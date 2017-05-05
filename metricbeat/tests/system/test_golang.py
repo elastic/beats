@@ -32,14 +32,7 @@ class Test(metricbeat.BaseTest):
 
         self.wait_until(lambda: self.output_lines() > 0)
         proc.check_kill_and_wait()
-
-        # Ensure no errors or warnings exist in the log.
-        log = self.get_log()
-        self.assertNotRegexpMatches(
-            log.replace(
-                "WARN EXPERIMENTAL",
-                ""),
-            "ERR|WARN")
+        self.assert_no_logged_warnings()
 
         output = self.read_output_json()
         evt = output[0]

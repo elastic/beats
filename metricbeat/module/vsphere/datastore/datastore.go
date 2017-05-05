@@ -29,7 +29,7 @@ type MetricSet struct {
 }
 
 func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
-	logp.Warn("EXPERIMENTAL: The vsphere datastore metricset is experimental")
+	logp.Experimental("The vsphere datastore metricset is experimental")
 
 	config := struct {
 		Username string `config:"username"`

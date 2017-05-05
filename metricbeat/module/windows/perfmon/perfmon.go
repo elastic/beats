@@ -31,7 +31,7 @@ type MetricSet struct {
 
 // New create a new instance of the MetricSet.
 func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
-	logp.Warn("BETA: The perfmon metricset is beta")
+	logp.Beta("The perfmon metricset is beta")
 
 	config := struct {
 		CounterConfig []CounterConfig `config:"perfmon.counters" validate:"required"`

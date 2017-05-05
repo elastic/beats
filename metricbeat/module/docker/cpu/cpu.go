@@ -23,7 +23,7 @@ type MetricSet struct {
 
 // New creates a new instance of the docker cpu MetricSet.
 func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
-	logp.Warn("BETA: The docker cpu metricset is beta")
+	logp.Beta("The docker cpu metricset is beta")
 
 	config := docker.Config{}
 	if err := base.Module().UnpackConfig(&config); err != nil {
