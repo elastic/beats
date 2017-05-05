@@ -39,7 +39,8 @@ type MetricSet struct {
 
 // New create a new instance of the MetricSet
 func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
-	logp.Warn("BETA: The php-fpm pool metricset is beta")
+	logp.Beta("The php_fpm pool metricset is beta")
+
 	return &MetricSet{
 		base,
 		helper.NewHTTP(base),

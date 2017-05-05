@@ -21,8 +21,7 @@ type MetricSet struct {
 }
 
 func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
-
-	logp.Warn("BETA: The memcached stats metricset is beta")
+	logp.Beta("The memcached stats metricset is beta")
 
 	return &MetricSet{
 		BaseMetricSet: base,
@@ -30,7 +29,6 @@ func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
 }
 
 func (m *MetricSet) Fetch() (common.MapStr, error) {
-
 	conn, err := net.DialTimeout("tcp", m.Host(), m.Module().Config().Timeout)
 	if err != nil {
 		return nil, err
