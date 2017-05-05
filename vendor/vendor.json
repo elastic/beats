@@ -323,22 +323,28 @@
 			"revisionTime": "2017-03-21T23:07:31Z"
 		},
 		{
-			"checksumSHA1": "EHW4AH6SCfTJGTrnqZ56PiOrJ7o=",
+			"checksumSHA1": "9ev6lHyQOxl1/VndOHAnMfbLmvs=",
 			"path": "github.com/shirou/gopsutil/disk",
-			"revision": "f18f7dcbae9dcf766ffefecb4c953cd6aab0bc6d",
-			"revisionTime": "2017-03-30T04:27:26Z"
+			"revision": "9af92986dda65a8c367157a82b484553e1ec1c55",
+			"revisionTime": "2017-04-30T14:39:46Z",
+			"version": "v2.17.04",
+			"versionExact": "v2.17.04"
 		},
 		{
 			"checksumSHA1": "hKDsT0KAOtA7UqiXYdO0RahnQZ8=",
 			"path": "github.com/shirou/gopsutil/internal/common",
-			"revision": "f18f7dcbae9dcf766ffefecb4c953cd6aab0bc6d",
-			"revisionTime": "2017-03-30T04:27:26Z"
+			"revision": "9af92986dda65a8c367157a82b484553e1ec1c55",
+			"revisionTime": "2017-04-30T14:39:46Z",
+			"version": "v2.17.04",
+			"versionExact": "v2.17.04"
 		},
 		{
-			"checksumSHA1": "zqdJo70e2vfUaNAs8hs3CA7ZmfQ=",
+			"checksumSHA1": "/MH6TIdlj16nThxkU9Bu+/WBm2w=",
 			"path": "github.com/shirou/gopsutil/net",
-			"revision": "f18f7dcbae9dcf766ffefecb4c953cd6aab0bc6d",
-			"revisionTime": "2017-03-30T04:27:26Z"
+			"revision": "9af92986dda65a8c367157a82b484553e1ec1c55",
+			"revisionTime": "2017-04-30T14:39:46Z",
+			"version": "v2.17.04",
+			"versionExact": "v2.17.04"
 		},
 		{
 			"checksumSHA1": "K0crHygPTP42i1nLKWphSlvOQJw=",

@@ -63,7 +63,7 @@ func Partitions(all bool) ([]PartitionStat, error) {
 	return ret, nil
 }
 
-func IOCounters() (map[string]IOCountersStat, error) {
+func IOCounters(names ...string) (map[string]IOCountersStat, error) {
 	ret := make(map[string]IOCountersStat)
 
 	r, err := syscall.Sysctl("hw.diskstats")
@@ -83,6 +83,10 @@ func IOCounters() (map[string]IOCountersStat, error) {
 			continue
 		}
 		name := common.IntToString(d.Name[:])
+
+		if len(names) > 0 && !common.StringsHas(names, name) {
+			continue
+		}
 
 		ds := IOCountersStat{
 			ReadCount:  d.Rxfer,

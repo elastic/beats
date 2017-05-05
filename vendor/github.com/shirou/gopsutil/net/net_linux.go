@@ -32,15 +32,20 @@ func IOCountersByFile(pernic bool, filename string) ([]IOCountersStat, error) {
 		return nil, err
 	}
 
+	parts := make([]string, 2)
+
 	statlen := len(lines) - 1
 
 	ret := make([]IOCountersStat, 0, statlen)
 
 	for _, line := range lines[2:] {
-		parts := strings.SplitN(line, ": ", 2)
-		if len(parts) != 2 {
+		separatorPos := strings.LastIndex(line, ":")
+		if separatorPos == -1 {
 			continue
 		}
+		parts[0] = line[0:separatorPos]
+		parts[1] = line[separatorPos+1:]
+
 		interfaceName := strings.TrimSpace(parts[0])
 		if interfaceName == "" {
 			continue
@@ -346,12 +351,13 @@ func ConnectionsPidMax(kind string, pid int32, max int) ([]ConnectionStat, error
 }
 
 func statsFromInodes(root string, pid int32, tmap []netConnectionKindType, inodes map[string][]inodeMap) ([]ConnectionStat, error) {
-	dupCheckMap := make(map[connTmp]struct{})
+	dupCheckMap := make(map[string]struct{})
 	var ret []ConnectionStat
 
 	var err error
 	for _, t := range tmap {
 		var path string
+		var connKey string
 		var ls []connTmp
 		path = fmt.Sprintf("%s/net/%s", root, t.filename)
 		switch t.family {
@@ -366,7 +372,11 @@ func statsFromInodes(root string, pid int32, tmap []netConnectionKindType, inode
 			return nil, err
 		}
 		for _, c := range ls {
-			if _, ok := dupCheckMap[c]; ok {
+			// Build TCP key to id the connection uniquely
+			// socket type, src ip, src port, dst ip, dst port and state should be enough
+			// to prevent duplications.
+			connKey = fmt.Sprintf("%d-%s:%d-%s:%d-%s", c.sockType, c.laddr.IP, c.laddr.Port, c.raddr.IP, c.raddr.Port, c.status)
+			if _, ok := dupCheckMap[connKey]; ok {
 				continue
 			}
 
@@ -390,7 +400,7 @@ func statsFromInodes(root string, pid int32, tmap []netConnectionKindType, inode
 			conn.Uids, _ = proc.getUids()
 
 			ret = append(ret, conn)
-			dupCheckMap[c] = struct{}{}
+			dupCheckMap[connKey] = struct{}{}
 		}
 
 	}
