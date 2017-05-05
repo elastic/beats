@@ -11,6 +11,7 @@ import (
 	_ "github.com/elastic/beats/packetbeat/protos/applayer"
 	_ "github.com/elastic/beats/packetbeat/protos/cassandra"
 	_ "github.com/elastic/beats/packetbeat/protos/dns"
+	_ "github.com/elastic/beats/packetbeat/protos/graphite"
 	_ "github.com/elastic/beats/packetbeat/protos/http"
 	_ "github.com/elastic/beats/packetbeat/protos/icmp"
 	_ "github.com/elastic/beats/packetbeat/protos/memcache"
