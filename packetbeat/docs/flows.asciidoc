@@ -9,22 +9,14 @@ your network.
 
 For each flow, Packetbeat reports the number of packets and the total number of
 bytes sent from the source to the destination. Each flow event also contains
-information about the source and destination hosts, such as their IP address and
-location. For bi-directional flows, Packetbeat reports statistics for the reverse
-flow.
+information about the source and destination hosts, such as their IP address.
+For bi-directional flows, Packetbeat reports statistics for the reverse flow.
 
-Packetbeat collects and reports statistics per flow on the following network
-layers:
+Packetbeat collects and reports statistics up to and including the transport
+layer. See <<exported-fields-flows_event>> for more info about the exported
+data.
 
-* IP/TCP
-* UDP
-* SSL
-
-//REVEIWER: Not sure this list is complete. should it also say Application? Anything else?
-
-Here's an example of flow events visualized in the Flows dashbaord:
-
-//REVIEWERS: Is it OK for me to show all these IP addresses (not sure what might be sensitive)? I don't worry about that as much as I should, but now that I know Mr. Robot is watching...perhaps I should be more careful. Do we have a better image to use? This one is actually from a v5.3.
+Here's an example of flow events visualized in the Flows dashboard:
 
 image:./images/flows.png[]
 
@@ -40,29 +32,21 @@ packetbeat.flows:
 
 See <<configuration-flows>> for more info about these configuration options.
 
-Here’s an example of a flow event sent by Packetbeat. See
+Here’s an example of a flow information sent by Packetbeat. See
 <<exported-fields-flows_event>> for a description of each field.
-
-//REVIEWERS: As always, I sit on the fence about whether to show the output event because it may change.
 
 ["source","json",subs="attributes"]
 --------------------------------------------------------------------------------
-{
-  "_index": "packetbeat-2017.05.03",
-  "_type": "flow",
-  "_id": "AVvP1gAcqsX8rEl-yTHr",
-  "_version": 1,
-  "_score": null,
   "_source": {
     "@timestamp": "2017-05-03T19:42:40.003Z",
     "beat": {
-      "hostname": "My-MacBook-Pro.local",
-      "name": "My-MacBook-Pro.local",
+      "hostname": "host.example.com",
+      "name": "host.example.com",
       "version": "{stack-version}"
     },
     "connection_id": "AQAAAAAAAAA=",
     "dest": {
-      "ip": "65.208.228.223",
+      "ip": "192.0.2.0",
       "mac": "fe:ff:20:00:01:00",
       "port": 80,
       "stats": {
@@ -70,11 +54,11 @@ Here’s an example of a flow event sent by Packetbeat. See
         "net_packets_total": 16
       }
     },
-    "final": false,
+    "final": false, <1>
     "flow_id": "EQwA////DP//////FBgBAAEAAAEAAAD+/yAAAQCR/qDtQdDk3ywNUAABAAAAAAAAAA",
     "last_time": "2017-05-03T19:42:24.151Z",
     "source": {
-      "ip": "145.254.160.237",
+      "ip": "203.0.113.0",
       "mac": "00:00:01:00:00:00",
       "port": 3372,
       "stats": {
@@ -100,5 +84,11 @@ Here’s an example of a flow event sent by Packetbeat. See
   "sort": [
     1493840560003
   ]
-}
 --------------------------------------------------------------------------------
+
+<1> Packetbeat sets the `final` flag to `false` to indicate that the event
+contains an intermediate report about a flow that it's tracking. When the flow
+completes, Packetbeat sends one last event with `final` set to `true`. If you
+want to aggregate sums of traffic, you need to filter on `final:true`, or use
+some other technique, so that you get only the latest update from each flow.
+You can disable intermediate reports by setting `period: -1`.
