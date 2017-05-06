@@ -156,6 +156,15 @@ type ProcTime struct {
 	Total     uint64
 }
 
+type ProcIO struct {
+	ReadChar            uint64
+	WriteChar           uint64
+	SysCounterRead      uint64
+	SysCounterWrite     uint64
+	ReadBytes           uint64
+	WriteBytes          uint64
+}
+
 type ProcArgs struct {
 	List []string
 }
