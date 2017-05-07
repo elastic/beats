@@ -5,6 +5,7 @@ system. One event is created for each disk mounted on the system.
 
 This metricset is available on:
 
+- macOS (requires 10.10+)
 - Linux
 - Windows
 - FreeBSD (amd64)
