@@ -2,6 +2,7 @@
   title: Kubernetes info
   description: >
     Kubernetes metadata added by the kubernetes processor
+  anchor: kubernetes-processor
   fields:
     - name: kubernetes.pod.name
       type: keyword

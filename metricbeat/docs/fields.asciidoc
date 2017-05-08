@@ -3863,7 +3863,7 @@ type: long
 Total number of connections.
 
 
-[[exported-fields-kubernetes]]
+[[exported-fields-kubernetes-processor]]
 == Kubernetes info Fields
 
 Kubernetes metadata added by the kubernetes processor
