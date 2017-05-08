@@ -5,6 +5,6 @@
   "uiStateJSON": "{\"vis\":{\"params\":{\"sort\":{\"columnIndex\":null,\"direction\":null}}}}", 
   "version": 1, 
   "kibanaSavedObjectMeta": {
-    "searchSourceJSON": "{\"index\":\"metricbeat-*\",\"query\":{\"query_string\":{\"query\":\"*\",\"analyze_wildcard\":true}},\"filter\":[{\"meta\":{\"index\":\"metricbeat-*\",\"key\":\"beat.name\",\"value\":\"mar.local\",\"disabled\":false,\"negate\":false,\"alias\":null},\"query\":{\"match\":{\"beat.name\":{\"query\":\"mar.local\",\"type\":\"phrase\"}}},\"$state\":{\"store\":\"globalState\"}}]}"
+    "searchSourceJSON": "{\"index\":\"metricbeat-*\",\"query\":{\"query_string\":{\"query\":\"*\",\"analyze_wildcard\":true}},\"filter\":[]}"
   }
 }
