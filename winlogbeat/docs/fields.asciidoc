@@ -16,7 +16,7 @@ grouped in the following categories:
 * <<exported-fields-cloud>>
 * <<exported-fields-common>>
 * <<exported-fields-eventlog>>
-* <<exported-fields-kubernetes>>
+* <<exported-fields-kubernetes-processor>>
 
 --
 [[exported-fields-beat]]
@@ -428,7 +428,7 @@ The raw XML representation of the event obtained from Windows. This field is onl
 The XML representation of the event is useful for troubleshooting purposes. The data in the fields reported by Winlogbeat can be compared to the data in the XML to diagnose problems.
 
 
-[[exported-fields-kubernetes]]
+[[exported-fields-kubernetes-processor]]
 == Kubernetes info Fields
 
 Kubernetes metadata added by the kubernetes processor
