@@ -94,7 +94,8 @@ grouped in the following categories:
     # Sort alphabetically by key
     for section in sorted(docs, key=lambda field: field["key"]):
         section["name"] = section["title"]
-        section["anchor"] = section["key"]
+        if "anchor" not in section:
+            section["anchor"] = section["key"]
         document_fields(output, section, sections, "")
 
 
