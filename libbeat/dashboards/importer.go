@@ -93,7 +93,7 @@ func (imp Importer) CreateKibanaIndex() error {
 			},
 		})
 	if err != nil {
-		fmt.Fprintln(os.Stderr, fmt.Sprintf("Failed to set the mapping - %s", err))
+		imp.statusMsg("Failed to set the mapping: %v", err)
 	}
 	return nil
 }
@@ -360,12 +360,13 @@ func (imp Importer) unzip(archive, target string) error {
 		return err
 	}
 
-	for _, file := range reader.File {
+	// Closure to close the files on each iteration
+	unzipFile := func(file *zip.File) error {
 		filePath := filepath.Join(target, file.Name)
 
 		if file.FileInfo().IsDir() {
 			os.MkdirAll(filePath, file.Mode())
-			continue
+			return nil
 		}
 		fileReader, err := file.Open()
 		if err != nil {
@@ -382,6 +383,14 @@ func (imp Importer) unzip(archive, target string) error {
 		if _, err := io.Copy(targetFile, fileReader); err != nil {
 			return err
 		}
+		return nil
+	}
+
+	for _, file := range reader.File {
+		err := unzipFile(file)
+		if err != nil {
+			return err
+		}
 	}
 	return nil
 }
@@ -392,16 +401,16 @@ func (imp Importer) ImportArchive() error {
 
 	target, err := ioutil.TempDir("", "tmp")
 	if err != nil {
-		return errors.New("Failed to generate a temporary directory name")
+		return fmt.Errorf("Failed to generate a temporary directory name: %v", err)
 	}
 
 	if err = os.MkdirAll(target, 0755); err != nil {
-		return fmt.Errorf("Failed to create a temporary directory: %v", target)
+		return fmt.Errorf("Failed to create a temporary directory %s: %v", target, err)
 	}
 
 	defer os.RemoveAll(target) // clean up
 
-	imp.statusMsg("Create temporary directory %s", target)
+	imp.statusMsg("Created temporary directory %s", target)
 	if imp.cfg.File != "" {
 		archive = imp.cfg.File
 	} else if imp.cfg.Snapshot {
@@ -422,7 +431,7 @@ func (imp Importer) ImportArchive() error {
 
 	err = imp.unzip(archive, target)
 	if err != nil {
-		return fmt.Errorf("Failed to unzip the archive: %s", archive)
+		return fmt.Errorf("Failed to unzip the archive: %s: %v", archive, err)
 	}
 	dirs, err := getDirectories(target)
 	if err != nil {
