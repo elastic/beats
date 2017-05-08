@@ -39,7 +39,9 @@ filebeat.prospectors:
     - /var/path2/*.log
 -------------------------------------------------------------------------------------
 
-Filebeat currently supports two `prospector` types: `log` and `stdin`. Each prospector type can be defined multiple times. The `log` prospector checks each file to see whether a harvester needs to be started, whether one is already running, or whether the file can be ignored (see <<ignore-older,`ignore_older`>>). New files are only picked up if the size of the file has changed since the harvester was closed.
+Filebeat currently supports two `prospector` types: `log` and `stdin`. Each prospector type can be defined multiple times. The `log` prospector checks each file to see whether a harvester needs to be started, whether one is already running, or whether the file can be ignored (see <<ignore-older,`ignore_older`>>). New lines are only picked up if the size of the file has changed since the harvester was closed.
+
+NOTE: Filebeat prospectors can only read local files. There is no functionality to connect to remote hosts to read stored files or logs.
 
 [float]
 === How Does Filebeat Keep the State of Files?
