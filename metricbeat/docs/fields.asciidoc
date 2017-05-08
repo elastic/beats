@@ -27,6 +27,7 @@ grouped in the following categories:
 * <<exported-fields-jolokia>>
 * <<exported-fields-kafka>>
 * <<exported-fields-kibana>>
+* <<exported-fields-kubernetes-processor>>
 * <<exported-fields-kubernetes>>
 * <<exported-fields-memcached>>
 * <<exported-fields-mongodb>>
