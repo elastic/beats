@@ -21,7 +21,7 @@ grouped in the following categories:
 * <<exported-fields-flows_event>>
 * <<exported-fields-http>>
 * <<exported-fields-icmp>>
-* <<exported-fields-kubernetes>>
+* <<exported-fields-kubernetes-processor>>
 * <<exported-fields-memcache>>
 * <<exported-fields-mongodb>>
 * <<exported-fields-mysql>>
@@ -1902,7 +1902,7 @@ type: long
 
 The response code.
 
-[[exported-fields-kubernetes]]
+[[exported-fields-kubernetes-processor]]
 == Kubernetes info Fields
 
 Kubernetes metadata added by the kubernetes processor

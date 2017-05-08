@@ -87,8 +87,11 @@ grouped in the following categories:
     for v in docs:
         sections[v["key"]] = v["title"]
 
-    for key in sorted(sections):
-        output.write("* <<exported-fields-{}>>\n".format(key))
+    for section in sorted(docs, key=lambda field: field["key"]):
+        if "anchor" not in section:
+            section["anchor"] = section["key"]
+
+        output.write("* <<exported-fields-{}>>\n".format(section["anchor"]))
     output.write("\n--\n")
 
     # Sort alphabetically by key
