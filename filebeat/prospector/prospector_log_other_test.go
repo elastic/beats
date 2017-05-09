@@ -131,24 +131,22 @@ func TestInit(t *testing.T) {
 
 	for _, test := range initStateTests {
 		l := Log{
-			Prospector: &Prospector{
-				states: &file.States{},
-				outlet: TestOutlet{},
-			},
 			config: prospectorConfig{
 				Paths: test.paths,
 			},
+			states: &file.States{},
+			outlet: TestOutlet{},
 		}
-		states := file.NewStates()
+
 		// Set states to finished
 		for i, state := range test.states {
 			state.Finished = true
 			test.states[i] = state
 		}
-		states.SetStates(test.states)
-		err := l.LoadStates(states.GetStates())
+
+		err := l.loadStates(test.states)
 		assert.NoError(t, err)
-		assert.Equal(t, test.count, l.Prospector.states.Count())
+		assert.Equal(t, test.count, l.states.Count())
 	}
 
 }

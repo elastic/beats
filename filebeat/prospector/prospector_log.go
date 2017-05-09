@@ -1,13 +1,17 @@
 package prospector
 
 import (
+	"errors"
 	"fmt"
 	"os"
 	"path/filepath"
 	"time"
 
+	"github.com/elastic/beats/filebeat/channel"
 	"github.com/elastic/beats/filebeat/harvester"
 	"github.com/elastic/beats/filebeat/input/file"
+	"github.com/elastic/beats/filebeat/util"
+	"github.com/elastic/beats/libbeat/common"
 	"github.com/elastic/beats/libbeat/logp"
 	"github.com/elastic/beats/libbeat/monitoring"
 )
@@ -23,21 +27,46 @@ var (
 
 // Log contains the prospector and its config
 type Log struct {
-	Prospector *Prospector
-	config     prospectorConfig
+	cfg      *common.Config
+	config   prospectorConfig
+	states   *file.States
+	registry *harvesterRegistry
+	outlet   channel.Outleter
+	done     chan struct{}
 }
 
 // NewLog instantiates a new Log
-func NewLog(p *Prospector) (*Log, error) {
+func NewLog(cfg *common.Config, states []file.State, registry *harvesterRegistry, outlet channel.Outleter, done chan struct{}) (*Log, error) {
 
 	prospectorer := &Log{
-		Prospector: p,
-		config:     p.config,
+		cfg:      cfg,
+		registry: registry,
+		outlet:   outlet,
+		states:   &file.States{},
+		done:     done,
 	}
 
-	if len(p.config.Paths) == 0 {
+	if err := cfg.Unpack(&prospectorer.config); err != nil {
+		return nil, err
+	}
+
+	// Create empty harvester to check if configs are fine
+	// TODO: Do config validation instead
+	_, err := prospectorer.createHarvester(file.State{})
+	if err != nil {
+		return nil, err
+	}
+
+	if len(prospectorer.config.Paths) == 0 {
 		return nil, fmt.Errorf("each prospector must have at least one path defined")
 	}
+
+	err = prospectorer.loadStates(states)
+	if err != nil {
+		return nil, err
+	}
+
+	logp.Debug("prospector", "File Configs: %v", prospectorer.config.Paths)
 
 	return prospectorer, nil
 }
@@ -45,7 +74,7 @@ func NewLog(p *Prospector) (*Log, error) {
 // LoadStates loads states into prospector
 // It goes through all states coming from the registry. Only the states which match the glob patterns of
 // the prospector will be loaded and updated. All other states will not be touched.
-func (l *Log) LoadStates(states []file.State) error {
+func (l *Log) loadStates(states []file.State) error {
 	logp.Debug("prospector", "exclude_files: %s", l.config.ExcludeFiles)
 
 	for _, state := range states {
@@ -59,7 +88,7 @@ func (l *Log) LoadStates(states []file.State) error {
 			}
 
 			// Update prospector states and send new states to registry
-			err := l.Prospector.updateState(state)
+			err := l.updateState(state)
 			if err != nil {
 				logp.Err("Problem putting initial state: %+v", err)
 				return err
@@ -67,7 +96,7 @@ func (l *Log) LoadStates(states []file.State) error {
 		}
 	}
 
-	logp.Info("Prospector with previous states loaded: %v", l.Prospector.states.Count())
+	logp.Info("Prospector with previous states loaded: %v", l.states.Count())
 	return nil
 }
 
@@ -92,14 +121,14 @@ func (l *Log) Run() {
 
 	// It is important that a first scan is run before cleanup to make sure all new states are read first
 	if l.config.CleanInactive > 0 || l.config.CleanRemoved {
-		beforeCount := l.Prospector.states.Count()
-		cleanedStates := l.Prospector.states.Cleanup()
+		beforeCount := l.states.Count()
+		cleanedStates := l.states.Cleanup()
 		logp.Debug("prospector", "Prospector states cleaned up. Before: %d, After: %d", beforeCount, beforeCount-cleanedStates)
 	}
 
 	// Marking removed files to be cleaned up. Cleanup happens after next scan to make sure all states are updated first
 	if l.config.CleanRemoved {
-		for _, state := range l.Prospector.states.GetStates() {
+		for _, state := range l.states.GetStates() {
 			// os.Stat will return an error in case the file does not exist
 			stat, err := os.Stat(state.Source)
 			if err != nil {
@@ -130,7 +159,7 @@ func (l *Log) removeState(state file.State) {
 	}
 
 	state.TTL = 0
-	err := l.Prospector.updateState(state)
+	err := l.updateState(state)
 	if err != nil {
 		logp.Err("File cleanup state update error: %s", err)
 	}
@@ -239,7 +268,7 @@ func (l *Log) scan() {
 	for path, info := range l.getFiles() {
 
 		select {
-		case <-l.Prospector.done:
+		case <-l.done:
 			logp.Info("Scan aborted because prospector stopped.")
 			return
 		default:
@@ -256,7 +285,7 @@ func (l *Log) scan() {
 		newState := file.NewState(info, path, l.config.InputType)
 
 		// Load last state
-		lastState := l.Prospector.states.FindPrevious(newState)
+		lastState := l.states.FindPrevious(newState)
 
 		// Ignores all files which fall under ignore_older
 		if l.isIgnoreOlder(newState) {
@@ -270,7 +299,7 @@ func (l *Log) scan() {
 		// Decides if previous state exists
 		if lastState.IsEmpty() {
 			logp.Debug("prospector", "Start harvester for new file: %s", newState.Source)
-			err := l.Prospector.startHarvester(newState, 0)
+			err := l.startHarvester(newState, 0)
 			if err != nil {
 				logp.Err("Harvester could not be started on new file: %s, Err: %s", newState.Source, err)
 			}
@@ -293,7 +322,7 @@ func (l *Log) harvestExistingFile(newState file.State, oldState file.State) {
 		// This could also be an issue with force_close_older that a new harvester is started after each scan but not needed?
 		// One problem with comparing modTime is that it is in seconds, and scans can happen more then once a second
 		logp.Debug("prospector", "Resuming harvesting of file: %s, offset: %v", newState.Source, oldState.Offset)
-		err := l.Prospector.startHarvester(newState, oldState.Offset)
+		err := l.startHarvester(newState, oldState.Offset)
 		if err != nil {
 			logp.Err("Harvester could not be started on existing file: %s, Err: %s", newState.Source, err)
 		}
@@ -303,7 +332,7 @@ func (l *Log) harvestExistingFile(newState file.State, oldState file.State) {
 	// File size was reduced -> truncated file
 	if oldState.Finished && newState.Fileinfo.Size() < oldState.Offset {
 		logp.Debug("prospector", "Old file was truncated. Starting from the beginning: %s", newState.Source)
-		err := l.Prospector.startHarvester(newState, 0)
+		err := l.startHarvester(newState, 0)
 		if err != nil {
 			logp.Err("Harvester could not be started on truncated file: %s, Err: %s", newState.Source, err)
 		}
@@ -322,7 +351,7 @@ func (l *Log) harvestExistingFile(newState file.State, oldState file.State) {
 			logp.Debug("prospector", "Updating state for renamed file: %s -> %s, Current offset: %v", oldState.Source, newState.Source, oldState.Offset)
 			// Update state because of file rotation
 			oldState.Source = newState.Source
-			err := l.Prospector.updateState(oldState)
+			err := l.updateState(oldState)
 			if err != nil {
 				logp.Err("File rotation state update error: %s", err)
 			}
@@ -366,7 +395,7 @@ func (l *Log) handleIgnoreOlder(lastState, newState file.State) error {
 
 	// Write state for ignore_older file as none exists yet
 	newState.Finished = true
-	err := l.Prospector.updateState(newState)
+	err := l.updateState(newState)
 	if err != nil {
 		return err
 	}
@@ -410,4 +439,73 @@ func (l *Log) isCleanInactive(state file.State) bool {
 	}
 
 	return false
+}
+
+// createHarvester creates a new harvester instance from the given state
+func (l *Log) createHarvester(state file.State) (*harvester.Harvester, error) {
+
+	// Each harvester gets its own copy of the outlet
+	outlet := l.outlet.Copy()
+	h, err := harvester.NewHarvester(
+		l.cfg,
+		state,
+		l.states,
+		outlet,
+	)
+
+	return h, err
+}
+
+// startHarvester starts a new harvester with the given offset
+// In case the HarvesterLimit is reached, an error is returned
+func (l *Log) startHarvester(state file.State, offset int64) error {
+
+	if l.config.HarvesterLimit > 0 && l.registry.len() >= l.config.HarvesterLimit {
+		harvesterSkipped.Add(1)
+		return fmt.Errorf("Harvester limit reached")
+	}
+
+	// Set state to "not" finished to indicate that a harvester is running
+	state.Finished = false
+	state.Offset = offset
+
+	// Create harvester with state
+	h, err := l.createHarvester(state)
+	if err != nil {
+		return err
+	}
+
+	reader, err := h.Setup()
+	if err != nil {
+		return fmt.Errorf("Error setting up harvester: %s", err)
+	}
+
+	l.registry.start(h, reader)
+
+	return nil
+}
+
+// updateState updates the prospector state and forwards the event to the spooler
+// All state updates done by the prospector itself are synchronous to make sure not states are overwritten
+func (l *Log) updateState(state file.State) error {
+
+	// Add ttl if cleanOlder is enabled and TTL is not already 0
+	if l.config.CleanInactive > 0 && state.TTL != 0 {
+		state.TTL = l.config.CleanInactive
+	}
+
+	// Update first internal state
+	l.states.Update(state)
+
+	data := util.NewData()
+	data.SetState(state)
+
+	ok := l.outlet.OnEvent(data)
+
+	if !ok {
+		logp.Info("Prospector outlet closed")
+		return errors.New("prospector outlet closed")
+	}
+
+	return nil
 }

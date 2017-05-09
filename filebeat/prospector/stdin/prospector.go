@@ -38,11 +38,6 @@ func NewProspector(cfg *common.Config, outlet channel.Outleter) (*Stdin, error) 
 	return prospectorer, nil
 }
 
-// LoadStates loads the states
-func (s *Stdin) LoadStates(states []file.State) error {
-	return nil
-}
-
 // Run runs the prospector
 func (s *Stdin) Run() {
 
