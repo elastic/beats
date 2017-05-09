@@ -26,7 +26,6 @@ class Test(BaseTest):
 
         assert exit_code == 1
         assert self.log_contains("error loading config file") is True
-        assert self.log_contains("no such file or directory") is True
 
     def test_invalid_config(self):
         """
