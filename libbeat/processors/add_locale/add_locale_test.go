@@ -1,6 +1,7 @@
 package add_locale
 
 import (
+	"regexp"
 	"testing"
 	"time"
 
@@ -9,8 +10,13 @@ import (
 	"github.com/stretchr/testify/assert"
 )
 
-func TestExportTimeZone(t *testing.T) {
-	var testConfig = common.NewConfig()
+func TestExportTimezone(t *testing.T) {
+	testConfig, err := common.NewConfigFrom(map[string]interface{}{
+		"format": "abbrevation",
+	})
+	if err != nil {
+		t.Fatal(err)
+	}
 
 	input := common.MapStr{}
 
@@ -25,6 +31,38 @@ func TestExportTimeZone(t *testing.T) {
 	}
 
 	assert.Equal(t, expected.String(), actual.String())
+}
+
+func TestTimezoneFormat(t *testing.T) {
+	// Test positive format
+
+	posLoc, err := time.LoadLocation("Africa/Asmara")
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	posZone, posOffset := time.Now().In(posLoc).Zone()
+
+	posAddLocal := addLocale{TimezoneFormat: Offset}
+
+	posVal := posAddLocal.Format(posZone, posOffset)
+
+	assert.Regexp(t, regexp.MustCompile(`\+[\d]{2}\:[\d]{2}`), posVal)
+
+	// Test negative format
+
+	negLoc, err := time.LoadLocation("America/Curacao")
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	negZone, negOffset := time.Now().In(negLoc).Zone()
+
+	negAddLocal := addLocale{TimezoneFormat: Offset}
+
+	negVal := negAddLocal.Format(negZone, negOffset)
+
+	assert.Regexp(t, regexp.MustCompile(`\-[\d]{2}\:[\d]{2}`), negVal)
 }
 
 func getActualValue(t *testing.T, config *common.Config, input common.MapStr) common.MapStr {
