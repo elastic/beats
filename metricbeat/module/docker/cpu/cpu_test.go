@@ -65,7 +65,7 @@ func TestCPUService_TotalUsage(t *testing.T) {
 		given    dc.Stats
 		expected float64
 	}{
-		{statsList[0], 0},
+		{statsList[0], -1},
 		{statsList[1], 0.50},
 		{statsList[2], 0},
 	}
@@ -88,7 +88,7 @@ func TestCPUService_UsageInKernelmode(t *testing.T) {
 		given    dc.Stats
 		expected float64
 	}{
-		{statsList[0], 0},
+		{statsList[0], -1},
 		{statsList[1], 0.50},
 		{statsList[2], 0},
 	}
@@ -112,7 +112,7 @@ func TestCPUService_UsageInUsermode(t *testing.T) {
 		expected float64
 	}{
 		{statsList[0], 0.50},
-		{statsList[1], 0},
+		{statsList[1], -1},
 		{statsList[2], 1},
 	}
 	for _, tt := range testCase {
