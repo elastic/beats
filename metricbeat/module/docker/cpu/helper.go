@@ -5,6 +5,7 @@ import (
 
 	"github.com/elastic/beats/libbeat/common"
 	"github.com/elastic/beats/metricbeat/module/docker"
+	"github.com/elastic/beats1/libbeat/logp"
 
 	dc "github.com/fsouza/go-dockerclient"
 )
@@ -93,10 +94,15 @@ func systemUsage(stats *dc.Stats) float64 {
 	return calculateLoad(stats.CPUStats.SystemCPUUsage, stats.PreCPUStats.SystemCPUUsage)
 }
 
+// This function is meant to calculate the % CPU time change between two successive readings.
+// The "oldValue" refers to the CPU statistics of the last read.
+// Time here is expressed by second and not by nanoseconde.
+// The main goal is to expose the %, in the same way, it's displayed by docker Client.
 func calculateLoad(newValue uint64, oldValue uint64) float64 {
 	value := float64(newValue) - float64(oldValue)
 	if value < 0 {
-		value = 0
+		logp.Err("time change calculation failed")
+		return -1
 	}
 	return value / float64(1000000000)
 }
