@@ -37,53 +37,39 @@ Here’s an example of a flow information sent by Packetbeat. See
 
 ["source","json",subs="attributes"]
 --------------------------------------------------------------------------------
-  "_source": {
-    "@timestamp": "2017-05-03T19:42:40.003Z",
-    "beat": {
-      "hostname": "host.example.com",
-      "name": "host.example.com",
-      "version": "{stack-version}"
-    },
-    "connection_id": "AQAAAAAAAAA=",
-    "dest": {
-      "ip": "192.0.2.0",
-      "mac": "fe:ff:20:00:01:00",
-      "port": 80,
-      "stats": {
-        "net_bytes_total": 19236,
-        "net_packets_total": 16
-      }
-    },
-    "final": false, <1>
-    "flow_id": "EQwA////DP//////FBgBAAEAAAEAAAD+/yAAAQCR/qDtQdDk3ywNUAABAAAAAAAAAA",
-    "last_time": "2017-05-03T19:42:24.151Z",
-    "source": {
-      "ip": "203.0.113.0",
-      "mac": "00:00:01:00:00:00",
-      "port": 3372,
-      "stats": {
-        "net_bytes_total": 1243,
-        "net_packets_total": 14
-      }
-    },
-    "start_time": "2017-05-03T19:42:24.151Z",
-    "transport": "tcp",
-    "type": "flow"
+{
+  "@timestamp": "2017-05-03T19:42:40.003Z",
+  "beat": {
+    "hostname": "host.example.com",
+    "name": "host.example.com",
+    "version": "{stack-version}"
   },
-  "fields": {
-    "start_time": [
-      1493840544151
-    ],
-    "last_time": [
-      1493840544151
-    ],
-    "@timestamp": [
-      1493840560003
-    ]
+  "connection_id": "AQAAAAAAAAA=",
+  "dest": {
+    "ip": "192.0.2.0",
+    "mac": "fe:ff:20:00:01:00",
+    "port": 80,
+    "stats": {
+      "net_bytes_total": 19236,
+      "net_packets_total": 16
+    }
   },
-  "sort": [
-    1493840560003
-  ]
+  "final": false, <1>
+  "flow_id": "EQwA////DP//////FBgBAAEAAAEAAAD+/yAAAQCR/qDtQdDk3ywNUAABAAAAAAAAAA",
+  "last_time": "2017-05-03T19:42:24.151Z",
+  "source": {
+    "ip": "203.0.113.0",
+    "mac": "00:00:01:00:00:00",
+    "port": 3372,
+    "stats": {
+      "net_bytes_total": 1243,
+      "net_packets_total": 14
+    }
+  },
+  "start_time": "2017-05-03T19:42:24.151Z",
+  "transport": "tcp",
+  "type": "flow"
+}
 --------------------------------------------------------------------------------
 
 <1> Packetbeat sets the `final` flag to `false` to indicate that the event
