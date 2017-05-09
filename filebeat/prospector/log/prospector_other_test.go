@@ -1,6 +1,6 @@
 // +build !windows
 
-package prospector
+package log
 
 import (
 	"testing"
@@ -61,14 +61,14 @@ func TestMatchFile(t *testing.T) {
 
 	for _, test := range matchTests {
 
-		l := Log{
-			config: prospectorConfig{
+		p := Prospector{
+			config: config{
 				Paths:        test.paths,
 				ExcludeFiles: test.excludeFiles,
 			},
 		}
 
-		assert.Equal(t, test.result, l.matchesFile(test.file))
+		assert.Equal(t, test.result, p.matchesFile(test.file))
 	}
 }
 
@@ -130,8 +130,8 @@ var initStateTests = []struct {
 func TestInit(t *testing.T) {
 
 	for _, test := range initStateTests {
-		l := Log{
-			config: prospectorConfig{
+		p := Prospector{
+			config: config{
 				Paths: test.paths,
 			},
 			states: &file.States{},
@@ -144,9 +144,9 @@ func TestInit(t *testing.T) {
 			test.states[i] = state
 		}
 
-		err := l.loadStates(test.states)
+		err := p.loadStates(test.states)
 		assert.NoError(t, err)
-		assert.Equal(t, test.count, l.states.Count())
+		assert.Equal(t, test.count, p.states.Count())
 	}
 
 }

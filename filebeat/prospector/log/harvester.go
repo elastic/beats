@@ -9,7 +9,7 @@
 //  line. As soon as the line is completed, it is read and returned.
 //
 //  The stdin harvesters reads data from stdin.
-package harvester
+package log
 
 import (
 	"errors"
@@ -18,7 +18,7 @@ import (
 
 	"github.com/satori/go.uuid"
 
-	"github.com/elastic/beats/filebeat/config"
+	cfg "github.com/elastic/beats/filebeat/config"
 	"github.com/elastic/beats/filebeat/harvester/encoding"
 	"github.com/elastic/beats/filebeat/harvester/source"
 	"github.com/elastic/beats/filebeat/input/file"
@@ -43,7 +43,7 @@ type Outlet interface {
 }
 
 type Harvester struct {
-	config          harvesterConfig
+	config          config
 	state           file.State
 	states          *file.States
 	file            source.FileSource /* the file being watched */
@@ -59,7 +59,7 @@ type Harvester struct {
 }
 
 func NewHarvester(
-	cfg *common.Config,
+	config *common.Config,
 	state file.State,
 	states *file.States,
 	outlet Outlet,
@@ -75,7 +75,7 @@ func NewHarvester(
 		ID:     uuid.NewV4(),
 	}
 
-	if err := cfg.Unpack(&h.config); err != nil {
+	if err := config.Unpack(&h.config); err != nil {
 		return nil, err
 	}
 
@@ -107,12 +107,12 @@ func NewHarvester(
 func (h *Harvester) open() error {
 
 	switch h.config.InputType {
-	case config.StdinInputType:
+	case cfg.StdinInputType:
 		return h.openStdin()
-	case config.LogInputType:
+	case cfg.LogInputType:
 		return h.openFile()
 	default:
-		return fmt.Errorf("Invalid input type")
+		return fmt.Errorf("Invalid harvester type: %+v", h.config)
 	}
 }
 

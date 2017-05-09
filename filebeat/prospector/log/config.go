@@ -1,22 +1,34 @@
-package harvester
+package log
 
 import (
 	"fmt"
 	"time"
 
+	"github.com/dustin/go-humanize"
 	cfg "github.com/elastic/beats/filebeat/config"
 	"github.com/elastic/beats/filebeat/harvester/reader"
-
-	"github.com/dustin/go-humanize"
 	"github.com/elastic/beats/libbeat/common"
 	"github.com/elastic/beats/libbeat/common/match"
 	"github.com/elastic/beats/libbeat/processors"
 )
 
 var (
-	defaultConfig = harvesterConfig{
-		BufferSize:    16 * humanize.KiByte,
+	defaultConfig = config{
+		// Common
 		InputType:     cfg.DefaultInputType,
+		CleanInactive: 0,
+
+		// Prospector
+		Enabled:        true,
+		IgnoreOlder:    0,
+		ScanFrequency:  10 * time.Second,
+		CleanRemoved:   true,
+		HarvesterLimit: 0,
+		Symlinks:       false,
+		TailFiles:      false,
+
+		// Harvester
+		BufferSize:    16 * humanize.KiByte,
 		Backoff:       1 * time.Second,
 		BackoffFactor: 2,
 		MaxBackoff:    10 * time.Second,
@@ -26,15 +38,31 @@ var (
 		CloseRenamed:  false,
 		CloseEOF:      false,
 		CloseTimeout:  0,
-		CleanInactive: 0,
 	}
 )
 
-type harvesterConfig struct {
+type config struct {
+
+	// Common
+	InputType     string        `config:"input_type"`
+	CleanInactive time.Duration `config:"clean_inactive" validate:"min=0"`
+
+	// Prospector
+	Enabled        bool            `config:"enabled"`
+	ExcludeFiles   []match.Matcher `config:"exclude_files"`
+	IgnoreOlder    time.Duration   `config:"ignore_older"`
+	Paths          []string        `config:"paths"`
+	ScanFrequency  time.Duration   `config:"scan_frequency" validate:"min=0,nonzero"`
+	CleanRemoved   bool            `config:"clean_removed"`
+	HarvesterLimit uint64          `config:"harvester_limit" validate:"min=0"`
+	Symlinks       bool            `config:"symlinks"`
+	TailFiles      bool            `config:"tail_files"`
+	recursiveGlob  bool            `config:"recursive_glob.enabled"`
+
+	// Harvester
 	common.EventMetadata `config:",inline"`      // Fields and tags to add to events.
 	BufferSize           int                     `config:"harvester_buffer_size"`
 	Encoding             string                  `config:"encoding"`
-	InputType            string                  `config:"input_type"`
 	Backoff              time.Duration           `config:"backoff" validate:"min=0,nonzero"`
 	BackoffFactor        int                     `config:"backoff_factor" validate:"min=1"`
 	MaxBackoff           time.Duration           `config:"max_backoff" validate:"min=0,nonzero"`
@@ -48,27 +76,40 @@ type harvesterConfig struct {
 	MaxBytes             int                     `config:"max_bytes" validate:"min=0,nonzero"`
 	Multiline            *reader.MultilineConfig `config:"multiline"`
 	JSON                 *reader.JSONConfig      `config:"json"`
-	CleanInactive        time.Duration           `config:"clean_inactive" validate:"min=0"`
 	Pipeline             string                  `config:"pipeline"`
 	Module               string                  `config:"_module_name"`  // hidden option to set the module name
 	Fileset              string                  `config:"_fileset_name"` // hidden option to set the fileset name
 	Processors           processors.PluginConfig `config:"processors"`
 }
 
-func (config *harvesterConfig) Validate() error {
+func (c *config) Validate() error {
 
-	// Check input type
-	if _, ok := cfg.ValidInputType[config.InputType]; !ok {
-		return fmt.Errorf("Invalid input type: %v", config.InputType)
+	// Prospector
+	if c.InputType == cfg.LogInputType && len(c.Paths) == 0 {
+		return fmt.Errorf("No paths were defined for prospector")
 	}
 
-	if config.JSON != nil && len(config.JSON.MessageKey) == 0 &&
-		config.Multiline != nil {
+	if c.CleanInactive != 0 && c.IgnoreOlder == 0 {
+		return fmt.Errorf("ignore_older must be enabled when clean_inactive is used")
+	}
+
+	if c.CleanInactive != 0 && c.CleanInactive <= c.IgnoreOlder+c.ScanFrequency {
+		return fmt.Errorf("clean_inactive must be > ignore_older + scan_frequency to make sure only files which are not monitored anymore are removed")
+	}
+
+	// Harvester
+	// Check input type
+	if _, ok := cfg.ValidInputType[c.InputType]; !ok {
+		return fmt.Errorf("Invalid input type: %v", c.InputType)
+	}
+
+	if c.JSON != nil && len(c.JSON.MessageKey) == 0 &&
+		c.Multiline != nil {
 		return fmt.Errorf("When using the JSON decoder and multiline together, you need to specify a message_key value")
 	}
 
-	if config.JSON != nil && len(config.JSON.MessageKey) == 0 &&
-		(len(config.IncludeLines) > 0 || len(config.ExcludeLines) > 0) {
+	if c.JSON != nil && len(c.JSON.MessageKey) == 0 &&
+		(len(c.IncludeLines) > 0 || len(c.ExcludeLines) > 0) {
 		return fmt.Errorf("When using the JSON decoder and line filtering together, you need to specify a message_key value")
 	}
 

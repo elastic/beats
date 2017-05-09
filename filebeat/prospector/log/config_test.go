@@ -1,6 +1,6 @@
 // +build !integration
 
-package prospector
+package log
 
 import (
 	"testing"
@@ -12,7 +12,7 @@ import (
 
 func TestCleanOlderError(t *testing.T) {
 
-	config := prospectorConfig{
+	config := config{
 		CleanInactive: 10 * time.Hour,
 	}
 
@@ -22,7 +22,7 @@ func TestCleanOlderError(t *testing.T) {
 
 func TestCleanOlderIgnoreOlderError(t *testing.T) {
 
-	config := prospectorConfig{
+	config := config{
 		CleanInactive: 10 * time.Hour,
 		IgnoreOlder:   15 * time.Hour,
 	}
@@ -33,7 +33,7 @@ func TestCleanOlderIgnoreOlderError(t *testing.T) {
 
 func TestCleanOlderIgnoreOlderErrorEqual(t *testing.T) {
 
-	config := prospectorConfig{
+	config := config{
 		CleanInactive: 10 * time.Hour,
 		IgnoreOlder:   10 * time.Hour,
 	}
@@ -44,9 +44,11 @@ func TestCleanOlderIgnoreOlderErrorEqual(t *testing.T) {
 
 func TestCleanOlderIgnoreOlder(t *testing.T) {
 
-	config := prospectorConfig{
+	config := config{
 		CleanInactive: 10*time.Hour + defaultConfig.ScanFrequency + 1*time.Second,
 		IgnoreOlder:   10 * time.Hour,
+		InputType:     "log",
+		Paths:         []string{"hello"},
 	}
 
 	err := config.Validate()
