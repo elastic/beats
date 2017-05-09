@@ -296,6 +296,8 @@ The default setting is 10s.
 
 ===== document_type
 
+deprecated[5.5,Use `fields` instead]
+
 The event type to use for published lines read by harvesters. For Elasticsearch
 output, the value that you specify here is used to set the `type` field in the output
 document. The default value is `log`.
