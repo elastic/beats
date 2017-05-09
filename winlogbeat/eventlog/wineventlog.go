@@ -11,7 +11,6 @@ import (
 	"github.com/elastic/beats/libbeat/common"
 	"github.com/elastic/beats/libbeat/logp"
 	"github.com/elastic/beats/winlogbeat/sys"
-	"github.com/elastic/beats/winlogbeat/sys/wineventlog"
 	win "github.com/elastic/beats/winlogbeat/sys/wineventlog"
 	"github.com/joeshaw/multierror"
 	"github.com/pkg/errors"
@@ -218,8 +217,8 @@ func (l *winEventLog) buildRecordFromXML(x []byte, recoveredErr error) (Record, 
 	}
 
 	if e.Level == "" {
-		//Let's fallback on LevelRaw if the level is not set in the RenderingInfo
-		e.Level = wineventlog.EventLevel(e.LevelRaw).String()
+		// Fallback on LevelRaw if the Level is not set in the RenderingInfo.
+		e.Level = win.EventLevel(e.LevelRaw).String()
 	}
 
 	if logp.IsDebug(detailSelector) {
