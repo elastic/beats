@@ -66,7 +66,7 @@ func (c *Crawler) startProspector(config *common.Config, states []file.State) er
 	if !config.Enabled() {
 		return nil
 	}
-	p, err := prospector.NewProspector(config, c.out, c.beatDone)
+	p, err := prospector.NewProspector(config, c.out, c.beatDone, states)
 	if err != nil {
 		return fmt.Errorf("Error in initing prospector: %s", err)
 	}
@@ -74,11 +74,6 @@ func (c *Crawler) startProspector(config *common.Config, states []file.State) er
 
 	if _, ok := c.prospectors[p.ID()]; ok {
 		return fmt.Errorf("Prospector with same ID already exists: %v", p.ID())
-	}
-
-	err = p.LoadStates(states)
-	if err != nil {
-		return fmt.Errorf("error loading states for prospector %v: %v", p.ID(), err)
 	}
 
 	c.prospectors[p.ID()] = p
