@@ -62,7 +62,8 @@ func newAddLocale(c common.Config) (processors.Processor, error) {
 }
 
 func (l addLocale) Run(event common.MapStr) (common.MapStr, error) {
-	format := l.Format()
+	zone, offset := time.Now().Zone()
+	format := l.Format(zone, offset)
 	event.Put("beat.timezone", format)
 
 	return event, nil
@@ -74,15 +75,12 @@ const (
 	hour = 60 * min
 )
 
-func (l addLocale) Format() string {
-	tm := time.Now()
+func (l addLocale) Format(zone string, offset int) string {
 	var ft string
 	switch l.TimezoneFormat {
 	case Abbrevation:
-		ft, _ = tm.Zone()
+		ft = zone
 	case Offset:
-		_, offset := tm.Zone()
-
 		sign := "+"
 		if offset < 0 {
 			sign = "-"
