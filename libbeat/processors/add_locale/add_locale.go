@@ -13,8 +13,10 @@ type addLocale struct {
 	TimezoneFormat TimezoneFormat
 }
 
+// TimezoneFormat type
 type TimezoneFormat int
 
+// Timezone formats
 const (
 	Abbrevation TimezoneFormat = iota
 	Offset
