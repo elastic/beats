@@ -301,7 +301,6 @@ If you require log lines to be sent in near real time do not use a very low `sca
 
 The default setting is 10s.
 
-[[filebeat-document-type]]
 ===== harvester_buffer_size
 
 The size in bytes of the buffer that each harvester uses when fetching a file. The default is 16384.
