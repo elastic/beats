@@ -1,12 +1,8 @@
-- name: node_stats
+- name: node.stats
   type: group
   description: >
     node_stats
   fields:
-    - name: name
-      type: keyword
-      description: >
-        Node name.
     - name: indices
       type: group
       description: >

@@ -22,7 +22,7 @@ func eventMapping(content []byte) ([]common.MapStr, error) {
 
 	for _, syscontainer := range node.SystemContainers {
 		containerEvent := common.MapStr{
-			mb.ModuleData: common.MapStr{
+			mb.ModuleDataKey: common.MapStr{
 				"node": common.MapStr{
 					"name": node.NodeName,
 				},

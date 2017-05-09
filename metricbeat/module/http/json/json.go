@@ -115,7 +115,7 @@ func (m *MetricSet) Fetch() (common.MapStr, error) {
 	event := jsonBody
 
 	if m.requestEnabled {
-		event[mb.ModuleData] = common.MapStr{
+		event[mb.ModuleDataKey] = common.MapStr{
 			"request": common.MapStr{
 				"headers": m.getHeaders(response.Request.Header),
 				"method":  response.Request.Method,
@@ -125,7 +125,7 @@ func (m *MetricSet) Fetch() (common.MapStr, error) {
 	}
 
 	if m.responseEnabled {
-		event[mb.ModuleData] = common.MapStr{
+		event[mb.ModuleDataKey] = common.MapStr{
 			"response": common.MapStr{
 				"status_code": response.StatusCode,
 				"headers":     m.getHeaders(response.Header),
