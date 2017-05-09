@@ -26,7 +26,6 @@ var (
 		CloseRenamed:  false,
 		CloseEOF:      false,
 		CloseTimeout:  0,
-		DocumentType:  "log",
 		CleanInactive: 0,
 	}
 )
@@ -49,7 +48,6 @@ type harvesterConfig struct {
 	MaxBytes             int                     `config:"max_bytes" validate:"min=0,nonzero"`
 	Multiline            *reader.MultilineConfig `config:"multiline"`
 	JSON                 *reader.JSONConfig      `config:"json"`
-	DocumentType         string                  `config:"document_type"`
 	CleanInactive        time.Duration           `config:"clean_inactive" validate:"min=0"`
 	Pipeline             string                  `config:"pipeline"`
 	Module               string                  `config:"_module_name"`  // hidden option to set the module name

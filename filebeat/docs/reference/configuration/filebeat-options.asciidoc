@@ -14,7 +14,6 @@ filebeat.prospectors:
 - input_type: log
   paths:
     - /var/log/apache/httpd-*.log
-  document_type: apache
 
 - input_type: log
   paths:
@@ -303,12 +302,6 @@ If you require log lines to be sent in near real time do not use a very low `sca
 The default setting is 10s.
 
 [[filebeat-document-type]]
-===== document_type
-
-The event type to use for published lines read by harvesters. For Elasticsearch
-output, the value that you specify here is used to set the `type` field in the output
-document. The default value is `log`.
-
 ===== harvester_buffer_size
 
 The size in bytes of the buffer that each harvester uses when fetching a file. The default is 16384.
