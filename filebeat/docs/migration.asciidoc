@@ -143,7 +143,7 @@ filebeat.prospectors:
     service: apache
     zone: us-east-1
   fields_under_root: true
-- input_type: stdin <2>
+- input_type: stdin <1>
 - input_type: log
   paths:
     - /var/log/apache2/httpd-*.log
