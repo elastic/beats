@@ -12,15 +12,25 @@
     },
     "mongodb": {
         "dbstats": {
-            "avg_obj_size": 59,
+            "avg_obj_size": {
+                "bytes": 59
+            },
             "collections": 1,
-            "data_size": 59,
+            "data_size": {
+                "bytes": 59
+            },
             "db": "admin",
-            "index_size": 32768,
+            "file_size": {},
+            "index_size": {
+                "bytes": 32768
+            },
             "indexes": 2,
+            "ns_size_mb": {},
             "num_extents": 0,
             "objects": 1,
-            "storage_size": 16384
+            "storage_size": {
+                "bytes": 16384
+            }
         }
     },
     "type": "metricsets"
