@@ -21,8 +21,8 @@ func wildcards(doubleStarPatternDepth uint8, dir string, suffix string) []string
 	return wildcardList
 }
 
-// globPattern detects the use of "**" and expands it to standard glob patterns up to a max depth
-func globPatterns(pattern string, doubleStarPatternDepth uint8) ([]string, error) {
+// GlobPatterns detects the use of "**" and expands it to standard glob patterns up to a max depth
+func GlobPatterns(pattern string, doubleStarPatternDepth uint8) ([]string, error) {
 	if doubleStarPatternDepth == 0 {
 		return []string{pattern}, nil
 	}
@@ -54,7 +54,7 @@ func globPatterns(pattern string, doubleStarPatternDepth uint8) ([]string, error
 
 // Glob expands '**' patterns into multiple patterns to satisfy https://golang.org/pkg/path/filepath/#Match
 func Glob(pattern string, doubleStarPatternDepth uint8) ([]string, error) {
-	patterns, err := globPatterns(pattern, doubleStarPatternDepth)
+	patterns, err := GlobPatterns(pattern, doubleStarPatternDepth)
 	if err != nil {
 		return nil, err
 	}

@@ -17,6 +17,10 @@ BEAT_REQUIRED_FIELDS = ["@timestamp",
 INTEGRATION_TESTS = os.environ.get('INTEGRATION_TESTS', False)
 
 
+class TimeoutError(Exception):
+    pass
+
+
 class Proc(object):
     """
     Slim wrapper on subprocess.Popen that redirects
@@ -279,9 +283,8 @@ class TestCase(unittest.TestCase):
         start = datetime.now()
         while not cond():
             if datetime.now() - start > timedelta(seconds=max_timeout):
-                raise Exception("Timeout waiting for '{}' to be true. "
-                                .format(name) +
-                                "Waited {} seconds.".format(max_timeout))
+                raise TimeoutError("Timeout waiting for '{}' to be true. ".format(name) +
+                                   "Waited {} seconds.".format(max_timeout))
             time.sleep(poll_interval)
 
     def get_log(self, logfile=None):
@@ -349,6 +352,16 @@ class TestCase(unittest.TestCase):
             with open(os.path.join(self.working_dir, output_file), "r") as f:
                 return len([1 for line in f]) == lines
         except IOError:
+            return False
+
+    def output_has_message(self, message, output_file=None):
+        """
+        Returns true if the output has the given message field.
+        """
+        try:
+            return any(line for line in self.read_output(output_file=output_file, required_fields=["message"])
+                       if line.get("message") == message)
+        except (IOError, TypeError):
             return False
 
     def all_have_fields(self, objs, fields):
