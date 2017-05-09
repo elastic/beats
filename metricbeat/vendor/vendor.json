@@ -39,5 +39,5 @@
 			"revisionTime": "2017-04-27T09:54:55Z"
 		}
 	],
-	"rootPath": "github.com/elastic/beats/metricbeat/module/kubernetes"
+	"rootPath": "github.com/elastic/beats/metricbeat"
 }
