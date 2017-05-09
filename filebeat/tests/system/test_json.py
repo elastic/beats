@@ -196,7 +196,6 @@ class Test(BaseTest):
         output = self.read_output()
         assert len(output) == 5
         assert all(isinstance(o["@timestamp"], basestring) for o in output)
-        assert all(isinstance(o["type"], basestring) for o in output)
         assert output[0]["@timestamp"] == "2016-04-05T18:47:18.444Z"
 
         assert output[1]["@timestamp"] != "invalid"
@@ -239,14 +238,13 @@ class Test(BaseTest):
         output = self.read_output()
         assert len(output) == 3
         assert all(isinstance(o["@timestamp"], basestring) for o in output)
-        assert all(isinstance(o["type"], basestring) for o in output)
         assert output[0]["type"] == "test"
 
-        assert output[1]["type"] == "log"
+        assert "type" not in output[1]
         assert output[1]["json_error"] == \
             "type not overwritten (not string)"
 
-        assert output[2]["type"] == "log"
+        assert "type" not in output[2]
         assert output[2]["json_error"] == \
             "type not overwritten (not string)"
 
@@ -283,7 +281,7 @@ class Test(BaseTest):
         proc.check_kill_and_wait()
 
         output = self.read_output(
-            required_fields=["@timestamp", "type"],
+            required_fields=["@timestamp"],
         )
         assert len(output) == 1
         o = output[0]
@@ -327,7 +325,7 @@ class Test(BaseTest):
         proc.check_kill_and_wait()
 
         output = self.read_output(
-            required_fields=["@timestamp", "type"],
+            required_fields=["@timestamp"],
         )
         assert len(output) == 1
         o = output[0]

@@ -28,7 +28,7 @@ class Test(BaseTest):
         filebeat.check_kill_and_wait()
 
         output = self.read_output(
-            required_fields=["@timestamp", "type"],
+            required_fields=["@timestamp"],
         )[0]
         assert "beat.name" not in output
         assert "message" in output
@@ -53,7 +53,7 @@ class Test(BaseTest):
         filebeat.check_kill_and_wait()
 
         output = self.read_output(
-            required_fields=["@timestamp", "type"],
+            required_fields=["@timestamp"],
         )[0]
         assert "beat.name" not in output
         assert "message" in output
@@ -81,7 +81,7 @@ class Test(BaseTest):
         filebeat.check_kill_and_wait()
 
         output = self.read_output(
-            required_fields=["@timestamp", "type"],
+            required_fields=["@timestamp"],
         )[0]
         assert "beat.name" in output
         assert "message" in output
@@ -110,7 +110,7 @@ class Test(BaseTest):
         filebeat.check_kill_and_wait()
 
         output = self.read_output(
-            required_fields=["@timestamp", "type"],
+            required_fields=["@timestamp"],
         )[0]
         assert "beat.name" in output
         assert "message" in output

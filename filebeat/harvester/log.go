@@ -150,7 +150,6 @@ func (h *Harvester) Harvest(r reader.Reader) {
 				"@timestamp": common.Time(message.Ts),
 				"source":     state.Source,
 				"offset":     state.Offset, // Offset here is the offset before the starting char.
-				"type":       h.config.DocumentType,
 				"input_type": h.config.InputType,
 			}
 			data.Event.DeepUpdate(message.Fields)

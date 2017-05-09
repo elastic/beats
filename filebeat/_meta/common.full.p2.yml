@@ -67,11 +67,6 @@ filebeat.prospectors:
   # Time strings like 2h (2 hours), 5m (5 minutes) can be used.
   #ignore_older: 0
 
-  # Type to be published in the 'type' field. For Elasticsearch output,
-  # the type defines the document type these entries should be stored
-  # in. Default: log
-  #document_type: log
-
   # How often the prospector checks for new files in the paths that are specified
   # for harvesting. Specify 1s to scan the directory as frequently as possible
   # without causing Filebeat to scan too frequently. Default: 10s.
