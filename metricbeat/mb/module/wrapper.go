@@ -131,7 +131,6 @@ func NewWrappers(modulesConfig []*common.Config, r *mb.Register) ([]*Wrapper, er
 // Start should be called only once in the life of a Wrapper.
 func (mw *Wrapper) Start(done <-chan struct{}) <-chan common.MapStr {
 	debugf("Starting %s", mw)
-	defer debugf("Stopped %s", mw)
 
 	out := make(chan common.MapStr, 1)
 
@@ -151,6 +150,7 @@ func (mw *Wrapper) Start(done <-chan struct{}) <-chan common.MapStr {
 	go func() {
 		wg.Wait()
 		close(out)
+		debugf("Stopped %s", mw)
 	}()
 
 	return out
