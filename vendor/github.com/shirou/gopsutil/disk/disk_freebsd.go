@@ -94,7 +94,7 @@ func Partitions(all bool) ([]PartitionStat, error) {
 	return ret, nil
 }
 
-func IOCounters() (map[string]IOCountersStat, error) {
+func IOCounters(names ...string) (map[string]IOCountersStat, error) {
 	// statinfo->devinfo->devstat
 	// /usr/include/devinfo.h
 	ret := make(map[string]IOCountersStat)
@@ -118,6 +118,10 @@ func IOCounters() (map[string]IOCountersStat, error) {
 		}
 		un := strconv.Itoa(int(d.Unit_number))
 		name := common.IntToString(d.Device_name[:]) + un
+
+		if len(names) > 0 && !common.StringsHas(names, name) {
+			continue
+		}
 
 		ds := IOCountersStat{
 			ReadCount:  d.Operations[DEVSTAT_READ],

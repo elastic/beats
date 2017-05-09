@@ -36,7 +36,7 @@ var debugf = logp.MakeDebug("kafka")
 
 // New creates a new instance of the MetricSet.
 func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
-	logp.Warn("BETA: The kafka consumergroup metricset is beta")
+	logp.Beta("The kafka consumergroup metricset is beta")
 
 	config := defaultConfig
 	if err := base.Module().UnpackConfig(&config); err != nil {

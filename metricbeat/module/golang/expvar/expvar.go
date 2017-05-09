@@ -44,8 +44,7 @@ type MetricSet struct {
 // Part of new is also setting up the configuration by processing additional
 // configuration entries if needed.
 func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
-
-	logp.Warn("EXPERIMENTAL: The golang expvar metricset is experimental")
+	logp.Experimental("The golang expvar metricset is experimental")
 
 	config := struct {
 		Namespace string `config:"expvar.namespace" validate:"required"`
@@ -66,7 +65,6 @@ func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
 // It returns the event which is then forward to the output. In case of an error, a
 // descriptive error must be returned.
 func (m *MetricSet) Fetch() (common.MapStr, error) {
-
 	json, err := m.http.FetchJSON()
 
 	if err != nil {

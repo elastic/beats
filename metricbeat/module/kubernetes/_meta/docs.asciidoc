@@ -1,0 +1,5 @@
+== kubernetes Module
+
+beta[]
+
+This module fetches metrics from Kubernetes https://kubernetes.io/docs/admin/kubelet/[kubelet] agent.

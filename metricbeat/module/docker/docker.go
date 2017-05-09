@@ -2,12 +2,11 @@ package docker
 
 import (
 	"sync"
+	"time"
 
 	"github.com/elastic/beats/libbeat/logp"
 	"github.com/elastic/beats/metricbeat/mb"
 	"github.com/elastic/beats/metricbeat/mb/parse"
-
-	"time"
 
 	"github.com/fsouza/go-dockerclient"
 )

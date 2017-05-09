@@ -55,8 +55,7 @@ type MetricSet struct {
 // Part of new is also setting up the configuration by processing additional
 // configuration entries if needed.
 func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
-
-	logp.Warn("The http json metricset is in beta.")
+	logp.Beta("The http json metricset is in beta.")
 
 	config := struct {
 		Namespace       string `config:"namespace" validate:"required"`

@@ -1,3 +1,0 @@
-=== kubelet container MetricSet
-
-This is the container metricset of the module kubelet.

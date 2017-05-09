@@ -1,0 +1,13 @@
+- key: kubernetes
+  title: "kubernetes"
+  description: >
+    beta[]
+
+    kubernetes metrics
+  short_config: false
+  fields:
+    - name: kubernetes
+      type: group
+      description: >
+        Information and statistics of pods managed by kubernetes.
+      fields:

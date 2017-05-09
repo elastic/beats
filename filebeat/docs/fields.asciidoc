@@ -17,7 +17,7 @@ grouped in the following categories:
 * <<exported-fields-beat>>
 * <<exported-fields-cloud>>
 * <<exported-fields-icinga>>
-* <<exported-fields-kubernetes>>
+* <<exported-fields-kubernetes-processor>>
 * <<exported-fields-log>>
 * <<exported-fields-mysql>>
 * <<exported-fields-nginx>>
@@ -683,7 +683,7 @@ type: text
 The logged message.
 
 
-[[exported-fields-kubernetes]]
+[[exported-fields-kubernetes-processor]]
 == Kubernetes info Fields
 
 Kubernetes metadata added by the kubernetes processor

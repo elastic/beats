@@ -37,7 +37,7 @@ type MetricSet struct {
 }
 
 func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
-	logp.Warn("BETA: The prometheus collector metricset is beta")
+	logp.Beta("The prometheus collector metricset is beta")
 
 	config := struct {
 		Namespace string `config:"namespace" validate:"required"`

@@ -31,7 +31,6 @@ import (
 
 	"github.com/docker/docker/opts"
 	"github.com/docker/docker/pkg/homedir"
-	"github.com/docker/docker/pkg/jsonmessage"
 	"github.com/docker/docker/pkg/stdcopy"
 	"github.com/hashicorp/go-cleanhttp"
 	"golang.org/x/net/context"
@@ -58,6 +57,7 @@ var (
 	apiVersion112, _ = NewAPIVersion("1.12")
 	apiVersion119, _ = NewAPIVersion("1.19")
 	apiVersion124, _ = NewAPIVersion("1.24")
+	apiVersion125, _ = NewAPIVersion("1.25")
 )
 
 // APIVersion is an internal representation of a version of the Remote API.
@@ -630,15 +630,9 @@ func handleStreamResponse(resp *http.Response, streamOptions *streamOptions) err
 		_, err = io.Copy(streamOptions.stdout, resp.Body)
 		return err
 	}
-	if st, ok := streamOptions.stdout.(interface {
-		io.Writer
-		FD() uintptr
-		IsTerminal() bool
-	}); ok {
-		err = jsonmessage.DisplayJSONMessagesToStream(resp.Body, st, nil)
-	} else {
-		err = jsonmessage.DisplayJSONMessagesStream(resp.Body, streamOptions.stdout, 0, false, nil)
-	}
+
+	err = DisplayJSONMessagesStream(resp.Body, streamOptions.stdout, 0, false, nil)
+
 	return err
 }
 

@@ -176,6 +176,7 @@ type ImageBuildOptions struct {
 	CacheFrom   []string
 	SecurityOpt []string
 	ExtraHosts  []string // List of extra hosts
+	Target      string
 }
 
 // ImageBuildResponse holds information
@@ -315,12 +316,18 @@ type ServiceUpdateOptions struct {
 	Rollback string
 }
 
-// ServiceListOptions holds parameters to list  services with.
+// ServiceListOptions holds parameters to list services with.
 type ServiceListOptions struct {
 	Filters filters.Args
 }
 
-// TaskListOptions holds parameters to list  tasks with.
+// ServiceInspectOptions holds parameters related to the "service inspect"
+// operation.
+type ServiceInspectOptions struct {
+	InsertDefaults bool
+}
+
+// TaskListOptions holds parameters to list tasks with.
 type TaskListOptions struct {
 	Filters filters.Args
 }

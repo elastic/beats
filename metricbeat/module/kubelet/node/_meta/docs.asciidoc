@@ -1,3 +1,0 @@
-=== kubelet node MetricSet
-
-This is the node metricset of the module kubelet.
