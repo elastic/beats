@@ -13,11 +13,17 @@ import (
 )
 
 const (
-	// ModuleData is the key used in events created by MetricSets to add data
+	// ModuleDataKey is the key used in events created by MetricSets to add data
 	// to an event that is common to the module. The data must be a
 	// common.MapStr and when the final event is built the object will be stored
 	// in the event under a key that is the module name.
-	ModuleData string = "_module"
+	ModuleDataKey string = "_module"
+
+	// NamespaceKey is used to define a different namespace for the metricset
+	// This is useful for dynamic metricsets or metricsets which do not
+	// put the name under the same name as the package. This is for example
+	// the case in elasticsearch `node_stats` which puts the data under `node.stats`.
+	NamespaceKey string = "_namespace"
 )
 
 // Module interfaces

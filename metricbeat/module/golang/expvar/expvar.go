@@ -75,7 +75,7 @@ func (m *MetricSet) Fetch() (common.MapStr, error) {
 	json["cmdline"] = golang.GetCmdStr(json["cmdline"])
 
 	//set namespace
-	json["_namespace"] = m.namespace
+	json[mb.NamespaceKey] = m.namespace
 
 	return json, nil
 }

@@ -40,7 +40,7 @@ func eventsMapping(content []byte) ([]common.MapStr, error) {
 		event, errs := eventMapping(node)
 		// Write name here as full name only available as key
 		event["name"] = name
-		event[mb.ModuleData] = common.MapStr{
+		event[mb.ModuleDataKey] = common.MapStr{
 			"cluster": common.MapStr{
 				"name": nodesStruct.ClusterName,
 			},

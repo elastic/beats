@@ -83,7 +83,7 @@ func eventsMapping(content []byte) ([]common.MapStr, error) {
 	for name, node := range nodesStruct.Nodes {
 		event, errs := schema.Apply(node)
 		// Write name here as full name only available as key
-		event[mb.ModuleData] = common.MapStr{
+		event[mb.ModuleDataKey] = common.MapStr{
 			"node": common.MapStr{
 				"name": name,
 			},
@@ -91,6 +91,7 @@ func eventsMapping(content []byte) ([]common.MapStr, error) {
 				"name": nodesStruct.ClusterName,
 			},
 		}
+		event[mb.NamespaceKey] = "node.stats"
 		events = append(events, event)
 		errors.AddErrors(errs)
 	}

@@ -40,7 +40,7 @@ func eventMapping(cont *dc.APIContainers, m *MetricSet) common.MapStr {
 	}
 
 	return common.MapStr{
-		mb.ModuleData: common.MapStr{
+		mb.ModuleDataKey: common.MapStr{
 			"container": docker.NewContainer(cont).ToMapStr(),
 		},
 		"status":        container.State.Health.Status,
