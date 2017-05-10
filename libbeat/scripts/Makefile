@@ -239,6 +239,10 @@ testsuite: clean update
 	$(MAKE) benchmark-tests
 	$(MAKE) coverage-report
 
+	if [ $(TEST_ENVIRONMENT) = true ]; then \
+		$(MAKE) stop-environment; \
+    fi
+
 # Generates a coverage report from the existing coverage files
 .PHONY: coverage-report
 coverage-report:
