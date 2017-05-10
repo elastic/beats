@@ -51,3 +51,15 @@ class BaseTest(TestCase):
                 fields[key] = self.de_dot(fields[key])
 
         return fields
+
+    def assert_no_logged_warnings(self):
+        """
+        Assert that the log file contains no ERR or WARN lines.
+        """
+        log = self.get_log()
+        log = log.replace("WARN EXPERIMENTAL", "")
+        log = log.replace("WARN BETA", "")
+        # Jenkins runs as a Windows service and when Jenkins executes theses
+        # tests the Beat is confused since it thinks it is running as a service.
+        log = log.replace("ERR Error: The service process could not connect to the service controller.", "")
+        self.assertNotRegexpMatches(log, "ERR|WARN")
