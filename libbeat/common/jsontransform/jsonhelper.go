@@ -8,14 +8,15 @@ import (
 	"github.com/elastic/beats/libbeat/logp"
 )
 
-func WriteJSONKeys(event common.MapStr, keys map[string]interface{}, overwriteKeys bool, errorKey string) {
+// WriteJSONKeys writes the json keys to the given event based on the overwriteKeys option
+func WriteJSONKeys(event common.MapStr, keys map[string]interface{}, overwriteKeys bool) {
 	for k, v := range keys {
 		if overwriteKeys {
 			if k == "@timestamp" {
 				vstr, ok := v.(string)
 				if !ok {
 					logp.Err("JSON: Won't overwrite @timestamp because value is not string")
-					event[errorKey] = "@timestamp not overwritten (not string)"
+					event["error"] = createJSONError("@timestamp not overwritten (not string)")
 					continue
 				}
 
@@ -23,7 +24,7 @@ func WriteJSONKeys(event common.MapStr, keys map[string]interface{}, overwriteKe
 				ts, err := time.Parse(time.RFC3339, vstr)
 				if err != nil {
 					logp.Err("JSON: Won't overwrite @timestamp because of parsing error: %v", err)
-					event[errorKey] = fmt.Sprintf("@timestamp not overwritten (parse error on %s)", vstr)
+					event["error"] = createJSONError(fmt.Sprintf("@timestamp not overwritten (parse error on %s)", vstr))
 					continue
 				}
 				event[k] = common.Time(ts)
@@ -31,12 +32,12 @@ func WriteJSONKeys(event common.MapStr, keys map[string]interface{}, overwriteKe
 				vstr, ok := v.(string)
 				if !ok {
 					logp.Err("JSON: Won't overwrite type because value is not string")
-					event[errorKey] = "type not overwritten (not string)"
+					event["error"] = createJSONError("type not overwritten (not string)")
 					continue
 				}
 				if len(vstr) == 0 || vstr[0] == '_' {
 					logp.Err("JSON: Won't overwrite type because value is empty or starts with an underscore")
-					event[errorKey] = fmt.Sprintf("type not overwritten (invalid value [%s])", vstr)
+					event["error"] = createJSONError(fmt.Sprintf("type not overwritten (invalid value [%s])", vstr))
 					continue
 				}
 				event[k] = vstr
@@ -48,4 +49,8 @@ func WriteJSONKeys(event common.MapStr, keys map[string]interface{}, overwriteKe
 		}
 
 	}
+}
+
+func createJSONError(message string) common.MapStr {
+	return common.MapStr{"message": message, "type": "json"}
 }

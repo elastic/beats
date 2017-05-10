@@ -87,7 +87,7 @@ func (f decodeJSONFields) Run(event common.MapStr) (common.MapStr, error) {
 					default:
 						errs = append(errs, errors.New("Error trying to add target to root.").Error())
 					case map[string]interface{}:
-						jsontransform.WriteJSONKeys(event, t, f.overwriteKeys, "json_error")
+						jsontransform.WriteJSONKeys(event, t, f.overwriteKeys)
 					}
 				}
 			} else {

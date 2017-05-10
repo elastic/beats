@@ -10,10 +10,6 @@ import (
 	"github.com/elastic/beats/libbeat/logp"
 )
 
-const (
-	JsonErrorKey = "json_error"
-)
-
 type JSON struct {
 	reader Reader
 	cfg    *JSONConfig
@@ -33,7 +29,7 @@ func (r *JSON) decodeJSON(text []byte) ([]byte, common.MapStr) {
 	if err != nil || jsonFields == nil {
 		logp.Err("Error decoding JSON: %v", err)
 		if r.cfg.AddErrorKey {
-			jsonFields = common.MapStr{JsonErrorKey: fmt.Sprintf("Error decoding JSON: %v", err)}
+			jsonFields = common.MapStr{"error": createJSONError(fmt.Sprintf("Error decoding JSON: %v", err))}
 		}
 		return text, jsonFields
 	}
@@ -45,7 +41,7 @@ func (r *JSON) decodeJSON(text []byte) ([]byte, common.MapStr) {
 	textValue, ok := jsonFields[r.cfg.MessageKey]
 	if !ok {
 		if r.cfg.AddErrorKey {
-			jsonFields[JsonErrorKey] = fmt.Sprintf("Key '%s' not found", r.cfg.MessageKey)
+			jsonFields["error"] = createJSONError(fmt.Sprintf("Key '%s' not found", r.cfg.MessageKey))
 		}
 		return []byte(""), jsonFields
 	}
@@ -53,7 +49,7 @@ func (r *JSON) decodeJSON(text []byte) ([]byte, common.MapStr) {
 	textString, ok := textValue.(string)
 	if !ok {
 		if r.cfg.AddErrorKey {
-			jsonFields[JsonErrorKey] = fmt.Sprintf("Value of key '%s' is not a string", r.cfg.MessageKey)
+			jsonFields["error"] = createJSONError(fmt.Sprintf("Value of key '%s' is not a string", r.cfg.MessageKey))
 		}
 		return []byte(""), jsonFields
 	}
@@ -85,4 +81,8 @@ func (r *JSON) Next() (Message, error) {
 	message.Content, fields = r.decodeJSON(message.Content)
 	message.AddFields(common.MapStr{"json": fields})
 	return message, nil
+}
+
+func createJSONError(message string) common.MapStr {
+	return common.MapStr{"message": message, "type": "json"}
 }
