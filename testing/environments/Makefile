@@ -7,8 +7,7 @@ start:
 	${BASE_COMMAND} run beat bash
 
 stop:
-	${BASE_COMMAND} stop
-	${BASE_COMMAND} rm -f
+	${BASE_COMMAND} down -v
 
 
 up:
