@@ -327,8 +327,7 @@ start-environment: stop-environment
 
 .PHONY: stop-environment
 stop-environment:
-	-${DOCKER_COMPOSE} stop
-	-${DOCKER_COMPOSE} rm -f -v
+	-${DOCKER_COMPOSE} down -v
 
 .PHONY: write-environment
 write-environment:
