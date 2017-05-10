@@ -100,16 +100,22 @@ func (b EventBuilder) Build() (common.MapStr, error) {
 	return event, nil
 }
 
+// getTimestamp gets the @timestamp field from the event, removes the key from
+// the event, and returns the value. If the key is not present or not the proper
+// type then the provided timestamp value is returned instead.
 func getTimestamp(event common.MapStr, timestamp common.Time) common.Time {
-
-	// Set timestamp from event if set, move it to the top level
-	// If not set, timestamp is created
-	if _, ok := event["@timestamp"]; ok {
-		timestamp, ok = event["@timestamp"].(common.Time)
-		if !ok {
-			logp.Err("Timestamp couldn't be overwritten because event @timestamp is not common.Time")
-		}
+	if ts, found := event["@timestamp"]; found {
 		delete(event, "@timestamp")
+
+		switch v := ts.(type) {
+		case common.Time:
+			timestamp = v
+		case time.Time:
+			timestamp = common.Time(v)
+		default:
+			logp.Err("Ignoring @timestamp value because its type (%T) is not "+
+				"common.Time or time.Time", v)
+		}
 	}
 	return timestamp
 }

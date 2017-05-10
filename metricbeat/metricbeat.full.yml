@@ -114,6 +114,16 @@ metricbeat.modules:
   # Password of hosts. Empty by default
   #password: password
 
+#-------------------------------- Audit Module -------------------------------
+- module: audit
+  enabled: false
+  metricsets: ["kernel"]
+  kernel.resolve_ids: true
+  kernel.backlog_limit: 8196
+  kernel.rate_limit: 0
+  kernel.include_raw_message: false
+  kernel.include_warnings: false
+
 #-------------------------------- ceph Module --------------------------------
 - module: ceph
   metricsets: ["cluster_disk", "cluster_health", "monitor_health", "pool_disk"]
