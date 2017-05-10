@@ -51,10 +51,6 @@ func (m *MetricSet) Fetch() (event common.MapStr, err error) {
 		"free": memStat.Free,
 		"actual": common.MapStr{
 			"free": memStat.ActualFree,
-			"used": common.MapStr{
-				"pct":   memStat.ActualUsedPercent,
-				"bytes": memStat.ActualUsed,
-			},
 		},
 	}
 
