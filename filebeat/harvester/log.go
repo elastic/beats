@@ -424,6 +424,6 @@ func (h *Harvester) mergeJSONFields(data common.MapStr, jsonFields common.MapStr
 		// Delete existing json key
 		delete(data, "json")
 
-		jsontransform.WriteJSONKeys(data, jsonFields, h.config.JSON.OverwriteKeys, reader.JsonErrorKey)
+		jsontransform.WriteJSONKeys(data, jsonFields, h.config.JSON.OverwriteKeys)
 	}
 }

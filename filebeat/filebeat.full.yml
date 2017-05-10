@@ -271,7 +271,7 @@ filebeat.prospectors:
   # in case of conflicts.
   #json.overwrite_keys: false
 
-  # If this setting is enabled, Filebeat adds a "json_error" key in case of JSON
+  # If this setting is enabled, Filebeat adds a "error.message" and "error.key: json" key in case of JSON
   # unmarshaling errors or when a text key is defined in the configuration but cannot
   # be used.
   #json.add_error_key: false

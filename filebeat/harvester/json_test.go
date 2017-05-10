@@ -81,7 +81,7 @@ func TestAddJSONFields(t *testing.T) {
 			ExpectedItems: common.MapStr{
 				"@timestamp": common.Time(now),
 				"type":       "test",
-				"json_error": "@timestamp not overwritten (parse error on 2016-04-05T18:47:18.44XX4Z)",
+				"error":      common.MapStr{"type": "json", "message": "@timestamp not overwritten (parse error on 2016-04-05T18:47:18.44XX4Z)"},
 			},
 		},
 		{
@@ -93,7 +93,7 @@ func TestAddJSONFields(t *testing.T) {
 			ExpectedItems: common.MapStr{
 				"@timestamp": common.Time(now),
 				"type":       "test",
-				"json_error": "@timestamp not overwritten (not string)",
+				"error":      common.MapStr{"type": "json", "message": "@timestamp not overwritten (not string)"},
 			},
 		},
 		{
@@ -102,8 +102,8 @@ func TestAddJSONFields(t *testing.T) {
 			Text:       &text,
 			JSONConfig: reader.JSONConfig{KeysUnderRoot: true, OverwriteKeys: true},
 			ExpectedItems: common.MapStr{
-				"type":       "test_type",
-				"json_error": "type not overwritten (not string)",
+				"type":  "test_type",
+				"error": common.MapStr{"type": "json", "message": "type not overwritten (not string)"},
 			},
 		},
 		{
@@ -112,8 +112,8 @@ func TestAddJSONFields(t *testing.T) {
 			Text:       &text,
 			JSONConfig: reader.JSONConfig{KeysUnderRoot: true, OverwriteKeys: true},
 			ExpectedItems: common.MapStr{
-				"type":       "test_type",
-				"json_error": "type not overwritten (invalid value [])",
+				"type":  "test_type",
+				"error": common.MapStr{"type": "json", "message": "type not overwritten (invalid value [])"},
 			},
 		},
 		{
@@ -122,8 +122,8 @@ func TestAddJSONFields(t *testing.T) {
 			Text:       &text,
 			JSONConfig: reader.JSONConfig{KeysUnderRoot: true, OverwriteKeys: true},
 			ExpectedItems: common.MapStr{
-				"type":       "test_type",
-				"json_error": "type not overwritten (invalid value [_type])",
+				"type":  "test_type",
+				"error": common.MapStr{"type": "json", "message": "type not overwritten (invalid value [_type])"},
 			},
 		},
 	}
