@@ -54,6 +54,7 @@ https://github.com/elastic/beats/compare/v5.3.0...master[Check the HEAD diff]
 *Packetbeat*
 
 *Winlogbeat*
+- Add the ability to use LevelRaw if Level isn't populated in the event XML. {pull}4257[4257]
 
 ==== Deprecated
 
@@ -69,7 +70,7 @@ https://github.com/elastic/beats/compare/v5.3.0...master[Check the HEAD diff]
 
 *Winlogbeat*
 
-==== Knwon Issue
+==== Known Issue
 
 *Affecting all Beats*
 
