@@ -32,7 +32,7 @@ func TestFileSystemList(t *testing.T) {
 			continue
 		}
 
-		if assert.NoError(t, err, "%v", err) {
+		if assert.NoError(t, err, "filesystem=%v: %v", fs, err) {
 			assert.True(t, (stat.Total >= 0))
 			assert.True(t, (stat.Free >= 0))
 			assert.True(t, (stat.Avail >= 0))
