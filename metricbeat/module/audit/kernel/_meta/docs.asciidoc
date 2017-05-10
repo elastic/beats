@@ -7,7 +7,7 @@ is a part of the Linux kernel.
 
 This metricset is available only for Linux.
 
-[floag]
+[float]
 === How it Works
 
 This metricset establishes a subscription to the `kernel` to receive the events
@@ -18,7 +18,7 @@ The Linux kernel only supports a single subscriber to the audit events so this
 metricset cannot be used simultaneously with a service like `auditd`. `auditd`
 should be disabled if this metricset is being used. If you wish to continue to
 use `auditd` instead of this metricset to receive audit messages from the kernel
-then consider using <<filebeat-module-auditd, Filebeat>> to collect the daemon's
+then consider using {filebeat}/filebeat-module-auditd.html[Filebeat] to collect the daemon's
 log files.
 
 The Linux Audit Framework can send multiple messages for a single auditable
