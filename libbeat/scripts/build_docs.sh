@@ -1,5 +1,7 @@
 #!/usr/bin/env bash
 
+set -e
+
 # Checks if docs clone already exists
 if [ ! -d "build/docs" ]; then
     # Only head is cloned
