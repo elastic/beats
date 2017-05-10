@@ -58,6 +58,30 @@
 			"revisionTime": "2016-08-05T00:47:13Z"
 		},
 		{
+			"checksumSHA1": "t1UusuFMT4rvoLlMAtIUWsVIe3s=",
+			"path": "github.com/elastic/go-libaudit",
+			"revision": "cce87232cabb992866d94d6b6b6f810adcf13f9b",
+			"revisionTime": "2017-05-01T21:53:26Z",
+			"version": "v0.0.3",
+			"versionExact": "v0.0.3"
+		},
+		{
+			"checksumSHA1": "8rBSpuume8/w+8b0CkKS54lXsXQ=",
+			"path": "github.com/elastic/go-libaudit/aucoalesce",
+			"revision": "cce87232cabb992866d94d6b6b6f810adcf13f9b",
+			"revisionTime": "2017-05-01T21:53:26Z",
+			"version": "v0.0.3",
+			"versionExact": "v0.0.3"
+		},
+		{
+			"checksumSHA1": "Cw1GTJGuo3rb3HCIXNZXfJOJbzk=",
+			"path": "github.com/elastic/go-libaudit/auparse",
+			"revision": "cce87232cabb992866d94d6b6b6f810adcf13f9b",
+			"revisionTime": "2017-05-01T21:53:26Z",
+			"version": "v0.0.3",
+			"versionExact": "v0.0.3"
+		},
+		{
 			"checksumSHA1": "3jizmlZPCyo6FAZY8Trk9jA8NH4=",
 			"path": "github.com/elastic/go-lumber/client/v2",
 			"revision": "616041e345fc33c97bc0eb0fa6b388aa07bca3e1",
