@@ -216,6 +216,11 @@ func (l *winEventLog) buildRecordFromXML(x []byte, recoveredErr error) (Record, 
 		e.RenderErr = recoveredErr.Error()
 	}
 
+	if e.Level == "" {
+		// Fallback on LevelRaw if the Level is not set in the RenderingInfo.
+		e.Level = win.EventLevel(e.LevelRaw).String()
+	}
+
 	if logp.IsDebug(detailSelector) {
 		detailf("%s XML=%s Event=%+v", l.logPrefix, string(x), e)
 	}
