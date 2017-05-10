@@ -1,4 +1,4 @@
-# This is the latest stable release environment.
+# This is the latest stable 5x release environment.
 
 version: '2.1'
 services:
