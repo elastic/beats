@@ -1,4 +1,4 @@
-package harvester
+package log
 
 import (
 	"bytes"
@@ -8,7 +8,7 @@ import (
 	"os"
 	"time"
 
-	"github.com/elastic/beats/filebeat/config"
+	"github.com/elastic/beats/filebeat/harvester"
 	"github.com/elastic/beats/filebeat/harvester/reader"
 	"github.com/elastic/beats/filebeat/harvester/source"
 	"github.com/elastic/beats/filebeat/input/file"
@@ -28,7 +28,6 @@ var (
 	harvesterClosed    = monitoring.NewInt(harvesterMetrics, "closed")
 	harvesterRunning   = monitoring.NewInt(harvesterMetrics, "running")
 	harvesterOpenFiles = monitoring.NewInt(harvesterMetrics, "open_files")
-	filesTruncated     = monitoring.NewInt(harvesterMetrics, "files.truncated")
 )
 
 // Setup opens the file handler and creates the reader for the harvester
@@ -226,14 +225,14 @@ func (h *Harvester) SendStateUpdate() {
 // the include_lines and exclude_lines options.
 func (h *Harvester) shouldExportLine(line string) bool {
 	if len(h.config.IncludeLines) > 0 {
-		if !MatchAny(h.config.IncludeLines, line) {
+		if !harvester.MatchAny(h.config.IncludeLines, line) {
 			// drop line
 			logp.Debug("harvester", "Drop line as it does not match any of the include patterns %s", line)
 			return false
 		}
 	}
 	if len(h.config.ExcludeLines) > 0 {
-		if MatchAny(h.config.ExcludeLines, line) {
+		if harvester.MatchAny(h.config.ExcludeLines, line) {
 			// drop line
 			logp.Debug("harvester", "Drop line as it does match one of the exclude patterns%s", line)
 			return false
@@ -324,7 +323,7 @@ func (h *Harvester) initFileOffset(file *os.File) (int64, error) {
 // getState returns an updated copy of the harvester state
 func (h *Harvester) getState() file.State {
 
-	if h.config.InputType == config.StdinInputType {
+	if !h.file.HasState() {
 		return file.State{}
 	}
 

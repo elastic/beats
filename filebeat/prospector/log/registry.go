@@ -1,32 +1,31 @@
-package prospector
+package log
 
 import (
 	"sync"
 
-	"github.com/elastic/beats/filebeat/harvester"
 	"github.com/elastic/beats/filebeat/harvester/reader"
 	uuid "github.com/satori/go.uuid"
 )
 
 type harvesterRegistry struct {
 	sync.Mutex
-	harvesters map[uuid.UUID]*harvester.Harvester
+	harvesters map[uuid.UUID]*Harvester
 	wg         sync.WaitGroup
 }
 
 func newHarvesterRegistry() *harvesterRegistry {
 	return &harvesterRegistry{
-		harvesters: map[uuid.UUID]*harvester.Harvester{},
+		harvesters: map[uuid.UUID]*Harvester{},
 	}
 }
 
-func (hr *harvesterRegistry) add(h *harvester.Harvester) {
+func (hr *harvesterRegistry) add(h *Harvester) {
 	hr.Lock()
 	defer hr.Unlock()
 	hr.harvesters[h.ID] = h
 }
 
-func (hr *harvesterRegistry) remove(h *harvester.Harvester) {
+func (hr *harvesterRegistry) remove(h *Harvester) {
 	hr.Lock()
 	defer hr.Unlock()
 	delete(hr.harvesters, h.ID)
@@ -36,7 +35,7 @@ func (hr *harvesterRegistry) Stop() {
 	hr.Lock()
 	for _, hv := range hr.harvesters {
 		hr.wg.Add(1)
-		go func(h *harvester.Harvester) {
+		go func(h *Harvester) {
 			hr.wg.Done()
 			h.Stop()
 		}(hv)
@@ -49,7 +48,7 @@ func (hr *harvesterRegistry) waitForCompletion() {
 	hr.wg.Wait()
 }
 
-func (hr *harvesterRegistry) start(h *harvester.Harvester, r reader.Reader) {
+func (hr *harvesterRegistry) start(h *Harvester, r reader.Reader) {
 
 	hr.wg.Add(1)
 	hr.add(h)

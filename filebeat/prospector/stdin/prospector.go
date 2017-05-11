@@ -4,15 +4,15 @@ import (
 	"fmt"
 
 	"github.com/elastic/beats/filebeat/channel"
-	"github.com/elastic/beats/filebeat/harvester"
 	"github.com/elastic/beats/filebeat/input/file"
+	"github.com/elastic/beats/filebeat/prospector/log"
 	"github.com/elastic/beats/libbeat/common"
 	"github.com/elastic/beats/libbeat/logp"
 )
 
-// Stdin is a prospector for stdin
-type Stdin struct {
-	harvester *harvester.Harvester
+// Prospector is a prospector for stdin
+type Prospector struct {
+	harvester *log.Harvester
 	started   bool
 	cfg       *common.Config
 	outlet    channel.Outleter
@@ -20,9 +20,9 @@ type Stdin struct {
 
 // NewStdin creates a new stdin prospector
 // This prospector contains one harvester which is reading from stdin
-func NewProspector(cfg *common.Config, outlet channel.Outleter) (*Stdin, error) {
+func NewProspector(cfg *common.Config, outlet channel.Outleter) (*Prospector, error) {
 
-	prospectorer := &Stdin{
+	p := &Prospector{
 		started: false,
 		cfg:     cfg,
 		outlet:  outlet,
@@ -30,36 +30,36 @@ func NewProspector(cfg *common.Config, outlet channel.Outleter) (*Stdin, error) 
 
 	var err error
 
-	prospectorer.harvester, err = prospectorer.createHarvester(file.State{Source: "-"})
+	p.harvester, err = p.createHarvester(file.State{Source: "-"})
 	if err != nil {
 		return nil, fmt.Errorf("Error initializing stdin harvester: %v", err)
 	}
 
-	return prospectorer, nil
+	return p, nil
 }
 
 // Run runs the prospector
-func (s *Stdin) Run() {
+func (p *Prospector) Run() {
 
 	// Make sure stdin harvester is only started once
-	if !s.started {
-		reader, err := s.harvester.Setup()
+	if !p.started {
+		reader, err := p.harvester.Setup()
 		if err != nil {
 			logp.Err("Error starting stdin harvester: %s", err)
 			return
 		}
-		go s.harvester.Harvest(reader)
-		s.started = true
+		go p.harvester.Harvest(reader)
+		p.started = true
 	}
 }
 
 // createHarvester creates a new harvester instance from the given state
-func (s *Stdin) createHarvester(state file.State) (*harvester.Harvester, error) {
+func (p *Prospector) createHarvester(state file.State) (*log.Harvester, error) {
 
 	// Each harvester gets its own copy of the outlet
-	outlet := s.outlet.Copy()
-	h, err := harvester.NewHarvester(
-		s.cfg,
+	outlet := p.outlet.Copy()
+	h, err := log.NewHarvester(
+		p.cfg,
 		state,
 		nil,
 		outlet,
@@ -67,3 +67,9 @@ func (s *Stdin) createHarvester(state file.State) (*harvester.Harvester, error) 
 
 	return h, err
 }
+
+// Wait waits for completion of the prospector.
+func (p *Prospector) Wait() {}
+
+// Stop stops the prospector.
+func (p *Prospector) Stop() {}

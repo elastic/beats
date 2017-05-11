@@ -10,14 +10,10 @@ import (
 	"github.com/elastic/beats/filebeat/channel"
 	cfg "github.com/elastic/beats/filebeat/config"
 	"github.com/elastic/beats/filebeat/input/file"
+	"github.com/elastic/beats/filebeat/prospector/log"
 	"github.com/elastic/beats/filebeat/prospector/stdin"
 	"github.com/elastic/beats/libbeat/common"
 	"github.com/elastic/beats/libbeat/logp"
-	"github.com/elastic/beats/libbeat/monitoring"
-)
-
-var (
-	harvesterSkipped = monitoring.NewInt(nil, "filebeat.harvester.skipped")
 )
 
 // Prospector contains the prospector
@@ -28,13 +24,14 @@ type Prospector struct {
 	wg           *sync.WaitGroup
 	id           uint64
 	Once         bool
-	registry     *harvesterRegistry
 	beatDone     chan struct{}
 }
 
 // Prospectorer is the interface common to all prospectors
 type Prospectorer interface {
 	Run()
+	Stop()
+	Wait()
 }
 
 // NewProspector instantiates a new prospector
@@ -44,7 +41,6 @@ func NewProspector(conf *common.Config, outlet channel.Outleter, beatDone chan s
 		wg:       &sync.WaitGroup{},
 		done:     make(chan struct{}),
 		Once:     false,
-		registry: newHarvesterRegistry(),
 		beatDone: beatDone,
 	}
 
@@ -77,9 +73,9 @@ func (p *Prospector) initProspectorer(outlet channel.Outleter, states []file.Sta
 	case cfg.StdinInputType:
 		prospectorer, err = stdin.NewProspector(config, outlet)
 	case cfg.LogInputType:
-		prospectorer, err = NewLog(config, states, p.registry, outlet, p.done)
+		prospectorer, err = log.NewProspector(config, states, outlet, p.done)
 	default:
-		return fmt.Errorf("Invalid input type: %v", p.config.InputType)
+		return fmt.Errorf("invalid prospector type: %v. Change input_type", p.config.InputType)
 	}
 
 	if err != nil {
@@ -155,11 +151,8 @@ func (p *Prospector) stop() {
 
 	// In case of once, it will be waited until harvesters close itself
 	if p.Once {
-		p.registry.waitForCompletion()
+		p.prospectorer.Wait()
+	} else {
+		p.prospectorer.Stop()
 	}
-
-	// Stop all harvesters
-	// In case the beatDone channel is closed, this will not wait for completion
-	// Otherwise Stop will wait until output is complete
-	p.registry.Stop()
 }

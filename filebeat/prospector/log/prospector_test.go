@@ -1,6 +1,6 @@
 // +build !integration
 
-package prospector
+package log
 
 import (
 	"os"
@@ -14,8 +14,8 @@ import (
 
 func TestProspectorFileExclude(t *testing.T) {
 
-	p := Log{
-		config: prospectorConfig{
+	p := Prospector{
+		config: config{
 			ExcludeFiles: []match.Matcher{match.MustCompile(`\.gz$`)},
 		},
 	}
@@ -50,8 +50,8 @@ func TestIsCleanInactive(t *testing.T) {
 
 	for _, test := range cleanInactiveTests {
 
-		l := Log{
-			config: prospectorConfig{
+		l := Prospector{
+			config: config{
 				CleanInactive: test.cleanInactive,
 			},
 		}
