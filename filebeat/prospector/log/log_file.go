@@ -1,4 +1,4 @@
-package harvester
+package log
 
 import (
 	"io"
@@ -13,7 +13,7 @@ import (
 type LogFile struct {
 	fs           source.FileSource
 	offset       int64
-	config       harvesterConfig
+	config       config
 	lastTimeRead time.Time
 	backoff      time.Duration
 	done         chan struct{}
@@ -21,7 +21,7 @@ type LogFile struct {
 
 func NewLogFile(
 	fs source.FileSource,
-	config harvesterConfig,
+	config config,
 ) (*LogFile, error) {
 	var offset int64
 	if seeker, ok := fs.(io.Seeker); ok {

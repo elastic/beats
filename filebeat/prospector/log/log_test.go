@@ -1,6 +1,6 @@
 // +build !integration
 
-package harvester
+package log
 
 import (
 	"fmt"
@@ -20,7 +20,7 @@ import (
 
 func TestReadLine(t *testing.T) {
 
-	absPath, err := filepath.Abs("../tests/files/logs/")
+	absPath, err := filepath.Abs("../../tests/files/logs/")
 	// All files starting with tmp are ignored
 	logFile := absPath + "/tmp" + strconv.Itoa(rand.Int()) + ".log"
 
@@ -59,7 +59,7 @@ func TestReadLine(t *testing.T) {
 	f := source.File{File: readFile}
 
 	h := Harvester{
-		config: harvesterConfig{
+		config: config{
 			CloseInactive: 500 * time.Millisecond,
 			Backoff:       100 * time.Millisecond,
 			MaxBackoff:    1 * time.Second,
@@ -100,27 +100,6 @@ func TestReadLine(t *testing.T) {
 	assert.Equal(t, "", text)
 	assert.Equal(t, bytesread, 0)
 	assert.Equal(t, err, ErrInactive)
-}
-
-func TestExcludeLine(t *testing.T) {
-	regexp, err := InitMatchers("^DBG")
-	assert.Nil(t, err)
-	assert.True(t, MatchAny(regexp, "DBG: a debug message"))
-	assert.False(t, MatchAny(regexp, "ERR: an error message"))
-}
-
-func TestIncludeLine(t *testing.T) {
-	regexp, err := InitMatchers("^ERR", "^WARN")
-
-	assert.Nil(t, err)
-	assert.False(t, MatchAny(regexp, "DBG: a debug message"))
-	assert.True(t, MatchAny(regexp, "ERR: an error message"))
-	assert.True(t, MatchAny(regexp, "WARNING: a simple warning message"))
-}
-
-func TestInitRegexp(t *testing.T) {
-	_, err := InitMatchers("(((((")
-	assert.NotNil(t, err)
 }
 
 // readLine reads a full line into buffer and returns it.

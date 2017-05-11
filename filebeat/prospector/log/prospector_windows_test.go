@@ -1,6 +1,6 @@
 // +build !integration
 
-package prospector
+package log
 
 import (
 	"testing"
@@ -59,13 +59,13 @@ func TestMatchFileWindows(t *testing.T) {
 
 	for _, test := range matchTestsWindows {
 
-		l := Log{
-			config: prospectorConfig{
+		p := Prospector{
+			config: config{
 				Paths:        test.paths,
 				ExcludeFiles: test.excludeFiles,
 			},
 		}
 
-		assert.Equal(t, test.result, l.matchesFile(test.file))
+		assert.Equal(t, test.result, p.matchesFile(test.file))
 	}
 }
