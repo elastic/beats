@@ -5777,9 +5777,11 @@ Total number of connections.
 
 
 [[exported-fields-kubernetes-processor]]
-== Kubernetes info Fields
+== kubernetes Fields
 
+beta[]
 Kubernetes metadata added by the kubernetes processor
+
 
 
 
@@ -5823,6 +5825,14 @@ type: keyword
 Kubernetes container name
 
 
+[float]
+=== kubernetes.container.image
+
+type: keyword
+
+Kubernetes container image
+
+
 [[exported-fields-kubernetes]]
 == kubernetes Fields
 
@@ -5843,6 +5853,14 @@ Information and statistics of pods managed by kubernetes.
 
 kubernetes container metrics
 
+
+
+[float]
+=== kubernetes.container.start_time
+
+type: date
+
+Start time
 
 
 [float]
@@ -6055,6 +6073,14 @@ Node name
 
 
 [float]
+=== kubernetes.node.start_time
+
+type: date
+
+Start time
+
+
+[float]
 == cpu Fields
 
 CPU usage metrics
@@ -6214,6 +6240,31 @@ Filesystem total used in bytes
 
 
 
+[float]
+=== kubernetes.node.fs.inodes.used
+
+type: long
+
+Number of used inodes
+
+
+[float]
+=== kubernetes.node.fs.inodes.count
+
+type: long
+
+Number of inodes
+
+
+[float]
+=== kubernetes.node.fs.inodes.free
+
+type: long
+
+Number of free inodes
+
+
+
 
 
 [float]
@@ -6253,6 +6304,14 @@ Image filesystem total used in bytes
 
 kubernetes pod metrics
 
+
+
+[float]
+=== kubernetes.pod.start_time
+
+type: date
+
+Start time
 
 
 
@@ -6641,6 +6700,14 @@ kubernetes system containers metrics
 type: keyword
 
 Container name
+
+
+[float]
+=== kubernetes.system.start_time
+
+type: date
+
+Start time
 
 
 [float]
