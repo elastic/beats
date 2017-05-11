@@ -57,7 +57,7 @@ func (l *Loader) Load() error {
 			l.config.Name = l.beatInfo.Beat
 		}
 
-		tmpl, err := New(l.beatInfo.Version, l.client.GetVersion(), l.config.Name)
+		tmpl, err := New(l.beatInfo.Version, l.client.GetVersion(), l.config.Name, l.config.Settings)
 		if err != nil {
 			return fmt.Errorf("error creating template instance: %v", err)
 		}

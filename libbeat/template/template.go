@@ -20,10 +20,11 @@ type Template struct {
 	index       string
 	beatVersion Version
 	esVersion   Version
+	settings    common.MapStr
 }
 
 // New creates a new template instance
-func New(beatVersion string, esVersion string, index string) (*Template, error) {
+func New(beatVersion string, esVersion string, index string, settings common.MapStr) (*Template, error) {
 
 	bV, err := NewVersion(beatVersion)
 	if err != nil {
@@ -44,6 +45,7 @@ func New(beatVersion string, esVersion string, index string) (*Template, error) 
 		index:       index,
 		beatVersion: *bV,
 		esVersion:   *esV,
+		settings:    settings,
 	}, nil
 
 }
@@ -90,6 +92,18 @@ func (t *Template) generate(properties common.MapStr, dynamicTemplates []common.
 
 	dynamicTemplates = append(dynamicTemplates, dynamicTemplateBase)
 
+	settings := common.MapStr{
+		"index": common.MapStr{
+			"refresh_interval": "5s",
+			"mapping": common.MapStr{
+				"total_fields": common.MapStr{
+					"limit": defaultTotalFieldsLimit,
+				},
+			},
+		},
+	}
+	settings.DeepUpdate(t.settings)
+
 	// Load basic structure
 	basicStructure := common.MapStr{
 		"mappings": common.MapStr{
@@ -102,10 +116,8 @@ func (t *Template) generate(properties common.MapStr, dynamicTemplates []common.
 				"properties":        properties,
 			},
 		},
-		"order": 1,
-		"settings": common.MapStr{
-			"index.refresh_interval": "5s",
-		},
+		"order":    1,
+		"settings": settings,
 	}
 
 	// ES 6 moved from template to index_patterns: https://github.com/elastic/elasticsearch/pull/21009
@@ -117,11 +129,6 @@ func (t *Template) generate(properties common.MapStr, dynamicTemplates []common.
 
 	if t.esVersion.IsMajor(2) || t.esVersion.IsMajor(5) {
 		basicStructure.Put("mappings._default_._all.norms.enabled", false)
-	}
-
-	if t.esVersion.major >= 5 {
-		// Metricbeat exceeds the default of 1000 fields
-		basicStructure.Put("settings.index.mapping.total_fields.limit", defaultTotalFieldsLimit)
 	}
 
 	return basicStructure

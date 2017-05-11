@@ -13,12 +13,16 @@ you must <<load-template-manually,load the template manually>>.
 
 *`name`*:: The name of the template. The default is +{beatname_lc}+.
 
-*`path`*:: The path to the template file. The default is +fields.yml+. If a relative
-path is set, it is considered relative to the config path. See the <<directory-layout>> section for
-details.
+*`fields`*:: The path to the YAML file describing the fields. The default is +fields.yml+. If a
+relative path is set, it is considered relative to the config path. See the <<directory-layout>>
+section for details.
 
 *`overwrite`*:: A boolean that specifies whether to overwrite the existing template. The default
 is false.
+
+*`settings`*:: A dictionary of settings to place into the `settings` dictionary of the Elasticsearch
+template. For more details about the available Elasticsearch mapping options, please see the
+Elasticsearch {elasticsearch}/mapping.html[mapping reference].
 
 For example:
 
@@ -27,4 +31,7 @@ For example:
 setup.template.name: "{beatname_lc}"
 setup.template.fields: "fields.yml"
 setup.template.overwrite: false
+setup.template.settings:
+  index.number_of_shards: 1
+  index.number_of_replicas: 1
 ----------------------------------------------------------------------
