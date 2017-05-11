@@ -12,10 +12,22 @@
     "type": "metricsets",
     "windows": {
         "perfmon": {
+            "disk": {
+                "bytes": {
+                    "read": {
+                        "total": 0
+                    }
+                }
+            },
             "processor": {
                 "time": {
+                    "idle": {
+                        "average": {
+                            "ns": 670661.5894039735
+                        }
+                    },
                     "total": {
-                        "pct": null
+                        "pct": 3.135058464112306
                     }
                 }
             }

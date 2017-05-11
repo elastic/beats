@@ -21,12 +21,22 @@ func TestData(t *testing.T) {
 		"metricsets": []string{"perfmon"},
 		"perfmon.counters": []map[string]string{
 			{"alias": "processor.time.total.pct",
-				"query": processorTimeCounter,
+				"query": `\Processor Information(_Total)\% Processor Time`,
+			},
+			{"alias": "disk.bytes.read.total",
+				"query": `\FileSystem Disk Activity(_Total)\FileSystem Bytes Read`,
+			},
+			{"alias": "processor.time.idle.average.ns",
+				"query": `\Processor Information(_Total)\Average Idle Time`,
 			},
 		},
 	}
 
 	f := mbtest.NewEventFetcher(t, config)
+
+	f.Fetch()
+
+	time.Sleep(60 * time.Millisecond)
 
 	err := mbtest.WriteEvent(f, t)
 	if err != nil {
