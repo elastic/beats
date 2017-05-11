@@ -1,6 +1,7 @@
 import os
 import metricbeat
 import unittest
+from nose.plugins.skip import SkipTest
 
 
 class Test(metricbeat.BaseTest):
@@ -10,6 +11,12 @@ class Test(metricbeat.BaseTest):
         """
         kibana status metricset test
         """
+        env = os.environ.get('TESTING_ENVIRONMENT')
+
+        if env == "2x" or env == "5x":
+            # Skip for 5.x and 2.x tests as Kibana endpoint not available
+            raise SkipTest
+
         self.render_config_template(modules=[{
             "name": "kibana",
             "metricsets": ["status"],
