@@ -16,6 +16,8 @@ lines that match the specified regular expression are considered either continua
 
 * the `match` option, which specifies how Filebeat combines matching lines into an event. You can specify `before` or `after`.
 
+* the 'flush_pattern option, which specifies a regular expression, in which the current multiline will be flushed from memory, ending the multline-message.
+
 See the full documentation for <<multiline>> to learn more about these options. Also read <<yaml-tips>> and 
 <<regexp-support>> to avoid common mistakes.
 
@@ -137,8 +139,28 @@ multiline.match: after
 This configuration uses the `negate: true` and `match: after` settings to specify that any line that does not match the 
 specified pattern belongs to the previous line.
 
+==== Application events
 
+Sometimes your application logs contain events, that begin and end with custom markers, such as the following example:
 
+[source,shell]
+-------------------------------------------------------------------------------------
+[2015-08-24 11:49:14,389] Start new event
+[2015-08-24 11:49:14,395] Content of processeing something
+[2015-08-24 11:49:14,399] End event
+-------------------------------------------------------------------------------------
+
+To consolidate this as a single event in Filebeat, use the following multiline configuration:
+
+[source,yaml]
+-------------------------------------------------------------------------------------
+multiline.pattern: 'Start new event'
+multiline.negate: true
+multiline.match: after
+multiline.flush_pattern: 'End event'
+-------------------------------------------------------------------------------------
+
+The 'flush_pattern' option, specifies a regex at which the current multiline will be flushed. If you think of the 'pattern' option specifying the beginning of an event, the 'flush_pattern' option will specify the end or last line of the event.
 
 
 
