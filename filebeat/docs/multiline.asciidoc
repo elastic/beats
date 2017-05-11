@@ -139,6 +139,7 @@ multiline.match: after
 This configuration uses the `negate: true` and `match: after` settings to specify that any line that does not match the 
 specified pattern belongs to the previous line.
 
+[float]
 ==== Application events
 
 Sometimes your application logs contain events, that begin and end with custom markers, such as the following example:
@@ -146,7 +147,7 @@ Sometimes your application logs contain events, that begin and end with custom m
 [source,shell]
 -------------------------------------------------------------------------------------
 [2015-08-24 11:49:14,389] Start new event
-[2015-08-24 11:49:14,395] Content of processeing something
+[2015-08-24 11:49:14,395] Content of processing something
 [2015-08-24 11:49:14,399] End event
 -------------------------------------------------------------------------------------
 
