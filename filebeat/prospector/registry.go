@@ -12,11 +12,13 @@ type harvesterRegistry struct {
 	sync.Mutex
 	harvesters map[uuid.UUID]*harvester.Harvester
 	wg         sync.WaitGroup
+	done       chan struct{}
 }
 
 func newHarvesterRegistry() *harvesterRegistry {
 	return &harvesterRegistry{
 		harvesters: map[uuid.UUID]*harvester.Harvester{},
+		done:       make(chan struct{}),
 	}
 }
 
@@ -33,7 +35,13 @@ func (hr *harvesterRegistry) remove(h *harvester.Harvester) {
 }
 
 func (hr *harvesterRegistry) Stop() {
+
 	hr.Lock()
+	defer func() {
+		hr.Unlock()
+		hr.waitForCompletion()
+	}()
+	close(hr.done)
 	for _, hv := range hr.harvesters {
 		hr.wg.Add(1)
 		go func(h *harvester.Harvester) {
@@ -41,8 +49,7 @@ func (hr *harvesterRegistry) Stop() {
 			h.Stop()
 		}(hv)
 	}
-	hr.Unlock()
-	hr.waitForCompletion()
+
 }
 
 func (hr *harvesterRegistry) waitForCompletion() {
@@ -51,7 +58,23 @@ func (hr *harvesterRegistry) waitForCompletion() {
 
 func (hr *harvesterRegistry) start(h *harvester.Harvester, r reader.Reader) {
 
+	// Make sure stop is not called during starting a harvester
+	hr.Lock()
+
+	// Make sure no new harvesters are started after stop was called
+	select {
+	case <-hr.done:
+		return
+	default:
+	}
+
 	hr.wg.Add(1)
+	h.StopWg.Add(1)
+
+	hr.Unlock()
+
+	// TODO: It could happen that stop is called here
+
 	hr.add(h)
 
 	// Update state before staring harvester

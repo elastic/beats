@@ -56,7 +56,6 @@ func (h *Harvester) Harvest(r reader.Reader) {
 	harvesterStarted.Add(1)
 	harvesterRunning.Add(1)
 
-	h.stopWg.Add(1)
 	defer func() {
 		// Channel to stop internal harvester routines
 		h.stop()
@@ -66,7 +65,7 @@ func (h *Harvester) Harvest(r reader.Reader) {
 		harvesterRunning.Add(-1)
 
 		// Marks harvester stopping completed
-		h.stopWg.Done()
+		h.StopWg.Done()
 	}()
 
 	// Closes reader after timeout or when done channel is closed
@@ -190,7 +189,7 @@ func (h *Harvester) stop() {
 // Stop stops harvester and waits for completion
 func (h *Harvester) Stop() {
 	h.stop()
-	h.stopWg.Wait()
+	h.StopWg.Wait()
 }
 
 // sendEvent sends event to the spooler channel
