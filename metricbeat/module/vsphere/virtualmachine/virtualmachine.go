@@ -2,7 +2,6 @@ package virtualmachine
 
 import (
 	"context"
-	"errors"
 	"net/url"
 	"sync"
 
@@ -10,6 +9,7 @@ import (
 	"github.com/elastic/beats/libbeat/logp"
 	"github.com/elastic/beats/metricbeat/mb"
 
+	"github.com/pkg/errors"
 	"github.com/vmware/govmomi"
 	"github.com/vmware/govmomi/find"
 	"github.com/vmware/govmomi/property"
@@ -62,44 +62,38 @@ func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
 
 func (m *MetricSet) Fetch() ([]common.MapStr, error) {
 	f := find.NewFinder(m.Client, true)
-	if f == nil {
-		return nil, errors.New("Finder undefined for vsphere.")
-	}
 
 	ctx, cancel := context.WithCancel(context.Background())
 	defer cancel()
 
-	// Get all datacenters
+	// Get all data centers.
 	dcs, err := f.DatacenterList(ctx, "*")
 	if err != nil {
 		return nil, err
 	}
 
 	events := []common.MapStr{}
-	// to know when its finished
+
 	var wg sync.WaitGroup
-	// to prevent events be modified at same time
 	var mutex sync.Mutex
 
 	for _, dc := range dcs {
-
 		f.SetDatacenter(dc)
 
-		// Get all virtual machines
 		vms, err := f.VirtualMachineList(ctx, "*")
 		if err != nil {
-			return nil, err
+			return nil, errors.Wrap(err, "failed to get virtual machine list")
 		}
 
 		pc := property.DefaultCollector(m.Client)
 
-		// Convert virtual machines into list of references
+		// Convert virtual machines into list of references.
 		var refs []types.ManagedObjectReference
 		for _, vm := range vms {
 			refs = append(refs, vm.Reference())
 		}
 
-		// Get summary property (VirtualMachineSummary)
+		// Retrieve summary property (VirtualMachineSummary).
 		var vmt []mo.VirtualMachine
 		err = pc.Retrieve(ctx, refs, []string{"summary"}, &vmt)
 		if err != nil {

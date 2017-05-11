@@ -2,13 +2,13 @@ package host
 
 import (
 	"context"
-	"errors"
 	"net/url"
 
 	"github.com/elastic/beats/libbeat/common"
 	"github.com/elastic/beats/libbeat/logp"
 	"github.com/elastic/beats/metricbeat/mb"
 
+	"github.com/pkg/errors"
 	"github.com/vmware/govmomi"
 	"github.com/vmware/govmomi/find"
 	"github.com/vmware/govmomi/property"
@@ -61,40 +61,34 @@ func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
 
 func (m *MetricSet) Fetch() ([]common.MapStr, error) {
 	f := find.NewFinder(m.Client, true)
-	if f == nil {
-		return nil, errors.New("Finder undefined for vsphere.")
-	}
 
 	ctx, cancel := context.WithCancel(context.Background())
 	defer cancel()
 
-	// Get all datacenters
+	// Get all data centers.
 	dcs, err := f.DatacenterList(ctx, "*")
 	if err != nil {
 		return nil, err
 	}
 
 	events := []common.MapStr{}
-
 	for _, dc := range dcs {
-
 		f.SetDatacenter(dc)
 
-		// Get all hosts
 		hss, err := f.HostSystemList(ctx, "*")
 		if err != nil {
-			return nil, err
+			return nil, errors.Wrap(err, "failed to get hostsystem list")
 		}
 
 		pc := property.DefaultCollector(m.Client)
 
-		// Convert hosts into list of references
+		// Convert hosts into list of references.
 		var refs []types.ManagedObjectReference
 		for _, hs := range hss {
 			refs = append(refs, hs.Reference())
 		}
 
-		// Get summary property (HostListSummary)
+		// Retrieve summary property (HostListSummary).
 		var hst []mo.HostSystem
 		err = pc.Retrieve(ctx, refs, []string{"summary"}, &hst)
 		if err != nil {
