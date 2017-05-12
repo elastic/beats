@@ -31,7 +31,7 @@ type Prospector struct {
 	cfg      *common.Config
 	config   config
 	states   *file.States
-	registry *harvesterRegistry
+	registry *harvester.Registry
 	outlet   channel.Outleter
 	done     chan struct{}
 }
@@ -42,7 +42,7 @@ func NewProspector(cfg *common.Config, states []file.State, outlet channel.Outle
 	p := &Prospector{
 		config:   defaultConfig,
 		cfg:      cfg,
-		registry: newHarvesterRegistry(),
+		registry: harvester.NewRegistry(),
 		outlet:   outlet,
 		states:   &file.States{},
 		done:     done,
@@ -462,7 +462,7 @@ func (p *Prospector) createHarvester(state file.State) (*Harvester, error) {
 // In case the HarvesterLimit is reached, an error is returned
 func (p *Prospector) startHarvester(state file.State, offset int64) error {
 
-	if p.config.HarvesterLimit > 0 && p.registry.len() >= p.config.HarvesterLimit {
+	if p.config.HarvesterLimit > 0 && p.registry.Len() >= p.config.HarvesterLimit {
 		harvesterSkipped.Add(1)
 		return fmt.Errorf("Harvester limit reached")
 	}
@@ -477,12 +477,17 @@ func (p *Prospector) startHarvester(state file.State, offset int64) error {
 		return err
 	}
 
-	reader, err := h.Setup()
+	err = h.Setup()
 	if err != nil {
 		return fmt.Errorf("Error setting up harvester: %s", err)
 	}
 
-	p.registry.start(h, reader)
+	// Update state before staring harvester
+	// This makes sure the states is set to Finished: false
+	// This is synchronous state update as part of the scan
+	h.SendStateUpdate()
+
+	p.registry.Start(h)
 
 	return nil
 }
@@ -514,7 +519,7 @@ func (p *Prospector) updateState(state file.State) error {
 
 // Wait waits for the all harvesters to complete and only then call stop
 func (p *Prospector) Wait() {
-	p.registry.waitForCompletion()
+	p.registry.WaitForCompletion()
 	p.Stop()
 }
 

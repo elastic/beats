@@ -20,6 +20,7 @@ import (
 
 	cfg "github.com/elastic/beats/filebeat/config"
 	"github.com/elastic/beats/filebeat/harvester/encoding"
+	"github.com/elastic/beats/filebeat/harvester/reader"
 	"github.com/elastic/beats/filebeat/harvester/source"
 	"github.com/elastic/beats/filebeat/input/file"
 	"github.com/elastic/beats/filebeat/util"
@@ -54,8 +55,9 @@ type Harvester struct {
 	stopOnce        sync.Once
 	stopWg          *sync.WaitGroup
 	outlet          Outlet
-	ID              uuid.UUID
+	id              uuid.UUID
 	processors      *processors.Processors
+	reader          reader.Reader
 }
 
 func NewHarvester(
@@ -72,7 +74,7 @@ func NewHarvester(
 		done:   make(chan struct{}),
 		stopWg: &sync.WaitGroup{},
 		outlet: outlet,
-		ID:     uuid.NewV4(),
+		id:     uuid.NewV4(),
 	}
 
 	if err := config.Unpack(&h.config); err != nil {
@@ -140,4 +142,9 @@ func (h *Harvester) forwardEvent(data *util.Data) error {
 	}
 
 	return nil
+}
+
+// ID returns the unique harvester identifier
+func (h *Harvester) ID() uuid.UUID {
+	return h.id
 }

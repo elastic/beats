@@ -43,12 +43,12 @@ func (p *Prospector) Run() {
 
 	// Make sure stdin harvester is only started once
 	if !p.started {
-		reader, err := p.harvester.Setup()
+		err := p.harvester.Setup()
 		if err != nil {
 			logp.Err("Error starting stdin harvester: %s", err)
 			return
 		}
-		go p.harvester.Harvest(reader)
+		go p.harvester.Start()
 		p.started = true
 	}
 }
