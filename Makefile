@@ -66,7 +66,7 @@ clean-vendor:
 check: python-env
 	$(foreach var,$(PROJECTS),$(MAKE) -C $(var) check || exit 1;)
 	# Checks also python files which are not part of the beats
-	$(FIND) -name *.py -exec autopep8 -d --max-line-length 120  {} \; | (! grep . -q) || (echo "Code differs from autopep8's style" && false)
+	. $(PYTHON_ENV)/bin/activate && $(FIND) -name *.py -exec autopep8 -d --max-line-length 120  {} \; | (! grep . -q) || (echo "Code differs from autopep8's style" && false)
 	# Validate that all updates were committed
 	$(MAKE) update
 	git diff | cat
@@ -83,7 +83,7 @@ misspell:
 fmt: python-env
 	$(foreach var,$(PROJECTS),$(MAKE) -C $(var) fmt || exit 1;)
 	# Cleans also python files which are not part of the beats
-	. $(PYTHON_ENV)/bin/activate && find . -type f -name *.py -not -path "*/vendor/*" -not -path "*/build/*" -not -path "*/.git/*" -exec autopep8 --in-place --max-line-length 120  {} \;
+	. $(PYTHON_ENV)/bin/activate && $(FIND) . -name *.py -exec autopep8 --in-place --max-line-length 120  {} \;
 
 .PHONY: lint
 lint:
@@ -136,11 +136,11 @@ upload-release:
 	aws s3 cp --recursive --acl public-read build/upload s3://download.elasticsearch.org/beats/
 
 .PHONY: notice
-notice:
-	python dev-tools/generate_notice.py .
+notice: python-env
+	@. $(PYTHON_ENV)/bin/activate && python dev-tools/generate_notice.py .
 
 # Sets up the virtual python environment
 .PHONY: python-env
 python-env:
 	@test -d $(PYTHON_ENV) || virtualenv $(VIRTUALENV_PARAMS) $(PYTHON_ENV)
-	@. $(PYTHON_ENV)/bin/activate && pip install -q --upgrade pip autopep8
+	@. $(PYTHON_ENV)/bin/activate && pip install -q --upgrade pip autopep8 six

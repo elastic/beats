@@ -198,7 +198,7 @@ class TestCase(unittest.TestCase):
         kargs["beat"] = self
         output_str = template.render(**kargs)
         with open(os.path.join(self.working_dir, output), "wb") as f:
-            f.write(output_str)
+            f.write(output_str.encode('utf8'))
 
     # Returns output as JSON object with flattened fields (. notation)
     def read_output(self,
