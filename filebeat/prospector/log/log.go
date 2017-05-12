@@ -31,26 +31,26 @@ var (
 )
 
 // Setup opens the file handler and creates the reader for the harvester
-func (h *Harvester) Setup() (reader.Reader, error) {
+func (h *Harvester) Setup() error {
 	err := h.open()
 	if err != nil {
-		return nil, fmt.Errorf("Harvester setup failed. Unexpected file opening error: %s", err)
+		return fmt.Errorf("Harvester setup failed. Unexpected file opening error: %s", err)
 	}
 
-	r, err := h.newLogFileReader()
+	h.reader, err = h.newLogFileReader()
 	if err != nil {
 		if h.file != nil {
 			h.file.Close()
 		}
-		return nil, fmt.Errorf("Harvester setup failed. Unexpected encoding line reader error: %s", err)
+		return fmt.Errorf("Harvester setup failed. Unexpected encoding line reader error: %s", err)
 	}
 
-	return r, nil
+	return nil
 
 }
 
 // Harvest reads files line by line and sends events to the defined output
-func (h *Harvester) Harvest(r reader.Reader) {
+func (h *Harvester) Start() {
 
 	harvesterStarted.Add(1)
 	harvesterRunning.Add(1)
@@ -99,7 +99,7 @@ func (h *Harvester) Harvest(r reader.Reader) {
 		default:
 		}
 
-		message, err := r.Next()
+		message, err := h.reader.Next()
 		if err != nil {
 			switch err {
 			case ErrFileTruncate:
