@@ -137,7 +137,7 @@ started experience for common log formats. See <<filebeat-modules-quickstart>>
 to learn how to get started with modules. If you use Filebeat modules to get
 started, you can skip the content in this section, including the remaining
 getting started steps, and go directly to the <<filebeat-modules-quickstart>>
-page. 
+page.
 
 To configure Filebeat manually, you edit the configuration file. For rpm and deb,
 you'll find the configuration file at `/etc/filebeat/filebeat.yml`. For mac and
@@ -155,7 +155,7 @@ default values for most configuration options.
 [source,yaml]
 -------------------------------------------------------------------------------------
 filebeat.prospectors:
-- input_type: log
+- type: log
   paths:
     - /var/log/*.log
     #- c:\programdata\elasticsearch\logs\*
@@ -170,7 +170,7 @@ For the most basic Filebeat configuration, you can define a single prospector wi
 [source,yaml]
 -------------------------------------------------------------------------------------
 filebeat.prospectors:
-- input_type: log
+- type: log
   paths:
     - /var/log/*.log
 -------------------------------------------------------------------------------------

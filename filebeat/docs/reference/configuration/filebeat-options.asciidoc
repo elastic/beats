@@ -11,11 +11,11 @@ Here is a sample configuration:
 [source,yaml]
 -------------------------------------------------------------------------------------
 filebeat.prospectors:
-- input_type: log
+- type: log
   paths:
     - /var/log/apache/httpd-*.log
 
-- input_type: log
+- type: log
   paths:
     - /var/log/messages
     - /var/log/*.log
@@ -23,14 +23,14 @@ filebeat.prospectors:
 
 ==== Options
 
-===== input_type
+===== type
 
 One of the following input types:
 
     * log: Reads every line of the log file (default)
     * stdin: Reads the standard in
 
-The value that you specify here is used as the `input_type` for each event published to Logstash and Elasticsearch.
+The value that you specify here is used as the `type` for each event published to Logstash and Elasticsearch.
 
 [[prospector-paths]]
 ===== paths

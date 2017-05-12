@@ -15,7 +15,7 @@ import (
 
 // Defaults for config variables which are not set
 const (
-	DefaultInputType = "log"
+	DefaultType = "log"
 )
 
 type Config struct {
@@ -39,15 +39,16 @@ var (
 	}
 )
 
+// Contains available prospector types
 const (
-	LogInputType   = "log"
-	StdinInputType = "stdin"
+	LogType   = "log"
+	StdinType = "stdin"
 )
 
 // List of valid input types
-var ValidInputType = map[string]struct{}{
-	StdinInputType: {},
-	LogInputType:   {},
+var ValidType = map[string]struct{}{
+	StdinType: {},
+	LogType:   {},
 }
 
 // getConfigFiles returns list of config files.

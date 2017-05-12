@@ -153,7 +153,7 @@ class Test(BaseTest):
         """
 
         prospector_raw = """
-- input_type: log
+- type: log
   paths: []
 """
 

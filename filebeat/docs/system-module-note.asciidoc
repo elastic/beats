@@ -7,7 +7,7 @@ you plan to run the `system` module, edit the Filebeat configuration file,
 
 [source,yaml]
 ----------------------------------------------------------------------
-#- input_type: log
+#- type: log
   #paths:
     #- /var/log/*.log
 ----------------------------------------------------------------------

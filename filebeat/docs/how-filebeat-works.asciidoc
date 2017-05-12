@@ -1,9 +1,9 @@
 [[how-filebeat-works]]
 == How Filebeat Works
 
-In this topic, you learn about the key building blocks of Filebeat and how they work together. Understanding these concepts will help you make informed decisions about configuring Filebeat for specific use cases.  
+In this topic, you learn about the key building blocks of Filebeat and how they work together. Understanding these concepts will help you make informed decisions about configuring Filebeat for specific use cases.
 
-Filebeat consists of two main components: <<prospector,prospectors>> and <<harvester,harvesters>>. These components work together to tail files and send event data to the output that you specify. 
+Filebeat consists of two main components: <<prospector,prospectors>> and <<harvester,harvesters>>. These components work together to tail files and send event data to the output that you specify.
 
 
 [float]
@@ -26,14 +26,14 @@ To control when a harvester is closed, use the <<close-options,`close_*`>> confi
 
 A prospector is responsible for managing the harvesters and finding all sources to read from.
 
-If the input type is `log`, the prospector finds all files on the drive that match the defined glob paths and starts a harvester for each file. Each prospector runs in its own Go routine. 
+If the input type is `log`, the prospector finds all files on the drive that match the defined glob paths and starts a harvester for each file. Each prospector runs in its own Go routine.
 
 The following example configures Filebeat to harvest lines from all log files that match the specified glob patterns:
 
 [source,yaml]
 -------------------------------------------------------------------------------------
 filebeat.prospectors:
-- input_type: log
+- type: log
   paths:
     - /var/log/*.log
     - /var/path2/*.log
@@ -50,7 +50,7 @@ Filebeat keeps the state of each file and frequently flushes the state to disk i
 
 Each prospector keeps a state for each file it finds. Because files can be renamed or moved, the filename and path are not enough to identify a file. For each file, Filebeat stores unique identifiers to detect whether a file was harvested previously.
 
-If your use case involves creating a large number of new files every day, you might find that the registry file grows to be too large. See <<reduce-registry-size>> for details about configuration options that you can set to resolve this issue. 
+If your use case involves creating a large number of new files every day, you might find that the registry file grows to be too large. See <<reduce-registry-size>> for details about configuration options that you can set to resolve this issue.
 
 [float]
 [[at-least-once-delivery]]
@@ -58,11 +58,11 @@ If your use case involves creating a large number of new files every day, you mi
 
 Filebeat guarantees that events will be delivered to the configured output at
 least once and with no data loss. Filebeat is able to achieve this behavior
-because it stores the delivery state of each event in the registry file. 
+because it stores the delivery state of each event in the registry file.
 
 In situations where the defined output is blocked and has not confirmed all
 events, Filebeat will keep trying to send events until the output acknowledges
-that it has received the events. 
+that it has received the events.
 
 If Filebeat shuts down while it's in the process of sending events, it does not
 wait for the output to acknowledge all events before shutting down. Any events

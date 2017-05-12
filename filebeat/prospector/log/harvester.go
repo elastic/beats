@@ -108,10 +108,10 @@ func NewHarvester(
 // open does open the file given under h.Path and assigns the file handler to h.file
 func (h *Harvester) open() error {
 
-	switch h.config.InputType {
-	case cfg.StdinInputType:
+	switch h.config.Type {
+	case cfg.StdinType:
 		return h.openStdin()
-	case cfg.LogInputType:
+	case cfg.LogType:
 		return h.openFile()
 	default:
 		return fmt.Errorf("Invalid harvester type: %+v", h.config)
@@ -129,6 +129,7 @@ func (h *Harvester) forwardEvent(data *util.Data) error {
 
 	if data.HasEvent() {
 		data.Event[common.EventMetadataKey] = h.config.EventMetadata
+		data.Event.Put("prospector.type", h.config.Type)
 
 		// run the filters before sending to spooler
 		data.Event = h.processors.Run(data.Event)

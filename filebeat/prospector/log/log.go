@@ -149,7 +149,6 @@ func (h *Harvester) Start() {
 				"@timestamp": common.Time(message.Ts),
 				"source":     state.Source,
 				"offset":     state.Offset, // Offset here is the offset before the starting char.
-				"input_type": h.config.InputType,
 			}
 			data.Event.DeepUpdate(message.Fields)
 

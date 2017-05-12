@@ -37,7 +37,7 @@ Example:
 [source,yaml]
 -------------------------------------------------------------------------------
 filebeat.prospectors:
-- input_type: log
+- type: log
   paths:
     - /var/log/*.log
 output.logstash:
@@ -63,7 +63,7 @@ Example:
 [source,yaml]
 -------------------------------------------------------------------------------
 filebeat.prospectors:
-- input_type: log
+- type: log
   paths:
     - /var/log/*.log
 filebeat.spool_size: 4096

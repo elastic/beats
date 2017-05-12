@@ -183,7 +183,7 @@ filebeat.prospectors:
 # * stdin: Reads the standard in
 
 #------------------------------ Log prospector --------------------------------
-- input_type: log
+- type: log
 
   # Change to true to enable this prospector configuration.
   enabled: false
@@ -377,7 +377,7 @@ filebeat.prospectors:
 
 #----------------------------- Stdin prospector -------------------------------
 # Configuration to use stdin input
-#- input_type: stdin
+#- type: stdin
 
 #========================= Filebeat global options ============================
 

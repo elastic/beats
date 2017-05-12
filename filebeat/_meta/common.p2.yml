@@ -9,7 +9,7 @@ filebeat.prospectors:
 # you can use different prospectors for various configurations.
 # Below are the prospector specific configurations.
 
-- input_type: log
+- type: log
 
   # Change to true to enable this prospector configuration.
   enabled: false
