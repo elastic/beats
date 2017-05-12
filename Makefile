@@ -83,7 +83,7 @@ misspell:
 fmt: python-env
 	$(foreach var,$(PROJECTS),$(MAKE) -C $(var) fmt || exit 1;)
 	# Cleans also python files which are not part of the beats
-	find . -type f -name *.py -not -path "*/vendor/*" -not -path "*/build/*" -not -path "*/.git/*" -exec autopep8 --in-place --max-line-length 120  {} \;
+	. ${PYTHON_ENV}/bin/activate && find . -type f -name *.py -not -path "*/vendor/*" -not -path "*/build/*" -not -path "*/.git/*" -exec autopep8 --in-place --max-line-length 120  {} \;
 
 .PHONY: lint
 lint:

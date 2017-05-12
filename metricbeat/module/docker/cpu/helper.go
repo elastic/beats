@@ -4,8 +4,8 @@ import (
 	"strconv"
 
 	"github.com/elastic/beats/libbeat/common"
-	"github.com/elastic/beats/metricbeat/module/docker"
 	"github.com/elastic/beats/libbeat/logp"
+	"github.com/elastic/beats/metricbeat/module/docker"
 
 	dc "github.com/fsouza/go-dockerclient"
 )
@@ -101,7 +101,7 @@ func systemUsage(stats *dc.Stats) float64 {
 func calculateLoad(newValue uint64, oldValue uint64) float64 {
 	value := float64(newValue) - float64(oldValue)
 	if value < 0 {
-		logp.Err("Error calculating CPU time change for docker module: new stats value (%v) is lower than the old one(%v)",newValue,oldValue)
+		logp.Err("Error calculating CPU time change for docker module: new stats value (%v) is lower than the old one(%v)", newValue, oldValue)
 		return -1
 	}
 	return value / float64(1000000000)
