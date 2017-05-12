@@ -9,6 +9,7 @@ include::./version.asciidoc[]
 :winlogbeat: http://www.elastic.co/guide/en/beats/winlogbeat/{doc-branch}
 :heartbeat: http://www.elastic.co/guide/en/beats/heartbeat/{doc-branch}
 :securitydoc: https://www.elastic.co/guide/en/x-pack/5.2
+:logstashdoc: https://www.elastic.co/guide/en/logstash/{doc-branch}
 :beatname_lc: beatname
 :beatname_uc: a Beat
 :security: X-Pack Security
@@ -33,14 +34,10 @@ include::./upgrading.asciidoc[]
 
 include::./config-file-format.asciidoc[]
 
-pass::[<?page_header Always refer to the documentation in master for the latest information about contributing to Beats.?>]
-
 include::./newbeat.asciidoc[]
 
 include::./event-conventions.asciidoc[]
 
 include::./newdashboards.asciidoc[]
-
-pass::[<?page_header ?>]
 
 include::./release.asciidoc[]

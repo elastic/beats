@@ -1,5 +1,5 @@
 [[configuration-metricbeat]]
-=== Modules Configuration
+=== Modules
 
 The `metricbeat.modules` section of the +{beatname_lc}.yml+ config file contains an array with the enabled <<metricbeat-modules,modules>>. The following example shows a configuration where the Apache and MySQL modules are enabled:
 
@@ -44,6 +44,7 @@ A Boolean value that specifies whether the module is enabled. If you use the def
 the System module is enabled (set to `enabled: true`) by default. If the `enabled` option is missing from the
 configuration block, the module is enabled by default.
 
+[[metricset-period]]
 ===== period
 
 How often the metricsets are executed. If a system is not reachable, Metricbeat returns an error for each period. This setting is required.

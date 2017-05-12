@@ -49,9 +49,6 @@ metricbeat.modules:
   cpu_ticks: true
 ----
 
-It is strongly recommended to not run docker metricsets with a period smaller then 3 seconds. The request to the docker
-API already takes up to 2s seconds. Otherwise all the requests would timeout and no data is reported.
-
 [float]
 === Dashboard
 

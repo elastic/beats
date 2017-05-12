@@ -11,7 +11,7 @@ related products:
  * Kibana for the UI.
  * Logstash (optional) for inserting data into Elasticsearch.
 
-See {libbeat}/getting-started.html[Getting Started with Beats and the Elastic Stack] for more information. 
+See {libbeat}/getting-started.html[Getting Started with Beats and the Elastic Stack] for more information.
 
 After installing the Elastic Stack, read the following topics to learn how to install, configure, and run Metricbeat:
 
@@ -127,7 +127,8 @@ https://www.elastic.co/downloads/beats/metricbeat[downloads page].
 and select *Run As Administrator*). If you are running Windows XP, you may need
 to download and install PowerShell.
 
-. Run the following commands to install Metricbeat as a Windows service:
+. From the PowerShell prompt, run the following commands to install Metricbeat
+as a Windows service:
 +
 [source,shell]
 ----------------------------------------------------------------------
@@ -179,7 +180,7 @@ metricbeat.modules:
   enabled: true
   period: 10s
   processes: ['.*']
-  cpu_ticks: false  
+  cpu_ticks: false
 -------------------------------------
 
 The following example shows how to configure two modules: the system module
@@ -198,7 +199,7 @@ metricbeat.modules:
   enabled: true
   period: 10s
   processes: ['.*']
-  cpu_ticks: false  
+  cpu_ticks: false
 - module: apache
   metricsets: ["status"]
   enabled: true
@@ -259,8 +260,13 @@ sudo /etc/init.d/metricbeat start
 
 [source,shell]
 ----------------------------------------------------------------------
+sudo chown root metricbeat.yml <1>
 sudo ./metricbeat -e -c metricbeat.yml -d "publish"
 ----------------------------------------------------------------------
+<1> You'll be running Metricbeat as root, so you need to change ownership
+of the configuration file (see
+{libbeat}/config-file-permissions.html[Config File Ownership and Permissions]
+in the _Beats Platform Reference_).
 
 *win:*
 
@@ -303,3 +309,4 @@ image:./images/metricbeat_system_dashboard.png[Metricbeat Dashboard]
 
 :allplatforms:
 include::../../libbeat/docs/dashboards.asciidoc[]
+

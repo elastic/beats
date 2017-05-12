@@ -32,7 +32,8 @@ func (r *Factory) Create(c *common.Config) (cfgfile.Runner, error) {
 	err = p.LoadStates(r.registrar.GetStates())
 	if err != nil {
 		logp.Err("Error loading states for prospector %v: %v", p.ID(), err)
-		return nil, err
+		// In case of error with loading state, prospector is still returne
+		return p, err
 	}
 
 	return p, nil

@@ -1,14 +1,22 @@
+[[metricbeat-configuration-reloading]]
 === Reload Configuration
 
 beta[]
 
-Reload configuration allows to dynamically reload module configuration files. A glob can be defined which should be watched
- for module configuration changes. New modules will started / stopped accordingly. This is especially useful in
- container environments where 1 container is used to monitor all services in other containers on the same host.
- New containers appear and disappear dynamically which requires changes to which modules
- are needed and which hosts must be monitored.
+You can configure Metricbeat to dynamically reload configuration files when
+there are changes. To do this, you specify a path 
+(https://golang.org/pkg/path/filepath/#Glob[Glob]) to watch for module
+configuration changes. When the files found by the Glob change, new modules are
+started/stopped according to changes in the configuration files.
 
-The configuration in the main metricbeat.yml config file looks as following:
+This feature is especially useful in container environments where one container
+is used to monitor all services running in other containers on the same host.
+Because new containers appear and disappear dynamically, you may need to change
+the Metricbeat configuration frequently to specify which modules are needed and
+which hosts must be monitored. 
+
+To enable dynamic config reloading, you specify the `path` and `reload` options
+in the main `metricbeat.yml` config file. For example: 
 
 [source,yaml]
 ------------------------------------------------------------------------------
@@ -18,11 +26,16 @@ metricbeat.config.modules:
   reload.period: 10s
 ------------------------------------------------------------------------------
 
-A path with a glob must be defined on which files should be checked for changes. A period is set on how often
-the files are checked for changes. Do not set period below 1s as the modification time of files is often stored in seconds.
-Setting it below 1s will have an unnecessary overhead.
+`path`:: A Glob that defines the files to check for changes. 
+`reload.enabled`:: When set to `true`, enables dynamic config reload. 
+`reload.period`:: Specifies how often the files are checked for changes. Do not
+set the `period` to less than 1s because the modification time of files is often
+stored in seconds. Setting the `period` to less than 1s will result in
+unnecessary overhead.
 
-The configuration inside the files which are found by the glob look as following:
+Each file found by the Glob must contain a list of one or more module
+definitions. For example: 
+
 [source,yaml]
 ------------------------------------------------------------------------------
 - module: system
@@ -35,5 +48,3 @@ The configuration inside the files which are found by the glob look as following
   enabled: true
   period: 10s
 ------------------------------------------------------------------------------
-
-Each file directly contains a list of modules. Each file can contain one or multiple module definitions.
