@@ -558,6 +558,8 @@ class Test(BaseTest):
         self.render_config_template(
             path=os.path.abspath(self.working_dir) + "/log/symlink.log",
             symlinks="true",
+            close_removed="false",
+            clean_removed="false",
         )
 
         os.mkdir(self.working_dir + "/log/")
