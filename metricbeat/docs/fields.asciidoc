@@ -10513,6 +10513,69 @@ Total number of I/O operations performed on all devices by processes in the cgro
 
 
 [float]
+== process.summary Fields
+
+Summary metrics for the processes running on the host.
+
+
+
+[float]
+=== system.process.summary.total
+
+type: long
+
+Total number of processes on this host.
+
+
+[float]
+=== system.process.summary.running
+
+type: long
+
+Number of running processes on this host.
+
+
+[float]
+=== system.process.summary.idle
+
+type: long
+
+Number of idle processes on this host.
+
+
+[float]
+=== system.process.summary.sleeping
+
+type: long
+
+Number of sleeping processes on this host.
+
+
+[float]
+=== system.process.summary.stopped
+
+type: long
+
+Number of stopped processes on this host.
+
+
+[float]
+=== system.process.summary.zombie
+
+type: long
+
+Number of zombie processes on this host.
+
+
+[float]
+=== system.process.summary.unknown
+
+type: long
+
+Number of processes for which the state couldn't be retrieved or is unknown.
+
+
+[float]
 == socket Fields
 
 TCP sockets that are active.

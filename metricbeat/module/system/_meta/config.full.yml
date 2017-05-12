@@ -24,6 +24,9 @@
     # Network stats
     - network
 
+    # Processes summary
+    - process_summary
+
     # Per process stats
     - process
 

@@ -16,6 +16,7 @@ import (
 	"github.com/elastic/beats/metricbeat/module/system"
 	"github.com/elastic/beats/metricbeat/module/system/memory"
 	sigar "github.com/elastic/gosigar"
+	"github.com/pkg/errors"
 )
 
 type ProcsMap map[int]*Process
@@ -335,8 +336,7 @@ func (procStats *ProcStats) GetProcStats() ([]common.MapStr, error) {
 
 	pids, err := Pids()
 	if err != nil {
-		logp.Warn("Getting the list of pids: %v", err)
-		return nil, err
+		return nil, errors.Wrap(err, "failed to fetch the list of PIDs")
 	}
 
 	var processes []Process
