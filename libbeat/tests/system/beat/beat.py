@@ -163,6 +163,7 @@ class TestCase(unittest.TestCase):
                 "-systemTest",
                 "-test.coverprofile",
                 os.path.join(self.working_dir, "coverage.cov"),
+                "-path.home", os.path.normpath(self.working_dir),
                 "-c", os.path.join(self.working_dir, config)
                 ]
 
