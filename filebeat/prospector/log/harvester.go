@@ -144,6 +144,7 @@ func (h *Harvester) forwardEvent(data *util.Data) error {
 	return nil
 }
 
+// ID returns the unique harvester identifier
 func (h *Harvester) ID() uuid.UUID {
 	return h.id
 }

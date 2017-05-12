@@ -6,12 +6,14 @@ import (
 	uuid "github.com/satori/go.uuid"
 )
 
+// Registry struct manages (start / stop) a list of harvesters
 type Registry struct {
 	sync.RWMutex
 	harvesters map[uuid.UUID]Harvester
 	wg         sync.WaitGroup
 }
 
+// NewRegistry creates a new registry object
 func NewRegistry() *Registry {
 	return &Registry{
 		harvesters: map[uuid.UUID]Harvester{},
@@ -30,6 +32,7 @@ func (hr *Registry) remove(h Harvester) {
 	delete(hr.harvesters, h.ID())
 }
 
+// Stop stops all harvesters in the registry
 func (hr *Registry) Stop() {
 	hr.Lock()
 	for _, hv := range hr.harvesters {
@@ -43,10 +46,12 @@ func (hr *Registry) Stop() {
 	hr.WaitForCompletion()
 }
 
+// WaitForCompletion can be used to wait until all harvesters are stopped
 func (hr *Registry) WaitForCompletion() {
 	hr.wg.Wait()
 }
 
+// Start starts the given harvester and add its to the registry
 func (hr *Registry) Start(h Harvester) {
 
 	hr.wg.Add(1)
@@ -62,6 +67,7 @@ func (hr *Registry) Start(h Harvester) {
 	}()
 }
 
+// Len returns the current number of harvesters in the registry
 func (hr *Registry) Len() uint64 {
 	hr.RLock()
 	defer hr.RUnlock()
