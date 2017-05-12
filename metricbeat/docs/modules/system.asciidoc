@@ -111,6 +111,9 @@ metricbeat.modules:
     # Network stats
     - network
 
+    # Processes summary
+    - process_summary
+
     # Per process stats
     - process
 
@@ -147,6 +150,8 @@ The following metricsets are available:
 
 * <<metricbeat-metricset-system-process,process>>
 
+* <<metricbeat-metricset-system-process_summary,process_summary>>
+
 * <<metricbeat-metricset-system-socket,socket>>
 
 include::system/core.asciidoc[]
@@ -166,6 +171,8 @@ include::system/memory.asciidoc[]
 include::system/network.asciidoc[]
 
 include::system/process.asciidoc[]
+
+include::system/process_summary.asciidoc[]
 
 include::system/socket.asciidoc[]
 
