@@ -4,6 +4,7 @@ from heartbeat import BaseTest
 
 
 class Test(BaseTest):
+
     def test_base(self):
         """
         Basic test with exiting Heartbeat normally
