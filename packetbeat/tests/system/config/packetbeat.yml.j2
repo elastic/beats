@@ -171,7 +171,7 @@ tags: [
 geoip:
   paths: [
       {%- for path in geoip_paths -%}
-          "{{ beat.working_dir + '/' + path }}"
+          '{{ beat.working_dir + '/' + path }}'
           {%- if not loop.last %}, {% endif -%}
       {%- endfor -%}
   ]
