@@ -117,10 +117,10 @@ tags: [
   {%- endif -%}
 ]
 
+
+#================================ Processors =====================================
+
 {%- if processors %}
-
-#================================ Filters =====================================
-
 processors:
 {%- for processor in processors %}
 {%- for name, settings in processor.iteritems() %}
