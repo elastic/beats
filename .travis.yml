@@ -12,73 +12,73 @@ env:
   global:
     # Cross-compile for amd64 only to speed up testing.
     - GOX_FLAGS="-arch amd64"
-    - DOCKER_COMPOSE_VERSION: 1.11.1
-    - &go_version 1.8.1
+    - DOCKER_COMPOSE_VERSION=1.11.1
+    - GO_VERSION="$(cat .go-version)"
 
 matrix:
   include:
     # General checks
     - os: linux
       env: TARGETS="check"
-      go: *go_version
+      go: $GO_VERSION
 
     # Filebeat
     - os: linux
       env: TARGETS="-C filebeat testsuite"
-      go: *go_version
+      go: $GO_VERSION
     - os: osx
       env: TARGETS="TEST_ENVIRONMENT=0 -C filebeat testsuite"
-      go: *go_version
+      go: $GO_VERSION
 
     # Heartbeat
     - os: linux
       env: TARGETS="-C heartbeat testsuite"
-      go: *go_version
+      go: $GO_VERSION
     - os: osx
       env: TARGETS="TEST_ENVIRONMENT=0 -C heartbeat testsuite"
-      go: *go_version
+      go: $GO_VERSION
 
     # Libbeat
     - os: linux
       env: TARGETS="-C libbeat testsuite"
-      go: *go_version
+      go: $GO_VERSION
     - os: linux
       env: TARGETS="-C libbeat crosscompile"
-      go: *go_version
+      go: $GO_VERSION
 
     # Metricbeat
     - os: linux
       env: TARGETS="-C metricbeat testsuite"
-      go: *go_version
+      go: $GO_VERSION
     - os: osx
       env: TARGETS="TEST_ENVIRONMENT=0 -C metricbeat testsuite"
-      go: *go_version
+      go: $GO_VERSION
     - os: linux
       env: TARGETS="-C metricbeat crosscompile"
-      go: *go_version
+      go: $GO_VERSION
 
     # Packetbeat
     - os: linux
       env: TARGETS="-C packetbeat testsuite"
-      go: *go_version
+      go: $GO_VERSION
 
     # Winlogbeat
     - os: linux
       env: TARGETS="-C winlogbeat crosscompile"
-      go: *go_version
+      go: $GO_VERSION
 
     # Dashboards
     - os: linux
       env: TARGETS="-C dev-tools/cmd/import_dashboards"
-      go: *go_version
+      go: $GO_VERSION
 
     # Generators
     - os: linux
       env: TARGETS="-C generator/metricbeat test"
-      go: *go_version
+      go: $GO_VERSION
     - os: linux
       env: TARGETS="-C generator/beat test"
-      go: *go_version
+      go: $GO_VERSION
 
 addons:
   apt:
