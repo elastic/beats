@@ -30,6 +30,7 @@ func LoadGeoIPData(config Geoip) *libgeo.GeoIP {
 	// look for the first existing path
 	var geoipPath string
 	for _, path := range geoipPaths {
+		path = filepath.Clean(path)
 		fi, err := os.Lstat(path)
 		if err != nil {
 			logp.Err("GeoIP path could not be loaded: %s", path)
