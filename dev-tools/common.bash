@@ -27,7 +27,7 @@ err()
 # Read the project's Go version and return it in the GO_VERSION variable.
 # On failure it will exit.
 get_go_version() {
-  GO_VERSION=$(awk '/^:go-version:/{print $NF}' "${_sdir}/../libbeat/docs/version.asciidoc")
+  GO_VERSION=$(cat "${_sdir}/../.go-version")
   if [ -z "$GO_VERSION" ]; then
     err "Failed to detect the project's Go version"
     exit 1
