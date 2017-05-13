@@ -316,12 +316,16 @@ class Test(metricbeat.BaseTest):
             self.assert_fields_are_documented(evt)
 
             summary = evt["system"]["process"]["summary"]
+            assert isinstance(summary["total"], int)
             assert isinstance(summary["sleeping"], int)
             assert isinstance(summary["running"], int)
             assert isinstance(summary["idle"], int)
             assert isinstance(summary["stopped"], int)
             assert isinstance(summary["zombie"], int)
             assert isinstance(summary["unknown"], int)
+
+            assert summary["total"] == summary["sleeping"] + summary["running"] + \
+                summary["idle"] + summary["stopped"] + summary["zombie"] + summary["unknown"]
 
     @unittest.skipUnless(re.match("(?i)win|linux|darwin|freebsd", sys.platform), "os")
     def test_process(self):
