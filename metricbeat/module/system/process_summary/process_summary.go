@@ -68,18 +68,18 @@ func (m *MetricSet) Fetch() (common.MapStr, error) {
 
 		switch byte(state.State) {
 		case 'S':
-			summary.sleeping += 1
+			summary.sleeping++
 		case 'R':
-			summary.running += 1
+			summary.running++
 		case 'D':
-			summary.idle += 1
+			summary.idle++
 		case 'T':
-			summary.stopped += 1
+			summary.stopped++
 		case 'Z':
-			summary.zombie += 1
+			summary.zombie++
 		default:
 			logp.Err("Unknown state <%v> for process with pid %d", state.State, pid)
-			summary.unknown += 1
+			summary.unknown++
 		}
 	}
 
