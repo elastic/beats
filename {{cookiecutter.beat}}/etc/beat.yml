@@ -1,0 +1,5 @@
+################### {{cookiecutter.beat|capitalize}} Configuration Example #########################
+
+############################# {{cookiecutter.beat|capitalize}} ######################################
+
+{{cookiecutter.beat}}:
