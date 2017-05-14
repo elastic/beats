@@ -53,6 +53,7 @@ services:
       kafka:          { condition: service_healthy }
       kibana:         { condition: service_healthy }
       kubernetes:     { condition: service_healthy }
+      kube-state:     { condition: service_started }
       memcached:      { condition: service_healthy }
       mongodb:        { condition: service_healthy }
       mysql:          { condition: service_healthy }
@@ -108,6 +109,11 @@ services:
       - /sys:/sys
       - /var/lib/docker:/var/lib/docker
       - /var/run:/var/run
+
+  kube-state:
+    build:
+      context: ${PWD}/module/kubernetes/_meta/
+      dockerfile: Dockerfile.kube-state
 
   memcached:
     build: ${PWD}/module/memcached/_meta

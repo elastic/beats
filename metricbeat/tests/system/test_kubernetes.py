@@ -27,6 +27,21 @@ class Test(metricbeat.BaseTest):
         """ Kubernetes kubelet container metricset tests """
         self._test_metricset('container', 1, self.get_kubelet_hosts())
 
+    @unittest.skipUnless(metricbeat.INTEGRATION_TESTS, "integration test")
+    def test_state_node(self):
+        """ Kubernetes state node metricset tests """
+        self._test_metricset('state_node', 1, self.get_kube_state_hosts())
+
+    @unittest.skipUnless(metricbeat.INTEGRATION_TESTS, "integration test")
+    def test_state_pod(self):
+        """ Kubernetes state pod metricset tests """
+        self._test_metricset('state_pod', 1, self.get_kube_state_hosts())
+
+    @unittest.skipUnless(metricbeat.INTEGRATION_TESTS, "integration test")
+    def test_state_container(self):
+        """ Kubernetes state container metricset tests """
+        self._test_metricset('state_container', 1, self.get_kube_state_hosts())
+
     def _test_metricset(self, metricset, expected_events, hosts):
         self.render_config_template(modules=[{
             "name": "kubernetes",
@@ -58,4 +73,12 @@ class Test(metricbeat.BaseTest):
             "http://" +
             os.getenv('KUBELET_HOST', 'localhost') + ':' +
             os.getenv('KUBELET_PORT', '10255')
+        ]
+
+    @classmethod
+    def get_kube_state_hosts(cls):
+        return [
+            "http://" +
+            os.getenv('KUBE_STATE_METRICS_HOST', 'localhost') + ':' +
+            os.getenv('KUBE_STATE_METRICS_PORT', '18080')
         ]

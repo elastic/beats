@@ -6361,15 +6361,15 @@ kubernetes container metrics
 
 
 [float]
-== resource Fields
+=== kubernetes.container.id
 
-Kubernetes container resource requests and limits
+type: keyword
 
-
+Container id
 
 
 [float]
-=== kubernetes.container.resource.status.phase
+=== kubernetes.container.status.phase
 
 type: keyword
 
@@ -6377,7 +6377,7 @@ Container phase (running, waiting, terminated)
 
 
 [float]
-=== kubernetes.container.resource.status.ready
+=== kubernetes.container.status.ready
 
 type: boolean
 
@@ -6385,7 +6385,7 @@ Container ready status
 
 
 [float]
-=== kubernetes.container.resource.status.restarts
+=== kubernetes.container.status.restarts
 
 type: integer
 
@@ -6394,7 +6394,7 @@ Container restarts count
 
 
 [float]
-=== kubernetes.container.resource.cpu.limit.nanocores
+=== kubernetes.container.cpu.limit.nanocores
 
 type: long
 
@@ -6402,7 +6402,7 @@ Container CPU nanocores limit
 
 
 [float]
-=== kubernetes.container.resource.cpu.request.nanocores
+=== kubernetes.container.cpu.request.nanocores
 
 type: long
 
@@ -6411,7 +6411,7 @@ Container CPU requested nanocores
 
 
 [float]
-=== kubernetes.container.resource.memory.limit.bytes
+=== kubernetes.container.memory.limit.bytes
 
 type: long
 
@@ -6421,7 +6421,7 @@ Container memory limit in bytes
 
 
 [float]
-=== kubernetes.container.resource.memory.request.bytes
+=== kubernetes.container.memory.request.bytes
 
 type: long
 
