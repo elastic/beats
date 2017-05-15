@@ -87,6 +87,13 @@ func (rl *Reloader) Run(runnerFactory RunnerFactory) {
 
 	gw := NewGlobWatcher(path)
 
+	// If reloading is disable, config files should be loaded immidiately
+	if !rl.config.Reload.Enabled {
+		rl.config.Reload.Period = 0
+	}
+
+	overwriteUpate := true
+
 	for {
 		select {
 		case <-rl.done:
@@ -105,7 +112,8 @@ func (rl *Reloader) Run(runnerFactory RunnerFactory) {
 			}
 
 			// no file changes
-			if !updated {
+			if !updated && !overwriteUpate {
+				overwriteUpate = false
 				continue
 			}
 
@@ -135,6 +143,14 @@ func (rl *Reloader) Run(runnerFactory RunnerFactory) {
 
 				runner, err := runnerFactory.Create(c)
 				if err != nil {
+					// Make sure the next run also updates because some runners were not properly loaded
+					overwriteUpate = true
+
+					// In case prospector already is running, do not stop it
+					if runner != nil && rl.registry.Has(runner.ID()) {
+						debugf("Remove module from stoplist: %v", runner.ID())
+						delete(stopList, runner.ID())
+					}
 					logp.Err("Error creating module: %s", err)
 					continue
 				}
@@ -152,6 +168,16 @@ func (rl *Reloader) Run(runnerFactory RunnerFactory) {
 
 			rl.stopRunners(stopList)
 			rl.startRunners(startList)
+		}
+
+		// Path loading is enabled but not reloading. Loads files only once and then stops.
+		if !rl.config.Reload.Enabled {
+			logp.Info("Loading of config files completed.")
+			select {
+			case <-rl.done:
+				logp.Info("Dynamic config reloader stopped")
+				return
+			}
 		}
 	}
 }

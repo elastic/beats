@@ -267,9 +267,8 @@ endif::[]
 ==== Setting Up Logstash
 
 In this setup, the Beat sends events to Logstash. Logstash receives
-these events by using the
-https://www.elastic.co/guide/en/logstash/current/plugins-inputs-beats.html[Beats input plugin for Logstash] and then sends the transaction to Elasticsearch by using the
-http://www.elastic.co/guide/en/logstash/current/plugins-outputs-elasticsearch.html[Elasticsearch
+these events by using the {logstashdoc}/plugins-inputs-beats.html[Beats input plugin for Logstash] and then sends the transaction to Elasticsearch by using the
+{logstashdoc}/plugins-outputs-elasticsearch.html[Elasticsearch
 output plugin for Logstash]. The Elasticsearch output plugin uses the bulk API, making
 indexing very efficient.
 
@@ -305,6 +304,7 @@ and to index into Elasticsearch. You configure Logstash by creating a
 configuration file. For example, you can save the following example configuration
 to a file called `logstash.conf`:
 +
+--
 [source,ruby]
 ------------------------------------------------------------------------------
 input {
@@ -317,15 +317,22 @@ output {
   elasticsearch {
     hosts => "localhost:9200"
     manage_template => false
-    index => "%{[@metadata][beat]}-%{+YYYY.MM.dd}"
-    document_type => "%{[@metadata][type]}"
+    index => "%{[@metadata][beat]}-%{+YYYY.MM.dd}" <1>
+    document_type => "%{[@metadata][type]}" <2>
   }
 }
 ------------------------------------------------------------------------------
-+
+<1> `%{[@metadata][beat]}` sets the first part of the index name to the value
+of the `beat` metadata field, and `%{+YYYY.MM.dd}` sets the second part of the
+name to a date based on the Logstash `@timestamp` field. For example:
++{beatname_lc}-2017.03.29+.
+<2> `%{[@metadata][type]}` sets the document type based on the value of the `type`
+metadata field.
+
 Logstash uses this configuration to index events in Elasticsearch in the same
 way that the Beat would, but you get additional buffering and other capabilities
 provided by Logstash.
+--
 
 To use this setup, you'll also need to configure your Beat to use Logstash. For more information, see the documentation for the Beat.
 

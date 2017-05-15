@@ -408,6 +408,7 @@ func fieldString(event common.MapStr, field string) (string, error) {
 	if err != nil {
 		logp.Warn("Can not convert key '%v' value to string", v)
 	}
+
 	return s, err
 }
 
@@ -419,6 +420,8 @@ func tryConvString(v interface{}) (string, error) {
 	switch s := v.(type) {
 	case string:
 		return s, nil
+	case common.Time:
+		return s.String(), nil
 	case []byte:
 		return string(s), nil
 	case stringer:
