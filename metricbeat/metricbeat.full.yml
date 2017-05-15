@@ -16,7 +16,7 @@ metricbeat.config.modules:
   # Glob pattern for configuration reloading
   path: ${path.config}/conf.d/*.yml
 
-  # Period on which files under path should be checked for chagnes
+  # Period on which files under path should be checked for changes
   reload.period: 10s
 
   # Set to true to enable config reloading
