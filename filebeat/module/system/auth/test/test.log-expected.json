@@ -1,362 +1,372 @@
 [
-  {
-    "_index" : "test-filebeat-modules",
-    "_type" : "log",
-    "_id" : "AVpwYhxbd3MQAzSWoGjF",
-    "_score" : 1.0,
-    "_source" : {
-      "@timestamp" : "2017-02-23T00:13:35.000Z",
-      "system" : {
-        "auth" : {
-          "hostname" : "localhost",
-          "ssh" : {
-            "method" : "password",
-            "port" : "58803",
-            "ip" : "192.168.33.1",
-            "event" : "Accepted"
-          },
-          "pid" : "7483",
-          "user" : "vagrant",
-          "timestamp" : "Feb 23 00:13:35"
-        }
-      },
-      "offset" : 254,
-      "beat" : {
-        "hostname" : "a-mac-with-esc-key.local",
-        "name" : "a-mac-with-esc-key.local",
-        "version" : "6.0.0-alpha1"
-      },
-      "input_type" : "log",
-      "source" : "/Users/tsg/src/github.com/elastic/beats/filebeat/module/system/auth/test/test.log",
-      "fileset" : {
-        "module" : "system",
-        "name" : "auth"
-      },
-      "type" : "log"
-    }
-  },
-  {
-    "_index" : "test-filebeat-modules",
-    "_type" : "log",
-    "_id" : "AVpwYhxbd3MQAzSWoGjK",
-    "_score" : 1.0,
-    "_source" : {
-      "@timestamp" : "2017-02-23T00:08:48.000Z",
-      "system" : {
-        "auth" : {
-          "hostname" : "localhost",
-          "sudo" : {
-            "tty" : "pts/1",
-            "pwd" : "/home/vagrant",
-            "user" : "root",
-            "command" : "/bin/cat /var/log/secure"
-          },
-          "user" : "vagrant",
-          "timestamp" : "Feb 23 00:08:48"
-        }
-      },
-      "offset" : 736,
-      "beat" : {
-        "hostname" : "a-mac-with-esc-key.local",
-        "name" : "a-mac-with-esc-key.local",
-        "version" : "6.0.0-alpha1"
-      },
-      "input_type" : "log",
-      "source" : "/Users/tsg/src/github.com/elastic/beats/filebeat/module/system/auth/test/test.log",
-      "fileset" : {
-        "module" : "system",
-        "name" : "auth"
-      },
-      "type" : "log"
-    }
-  },
-  {
-    "_index" : "test-filebeat-modules",
-    "_type" : "log",
-    "_id" : "AVpwYhxbd3MQAzSWoGjG",
-    "_score" : 1.0,
-    "_source" : {
-      "@timestamp" : "2017-02-21T21:56:12.000Z",
-      "system" : {
-        "auth" : {
-          "hostname" : "localhost",
-          "ssh" : {
-            "ip" : "10.0.2.2",
-            "event" : "Invalid"
-          },
-          "pid" : "3430",
-          "user" : "test",
-          "timestamp" : "Feb 21 21:56:12"
-        }
-      },
-      "offset" : 324,
-      "beat" : {
-        "hostname" : "a-mac-with-esc-key.local",
-        "name" : "a-mac-with-esc-key.local",
-        "version" : "6.0.0-alpha1"
-      },
-      "input_type" : "log",
-      "source" : "/Users/tsg/src/github.com/elastic/beats/filebeat/module/system/auth/test/test.log",
-      "fileset" : {
-        "module" : "system",
-        "name" : "auth"
-      },
-      "type" : "log"
-    }
-  },
-  {
-    "_index" : "test-filebeat-modules",
-    "_type" : "log",
-    "_id" : "AVpwYhxbd3MQAzSWoGjJ",
-    "_score" : 1.0,
-    "_source" : {
-      "@timestamp" : "2017-02-19T15:30:04.000Z",
-      "system" : {
-        "auth" : {
-          "hostname" : "slave22",
-          "ssh" : {
-            "dropped_ip" : "123.57.245.163"
-          },
-          "pid" : "18406",
-          "timestamp" : "Feb 19 15:30:04"
-        }
-      },
-      "offset" : 617,
-      "beat" : {
-        "hostname" : "a-mac-with-esc-key.local",
-        "name" : "a-mac-with-esc-key.local",
-        "version" : "6.0.0-alpha1"
-      },
-      "input_type" : "log",
-      "source" : "/Users/tsg/src/github.com/elastic/beats/filebeat/module/system/auth/test/test.log",
-      "fileset" : {
-        "module" : "system",
-        "name" : "auth"
-      },
-      "type" : "log"
-    }
-  },
-  {
-    "_index" : "test-filebeat-modules",
-    "_type" : "log",
-    "_id" : "AVpwYhxbd3MQAzSWoGjL",
-    "_score" : 1.0,
-    "_source" : {
-      "@timestamp" : "2017-02-24T00:13:02.000Z",
-      "system" : {
-        "auth" : {
-          "hostname" : "precise32",
-          "sudo" : {
-            "tty" : "pts/1",
-            "pwd" : "/home/vagrant",
-            "error" : "user NOT in sudoers",
-            "user" : "root",
-            "command" : "/bin/ls"
-          },
-          "user" : "tsg",
-          "timestamp" : "Feb 24 00:13:02"
-        }
-      },
-      "offset" : 861,
-      "beat" : {
-        "hostname" : "a-mac-with-esc-key.local",
-        "name" : "a-mac-with-esc-key.local",
-        "version" : "6.0.0-alpha1"
-      },
-      "input_type" : "log",
-      "source" : "/Users/tsg/src/github.com/elastic/beats/filebeat/module/system/auth/test/test.log",
-      "fileset" : {
-        "module" : "system",
-        "name" : "auth"
-      },
-      "type" : "log"
-    }
-  },
-  {
-    "_index" : "test-filebeat-modules",
-    "_type" : "log",
-    "_id" : "AVpwYhxbd3MQAzSWoGjM",
-    "_score" : 1.0,
-    "_source" : {
-      "@timestamp" : "2017-02-22T11:47:05.000Z",
-      "system" : {
-        "auth" : {
-          "hostname" : "localhost",
-          "pid" : "6991",
-          "groupadd" : {
-            "gid" : "48",
-            "name" : "apache"
-          },
-          "timestamp" : "Feb 22 11:47:05"
-        }
-      },
-      "offset" : 934,
-      "beat" : {
-        "hostname" : "a-mac-with-esc-key.local",
-        "name" : "a-mac-with-esc-key.local",
-        "version" : "6.0.0-alpha1"
-      },
-      "input_type" : "log",
-      "source" : "/Users/tsg/src/github.com/elastic/beats/filebeat/module/system/auth/test/test.log",
-      "fileset" : {
-        "module" : "system",
-        "name" : "auth"
-      },
-      "type" : "log"
-    }
-  },
-  {
-    "_index" : "test-filebeat-modules",
-    "_type" : "log",
-    "_id" : "AVpwYhxbd3MQAzSWoGjN",
-    "_score" : 1.0,
-    "_source" : {
-      "@timestamp" : "2017-02-22T11:47:05.000Z",
-      "system" : {
-        "auth" : {
-          "hostname" : "localhost",
-          "pid" : "6995",
-          "useradd" : {
-            "uid" : "48",
-            "gid" : "48",
-            "shell" : "/sbin/nologin",
-            "name" : "apache",
-            "home" : "/usr/share/httpd"
-          },
-          "timestamp" : "Feb 22 11:47:05"
-        }
-      },
-      "offset" : 1057,
-      "beat" : {
-        "hostname" : "a-mac-with-esc-key.local",
-        "name" : "a-mac-with-esc-key.local",
-        "version" : "6.0.0-alpha1"
-      },
-      "input_type" : "log",
-      "source" : "/Users/tsg/src/github.com/elastic/beats/filebeat/module/system/auth/test/test.log",
-      "fileset" : {
-        "module" : "system",
-        "name" : "auth"
-      },
-      "type" : "log"
-    }
-  },
-  {
-    "_index" : "test-filebeat-modules",
-    "_type" : "log",
-    "_id" : "AVpwYhxbd3MQAzSWoGjE",
-    "_score" : 1.0,
-    "_source" : {
-      "@timestamp" : "2017-02-21T21:54:44.000Z",
-      "system" : {
-        "auth" : {
-          "hostname" : "localhost",
-          "ssh" : {
-            "method" : "publickey",
-            "signature" : "RSA 39:33:99:e9:a0:dc:f2:33:a3:e5:72:3b:7c:3a:56:84",
-            "port" : "63673",
-            "ip" : "10.0.2.2",
-            "event" : "Accepted"
-          },
-          "pid" : "3402",
-          "user" : "vagrant",
-          "timestamp" : "Feb 21 21:54:44"
-        }
-      },
-      "offset" : 152,
-      "beat" : {
-        "hostname" : "a-mac-with-esc-key.local",
-        "name" : "a-mac-with-esc-key.local",
-        "version" : "6.0.0-alpha1"
-      },
-      "input_type" : "log",
-      "source" : "/Users/tsg/src/github.com/elastic/beats/filebeat/module/system/auth/test/test.log",
-      "fileset" : {
-        "module" : "system",
-        "name" : "auth"
-      },
-      "type" : "log"
-    }
-  },
-  {
-    "_index" : "test-filebeat-modules",
-    "_type" : "log",
-    "_id" : "AVpwYhxbd3MQAzSWoGjH",
-    "_score" : 1.0,
-    "_source" : {
-      "@timestamp" : "2017-02-20T08:35:22.000Z",
-      "system" : {
-        "auth" : {
-          "hostname" : "slave22",
-          "ssh" : {
-            "geoip" : {
-              "continent_name" : "Asia",
-              "city_name" : "Guangzhou",
-              "country_iso_code" : "CN",
-              "region_name" : "Guangdong",
-              "location" : {
-                "lon" : 113.25,
-                "lat" : 23.1167
-              }
+    {
+        "_index": "test-filebeat-modules",
+        "_type": "log",
+        "_id": "AVpwYhxbd3MQAzSWoGjF",
+        "_score": 1.0,
+        "_source": {
+            "@timestamp": "2017-02-23T00:13:35.000Z",
+            "system": {
+                "auth": {
+                    "hostname": "localhost",
+                    "ssh": {
+                        "method": "password",
+                        "port": "58803",
+                        "ip": "192.168.33.1",
+                        "event": "Accepted"
+                    },
+                    "pid": "7483",
+                    "user": "vagrant",
+                    "timestamp": "Feb 23 00:13:35"
+                }
             },
-            "method" : "password",
-            "port" : "29160",
-            "ip" : "116.31.116.24",
-            "event" : "Failed"
-          },
-          "pid" : "5774",
-          "user" : "root",
-          "timestamp" : "Feb 20 08:35:22"
+            "offset": 254,
+            "beat": {
+                "hostname": "a-mac-with-esc-key.local",
+                "name": "a-mac-with-esc-key.local",
+                "version": "6.0.0-alpha1"
+            },
+            "prospector": {
+                "type": "log"
+            },
+            "source": "/Users/tsg/src/github.com/elastic/beats/filebeat/module/system/auth/test/test.log",
+            "fileset": {
+                "module": "system",
+                "name": "auth"
+            }
         }
-      },
-      "offset" : 420,
-      "beat" : {
-        "hostname" : "a-mac-with-esc-key.local",
-        "name" : "a-mac-with-esc-key.local",
-        "version" : "6.0.0-alpha1"
-      },
-      "input_type" : "log",
-      "source" : "/Users/tsg/src/github.com/elastic/beats/filebeat/module/system/auth/test/test.log",
-      "fileset" : {
-        "module" : "system",
-        "name" : "auth"
-      },
-      "type" : "log"
-    }
-  },
-  {
-    "_index" : "test-filebeat-modules",
-    "_type" : "log",
-    "_id" : "AVpwYhxbd3MQAzSWoGjI",
-    "_score" : 1.0,
-    "_source" : {
-      "@timestamp" : "2017-02-21T23:35:33.000Z",
-      "system" : {
-        "auth" : {
-          "hostname" : "localhost",
-          "sudo" : {
-            "tty" : "pts/0",
-            "pwd" : "/home/vagrant",
-            "user" : "root",
-            "command" : "/bin/ls"
-          },
-          "user" : "vagrant",
-          "timestamp" : "Feb 21 23:35:33"
+    },
+    {
+        "_index": "test-filebeat-modules",
+        "_type": "log",
+        "_id": "AVpwYhxbd3MQAzSWoGjK",
+        "_score": 1.0,
+        "_source": {
+            "@timestamp": "2017-02-23T00:08:48.000Z",
+            "system": {
+                "auth": {
+                    "hostname": "localhost",
+                    "sudo": {
+                        "tty": "pts/1",
+                        "pwd": "/home/vagrant",
+                        "user": "root",
+                        "command": "/bin/cat /var/log/secure"
+                    },
+                    "user": "vagrant",
+                    "timestamp": "Feb 23 00:08:48"
+                }
+            },
+            "offset": 736,
+            "beat": {
+                "hostname": "a-mac-with-esc-key.local",
+                "name": "a-mac-with-esc-key.local",
+                "version": "6.0.0-alpha1"
+            },
+            "prospector": {
+                "type": "log"
+            },
+            "source": "/Users/tsg/src/github.com/elastic/beats/filebeat/module/system/auth/test/test.log",
+            "fileset": {
+                "module": "system",
+                "name": "auth"
+            }
         }
-      },
-      "offset" : 522,
-      "beat" : {
-        "hostname" : "a-mac-with-esc-key.local",
-        "name" : "a-mac-with-esc-key.local",
-        "version" : "6.0.0-alpha1"
-      },
-      "input_type" : "log",
-      "source" : "/Users/tsg/src/github.com/elastic/beats/filebeat/module/system/auth/test/test.log",
-      "fileset" : {
-        "module" : "system",
-        "name" : "auth"
-      },
-      "type" : "log"
+    },
+    {
+        "_index": "test-filebeat-modules",
+        "_type": "log",
+        "_id": "AVpwYhxbd3MQAzSWoGjG",
+        "_score": 1.0,
+        "_source": {
+            "@timestamp": "2017-02-21T21:56:12.000Z",
+            "system": {
+                "auth": {
+                    "hostname": "localhost",
+                    "ssh": {
+                        "ip": "10.0.2.2",
+                        "event": "Invalid"
+                    },
+                    "pid": "3430",
+                    "user": "test",
+                    "timestamp": "Feb 21 21:56:12"
+                }
+            },
+            "offset": 324,
+            "beat": {
+                "hostname": "a-mac-with-esc-key.local",
+                "name": "a-mac-with-esc-key.local",
+                "version": "6.0.0-alpha1"
+            },
+            "prospector": {
+                "type": "log"
+            },
+            "source": "/Users/tsg/src/github.com/elastic/beats/filebeat/module/system/auth/test/test.log",
+            "fileset": {
+                "module": "system",
+                "name": "auth"
+            }
+        }
+    },
+    {
+        "_index": "test-filebeat-modules",
+        "_type": "log",
+        "_id": "AVpwYhxbd3MQAzSWoGjJ",
+        "_score": 1.0,
+        "_source": {
+            "@timestamp": "2017-02-19T15:30:04.000Z",
+            "system": {
+                "auth": {
+                    "hostname": "slave22",
+                    "ssh": {
+                        "dropped_ip": "123.57.245.163"
+                    },
+                    "pid": "18406",
+                    "timestamp": "Feb 19 15:30:04"
+                }
+            },
+            "offset": 617,
+            "beat": {
+                "hostname": "a-mac-with-esc-key.local",
+                "name": "a-mac-with-esc-key.local",
+                "version": "6.0.0-alpha1"
+            },
+            "prospector": {
+                "type": "log"
+            },
+            "source": "/Users/tsg/src/github.com/elastic/beats/filebeat/module/system/auth/test/test.log",
+            "fileset": {
+                "module": "system",
+                "name": "auth"
+            }
+        }
+    },
+    {
+        "_index": "test-filebeat-modules",
+        "_type": "log",
+        "_id": "AVpwYhxbd3MQAzSWoGjL",
+        "_score": 1.0,
+        "_source": {
+            "@timestamp": "2017-02-24T00:13:02.000Z",
+            "system": {
+                "auth": {
+                    "hostname": "precise32",
+                    "sudo": {
+                        "tty": "pts/1",
+                        "pwd": "/home/vagrant",
+                        "error": "user NOT in sudoers",
+                        "user": "root",
+                        "command": "/bin/ls"
+                    },
+                    "user": "tsg",
+                    "timestamp": "Feb 24 00:13:02"
+                }
+            },
+            "offset": 861,
+            "beat": {
+                "hostname": "a-mac-with-esc-key.local",
+                "name": "a-mac-with-esc-key.local",
+                "version": "6.0.0-alpha1"
+            },
+            "prospector": {
+                "type": "log"
+            },
+            "source": "/Users/tsg/src/github.com/elastic/beats/filebeat/module/system/auth/test/test.log",
+            "fileset": {
+                "module": "system",
+                "name": "auth"
+            }
+        }
+    },
+    {
+        "_index": "test-filebeat-modules",
+        "_type": "log",
+        "_id": "AVpwYhxbd3MQAzSWoGjM",
+        "_score": 1.0,
+        "_source": {
+            "@timestamp": "2017-02-22T11:47:05.000Z",
+            "system": {
+                "auth": {
+                    "hostname": "localhost",
+                    "pid": "6991",
+                    "groupadd": {
+                        "gid": "48",
+                        "name": "apache"
+                    },
+                    "timestamp": "Feb 22 11:47:05"
+                }
+            },
+            "offset": 934,
+            "beat": {
+                "hostname": "a-mac-with-esc-key.local",
+                "name": "a-mac-with-esc-key.local",
+                "version": "6.0.0-alpha1"
+            },
+            "prospector": {
+                "type": "log"
+            },
+            "source": "/Users/tsg/src/github.com/elastic/beats/filebeat/module/system/auth/test/test.log",
+            "fileset": {
+                "module": "system",
+                "name": "auth"
+            }
+        }
+    },
+    {
+        "_index": "test-filebeat-modules",
+        "_type": "log",
+        "_id": "AVpwYhxbd3MQAzSWoGjN",
+        "_score": 1.0,
+        "_source": {
+            "@timestamp": "2017-02-22T11:47:05.000Z",
+            "system": {
+                "auth": {
+                    "hostname": "localhost",
+                    "pid": "6995",
+                    "useradd": {
+                        "uid": "48",
+                        "gid": "48",
+                        "shell": "/sbin/nologin",
+                        "name": "apache",
+                        "home": "/usr/share/httpd"
+                    },
+                    "timestamp": "Feb 22 11:47:05"
+                }
+            },
+            "offset": 1057,
+            "beat": {
+                "hostname": "a-mac-with-esc-key.local",
+                "name": "a-mac-with-esc-key.local",
+                "version": "6.0.0-alpha1"
+            },
+            "prospector": {
+                "type": "log"
+            },
+            "source": "/Users/tsg/src/github.com/elastic/beats/filebeat/module/system/auth/test/test.log",
+            "fileset": {
+                "module": "system",
+                "name": "auth"
+            }
+        }
+    },
+    {
+        "_index": "test-filebeat-modules",
+        "_type": "log",
+        "_id": "AVpwYhxbd3MQAzSWoGjE",
+        "_score": 1.0,
+        "_source": {
+            "@timestamp": "2017-02-21T21:54:44.000Z",
+            "system": {
+                "auth": {
+                    "hostname": "localhost",
+                    "ssh": {
+                        "method": "publickey",
+                        "signature": "RSA 39:33:99:e9:a0:dc:f2:33:a3:e5:72:3b:7c:3a:56:84",
+                        "port": "63673",
+                        "ip": "10.0.2.2",
+                        "event": "Accepted"
+                    },
+                    "pid": "3402",
+                    "user": "vagrant",
+                    "timestamp": "Feb 21 21:54:44"
+                }
+            },
+            "offset": 152,
+            "beat": {
+                "hostname": "a-mac-with-esc-key.local",
+                "name": "a-mac-with-esc-key.local",
+                "version": "6.0.0-alpha1"
+            },
+            "prospector": {
+                "type": "log"
+            },
+            "source": "/Users/tsg/src/github.com/elastic/beats/filebeat/module/system/auth/test/test.log",
+            "fileset": {
+                "module": "system",
+                "name": "auth"
+            }
+        }
+    },
+    {
+        "_index": "test-filebeat-modules",
+        "_type": "log",
+        "_id": "AVpwYhxbd3MQAzSWoGjH",
+        "_score": 1.0,
+        "_source": {
+            "@timestamp": "2017-02-20T08:35:22.000Z",
+            "system": {
+                "auth": {
+                    "hostname": "slave22",
+                    "ssh": {
+                        "geoip": {
+                            "continent_name": "Asia",
+                            "city_name": "Guangzhou",
+                            "country_iso_code": "CN",
+                            "region_name": "Guangdong",
+                            "location": {
+                                "lon": 113.25,
+                                "lat": 23.1167
+                            }
+                        },
+                        "method": "password",
+                        "port": "29160",
+                        "ip": "116.31.116.24",
+                        "event": "Failed"
+                    },
+                    "pid": "5774",
+                    "user": "root",
+                    "timestamp": "Feb 20 08:35:22"
+                }
+            },
+            "offset": 420,
+            "beat": {
+                "hostname": "a-mac-with-esc-key.local",
+                "name": "a-mac-with-esc-key.local",
+                "version": "6.0.0-alpha1"
+            },
+            "prospector": {
+                "type": "log"
+            },
+            "source": "/Users/tsg/src/github.com/elastic/beats/filebeat/module/system/auth/test/test.log",
+            "fileset": {
+                "module": "system",
+                "name": "auth"
+            }
+        }
+    },
+    {
+        "_index": "test-filebeat-modules",
+        "_type": "log",
+        "_id": "AVpwYhxbd3MQAzSWoGjI",
+        "_score": 1.0,
+        "_source": {
+            "@timestamp": "2017-02-21T23:35:33.000Z",
+            "system": {
+                "auth": {
+                    "hostname": "localhost",
+                    "sudo": {
+                        "tty": "pts/0",
+                        "pwd": "/home/vagrant",
+                        "user": "root",
+                        "command": "/bin/ls"
+                    },
+                    "user": "vagrant",
+                    "timestamp": "Feb 21 23:35:33"
+                }
+            },
+            "offset": 522,
+            "beat": {
+                "hostname": "a-mac-with-esc-key.local",
+                "name": "a-mac-with-esc-key.local",
+                "version": "6.0.0-alpha1"
+            },
+            "prospector": {
+                "type": "log"
+            },
+            "source": "/Users/tsg/src/github.com/elastic/beats/filebeat/module/system/auth/test/test.log",
+            "fileset": {
+                "module": "system",
+                "name": "auth"
+            }
+        }
     }
-  }
 ]

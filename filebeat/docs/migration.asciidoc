@@ -135,7 +135,7 @@ The equivalent `prospectors` section would look like this:
 [source,yaml]
 -------------------------------------------------------------------------------------
 filebeat.prospectors:
-- input_type: log
+- type: log
   paths:
     - /var/log/messages
     - /var/log/*.log
@@ -143,16 +143,16 @@ filebeat.prospectors:
     service: apache
     zone: us-east-1
   fields_under_root: true
-- input_type: stdin <1>
-- input_type: log
+- type: stdin <1>
+- type: log
   paths:
     - /var/log/apache2/httpd-*.log
 -------------------------------------------------------------------------------------
 
-<1> The explicit `input_type` option was introduced to differentiate between normal files and
+<1> The explicit `type` option was introduced to differentiate between normal files and
     stdin. In the future, additional types might be supported.
 
-As you can see, apart from the new `input_type` options,
+As you can see, apart from the new `type` options,
 which were before implicitly defined via the `type` custom field, the remaining
 options can be migrated mechanically.
 
@@ -279,7 +279,7 @@ Filebeat configuration:
 [source,yaml]
 -------------------------------------------------------------------------------------
 filebeat.prospectors:
-- input_type: log
+- type: log
   paths:
     - /var/log/*.log
   fields:
@@ -366,7 +366,7 @@ you can use the <<fields-under-root>> configuration option:
 [source,yaml]
 -------------------------------------------------------------------------------------
 filebeat.prospectors:
-- input_type: log
+- type: log
   paths:
     - /var/log/*.log
   fields:

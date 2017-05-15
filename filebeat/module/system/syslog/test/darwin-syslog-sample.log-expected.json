@@ -1,90 +1,93 @@
 [
-  {
-    "_index" : "filebeat-2017.01.27",
-    "_type" : "log",
-    "_id" : "AVngMBcpUmQau8zc_UuM",
-    "_score" : 1.0,
-    "_source" : {
-      "@timestamp" : "2017-12-13T11:35:28.000Z",
-      "system" : {
-        "syslog" : {
-          "hostname" : "a-mac-with-esc-key",
-          "pid" : "21412",
-          "program" : "GoogleSoftwareUpdateAgent",
-          "message" : "2016-12-13 11:35:28.420 GoogleSoftwareUpdateAgent[21412/0x700007399000] [lvl=2] -[KSAgentApp updateProductWithProductID:usingEngine:] Checking for updates for \"All Products\" using engine <KSUpdateEngine:0x100341a00\n\t\tticketStore=<KSPersistentTicketStore:0x100204520 store=<KSKeyedPersistentStore:0x100213290\n\t\t\tpath=\"/Users/tsg/Library/Google/GoogleSoftwareUpdate/TicketStore/Keystone.ticketstore\"\n\t\t\tlockFile=<KSLockFile:0x1002160e0\n\t\t\t\tpath=\"/Users/tsg/Library/Google/GoogleSoftwareUpdate/TicketStore/Keystone.ticketstore.lock\"\n\t\t\t\tlocked=NO\n\t\t\t>\n\t\t>>\n\t\tprocessor=<KSActionProcessor:0x1003bb5f0\n\t\t\tdelegate=<KSUpdateEngine:0x100341a00>\n\t\t\tisProcessing=NO actionsCompleted=0 progress=0.00\n\t\t\terrors=0 currentActionErrors=0\n\t\t\tevents=0 currentActionEvents=0\n\t\t\tactionQueue=( )\n\t\t>\n\t\tdelegate=(null)\n\t\tserverInfoStore=(null)\n\t\terrors=0\n\t>",
-          "timestamp" : "Dec 13 11:35:28"
+    {
+        "_index": "filebeat-2017.01.27",
+        "_type": "log",
+        "_id": "AVngMBcpUmQau8zc_UuM",
+        "_score": 1.0,
+        "_source": {
+            "@timestamp": "2017-12-13T11:35:28.000Z",
+            "system": {
+                "syslog": {
+                    "hostname": "a-mac-with-esc-key",
+                    "pid": "21412",
+                    "program": "GoogleSoftwareUpdateAgent",
+                    "message": "2016-12-13 11:35:28.420 GoogleSoftwareUpdateAgent[21412/0x700007399000] [lvl=2] -[KSAgentApp updateProductWithProductID:usingEngine:] Checking for updates for \"All Products\" using engine <KSUpdateEngine:0x100341a00\n\t\tticketStore=<KSPersistentTicketStore:0x100204520 store=<KSKeyedPersistentStore:0x100213290\n\t\t\tpath=\"/Users/tsg/Library/Google/GoogleSoftwareUpdate/TicketStore/Keystone.ticketstore\"\n\t\t\tlockFile=<KSLockFile:0x1002160e0\n\t\t\t\tpath=\"/Users/tsg/Library/Google/GoogleSoftwareUpdate/TicketStore/Keystone.ticketstore.lock\"\n\t\t\t\tlocked=NO\n\t\t\t>\n\t\t>>\n\t\tprocessor=<KSActionProcessor:0x1003bb5f0\n\t\t\tdelegate=<KSUpdateEngine:0x100341a00>\n\t\t\tisProcessing=NO actionsCompleted=0 progress=0.00\n\t\t\terrors=0 currentActionErrors=0\n\t\t\tevents=0 currentActionEvents=0\n\t\t\tactionQueue=( )\n\t\t>\n\t\tdelegate=(null)\n\t\tserverInfoStore=(null)\n\t\terrors=0\n\t>",
+                    "timestamp": "Dec 13 11:35:28"
+                }
+            },
+            "offset": 907,
+            "beat": {
+                "hostname": "a-mac-with-esc-key.local",
+                "name": "a-mac-with-esc-key.local",
+                "version": "6.0.0-alpha1"
+            },
+            "prospector": {
+                "type": "log"
+            },
+            "source": "module/system/syslog/test/darwin-syslog-sample.log",
+            "fields": {
+                "source_type": "system-syslog"
+            }
         }
-      },
-      "offset" : 907,
-      "beat" : {
-        "hostname" : "a-mac-with-esc-key.local",
-        "name" : "a-mac-with-esc-key.local",
-        "version" : "6.0.0-alpha1"
-      },
-      "input_type" : "log",
-      "source" : "module/system/syslog/test/darwin-syslog-sample.log",
-      "fields" : {
-        "source_type" : "system-syslog"
-      },
-      "type" : "log"
-    }
-  },
-  {
-    "_index" : "filebeat-2017.01.27",
-    "_type" : "log",
-    "_id" : "AVngMCdNUmQau8zc_UuN",
-    "_score" : 1.0,
-    "_source" : {
-      "@timestamp" : "2017-12-13T11:35:28.000Z",
-      "system" : {
-        "syslog" : {
-          "hostname" : "a-mac-with-esc-key",
-          "pid" : "21412",
-          "program" : "GoogleSoftwareUpdateAgent",
-          "message" : "2016-12-13 11:35:28.421 GoogleSoftwareUpdateAgent[21412/0x700007399000] [lvl=2] -[KSUpdateEngine updateAllExceptProduct:] KSUpdateEngine updating all installed products, except:'com.google.Keystone'.",
-          "timestamp" : "Dec 13 11:35:28"
+    },
+    {
+        "_index": "filebeat-2017.01.27",
+        "_type": "log",
+        "_id": "AVngMCdNUmQau8zc_UuN",
+        "_score": 1.0,
+        "_source": {
+            "@timestamp": "2017-12-13T11:35:28.000Z",
+            "system": {
+                "syslog": {
+                    "hostname": "a-mac-with-esc-key",
+                    "pid": "21412",
+                    "program": "GoogleSoftwareUpdateAgent",
+                    "message": "2016-12-13 11:35:28.421 GoogleSoftwareUpdateAgent[21412/0x700007399000] [lvl=2] -[KSUpdateEngine updateAllExceptProduct:] KSUpdateEngine updating all installed products, except:'com.google.Keystone'.",
+                    "timestamp": "Dec 13 11:35:28"
+                }
+            },
+            "offset": 1176,
+            "beat": {
+                "hostname": "a-mac-with-esc-key.local",
+                "name": "a-mac-with-esc-key.local",
+                "version": "6.0.0-alpha1"
+            },
+            "prospector": {
+                "type": "log"
+            },
+            "source": "module/system/syslog/test/darwin-syslog-sample.log",
+            "fields": {
+                "source_type": "system-syslog"
+            }
         }
-      },
-      "offset" : 1176,
-      "beat" : {
-        "hostname" : "a-mac-with-esc-key.local",
-        "name" : "a-mac-with-esc-key.local",
-        "version" : "6.0.0-alpha1"
-      },
-      "input_type" : "log",
-      "source" : "module/system/syslog/test/darwin-syslog-sample.log",
-      "fields" : {
-        "source_type" : "system-syslog"
-      },
-      "type" : "log"
-    }
-  },
-  {
-    "_index": "test-filebeat-modules",
-    "_type": "doc",
-    "_id": "AVtFVFY1nbkdi71WgGxo",
-    "_score": 1,
-    "_source": {
-      "@timestamp": "2017-04-04T03:39:57.000Z",
-      "system": {
-        "syslog": {
-          "message": "--- last message repeated 1 time ---",
-          "timestamp": "Apr 4 03:39:57"
+    },
+    {
+        "_index": "test-filebeat-modules",
+        "_type": "doc",
+        "_id": "AVtFVFY1nbkdi71WgGxo",
+        "_score": 1,
+        "_source": {
+            "@timestamp": "2017-04-04T03:39:57.000Z",
+            "system": {
+                "syslog": {
+                    "message": "--- last message repeated 1 time ---",
+                    "timestamp": "Apr 4 03:39:57"
+                }
+            },
+            "offset": 1228,
+            "beat": {
+                "hostname": "a-mac-with-esc-key-2.local",
+                "name": "a-mac-with-esc-key-2.local",
+                "version": "6.0.0-alpha1"
+            },
+            "prospector": {
+                "type": "log"
+            },
+            "source": "/Users/tsg/src/github.com/elastic/beats/filebeat/module/system/syslog/test/darwin-syslog-sample.log",
+            "fileset": {
+                "module": "system",
+                "name": "syslog"
+            }
         }
-      },
-      "offset": 1228,
-      "beat": {
-        "hostname": "a-mac-with-esc-key-2.local",
-        "name": "a-mac-with-esc-key-2.local",
-        "version": "6.0.0-alpha1"
-      },
-      "input_type": "log",
-      "source": "/Users/tsg/src/github.com/elastic/beats/filebeat/module/system/syslog/test/darwin-syslog-sample.log",
-      "fileset": {
-        "module": "system",
-        "name": "syslog"
-      },
-      "type": "log"
     }
-  }
 ]

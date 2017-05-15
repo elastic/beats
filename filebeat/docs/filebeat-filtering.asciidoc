@@ -93,7 +93,9 @@ The resulting output looks something like this:
   "inner": {
     "data": "value"
   },
-  "input_type": "log",
+  "prospector": {
+    "type": "log",
+  },
   "offset": 55,
   "outer": "value",
   "source": "input.json",

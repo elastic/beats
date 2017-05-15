@@ -15,7 +15,7 @@ import (
 var (
 	defaultConfig = config{
 		// Common
-		InputType:     cfg.DefaultInputType,
+		Type:          cfg.DefaultType,
 		CleanInactive: 0,
 
 		// Prospector
@@ -44,6 +44,7 @@ var (
 type config struct {
 
 	// Common
+	Type          string        `config:"type"`
 	InputType     string        `config:"input_type"`
 	CleanInactive time.Duration `config:"clean_inactive" validate:"min=0"`
 
@@ -84,8 +85,13 @@ type config struct {
 
 func (c *config) Validate() error {
 
+	// DEPRECATED 6.0.0: warning is already outputted on propsector level
+	if c.InputType != "" {
+		c.Type = c.InputType
+	}
+
 	// Prospector
-	if c.InputType == cfg.LogInputType && len(c.Paths) == 0 {
+	if c.Type == cfg.LogType && len(c.Paths) == 0 {
 		return fmt.Errorf("No paths were defined for prospector")
 	}
 
@@ -99,8 +105,8 @@ func (c *config) Validate() error {
 
 	// Harvester
 	// Check input type
-	if _, ok := cfg.ValidInputType[c.InputType]; !ok {
-		return fmt.Errorf("Invalid input type: %v", c.InputType)
+	if _, ok := cfg.ValidType[c.Type]; !ok {
+		return fmt.Errorf("Invalid input type: %v", c.Type)
 	}
 
 	if c.JSON != nil && len(c.JSON.MessageKey) == 0 &&

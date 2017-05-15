@@ -79,7 +79,7 @@ class Test(BaseTest):
         Test stdin input. Checks if reading is continued after the first read.
         """
         self.render_config_template(
-            input_type="stdin"
+            type="stdin"
         )
 
         proc = self.start_beat()
@@ -115,7 +115,7 @@ class Test(BaseTest):
         Test that Filebeat works when stdin is closed.
         """
         self.render_config_template(
-            input_type="stdin",
+            type="stdin",
             close_eof="true",
         )
 

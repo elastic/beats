@@ -15,6 +15,7 @@ https://github.com/elastic/beats/compare/v6.0.0-alpha1...master[Check the HEAD d
 *Affecting all Beats*
 
 *Filebeat*
+- Rename `input_type` field to `prospector.type` {pull}4294[4294]
 
 *Heartbeat*
 
@@ -67,6 +68,8 @@ https://github.com/elastic/beats/compare/v6.0.0-alpha1...master[Check the HEAD d
 *Affecting all Beats*
 
 *Filebeat*
+- Deprecate `input_type` prospector config. Use `type` config option instead. {pull}4294[4294]
+
 
 *Heartbeat*
 

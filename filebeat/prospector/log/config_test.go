@@ -47,7 +47,7 @@ func TestCleanOlderIgnoreOlder(t *testing.T) {
 	config := config{
 		CleanInactive: 10*time.Hour + defaultConfig.ScanFrequency + 1*time.Second,
 		IgnoreOlder:   10 * time.Hour,
-		InputType:     "log",
+		Type:          "log",
 		Paths:         []string{"hello"},
 	}
 
