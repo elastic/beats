@@ -19,14 +19,12 @@ import (
 	"github.com/satori/go.uuid"
 
 	cfg "github.com/elastic/beats/filebeat/config"
+	"github.com/elastic/beats/filebeat/harvester"
 	"github.com/elastic/beats/filebeat/harvester/encoding"
 	"github.com/elastic/beats/filebeat/harvester/reader"
 	"github.com/elastic/beats/filebeat/harvester/source"
 	"github.com/elastic/beats/filebeat/input/file"
-	"github.com/elastic/beats/filebeat/util"
 	"github.com/elastic/beats/libbeat/common"
-	"github.com/elastic/beats/libbeat/logp"
-	"github.com/elastic/beats/libbeat/processors"
 )
 
 var (
@@ -37,13 +35,8 @@ var (
 	ErrClosed       = errors.New("reader closed")
 )
 
-type Outlet interface {
-	SetSignal(signal <-chan struct{})
-	OnEventSignal(data *util.Data) bool
-	OnEvent(data *util.Data) bool
-}
-
 type Harvester struct {
+	forwarder       *harvester.Forwarder
 	config          config
 	state           file.State
 	states          *file.States
@@ -54,9 +47,7 @@ type Harvester struct {
 	done            chan struct{}
 	stopOnce        sync.Once
 	stopWg          *sync.WaitGroup
-	outlet          Outlet
 	id              uuid.UUID
-	processors      *processors.Processors
 	reader          reader.Reader
 }
 
@@ -64,7 +55,7 @@ func NewHarvester(
 	config *common.Config,
 	state file.State,
 	states *file.States,
-	outlet Outlet,
+	outlet harvester.Outlet,
 ) (*Harvester, error) {
 
 	h := &Harvester{
@@ -73,7 +64,6 @@ func NewHarvester(
 		states: states,
 		done:   make(chan struct{}),
 		stopWg: &sync.WaitGroup{},
-		outlet: outlet,
 		id:     uuid.NewV4(),
 	}
 
@@ -87,20 +77,19 @@ func NewHarvester(
 	}
 	h.encodingFactory = encodingFactory
 
-	f, err := processors.New(h.config.Processors)
-	if err != nil {
-		return nil, err
-	}
-
-	h.processors = f
-
 	// Add ttl if clean_inactive is set
 	if h.config.CleanInactive > 0 {
 		h.state.TTL = h.config.CleanInactive
 	}
 
 	// Add outlet signal so harvester can also stop itself
-	h.outlet.SetSignal(h.done)
+	outlet.SetSignal(h.done)
+
+	var err error
+	h.forwarder, err = harvester.NewForwarder(config, outlet)
+	if err != nil {
+		return nil, err
+	}
 
 	return h, nil
 }
@@ -116,33 +105,6 @@ func (h *Harvester) open() error {
 	default:
 		return fmt.Errorf("Invalid harvester type: %+v", h.config)
 	}
-}
-
-// updateState updates the prospector state and forwards the event to the spooler
-// All state updates done by the prospector itself are synchronous to make sure not states are overwritten
-func (h *Harvester) forwardEvent(data *util.Data) error {
-
-	// Add additional prospector meta data to the event
-	data.Meta.Pipeline = h.config.Pipeline
-	data.Meta.Module = h.config.Module
-	data.Meta.Fileset = h.config.Fileset
-
-	if data.HasEvent() {
-		data.Event[common.EventMetadataKey] = h.config.EventMetadata
-		data.Event.Put("prospector.type", h.config.Type)
-
-		// run the filters before sending to spooler
-		data.Event = h.processors.Run(data.Event)
-	}
-
-	ok := h.outlet.OnEventSignal(data)
-
-	if !ok {
-		logp.Info("Prospector outlet closed")
-		return errors.New("prospector outlet closed")
-	}
-
-	return nil
 }
 
 // ID returns the unique harvester identifier

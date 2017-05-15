@@ -197,7 +197,8 @@ func (h *Harvester) sendEvent(data *util.Data) bool {
 	if h.file.HasState() {
 		h.states.Update(data.GetState())
 	}
-	err := h.forwardEvent(data)
+
+	err := h.forwarder.Send(data)
 	return err == nil
 }
 
@@ -217,7 +218,7 @@ func (h *Harvester) SendStateUpdate() {
 
 	d := util.NewData()
 	d.SetState(h.state)
-	h.outlet.OnEvent(d)
+	h.forwarder.Outlet.OnEvent(d)
 }
 
 // shouldExportLine decides if the line is exported or not based on
