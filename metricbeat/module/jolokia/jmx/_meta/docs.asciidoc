@@ -1,4 +1,4 @@
-=== jolokia jmx MetricSet
+=== Jolokia jmx Metricset
 
 This is the jmx metricset of the module jolokia.
 
@@ -26,11 +26,11 @@ mapping:
           field: uptime
 ---
 
-In case the underlying attribute is an object (e.g. see HeapMemoryUsage attribute in java.lang:type=Memory) it`s
+In case the underlying attribute is an object (e.g. see HeapMemoryUsage attribute in java.lang:type=Memory) its
 structure will be published to Elastic "as is".
 
 It is possible to configure nested metric aliases by using dots in the mapping name (e.g. gc.cms_collection_time). For examples please refer to the
-/jolokia/jmx/test/config.yml.
+https://github.com/elastic/beats/blob/{doc-branch}/metricbeat/module/jolokia/jmx/_meta/test/config.yml[/jolokia/jmx/test/config.yml].
 
 All metrics from a single mapping will be POSTed to the defined host/port and sent to Elastic as a single event.
 To make it possible to differentiate between metrics from multiple similar applications running on the same host,
@@ -46,5 +46,5 @@ All Jolokia requests have canonicalNaming set to false (details see here: https:
 
 [float]
 === Exposed fields, Dashboards, Indexes, etc.
-Since this is a very general module that can be tailored for any application that exposes it's metrics over Jolokia, it
+Since this is a very general module that can be tailored for any application that exposes its metrics over Jolokia, it
 comes with no exposed fields description, dashboards or index patterns.
