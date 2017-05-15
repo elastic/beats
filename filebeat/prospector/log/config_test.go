@@ -7,6 +7,7 @@ import (
 
 	"time"
 
+	"github.com/elastic/beats/filebeat/harvester"
 	"github.com/stretchr/testify/assert"
 )
 
@@ -47,8 +48,10 @@ func TestCleanOlderIgnoreOlder(t *testing.T) {
 	config := config{
 		CleanInactive: 10*time.Hour + defaultConfig.ScanFrequency + 1*time.Second,
 		IgnoreOlder:   10 * time.Hour,
-		Type:          "log",
 		Paths:         []string{"hello"},
+		ForwarderConfig: harvester.ForwarderConfig{
+			Type: "log",
+		},
 	}
 
 	err := config.Validate()

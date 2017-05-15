@@ -6,16 +6,17 @@ import (
 
 	"github.com/dustin/go-humanize"
 	cfg "github.com/elastic/beats/filebeat/config"
+	"github.com/elastic/beats/filebeat/harvester"
 	"github.com/elastic/beats/filebeat/harvester/reader"
-	"github.com/elastic/beats/libbeat/common"
 	"github.com/elastic/beats/libbeat/common/match"
-	"github.com/elastic/beats/libbeat/processors"
 )
 
 var (
 	defaultConfig = config{
 		// Common
-		Type:          cfg.DefaultType,
+		ForwarderConfig: harvester.ForwarderConfig{
+			Type: cfg.DefaultType,
+		},
 		CleanInactive: 0,
 
 		// Prospector
@@ -42,9 +43,9 @@ var (
 )
 
 type config struct {
+	harvester.ForwarderConfig `config:",inline"`
 
 	// Common
-	Type          string        `config:"type"`
 	InputType     string        `config:"input_type"`
 	CleanInactive time.Duration `config:"clean_inactive" validate:"min=0"`
 
@@ -61,26 +62,21 @@ type config struct {
 	recursiveGlob  bool            `config:"recursive_glob.enabled"`
 
 	// Harvester
-	common.EventMetadata `config:",inline"`      // Fields and tags to add to events.
-	BufferSize           int                     `config:"harvester_buffer_size"`
-	Encoding             string                  `config:"encoding"`
-	Backoff              time.Duration           `config:"backoff" validate:"min=0,nonzero"`
-	BackoffFactor        int                     `config:"backoff_factor" validate:"min=1"`
-	MaxBackoff           time.Duration           `config:"max_backoff" validate:"min=0,nonzero"`
-	CloseInactive        time.Duration           `config:"close_inactive"`
-	CloseRemoved         bool                    `config:"close_removed"`
-	CloseRenamed         bool                    `config:"close_renamed"`
-	CloseEOF             bool                    `config:"close_eof"`
-	CloseTimeout         time.Duration           `config:"close_timeout" validate:"min=0"`
-	ExcludeLines         []match.Matcher         `config:"exclude_lines"`
-	IncludeLines         []match.Matcher         `config:"include_lines"`
-	MaxBytes             int                     `config:"max_bytes" validate:"min=0,nonzero"`
-	Multiline            *reader.MultilineConfig `config:"multiline"`
-	JSON                 *reader.JSONConfig      `config:"json"`
-	Pipeline             string                  `config:"pipeline"`
-	Module               string                  `config:"_module_name"`  // hidden option to set the module name
-	Fileset              string                  `config:"_fileset_name"` // hidden option to set the fileset name
-	Processors           processors.PluginConfig `config:"processors"`
+	BufferSize    int                     `config:"harvester_buffer_size"`
+	Encoding      string                  `config:"encoding"`
+	Backoff       time.Duration           `config:"backoff" validate:"min=0,nonzero"`
+	BackoffFactor int                     `config:"backoff_factor" validate:"min=1"`
+	MaxBackoff    time.Duration           `config:"max_backoff" validate:"min=0,nonzero"`
+	CloseInactive time.Duration           `config:"close_inactive"`
+	CloseRemoved  bool                    `config:"close_removed"`
+	CloseRenamed  bool                    `config:"close_renamed"`
+	CloseEOF      bool                    `config:"close_eof"`
+	CloseTimeout  time.Duration           `config:"close_timeout" validate:"min=0"`
+	ExcludeLines  []match.Matcher         `config:"exclude_lines"`
+	IncludeLines  []match.Matcher         `config:"include_lines"`
+	MaxBytes      int                     `config:"max_bytes" validate:"min=0,nonzero"`
+	Multiline     *reader.MultilineConfig `config:"multiline"`
+	JSON          *reader.JSONConfig      `config:"json"`
 }
 
 func (c *config) Validate() error {
