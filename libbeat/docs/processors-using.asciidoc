@@ -520,7 +520,7 @@ processors:
 - kubernetes:
     in_cluster: false
     host: <hostname>
-    kube_config: ~/.kube/config
+    kube_config: ${HOME}/.kube/config
 -------------------------------------------------------------------------------
 
 The configuration below has the default indexers and matchers disabled and enables ones that
