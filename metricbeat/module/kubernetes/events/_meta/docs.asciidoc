@@ -1,0 +1,3 @@
+=== kubernetes events MetricSet
+
+This is the events metricset of the module kubernetes.

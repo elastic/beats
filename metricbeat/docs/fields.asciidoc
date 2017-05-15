@@ -6058,6 +6058,21 @@ Used inodes
 
 
 [float]
+== events Fields
+
+events
+
+
+
+[float]
+=== kubernetes.events.example
+
+type: keyword
+
+Example field
+
+
+[float]
 == node Fields
 
 kubernetes node metrics

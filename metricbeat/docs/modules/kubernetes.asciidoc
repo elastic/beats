@@ -56,6 +56,8 @@ The following metricsets are available:
 
 * <<metricbeat-metricset-kubernetes-container,container>>
 
+* <<metricbeat-metricset-kubernetes-events,events>>
+
 * <<metricbeat-metricset-kubernetes-node,node>>
 
 * <<metricbeat-metricset-kubernetes-pod,pod>>
@@ -75,6 +77,8 @@ The following metricsets are available:
 * <<metricbeat-metricset-kubernetes-volume,volume>>
 
 include::kubernetes/container.asciidoc[]
+
+include::kubernetes/events.asciidoc[]
 
 include::kubernetes/node.asciidoc[]
 
