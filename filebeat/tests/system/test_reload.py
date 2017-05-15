@@ -7,7 +7,7 @@ from filebeat import BaseTest
 
 
 prospectorConfigTemplate = """
-- input_type: log
+- type: log
   paths:
     - {}
   scan_frequency: 1s

@@ -5,7 +5,8 @@ filebeat.prospectors:
 {% set prospectors = true %}
 {% endif %}
 {% if prospectors %}
-- input_type: {{input_type | default("log") }}
+- type: {{type | default("log") }}
+  input_type: {{input_type_deprecated }}
   # Paths that should be crawled and fetched
   {% if path %}paths:
     - {{ path }}{% endif %}

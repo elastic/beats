@@ -69,13 +69,13 @@ func (p *Prospector) initProspectorer(outlet channel.Outleter, states []file.Sta
 	var prospectorer Prospectorer
 	var err error
 
-	switch p.config.InputType {
-	case cfg.StdinInputType:
+	switch p.config.Type {
+	case cfg.StdinType:
 		prospectorer, err = stdin.NewProspector(config, outlet)
-	case cfg.LogInputType:
+	case cfg.LogType:
 		prospectorer, err = log.NewProspector(config, states, outlet, p.done)
 	default:
-		return fmt.Errorf("invalid prospector type: %v. Change input_type", p.config.InputType)
+		return fmt.Errorf("invalid prospector type: %v. Change type", p.config.Type)
 	}
 
 	if err != nil {
@@ -90,7 +90,7 @@ func (p *Prospector) initProspectorer(outlet channel.Outleter, states []file.Sta
 // Start starts the prospector
 func (p *Prospector) Start() {
 	p.wg.Add(1)
-	logp.Info("Starting prospector of type: %v; id: %v ", p.config.InputType, p.ID())
+	logp.Info("Starting prospector of type: %v; id: %v ", p.config.Type, p.ID())
 
 	onceWg := sync.WaitGroup{}
 	if p.Once {
