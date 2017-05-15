@@ -253,6 +253,12 @@ This product includes software developed at
 SoundCloud Ltd. (http://soundcloud.com/).
 
 --------------------------------------------------------------------
+github.com/ericchiang/k8s
+--------------------------------------------------------------------
+Apache License
+
+
+--------------------------------------------------------------------
 github.com/garyburd/redigo
 --------------------------------------------------------------------
 Apache License
@@ -1176,6 +1182,7 @@ THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 --------------------------------------------------------------------
+<<<<<<< HEAD
 github.com/ericchiang/k8s
 --------------------------------------------------------------------
 Apache License
