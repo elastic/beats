@@ -1,4 +1,4 @@
-package events
+package event
 
 import (
 	"context"
@@ -11,8 +11,8 @@ import (
 	corev1 "github.com/ericchiang/k8s/api/v1"
 )
 
-// EventWatcher is a controller that synchronizes Pods.
-type EventWatcher struct {
+// Watcher is a controller that synchronizes Pods.
+type Watcher struct {
 	kubeClient          *k8s.Client
 	namespace           string
 	syncPeriod          time.Duration
@@ -22,11 +22,11 @@ type EventWatcher struct {
 	stop                context.CancelFunc
 }
 
-// NewEventWatcher initializes the watcher client to provide a local state of
+// NewWatcher initializes the watcher client to provide a local state of
 // pods from the cluster (filtered to the given host)
-func NewEventWatcher(kubeClient *k8s.Client, syncPeriod time.Duration, namespace string) *EventWatcher {
+func NewWatcher(kubeClient *k8s.Client, syncPeriod time.Duration, namespace string) *Watcher {
 	ctx, cancel := context.WithCancel(context.Background())
-	return &EventWatcher{
+	return &Watcher{
 		kubeClient:          kubeClient,
 		namespace:           namespace,
 		syncPeriod:          syncPeriod,
@@ -39,33 +39,37 @@ func NewEventWatcher(kubeClient *k8s.Client, syncPeriod time.Duration, namespace
 
 // watchEvents watches on the Kubernetes API server and puts them onto a channel.
 // watchEvents only starts from the most recent event.
-func (p *EventWatcher) watchEvents() {
+func (w *Watcher) watchEvents() {
 	for {
 		//To avoid writing old events, list events to get last resource version
-		events, err := p.kubeClient.CoreV1().ListEvents(
-			p.ctx,
-			p.namespace,
+		events, err := w.kubeClient.CoreV1().ListEvents(
+			w.ctx,
+			w.namespace,
 		)
 
 		if err != nil {
 			//if listing fails try again after sometime
 			logp.Err("kubernetes: List API error %v", err)
+			// Sleep for a second to prevent API server from being bombarded
+			// API server could be down
 			time.Sleep(time.Second)
 			continue
 		}
 
-		p.lastResourceVersion = events.Metadata.GetResourceVersion()
+		w.lastResourceVersion = events.Metadata.GetResourceVersion()
 
 		logp.Info("kubernetes: %s", "Watching API for events")
-		watcher, err := p.kubeClient.CoreV1().WatchEvents(
-			p.ctx,
-			p.namespace,
-			k8s.ResourceVersion(p.lastResourceVersion),
+		watcher, err := w.kubeClient.CoreV1().WatchEvents(
+			w.ctx,
+			w.namespace,
+			k8s.ResourceVersion(w.lastResourceVersion),
 		)
 		if err != nil {
 			//watch events failures should be logged and gracefully failed over as metadata retrieval
 			//should never stop.
 			logp.Err("kubernetes: Watching API eror %v", err)
+			// Sleep for a second to prevent API server from being bombarded
+			// API server could be down
 			time.Sleep(time.Second)
 			continue
 		}
@@ -77,9 +81,9 @@ func (p *EventWatcher) watchEvents() {
 				break
 			}
 
-			event := p.getEventMeta(eve)
+			event := w.getEventMeta(eve)
 			if event != nil {
-				p.eventQueue <- event
+				w.eventQueue <- event
 			}
 
 		}
@@ -87,12 +91,12 @@ func (p *EventWatcher) watchEvents() {
 
 }
 
-func (p *EventWatcher) Run() {
+func (w *Watcher) Run() {
 	// Start watching on events
-	go p.watchEvents()
+	go w.watchEvents()
 }
 
-func (p *EventWatcher) getEventMeta(pod *corev1.Event) *Event {
+func (w *Watcher) getEventMeta(pod *corev1.Event) *Event {
 	bytes, err := json.Marshal(pod)
 	if err != nil {
 		logp.Warn("Unable to marshal %v", pod.String())
@@ -110,7 +114,7 @@ func (p *EventWatcher) getEventMeta(pod *corev1.Event) *Event {
 
 }
 
-func (p *EventWatcher) Stop() {
-	p.stop()
-	close(p.eventQueue)
+func (w *Watcher) Stop() {
+	w.stop()
+	close(w.eventQueue)
 }

@@ -1,6 +1,7 @@
-package events
+package event
 
 import (
+	"errors"
 	"time"
 
 	"github.com/elastic/beats/libbeat/common"
@@ -24,4 +25,11 @@ func defaultKuberentesEventsConfig() kubeEventsConfig {
 		InCluster:  true,
 		SyncPeriod: 1 * time.Second,
 	}
+}
+
+func (c kubeEventsConfig) Validate() error {
+	if !c.InCluster && c.KubeConfig == "" {
+		return errors.New("`kube_config` path can't be empty when in_cluster is set to false")
+	}
+	return nil
 }
