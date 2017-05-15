@@ -31,6 +31,7 @@ https://github.com/elastic/beats/compare/v6.0.0-alpha1...master[Check the HEAD d
 - Fix importing the dashboards when the limit for max open files is too low. {issue}4244[4244]
 
 *Filebeat*
+- Fix race condition on harvester stopping with reloading enabled. {issue}3779[3779]
 
 *Heartbeat*
 
