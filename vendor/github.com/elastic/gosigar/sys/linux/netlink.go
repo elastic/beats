@@ -1,9 +1,13 @@
+// +build linux
+
 package linux
 
 import (
 	"encoding/binary"
 	"errors"
 )
+
+// Netlink Error Code Handling
 
 // ParseNetlinkError parses the errno from the data section of a
 // syscall.NetlinkMessage. If netlinkData is less than 4 bytes an error

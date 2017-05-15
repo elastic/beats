@@ -2,9 +2,10 @@
 All notable changes to this project will be documented in this file.
 This project adheres to [Semantic Versioning](http://semver.org/).
 
-## [Unreleased]
+## [0.3.0]
 
 ### Added
+- Read `MemAvailable` value for kernel 3.14+
 
 ### Changed
 
