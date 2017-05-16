@@ -20,11 +20,11 @@ type Template struct {
 	index       string
 	beatVersion Version
 	esVersion   Version
-	settings    common.MapStr
+	settings    templateSettings
 }
 
 // New creates a new template instance
-func New(beatVersion string, esVersion string, index string, settings common.MapStr) (*Template, error) {
+func New(beatVersion string, esVersion string, index string, settings templateSettings) (*Template, error) {
 
 	bV, err := NewVersion(beatVersion)
 	if err != nil {
@@ -92,17 +92,15 @@ func (t *Template) generate(properties common.MapStr, dynamicTemplates []common.
 
 	dynamicTemplates = append(dynamicTemplates, dynamicTemplateBase)
 
-	settings := common.MapStr{
-		"index": common.MapStr{
-			"refresh_interval": "5s",
-			"mapping": common.MapStr{
-				"total_fields": common.MapStr{
-					"limit": defaultTotalFieldsLimit,
-				},
+	indexSettings := common.MapStr{
+		"refresh_interval": "5s",
+		"mapping": common.MapStr{
+			"total_fields": common.MapStr{
+				"limit": defaultTotalFieldsLimit,
 			},
 		},
 	}
-	settings.DeepUpdate(t.settings)
+	indexSettings.DeepUpdate(t.settings.Index)
 
 	// Load basic structure
 	basicStructure := common.MapStr{
@@ -116,8 +114,14 @@ func (t *Template) generate(properties common.MapStr, dynamicTemplates []common.
 				"properties":        properties,
 			},
 		},
-		"order":    1,
-		"settings": settings,
+		"order": 1,
+		"settings": common.MapStr{
+			"index": indexSettings,
+		},
+	}
+
+	if len(t.settings.Source) > 0 {
+		basicStructure.Put("mappings._default_._source", t.settings.Source)
 	}
 
 	// ES 6 moved from template to index_patterns: https://github.com/elastic/elasticsearch/pull/21009

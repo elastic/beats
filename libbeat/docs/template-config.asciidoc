@@ -20,11 +20,11 @@ section for details.
 *`overwrite`*:: A boolean that specifies whether to overwrite the existing template. The default
 is false.
 
-*`settings`*:: A dictionary of settings to place into the `settings` dictionary of the Elasticsearch
-template. For more details about the available Elasticsearch mapping options, please see the
-Elasticsearch {elasticsearch}/mapping.html[mapping reference].
+*`settings.index`*:: A dictionary of settings to place into the `settings.index` dictionary of the
+Elasticsearch template. For more details about the available Elasticsearch mapping options, please
+see the Elasticsearch {elasticsearch}/mapping.html[mapping reference].
 
-For example:
+Example:
 
 ["source","yaml",subs="attributes,callouts"]
 ----------------------------------------------------------------------
@@ -34,4 +34,18 @@ setup.template.overwrite: false
 setup.template.settings:
   index.number_of_shards: 1
   index.number_of_replicas: 1
+----------------------------------------------------------------------
+
+*`settings._source`*:: A dictionary of settings for the `_source` field. For the available settings,
+please see the Elasticsearch {elasticsearch}/mapping-source-field.html[reference].
+
+Example:
+
+["source","yaml",subs="attributes,callouts"]
+----------------------------------------------------------------------
+setup.template.name: "{beatname_lc}"
+setup.template.fields: "fields.yml"
+setup.template.overwrite: false
+setup.template.settings:
+  _source.enabled: false
 ----------------------------------------------------------------------

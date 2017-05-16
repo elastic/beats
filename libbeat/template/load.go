@@ -43,23 +43,23 @@ func NewLoader(cfg *common.Config, client ESClient, beatInfo common.BeatInfo) (*
 // template is written to index
 func (l *Loader) Load() error {
 
+	if l.config.Name == "" {
+		l.config.Name = l.beatInfo.Beat
+	}
+
+	tmpl, err := New(l.beatInfo.Version, l.client.GetVersion(), l.config.Name, l.config.Settings)
+	if err != nil {
+		return fmt.Errorf("error creating template instance: %v", err)
+	}
+
 	// Check if template already exist or should be overwritten
-	exists := l.CheckTemplate(l.config.Name)
+	exists := l.CheckTemplate(tmpl.GetName())
 	if !exists || l.config.Overwrite {
 
-		logp.Info("Loading template for elasticsearch version: %s", l.client.GetVersion())
+		logp.Info("Loading template for Elasticsearch version: %s", l.client.GetVersion())
 
 		if l.config.Overwrite {
 			logp.Info("Existing template will be overwritten, as overwrite is enabled.")
-		}
-
-		if l.config.Name == "" {
-			l.config.Name = l.beatInfo.Beat
-		}
-
-		tmpl, err := New(l.beatInfo.Version, l.client.GetVersion(), l.config.Name, l.config.Settings)
-		if err != nil {
-			return fmt.Errorf("error creating template instance: %v", err)
 		}
 
 		fieldsPath := paths.Resolve(paths.Config, l.config.Fields)

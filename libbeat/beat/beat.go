@@ -487,12 +487,14 @@ func (b *Beat) registerTemplateLoading() error {
 
 			loader, err := template.NewLoader(b.Config.Template, esClient, b.Info)
 			if err != nil {
-				return fmt.Errorf("Error loading elasticsearch template: %v", err)
+				return fmt.Errorf("Error creating Elasticsearch template: %v", err)
 			}
 
-			loader.Load()
+			err = loader.Load()
+			if err != nil {
+				return fmt.Errorf("Error loading Elasticsearch template: %v", err)
+			}
 
-			logp.Info("ES template successfully loaded.")
 			return nil
 		}
 
