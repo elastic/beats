@@ -340,10 +340,13 @@ func (r *eventReporter) ErrorWith(err error, meta common.MapStr) bool {
 		return false
 	}
 
-	if !writeEvent(r.done, r.out, event) {
-		return false
+	if event != nil { // event can be nil if it was dropped by processors
+		if !writeEvent(r.done, r.out, event) {
+			return false
+		}
+		r.msw.stats.events.Add(1)
 	}
-	r.msw.stats.events.Add(1)
+
 	return true
 }
 
