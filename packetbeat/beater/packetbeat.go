@@ -40,24 +40,22 @@ type packetbeat struct {
 }
 
 type flags struct {
-	file         *string
-	loop         *int
-	oneAtAtime   *bool
-	topSpeed     *bool
-	dumpfile     *string
-	waitShutdown *int
+	file       *string
+	loop       *int
+	oneAtAtime *bool
+	topSpeed   *bool
+	dumpfile   *string
 }
 
 var cmdLineArgs flags
 
 func init() {
 	cmdLineArgs = flags{
-		file:         flag.String("I", "", "Read packet data from specified file"),
-		loop:         flag.Int("l", 1, "Loop file. 0 - loop forever"),
-		oneAtAtime:   flag.Bool("O", false, "Read packets one at a time (press Enter)"),
-		topSpeed:     flag.Bool("t", false, "Read packets as fast as possible, without sleeping"),
-		dumpfile:     flag.String("dump", "", "Write all captured packets to this libpcap file"),
-		waitShutdown: flag.Int("waitstop", 0, "Additional seconds to wait before shutting down"),
+		file:       flag.String("I", "", "Read packet data from specified file"),
+		loop:       flag.Int("l", 1, "Loop file. 0 - loop forever"),
+		oneAtAtime: flag.Bool("O", false, "Read packets one at a time (press Enter)"),
+		topSpeed:   flag.Bool("t", false, "Read packets as fast as possible, without sleeping"),
+		dumpfile:   flag.String("dump", "", "Write all captured packets to this libpcap file"),
 	}
 }
 
@@ -172,9 +170,9 @@ func (pb *packetbeat) Run(b *beat.Beat) error {
 		service.Stop()
 	}
 
-	waitShutdown := pb.cmdLineArgs.waitShutdown
-	if waitShutdown != nil && *waitShutdown > 0 {
-		time.Sleep(time.Duration(*waitShutdown) * time.Second)
+	timeout := pb.config.ShutdownTimeout
+	if timeout > 0 {
+		time.Sleep(timeout)
 	}
 
 	return nil

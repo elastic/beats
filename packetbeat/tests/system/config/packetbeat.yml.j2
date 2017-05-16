@@ -168,6 +168,8 @@ tags: [
   {%- endif -%}
 ]
 
+packetbeat.shutdown_timeout: {{ shutdown_timeout|default(0) }}
+
 {%- if processors %}
 
 #================================ Filters =====================================
