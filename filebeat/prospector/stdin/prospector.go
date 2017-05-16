@@ -4,6 +4,7 @@ import (
 	"fmt"
 
 	"github.com/elastic/beats/filebeat/channel"
+	"github.com/elastic/beats/filebeat/harvester"
 	"github.com/elastic/beats/filebeat/input/file"
 	"github.com/elastic/beats/filebeat/prospector/log"
 	"github.com/elastic/beats/libbeat/common"
@@ -16,6 +17,7 @@ type Prospector struct {
 	started   bool
 	cfg       *common.Config
 	outlet    channel.Outleter
+	registry  *harvester.Registry
 }
 
 // NewStdin creates a new stdin prospector
@@ -23,9 +25,10 @@ type Prospector struct {
 func NewProspector(cfg *common.Config, outlet channel.Outleter) (*Prospector, error) {
 
 	p := &Prospector{
-		started: false,
-		cfg:     cfg,
-		outlet:  outlet,
+		started:  false,
+		cfg:      cfg,
+		outlet:   outlet,
+		registry: harvester.NewRegistry(),
 	}
 
 	var err error
@@ -45,10 +48,10 @@ func (p *Prospector) Run() {
 	if !p.started {
 		err := p.harvester.Setup()
 		if err != nil {
-			logp.Err("Error starting stdin harvester: %s", err)
+			logp.Err("Error setting up stdin harvester: %s", err)
 			return
 		}
-		go p.harvester.Start()
+		p.registry.Start(p.harvester)
 		p.started = true
 	}
 }
@@ -72,4 +75,6 @@ func (p *Prospector) createHarvester(state file.State) (*log.Harvester, error) {
 func (p *Prospector) Wait() {}
 
 // Stop stops the prospector.
-func (p *Prospector) Stop() {}
+func (p *Prospector) Stop() {
+
+}
