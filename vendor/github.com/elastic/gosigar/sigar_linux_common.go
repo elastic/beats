@@ -53,35 +53,38 @@ func (self *LoadAverage) Get() error {
 }
 
 func (self *Mem) Get() error {
-	var buffers, cached uint64
-	table := map[string]*uint64{
-		"MemTotal": &self.Total,
-		"MemFree":  &self.Free,
-		"Buffers":  &buffers,
-		"Cached":   &cached,
-	}
 
-	if err := parseMeminfo(table); err != nil {
+	table, err := parseMeminfo()
+	if err != nil {
 		return err
 	}
 
-	self.Used = self.Total - self.Free
-	kern := buffers + cached
-	self.ActualFree = self.Free + kern
-	self.ActualUsed = self.Used - kern
+	self.Total, _ = table["MemTotal"]
+	self.Free, _ = table["MemFree"]
+	buffers, _ := table["Buffers"]
+	cached, _ := table["Cached"]
+
+	if available, ok := table["MemAvailable"]; ok {
+		// MemAvailable is in /proc/meminfo (kernel 3.14+)
+		self.ActualFree = available
+	} else {
+		self.ActualFree = self.Free + buffers + cached
+	}
+
+	self.Used = self.Total - self.ActualFree
+	self.ActualUsed = self.Total - self.ActualFree
 
 	return nil
 }
 
 func (self *Swap) Get() error {
-	table := map[string]*uint64{
-		"SwapTotal": &self.Total,
-		"SwapFree":  &self.Free,
-	}
 
-	if err := parseMeminfo(table); err != nil {
+	table, err := parseMeminfo()
+	if err != nil {
 		return err
 	}
+	self.Total, _ = table["SwapTotal"]
+	self.Free, _ = table["SwapFree"]
 
 	self.Used = self.Total - self.Free
 	return nil
@@ -353,20 +356,26 @@ func (self *ProcExe) Get(pid int) error {
 	return nil
 }
 
-func parseMeminfo(table map[string]*uint64) error {
-	return readFile(Procd+"/meminfo", func(line string) bool {
+func parseMeminfo() (map[string]uint64, error) {
+	table := map[string]uint64{}
+
+	err := readFile(Procd+"/meminfo", func(line string) bool {
 		fields := strings.Split(line, ":")
 
-		if ptr := table[fields[0]]; ptr != nil {
-			num := strings.TrimLeft(fields[1], " ")
-			val, err := strtoull(strings.Fields(num)[0])
-			if err == nil {
-				*ptr = val * 1024
-			}
+		if len(fields) != 2 {
+			return true // skip on errors
 		}
+
+		num := strings.TrimLeft(fields[1], " ")
+		val, err := strtoull(strings.Fields(num)[0])
+		if err != nil {
+			return true // skip on errors
+		}
+		table[fields[0]] = val * 1024 //in bytes
 
 		return true
 	})
+	return table, err
 }
 
 func readFile(file string, handler func(string) bool) error {
