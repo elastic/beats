@@ -26,6 +26,7 @@ services:
       - ${PWD}/module/jolokia/_meta/env
       - ${PWD}/module/kafka/_meta/env
       - ${PWD}/module/kibana/_meta/env
+      - ${PWD}/module/kubernetes/_meta/env
       - ${PWD}/module/memcached/_meta/env
       - ${PWD}/module/mongodb/_meta/env
       - ${PWD}/module/mysql/_meta/env
@@ -51,6 +52,8 @@ services:
       jolokia:        { condition: service_healthy }
       kafka:          { condition: service_healthy }
       kibana:         { condition: service_healthy }
+      kubernetes:     { condition: service_healthy }
+      kube-state:     { condition: service_started }
       memcached:      { condition: service_healthy }
       mongodb:        { condition: service_healthy }
       mysql:          { condition: service_healthy }
@@ -95,6 +98,22 @@ services:
     extends:
       file: ${ES_BEATS}/testing/environments/${TESTING_ENVIRONMENT}.yml
       service: kibana
+
+  kubernetes:
+    build: ${PWD}/module/kubernetes/_meta
+    network_mode: host
+    pid: host
+    privileged: true
+    volumes:
+      - /:/rootfs:ro
+      - /sys:/sys
+      - /var/lib/docker:/var/lib/docker
+      - /var/run:/var/run
+
+  kube-state:
+    build:
+      context: ${PWD}/module/kubernetes/_meta/
+      dockerfile: Dockerfile.kube-state
 
   memcached:
     build: ${PWD}/module/memcached/_meta

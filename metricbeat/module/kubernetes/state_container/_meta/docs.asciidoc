@@ -1,0 +1,3 @@
+=== kubernetes state_container MetricSet
+
+This is the state_container metricset of the module kubernetes.

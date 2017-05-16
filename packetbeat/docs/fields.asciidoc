@@ -1903,9 +1903,11 @@ type: long
 The response code.
 
 [[exported-fields-kubernetes-processor]]
-== Kubernetes info Fields
+== kubernetes Fields
 
+beta[]
 Kubernetes metadata added by the kubernetes processor
+
 
 
 
@@ -1947,6 +1949,14 @@ Kubernetes annotations map
 type: keyword
 
 Kubernetes container name
+
+
+[float]
+=== kubernetes.container.image
+
+type: keyword
+
+Kubernetes container image
 
 
 [[exported-fields-memcache]]

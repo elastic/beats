@@ -1,0 +1,3 @@
+=== kubernetes state_pod MetricSet
+
+This is the state_pod metricset of the module kubernetes.

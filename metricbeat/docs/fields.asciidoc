@@ -5777,9 +5777,11 @@ Total number of connections.
 
 
 [[exported-fields-kubernetes-processor]]
-== Kubernetes info Fields
+== kubernetes Fields
 
+beta[]
 Kubernetes metadata added by the kubernetes processor
+
 
 
 
@@ -5823,6 +5825,14 @@ type: keyword
 Kubernetes container name
 
 
+[float]
+=== kubernetes.container.image
+
+type: keyword
+
+Kubernetes container image
+
+
 [[exported-fields-kubernetes]]
 == kubernetes Fields
 
@@ -5843,6 +5853,14 @@ Information and statistics of pods managed by kubernetes.
 
 kubernetes container metrics
 
+
+
+[float]
+=== kubernetes.container.start_time
+
+type: date
+
+Start time
 
 
 [float]
@@ -6055,6 +6073,14 @@ Node name
 
 
 [float]
+=== kubernetes.node.start_time
+
+type: date
+
+Start time
+
+
+[float]
 == cpu Fields
 
 CPU usage metrics
@@ -6214,6 +6240,31 @@ Filesystem total used in bytes
 
 
 
+[float]
+=== kubernetes.node.fs.inodes.used
+
+type: long
+
+Number of used inodes
+
+
+[float]
+=== kubernetes.node.fs.inodes.count
+
+type: long
+
+Number of inodes
+
+
+[float]
+=== kubernetes.node.fs.inodes.free
+
+type: long
+
+Number of free inodes
+
+
+
 
 
 [float]
@@ -6253,6 +6304,14 @@ Image filesystem total used in bytes
 
 kubernetes pod metrics
 
+
+
+[float]
+=== kubernetes.pod.start_time
+
+type: date
+
+Start time
 
 
 
@@ -6295,6 +6354,340 @@ Tx errors
 
 
 [float]
+== container Fields
+
+kubernetes container metrics
+
+
+
+[float]
+=== kubernetes.container.id
+
+type: keyword
+
+Container id
+
+
+[float]
+=== kubernetes.container.status.phase
+
+type: keyword
+
+Container phase (running, waiting, terminated)
+
+
+[float]
+=== kubernetes.container.status.ready
+
+type: boolean
+
+Container ready status
+
+
+[float]
+=== kubernetes.container.status.restarts
+
+type: integer
+
+Container restarts count
+
+
+
+[float]
+=== kubernetes.container.cpu.limit.nanocores
+
+type: long
+
+Container CPU nanocores limit
+
+
+[float]
+=== kubernetes.container.cpu.request.nanocores
+
+type: long
+
+Container CPU requested nanocores
+
+
+
+[float]
+=== kubernetes.container.memory.limit.bytes
+
+type: long
+
+format: bytes
+
+Container memory limit in bytes
+
+
+[float]
+=== kubernetes.container.memory.request.bytes
+
+type: long
+
+format: bytes
+
+Container requested memory in bytes
+
+
+[float]
+== deployment Fields
+
+kubernetes deployment metrics
+
+
+
+[float]
+=== kubernetes.deployment.name
+
+type: keyword
+
+Kubernetes deployment name
+
+
+[float]
+=== kubernetes.deployment.paused
+
+type: boolean
+
+Kubernetes deployment paused status
+
+
+[float]
+== replicas Fields
+
+Kubernetes deployment replicas info
+
+
+
+[float]
+=== kubernetes.deployment.replicas.desired
+
+type: integer
+
+Deployment number of desired replicas (spec)
+
+
+[float]
+=== kubernetes.deployment.replicas.available
+
+type: integer
+
+Deployment available replicas
+
+
+[float]
+=== kubernetes.deployment.replicas.unavailable
+
+type: integer
+
+Deployment unavailable replicas
+
+
+[float]
+=== kubernetes.deployment.replicas.updated
+
+type: integer
+
+Deployment updated replicas
+
+
+[float]
+== node Fields
+
+kubernetes node metrics
+
+
+
+
+[float]
+=== kubernetes.node.status.ready
+
+type: keyword
+
+Node ready status (true, false or unknown)
+
+
+[float]
+=== kubernetes.node.status.unschedulable
+
+type: boolean
+
+Node unschedulable status
+
+
+
+[float]
+=== kubernetes.node.cpu.allocatable.cores
+
+type: long
+
+Node CPU allocatable cores
+
+
+[float]
+=== kubernetes.node.cpu.capacity.cores
+
+type: long
+
+Node CPU capacity cores
+
+
+
+[float]
+=== kubernetes.node.memory.allocatable.bytes
+
+type: long
+
+format: bytes
+
+Node allocatable memory in bytes
+
+
+[float]
+=== kubernetes.node.memory.capacity.bytes
+
+type: long
+
+format: bytes
+
+Node memory capacity in bytes
+
+
+
+[float]
+=== kubernetes.node.pod.allocatable.total
+
+type: long
+
+Node allocatable pods
+
+
+[float]
+=== kubernetes.node.pod.capacity.total
+
+type: long
+
+Node pod capacity
+
+
+[float]
+== pod Fields
+
+kubernetes pod metrics
+
+
+
+[float]
+=== kubernetes.pod.ip
+
+type: ip
+
+Kubernetes pod IP
+
+
+[float]
+=== kubernetes.pod.host_ip
+
+type: ip
+
+Kubernetes pod host IP
+
+
+[float]
+== status Fields
+
+Kubernetes pod status metrics
+
+
+
+[float]
+=== kubernetes.pod.status.phase
+
+type: keyword
+
+Kubernetes pod phase (Running, Pending...)
+
+
+[float]
+=== kubernetes.pod.status.ready
+
+type: keyword
+
+Kubernetes pod ready status (true, false or unknown)
+
+
+[float]
+=== kubernetes.pod.status.scheduled
+
+type: keyword
+
+Kubernetes pod scheduled status (true, false, unknown)
+
+
+[float]
+== replicaset Fields
+
+kubernetes replica set metrics
+
+
+
+[float]
+=== kubernetes.replicaset.name
+
+type: keyword
+
+Kubernetes replica set name
+
+
+[float]
+== replicas Fields
+
+Kubernetes replica set paused status
+
+
+
+[float]
+=== kubernetes.replicaset.replicas.available
+
+type: long
+
+The number of replicas per ReplicaSet
+
+
+[float]
+=== kubernetes.replicaset.replicas.desired
+
+type: long
+
+The number of replicas per ReplicaSet
+
+
+[float]
+=== kubernetes.replicaset.replicas.ready
+
+type: long
+
+The number of ready replicas per ReplicaSet
+
+
+[float]
+=== kubernetes.replicaset.replicas.observed
+
+type: long
+
+The generation observed by the ReplicaSet controller
+
+
+[float]
+=== kubernetes.replicaset.replicas.labeled
+
+type: long
+
+The number of fully labeled replicas per ReplicaSet
+
+
+[float]
 == system Fields
 
 kubernetes system containers metrics
@@ -6307,6 +6700,14 @@ kubernetes system containers metrics
 type: keyword
 
 Container name
+
+
+[float]
+=== kubernetes.system.start_time
+
+type: date
+
+Start time
 
 
 [float]

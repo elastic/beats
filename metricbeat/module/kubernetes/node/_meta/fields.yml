@@ -7,6 +7,10 @@
       type: keyword
       description: >
         Node name
+    - name: start_time
+      type: date
+      description: >
+        Start time
     - name: cpu
       type: group
       description: >
@@ -123,6 +127,21 @@
               format: bytes
               description: >
                 Filesystem total used in bytes
+        - name: inodes
+          type: group
+          fields:
+            - name: used
+              type: long
+              description: >
+                Number of used inodes
+            - name: count
+              type: long
+              description: >
+                Number of inodes
+            - name: free
+              type: long
+              description: >
+                Number of free inodes
     - name: runtime
       type: group
       fields:

@@ -426,7 +426,9 @@ class TestCase(unittest.TestCase):
 
         # TODO: Make fields_doc path more generic to work with beat-generator
         with open(fields_doc, "r") as f:
-            path = os.path.abspath(os.path.dirname(__file__) + "../../../../_meta/fields.common.yml")
+            path = os.path.abspath(os.path.dirname(__file__) + "../../../../_meta/fields.generated.yml")
+            if not os.path.isfile(path):
+                path = os.path.abspath(os.path.dirname(__file__) + "../../../../_meta/fields.common.yml")
             with open(path) as f2:
                 content = f2.read()
 
