@@ -3,6 +3,10 @@
   description: >
     kubernetes container metrics
   fields:
+    - name: start_time
+      type: date
+      description: >
+        Start time
     - name: cpu
       type: group
       description: >

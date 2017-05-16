@@ -59,6 +59,7 @@ https://github.com/elastic/beats/compare/v6.0.0-alpha1...master[Check the HEAD d
 
 - Add macOS implementation of the system diskio metricset. {issue}4144[4144]
 - Add process_summary metricset that records high level metrics about processes. {pull}4231[4231]
+- Add `kube-state-metrics` based metrics to `kubernetes` module {pull}4253[4253]
 
 *Packetbeat*
 
