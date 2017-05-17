@@ -9,7 +9,9 @@ import (
 )
 
 var (
-	debugf = logp.MakeDebug("jolokia-jmx")
+	metricsetName = "jolokia.jmx"
+	logPrefix     = "[" + metricsetName + "]"
+	debugf        = logp.MakeDebug(metricsetName)
 )
 
 // init registers the MetricSet with the central registry.
@@ -67,6 +69,11 @@ func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
 	http.SetMethod("POST")
 	http.SetBody(body)
 
+	if logp.IsDebug(metricsetName) {
+		debugf("%v The body for POST requests to jolokia host %v is: %v",
+			logPrefix, base.HostData().Host, string(body))
+	}
+
 	return &MetricSet{
 		BaseMetricSet: base,
 		mapping:       mapping,
@@ -83,12 +90,17 @@ func (m *MetricSet) Fetch() (common.MapStr, error) {
 		return nil, err
 	}
 
+	if logp.IsDebug(metricsetName) {
+		debugf("%v The response body from jolokia host %v is: %v",
+			logPrefix, m.HostData().Host, string(body))
+	}
+
 	event, err := eventMapping(body, m.mapping)
 	if err != nil {
 		return nil, err
 	}
 
-	// Set dynamic namespace
+	// Set dynamic namespace.
 	event[mb.NamespaceKey] = m.namespace
 
 	return event, nil

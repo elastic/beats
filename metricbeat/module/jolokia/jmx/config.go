@@ -38,12 +38,10 @@ type RequestBlock struct {
 }
 
 func buildRequestBodyAndMapping(mappings []JMXMapping) ([]byte, map[string]string, error) {
-
 	responseMapping := map[string]string{}
-	blocks := []RequestBlock{}
+	var blocks []RequestBlock
 
 	for _, mapping := range mappings {
-
 		rb := RequestBlock{
 			Type:  "read",
 			MBean: mapping.MBean,
