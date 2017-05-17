@@ -246,6 +246,12 @@
 			"revisionTime": "2016-12-05T14:13:22Z"
 		},
 		{
+			"checksumSHA1": "qz0tMbqt+Hid8cnl8h5O5k2BiAE=",
+			"path": "github.com/hydrogen18/stalecucumber",
+			"revision": "0a94983f3e27967c69ba6bb92f9d5f0a68a97bc0",
+			"revisionTime": "2016-12-15T20:33:36Z"
+		},
+		{
 			"checksumSHA1": "l9wW52CYGbmO/NGwYZ/Op2QTmaA=",
 			"path": "github.com/joeshaw/multierror",
 			"revision": "69b34d4ec901851247ae7e77d33909caf9df99ed",
