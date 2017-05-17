@@ -5,6 +5,8 @@ import (
 	"strings"
 	"time"
 
+	"github.com/pkg/errors"
+
 	"github.com/elastic/beats/libbeat/common"
 	"github.com/elastic/beats/libbeat/processors"
 )
@@ -18,13 +20,13 @@ type TimezoneFormat int
 
 // Timezone formats
 const (
-	Abbrevation TimezoneFormat = iota
+	Abbreviation TimezoneFormat = iota
 	Offset
 )
 
 var timezoneFormats = map[TimezoneFormat]string{
-	Abbrevation: "abbrevation",
-	Offset:      "offset",
+	Abbreviation: "abbreviation",
+	Offset:       "offset",
 }
 
 func (t TimezoneFormat) String() string {
@@ -44,18 +46,20 @@ func newAddLocale(c common.Config) (processors.Processor, error) {
 
 	err := c.Unpack(&config)
 	if err != nil {
-		return nil, fmt.Errorf("fail to unpack the include_fields configuration: %s", err)
+		return nil, errors.Wrap(err, "fail to unpack the add_locale configuration")
 	}
 
-	loc := addLocale{}
+	var loc addLocale
 
 	switch strings.ToLower(config.Format) {
-	case "abbrevation":
-		loc.TimezoneFormat = Abbrevation
+	case "abbreviation":
+		loc.TimezoneFormat = Abbreviation
 	case "offset":
 		loc.TimezoneFormat = Offset
 	default:
-		return nil, fmt.Errorf("'%s' is not a valid format option for processor add_locale. Valid options are 'abbrevation' and 'offset'", config.Format)
+		return nil, errors.Errorf("'%s' is not a valid format option for the "+
+			"add_locale processor. Valid options are 'abbreviation' and 'offset'.",
+			config.Format)
 
 	}
 	return loc, nil
@@ -78,7 +82,7 @@ const (
 func (l addLocale) Format(zone string, offset int) string {
 	var ft string
 	switch l.TimezoneFormat {
-	case Abbrevation:
+	case Abbreviation:
 		ft = zone
 	case Offset:
 		sign := "+"
@@ -95,5 +99,5 @@ func (l addLocale) Format(zone string, offset int) string {
 }
 
 func (l addLocale) String() string {
-	return "add_locale=" + l.TimezoneFormat.String()
+	return "add_locale=[format=" + l.TimezoneFormat.String() + "]"
 }

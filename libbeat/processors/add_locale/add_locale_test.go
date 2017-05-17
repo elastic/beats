@@ -12,7 +12,7 @@ import (
 
 func TestExportTimezone(t *testing.T) {
 	testConfig, err := common.NewConfigFrom(map[string]interface{}{
-		"format": "abbrevation",
+		"format": "abbreviation",
 	})
 	if err != nil {
 		t.Fatal(err)
