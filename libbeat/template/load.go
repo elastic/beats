@@ -40,7 +40,7 @@ func NewLoader(cfg *common.Config, client ESClient, beatInfo common.BeatInfo) (*
 	}, nil
 }
 
-// loadTemplate checks if the index mapping template should be loaded
+// Load checks if the index mapping template should be loaded
 // In case the template is not already loaded or overwriting is enabled, the
 // template is written to index
 func (l *Loader) Load() error {
@@ -82,6 +82,8 @@ func (l *Loader) Load() error {
 	return nil
 }
 
+// Generate generates the template and writes it to a file based on the configuration
+// from `output_to_file`.
 func (l *Loader) Generate() error {
 	if l.config.OutputToFile.Version == "" {
 		l.config.OutputToFile.Version = l.beatInfo.Version
