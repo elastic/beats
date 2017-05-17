@@ -34,14 +34,11 @@ func makeLogstashEventEncoder(beat string) (func(interface{}) ([]byte, error), e
 
 		buf.WriteRune('{')
 		if _, hasMeta := event["@metadata"]; !hasMeta {
-			typ := event["type"].(string)
-			buf.WriteString(`"@metadata":{"type":`)
-			encodeString(buf, typ)
+			buf.WriteString(`"@metadata":{"type":"doc","beat":`)
+			buf.Write(beatName)
+			buf.WriteString(`},`)
 		}
 
-		buf.WriteString(`,"beat":`)
-		buf.Write(beatName)
-		buf.WriteString(`},`)
 		err := enc.encodeKeyValues(event)
 		if err != nil {
 			logp.Err("jsonEncode failed with: %v", err)

@@ -54,7 +54,6 @@ func TestKafkaPublish(t *testing.T) {
 			single(common.MapStr{
 				"@timestamp": common.Time(time.Now()),
 				"host":       "test-host",
-				"type":       "log",
 				"message":    id,
 			}),
 		},
@@ -80,7 +79,6 @@ func TestKafkaPublish(t *testing.T) {
 			single(common.MapStr{
 				"@timestamp": common.Time(time.Now()),
 				"host":       "test-host",
-				"type":       "log",
 				"message":    id,
 			}),
 		},
@@ -91,7 +89,6 @@ func TestKafkaPublish(t *testing.T) {
 			randMulti(5, 100, common.MapStr{
 				"@timestamp": common.Time(time.Now()),
 				"host":       "test-host",
-				"type":       "log",
 			}),
 		},
 		{
