@@ -12,20 +12,18 @@ class Test(BaseTest):
         """
         self.render_config_template()
 
-        for beat in self.beats:
+        output_json = os.path.join(self.working_dir, "template.json")
+        fields_yml = "../../../../fields.yml"
 
-            output_json = os.path.join(self.working_dir, beat + ".template.json")
-            fields_yml = "../../../../../{}/fields.yml".format(beat)
+        exit_code = self.run_beat(extra_args=[
+            "-E", "setup.template.output_to_file.path={}".format(output_json),
+            "-E", "setup.template.fields={}".format(fields_yml)])
+        assert exit_code == 1
 
-            exit_code = self.run_beat(extra_args=[
-                "-E", "setup.template.output_to_file.path={}".format(output_json),
-                "-E", "setup.template.fields={}".format(fields_yml)])
-            assert exit_code == 1
-
-            # check json file
-            with open(output_json) as f:
-                tmpl = json.load(f)
-            assert "mappings" in tmpl
+        # check json file
+        with open(output_json) as f:
+            tmpl = json.load(f)
+        assert "mappings" in tmpl
 
     def test_generate_templates_v5(self):
         """
@@ -33,19 +31,17 @@ class Test(BaseTest):
         """
         self.render_config_template()
 
-        for beat in self.beats:
+        output_json = os.path.join(self.working_dir, "template-5x.json")
+        fields_yml = "../../../../fields.yml"
 
-            output_json = os.path.join(self.working_dir, beat + ".5x-template.json")
-            fields_yml = "../../../../../{}/fields.yml".format(beat)
+        exit_code = self.run_beat(extra_args=[
+            "-E", "setup.template.output_to_file.path={}".format(output_json),
+            "-E", "setup.template.output_to_file.version=5.0.0".format(output_json),
+            "-E", "setup.template.fields={}".format(fields_yml)])
+        assert exit_code == 1
 
-            exit_code = self.run_beat(extra_args=[
-                "-E", "setup.template.output_to_file.path={}".format(output_json),
-                "-E", "setup.template.output_to_file.version=5.0.0".format(output_json),
-                "-E", "setup.template.fields={}".format(fields_yml)])
-            assert exit_code == 1
-
-            # check json file
-            with open(output_json) as f:
-                tmpl = json.load(f)
-            assert "mappings" in tmpl
-            assert tmpl["mappings"]["_default_"]["_all"]["norms"]["enabled"] is False
+        # check json file
+        with open(output_json) as f:
+            tmpl = json.load(f)
+        assert "mappings" in tmpl
+        assert tmpl["mappings"]["_default_"]["_all"]["norms"]["enabled"] is False
