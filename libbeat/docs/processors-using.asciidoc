@@ -11,13 +11,13 @@ and a set of parameters:
 ------
 processors:
  - <processor_name>:
-     when:
-        <condition>
      <parameters>
+     when:
+       <condition>
  - <processor_name>:
-     when:
-        <condition>
      <parameters>
+     when:
+       <condition>
 ...
 
 ------
@@ -265,7 +265,7 @@ The simple configuration below enables the processor.
 [source,yaml]
 -------------------------------------------------------------------------------
 processors:
-- add_cloud_metadata:
+- add_cloud_metadata: ~
 -------------------------------------------------------------------------------
 
 The `add_cloud_metadata` processor has one optional configuration setting named
@@ -347,7 +347,8 @@ _Tencent Cloud_
 
 _Alibaba Cloud_
 
-This metadata is only available when VPC is selected as the network type of the ECS instance.
+This metadata is only available when VPC is selected as the network type of the
+ECS instance.
 
 [source,json]
 -------------------------------------------------------------------------------
@@ -366,18 +367,33 @@ This metadata is only available when VPC is selected as the network type of the 
 [[add-locale]]
 === Adding the Local Time Zone
 
-The `add_locale` processor enriches each event with the machine's time zone.
+The `add_locale` processor enriches each event with the machine's time zone
+offset from UTC or with the name of the time zone. It supports one configuration
+option named `format` that controls whether an offset or time zone abbreviation
+is added to the event. The default format is `offset`. The processor adds the
+a `beat.timezone` value to each event.
 
-The simple configuration below enables the processor.
+The configuration below enables the processor with the default settings.
+
+[source,yaml]
+-------------------------------------------------------------------------------
+processors:
+- add_locale: ~
+-------------------------------------------------------------------------------
+
+This configuration enables the processor and configures it to add the time zone
+abbreviation to events.
 
 [source,yaml]
 -------------------------------------------------------------------------------
 processors:
 - add_locale:
+    format: abbreviation
 -------------------------------------------------------------------------------
 
-NOTE: Please consider that `add_locale` differentiates between DST and regular time.
-For example `CET` and `CEST`.
+NOTE: Please note that `add_locale` differentiates between daylight savings
+time (DST) and regular time. For example `CEST` indicates DST and and `CET` is
+regular time.
 
 
 [[decode-json-fields]]
@@ -490,20 +506,21 @@ The `kubernetes` processor has two basic building blocks which are:
 * Indexers
 * Matchers
 
-Indexers take in a pod's metadata and builds indices based on the pod metadata. For example,
-the `ip_port` indexer can take a Kubernetes pod and index the pod metadata based on all
-`pod_ip:container_port` combinations.
+Indexers take in a pod's metadata and builds indices based on the pod metadata.
+For example, the `ip_port` indexer can take a Kubernetes pod and index the pod
+metadata based on all `pod_ip:container_port` combinations.
 
-Matchers are used to contruct lookup keys for querying indices. For example, when the `fields`
-matcher takes `["metricset.host"]` as a lookup field, it would construct a lookup key with the value of the
-field `metricset.host`.
+Matchers are used to contruct lookup keys for querying indices. For example,
+when the `fields` matcher takes `["metricset.host"]` as a lookup field, it would
+construct a lookup key with the value of the field `metricset.host`.
 
-Each Beat can define its own default indexers and matchers which are enabled by default. For example,
-FileBeat enables the `container` indexer, which indexes pod metadata based on all container IDs, and a
-`logs_path` matcher, which takes the `source` field, extracts the container ID, and uses it to retrieve
-metadata.
+Each Beat can define its own default indexers and matchers which are enabled by
+default. For example, FileBeat enables the `container` indexer, which indexes
+pod metadata based on all container IDs, and a `logs_path` matcher, which takes
+the `source` field, extracts the container ID, and uses it to retrieve metadata.
 
-The configuration below enables the processor when the Beat is run as a pod in Kubernetes.
+The configuration below enables the processor when the Beat is run as a pod in
+Kubernetes.
 
 [source,yaml]
 -------------------------------------------------------------------------------
@@ -512,7 +529,8 @@ processors:
     in_cluster: true
 -------------------------------------------------------------------------------
 
-The configuration below enables the processor on a Beat running as a process on the Kubernetes node.
+The configuration below enables the processor on a Beat running as a process on
+the Kubernetes node.
 
 [source,yaml]
 -------------------------------------------------------------------------------
@@ -523,8 +541,8 @@ processors:
     kube_config: ${HOME}/.kube/config
 -------------------------------------------------------------------------------
 
-The configuration below has the default indexers and matchers disabled and enables ones that
-the user is interested in.
+The configuration below has the default indexers and matchers disabled and
+enables ones that the user is interested in.
 
 [source,yaml]
 -------------------------------------------------------------------------------
@@ -541,4 +559,3 @@ processors:
       - fields:
           lookup_fields: ["metricset.host"]
 -------------------------------------------------------------------------------
-

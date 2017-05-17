@@ -477,15 +477,18 @@ filebeat.prospectors:
 #           http.code: 200
 #
 # The following example enriches each event with metadata from the cloud
-# provider about the host machine. It works on EC2, GCE, and DigitalOcean.
+# provider about the host machine. It works on EC2, GCE, DigitalOcean,
+# Tencent Cloud, and Alibaba Cloud.
 #
 #processors:
-#- add_cloud_metadata:
+#- add_cloud_metadata: ~
 #
-# The following example enriches each event with the local timezone.
+# The following example enriches each event with the machine's local time zone
+# offset from UTC.
 #
 #processors:
 #- add_locale:
+#    format: offset
 #
 
 #================================ Outputs ======================================
