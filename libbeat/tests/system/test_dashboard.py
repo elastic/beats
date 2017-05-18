@@ -1,12 +1,14 @@
-from base import BaseTest
+import os
+import re
+import shutil
+import subprocess
+import tempfile
+import unittest
+import elasticsearch
+
 from nose.plugins.attrib import attr
 
-import os
-import subprocess
-import unittest
-import re
-from nose.plugins.skip import Skip, SkipTest
-
+from base import BaseTest
 
 INTEGRATION_TESTS = os.environ.get('INTEGRATION_TESTS', False)
 
@@ -30,11 +32,13 @@ class Test(BaseTest):
                 command = "go run ..\..\..\dev_tools\import_dashboards\import_dashboards.go -es http:\\" + \
                     self.get_elasticsearch_host() + " -dir ..\..\..\\" + beat + "\_meta\kibana"
 
-            print(command)
-            p = subprocess.Popen(command, shell=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+            print command
+            p = subprocess.Popen(
+                command, shell=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
             content, err = p.communicate()
 
-            self.assertEqual(p.returncode, 0, "stdout:\n{}\n\nstderr:\n{}\n".format(content, err))
+            self.assertEqual(
+                p.returncode, 0, "stdout:\n{}\n\nstderr:\n{}\n".format(content, err))
 
     @unittest.skipUnless(INTEGRATION_TESTS, "integration test")
     @attr('integration')
@@ -43,7 +47,7 @@ class Test(BaseTest):
         Test export dashboards and remove unsupported characters
         """
 
-        raise SkipTest
+        # raise SkipTest
         # This test is currently skipped as it does not work.
         # The test fails as soon as there are dashboards loaded which can happen if
         # test_load_dashboard was run previously. Also this test should pass exactly
@@ -54,21 +58,20 @@ class Test(BaseTest):
         beats = ["metricbeat", "packetbeat", "filebeat", "winlogbeat"]
 
         for beat in beats:
+            path = tempfile.mkdtemp()
+
             if os.name == "nt":
-                path = "..\..\..\\" + beat + "\etc\kibana"
+                command = 'python ..\..\..\\dev-tools\export_dashboards.py --url http://' + \
+                    self.get_elasticsearch_host() + ' --dir ' + path + ' --regex ' + beat + '-*'
             else:
-                path = "../../../" + beat + "/etc/kibana"
-
-            command = "python ../../../dev-tools/export_dashboards.py --url http://" + \
-                self.get_elasticsearch_host() + " --dir " + path + " --regex " + beat + "-*"
-
-            if os.name == "nt":
-                command = "python ..\..\..\dev-tools/export_dashboards.py --url http://" + \
-                    self.get_elasticsearch_host() + " --dir " + path + " --regex " + beat + "-*"
+                command = 'python ../../../dev-tools/export_dashboards.py ' \
+                          '--url http://' + self.get_elasticsearch_host() + ' --dir ' + path + \
+                          ' --regex ' + beat + '-*'
 
             print(command)
 
-            p = subprocess.Popen(command, shell=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+            p = subprocess.Popen(command, shell=True,
+                                 stdout=subprocess.PIPE, stderr=subprocess.PIPE)
             content, err = p.communicate()
 
             assert p.returncode == 0
@@ -77,6 +80,58 @@ class Test(BaseTest):
 
             for f in files:
                 self.assertIsNone(re.search('[:\>\<"/\\\|\?\*]', f))
+
+            shutil.rmtree(path)
+
+    #@unittest.skipUnless(INTEGRATION_TESTS, "integration test")
+    @attr('integration')
+    def test_export_dashboard_with_special_chars(self):
+        """
+        Test export dashboards with special characters in name
+        """
+
+        client = elasticsearch.Elasticsearch(
+            ['http://' + self.get_elasticsearch_host()])
+
+        # Create index and dashboard
+        if client.indices.exists(index=".testdashboard"):
+            if not client.exists(index=".testdashboard", doc_type="dashboard",
+                                 id="test:-dashboard",):
+                client.create(index=".testdashboard", doc_type="dashboard",
+                              id="test:-dashboard", body={
+                                  'title': "test-dashboard",
+                                  "panelsJSON": ""
+                              })
+        else:
+            client.index(index=".testdashboard", doc_type="dashboard", id="test:-dashboard", body={
+                'title': "test-dashboard",
+                "panelsJSON": ""
+            })
+
+        path = tempfile.mkdtemp()
+
+        if os.name == "nt":
+            command = 'python ..\..\..\\dev-tools\export_dashboards.py --url http://' + \
+                self.get_elasticsearch_host() + ' --kibana .testdashboard --regex ".*" --dir ' + path
+        else:
+            command = 'python ../../../dev-tools/export_dashboards.py ' \
+                '--url http://' + self.get_elasticsearch_host() + \
+                ' --kibana .testdashboard --regex ".*" --dir ' + path
+
+        print command
+
+        p = subprocess.Popen(command, shell=True,
+                             stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+        content, err = p.communicate()
+
+        assert p.returncode == 0
+
+        files = os.listdir(path)
+
+        for f in files:
+            self.assertIsNone(re.search('[:\>\<"/\\\|\?\*]', f))
+
+        shutil.rmtree(path)
 
     def get_elasticsearch_host(self):
         return os.getenv('ES_HOST', 'localhost') + ':' + os.getenv('ES_PORT', '9200')
