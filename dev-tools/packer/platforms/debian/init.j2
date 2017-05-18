@@ -35,7 +35,7 @@ WRAPPER_ARGS="-r / -n -p $PIDFILE -u $BEAT_USER"
 USER_WRAPPER="su"
 USER_WRAPPER_ARGS="$BEAT_USER -c"
 
-if [ -f /sbin/runuser ]; then
+if runuser -v &> /dev/null; then
     USER_WRAPPER="runuser"
 fi
 

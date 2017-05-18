@@ -44,7 +44,7 @@ if status | grep -q -- '-p' 2>/dev/null; then
     pidopts="-p $pidfile"
 fi
 
-if [ -f /sbin/runuser ]; then
+if runuser -v &> /dev/null; then
     user_wrapper="runuser"
 fi
 
