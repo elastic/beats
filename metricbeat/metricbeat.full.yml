@@ -275,6 +275,12 @@ metricbeat.modules:
   period: 10s
   hosts: ["kube-state-metrics:8080"]
 
+# Kubernetes events
+- module: kubernetes
+  metricsets:
+    - event
+  in_cluster: true
+
 #------------------------------ memcached Module -----------------------------
 - module: memcached
   metricsets: ["stats"]
