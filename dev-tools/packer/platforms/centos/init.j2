@@ -30,6 +30,8 @@ test_args="-e -configtest"
 beat_user="${BEAT_USER:-root}"
 wrapper="/usr/share/{{.beat_name}}/bin/{{.beat_name}}-god"
 wrapperopts="-r / -n -p $pidfile -u $beat_user"
+user_wrapper="su"
+user_wrapperopts="$beat_user -c"
 RETVAL=0
 
 # Source function library.
@@ -42,8 +44,12 @@ if status | grep -q -- '-p' 2>/dev/null; then
     pidopts="-p $pidfile"
 fi
 
+if [ -f /sbin/runuser ]; then
+    user_wrapper="runuser"
+fi
+
 test() {
-	runuser -u $beat_user $agent $args $test_args
+	$user_wrapper $user_wrapperopts "$agent $args $test_args"
 }
 
 start() {

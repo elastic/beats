@@ -32,6 +32,12 @@ SCRIPTNAME=/etc/init.d/$NAME
 [ -r /etc/default/$NAME ] && . /etc/default/$NAME
 
 WRAPPER_ARGS="-r / -n -p $PIDFILE -u $BEAT_USER"
+USER_WRAPPER="su"
+USER_WRAPPER_ARGS="$BEAT_USER -c"
+
+if [ -f /sbin/runuser ]; then
+    USER_WRAPPER="runuser"
+fi
 
 # Load the VERBOSE setting and other rcS variables
 . /lib/init/vars.sh
@@ -47,7 +53,7 @@ WRAPPER_ARGS="-r / -n -p $PIDFILE -u $BEAT_USER"
 #
 do_test()
 {
-        runuser -u $DAEMON $DAEMON_ARGS $TEST_ARGS
+        $USER_WRAPPER $USER_WRAPPER_ARGS "$DAEMON $DAEMON_ARGS $TEST_ARGS"
 }
 
 #
