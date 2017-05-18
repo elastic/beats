@@ -628,6 +628,13 @@ output.elasticsearch:
   # Optional load balance the events between the Logstash hosts
   #loadbalance: true
 
+  # Optional maximum time to live for a connection to Logstash, after which the
+  # connection will be re-established.  A value of 0 (the default) will disable
+  # this feature.
+  #
+  # Not yet supported for async connections (i.e. with the "pipelining" option set)
+  #ttl: 30s
+
   # Number of batches to be send asynchronously to logstash while processing
   # new batches.
   #pipelining: 0
