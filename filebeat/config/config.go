@@ -39,18 +39,6 @@ var (
 	}
 )
 
-// Contains available prospector types
-const (
-	LogType   = "log"
-	StdinType = "stdin"
-)
-
-// List of valid input types
-var ValidType = map[string]struct{}{
-	StdinType: {},
-	LogType:   {},
-}
-
 // getConfigFiles returns list of config files.
 // In case path is a file, it will be directly returned.
 // In case it is a directory, it will fetch all .yml files inside this directory

@@ -29,21 +29,24 @@ var (
 		TailFiles:      false,
 
 		// Harvester
-		BufferSize:    16 * humanize.KiByte,
-		Backoff:       1 * time.Second,
-		BackoffFactor: 2,
-		MaxBackoff:    10 * time.Second,
-		CloseInactive: 5 * time.Minute,
-		MaxBytes:      10 * humanize.MiByte,
-		CloseRemoved:  true,
-		CloseRenamed:  false,
-		CloseEOF:      false,
-		CloseTimeout:  0,
+		BufferSize: 16 * humanize.KiByte,
+		MaxBytes:   10 * humanize.MiByte,
+		LogConfig: LogConfig{
+			Backoff:       1 * time.Second,
+			BackoffFactor: 2,
+			MaxBackoff:    10 * time.Second,
+			CloseInactive: 5 * time.Minute,
+			CloseRemoved:  true,
+			CloseRenamed:  false,
+			CloseEOF:      false,
+			CloseTimeout:  0,
+		},
 	}
 )
 
 type config struct {
 	harvester.ForwarderConfig `config:",inline"`
+	LogConfig                 `config:",inline"`
 
 	// Common
 	InputType     string        `config:"input_type"`
@@ -62,21 +65,25 @@ type config struct {
 	recursiveGlob  bool            `config:"recursive_glob.enabled"`
 
 	// Harvester
-	BufferSize    int                     `config:"harvester_buffer_size"`
-	Encoding      string                  `config:"encoding"`
-	Backoff       time.Duration           `config:"backoff" validate:"min=0,nonzero"`
-	BackoffFactor int                     `config:"backoff_factor" validate:"min=1"`
-	MaxBackoff    time.Duration           `config:"max_backoff" validate:"min=0,nonzero"`
-	CloseInactive time.Duration           `config:"close_inactive"`
-	CloseRemoved  bool                    `config:"close_removed"`
-	CloseRenamed  bool                    `config:"close_renamed"`
-	CloseEOF      bool                    `config:"close_eof"`
-	CloseTimeout  time.Duration           `config:"close_timeout" validate:"min=0"`
-	ExcludeLines  []match.Matcher         `config:"exclude_lines"`
-	IncludeLines  []match.Matcher         `config:"include_lines"`
-	MaxBytes      int                     `config:"max_bytes" validate:"min=0,nonzero"`
-	Multiline     *reader.MultilineConfig `config:"multiline"`
-	JSON          *reader.JSONConfig      `config:"json"`
+	BufferSize int    `config:"harvester_buffer_size"`
+	Encoding   string `config:"encoding"`
+
+	ExcludeLines []match.Matcher         `config:"exclude_lines"`
+	IncludeLines []match.Matcher         `config:"include_lines"`
+	MaxBytes     int                     `config:"max_bytes" validate:"min=0,nonzero"`
+	Multiline    *reader.MultilineConfig `config:"multiline"`
+	JSON         *reader.JSONConfig      `config:"json"`
+}
+
+type LogConfig struct {
+	Backoff       time.Duration `config:"backoff" validate:"min=0,nonzero"`
+	BackoffFactor int           `config:"backoff_factor" validate:"min=1"`
+	MaxBackoff    time.Duration `config:"max_backoff" validate:"min=0,nonzero"`
+	CloseInactive time.Duration `config:"close_inactive"`
+	CloseRemoved  bool          `config:"close_removed"`
+	CloseRenamed  bool          `config:"close_renamed"`
+	CloseEOF      bool          `config:"close_eof"`
+	CloseTimeout  time.Duration `config:"close_timeout" validate:"min=0"`
 }
 
 func (c *config) Validate() error {
@@ -87,7 +94,7 @@ func (c *config) Validate() error {
 	}
 
 	// Prospector
-	if c.Type == cfg.LogType && len(c.Paths) == 0 {
+	if c.Type == harvester.LogType && len(c.Paths) == 0 {
 		return fmt.Errorf("No paths were defined for prospector")
 	}
 
@@ -101,7 +108,7 @@ func (c *config) Validate() error {
 
 	// Harvester
 	// Check input type
-	if _, ok := cfg.ValidType[c.Type]; !ok {
+	if _, ok := harvester.ValidType[c.Type]; !ok {
 		return fmt.Errorf("Invalid input type: %v", c.Type)
 	}
 
