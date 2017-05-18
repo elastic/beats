@@ -3,6 +3,7 @@ package harvester
 import (
 	"sync"
 
+	"github.com/elastic/beats/libbeat/logp"
 	uuid "github.com/satori/go.uuid"
 )
 
@@ -76,7 +77,10 @@ func (r *Registry) Start(h Harvester) {
 			r.wg.Done()
 		}()
 		// Starts harvester and picks the right type. In case type is not set, set it to default (log)
-		h.Start()
+		err := h.Run()
+		if err != nil {
+			logp.Err("Error running prospector: %v", err)
+		}
 	}()
 }
 

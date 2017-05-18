@@ -8,7 +8,7 @@ import (
 	"github.com/mitchellh/hashstructure"
 
 	"github.com/elastic/beats/filebeat/channel"
-	cfg "github.com/elastic/beats/filebeat/config"
+	"github.com/elastic/beats/filebeat/harvester"
 	"github.com/elastic/beats/filebeat/input/file"
 	"github.com/elastic/beats/filebeat/prospector/log"
 	"github.com/elastic/beats/filebeat/prospector/stdin"
@@ -70,9 +70,9 @@ func (p *Prospector) initProspectorer(outlet channel.Outleter, states []file.Sta
 	var err error
 
 	switch p.config.Type {
-	case cfg.StdinType:
+	case harvester.StdinType:
 		prospectorer, err = stdin.NewProspector(config, outlet)
-	case cfg.LogType:
+	case harvester.LogType:
 		prospectorer, err = log.NewProspector(config, states, outlet, p.done)
 	default:
 		return fmt.Errorf("invalid prospector type: %v. Change type", p.config.Type)
