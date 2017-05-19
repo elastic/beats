@@ -36,6 +36,7 @@ https://github.com/elastic/beats/compare/v6.0.0-alpha1...master[Check the HEAD d
 
 *Filebeat*
 - Fix race condition on harvester stopping with reloading enabled. {issue}3779[3779]
+- Fix recursive glob config parsing and resolution across restarts. {pull}4269[4269]
 
 *Heartbeat*
 

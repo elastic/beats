@@ -61,7 +61,7 @@ type globPatternsTest struct {
 
 func TestGlobPatterns(t *testing.T) {
 	for _, test := range globPatternsTests {
-		patterns, err := globPatterns(test.pattern, 2)
+		patterns, err := GlobPatterns(test.pattern, 2)
 		if err != nil {
 			if test.expectedError {
 				continue
