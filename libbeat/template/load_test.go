@@ -15,11 +15,11 @@ import (
 )
 
 func TestGenerateTemplate(t *testing.T) {
-
 	// Load template
 	absPath, err := filepath.Abs("../")
-	assert.NotNil(t, absPath)
-	assert.Nil(t, err)
+	if err != nil {
+		t.Fatal(err)
+	}
 
 	beatInfo := common.BeatInfo{
 		Beat:    "testbeat",
@@ -27,44 +27,55 @@ func TestGenerateTemplate(t *testing.T) {
 	}
 
 	dir, err := ioutil.TempDir("", "test-template")
-	assert.NoError(t, err)
+	if err != nil {
+		t.Fatal(err)
+	}
 	defer os.RemoveAll(dir)
-	path := filepath.Join(dir, "template.json")
+
+	outputFile := filepath.Join(dir, "template.json")
 
 	config := newConfigFrom(t, TemplateConfig{
 		Enabled: true,
-		Fields:  absPath + "/fields.yml",
+		Fields:  filepath.Join(absPath, "fields.yml"),
 		OutputToFile: OutputToFile{
-			Path: path,
+			Path: outputFile,
 		},
 	})
 
 	loader, err := NewLoader(config, nil, beatInfo)
-	assert.NoError(t, err)
+	if err != nil {
+		t.Fatal(err)
+	}
 
-	err = loader.Generate()
-	assert.NoError(t, err)
+	if err = loader.Generate(); err != nil {
+		t.Fatal("generate failed", err)
+	}
 
 	// Read it back to check it
-	fp, err := os.Open(path)
-	assert.NoError(t, err)
+	fp, err := os.Open(outputFile)
+	if err != nil {
+		t.Fatal(err)
+	}
+
 	jsonParser := json.NewDecoder(fp)
 	var parsed common.MapStr
-	err = jsonParser.Decode(&parsed)
-	assert.NoError(t, err)
+	if err = jsonParser.Decode(&parsed); err != nil {
+		t.Fatal("decoding failed", err)
+	}
 
 	val, err := parsed.GetValue("mappings._default_._meta.version")
-	assert.NoError(t, err)
+	if err != nil {
+		t.Fatal(err)
+	}
 	assert.Equal(t, val.(string), version.GetDefaultVersion())
-
 }
 
 func TestGenerateTemplateWithVersion(t *testing.T) {
-
 	// Load template
 	absPath, err := filepath.Abs("../")
-	assert.NotNil(t, absPath)
-	assert.Nil(t, err)
+	if err != nil {
+		t.Fatal(err)
+	}
 
 	beatInfo := common.BeatInfo{
 		Beat:    "testbeat",
@@ -72,36 +83,48 @@ func TestGenerateTemplateWithVersion(t *testing.T) {
 	}
 
 	dir, err := ioutil.TempDir("", "test-template")
-	assert.NoError(t, err)
+	if err != nil {
+		t.Fatal(err)
+	}
 	defer os.RemoveAll(dir)
-	path := filepath.Join(dir, "template.json")
+
+	outputFile := filepath.Join(dir, "template.json")
 
 	config := newConfigFrom(t, TemplateConfig{
 		Enabled: true,
-		Fields:  absPath + "/fields.yml",
+		Fields:  filepath.Join(absPath, "fields.yml"),
 		OutputToFile: OutputToFile{
-			Path:    path,
+			Path:    outputFile,
 			Version: "2.4.0",
 		},
 	})
 
 	loader, err := NewLoader(config, nil, beatInfo)
-	assert.NoError(t, err)
+	if err != nil {
+		t.Fatal(err)
+	}
 
-	err = loader.Generate()
-	assert.NoError(t, err)
+	if err = loader.Generate(); err != nil {
+		t.Fatal("generate failed", err)
+	}
 
 	// Read it back to check it
-	fp, err := os.Open(path)
-	assert.NoError(t, err)
+	fp, err := os.Open(outputFile)
+	if err != nil {
+		t.Fatal(err)
+	}
+
 	jsonParser := json.NewDecoder(fp)
 	var parsed common.MapStr
-	err = jsonParser.Decode(&parsed)
-	assert.NoError(t, err)
+	if err = jsonParser.Decode(&parsed); err != nil {
+		t.Fatal("decoding failed", err)
+	}
 
-	// check a setting specific to that version
+	// Check a setting specific to that version.
 	val, err := parsed.GetValue("mappings._default_._all.norms.enabled")
-	assert.NoError(t, err)
+	if err != nil {
+		t.Fatal(err)
+	}
 	assert.Equal(t, val.(bool), false)
 }
 
