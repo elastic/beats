@@ -8,7 +8,9 @@ import (
 	cfg "github.com/elastic/beats/filebeat/config"
 	"github.com/elastic/beats/filebeat/harvester"
 	"github.com/elastic/beats/filebeat/harvester/reader"
+	"github.com/elastic/beats/filebeat/input/file"
 	"github.com/elastic/beats/libbeat/common/match"
+	"github.com/elastic/beats/libbeat/logp"
 )
 
 var (
@@ -62,7 +64,7 @@ type config struct {
 	HarvesterLimit uint64          `config:"harvester_limit" validate:"min=0"`
 	Symlinks       bool            `config:"symlinks"`
 	TailFiles      bool            `config:"tail_files"`
-	recursiveGlob  bool            `config:"recursive_glob.enabled"`
+	RecursiveGlob  bool            `config:"recursive_glob.enabled"`
 
 	// Harvester
 	BufferSize int    `config:"harvester_buffer_size"`
@@ -122,5 +124,27 @@ func (c *config) Validate() error {
 		return fmt.Errorf("When using the JSON decoder and line filtering together, you need to specify a message_key value")
 	}
 
+	return nil
+}
+
+func (c *config) resolvePaths() error {
+	var paths []string
+	if !c.RecursiveGlob {
+		logp.Debug("prospector", "recursive glob disabled")
+		paths = c.Paths
+	} else {
+		logp.Debug("prospector", "recursive glob enabled")
+	}
+	for _, path := range c.Paths {
+		patterns, err := file.GlobPatterns(path, recursiveGlobDepth)
+		if err != nil {
+			return err
+		}
+		if len(patterns) > 1 {
+			logp.Debug("prospector", "%q expanded to %#v", path, patterns)
+		}
+		paths = append(paths, patterns...)
+	}
+	c.Paths = paths
 	return nil
 }

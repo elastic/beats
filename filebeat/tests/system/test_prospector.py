@@ -1,3 +1,5 @@
+#!/usr/bin/env python
+
 from filebeat import BaseTest
 import os
 import time
@@ -678,3 +680,47 @@ class Test(BaseTest):
         )[0]
         assert "message" not in output
         assert "offset" in output
+
+    def test_restart_recursive_glob(self):
+        """
+        Check that file reading via recursive glob patterns continues after restart
+        """
+        self.render_config_template(
+            path=os.path.abspath(self.working_dir) + "/log/**",
+            scan_frequency="1s",
+            recursive_glob=True,
+        )
+
+        testfile_dir = os.path.join(self.working_dir, "log", "some", "other", "subdir")
+        os.makedirs(testfile_dir)
+        testfile_path = os.path.join(testfile_dir, "input")
+
+        filebeat = self.start_beat()
+
+        with open(testfile_path, 'w') as testfile:
+            testfile.write("entry1\n")
+
+        self.wait_until(
+            lambda: self.output_has_message("entry1"),
+            max_timeout=10,
+            name="output contains 'entry1'")
+
+        filebeat.check_kill_and_wait()
+
+        # Append to file
+        with open(testfile_path, 'a') as testfile:
+            testfile.write("entry2\n")
+
+        filebeat = self.start_beat(output="filebeat2.log")
+
+        self.wait_until(
+            lambda: self.output_has_message("entry2"),
+            max_timeout=10,
+            name="output contains 'entry2'")
+
+        filebeat.check_kill_and_wait()
+
+
+if __name__ == '__main__':
+    import unittest
+    unittest.main()
