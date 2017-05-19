@@ -480,7 +480,7 @@ class Test(BaseTest):
 
         filebeat.check_kill_and_wait()
 
-    def test_close_inactive_file_rotation_and_removal_while_new_file_created(self):
+    def test_close_inactive_file_rotation_and_removal2(self):
         """
         Test that close_inactive still applies also if file was rotated,
         new file created, and rotated file removed.
