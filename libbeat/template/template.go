@@ -9,7 +9,7 @@ import (
 
 var (
 	// Defaults used in the template
-	defaultDateDetection    = false
+	defaultDateDetection    = true
 	defaultTotalFieldsLimit = 10000
 
 	// Array to store dynamicTemplate parts in
