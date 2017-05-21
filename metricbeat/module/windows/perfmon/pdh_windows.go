@@ -8,6 +8,8 @@ import (
 	"unicode/utf16"
 	"unsafe"
 
+	"regexp"
+
 	"github.com/elastic/beats/libbeat/common"
 	"github.com/joeshaw/multierror"
 	"github.com/pkg/errors"
@@ -19,7 +21,9 @@ import (
 //sys _PdhAddCounter(query PdhQueryHandle, counterPath string, userData uintptr, counter *PdhCounterHandle) (errcode error) [failretval!=0] = pdh.PdhAddEnglishCounterW
 //sys _PdhCollectQueryData(query PdhQueryHandle) (errcode error) [failretval!=0] = pdh.PdhCollectQueryData
 //sys _PdhGetFormattedCounterValue(counter PdhCounterHandle, format PdhCounterFormat, counterType *uint32, value *PdhCounterValue) (errcode error) [failretval!=0] = pdh.PdhGetFormattedCounterValue
+//sys _PdhGetFormattedCounterArray(counter PdhCounterHandle, format PdhCounterFormat, bufferSize *uint32, bufferCount *uint32, itemBuffer *PdhCounterValueItem) (errcode error) [failretval!=0] = pdh.PdhGetFormattedCounterArrayW
 //sys _PdhGetRawCounterValue(counter PdhCounterHandle, counterType *uint32, value *PdhRawCounter) (errcode error) [failretval!=0] = pdh.PdhGetRawCounterValue
+//sys _PdhGetRawCounterArray(counter PdhCounterHandle, bufferSize *uint32, bufferCount *uint32, itemBuffer *PdhRawCounterItem) (errcode error) [failretval!=0] = pdh.PdhGetRawCounterArray
 //sys _PdhCalculateCounterFromRawValue(counter PdhCounterHandle, format PdhCounterFormat, rawValue1 *PdhRawCounter, rawValue2 *PdhRawCounter, value *PdhCounterValue) (errcode error) [failretval!=0] = pdh.PdhCalculateCounterFromRawValue
 //sys _PdhFormatFromRawValue(counterType uint32, format PdhCounterFormat, timeBase *uint64, rawValue1 *PdhRawCounter, rawValue2 *PdhRawCounter, value *PdhCounterValue) (errcode error) [failretval!=0] = pdh.PdhFormatFromRawValue
 //sys _PdhCloseQuery(query PdhQueryHandle) (errcode error) [failretval!=0] = pdh.PdhCloseQuery
@@ -75,6 +79,26 @@ func PdhGetFormattedCounterValue(counter PdhCounterHandle, format PdhCounterForm
 	}
 
 	return counterType, &value, nil
+}
+
+func PdhGetFormattedCounterArray(counter PdhCounterHandle, format PdhCounterFormat) (int, *[]PdhCounterValueItem, error) {
+	var bufferSize uint32
+	var bufferCount uint32
+
+	if err := _PdhGetFormattedCounterArray(counter, format, &bufferSize, &bufferCount, nil); err != nil {
+		//From MSDN: You should call this function twice, the first time to get the required buffer size (set ItemBuffer to NULL and lpdwBufferSize to 0), and the second time to get the data.
+		if PdhErrno(err.(syscall.Errno)) == PDH_MORE_DATA {
+			value := make([]PdhCounterValueItem, bufferSize)
+			if err := _PdhGetFormattedCounterArray(counter, format, &bufferSize, &bufferCount, &value[0]); err != nil {
+				return 0, nil, PdhErrno(err.(syscall.Errno))
+			}
+
+			return (int)(bufferCount), &value, nil
+		}
+		return 0, nil, PdhErrno(err.(syscall.Errno))
+	}
+
+	return 0, nil, nil
 }
 
 func PdhGetRawCounterValue(counter PdhCounterHandle) (uint32, *PdhRawCounter, error) {
@@ -171,26 +195,64 @@ func (q *Query) Execute() error {
 }
 
 type Value struct {
-	Num interface{}
-	Err error
+	Num      interface{}
+	Instance string
+	Err      error
 }
 
 func (q *Query) Values() (map[string]Value, error) {
 	rtn := make(map[string]Value, len(q.counters))
+
 	for path, counter := range q.counters {
-		_, value, err := PdhGetFormattedCounterValue(counter.handle, counter.format|PdhFmtNoCap100)
-		if err != nil {
-			rtn[path] = Value{Err: err}
-			continue
-		}
 
-		switch counter.format {
-		case PdhFmtDouble:
-			rtn[path] = Value{Num: *(*float64)(unsafe.Pointer(&value.LongValue))}
-		case PdhFmtLarge:
-			rtn[path] = Value{Num: *(*int64)(unsafe.Pointer(&value.LongValue))}
-		}
+		if match, _ := regexp.MatchString(".*\\(\\*\\)\\.*", path); match {
+			count, value, err := PdhGetFormattedCounterArray(counter.handle, counter.format|PdhFmtNoCap100)
+			if err != nil {
+				rtn[path] = Value{Err: err}
+				continue
+			}
 
+			rtn[path] = Value{Num: common.MapStr{}}
+
+			for i := 0; i < count; i++ {
+				data := *value
+				a := (*[1<<30 - 1]uint16)(unsafe.Pointer(data[i].SzName))
+				size := 0
+				for ; size < len(a); size++ {
+					if a[size] == uint16(0) {
+						break
+					}
+				}
+				runes := utf16.Decode(a[:size:size])
+				name := string(runes)
+
+				var val interface{}
+
+				switch counter.format {
+				case PdhFmtDouble:
+					val = *(*float64)(unsafe.Pointer(&data[i].FmtValue.LongValue))
+				case PdhFmtLarge:
+					val = *(*int64)(unsafe.Pointer(&data[i].FmtValue.LongValue))
+				}
+
+				if m, ok := rtn[path].Num.(common.MapStr); ok {
+					m[name] = val
+				}
+			}
+		} else {
+			_, value, err := PdhGetFormattedCounterValue(counter.handle, counter.format|PdhFmtNoCap100)
+			if err != nil {
+				rtn[path] = Value{Err: err}
+				continue
+			}
+
+			switch counter.format {
+			case PdhFmtDouble:
+				rtn[path] = Value{Num: *(*float64)(unsafe.Pointer(&value.LongValue))}
+			case PdhFmtLarge:
+				rtn[path] = Value{Num: *(*int64)(unsafe.Pointer(&value.LongValue))}
+			}
+		}
 	}
 
 	return rtn, nil
