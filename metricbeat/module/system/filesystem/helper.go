@@ -31,7 +31,9 @@ func GetFileSystemList() ([]sigar.FileSystem, error) {
 	for _, fs := range fss.List {
 		if filepath.IsAbs(fs.DirName) {
 			filtered = append(filtered, fs)
+			continue
 		}
+		debugf("Filtering filesystem with relative mountpoint %+v", fs)
 	}
 	fss.List = filtered
 
