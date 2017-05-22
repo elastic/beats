@@ -15,7 +15,7 @@ def read_file(filename):
         return file_content
 
 
-def get_library_name(license):
+def get_library_path(license):
 
     lib = ""
     path = os.path.dirname(license)
@@ -30,25 +30,34 @@ def get_library_name(license):
     return lib
 
 
-def add_licenses(f, licenses):
+def add_licenses(f, license_globs):
 
-    for license in licenses:
-        for license_file in sorted(glob.glob(license)):
-            f.write("\n--------------------------------------------------------------------\n")
-            f.write("{}\n".format(get_library_name(license_file)))
-            f.write("--------------------------------------------------------------------\n")
-            copyright = read_file(license_file)
-            if "Apache License" not in copyright:
-                f.write(copyright)
-            else:
-                # it's an Apache License, so include only the NOTICE file
-                f.write("Apache License\n\n")
-                for notice_file in glob.glob(os.path.join(os.path.dirname(license_file), "NOTICE*")):
-                    f.write("-------{}-----\n".format(os.path.basename(notice_file)))
-                    f.write(read_file(notice_file))
+    licenses = {}
+    for license_glob in license_globs:
+        for license_file in glob.glob(license_glob):
+            lib_path = get_library_path(license_file)
+            if lib_path in licenses:
+                print("WARNING: Dependency appears multiple times: {}".format(lib_path))
+            licenses[lib_path] = license_file
+
+    # Sort licenses by package path, ignore upper / lower case
+    for key in sorted(licenses, key=str.lower):
+        license_file = licenses[key]
+        f.write("\n--------------------------------------------------------------------\n")
+        f.write("{}\n".format(key))
+        f.write("--------------------------------------------------------------------\n")
+        copyright = read_file(license_file)
+        if "Apache License" not in copyright:
+            f.write(copyright)
+        else:
+            # it's an Apache License, so include only the NOTICE file
+            f.write("Apache License\n\n")
+            for notice_file in glob.glob(os.path.join(os.path.dirname(license_file), "NOTICE*")):
+                f.write("-------{}-----\n".format(os.path.basename(notice_file)))
+                f.write(read_file(notice_file))
 
 
-def create_notice(filename, beat, copyright, licenses):
+def create_notice(filename, beat, copyright, license_globs):
 
     now = datetime.datetime.now()
 
@@ -64,7 +73,7 @@ def create_notice(filename, beat, copyright, licenses):
         f.write("==========================================================================\n")
         f.write("Third party libraries used by the Beats project:\n")
         f.write("==========================================================================\n\n")
-        add_licenses(f, licenses)
+        add_licenses(f, license_globs)
 
 
 if __name__ == "__main__":
@@ -82,16 +91,22 @@ if __name__ == "__main__":
 
     cwd = os.getcwd()
     notice = os.path.join(cwd, "NOTICE")
-    licenses = []
+    license_globs = []
+
+    print args.vendor
 
     for root, dirs, files in os.walk(args.vendor):
-        dirs.sort()
-        if 'vendor' in dirs:
-            license = os.path.join(os.path.join(root, 'vendor'),
-                                   '**/**/**/LICENSE*')
-            licenses.append(license)
 
-    print("Get the licenses available from {}".format(licenses))
-    create_notice(notice, args.beat, args.copyright, licenses)
+        # Skips all hidden paths like ".git"
+        if '/.' in root:
+            continue
+
+        if 'vendor' in dirs:
+            license_glob = os.path.join(os.path.join(root, 'vendor'),
+                                        '**/**/**/LICENSE*')
+            license_globs.append(license_glob)
+
+    print("Get the licenses available from {}".format(license_globs))
+    create_notice(notice, args.beat, args.copyright, license_globs)
 
     print("Available at {}\n".format(notice))
