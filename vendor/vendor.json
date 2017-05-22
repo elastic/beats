@@ -28,12 +28,6 @@
 			"revisionTime": "2016-09-02T18:42:37Z"
 		},
 		{
-			"checksumSHA1": "5rPfda8jFccr3A6heL+JAmi9K9g=",
-			"path": "github.com/davecgh/go-spew/spew",
-			"revision": "5215b55f46b2b919f50a1df0eaa5886afe4e3b3d",
-			"revisionTime": "2015-11-05T21:09:06Z"
-		},
-		{
 			"checksumSHA1": "rhLUtXvcmouYuBwOq9X/nYKzvNg=",
 			"path": "github.com/dustin/go-humanize",
 			"revision": "259d2a102b871d17f30e3cd9881a642961a1e486",
