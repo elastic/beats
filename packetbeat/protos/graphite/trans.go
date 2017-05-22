@@ -1,6 +1,3 @@
-// Author: Sudhindra Sajjal <sudhindra.s@media.net> & Sumit Sulakhe <sumit.su@media.net>
-// Copyright: Media.net 2017
-
 package graphite
 
 import (
@@ -55,7 +52,6 @@ func (trans *transactions) onMessage(
 		}
 		err = trans.onRequest(tuple, dir, msg)
 		err = trans.onResponse(tuple, dir, msg)
-		//	fmt.Printf("Published Req and Resp\n")
 	}
 
 	return err

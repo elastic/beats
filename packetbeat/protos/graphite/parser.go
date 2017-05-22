@@ -1,6 +1,3 @@
-// Author: Sudhindra Sajjal <sudhindra.s@media.net> & Sumit Sulakhe <sumit.su@media.net>
-// Copyright: Media.net 2017
-
 package graphite
 
 import (
@@ -14,7 +11,6 @@ import (
 	"github.com/elastic/beats/libbeat/common/streambuf"
 	"github.com/elastic/beats/packetbeat/protos/applayer"
 	"github.com/hydrogen18/stalecucumber"
-	//	"fmt"
 )
 
 type parser struct {
@@ -113,7 +109,6 @@ func (p *parser) newMessage(ts time.Time) *message {
 func (p *parser) parse() (*message, error) {
 	// get the length of data in buffer
 	length := p.buf.Len()
-	//buf, err := p.buf.CollectUntil([]byte{'\n'})
 	// Read the entire buffer content
 	buf, err := p.buf.Collect(length)
 	if err == streambuf.ErrNoMoreBytes || length <= 2 {
@@ -150,13 +145,12 @@ func (p *parser) parse() (*message, error) {
 					for _, k := range j.([]interface{}) {
 						if reflect.TypeOf(k).String() == "int64" {
 							msg.Notes = append(msg.Notes, strconv.Itoa(int(k.(int64))))
-							//fmt.Println("Type: int64")
+
 						} else if reflect.TypeOf(k).String() == "float64" {
 							msg.Notes = append(msg.Notes, strconv.FormatFloat(k.(float64), 'E', -1, 64))
-							//fmt.Println("Type: float")
+
 						} else {
 							msg.Notes = append(msg.Notes, k.(string))
-							//fmt.Println("Type: string")
 						}
 					}
 				}

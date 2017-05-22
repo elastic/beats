@@ -1,6 +1,3 @@
-// Author: Sudhindra Sajjal <sudhindra.s@media.net> & Sumit Sulakhe <sumit.su@media.net>
-// Copyright: Media.net 2017
-
 package graphite
 
 import (
@@ -79,10 +76,7 @@ func (pub *transPub) createEvent(requ, resp *message) common.MapStr {
 		"graphite_data": common.MapStr{},
 	}
 
-	//event["graphite"].(common.MapStr)["request"].(common.MapStr)["0"] = gra_event
-	//fmt.Println("generating")
 	event["graphite_data"] = list
-	//fmt.Println("generated")
 
 	return event
 }
