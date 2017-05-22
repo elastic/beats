@@ -67,6 +67,7 @@ func (f *Forwarder) Send(data *util.Data) error {
 
 	if data.HasEvent() {
 		data.Event[common.EventMetadataKey] = f.Config.EventMetadata
+		data.Event.Put("prospector.type", f.Config.Type)
 
 		// run the filters before sending to spooler
 		data.Event = f.Processors.Run(data.Event)
