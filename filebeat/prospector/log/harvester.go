@@ -149,7 +149,18 @@ func (h *Harvester) Setup() error {
 // Run start the harvester and reads files line by line and sends events to the defined output
 func (h *Harvester) Run() error {
 
+	// This is to make sure a harvester is not started anymore if stop was already
+	// called before the harvester was started. The waitgroup is not incremented afterwards
+	// as otherwise it could happend that between checking for the close channel and incrementing
+	// the waitgroup, the harvester could be stopped.
 	h.stopWg.Add(1)
+	select {
+	case <-h.done:
+		h.stopWg.Done()
+		return nil
+	default:
+	}
+
 	defer func() {
 		// Channel to stop internal harvester routines
 		h.stop()
