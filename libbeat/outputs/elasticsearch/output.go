@@ -59,7 +59,19 @@ func New(beat common.BeatInfo, cfg *common.Config) (outputs.Outputer, error) {
 	}
 
 	if !cfg.HasField("index") {
-		pattern := fmt.Sprintf("%v-%v-%%{+yyyy.MM.dd}", beat.Beat, beat.Version)
+		pattern = fmt.Sprintf("%v-%v-%%{+yyyy.MM.dd}", beat.Beat, beat.Version)
+		if cfg.HasField("timezone") {
+			zone, err := cfg.String("timezone", -1)
+			if err != nil {
+				return nil, err
+			}
+			loc, err := time.LoadLocation(zone)
+			if err != nil {
+				logp.Err(err.Error())
+			} else {
+				pattern = fmt.Sprintf("%v-%v-"+time.Now().In(loc).Format("2006.01.02"), beat.Beat, beat.Version)
+			}
+		} 
 		cfg.SetString("index", -1, pattern)
 	}
 
