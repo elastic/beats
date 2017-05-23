@@ -31,7 +31,7 @@ def add_licenses(f, vendor_dirs):
     for vendor in vendor_dirs:
         # walk looking for LICENSE files
         for root, dirs, filenames in os.walk(vendor):
-            for filename in filenames:
+            for filename in sorted(filenames):
                 if filename.startswith("LICENSE"):
                     lib_path = get_library_path(root)
                     if lib_path in licenses:
