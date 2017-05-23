@@ -7,6 +7,7 @@ import (
 	"github.com/dustin/go-humanize"
 	cfg "github.com/elastic/beats/filebeat/config"
 	"github.com/elastic/beats/filebeat/harvester"
+	"github.com/elastic/beats/filebeat/harvester/encoding"
 	"github.com/elastic/beats/filebeat/harvester/reader"
 	"github.com/elastic/beats/filebeat/input/file"
 	"github.com/elastic/beats/libbeat/common/match"
@@ -106,6 +107,11 @@ func (c *config) Validate() error {
 
 	if c.CleanInactive != 0 && c.CleanInactive <= c.IgnoreOlder+c.ScanFrequency {
 		return fmt.Errorf("clean_inactive must be > ignore_older + scan_frequency to make sure only files which are not monitored anymore are removed")
+	}
+
+	encodingFactory, ok := encoding.FindEncoding(c.Encoding)
+	if !ok || encodingFactory == nil {
+		return fmt.Errorf("unknown encoding('%v')", c.Encoding)
 	}
 
 	// Harvester
