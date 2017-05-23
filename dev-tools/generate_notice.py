@@ -16,29 +16,27 @@ def read_file(filename):
 
 
 def get_library_path(license):
-
-    lib = ""
-    path = os.path.dirname(license)
-    # get the last three directories
-    for i in range(0, 3):
-        path, x = os.path.split(path)
-        if len(lib) == 0:
-            lib = x
-        elif len(x) > 0:
-            lib = x + "/" + lib
-
-    return lib
+    """
+    Get the contents up to the vendor folder.
+    """
+    split = license.split(os.sep)
+    for i, word in reversed(list(enumerate(split))):
+        if word == "vendor":
+            return "/".join(split[i+1:])
+    return "/".join(split)
 
 
-def add_licenses(f, license_globs):
-
+def add_licenses(f, vendor_dirs):
     licenses = {}
-    for license_glob in license_globs:
-        for license_file in glob.glob(license_glob):
-            lib_path = get_library_path(license_file)
-            if lib_path in licenses:
-                print("WARNING: Dependency appears multiple times: {}".format(lib_path))
-            licenses[lib_path] = license_file
+    for vendor in vendor_dirs:
+        # walk looking for LICENSE files
+        for root, dirs, filenames in os.walk(vendor):
+            for filename in sorted(filenames):
+                if filename.startswith("LICENSE"):
+                    lib_path = get_library_path(root)
+                    if lib_path in licenses:
+                        print("WARNING: Dependency appears multiple times: {}".format(lib_path))
+                    licenses[lib_path] = os.path.abspath(os.path.join(root, filename))
 
     # Sort licenses by package path, ignore upper / lower case
     for key in sorted(licenses, key=str.lower):
@@ -57,7 +55,7 @@ def add_licenses(f, license_globs):
                 f.write(read_file(notice_file))
 
 
-def create_notice(filename, beat, copyright, license_globs):
+def create_notice(filename, beat, copyright, vendor_dirs):
 
     now = datetime.datetime.now()
 
@@ -67,13 +65,14 @@ def create_notice(filename, beat, copyright, license_globs):
         f.write("{}\n".format(beat))
         f.write("Copyright 2014-{0} {1}\n".format(now.year, copyright))
         f.write("\n")
-        f.write("This product includes software developed by The Apache Software \nFoundation (http://www.apache.org/).\n\n")
+        f.write("This product includes software developed by The Apache Software \n" +
+                "Foundation (http://www.apache.org/).\n\n")
 
         # Add licenses for 3rd party libraries
         f.write("==========================================================================\n")
         f.write("Third party libraries used by the Beats project:\n")
         f.write("==========================================================================\n\n")
-        add_licenses(f, license_globs)
+        add_licenses(f, vendor_dirs)
 
 
 if __name__ == "__main__":
@@ -91,7 +90,7 @@ if __name__ == "__main__":
 
     cwd = os.getcwd()
     notice = os.path.join(cwd, "NOTICE")
-    license_globs = []
+    vendor_dirs = []
 
     print args.vendor
 
@@ -102,11 +101,9 @@ if __name__ == "__main__":
             continue
 
         if 'vendor' in dirs:
-            license_glob = os.path.join(os.path.join(root, 'vendor'),
-                                        '**/**/**/LICENSE*')
-            license_globs.append(license_glob)
+            vendor_dirs.append(os.path.join(root, 'vendor'))
 
-    print("Get the licenses available from {}".format(license_globs))
-    create_notice(notice, args.beat, args.copyright, license_globs)
+    print("Get the licenses available from {}".format(vendor_dirs))
+    create_notice(notice, args.beat, args.copyright, vendor_dirs)
 
     print("Available at {}\n".format(notice))
