@@ -10,7 +10,9 @@ Third party libraries used by the Beats project:
 
 
 --------------------------------------------------------------------
-github.com/andrewkroh/sys
+Dependency: github.com/andrewkroh/sys
+Revision: 287798fe3e430efeb9318b95ff52353aaa2b59b1
+./vendor/github.com/andrewkroh/sys/LICENSE:
 --------------------------------------------------------------------
 Copyright (c) 2009 The Go Authors. All rights reserved.
 
@@ -41,7 +43,9 @@ THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 --------------------------------------------------------------------
-github.com/armon/go-socks5
+Dependency: github.com/armon/go-socks5
+Revision: e75332964ef517daa070d7c38a9466a0d687e0a5
+./vendor/github.com/armon/go-socks5/LICENSE:
 --------------------------------------------------------------------
 The MIT License (MIT)
 
@@ -65,29 +69,9 @@ IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN
 CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
 --------------------------------------------------------------------
-github.com/cavaliercoder/badio
---------------------------------------------------------------------
-Copyright (c) 2015 Ryan Armstrong
-
-Permission is hereby granted, free of charge, to any person obtaining a copy of
-this software and associated documentation files (the "Software"), to deal in
-the Software without restriction, including without limitation the rights to
-use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies of
-the Software, and to permit persons to whom the Software is furnished to do so,
-subject to the following conditions:
-
-The above copyright notice and this permission notice shall be included in all
-copies or substantial portions of the Software.
-
-THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS
-FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR
-COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER
-IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN
-CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
-
---------------------------------------------------------------------
-github.com/davecgh/go-spew
+Dependency: github.com/davecgh/go-spew
+Revision: 5215b55f46b2b919f50a1df0eaa5886afe4e3b3d
+./vendor/github.com/davecgh/go-spew/LICENSE:
 --------------------------------------------------------------------
 Copyright (c) 2012-2013 Dave Collins <dave@davec.name>
 
@@ -104,7 +88,10 @@ ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING OUT OF
 OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 
 --------------------------------------------------------------------
-github.com/docker/docker
+Dependency: github.com/docker/docker
+Version: v17.05.0-ce
+Revision: 89658bed64c2a8fe05a978e5b87dbec409d57a0f
+./metricbeat/module/docker/vendor/github.com/docker/docker/LICENSE:
 --------------------------------------------------------------------
 Apache License
 
@@ -130,19 +117,25 @@ For more information, please see https://www.bis.doc.gov
 See also https://www.apache.org/dev/crypto.html and/or seek legal counsel.
 
 --------------------------------------------------------------------
-github.com/docker/go-connections
+Dependency: github.com/docker/go-connections
+Revision: e15c02316c12de00874640cd76311849de2aeed5
+./metricbeat/module/docker/vendor/github.com/docker/go-connections/LICENSE:
 --------------------------------------------------------------------
 Apache License
 
 
 --------------------------------------------------------------------
-github.com/docker/go-units
+Dependency: github.com/docker/go-units
+Revision: 0dadbb0345b35ec7ef35e228dabb8de89a65bf52
+./metricbeat/module/docker/vendor/github.com/docker/go-units/LICENSE:
 --------------------------------------------------------------------
 Apache License
 
 
 --------------------------------------------------------------------
-github.com/dustin/go-humanize
+Dependency: github.com/dustin/go-humanize
+Revision: 259d2a102b871d17f30e3cd9881a642961a1e486
+./vendor/github.com/dustin/go-humanize/LICENSE:
 --------------------------------------------------------------------
 Copyright (c) 2005-2008  Dustin Sallings <dustin@spy.net>
 
@@ -167,7 +160,9 @@ SOFTWARE.
 <http://www.opensource.org/licenses/mit-license.php>
 
 --------------------------------------------------------------------
-github.com/eapache/go-resiliency
+Dependency: github.com/eapache/go-resiliency
+Revision: b86b1ec0dd4209a588dc1285cdd471e73525c0b3
+./vendor/github.com/eapache/go-resiliency/LICENSE:
 --------------------------------------------------------------------
 The MIT License (MIT)
 
@@ -193,7 +188,9 @@ SOFTWARE.
 
 
 --------------------------------------------------------------------
-github.com/eapache/go-xerial-snappy
+Dependency: github.com/eapache/go-xerial-snappy
+Revision: bb955e01b9346ac19dc29eb16586c90ded99a98c
+./vendor/github.com/eapache/go-xerial-snappy/LICENSE:
 --------------------------------------------------------------------
 The MIT License (MIT)
 
@@ -218,7 +215,9 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 
 --------------------------------------------------------------------
-github.com/eapache/queue
+Dependency: github.com/eapache/queue
+Revision: 44cc805cf13205b55f69e14bcb69867d1ae92f98
+./vendor/github.com/eapache/queue/LICENSE:
 --------------------------------------------------------------------
 The MIT License (MIT)
 
@@ -242,25 +241,35 @@ LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 --------------------------------------------------------------------
-github.com/elastic/go-libaudit
+Dependency: github.com/elastic/go-libaudit
+Version: v0.0.3
+Revision: cce87232cabb992866d94d6b6b6f810adcf13f9b
+./vendor/github.com/elastic/go-libaudit/LICENSE:
 --------------------------------------------------------------------
 Apache License
 
 
 --------------------------------------------------------------------
-github.com/elastic/go-lumber
+Dependency: github.com/elastic/go-lumber
+Revision: 616041e345fc33c97bc0eb0fa6b388aa07bca3e1
+./vendor/github.com/elastic/go-lumber/LICENSE:
 --------------------------------------------------------------------
 Apache License
 
 
 --------------------------------------------------------------------
-github.com/elastic/go-ucfg
+Dependency: github.com/elastic/go-ucfg
+Revision: ec8488a52542c0c51e42e8ea204dcaff400bc644
+./vendor/github.com/elastic/go-ucfg/LICENSE:
 --------------------------------------------------------------------
 Apache License
 
 
 --------------------------------------------------------------------
-github.com/elastic/gosigar
+Dependency: github.com/elastic/gosigar
+Version: v0.3.0
+Revision: 026c67add059f36c9679ddc16fe57ebae37fb8d6
+./vendor/github.com/elastic/gosigar/LICENSE:
 --------------------------------------------------------------------
 Apache License
 
@@ -275,7 +284,9 @@ separate copyright notices and license terms. Your use of these
 subcomponents is subject to the terms and conditions of the 
 subcomponent's license, as noted in the LICENSE file.
 --------------------------------------------------------------------
-github.com/elastic/procfs
+Dependency: github.com/elastic/procfs
+Revision: 664e6bc79eb43c956507b6e20a867140516ad15a
+./vendor/github.com/elastic/procfs/LICENSE:
 --------------------------------------------------------------------
 Apache License
 
@@ -289,13 +300,18 @@ This product includes software developed at
 SoundCloud Ltd. (http://soundcloud.com/).
 
 --------------------------------------------------------------------
-github.com/ericchiang/k8s
+Dependency: github.com/ericchiang/k8s
+Revision: 28fccef3cb52078910f5f4c09f395c2f7e5fc1b0
+./vendor/github.com/ericchiang/k8s/LICENSE:
 --------------------------------------------------------------------
 Apache License
 
 
 --------------------------------------------------------------------
-github.com/fsouza/go-dockerclient
+Dependency: github.com/fsouza/go-dockerclient
+Version: beats-branch
+Revision: ba365ff5e4281feb28654e4ca599a1defd063497
+./metricbeat/module/docker/vendor/github.com/fsouza/go-dockerclient/LICENSE:
 --------------------------------------------------------------------
 Copyright (c) 2013-2017, go-dockerclient authors
 All rights reserved.
@@ -321,13 +337,17 @@ OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 --------------------------------------------------------------------
-github.com/garyburd/redigo
+Dependency: github.com/garyburd/redigo
+Revision: b8dc90050f24c1a73a52f107f3f575be67b21b7c
+./vendor/github.com/garyburd/redigo/LICENSE:
 --------------------------------------------------------------------
 Apache License
 
 
 --------------------------------------------------------------------
-github.com/ghodss/yaml
+Dependency: github.com/ghodss/yaml
+Revision: 0ca9ea5df5451ffdf184b4428c902747c2c11cd7
+./vendor/github.com/ghodss/yaml/LICENSE:
 --------------------------------------------------------------------
 The MIT License (MIT)
 
@@ -381,7 +401,9 @@ THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 --------------------------------------------------------------------
-github.com/go-sql-driver/mysql
+Dependency: github.com/go-sql-driver/mysql
+Revision: 9dee4ca50b83acdf57a35fb9e6fb4be640afa2f3
+./metricbeat/module/mysql/vendor/github.com/go-sql-driver/mysql/LICENSE:
 --------------------------------------------------------------------
 Mozilla Public License Version 2.0
 ==================================
@@ -758,7 +780,9 @@ Exhibit B - "Incompatible With Secondary Licenses" Notice
   defined by the Mozilla Public License, v. 2.0.
 
 --------------------------------------------------------------------
-github.com/gocarina/gocsv
+Dependency: github.com/gocarina/gocsv
+Revision: ffef3ffc77bec026fefa6f76bd53d158cfa0e669
+./vendor/github.com/gocarina/gocsv/LICENSE:
 --------------------------------------------------------------------
 The MIT License (MIT)
 
@@ -782,7 +806,9 @@ LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 --------------------------------------------------------------------
-github.com/golang/protobuf
+Dependency: github.com/golang/protobuf
+Revision: 2bba0603135d7d7f5cb73b2125beeda19c09f4ef
+./vendor/github.com/golang/protobuf/LICENSE:
 --------------------------------------------------------------------
 Go support for Protocol Buffers - Google's data interchange format
 
@@ -817,7 +843,46 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 
 --------------------------------------------------------------------
-github.com/golang/snappy
+Dependency: github.com/golang/protobuf
+Revision: 18c9bb3261723cd5401db4d0c9fbc5c3b6c70fe8
+./metricbeat/vendor/github.com/golang/protobuf/LICENSE:
+--------------------------------------------------------------------
+Go support for Protocol Buffers - Google's data interchange format
+
+Copyright 2010 The Go Authors.  All rights reserved.
+https://github.com/golang/protobuf
+
+Redistribution and use in source and binary forms, with or without
+modification, are permitted provided that the following conditions are
+met:
+
+    * Redistributions of source code must retain the above copyright
+notice, this list of conditions and the following disclaimer.
+    * Redistributions in binary form must reproduce the above
+copyright notice, this list of conditions and the following disclaimer
+in the documentation and/or other materials provided with the
+distribution.
+    * Neither the name of Google Inc. nor the names of its
+contributors may be used to endorse or promote products derived from
+this software without specific prior written permission.
+
+THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
+"AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
+LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR
+A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT
+OWNER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL,
+SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT
+LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE,
+DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY
+THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
+(INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
+OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+
+
+--------------------------------------------------------------------
+Dependency: github.com/golang/snappy
+Revision: 553a641470496b2327abcac10b36396bd98e45c9
+./vendor/github.com/golang/snappy/LICENSE:
 --------------------------------------------------------------------
 Copyright (c) 2011 The Snappy-Go Authors. All rights reserved.
 
@@ -848,7 +913,9 @@ THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 --------------------------------------------------------------------
-github.com/google/uuid
+Dependency: github.com/google/uuid
+Revision: 6a5e28554805e78ea6141142aba763936c4761c0
+./metricbeat/module/vsphere/vendor/github.com/google/uuid/LICENSE:
 --------------------------------------------------------------------
 Copyright (c) 2009,2014 Google Inc. All rights reserved.
 
@@ -879,7 +946,9 @@ THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 --------------------------------------------------------------------
-github.com/hashicorp/go-cleanhttp
+Dependency: github.com/hashicorp/go-cleanhttp
+Revision: 3573b8b52aa7b37b9358d966a898feb387f62437
+./metricbeat/module/docker/vendor/github.com/hashicorp/go-cleanhttp/LICENSE:
 --------------------------------------------------------------------
 Mozilla Public License, version 2.0
 
@@ -1246,7 +1315,9 @@ Exhibit B - "Incompatible With Secondary Licenses" Notice
 
 
 --------------------------------------------------------------------
-github.com/joeshaw/multierror
+Dependency: github.com/joeshaw/multierror
+Revision: 69b34d4ec901851247ae7e77d33909caf9df99ed
+./vendor/github.com/joeshaw/multierror/LICENSE:
 --------------------------------------------------------------------
 The MIT License (MIT)
 
@@ -1271,7 +1342,9 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 THE SOFTWARE.
 
 --------------------------------------------------------------------
-github.com/klauspost/compress
+Dependency: github.com/klauspost/compress
+Revision: 14c9a76e3c95e47f8ccce949bba2c1101a8b85e6
+./vendor/github.com/klauspost/compress/LICENSE:
 --------------------------------------------------------------------
 Copyright (c) 2012 The Go Authors. All rights reserved.
 
@@ -1302,7 +1375,9 @@ THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 --------------------------------------------------------------------
-github.com/klauspost/cpuid
+Dependency: github.com/klauspost/cpuid
+Revision: 09cded8978dc9e80714c4d85b0322337b0a1e5e0
+./vendor/github.com/klauspost/cpuid/LICENSE:
 --------------------------------------------------------------------
 The MIT License (MIT)
 
@@ -1328,7 +1403,9 @@ SOFTWARE.
 
 
 --------------------------------------------------------------------
-github.com/klauspost/crc32
+Dependency: github.com/klauspost/crc32
+Revision: 1bab8b35b6bb565f92cbc97939610af9369f942a
+./vendor/github.com/klauspost/crc32/LICENSE:
 --------------------------------------------------------------------
 Copyright (c) 2012 The Go Authors. All rights reserved.
 Copyright (c) 2015 Klaus Post
@@ -1360,7 +1437,9 @@ THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 --------------------------------------------------------------------
-github.com/lib/pq
+Dependency: github.com/lib/pq
+Revision: 2704adc878c21e1329f46f6e56a1c387d788ff94
+./metricbeat/module/postgresql/vendor/github.com/lib/pq/LICENSE.md:
 --------------------------------------------------------------------
 Copyright (c) 2011-2013, 'pq' Contributors
 Portions Copyright (C) 2011 Blake Mizerany
@@ -1372,7 +1451,9 @@ The above copyright notice and this permission notice shall be included in all c
 THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
 --------------------------------------------------------------------
-github.com/matttproud/golang_protobuf_extensions
+Dependency: github.com/matttproud/golang_protobuf_extensions
+Revision: c12348ce28de40eed0136aa2b644d0ee0650e56c
+./metricbeat/vendor/github.com/matttproud/golang_protobuf_extensions/LICENSE:
 --------------------------------------------------------------------
 Apache License
 
@@ -1380,7 +1461,9 @@ Apache License
 Copyright 2012 Matt T. Proud (matt.proud@gmail.com)
 
 --------------------------------------------------------------------
-github.com/Microsoft/go-winio
+Dependency: github.com/Microsoft/go-winio
+Revision: fff283ad5116362ca252298cfc9b95828956d85d
+./metricbeat/module/docker/vendor/github.com/Microsoft/go-winio/LICENSE:
 --------------------------------------------------------------------
 The MIT License (MIT)
 
@@ -1406,7 +1489,9 @@ SOFTWARE.
 
 
 --------------------------------------------------------------------
-github.com/miekg/dns
+Dependency: github.com/miekg/dns
+Revision: 5d001d020961ae1c184f9f8152fdc73810481677
+./vendor/github.com/miekg/dns/LICENSE:
 --------------------------------------------------------------------
 Extensions of the original work are copyright (c) 2011 Miek Gieben
 
@@ -1442,7 +1527,9 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 
 --------------------------------------------------------------------
-github.com/mitchellh/hashstructure
+Dependency: github.com/mitchellh/hashstructure
+Revision: ab25296c0f51f1022f01cd99dfb45f1775de8799
+./vendor/github.com/mitchellh/hashstructure/LICENSE:
 --------------------------------------------------------------------
 The MIT License (MIT)
 
@@ -1467,7 +1554,9 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 THE SOFTWARE.
 
 --------------------------------------------------------------------
-github.com/mitchellh/mapstructure
+Dependency: github.com/mitchellh/mapstructure
+Revision: 740c764bc6149d3f1806231418adb9f52c11bcbf
+./vendor/github.com/mitchellh/mapstructure/LICENSE:
 --------------------------------------------------------------------
 The MIT License (MIT)
 
@@ -1492,7 +1581,9 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 THE SOFTWARE.
 
 --------------------------------------------------------------------
-github.com/opencontainers/runc
+Dependency: github.com/opencontainers/runc
+Revision: 653207bc29a6d2d62b5d4f55b596467cb715a128
+./metricbeat/module/docker/vendor/github.com/opencontainers/runc/LICENSE:
 --------------------------------------------------------------------
 Apache License
 
@@ -1516,7 +1607,9 @@ For more information, please see http://www.bis.doc.gov
 See also http://www.apache.org/dev/crypto.html and/or seek legal counsel.
 
 --------------------------------------------------------------------
-github.com/pierrec/lz4
+Dependency: github.com/pierrec/lz4
+Revision: 90290f74b1b4d9c097f0a3b3c7eba2ef3875c699
+./vendor/github.com/pierrec/lz4/LICENSE:
 --------------------------------------------------------------------
 Copyright (c) 2015, Pierre Curto
 All rights reserved.
@@ -1548,7 +1641,9 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 
 --------------------------------------------------------------------
-github.com/pierrec/xxHash
+Dependency: github.com/pierrec/xxHash
+Revision: 5a004441f897722c627870a981d02b29924215fa
+./vendor/github.com/pierrec/xxHash/LICENSE:
 --------------------------------------------------------------------
 Copyright (c) 2014, Pierre Curto
 All rights reserved.
@@ -1580,7 +1675,9 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 
 --------------------------------------------------------------------
-github.com/pierrre/gotestcover
+Dependency: github.com/pierrre/gotestcover
+Revision: 7b94f124d338b6ae06df22bc2ee7909af27aae85
+./vendor/github.com/pierrre/gotestcover/LICENSE:
 --------------------------------------------------------------------
 Copyright (C) 2015 Pierre Durand
 
@@ -1590,7 +1687,9 @@ The above copyright notice and this permission notice shall be included in all c
 
 THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 --------------------------------------------------------------------
-github.com/pkg/errors
+Dependency: github.com/pkg/errors
+Revision: ff09b135c25aae272398c51a07235b90a75aa4f0
+./vendor/github.com/pkg/errors/LICENSE:
 --------------------------------------------------------------------
 Copyright (c) 2015, Dave Cheney <dave@cheney.net>
 All rights reserved.
@@ -1617,7 +1716,8 @@ OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 --------------------------------------------------------------------
-github.com/pmezard/go-difflib
+Dependency: github.com/pmezard/go-difflib
+./vendor/github.com/pmezard/go-difflib/LICENSE:
 --------------------------------------------------------------------
 Copyright (c) 2013, Patrick Mezard
 All rights reserved.
@@ -1648,7 +1748,9 @@ NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 --------------------------------------------------------------------
-github.com/prometheus/client_model
+Dependency: github.com/prometheus/client_model
+Revision: 6f3806018612930941127f2a7c6c453ba2c527d2
+./metricbeat/vendor/github.com/prometheus/client_model/LICENSE:
 --------------------------------------------------------------------
 Apache License
 
@@ -1660,7 +1762,9 @@ This product includes software developed at
 SoundCloud Ltd. (http://soundcloud.com/).
 
 --------------------------------------------------------------------
-github.com/prometheus/common
+Dependency: github.com/prometheus/common
+Revision: 13ba4ddd0caa9c28ca7b7bffe1dfa9ed8d5ef207
+./metricbeat/vendor/github.com/prometheus/common/LICENSE:
 --------------------------------------------------------------------
 Apache License
 
@@ -1672,7 +1776,9 @@ This product includes software developed at
 SoundCloud Ltd. (http://soundcloud.com/).
 
 --------------------------------------------------------------------
-github.com/rcrowley/go-metrics
+Dependency: github.com/rcrowley/go-metrics
+Revision: 1f30fe9094a513ce4c700b9a54458bbb0c96996c
+./vendor/github.com/rcrowley/go-metrics/LICENSE:
 --------------------------------------------------------------------
 Copyright 2012 Richard Crowley. All rights reserved.
 
@@ -1705,7 +1811,9 @@ are those of the authors and should not be interpreted as representing
 official policies, either expressed or implied, of Richard Crowley.
 
 --------------------------------------------------------------------
-github.com/samuel/go-thrift
+Dependency: github.com/samuel/go-thrift
+Revision: 2187045faa54fce7f5028706ffeb2f2fc342aa7e
+./vendor/github.com/samuel/go-thrift/LICENSE:
 --------------------------------------------------------------------
 Copyright (c) 2012, Samuel Stauffer <samuel@descolada.com>
 All rights reserved.
@@ -1734,7 +1842,9 @@ ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
 SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 --------------------------------------------------------------------
-github.com/satori/go.uuid
+Dependency: github.com/satori/go.uuid
+Revision: 5bf94b69c6b68ee1b541973bb8e1144db23a194b
+./vendor/github.com/satori/go.uuid/LICENSE:
 --------------------------------------------------------------------
 Copyright (C) 2013-2016 by Maxim Bublis <b@codemonkey.ru>
 
@@ -1758,7 +1868,10 @@ OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION
 WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
 --------------------------------------------------------------------
-github.com/shirou/gopsutil
+Dependency: github.com/shirou/gopsutil
+Version: v2.17.04
+Revision: 9af92986dda65a8c367157a82b484553e1ec1c55
+./vendor/github.com/shirou/gopsutil/LICENSE:
 --------------------------------------------------------------------
 gopsutil is distributed under BSD license reproduced below.
 
@@ -1822,7 +1935,9 @@ THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
 (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 --------------------------------------------------------------------
-github.com/Sirupsen/logrus
+Dependency: github.com/Sirupsen/logrus
+Revision: 10f801ebc38b33738c9d17d50860f484a0988ff5
+./metricbeat/module/docker/vendor/github.com/Sirupsen/logrus/LICENSE:
 --------------------------------------------------------------------
 The MIT License (MIT)
 
@@ -1847,7 +1962,9 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 THE SOFTWARE.
 
 --------------------------------------------------------------------
-github.com/StackExchange/wmi
+Dependency: github.com/StackExchange/wmi
+Revision: 9f32b5905fd6ce7384093f9d048437e79f7b4d85
+./vendor/github.com/StackExchange/wmi/LICENSE:
 --------------------------------------------------------------------
 The MIT License (MIT)
 
@@ -1871,7 +1988,8 @@ IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN
 CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
 --------------------------------------------------------------------
-github.com/stretchr/objx
+Dependency: github.com/stretchr/objx
+./vendor/github.com/stretchr/objx/LICENSE.md:
 --------------------------------------------------------------------
 objx - by Mat Ryer and Tyler Bunnell
 
@@ -1898,7 +2016,9 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 
 --------------------------------------------------------------------
-github.com/stretchr/testify
+Dependency: github.com/stretchr/testify
+Revision: f390dcf405f7b83c997eac1b06768bb9f44dec18
+./vendor/github.com/stretchr/testify/LICENSE:
 --------------------------------------------------------------------
 Copyright (c) 2012 - 2013 Mat Ryer and Tyler Bunnell
 
@@ -1924,7 +2044,9 @@ OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE
 OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
 --------------------------------------------------------------------
-github.com/tsg/gopacket
+Dependency: github.com/tsg/gopacket
+Revision: 8e703b9968693c15f25cabb6ba8be4370cf431d0
+./vendor/github.com/tsg/gopacket/LICENSE:
 --------------------------------------------------------------------
 Copyright (c) 2012 Google, Inc. All rights reserved.
 Copyright (c) 2009-2011 Andreas Krennmair. All rights reserved.
@@ -1956,13 +2078,17 @@ THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 --------------------------------------------------------------------
-github.com/vmware/govmomi
+Dependency: github.com/vmware/govmomi
+Revision: 9bfdc5ce62c0585b48b154cc460f8664dcd124c3
+./metricbeat/module/vsphere/vendor/github.com/vmware/govmomi/LICENSE.txt:
 --------------------------------------------------------------------
 Apache License
 
 
 --------------------------------------------------------------------
-github.com/vmware/govmomi/vim25/xml
+Dependency: github.com/vmware/govmomi/vim25/xml
+Revision: 5072cda664c79ada30834d171d2ed1f76317d3b2
+./metricbeat/module/vsphere/vendor/github.com/vmware/govmomi/vim25/xml/LICENSE:
 --------------------------------------------------------------------
 Copyright (c) 2012 The Go Authors. All rights reserved.
 
@@ -1993,13 +2119,17 @@ THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 --------------------------------------------------------------------
-github.com/vmware/vic
+Dependency: github.com/vmware/vic
+Revision: a2b2afb419d70009cd4d0b58f37b1a095c58b526
+./metricbeat/module/vsphere/vendor/github.com/vmware/vic/LICENSE:
 --------------------------------------------------------------------
 Apache License
 
 
 --------------------------------------------------------------------
-golang.org/x/crypto
+Dependency: golang.org/x/net
+Revision: e90d6d0afc4c315a0d87a568ae68577cc15149a0
+./vendor/golang.org/x/net/LICENSE:
 --------------------------------------------------------------------
 Copyright (c) 2009 The Go Authors. All rights reserved.
 
@@ -2030,7 +2160,9 @@ THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 --------------------------------------------------------------------
-golang.org/x/net
+Dependency: golang.org/x/net
+Revision: ffcf1bedda3b04ebb15a168a59800a73d6dc0f4d
+./metricbeat/module/docker/vendor/golang.org/x/net/LICENSE:
 --------------------------------------------------------------------
 Copyright (c) 2009 The Go Authors. All rights reserved.
 
@@ -2061,7 +2193,9 @@ THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 --------------------------------------------------------------------
-golang.org/x/sys
+Dependency: golang.org/x/sys
+Revision: 62bee037599929a6e9146f29d10dd5208c43507d
+./vendor/golang.org/x/sys/LICENSE:
 --------------------------------------------------------------------
 Copyright (c) 2009 The Go Authors. All rights reserved.
 
@@ -2092,7 +2226,9 @@ THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 --------------------------------------------------------------------
-golang.org/x/text
+Dependency: golang.org/x/sys
+Revision: 9a7256cb28ed514b4e1e5f68959914c4c28a92e0
+./metricbeat/module/docker/vendor/golang.org/x/sys/LICENSE:
 --------------------------------------------------------------------
 Copyright (c) 2009 The Go Authors. All rights reserved.
 
@@ -2123,7 +2259,42 @@ THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 --------------------------------------------------------------------
-gopkg.in/inf.v0
+Dependency: golang.org/x/text
+Revision: 2910a502d2bf9e43193af9d68ca516529614eed3
+./vendor/golang.org/x/text/LICENSE:
+--------------------------------------------------------------------
+Copyright (c) 2009 The Go Authors. All rights reserved.
+
+Redistribution and use in source and binary forms, with or without
+modification, are permitted provided that the following conditions are
+met:
+
+   * Redistributions of source code must retain the above copyright
+notice, this list of conditions and the following disclaimer.
+   * Redistributions in binary form must reproduce the above
+copyright notice, this list of conditions and the following disclaimer
+in the documentation and/or other materials provided with the
+distribution.
+   * Neither the name of Google Inc. nor the names of its
+contributors may be used to endorse or promote products derived from
+this software without specific prior written permission.
+
+THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
+"AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
+LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR
+A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT
+OWNER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL,
+SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT
+LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE,
+DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY
+THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
+(INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
+OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+
+--------------------------------------------------------------------
+Dependency: gopkg.in/inf.v0
+Revision: 3887ee99ecf07df5b447e9b00d9c0b2adaa9f3e4
+./vendor/gopkg.in/inf.v0/LICENSE:
 --------------------------------------------------------------------
 Copyright (c) 2012 Péter Surányi. Portions Copyright (c) 2009 The Go
 Authors. All rights reserved.
@@ -2155,7 +2326,9 @@ THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 --------------------------------------------------------------------
-gopkg.in/mgo.v2
+Dependency: gopkg.in/mgo.v2
+Revision: 3f83fa5005286a7fe593b055f0d7771a7dce4655
+./vendor/gopkg.in/mgo.v2/LICENSE:
 --------------------------------------------------------------------
 mgo - MongoDB driver for Go
 
@@ -2184,7 +2357,9 @@ ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
 SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 --------------------------------------------------------------------
-gopkg.in/mgo.v2/bson
+Dependency: gopkg.in/mgo.v2/bson
+Revision: 3f83fa5005286a7fe593b055f0d7771a7dce4655
+./vendor/gopkg.in/mgo.v2/bson/LICENSE:
 --------------------------------------------------------------------
 BSON library for Go
 
@@ -2213,7 +2388,9 @@ ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
 SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 --------------------------------------------------------------------
-gopkg.in/mgo.v2/internal/json
+Dependency: gopkg.in/mgo.v2/internal/json
+Revision: 3f83fa5005286a7fe593b055f0d7771a7dce4655
+./vendor/gopkg.in/mgo.v2/internal/json/LICENSE:
 --------------------------------------------------------------------
 Copyright (c) 2012 The Go Authors. All rights reserved.
 
@@ -2244,7 +2421,46 @@ THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 --------------------------------------------------------------------
-gopkg.in/yaml.v2
+Dependency: gopkg.in/yaml.v2
+Revision: cd8b52f8269e0feb286dfeef29f8fe4d5b397e0b
+./vendor/gopkg.in/yaml.v2/LICENSE.libyaml:
+--------------------------------------------------------------------
+The following files were ported to Go from C files of libyaml, and thus
+are still covered by their original copyright and license:
+
+    apic.go
+    emitterc.go
+    parserc.go
+    readerc.go
+    scannerc.go
+    writerc.go
+    yamlh.go
+    yamlprivateh.go
+
+Copyright (c) 2006 Kirill Simonov
+
+Permission is hereby granted, free of charge, to any person obtaining a copy of
+this software and associated documentation files (the "Software"), to deal in
+the Software without restriction, including without limitation the rights to
+use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies
+of the Software, and to permit persons to whom the Software is furnished to do
+so, subject to the following conditions:
+
+The above copyright notice and this permission notice shall be included in all
+copies or substantial portions of the Software.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+SOFTWARE.
+
+--------------------------------------------------------------------
+Dependency: gopkg.in/yaml.v2
+Revision: cd8b52f8269e0feb286dfeef29f8fe4d5b397e0b
+./vendor/gopkg.in/yaml.v2/LICENSE.libyaml:
 --------------------------------------------------------------------
 The following files were ported to Go from C files of libyaml, and thus
 are still covered by their original copyright and license:
