@@ -25,7 +25,7 @@ def get_library_path(license):
     split = license.split(os.sep)
     for i, word in reversed(list(enumerate(split))):
         if word == "vendor":
-            return "/".join(split[i+1:])
+            return "/".join(split[i + 1:])
     return "/".join(split)
 
 
