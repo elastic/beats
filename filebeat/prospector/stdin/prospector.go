@@ -2,13 +2,13 @@ package stdin
 
 import (
 	"fmt"
+	"os"
 
 	"github.com/elastic/beats/filebeat/channel"
 	"github.com/elastic/beats/filebeat/harvester"
 	"github.com/elastic/beats/filebeat/input/file"
 	"github.com/elastic/beats/filebeat/prospector/log"
 	"github.com/elastic/beats/libbeat/common"
-	"github.com/elastic/beats/libbeat/logp"
 )
 
 // Prospector is a prospector for stdin
@@ -46,11 +46,6 @@ func (p *Prospector) Run() {
 
 	// Make sure stdin harvester is only started once
 	if !p.started {
-		err := p.harvester.Setup()
-		if err != nil {
-			logp.Err("Error setting up stdin harvester: %s", err)
-			return
-		}
 		p.registry.Start(p.harvester)
 		p.started = true
 	}
@@ -66,6 +61,7 @@ func (p *Prospector) createHarvester(state file.State) (*log.Harvester, error) {
 		state,
 		nil,
 		outlet,
+		log.Pipe{File: os.Stdin},
 	)
 
 	return h, err

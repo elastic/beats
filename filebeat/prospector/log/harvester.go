@@ -71,6 +71,7 @@ func NewHarvester(
 	state file.State,
 	states *file.States,
 	outlet harvester.Outlet,
+	source harvester.Source,
 ) (*Harvester, error) {
 
 	h := &Harvester{
@@ -80,6 +81,7 @@ func NewHarvester(
 		done:   make(chan struct{}),
 		stopWg: &sync.WaitGroup{},
 		id:     uuid.NewV4(),
+		source: source,
 	}
 
 	if err := config.Unpack(&h.config); err != nil {
@@ -159,6 +161,11 @@ func (h *Harvester) Run() error {
 		h.stopWg.Done()
 		return nil
 	default:
+	}
+
+	err := h.Setup()
+	if err != nil {
+		return err
 	}
 
 	defer func() {
