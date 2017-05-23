@@ -128,8 +128,7 @@ func StrFromNum(key string, opts ...schema.SchemaOption) schema.Conv {
 func toStr(key string, data map[string]interface{}) (interface{}, error) {
 	emptyIface, err := common.MapStr(data).GetValue(key)
 	if err != nil {
-		fmt.Println(err)
-		return "", fmt.Errorf("Key %s not found", key)
+		return "", fmt.Errorf("Key %s not found: %s", key, err.Error())
 	}
 	str, ok := emptyIface.(string)
 	if !ok {
