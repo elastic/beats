@@ -1,0 +1,61 @@
+[[running-on-docker]]
+== Running {beatname_uc} on Docker
+
+Docker images for {beatname_uc} are available from the Elastic Docker
+registry. You can retrieve an image with a `docker pull` command.
+
+ifeval::["{release-state}"=="unreleased"]
+
+However, version {stack-version} of {beatname_uc} has not yet been
+released, so no Docker image is currently available for this version.
+
+endif::[]
+
+ifeval::["{release-state}"!="unreleased"]
+
+["source", "sh", subs="attributes"]
+------------------------------------------------
+docker pull {dockerimage}
+------------------------------------------------
+
+endif::[]
+
+The base image is https://hub.docker.com/_/centos/[centos:7] and the source
+code can be found on
+https://github.com/elastic/beats-docker/tree/{doc-branch}[GitHub].
+
+[float]
+=== Configuring {beatname_uc} on Docker
+
+The Docker image provides several methods for configuring {beatname_uc}. The
+conventional approach is to provide a configuration file via a bind-mounted
+volume, but it's also possible to create a custom image with your
+configuration included.
+
+[float]
+==== Bind-Mounted Configuration
+
+One way to configure {beatname_uc} on Docker is to provide +{beatname_lc}.yml+ via bind-mounting.
+With +docker run+, the bind-mount can be specified like this:
+
+["source", "sh", subs="attributes"]
+--------------------------------------------
+docker run \
+  -v ~/{beatname_lc}.yml:/usr/share/{beatname_lc}/{beatname_lc}.yml \
+  {dockerimage}
+--------------------------------------------
+
+[float]
+==== Custom Image Configuration
+
+It's possible to embed your {beatname_uc} configuration in a custom image.
+Here is an example Dockerfile to achieve this:
+
+["source", "dockerfile", subs="attributes"]
+--------------------------------------------
+FROM {dockerimage}
+COPY {beatname_lc}.yml /usr/share/{beatname_lc}/{beatname_lc}.yml
+USER root
+RUN chown {beatname_lc} /usr/share/{beatname_lc}/{beatname_lc}.yml
+USER {beatname_lc}
+--------------------------------------------

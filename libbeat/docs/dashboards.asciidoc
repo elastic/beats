@@ -16,7 +16,7 @@
 
 {beatname_uc} comes packaged with the `scripts/import_dashboards` script that you can use to import the example dashboards,
 visualizations, and searches for {beatname_uc}. The script also creates an index pattern,
-+{beatname_lc}-*+, for {beatname_uc}. 
++{beatname_lc}-*+, for {beatname_uc}.
 
 The steps in this section show how to import {beatname_uc} dashboards. You may want to import dashboards for more than
 one Beat or specify import options that aren't described here. See {libbeat}/import-dashboards.html[Importing Existing Beat Dashboards]
@@ -28,21 +28,28 @@ ifdef::allplatforms[]
 
 *deb, rpm, and mac:*
 
-From the directory where you installed {beatname_uc}, run the `import_dashboards` script. 
+From the directory where you installed {beatname_uc}, run the `import_dashboards` script.
 
 ["source","sh",subs="attributes,callouts"]
 ----------------------------------------------------------------------
 ./scripts/import_dashboards
 ----------------------------------------------------------------------
 
-On deb and rpm, the `scripts` folder is located under the home path, which is +/usr/share/{beatname_lc}/+ unless you change it.
+*docker:*
+
+["source","sh",subs="attributes"]
+----------------------------------------------------------------------
+docker run {dockerimage} ./scripts/import_dashboards
+----------------------------------------------------------------------
+
+On deb, rpm, and docker, the `scripts` folder is located under the home path, which is +/usr/share/{beatname_lc}/+ unless you change it.
 
 By default, the script assumes that you are running Elasticsearch on `127.0.0.1:9200`. Use the `-es` option
-to specify a different location. For example: 
+to specify a different location. For example:
 
 ["source","sh",subs="attributes,callouts"]
 ----------------------------------------------------------------------
-./scripts/import_dashboards -es http://192.168.33.60:9200 
+./scripts/import_dashboards -es http://192.168.33.60:9200
 ----------------------------------------------------------------------
 
 Use the `-user` option to specify the username and password to use for Elasticsearch authentication. There are a few ways to pass
@@ -51,7 +58,7 @@ in the username and password. For example:
 ["source","sh",subs="attributes,callouts"]
 -----------------------------------------------------------------------
 ./scripts/import_dashboards -es https://xyz.found.io -user user -pass password <1>
-./scripts/import_dashboards -es https://xyz.found.io -user admin -pass $(cat ~/pass-file) <2> 
+./scripts/import_dashboards -es https://xyz.found.io -user admin -pass $(cat ~/pass-file) <2>
 -----------------------------------------------------------------------
 
 <1> Specify the username and password as options.
@@ -63,7 +70,7 @@ endif::allplatforms[]
 
 Open a PowerShell prompt as an Administrator (right-click the PowerShell icon
 and select *Run As Administrator*). If you are running Windows XP, you may need
-to download and install PowerShell. 
+to download and install PowerShell.
 
 From the PowerShell prompt, change to the directory where you installed {beatname_uc}, and run the
 `import_dashboards.exe` script:
@@ -103,6 +110,6 @@ pattern is selected to see {beatname_uc} data.
 image:./images/kibana-created-indexes.png[Discover tab with index selected]
 
 To open the loaded dashboards, go to the *Dashboard* page and select the
-dashboard that you want to open. 
+dashboard that you want to open.
 
 image:./images/kibana-navigation-vis.png[Navigation widget in Kibana]
