@@ -6,6 +6,7 @@ import (
 
 	"github.com/elastic/beats/filebeat/channel"
 	"github.com/elastic/beats/filebeat/harvester"
+	"github.com/elastic/beats/filebeat/harvester/encoding"
 	"github.com/elastic/beats/filebeat/input/file"
 	"github.com/elastic/beats/filebeat/prospector/log"
 	"github.com/elastic/beats/libbeat/common"
@@ -13,11 +14,13 @@ import (
 
 // Prospector is a prospector for stdin
 type Prospector struct {
-	harvester *log.Harvester
-	started   bool
-	cfg       *common.Config
-	outlet    channel.Outleter
-	registry  *harvester.Registry
+	harvester       *log.Harvester
+	started         bool
+	cfg             *common.Config
+	config          config
+	outlet          channel.Outleter
+	registry        *harvester.Registry
+	encodingFactory encoding.EncodingFactory
 }
 
 // NewStdin creates a new stdin prospector
@@ -31,12 +34,21 @@ func NewProspector(cfg *common.Config, outlet channel.Outleter) (*Prospector, er
 		registry: harvester.NewRegistry(),
 	}
 
-	var err error
+	if err := cfg.Unpack(&p.config); err != nil {
+		return nil, err
+	}
 
+	var err error
 	p.harvester, err = p.createHarvester(file.State{Source: "-"})
 	if err != nil {
 		return nil, fmt.Errorf("Error initializing stdin harvester: %v", err)
 	}
+
+	encodingFactory, ok := encoding.FindEncoding(p.config.Encoding)
+	if !ok || encodingFactory == nil {
+		return nil, fmt.Errorf("unknown encoding('%v')", p.config.Encoding)
+	}
+	p.encodingFactory = encodingFactory
 
 	return p, nil
 }
@@ -62,6 +74,7 @@ func (p *Prospector) createHarvester(state file.State) (*log.Harvester, error) {
 		nil,
 		outlet,
 		log.Pipe{File: os.Stdin},
+		p.encodingFactory,
 	)
 
 	return h, err

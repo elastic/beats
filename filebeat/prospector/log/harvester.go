@@ -72,6 +72,7 @@ func NewHarvester(
 	states *file.States,
 	outlet harvester.Outlet,
 	source harvester.Source,
+	encodingFactory encoding.EncodingFactory,
 ) (*Harvester, error) {
 
 	h := &Harvester{
@@ -88,10 +89,6 @@ func NewHarvester(
 		return nil, err
 	}
 
-	encodingFactory, ok := encoding.FindEncoding(h.config.Encoding)
-	if !ok || encodingFactory == nil {
-		return nil, fmt.Errorf("unknown encoding('%v')", h.config.Encoding)
-	}
 	h.encodingFactory = encodingFactory
 
 	// Add ttl if clean_inactive is set
