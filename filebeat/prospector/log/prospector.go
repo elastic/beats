@@ -9,7 +9,6 @@ import (
 
 	"github.com/elastic/beats/filebeat/channel"
 	"github.com/elastic/beats/filebeat/harvester"
-	"github.com/elastic/beats/filebeat/harvester/encoding"
 	"github.com/elastic/beats/filebeat/input/file"
 	"github.com/elastic/beats/filebeat/util"
 	"github.com/elastic/beats/libbeat/common"
@@ -29,13 +28,12 @@ var (
 
 // Prospector contains the prospector and its config
 type Prospector struct {
-	cfg             *common.Config
-	config          config
-	states          *file.States
-	registry        *harvester.Registry
-	outlet          channel.Outleter
-	done            chan struct{}
-	encodingFactory encoding.EncodingFactory
+	cfg      *common.Config
+	config   config
+	states   *file.States
+	registry *harvester.Registry
+	outlet   channel.Outleter
+	done     chan struct{}
 }
 
 // NewProspector instantiates a new Log
@@ -65,12 +63,6 @@ func NewProspector(cfg *common.Config, states []file.State, outlet channel.Outle
 	if err := p.loadStates(states); err != nil {
 		return nil, err
 	}
-
-	encodingFactory, ok := encoding.FindEncoding(p.config.Encoding)
-	if !ok || encodingFactory == nil {
-		return nil, fmt.Errorf("unknown encoding('%v')", p.config.Encoding)
-	}
-	p.encodingFactory = encodingFactory
 
 	logp.Debug("prospector", "File Configs: %v", p.config.Paths)
 
@@ -454,7 +446,6 @@ func (p *Prospector) createHarvester(state file.State) (*Harvester, error) {
 		p.states,
 		outlet,
 		File{},
-		p.encodingFactory,
 	)
 
 	return h, err

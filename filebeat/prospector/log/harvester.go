@@ -50,19 +50,18 @@ var (
 
 // Harvester contains all harvester related data
 type Harvester struct {
-	forwarder       *harvester.Forwarder
-	config          config
-	state           file.State
-	states          *file.States
-	source          harvester.Source // the source being watched
-	log             *Log
-	encodingFactory encoding.EncodingFactory
-	encoding        encoding.Encoding
-	done            chan struct{}
-	stopOnce        sync.Once
-	stopWg          *sync.WaitGroup
-	id              uuid.UUID
-	reader          reader.Reader
+	forwarder *harvester.Forwarder
+	config    config
+	state     file.State
+	states    *file.States
+	source    harvester.Source // the source being watched
+	log       *Log
+	encoding  encoding.Encoding
+	done      chan struct{}
+	stopOnce  sync.Once
+	stopWg    *sync.WaitGroup
+	id        uuid.UUID
+	reader    reader.Reader
 }
 
 // NewHarvester creates a new harvester
@@ -72,7 +71,6 @@ func NewHarvester(
 	states *file.States,
 	outlet harvester.Outlet,
 	source harvester.Source,
-	encodingFactory encoding.EncodingFactory,
 ) (*Harvester, error) {
 
 	h := &Harvester{
@@ -88,8 +86,6 @@ func NewHarvester(
 	if err := config.Unpack(&h.config); err != nil {
 		return nil, err
 	}
-
-	h.encodingFactory = encodingFactory
 
 	// Add ttl if clean_inactive is set
 	if h.config.CleanInactive > 0 {
@@ -396,7 +392,12 @@ func (h *Harvester) validateFile(f *os.File) error {
 		return errors.New("file info is not identical with opened file. Aborting harvesting and retrying file later again")
 	}
 
-	h.encoding, err = h.encodingFactory(f)
+	encodingFactory, ok := encoding.FindEncoding(h.config.Encoding)
+	if !ok || encodingFactory == nil {
+		return fmt.Errorf("unknown encoding('%v')", h.config.Encoding)
+	}
+
+	h.encoding, err = encodingFactory(f)
 	if err != nil {
 
 		if err == transform.ErrShortSrc {
