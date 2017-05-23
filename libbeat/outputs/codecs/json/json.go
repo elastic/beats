@@ -1,8 +1,6 @@
 package json
 
 import (
-	"encoding/json"
-
 	"github.com/elastic/beats/libbeat/common"
 	"github.com/elastic/beats/libbeat/logp"
 	"github.com/elastic/beats/libbeat/outputs"
@@ -38,17 +36,12 @@ func New(pretty bool) *Encoder {
 }
 
 func (e *Encoder) Encode(event common.MapStr) ([]byte, error) {
-	var err error
-	var serializedEvent []byte
 
-	if e.Pretty {
-		serializedEvent, err = json.MarshalIndent(event, "", "  ")
-	} else {
-		serializedEvent, err = json.Marshal(event)
-	}
+	buffer, err := common.JSONEncode(event, e.Pretty)
 	if err != nil {
 		logp.Err("Fail to convert the event to JSON (%v): %#v", err, event)
+		return nil, err
 	}
 
-	return serializedEvent, err
+	return buffer, nil
 }

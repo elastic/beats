@@ -67,7 +67,6 @@ func (rotator *FileRotator) WriteLine(line []byte) error {
 		}
 	}
 
-	line = append(line, '\n')
 	_, err := rotator.current.Write(line)
 	if err != nil {
 		return err
