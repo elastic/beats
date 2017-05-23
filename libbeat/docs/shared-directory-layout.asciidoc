@@ -29,7 +29,7 @@ file.
 
 ==== Default paths
 
-{beatname_uc} uses the following default paths unless you explicitly change them. 
+{beatname_uc} uses the following default paths unless you explicitly change them.
 
 [float]
 ===== deb and rpm
@@ -47,6 +47,18 @@ For the deb and rpm distributions, these paths are set in the init script or in
 the systemd unit file.  Make sure that you start the {beatname_uc} service by using
 the preferred operating system method (init scripts or `systemctl`).
 Otherwise the paths might be set incorrectly.
+
+[float]
+===== docker
+[cols="<h,<,<m",options="header",]
+|=======================================================================
+| Type | Description | Location
+| home | Home of the {beatname_uc} installation. | /usr/share/{beatname_lc}
+| bin  | The location for the binary files. | /usr/share/{beatname_lc}
+| conf | The location for configuration files. | /usr/share/{beatname_lc}
+| data | The location for persistent data files. | /usr/share/{beatname_lc}/data
+| logs | The location for the logs created by {beatname_uc}. | /usr/share//{beatname_lc}/logs
+|=======================================================================
 
 [float]
 ===== zip, tar.gz, and tgz
