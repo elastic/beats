@@ -8,7 +8,7 @@
 // Template, add newest changes here
 
 === Beats version HEAD
-https://github.com/elastic/beats/compare/v5.3.2...master[Check the HEAD diff]
+https://github.com/elastic/beats/compare/v5.3.3...master[Check the HEAD diff]
 
 ==== Breaking changes
 
@@ -28,7 +28,7 @@ https://github.com/elastic/beats/compare/v5.3.2...master[Check the HEAD diff]
 ==== Bugfixes
 
 *Affecting all Beats*
-- Fix console output {pull}4045[4045]
+
 
 *Filebeat*
 
@@ -86,6 +86,17 @@ https://github.com/elastic/beats/compare/v5.3.2...master[Check the HEAD diff]
 
 ////////////////////////////////////////////////////////////
 
+[[release-notes-5.3.3]]
+=== Beats version 5.3.3
+https://github.com/elastic/beats/compare/v5.3.2...v5.3.3[View commits]
+
+==== Bugfixes
+
+*Affecting all Beats*
+
+- Fix panic due to race condition in Kafka output. {pull}4098[4098]
+- Fix console output {pull}4045[4045]
+
 [[release-notes-5.3.2]]
 === Beats version 5.3.2
 https://github.com/elastic/beats/compare/v5.3.1...v5.3.2[View commits]
@@ -107,7 +118,6 @@ https://github.com/elastic/beats/compare/v5.3.0...v5.3.1[View commits]
 *Affecting all Beats*
 
 - Fix panic when testing regex-AST to match against date patterns. {issue}3889[3889]
-- Fix panic due to race condition in kafka output. {pull}4098[4098]
 
 *Filebeat*
 
