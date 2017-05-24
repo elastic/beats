@@ -336,3 +336,19 @@ SetAdCodeMiddleware.default_ad_code route """
         output = self.read_output_json()
         output[0]["message"] = logentry1
         output[1]["message"] = logentry2
+
+    def test_invalid_config(self):
+        """
+        Test that filebeat errors if pattern is missing config
+        """
+        self.render_config_template(
+            path=os.path.abspath(self.working_dir + "/log/") + "*",
+            multiline=True,
+            match="after",
+        )
+
+        proc = self.start_beat()
+
+        self.wait_until(lambda: self.log_contains("missing required field accessing") == 1)
+
+        proc.check_kill_and_wait(exit_code=1)
