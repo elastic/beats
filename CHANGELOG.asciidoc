@@ -16,6 +16,7 @@ https://github.com/elastic/beats/compare/v6.0.0-alpha1...master[Check the HEAD d
 
 *Filebeat*
 - Rename `input_type` field to `prospector.type` {pull}4294[4294]
+- The `@metadata.type` field, added by the Logstash output, is now hardcoded to `doc` and will be removed in future versions. {pull}4331[4331].
 
 *Heartbeat*
 
@@ -35,6 +36,7 @@ https://github.com/elastic/beats/compare/v6.0.0-alpha1...master[Check the HEAD d
 
 *Filebeat*
 - Fix race condition on harvester stopping with reloading enabled. {issue}3779[3779]
+- Fix recursive glob config parsing and resolution across restarts. {pull}4269[4269]
 
 *Heartbeat*
 
@@ -42,6 +44,9 @@ https://github.com/elastic/beats/compare/v6.0.0-alpha1...master[Check the HEAD d
 - Fix a debug statement that said a module wrapper had stopped when it hadn't. {pull}4264[4264]
 - Use MemAvailable value from /proc/meminfo on Linux 3.14. {pull}4316[4316]
 - Fix panic when events were dropped by filters. {issue}4327[4327]
+- Add filtering to system filesystem metricset to remove relative mountpoints like those
+  from Linux network namespaces. {pull}4370[4370]
+- Remove unnecessary print statement in schema apis {pull}4355[4355]
 
 *Packetbeat*
 
@@ -52,7 +57,8 @@ https://github.com/elastic/beats/compare/v6.0.0-alpha1...master[Check the HEAD d
 *Affecting all Beats*
 
 - Added the possibility to set Elasticsearch mapping template settings from the Beat configuration file. {pull}4284[4284] {pull}4317[4317]
-- Added a variable to the SysV init scripts to make it easier to change the user. {pull}4340[4340]
+- Add a variable to the SysV init scripts to make it easier to change the user. {pull}4340[4340]
+- Add the option to write the generated Elasticsearch mapping template into a file. {pull}4323[4323]
 
 *Filebeat*
 
@@ -63,6 +69,8 @@ https://github.com/elastic/beats/compare/v6.0.0-alpha1...master[Check the HEAD d
 - Add macOS implementation of the system diskio metricset. {issue}4144[4144]
 - Add process_summary metricset that records high level metrics about processes. {pull}4231[4231]
 - Add `kube-state-metrics` based metrics to `kubernetes` module {pull}4253[4253]
+- Add debug logging to Jolokia JMX metricset. {pull}4341[4341]
+- Add events metricset for kubernetes metricbeat module {pull}4315[4315]
 
 *Packetbeat*
 
@@ -71,6 +79,8 @@ https://github.com/elastic/beats/compare/v6.0.0-alpha1...master[Check the HEAD d
 ==== Deprecated
 
 *Affecting all Beats*
+
+- The `@metadata.type` field, added by the Logstash output, is deprecated, hardcoded to `doc` and will be removed in future versions. {pull}4331[4331].
 
 *Filebeat*
 - Deprecate `input_type` prospector config. Use `type` config option instead. {pull}4294[4294]

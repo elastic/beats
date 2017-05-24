@@ -36,7 +36,7 @@ type Prospector struct {
 	done     chan struct{}
 }
 
-// NewLog instantiates a new Log
+// NewProspector instantiates a new Log
 func NewProspector(cfg *common.Config, states []file.State, outlet channel.Outleter, done chan struct{}) (*Prospector, error) {
 
 	p := &Prospector{
@@ -49,6 +49,10 @@ func NewProspector(cfg *common.Config, states []file.State, outlet channel.Outle
 	}
 
 	if err := cfg.Unpack(&p.config); err != nil {
+		return nil, err
+	}
+	if err := p.config.resolvePaths(); err != nil {
+		logp.Err("Failed to resolve paths in config: %+v", err)
 		return nil, err
 	}
 
@@ -175,11 +179,7 @@ func (p *Prospector) getFiles() map[string]os.FileInfo {
 	paths := map[string]os.FileInfo{}
 
 	for _, path := range p.config.Paths {
-		depth := uint8(0)
-		if p.config.recursiveGlob {
-			depth = recursiveGlobDepth
-		}
-		matches, err := file.Glob(path, depth)
+		matches, err := filepath.Glob(path)
 		if err != nil {
 			logp.Err("glob(%s) failed: %v", path, err)
 			continue
