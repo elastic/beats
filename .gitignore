@@ -15,6 +15,7 @@
 *.dev.yml
 *.generated.yml
 coverage.out
+.python-version
 
 # Editor swap files
 *.swp
