@@ -1,0 +1,8 @@
+- module: rabbitmq
+  metricsets: ["node"]
+  enabled: false
+  period: 10s
+  hosts: ["localhost:15672"]
+
+  username: guest
+  password: guest

@@ -385,6 +385,16 @@ metricbeat.modules:
   metrics_path: /metrics
   #namespace: example
 
+#------------------------------ rabbitmq Module ------------------------------
+- module: rabbitmq
+  metricsets: ["node"]
+  enabled: false
+  period: 10s
+  hosts: ["localhost:15672"]
+
+  username: guest
+  password: guest
+
 #-------------------------------- Redis Module -------------------------------
 - module: redis
   metricsets: ["info", "keyspace"]
