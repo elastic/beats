@@ -1,7 +1,10 @@
+from __future__ import print_function
+
 import glob
 import os
 import datetime
 import argparse
+import six
 
 
 def read_file(filename):
@@ -10,7 +13,7 @@ def read_file(filename):
         print("File not found {}".format(filename))
         return ""
 
-    with open(filename, 'r') as f:
+    with open(filename, 'rb') as f:
         file_content = f.read()
         return file_content
 
@@ -22,7 +25,7 @@ def get_library_path(license):
     split = license.split(os.sep)
     for i, word in reversed(list(enumerate(split))):
         if word == "vendor":
-            return "/".join(split[i+1:])
+            return "/".join(split[i + 1:])
     return "/".join(split)
 
 
@@ -41,17 +44,18 @@ def add_licenses(f, vendor_dirs):
     # Sort licenses by package path, ignore upper / lower case
     for key in sorted(licenses, key=str.lower):
         license_file = licenses[key]
-        f.write("\n--------------------------------------------------------------------\n")
-        f.write("{}\n".format(key))
-        f.write("--------------------------------------------------------------------\n")
+        f.write(six.b("\n--------------------------------------------------------------------\n"))
+        f.write(six.b("{}\n".format(key)))
+        f.write(six.b("--------------------------------------------------------------------\n"))
         copyright = read_file(license_file)
-        if "Apache License" not in copyright:
+        if six.b('Apache License') not in copyright:
             f.write(copyright)
         else:
             # it's an Apache License, so include only the NOTICE file
-            f.write("Apache License\n\n")
+            f.write(six.b("Apache License\n\n"))
             for notice_file in glob.glob(os.path.join(os.path.dirname(license_file), "NOTICE*")):
-                f.write("-------{}-----\n".format(os.path.basename(notice_file)))
+                notice_file_hdr = "-------{}-----\n".format(os.path.basename(notice_file))
+                f.write(six.b(notice_file_hdr))
                 f.write(read_file(notice_file))
 
 
@@ -59,19 +63,19 @@ def create_notice(filename, beat, copyright, vendor_dirs):
 
     now = datetime.datetime.now()
 
-    with open(filename, "w+") as f:
+    with open(filename, "wb+") as f:
 
         # Add header
-        f.write("{}\n".format(beat))
-        f.write("Copyright 2014-{0} {1}\n".format(now.year, copyright))
-        f.write("\n")
-        f.write("This product includes software developed by The Apache Software \n" +
-                "Foundation (http://www.apache.org/).\n\n")
+        f.write(six.b("{}\n".format(beat)))
+        f.write(six.b("Copyright 2014-{0} {1}\n".format(now.year, copyright)))
+        f.write(six.b("\n"))
+        f.write(six.b("This product includes software developed by The Apache Software \n") +
+                six.b("Foundation (http://www.apache.org/).\n\n"))
 
         # Add licenses for 3rd party libraries
-        f.write("==========================================================================\n")
-        f.write("Third party libraries used by the Beats project:\n")
-        f.write("==========================================================================\n\n")
+        f.write(six.b("==========================================================================\n"))
+        f.write(six.b("Third party libraries used by the Beats project:\n"))
+        f.write(six.b("==========================================================================\n\n"))
         add_licenses(f, vendor_dirs)
 
 
@@ -92,7 +96,7 @@ if __name__ == "__main__":
     notice = os.path.join(cwd, "NOTICE")
     vendor_dirs = []
 
-    print args.vendor
+    print(args.vendor)
 
     for root, dirs, files in os.walk(args.vendor):
 
