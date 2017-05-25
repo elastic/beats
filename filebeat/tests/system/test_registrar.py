@@ -1,9 +1,11 @@
+#!/usr/bin/env python
 """Test the registrar"""
 
 import os
 import platform
 import time
 import shutil
+
 from filebeat import BaseTest
 from nose.plugins.skip import SkipTest
 
@@ -323,7 +325,7 @@ class Test(BaseTest):
 
     def test_restart_continue(self):
         """
-        Check that file readining continues after restart
+        Check that file reading continues after restart
         """
         self.render_config_template(
             path=os.path.abspath(self.working_dir) + "/log/input*",
@@ -1396,3 +1398,8 @@ class Test(BaseTest):
                 "inode": stat.st_ino,
                 "device": stat.st_dev,
             }, file_state_os)
+
+
+if __name__ == '__main__':
+    import unittest
+    unittest.main()

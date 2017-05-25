@@ -210,7 +210,6 @@ func partTestSimple(N int, makeKey bool) partTestScenario {
 
 			event := common.MapStr{
 				"@timestamp": common.Time(ts),
-				"type":       "test",
 				"message":    randString(20),
 			}
 
@@ -263,7 +262,6 @@ func partTestHashInvariant(N int) partTestScenario {
 
 			event := common.MapStr{
 				"@timestamp": common.Time(ts),
-				"type":       "test",
 				"message":    randString(20),
 			}
 

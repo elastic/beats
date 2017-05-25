@@ -1,7 +1,10 @@
+from __future__ import print_function
+
 import glob
 import os
 import datetime
 import argparse
+import json
 
 
 def read_file(filename):
@@ -10,45 +13,86 @@ def read_file(filename):
         print("File not found {}".format(filename))
         return ""
 
-    with open(filename, 'r') as f:
-        file_content = f.read()
-        return file_content
+    try:
+        with open(filename, 'r') as f:
+            return f.read()
+    except UnicodeDecodeError:
+        # try latin-1
+        with open(filename, 'r', encoding="ISO-8859-1") as f:
+            return f.read()
 
 
-def get_library_name(license):
-
-    lib = ""
-    path = os.path.dirname(license)
-    # get the last three directories
-    for i in range(0, 3):
-        path, x = os.path.split(path)
-        if len(lib) == 0:
-            lib = x
-        elif len(x) > 0:
-            lib = x + "/" + lib
-
-    return lib
+def get_library_path(license):
+    """
+    Get the contents up to the vendor folder.
+    """
+    split = license.split(os.sep)
+    for i, word in reversed(list(enumerate(split))):
+        if word == "vendor":
+            return "/".join(split[i + 1:])
+    return "/".join(split)
 
 
-def add_licenses(f, licenses):
+def add_licenses(f, vendor_dirs):
+    dependencies = {}   # lib_path -> [array of lib]
+    for vendor in vendor_dirs:
+        libs = read_versions(vendor)
 
-    for license in licenses:
-        for license_file in sorted(glob.glob(license)):
+        # walk looking for LICENSE files
+        for root, dirs, filenames in os.walk(vendor):
+            for filename in sorted(filenames):
+                if filename.startswith("LICENSE"):
+                    lib_path = get_library_path(root)
+                    lib_search = [l for l in libs if l["path"].startswith(lib_path)]
+                    if len(lib_search) == 0:
+                        print("WARNING: No version information found for: {}".format(lib_path))
+                        lib = {"path": lib_path}
+                    else:
+                        lib = lib_search[0]
+                    lib["license_file"] = os.path.join(root, filename)
+
+                    if lib_path not in dependencies:
+                        dependencies[lib_path] = [lib]
+                    else:
+                        dependencies[lib_path].append(lib)
+
+            # don't walk down into another vendor dir
+            if "vendor" in dirs:
+                dirs.remove("vendor")
+
+    # Sort licenses by package path, ignore upper / lower case
+    for key in sorted(dependencies, key=str.lower):
+        for lib in dependencies[key]:
             f.write("\n--------------------------------------------------------------------\n")
-            f.write("{}\n".format(get_library_name(license_file)))
+            f.write("Dependency: {}\n".format(key))
+            if "version" in lib:
+                f.write("Version: {}\n".format(lib["version"]))
+            if "revision" in lib:
+                f.write("Revision: {}\n".format(lib["revision"]))
+            f.write("{}:\n".format(lib["license_file"]))
             f.write("--------------------------------------------------------------------\n")
-            copyright = read_file(license_file)
+            copyright = read_file(lib["license_file"])
             if "Apache License" not in copyright:
                 f.write(copyright)
             else:
                 # it's an Apache License, so include only the NOTICE file
                 f.write("Apache License\n\n")
-                for notice_file in glob.glob(os.path.join(os.path.dirname(license_file), "NOTICE*")):
-                    f.write("-------{}-----\n".format(os.path.basename(notice_file)))
+                for notice_file in glob.glob(os.path.join(os.path.dirname(lib["license_file"]), "NOTICE*")):
+                    notice_file_hdr = "-------{}-----\n".format(os.path.basename(notice_file))
+                    f.write(notice_file_hdr)
                     f.write(read_file(notice_file))
 
 
-def create_notice(filename, beat, copyright, licenses):
+def read_versions(vendor):
+    libs = []
+    with open(os.path.join(vendor, "vendor.json")) as f:
+        govendor = json.load(f)
+        for package in govendor["package"]:
+            libs.append(package)
+    return libs
+
+
+def create_notice(filename, beat, copyright, vendor_dirs):
 
     now = datetime.datetime.now()
 
@@ -58,14 +102,17 @@ def create_notice(filename, beat, copyright, licenses):
         f.write("{}\n".format(beat))
         f.write("Copyright 2014-{0} {1}\n".format(now.year, copyright))
         f.write("\n")
-        f.write("This product includes software developed by The Apache Software \nFoundation (http://www.apache.org/).\n\n")
+        f.write("This product includes software developed by The Apache Software \n" +
+                "Foundation (http://www.apache.org/).\n\n")
 
         # Add licenses for 3rd party libraries
         f.write("==========================================================================\n")
         f.write("Third party libraries used by the Beats project:\n")
         f.write("==========================================================================\n\n")
-        add_licenses(f, licenses)
+        add_licenses(f, vendor_dirs)
 
+
+EXCLUDES = ["dev-tools"]
 
 if __name__ == "__main__":
 
@@ -82,16 +129,25 @@ if __name__ == "__main__":
 
     cwd = os.getcwd()
     notice = os.path.join(cwd, "NOTICE")
-    licenses = []
+    vendor_dirs = []
+
+    print(args.vendor)
 
     for root, dirs, files in os.walk(args.vendor):
-        dirs.sort()
-        if 'vendor' in dirs:
-            license = os.path.join(os.path.join(root, 'vendor'),
-                                   '**/**/**/LICENSE*')
-            licenses.append(license)
 
-    print("Get the licenses available from {}".format(licenses))
-    create_notice(notice, args.beat, args.copyright, licenses)
+        # Skips all hidden paths like ".git"
+        if '/.' in root:
+            continue
+
+        if 'vendor' in dirs:
+            vendor_dirs.append(os.path.join(root, 'vendor'))
+            dirs.remove('vendor')   # don't walk down into sub-vendors
+
+        for exclude in EXCLUDES:
+            if exclude in dirs:
+                dirs.remove(exclude)
+
+    print("Get the licenses available from {}".format(vendor_dirs))
+    create_notice(notice, args.beat, args.copyright, vendor_dirs)
 
     print("Available at {}\n".format(notice))

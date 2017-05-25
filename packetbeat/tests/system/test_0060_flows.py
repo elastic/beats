@@ -1,13 +1,13 @@
 from packetbeat import (BaseTest, FLOWS_REQUIRED_FIELDS)
-
 from pprint import PrettyPrinter
+import six
 
 
 def pprint(x): return PrettyPrinter().pprint(x)
 
 
 def check_fields(flow, fields):
-    for k, v in fields.iteritems():
+    for k, v in six.iteritems(fields):
         assert flow[k] == v
 
 
