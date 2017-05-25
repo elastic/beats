@@ -274,7 +274,6 @@ func (stream *tdsStream) prepareForNewMessage() {
 
 func tdsMessageParser(s *tdsStream) (bool, bool) {
 
-	//logp.Info("Inside tdsMessageParser")
 	m := s.message
 	for s.parseOffset < len(s.data) {
 		m.start = s.parseOffset
