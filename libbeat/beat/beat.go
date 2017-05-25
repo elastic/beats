@@ -43,8 +43,6 @@ import (
 	"strings"
 	"time"
 
-	"github.com/satori/go.uuid"
-
 	"github.com/elastic/beats/filebeat/input/file"
 	"github.com/elastic/beats/libbeat/api"
 	"github.com/elastic/beats/libbeat/cfgfile"

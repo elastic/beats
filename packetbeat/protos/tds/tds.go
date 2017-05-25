@@ -17,59 +17,58 @@ import (
 
 // Packet types
 const (
-	TDS_7_Query = 0x01
-	TDS_RPC = 0x03
+	TDS_7_Query         = 0x01
+	TDS_RPC             = 0x03
 	TDS_Server_Response = 0x04
-	TDS_Cancels = 0x06
-	TDS_BulkCopy = 0x07
-	TDS_7_Login = 0x10
-	TDS_7_Auth = 0x11
-	TDS_8_Prelogin = 0x12
+	TDS_Cancels         = 0x06
+	TDS_BulkCopy        = 0x07
+	TDS_7_Login         = 0x10
+	TDS_7_Auth          = 0x11
+	TDS_8_Prelogin      = 0x12
 )
 
 // Types
 const (
-	SYBVOID = 0x1F
-	SYBIMAGE = 0x22
-	SYBTEXT = 0x23
-	SYBUNIQUE = 0x24
-	SYBVARBINARY = 0x25
-	SYBINTN	= 0x26
-	SYBVARCHAR = 0x27
-	SYBBINARY = 0x2D
-	SYBCHAR	= 0x2F
-	SYBINT1	= 0x30
-	SYBBIT = 0x32
-	SYBINT2	= 0x34
-	SYBINT4	= 0x38
-	SYBDATETIME4 = 0x3A
-	SYBREAL	= 0x3B
-	SYBMONEY = 0x3C
-	SYBDATETIME = 0x3D
-	SYBFLT8	= 0x3E
-	SYBSINT1 = 0x40
-	SYBUINT2 = 0x41
-	SYBUINT4 = 0x42
-	SYBUINT8 = 0x43
-	SYBVARIANT = 0x62
-	SYBNTEXT = 0x63
-	SYBNVARCHAR = 0x67
-	SYBBITN	= 0x68
-	SYBDECIMAL = 0x6A
-	SYBNUMERIC = 0x6C
-	SYBFLTN	= 0x6D
-	SYBMONEYN = 0x6E
-	SYBDATETIMN = 0x6F
-	SYBMONEY4 = 0x7A
-	SYBINT8	= 0x7F
+	SYBVOID       = 0x1F
+	SYBIMAGE      = 0x22
+	SYBTEXT       = 0x23
+	SYBUNIQUE     = 0x24
+	SYBVARBINARY  = 0x25
+	SYBINTN       = 0x26
+	SYBVARCHAR    = 0x27
+	SYBBINARY     = 0x2D
+	SYBCHAR       = 0x2F
+	SYBINT1       = 0x30
+	SYBBIT        = 0x32
+	SYBINT2       = 0x34
+	SYBINT4       = 0x38
+	SYBDATETIME4  = 0x3A
+	SYBREAL       = 0x3B
+	SYBMONEY      = 0x3C
+	SYBDATETIME   = 0x3D
+	SYBFLT8       = 0x3E
+	SYBSINT1      = 0x40
+	SYBUINT2      = 0x41
+	SYBUINT4      = 0x42
+	SYBUINT8      = 0x43
+	SYBVARIANT    = 0x62
+	SYBNTEXT      = 0x63
+	SYBNVARCHAR   = 0x67
+	SYBBITN       = 0x68
+	SYBDECIMAL    = 0x6A
+	SYBNUMERIC    = 0x6C
+	SYBFLTN       = 0x6D
+	SYBMONEYN     = 0x6E
+	SYBDATETIMN   = 0x6F
+	SYBMONEY4     = 0x7A
+	SYBINT8       = 0x7F
 	XSYBVARBINARY = 0xA5
-	XSYBVARCHAR	= 0xA7
-	XSYBBINARY = 0xAD
-	XSYBCHAR = 0xAF
+	XSYBVARCHAR   = 0xA7
+	XSYBBINARY    = 0xAD
+	XSYBCHAR      = 0xAF
 	SYBLONGBINARY = 0xE1
-	XSYBNVARCHAR = 0xE7
-	XSYBNCHAR = 0xEF
-
+	XSYBNVARCHAR  = 0xE7
+	XSYBNCHAR     = 0xEF
 )
 
 const maxPayloadSize = 100 * 1024
@@ -83,70 +82,69 @@ type tdsMessage struct {
 	start int
 	end   int
 
-	ts                    time.Time
-	isRequest             bool
-	packetLength          uint32
-	seq                   uint8
-	typ                   uint8
-	numberOfRows          int
-	numberOfFields        int
-	size                  uint64
-	fields                []string
-	rows                  [][]string
-	tables                string
-	isOK                  bool
-	affectedRows          uint64
-	insertID              uint64
-	isError               bool
-	errorCode             uint16
-	errorInfo             string
-	query			  string
-	ignoreMessage		  bool
-	isLastPacket		  bool
-	version			  string
-	client_version		  string
-	clientPID		  uint32
-	flags_1			  uint8
-	flags_2			  uint8
-	flags_3			  uint8
+	ts             time.Time
+	isRequest      bool
+	packetLength   uint32
+	seq            uint8
+	typ            uint8
+	numberOfRows   int
+	numberOfFields int
+	size           uint64
+	fields         []string
+	rows           [][]string
+	tables         string
+	isOK           bool
+	affectedRows   uint64
+	insertID       uint64
+	isError        bool
+	errorCode      uint16
+	errorInfo      string
+	query          string
+	ignoreMessage  bool
+	isLastPacket   bool
+	version        string
+	client_version string
+	clientPID      uint32
+	flags_1        uint8
+	flags_2        uint8
+	flags_3        uint8
 
-	hostname_length		  uint16
-	username_length		  uint16
-	password_length		  uint16
-	app_name_length		  uint16
-	server_name_length    uint16
-	library_length        uint16
-	language_length       uint16
-	database_name_length  uint16
-	auth_length           uint16
-	filename_length       uint16
-	new_password_length   uint16
+	hostname_length      uint16
+	username_length      uint16
+	password_length      uint16
+	app_name_length      uint16
+	server_name_length   uint16
+	library_length       uint16
+	language_length      uint16
+	database_name_length uint16
+	auth_length          uint16
+	filename_length      uint16
+	new_password_length  uint16
 
-	hostname_pos          uint16
-	username_pos          uint16
-	password_pos          uint16
-	app_name_pos          uint16
-	server_name_pos       uint16
-	library_pos           uint16
-	language_pos          uint16
-	database_name_pos     uint16
-	auth_pos              uint16
-	filename_pos          uint16
-	new_password_pos      uint16
+	hostname_pos      uint16
+	username_pos      uint16
+	password_pos      uint16
+	app_name_pos      uint16
+	server_name_pos   uint16
+	library_pos       uint16
+	language_pos      uint16
+	database_name_pos uint16
+	auth_pos          uint16
+	filename_pos      uint16
+	new_password_pos  uint16
 
-	MAC_address           []uint8
+	MAC_address []uint8
 
-	hostname              string
-	username              string
-	password		  string
-	app_name		  string
-	server_name		  string
-	library_name		  string
-	language_name		  string
-	database_name		  string
-	filename	      string
-	new_password		  string
-
+	hostname      string
+	username      string
+	password      string
+	app_name      string
+	server_name   string
+	library_name  string
+	language_name string
+	database_name string
+	filename      string
+	new_password  string
 
 	direction    uint8
 	isTruncated  bool
@@ -174,10 +172,10 @@ type tdsTransaction struct {
 	requestRaw  string
 	responseRaw string
 
-	username    string
-	hostname    string
-	server      string
-	version     string
+	username string
+	hostname string
+	server   string
+	version  string
 }
 
 type tdsStream struct {
@@ -283,13 +281,13 @@ func tdsMessageParser(s *tdsStream) (bool, bool) {
 		}
 		hdr := s.data[s.parseOffset : s.parseOffset+8]
 		m.typ = hdr[0]
-		if hdr[1] == 0x00{
+		if hdr[1] == 0x00 {
 			m.isLastPacket = false
 		} else {
 			m.isLastPacket = true
 		}
 		m.size = uint64(hdr[2]) + uint64(hdr[3])
-		m.start = s.parseOffset+8
+		m.start = s.parseOffset + 8
 		if m.typ == TDS_7_Query {
 			// TDS Query
 			m.isRequest = true
@@ -301,7 +299,7 @@ func tdsMessageParser(s *tdsStream) (bool, bool) {
 				i = i + 1
 			}
 			m.query = str
-			m.end = int(len(m.query))+8
+			m.end = int(len(m.query)) + 8
 			m.size = uint64(m.end - m.start)
 			s.parseOffset += int(m.end)
 
@@ -321,7 +319,7 @@ func tdsMessageParser(s *tdsStream) (bool, bool) {
 			m.isRequest = true
 			m.query = "Login Packet"
 			m.end = int(m.size)
-			m.raw = s.data[s.parseOffset+8:m.end]
+			m.raw = s.data[s.parseOffset+8 : m.end]
 			s.parseOffset += int(m.end)
 
 			return true, true
@@ -338,7 +336,7 @@ func tdsMessageParser(s *tdsStream) (bool, bool) {
 			m.query = str
 			s.parseOffset += q_len
 			m.isRequest = false
-			m.end = int(len(m.query))+8
+			m.end = int(len(m.query)) + 8
 
 			return true, true
 
@@ -346,14 +344,14 @@ func tdsMessageParser(s *tdsStream) (bool, bool) {
 			//TDS Response
 			m.isRequest = false
 			m.raw = s.data[s.parseOffset+8:]
-			if len(s.data) > 8{
-				if s.data[s.parseOffset+8] == 170{
+			if len(s.data) > 8 {
+				if s.data[s.parseOffset+8] == 170 {
 					m.isError = true
 				} else {
 					m.isError = false
 				}
 
-				if s.data[s.parseOffset+8] == 167{
+				if s.data[s.parseOffset+8] == 167 {
 					m.ignoreMessage = true
 				}
 			}
@@ -403,7 +401,7 @@ func (tds *tdsPlugin) Parse(pkt *protos.Packet, tcptuple *common.TCPTuple,
 			priv = tdsPrivateData{}
 		}
 	} else {
-		logp.Debug("tds","Private is nil")
+		logp.Debug("tds", "Private is nil")
 	}
 
 	if priv.data[dir] == nil {
@@ -460,7 +458,7 @@ func (tds *tdsPlugin) GapInStream(tcptuple *common.TCPTuple, dir uint8,
 		return private, false
 	}
 	stream := tdsData.data[dir]
-	if stream == nil{
+	if stream == nil {
 		return private, false
 	}
 
@@ -550,10 +548,10 @@ func (tds *tdsPlugin) receivedTDSResponse(msg *tdsMessage) {
 
 	trans := tds.getTransaction(msg.tcpTuple.Hashable())
 
-	if trans == nil{
+	if trans == nil {
 		return
 	}
-	if trans.tds == nil{
+	if trans.tds == nil {
 		return
 	}
 	//save json details
@@ -625,7 +623,7 @@ func (tds *tdsPlugin) parseTDSResponse(data []byte) ([]string, [][]string) {
 
 		case 129:
 			//TDS 7.0+ Result
-			start_off := parseOffset+1
+			start_off := parseOffset + 1
 			// col_num := data[start_off]
 			start_off += 8
 			prim := data[start_off]
@@ -642,15 +640,15 @@ func (tds *tdsPlugin) parseTDSResponse(data []byte) ([]string, [][]string) {
 			start := start_off
 			str := ""
 			flag := 0
-			for flag != 1{
+			for flag != 1 {
 				if int(data[start_off]) == 253 || int(data[start_off]) == 254 || int(data[start_off]) == 255 {
 					flag = 1
-				} else { 
+				} else {
 					start_off += 1
 				}
 			}
 
-			str = string(data[start:start_off-1])
+			str = string(data[start : start_off-1])
 
 			row = append(row, str)
 			//}
@@ -661,9 +659,9 @@ func (tds *tdsPlugin) parseTDSResponse(data []byte) ([]string, [][]string) {
 			total_length := int(data[parseOffset+1])
 			parseOffset += 2
 			i := 0
-			for i < total_length{
+			for i < total_length {
 				length := int(data[parseOffset])
-				col_name := data[parseOffset+1:parseOffset+length+2]
+				col_name := data[parseOffset+1 : parseOffset+length+2]
 				fields = append(fields, string(col_name[:length]))
 				parseOffset += length + 2
 				i += 1
@@ -691,7 +689,7 @@ func (tds *tdsPlugin) parseTDSResponse(data []byte) ([]string, [][]string) {
 			err_level := data[parseOffset+4]
 
 			if err_level > 10 {
-				logp.Debug("tds","Error while executing")
+				logp.Debug("tds", "Error while executing")
 			} else {
 				logp.Warn("SQL Message")
 			}
@@ -700,7 +698,7 @@ func (tds *tdsPlugin) parseTDSResponse(data []byte) ([]string, [][]string) {
 		case 171:
 			//Info Message
 			length := int(data[parseOffset+1])
-			text := data[parseOffset+2:parseOffset+length+3]
+			text := data[parseOffset+2 : parseOffset+length+3]
 			row_val := string(text[:length])
 			row = append(row, row_val)
 			parseOffset += length + 3
@@ -715,7 +713,7 @@ func (tds *tdsPlugin) parseTDSResponse(data []byte) ([]string, [][]string) {
 			process_name := ""
 
 			for i <= int(msg_len) {
-				error_msg = error_msg + string(data[start_off + i])
+				error_msg = error_msg + string(data[start_off+i])
 				i = i + 1
 			}
 
@@ -725,7 +723,7 @@ func (tds *tdsPlugin) parseTDSResponse(data []byte) ([]string, [][]string) {
 			i = 1
 
 			for i <= int(server_len) {
-				server_name = server_name + string(data[start_off + i])
+				server_name = server_name + string(data[start_off+i])
 				i = i + 1
 			}
 
@@ -735,7 +733,7 @@ func (tds *tdsPlugin) parseTDSResponse(data []byte) ([]string, [][]string) {
 			i = 1
 
 			for i <= int(proc_len) {
-				process_name = process_name + string(data[start_off + i])
+				process_name = process_name + string(data[start_off+i])
 				i = i + 1
 			}
 
@@ -761,7 +759,7 @@ func (tds *tdsPlugin) parseTDSResponse(data []byte) ([]string, [][]string) {
 		case 209:
 			//Row Result
 			length := int(data[parseOffset+1])
-			text := data[parseOffset+2:parseOffset+2+length]
+			text := data[parseOffset+2 : parseOffset+2+length]
 			row_val := string(text[:length])
 			logp.Info(row_val)
 			row = append(row, row_val)
@@ -771,53 +769,53 @@ func (tds *tdsPlugin) parseTDSResponse(data []byte) ([]string, [][]string) {
 			//Environment Change
 			length := int(data[parseOffset+1])
 			parseOffset += 2
-			text := data[parseOffset:parseOffset+length]
+			text := data[parseOffset : parseOffset+length]
 			row_val := string(text[:length])
 			row = append(row, row_val)
-			parseOffset += length+1
+			parseOffset += length + 1
 
 		case 228:
 			//Unknown ???
 			length := int(data[parseOffset+1])
 			parseOffset += 5
-			text := data[parseOffset:parseOffset+length]
+			text := data[parseOffset : parseOffset+length]
 			row_val := string(text[:length])
 			row = append(row, row_val)
-			parseOffset += length+5
+			parseOffset += length + 5
 
 		case 237:
 			//Authentication
 			length := int(data[parseOffset+1])
-			text := data[parseOffset+2:parseOffset+2+length]
+			text := data[parseOffset+2 : parseOffset+2+length]
 			row_val := string(text[:length])
 			row = append(row, row_val)
 			parseOffset += length + 2
 
 		case 253:
 			//Result Set Done
-			parseOffset += len(data)+1
-			rows = append(rows,row)
+			parseOffset += len(data) + 1
+			rows = append(rows, row)
 			return fields, rows
 
 		case 254:
 			//Process Done
-			parseOffset += len(data)+1
-			rows = append(rows,row)
+			parseOffset += len(data) + 1
+			rows = append(rows, row)
 			return fields, rows
 
 		case 255:
 			//Done Inside Process
-			parseOffset += len(data)+1
-			rows = append(rows,row)
+			parseOffset += len(data) + 1
+			rows = append(rows, row)
 			return fields, rows
 
 		default:
-			parseOffset += len(data)+1
+			parseOffset += len(data) + 1
 			//return fields, rows
 			break
 		}
 	}
-	rows = append(rows,row)
+	rows = append(rows, row)
 	return fields, rows
 }
 
@@ -867,4 +865,3 @@ func readLength(data []byte, offset int) (int, error) {
 		uint32(data[offset+2])<<16
 	return int(length), nil
 }
-

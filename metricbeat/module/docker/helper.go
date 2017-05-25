@@ -4,8 +4,6 @@ import (
 	"strings"
 
 	"github.com/elastic/beats/libbeat/common"
-
-	"github.com/fsouza/go-dockerclient"
 )
 
 type Container struct {

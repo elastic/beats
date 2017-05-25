@@ -7,8 +7,6 @@ import (
 	"github.com/elastic/beats/libbeat/logp"
 	"github.com/elastic/beats/metricbeat/mb"
 	"github.com/elastic/beats/metricbeat/mb/parse"
-
-	"github.com/fsouza/go-dockerclient"
 )
 
 var HostParser = parse.URLHostParserBuilder{DefaultScheme: "tcp"}.Build()
