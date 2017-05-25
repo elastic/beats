@@ -464,9 +464,7 @@ func (tds *tdsPlugin) GapInStream(tcptuple *common.TCPTuple, dir uint8,
 	if stream == nil{
 		return private, false
 	}
-	if dir != 0 || dir != 1 {
-		return private, false
-	}
+
 	// we need to publish from here
 	tds.messageComplete(tcptuple, dir, stream)
 	// we always drop the TCP stream. Because it's binary and len based,
