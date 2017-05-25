@@ -8,6 +8,6 @@ import (
 // so the registry can be used by the prospector.
 type Harvester interface {
 	ID() uuid.UUID
-	Start()
+	Run() error
 	Stop()
 }

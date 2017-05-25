@@ -1,5 +1,6 @@
 from packetbeat import BaseTest
 
+import six
 
 # import pprint
 #
@@ -68,8 +69,7 @@ class Test(BaseTest):
         assert sets['k1']['memcache.request.bytes'] == 100
         assert sets['k2']['memcache.request.bytes'] == 20
         assert sets['k3']['memcache.request.bytes'] == 10
-        assert all(o['memcache.response.type'] == 'Success'
-                   for o in sets.itervalues())
+        assert all(o['memcache.response.type'] == 'Success' for o in six.itervalues(sets))
 
         get = objs[3]
         assert get['memcache.request.keys'] == ['x', 'k1', 'k2', 'k3', 'y']
