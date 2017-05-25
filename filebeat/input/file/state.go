@@ -10,6 +10,7 @@ import (
 
 // State is used to communicate the reading state of a file
 type State struct {
+	Id          string        `json:"-"` // local unique id to make comparison more efficient
 	Finished    bool          `json:"-"` // harvester state
 	Fileinfo    os.FileInfo   `json:"-"` // the file info
 	Source      string        `json:"source"`
@@ -31,6 +32,20 @@ func NewState(fileInfo os.FileInfo, path string, t string) State {
 		TTL:         -1, // By default, state does have an infinite ttl
 		Type:        t,
 	}
+}
+
+// ID returns a unique id for the state as a string
+func (s *State) ID() string {
+	// Generate id on first request. This is needed as id is not set when converting back from json
+	if s.Id == "" {
+		s.Id = s.FileStateOS.String()
+	}
+	return s.Id
+}
+
+// IsEqual compares the state to an other state supporing stringer based on the unique string
+func (s *State) IsEqual(c *State) bool {
+	return s.ID() == c.ID()
 }
 
 // IsEmpty returns true if the state is empty
@@ -81,7 +96,7 @@ func (s *States) findPrevious(newState State) (int, State) {
 	// TODO: This could be made potentially more performance by using an index (harvester id) and only use iteration as fall back
 	for index, oldState := range s.states {
 		// This is using the FileStateOS for comparison as FileInfo identifiers can only be fetched for existing files
-		if oldState.FileStateOS.IsSame(newState.FileStateOS) {
+		if oldState.IsEqual(&newState) {
 			return index, oldState
 		}
 	}

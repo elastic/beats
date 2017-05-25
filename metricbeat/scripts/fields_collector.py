@@ -21,7 +21,7 @@ def collect():
             continue
 
         # Load module yaml
-        with file(module_fields) as f:
+        with open(module_fields) as f:
             tmp = f.read()
             fields_yml += tmp
 
@@ -35,7 +35,7 @@ def collect():
                 continue
 
             # Load metricset yaml
-            with file(metricset_fields) as f:
+            with open(metricset_fields) as f:
                 # Add 4 spaces for indentation in front of each line
                 for line in f:
                     if len(line.strip()) > 0:

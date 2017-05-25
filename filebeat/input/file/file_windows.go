@@ -45,6 +45,10 @@ func (fs StateOS) IsSame(state StateOS) bool {
 	return fs.IdxHi == state.IdxHi && fs.IdxLo == state.IdxLo && fs.Vol == state.Vol
 }
 
+func (fs StateOS) String() string {
+	return fmt.Sprintf("%d-%d-%d", fs.IdxHi, fs.IdxLo, fs.Vol)
+}
+
 // SafeFileRotate safely rotates an existing file under path and replaces it with the tempfile
 func SafeFileRotate(path, tempfile string) error {
 	old := path + ".old"

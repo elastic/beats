@@ -318,7 +318,7 @@ use in Logstash for indexing and filtering:
     ...
     "@metadata": { <1>
       "beat": "{beatname_lc}", <2>
-      "type": "<event type>" <3>
+      "type": "doc" <3>
     }
 }
 ------------------------------------------------------------------------------
@@ -329,7 +329,12 @@ events sent from Logstash. See the
 for more about the `@metadata` field.
 <2> The default is {beatname_lc}. To change this value, set the
 <<logstash-index,`index`>> option in the {beatname_uc} config file.
-<3> The value of `type` varies depending on the event type.
+<3> The value of `type` is currently hardcoded to `doc`. It was used by previous
+Logstash configs to set the type of the document in Elasticsearch.
+
+
+WARNING: The `@metadata.type` field, added by the Logstash output, is
+deprecated, hardcoded to `doc`, and will be removed in {beatname_uc} 7.0.
 
 You can access this metadata from within the Logstash config file to set values
 dynamically based on the contents of the metadata.
@@ -351,7 +356,6 @@ output {
   elasticsearch {
     hosts => ["http://localhost:9200"]
     index => "%{[@metadata][beat]}-%{+YYYY.MM.dd}" <1>
-    document_type => "%{[@metadata][type]}" <2>
   }
 }
 ------------------------------------------------------------------------------
@@ -359,11 +363,10 @@ output {
 of the `beat` metadata field, and `%{+YYYY.MM.dd}` sets the second part of the
 name to a date based on the Logstash `@timestamp` field. For example:
 +{beatname_lc}-2017.03.29+.
-<2> `%{[@metadata][type]}` sets the document type based on the value of the `type`
-metadata field.
 
 Events indexed into Elasticsearch with the Logstash configuration shown here
 will be similar to events directly indexed by Beats into Elasticsearch.
+
 
 ==== Compatibility
 

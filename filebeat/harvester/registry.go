@@ -3,6 +3,7 @@ package harvester
 import (
 	"sync"
 
+	"github.com/elastic/beats/libbeat/logp"
 	uuid "github.com/satori/go.uuid"
 )
 
@@ -28,6 +29,12 @@ func (r *Registry) remove(h Harvester) {
 	delete(r.harvesters, h.ID())
 }
 
+func (r *Registry) add(h Harvester) {
+	r.Lock()
+	defer r.Unlock()
+	r.harvesters[h.ID()] = h
+}
+
 // Stop stops all harvesters in the registry
 func (r *Registry) Stop() {
 	r.Lock()
@@ -39,9 +46,7 @@ func (r *Registry) Stop() {
 	close(r.done)
 
 	for _, hv := range r.harvesters {
-		r.wg.Add(1)
 		go func(h Harvester) {
-			r.wg.Done()
 			h.Stop()
 		}(hv)
 	}
@@ -61,22 +66,22 @@ func (r *Registry) Start(h Harvester) {
 	defer r.Unlock()
 
 	// Make sure no new harvesters are started after stop was called
-	select {
-	case <-r.done:
+	if !r.active() {
 		return
-	default:
 	}
 
 	r.wg.Add(1)
-	r.harvesters[h.ID()] = h
-
 	go func() {
 		defer func() {
 			r.remove(h)
 			r.wg.Done()
 		}()
+		r.add(h)
 		// Starts harvester and picks the right type. In case type is not set, set it to default (log)
-		h.Start()
+		err := h.Run()
+		if err != nil {
+			logp.Err("Error running prospector: %v", err)
+		}
 	}()
 }
 
@@ -85,4 +90,13 @@ func (r *Registry) Len() uint64 {
 	r.RLock()
 	defer r.RUnlock()
 	return uint64(len(r.harvesters))
+}
+
+func (r *Registry) active() bool {
+	select {
+	case <-r.done:
+		return false
+	default:
+		return true
+	}
 }

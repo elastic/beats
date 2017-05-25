@@ -2,10 +2,10 @@ package jmx
 
 import (
 	"encoding/json"
-	"fmt"
 
 	"github.com/elastic/beats/libbeat/common"
 	"github.com/joeshaw/multierror"
+	"github.com/pkg/errors"
 )
 
 type Entry struct {
@@ -47,11 +47,9 @@ type Entry struct {
 //     }
 //  ]
 func eventMapping(content []byte, mapping map[string]string) (common.MapStr, error) {
-
 	var entries []Entry
-	err := json.Unmarshal(content, &entries)
-	if err != nil {
-		return nil, fmt.Errorf("Cannot unmarshal json response: %s", err)
+	if err := json.Unmarshal(content, &entries); err != nil {
+		return nil, errors.Wrapf(err, "failed to unmarshal jolokia JSON response '%v'", string(content))
 	}
 
 	event := common.MapStr{}
@@ -68,18 +66,21 @@ func eventMapping(content []byte, mapping map[string]string) (common.MapStr, err
 	}
 
 	return event, errs.Err()
-
 }
 
-func parseResponseEntry(mbeanName string, attributeName string, attibuteValue interface{},
-	event common.MapStr, mapping map[string]string) error {
-
-	//create metric name by merging mbean and attribute fields
+func parseResponseEntry(
+	mbeanName string,
+	attributeName string,
+	attibuteValue interface{},
+	event common.MapStr,
+	mapping map[string]string,
+) error {
+	// Create metric name by merging mbean and attribute fields.
 	var metricName = mbeanName + "_" + attributeName
 
 	key, exists := mapping[metricName]
 	if !exists {
-		return fmt.Errorf("No key found for metric: '%s', skipping...", metricName)
+		return errors.Errorf("metric key '%v' not found in response", key)
 	}
 
 	_, err := event.Put(key, attibuteValue)

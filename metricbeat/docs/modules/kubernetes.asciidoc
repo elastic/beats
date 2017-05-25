@@ -47,6 +47,12 @@ metricbeat.modules:
     - state_container
   period: 10s
   hosts: ["kube-state-metrics:8080"]
+
+# Kubernetes events
+- module: kubernetes
+  metricsets:
+    - event
+  in_cluster: true
 ----
 
 [float]
@@ -55,6 +61,8 @@ metricbeat.modules:
 The following metricsets are available:
 
 * <<metricbeat-metricset-kubernetes-container,container>>
+
+* <<metricbeat-metricset-kubernetes-event,event>>
 
 * <<metricbeat-metricset-kubernetes-node,node>>
 
@@ -75,6 +83,8 @@ The following metricsets are available:
 * <<metricbeat-metricset-kubernetes-volume,volume>>
 
 include::kubernetes/container.asciidoc[]
+
+include::kubernetes/event.asciidoc[]
 
 include::kubernetes/node.asciidoc[]
 

@@ -1,4 +1,5 @@
 import re
+import six
 import sys
 import unittest
 import metricbeat
@@ -404,8 +405,8 @@ class Test(metricbeat.BaseTest):
 
         assert re.match("(?i)metricbeat.test(.exe)?", output["system.process.name"])
         assert re.match("(?i).*metricbeat.test(.exe)? -systemTest", output["system.process.cmdline"])
-        assert isinstance(output["system.process.state"], basestring)
-        assert isinstance(output["system.process.cpu.start_time"], basestring)
+        assert isinstance(output["system.process.state"], six.string_types)
+        assert isinstance(output["system.process.cpu.start_time"], six.string_types)
         self.check_username(output["system.process.username"])
 
     def check_username(self, observed, expected=None):
