@@ -18,7 +18,7 @@ install, configure, and run Heartbeat:
 * <<heartbeat-configuration>>
 * <<heartbeat-template>>
 * <<heartbeat-starting>>
-* <<heartbeat-command-line>>
+* <<command-line-options>>
 * <<directory-layout>>
 
 
@@ -234,7 +234,7 @@ include::../../libbeat/docs/shared-template-load.asciidoc[]
 Start Heartbeat by issuing the appropriate command for your platform.
 
 NOTE: If you use an init.d script to start Heartbeat on deb or rpm, you can't
-specify command line flags (see <<heartbeat-command-line>>). To specify flags,
+specify command line flags (see <<command-line-options>>). To specify flags,
 start Heartbeat in the foreground.
 
 *deb:*
