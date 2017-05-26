@@ -11,6 +11,7 @@ import (
 	"github.com/elastic/beats/filebeat/harvester"
 	"github.com/elastic/beats/filebeat/input/file"
 	"github.com/elastic/beats/filebeat/prospector/log"
+	"github.com/elastic/beats/filebeat/prospector/redis"
 	"github.com/elastic/beats/filebeat/prospector/stdin"
 	"github.com/elastic/beats/libbeat/common"
 	"github.com/elastic/beats/libbeat/logp"
@@ -72,6 +73,8 @@ func (p *Prospector) initProspectorer(outlet channel.Outleter, states []file.Sta
 	switch p.config.Type {
 	case harvester.StdinType:
 		prospectorer, err = stdin.NewProspector(config, outlet)
+	case harvester.RedisType:
+		prospectorer, err = redis.NewProspector(config, outlet)
 	case harvester.LogType:
 		prospectorer, err = log.NewProspector(config, states, outlet, p.done)
 	default:

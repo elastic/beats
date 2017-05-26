@@ -6,6 +6,7 @@ services:
       - proxy_dep
     env_file:
       - ${PWD}/build/test.env
+      - ${PWD}/prospector/redis/_meta/env
     working_dir: /go/src/github.com/elastic/beats/filebeat
     volumes:
       - ${PWD}/..:/go/src/github.com/elastic/beats/
@@ -17,8 +18,12 @@ services:
     image: busybox
     depends_on:
       elasticsearch: { condition: service_healthy }
+      redis:         { condition: service_healthy }
 
   elasticsearch:
     extends:
       file: ../testing/environments/${TESTING_ENVIRONMENT}.yml
       service: elasticsearch
+
+  redis:
+    build: ${PWD}/prospector/redis/_meta
