@@ -1,6 +1,7 @@
 package status
 
 import (
+	"fmt"
 	"testing"
 
 	"github.com/elastic/beats/libbeat/common"
@@ -72,7 +73,7 @@ func TestConfigValidation(t *testing.T) {
 			t.Errorf("unexpected error in testcase %d: %v", i, err)
 			continue
 		}
-		if test.err != "" && assert.Error(t, err, "expected '%v' in testcase %d", test.err, i) {
+		if test.err != "" && assert.Error(t, err, fmt.Sprintf("expected '%v' in testcase %d", test.err, i)) {
 			assert.Contains(t, err.Error(), test.err, "testcase %d", i)
 			continue
 		}
