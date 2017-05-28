@@ -69,7 +69,7 @@ type config struct {
 	// Harvester
 	BufferSize         int    `config:"harvester_buffer_size"`
 	Encoding           string `config:"encoding"`
-	HarvesterScanOlder bool `config:"harvester_scan_older"`
+	ScanOrder string `config:"scan_order"`
 
 	ExcludeLines []match.Matcher         `config:"exclude_lines"`
 	IncludeLines []match.Matcher         `config:"include_lines"`

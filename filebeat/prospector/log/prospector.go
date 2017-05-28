@@ -15,6 +15,7 @@ import (
 	"github.com/elastic/beats/libbeat/logp"
 	"github.com/elastic/beats/libbeat/monitoring"
 	"sort"
+	"strings"
 )
 
 const (
@@ -281,23 +282,37 @@ func getSortInfos(paths map[string]os.FileInfo) []FileSortInfo {
 	return sortInfos;
 }
 
-func getSortedFiles(sortInfos []FileSortInfo) []FileSortInfo {
-
-	sort.Slice(sortInfos, func(i, j int) bool {
-		return sortInfos[i].info.ModTime().Before(sortInfos[j].info.ModTime());
-	})
+func getSortedFiles(sortOrder string, sortInfos []FileSortInfo) []FileSortInfo {
+	switch sortOrder {
+		case "mod_time_ascending":
+			sort.Slice(sortInfos, func(i, j int) bool {
+				return sortInfos[i].info.ModTime().Before(sortInfos[j].info.ModTime());
+			});
+		case "mod_time_descending":
+			sort.Slice(sortInfos, func(i, j int) bool {
+				return sortInfos[i].info.ModTime().After(sortInfos[j].info.ModTime());
+			});
+		case "file_name_ascending":
+			sort.Slice(sortInfos, func(i, j int) bool {
+				return strings.Compare(sortInfos[i].info.Name(), sortInfos[j].info.Name()) < 0
+			});
+		case "file_name_descending":
+			sort.Slice(sortInfos, func(i, j int) bool {
+				return strings.Compare(sortInfos[i].info.Name(), sortInfos[j].info.Name()) > 0
+			});
+		default:
+	}
 
 	return sortInfos;
 }
+
 
 // Scan starts a scanGlob for each provided path/glob
 func (p *Prospector) scan() {
 
 	paths := p.getFiles();
 	files := getSortInfos(paths)
-	if p.config.HarvesterScanOlder {
-		files = getSortedFiles(files)
-	}
+	files = getSortedFiles(strings.ToLower(p.config.ScanOrder), files)
 	for _,fileInfo := range files {
 
 		select {
