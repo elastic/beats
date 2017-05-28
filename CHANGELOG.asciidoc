@@ -57,6 +57,7 @@ https://github.com/elastic/beats/compare/v6.0.0-alpha1...master[Check the HEAD d
 
 *Affecting all Beats*
 
+- Upgraded to Golang 1.8.3. {pull}4401[4401]
 - Added the possibility to set Elasticsearch mapping template settings from the Beat configuration file. {pull}4284[4284] {pull}4317[4317]
 - Add a variable to the SysV init scripts to make it easier to change the user. {pull}4340[4340]
 - Add the option to write the generated Elasticsearch mapping template into a file. {pull}4323[4323]
