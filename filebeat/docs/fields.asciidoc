@@ -548,6 +548,12 @@ Instance ID of the host machine.
 
 
 [float]
+=== meta.cloud.instance_name
+
+Instance name of the host machine.
+
+
+[float]
 === meta.cloud.machine_type
 
 example: t2.medium
