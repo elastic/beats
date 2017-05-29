@@ -64,6 +64,7 @@ https://github.com/elastic/beats/compare/v6.0.0-alpha1...master[Check the HEAD d
 - Add a variable to the SysV init scripts to make it easier to change the user. {pull}4340[4340]
 - Add the option to write the generated Elasticsearch mapping template into a file. {pull}4323[4323]
 - Add instance_name in GCE add_cloud_metadata processor. {pull}4414[4414]
+- Add `add_docker_metadata` processor. {pull}4352[4352]
 
 *Filebeat*
 - Add experimental Redis slow log prospector type. {pull}4180[4180]
