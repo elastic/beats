@@ -157,10 +157,48 @@
 			"versionExact": "master"
 		},
 		{
+			"checksumSHA1": "kK/ZpRsTmbHTYGkV7NixaG2rork=",
+			"path": "github.com/docker/docker/opts",
+			"revision": "89658bed64c2a8fe05a978e5b87dbec409d57a0f",
+			"revisionTime": "2017-05-04T20:25:03Z",
+			"version": "v17.05.0-ce",
+			"versionExact": "v17.05.0-ce"
+		},
+		{
+			"checksumSHA1": "NC4Tz59SrBVdPxt12GjYCxX60eU=",
+			"path": "github.com/docker/docker/pkg/fileutils",
+			"revision": "89658bed64c2a8fe05a978e5b87dbec409d57a0f",
+			"revisionTime": "2017-05-04T20:25:03Z",
+			"version": "v17.05.0-ce",
+			"versionExact": "v17.05.0-ce"
+		},
+		{
+			"checksumSHA1": "W7Rnb5YoC9u0vT9eLKoezV3N4E8=",
+			"path": "github.com/docker/docker/pkg/homedir",
+			"revision": "89658bed64c2a8fe05a978e5b87dbec409d57a0f",
+			"revisionTime": "2017-05-04T20:25:03Z",
+			"version": "v17.05.0-ce",
+			"versionExact": "v17.05.0-ce"
+		},
+		{
+			"checksumSHA1": "bfvwzIbEFwclBKJSNa6oaA27DgE=",
+			"path": "github.com/docker/docker/pkg/idtools",
+			"revision": "d192db0d9350222d2b8bb6eba8525b04c3be7d61",
+			"revisionTime": "2017-05-29T13:58:50Z"
+		},
+		{
 			"checksumSHA1": "jmo/t2zXAxirEPoFucNPXA/1SEc=",
 			"path": "github.com/docker/docker/pkg/ioutils",
 			"revision": "d192db0d9350222d2b8bb6eba8525b04c3be7d61",
 			"revisionTime": "2017-05-29T13:58:50Z"
+		},
+		{
+			"checksumSHA1": "kp20bhjkvJ06uW6DRfVIZbCj8SY=",
+			"path": "github.com/docker/docker/pkg/jsonlog",
+			"revision": "89658bed64c2a8fe05a978e5b87dbec409d57a0f",
+			"revisionTime": "2017-05-04T20:25:03Z",
+			"version": "v17.05.0-ce",
+			"versionExact": "v17.05.0-ce"
 		},
 		{
 			"checksumSHA1": "ndnAFCfsGC3upNQ6jAEwzxcurww=",
@@ -173,6 +211,14 @@
 			"path": "github.com/docker/docker/pkg/mount",
 			"revision": "d192db0d9350222d2b8bb6eba8525b04c3be7d61",
 			"revisionTime": "2017-05-29T13:58:50Z"
+		},
+		{
+			"checksumSHA1": "H1rrbVmeE1z2TnkF7tSrfh+qUOY=",
+			"path": "github.com/docker/docker/pkg/stdcopy",
+			"revision": "89658bed64c2a8fe05a978e5b87dbec409d57a0f",
+			"revisionTime": "2017-05-04T20:25:03Z",
+			"version": "v17.05.0-ce",
+			"versionExact": "v17.05.0-ce"
 		},
 		{
 			"checksumSHA1": "kr46EAa+FsUcWxOq6edyX6BUzE4=",
@@ -677,6 +723,12 @@
 			"path": "github.com/opencontainers/image-spec/specs-go/v1",
 			"revision": "4038d4391fe912af1031db5a1f511cf07c07cbc8",
 			"revisionTime": "2017-05-25T20:40:40Z"
+		},
+		{
+			"checksumSHA1": "MA07KaAp1aPVheuopyrFr7pxANs=",
+			"path": "github.com/opencontainers/runc/libcontainer/user",
+			"revision": "653207bc29a6d2d62b5d4f55b596467cb715a128",
+			"revisionTime": "2017-03-27T18:58:03Z"
 		},
 		{
 			"checksumSHA1": "WmrPO1ovmQ7t7hs9yZGbr2SAoM4=",

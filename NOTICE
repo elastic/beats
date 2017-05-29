@@ -129,36 +129,6 @@ For more information, please see https://www.bis.doc.gov
 See also https://www.apache.org/dev/crypto.html and/or seek legal counsel.
 
 --------------------------------------------------------------------
-Dependency: github.com/docker/docker
-Version: v17.05.0-ce
-Revision: 89658bed64c2a8fe05a978e5b87dbec409d57a0f
-License type (autodetected): Apache License 2.0
-./metricbeat/module/docker/vendor/github.com/docker/docker/LICENSE:
---------------------------------------------------------------------
-Apache License 2.0
-
--------NOTICE-----
-Docker
-Copyright 2012-2017 Docker, Inc.
-
-This product includes software developed at Docker, Inc. (https://www.docker.com).
-
-This product contains software (https://github.com/kr/pty) developed
-by Keith Rarick, licensed under the MIT License.
-
-The following is courtesy of our legal counsel:
-
-
-Use and transfer of Docker may be subject to certain restrictions by the
-United States and other governments.
-It is your responsibility to ensure that your use and/or transfer does not
-violate applicable laws.
-
-For more information, please see https://www.bis.doc.gov
-
-See also https://www.apache.org/dev/crypto.html and/or seek legal counsel.
-
---------------------------------------------------------------------
 Dependency: github.com/docker/go-connections
 Revision: e15c02316c12de00874640cd76311849de2aeed5
 License type (autodetected): Apache License 2.0
@@ -168,28 +138,10 @@ Apache License 2.0
 
 
 --------------------------------------------------------------------
-Dependency: github.com/docker/go-connections
-Revision: e15c02316c12de00874640cd76311849de2aeed5
-License type (autodetected): Apache License 2.0
-./metricbeat/module/docker/vendor/github.com/docker/go-connections/LICENSE:
---------------------------------------------------------------------
-Apache License 2.0
-
-
---------------------------------------------------------------------
 Dependency: github.com/docker/go-units
 Revision: 0dadbb0345b35ec7ef35e228dabb8de89a65bf52
 License type (autodetected): Apache License 2.0
 ./vendor/github.com/docker/go-units/LICENSE:
---------------------------------------------------------------------
-Apache License 2.0
-
-
---------------------------------------------------------------------
-Dependency: github.com/docker/go-units
-Revision: 0dadbb0345b35ec7ef35e228dabb8de89a65bf52
-License type (autodetected): Apache License 2.0
-./metricbeat/module/docker/vendor/github.com/docker/go-units/LICENSE:
 --------------------------------------------------------------------
 Apache License 2.0
 
@@ -1587,35 +1539,6 @@ SOFTWARE.
 
 
 --------------------------------------------------------------------
-Dependency: github.com/Microsoft/go-winio
-Revision: fff283ad5116362ca252298cfc9b95828956d85d
-License type (autodetected): MIT license
-./metricbeat/module/docker/vendor/github.com/Microsoft/go-winio/LICENSE:
---------------------------------------------------------------------
-The MIT License (MIT)
-
-Copyright (c) 2015 Microsoft
-
-Permission is hereby granted, free of charge, to any person obtaining a copy
-of this software and associated documentation files (the "Software"), to deal
-in the Software without restriction, including without limitation the rights
-to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
-copies of the Software, and to permit persons to whom the Software is
-furnished to do so, subject to the following conditions:
-
-The above copyright notice and this permission notice shall be included in all
-copies or substantial portions of the Software.
-
-THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
-AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
-LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
-OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
-SOFTWARE.
-
-
---------------------------------------------------------------------
 Dependency: github.com/miekg/dns
 Revision: 5d001d020961ae1c184f9f8152fdc73810481677
 License type (autodetected): BSD license
@@ -2587,7 +2510,7 @@ Apache License 2.0
 Dependency: github.com/opencontainers/runc
 Revision: 653207bc29a6d2d62b5d4f55b596467cb715a128
 License type (autodetected): Apache License 2.0
-./metricbeat/module/docker/vendor/github.com/opencontainers/runc/LICENSE:
+./vendor/github.com/opencontainers/runc/LICENSE:
 --------------------------------------------------------------------
 Apache License 2.0
 
@@ -2722,39 +2645,6 @@ SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER
 CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY,
 OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
-
---------------------------------------------------------------------
-Dependency: github.com/pmezard/go-difflib
-License type (autodetected): BSD license
-./vendor/github.com/pmezard/go-difflib/LICENSE:
---------------------------------------------------------------------
-Copyright (c) 2013, Patrick Mezard
-All rights reserved.
-
-Redistribution and use in source and binary forms, with or without
-modification, are permitted provided that the following conditions are
-met:
-
-    Redistributions of source code must retain the above copyright
-notice, this list of conditions and the following disclaimer.
-    Redistributions in binary form must reproduce the above copyright
-notice, this list of conditions and the following disclaimer in the
-documentation and/or other materials provided with the distribution.
-    The names of its contributors may not be used to endorse or promote
-products derived from this software without specific prior written
-permission.
-
-THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS
-IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED
-TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A
-PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT
-HOLDER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL,
-SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED
-TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR
-PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF
-LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
-NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
-SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 --------------------------------------------------------------------
 Dependency: github.com/prometheus/client_model
@@ -2954,34 +2844,6 @@ Dependency: github.com/Sirupsen/logrus
 Revision: 5e5dc898656f695e2a086b8e12559febbfc01562
 License type (autodetected): MIT license
 ./vendor/github.com/Sirupsen/logrus/LICENSE:
---------------------------------------------------------------------
-The MIT License (MIT)
-
-Copyright (c) 2014 Simon Eskildsen
-
-Permission is hereby granted, free of charge, to any person obtaining a copy
-of this software and associated documentation files (the "Software"), to deal
-in the Software without restriction, including without limitation the rights
-to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
-copies of the Software, and to permit persons to whom the Software is
-furnished to do so, subject to the following conditions:
-
-The above copyright notice and this permission notice shall be included in
-all copies or substantial portions of the Software.
-
-THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
-AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
-LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
-OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
-THE SOFTWARE.
-
---------------------------------------------------------------------
-Dependency: github.com/Sirupsen/logrus
-Revision: 10f801ebc38b33738c9d17d50860f484a0988ff5
-License type (autodetected): MIT license
-./metricbeat/module/docker/vendor/github.com/Sirupsen/logrus/LICENSE:
 --------------------------------------------------------------------
 The MIT License (MIT)
 
@@ -3212,78 +3074,10 @@ THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 --------------------------------------------------------------------
-Dependency: golang.org/x/net
-Revision: ffcf1bedda3b04ebb15a168a59800a73d6dc0f4d
-License type (autodetected): BSD license
-./metricbeat/module/docker/vendor/golang.org/x/net/LICENSE:
---------------------------------------------------------------------
-Copyright (c) 2009 The Go Authors. All rights reserved.
-
-Redistribution and use in source and binary forms, with or without
-modification, are permitted provided that the following conditions are
-met:
-
-   * Redistributions of source code must retain the above copyright
-notice, this list of conditions and the following disclaimer.
-   * Redistributions in binary form must reproduce the above
-copyright notice, this list of conditions and the following disclaimer
-in the documentation and/or other materials provided with the
-distribution.
-   * Neither the name of Google Inc. nor the names of its
-contributors may be used to endorse or promote products derived from
-this software without specific prior written permission.
-
-THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
-"AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
-LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR
-A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT
-OWNER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL,
-SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT
-LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE,
-DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY
-THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
-(INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
-OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
-
---------------------------------------------------------------------
 Dependency: golang.org/x/sys
 Revision: a55a76086885b80f79961eacb876ebd8caf3868d
 License type (autodetected): BSD license
 ./vendor/golang.org/x/sys/LICENSE:
---------------------------------------------------------------------
-Copyright (c) 2009 The Go Authors. All rights reserved.
-
-Redistribution and use in source and binary forms, with or without
-modification, are permitted provided that the following conditions are
-met:
-
-   * Redistributions of source code must retain the above copyright
-notice, this list of conditions and the following disclaimer.
-   * Redistributions in binary form must reproduce the above
-copyright notice, this list of conditions and the following disclaimer
-in the documentation and/or other materials provided with the
-distribution.
-   * Neither the name of Google Inc. nor the names of its
-contributors may be used to endorse or promote products derived from
-this software without specific prior written permission.
-
-THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
-"AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
-LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR
-A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT
-OWNER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL,
-SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT
-LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE,
-DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY
-THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
-(INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
-OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
-
---------------------------------------------------------------------
-Dependency: golang.org/x/sys
-Revision: 9a7256cb28ed514b4e1e5f68959914c4c28a92e0
-License type (autodetected): BSD license
-./metricbeat/module/docker/vendor/golang.org/x/sys/LICENSE:
 --------------------------------------------------------------------
 Copyright (c) 2009 The Go Authors. All rights reserved.
 
