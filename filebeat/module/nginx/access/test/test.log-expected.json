@@ -54,5 +54,56 @@
         "sort": [
             1481105107000
         ]
+    },
+    {
+        "_id": "AVxVuTJrsqw9BQCgtCgi",
+        "_index": "filebeat-6.0.0-alpha2-2017.05.29",
+        "_score": null,
+        "_source": {
+            "@timestamp": "2017-05-29T19:02:48.000Z",
+            "beat": {
+                "hostname": "X1",
+                "name": "X1",
+                "version": "6.0.0-alpha2"
+            },
+            "nginx": {
+                "access": {
+                    "body_sent": {
+                        "bytes": "612"
+                    },
+                    "http_version": "1.1",
+                    "method": "GET",
+                    "referrer": "-",
+                    "remote_ip": "172.17.0.1",
+                    "response_code": "404",
+                    "url": "/stringpatch",
+                    "user_agent": {
+                        "device": "Other",
+                        "major": "15",
+                        "minor": "0",
+                        "name": "Firefox Alpha",
+                        "os": "Windows 7",
+                        "os_name": "Windows 7",
+                        "patch": "a2"
+                    },
+                    "user_name": "-"
+                }
+            },
+            "offset": 341,
+            "prospector": {
+                "type": "log"
+            },
+            "read_timestamp": "2017-05-29T19:40:14.373Z",
+            "source": "/home/exekias/go/src/github.com/elastic/beats/filebeat/nginx.log"
+        },
+        "_type": "doc",
+        "fields": {
+            "@timestamp": [
+                1496084568000
+            ]
+        },
+        "sort": [
+            1496084568000
+        ]
     }
 ]
