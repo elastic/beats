@@ -298,12 +298,14 @@
             Time in ms that it took to finish the last health check.
 
         - name: health.last
-          type: long
+          type: keyword
           description: >
+            The result of the last health check.
 
         - name: health.fail
           type: long
           description: >
+            Number of failed checks.
 
         - name: agent.last
           type: integer
