@@ -5188,8 +5188,9 @@ Time in ms that it took to finish the last health check.
 [float]
 === haproxy.stat.check.health.last
 
-type: long
+type: keyword
 
+The result of the last health check.
 
 
 [float]
@@ -5197,6 +5198,7 @@ type: long
 
 type: long
 
+Number of failed checks.
 
 
 [float]

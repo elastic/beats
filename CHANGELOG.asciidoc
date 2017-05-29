@@ -47,6 +47,7 @@ https://github.com/elastic/beats/compare/v6.0.0-alpha1...master[Check the HEAD d
 - Add filtering to system filesystem metricset to remove relative mountpoints like those
   from Linux network namespaces. {pull}4370[4370]
 - Remove unnecessary print statement in schema apis {pull}4355[4355]
+- Fix type of field `haproxy.stat.check.health.last`. {issue}4407[4407]
 
 *Packetbeat*
 - Enable memcache filtering only if a port is specified in the config file. {issue}4335[4335]
