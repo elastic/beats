@@ -7,6 +7,9 @@ import (
 	"path/filepath"
 	"time"
 
+	"sort"
+	"strings"
+
 	"github.com/elastic/beats/filebeat/channel"
 	"github.com/elastic/beats/filebeat/harvester"
 	"github.com/elastic/beats/filebeat/input/file"
@@ -14,8 +17,6 @@ import (
 	"github.com/elastic/beats/libbeat/common"
 	"github.com/elastic/beats/libbeat/logp"
 	"github.com/elastic/beats/libbeat/monitoring"
-	"sort"
-	"strings"
 )
 
 const (
@@ -279,41 +280,42 @@ func getSortInfos(paths map[string]os.FileInfo) []FileSortInfo {
 		sortInfos = append(sortInfos, sortInfo)
 	}
 
-	return sortInfos;
+	return sortInfos
 }
 
-func getSortedFiles(sortOrder string, sortInfos []FileSortInfo) []FileSortInfo {
-	switch sortOrder {
-		case "mod_time_ascending":
-			sort.Slice(sortInfos, func(i, j int) bool {
-				return sortInfos[i].info.ModTime().Before(sortInfos[j].info.ModTime());
-			});
-		case "mod_time_descending":
-			sort.Slice(sortInfos, func(i, j int) bool {
-				return sortInfos[i].info.ModTime().After(sortInfos[j].info.ModTime());
-			});
-		case "file_name_ascending":
-			sort.Slice(sortInfos, func(i, j int) bool {
-				return strings.Compare(sortInfos[i].info.Name(), sortInfos[j].info.Name()) < 0
-			});
-		case "file_name_descending":
-			sort.Slice(sortInfos, func(i, j int) bool {
-				return strings.Compare(sortInfos[i].info.Name(), sortInfos[j].info.Name()) > 0
-			});
-		default:
+func getSortedFiles(scanOrder string, scanSort string, sortInfos []FileSortInfo) []FileSortInfo {
+	switch scanOrder + "_" + scanSort {
+	case "asc_modtime":
+		sort.Slice(sortInfos, func(i, j int) bool {
+			return sortInfos[i].info.ModTime().Before(sortInfos[j].info.ModTime())
+		})
+	case "desc_modtime":
+		sort.Slice(sortInfos, func(i, j int) bool {
+			return sortInfos[i].info.ModTime().After(sortInfos[j].info.ModTime())
+		})
+	case "asc_filename":
+		sort.Slice(sortInfos, func(i, j int) bool {
+			return strings.Compare(sortInfos[i].info.Name(), sortInfos[j].info.Name()) < 0
+		})
+	case "desc_filename":
+		sort.Slice(sortInfos, func(i, j int) bool {
+			return strings.Compare(sortInfos[i].info.Name(), sortInfos[j].info.Name()) > 0
+		})
+	default:
 	}
 
-	return sortInfos;
+	return sortInfos
 }
-
 
 // Scan starts a scanGlob for each provided path/glob
 func (p *Prospector) scan() {
 
-	paths := p.getFiles();
+	paths := p.getFiles()
 	files := getSortInfos(paths)
-	files = getSortedFiles(strings.ToLower(p.config.ScanOrder), files)
-	for _,fileInfo := range files {
+	files = getSortedFiles(strings.ToLower(p.config.ScanOrder),
+		strings.ToLower(p.config.ScanSort),
+		files)
+	for _, fileInfo := range files {
 
 		select {
 		case <-p.done:

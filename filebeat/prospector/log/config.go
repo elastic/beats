@@ -67,9 +67,10 @@ type config struct {
 	RecursiveGlob  bool            `config:"recursive_glob.enabled"`
 
 	// Harvester
-	BufferSize         int    `config:"harvester_buffer_size"`
-	Encoding           string `config:"encoding"`
-	ScanOrder string `config:"scan_order"`
+	BufferSize int    `config:"harvester_buffer_size"`
+	Encoding   string `config:"encoding"`
+	ScanOrder  string `config:"scan.order"`
+	ScanSort   string `config:"scan.sort"`
 
 	ExcludeLines []match.Matcher         `config:"exclude_lines"`
 	IncludeLines []match.Matcher         `config:"include_lines"`
