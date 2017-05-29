@@ -1,0 +1,58 @@
+[
+    {
+        "_index": "filebeat-2016.12.27",
+        "_type": "log",
+        "_id": "AVlBCaYsqYg9cc5KQfcT",
+        "_score": null,
+        "_source": {
+            "@timestamp": "2016-12-07T10:05:07.000Z",
+            "offset": 191,
+            "nginx": {
+                "access": {
+                    "referrer": "-",
+                    "response_code": "200",
+                    "remote_ip": "10.0.0.2",
+                    "method": "GET",
+                    "user_name": "-",
+                    "http_version": "1.1",
+                    "body_sent": {
+                        "bytes": "571"
+                    },
+                    "url": "/ocelot",
+                    "user_agent": {
+                        "major": "49",
+                        "minor": "0",
+                        "os": "Mac OS X 10.12",
+                        "os_minor": "12",
+                        "os_major": "10",
+                        "name": "Firefox",
+                        "os_name": "Mac OS X",
+                        "device": "Other"
+                    }
+                }
+            },
+            "beat": {
+                "hostname": "192-168-0-7.rdsnet.ro",
+                "name": "192-168-0-7.rdsnet.ro",
+                "version": "6.0.0-alpha1"
+            },
+            "read_timestamp": "2016-12-27T15:52:23.304Z",
+            "source": "module/nginx/access/test/test.log",
+            "fields": {
+                "pipeline_id": "nginx-access-with_plugins",
+                "source_type": "nginx-access"
+            },
+            "prospector": {
+                "type": "log"
+            }
+        },
+        "fields": {
+            "@timestamp": [
+                1481105107000
+            ]
+        },
+        "sort": [
+            1481105107000
+        ]
+    }
+]
