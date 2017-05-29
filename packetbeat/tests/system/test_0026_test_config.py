@@ -29,4 +29,5 @@ class Test(BaseTest):
         self.render_config_template(
             iface_device="NoSuchDevice"
         )
-        self.start_packetbeat(extra_args=["-configtest"]).check_wait(exit_code=1)
+        self.start_packetbeat(
+            extra_args=["-configtest"]).check_wait(exit_code=1)

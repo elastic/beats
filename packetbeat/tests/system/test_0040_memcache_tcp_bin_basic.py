@@ -78,16 +78,21 @@ class Test(BaseTest):
         assert sets['k1']['memcache.request.bytes'] == 100
         assert sets['k2']['memcache.request.bytes'] == 20
         assert sets['k3']['memcache.request.bytes'] == 10
-        assert all(o['memcache.request.opcode'] == 'Set' for o in six.itervalues(sets))
-        assert all('memcache.response.cas_unique' in o for o in six.itervalues(sets))
-        assert all(o['memcache.response.status'] == 'Success' for o in six.itervalues(sets))
+        assert all(o['memcache.request.opcode'] ==
+                   'Set' for o in six.itervalues(sets))
+        assert all(
+            'memcache.response.cas_unique' in o for o in six.itervalues(sets))
+        assert all(o['memcache.response.status'] ==
+                   'Success' for o in six.itervalues(sets))
         assert all((o['memcache.request.opaque'] ==
                     o['memcache.response.opaque']) for o in six.itervalues(sets))
 
         gets = dict([(o['memcache.request.keys'][0], o) for o in objs[3:8]])
         # check all gets are quiet (transaction piping)
-        assert all(o['memcache.request.opcode'] == 'GetKQ' for o in six.itervalues(gets))
-        assert all(o['memcache.request.command'] == 'get' for o in six.itervalues(gets))
+        assert all(o['memcache.request.opcode'] ==
+                   'GetKQ' for o in six.itervalues(gets))
+        assert all(o['memcache.request.command'] ==
+                   'get' for o in six.itervalues(gets))
         assert all(o['memcache.request.quiet'] for o in six.itervalues(gets))
         assert 'memcache.response.opcode' not in gets['x']
         assert 'memcache.response.opcode' not in gets['y']
@@ -96,8 +101,10 @@ class Test(BaseTest):
         gets = dict((k, v)
                     for k, v in six.iteritems(gets)
                     if k in ['k1', 'k2', 'k3'])
-        assert all('memcache.response.cas_unique' in o for o in six.itervalues(gets))
-        assert all(o['memcache.response.status'] == 'Success' for o in six.itervalues(gets))
+        assert all(
+            'memcache.response.cas_unique' in o for o in six.itervalues(gets))
+        assert all(o['memcache.response.status'] ==
+                   'Success' for o in six.itervalues(gets))
         assert all((o['memcache.request.opaque'] ==
                     o['memcache.response.opaque']) for o in six.itervalues(gets))
 

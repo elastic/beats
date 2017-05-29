@@ -3,7 +3,10 @@ import sys
 import subprocess
 import json
 
-sys.path.append(os.path.join(os.path.dirname(__file__), '../../../libbeat/tests/system'))
+sys.path.append(
+    os.path.join(
+        os.path.dirname(__file__),
+        '../../../libbeat/tests/system'))
 
 from beat.beat import TestCase
 from beat.beat import Proc
@@ -20,7 +23,8 @@ class BaseTest(TestCase):
     @classmethod
     def setUpClass(self):
         self.beat_name = "packetbeat"
-        self.beat_path = os.path.abspath(os.path.join(os.path.dirname(__file__), "../../"))
+        self.beat_path = os.path.abspath(
+            os.path.join(os.path.dirname(__file__), "../../"))
         super(BaseTest, self).setUpClass()
 
     def run_packetbeat(self, pcap,
@@ -76,12 +80,18 @@ class BaseTest(TestCase):
         caller is responsible for stopping / waiting for the
         Proc instance.
         """
-        args = [cmd,
-                "-e",
-                "-c", os.path.join(self.working_dir, config),
-                "-systemTest",
-                "-test.coverprofile", os.path.join(self.working_dir, "coverage.cov")
-                ]
+        args = [
+            cmd,
+            "-e",
+            "-c",
+            os.path.join(
+                self.working_dir,
+                config),
+            "-systemTest",
+            "-test.coverprofile",
+            os.path.join(
+                self.working_dir,
+                "coverage.cov")]
 
         if extra_args:
             args.extend(extra_args)
@@ -100,7 +110,8 @@ class BaseTest(TestCase):
         jsons = []
         with open(os.path.join(self.working_dir, output_file), "r") as f:
             for line in f:
-                document = self.flatten_object(json.loads(line), self.dict_fields)
+                document = self.flatten_object(
+                    json.loads(line), self.dict_fields)
                 if not types or document["type"] in types:
                     jsons.append(document)
         self.all_have_fields(jsons, required_fields or TRANS_REQUIRED_FIELDS)

@@ -63,7 +63,8 @@ class Test(BaseTest):
         assert sets['k1']['memcache.request.bytes'] == 100
         assert sets['k2']['memcache.request.bytes'] == 20
         assert sets['k3']['memcache.request.bytes'] == 10
-        assert all(o['memcache.request.opcode'] == 'SetQ' for o in six.itervalues(sets))
+        assert all(o['memcache.request.opcode'] ==
+                   'SetQ' for o in six.itervalues(sets))
         assert all(o['memcache.request.quiet'] for o in six.itervalues(sets))
 
     def test_delete(self):
