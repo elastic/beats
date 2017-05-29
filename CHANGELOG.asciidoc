@@ -49,6 +49,7 @@ https://github.com/elastic/beats/compare/v5.3.0...master[Check the HEAD diff]
 *Packetbeat*
 
 - Clean configured geoip.paths before attempting to open the database. {pull}4306[4306]
+- Fix `packetbeat.interface` options that contain underscores (e.g. `with_vlans` or `bpf_filter`). {pull}4378[4378]
 
 *Winlogbeat*
 
