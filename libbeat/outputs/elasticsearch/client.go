@@ -701,6 +701,10 @@ func (conn *Connection) execHTTPRequest(req *http.Request) (int, []byte, error) 
 	return status, obj, retErr
 }
 
+func (conn *Connection) GetVersion() string {
+	return conn.version
+}
+
 func closing(c io.Closer) {
 	err := c.Close()
 	if err != nil {

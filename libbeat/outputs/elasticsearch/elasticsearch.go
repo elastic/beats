@@ -141,7 +141,7 @@ func makeES(beat common.BeatInfo, cfg *common.Config) (outputs.Group, error) {
 
 	clients := make([]outputs.NetworkClient, len(hosts))
 	for i, host := range hosts {
-		esURL, err := MakeURL(config.Protocol, config.Path, host)
+		esURL, err := common.MakeURL(config.Protocol, config.Path, host, 9200)
 		if err != nil {
 			logp.Err("Invalid host param set: %s, Error: %v", host, err)
 			return outputs.Fail(err)
@@ -230,7 +230,7 @@ func NewElasticsearchClients(cfg *common.Config) ([]Client, error) {
 
 	clients := []Client{}
 	for _, host := range hosts {
-		esURL, err := MakeURL(config.Protocol, config.Path, host)
+		esURL, err := common.MakeURL(config.Protocol, config.Path, host, 9200)
 		if err != nil {
 			logp.Err("Invalid host param set: %s, Error: %v", host, err)
 			return nil, err

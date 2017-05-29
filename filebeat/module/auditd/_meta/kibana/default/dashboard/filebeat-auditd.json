@@ -1,0 +1,121 @@
+{
+  "objects": [
+    {
+      "attributes": {
+        "description": "",
+        "kibanaSavedObjectMeta": {
+          "searchSourceJSON": "{\n  \"index\": \"filebeat-*\",\n  \"query\": {\n    \"query_string\": {\n      \"query\": \"*\",\n      \"analyze_wildcard\": true\n    }\n  },\n  \"filter\": []\n}"
+        },
+        "title": "Audit Event Types",
+        "uiStateJSON": "{}",
+        "version": 1,
+        "visState": "{\n  \"title\": \"Audit Event Types\",\n  \"type\": \"pie\",\n  \"params\": {\n    \"addTooltip\": true,\n    \"addLegend\": true,\n    \"legendPosition\": \"right\",\n    \"isDonut\": true\n  },\n  \"aggs\": [\n    {\n      \"id\": \"1\",\n      \"enabled\": true,\n      \"type\": \"count\",\n      \"schema\": \"metric\",\n      \"params\": {}\n    },\n    {\n      \"id\": \"2\",\n      \"enabled\": true,\n      \"type\": \"terms\",\n      \"schema\": \"segment\",\n      \"params\": {\n        \"field\": \"auditd.log.record_type\",\n        \"size\": 50,\n        \"order\": \"desc\",\n        \"orderBy\": \"1\"\n      }\n    }\n  ],\n  \"listeners\": {}\n}"
+      },
+      "id": "6295bdd0-0a0e-11e7-825f-6748cda7d858",
+      "type": "visualization",
+      "version": 4
+    },
+    {
+      "attributes": {
+        "description": "",
+        "kibanaSavedObjectMeta": {
+          "searchSourceJSON": "{\"index\":\"filebeat-*\",\"query\":{\"query_string\":{\"query\":\"auditd.log.record_type:EXECVE\",\"analyze_wildcard\":true}},\"filter\":[]}"
+        },
+        "title": "Audit Top Exec Commands",
+        "uiStateJSON": "{\"vis\":{\"params\":{\"sort\":{\"columnIndex\":null,\"direction\":null}}}}",
+        "version": 1,
+        "visState": "{\"title\":\"Audit Top Exec Commands\",\"type\":\"table\",\"params\":{\"perPage\":10,\"showPartialRows\":false,\"showMeticsAtAllLevels\":false,\"sort\":{\"columnIndex\":null,\"direction\":null},\"showTotal\":false,\"totalFunc\":\"sum\"},\"aggs\":[{\"id\":\"1\",\"enabled\":true,\"type\":\"count\",\"schema\":\"metric\",\"params\":{}},{\"id\":\"2\",\"enabled\":true,\"type\":\"terms\",\"schema\":\"bucket\",\"params\":{\"field\":\"auditd.log.a0\",\"size\":30,\"order\":\"desc\",\"orderBy\":\"1\",\"customLabel\":\"Command (arg 0)\"}}],\"listeners\":{}}"
+      },
+      "id": "5ebdbe50-0a0f-11e7-825f-6748cda7d858",
+      "type": "visualization",
+      "version": 4
+    },
+    {
+      "attributes": {
+        "description": "",
+        "kibanaSavedObjectMeta": {
+          "searchSourceJSON": "{}"
+        },
+        "title": "Audit Event Results",
+        "uiStateJSON": "{}",
+        "version": 1,
+        "visState": "{\"type\":\"timelion\",\"title\":\"Audit Event Results\",\"params\":{\"expression\":\".es(q=\\\"_exists_:auditd.log NOT auditd.log.res:failure\\\").label(\\\"Success\\\") .es(q=\\\"auditd.log.res:failed\\\").label(\\\"Failure\\\").title(\\\"Audit Event Results\\\")\",\"interval\":\"auto\"}}"
+      },
+      "id": "2bb0fa70-0a11-11e7-9e84-43da493ad0c7",
+      "type": "visualization",
+      "version": 4
+    },
+    {
+      "attributes": {
+        "description": "",
+        "kibanaSavedObjectMeta": {
+          "searchSourceJSON": "{\"index\":\"filebeat-*\",\"query\":{\"query_string\":{\"query\":\"*\",\"analyze_wildcard\":true}},\"filter\":[]}"
+        },
+        "title": "Audit Event Address Geo Location",
+        "uiStateJSON": "{}",
+        "version": 1,
+        "visState": "{\"title\":\"Audit Event Address Geo Location\",\"type\":\"tile_map\",\"params\":{\"mapType\":\"Scaled Circle Markers\",\"isDesaturated\":true,\"addTooltip\":true,\"heatMaxZoom\":16,\"heatMinOpacity\":0.1,\"heatRadius\":25,\"heatBlur\":15,\"heatNormalizeData\":true,\"legendPosition\":\"bottomright\",\"mapZoom\":2,\"mapCenter\":[15,5],\"wms\":{\"enabled\":false,\"url\":\"https://basemap.nationalmap.gov/arcgis/services/USGSTopo/MapServer/WMSServer\",\"options\":{\"version\":\"1.3.0\",\"layers\":\"0\",\"format\":\"image/png\",\"transparent\":true,\"attribution\":\"Maps provided by USGS\",\"styles\":\"\"}}},\"aggs\":[{\"id\":\"1\",\"enabled\":true,\"type\":\"count\",\"schema\":\"metric\",\"params\":{}},{\"id\":\"2\",\"enabled\":true,\"type\":\"geohash_grid\",\"schema\":\"segment\",\"params\":{\"field\":\"auditd.log.geoip.location\",\"autoPrecision\":true,\"precision\":2}}],\"listeners\":{}}"
+      },
+      "id": "d1726930-0a7f-11e7-8b04-eb22a5669f27",
+      "type": "visualization",
+      "version": 4
+    },
+    {
+      "attributes": {
+        "description": "",
+        "kibanaSavedObjectMeta": {
+          "searchSourceJSON": "{\"index\":\"filebeat-*\",\"query\":{\"query_string\":{\"query\":\"*\",\"analyze_wildcard\":true}},\"filter\":[]}"
+        },
+        "title": "Audit Event Account Tag Cloud",
+        "uiStateJSON": "{}",
+        "version": 1,
+        "visState": "{\"title\":\"Audit Event Account Tag Cloud\",\"type\":\"tagcloud\",\"params\":{\"scale\":\"linear\",\"orientation\":\"single\",\"minFontSize\":15,\"maxFontSize\":42,\"hideLabel\":false},\"aggs\":[{\"id\":\"1\",\"enabled\":true,\"type\":\"count\",\"schema\":\"metric\",\"params\":{}},{\"id\":\"2\",\"enabled\":true,\"type\":\"terms\",\"schema\":\"segment\",\"params\":{\"field\":\"auditd.log.acct\",\"size\":15,\"order\":\"desc\",\"orderBy\":\"1\"}}],\"listeners\":{}}"
+      },
+      "id": "c5411910-0a87-11e7-8b04-eb22a5669f27",
+      "type": "visualization",
+      "version": 4
+    },
+    {
+      "attributes": {
+        "columns": [
+          "auditd.log.record_type",
+          "auditd.log.sequence",
+          "auditd.log.acct"
+        ],
+        "description": "",
+        "hits": 0,
+        "kibanaSavedObjectMeta": {
+          "searchSourceJSON": "{\"index\":\"filebeat-*\",\"highlightAll\":true,\"version\":true,\"query\":{\"query_string\":{\"query\":\"_exists_:auditd.log\",\"analyze_wildcard\":true}},\"filter\":[]}"
+        },
+        "sort": [
+          "@timestamp",
+          "desc"
+        ],
+        "title": "Audit Events",
+        "version": 1
+      },
+      "id": "4ac0a370-0a11-11e7-8b04-eb22a5669f27",
+      "type": "search",
+      "version": 4
+    },
+    {
+      "attributes": {
+        "description": "",
+        "hits": 0,
+        "kibanaSavedObjectMeta": {
+          "searchSourceJSON": "{\"filter\":[{\"query\":{\"query_string\":{\"analyze_wildcard\":true,\"query\":\"*\"}}}],\"highlightAll\":true,\"version\":true}"
+        },
+        "optionsJSON": "{\"darkTheme\":false}",
+        "panelsJSON": "[{\"col\":1,\"id\":\"6295bdd0-0a0e-11e7-825f-6748cda7d858\",\"panelIndex\":1,\"row\":1,\"size_x\":4,\"size_y\":4,\"type\":\"visualization\"},{\"col\":9,\"id\":\"5ebdbe50-0a0f-11e7-825f-6748cda7d858\",\"panelIndex\":2,\"row\":1,\"size_x\":4,\"size_y\":4,\"type\":\"visualization\"},{\"col\":1,\"id\":\"2bb0fa70-0a11-11e7-9e84-43da493ad0c7\",\"panelIndex\":3,\"row\":5,\"size_x\":6,\"size_y\":3,\"type\":\"visualization\"},{\"col\":7,\"id\":\"d1726930-0a7f-11e7-8b04-eb22a5669f27\",\"panelIndex\":5,\"row\":5,\"size_x\":6,\"size_y\":3,\"type\":\"visualization\"},{\"col\":5,\"id\":\"c5411910-0a87-11e7-8b04-eb22a5669f27\",\"panelIndex\":6,\"row\":1,\"size_x\":4,\"size_y\":4,\"type\":\"visualization\"},{\"size_x\":12,\"size_y\":3,\"panelIndex\":7,\"type\":\"search\",\"id\":\"4ac0a370-0a11-11e7-8b04-eb22a5669f27\",\"col\":1,\"row\":8,\"columns\":[\"auditd.log.record_type\",\"auditd.log.sequence\",\"auditd.log.acct\"],\"sort\":[\"@timestamp\",\"desc\"]}]",
+        "timeRestore": false,
+        "title": "Filebeat Auditd",
+        "uiStateJSON": "{\"P-2\":{\"vis\":{\"params\":{\"sort\":{\"columnIndex\":null,\"direction\":null}}}}}",
+        "version": 1
+      },
+      "id": "dfbb49f0-0a0f-11e7-8a62-2d05eaaac5cb",
+      "type": "dashboard",
+      "version": 4
+    }
+  ],
+  "version": "6.0.0-alpha3-SNAPSHOT"
+}

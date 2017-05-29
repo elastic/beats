@@ -1,0 +1,113 @@
+{
+  "objects": [
+    {
+      "attributes": {
+        "description": "",
+        "kibanaSavedObjectMeta": {
+          "searchSourceJSON": "{\"query\":{\"query_string\":{\"query\":\"*\",\"analyze_wildcard\":true}},\"filter\":[]}"
+        },
+        "title": "Golang: Heap Summary",
+        "uiStateJSON": "{}",
+        "version": 1,
+        "visState": "{\"title\":\"Golang: Heap Summary\",\"type\":\"timelion\",\"params\":{\"expression\":\".es(index=\\\"metricbeat*\\\",metric=\\\"avg:golang.heap.system.total\\\").label(\\\"System Total Memory\\\").yaxis(label=\\\"Bytes\\\"),.es(index=\\\"metricbeat*\\\",metric=\\\"min:golang.heap.allocations.allocated\\\").label(\\\"Bytes Allocated(min)\\\").movingaverage(30),.es(index=\\\"metricbeat*\\\",metric=\\\"max:golang.heap.allocations.allocated\\\").label(\\\"Bytes Allocated(max)\\\").movingaverage(30),.es(index=\\\"metricbeat*\\\",metric=\\\"avg:golang.heap.gc.next_gc_limit\\\").label(\\\"GC Limit\\\"),.es(index=\\\"metricbeat*\\\",metric=\\\"avg:golang.heap.gc.pause.count\\\").condition(lt,1, null).points().label(\\\"GC Cycles(count)\\\").yaxis(2,label=\\\"Count\\\")\",\"interval\":\"10s\"},\"aggs\":[],\"listeners\":{}}"
+      },
+      "id": "58000780-f529-11e6-844d-b170e2f0a07e",
+      "type": "visualization",
+      "version": 1
+    },
+    {
+      "attributes": {
+        "description": "",
+        "kibanaSavedObjectMeta": {
+          "searchSourceJSON": "{\"query\":{\"query_string\":{\"query\":\"*\",\"analyze_wildcard\":true}},\"filter\":[]}"
+        },
+        "title": "Golang: Heap",
+        "uiStateJSON": "{}",
+        "version": 1,
+        "visState": "{\"title\":\"Golang: Heap\",\"type\":\"timelion\",\"params\":{\"expression\":\".es(index=\\\"metricbeat*\\\",metric=\\\"avg:golang.heap.allocations.total\\\").label(\\\"Heap Total\\\").derivative().movingaverage(30),.es(index=\\\"metricbeat*\\\",metric=\\\"avg:golang.heap.allocations.active\\\").label(\\\"Heap Inuse\\\").movingaverage(30),.es(index=\\\"metricbeat*\\\",metric=\\\"avg:golang.heap.allocations.allocated\\\").label(\\\"Heap Allocated\\\").movingaverage(30),.es(index=\\\"metricbeat*\\\",metric=\\\"avg:golang.heap.allocations.idle\\\").label(\\\"Heap Idle\\\").movingaverage(30)\",\"interval\":\"10s\"},\"aggs\":[],\"listeners\":{}}"
+      },
+      "id": "95388680-f52a-11e6-969c-518c48c913e4",
+      "type": "visualization",
+      "version": 1
+    },
+    {
+      "attributes": {
+        "description": "",
+        "kibanaSavedObjectMeta": {
+          "searchSourceJSON": "{\"query\":{\"query_string\":{\"query\":\"*\",\"analyze_wildcard\":true}},\"filter\":[]}"
+        },
+        "title": "Golang: Objects",
+        "uiStateJSON": "{}",
+        "version": 1,
+        "visState": "{\"title\":\"Golang: Objects\",\"type\":\"timelion\",\"params\":{\"expression\":\".es(index=\\\"metricbeat*\\\",metric=\\\"max:golang.heap.allocations.objects\\\").label(\\\"Object Count(avg)\\\").yaxis(1,label=\\\"Count\\\").movingaverage(30),.es(index=\\\"metricbeat*\\\",metric=\\\"max:golang.heap.allocations.total\\\").derivative().label(\\\"Allocation Rate\\\").yaxis(2,label=\\\"Rate\\\").movingaverage(30)\",\"interval\":\"10s\"},\"aggs\":[],\"listeners\":{}}"
+      },
+      "id": "b59a5200-f52a-11e6-969c-518c48c913e4",
+      "type": "visualization",
+      "version": 1
+    },
+    {
+      "attributes": {
+        "description": "",
+        "kibanaSavedObjectMeta": {
+          "searchSourceJSON": "{\"query\":{\"query_string\":{\"query\":\"*\",\"analyze_wildcard\":true}},\"filter\":[]}"
+        },
+        "title": "Golang: System",
+        "uiStateJSON": "{}",
+        "version": 1,
+        "visState": "{\"title\":\"Golang: System\",\"type\":\"timelion\",\"params\":{\"expression\":\".es(index=\\\"metricbeat*\\\",metric=\\\"avg:golang.heap.system.total\\\").label(\\\"System Total\\\"),.es(index=\\\"metricbeat*\\\",metric=\\\"avg:golang.heap.system.optained\\\").label(\\\"System Obtained\\\"),.es(index=\\\"metricbeat*\\\",metric=\\\"avg:golang.heap.system.stack\\\").label(\\\"System Stack\\\"),.es(index=\\\"metricbeat*\\\",metric=\\\"avg:golang.heap.system.released\\\").label(\\\"System Released\\\")\",\"interval\":\"10s\"},\"aggs\":[],\"listeners\":{}}"
+      },
+      "id": "9a9a8bf0-f52a-11e6-969c-518c48c913e4",
+      "type": "visualization",
+      "version": 1
+    },
+    {
+      "attributes": {
+        "description": "",
+        "kibanaSavedObjectMeta": {
+          "searchSourceJSON": "{\"query\":{\"query_string\":{\"query\":\"*\",\"analyze_wildcard\":true}},\"filter\":[]}"
+        },
+        "title": "Golang: GC count",
+        "uiStateJSON": "{}",
+        "version": 1,
+        "visState": "{\"title\":\"Golang: GC count\",\"type\":\"timelion\",\"params\":{\"expression\":\".es(index=\\\"metricbeat*\\\",metric=\\\"max:golang.heap.gc.pause.count\\\").label(\\\"GC Count\\\").bars().yaxis(label=\\\"Count\\\"),.es(index=\\\"metricbeat*\\\",metric=\\\"max:golang.heap.gc.total_count\\\").label(\\\"GC Rate\\\").derivative().movingaverage(30),.es(index=\\\"metricbeat*\\\",metric=\\\"max:golang.heap.gc.cpu_fraction\\\").label(\\\"CPU Fraction\\\").yaxis(2,label=\\\"Fraction\\\")\",\"interval\":\"10s\"},\"aggs\":[],\"listeners\":{}}"
+      },
+      "id": "b046cb80-f52a-11e6-969c-518c48c913e4",
+      "type": "visualization",
+      "version": 1
+    },
+    {
+      "attributes": {
+        "description": "",
+        "kibanaSavedObjectMeta": {
+          "searchSourceJSON": "{\"query\":{\"query_string\":{\"query\":\"*\",\"analyze_wildcard\":true}},\"filter\":[]}"
+        },
+        "title": "Golang: GC durations",
+        "uiStateJSON": "{}",
+        "version": 1,
+        "visState": "{\"title\":\"Golang: GC durations\",\"type\":\"timelion\",\"params\":{\"expression\":\".es(index=\\\"metricbeat*\\\",metric=\\\"max:golang.heap.gc.pause.sum.ns\\\").bars().label(\\\"sum of GC Pause durations(ns)\\\").yaxis(label=\\\"Durations(ns)\\\"),.es(index=\\\"metricbeat*\\\",metric=\\\"max:golang.heap.gc.total_pause.ns\\\").derivative().movingaverage(30).label(\\\"Total GC Pause(ns) Rate\\\"),.es(index=\\\"metricbeat*\\\",metric=\\\"max:golang.heap.gc.pause.max.ns\\\").label(\\\"Max GC Pause(ns)\\\").movingaverage(30),.es(index=\\\"metricbeat*\\\",metric=\\\"avg:golang.heap.gc.pause.avg.ns\\\").label(\\\"Avg GC Pause(ns)\\\").movingaverage(30),.es(index=\\\"metricbeat*\\\",metric=\\\"max:golang.heap.gc.pause.count\\\").condition(lt,1, null).label(\\\"GC Pause count\\\").points().yaxis(2,label=\\\"Count\\\")\",\"interval\":\"10s\"},\"aggs\":[],\"listeners\":{}}"
+      },
+      "id": "ab226b50-f52a-11e6-969c-518c48c913e4",
+      "type": "visualization",
+      "version": 1
+    },
+    {
+      "attributes": {
+        "description": "",
+        "hits": 0,
+        "kibanaSavedObjectMeta": {
+          "searchSourceJSON": "{\"filter\":[{\"query\":{\"query_string\":{\"analyze_wildcard\":true,\"query\":\"*\"}}}]}"
+        },
+        "optionsJSON": "{\"darkTheme\":false}",
+        "panelsJSON": "[{\"col\":1,\"id\":\"58000780-f529-11e6-844d-b170e2f0a07e\",\"panelIndex\":8,\"row\":1,\"size_x\":12,\"size_y\":3,\"type\":\"visualization\"},{\"col\":1,\"id\":\"95388680-f52a-11e6-969c-518c48c913e4\",\"panelIndex\":9,\"row\":4,\"size_x\":4,\"size_y\":4,\"type\":\"visualization\"},{\"col\":9,\"id\":\"b59a5200-f52a-11e6-969c-518c48c913e4\",\"panelIndex\":10,\"row\":4,\"size_x\":4,\"size_y\":4,\"type\":\"visualization\"},{\"col\":5,\"id\":\"9a9a8bf0-f52a-11e6-969c-518c48c913e4\",\"panelIndex\":11,\"row\":4,\"size_x\":4,\"size_y\":4,\"type\":\"visualization\"},{\"col\":7,\"id\":\"b046cb80-f52a-11e6-969c-518c48c913e4\",\"panelIndex\":12,\"row\":8,\"size_x\":6,\"size_y\":4,\"type\":\"visualization\"},{\"col\":1,\"id\":\"ab226b50-f52a-11e6-969c-518c48c913e4\",\"panelIndex\":13,\"row\":8,\"size_x\":6,\"size_y\":4,\"type\":\"visualization\"}]",
+        "timeRestore": false,
+        "title": "Golang: Heap",
+        "uiStateJSON": "{}",
+        "version": 1
+      },
+      "id": "f2dc7320-f519-11e6-a3c9-9d1f7c42b045",
+      "type": "dashboard",
+      "version": 1
+    }
+  ],
+  "version": "6.0.0-alpha3-SNAPSHOT"
+}
