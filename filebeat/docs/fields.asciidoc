@@ -153,7 +153,7 @@ The minor version of the user agent.
 [float]
 === apache2.access.user_agent.patch
 
-type: long
+type: keyword
 
 The patch version of the user agent.
 
@@ -875,7 +875,7 @@ The minor version of the user agent.
 [float]
 === nginx.access.user_agent.patch
 
-type: long
+type: keyword
 
 The patch version of the user agent.
 
