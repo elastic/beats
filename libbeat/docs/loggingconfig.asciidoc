@@ -15,8 +15,8 @@
 
 The `logging` section of the +{beatname_lc}.yml+ config file contains options
 for configuring the Beats logging output. The logging system can write logs to
-syslog or rotate log files. If logging is not explicitly configured, file output
-is used on Windows systems, and syslog output is used on Linux and OS X.
+the syslog or rotate log files. If logging is not explicitly configured, file
+output is used on Windows systems, and syslog output is used on Linux and OS X.
 
 [source,yaml]
 ------------------------------------------------------------------------------
@@ -29,8 +29,9 @@ logging.files:
   keepfiles: 7
 ------------------------------------------------------------------------------
 
-In addition to the logging system, the logging output configuration can be
-modified from the command line.
+TIP: In addition to setting logging options in the config file, you can modify
+the logging output configuration from the command line. See
+<<command-line-options>>.
 
 ==== Logging Options
 
@@ -38,20 +39,40 @@ You can specify the following options in the `logging` section of the +{beatname
 
 ===== to_syslog
 
-If enabled, sends all logging output to syslog. The default
-value is false. 
+When true, writes all logging output to the syslog.
 
 ===== to_files
 
-Writes all logging output to files subject to file rotation. The
-default value is true.
+When true, writes all logging output to files. The log files are automatically
+rotated when the log file size limit is reached.
 
+NOTE: {beatname_uc} only creates a log file if there is logging output. For
+example, if you set the log <<level,`level`>> to `error` and there are no errors,
+there will be no log file in the directory specified for logs.
+
+[[level]]
 ===== level
 
-Minimum log level. One of debug, info, warning, error or critical. If debug is
-used, but no selectors are configured, the `*` selector will be used.
-The default log level is "info".
+Minimum log level. One of `debug`, `info`, `warning`, `error`, or `critical`.
+The default log level is `info`.
 
+`debug`:: Logs debug messages, including a detailed printout of all events
+flushed by the Beat. Also logs informational messages, warnings, errors, and
+critical errors. When the log level is `debug`, you can specify a list of
+<<selectors,`selectors`>> to display debug messages for specific components.
+If no selectors are specified, the `*` selector is used to display debug
+messages for all components.
+
+`info`:: Logs informational messages, including the number of events
+that are published. Also logs any warnings, errors, or critical errors.
+
+`warning`:: Logs warnings, errors, and critical errors.
+
+`error`:: Logs errors and critical errors.
+
+`critical`:: Logs critical errors only.
+
+[[selectors]]
 ===== selectors
 
 The list of debugging-only selector tags used by different Beats components. Use `*`
