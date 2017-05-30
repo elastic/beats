@@ -1,7 +1,5 @@
 package common
 
-import "github.com/satori/go.uuid"
-
 // BeatInfo stores a beats instance meta data.
 type BeatInfo struct {
 	Beat     string    // The actual beat its name

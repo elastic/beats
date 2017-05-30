@@ -11,7 +11,6 @@ import (
 	"time"
 
 	elog "github.com/andrewkroh/sys/windows/svc/eventlog"
-	"github.com/dustin/go-humanize"
 )
 
 // Benchmark tests with customized output. (`go test -v -benchtime 10s -benchtest .`)
