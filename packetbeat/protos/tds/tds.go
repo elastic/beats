@@ -223,7 +223,7 @@ func New(
         }
     }
 
-    if err:= p.init(results, & config); err != nil {
+    if err := p.init(results, & config); err != nil {
         return nil, err
     }
     return p, nil
@@ -272,14 +272,14 @@ func(stream * tdsStream) prepareForNewMessage() {
 
 func tdsMessageParser(s * tdsStream)(bool, bool) {
 
-    m:= s.message
+    m := s.message
     for s.parseOffset < len(s.data) {
         m.start = s.parseOffset
         if len(s.data[s.parseOffset:]) < 8 {
             logp.Warn("TDS Message too short. Ignore it.")
             return false, false
         }
-        hdr:= s.data[s.parseOffset: s.parseOffset + 8]
+        hdr := s.data[s.parseOffset: s.parseOffset + 8]
         m.typ = hdr[0]
         if hdr[1] == 0x00 {
             m.isLastPacket = false
@@ -291,9 +291,9 @@ func tdsMessageParser(s * tdsStream)(bool, bool) {
         if m.typ == TDS_7_Query {
             // TDS Query
             m.isRequest = true
-            q_len:= len(s.data) - 8
-            i:= 0
-            str:= ""
+            q_len := len(s.data) - 8
+            i := 0
+            str := ""
             for i < q_len {
                 str = str + string(s.data[s.parseOffset + 8 + i])
                 i = i + 1
@@ -326,9 +326,9 @@ func tdsMessageParser(s * tdsStream)(bool, bool) {
 
         } else if m.typ == TDS_7_Auth {
             // TDS Authentication Packet
-            q_len:= len(s.data)
-            i:= m.start
-            str:= ""
+            q_len := len(s.data)
+            i := m.start
+            str := ""
             for i < q_len {
                 str = str + string(s.data[i])
                 i = i + 1
@@ -393,7 +393,7 @@ func(tds * tdsPlugin) Parse(pkt * protos.Packet, tcptuple * common.TCPTuple,
                             dir uint8, private protos.ProtocolData) protos.ProtocolData {
     defer logp.Recover("ParseTDS exception")
 
-    priv:= tdsPrivateData{}
+    priv := tdsPrivateData{}
     if private != nil {
         var ok bool
         priv, ok = private.(tdsPrivateData)
@@ -419,13 +419,13 @@ func(tds * tdsPlugin) Parse(pkt * protos.Packet, tcptuple * common.TCPTuple,
         }
     }
 
-    stream:= priv.data[dir]
+    stream := priv.data[dir]
     for len(stream.data) > 0 {
         if stream.message == nil {
             stream.message = &tdsMessage{ts: pkt.Ts}
         }
 
-        ok, complete:= tdsMessageParser(priv.data[dir])
+        ok, complete := tdsMessageParser(priv.data[dir])
         logp.Debug("tdsdetailed", "tdsMessageParser returned ok=%b complete=%b", ok, complete)
         if !ok {
             // drop this tcp stream. Will retry parsing with the next
@@ -453,11 +453,11 @@ func(tds * tdsPlugin) GapInStream(tcptuple * common.TCPTuple, dir uint8,
     if private == nil {
         return private, false
     }
-    tdsData, ok:= private.(tdsPrivateData)
+    tdsData, ok := private.(tdsPrivateData)
     if !ok {
         return private, false
     }
-    stream:= tdsData.data[dir]
+    stream := tdsData.data[dir]
     if stream == nil {
         return private, false
     }
@@ -641,7 +641,7 @@ func(tds * tdsPlugin) parseTDSResponse(data[]byte)([]string, [][]string) {
                     str:= ""
                     flag:= 0
                     for flag != 1 {
-                        if int(data[start_off]) == 253 | | int(data[start_off]) == 254 | | int(data[start_off]) == 255 {
+                        if int(data[start_off]) == 253 || int(data[start_off]) == 254 || int(data[start_off]) == 255 {
                             flag = 1
                         } else {
                             start_off += 1
