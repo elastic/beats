@@ -65,15 +65,15 @@ func (pub *transPub) createEvent(requ, resp *message) common.MapStr {
 	}
 
 	event := common.MapStr{
-		"@timestamp":    common.Time(requ.Ts),
-		"type":          "graphite",
-		"status":        status,
-		"responsetime":  0,
-		"bytes_in":      requ.Size,
-		"bytes_out":     0,
-		"src":           src,
-		"dst":           dst,
-		"request": common.MapStr{},
+		"@timestamp":   common.Time(requ.Ts),
+		"type":         "graphite",
+		"status":       status,
+		"responsetime": 0,
+		"bytes_in":     requ.Size,
+		"bytes_out":    0,
+		"src":          src,
+		"dst":          dst,
+		"request":      common.MapStr{},
 	}
 
 	event["request"] = list
