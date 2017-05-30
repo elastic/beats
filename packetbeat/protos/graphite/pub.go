@@ -73,10 +73,10 @@ func (pub *transPub) createEvent(requ, resp *message) common.MapStr {
 		"bytes_out":     0,
 		"src":           src,
 		"dst":           dst,
-		"graphite_data": common.MapStr{},
+		"request": common.MapStr{},
 	}
 
-	event["graphite_data"] = list
+	event["request"] = list
 
 	return event
 }
