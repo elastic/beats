@@ -613,23 +613,23 @@ func (tds *tdsPlugin) parseTDSResponse(data []byte) ([]string, [][]string) {
 
 		case 121:
 			// Return Status
-			// return_value:= data[1]
+			// return_value := data[1]
 			parseOffset += 2
 
 		case 124:
 			// Process ID
-			// process_number:= data[1]
+			// process_number := data[1]
 			parseOffset += 2
 
 		case 129:
 			// TDS 7.0 + Result
 			start_off := parseOffset + 1
-			// col_num:= data[start_off]
+			// col_num := data[start_off]
 			start_off += 8
 			prim := data[start_off]
 			start_off += int(prim) + 2
 
-			// col:= int(data[start_off])
+			// col := int(data[start_off])
 			// start_off += 1
 			// fields = append(fields, string(data[start_off:start_off + 2 * col - 1]))
 
@@ -673,8 +673,8 @@ func (tds *tdsPlugin) parseTDSResponse(data []byte) ([]string, [][]string) {
 			parseOffset += total_length + 3
 
 		case 167:
-		// Compute Names
-		// TODO Documentation missing
+			// Compute Names
+			// TODO Documentation missing
 
 		case 169:
 			// Order by
@@ -684,8 +684,8 @@ func (tds *tdsPlugin) parseTDSResponse(data []byte) ([]string, [][]string) {
 		case 170:
 			// TDS 7.0 + Error Message
 			length := int(data[parseOffset+1])
-			// msg_len:= data[parseOffset + 2]
-			// err_state:= data[parseOffset + 3]
+			// msg_len := data[parseOffset + 2]
+			// err_state := data[parseOffset + 3]
 			err_level := data[parseOffset+4]
 
 			if err_level > 10 {
@@ -753,7 +753,7 @@ func (tds *tdsPlugin) parseTDSResponse(data []byte) ([]string, [][]string) {
 		case 173:
 			// Login Acknowledgement
 			length := int(data[parseOffset+1])
-			// ack:= data[parseOffset + 2]
+			// ack := data[parseOffset + 2]
 			parseOffset += length + 3
 
 		case 209:
