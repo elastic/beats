@@ -5,12 +5,15 @@ package main
 import (
 	"flag"
 	"testing"
+
+	"github.com/elastic/beats/heartbeat/cmd"
 )
 
 var systemTest *bool
 
 func init() {
 	systemTest = flag.Bool("systemTest", false, "Set to true when running system tests")
+	cmd.RootCmd.Flags().AddGoFlag(flag.CommandLine.Lookup("systemTest"))
 }
 
 // Test started when the test binary is started. Only calls main.

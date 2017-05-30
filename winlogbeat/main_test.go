@@ -4,12 +4,15 @@ package main
 import (
 	"flag"
 	"testing"
+
+	"github.com/elastic/beats/winlogbeat/cmd"
 )
 
 var systemTest *bool
 
 func init() {
 	systemTest = flag.Bool("systemTest", false, "Set to true when running system tests")
+	cmd.RootCmd.Flags().AddGoFlag(flag.CommandLine.Lookup("systemTest"))
 }
 
 // TestSystem is the function called when the test binary is started.

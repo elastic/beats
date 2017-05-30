@@ -153,7 +153,7 @@ func init() {
 // instance.
 func Run(name, version string, bt Creator) error {
 	return handleError(func() error {
-		b, err := newBeat(name, version)
+		b, err := New(name, version)
 		if err != nil {
 			return err
 		}
@@ -161,8 +161,8 @@ func Run(name, version string, bt Creator) error {
 	}())
 }
 
-// newBeat creates a new beat instance
-func newBeat(name, v string) (*Beat, error) {
+// NewBeat creates a new beat instance
+func New(name, v string) (*Beat, error) {
 	if v == "" {
 		v = version.GetDefaultVersion()
 	}
