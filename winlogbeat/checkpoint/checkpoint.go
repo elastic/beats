@@ -13,6 +13,7 @@ import (
 	"time"
 
 	"github.com/elastic/beats/libbeat/logp"
+	"gopkg.in/yaml.v2"
 )
 
 // Checkpoint persists event log state information to disk.
