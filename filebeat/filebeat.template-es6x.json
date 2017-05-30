@@ -104,7 +104,8 @@
                       "type": "keyword"
                     },
                     "patch": {
-                      "type": "long"
+                      "ignore_above": 1024,
+                      "type": "keyword"
                     }
                   }
                 },
@@ -452,7 +453,8 @@
                       "type": "keyword"
                     },
                     "patch": {
-                      "type": "long"
+                      "ignore_above": 1024,
+                      "type": "keyword"
                     }
                   }
                 },

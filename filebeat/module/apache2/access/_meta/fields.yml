@@ -61,7 +61,7 @@
           description: >
             The minor version of the user agent.
         - name: patch
-          type: long
+          type: keyword
           description: >
             The patch version of the user agent.
         - name: name
