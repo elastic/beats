@@ -78,6 +78,7 @@ https://github.com/elastic/beats/compare/v6.0.0-alpha1...master[Check the HEAD d
 - Add debug logging to Jolokia JMX metricset. {pull}4341[4341]
 - Add events metricset for kubernetes metricbeat module {pull}4315[4315]
 - Change Metricbeat default configuration file to be better optimized for most users. {pull}4329[4329]
+- Add experimental RabbitMQ module. {pull}4394[4394]
 
 *Packetbeat*
 

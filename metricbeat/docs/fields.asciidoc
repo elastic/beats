@@ -37,6 +37,7 @@ grouped in the following categories:
 * <<exported-fields-php_fpm>>
 * <<exported-fields-postgresql>>
 * <<exported-fields-prometheus>>
+* <<exported-fields-rabbitmq>>
 * <<exported-fields-redis>>
 * <<exported-fields-system>>
 * <<exported-fields-vsphere>>
@@ -8873,6 +8874,335 @@ Number of open file descriptors.
 type: long
 
 Number of memory chunks that are not yet persisted to disk.
+
+
+[[exported-fields-rabbitmq]]
+== rabbitmq Fields
+
+[]experimental
+rabbitmq Module
+
+
+
+[float]
+== rabbitmq Fields
+
+
+
+
+[float]
+== node Fields
+
+node
+
+
+
+[float]
+=== rabbitmq.node.disk.free.bytes
+
+type: long
+
+format: bytes
+
+Disk free space in bytes.
+
+
+[float]
+=== rabbitmq.node.disk.free.limit.bytes
+
+type: long
+
+format: bytes
+
+Point at which the disk alarm will go off.
+
+
+[float]
+=== rabbitmq.node.fd.total
+
+type: long
+
+File descriptors available.
+
+
+[float]
+=== rabbitmq.node.fd.used
+
+type: long
+
+Used file descriptors.
+
+
+[float]
+=== rabbitmq.node.gc.num.count
+
+type: long
+
+Number of GC operations.
+
+
+[float]
+=== rabbitmq.node.gc.reclaimed.bytes
+
+type: long
+
+format: bytes
+
+GC bytes reclaimed.
+
+
+[float]
+=== rabbitmq.node.io.file_handle.open_attempt.avg.ms
+
+type: long
+
+File handle open avg time
+
+
+[float]
+=== rabbitmq.node.io.file_handle.open_attempt.count
+
+type: long
+
+File handle open attempts
+
+
+[float]
+=== rabbitmq.node.io.read.avg.ms
+
+type: long
+
+File handle read avg time
+
+
+[float]
+=== rabbitmq.node.io.read.bytes
+
+type: long
+
+format: bytes
+
+Data read in bytes
+
+
+[float]
+=== rabbitmq.node.io.read.count
+
+type: long
+
+Data read operations
+
+
+[float]
+=== rabbitmq.node.io.reopen.count
+
+type: long
+
+Data reopen operations
+
+
+[float]
+=== rabbitmq.node.io.seek.avg.ms
+
+type: long
+
+Data seek avg time
+
+
+[float]
+=== rabbitmq.node.io.seek.count
+
+type: long
+
+Data seek operations
+
+
+[float]
+=== rabbitmq.node.io.sync.avg.ms
+
+type: long
+
+Data sync avg time
+
+
+[float]
+=== rabbitmq.node.io.sync.count
+
+type: long
+
+Data sync operations
+
+
+[float]
+=== rabbitmq.node.io.write.avg.ms
+
+type: long
+
+Data write avg time
+
+
+[float]
+=== rabbitmq.node.io.write.bytes
+
+type: long
+
+format: bytes
+
+Data write in bytes
+
+
+[float]
+=== rabbitmq.node.io.write.count
+
+type: long
+
+Data write operations
+
+
+[float]
+=== rabbitmq.node.mem.limit.bytes
+
+type: long
+
+format: bytes
+
+Point at which the memory alarm will go off. 
+
+
+[float]
+=== rabbitmq.node.mem.used.bytes
+
+type: long
+
+Memory used in bytes. 
+
+
+[float]
+=== rabbitmq.node.mnesia.disk.tx.count
+
+type: long
+
+Number of Mnesia transactions which have been performed that required writes to disk.
+
+
+[float]
+=== rabbitmq.node.mnesia.ram.tx.count
+
+type: long
+
+Number of Mnesia transactions which have been performed that did not require writes to disk.
+
+
+[float]
+=== rabbitmq.node.msg.store_read.count
+
+type: long
+
+Number of messages which have been read from the message store. 
+
+
+[float]
+=== rabbitmq.node.msg.store_write.count
+
+type: long
+
+Number of messages which have been written to the message store. 
+
+
+[float]
+=== rabbitmq.node.name
+
+type: keyword
+
+Node name
+
+
+[float]
+=== rabbitmq.node.proc.total
+
+type: long
+
+Maximum number of Erlang processes.
+
+
+[float]
+=== rabbitmq.node.proc.used
+
+type: long
+
+Number of Erlang processes in use.
+
+
+[float]
+=== rabbitmq.node.processors
+
+type: long
+
+Number of cores detected and usable by Erlang.
+
+
+[float]
+=== rabbitmq.node.queue.index.journal_write.count
+
+type: long
+
+Number of records written to the queue index journal.
+
+
+[float]
+=== rabbitmq.node.queue.index.read.count
+
+type: long
+
+Number of records read from the queue index. 
+
+
+[float]
+=== rabbitmq.node.queue.index.write.count
+
+type: long
+
+Number of records written to the queue index. 
+
+
+[float]
+=== rabbitmq.node.run.queue
+
+type: long
+
+Average number of Erlang processes waiting to run. 
+
+
+[float]
+=== rabbitmq.node.socket.total
+
+type: long
+
+File descriptors available for use as sockets. 
+
+
+[float]
+=== rabbitmq.node.socket.used
+
+type: long
+
+File descriptors used as sockets.
+
+
+[float]
+=== rabbitmq.node.type
+
+type: keyword
+
+Node type.
+
+
+[float]
+=== rabbitmq.node.uptime
+
+type: long
+
+Node uptime.
 
 
 [[exported-fields-redis]]
