@@ -212,7 +212,7 @@ filebeat.prospectors:
 
 #------------------------- Redis slowlog prospector ---------------------------
 # Experimental: Config options for the redis slow log prospector
-#- input_type: redis
+#- type: redis
   #hosts: ["localhost:6379"]
   #username:
   #password:

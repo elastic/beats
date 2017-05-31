@@ -1,0 +1,55 @@
+{
+  "description": "Pipeline for parsing redis logs",
+  "processors": [
+    {
+      "grok": {
+        "field": "message",
+        "patterns": [
+          "(%{POSINT:redis.log.pid}:%{CHAR:redis.log.role} )?%{REDISTIMESTAMP:redis.log.timestamp} %{REDISLEVEL:redis.log.level} %{GREEDYDATA:redis.log.message}",
+          "%{POSINT:redis.log.pid}:signal-handler \\(%{POSINT:redis.log.timestamp}\\) %{GREEDYDATA:redis.log.message}"
+        ],
+        "pattern_definitions": {
+          "CHAR": "[a-zA-Z]",
+          "REDISLEVEL": "[.\\-*#]"
+        }
+      }
+    }, {
+      "script": {
+        "lang": "painless",
+        "inline": "if (ctx.redis.log.level == '.') {\n          ctx.redis.log.level = 'debug';\n        } else if (ctx.redis.log.level == '-') {\n          ctx.redis.log.level = 'verbose';\n        } else if (ctx.redis.log.level == '*') {\n          ctx.redis.log.level = 'notice';\n        } else if (ctx.redis.log.level == '#') {\n          ctx.redis.log.level = 'warning';\n        }"
+      }
+    }, {
+      "script": {
+        "lang": "painless",
+        "inline": "if (ctx.redis.log.role == 'M') {\n          ctx.redis.log.role = 'master';\n        } else if (ctx.redis.log.role == 'S') {\n          ctx.redis.log.role = 'slave';\n        } else if (ctx.redis.log.role == 'C') {\n          ctx.redis.log.role = 'child';\n        } else if (ctx.redis.log.role == 'X') {\n          ctx.redis.log.role = 'sentinel';\n        }\n        "
+      }
+    }, {
+      "remove": {
+        "field": "message"
+      }
+    }, {
+      "rename": {
+        "field": "@timestamp",
+        "target_field": "read_timestamp"
+      }
+    }, {
+      "date": {
+        "field": "redis.log.timestamp",
+        "target_field": "@timestamp",
+        "formats": ["dd MMM H:m:s.SSS", "dd MMM H:m:s", "UNIX"],
+        "ignore_failure": true
+      }
+    }, {
+      "remove": {
+        "field": "redis.log.timestamp",
+        "ignore_failure": true
+      }
+    }
+  ],
+  "on_failure" : [{
+    "set" : {
+      "field" : "error.message",
+      "value" : "{{ _ingest.on_failure_message }}"
+    }
+  }]
+}

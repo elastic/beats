@@ -21,6 +21,7 @@ grouped in the following categories:
 * <<exported-fields-log>>
 * <<exported-fields-mysql>>
 * <<exported-fields-nginx>>
+* <<exported-fields-redis>>
 * <<exported-fields-system>>
 
 --
@@ -1232,6 +1233,105 @@ Connection identifier.
 type: text
 
 The error message
+
+
+[[exported-fields-redis]]
+== redis Fields
+
+redis Module
+
+
+
+[float]
+== redis Fields
+
+
+
+
+[float]
+== log Fields
+
+Redis log files
+
+
+
+[float]
+=== redis.log.pid
+
+type: long
+
+The process ID of the Redis server.
+
+
+[float]
+=== redis.log.role
+
+type: keyword
+
+The role of the Redis instance. Can be one of `master`, `slave`, `child` (for RDF/AOF writing child), or `sentinel`.
+
+
+[float]
+=== redis.log.level
+
+type: keyword
+
+The log level. Can be one of `debug`, `verbose`, `notice`, or `warning`.
+
+
+[float]
+=== redis.log.message
+
+type: text
+
+The log message
+
+
+[float]
+== slowlog Fields
+
+Slow logs are retrieved from Redis via a network connection.
+
+
+
+[float]
+=== redis.slowlog.cmd
+
+type: keyword
+
+The command executed.
+
+
+[float]
+=== redis.slowlog.duration.us
+
+type: long
+
+How long it took to execute the command in microseconds.
+
+
+[float]
+=== redis.slowlog.id
+
+type: long
+
+The ID of the query.
+
+
+[float]
+=== redis.slowlog.key
+
+type: keyword
+
+The key on which the command was executed.
+
+
+[float]
+=== redis.slowlog.args
+
+type: keyword
+
+The arguments with which the command was called.
 
 
 [[exported-fields-system]]
