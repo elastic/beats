@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"time"
 
+	"github.com/dustin/go-humanize"
 	cfg "github.com/elastic/beats/filebeat/config"
 	"github.com/elastic/beats/filebeat/harvester"
 	"github.com/elastic/beats/filebeat/harvester/reader"

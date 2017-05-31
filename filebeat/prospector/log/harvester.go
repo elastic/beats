@@ -29,6 +29,7 @@ import (
 	"github.com/elastic/beats/libbeat/logp"
 	"github.com/elastic/beats/libbeat/monitoring"
 
+	"github.com/satori/go.uuid"
 	"golang.org/x/text/transform"
 )
 
