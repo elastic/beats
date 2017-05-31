@@ -1,4 +1,4 @@
-// package tds
+package tds
 
 // import (
 // 	"github.com/elastic/beats/packetbeat/config"
