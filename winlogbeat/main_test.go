@@ -13,6 +13,7 @@ var systemTest *bool
 func init() {
 	systemTest = flag.Bool("systemTest", false, "Set to true when running system tests")
 	cmd.RootCmd.Flags().AddGoFlag(flag.CommandLine.Lookup("systemTest"))
+	cmd.RootCmd.Flags().AddGoFlag(flag.CommandLine.Lookup("test.coverprofile"))
 }
 
 // TestSystem is the function called when the test binary is started.

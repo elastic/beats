@@ -2,10 +2,24 @@ package cmd
 
 import (
 	"flag"
+	"os"
+	"strings"
+
+	"github.com/spf13/cobra"
 
 	"github.com/elastic/beats/libbeat/beat"
-	"github.com/spf13/cobra"
+	"github.com/elastic/beats/libbeat/logp"
 )
+
+func init() {
+	// backwards compatibility workaround, convert -flags to --flags:
+	for i, arg := range os.Args[1:] {
+		if strings.HasPrefix(arg, "-") && !strings.HasPrefix(arg, "--") && len(arg) > 2 {
+			logp.Deprecate("6.0", "Argument %s should be -%s", arg, arg)
+			os.Args[1+i] = "-" + arg
+		}
+	}
+}
 
 // GenRootCmd returns the root command to use for your beat. It takes
 // beat name as paramter, and also run command, which will be called if no args are
