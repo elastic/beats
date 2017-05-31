@@ -532,6 +532,19 @@ packetbeat.protocols:
 #- add_locale:
 #    format: offset
 #
+# The following example enriches each event with docker metadata, it matches
+# given fields to an existing container id and adds info from that container:
+#
+#processors:
+#- add_docker_metadata:
+#    match_fields: ["system.process.cgroup.id"]
+#  host: "unix:///var/run/docker.sock"
+#  # To connect to Docker over TLS you must specify a client and CA certificate.
+#  #ssl:
+#  #  certificate_authority: "/etc/pki/root/ca.pem"
+#  #  certificate:           "/etc/pki/client/cert.pem"
+#  #  key:                   "/etc/pki/client/cert.key"
+#
 
 #================================ Outputs ======================================
 
