@@ -1,0 +1,109 @@
+[
+    {
+        "_index": "filebeat-2016.12.27",
+        "_type": "log",
+        "_id": "AVlBCaYsqYg9cc5KQfcT",
+        "_score": null,
+        "_source": {
+            "@timestamp": "2016-12-07T10:05:07.000Z",
+            "offset": 191,
+            "nginx": {
+                "access": {
+                    "referrer": "-",
+                    "response_code": "200",
+                    "remote_ip": "10.0.0.2",
+                    "method": "GET",
+                    "user_name": "-",
+                    "http_version": "1.1",
+                    "body_sent": {
+                        "bytes": "571"
+                    },
+                    "url": "/ocelot",
+                    "user_agent": {
+                        "major": "49",
+                        "minor": "0",
+                        "os": "Mac OS X 10.12",
+                        "os_minor": "12",
+                        "os_major": "10",
+                        "name": "Firefox",
+                        "os_name": "Mac OS X",
+                        "device": "Other"
+                    }
+                }
+            },
+            "beat": {
+                "hostname": "192-168-0-7.rdsnet.ro",
+                "name": "192-168-0-7.rdsnet.ro",
+                "version": "6.0.0-alpha1"
+            },
+            "read_timestamp": "2016-12-27T15:52:23.304Z",
+            "source": "module/nginx/access/test/test.log",
+            "fields": {
+                "pipeline_id": "nginx-access-with_plugins",
+                "source_type": "nginx-access"
+            },
+            "prospector": {
+                "type": "log"
+            }
+        },
+        "fields": {
+            "@timestamp": [
+                1481105107000
+            ]
+        },
+        "sort": [
+            1481105107000
+        ]
+    },
+    {
+        "_id": "AVxVuTJrsqw9BQCgtCgi",
+        "_index": "filebeat-6.0.0-alpha2-2017.05.29",
+        "_score": null,
+        "_source": {
+            "@timestamp": "2017-05-29T19:02:48.000Z",
+            "beat": {
+                "hostname": "X1",
+                "name": "X1",
+                "version": "6.0.0-alpha2"
+            },
+            "nginx": {
+                "access": {
+                    "body_sent": {
+                        "bytes": "612"
+                    },
+                    "http_version": "1.1",
+                    "method": "GET",
+                    "referrer": "-",
+                    "remote_ip": "172.17.0.1",
+                    "response_code": "404",
+                    "url": "/stringpatch",
+                    "user_agent": {
+                        "device": "Other",
+                        "major": "15",
+                        "minor": "0",
+                        "name": "Firefox Alpha",
+                        "os": "Windows 7",
+                        "os_name": "Windows 7",
+                        "patch": "a2"
+                    },
+                    "user_name": "-"
+                }
+            },
+            "offset": 341,
+            "prospector": {
+                "type": "log"
+            },
+            "read_timestamp": "2017-05-29T19:40:14.373Z",
+            "source": "/home/exekias/go/src/github.com/elastic/beats/filebeat/nginx.log"
+        },
+        "_type": "doc",
+        "fields": {
+            "@timestamp": [
+                1496084568000
+            ]
+        },
+        "sort": [
+            1496084568000
+        ]
+    }
+]

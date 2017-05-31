@@ -155,7 +155,7 @@ The minor version of the user agent.
 [float]
 === apache2.access.user_agent.patch
 
-type: long
+type: keyword
 
 The patch version of the user agent.
 
@@ -545,6 +545,12 @@ Name of the cloud provider. Possible values are ec2, gce, or digitalocean.
 === meta.cloud.instance_id
 
 Instance ID of the host machine.
+
+
+[float]
+=== meta.cloud.instance_name
+
+Instance name of the host machine.
 
 
 [float]
@@ -1063,7 +1069,7 @@ The minor version of the user agent.
 [float]
 === nginx.access.user_agent.patch
 
-type: long
+type: keyword
 
 The patch version of the user agent.
 

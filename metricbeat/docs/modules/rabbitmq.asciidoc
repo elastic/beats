@@ -1,0 +1,39 @@
+////
+This file is generated! See scripts/docs_collector.py
+////
+
+[[metricbeat-module-rabbitmq]]
+== rabbitmq Module
+
+This is the rabbitmq Module. It uses http://www.rabbitmq.com/management.html [HTTP API] created by the management plugin to collect metrics.
+
+
+
+[float]
+=== Example Configuration
+
+The rabbitmq module supports the standard configuration options that are described
+in <<configuration-metricbeat>>. Here is an example configuration:
+
+[source,yaml]
+----
+metricbeat.modules:
+- module: rabbitmq
+  metricsets: ["node"]
+  enabled: false
+  period: 10s
+  hosts: ["localhost:15672"]
+
+  username: guest
+  password: guest
+----
+
+[float]
+=== Metricsets
+
+The following metricsets are available:
+
+* <<metricbeat-metricset-rabbitmq-node,node>>
+
+include::rabbitmq/node.asciidoc[]
+

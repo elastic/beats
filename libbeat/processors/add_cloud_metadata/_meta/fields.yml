@@ -13,6 +13,10 @@
       description: >
         Instance ID of the host machine.
 
+    - name: meta.cloud.instance_name
+      description: >
+        Instance name of the host machine.
+
     - name: meta.cloud.machine_type
       example: t2.medium
       description: >

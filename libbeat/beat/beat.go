@@ -64,6 +64,7 @@ import (
 	// Register default processors.
 	_ "github.com/elastic/beats/libbeat/processors/actions"
 	_ "github.com/elastic/beats/libbeat/processors/add_cloud_metadata"
+	_ "github.com/elastic/beats/libbeat/processors/add_docker_metadata"
 	_ "github.com/elastic/beats/libbeat/processors/add_locale"
 	_ "github.com/elastic/beats/libbeat/processors/kubernetes"
 
