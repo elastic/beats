@@ -6,12 +6,14 @@ import "github.com/elastic/beats/libbeat/common/match"
 const (
 	LogType   = "log"
 	StdinType = "stdin"
+	RedisType = "redis"
 )
 
-// ValidType is a list of all valid input types
+// ValidType of valid input types
 var ValidType = map[string]struct{}{
 	StdinType: {},
 	LogType:   {},
+	RedisType: {},
 }
 
 // MatchAny checks if the text matches any of the regular expressions

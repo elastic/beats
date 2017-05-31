@@ -12,47 +12,37 @@ metricbeat.modules:
 
 #------------------------------- System Module -------------------------------
 - module: system
-  metricsets:
-    # CPU stats
-    - cpu
-
-    # System Load stats
-    - load
-
-    # Per CPU core stats
-    #- core
-
-    # IO stats
-    #- diskio
-
-    # Per filesystem stats
-    - filesystem
-
-    # File system summary stats
-    - fsstat
-
-    # Memory stats
-    - memory
-
-    # Network stats
-    - network
-
-    # Processes summary
-    - process_summary
-
-    # Per process stats
-    - process
-
-    # Sockets (linux only)
-    #- socket
   enabled: true
   period: 10s
+  metricsets:
+    - cpu
+    - load
+    - memory
+    #- core
+    #- diskio
+    - network
+    - process_summary
+    - process
+    #- socket
   processes: ['.*']
   process.include_top_n:
     by_cpu: 5      # include top 5 processes by CPU
     by_memory: 5   # include top 5 processes by memory
+- module: system
+  enabled: true
+  period: 1m
+  metricsets:
+    - filesystem
+    - fsstat
+  filters:
+    - drop_event.when.regexp.mount_point: '^/(sys|cgroup|proc|dev|etc|host|lib)($|/)'
 
 
+#==================== Elasticsearch template setting ==========================
+setup.template.settings:
+  index.number_of_shards: 1
+  index.codec: best_compression
+  #_source.enabled: false
 
 #================================ General =====================================
 

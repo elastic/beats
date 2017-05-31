@@ -1,4 +1,4 @@
-[[filebeat-command-line]]
+[[command-line-options]]
 === Command Line Options
 
 The following command line option is specific to Filebeat.

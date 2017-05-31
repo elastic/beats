@@ -24,6 +24,7 @@ const gceMetadataV1 = `{
       }
     ],
     "hostname": "test-gce-dev.c.test-dev.internal",
+    "name": "test-gce-dev",
     "id": 3910564293633576924,
     "image": "",
     "licenses": [
@@ -137,6 +138,7 @@ func TestRetrieveGCEMetadata(t *testing.T) {
 			"cloud": common.MapStr{
 				"provider":          "gce",
 				"instance_id":       "3910564293633576924",
+				"instance_name":     "test-gce-dev",
 				"machine_type":      "projects/111111111111/machineTypes/f1-micro",
 				"availability_zone": "projects/111111111111/zones/us-east1-b",
 				"project_id":        "test-dev",
