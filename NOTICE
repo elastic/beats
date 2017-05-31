@@ -1360,6 +1360,7 @@ Exhibit B - "Incompatible With Secondary Licenses" Notice
 --------------------------------------------------------------------
 Dependency: github.com/hydrogen18/stalecucumber
 Revision: 0a94983f3e27967c69ba6bb92f9d5f0a68a97bc0
+License type (autodetected): BSD license
 ./vendor/github.com/hydrogen18/stalecucumber/LICENSE:
 --------------------------------------------------------------------
 Copyright (c) 2014, Eric Urban
