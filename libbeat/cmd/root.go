@@ -6,6 +6,7 @@ import (
 	"strings"
 
 	"github.com/spf13/cobra"
+	"github.com/spf13/pflag"
 
 	"github.com/elastic/beats/libbeat/beat"
 	"github.com/elastic/beats/libbeat/logp"
@@ -25,7 +26,15 @@ func init() {
 // beat name as paramter, and also run command, which will be called if no args are
 // given (for backwards compatibility)
 func GenRootCmd(name string, beatCreator beat.Creator) *cobra.Command {
-	runCmd := genRunCmd(name, beatCreator)
+	return GenRootCmdWithRunFlags(name, beatCreator, nil)
+}
+
+// GenRootCmdWithRunFlags returns the root command to use for your beat. It takes
+// beat name as paramter, and also run command, which will be called if no args are
+// given (for backwards compatibility). runFlags parameter must the flagset used by
+// run command
+func GenRootCmdWithRunFlags(name string, beatCreator beat.Creator, runFlags *pflag.FlagSet) *cobra.Command {
+	runCmd := genRunCmd(name, beatCreator, runFlags)
 
 	rootCmd := &cobra.Command{
 		Use: name,

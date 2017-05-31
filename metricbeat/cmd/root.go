@@ -1,10 +1,25 @@
 package cmd
 
-import cmd "github.com/elastic/beats/libbeat/cmd"
-import "github.com/elastic/beats/metricbeat/beater"
+import (
+	"flag"
+
+	"github.com/spf13/cobra"
+	"github.com/spf13/pflag"
+
+	"github.com/elastic/beats/metricbeat/beater"
+
+	cmd "github.com/elastic/beats/libbeat/cmd"
+)
 
 // Name of this beat
 var Name = "metricbeat"
 
 // RootCmd to handle beats cli
-var RootCmd = cmd.GenRootCmd(Name, beater.New)
+var RootCmd *cobra.Command
+
+func init() {
+	var runFlags = pflag.NewFlagSet(Name, pflag.ExitOnError)
+	runFlags.AddGoFlag(flag.CommandLine.Lookup("system.hostfs"))
+
+	RootCmd = cmd.GenRootCmdWithRunFlags(Name, beater.New, runFlags)
+}

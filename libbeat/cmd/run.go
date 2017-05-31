@@ -5,11 +5,12 @@ import (
 	"os"
 
 	"github.com/spf13/cobra"
+	"github.com/spf13/pflag"
 
 	"github.com/elastic/beats/libbeat/beat"
 )
 
-func genRunCmd(name string, beatCreator beat.Creator) *cobra.Command {
+func genRunCmd(name string, beatCreator beat.Creator, runFlags *pflag.FlagSet) *cobra.Command {
 	runCmd := cobra.Command{
 		Use:   "run",
 		Short: "Run " + name,
@@ -32,6 +33,10 @@ func genRunCmd(name string, beatCreator beat.Creator) *cobra.Command {
 	runCmd.Flags().AddGoFlag(flag.CommandLine.Lookup("configtest"))
 	runCmd.Flags().AddGoFlag(flag.CommandLine.Lookup("setup"))
 	runCmd.Flags().AddGoFlag(flag.CommandLine.Lookup("version"))
+
+	if runFlags != nil {
+		runCmd.Flags().AddFlagSet(runFlags)
+	}
 
 	return &runCmd
 }
