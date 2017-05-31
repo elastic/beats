@@ -190,7 +190,7 @@ type tdsStream struct {
 type tdsPlugin struct {
 
 	// config
-	ports        []int
+	ports []int
 	// maxStoreRows int
 	// maxRowLength int
 	sendRequest  bool
@@ -673,8 +673,8 @@ func (tds *tdsPlugin) parseTDSResponse(data []byte) ([]string, [][]string) {
 			parseOffset += total_length + 3
 
 		case 167:
-			// Compute Names
-			// TODO Documentation missing
+		// Compute Names
+		// TODO Documentation missing
 
 		case 169:
 			// Order by
