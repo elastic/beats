@@ -6,7 +6,7 @@ import (
 )
 
 type tdsConfig struct {
-	config.ProtocolCommon `config: ",inline"`
+	config.ProtocolCommon //`config: ",inline"`
 	// MaxRowLength          int `config: "max_row_length"`
 	// MaxRows               int `config: "max_rows"`
 }
