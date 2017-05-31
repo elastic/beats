@@ -1,17 +1,6 @@
 [[beats-contributing]]
 == Contributing to Beats
 
-IMPORTANT: Please post all questions and issues first on
-https://discuss.elastic.co/c/beats[https://discuss.elastic.co/c/beats]
-before opening a Github Issue.
-
-The Beats are open source and we love to receive contributions from our
-community — you!
-
-There are many ways to contribute, from writing tutorials or blog posts,
-improving the documentation, submitting bug reports and feature requests, or
-writing code that implements a whole new protocol, module, or Beat.
-
 If you have a bugfix or new feature that you would like to contribute, please
 start by opening a topic on the https://discuss.elastic.co/c/beats[forums].
 It may be that somebody is already working on it, or that there are particular
@@ -43,7 +32,7 @@ related to the pull request.
 If you want to create a new Beat, please read <<new-beat>>. You don't need to
 submit the code to this repository. Most new Beats start in their own repository
 and just make use of the libbeat packages. After you have a working Beat that
-you'd like to share with others, open a PR to add it to our list of 
+you'd like to share with others, open a PR to add it to our list of
 https://github.com/elastic/beats/blob/master/libbeat/docs/communitybeats.asciidoc[community
 Beats].
 
@@ -57,7 +46,7 @@ used for development is Golang {go-version}.
 
 The location where you clone is important. Please clone under the source
 directory of your `GOPATH`. If you don't have `GOPATH` already set, you can
-simply set it to your home directory (`export GOPATH=$HOME`).
+simply set it to the `go` directory in your home (`export GOPATH=$HOME/go`).
 
 [source,shell]
 --------------------------------------------------------------------------------
@@ -77,8 +66,14 @@ cd beats/packetbeat
 make
 --------------------------------------------------------------------------------
 
-Some of the Beats might have extra development requirements, in which case you'll find a
-CONTRIBUTING.md file in the Beat directory.
+Some of the Beats might have extra development requirements, in which case
+you'll find a CONTRIBUTING.md file in the Beat directory.
+
+We use an http://editorconfig.org/[EditorConfig] file in the beats repository
+to standardise how different editors handle whitespace, line endings, and other
+coding styles in our files. Most popular editors have a
+http://editorconfig.org/#download[plugin] for EditorConfig and we strongly
+recommend that you install it.
 
 [float]
 [[update-scripts]]
