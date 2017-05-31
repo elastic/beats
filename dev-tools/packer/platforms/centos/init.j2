@@ -29,7 +29,7 @@ args="-c /etc/{{.beat_name}}/{{.beat_name}}.yml -path.home /usr/share/{{.beat_na
 test_args="-e -configtest"
 beat_user="${BEAT_USER:-root}"
 wrapper="/usr/share/{{.beat_name}}/bin/{{.beat_name}}-god"
-wrapperopts="-r / -n -p $pidfile -u $beat_user"
+wrapperopts="-r / -n -p $pidfile"
 user_wrapper="su"
 user_wrapperopts="$beat_user -c"
 RETVAL=0
@@ -44,9 +44,11 @@ if status | grep -q -- '-p' 2>/dev/null; then
     pidopts="-p $pidfile"
 fi
 
-if runuser -v &> /dev/null; then
+if command -v runuser >/dev/null 2>&1; then
     user_wrapper="runuser"
 fi
+
+[ "$beat_user" != "root" ] && wrapperopts="$wrapperopts -u $beat_user"
 
 test() {
 	$user_wrapper $user_wrapperopts "$agent $args $test_args"
