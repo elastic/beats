@@ -102,7 +102,12 @@ docs:
 	sh libbeat/scripts/build_docs.sh $(PROJECTS)
 
 .PHONY: package
-package: update beats-dashboards
+package:
+
+	# Runs update inside python container to prevent virtualenv dependency
+	docker run -e GOPATH=/go -v $(PWD):/go/src/github.com/elastic/beats python:2.7 make -C /go/src/github.com/elastic/beats update
+	$(MAKE) beats-dashboards
+
 	$(foreach var,$(BEATS),SNAPSHOT=$(SNAPSHOT) $(MAKE) -C $(var) package || exit 1;)
 
 	# build the dashboards package
