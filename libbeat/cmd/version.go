@@ -5,9 +5,10 @@ import (
 	"os"
 	"runtime"
 
+	"github.com/spf13/cobra"
+
 	"github.com/elastic/beats/libbeat/beat"
 	"github.com/elastic/beats/libbeat/version"
-	"github.com/spf13/cobra"
 )
 
 func genVersionCmd(name string) *cobra.Command {

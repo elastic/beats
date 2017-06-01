@@ -23,8 +23,6 @@ func genRunCmd(name string, beatCreator beat.Creator, runFlags *pflag.FlagSet) *
 
 	// Run subcommand flags, only available to *beat run
 	runCmd.Flags().AddGoFlag(flag.CommandLine.Lookup("N"))
-	runCmd.Flags().AddGoFlag(flag.CommandLine.Lookup("e"))
-	runCmd.Flags().AddGoFlag(flag.CommandLine.Lookup("v"))
 	runCmd.Flags().AddGoFlag(flag.CommandLine.Lookup("httpprof"))
 	runCmd.Flags().AddGoFlag(flag.CommandLine.Lookup("cpuprofile"))
 	runCmd.Flags().AddGoFlag(flag.CommandLine.Lookup("memprofile"))
