@@ -29,6 +29,8 @@ var (
 		HarvesterLimit: 0,
 		Symlinks:       false,
 		TailFiles:      false,
+		ScanSort:       "none",
+		ScanOrder:      "asc",
 
 		// Harvester
 		BufferSize: 16 * humanize.KiByte,

@@ -6,7 +6,6 @@ import (
 	"os"
 	"path/filepath"
 	"time"
-
 	"sort"
 	"strings"
 
@@ -284,38 +283,90 @@ func getSortInfos(paths map[string]os.FileInfo) []FileSortInfo {
 }
 
 func getSortedFiles(scanOrder string, scanSort string, sortInfos []FileSortInfo) []FileSortInfo {
-	switch scanOrder + "_" + scanSort {
-	case "asc_modtime":
-		sort.Slice(sortInfos, func(i, j int) bool {
-			return sortInfos[i].info.ModTime().Before(sortInfos[j].info.ModTime())
-		})
-	case "desc_modtime":
-		sort.Slice(sortInfos, func(i, j int) bool {
-			return sortInfos[i].info.ModTime().After(sortInfos[j].info.ModTime())
-		})
-	case "asc_filename":
-		sort.Slice(sortInfos, func(i, j int) bool {
-			return strings.Compare(sortInfos[i].info.Name(), sortInfos[j].info.Name()) < 0
-		})
-	case "desc_filename":
-		sort.Slice(sortInfos, func(i, j int) bool {
-			return strings.Compare(sortInfos[i].info.Name(), sortInfos[j].info.Name()) > 0
-		})
+	var sortFunc func(i, j int) bool = nil
+	switch scanSort {
+	case "modtime":
+		switch scanOrder {
+		case "asc":
+			sortFunc = func(i, j int) bool {
+				return sortInfos[i].info.ModTime().Before(sortInfos[j].info.ModTime())
+			}
+		case "desc":
+			sortFunc = func(i, j int) bool {
+				return sortInfos[i].info.ModTime().After(sortInfos[j].info.ModTime())
+			}
+		default:
+		}
+	case "filename":
+		switch scanOrder {
+		case "asc":
+			sortFunc = func(i, j int) bool {
+				return strings.Compare(sortInfos[i].info.Name(), sortInfos[j].info.Name()) < 0
+			}
+		case "desc":
+			sortFunc = func(i, j int) bool {
+				return strings.Compare(sortInfos[i].info.Name(), sortInfos[j].info.Name()) > 0
+			}
+		default:
+		}
 	default:
+	}
+
+	if sortFunc != nil {
+		sort.Slice(sortInfos, sortFunc)
 	}
 
 	return sortInfos
 }
 
+func getFileState(path string, info os.FileInfo, p *Prospector) (file.State) {
+	var err error
+	var absolutePath string
+	absolutePath, err = filepath.Abs(path)
+	if err != nil {
+		logp.Err("could not fetch abs path for file %s: %s", absolutePath, err)
+	}
+	logp.Debug("prospector", "Check file for harvesting: %s", absolutePath)
+	// Create new state for comparison
+	newState := file.NewState(info, absolutePath, p.config.Type)
+	return newState
+}
+
+func getKeys(paths map[string]os.FileInfo) []string {
+	files := make([]string, 0)
+	for file := range paths {
+		files = append(files, file)
+	}
+	return files
+}
+
 // Scan starts a scanGlob for each provided path/glob
 func (p *Prospector) scan() {
 
+	var sortInfos []FileSortInfo
+	var files []string
+
 	paths := p.getFiles()
-	files := getSortInfos(paths)
-	files = getSortedFiles(strings.ToLower(p.config.ScanOrder),
-		strings.ToLower(p.config.ScanSort),
-		files)
-	for _, fileInfo := range files {
+	if strings.ToLower(p.config.ScanSort) != "none" {
+		sortInfos = getSortedFiles(strings.ToLower(p.config.ScanOrder),
+			strings.ToLower(p.config.ScanSort),
+			getSortInfos(paths))
+	} else {
+		files = getKeys(paths)
+	}
+
+	for i := 0; i < len(paths); i++ {
+
+		var path string
+		var info os.FileInfo
+
+		if strings.ToLower(p.config.ScanSort) != "none" {
+			path = sortInfos[i].path
+			info = sortInfos[i].info
+		} else {
+			path = files[i]
+			info = paths[path]
+		}
 
 		select {
 		case <-p.done:
@@ -324,15 +375,7 @@ func (p *Prospector) scan() {
 		default:
 		}
 
-		var err error
-		fileInfo.path, err = filepath.Abs(fileInfo.path)
-		if err != nil {
-			logp.Err("could not fetch abs path for file %s: %s", fileInfo.path, err)
-		}
-		logp.Debug("prospector", "Check file for harvesting: %s", fileInfo.path)
-
-		// Create new state for comparison
-		newState := file.NewState(fileInfo.info, fileInfo.path, p.config.Type)
+		newState := getFileState(path, info, p)
 
 		// Load last state
 		lastState := p.states.FindPrevious(newState)
