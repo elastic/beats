@@ -14,7 +14,7 @@ var metagen = &kubernetes.GenDefaultMeta{}
 func TestIpPortIndexer(t *testing.T) {
 	var testConfig = common.NewConfig()
 
-	ipIndexer, err := newIpPortIndexer(*testConfig, metagen)
+	ipIndexer, err := NewIpPortIndexer(*testConfig, metagen)
 	assert.Nil(t, err)
 
 	podName := "testpod"

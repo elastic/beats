@@ -14,7 +14,7 @@ const (
 
 func init() {
 	// Register default indexers
-	kubernetes.Indexing.AddIndexer(IpPortIndexerName, newIpPortIndexer)
+	kubernetes.Indexing.AddIndexer(IpPortIndexerName, NewIpPortIndexer)
 	cfg := common.NewConfig()
 
 	//Add IP Port Indexer as a default indexer
@@ -35,7 +35,7 @@ type IpPortIndexer struct {
 	genMeta kubernetes.GenMeta
 }
 
-func newIpPortIndexer(_ common.Config, genMeta kubernetes.GenMeta) (kubernetes.Indexer, error) {
+func NewIpPortIndexer(_ common.Config, genMeta kubernetes.GenMeta) (kubernetes.Indexer, error) {
 	return &IpPortIndexer{genMeta: genMeta}, nil
 }
 
