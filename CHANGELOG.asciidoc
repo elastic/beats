@@ -207,6 +207,7 @@ https://github.com/elastic/beats/compare/v5.4.0...v6.0.0-alpha1[View commits]
 - Add experimental Elasticsearch module. {pull}3903[3903]
 - Add experimental Kibana module. {pull}3895[3895]
 - Move elasticsearch metricset node_stats under node.stats namespace. {pull}4142[4142]
+- Make IP port indexer constructor public {pull}4434[4434]
 
 *Packetbeat*
 
