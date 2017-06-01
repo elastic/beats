@@ -459,17 +459,6 @@ func (b *Beat) loadDashboards() error {
 // the elasticsearch output. It is important the the registration happens before
 // the publisher is created.
 func (b *Beat) registerTemplateLoading() error {
-	if *setup {
-		// -setup implies template.enabled=true
-		if b.Config.Template == nil {
-			b.Config.Template = common.NewConfig()
-		}
-		err := b.Config.Template.SetBool("enabled", -1, true)
-		if err != nil {
-			return fmt.Errorf("Error setting template.enabled=true: %v", err)
-		}
-	}
-
 	// Check if outputting to file is enabled, and output to file if it is
 	if b.Config.Template != nil && b.Config.Template.Enabled() {
 		var cfg template.TemplateConfig
@@ -495,33 +484,31 @@ func (b *Beat) registerTemplateLoading() error {
 
 	esConfig := b.Config.Output["elasticsearch"]
 	// Loads template by default if esOutput is enabled
-	if (b.Config.Template == nil && esConfig.Enabled()) || (b.Config.Template != nil && b.Config.Template.Enabled()) {
-		if esConfig == nil || !esConfig.Enabled() {
-			return fmt.Errorf("Template loading requested but the Elasticsearch output is not configured/enabled")
+	if esConfig != nil && esConfig.Enabled() {
+		if b.Config.Template == nil || (b.Config.Template != nil && b.Config.Template.Enabled()) {
+			// load template through callback to make sure it is also loaded
+			// on reconnecting
+			callback := func(esClient *elasticsearch.Client) error {
+
+				if b.Config.Template == nil {
+					b.Config.Template = common.NewConfig()
+				}
+
+				loader, err := template.NewLoader(b.Config.Template, esClient, b.Info)
+				if err != nil {
+					return fmt.Errorf("Error creating Elasticsearch template loader: %v", err)
+				}
+
+				err = loader.Load()
+				if err != nil {
+					return fmt.Errorf("Error loading Elasticsearch template: %v", err)
+				}
+
+				return nil
+			}
+
+			elasticsearch.RegisterConnectCallback(callback)
 		}
-
-		// load template through callback to make sure it is also loaded
-		// on reconnecting
-		callback := func(esClient *elasticsearch.Client) error {
-
-			if b.Config.Template == nil {
-				b.Config.Template = common.NewConfig()
-			}
-
-			loader, err := template.NewLoader(b.Config.Template, esClient, b.Info)
-			if err != nil {
-				return fmt.Errorf("Error creating Elasticsearch template loader: %v", err)
-			}
-
-			err = loader.Load()
-			if err != nil {
-				return fmt.Errorf("Error loading Elasticsearch template: %v", err)
-			}
-
-			return nil
-		}
-
-		elasticsearch.RegisterConnectCallback(callback)
 	}
 
 	return nil
