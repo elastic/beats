@@ -93,6 +93,11 @@ packetbeat.protocols:
   # the NFS protocol by commenting out the list of ports.
   ports: [2049]
 
+- type: tds
+  # Configure the ports where to listen for MSSQL traffic. You can disable
+  # the TDS protocol by commenting out the list of ports.
+  ports: [1433]
+
 #================================ General =====================================
 
 # The name of the shipper that publishes the network data. It can be used to group

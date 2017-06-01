@@ -3,7 +3,7 @@ from packetbeat import BaseTest
 
 class Test(BaseTest):
     """
-    Basic Graphite Tests
+    Basic MSSQL TDS Tests
     """
 
     def test_tds_protocol(self):
