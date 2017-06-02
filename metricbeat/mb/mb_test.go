@@ -3,6 +3,7 @@
 package mb
 
 import (
+	"fmt"
 	"testing"
 	"time"
 
@@ -95,7 +96,7 @@ func TestModuleConfig(t *testing.T) {
 			continue
 		}
 		if test.err != "" &&
-			assert.Error(t, err, "expected '%v' in testcase %d", test.err, i) {
+			assert.Error(t, err, fmt.Sprintf("expected '%v' in testcase %d", test.err, i)) {
 			assert.Contains(t, err.Error(), test.err, "testcase %d", i)
 			continue
 		}

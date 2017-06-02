@@ -36,7 +36,7 @@ install:
         wget "$env:GVM_DL" -Outfile C:\Windows\System32\gvm.exe
       }
   - ps: gvm --format=powershell $(Get-Content .go-version) | Invoke-Expression
-  # AppVeyor installed mingw is 32-bit only.
+  # AppVeyor installed mingw is 32-bit only so install 64-bit version.
   - ps: >-
       if(!(Test-Path "C:\tools\mingw64\bin\gcc.exe")) {
         cinst mingw > mingw-install.txt

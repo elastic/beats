@@ -3,6 +3,7 @@
 package config
 
 import (
+	"fmt"
 	"testing"
 
 	"github.com/stretchr/testify/assert"
@@ -18,7 +19,7 @@ func (v validationTestCase) run(t *testing.T) {
 		assert.NoError(t, v.config.Validate())
 	} else {
 		err := v.config.Validate()
-		if assert.Error(t, err, "expected '%s'", v.errMsg) {
+		if assert.Error(t, err, fmt.Sprintf("expected '%s'", v.errMsg)) {
 			assert.Contains(t, err.Error(), v.errMsg)
 		}
 	}
