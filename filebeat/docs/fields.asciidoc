@@ -234,6 +234,22 @@ The longitude and latitude.
 
 
 [float]
+=== apache2.access.geoip.region_name
+
+type: keyword
+
+The region name.
+
+
+[float]
+=== apache2.access.geoip.city_name
+
+type: keyword
+
+The city name.
+
+
+[float]
 == error Fields
 
 Fields from the Apache error logs.
@@ -960,11 +976,19 @@ Contains fields for the Nginx access logs.
 
 
 [float]
+=== nginx.access.remote_ip_list
+
+type: array
+
+An array of remote IP addresses. It is a list because it is common to include, besides the client IP address, IP addresses from headers like `X-Forwarded-For`. See also the `remote_ip` field.
+
+
+[float]
 === nginx.access.remote_ip
 
 type: keyword
 
-Client IP address.
+Client IP address. The first public IP address from the `remote_ip_list` array. If no public IP addresses are present, this field contains the first private IP address from the `remote_ip_list` array.
 
 
 [float]
@@ -1145,6 +1169,22 @@ Country ISO code.
 type: geo_point
 
 The longitude and latitude.
+
+
+[float]
+=== nginx.access.geoip.region_name
+
+type: keyword
+
+The region name.
+
+
+[float]
+=== nginx.access.geoip.city_name
+
+type: keyword
+
+The city name.
 
 
 [float]

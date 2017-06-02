@@ -104,4 +104,12 @@
           type: geo_point
           description: >
             The longitude and latitude.
+        - name: region_name
+          type: keyword
+          description: >
+            The region name.
+        - name: city_name
+          type: keyword
+          description: >
+            The city name.
 
