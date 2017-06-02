@@ -191,8 +191,8 @@ type tdsPlugin struct {
 
     // config
     ports[]int
-    maxStoreRows int
-    maxRowLength int
+    //maxStoreRows int
+    //maxRowLength int
     sendRequest  bool
     sendResponse bool
 
@@ -244,8 +244,8 @@ func(tds * tdsPlugin) init(results publish.Transactions, config * tdsConfig) err
 
 func(tds * tdsPlugin) setFromConfig(config * tdsConfig) {
     tds.ports = config.Ports
-    tds.maxRowLength = config.MaxRowLength
-    tds.maxStoreRows = config.MaxRows
+    //tds.maxRowLength = config.MaxRowLength
+    //tds.maxStoreRows = config.MaxRows
     tds.sendRequest = config.SendRequest
     tds.sendResponse = config.SendResponse
     tds.transactionTimeout = config.TransactionTimeout
