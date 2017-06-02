@@ -20,7 +20,7 @@ func (c *countFilter) Run(e common.MapStr) (common.MapStr, error) {
 
 func (c *countFilter) String() string { return "count" }
 
-func TestBadCondition(t *testing.T) {
+func TestConditions(t *testing.T) {
 
 	if testing.Verbose() {
 		logp.LogInit(logp.LOG_DEBUG, "", false, true, []string{"*"})

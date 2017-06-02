@@ -3,10 +3,10 @@
 package filesystem
 
 import (
+	"path/filepath"
 	"time"
 
 	"github.com/elastic/beats/libbeat/common"
-	"github.com/elastic/beats/libbeat/logp"
 	"github.com/elastic/beats/metricbeat/module/system"
 	sigar "github.com/elastic/gosigar"
 )
@@ -20,12 +20,22 @@ type FileSystemStat struct {
 }
 
 func GetFileSystemList() ([]sigar.FileSystem, error) {
-
 	fss := sigar.FileSystemList{}
-	err := fss.Get()
-	if err != nil {
+	if err := fss.Get(); err != nil {
 		return nil, err
 	}
+
+	// Ignore relative mount points, which are present for example
+	// in /proc/mounts on Linux with network namespaces.
+	filtered := fss.List[:0]
+	for _, fs := range fss.List {
+		if filepath.IsAbs(fs.DirName) {
+			filtered = append(filtered, fs)
+			continue
+		}
+		debugf("Filtering filesystem with relative mountpoint %+v", fs)
+	}
+	fss.List = filtered
 
 	return fss.List, nil
 }
@@ -54,26 +64,6 @@ func AddFileSystemUsedPercentage(f *FileSystemStat) {
 	f.UsedPercent = system.Round(perc, .5, 4)
 }
 
-func CollectFileSystemStats(fss []sigar.FileSystem) []common.MapStr {
-	events := make([]common.MapStr, 0, len(fss))
-	for _, fs := range fss {
-		fsStat, err := GetFileSystemStat(fs)
-		if err != nil {
-			logp.Debug("system", "Skip filesystem %d: %v", fsStat, err)
-			continue
-		}
-		AddFileSystemUsedPercentage(fsStat)
-
-		event := common.MapStr{
-			"@timestamp": common.Time(time.Now()),
-			"type":       "filesystem",
-			"fs":         GetFilesystemEvent(fsStat),
-		}
-		events = append(events, event)
-	}
-	return events
-}
-
 func GetFilesystemEvent(fsStat *FileSystemStat) common.MapStr {
 	return common.MapStr{
 		"device_name": fsStat.DevName,
@@ -88,14 +78,4 @@ func GetFilesystemEvent(fsStat *FileSystemStat) common.MapStr {
 			"bytes": fsStat.Used,
 		},
 	}
-}
-
-func GetFileSystemStats() ([]common.MapStr, error) {
-	fss, err := GetFileSystemList()
-	if err != nil {
-		logp.Warn("Getting filesystem list: %v", err)
-		return nil, err
-	}
-
-	return CollectFileSystemStats(fss), nil
 }

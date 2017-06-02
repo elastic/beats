@@ -74,8 +74,7 @@ func TestConfigValidate(t *testing.T) {
 		},
 		{
 			MetricsConfig{BindAddress: "example.com"},
-			"bind_address must be formatted as host:port but was " +
-				"'example.com' (missing port in address example.com)",
+			"bind_address must be formatted as host:port but was 'example.com'",
 		},
 		{
 			MetricsConfig{BindAddress: ":1"},
@@ -83,8 +82,7 @@ func TestConfigValidate(t *testing.T) {
 		},
 		{
 			MetricsConfig{BindAddress: "example.com:1024f"},
-			"bind_address port value ('1024f') must be a number " +
-				"(strconv.ParseInt: parsing \"1024f\": invalid syntax)",
+			"bind_address port value ('1024f') must be a number",
 		},
 		{
 			MetricsConfig{BindAddress: "example.com:0"},

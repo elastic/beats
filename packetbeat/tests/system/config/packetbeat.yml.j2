@@ -111,12 +111,10 @@ packetbeat.protocols.thrift:
   ports: [{{ thrift_ports|default([9090])|join(", ") }}]
   transport_type: "{{ thrift_transport_type|default('socket') }}"
 {% if thrift_idl_files %}
-  idl_files: [
-      {%- for file in thrift_idl_files -%}
-              "{{ beat.working_dir + '/' + file }}"
-              {%- if not loop.last %}, {% endif -%}
-      {%- endfor -%}
-  ]
+  idl_files:
+  {%- for file in thrift_idl_files %}
+  - '{{ beat.working_dir + '/' + file }}'
+  {%- endfor -%}
 {%- endif %}
 {% if thrift_send_request %}  send_request: true{%- endif %}
 {% if thrift_send_response %}  send_response: true{%- endif %}
@@ -173,7 +171,7 @@ tags: [
 geoip:
   paths: [
       {%- for path in geoip_paths -%}
-          "{{ beat.working_dir + '/' + path }}"
+          '{{ beat.working_dir + '/' + path }}'
           {%- if not loop.last %}, {% endif -%}
       {%- endfor -%}
   ]

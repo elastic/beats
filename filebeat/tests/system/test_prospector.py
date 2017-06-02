@@ -485,21 +485,22 @@ class Test(BaseTest):
 
         filebeat.check_kill_and_wait()
 
-    def test_close_inactive_file_rotation_and_removal_while_new_file_created(self):
+    def test_close_inactive_file_rotation_and_removal2(self):
         """
         Test that close_inactive still applies also if file was rotated,
         new file created, and rotated file removed.
         """
+        log_path = os.path.abspath(os.path.join(self.working_dir, "log"))
+        os.mkdir(log_path)
+        testfile = os.path.join(log_path, "a.log")
+        renamed_file = os.path.join(log_path, "b.log")
+
         self.render_config_template(
-            path=os.path.abspath(self.working_dir) + "/log/test.log",
+            path=testfile,
             ignore_older="1h",
             close_inactive="3s",
             scan_frequency="0.1s",
         )
-
-        os.mkdir(self.working_dir + "/log/")
-        testfile = self.working_dir + "/log/test.log"
-        renamed_file = self.working_dir + "/log/test_renamed.log"
 
         filebeat = self.start_beat()
 
