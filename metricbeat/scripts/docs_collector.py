@@ -1,6 +1,7 @@
 import os
 import argparse
 import yaml
+import six
 
 # Collects docs for all modules and metricset
 
@@ -33,7 +34,7 @@ This file is generated! See scripts/docs_collector.py
         module_file = generated_note
         module_file += "[[metricbeat-module-" + module + "]]\n"
 
-        with file(module_doc) as f:
+        with open(module_doc) as f:
             module_file += f.read()
 
         beat_path = path + "/" + module + "/_meta"
@@ -63,7 +64,7 @@ in <<configuration-metricbeat>>. Here is an example configuration:
 """ + beat_name + ".modules:\n"
 
             # Load metricset yaml
-            with file(config_file) as f:
+            with open(config_file) as f:
                 # Add 2 spaces for indentation in front of each line
                 for line in f:
                     module_file += line
@@ -135,11 +136,11 @@ For a description of each field in the metricset, see the
             f.write(module_file)
 
     module_list_output = generated_note
-    for m, title in sorted(modules_list.iteritems()):
+    for m, title in sorted(six.iteritems(modules_list)):
         module_list_output += "  * <<metricbeat-module-" + m + "," + title + ">>\n"
 
     module_list_output += "\n\n--\n\n"
-    for m, title in sorted(modules_list.iteritems()):
+    for m, title in sorted(six.iteritems(modules_list)):
         module_list_output += "include::modules/" + m + ".asciidoc[]\n"
 
     # Write module link list

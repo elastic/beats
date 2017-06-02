@@ -3,6 +3,7 @@
 package file
 
 import (
+	"fmt"
 	"os"
 	"syscall"
 
@@ -31,6 +32,10 @@ func GetOSState(info os.FileInfo) StateOS {
 // IsSame file checks if the files are identical
 func (fs StateOS) IsSame(state StateOS) bool {
 	return fs.Inode == state.Inode && fs.Device == state.Device
+}
+
+func (fs StateOS) String() string {
+	return fmt.Sprintf("%d-%d", fs.Inode, fs.Device)
 }
 
 // SafeFileRotate safely rotates an existing file under path and replaces it with the tempfile

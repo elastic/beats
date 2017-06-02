@@ -16,6 +16,7 @@ include::../../libbeat/docs/version.asciidoc[]
 :beatname_lc: heartbeat
 :beatname_uc: Heartbeat
 :security: X-Pack Security
+:dockerimage: docker.elastic.co/beats/{beatname_lc}:{version}
 
 include::./overview.asciidoc[]
 
@@ -28,6 +29,8 @@ include::./command-line.asciidoc[]
 include::../../libbeat/docs/shared-directory-layout.asciidoc[]
 
 include::../../libbeat/docs/repositories.asciidoc[]
+
+include::./running-on-docker.asciidoc[]
 
 //
 //include::./upgrading.asciidoc[]
@@ -60,5 +63,5 @@ include::./troubleshooting.asciidoc[]
 
 include::./faq.asciidoc[]
 
-// 
+//
 //include::./heartbeat-devguide.asciidoc[]

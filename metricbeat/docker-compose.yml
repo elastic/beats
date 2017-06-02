@@ -34,6 +34,7 @@ services:
       - ${PWD}/module/php_fpm/_meta/env
       - ${PWD}/module/postgresql/_meta/env
       - ${PWD}/module/prometheus/_meta/env
+      - ${PWD}/module/rabbitmq/_meta/env
       - ${PWD}/module/redis/_meta/env
       - ${PWD}/module/zookeeper/_meta/env
 
@@ -61,6 +62,7 @@ services:
       phpfpm:         { condition: service_healthy }
       postgresql:     { condition: service_healthy }
       prometheus:     { condition: service_healthy }
+      rabbitmq:       { condition: service_healthy }
       redis:          { condition: service_healthy }
       zookeeper:      { condition: service_healthy }
 
@@ -135,6 +137,9 @@ services:
 
   prometheus:
     build: ${PWD}/module/prometheus/_meta
+
+  rabbitmq:
+    build: ${PWD}/module/rabbitmq/_meta
 
   redis:
     build: ${PWD}/module/redis/_meta

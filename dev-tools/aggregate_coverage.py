@@ -37,7 +37,7 @@ def main(arguments):
                         stmt = int(stmt)
                         count = int(count)
                         prev_count = 0
-                        if lines.has_key(position):
+                        if position in lines:
                             (_, prev_stmt, prev_count) = lines[position]
                             assert prev_stmt == stmt
                         lines[position] = (position, stmt, prev_count + count)

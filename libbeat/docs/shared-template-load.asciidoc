@@ -78,6 +78,13 @@ cd {beatname_lc}-{version}-darwin-x86_64
 curl -H 'Content-Type: application/json' -XPUT 'http://localhost:9200/_template/{beatname_lc}' -d@{beatname_lc}.template.json
 ----------------------------------------------------------------------
 
+*docker:*
+
+["source", "sh", subs="attributes"]
+----------------------------------------------------------------------
+docker run --rm {dockerimage} curl -H 'Content-Type: application/json' -XPUT 'http://localhost:9200/_template/{beatname_lc}' -d@{beatname_lc}.template.json
+----------------------------------------------------------------------
+
 *win:*
 
 endif::allplatforms[]

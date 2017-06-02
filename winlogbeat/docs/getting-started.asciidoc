@@ -19,7 +19,7 @@ After installing the Elastic Stack, read the following topics to learn how to in
 * <<winlogbeat-template>>
 * <<winlogbeat-starting>>
 * <<winlogbeat-sample-dashboards>>
-* <<winlogbeat-command-line-options>>
+* <<command-line-options>>
 * <<directory-layout>>
 
 [[winlogbeat-installation]]

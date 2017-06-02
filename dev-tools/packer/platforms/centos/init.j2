@@ -13,7 +13,7 @@
 # Default-Start:     2 3 4 5
 # Default-Stop:      0 1 6
 # Short-Description: {{.beat_description}}
-# Description:       {{.beat_name}} is a shipper part of the Elastic Beats 
+# Description:       {{.beat_name}} is a shipper part of the Elastic Beats
 #					 family. Please see: https://www.elastic.co/products/beats
 ### END INIT INFO
 
@@ -27,8 +27,11 @@ pidfile=${PIDFILE-/var/run/{{.beat_name}}.pid}
 agent=${BEATS_AGENT-/usr/share/{{.beat_name}}/bin/{{.beat_name}}}
 args="-c /etc/{{.beat_name}}/{{.beat_name}}.yml -path.home /usr/share/{{.beat_name}} -path.config /etc/{{.beat_name}} -path.data /var/lib/{{.beat_name}} -path.logs /var/log/{{.beat_name}}"
 test_args="-e -configtest"
+beat_user="${BEAT_USER:-root}"
 wrapper="/usr/share/{{.beat_name}}/bin/{{.beat_name}}-god"
 wrapperopts="-r / -n -p $pidfile"
+user_wrapper="su"
+user_wrapperopts="$beat_user -c"
 RETVAL=0
 
 # Source function library.
@@ -41,8 +44,14 @@ if status | grep -q -- '-p' 2>/dev/null; then
     pidopts="-p $pidfile"
 fi
 
+if command -v runuser >/dev/null 2>&1; then
+    user_wrapper="runuser"
+fi
+
+[ "$beat_user" != "root" ] && wrapperopts="$wrapperopts -u $beat_user"
+
 test() {
-	$agent $args $test_args
+	$user_wrapper $user_wrapperopts "$agent $args $test_args"
 }
 
 start() {

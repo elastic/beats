@@ -21,6 +21,7 @@ DAEMON_ARGS="-c /etc/{{.beat_name}}/{{.beat_name}}.yml -path.home /usr/share/{{.
 TEST_ARGS="-e -configtest"
 PIDFILE=/var/run/{{.beat_name}}.pid
 WRAPPER="/usr/share/{{.beat_name}}/bin/{{.beat_name}}-god"
+BEAT_USER="root"
 WRAPPER_ARGS="-r / -n -p $PIDFILE"
 SCRIPTNAME=/etc/init.d/$NAME
 
@@ -29,6 +30,14 @@ SCRIPTNAME=/etc/init.d/$NAME
 
 # Read configuration variable file if it is present
 [ -r /etc/default/$NAME ] && . /etc/default/$NAME
+
+[ "$BEAT_USER" != "root" ] && WRAPPER_ARGS="$WRAPPER_ARGS -u $BEAT_USER"
+USER_WRAPPER="su"
+USER_WRAPPER_ARGS="$BEAT_USER -c"
+
+if command -v runuser >/dev/null 2>&1; then
+    USER_WRAPPER="runuser"
+fi
 
 # Load the VERBOSE setting and other rcS variables
 . /lib/init/vars.sh
@@ -44,7 +53,7 @@ SCRIPTNAME=/etc/init.d/$NAME
 #
 do_test()
 {
-        $DAEMON $DAEMON_ARGS $TEST_ARGS
+        $USER_WRAPPER $USER_WRAPPER_ARGS "$DAEMON $DAEMON_ARGS $TEST_ARGS"
 }
 
 #
