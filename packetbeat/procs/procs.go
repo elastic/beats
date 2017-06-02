@@ -324,7 +324,7 @@ func (proc *ProcessesWatcher) updateMap() {
 }
 
 func socketsFromProc(filename string, ipv6 bool) ([]*socketInfo, error) {
-	file, err := os.Open("/proc/net/tcp")
+	file, err := os.Open(filename)
 	if err != nil {
 		return nil, err
 	}
