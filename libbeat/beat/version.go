@@ -1,3 +1,3 @@
 package beat
 
-const defaultBeatVersion = "5.4.1"
+const defaultBeatVersion = "5.4.2"
