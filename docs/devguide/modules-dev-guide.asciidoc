@@ -149,7 +149,7 @@ A typical example looks like this:
 
 [source,yaml]
 ----
-input_type: log
+type: log
 paths:
 {{ range $i, $path := .paths }}
  - {{$path}}
@@ -174,7 +174,7 @@ Here is another example that also configures multiline stitching:
 
 [source,yaml]
 ----
-input_type: log
+type: log
 paths:
 {{ range $i, $path := .paths }}
  - {{$path}}
