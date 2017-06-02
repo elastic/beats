@@ -129,6 +129,10 @@ packetbeat.protocols:
 
 - type: tds
   ports: [{{ tds_ports|default([1433])|join(", ") }}]
+{% if tds_max_rows %}  max_rows: {{tds_max_rows}}{%- endif %}
+{% if tds_max_row_length %}  max_row_length: {{tds_max_row_length}}{%- endif %}
+{% if tds_send_request %}  send_request: true{%- endif %}
+{% if tds_send_response %}  send_response: true{%- endif %}
 
 {% if procs_enabled %}
 #=========================== Monitored processes ==============================
