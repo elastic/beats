@@ -52,6 +52,7 @@ https://github.com/elastic/beats/compare/v6.0.0-alpha1...master[Check the HEAD d
 
 *Packetbeat*
 - Enable memcache filtering only if a port is specified in the config file. {issue}4335[4335]
+- Enabled /proc/net/tcp6 scanning and fixed ip v6 parsing. {pull}4442[4442]
 
 *Winlogbeat*
 
