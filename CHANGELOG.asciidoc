@@ -83,6 +83,8 @@ https://github.com/elastic/beats/compare/v6.0.0-alpha1...master[Check the HEAD d
 
 *Packetbeat*
 
+- Add support to capture from a tun device. {issue}4426{4426}
+
 *Winlogbeat*
 
 ==== Deprecated

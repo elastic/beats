@@ -24,6 +24,7 @@ type Decoder struct {
 	sll       layers.LinuxSLL
 	lo        layers.Loopback
 	eth       layers.Ethernet
+	raw       layers.Raw
 	d1q       [2]layers.Dot1Q
 	ip4       [2]layers.IPv4
 	ip6       [2]layers.IPv6
@@ -107,6 +108,9 @@ func New(
 	case layers.LinkTypeNull: // loopback on OSx
 		d.linkLayerDecoder = &d.lo
 		d.linkLayerType = layers.LayerTypeLoopback
+	case layers.LinkTypeRaw:
+		d.linkLayerDecoder = &d.raw
+		d.linkLayerType = layers.LayerTypeRaw
 	default:
 		return nil, fmt.Errorf("Unsupported link type: %s", datalink.String())
 	}
