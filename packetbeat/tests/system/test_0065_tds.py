@@ -25,4 +25,4 @@ class Test(BaseTest):
         # assert all([o["bytes_out"] > 0 for o in objs])
         assert all([o["port"] == 1433 for o in objs])
 
-        # assert objs[0]["request"] == ""  
+        # assert objs[0]["request"] == ""
