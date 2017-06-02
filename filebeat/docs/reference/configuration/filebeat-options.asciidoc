@@ -432,7 +432,7 @@ Because this option may lead to data loss, it is disabled by default.
 
 ===== backoff
 
-The backoff options specify how aggressively Filebeat crawls new files for updates.
+The backoff options specify how aggressively Filebeat crawls open files for updates.
 You can use the default values in most cases.
 
 The `backoff` option defines how long Filebeat

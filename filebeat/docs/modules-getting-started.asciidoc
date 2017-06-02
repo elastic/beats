@@ -15,7 +15,7 @@ modules, see <<filebeat-modules>>.
 
 If you are using a log file type that isn't supported by one of the available
 Filebeat modules, you'll need to set up and configure Filebeat manually by
-following the numbered steps under <<filebeat-getting-started>>. 
+following the numbered steps under <<filebeat-getting-started>>.
 
 ==== Prerequisites
 
@@ -23,6 +23,7 @@ Before running Filebeat with modules enabled, you need to:
 
 * Install and configure the Elastic stack. See
 {libbeat}/getting-started.html[Getting Started with Beats and the Elastic Stack].
+Filebeat modules require Elasticsearch 5.2 or later.
 
 * Complete the Filebeat installation instructions described in
 <<filebeat-installation>>. After installing Filebeat, return to this
