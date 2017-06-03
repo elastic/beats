@@ -21,5 +21,5 @@ func init() {
 	var runFlags = pflag.NewFlagSet(Name, pflag.ExitOnError)
 	runFlags.AddGoFlag(flag.CommandLine.Lookup("system.hostfs"))
 
-	RootCmd = cmd.GenRootCmdWithRunFlags(Name, beater.New, runFlags)
+	RootCmd = cmd.GenRootCmdWithRunFlags(Name, "", beater.New, runFlags)
 }

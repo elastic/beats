@@ -25,16 +25,16 @@ func init() {
 // GenRootCmd returns the root command to use for your beat. It takes
 // beat name as paramter, and also run command, which will be called if no args are
 // given (for backwards compatibility)
-func GenRootCmd(name string, beatCreator beat.Creator) *cobra.Command {
-	return GenRootCmdWithRunFlags(name, beatCreator, nil)
+func GenRootCmd(name, version string, beatCreator beat.Creator) *cobra.Command {
+	return GenRootCmdWithRunFlags(name, version, beatCreator, nil)
 }
 
 // GenRootCmdWithRunFlags returns the root command to use for your beat. It takes
 // beat name as paramter, and also run command, which will be called if no args are
 // given (for backwards compatibility). runFlags parameter must the flagset used by
 // run command
-func GenRootCmdWithRunFlags(name string, beatCreator beat.Creator, runFlags *pflag.FlagSet) *cobra.Command {
-	runCmd := genRunCmd(name, beatCreator, runFlags)
+func GenRootCmdWithRunFlags(name, version string, beatCreator beat.Creator, runFlags *pflag.FlagSet) *cobra.Command {
+	runCmd := genRunCmd(name, version, beatCreator, runFlags)
 
 	rootCmd := &cobra.Command{
 		Use: name,
@@ -59,7 +59,7 @@ func GenRootCmdWithRunFlags(name string, beatCreator beat.Creator, runFlags *pfl
 
 	// Register subcommands common to all beats
 	rootCmd.AddCommand(runCmd)
-	rootCmd.AddCommand(genVersionCmd(name))
+	rootCmd.AddCommand(genVersionCmd(name, version))
 	rootCmd.AddCommand(genSetupCmd(name))
 
 	return rootCmd

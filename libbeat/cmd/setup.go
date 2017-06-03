@@ -32,7 +32,9 @@ func genSetupCmd(name string) *cobra.Command {
 				dashboards = true
 			}
 
-			beat.Setup(template, dashboards)
+			if err = beat.Setup(template, dashboards); err != nil {
+				os.Exit(1)
+			}
 		},
 	}
 

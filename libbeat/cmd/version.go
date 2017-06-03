@@ -11,12 +11,12 @@ import (
 	"github.com/elastic/beats/libbeat/version"
 )
 
-func genVersionCmd(name string) *cobra.Command {
+func genVersionCmd(name, beatVersion string) *cobra.Command {
 	return &cobra.Command{
 		Use:   "version",
 		Short: "Show current version info",
 		Run: func(cmd *cobra.Command, args []string) {
-			beat, err := beat.New(name, "")
+			beat, err := beat.New(name, beatVersion)
 			if err != nil {
 				os.Exit(1)
 			}

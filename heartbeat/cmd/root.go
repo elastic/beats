@@ -7,4 +7,4 @@ import "github.com/elastic/beats/heartbeat/beater"
 var Name = "heartbeat"
 
 // RootCmd to handle beats cli
-var RootCmd = cmd.GenRootCmd(Name, beater.New)
+var RootCmd = cmd.GenRootCmd(Name, "", beater.New)

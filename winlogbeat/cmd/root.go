@@ -7,4 +7,4 @@ import "github.com/elastic/beats/winlogbeat/beater"
 var Name = "winlogbeat"
 
 // RootCmd to handle beats cli
-var RootCmd = cmd.GenRootCmd(Name, beater.New)
+var RootCmd = cmd.GenRootCmd(Name, "", beater.New)

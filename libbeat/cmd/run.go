@@ -10,12 +10,13 @@ import (
 	"github.com/elastic/beats/libbeat/beat"
 )
 
-func genRunCmd(name string, beatCreator beat.Creator, runFlags *pflag.FlagSet) *cobra.Command {
+func genRunCmd(name, version string, beatCreator beat.Creator, runFlags *pflag.FlagSet) *cobra.Command {
 	runCmd := cobra.Command{
 		Use:   "run",
 		Short: "Run " + name,
 		Run: func(cmd *cobra.Command, args []string) {
-			if err := beat.Run(name, "", beatCreator); err != nil {
+			err := beat.Run(name, version, beatCreator)
+			if err != nil {
 				os.Exit(1)
 			}
 		},

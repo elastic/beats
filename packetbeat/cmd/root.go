@@ -28,5 +28,5 @@ func init() {
 	// TODO Deprecate this one in favor of subcommand
 	runFlags.AddGoFlag(flag.CommandLine.Lookup("devices"))
 
-	RootCmd = cmd.GenRootCmdWithRunFlags(Name, beater.New, runFlags)
+	RootCmd = cmd.GenRootCmdWithRunFlags(Name, "", beater.New, runFlags)
 }
