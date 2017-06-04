@@ -573,7 +573,7 @@ from Docker containers:
 * Labels
 
 Currently it supports enriching events by matching existing fields with the
-container ID on them, for example, cgroup IDs retrieved by metricbeat system
+container ID in them, for example, cgroup IDs retrieved by metricbeat system
 module:
 
 [source,yaml]
