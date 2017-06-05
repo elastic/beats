@@ -5,9 +5,9 @@ import (
 	"fmt"
 	"os"
 	"path/filepath"
-	"time"
 	"sort"
 	"strings"
+	"time"
 
 	"github.com/elastic/beats/filebeat/channel"
 	"github.com/elastic/beats/filebeat/harvester"
@@ -319,7 +319,7 @@ func getSortedFiles(scanOrder string, scanSort string, sortInfos []FileSortInfo)
 	return sortInfos
 }
 
-func getFileState(path string, info os.FileInfo, p *Prospector) (file.State) {
+func getFileState(path string, info os.FileInfo, p *Prospector) file.State {
 	var err error
 	var absolutePath string
 	absolutePath, err = filepath.Abs(path)
