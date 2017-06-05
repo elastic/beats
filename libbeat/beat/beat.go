@@ -217,34 +217,29 @@ func (b *Beat) config() (*common.Config, error) {
 	return common.NewConfig(), nil
 }
 
-func (b *Beat) launch(bt Creator) error {
-	if err := b.init(); err != nil {
-		return err
-	}
-
+// create and return the beater, this method also initializes all needed items,
+// including template registering, publisher, xpack monitoring
+func (b *Beat) createBeater(bt Creator) (Beater, error) {
 	sub, err := b.config()
 	if err != nil {
-		return err
+		return nil, err
 	}
-
-	svc.BeforeRun()
-	defer svc.Cleanup()
 
 	logp.Info("Setup Beat: %s; Version: %s", b.Info.Beat, b.Info.Version)
 	processors, err := processors.New(b.Config.Processors)
 	if err != nil {
-		return fmt.Errorf("error initializing processors: %v", err)
+		return nil, fmt.Errorf("error initializing processors: %v", err)
 	}
 
 	err = b.registerTemplateLoading()
 	if err != nil {
-		return err
+		return nil, err
 	}
 
 	debugf("Initializing output plugins")
 	publisher, err := publisher.New(b.Info, b.Config.Output, b.Config.Shipper, processors)
 	if err != nil {
-		return fmt.Errorf("error initializing publisher: %v", err)
+		return nil, fmt.Errorf("error initializing publisher: %v", err)
 	}
 
 	// TODO: some beats race on shutdown with publisher.Stop -> do not call Stop yet,
@@ -253,6 +248,23 @@ func (b *Beat) launch(bt Creator) error {
 
 	b.Publisher = publisher
 	beater, err := bt(b, sub)
+	if err != nil {
+		return nil, err
+	}
+
+	return beater, nil
+}
+
+func (b *Beat) launch(bt Creator) error {
+	err := b.init()
+	if err != nil {
+		return err
+	}
+
+	svc.BeforeRun()
+	defer svc.Cleanup()
+
+	beater, err := b.createBeater(bt)
 	if err != nil {
 		return err
 	}
@@ -288,6 +300,25 @@ func (b *Beat) launch(bt Creator) error {
 	}
 
 	return beater.Run(b)
+}
+
+// TestConfig check all settings are ok and the beat can be run
+func (b *Beat) TestConfig(bt Creator) error {
+	return handleError(func() error {
+		err := b.init()
+		if err != nil {
+			return err
+		}
+
+		// Create beater to ensure all settings are OK
+		_, err = b.createBeater(bt)
+		if err != nil {
+			return err
+		}
+
+		fmt.Println("Config OK")
+		return GracefulExit
+	}())
 }
 
 // Setup registers ES index template and kibana dashboards
@@ -395,8 +426,6 @@ func (b *Beat) configure() error {
 	if err != nil {
 		return fmt.Errorf("error initializing logging: %v", err)
 	}
-	// Disable stderr logging if requested by cmdline flag
-	logp.SetStderr()
 
 	// log paths values to help with troubleshooting
 	logp.Info(paths.Paths.String())

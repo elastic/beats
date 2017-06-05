@@ -60,7 +60,8 @@ func GenRootCmdWithRunFlags(name, version string, beatCreator beat.Creator, runF
 	// Register subcommands common to all beats
 	rootCmd.AddCommand(runCmd)
 	rootCmd.AddCommand(genVersionCmd(name, version))
-	rootCmd.AddCommand(genSetupCmd(name))
+	rootCmd.AddCommand(genSetupCmd(name, version))
+	rootCmd.AddCommand(genConfigTestCmd(name, version, beatCreator))
 
 	return rootCmd
 }

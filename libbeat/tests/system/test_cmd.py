@@ -68,5 +68,35 @@ class TestCommands(BaseTest):
         assert exit_code == 0
         assert len(self.es.cat.templates(h='name')) > 0
 
+    @unittest.skipUnless(INTEGRATION_TESTS, "integration test")
+    @attr('integration')
+    def test_configtest(self):
+        """
+        Test configtest command
+        """
+        self.render_config_template("mockbeat",
+                                    os.path.join(self.working_dir, "libbeat.yml"))
+
+        exit_code = self.run_beat(
+            logging_args=[],
+            extra_args=["configtest"],
+            config="libbeat.yml")
+
+        print(self.get_log())
+        assert exit_code == 0
+        assert self.log_contains("Config OK")
+
+    def test_configtest_bad_config(self):
+        """
+        Test configtest command with bad config
+        """
+        exit_code = self.run_beat(
+            logging_args=[],
+            extra_args=["configtest"],
+            config="libbeat-missing.yml")
+
+        assert exit_code == 1
+        assert self.log_contains("Config OK") is False
+
     def get_host(self):
         return os.getenv('ES_HOST', 'localhost') + ':' + os.getenv('ES_PORT', '9200')

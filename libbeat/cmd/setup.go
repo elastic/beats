@@ -8,7 +8,7 @@ import (
 	"github.com/elastic/beats/libbeat/beat"
 )
 
-func genSetupCmd(name string) *cobra.Command {
+func genSetupCmd(name, version string) *cobra.Command {
 	setup := cobra.Command{
 		Use:   "setup",
 		Short: "Setup index template and dashboards",
@@ -18,7 +18,7 @@ func genSetupCmd(name string) *cobra.Command {
  * Kibana dashboards (where available).
 `,
 		Run: func(cmd *cobra.Command, args []string) {
-			beat, err := beat.New(name, "")
+			beat, err := beat.New(name, version)
 			if err != nil {
 				os.Exit(1)
 			}
