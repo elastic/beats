@@ -136,6 +136,7 @@ https://github.com/elastic/beats/compare/v5.5.3...v5.6.0[View commits]
 *Affecting all Beats*
 
 - Add option to the import_dashboards script to load the dashboards via Kibana API. {pull}4682[4682]
+- Add `logging.files` `permissions` option. {pull}4295[4295]
 
 *Filebeat*
 
