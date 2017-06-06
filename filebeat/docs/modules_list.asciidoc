@@ -8,6 +8,7 @@ This file is generated! See scripts/docs_collector.py
   * <<filebeat-module-icinga>>
   * <<filebeat-module-mysql>>
   * <<filebeat-module-nginx>>
+  * <<filebeat-module-redis>>
   * <<filebeat-module-system>>
 
 
@@ -19,4 +20,5 @@ include::modules/auditd.asciidoc[]
 include::modules/icinga.asciidoc[]
 include::modules/mysql.asciidoc[]
 include::modules/nginx.asciidoc[]
+include::modules/redis.asciidoc[]
 include::modules/system.asciidoc[]

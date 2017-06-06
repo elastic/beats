@@ -1,0 +1,4 @@
+98738:M 30 May 12:23:52.442 * Saving the final RDB snapshot before exiting.
+30 May 10:05:20 . 0 clients connected (0 slaves), 618932 bytes in use, 0 shared objects.
+[2932] 31 May 04:32:08 * The server is now ready to accept connections on port 6379"
+5092:signal-handler (1496141844) Received SIGINT scheduling shutdown...
