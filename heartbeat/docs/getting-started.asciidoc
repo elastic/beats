@@ -18,7 +18,7 @@ install, configure, and run Heartbeat:
 * <<heartbeat-configuration>>
 * <<heartbeat-template>>
 * <<heartbeat-starting>>
-* <<heartbeat-command-line>>
+* <<command-line-options>>
 * <<directory-layout>>
 
 
@@ -32,17 +32,7 @@ monitor are running.
 
 //TODO: Add a separate topic that explores deployment scenarios in more detail (like installing on a sub-network where there's a firewall etc.
 
-To download and install Heartbeat, use the commands that work with your
-system (<<deb, deb>> for Debian/Ubuntu, <<rpm, rpm>> for Redhat/Centos/Fedora,
-<<mac,mac>> for OS X, and <<win, win>> for Windows).
-
-[NOTE]
-==================================================
-If you use Apt or Yum, you can <<setup-repositories,install Heartbeat from our repositories>> to update to the newest version more easily.
-
-See our https://www.elastic.co/downloads/beats/heartbeat[download page] for other installation options, such as 32-bit images.
-
-==================================================
+include::../../libbeat/docs/shared-download-and-install.asciidoc[]
 
 [[deb]]
 *deb:*
@@ -101,6 +91,25 @@ tar xzvf heartbeat-{version}-darwin-x86_64.tar.gz
 
 endif::[]
 
+
+[[docker]]
+*docker:*
+
+ifeval::["{release-state}"=="unreleased"]
+
+Version {stack-version} of {beatname_uc} has not yet been released.
+
+endif::[]
+
+ifeval::["{release-state}"!="unreleased"]
+
+["source", "shell", subs="attributes"]
+------------------------------------------------
+docker pull {dockerimage}
+------------------------------------------------
+
+endif::[]
+
 [[win]]
 *win:*
 
@@ -147,15 +156,7 @@ options, see <<heartbeat-configuration-details>>.
 [[heartbeat-configuration]]
 === Step 2: Configuring Heartbeat
 
-To configure Heartbeat, you edit the configuration file. For rpm and deb,
-you'll find the configuration file at +/etc/heartbeat/heartbeat.yml+.
-For mac and win, look in the archive that you just extracted. There’s also a
-full example configuration file called `heartbeat.full.yml` that shows all
-non-deprecated options.
-
-See the
-{libbeat}/config-file-format.html[Config File Format] section of the
-_Beats Platform Reference_ for more about the structure of the config file.
+include::../../libbeat/docs/shared-configuring.asciidoc[]
 
 Heartbeat provides monitors to check the status of hosts at set intervals.
 You configure each monitor individually. Heartbeat currently provides monitors
@@ -233,7 +234,7 @@ include::../../libbeat/docs/shared-template-load.asciidoc[]
 Start Heartbeat by issuing the appropriate command for your platform.
 
 NOTE: If you use an init.d script to start Heartbeat on deb or rpm, you can't
-specify command line flags (see <<heartbeat-command-line>>). To specify flags,
+specify command line flags (see <<command-line-options>>). To specify flags,
 start Heartbeat in the foreground.
 
 *deb:*

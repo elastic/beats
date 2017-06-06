@@ -19,22 +19,13 @@ After installing the Elastic Stack, read the following topics to learn how to in
 * <<packetbeat-template>>
 * <<packetbeat-starting>>
 * <<packetbeat-sample-dashboards>>
-* <<packetbeat-command>>
+* <<command-line-options>>
 * <<directory-layout>>
 
 [[packetbeat-installation]]
 === Step 1: Installing Packetbeat
 
-To download and install Packetbeat on your application servers, use the commands
-that work with your system (<<deb, deb>> for Debian/Ubuntu, <<rpm, rpm>> for
-Redhat/Centos/Fedora, <<mac, mac>> for OS X, and <<win, win>> for Windows).
-
-[NOTE]
-==================================================
-If you use Apt or Yum, you can <<setup-repositories,install Packetbeat from our repositories>> to update to the newest version more easily.
-
-See our https://www.elastic.co/downloads/beats/packetbeat[download page] for other installation options, such as 32-bit images.
-==================================================
+include::../../libbeat/docs/shared-download-and-install.asciidoc[]
 
 [[deb]]
 *deb:*
@@ -73,6 +64,24 @@ sudo yum install libpcap
 curl -L -O https://artifacts.elastic.co/downloads/beats/packetbeat/packetbeat-{version}-x86_64.rpm
 sudo rpm -vi packetbeat-{version}-x86_64.rpm
 ----------------------------------------------------------------------
+
+endif::[]
+
+[[docker]]
+*docker:*
+
+ifeval::["{release-state}"=="unreleased"]
+
+Version {stack-version} of {beatname_uc} has not yet been released.
+
+endif::[]
+
+ifeval::["{release-state}"!="unreleased"]
+
+["source", "shell", subs="attributes"]
+------------------------------------------------
+docker pull {dockerimage}
+------------------------------------------------
 
 endif::[]
 
@@ -138,14 +147,7 @@ more information about these options, see <<packetbeat-configuration>>.
 [[configuring-packetbeat]]
 === Step 2: Configuring Packetbeat
 
-To configure Packetbeat, you edit the configuration file. For rpm and deb, you'll
-find the configuration file at `/etc/packetbeat/packetbeat.yml`. For mac and win, look in
-the archive that you just extracted. There’s also a full example configuration file called
-`packetbeat.full.yml` that shows all non-deprecated options.
-
-See the
-{libbeat}/config-file-format.html[Config File Format] section of the
-_Beats Platform Reference_ for more about the structure of the config file.
+include::../../libbeat/docs/shared-configuring.asciidoc[]
 
 To configure Packetbeat:
 
@@ -255,7 +257,7 @@ include::../../libbeat/docs/shared-template-load.asciidoc[]
 Run Packetbeat by issuing the command that is appropriate for your platform.
 
 NOTE: If you use an init.d script to start Packetbeat on deb or rpm, you can't
-specify command line flags (see <<packetbeat-command>>). To specify flags,
+specify command line flags (see <<command-line-options>>). To specify flags,
 start Packetbeat in the foreground.
 
 *deb:*
@@ -270,6 +272,13 @@ sudo /etc/init.d/packetbeat start
 [source,shell]
 ----------------------------------------------------------------------
 sudo /etc/init.d/packetbeat start
+----------------------------------------------------------------------
+
+*docker:*
+
+["source", "shell", subs="attributes"]
+----------------------------------------------------------------------
+docker run {dockerimage}
 ----------------------------------------------------------------------
 
 *mac:*

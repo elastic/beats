@@ -1,4 +1,4 @@
-[[heartbeat-command-line]]
+[[command-line-options]]
 === Command Line Options
 
 Heartbeat does not have any Heartbeat-specific command line options.

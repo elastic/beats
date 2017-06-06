@@ -34,19 +34,7 @@ traffic or prevent Metricbeat from collecting metrics when there are network
 problems. Metrics from multiple Metricbeat instances will be combined on the
 Elasticsearch server.
 
-To download and install Metricbeat, use the commands that work with your system
-(<<deb, deb>> for Debian/Ubuntu, <<rpm, rpm>> for Redhat/Centos/Fedora, <<mac,
-mac>> for OS X, and <<win, win>> for Windows).
-
-[NOTE]
-==================================================
-If you use Apt or Yum, you can
-<<setup-repositories,install Metricbeat from our repositories>> to
-update to the newest version more easily.
-
-See our https://www.elastic.co/downloads/beats/metricbeat[download page] for
-other installation options, such as 32-bit images.
-==================================================
+include::../../libbeat/docs/shared-download-and-install.asciidoc[]
 
 [[deb]]
 *deb:*
@@ -105,6 +93,24 @@ tar xzvf metricbeat-{version}-darwin-x86_64.tar.gz
 
 endif::[]
 
+[[docker]]
+*docker:*
+
+ifeval::["{release-state}"=="unreleased"]
+
+Version {stack-version} of {beatname_uc} has not yet been released.
+
+endif::[]
+
+ifeval::["{release-state}"!="unreleased"]
+
+["source", "shell", subs="attributes"]
+------------------------------------------------
+docker pull {dockerimage}
+------------------------------------------------
+
+endif::[]
+
 [[win]]
 *win:*
 
@@ -151,15 +157,7 @@ For more information about these options, see
 [[metricbeat-configuration]]
 === Step 2: Configuring Metricbeat
 
-To configure Metricbeat, you edit the configuration file. For rpm and deb,
-you'll find the configuration file at `/etc/metricbeat/metricbeat.yml`. For mac
-and win, look in the archive that you just extracted. There’s also a full
-example configuration file called `metricbeat.full.yml` that shows all
-non-deprecated options.
-
-See the
-{libbeat}/config-file-format.html[Config File Format] section of the
-_Beats Platform Reference_ for more about the structure of the config file.
+include::../../libbeat/docs/shared-configuring.asciidoc[]
 
 Metricbeat uses <<metricbeat-modules,modules>> to collect metrics. You configure
 each module individually. The following example shows the default configuration
@@ -249,11 +247,19 @@ start Metricbeat in the foreground.
 ----------------------------------------------------------------------
 sudo /etc/init.d/metricbeat start
 ----------------------------------------------------------------------
+
 *rpm:*
 
 [source,shell]
 ----------------------------------------------------------------------
 sudo /etc/init.d/metricbeat start
+----------------------------------------------------------------------
+
+*docker:*
+
+["source", "shell", subs="attributes"]
+----------------------------------------------------------------------
+docker run {dockerimage}
 ----------------------------------------------------------------------
 
 *mac:*
