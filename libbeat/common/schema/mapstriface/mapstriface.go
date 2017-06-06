@@ -59,8 +59,8 @@ import (
 	"time"
 
 	"github.com/elastic/beats/libbeat/common"
+	"github.com/elastic/beats/libbeat/common/schema"
 	"github.com/elastic/beats/libbeat/logp"
-	"github.com/elastic/beats/metricbeat/schema"
 )
 
 type ConvMap struct {
