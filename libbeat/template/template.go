@@ -20,11 +20,11 @@ type Template struct {
 	index       string
 	beatVersion Version
 	esVersion   Version
-	settings    templateSettings
+	settings    TemplateSettings
 }
 
 // New creates a new template instance
-func New(beatVersion string, esVersion string, index string, settings templateSettings) (*Template, error) {
+func New(beatVersion string, esVersion string, index string, settings TemplateSettings) (*Template, error) {
 
 	bV, err := NewVersion(beatVersion)
 	if err != nil {
