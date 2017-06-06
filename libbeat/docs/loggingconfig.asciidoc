@@ -27,6 +27,7 @@ logging.files:
   path: /var/log/mybeat
   name: mybeat.log
   keepfiles: 7
+  permissions: 0644
 ------------------------------------------------------------------------------
 
 TIP: In addition to setting logging options in the config file, you can modify
@@ -123,6 +124,18 @@ The default size limit is 10485760 (10 MB).
 The number of most recent rotated log files to keep on disk. Older files are
 deleted during log rotation. The default value is 7. The `keepfiles` options has to be
 in the range of 2 to 1024 files.
+
+===== files.permissions
+
+The permission mask to apply when rotating log files. The default value is 0600. The
+ `permissions` options must be a valid Unix-style file permissions mask expressed 
+ in octal notation. In Go, numbers in octal notation must start with '0'.
+ 
+Examples:
+* 0644: give read and write access to the file owner, and read access to all others.
+* 0600: give read and write access to the file owner, and no access to all others.
+* 0664: give read and write access to the file owner and members of the group 
+associated with the file, as well as read access to all other users.
 
 ==== Logging Format
 
