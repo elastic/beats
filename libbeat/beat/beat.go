@@ -45,10 +45,10 @@ import (
 
 	"github.com/satori/go.uuid"
 
-	"github.com/elastic/beats/filebeat/input/file"
 	"github.com/elastic/beats/libbeat/api"
 	"github.com/elastic/beats/libbeat/cfgfile"
 	"github.com/elastic/beats/libbeat/common"
+	"github.com/elastic/beats/libbeat/common/file"
 	"github.com/elastic/beats/libbeat/dashboards"
 	"github.com/elastic/beats/libbeat/logp"
 	"github.com/elastic/beats/libbeat/monitoring/report"

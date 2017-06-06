@@ -6,8 +6,6 @@ import (
 	"fmt"
 	"os"
 	"syscall"
-
-	"github.com/elastic/beats/libbeat/logp"
 )
 
 type StateOS struct {
@@ -36,15 +34,6 @@ func (fs StateOS) IsSame(state StateOS) bool {
 
 func (fs StateOS) String() string {
 	return fmt.Sprintf("%d-%d", fs.Inode, fs.Device)
-}
-
-// SafeFileRotate safely rotates an existing file under path and replaces it with the tempfile
-func SafeFileRotate(path, tempfile string) error {
-	if e := os.Rename(tempfile, path); e != nil {
-		logp.Err("Rotate error: %s", e)
-		return e
-	}
-	return nil
 }
 
 // ReadOpen opens a file for reading only
