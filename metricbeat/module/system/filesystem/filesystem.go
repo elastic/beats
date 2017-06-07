@@ -11,7 +11,7 @@ import (
 	"github.com/pkg/errors"
 )
 
-var debugf = logp.MakeDebug("system-filesystem")
+var debugf = logp.MakeDebug("system.filesystem")
 
 func init() {
 	if err := mb.Registry.AddMetricSet("system", "filesystem", New, parse.EmptyHostParser); err != nil {

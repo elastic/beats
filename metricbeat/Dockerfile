@@ -1,4 +1,4 @@
-FROM golang:1.7.4
+FROM golang:1.7.6
 MAINTAINER Nicolas Ruflin <ruflin@elastic.co>
 
 RUN set -x && \
