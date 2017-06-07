@@ -66,7 +66,7 @@ func NewMultiline(
 		return nil, fmt.Errorf("unknown matcher type: %s", config.Match)
 	}
 
-	matcher, err := matcherType(config.Pattern)
+	matcher, err := matcherType(*config.Pattern)
 	if err != nil {
 		return nil, err
 	}
