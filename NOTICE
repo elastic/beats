@@ -12,7 +12,7 @@ Third party libraries used by the Beats project:
 --------------------------------------------------------------------
 Dependency: github.com/andrewkroh/sys
 Revision: 287798fe3e430efeb9318b95ff52353aaa2b59b1
-License type (autodetected): BSD license
+License type (autodetected): BSD 3-clause license
 ./vendor/github.com/andrewkroh/sys/LICENSE:
 --------------------------------------------------------------------
 Copyright (c) 2009 The Go Authors. All rights reserved.
@@ -344,7 +344,7 @@ Apache License 2.0
 Dependency: github.com/fsouza/go-dockerclient
 Version: beats-branch
 Revision: ba365ff5e4281feb28654e4ca599a1defd063497
-License type (autodetected): BSD license
+License type (autodetected): BSD 2-clause license
 ./metricbeat/module/docker/vendor/github.com/fsouza/go-dockerclient/LICENSE:
 --------------------------------------------------------------------
 Copyright (c) 2013-2017, go-dockerclient authors
@@ -846,7 +846,7 @@ SOFTWARE.
 --------------------------------------------------------------------
 Dependency: github.com/golang/protobuf
 Revision: 2bba0603135d7d7f5cb73b2125beeda19c09f4ef
-License type (autodetected): BSD license
+License type (autodetected): BSD 3-clause license
 ./vendor/github.com/golang/protobuf/LICENSE:
 --------------------------------------------------------------------
 Go support for Protocol Buffers - Google's data interchange format
@@ -884,7 +884,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 --------------------------------------------------------------------
 Dependency: github.com/golang/protobuf
 Revision: 18c9bb3261723cd5401db4d0c9fbc5c3b6c70fe8
-License type (autodetected): BSD license
+License type (autodetected): BSD 3-clause license
 ./metricbeat/vendor/github.com/golang/protobuf/LICENSE:
 --------------------------------------------------------------------
 Go support for Protocol Buffers - Google's data interchange format
@@ -922,7 +922,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 --------------------------------------------------------------------
 Dependency: github.com/golang/snappy
 Revision: 553a641470496b2327abcac10b36396bd98e45c9
-License type (autodetected): BSD license
+License type (autodetected): BSD 3-clause license
 ./vendor/github.com/golang/snappy/LICENSE:
 --------------------------------------------------------------------
 Copyright (c) 2011 The Snappy-Go Authors. All rights reserved.
@@ -956,7 +956,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 --------------------------------------------------------------------
 Dependency: github.com/google/uuid
 Revision: 6a5e28554805e78ea6141142aba763936c4761c0
-License type (autodetected): BSD license
+License type (autodetected): BSD 3-clause license
 ./metricbeat/module/vsphere/vendor/github.com/google/uuid/LICENSE:
 --------------------------------------------------------------------
 Copyright (c) 2009,2014 Google Inc. All rights reserved.
@@ -1388,7 +1388,7 @@ THE SOFTWARE.
 --------------------------------------------------------------------
 Dependency: github.com/klauspost/compress
 Revision: 14c9a76e3c95e47f8ccce949bba2c1101a8b85e6
-License type (autodetected): BSD license
+License type (autodetected): BSD 3-clause license
 ./vendor/github.com/klauspost/compress/LICENSE:
 --------------------------------------------------------------------
 Copyright (c) 2012 The Go Authors. All rights reserved.
@@ -1451,7 +1451,7 @@ SOFTWARE.
 --------------------------------------------------------------------
 Dependency: github.com/klauspost/crc32
 Revision: 1bab8b35b6bb565f92cbc97939610af9369f942a
-License type (autodetected): BSD license
+License type (autodetected): BSD 3-clause license
 ./vendor/github.com/klauspost/crc32/LICENSE:
 --------------------------------------------------------------------
 Copyright (c) 2012 The Go Authors. All rights reserved.
@@ -1541,7 +1541,7 @@ SOFTWARE.
 --------------------------------------------------------------------
 Dependency: github.com/miekg/dns
 Revision: 5d001d020961ae1c184f9f8152fdc73810481677
-License type (autodetected): BSD license
+License type (autodetected): BSD 3-clause license
 ./vendor/github.com/miekg/dns/LICENSE:
 --------------------------------------------------------------------
 Extensions of the original work are copyright (c) 2011 Miek Gieben
@@ -2536,7 +2536,7 @@ See also http://www.apache.org/dev/crypto.html and/or seek legal counsel.
 --------------------------------------------------------------------
 Dependency: github.com/pierrec/lz4
 Revision: 90290f74b1b4d9c097f0a3b3c7eba2ef3875c699
-License type (autodetected): BSD license
+License type (autodetected): BSD 3-clause license
 ./vendor/github.com/pierrec/lz4/LICENSE:
 --------------------------------------------------------------------
 Copyright (c) 2015, Pierre Curto
@@ -2571,7 +2571,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 --------------------------------------------------------------------
 Dependency: github.com/pierrec/xxHash
 Revision: 5a004441f897722c627870a981d02b29924215fa
-License type (autodetected): BSD license
+License type (autodetected): BSD 3-clause license
 ./vendor/github.com/pierrec/xxHash/LICENSE:
 --------------------------------------------------------------------
 Copyright (c) 2014, Pierre Curto
@@ -2619,7 +2619,7 @@ THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLI
 --------------------------------------------------------------------
 Dependency: github.com/pkg/errors
 Revision: ff09b135c25aae272398c51a07235b90a75aa4f0
-License type (autodetected): BSD license
+License type (autodetected): BSD 2-clause license
 ./vendor/github.com/pkg/errors/LICENSE:
 --------------------------------------------------------------------
 Copyright (c) 2015, Dave Cheney <dave@cheney.net>
@@ -2679,7 +2679,7 @@ SoundCloud Ltd. (http://soundcloud.com/).
 --------------------------------------------------------------------
 Dependency: github.com/rcrowley/go-metrics
 Revision: 1f30fe9094a513ce4c700b9a54458bbb0c96996c
-License type (autodetected): BSD license
+License type (autodetected): BSD 2-clause license
 ./vendor/github.com/rcrowley/go-metrics/LICENSE:
 --------------------------------------------------------------------
 Copyright 2012 Richard Crowley. All rights reserved.
@@ -2715,7 +2715,7 @@ official policies, either expressed or implied, of Richard Crowley.
 --------------------------------------------------------------------
 Dependency: github.com/samuel/go-thrift
 Revision: 2187045faa54fce7f5028706ffeb2f2fc342aa7e
-License type (autodetected): BSD license
+License type (autodetected): BSD 3-clause license
 ./vendor/github.com/samuel/go-thrift/LICENSE:
 --------------------------------------------------------------------
 Copyright (c) 2012, Samuel Stauffer <samuel@descolada.com>
@@ -2775,7 +2775,7 @@ WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 Dependency: github.com/shirou/gopsutil
 Version: v2.17.04
 Revision: 9af92986dda65a8c367157a82b484553e1ec1c55
-License type (autodetected): BSD license
+License type (autodetected): BSD 3-clause license
 ./vendor/github.com/shirou/gopsutil/LICENSE:
 --------------------------------------------------------------------
 gopsutil is distributed under BSD license reproduced below.
@@ -2955,7 +2955,7 @@ OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 --------------------------------------------------------------------
 Dependency: github.com/tsg/gopacket
 Revision: 8e703b9968693c15f25cabb6ba8be4370cf431d0
-License type (autodetected): BSD license
+License type (autodetected): BSD 3-clause license
 ./vendor/github.com/tsg/gopacket/LICENSE:
 --------------------------------------------------------------------
 Copyright (c) 2012 Google, Inc. All rights reserved.
@@ -2999,7 +2999,7 @@ Apache License 2.0
 --------------------------------------------------------------------
 Dependency: github.com/vmware/govmomi/vim25/xml
 Revision: 5072cda664c79ada30834d171d2ed1f76317d3b2
-License type (autodetected): BSD license
+License type (autodetected): BSD 3-clause license
 ./metricbeat/module/vsphere/vendor/github.com/vmware/govmomi/vim25/xml/LICENSE:
 --------------------------------------------------------------------
 Copyright (c) 2012 The Go Authors. All rights reserved.
@@ -3042,7 +3042,7 @@ Apache License 2.0
 --------------------------------------------------------------------
 Dependency: golang.org/x/net
 Revision: e90d6d0afc4c315a0d87a568ae68577cc15149a0
-License type (autodetected): BSD license
+License type (autodetected): BSD 3-clause license
 ./vendor/golang.org/x/net/LICENSE:
 --------------------------------------------------------------------
 Copyright (c) 2009 The Go Authors. All rights reserved.
@@ -3076,7 +3076,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 --------------------------------------------------------------------
 Dependency: golang.org/x/sys
 Revision: a55a76086885b80f79961eacb876ebd8caf3868d
-License type (autodetected): BSD license
+License type (autodetected): BSD 3-clause license
 ./vendor/golang.org/x/sys/LICENSE:
 --------------------------------------------------------------------
 Copyright (c) 2009 The Go Authors. All rights reserved.
@@ -3110,7 +3110,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 --------------------------------------------------------------------
 Dependency: golang.org/x/text
 Revision: 2910a502d2bf9e43193af9d68ca516529614eed3
-License type (autodetected): BSD license
+License type (autodetected): BSD 3-clause license
 ./vendor/golang.org/x/text/LICENSE:
 --------------------------------------------------------------------
 Copyright (c) 2009 The Go Authors. All rights reserved.
@@ -3144,7 +3144,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 --------------------------------------------------------------------
 Dependency: gopkg.in/inf.v0
 Revision: 3887ee99ecf07df5b447e9b00d9c0b2adaa9f3e4
-License type (autodetected): BSD license
+License type (autodetected): BSD 3-clause license
 ./vendor/gopkg.in/inf.v0/LICENSE:
 --------------------------------------------------------------------
 Copyright (c) 2012 Péter Surányi. Portions Copyright (c) 2009 The Go
@@ -3179,7 +3179,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 --------------------------------------------------------------------
 Dependency: gopkg.in/mgo.v2
 Revision: 3f83fa5005286a7fe593b055f0d7771a7dce4655
-License type (autodetected): BSD license
+License type (autodetected): BSD 2-clause license
 ./vendor/gopkg.in/mgo.v2/LICENSE:
 --------------------------------------------------------------------
 mgo - MongoDB driver for Go
@@ -3211,7 +3211,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 --------------------------------------------------------------------
 Dependency: gopkg.in/mgo.v2/bson
 Revision: 3f83fa5005286a7fe593b055f0d7771a7dce4655
-License type (autodetected): BSD license
+License type (autodetected): BSD 2-clause license
 ./vendor/gopkg.in/mgo.v2/bson/LICENSE:
 --------------------------------------------------------------------
 BSON library for Go
@@ -3243,7 +3243,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 --------------------------------------------------------------------
 Dependency: gopkg.in/mgo.v2/internal/json
 Revision: 3f83fa5005286a7fe593b055f0d7771a7dce4655
-License type (autodetected): BSD license
+License type (autodetected): BSD 3-clause license
 ./vendor/gopkg.in/mgo.v2/internal/json/LICENSE:
 --------------------------------------------------------------------
 Copyright (c) 2012 The Go Authors. All rights reserved.
