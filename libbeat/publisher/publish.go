@@ -12,6 +12,7 @@ import (
 	"github.com/elastic/beats/libbeat/processors"
 
 	// load supported output plugins
+	_ "github.com/elastic/beats/libbeat/outputs/awscwl"
 	_ "github.com/elastic/beats/libbeat/outputs/console"
 	_ "github.com/elastic/beats/libbeat/outputs/elasticsearch"
 	_ "github.com/elastic/beats/libbeat/outputs/fileout"
