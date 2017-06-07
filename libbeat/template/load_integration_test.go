@@ -45,7 +45,7 @@ func TestLoadTemplate(t *testing.T) {
 	fieldsPath := absPath + "/fields.yml"
 	index := "testbeat"
 
-	tmpl, err := New(version.GetDefaultVersion(), client.GetVersion(), index, templateSettings{})
+	tmpl, err := New(version.GetDefaultVersion(), client.GetVersion(), index, TemplateSettings{})
 	assert.NoError(t, err)
 	content, err := tmpl.Load(fieldsPath)
 	assert.NoError(t, err)
@@ -135,7 +135,7 @@ func TestLoadBeatsTemplate(t *testing.T) {
 		fieldsPath := absPath + "/fields.yml"
 		index := beat
 
-		tmpl, err := New(version.GetDefaultVersion(), client.GetVersion(), index, templateSettings{})
+		tmpl, err := New(version.GetDefaultVersion(), client.GetVersion(), index, TemplateSettings{})
 		assert.NoError(t, err)
 		content, err := tmpl.Load(fieldsPath)
 		assert.NoError(t, err)
@@ -173,7 +173,7 @@ func TestTemplateSettings(t *testing.T) {
 
 	fieldsPath := absPath + "/fields.yml"
 
-	settings := templateSettings{
+	settings := TemplateSettings{
 		Index: common.MapStr{
 			"number_of_shards": 1,
 		},
@@ -245,7 +245,7 @@ func TestOverwrite(t *testing.T) {
 	config = newConfigFrom(t, TemplateConfig{
 		Enabled: true,
 		Fields:  absPath + "/fields.yml",
-		Settings: templateSettings{
+		Settings: TemplateSettings{
 			Source: map[string]interface{}{
 				"enabled": false,
 			},
@@ -266,7 +266,7 @@ func TestOverwrite(t *testing.T) {
 		Enabled:   true,
 		Overwrite: true,
 		Fields:    absPath + "/fields.yml",
-		Settings: templateSettings{
+		Settings: TemplateSettings{
 			Source: map[string]interface{}{
 				"enabled": false,
 			},
