@@ -46,7 +46,7 @@ import (
 	"time"
 
 	"github.com/elastic/beats/libbeat/common"
-	"github.com/elastic/beats/metricbeat/schema"
+	"github.com/elastic/beats/libbeat/common/schema"
 )
 
 // toBool converts value to bool. In case of error, returns false
