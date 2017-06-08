@@ -141,7 +141,7 @@ func (es *Connection) CreateIndex(index string, body interface{}) (int, *QueryRe
 }
 
 // IndexExists checks if an index exists.
-// Implements: https://www.elastic.co/guide/en/elasticsearch/reference/current/indices-  exists.html
+// Implements: https://www.elastic.co/guide/en/elasticsearch/reference/current/indices-exists.html
 //
 func (es *Connection) IndexExists(index string) (int, error) {
 	status, _, err := es.apiCall("HEAD", index, "", "", "", nil, nil)
