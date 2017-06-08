@@ -79,7 +79,7 @@ func (imp Importer) CreateKibanaIndex() error {
 		if status != 404 {
 			return err
 		} else {
-			_, _, err := imp.client.CreateIndex(imp.cfg.KibanaIndex,
+			_, _, err = imp.client.CreateIndex(imp.cfg.KibanaIndex,
 				common.MapStr{
 					"settings": common.MapStr{
 						"index.mapping.single_type": false,
