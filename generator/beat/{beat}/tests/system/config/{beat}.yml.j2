@@ -14,12 +14,12 @@ output:
     enabled: true
 
     # Path to the directory where to save the generated files. The option is mandatory.
-    path: {{ '{{' }} output_file_path|default(beat.working_dir + "/output") {{ '}}' }}
+    path: {{ output_file_path|default(beat.working_dir + "/output") }}
 
 
     # Name of the generated files. The default is `{beat}` and it generates
     # files: `{beat}`, `{beat}.1`, `{beat}.2`, etc.
-    filename: "{{ '{{' }} output_file_filename|default("{beat}") {{ '}}' }}"
+    filename: {{ output_file_filename|default("{beat}") }}
 
     # Maximum size in kilobytes of each file. When this size is reached, the files are
     # rotated. The default value is 10 MB.
