@@ -1,4 +1,4 @@
-package kubernetes
+package add_kubernetes_metadata
 
 import (
 	"fmt"
@@ -6,18 +6,18 @@ import (
 
 	"github.com/elastic/beats/libbeat/common"
 	"github.com/elastic/beats/libbeat/logp"
-	"github.com/elastic/beats/libbeat/processors/kubernetes"
+	"github.com/elastic/beats/libbeat/processors/add_kubernetes_metadata"
 )
 
 func init() {
-	kubernetes.Indexing.AddMatcher(LogPathMatcherName, newLogsPathMatcher)
+	add_kubernetes_metadata.Indexing.AddMatcher(LogPathMatcherName, newLogsPathMatcher)
 	cfg := common.NewConfig()
 
 	//Add a container indexer config by default.
-	kubernetes.Indexing.AddDefaultIndexerConfig(kubernetes.ContainerIndexerName, *cfg)
+	add_kubernetes_metadata.Indexing.AddDefaultIndexerConfig(add_kubernetes_metadata.ContainerIndexerName, *cfg)
 
 	//Add a log path matcher which can extract container ID from the "source" field.
-	kubernetes.Indexing.AddDefaultMatcherConfig(LogPathMatcherName, *cfg)
+	add_kubernetes_metadata.Indexing.AddDefaultMatcherConfig(LogPathMatcherName, *cfg)
 }
 
 const LogPathMatcherName = "logs_path"
@@ -26,7 +26,7 @@ type LogPathMatcher struct {
 	LogsPath string
 }
 
-func newLogsPathMatcher(cfg common.Config) (kubernetes.Matcher, error) {
+func newLogsPathMatcher(cfg common.Config) (add_kubernetes_metadata.Matcher, error) {
 	config := struct {
 		LogsPath string `config:"logs_path"`
 	}{
