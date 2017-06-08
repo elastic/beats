@@ -22,10 +22,20 @@ func init() {
 	}
 }
 
+// BeatsRootCmd handles all application command line interface, parses user
+// flags and runs subcommands
+type BeatsRootCmd struct {
+	cobra.Command
+	RunCmd     *cobra.Command
+	SetupCmd   *cobra.Command
+	VersionCmd *cobra.Command
+	ConfigTest *cobra.Command
+}
+
 // GenRootCmd returns the root command to use for your beat. It takes
 // beat name as paramter, and also run command, which will be called if no args are
 // given (for backwards compatibility)
-func GenRootCmd(name, version string, beatCreator beat.Creator) *cobra.Command {
+func GenRootCmd(name, version string, beatCreator beat.Creator) *BeatsRootCmd {
 	return GenRootCmdWithRunFlags(name, version, beatCreator, nil)
 }
 
@@ -33,13 +43,17 @@ func GenRootCmd(name, version string, beatCreator beat.Creator) *cobra.Command {
 // beat name as paramter, and also run command, which will be called if no args are
 // given (for backwards compatibility). runFlags parameter must the flagset used by
 // run command
-func GenRootCmdWithRunFlags(name, version string, beatCreator beat.Creator, runFlags *pflag.FlagSet) *cobra.Command {
-	runCmd := genRunCmd(name, version, beatCreator, runFlags)
+func GenRootCmdWithRunFlags(name, version string, beatCreator beat.Creator, runFlags *pflag.FlagSet) *BeatsRootCmd {
+	rootCmd := &BeatsRootCmd{}
+	rootCmd.Use = name
 
-	rootCmd := &cobra.Command{
-		Use: name,
-		Run: runCmd.Run,
-	}
+	rootCmd.RunCmd = genRunCmd(name, version, beatCreator, runFlags)
+	rootCmd.SetupCmd = genSetupCmd(name, version)
+	rootCmd.VersionCmd = genVersionCmd(name, version)
+	rootCmd.ConfigTest = genConfigTestCmd(name, version, beatCreator)
+
+	// Root command is an alias for run
+	rootCmd.Run = rootCmd.RunCmd.Run
 
 	// Persistent flags, common accross all subcommands
 	rootCmd.PersistentFlags().AddGoFlag(flag.CommandLine.Lookup("E"))
@@ -55,13 +69,13 @@ func GenRootCmdWithRunFlags(name, version string, beatCreator beat.Creator, runF
 
 	// Inherit root flags from run command
 	// TODO deprecate when root command no longer executes run (7.0)
-	rootCmd.Flags().AddFlagSet(runCmd.Flags())
+	rootCmd.Flags().AddFlagSet(rootCmd.RunCmd.Flags())
 
 	// Register subcommands common to all beats
-	rootCmd.AddCommand(runCmd)
-	rootCmd.AddCommand(genVersionCmd(name, version))
-	rootCmd.AddCommand(genSetupCmd(name, version))
-	rootCmd.AddCommand(genConfigTestCmd(name, version, beatCreator))
+	rootCmd.AddCommand(rootCmd.RunCmd)
+	rootCmd.AddCommand(rootCmd.SetupCmd)
+	rootCmd.AddCommand(rootCmd.VersionCmd)
+	rootCmd.AddCommand(rootCmd.ConfigTest)
 
 	return rootCmd
 }

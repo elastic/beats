@@ -3,7 +3,6 @@ package cmd
 import (
 	"flag"
 
-	"github.com/spf13/cobra"
 	"github.com/spf13/pflag"
 
 	"github.com/elastic/beats/metricbeat/beater"
@@ -15,7 +14,7 @@ import (
 var Name = "metricbeat"
 
 // RootCmd to handle beats cli
-var RootCmd *cobra.Command
+var RootCmd *cmd.BeatsRootCmd
 
 func init() {
 	var runFlags = pflag.NewFlagSet(Name, pflag.ExitOnError)
