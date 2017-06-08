@@ -244,7 +244,7 @@ func hexToIpv4(word string) (net.IP, error) {
 func hexToIpv6(word string) (net.IP, error) {
 	p := make(net.IP, net.IPv6len)
 	for i := 0; i < 4; i++ {
-		part, err := strconv.ParseInt(word[i*8:(i+1)*8], 16, 32)
+		part, err := strconv.ParseUint(word[i*8:(i+1)*8], 16, 32)
 		if err != nil {
 			return nil, err
 		}
@@ -324,12 +324,12 @@ func (proc *ProcessesWatcher) updateMap() {
 }
 
 func socketsFromProc(filename string, ipv6 bool) ([]*socketInfo, error) {
-	file, err := os.Open("/proc/net/tcp")
+	file, err := os.Open(filename)
 	if err != nil {
 		return nil, err
 	}
 	defer file.Close()
-	return parseProcNetTCP(file, false)
+	return parseProcNetTCP(file, ipv6)
 }
 
 // Parses the /proc/net/tcp file
