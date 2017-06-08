@@ -15,7 +15,7 @@ modules, see <<filebeat-modules>>.
 
 If you are using a log file type that isn't supported by one of the available
 Filebeat modules, you'll need to set up and configure Filebeat manually by
-following the numbered steps under <<filebeat-getting-started>>. 
+following the numbered steps under <<filebeat-getting-started>>.
 
 ==== Prerequisites
 
@@ -116,4 +116,4 @@ Open the dashboard and explore the visualizations for your parsed logs.
 
 Here's an example of the syslog dashboard:
 
-image:./images/kibana-system.png[Sylog dashboard]
+image:./images/kibana-system.png[Syslog dashboard]
