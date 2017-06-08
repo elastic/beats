@@ -14,7 +14,7 @@ import (
 	"github.com/pkg/errors"
 
 	// Add metricbeat specific processors
-	_ "github.com/elastic/beats/metricbeat/processor/kubernetes"
+	_ "github.com/elastic/beats/metricbeat/processor/add_kubernetes_metadata"
 )
 
 // Metricbeat implements the Beater interface for metricbeat.

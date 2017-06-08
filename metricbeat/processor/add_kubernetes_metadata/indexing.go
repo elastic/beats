@@ -1,11 +1,11 @@
-package kubernetes
+package add_kubernetes_metadata
 
 import (
 	"fmt"
 	"strings"
 
 	"github.com/elastic/beats/libbeat/common"
-	"github.com/elastic/beats/libbeat/processors/kubernetes"
+	kubernetes "github.com/elastic/beats/libbeat/processors/add_kubernetes_metadata"
 )
 
 const (
