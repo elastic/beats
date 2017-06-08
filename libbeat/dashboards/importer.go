@@ -73,7 +73,7 @@ func (imp Importer) Import() error {
 // some index properties which are needed as a workaround for:
 // https://github.com/elastic/beats-dashboards/issues/94
 func (imp Importer) CreateKibanaIndex() error {
-	status, err := imp.client.IndexExists(imp.cfg.KibanaIndex) 
+	status, err := imp.client.IndexExists(imp.cfg.KibanaIndex)
 
 	if err != nil {
 		if status != 404 {
@@ -505,7 +505,7 @@ func (imp Importer) downloadFile(url string, target string) (string, error) {
 	if err != nil {
 		return targetPath, err
 	}
-	if (resp.StatusCode != 200) {
+	if resp.StatusCode != 200 {
 		return targetPath, fmt.Errorf("Server returned: %s", resp.Status)
 	}
 	defer resp.Body.Close()
