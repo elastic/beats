@@ -12,7 +12,21 @@
 [[regexp-support]]
 == Regular Expression Support
 
-{beatname_uc} regular expression support is based on https://godoc.org/regexp/syntax[RE2]. 
+{beatname_uc} regular expression support is based on https://godoc.org/regexp/syntax[RE2].
+
+ifeval::["{beatname_lc}"=="filebeat"]
+
+{beatname_uc} has several configuration options that accept regular expressions.
+For example, <<multiline,`multiline.pattern`>>,
+<<include-lines,`include_lines`>>, <<exclude-lines,`exclude_lines`>>, and
+<<exclude-files,`exclude_files`>> all accept regular expressions. Some options,
+however, such as the prospector <<prospector-paths,`paths`>> option, accept only
+glob-based paths.
+
+endif::[]
+
+Before using a regular expression in the config file, refer to the documentation
+to verify that the option you are setting accepts a regular expression.
 
 NOTE: We recommend that you wrap regular expressions in single quotation marks to work around YAML's string escaping rules. For example, `'^\[?[0-9][0-9]:?[0-9][0-9]|^[[:graph:]]+'`.
 
@@ -33,7 +47,7 @@ The following patterns are supported:
 [options="header"]
 |=======================
 |Pattern          |Description
-|[[single-characters]]*Single Characters* 1+|  
+|[[single-characters]]*Single Characters* 1+|
 |`x`              |single character
 |`.`              |any character
 |`[xyz]`          |character class
@@ -49,7 +63,7 @@ The following patterns are supported:
 |[[composites]]*Composites* 1+|
 |`xy`             |`x` followed by `y`
 |`x\|y`           |`x` or `y` (prefer `x`)
-|[[repetitions]]*Repetitions* 1+| 
+|[[repetitions]]*Repetitions* 1+|
 |`x*`             |zero or more `x`
 |`x+`             |one or more `x`
 |`x?`             |zero or one `x`
