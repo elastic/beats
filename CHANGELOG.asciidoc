@@ -58,6 +58,8 @@ https://github.com/elastic/beats/compare/v6.0.0-alpha1...master[Check the HEAD d
 
 *Metricbeat*
 
+- Add the ability to configure audit rules to the kernel module. {pull}4482[4482]
+
 *Packetbeat*
 
 *Winlogbeat*

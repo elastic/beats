@@ -30,6 +30,16 @@ func (n *MockNetlinkSendReceiver) returnACK() *MockNetlinkSendReceiver {
 	return n
 }
 
+func (n *MockNetlinkSendReceiver) returnDone() *MockNetlinkSendReceiver {
+	n.messages = append(n.messages, syscall.NetlinkMessage{
+		Header: syscall.NlMsghdr{
+			Type:  syscall.NLMSG_DONE,
+			Flags: syscall.NLM_F_ACK,
+		},
+	})
+	return n
+}
+
 func (n *MockNetlinkSendReceiver) returnStatus() *MockNetlinkSendReceiver {
 	status := libaudit.AuditStatus{}
 	buf := new(bytes.Buffer)
