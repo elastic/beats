@@ -18,6 +18,9 @@ To use SSL mutual authentication:
 . Create a certificate authority (CA) and use it to sign the certificates that you plan to use for
 {beatname_uc} and Logstash. Creating a correct SSL/TLS infrastructure is outside the scope of this
 document. There are many online resources available that describe how to create certificates.
++
+TIP: If you are using X-Pack, you can use the
+{securitydoc}/ssl-tls.html#generating-signed-certificates[certgen tool] to generate certificates.
 
 . Configure {beatname_uc} to use SSL. In the +{beatname_lc}.yml+ config file, specify the following settings under
 `ssl`:
@@ -94,7 +97,7 @@ If the test is successful, you'll receive an empty response error:
 > Host: logs.mycompany.com:5044
 > User-Agent: curl/7.43.0
 > Accept: */*
-> 
+>
 * Empty reply from server
 * Connection #0 to host logs.mycompany.com left intact
 curl: (52) Empty reply from server

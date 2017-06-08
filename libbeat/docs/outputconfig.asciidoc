@@ -234,10 +234,10 @@ output.elasticsearch:
   pipelines:
     - pipeline: critical_pipeline
       when.equals:
-        type: "critical"
+        fields.type: "critical"
     - pipeline: normal_pipeline
       when.equals:
-        type: "normal"
+        fields.type: "normal"
 ------------------------------------------------------------------------------
 
 ===== template
