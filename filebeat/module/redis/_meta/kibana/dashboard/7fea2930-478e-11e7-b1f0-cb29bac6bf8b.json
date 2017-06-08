@@ -1,0 +1,13 @@
+{
+  "hits": 0, 
+  "timeRestore": false, 
+  "description": "", 
+  "title": "Filebeat Redis", 
+  "uiStateJSON": "{\"P-5\":{\"vis\":{\"legendOpen\":false}}}", 
+  "panelsJSON": "[{\"col\":1,\"id\":\"78b9afe0-478f-11e7-b1f0-cb29bac6bf8b\",\"panelIndex\":2,\"row\":5,\"size_x\":3,\"size_y\":3,\"type\":\"visualization\"},{\"col\":4,\"id\":\"d2864600-478f-11e7-be88-2ddb32f3df97\",\"panelIndex\":3,\"row\":5,\"size_x\":9,\"size_y\":3,\"type\":\"visualization\"},{\"size_x\":12,\"size_y\":4,\"panelIndex\":4,\"type\":\"search\",\"id\":\"73613570-4791-11e7-be88-2ddb32f3df97\",\"col\":1,\"row\":8,\"columns\":[\"beat.name\",\"redis.log.level\",\"redis.log.role\",\"redis.log.message\"],\"sort\":[\"@timestamp\",\"desc\"]},{\"size_x\":6,\"size_y\":4,\"panelIndex\":5,\"type\":\"visualization\",\"id\":\"dcccaa80-4791-11e7-be88-2ddb32f3df97\",\"col\":7,\"row\":1},{\"size_x\":6,\"size_y\":4,\"panelIndex\":6,\"type\":\"search\",\"id\":\"0ab87b80-478e-11e7-b1f0-cb29bac6bf8b\",\"col\":1,\"row\":1,\"columns\":[\"beat.name\",\"message\",\"redis.slowlog.duration.us\",\"redis.slowlog.key\"],\"sort\":[\"@timestamp\",\"desc\"]}]", 
+  "optionsJSON": "{\"darkTheme\":false}", 
+  "version": 1, 
+  "kibanaSavedObjectMeta": {
+    "searchSourceJSON": "{\"filter\":[{\"query\":{\"query_string\":{\"analyze_wildcard\":true,\"query\":\"*\"}}}],\"highlightAll\":true,\"version\":true}"
+  }
+}

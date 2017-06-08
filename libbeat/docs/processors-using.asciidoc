@@ -44,6 +44,7 @@ The supported processors are:
  * <<drop-fields,`drop_fields`>>
  * <<include-fields,`include_fields`>>
  * <<kubernetes,`kubernetes`>>
+ * <<add-docker-metadata,`add_docker_metadata`>>
 
 [[conditions]]
 ==== Conditions
@@ -558,4 +559,33 @@ processors:
     matchers:
       - fields:
           lookup_fields: ["metricset.host"]
+-------------------------------------------------------------------------------
+
+[[add-docker-metadata]]
+=== Adding Docker metadata
+
+The `add_docker_metadata` processor annotates each event with relevant metadata
+from Docker containers:
+
+* Container ID
+* Name
+* Image
+* Labels
+
+Currently it supports enriching events by matching existing fields with the
+container ID in them, for example, cgroup IDs retrieved by metricbeat system
+module:
+
+[source,yaml]
+-------------------------------------------------------------------------------
+processors:
+- add_docker_metadata:
+    match_fields: ["system.process.cgroup.id"]
+  host: "unix:///var/run/docker.sock"
+
+  # To connect to Docker over TLS you must specify a client and CA certificate.
+  #ssl:
+  #  certificate_authority: "/etc/pki/root/ca.pem"
+  #  certificate:           "/etc/pki/client/cert.pem"
+  #  key:                   "/etc/pki/client/cert.key"
 -------------------------------------------------------------------------------

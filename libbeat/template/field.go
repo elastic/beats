@@ -109,9 +109,7 @@ func (f *Field) text() common.MapStr {
 }
 
 func (f *Field) array() common.MapStr {
-	return common.MapStr{
-		"properties": common.MapStr{},
-	}
+	return common.MapStr{}
 }
 
 func (f *Field) object() common.MapStr {
