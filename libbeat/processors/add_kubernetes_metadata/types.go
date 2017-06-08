@@ -1,4 +1,4 @@
-package kubernetes
+package add_kubernetes_metadata
 
 type ObjectMeta struct {
 	Annotations       map[string]string `json:"annotations"`
