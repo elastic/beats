@@ -97,16 +97,10 @@ func (c *AuditClient) GetStatus() (*AuditStatus, error) {
 	}
 
 	if ack.Header.Type != syscall.NLMSG_ERROR {
-		return nil, errors.Errorf("unexpected ACK to GET, type=%d", ack.Header.Type)
+		return nil, errors.Errorf("unexpected ACK to GET, got type=%d", ack.Header.Type)
 	}
 
-	if err = ParseNetlinkError(ack.Data); err != NLE_SUCCESS {
-		if len(ack.Data) >= 4+12 {
-			status := &AuditStatus{}
-			if err = status.fromWireFormat(ack.Data[4:]); err == nil {
-				return nil, syscall.Errno(status.Failure)
-			}
-		}
+	if err = ParseNetlinkError(ack.Data); err != nil {
 		return nil, err
 	}
 
@@ -118,7 +112,7 @@ func (c *AuditClient) GetStatus() (*AuditStatus, error) {
 	}
 
 	if reply.Header.Type != AuditGet {
-		return nil, errors.Errorf("unexpected reply to GET, type%d", reply.Header.Type)
+		return nil, errors.Errorf("unexpected reply to GET, got type=%d", reply.Header.Type)
 	}
 
 	replyStatus := &AuditStatus{}
@@ -127,6 +121,134 @@ func (c *AuditClient) GetStatus() (*AuditStatus, error) {
 	}
 
 	return replyStatus, nil
+}
+
+// GetRules returns a list of audit rules (in binary format).
+func (c *AuditClient) GetRules() ([][]byte, error) {
+	msg := syscall.NetlinkMessage{
+		Header: syscall.NlMsghdr{
+			Type:  uint16(auparse.AUDIT_LIST_RULES),
+			Flags: syscall.NLM_F_REQUEST | syscall.NLM_F_ACK,
+		},
+		Data: nil,
+	}
+
+	// Send AUDIT_LIST_RULES message to the kernel.
+	seq, err := c.Netlink.Send(msg)
+	if err != nil {
+		return nil, errors.Wrap(err, "failed sending request")
+	}
+
+	// Get the ack message which is a NLMSG_ERROR type whose error code is SUCCESS.
+	ack, err := c.getReply(seq)
+	if err != nil {
+		return nil, errors.Wrap(err, "failed to get audit ACK")
+	}
+
+	if ack.Header.Type != syscall.NLMSG_ERROR {
+		return nil, errors.Errorf("unexpected ACK to LIST_RULES, got type=%d", ack.Header.Type)
+	}
+
+	if err = ParseNetlinkError(ack.Data); err != nil {
+		return nil, err
+	}
+
+	var rules [][]byte
+	for {
+		reply, err := c.getReply(seq)
+		if err != nil {
+			return nil, errors.Wrap(err, "failed receive rule data")
+		}
+
+		if reply.Header.Type == syscall.NLMSG_DONE {
+			break
+		}
+
+		if reply.Header.Type != uint16(auparse.AUDIT_LIST_RULES) {
+			return nil, errors.Errorf("unexpected message type %d while receiving rules", reply.Header.Type)
+		}
+
+		rule := make([]byte, len(reply.Data))
+		copy(rule, reply.Data)
+		rules = append(rules, rule)
+	}
+
+	return rules, nil
+}
+
+// DeleteRules deletes all rules.
+func (c *AuditClient) DeleteRules() (int, error) {
+	rules, err := c.GetRules()
+	if err != nil {
+		return 0, err
+	}
+
+	for i, rule := range rules {
+		if err := c.DeleteRule(rule); err != nil {
+			return 0, errors.Wrapf(err, "failed to delete rule %v of %v", i, len(rules))
+		}
+	}
+
+	return len(rules), nil
+}
+
+// DeleteRule deletes the given rule (specified in binary format).
+func (c *AuditClient) DeleteRule(rule []byte) error {
+	msg := syscall.NetlinkMessage{
+		Header: syscall.NlMsghdr{
+			Type:  uint16(auparse.AUDIT_DEL_RULE),
+			Flags: syscall.NLM_F_REQUEST | syscall.NLM_F_ACK,
+		},
+		Data: rule,
+	}
+
+	// Send AUDIT_DEL_RULE message to the kernel.
+	seq, err := c.Netlink.Send(msg)
+	if err != nil {
+		return errors.Wrapf(err, "failed sending delete request")
+	}
+
+	_, err = c.getReply(seq)
+	if err != nil {
+		return errors.Wrap(err, "failed to get ACK to rule delete request")
+	}
+
+	return nil
+}
+
+// AddRule adds the given rule to the kernel's audit rule list.
+func (c *AuditClient) AddRule(rule []byte) error {
+	msg := syscall.NetlinkMessage{
+		Header: syscall.NlMsghdr{
+			Type:  uint16(auparse.AUDIT_ADD_RULE),
+			Flags: syscall.NLM_F_REQUEST | syscall.NLM_F_ACK,
+		},
+		Data: rule,
+	}
+
+	// Send AUDIT_ADD_RULE message to the kernel.
+	seq, err := c.Netlink.Send(msg)
+	if err != nil {
+		return errors.Wrapf(err, "failed sending delete request")
+	}
+
+	ack, err := c.getReply(seq)
+	if err != nil {
+		return errors.Wrap(err, "failed to get ACK to rule delete request")
+	}
+
+	if ack.Header.Type != syscall.NLMSG_ERROR {
+		return errors.Errorf("unexpected ACK to AUDIT_ADD_RULE, got type=%d", ack.Header.Type)
+	}
+
+	if err = ParseNetlinkError(ack.Data); err != nil {
+		if errno, ok := err.(syscall.Errno); ok && errno == syscall.EEXIST {
+			return errors.New("rule exists")
+		}
+		return errors.Wrap(err, "error adding audit rule")
+	}
+
+	return nil
 }
 
 // SetPID sends a netlink message to the kernel telling it the PID of the
@@ -272,13 +394,7 @@ func (c *AuditClient) set(status AuditStatus, mode WaitMode) error {
 		return errors.Errorf("unexpected ACK to SET, type=%d", ack.Header.Type)
 	}
 
-	if err := ParseNetlinkError(ack.Data); err != NLE_SUCCESS {
-		if len(ack.Data) >= 4+12 {
-			status := &AuditStatus{}
-			if err = status.fromWireFormat(ack.Data[4:]); err == nil {
-				return syscall.Errno(status.Failure)
-			}
-		}
+	if err := ParseNetlinkError(ack.Data); err != nil {
 		return err
 	}
 
