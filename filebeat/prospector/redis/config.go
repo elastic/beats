@@ -3,14 +3,13 @@ package redis
 import (
 	"time"
 
-	cfg "github.com/elastic/beats/filebeat/config"
 	"github.com/elastic/beats/filebeat/harvester"
 )
 
 var defaultConfig = config{
 
 	ForwarderConfig: harvester.ForwarderConfig{
-		Type: cfg.DefaultType,
+		Type: "redis",
 	},
 	Network:  "tcp",
 	MaxConn:  10,
