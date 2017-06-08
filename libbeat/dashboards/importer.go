@@ -505,11 +505,7 @@ func (imp Importer) downloadFile(url string, target string) (string, error) {
 	if err != nil {
 		return targetPath, err
 	}
-<<<<<<< HEAD
 	if resp.StatusCode != 200 {
-=======
-	if (resp.StatusCode != 200) {
->>>>>>> Check if .kibana exists before trying to create it
 		return targetPath, fmt.Errorf("Server returned: %s", resp.Status)
 	}
 	defer resp.Body.Close()
