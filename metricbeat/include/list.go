@@ -11,6 +11,7 @@ import (
 	_ "github.com/elastic/beats/metricbeat/module/apache"
 	_ "github.com/elastic/beats/metricbeat/module/apache/status"
 	_ "github.com/elastic/beats/metricbeat/module/audit"
+	_ "github.com/elastic/beats/metricbeat/module/audit/file"
 	_ "github.com/elastic/beats/metricbeat/module/audit/kernel"
 	_ "github.com/elastic/beats/metricbeat/module/ceph"
 	_ "github.com/elastic/beats/metricbeat/module/ceph/cluster_disk"
