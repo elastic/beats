@@ -6,7 +6,10 @@
 //// Use the appropriate variables defined in the index.asciidoc file to
 //// resolve Beat names: beatname_uc and beatname_lc.
 //// Use the following include to pull this content into a doc file:
+//// :standalone:
 //// include::../../libbeat/docs/yaml.asciidoc[]
+//// Specify :standalone: when this file is pulled into and index. When
+//// the file is embedded in another file, do no specify :standalone:
 //////////////////////////////////////////////////////////////////////////
 
 ifdef::standalone[]
@@ -40,7 +43,7 @@ simply uncomment the line and change the values.
 
 You can test your configuration file to verify that the structure is valid.
 Simply change to the directory where the binary is installed, and run
-the Beat in the foreground with the `-configtest` flag specified. For example: 
+the Beat in the foreground with the `-configtest` flag specified. For example:
 
 ifdef::allplatforms[]
 
@@ -65,7 +68,7 @@ You'll see a message if the Beat finds an error in the file.
 [float]
 === Wrap Regular Expressions in Single Quotation Marks
 
-If you need to specify a regular expression in a YAML file, it's a good idea to wrap the regular expression in single quotation marks to work around YAML's tricky rules for string escaping. 
+If you need to specify a regular expression in a YAML file, it's a good idea to wrap the regular expression in single quotation marks to work around YAML's tricky rules for string escaping.
 
 For more information about YAML, see http://yaml.org/.
 
@@ -74,9 +77,9 @@ For more information about YAML, see http://yaml.org/.
 === Wrap Paths in Single Quotation Marks
 
 Windows paths in particular sometimes contain spaces or characters, such as drive
-letters or triple dots, that may be misinterpreted by the YAML parser. 
+letters or triple dots, that may be misinterpreted by the YAML parser.
 
-To avoid this problem, it's a good idea to wrap paths in single quotation marks. 
+To avoid this problem, it's a good idea to wrap paths in single quotation marks.
 
 [float]
 [[avoid-leading-zeros]]
@@ -85,7 +88,7 @@ To avoid this problem, it's a good idea to wrap paths in single quotation marks.
 If you use a leading zero (for example, `09`) in a numeric field without
 wrapping the value in single quotation marks, the value may be interpreted
 incorrectly by the YAML parser. If the value is a valid octal, it's converted
-to an integer. If not, it's converted to a float. 
+to an integer. If not, it's converted to a float.
 
 To prevent unwanted type conversions, avoid using leading zeros in field values,
 or wrap the values in single quotation marks.
