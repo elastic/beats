@@ -204,6 +204,10 @@ output.elasticsearch:
   # Set gzip compression level.
   #compression_level: 3
 
+  # Time-to-live for a logstash connection.
+  # Useful when Logstash hosts are behind load balancers. Defaults to `0s`.
+  #ttl: 30s
+
   # Optional load balance the events between the Logstash hosts
   #loadbalance: true
 

@@ -46,7 +46,7 @@ type testDriverCommand struct {
 
 func newLumberjackTestClient(conn *transport.Client) *client {
 	c, err := newLumberjackClient(conn, 3,
-		testMaxWindowSize, 100*time.Millisecond, "test")
+		testMaxWindowSize, 100*time.Millisecond, 5*time.Second, "test")
 	if err != nil {
 		panic(err)
 	}
@@ -109,6 +109,52 @@ func testSimpleEvent(t *testing.T, factory clientFactory) {
 	msg := events[0].(map[string]interface{})
 	assert.Equal(t, "me", msg["name"])
 	assert.Equal(t, 10.0, msg["line"])
+}
+
+func testSimpleEventWithTTL(t *testing.T, factory clientFactory) {
+	enableLogging([]string{"*"})
+	mock := transptest.NewMockServerTCP(t, 1*time.Second, "", nil)
+	server, _ := v2.NewWithListener(mock.Listener)
+	defer server.Close()
+
+	transp, err := mock.Connect()
+	if err != nil {
+		t.Fatalf("Failed to connect: %v", err)
+	}
+	client := factory(transp)
+	defer transp.Close()
+	defer client.Stop()
+
+	event := outputs.Data{Event: common.MapStr{"type": "test", "name": "me", "line": 10}}
+	go client.Publish([]outputs.Data{event})
+
+	// try to receive event from server
+	batch := server.Receive()
+	batch.ACK()
+
+	// validate
+	events := batch.Events
+	assert.Equal(t, 1, len(events))
+	msg := events[0].(map[string]interface{})
+	assert.Equal(t, "me", msg["name"])
+	assert.Equal(t, 10.0, msg["line"])
+
+	//wait 10 seconds (ttl: 5 seconds) then send the event again
+	time.Sleep(10 * time.Second)
+
+	event = outputs.Data{Event: common.MapStr{"type": "test", "name": "me", "line": 11}}
+	go client.Publish([]outputs.Data{event})
+
+	// try to receive event from server
+	batch = server.Receive()
+	batch.ACK()
+
+	// validate
+	events = batch.Events
+	assert.Equal(t, 1, len(events))
+	msg = events[0].(map[string]interface{})
+	assert.Equal(t, "me", msg["name"])
+	assert.Equal(t, 11.0, msg["line"])
 }
 
 func testStructuredEvent(t *testing.T, factory clientFactory) {
