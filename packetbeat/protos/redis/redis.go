@@ -277,12 +277,14 @@ func (redis *redisPlugin) newTransaction(requ, resp *redisMessage) common.MapStr
 	src := &common.Endpoint{
 		IP:   requ.tcpTuple.SrcIP.String(),
 		Port: requ.tcpTuple.SrcPort,
-		Proc: string(requ.cmdlineTuple.Src),
+		Proc: requ.cmdlineTuple.Src,
+		PID:  requ.cmdlineTuple.SrcPID,
 	}
 	dst := &common.Endpoint{
 		IP:   requ.tcpTuple.DstIP.String(),
 		Port: requ.tcpTuple.DstPort,
-		Proc: string(requ.cmdlineTuple.Dst),
+		Proc: requ.cmdlineTuple.Dst,
+		PID:  requ.cmdlineTuple.DstPID,
 	}
 	if requ.direction == tcp.TCPDirectionReverse {
 		src, dst = dst, src

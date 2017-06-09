@@ -23,7 +23,7 @@ This requires [python](https://www.python.org/downloads/) to be installed.
   - server: Send echo response upon receiving a message. Echo response begins
     with `<` character. Errors responses begin with `!` character. An error message
     will be returned for any received request not starting with `>`.
-    
+
 - Echo Server sample code:
 
 ```
@@ -99,7 +99,7 @@ func echo(sock net.Conn) {
 
 ### 2.1 Add protocol analyzer (echo) to packetbeat:
 
-Create analyzer skeleton from code generator template. 
+Create analyzer skeleton from code generator template.
 
 ```
   $ cd ${GOPATH}/src/github.com/elastic/beats/packetbeat/protos
@@ -238,12 +238,14 @@ func (pub *transPub) createEvent(requ, resp *message) common.MapStr {
 	src := &common.Endpoint{
 		IP:   requ.Tuple.SrcIP.String(),
 		Port: requ.Tuple.SrcPort,
-		Proc: string(requ.CmdlineTuple.Src),
+		Proc: requ.CmdlineTuple.Src,
+		PID:  requ.CmdlineTuple.SrcPID,
 	}
 	dst := &common.Endpoint{
 		IP:   requ.Tuple.DstIP.String(),
 		Port: requ.Tuple.DstPort,
-		Proc: string(requ.CmdlineTuple.Dst),
+		Proc: requ.CmdlineTuple.Dst,
+		PID:  requ.CmdlineTuple.DstPID,
 	}
 
 	event := common.MapStr{

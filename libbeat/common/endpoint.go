@@ -7,4 +7,5 @@ type Endpoint struct {
 	Name    string
 	Cmdline string
 	Proc    string
+	PID     int
 }

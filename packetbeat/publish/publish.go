@@ -215,6 +215,9 @@ func (p *PacketbeatPublisher) normalizeTransAddr(event common.MapStr) bool {
 		event["client_ip"] = src.IP
 		event["client_port"] = src.Port
 		event["client_proc"] = src.Proc
+		if src.PID != 0 {
+			event["client_pid"] = src.PID
+		}
 		event["client_server"] = srcServer
 		delete(event, "src")
 	}
@@ -226,6 +229,9 @@ func (p *PacketbeatPublisher) normalizeTransAddr(event common.MapStr) bool {
 		event["ip"] = dst.IP
 		event["port"] = dst.Port
 		event["proc"] = dst.Proc
+		if dst.PID != 0 {
+			event["pid"] = dst.PID
+		}
 		event["server"] = dstServer
 		delete(event, "dst")
 

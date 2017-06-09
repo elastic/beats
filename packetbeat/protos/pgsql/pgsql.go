@@ -377,12 +377,14 @@ func (pgsql *pgsqlPlugin) receivedPgsqlRequest(msg *pgsqlMessage) {
 		trans.src = common.Endpoint{
 			IP:   msg.tcpTuple.SrcIP.String(),
 			Port: msg.tcpTuple.SrcPort,
-			Proc: string(msg.cmdlineTuple.Src),
+			Proc: msg.cmdlineTuple.Src,
+			PID:  msg.cmdlineTuple.SrcPID,
 		}
 		trans.dst = common.Endpoint{
 			IP:   msg.tcpTuple.DstIP.String(),
 			Port: msg.tcpTuple.DstPort,
-			Proc: string(msg.cmdlineTuple.Dst),
+			Proc: msg.cmdlineTuple.Dst,
+			PID:  msg.cmdlineTuple.DstPID,
 		}
 		if msg.direction == tcp.TCPDirectionReverse {
 			trans.src, trans.dst = trans.dst, trans.src

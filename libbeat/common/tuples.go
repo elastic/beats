@@ -131,5 +131,6 @@ func (t *TCPTuple) Hashable() HashableTCPTuple {
 
 // Source and destination process names, as found by the proc module.
 type CmdlineTuple struct {
-	Src, Dst []byte
+	Src, Dst       string
+	SrcPID, DstPID int
 }

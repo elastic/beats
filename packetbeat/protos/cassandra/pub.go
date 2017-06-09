@@ -54,7 +54,8 @@ func (pub *transPub) createEvent(requ, resp *message) common.MapStr {
 		src := &common.Endpoint{
 			IP:   requ.Tuple.SrcIP.String(),
 			Port: requ.Tuple.SrcPort,
-			Proc: string(requ.CmdlineTuple.Src),
+			Proc: requ.CmdlineTuple.Src,
+			PID:  requ.CmdlineTuple.SrcPID,
 		}
 
 		event["@timestamp"] = common.Time(requ.Ts)
@@ -83,7 +84,8 @@ func (pub *transPub) createEvent(requ, resp *message) common.MapStr {
 		dst := &common.Endpoint{
 			IP:   requ.Tuple.DstIP.String(),
 			Port: requ.Tuple.DstPort,
-			Proc: string(requ.CmdlineTuple.Dst),
+			Proc: requ.CmdlineTuple.Dst,
+			PID:  requ.CmdlineTuple.DstPID,
 		}
 		event["dst"] = dst
 
@@ -95,7 +97,8 @@ func (pub *transPub) createEvent(requ, resp *message) common.MapStr {
 		dst := &common.Endpoint{
 			IP:   resp.Tuple.DstIP.String(),
 			Port: resp.Tuple.DstPort,
-			Proc: string(resp.CmdlineTuple.Dst),
+			Proc: resp.CmdlineTuple.Dst,
+			PID:  resp.CmdlineTuple.DstPID,
 		}
 		event["dst"] = dst
 	}

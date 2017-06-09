@@ -191,7 +191,7 @@ func (proc *ProcessesWatcher) FindProcessesTuple(tuple *common.IPPortTuple) (pro
 
 	if proc.isLocalIP(tuple.SrcIP) {
 		logp.Debug("procs", "Looking for port %d", tuple.SrcPort)
-		procTuple.Src = []byte(proc.findProc(tuple.SrcPort))
+		procTuple.Src, procTuple.SrcPID = proc.findProc(tuple.SrcPort)
 		if len(procTuple.Src) > 0 {
 			logp.Debug("procs", "Found device %s for port %d", procTuple.Src, tuple.SrcPort)
 		}
@@ -199,7 +199,7 @@ func (proc *ProcessesWatcher) FindProcessesTuple(tuple *common.IPPortTuple) (pro
 
 	if proc.isLocalIP(tuple.DstIP) {
 		logp.Debug("procs", "Looking for port %d", tuple.DstPort)
-		procTuple.Dst = []byte(proc.findProc(tuple.DstPort))
+		procTuple.Dst, procTuple.DstPID = proc.findProc(tuple.DstPort)
 		if len(procTuple.Dst) > 0 {
 			logp.Debug("procs", "Found device %s for port %d", procTuple.Dst, tuple.DstPort)
 		}
@@ -208,13 +208,13 @@ func (proc *ProcessesWatcher) FindProcessesTuple(tuple *common.IPPortTuple) (pro
 	return
 }
 
-func (proc *ProcessesWatcher) findProc(port uint16) (procname string) {
+func (proc *ProcessesWatcher) findProc(port uint16) (procname string, pid int) {
 	procname = ""
 	defer logp.Recover("FindProc exception")
 
 	p, exists := proc.portProcMap[port]
 	if exists {
-		return p.proc.name
+		return p.proc.name, p.pid
 	}
 
 	now := time.Now()
@@ -226,11 +226,11 @@ func (proc *ProcessesWatcher) findProc(port uint16) (procname string) {
 		// try again
 		p, exists := proc.portProcMap[port]
 		if exists {
-			return p.proc.name
+			return p.proc.name, p.pid
 		}
 	}
 
-	return ""
+	return "", 0
 }
 
 func hexToIpv4(word string) (net.IP, error) {

@@ -257,12 +257,14 @@ func newTransaction(ts time.Time, tuple dnsTuple, cmd common.CmdlineTuple) *dnsT
 	trans.src = common.Endpoint{
 		IP:   tuple.srcIP.String(),
 		Port: tuple.srcPort,
-		Proc: string(cmd.Src),
+		Proc: cmd.Src,
+		PID:  cmd.SrcPID,
 	}
 	trans.dst = common.Endpoint{
 		IP:   tuple.dstIP.String(),
 		Port: tuple.dstPort,
-		Proc: string(cmd.Dst),
+		Proc: cmd.Dst,
+		PID:  cmd.DstPID,
 	}
 	return trans
 }
