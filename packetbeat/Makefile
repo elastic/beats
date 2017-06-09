@@ -34,8 +34,8 @@ collect: fields imports
 .PHONY: fields
 fields:
 	mkdir -p _meta
-	cat ${ES_BEATS}/packetbeat/_meta/fields_base.yml > _meta/fields.yml
-	-cat protos/*/_meta/fields.yml >> _meta/fields.yml
+	cat ${ES_BEATS}/packetbeat/_meta/fields_base.yml > _meta/fields.generated.yml
+	-cat protos/*/_meta/fields.yml >> _meta/fields.generated.yml
 
 .PHONY: benchmark
 benchmark:

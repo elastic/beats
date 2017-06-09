@@ -1213,9 +1213,21 @@ The name of the process that served the transaction.
 
 
 [float]
+=== pid
+
+The PID of the process that served the transaction.
+
+
+[float]
 === client_proc
 
 The name of the process that initiated the transaction.
+
+
+[float]
+=== client_pid
+
+The PID of the process that initiated the transaction.
 
 
 [float]
