@@ -233,6 +233,13 @@ output.elasticsearch:
   # Set gzip compression level.
   #compression_level: 3
 
+  # Optional maximum time to live for a connection to Logstash, after which the
+  # connection will be re-established.  A value of `0s` (the default) will
+  # disable this feature.
+  #
+  # Not yet supported for async connections (i.e. with the "pipelining" option set)
+  #ttl: 30s
+
   # Optional load balance the events between the Logstash hosts
   #loadbalance: true
 
