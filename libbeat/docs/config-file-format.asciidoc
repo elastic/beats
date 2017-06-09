@@ -335,13 +335,41 @@ overwrite settings via local configuration files.
 In addition to overwriting settings using multiple configuration files,
 individual settings can be overwritten using `-E <setting>=<value>`. The
 `<value>` can be either a single value or a complex object, such as a list or
-dictionary. For example, you can disable the Elasticsearch output and write all
-events to the console by setting:
+dictionary.
+
+For example, given the following configuration:
+
+["source","yaml"]
+--------------------------------------------------------------------------------
+output.elasticsearch:
+  hosts: ["http://localhost:9200"]
+  username: username
+  password: password
+--------------------------------------------------------------------------------
+
+You can disable the Elasticsearch output and write all events to the console by
+setting:
 
 ["source","sh"]
 --------------------------------------------------------------------------------
 -E output='{elasticsearch.enabled: false, console.pretty: true}'
 --------------------------------------------------------------------------------
+
+Any complex objects that you specify at the command line are merged with the
+original configuration, and the following configuration is passed to the Beat:
+
+["source","yaml"]
+--------------------------------------------------------------------------------
+output.elasticsearch:
+  enabled: false
+  hosts: ["http://localhost:9200"]
+  username: username
+  password: password
+
+output.console:
+  pretty: true
+--------------------------------------------------------------------------------
+
 
 [[config-file-format-tips]]
 === YAML Tips and Gotchas

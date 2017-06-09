@@ -29,12 +29,21 @@ Where `VAR` is the name of the environment variable.
 Each variable reference is replaced at startup by the value of the environment
 variable. The replacement is case-sensitive and occurs before the YAML file is
 parsed. References to undefined variables are replaced by empty strings unless
-you specify a default value. To specify a default value, use:
+you specify a default value or custom error text.
+
+To specify a default value, use:
 
 `${VAR:default_value}`
 
 Where `default_value` is the value to use if the environment variable is
 undefined.
+
+To specify custom error text, use:
+
+`${VAR:?error_text}`
+
+Where `error_text` is custom text that will be prepended to the error
+message if the environment variable cannot be expanded.
 
 If you need to use a literal `${` in your configuration file then you can write
 `$${` to escape the expansion.
@@ -59,11 +68,13 @@ and what each configuration looks like after replacement:
 
 [options="header"]
 |==================================
-|Config source	       |Environment setting   |Config after replacement
-|`name: ${NAME}`       |`export NAME=elastic` |`name: elastic`
-|`name: ${NAME}`       |no setting            |`name:`
-|`name: ${NAME:beats}` |no setting            |`name: beats`
-|`name: ${NAME:beats}` |`export NAME=elastic` |`name: elastic`
+|Config source	         |Environment setting   |Config after replacement
+|`name: ${NAME}`         |`export NAME=elastic` |`name: elastic`
+|`name: ${NAME}`         |no setting            |`name:`
+|`name: ${NAME:beats}`   |no setting            |`name: beats`
+|`name: ${NAME:beats}`   |`export NAME=elastic` |`name: elastic`
+|`name: ${NAME:?You need to set the NAME environment variable}`  |no setting            | None. Returns an error message that's prepended with the custom text.
+|`name: ${NAME:?You need to set the NAME environment variable}`  |`export NAME=elastic` | `name: elastic`
 |==================================
 
 [float]
@@ -71,6 +82,12 @@ and what each configuration looks like after replacement:
 
 You can specify complex objects, such as lists or dictionaries, in environment
 variables by using a JSON-like syntax.
+
+As with JSON, dictionaries and lists are constructed using `{}` and `[]`. But
+unlike JSON, the syntax allows for trailing commas and slightly different string
+quotation rules. Strings can be unquoted, single-quoted, or double-quoted, as a
+convenience for simple settings and to make it easier for you to mix quotation
+usage in the shell. Arrays at the top-level do not require brackets (`[]`).
 
 For example, the following environment variable is set to a list:
 
@@ -89,14 +106,5 @@ output.elasticsearch:
 
 When the Beat loads the config file, it resolves the environment variable and
 replaces it with the specified list before reading the `hosts` setting.
-
-When you specify complex objects in environment variables, keep the following
-in mind:
-
-* Strings can be unquoted, single-quoted, or double-quoted, as a convenience for
-simple settings and to make it easier for you to mix quotation usage in the
-shell.
-* Arrays at the top-level do not require brackets (`[]`). For convenience, you
-can use commas (`,`) to separate the elements.
 
 NOTE: Do not use double-quotes (`"`) to wrap regular expressions, or the backslash (`\`) will be interpreted as an escape character.
