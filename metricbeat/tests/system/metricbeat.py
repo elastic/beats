@@ -28,7 +28,9 @@ class BaseTest(TestCase):
         flat = self.flatten_object(evt, [])
 
         for key in flat.keys():
-            if key not in expected_fields:
+            documented = key in expected_fields
+            metaKey = key.startswith('@metadata.')
+            if not(documented or metaKey):
                 raise Exception("Key '{}' found in event is not documented!".format(key))
 
     def de_dot(self, existing_fields):

@@ -10,7 +10,8 @@ import (
 
 	"github.com/Shopify/sarama"
 	"github.com/elastic/beats/libbeat/common"
-	"github.com/elastic/beats/libbeat/outputs"
+	"github.com/elastic/beats/libbeat/publisher"
+	"github.com/elastic/beats/libbeat/publisher/beat"
 	"github.com/stretchr/testify/assert"
 )
 
@@ -219,7 +220,7 @@ func partTestSimple(N int, makeKey bool) partTestScenario {
 			}
 
 			msg := &message{partition: -1}
-			msg.data = outputs.Data{Event: event, Values: nil}
+			msg.data = publisher.Event{Content: beat.Event{Fields: event}}
 			msg.topic = "test"
 			if makeKey {
 				msg.key = randASCIIBytes(10)
@@ -271,7 +272,7 @@ func partTestHashInvariant(N int) partTestScenario {
 			}
 
 			msg := &message{partition: -1}
-			msg.data = outputs.Data{Event: event, Values: nil}
+			msg.data = publisher.Event{Content: beat.Event{Fields: event}}
 			msg.topic = "test"
 			msg.key = randASCIIBytes(10)
 			msg.value = jsonEvent

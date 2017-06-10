@@ -109,6 +109,11 @@ func (p *messagePartitioner) Partition(
 	}
 
 	msg.partition = partition
+	event := &msg.data.Content
+	if event.Meta == nil {
+		event.Meta = map[string]interface{}{}
+	}
+	event.Meta["partition"] = partition
 	p.partitions = numPartitions
 	return msg.partition, nil
 }
@@ -223,7 +228,7 @@ func makeFieldsHashPartitioner(fields []string, dropFail bool) partitioner {
 
 			var err error
 			for _, field := range fields {
-				err = hashFieldValue(hasher, msg.data.Event, field)
+				err = hashFieldValue(hasher, msg.data.Content.Fields, field)
 				if err != nil {
 					break
 				}

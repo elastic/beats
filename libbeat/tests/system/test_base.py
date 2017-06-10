@@ -58,7 +58,7 @@ class Test(BaseTest):
 
         # start beat with invalid config setting on command line
         exit_code = self.run_beat(
-            extra_args=["-E", "output.console=invalid"])
+            extra_args=["-d", "config", "-E", "output.console=invalid"])
 
         assert exit_code == 1
         assert self.log_contains("error unpacking config data") is True

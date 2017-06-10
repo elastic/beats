@@ -10,8 +10,9 @@ import (
 	"strings"
 	"testing"
 
-	"github.com/elastic/beats/libbeat/logp"
 	"github.com/stretchr/testify/assert"
+
+	"github.com/elastic/beats/libbeat/logp"
 )
 
 func TestIndex(t *testing.T) {

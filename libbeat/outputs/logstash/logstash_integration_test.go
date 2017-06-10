@@ -6,15 +6,17 @@ import (
 	"encoding/json"
 	"fmt"
 	"os"
+	"sync"
 	"testing"
 	"time"
 
 	"github.com/elastic/beats/libbeat/common"
 	"github.com/elastic/beats/libbeat/common/fmtstr"
-	"github.com/elastic/beats/libbeat/common/op"
 	"github.com/elastic/beats/libbeat/outputs"
 	"github.com/elastic/beats/libbeat/outputs/elasticsearch"
+	"github.com/elastic/beats/libbeat/outputs/outest"
 	"github.com/elastic/beats/libbeat/outputs/outil"
+	"github.com/elastic/beats/libbeat/publisher/beat"
 	"github.com/stretchr/testify/assert"
 )
 
@@ -34,7 +36,7 @@ type esConnection struct {
 }
 
 type testOutputer struct {
-	outputs.BulkOutputer
+	outputs.NetworkClient
 	*esConnection
 }
 
@@ -72,8 +74,8 @@ func esConnect(t *testing.T, index string) *esConnection {
 	host := getElasticsearchHost()
 	indexFmt := fmtstr.MustCompileEvent(fmt.Sprintf("%s-%%{+yyyy.MM.dd}", index))
 	indexSel := outil.MakeSelector(outil.FmtSelectorExpr(indexFmt, ""))
-	index, _ = indexSel.Select(common.MapStr{
-		"@timestamp": common.Time(ts),
+	index, _ = indexSel.Select(&beat.Event{
+		Timestamp: ts,
 	})
 
 	username := os.Getenv("ES_USER")
@@ -129,18 +131,15 @@ func newTestLogstashOutput(t *testing.T, test string, tls bool) *testOutputer {
 		}
 	}
 
-	lumberjack := newTestLumberjackOutput(t, test, config)
+	output := newTestLumberjackOutput(t, test, config)
 	index := testLogstashIndex(test)
 	connection := esConnect(t, index)
 
-	ls := &testOutputer{}
-	ls.BulkOutputer = lumberjack
-	ls.esConnection = connection
-	return ls
+	return &testOutputer{output, connection}
 }
 
 func newTestElasticsearchOutput(t *testing.T, test string) *testOutputer {
-	plugin := outputs.FindOutputPlugin("elasticsearch")
+	plugin := outputs.FindFactory("elasticsearch")
 	if plugin == nil {
 		t.Fatalf("No elasticsearch output plugin found")
 	}
@@ -160,13 +159,13 @@ func newTestElasticsearchOutput(t *testing.T, test string) *testOutputer {
 		"template.enabled": false,
 	})
 
-	output, err := plugin(common.BeatInfo{Beat: "libbeat"}, config)
+	grp, err := plugin(common.BeatInfo{Beat: "libbeat"}, config)
 	if err != nil {
 		t.Fatalf("init elasticsearch output plugin failed: %v", err)
 	}
 
 	es := &testOutputer{}
-	es.BulkOutputer = output.(outputs.BulkOutputer)
+	es.NetworkClient = grp.Clients[0].(outputs.NetworkClient)
 	es.esConnection = connection
 	return es
 }
@@ -263,12 +262,16 @@ func testSendMessageViaLogstash(t *testing.T, name string, tls bool) {
 	ls := newTestLogstashOutput(t, name, tls)
 	defer ls.Cleanup()
 
-	event := outputs.Data{Event: common.MapStr{
-		"@timestamp": common.Time(time.Now()),
-		"host":       "test-host",
-		"message":    "hello world",
-	}}
-	ls.PublishEvent(nil, testOptions, event)
+	batch := outest.NewBatch(
+		beat.Event{
+			Timestamp: time.Now(),
+			Fields: common.MapStr{
+				"host":    "test-host",
+				"message": "hello world",
+			},
+		},
+	)
+	ls.Publish(batch)
 
 	// wait for logstash event flush + elasticsearch
 	waitUntilTrue(5*time.Second, checkIndex(ls, 1))
@@ -296,13 +299,15 @@ func testSendMultipleViaLogstash(t *testing.T, name string, tls bool) {
 	ls := newTestLogstashOutput(t, name, tls)
 	defer ls.Cleanup()
 	for i := 0; i < 10; i++ {
-		event := outputs.Data{Event: common.MapStr{
-			"@timestamp": common.Time(time.Now()),
-			"host":       "test-host",
-			"type":       "log",
-			"message":    fmt.Sprintf("hello world - %v", i),
-		}}
-		ls.PublishEvent(nil, testOptions, event)
+		event := beat.Event{
+			Timestamp: time.Now(),
+			Fields: common.MapStr{
+				"host":    "test-host",
+				"type":    "log",
+				"message": fmt.Sprintf("hello world - %v", i),
+			},
+		}
+		ls.PublishEvent(event)
 	}
 
 	// wait for logstash event flush + elasticsearch
@@ -353,25 +358,25 @@ func testSendMultipleBatchesViaLogstash(
 	ls := newTestLogstashOutput(t, name, tls)
 	defer ls.Cleanup()
 
-	batches := make([][]outputs.Data, 0, numBatches)
+	batches := make([][]beat.Event, 0, numBatches)
 	for i := 0; i < numBatches; i++ {
-		batch := make([]outputs.Data, 0, batchSize)
+		batch := make([]beat.Event, 0, batchSize)
 		for j := 0; j < batchSize; j++ {
-			event := outputs.Data{Event: common.MapStr{
-				"@timestamp": common.Time(time.Now()),
-				"host":       "test-host",
-				"type":       "log",
-				"message":    fmt.Sprintf("batch hello world - %v", i*batchSize+j),
-			}}
+			event := beat.Event{
+				Timestamp: time.Now(),
+				Fields: common.MapStr{
+					"host":    "test-host",
+					"type":    "log",
+					"message": fmt.Sprintf("batch hello world - %v", i*batchSize+j),
+				},
+			}
 			batch = append(batch, event)
 		}
 		batches = append(batches, batch)
 	}
 
 	for _, batch := range batches {
-		sig := op.NewSignalChannel()
-		ls.BulkPublish(sig, testOptions, batch)
-		ok := sig.Wait() == op.SignalCompleted
+		ok := ls.BulkPublish(batch)
 		assert.Equal(t, true, ok)
 	}
 
@@ -408,15 +413,17 @@ func testLogstashElasticOutputPluginCompatibleMessage(t *testing.T, name string,
 	defer es.Cleanup()
 
 	ts := time.Now()
-	event := outputs.Data{Event: common.MapStr{
-		"@timestamp": common.Time(ts),
-		"host":       "test-host",
-		"type":       "log",
-		"message":    "hello world",
-	}}
+	event := beat.Event{
+		Timestamp: ts,
+		Fields: common.MapStr{
+			"host":    "test-host",
+			"type":    "log",
+			"message": "hello world",
+		},
+	}
 
-	es.PublishEvent(nil, testOptions, event)
-	ls.PublishEvent(nil, testOptions, event)
+	es.PublishEvent(event)
+	ls.PublishEvent(event)
 
 	waitUntilTrue(timeout, checkIndex(es, 1))
 	waitUntilTrue(timeout, checkIndex(ls, 1))
@@ -462,19 +469,19 @@ func testLogstashElasticOutputPluginBulkCompatibleMessage(t *testing.T, name str
 	defer es.Cleanup()
 
 	ts := time.Now()
-	events := []outputs.Data{
+	events := []beat.Event{
 		{
-			Event: common.MapStr{
-				"@timestamp": common.Time(ts),
-				"host":       "test-host",
-				"type":       "log",
-				"message":    "hello world",
+			Timestamp: ts,
+			Fields: common.MapStr{
+				"host":    "test-host",
+				"type":    "log",
+				"message": "hello world",
 			},
 		},
 	}
 
-	ls.BulkPublish(nil, testOptions, events)
-	es.BulkPublish(nil, testOptions, events)
+	ls.BulkPublish(events)
+	es.BulkPublish(events)
 
 	waitUntilTrue(timeout, checkIndex(ls, 1))
 	waitUntilTrue(timeout, checkIndex(es, 1))
@@ -508,4 +515,24 @@ func checkEvent(t *testing.T, ls, es map[string]interface{}) {
 		assert.NotNil(t, esEvent[field])
 		assert.Equal(t, lsEvent[field], esEvent[field])
 	}
+}
+
+func (t *testOutputer) PublishEvent(event beat.Event) {
+	t.Publish(outest.NewBatch(event))
+}
+
+func (t *testOutputer) BulkPublish(events []beat.Event) bool {
+	ok := false
+	batch := outest.NewBatch(events...)
+
+	var wg sync.WaitGroup
+	wg.Add(1)
+	batch.OnSignal = func(sig outest.BatchSignal) {
+		ok = sig.Tag == outest.BatchACK
+		wg.Done()
+	}
+
+	t.Publish(batch)
+	wg.Wait()
+	return ok
 }

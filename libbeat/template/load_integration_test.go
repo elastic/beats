@@ -17,6 +17,9 @@ import (
 func TestCheckTemplate(t *testing.T) {
 
 	client := elasticsearch.GetTestingElasticsearch(t)
+	if err := client.Connect(); err != nil {
+		t.Fatal(err)
+	}
 
 	loader := &Loader{
 		client: client,
@@ -30,6 +33,9 @@ func TestLoadTemplate(t *testing.T) {
 
 	// Setup ES
 	client := elasticsearch.GetTestingElasticsearch(t)
+	if err := client.Connect(); err != nil {
+		t.Fatal(err)
+	}
 
 	// Load template
 	absPath, err := filepath.Abs("../")
@@ -71,6 +77,9 @@ func TestLoadInvalidTemplate(t *testing.T) {
 
 	// Setup ES
 	client := elasticsearch.GetTestingElasticsearch(t)
+	if err := client.Connect(); err != nil {
+		t.Fatal(err)
+	}
 
 	templateName := "invalidtemplate"
 
@@ -120,6 +129,9 @@ func TestLoadBeatsTemplate(t *testing.T) {
 
 		// Setup ES
 		client := elasticsearch.GetTestingElasticsearch(t)
+		if err := client.Connect(); err != nil {
+			t.Fatal(err)
+		}
 
 		fieldsPath := absPath + "/fields.yml"
 		index := beat
@@ -152,6 +164,9 @@ func TestTemplateSettings(t *testing.T) {
 
 	// Setup ES
 	client := elasticsearch.GetTestingElasticsearch(t)
+	if err := client.Connect(); err != nil {
+		t.Fatal(err)
+	}
 
 	// Load template
 	absPath, err := filepath.Abs("../")
@@ -202,6 +217,9 @@ func TestOverwrite(t *testing.T) {
 
 	// Setup ES
 	client := elasticsearch.GetTestingElasticsearch(t)
+	if err := client.Connect(); err != nil {
+		t.Fatal(err)
+	}
 
 	beatInfo := common.BeatInfo{
 		Beat:    "testbeat",

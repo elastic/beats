@@ -1,96 +1,118 @@
 package console
 
 import (
+	"bufio"
 	"fmt"
 	"os"
 	"runtime"
+	"time"
 
 	"github.com/elastic/beats/libbeat/common"
-	"github.com/elastic/beats/libbeat/common/op"
 	"github.com/elastic/beats/libbeat/logp"
 	"github.com/elastic/beats/libbeat/outputs"
-	"github.com/elastic/beats/libbeat/outputs/codecs/json"
+	"github.com/elastic/beats/libbeat/outputs/codec"
+	"github.com/elastic/beats/libbeat/outputs/codec/json"
+	"github.com/elastic/beats/libbeat/publisher"
 )
 
-func init() {
-	outputs.RegisterOutputPlugin("console", New)
-}
-
 type console struct {
-	out   *os.File
-	codec outputs.Codec
+	out    *os.File
+	writer *bufio.Writer
+	codec  codec.Codec
+	index  string
 }
 
-func New(_ common.BeatInfo, config *common.Config) (outputs.Outputer, error) {
-	var unpackedConfig Config
-	err := config.Unpack(&unpackedConfig)
+type consoleEvent struct {
+	Timestamp time.Time `json:"@timestamp" struct:"@timestamp"`
+
+	// Note: stdlib json doesn't support inlining :( -> use `codec: 2`, to generate proper event
+	Fields interface{} `struct:",inline"`
+}
+
+func init() {
+	outputs.RegisterType("console", makeConsole)
+}
+
+func makeConsole(beat common.BeatInfo, cfg *common.Config) (outputs.Group, error) {
+	config := defaultConfig
+	err := cfg.Unpack(&config)
 	if err != nil {
-		return nil, err
+		return outputs.Fail(err)
 	}
 
-	var codec outputs.Codec
-	if unpackedConfig.Codec.Namespace.IsSet() {
-		codec, err = outputs.CreateEncoder(unpackedConfig.Codec)
+	var enc codec.Codec
+	if config.Codec.Namespace.IsSet() {
+		enc, err = codec.CreateEncoder(config.Codec)
 		if err != nil {
-			return nil, err
+			return outputs.Fail(err)
 		}
 	} else {
-		codec = json.New(unpackedConfig.Pretty)
+		enc = json.New(config.Pretty)
 	}
 
-	c, err := newConsole(codec)
+	index := beat.Beat
+	c, err := newConsole(index, enc)
 	if err != nil {
-		return nil, fmt.Errorf("console output initialization failed with: %v", err)
+		return outputs.Fail(fmt.Errorf("console output initialization failed with: %v", err))
 	}
 
 	// check stdout actually being available
 	if runtime.GOOS != "windows" {
 		if _, err = c.out.Stat(); err != nil {
-			return nil, fmt.Errorf("console output initialization failed with: %v", err)
+			err = fmt.Errorf("console output initialization failed with: %v", err)
+			return outputs.Fail(err)
 		}
 	}
 
+	return outputs.Success(config.BatchSize, 0, c)
+}
+
+func newConsole(index string, codec codec.Codec) (*console, error) {
+	c := &console{out: os.Stdout, codec: codec, index: index}
+	c.writer = bufio.NewWriterSize(c.out, 8*1024)
 	return c, nil
 }
 
-func newConsole(codec outputs.Codec) (*console, error) {
-	return &console{codec: codec, out: os.Stdout}, nil
-}
+func (c *console) Close() error { return nil }
+func (c *console) Publish(batch publisher.Batch) error {
+	events := batch.Events()
+	for i := range events {
+		c.publishEvent(&events[i])
+	}
 
-// Implement Outputer
-func (c *console) Close() error {
+	c.writer.Flush()
+	batch.ACK()
 	return nil
 }
 
-var nl = []byte{'\n'}
+var nl = []byte("\n")
 
-func (c *console) PublishEvent(
-	s op.Signaler,
-	opts outputs.Options,
-	data outputs.Data,
-) error {
-	serializedEvent, err := c.codec.Encode(data.Event)
-	if err = c.writeBuffer(serializedEvent); err != nil {
-		goto fail
-	}
-	if err = c.writeBuffer(nl); err != nil {
-		goto fail
+func (c *console) publishEvent(event *publisher.Event) {
+	serializedEvent, err := c.codec.Encode(c.index, &event.Content)
+	if err != nil {
+		if !event.Guaranteed() {
+			return
+		}
+
+		logp.Critical("Unable to encode event: %v", err)
+		return
 	}
 
-	op.SigCompleted(s)
-	return nil
-fail:
-	if opts.Guaranteed {
+	if err := c.writeBuffer(serializedEvent); err != nil {
 		logp.Critical("Unable to publish events to console: %v", err)
+		return
 	}
-	op.SigFailed(s, err)
-	return err
+
+	if err := c.writeBuffer(nl); err != nil {
+		logp.Critical("Error when appending newline to event: %v", err)
+		return
+	}
 }
 
 func (c *console) writeBuffer(buf []byte) error {
 	written := 0
 	for written < len(buf) {
-		n, err := c.out.Write(buf[written:])
+		n, err := c.writer.Write(buf[written:])
 		if err != nil {
 			return err
 		}

@@ -80,7 +80,7 @@ func HandleFlags(name string) error {
 // line flag with a later SetStderr call.
 func Init(name string, config *Logging) error {
 	// reset settings from HandleFlags
-	_log = Logger{}
+	_log = logger{}
 
 	logLevel, err := getLogLevel(config)
 	if err != nil {

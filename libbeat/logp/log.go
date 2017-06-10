@@ -23,7 +23,7 @@ const (
 	LOG_DEBUG
 )
 
-type Logger struct {
+type logger struct {
 	toSyslog          bool
 	toStderr          bool
 	toFile            bool
@@ -40,7 +40,7 @@ type Logger struct {
 
 const stderrLogFlags = log.Ldate | log.Ltime | log.Lmicroseconds | log.LUTC | log.Lshortfile
 
-var _log = Logger{}
+var _log = logger{}
 
 // TODO: remove toSyslog and toStderr from the init function
 func LogInit(level Priority, prefix string, toSyslog bool, toStderr bool, debugSelectors []string) {
