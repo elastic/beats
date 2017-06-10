@@ -241,14 +241,6 @@ filebeat.prospectors:
   # without causing Filebeat to scan too frequently. Default: 10s.
   #scan_frequency: 10s
 
-  # Specifies if files should be harvested in order and how to determine the order.
-  # Possible values are modtime, filename and none
-  #scan.sort: modtime
-
-  # Specifies ascending or descending order if scan.sort is set
-  # Possible values are asc or desc
-  #scan.order: asc
-
   # Defines the buffer size every harvester uses when fetching the file
   #harvester_buffer_size: 16384
 
