@@ -33,9 +33,6 @@
               "index": "not_analyzed",
               "type": "string"
             },
-            "arguments": {
-              "properties": {}
-            },
             "auto-delete": {
               "type": "boolean"
             },
@@ -93,9 +90,6 @@
               "ignore_above": 1024,
               "index": "not_analyzed",
               "type": "string"
-            },
-            "headers": {
-              "properties": {}
             },
             "if-empty": {
               "type": "boolean"
@@ -574,9 +568,6 @@
                     }
                   }
                 },
-                "supported": {
-                  "properties": {}
-                },
                 "warnings": {
                   "ignore_above": 1024,
                   "index": "not_analyzed",
@@ -864,9 +855,6 @@
         "domloadtime": {
           "type": "long"
         },
-        "fields": {
-          "properties": {}
-        },
         "final": {
           "ignore_above": 1024,
           "index": "not_analyzed",
@@ -888,9 +876,6 @@
                   },
                   "type": "string"
                 },
-                "headers": {
-                  "properties": {}
-                },
                 "params": {
                   "ignore_above": 1024,
                   "index": "not_analyzed",
@@ -909,9 +894,6 @@
                   "ignore_above": 1024,
                   "index": "not_analyzed",
                   "type": "string"
-                },
-                "headers": {
-                  "properties": {}
                 },
                 "phrase": {
                   "ignore_above": 1024,
@@ -1020,9 +1002,6 @@
                 "initial": {
                   "type": "long"
                 },
-                "keys": {
-                  "properties": {}
-                },
                 "line": {
                   "ignore_above": 1024,
                   "index": "not_analyzed",
@@ -1061,9 +1040,6 @@
                   "index": "not_analyzed",
                   "type": "string"
                 },
-                "values": {
-                  "properties": {}
-                },
                 "vbucket": {
                   "type": "long"
                 },
@@ -1096,9 +1072,6 @@
                 "flags": {
                   "type": "long"
                 },
-                "keys": {
-                  "properties": {}
-                },
                 "opaque": {
                   "type": "long"
                 },
@@ -1109,9 +1082,6 @@
                 },
                 "opcode_value": {
                   "type": "long"
-                },
-                "stats": {
-                  "properties": {}
                 },
                 "status": {
                   "ignore_above": 1024,
@@ -1128,9 +1098,6 @@
                 },
                 "value": {
                   "type": "long"
-                },
-                "values": {
-                  "properties": {}
                 },
                 "version": {
                   "ignore_above": 1024,

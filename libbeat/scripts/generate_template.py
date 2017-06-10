@@ -305,13 +305,6 @@ def fill_field_properties(args, field, defaults, path):
                 }
             })
 
-
-        properties[field["name"]] = {
-            "properties": {}
-        }
-
-
-
     elif field.get("type") == "group":
         if len(path) > 0:
             path = path + "." + field["name"]
