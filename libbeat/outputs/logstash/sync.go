@@ -19,6 +19,7 @@ type client struct {
 	*transport.Client
 	client *v2.SyncClient
 	win    window
+	ticker *time.Ticker
 }
 
 func newLumberjackClient(
@@ -26,11 +27,15 @@ func newLumberjackClient(
 	compressLevel int,
 	maxWindowSize int,
 	timeout time.Duration,
+	ttl time.Duration,
 	beat string,
 ) (*client, error) {
 	c := &client{}
 	c.Client = conn
 	c.win.init(defaultStartMaxWindowSize, maxWindowSize)
+	if ttl > 0 {
+		c.ticker = time.NewTicker(ttl)
+	}
 
 	enc, err := makeLogstashEventEncoder(beat)
 	if err != nil {
@@ -55,6 +60,9 @@ func (c *client) Connect(timeout time.Duration) error {
 }
 
 func (c *client) Close() error {
+	if c.ticker != nil {
+		c.ticker.Stop()
+	}
 	logp.Debug("logstash", "close connection")
 	return c.Client.Close()
 }
@@ -62,6 +70,13 @@ func (c *client) Close() error {
 func (c *client) PublishEvent(data outputs.Data) error {
 	_, err := c.PublishEvents([]outputs.Data{data})
 	return err
+}
+
+func (c *client) reconnect() error {
+	if err := c.Client.Close(); err != nil {
+		logp.Err("error closing connection to logstash: %s, reconnecting...", err)
+	}
+	return c.Client.Connect()
 }
 
 // PublishEvents sends all events to logstash. On error a slice with all events
@@ -72,6 +87,17 @@ func (c *client) PublishEvents(
 	publishEventsCallCount.Add(1)
 	totalNumberOfEvents := len(data)
 	for len(data) > 0 {
+		if c.ticker != nil {
+			select {
+			case <-c.ticker.C:
+				if err := c.reconnect(); err != nil {
+					return nil, err
+				}
+				// reset window size on reconnect
+				c.win.windowSize = int32(defaultStartMaxWindowSize)
+			default:
+			}
+		}
 		n, err := c.publishWindowed(data)
 
 		debug("%v events out of %v events sent to logstash. Continue sending",

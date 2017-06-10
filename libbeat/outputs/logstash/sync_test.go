@@ -32,6 +32,10 @@ func TestClientSimpleEvent(t *testing.T) {
 	testSimpleEvent(t, makeTestClient)
 }
 
+func TestClientSimpleEventTTL(t *testing.T) {
+	testSimpleEventWithTTL(t, makeTestClient)
+}
+
 func TestClientStructuredEvent(t *testing.T) {
 	testStructuredEvent(t, makeTestClient)
 }

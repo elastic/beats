@@ -46,6 +46,7 @@ include::./multiline.asciidoc[]
 
 include::../../libbeat/docs/shared-config-ingest.asciidoc[]
 
+:standalone:
 include::../../libbeat/docs/shared-env-vars.asciidoc[]
 
 include::./multiple-prospectors.asciidoc[]

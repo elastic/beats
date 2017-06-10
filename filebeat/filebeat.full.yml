@@ -219,7 +219,7 @@ filebeat.prospectors:
   # are matching any regular expression from the list. By default, no files are dropped.
   #exclude_files: ['.gz$']
 
-  # Optional additional fields. These field can be freely picked
+  # Optional additional fields. These fields can be freely picked
   # to add additional information to the crawled log files for filtering
   #fields:
   #  level: debug
@@ -389,7 +389,7 @@ filebeat.prospectors:
 
 #------------------------- Redis slowlog prospector ---------------------------
 # Experimental: Config options for the redis slow log prospector
-#- input_type: redis
+#- type: redis
   #hosts: ["localhost:6379"]
   #username:
   #password:
@@ -645,6 +645,13 @@ output.elasticsearch:
 
   # Set gzip compression level.
   #compression_level: 3
+
+  # Optional maximum time to live for a connection to Logstash, after which the
+  # connection will be re-established.  A value of `0s` (the default) will
+  # disable this feature.
+  #
+  # Not yet supported for async connections (i.e. with the "pipelining" option set)
+  #ttl: 30s
 
   # Optional load balance the events between the Logstash hosts
   #loadbalance: true

@@ -142,13 +142,14 @@ func makeClientFactory(
 	compressLvl := cfg.CompressionLevel
 	maxBulkSz := cfg.BulkMaxSize
 	to := cfg.Timeout
+	ttl := cfg.TTL
 
 	return func(host string) (mode.ProtocolClient, error) {
 		t, err := transport.NewClient(tcfg, "tcp", host, cfg.Port)
 		if err != nil {
 			return nil, err
 		}
-		return newLumberjackClient(t, compressLvl, maxBulkSz, to, cfg.Index)
+		return newLumberjackClient(t, compressLvl, maxBulkSz, to, ttl, cfg.Index)
 	}
 }
 
@@ -160,6 +161,10 @@ func makeAsyncClientFactory(
 	maxBulkSz := cfg.BulkMaxSize
 	queueSize := cfg.Pipelining - 1
 	to := cfg.Timeout
+
+	if cfg.TTL != 0 {
+		logp.Warn(`The async Logstash client does not support the "ttl" option`)
+	}
 
 	return func(host string) (mode.AsyncProtocolClient, error) {
 		t, err := transport.NewClient(tcfg, "tcp", host, cfg.Port)
