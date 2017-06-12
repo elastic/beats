@@ -342,7 +342,7 @@ func parseProcNetTCP(input io.Reader, ipv6 bool) ([]*socketInfo, error) {
 	for err != io.EOF {
 		line, err = buf.ReadBytes('\n')
 		if err != nil && err != io.EOF {
-			logp.Err("Error reading /proc/net/tcp: %s", err)
+			logp.Err("Error reading proc net tcp file: %s", err)
 			return nil, err
 		}
 		words := bytes.Fields(line)

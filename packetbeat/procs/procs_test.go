@@ -209,11 +209,7 @@ func TestFindSocketsOfPid(t *testing.T) {
 }
 
 func TestParse_Proc_Net_Tcp(t *testing.T) {
-	file, err := os.Open("../tests/files/proc_net_tcp.txt")
-	if err != nil {
-		t.Fatalf("Opening ../tests/files/proc_net_tcp.txt: %s", err)
-	}
-	socketInfo, err := parseProcNetTCP(file, false)
+	socketInfo, err := socketsFromProc("../tests/files/proc_net_tcp.txt", false)
 	if err != nil {
 		t.Fatalf("Parse_Proc_Net_Tcp: %s", err)
 	}
@@ -229,11 +225,7 @@ func TestParse_Proc_Net_Tcp(t *testing.T) {
 }
 
 func TestParse_Proc_Net_Tcp6(t *testing.T) {
-	file, err := os.Open("../tests/files/proc_net_tcp6.txt")
-	if err != nil {
-		t.Fatalf("Opening ../tests/files/proc_net_tcp6.txt: %s", err)
-	}
-	socketInfo, err := parseProcNetTCP(file, true)
+	socketInfo, err := socketsFromProc("../tests/files/proc_net_tcp6.txt", true)
 	if err != nil {
 		t.Fatalf("Parse_Proc_Net_Tcp: %s", err)
 	}
@@ -243,8 +235,10 @@ func TestParse_Proc_Net_Tcp6(t *testing.T) {
 	if socketInfo[5].srcIP.String() != "::" {
 		t.Error("Failed to parse source IP address ::, got instead", socketInfo[5].srcIP.String())
 	}
-	// TODO add an example of a 'real' IPv6 address
 	if socketInfo[5].srcPort != 59497 {
 		t.Error("Failed to parse source port 59497, got instead", socketInfo[5].srcPort)
+	}
+	if socketInfo[4].srcIP.String() != "2001:db8::123:ffff:89ab:cdef" {
+		t.Error("Failed to parse source IP address 2001:db8::123:ffff:89ab:cdef, got instead", socketInfo[4].srcIP.String())
 	}
 }
