@@ -659,6 +659,12 @@
 			"revisionTime": "2016-12-05T14:13:22Z"
 		},
 		{
+			"checksumSHA1": "40vJyUB4ezQSn/NSadsKEOrudMc=",
+			"path": "github.com/inconshreveable/mousetrap",
+			"revision": "76626ae9c91c4f2a10f34cad8ce83ea42c93bb75",
+			"revisionTime": "2014-10-17T20:07:13Z"
+		},
+		{
 			"checksumSHA1": "l9wW52CYGbmO/NGwYZ/Op2QTmaA=",
 			"path": "github.com/joeshaw/multierror",
 			"revision": "69b34d4ec901851247ae7e77d33909caf9df99ed",
@@ -808,6 +814,18 @@
 			"revisionTime": "2017-04-30T14:39:46Z",
 			"version": "v2.17.04",
 			"versionExact": "v2.17.04"
+		},
+		{
+			"checksumSHA1": "B4668jhwnUwJ+QOdMCw5qINbTq8=",
+			"path": "github.com/spf13/cobra",
+			"revision": "e606913c4ee45fec232e67e70105fb6c866b95d9",
+			"revisionTime": "2017-05-28T10:56:30Z"
+		},
+		{
+			"checksumSHA1": "STxYqRb4gnlSr3mRpT+Igfdz/kM=",
+			"path": "github.com/spf13/pflag",
+			"revision": "e57e3eeb33f795204c1ca35f56c44f83227c6e66",
+			"revisionTime": "2017-05-08T18:43:26Z"
 		},
 		{
 			"checksumSHA1": "Z7NuzgpfDQhKRvVq4qsbD/v9cIY=",
