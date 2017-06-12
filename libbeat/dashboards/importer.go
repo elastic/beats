@@ -73,28 +73,41 @@ func (imp Importer) Import() error {
 // some index properties which are needed as a workaround for:
 // https://github.com/elastic/beats-dashboards/issues/94
 func (imp Importer) CreateKibanaIndex() error {
-	imp.client.CreateIndex(imp.cfg.KibanaIndex,
-		common.MapStr{
-			"settings": common.MapStr{
-				"index.mapping.single_type": false,
-			},
-		})
-	_, _, err := imp.client.CreateIndex(imp.cfg.KibanaIndex+"/_mapping/search",
-		common.MapStr{
-			"search": common.MapStr{
-				"properties": common.MapStr{
-					"hits": common.MapStr{
-						"type": "integer",
-					},
-					"version": common.MapStr{
-						"type": "integer",
-					},
-				},
-			},
-		})
+	status, err := imp.client.IndexExists(imp.cfg.KibanaIndex)
+
 	if err != nil {
-		imp.statusMsg("Failed to set the mapping: %v", err)
+		if status != 404 {
+			return err
+		} else {
+			_, _, err = imp.client.CreateIndex(imp.cfg.KibanaIndex,
+				common.MapStr{
+					"settings": common.MapStr{
+						"index.mapping.single_type": false,
+					},
+				})
+			if err != nil {
+				return fmt.Errorf("Failed to create index: %v", err)
+			}
+
+			_, _, err = imp.client.CreateIndex(imp.cfg.KibanaIndex+"/_mapping/search",
+				common.MapStr{
+					"search": common.MapStr{
+						"properties": common.MapStr{
+							"hits": common.MapStr{
+								"type": "integer",
+							},
+							"version": common.MapStr{
+								"type": "integer",
+							},
+						},
+					},
+				})
+			if err != nil {
+				return fmt.Errorf("Failed to set the mapping: %v", err)
+			}
+		}
 	}
+
 	return nil
 }
 
@@ -491,6 +504,9 @@ func (imp Importer) downloadFile(url string, target string) (string, error) {
 	resp, err := http.Get(url)
 	if err != nil {
 		return targetPath, err
+	}
+	if resp.StatusCode != 200 {
+		return targetPath, fmt.Errorf("Server returned: %s", resp.Status)
 	}
 	defer resp.Body.Close()
 
