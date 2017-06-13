@@ -2,16 +2,25 @@
 All notable changes to this project will be documented in this file.
 This project adheres to [Semantic Versioning](http://semver.org/).
 
-## [0.3.0]
+## [Unreleased]
 
 ### Added
-- Read `MemAvailable` value for kernel 3.14+
 
 ### Changed
 
 ### Deprecated
 
 ### Removed
+
+## [0.4.0]
+
+### Changed
+- Fixed Windows issue that caused a hang during `init()` if WMI wasn't ready. #74
+
+## [0.3.0]
+
+### Added
+- Read `MemAvailable` value for kernel 3.14+ #71
 
 ## [0.2.0]
 
