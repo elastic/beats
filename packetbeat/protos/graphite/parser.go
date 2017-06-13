@@ -139,14 +139,14 @@ func (p *parser) parse() (*message, error) {
 		// Extract pickle data fields
 		for _, i := range data.([]interface{}) {
 			for _, j := range i.([]interface{}) {
-				if reflect.TypeOf(j).String() == "string" {
+				if reflect.TypeOf(j).Kind() == reflect.String {
 					msg.Notes = append(msg.Notes, j.(string))
 				} else {
 					for _, k := range j.([]interface{}) {
-						if reflect.TypeOf(k).String() == "int64" {
+						if reflect.TypeOf(k).String() == reflect.Int64 {
 							msg.Notes = append(msg.Notes, strconv.Itoa(int(k.(int64))))
 
-						} else if reflect.TypeOf(k).String() == "float64" {
+						} else if reflect.TypeOf(k).String() == reflect.Float64 {
 							msg.Notes = append(msg.Notes, strconv.FormatFloat(k.(float64), 'E', -1, 64))
 
 						} else {

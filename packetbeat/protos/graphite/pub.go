@@ -73,10 +73,8 @@ func (pub *transPub) createEvent(requ, resp *message) common.MapStr {
 		"bytes_out":    0,
 		"src":          src,
 		"dst":          dst,
-		"request":      common.MapStr{},
+		"request":      list,
 	}
-
-	event["request"] = list
 
 	return event
 }
