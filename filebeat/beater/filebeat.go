@@ -21,6 +21,8 @@ import (
 
 	// Add filebeat level processors
 	_ "github.com/elastic/beats/filebeat/processor/kubernetes"
+	// Add filebeat level processors
+	_ "github.com/elastic/beats/filebeat/processor/add_docker_metadata"
 )
 
 var (

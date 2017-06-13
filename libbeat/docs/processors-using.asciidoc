@@ -574,13 +574,15 @@ from Docker containers:
 
 Currently it supports enriching events by matching existing fields with the
 container ID in them, for example, cgroup IDs retrieved by metricbeat system
-module:
+module. In case of filebeat, it supports parsing Docker Container ID from the prospector
+path:
 
 [source,yaml]
 -------------------------------------------------------------------------------
 processors:
 - add_docker_metadata:
     match_fields: ["system.process.cgroup.id"]
+    logs_path: "/var/lib/docker/containers"
   host: "unix:///var/run/docker.sock"
 
   # To connect to Docker over TLS you must specify a client and CA certificate.

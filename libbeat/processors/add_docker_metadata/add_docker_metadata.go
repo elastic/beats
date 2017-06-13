@@ -13,16 +13,68 @@ func init() {
 	processors.RegisterPlugin("add_docker_metadata", newDockerMetadataProcessor)
 }
 
+var Matcher Match = &FieldMatch{};
+
+type Match interface {
+	InitMatcher(cfg common.Config) error
+	MetadataIndex(event common.MapStr) string
+}
+
+type NoopMatch struct {
+	MatchFields []string
+}
+
+type FieldMatch struct {
+	MatchFields []string
+}
+
+func (match *FieldMatch) MetadataIndex(event common.MapStr) string{
+	for _, field := range match.MatchFields {
+		keyIface, err := event.GetValue(field)
+		if err == nil {
+			key, ok := keyIface.(string)
+			if ok {
+				return key
+			}
+		}
+	}
+
+	return ""
+}
+
+func (match *NoopMatch) InitMatcher(cfg common.Config) error {
+	return nil
+}
+
+func (match *NoopMatch) MetadataIndex(event common.MapStr) string{
+	return ""
+}
+
+func (match *FieldMatch) InitMatcher(cfg common.Config) error {
+	config := struct {
+		Fields []string `config:"match_fields"`
+	}{}
+	err := cfg.Unpack(&config)
+	if err != nil || len(config.Fields) ==0 {
+		return err
+	}
+	match.MatchFields = config.Fields
+	return nil
+}
+
+
+
 type addDockerMetadata struct {
 	watcher Watcher
 	fields  []string
+	matcher   Match
 }
 
 func newDockerMetadataProcessor(cfg common.Config) (processors.Processor, error) {
-	return buildDockerMetadataProcessor(cfg, NewWatcher)
+	return BuildDockerMetadataProcessor(cfg, NewWatcher)
 }
 
-func buildDockerMetadataProcessor(cfg common.Config, watcherConstructor WatcherConstructor) (processors.Processor, error) {
+func BuildDockerMetadataProcessor(cfg common.Config, watcherConstructor WatcherConstructor) (processors.Processor, error) {
 	logp.Beta("The add_docker_metadata processor is beta")
 
 	config := defaultConfig()
@@ -41,24 +93,20 @@ func buildDockerMetadataProcessor(cfg common.Config, watcherConstructor WatcherC
 		return nil, err
 	}
 
+	if err = Matcher.InitMatcher(cfg); err != nil {
+	      Matcher = &NoopMatch{}
+	}
+
 	return &addDockerMetadata{
 		watcher: watcher,
 		fields:  config.Fields,
+		matcher: Matcher,
 	}, nil
 }
 
 func (d *addDockerMetadata) Run(event common.MapStr) (common.MapStr, error) {
-	var cid string
-	for _, field := range d.fields {
-		value, err := event.GetValue(field)
-		if err != nil {
-			continue
-		}
 
-		if strValue, ok := value.(string); ok {
-			cid = strValue
-		}
-	}
+	cid := d.matcher.MetadataIndex(event)
 
 	if cid == "" {
 		return event, nil
