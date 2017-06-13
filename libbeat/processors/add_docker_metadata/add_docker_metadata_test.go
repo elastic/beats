@@ -10,7 +10,7 @@ import (
 func TestInitialization(t *testing.T) {
 	var testConfig = common.NewConfig()
 
-	p, err := buildDockerMetadataProcessor(*testConfig, MockWatcherFactory(nil))
+	p, err := BuildDockerMetadataProcessor(*testConfig, MockWatcherFactory(nil))
 	assert.NoError(t, err, "initializing add_docker_metadata processor")
 
 	input := common.MapStr{}
@@ -26,7 +26,7 @@ func TestNoMatch(t *testing.T) {
 	})
 	assert.NoError(t, err)
 
-	p, err := buildDockerMetadataProcessor(*testConfig, MockWatcherFactory(nil))
+	p, err := BuildDockerMetadataProcessor(*testConfig, MockWatcherFactory(nil))
 	assert.NoError(t, err, "initializing add_docker_metadata processor")
 
 	input := common.MapStr{
@@ -44,7 +44,7 @@ func TestMatchNoContainer(t *testing.T) {
 	})
 	assert.NoError(t, err)
 
-	p, err := buildDockerMetadataProcessor(*testConfig, MockWatcherFactory(nil))
+	p, err := BuildDockerMetadataProcessor(*testConfig, MockWatcherFactory(nil))
 	assert.NoError(t, err, "initializing add_docker_metadata processor")
 
 	input := common.MapStr{
@@ -62,7 +62,7 @@ func TestMatchContainer(t *testing.T) {
 	})
 	assert.NoError(t, err)
 
-	p, err := buildDockerMetadataProcessor(*testConfig, MockWatcherFactory(
+	p, err := BuildDockerMetadataProcessor(*testConfig, MockWatcherFactory(
 		map[string]*Container{
 			"container_id": &Container{
 				ID:    "container_id",
