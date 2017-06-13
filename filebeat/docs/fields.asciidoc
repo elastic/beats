@@ -16,6 +16,7 @@ grouped in the following categories:
 * <<exported-fields-auditd>>
 * <<exported-fields-beat>>
 * <<exported-fields-cloud>>
+* <<exported-fields-docker-processor>>
 * <<exported-fields-icinga>>
 * <<exported-fields-kubernetes-processor>>
 * <<exported-fields-log>>
@@ -598,6 +599,47 @@ Name of the project in Google Cloud.
 === meta.cloud.region
 
 Region in which this host is running.
+
+
+[[exported-fields-docker-processor]]
+== docker Fields
+
+beta[]
+Docker stats collected from Docker.
+
+
+
+
+[float]
+=== docker.container.id
+
+type: keyword
+
+Unique container id.
+
+
+[float]
+=== docker.container.image
+
+type: keyword
+
+Name of the image the container was built on.
+
+
+[float]
+=== docker.container.name
+
+type: keyword
+
+Container name.
+
+
+[float]
+=== docker.container.labels
+
+type: object
+
+Image labels.
 
 
 [[exported-fields-icinga]]
