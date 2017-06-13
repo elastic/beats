@@ -24,4 +24,5 @@ func init() {
 	RootCmd = cmd.GenRootCmdWithRunFlags(Name, "", beater.New, runFlags)
 	RootCmd.PersistentFlags().AddGoFlag(flag.CommandLine.Lookup("M"))
 	RootCmd.ConfigTest.Flags().AddGoFlag(flag.CommandLine.Lookup("modules"))
+	RootCmd.SetupCmd.Flags().AddGoFlag(flag.CommandLine.Lookup("modules"))
 }

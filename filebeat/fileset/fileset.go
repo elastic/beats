@@ -17,6 +17,7 @@ import (
 	"text/template"
 
 	"github.com/elastic/beats/libbeat/common"
+	mlimporter "github.com/elastic/beats/libbeat/ml-importer"
 )
 
 // Fileset struct is the representation of a fileset.
@@ -74,11 +75,16 @@ func (fs *Fileset) Read(beatVersion string) error {
 // manifest structure is the representation of the manifest.yml file from the
 // fileset.
 type manifest struct {
-	ModuleVersion  string                   `config:"module_version"`
-	Vars           []map[string]interface{} `config:"var"`
-	IngestPipeline string                   `config:"ingest_pipeline"`
-	Prospector     string                   `config:"prospector"`
-	Requires       struct {
+	ModuleVersion   string                   `config:"module_version"`
+	Vars            []map[string]interface{} `config:"var"`
+	IngestPipeline  string                   `config:"ingest_pipeline"`
+	Prospector      string                   `config:"prospector"`
+	MachineLearning []struct {
+		Name     string `config:"name"`
+		Job      string `config:"job"`
+		Datafeed string `config:"datafeed"`
+	} `config:"machine_learning"`
+	Requires struct {
 		Processors []ProcessorRequirement `config:"processors"`
 	} `config:"requires"`
 }
@@ -309,4 +315,18 @@ func removeExt(path string) string {
 // fileset depends.
 func (fs *Fileset) GetRequiredProcessors() []ProcessorRequirement {
 	return fs.manifest.Requires.Processors
+}
+
+// GetMLConfigs returns the list of machine-learning configurations declared
+// by this fileset.
+func (fs *Fileset) GetMLConfigs() []mlimporter.MLConfig {
+	var mlConfigs []mlimporter.MLConfig
+	for _, ml := range fs.manifest.MachineLearning {
+		mlConfigs = append(mlConfigs, mlimporter.MLConfig{
+			ID:           fmt.Sprintf("filebeat-%s-%s-%s", fs.mcfg.Module, fs.name, ml.Name),
+			JobPath:      filepath.Join(fs.modulePath, fs.name, ml.Job),
+			DatafeedPath: filepath.Join(fs.modulePath, fs.name, ml.Datafeed),
+		})
+	}
+	return mlConfigs
 }

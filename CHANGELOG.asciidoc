@@ -60,6 +60,7 @@ https://github.com/elastic/beats/compare/v6.0.0-alpha1...master[Check the HEAD d
 - Add experimental Redis module. {pull}4441[4441]
 - Nginx module: use the first not-private IP address as the remote_ip. {pull}4417[4417]
 - Load Ingest Node pipelines when the Elasticsearch connection is established, instead of only once at startup. {pull}4479[4479]
+- Add support for loading Xpack Machine Learning configurations from the modules, and added sample configurations for the Nginx module. {pull}4506[4506]
 
 *Heartbeat*
 
