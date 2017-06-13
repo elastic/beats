@@ -7,6 +7,7 @@ import (
 	"github.com/elastic/beats/libbeat/common"
 	"github.com/elastic/beats/libbeat/logp"
 	"github.com/elastic/beats/libbeat/processors"
+	"github.com/elastic/beats/libbeat/processors/actions"
 )
 
 func init() {
@@ -14,8 +15,9 @@ func init() {
 }
 
 type addDockerMetadata struct {
-	watcher Watcher
-	fields  []string
+	watcher         Watcher
+	fields          []string
+	sourceProcessor processors.Processor
 }
 
 func newDockerMetadataProcessor(cfg common.Config) (processors.Processor, error) {
@@ -41,14 +43,45 @@ func buildDockerMetadataProcessor(cfg common.Config, watcherConstructor WatcherC
 		return nil, err
 	}
 
+	// Use extract_field processor to get container id from source file path
+	var sourceProcessor processors.Processor
+	if config.MatchSource {
+		var procConf, _ = common.NewConfigFrom(map[string]interface{}{
+			"field":     "source",
+			"separator": "/",
+			"index":     config.SourceIndex,
+			"target":    "docker.container.id",
+		})
+		sourceProcessor, err = actions.NewExtractField(*procConf)
+		if err != nil {
+			return nil, err
+		}
+
+		// Ensure `docker.container.id` is matched:
+		config.Fields = append(config.Fields, "docker.container.id")
+	}
+
 	return &addDockerMetadata{
-		watcher: watcher,
-		fields:  config.Fields,
+		watcher:         watcher,
+		fields:          config.Fields,
+		sourceProcessor: sourceProcessor,
 	}, nil
 }
 
 func (d *addDockerMetadata) Run(event common.MapStr) (common.MapStr, error) {
 	var cid string
+	var err error
+
+	// Process source field
+	if d.sourceProcessor != nil {
+		if event["source"] != nil {
+			event, err = d.sourceProcessor.Run(event)
+			if err != nil {
+				return nil, err
+			}
+		}
+	}
+
 	for _, field := range d.fields {
 		value, err := event.GetValue(field)
 		if err != nil {
