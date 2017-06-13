@@ -2,15 +2,10 @@
 All notable changes to this project will be documented in this file.
 This project adheres to [Semantic Versioning](http://semver.org/).
 
-## [Unreleased]
-
-### Added
+## [0.2.1]
 
 ### Changed
-
-### Deprecated
-
-### Removed
+- Fixed Windows issue that caused a hang during `init()` if WMI wasn't ready. #74
 
 ## [0.2.0]
 
