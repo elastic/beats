@@ -282,7 +282,7 @@ func getSortInfos(paths map[string]os.FileInfo) []FileSortInfo {
 	return sortInfos
 }
 
-func getSortedFiles(scanOrder string, scanSort string, sortInfos []FileSortInfo) []FileSortInfo {
+func getSortedFiles(scanOrder string, scanSort string, sortInfos []FileSortInfo) ([]FileSortInfo, string) {
 	var sortFunc func(i, j int) bool = nil
 	switch scanSort {
 	case "modtime":
@@ -296,6 +296,7 @@ func getSortedFiles(scanOrder string, scanSort string, sortInfos []FileSortInfo)
 				return sortInfos[i].info.ModTime().After(sortInfos[j].info.ModTime())
 			}
 		default:
+			return nil, "Unexpected value for scan.order: " + scanOrder
 		}
 	case "filename":
 		switch scanOrder {
@@ -308,15 +309,17 @@ func getSortedFiles(scanOrder string, scanSort string, sortInfos []FileSortInfo)
 				return strings.Compare(sortInfos[i].info.Name(), sortInfos[j].info.Name()) > 0
 			}
 		default:
+			return nil, "Unexpected value for scan.order: " + scanOrder
 		}
 	default:
+		return nil, "Unexpected value for scan.sort: " + scanSort
 	}
 
 	if sortFunc != nil {
 		sort.Slice(sortInfos, sortFunc)
 	}
 
-	return sortInfos
+	return sortInfos, ""
 }
 
 func getFileState(path string, info os.FileInfo, p *Prospector) file.State {
@@ -343,15 +346,24 @@ func getKeys(paths map[string]os.FileInfo) []string {
 // Scan starts a scanGlob for each provided path/glob
 func (p *Prospector) scan() {
 
-	var sortInfos []FileSortInfo
-	var files []string
+	var sortInfos []FileSortInfo = nil
+	var files []string = nil
 
 	paths := p.getFiles()
-	if strings.ToLower(p.config.ScanSort) != "none" {
-		sortInfos = getSortedFiles(strings.ToLower(p.config.ScanOrder),
+
+	var err string = ""
+
+	if p.config.ScanSort != "none" {
+		sortInfos, err = getSortedFiles(strings.ToLower(p.config.ScanOrder),
 			strings.ToLower(p.config.ScanSort),
 			getSortInfos(paths))
-	} else {
+	}
+
+	if err != "" {
+		logp.Err(err)
+	}
+
+	if sortInfos == nil {
 		files = getKeys(paths)
 	}
 
@@ -360,12 +372,12 @@ func (p *Prospector) scan() {
 		var path string
 		var info os.FileInfo
 
-		if strings.ToLower(p.config.ScanSort) != "none" {
-			path = sortInfos[i].path
-			info = sortInfos[i].info
-		} else {
+		if sortInfos == nil {
 			path = files[i]
 			info = paths[path]
+		} else {
+			path = sortInfos[i].path
+			info = sortInfos[i].info
 		}
 
 		select {

@@ -135,8 +135,6 @@ https://github.com/elastic/beats/compare/v6.0.0-alpha1...v6.0.0-alpha2[View comm
 - Added ability to sort harvested files. {pull}4374[4374]
 - Add experimental Redis slow log prospector type. {pull}4180[4180]
 
-- Add experimental Redis slow log prospector type. {pull}4180[4180]
-
 *Metricbeat*
 
 - Add macOS implementation of the system diskio metricset. {issue}4144[4144]
