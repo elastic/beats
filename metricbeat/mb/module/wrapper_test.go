@@ -121,7 +121,7 @@ func TestWrapperOfEventFetcher(t *testing.T) {
 		"hosts":      hosts,
 	})
 
-	m, err := module.NewWrapper(c, newTestRegistry(t))
+	m, err := module.NewWrapper(0, c, newTestRegistry(t))
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -154,7 +154,7 @@ func TestWrapperOfReportingFetcher(t *testing.T) {
 		"hosts":      hosts,
 	})
 
-	m, err := module.NewWrapper(c, newTestRegistry(t))
+	m, err := module.NewWrapper(0, c, newTestRegistry(t))
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -187,7 +187,7 @@ func TestWrapperOfPushMetricSet(t *testing.T) {
 		"hosts":      hosts,
 	})
 
-	m, err := module.NewWrapper(c, newTestRegistry(t))
+	m, err := module.NewWrapper(0, c, newTestRegistry(t))
 	if err != nil {
 		t.Fatal(err)
 	}

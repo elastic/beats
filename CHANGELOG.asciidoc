@@ -59,6 +59,7 @@ https://github.com/elastic/beats/compare/v6.0.0-alpha1...master[Check the HEAD d
 *Heartbeat*
 
 *Metricbeat*
+- Add random startup delay to each metricset to avoid the thundering herd problem. {issue}4010[4010]
 
 *Packetbeat*
 
