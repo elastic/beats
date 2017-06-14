@@ -5,5 +5,5 @@ services:
   args:
     build:
       args:
-        DOWNLOAD_URL: https://staging.elastic.co/5.4.1-0b364ac0/downloads
-        ELASTIC_VERSION: 5.4.1
+        DOWNLOAD_URL: https://snapshots.elastic.co/downloads
+        ELASTIC_VERSION: 5.4.2-SNAPSHOT
