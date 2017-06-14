@@ -3,12 +3,11 @@
 package perfmon
 
 import (
+	"regexp"
 	"strconv"
 	"syscall"
 	"unicode/utf16"
 	"unsafe"
-
-	"regexp"
 
 	"github.com/elastic/beats/libbeat/common"
 	"github.com/joeshaw/multierror"
@@ -195,9 +194,8 @@ func (q *Query) Execute() error {
 }
 
 type Value struct {
-	Num      interface{}
-	Instance string
-	Err      error
+	Num interface{}
+	Err error
 }
 
 func (q *Query) Values() (map[string]Value, error) {
@@ -206,7 +204,7 @@ func (q *Query) Values() (map[string]Value, error) {
 	for path, counter := range q.counters {
 
 		if match, _ := regexp.MatchString(".*\\(\\*\\)\\.*", path); match {
-			count, value, err := PdhGetFormattedCounterArray(counter.handle, counter.format|PdhFmtNoCap100)
+			count, values, err := PdhGetFormattedCounterArray(counter.handle, counter.format|PdhFmtNoCap100)
 			if err != nil {
 				rtn[path] = Value{Err: err}
 				continue
@@ -215,7 +213,7 @@ func (q *Query) Values() (map[string]Value, error) {
 			rtn[path] = Value{Num: common.MapStr{}}
 
 			for i := 0; i < count; i++ {
-				data := *value
+				data := *values
 				a := (*[1<<30 - 1]uint16)(unsafe.Pointer(data[i].SzName))
 				size := 0
 				for ; size < len(a); size++ {

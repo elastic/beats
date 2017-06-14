@@ -20,6 +20,6 @@ With `format` you can set the output format for a specific counter. Possible val
     - alias: "processor.time.total.pct"
       query: '\Processor Information(_Total)\% Processor Time'
     - alias: "diskio.write.bytes"
-      query: '\PhysicalDisk(_Total)\Disk Writes/sec'
+      query: '\PhysicalDisk(*)\Disk Writes/sec'
       format: "long"
 ----
