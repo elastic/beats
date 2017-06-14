@@ -9,14 +9,12 @@ import (
 	"github.com/spf13/pflag"
 
 	"github.com/elastic/beats/libbeat/beat"
-	"github.com/elastic/beats/libbeat/logp"
 )
 
 func init() {
 	// backwards compatibility workaround, convert -flags to --flags:
 	for i, arg := range os.Args[1:] {
 		if strings.HasPrefix(arg, "-") && !strings.HasPrefix(arg, "--") && len(arg) > 2 {
-			logp.Deprecate("6.0", "Argument %s should be -%s", arg, arg)
 			os.Args[1+i] = "-" + arg
 		}
 	}

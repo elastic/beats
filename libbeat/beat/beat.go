@@ -289,6 +289,7 @@ func (b *Beat) launch(bt Creator) error {
 
 	// If -configtest was specified, exit now prior to run.
 	if cfgfile.IsTestConfig() {
+		logp.Deprecate("6.0", "-configtest flag has been deprecated, use configtest subcommand")
 		fmt.Println("Config OK")
 		return GracefulExit
 	}
@@ -296,6 +297,9 @@ func (b *Beat) launch(bt Creator) error {
 	svc.HandleSignals(beater.Stop)
 
 	// TODO Deprecate this in favor of setup subcommand (7.0)
+	if *setup {
+		logp.Deprecate("6.0", "-setup flag has been deprectad, use setup subcommand")
+	}
 	err = b.loadDashboards(false)
 	if err != nil {
 		return err
@@ -414,6 +418,7 @@ func (b *Beat) handleFlags() error {
 	flag.Parse()
 
 	if *printVersion {
+		logp.Deprecate("6.0", "-version flag has been deprectad, use version subcommand")
 		fmt.Printf("%s version %s (%s), libbeat %s\n",
 			b.Info.Beat, b.Info.Version, runtime.GOARCH, version.GetDefaultVersion())
 		return GracefulExit
