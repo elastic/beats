@@ -2,6 +2,7 @@ package module
 
 import (
 	"fmt"
+	"math/rand"
 	"sync"
 	"time"
 
@@ -36,9 +37,10 @@ var (
 // Use NewWrapper or NewWrappers to construct new Wrappers.
 type Wrapper struct {
 	mb.Module
-	filters    *processors.Processors
-	metricSets []*metricSetWrapper // List of pointers to its associated MetricSets.
-	configHash uint64
+	filters       *processors.Processors
+	metricSets    []*metricSetWrapper // List of pointers to its associated MetricSets.
+	configHash    uint64
+	maxStartDelay time.Duration
 }
 
 // metricSetWrapper contains the MetricSet and the private data associated with
@@ -61,8 +63,8 @@ type stats struct {
 // NewWrapper create a new Module and its associated MetricSets based
 // on the given configuration. It constructs the supporting filters and stores
 // them in the Wrapper.
-func NewWrapper(moduleConfig *common.Config, r *mb.Register) (*Wrapper, error) {
-	mws, err := NewWrappers([]*common.Config{moduleConfig}, r)
+func NewWrapper(maxStartDelay time.Duration, moduleConfig *common.Config, r *mb.Register) (*Wrapper, error) {
+	mws, err := NewWrappers(maxStartDelay, []*common.Config{moduleConfig}, r)
 	if err != nil {
 		return nil, err
 	}
@@ -77,7 +79,7 @@ func NewWrapper(moduleConfig *common.Config, r *mb.Register) (*Wrapper, error) {
 // NewWrappers creates new Modules and their associated MetricSets based
 // on the given configuration. It constructs the supporting filters and stores
 // them all in a Wrapper.
-func NewWrappers(modulesConfig []*common.Config, r *mb.Register) ([]*Wrapper, error) {
+func NewWrappers(maxStartDelay time.Duration, modulesConfig []*common.Config, r *mb.Register) ([]*Wrapper, error) {
 	modules, err := mb.NewModules(modulesConfig, r)
 	if err != nil {
 		return nil, err
@@ -95,8 +97,9 @@ func NewWrappers(modulesConfig []*common.Config, r *mb.Register) ([]*Wrapper, er
 		}
 
 		mw := &Wrapper{
-			Module:  k,
-			filters: f,
+			Module:        k,
+			filters:       f,
+			maxStartDelay: maxStartDelay,
 		}
 		wrappers = append(wrappers, mw)
 
@@ -187,6 +190,17 @@ func (mw *Wrapper) Hash() uint64 {
 func (msw *metricSetWrapper) run(done <-chan struct{}, out chan<- common.MapStr) {
 	defer logp.Recover(fmt.Sprintf("recovered from panic while fetching "+
 		"'%s/%s' for host '%s'", msw.module.Name(), msw.Name(), msw.Host()))
+
+	// Start each metricset randomly over a period of MaxDelayPeriod.
+	if msw.module.maxStartDelay > 0 {
+		delay := time.Duration(rand.Int63n(int64(msw.module.maxStartDelay)))
+		debugf("%v/%v will start after %v", msw.module.Name(), msw.Name(), delay)
+		select {
+		case <-done:
+			return
+		case <-time.After(delay):
+		}
+	}
 
 	debugf("Starting %s", msw)
 	defer debugf("Stopped %s", msw)

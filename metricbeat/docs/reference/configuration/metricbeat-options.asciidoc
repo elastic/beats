@@ -22,7 +22,22 @@ metricbeat.modules:
   hosts: ["root@tcp(127.0.0.1:3306)/"]
 ------------------------------------------------------------------------------
 
-==== Metricbeat Options
+==== General Options
+
+===== max_start_delay
+
+The maximum random delay to apply to the startup of a metricset. Random delays
+ranging from [0, _max_start_delay_) are applied to reduce the thundering herd
+effect that can occur if a fleet of machines running Metricbeat are restarted at
+the same time. Specifying a value of 0 disables the startup delay. The default
+is 10s.
+
+[source,yaml]
+----
+metricbeat.max_start_delay: 10s
+----
+
+==== Module Options
 
 You can specify the following options in the `metricbeat` section of the +{beatname_lc}.yml+ config file. These options
 are the same for all modules. Each module may have additional configuration options that are specific to that module.
