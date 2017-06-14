@@ -9,6 +9,7 @@ import (
 
 	mbtest "github.com/elastic/beats/metricbeat/mb/testing"
 
+	"github.com/elastic/beats/libbeat/common"
 	"github.com/pkg/errors"
 	"github.com/stretchr/testify/assert"
 )
@@ -243,6 +244,43 @@ func TestRawValues(t *testing.T) {
 
 		values = append(values, *(*float64)(unsafe.Pointer(&value.LongValue)))
 
+	}
+
+	t.Log(values)
+}
+
+func TestWildcardQuery(t *testing.T) {
+	config := make([]CounterConfig, 1)
+	config[0].Alias = "processor.time.pct"
+	config[0].Query = `\Processor Information(*)\% Processor Time`
+	config[0].Format = "float"
+	handle, err := NewPerfmonReader(config)
+	if err != nil {
+		t.Fatal(err)
+	}
+	defer handle.query.Close()
+
+	values, err := handle.Read()
+
+	time.Sleep(time.Millisecond * 1000)
+
+	values, err = handle.Read()
+
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	for k, _ := range values {
+		println(k)
+	}
+
+	if m, n := values["processor"].(common.MapStr); n {
+		if o, p := m["time"].(common.MapStr); p {
+			if q, r := o["pct"].(common.MapStr); r {
+				l := len(q) >= 1
+				assert.True(t, l)
+			}
+		}
 	}
 
 	t.Log(values)
