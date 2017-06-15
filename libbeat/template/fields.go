@@ -53,7 +53,9 @@ func (f Fields) process(path string, esVersion Version) common.MapStr {
 			mapping = field.other()
 		}
 
-		output.Put(generateKey(field.Name), mapping)
+		if len(mapping) > 0 {
+			output.Put(generateKey(field.Name), mapping)
+		}
 	}
 
 	return output

@@ -1,4 +1,4 @@
-:stack-version: 6.0.0-alpha1
+:stack-version: 6.0.0-alpha2
 :doc-branch: master
 :go-version: 1.8.3
 :release-state: prerelease

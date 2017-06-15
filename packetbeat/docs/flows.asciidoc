@@ -77,4 +77,4 @@ contains an intermediate report about a flow that it's tracking. When the flow
 completes, Packetbeat sends one last event with `final` set to `true`. If you
 want to aggregate sums of traffic, you need to filter on `final:true`, or use
 some other technique, so that you get only the latest update from each flow.
-You can disable intermediate reports by setting `period: -1`.
+You can disable intermediate reports by setting `period: -1s`.

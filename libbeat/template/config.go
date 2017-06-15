@@ -5,7 +5,7 @@ type TemplateConfig struct {
 	Name         string           `config:"name"`
 	Fields       string           `config:"fields"`
 	Overwrite    bool             `config:"overwrite"`
-	Settings     templateSettings `config:"settings"`
+	Settings     TemplateSettings `config:"settings"`
 	OutputToFile OutputToFile     `config:"output_to_file"`
 }
 
@@ -16,7 +16,7 @@ type OutputToFile struct {
 	Version string `config:"version"`
 }
 
-type templateSettings struct {
+type TemplateSettings struct {
 	Index  map[string]interface{} `config:"index"`
 	Source map[string]interface{} `config:"_source"`
 }

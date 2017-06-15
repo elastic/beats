@@ -20,7 +20,7 @@ import (
 	"github.com/elastic/beats/filebeat/spooler"
 
 	// Add filebeat level processors
-	_ "github.com/elastic/beats/filebeat/processor/kubernetes"
+	_ "github.com/elastic/beats/filebeat/processor/add_kubernetes_metadata"
 )
 
 var (
@@ -93,16 +93,13 @@ func (fb *Filebeat) modulesSetup(b *beat.Beat) error {
 			" can ignore this warning.")
 		return nil
 	}
-	esClient, err := elasticsearch.NewConnectedClient(esConfig)
-	if err != nil {
-		return fmt.Errorf("Error creating ES client: %v", err)
-	}
-	defer esClient.Close()
 
-	err = fb.moduleRegistry.LoadPipelines(esClient)
-	if err != nil {
-		return err
+	// register pipeline loading to happen every time a new ES connection is
+	// established
+	callback := func(esClient *elasticsearch.Client) error {
+		return fb.moduleRegistry.LoadPipelines(esClient)
 	}
+	elasticsearch.RegisterConnectCallback(callback)
 
 	return nil
 }

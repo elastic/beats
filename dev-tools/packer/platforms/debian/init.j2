@@ -31,11 +31,11 @@ SCRIPTNAME=/etc/init.d/$NAME
 # Read configuration variable file if it is present
 [ -r /etc/default/$NAME ] && . /etc/default/$NAME
 
-WRAPPER_ARGS="-r / -n -p $PIDFILE -u $BEAT_USER"
+[ "$BEAT_USER" != "root" ] && WRAPPER_ARGS="$WRAPPER_ARGS -u $BEAT_USER"
 USER_WRAPPER="su"
 USER_WRAPPER_ARGS="$BEAT_USER -c"
 
-if runuser -v &> /dev/null; then
+if command -v runuser >/dev/null 2>&1; then
     USER_WRAPPER="runuser"
 fi
 

@@ -140,6 +140,14 @@ func (es *Connection) CreateIndex(index string, body interface{}) (int, *QueryRe
 	return withQueryResult(es.apiCall("PUT", index, "", "", "", nil, body))
 }
 
+// IndexExists checks if an index exists.
+// Implements: https://www.elastic.co/guide/en/elasticsearch/reference/current/indices-exists.html
+//
+func (es *Connection) IndexExists(index string) (int, error) {
+	status, _, err := es.apiCall("HEAD", index, "", "", "", nil, nil)
+	return status, err
+}
+
 // Delete deletes a typed JSON document from a specific index based on its id.
 // Implements: http://www.elastic.co/guide/en/elasticsearch/reference/current/docs-delete.html
 func (es *Connection) Delete(index string, docType string, id string, params map[string]string) (int, *QueryResult, error) {

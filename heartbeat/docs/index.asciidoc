@@ -47,6 +47,7 @@ include::../../libbeat/docs/shared-config-ingest.asciidoc[]
 //points to shared topic because configuring-logstash.asciidoc is just a wrapper
 include::./configuring-logstash.asciidoc[]
 
+:standalone:
 include::../../libbeat/docs/shared-env-vars.asciidoc[]
 
 :standalone:

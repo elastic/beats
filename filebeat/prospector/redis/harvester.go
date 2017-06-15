@@ -131,12 +131,7 @@ func (h *Harvester) Run() error {
 			"redis": common.MapStr{
 				"slowlog": subEvent,
 			},
-			"beat": common.MapStr{
-				"read_timestamp": common.Time(time.Now()),
-			},
-			"prospector": common.MapStr{
-				"type": "redis",
-			},
+			"read_timestamp": common.Time(time.Now()),
 		}
 
 		h.forwarder.Send(data)

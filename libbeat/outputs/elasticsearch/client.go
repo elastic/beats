@@ -103,7 +103,7 @@ const (
 // NewClient instantiates a new client.
 func NewClient(
 	s ClientSettings,
-	onConnectCallback connectCallback,
+	onConnect *callbacksRegistry,
 ) (*Client, error) {
 	proxy := http.ProxyFromEnvironment
 	if s.Proxy != nil {
@@ -196,8 +196,16 @@ func NewClient(
 	}
 
 	client.Connection.onConnectCallback = func() error {
-		if onConnectCallback != nil {
-			return onConnectCallback(client)
+		if onConnect != nil {
+			onConnect.mutex.Lock()
+			defer onConnect.mutex.Unlock()
+
+			for _, callback := range onConnect.callbacks {
+				err := callback(client)
+				if err != nil {
+					return err
+				}
+			}
 		}
 		return nil
 	}
