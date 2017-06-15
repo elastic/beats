@@ -64,6 +64,13 @@ output:
     #number_of_files: 7
   {%- endif %}
 
+#==================== Elasticsearch template setting ==========================
+setup.template:
+  fields: {{ fields|default("fields.yml") }}
+  settings:
+    index.number_of_shards: 1
+    index.codec: best_compression
+
 #================================ Logging =====================================
 
 {% if metrics_period -%}

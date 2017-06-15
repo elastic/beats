@@ -14,6 +14,7 @@ func genExportCmd(name, beatVersion string, beatCreator beat.Creator) *cobra.Com
 	}
 
 	exportCmd.AddCommand(export.GenExportConfigCmd(name, beatVersion, beatCreator))
+	exportCmd.AddCommand(export.GenTemplateConfigCmd(name, beatVersion, beatCreator))
 
 	return exportCmd
 }
