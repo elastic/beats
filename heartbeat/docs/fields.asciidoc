@@ -15,6 +15,7 @@ grouped in the following categories:
 * <<exported-fields-beat>>
 * <<exported-fields-cloud>>
 * <<exported-fields-common>>
+* <<exported-fields-docker-processor>>
 * <<exported-fields-http>>
 * <<exported-fields-icmp>>
 * <<exported-fields-kubernetes-processor>>
@@ -253,6 +254,47 @@ type: keyword
 required: True
 
 Indicator if monitor could validate the service to be available.
+
+
+[[exported-fields-docker-processor]]
+== docker Fields
+
+beta[]
+Docker stats collected from Docker.
+
+
+
+
+[float]
+=== docker.container.id
+
+type: keyword
+
+Unique container id.
+
+
+[float]
+=== docker.container.image
+
+type: keyword
+
+Name of the image the container was built on.
+
+
+[float]
+=== docker.container.name
+
+type: keyword
+
+Container name.
+
+
+[float]
+=== docker.container.labels
+
+type: object
+
+Image labels.
 
 
 [[exported-fields-http]]

@@ -537,8 +537,10 @@ packetbeat.protocols:
 #
 #processors:
 #- add_docker_metadata:
+#    host: "unix:///var/run/docker.sock"
+#    match_source: true
+#    match_source_index: 4
 #    match_fields: ["system.process.cgroup.id"]
-#  host: "unix:///var/run/docker.sock"
 #  # To connect to Docker over TLS you must specify a client and CA certificate.
 #  #ssl:
 #  #  certificate_authority: "/etc/pki/root/ca.pem"

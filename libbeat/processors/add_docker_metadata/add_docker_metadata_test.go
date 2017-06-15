@@ -98,6 +98,78 @@ func TestMatchContainer(t *testing.T) {
 	}, result)
 }
 
+func TestMatchSource(t *testing.T) {
+	// Use defaults
+	testConfig, err := common.NewConfigFrom(map[string]interface{}{})
+	assert.NoError(t, err)
+
+	p, err := buildDockerMetadataProcessor(*testConfig, MockWatcherFactory(
+		map[string]*Container{
+			"FABADA": &Container{
+				ID:    "FABADA",
+				Image: "image",
+				Name:  "name",
+				Labels: map[string]string{
+					"a": "1",
+					"b": "2",
+				},
+			},
+		}))
+	assert.NoError(t, err, "initializing add_docker_metadata processor")
+
+	input := common.MapStr{
+		"source": "/var/lib/docker/containers/FABADA/foo.log",
+	}
+	result, err := p.Run(input)
+	assert.NoError(t, err, "processing an event")
+
+	assert.EqualValues(t, common.MapStr{
+		"docker": common.MapStr{
+			"container": common.MapStr{
+				"id":    "FABADA",
+				"image": "image",
+				"labels": common.MapStr{
+					"a": "1",
+					"b": "2",
+				},
+				"name": "name",
+			},
+		},
+		"source": "/var/lib/docker/containers/FABADA/foo.log",
+	}, result)
+}
+
+func TestDisableSource(t *testing.T) {
+	// Use defaults
+	testConfig, err := common.NewConfigFrom(map[string]interface{}{
+		"match_source": false,
+	})
+	assert.NoError(t, err)
+
+	p, err := buildDockerMetadataProcessor(*testConfig, MockWatcherFactory(
+		map[string]*Container{
+			"FABADA": &Container{
+				ID:    "FABADA",
+				Image: "image",
+				Name:  "name",
+				Labels: map[string]string{
+					"a": "1",
+					"b": "2",
+				},
+			},
+		}))
+	assert.NoError(t, err, "initializing add_docker_metadata processor")
+
+	input := common.MapStr{
+		"source": "/var/lib/docker/containers/FABADA/foo.log",
+	}
+	result, err := p.Run(input)
+	assert.NoError(t, err, "processing an event")
+
+	// remains unchanged
+	assert.EqualValues(t, input, result)
+}
+
 // Mock container watcher
 
 func MockWatcherFactory(containers map[string]*Container) WatcherConstructor {
