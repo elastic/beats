@@ -19,6 +19,7 @@ grouped in the following categories:
 * <<exported-fields-cloud>>
 * <<exported-fields-common>>
 * <<exported-fields-couchbase>>
+* <<exported-fields-docker-processor>>
 * <<exported-fields-docker>>
 * <<exported-fields-dropwizard>>
 * <<exported-fields-elasticsearch>>
@@ -3213,6 +3214,47 @@ type: long
 Number of items/documents that are replicas.
 
 
+[[exported-fields-docker-processor]]
+== docker Fields
+
+beta[]
+Docker stats collected from Docker.
+
+
+
+
+[float]
+=== docker.container.id
+
+type: keyword
+
+Unique container id.
+
+
+[float]
+=== docker.container.image
+
+type: keyword
+
+Name of the image the container was built on.
+
+
+[float]
+=== docker.container.name
+
+type: keyword
+
+Container name.
+
+
+[float]
+=== docker.container.labels
+
+type: object
+
+Image labels.
+
+
 [[exported-fields-docker]]
 == Docker Fields
 
@@ -3252,30 +3294,6 @@ Date when the container was created.
 
 
 [float]
-=== docker.container.id
-
-type: keyword
-
-Unique container id.
-
-
-[float]
-=== docker.container.image
-
-type: keyword
-
-Name of the image the container was built on.
-
-
-[float]
-=== docker.container.name
-
-type: keyword
-
-Container name.
-
-
-[float]
 === docker.container.status
 
 type: keyword
@@ -3304,14 +3322,6 @@ Total size of all the files in the container.
 type: long
 
 Size of the files that have been created or changed since creation.
-
-
-[float]
-=== docker.container.labels
-
-type: object
-
-Image labels.
 
 
 [float]

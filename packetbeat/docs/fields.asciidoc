@@ -18,6 +18,7 @@ grouped in the following categories:
 * <<exported-fields-cloud>>
 * <<exported-fields-common>>
 * <<exported-fields-dns>>
+* <<exported-fields-docker-processor>>
 * <<exported-fields-flows_event>>
 * <<exported-fields-http>>
 * <<exported-fields-icmp>>
@@ -1497,6 +1498,47 @@ Extended response code field.
 type: long
 
 Requestor's UDP payload size (in bytes).
+
+[[exported-fields-docker-processor]]
+== docker Fields
+
+beta[]
+Docker stats collected from Docker.
+
+
+
+
+[float]
+=== docker.container.id
+
+type: keyword
+
+Unique container id.
+
+
+[float]
+=== docker.container.image
+
+type: keyword
+
+Name of the image the container was built on.
+
+
+[float]
+=== docker.container.name
+
+type: keyword
+
+Container name.
+
+
+[float]
+=== docker.container.labels
+
+type: object
+
+Image labels.
+
 
 [[exported-fields-flows_event]]
 == Flow Event Fields

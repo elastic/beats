@@ -51,6 +51,7 @@ https://github.com/elastic/beats/compare/v6.0.0-alpha1...master[Check the HEAD d
 *Affecting all Beats*
 
 - New cli subcommands interface. {pull}4420[4420]
+- Allow source path matching in `add_docker_metadata` processor {pull}4495[4495]
 
 *Filebeat*
 
