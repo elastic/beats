@@ -211,6 +211,8 @@ packetbeat.flows:
   period: 10s
 ------------------------------------------------------------------------------
 
+See <<flows>> for more information.
+
 ==== Options
 
 You can specify the following options in the `flows` section of the +{beatname_lc}.yml+ config file:
@@ -836,7 +838,7 @@ process' command line as read from `/proc/<pid>/cmdline`.
 [[shutdown-timeout]]
 ===== shutdown_timeout
 
-How long Packetbeat waits on shutdown. By default, this option is disabled. Packetbeat 
+How long Packetbeat waits on shutdown. By default, this option is disabled. Packetbeat
 will wait for `shutdown_timeout` and then close. It will not track if all events were sent
 previously.
 
