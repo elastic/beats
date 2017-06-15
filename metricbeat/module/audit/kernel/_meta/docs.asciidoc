@@ -71,20 +71,14 @@ as warnings any issues that were encountered while parsing the raw messages.
 The default value is false. This setting is primarily used for development and
 debugging purposes.
 
-////
-TODO (andrewkroh): Uncomment when rules can be installed by Metricbeat.
 *`kernel.audit_rules`*:: A string containing the audit rules that should be
 installed to the kernel. There should be one rule per line. Comments can be
 embedded in the string using `#` as a prefix. The format for rules is the same
-used by the Linux `auditctl` utility.
-////
+used by the Linux `auditctl` utility. Metricbeat supports adding file watches
+(`-w`) and syscall rules (`-a` or `-A`).
 
 [float]
 === Audit Rules
-
-// TODO (andrewkroh): Uncomment when rules can be installed by Metricbeat.
-WARNING: This feature is not complete yet. Currently you must manually install
-audit rules using `auditctl`.
 
 The audit rules are where you configure the activities that are audited. These
 rules are configured as either syscalls or files that should be monitored. For
@@ -100,6 +94,10 @@ the most active rules first in order to speed up evaluation.
 
 You can assign keys to each rule for better identification of the rule that
 triggered an event and easier filtering later in Elasticsearch.
+
+Defining any audit rules in the config causes Metricbeat to purge all existing
+audit rules prior to adding the rules specified in the config. Therefore it is
+unnecessary and unsupported to include a `-D` (delete all) rule.
 
 [source,yaml]
 ----

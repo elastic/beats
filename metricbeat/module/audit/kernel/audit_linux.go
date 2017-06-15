@@ -79,6 +79,12 @@ func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
 func (ms *MetricSet) Run(reporter mb.PushReporter) {
 	defer ms.client.Close()
 
+	if err := ms.addRules(reporter); err != nil {
+		reporter.Error(err)
+		logp.Err("%v %v", logPrefix, err)
+		return
+	}
+
 	out, err := ms.receiveEvents(reporter.Done())
 	if err != nil {
 		reporter.Error(err)
@@ -99,6 +105,37 @@ func (ms *MetricSet) Run(reporter mb.PushReporter) {
 			}
 		}
 	}
+}
+
+func (ms *MetricSet) addRules(reporter mb.PushReporter) error {
+	rules, err := ms.config.rules()
+	if err != nil {
+		return errors.Wrap(err, "failed to add rules")
+	}
+
+	if len(rules) == 0 {
+		logp.Info("%v No audit kernel.rules were specified.", logPrefix)
+		return nil
+	}
+
+	// Delete existing rules.
+	n, err := ms.client.DeleteRules()
+	if err != nil {
+		return errors.Wrap(err, "failed to delete existing rules")
+	}
+	logp.Info("%v Deleted %v pre-existing audit rules.", logPrefix, n)
+
+	// Add rules from config.
+	for _, rule := range rules {
+		if err = ms.client.AddRule(rule.data); err != nil {
+			// Treat rule add errors as warnings and continue.
+			err = errors.Wrapf(err, "failed to add kernel rule '%v'", rule.flags)
+			reporter.Error(err)
+			logp.Warn("%v %v", err)
+		}
+	}
+	logp.Info("%v Successfully added %d kernel audit rules.", logPrefix, len(rules))
+	return nil
 }
 
 func (ms *MetricSet) initClient() error {

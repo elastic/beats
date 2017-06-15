@@ -11,8 +11,18 @@ import (
 var userLoginMsg = `type=USER_LOGIN msg=audit(1492896301.818:19955): pid=12635 uid=0 auid=4294967295 ses=4294967295 msg='op=login acct=28696E76616C6964207573657229 exe="/usr/sbin/sshd" hostname=? addr=179.38.151.221 terminal=sshd res=failed'`
 
 func TestData(t *testing.T) {
-	// Create a mock netlink client.
-	mock := NewMock().returnACK().returnStatus().returnMessage(userLoginMsg)
+	// Create a mock netlink client that provides the expected responses.
+	mock := NewMock().
+		// GetRules response with zero rules. Used by DeleteAll rules.
+		returnACK().returnDone().
+		// AddRule response.
+		returnACK().
+		// AddRule response.
+		returnACK().
+		// Get Status response for initClient
+		returnACK().returnStatus().
+		// Send a single audit message from the kernel.
+		returnMessage(userLoginMsg)
 
 	// Replace the default AuditClient with a mock.
 	ms := mbtest.NewPushMetricSet(t, getConfig())
@@ -22,7 +32,7 @@ func TestData(t *testing.T) {
 
 	events, errs := mbtest.RunPushMetricSet(time.Second, ms)
 	if len(errs) > 0 {
-		t.Fatal("received errors:", errs)
+		t.Fatalf("received errors: %+v", errs)
 	}
 	if len(events) == 0 {
 		t.Fatal("received no events")
@@ -36,5 +46,9 @@ func getConfig() map[string]interface{} {
 	return map[string]interface{}{
 		"module":     "audit",
 		"metricsets": []string{"kernel"},
+		"kernel.audit_rules": `
+		   -w /etc/passwd -p wa -k auth
+		   -a always,exit -F arch=b64 -S execve -k exec
+		`,
 	}
 }
