@@ -877,6 +877,13 @@
 			"revisionTime": "2016-08-17T18:24:57Z"
 		},
 		{
+			"checksumSHA1": "DED+CN5rfuxbWisgi5vXHqsk0os=",
+			"path": "github.com/urso/go-structform",
+			"revision": "12cbde40ef8e75dd5ead25c50333262463a89574",
+			"revisionTime": "2017-05-18T15:23:53Z",
+			"tree": true
+		},
+		{
 			"checksumSHA1": "tK8eFmQ0JeKpR3P0TjiGobzlIh0=",
 			"path": "golang.org/x/net/bpf",
 			"revision": "e90d6d0afc4c315a0d87a568ae68577cc15149a0",

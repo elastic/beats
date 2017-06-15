@@ -1,0 +1,18 @@
+import:
+  - types.yml
+
+main: |
+  package gotype
+
+  var _reflPrimitivesMapping = map[reflect.Type]reFoldFn{
+    {{ range data.primitiveTypes }}
+      {{ $t := capitalize . }}
+      t{{ $t }}: reFold{{ $t }},
+      reflect.SliceOf(t{{ $t }}): reFoldArr{{ $t }},
+      reflect.MapOf(tString, t{{ $t }}): reFoldMap{{ $t }},
+    {{ end }}
+  }
+
+  func getReflectFoldPrimitive(t reflect.Type) reFoldFn {
+    return _reflPrimitivesMapping[t]
+  }
