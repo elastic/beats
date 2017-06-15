@@ -1,4 +1,4 @@
-package kubernetes
+package add_kubernetes_metadata
 
 import (
 	"context"
@@ -30,7 +30,7 @@ type kubernetesAnnotator struct {
 }
 
 func init() {
-	processors.RegisterPlugin("kubernetes", newKubernetesAnnotator)
+	processors.RegisterPlugin("add_kubernetes_metadata", newKubernetesAnnotator)
 
 	// Register default indexers
 	Indexing.AddIndexer(PodNameIndexerName, NewPodNameIndexer)
@@ -208,7 +208,7 @@ func (k kubernetesAnnotator) Run(event common.MapStr) (common.MapStr, error) {
 	return event, nil
 }
 
-func (k kubernetesAnnotator) String() string { return "kubernetes" }
+func (k kubernetesAnnotator) String() string { return "add_kubernetes_metadata" }
 
 func validate(config kubeAnnotatorConfig) error {
 	if !config.InCluster && config.KubeConfig == "" {
