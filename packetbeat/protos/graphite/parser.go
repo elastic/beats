@@ -143,10 +143,10 @@ func (p *parser) parse() (*message, error) {
 					msg.Notes = append(msg.Notes, j.(string))
 				} else {
 					for _, k := range j.([]interface{}) {
-						if reflect.TypeOf(k).String() == reflect.Int64 {
+						if reflect.TypeOf(k).Kind() == reflect.Int64 {
 							msg.Notes = append(msg.Notes, strconv.Itoa(int(k.(int64))))
 
-						} else if reflect.TypeOf(k).String() == reflect.Float64 {
+						} else if reflect.TypeOf(k).Kind() == reflect.Float64 {
 							msg.Notes = append(msg.Notes, strconv.FormatFloat(k.(float64), 'E', -1, 64))
 
 						} else {
