@@ -17,9 +17,9 @@
 
 package auparse
 
-// auditSyscalls is a mapping of arch names to tables of syscall numbers to names.
+// AuditSyscalls is a mapping of arch names to tables of syscall numbers to names.
 // For example, x86_64 -> 165 = "mount".
-var auditSyscalls = map[string]map[int]string{
+var AuditSyscalls = map[string]map[int]string{
 	"aarch64": {
 		0:   "io_setup",
 		1:   "io_destroy",

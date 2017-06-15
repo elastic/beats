@@ -28,6 +28,7 @@ import (
 //go:generate sh -c "go run mk_audit_msg_types.go && gofmt -s -w zaudit_msg_types.go"
 //go:generate sh -c "perl mk_audit_syscalls.pl > zaudit_syscalls.go && gofmt -s -w zaudit_syscalls.go"
 //go:generate perl mk_audit_arches.pl
+//go:generate go run mk_audit_exit_codes.go
 
 const (
 	typeToken = "type="
@@ -285,6 +286,9 @@ func enrichData(msg *AuditMessage) error {
 	// Normalize success/res to result.
 	result(msg.data)
 
+	// Convert exit codes to named POSIX exit codes.
+	exit(msg.data)
+
 	// Normalize keys that are of the form key="key=user_command".
 	auditRuleKey(msg.data)
 
@@ -340,7 +344,7 @@ func arch(data map[string]string) error {
 		return errors.Wrap(err, "failed to parse arch")
 	}
 
-	data["arch"] = auditArch(arch).String()
+	data["arch"] = AuditArch(arch).String()
 	return nil
 }
 
@@ -356,7 +360,7 @@ func syscall(data map[string]string) error {
 	}
 
 	arch := data["arch"]
-	data["syscall"] = auditSyscalls[arch][syscall]
+	data["syscall"] = AuditSyscalls[arch][syscall]
 	return nil
 }
 
@@ -527,4 +531,28 @@ func auditRuleKey(data map[string]string) {
 	}
 
 	data["key"] = parts[1]
+}
+
+func exit(data map[string]string) error {
+	value, found := data["exit"]
+	if !found {
+		return errors.New("exit key not found")
+	}
+
+	exitCode, err := strconv.Atoi(value)
+	if err != nil {
+		return errors.Wrap(err, "failed to parse exit")
+	}
+
+	if exitCode >= 0 {
+		return nil
+	}
+
+	name, found := AuditErrnoToName[-1*exitCode]
+	if !found {
+		return nil
+	}
+
+	data["exit"] = name
+	return nil
 }
