@@ -54,6 +54,18 @@ const (
 	NoWait
 )
 
+// FailureMode defines the kernel's behavior on critical errors.
+type FailureMode uint32
+
+const (
+	// SilentOnFailure ignores errors.
+	SilentOnFailure FailureMode = 0
+	// LogOnFailure logs errors using printk.
+	LogOnFailure
+	// PanicOnFailure causes a kernel panic on error.
+	PanicOnFailure
+)
+
 // AuditClient is a client for communicating with the Linux kernels audit
 // interface over netlink.
 type AuditClient struct {
@@ -299,6 +311,16 @@ func (c *AuditClient) SetEnabled(enabled bool, wm WaitMode) error {
 	status := AuditStatus{
 		Mask:    AuditStatusEnabled,
 		Enabled: e,
+	}
+	return c.set(status, wm)
+}
+
+// SetFailure sets the action that the kernel will perform when the backlog
+// limit is reached or when it encounters an error and cannot proceed.
+func (c *AuditClient) SetFailure(fm FailureMode, wm WaitMode) error {
+	status := AuditStatus{
+		Mask:    AuditStatusFailure,
+		Failure: uint32(fm),
 	}
 	return c.set(status, wm)
 }

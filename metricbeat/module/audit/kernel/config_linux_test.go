@@ -56,6 +56,14 @@ kernel.audit_rules: |
 	t.Log(err)
 }
 
+func TestConfigValidateFailureMode(t *testing.T) {
+	config := defaultConfig
+	config.FailureMode = "boom"
+	err := config.Validate()
+	assert.Error(t, err)
+	t.Log(err)
+}
+
 func parseConfig(t testing.TB, yaml string) (Config, error) {
 	c, err := common.NewConfigWithYAML([]byte(yaml), "")
 	if err != nil {
