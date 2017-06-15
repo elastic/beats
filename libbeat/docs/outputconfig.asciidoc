@@ -234,10 +234,10 @@ output.elasticsearch:
   pipelines:
     - pipeline: critical_pipeline
       when.equals:
-        type: "critical"
+        fields.type: "critical"
     - pipeline: normal_pipeline
       when.equals:
-        type: "normal"
+        fields.type: "normal"
 ------------------------------------------------------------------------------
 
 ===== max_retries
@@ -416,6 +416,18 @@ If set to true and multiple Logstash hosts are configured, the output plugin
 load balances published events onto all Logstash hosts. If set to false,
 the output plugin sends all events to only one host (determined at random) and
 will switch to another host if the selected one becomes unresponsive. The default value is false.
+
+===== ttl
+
+Time to live for a connection to Logstash after which the connection will be re-established.
+Useful when Logstash hosts represent load balancers. Since the connections to Logstash hosts
+are sticky operating behind load balancers can lead to uneven load distribution between the instances.
+Specifying a TTL on the connection allows to achieve equal connection distribution between the
+instances.  Specifying a TTL of 0 will disable this feature.
+
+The default value is 0.
+
+NOTE: The "ttl" option is not yet supported on an async Logstash client (one with the "pipelining" option set).
 
 ["source","yaml",subs="attributes"]
 ------------------------------------------------------------------------------

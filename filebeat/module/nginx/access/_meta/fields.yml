@@ -3,10 +3,17 @@
   description: >
     Contains fields for the Nginx access logs.
   fields:
+    - name: remote_ip_list
+      type: array
+      description: >
+        An array of remote IP addresses. It is a list because it is common to include, besides the client
+        IP address, IP addresses from headers like `X-Forwarded-For`. See also the `remote_ip` field.
     - name: remote_ip
       type: keyword
       description: >
-        Client IP address.
+        Client IP address. The first public IP address from the `remote_ip_list` array. If no public IP
+        addresses are present, this field contains the first private IP address from the `remote_ip_list`
+        array.
     - name: user_name
       type: keyword
       description: >
@@ -104,4 +111,12 @@
           type: geo_point
           description: >
             The longitude and latitude.
+        - name: region_name
+          type: keyword
+          description: >
+            The region name.
+        - name: city_name
+          type: keyword
+          description: >
+            The city name.
 

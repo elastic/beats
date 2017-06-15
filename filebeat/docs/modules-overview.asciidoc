@@ -32,6 +32,8 @@ NOTE: At the moment, Filebeat modules require using the Elasticsearch
 be able to also configure Logstash as a more powerful alternative to Ingest
 Node.
 
+Filebeat modules require Elasticsearch 5.2 or later.
+
 === Tutorial
 
 This tutorial assumes you have Elasticsearch and Kibana installed and

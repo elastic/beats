@@ -158,6 +158,9 @@ func Init(name string, config *Logging) error {
 		log.SetOutput(ioutil.Discard)
 	}
 
+	// Disable stderr logging if requested by cmdline flag
+	SetStderr()
+
 	go logMetrics(&config.Metrics)
 
 	return nil

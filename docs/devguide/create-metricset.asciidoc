@@ -17,16 +17,16 @@ To create a new metricset:
 make create-metricset
 ----
 +
-You'll be prompted to enter a module and metricset name. Only use characters `[a-z]` 
+You'll be prompted to enter a module and metricset name. Only use characters `[a-z]`
 and, if required, underscores (`_`). No other characters are allowed.
 +
 When you run `make create-metricset`, it creates all the basic files for your metricset, along with the required module
 files if the module does not already exist. See <<creating-metricbeat-module>> for more details about the module files.
 +
 NOTE: We use `{metricset}`, `{module}`, and `{beat}` in this guide as placeholders. You need to replace these with
-the actual names of your metricset, module, and beat. 
+the actual names of your metricset, module, and beat.
 +
-The metricset that you created is already a functioning metricset and can be compiled. 
+The metricset that you created is already a functioning metricset and can be compiled.
 +
 . Compile your new metricset by running the following command:
 +
@@ -70,7 +70,7 @@ include::../../metricbeat/scripts/module/metricset/metricset.go.tmpl[]
 ----
 
 The `package` clause and `import` declaration are part of the base structure of each Golang file. You should only
-modify this part of the file if your implementation requires more imports. 
+modify this part of the file if your implementation requires more imports.
 
 [float]
 ===== Initialisation
@@ -78,7 +78,7 @@ modify this part of the file if your implementation requires more imports.
 The init method registers the metricset with the central registry. In Golang the `init()` function is called
 before the execution of all other code. This means the module will be automatically registered with the global registry.
 
-The `New` method, which is passed to `AddMetricSet`, will be called after the setup of the module and before starting to fetch data. You normally don't need to change this part of the file. 
+The `New` method, which is passed to `AddMetricSet`, will be called after the setup of the module and before starting to fetch data. You normally don't need to change this part of the file.
 
 [source,go]
 ----
@@ -195,7 +195,7 @@ respect a common <<event-conventions,set of conventions>>. This
 makes it easy for users to find and interpret metrics. To simplify parsing,
 converting, renaming, and restructuring of the object read from the monitored
 system to the Metricbeat format, we have created the
-https://godoc.org/github.com/elastic/beats/metricbeat/schema[schema] package
+https://godoc.org/github.com/elastic/beats/libbeat/common/schema[schema] package
 that allows you to declaratively define transformations.
 
 For example, assuming this input object:
@@ -231,8 +231,8 @@ You can use the following code to make the transformations:
 [source,go]
 ----
 import (
-	s "github.com/elastic/beats/metricbeat/schema"
-	c "github.com/elastic/beats/metricbeat/schema/mapstrstr"
+	s "github.com/elastic/beats/libbeat/common/schema"
+	c "github.com/elastic/beats/libbeat/common/schema/mapstrstr"
 )
 
 var (
@@ -257,7 +257,7 @@ and apply it to all events.
 
 [float]
 ==== Configuration File
-The configuration file for a metricset is handled by the module. If there are 
+The configuration file for a metricset is handled by the module. If there are
 multiple metricsets in one module, make sure you add all metricsets to the configuration.
 For example:
 

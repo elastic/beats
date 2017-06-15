@@ -1,6 +1,8 @@
 package module
 
 import (
+	"time"
+
 	"github.com/elastic/beats/libbeat/cfgfile"
 	"github.com/elastic/beats/libbeat/common"
 	"github.com/elastic/beats/libbeat/publisher"
@@ -9,18 +11,20 @@ import (
 
 // Factory is used to register and reload modules
 type Factory struct {
-	client func() publisher.Client
+	client        func() publisher.Client
+	maxStartDelay time.Duration
 }
 
 // NewFactory creates new Reloader instance for the given config
-func NewFactory(p publisher.Publisher) *Factory {
+func NewFactory(maxStartDelay time.Duration, p publisher.Publisher) *Factory {
 	return &Factory{
-		client: p.Connect,
+		client:        p.Connect,
+		maxStartDelay: maxStartDelay,
 	}
 }
 
 func (r *Factory) Create(c *common.Config) (cfgfile.Runner, error) {
-	w, err := NewWrapper(c, mb.Registry)
+	w, err := NewWrapper(r.maxStartDelay, c, mb.Registry)
 	if err != nil {
 		return nil, err
 	}

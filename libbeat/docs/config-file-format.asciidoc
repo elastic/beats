@@ -35,7 +35,7 @@ Lists and dictionaries are used in beats to build structured configurations.
 ------------------------------------------------------------------------------
 filebeat:
   prospectors:
-    - input_type: log
+    - type: log
       paths:
         - /var/log/*.log
       multiline:
@@ -92,11 +92,11 @@ For example this filebeat setting:
 
 filebeat:
   prospectors:
-    - input_type: log
+    - type: log
 
 ------------------------------------------------------------------------------
 
-Gets collapsed into `filebeat.prospectors.0.input_type: log`.
+Gets collapsed into `filebeat.prospectors.0.type: log`.
 
 Alternatively to using indentation, setting names can be used in collapsed form too.
 
@@ -109,8 +109,8 @@ Simple filebeat example with partially collapsed setting names and use of compac
 ------------------------------------------------------------------------------
 
 filebeat.prospectors:
-- input_type: log
-  paths: ["/var/log/*.log"] 
+- type: log
+  paths: ["/var/log/*.log"]
   multiline.pattern: '^['
   multiline.match: after
 
@@ -213,44 +213,7 @@ format-string-with-date: '%{[fieldname]}-%{+yyyy.MM.dd}'
 [[config-file-format-env-vars]]
 === Environment Variables
 
-Beats support use of environment variables in config files to set values that
-need to be configurable during deployment. Environment variable expansion is
-introduced using `${VAR}`, where `VAR` is the name of the environment variable.
-
-Note: Only values can be set using environment variables. Environment variables
-usage in namespace and setting names are not supported.
-
-Variable references are replaced when settings are read by beats. The
-replacement is case-sensitive and occurs after the YAML file itself has been
-parsed. References to undefined variables will lead to errors when dereferenced
-and no default value is specified. To specify a default value, use:
-
-`${VAR:default_value}`
-
-Where `default_value` is the value to use if the environment variable is
-undefined.
-
-If you need to use a literal `${` in your configuration file then you can write
-`$${` to escape the expansion. The `$` symbol can be used to escape other
-characters in the default_value like using `$}` in order to generate a `}`
-character without closing the variable expansion.
-
-After changing the value of an environment variable, the beat needs to be
-restarted to pick up the new value.
-
-[float]
-==== Examples
-
-Here are some examples of configurations that use environment variables
-and what each configuration looks like after replacement:
-
-[options="header"]
-|==================================
-|Config source	       |Environment setting   |Config after replacement
-|`name: ${NAME}`       |`export NAME=elastic` |`name: elastic`
-|`name: ${NAME:beats}` |no setting            |`name: beats`
-|`name: ${NAME:beats}` |`export NAME=elastic` |`name: elastic`
-|==================================
+include::shared-env-vars.asciidoc[]
 
 [[config-gile-format-refs]]
 === Reference Variables
@@ -333,7 +296,7 @@ When installed via an RPM or DEB package, the config file at
 `/etc/{beatname}/{beatname}.yml` will have the proper owner and permissions. The
 file is owned by `root` and has file permissions of `0644` (`-rw-r--r--`).
 
-You may encounter the following errors if your config file fails these checks: 
+You may encounter the following errors if your config file fails these checks:
 
 ["source","sh"]
 --------------------------------------------------------------------------------
@@ -341,7 +304,7 @@ Exiting: error loading config file: config file ("{beatname}.yml") must be
 owned by the beat user (uid=501) or root
 --------------------------------------------------------------------------------
 
-To correct this problem you can use either `chown root {beatname}.yml` or 
+To correct this problem you can use either `chown root {beatname}.yml` or
 `chown 501 {beatname}.yml` to change the owner of the configuration file.
 
 ["source","sh"]
@@ -370,7 +333,43 @@ use this, for example, for setting defaults in a base configuration file, and
 overwrite settings via local configuration files.
 
 In addition to overwriting settings using multiple configuration files,
-individual settings can be overwritten using `-E <setting>=<value>`.
+individual settings can be overwritten using `-E <setting>=<value>`. The
+`<value>` can be either a single value or a complex object, such as a list or
+dictionary.
+
+For example, given the following configuration:
+
+["source","yaml"]
+--------------------------------------------------------------------------------
+output.elasticsearch:
+  hosts: ["http://localhost:9200"]
+  username: username
+  password: password
+--------------------------------------------------------------------------------
+
+You can disable the Elasticsearch output and write all events to the console by
+setting:
+
+["source","sh"]
+--------------------------------------------------------------------------------
+-E output='{elasticsearch.enabled: false, console.pretty: true}'
+--------------------------------------------------------------------------------
+
+Any complex objects that you specify at the command line are merged with the
+original configuration, and the following configuration is passed to the Beat:
+
+["source","yaml"]
+--------------------------------------------------------------------------------
+output.elasticsearch:
+  enabled: false
+  hosts: ["http://localhost:9200"]
+  username: username
+  password: password
+
+output.console:
+  pretty: true
+--------------------------------------------------------------------------------
+
 
 [[config-file-format-tips]]
 === YAML Tips and Gotchas

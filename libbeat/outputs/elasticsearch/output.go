@@ -4,6 +4,7 @@ import (
 	"errors"
 	"fmt"
 	"net/url"
+	"sync"
 	"time"
 
 	"github.com/elastic/beats/libbeat/common"
@@ -44,12 +45,21 @@ var (
 	ErrResponseRead = errors.New("bulk item status parse failed")
 )
 
-var connectCallbackRegistry connectCallback
+type callbacksRegistry struct {
+	callbacks []connectCallback
+	mutex     sync.Mutex
+}
+
+// XXX: it would be fantastic to do this without a package global
+var connectCallbackRegistry callbacksRegistry
 
 // RegisterConnectCallback registers a callback for the elasticsearch output
 // The callback is called each time the client connects to elasticsearch.
 func RegisterConnectCallback(callback connectCallback) {
-	connectCallbackRegistry = callback
+	connectCallbackRegistry.mutex.Lock()
+	defer connectCallbackRegistry.mutex.Unlock()
+
+	connectCallbackRegistry.callbacks = append(connectCallbackRegistry.callbacks, callback)
 }
 
 // New instantiates a new output plugin instance publishing to elasticsearch.
@@ -265,7 +275,7 @@ func makeClientFactory(
 			Headers:          config.Headers,
 			Timeout:          config.Timeout,
 			CompressionLevel: config.CompressionLevel,
-		}, connectCallbackRegistry)
+		}, &connectCallbackRegistry)
 	}
 }
 

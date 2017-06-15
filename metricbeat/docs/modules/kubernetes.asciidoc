@@ -50,6 +50,7 @@ metricbeat.modules:
 
 # Kubernetes events
 - module: kubernetes
+  enabled: false
   metricsets:
     - event
   in_cluster: true

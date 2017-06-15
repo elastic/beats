@@ -21,3 +21,7 @@ metricbeat.config.modules:
 
   # Set to true to enable config reloading
   reload.enabled: false
+
+# Maximum amount of time to randomly delay the start of a metricset. Use 0 to
+# disable startup delay.
+metricbeat.max_start_delay: 10s

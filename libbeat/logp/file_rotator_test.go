@@ -160,4 +160,17 @@ func TestConfigSane(t *testing.T) {
 	}
 	assert.NotNil(t, rotator.CheckIfConfigSane())
 
+	perms := uint32(0544)
+	rotator = FileRotator{
+		Name:        "test2",
+		Permissions: &perms,
+	}
+	assert.Nil(t, rotator.CheckIfConfigSane())
+
+	perms = uint32(077777)
+	rotator = FileRotator{
+		Name:        "test2",
+		Permissions: &perms,
+	}
+	assert.NotNil(t, rotator.CheckIfConfigSane())
 }

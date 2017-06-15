@@ -51,6 +51,9 @@ include::./configuring-logstash.asciidoc[]
 
 include::./flows.asciidoc[]
 
+:standalone:
+include::../../libbeat/docs/shared-env-vars.asciidoc[]
+
 include::./thrift.asciidoc[]
 
 :standalone:

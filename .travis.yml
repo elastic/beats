@@ -15,70 +15,85 @@ env:
     - DOCKER_COMPOSE_VERSION=1.11.1
     - GO_VERSION="$(cat .go-version)"
 
-matrix:
+jobs:
   include:
     # General checks
     - os: linux
       env: TARGETS="check"
       go: $GO_VERSION
+      stage: check
 
     # Filebeat
     - os: linux
       env: TARGETS="-C filebeat testsuite"
       go: $GO_VERSION
+      stage: test
     - os: osx
       env: TARGETS="TEST_ENVIRONMENT=0 -C filebeat testsuite"
       go: $GO_VERSION
+      stage: test
 
     # Heartbeat
     - os: linux
       env: TARGETS="-C heartbeat testsuite"
       go: $GO_VERSION
+      stage: test
     - os: osx
       env: TARGETS="TEST_ENVIRONMENT=0 -C heartbeat testsuite"
       go: $GO_VERSION
+      stage: test
 
     # Libbeat
     - os: linux
       env: TARGETS="-C libbeat testsuite"
       go: $GO_VERSION
+      stage: test
     - os: linux
       env: TARGETS="-C libbeat crosscompile"
       go: $GO_VERSION
+      stage: test
 
     # Metricbeat
     - os: linux
       env: TARGETS="-C metricbeat testsuite"
       go: $GO_VERSION
+      stage: test
     - os: osx
       env: TARGETS="TEST_ENVIRONMENT=0 -C metricbeat testsuite"
       go: $GO_VERSION
+      stage: test
     - os: linux
       env: TARGETS="-C metricbeat crosscompile"
       go: $GO_VERSION
+      stage: test
 
     # Packetbeat
     - os: linux
       env: TARGETS="-C packetbeat testsuite"
       go: $GO_VERSION
+      stage: test
 
     # Winlogbeat
     - os: linux
       env: TARGETS="-C winlogbeat crosscompile"
       go: $GO_VERSION
+      stage: test
 
     # Dashboards
     - os: linux
       env: TARGETS="-C dev-tools/cmd/import_dashboards"
       go: $GO_VERSION
+      stage: test
 
     # Generators
     - os: linux
       env: TARGETS="-C generator/metricbeat test"
       go: $GO_VERSION
+      stage: test
     - os: linux
       env: TARGETS="-C generator/beat test"
       go: $GO_VERSION
+      stage: test
 
 addons:
   apt:
