@@ -64,7 +64,9 @@ func TestCommonPaths(t *testing.T) {
 		actual := runExtractField(t, testConfig, input)
 
 		result, err := actual.GetValue(test.Target)
-		assert.NoError(t, err)
+		if err != nil {
+			t.Fatalf("could not get target field: %s", err)
+		}
 		assert.Equal(t, result.(string), test.Result)
 	}
 }
@@ -76,12 +78,13 @@ func runExtractField(t *testing.T, config *common.Config, input common.MapStr) c
 
 	p, err := NewExtractField(*config)
 	if err != nil {
-		logp.Err("Error initializing decode_json_fields")
-		t.Fatal(err)
+		t.Fatalf("error initializing extract_field: %s", err)
 	}
 
 	actual, err := p.Run(input)
-	assert.NoError(t, err)
+	if err != nil {
+		t.Fatalf("error running extract_field: %s", err)
+	}
 
 	return actual
 }
