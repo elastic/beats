@@ -20,7 +20,7 @@ import (
 	"github.com/elastic/beats/filebeat/spooler"
 
 	// Add filebeat level processors
-	_ "github.com/elastic/beats/filebeat/processor/kubernetes"
+	_ "github.com/elastic/beats/filebeat/processor/add_kubernetes_metadata"
 )
 
 var (
