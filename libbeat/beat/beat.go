@@ -195,7 +195,7 @@ func New(name, v string) (*Beat, error) {
 }
 
 // init does initialization of things common to all actions (read confs, flags)
-func (b *Beat) init() error {
+func (b *Beat) Init() error {
 	err := b.handleFlags()
 	if err != nil {
 		return err
@@ -266,7 +266,7 @@ func (b *Beat) createBeater(bt Creator) (Beater, error) {
 }
 
 func (b *Beat) launch(bt Creator) error {
-	err := b.init()
+	err := b.Init()
 	if err != nil {
 		return err
 	}
@@ -325,7 +325,7 @@ func (b *Beat) launch(bt Creator) error {
 // TestConfig check all settings are ok and the beat can be run
 func (b *Beat) TestConfig(bt Creator) error {
 	return handleError(func() error {
-		err := b.init()
+		err := b.Init()
 		if err != nil {
 			return err
 		}
@@ -344,7 +344,7 @@ func (b *Beat) TestConfig(bt Creator) error {
 // Setup registers ES index template and kibana dashboards
 func (b *Beat) Setup(bt Creator, template, dashboards, machineLearning bool) error {
 	return handleError(func() error {
-		err := b.init()
+		err := b.Init()
 		if err != nil {
 			return err
 		}

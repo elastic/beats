@@ -22,7 +22,8 @@ type TemplateSettings struct {
 }
 
 var (
-	defaultConfig = TemplateConfig{
+	// DefaultConfig for index template
+	DefaultConfig = TemplateConfig{
 		Enabled: true,
 		Fields:  "fields.yml",
 	}

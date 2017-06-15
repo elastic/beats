@@ -26,7 +26,7 @@ type Loader struct {
 
 func NewLoader(cfg *common.Config, client ESClient, beatInfo common.BeatInfo) (*Loader, error) {
 
-	config := defaultConfig
+	config := DefaultConfig
 
 	err := cfg.Unpack(&config)
 	if err != nil {
