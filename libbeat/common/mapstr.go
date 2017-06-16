@@ -6,6 +6,8 @@ import (
 	"strings"
 
 	"github.com/pkg/errors"
+
+	"github.com/elastic/beats/libbeat/logp"
 )
 
 // Event metadata constants. These keys are used within libbeat to identify
@@ -142,11 +144,14 @@ func (m MapStr) Put(key string, value interface{}) (interface{}, error) {
 
 // StringToPrint returns the MapStr as pretty JSON.
 func (m MapStr) StringToPrint() string {
-	json, err := json.MarshalIndent(m, "", "  ")
+
+	buffer, err := JSONEncode(m, true)
 	if err != nil {
-		return fmt.Sprintf("Not valid json: %v", err)
+		logp.Err("Fail to convert the event to JSON (%v): %#v", err, m)
+		return ""
 	}
-	return string(json)
+
+	return string(buffer)
 }
 
 // String returns the MapStr as JSON.
