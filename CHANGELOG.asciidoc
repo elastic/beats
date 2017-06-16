@@ -39,6 +39,7 @@ https://github.com/elastic/beats/compare/v6.0.0-alpha1...master[Check the HEAD d
 *Metricbeat*
 
 - Fix issue affecting Windows services timing out at startup. {pull}4491[4491]
+- Fix incorrect docker.diskio.total metric calculation. {pull}4507[4507]
 
 *Packetbeat*
 
