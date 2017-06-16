@@ -46,7 +46,7 @@ in <<configuration-metricbeat>>. Here is an example configuration:
 
 [source,yaml]
 ----
-metricbeat.modules:
+auditbeat.modules:
 - module: audit
   metricsets: ["kernel"]
 

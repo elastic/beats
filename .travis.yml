@@ -38,8 +38,14 @@ jobs:
       env: TARGETS="-C heartbeat testsuite"
       go: $GO_VERSION
       stage: test
+
+    # Auditbeat
+    - os: linux
+      env: TARGETS="-C auditbeat testsuite"
+      go: $GO_VERSION
+      stage: test
     - os: osx
-      env: TARGETS="TEST_ENVIRONMENT=0 -C heartbeat testsuite"
+      env: TARGETS="TEST_ENVIRONMENT=0 -C auditbeat testsuite"
       go: $GO_VERSION
       stage: test
 

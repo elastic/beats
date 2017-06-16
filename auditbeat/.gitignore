@@ -1,0 +1,9 @@
+build
+_meta/kibana
+_meta/beat.yml
+_meta/beat.full.yml
+
+/auditbeat
+/auditbeat.test
+/docs/html_docs
+
