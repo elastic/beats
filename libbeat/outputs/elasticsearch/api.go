@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 
 	"github.com/elastic/beats/libbeat/logp"
+	"github.com/pkg/errors"
 )
 
 // QueryResult contains the result of a query.
@@ -52,7 +53,7 @@ func (r QueryResult) String() string {
 
 func withQueryResult(status int, resp []byte, err error) (int, *QueryResult, error) {
 	if err != nil {
-		return status, nil, err
+		return status, nil, errors.Wrapf(err, "Elasticsearch response: %s", resp)
 	}
 	result, err := readQueryResult(resp)
 	return status, result, err
