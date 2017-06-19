@@ -877,10 +877,10 @@
 			"revisionTime": "2016-08-17T18:24:57Z"
 		},
 		{
-			"checksumSHA1": "DED+CN5rfuxbWisgi5vXHqsk0os=",
+			"checksumSHA1": "DOrKk9xQGAoIpTlsSbuBjRu/Fnc=",
 			"path": "github.com/urso/go-structform",
-			"revision": "12cbde40ef8e75dd5ead25c50333262463a89574",
-			"revisionTime": "2017-05-18T15:23:53Z",
+			"revision": "fc6abfdbae53e185870094bc210b42a0f65f6176",
+			"revisionTime": "2017-06-19T19:54:08Z",
 			"tree": true
 		},
 		{
