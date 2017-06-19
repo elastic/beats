@@ -19,7 +19,6 @@ in <<configuration-metricbeat>>. Here is an example configuration:
 metricbeat.modules:
 - module: golang
   metricsets: ["expvar","heap"]
-  enabled: false
   period: 10s
   hosts: ["localhost:6060"]
   heap.path: "/debug/vars"

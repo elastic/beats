@@ -22,7 +22,6 @@ in <<configuration-metricbeat>>. Here is an example configuration:
 metricbeat.modules:
 - module: prometheus
   metricsets: ["stats"]
-  enabled: false
   period: 10s
   hosts: ["localhost:9090"]
   metrics_path: /metrics

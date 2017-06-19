@@ -25,7 +25,6 @@ in <<configuration-metricbeat>>. Here is an example configuration:
 metricbeat.modules:
 - module: zookeeper
   metricsets: ["mntr"]
-  enabled: false
   period: 10s
   hosts: ["localhost:2181"]
 ----

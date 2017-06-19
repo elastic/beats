@@ -47,10 +47,14 @@ collect-docs: python-env
 .PHONY: configs
 configs: python-env
 	@cp ${ES_BEATS}/metricbeat/_meta/common.yml _meta/beat.yml
-	@${PYTHON_ENV}/bin/python ${ES_BEATS}/script/config_collector.py --beat ${BEAT_NAME} $(PWD) >> _meta/beat.yml
 	@cat ${ES_BEATS}/metricbeat/_meta/setup.yml >> _meta/beat.yml
-	@cp ${ES_BEATS}/metricbeat/_meta/common.reference.yml _meta/beat.reference.yml
-	@${PYTHON_ENV}/bin/python ${ES_BEATS}/script/config_collector.py --beat ${BEAT_NAME} --full $(PWD) >> _meta/beat.reference.yml
+	@cat ${ES_BEATS}/metricbeat/_meta/common.reference.yml > _meta/beat.reference.yml
+	@. ${PYTHON_ENV}/bin/activate; python ${ES_BEATS}/script/config_collector.py --beat ${BEAT_NAME} --full $(PWD) >> _meta/beat.reference.yml
+	@rm -rf modules.d && mkdir -p modules.d
+	@for MODULE in `ls module | grep -v .go`; do cp -a $(PWD)/module/$$MODULE/_meta/config.yml modules.d/$$MODULE.yml.disabled; done
+	@chmod go-w modules.d/*
+	# Enable system by default:
+	@mv modules.d/system.yml.disabled modules.d/system.yml
 
 # Generates imports for all modules and metricsets
 .PHONY: imports
