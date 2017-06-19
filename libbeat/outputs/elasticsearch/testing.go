@@ -7,7 +7,6 @@ import (
 	"time"
 
 	"github.com/elastic/beats/libbeat/outputs/outil"
-	"github.com/stretchr/testify/assert"
 )
 
 const (
@@ -48,7 +47,9 @@ func GetTestingElasticsearch(t *testing.T) *Client {
 
 	// Load version number
 	err := client.Connect(60 * time.Second)
-	assert.NoError(t, err)
+	if err != nil {
+		t.Fatal(err)
+	}
 	return client
 }
 

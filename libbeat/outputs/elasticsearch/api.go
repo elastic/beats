@@ -53,7 +53,7 @@ func (r QueryResult) String() string {
 
 func withQueryResult(status int, resp []byte, err error) (int, *QueryResult, error) {
 	if err != nil {
-		return status, nil, errors.Errorf("%v. Response: %s", err, resp)
+		return status, nil, errors.Wrapf(err, "Elasticsearch response: %s", resp)
 	}
 	result, err := readQueryResult(resp)
 	return status, result, err
