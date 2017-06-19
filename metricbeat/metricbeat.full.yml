@@ -126,6 +126,7 @@ metricbeat.modules:
   enabled: false
   metricsets: ["kernel"]
   kernel.resolve_ids: true
+  kernel.failure_mode: silent
   kernel.backlog_limit: 8196
   kernel.rate_limit: 0
   kernel.include_raw_message: false

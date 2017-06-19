@@ -270,7 +270,7 @@ SOFTWARE.
 --------------------------------------------------------------------
 Dependency: github.com/elastic/go-libaudit
 Version: v0.0.3
-Revision: b2d37f9d37d8e2a81bf69b5fae3c1f49bf6a14bf
+Revision: 01c7fd0956dbe3fea61047c330de4c1e06b6427d
 License type (autodetected): Apache License 2.0
 ./vendor/github.com/elastic/go-libaudit/LICENSE:
 --------------------------------------------------------------------
