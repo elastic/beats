@@ -17,7 +17,7 @@ import (
 
 func TestClientConnect(t *testing.T) {
 
-	client := GetTestingElasticsearch()
+	client := GetTestingElasticsearch(t)
 	err := client.Connect(5 * time.Second)
 	assert.NoError(t, err)
 }

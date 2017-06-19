@@ -3,9 +3,11 @@ package elasticsearch
 import (
 	"math/rand"
 	"os"
+	"testing"
 	"time"
 
 	"github.com/elastic/beats/libbeat/outputs/outil"
+	"github.com/stretchr/testify/assert"
 )
 
 const (
@@ -38,14 +40,15 @@ func GetEsPort() string {
 }
 
 // GetTestingElasticsearch creates a test client.
-func GetTestingElasticsearch() *Client {
+func GetTestingElasticsearch(t *testing.T) *Client {
 	var address = "http://" + GetEsHost() + ":" + GetEsPort()
 	username := os.Getenv("ES_USER")
 	pass := os.Getenv("ES_PASS")
 	client := newTestClientAuth(address, username, pass)
 
 	// Load version number
-	client.Connect(3 * time.Second)
+	err := client.Connect(60 * time.Second)
+	assert.NoError(t, err)
 	return client
 }
 

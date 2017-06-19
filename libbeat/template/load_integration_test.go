@@ -6,7 +6,6 @@ import (
 	"encoding/json"
 	"path/filepath"
 	"testing"
-	"time"
 
 	"github.com/elastic/beats/libbeat/common"
 	"github.com/elastic/beats/libbeat/outputs/elasticsearch"
@@ -17,10 +16,7 @@ import (
 
 func TestCheckTemplate(t *testing.T) {
 
-	client := elasticsearch.GetTestingElasticsearch()
-
-	err := client.Connect(5 * time.Second)
-	assert.Nil(t, err)
+	client := elasticsearch.GetTestingElasticsearch(t)
 
 	loader := &Loader{
 		client: client,
@@ -33,9 +29,7 @@ func TestCheckTemplate(t *testing.T) {
 func TestLoadTemplate(t *testing.T) {
 
 	// Setup ES
-	client := elasticsearch.GetTestingElasticsearch()
-	err := client.Connect(5 * time.Second)
-	assert.Nil(t, err)
+	client := elasticsearch.GetTestingElasticsearch(t)
 
 	// Load template
 	absPath, err := filepath.Abs("../")
@@ -76,9 +70,7 @@ func TestLoadInvalidTemplate(t *testing.T) {
 	}
 
 	// Setup ES
-	client := elasticsearch.GetTestingElasticsearch()
-	err := client.Connect(5 * time.Second)
-	assert.Nil(t, err)
+	client := elasticsearch.GetTestingElasticsearch(t)
 
 	templateName := "invalidtemplate"
 
@@ -87,7 +79,7 @@ func TestLoadInvalidTemplate(t *testing.T) {
 	}
 
 	// Try to load invalid template
-	err = loader.LoadTemplate(templateName, template)
+	err := loader.LoadTemplate(templateName, template)
 	assert.Error(t, err)
 
 	// Make sure template was not loaded
@@ -127,10 +119,7 @@ func TestLoadBeatsTemplate(t *testing.T) {
 		assert.Nil(t, err)
 
 		// Setup ES
-		client := elasticsearch.GetTestingElasticsearch()
-
-		err = client.Connect(5 * time.Second)
-		assert.Nil(t, err)
+		client := elasticsearch.GetTestingElasticsearch(t)
 
 		fieldsPath := absPath + "/fields.yml"
 		index := beat
@@ -162,9 +151,7 @@ func TestLoadBeatsTemplate(t *testing.T) {
 func TestTemplateSettings(t *testing.T) {
 
 	// Setup ES
-	client := elasticsearch.GetTestingElasticsearch()
-	err := client.Connect(5 * time.Second)
-	assert.Nil(t, err)
+	client := elasticsearch.GetTestingElasticsearch(t)
 
 	// Load template
 	absPath, err := filepath.Abs("../")
@@ -214,9 +201,7 @@ func TestTemplateSettings(t *testing.T) {
 func TestOverwrite(t *testing.T) {
 
 	// Setup ES
-	client := elasticsearch.GetTestingElasticsearch()
-	err := client.Connect(5 * time.Second)
-	assert.Nil(t, err)
+	client := elasticsearch.GetTestingElasticsearch(t)
 
 	beatInfo := common.BeatInfo{
 		Beat:    "testbeat",

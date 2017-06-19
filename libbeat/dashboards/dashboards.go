@@ -13,6 +13,7 @@ type DashboardLoader interface {
 	LoadJSON(path string, json map[string]interface{}) ([]byte, error)
 	CreateIndex(index string, body interface{}) (int, *elasticsearch.QueryResult, error)
 	IndexExists(index string) (int, error)
+	GetVersion() string
 }
 
 func ImportDashboards(beatName, beatVersion string, esClient DashboardLoader, cfg *common.Config) error {
