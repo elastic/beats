@@ -290,40 +290,40 @@
 			"revisionTime": "2016-08-05T00:47:13Z"
 		},
 		{
-			"checksumSHA1": "MfmdLoBh0b2JUUyS2QLu2fcGYIQ=",
+			"checksumSHA1": "5cppdt4ZlFpURXuZ7QeBQvdhmKQ=",
 			"path": "github.com/elastic/go-libaudit",
-			"revision": "b2d37f9d37d8e2a81bf69b5fae3c1f49bf6a14bf",
-			"revisionTime": "2017-06-08T23:02:06Z",
+			"revision": "01c7fd0956dbe3fea61047c330de4c1e06b6427d",
+			"revisionTime": "2017-06-15T21:41:34Z",
 			"version": "v0.0.3",
 			"versionExact": "v0.0.3"
 		},
 		{
 			"checksumSHA1": "Ca2OhodWbbke1v+cctf9y/HdwZM=",
 			"path": "github.com/elastic/go-libaudit/aucoalesce",
-			"revision": "b2d37f9d37d8e2a81bf69b5fae3c1f49bf6a14bf",
-			"revisionTime": "2017-06-08T23:02:06Z",
+			"revision": "01c7fd0956dbe3fea61047c330de4c1e06b6427d",
+			"revisionTime": "2017-06-15T21:41:34Z",
 			"version": "v0.0.3",
 			"versionExact": "v0.0.3"
 		},
 		{
 			"checksumSHA1": "9hp7icHi638Ye1yXSgmoyy/HvW4=",
 			"path": "github.com/elastic/go-libaudit/auparse",
-			"revision": "b2d37f9d37d8e2a81bf69b5fae3c1f49bf6a14bf",
-			"revisionTime": "2017-06-08T23:02:06Z",
+			"revision": "01c7fd0956dbe3fea61047c330de4c1e06b6427d",
+			"revisionTime": "2017-06-15T21:41:34Z",
 			"version": "v0.0.3",
 			"versionExact": "v0.0.3"
 		},
 		{
 			"checksumSHA1": "H0rnscnKHbkjmXc4whC3gtIPR0c=",
 			"path": "github.com/elastic/go-libaudit/rule",
-			"revision": "b2d37f9d37d8e2a81bf69b5fae3c1f49bf6a14bf",
-			"revisionTime": "2017-06-08T23:02:06Z"
+			"revision": "01c7fd0956dbe3fea61047c330de4c1e06b6427d",
+			"revisionTime": "2017-06-15T21:41:34Z"
 		},
 		{
 			"checksumSHA1": "36UaYid29Kyhrsa5D8N6BoM8dVw=",
 			"path": "github.com/elastic/go-libaudit/rule/flags",
-			"revision": "b2d37f9d37d8e2a81bf69b5fae3c1f49bf6a14bf",
-			"revisionTime": "2017-06-08T23:02:06Z"
+			"revision": "01c7fd0956dbe3fea61047c330de4c1e06b6427d",
+			"revisionTime": "2017-06-15T21:41:34Z"
 		},
 		{
 			"checksumSHA1": "3jizmlZPCyo6FAZY8Trk9jA8NH4=",

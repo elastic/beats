@@ -15,6 +15,7 @@ import (
 // Config defines the kernel metricset's possible configuration options.
 type Config struct {
 	ResolveIDs   bool   `config:"kernel.resolve_ids"`         // Resolve UID/GIDs to names.
+	FailureMode  string `config:"kernel.failure_mode"`        // Failure mode for the kernel (silent, log, panic).
 	BacklogLimit uint32 `config:"kernel.backlog_limit"`       // Max number of message to buffer in the kernel.
 	RateLimit    uint32 `config:"kernel.rate_limit"`          // Rate limit in messages/sec of messages from kernel.
 	RawMessage   bool   `config:"kernel.include_raw_message"` // Include the list of raw audit messages in the event.
@@ -29,8 +30,16 @@ type auditRule struct {
 
 // Validate validates the rules specified in the config.
 func (c Config) Validate() error {
+	var errs multierror.Errors
 	_, err := c.rules()
-	return err
+	if err != nil {
+		errs = append(errs, err)
+	}
+	_, err = c.failureMode()
+	if err != nil {
+		errs = append(errs, err)
+	}
+	return errs.Err()
 }
 
 // Rules returns a list of rules specified in the config.
@@ -77,8 +86,22 @@ func (c Config) rules() ([]auditRule, error) {
 	return auditRules, nil
 }
 
+func (c Config) failureMode() (uint32, error) {
+	switch strings.ToLower(c.FailureMode) {
+	case "silent":
+		return 0, nil
+	case "log":
+		return 1, nil
+	case "panic":
+		return 2, nil
+	default:
+		return 0, errors.Errorf("invalid kernel.failure_mode '%v' (use silent, log, or panic)", c.FailureMode)
+	}
+}
+
 var defaultConfig = Config{
 	ResolveIDs:   true,
+	FailureMode:  "silent",
 	BacklogLimit: 8192,
 	RateLimit:    0,
 	RawMessage:   false,

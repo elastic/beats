@@ -43,6 +43,7 @@ is example showing all configuration options with their default values.
 - module: audit
   metricsets: ["kernel"]
   kernel.resolve_ids: true
+  kernel.failure_mode: silent
   kernel.backlog_limit: 8196
   kernel.rate_limit: 0
   kernel.include_raw_message: false
@@ -51,6 +52,14 @@ is example showing all configuration options with their default values.
 
 *`kernel.resolve_ids`*:: This boolean setting enables the resolution of UIDs and
 GIDs to their associated names. The default value is true.
+
+*`kernel.failure_mode`*:: This determines the kernel's behavior on critical
+failures such as errors sending events to Metricbeat, the backlog limit was
+exceeded, the kernel ran out of memory, or the rate limit was exceeded. The
+options are `silent`, `log`, or `panic`. `silent` basically makes the kernel
+ignore the errors, `log` makes the kernel write the audit messages using
+`printk` so they show up in system's syslog, and `panic` causes the kernel to
+panic to prevent use of the machine. Metricbeat's default is `silent`.
 
 *`kernel.backlog_limit`*:: This controls the maximum number of audit messages
 that will be buffered by kernel.

@@ -44,8 +44,9 @@ func TestData(t *testing.T) {
 
 func getConfig() map[string]interface{} {
 	return map[string]interface{}{
-		"module":     "audit",
-		"metricsets": []string{"kernel"},
+		"module":              "audit",
+		"metricsets":          []string{"kernel"},
+		"kernel.failure_mode": "log",
 		"kernel.audit_rules": `
 		   -w /etc/passwd -p wa -k auth
 		   -a always,exit -F arch=b64 -S execve -k exec

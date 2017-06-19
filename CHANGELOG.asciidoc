@@ -65,8 +65,8 @@ https://github.com/elastic/beats/compare/v6.0.0-alpha1...master[Check the HEAD d
 
 *Metricbeat*
 - Add random startup delay to each metricset to avoid the thundering herd problem. {issue}4010[4010]
-
 - Add the ability to configure audit rules to the kernel module. {pull}4482[4482]
+- Add the ability to configure kernel's audit failure mode. {pull}4516[4516]
 
 *Packetbeat*
 

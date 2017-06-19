@@ -145,9 +145,9 @@ func (ms *MetricSet) initClient() error {
 	}
 	debugf("%v audit status from kernel at start: status=%+v", logPrefix, status)
 
-	if status.Enabled == 0 {
-		if err = ms.client.SetEnabled(true, libaudit.NoWait); err != nil {
-			return errors.Wrap(err, "failed to enable auditing in the kernel")
+	if fm, _ := ms.config.failureMode(); status.Failure != fm {
+		if err = ms.client.SetFailure(libaudit.FailureMode(fm), libaudit.NoWait); err != nil {
+			return errors.Wrap(err, "failed to set audit failure mode in kernel")
 		}
 	}
 
@@ -160,6 +160,12 @@ func (ms *MetricSet) initClient() error {
 	if status.BacklogLimit != ms.config.BacklogLimit {
 		if err = ms.client.SetBacklogLimit(ms.config.BacklogLimit, libaudit.NoWait); err != nil {
 			return errors.Wrap(err, "failed to set audit backlog limit in kernel")
+		}
+	}
+
+	if status.Enabled == 0 {
+		if err = ms.client.SetEnabled(true, libaudit.NoWait); err != nil {
+			return errors.Wrap(err, "failed to enable auditing in the kernel")
 		}
 	}
 
