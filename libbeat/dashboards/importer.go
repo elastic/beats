@@ -79,12 +79,19 @@ func (imp Importer) CreateKibanaIndex() error {
 		if status != 404 {
 			return err
 		} else {
-			_, _, err = imp.client.CreateIndex(imp.cfg.KibanaIndex,
-				common.MapStr{
+			var settings common.MapStr
+			// XXX: this can be removed when the dashboard loaded will no longer need to support 6.0,
+			// because the Kibana API is used instead
+			if strings.HasPrefix(imp.client.GetVersion(), "6.") {
+				settings = common.MapStr{
 					"settings": common.MapStr{
 						"index.mapping.single_type": false,
 					},
-				})
+				}
+			} else {
+				settings = nil
+			}
+			_, _, err = imp.client.CreateIndex(imp.cfg.KibanaIndex, settings)
 			if err != nil {
 				return fmt.Errorf("Failed to create index: %v", err)
 			}
