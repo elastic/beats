@@ -31,6 +31,7 @@ https://github.com/elastic/beats/compare/v6.0.0-alpha1...master[Check the HEAD d
 *Affecting all Beats*
 
 - Don't stop with error loading the ES template if the ES output is not enabled. {pull}4436[4436]
+- Fix race condition in internal logging rotator. {pull}4519[4519]
 
 *Filebeat*
 
