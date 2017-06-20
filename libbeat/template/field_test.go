@@ -12,6 +12,8 @@ func TestField(t *testing.T) {
 	esVersion2, err := NewVersion("2.0.0")
 	assert.NoError(t, err)
 
+	falseVar := false
+
 	tests := []struct {
 		field  Field
 		method func(f Field) common.MapStr
@@ -47,10 +49,17 @@ func TestField(t *testing.T) {
 				"type": "float",
 			},
 		},
+		{
+			field:  Field{Type: "object", Enabled: &falseVar},
+			method: func(f Field) common.MapStr { return f.other() },
+			output: common.MapStr{
+				"type":    "object",
+				"enabled": false,
+			},
+		},
 	}
 
 	for _, test := range tests {
-
 		output := test.method(test.field)
 		assert.Equal(t, test.output, output)
 	}
