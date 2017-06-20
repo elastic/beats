@@ -1,5 +1,6 @@
 sudo: required
 dist: trusty
+group: edge     # in preparation for https://blog.travis-ci.com/2017-06-19-trusty-updates-2017-Q2
 services:
   - docker
 
