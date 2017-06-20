@@ -18,6 +18,7 @@ type Field struct {
 	ScalingFactor int    `config:"scaling_factor"`
 	Fields        Fields `config:"fields"`
 	ObjectType    string `config:"object_type"`
+	Enabled       *bool  `config:"enabled"`
 
 	path      string
 	esVersion Version
@@ -27,19 +28,20 @@ type Field struct {
 // Currently this is:
 // long, geo_point, date, short, byte, float, double, boolean
 func (f *Field) other() common.MapStr {
-	property := getDefaultProperties()
+	property := f.getDefaultProperties()
 	property["type"] = f.Type
+
 	return property
 }
 
 func (f *Field) integer() common.MapStr {
-	property := getDefaultProperties()
+	property := f.getDefaultProperties()
 	property["type"] = "long"
 	return property
 }
 
 func (f *Field) scaledFloat() common.MapStr {
-	property := getDefaultProperties()
+	property := f.getDefaultProperties()
 	property["type"] = "scaled_float"
 
 	if f.esVersion.IsMajor(2) {
@@ -55,7 +57,7 @@ func (f *Field) scaledFloat() common.MapStr {
 }
 
 func (f *Field) halfFloat() common.MapStr {
-	property := getDefaultProperties()
+	property := f.getDefaultProperties()
 	property["type"] = "half_float"
 
 	if f.esVersion.IsMajor(2) {
@@ -65,7 +67,7 @@ func (f *Field) halfFloat() common.MapStr {
 }
 
 func (f *Field) ip() common.MapStr {
-	property := getDefaultProperties()
+	property := f.getDefaultProperties()
 
 	property["type"] = "ip"
 
@@ -78,7 +80,7 @@ func (f *Field) ip() common.MapStr {
 }
 
 func (f *Field) keyword() common.MapStr {
-	property := getDefaultProperties()
+	property := f.getDefaultProperties()
 
 	property["type"] = "keyword"
 	property["ignore_above"] = 1024
@@ -92,7 +94,7 @@ func (f *Field) keyword() common.MapStr {
 }
 
 func (f *Field) text() common.MapStr {
-	property := getDefaultProperties()
+	property := f.getDefaultProperties()
 
 	property["type"] = "text"
 
@@ -115,7 +117,7 @@ func (f *Field) array() common.MapStr {
 func (f *Field) object() common.MapStr {
 
 	if f.ObjectType == "text" {
-		properties := getDefaultProperties()
+		properties := f.getDefaultProperties()
 		properties["type"] = "text"
 
 		if f.esVersion.IsMajor(2) {
@@ -126,7 +128,7 @@ func (f *Field) object() common.MapStr {
 	}
 
 	if f.ObjectType == "long" {
-		properties := getDefaultProperties()
+		properties := f.getDefaultProperties()
 		properties["type"] = "long"
 		f.addDynamicTemplate(properties, "long")
 	}
@@ -159,7 +161,11 @@ func generateKey(key string) string {
 	return key
 }
 
-func getDefaultProperties() common.MapStr {
+func (f *Field) getDefaultProperties() common.MapStr {
 	// Currently no defaults exist
-	return common.MapStr{}
+	property := common.MapStr{}
+	if f.Enabled != nil {
+		property["enabled"] = *f.Enabled
+	}
+	return property
 }
