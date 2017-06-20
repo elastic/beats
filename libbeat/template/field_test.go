@@ -57,6 +57,14 @@ func TestField(t *testing.T) {
 				"enabled": false,
 			},
 		},
+		{
+			field:  Field{Type: "object", Enabled: &falseVar},
+			method: func(f Field) common.MapStr { return f.object() },
+			output: common.MapStr{
+				"type":    "object",
+				"enabled": false,
+			},
+		},
 	}
 
 	for _, test := range tests {
