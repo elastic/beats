@@ -1,5 +1,5 @@
 [[getting-started]]
-== Getting Started with Beats and the Elastic Stack 
+== Getting Started with Beats and the Elastic Stack
 
 Looking for an "ELK tutorial" that shows how to set up the Elastic stack for Beats? You've
 come to the right place. The topics in this section describe how to install and configure
@@ -12,8 +12,8 @@ A regular _Beats setup_ consists of:
  * Kibana for the UI. See <<kibana-installation>>.
  * One or more Beats. You install the Beats on your servers to capture operational data. See <<installing-beats>>.
  * Kibana dashboards for visualizing the data.
- 
-See the https://www.elastic.co/support/matrix[Elastic Support Matrix] for information 
+
+See the https://www.elastic.co/support/matrix[Elastic Support Matrix] for information
 about supported operating systems and product compatibility.
 
 NOTE: To get started, you can install Elasticsearch and Kibana on a
@@ -173,10 +173,10 @@ The simplest architecture for the Beats platform setup consists of one or more B
 Elasticsearch, and Kibana. This architecture is easy to get started
 with and sufficient for networks with low traffic. It also uses the minimum amount of
 servers: a single machine running Elasticsearch and Kibana. The Beats
-insert the transactions directly into the Elasticsearch instance. 
+insert the transactions directly into the Elasticsearch instance.
 
 If you want to perform additional processing or buffering on the data, however,
-you'll want to install Logstash. 
+you'll want to install Logstash.
 
 An important advantage to this approach is that you can
 use Logstash to modify the data captured by Beats in any way you like. You can also
@@ -267,44 +267,17 @@ endif::[]
 ==== Setting Up Logstash
 
 In this setup, the Beat sends events to Logstash. Logstash receives
-these events by using the {logstashdoc}/plugins-inputs-beats.html[Beats input plugin for Logstash] and then sends the transaction to Elasticsearch by using the
-{logstashdoc}/plugins-outputs-elasticsearch.html[Elasticsearch
-output plugin for Logstash]. The Elasticsearch output plugin uses the bulk API, making
-indexing very efficient.
+these events by using the
+{logstashdoc}/plugins-inputs-beats.html[Beats input plugin for Logstash]
+and then sends the transaction to Elasticsearch by using the
+{logstashdoc}/plugins-outputs-elasticsearch.html[Elasticsearch output plugin for Logstash].
+The Elasticsearch output plugin uses the bulk API, making indexing very efficient.
 
-To set up Logstash:
+To set up Logstash, you create a Logstash pipeline configuration file that
+configures Logstash to listen on port 5044 for incoming Beats connections
+and to index into Elasticsearch.  For example, you can save the following
+example configuration to a file called `logstash.conf`:
 
-. Make sure you have the latest compatible version of the Beats input plugin for
-Logstash installed.
-+
-The Beats input plugin requires Logstash 1.5.4 or later. If you are using
-Logstash 1.5.4, you must install the Beats input plugin before applying this
-configuration because the plugin is not shipped with 1.5.4. 
-+
-To install
-the required plugin, run the following command inside the logstash directory
-(for deb and rpm installs, the directory is `/opt/logstash`).
-+
-*deb, rpm, and mac:*
-+
-["source","sh",subs="attributes,callouts"]
-----------------------------------------------------------------------
-./bin/logstash-plugin install logstash-input-beats
-----------------------------------------------------------------------
-+
-*win:*
-+
-["source","sh",subs="attributes,callouts"]
-----------------------------------------------------------------------
-bin\logstash-plugin install logstash-input-beats
-----------------------------------------------------------------------
-
-. Configure Logstash to listen on port 5044 for incoming Beats connections
-and to index into Elasticsearch. You configure Logstash by creating a
-configuration file. For example, you can save the following example configuration
-to a file called `logstash.conf`:
-+
---
 [source,ruby]
 ------------------------------------------------------------------------------
 input {
@@ -312,6 +285,12 @@ input {
     port => 5044
   }
 }
+
+# The filter part of this file is commented out to indicate that it is
+# optional.
+# filter {
+#
+# }
 
 output {
   elasticsearch {
@@ -329,19 +308,21 @@ name to a date based on the Logstash `@timestamp` field. For example:
 <2> `%{[@metadata][type]}` sets the document type based on the value of the `type`
 metadata field.
 
-Logstash uses this configuration to index events in Elasticsearch in the same
-way that the Beat would, but you get additional buffering and other capabilities
-provided by Logstash.
---
+When you run Logstash with this configuration, it indexes events into
+Elasticsearch in the same way that the Beat would, but you get access to other
+capabilities provided by Logstash for collecting, enriching, and transforming
+data. See the {logstashdoc}/introduction.html[Logstash introduction] for more
+information about these capabilities.
 
-To use this setup, you'll also need to configure your Beat to use Logstash. For more information, see the documentation for the Beat.
+To use this setup, you'll also need to configure your Beat to use Logstash.
+For more information, see the documentation for the Beat.
 
 [[logstash-input-update]]
-==== Updating the Beats Input Plugin for Logstash
+===== Updating the Beats Input Plugin for Logstash
 
 Plugins have their own release cycle and are often released independent of
 Logstash’s core release cycle. To ensure that you have the latest version of
-the https://www.elastic.co/guide/en/logstash/current/plugins-inputs-beats.html[Beats input plugin for Logstash], 
+the https://www.elastic.co/guide/en/logstash/current/plugins-inputs-beats.html[Beats input plugin for Logstash],
 run the following command from your Logstash installation:
 
 *deb, rpm, and mac:*
