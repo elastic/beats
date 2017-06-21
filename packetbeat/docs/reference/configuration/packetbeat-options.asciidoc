@@ -211,6 +211,8 @@ packetbeat.flows:
   period: 10s
 ------------------------------------------------------------------------------
 
+See <<flows>> for more information.
+
 ==== Options
 
 You can specify the following options in the `flows` section of the +{beatname_lc}.yml+ config file:
