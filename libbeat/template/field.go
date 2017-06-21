@@ -111,30 +111,31 @@ func (f *Field) text() common.MapStr {
 }
 
 func (f *Field) array() common.MapStr {
-	return common.MapStr{}
+	return f.getDefaultProperties()
 }
 
 func (f *Field) object() common.MapStr {
 
 	if f.ObjectType == "text" {
-		properties := f.getDefaultProperties()
-		properties["type"] = "text"
+		dynProperties := f.getDefaultProperties()
+		dynProperties["type"] = "text"
 
 		if f.esVersion.IsMajor(2) {
-			properties["type"] = "string"
-			properties["index"] = "analyzed"
+			dynProperties["type"] = "string"
+			dynProperties["index"] = "analyzed"
 		}
-		f.addDynamicTemplate(properties, "string")
+		f.addDynamicTemplate(dynProperties, "string")
 	}
 
 	if f.ObjectType == "long" {
-		properties := f.getDefaultProperties()
-		properties["type"] = "long"
-		f.addDynamicTemplate(properties, "long")
+		dynProperties := f.getDefaultProperties()
+		dynProperties["type"] = "long"
+		f.addDynamicTemplate(dynProperties, "long")
 	}
-	return common.MapStr{
-		"properties": common.MapStr{},
-	}
+
+	properties := f.getDefaultProperties()
+	properties["type"] = "object"
+	return properties
 }
 
 func (f *Field) addDynamicTemplate(properties common.MapStr, matchType string) {
