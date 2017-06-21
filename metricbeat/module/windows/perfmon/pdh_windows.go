@@ -80,7 +80,7 @@ func PdhGetFormattedCounterValue(counter PdhCounterHandle, format PdhCounterForm
 	return counterType, &value, nil
 }
 
-func PdhGetFormattedCounterArray(counter PdhCounterHandle, format PdhCounterFormat) (int, *[]PdhCounterValueItem, error) {
+func PdhGetFormattedCounterArray(counter PdhCounterHandle, format PdhCounterFormat) (int, []PdhCounterValueItem, error) {
 	var bufferSize uint32
 	var bufferCount uint32
 
@@ -92,7 +92,7 @@ func PdhGetFormattedCounterArray(counter PdhCounterHandle, format PdhCounterForm
 				return 0, nil, PdhErrno(err.(syscall.Errno))
 			}
 
-			return (int)(bufferCount), &value, nil
+			return (int)(bufferCount), value, nil
 		}
 		return 0, nil, PdhErrno(err.(syscall.Errno))
 	}
@@ -213,8 +213,7 @@ func (q *Query) Values() (map[string]Value, error) {
 			rtn[path] = Value{Num: common.MapStr{}}
 
 			for i := 0; i < count; i++ {
-				data := *values
-				a := (*[1<<30 - 1]uint16)(unsafe.Pointer(data[i].SzName))
+				a := (*[1<<30 - 1]uint16)(unsafe.Pointer(values[i].SzName))
 				size := 0
 				for ; size < len(a); size++ {
 					if a[size] == uint16(0) {
@@ -228,9 +227,9 @@ func (q *Query) Values() (map[string]Value, error) {
 
 				switch counter.format {
 				case PdhFmtDouble:
-					val = *(*float64)(unsafe.Pointer(&data[i].FmtValue.LongValue))
+					val = *(*float64)(unsafe.Pointer(&values[i].FmtValue.LongValue))
 				case PdhFmtLarge:
-					val = *(*int64)(unsafe.Pointer(&data[i].FmtValue.LongValue))
+					val = *(*int64)(unsafe.Pointer(&values[i].FmtValue.LongValue))
 				}
 
 				if m, ok := rtn[path].Num.(common.MapStr); ok {

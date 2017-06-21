@@ -250,7 +250,7 @@ func TestRawValues(t *testing.T) {
 
 func TestWildcardQuery(t *testing.T) {
 	config := make([]CounterConfig, 1)
-	config[0].Alias = "processor.time.pct"
+	config[0].Alias = "processors.time.pct"
 	config[0].Query = `\Processor Information(*)\% Processor Time`
 	config[0].Format = "float"
 	handle, err := NewPerfmonReader(config)
