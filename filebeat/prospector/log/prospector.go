@@ -282,8 +282,8 @@ func getSortInfos(paths map[string]os.FileInfo) []FileSortInfo {
 	return sortInfos
 }
 
-func getSortedFiles(scanOrder string, scanSort string, sortInfos []FileSortInfo) ([]FileSortInfo, string) {
-	var sortFunc func(i, j int) bool = nil
+func getSortedFiles(scanOrder string, scanSort string, sortInfos []FileSortInfo) ([]FileSortInfo, error) {
+	var sortFunc func(i, j int) bool
 	switch scanSort {
 	case "modtime":
 		switch scanOrder {
@@ -296,7 +296,7 @@ func getSortedFiles(scanOrder string, scanSort string, sortInfos []FileSortInfo)
 				return sortInfos[i].info.ModTime().After(sortInfos[j].info.ModTime())
 			}
 		default:
-			return nil, "Unexpected value for scan.order: " + scanOrder
+			return nil, fmt.Errorf("Unexpected value for scan.order: %v", scanOrder)
 		}
 	case "filename":
 		switch scanOrder {
@@ -309,30 +309,30 @@ func getSortedFiles(scanOrder string, scanSort string, sortInfos []FileSortInfo)
 				return strings.Compare(sortInfos[i].info.Name(), sortInfos[j].info.Name()) > 0
 			}
 		default:
-			return nil, "Unexpected value for scan.order: " + scanOrder
+			return nil, fmt.Errorf("Unexpected value for scan.order: %v", scanOrder)
 		}
 	default:
-		return nil, "Unexpected value for scan.sort: " + scanSort
+		return nil, fmt.Errorf("Unexpected value for scan.sort: %v", scanSort)
 	}
 
 	if sortFunc != nil {
 		sort.Slice(sortInfos, sortFunc)
 	}
 
-	return sortInfos, ""
+	return sortInfos, nil
 }
 
-func getFileState(path string, info os.FileInfo, p *Prospector) file.State {
+func getFileState(path string, info os.FileInfo, p *Prospector) (file.State, error) {
 	var err error
 	var absolutePath string
 	absolutePath, err = filepath.Abs(path)
 	if err != nil {
-		logp.Err("could not fetch abs path for file %s: %s", absolutePath, err)
+		return file.State{}, fmt.Errorf("could not fetch abs path for file %s: %s", absolutePath, err)
 	}
 	logp.Debug("prospector", "Check file for harvesting: %s", absolutePath)
 	// Create new state for comparison
 	newState := file.NewState(info, absolutePath, p.config.Type)
-	return newState
+	return newState, nil
 }
 
 func getKeys(paths map[string]os.FileInfo) []string {
@@ -346,21 +346,20 @@ func getKeys(paths map[string]os.FileInfo) []string {
 // Scan starts a scanGlob for each provided path/glob
 func (p *Prospector) scan() {
 
-	var sortInfos []FileSortInfo = nil
-	var files []string = nil
+	var sortInfos []FileSortInfo
+	var files []string
 
 	paths := p.getFiles()
 
-	var err string = ""
+	var err error
 
 	if p.config.ScanSort != "none" {
 		sortInfos, err = getSortedFiles(strings.ToLower(p.config.ScanOrder),
 			strings.ToLower(p.config.ScanSort),
 			getSortInfos(paths))
-	}
-
-	if err != "" {
-		logp.Err(err)
+		if err != nil {
+			logp.Err("Failed to sort files during scan due to error %s", err)
+		}
 	}
 
 	if sortInfos == nil {
@@ -387,7 +386,10 @@ func (p *Prospector) scan() {
 		default:
 		}
 
-		newState := getFileState(path, info, p)
+		newState, err := getFileState(path, info, p)
+		if err != nil {
+			logp.Err("Skipping file %s due to error %s", path, err)
+		}
 
 		// Load last state
 		lastState := p.states.FindPrevious(newState)
