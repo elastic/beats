@@ -17,13 +17,13 @@ func GenExportConfigCmd(name, beatVersion string, beatCreator beat.Creator) *cob
 		Run: func(cmd *cobra.Command, args []string) {
 			b, err := beat.New(name, beatVersion)
 			if err != nil {
-				fmt.Fprintf(os.Stderr, "Error initializing beat")
+				fmt.Fprintf(os.Stderr, "Error initializing beat: %s\n", err)
 				os.Exit(1)
 			}
 
 			err = b.Init()
 			if err != nil {
-				fmt.Fprintf(os.Stderr, "Error initializing beat")
+				fmt.Fprintf(os.Stderr, "Error initializing beat: %s\n", err)
 				os.Exit(1)
 			}
 

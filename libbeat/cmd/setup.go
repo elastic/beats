@@ -1,6 +1,7 @@
 package cmd
 
 import (
+	"fmt"
 	"os"
 
 	"github.com/spf13/cobra"
@@ -20,6 +21,7 @@ func genSetupCmd(name, version string, beatCreator beat.Creator) *cobra.Command 
 		Run: func(cmd *cobra.Command, args []string) {
 			beat, err := beat.New(name, version)
 			if err != nil {
+				fmt.Fprintf(os.Stderr, "Error initializing beat: %s\n", err)
 				os.Exit(1)
 			}
 
