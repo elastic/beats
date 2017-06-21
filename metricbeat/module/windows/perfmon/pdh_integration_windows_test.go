@@ -9,7 +9,6 @@ import (
 
 	mbtest "github.com/elastic/beats/metricbeat/mb/testing"
 
-	"github.com/elastic/beats/libbeat/common"
 	"github.com/pkg/errors"
 	"github.com/stretchr/testify/assert"
 )
@@ -260,7 +259,7 @@ func TestWildcardQuery(t *testing.T) {
 	}
 	defer handle.query.Close()
 
-	values, err := handle.Read()
+	values, _ := handle.Read()
 
 	time.Sleep(time.Millisecond * 1000)
 
@@ -270,18 +269,11 @@ func TestWildcardQuery(t *testing.T) {
 		t.Fatal(err)
 	}
 
-	for k, _ := range values {
-		println(k)
+	pcts, err := values.GetValue("processors.time.pct")
+	if err != nil {
+		t.Fatal(err)
 	}
-
-	if m, n := values["processor"].(common.MapStr); n {
-		if o, p := m["time"].(common.MapStr); p {
-			if q, r := o["pct"].(common.MapStr); r {
-				l := len(q) >= 1
-				assert.True(t, l)
-			}
-		}
-	}
+	assert.NotEmpty(t, pcts)
 
 	t.Log(values)
 }
