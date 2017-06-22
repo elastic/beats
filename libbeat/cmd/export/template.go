@@ -35,10 +35,12 @@ func GenTemplateConfigCmd(name, beatVersion string, beatCreator beat.Creator) *c
 			}
 
 			cfg := template.DefaultConfig
-			err = b.Config.Template.Unpack(&cfg)
-			if err != nil {
-				fmt.Fprintf(os.Stderr, "Error getting template settings: %+v", err)
-				os.Exit(1)
+			if b.Config.Template.Enabled() {
+				err = b.Config.Template.Unpack(&cfg)
+				if err != nil {
+					fmt.Fprintf(os.Stderr, "Error getting template settings: %+v", err)
+					os.Exit(1)
+				}
 			}
 
 			tmpl, err := template.New(b.Info.Version, version, index, cfg.Settings)
@@ -53,7 +55,7 @@ func GenTemplateConfigCmd(name, beatVersion string, beatCreator beat.Creator) *c
 				os.Exit(1)
 			}
 
-			_, err = os.Stdout.WriteString(templateString.StringToPrint())
+			_, err = os.Stdout.WriteString(templateString.StringToPrint() + "\n")
 			if err != nil {
 				fmt.Fprintf(os.Stderr, "Error writing template: %+v", err)
 				os.Exit(1)
