@@ -6,14 +6,14 @@
     - name: cores
       type: long
       description: >
-        The number of CPU cores.
+        The number of CPU cores. The CPU percentages can range from `[0, 100% * cores]`.
 
     - name: user.pct
       type: scaled_float
       format: percent
       description: >
         The percentage of CPU time spent in user space. On multi-core systems, you can have percentages that are greater than 100%.
-        For example, if 3 cores are at 60% use, then the `cpu.user_p` will be 180%.
+        For example, if 3 cores are at 60% use, then the `system.cpu.user.pct` will be 180%.
 
     - name: system.pct
       type: scaled_float
