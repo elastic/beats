@@ -6,7 +6,7 @@ services:
 language: go
 
 go:
-  - 1.6
+  - 1.8.3
 
 os:
   - linux
@@ -27,6 +27,8 @@ addons:
       - python-virtualenv
 
 before_install:
+  - umask 022
+  - chmod -R go-w $GOPATH/src/github.com/elastic/beats
   # Redo the travis setup but with the elastic/libbeat path. This is needed so the package path is correct
   - mkdir -p $HOME/gopath/src/github.com/{github_name}/{beat}/
   - rsync -az ${TRAVIS_BUILD_DIR}/ $HOME/gopath/src/github.com/{github_name}/{beat}/
