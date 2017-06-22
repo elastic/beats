@@ -56,12 +56,12 @@ PYTHON_ENV?=${BUILD_DIR}/python-env
 BUILDID?=$(shell git rev-parse HEAD) ## @Building The build ID
 VIRTUALENV_PARAMS?=
 INTEGRATION_TESTS?=
-CGO?=false ## @building if true, Build with C Go support
 FIND=. ${PYTHON_ENV}/bin/activate; find . -type f -not -path "*/vendor/*" -not -path "*/build/*" -not -path "*/.git/*"
 
 # Cross compiling targets
-TARGETS?="linux/amd64 linux/386 windows/amd64 windows/386 darwin/amd64" ## @building list of platforms/architecture to be built by "make package"
-TARGETS_OLD?="" ## @building list of Debian6 architecture to be built by "make package" when CGO is true
+CGO?=true ## @building if true, Build with C Go support
+TARGETS?="windows/amd64 windows/386 darwin/amd64" ## @building list of platforms/architecture to be built by "make package"
+TARGETS_OLD?="linux/amd64 linux/386" ## @building list of Debian6 architecture to be built by "make package" when CGO is true
 PACKAGES?=${BEAT_NAME}/deb ${BEAT_NAME}/rpm ${BEAT_NAME}/darwin ${BEAT_NAME}/win ${BEAT_NAME}/bin ## @Building List of OS to be supported by "make package"
 SNAPSHOT?=yes ## @Building If yes, builds a snapshot version
 BEATS_BUILDER_IMAGE?=tudorg/beats-builder ## @Building Name of the docker image to use when packaging the application
