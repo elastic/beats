@@ -190,7 +190,7 @@ func GetProcMemPercentage(proc *Process, totalPhyMem uint64) float64 {
 
 	perc := (float64(proc.Mem.Resident) / float64(totalPhyMem))
 
-	return system.Round(perc, .5, 4)
+	return system.Round(perc)
 }
 
 func Pids() ([]int, error) {
@@ -284,7 +284,7 @@ func GetProcCpuPercentage(last *Process, current *Process) float64 {
 		dt := float64(current.Ctime.Sub(last.Ctime).Nanoseconds()) / float64(1e6) // in milliseconds
 		perc := float64(dCPU) / dt
 
-		return system.Round(perc, .5, 4)
+		return system.Round(perc)
 	}
 	return 0
 }
