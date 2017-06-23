@@ -3,11 +3,14 @@
 package cpu
 
 import (
+	"strings"
+
+	"github.com/pkg/errors"
+
 	"github.com/elastic/beats/libbeat/common"
 	"github.com/elastic/beats/metricbeat/mb"
 	"github.com/elastic/beats/metricbeat/mb/parse"
-
-	"github.com/pkg/errors"
+	"github.com/elastic/beats/metricbeat/module/system"
 )
 
 func init() {
@@ -19,79 +22,71 @@ func init() {
 // MetricSet for fetching system CPU metrics.
 type MetricSet struct {
 	mb.BaseMetricSet
-	cpu *CPU
+	config Config
+	cpu    *system.CPUMonitor
 }
 
 // New is a mb.MetricSetFactory that returns a cpu.MetricSet.
 func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
-
-	config := struct {
-		CpuTicks bool `config:"cpu_ticks"` // export CPU usage in ticks
-	}{
-		CpuTicks: false,
-	}
-
+	config := defaultConfig
 	if err := base.Module().UnpackConfig(&config); err != nil {
 		return nil, err
 	}
 
+	if config.CPUTicks != nil && *config.CPUTicks {
+		config.Metrics = append(config.Metrics, "ticks")
+	}
+
 	return &MetricSet{
 		BaseMetricSet: base,
-		cpu: &CPU{
-			CpuTicks: config.CpuTicks,
-		},
+		config:        config,
+		cpu:           new(system.CPUMonitor),
 	}, nil
 }
 
 // Fetch fetches CPU metrics from the OS.
 func (m *MetricSet) Fetch() (common.MapStr, error) {
-
-	stat, err := GetCpuTimes()
+	sample, err := m.cpu.Sample()
 	if err != nil {
-		return nil, errors.Wrap(err, "cpu times")
-	}
-	m.cpu.AddCpuPercentage(stat)
-
-	cpuCores := GetCores()
-
-	cpuStat := common.MapStr{
-		"cores": cpuCores,
-		"user": common.MapStr{
-			"pct": stat.UserPercent,
-		},
-		"system": common.MapStr{
-			"pct": stat.SystemPercent,
-		},
-		"idle": common.MapStr{
-			"pct": stat.IdlePercent,
-		},
-		"iowait": common.MapStr{
-			"pct": stat.IOwaitPercent,
-		},
-		"irq": common.MapStr{
-			"pct": stat.IrqPercent,
-		},
-		"nice": common.MapStr{
-			"pct": stat.NicePercent,
-		},
-		"softirq": common.MapStr{
-			"pct": stat.SoftIrqPercent,
-		},
-		"steal": common.MapStr{
-			"pct": stat.StealPercent,
-		},
+		return nil, errors.Wrap(err, "failed to fetch CPU times")
 	}
 
-	if m.cpu.CpuTicks {
-		cpuStat["user"].(common.MapStr)["ticks"] = stat.User
-		cpuStat["system"].(common.MapStr)["ticks"] = stat.Sys
-		cpuStat["nice"].(common.MapStr)["ticks"] = stat.Nice
-		cpuStat["idle"].(common.MapStr)["ticks"] = stat.Idle
-		cpuStat["iowait"].(common.MapStr)["ticks"] = stat.Wait
-		cpuStat["irq"].(common.MapStr)["ticks"] = stat.Irq
-		cpuStat["softirq"].(common.MapStr)["ticks"] = stat.SoftIrq
-		cpuStat["steal"].(common.MapStr)["ticks"] = stat.Stolen
+	event := common.MapStr{"cores": system.NumCPU}
+
+	for _, metric := range m.config.Metrics {
+		switch strings.ToLower(metric) {
+		case percentages:
+			pct := sample.Percentages()
+			event.Put("user.pct", pct.User)
+			event.Put("system.pct", pct.System)
+			event.Put("idle.pct", pct.Idle)
+			event.Put("iowait.pct", pct.IOWait)
+			event.Put("irq.pct", pct.IRQ)
+			event.Put("nice.pct", pct.Nice)
+			event.Put("softirq.pct", pct.SoftIRQ)
+			event.Put("steal.pct", pct.Steal)
+		case normalizedPercentages:
+			normalizedPct := sample.NormalizedPercentages()
+			event.Put("user.norm.pct", normalizedPct.User)
+			event.Put("system.norm.pct", normalizedPct.System)
+			event.Put("idle.norm.pct", normalizedPct.Idle)
+			event.Put("iowait.norm.pct", normalizedPct.IOWait)
+			event.Put("irq.norm.pct", normalizedPct.IRQ)
+			event.Put("nice.norm.pct", normalizedPct.Nice)
+			event.Put("softirq.norm.pct", normalizedPct.SoftIRQ)
+			event.Put("steal.norm.pct", normalizedPct.Steal)
+		case ticks:
+			ticks := sample.Ticks()
+			event.Put("user.ticks", ticks.User)
+			event.Put("system.ticks", ticks.System)
+			event.Put("idle.ticks", ticks.Idle)
+			event.Put("iowait.ticks", ticks.IOWait)
+			event.Put("irq.ticks", ticks.IRQ)
+			event.Put("nice.ticks", ticks.Nice)
+			event.Put("softirq.ticks", ticks.SoftIRQ)
+			event.Put("steal.ticks", ticks.Steal)
+		}
 	}
 
-	return cpuStat, nil
+	return event, nil
 }

@@ -5,42 +5,36 @@
         "name": "host.example.com"
     },
     "metricset": {
-        "host": "localhost",
         "module": "system",
         "name": "process",
         "rtt": 115
     },
     "system": {
         "process": {
-            "cmdline": "go test -tags=integration github.com/elastic/beats/metricbeat/module/... -data",
+            "cmdline": "/var/folders/8x/rnyk6yxn6w97lddn3bs02gf00000gn/T/go-build935695167/github.com/elastic/beats/metricbeat/module/system/process/_test/process.test -test.v=true -data",
             "cpu": {
-                "start_time": "2016-09-06T07:33:04.000Z",
+                "start_time": "2017-06-23T19:57:04.691Z",
                 "total": {
-                    "pct": 0
+                    "norm": {
+                        "pct": 0.0117
+                    },
+                    "pct": 0.0938
                 }
-            },
-            "fd": {
-                "limit": {
-                    "hard": 1048576,
-                    "soft": 1048576
-                },
-                "open": 4
             },
             "memory": {
                 "rss": {
-                    "bytes": 13770752,
-                    "pct": 0.0016
+                    "bytes": 13565952,
+                    "pct": 0.0008
                 },
-                "share": 6594560,
-                "size": 232972288
+                "share": 0,
+                "size": 570052358144
             },
-            "name": "go",
-            "pgid": 1,
-            "pid": 1,
-            "ppid": 0,
-            "state": "sleeping",
-            "username": "root"
+            "name": "process.test",
+            "pgid": 61828,
+            "pid": 61938,
+            "ppid": 61828,
+            "state": "running",
+            "username": "akroh"
         }
-    },
-    "type": "metricsets"
+    }
 }
