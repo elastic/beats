@@ -126,6 +126,25 @@ func NewEventsFetcher(t testing.TB, config interface{}) mb.EventsFetcher {
 	return fetcher
 }
 
+func NewReportingMetricSet(t testing.TB, config interface{}) mb.ReportingMetricSet {
+	metricSet := newMetricSet(t, config)
+
+	reportingMetricSet, ok := metricSet.(mb.ReportingMetricSet)
+	if !ok {
+		t.Fatal("MetricSet does not implement ReportingMetricSet")
+	}
+
+	return reportingMetricSet
+}
+
+// ReportingFetch runs the given reporting metricset and returns all of the
+// events and errors that occur during that period.
+func ReportingFetch(metricSet mb.ReportingMetricSet) ([]common.MapStr, []error) {
+	r := &capturingReporter{}
+	metricSet.Fetch(r)
+	return r.events, r.errs
+}
+
 // NewPushMetricSet instantiates a new PushMetricSet using the given
 // configuration. The ModuleFactory and MetricSetFactory are obtained from the
 // global Registry.
