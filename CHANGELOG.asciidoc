@@ -8,7 +8,7 @@
 // Template, add newest changes here
 
 === Beats version HEAD
-https://github.com/elastic/beats/compare/v6.0.0-alpha1...master[Check the HEAD diff]
+https://github.com/elastic/beats/compare/v6.0.0-alpha2...master[Check the HEAD diff]
 
 ==== Breaking changes
 
@@ -21,6 +21,10 @@ https://github.com/elastic/beats/compare/v6.0.0-alpha1...master[Check the HEAD d
 *Heartbeat*
 
 *Metricbeat*
+- Change all `system.cpu.*.pct` metrics to be scaled by the number of CPU cores.
+  This will make the CPU usage percentages from the system cpu metricset consistent
+  with the system process metricset. The documentation for these metrics already
+  stated that on multi-core systems the percentages could be greater than 100%. {pull}4544[4544]
 
 *Packetbeat*
 
