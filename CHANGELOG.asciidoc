@@ -8,7 +8,7 @@
 // Template, add newest changes here
 
 === Beats version HEAD
-https://github.com/elastic/beats/compare/v5.4.1...master[Check the HEAD diff]
+https://github.com/elastic/beats/compare/v5.5.0...master[Check the HEAD diff]
 
 ==== Breaking changes
 
@@ -91,6 +91,12 @@ https://github.com/elastic/beats/compare/v5.4.2...v5.5.0[View commits]
 *Affecting all Beats*
 
 - Usage of field `_type` is now ignored and hardcoded to `doc`. {pull}3757[3757]
+
+*Metricbeat*
+- Change all `system.cpu.*.pct` metrics to be scaled by the number of CPU cores.
+  This will make the CPU usage percentages from the system cpu metricset consistent
+  with the system process metricset. The documentation for these metrics already
+  stated that on multi-core systems the percentages could be greater than 100%. {pull}4544[4544]
 
 ==== Bugfixes
 
