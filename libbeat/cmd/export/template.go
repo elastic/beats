@@ -18,11 +18,6 @@ func GenTemplateConfigCmd(name, beatVersion string, beatCreator beat.Creator) *c
 			version, _ := cmd.Flags().GetString("es.version")
 			index, _ := cmd.Flags().GetString("index")
 
-			// Make it compatible with the sem versioning
-			if version == "2x" {
-				version = "2.0.0"
-			}
-
 			b, err := beat.New(name, beatVersion)
 			if err != nil {
 				fmt.Fprintf(os.Stderr, "Error initializing beat: %s\n", err)
