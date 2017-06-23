@@ -7,6 +7,7 @@ const (
 	LogType   = "log"
 	StdinType = "stdin"
 	RedisType = "redis"
+	UdpType   = "udp"
 )
 
 // ValidType of valid input types
@@ -14,6 +15,7 @@ var ValidType = map[string]struct{}{
 	StdinType: {},
 	LogType:   {},
 	RedisType: {},
+	UdpType:   {},
 }
 
 // MatchAny checks if the text matches any of the regular expressions

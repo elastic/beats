@@ -13,6 +13,7 @@ import (
 	"github.com/elastic/beats/filebeat/prospector/log"
 	"github.com/elastic/beats/filebeat/prospector/redis"
 	"github.com/elastic/beats/filebeat/prospector/stdin"
+	"github.com/elastic/beats/filebeat/prospector/udp"
 	"github.com/elastic/beats/libbeat/common"
 	"github.com/elastic/beats/libbeat/logp"
 )
@@ -77,6 +78,8 @@ func (p *Prospector) initProspectorer(outlet channel.Outleter, states []file.Sta
 		prospectorer, err = redis.NewProspector(config, outlet)
 	case harvester.LogType:
 		prospectorer, err = log.NewProspector(config, states, outlet, p.done)
+	case harvester.UdpType:
+		prospectorer, err = udp.NewProspector(config, outlet)
 	default:
 		return fmt.Errorf("invalid prospector type: %v. Change type", p.config.Type)
 	}
