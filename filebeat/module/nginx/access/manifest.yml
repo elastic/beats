@@ -12,6 +12,11 @@ var:
 ingest_pipeline: ingest/default.json
 prospector: config/nginx-access.yml
 
+machine_learning:
+- name: response_code
+  job: machine_learning/response_code.json
+  datafeed: machine_learning/datafeed_response_code.json
+
 requires.processors:
 - name: user_agent
   plugin: ingest-user-agent
