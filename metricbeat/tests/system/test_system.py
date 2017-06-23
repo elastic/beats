@@ -10,15 +10,19 @@ SYSTEM_CPU_FIELDS = ["cores", "idle.pct", "iowait.pct", "irq.pct", "nice.pct",
                      "softirq.pct", "steal.pct", "system.pct", "user.pct"]
 
 SYSTEM_CPU_FIELDS_ALL = ["cores", "idle.pct", "idle.ticks", "iowait.pct", "iowait.ticks", "irq.pct", "irq.ticks", "nice.pct", "nice.ticks",
-                         "softirq.pct", "softirq.ticks", "steal.pct", "steal.ticks", "system.pct", "system.ticks", "user.pct", "user.ticks"]
+                         "softirq.pct", "softirq.ticks", "steal.pct", "steal.ticks", "system.pct", "system.ticks", "user.pct", "user.ticks",
+                         "idle.norm.pct", "iowait.norm.pct", "irq.norm.pct", "nice.norm.pct", "softirq.norm.pct",
+                         "steal.norm.pct", "system.norm.pct", "user.norm.pct"]
 
-SYSTEM_LOAD_FIELDS = ["1", "5", "15", "norm.1", "norm.5", "norm.15"]
+SYSTEM_LOAD_FIELDS = ["cores", "1", "5", "15", "norm.1", "norm.5", "norm.15"]
 
 SYSTEM_CORE_FIELDS = ["id", "idle.pct", "iowait.pct", "irq.pct", "nice.pct",
                       "softirq.pct", "steal.pct", "system.pct", "user.pct"]
 
 SYSTEM_CORE_FIELDS_ALL = SYSTEM_CORE_FIELDS + ["idle.ticks", "iowait.ticks", "irq.ticks", "nice.ticks",
-                                               "softirq.ticks", "steal.ticks", "system.ticks", "user.ticks"]
+                                               "softirq.ticks", "steal.ticks", "system.ticks", "user.ticks",
+                                               "idle.norm.pct", "iowait.norm.pct", "irq.norm.pct", "nice.norm.pct",
+                                               "softirq.norm.pct", "steal.norm.pct", "system.norm.pct", "user.norm.pct"]
 
 SYSTEM_DISKIO_FIELDS = ["name", "read.count", "write.count", "read.bytes",
                         "write.bytes", "read.time", "write.time", "io.time"]
@@ -78,7 +82,7 @@ class Test(metricbeat.BaseTest):
             "metricsets": ["cpu"],
             "period": "5s",
             "extras": {
-                "cpu_ticks": True,
+                "cpu.metrics": ["percentages", "ticks"],
             },
         }])
         proc = self.start_beat()
@@ -127,7 +131,7 @@ class Test(metricbeat.BaseTest):
             "metricsets": ["core"],
             "period": "5s",
             "extras": {
-                "cpu_ticks": True,
+                "core.metrics": ["percentages", "ticks"],
             },
         }])
         proc = self.start_beat()

@@ -6,22 +6,19 @@ package load
 import (
 	"testing"
 
-	"time"
-
 	mbtest "github.com/elastic/beats/metricbeat/mb/testing"
 )
 
 func TestData(t *testing.T) {
 	f := mbtest.NewEventFetcher(t, getConfig())
 
-	// Do a first fetch to have percentages
-	f.Fetch()
-	time.Sleep(1 * time.Second)
-
-	err := mbtest.WriteEvent(f, t)
+	load, err := f.Fetch()
 	if err != nil {
-		t.Fatal("write", err)
+		t.Fatal(err)
 	}
+
+	event := mbtest.CreateFullEvent(f, load)
+	mbtest.WriteEventToDataJSON(t, event)
 }
 
 func getConfig() map[string]interface{} {

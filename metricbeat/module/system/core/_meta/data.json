@@ -11,14 +11,14 @@
     },
     "system": {
         "core": {
-            "id": 0,
+            "id": 1,
             "idle": {
-                "pct": 0.9063,
-                "ticks": 22204290
+                "pct": 0.98,
+                "ticks": 243110733
             },
             "iowait": {
                 "pct": 0,
-                "ticks": 79386
+                "ticks": 0
             },
             "irq": {
                 "pct": 0,
@@ -30,21 +30,20 @@
             },
             "softirq": {
                 "pct": 0,
-                "ticks": 7944
+                "ticks": 0
             },
             "steal": {
                 "pct": 0,
                 "ticks": 0
             },
             "system": {
-                "pct": 0.0208,
-                "ticks": 160489
+                "pct": 0,
+                "ticks": 840906
             },
             "user": {
-                "pct": 0.0729,
-                "ticks": 417331
+                "pct": 0.02,
+                "ticks": 1266791
             }
         }
-    },
-    "type": "metricsets"
+    }
 }

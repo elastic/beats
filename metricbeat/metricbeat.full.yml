@@ -47,8 +47,9 @@ metricbeat.modules:
   period: 10s
   processes: ['.*']
 
-  # if true, exports the CPU usage in ticks, together with the percentage values
-  #cpu_ticks: false
+  # Configure the metric types that are included by these metricsets.
+  cpu.metrics:  ["percentages"]  # The other available options are normalized_percentages and ticks.
+  core.metrics: ["percentages"]  # The other available option is ticks.
 
   # These options allow you to filter out all processes that are not
   # in the top N by CPU or memory, in order to reduce the number of documents created.
