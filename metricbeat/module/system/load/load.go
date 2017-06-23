@@ -56,13 +56,13 @@ func (m *MetricSet) Fetch() (common.MapStr, error) {
 	}
 
 	event := common.MapStr{
-		"1":  system.Round(loadStat.Load1, .5, 4),
-		"5":  system.Round(loadStat.Load5, .5, 4),
-		"15": system.Round(loadStat.Load15, .5, 4),
+		"1":  system.Round(loadStat.Load1),
+		"5":  system.Round(loadStat.Load5),
+		"15": system.Round(loadStat.Load15),
 		"norm": common.MapStr{
-			"1":  system.Round(loadStat.LoadNorm1, .5, 4),
-			"5":  system.Round(loadStat.LoadNorm5, .5, 4),
-			"15": system.Round(loadStat.LoadNorm15, .5, 4),
+			"1":  system.Round(loadStat.LoadNorm1),
+			"5":  system.Round(loadStat.LoadNorm5),
+			"15": system.Round(loadStat.LoadNorm15),
 		},
 	}
 

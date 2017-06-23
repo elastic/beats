@@ -75,7 +75,7 @@ func GetCpuPercentage(last *CpuTimes, current *CpuTimes) *CpuTimes {
 			perc := 0.0
 			delta := int64(field2 - field1)
 			perc = float64(delta) / float64(allDelta)
-			return system.Round(perc*float64(NumCPU), .5, 4)
+			return system.Round(perc * float64(NumCPU))
 		}
 
 		current.UserPercent = calculate(current.Cpu.User, last.Cpu.User)
@@ -100,7 +100,7 @@ func GetCpuPercentageList(last, current []CpuTimes) []CpuTimes {
 			perc := 0.0
 			delta := int64(field2 - field1)
 			perc = float64(delta) / float64(all_delta)
-			return system.Round(perc, .5, 4)
+			return system.Round(perc)
 		}
 
 		for i := 0; i < len(last); i++ {
