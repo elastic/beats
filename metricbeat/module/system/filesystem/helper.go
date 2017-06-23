@@ -61,7 +61,7 @@ func AddFileSystemUsedPercentage(f *FileSystemStat) {
 	}
 
 	perc := float64(f.Used) / float64(f.Total)
-	f.UsedPercent = system.Round(perc, .5, 4)
+	f.UsedPercent = system.Round(perc)
 }
 
 func GetFilesystemEvent(fsStat *FileSystemStat) common.MapStr {
