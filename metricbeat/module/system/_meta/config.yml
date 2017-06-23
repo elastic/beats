@@ -5,11 +5,11 @@
     - cpu
     - load
     - memory
+    - network
+    - process
+    - process_summary
     #- core
     #- diskio
-    - network
-    - process_summary
-    - process
     #- socket
   processes: ['.*']
   process.include_top_n:
