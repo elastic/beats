@@ -1,0 +1,3 @@
+=== aerospike namespace MetricSet
+
+This is the namespace metricset of the module aerospike.

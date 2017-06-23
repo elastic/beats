@@ -12,6 +12,7 @@ This file is generated! See _meta/fields.yml and scripts/generate_field_docs.py
 This document describes the fields that are exported by Metricbeat. They are
 grouped in the following categories:
 
+* <<exported-fields-aerospike>>
 * <<exported-fields-apache>>
 * <<exported-fields-beat>>
 * <<exported-fields-ceph>>
@@ -45,6 +46,307 @@ grouped in the following categories:
 * <<exported-fields-zookeeper>>
 
 --
+[[exported-fields-aerospike]]
+== aerospike Fields
+
+[]experimental
+aerospike Module
+
+
+
+[float]
+== aerospike Fields
+
+
+
+
+[float]
+== namespace Fields
+
+namespace
+
+
+
+[float]
+== client Fields
+
+Client stats.
+
+
+
+[float]
+== delete Fields
+
+Client delete transactions stats.
+
+
+
+[float]
+=== aerospike.namespace.client.delete.error
+
+type: long
+
+Number of client delete transactions that failed with an error.
+
+
+[float]
+=== aerospike.namespace.client.delete.not_found
+
+type: long
+
+Number of client delete transactions that resulted in a not found.
+
+
+[float]
+=== aerospike.namespace.client.delete.success
+
+type: long
+
+Number of successful client delete transactions.
+
+
+[float]
+=== aerospike.namespace.client.delete.timeout
+
+type: long
+
+Number of client delete transactions that timed out.
+
+
+[float]
+== read Fields
+
+Client read transactions stats.
+
+
+
+[float]
+=== aerospike.namespace.client.read.error
+
+type: long
+
+Number of client read transaction errors.
+
+
+[float]
+=== aerospike.namespace.client.read.not_found
+
+type: long
+
+Number of client read transaction that resulted in not found.
+
+
+[float]
+=== aerospike.namespace.client.read.success
+
+type: long
+
+Number of successful client read transactions.
+
+
+[float]
+=== aerospike.namespace.client.read.timeout
+
+type: long
+
+Number of client read transaction that timed out.
+
+
+[float]
+== write Fields
+
+Client write transactions stats.
+
+
+
+[float]
+=== aerospike.namespace.client.write.error
+
+type: long
+
+Number of client write transactions that failed with an error.
+
+
+[float]
+=== aerospike.namespace.client.write.success
+
+type: long
+
+Number of successful client write transactions.
+
+
+[float]
+=== aerospike.namespace.client.write.timeout
+
+type: long
+
+Number of client write transactions that timed out.
+
+
+[float]
+== device Fields
+
+Disk storage stats
+
+
+
+[float]
+=== aerospike.namespace.device.available.pct
+
+type: scaled_float
+
+format: percent
+
+Measures the minimum contiguous disk space across all disks in a namespace.
+
+
+[float]
+=== aerospike.namespace.device.free.pct
+
+type: scaled_float
+
+format: percent
+
+Percentage of disk capacity free for this namespace.
+
+
+[float]
+=== aerospike.namespace.device.total.bytes
+
+type: long
+
+format: bytes
+
+Total bytes of disk space allocated to this namespace on this node.
+
+
+[float]
+=== aerospike.namespace.device.used.bytes
+
+type: long
+
+format: bytes
+
+Total bytes of disk space used by this namespace on this node.
+
+
+[float]
+=== aerospike.namespace.hwm_breached
+
+type: boolean
+
+If true, Aerospike has breached 'high-water-[disk|memory]-pct' for this namespace.
+
+
+[float]
+== memory Fields
+
+Memory storage stats.
+
+
+
+[float]
+=== aerospike.namespace.memory.free.pct
+
+type: scaled_float
+
+format: percent
+
+Percentage of memory capacity free for this namespace on this node.
+
+
+[float]
+=== aerospike.namespace.memory.used.data.bytes
+
+type: long
+
+format: bytes
+
+Amount of memory occupied by data for this namespace on this node.
+
+
+[float]
+=== aerospike.namespace.memory.used.index.bytes
+
+type: long
+
+format: bytes
+
+Amount of memory occupied by the index for this namespace on this node.
+
+
+[float]
+=== aerospike.namespace.memory.used.sindex.bytes
+
+type: long
+
+format: bytes
+
+Amount of memory occupied by secondary indexes for this namespace on this node.
+
+
+[float]
+=== aerospike.namespace.memory.used.total.bytes
+
+type: long
+
+format: bytes
+
+Total bytes of memory used by this namespace on this node.
+
+
+[float]
+=== aerospike.namespace.name
+
+type: keyword
+
+Namespace name
+
+
+[float]
+=== aerospike.namespace.node.host
+
+type: keyword
+
+[float]
+=== aerospike.namespace.node.name
+
+type: keyword
+
+Node name
+
+
+[float]
+== objects Fields
+
+Records stats.
+
+
+
+[float]
+=== aerospike.namespace.objects.master
+
+type: long
+
+Number of records on this node which are active masters.
+
+
+[float]
+=== aerospike.namespace.objects.total
+
+type: long
+
+Number of records in this namespace for this node.
+
+
+[float]
+=== aerospike.namespace.stop_writes
+
+type: boolean
+
+If true this namespace is currently not allowing writes.
+
+
 [[exported-fields-apache]]
 == Apache Fields
 
