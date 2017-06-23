@@ -190,6 +190,10 @@ func (rl *Reloader) Stop() {
 
 func (rl *Reloader) startRunners(list map[uint64]Runner) {
 
+	if len(list) == 0 {
+		return
+	}
+
 	logp.Info("Starting %v runners ...", len(list))
 	for id, runner := range list {
 		runner.Start()
@@ -202,6 +206,11 @@ func (rl *Reloader) startRunners(list map[uint64]Runner) {
 }
 
 func (rl *Reloader) stopRunners(list map[uint64]Runner) {
+
+	if len(list) == 0 {
+		return
+	}
+
 	logp.Info("Stopping %v runners ...", len(list))
 
 	wg := sync.WaitGroup{}
