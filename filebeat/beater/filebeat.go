@@ -1,10 +1,11 @@
 package beater
 
 import (
-	"errors"
 	"flag"
 	"fmt"
 	"sync"
+
+	"github.com/pkg/errors"
 
 	"github.com/elastic/beats/libbeat/beat"
 	"github.com/elastic/beats/libbeat/common"
@@ -67,7 +68,12 @@ func New(b *beat.Beat, rawConfig *common.Config) (beat.Beater, error) {
 	}
 
 	if !config.ConfigProspector.Enabled() && !haveEnabledProspectors {
-		return nil, errors.New("No modules or prospectors enabled and configuration reloading disabled. What files do you want me to watch?")
+		if !b.InSetupCmd {
+			return nil, errors.New("No modules or prospectors enabled and configuration reloading disabled. What files do you want me to watch?")
+		} else {
+			// in the `setup` command, log this only as a warning
+			logp.Warn("Setup called, but no modules enabled.")
+		}
 	}
 
 	if *once && config.ConfigProspector.Enabled() {
@@ -79,12 +85,19 @@ func New(b *beat.Beat, rawConfig *common.Config) (beat.Beater, error) {
 		config:         &config,
 		moduleRegistry: moduleRegistry,
 	}
+
+	// register `setup` callback for ML jobs
+	if !moduleRegistry.Empty() {
+		b.SetupMLCallback = func(b *beat.Beat) error {
+			return fb.loadModulesML(b)
+		}
+	}
 	return fb, nil
 }
 
-// modulesSetup is called when modules are configured to do the initial
+// loadModulesPipelines is called when modules are configured to do the initial
 // setup.
-func (fb *Filebeat) modulesSetup(b *beat.Beat) error {
+func (fb *Filebeat) loadModulesPipelines(b *beat.Beat) error {
 	esConfig := b.Config.Output["elasticsearch"]
 	if esConfig == nil || !esConfig.Enabled() {
 		logp.Warn("Filebeat is unable to load the Ingest Node pipelines for the configured" +
@@ -104,13 +117,31 @@ func (fb *Filebeat) modulesSetup(b *beat.Beat) error {
 	return nil
 }
 
+func (fb *Filebeat) loadModulesML(b *beat.Beat) error {
+	logp.Debug("machine-learning", "Setting up ML jobs for modules")
+
+	esConfig := b.Config.Output["elasticsearch"]
+	if esConfig == nil || !esConfig.Enabled() {
+		logp.Warn("Filebeat is unable to load the Xpack Machine Learning configurations for the" +
+			" modules because the Elasticsearch output is not configured/enabled.")
+		return nil
+	}
+
+	esClient, err := elasticsearch.NewConnectedClient(esConfig)
+	if err != nil {
+		return errors.Errorf("Error creating Elasticsearch client: %v", err)
+	}
+
+	return fb.moduleRegistry.LoadML(esClient)
+}
+
 // Run allows the beater to be run as a beat.
 func (fb *Filebeat) Run(b *beat.Beat) error {
 	var err error
 	config := fb.config
 
 	if !fb.moduleRegistry.Empty() {
-		err = fb.modulesSetup(b)
+		err = fb.loadModulesPipelines(b)
 		if err != nil {
 			return err
 		}

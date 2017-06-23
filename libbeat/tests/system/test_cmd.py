@@ -45,12 +45,11 @@ class TestCommands(BaseTest):
         """
         # Delete any existing template
         try:
-            for t in self.es.cat.templates(h='name').strip().split('\n'):
-                self.es.indices.delete_template(t)
+            self.es.indices.delete_template('mockbeat-*')
         except:
             pass
 
-        assert len(self.es.cat.templates(h='name')) == 0
+        assert len(self.es.cat.templates(name='mockbeat-*', h='name')) == 0
 
         shutil.copy(self.beat_path + "/_meta/config.yml",
                     os.path.join(self.working_dir, "libbeat.yml"))
@@ -66,7 +65,7 @@ class TestCommands(BaseTest):
             config="libbeat.yml")
 
         assert exit_code == 0
-        assert len(self.es.cat.templates(h='name')) > 0
+        assert len(self.es.cat.templates(name='mockbeat-*', h='name')) > 0
 
     @unittest.skipUnless(INTEGRATION_TESTS, "integration test")
     @attr('integration')
