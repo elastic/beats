@@ -7950,7 +7950,7 @@ System status metrics, like CPU and memory usage, that are collected from the op
 [float]
 == core Fields
 
-`system-core` contains local CPU core stats.
+`system-core` contains CPU metrics for a single core of a multi-core system.
 
 
 
@@ -7969,7 +7969,7 @@ type: scaled_float
 
 format: percent
 
-The percentage of CPU time spent in user space. On multi-core systems, you can have percentages that are greater than 100%. For example, if 3 cores are at 60% use, then the `cpu.user_p` will be 180%.
+The percentage of CPU time spent in user space.
 
 
 [float]
@@ -8118,7 +8118,7 @@ The amount of CPU time spent in involuntary wait by the virtual CPU while the hy
 
 type: long
 
-The number of CPU cores. The CPU percentages can range from `[0, 100% * cores]`.
+The number of CPU cores present on the host. The non-normalized percentages will have a maximum value of `100% * cores`. The normalized percentages already take this value into account and have a maximum value of 100%.
 
 
 [float]
@@ -8193,6 +8193,86 @@ The percentage of CPU time spent servicing and handling software interrupts.
 
 [float]
 === system.cpu.steal.pct
+
+type: scaled_float
+
+format: percent
+
+The percentage of CPU time spent in involuntary wait by the virtual CPU while the hypervisor was servicing another processor. Available only on Unix.
+
+
+[float]
+=== system.cpu.user.norm.pct
+
+type: scaled_float
+
+format: percent
+
+The percentage of CPU time spent in user space.
+
+
+[float]
+=== system.cpu.system.norm.pct
+
+type: scaled_float
+
+format: percent
+
+The percentage of CPU time spent in kernel space.
+
+
+[float]
+=== system.cpu.nice.norm.pct
+
+type: scaled_float
+
+format: percent
+
+The percentage of CPU time spent on low-priority processes.
+
+
+[float]
+=== system.cpu.idle.norm.pct
+
+type: scaled_float
+
+format: percent
+
+The percentage of CPU time spent idle.
+
+
+[float]
+=== system.cpu.iowait.norm.pct
+
+type: scaled_float
+
+format: percent
+
+The percentage of CPU time spent in wait (on disk).
+
+
+[float]
+=== system.cpu.irq.norm.pct
+
+type: scaled_float
+
+format: percent
+
+The percentage of CPU time spent servicing and handling hardware interrupts.
+
+
+[float]
+=== system.cpu.softirq.norm.pct
+
+type: scaled_float
+
+format: percent
+
+The percentage of CPU time spent servicing and handling software interrupts.
+
+
+[float]
+=== system.cpu.steal.norm.pct
 
 type: scaled_float
 
@@ -8499,7 +8579,7 @@ Total space (used plus free).
 [float]
 == load Fields
 
-Load averages.
+CPU load averages.
 
 
 
@@ -8532,7 +8612,7 @@ Load average for the last 15 minutes.
 
 type: scaled_float
 
-Load divided by the number of cores for the last minute.
+Load for the last minute divided by the number of cores.
 
 
 [float]
@@ -8540,7 +8620,7 @@ Load divided by the number of cores for the last minute.
 
 type: scaled_float
 
-Load divided by the number of cores for the last 5 minutes.
+Load for the last 5 minutes divided by the number of cores.
 
 
 [float]
@@ -8548,7 +8628,15 @@ Load divided by the number of cores for the last 5 minutes.
 
 type: scaled_float
 
-Load divided by the number of cores for the last 15 minutes.
+Load for the last 15 minutes divided by the number of cores.
+
+
+[float]
+=== system.load.cores
+
+type: long
+
+The number of CPU cores present on the host.
 
 
 [float]
@@ -8867,6 +8955,16 @@ type: scaled_float
 format: percent
 
 The percentage of CPU time spent by the process since the last update. Its value is similar to the %CPU value of the process displayed by the top command on Unix systems.
+
+
+[float]
+=== system.process.cpu.total.norm.pct
+
+type: scaled_float
+
+format: percent
+
+The percentage of CPU time spent by the process since the last event. This value is normalized by the number of CPU cores and it ranges from 0 to 100%.
 
 
 [float]

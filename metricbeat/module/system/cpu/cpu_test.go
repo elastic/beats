@@ -11,21 +11,25 @@ import (
 
 func TestData(t *testing.T) {
 	f := mbtest.NewEventFetcher(t, getConfig())
-
-	// Do a first fetch to have percentages
-	f.Fetch()
+	_, err := f.Fetch()
+	if err != nil {
+		t.Fatal(err)
+	}
 	time.Sleep(1 * time.Second)
 
-	err := mbtest.WriteEvent(f, t)
+	event, err := f.Fetch()
 	if err != nil {
-		t.Fatal("write", err)
+		t.Fatal(err)
 	}
+
+	event = mbtest.CreateFullEvent(f, event)
+	mbtest.WriteEventToDataJSON(t, event)
 }
 
 func getConfig() map[string]interface{} {
 	return map[string]interface{}{
-		"module":     "system",
-		"metricsets": []string{"cpu"},
-		"cpu_ticks":  true,
+		"module":      "system",
+		"metricsets":  []string{"cpu"},
+		"cpu.metrics": []string{"percentages", "normalized_percentages", "ticks"},
 	}
 }
