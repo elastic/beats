@@ -48,7 +48,7 @@ func GenRootCmdWithRunFlags(name, version string, beatCreator beat.Creator, runF
 	rootCmd.Use = name
 
 	rootCmd.RunCmd = genRunCmd(name, version, beatCreator, runFlags)
-	rootCmd.SetupCmd = genSetupCmd(name, version)
+	rootCmd.SetupCmd = genSetupCmd(name, version, beatCreator)
 	rootCmd.VersionCmd = genVersionCmd(name, version)
 	rootCmd.ConfigTest = genConfigTestCmd(name, version, beatCreator)
 

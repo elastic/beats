@@ -190,3 +190,39 @@ class Test(BaseTest):
         assert len(objects) == 1
         o = objects[0]
         assert o["x-pipeline"] == "test-pipeline"
+
+    @unittest.skipIf(not INTEGRATION_TESTS or
+                     os.getenv("TESTING_ENVIRONMENT") == "2x",
+                     "integration test not available on 2.x")
+    def test_setup_machine_learning_nginx(self):
+        """
+        Tests that setup works and loads nginx dashboards.
+        """
+        self.init()
+        # generate a minimal configuration
+        cfgfile = os.path.join(self.working_dir, "filebeat.yml")
+        self.render_config_template(
+            template_name="filebeat_modules",
+            output=cfgfile,
+            index_name=self.index_name,
+            elasticsearch_url=self.elasticsearch_url)
+
+        cmd = [
+            self.filebeat, "-systemTest",
+            "-e", "-d", "*",
+            "-c", cfgfile,
+            "setup", "--modules=nginx", "--machine-learning"]
+
+        output = open(os.path.join(self.working_dir, "output.log"), "ab")
+        output.write(" ".join(cmd) + "\n")
+        subprocess.Popen(cmd,
+                         stdin=None,
+                         stdout=output,
+                         stderr=subprocess.STDOUT,
+                         bufsize=0).wait()
+
+        jobs = self.es.transport.perform_request("GET", "/_xpack/ml/anomaly_detectors/")
+        assert "filebeat-nginx-access-response_code" in (job["job_id"] for job in jobs["jobs"])
+
+        datafeeds = self.es.transport.perform_request("GET", "/_xpack/ml/datafeeds/")
+        assert "filebeat-nginx-access-response_code" in (df["job_id"] for df in datafeeds["datafeeds"])

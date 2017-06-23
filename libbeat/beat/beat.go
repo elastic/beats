@@ -97,6 +97,10 @@ type Beater interface {
 // the beat its run-loop.
 type Creator func(*Beat, *common.Config) (Beater, error)
 
+// SetupMLCallback can be used by the Beat to register MachineLearning configurations
+// for the enabled modules.
+type SetupMLCallback func(*Beat) error
+
 // Beat contains the basic beat data and the publisher client used to publish
 // events.
 type Beat struct {
@@ -104,6 +108,9 @@ type Beat struct {
 	RawConfig *common.Config      // Raw config that can be unpacked to get Beat specific config data.
 	Config    BeatConfig          // Common Beat configuration data.
 	Publisher publisher.Publisher // Publisher
+
+	SetupMLCallback SetupMLCallback // setup callback for ML job configs
+	InSetupCmd      bool            // this is set to true when the `setup` command is called
 }
 
 // BeatConfig struct contains the basic configuration of every beat
@@ -290,6 +297,12 @@ func (b *Beat) launch(bt Creator) error {
 	if err != nil {
 		return err
 	}
+	if b.SetupMLCallback != nil && *setup {
+		err = b.SetupMLCallback(b)
+		if err != nil {
+			return err
+		}
+	}
 
 	logp.Info("%s start running.", b.Info.Beat)
 	defer logp.Info("%s stopped.", b.Info.Beat)
@@ -322,9 +335,18 @@ func (b *Beat) TestConfig(bt Creator) error {
 }
 
 // Setup registers ES index template and kibana dashboards
-func (b *Beat) Setup(template, dashboards bool) error {
+func (b *Beat) Setup(bt Creator, template, dashboards, machineLearning bool) error {
 	return handleError(func() error {
 		err := b.init()
+		if err != nil {
+			return err
+		}
+
+		// Tell the beat that we're in the setup command
+		b.InSetupCmd = true
+
+		// Create beater to give it the opportunity to set loading callbacks
+		_, err = b.createBeater(bt)
 		if err != nil {
 			return err
 		}
@@ -363,6 +385,14 @@ func (b *Beat) Setup(template, dashboards bool) error {
 			}
 
 			fmt.Println("Loaded dashboards")
+		}
+
+		if machineLearning && b.SetupMLCallback != nil {
+			err = b.SetupMLCallback(b)
+			if err != nil {
+				return err
+			}
+			fmt.Println("Loaded machine learning job configurations")
 		}
 
 		return nil
