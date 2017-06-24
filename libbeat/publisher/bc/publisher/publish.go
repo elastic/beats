@@ -32,18 +32,13 @@ type TransactionalEventPublisher interface {
 
 type Publisher interface {
 	Connect() Client
+
+	ConnectX(beat.ClientConfig) (beat.Client, error)
 }
 
 type BeatPublisher struct {
-	shipperName string // Shipper name as set in the configuration file
-	hostname    string // Host name as returned by the operation system
-	name        string // The shipperName if configured, the hostname otherwise
-	version     string
-
-	disabled   bool
-	processors *processors.Processors
-
-	globalEventMetadata common.EventMetadata // Fields and tags to add to each event.
+	disabled bool
+	name     string
 
 	// keep count of clients connected to publisher. A publisher is allowed to
 	// Stop only if all clients have been disconnected
@@ -93,31 +88,24 @@ func (publisher *BeatPublisher) init(
 	processors *processors.Processors,
 ) error {
 	var err error
-	publisher.processors = processors
-
 	publisher.disabled = *publishDisabled
 	if publisher.disabled {
 		logp.Info("Dry run mode. All output types except the file based one are disabled.")
 	}
 
 	shipper.InitShipperConfig()
-	publisher.shipperName = shipper.Name
-	publisher.hostname = beat.Hostname
-	publisher.version = beat.Version
-	if len(publisher.shipperName) > 0 {
-		publisher.name = publisher.shipperName
-	} else {
-		publisher.name = publisher.hostname
+
+	publisher.name = shipper.Name
+	if publisher.name == "" {
+		publisher.name = beat.Hostname
 	}
 
-	publisher.pipeline, err = createPipeline(beat, shipper, outConfig)
+	publisher.pipeline, err = createPipeline(beat, shipper, processors, outConfig)
 	if err != nil {
 		return err
 	}
 
 	logp.Info("Publisher name: %s", publisher.name)
-
-	publisher.globalEventMetadata = shipper.EventMetadata
 	return nil
 }
 
@@ -132,6 +120,10 @@ func (publisher *BeatPublisher) Stop() {
 func (publisher *BeatPublisher) Connect() Client {
 	publisher.numClients.Inc()
 	return newClient(publisher)
+}
+
+func (publisher *BeatPublisher) ConnectX(config beat.ClientConfig) (beat.Client, error) {
+	return publisher.pipeline.ConnectWith(config)
 }
 
 func (publisher *BeatPublisher) GetName() string {

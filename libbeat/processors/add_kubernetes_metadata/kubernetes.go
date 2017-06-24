@@ -11,6 +11,7 @@ import (
 	"github.com/elastic/beats/libbeat/common"
 	"github.com/elastic/beats/libbeat/logp"
 	"github.com/elastic/beats/libbeat/processors"
+	"github.com/elastic/beats/libbeat/publisher/beat"
 
 	"github.com/ericchiang/k8s"
 	"github.com/ghodss/yaml"
@@ -39,7 +40,7 @@ func init() {
 
 }
 
-func newKubernetesAnnotator(cfg common.Config) (processors.Processor, error) {
+func newKubernetesAnnotator(cfg *common.Config) (processors.Processor, error) {
 	logp.Beta("The kubernetes processor is beta")
 
 	config := defaultKuberentesAnnotatorConfig()
@@ -174,7 +175,7 @@ func newKubernetesAnnotator(cfg common.Config) (processors.Processor, error) {
 		watcher := NewPodWatcher(client, &indexers, config.SyncPeriod, config.Host)
 
 		if watcher.Run() {
-			return kubernetesAnnotator{podWatcher: watcher, matchers: &matchers}, nil
+			return &kubernetesAnnotator{podWatcher: watcher, matchers: &matchers}, nil
 		}
 
 		return nil, fatalError
@@ -183,8 +184,8 @@ func newKubernetesAnnotator(cfg common.Config) (processors.Processor, error) {
 	return nil, fatalError
 }
 
-func (k kubernetesAnnotator) Run(event common.MapStr) (common.MapStr, error) {
-	index := k.matchers.MetadataIndex(event)
+func (k *kubernetesAnnotator) Run(event *beat.Event) (*beat.Event, error) {
+	index := k.matchers.MetadataIndex(event.Fields)
 	if index == "" {
 		return event, nil
 	}
@@ -195,20 +196,20 @@ func (k kubernetesAnnotator) Run(event common.MapStr) (common.MapStr, error) {
 	}
 
 	meta := common.MapStr{}
-	metaIface, ok := event["kubernetes"]
+	metaIface, ok := event.Fields["kubernetes"]
 	if !ok {
-		event["kubernetes"] = common.MapStr{}
+		event.Fields["kubernetes"] = common.MapStr{}
 	} else {
 		meta = metaIface.(common.MapStr)
 	}
 
 	meta.Update(metadata)
-	event["kubernetes"] = meta
+	event.Fields["kubernetes"] = meta
 
 	return event, nil
 }
 
-func (k kubernetesAnnotator) String() string { return "add_kubernetes_metadata" }
+func (*kubernetesAnnotator) String() string { return "add_kubernetes_metadata" }
 
 func validate(config kubeAnnotatorConfig) error {
 	if !config.InCluster && config.KubeConfig == "" {

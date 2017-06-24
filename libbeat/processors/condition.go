@@ -10,6 +10,7 @@ import (
 	"github.com/elastic/beats/libbeat/common"
 	"github.com/elastic/beats/libbeat/common/match"
 	"github.com/elastic/beats/libbeat/logp"
+	"github.com/elastic/beats/libbeat/publisher/beat"
 )
 
 type RangeValue struct {
@@ -44,7 +45,7 @@ type WhenProcessor struct {
 func NewConditional(
 	ruleFactory Constructor,
 ) Constructor {
-	return func(cfg common.Config) (Processor, error) {
+	return func(cfg *common.Config) (Processor, error) {
 		rule, err := ruleFactory(cfg)
 		if err != nil {
 			return nil, err
@@ -196,7 +197,7 @@ func (c *Condition) setRange(cfg *ConditionFields) error {
 	return nil
 }
 
-func (c *Condition) Check(event common.MapStr) bool {
+func (c *Condition) Check(event *beat.Event) bool {
 
 	if len(c.or) > 0 {
 		return c.checkOR(event)
@@ -215,8 +216,32 @@ func (c *Condition) Check(event common.MapStr) bool {
 		c.checkRange(event)
 }
 
-func (c *Condition) checkEquals(event common.MapStr) bool {
+func (c *Condition) checkOR(event *beat.Event) bool {
+	for _, cond := range c.or {
+		if cond.Check(event) {
+			return true
+		}
+	}
+	return false
+}
 
+func (c *Condition) checkAND(event *beat.Event) bool {
+	for _, cond := range c.and {
+		if !cond.Check(event) {
+			return false
+		}
+	}
+	return true
+}
+
+func (c *Condition) checkNOT(event *beat.Event) bool {
+	if c.not.Check(event) {
+		return false
+	}
+	return true
+}
+
+func (c *Condition) checkEquals(event *beat.Event) bool {
 	for field, equalValue := range c.equals {
 
 		value, err := event.GetValue(field)
@@ -245,7 +270,7 @@ func (c *Condition) checkEquals(event common.MapStr) bool {
 
 }
 
-func (c *Condition) checkMatches(event common.MapStr) bool {
+func (c *Condition) checkMatches(event *beat.Event) bool {
 	matchers := c.matches.filters
 	if matchers == nil {
 		return true
@@ -284,7 +309,7 @@ func (c *Condition) checkMatches(event common.MapStr) bool {
 	return true
 }
 
-func (c *Condition) checkRange(event common.MapStr) bool {
+func (c *Condition) checkRange(event *beat.Event) bool {
 
 	checkValue := func(value float64, rangeValue RangeValue) bool {
 
@@ -345,34 +370,6 @@ func (c *Condition) checkRange(event common.MapStr) bool {
 			return false
 		}
 
-	}
-	return true
-}
-
-func (c *Condition) checkOR(event common.MapStr) bool {
-
-	for _, cond := range c.or {
-		if cond.Check(event) {
-			return true
-		}
-	}
-	return false
-}
-
-func (c *Condition) checkAND(event common.MapStr) bool {
-
-	for _, cond := range c.and {
-		if !cond.Check(event) {
-			return false
-		}
-	}
-	return true
-}
-
-func (c *Condition) checkNOT(event common.MapStr) bool {
-
-	if c.not.Check(event) {
-		return false
 	}
 	return true
 }
@@ -462,7 +459,7 @@ func NewConditionRule(
 	return &WhenProcessor{cond, p}, nil
 }
 
-func (r *WhenProcessor) Run(event common.MapStr) (common.MapStr, error) {
+func (r *WhenProcessor) Run(event *beat.Event) (*beat.Event, error) {
 	if !r.condition.Check(event) {
 		return event, nil
 	}
@@ -474,7 +471,7 @@ func (r *WhenProcessor) String() string {
 }
 
 func addCondition(
-	cfg common.Config,
+	cfg *common.Config,
 	p Processor,
 ) (Processor, error) {
 	if !cfg.HasField("when") {

@@ -51,6 +51,10 @@ func newSyncClient(pub *BeatPublisher, done <-chan struct{}) (*syncClient, error
 
 func (c *syncClient) onACK(count int) {
 	c.active.count -= count
+	if c.active.count < 0 {
+		panic("negative event count")
+	}
+
 	if c.active.count == 0 {
 		c.active.sig <- struct{}{}
 	}
