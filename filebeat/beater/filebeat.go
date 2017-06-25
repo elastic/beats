@@ -98,8 +98,7 @@ func New(b *beat.Beat, rawConfig *common.Config) (beat.Beater, error) {
 // loadModulesPipelines is called when modules are configured to do the initial
 // setup.
 func (fb *Filebeat) loadModulesPipelines(b *beat.Beat) error {
-	esConfig := b.Config.Output["elasticsearch"]
-	if esConfig == nil || !esConfig.Enabled() {
+	if b.Config.Output.Name() != "elasticsearch" {
 		logp.Warn("Filebeat is unable to load the Ingest Node pipelines for the configured" +
 			" modules because the Elasticsearch output is not configured/enabled. If you have" +
 			" already loaded the Ingest Node pipelines or are using Logstash pipelines, you" +
@@ -120,13 +119,13 @@ func (fb *Filebeat) loadModulesPipelines(b *beat.Beat) error {
 func (fb *Filebeat) loadModulesML(b *beat.Beat) error {
 	logp.Debug("machine-learning", "Setting up ML jobs for modules")
 
-	esConfig := b.Config.Output["elasticsearch"]
-	if esConfig == nil || !esConfig.Enabled() {
+	if b.Config.Output.Name() != "elasticsearch" {
 		logp.Warn("Filebeat is unable to load the Xpack Machine Learning configurations for the" +
 			" modules because the Elasticsearch output is not configured/enabled.")
 		return nil
 	}
 
+	esConfig := b.Config.Output.Config()
 	esClient, err := elasticsearch.NewConnectedClient(esConfig)
 	if err != nil {
 		return errors.Errorf("Error creating Elasticsearch client: %v", err)

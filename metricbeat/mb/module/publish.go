@@ -4,7 +4,7 @@ import (
 	"sync"
 
 	"github.com/elastic/beats/libbeat/common"
-	"github.com/elastic/beats/libbeat/publisher"
+	"github.com/elastic/beats/libbeat/publisher/bc/publisher"
 )
 
 // PublishChannels publishes the events read from each channel to the given

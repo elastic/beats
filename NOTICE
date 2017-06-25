@@ -3042,7 +3042,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 --------------------------------------------------------------------
 Dependency: github.com/urso/go-structform
-Revision: 12cbde40ef8e75dd5ead25c50333262463a89574
+Revision: fc6abfdbae53e185870094bc210b42a0f65f6176
 License type (autodetected): Apache License 2.0
 ./vendor/github.com/urso/go-structform/LICENSE:
 --------------------------------------------------------------------

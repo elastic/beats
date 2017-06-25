@@ -4,23 +4,24 @@ import (
 	"fmt"
 	"sync"
 	"sync/atomic"
-	"time"
 
 	"github.com/Shopify/sarama"
 
-	"github.com/elastic/beats/libbeat/common"
 	"github.com/elastic/beats/libbeat/common/fmtstr"
 	"github.com/elastic/beats/libbeat/logp"
 	"github.com/elastic/beats/libbeat/monitoring"
 	"github.com/elastic/beats/libbeat/outputs"
+	"github.com/elastic/beats/libbeat/outputs/codec"
 	"github.com/elastic/beats/libbeat/outputs/outil"
+	"github.com/elastic/beats/libbeat/publisher"
 )
 
 type client struct {
 	hosts  []string
 	topic  outil.Selector
 	key    *fmtstr.EventFormatString
-	codec  outputs.Codec
+	index  string
+	codec  codec.Codec
 	config sarama.Config
 
 	producer sarama.AsyncProducer
@@ -31,39 +32,41 @@ type client struct {
 type msgRef struct {
 	count  int32
 	total  int
-	failed []outputs.Data
-	cb     func([]outputs.Data, error)
+	failed []publisher.Event
+	batch  publisher.Batch
 
 	err error
 }
 
 var (
-	ackedEvents            = monitoring.NewInt(outputs.Metrics, "kafka.events.acked")
-	eventsNotAcked         = monitoring.NewInt(outputs.Metrics, "kafka.events.not_acked")
-	publishEventsCallCount = monitoring.NewInt(outputs.Metrics, "kafka.publishEvents.call.count")
+	kafkaMetrics = outputs.Metrics.NewRegistry("kafka")
+
+	ackedEvents            = monitoring.NewInt(kafkaMetrics, "events.acked")
+	eventsNotAcked         = monitoring.NewInt(kafkaMetrics, "events.not_acked")
+	publishEventsCallCount = monitoring.NewInt(kafkaMetrics, "publishEvents.call.count")
 )
 
 func newKafkaClient(
 	hosts []string,
+	index string,
 	key *fmtstr.EventFormatString,
 	topic outil.Selector,
-	writer outputs.Codec,
+	writer codec.Codec,
 	cfg *sarama.Config,
 ) (*client, error) {
 	c := &client{
 		hosts:  hosts,
 		topic:  topic,
 		key:    key,
+		index:  index,
 		codec:  writer,
 		config: *cfg,
 	}
 	return c, nil
 }
 
-func (c *client) Connect(timeout time.Duration) error {
+func (c *client) Connect() error {
 	debugf("connect: %v", c.hosts)
-
-	c.config.Net.DialTimeout = timeout
 
 	// try to connect
 	producer, err := sarama.NewAsyncProducer(c.hosts, &c.config)
@@ -90,42 +93,30 @@ func (c *client) Close() error {
 	return nil
 }
 
-func (c *client) AsyncPublishEvent(
-	cb func(error),
-	data outputs.Data,
-) error {
-	return c.AsyncPublishEvents(func(_ []outputs.Data, err error) {
-		cb(err)
-	}, []outputs.Data{data})
-}
-
-func (c *client) AsyncPublishEvents(
-	cb func([]outputs.Data, error),
-	data []outputs.Data,
-) error {
+func (c *client) Publish(batch publisher.Batch) error {
 	publishEventsCallCount.Add(1)
 	debugf("publish events")
 
+	events := batch.Events()
+
 	ref := &msgRef{
-		count:  int32(len(data)),
-		total:  len(data),
+		count:  int32(len(events)),
+		total:  len(events),
 		failed: nil,
-		cb:     cb,
+		batch:  batch,
 	}
 
 	ch := c.producer.Input()
-
-	for i := range data {
-		d := &data[i]
-
+	for i := range events {
+		d := &events[i]
 		msg, err := c.getEventMessage(d)
 		if err != nil {
 			logp.Err("Dropping event: %v", err)
 			ref.done()
 			continue
 		}
-		msg.ref = ref
 
+		msg.ref = ref
 		msg.initProducerMessage()
 		ch <- &msg.msg
 	}
@@ -133,40 +124,47 @@ func (c *client) AsyncPublishEvents(
 	return nil
 }
 
-func (c *client) getEventMessage(data *outputs.Data) (*message, error) {
-	event := data.Event
-	msg := messageFromData(data)
-	if msg.topic != "" {
-		return msg, nil
+func (c *client) getEventMessage(data *publisher.Event) (*message, error) {
+	event := &data.Content
+	msg := &message{partition: -1, data: *data}
+	if event.Meta != nil {
+		if value, ok := event.Meta["partition"]; ok {
+			if partition, ok := value.(int32); ok {
+				msg.partition = partition
+			}
+		}
+
+		if value, ok := event.Meta["topic"]; ok {
+			if topic, ok := value.(string); ok {
+				msg.topic = topic
+			}
+		}
+	}
+	if msg.topic == "" {
+		topic, err := c.topic.Select(event)
+		if err != nil {
+			return nil, fmt.Errorf("setting kafka topic failed with %v", err)
+		}
+		msg.topic = topic
+		if event.Meta == nil {
+			event.Meta = map[string]interface{}{}
+		}
+		event.Meta["topic"] = topic
 	}
 
-	msg.data = *data
-
-	topic, err := c.topic.Select(event)
-	if err != nil {
-		return nil, fmt.Errorf("setting kafka topic failed with %v", err)
-	}
-	msg.topic = topic
-
-	serializedEvent, err := c.codec.Encode(event)
+	serializedEvent, err := c.codec.Encode(c.index, event)
 	if err != nil {
 		return nil, err
 	}
 
-	msg.value = serializedEvent
+	buf := make([]byte, len(serializedEvent))
+	copy(buf, serializedEvent)
+	msg.value = buf
 
 	// message timestamps have been added to kafka with version 0.10.0.0
-	var ts time.Time
 	if c.config.Version.IsAtLeast(sarama.V0_10_0_0) {
-		if tsRaw, ok := event["@timestamp"]; ok {
-			if tmp, ok := tsRaw.(common.Time); ok {
-				ts = time.Time(tmp)
-			} else if tmp, ok := tsRaw.(time.Time); ok {
-				ts = tmp
-			}
-		}
+		msg.ts = event.Timestamp
 	}
-	msg.ts = ts
 
 	if c.key != nil {
 		if key, err := c.key.RunBytes(event); err == nil {
@@ -230,6 +228,7 @@ func (r *msgRef) dec() {
 	if err != nil {
 		failed := len(r.failed)
 		success := r.total - failed
+		r.batch.RetryEvents(r.failed)
 
 		eventsNotAcked.Add(int64(failed))
 		if success > 0 {
@@ -238,10 +237,10 @@ func (r *msgRef) dec() {
 		}
 
 		debugf("Kafka publish failed with: %v", err)
-		r.cb(r.failed, err)
 	} else {
+		r.batch.ACK()
+
 		ackedEvents.Add(int64(r.total))
 		outputs.AckedEvents.Add(int64(r.total))
-		r.cb(nil, nil)
 	}
 }

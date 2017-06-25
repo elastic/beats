@@ -9,25 +9,19 @@ import (
 
 	"github.com/Shopify/sarama"
 	gometrics "github.com/rcrowley/go-metrics"
-	"github.com/rcrowley/go-metrics/exp"
 
 	"github.com/elastic/beats/libbeat/common"
-	"github.com/elastic/beats/libbeat/common/op"
 	"github.com/elastic/beats/libbeat/logp"
 	"github.com/elastic/beats/libbeat/monitoring"
 	"github.com/elastic/beats/libbeat/monitoring/adapter"
 	"github.com/elastic/beats/libbeat/outputs"
-	"github.com/elastic/beats/libbeat/outputs/mode"
-	"github.com/elastic/beats/libbeat/outputs/mode/modeutil"
+	"github.com/elastic/beats/libbeat/outputs/codec"
 	"github.com/elastic/beats/libbeat/outputs/outil"
 )
 
 type kafka struct {
 	config kafkaConfig
 	topic  outil.Selector
-
-	modeRetry      mode.ConnectionMode
-	modeGuaranteed mode.ConnectionMode
 
 	partitioner sarama.PartitionerConstructor
 }
@@ -40,25 +34,8 @@ const (
 	defaultMaxWaitRetry = 60 * time.Second
 )
 
-var kafkaMetricsRegistryInstance gometrics.Registry
-
-func init() {
-	sarama.Logger = kafkaLogger{}
-
-	reg := gometrics.NewPrefixedRegistry("libbeat.kafka.")
-
-	// Note: registers /debug/metrics handler for displaying all expvar counters
-	exp.Exp(reg)
-	kafkaMetricsRegistryInstance = reg
-
-	outputs.RegisterOutputPlugin("kafka", New)
-}
-
 var kafkaMetricsOnce sync.Once
-
-func kafkaMetricsRegistry() gometrics.Registry {
-	return kafkaMetricsRegistryInstance
-}
+var kafkaMetricsRegistryInstance gometrics.Registry
 
 var debugf = logp.MakeDebug("kafka")
 
@@ -99,27 +76,30 @@ var (
 	}
 )
 
-// New instantiates a new kafka output instance.
-func New(_ common.BeatInfo, cfg *common.Config) (outputs.Outputer, error) {
-	output := &kafka{}
-	err := output.init(cfg)
-	if err != nil {
-		return nil, err
-	}
-	return output, nil
+func init() {
+	sarama.Logger = kafkaLogger{}
+
+	reg := gometrics.NewPrefixedRegistry("libbeat.kafka.")
+
+	// Note: registers /debug/metrics handler for displaying all expvar counters
+	// TODO: enable
+	//exp.Exp(reg)
+
+	kafkaMetricsRegistryInstance = reg
+
+	outputs.RegisterType("kafka", makeKafka)
 }
 
-func (k *kafka) init(cfg *common.Config) error {
+func kafkaMetricsRegistry() gometrics.Registry {
+	return kafkaMetricsRegistryInstance
+}
+
+func makeKafka(beat common.BeatInfo, cfg *common.Config) (outputs.Group, error) {
 	debugf("initialize kafka output")
 
 	config := defaultConfig
 	if err := cfg.Unpack(&config); err != nil {
-		return err
-	}
-
-	// validate codec
-	if _, err := outputs.CreateEncoder(config.Codec); err != nil {
-		return err
+		return outputs.Fail(err)
 	}
 
 	topic, err := outil.BuildSelectorFromConfig(cfg, outil.Settings{
@@ -129,162 +109,42 @@ func (k *kafka) init(cfg *common.Config) error {
 		FailEmpty:        true,
 	})
 	if err != nil {
-		return err
+		return outputs.Fail(err)
 	}
 
-	partitioner, err := makePartitioner(config.Partition)
+	libCfg, err := newKafkaConfig(&config)
 	if err != nil {
-		return err
+		return outputs.Fail(err)
 	}
 
-	k.config = config
-	k.partitioner = partitioner
-	k.topic = topic
-
-	// validate config one more time
-	_, err = k.newKafkaConfig()
+	hosts, err := outputs.ReadHostList(cfg)
 	if err != nil {
-		return err
+		return outputs.Fail(err)
 	}
 
-	return nil
-}
-
-func (k *kafka) initMode(guaranteed bool) (mode.ConnectionMode, error) {
-	libCfg, err := k.newKafkaConfig()
+	codec, err := codec.CreateEncoder(config.Codec)
 	if err != nil {
-		return nil, err
+		return outputs.Fail(err)
 	}
 
-	if guaranteed {
-		libCfg.Producer.Retry.Max = 1000
-	}
-
-	worker := 1
-	if k.config.Worker > 1 {
-		worker = k.config.Worker
-	}
-
-	var clients []mode.AsyncProtocolClient
-	hosts := k.config.Hosts
-	topic := k.topic
-
-	for i := 0; i < worker; i++ {
-		codec, err := outputs.CreateEncoder(k.config.Codec)
-		if err != nil {
-			return nil, err
-		}
-
-		client, err := newKafkaClient(hosts, k.config.Key, topic, codec, libCfg)
-		if err != nil {
-			logp.Err("Failed to create kafka client: %v", err)
-			return nil, err
-		}
-		clients = append(clients, client)
-	}
-
-	maxAttempts := 1
-	if guaranteed {
-		maxAttempts = 0
-	}
-
-	mode, err := modeutil.NewAsyncConnectionMode(clients, modeutil.Settings{
-		Failover:     false,
-		MaxAttempts:  maxAttempts,
-		WaitRetry:    defaultWaitRetry,
-		Timeout:      libCfg.Net.WriteTimeout,
-		MaxWaitRetry: defaultMaxWaitRetry,
-	})
+	client, err := newKafkaClient(hosts, beat.Beat, config.Key, topic, codec, libCfg)
 	if err != nil {
-		logp.Err("Failed to configure kafka connection: %v", err)
-		return nil, err
-	}
-	return mode, nil
-}
-
-func (k *kafka) getMode(opts outputs.Options) (mode.ConnectionMode, error) {
-	var err error
-	guaranteed := opts.Guaranteed || k.config.MaxRetries == -1
-	if guaranteed {
-		if k.modeGuaranteed == nil {
-			k.modeGuaranteed, err = k.initMode(true)
-		}
-		return k.modeGuaranteed, err
+		return outputs.Fail(err)
 	}
 
-	if k.modeRetry == nil {
-		k.modeRetry, err = k.initMode(false)
+	retry := 0
+	if config.MaxRetries < 0 {
+		retry = -1
 	}
-	return k.modeRetry, err
-}
-
-func (k *kafka) Close() error {
-	var err error
-
-	if k.modeGuaranteed != nil {
-		err = k.modeGuaranteed.Close()
-	}
-	if k.modeRetry != nil {
-		tmp := k.modeRetry.Close()
-		if err == nil {
-			err = tmp
-		}
-	}
-	return err
-}
-
-func (k *kafka) PublishEvent(
-	signal op.Signaler,
-	opts outputs.Options,
-	data outputs.Data,
-) error {
-	mode, err := k.getMode(opts)
-	if err != nil {
-		return err
-	}
-	return mode.PublishEvent(signal, opts, data)
-}
-
-func (k *kafka) BulkPublish(
-	signal op.Signaler,
-	opts outputs.Options,
-	data []outputs.Data,
-) error {
-	mode, err := k.getMode(opts)
-	if err != nil {
-		return err
-	}
-	return mode.PublishEvents(signal, opts, data)
-}
-
-func (k *kafka) PublishEvents(
-	signal op.Signaler,
-	opts outputs.Options,
-	data []outputs.Data,
-) error {
-	return k.BulkPublish(signal, opts, data)
-}
-
-func (k *kafka) newKafkaConfig() (*sarama.Config, error) {
-	cfg, err := newKafkaConfig(&k.config)
-	if err != nil {
-		return nil, err
-	}
-
-	cfg.Producer.Partitioner = k.partitioner
-
-	// TODO: figure out which metrics we want to collect
-	cfg.MetricRegistry = adapter.GetGoMetrics(
-		monitoring.Default,
-		"libbeat.output.kafka",
-		adapter.Rename("incoming-byte-rate", "bytes_read"),
-		adapter.Rename("outgoing-byte-rate", "bytes_write"),
-		adapter.GoMetricsNilify,
-	)
-	return cfg, nil
+	return outputs.Success(config.BulkMaxSize, retry, client)
 }
 
 func newKafkaConfig(config *kafkaConfig) (*sarama.Config, error) {
+	partitioner, err := makePartitioner(config.Partition)
+	if err != nil {
+		return nil, err
+	}
+
 	k := sarama.NewConfig()
 
 	// configure network level properties
@@ -357,5 +217,15 @@ func newKafkaConfig(config *kafkaConfig) (*sarama.Config, error) {
 	k.Version = version
 
 	k.MetricRegistry = kafkaMetricsRegistry()
+
+	k.Producer.Partitioner = partitioner
+	k.MetricRegistry = adapter.GetGoMetrics(
+		monitoring.Default,
+		"libbeat.outputs.kafka",
+		adapter.Rename("incoming-byte-rate", "bytes_read"),
+		adapter.Rename("outgoing-byte-rate", "bytes_write"),
+		adapter.GoMetricsNilify,
+	)
+
 	return k, nil
 }

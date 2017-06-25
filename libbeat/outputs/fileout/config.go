@@ -4,15 +4,15 @@ import (
 	"fmt"
 
 	"github.com/elastic/beats/libbeat/logp"
-	"github.com/elastic/beats/libbeat/outputs"
+	"github.com/elastic/beats/libbeat/outputs/codec"
 )
 
 type config struct {
-	Path          string              `config:"path"`
-	Filename      string              `config:"filename"`
-	RotateEveryKb int                 `config:"rotate_every_kb" validate:"min=1"`
-	NumberOfFiles int                 `config:"number_of_files"`
-	Codec         outputs.CodecConfig `config:"codec"`
+	Path          string       `config:"path"`
+	Filename      string       `config:"filename"`
+	RotateEveryKb int          `config:"rotate_every_kb" validate:"min=1"`
+	NumberOfFiles int          `config:"number_of_files"`
+	Codec         codec.Config `config:"codec"`
 }
 
 var (

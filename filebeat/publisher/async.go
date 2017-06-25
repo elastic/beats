@@ -7,7 +7,7 @@ import (
 
 	"github.com/elastic/beats/filebeat/util"
 	"github.com/elastic/beats/libbeat/logp"
-	"github.com/elastic/beats/libbeat/publisher"
+	"github.com/elastic/beats/libbeat/publisher/bc/publisher"
 )
 
 type asyncLogPublisher struct {

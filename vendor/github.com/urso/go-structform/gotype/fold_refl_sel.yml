@@ -16,3 +16,15 @@ main: |
   func getReflectFoldPrimitive(t reflect.Type) reFoldFn {
     return _reflPrimitivesMapping[t]
   }
+
+  func getReflectFoldPrimitiveKind(t reflect.Type) (reFoldFn, error) {
+    switch t.Kind() {
+    {{ range data.primitiveTypes }}
+      {{ $t := capitalize . }}
+      case reflect.{{ $t }}:
+        return reFold{{ $t }}, nil
+    {{ end }}
+    default:
+      return nil, errUnsupported
+    }
+  }

@@ -1,0 +1,16 @@
+followup:
+---------
+- make broker configurable
+- elasticsearch output update:
+  - replace json reader with go-structform on struct
+- update processors to operate on beat.Event
+- move package pipeline go files to libbeat/publisher if possible
+- '@metadata' accessor from withing fmtstr
+- remove publisher/bc package
+
+PR notes:
+---------
+- add note on elasitcsearch output:
+  remove output_test.go, as with new reduced interfaces tests will give us redundant tests in client_integration_test 
+- describe logstash json encoding
+- PR restricts output configuration to exactly one output
