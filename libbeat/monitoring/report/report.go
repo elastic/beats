@@ -34,7 +34,7 @@ func RegisterReporterFactory(name string, f ReporterFactory) {
 func New(
 	beat common.BeatInfo,
 	cfg *common.Config,
-	outputs map[string]*common.Config,
+	outputs common.ConfigNamespace,
 ) (Reporter, error) {
 	name, cfg, err := getReporterConfig(cfg, outputs)
 	if err != nil {
@@ -51,7 +51,7 @@ func New(
 
 func getReporterConfig(
 	cfg *common.Config,
-	outputs map[string]*common.Config,
+	outputs common.ConfigNamespace,
 ) (string, *common.Config, error) {
 	cfg = collectSubObject(cfg)
 	config := defaultConfig
@@ -66,7 +66,7 @@ func getReporterConfig(
 		rc := config.Reporter.Config()
 
 		// merge reporter config with output config if both are present
-		if outCfg := outputs[name]; outCfg != nil {
+		if outCfg := outputs.Config(); outputs.Name() == name && outCfg != nil {
 			// require monitoring to not configure any hosts if output is configured:
 			hosts := struct {
 				Hosts []string `config:"hosts"`
@@ -91,25 +91,14 @@ func getReporterConfig(
 	}
 
 	// find output also available for reporting telemetry.
-	// Fail if multiple potential reporters have been found
-	var found string
-	for name := range outputs {
-		if reportFactories[name] == nil {
-			continue
+	if outputs.IsSet() {
+		name := outputs.Name()
+		if reportFactories[name] != nil {
+			return name, outputs.Config(), nil
 		}
-
-		if found != "" {
-			err := fmt.Errorf("multiple potential monitoring reporters found (for example %v and %v)", found, name)
-			return "", nil, err
-		}
-		found = name
 	}
 
-	if found == "" {
-		return "", nil, errors.New("No monitoring reporter configured")
-	}
-
-	return found, outputs[found], nil
+	return "", nil, errors.New("No monitoring reporter configured")
 }
 
 func collectSubObject(cfg *common.Config) *common.Config {

@@ -3,7 +3,6 @@ package elasticsearch
 import (
 	"encoding/json"
 
-	"github.com/elastic/beats/libbeat/logp"
 	"github.com/pkg/errors"
 )
 
@@ -40,15 +39,6 @@ type Hits struct {
 type CountResults struct {
 	Count  int             `json:"count"`
 	Shards json.RawMessage `json:"_shards"`
-}
-
-func (r QueryResult) String() string {
-	out, err := json.Marshal(r)
-	if err != nil {
-		logp.Warn("failed to marshal QueryResult (%v): %#v", err, r)
-		return "ERROR"
-	}
-	return string(out)
 }
 
 func withQueryResult(status int, resp []byte, err error) (int, *QueryResult, error) {

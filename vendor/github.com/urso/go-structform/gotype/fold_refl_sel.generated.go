@@ -65,3 +65,53 @@ var _reflPrimitivesMapping = map[reflect.Type]reFoldFn{
 func getReflectFoldPrimitive(t reflect.Type) reFoldFn {
 	return _reflPrimitivesMapping[t]
 }
+
+func getReflectFoldPrimitiveKind(t reflect.Type) (reFoldFn, error) {
+	switch t.Kind() {
+
+	case reflect.Bool:
+		return reFoldBool, nil
+
+	case reflect.String:
+		return reFoldString, nil
+
+	case reflect.Uint:
+		return reFoldUint, nil
+
+	case reflect.Uint8:
+		return reFoldUint8, nil
+
+	case reflect.Uint16:
+		return reFoldUint16, nil
+
+	case reflect.Uint32:
+		return reFoldUint32, nil
+
+	case reflect.Uint64:
+		return reFoldUint64, nil
+
+	case reflect.Int:
+		return reFoldInt, nil
+
+	case reflect.Int8:
+		return reFoldInt8, nil
+
+	case reflect.Int16:
+		return reFoldInt16, nil
+
+	case reflect.Int32:
+		return reFoldInt32, nil
+
+	case reflect.Int64:
+		return reFoldInt64, nil
+
+	case reflect.Float32:
+		return reFoldFloat32, nil
+
+	case reflect.Float64:
+		return reFoldFloat64, nil
+
+	default:
+		return nil, errUnsupported
+	}
+}

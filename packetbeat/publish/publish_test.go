@@ -7,7 +7,7 @@ import (
 	"time"
 
 	"github.com/elastic/beats/libbeat/common"
-	"github.com/elastic/beats/libbeat/publisher"
+	"github.com/elastic/beats/libbeat/publisher/bc/publisher"
 	"github.com/stretchr/testify/assert"
 )
 
@@ -62,8 +62,9 @@ func TestFilterEvent(t *testing.T) {
 }
 
 func TestDirectionOut(t *testing.T) {
-	publisher := newTestPublisher([]string{"192.145.2.4"})
+	publisher := newTestPublisher()
 	ppub, _ := NewPublisher(publisher, 1000, 1, false)
+	ppub.localIPs = []string{"192.145.2.4"}
 
 	event := common.MapStr{
 		"src": &common.Endpoint{
@@ -88,8 +89,9 @@ func TestDirectionOut(t *testing.T) {
 }
 
 func TestDirectionIn(t *testing.T) {
-	publisher := newTestPublisher([]string{"192.145.2.5"})
+	publisher := newTestPublisher()
 	ppub, _ := NewPublisher(publisher, 1000, 1, false)
+	ppub.localIPs = []string{"192.145.2.5"}
 
 	event := common.MapStr{
 		"src": &common.Endpoint{
@@ -113,15 +115,15 @@ func TestDirectionIn(t *testing.T) {
 	assert.True(t, event["direction"] == "in")
 }
 
-func newTestPublisher(ips []string) *publisher.BeatPublisher {
+func newTestPublisher() *publisher.BeatPublisher {
 	p := &publisher.BeatPublisher{}
-	p.IPAddrs = ips
 	return p
 }
 
 func TestNoDirection(t *testing.T) {
-	publisher := newTestPublisher([]string{"192.145.2.6"})
+	publisher := newTestPublisher()
 	ppub, _ := NewPublisher(publisher, 1000, 1, false)
+	ppub.localIPs = []string{"192.145.2.6"}
 
 	event := common.MapStr{
 		"src": &common.Endpoint{

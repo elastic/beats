@@ -9,13 +9,13 @@ import (
 	"github.com/elastic/beats/libbeat/common"
 	"github.com/elastic/beats/libbeat/common/fmtstr"
 	"github.com/elastic/beats/libbeat/outputs"
+	"github.com/elastic/beats/libbeat/outputs/codec"
 )
 
 type kafkaConfig struct {
 	Hosts           []string                  `config:"hosts"               validate:"required"`
 	TLS             *outputs.TLSConfig        `config:"ssl"`
 	Timeout         time.Duration             `config:"timeout"             validate:"min=1"`
-	Worker          int                       `config:"worker"              validate:"min=1"`
 	Metadata        metaConfig                `config:"metadata"`
 	Key             *fmtstr.EventFormatString `config:"key"`
 	Partition       map[string]*common.Config `config:"partition"`
@@ -25,12 +25,13 @@ type kafkaConfig struct {
 	BrokerTimeout   time.Duration             `config:"broker_timeout"      validate:"min=1"`
 	Compression     string                    `config:"compression"`
 	Version         string                    `config:"version"`
+	BulkMaxSize     int                       `config:"bulk_max_size"`
 	MaxRetries      int                       `config:"max_retries"         validate:"min=-1,nonzero"`
 	ClientID        string                    `config:"client_id"`
 	ChanBufferSize  int                       `config:"channel_buffer_size" validate:"min=1"`
 	Username        string                    `config:"username"`
 	Password        string                    `config:"password"`
-	Codec           outputs.CodecConfig       `config:"codec"`
+	Codec           codec.Config              `config:"codec"`
 }
 
 type metaConfig struct {
@@ -45,10 +46,10 @@ type metaRetryConfig struct {
 
 var (
 	defaultConfig = kafkaConfig{
-		Hosts:   nil,
-		TLS:     nil,
-		Timeout: 30 * time.Second,
-		Worker:  1,
+		Hosts:       nil,
+		TLS:         nil,
+		Timeout:     30 * time.Second,
+		BulkMaxSize: 2048,
 		Metadata: metaConfig{
 			Retry: metaRetryConfig{
 				Max:     3,

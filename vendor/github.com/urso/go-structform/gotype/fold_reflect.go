@@ -48,7 +48,10 @@ func getReflectFold(c *foldContext, t reflect.Type) (reFoldFn, error) {
 	case reflect.Interface:
 		f, err = getReflectFoldElem(c, t)
 	default:
-		return nil, errUnsupported
+		f, err = getReflectFoldPrimitiveKind(t)
+		if err != nil {
+			return nil, err
+		}
 	}
 
 	if err != nil {

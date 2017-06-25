@@ -6,6 +6,7 @@ import (
 	"testing"
 	"time"
 
+	"github.com/elastic/beats/libbeat/outputs"
 	"github.com/elastic/beats/libbeat/outputs/outil"
 )
 
@@ -46,7 +47,7 @@ func GetTestingElasticsearch(t *testing.T) *Client {
 	client := newTestClientAuth(address, username, pass)
 
 	// Load version number
-	err := client.Connect(60 * time.Second)
+	err := client.Connect()
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -68,13 +69,12 @@ func newTestClientAuth(url, user, pass string) *Client {
 	return client
 }
 
-func (t *elasticsearchOutput) randomClient() *Client {
-	switch len(t.clients) {
-	case 0:
-		return nil
-	case 1:
-		return t.clients[0].(*Client).Clone()
-	default:
-		return t.clients[rand.Intn(len(t.clients))].(*Client).Clone()
+func randomClient(grp outputs.Group) outputs.NetworkClient {
+	L := len(grp.Clients)
+	if L == 0 {
+		panic("no elasticsearch client")
 	}
+
+	client := grp.Clients[rand.Intn(L)]
+	return client.(outputs.NetworkClient)
 }

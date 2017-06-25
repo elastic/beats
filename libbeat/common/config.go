@@ -337,8 +337,15 @@ func (ns *ConfigNamespace) Unpack(cfg *Config) error {
 		return nil
 	}
 
+	var (
+		err   error
+		found bool
+	)
+
 	for _, name := range fields {
-		sub, err := cfg.Child(name, -1)
+		var sub *Config
+
+		sub, err = cfg.Child(name, -1)
 		if err != nil {
 			// element is no configuration object -> continue so a namespace
 			// Config unpacked as a namespace can have other configuration
@@ -356,8 +363,12 @@ func (ns *ConfigNamespace) Unpack(cfg *Config) error {
 
 		ns.name = name
 		ns.config = sub
+		found = true
 	}
 
+	if !found {
+		return err
+	}
 	return nil
 }
 

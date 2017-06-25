@@ -56,10 +56,13 @@ import (
 	"github.com/elastic/beats/libbeat/paths"
 	"github.com/elastic/beats/libbeat/plugin"
 	"github.com/elastic/beats/libbeat/processors"
-	"github.com/elastic/beats/libbeat/publisher"
+	"github.com/elastic/beats/libbeat/publisher/bc/publisher"
 	svc "github.com/elastic/beats/libbeat/service"
 	"github.com/elastic/beats/libbeat/template"
 	"github.com/elastic/beats/libbeat/version"
+
+	// Register publisher pipeline modules
+	_ "github.com/elastic/beats/libbeat/publisher/includes"
 
 	// Register default processors.
 	_ "github.com/elastic/beats/libbeat/processors/actions"
@@ -115,15 +118,15 @@ type Beat struct {
 
 // BeatConfig struct contains the basic configuration of every beat
 type BeatConfig struct {
-	Shipper    publisher.ShipperConfig   `config:",inline"`
-	Output     map[string]*common.Config `config:"output"`
-	Monitoring *common.Config            `config:"xpack.monitoring"`
-	Logging    logp.Logging              `config:"logging"`
-	Processors processors.PluginConfig   `config:"processors"`
-	Path       paths.Path                `config:"path"`
-	Dashboards *common.Config            `config:"setup.dashboards"`
-	Template   *common.Config            `config:"setup.template"`
-	Http       *common.Config            `config:"http"`
+	Shipper    publisher.ShipperConfig `config:",inline"`
+	Output     common.ConfigNamespace  `config:"output"`
+	Monitoring *common.Config          `config:"xpack.monitoring"`
+	Logging    logp.Logging            `config:"logging"`
+	Processors processors.PluginConfig `config:"processors"`
+	Path       paths.Path              `config:"path"`
+	Dashboards *common.Config          `config:"setup.dashboards"`
+	Template   *common.Config          `config:"setup.template"`
+	Http       *common.Config          `config:"http"`
 }
 
 var (
@@ -352,11 +355,11 @@ func (b *Beat) Setup(bt Creator, template, dashboards, machineLearning bool) err
 		}
 
 		if template {
-			esConfig := b.Config.Output["elasticsearch"]
-			if esConfig == nil || !esConfig.Enabled() {
+			if b.Config.Output.Name() != "elasticsearch" {
 				return fmt.Errorf("Template loading requested but the Elasticsearch output is not configured/enabled")
 			}
 
+			esConfig := b.Config.Output.Config()
 			if b.Config.Template == nil || (b.Config.Template != nil && b.Config.Template.Enabled()) {
 				loadCallback, err := b.templateLoadingCallback()
 				if err != nil {
@@ -560,8 +563,8 @@ func (b *Beat) loadDashboards(force bool) error {
 		}
 	}
 
-	if b.Config.Dashboards != nil && b.Config.Dashboards.Enabled() {
-		esConfig := b.Config.Output["elasticsearch"]
+	if b.Config.Dashboards != nil && b.Config.Dashboards.Enabled() && b.Config.Output.Name() == "elasticsearch" {
+		esConfig := b.Config.Output.Config()
 		if esConfig == nil || !esConfig.Enabled() {
 			return fmt.Errorf("Dashboard loading requested but the Elasticsearch output is not configured/enabled")
 		}
@@ -608,9 +611,8 @@ func (b *Beat) registerTemplateLoading() error {
 		}
 	}
 
-	esConfig := b.Config.Output["elasticsearch"]
 	// Loads template by default if esOutput is enabled
-	if esConfig != nil && esConfig.Enabled() {
+	if b.Config.Output.Name() == "elasticsearch" {
 		if b.Config.Template == nil || (b.Config.Template != nil && b.Config.Template.Enabled()) {
 			// load template through callback to make sure it is also loaded
 			// on reconnecting

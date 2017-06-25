@@ -5,7 +5,6 @@ package elasticsearch
 import (
 	"fmt"
 	"os"
-	"time"
 
 	"encoding/json"
 	"net/http"
@@ -82,7 +81,7 @@ func TestOneHost500Resp(t *testing.T) {
 	server := ElasticsearchMock(http.StatusInternalServerError, []byte("Something wrong happened"))
 
 	client := newTestClient(server.URL)
-	err := client.Connect(1 * time.Second)
+	err := client.Connect()
 	if err != nil {
 		t.Fatalf("Failed to connect: %v", err)
 	}

@@ -30,11 +30,6 @@ func init() {
 	})
 }
 
-type Processor interface {
-	Run(event common.MapStr) (common.MapStr, error)
-	String() string
-}
-
 type Constructor func(config common.Config) (Processor, error)
 
 var registry = NewNamespace()

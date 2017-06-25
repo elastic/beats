@@ -5,18 +5,15 @@ import (
 	"time"
 
 	"github.com/elastic/beats/libbeat/common"
-	"github.com/elastic/beats/libbeat/common/op"
 	"github.com/elastic/beats/libbeat/logp"
 	"github.com/elastic/beats/libbeat/monitoring"
 	"github.com/elastic/beats/libbeat/outputs"
-	"github.com/elastic/beats/libbeat/outputs/mode"
-	"github.com/elastic/beats/libbeat/outputs/mode/modeutil"
+	"github.com/elastic/beats/libbeat/outputs/codec"
 	"github.com/elastic/beats/libbeat/outputs/outil"
 	"github.com/elastic/beats/libbeat/outputs/transport"
 )
 
 type redisOut struct {
-	mode mode.ConnectionMode
 	beat common.BeatInfo
 }
 
@@ -24,10 +21,15 @@ var debugf = logp.MakeDebug("redis")
 
 // Metrics that can retrieved through the expvar web interface.
 var (
-	statReadBytes   = monitoring.NewInt(outputs.Metrics, "redis.read.bytes")
-	statWriteBytes  = monitoring.NewInt(outputs.Metrics, "redis.write.bytes")
-	statReadErrors  = monitoring.NewInt(outputs.Metrics, "redis.read.errors")
-	statWriteErrors = monitoring.NewInt(outputs.Metrics, "redis.write.errors")
+	redisMetrics = outputs.Metrics.NewRegistry("redis")
+
+	ackedEvents    = monitoring.NewInt(redisMetrics, "events.acked")
+	eventsNotAcked = monitoring.NewInt(redisMetrics, "events.not_acked")
+
+	statReadBytes   = monitoring.NewInt(redisMetrics, "read.bytes")
+	statWriteBytes  = monitoring.NewInt(redisMetrics, "write.bytes")
+	statReadErrors  = monitoring.NewInt(redisMetrics, "read.errors")
+	statWriteErrors = monitoring.NewInt(redisMetrics, "write.errors")
 )
 
 const (
@@ -36,27 +38,13 @@ const (
 )
 
 func init() {
-	outputs.RegisterOutputPlugin("redis", new)
+	outputs.RegisterType("redis", makeRedis)
 }
 
-func new(beat common.BeatInfo, cfg *common.Config) (outputs.Outputer, error) {
-	r := &redisOut{beat: beat}
-	if err := r.init(cfg); err != nil {
-		return nil, err
-	}
-	return r, nil
-}
-
-func (r *redisOut) init(cfg *common.Config) error {
+func makeRedis(beat common.BeatInfo, cfg *common.Config) (outputs.Group, error) {
 	config := defaultConfig
 	if err := cfg.Unpack(&config); err != nil {
-		return err
-	}
-
-	sendRetries := config.MaxRetries
-	maxAttempts := config.MaxRetries + 1
-	if sendRetries < 0 {
-		maxAttempts = 0
+		return outputs.Fail(err)
 	}
 
 	var dataType redisDataType
@@ -66,20 +54,24 @@ func (r *redisOut) init(cfg *common.Config) error {
 	case "channel":
 		dataType = redisChannelType
 	default:
-		return errors.New("Bad Redis data type")
+		return outputs.Fail(errors.New("Bad Redis data type"))
 	}
 
+	// ensure we have a `key` field in settings
 	if cfg.HasField("index") && !cfg.HasField("key") {
 		s, err := cfg.String("index", -1)
 		if err != nil {
-			return err
+			return outputs.Fail(err)
 		}
 		if err := cfg.SetString("key", -1, s); err != nil {
-			return err
+			return outputs.Fail(err)
 		}
 	}
+	if !cfg.HasField("index") {
+		cfg.SetString("index", -1, beat.Beat)
+	}
 	if !cfg.HasField("key") {
-		cfg.SetString("key", -1, r.beat.Beat)
+		cfg.SetString("key", -1, beat.Beat)
 	}
 
 	key, err := outil.BuildSelectorFromConfig(cfg, outil.Settings{
@@ -89,12 +81,17 @@ func (r *redisOut) init(cfg *common.Config) error {
 		FailEmpty:        true,
 	})
 	if err != nil {
-		return err
+		return outputs.Fail(err)
+	}
+
+	hosts, err := outputs.ReadHostList(cfg)
+	if err != nil {
+		return outputs.Fail(err)
 	}
 
 	tls, err := outputs.LoadTLSConfig(config.TLS)
 	if err != nil {
-		return err
+		return outputs.Fail(err)
 	}
 
 	transp := &transport.Config{
@@ -111,57 +108,21 @@ func (r *redisOut) init(cfg *common.Config) error {
 		},
 	}
 
-	// configure publisher clients
-	clients, err := modeutil.MakeClients(cfg, func(host string) (mode.ProtocolClient, error) {
-
-		t, err := transport.NewClient(transp, "tcp", host, config.Port)
+	clients := make([]outputs.NetworkClient, len(hosts))
+	for i, host := range hosts {
+		enc, err := codec.CreateEncoder(config.Codec)
 		if err != nil {
-			return nil, err
+			return outputs.Fail(err)
 		}
 
-		codec, err := outputs.CreateEncoder(config.Codec)
+		conn, err := transport.NewClient(transp, "tcp", host, config.Port)
 		if err != nil {
-			return nil, err
+			return outputs.Fail(err)
 		}
 
-		return newClient(t, config.Password, config.Db, key, dataType, codec), nil
-	})
-	if err != nil {
-		return err
+		clients[i] = newClient(conn, config.Timeout,
+			config.Password, config.Db, key, dataType, config.Index, enc)
 	}
 
-	logp.Info("Max Retries set to: %v", sendRetries)
-	m, err := modeutil.NewConnectionMode(clients, modeutil.Settings{
-		Failover:     !config.LoadBalance,
-		MaxAttempts:  maxAttempts,
-		Timeout:      config.Timeout,
-		WaitRetry:    defaultWaitRetry,
-		MaxWaitRetry: defaultMaxWaitRetry,
-	})
-	if err != nil {
-		return err
-	}
-
-	r.mode = m
-	return nil
-}
-
-func (r *redisOut) Close() error {
-	return r.mode.Close()
-}
-
-func (r *redisOut) PublishEvent(
-	signaler op.Signaler,
-	opts outputs.Options,
-	data outputs.Data,
-) error {
-	return r.mode.PublishEvent(signaler, opts, data)
-}
-
-func (r *redisOut) BulkPublish(
-	signaler op.Signaler,
-	opts outputs.Options,
-	data []outputs.Data,
-) error {
-	return r.mode.PublishEvents(signaler, opts, data)
+	return outputs.SuccessNet(config.LoadBalance, config.BulkMaxSize, config.MaxRetries, clients)
 }
