@@ -10,8 +10,6 @@ package main
 import (
 	"os"
 
-	_ "github.com/elastic/beats/metricbeat/include"
-
 	"github.com/elastic/beats/metricbeat/cmd"
 )
 

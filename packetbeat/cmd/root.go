@@ -5,9 +5,11 @@ import (
 
 	"github.com/spf13/pflag"
 
-	"github.com/elastic/beats/packetbeat/beater"
+	// import protocol modules
+	_ "github.com/elastic/beats/packetbeat/include"
 
 	cmd "github.com/elastic/beats/libbeat/cmd"
+	"github.com/elastic/beats/packetbeat/beater"
 )
 
 // Name of this beat

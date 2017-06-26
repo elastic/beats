@@ -81,7 +81,6 @@ class TestCommands(BaseTest):
             extra_args=["configtest"],
             config="libbeat.yml")
 
-        print(self.get_log())
         assert exit_code == 0
         assert self.log_contains("Config OK")
 
@@ -96,6 +95,42 @@ class TestCommands(BaseTest):
 
         assert exit_code == 1
         assert self.log_contains("Config OK") is False
+
+    def test_export_config(self):
+        """
+        Test export config works
+        """
+        self.render_config_template("mockbeat",
+                                    os.path.join(self.working_dir,
+                                                 "libbeat.yml"),
+                                    metrics_period=1234)
+
+        exit_code = self.run_beat(
+            logging_args=[],
+            extra_args=["export", "config"],
+            config="libbeat.yml")
+
+        assert exit_code == 0
+        assert self.log_contains("filename: mockbeat")
+        assert self.log_contains("period: 1234")
+
+    def test_export_template(self):
+        """
+        Test export template works
+        """
+        self.render_config_template("mockbeat",
+                                    os.path.join(self.working_dir, "mockbeat.yml"),
+                                    fields=os.path.join(self.working_dir, "fields.yml"))
+        shutil.copy(self.beat_path + "/fields.yml",
+                    os.path.join(self.working_dir, "fields.yml"))
+        exit_code = self.run_beat(
+            logging_args=[],
+            extra_args=["export", "template"],
+            config="mockbeat.yml")
+
+        assert exit_code == 0
+        assert self.log_contains('"mockbeat-9.9.9-*"')
+        assert self.log_contains('"codec": "best_compression"')
 
     def get_host(self):
         return os.getenv('ES_HOST', 'localhost') + ':' + os.getenv('ES_PORT', '9200')

@@ -4,9 +4,6 @@ import (
 	"os"
 
 	"github.com/elastic/beats/heartbeat/cmd"
-
-	// register default heartbeat monitors
-	_ "github.com/elastic/beats/heartbeat/monitors/defaults"
 )
 
 func main() {
