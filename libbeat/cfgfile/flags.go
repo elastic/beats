@@ -26,8 +26,11 @@ func flagArgList(name string, def string, usage string) *argList {
 
 func (l *argList) SetDefault(v string) {
 	l.f.DefValue = v
-	l.list = []string{v}
-	l.isDefault = true
+	// Only update value if we are still in the default
+	if l.isDefault {
+		l.list = []string{v}
+		l.isDefault = true
+	}
 }
 
 func (l *argList) String() string {
@@ -38,6 +41,12 @@ func (l *argList) Set(v string) error {
 	if l.isDefault {
 		l.list = []string{v}
 	} else {
+		// Ignore duplicates, can be caused by multiple flag parses
+		for _, f := range l.list {
+			if f == v {
+				return nil
+			}
+		}
 		l.list = append(l.list, v)
 	}
 	l.isDefault = false
