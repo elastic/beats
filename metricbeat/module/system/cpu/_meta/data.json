@@ -11,13 +11,14 @@
     },
     "system": {
         "cpu": {
+            "cores": 8,
             "idle": {
-                "pct": 0.852,
-                "ticks": 44421033
+                "pct": 7.0854,
+                "ticks": 1617015818
             },
             "iowait": {
                 "pct": 0,
-                "ticks": 159735
+                "ticks": 0
             },
             "irq": {
                 "pct": 0,
@@ -29,19 +30,19 @@
             },
             "softirq": {
                 "pct": 0,
-                "ticks": 14070
+                "ticks": 0
             },
             "steal": {
                 "pct": 0,
                 "ticks": 0
             },
             "system": {
-                "pct": 0.0408,
-                "ticks": 305704
+                "pct": 0.3317,
+                "ticks": 40488863
             },
             "user": {
-                "pct": 0.1071,
-                "ticks": 841974
+                "pct": 0.5829,
+                "ticks": 48194733
             }
         }
     },
