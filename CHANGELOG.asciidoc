@@ -484,6 +484,9 @@ https://github.com/elastic/beats/compare/v5.2.2...v5.3.0[View commits]
 - Improve handling of different path variants on Windows. {pull}3781[3781]
 - Add multiline.flush_pattern option, for specifying the 'end' of a multiline pattern {pull}4019[4019]
 
+*Heartbeat*
+
+- Add `tags`, `fields` and `fields_under_root` in monitors configuration. {pull}3623[3623]
 
 *Metricbeat*
 

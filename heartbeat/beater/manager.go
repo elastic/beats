@@ -32,15 +32,22 @@ type Monitor struct {
 	factory    monitors.Factory
 	config     *common.Config
 
-	active map[string]MonitorTask
+	active map[string]monitorTask
 }
 
-type MonitorTask struct {
-	name, typ string
+type monitorTask struct {
+	job    monitors.Job
+	cancel JobCanceller
 
-	job      monitors.Job
-	schedule scheduler.Schedule
-	cancel   JobCanceller
+	config monitorTaskConfig
+}
+
+type monitorTaskConfig struct {
+	Name     string             `config:"name"`
+	Type     string             `config:"type"`
+	Schedule *schedule.Schedule `config:"schedule" validate:"required"`
+	// Fields and tags to add to monitor.
+	EventMetadata common.EventMetadata `config:",inline"`
 }
 
 type JobControl interface {
@@ -109,7 +116,7 @@ func newMonitorManager(
 			name:    info.Name,
 			factory: factory,
 			config:  config,
-			active:  map[string]MonitorTask{},
+			active:  map[string]monitorTask{},
 		})
 	}
 
@@ -146,7 +153,7 @@ func newMonitorManager(
 }
 
 func (m *Monitor) Update(configs []*common.Config) error {
-	all := map[string]MonitorTask{}
+	all := map[string]monitorTask{}
 	for i, upd := range configs {
 		config, err := common.MergeConfigs(m.config, upd)
 		if err != nil {
@@ -154,11 +161,7 @@ func (m *Monitor) Update(configs []*common.Config) error {
 			return err
 		}
 
-		shared := struct {
-			Name     string             `config:"name"`
-			Type     string             `config:"type"`
-			Schedule *schedule.Schedule `config:"schedule" validate:"required"`
-		}{}
+		shared := monitorTaskConfig{}
 		if err := config.Unpack(&shared); err != nil {
 			logp.Err("Failed parsing job schedule: ", err)
 			return err
@@ -170,17 +173,10 @@ func (m *Monitor) Update(configs []*common.Config) error {
 			return err
 		}
 
-		name := shared.Name
-		if name == "" {
-			name = shared.Type
-		}
-
 		for _, job := range jobs {
-			all[job.Name()] = MonitorTask{
-				name:     name,
-				typ:      shared.Type,
-				job:      job,
-				schedule: shared.Schedule,
+			all[job.Name()] = monitorTask{
+				job:    job,
+				config: shared,
 			}
 		}
 	}
@@ -189,12 +185,12 @@ func (m *Monitor) Update(configs []*common.Config) error {
 	for _, job := range m.active {
 		job.cancel()
 	}
-	m.active = map[string]MonitorTask{}
+	m.active = map[string]monitorTask{}
 
 	// start new and reconfigured tasks
 	for id, t := range all {
-		job := createJob(m.manager.client, t.job, t.name, t.typ)
-		t.cancel = m.manager.jobControl.Add(t.schedule, id, job)
+		job := createJob(m.manager.client, t)
+		t.cancel = m.manager.jobControl.Add(t.config.Schedule, id, job)
 		m.active[id] = t
 	}
 
@@ -234,13 +230,17 @@ func createWatchUpdater(monitor *Monitor) func(content []byte) {
 	}
 }
 
-func createJob(client publisher.Client, r monitors.Job, name, typ string) scheduler.TaskFunc {
-	return createJobTask(client, r, name, typ)
+func createJob(client publisher.Client, task monitorTask) scheduler.TaskFunc {
+	return task.prepareSchedulerJob(client, task.job)
 }
 
-func createJobTask(client publisher.Client, r monitors.TaskRunner, name, typ string) scheduler.TaskFunc {
+func (m *monitorTask) prepareSchedulerJob(client publisher.Client, r monitors.TaskRunner) scheduler.TaskFunc {
+	name := m.config.Name
+	if name == "" {
+		name = m.config.Name
+	}
 	return func() []scheduler.TaskFunc {
-		event, next, err := r.Run()
+		event, next, err := m.job.Run()
 		if err != nil {
 			logp.Err("Job %v failed with: ", err)
 		}
@@ -249,13 +249,15 @@ func createJobTask(client publisher.Client, r monitors.TaskRunner, name, typ str
 			event.DeepUpdate(common.MapStr{
 				"monitor": common.MapStr{
 					"name": name,
-					"type": typ,
+					"type": m.config.Type,
 				},
 			})
 
 			if _, exists := event["type"]; !exists {
 				event["type"] = defaultEventType
 			}
+			common.MergeFields(event, m.config.EventMetadata.Fields, m.config.EventMetadata.FieldsUnderRoot)
+			common.AddTags(event, m.config.EventMetadata.Tags)
 			client.PublishEvent(event)
 		}
 
@@ -265,7 +267,7 @@ func createJobTask(client publisher.Client, r monitors.TaskRunner, name, typ str
 
 		cont := make([]scheduler.TaskFunc, len(next))
 		for i, n := range next {
-			cont[i] = createJobTask(client, n, name, typ)
+			cont[i] = m.prepareSchedulerJob(client, n)
 		}
 		return cont
 	}
