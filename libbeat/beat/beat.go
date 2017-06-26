@@ -600,20 +600,6 @@ func (b *Beat) registerTemplateLoading() error {
 		if err != nil {
 			return fmt.Errorf("unpacking template config fails: %v", err)
 		}
-		if len(cfg.OutputToFile.Path) > 0 {
-			// output to file is enabled
-			loader, err := template.NewLoader(b.Config.Template, nil, b.Info)
-			if err != nil {
-				return fmt.Errorf("Error creating Elasticsearch template loader: %v", err)
-			}
-			err = loader.Generate()
-			if err != nil {
-				return fmt.Errorf("Error generating template: %v", err)
-			}
-
-			// XXX: Should we kill the Beat here or just continue?
-			return fmt.Errorf("Stopping after successfully writing the template to the file.")
-		}
 	}
 
 	// Loads template by default if esOutput is enabled

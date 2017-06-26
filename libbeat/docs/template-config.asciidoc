@@ -49,25 +49,3 @@ setup.template.overwrite: false
 setup.template.settings:
   _source.enabled: false
 ----------------------------------------------------------------------
-
-*`output_to_file.path`*:: If this option is set, {beatname_uc} generates the Elasticsearch template
-  JSON object and writes into a file at the specified path. Immediately after writing the file,
-  {beatname_uc} exists with the exit code 1.
-
-For example, you can generate a template file ready to be uploaded to Elasticsearch like this:
-
-["source","yaml",subs="attributes,callouts"]
-----------------------------------------------------------------------
-./{beatname_lc} -e -E "setup.template.output_to_file.path={beatname_lc}.template.json"
-----------------------------------------------------------------------
-
-*`output_to_file.version`*:: The Elasticsearch version for which to generate the template file. By
-default, the {beatname_uc} version is used. This setting is only used if `output_to_file.path` is
-also set.
-
-For example, the following generates a template file for Elasticsearch 5.4:
-
-["source","yaml",subs="attributes,callouts"]
-----------------------------------------------------------------------
-./{beatname_lc} -e -E "setup.template.output_to_file.path={beatname_lc}.template.json" -E "setup.template.output_to_file.version=5.4.0"
-----------------------------------------------------------------------
