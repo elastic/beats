@@ -79,8 +79,8 @@ func TestGlobManager(t *testing.T) {
 	}
 
 	assert.Equal(t, files, []string{
-		dir + "/config1.yml",
-		dir + "/config2.yml.disabled",
-		dir + "/config3.yml",
+		filepath.Join(dir, "config1.yml"),
+		filepath.Join(dir, "config2.yml.disabled"),
+		filepath.Join(dir, "config3.yml"),
 	})
 }
