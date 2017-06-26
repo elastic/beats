@@ -67,7 +67,7 @@ func New(b *beat.Beat, rawConfig *common.Config) (beat.Beater, error) {
 		}
 	}
 
-	if !config.ConfigProspector.Enabled() && !haveEnabledProspectors {
+	if !config.ConfigProspector.Enabled() && !config.ConfigModules.Enabled() && !haveEnabledProspectors {
 		if !b.InSetupCmd {
 			return nil, errors.New("No modules or prospectors enabled and configuration reloading disabled. What files do you want me to watch?")
 		} else {
@@ -76,7 +76,7 @@ func New(b *beat.Beat, rawConfig *common.Config) (beat.Beater, error) {
 		}
 	}
 
-	if *once && config.ConfigProspector.Enabled() {
+	if *once && config.ConfigProspector.Enabled() && config.ConfigModules.Enabled() {
 		return nil, errors.New("prospector configs and -once cannot be used together")
 	}
 
@@ -176,7 +176,8 @@ func (fb *Filebeat) Run(b *beat.Beat) error {
 		return err
 	}
 
-	crawler, err := crawler.New(channel.NewOutlet(fb.done, spooler.Channel, wgEvents), config.Prospectors, fb.done, *once)
+	outlet := channel.NewOutlet(fb.done, spooler.Channel, wgEvents)
+	crawler, err := crawler.New(outlet, config.Prospectors, b.Info.Version, fb.done, *once)
 	if err != nil {
 		logp.Err("Could not init crawler: %v", err)
 		return err
@@ -218,7 +219,7 @@ func (fb *Filebeat) Run(b *beat.Beat) error {
 		spooler.Stop()
 	}()
 
-	err = crawler.Start(registrar, config.ConfigProspector)
+	err = crawler.Start(registrar, config.ConfigProspector, config.ConfigModules)
 	if err != nil {
 		crawler.Stop()
 		return err

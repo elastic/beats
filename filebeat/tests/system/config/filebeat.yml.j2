@@ -98,7 +98,7 @@ filebeat.registry_file: {{ beat.working_dir + '/' }}{{ registryFile|default("reg
 filebeat.publish_async: {{publish_async}}
 
 {% if reload or reload_path -%}
-filebeat.config.prospectors:
+filebeat.config.{{ reload_type|default("prospectors") }}:
   enabled: true
   path: {{ reload_path }}
   {% if reload  -%}

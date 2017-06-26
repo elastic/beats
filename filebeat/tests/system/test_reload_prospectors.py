@@ -18,7 +18,7 @@ class Test(BaseTest):
 
     def test_reload(self):
         """
-        Test basic reload
+        Test basic prospectors reload
         """
         self.render_config_template(
             reload=True,
@@ -43,7 +43,7 @@ class Test(BaseTest):
 
     def test_start_stop(self):
         """
-        Test basic start and stop
+        Test basic prospectors start and stop
         """
         self.render_config_template(
             reload=True,
@@ -86,7 +86,7 @@ class Test(BaseTest):
 
     def test_start_stop_replace(self):
         """
-        Test basic start and replace with an other prospecto
+        Test basic start and replace with another prospector
         """
         self.render_config_template(
             reload=True,
