@@ -1,37 +1,16 @@
 - module: system
   metricsets:
-    # CPU stats
-    - cpu
-
-    # System Load stats
-    - load
-
-    # Per CPU core stats
-    #- core
-
-    # IO stats
-    #- diskio
-
-    # Per filesystem stats
-    - filesystem
-
-    # File system summary stats
-    - fsstat
-
-    # Memory stats
-    - memory
-
-    # Network stats
-    - network
-
-    # Processes summary
-    - process_summary
-
-    # Per process stats
-    - process
-
-    # Sockets and connection info (linux only)
-    #- socket
+    - cpu             # CPU usage
+    - filesystem      # File system usage for each mountpoint
+    - fsstat          # File system summary metrics
+    - load            # CPU load averages
+    - memory          # Memory usage
+    - network         # Network IO
+    - process         # Per process metrics
+    - process_summary # Process summary
+    #- core           # Per CPU core usage
+    #- diskio         # Disk IO
+    #- socket         # Sockets and connection info (linux only)
   enabled: true
   period: 10s
   processes: ['.*']
