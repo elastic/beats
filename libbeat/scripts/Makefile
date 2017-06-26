@@ -85,7 +85,7 @@ ${BEAT_NAME}: $(GOFILES_ALL) ## @build build the beat application
 
 # Create test coverage binary
 ${BEAT_NAME}.test: $(GOFILES_ALL)
-	go test $(RACE) -c -coverpkg ${GOPACKAGES_COMMA_SEP}
+	@go test $(RACE) -c -coverpkg ${GOPACKAGES_COMMA_SEP}
 
 .PHONY: crosscompile
 crosscompile: ## @build Cross-compile beat for the OS'es specified in GOX_OS variable. The binaries are placed in the build/bin directory.
@@ -96,15 +96,15 @@ crosscompile: $(GOFILES)
 
 .PHONY: check
 check: python-env ## @build Checks project and source code if everything is according to standard
-	go vet ${GOPACKAGES}
+	@go vet ${GOPACKAGES}
 	@go get $(GOIMPORTS_REPO)
 	@goimports -l ${GOFILES_NOVENDOR} | (! grep . -q) || (echo "Code differs from goimports' style" && false)
-	${FIND} -name *.py -exec autopep8 -d --max-line-length 120  {} \; | (! grep . -q) || (echo "Code differs from autopep8's style" && false)
+	@${FIND} -name *.py -exec autopep8 -d --max-line-length 120  {} \; | (! grep . -q) || (echo "Code differs from autopep8's style" && false)
 
 .PHONY: fmt
 fmt: python-env ## @build Runs `goimports -l -w` and `autopep8`on the project's source code, modifying any files that do not match its style.
-	goimports -l -w ${GOFILES_NOVENDOR}
-	. ${PYTHON_ENV}/bin/activate && ${FIND} -name *.py -exec autopep8 --in-place --max-line-length 120  {} \;
+	@goimports -l -w ${GOFILES_NOVENDOR}
+	@${FIND} -name *.py -exec ${PYTHON_ENV}/bin/autopep8 --in-place --max-line-length 120  {} \;
 
 .PHONY: lint
 lint:
