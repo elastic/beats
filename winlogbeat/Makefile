@@ -7,6 +7,8 @@ GOX_OS=windows
 TARGETS="windows/amd64 windows/386"
 PACKAGES=winlogbeat/win
 
+CGO=false		# don't need Cgo in Winlogbeat
+
 include ../libbeat/scripts/Makefile
 
 .PHONY: gen

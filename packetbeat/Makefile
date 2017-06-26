@@ -3,9 +3,6 @@ BEAT_NAME?=packetbeat
 BEAT_DESCRIPTION?=Packetbeat analyzes network traffic and sends the data to Elasticsearch.
 SYSTEM_TESTS?=true
 TEST_ENVIRONMENT=false
-TARGETS="windows/amd64 windows/386 darwin/amd64"
-TARGETS_OLD="linux/amd64 linux/386"
-CGO=true
 ES_BEATS?=..
 
 include ${ES_BEATS}/libbeat/scripts/Makefile
