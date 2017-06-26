@@ -27,3 +27,4 @@ services:
     image: docker.elastic.co/kibana/kibana:5.4.1
     healthcheck:
       test: ["CMD", "curl", "-f", "http://localhost:5601"]
+      retries: 6

@@ -5,7 +5,7 @@ MAINTAINER Elastic Docker Team <docker@elastic.co>
 ARG DOWNLOAD_URL
 ARG ELASTIC_VERSION
 
-HEALTHCHECK CMD curl -f http://localhost:5601
+HEALTHCHECK --retries=6 CMD curl -f http://localhost:5601
 EXPOSE 5601
 
 WORKDIR /usr/share/kibana
