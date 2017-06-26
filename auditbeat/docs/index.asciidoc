@@ -1,0 +1,5 @@
+= Auditbeat Docs
+
+Welcome to the Auditbeat documentation.
+
+
