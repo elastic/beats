@@ -1,6 +1,6 @@
 - key: audit
   title: Audit
-  short_config: false
+  short_config: true
   description: >
     The `audit` module reports security-relevant information based on data
     captured from the operating system (OS) or services running on the OS.
