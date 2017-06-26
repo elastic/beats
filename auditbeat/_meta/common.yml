@@ -7,11 +7,3 @@
 # You can find the full configuration reference here:
 # https://www.elastic.co/guide/en/beats/auditbeat/index.html
 
-auditbeat.modules:
-- module: audit
-  metricsets: ["kernel"]
-  kernel.audit_rules:
-    # Define audit rules here.
-    # Create file watches (-w) or syscall audits (-a or -A). For example:
-    #-w /etc/passwd -p wa -k identity
-    #-a always,exit -F arch=b32 -S open,creat,truncate,ftruncate,openat,open_by_handle_at -F exit=-EPERM -k access

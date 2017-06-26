@@ -7,7 +7,11 @@
 # You can find the full configuration reference here:
 # https://www.elastic.co/guide/en/beats/auditbeat/index.html
 
+
+#==========================  Modules configuration ============================
 auditbeat.modules:
+
+#-------------------------------- Audit Module -------------------------------
 - module: audit
   metricsets: ["kernel"]
   kernel.audit_rules:
@@ -16,7 +20,5 @@ auditbeat.modules:
     #-w /etc/passwd -p wa -k identity
     #-a always,exit -F arch=b32 -S open,creat,truncate,ftruncate,openat,open_by_handle_at -F exit=-EPERM -k access
 
-#==========================  Modules configuration ============================
-auditbeat.modules:
 
 
