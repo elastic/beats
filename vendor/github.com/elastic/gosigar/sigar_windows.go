@@ -352,6 +352,10 @@ func (self *ProcTime) Get(pid int) error {
 	return nil
 }
 
+func (self *ProcIO) Get(pid int) error {
+	return ErrNotImplemented{runtime.GOOS}
+}
+
 func (self *ProcArgs) Get(pid int) error {
 	// The minimum supported client for Win32_Process is Windows Vista.
 	if !version.IsWindowsVistaOrGreater() {

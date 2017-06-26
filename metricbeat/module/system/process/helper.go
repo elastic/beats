@@ -32,6 +32,7 @@ type Process struct {
 	Cwd         string `json:"cwd"`
 	Mem         sigar.ProcMem
 	Cpu         sigar.ProcTime
+	IO          sigar.ProcIO
 	Ctime       time.Time
 	FD          sigar.ProcFDUsage
 	Env         common.MapStr
@@ -80,7 +81,7 @@ func newProcess(pid int, cmdline string, env common.MapStr) (*Process, error) {
 	return &proc, nil
 }
 
-// getDetails fetches CPU, memory, FD usage, command line arguments, and
+// getDetails fetches CPU, memory, io, FD usage, command line arguments, and
 // environment variables for the process. The envPredicate parameter is an
 // optional predicate function that should return true if an environment
 // variable should be saved with the process. If the argument is nil then all
@@ -94,6 +95,11 @@ func (proc *Process) getDetails(envPredicate func(string) bool) error {
 	proc.Cpu = sigar.ProcTime{}
 	if err := proc.Cpu.Get(proc.Pid); err != nil {
 		return fmt.Errorf("error getting process cpu time for pid=%d: %v", proc.Pid, err)
+	}
+	
+	proc.IO = sigar.ProcIO{}
+	if err := proc.IO.Get(proc.Pid); err != nil {
+		return fmt.Errorf("error getting process io for pid=%d: %v", proc.Pid, err)
 	}
 
 	if proc.CmdLine == "" {
@@ -235,6 +241,14 @@ func (procStats *ProcStats) getProcessEvent(process *Process) common.MapStr {
 				"pct":   GetProcMemPercentage(process, 0 /* read total mem usage */),
 			},
 			"share": process.Mem.Share,
+		},
+		"io": common.MapStr{
+			"read_char":   process.IO.ReadChar,
+			"write_char":  process.IO.WriteChar,
+			"read_count":  process.IO.SysCounterRead,
+			"write_count": process.IO.SysCounterWrite,
+			"read_bytes":  process.IO.ReadBytes,
+			"write_bytes": process.IO.WriteBytes,
 		},
 	}
 

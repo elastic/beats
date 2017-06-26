@@ -285,6 +285,61 @@ func (self *ProcTime) Get(pid int) error {
 	return nil
 }
 
+func (self *ProcIO) Get(pid int) error {
+	// read proc io statistics from /proc/<pid>/io
+	statistics := make(map[string]string, 42)
+	path := filepath.Join(Procd, strconv.Itoa(pid), "io")
+	err := readFile(path, func(line string) bool {
+		fields := strings.SplitN(line, ":", 2)
+		if len(fields) == 2 {
+			statistics[fields[0]] = strings.TrimSpace(fields[1])
+		}
+		return true
+	})
+	if err != nil {
+		return err
+	}
+
+	// get rchar wchar syscr syscw read_bytes write_bytes cancelled_write_bytes from statistics
+	rchar, ok := statistics["rchar"]
+	if !ok {
+		fmt.Errorf("rchar not found in proc io")
+	}
+	self.ReadChar, _ = strtoull(rchar)
+
+	wchar, ok := statistics["wchar"]
+	if !ok {
+		fmt.Errorf("wchar not found in proc io")
+	}
+	self.WriteChar, _ = strtoull(wchar)
+
+	syscr, ok := statistics["syscr"]
+	if !ok {
+		fmt.Errorf("syscr not found in proc io")
+	}
+	self.SysCounterRead, _ = strtoull(syscr)
+
+	syscw, ok := statistics["syscw"]
+	if !ok {
+		fmt.Errorf("syscw not found in proc io")
+	}
+	self.SysCounterWrite, _ = strtoull(syscw)
+
+	read_bytes, ok := statistics["read_bytes"]
+	if !ok {
+		fmt.Errorf("read_bytes not found in proc io")
+	}
+	self.ReadBytes, _ = strtoull(read_bytes)
+
+	write_bytes, ok := statistics["write_bytes"]
+	if !ok {
+		fmt.Errorf("write_bytes not found in proc io")
+	}
+	self.WriteBytes, _ = strtoull(write_bytes)
+	
+	return nil
+}
+
 func (self *ProcArgs) Get(pid int) error {
 	contents, err := readProcFile(pid, "cmdline")
 	if err != nil {
