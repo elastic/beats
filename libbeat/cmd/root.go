@@ -9,14 +9,12 @@ import (
 	"github.com/spf13/pflag"
 
 	"github.com/elastic/beats/libbeat/beat"
-	"github.com/elastic/beats/libbeat/logp"
 )
 
 func init() {
 	// backwards compatibility workaround, convert -flags to --flags:
 	for i, arg := range os.Args[1:] {
 		if strings.HasPrefix(arg, "-") && !strings.HasPrefix(arg, "--") && len(arg) > 2 {
-			logp.Deprecate("6.0", "Argument %s should be -%s", arg, arg)
 			os.Args[1+i] = "-" + arg
 		}
 	}
@@ -26,10 +24,12 @@ func init() {
 // flags and runs subcommands
 type BeatsRootCmd struct {
 	cobra.Command
-	RunCmd     *cobra.Command
-	SetupCmd   *cobra.Command
-	VersionCmd *cobra.Command
-	ConfigTest *cobra.Command
+	RunCmd        *cobra.Command
+	SetupCmd      *cobra.Command
+	VersionCmd    *cobra.Command
+	ConfigTestCmd *cobra.Command
+	CompletionCmd *cobra.Command
+	ExportCmd     *cobra.Command
 }
 
 // GenRootCmd returns the root command to use for your beat. It takes
@@ -50,7 +50,9 @@ func GenRootCmdWithRunFlags(name, version string, beatCreator beat.Creator, runF
 	rootCmd.RunCmd = genRunCmd(name, version, beatCreator, runFlags)
 	rootCmd.SetupCmd = genSetupCmd(name, version, beatCreator)
 	rootCmd.VersionCmd = genVersionCmd(name, version)
-	rootCmd.ConfigTest = genConfigTestCmd(name, version, beatCreator)
+	rootCmd.ConfigTestCmd = genConfigTestCmd(name, version, beatCreator)
+	rootCmd.CompletionCmd = genCompletionCmd(name, version, rootCmd)
+	rootCmd.ExportCmd = genExportCmd(name, version, beatCreator)
 
 	// Root command is an alias for run
 	rootCmd.Run = rootCmd.RunCmd.Run
@@ -75,7 +77,9 @@ func GenRootCmdWithRunFlags(name, version string, beatCreator beat.Creator, runF
 	rootCmd.AddCommand(rootCmd.RunCmd)
 	rootCmd.AddCommand(rootCmd.SetupCmd)
 	rootCmd.AddCommand(rootCmd.VersionCmd)
-	rootCmd.AddCommand(rootCmd.ConfigTest)
+	rootCmd.AddCommand(rootCmd.ConfigTestCmd)
+	rootCmd.AddCommand(rootCmd.CompletionCmd)
+	rootCmd.AddCommand(rootCmd.ExportCmd)
 
 	return rootCmd
 }

@@ -195,7 +195,7 @@ func New(name, v string) (*Beat, error) {
 }
 
 // init does initialization of things common to all actions (read confs, flags)
-func (b *Beat) init() error {
+func (b *Beat) Init() error {
 	err := b.handleFlags()
 	if err != nil {
 		return err
@@ -266,7 +266,7 @@ func (b *Beat) createBeater(bt Creator) (Beater, error) {
 }
 
 func (b *Beat) launch(bt Creator) error {
-	err := b.init()
+	err := b.Init()
 	if err != nil {
 		return err
 	}
@@ -289,6 +289,7 @@ func (b *Beat) launch(bt Creator) error {
 
 	// If -configtest was specified, exit now prior to run.
 	if cfgfile.IsTestConfig() {
+		logp.Deprecate("6.0", "-configtest flag has been deprecated, use configtest subcommand")
 		fmt.Println("Config OK")
 		return GracefulExit
 	}
@@ -296,6 +297,9 @@ func (b *Beat) launch(bt Creator) error {
 	svc.HandleSignals(beater.Stop)
 
 	// TODO Deprecate this in favor of setup subcommand (7.0)
+	if *setup {
+		logp.Deprecate("6.0", "-setup flag has been deprectad, use setup subcommand")
+	}
 	err = b.loadDashboards(false)
 	if err != nil {
 		return err
@@ -321,7 +325,7 @@ func (b *Beat) launch(bt Creator) error {
 // TestConfig check all settings are ok and the beat can be run
 func (b *Beat) TestConfig(bt Creator) error {
 	return handleError(func() error {
-		err := b.init()
+		err := b.Init()
 		if err != nil {
 			return err
 		}
@@ -340,7 +344,7 @@ func (b *Beat) TestConfig(bt Creator) error {
 // Setup registers ES index template and kibana dashboards
 func (b *Beat) Setup(bt Creator, template, dashboards, machineLearning bool) error {
 	return handleError(func() error {
-		err := b.init()
+		err := b.Init()
 		if err != nil {
 			return err
 		}
@@ -414,6 +418,7 @@ func (b *Beat) handleFlags() error {
 	flag.Parse()
 
 	if *printVersion {
+		logp.Deprecate("6.0", "-version flag has been deprectad, use version subcommand")
 		fmt.Printf("%s version %s (%s), libbeat %s\n",
 			b.Info.Beat, b.Info.Version, runtime.GOARCH, version.GetDefaultVersion())
 		return GracefulExit
@@ -594,20 +599,6 @@ func (b *Beat) registerTemplateLoading() error {
 		err := b.Config.Template.Unpack(&cfg)
 		if err != nil {
 			return fmt.Errorf("unpacking template config fails: %v", err)
-		}
-		if len(cfg.OutputToFile.Path) > 0 {
-			// output to file is enabled
-			loader, err := template.NewLoader(b.Config.Template, nil, b.Info)
-			if err != nil {
-				return fmt.Errorf("Error creating Elasticsearch template loader: %v", err)
-			}
-			err = loader.Generate()
-			if err != nil {
-				return fmt.Errorf("Error generating template: %v", err)
-			}
-
-			// XXX: Should we kill the Beat here or just continue?
-			return fmt.Errorf("Stopping after successfully writing the template to the file.")
 		}
 	}
 
