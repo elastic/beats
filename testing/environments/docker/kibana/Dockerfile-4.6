@@ -35,7 +35,7 @@ RUN gosu kibana kibana plugin --install kibana/reporting/2.4.0
 # generate a random key
 RUN echo "reporting.encryptionKey: `date +%s | sha256sum | base64 | head -c 32`" >> /opt/kibana/config/kibana.yml
 
-HEALTHCHECK CMD curl -f http://localhost:5601
+HEALTHCHECK --retries=6 CMD curl -f http://localhost:5601
 EXPOSE 5601
 ENTRYPOINT ["/docker-entrypoint.sh"]
 CMD ["kibana"]
