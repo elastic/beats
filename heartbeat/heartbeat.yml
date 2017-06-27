@@ -1,7 +1,7 @@
 ################### Heartbeat Configuration Example #########################
 
 # This file is an example configuration file highlighting only some common options.
-# The heartbeat.full.yml file in the same directory contains all the supported options
+# The heartbeat.reference.yml file in the same directory contains all the supported options
 # with detailed comments. You can use it for reference.
 #
 # You can find the full configuration reference here:

@@ -26,8 +26,8 @@ fields: python-env
 configs: python-env
 	@cp ${ES_BEATS}/auditbeat/_meta/common.yml _meta/beat.yml
 	@${PYTHON_ENV}/bin/python ${ES_BEATS}/script/config_collector.py --beat ${BEAT_NAME} $(PWD) >> _meta/beat.yml
-	@cp ${ES_BEATS}/auditbeat/_meta/common.full.yml _meta/beat.full.yml
-	@${PYTHON_ENV}/bin/python ${ES_BEATS}/script/config_collector.py --beat ${BEAT_NAME} --full $(PWD) >> _meta/beat.full.yml
+	@cp ${ES_BEATS}/auditbeat/_meta/common.reference.yml _meta/beat.reference.yml
+	@${PYTHON_ENV}/bin/python ${ES_BEATS}/script/config_collector.py --beat ${BEAT_NAME} --full $(PWD) >> _meta/beat.reference.yml
 
 # Collects all module docs
 .PHONY: collect-docs

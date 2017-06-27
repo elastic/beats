@@ -50,8 +50,8 @@ configs: python-env
 	cat ${ES_BEATS}/metricbeat/_meta/common.yml > _meta/beat.yml
 	. ${PYTHON_ENV}/bin/activate; python ${ES_BEATS}/script/config_collector.py --beat ${BEAT_NAME} $(PWD) >> _meta/beat.yml
 	cat ${ES_BEATS}/metricbeat/_meta/setup.yml >> _meta/beat.yml
-	cat ${ES_BEATS}/metricbeat/_meta/common.full.yml > _meta/beat.full.yml
-	. ${PYTHON_ENV}/bin/activate; python ${ES_BEATS}/script/config_collector.py --beat ${BEAT_NAME} --full $(PWD) >> _meta/beat.full.yml
+	cat ${ES_BEATS}/metricbeat/_meta/common.reference.yml > _meta/beat.reference.yml
+	. ${PYTHON_ENV}/bin/activate; python ${ES_BEATS}/script/config_collector.py --beat ${BEAT_NAME} --full $(PWD) >> _meta/beat.reference.yml
 
 # Generates imports for all modules and metricsets
 .PHONY: imports
@@ -66,8 +66,8 @@ ifeq ($(BEAT_NAME), metricbeat)
 	# disable the system/load metricset on windows
 	sed -i.bk 's/- load/#- load/' $(PREFIX)/metricbeat-win.yml
 	rm $(PREFIX)/metricbeat-win.yml.bk
-	sed -i.bk 's/- load/#- load/' $(PREFIX)/metricbeat-win.full.yml
-	rm $(PREFIX)/metricbeat-win.full.yml.bk
+	sed -i.bk 's/- load/#- load/' $(PREFIX)/metricbeat-win.reference.yml
+	rm $(PREFIX)/metricbeat-win.reference.yml.bk
 endif
 
 # Runs all collection steps and updates afterwards

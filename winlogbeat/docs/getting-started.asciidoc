@@ -57,9 +57,9 @@ execution policy for the current session to allow the script to run. For example
 
 Before starting Winlogbeat, you should look at the configuration options in the
 configuration file, for example `C:\Program Files\Winlogbeat\winlogbeat.yml`.
-There’s also a full example configuration file called `winlogbeat.full.yml` that
+There’s also a full example configuration file called `winlogbeat.reference.yml` that
 shows all non-deprecated options. For more information about these options, see
-<<winlogbeat-configuration-details>>. 
+<<winlogbeat-configuration-details>>.
 
 [[winlogbeat-configuration]]
 === Step 2: Configuring Winlogbeat
