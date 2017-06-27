@@ -302,6 +302,25 @@ If you require log lines to be sent in near real time do not use a very low `sca
 
 The default setting is 10s.
 
+
+[[scan-sort]]
+===== scan.sort
+
+Specifies if files should be harvested in order and how to determine the order. Possible values are modtime, filename and none. To sort by file modification time use modtime otherwise use filename.
+
+If you specify a value other than none for this setting you can determine whether to use ascending or descending order using `scan.order`.
+
+The default setting is none.
+
+
+[[scan-order]]
+===== scan.order
+
+Specifies ascending or descending order if `scan.sort` is set to a value other than none. Possible values are asc or desc.
+
+The default setting is asc.
+
+
 ===== harvester_buffer_size
 
 The size in bytes of the buffer that each harvester uses when fetching a file. The default is 16384.
