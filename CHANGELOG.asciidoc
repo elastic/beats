@@ -153,7 +153,7 @@ https://github.com/elastic/beats/compare/v6.0.0-alpha1...v6.0.0-alpha2[View comm
 - Add `logging.files` `permissions` option. {pull}4295[4295]
 
 *Filebeat*
-
+- Added ability to sort harvested files. {pull}4374[4374]
 - Add experimental Redis slow log prospector type. {pull}4180[4180]
 
 *Metricbeat*
