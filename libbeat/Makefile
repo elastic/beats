@@ -16,4 +16,4 @@ fields:
 collect: fields
 
 clean::
-	rm -rf libbeat.full.yml libbeat.yml
+	rm -rf libbeat.reference.yml libbeat.yml

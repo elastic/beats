@@ -18,17 +18,17 @@ cp fields.yml $PREFIX/fields.yml
 # linux
 cp $BEAT_NAME.yml $PREFIX/$BEAT_NAME-linux.yml
 chmod 0600 $PREFIX/$BEAT_NAME-linux.yml
-cp $BEAT_NAME.full.yml $PREFIX/$BEAT_NAME-linux.full.yml
+cp $BEAT_NAME.reference.yml $PREFIX/$BEAT_NAME-linux.reference.yml
 
 # darwin
 cp $BEAT_NAME.yml $PREFIX/$BEAT_NAME-darwin.yml
 chmod 0600 $PREFIX/$BEAT_NAME-darwin.yml
-cp $BEAT_NAME.full.yml $PREFIX/$BEAT_NAME-darwin.full.yml
+cp $BEAT_NAME.reference.yml $PREFIX/$BEAT_NAME-darwin.reference.yml
 
 # win
 cp $BEAT_NAME.yml $PREFIX/$BEAT_NAME-win.yml
 chmod 0600 $PREFIX/$BEAT_NAME-win.yml
-cp $BEAT_NAME.full.yml $PREFIX/$BEAT_NAME-win.full.yml
+cp $BEAT_NAME.reference.yml $PREFIX/$BEAT_NAME-win.reference.yml
 
 # Runs beat specific tasks which should be done before building
 PREFIX=$PREFIX make before-build

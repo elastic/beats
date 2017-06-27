@@ -1,4 +1,4 @@
-# For more available modules and options, please see the filebeat.full.yml sample
+# For more available modules and options, please see the filebeat.reference.yml sample
 # configuration file.
 
 #=========================== Filebeat prospectors =============================
