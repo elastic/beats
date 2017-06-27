@@ -32,7 +32,7 @@ fpm --force -s dir -t deb \
         beatname-${RUNID}.sh=/usr/bin/{{.beat_name}}.sh \
         {{.beat_name}}-linux-{{.arch}}=/usr/share/{{.beat_name}}/bin/{{.beat_name}} \
         {{.beat_name}}-linux.yml=/etc/{{.beat_name}}/{{.beat_name}}.yml \
-        {{.beat_name}}-linux.full.yml=/etc/{{.beat_name}}/{{.beat_name}}.full.yml \
+        {{.beat_name}}-linux.reference.yml=/etc/{{.beat_name}}/{{.beat_name}}.reference.yml \
         fields.yml=/etc/{{.beat_name}}/fields.yml \
         ${RUNID}.service=/lib/systemd/system/{{.beat_name}}.service \
         god-linux-{{.arch}}=/usr/share/{{.beat_name}}/bin/{{.beat_name}}-god \
