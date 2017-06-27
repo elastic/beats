@@ -306,19 +306,23 @@ The default setting is 10s.
 [[scan-sort]]
 ===== scan.sort
 
-Specifies if files should be harvested in order and how to determine the order. Possible values are modtime, filename and none. To sort by file modification time use modtime otherwise use filename.
+[]experimental
 
-If you specify a value other than none for this setting you can determine whether to use ascending or descending order using `scan.order`.
+ If you specify a value other than the empty string for this setting you can determine whether to use ascending or descending order using `scan.order`. Possible values are `modtime` and `filename`. To sort by file modification time, use `modtime`, otherwise use `filename`. Leave this option empty to disable it.
 
-The default setting is none.
+If you specify a value for this setting, you can use `scan.order` to configure whether files are scanned in ascending or descending order.
+
+The default setting is disabled.
 
 
 [[scan-order]]
 ===== scan.order
 
-Specifies ascending or descending order if `scan.sort` is set to a value other than none. Possible values are asc or desc.
+[]experimental
 
-The default setting is asc.
+Specifies whether to use ascending or descending order when `scan.sort` is set to a value other than none. Possible values are `asc` or `desc`.
+
+The default setting is `asc`.
 
 
 ===== harvester_buffer_size
