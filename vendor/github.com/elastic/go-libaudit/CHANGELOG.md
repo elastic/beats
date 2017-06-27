@@ -2,19 +2,13 @@
 All notable changes to this project will be documented in this file.
 This project adheres to [Semantic Versioning](http://semver.org/).
 
-## [Unreleased]
+## [0.0.4]
 
 ### Added
 - Add a package for building audit rules that can be added to the kernel.
 - Add GetRules, DeleteRules, DeleteRule, and AddRule methods to AuditClient.
 - auparse - Add conversion of POSIX exit code values to their name.
 - Add SetFailure to AuditClient. #8
-
-### Changed
-
-### Deprecated
-
-### Removed
 
 ## [0.0.3]
 
