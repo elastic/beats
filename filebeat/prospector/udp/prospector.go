@@ -13,6 +13,8 @@ type Prospector struct {
 }
 
 func NewProspector(cfg *common.Config, outlet channel.Outleter) (*Prospector, error) {
+	logp.Experimental("UDP prospector type is used")
+
 	forwarder, err := harvester.NewForwarder(cfg, outlet)
 	if err != nil {
 		return nil, err

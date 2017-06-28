@@ -231,10 +231,13 @@ filebeat.prospectors:
   # Redis AUTH password. Empty by default.
   #password: foobared
 
+#------------------------------ Udp prospector --------------------------------
+# Experimental: Config options for the udp prospector
 #- type: udp
 
   # Maximum size of the message received over UDP
   #max_message_size: 10240
+
 #========================= Filebeat global options ============================
 
 # Event count spool threshold - forces network flush if exceeded
