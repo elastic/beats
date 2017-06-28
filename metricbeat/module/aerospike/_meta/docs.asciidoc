@@ -1,0 +1,8 @@
+== aerospike Module
+
+This is the aerospike Module. It uses http://www.aerospike.com/docs/reference/info[Info command] to collect metrics.
+
+[float]
+=== Compatibility
+
+The Aeropsike metricsets were tested with Aerospike 3.9 and are expected to work with all versions >= 3.9.

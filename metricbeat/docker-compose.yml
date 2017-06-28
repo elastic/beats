@@ -16,6 +16,7 @@ services:
       - proxy_dep
 
     env_file:
+      - ${PWD}/module/aerospike/_meta/env
       - ${PWD}/module/apache/_meta/env
       - ${PWD}/module/ceph/_meta/env
       - ${PWD}/module/couchbase/_meta/env
@@ -43,6 +44,7 @@ services:
   proxy_dep:
     image: busybox
     depends_on:
+      aerospike:      { condition: service_healthy }
       apache:         { condition: service_healthy }
       ceph:           { condition: service_healthy }
       couchbase:      { condition: service_healthy }
@@ -67,6 +69,9 @@ services:
       zookeeper:      { condition: service_healthy }
 
   # Modules
+  aerospike:
+    build: ${PWD}/module/aerospike/_meta
+
   apache:
     build: ${PWD}/module/apache/_meta
 

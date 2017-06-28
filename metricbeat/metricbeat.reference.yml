@@ -83,6 +83,13 @@ metricbeat.modules:
   #socket.reverse_lookup.success_ttl: 60s
   #socket.reverse_lookup.failure_ttl: 60s
 
+#------------------------------ aerospike Module -----------------------------
+- module: aerospike
+  metricsets: ["namespace"]
+  enabled: false
+  period: 10s
+  hosts: ["localhost:3000"]
+
 #------------------------------- Apache Module -------------------------------
 - module: apache
   metricsets: ["status"]
