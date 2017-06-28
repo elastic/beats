@@ -131,7 +131,7 @@ func (ms *MetricSet) addRules(reporter mb.PushReporter) error {
 			// Treat rule add errors as warnings and continue.
 			err = errors.Wrapf(err, "failed to add kernel rule '%v'", rule.flags)
 			reporter.Error(err)
-			logp.Warn("%v %v", err)
+			logp.Warn("%v %v", logPrefix, err)
 		}
 	}
 	logp.Info("%v Successfully added %d kernel audit rules.", logPrefix, len(rules))
