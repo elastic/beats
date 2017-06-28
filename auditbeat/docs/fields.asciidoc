@@ -145,6 +145,15 @@ The kernel metricset distributes audit events received from the Linux Audit Fram
 
 
 [float]
+=== audit.kernel.action
+
+type: keyword
+
+example: logged-in
+
+A description of the action taken by the user.
+
+[float]
 == actor Fields
 
 The actor is the user that triggered the audit event.
