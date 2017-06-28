@@ -126,15 +126,18 @@ func (ms *MetricSet) addRules(reporter mb.PushReporter) error {
 	logp.Info("%v Deleted %v pre-existing audit rules.", logPrefix, n)
 
 	// Add rules from config.
+	var failCount int
 	for _, rule := range rules {
 		if err = ms.client.AddRule(rule.data); err != nil {
 			// Treat rule add errors as warnings and continue.
 			err = errors.Wrapf(err, "failed to add kernel rule '%v'", rule.flags)
 			reporter.Error(err)
 			logp.Warn("%v %v", logPrefix, err)
+			failCount++
 		}
 	}
-	logp.Info("%v Successfully added %d kernel audit rules.", logPrefix, len(rules))
+	logp.Info("%v Successfully added %d of %d kernel audit rules.",
+		logPrefix, len(rules)-failCount, len(rules))
 	return nil
 }
 
