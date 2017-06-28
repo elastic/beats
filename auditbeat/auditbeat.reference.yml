@@ -32,7 +32,9 @@ auditbeat.modules:
 #-------------------------------- Audit Module -------------------------------
 - module: audit
   enabled: false
-  metricsets: ["kernel"]
+  metricsets: [kernel, file]
+
+  # Kernel Metricset Options
   kernel.resolve_ids: true
   kernel.failure_mode: silent
   kernel.backlog_limit: 8196
@@ -44,6 +46,15 @@ auditbeat.modules:
     # Create file watches (-w) or syscall audits (-a or -A). For example:
     -w /etc/passwd -p wa -k identity
     -a always,exit -F arch=b32 -S open,creat,truncate,ftruncate,openat,open_by_handle_at -F exit=-EPERM -k access
+
+  # File Metricset Options
+  file.paths:
+    binaries:
+    - /usr/bin
+    - /usr/sbin
+    libraries:
+    - /usr/lib
+  file.max_file_size: 1073741824 # 1 GiB
 
 
 

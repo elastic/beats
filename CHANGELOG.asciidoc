@@ -82,6 +82,9 @@ https://github.com/elastic/beats/compare/v6.0.0-alpha2...master[Check the HEAD d
 
 *Winlogbeat*
 
+*Auditbeat*
+- Add file integrity metricset to the audit module. {pull}4486[4486]
+
 ==== Deprecated
 
 *Affecting all Beats*
