@@ -65,6 +65,73 @@ func TestField(t *testing.T) {
 				"enabled": false,
 			},
 		},
+		{
+			field:  Field{Type: "text", Analyzer: "autocomplete"},
+			method: func(f Field) common.MapStr { return f.text() },
+			output: common.MapStr{
+				"type":     "text",
+				"analyzer": "autocomplete",
+				"norms":    false,
+			},
+		},
+		{
+			field:  Field{Type: "text", Analyzer: "autocomplete", Norms: true},
+			method: func(f Field) common.MapStr { return f.text() },
+			output: common.MapStr{
+				"type":     "text",
+				"analyzer": "autocomplete",
+			},
+		},
+		{
+			field:  Field{Type: "text", SearchAnalyzer: "standard", Norms: true},
+			method: func(f Field) common.MapStr { return f.text() },
+			output: common.MapStr{
+				"type":            "text",
+				"search_analyzer": "standard",
+			},
+		},
+		{
+			field:  Field{Type: "text", Analyzer: "autocomplete", SearchAnalyzer: "standard", Norms: true},
+			method: func(f Field) common.MapStr { return f.text() },
+			output: common.MapStr{
+				"type":            "text",
+				"analyzer":        "autocomplete",
+				"search_analyzer": "standard",
+			},
+		},
+		{
+			field:  Field{Type: "text", MultiFields: Fields{Field{Name: "raw", Type: "keyword"}}, Norms: true},
+			method: func(f Field) common.MapStr { return f.text() },
+			output: common.MapStr{
+				"type": "text",
+				"fields": common.MapStr{
+					"raw": common.MapStr{
+						"type":         "keyword",
+						"ignore_above": 1024,
+					},
+				},
+			},
+		},
+		{
+			field: Field{Type: "text", MultiFields: Fields{
+				Field{Name: "raw", Type: "keyword"},
+				Field{Name: "indexed", Type: "text"},
+			}, Norms: true},
+			method: func(f Field) common.MapStr { return f.text() },
+			output: common.MapStr{
+				"type": "text",
+				"fields": common.MapStr{
+					"raw": common.MapStr{
+						"type":         "keyword",
+						"ignore_above": 1024,
+					},
+					"indexed": common.MapStr{
+						"type":  "text",
+						"norms": false,
+					},
+				},
+			},
+		},
 	}
 
 	for _, test := range tests {
