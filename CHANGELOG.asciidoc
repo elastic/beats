@@ -58,7 +58,8 @@ https://github.com/elastic/beats/compare/v6.0.0-alpha2...master[Check the HEAD d
 *Affecting all Beats*
 
 - New cli subcommands interface. {pull}4420[4420]
-- Allow source path matching in `add_docker_metadata` processor {pull}4495[4495]
+- Allow source path matching in `add_docker_metadata` processor. {pull}4495[4495]
+- Add support for analyzers and multifields in fields.yml. {pull}4574[4574]
 
 *Filebeat*
 
