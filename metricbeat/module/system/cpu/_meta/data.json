@@ -11,39 +11,63 @@
     },
     "system": {
         "cpu": {
+            "cores": 8,
             "idle": {
-                "pct": 0.852,
-                "ticks": 44421033
+                "norm": {
+                    "pct": 0.8851
+                },
+                "pct": 7.0811,
+                "ticks": 1680102981
             },
             "iowait": {
+                "norm": {
+                    "pct": 0
+                },
                 "pct": 0,
-                "ticks": 159735
+                "ticks": 0
             },
             "irq": {
+                "norm": {
+                    "pct": 0
+                },
                 "pct": 0,
                 "ticks": 0
             },
             "nice": {
+                "norm": {
+                    "pct": 0
+                },
                 "pct": 0,
                 "ticks": 0
             },
             "softirq": {
+                "norm": {
+                    "pct": 0
+                },
                 "pct": 0,
-                "ticks": 14070
+                "ticks": 0
             },
             "steal": {
+                "norm": {
+                    "pct": 0
+                },
                 "pct": 0,
                 "ticks": 0
             },
             "system": {
-                "pct": 0.0408,
-                "ticks": 305704
+                "norm": {
+                    "pct": 0.0412
+                },
+                "pct": 0.3296,
+                "ticks": 42755361
             },
             "user": {
-                "pct": 0.1071,
-                "ticks": 841974
+                "norm": {
+                    "pct": 0.0737
+                },
+                "pct": 0.5893,
+                "ticks": 50330417
             }
         }
-    },
-    "type": "metricsets"
+    }
 }

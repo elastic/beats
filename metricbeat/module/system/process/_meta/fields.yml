@@ -61,6 +61,13 @@
           description: >
             The percentage of CPU time spent by the process since the last update. Its value is similar to the
             %CPU value of the process displayed by the top command on Unix systems.
+        - name: total.norm.pct
+          type: scaled_float
+          format: percent
+          description: >
+            The percentage of CPU time spent by the process since the last event.
+            This value is normalized by the number of CPU cores and it ranges
+            from 0 to 100%.
         - name: system
           type: long
           description: >

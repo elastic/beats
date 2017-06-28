@@ -1,4 +1,4 @@
-# For more available modules and options, please see the filebeat.full.yml sample
+# For more available modules and options, please see the filebeat.reference.yml sample
 # configuration file.
 
 #=========================== Filebeat prospectors =============================
@@ -9,7 +9,7 @@ filebeat.prospectors:
 # you can use different prospectors for various configurations.
 # Below are the prospector specific configurations.
 
-- input_type: log
+- type: log
 
   # Change to true to enable this prospector configuration.
   enabled: false
@@ -31,7 +31,7 @@ filebeat.prospectors:
   # are matching any regular expression from the list. By default, no files are dropped.
   #exclude_files: ['.gz$']
 
-  # Optional additional fields. These field can be freely picked
+  # Optional additional fields. These fields can be freely picked
   # to add additional information to the crawled log files for filtering
   #fields:
   #  level: debug

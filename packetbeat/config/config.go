@@ -9,23 +9,24 @@ import (
 )
 
 type Config struct {
-	Interfaces     InterfacesConfig          `config:"interfaces"`
-	Flows          *Flows                    `config:"flows"`
-	Protocols      map[string]*common.Config `config:"protocols"`
-	ProtocolsList  []*common.Config          `config:"protocols"`
-	Procs          procs.ProcsConfig         `config:"procs"`
-	IgnoreOutgoing bool                      `config:"ignore_outgoing"`
-	RunOptions     droppriv.RunOptions
+	Interfaces      InterfacesConfig          `config:"interfaces"`
+	Flows           *Flows                    `config:"flows"`
+	Protocols       map[string]*common.Config `config:"protocols"`
+	ProtocolsList   []*common.Config          `config:"protocols"`
+	Procs           procs.ProcsConfig         `config:"procs"`
+	IgnoreOutgoing  bool                      `config:"ignore_outgoing"`
+	ShutdownTimeout time.Duration             `config:"shutdown_timeout"`
+	RunOptions      droppriv.RunOptions
 }
 
 type InterfacesConfig struct {
-	Device       string
-	Type         string
-	File         string
-	WithVlans    bool
-	BpfFilter    string
-	Snaplen      int
-	BufferSizeMb int
+	Device       string `config:"device"`
+	Type         string `config:"type"`
+	File         string `config:"file"`
+	WithVlans    bool   `config:"with_vlans"`
+	BpfFilter    string `config:"bpf_filter"`
+	Snaplen      int    `config:"snaplen"`
+	BufferSizeMb int    `config:"buffer_size_mb"`
 	TopSpeed     bool
 	Dumpfile     string
 	OneAtATime   bool

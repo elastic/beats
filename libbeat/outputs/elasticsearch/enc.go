@@ -3,9 +3,16 @@ package elasticsearch
 import (
 	"bytes"
 	"compress/gzip"
-	"encoding/json"
 	"io"
 	"net/http"
+	"time"
+
+	"github.com/urso/go-structform/gotype"
+	"github.com/urso/go-structform/json"
+
+	"github.com/elastic/beats/libbeat/common"
+	"github.com/elastic/beats/libbeat/outputs/codec"
+	"github.com/elastic/beats/libbeat/publisher/beat"
 )
 
 type bodyEncoder interface {
@@ -27,23 +34,42 @@ type bulkWriter interface {
 }
 
 type jsonEncoder struct {
-	buf *bytes.Buffer
+	buf    *bytes.Buffer
+	folder *gotype.Iterator
 }
 
 type gzipEncoder struct {
-	buf  *bytes.Buffer
-	gzip *gzip.Writer
+	buf    *bytes.Buffer
+	gzip   *gzip.Writer
+	folder *gotype.Iterator
+}
+
+type event struct {
+	Timestamp time.Time     `struct:"@timestamp"`
+	Fields    common.MapStr `struct:",inline"`
 }
 
 func newJSONEncoder(buf *bytes.Buffer) *jsonEncoder {
 	if buf == nil {
 		buf = bytes.NewBuffer(nil)
 	}
-	return &jsonEncoder{buf}
+	e := &jsonEncoder{buf: buf}
+	e.resetState()
+	return e
 }
 
 func (b *jsonEncoder) Reset() {
 	b.buf.Reset()
+}
+
+func (b *jsonEncoder) resetState() {
+	var err error
+	visitor := json.NewVisitor(b.buf)
+	b.folder, err = gotype.NewIterator(visitor,
+		gotype.Folders(codec.TimestampEncoder, codec.BcTimestampEncoder))
+	if err != nil {
+		panic(err)
+	}
 }
 
 func (b *jsonEncoder) AddHeader(header *http.Header) {
@@ -56,24 +82,36 @@ func (b *jsonEncoder) Reader() io.Reader {
 
 func (b *jsonEncoder) Marshal(obj interface{}) error {
 	b.Reset()
-	enc := json.NewEncoder(b.buf)
-	return enc.Encode(obj)
+	return b.AddRaw(obj)
 }
 
-func (b *jsonEncoder) AddRaw(raw interface{}) error {
-	enc := json.NewEncoder(b.buf)
-	return enc.Encode(raw)
+func (b *jsonEncoder) AddRaw(obj interface{}) error {
+	var err error
+	switch v := obj.(type) {
+	case beat.Event:
+		err = b.folder.Fold(event{Timestamp: v.Timestamp, Fields: v.Fields})
+	case *beat.Event:
+		err = b.folder.Fold(event{Timestamp: v.Timestamp, Fields: v.Fields})
+	default:
+		err = b.folder.Fold(obj)
+	}
+
+	if err != nil {
+		b.resetState()
+	}
+
+	b.buf.WriteByte('\n')
+
+	return err
 }
 
 func (b *jsonEncoder) Add(meta, obj interface{}) error {
-	enc := json.NewEncoder(b.buf)
 	pos := b.buf.Len()
-
-	if err := enc.Encode(meta); err != nil {
+	if err := b.AddRaw(meta); err != nil {
 		b.buf.Truncate(pos)
 		return err
 	}
-	if err := enc.Encode(obj); err != nil {
+	if err := b.AddRaw(obj); err != nil {
 		b.buf.Truncate(pos)
 		return err
 	}
@@ -89,7 +127,19 @@ func newGzipEncoder(level int, buf *bytes.Buffer) (*gzipEncoder, error) {
 		return nil, err
 	}
 
-	return &gzipEncoder{buf, w}, nil
+	g := &gzipEncoder{buf: buf, gzip: w}
+	g.resetState()
+	return g, nil
+}
+
+func (g *gzipEncoder) resetState() {
+	var err error
+	visitor := json.NewVisitor(g.gzip)
+	g.folder, err = gotype.NewIterator(visitor,
+		gotype.Folders(codec.TimestampEncoder, codec.BcTimestampEncoder))
+	if err != nil {
+		panic(err)
+	}
 }
 
 func (b *gzipEncoder) Reset() {
@@ -109,25 +159,41 @@ func (b *gzipEncoder) AddHeader(header *http.Header) {
 
 func (b *gzipEncoder) Marshal(obj interface{}) error {
 	b.Reset()
-	enc := json.NewEncoder(b.gzip)
-	err := enc.Encode(obj)
-	return err
+	return b.AddRaw(obj)
 }
 
-func (b *gzipEncoder) AddRaw(raw interface{}) error {
-	enc := json.NewEncoder(b.gzip)
-	return enc.Encode(raw)
+var nl = []byte("\n")
+
+func (b *gzipEncoder) AddRaw(obj interface{}) error {
+	var err error
+	switch v := obj.(type) {
+	case beat.Event:
+		err = b.folder.Fold(event{Timestamp: v.Timestamp, Fields: v.Fields})
+	case *beat.Event:
+		err = b.folder.Fold(event{Timestamp: v.Timestamp, Fields: v.Fields})
+	default:
+		err = b.folder.Fold(obj)
+	}
+
+	if err != nil {
+		b.resetState()
+	}
+
+	_, err = b.gzip.Write(nl)
+	if err != nil {
+		b.resetState()
+	}
+
+	return nil
 }
 
 func (b *gzipEncoder) Add(meta, obj interface{}) error {
-	enc := json.NewEncoder(b.gzip)
 	pos := b.buf.Len()
-
-	if err := enc.Encode(meta); err != nil {
+	if err := b.AddRaw(meta); err != nil {
 		b.buf.Truncate(pos)
 		return err
 	}
-	if err := enc.Encode(obj); err != nil {
+	if err := b.AddRaw(obj); err != nil {
 		b.buf.Truncate(pos)
 		return err
 	}

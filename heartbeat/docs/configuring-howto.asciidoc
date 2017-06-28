@@ -10,7 +10,7 @@ This section describes some common use cases for changing configuration options.
 To configure Heartbeat, you edit the configuration file. For rpm and deb,
 you’ll find the default configuration file at
 +/etc/heartbeat/heartbeat.yml+. There's also a full example
-configuration file at +/etc/heartbeat/heartbeat.full.yml+ that shows
+configuration file at +/etc/heartbeat/heartbeat.reference.yml+ that shows
 all non-deprecated options. For mac and win, look in the archive that you
 extracted.
 

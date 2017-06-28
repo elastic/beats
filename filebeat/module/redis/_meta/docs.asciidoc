@@ -1,0 +1,54 @@
+== Redis module
+
+experimental[]
+
+This module has two filesets:
+
+* The `log` fileset collects and parses the logs that Redis writes to disk.  The `slowlog` fileset
+* connects to Redis via the network and retrieves the slow logs
+  by using the `SLOWLOG` command.
+
+For the `log` fileset, make sure the `logfile` option is set in the Redis configuration file. For
+the `slowlog` fileset, make sure the `slowlog-log-slower-than` is set.
+
+[float]
+=== Compatibility
+
+The Redis `log` fileset was tested with logs from Redis versions 1.2.6, 2.4.6, and 3.0.2, so we
+expect compatibility with any version 1.x, 2.x, or 3.x.
+
+On Windows, the default paths assume that Redis was installed from the Chocolatey repository.
+
+The Redis `slowlog` fileset was tested with Redis 3.0.2 and 2.4.6. We expect compatibility with any
+Redis version newer than 2.2.12, when the SLOWLOG command was added.
+
+[float]
+=== Dashboard
+
+This module comes with a sample dashboard.
+
+image::./images/kibana-redis.png[]
+
+[float]
+=== Log fileset settings
+
+[float]
+==== var.paths
+
+An array of paths where to look for the log files. If left empty, Filebeat
+will choose the paths depending on your operating systems.
+
+[float]
+=== Slowlog fileset settings
+
+[float]
+==== var.hosts
+
+An array of hosts to which Filebeat should connect to retrieve the slow logs. If left empty,
+`localhost:6379` is assumed.
+
+[float]
+==== var.password
+
+The password to use to connect to Redis, in case Redis authentication is enabled (the `requirepass`
+option in the Redis configuration).

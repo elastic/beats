@@ -2,8 +2,8 @@ package add_cloud_metadata
 
 import (
 	"github.com/elastic/beats/libbeat/common"
-	s "github.com/elastic/beats/metricbeat/schema"
-	c "github.com/elastic/beats/metricbeat/schema/mapstriface"
+	s "github.com/elastic/beats/libbeat/common/schema"
+	c "github.com/elastic/beats/libbeat/common/schema/mapstriface"
 )
 
 // Google GCE Metadata Service
@@ -16,6 +16,7 @@ func newGceMetadataFetcher(config common.Config) (*metadataFetcher, error) {
 		if instance, ok := m["instance"].(map[string]interface{}); ok {
 			s.Schema{
 				"instance_id":       c.StrFromNum("id"),
+				"instance_name":     c.Str("name"),
 				"machine_type":      c.Str("machineType"),
 				"availability_zone": c.Str("zone"),
 			}.ApplyTo(out, instance)

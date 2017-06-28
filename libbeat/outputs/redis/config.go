@@ -7,6 +7,7 @@ import (
 
 	"github.com/elastic/beats/libbeat/logp"
 	"github.com/elastic/beats/libbeat/outputs"
+	"github.com/elastic/beats/libbeat/outputs/codec"
 	"github.com/elastic/beats/libbeat/outputs/transport"
 )
 
@@ -17,10 +18,11 @@ type redisConfig struct {
 	Port        int                   `config:"port"`
 	LoadBalance bool                  `config:"loadbalance"`
 	Timeout     time.Duration         `config:"timeout"`
+	BulkMaxSize int                   `config:"bulk_max_size"`
 	MaxRetries  int                   `config:"max_retries"`
 	TLS         *outputs.TLSConfig    `config:"ssl"`
 	Proxy       transport.ProxyConfig `config:",inline"`
-	Codec       outputs.CodecConfig   `config:"codec"`
+	Codec       codec.Config          `config:"codec"`
 	Db          int                   `config:"db"`
 	DataType    string                `config:"datatype"`
 }
@@ -30,6 +32,7 @@ var (
 		Port:        6379,
 		LoadBalance: true,
 		Timeout:     5 * time.Second,
+		BulkMaxSize: 2048,
 		MaxRetries:  3,
 		TLS:         nil,
 		Db:          0,

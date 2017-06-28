@@ -8,10 +8,12 @@ import (
 	"github.com/mitchellh/hashstructure"
 
 	"github.com/elastic/beats/filebeat/channel"
-	cfg "github.com/elastic/beats/filebeat/config"
+	"github.com/elastic/beats/filebeat/harvester"
 	"github.com/elastic/beats/filebeat/input/file"
 	"github.com/elastic/beats/filebeat/prospector/log"
+	"github.com/elastic/beats/filebeat/prospector/redis"
 	"github.com/elastic/beats/filebeat/prospector/stdin"
+	"github.com/elastic/beats/filebeat/prospector/udp"
 	"github.com/elastic/beats/libbeat/common"
 	"github.com/elastic/beats/libbeat/logp"
 )
@@ -69,13 +71,17 @@ func (p *Prospector) initProspectorer(outlet channel.Outleter, states []file.Sta
 	var prospectorer Prospectorer
 	var err error
 
-	switch p.config.InputType {
-	case cfg.StdinInputType:
+	switch p.config.Type {
+	case harvester.StdinType:
 		prospectorer, err = stdin.NewProspector(config, outlet)
-	case cfg.LogInputType:
+	case harvester.RedisType:
+		prospectorer, err = redis.NewProspector(config, outlet)
+	case harvester.LogType:
 		prospectorer, err = log.NewProspector(config, states, outlet, p.done)
+	case harvester.UdpType:
+		prospectorer, err = udp.NewProspector(config, outlet)
 	default:
-		return fmt.Errorf("invalid prospector type: %v. Change input_type", p.config.InputType)
+		return fmt.Errorf("invalid prospector type: %v. Change type", p.config.Type)
 	}
 
 	if err != nil {
@@ -90,7 +96,7 @@ func (p *Prospector) initProspectorer(outlet channel.Outleter, states []file.Sta
 // Start starts the prospector
 func (p *Prospector) Start() {
 	p.wg.Add(1)
-	logp.Info("Starting prospector of type: %v; id: %v ", p.config.InputType, p.ID())
+	logp.Info("Starting prospector of type: %v; id: %v ", p.config.Type, p.ID())
 
 	onceWg := sync.WaitGroup{}
 	if p.Once {

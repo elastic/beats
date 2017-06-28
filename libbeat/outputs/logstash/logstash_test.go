@@ -1,4 +1,3 @@
-// Need for unit and integration tests
 package logstash
 
 import (
@@ -13,9 +12,10 @@ import (
 	"github.com/elastic/go-lumber/server/v2"
 
 	"github.com/elastic/beats/libbeat/common"
-	"github.com/elastic/beats/libbeat/common/op"
 	"github.com/elastic/beats/libbeat/outputs"
+	"github.com/elastic/beats/libbeat/outputs/outest"
 	"github.com/elastic/beats/libbeat/outputs/transport/transptest"
+	"github.com/elastic/beats/libbeat/publisher/beat"
 )
 
 const (
@@ -23,89 +23,23 @@ const (
 	logstashTestDefaultPort = "5044"
 )
 
-var testOptions = outputs.Options{}
-
-func strDefault(a, defaults string) string {
-	if len(a) == 0 {
-		return defaults
-	}
-	return a
-}
-
-func getenv(name, defaultValue string) string {
-	return strDefault(os.Getenv(name), defaultValue)
-}
-
-func getLogstashHost() string {
-	return fmt.Sprintf("%v:%v",
-		getenv("LS_HOST", logstashDefaultHost),
-		getenv("LS_TCP_PORT", logstashTestDefaultPort),
-	)
-}
-
-func testEvent() outputs.Data {
-	return outputs.Data{Event: common.MapStr{
-		"@timestamp": common.Time(time.Now()),
-		"type":       "log",
-		"extra":      10,
-		"message":    "message",
-	}}
-}
-
-func testLogstashIndex(test string) string {
-	return fmt.Sprintf("beat-logstash-int-%v-%d", test, os.Getpid())
-}
-
-func newTestLumberjackOutput(
-	t *testing.T,
-	test string,
-	config map[string]interface{},
-) outputs.BulkOutputer {
-	if config == nil {
-		config = map[string]interface{}{
-			"hosts": []string{getLogstashHost()},
-			"index": testLogstashIndex(test),
-		}
-	}
-
-	plugin := outputs.FindOutputPlugin("logstash")
-	if plugin == nil {
-		t.Fatalf("No logstash output plugin found")
-	}
-
-	cfg, _ := common.NewConfigFrom(config)
-	output, err := plugin(common.BeatInfo{}, cfg)
-	if err != nil {
-		t.Fatalf("init logstash output plugin failed: %v", err)
-	}
-
-	return output.(outputs.BulkOutputer)
-}
-
-func testOutputerFactory(
-	t *testing.T,
-	test string,
-	config map[string]interface{},
-) func() outputs.BulkOutputer {
-	return func() outputs.BulkOutputer {
-		return newTestLumberjackOutput(t, test, config)
-	}
-}
-
 func TestLogstashTCP(t *testing.T) {
+	enableLogging([]string{"*"})
+
 	timeout := 2 * time.Second
 	server := transptest.NewMockServerTCP(t, timeout, "", nil)
 
-	// create lumberjack output client
 	config := map[string]interface{}{
 		"hosts":   []string{server.Addr()},
 		"index":   testLogstashIndex("logstash-conn-tcp"),
-		"timeout": 2,
+		"timeout": "2s",
 	}
 	testConnectionType(t, server, testOutputerFactory(t, "", config))
 }
 
 func TestLogstashTLS(t *testing.T) {
+	enableLogging([]string{"*"})
+
 	certName := "ca_test"
 	ip := net.IP{127, 0, 0, 1}
 
@@ -113,10 +47,11 @@ func TestLogstashTLS(t *testing.T) {
 	transptest.GenCertsForIPIfMIssing(t, ip, certName)
 	server := transptest.NewMockServerTLS(t, timeout, certName, nil)
 
+	// create lumberjack output client
 	config := map[string]interface{}{
 		"hosts":                       []string{server.Addr()},
 		"index":                       testLogstashIndex("logstash-conn-tls"),
-		"timeout":                     2,
+		"timeout":                     "2s",
 		"ssl.certificate_authorities": []string{certName + ".pem"},
 	}
 	testConnectionType(t, server, testOutputerFactory(t, "", config))
@@ -141,16 +76,22 @@ func TestLogstashInvalidTLSInsecure(t *testing.T) {
 	testConnectionType(t, server, testOutputerFactory(t, "", config))
 }
 
+func testLogstashIndex(test string) string {
+	return fmt.Sprintf("beat-logstash-int-%v-%d", test, os.Getpid())
+}
+
 func testConnectionType(
 	t *testing.T,
 	mock *transptest.MockServer,
-	makeOutputer func() outputs.BulkOutputer,
+	makeOutputer func() outputs.NetworkClient,
 ) {
 	t.Log("testConnectionType")
 	server, _ := v2.NewWithListener(mock.Listener)
 
 	// worker loop
 	go func() {
+		defer server.Close()
+
 		t.Log("start worker loop")
 		defer t.Log("stop worker loop")
 
@@ -158,14 +99,26 @@ func testConnectionType(
 		output := makeOutputer()
 		t.Logf("new outputter: %v", output)
 
-		signal := op.NewSignalChannel()
+		err := output.Connect()
+		if err != nil {
+			t.Error("test client failed to connect: ", err)
+			return
+		}
+
+		sig := make(chan struct{})
+
 		t.Log("publish event")
-		output.PublishEvent(signal, testOptions, testEvent())
+		batch := outest.NewBatch(testEvent())
+		batch.OnSignal = func(_ outest.BatchSignal) {
+			close(sig)
+		}
+		err = output.Publish(batch)
 
 		t.Log("wait signal")
-		assert.True(t, signal.Wait() == op.SignalCompleted)
+		<-sig
 
-		server.Close()
+		assert.NoError(t, err)
+		assert.Equal(t, outest.BatchACK, batch.Signals[0].Tag)
 	}()
 
 	for batch := range server.ReceiveChan() {
@@ -177,4 +130,67 @@ func testConnectionType(
 		assert.Equal(t, 10.0, msg["extra"])
 		assert.Equal(t, "message", msg["message"])
 	}
+}
+
+func testEvent() beat.Event {
+	return beat.Event{Fields: common.MapStr{
+		"@timestamp": common.Time(time.Now()),
+		"type":       "log",
+		"extra":      10,
+		"message":    "message",
+	}}
+}
+
+func testOutputerFactory(
+	t *testing.T,
+	test string,
+	config map[string]interface{},
+) func() outputs.NetworkClient {
+	return func() outputs.NetworkClient {
+		return newTestLumberjackOutput(t, test, config)
+	}
+}
+
+func newTestLumberjackOutput(
+	t *testing.T,
+	test string,
+	config map[string]interface{},
+) outputs.NetworkClient {
+	if config == nil {
+		config = map[string]interface{}{
+			"hosts": []string{getLogstashHost()},
+			"index": testLogstashIndex(test),
+		}
+	}
+
+	cfg, _ := common.NewConfigFrom(config)
+	grp, err := outputs.Load(common.BeatInfo{}, "logstash", cfg)
+	if err != nil {
+		t.Fatalf("init logstash output plugin failed: %v", err)
+	}
+
+	client := grp.Clients[0].(outputs.NetworkClient)
+	if err := client.Connect(); err != nil {
+		t.Fatalf("Client failed to connected: %v", err)
+	}
+
+	return client
+}
+
+func getLogstashHost() string {
+	return fmt.Sprintf("%v:%v",
+		getenv("LS_HOST", logstashDefaultHost),
+		getenv("LS_TCP_PORT", logstashTestDefaultPort),
+	)
+}
+
+func getenv(name, defaultValue string) string {
+	return strDefault(os.Getenv(name), defaultValue)
+}
+
+func strDefault(a, defaults string) string {
+	if len(a) == 0 {
+		return defaults
+	}
+	return a
 }

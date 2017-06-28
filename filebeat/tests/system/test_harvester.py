@@ -558,6 +558,8 @@ class Test(BaseTest):
         self.render_config_template(
             path=os.path.abspath(self.working_dir) + "/log/symlink.log",
             symlinks="true",
+            close_removed="false",
+            clean_removed="false",
         )
 
         os.mkdir(self.working_dir + "/log/")
@@ -612,7 +614,7 @@ class Test(BaseTest):
 
         # Check if two different files are in registry
         data = self.get_registry()
-        assert len(data) == 2
+        assert len(data) == 2, "expected to see 2 entries, got '%s'" % data
 
     def test_symlink_removed(self):
         """

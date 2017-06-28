@@ -7,3 +7,4 @@ redis
 elasticsearch
 requests
 autopep8
+six

@@ -10,8 +10,9 @@ import (
 	"strings"
 	"testing"
 
-	"github.com/elastic/beats/libbeat/logp"
 	"github.com/stretchr/testify/assert"
+
+	"github.com/elastic/beats/libbeat/logp"
 )
 
 func TestIndex(t *testing.T) {
@@ -21,7 +22,7 @@ func TestIndex(t *testing.T) {
 
 	index := fmt.Sprintf("beats-test-index-%d", os.Getpid())
 
-	client := GetTestingElasticsearch()
+	client := GetTestingElasticsearch(t)
 
 	body := map[string]interface{}{
 		"user":      "test",
@@ -77,7 +78,7 @@ func TestIngest(t *testing.T) {
 		},
 	}
 
-	client := GetTestingElasticsearch()
+	client := GetTestingElasticsearch(t)
 	if strings.HasPrefix(client.Connection.version, "2.") {
 		t.Skip("Skipping tests as pipeline not available in 2.x releases")
 	}

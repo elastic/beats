@@ -5,6 +5,8 @@ import (
 	"fmt"
 	"os"
 	"path/filepath"
+	"sort"
+	"strings"
 	"time"
 
 	"github.com/elastic/beats/filebeat/channel"
@@ -31,24 +33,28 @@ type Prospector struct {
 	cfg      *common.Config
 	config   config
 	states   *file.States
-	registry *harvesterRegistry
+	registry *harvester.Registry
 	outlet   channel.Outleter
 	done     chan struct{}
 }
 
-// NewLog instantiates a new Log
+// NewProspector instantiates a new Log
 func NewProspector(cfg *common.Config, states []file.State, outlet channel.Outleter, done chan struct{}) (*Prospector, error) {
 
 	p := &Prospector{
 		config:   defaultConfig,
 		cfg:      cfg,
-		registry: newHarvesterRegistry(),
+		registry: harvester.NewRegistry(),
 		outlet:   outlet,
 		states:   &file.States{},
 		done:     done,
 	}
 
 	if err := cfg.Unpack(&p.config); err != nil {
+		return nil, err
+	}
+	if err := p.config.resolvePaths(); err != nil {
+		logp.Err("Failed to resolve paths in config: %+v", err)
 		return nil, err
 	}
 
@@ -142,7 +148,7 @@ func (p *Prospector) Run() {
 				}
 			} else {
 				// Check if existing source on disk and state are the same. Remove if not the case.
-				newState := file.NewState(stat, state.Source, p.config.InputType)
+				newState := file.NewState(stat, state.Source, p.config.Type)
 				if !newState.FileStateOS.IsSame(state.FileStateOS) {
 					p.removeState(state)
 					logp.Debug("prospector", "Remove state for file as file removed or renamed: %s", state.Source)
@@ -175,11 +181,7 @@ func (p *Prospector) getFiles() map[string]os.FileInfo {
 	paths := map[string]os.FileInfo{}
 
 	for _, path := range p.config.Paths {
-		depth := uint8(0)
-		if p.config.recursiveGlob {
-			depth = recursiveGlobDepth
-		}
-		matches, err := file.Glob(path, depth)
+		matches, err := filepath.Glob(path)
 		if err != nil {
 			logp.Err("glob(%s) failed: %v", path, err)
 			continue
@@ -264,10 +266,116 @@ func (p *Prospector) matchesFile(filePath string) bool {
 	return false
 }
 
+type FileSortInfo struct {
+	info os.FileInfo
+	path string
+}
+
+func getSortInfos(paths map[string]os.FileInfo) []FileSortInfo {
+
+	sortInfos := make([]FileSortInfo, 0, len(paths))
+	for path, info := range paths {
+		sortInfo := FileSortInfo{info: info, path: path}
+		sortInfos = append(sortInfos, sortInfo)
+	}
+
+	return sortInfos
+}
+
+func getSortedFiles(scanOrder string, scanSort string, sortInfos []FileSortInfo) ([]FileSortInfo, error) {
+	var sortFunc func(i, j int) bool
+	switch scanSort {
+	case "modtime":
+		switch scanOrder {
+		case "asc":
+			sortFunc = func(i, j int) bool {
+				return sortInfos[i].info.ModTime().Before(sortInfos[j].info.ModTime())
+			}
+		case "desc":
+			sortFunc = func(i, j int) bool {
+				return sortInfos[i].info.ModTime().After(sortInfos[j].info.ModTime())
+			}
+		default:
+			return nil, fmt.Errorf("Unexpected value for scan.order: %v", scanOrder)
+		}
+	case "filename":
+		switch scanOrder {
+		case "asc":
+			sortFunc = func(i, j int) bool {
+				return strings.Compare(sortInfos[i].info.Name(), sortInfos[j].info.Name()) < 0
+			}
+		case "desc":
+			sortFunc = func(i, j int) bool {
+				return strings.Compare(sortInfos[i].info.Name(), sortInfos[j].info.Name()) > 0
+			}
+		default:
+			return nil, fmt.Errorf("Unexpected value for scan.order: %v", scanOrder)
+		}
+	default:
+		return nil, fmt.Errorf("Unexpected value for scan.sort: %v", scanSort)
+	}
+
+	if sortFunc != nil {
+		sort.Slice(sortInfos, sortFunc)
+	}
+
+	return sortInfos, nil
+}
+
+func getFileState(path string, info os.FileInfo, p *Prospector) (file.State, error) {
+	var err error
+	var absolutePath string
+	absolutePath, err = filepath.Abs(path)
+	if err != nil {
+		return file.State{}, fmt.Errorf("could not fetch abs path for file %s: %s", absolutePath, err)
+	}
+	logp.Debug("prospector", "Check file for harvesting: %s", absolutePath)
+	// Create new state for comparison
+	newState := file.NewState(info, absolutePath, p.config.Type)
+	return newState, nil
+}
+
+func getKeys(paths map[string]os.FileInfo) []string {
+	files := make([]string, 0)
+	for file := range paths {
+		files = append(files, file)
+	}
+	return files
+}
+
 // Scan starts a scanGlob for each provided path/glob
 func (p *Prospector) scan() {
 
-	for path, info := range p.getFiles() {
+	var sortInfos []FileSortInfo
+	var files []string
+
+	paths := p.getFiles()
+
+	var err error
+
+	if p.config.ScanSort != "none" {
+		sortInfos, err = getSortedFiles(p.config.ScanOrder, p.config.ScanSort, getSortInfos(paths))
+		if err != nil {
+			logp.Err("Failed to sort files during scan due to error %s", err)
+		}
+	}
+
+	if sortInfos == nil {
+		files = getKeys(paths)
+	}
+
+	for i := 0; i < len(paths); i++ {
+
+		var path string
+		var info os.FileInfo
+
+		if sortInfos == nil {
+			path = files[i]
+			info = paths[path]
+		} else {
+			path = sortInfos[i].path
+			info = sortInfos[i].info
+		}
 
 		select {
 		case <-p.done:
@@ -276,15 +384,10 @@ func (p *Prospector) scan() {
 		default:
 		}
 
-		var err error
-		path, err = filepath.Abs(path)
+		newState, err := getFileState(path, info, p)
 		if err != nil {
-			logp.Err("could not fetch abs path for file %s: %s", path, err)
+			logp.Err("Skipping file %s due to error %s", path, err)
 		}
-		logp.Debug("prospector", "Check file for harvesting: %s", path)
-
-		// Create new state for comparison
-		newState := file.NewState(info, path, p.config.InputType)
 
 		// Load last state
 		lastState := p.states.FindPrevious(newState)
@@ -462,7 +565,7 @@ func (p *Prospector) createHarvester(state file.State) (*Harvester, error) {
 // In case the HarvesterLimit is reached, an error is returned
 func (p *Prospector) startHarvester(state file.State, offset int64) error {
 
-	if p.config.HarvesterLimit > 0 && p.registry.len() >= p.config.HarvesterLimit {
+	if p.config.HarvesterLimit > 0 && p.registry.Len() >= p.config.HarvesterLimit {
 		harvesterSkipped.Add(1)
 		return fmt.Errorf("Harvester limit reached")
 	}
@@ -477,12 +580,17 @@ func (p *Prospector) startHarvester(state file.State, offset int64) error {
 		return err
 	}
 
-	reader, err := h.Setup()
+	err = h.Setup()
 	if err != nil {
 		return fmt.Errorf("Error setting up harvester: %s", err)
 	}
 
-	p.registry.start(h, reader)
+	// Update state before staring harvester
+	// This makes sure the states is set to Finished: false
+	// This is synchronous state update as part of the scan
+	h.SendStateUpdate()
+
+	p.registry.Start(h)
 
 	return nil
 }
@@ -514,7 +622,7 @@ func (p *Prospector) updateState(state file.State) error {
 
 // Wait waits for the all harvesters to complete and only then call stop
 func (p *Prospector) Wait() {
-	p.registry.waitForCompletion()
+	p.registry.WaitForCompletion()
 	p.Stop()
 }
 

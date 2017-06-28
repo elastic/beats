@@ -35,7 +35,7 @@ def collect(beat_name, beat_path, full=False):
 
         # Check if full config exists
         if full:
-            full_module_config = beat_path + "/config.full.yml"
+            full_module_config = beat_path + "/config.reference.yml"
             if os.path.isfile(full_module_config):
                 module_configs = full_module_config
 
@@ -58,7 +58,7 @@ def collect(beat_name, beat_path, full=False):
         config_yml += get_title_line(title)
 
         # Load module yaml
-        with file(module_configs) as f:
+        with open(module_configs) as f:
             for line in f:
                 config_yml += line
 
@@ -69,7 +69,7 @@ def collect(beat_name, beat_path, full=False):
 
 # Makes sure every title line is 79 + newline chars long
 def get_title_line(title):
-    dashes = (79 - 10 - len(title)) / 2
+    dashes = (79 - 10 - len(title)) // 2
 
     line = "#"
     line += "-" * dashes

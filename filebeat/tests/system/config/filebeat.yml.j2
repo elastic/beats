@@ -5,10 +5,13 @@ filebeat.prospectors:
 {% set prospectors = true %}
 {% endif %}
 {% if prospectors %}
-- input_type: {{input_type | default("log") }}
+- type: {{type | default("log") }}
+  input_type: {{input_type_deprecated }}
   # Paths that should be crawled and fetched
   {% if path %}paths:
     - {{ path }}{% endif %}
+  {% if recursive_glob %}recursive_glob.enabled: true
+  {% endif %}
   # Type of the files. Annotated in every documented
   scan_frequency: {{scan_frequency | default("0.1s") }}
   ignore_older: {{ignore_older}}
@@ -31,10 +34,10 @@ filebeat.prospectors:
   {%- if prospector_processors %}
   processors:
     {%- for processor in prospector_processors %}
-    {%- for name, settings in processor.iteritems() %}
+    {%- for name, settings in processor.items() %}
     - {{name}}:
       {%- if settings %}
-      {%- for k, v in settings.iteritems() %}
+      {%- for k, v in settings.items() %}
         {{k}}:
           {{v | default([])}}
       {%- endfor %}
@@ -139,10 +142,10 @@ geoip:
 
 processors:
 {%- for processor in processors %}
-{%- for name, settings in processor.iteritems() %}
+{%- for name, settings in processor.items() %}
 - {{name}}:
   {%- if settings %}
-  {%- for k, v in settings.iteritems() %}
+  {%- for k, v in settings.items() %}
     {{k}}:
       {{v | default([])}}
   {%- endfor %}

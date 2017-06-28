@@ -52,7 +52,7 @@ func TestGetProcess(t *testing.T) {
 	assert.True(t, (process.Cpu.User >= 0))
 	assert.True(t, (process.Cpu.Sys >= 0))
 
-	assert.True(t, (process.Ctime.Unix() <= time.Now().Unix()))
+	assert.True(t, (process.SampleTime.Unix() <= time.Now().Unix()))
 
 	switch runtime.GOOS {
 	case "darwin", "linux", "freebsd":
@@ -114,35 +114,30 @@ func TestProcMemPercentage(t *testing.T) {
 }
 
 func TestProcCpuPercentage(t *testing.T) {
-	procStats := ProcStats{}
-
-	ctime := time.Now()
-
-	p2 := Process{
-		Pid: 3545,
-		Cpu: gosigar.ProcTime{
-			User:  14794,
-			Sys:   47,
-			Total: 14841,
-		},
-		Ctime: ctime,
-	}
-
-	p1 := Process{
-		Pid: 3545,
+	p1 := &Process{
 		Cpu: gosigar.ProcTime{
 			User:  11345,
 			Sys:   37,
 			Total: 11382,
 		},
-		Ctime: ctime.Add(-1 * time.Second),
+		SampleTime: time.Now(),
 	}
 
-	procStats.ProcsMap = make(ProcsMap)
-	procStats.ProcsMap[p1.Pid] = &p1
+	p2 := &Process{
+		Cpu: gosigar.ProcTime{
+			User:  14794,
+			Sys:   47,
+			Total: 14841,
+		},
+		SampleTime: p1.SampleTime.Add(time.Second),
+	}
 
-	totalPercent := GetProcCpuPercentage(&p1, &p2)
-	assert.Equal(t, totalPercent, 3.459)
+	NumCPU = 48
+	defer func() { NumCPU = runtime.NumCPU() }()
+
+	totalPercentNormalized, totalPercent := GetProcCpuPercentage(p1, p2)
+	assert.EqualValues(t, 0.0721, totalPercentNormalized)
+	assert.EqualValues(t, 3.459, totalPercent)
 }
 
 // BenchmarkGetProcess runs a benchmark of the GetProcess method with caching

@@ -15,7 +15,7 @@ import (
 
 // Defaults for config variables which are not set
 const (
-	DefaultInputType = "log"
+	DefaultType = "log"
 )
 
 type Config struct {
@@ -38,17 +38,6 @@ var (
 		ShutdownTimeout: 0,
 	}
 )
-
-const (
-	LogInputType   = "log"
-	StdinInputType = "stdin"
-)
-
-// List of valid input types
-var ValidInputType = map[string]struct{}{
-	StdinInputType: {},
-	LogInputType:   {},
-}
 
 // getConfigFiles returns list of config files.
 // In case path is a file, it will be directly returned.

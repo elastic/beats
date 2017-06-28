@@ -1,4 +1,5 @@
 import re
+import six
 import sys
 import unittest
 import metricbeat
@@ -9,15 +10,19 @@ SYSTEM_CPU_FIELDS = ["cores", "idle.pct", "iowait.pct", "irq.pct", "nice.pct",
                      "softirq.pct", "steal.pct", "system.pct", "user.pct"]
 
 SYSTEM_CPU_FIELDS_ALL = ["cores", "idle.pct", "idle.ticks", "iowait.pct", "iowait.ticks", "irq.pct", "irq.ticks", "nice.pct", "nice.ticks",
-                         "softirq.pct", "softirq.ticks", "steal.pct", "steal.ticks", "system.pct", "system.ticks", "user.pct", "user.ticks"]
+                         "softirq.pct", "softirq.ticks", "steal.pct", "steal.ticks", "system.pct", "system.ticks", "user.pct", "user.ticks",
+                         "idle.norm.pct", "iowait.norm.pct", "irq.norm.pct", "nice.norm.pct", "softirq.norm.pct",
+                         "steal.norm.pct", "system.norm.pct", "user.norm.pct"]
 
-SYSTEM_LOAD_FIELDS = ["1", "5", "15", "norm.1", "norm.5", "norm.15"]
+SYSTEM_LOAD_FIELDS = ["cores", "1", "5", "15", "norm.1", "norm.5", "norm.15"]
 
 SYSTEM_CORE_FIELDS = ["id", "idle.pct", "iowait.pct", "irq.pct", "nice.pct",
                       "softirq.pct", "steal.pct", "system.pct", "user.pct"]
 
 SYSTEM_CORE_FIELDS_ALL = SYSTEM_CORE_FIELDS + ["idle.ticks", "iowait.ticks", "irq.ticks", "nice.ticks",
-                                               "softirq.ticks", "steal.ticks", "system.ticks", "user.ticks"]
+                                               "softirq.ticks", "steal.ticks", "system.ticks", "user.ticks",
+                                               "idle.norm.pct", "iowait.norm.pct", "irq.norm.pct", "nice.norm.pct",
+                                               "softirq.norm.pct", "steal.norm.pct", "system.norm.pct", "user.norm.pct"]
 
 SYSTEM_DISKIO_FIELDS = ["name", "read.count", "write.count", "read.bytes",
                         "write.bytes", "read.time", "write.time", "io.time"]
@@ -77,7 +82,7 @@ class Test(metricbeat.BaseTest):
             "metricsets": ["cpu"],
             "period": "5s",
             "extras": {
-                "cpu_ticks": True,
+                "cpu.metrics": ["percentages", "ticks"],
             },
         }])
         proc = self.start_beat()
@@ -126,7 +131,7 @@ class Test(metricbeat.BaseTest):
             "metricsets": ["core"],
             "period": "5s",
             "extras": {
-                "cpu_ticks": True,
+                "core.metrics": ["percentages", "ticks"],
             },
         }])
         proc = self.start_beat()
@@ -292,6 +297,39 @@ class Test(metricbeat.BaseTest):
             self.assertItemsEqual(self.de_dot(SYSTEM_NETWORK_FIELDS), network.keys())
 
     @unittest.skipUnless(re.match("(?i)win|linux|darwin|freebsd", sys.platform), "os")
+    def test_process_summary(self):
+        """
+        Test system/process_summary output.
+        """
+        self.render_config_template(modules=[{
+            "name": "system",
+            "metricsets": ["process_summary"],
+            "period": "5s",
+        }])
+        proc = self.start_beat()
+        self.wait_until(lambda: self.output_lines() > 0)
+        proc.check_kill_and_wait()
+        self.assert_no_logged_warnings()
+
+        output = self.read_output_json()
+        self.assertGreater(len(output), 0)
+
+        for evt in output:
+            self.assert_fields_are_documented(evt)
+
+            summary = evt["system"]["process"]["summary"]
+            assert isinstance(summary["total"], int)
+            assert isinstance(summary["sleeping"], int)
+            assert isinstance(summary["running"], int)
+            assert isinstance(summary["idle"], int)
+            assert isinstance(summary["stopped"], int)
+            assert isinstance(summary["zombie"], int)
+            assert isinstance(summary["unknown"], int)
+
+            assert summary["total"] == summary["sleeping"] + summary["running"] + \
+                summary["idle"] + summary["stopped"] + summary["zombie"] + summary["unknown"]
+
+    @unittest.skipUnless(re.match("(?i)win|linux|darwin|freebsd", sys.platform), "os")
     def test_process(self):
         """
         Test system/process output.
@@ -371,8 +409,8 @@ class Test(metricbeat.BaseTest):
 
         assert re.match("(?i)metricbeat.test(.exe)?", output["system.process.name"])
         assert re.match("(?i).*metricbeat.test(.exe)? -systemTest", output["system.process.cmdline"])
-        assert isinstance(output["system.process.state"], basestring)
-        assert isinstance(output["system.process.cpu.start_time"], basestring)
+        assert isinstance(output["system.process.state"], six.string_types)
+        assert isinstance(output["system.process.cpu.start_time"], six.string_types)
         self.check_username(output["system.process.username"])
 
     def check_username(self, observed, expected=None):

@@ -6,7 +6,7 @@ import (
 
 	"github.com/elastic/beats/libbeat/common"
 	"github.com/elastic/beats/libbeat/logp"
-	"github.com/elastic/beats/libbeat/publisher"
+	"github.com/elastic/beats/libbeat/publisher/bc/publisher"
 )
 
 type Transactions interface {
@@ -20,6 +20,8 @@ type Flows interface {
 type PacketbeatPublisher struct {
 	beatPublisher *publisher.BeatPublisher
 	client        publisher.Client
+
+	localIPs []string
 
 	ignoreOutgoing bool
 
@@ -47,10 +49,16 @@ func NewPublisher(
 	ignoreOutgoing bool,
 ) (*PacketbeatPublisher, error) {
 
+	localIPs, err := common.LocalIPAddrsAsStrings(false)
+	if err != nil {
+		return nil, err
+	}
+
 	return &PacketbeatPublisher{
 		beatPublisher:  pub.(*publisher.BeatPublisher),
 		ignoreOutgoing: ignoreOutgoing,
 		client:         pub.Connect(),
+		localIPs:       localIPs,
 		done:           make(chan struct{}),
 		trans:          make(chan common.MapStr, hwm),
 		flows:          make(chan []common.MapStr, bulkHWM),
@@ -140,7 +148,7 @@ func (p *PacketbeatPublisher) onFlow(events []common.MapStr) {
 
 func (p *PacketbeatPublisher) IsPublisherIP(ip string) bool {
 
-	for _, myip := range p.beatPublisher.IPAddrs {
+	for _, myip := range p.localIPs {
 		if myip == ip {
 			return true
 		}

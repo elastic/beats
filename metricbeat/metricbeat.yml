@@ -1,7 +1,7 @@
 ###################### Metricbeat Configuration Example #######################
 
 # This file is an example configuration file highlighting only the most common
-# options. The metricbeat.full.yml file from the same directory contains all the
+# options. The metricbeat.reference.yml file from the same directory contains all the
 # supported options with more comments. You can use it as a reference.
 #
 # You can find the full configuration reference here:
@@ -12,44 +12,37 @@ metricbeat.modules:
 
 #------------------------------- System Module -------------------------------
 - module: system
-  metricsets:
-    # CPU stats
-    - cpu
-
-    # System Load stats
-    - load
-
-    # Per CPU core stats
-    #- core
-
-    # IO stats
-    #- diskio
-
-    # Per filesystem stats
-    - filesystem
-
-    # File system summary stats
-    - fsstat
-
-    # Memory stats
-    - memory
-
-    # Network stats
-    - network
-
-    # Per process stats
-    - process
-
-    # Sockets (linux only)
-    #- socket
   enabled: true
   period: 10s
+  metricsets:
+    - cpu
+    - load
+    - memory
+    - network
+    - process
+    - process_summary
+    #- core
+    #- diskio
+    #- socket
   processes: ['.*']
   process.include_top_n:
     by_cpu: 5      # include top 5 processes by CPU
     by_memory: 5   # include top 5 processes by memory
+- module: system
+  enabled: true
+  period: 1m
+  metricsets:
+    - filesystem
+    - fsstat
+  filters:
+    - drop_event.when.regexp.mount_point: '^/(sys|cgroup|proc|dev|etc|host|lib)($|/)'
 
 
+#==================== Elasticsearch template setting ==========================
+setup.template.settings:
+  index.number_of_shards: 1
+  index.codec: best_compression
+  #_source.enabled: false
 
 #================================ General =====================================
 

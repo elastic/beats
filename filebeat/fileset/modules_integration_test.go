@@ -13,7 +13,7 @@ import (
 )
 
 func TestLoadPipeline(t *testing.T) {
-	client := elasticsearch.GetTestingElasticsearch()
+	client := elasticsearch.GetTestingElasticsearch(t)
 	if !hasIngest(client) {
 		t.Skip("Skip tests because ingest is missing in this elasticsearch version: %s", client.GetVersion())
 	}
@@ -56,7 +56,7 @@ func TestLoadPipeline(t *testing.T) {
 }
 
 func TestSetupNginx(t *testing.T) {
-	client := elasticsearch.GetTestingElasticsearch()
+	client := elasticsearch.GetTestingElasticsearch(t)
 	if !hasIngest(client) {
 		t.Skip("Skip tests because ingest is missing in this elasticsearch version: %s", client.GetVersion())
 	}
@@ -88,7 +88,7 @@ func TestSetupNginx(t *testing.T) {
 }
 
 func TestAvailableProcessors(t *testing.T) {
-	client := elasticsearch.GetTestingElasticsearch()
+	client := elasticsearch.GetTestingElasticsearch(t)
 	if !hasIngest(client) {
 		t.Skip("Skip tests because ingest is missing in this elasticsearch version: %s", client.GetVersion())
 	}

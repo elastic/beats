@@ -41,7 +41,7 @@ func main() {
 		*version = "2.0.0"
 	}
 
-	tmpl, err := template.New(beatVersion, *version, *index)
+	tmpl, err := template.New(beatVersion, *version, *index, template.TemplateSettings{})
 	if err != nil {
 		fmt.Fprintf(os.Stderr, "Error generating template: %+v", err)
 		os.Exit(1)

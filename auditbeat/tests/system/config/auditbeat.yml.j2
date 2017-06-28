@@ -1,0 +1,22 @@
+auditbeat.modules:
+{% for m in modules -%}
+- module: {{ m.name }}
+  {% if m.metricsets -%}
+  metricsets:
+    {% for ms in m.metricsets -%}
+    - {{ ms }}
+    {% endfor %}
+  {% endif -%}
+  {% if m.extras -%}
+  {% for k, v in m.extras.items() -%}
+  {{ k }}: {{ v }}
+  {% endfor %}
+  {% endif -%}
+  {% if m.additional_content -%}
+  {{ m.additional_content }}
+  {% endif -%}
+{%- endfor %}
+
+output.file:
+  path: '{{ output_file_path|default(beat.working_dir + "/output") }}'
+  filename: {{ output_file_filename|default("auditbeat") }}

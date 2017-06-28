@@ -17,6 +17,10 @@ BEAT_REQUIRED_FIELDS = ["@timestamp",
 INTEGRATION_TESTS = os.environ.get('INTEGRATION_TESTS', False)
 
 
+class TimeoutError(Exception):
+    pass
+
+
 class Proc(object):
     """
     Slim wrapper on subprocess.Popen that redirects
@@ -163,6 +167,7 @@ class TestCase(unittest.TestCase):
                 "-systemTest",
                 "-test.coverprofile",
                 os.path.join(self.working_dir, "coverage.cov"),
+                "-path.home", os.path.normpath(self.working_dir),
                 "-c", os.path.join(self.working_dir, config)
                 ]
 
@@ -194,7 +199,7 @@ class TestCase(unittest.TestCase):
         output_str = template.render(**kargs)
         filepath = os.path.join(self.working_dir, output)
         with os.fdopen(os.open(filepath, os.O_WRONLY | os.O_CREAT, 0o600), "wb") as f:
-            f.write(output_str)
+            f.write(output_str.encode('utf8'))
 
     # Returns output as JSON object with flattened fields (. notation)
     def read_output(self,
@@ -235,7 +240,9 @@ class TestCase(unittest.TestCase):
                     # hit EOF
                     break
 
-                jsons.append(json.loads(line))
+                event = json.loads(line)
+                del event['@metadata']
+                jsons.append(event)
         return jsons
 
     def copy_files(self, files, source_dir="files/"):
@@ -279,9 +286,8 @@ class TestCase(unittest.TestCase):
         start = datetime.now()
         while not cond():
             if datetime.now() - start > timedelta(seconds=max_timeout):
-                raise Exception("Timeout waiting for '{}' to be true. "
-                                .format(name) +
-                                "Waited {} seconds.".format(max_timeout))
+                raise TimeoutError("Timeout waiting for '{}' to be true. ".format(name) +
+                                   "Waited {} seconds.".format(max_timeout))
             time.sleep(poll_interval)
 
     def get_log(self, logfile=None):
@@ -351,6 +357,16 @@ class TestCase(unittest.TestCase):
         except IOError:
             return False
 
+    def output_has_message(self, message, output_file=None):
+        """
+        Returns true if the output has the given message field.
+        """
+        try:
+            return any(line for line in self.read_output(output_file=output_file, required_fields=["message"])
+                       if line.get("message") == message)
+        except (IOError, TypeError):
+            return False
+
     def all_have_fields(self, objs, fields):
         """
         Checks that the given list of output objects have
@@ -379,7 +395,9 @@ class TestCase(unittest.TestCase):
         """
         for o in objs:
             for key in o.keys():
-                if key not in dict_fields and key not in expected_fields:
+                known = key in dict_fields or key in expected_fields
+                ismeta = key.startswith('@metadata.')
+                if not(known or ismeta):
                     raise Exception("Unexpected key '{}' found"
                                     .format(key))
 
@@ -426,7 +444,9 @@ class TestCase(unittest.TestCase):
 
         # TODO: Make fields_doc path more generic to work with beat-generator
         with open(fields_doc, "r") as f:
-            path = os.path.abspath(os.path.dirname(__file__) + "../../../../_meta/fields.common.yml")
+            path = os.path.abspath(os.path.dirname(__file__) + "../../../../_meta/fields.generated.yml")
+            if not os.path.isfile(path):
+                path = os.path.abspath(os.path.dirname(__file__) + "../../../../_meta/fields.common.yml")
             with open(path) as f2:
                 content = f2.read()
 

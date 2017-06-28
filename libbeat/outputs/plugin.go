@@ -9,13 +9,13 @@ import (
 
 type outputPlugin struct {
 	name    string
-	builder OutputBuilder
+	factory Factory
 }
 
-var pluginKey = "libbeat.output"
+var pluginKey = "libbeat.out"
 
-func Plugin(name string, l OutputBuilder) map[string][]interface{} {
-	return p.MakePlugin(pluginKey, outputPlugin{name, l})
+func Plugin(name string, f Factory) map[string][]interface{} {
+	return p.MakePlugin(pluginKey, outputPlugin{name, f})
 }
 
 func init() {
@@ -26,11 +26,11 @@ func init() {
 		}
 
 		name := b.name
-		if outputsPlugins[name] != nil {
+		if outputReg[name] != nil {
 			return fmt.Errorf("output type %v already registered", name)
 		}
 
-		RegisterOutputPlugin(name, b.builder)
+		RegisterType(name, b.factory)
 		return nil
 	})
 }

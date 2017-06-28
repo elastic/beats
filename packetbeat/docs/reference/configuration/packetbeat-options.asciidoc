@@ -211,6 +211,8 @@ packetbeat.flows:
   period: 10s
 ------------------------------------------------------------------------------
 
+See <<flows>> for more information.
+
 ==== Options
 
 You can specify the following options in the `flows` section of the +{beatname_lc}.yml+ config file:
@@ -831,6 +833,23 @@ The name used to identify the process at run time. When Packetbeat starts, and t
 periodically afterwards, it scans the process table for
 processes that match the values specified for this option. The match is done against the
 process' command line as read from `/proc/<pid>/cmdline`.
+
+
+[[shutdown-timeout]]
+===== shutdown_timeout
+
+How long Packetbeat waits on shutdown. By default, this option is disabled. Packetbeat
+will wait for `shutdown_timeout` and then close. It will not track if all events were sent
+previously.
+
+Example configuration:
+
+[source,yaml]
+-------------------------------------------------------------------------------------
+packetbeat.shutdown_timeout: 5s
+-------------------------------------------------------------------------------------
+
+
 
 include::../../../../libbeat/docs/generalconfig.asciidoc[]
 

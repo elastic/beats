@@ -28,7 +28,9 @@ class BaseTest(TestCase):
         flat = self.flatten_object(evt, [])
 
         for key in flat.keys():
-            if key not in expected_fields:
+            documented = key in expected_fields
+            metaKey = key.startswith('@metadata.')
+            if not(documented or metaKey):
                 raise Exception("Key '{}' found in event is not documented!".format(key))
 
     def de_dot(self, existing_fields):
@@ -53,7 +55,7 @@ class BaseTest(TestCase):
 
         return fields
 
-    def assert_no_logged_warnings(self):
+    def assert_no_logged_warnings(self, replace=None):
         """
         Assert that the log file contains no ERR or WARN lines.
         """
@@ -63,4 +65,7 @@ class BaseTest(TestCase):
         # Jenkins runs as a Windows service and when Jenkins executes theses
         # tests the Beat is confused since it thinks it is running as a service.
         log = log.replace("ERR Error: The service process could not connect to the service controller.", "")
+        if replace:
+            for r in replace:
+                log = log.replace(r, "")
         self.assertNotRegexpMatches(log, "ERR|WARN")

@@ -6,6 +6,7 @@ import (
 	"time"
 
 	"github.com/elastic/beats/libbeat/common/match"
+	"github.com/elastic/beats/libbeat/logp"
 )
 
 // MultiLine reader combining multiple line events into one multi-line event.
@@ -67,7 +68,7 @@ func NewMultiline(
 		return nil, fmt.Errorf("unknown matcher type: %s", config.Match)
 	}
 
-	matcher, err := matcherType(config.Pattern)
+	matcher, err := matcherType(*config.Pattern)
 	if err != nil {
 		return nil, err
 	}
@@ -122,6 +123,8 @@ func (mlr *Multiline) readFirst() (Message, error) {
 				continue
 			}
 
+			logp.Debug("multiline", "Multiline event flushed because timeout reached.")
+
 			// pass error to caller (next layer) for handling
 			return message, err
 		}
@@ -148,6 +151,8 @@ func (mlr *Multiline) readNext() (Message, error) {
 				if mlr.numLines == 0 {
 					continue
 				}
+
+				logp.Debug("multiline", "Multiline event flushed because timeout reached.")
 
 				// return collected multiline event and
 				// empty buffer for new multiline event

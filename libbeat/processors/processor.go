@@ -12,6 +12,11 @@ type Processors struct {
 	list []Processor
 }
 
+type Processor interface {
+	Run(event common.MapStr) (common.MapStr, error)
+	String() string
+}
+
 func New(config PluginConfig) (*Processors, error) {
 
 	procs := Processors{}

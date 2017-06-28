@@ -12,73 +12,94 @@ env:
   global:
     # Cross-compile for amd64 only to speed up testing.
     - GOX_FLAGS="-arch amd64"
-    - DOCKER_COMPOSE_VERSION: 1.11.1
-    - &go_version 1.8.1
+    - DOCKER_COMPOSE_VERSION=1.11.1
+    - GO_VERSION="$(cat .go-version)"
 
-matrix:
+jobs:
   include:
     # General checks
     - os: linux
       env: TARGETS="check"
-      go: *go_version
+      go: $GO_VERSION
+      stage: check
 
     # Filebeat
     - os: linux
       env: TARGETS="-C filebeat testsuite"
-      go: *go_version
+      go: $GO_VERSION
+      stage: test
     - os: osx
       env: TARGETS="TEST_ENVIRONMENT=0 -C filebeat testsuite"
-      go: *go_version
+      go: $GO_VERSION
+      stage: test
 
     # Heartbeat
     - os: linux
       env: TARGETS="-C heartbeat testsuite"
-      go: *go_version
+      go: $GO_VERSION
+      stage: test
     - os: osx
       env: TARGETS="TEST_ENVIRONMENT=0 -C heartbeat testsuite"
-      go: *go_version
+      go: $GO_VERSION
+      stage: test
+
+    # Auditbeat
+    - os: linux
+      env: TARGETS="-C auditbeat testsuite"
+      go: $GO_VERSION
+      stage: test
 
     # Libbeat
     - os: linux
       env: TARGETS="-C libbeat testsuite"
-      go: *go_version
+      go: $GO_VERSION
+      stage: test
     - os: linux
       env: TARGETS="-C libbeat crosscompile"
-      go: *go_version
+      go: $GO_VERSION
+      stage: test
 
     # Metricbeat
     - os: linux
       env: TARGETS="-C metricbeat testsuite"
-      go: *go_version
+      go: $GO_VERSION
+      stage: test
     - os: osx
       env: TARGETS="TEST_ENVIRONMENT=0 -C metricbeat testsuite"
-      go: *go_version
+      go: $GO_VERSION
+      stage: test
     - os: linux
       env: TARGETS="-C metricbeat crosscompile"
-      go: *go_version
+      go: $GO_VERSION
+      stage: test
 
     # Packetbeat
     - os: linux
       env: TARGETS="-C packetbeat testsuite"
-      go: *go_version
+      go: $GO_VERSION
+      stage: test
 
     # Winlogbeat
     - os: linux
       env: TARGETS="-C winlogbeat crosscompile"
-      go: *go_version
+      go: $GO_VERSION
+      stage: test
 
     # Dashboards
     - os: linux
       env: TARGETS="-C dev-tools/cmd/import_dashboards"
-      go: *go_version
+      go: $GO_VERSION
+      stage: test
 
     # Generators
     - os: linux
       env: TARGETS="-C generator/metricbeat test"
-      go: *go_version
+      go: $GO_VERSION
+      stage: test
     - os: linux
       env: TARGETS="-C generator/beat test"
-      go: *go_version
+      go: $GO_VERSION
+      stage: test
 
 addons:
   apt:
@@ -87,6 +108,7 @@ addons:
       - libpcap-dev
 
 before_install:
+  - python --version
   - umask 022
   - chmod -R go-w $GOPATH/src/github.com/elastic/beats
   # Docker-compose installation
@@ -111,6 +133,7 @@ notifications:
 
 after_success:
   # Copy full.cov to coverage.txt because codecov.io requires this file
+  - test -f auditbeat/build/coverage/full.cov && bash <(curl -s https://codecov.io/bash) -f auditbeat/build/coverage/full.cov
   - test -f filebeat/build/coverage/full.cov && bash <(curl -s https://codecov.io/bash) -f filebeat/build/coverage/full.cov
   - test -f heartbeat/build/coverage/full.cov && bash <(curl -s https://codecov.io/bash) -f heartbeat/build/coverage/full.cov
   - test -f libbeat/build/coverage/full.cov && bash <(curl -s https://codecov.io/bash) -f libbeat/build/coverage/full.cov

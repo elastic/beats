@@ -11,11 +11,11 @@ Here is a sample configuration:
 [source,yaml]
 -------------------------------------------------------------------------------------
 filebeat.prospectors:
-- input_type: log
+- type: log
   paths:
     - /var/log/apache/httpd-*.log
 
-- input_type: log
+- type: log
   paths:
     - /var/log/messages
     - /var/log/*.log
@@ -23,14 +23,15 @@ filebeat.prospectors:
 
 ==== Options
 
-===== input_type
+===== type
 
 One of the following input types:
 
     * log: Reads every line of the log file (default)
     * stdin: Reads the standard in
+    * redis: Reads slow log entries from redis (experimental)
 
-The value that you specify here is used as the `input_type` for each event published to Logstash and Elasticsearch.
+The value that you specify here is used as the `type` for each event published to Logstash and Elasticsearch.
 
 [[prospector-paths]]
 ===== paths
@@ -301,6 +302,25 @@ If you require log lines to be sent in near real time do not use a very low `sca
 
 The default setting is 10s.
 
+
+[[scan-sort]]
+===== scan.sort
+
+Specifies if files should be harvested in order and how to determine the order. Possible values are modtime, filename and none. To sort by file modification time use modtime otherwise use filename.
+
+If you specify a value other than none for this setting you can determine whether to use ascending or descending order using `scan.order`.
+
+The default setting is none.
+
+
+[[scan-order]]
+===== scan.order
+
+Specifies ascending or descending order if `scan.sort` is set to a value other than none. Possible values are asc or desc.
+
+The default setting is asc.
+
+
 ===== harvester_buffer_size
 
 The size in bytes of the buffer that each harvester uses when fetching a file. The default is 16384.
@@ -388,11 +408,11 @@ somewhat from the patterns supported by Logstash. See <<regexp-support>> for a l
 +
 [options="header"]
 |=======================
-|Setting for `negate` | Setting for `match` | Result
-|`false`              | `after`             | Consecutive lines that match the pattern are appended to the previous line that doesn't match.
-|`false`              | `before`            | Consecutive lines that match the pattern are prepended to the next line that doesn't match.
-|`true`               | `after`             | Consecutive lines that don't match the pattern are appended to the previous line that does match.
-|`true`               | `before`            | Consecutive lines that don't match the pattern are prepended to the next line that does match.
+|Setting for `negate` | Setting for `match` | Result | Example `pattern: ^b`
+|`false`              | `after`             | Consecutive lines that match the pattern are appended to the previous line that doesn't match. | image:./images/false-after-multi.png[Lines a b b c b b become "abb" and "cbb"]
+|`false`              | `before`            | Consecutive lines that match the pattern are prepended to the next line that doesn't match. | image:./images/false-before-multi.png[Lines b b a b b c become "bba" and "bbc"]
+|`true`               | `after`             | Consecutive lines that don't match the pattern are appended to the previous line that does match. | image:./images/true-after-multi.png[Lines b a c b d e become "bac" and "bde"]
+|`true`               | `before`            | Consecutive lines that don't match the pattern are prepended to the next line that does match. | image:./images/true-before-multi.png[Lines a c b d e b become "acb" and "deb"]
 |=======================
 +
 NOTE: The `after` setting is equivalent to `previous` in https://www.elastic.co/guide/en/logstash/current/plugins-codecs-multiline.html[Logstash], and `before` is equivalent to `next`.
@@ -431,7 +451,7 @@ Because this option may lead to data loss, it is disabled by default.
 
 ===== backoff
 
-The backoff options specify how aggressively Filebeat crawls new files for updates.
+The backoff options specify how aggressively Filebeat crawls open files for updates.
 You can use the default values in most cases.
 
 The `backoff` option defines how long Filebeat

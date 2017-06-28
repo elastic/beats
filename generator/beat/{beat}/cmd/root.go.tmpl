@@ -1,0 +1,13 @@
+package cmd
+
+import (
+	"{beat_path}/beater"
+
+	cmd "github.com/elastic/beats/libbeat/cmd"
+)
+
+// Name of this beat
+var Name = "{beat}"
+
+// RootCmd to handle beats cli
+var RootCmd = cmd.GenRootCmd(Name, "", beater.New)

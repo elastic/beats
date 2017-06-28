@@ -15,7 +15,7 @@ func TestImporter(t *testing.T) {
 		logp.LogInit(logp.LOG_DEBUG, "", false, true, []string{"*"})
 	}
 
-	client := elasticsearch.GetTestingElasticsearch()
+	client := elasticsearch.GetTestingElasticsearch(t)
 
 	imp, err := NewImporter(&DashboardsConfig{
 		KibanaIndex: ".kibana-test",
@@ -37,7 +37,7 @@ func TestImporterEmptyBeat(t *testing.T) {
 		logp.LogInit(logp.LOG_DEBUG, "", false, true, []string{"*"})
 	}
 
-	client := elasticsearch.GetTestingElasticsearch()
+	client := elasticsearch.GetTestingElasticsearch(t)
 
 	imp, err := NewImporter(&DashboardsConfig{
 		KibanaIndex: ".kibana-test-nobeat",

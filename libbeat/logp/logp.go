@@ -80,7 +80,7 @@ func HandleFlags(name string) error {
 // line flag with a later SetStderr call.
 func Init(name string, config *Logging) error {
 	// reset settings from HandleFlags
-	_log = Logger{}
+	_log = logger{}
 
 	logLevel, err := getLogLevel(config)
 	if err != nil {
@@ -157,6 +157,9 @@ func Init(name string, config *Logging) error {
 		// used by libraries and we don't want their logs to spam ours)
 		log.SetOutput(ioutil.Discard)
 	}
+
+	// Disable stderr logging if requested by cmdline flag
+	SetStderr()
 
 	go logMetrics(&config.Metrics)
 

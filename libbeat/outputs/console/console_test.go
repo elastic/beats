@@ -8,12 +8,16 @@ import (
 	"os"
 	"testing"
 
+	"github.com/stretchr/testify/assert"
+
 	"github.com/elastic/beats/libbeat/common"
 	"github.com/elastic/beats/libbeat/common/fmtstr"
-	"github.com/elastic/beats/libbeat/outputs"
-	"github.com/elastic/beats/libbeat/outputs/codecs/format"
-	"github.com/elastic/beats/libbeat/outputs/codecs/json"
-	"github.com/stretchr/testify/assert"
+	"github.com/elastic/beats/libbeat/outputs/codec"
+	"github.com/elastic/beats/libbeat/outputs/codec/format"
+	"github.com/elastic/beats/libbeat/outputs/codec/json"
+	"github.com/elastic/beats/libbeat/outputs/outest"
+	"github.com/elastic/beats/libbeat/publisher"
+	"github.com/elastic/beats/libbeat/publisher/beat"
 )
 
 // capture stdout and return captured string
@@ -45,65 +49,68 @@ func withStdout(fn func()) (string, error) {
 	return result, err
 }
 
-func event(k, v string) common.MapStr {
-	return common.MapStr{k: v}
+// TODO: add tests with other formatstr codecs
+
+func TestConsoleOutput(t *testing.T) {
+	tests := []struct {
+		title    string
+		codec    codec.Codec
+		events   []beat.Event
+		expected string
+	}{
+		{
+			"single json event (pretty=false)",
+			json.New(false),
+			[]beat.Event{
+				{Fields: event("field", "value")},
+			},
+			"{\"@timestamp\":\"0001-01-01T00:00:00.000Z\",\"@metadata\":{\"beat\":\"test\",\"type\":\"doc\"},\"field\":\"value\"}\n",
+		},
+		{
+			"single json event (pretty=true)",
+			json.New(true),
+			[]beat.Event{
+				{Fields: event("field", "value")},
+			},
+			"{\n  \"@timestamp\": \"0001-01-01T00:00:00.000Z\",\n  \"@metadata\": {\n    \"beat\": \"test\",\n    \"type\": \"doc\"\n  },\n  \"field\": \"value\"\n}\n",
+		},
+		// TODO: enable test after update fmtstr support to beat.Event
+		{
+			"event with custom format string",
+			format.New(fmtstr.MustCompileEvent("%{[event]}")),
+			[]beat.Event{
+				{Fields: event("event", "myevent")},
+			},
+			"myevent\n",
+		},
+	}
+
+	for _, test := range tests {
+		test := test
+		t.Run(test.title, func(t *testing.T) {
+			batch := outest.NewBatch(test.events...)
+			lines, err := run(test.codec, batch)
+			assert.Nil(t, err)
+			assert.Equal(t, test.expected, lines)
+
+			// check batch correctly signalled
+			if !assert.Len(t, batch.Signals, 1) {
+				return
+			}
+			assert.Equal(t, outest.BatchACK, batch.Signals[0].Tag)
+		})
+	}
 }
 
-func run(codec outputs.Codec, events ...common.MapStr) (string, error) {
+func run(codec codec.Codec, batches ...publisher.Batch) (string, error) {
 	return withStdout(func() {
-		c, _ := newConsole(codec)
-		for _, event := range events {
-			c.PublishEvent(nil, outputs.Options{}, outputs.Data{Event: event})
+		c, _ := newConsole("test", codec)
+		for _, b := range batches {
+			c.Publish(b)
 		}
 	})
 }
 
-func TestConsoleOneEvent(t *testing.T) {
-	lines, err := run(json.New(false), event("event", "myevent"))
-	assert.Nil(t, err)
-	expected := "{\"event\":\"myevent\"}\n"
-	assert.Equal(t, expected, lines)
-}
-
-func TestConsoleOneEventIndented(t *testing.T) {
-	lines, err := run(json.New(true), event("event", "myevent"))
-	assert.Nil(t, err)
-	expected := "{\n  \"event\": \"myevent\"\n}\n"
-	assert.Equal(t, expected, lines)
-}
-
-func TestConsoleOneEventFormatted(t *testing.T) {
-	lines, err := run(
-		format.New(fmtstr.MustCompileEvent("%{[event]}")),
-		event("event", "myevent"),
-	)
-	assert.Nil(t, err)
-	expected := "myevent\n"
-	assert.Equal(t, expected, lines)
-}
-
-func TestConsoleMultipleEvents(t *testing.T) {
-	lines, err := run(json.New(false),
-		event("event", "event1"),
-		event("event", "event2"),
-		event("event", "event3"),
-	)
-
-	assert.Nil(t, err)
-	expected := "{\"event\":\"event1\"}\n{\"event\":\"event2\"}\n{\"event\":\"event3\"}\n"
-	assert.Equal(t, expected, lines)
-}
-
-func TestConsoleMultipleEventsIndented(t *testing.T) {
-	lines, err := run(json.New(true),
-		event("event", "event1"),
-		event("event", "event2"),
-		event("event", "event3"),
-	)
-
-	assert.Nil(t, err)
-	expected := "{\n  \"event\": \"event1\"\n}\n" +
-		"{\n  \"event\": \"event2\"\n}\n" +
-		"{\n  \"event\": \"event3\"\n}\n"
-	assert.Equal(t, expected, lines)
+func event(k, v string) common.MapStr {
+	return common.MapStr{k: v}
 }

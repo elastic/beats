@@ -5,11 +5,11 @@
 --
 After following the <<configuring-packetbeat,configuration steps>> in the
 Getting Started, you might want to fine tune the behavior of Packetbeat. This section
-describes some common use cases for changing configuration options. 
+describes some common use cases for changing configuration options.
 
 To configure {beatname_uc}, you edit the configuration file. For rpm and deb, you’ll find the default configuration file at
 +/etc/{beatname_lc}/{beatname_lc}.yml+. There's also a full example configuration file at
-+/etc/{beatname_lc}/{beatname_lc}.full.yml+ that shows all non-deprecated options. For mac and win, look in the archive
++/etc/{beatname_lc}/{beatname_lc}.reference.yml+ that shows all non-deprecated options. For mac and win, look in the archive
 that you extracted.
 
 See the

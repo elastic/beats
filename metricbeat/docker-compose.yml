@@ -16,6 +16,7 @@ services:
       - proxy_dep
 
     env_file:
+      - ${PWD}/module/aerospike/_meta/env
       - ${PWD}/module/apache/_meta/env
       - ${PWD}/module/ceph/_meta/env
       - ${PWD}/module/couchbase/_meta/env
@@ -26,6 +27,7 @@ services:
       - ${PWD}/module/jolokia/_meta/env
       - ${PWD}/module/kafka/_meta/env
       - ${PWD}/module/kibana/_meta/env
+      - ${PWD}/module/kubernetes/_meta/env
       - ${PWD}/module/memcached/_meta/env
       - ${PWD}/module/mongodb/_meta/env
       - ${PWD}/module/mysql/_meta/env
@@ -33,6 +35,7 @@ services:
       - ${PWD}/module/php_fpm/_meta/env
       - ${PWD}/module/postgresql/_meta/env
       - ${PWD}/module/prometheus/_meta/env
+      - ${PWD}/module/rabbitmq/_meta/env
       - ${PWD}/module/redis/_meta/env
       - ${PWD}/module/zookeeper/_meta/env
 
@@ -41,6 +44,7 @@ services:
   proxy_dep:
     image: busybox
     depends_on:
+      aerospike:      { condition: service_healthy }
       apache:         { condition: service_healthy }
       ceph:           { condition: service_healthy }
       couchbase:      { condition: service_healthy }
@@ -51,6 +55,8 @@ services:
       jolokia:        { condition: service_healthy }
       kafka:          { condition: service_healthy }
       kibana:         { condition: service_healthy }
+      kubernetes:     { condition: service_healthy }
+      kube-state:     { condition: service_started }
       memcached:      { condition: service_healthy }
       mongodb:        { condition: service_healthy }
       mysql:          { condition: service_healthy }
@@ -58,10 +64,14 @@ services:
       phpfpm:         { condition: service_healthy }
       postgresql:     { condition: service_healthy }
       prometheus:     { condition: service_healthy }
+      rabbitmq:       { condition: service_healthy }
       redis:          { condition: service_healthy }
       zookeeper:      { condition: service_healthy }
 
   # Modules
+  aerospike:
+    build: ${PWD}/module/aerospike/_meta
+
   apache:
     build: ${PWD}/module/apache/_meta
 
@@ -96,6 +106,22 @@ services:
       file: ${ES_BEATS}/testing/environments/${TESTING_ENVIRONMENT}.yml
       service: kibana
 
+  kubernetes:
+    build: ${PWD}/module/kubernetes/_meta
+    network_mode: host
+    pid: host
+    privileged: true
+    volumes:
+      - /:/rootfs:ro
+      - /sys:/sys
+      - /var/lib/docker:/var/lib/docker
+      - /var/run:/var/run
+
+  kube-state:
+    build:
+      context: ${PWD}/module/kubernetes/_meta/
+      dockerfile: Dockerfile.kube-state
+
   memcached:
     build: ${PWD}/module/memcached/_meta
 
@@ -116,6 +142,9 @@ services:
 
   prometheus:
     build: ${PWD}/module/prometheus/_meta
+
+  rabbitmq:
+    build: ${PWD}/module/rabbitmq/_meta
 
   redis:
     build: ${PWD}/module/redis/_meta

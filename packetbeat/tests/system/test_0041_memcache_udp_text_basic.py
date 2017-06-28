@@ -1,5 +1,6 @@
 from packetbeat import BaseTest
 
+import six
 
 # import pprint
 #
@@ -17,7 +18,6 @@ class Test(BaseTest):
             memcache_udp_transaction_timeout=10
         )
         self.run_packetbeat(pcap=pcap,
-                            extra_args=['-waitstop', '1'],
                             debug_selectors=["memcache", "udp", "publish"])
         objs = self.read_output()
         self.assert_common(objs)
@@ -62,8 +62,7 @@ class Test(BaseTest):
         assert sets['k1']['memcache.request.bytes'] == 100
         assert sets['k2']['memcache.request.bytes'] == 20
         assert sets['k3']['memcache.request.bytes'] == 10
-        assert all(o['memcache.request.noreply']
-                   for o in sets.itervalues())
+        assert all(o['memcache.request.noreply'] for o in six.itervalues(sets))
 
     def test_delete(self):
         objs = self._run('memcache/memcache_text_udp_delete.pcap')

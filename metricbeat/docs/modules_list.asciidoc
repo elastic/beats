@@ -2,8 +2,8 @@
 This file is generated! See scripts/docs_collector.py
 ////
 
+  * <<metricbeat-module-aerospike,aerospike>>
   * <<metricbeat-module-apache,Apache>>
-  * <<metricbeat-module-audit,Audit>>
   * <<metricbeat-module-ceph,ceph>>
   * <<metricbeat-module-couchbase,Couchbase>>
   * <<metricbeat-module-docker,Docker>>
@@ -23,6 +23,7 @@ This file is generated! See scripts/docs_collector.py
   * <<metricbeat-module-php_fpm,php_fpm>>
   * <<metricbeat-module-postgresql,PostgreSQL>>
   * <<metricbeat-module-prometheus,Prometheus>>
+  * <<metricbeat-module-rabbitmq,rabbitmq>>
   * <<metricbeat-module-redis,Redis>>
   * <<metricbeat-module-system,System>>
   * <<metricbeat-module-vsphere,vsphere>>
@@ -32,8 +33,8 @@ This file is generated! See scripts/docs_collector.py
 
 --
 
+include::modules/aerospike.asciidoc[]
 include::modules/apache.asciidoc[]
-include::modules/audit.asciidoc[]
 include::modules/ceph.asciidoc[]
 include::modules/couchbase.asciidoc[]
 include::modules/docker.asciidoc[]
@@ -53,6 +54,7 @@ include::modules/nginx.asciidoc[]
 include::modules/php_fpm.asciidoc[]
 include::modules/postgresql.asciidoc[]
 include::modules/prometheus.asciidoc[]
+include::modules/rabbitmq.asciidoc[]
 include::modules/redis.asciidoc[]
 include::modules/system.asciidoc[]
 include::modules/vsphere.asciidoc[]

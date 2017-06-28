@@ -16,6 +16,7 @@ include::../../libbeat/docs/version.asciidoc[]
 :beatname_lc: filebeat
 :beatname_uc: Filebeat
 :security: X-Pack Security
+:dockerimage: docker.elastic.co/beats/{beatname_lc}:{version}
 
 include::./overview.asciidoc[]
 
@@ -31,6 +32,8 @@ include::../../libbeat/docs/shared-directory-layout.asciidoc[]
 
 include::../../libbeat/docs/repositories.asciidoc[]
 
+include::./running-on-docker.asciidoc[]
+
 include::./upgrading.asciidoc[]
 
 include::./how-filebeat-works.asciidoc[]
@@ -43,6 +46,7 @@ include::./multiline.asciidoc[]
 
 include::../../libbeat/docs/shared-config-ingest.asciidoc[]
 
+:standalone:
 include::../../libbeat/docs/shared-env-vars.asciidoc[]
 
 include::./multiple-prospectors.asciidoc[]

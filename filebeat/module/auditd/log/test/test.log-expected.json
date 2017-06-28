@@ -7,13 +7,14 @@
         "_score": null,
         "_source": {
             "offset": 172,
-            "input_type": "log",
+            "prospector": {
+                "type": "log"
+            },
             "source": "/Users/me/go/src/github.com/elastic/beats/filebeat/module/auditd/log/test/test.log",
             "fileset": {
                 "module": "auditd",
                 "name": "log"
             },
-            "type": "log",
             "error": "",
             "@timestamp": "2017-01-31T20:18:46.912Z",
             "auditd": {
@@ -45,13 +46,14 @@
         "_score": null,
         "_source": {
             "offset": 534,
-            "input_type": "log",
+            "prospector": {
+                "type": "log"
+            },
             "source": "/Users/me/go/src/github.com/elastic/beats/filebeat/module/auditd/log/test/test.log",
             "fileset": {
                 "module": "auditd",
                 "name": "log"
             },
-            "type": "log",
             "error": "",
             "@timestamp": "2017-01-31T20:18:46.912Z",
             "auditd": {

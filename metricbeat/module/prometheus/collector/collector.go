@@ -8,7 +8,6 @@ import (
 	"github.com/elastic/beats/metricbeat/helper"
 	"github.com/elastic/beats/metricbeat/mb"
 	"github.com/elastic/beats/metricbeat/mb/parse"
-	"github.com/elastic/beats/metricbeat/module/prometheus"
 )
 
 const (
@@ -32,8 +31,8 @@ func init() {
 
 type MetricSet struct {
 	mb.BaseMetricSet
-	http      *helper.HTTP
-	namespace string
+	prometheus *helper.Prometheus
+	namespace  string
 }
 
 func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
@@ -49,19 +48,13 @@ func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
 
 	return &MetricSet{
 		BaseMetricSet: base,
-		http:          helper.NewHTTP(base),
+		prometheus:    helper.NewPrometheusClient(base),
 		namespace:     config.Namespace,
 	}, nil
 }
 
 func (m *MetricSet) Fetch() ([]common.MapStr, error) {
-
-	resp, err := m.http.FetchResponse()
-	if err != nil {
-		return nil, err
-	}
-	defer resp.Body.Close()
-	families, err := prometheus.GetMetricFamiliesFromResponse(resp)
+	families, err := m.prometheus.GetFamilies()
 
 	if err != nil {
 		return nil, fmt.Errorf("Unable to decode response from prometheus endpoint")
@@ -80,11 +73,9 @@ func (m *MetricSet) Fetch() ([]common.MapStr, error) {
 				if len(promEvent.labels) > 0 {
 					eventList[promEvent.labelHash]["label"] = promEvent.labels
 				}
-
 			}
 
 			eventList[promEvent.labelHash][promEvent.key] = promEvent.value
-
 		}
 	}
 
