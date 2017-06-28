@@ -621,6 +621,18 @@
 			"revisionTime": "2017-04-20T15:30:38Z"
 		},
 		{
+			"checksumSHA1": "LI9vdJJ/cOBwVI4y/8NIWp2nW4U=",
+			"path": "github.com/fsnotify/fsevents",
+			"revision": "3ceee05210c3babaa38cdc9181dabdcc83076a44",
+			"revisionTime": "2017-03-31T13:51:01Z"
+		},
+		{
+			"checksumSHA1": "x2Km0Qy3WgJJnV19Zv25VwTJcBM=",
+			"path": "github.com/fsnotify/fsnotify",
+			"revision": "4da3e2cfbabc9f751898f250b49f2439785783a1",
+			"revisionTime": "2017-03-29T04:21:07Z"
+		},
+		{
 			"checksumSHA1": "2UmMbNHc8FBr98mJFN1k8ISOIHk=",
 			"path": "github.com/garyburd/redigo/internal",
 			"revision": "b8dc90050f24c1a73a52f107f3f575be67b21b7c",

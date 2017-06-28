@@ -13,7 +13,7 @@ auditbeat.modules:
 
 #-------------------------------- Audit Module -------------------------------
 - module: audit
-  metricsets: ["kernel"]
+  metricsets: [kernel]
   kernel.audit_rules:
     # Define audit rules here.
     # Create file watches (-w) or syscall audits (-a or -A). For example:

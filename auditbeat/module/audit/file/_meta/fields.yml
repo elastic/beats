@@ -1,0 +1,52 @@
+  - name: file
+    type: group
+    description: >
+      The file metricset generates events when a file changes on disk.
+    fields:
+    - name: path
+      type: keyword
+      description: The path to the file.
+    - name: action
+      type: keyword
+      example: attributes_modified
+      description: >
+        Action describes the change to the file. The possible values are:
+        attributes_modified, created, deleted, updated, moved_to,
+        collision_within, unmounted, root_changed.
+    - name: inode
+      type: keyword
+      description: The inode representing the file in the filesystem.
+    - name: uid
+      type: keyword
+      description: The user ID (UID) of the file owner.
+    - name: owner
+      type: keyword
+      description: The file owner's username.
+    - name: gid
+      type: keyword
+      description: The primary group ID (GID) of the file.
+    - name: group
+      type: keyword
+      description: The primary group name of the file.
+    - name: mode
+      type: keyword
+      example: 0640
+      description: The mode of the file in octal representation.
+    - name: size
+      type: long
+      description: The file size in bytes.
+    - name: atime
+      type: date
+      description: The last access time of the file.
+    - name: mtime
+      type: date
+      description: The last modified time of the file.
+    - name: ctime
+      type: date
+      description: The creation time of the file.
+    - name: hashed
+      type: boolean
+      description: >
+        Boolean indicating if the event includes a file hashes. If true the
+        md5, sha1, and sha256 fields will be present.
+

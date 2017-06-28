@@ -6,6 +6,7 @@ import (
 	"github.com/elastic/beats/auditbeat/cmd"
 
 	_ "github.com/elastic/beats/auditbeat/module/audit"
+	_ "github.com/elastic/beats/auditbeat/module/audit/file"
 	_ "github.com/elastic/beats/auditbeat/module/audit/kernel"
 )
 
