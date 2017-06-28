@@ -54,7 +54,7 @@ configs: python-env
 	@for MODULE in `ls module | grep -v .go`; do cp -a $(PWD)/module/$$MODULE/_meta/config.yml modules.d/$$MODULE.yml.disabled; done
 	@chmod go-w modules.d/*
 	# Enable system by default:
-	@mv modules.d/system.yml.disabled modules.d/system.yml
+	@if [ -f modules.d/system.yml.disabled ]; then mv modules.d/system.yml.disabled modules.d/system.yml; fi
 
 # Generates imports for all modules and metricsets
 .PHONY: imports
