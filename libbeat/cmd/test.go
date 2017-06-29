@@ -14,6 +14,7 @@ func genTestCmd(name, beatVersion string, beatCreator beat.Creator) *cobra.Comma
 	}
 
 	exportCmd.AddCommand(test.GenTestConfigCmd(name, beatVersion, beatCreator))
+	exportCmd.AddCommand(test.GenTestOutputCmd(name, beatVersion))
 
 	return exportCmd
 }

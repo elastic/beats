@@ -18,6 +18,7 @@ import (
 	"github.com/elastic/beats/libbeat/outputs/transport"
 	"github.com/elastic/beats/libbeat/publisher"
 	"github.com/elastic/beats/libbeat/publisher/beat"
+	"github.com/elastic/beats/libbeat/testing"
 )
 
 // Client is an elasticsearch client.
@@ -575,6 +576,38 @@ func (client *Client) LoadJSON(path string, json map[string]interface{}) ([]byte
 // GetVersion returns the elasticsearch version the client is connected to
 func (client *Client) GetVersion() string {
 	return client.Connection.version
+}
+
+func (client *Client) Test(d testing.Driver) {
+	d.Run("elasticsearch: "+client.URL, func(d testing.Driver) {
+		u, err := url.Parse(client.URL)
+		d.Fatal("parse url", err)
+
+		address := u.Hostname()
+		if u.Port() != "" {
+			address += ":" + u.Port()
+		}
+		d.Run("connection", func(d testing.Driver) {
+			netDialer := transport.TestNetDialer(d, client.timeout)
+			_, err = netDialer.Dial("tcp", address)
+			d.Fatal("dial up", err)
+		})
+
+		if u.Scheme != "https" {
+			d.Warn("TLS", "secure connection disabled")
+		} else {
+			d.Run("TLS", func(d testing.Driver) {
+				netDialer := transport.NetDialer(client.timeout)
+				tlsDialer, err := transport.TestTLSDialer(d, netDialer, client.tlsConfig, client.timeout)
+				_, err = tlsDialer.Dial("tcp", address)
+				d.Fatal("dial up", err)
+			})
+		}
+
+		err = client.Connect()
+		d.Fatal("talk to server", err)
+		d.Info("version", client.version)
+	})
 }
 
 // Connect connects the client.
