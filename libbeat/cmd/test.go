@@ -4,6 +4,7 @@ import (
 	"github.com/spf13/cobra"
 
 	"github.com/elastic/beats/libbeat/beat"
+	"github.com/elastic/beats/libbeat/cmd/test"
 )
 
 func genTestCmd(name, beatVersion string, beatCreator beat.Creator) *cobra.Command {
@@ -11,6 +12,8 @@ func genTestCmd(name, beatVersion string, beatCreator beat.Creator) *cobra.Comma
 		Use:   "test",
 		Short: "Test config",
 	}
+
+	exportCmd.AddCommand(test.GenTestConfigCmd(name, beatVersion, beatCreator))
 
 	return exportCmd
 }

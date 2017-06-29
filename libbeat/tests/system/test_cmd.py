@@ -69,28 +69,28 @@ class TestCommands(BaseTest):
 
     @unittest.skipUnless(INTEGRATION_TESTS, "integration test")
     @attr('integration')
-    def test_configtest(self):
+    def test_test_config(self):
         """
-        Test configtest command
+        Test test config command
         """
         self.render_config_template("mockbeat",
                                     os.path.join(self.working_dir, "libbeat.yml"))
 
         exit_code = self.run_beat(
             logging_args=[],
-            extra_args=["configtest"],
+            extra_args=["test", "config"],
             config="libbeat.yml")
 
         assert exit_code == 0
         assert self.log_contains("Config OK")
 
-    def test_configtest_bad_config(self):
+    def test_test_bad_config(self):
         """
-        Test configtest command with bad config
+        Test test config command with bad config
         """
         exit_code = self.run_beat(
             logging_args=[],
-            extra_args=["configtest"],
+            extra_args=["test", "config"],
             config="libbeat-missing.yml")
 
         assert exit_code == 1
