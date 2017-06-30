@@ -109,7 +109,7 @@ func PdhGetFormattedCounterArray(counter PdhCounterHandle, format PdhCounterForm
 						break
 					}
 				}
-				runes := utf16.Decode(a[:size:size])
+				runes := utf16.Decode(a[:size])
 				name := string(runes)
 				value.Name = name
 				value.Value = pdhValues[i].FmtValue
