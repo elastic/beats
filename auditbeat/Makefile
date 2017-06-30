@@ -9,6 +9,32 @@ TEST_ENVIRONMENT=false
 # This is called by the beats packer before building starts
 .PHONY: before-build
 before-build:
+	@cat ${ES_BEATS}/auditbeat/_meta/common.yml \
+	     <(go run scripts/generate_config.go -os windows -concat) \
+	     ${ES_BEATS}/libbeat/_meta/config.yml > \
+	     ${PREFIX}/${BEAT_NAME}-win.yml
+	@cat ${ES_BEATS}/auditbeat/_meta/common.reference.yml \
+	     <(go run scripts/generate_config.go -os windows -concat) \
+	     ${ES_BEATS}/libbeat/_meta/config.reference.yml > \
+	     ${PREFIX}/${BEAT_NAME}-win.reference.yml
+
+	@cat ${ES_BEATS}/auditbeat/_meta/common.yml \
+	     <(go run scripts/generate_config.go -os darwin -concat) \
+	     ${ES_BEATS}/libbeat/_meta/config.yml > \
+	     ${PREFIX}/${BEAT_NAME}-darwin.yml
+	@cat ${ES_BEATS}/auditbeat/_meta/common.reference.yml \
+	     <(go run scripts/generate_config.go -os darwin -concat) \
+	     ${ES_BEATS}/libbeat/_meta/config.reference.yml > \
+	     ${PREFIX}/${BEAT_NAME}-darwin.reference.yml
+
+	@cat ${ES_BEATS}/auditbeat/_meta/common.yml \
+	     <(go run scripts/generate_config.go -os linux -concat) \
+	     ${ES_BEATS}/libbeat/_meta/config.yml > \
+	     ${PREFIX}/${BEAT_NAME}-linux.yml
+	@cat ${ES_BEATS}/auditbeat/_meta/common.reference.yml \
+	     <(go run scripts/generate_config.go -os linux -concat) \
+	     ${ES_BEATS}/libbeat/_meta/config.reference.yml > \
+	     ${PREFIX}/${BEAT_NAME}-linux.reference.yml
 
 # Collects all dependencies and then calls update
 .PHONY: collect
@@ -24,16 +50,17 @@ fields: python-env
 # Collects all module configs
 .PHONY: configs
 configs: python-env
-	@cp ${ES_BEATS}/auditbeat/_meta/common.yml _meta/beat.yml
-	@${PYTHON_ENV}/bin/python ${ES_BEATS}/script/config_collector.py --beat ${BEAT_NAME} $(PWD) >> _meta/beat.yml
-	@cp ${ES_BEATS}/auditbeat/_meta/common.reference.yml _meta/beat.reference.yml
-	@${PYTHON_ENV}/bin/python ${ES_BEATS}/script/config_collector.py --beat ${BEAT_NAME} --full $(PWD) >> _meta/beat.reference.yml
+	@cat ${ES_BEATS}/auditbeat/_meta/common.yml \
+	     <(go run scripts/generate_config.go -os linux -concat) > _meta/beat.yml
+	@cat ${ES_BEATS}/auditbeat/_meta/common.reference.yml \
+	     <(go run scripts/generate_config.go -os linux -ref -concat) > _meta/beat.reference.yml
 
 # Collects all module docs
 .PHONY: collect-docs
 collect-docs: python-env
-	@-rm -rf docs/modules
+	@rm -rf docs/modules
 	@mkdir -p docs/modules
+	@go run scripts/generate_config.go -os linux
 	@${PYTHON_ENV}/bin/python ${ES_BEATS}/metricbeat/scripts/docs_collector.py --beat ${BEAT_NAME}
 
 # Collects all module dashboards
