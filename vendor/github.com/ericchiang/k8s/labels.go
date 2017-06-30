@@ -7,7 +7,7 @@ import (
 
 const (
 	qnameCharFmt           string = "[A-Za-z0-9]"
-	qnameExtCharFmt        string = "[-A-Za-z0-9_.]"
+	qnameExtCharFmt        string = "[-A-Za-z0-9_./]"
 	qualifiedNameFmt       string = "(" + qnameCharFmt + qnameExtCharFmt + "*)?" + qnameCharFmt
 	qualifiedNameMaxLength int    = 63
 	labelValueFmt          string = "(" + qualifiedNameFmt + ")?"
