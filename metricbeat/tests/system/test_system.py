@@ -27,6 +27,11 @@ SYSTEM_CORE_FIELDS_ALL = SYSTEM_CORE_FIELDS + ["idle.ticks", "iowait.ticks", "ir
 SYSTEM_DISKIO_FIELDS = ["name", "read.count", "write.count", "read.bytes",
                         "write.bytes", "read.time", "write.time", "io.time"]
 
+SYSTEM_DISKIO_FIELDS_LINUX = ["name", "read.count", "write.count", "read.bytes",
+                              "write.bytes", "read.time", "write.time", "io.time",
+                              "iostat.read_request_merged_per_sec", "iostat.write_request_merged_per_sec", "iostat.read_request_per_sec", "iostat.write_request_per_sec", "iostat.read_byte_per_sec", "iostat.write_byte_per_sec"
+                              "iostat.avg_request_size", "iostat.avg_queue_size", "iostat.await", "iostat.service_time", "iostat.busy"]
+
 SYSTEM_FILESYSTEM_FIELDS = ["available", "device_name", "type", "files", "free",
                             "free_files", "mount_point", "total", "used.bytes",
                             "used.pct"]
@@ -170,7 +175,7 @@ class Test(metricbeat.BaseTest):
         cpu = evt["system"]["load"]
         self.assertItemsEqual(self.de_dot(SYSTEM_LOAD_FIELDS), cpu.keys())
 
-    @unittest.skipUnless(re.match("(?i)win|linux|freebsd", sys.platform), "os")
+    @unittest.skipUnless(re.match("(?i)win|freebsd", sys.platform), "os")
     def test_diskio(self):
         """
         Test system/diskio output.
@@ -192,6 +197,29 @@ class Test(metricbeat.BaseTest):
             self.assert_fields_are_documented(evt)
             diskio = evt["system"]["diskio"]
             self.assertItemsEqual(self.de_dot(SYSTEM_DISKIO_FIELDS), diskio.keys())
+
+    @unittest.skipUnless(re.match("(?i)linux", sys.platform), "os")
+    def test_diskio_linux(self):
+        """
+        Test system/diskio output on linux.
+        """
+        self.render_config_template(modules=[{
+            "name": "system",
+            "metricsets": ["diskio"],
+            "period": "5s"
+        }])
+        proc = self.start_beat()
+        self.wait_until(lambda: self.output_lines() > 0)
+        proc.check_kill_and_wait()
+        self.assert_no_logged_warnings()
+
+        output = self.read_output_json()
+        self.assertGreater(len(output), 0)
+
+        for evt in output:
+            self.assert_fields_are_documented(evt)
+            diskio = evt["system"]["diskio"]
+            self.assertItemsEqual(self.de_dot(SYSTEM_DISKIO_FIELDS_LINUX), diskio.keys())
 
     @unittest.skipUnless(re.match("(?i)win|linux|darwin|freebsd|openbsd", sys.platform), "os")
     def test_filesystem(self):

@@ -8773,6 +8773,94 @@ The total number of of milliseconds spent doing I/Os.
 
 
 [float]
+=== `system.diskio.iostat.read_request_merged_per_sec`
+
+type: float
+
+The number of read requests merged per second that were queued to the device.
+
+
+[float]
+=== `system.diskio.iostat.write_request_merged_per_sec`
+
+type: float
+
+The number of write requests merged per second that were queued to the device.
+
+
+[float]
+=== `system.diskio.iostat.read_request_per_sec`
+
+type: float
+
+The number of read requests that were issued to the device per second
+
+
+[float]
+=== `system.diskio.iostat.write_request_per_sec`
+
+type: float
+
+The number of write requests that were issued to the device per second
+
+
+[float]
+=== `system.diskio.iostat.read_byte_per_sec`
+
+type: float
+
+The number of Bytes read from the device per second.
+
+
+[float]
+=== `system.diskio.iostat.write_byte_per_sec`
+
+type: float
+
+The number of Bytes write from the device per second.
+
+
+[float]
+=== `system.diskio.iostat.avg_request_size`
+
+type: float
+
+The average size (in sectors) of the requests that were issued to the device.
+
+
+[float]
+=== `system.diskio.iostat.avg_queue_size`
+
+type: float
+
+The average queue length of the requests that were issued to the device.
+
+
+[float]
+=== `system.diskio.iostat.await`
+
+type: float
+
+The average queue length of the requests that were issued to the device.
+
+
+[float]
+=== `system.diskio.iostat.service_time`
+
+type: float
+
+The average service time (in milliseconds) for I/O requests that were issued to the device.
+
+
+[float]
+=== `system.diskio.iostat.busy`
+
+type: float
+
+Percentage of CPU time during which I/O requests were issued to the device (bandwidth utilization for the device). Device saturation occurs when this value is close to 100%.
+
+
+[float]
 == filesystem fields
 
 `filesystem` contains local filesystem stats.
