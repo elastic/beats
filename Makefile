@@ -37,10 +37,7 @@ coverage-report:
 	@mkdir -p $(COVERAGE_DIR)
 	@echo 'mode: atomic' > ./$(COVERAGE_DIR)/full.cov
 	@# Collects all coverage files and skips top line with mode
-	@-tail -q -n +2 ./filebeat/$(COVERAGE_DIR)/*.cov >> ./$(COVERAGE_DIR)/full.cov
-	@-tail -q -n +2 ./packetbeat/$(COVERAGE_DIR)/*.cov >> ./$(COVERAGE_DIR)/full.cov
-	@-tail -q -n +2 ./winlogbeat/$(COVERAGE_DIR)/*.cov >> ./$(COVERAGE_DIR)/full.cov
-	@-tail -q -n +2 ./libbeat/$(COVERAGE_DIR)/*.cov >> ./$(COVERAGE_DIR)/full.cov
+	@$(foreach var,$(PROJECTS),tail -q -n +2 ./$(var)/$(COVERAGE_DIR)/*.cov >> ./$(COVERAGE_DIR)/full.cov || true;)
 	@go tool cover -html=./$(COVERAGE_DIR)/full.cov -o $(COVERAGE_DIR)/full.html
 	@echo "Generated coverage report $(COVERAGE_DIR)/full.html"
 
