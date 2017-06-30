@@ -35,8 +35,7 @@ fpm --force -s dir -t deb \
         {{.beat_name}}-linux.reference.yml=/etc/{{.beat_name}}/{{.beat_name}}.reference.yml \
         fields.yml=/etc/{{.beat_name}}/fields.yml \
         ${RUNID}.service=/lib/systemd/system/{{.beat_name}}.service \
-        god-linux-{{.arch}}=/usr/share/{{.beat_name}}/bin/{{.beat_name}}-god \
-        import_dashboards-linux-{{.arch}}=/usr/share/{{.beat_name}}/scripts/import_dashboards
+        god-linux-{{.arch}}=/usr/share/{{.beat_name}}/bin/{{.beat_name}}-god
 
 # move and rename to use the elastic conventions
 mkdir -p upload
