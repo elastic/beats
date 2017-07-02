@@ -6,6 +6,7 @@ import (
 	"strings"
 
 	"github.com/elastic/beats/libbeat/common"
+	"github.com/elastic/beats/libbeat/publisher/beat"
 )
 
 type Factory func(*common.Config) ([]Job, error)
@@ -14,8 +15,10 @@ type ActiveBuilder func(Info, *common.Config) ([]Job, error)
 
 type Job interface {
 	Name() string
-	TaskRunner
+	Run() (beat.Event, []JobRunner, error)
 }
+
+type JobRunner func() (beat.Event, []JobRunner, error)
 
 type TaskRunner interface {
 	Run() (common.MapStr, []TaskRunner, error)
