@@ -7,13 +7,14 @@ import (
 	"time"
 
 	"github.com/elastic/beats/libbeat/common"
+	"github.com/elastic/beats/libbeat/publisher/beat"
 
 	"github.com/elastic/beats/heartbeat/look"
 )
 
 type funcJob struct {
 	settings JobSettings
-	funcTask
+	run      JobRunner
 }
 
 type funcTask struct {
@@ -96,9 +97,48 @@ func MakeJob(settings JobSettings, f func() (common.MapStr, []TaskRunner, error)
 		},
 	})
 
-	return &funcJob{settings, funcTask{func() (common.MapStr, []TaskRunner, error) {
-		return annotated(settings, time.Now(), f).Run()
-	}}}
+	return &funcJob{settings, annotated(settings, time.Now(), f)}
+}
+
+// annotated lifts a TaskRunner into a job, annotating events with common fields and start timestamp.
+func annotated(
+	settings JobSettings,
+	start time.Time,
+	fn func() (common.MapStr, []TaskRunner, error),
+) JobRunner {
+	return func() (beat.Event, []JobRunner, error) {
+		var event beat.Event
+
+		fields, cont, err := fn()
+		if err != nil {
+			if fields == nil {
+				fields = common.MapStr{}
+			}
+			fields["error"] = look.Reason(err)
+		}
+
+		if fields != nil {
+			status := look.Status(err)
+			fields.DeepUpdate(common.MapStr{
+				"monitor": common.MapStr{
+					"duration": look.RTT(time.Since(start)),
+					"status":   status,
+				},
+			})
+			if user := settings.Fields; user != nil {
+				fields.DeepUpdate(user)
+			}
+
+			event.Timestamp = start
+			event.Fields = fields
+		}
+
+		jobCont := make([]JobRunner, len(cont))
+		for i, c := range cont {
+			jobCont[i] = annotated(settings, start, c.Run)
+		}
+		return event, jobCont, nil
+	}
 }
 
 // MakeCont wraps a function into an executable TaskRunner. The task being generated
@@ -362,11 +402,15 @@ func withStart(field string, start time.Time, r TaskRunner) TaskRunner {
 
 func (f *funcJob) Name() string { return f.settings.Name }
 
+func (f *funcJob) Run() (beat.Event, []JobRunner, error) { return f.run() }
+
 func (f funcTask) Run() (common.MapStr, []TaskRunner, error) { return f.run() }
 
+/*
 func (f funcTask) annotated(settings JobSettings, start time.Time) TaskRunner {
 	return annotated(settings, start, f.run)
 }
+*/
 
 // Unpack sets PingMode from a constant string. Unpack will be called by common.Unpack when
 // unpacking into an IPSettings type.
@@ -380,45 +424,6 @@ func (p *PingMode) Unpack(s string) error {
 		return fmt.Errorf("expecting 'any' or 'all', not '%v'", s)
 	}
 	return nil
-}
-
-func annotated(
-	settings JobSettings,
-	start time.Time,
-	fn func() (common.MapStr, []TaskRunner, error),
-) TaskRunner {
-	return MakeCont(func() (common.MapStr, []TaskRunner, error) {
-		event, cont, err := fn()
-		if err != nil {
-			if event == nil {
-				event = common.MapStr{}
-			}
-			event["error"] = look.Reason(err)
-		}
-
-		if event != nil {
-			status := look.Status(err)
-			event.DeepUpdate(common.MapStr{
-				"@timestamp": look.Timestamp(start),
-				"monitor": common.MapStr{
-					"duration": look.RTT(time.Since(start)),
-					"status":   status,
-				},
-			})
-			if fields := settings.Fields; fields != nil {
-				event.DeepUpdate(fields)
-			}
-		}
-
-		for i := range cont {
-			if fcont, ok := cont[i].(funcTask); ok {
-				cont[i] = fcont.annotated(settings, start)
-			} else {
-				cont[i] = annotated(settings, start, cont[i].Run)
-			}
-		}
-		return event, cont, nil
-	})
 }
 
 func makeIPFilter(network string) func(net.IP) bool {
