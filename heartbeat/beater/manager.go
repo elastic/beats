@@ -9,6 +9,7 @@ import (
 
 	"github.com/elastic/beats/libbeat/common"
 	"github.com/elastic/beats/libbeat/logp"
+	"github.com/elastic/beats/libbeat/processors"
 	"github.com/elastic/beats/libbeat/publisher/bc/publisher"
 	"github.com/elastic/beats/libbeat/publisher/beat"
 
@@ -48,8 +49,10 @@ type monitorTaskConfig struct {
 	Name     string             `config:"name"`
 	Type     string             `config:"type"`
 	Schedule *schedule.Schedule `config:"schedule" validate:"required"`
+
 	// Fields and tags to add to monitor.
-	EventMetadata common.EventMetadata `config:",inline"`
+	EventMetadata common.EventMetadata    `config:",inline"`
+	Processors    processors.PluginConfig `config:"processors"`
 }
 
 type jobControl interface {
@@ -197,10 +200,16 @@ func (m *monitor) Update(configs []*common.Config) error {
 
 	// start new and reconfigured tasks
 	for id, t := range all {
+		processors, err := processors.New(t.config.Processors)
+		if err != nil {
+			logp.Critical("Fail to load monitor processors: %v", err)
+			continue
+		}
 
 		// create connection per monitorTask
 		client, err := m.pipeline.ConnectX(beat.ClientConfig{
 			EventMetadata: t.config.EventMetadata,
+			Processor:     processors,
 		})
 		if err != nil {
 			logp.Critical("Fail to connect job '%v' to publisher pipeline: %v", id, err)
