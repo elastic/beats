@@ -66,7 +66,7 @@ func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
 		Password:    config.Password,
 
 		// consumer groups API requires at least 0.9.0.0
-		Version: kafka.Version{"0.9.0.0"},
+		Version: kafka.Version{String: "0.9.0.0"},
 	}
 
 	return &MetricSet{

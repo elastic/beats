@@ -160,7 +160,7 @@ integration-tests-environment: prepare-tests build-image
 # Runs the system tests
 .PHONY: system-tests
 system-tests: ## @testing Runs the system tests
-system-tests: ${BEAT_NAME}.test prepare-tests python-env ${ES_BEATS}/dev-tools/cmd/import_dashboards/import_dashboards
+system-tests: ${BEAT_NAME}.test prepare-tests python-env ${ES_BEATS}/dev-tools/cmd/dashboards/export_dashboards
 	. ${PYTHON_ENV}/bin/activate; INTEGRATION_TESTS=${INTEGRATION_TESTS} TESTING_ENVIRONMENT=${TESTING_ENVIRONMENT} nosetests -w tests/system ${NOSETESTS_OPTIONS}
 	python ${ES_BEATS}/dev-tools/aggregate_coverage.py -o ${COVERAGE_DIR}/system.cov ./build/system-tests/run
 
@@ -277,8 +277,10 @@ endif
 	@${PYTHON_ENV}/bin/python ${ES_BEATS}/libbeat/scripts/generate_fields_docs.py $(PWD) ${BEAT_NAME} ${ES_BEATS}
 
 	@# Generate Kibana index pattern
-	@mkdir -p $(PWD)/_meta/kibana/index-pattern
-	@${PYTHON_ENV}/bin/python ${ES_BEATS}/libbeat/scripts/generate_index_pattern.py --index '${BEAT_NAME}-*' --libbeat ${ES_BEATS}/libbeat --beat $(PWD)
+	@mkdir -p $(PWD)/_meta/kibana/5.x/index-pattern
+	@mkdir -p $(PWD)/_meta/kibana/default/index-pattern
+	@${PYTHON_ENV}/bin/python ${ES_BEATS}/libbeat/scripts/generate_index_pattern.py --index '${BEAT_NAME}-*' --beat $(PWD) --version ${BEAT_VERSION}
+
 
 .PHONY: docs
 docs:  ## @build Builds the documents for the beat
@@ -297,16 +299,8 @@ index-template: ## @build Generate index templates for the given $VERSION. This 
 ### KIBANA FILES HANDLING ###
 ES_URL?=http://localhost:9200
 
-.PHONY: export-dashboards
-export-dashboards: python-env update
-	. ${PYTHON_ENV}/bin/activate && python ${ES_BEATS}/dev-tools/export_dashboards.py --url ${ES_URL} --dir $(shell pwd)/_meta/kibana --regex ${BEAT_NAME}-*
-
-${ES_BEATS}/dev-tools/cmd/import_dashboards/import_dashboards:
-	$(MAKE) -C ${ES_BEATS}/dev-tools/cmd/import_dashboards import_dashboards
-
-.PHONY: import-dashboards
-import-dashboards: update ${ES_BEATS}/dev-tools/cmd/import_dashboards/import_dashboards
-	${ES_BEATS}/dev-tools/cmd/import_dashboards/import_dashboards -es ${ES_URL} -dir ${PWD}/_meta/kibana
+${ES_BEATS}/dev-tools/cmd/dashboards/export_dashboards:
+	$(MAKE) -C ${ES_BEATS}/dev-tools/cmd/dashboards export_dashboards
 
 ### CONTAINER ENVIRONMENT ####
 

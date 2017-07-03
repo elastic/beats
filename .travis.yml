@@ -85,12 +85,6 @@ jobs:
       go: $GO_VERSION
       stage: test
 
-    # Dashboards
-    - os: linux
-      env: TARGETS="-C dev-tools/cmd/import_dashboards"
-      go: $GO_VERSION
-      stage: test
-
     # Generators
     - os: linux
       env: TARGETS="-C generator/metricbeat test"
