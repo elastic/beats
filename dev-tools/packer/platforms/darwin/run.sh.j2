@@ -12,7 +12,6 @@ fi
 
 mkdir /{{.beat_name}}-${VERSION}-darwin-x86_64
 cp -a homedir/. /{{.beat_name}}-${VERSION}-darwin-x86_64/
-install -D -m 755 import_dashboards-darwin-{{.arch}} /{{.beat_name}}-${VERSION}-darwin-x86_64/scripts/import_dashboards
 cp {{.beat_name}}-darwin-amd64 /{{.beat_name}}-${VERSION}-darwin-x86_64/{{.beat_name}}
 cp {{.beat_name}}-darwin.yml /{{.beat_name}}-${VERSION}-darwin-x86_64/{{.beat_name}}.yml
 cp {{.beat_name}}-darwin.reference.yml /{{.beat_name}}-${VERSION}-darwin-x86_64/{{.beat_name}}.reference.yml
