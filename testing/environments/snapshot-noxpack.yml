@@ -10,13 +10,12 @@ services:
       context: ./docker/elasticsearch
       dockerfile: Dockerfile-snapshot
       args:
-        XPACK: 1
+        XPACK: 0
     environment:
       - "ES_JAVA_OPTS=-Xms512m -Xmx512m"
       - "network.host="
       - "transport.host=127.0.0.1"
       - "http.host=0.0.0.0"
-      - "xpack.security.enabled=false"
 
   logstash:
     extends:
@@ -26,7 +25,7 @@ services:
       context: ./docker/logstash
       dockerfile: Dockerfile
       args:
-        XPACK: 1
+        XPACK: 0
     environment:
       - ES_HOST=elasticsearch
 
