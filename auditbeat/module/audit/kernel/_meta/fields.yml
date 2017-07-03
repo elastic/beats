@@ -4,6 +4,10 @@
       The kernel metricset distributes audit events received from the Linux
       Audit Framework that is a part of the Linux kernel.
     fields:
+    - name: action
+      type: keyword
+      example: logged-in
+      description: A description of the action taken by the user.
     - name: actor
       type: group
       description: The actor is the user that triggered the audit event.
