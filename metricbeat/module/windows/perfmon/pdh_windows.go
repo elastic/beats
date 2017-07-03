@@ -218,23 +218,22 @@ func (q *Query) Execute() error {
 }
 
 type Value struct {
-	Num interface{}
-	Err error
+	Instance    string
+	Measurement interface{}
+	Err         error
 }
 
-func (q *Query) Values() (map[string]Value, error) {
-	rtn := make(map[string]Value, len(q.counters))
+func (q *Query) Values() (map[string][]Value, error) {
+	rtn := make(map[string][]Value, len(q.counters))
 
 	for path, counter := range q.counters {
 
 		if match, _ := regexp.MatchString(".*\\(\\*\\)\\.*", path); match {
 			values, err := PdhGetFormattedCounterArray(counter.handle, counter.format|PdhFmtNoCap100)
 			if err != nil {
-				rtn[path] = Value{Err: err}
+				rtn[path] = append(rtn[path], Value{Err: err})
 				continue
 			}
-
-			rtn[path] = Value{Num: common.MapStr{}}
 
 			for i := 0; i < len(values); i++ {
 				var val interface{}
@@ -246,22 +245,25 @@ func (q *Query) Values() (map[string]Value, error) {
 					val = *(*int64)(unsafe.Pointer(&values[i].Value.LongValue))
 				}
 
-				if m, ok := rtn[path].Num.(common.MapStr); ok {
-					m[values[i].Name] = val
-				}
+				rtn[path] = append(rtn[path], Value{Instance: values[i].Name, Measurement: val})
+
 			}
 		} else {
 			_, value, err := PdhGetFormattedCounterValue(counter.handle, counter.format|PdhFmtNoCap100)
 			if err != nil {
-				rtn[path] = Value{Err: err}
+				rtn[path] = append(rtn[path], Value{Err: err})
 				continue
 			}
 
+			re := regexp.MustCompile("\\((.*)\\)")
+			match := re.FindStringSubmatch(path)
+			name := match[1]
+
 			switch counter.format {
 			case PdhFmtDouble:
-				rtn[path] = Value{Num: *(*float64)(unsafe.Pointer(&value.LongValue))}
+				rtn[path] = append(rtn[path], Value{Measurement: *(*float64)(unsafe.Pointer(&value.LongValue)), Instance: name})
 			case PdhFmtLarge:
-				rtn[path] = Value{Num: *(*int64)(unsafe.Pointer(&value.LongValue))}
+				rtn[path] = append(rtn[path], Value{Measurement: *(*int64)(unsafe.Pointer(&value.LongValue)), Instance: name})
 			}
 		}
 	}
@@ -275,9 +277,10 @@ func (q *Query) Close() error {
 }
 
 type PerfmonReader struct {
-	query     *Query            // PDH Query
-	pathToKey map[string]string // Mapping of counter path to key used in output.
-	executed  bool              // Indicates if the query has been executed.
+	query       *Query            // PDH Query
+	instance    map[string]string // Mapping of counter path to key used in output.
+	measurement map[string]string
+	executed    bool // Indicates if the query has been executed.
 }
 
 func NewPerfmonReader(config []CounterConfig) (*PerfmonReader, error) {
@@ -287,8 +290,9 @@ func NewPerfmonReader(config []CounterConfig) (*PerfmonReader, error) {
 	}
 
 	r := &PerfmonReader{
-		query:     query,
-		pathToKey: map[string]string{},
+		query:       query,
+		instance:    map[string]string{},
+		measurement: map[string]string{},
 	}
 
 	for _, counter := range config {
@@ -304,14 +308,15 @@ func NewPerfmonReader(config []CounterConfig) (*PerfmonReader, error) {
 			return nil, err
 		}
 
-		r.pathToKey[counter.Query] = counter.Alias
+		r.instance[counter.Query] = counter.InstanceLabel
+		r.measurement[counter.Query] = counter.MeasurementLabel
 
 	}
 
 	return r, nil
 }
 
-func (r *PerfmonReader) Read() (common.MapStr, error) {
+func (r *PerfmonReader) Read() ([]common.MapStr, error) {
 	if err := r.query.Execute(); err != nil {
 		return nil, err
 	}
@@ -323,23 +328,30 @@ func (r *PerfmonReader) Read() (common.MapStr, error) {
 	}
 
 	// Write the values into the map.
-	result := common.MapStr{}
+	result := []common.MapStr{}
 	var errs multierror.Errors
 
-	for counterPath, value := range values {
-		key := r.pathToKey[counterPath]
-		result.Put(key, value.Num)
+	for counterPath, counter := range values {
+		for _, val := range counter {
+			ev := common.MapStr{}
+			instanceKey := r.instance[counterPath]
+			ev.Put(instanceKey, val.Instance)
+			measurementKey := r.measurement[counterPath]
+			ev.Put(measurementKey, val.Measurement)
 
-		if value.Err != nil {
-			switch value.Err {
-			case PDH_CALC_NEGATIVE_DENOMINATOR:
-			case PDH_INVALID_DATA:
-				if r.executed {
-					errs = append(errs, errors.Wrapf(value.Err, "key=%v", key))
+			if val.Err != nil {
+				switch val.Err {
+				case PDH_CALC_NEGATIVE_DENOMINATOR:
+				case PDH_INVALID_DATA:
+					if r.executed {
+						errs = append(errs, errors.Wrapf(val.Err, "key=%v", measurementKey))
+					}
+				default:
+					errs = append(errs, errors.Wrapf(val.Err, "key=%v", measurementKey))
 				}
-			default:
-				errs = append(errs, errors.Wrapf(value.Err, "key=%v", key))
 			}
+
+			result = append(result, ev)
 		}
 	}
 

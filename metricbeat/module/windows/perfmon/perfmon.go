@@ -13,9 +13,10 @@ import (
 )
 
 type CounterConfig struct {
-	Alias  string `config:"alias" validate:"required"`
-	Query  string `config:"query" validate:"required"`
-	Format string `config:"format"`
+	InstanceLabel    string `config:"instance_label" validate:"required"`
+	MeasurementLabel string `config:"measurement_label" validate:"required"`
+	Query            string `config:"query" validate:"required"`
+	Format           string `config:"format"`
 }
 
 func init() {
@@ -48,7 +49,7 @@ func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
 			value.Format = "float"
 		case "float", "long":
 		default:
-			err := fmt.Errorf("format '%s' for counter '%s' are not valid", value.Format, value.Alias)
+			err := fmt.Errorf("format '%s' for counter '%s' are not valid", value.Format, value.InstanceLabel)
 			return nil, errors.Wrap(err, "initialization failed")
 		}
 
@@ -65,7 +66,7 @@ func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
 	}, nil
 }
 
-func (m *MetricSet) Fetch() (common.MapStr, error) {
+func (m *MetricSet) Fetch() ([]common.MapStr, error) {
 	data, err := m.reader.Read()
 	if err != nil {
 		return nil, errors.Wrap(err, "failed reading counters")
