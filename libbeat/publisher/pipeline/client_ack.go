@@ -181,22 +181,25 @@ func (a *gapCountACK) ackLoop() {
 
 func (a *gapCountACK) handleACK(n int) {
 	// collect items and compute total count from gapList
-	total := n
+
+	total := 0
 	for n > 0 {
 		a.lst.Lock()
 		current := a.lst.head
+
+		current.Lock()
 		if n >= current.send {
-			if current.next != nil {
+			if nxt := current.next; nxt != nil {
 				// advance list all event in current entry have been send and list as
 				// more then 1 gapInfo entry. If only 1 entry is present, list item will be
 				// reset and reused
-				a.lst.head = current.next
+
+				a.lst.head = nxt
 			}
 		}
 
 		// hand over lock list-entry, so ACK handler and producer can operate
 		// on potentially different list ends
-		current.Lock()
 		a.lst.Unlock()
 
 		if n < current.send {

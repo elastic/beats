@@ -6,6 +6,7 @@ import (
 
 	"github.com/elastic/beats/libbeat/common"
 	"github.com/elastic/beats/libbeat/processors"
+	"github.com/elastic/beats/libbeat/publisher/beat"
 )
 
 type extract_field struct {
@@ -26,7 +27,7 @@ func init() {
 }
 */
 
-func NewExtractField(c common.Config) (processors.Processor, error) {
+func NewExtractField(c *common.Config) (processors.Processor, error) {
 	config := struct {
 		Field     string `config:"field"`
 		Separator string `config:"separator"`
@@ -45,7 +46,7 @@ func NewExtractField(c common.Config) (processors.Processor, error) {
 		}
 	}
 
-	f := extract_field{
+	f := &extract_field{
 		Field:     config.Field,
 		Separator: config.Separator,
 		Index:     config.Index,
@@ -54,7 +55,7 @@ func NewExtractField(c common.Config) (processors.Processor, error) {
 	return f, nil
 }
 
-func (f extract_field) Run(event common.MapStr) (common.MapStr, error) {
+func (f *extract_field) Run(event *beat.Event) (*beat.Event, error) {
 	fieldValue, err := event.GetValue(f.Field)
 	if err != nil {
 		return nil, fmt.Errorf("error getting field '%s' from event", f.Field)
@@ -71,7 +72,7 @@ func (f extract_field) Run(event common.MapStr) (common.MapStr, error) {
 		return nil, fmt.Errorf("index is out of range for field '%s'", f.Field)
 	}
 
-	event.Put(f.Target, parts[f.Index])
+	event.PutValue(f.Target, parts[f.Index])
 
 	return event, nil
 }

@@ -66,9 +66,6 @@ type client struct {
 	publisher *BeatPublisher
 	sync      *syncClient
 	async     *asyncClient
-
-	beatMeta            common.MapStr        // Beat metadata that is added to all events.
-	globalEventMetadata common.EventMetadata // Fields and tags that are added to all events.
 }
 
 type message struct {
@@ -84,15 +81,8 @@ type sender interface {
 
 func newClient(pub *BeatPublisher) *client {
 	c := &client{
-		canceler: op.NewCanceler(),
-
+		canceler:  op.NewCanceler(),
 		publisher: pub,
-		beatMeta: common.MapStr{
-			"name":     pub.name,
-			"hostname": pub.hostname,
-			"version":  pub.version,
-		},
-		globalEventMetadata: pub.globalEventMetadata,
 	}
 	return c
 }
@@ -110,13 +100,6 @@ func (c *client) Close() error {
 }
 
 func (c *client) PublishEvent(event common.MapStr, opts ...ClientOption) bool {
-	c.annotateEvent(event)
-
-	publishEvent := c.filterEvent(event)
-	if publishEvent == nil {
-		return false
-	}
-
 	var metadata common.MapStr
 	meta, ctx, pipeline, err := c.getPipeline(opts)
 	if err != nil {
@@ -134,7 +117,7 @@ func (c *client) PublishEvent(event common.MapStr, opts ...ClientOption) bool {
 	return pipeline.publish(message{
 		client:  c,
 		context: ctx,
-		datum:   makeEvent(*publishEvent, metadata),
+		datum:   makeEvent(event, metadata),
 	})
 }
 
@@ -158,18 +141,11 @@ func (c *client) PublishEvents(events []common.MapStr, opts ...ClientOption) boo
 
 	data := make([]beat.Event, 0, len(events))
 	for i, event := range events {
-		c.annotateEvent(event)
-
-		publishEvent := c.filterEvent(event)
-		if publishEvent == nil {
-			continue
-		}
-
 		metadata := metadataAll
 		if meta != nil {
 			metadata = meta[i]
 		}
-		data = append(data, makeEvent(*publishEvent, metadata))
+		data = append(data, makeEvent(event, metadata))
 	}
 
 	if len(data) == 0 {
@@ -179,59 +155,6 @@ func (c *client) PublishEvents(events []common.MapStr, opts ...ClientOption) boo
 
 	publishedEvents.Add(int64(len(data)))
 	return pipeline.publish(message{client: c, context: ctx, data: data})
-}
-
-// annotateEvent adds fields that are common to all events. This adds the 'beat'
-// field that contains name and hostname. It also adds 'tags' and 'fields'. See
-// the documentation for Client for more information.
-func (c *client) annotateEvent(event common.MapStr) {
-	// Allow an event to override the destination index for an event by setting
-	// beat.index in an event.
-	beatMeta := c.beatMeta
-	if beatIfc, ok := event["beat"]; ok {
-		ms, ok := beatIfc.(common.MapStr)
-		if ok {
-			// Copy beatMeta so the defaults are not changed.
-			beatMeta = common.MapStrUnion(beatMeta, ms)
-		}
-	}
-	event["beat"] = beatMeta
-
-	// Add the global tags and fields defined under shipper.
-	common.AddTags(event, c.globalEventMetadata.Tags)
-	common.MergeFields(event, c.globalEventMetadata.Fields, c.globalEventMetadata.FieldsUnderRoot)
-
-	// Add the event specific fields last so that they precedence over globals.
-	if metaIfc, ok := event[common.EventMetadataKey]; ok {
-		eventMetadata, ok := metaIfc.(common.EventMetadata)
-		if ok {
-			common.AddTags(event, eventMetadata.Tags)
-			common.MergeFields(event, eventMetadata.Fields, eventMetadata.FieldsUnderRoot)
-		}
-		delete(event, common.EventMetadataKey)
-	}
-
-}
-
-func (c *client) filterEvent(event common.MapStr) *common.MapStr {
-
-	if event = common.ConvertToGenericEvent(event); event == nil {
-		logp.Err("fail to convert to a generic event")
-		return nil
-
-	}
-
-	// process the event by applying the configured actions
-	publishEvent := c.publisher.processors.Run(event)
-	if publishEvent == nil {
-		// the event is dropped
-		logp.Debug("publish", "Drop event %s", event.StringToPrint())
-		return nil
-	}
-	if logp.IsDebug("publish") {
-		logp.Debug("publish", "Publish: %s", publishEvent.StringToPrint())
-	}
-	return &publishEvent
 }
 
 func (c *client) getPipeline(opts []ClientOption) ([]common.MapStr, Context, sender, error) {
@@ -276,6 +199,10 @@ func MakeContext(opts []ClientOption) ([]common.MapStr, Context) {
 }
 
 func makeEvent(fields common.MapStr, meta common.MapStr) beat.Event {
+	if logp.IsDebug("publish") {
+		logp.Debug("publish", "Publish: %s", fields.StringToPrint())
+	}
+
 	var ts time.Time
 	switch value := fields["@timestamp"].(type) {
 	case time.Time:

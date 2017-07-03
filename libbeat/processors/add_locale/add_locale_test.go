@@ -7,6 +7,7 @@ import (
 
 	"github.com/elastic/beats/libbeat/common"
 	"github.com/elastic/beats/libbeat/logp"
+	"github.com/elastic/beats/libbeat/publisher/beat"
 	"github.com/stretchr/testify/assert"
 )
 
@@ -70,15 +71,14 @@ func getActualValue(t *testing.T, config *common.Config, input common.MapStr) co
 		logp.LogInit(logp.LOG_DEBUG, "", false, true, []string{"*"})
 	}
 
-	p, err := newAddLocale(*config)
+	p, err := newAddLocale(config)
 	if err != nil {
 		logp.Err("Error initializing add_locale")
 		t.Fatal(err)
 	}
 
-	actual, err := p.Run(input)
-
-	return actual
+	actual, err := p.Run(&beat.Event{Fields: input})
+	return actual.Fields
 }
 
 func BenchmarkConstruct(b *testing.B) {
@@ -86,12 +86,12 @@ func BenchmarkConstruct(b *testing.B) {
 
 	input := common.MapStr{}
 
-	p, err := newAddLocale(*testConfig)
+	p, err := newAddLocale(testConfig)
 	if err != nil {
 		b.Fatal(err)
 	}
 
 	for i := 0; i < b.N; i++ {
-		_, err = p.Run(input)
+		_, err = p.Run(&beat.Event{Fields: input})
 	}
 }

@@ -3,6 +3,7 @@ package actions
 import (
 	"github.com/elastic/beats/libbeat/common"
 	"github.com/elastic/beats/libbeat/processors"
+	"github.com/elastic/beats/libbeat/publisher/beat"
 )
 
 type dropEvent struct{}
@@ -12,13 +13,15 @@ func init() {
 		configChecked(newDropEvent, allowedFields("when")))
 }
 
-func newDropEvent(c common.Config) (processors.Processor, error) {
-	return dropEvent{}, nil
+var dropEventsSingleton = (*dropEvent)(nil)
+
+func newDropEvent(c *common.Config) (processors.Processor, error) {
+	return dropEventsSingleton, nil
 }
 
-func (f dropEvent) Run(event common.MapStr) (common.MapStr, error) {
+func (*dropEvent) Run(_ *beat.Event) (*beat.Event, error) {
 	// return event=nil to delete the entire event
 	return nil, nil
 }
 
-func (f dropEvent) String() string { return "drop_event" }
+func (*dropEvent) String() string { return "drop_event" }

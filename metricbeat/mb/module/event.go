@@ -38,7 +38,7 @@ func (b EventBuilder) Build() (common.MapStr, error) {
 
 	// Apply filters.
 	if b.filters != nil {
-		if event = b.filters.Run(event); event == nil {
+		if event = b.filters.RunBC(event); event == nil {
 			return nil, nil
 		}
 	}

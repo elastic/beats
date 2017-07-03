@@ -4,6 +4,7 @@ package testing
 import (
 	"github.com/elastic/beats/libbeat/common"
 	"github.com/elastic/beats/libbeat/publisher/bc/publisher"
+	"github.com/elastic/beats/libbeat/publisher/beat"
 )
 
 type TestPublisher struct {
@@ -29,6 +30,10 @@ func PublisherWithClient(client publisher.Client) publisher.Publisher {
 
 func (pub *TestPublisher) Connect() publisher.Client {
 	return pub.client
+}
+
+func (pub *TestPublisher) ConnectX(_ beat.ClientConfig) (beat.Client, error) {
+	panic("Not supported")
 }
 
 func NewChanClient(bufSize int) *ChanClient {

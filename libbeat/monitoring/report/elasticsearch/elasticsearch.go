@@ -104,8 +104,11 @@ func makeReporter(beat common.BeatInfo, cfg *common.Config) (report.Reporter, er
 	}
 
 	broker := membroker.NewBroker(20, false)
-	settings := pipeline.Settings{}
-	pipeline, err := pipeline.New(broker, nil, out, settings)
+	settings := pipeline.Settings{
+		WaitClose:     0,
+		WaitCloseMode: pipeline.NoWaitOnClose,
+	}
+	pipeline, err := pipeline.New(broker, out, settings)
 	if err != nil {
 		broker.Close()
 		return nil, err
