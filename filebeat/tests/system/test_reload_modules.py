@@ -4,7 +4,10 @@ import unittest
 import os
 import shutil
 import time
+
 from filebeat import BaseTest
+from beat.beat import INTEGRATION_TESTS
+from elasticsearch import Elasticsearch
 
 
 moduleConfigTemplate = """
@@ -24,6 +27,7 @@ class Test(BaseTest):
 
     def setUp(self):
         super(BaseTest, self).setUp()
+        self.es = Elasticsearch([self.get_elasticsearch_url()])
         # Copy system module
         shutil.copytree(os.path.join("module", "test"),
                         os.path.join(self.working_dir, "module", "test"))
@@ -55,6 +59,38 @@ class Test(BaseTest):
 
         self.wait_until(lambda: self.output_lines() > 0)
         assert self.output_has_message("Hello world")
+        proc.check_kill_and_wait()
+
+    @unittest.skipUnless(INTEGRATION_TESTS, "integration test")
+    def test_reload_writes_pipeline(self):
+        """
+        Test modules reload brings pipelines
+        """
+        self.render_config_template(
+            reload=True,
+            reload_path=self.working_dir + "/configs/*.yml",
+            reload_type="modules",
+            prospectors=False,
+            elasticsearch={"host": self.get_elasticsearch_url()}
+        )
+
+        proc = self.start_beat()
+
+        os.mkdir(self.working_dir + "/logs/")
+        logfile = self.working_dir + "/logs/test.log"
+        os.mkdir(self.working_dir + "/configs/")
+
+        with open(self.working_dir + "/configs/system.yml.test", 'w') as f:
+            f.write(moduleConfigTemplate.format(self.working_dir + "/logs/*"))
+        os.rename(self.working_dir + "/configs/system.yml.test",
+                  self.working_dir + "/configs/system.yml")
+
+        with open(logfile, 'w') as f:
+            f.write("Hello world\n")
+
+        # Check pipeline is present
+        self.wait_until(lambda: any(re.match("filebeat-.*-test-test-default", key)
+                                    for key in self.es.transport.perform_request("GET", "/_ingest/pipeline/").keys()))
         proc.check_kill_and_wait()
 
     def test_start_stop(self):

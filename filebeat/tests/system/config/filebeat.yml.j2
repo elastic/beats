@@ -164,8 +164,12 @@ processors:
 #------------------------------- Elasticsearch output ----------------------------
 output.elasticsearch:
   hosts: ["{{ elasticsearch.host }}"]
+{% if elasticsearch.pipeline %}
   pipeline: {{elasticsearch.pipeline}}
+{% endif %}
+{% if elasticsearch.index %}
   index: {{elasticsearch.index}}
+{% endif %}
 {%- elif logstash %}
 #------------------------------- Logstash output ---------------------------------
 output.logstash:
