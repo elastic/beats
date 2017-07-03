@@ -6,6 +6,7 @@ MAINTAINER Elastic Docker Team <docker@elastic.co>
 ARG ELASTIC_VERSION
 ARG DOWNLOAD_URL
 ARG ES_JAVA_OPTS
+ARG XPACK
 
 ENV ELASTIC_CONTAINER true
 ENV PATH /usr/share/elasticsearch/bin:$PATH
@@ -35,7 +36,7 @@ RUN set -ex && for esdirs in config data logs; do \
 USER elasticsearch
 
 # Install xpack
-RUN elasticsearch-plugin install --batch ${DOWNLOAD_URL}/packs/x-pack/x-pack-${ELASTIC_VERSION}.zip
+RUN if [ ${XPACK} = "1" ]; then elasticsearch-plugin install --batch ${DOWNLOAD_URL}/packs/x-pack/x-pack-${ELASTIC_VERSION}.zip; fi
 RUN elasticsearch-plugin install --batch ${DOWNLOAD_URL}/elasticsearch-plugins/ingest-user-agent/ingest-user-agent-${ELASTIC_VERSION}.zip
 RUN elasticsearch-plugin install --batch ${DOWNLOAD_URL}/elasticsearch-plugins/ingest-geoip/ingest-geoip-${ELASTIC_VERSION}.zip
 
