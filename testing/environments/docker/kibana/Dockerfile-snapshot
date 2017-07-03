@@ -9,7 +9,7 @@ EXPOSE 5601
 
 WORKDIR /usr/share/kibana
 RUN curl -Ls ${DOWNLOAD_URL}/kibana/kibana-${ELASTIC_VERSION}-linux-x86_64.tar.gz | tar --strip-components=1 -zxf - && \
-    #bin/kibana-plugin install ${DOWNLOAD_URL}/kibana-plugins/x-pack/x-pack-${ELASTIC_VERSION}.zip} && \
+    bin/kibana-plugin install ${DOWNLOAD_URL}/kibana-plugins/x-pack/x-pack-${ELASTIC_VERSION}.zip && \
     ln -s /usr/share/kibana /opt/kibana
 
 # Set some Kibana configuration defaults.

@@ -1,0 +1,23 @@
+{
+  "description" : "Anomaly detector for changes in event rates of nginx.access.response_code responses",
+  "analysis_config" : {
+    "bucket_span": "1h",
+    "summary_count_field_name": "doc_count",
+    "detectors": [
+      {
+        "detector_description": "Event rate for nginx.access.response_code",
+        "function": "count",
+        "detector_rules": [],
+        "partition_field_name": "nginx.access.response_code"
+      }
+    ],
+    "influencers": ["nginx.access.response_code"]
+  },
+  "data_description": {
+    "time_field": "@timestamp",
+    "time_format": "epoch_ms"
+  },
+  "model_plot_config": {
+    "enabled": true
+  }
+}
