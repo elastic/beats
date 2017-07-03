@@ -64,8 +64,7 @@ func (c *Crawler) Start(r *registrar.Registrar, configProspectors *common.Config
 		logp.Beta("Loading separate prospectors is enabled.")
 
 		c.reloader = cfgfile.NewReloader(configModules)
-		// TODO add beatVersion here
-		factory := fileset.NewFactory(c.out, r, "", c.beatDone)
+		factory := fileset.NewFactory(c.out, r, c.beatVersion, c.beatDone)
 		go func() {
 			c.reloader.Run(factory)
 		}()
