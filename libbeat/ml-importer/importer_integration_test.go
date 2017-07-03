@@ -87,7 +87,7 @@ const sampleDatafeed = `
 `
 
 func TestImportJobs(t *testing.T) {
-	client := elasticsearch.GetTestingElasticsearch(t)
+	client := elasticsearch.GetTestingElasticsearch()
 
 	if testing.Verbose() {
 		logp.LogInit(logp.LOG_DEBUG, "", false, true, []string{"*"})
