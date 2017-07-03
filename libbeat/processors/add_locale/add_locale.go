@@ -9,6 +9,7 @@ import (
 
 	"github.com/elastic/beats/libbeat/common"
 	"github.com/elastic/beats/libbeat/processors"
+	"github.com/elastic/beats/libbeat/publisher/beat"
 )
 
 type addLocale struct {
@@ -37,7 +38,7 @@ func init() {
 	processors.RegisterPlugin("add_locale", newAddLocale)
 }
 
-func newAddLocale(c common.Config) (processors.Processor, error) {
+func newAddLocale(c *common.Config) (processors.Processor, error) {
 	config := struct {
 		Format string `config:"format"`
 	}{
@@ -65,11 +66,10 @@ func newAddLocale(c common.Config) (processors.Processor, error) {
 	return loc, nil
 }
 
-func (l addLocale) Run(event common.MapStr) (common.MapStr, error) {
+func (l addLocale) Run(event *beat.Event) (*beat.Event, error) {
 	zone, offset := time.Now().Zone()
 	format := l.Format(zone, offset)
-	event.Put("beat.timezone", format)
-
+	event.PutValue("beat.timezone", format)
 	return event, nil
 }
 

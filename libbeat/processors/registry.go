@@ -30,7 +30,7 @@ func init() {
 	})
 }
 
-type Constructor func(config common.Config) (Processor, error)
+type Constructor func(config *common.Config) (Processor, error)
 
 var registry = NewNamespace()
 

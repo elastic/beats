@@ -325,7 +325,7 @@ func (s *listSelector) sel(evt *beat.Event) (string, error) {
 }
 
 func (s *condSelector) sel(evt *beat.Event) (string, error) {
-	if !s.cond.Check(evt.Fields) {
+	if !s.cond.Check(evt) {
 		return "", nil
 	}
 	return s.s.sel(evt)

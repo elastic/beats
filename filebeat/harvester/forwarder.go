@@ -70,7 +70,7 @@ func (f *Forwarder) Send(data *util.Data) error {
 		data.Event.Put("prospector.type", f.Config.Type)
 
 		// run the filters before sending to spooler
-		data.Event = f.Processors.Run(data.Event)
+		data.Event = f.Processors.RunBC(data.Event)
 	}
 
 	ok := f.Outlet.OnEventSignal(data)

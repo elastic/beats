@@ -31,22 +31,26 @@ func (c *client) PublishAll(events []beat.Event) {
 }
 
 func (c *client) Publish(e beat.Event) {
-	publish := true
+	var (
+		event   = &e
+		publish = true
+	)
 
 	if c.processors != nil {
 		var err error
 
-		e, publish, err = c.processors.Run(e)
+		event, err = c.processors.Run(event)
+		publish = event != nil
 		if err != nil {
 			// TODO: introduce dead-letter queue?
 
 			log := c.pipeline.logger
 			log.Errf("Failed to publish event: %v", err)
-
-			// set publish to false, so event dropped/failed event can
-			// be account on ACK for.
-			publish = false
 		}
+	}
+
+	if event != nil {
+		e = *event
 	}
 
 	c.acker.addEvent(e, publish)
@@ -54,7 +58,8 @@ func (c *client) Publish(e beat.Event) {
 		return
 	}
 
-	event := publisher.Event{
+	e = *event
+	pubEvent := publisher.Event{
 		Content: e,
 		Flags:   c.eventFlags,
 	}
@@ -64,7 +69,7 @@ func (c *client) Publish(e beat.Event) {
 		if c.reportEvents {
 			c.pipeline.events.Add(1)
 		}
-		dropped = !c.producer.TryPublish(event)
+		dropped = !c.producer.TryPublish(pubEvent)
 		if dropped && c.reportEvents {
 			c.pipeline.activeEventsDone(1)
 		}
@@ -72,7 +77,7 @@ func (c *client) Publish(e beat.Event) {
 		if c.reportEvents {
 			c.pipeline.activeEventsAdd(1)
 		}
-		c.producer.Publish(event)
+		c.producer.Publish(pubEvent)
 	}
 }
 

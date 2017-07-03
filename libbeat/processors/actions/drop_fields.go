@@ -6,6 +6,7 @@ import (
 
 	"github.com/elastic/beats/libbeat/common"
 	"github.com/elastic/beats/libbeat/processors"
+	"github.com/elastic/beats/libbeat/publisher/beat"
 )
 
 type dropFields struct {
@@ -19,7 +20,7 @@ func init() {
 			allowedFields("fields", "when")))
 }
 
-func newDropFields(c common.Config) (processors.Processor, error) {
+func newDropFields(c *common.Config) (processors.Processor, error) {
 	config := struct {
 		Fields []string `config:"fields"`
 	}{}
@@ -37,11 +38,11 @@ func newDropFields(c common.Config) (processors.Processor, error) {
 		}
 	}
 
-	f := dropFields{Fields: config.Fields}
+	f := &dropFields{Fields: config.Fields}
 	return f, nil
 }
 
-func (f dropFields) Run(event common.MapStr) (common.MapStr, error) {
+func (f *dropFields) Run(event *beat.Event) (*beat.Event, error) {
 	var errors []string
 
 	for _, field := range f.Fields {
@@ -58,6 +59,6 @@ func (f dropFields) Run(event common.MapStr) (common.MapStr, error) {
 	return event, nil
 }
 
-func (f dropFields) String() string {
+func (f *dropFields) String() string {
 	return "drop_fields=" + strings.Join(f.Fields, ", ")
 }

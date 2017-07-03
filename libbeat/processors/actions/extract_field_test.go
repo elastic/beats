@@ -5,6 +5,7 @@ import (
 
 	"github.com/elastic/beats/libbeat/common"
 	"github.com/elastic/beats/libbeat/logp"
+	"github.com/elastic/beats/libbeat/publisher/beat"
 	"github.com/stretchr/testify/assert"
 )
 
@@ -76,15 +77,15 @@ func runExtractField(t *testing.T, config *common.Config, input common.MapStr) c
 		logp.LogInit(logp.LOG_DEBUG, "", false, true, []string{"*"})
 	}
 
-	p, err := NewExtractField(*config)
+	p, err := NewExtractField(config)
 	if err != nil {
 		t.Fatalf("error initializing extract_field: %s", err)
 	}
 
-	actual, err := p.Run(input)
+	actual, err := p.Run(&beat.Event{Fields: input})
 	if err != nil {
 		t.Fatalf("error running extract_field: %s", err)
 	}
 
-	return actual
+	return actual.Fields
 }

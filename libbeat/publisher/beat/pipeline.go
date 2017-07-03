@@ -2,6 +2,8 @@ package beat
 
 import (
 	"time"
+
+	"github.com/elastic/beats/libbeat/common"
 )
 
 type Pipeline interface {
@@ -22,9 +24,12 @@ type Client interface {
 type ClientConfig struct {
 	PublishMode PublishMode
 
+	// EventMetadata configures additional fields/tags to be added to published events.
+	EventMetadata common.EventMetadata
+
 	// Processors passes additional processor to the client, to be executed before
 	// the pipeline processors.
-	Processor Processor
+	Processor ProcessorList
 
 	// WaitClose sets the maximum duration to wait on ACK, if client still has events
 	// active non-acknowledged events in the publisher pipeline.
@@ -52,11 +57,15 @@ type ClientConfig struct {
 	ACKLastEvent func(Event)
 }
 
+type ProcessorList interface {
+	All() []Processor
+}
+
 // Processor defines the minimal required interface for processor, that can be
 // registered with the publisher pipeline.
 type Processor interface {
 	String() string // print full processor description
-	Run(in Event) (event Event, publish bool, err error)
+	Run(in *Event) (event *Event, err error)
 }
 
 // PublishMode enum sets some requirements on the client connection to the beats

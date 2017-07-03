@@ -11,6 +11,7 @@ import (
 	"github.com/elastic/beats/libbeat/common"
 	"github.com/elastic/beats/libbeat/logp"
 	"github.com/elastic/beats/libbeat/outputs"
+	"github.com/elastic/beats/libbeat/processors"
 	"github.com/elastic/beats/libbeat/publisher"
 	"github.com/elastic/beats/libbeat/publisher/beat"
 	"github.com/elastic/beats/libbeat/publisher/broker"
@@ -30,9 +31,9 @@ import (
 // Processors in the pipeline are executed in the clients go-routine, before
 // entering the broker. No filtering/processing will occur on the output side.
 type Pipeline struct {
-	logger     *logp.Logger
-	processors beat.Processor
-	broker     broker.Broker
+	logger *logp.Logger
+	broker broker.Broker
+	output *outputController
 
 	waitClose     time.Duration
 	waitCloseMode WaitCloseMode
@@ -40,8 +41,13 @@ type Pipeline struct {
 	// keep track of total number of active events (minus dropped by processors)
 	events sync.WaitGroup
 
-	// outputs
-	output *outputController
+	// The pipeline its processor settings for
+	// constructing the clients complete processor
+	// pipeline on connect.
+	beatMetaProcessor  beat.Processor
+	eventMetaProcessor beat.Processor
+	processors         beat.Processor
+	disabled           bool // disabled is set if outputs have been disabled via CLI
 }
 
 // Settings is used to pass additional settings to a newly created pipeline instance.
@@ -51,6 +57,20 @@ type Settings struct {
 	WaitClose time.Duration
 
 	WaitCloseMode WaitCloseMode
+
+	Annotations Annotations
+	Processors  *processors.Processors
+
+	Disabled bool
+}
+
+// Annotations configures additional metadata to be adde to every single event
+// being published. The meta data will be added before executing the configured
+// processors, so all processors configured with the pipeline or client will see
+// the same/complete event.
+type Annotations struct {
+	Beat  common.MapStr
+	Event common.EventMetadata
 }
 
 // WaitCloseMode enumerates the possible behaviors of WaitClose in a pipeline.
@@ -90,8 +110,7 @@ func Load(beatInfo common.BeatInfo, config Config) (*Pipeline, error) {
 	}
 
 	// TODO: configure pipeline processors
-	var processors beat.Processor
-	pipeline, err := New(broker, processors, output, Settings{
+	pipeline, err := New(broker, output, Settings{
 		WaitClose:     config.WaitShutdown,
 		WaitCloseMode: WaitOnPipelineClose,
 	})
@@ -111,18 +130,42 @@ func Load(beatInfo common.BeatInfo, config Config) (*Pipeline, error) {
 // broker and outputs will be closed.
 func New(
 	broker broker.Broker,
-	processors beat.Processor,
 	out outputs.Group,
 	settings Settings,
 ) (*Pipeline, error) {
+
+	annotations := settings.Annotations
+
+	var beatMeta beat.Processor
+	if meta := annotations.Beat; meta != nil {
+		beatMeta = beatAnnotateProcessor(meta)
+	}
+
+	var eventMeta beat.Processor
+	if em := annotations.Event; len(em.Fields) > 0 || len(em.Tags) > 0 {
+		eventMeta = eventAnnotateProcessor(em)
+	}
+
+	var prog beat.Processor
+	if ps := settings.Processors; ps != nil && len(ps.List) > 0 {
+		tmp := &program{title: "global"}
+		for _, p := range ps.List {
+			tmp.add(p)
+		}
+		prog = tmp
+	}
+
 	log := defaultLogger
 	p := &Pipeline{
-		logger:        log,
-		processors:    processors,
-		broker:        broker,
-		waitClose:     settings.WaitClose,
-		waitCloseMode: settings.WaitCloseMode,
-		output:        newOutputController(log, broker),
+		logger:             log,
+		broker:             broker,
+		output:             newOutputController(log, broker),
+		waitClose:          settings.WaitClose,
+		waitCloseMode:      settings.WaitCloseMode,
+		beatMetaProcessor:  beatMeta,
+		eventMetaProcessor: eventMeta,
+		processors:         prog,
+		disabled:           settings.Disabled,
 	}
 
 	p.output.Set(out)
@@ -219,7 +262,7 @@ func (p *Pipeline) ConnectWith(cfg beat.ClientConfig) (beat.Client, error) {
 		reportEvents = p.waitClose > 0
 	}
 
-	processors := mergeProcessors(cfg.Processor, p.processors)
+	processors := p.newProcessorPipeline(cfg)
 	acker := makeACKer(processors != nil, &cfg, waitClose)
 	producerCfg := broker.ProducerConfig{}
 
@@ -259,20 +302,6 @@ func (p *Pipeline) ConnectWith(cfg beat.ClientConfig) (beat.Client, error) {
 	}
 
 	return client, nil
-}
-
-func mergeProcessors(p1, p2 beat.Processor) beat.Processor {
-	if p1 == nil {
-		return p2
-	}
-	if p2 == nil {
-		return p2
-	}
-
-	panic("merging processors not supported")
-	/*
-		return processors.NewProgram(p1, p2)
-	*/
 }
 
 func makeACKer(

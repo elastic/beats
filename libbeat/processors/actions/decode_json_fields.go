@@ -1,7 +1,6 @@
 package actions
 
 import (
-	"bytes"
 	"encoding/json"
 	"fmt"
 	"strings"
@@ -10,6 +9,7 @@ import (
 	"github.com/elastic/beats/libbeat/common/jsontransform"
 	"github.com/elastic/beats/libbeat/logp"
 	"github.com/elastic/beats/libbeat/processors"
+	"github.com/elastic/beats/libbeat/publisher/beat"
 	"github.com/pkg/errors"
 )
 
@@ -45,21 +45,20 @@ func init() {
 			allowedFields("fields", "max_depth", "overwrite_keys", "process_array", "target", "when")))
 }
 
-func newDecodeJSONFields(c common.Config) (processors.Processor, error) {
+func newDecodeJSONFields(c *common.Config) (processors.Processor, error) {
 	config := defaultConfig
 
 	err := c.Unpack(&config)
-
 	if err != nil {
 		logp.Warn("Error unpacking config for decode_json_fields")
 		return nil, fmt.Errorf("fail to unpack the decode_json_fields configuration: %s", err)
 	}
 
-	f := decodeJSONFields{fields: config.Fields, maxDepth: config.MaxDepth, overwriteKeys: config.OverwriteKeys, processArray: config.ProcessArray, target: config.Target}
+	f := &decodeJSONFields{fields: config.Fields, maxDepth: config.MaxDepth, overwriteKeys: config.OverwriteKeys, processArray: config.ProcessArray, target: config.Target}
 	return f, nil
 }
 
-func (f decodeJSONFields) Run(event common.MapStr) (common.MapStr, error) {
+func (f *decodeJSONFields) Run(event *beat.Event) (*beat.Event, error) {
 	var errs []string
 
 	for _, field := range f.fields {
@@ -69,36 +68,41 @@ func (f decodeJSONFields) Run(event common.MapStr) (common.MapStr, error) {
 			errs = append(errs, err.Error())
 			continue
 		}
+
 		text, ok := data.(string)
-		if ok {
-			var output interface{}
-			err := unmarshal(f.maxDepth, []byte(text), &output, f.processArray)
-			if err != nil {
-				debug("Error trying to unmarshal %s", event[field])
-				errs = append(errs, err.Error())
-				continue
-			}
+		if !ok {
+			// ignore non string fields when unmarshaling
+			continue
+		}
 
-			if f.target != nil {
-				if len(*f.target) > 0 {
-					_, err = event.Put(*f.target, output)
-				} else {
-					switch t := output.(type) {
-					default:
-						errs = append(errs, errors.New("Error trying to add target to root.").Error())
-					case map[string]interface{}:
-						jsontransform.WriteJSONKeys(event, t, f.overwriteKeys)
-					}
-				}
-			} else {
-				_, err = event.Put(field, output)
-			}
+		var output interface{}
+		err = unmarshal(f.maxDepth, text, &output, f.processArray)
+		if err != nil {
+			debug("Error trying to unmarshal %s", text)
+			errs = append(errs, err.Error())
+			continue
+		}
 
-			if err != nil {
-				debug("Error trying to Put value %v for field : %s", output, field)
-				errs = append(errs, err.Error())
-				continue
+		target := field
+		if f.target != nil {
+			target = *f.target
+		}
+
+		if target != "" {
+			_, err = event.PutValue(target, output)
+		} else {
+			switch t := output.(type) {
+			case map[string]interface{}:
+				jsontransform.WriteJSONKeys(event, t, f.overwriteKeys)
+			default:
+				errs = append(errs, "failed to add target to root")
 			}
+		}
+
+		if err != nil {
+			debug("Error trying to Put value %v for field : %s", output, field)
+			errs = append(errs, err.Error())
+			continue
 		}
 	}
 
@@ -108,8 +112,8 @@ func (f decodeJSONFields) Run(event common.MapStr) (common.MapStr, error) {
 	return event, nil
 }
 
-func unmarshal(maxDepth int, text []byte, fields *interface{}, processArray bool) error {
-	if err := DecodeJSON(text, fields); err != nil {
+func unmarshal(maxDepth int, text string, fields *interface{}, processArray bool) error {
+	if err := decodeJSON(text, fields); err != nil {
 		return err
 	}
 
@@ -125,7 +129,7 @@ func unmarshal(maxDepth int, text []byte, fields *interface{}, processArray bool
 		}
 
 		var tmp interface{}
-		err := unmarshal(maxDepth, []byte(str), &tmp, processArray)
+		err := unmarshal(maxDepth, str, &tmp, processArray)
 		if err != nil {
 			return v, false
 		}
@@ -156,8 +160,8 @@ func unmarshal(maxDepth int, text []byte, fields *interface{}, processArray bool
 	return nil
 }
 
-func DecodeJSON(text []byte, to *interface{}) error {
-	dec := json.NewDecoder(bytes.NewReader(text))
+func decodeJSON(text string, to *interface{}) error {
+	dec := json.NewDecoder(strings.NewReader(text))
 	dec.UseNumber()
 	err := dec.Decode(to)
 
