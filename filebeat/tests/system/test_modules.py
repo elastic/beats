@@ -192,19 +192,29 @@ class Test(BaseTest):
         Tests that setup works and loads nginx dashboards.
         """
         self.init()
+
         # generate a minimal configuration
         cfgfile = os.path.join(self.working_dir, "filebeat.yml")
         self.render_config_template(
-            template_name="filebeat_modules",
+            template="filebeat_modules.yml.j2",
             output=cfgfile,
             index_name=self.index_name,
             elasticsearch_url=self.elasticsearch_url)
 
+        os.mkdir(self.working_dir + "/log/")
+        self.copy_files(["logs/nginx.log"],
+                        source_dir="../files",
+                        target_dir="log")
+
         cmd = [
             self.filebeat, "-systemTest",
-            "-e", "-d", "*",
+            "-e", "-d", "*", "-once",
             "-c", cfgfile,
-            "setup", "--modules=nginx", "--machine-learning"]
+            "-setup", "-modules=nginx",
+            "-E", "dashboards.directory=../../_meta/kibana",
+            "-M", "*.*.prospector.close_eof=true",
+            "-M", "nginx.error.enabled=false",
+            "-M", "nginx.access.var.paths=[{}/log/nginx.log]".format(self.working_dir)]
 
         output = open(os.path.join(self.working_dir, "output.log"), "ab")
         output.write(" ".join(cmd) + "\n")
