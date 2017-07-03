@@ -61,7 +61,7 @@ func (c *Crawler) Start(r *registrar.Registrar, configProspectors *common.Config
 	}
 
 	if configModules.Enabled() {
-		logp.Beta("Loading separate prospectors is enabled.")
+		logp.Beta("Loading separate modules is enabled.")
 
 		c.reloader = cfgfile.NewReloader(configModules)
 		factory := fileset.NewFactory(c.out, r, c.beatVersion, c.beatDone)
