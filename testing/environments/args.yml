@@ -5,5 +5,5 @@ services:
   args:
     build:
       args:
-        DOWNLOAD_URL: https://artifacts.elastic.co/downloads
-        ELASTIC_VERSION: 6.0.0-alpha2
+        DOWNLOAD_URL: https://snapshots.elastic.co/downloads
+        ELASTIC_VERSION: 6.0.0-alpha3-SNAPSHOT

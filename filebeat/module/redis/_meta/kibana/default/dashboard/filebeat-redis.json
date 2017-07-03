@@ -1,0 +1,117 @@
+{
+  "objects": [
+    {
+      "attributes": {
+        "description": "",
+        "kibanaSavedObjectMeta": {
+          "searchSourceJSON": "{\"filter\":[],\"index\":\"filebeat-*\",\"highlightAll\":true,\"version\":true,\"query\":{\"query_string\":{\"query\":\"_exists_:redis.log\",\"analyze_wildcard\":true}}}"
+        },
+        "title": "Redis log levels and roles",
+        "uiStateJSON": "{}",
+        "version": 1,
+        "visState": "{\"title\":\"Redis log levels and roles\",\"type\":\"pie\",\"params\":{\"addLegend\":true,\"addTooltip\":true,\"isDonut\":false,\"legendPosition\":\"bottom\"},\"aggs\":[{\"id\":\"1\",\"enabled\":true,\"type\":\"count\",\"schema\":\"metric\",\"params\":{}},{\"id\":\"3\",\"enabled\":true,\"type\":\"terms\",\"schema\":\"segment\",\"params\":{\"field\":\"redis.log.role\",\"size\":5,\"order\":\"desc\",\"orderBy\":\"1\"}},{\"id\":\"2\",\"enabled\":true,\"type\":\"terms\",\"schema\":\"segment\",\"params\":{\"field\":\"redis.log.level\",\"size\":5,\"order\":\"desc\",\"orderBy\":\"1\",\"customLabel\":\"Log level\"}}],\"listeners\":{}}"
+      },
+      "id": "78b9afe0-478f-11e7-b1f0-cb29bac6bf8b",
+      "type": "visualization",
+      "version": 1
+    },
+    {
+      "attributes": {
+        "description": "",
+        "kibanaSavedObjectMeta": {
+          "searchSourceJSON": "{\"filter\":[],\"index\":\"filebeat-*\",\"highlightAll\":true,\"version\":true,\"query\":{\"query_string\":{\"query\":\"_exists_:redis.log\",\"analyze_wildcard\":true}}}"
+        },
+        "title": "Redis logs over time",
+        "uiStateJSON": "{\"vis\":{\"colors\":{\"notice\":\"#629E51\",\"warning\":\"#EF843C\"}}}",
+        "version": 1,
+        "visState": "{\"aggs\":[{\"enabled\":true,\"id\":\"1\",\"params\":{},\"schema\":\"metric\",\"type\":\"count\"},{\"enabled\":true,\"id\":\"2\",\"params\":{\"customInterval\":\"2h\",\"extended_bounds\":{},\"field\":\"@timestamp\",\"interval\":\"auto\",\"min_doc_count\":1},\"schema\":\"segment\",\"type\":\"date_histogram\"},{\"enabled\":true,\"id\":\"3\",\"params\":{\"field\":\"redis.log.level\",\"order\":\"desc\",\"orderBy\":\"1\",\"size\":5},\"schema\":\"group\",\"type\":\"terms\"}],\"listeners\":{},\"params\":{\"addLegend\":true,\"addTimeMarker\":false,\"addTooltip\":true,\"categoryAxes\":[{\"id\":\"CategoryAxis-1\",\"labels\":{\"show\":true,\"truncate\":100},\"position\":\"bottom\",\"scale\":{\"type\":\"linear\"},\"show\":true,\"style\":{},\"title\":{\"text\":\"@timestamp per week\"},\"type\":\"category\"}],\"defaultYExtents\":false,\"drawLinesBetweenPoints\":true,\"grid\":{\"categoryLines\":false,\"style\":{\"color\":\"#eee\"}},\"interpolate\":\"linear\",\"legendPosition\":\"right\",\"radiusRatio\":9,\"scale\":\"linear\",\"seriesParams\":[{\"data\":{\"id\":\"1\",\"label\":\"Count\"},\"drawLinesBetweenPoints\":true,\"mode\":\"stacked\",\"show\":\"true\",\"showCircles\":true,\"type\":\"histogram\",\"valueAxis\":\"ValueAxis-1\"}],\"setYExtents\":false,\"showCircles\":true,\"times\":[],\"valueAxes\":[{\"id\":\"ValueAxis-1\",\"labels\":{\"filter\":false,\"rotate\":0,\"show\":true,\"truncate\":100},\"name\":\"LeftAxis-1\",\"position\":\"left\",\"scale\":{\"mode\":\"normal\",\"type\":\"linear\"},\"show\":true,\"style\":{},\"title\":{},\"type\":\"value\"}]},\"title\":\"Redis logs over time\",\"type\":\"histogram\"}"
+      },
+      "id": "d2864600-478f-11e7-be88-2ddb32f3df97",
+      "type": "visualization",
+      "version": 1
+    },
+    {
+      "attributes": {
+        "columns": [
+          "beat.name",
+          "redis.log.level",
+          "redis.log.role",
+          "redis.log.message"
+        ],
+        "description": "",
+        "hits": 0,
+        "kibanaSavedObjectMeta": {
+          "searchSourceJSON": "{\"index\":\"filebeat-*\",\"highlightAll\":true,\"version\":true,\"query\":{\"query_string\":{\"query\":\"_exists_:redis.log\",\"analyze_wildcard\":true}},\"filter\":[]}"
+        },
+        "sort": [
+          "@timestamp",
+          "desc"
+        ],
+        "title": "Filebeat Redis logs",
+        "version": 1
+      },
+      "id": "73613570-4791-11e7-be88-2ddb32f3df97",
+      "type": "search",
+      "version": 1
+    },
+    {
+      "attributes": {
+        "description": "",
+        "kibanaSavedObjectMeta": {
+          "searchSourceJSON": "{\"filter\":[]}"
+        },
+        "savedSearchId": "0ab87b80-478e-11e7-b1f0-cb29bac6bf8b",
+        "title": "Redis slowest commands",
+        "uiStateJSON": "{}",
+        "version": 1,
+        "visState": "{\"title\":\"Redis slowest commands\",\"type\":\"histogram\",\"params\":{\"addLegend\":true,\"addTimeMarker\":false,\"addTooltip\":true,\"categoryAxes\":[{\"id\":\"CategoryAxis-1\",\"labels\":{\"filter\":false,\"rotate\":0,\"show\":true,\"truncate\":200},\"position\":\"left\",\"scale\":{\"type\":\"linear\"},\"show\":true,\"style\":{},\"title\":{\"text\":\"Duration (microseconds)\"},\"type\":\"category\"}],\"defaultYExtents\":false,\"drawLinesBetweenPoints\":true,\"grid\":{\"categoryLines\":false,\"style\":{\"color\":\"#eee\"}},\"interpolate\":\"linear\",\"legendPosition\":\"right\",\"radiusRatio\":9,\"scale\":\"linear\",\"seriesParams\":[{\"data\":{\"id\":\"1\",\"label\":\"Command\"},\"drawLinesBetweenPoints\":true,\"mode\":\"normal\",\"show\":true,\"showCircles\":true,\"type\":\"histogram\",\"valueAxis\":\"ValueAxis-1\"}],\"setYExtents\":false,\"showCircles\":true,\"times\":[],\"valueAxes\":[{\"id\":\"ValueAxis-1\",\"labels\":{\"filter\":true,\"rotate\":75,\"show\":true,\"truncate\":100},\"name\":\"LeftAxis-1\",\"position\":\"bottom\",\"scale\":{\"mode\":\"normal\",\"type\":\"linear\"},\"show\":true,\"style\":{},\"title\":{\"text\":\"Command\"},\"type\":\"value\"}]},\"aggs\":[{\"id\":\"1\",\"enabled\":true,\"type\":\"max\",\"schema\":\"metric\",\"params\":{\"field\":\"redis.slowlog.duration.us\",\"customLabel\":\"Command\"}},{\"id\":\"2\",\"enabled\":true,\"type\":\"terms\",\"schema\":\"segment\",\"params\":{\"field\":\"redis.slowlog.cmd\",\"size\":5,\"order\":\"desc\",\"orderBy\":\"1\",\"customLabel\":\"Duration (microseconds)\"}}],\"listeners\":{}}"
+      },
+      "id": "dcccaa80-4791-11e7-be88-2ddb32f3df97",
+      "type": "visualization",
+      "version": 1
+    },
+    {
+      "attributes": {
+        "columns": [
+          "beat.name",
+          "message",
+          "redis.slowlog.duration.us",
+          "redis.slowlog.key"
+        ],
+        "description": "",
+        "hits": 0,
+        "kibanaSavedObjectMeta": {
+          "searchSourceJSON": "{\"index\":\"filebeat-*\",\"highlightAll\":true,\"version\":true,\"query\":{\"query_string\":{\"query\":\"_exists_:redis.slowlog\",\"analyze_wildcard\":true}},\"filter\":[]}"
+        },
+        "sort": [
+          "@timestamp",
+          "desc"
+        ],
+        "title": "Filebeat Redis slowlog",
+        "version": 1
+      },
+      "id": "0ab87b80-478e-11e7-b1f0-cb29bac6bf8b",
+      "type": "search",
+      "version": 2
+    },
+    {
+      "attributes": {
+        "description": "",
+        "hits": 0,
+        "kibanaSavedObjectMeta": {
+          "searchSourceJSON": "{\"filter\":[{\"query\":{\"query_string\":{\"analyze_wildcard\":true,\"query\":\"*\"}}}],\"highlightAll\":true,\"version\":true}"
+        },
+        "optionsJSON": "{\"darkTheme\":false}",
+        "panelsJSON": "[{\"col\":1,\"id\":\"78b9afe0-478f-11e7-b1f0-cb29bac6bf8b\",\"panelIndex\":2,\"row\":5,\"size_x\":3,\"size_y\":3,\"type\":\"visualization\"},{\"col\":4,\"id\":\"d2864600-478f-11e7-be88-2ddb32f3df97\",\"panelIndex\":3,\"row\":5,\"size_x\":9,\"size_y\":3,\"type\":\"visualization\"},{\"size_x\":12,\"size_y\":4,\"panelIndex\":4,\"type\":\"search\",\"id\":\"73613570-4791-11e7-be88-2ddb32f3df97\",\"col\":1,\"row\":8,\"columns\":[\"beat.name\",\"redis.log.level\",\"redis.log.role\",\"redis.log.message\"],\"sort\":[\"@timestamp\",\"desc\"]},{\"size_x\":6,\"size_y\":4,\"panelIndex\":5,\"type\":\"visualization\",\"id\":\"dcccaa80-4791-11e7-be88-2ddb32f3df97\",\"col\":7,\"row\":1},{\"size_x\":6,\"size_y\":4,\"panelIndex\":6,\"type\":\"search\",\"id\":\"0ab87b80-478e-11e7-b1f0-cb29bac6bf8b\",\"col\":1,\"row\":1,\"columns\":[\"beat.name\",\"message\",\"redis.slowlog.duration.us\",\"redis.slowlog.key\"],\"sort\":[\"@timestamp\",\"desc\"]}]",
+        "timeRestore": false,
+        "title": "Filebeat Redis",
+        "uiStateJSON": "{\"P-5\":{\"vis\":{\"legendOpen\":false}}}",
+        "version": 1
+      },
+      "id": "7fea2930-478e-11e7-b1f0-cb29bac6bf8b",
+      "type": "dashboard",
+      "version": 1
+    }
+  ],
+  "version": "6.0.0-alpha3-SNAPSHOT"
+}

@@ -208,7 +208,7 @@ func makeClient(
 	tlsConfig *transport.TLSConfig,
 	config *config,
 ) (outputs.NetworkClient, error) {
-	url, err := esout.MakeURL(config.Protocol, "", host)
+	url, err := common.MakeURL(config.Protocol, "", host, 9200)
 	if err != nil {
 		return nil, err
 	}
