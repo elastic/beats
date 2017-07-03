@@ -75,12 +75,13 @@ func TestQuery(t *testing.T) {
 		t.Fatal(processorTimeCounter, "not found")
 	}
 
-	assert.NoError(t, value.Err)
+	assert.NoError(t, value[0].Err)
 }
 
 func TestExistingCounter(t *testing.T) {
 	config := make([]CounterConfig, 1)
-	config[0].Alias = "processor.time.total.pct"
+	config[0].InstanceLabel = "processor.name"
+	config[0].MeasurementLabel = "processor.time.total.pct"
 	config[0].Query = processorTimeCounter
 	config[0].Format = "float"
 	handle, err := NewPerfmonReader(config)
@@ -99,7 +100,8 @@ func TestExistingCounter(t *testing.T) {
 
 func TestNonExistingCounter(t *testing.T) {
 	config := make([]CounterConfig, 1)
-	config[0].Alias = "processor.time.total.pct"
+	config[0].InstanceLabel = "processor.name"
+	config[0].MeasurementLabel = "processor.time.total.pct"
 	config[0].Query = "\\Processor Information(_Total)\\not existing counter"
 	config[0].Format = "float"
 	handle, err := NewPerfmonReader(config)
@@ -115,7 +117,8 @@ func TestNonExistingCounter(t *testing.T) {
 
 func TestNonExistingObject(t *testing.T) {
 	config := make([]CounterConfig, 1)
-	config[0].Alias = "processor.time.total.pct"
+	config[0].InstanceLabel = "processor.name"
+	config[0].MeasurementLabel = "processor.time.total.pct"
 	config[0].Query = "\\non existing object\\% Processor Performance"
 	config[0].Format = "float"
 	handle, err := NewPerfmonReader(config)
@@ -158,7 +161,7 @@ func TestLongOutputFormat(t *testing.T) {
 		t.Fatal(err)
 	}
 
-	_, okLong := values[processorTimeCounter].Num.(int64)
+	_, okLong := values[processorTimeCounter][0].Measurement.(int64)
 
 	assert.True(t, okLong)
 }
@@ -192,7 +195,7 @@ func TestFloatOutputFormat(t *testing.T) {
 		t.Fatal(err)
 	}
 
-	_, okFloat := values[processorTimeCounter].Num.(float64)
+	_, okFloat := values[processorTimeCounter][0].Measurement.(float64)
 
 	assert.True(t, okFloat)
 }
@@ -250,7 +253,8 @@ func TestRawValues(t *testing.T) {
 
 func TestWildcardQuery(t *testing.T) {
 	config := make([]CounterConfig, 1)
-	config[0].Alias = "processors.time.pct"
+	config[0].InstanceLabel = "processor.name"
+	config[0].MeasurementLabel = "processor.time.pct"
 	config[0].Query = `\Processor Information(*)\% Processor Time`
 	config[0].Format = "float"
 	handle, err := NewPerfmonReader(config)
@@ -269,7 +273,7 @@ func TestWildcardQuery(t *testing.T) {
 		t.Fatal(err)
 	}
 
-	pcts, err := values.GetValue("processors.time.pct")
+	pcts, err := values[0].GetValue("processors.time.pct")
 	if err != nil {
 		t.Fatal(err)
 	}
