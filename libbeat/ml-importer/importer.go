@@ -80,7 +80,7 @@ func ImportMachineLearningJob(esClient MLLoader, cfg *MLConfig) error {
 func HaveXpackML(esClient MLLoader) (bool, error) {
 
 	status, response, err := esClient.Request("GET", "/_xpack", "", nil, nil)
-	if status == 404 {
+	if status == 404 || status == 400 {
 		return false, nil
 	}
 	if err != nil {
