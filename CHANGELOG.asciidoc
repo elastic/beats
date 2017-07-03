@@ -22,6 +22,8 @@ https://github.com/elastic/beats/compare/v6.0.0-alpha2...master[Check the HEAD d
 
 *Heartbeat*
 
+- Renamed the heartbeat RPM/DEB name to `heartbeat-elastic`. {pull}4601[4601]
+
 *Metricbeat*
 - Change all `system.cpu.*.pct` metrics to be scaled by the number of CPU cores.
   This will make the CPU usage percentages from the system cpu metricset consistent
