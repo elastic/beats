@@ -9,17 +9,17 @@ import (
 
 	"github.com/elastic/beats/libbeat/common"
 	"github.com/elastic/beats/libbeat/logp"
+	"github.com/elastic/beats/libbeat/publisher/beat"
 	"github.com/elastic/beats/packetbeat/config"
 	"github.com/stretchr/testify/assert"
 )
 
 type flowsChan struct {
-	ch chan []common.MapStr
+	ch chan []beat.Event
 }
 
-func (f *flowsChan) PublishFlows(events []common.MapStr) bool {
+func (f *flowsChan) PublishFlows(events []beat.Event) {
 	f.ch <- events
-	return true
 }
 
 func TestFlowsCounting(t *testing.T) {
@@ -45,14 +45,14 @@ func TestFlowsCounting(t *testing.T) {
 
 	assert.NoError(t, err)
 
-	pub := &flowsChan{make(chan []common.MapStr, 1)}
+	pub := &flowsChan{make(chan []beat.Event, 1)}
 
 	processor := &flowsProcessor{
 		table:    module.table,
 		counters: module.counterReg,
 		timeout:  20 * time.Millisecond,
 	}
-	processor.spool.init(pub, 1)
+	processor.spool.init(pub.PublishFlows, 1)
 
 	worker, err := makeWorker(
 		processor,
@@ -101,7 +101,7 @@ func TestFlowsCounting(t *testing.T) {
 		module.Unlock()
 	}
 
-	var events []common.MapStr
+	var events []beat.Event
 	select {
 	case events = <-pub.ch:
 	case <-time.After(5 * time.Second):
@@ -110,7 +110,7 @@ func TestFlowsCounting(t *testing.T) {
 	if events == nil {
 		t.Fatalf("no event received in time")
 	}
-	event := events[0]
+	event := events[0].Fields
 	t.Logf("event: %v", event)
 
 	source := event["source"].(common.MapStr)

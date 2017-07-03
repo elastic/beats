@@ -8,7 +8,6 @@ import (
 
 	"github.com/elastic/beats/packetbeat/protos"
 	"github.com/elastic/beats/packetbeat/protos/tcp"
-	"github.com/elastic/beats/packetbeat/publish"
 
 	gocql "github.com/elastic/beats/packetbeat/protos/cassandra/internal/gocql"
 )
@@ -43,7 +42,7 @@ func init() {
 // New create and initializes a new cassandra protocol analyzer instance.
 func New(
 	testMode bool,
-	results publish.Transactions,
+	results protos.Reporter,
 	cfg *common.Config,
 ) (protos.Plugin, error) {
 	p := &cassandra{}
@@ -60,7 +59,7 @@ func New(
 	return p, nil
 }
 
-func (cassandra *cassandra) init(results publish.Transactions, config *cassandraConfig) error {
+func (cassandra *cassandra) init(results protos.Reporter, config *cassandraConfig) error {
 	if err := cassandra.setFromConfig(config); err != nil {
 		return err
 	}

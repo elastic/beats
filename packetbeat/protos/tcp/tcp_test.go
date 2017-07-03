@@ -10,7 +10,6 @@ import (
 
 	"github.com/elastic/beats/libbeat/common"
 	"github.com/elastic/beats/packetbeat/protos"
-	"github.com/elastic/beats/packetbeat/publish"
 
 	"github.com/stretchr/testify/assert"
 	"github.com/tsg/gopacket/layers"
@@ -28,7 +27,7 @@ var (
 )
 
 func init() {
-	new := func(_ bool, _ publish.Transactions, _ *common.Config) (protos.Plugin, error) {
+	new := func(_ bool, _ protos.Reporter, _ *common.Config) (protos.Plugin, error) {
 		return &TestProtocol{}, nil
 	}
 
@@ -44,14 +43,14 @@ func init() {
 type TestProtocol struct {
 	Ports []int
 
-	init  func(testMode bool, results publish.Transactions) error
+	init  func(testMode bool, results protos.Reporter) error
 	parse func(*protos.Packet, *common.TCPTuple, uint8, protos.ProtocolData) protos.ProtocolData
 	onFin func(*common.TCPTuple, uint8, protos.ProtocolData) protos.ProtocolData
 	gap   func(*common.TCPTuple, uint8, int, protos.ProtocolData) (protos.ProtocolData, bool)
 }
 
 var _ protos.Plugin = &TestProtocol{
-	init: func(m bool, r publish.Transactions) error { return nil },
+	init: func(m bool, r protos.Reporter) error { return nil },
 	parse: func(p *protos.Packet, t *common.TCPTuple, d uint8, priv protos.ProtocolData) protos.ProtocolData {
 		return priv
 	},
@@ -63,7 +62,7 @@ var _ protos.Plugin = &TestProtocol{
 	},
 }
 
-func (proto *TestProtocol) Init(testMode bool, results publish.Transactions) error {
+func (proto *TestProtocol) Init(testMode bool, results protos.Reporter) error {
 	return proto.init(testMode, results)
 }
 

@@ -10,11 +10,11 @@ import (
 	"github.com/elastic/beats/libbeat/common"
 	"github.com/elastic/beats/libbeat/logp"
 	"github.com/elastic/beats/libbeat/monitoring"
+	"github.com/elastic/beats/libbeat/publisher/beat"
 
 	"github.com/elastic/beats/packetbeat/procs"
 	"github.com/elastic/beats/packetbeat/protos"
 	"github.com/elastic/beats/packetbeat/protos/tcp"
-	"github.com/elastic/beats/packetbeat/publish"
 )
 
 var debugf = logp.MakeDebug("http")
@@ -74,7 +74,7 @@ type httpPlugin struct {
 
 	transactionTimeout time.Duration
 
-	results publish.Transactions
+	results protos.Reporter
 }
 
 var (
@@ -88,7 +88,7 @@ func init() {
 
 func New(
 	testMode bool,
-	results publish.Transactions,
+	results protos.Reporter,
 	cfg *common.Config,
 ) (protos.Plugin, error) {
 	p := &httpPlugin{}
@@ -106,7 +106,7 @@ func New(
 }
 
 // Init initializes the HTTP protocol analyser.
-func (http *httpPlugin) init(results publish.Transactions, config *httpConfig) error {
+func (http *httpPlugin) init(results protos.Reporter, config *httpConfig) error {
 	http.setFromConfig(config)
 
 	isDebug = logp.IsDebug("http")
@@ -428,16 +428,16 @@ func (http *httpPlugin) correlate(conn *httpConnectionData) {
 	for !conn.responses.empty() && !conn.requests.empty() {
 		requ := conn.requests.pop()
 		resp := conn.responses.pop()
-		trans := http.newTransaction(requ, resp)
+		event := http.newTransaction(requ, resp)
 
 		if isDebug {
 			debugf("HTTP transaction completed")
 		}
-		http.publishTransaction(trans)
+		http.publishTransaction(event)
 	}
 }
 
-func (http *httpPlugin) newTransaction(requ, resp *message) common.MapStr {
+func (http *httpPlugin) newTransaction(requ, resp *message) beat.Event {
 	status := common.OK_STATUS
 	if resp.statusCode >= 400 {
 		status = common.ERROR_STATUS
@@ -480,8 +480,8 @@ func (http *httpPlugin) newTransaction(requ, resp *message) common.MapStr {
 	http.setBody(httpDetails["request"].(common.MapStr), requ)
 	http.setBody(httpDetails["response"].(common.MapStr), resp)
 
-	event := common.MapStr{
-		"@timestamp":   common.Time(requ.ts),
+	timestamp := requ.ts
+	fields := common.MapStr{
 		"type":         "http",
 		"status":       status,
 		"responsetime": responseTime,
@@ -496,27 +496,30 @@ func (http *httpPlugin) newTransaction(requ, resp *message) common.MapStr {
 	}
 
 	if http.sendRequest {
-		event["request"] = string(http.cutMessageBody(requ))
+		fields["request"] = string(http.cutMessageBody(requ))
 	}
 	if http.sendResponse {
-		event["response"] = string(http.cutMessageBody(resp))
+		fields["response"] = string(http.cutMessageBody(resp))
 	}
 
 	if len(requ.notes)+len(resp.notes) > 0 {
-		event["notes"] = append(requ.notes, resp.notes...)
+		fields["notes"] = append(requ.notes, resp.notes...)
 	}
 	if len(requ.realIP) > 0 {
-		event["real_ip"] = requ.realIP
+		fields["real_ip"] = requ.realIP
 	}
 
-	return event
+	return beat.Event{
+		Timestamp: timestamp,
+		Fields:    fields,
+	}
 }
 
-func (http *httpPlugin) publishTransaction(event common.MapStr) {
+func (http *httpPlugin) publishTransaction(event beat.Event) {
 	if http.results == nil {
 		return
 	}
-	http.results.PublishTransaction(event)
+	http.results(event)
 }
 
 func (http *httpPlugin) collectHeaders(m *message) interface{} {

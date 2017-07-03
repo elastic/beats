@@ -8,6 +8,7 @@ import (
 
 	"github.com/elastic/beats/libbeat/common"
 	"github.com/elastic/beats/libbeat/common/streambuf"
+	"github.com/elastic/beats/libbeat/publisher/beat"
 )
 
 // A Message its direction indicator
@@ -210,18 +211,20 @@ func (t *Transaction) InitWithMsg(
 }
 
 // Event fills common event fields.
-func (t *Transaction) Event(event common.MapStr) error {
-	event["type"] = t.Type
-	event["@timestamp"] = common.Time(t.Ts.Ts)
-	event["responsetime"] = t.ResponseTime
-	event["src"] = &t.Src
-	event["dst"] = &t.Dst
-	event["transport"] = t.Transport.String()
-	event["bytes_out"] = t.BytesOut
-	event["bytes_in"] = t.BytesIn
-	event["status"] = t.Status
+func (t *Transaction) Event(event *beat.Event) error {
+	event.Timestamp = t.Ts.Ts
+
+	fields := event.Fields
+	fields["type"] = t.Type
+	fields["responsetime"] = t.ResponseTime
+	fields["src"] = &t.Src
+	fields["dst"] = &t.Dst
+	fields["transport"] = t.Transport.String()
+	fields["bytes_out"] = t.BytesOut
+	fields["bytes_in"] = t.BytesIn
+	fields["status"] = t.Status
 	if len(t.Notes) > 0 {
-		event["notes"] = t.Notes
+		fields["notes"] = t.Notes
 	}
 	return nil
 }
