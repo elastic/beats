@@ -1,7 +1,6 @@
 package kibana
 
 import (
-	"crypto/tls"
 	"encoding/json"
 	"fmt"
 	"io"
@@ -12,11 +11,15 @@ import (
 
 	"github.com/elastic/beats/libbeat/common"
 	"github.com/elastic/beats/libbeat/logp"
+	"github.com/elastic/beats/libbeat/outputs"
+	"github.com/elastic/beats/libbeat/outputs/transport"
 )
 
 type Connection struct {
-	URL     string
-	Headers map[string]string
+	URL      string
+	Username string
+	Password string
+	Headers  map[string]string
 
 	http    *http.Client
 	version string
@@ -48,15 +51,49 @@ func NewKibanaClient(cfg *common.Config) (*Client, error) {
 		return nil, fmt.Errorf("invalid Kibana host: %v", err)
 	}
 
-	logp.Debug("kibana", "Kibana url: %s", kibanaURL)
+	u, err := url.Parse(kibanaURL)
+	if err != nil {
+		return nil, fmt.Errorf("failed to parse the Kibana URL: %v", err)
+	}
+
+	username := config.Username
+	password := config.Password
+
+	if u.User != nil {
+		username = u.User.Username()
+		password, _ = u.User.Password()
+		u.User = nil
+
+		// Re-write URL without credentials.
+		kibanaURL = u.String()
+	}
+
+	logp.Info("Kibana url: %s", kibanaURL)
+
+	var dialer, tlsDialer transport.Dialer
+
+	tlsConfig, err := outputs.LoadTLSConfig(config.TLS)
+	if err != nil {
+		return nil, fmt.Errorf("fail to load the TLS config: %v", err)
+	}
+
+	dialer = transport.NetDialer(config.Timeout)
+	tlsDialer, err = transport.TLSDialer(dialer, tlsConfig, config.Timeout)
+	if err != nil {
+		return nil, err
+	}
 
 	client := &Client{
 		Connection: Connection{
-			URL: kibanaURL,
+			URL:      kibanaURL,
+			Username: username,
+			Password: password,
 			http: &http.Client{
 				Transport: &http.Transport{
-					TLSClientConfig: &tls.Config{InsecureSkipVerify: true}, // ignore expired SSL certificates
+					Dial:    dialer.Dial,
+					DialTLS: tlsDialer.Dial,
 				},
+				Timeout: config.Timeout,
 			},
 		},
 	}
@@ -76,14 +113,19 @@ func (conn *Connection) Request(method, extraPath string, params url.Values, bod
 	}
 
 	logp.Debug("kibana", "HTTP request URL: %s", reqURL)
-	logp.Debug("kibana", "Kibana version: %s", conn.version)
 
 	req, err := http.NewRequest(method, reqURL, body)
 	if err != nil {
 		return 0, nil, fmt.Errorf("fail to create the HTTP %s request: %v", method, err)
 	}
 
+	if conn.Username != "" || conn.Password != "" {
+		req.SetBasicAuth(conn.Username, conn.Password)
+	}
+
 	req.Header.Set("Content-Type", "application/json")
+	req.Header.Add("Accept", "application/json")
+
 	if method != "GET" {
 		req.Header.Set("kbn-version", conn.version)
 	}
@@ -94,8 +136,6 @@ func (conn *Connection) Request(method, extraPath string, params url.Values, bod
 	}
 
 	defer resp.Body.Close()
-
-	logp.Debug("kibana", "Response: %s", resp.Status)
 
 	var retError error
 	if resp.StatusCode >= 300 {
@@ -128,7 +168,7 @@ func (client *Client) SetVersion() error {
 	var kibanaVersion kibanaVersionResponse
 	err = json.Unmarshal(result, &kibanaVersion)
 	if err != nil {
-		return fmt.Errorf("fail to unmarshal the HTTP response from Kibana %s: %v", client.Connection.URL, err)
+		return fmt.Errorf("fail to unmarshal the response from GET %s/api/status: %v", client.Connection.URL, err)
 	}
 
 	client.version = kibanaVersion.Version.Number
