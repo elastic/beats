@@ -1,4 +1,3 @@
-
 BEAT_NAME?=packetbeat
 BEAT_DESCRIPTION?=Packetbeat analyzes network traffic and sends the data to Elasticsearch.
 SYSTEM_TESTS?=true
@@ -30,21 +29,21 @@ collect: fields imports
 
 .PHONY: fields
 fields:
-	mkdir -p _meta
-	cat ${ES_BEATS}/packetbeat/_meta/fields_base.yml > _meta/fields.yml
-	-cat protos/*/_meta/fields.yml >> _meta/fields.yml
+	@mkdir -p _meta
+	@cp ${ES_BEATS}/packetbeat/_meta/fields_base.yml _meta/fields.yml
+	@-cat protos/*/_meta/fields.yml >> _meta/fields.yml
 
 .PHONY: benchmark
 benchmark:
 	go test -short -bench=. ./... -cpu=2
 
 .PHONY: create-tcp-protocol
-create-tcp-protocol:
-	python ${ES_BEATS}/packetbeat/scripts/create_tcp_protocol.py
+create-tcp-protocol: python-env
+	@${PYTHON_ENV}/bin/python ${ES_BEATS}/packetbeat/scripts/create_tcp_protocol.py
 
 # Generates imports for all modules and metricsets
 .PHONY: imports
-imports:
-	mkdir -p include
-	mkdir -p protos
-	python ${ES_BEATS}/packetbeat/scripts/generate_imports.py ${BEAT_PATH} > include/list.go
+imports: python-env
+	@mkdir -p include
+	@mkdir -p protos
+	@${PYTHON_ENV}/bin/python ${ES_BEATS}/packetbeat/scripts/generate_imports.py ${BEAT_PATH} > include/list.go
