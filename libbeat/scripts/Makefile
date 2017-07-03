@@ -174,7 +174,7 @@ system-tests-environment: prepare-tests build-image
 .PHONY: fast-system-tests
 fast-system-tests: ## @testing Runs system tests without coverage reports and in parallel
 fast-system-tests: ${BEAT_NAME}.test python-env
-	. ${PYTHON_ENV}/bin/activate; nosetests -w tests/system --processes=$(PROCESSES) --process-timeout=$(TIMEOUT)
+	. ${PYTHON_ENV}/bin/activate; nosetests -w tests/system ${NOSETESTS_OPTIONS}
 
 # Run benchmark tests
 .PHONY: benchmark-tests
