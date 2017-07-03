@@ -276,14 +276,8 @@ class Test(BaseTest):
 
         filebeat = self.start_beat()
 
-        # wait for first  "Start next scan" log message
         self.wait_until(
-            lambda: self.log_contains(
-                "No prospectors defined"),
-            max_timeout=10)
-
-        self.wait_until(
-            lambda: self.log_contains("No prospectors defined"),
+            lambda: self.log_contains("No modules or prospectors enabled"),
             max_timeout=10)
 
         filebeat.check_wait(exit_code=1)
