@@ -67,8 +67,8 @@ imports: python-env
 before-build:
 ifeq ($(BEAT_NAME), metricbeat)
 	# disable the system/load metricset on windows
-	sed -i.bk 's/- load/#- load/' $(PREFIX)/metricbeat-win.yml
-	rm $(PREFIX)/metricbeat-win.yml.bk
+	sed -i.bk 's/- load/#- load/' $(PREFIX)/modules.d-win/system.yml
+	rm $(PREFIX)/modules.d-win/system.yml.bk
 	sed -i.bk 's/- load/#- load/' $(PREFIX)/metricbeat-win.reference.yml
 	rm $(PREFIX)/metricbeat-win.reference.yml.bk
 endif
