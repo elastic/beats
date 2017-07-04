@@ -6,6 +6,7 @@ include::../../libbeat/docs/version.asciidoc[]
 :version: {stack-version}
 :beatname_lc: auditbeat
 :beatname_uc: Auditbeat
+:beatname_pkg: {beatname_lc}
 :security: X-Pack Security
 :dockerimage: docker.elastic.co/beats/{beatname_lc}:{version}
 
