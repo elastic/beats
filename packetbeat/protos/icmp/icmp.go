@@ -7,10 +7,10 @@ import (
 	"github.com/elastic/beats/libbeat/common"
 	"github.com/elastic/beats/libbeat/logp"
 	"github.com/elastic/beats/libbeat/monitoring"
+	"github.com/elastic/beats/libbeat/publisher/beat"
 
 	"github.com/elastic/beats/packetbeat/flows"
 	"github.com/elastic/beats/packetbeat/protos"
-	"github.com/elastic/beats/packetbeat/publish"
 
 	"github.com/tsg/gopacket/layers"
 )
@@ -26,7 +26,7 @@ type icmpPlugin struct {
 	transactions       *common.Cache
 	transactionTimeout time.Duration
 
-	results publish.Transactions
+	results protos.Reporter
 }
 
 type ICMPv4Processor interface {
@@ -56,7 +56,7 @@ var (
 	duplicateRequests  = monitoring.NewInt(nil, "icmp.duplicate_requests")
 )
 
-func New(testMode bool, results publish.Transactions, cfg *common.Config) (*icmpPlugin, error) {
+func New(testMode bool, results protos.Reporter, cfg *common.Config) (*icmpPlugin, error) {
 	p := &icmpPlugin{}
 	config := defaultConfig
 	if !testMode {
@@ -71,7 +71,7 @@ func New(testMode bool, results publish.Transactions, cfg *common.Config) (*icmp
 	return p, nil
 }
 
-func (icmp *icmpPlugin) init(results publish.Transactions, config *icmpConfig) error {
+func (icmp *icmpPlugin) init(results protos.Reporter, config *icmpConfig) error {
 	icmp.setFromConfig(config)
 
 	var err error
@@ -266,50 +266,49 @@ func (icmp *icmpPlugin) publishTransaction(trans *icmpTransaction) {
 
 	logp.Debug("icmp", "Publishing transaction. %s", &trans.tuple)
 
-	event := common.MapStr{}
+	fields := common.MapStr{}
 
 	// common fields - group "env"
-	event["client_ip"] = trans.tuple.srcIP
-	event["ip"] = trans.tuple.dstIP
+	fields["client_ip"] = trans.tuple.srcIP
+	fields["ip"] = trans.tuple.dstIP
 
 	// common fields - group "event"
-	event["@timestamp"] = common.Time(trans.ts) // timestamp of the first packet
-	event["type"] = "icmp"                      // protocol name
-	event["path"] = trans.tuple.dstIP           // what is requested (dst ip)
+	fields["type"] = "icmp"            // protocol name
+	fields["path"] = trans.tuple.dstIP // what is requested (dst ip)
 	if trans.HasError() {
-		event["status"] = common.ERROR_STATUS
+		fields["status"] = common.ERROR_STATUS
 	} else {
-		event["status"] = common.OK_STATUS
+		fields["status"] = common.OK_STATUS
 	}
 	if len(trans.notes) > 0 {
-		event["notes"] = trans.notes
+		fields["notes"] = trans.notes
 	}
 
 	// common fields - group "measurements"
 	responsetime, hasResponseTime := trans.ResponseTimeMillis()
 	if hasResponseTime {
-		event["responsetime"] = responsetime
+		fields["responsetime"] = responsetime
 	}
 	switch icmp.direction(trans) {
 	case directionFromInside:
 		if trans.request != nil {
-			event["bytes_out"] = trans.request.length
+			fields["bytes_out"] = trans.request.length
 		}
 		if trans.response != nil {
-			event["bytes_in"] = trans.response.length
+			fields["bytes_in"] = trans.response.length
 		}
 	case directionFromOutside:
 		if trans.request != nil {
-			event["bytes_in"] = trans.request.length
+			fields["bytes_in"] = trans.request.length
 		}
 		if trans.response != nil {
-			event["bytes_out"] = trans.response.length
+			fields["bytes_out"] = trans.response.length
 		}
 	}
 
 	// event fields - group "icmp"
 	icmpEvent := common.MapStr{}
-	event["icmp"] = icmpEvent
+	fields["icmp"] = icmpEvent
 
 	icmpEvent["version"] = trans.tuple.icmpVersion
 
@@ -341,5 +340,8 @@ func (icmp *icmpPlugin) publishTransaction(trans *icmpTransaction) {
 		// }
 	}
 
-	icmp.results.PublishTransaction(event)
+	icmp.results(beat.Event{
+		Timestamp: trans.ts,
+		Fields:    fields,
+	})
 }

@@ -18,9 +18,9 @@ import (
 	"github.com/elastic/beats/libbeat/common"
 	"github.com/elastic/beats/libbeat/logp"
 	"github.com/elastic/beats/libbeat/monitoring"
+	"github.com/elastic/beats/libbeat/publisher/beat"
 
 	"github.com/elastic/beats/packetbeat/protos"
-	"github.com/elastic/beats/packetbeat/publish"
 
 	mkdns "github.com/miekg/dns"
 	"golang.org/x/net/publicsuffix"
@@ -39,7 +39,7 @@ type dnsPlugin struct {
 	transactions       *common.Cache
 	transactionTimeout time.Duration
 
-	results publish.Transactions // Channel where results are pushed.
+	results protos.Reporter // Channel where results are pushed.
 }
 
 var (
@@ -201,7 +201,7 @@ func init() {
 
 func New(
 	testMode bool,
-	results publish.Transactions,
+	results protos.Reporter,
 	cfg *common.Config,
 ) (protos.Plugin, error) {
 	p := &dnsPlugin{}
@@ -218,7 +218,7 @@ func New(
 	return p, nil
 }
 
-func (dns *dnsPlugin) init(results publish.Transactions, config *dnsConfig) error {
+func (dns *dnsPlugin) init(results protos.Reporter, config *dnsConfig) error {
 	dns.setFromConfig(config)
 	dns.transactions = common.NewCacheWithRemovalListener(
 		dns.transactionTimeout,
@@ -356,72 +356,75 @@ func (dns *dnsPlugin) publishTransaction(t *dnsTransaction) {
 
 	debugf("Publishing transaction. %s", t.tuple.String())
 
-	event := common.MapStr{}
-	event["@timestamp"] = common.Time(t.ts)
-	event["type"] = "dns"
-	event["transport"] = t.transport.String()
-	event["src"] = &t.src
-	event["dst"] = &t.dst
-	event["status"] = common.ERROR_STATUS
+	timestamp := t.ts
+	fields := common.MapStr{}
+	fields["type"] = "dns"
+	fields["transport"] = t.transport.String()
+	fields["src"] = &t.src
+	fields["dst"] = &t.dst
+	fields["status"] = common.ERROR_STATUS
 	if len(t.notes) == 1 {
-		event["notes"] = t.notes[0]
+		fields["notes"] = t.notes[0]
 	} else if len(t.notes) > 1 {
-		event["notes"] = strings.Join(t.notes, " ")
+		fields["notes"] = strings.Join(t.notes, " ")
 	}
 
 	dnsEvent := common.MapStr{}
-	event["dns"] = dnsEvent
+	fields["dns"] = dnsEvent
 
 	if t.request != nil && t.response != nil {
-		event["bytes_in"] = t.request.length
-		event["bytes_out"] = t.response.length
-		event["responsetime"] = int32(t.response.ts.Sub(t.ts).Nanoseconds() / 1e6)
-		event["method"] = dnsOpCodeToString(t.request.data.Opcode)
+		fields["bytes_in"] = t.request.length
+		fields["bytes_out"] = t.response.length
+		fields["responsetime"] = int32(t.response.ts.Sub(t.ts).Nanoseconds() / 1e6)
+		fields["method"] = dnsOpCodeToString(t.request.data.Opcode)
 		if len(t.request.data.Question) > 0 {
-			event["query"] = dnsQuestionToString(t.request.data.Question[0])
-			event["resource"] = t.request.data.Question[0].Name
+			fields["query"] = dnsQuestionToString(t.request.data.Question[0])
+			fields["resource"] = t.request.data.Question[0].Name
 		}
 		addDNSToMapStr(dnsEvent, t.response.data, dns.includeAuthorities,
 			dns.includeAdditionals)
 
 		if t.response.data.Rcode == 0 {
-			event["status"] = common.OK_STATUS
+			fields["status"] = common.OK_STATUS
 		}
 
 		if dns.sendRequest {
-			event["request"] = dnsToString(t.request.data)
+			fields["request"] = dnsToString(t.request.data)
 		}
 		if dns.sendResponse {
-			event["response"] = dnsToString(t.response.data)
+			fields["response"] = dnsToString(t.response.data)
 		}
 	} else if t.request != nil {
-		event["bytes_in"] = t.request.length
-		event["method"] = dnsOpCodeToString(t.request.data.Opcode)
+		fields["bytes_in"] = t.request.length
+		fields["method"] = dnsOpCodeToString(t.request.data.Opcode)
 		if len(t.request.data.Question) > 0 {
-			event["query"] = dnsQuestionToString(t.request.data.Question[0])
-			event["resource"] = t.request.data.Question[0].Name
+			fields["query"] = dnsQuestionToString(t.request.data.Question[0])
+			fields["resource"] = t.request.data.Question[0].Name
 		}
 		addDNSToMapStr(dnsEvent, t.request.data, dns.includeAuthorities,
 			dns.includeAdditionals)
 
 		if dns.sendRequest {
-			event["request"] = dnsToString(t.request.data)
+			fields["request"] = dnsToString(t.request.data)
 		}
 	} else if t.response != nil {
-		event["bytes_out"] = t.response.length
-		event["method"] = dnsOpCodeToString(t.response.data.Opcode)
+		fields["bytes_out"] = t.response.length
+		fields["method"] = dnsOpCodeToString(t.response.data.Opcode)
 		if len(t.response.data.Question) > 0 {
-			event["query"] = dnsQuestionToString(t.response.data.Question[0])
-			event["resource"] = t.response.data.Question[0].Name
+			fields["query"] = dnsQuestionToString(t.response.data.Question[0])
+			fields["resource"] = t.response.data.Question[0].Name
 		}
 		addDNSToMapStr(dnsEvent, t.response.data, dns.includeAuthorities,
 			dns.includeAdditionals)
 		if dns.sendResponse {
-			event["response"] = dnsToString(t.response.data)
+			fields["response"] = dnsToString(t.response.data)
 		}
 	}
 
-	dns.results.PublishTransaction(event)
+	dns.results(beat.Event{
+		Timestamp: timestamp,
+		Fields:    fields,
+	})
 }
 
 func (dns *dnsPlugin) expireTransaction(t *dnsTransaction) {

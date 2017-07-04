@@ -1,8 +1,11 @@
 package cassandra
 
 import (
+	"time"
+
 	"github.com/elastic/beats/libbeat/common"
-	"github.com/elastic/beats/packetbeat/publish"
+	"github.com/elastic/beats/libbeat/publisher/beat"
+	"github.com/elastic/beats/packetbeat/protos"
 )
 
 // Transaction Publisher.
@@ -13,7 +16,7 @@ type transPub struct {
 	sendResponseHeader bool
 	ignoredOps         string
 
-	results publish.Transactions
+	results protos.Reporter
 }
 
 func (pub *transPub) onTransaction(requ, resp *message) error {
@@ -22,13 +25,13 @@ func (pub *transPub) onTransaction(requ, resp *message) error {
 	}
 
 	event := pub.createEvent(requ, resp)
-	if event != nil {
-		pub.results.PublishTransaction(event)
+	if event.Fields != nil {
+		pub.results(event)
 	}
 	return nil
 }
 
-func (pub *transPub) createEvent(requ, resp *message) common.MapStr {
+func (pub *transPub) createEvent(requ, resp *message) beat.Event {
 	status := common.OK_STATUS
 
 	if resp.failed {
@@ -37,10 +40,11 @@ func (pub *transPub) createEvent(requ, resp *message) common.MapStr {
 
 	//ignore
 	if (resp != nil && resp.ignored) || (requ != nil && requ.ignored) {
-		return nil
+		return beat.Event{}
 	}
 
-	event := common.MapStr{
+	var timestamp time.Time
+	fields := common.MapStr{
 		"type":      "cassandra",
 		"status":    status,
 		"cassandra": common.MapStr{},
@@ -57,14 +61,14 @@ func (pub *transPub) createEvent(requ, resp *message) common.MapStr {
 			Proc: string(requ.CmdlineTuple.Src),
 		}
 
-		event["@timestamp"] = common.Time(requ.Ts)
-		event["responsetime"] = responseTime
-		event["bytes_in"] = requ.Size
-		event["src"] = src
+		timestamp = requ.Ts
+		fields["responsetime"] = responseTime
+		fields["bytes_in"] = requ.Size
+		fields["src"] = src
 
-		// add processing notes/errors to event
+		// add processing notes/errors to fields
 		if len(requ.Notes)+len(resp.Notes) > 0 {
-			event["notes"] = append(requ.Notes, resp.Notes...)
+			fields["notes"] = append(requ.Notes, resp.Notes...)
 		}
 
 		if pub.sendRequest {
@@ -76,7 +80,7 @@ func (pub *transPub) createEvent(requ, resp *message) common.MapStr {
 			}
 
 			if len(requ.data) > 0 {
-				event["cassandra"].(common.MapStr)["request"] = requ.data
+				fields["cassandra"].(common.MapStr)["request"] = requ.data
 			}
 		}
 
@@ -85,22 +89,22 @@ func (pub *transPub) createEvent(requ, resp *message) common.MapStr {
 			Port: requ.Tuple.DstPort,
 			Proc: string(requ.CmdlineTuple.Dst),
 		}
-		event["dst"] = dst
+		fields["dst"] = dst
 
 	} else {
 		//dealing with PUSH message
-		event["no_request"] = true
-		event["@timestamp"] = common.Time(resp.Ts)
+		fields["no_request"] = true
+		timestamp = resp.Ts
 
 		dst := &common.Endpoint{
 			IP:   resp.Tuple.DstIP.String(),
 			Port: resp.Tuple.DstPort,
 			Proc: string(resp.CmdlineTuple.Dst),
 		}
-		event["dst"] = dst
+		fields["dst"] = dst
 	}
 
-	event["bytes_out"] = resp.Size
+	fields["bytes_out"] = resp.Size
 
 	if pub.sendResponse {
 
@@ -113,10 +117,13 @@ func (pub *transPub) createEvent(requ, resp *message) common.MapStr {
 		}
 
 		if len(resp.data) > 0 {
-			event["cassandra"].(common.MapStr)["response"] = resp.data
+			fields["cassandra"].(common.MapStr)["response"] = resp.data
 		}
 
 	}
 
-	return event
+	return beat.Event{
+		Timestamp: timestamp,
+		Fields:    fields,
+	}
 }

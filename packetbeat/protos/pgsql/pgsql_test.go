@@ -10,23 +10,39 @@ import (
 
 	"github.com/elastic/beats/libbeat/common"
 	"github.com/elastic/beats/libbeat/logp"
+	"github.com/elastic/beats/libbeat/publisher/beat"
 	"github.com/stretchr/testify/assert"
 
 	"github.com/elastic/beats/packetbeat/protos"
-	"github.com/elastic/beats/packetbeat/publish"
 )
 
-func pgsqlModForTests() *pgsqlPlugin {
+type eventStore struct {
+	events []beat.Event
+}
+
+func (e *eventStore) publish(event beat.Event) {
+	e.events = append(e.events, event)
+}
+
+func (e *eventStore) empty() bool {
+	return len(e.events) == 0
+}
+
+func pgsqlModForTests(store *eventStore) *pgsqlPlugin {
+	callback := func(beat.Event) {}
+	if store != nil {
+		callback = store.publish
+	}
+
 	var pgsql pgsqlPlugin
-	results := &publish.ChanTransactions{Channel: make(chan common.MapStr, 10)}
 	config := defaultConfig
-	pgsql.init(results, &config)
+	pgsql.init(callback, &config)
 	return &pgsql
 }
 
 // Test parsing a request with a single query
 func TestPgsqlParser_simpleRequest(t *testing.T) {
-	pgsql := pgsqlModForTests()
+	pgsql := pgsqlModForTests(nil)
 
 	data := []byte(
 		"510000001a53454c454354202a2046524f4d20466f6f6261723b00")
@@ -63,7 +79,7 @@ func TestPgsqlParser_dataResponse(t *testing.T) {
 		logp.LogInit(logp.LOG_DEBUG, "", false, true, []string{"pgsql", "pgsqldetailed"})
 	}
 
-	pgsql := pgsqlModForTests()
+	pgsql := pgsqlModForTests(nil)
 	data := []byte(
 		"5400000033000269640000008fc40001000000170004ffffffff000076616c75650000008fc4000200000019ffffffffffff0000" +
 			"44000000130002000000013100000004746f746f" +
@@ -108,7 +124,7 @@ func TestPgsqlParser_dataResponse(t *testing.T) {
 // Test parsing a pgsql response
 func TestPgsqlParser_response(t *testing.T) {
 
-	pgsql := pgsqlModForTests()
+	pgsql := pgsqlModForTests(nil)
 	data := []byte(
 		"54000000420003610000004009000100000413ffffffffffff0000620000004009000200000413ffffffffffff0000630000004009000300000413ffffffffffff0000" +
 			"440000001b0003000000036d6561000000036d6562000000036d6563" +
@@ -156,7 +172,7 @@ func TestPgsqlParser_incomplete_response(t *testing.T) {
 	if testing.Verbose() {
 		logp.LogInit(logp.LOG_DEBUG, "", false, true, []string{"pgsql", "pgsqldetailed"})
 	}
-	pgsql := pgsqlModForTests()
+	pgsql := pgsqlModForTests(nil)
 
 	data := []byte(
 		"54000000420003610000004009000100000413ffffffffffff0000620000004009000200000413ffffffffffff0000630000004009000300000413ffffffffffff0000" +
@@ -185,7 +201,7 @@ func TestPgsqlParser_incomplete_response(t *testing.T) {
 // Test 3 responses in a row
 func TestPgsqlParser_threeResponses(t *testing.T) {
 
-	pgsql := pgsqlModForTests()
+	pgsql := pgsqlModForTests(nil)
 
 	data, err := hex.DecodeString(
 		"5300000017446174655374796c650049534f2c204d445900430000000853455400430000000853455400540000005700036f696400000004eefffe0000001a0004ffffffff0000656e636f64696e6700000000000000000000130040ffffffff00006461746c6173747379736f696400000004ee00090000001a0004ffffffff0000440000002000030000000531313836350000000455544638000000053131383537430000000d53454c4543542031005a0000000549")
@@ -225,7 +241,7 @@ func TestPgsqlParser_errorResponse(t *testing.T) {
 		logp.LogInit(logp.LOG_DEBUG, "", false, true, []string{"pgsql", "pgsqldetailed"})
 	}
 
-	pgsql := pgsqlModForTests()
+	pgsql := pgsqlModForTests(nil)
 	data := []byte(
 		"4500000088534552524f5200433235503032004d63757272656e74207472616e73616374696f6e2069732061626f727465642c20636f6d6d616e64732069676e6f72656420756e74696c20656e64206f66207472616e73616374696f6e20626c6f636b0046706f7374677265732e63004c3932310052657865635f73696d706c655f71756572790000")
 
@@ -270,7 +286,7 @@ func TestPgsqlParser_invalidMessage(t *testing.T) {
 	if testing.Verbose() {
 		logp.LogInit(logp.LOG_DEBUG, "", false, true, []string{"pgsql", "pgsqldetailed"})
 	}
-	pgsql := pgsqlModForTests()
+	pgsql := pgsqlModForTests(nil)
 	data := []byte(
 		"4300000002")
 
@@ -302,15 +318,15 @@ func testTCPTuple() *common.TCPTuple {
 }
 
 // Helper function to read from the Publisher Queue
-func expectTransaction(t *testing.T, pgsql *pgsqlPlugin) common.MapStr {
-	client := pgsql.results.(*publish.ChanTransactions)
-	select {
-	case trans := <-client.Channel:
-		return trans
-	default:
+func expectTransaction(t *testing.T, e *eventStore) common.MapStr {
+	if len(e.events) == 0 {
 		t.Error("No transaction")
+		return nil
 	}
-	return nil
+
+	event := e.events[0]
+	e.events = e.events[1:]
+	return event.Fields
 }
 
 // Test that loss of data during the response (but not at the beginning)
@@ -320,7 +336,8 @@ func Test_gap_in_response(t *testing.T) {
 		logp.LogInit(logp.LOG_DEBUG, "", false, true, []string{"pgsql", "pgsqldetailed"})
 	}
 
-	pgsql := pgsqlModForTests()
+	store := &eventStore{}
+	pgsql := pgsqlModForTests(store)
 
 	// request and response from tests/pcaps/pgsql_request_response.pcap
 	// select * from test
@@ -356,7 +373,7 @@ func Test_gap_in_response(t *testing.T) {
 	_, drop := pgsql.GapInStream(tcptuple, 1, 10, private)
 	assert.Equal(t, true, drop)
 
-	trans := expectTransaction(t, pgsql)
+	trans := expectTransaction(t, store)
 	assert.NotNil(t, trans)
 	assert.Equal(t, trans["notes"], []string{"Packet loss while capturing the response"})
 }

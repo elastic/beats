@@ -7,12 +7,12 @@ import (
 	"github.com/elastic/beats/libbeat/common"
 	"github.com/elastic/beats/libbeat/logp"
 	"github.com/elastic/beats/libbeat/monitoring"
+	"github.com/elastic/beats/libbeat/publisher/beat"
 
 	"github.com/elastic/beats/packetbeat/procs"
 	"github.com/elastic/beats/packetbeat/protos"
 	"github.com/elastic/beats/packetbeat/protos/applayer"
 	"github.com/elastic/beats/packetbeat/protos/tcp"
-	"github.com/elastic/beats/packetbeat/publish"
 )
 
 type stream struct {
@@ -40,7 +40,7 @@ type redisPlugin struct {
 
 	transactionTimeout time.Duration
 
-	results publish.Transactions
+	results protos.Reporter
 }
 
 var (
@@ -58,7 +58,7 @@ func init() {
 
 func New(
 	testMode bool,
-	results publish.Transactions,
+	results protos.Reporter,
 	cfg *common.Config,
 ) (protos.Plugin, error) {
 	p := &redisPlugin{}
@@ -75,7 +75,7 @@ func New(
 	return p, nil
 }
 
-func (redis *redisPlugin) init(results publish.Transactions, config *redisConfig) error {
+func (redis *redisPlugin) init(results protos.Reporter, config *redisConfig) error {
 	redis.setFromConfig(config)
 
 	redis.results = results
@@ -252,12 +252,12 @@ func (redis *redisPlugin) correlate(conn *redisConnectionData) {
 
 		if redis.results != nil {
 			event := redis.newTransaction(requ, resp)
-			redis.results.PublishTransaction(event)
+			redis.results(event)
 		}
 	}
 }
 
-func (redis *redisPlugin) newTransaction(requ, resp *redisMessage) common.MapStr {
+func (redis *redisPlugin) newTransaction(requ, resp *redisMessage) beat.Event {
 	error := common.OK_STATUS
 	if resp.isError {
 		error = common.ERROR_STATUS
@@ -291,8 +291,7 @@ func (redis *redisPlugin) newTransaction(requ, resp *redisMessage) common.MapStr
 	// resp_time in milliseconds
 	responseTime := int32(resp.ts.Sub(requ.ts).Nanoseconds() / 1e6)
 
-	event := common.MapStr{
-		"@timestamp":   common.Time(requ.ts),
+	fields := common.MapStr{
 		"type":         "redis",
 		"status":       error,
 		"responsetime": responseTime,
@@ -306,13 +305,16 @@ func (redis *redisPlugin) newTransaction(requ, resp *redisMessage) common.MapStr
 		"dst":          dst,
 	}
 	if redis.sendRequest {
-		event["request"] = requ.message
+		fields["request"] = requ.message
 	}
 	if redis.sendResponse {
-		event["response"] = resp.message
+		fields["response"] = resp.message
 	}
 
-	return event
+	return beat.Event{
+		Timestamp: requ.ts,
+		Fields:    fields,
+	}
 }
 
 func (redis *redisPlugin) GapInStream(tcptuple *common.TCPTuple, dir uint8,

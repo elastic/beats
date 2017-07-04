@@ -4,14 +4,17 @@ import (
 	"time"
 
 	"github.com/elastic/beats/libbeat/common"
-	"github.com/elastic/beats/packetbeat/publish"
+	"github.com/elastic/beats/libbeat/publisher/beat"
 )
 
 type ProtocolPlugin func(
 	testMode bool,
-	results publish.Transactions,
+	results Reporter,
 	cfg *common.Config,
 ) (Plugin, error)
+
+// Reporter is used by plugin instances to report new transaction events.
+type Reporter func(beat.Event)
 
 // Functions to be exported by a protocol plugin
 type Plugin interface {
