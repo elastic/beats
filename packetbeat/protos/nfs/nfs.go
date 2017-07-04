@@ -2,12 +2,13 @@ package nfs
 
 import (
 	"github.com/elastic/beats/libbeat/common"
+	"github.com/elastic/beats/libbeat/publisher/beat"
 )
 
 type nfs struct {
 	vers  uint32
 	proc  uint32
-	event common.MapStr
+	event beat.Event
 }
 
 func (nfs *nfs) getRequestInfo(xdr *xdr) common.MapStr {

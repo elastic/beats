@@ -8,10 +8,10 @@ import (
 	"github.com/elastic/beats/libbeat/common"
 	"github.com/elastic/beats/libbeat/logp"
 	"github.com/elastic/beats/libbeat/monitoring"
+	"github.com/elastic/beats/libbeat/publisher/beat"
 	"github.com/elastic/beats/packetbeat/procs"
 	"github.com/elastic/beats/packetbeat/protos"
 	"github.com/elastic/beats/packetbeat/protos/tcp"
-	"github.com/elastic/beats/packetbeat/publish"
 )
 
 var debugf = logp.MakeDebug("mongodb")
@@ -28,7 +28,7 @@ type mongodbPlugin struct {
 	responses          *common.Cache
 	transactionTimeout time.Duration
 
-	results publish.Transactions
+	results protos.Reporter
 }
 
 type transactionKey struct {
@@ -46,7 +46,7 @@ func init() {
 
 func New(
 	testMode bool,
-	results publish.Transactions,
+	results protos.Reporter,
 	cfg *common.Config,
 ) (protos.Plugin, error) {
 	p := &mongodbPlugin{}
@@ -63,7 +63,7 @@ func New(
 	return p, nil
 }
 
-func (mongodb *mongodbPlugin) init(results publish.Transactions, config *mongodbConfig) error {
+func (mongodb *mongodbPlugin) init(results protos.Reporter, config *mongodbConfig) error {
 	debugf("Init a MongoDB protocol parser")
 	mongodb.setFromConfig(config)
 
@@ -368,27 +368,27 @@ func (mongodb *mongodbPlugin) publishTransaction(t *transaction) {
 		return
 	}
 
-	event := common.MapStr{}
-	event["type"] = "mongodb"
+	timestamp := t.ts
+	fields := common.MapStr{}
+	fields["type"] = "mongodb"
 	if t.error == "" {
-		event["status"] = common.OK_STATUS
+		fields["status"] = common.OK_STATUS
 	} else {
 		t.event["error"] = t.error
-		event["status"] = common.ERROR_STATUS
+		fields["status"] = common.ERROR_STATUS
 	}
-	event["mongodb"] = t.event
-	event["method"] = t.method
-	event["resource"] = t.resource
-	event["query"] = reconstructQuery(t, false)
-	event["responsetime"] = t.responseTime
-	event["bytes_in"] = uint64(t.bytesIn)
-	event["bytes_out"] = uint64(t.bytesOut)
-	event["@timestamp"] = common.Time(t.ts)
-	event["src"] = &t.src
-	event["dst"] = &t.dst
+	fields["mongodb"] = t.event
+	fields["method"] = t.method
+	fields["resource"] = t.resource
+	fields["query"] = reconstructQuery(t, false)
+	fields["responsetime"] = t.responseTime
+	fields["bytes_in"] = uint64(t.bytesIn)
+	fields["bytes_out"] = uint64(t.bytesOut)
+	fields["src"] = &t.src
+	fields["dst"] = &t.dst
 
 	if mongodb.sendRequest {
-		event["request"] = reconstructQuery(t, true)
+		fields["request"] = reconstructQuery(t, true)
 	}
 	if mongodb.sendResponse {
 		if len(t.documents) > 0 {
@@ -409,9 +409,12 @@ func (mongodb *mongodbPlugin) publishTransaction(t *transaction) {
 					docs = append(docs, str)
 				}
 			}
-			event["response"] = strings.Join(docs, "\n")
+			fields["response"] = strings.Join(docs, "\n")
 		}
 	}
 
-	mongodb.results.PublishTransaction(event)
+	mongodb.results(beat.Event{
+		Timestamp: timestamp,
+		Fields:    fields,
+	})
 }

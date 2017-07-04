@@ -5,6 +5,7 @@ import (
 
 	"github.com/elastic/beats/libbeat/common"
 	"github.com/elastic/beats/libbeat/common/droppriv"
+	"github.com/elastic/beats/libbeat/processors"
 	"github.com/elastic/beats/packetbeat/procs"
 )
 
@@ -34,9 +35,11 @@ type InterfacesConfig struct {
 }
 
 type Flows struct {
-	Enabled *bool  `config:"enabled"`
-	Timeout string `config:"timeout"`
-	Period  string `config:"period"`
+	Enabled       *bool                   `config:"enabled"`
+	Timeout       string                  `config:"timeout"`
+	Period        string                  `config:"period"`
+	EventMetadata common.EventMetadata    `config:",inline"`
+	Processors    processors.PluginConfig `config:"processors"`
 }
 
 type ProtocolCommon struct {

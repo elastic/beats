@@ -9,7 +9,7 @@ import (
 
 	"github.com/elastic/beats/libbeat/common"
 	"github.com/elastic/beats/libbeat/logp"
-	"github.com/elastic/beats/packetbeat/publish"
+	"github.com/elastic/beats/libbeat/publisher/beat"
 )
 
 const (
@@ -33,11 +33,6 @@ var ErrInvalidPort = errors.New("port number out of range")
 // Protocol Plugin Port configuration with validation on init
 type PortsConfig struct {
 	Ports []int
-}
-
-type enhTransactions struct {
-	t    publish.Transactions
-	meta common.EventMetadata
 }
 
 func (p *PortsConfig) Init(ports ...int) error {
@@ -65,29 +60,39 @@ type Protocols interface {
 	BpfFilter(withVlans bool, withICMP bool) string
 	GetTCP(proto Protocol) TCPPlugin
 	GetUDP(proto Protocol) UDPPlugin
-	GetAll() map[Protocol]Plugin
+
 	GetAllTCP() map[Protocol]TCPPlugin
 	GetAllUDP() map[Protocol]UDPPlugin
+
 	// Register(proto Protocol, plugin ProtocolPlugin)
 }
 
 // list of protocol plugins
 type ProtocolsStruct struct {
-	all map[Protocol]Plugin
+	all map[Protocol]protocolInstance
 	tcp map[Protocol]TCPPlugin
 	udp map[Protocol]UDPPlugin
 }
 
 // Singleton of Protocols type.
 var Protos = ProtocolsStruct{
-	all: map[Protocol]Plugin{},
+	all: map[Protocol]protocolInstance{},
 	tcp: map[Protocol]TCPPlugin{},
 	udp: map[Protocol]UDPPlugin{},
 }
 
+type protocolInstance struct {
+	client beat.Client
+	plugin Plugin
+}
+
+type reporterFactory interface {
+	CreateReporter(*common.Config) (func(beat.Event), error)
+}
+
 func (s ProtocolsStruct) Init(
 	testMode bool,
-	results publish.Transactions,
+	pub reporterFactory,
 	configs map[string]*common.Config,
 	listConfigs []*common.Config,
 ) error {
@@ -100,7 +105,7 @@ func (s ProtocolsStruct) Init(
 	}
 
 	for name, config := range configs {
-		if err := s.configureProtocol(testMode, results, name, config); err != nil {
+		if err := s.configureProtocol(testMode, pub, name, config); err != nil {
 			return err
 		}
 	}
@@ -113,7 +118,7 @@ func (s ProtocolsStruct) Init(
 			return err
 		}
 
-		if err := s.configureProtocol(testMode, results, module.Name, config); err != nil {
+		if err := s.configureProtocol(testMode, pub, module.Name, config); err != nil {
 			return err
 		}
 	}
@@ -123,7 +128,7 @@ func (s ProtocolsStruct) Init(
 
 func (s ProtocolsStruct) configureProtocol(
 	testMode bool,
-	results publish.Transactions,
+	pub reporterFactory,
 	name string,
 	config *common.Config,
 ) error {
@@ -149,31 +154,24 @@ func (s ProtocolsStruct) configureProtocol(
 		return nil
 	}
 
-	meta := struct {
-		Config common.EventMetadata `config:",inline"` // Fields and tags to add to events.
-	}{}
-	if err := config.Unpack(&meta); err != nil {
-		return err
+	var client beat.Client
+	results := func(beat.Event) {}
+	if !testMode {
+		var err error
+		results, err = pub.CreateReporter(config)
+		if err != nil {
+			return err
+		}
 	}
 
-	inst, err := plugin(testMode, resultsChannel(results, meta.Config), config)
+	inst, err := plugin(testMode, results, config)
 	if err != nil {
 		logp.Err("Failed to register protocol plugin: %v", err)
 		return err
 	}
 
-	s.register(proto, inst)
+	s.register(proto, client, inst)
 	return nil
-}
-
-func resultsChannel(
-	results publish.Transactions,
-	meta common.EventMetadata,
-) publish.Transactions {
-	if len(meta.Fields) == 0 && len(meta.Tags) == 0 {
-		return results
-	}
-	return &enhTransactions{results, meta}
 }
 
 func (s ProtocolsStruct) GetTCP(proto Protocol) TCPPlugin {
@@ -192,10 +190,6 @@ func (s ProtocolsStruct) GetUDP(proto Protocol) UDPPlugin {
 	}
 
 	return plugin
-}
-
-func (s ProtocolsStruct) GetAll() map[Protocol]Plugin {
-	return s.all
 }
 
 func (s ProtocolsStruct) GetAllTCP() map[Protocol]TCPPlugin {
@@ -221,7 +215,7 @@ func (s ProtocolsStruct) BpfFilter(withVlans bool, withICMP bool) string {
 	var expressions []string
 	for _, key := range protos {
 		proto := Protocol(key)
-		plugin := s.all[proto]
+		plugin := s.all[proto].plugin
 		for _, port := range plugin.GetPorts() {
 			hasTCP := false
 			hasUDP := false
@@ -257,12 +251,15 @@ func (s ProtocolsStruct) BpfFilter(withVlans bool, withICMP bool) string {
 	return filter
 }
 
-func (s ProtocolsStruct) register(proto Protocol, plugin Plugin) {
+func (s ProtocolsStruct) register(proto Protocol, client beat.Client, plugin Plugin) {
 	if _, exists := s.all[proto]; exists {
 		logp.Warn("Protocol (%s) plugin will overwritten by another plugin", proto.String())
 	}
 
-	s.all[proto] = plugin
+	s.all[proto] = protocolInstance{
+		client: client,
+		plugin: plugin,
+	}
 
 	success := false
 	if tcp, ok := plugin.(TCPPlugin); ok {
@@ -276,20 +273,4 @@ func (s ProtocolsStruct) register(proto Protocol, plugin Plugin) {
 	if !success {
 		logp.Warn("Protocol (%s) register failed, port: %v", proto.String(), plugin.GetPorts())
 	}
-}
-
-func (e *enhTransactions) PublishTransaction(event common.MapStr) bool {
-	err := common.MergeFields(event, e.meta.Fields, e.meta.FieldsUnderRoot)
-	if err != nil {
-		logp.Err("Failed to merge fields: %v", err)
-		return false
-	}
-
-	err = common.AddTags(event, e.meta.Tags)
-	if err != nil {
-		logp.Err("Failed to add tags: %v", err)
-		return false
-	}
-
-	return e.t.PublishTransaction(event)
 }

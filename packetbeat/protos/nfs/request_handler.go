@@ -8,6 +8,7 @@ import (
 
 	"github.com/elastic/beats/libbeat/common"
 	"github.com/elastic/beats/libbeat/monitoring"
+	"github.com/elastic/beats/libbeat/publisher/beat"
 	"github.com/elastic/beats/packetbeat/protos/tcp"
 )
 
@@ -28,8 +29,8 @@ var (
 
 // called by Cache, when re reply seen within expected time window
 func (r *rpc) handleExpiredPacket(nfs *nfs) {
-	nfs.event["status"] = "NO_REPLY"
-	r.results.PublishTransaction(nfs.event)
+	nfs.event.Fields["status"] = "NO_REPLY"
+	r.results(nfs.event)
 	unmatchedRequests.Add(1)
 }
 
@@ -59,11 +60,10 @@ func (r *rpc) handleCall(xid string, xdr *xdr, ts time.Time, tcptuple *common.TC
 		src, dst = dst, src
 	}
 
-	event := common.MapStr{}
-	event["@timestamp"] = common.Time(ts)
-	event["status"] = common.OK_STATUS // all packages are OK for now
-	event["src"] = &src
-	event["dst"] = &dst
+	fields := common.MapStr{}
+	fields["status"] = common.OK_STATUS // all packages are OK for now
+	fields["src"] = &src
+	fields["dst"] = &dst
 
 	nfsVers := xdr.getUInt()
 	nfsProc := xdr.getUInt()
@@ -102,10 +102,17 @@ func (r *rpc) handleCall(xid string, xdr *xdr, ts time.Time, tcptuple *common.TC
 	xdr.getUInt()
 	xdr.getDynamicOpaque()
 
-	event["type"] = "nfs"
-	event["rpc"] = rpcInfo
-	nfs := nfs{vers: nfsVers, proc: nfsProc, event: event}
-	event["nfs"] = nfs.getRequestInfo(xdr)
+	fields["type"] = "nfs"
+	fields["rpc"] = rpcInfo
+	nfs := nfs{
+		vers: nfsVers,
+		proc: nfsProc,
+		event: beat.Event{
+			Timestamp: ts,
+			Fields:    fields,
+		},
+	}
+	fields["nfs"] = nfs.getRequestInfo(xdr)
 
 	// use xid+src ip to uniquely identify request
 	reqID := xid + tcptuple.SrcIP.String()
@@ -141,9 +148,10 @@ func (r *rpc) handleReply(xid string, xdr *xdr, ts time.Time, tcptuple *common.T
 	if v != nil {
 		nfs := v.(*nfs)
 		event := nfs.event
-		rpcInfo := event["rpc"].(common.MapStr)
+		fields := event.Fields
+		rpcInfo := fields["rpc"].(common.MapStr)
 		rpcInfo["reply_size"] = xdr.size()
-		rpcTime := ts.Sub(time.Time(event["@timestamp"].(common.Time)))
+		rpcTime := ts.Sub(event.Timestamp)
 		rpcInfo["time"] = rpcTime
 		// the same in human readable form
 		rpcInfo["time_str"] = fmt.Sprintf("%v", rpcTime)
@@ -152,9 +160,9 @@ func (r *rpc) handleReply(xid string, xdr *xdr, ts time.Time, tcptuple *common.T
 
 		// populate nfs info for successfully executed requests
 		if status == 0 {
-			nfsInfo := event["nfs"].(common.MapStr)
+			nfsInfo := fields["nfs"].(common.MapStr)
 			nfsInfo["status"] = nfs.getNFSReplyStatus(xdr)
 		}
-		r.results.PublishTransaction(event)
+		r.results(event)
 	}
 }

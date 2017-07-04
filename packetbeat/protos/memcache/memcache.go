@@ -10,16 +10,16 @@ import (
 	"github.com/elastic/beats/libbeat/common"
 	"github.com/elastic/beats/libbeat/logp"
 	"github.com/elastic/beats/libbeat/monitoring"
+	"github.com/elastic/beats/libbeat/publisher/beat"
 
 	"github.com/elastic/beats/packetbeat/protos"
 	"github.com/elastic/beats/packetbeat/protos/applayer"
-	"github.com/elastic/beats/packetbeat/publish"
 )
 
 // memcache types
 type memcache struct {
 	ports   protos.PortsConfig
-	results publish.Transactions
+	results protos.Reporter
 	config  parserConfig
 
 	udpMemcache
@@ -112,7 +112,7 @@ func init() {
 
 func New(
 	testMode bool,
-	results publish.Transactions,
+	results protos.Reporter,
 	cfg *common.Config,
 ) (protos.Plugin, error) {
 	p := &memcache{}
@@ -130,7 +130,7 @@ func New(
 }
 
 // Called to initialize the Plugin
-func (mc *memcache) init(results publish.Transactions, config *memcacheConfig) error {
+func (mc *memcache) init(results protos.Reporter, config *memcacheConfig) error {
 	debug("init memcache plugin")
 
 	mc.handler = mc
@@ -179,10 +179,12 @@ func (mc *memcache) finishTransaction(t *transaction) error {
 }
 
 func (mc *memcache) onTransaction(t *transaction) {
-	event := common.MapStr{}
-	t.Event(event)
+	event := beat.Event{
+		Fields: common.MapStr{},
+	}
+	t.Event(&event)
 	debug("publish event: %s", event)
-	mc.results.PublishTransaction(event)
+	mc.results(event)
 }
 
 func newMessage(ts time.Time) *message {
@@ -361,7 +363,7 @@ func (t *transaction) Init(msg *message) {
 	}
 }
 
-func (t *transaction) Event(event common.MapStr) error {
+func (t *transaction) Event(event *beat.Event) error {
 	debug("count event notes: %v", len(t.Notes))
 	if err := t.Transaction.Event(event); err != nil {
 		logp.Warn("error filling generic transaction fields: %v", err)
@@ -369,7 +371,7 @@ func (t *transaction) Event(event common.MapStr) error {
 	}
 
 	mc := common.MapStr{}
-	event["memcache"] = mc
+	event.Fields["memcache"] = mc
 
 	if t.request != nil {
 		_, err := t.request.SubEvent("request", mc)
