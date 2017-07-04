@@ -90,12 +90,6 @@ Packetbeat supports three sniffer types:
    it's not the fastest option.
  * `af_packet`, which uses memory-mapped sniffing. This option is faster than libpcap
    and doesn't require a kernel module, but it's Linux-specific.
- * `pf_ring`, which makes use of an ntop.org
-   http://www.ntop.org/products/pf_ring/[project]. This setting provides the best
-   sniffing speed, but it requires a kernel module, and it's Linux-specific.
-
-NOTE: The `pf_ring` option requires re-compilation of Packetbeat and is not
-      officially supported by Elastic at this moment.
 
 The default sniffer type is `pcap`.
 
