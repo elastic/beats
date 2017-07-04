@@ -96,9 +96,7 @@ func (l *ackLoop) handleBatchSig() int {
 		}
 	}
 
-	// return acks to waiting clients
-	// TODO: global boolean to check if clients will need an ACK
-	//       no need to report ACKs if no client is interested in ACKs
+	// report acks to waiting clients
 	states := l.broker.buf.buf.clients
 	end := start + count
 	if end > len(states) {

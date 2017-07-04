@@ -61,6 +61,8 @@ func create(cfg *common.Config) (broker.Broker, error) {
 // If waitOnClose is set to true, the broker will block on Close, until all internal
 // workers handling incoming messages and ACKs have been shut down.
 func NewBroker(sz int, waitOnClose bool) *Broker {
+	// define internal channel size for procuder/client requests
+	// to the broker
 	chanSize := 20
 
 	logger := defaultLogger
@@ -102,6 +104,12 @@ func (b *Broker) Close() error {
 		b.wg.Wait()
 	}
 	return nil
+}
+
+func (b *Broker) BufferConfig() broker.BufferConfig {
+	return broker.BufferConfig{
+		Events: b.buf.Size(),
+	}
 }
 
 func (b *Broker) Producer(cfg broker.ProducerConfig) broker.Producer {
@@ -246,6 +254,10 @@ func (b *Broker) reportACK(states []clientState, start, end int) {
 	N := end - start
 	b.logger.Debug("handle ACKs: ", N)
 	idx := end - 1
+
+	// TODO: global boolean to check if clients will need an ACK
+	//       no need to report ACKs if no client is interested in ACKs
+
 	for i := N - 1; i >= 0; i-- {
 		if idx < 0 {
 			idx = len(states) - 1

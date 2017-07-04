@@ -22,8 +22,19 @@ type Factory func(*common.Config) (Broker, error)
 type Broker interface {
 	io.Closer
 
+	BufferConfig() BufferConfig
+
 	Producer(cfg ProducerConfig) Producer
 	Consumer() Consumer
+}
+
+// BufferConfig returns the pipelines buffering settings,
+// for the pipeline to use.
+// In case of the pipeline itself storing events for reporting ACKs to clients,
+// but still dropping events, the pipeline can use the buffer information,
+// to define an upper bound of events being active in the pipeline.
+type BufferConfig struct {
+	Events int // can be <= 0, if broker can not determine limit
 }
 
 // ProducerConfig as used by the Pipeline to configure some custom callbacks
