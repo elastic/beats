@@ -1,13 +1,13 @@
 #!/bin/bash
 #
-# {{.beat_name}}          {{.beat_name}} shipper
+# {{.beat_pkg_name}}          {{.beat_name}} shipper
 #
 # chkconfig: 2345 98 02
 # description: Starts and stops a single {{.beat_name}} instance on this system
 #
 
 ### BEGIN INIT INFO
-# Provides:          {{.beat_name}}
+# Provides:          {{.beat_pkg_name}}
 # Required-Start:    $local_fs $network $syslog
 # Required-Stop:     $local_fs $network $syslog
 # Default-Start:     2 3 4 5
@@ -22,8 +22,8 @@
 PATH=/usr/bin:/sbin:/bin:/usr/sbin
 export PATH
 
-[ -f /etc/sysconfig/{{.beat_name}} ] && . /etc/sysconfig/{{.beat_name}}
-pidfile=${PIDFILE-/var/run/{{.beat_name}}.pid}
+[ -f /etc/sysconfig/{{.beat_pkg_name}} ] && . /etc/sysconfig/{{.beat_pkg_name}}
+pidfile=${PIDFILE-/var/run/{{.beat_pkg_name}}.pid}
 agent=${BEATS_AGENT-/usr/share/{{.beat_name}}/bin/{{.beat_name}}}
 args="-c /etc/{{.beat_name}}/{{.beat_name}}.yml -path.home /usr/share/{{.beat_name}} -path.config /etc/{{.beat_name}} -path.data /var/lib/{{.beat_name}} -path.logs /var/log/{{.beat_name}}"
 test_args="-e -configtest"

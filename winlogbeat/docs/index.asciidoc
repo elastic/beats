@@ -14,6 +14,7 @@ include::../../libbeat/docs/version.asciidoc[]
 :version: {stack-version}
 :beatname_lc: winlogbeat
 :beatname_uc: Winlogbeat
+:beatname_pkg: {beatname_lc}
 :security: X-Pack Security
 
 include::./overview.asciidoc[]

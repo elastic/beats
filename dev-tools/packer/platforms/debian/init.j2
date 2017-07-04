@@ -1,6 +1,6 @@
 #!/bin/sh
 ### BEGIN INIT INFO
-# Provides:          {{.beat_name}}
+# Provides:          {{.beat_pkg_name}}
 # Required-Start:    $local_fs $network $syslog
 # Required-Stop:     $local_fs $network $syslog
 # Default-Start:     2 3 4 5
@@ -19,7 +19,7 @@ NAME="{{.beat_name}}"
 DAEMON=/usr/share/{{.beat_name}}/bin/$NAME
 DAEMON_ARGS="-c /etc/{{.beat_name}}/{{.beat_name}}.yml -path.home /usr/share/{{.beat_name}} -path.config /etc/{{.beat_name}} -path.data /var/lib/{{.beat_name}} -path.logs /var/log/{{.beat_name}}"
 TEST_ARGS="-e -configtest"
-PIDFILE=/var/run/{{.beat_name}}.pid
+PIDFILE=/var/run/{{.beat_pkg_name}}.pid
 WRAPPER="/usr/share/{{.beat_name}}/bin/{{.beat_name}}-god"
 BEAT_USER="root"
 WRAPPER_ARGS="-r / -n -p $PIDFILE"
@@ -29,7 +29,7 @@ SCRIPTNAME=/etc/init.d/$NAME
 [ -x "$DAEMON" ] || exit 0
 
 # Read configuration variable file if it is present
-[ -r /etc/default/$NAME ] && . /etc/default/$NAME
+[ -r /etc/default/{{.beat_pkg_name}} ] && . /etc/default/{{.beat_pkg_name}}
 
 [ "$BEAT_USER" != "root" ] && WRAPPER_ARGS="$WRAPPER_ARGS -u $BEAT_USER"
 USER_WRAPPER="su"
