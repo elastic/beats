@@ -15,6 +15,7 @@ include::../../libbeat/docs/version.asciidoc[]
 :version: {stack-version}
 :beatname_lc: heartbeat
 :beatname_uc: Heartbeat
+:beatname_pkg: heartbeat-elastic
 :security: X-Pack Security
 :dockerimage: docker.elastic.co/beats/{beatname_lc}:{version}
 
