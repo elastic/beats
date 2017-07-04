@@ -273,7 +273,7 @@ func TestWildcardQuery(t *testing.T) {
 		t.Fatal(err)
 	}
 
-	pcts, err := values[0].GetValue("processors.time.pct")
+	pcts, err := values[0].GetValue("processor.time.pct")
 	if err != nil {
 		t.Fatal(err)
 	}
