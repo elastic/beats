@@ -13,7 +13,7 @@
       },
       "id": "Errors-over-time",
       "type": "visualization",
-      "version": 4
+      "version": 2
     },
     {
       "attributes": {
@@ -28,7 +28,7 @@
       },
       "id": "Nginx-Access-Browsers",
       "type": "visualization",
-      "version": 4
+      "version": 2
     },
     {
       "attributes": {
@@ -43,7 +43,7 @@
       },
       "id": "Nginx-Access-OSes",
       "type": "visualization",
-      "version": 4
+      "version": 2
     },
     {
       "attributes": {
@@ -59,7 +59,7 @@
       },
       "id": "New-Visualization",
       "type": "visualization",
-      "version": 4
+      "version": 2
     },
     {
       "attributes": {
@@ -74,7 +74,7 @@
       },
       "id": "Nginx-Access-Response-codes-by-top-URLs",
       "type": "visualization",
-      "version": 4
+      "version": 2
     },
     {
       "attributes": {
@@ -89,7 +89,7 @@
       },
       "id": "Sent-sizes",
       "type": "visualization",
-      "version": 4
+      "version": 2
     },
     {
       "attributes": {
@@ -105,7 +105,7 @@
       },
       "id": "Nginx-Access-Map",
       "type": "visualization",
-      "version": 4
+      "version": 2
     },
     {
       "attributes": {
@@ -126,7 +126,7 @@
       },
       "id": "Filebeat-Nginx-module",
       "type": "search",
-      "version": 8
+      "version": 3
     },
     {
       "attributes": {
@@ -144,7 +144,7 @@
       },
       "id": "Filebeat-Nginx-Dashboard",
       "type": "dashboard",
-      "version": 4
+      "version": 2
     }
   ],
   "version": "6.0.0-alpha3-SNAPSHOT"

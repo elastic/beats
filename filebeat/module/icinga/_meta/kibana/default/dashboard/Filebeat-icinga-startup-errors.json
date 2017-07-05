@@ -1,0 +1,62 @@
+{
+  "objects": [
+    {
+      "attributes": {
+        "description": "",
+        "kibanaSavedObjectMeta": {
+          "searchSourceJSON": "{\"filter\":[]}"
+        },
+        "savedSearchId": "710043e0-2417-11e7-a83b-d5f4cebac9ff",
+        "title": "Icinga Startup Errors",
+        "uiStateJSON": "{\"vis\":{\"colors\":{\"Count\":\"#BF1B00\"}}}",
+        "version": 1,
+        "visState": "{\"title\":\"Icinga Startup Errors\",\"type\":\"histogram\",\"params\":{\"addTooltip\":true,\"addLegend\":true,\"legendPosition\":\"right\",\"scale\":\"linear\",\"mode\":\"stacked\",\"times\":[],\"addTimeMarker\":false,\"defaultYExtents\":false,\"setYExtents\":false},\"aggs\":[{\"id\":\"1\",\"enabled\":true,\"type\":\"count\",\"schema\":\"metric\",\"params\":{}},{\"id\":\"2\",\"enabled\":true,\"type\":\"date_histogram\",\"schema\":\"segment\",\"params\":{\"field\":\"@timestamp\",\"interval\":\"auto\",\"customInterval\":\"2h\",\"min_doc_count\":1,\"extended_bounds\":{}}}],\"listeners\":{}}"
+      },
+      "id": "a59b5e00-2417-11e7-a83b-d5f4cebac9ff",
+      "type": "visualization",
+      "version": 1
+    },
+    {
+      "attributes": {
+        "columns": [
+          "icinga.startup.facility",
+          "icinga.startup.severity",
+          "icinga.startup.message"
+        ],
+        "description": "",
+        "hits": 0,
+        "kibanaSavedObjectMeta": {
+          "searchSourceJSON": "{\"index\":\"filebeat-*\",\"highlightAll\":true,\"query\":{\"query_string\":{\"query\":\"icinga.startup.severity:critical\",\"analyze_wildcard\":true}},\"filter\":[]}"
+        },
+        "sort": [
+          "@timestamp",
+          "desc"
+        ],
+        "title": "Icinga Startup Errors",
+        "version": 1
+      },
+      "id": "710043e0-2417-11e7-a83b-d5f4cebac9ff",
+      "type": "search",
+      "version": 2
+    },
+    {
+      "attributes": {
+        "description": "",
+        "hits": 0,
+        "kibanaSavedObjectMeta": {
+          "searchSourceJSON": "{\"filter\":[{\"query\":{\"query_string\":{\"query\":\"*\",\"analyze_wildcard\":true}}}]}"
+        },
+        "optionsJSON": "{\"darkTheme\":false}",
+        "panelsJSON": "[{\"size_x\":12,\"size_y\":2,\"panelIndex\":1,\"type\":\"visualization\",\"id\":\"a59b5e00-2417-11e7-a83b-d5f4cebac9ff\",\"col\":1,\"row\":1},{\"size_x\":12,\"size_y\":13,\"panelIndex\":2,\"type\":\"search\",\"id\":\"710043e0-2417-11e7-a83b-d5f4cebac9ff\",\"col\":1,\"row\":3,\"columns\":[\"icinga.startup.facility\",\"icinga.startup.severity\",\"icinga.startup.message\"],\"sort\":[\"@timestamp\",\"desc\"]}]",
+        "timeRestore": false,
+        "title": "Icinga Startup Errors",
+        "uiStateJSON": "{}",
+        "version": 1
+      },
+      "id": "b9163ea0-2417-11e7-a83b-d5f4cebac9ff",
+      "type": "dashboard",
+      "version": 1
+    }
+  ],
+  "version": "6.0.0-alpha3-SNAPSHOT"
+}

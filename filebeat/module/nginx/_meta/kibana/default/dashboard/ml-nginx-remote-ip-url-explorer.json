@@ -30,7 +30,7 @@
       },
       "id": "ML-Nginx-Access-Response-Code-Timechart",
       "type": "visualization",
-      "version": 2
+      "version": 1
     },
     {
       "attributes": {
@@ -46,7 +46,7 @@
       },
       "id": "ML-Nginx-Access-Top-Remote-IPs-Table",
       "type": "visualization",
-      "version": 2
+      "version": 1
     },
     {
       "attributes": {
@@ -62,7 +62,7 @@
       },
       "id": "ML-Nginx-Access-Map",
       "type": "visualization",
-      "version": 2
+      "version": 1
     },
     {
       "attributes": {
@@ -78,7 +78,7 @@
       },
       "id": "ML-Nginx-Access-Top-URLs-Table",
       "type": "visualization",
-      "version": 2
+      "version": 1
     },
     {
       "attributes": {
@@ -99,7 +99,7 @@
       },
       "id": "ML-Filebeat-Nginx-Access",
       "type": "search",
-      "version": 10
+      "version": 1
     },
     {
       "attributes": {

@@ -1,0 +1,108 @@
+{
+  "objects": [
+    {
+      "attributes": {
+        "description": "",
+        "kibanaSavedObjectMeta": {
+          "searchSourceJSON": "{\"filter\":[],\"index\":\"filebeat-*\",\"highlightAll\":true,\"query\":{\"query_string\":{\"query\":\"system.auth.ssh.event:Accepted\",\"analyze_wildcard\":true}}}"
+        },
+        "title": "Successful SSH logins",
+        "uiStateJSON": "{\"vis\":{\"colors\":{\"Accepted\":\"#3F6833\",\"Failed\":\"#F9934E\",\"Invalid\":\"#447EBC\",\"publickey\":\"#629E51\",\"password\":\"#BF1B00\"}}}",
+        "version": 1,
+        "visState": "{\"title\":\"Successful SSH logins\",\"type\":\"histogram\",\"params\":{\"addTooltip\":true,\"addLegend\":true,\"legendPosition\":\"right\",\"scale\":\"linear\",\"mode\":\"stacked\",\"times\":[],\"addTimeMarker\":false,\"defaultYExtents\":false,\"setYExtents\":false},\"aggs\":[{\"id\":\"1\",\"enabled\":true,\"type\":\"count\",\"schema\":\"metric\",\"params\":{}},{\"id\":\"2\",\"enabled\":true,\"type\":\"date_histogram\",\"schema\":\"segment\",\"params\":{\"field\":\"@timestamp\",\"interval\":\"auto\",\"customInterval\":\"2h\",\"min_doc_count\":1,\"extended_bounds\":{}}},{\"id\":\"3\",\"enabled\":true,\"type\":\"terms\",\"schema\":\"group\",\"params\":{\"field\":\"system.auth.ssh.method\",\"size\":5,\"order\":\"desc\",\"orderBy\":\"1\"}}],\"listeners\":{}}"
+      },
+      "id": "d16bb400-f9cc-11e6-8115-a7c18106d86a",
+      "type": "visualization",
+      "version": 1
+    },
+    {
+      "attributes": {
+        "description": "",
+        "kibanaSavedObjectMeta": {
+          "searchSourceJSON": "{\"filter\":[],\"index\":\"filebeat-*\",\"highlightAll\":true}"
+        },
+        "title": "SSH login attempts",
+        "uiStateJSON": "{\"vis\":{\"colors\":{\"Accepted\":\"#3F6833\",\"Failed\":\"#F9934E\",\"Invalid\":\"#447EBC\"}}}",
+        "version": 1,
+        "visState": "{\"aggs\":[{\"enabled\":true,\"id\":\"1\",\"params\":{},\"schema\":\"metric\",\"type\":\"count\"},{\"enabled\":true,\"id\":\"2\",\"params\":{\"customInterval\":\"2h\",\"extended_bounds\":{},\"field\":\"@timestamp\",\"interval\":\"auto\",\"min_doc_count\":1},\"schema\":\"segment\",\"type\":\"date_histogram\"},{\"enabled\":true,\"id\":\"3\",\"params\":{\"field\":\"system.auth.ssh.event\",\"order\":\"desc\",\"orderBy\":\"1\",\"size\":5},\"schema\":\"group\",\"type\":\"terms\"}],\"listeners\":{},\"params\":{\"addLegend\":true,\"addTimeMarker\":false,\"addTooltip\":true,\"defaultYExtents\":false,\"legendPosition\":\"right\",\"mode\":\"stacked\",\"scale\":\"linear\",\"setYExtents\":false,\"times\":[]},\"title\":\"SSH login attempts\",\"type\":\"histogram\"}"
+      },
+      "id": "78b74f30-f9cd-11e6-8115-a7c18106d86a",
+      "type": "visualization",
+      "version": 1
+    },
+    {
+      "attributes": {
+        "description": "",
+        "kibanaSavedObjectMeta": {
+          "searchSourceJSON": "{\"filter\":[],\"index\":\"filebeat-*\",\"highlightAll\":true,\"query\":{\"query_string\":{\"query\":\"system.auth.ssh.event:Failed OR system.auth.ssh.event:Invalid\",\"analyze_wildcard\":true}}}"
+        },
+        "title": "SSH users of failed login attempts",
+        "uiStateJSON": "{}",
+        "version": 1,
+        "visState": "{\"title\":\"SSH users of failed login attempts\",\"type\":\"tagcloud\",\"params\":{\"maxFontSize\":72,\"minFontSize\":18,\"orientation\":\"single\",\"scale\":\"linear\"},\"aggs\":[{\"id\":\"1\",\"enabled\":true,\"type\":\"count\",\"schema\":\"metric\",\"params\":{}},{\"id\":\"2\",\"enabled\":true,\"type\":\"terms\",\"schema\":\"segment\",\"params\":{\"field\":\"system.auth.user\",\"size\":50,\"order\":\"desc\",\"orderBy\":\"1\"}}],\"listeners\":{}}"
+      },
+      "id": "341ffe70-f9ce-11e6-8115-a7c18106d86a",
+      "type": "visualization",
+      "version": 1
+    },
+    {
+      "attributes": {
+        "description": "",
+        "kibanaSavedObjectMeta": {
+          "searchSourceJSON": "{\"filter\":[],\"index\":\"filebeat-*\",\"highlightAll\":true,\"query\":{\"query_string\":{\"query\":\"system.auth.ssh.event:Failed OR system.auth.ssh.event:Invalid\",\"analyze_wildcard\":true}}}"
+        },
+        "title": "SSH failed login attempts source locations",
+        "uiStateJSON": "{\"mapZoom\":2,\"mapCenter\":[17.602139123350838,69.697265625]}",
+        "version": 1,
+        "visState": "{\"title\":\"SSH failed login attempts source locations\",\"type\":\"tile_map\",\"params\":{\"mapType\":\"Shaded Circle Markers\",\"isDesaturated\":true,\"addTooltip\":true,\"heatMaxZoom\":16,\"heatMinOpacity\":0.1,\"heatRadius\":25,\"heatBlur\":15,\"heatNormalizeData\":true,\"legendPosition\":\"bottomright\",\"mapZoom\":2,\"mapCenter\":[15,5],\"wms\":{\"enabled\":false,\"url\":\"https://basemap.nationalmap.gov/arcgis/services/USGSTopo/MapServer/WMSServer\",\"options\":{\"version\":\"1.3.0\",\"layers\":\"0\",\"format\":\"image/png\",\"transparent\":true,\"attribution\":\"Maps provided by USGS\",\"styles\":\"\"}}},\"aggs\":[{\"id\":\"1\",\"enabled\":true,\"type\":\"count\",\"schema\":\"metric\",\"params\":{}},{\"id\":\"2\",\"enabled\":true,\"type\":\"geohash_grid\",\"schema\":\"segment\",\"params\":{\"field\":\"system.auth.ssh.geoip.location\",\"autoPrecision\":true,\"precision\":2}}],\"listeners\":{}}"
+      },
+      "id": "3cec3eb0-f9d3-11e6-8a3e-2b904044ea1d",
+      "type": "visualization",
+      "version": 1
+    },
+    {
+      "attributes": {
+        "columns": [
+          "system.auth.ssh.event",
+          "system.auth.ssh.method",
+          "system.auth.user",
+          "system.auth.ssh.ip",
+          "system.auth.ssh.geoip.country_iso_code"
+        ],
+        "description": "",
+        "hits": 0,
+        "kibanaSavedObjectMeta": {
+          "searchSourceJSON": "{\"index\":\"filebeat-*\",\"highlightAll\":true,\"query\":{\"query_string\":{\"query\":\"_exists_:system.auth.ssh.event\",\"analyze_wildcard\":true}},\"filter\":[]}"
+        },
+        "sort": [
+          "@timestamp",
+          "desc"
+        ],
+        "title": "SSH login attempts",
+        "version": 1
+      },
+      "id": "62439dc0-f9c9-11e6-a747-6121780e0414",
+      "type": "search",
+      "version": 1
+    },
+    {
+      "attributes": {
+        "description": "",
+        "hits": 0,
+        "kibanaSavedObjectMeta": {
+          "searchSourceJSON": "{\"filter\":[{\"query\":{\"query_string\":{\"analyze_wildcard\":true,\"query\":\"*\"}}}]}"
+        },
+        "optionsJSON": "{\"darkTheme\":false}",
+        "panelsJSON": "[{\"col\":1,\"id\":\"d16bb400-f9cc-11e6-8115-a7c18106d86a\",\"panelIndex\":1,\"row\":4,\"size_x\":12,\"size_y\":3,\"type\":\"visualization\"},{\"col\":1,\"id\":\"78b74f30-f9cd-11e6-8115-a7c18106d86a\",\"panelIndex\":2,\"row\":1,\"size_x\":12,\"size_y\":3,\"type\":\"visualization\"},{\"col\":1,\"id\":\"341ffe70-f9ce-11e6-8115-a7c18106d86a\",\"panelIndex\":3,\"row\":7,\"size_x\":6,\"size_y\":4,\"type\":\"visualization\"},{\"col\":7,\"id\":\"3cec3eb0-f9d3-11e6-8a3e-2b904044ea1d\",\"panelIndex\":4,\"row\":7,\"size_x\":6,\"size_y\":4,\"type\":\"visualization\"},{\"size_x\":12,\"size_y\":3,\"panelIndex\":5,\"type\":\"search\",\"id\":\"62439dc0-f9c9-11e6-a747-6121780e0414\",\"col\":1,\"row\":11,\"columns\":[\"system.auth.ssh.event\",\"system.auth.ssh.method\",\"system.auth.user\",\"system.auth.ssh.ip\",\"system.auth.ssh.geoip.country_iso_code\"],\"sort\":[\"@timestamp\",\"desc\"]}]",
+        "timeRestore": false,
+        "title": "Filebeat SSH login attempts",
+        "uiStateJSON": "{\"P-4\":{\"mapCenter\":[39.774769485295465,23.203125],\"mapZoom\":3}}",
+        "version": 1
+      },
+      "id": "5517a150-f9ce-11e6-8115-a7c18106d86a",
+      "type": "dashboard",
+      "version": 1
+    }
+  ],
+  "version": "6.0.0-alpha3-SNAPSHOT"
+}
