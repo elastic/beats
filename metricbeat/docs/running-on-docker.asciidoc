@@ -19,7 +19,7 @@ docker run \
   --volume=/sys/fs/cgroup:/hostfs/sys/fs/cgroup:ro \ <2>
   --volume=/:/hostfs:ro \ <3>
   --net=host <4>
-  {dockerimage} -system.hostfs=/hostfs
+  {dockerimage} metricbeat -e -system.hostfs=/hostfs
 ----
 
 <1> Metricbeat's <<metricbeat-module-system,system module>> collects much of its data through the Linux proc
