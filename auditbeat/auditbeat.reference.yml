@@ -1,13 +1,13 @@
-########################## Auditbeat Configuration ###########################
+########################## Auditbeat Configuration #############################
 
-# This file is a full configuration example documenting all non-deprecated
-# options in comments. For a shorter configuration example, that contains only
-# the most common options, please see auditbeat.yml in the same directory.
+# This is a reference configuration file documenting all non-deprecated options
+# in comments. For a shorter configuration example that contains only the most
+# common options, please see auditbeat.yml in the same directory.
 #
 # You can find the full configuration reference here:
 # https://www.elastic.co/guide/en/beats/auditbeat/index.html
 
-#============================  Config Reloading ===============================
+#============================  Config Reloading ================================
 
 # Config reloading allows to dynamically load modules. Each file which is
 # monitored must contain one or multiple modules as a list.
@@ -26,15 +26,13 @@ auditbeat.config.modules:
 # disable startup delay.
 auditbeat.max_start_delay: 10s
 
-#==========================  Modules configuration ============================
+#==========================  Modules configuration =============================
 auditbeat.modules:
 
-#-------------------------------- Audit Module -------------------------------
+# The kernel metricset collects events from the audit framework in the Linux
+# kernel. You need to specify audit rules for the events that you want to audit.
 - module: audit
-  enabled: false
-  metricsets: [kernel, file]
-
-  # Kernel Metricset Options
+  metricsets: [kernel]
   kernel.resolve_ids: true
   kernel.failure_mode: silent
   kernel.backlog_limit: 8196
@@ -44,18 +42,25 @@ auditbeat.modules:
   kernel.audit_rules: |
     # Define audit rules here.
     # Create file watches (-w) or syscall audits (-a or -A). For example:
-    -w /etc/passwd -p wa -k identity
-    -a always,exit -F arch=b32 -S open,creat,truncate,ftruncate,openat,open_by_handle_at -F exit=-EPERM -k access
+    #-w /etc/passwd -p wa -k identity
+    #-a always,exit -F arch=b32 -S open,creat,truncate,ftruncate,openat,open_by_handle_at -F exit=-EPERM -k access
 
-  # File Metricset Options
+# The file integrity metricset sends events when files are changed (created,
+# updated, deleted). The events contain file metadata and hashes (MD5, SHA1, and
+# SHA256).
+- module: audit
+  metricsets: [file]
   file.paths:
     binaries:
+    - /bin
     - /usr/bin
+    - /sbin
     - /usr/sbin
-    libraries:
-    - /usr/lib
+    conf:
+    - /etc
+  
+  # Limit in bytes on the size of files that will be hashed.
   file.max_file_size: 1073741824 # 1 GiB
-
 
 
 #================================ General ======================================
