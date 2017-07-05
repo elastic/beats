@@ -1,0 +1,8 @@
+{
+  "description": "Test pipeline.",
+  "processors": [{
+    "remove":{
+      "field": "message"
+    }
+  }]
+}

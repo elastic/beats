@@ -28,6 +28,7 @@ type Config struct {
 	ShutdownTimeout  time.Duration    `config:"shutdown_timeout"`
 	Modules          []*common.Config `config:"modules"`
 	ConfigProspector *common.Config   `config:"config.prospectors"`
+	ConfigModules    *common.Config   `config:"config.modules"`
 }
 
 var (
