@@ -618,7 +618,7 @@ output.elasticsearch:
 
 #============================== Kibana =====================================
 
-# Starting with Beats version 6.0.0, the dashboards are loaded via the Kibana API. 
+# Starting with Beats version 6.0.0, the dashboards are loaded via the Kibana API.
 # This requires a Kibana endpoint configuration.
 setup.kibana:
 
@@ -669,19 +669,6 @@ setup.kibana:
   #ssl.curve_types: []
 
 
-
-#================================ HTTP Endpoint ======================================
-# Each beat can expose internal data points through a http endpoint. For security
-# reason the endpoint is disabled by default. This feature is currently in beta.
-
-# Defines if http endpoint is enabled
-#http.enabled: false
-
-# Host to expose the http endpoint to. It is recommended to use only localhost.
-#http.host: localhost
-
-# Port on which the http endpoint is exposed. Default is 5066
-#http.port: 5066
 
 #================================ Logging ======================================
 # There are three options for the log output: syslog, file, stderr.
