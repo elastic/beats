@@ -70,7 +70,7 @@ https://github.com/elastic/beats/compare/v5.4.1...master[Check the HEAD diff]
 
 *Filebeat*
 
-- Add support for loading Xpack Machine Learning configurations from the modules, and added sample configurations for the Nginx module. {pull}4506[4506]
+- Add support for loading Xpack Machine Learning configurations from the modules, and added sample configurations for the Nginx module. {pull}4506[4506] {pull}4609[4609]
 
 *Heartbeat*
 
