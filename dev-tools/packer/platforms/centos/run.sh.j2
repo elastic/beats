@@ -21,7 +21,8 @@ fi
 RPM_VERSION=`echo ${VERSION} | sed 's/-/_/g'`
 
 # create rpm
-COMMAND='fpm --force -s dir -t rpm
+FPM_ARGS=(
+        --force -s dir -t rpm
         -n {{.beat_pkg_name}} -v ${RPM_VERSION}
         --architecture {{.rpm_arch}}
         --vendor "{{.beat_vendor}}"
@@ -38,13 +39,14 @@ COMMAND='fpm --force -s dir -t rpm
         {{.beat_name}}-linux.reference.yml=/etc/{{.beat_name}}/{{.beat_name}}.reference.yml
         fields.yml=/etc/{{.beat_name}}/fields.yml
         ${RUNID}.service=/lib/systemd/system/{{.beat_pkg_name}}.service
-        god-linux-{{.arch}}=/usr/share/{{.beat_name}}/bin/{{.beat_name}}-god'
+        god-linux-{{.arch}}=/usr/share/{{.beat_name}}/bin/{{.beat_name}}-god
+  )
 
 if [ -d modules.d-linux ]; then
-  COMMAND="$COMMAND modules.d-linux/=/etc/{{.beat_name}}/modules.d/"
+  FPM_ARGS+=(modules.d-linux/=/etc/{{.beat_name}}/modules.d/)
 fi
 
-eval $COMMAND
+fpm "${FPM_ARGS[@]}"
 
 # rename so that the filename respects semver rules
 mkdir -p upload

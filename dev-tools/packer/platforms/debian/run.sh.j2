@@ -18,7 +18,8 @@ if [ "$SNAPSHOT" = "yes" ]; then
 fi
 
 # create deb
-COMMAND='fpm --force -s dir -t deb
+FPM_ARGS=(
+        --force -s dir -t deb
         -n {{.beat_pkg_name}} -v ${VERSION}
         --vendor "{{.beat_vendor}}"
         --license "{{.beat_license}}"
@@ -35,13 +36,14 @@ COMMAND='fpm --force -s dir -t deb
         {{.beat_name}}-linux.reference.yml=/etc/{{.beat_name}}/{{.beat_name}}.reference.yml
         fields.yml=/etc/{{.beat_name}}/fields.yml
         ${RUNID}.service=/lib/systemd/system/{{.beat_pkg_name}}.service
-        god-linux-{{.arch}}=/usr/share/{{.beat_name}}/bin/{{.beat_name}}-god'
+        god-linux-{{.arch}}=/usr/share/{{.beat_name}}/bin/{{.beat_name}}-god
+  )
 
 if [ -d modules.d-linux ]; then
-  COMMAND="$COMMAND modules.d-linux/=/etc/{{.beat_name}}/modules.d/"
+  FPM_ARGS+=(modules.d-linux/=/etc/{{.beat_name}}/modules.d/)
 fi
 
-eval $COMMAND
+fpm "${FPM_ARGS[@]}"
 
 # move and rename to use the elastic conventions
 mkdir -p upload
