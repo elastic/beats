@@ -19,5 +19,5 @@ var defaultDashboardsConfig = DashboardsConfig{
 }
 var (
 	defaultURLPattern  = "https://artifacts.elastic.co/downloads/beats/beats-dashboards/beats-dashboards-%s.zip"
-	snapshotURLPattern = "https://beats-nightlies.s3.amazonaws.com/dashboards/beats-dashboards-%s-SNAPSHOT.zip"
+	snapshotURLPattern = "https://snapshots.elastic.co/downloads/beats/beats-dashboards/beats-dashboards-%s-SNAPSHOT.zip"
 )
