@@ -21,7 +21,6 @@ import (
 type SnifferSetup struct {
 	pcapHandle     *pcap.Handle
 	afpacketHandle *afpacketHandle
-	pfringHandle   *pfringHandle
 	config         *config.InterfacesConfig
 	isAlive        bool
 	dumper         *pcap.Dumper
@@ -208,27 +207,6 @@ func (sniffer *SnifferSetup) setFromConfig(config *config.InterfacesConfig) erro
 		}
 
 		sniffer.DataSource = gopacket.PacketDataSource(sniffer.afpacketHandle)
-	case "pfring", "pf_ring":
-		sniffer.pfringHandle, err = newPfringHandle(
-			sniffer.config.Device,
-			sniffer.config.Snaplen,
-			true)
-
-		if err != nil {
-			return err
-		}
-
-		err = sniffer.pfringHandle.SetBPFFilter(sniffer.filter)
-		if err != nil {
-			return fmt.Errorf("SetBPFFilter failed: %s", err)
-		}
-
-		err = sniffer.pfringHandle.Enable()
-		if err != nil {
-			return fmt.Errorf("Enable failed: %s", err)
-		}
-
-		sniffer.DataSource = gopacket.PacketDataSource(sniffer.pfringHandle)
 
 	default:
 		return fmt.Errorf("Unknown sniffer type: %s", sniffer.config.Type)
@@ -396,8 +374,6 @@ func (sniffer *SnifferSetup) Close() error {
 		sniffer.pcapHandle.Close()
 	case "af_packet":
 		sniffer.afpacketHandle.Close()
-	case "pfring", "pf_ring":
-		sniffer.pfringHandle.Close()
 	}
 	return nil
 }

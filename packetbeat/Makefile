@@ -6,10 +6,6 @@ ES_BEATS?=..
 
 include ${ES_BEATS}/libbeat/scripts/Makefile
 
-.PHONY: with_pfring
-with_pfring:
-	go build --tags havepfring
-
 # This is called by the beats packer before building starts
 .PHONY: before-build
 before-build:
