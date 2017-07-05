@@ -14,29 +14,30 @@ import (
 
 // Factory for modules
 type Factory struct {
-	outlet         channel.Outleter
-	registrar      *registrar.Registrar
-	beatVersion    string
-	pipelineLoader PipelineLoader
-	beatDone       chan struct{}
+	outlet                channel.Outleter
+	registrar             *registrar.Registrar
+	beatVersion           string
+	pipelineLoaderFactory PipelineLoaderFactory
+	beatDone              chan struct{}
 }
 
 // Wrap an array of prospectors and implements cfgfile.Runner interface
 type prospectorsRunner struct {
-	id             uint64
-	moduleRegistry *ModuleRegistry
-	prospectors    []*prospector.Prospector
-	pipelineLoader PipelineLoader
+	id                    uint64
+	moduleRegistry        *ModuleRegistry
+	prospectors           []*prospector.Prospector
+	pipelineLoaderFactory PipelineLoaderFactory
 }
 
 // NewFactory instantiates a new Factory
-func NewFactory(outlet channel.Outleter, registrar *registrar.Registrar, beatVersion string, pipelineLoader PipelineLoader, beatDone chan struct{}) *Factory {
+func NewFactory(outlet channel.Outleter, registrar *registrar.Registrar, beatVersion string,
+	pipelineLoaderFactory PipelineLoaderFactory, beatDone chan struct{}) *Factory {
 	return &Factory{
-		outlet:         outlet,
-		registrar:      registrar,
-		beatVersion:    beatVersion,
-		beatDone:       beatDone,
-		pipelineLoader: pipelineLoader,
+		outlet:                outlet,
+		registrar:             registrar,
+		beatVersion:           beatVersion,
+		beatDone:              beatDone,
+		pipelineLoaderFactory: pipelineLoaderFactory,
 	}
 }
 
@@ -71,27 +72,33 @@ func (f *Factory) Create(c *common.Config) (cfgfile.Runner, error) {
 	}
 
 	return &prospectorsRunner{
-		id:             id,
-		moduleRegistry: m,
-		prospectors:    prospectors,
-		pipelineLoader: f.pipelineLoader,
+		id:                    id,
+		moduleRegistry:        m,
+		prospectors:           prospectors,
+		pipelineLoaderFactory: f.pipelineLoaderFactory,
 	}, nil
 }
 
 func (p *prospectorsRunner) Start() {
 	// Load pipelines
-	if p.pipelineLoader != nil {
-		// Setup a callback & load now too, as we are already connected
+	if p.pipelineLoaderFactory != nil {
+		// Load pipelines instantly and then setup a callback for reconnections:
+		pipelineLoader, err := p.pipelineLoaderFactory()
+		if err != nil {
+			logp.Err("Error loading pipeline: %s", err)
+		} else {
+			err := p.moduleRegistry.LoadPipelines(pipelineLoader)
+			if err != nil {
+				// Log error and continue
+				logp.Err("Error loading pipeline: %s", err)
+			}
+		}
+
+		// Callback:
 		callback := func(esClient *elasticsearch.Client) error {
-			return p.moduleRegistry.LoadPipelines(p.pipelineLoader)
+			return p.moduleRegistry.LoadPipelines(esClient)
 		}
 		elasticsearch.RegisterConnectCallback(callback)
-
-		err := p.moduleRegistry.LoadPipelines(p.pipelineLoader)
-		if err != nil {
-			// Log error and continue
-			logp.Err("Error loading pipeline: %s", err)
-		}
 	}
 
 	for _, prospector := range p.prospectors {

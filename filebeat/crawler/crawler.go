@@ -38,7 +38,8 @@ func New(out channel.Outleter, prospectorConfigs []*common.Config, beatVersion s
 }
 
 // Start starts the crawler with all prospectors
-func (c *Crawler) Start(r *registrar.Registrar, configProspectors *common.Config, configModules *common.Config, pipelineLoader fileset.PipelineLoader) error {
+func (c *Crawler) Start(r *registrar.Registrar, configProspectors *common.Config,
+	configModules *common.Config, pipelineLoaderFactory fileset.PipelineLoaderFactory) error {
 
 	logp.Info("Loading Prospectors: %v", len(c.prospectorConfigs))
 
@@ -64,7 +65,7 @@ func (c *Crawler) Start(r *registrar.Registrar, configProspectors *common.Config
 		logp.Beta("Loading separate modules is enabled.")
 
 		c.reloader = cfgfile.NewReloader(configModules)
-		factory := fileset.NewFactory(c.out, r, c.beatVersion, pipelineLoader, c.beatDone)
+		factory := fileset.NewFactory(c.out, r, c.beatVersion, pipelineLoaderFactory, c.beatDone)
 		go func() {
 			c.reloader.Run(factory)
 		}()
