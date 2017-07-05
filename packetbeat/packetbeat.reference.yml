@@ -18,9 +18,6 @@ packetbeat.interfaces.device: any
 # not the fastest option.
 # * af_packet, which uses memory-mapped sniffing. This option is faster than
 # libpcap and doesn't require a kernel module, but it's Linux-specific.
-# * pf_ring, which makes use of an ntop.org project. This setting provides the
-# best sniffing speed, but it requires a kernel module, and it's Linux-specific.
-# The default sniffer type is pcap.
 #packetbeat.interfaces.type: pcap
 
 # The maximum size of the packets to capture. The default is 65535, which is
