@@ -299,9 +299,14 @@ index-template: ## @build Generate index templates for the given $VERSION. This 
 
 ### KIBANA FILES HANDLING ###
 ES_URL?=http://localhost:9200
+KIBANA_URL?=http://localhost:5601
 
 ${ES_BEATS}/dev-tools/cmd/dashboards/export_dashboards:
 	$(MAKE) -C ${ES_BEATS}/dev-tools/cmd/dashboards export_dashboards
+
+.PHONY: import-dashboards
+import-dashboards: update ${BEAT_NAME}
+	${BEAT_GOPATH}/src/${BEAT_PATH}/${BEAT_NAME} setup -E setup.dashboards.directory=${PWD}/_meta/kibana -E setup.kibana.host=${KIBANA_URL} --dashboards
 
 ### CONTAINER ENVIRONMENT ####
 
