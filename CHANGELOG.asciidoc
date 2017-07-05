@@ -71,7 +71,8 @@ https://github.com/elastic/beats/compare/v6.0.0-alpha2...master[Check the HEAD d
 - Add experimental Redis module. {pull}4441[4441]
 - Nginx module: use the first not-private IP address as the remote_ip. {pull}4417[4417]
 - Load Ingest Node pipelines when the Elasticsearch connection is established, instead of only once at startup. {pull}4479[4479]
-- Add support for loading Xpack Machine Learning configurations from the modules, and added sample configurations for the Nginx module. {pull}4506[4506]
+- Add support for loading Xpack Machine Learning configurations from the modules, and added sample configurations for the Nginx module. {pull}4506[4506] {pull}4609[4609]
+
 - Add udp prospector type. {pull}4452[4452]
 - Enabled Cgo which means libc is dynamically compiled. {pull}4546[4546]
 - Add Beta module config reloading mechanism {pull}4566[4566]

@@ -14,7 +14,7 @@ RUN curl -Ls ${DOWNLOAD_URL}/kibana/kibana-${ELASTIC_VERSION}-linux-x86_64.tar.g
     ln -s /usr/share/kibana /opt/kibana
 
 # Install XPACK
-RUN if  [ ${XPACK} = 1]; then bin/kibana-plugin install ${DOWNLOAD_URL}/kibana-plugins/x-pack/x-pack-${ELASTIC_VERSION}.zip; fi
+RUN if [ ${XPACK} = "1" ]; then bin/kibana-plugin install ${DOWNLOAD_URL}/kibana-plugins/x-pack/x-pack-${ELASTIC_VERSION}.zip; fi
 
 # Set some Kibana configuration defaults.
 ADD config/kibana.yml /usr/share/kibana/config/
