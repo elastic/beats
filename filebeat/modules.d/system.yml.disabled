@@ -1,15 +1,15 @@
-#- module: system
+- module: system
   # Syslog
-  #syslog:
-    #enabled: true
+  syslog:
+    enabled: true
 
     # Set custom paths for the log files. If left empty,
     # Filebeat will choose the paths depending on your OS.
     #var.paths:
 
   # Authorization logs
-  #auth:
-    #enabled: true
+  auth:
+    enabled: true
 
     # Set custom paths for the log files. If left empty,
     # Filebeat will choose the paths depending on your OS.
