@@ -1,0 +1,9 @@
+dashboards:
+    - id: Filebeat-Nginx-Dashboard
+      file: Filebeat-nginx-overview.json
+
+    - id: ML-Nginx-Access-Remote-IP-Count-Explorer
+      file: ml-nginx-access-remote-ip-count-explorer.json
+
+    - id: ML-Nginx-Remote-IP-URL-Explorer
+      file: ml-nginx-remote-ip-url-explorer.json

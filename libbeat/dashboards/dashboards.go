@@ -98,7 +98,7 @@ func ImportDashboardsViaElasticsearch(config *common.Config, dashConfig *Dashboa
 	}
 
 	if version >= 6 {
-		logp.Warn("For Elasticsearch version >= 6.0.0, the Kibana dashboards need to be imported via the Kibana API.")
+		logp.Info("For Elasticsearch version >= 6.0.0, the Kibana dashboards need to be imported via the Kibana API.")
 		return false, nil
 	}
 

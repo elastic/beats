@@ -52,7 +52,7 @@ class Test(BaseTest):
             command = "..\..\..\dev-tools\cmd\dashboards\export_dashboards -kibana http://" + \
                 self.get_kibana_host() + ":" + self.get_kibana_port()
 
-        command = command + " Metricbeat-system-overview"
+        command = command + " -dashboard Metricbeat-system-overview"
 
         print(command)
 
