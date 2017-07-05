@@ -1,0 +1,38 @@
+{
+    "job_id": "JOB_ID",
+    "query_delay": "60s",
+    "frequency": "60s",
+    "indexes": [
+      "filebeat-*"
+    ],
+    "types": [
+      "_default_",
+      "log"
+    ],
+    "query": {
+      "match_all": {
+        "boost": 1
+      }
+    },
+    "aggregations": {
+      "buckets": {
+        "date_histogram": {
+          "field": "@timestamp",
+          "interval": 900000,
+          "offset": 0,
+          "order": {
+            "_key": "asc"
+          },
+          "keyed": false,
+          "min_doc_count": 0
+        },
+        "aggregations": {
+          "@timestamp": {
+            "max": {
+              "field": "@timestamp"
+            }
+          }
+        }
+      }
+    }
+}
