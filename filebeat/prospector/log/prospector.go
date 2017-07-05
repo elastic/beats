@@ -104,7 +104,7 @@ func (p *Prospector) loadStates(states []file.State) error {
 		}
 	}
 
-	logp.Info("Prospector with previous states loaded: %v", p.states.Count())
+	logp.Debug("prospector", "Prospector with previous states loaded: %v", p.states.Count())
 	return nil
 }
 

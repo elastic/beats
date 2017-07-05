@@ -24,6 +24,11 @@ import (
 	_ "github.com/elastic/beats/filebeat/processor/add_kubernetes_metadata"
 )
 
+const pipelinesWarning = "Filebeat is unable to load the Ingest Node pipelines for the configured" +
+	" modules because the Elasticsearch output is not configured/enabled. If you have" +
+	" already loaded the Ingest Node pipelines or are using Logstash pipelines, you" +
+	" can ignore this warning."
+
 var (
 	once = flag.Bool("once", false, "Run filebeat only once until all harvesters reach EOF")
 )
@@ -67,7 +72,7 @@ func New(b *beat.Beat, rawConfig *common.Config) (beat.Beater, error) {
 		}
 	}
 
-	if !config.ConfigProspector.Enabled() && !haveEnabledProspectors {
+	if !config.ConfigProspector.Enabled() && !config.ConfigModules.Enabled() && !haveEnabledProspectors {
 		if !b.InSetupCmd {
 			return nil, errors.New("No modules or prospectors enabled and configuration reloading disabled. What files do you want me to watch?")
 		} else {
@@ -76,7 +81,7 @@ func New(b *beat.Beat, rawConfig *common.Config) (beat.Beater, error) {
 		}
 	}
 
-	if *once && config.ConfigProspector.Enabled() {
+	if *once && config.ConfigProspector.Enabled() && config.ConfigModules.Enabled() {
 		return nil, errors.New("prospector configs and -once cannot be used together")
 	}
 
@@ -99,10 +104,7 @@ func New(b *beat.Beat, rawConfig *common.Config) (beat.Beater, error) {
 // setup.
 func (fb *Filebeat) loadModulesPipelines(b *beat.Beat) error {
 	if b.Config.Output.Name() != "elasticsearch" {
-		logp.Warn("Filebeat is unable to load the Ingest Node pipelines for the configured" +
-			" modules because the Elasticsearch output is not configured/enabled. If you have" +
-			" already loaded the Ingest Node pipelines or are using Logstash pipelines, you" +
-			" can ignore this warning.")
+		logp.Warn(pipelinesWarning)
 		return nil
 	}
 
@@ -176,7 +178,8 @@ func (fb *Filebeat) Run(b *beat.Beat) error {
 		return err
 	}
 
-	crawler, err := crawler.New(channel.NewOutlet(fb.done, spooler.Channel, wgEvents), config.Prospectors, fb.done, *once)
+	outlet := channel.NewOutlet(fb.done, spooler.Channel, wgEvents)
+	crawler, err := crawler.New(outlet, config.Prospectors, b.Info.Version, fb.done, *once)
 	if err != nil {
 		logp.Err("Could not init crawler: %v", err)
 		return err
@@ -218,7 +221,18 @@ func (fb *Filebeat) Run(b *beat.Beat) error {
 		spooler.Stop()
 	}()
 
-	err = crawler.Start(registrar, config.ConfigProspector)
+	var esClient fileset.PipelineLoader
+	if b.Config.Output.Name() == "elasticsearch" {
+		esConfig := b.Config.Output.Config()
+		esClient, err = elasticsearch.NewConnectedClient(esConfig)
+		if err != nil {
+			return errors.Wrap(err, "Error creating Elasticsearch client")
+		}
+	} else {
+		logp.Warn(pipelinesWarning)
+	}
+
+	err = crawler.Start(registrar, config.ConfigProspector, config.ConfigModules, esClient)
 	if err != nil {
 		crawler.Stop()
 		return err

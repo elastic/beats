@@ -265,8 +265,14 @@ filebeat.prospectors:
 #filebeat.shutdown_timeout: 0
 
 # Enable filebeat config reloading
-#filebeat.config.prospectors:
-  #enabled: false
-  #path: configs/*.yml
-  #reload.enabled: true
-  #reload.period: 10s
+#filebeat.config:
+  #prospectors:
+    #enabled: false
+    #path: prospectors.d/*.yml
+    #reload.enabled: true
+    #reload.period: 10s
+  #modules:
+    #enabled: false
+    #path: modules.d/*.yml
+    #reload.enabled: true
+    #reload.period: 10s
