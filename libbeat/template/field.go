@@ -139,7 +139,8 @@ func (f *Field) object() common.MapStr {
 
 	dynProperties := f.getDefaultProperties()
 
-	if f.ObjectType == "text" {
+	switch f.ObjectType {
+	case "text":
 		dynProperties["type"] = "text"
 
 		if f.esVersion.IsMajor(2) {
@@ -147,14 +148,10 @@ func (f *Field) object() common.MapStr {
 			dynProperties["index"] = "analyzed"
 		}
 		f.addDynamicTemplate(dynProperties, "string")
-	}
-
-	if f.ObjectType == "long" {
+	case "long":
 		dynProperties["type"] = f.ObjectType
 		f.addDynamicTemplate(dynProperties, "long")
-	}
-
-	if f.ObjectType == "keyword" {
+	case "keyword":
 		dynProperties["type"] = f.ObjectType
 		f.addDynamicTemplate(dynProperties, "string")
 	}
