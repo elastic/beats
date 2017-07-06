@@ -137,8 +137,10 @@ func (f *Field) array() common.MapStr {
 
 func (f *Field) object() common.MapStr {
 
-	if f.ObjectType == "text" {
-		dynProperties := f.getDefaultProperties()
+	dynProperties := f.getDefaultProperties()
+
+	switch f.ObjectType {
+	case "text":
 		dynProperties["type"] = "text"
 
 		if f.esVersion.IsMajor(2) {
@@ -146,12 +148,12 @@ func (f *Field) object() common.MapStr {
 			dynProperties["index"] = "analyzed"
 		}
 		f.addDynamicTemplate(dynProperties, "string")
-	}
-
-	if f.ObjectType == "long" {
-		dynProperties := f.getDefaultProperties()
-		dynProperties["type"] = "long"
+	case "long":
+		dynProperties["type"] = f.ObjectType
 		f.addDynamicTemplate(dynProperties, "long")
+	case "keyword":
+		dynProperties["type"] = f.ObjectType
+		f.addDynamicTemplate(dynProperties, "string")
 	}
 
 	properties := f.getDefaultProperties()
@@ -161,12 +163,16 @@ func (f *Field) object() common.MapStr {
 
 func (f *Field) addDynamicTemplate(properties common.MapStr, matchType string) {
 
+	path := ""
+	if len(f.path) > 0 {
+		path = f.path + "."
+	}
 	template := common.MapStr{
 		// Set the path of the field as name
-		f.path + "." + f.Name: common.MapStr{
+		path + f.Name: common.MapStr{
 			"mapping":            properties,
 			"match_mapping_type": matchType,
-			"path_match":         f.path + "." + f.Name + ".*",
+			"path_match":         path + f.Name + ".*",
 		},
 	}
 
