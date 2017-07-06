@@ -8,7 +8,12 @@ import (
 )
 
 // Factory for creating a broker used by a pipeline instance.
-type Factory func(*common.Config) (Broker, error)
+type Factory func(Eventer, *common.Config) (Broker, error)
+
+// Eventer listens to special events to be send by broker implementations.
+type Eventer interface {
+	OnACK(int) // number of consecutively published messages, acked by producers
+}
 
 // Broker is responsible for accepting, forwarding and ACKing events.
 // A broker will receive and buffer single events from its producers.
@@ -40,8 +45,8 @@ type BufferConfig struct {
 // ProducerConfig as used by the Pipeline to configure some custom callbacks
 // between pipeline and broker.
 type ProducerConfig struct {
-	// if ACK is set, the callback will be called with number of events being ACKed
-	// by the broker
+	// if ACK is set, the callback will be called with number of events produced
+	// by the producer instance and being ACKed by the broker.
 	ACK func(count int)
 
 	// OnDrop provided to the broker, to report events being silently dropped by

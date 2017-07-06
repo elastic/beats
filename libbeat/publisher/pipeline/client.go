@@ -67,15 +67,15 @@ func (c *client) Publish(e beat.Event) {
 	dropped := false
 	if c.canDrop {
 		if c.reportEvents {
-			c.pipeline.events.Add(1)
+			c.pipeline.waitCloser.inc()
 		}
 		dropped = !c.producer.TryPublish(pubEvent)
 		if dropped && c.reportEvents {
-			c.pipeline.activeEventsDone(1)
+			c.pipeline.waitCloser.dec(1)
 		}
 	} else {
 		if c.reportEvents {
-			c.pipeline.activeEventsAdd(1)
+			c.pipeline.waitCloser.inc()
 		}
 		c.producer.Publish(pubEvent)
 	}
@@ -99,7 +99,7 @@ func (c *client) Close() error {
 
 		if c.reportEvents {
 			log.Debugf("client: remove client events")
-			c.pipeline.activeEventsDone(n)
+			c.pipeline.waitCloser.dec(n)
 		}
 	}
 

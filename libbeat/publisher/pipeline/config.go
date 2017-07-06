@@ -45,7 +45,6 @@ func validateClientConfig(c *beat.ClientConfig) error {
 	// ACK handlers can not be registered DropIfFull is set, as dropping events
 	// due to full broker can not be accounted for in the clients acker.
 	if fnCount != 0 && withDrop {
-
 		return errors.New("ACK handlers with DropIfFull mode not supported")
 	}
 

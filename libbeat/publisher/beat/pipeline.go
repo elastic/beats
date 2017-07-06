@@ -57,6 +57,19 @@ type ClientConfig struct {
 	ACKLastEvent func(Event)
 }
 
+// PipelineACKHandler configures some pipeline-wide event ACK handler.
+type PipelineACKHandler struct {
+	// ACKCount reports the number of published events recently acknowledged
+	// by the pipeline.
+	ACKCount func(int)
+
+	// ACKEvents reports the events recently acknowledged by the pipeline.
+	ACKEvents func([]Event)
+
+	// ACKLastEvent reports the last ACKed event per pipeline client.
+	ACKLastEvents func([]Event)
+}
+
 type ProcessorList interface {
 	All() []Processor
 }

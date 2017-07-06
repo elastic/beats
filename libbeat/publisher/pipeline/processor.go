@@ -44,15 +44,17 @@ func (p *Pipeline) newProcessorPipeline(
 ) beat.Processor {
 	processors := &program{title: "processPipeline"}
 
+	global := p.processors
+
 	// setup 1: extract EventMetadataKey fields + tags
 	processors.add(preEventUserAnnotateProcessor)
 
 	// setup 2 and 3: generalize/normalize output (P)
 	processors.add(generalizeProcessor)
-	processors.add(p.beatMetaProcessor)
+	processors.add(global.beatMetaProcessor)
 
 	// setup 4: add event fields + tags (P)
-	processors.add(p.eventMetaProcessor)
+	processors.add(global.eventMetaProcessor)
 
 	// setup 5: add fields + tags (C)
 	if em := config.EventMetadata; len(em.Fields) > 0 || len(em.Tags) > 0 {
@@ -74,14 +76,14 @@ func (p *Pipeline) newProcessorPipeline(
 	}
 
 	// setup 8: pipeline processors (P)
-	processors.add(p.processors)
+	processors.add(global.processors)
 
 	// setup 9: debug print final event (P)
 	if logp.IsDebug("publish") {
 		processors.add(debugPrintProcessor())
 	}
 
-	if p.disabled {
+	if global.disabled {
 		processors.add(dropDisabledProcessor)
 	}
 
