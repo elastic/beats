@@ -2063,6 +2063,8 @@ Total memory resident set size.
 
 type: scaled_float
 
+format: percentage
+
 Memory resident set size percentage.
 
 
@@ -2087,6 +2089,8 @@ Max memory usage.
 === docker.memory.usage.pct
 
 type: scaled_float
+
+format: percentage
 
 Memory usage percentage.
 
