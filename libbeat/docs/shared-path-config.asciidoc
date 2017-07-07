@@ -51,7 +51,7 @@ Example:
 path.home: /usr/share/beats
 ------------------------------------------------------------------------------
 
-===== conf
+===== config
 
 The configuration path for the {beatname_uc} installation. This is the default base path
 for configuration files, including the main YAML configuration file and the
