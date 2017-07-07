@@ -27,12 +27,13 @@ func Test_Rotator(t *testing.T) {
 
 	rotateeverybytes := uint64(1000)
 	keepfiles := 3
-
+	perms := uint32(0655)
 	rotator := FileRotator{
 		Path:             dir,
 		Name:             "packetbeat",
 		RotateEveryBytes: &rotateeverybytes,
 		KeepFiles:        &keepfiles,
+		Permissions:      &perms,
 	}
 
 	err = rotator.Rotate()
@@ -120,12 +121,14 @@ func Test_Rotator_By_Bytes(t *testing.T) {
 
 	rotateeverybytes := uint64(100)
 	keepfiles := 3
+	perms := uint32(0655)
 
 	rotator := FileRotator{
 		Path:             dir,
 		Name:             "packetbeat",
 		RotateEveryBytes: &rotateeverybytes,
 		KeepFiles:        &keepfiles,
+		Permissions:      &perms,
 	}
 
 	for i := 0; i < 300; i++ {
@@ -189,12 +192,14 @@ func TestRaceConditions(t *testing.T) {
 
 	rotateeverybytes := uint64(10)
 	keepfiles := 20
+	perms := uint32(0600)
 
 	rotator := FileRotator{
 		Path:             dir,
 		Name:             "testbeat",
 		RotateEveryBytes: &rotateeverybytes,
 		KeepFiles:        &keepfiles,
+		Permissions:      &perms,
 	}
 
 	for i := 0; i < 1000; i++ {

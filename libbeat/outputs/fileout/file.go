@@ -61,6 +61,9 @@ func (out *fileOutput) init(beat beat.Info, config config) error {
 	logp.Info("File output path set to: %v", out.rotator.Path)
 	logp.Info("File output base filename set to: %v", out.rotator.Name)
 
+	logp.Info("File output permissions set to: %#o", config.Permissions)
+	out.rotator.Permissions = &config.Permissions
+
 	rotateeverybytes := uint64(config.RotateEveryKb) * 1024
 	logp.Info("Rotate every bytes set to: %v", rotateeverybytes)
 	out.rotator.RotateEveryBytes = &rotateeverybytes
