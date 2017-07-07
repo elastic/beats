@@ -1004,6 +1004,10 @@ output.elasticsearch:
   # default is 7 files.
   #number_of_files: 7
 
+  # Permissions to use for file creation.
+  # default is 0600.
+  #permissions: 0666
+
 
 #----------------------------- Console output ---------------------------------
 #output.console:
