@@ -38,13 +38,13 @@ func TestData(t *testing.T) {
 		},
 	}
 
-	f := mbtest.NewEventFetcher(t, config)
+	f := mbtest.NewEventsFetcher(t, config)
 
 	f.Fetch()
 
 	time.Sleep(60 * time.Millisecond)
 
-	err := mbtest.WriteEvent(f, t)
+	err := mbtest.WriteEvents(f, t)
 	if err != nil {
 		t.Fatal("write", err)
 	}
