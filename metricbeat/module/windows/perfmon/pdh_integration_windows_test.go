@@ -20,14 +20,20 @@ func TestData(t *testing.T) {
 		"module":     "windows",
 		"metricsets": []string{"perfmon"},
 		"perfmon.counters": []map[string]string{
-			{"alias": "processor.time.total.pct",
-				"query": `\Processor Information(_Total)\% Processor Time`,
+			{
+				"instance_label":    "processor.name",
+				"measurement_label": "processor.time.total.pct",
+				"query":             `\Processor Information(_Total)\% Processor Time`,
 			},
-			{"alias": "disk.bytes.read.total",
-				"query": `\FileSystem Disk Activity(_Total)\FileSystem Bytes Read`,
+			{
+				"instance_label":    "disk.bytes.name",
+				"measurement_label": "disk.bytes.read.total",
+				"query":             `\FileSystem Disk Activity(_Total)\FileSystem Bytes Read`,
 			},
-			{"alias": "processor.time.idle.average.ns",
-				"query": `\Processor Information(_Total)\Average Idle Time`,
+			{
+				"instance_label":    "processor.name",
+				"measurement_label": "processor.time.idle.average.ns",
+				"query":             `\Processor Information(_Total)\Average Idle Time`,
 			},
 		},
 	}
