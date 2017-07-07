@@ -21,7 +21,7 @@ func buildModulesManager(beat *beat.Beat) (cmd.ModulesManager, error) {
 		return nil, errors.Errorf("modules management requires 'metricbeat.config.modules.path' setting")
 	}
 
-	if !strings.HasSuffix(glob, ".yml") {
+	if !strings.HasSuffix(glob, "*.yml") {
 		return nil, errors.Errorf("wrong settings for config.modules.path, it is expected to end with *.yml. Got: %s", glob)
 	}
 

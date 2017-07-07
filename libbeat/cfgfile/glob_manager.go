@@ -46,7 +46,8 @@ func NewGlobManager(glob, enabledExtension, disabledExtension string) (*GlobMana
 }
 
 func (g *GlobManager) load() error {
-	g.files = []*cfgfile{}
+	// empty previous data
+	g.files = nil
 
 	// Load enabled
 	watcher := NewGlobWatcher(g.glob)
@@ -85,8 +86,7 @@ func (g *GlobManager) load() error {
 
 // ListEnabled conf files
 func (g *GlobManager) ListEnabled() []string {
-	names := []string{}
-
+	var names []string
 	for _, file := range g.files {
 		if file.enabled {
 			names = append(names, file.name)
@@ -98,8 +98,7 @@ func (g *GlobManager) ListEnabled() []string {
 
 // ListDisabled conf files
 func (g *GlobManager) ListDisabled() []string {
-	names := []string{}
-
+	var names []string
 	for _, file := range g.files {
 		if !file.enabled {
 			names = append(names, file.name)
