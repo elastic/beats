@@ -22,7 +22,6 @@ in <<configuration-metricbeat>>. Here is an example configuration:
 metricbeat.modules:
 - module: ceph
   metricsets: ["cluster_disk", "cluster_health", "monitor_health", "pool_disk"]
-  enabled: false
   period: 10s
   hosts: ["localhost:5000"]
 ----

@@ -38,7 +38,7 @@ func New(b *beat.Beat, rawConfig *common.Config) (beat.Beater, error) {
 	modules, err := module.NewWrappers(config.MaxStartDelay, config.Modules, mb.Registry)
 	if err != nil {
 		// Empty config is fine if dynamic config is enabled
-		if !config.ReloadModules.Enabled() {
+		if !config.ConfigModules.Enabled() {
 			return nil, err
 		} else if err != mb.ErrEmptyConfig && err != mb.ErrAllModulesDisabled {
 			return nil, err
@@ -72,9 +72,8 @@ func (bt *Metricbeat) Run(b *beat.Beat) error {
 		}()
 	}
 
-	if bt.config.ReloadModules.Enabled() {
-		logp.Beta("feature dynamic configuration reloading is enabled.")
-		moduleReloader := cfgfile.NewReloader(bt.config.ReloadModules)
+	if bt.config.ConfigModules.Enabled() {
+		moduleReloader := cfgfile.NewReloader(bt.config.ConfigModules)
 		factory := module.NewFactory(bt.config.MaxStartDelay, b.Publisher)
 
 		go moduleReloader.Run(factory)

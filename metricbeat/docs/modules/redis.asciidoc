@@ -42,7 +42,6 @@ in <<configuration-metricbeat>>. Here is an example configuration:
 metricbeat.modules:
 - module: redis
   metricsets: ["info", "keyspace"]
-  enabled: false
   period: 10s
 
   # Redis hosts

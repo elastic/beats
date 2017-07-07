@@ -7,93 +7,6 @@
 # You can find the full configuration reference here:
 # https://www.elastic.co/guide/en/beats/filebeat/index.html
 
-
-#==========================  Modules configuration ============================
-filebeat.modules:
-
-#------------------------------- System Module -------------------------------
-#- module: system
-  # Syslog
-  #syslog:
-    #enabled: true
-
-    # Set custom paths for the log files. If left empty,
-    # Filebeat will choose the paths depending on your OS.
-    #var.paths:
-
-  # Authorization logs
-  #auth:
-    #enabled: true
-
-    # Set custom paths for the log files. If left empty,
-    # Filebeat will choose the paths depending on your OS.
-    #var.paths:
-
-#------------------------------- Apache2 Module ------------------------------
-#- module: apache2
-  # Access logs
-  #access:
-    #enabled: true
-
-    # Set custom paths for the log files. If left empty,
-    # Filebeat will choose the paths depending on your OS.
-    #var.paths:
-
-  # Error logs
-  #error:
-    #enabled: true
-
-    # Set custom paths for the log files. If left empty,
-    # Filebeat will choose the paths depending on your OS.
-    #var.paths:
-
-#------------------------------- Auditd Module -------------------------------
-#- module: auditd
-  #log:
-    #enabled: true
-
-    # Set custom paths for the log files. If left empty,
-    # Filebeat will choose the paths depending on your OS.
-    #var.paths:
-
-
-#-------------------------------- MySQL Module -------------------------------
-#- module: mysql
-  # Error logs
-  #error:
-    #enabled: true
-
-    # Set custom paths for the log files. If left empty,
-    # Filebeat will choose the paths depending on your OS.
-    #var.paths:
-
-  # Slow logs
-  #slowlog:
-    #enabled: true
-
-    # Set custom paths for the log files. If left empty,
-    # Filebeat will choose the paths depending on your OS.
-    #var.paths:
-
-#-------------------------------- Nginx Module -------------------------------
-#- module: nginx
-  # Access logs
-  #access:
-    #enabled: true
-
-    # Set custom paths for the log files. If left empty,
-    # Filebeat will choose the paths depending on your OS.
-    #var.paths:
-
-  # Error logs
-  #error:
-    #enabled: true
-
-    # Set custom paths for the log files. If left empty,
-    # Filebeat will choose the paths depending on your OS.
-    #var.paths:
-
-
 # For more available modules and options, please see the filebeat.reference.yml sample
 # configuration file.
 
@@ -149,6 +62,18 @@ filebeat.prospectors:
   # Note: After is the equivalent to previous and before is the equivalent to to next in Logstash
   #multiline.match: after
 
+
+#============================= Filebeat modules ===============================
+
+filebeat.config.modules:
+  # Glob pattern for configuration loading
+  path: ${path.config}/modules.d/*.yml
+
+  # Set to true to enable config reloading
+  reload.enabled: false
+
+  # Period on which files under path should be checked for changes
+  #reload.period: 10s
 
 #================================ General =====================================
 

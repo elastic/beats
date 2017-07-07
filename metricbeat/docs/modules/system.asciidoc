@@ -86,7 +86,6 @@ in <<configuration-metricbeat>>. Here is an example configuration:
 ----
 metricbeat.modules:
 - module: system
-  enabled: true
   period: 10s
   metricsets:
     - cpu
@@ -102,8 +101,8 @@ metricbeat.modules:
   process.include_top_n:
     by_cpu: 5      # include top 5 processes by CPU
     by_memory: 5   # include top 5 processes by memory
+
 - module: system
-  enabled: true
   period: 1m
   metricsets:
     - filesystem

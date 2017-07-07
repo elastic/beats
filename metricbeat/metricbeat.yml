@@ -8,35 +8,15 @@
 # https://www.elastic.co/guide/en/beats/metricbeat/index.html
 
 #==========================  Modules configuration ============================
-metricbeat.modules:
+metricbeat.config.modules:
+  # Glob pattern for configuration loading
+  path: ${path.config}/modules.d/*.yml
 
-#------------------------------- System Module -------------------------------
-- module: system
-  enabled: true
-  period: 10s
-  metricsets:
-    - cpu
-    - load
-    - memory
-    - network
-    - process
-    - process_summary
-    #- core
-    #- diskio
-    #- socket
-  processes: ['.*']
-  process.include_top_n:
-    by_cpu: 5      # include top 5 processes by CPU
-    by_memory: 5   # include top 5 processes by memory
-- module: system
-  enabled: true
-  period: 1m
-  metricsets:
-    - filesystem
-    - fsstat
-  filters:
-    - drop_event.when.regexp.mount_point: '^/(sys|cgroup|proc|dev|etc|host|lib)($|/)'
+  # Set to true to enable config reloading
+  reload.enabled: false
 
+  # Period on which files under path should be checked for changes
+  #reload.period: 10s
 
 #==================== Elasticsearch template setting ==========================
 setup.template.settings:

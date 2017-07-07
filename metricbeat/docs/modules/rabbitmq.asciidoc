@@ -20,7 +20,6 @@ in <<configuration-metricbeat>>. Here is an example configuration:
 metricbeat.modules:
 - module: rabbitmq
   metricsets: ["node"]
-  enabled: false
   period: 10s
   hosts: ["localhost:15672"]
 

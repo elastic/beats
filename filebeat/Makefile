@@ -36,11 +36,13 @@ modules:
 .PHONY: configs
 configs: python-env
 	@cp ${ES_BEATS}/filebeat/_meta/common.p1.yml _meta/beat.yml
-	@${PYTHON_ENV}/bin/python ${ES_BEATS}/script/config_collector.py --beat ${BEAT_NAME} $(PWD) >> _meta/beat.yml
 	@cat ${ES_BEATS}/filebeat/_meta/common.p2.yml >> _meta/beat.yml
-	@cp ${ES_BEATS}/filebeat/_meta/common.reference.p1.yml _meta/beat.reference.yml
-	@${PYTHON_ENV}/bin/python ${ES_BEATS}/script/config_collector.py --beat ${BEAT_NAME} --full $(PWD) >> _meta/beat.reference.yml
+	@cat ${ES_BEATS}/filebeat/_meta/common.reference.p1.yml > _meta/beat.reference.yml
+	@${PYTHON_ENV}/bin/python  ${ES_BEATS}/script/config_collector.py --beat ${BEAT_NAME} --full $(PWD) >> _meta/beat.reference.yml
 	@cat ${ES_BEATS}/filebeat/_meta/common.reference.p2.yml >> _meta/beat.reference.yml
+	@rm -rf modules.d && mkdir -p modules.d
+	@for MODULE in `ls module | grep -v .go`; do cp -a $(PWD)/module/$$MODULE/_meta/config.yml modules.d/$$MODULE.yml.disabled; done
+	@chmod go-w modules.d/*
 
 # Collects all module docs
 .PHONY: collect-docs

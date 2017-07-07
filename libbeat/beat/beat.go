@@ -213,8 +213,8 @@ func (b *Beat) Init() error {
 	return nil
 }
 
-// load the beats config section
-func (b *Beat) config() (*common.Config, error) {
+// BeatConfig returns config section for this beat
+func (b *Beat) BeatConfig() (*common.Config, error) {
 	configName := strings.ToLower(b.Info.Beat)
 	if b.RawConfig.HasField(configName) {
 		sub, err := b.RawConfig.Child(configName, -1)
@@ -231,7 +231,7 @@ func (b *Beat) config() (*common.Config, error) {
 // create and return the beater, this method also initializes all needed items,
 // including template registering, publisher, xpack monitoring
 func (b *Beat) createBeater(bt Creator) (Beater, error) {
-	sub, err := b.config()
+	sub, err := b.BeatConfig()
 	if err != nil {
 		return nil, err
 	}
