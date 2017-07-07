@@ -71,6 +71,7 @@ https://github.com/elastic/beats/compare/v6.0.0-beta2...master[Check the HEAD di
 - Fix reloader error message to only print on actual error {pull}5066[5066]
 - Add support for enabling TLS renegotiation. {issue}4386[4386]
 - Add Azure VM support for add_cloud_metadata processor {pull}5355[5355]
+- Add `output.file.permission` config option. {pull}4638[4638]
 
 *Auditbeat*
 
