@@ -26,7 +26,6 @@ in <<configuration-metricbeat>>. Here is an example configuration:
 metricbeat.modules:
 # Node metrics, from kubelet:
 - module: kubernetes
-  enabled: false
   metricsets:
     - node
     - system
@@ -53,7 +52,6 @@ metricbeat.modules:
   enabled: false
   metricsets:
     - event
-  in_cluster: true
 ----
 
 [float]

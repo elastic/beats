@@ -19,11 +19,8 @@ in <<configuration-metricbeat>>. Here is an example configuration:
 metricbeat.modules:
 - module: elasticsearch
   metricsets: ["node", "node_stats"]
-  enabled: false
   period: 10s
   hosts: ["localhost:9200"]
-
-
 ----
 
 [float]

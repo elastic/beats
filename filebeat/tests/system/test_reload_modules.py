@@ -27,7 +27,9 @@ class Test(BaseTest):
 
     def setUp(self):
         super(BaseTest, self).setUp()
-        self.es = Elasticsearch([self.get_elasticsearch_url()])
+        if INTEGRATION_TESTS:
+            self.es = Elasticsearch([self.get_elasticsearch_url()])
+
         # Copy system module
         shutil.copytree(os.path.join("module", "test"),
                         os.path.join(self.working_dir, "module", "test"))
@@ -92,6 +94,29 @@ class Test(BaseTest):
         self.wait_until(lambda: any(re.match("filebeat-.*-test-test-default", key)
                                     for key in self.es.transport.perform_request("GET", "/_ingest/pipeline/").keys()))
         proc.check_kill_and_wait()
+
+    def test_no_es_connection(self):
+        """
+        Test pipeline loading failures don't crash filebeat
+        """
+        self.render_config_template(
+            reload=True,
+            reload_path=self.working_dir + "/configs/*.yml",
+            reload_type="modules",
+            prospectors=False,
+            elasticsearch={"host": 'errorhost:9201'}
+        )
+
+        proc = self.start_beat()
+
+        os.mkdir(self.working_dir + "/configs/")
+        with open(self.working_dir + "/configs/system.yml.test", 'w') as f:
+            f.write(moduleConfigTemplate.format(self.working_dir + "/logs/*"))
+        os.rename(self.working_dir + "/configs/system.yml.test",
+                  self.working_dir + "/configs/system.yml")
+
+        self.wait_until(lambda: self.log_contains("Error loading pipeline: Error creating Elasticsearch client"))
+        proc.check_kill_and_wait(0)
 
     def test_start_stop(self):
         """

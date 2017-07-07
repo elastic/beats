@@ -221,18 +221,15 @@ func (fb *Filebeat) Run(b *beat.Beat) error {
 		spooler.Stop()
 	}()
 
-	var esClient fileset.PipelineLoader
+	// Create a ES connection factory for dynamic modules pipeline loading
+	var pipelineLoaderFactory fileset.PipelineLoaderFactory
 	if b.Config.Output.Name() == "elasticsearch" {
-		esConfig := b.Config.Output.Config()
-		esClient, err = elasticsearch.NewConnectedClient(esConfig)
-		if err != nil {
-			return errors.Wrap(err, "Error creating Elasticsearch client")
-		}
+		pipelineLoaderFactory = newPipelineLoaderFactory(b.Config.Output.Config())
 	} else {
 		logp.Warn(pipelinesWarning)
 	}
 
-	err = crawler.Start(registrar, config.ConfigProspector, config.ConfigModules, esClient)
+	err = crawler.Start(registrar, config.ConfigProspector, config.ConfigModules, pipelineLoaderFactory)
 	if err != nil {
 		crawler.Stop()
 		return err
@@ -284,4 +281,16 @@ func (fb *Filebeat) Stop() {
 
 	// Stop Filebeat
 	close(fb.done)
+}
+
+// Create a new pipeline loader (es client) factory
+func newPipelineLoaderFactory(esConfig *common.Config) fileset.PipelineLoaderFactory {
+	pipelineLoaderFactory := func() (fileset.PipelineLoader, error) {
+		esClient, err := elasticsearch.NewConnectedClient(esConfig)
+		if err != nil {
+			return nil, errors.Wrap(err, "Error creating Elasticsearch client")
+		}
+		return esClient, nil
+	}
+	return pipelineLoaderFactory
 }

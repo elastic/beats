@@ -19,16 +19,22 @@ cp fields.yml $PREFIX/fields.yml
 cp $BEAT_NAME.yml $PREFIX/$BEAT_NAME-linux.yml
 chmod 0600 $PREFIX/$BEAT_NAME-linux.yml
 cp $BEAT_NAME.reference.yml $PREFIX/$BEAT_NAME-linux.reference.yml
+rm -rf $PREFIX/modules.d-linux
+cp -a modules.d/ $PREFIX/modules.d-linux || true
 
 # darwin
 cp $BEAT_NAME.yml $PREFIX/$BEAT_NAME-darwin.yml
 chmod 0600 $PREFIX/$BEAT_NAME-darwin.yml
 cp $BEAT_NAME.reference.yml $PREFIX/$BEAT_NAME-darwin.reference.yml
+rm -rf $PREFIX/modules.d-darwin
+cp -a modules.d/ $PREFIX/modules.d-darwin || true
 
 # win
 cp $BEAT_NAME.yml $PREFIX/$BEAT_NAME-win.yml
 chmod 0600 $PREFIX/$BEAT_NAME-win.yml
 cp $BEAT_NAME.reference.yml $PREFIX/$BEAT_NAME-win.reference.yml
+rm -rf $PREFIX/modules.d-win
+cp -a modules.d/ $PREFIX/modules.d-win || true
 
 # Runs beat specific tasks which should be done before building
 PREFIX=$PREFIX make before-build
@@ -49,4 +55,3 @@ sed -i -e 's/:doc-branch/doc_branch/g' ${PREFIX}/package.yml
 
 # Create README file
 /go/bin/gotpl /templates/readme.md.j2 < ${PREFIX}/package.yml > ${PREFIX}/homedir/README.md
-

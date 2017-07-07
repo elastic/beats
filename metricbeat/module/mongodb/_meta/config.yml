@@ -1,6 +1,5 @@
 - module: mongodb
   metricsets: ["dbstats", "status"]
-  enabled: false
   period: 10s
 
   # The hosts must be passed as MongoDB URLs in the format:
