@@ -9,6 +9,7 @@ import (
 	"time"
 
 	"github.com/elastic/beats/libbeat/common"
+	"github.com/elastic/beats/libbeat/common/atomic"
 	"github.com/elastic/beats/libbeat/logp"
 	"github.com/elastic/beats/libbeat/outputs"
 	"github.com/elastic/beats/libbeat/processors"
@@ -35,12 +36,24 @@ type Pipeline struct {
 	broker broker.Broker
 	output *outputController
 
-	waitClose     time.Duration
-	waitCloseMode WaitCloseMode
+	eventer pipelineEventer
 
-	// keep track of total number of active events (minus dropped by processors)
-	events sync.WaitGroup
+	// wait close support
+	waitCloseMode    WaitCloseMode
+	waitCloseTimeout time.Duration
+	waitCloser       *waitCloser
 
+	// pipeline ack
+	ackMode    pipelineACKMode
+	ackActive  atomic.Bool
+	ackDone    chan struct{}
+	ackBuilder ackBuilder
+	eventSema  *sema
+
+	processors pipelineProcessors
+}
+
+type pipelineProcessors struct {
 	// The pipeline its processor settings for
 	// constructing the clients complete processor
 	// pipeline on connect.
@@ -91,6 +104,21 @@ const (
 	WaitOnClientClose
 )
 
+type pipelineEventer struct {
+	mutex      sync.Mutex
+	modifyable bool
+
+	waitClose *waitCloser
+	cb        *pipelineEventCB
+}
+
+type waitCloser struct {
+	// keep track of total number of active events (minus dropped by processors)
+	events sync.WaitGroup
+}
+
+type brokerFactory func(broker.Eventer) (broker.Broker, error)
+
 // Load uses a Config object to create a new complete Pipeline instance with
 // configured broker and outputs.
 func Load(beatInfo common.BeatInfo, config Config) (*Pipeline, error) {
@@ -98,24 +126,21 @@ func Load(beatInfo common.BeatInfo, config Config) (*Pipeline, error) {
 		return nil, errors.New("no output configured")
 	}
 
-	broker, err := broker.Load(config.Broker)
-	if err != nil {
-		return nil, err
+	brokerFactory := func(e broker.Eventer) (broker.Broker, error) {
+		return broker.Load(e, config.Broker)
 	}
 
 	output, err := outputs.Load(beatInfo, config.Output.Name(), config.Output.Config())
 	if err != nil {
-		broker.Close()
 		return nil, err
 	}
 
 	// TODO: configure pipeline processors
-	pipeline, err := New(broker, output, Settings{
+	pipeline, err := New(brokerFactory, output, Settings{
 		WaitClose:     config.WaitShutdown,
 		WaitCloseMode: WaitOnPipelineClose,
 	})
 	if err != nil {
-		broker.Close()
 		for _, c := range output.Clients {
 			c.Close()
 		}
@@ -129,12 +154,13 @@ func Load(beatInfo common.BeatInfo, config Config) (*Pipeline, error) {
 // The new pipeline will take ownership of broker and outputs. On Close, the
 // broker and outputs will be closed.
 func New(
-	broker broker.Broker,
+	brokerFactory brokerFactory,
 	out outputs.Group,
 	settings Settings,
 ) (*Pipeline, error) {
 
 	annotations := settings.Annotations
+	var err error
 
 	var beatMeta beat.Processor
 	if meta := annotations.Beat; meta != nil {
@@ -157,19 +183,76 @@ func New(
 
 	log := defaultLogger
 	p := &Pipeline{
-		logger:             log,
-		broker:             broker,
-		output:             newOutputController(log, broker),
-		waitClose:          settings.WaitClose,
-		waitCloseMode:      settings.WaitCloseMode,
-		beatMetaProcessor:  beatMeta,
-		eventMetaProcessor: eventMeta,
-		processors:         prog,
-		disabled:           settings.Disabled,
+		logger:           log,
+		waitCloseMode:    settings.WaitCloseMode,
+		waitCloseTimeout: settings.WaitClose,
+		processors: pipelineProcessors{
+			beatMetaProcessor:  beatMeta,
+			eventMetaProcessor: eventMeta,
+			processors:         prog,
+			disabled:           settings.Disabled,
+		},
+	}
+	p.ackBuilder = &pipelineEmptyACK{p}
+	p.ackActive = atomic.MakeBool(true)
+	p.eventer.modifyable = true
+
+	if settings.WaitCloseMode == WaitOnPipelineClose && settings.WaitClose > 0 {
+		p.waitCloser = &waitCloser{}
+
+		// waitCloser decrements counter on broker ACK (not per client)
+		p.eventer.waitClose = p.waitCloser
 	}
 
+	p.broker, err = brokerFactory(&p.eventer)
+	if err != nil {
+		return nil, err
+	}
+	p.eventSema = newSema(p.broker.BufferConfig().Events)
+
+	p.output = newOutputController(log, p.broker)
 	p.output.Set(out)
+
 	return p, nil
+}
+
+// SetACKHandler sets a global ACK handler on all events published to the pipeline.
+// SetACKHandler must be called before any connection is made.
+func (p *Pipeline) SetACKHandler(handler beat.PipelineACKHandler) error {
+	p.eventer.mutex.Lock()
+	defer p.eventer.mutex.Unlock()
+
+	if !p.eventer.modifyable {
+		return errors.New("can not set ack handler on already active pipeline")
+	}
+
+	// TODO: check only one type being configured
+
+	cb, err := newPipelineEventCB(handler)
+	if err != nil {
+		return err
+	}
+
+	if cb == nil {
+		p.ackBuilder = &pipelineEmptyACK{p}
+		p.eventer.cb = nil
+		return nil
+	}
+
+	p.eventer.cb = cb
+	if cb.mode == countACKMode {
+		p.ackBuilder = &pipelineCountACK{
+			pipeline: p,
+			cb:       cb.onCounts,
+		}
+	} else {
+		p.ackBuilder = &pipelineEventsACK{
+			pipeline: p,
+			cb:       cb.onEvents,
+		}
+	}
+
+	return nil
 }
 
 // Close stops the pipeline, outputs and broker.
@@ -181,10 +264,10 @@ func (p *Pipeline) Close() error {
 
 	log.Debug("close pipeline")
 
-	if p.waitClose > 0 && p.waitCloseMode == WaitOnPipelineClose {
+	if p.waitCloser != nil {
 		ch := make(chan struct{})
 		go func() {
-			p.events.Wait()
+			p.waitCloser.wait()
 			ch <- struct{}{}
 		}()
 
@@ -192,9 +275,10 @@ func (p *Pipeline) Close() error {
 		case <-ch:
 			// all events have been ACKed
 
-		case <-time.After(p.waitClose):
+		case <-time.After(p.waitCloseTimeout):
 			// timeout -> close pipeline with pending events
 		}
+
 	}
 
 	// TODO: close/disconnect still active clients
@@ -216,16 +300,6 @@ func (p *Pipeline) Connect() (beat.Client, error) {
 	return p.ConnectWith(beat.ClientConfig{})
 }
 
-func (p *Pipeline) activeEventsAdd(n int) {
-	p.events.Add(n)
-}
-
-func (p *Pipeline) activeEventsDone(n int) {
-	for i := 0; i < n; i++ {
-		p.events.Done()
-	}
-}
-
 // ConnectWith create a new Client for publishing events to the pipeline.
 // The client behavior on close and ACK handling can be configured by setting
 // the appropriate fields in the passed ClientConfig.
@@ -240,6 +314,10 @@ func (p *Pipeline) ConnectWith(cfg beat.ClientConfig) (beat.Client, error) {
 		return nil, err
 	}
 
+	p.eventer.mutex.Lock()
+	p.eventer.modifyable = false
+	p.eventer.mutex.Unlock()
+
 	switch cfg.PublishMode {
 	case beat.GuaranteedSend:
 		eventFlags = publisher.GuaranteedSend
@@ -248,39 +326,28 @@ func (p *Pipeline) ConnectWith(cfg beat.ClientConfig) (beat.Client, error) {
 	}
 
 	waitClose := cfg.WaitClose
-	var reportEvents bool
+	reportEvents := p.waitCloser != nil
 
 	switch p.waitCloseMode {
 	case NoWaitOnClose:
 
 	case WaitOnClientClose:
 		if waitClose <= 0 {
-			waitClose = p.waitClose
+			waitClose = p.waitCloseTimeout
 		}
-
-	case WaitOnPipelineClose:
-		reportEvents = p.waitClose > 0
 	}
 
 	processors := p.newProcessorPipeline(cfg)
-	acker := makeACKer(processors != nil, &cfg, waitClose)
-	producerCfg := broker.ProducerConfig{}
 
-	// only cancel events from broker if acker is configured
-	cancelEvents := acker != nil
+	acker := p.makeACKer(processors != nil, &cfg, waitClose)
+	producerCfg := broker.ProducerConfig{
+		// only cancel events from broker if acker is configured
+		// and no pipeline-wide ACK handler is registered
+		DropOnCancel: acker != nil && p.eventer.cb == nil,
+	}
 
-	// configure client and acker to report events to pipeline.events
-	// for handling waitClose
 	if reportEvents {
-		if acker == nil {
-			acker = nilACKer
-		}
-
-		acker = &pipelineACK{
-			pipeline: p,
-			acker:    acker,
-		}
-		producerCfg.OnDrop = p.activeEventsDone
+		producerCfg.OnDrop = p.waitCloser.dec
 	}
 
 	if acker != nil {
@@ -297,30 +364,31 @@ func (p *Pipeline) ConnectWith(cfg beat.ClientConfig) (beat.Client, error) {
 		acker:        acker,
 		eventFlags:   eventFlags,
 		canDrop:      canDrop,
-		cancelEvents: cancelEvents,
 		reportEvents: reportEvents,
 	}
 
 	return client, nil
 }
 
-func makeACKer(
-	withProcessors bool,
-	cfg *beat.ClientConfig,
-	waitClose time.Duration,
-) acker {
-	// maximum number of events that can be published (including drops) without ACK.
-	//
-	// TODO: this MUST be configurable and should be max broker buffer size...
-	gapEventBuffer := 64
-
-	switch {
-	case cfg.ACKCount != nil:
-		return makeCountACK(withProcessors, gapEventBuffer, waitClose, cfg.ACKCount)
-	case cfg.ACKEvents != nil:
-		return newEventACK(withProcessors, gapEventBuffer, waitClose, cfg.ACKEvents)
-	case cfg.ACKLastEvent != nil:
-		return newEventACK(withProcessors, gapEventBuffer, waitClose, lastEventACK(cfg.ACKLastEvent))
+func (e *pipelineEventer) OnACK(n int) {
+	if wc := e.waitClose; wc != nil {
+		wc.dec(n)
 	}
-	return nil
+	if e.cb != nil {
+		e.cb.reportBrokerACK(n)
+	}
+}
+
+func (e *waitCloser) inc() {
+	e.events.Add(1)
+}
+
+func (e *waitCloser) dec(n int) {
+	for i := 0; i < n; i++ {
+		e.events.Done()
+	}
+}
+
+func (e *waitCloser) wait() {
+	e.events.Wait()
 }

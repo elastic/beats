@@ -1,8 +1,10 @@
 package membroker
 
 import (
+	"fmt"
 	"math"
 	"sync"
+	"time"
 
 	"github.com/elastic/beats/libbeat/common"
 	"github.com/elastic/beats/libbeat/publisher/broker"
@@ -26,6 +28,8 @@ type Broker struct {
 
 	ackSeq uint
 
+	eventer broker.Eventer
+
 	// wait group for worker shutdown
 	wg          sync.WaitGroup
 	waitOnClose bool
@@ -47,20 +51,22 @@ func init() {
 	broker.RegisterType("mem", create)
 }
 
-func create(cfg *common.Config) (broker.Broker, error) {
+func create(eventer broker.Eventer, cfg *common.Config) (broker.Broker, error) {
 	config := defaultConfig
 	if err := cfg.Unpack(&config); err != nil {
 		return nil, err
 	}
 
-	b := NewBroker(config.Events, false)
+	b := NewBroker(eventer, config.Events, false)
 	return b, nil
 }
 
 // NewBroker creates a new in-memory broker holding up to sz number of events.
 // If waitOnClose is set to true, the broker will block on Close, until all internal
 // workers handling incoming messages and ACKs have been shut down.
-func NewBroker(sz int, waitOnClose bool) *Broker {
+func NewBroker(eventer broker.Eventer, sz int, waitOnClose bool) *Broker {
+	// define internal channel size for procuder/client requests
+	// to the broker
 	chanSize := 20
 
 	logger := defaultLogger
@@ -78,6 +84,8 @@ func NewBroker(sz int, waitOnClose bool) *Broker {
 		scheduledACKs: make(chan chanList),
 
 		waitOnClose: waitOnClose,
+
+		eventer: eventer,
 	}
 	b.buf.init(logger, sz)
 
@@ -104,8 +112,14 @@ func (b *Broker) Close() error {
 	return nil
 }
 
+func (b *Broker) BufferConfig() broker.BufferConfig {
+	return broker.BufferConfig{
+		Events: b.buf.Size(),
+	}
+}
+
 func (b *Broker) Producer(cfg broker.ProducerConfig) broker.Producer {
-	return newProducer(b, cfg.ACK, cfg.OnDrop)
+	return newProducer(b, cfg.ACK, cfg.OnDrop, cfg.DropOnCancel)
 }
 
 func (b *Broker) Consumer() broker.Consumer {
@@ -242,10 +256,28 @@ func (b *Broker) insert(req pushRequest) (int, bool) {
 	return avail, true
 }
 
-func (b *Broker) reportACK(states []clientState, start, end int) {
-	N := end - start
-	b.logger.Debug("handle ACKs: ", N)
-	idx := end - 1
+func (b *Broker) reportACK(states []clientState, start, N int) {
+	{
+		start := time.Now()
+		b.logger.Debug("handle ACKs: ", N)
+		defer func() {
+			b.logger.Debug("handle ACK took: ", time.Since(start))
+		}()
+	}
+
+	if e := b.eventer; e != nil {
+		e.OnACK(N)
+	}
+
+	// TODO: global boolean to check if clients will need an ACK
+	//       no need to report ACKs if no client is interested in ACKs
+
+	idx := start + N - 1
+	if idx >= len(states) {
+		idx -= len(states)
+	}
+
+	total := 0
 	for i := N - 1; i >= 0; i-- {
 		if idx < 0 {
 			idx = len(states) - 1
@@ -275,6 +307,14 @@ func (b *Broker) reportACK(states []clientState, start, end int) {
 			st.state.lastACK+1,
 			st.seq,
 		)
+
+		total += int(count)
+		if total > N {
+			panic(fmt.Sprintf("Too many events acked (expected=%v, total=%v)",
+				count, total,
+			))
+		}
+
 		st.state.cb(int(count))
 		st.state.lastACK = st.seq
 		st.state = nil

@@ -32,8 +32,8 @@ type TransactionalEventPublisher interface {
 
 type Publisher interface {
 	Connect() Client
-
 	ConnectX(beat.ClientConfig) (beat.Client, error)
+	SetACKHandler(beat.PipelineACKHandler) error
 }
 
 type BeatPublisher struct {
@@ -124,6 +124,10 @@ func (publisher *BeatPublisher) Connect() Client {
 
 func (publisher *BeatPublisher) ConnectX(config beat.ClientConfig) (beat.Client, error) {
 	return publisher.pipeline.ConnectWith(config)
+}
+
+func (publisher *BeatPublisher) SetACKHandler(h beat.PipelineACKHandler) error {
+	return publisher.pipeline.SetACKHandler(h)
 }
 
 func (publisher *BeatPublisher) GetName() string {
