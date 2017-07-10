@@ -19,6 +19,7 @@ https://github.com/elastic/beats/compare/v6.0.0-alpha2...master[Check the HEAD d
 - The `scripts/import_dashboards` is removed from packages. Use the `setup` command instead. {pull}4586[4586]
 - Change format of the saved kibana dashboards to have a single JSON file for each dashboard {pull}4413[4413]
 - Rename `configtest` command to `test config`. {pull}4590[4590]
+- Remove setting `queue_size` and `bulk_queue_size`. {pull}4650[4650]
 
 *Filebeat*
 
@@ -70,6 +71,8 @@ https://github.com/elastic/beats/compare/v6.0.0-alpha2...master[Check the HEAD d
 - Add support for analyzers and multifields in fields.yml. {pull}4574[4574]
 - Add support for JSON logging. {pull}4523[4523]
 - Add `test output` command, to test Elasticsearch and Logstash output settings. {pull}4590[4590]
+- Introduce configurable event queue settings: queue.mem.events, queue.mem.flush.min_events and queue.mem.flush.timeout. {pull}4650[4650]
+- Enable pipelining in Logstash output by default. {pull}4650[4650]
 
 *Filebeat*
 
@@ -81,6 +84,7 @@ https://github.com/elastic/beats/compare/v6.0.0-alpha2...master[Check the HEAD d
 - Add udp prospector type. {pull}4452[4452]
 - Enabled Cgo which means libc is dynamically compiled. {pull}4546[4546]
 - Add Beta module config reloading mechanism {pull}4566[4566]
+- Remove spooler and publisher components and settings. {pull}4644[4644]
 
 *Heartbeat*
 

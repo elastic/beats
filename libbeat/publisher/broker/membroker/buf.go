@@ -240,6 +240,14 @@ func (b *brokerBuffer) Empty() bool {
 	return (b.regA.size - b.reserved) == 0
 }
 
+func (b *brokerBuffer) Avail() int {
+	return b.regA.size - b.reserved
+}
+
+func (b *brokerBuffer) TotalAvail() int {
+	return b.regA.size + b.regB.size - b.reserved
+}
+
 func (b *brokerBuffer) Full() bool {
 	var avail int
 	if b.regB.size > 0 {
