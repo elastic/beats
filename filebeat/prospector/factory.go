@@ -10,13 +10,13 @@ import (
 
 // Factory is a factory for registrars
 type Factory struct {
-	outlet    channel.Outleter
+	outlet    channel.OutleterFactory
 	registrar *registrar.Registrar
 	beatDone  chan struct{}
 }
 
 // NewFactory instantiates a new Factory
-func NewFactory(outlet channel.Outleter, registrar *registrar.Registrar, beatDone chan struct{}) *Factory {
+func NewFactory(outlet channel.OutleterFactory, registrar *registrar.Registrar, beatDone chan struct{}) *Factory {
 	return &Factory{
 		outlet:    outlet,
 		registrar: registrar,
@@ -26,7 +26,6 @@ func NewFactory(outlet channel.Outleter, registrar *registrar.Registrar, beatDon
 
 // Create creates a prospector based on a config
 func (r *Factory) Create(c *common.Config) (cfgfile.Runner, error) {
-
 	p, err := NewProspector(c, r.outlet, r.beatDone, r.registrar.GetStates())
 	if err != nil {
 		logp.Err("Error creating prospector: %s", err)

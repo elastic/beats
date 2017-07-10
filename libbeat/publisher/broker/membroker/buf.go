@@ -264,7 +264,7 @@ func (b *eventBuffer) Len() int {
 }
 
 func (b *eventBuffer) Set(idx int, event publisher.Event, st clientState) {
-	b.logger.Debugf("insert event: idx=%v, seq=%v\n", idx, st.seq)
+	// b.logger.Debugf("insert event: idx=%v, seq=%v\n", idx, st.seq)
 
 	b.events[idx] = event
 	b.clients[idx] = st

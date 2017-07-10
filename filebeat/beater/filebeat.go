@@ -11,14 +11,13 @@ import (
 	"github.com/elastic/beats/libbeat/common"
 	"github.com/elastic/beats/libbeat/logp"
 	"github.com/elastic/beats/libbeat/outputs/elasticsearch"
+	pub "github.com/elastic/beats/libbeat/publisher/beat"
 
 	"github.com/elastic/beats/filebeat/channel"
 	cfg "github.com/elastic/beats/filebeat/config"
 	"github.com/elastic/beats/filebeat/crawler"
 	"github.com/elastic/beats/filebeat/fileset"
-	"github.com/elastic/beats/filebeat/publisher"
 	"github.com/elastic/beats/filebeat/registrar"
-	"github.com/elastic/beats/filebeat/spooler"
 
 	// Add filebeat level processors
 	_ "github.com/elastic/beats/filebeat/processor/add_kubernetes_metadata"
@@ -165,21 +164,21 @@ func (fb *Filebeat) Run(b *beat.Beat) error {
 	// Make sure all events that were published in
 	registrarChannel := newRegistrarLogger(registrar)
 
-	// Channel from spooler to harvester
-	publisherChan := newPublisherChannel()
-
-	// Publishes event to output
-	publisher := publisher.New(config.PublishAsync, publisherChan.ch, registrarChannel, b.Publisher)
-
-	// Init and Start spooler: Harvesters dump events into the spooler.
-	spooler, err := spooler.New(config, publisherChan)
+	err = b.Publisher.SetACKHandler(pub.PipelineACKHandler{
+		ACKEvents: newEventACKer(registrarChannel).ackEvents,
+	})
 	if err != nil {
-		logp.Err("Could not init spooler: %v", err)
+		logp.Err("Failed to install the registry with the publisher pipeline: %v", err)
 		return err
 	}
 
-	outlet := channel.NewOutlet(fb.done, spooler.Channel, wgEvents)
-	crawler, err := crawler.New(outlet, config.Prospectors, b.Info.Version, fb.done, *once)
+	outDone := make(chan struct{}) // outDone closes down all active pipeline connections
+	crawler, err := crawler.New(
+		channel.NewOutletFactory(outDone, b.Publisher, wgEvents).Create,
+		config.Prospectors,
+		b.Info.Version,
+		fb.done,
+		*once)
 	if err != nil {
 		logp.Err("Could not init crawler: %v", err)
 		return err
@@ -194,32 +193,20 @@ func (fb *Filebeat) Run(b *beat.Beat) error {
 	if err != nil {
 		return fmt.Errorf("Could not start registrar: %v", err)
 	}
+
 	// Stopping registrar will write last state
 	defer registrar.Stop()
 
-	// Start publisher
-	publisher.Start()
 	// Stopping publisher (might potentially drop items)
 	defer func() {
 		// Closes first the registrar logger to make sure not more events arrive at the registrar
 		// registrarChannel must be closed first to potentially unblock (pretty unlikely) the publisher
 		registrarChannel.Close()
-		publisher.Stop()
+		close(outDone) // finally close all active connections to publisher pipeline
 	}()
 
-	// Starting spooler
-	spooler.Start()
-
-	// Stopping spooler will flush items
-	defer func() {
-		// Wait for all events to be processed or timeout
-		waitEvents.Wait()
-
-		// Closes publisher so no further events can be sent
-		publisherChan.Close()
-		// Stopping spooler
-		spooler.Stop()
-	}()
+	// Wait for all events to be processed or timeout
+	defer waitEvents.Wait()
 
 	// Create a ES connection factory for dynamic modules pipeline loading
 	var pipelineLoaderFactory fileset.PipelineLoaderFactory

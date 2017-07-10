@@ -9,7 +9,6 @@ import (
 	"github.com/elastic/beats/filebeat/util"
 	"github.com/elastic/beats/libbeat/common/match"
 
-	"github.com/elastic/beats/filebeat/channel"
 	"github.com/stretchr/testify/assert"
 )
 
@@ -154,7 +153,5 @@ func TestInit(t *testing.T) {
 // TestOutlet is an empty outlet for testing
 type TestOutlet struct{}
 
-func (o TestOutlet) OnEvent(event *util.Data) bool       { return true }
-func (o TestOutlet) OnEventSignal(event *util.Data) bool { return true }
-func (o TestOutlet) SetSignal(signal <-chan struct{})    {}
-func (o TestOutlet) Copy() channel.Outleter              { return o }
+func (o TestOutlet) OnEvent(event *util.Data) bool { return true }
+func (o TestOutlet) Close() error                  { return nil }

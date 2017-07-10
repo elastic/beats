@@ -346,8 +346,15 @@ func (p *Pipeline) ConnectWith(cfg beat.ClientConfig) (beat.Client, error) {
 		DropOnCancel: acker != nil && p.eventer.cb == nil,
 	}
 
-	if reportEvents {
-		producerCfg.OnDrop = p.waitCloser.dec
+	if reportEvents || cfg.Events != nil {
+		producerCfg.OnDrop = func(event beat.Event) {
+			if cfg.Events != nil {
+				cfg.Events.DroppedOnPublish(event)
+			}
+			if reportEvents {
+				p.waitCloser.dec(1)
+			}
+		}
 	}
 
 	if acker != nil {
@@ -359,6 +366,7 @@ func (p *Pipeline) ConnectWith(cfg beat.ClientConfig) (beat.Client, error) {
 	producer := p.broker.Producer(producerCfg)
 	client := &client{
 		pipeline:     p,
+		eventer:      cfg.Events,
 		processors:   processors,
 		producer:     producer,
 		acker:        acker,

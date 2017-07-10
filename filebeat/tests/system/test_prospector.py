@@ -320,10 +320,9 @@ class Test(BaseTest):
 
         filebeat = self.start_beat()
 
-        # wait until events are sent for the first time
+        # wait until first 3 scans
         self.wait_until(
-            lambda: self.log_contains(
-                "Events flushed"),
+            lambda: self.log_contains_count("Start next scan") > 3,
             max_timeout=10)
 
         testfile = self.working_dir + "/log/test.log"

@@ -58,12 +58,15 @@ class Test(BaseTest):
         self.wait_until(
             lambda: self.output_has(lines=iterations1 + 1), max_timeout=10)
 
-        filebeat.check_kill_and_wait()
-
-        data = self.get_registry()
-
         # Make sure new file was picked up. As it has the same file name,
         # one entry for the new and one for the old should exist
+        self.wait_until(
+            lambda: len(self.get_registry()) == 2, max_timeout=10)
+
+        filebeat.check_kill_and_wait()
+
+        # Check registry has 2 entries after shutdown
+        data = self.get_registry()
         assert len(data) == 2
 
     def test_close_removed(self):
@@ -260,6 +263,11 @@ class Test(BaseTest):
 
         with open(logfile, 'w') as f:
             f.write(message + "\n")
+
+        # wait for at least one event being written
+        self.wait_until(
+            lambda: self.output_has(lines=1),
+            max_timeout=10)
 
         # Wait until state is written
         self.wait_until(
