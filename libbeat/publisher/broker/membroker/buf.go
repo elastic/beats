@@ -219,7 +219,13 @@ func (b *brokerBuffer) ack(sz int) {
 		))
 	}
 
-	b.regA.index += sz
+	// clear region, so published events can be collected by the garbage collector:
+	end := b.regA.index + sz
+	for i := b.regA.index; i < end; i++ {
+		b.buf.events[i] = publisher.Event{}
+	}
+
+	b.regA.index = end
 	b.regA.size -= sz
 	b.reserved -= sz
 	if b.regA.size == 0 {
@@ -242,6 +248,10 @@ func (b *brokerBuffer) Full() bool {
 		avail = b.buf.Len() - b.regA.index - b.regA.size
 	}
 	return avail == 0
+}
+
+func (b *brokerBuffer) Size() int {
+	return b.buf.Len()
 }
 
 func (b *eventBuffer) init(size int) {

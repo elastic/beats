@@ -7,6 +7,7 @@ import (
 	"github.com/elastic/beats/libbeat/logp"
 	"github.com/elastic/beats/libbeat/outputs"
 	"github.com/elastic/beats/libbeat/processors"
+	"github.com/elastic/beats/libbeat/publisher/broker"
 	"github.com/elastic/beats/libbeat/publisher/broker/membroker"
 	"github.com/elastic/beats/libbeat/publisher/pipeline"
 )
@@ -61,10 +62,13 @@ func createPipeline(
 			},
 		},
 	}
-	broker := membroker.NewBroker(queueSize, false)
-	p, err := pipeline.New(broker, out, settings)
+
+	brokerFactory := func(e broker.Eventer) (broker.Broker, error) {
+		return membroker.NewBroker(e, queueSize, false), nil
+	}
+
+	p, err := pipeline.New(brokerFactory, out, settings)
 	if err != nil {
-		broker.Close()
 		return nil, err
 	}
 

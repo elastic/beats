@@ -17,6 +17,7 @@ import (
 	"github.com/elastic/beats/libbeat/outputs/outil"
 	"github.com/elastic/beats/libbeat/outputs/transport"
 	"github.com/elastic/beats/libbeat/publisher/beat"
+	"github.com/elastic/beats/libbeat/publisher/broker"
 	"github.com/elastic/beats/libbeat/publisher/broker/membroker"
 	"github.com/elastic/beats/libbeat/publisher/pipeline"
 )
@@ -103,14 +104,14 @@ func makeReporter(beat common.BeatInfo, cfg *common.Config) (report.Reporter, er
 		out.Clients = append(out.Clients, client)
 	}
 
-	broker := membroker.NewBroker(20, false)
-	settings := pipeline.Settings{
+	brokerFactory := func(e broker.Eventer) (broker.Broker, error) {
+		return membroker.NewBroker(e, 20, false), nil
+	}
+	pipeline, err := pipeline.New(brokerFactory, out, pipeline.Settings{
 		WaitClose:     0,
 		WaitCloseMode: pipeline.NoWaitOnClose,
-	}
-	pipeline, err := pipeline.New(broker, out, settings)
+	})
 	if err != nil {
-		broker.Close()
 		return nil, err
 	}
 
