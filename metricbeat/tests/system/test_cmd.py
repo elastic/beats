@@ -21,7 +21,8 @@ class TestCommands(metricbeat.BaseTest):
         self.touch(self.working_dir + "/modules.d/enabled.yml")
         self.touch(self.working_dir + "/modules.d/disabled.yml.disabled")
 
-        exit_code = self.run_beat(extra_args=["modules", "list"])
+        exit_code = self.run_beat(logging_args=None,
+                                  extra_args=["modules", "list"])
 
         assert exit_code == 0
         assert "Enabled:\nenabled" in self.get_log()
@@ -29,7 +30,8 @@ class TestCommands(metricbeat.BaseTest):
 
         # Add one more disabled module
         self.touch(self.working_dir + "/modules.d/disabled2.yml.disabled")
-        exit_code = self.run_beat(extra_args=["modules", "list"])
+        exit_code = self.run_beat(logging_args=None,
+                                  extra_args=["modules", "list"])
 
         assert exit_code == 0
         assert "Enabled:\nenabled" in self.get_log()
