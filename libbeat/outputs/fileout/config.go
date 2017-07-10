@@ -13,6 +13,7 @@ type config struct {
 	RotateEveryKb int          `config:"rotate_every_kb" validate:"min=1"`
 	NumberOfFiles int          `config:"number_of_files"`
 	Codec         codec.Config `config:"codec"`
+	Permissions   uint32       `config:"permissions"`
 }
 
 var (
