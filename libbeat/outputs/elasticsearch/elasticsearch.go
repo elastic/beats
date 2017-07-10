@@ -185,7 +185,7 @@ func NewConnectedClient(cfg *common.Config) (*Client, error) {
 	for _, client := range clients {
 		err = client.Connect()
 		if err != nil {
-			logp.Err("Error connecting to Elasticsearch: %s", client.Connection.URL)
+			logp.Err("Error connecting to Elasticsearch at %v: %v", client.Connection.URL, err)
 			continue
 		}
 		return &client, nil
