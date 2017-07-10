@@ -194,6 +194,7 @@ func New(
 		},
 	}
 	p.ackBuilder = &pipelineEmptyACK{p}
+	p.ackActive = atomic.MakeBool(true)
 	p.eventer.modifyable = true
 
 	if settings.WaitCloseMode == WaitOnPipelineClose && settings.WaitClose > 0 {
@@ -337,11 +338,13 @@ func (p *Pipeline) ConnectWith(cfg beat.ClientConfig) (beat.Client, error) {
 	}
 
 	processors := p.newProcessorPipeline(cfg)
-	acker := p.makeACKer(processors != nil, &cfg, waitClose)
-	producerCfg := broker.ProducerConfig{}
 
-	// only cancel events from broker if acker is configured
-	cancelEvents := acker != nil
+	acker := p.makeACKer(processors != nil, &cfg, waitClose)
+	producerCfg := broker.ProducerConfig{
+		// only cancel events from broker if acker is configured
+		// and no pipeline-wide ACK handler is registered
+		DropOnCancel: acker != nil && p.eventer.cb == nil,
+	}
 
 	if reportEvents {
 		producerCfg.OnDrop = p.waitCloser.dec
@@ -361,7 +364,6 @@ func (p *Pipeline) ConnectWith(cfg beat.ClientConfig) (beat.Client, error) {
 		acker:        acker,
 		eventFlags:   eventFlags,
 		canDrop:      canDrop,
-		cancelEvents: cancelEvents,
 		reportEvents: reportEvents,
 	}
 

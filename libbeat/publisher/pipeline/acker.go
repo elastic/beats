@@ -13,12 +13,7 @@ import (
 // All pipeline and client ACK handling support is provided by acker instances.
 type acker interface {
 	close()
-	addEvent(event beat.Event, published bool)
-	ackEvents(int)
-}
-
-type pipelineAcker interface {
-	addEvent(beat.Event, bool)
+	addEvent(event beat.Event, published bool) bool
 	ackEvents(int)
 }
 
@@ -27,19 +22,19 @@ type emptyACK struct{}
 
 var nilACKer acker = (*emptyACK)(nil)
 
-func (*emptyACK) close()                        {}
-func (*emptyACK) addEvent(_ beat.Event, _ bool) {}
-func (*emptyACK) ackEvents(_ int)               {}
+func (*emptyACK) close()                             {}
+func (*emptyACK) addEvent(_ beat.Event, _ bool) bool { return true }
+func (*emptyACK) ackEvents(_ int)                    {}
 
 type ackerFn struct {
 	Close     func()
-	AddEvent  func(beat.Event, bool)
+	AddEvent  func(beat.Event, bool) bool
 	AckEvents func(int)
 }
 
-func (a *ackerFn) close()                        { a.Close() }
-func (a *ackerFn) addEvent(e beat.Event, b bool) { a.AddEvent(e, b) }
-func (a *ackerFn) ackEvents(n int)               { a.AckEvents(n) }
+func (a *ackerFn) close()                             { a.Close() }
+func (a *ackerFn) addEvent(e beat.Event, b bool) bool { return a.AddEvent(e, b) }
+func (a *ackerFn) ackEvents(n int)                    { a.AckEvents(n) }
 
 // countACK is used when broker ACK events can be simply forwarded to the
 // producers ACKCount callback.
@@ -55,8 +50,8 @@ func newCountACK(fn func(total, acked int)) *countACK {
 	return a
 }
 
-func (a *countACK) close()                        {}
-func (a *countACK) addEvent(_ beat.Event, _ bool) {}
+func (a *countACK) close()                             {}
+func (a *countACK) addEvent(_ beat.Event, _ bool) bool { return true }
 func (a *countACK) ackEvents(n int) {
 	if a.pipeline.ackActive.Load() {
 		a.fn(n, n)
@@ -72,13 +67,14 @@ type gapCountACK struct {
 
 	fn func(total int, acked int)
 
-	done         chan struct{}
-	clientClosed bool
+	done chan struct{}
 
 	drop chan struct{}
 	acks chan int
 
 	lst gapList
+
+	totalPublished uint64
 }
 
 type gapList struct {
@@ -100,10 +96,11 @@ func newGapCountACK(pipeline *Pipeline, fn func(total, acked int)) *gapCountACK 
 
 func (a *gapCountACK) init(pipeline *Pipeline, fn func(int, int)) {
 	*a = gapCountACK{
-		fn:   fn,
-		done: make(chan struct{}),
-		drop: make(chan struct{}),
-		acks: make(chan int, 1),
+		pipeline: pipeline,
+		fn:       fn,
+		done:     make(chan struct{}),
+		drop:     make(chan struct{}),
+		acks:     make(chan int, 1),
 	}
 
 	init := &gapInfo{}
@@ -117,25 +114,27 @@ func (a *gapCountACK) ackLoop() {
 	// close channels, as no more events should be ACKed:
 	// - once pipeline is closed
 	// - all events of the closed client have been acked/processed by the pipeline
-	defer close(a.drop)
-	defer close(a.acks)
+
+	acks, drop := a.acks, a.drop
+	closing := false
 
 	for {
 		select {
 		case <-a.done:
-			a.clientClosed = true
+			closing = true
 			a.done = nil
 
 		case <-a.pipeline.ackDone:
 			return
 
-		case n := <-a.acks:
+		case n := <-acks:
 			empty := a.handleACK(n)
-			if empty && a.clientClosed {
+			if empty && closing {
+				// stop worker, iff all events accounted for have been ACKed
 				return
 			}
 
-		case <-a.drop:
+		case <-drop:
 			// TODO: accumulate mulitple drop events + flush count with timer
 			a.fn(1, 0)
 		}
@@ -147,14 +146,19 @@ func (a *gapCountACK) handleACK(n int) bool {
 
 	var (
 		total    = 0
+		acked    = n
 		emptyLst bool
 	)
 
 	for n > 0 {
+		if emptyLst {
+			panic("too many events acked")
+		}
+
 		a.lst.Lock()
 		current := a.lst.head
-
 		current.Lock()
+
 		if n >= current.send {
 			nxt := current.next
 			emptyLst = nxt == nil
@@ -171,9 +175,9 @@ func (a *gapCountACK) handleACK(n int) bool {
 		a.lst.Unlock()
 
 		if n < current.send {
+			current.send -= n
 			total += n
 			n = 0
-			current.send -= n
 		} else {
 			total += current.send + current.dropped
 			n -= current.send
@@ -183,7 +187,7 @@ func (a *gapCountACK) handleACK(n int) bool {
 		current.Unlock()
 	}
 
-	a.fn(total, n)
+	a.fn(total, acked)
 	return emptyLst
 }
 
@@ -192,44 +196,63 @@ func (a *gapCountACK) close() {
 	close(a.done)
 }
 
-func (a *gapCountACK) addEvent(_ beat.Event, published bool) {
+func (a *gapCountACK) addEvent(_ beat.Event, published bool) bool {
 	// if gapList is empty and event is being dropped, forward drop event to ack
 	// loop worker:
 	if !published {
-		a.lst.Lock()
-		current := a.lst.tail
-		if current.send == 0 {
-			a.lst.Unlock()
+		a.addDropEvent()
+	} else {
+		a.addPublishedEvent()
 
-			// send can only be 0 if no no events/gaps present yet
-			if a.lst.head != a.lst.tail {
-				panic("gap list expected to be empty")
-			}
-
-			a.drop <- struct{}{}
-		} else {
-			current.Lock()
-			a.lst.Unlock()
-
-			current.dropped++
-			current.Unlock()
-		}
-
-		return
+		a.totalPublished++
 	}
 
+	return true
+}
+
+func (a *gapCountACK) addDropEvent() {
+	a.lst.Lock()
+
+	current := a.lst.tail
+	current.Lock()
+
+	if current.send == 0 && current.next == nil {
+		// send can only be 0 if no no events/gaps present yet
+		if a.lst.head != a.lst.tail {
+			panic("gap list expected to be empty")
+		}
+
+		current.Unlock()
+		a.lst.Unlock()
+
+		a.drop <- struct{}{}
+	} else {
+		a.lst.Unlock()
+
+		current.dropped++
+		current.Unlock()
+	}
+}
+
+func (a *gapCountACK) addPublishedEvent() {
 	// event is publisher -> add a new gap list entry if gap is present in current
 	// gapInfo
 
 	a.lst.Lock()
 
 	current := a.lst.tail
+	current.Lock()
+
 	if current.dropped > 0 {
-		current = &gapInfo{}
-		a.lst.tail.next = current
+		tmp := &gapInfo{}
+		a.lst.tail.next = tmp
+		a.lst.tail = tmp
+
+		current.Unlock()
+		tmp.Lock()
+		current = tmp
 	}
 
-	current.Lock()
 	a.lst.Unlock()
 
 	current.send++
@@ -239,6 +262,7 @@ func (a *gapCountACK) addEvent(_ beat.Event, published bool) {
 func (a *gapCountACK) ackEvents(n int) {
 	select {
 	case <-a.pipeline.ackDone: // pipeline is closing down -> ignore event
+		a.acks = nil
 	case a.acks <- n: // send ack event to worker
 	}
 }
@@ -269,9 +293,9 @@ func (a *boundGapCountACK) close() {
 	a.acker.close()
 }
 
-func (a *boundGapCountACK) addEvent(event beat.Event, published bool) {
+func (a *boundGapCountACK) addEvent(event beat.Event, published bool) bool {
 	a.sema.inc()
-	a.acker.addEvent(event, published)
+	return a.acker.addEvent(event, published)
 }
 
 func (a *boundGapCountACK) ackEvents(n int) { a.acker.ackEvents(n) }
@@ -284,8 +308,7 @@ func (a *boundGapCountACK) onACK(total, acked int) {
 // An instance of eventACK requires a counting ACKer (boundGapCountACK or countACK),
 // for accounting for potentially dropped events.
 type eventACK struct {
-	mutex  sync.Mutex
-	active bool
+	mutex sync.Mutex
 
 	acker    acker
 	pipeline *Pipeline
@@ -301,8 +324,7 @@ func newEventACK(
 	sema *sema,
 	fn func([]beat.Event, int),
 ) *eventACK {
-	a := &eventACK{fn: fn}
-	a.active = true
+	a := &eventACK{pipeline: pipeline, fn: fn}
 	a.acker = makeCountACK(pipeline, canDrop, sema, a.onACK)
 
 	return a
@@ -316,24 +338,21 @@ func makeCountACK(pipeline *Pipeline, canDrop bool, sema *sema, fn func(int, int
 }
 
 func (a *eventACK) close() {
-	a.mutex.Lock()
-	a.active = false
-	a.mutex.Unlock()
-
 	a.acker.close()
 }
 
-func (a *eventACK) addEvent(event beat.Event, published bool) {
+func (a *eventACK) addEvent(event beat.Event, published bool) bool {
 	a.mutex.Lock()
-	active := a.active
+	active := a.pipeline.ackActive.Load()
 	if active {
 		a.events = append(a.events, event)
 	}
 	a.mutex.Unlock()
 
 	if active {
-		a.acker.addEvent(event, published)
+		return a.acker.addEvent(event, published)
 	}
+	return false
 }
 
 func (a *eventACK) ackEvents(n int) { a.acker.ackEvents(n) }
@@ -390,11 +409,11 @@ func (a *waitACK) close() {
 	a.acker.close()
 }
 
-func (a *waitACK) addEvent(event beat.Event, published bool) {
+func (a *waitACK) addEvent(event beat.Event, published bool) bool {
 	if published {
 		a.events.Inc()
 	}
-	a.acker.addEvent(event, published)
+	return a.acker.addEvent(event, published)
 }
 
 func (a *waitACK) ackEvents(n int) {
@@ -413,5 +432,4 @@ func (a *waitACK) releaseEvents(n int) {
 	if !a.active.Load() {
 		a.signal <- struct{}{}
 	}
-
 }

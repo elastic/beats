@@ -64,10 +64,11 @@ func (a *clientACKer) close() {
 	a.acker.close()
 }
 
-func (a *clientACKer) addEvent(event beat.Event, published bool) {
+func (a *clientACKer) addEvent(event beat.Event, published bool) bool {
 	if a.active.Load() {
-		a.acker.addEvent(event, published)
+		return a.acker.addEvent(event, published)
 	}
+	return false
 }
 
 func (a *clientACKer) ackEvents(n int) {

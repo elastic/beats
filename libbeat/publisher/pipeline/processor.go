@@ -32,13 +32,14 @@ type processorFn struct {
 // 1. (P) extract EventMetadataKey fields + tags (to be removed in favor of 4)
 // 2. (P) generalize/normalize event
 // 3. (P) add beats metadata (name, hostname, version)
-// 4. (P) add pipeline fields + tags
-// 5. (C) add client fields + tags
-// 6. (P/C) apply EventMetadataKey fields + tags (to be removed in favor of 4)
-// 7. (C) client processors list
-// 8. (P) pipeline processors list
-// 9. (P) (if publish/debug enabled) log event
-// 10. (P) (if output disabled) dropEvent
+// 4. (C) add Meta from client Config to event.Meta
+// 5. (P) add pipeline fields + tags
+// 6. (C) add client fields + tags
+// 7. (P/C) apply EventMetadataKey fields + tags (to be removed in favor of 4)
+// 8. (C) client processors list
+// 9. (P) pipeline processors list
+// 10. (P) (if publish/debug enabled) log event
+// 11. (P) (if output disabled) dropEvent
 func (p *Pipeline) newProcessorPipeline(
 	config beat.ClientConfig,
 ) beat.Processor {
@@ -53,18 +54,22 @@ func (p *Pipeline) newProcessorPipeline(
 	processors.add(generalizeProcessor)
 	processors.add(global.beatMetaProcessor)
 
+	if m := config.Meta; len(m) > 0 {
+		processors.add(clientEventMeta(m))
+	}
+
 	// setup 4: add event fields + tags (P)
 	processors.add(global.eventMetaProcessor)
 
-	// setup 5: add fields + tags (C)
+	// setup 6: add fields + tags (C)
 	if em := config.EventMetadata; len(em.Fields) > 0 || len(em.Tags) > 0 {
 		processors.add(eventAnnotateProcessor(em))
 	}
 
-	// setup 6: apply EventMetadata fields + tags
+	// setup 7: apply EventMetadata fields + tags
 	processors.add(eventUserAnnotateProcessor)
 
-	// setup 7: client processors (C)
+	// setup 8: client processors (C)
 	if procs := config.Processor; procs != nil {
 		if lst := procs.All(); len(lst) > 0 {
 
@@ -75,14 +80,15 @@ func (p *Pipeline) newProcessorPipeline(
 		}
 	}
 
-	// setup 8: pipeline processors (P)
+	// setup 9: pipeline processors (P)
 	processors.add(global.processors)
 
-	// setup 9: debug print final event (P)
+	// setup 10: debug print final event (P)
 	if logp.IsDebug("publish") {
 		processors.add(debugPrintProcessor())
 	}
 
+	// setup 11: drop all events if outputs are disabled
 	if global.disabled {
 		processors.add(dropDisabledProcessor)
 	}
@@ -150,6 +156,12 @@ func (p *processorFn) String() string                         { return p.name }
 func (p *processorFn) Run(e *beat.Event) (*beat.Event, error) { return p.fn(e) }
 
 var generalizeProcessor = newProcessor("generalizeEvent", func(event *beat.Event) (*beat.Event, error) {
+
+	// Filter out empty events. Empty events are still reported by ACK callbacks.
+	if len(event.Fields) == 0 {
+		return nil, nil
+	}
+
 	fields := common.ConvertToGenericEvent(event.Fields)
 	if fields == nil {
 		logp.Err("fail to convert to generic event")
@@ -182,6 +194,17 @@ func eventAnnotateProcessor(eventMeta common.EventMetadata) *processorFn {
 		common.AddTags(event.Fields, eventMeta.Tags)
 		if fields := eventMeta.Fields; len(fields) > 0 {
 			common.MergeFields(event.Fields, fields.Clone(), eventMeta.FieldsUnderRoot)
+		}
+	})
+}
+
+func clientEventMeta(meta common.MapStr) *processorFn {
+	return newAnnotateProcessor("@metadata", func(event *beat.Event) {
+		if event.Meta == nil {
+			event.Meta = meta.Clone()
+		} else {
+			event.Meta = event.Meta.Clone()
+			event.Meta.DeepUpdate(meta.Clone())
 		}
 	})
 }

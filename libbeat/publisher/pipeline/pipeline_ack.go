@@ -127,9 +127,6 @@ type pipelineEventCB struct {
 	events        chan eventsMsg
 	droppedEvents chan eventsMsg
 
-	counts        chan eventsMsg
-	droppedCounts chan eventsMsg
-
 	mode    pipelineACKMode
 	handler beat.PipelineACKHandler
 }
@@ -240,13 +237,8 @@ func (p *pipelineEventCB) reportBrokerACK(acked int) {
 
 func (p *pipelineEventCB) worker() {
 	defer close(p.acks)
-	if p.mode == countACKMode {
-		defer close(p.counts)
-		defer close(p.droppedCounts)
-	} else {
-		defer close(p.events)
-		defer close(p.droppedEvents)
-	}
+	defer close(p.events)
+	defer close(p.droppedEvents)
 
 	for {
 		select {
@@ -259,7 +251,7 @@ func (p *pipelineEventCB) worker() {
 			// short circuite dropped events, but have client block until all events
 			// have been processed by pipeline ack handler
 		case msg := <-p.droppedEvents:
-			p.reportEvents(msg.events, len(msg.events))
+			p.reportEvents(msg.events, msg.total)
 			close(msg.sig)
 
 		case <-p.done:
@@ -290,6 +282,10 @@ func (p *pipelineEventCB) collect(count int) (exit bool) {
 		total += msg.total
 		acked += msg.acked
 
+		if count-acked < 0 {
+			panic("ack count mismatch")
+		}
+
 		switch p.mode {
 		case eventsACKMode:
 			events = append(events, msg.events...)
@@ -305,7 +301,6 @@ func (p *pipelineEventCB) collect(count int) (exit bool) {
 	for _, sig := range signalers {
 		close(sig)
 	}
-
 	p.reportEvents(events, total)
 	return
 }
