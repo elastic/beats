@@ -48,14 +48,28 @@ type: keyword
 The path to the file.
 
 [float]
+=== audit.file.target_path
+
+type: keyword
+
+The target path for symlinks.
+
+[float]
 === audit.file.action
 
 type: keyword
 
 example: attributes_modified
 
-Action describes the change to the file. The possible values are: attributes_modified, created, deleted, updated, moved_to, collision_within, unmounted, root_changed.
+Action describes the change to the file. The possible values are: attributes_modified, created, deleted, updated, and moved.
 
+
+[float]
+=== audit.file.type
+
+type: keyword
+
+The file type (file, dir, or symlink).
 
 [float]
 === audit.file.inode
@@ -91,6 +105,13 @@ The primary group ID (GID) of the file.
 type: keyword
 
 The primary group name of the file.
+
+[float]
+=== audit.file.sid
+
+type: keyword
+
+The security identifier (SID) of the file owner (Windows only).
 
 [float]
 === audit.file.mode
@@ -136,6 +157,27 @@ type: boolean
 
 Boolean indicating if the event includes a file hashes. If true the md5, sha1, and sha256 fields will be present.
 
+
+[float]
+=== audit.file.md5
+
+type: keyword
+
+MD5 hash of the file.
+
+[float]
+=== audit.file.sha1
+
+type: keyword
+
+SHA1 hash of the file.
+
+[float]
+=== audit.file.sha256
+
+type: keyword
+
+SHA256 hash of the file.
 
 [float]
 == kernel Fields

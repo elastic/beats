@@ -3,43 +3,62 @@
 package file
 
 import (
-	"fmt"
 	"os"
+	"os/user"
+	"strconv"
 	"syscall"
 	"time"
 
+	"github.com/joeshaw/multierror"
 	"github.com/pkg/errors"
 )
 
-func addFileAttributes(e *Event, maxFileSize int64) error {
-	info, err := os.Lstat(e.Path)
+func Stat(path string) (*Metadata, error) {
+	info, err := os.Lstat(path)
 	if err != nil {
-		return errors.Wrap(err, "failed to stat file")
+		return nil, errors.Wrap(err, "failed to stat path")
 	}
 
 	stat, ok := info.Sys().(*syscall.Stat_t)
 	if !ok {
-		return errors.Errorf("unexpected fileinfo sys type %T", info.Sys())
+		return nil, errors.Errorf("unexpected fileinfo sys type %T", info.Sys())
 	}
 
-	e.Inode = stat.Ino
-	e.UID = int32(stat.Uid)
-	e.GID = int32(stat.Gid)
-	e.Mode = fmt.Sprintf("%#o", uint32(info.Mode()))
-	e.Size = info.Size()
-	e.ATime = time.Unix(0, stat.Atimespec.Nano())
-	e.MTime = time.Unix(0, stat.Mtimespec.Nano())
-	e.CTime = time.Unix(0, stat.Ctimespec.Nano())
-
-	if e.Size <= maxFileSize {
-		md5sum, sha1sum, sha256sum, err := hashFile(e.Path)
-		if err == nil {
-			e.MD5 = md5sum
-			e.SHA1 = sha1sum
-			e.SHA256 = sha256sum
-			e.Hashed = true
-		}
+	fileInfo := &Metadata{
+		Inode: stat.Ino,
+		UID:   stat.Uid,
+		GID:   stat.Gid,
+		Mode:  info.Mode(),
+		Size:  info.Size(),
+		ATime: time.Unix(0, stat.Atimespec.Nano()).UTC(),
+		MTime: time.Unix(0, stat.Mtimespec.Nano()).UTC(),
+		CTime: time.Unix(0, stat.Ctimespec.Nano()).UTC(),
 	}
 
-	return nil
+	switch {
+	case info.IsDir():
+		fileInfo.Type = "dir"
+	case info.Mode().IsRegular():
+		fileInfo.Type = "file"
+	case info.Mode()&os.ModeSymlink > 0:
+		fileInfo.Type = "symlink"
+	}
+
+	// Lookup UID and GID
+	var errs multierror.Errors
+	owner, err := user.LookupId(strconv.Itoa(int(fileInfo.UID)))
+	if err != nil {
+		errs = append(errs, err)
+	} else {
+		fileInfo.Owner = owner.Username
+	}
+
+	group, err := user.LookupGroupId(strconv.Itoa(int(fileInfo.GID)))
+	if err != nil {
+		errs = append(errs, err)
+	} else {
+		fileInfo.Group = group.Name
+	}
+
+	return fileInfo, errs.Err()
 }
