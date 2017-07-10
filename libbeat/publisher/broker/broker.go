@@ -55,6 +55,10 @@ type ProducerConfig struct {
 	// gives a brokers user a chance to keep track of total number of events
 	// being buffered by the broker.
 	OnDrop func(count int)
+
+	// DropOnCancel is a hint to the broker to drop events if the producer disconnects
+	// via Cancel.
+	DropOnCancel bool
 }
 
 // Producer interface to be used by the pipelines client to forward events to be
@@ -64,7 +68,7 @@ type ProducerConfig struct {
 // Note: A broker is still allowed to send the ACK signal after Cancel. The
 //       pipeline client must filter out ACKs after cancel.
 type Producer interface {
-	Publish(event publisher.Event)
+	Publish(event publisher.Event) bool
 	TryPublish(event publisher.Event) bool
 	Cancel() int
 }

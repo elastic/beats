@@ -97,13 +97,8 @@ func (l *ackLoop) handleBatchSig() int {
 	}
 
 	// report acks to waiting clients
-	events := l.broker.buf.buf.events
 	states := l.broker.buf.buf.clients
-	end := start + count
-	if end > len(states) {
-		end -= len(states)
-	}
-	l.broker.reportACK(events, states, start, end)
+	l.broker.reportACK(states, start, count)
 
 	// return final ACK to EventLoop, in order to clean up internal buffer
 	l.broker.logger.Debug("ackloop: return ack to broker loop:", count)

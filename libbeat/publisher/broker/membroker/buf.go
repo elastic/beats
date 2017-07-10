@@ -225,7 +225,7 @@ func (b *brokerBuffer) ack(sz int) {
 		b.buf.events[i] = publisher.Event{}
 	}
 
-	b.regA.index += end
+	b.regA.index = end
 	b.regA.size -= sz
 	b.reserved -= sz
 	if b.regA.size == 0 {
