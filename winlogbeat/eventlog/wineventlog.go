@@ -83,6 +83,7 @@ type winEventLog struct {
 
 	logPrefix     string               // String to prefix on log messages.
 	eventMetadata common.EventMetadata // Field and tags to add to each event.
+	evt           windows.Handle
 }
 
 // Name returns the name of the event log (i.e. Application, Security, etc.).
@@ -91,6 +92,7 @@ func (l *winEventLog) Name() string {
 }
 
 func (l *winEventLog) Open(recordNumber uint64) error {
+	var err error
 	bookmark, err := win.CreateBookmark(l.channelName, recordNumber)
 	if err != nil {
 		return err
@@ -99,15 +101,15 @@ func (l *winEventLog) Open(recordNumber uint64) error {
 
 	// Using a pull subscription to receive events. See:
 	// https://msdn.microsoft.com/en-us/library/windows/desktop/aa385771(v=vs.85).aspx#pull
-	signalEvent, err := windows.CreateEvent(nil, 0, 0, nil)
+	l.evt, err = windows.CreateEvent(nil, 0, 0, nil)
 	if err != nil {
 		return nil
 	}
 
 	debugf("%s using subscription query=%s", l.logPrefix, l.query)
 	subscriptionHandle, err := win.Subscribe(
-		0, // Session - nil for localhost
-		signalEvent,
+		0,        // Session - nil for localhost
+		l.evt,    //signalEvent
 		"",       // Channel - empty b/c channel is in the query
 		l.query,  // Query - nil means all events
 		bookmark, // Bookmark - for resuming from a specific event
@@ -178,8 +180,10 @@ func (l *winEventLog) eventHandles(maxRead int) ([]win.EvtHandle, int, error) {
 		}
 		return handles, maxRead, nil
 	case win.ERROR_NO_MORE_ITEMS:
-		detailf("%s No more events", l.logPrefix)
-		return nil, maxRead, nil
+		detailf("%s No more events. Waiting...", l.logPrefix)
+		_, _ = windows.WaitForSingleObject(l.evt, windows.INFINITE)
+		return l.eventHandles(maxRead)
+		//return nil, maxRead, nil
 	case win.RPC_S_INVALID_BOUND:
 		incrementMetric(readErrors, err)
 		if err := l.Close(); err != nil {
