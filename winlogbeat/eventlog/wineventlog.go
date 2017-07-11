@@ -181,9 +181,11 @@ func (l *winEventLog) eventHandles(maxRead int) ([]win.EvtHandle, int, error) {
 		return handles, maxRead, nil
 	case win.ERROR_NO_MORE_ITEMS:
 		detailf("%s No more events. Waiting...", l.logPrefix)
-		_, _ = windows.WaitForSingleObject(l.evt, windows.INFINITE)
+		res, err := windows.WaitForSingleObject(l.evt, windows.INFINITE)
+		if err != nil || res != syscall.WAIT_OBJECT_0 {
+			return nil, maxRead, nil
+		}
 		return l.eventHandles(maxRead)
-		//return nil, maxRead, nil
 	case win.RPC_S_INVALID_BOUND:
 		incrementMetric(readErrors, err)
 		if err := l.Close(); err != nil {
