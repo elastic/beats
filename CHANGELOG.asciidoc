@@ -18,6 +18,7 @@ https://github.com/elastic/beats/compare/v6.0.0-alpha2...master[Check the HEAD d
 - Rename `*.full.yml` config files to `*.reference.yml`. {pull}4563[4563]
 - The `scripts/import_dashboards` is removed from packages. Use the `setup` command instead. {pull}4586[4586]
 - Change format of the saved kibana dashboards to have a single JSON file for each dashboard {pull}4413[4413]
+- Rename `configtest` command to `test config`. {pull}4590[4590]
 
 *Filebeat*
 
@@ -68,6 +69,7 @@ https://github.com/elastic/beats/compare/v6.0.0-alpha2...master[Check the HEAD d
 - Allow source path matching in `add_docker_metadata` processor. {pull}4495[4495]
 - Add support for analyzers and multifields in fields.yml. {pull}4574[4574]
 - Add support for JSON logging. {pull}4523[4523]
+- Add `test output` command, to test Elasticsearch and Logstash output settings. {pull}4590[4590]
 
 *Filebeat*
 

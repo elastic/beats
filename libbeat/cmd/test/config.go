@@ -1,4 +1,4 @@
-package cmd
+package test
 
 import (
 	"fmt"
@@ -9,9 +9,9 @@ import (
 	"github.com/elastic/beats/libbeat/beat"
 )
 
-func genConfigTestCmd(name, version string, beatCreator beat.Creator) *cobra.Command {
+func GenTestConfigCmd(name, version string, beatCreator beat.Creator) *cobra.Command {
 	configTestCmd := cobra.Command{
-		Use:   "configtest",
+		Use:   "config",
 		Short: "Test configuration settings",
 		Run: func(cmd *cobra.Command, args []string) {
 			b, err := beat.New(name, version)

@@ -1,10 +1,12 @@
 package outputs
 
 import (
+	"errors"
 	"time"
 
 	"github.com/elastic/beats/libbeat/common"
 	"github.com/elastic/beats/libbeat/publisher"
+	"github.com/elastic/beats/libbeat/testing"
 )
 
 type backoffClient struct {
@@ -48,4 +50,13 @@ func (b *backoffClient) Publish(batch publisher.Batch) error {
 
 func (b *backoffClient) Client() NetworkClient {
 	return b.client
+}
+
+func (b *backoffClient) Test(d testing.Driver) {
+	c, ok := b.client.(testing.Testable)
+	if !ok {
+		d.Fatal("output", errors.New("client doesn't support testing"))
+	}
+
+	c.Test(d)
 }
