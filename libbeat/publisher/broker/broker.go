@@ -5,6 +5,7 @@ import (
 
 	"github.com/elastic/beats/libbeat/common"
 	"github.com/elastic/beats/libbeat/publisher"
+	"github.com/elastic/beats/libbeat/publisher/beat"
 )
 
 // Factory for creating a broker used by a pipeline instance.
@@ -54,7 +55,7 @@ type ProducerConfig struct {
 	// with close happening early might result in the event being dropped. The callback
 	// gives a brokers user a chance to keep track of total number of events
 	// being buffered by the broker.
-	OnDrop func(count int)
+	OnDrop func(beat.Event)
 
 	// DropOnCancel is a hint to the broker to drop events if the producer disconnects
 	// via Cancel.

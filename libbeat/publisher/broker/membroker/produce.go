@@ -3,6 +3,7 @@ package membroker
 import (
 	"github.com/elastic/beats/libbeat/common/atomic"
 	"github.com/elastic/beats/libbeat/publisher"
+	"github.com/elastic/beats/libbeat/publisher/beat"
 	"github.com/elastic/beats/libbeat/publisher/broker"
 )
 
@@ -27,14 +28,14 @@ type openState struct {
 
 type produceState struct {
 	cb        ackHandler
-	dropCB    func(int)
+	dropCB    func(beat.Event)
 	cancelled bool
 	lastACK   uint32
 }
 
 type ackHandler func(count int)
 
-func newProducer(b *Broker, cb ackHandler, dropCB func(int), dropOnCancel bool) broker.Producer {
+func newProducer(b *Broker, cb ackHandler, dropCB func(beat.Event), dropOnCancel bool) broker.Producer {
 	openState := openState{
 		isOpen: atomic.MakeBool(true),
 		done:   make(chan struct{}),

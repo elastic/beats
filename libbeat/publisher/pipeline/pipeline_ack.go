@@ -197,37 +197,21 @@ func (p *pipelineEventCB) close() {
 //       In the meantime the broker has the chance of batching-up more ACK events,
 //       such that only one ACK event is being reported to the pipeline handler
 func (p *pipelineEventCB) onEvents(events []beat.Event, acked int) {
-	ch := p.events
-	if acked == 0 {
-		ch = p.droppedEvents
-	}
-
-	msg := eventsMsg{
-		events: events,
-		total:  len(events),
-		acked:  acked,
-		sig:    make(chan struct{}),
-	}
-
-	// send message to worker and wait for completion signal
-	ch <- msg
-	<-msg.sig
+	p.pushMsg(eventsMsg{events: events, total: len(events), acked: acked})
 }
 
 func (p *pipelineEventCB) onCounts(total, acked int) {
-	ch := p.events
-	if acked == 0 {
-		ch = p.droppedEvents
-	}
+	p.pushMsg(eventsMsg{total: total, acked: acked})
+}
 
-	msg := eventsMsg{
-		total: total,
-		acked: acked,
-		sig:   make(chan struct{}),
+func (p *pipelineEventCB) pushMsg(msg eventsMsg) {
+	if msg.acked == 0 {
+		p.droppedEvents <- msg
+	} else {
+		msg.sig = make(chan struct{})
+		p.events <- msg
+		<-msg.sig
 	}
-
-	ch <- msg
-	<-msg.sig
 }
 
 // Starts a new ACKed event.
@@ -252,7 +236,9 @@ func (p *pipelineEventCB) worker() {
 			// have been processed by pipeline ack handler
 		case msg := <-p.droppedEvents:
 			p.reportEvents(msg.events, msg.total)
-			close(msg.sig)
+			if msg.sig != nil {
+				close(msg.sig)
+			}
 
 		case <-p.done:
 			return
@@ -278,7 +264,9 @@ func (p *pipelineEventCB) collect(count int) (exit bool) {
 			return
 		}
 
-		signalers = append(signalers, msg.sig)
+		if msg.sig != nil {
+			signalers = append(signalers, msg.sig)
+		}
 		total += msg.total
 		acked += msg.acked
 

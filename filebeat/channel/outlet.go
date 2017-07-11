@@ -2,93 +2,60 @@ package channel
 
 import (
 	"sync"
-	"sync/atomic"
 
 	"github.com/elastic/beats/filebeat/util"
+	"github.com/elastic/beats/libbeat/common/atomic"
+	"github.com/elastic/beats/libbeat/publisher/beat"
 )
 
-// Outlet struct is used to be passed to an object which needs an outlet
-//
-// The difference between signal and done channel is as following:
-// - signal channel can be added through SetSignal and is used to
-//   interrupt events sent through OnEventSignal-
-// - done channel is used to close and stop the outlet
-//
-// If SetSignal is used, it must be ensure that there is only one event producer.
-type Outlet struct {
-	wg      *sync.WaitGroup // Use for counting active events
-	done    <-chan struct{}
-	signal  <-chan struct{}
-	channel chan *util.Data
-	isOpen  int32 // atomic indicator
+type outlet struct {
+	wg     *sync.WaitGroup
+	client beat.Client
+	isOpen atomic.Bool
 }
 
-func NewOutlet(
-	done <-chan struct{},
-	c chan *util.Data,
-	wg *sync.WaitGroup,
-) *Outlet {
-	return &Outlet{
-		done:    done,
-		channel: c,
-		wg:      wg,
-		isOpen:  1,
+func newOutlet(client beat.Client, wg *sync.WaitGroup) *outlet {
+	o := &outlet{
+		wg:     wg,
+		client: client,
+		isOpen: atomic.MakeBool(true),
 	}
+	return o
 }
 
-// SetSignal sets the signal channel for OnEventSignal
-// If SetSignal is used, it must be ensure that only one producer exists.
-func (o *Outlet) SetSignal(signal <-chan struct{}) {
-	o.signal = signal
+func (o *outlet) Close() error {
+	isOpen := o.isOpen.Swap(false)
+	if isOpen {
+		return o.client.Close()
+	}
+	return nil
 }
 
-func (o *Outlet) OnEvent(data *util.Data) bool {
-	open := atomic.LoadInt32(&o.isOpen) == 1
-	if !open {
+func (o *outlet) OnEvent(d *util.Data) bool {
+	if !o.isOpen.Load() {
 		return false
+	}
+
+	event := d.GetEvent()
+	if d.HasState() {
+		event.Private = d
 	}
 
 	if o.wg != nil {
 		o.wg.Add(1)
 	}
 
-	select {
-	case <-o.done:
-		if o.wg != nil {
-			o.wg.Done()
-		}
-		atomic.StoreInt32(&o.isOpen, 0)
-		return false
-	case o.channel <- data:
-		return true
-	}
-}
+	o.client.Publish(event)
 
-// OnEventSignal can be stopped by the signal that is set with SetSignal
-// This does not close the outlet. Only OnEvent does close the outlet.
-// If OnEventSignal is used, it must be ensured that only one producer is used.
-func (o *Outlet) OnEventSignal(data *util.Data) bool {
-	open := atomic.LoadInt32(&o.isOpen) == 1
-	if !open {
-		return false
-	}
-
-	if o.wg != nil {
-		o.wg.Add(1)
-	}
-
-	select {
-	case <-o.signal:
-		if o.wg != nil {
-			o.wg.Done()
-		}
-		o.signal = nil
-		return false
-	case o.channel <- data:
-		return true
-	}
-}
-
-func (o *Outlet) Copy() Outleter {
-	return NewOutlet(o.done, o.channel, o.wg)
+	// Note: race condition on shutdown:
+	//  The underlying beat.Client is asynchronous. Without proper ACK
+	//  handler we can not tell if the event made it 'through' or the client
+	//  close has been completed before sending. In either case,
+	//  we report 'false' here, indicating the event eventually being dropped.
+	//  Returning false here, prevents the harvester from updating the state
+	//  to the most recently published events. Therefore, on shutdown the harvester
+	//  might report an old/outdated state update to the registry, overwriting the
+	//  most recently
+	//  published offset in the registry on shutdown.
+	return o.isOpen.Load()
 }

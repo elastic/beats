@@ -17,7 +17,7 @@ import (
 type Crawler struct {
 	prospectors       map[uint64]*prospector.Prospector
 	prospectorConfigs []*common.Config
-	out               channel.Outleter
+	out               channel.OutleterFactory
 	wg                sync.WaitGroup
 	reloader          *cfgfile.Reloader
 	once              bool
@@ -25,8 +25,7 @@ type Crawler struct {
 	beatDone          chan struct{}
 }
 
-func New(out channel.Outleter, prospectorConfigs []*common.Config, beatVersion string, beatDone chan struct{}, once bool) (*Crawler, error) {
-
+func New(out channel.OutleterFactory, prospectorConfigs []*common.Config, beatVersion string, beatDone chan struct{}, once bool) (*Crawler, error) {
 	return &Crawler{
 		out:               out,
 		prospectors:       map[uint64]*prospector.Prospector{},

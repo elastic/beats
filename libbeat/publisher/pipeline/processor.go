@@ -33,13 +33,14 @@ type processorFn struct {
 // 2. (P) generalize/normalize event
 // 3. (P) add beats metadata (name, hostname, version)
 // 4. (C) add Meta from client Config to event.Meta
-// 5. (P) add pipeline fields + tags
-// 6. (C) add client fields + tags
-// 7. (P/C) apply EventMetadataKey fields + tags (to be removed in favor of 4)
-// 8. (C) client processors list
-// 9. (P) pipeline processors list
-// 10. (P) (if publish/debug enabled) log event
-// 11. (P) (if output disabled) dropEvent
+// 5. (C) add Fields from client config to event.Fields
+// 6. (P) add pipeline fields + tags
+// 7. (C) add client fields + tags
+// 8. (P/C) apply EventMetadataKey fields + tags (to be removed in favor of 4)
+// 9. (C) client processors list
+// 10. (P) pipeline processors list
+// 11. (P) (if publish/debug enabled) log event
+// 12. (P) (if output disabled) dropEvent
 func (p *Pipeline) newProcessorPipeline(
 	config beat.ClientConfig,
 ) beat.Processor {
@@ -54,22 +55,28 @@ func (p *Pipeline) newProcessorPipeline(
 	processors.add(generalizeProcessor)
 	processors.add(global.beatMetaProcessor)
 
+	// setup 4: add Meta from client config
 	if m := config.Meta; len(m) > 0 {
 		processors.add(clientEventMeta(m))
 	}
 
-	// setup 4: add event fields + tags (P)
+	// setup 5: add Fields from client config
+	if m := config.Fields; len(m) > 0 {
+		processors.add(clientEventFields(m))
+	}
+
+	// setup 6: add event fields + tags (P)
 	processors.add(global.eventMetaProcessor)
 
-	// setup 6: add fields + tags (C)
+	// setup 7: add fields + tags (C)
 	if em := config.EventMetadata; len(em.Fields) > 0 || len(em.Tags) > 0 {
 		processors.add(eventAnnotateProcessor(em))
 	}
 
-	// setup 7: apply EventMetadata fields + tags
+	// setup 8: apply EventMetadata fields + tags
 	processors.add(eventUserAnnotateProcessor)
 
-	// setup 8: client processors (C)
+	// setup 9: client processors (C)
 	if procs := config.Processor; procs != nil {
 		if lst := procs.All(); len(lst) > 0 {
 
@@ -80,15 +87,15 @@ func (p *Pipeline) newProcessorPipeline(
 		}
 	}
 
-	// setup 9: pipeline processors (P)
+	// setup 10: pipeline processors (P)
 	processors.add(global.processors)
 
-	// setup 10: debug print final event (P)
+	// setup 11: debug print final event (P)
 	if logp.IsDebug("publish") {
 		processors.add(debugPrintProcessor())
 	}
 
-	// setup 11: drop all events if outputs are disabled
+	// setup 12: drop all events if outputs are disabled
 	if global.disabled {
 		processors.add(dropDisabledProcessor)
 	}
@@ -206,6 +213,12 @@ func clientEventMeta(meta common.MapStr) *processorFn {
 			event.Meta = event.Meta.Clone()
 			event.Meta.DeepUpdate(meta.Clone())
 		}
+	})
+}
+
+func clientEventFields(fields common.MapStr) *processorFn {
+	return newAnnotateProcessor("globalFields", func(event *beat.Event) {
+		event.Fields.DeepUpdate(fields.Clone())
 	})
 }
 

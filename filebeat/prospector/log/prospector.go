@@ -30,24 +30,47 @@ var (
 
 // Prospector contains the prospector and its config
 type Prospector struct {
-	cfg      *common.Config
-	config   config
-	states   *file.States
-	registry *harvester.Registry
-	outlet   channel.Outleter
-	done     chan struct{}
+	cfg         *common.Config
+	config      config
+	states      *file.States
+	harvesters  *harvester.Registry
+	outlet      channel.Outleter
+	stateOutlet channel.Outleter
+	done        chan struct{}
 }
 
 // NewProspector instantiates a new Log
-func NewProspector(cfg *common.Config, states []file.State, outlet channel.Outleter, done chan struct{}) (*Prospector, error) {
+func NewProspector(
+	cfg *common.Config,
+	states []file.State,
+	outlet channel.OutleterFactory,
+	done, beatDone chan struct{},
+) (*Prospector, error) {
+
+	// Note: underlying output.
+	//  The prospector and harvester do have different requirements
+	//  on the timings the outlets must be closed/unblocked.
+	//  The outlet generated here is the underlying outlet, only closed
+	//  once all workers have been shut down.
+	//  For state updates and events, separate sub-outlets will be used.
+	out, err := outlet(cfg)
+	if err != nil {
+		return nil, err
+	}
+
+	// stateOut will only be unblocked if the beat is shut down.
+	// otherwise it can block on a full publisher pipeline, so state updates
+	// can be forwarded correctly to the registrar.
+	stateOut := channel.CloseOnSignal(channel.SubOutlet(out), beatDone)
 
 	p := &Prospector{
-		config:   defaultConfig,
-		cfg:      cfg,
-		registry: harvester.NewRegistry(),
-		outlet:   outlet,
-		states:   &file.States{},
-		done:     done,
+		config:      defaultConfig,
+		cfg:         cfg,
+		harvesters:  harvester.NewRegistry(),
+		outlet:      out,
+		stateOutlet: stateOut,
+		states:      &file.States{},
+		done:        done,
 	}
 
 	if err := cfg.Unpack(&p.config); err != nil {
@@ -60,7 +83,7 @@ func NewProspector(cfg *common.Config, states []file.State, outlet channel.Outle
 
 	// Create empty harvester to check if configs are fine
 	// TODO: Do config validation instead
-	_, err := p.createHarvester(file.State{})
+	_, err = p.createHarvester(file.State{})
 	if err != nil {
 		return nil, err
 	}
@@ -549,12 +572,15 @@ func (p *Prospector) isCleanInactive(state file.State) bool {
 // createHarvester creates a new harvester instance from the given state
 func (p *Prospector) createHarvester(state file.State) (*Harvester, error) {
 
-	// Each harvester gets its own copy of the outlet
-	outlet := p.outlet.Copy()
+	// Each wraps the outlet, for closing the outlet individualy
+	outlet := channel.SubOutlet(p.outlet)
 	h, err := NewHarvester(
 		p.cfg,
 		state,
 		p.states,
+		func(d *util.Data) bool {
+			return p.stateOutlet.OnEvent(d)
+		},
 		outlet,
 	)
 
@@ -565,7 +591,7 @@ func (p *Prospector) createHarvester(state file.State) (*Harvester, error) {
 // In case the HarvesterLimit is reached, an error is returned
 func (p *Prospector) startHarvester(state file.State, offset int64) error {
 
-	if p.config.HarvesterLimit > 0 && p.registry.Len() >= p.config.HarvesterLimit {
+	if p.config.HarvesterLimit > 0 && p.harvesters.Len() >= p.config.HarvesterLimit {
 		harvesterSkipped.Add(1)
 		return fmt.Errorf("Harvester limit reached")
 	}
@@ -590,7 +616,7 @@ func (p *Prospector) startHarvester(state file.State, offset int64) error {
 	// This is synchronous state update as part of the scan
 	h.SendStateUpdate()
 
-	p.registry.Start(h)
+	p.harvesters.Start(h)
 
 	return nil
 }
@@ -598,7 +624,6 @@ func (p *Prospector) startHarvester(state file.State, offset int64) error {
 // updateState updates the prospector state and forwards the event to the spooler
 // All state updates done by the prospector itself are synchronous to make sure not states are overwritten
 func (p *Prospector) updateState(state file.State) error {
-
 	// Add ttl if cleanOlder is enabled and TTL is not already 0
 	if p.config.CleanInactive > 0 && state.TTL != 0 {
 		state.TTL = p.config.CleanInactive
@@ -609,9 +634,7 @@ func (p *Prospector) updateState(state file.State) error {
 
 	data := util.NewData()
 	data.SetState(state)
-
 	ok := p.outlet.OnEvent(data)
-
 	if !ok {
 		logp.Info("Prospector outlet closed")
 		return errors.New("prospector outlet closed")
@@ -622,7 +645,7 @@ func (p *Prospector) updateState(state file.State) error {
 
 // Wait waits for the all harvesters to complete and only then call stop
 func (p *Prospector) Wait() {
-	p.registry.WaitForCompletion()
+	p.harvesters.WaitForCompletion()
 	p.Stop()
 }
 
@@ -632,5 +655,11 @@ func (p *Prospector) Stop() {
 	// Stop all harvesters
 	// In case the beatDone channel is closed, this will not wait for completion
 	// Otherwise Stop will wait until output is complete
-	p.registry.Stop()
+	p.harvesters.Stop()
+
+	// close state updater
+	p.stateOutlet.Close()
+
+	// stop all communication between harvesters and publisher pipeline
+	p.outlet.Close()
 }
