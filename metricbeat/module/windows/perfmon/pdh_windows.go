@@ -3,6 +3,7 @@
 package perfmon
 
 import (
+	"regexp"
 	"strconv"
 	"syscall"
 	"unicode/utf16"
@@ -19,7 +20,9 @@ import (
 //sys _PdhAddCounter(query PdhQueryHandle, counterPath string, userData uintptr, counter *PdhCounterHandle) (errcode error) [failretval!=0] = pdh.PdhAddEnglishCounterW
 //sys _PdhCollectQueryData(query PdhQueryHandle) (errcode error) [failretval!=0] = pdh.PdhCollectQueryData
 //sys _PdhGetFormattedCounterValue(counter PdhCounterHandle, format PdhCounterFormat, counterType *uint32, value *PdhCounterValue) (errcode error) [failretval!=0] = pdh.PdhGetFormattedCounterValue
+//sys _PdhGetFormattedCounterArray(counter PdhCounterHandle, format PdhCounterFormat, bufferSize *uint32, bufferCount *uint32, itemBuffer *PdhCounterValueItem) (errcode error) [failretval!=0] = pdh.PdhGetFormattedCounterArrayW
 //sys _PdhGetRawCounterValue(counter PdhCounterHandle, counterType *uint32, value *PdhRawCounter) (errcode error) [failretval!=0] = pdh.PdhGetRawCounterValue
+//sys _PdhGetRawCounterArray(counter PdhCounterHandle, bufferSize *uint32, bufferCount *uint32, itemBuffer *PdhRawCounterItem) (errcode error) [failretval!=0] = pdh.PdhGetRawCounterArray
 //sys _PdhCalculateCounterFromRawValue(counter PdhCounterHandle, format PdhCounterFormat, rawValue1 *PdhRawCounter, rawValue2 *PdhRawCounter, value *PdhCounterValue) (errcode error) [failretval!=0] = pdh.PdhCalculateCounterFromRawValue
 //sys _PdhFormatFromRawValue(counterType uint32, format PdhCounterFormat, timeBase *uint64, rawValue1 *PdhRawCounter, rawValue2 *PdhRawCounter, value *PdhCounterValue) (errcode error) [failretval!=0] = pdh.PdhFormatFromRawValue
 //sys _PdhCloseQuery(query PdhQueryHandle) (errcode error) [failretval!=0] = pdh.PdhCloseQuery
@@ -31,6 +34,11 @@ var InvalidQueryHandle = ^PdhQueryHandle(0)
 type PdhCounterHandle uintptr
 
 var InvalidCounterHandle = ^PdhCounterHandle(0)
+
+type CounterValueItem struct {
+	Name  string
+	Value PdhCounterValue
+}
 
 func PdhOpenQuery(dataSource string, userData uintptr) (PdhQueryHandle, error) {
 	var dataSourcePtr *uint16
@@ -75,6 +83,45 @@ func PdhGetFormattedCounterValue(counter PdhCounterHandle, format PdhCounterForm
 	}
 
 	return counterType, &value, nil
+}
+
+func PdhGetFormattedCounterArray(counter PdhCounterHandle, format PdhCounterFormat) ([]CounterValueItem, error) {
+	var bufferSize uint32
+	var bufferCount uint32
+
+	if err := _PdhGetFormattedCounterArray(counter, format, &bufferSize, &bufferCount, nil); err != nil {
+		//From MSDN: You should call this function twice, the first time to get the required buffer size (set ItemBuffer to NULL and lpdwBufferSize to 0), and the second time to get the data.
+		if PdhErrno(err.(syscall.Errno)) == PDH_MORE_DATA {
+			pdhValues := make([]PdhCounterValueItem, bufferSize)
+			if err := _PdhGetFormattedCounterArray(counter, format, &bufferSize, &bufferCount, &pdhValues[0]); err != nil {
+				return nil, PdhErrno(err.(syscall.Errno))
+			}
+
+			values := make([]CounterValueItem, bufferCount)
+			var i uint32
+
+			for i = 0; i < bufferCount; i++ {
+				value := CounterValueItem{}
+				a := (*[1<<30 - 1]uint16)(unsafe.Pointer(pdhValues[i].SzName))
+				size := 0
+				for ; size < len(a); size++ {
+					if a[size] == uint16(0) {
+						break
+					}
+				}
+				runes := utf16.Decode(a[:size])
+				name := string(runes)
+				value.Name = name
+				value.Value = pdhValues[i].FmtValue
+				values[i] = value
+			}
+
+			return values, nil
+		}
+		return nil, PdhErrno(err.(syscall.Errno))
+	}
+
+	return nil, nil
 }
 
 func PdhGetRawCounterValue(counter PdhCounterHandle) (uint32, *PdhRawCounter, error) {
@@ -171,26 +218,54 @@ func (q *Query) Execute() error {
 }
 
 type Value struct {
-	Num interface{}
-	Err error
+	Instance    string
+	Measurement interface{}
+	Err         error
 }
 
-func (q *Query) Values() (map[string]Value, error) {
-	rtn := make(map[string]Value, len(q.counters))
+func (q *Query) Values() (map[string][]Value, error) {
+	rtn := make(map[string][]Value, len(q.counters))
+
 	for path, counter := range q.counters {
-		_, value, err := PdhGetFormattedCounterValue(counter.handle, counter.format|PdhFmtNoCap100)
-		if err != nil {
-			rtn[path] = Value{Err: err}
-			continue
-		}
 
-		switch counter.format {
-		case PdhFmtDouble:
-			rtn[path] = Value{Num: *(*float64)(unsafe.Pointer(&value.LongValue))}
-		case PdhFmtLarge:
-			rtn[path] = Value{Num: *(*int64)(unsafe.Pointer(&value.LongValue))}
-		}
+		if match, _ := regexp.MatchString(".*\\(\\*\\)\\.*", path); match {
+			values, err := PdhGetFormattedCounterArray(counter.handle, counter.format|PdhFmtNoCap100)
+			if err != nil {
+				rtn[path] = append(rtn[path], Value{Err: err})
+				continue
+			}
 
+			for i := 0; i < len(values); i++ {
+				var val interface{}
+
+				switch counter.format {
+				case PdhFmtDouble:
+					val = *(*float64)(unsafe.Pointer(&values[i].Value.LongValue))
+				case PdhFmtLarge:
+					val = *(*int64)(unsafe.Pointer(&values[i].Value.LongValue))
+				}
+
+				rtn[path] = append(rtn[path], Value{Instance: values[i].Name, Measurement: val})
+
+			}
+		} else {
+			_, value, err := PdhGetFormattedCounterValue(counter.handle, counter.format|PdhFmtNoCap100)
+			if err != nil {
+				rtn[path] = append(rtn[path], Value{Err: err})
+				continue
+			}
+
+			re := regexp.MustCompile("\\((.*)\\)")
+			match := re.FindStringSubmatch(path)
+			name := match[1]
+
+			switch counter.format {
+			case PdhFmtDouble:
+				rtn[path] = append(rtn[path], Value{Measurement: *(*float64)(unsafe.Pointer(&value.LongValue)), Instance: name})
+			case PdhFmtLarge:
+				rtn[path] = append(rtn[path], Value{Measurement: *(*int64)(unsafe.Pointer(&value.LongValue)), Instance: name})
+			}
+		}
 	}
 
 	return rtn, nil
@@ -202,9 +277,10 @@ func (q *Query) Close() error {
 }
 
 type PerfmonReader struct {
-	query     *Query            // PDH Query
-	pathToKey map[string]string // Mapping of counter path to key used in output.
-	executed  bool              // Indicates if the query has been executed.
+	query       *Query            // PDH Query
+	instance    map[string]string // Mapping of counter path to key used in output.
+	measurement map[string]string
+	executed    bool // Indicates if the query has been executed.
 }
 
 func NewPerfmonReader(config []CounterConfig) (*PerfmonReader, error) {
@@ -214,8 +290,9 @@ func NewPerfmonReader(config []CounterConfig) (*PerfmonReader, error) {
 	}
 
 	r := &PerfmonReader{
-		query:     query,
-		pathToKey: map[string]string{},
+		query:       query,
+		instance:    map[string]string{},
+		measurement: map[string]string{},
 	}
 
 	for _, counter := range config {
@@ -231,14 +308,15 @@ func NewPerfmonReader(config []CounterConfig) (*PerfmonReader, error) {
 			return nil, err
 		}
 
-		r.pathToKey[counter.Query] = counter.Alias
+		r.instance[counter.Query] = counter.InstanceLabel
+		r.measurement[counter.Query] = counter.MeasurementLabel
 
 	}
 
 	return r, nil
 }
 
-func (r *PerfmonReader) Read() (common.MapStr, error) {
+func (r *PerfmonReader) Read() ([]common.MapStr, error) {
 	if err := r.query.Execute(); err != nil {
 		return nil, err
 	}
@@ -250,23 +328,30 @@ func (r *PerfmonReader) Read() (common.MapStr, error) {
 	}
 
 	// Write the values into the map.
-	result := common.MapStr{}
+	result := []common.MapStr{}
 	var errs multierror.Errors
 
-	for counterPath, value := range values {
-		key := r.pathToKey[counterPath]
-		result.Put(key, value.Num)
+	for counterPath, counter := range values {
+		for _, val := range counter {
+			ev := common.MapStr{}
+			instanceKey := r.instance[counterPath]
+			ev.Put(instanceKey, val.Instance)
+			measurementKey := r.measurement[counterPath]
+			ev.Put(measurementKey, val.Measurement)
 
-		if value.Err != nil {
-			switch value.Err {
-			case PDH_CALC_NEGATIVE_DENOMINATOR:
-			case PDH_INVALID_DATA:
-				if r.executed {
-					errs = append(errs, errors.Wrapf(value.Err, "key=%v", key))
+			if val.Err != nil {
+				switch val.Err {
+				case PDH_CALC_NEGATIVE_DENOMINATOR:
+				case PDH_INVALID_DATA:
+					if r.executed {
+						errs = append(errs, errors.Wrapf(val.Err, "key=%v", measurementKey))
+					}
+				default:
+					errs = append(errs, errors.Wrapf(val.Err, "key=%v", measurementKey))
 				}
-			default:
-				errs = append(errs, errors.Wrapf(value.Err, "key=%v", key))
 			}
+
+			result = append(result, ev)
 		}
 	}
 
