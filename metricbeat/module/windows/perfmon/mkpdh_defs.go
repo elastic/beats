@@ -81,6 +81,10 @@ const (
 // PdhCounterValue is the structure that receives the counter value.
 type PdhCounterValue C.PDH_FMT_COUNTERVALUE
 
+type PdhCounterValueItem C.PDH_FMT_COUNTERVALUE_ITEM
+
+type PdhRawCounterItem C.PDH_RAW_COUNTER_ITEM 
+
 // PdhRawCounter is the structure that receives the raw counter.
 type PdhRawCounter C.PDH_RAW_COUNTER
 
