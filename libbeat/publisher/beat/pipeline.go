@@ -32,6 +32,9 @@ type ClientConfig struct {
 	// structure.
 	Meta common.MapStr
 
+	// Fields provides additional 'global' fields to be added to every event
+	Fields common.MapStr
+
 	// Processors passes additional processor to the client, to be executed before
 	// the pipeline processors.
 	Processor ProcessorList

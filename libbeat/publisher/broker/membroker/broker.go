@@ -219,9 +219,9 @@ func (b *Broker) eventLoop() {
 			events = b.events
 		}
 
-		b.logger.Debug("active events: ", activeEvents)
+		// b.logger.Debug("active events: ", activeEvents)
 		if b.buf.Empty() {
-			b.logger.Debugf("no event available in active region")
+			// b.logger.Debugf("no event available in active region")
 			get = nil
 		} else {
 			get = b.requests
@@ -241,7 +241,7 @@ func (b *Broker) insert(req pushRequest) (int, bool) {
 			// do not add waiting events if producer did send cancel signal
 
 			if cb := st.dropCB; cb != nil {
-				cb(1)
+				cb(req.event.Content)
 			}
 
 			return -1, false
