@@ -2,9 +2,11 @@ package outputs
 
 import (
 	"errors"
+	"fmt"
 	"math/rand"
 
 	"github.com/elastic/beats/libbeat/publisher"
+	"github.com/elastic/beats/libbeat/testing"
 )
 
 type failoverClient struct {
@@ -77,4 +79,16 @@ func (f *failoverClient) Publish(batch publisher.Batch) error {
 		return errNoActiveConnection
 	}
 	return f.clients[f.active].Publish(batch)
+}
+
+func (f *failoverClient) Test(d testing.Driver) {
+	for i, client := range f.clients {
+		c, ok := client.(testing.Testable)
+		d.Run(fmt.Sprintf("Client %d", i), func(d testing.Driver) {
+			if !ok {
+				d.Fatal("output", errors.New("client doesn't support testing"))
+			}
+			c.Test(d)
+		})
+	}
 }

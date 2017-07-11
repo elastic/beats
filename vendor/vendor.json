@@ -686,6 +686,14 @@
 			"revisionTime": "2017-06-29T16:56:01Z"
 		},
 		{
+			"checksumSHA1": "AANTVr9CVVyzsgviODY6Wi2thuM=",
+			"path": "github.com/fatih/color",
+			"revision": "570b54cabe6b8eb0bc2dfce68d964677d63b5260",
+			"revisionTime": "2017-05-23T13:53:55Z",
+			"version": "v1.5.0",
+			"versionExact": "v1.5.0"
+		},
+		{
 			"checksumSHA1": "LI9vdJJ/cOBwVI4y/8NIWp2nW4U=",
 			"path": "github.com/fsnotify/fsevents",
 			"revision": "3ceee05210c3babaa38cdc9181dabdcc83076a44",
@@ -786,6 +794,18 @@
 			"path": "github.com/klauspost/crc32",
 			"revision": "1bab8b35b6bb565f92cbc97939610af9369f942a",
 			"revisionTime": "2017-02-10T14:05:23Z"
+		},
+		{
+			"checksumSHA1": "qNkx9+OTwZI6aFv7K9zuFCGODUw=",
+			"path": "github.com/mattn/go-colorable",
+			"revision": "941b50ebc6efddf4c41c8e4537a5f68a4e686b24",
+			"revisionTime": "2017-06-15T03:49:14Z"
+		},
+		{
+			"checksumSHA1": "U6lX43KDDlNOn+Z0Yyww+ZzHfFo=",
+			"path": "github.com/mattn/go-isatty",
+			"revision": "fc9e8d8ef48496124e79ae0df75490096eccf6fe",
+			"revisionTime": "2017-03-22T23:44:13Z"
 		},
 		{
 			"checksumSHA1": "Y89CHl2URaBbobeyCOr4kzbLwYE=",

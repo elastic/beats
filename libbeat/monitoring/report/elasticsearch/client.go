@@ -7,6 +7,7 @@ import (
 	"github.com/elastic/beats/libbeat/common"
 	esout "github.com/elastic/beats/libbeat/outputs/elasticsearch"
 	"github.com/elastic/beats/libbeat/publisher"
+	"github.com/elastic/beats/libbeat/testing"
 )
 
 type publishClient struct {
@@ -93,4 +94,8 @@ func (c *publishClient) Publish(batch publisher.Batch) error {
 	}
 	batch.ACK()
 	return err
+}
+
+func (c *publishClient) Test(d testing.Driver) {
+	c.es.Test(d)
 }
