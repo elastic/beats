@@ -101,12 +101,10 @@ func (m MapStr) Clone() MapStr {
 	result := MapStr{}
 
 	for k, v := range m {
-		innerMap, err := toMapStr(v)
-		if err == nil {
-			result[k] = innerMap.Clone()
-		} else {
-			result[k] = v
+		if innerMap, ok := tryToMapStr(v); ok {
+			v = innerMap.Clone()
 		}
+		result[k] = v
 	}
 
 	return result
@@ -237,14 +235,21 @@ func AddTags(ms MapStr, tags []string) error {
 // a MapStr or a map[string]interface{}. If it's any other type or nil then
 // an error is returned.
 func toMapStr(v interface{}) (MapStr, error) {
-	switch v.(type) {
-	case MapStr:
-		return v.(MapStr), nil
-	case map[string]interface{}:
-		m := v.(map[string]interface{})
-		return MapStr(m), nil
-	default:
+	m, ok := tryToMapStr(v)
+	if !ok {
 		return nil, errors.Errorf("expected map but type is %T", v)
+	}
+	return m, nil
+}
+
+func tryToMapStr(v interface{}) (MapStr, bool) {
+	switch m := v.(type) {
+	case MapStr:
+		return m, true
+	case map[string]interface{}:
+		return MapStr(m), true
+	default:
+		return nil, false
 	}
 }
 
