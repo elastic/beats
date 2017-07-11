@@ -16,11 +16,6 @@ GOX_FLAGS=-arch="amd64 386 arm ppc64 ppc64le"
 
 include ${ES_BEATS}/libbeat/scripts/Makefile
 
-.PHONY: clean
-clean::
-	@rm -rf _meta/kibana/dashboard _meta/kibana/search _meta/kibana/visualization
-	@rm -rf docs/modules
-
 # Collects all module dashboards
 .PHONY: kibana
 kibana:
