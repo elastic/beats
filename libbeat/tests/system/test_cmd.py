@@ -152,8 +152,6 @@ class TestCommands(BaseTest):
         assert self.log_contains('TLS... WARN secure connection disabled')
         assert self.log_contains('talk to server... OK')
 
-    @unittest.skipUnless(INTEGRATION_TESTS, "integration test")
-    @attr('integration')
     def test_test_wrong_output(self):
         """
         Test test wrong output works
@@ -166,9 +164,9 @@ class TestCommands(BaseTest):
             extra_args=["test", "output"],
             config="mockbeat.yml")
 
-        assert exit_code == 0
+        assert exit_code == 1
         assert self.log_contains('parse url... OK')
-        assert self.log_contains('dns lookup... ERROR lookup badhost: no such host')
+        assert self.log_contains('dns lookup... ERROR')
 
     def get_host(self):
         return os.getenv('ES_HOST', 'localhost') + ':' + os.getenv('ES_PORT', '9200')
