@@ -1,7 +1,10 @@
 package log
 
 import (
+	"fmt"
 	"os"
+
+	"github.com/elastic/beats/filebeat/harvester/encoding"
 )
 
 // Stdin reads all incoming traffic from stdin and sends it directly to the output
@@ -9,8 +12,13 @@ import (
 func (h *Harvester) openStdin() error {
 	h.source = Pipe{File: os.Stdin}
 
+	encodingFactory, ok := encoding.FindEncoding(h.config.Encoding)
+	if !ok || encodingFactory == nil {
+		return fmt.Errorf("unknown encoding('%v')", h.config.Encoding)
+	}
+
 	var err error
-	h.encoding, err = h.encodingFactory(h.source)
+	h.encoding, err = encodingFactory(h.source)
 
 	return err
 }

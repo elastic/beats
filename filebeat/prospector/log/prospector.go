@@ -58,19 +58,11 @@ func NewProspector(cfg *common.Config, states []file.State, outlet channel.Outle
 		return nil, err
 	}
 
-	// Create empty harvester to check if configs are fine
-	// TODO: Do config validation instead
-	_, err := p.createHarvester(file.State{})
-	if err != nil {
-		return nil, err
-	}
-
 	if len(p.config.Paths) == 0 {
 		return nil, fmt.Errorf("each prospector must have at least one path defined")
 	}
 
-	err = p.loadStates(states)
-	if err != nil {
+	if err := p.loadStates(states); err != nil {
 		return nil, err
 	}
 
@@ -556,6 +548,7 @@ func (p *Prospector) createHarvester(state file.State) (*Harvester, error) {
 		state,
 		p.states,
 		outlet,
+		File{},
 	)
 
 	return h, err
@@ -578,11 +571,6 @@ func (p *Prospector) startHarvester(state file.State, offset int64) error {
 	h, err := p.createHarvester(state)
 	if err != nil {
 		return err
-	}
-
-	err = h.Setup()
-	if err != nil {
-		return fmt.Errorf("Error setting up harvester: %s", err)
 	}
 
 	// Update state before staring harvester
