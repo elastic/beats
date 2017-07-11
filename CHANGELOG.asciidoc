@@ -143,6 +143,7 @@ https://github.com/elastic/beats/compare/v6.0.0-alpha1...v6.0.0-alpha2[View comm
 
 *Metricbeat*
 
+- Set correct format for percent fields in memory module. {pull}4619[4619]
 - Fix a debug statement that said a module wrapper had stopped when it hadn't. {pull}4264[4264]
 - Use MemAvailable value from /proc/meminfo on Linux 3.14. {pull}4316[4316]
 - Fix panic when events were dropped by filters. {issue}4327[4327]
