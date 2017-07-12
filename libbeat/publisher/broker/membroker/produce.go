@@ -52,11 +52,11 @@ func newProducer(b *Broker, cb ackHandler, dropCB func(beat.Event), dropOnCancel
 }
 
 func (p *forgetfullProducer) Publish(event publisher.Event) bool {
-	return publish(p.makeRequest(event), &p.openState)
+	return p.openState.publish(p.makeRequest(event))
 }
 
 func (p *forgetfullProducer) TryPublish(event publisher.Event) bool {
-	return tryPublish(p.makeRequest(event), &p.openState)
+	return p.openState.tryPublish(p.makeRequest(event))
 }
 
 func (p *forgetfullProducer) makeRequest(event publisher.Event) pushRequest {
@@ -69,11 +69,11 @@ func (p *forgetfullProducer) Cancel() int {
 }
 
 func (p *ackProducer) Publish(event publisher.Event) bool {
-	return publish(p.makeRequest(event), &p.openState)
+	return p.openState.publish(p.makeRequest(event))
 }
 
 func (p *ackProducer) TryPublish(event publisher.Event) bool {
-	return tryPublish(p.makeRequest(event), &p.openState)
+	return p.openState.tryPublish(p.makeRequest(event))
 }
 
 func (p *ackProducer) makeRequest(event publisher.Event) pushRequest {
@@ -108,7 +108,7 @@ func (st *openState) Close() {
 	close(st.done)
 }
 
-func publish(req pushRequest, st *openState) bool {
+func (st *openState) publish(req pushRequest) bool {
 	select {
 	case st.events <- req:
 		return true
@@ -118,7 +118,7 @@ func publish(req pushRequest, st *openState) bool {
 	}
 }
 
-func tryPublish(req pushRequest, st *openState) bool {
+func (st *openState) tryPublish(req pushRequest) bool {
 	select {
 	case st.events <- req:
 		return true
