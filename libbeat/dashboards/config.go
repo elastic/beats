@@ -1,6 +1,6 @@
 package dashboards
 
-type DashboardsConfig struct {
+type Config struct {
 	Enabled        bool   `config:"enabled"`
 	KibanaIndex    string `config:"kibana_index"`
 	Index          string `config:"index"`
@@ -14,7 +14,7 @@ type DashboardsConfig struct {
 	SnapshotURL    string `config:"snapshot_url"`
 }
 
-var defaultDashboardsConfig = DashboardsConfig{
+var defaultConfig = Config{
 	KibanaIndex: ".kibana",
 }
 var (
