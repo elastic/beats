@@ -5,7 +5,7 @@ package sniffer
 import (
 	"fmt"
 
-	"github.com/tsg/deepanshumehndiratta/pfring"
+	"github.com/deepanshumehndiratta/gopacket/pfring"
 	"github.com/tsg/gopacket"
 )
 

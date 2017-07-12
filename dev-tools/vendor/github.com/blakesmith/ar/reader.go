@@ -1,4 +1,4 @@
-/* 
+/*
 Copyright (c) 2013 Blake Smith <blakesmith0@gmail.com>
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
@@ -31,7 +31,7 @@ import (
 
 // Provides read access to an ar archive.
 // Call next to skip files
-// 
+//
 // Example:
 //	reader := NewReader(f)
 //	var buf bytes.Buffer
@@ -47,8 +47,8 @@ import (
 //	}
 
 type Reader struct {
-	r io.Reader
-	nb int64
+	r   io.Reader
+	nb  int64
 	pad int64
 }
 
@@ -60,16 +60,16 @@ func NewReader(r io.Reader) *Reader {
 }
 
 func (rd *Reader) string(b []byte) string {
-	i := len(b)-1
+	i := len(b) - 1
 	for i > 0 && b[i] == 32 {
 		i--
 	}
 
-	return string(b[0:i+1])
+	return string(b[0 : i+1])
 }
 
 func (rd *Reader) numeric(b []byte) int64 {
-	i := len(b)-1
+	i := len(b) - 1
 	for i > 0 && b[i] == 32 {
 		i--
 	}
@@ -80,7 +80,7 @@ func (rd *Reader) numeric(b []byte) int64 {
 }
 
 func (rd *Reader) octal(b []byte) int64 {
-	i := len(b)-1
+	i := len(b) - 1
 	for i > 0 && b[i] == 32 {
 		i--
 	}
@@ -129,14 +129,14 @@ func (rd *Reader) readHeader() (*Header, error) {
 }
 
 // Call Next() to skip to the next file in the archive file.
-// Returns a Header which contains the metadata about the 
+// Returns a Header which contains the metadata about the
 // file in the archive.
 func (rd *Reader) Next() (*Header, error) {
 	err := rd.skipUnread()
 	if err != nil {
 		return nil, err
 	}
-	
+
 	return rd.readHeader()
 }
 
