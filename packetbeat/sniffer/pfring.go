@@ -6,7 +6,7 @@ import (
 	"fmt"
 
 	"github.com/tsg/gopacket"
-	"github.com/tsg/gopacket/pfring"
+	"github.com/tsg/deepanshumehndiratta/pfring"
 )
 
 type pfringHandle struct {
