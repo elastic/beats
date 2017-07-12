@@ -376,7 +376,7 @@ func (p *Prospector) scan() {
 
 	var err error
 
-	if p.config.ScanSort != "none" {
+	if p.config.ScanSort != "" {
 		sortInfos, err = getSortedFiles(p.config.ScanOrder, p.config.ScanSort, getSortInfos(paths))
 		if err != nil {
 			logp.Err("Failed to sort files during scan due to error %s", err)
