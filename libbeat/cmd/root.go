@@ -51,7 +51,7 @@ func GenRootCmdWithRunFlags(name, version string, beatCreator beat.Creator, runF
 	rootCmd.SetupCmd = genSetupCmd(name, version, beatCreator)
 	rootCmd.VersionCmd = genVersionCmd(name, version)
 	rootCmd.CompletionCmd = genCompletionCmd(name, version, rootCmd)
-	rootCmd.ExportCmd = genExportCmd(name, version, beatCreator)
+	rootCmd.ExportCmd = genExportCmd(name, version)
 	rootCmd.TestCmd = genTestCmd(name, version, beatCreator)
 
 	// Root command is an alias for run

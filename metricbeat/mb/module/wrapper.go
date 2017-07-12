@@ -10,6 +10,7 @@ import (
 	"github.com/elastic/beats/libbeat/logp"
 	"github.com/elastic/beats/libbeat/monitoring"
 	"github.com/elastic/beats/libbeat/processors"
+	"github.com/elastic/beats/libbeat/testing"
 	"github.com/elastic/beats/metricbeat/mb"
 
 	"github.com/joeshaw/multierror"
@@ -185,6 +186,11 @@ func (mw *Wrapper) Hash() uint64 {
 	return mw.configHash
 }
 
+// MetricSets return the list of metricsets of the module
+func (mw *Wrapper) MetricSets() []*metricSetWrapper {
+	return mw.metricSets
+}
+
 // metricSetWrapper methods
 
 func (msw *metricSetWrapper) run(done <-chan struct{}, out chan<- common.MapStr) {
@@ -227,7 +233,7 @@ func (msw *metricSetWrapper) run(done <-chan struct{}, out chan<- common.MapStr)
 // startPeriodicFetching performs an immediate fetch for the MetricSet then it
 // begins a continuous timer scheduled loop to fetch data. To stop the loop the
 // done channel should be closed.
-func (msw *metricSetWrapper) startPeriodicFetching(reporter *eventReporter) {
+func (msw *metricSetWrapper) startPeriodicFetching(reporter reporter) {
 	// Fetch immediately.
 	msw.fetch(reporter)
 
@@ -236,7 +242,7 @@ func (msw *metricSetWrapper) startPeriodicFetching(reporter *eventReporter) {
 	defer t.Stop()
 	for {
 		select {
-		case <-reporter.done:
+		case <-reporter.Done():
 			return
 		case <-t.C:
 			msw.fetch(reporter)
@@ -247,7 +253,7 @@ func (msw *metricSetWrapper) startPeriodicFetching(reporter *eventReporter) {
 // fetch invokes the appropriate Fetch method for the MetricSet and publishes
 // the result using the publisher client. This method will recover from panics
 // and log a stack track if one occurs.
-func (msw *metricSetWrapper) fetch(reporter *eventReporter) {
+func (msw *metricSetWrapper) fetch(reporter reporter) {
 	switch fetcher := msw.MetricSet.(type) {
 	case mb.EventFetcher:
 		msw.singleEventFetch(fetcher, reporter)
@@ -260,14 +266,14 @@ func (msw *metricSetWrapper) fetch(reporter *eventReporter) {
 	}
 }
 
-func (msw *metricSetWrapper) singleEventFetch(fetcher mb.EventFetcher, reporter *eventReporter) {
-	reporter.startFetchTimer()
+func (msw *metricSetWrapper) singleEventFetch(fetcher mb.EventFetcher, reporter reporter) {
+	reporter.StartFetchTimer()
 	event, err := fetcher.Fetch()
 	reporter.ErrorWith(err, event)
 }
 
-func (msw *metricSetWrapper) multiEventFetch(fetcher mb.EventsFetcher, reporter *eventReporter) {
-	reporter.startFetchTimer()
+func (msw *metricSetWrapper) multiEventFetch(fetcher mb.EventsFetcher, reporter reporter) {
+	reporter.StartFetchTimer()
 	events, err := fetcher.Fetch()
 	if len(events) == 0 {
 		reporter.ErrorWith(err, nil)
@@ -278,8 +284,8 @@ func (msw *metricSetWrapper) multiEventFetch(fetcher mb.EventsFetcher, reporter 
 	}
 }
 
-func (msw *metricSetWrapper) reportingFetch(fetcher mb.ReportingMetricSet, reporter *eventReporter) {
-	reporter.startFetchTimer()
+func (msw *metricSetWrapper) reportingFetch(fetcher mb.ReportingMetricSet, reporter reporter) {
+	reporter.StartFetchTimer()
 	fetcher.Fetch(reporter)
 }
 
@@ -298,7 +304,32 @@ func (msw *metricSetWrapper) String() string {
 		msw.module.Name(), msw.Name(), msw.Host())
 }
 
+func (msw *metricSetWrapper) Test(d testing.Driver) {
+	done := make(chan struct{})
+	d.Run(msw.Name(), func(d testing.Driver) {
+		// ReportingMetricSet would hang out forever, perhaps we can add a timeout based test in the future
+		if _, ok := msw.MetricSet.(mb.ReportingMetricSet); ok {
+			d.Warn("test", "metricset doesn't support testing")
+			return
+		}
+
+		reporter := &testingReporter{
+			driver: d,
+			done:   done,
+		}
+		msw.fetch(reporter)
+	})
+}
+
 // Reporter implementation
+
+type reporter interface {
+	StartFetchTimer()
+	Done() <-chan struct{}
+	Event(event common.MapStr) bool
+	Error(err error) bool
+	ErrorWith(err error, meta common.MapStr) bool
+}
 
 // eventReporter implements the Reporter interface which is a callback interface
 // used by MetricSet implementations to report an event(s), an error, or an error
@@ -312,7 +343,7 @@ type eventReporter struct {
 
 // startFetchTimer demarcates the start of a new fetch. The elapsed time of a
 // fetch is computed based on the time of this call.
-func (r *eventReporter) startFetchTimer() {
+func (r *eventReporter) StartFetchTimer() {
 	r.start = time.Now()
 }
 
