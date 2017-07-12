@@ -15,13 +15,12 @@ var importAPI = "/api/kibana/dashboards/import"
 
 type KibanaLoader struct {
 	client       *kibana.Client
-	config       *DashboardsConfig
+	config       *Config
 	version      string
-	msgOutputter *MessageOutputter
+	msgOutputter MessageOutputter
 }
 
-func NewKibanaLoader(cfg *common.Config, dashboardsConfig *DashboardsConfig, msgOutputter *MessageOutputter) (*KibanaLoader, error) {
-
+func NewKibanaLoader(cfg *common.Config, dashboardsConfig *Config, msgOutputter MessageOutputter) (*KibanaLoader, error) {
 	client, err := kibana.NewKibanaClient(cfg)
 	if err != nil {
 		return nil, fmt.Errorf("Error creating Kibana client: %v", err)
@@ -40,7 +39,6 @@ func NewKibanaLoader(cfg *common.Config, dashboardsConfig *DashboardsConfig, msg
 }
 
 func (loader KibanaLoader) ImportIndex(file string) error {
-
 	params := url.Values{}
 	params.Set("force", "true") //overwrite the existing dashboards
 
@@ -51,11 +49,9 @@ func (loader KibanaLoader) ImportIndex(file string) error {
 	}
 
 	return loader.client.ImportJSON(importAPI, params, bytes.NewBuffer(content))
-
 }
 
 func (loader KibanaLoader) ImportDashboard(file string) error {
-
 	params := url.Values{}
 	params.Set("force", "true")            //overwrite the existing dashboards
 	params.Add("exclude", "index-pattern") //don't import the index pattern from the dashboards
@@ -75,7 +71,7 @@ func (loader KibanaLoader) Close() error {
 
 func (loader KibanaLoader) statusMsg(msg string, a ...interface{}) {
 	if loader.msgOutputter != nil {
-		(*loader.msgOutputter)(msg, a...)
+		loader.msgOutputter(msg, a...)
 	} else {
 		logp.Debug("dashboards", msg, a...)
 	}

@@ -16,7 +16,7 @@ func TestImporter(t *testing.T) {
 		logp.LogInit(logp.LOG_DEBUG, "", false, true, []string{"*"})
 	}
 
-	dashboardsConfig := DashboardsConfig{
+	dashboardsConfig := Config{
 		KibanaIndex: ".kibana-test",
 		File:        "testdata/testbeat-dashboards.zip",
 		Beat:        "testbeat",
@@ -45,7 +45,6 @@ func TestImporter(t *testing.T) {
 
 	status, _, _ := client.Request("GET", "/.kibana-test/dashboard/1e4389f0-e871-11e6-911d-3f8ed6f72700", "", nil, nil)
 	assert.Equal(t, 200, status)
-
 }
 
 func TestImporterEmptyBeat(t *testing.T) {
@@ -53,7 +52,7 @@ func TestImporterEmptyBeat(t *testing.T) {
 		logp.LogInit(logp.LOG_DEBUG, "", false, true, []string{"*"})
 	}
 
-	dashboardsConfig := DashboardsConfig{
+	dashboardsConfig := Config{
 		KibanaIndex: ".kibana-test-nobeat",
 		File:        "testdata/testbeat-dashboards.zip",
 		Beat:        "",
@@ -78,5 +77,4 @@ func TestImporterEmptyBeat(t *testing.T) {
 
 	status, _, _ := client.Request("GET", "/.kibana-test-nobeat/dashboard/1e4389f0-e871-11e6-911d-3f8ed6f72700", "", nil, nil)
 	assert.Equal(t, 200, status)
-
 }
