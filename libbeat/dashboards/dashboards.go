@@ -15,7 +15,7 @@ func ImportDashboards(beatName, beatVersion string, kibanaConfig *common.Config,
 		return nil
 	}
 
-	dashConfig := defaultDashboardsConfig
+	dashConfig := defaultConfig
 	dashConfig.Beat = beatName
 	dashConfig.URL = fmt.Sprintf(defaultURLPattern, beatVersion)
 	dashConfig.SnapshotURL = fmt.Sprintf(snapshotURLPattern, beatVersion)
@@ -30,7 +30,7 @@ func ImportDashboards(beatName, beatVersion string, kibanaConfig *common.Config,
 		if err != nil {
 			return err
 		}
-		if status == true {
+		if status {
 			// the dashboards were imported via Elasticsearch
 			return nil
 		}
@@ -44,8 +44,7 @@ func ImportDashboards(beatName, beatVersion string, kibanaConfig *common.Config,
 	return nil
 }
 
-func ImportDashboardsViaKibana(config *common.Config, dashConfig *DashboardsConfig) error {
-
+func ImportDashboardsViaKibana(config *common.Config, dashConfig *Config) error {
 	if config == nil {
 		config = common.NewConfig()
 	}
@@ -81,13 +80,11 @@ func ImportDashboardsViaKibana(config *common.Config, dashConfig *DashboardsConf
 	return nil
 }
 
-func ImportDashboardsViaElasticsearch(config *common.Config, dashConfig *DashboardsConfig) (bool, error) {
-
+func ImportDashboardsViaElasticsearch(config *common.Config, dashConfig *Config) (bool, error) {
 	esLoader, err := NewElasticsearchLoader(config, dashConfig, nil)
 	if err != nil {
 		return false, fmt.Errorf("fail to create the Elasticsearch loader: %v", err)
 	}
-
 	defer esLoader.Close()
 
 	logp.Debug("dashboards", "Elasticsearch URL %v", esLoader.client.Connection.URL)
@@ -116,10 +113,9 @@ func ImportDashboardsViaElasticsearch(config *common.Config, dashConfig *Dashboa
 	}
 
 	return true, nil
-
 }
-func getMajorVersion(version string) (int, error) {
 
+func getMajorVersion(version string) (int, error) {
 	fields := strings.Split(version, ".")
 	if len(fields) != 3 {
 		return 0, fmt.Errorf("wrong version %s", version)
