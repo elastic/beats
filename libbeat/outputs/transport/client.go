@@ -23,7 +23,7 @@ type Config struct {
 	Proxy   *ProxyConfig
 	TLS     *TLSConfig
 	Timeout time.Duration
-	Stats   *IOStats
+	Stats   IOStatser
 }
 
 func MakeDialer(c *Config) (Dialer, error) {

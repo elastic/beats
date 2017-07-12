@@ -14,12 +14,17 @@ func init() {
 
 type fileOutput struct {
 	beat    common.BeatInfo
+	stats   *outputs.Stats
 	rotator logp.FileRotator
 	codec   codec.Codec
 }
 
 // New instantiates a new file output instance.
-func makeFileout(beat common.BeatInfo, cfg *common.Config) (outputs.Group, error) {
+func makeFileout(
+	beat common.BeatInfo,
+	stats *outputs.Stats,
+	cfg *common.Config,
+) (outputs.Group, error) {
 	config := defaultConfig
 	if err := cfg.Unpack(&config); err != nil {
 		return outputs.Fail(err)
@@ -29,7 +34,7 @@ func makeFileout(beat common.BeatInfo, cfg *common.Config) (outputs.Group, error
 	cfg.SetInt("flush_interval", -1, -1)
 	cfg.SetInt("bulk_max_size", -1, -1)
 
-	fo := &fileOutput{beat: beat}
+	fo := &fileOutput{beat: beat, stats: stats}
 	if err := fo.init(config); err != nil {
 		return outputs.Fail(err)
 	}
@@ -87,7 +92,11 @@ func (out *fileOutput) Publish(
 ) error {
 	defer batch.ACK()
 
+	st := out.stats
 	events := batch.Events()
+	st.NewBatch(len(events))
+
+	dropped := 0
 	for i := range events {
 		event := &events[i]
 
@@ -98,19 +107,30 @@ func (out *fileOutput) Publish(
 			} else {
 				logp.Warn("Failed to serialize the event: %v", err)
 			}
+
+			dropped++
 			continue
 		}
 
 		err = out.rotator.WriteLine(serializedEvent)
 		if err != nil {
+			st.WriteError()
+
 			if event.Guaranteed() {
 				logp.Critical("Writing event to file failed with: %v", err)
 			} else {
 				logp.Warn("Writing event to file failed with: %v", err)
 			}
+
+			dropped++
 			continue
 		}
+
+		st.WriteBytes(len(serializedEvent) + 1)
 	}
+
+	st.Dropped(dropped)
+	st.Acked(len(events) - dropped)
 
 	return nil
 }

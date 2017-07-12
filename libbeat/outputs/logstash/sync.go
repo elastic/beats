@@ -13,15 +13,21 @@ import (
 type syncClient struct {
 	*transport.Client
 	client *v2.SyncClient
+	stats  *outputs.Stats
 	win    window
 	ttl    time.Duration
 	ticker *time.Ticker
 }
 
-func newSyncClient(conn *transport.Client, config *Config) (*syncClient, error) {
+func newSyncClient(
+	conn *transport.Client,
+	stats *outputs.Stats,
+	config *Config,
+) (*syncClient, error) {
 	c := &syncClient{}
 	c.Client = conn
 	c.ttl = config.TTL
+	c.stats = stats
 	c.win.init(defaultStartMaxWindowSize, config.BulkMaxSize)
 	if c.ttl > 0 {
 		c.ticker = time.NewTicker(c.ttl)
@@ -71,13 +77,14 @@ func (c *syncClient) reconnect() error {
 
 func (c *syncClient) Publish(batch publisher.Batch) error {
 	events := batch.Events()
+	st := c.stats
+
+	st.NewBatch(len(events))
+
 	if len(events) == 0 {
 		batch.ACK()
 		return nil
 	}
-
-	publishEventsCallCount.Add(1)
-	totalNumberOfEvents := int64(len(events))
 
 	for len(events) > 0 {
 		// check if we need to reconnect
@@ -96,6 +103,7 @@ func (c *syncClient) Publish(batch publisher.Batch) error {
 
 		n, err := c.publishWindowed(events)
 		events = events[n:]
+		st.Acked(n)
 
 		debugf("%v events out of %v events sent to logstash. Continue sending",
 			n, len(events))
@@ -109,20 +117,14 @@ func (c *syncClient) Publish(batch publisher.Batch) error {
 
 			logp.Err("Failed to publish events caused by: %v", err)
 
-			rest := int64(len(events))
-			acked := totalNumberOfEvents - rest
-
-			eventsNotAcked.Add(rest)
-			ackedEvents.Add(acked)
-			outputs.AckedEvents.Add(acked)
+			rest := len(events)
+			st.Failed(rest)
 
 			return err
 		}
 	}
 
 	batch.ACK()
-	ackedEvents.Add(totalNumberOfEvents)
-	outputs.AckedEvents.Add(totalNumberOfEvents)
 	return nil
 }
 
