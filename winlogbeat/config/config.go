@@ -43,10 +43,8 @@ func (s Settings) Validate() error {
 	// TODO: winlogbeat should not try to validate top-level beats config
 
 	validKeys := []string{
-		"fields", "fields_under_root", "tags", "name",
-		"queue_size", "bulk_queue_size", "max_procs",
-		"processors", "logging", "output", "path", "winlogbeat",
-		"dashboards",
+		"fields", "fields_under_root", "tags", "name", "queue", "max_procs",
+		"processors", "logging", "output", "path", "winlogbeat", "dashboards",
 	}
 	sort.Strings(validKeys)
 

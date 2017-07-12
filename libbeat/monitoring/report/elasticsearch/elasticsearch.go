@@ -105,7 +105,10 @@ func makeReporter(beat common.BeatInfo, cfg *common.Config) (report.Reporter, er
 	}
 
 	brokerFactory := func(e broker.Eventer) (broker.Broker, error) {
-		return membroker.NewBroker(e, 20, false), nil
+		return membroker.NewBroker(membroker.Settings{
+			Eventer: e,
+			Events:  20,
+		}), nil
 	}
 	pipeline, err := pipeline.New(brokerFactory, out, pipeline.Settings{
 		WaitClose:     0,

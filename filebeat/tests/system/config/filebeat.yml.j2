@@ -89,13 +89,10 @@ filebeat.prospectors:
 {{prospector_raw}}
 {% endif %}
 
-filebeat.spool_size:
 filebeat.shutdown_timeout: {{ shutdown_timeout|default(0) }}
-filebeat.idle_timeout: 0.1s
 {% if not skip_registry_config %}
 filebeat.registry_file: {{ beat.working_dir + '/' }}{{ registryFile|default("registry")}}
 {%endif%}
-filebeat.publish_async: {{publish_async}}
 
 {% if reload or reload_path -%}
 filebeat.config.{{ reload_type|default("prospectors") }}:

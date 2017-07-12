@@ -48,19 +48,13 @@ type BeatPublisher struct {
 }
 
 type ShipperConfig struct {
-	common.EventMetadata `config:",inline"` // Fields and tags to add to each event.
-	Name                 string             `config:"name"`
+	common.EventMetadata `config:",inline"`     // Fields and tags to add to each event.
+	Name                 string                 `config:"name"`
+	Queue                common.ConfigNamespace `config:"queue"`
 
 	// internal publisher queue sizes
-	QueueSize     *int `config:"queue_size"`
-	BulkQueueSize *int `config:"bulk_queue_size"`
-	MaxProcs      *int `config:"max_procs"`
+	MaxProcs *int `config:"max_procs"`
 }
-
-const (
-	DefaultQueueSize     = 1000
-	DefaultBulkQueueSize = 0
-)
 
 func init() {
 	publishDisabled = flag.Bool("N", false, "Disable actual publishing for testing")
@@ -92,8 +86,6 @@ func (publisher *BeatPublisher) init(
 	if publisher.disabled {
 		logp.Info("Dry run mode. All output types except the file based one are disabled.")
 	}
-
-	shipper.InitShipperConfig()
 
 	publisher.name = shipper.Name
 	if publisher.name == "" {
@@ -132,18 +124,4 @@ func (publisher *BeatPublisher) SetACKHandler(h beat.PipelineACKHandler) error {
 
 func (publisher *BeatPublisher) GetName() string {
 	return publisher.name
-}
-
-func (config *ShipperConfig) InitShipperConfig() {
-
-	// TODO: replace by ucfg
-	if config.QueueSize == nil || *config.QueueSize <= 0 {
-		queueSize := DefaultQueueSize
-		config.QueueSize = &queueSize
-	}
-
-	if config.BulkQueueSize == nil || *config.BulkQueueSize < 0 {
-		bulkQueueSize := DefaultBulkQueueSize
-		config.BulkQueueSize = &bulkQueueSize
-	}
 }

@@ -15,7 +15,9 @@ type Broker struct {
 
 	logger logger
 
-	buf brokerBuffer
+	buf         brokerBuffer
+	minEvents   int
+	idleTimeout time.Duration
 
 	// api channels
 	events    chan pushRequest
@@ -33,6 +35,14 @@ type Broker struct {
 	// wait group for worker shutdown
 	wg          sync.WaitGroup
 	waitOnClose bool
+}
+
+type Settings struct {
+	Eventer        broker.Eventer
+	Events         int
+	FlushMinEvents int
+	FlushTimeout   time.Duration
+	WaitOnClose    bool
 }
 
 type ackChan struct {
@@ -57,17 +67,40 @@ func create(eventer broker.Eventer, cfg *common.Config) (broker.Broker, error) {
 		return nil, err
 	}
 
-	b := NewBroker(eventer, config.Events, false)
-	return b, nil
+	return NewBroker(Settings{
+		Eventer:        eventer,
+		Events:         config.Events,
+		FlushMinEvents: config.FlushMinEvents,
+		FlushTimeout:   config.FlushTimeout,
+	}), nil
 }
 
 // NewBroker creates a new in-memory broker holding up to sz number of events.
 // If waitOnClose is set to true, the broker will block on Close, until all internal
 // workers handling incoming messages and ACKs have been shut down.
-func NewBroker(eventer broker.Eventer, sz int, waitOnClose bool) *Broker {
+func NewBroker(
+	settings Settings,
+) *Broker {
 	// define internal channel size for procuder/client requests
 	// to the broker
 	chanSize := 20
+
+	var (
+		sz           = settings.Events
+		minEvents    = settings.FlushMinEvents
+		flushTimeout = settings.FlushTimeout
+	)
+
+	if minEvents < 1 {
+		minEvents = 1
+	}
+	if minEvents > 1 && flushTimeout <= 0 {
+		minEvents = 1
+		flushTimeout = 0
+	}
+	if minEvents > sz {
+		minEvents = sz
+	}
 
 	logger := defaultLogger
 	b := &Broker{
@@ -83,11 +116,13 @@ func NewBroker(eventer broker.Eventer, sz int, waitOnClose bool) *Broker {
 		acks:          make(chan int),
 		scheduledACKs: make(chan chanList),
 
-		waitOnClose: waitOnClose,
+		waitOnClose: settings.WaitOnClose,
 
-		eventer: eventer,
+		eventer: settings.Eventer,
 	}
 	b.buf.init(logger, sz)
+	b.minEvents = minEvents
+	b.idleTimeout = flushTimeout
 
 	ack := &ackLoop{broker: b}
 
@@ -128,6 +163,10 @@ func (b *Broker) Consumer() broker.Consumer {
 
 func (b *Broker) eventLoop() {
 	var (
+		timer      *time.Timer
+		idleC      <-chan time.Time
+		forceFlush bool
+
 		events = b.events
 		get    chan getRequest
 
@@ -143,6 +182,15 @@ func (b *Broker) eventLoop() {
 		pendingACKs chanList
 		schedACKS   chan chanList
 	)
+
+	if b.idleTimeout > 0 {
+		// create initialy 'stopped' timer -> reset will be used
+		// on timer object, if flush timer becomes active.
+		timer = time.NewTimer(b.idleTimeout)
+		if !timer.Stop() {
+			<-timer.C
+		}
+	}
 
 	for {
 		select {
@@ -182,6 +230,10 @@ func (b *Broker) eventLoop() {
 				events = b.events
 			}
 
+		case <-idleC:
+			forceFlush = true
+			idleC = nil
+
 		case req := <-get:
 			start, buf := b.buf.reserve(req.sz)
 			count := len(buf)
@@ -203,6 +255,15 @@ func (b *Broker) eventLoop() {
 			pendingACKs.append(ackCH)
 			schedACKS = b.scheduledACKs
 
+			// stop flush timer on get
+			forceFlush = false
+			if idleC != nil {
+				idleC = nil
+				if !timer.Stop() {
+					<-timer.C
+				}
+			}
+
 		case schedACKS <- pendingACKs:
 			schedACKS = nil
 			pendingACKs = chanList{}
@@ -219,12 +280,19 @@ func (b *Broker) eventLoop() {
 			events = b.events
 		}
 
-		// b.logger.Debug("active events: ", activeEvents)
-		if b.buf.Empty() {
-			// b.logger.Debugf("no event available in active region")
-			get = nil
-		} else {
-			get = b.requests
+		// update get and idle timer after state machine
+
+		get = b.requests
+		if !forceFlush {
+			avail := b.buf.Avail()
+			if avail == 0 || b.buf.TotalAvail() < b.minEvents {
+				get = nil
+
+				if avail > 0 && idleC == nil && timer != nil {
+					timer.Reset(b.idleTimeout)
+					idleC = timer.C
+				}
+			}
 		}
 	}
 }
