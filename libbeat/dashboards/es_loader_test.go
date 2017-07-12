@@ -32,7 +32,7 @@ func TestImporter(t *testing.T) {
 		config: &dashboardsConfig,
 	}
 
-	err := loader.createKibanaIndex()
+	err := loader.CreateKibanaIndex()
 
 	assert.NoError(t, err)
 

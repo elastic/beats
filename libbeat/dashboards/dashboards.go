@@ -102,6 +102,10 @@ func ImportDashboardsViaElasticsearch(config *common.Config, dashConfig *Dashboa
 		return false, nil
 	}
 
+	if err := esLoader.CreateKibanaIndex(); err != nil {
+		return false, fmt.Errorf("fail to create the kibana index: %v", err)
+	}
+
 	importer, err := NewImporter("5.x", dashConfig, *esLoader)
 	if err != nil {
 		return false, fmt.Errorf("fail to create an Elasticsearch importer for loading the dashboards: %v", err)
