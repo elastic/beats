@@ -7,6 +7,7 @@ import (
 	"time"
 
 	"github.com/elastic/beats/libbeat/common"
+	"github.com/elastic/beats/libbeat/publisher"
 	"github.com/elastic/beats/libbeat/publisher/broker"
 )
 
@@ -27,8 +28,6 @@ type Broker struct {
 	// internal channels
 	acks          chan int
 	scheduledACKs chan chanList
-
-	ackSeq uint
 
 	eventer broker.Eventer
 
@@ -124,12 +123,13 @@ func NewBroker(
 	b.minEvents = minEvents
 	b.idleTimeout = flushTimeout
 
+	eventLoop := newEventLoop(b)
 	ack := &ackLoop{broker: b}
 
 	b.wg.Add(2)
 	go func() {
 		defer b.wg.Done()
-		b.eventLoop()
+		eventLoop.run()
 	}()
 	go func() {
 		defer b.wg.Done()
@@ -161,143 +161,7 @@ func (b *Broker) Consumer() broker.Consumer {
 	return newConsumer(b)
 }
 
-func (b *Broker) eventLoop() {
-	var (
-		timer      *time.Timer
-		idleC      <-chan time.Time
-		forceFlush bool
-
-		events = b.events
-		get    chan getRequest
-
-		activeEvents int
-
-		totalGet   uint64
-		totalACK   uint64
-		batchesGen uint64
-
-		// log = b.logger
-
-		// Buffer and send pending batches to ackloop.
-		pendingACKs chanList
-		schedACKS   chan chanList
-	)
-
-	if b.idleTimeout > 0 {
-		// create initialy 'stopped' timer -> reset will be used
-		// on timer object, if flush timer becomes active.
-		timer = time.NewTimer(b.idleTimeout)
-		if !timer.Stop() {
-			<-timer.C
-		}
-	}
-
-	for {
-		select {
-		case <-b.done:
-			return
-
-		// receiving new events into the buffer
-		case req := <-events:
-			// log.Debugf("push event: %v\t%v\t%p\n", req.event, req.seq, req.state)
-
-			avail, ok := b.insert(req)
-			if !ok {
-				break
-			}
-			if avail == 0 {
-				// log.Debugf("buffer: all regions full")
-				events = nil
-			}
-
-		case req := <-b.pubCancel:
-			// log.Debug("handle cancel request")
-			var removed int
-			if st := req.state; st != nil {
-				st.cancelled = true
-				removed = b.buf.cancel(st)
-			}
-
-			// signal cancel request being finished
-			if req.resp != nil {
-				req.resp <- producerCancelResponse{
-					removed: removed,
-				}
-			}
-
-			// re-enable pushRequest if buffer can take new events
-			if !b.buf.Full() {
-				events = b.events
-			}
-
-		case <-idleC:
-			forceFlush = true
-			idleC = nil
-
-		case req := <-get:
-			start, buf := b.buf.reserve(req.sz)
-			count := len(buf)
-			if count == 0 {
-				panic("empty batch returned")
-			}
-
-			// log.Debug("newACKChan: ", b.ackSeq, count)
-			ackCH := newACKChan(b.ackSeq, start, count)
-			b.ackSeq++
-
-			activeEvents += ackCH.count
-			totalGet += uint64(ackCH.count)
-			batchesGen++
-			// log.Debug("broker: total events get = ", totalGet)
-			// log.Debug("broker: total batches generated = ", batchesGen)
-
-			req.resp <- getResponse{buf, ackCH}
-			pendingACKs.append(ackCH)
-			schedACKS = b.scheduledACKs
-
-			// stop flush timer on get
-			forceFlush = false
-			if idleC != nil {
-				idleC = nil
-				if !timer.Stop() {
-					<-timer.C
-				}
-			}
-
-		case schedACKS <- pendingACKs:
-			schedACKS = nil
-			pendingACKs = chanList{}
-
-		case count := <-b.acks:
-			// log.Debug("receive buffer ack:", count)
-
-			activeEvents -= count
-			totalACK += uint64(count)
-			// log.Debug("broker: total events ack = ", totalACK)
-
-			b.buf.ack(count)
-			// after ACK some buffer has been freed up, reenable publisher
-			events = b.events
-		}
-
-		// update get and idle timer after state machine
-
-		get = b.requests
-		if !forceFlush {
-			avail := b.buf.Avail()
-			if avail == 0 || b.buf.TotalAvail() < b.minEvents {
-				get = nil
-
-				if avail > 0 && idleC == nil && timer != nil {
-					timer.Reset(b.idleTimeout)
-					idleC = timer.C
-				}
-			}
-		}
-	}
-}
-
-func (b *Broker) insert(req pushRequest) (int, bool) {
+func (b *Broker) insert(req *pushRequest) (int, bool) {
 	var avail int
 	if req.state == nil {
 		_, avail = b.buf.insert(req.event, clientState{})
@@ -322,6 +186,30 @@ func (b *Broker) insert(req pushRequest) (int, bool) {
 	}
 
 	return avail, true
+}
+
+func (b *Broker) get(max int) (startIndex int, events []publisher.Event) {
+	return b.buf.reserve(max)
+}
+
+func (b *Broker) cancel(st *produceState) int {
+	return b.buf.cancel(st)
+}
+
+func (b *Broker) full() bool {
+	return b.buf.Full()
+}
+
+func (b *Broker) avail() int {
+	return b.buf.Avail()
+}
+
+func (b *Broker) totalAvail() int {
+	return b.buf.TotalAvail()
+}
+
+func (b *Broker) cleanACKs(count int) {
+	b.buf.ack(count)
 }
 
 func (b *Broker) reportACK(states []clientState, start, N int) {
