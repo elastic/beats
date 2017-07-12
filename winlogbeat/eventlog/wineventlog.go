@@ -91,13 +91,8 @@ func (l *winEventLog) Name() string {
 	return l.channelName
 }
 
-func (l *winEventLog) Open(recordNumber uint64) error {
+func (l *winEventLog) Open(_ uint64) error {
 	var err error
-	bookmark, err := win.CreateBookmark(l.channelName, recordNumber)
-	if err != nil {
-		return err
-	}
-	defer win.Close(bookmark)
 
 	// Using a pull subscription to receive events. See:
 	// https://msdn.microsoft.com/en-us/library/windows/desktop/aa385771(v=vs.85).aspx#pull
@@ -108,12 +103,13 @@ func (l *winEventLog) Open(recordNumber uint64) error {
 
 	debugf("%s using subscription query=%s", l.logPrefix, l.query)
 	subscriptionHandle, err := win.Subscribe(
-		0,        // Session - nil for localhost
-		l.evt,    //signalEvent
-		"",       // Channel - empty b/c channel is in the query
-		l.query,  // Query - nil means all events
-		bookmark, // Bookmark - for resuming from a specific event
-		win.EvtSubscribeStartAfterBookmark)
+		0,       // Session - nil for localhost
+		l.evt,   //signalEvent
+		"",      // Channel - empty b/c channel is in the query
+		l.query, // Query - nil means all events
+		0,       // Bookmark - for resuming from a specific event
+		win.EvtSubscribeToFutureEvents, //win.EvtSubscribeStartAfterBookmark to work with bookmarks
+	)
 	if err != nil {
 		return err
 	}
