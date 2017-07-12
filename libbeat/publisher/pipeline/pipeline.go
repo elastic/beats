@@ -10,6 +10,8 @@ import (
 
 	"github.com/elastic/beats/libbeat/common"
 	"github.com/elastic/beats/libbeat/common/atomic"
+	"github.com/elastic/beats/libbeat/monitoring"
+
 	"github.com/elastic/beats/libbeat/logp"
 	"github.com/elastic/beats/libbeat/outputs"
 	"github.com/elastic/beats/libbeat/processors"
@@ -35,6 +37,8 @@ type Pipeline struct {
 	logger *logp.Logger
 	broker broker.Broker
 	output *outputController
+
+	observer observer
 
 	eventer pipelineEventer
 
@@ -108,6 +112,7 @@ type pipelineEventer struct {
 	mutex      sync.Mutex
 	modifyable bool
 
+	observer  *observer
 	waitClose *waitCloser
 	cb        *pipelineEventCB
 }
@@ -121,7 +126,11 @@ type brokerFactory func(broker.Eventer) (broker.Broker, error)
 
 // Load uses a Config object to create a new complete Pipeline instance with
 // configured broker and outputs.
-func Load(beatInfo common.BeatInfo, config Config) (*Pipeline, error) {
+func Load(
+	beatInfo common.BeatInfo,
+	monitoring *monitoring.Registry,
+	config Config,
+) (*Pipeline, error) {
 	if !config.Output.IsSet() {
 		return nil, errors.New("no output configured")
 	}
@@ -130,13 +139,13 @@ func Load(beatInfo common.BeatInfo, config Config) (*Pipeline, error) {
 		return broker.Load(e, config.Broker)
 	}
 
-	output, err := outputs.Load(beatInfo, config.Output.Name(), config.Output.Config())
+	output, err := outputs.Load(beatInfo, nil, config.Output.Name(), config.Output.Config())
 	if err != nil {
 		return nil, err
 	}
 
 	// TODO: configure pipeline processors
-	pipeline, err := New(brokerFactory, output, Settings{
+	pipeline, err := New(monitoring, brokerFactory, output, Settings{
 		WaitClose:     config.WaitShutdown,
 		WaitCloseMode: WaitOnPipelineClose,
 	})
@@ -154,11 +163,11 @@ func Load(beatInfo common.BeatInfo, config Config) (*Pipeline, error) {
 // The new pipeline will take ownership of broker and outputs. On Close, the
 // broker and outputs will be closed.
 func New(
+	metrics *monitoring.Registry,
 	brokerFactory brokerFactory,
 	out outputs.Group,
 	settings Settings,
 ) (*Pipeline, error) {
-
 	annotations := settings.Annotations
 	var err error
 
@@ -195,6 +204,8 @@ func New(
 	}
 	p.ackBuilder = &pipelineEmptyACK{p}
 	p.ackActive = atomic.MakeBool(true)
+
+	p.eventer.observer = &p.observer
 	p.eventer.modifyable = true
 
 	if settings.WaitCloseMode == WaitOnPipelineClose && settings.WaitClose > 0 {
@@ -210,7 +221,9 @@ func New(
 	}
 	p.eventSema = newSema(p.broker.BufferConfig().Events)
 
-	p.output = newOutputController(log, p.broker)
+	p.observer.init(metrics)
+
+	p.output = newOutputController(log, &p.observer, p.broker)
 	p.output.Set(out)
 
 	return p, nil
@@ -292,6 +305,7 @@ func (p *Pipeline) Close() error {
 		log.Err("pipeline broker shutdown error: ", err)
 	}
 
+	p.observer.cleanup()
 	return nil
 }
 
@@ -375,10 +389,13 @@ func (p *Pipeline) ConnectWith(cfg beat.ClientConfig) (beat.Client, error) {
 		reportEvents: reportEvents,
 	}
 
+	p.observer.clientConnected()
 	return client, nil
 }
 
 func (e *pipelineEventer) OnACK(n int) {
+	e.observer.queueACKed(n)
+
 	if wc := e.waitClose; wc != nil {
 		wc.dec(n)
 	}

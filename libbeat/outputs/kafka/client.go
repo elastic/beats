@@ -9,7 +9,6 @@ import (
 
 	"github.com/elastic/beats/libbeat/common/fmtstr"
 	"github.com/elastic/beats/libbeat/logp"
-	"github.com/elastic/beats/libbeat/monitoring"
 	"github.com/elastic/beats/libbeat/outputs"
 	"github.com/elastic/beats/libbeat/outputs/codec"
 	"github.com/elastic/beats/libbeat/outputs/outil"
@@ -17,6 +16,7 @@ import (
 )
 
 type client struct {
+	stats  *outputs.Stats
 	hosts  []string
 	topic  outil.Selector
 	key    *fmtstr.EventFormatString
@@ -30,6 +30,7 @@ type client struct {
 }
 
 type msgRef struct {
+	client *client
 	count  int32
 	total  int
 	failed []publisher.Event
@@ -38,15 +39,8 @@ type msgRef struct {
 	err error
 }
 
-var (
-	kafkaMetrics = outputs.Metrics.NewRegistry("kafka")
-
-	ackedEvents            = monitoring.NewInt(kafkaMetrics, "events.acked")
-	eventsNotAcked         = monitoring.NewInt(kafkaMetrics, "events.not_acked")
-	publishEventsCallCount = monitoring.NewInt(kafkaMetrics, "publishEvents.call.count")
-)
-
 func newKafkaClient(
+	stats *outputs.Stats,
 	hosts []string,
 	index string,
 	key *fmtstr.EventFormatString,
@@ -55,6 +49,7 @@ func newKafkaClient(
 	cfg *sarama.Config,
 ) (*client, error) {
 	c := &client{
+		stats:  stats,
 		hosts:  hosts,
 		topic:  topic,
 		key:    key,
@@ -94,12 +89,11 @@ func (c *client) Close() error {
 }
 
 func (c *client) Publish(batch publisher.Batch) error {
-	publishEventsCallCount.Add(1)
-	debugf("publish events")
-
 	events := batch.Events()
+	c.stats.NewBatch(len(events))
 
 	ref := &msgRef{
+		client: c,
 		count:  int32(len(events)),
 		total:  len(events),
 		failed: nil,
@@ -113,6 +107,7 @@ func (c *client) Publish(batch publisher.Batch) error {
 		if err != nil {
 			logp.Err("Dropping event: %v", err)
 			ref.done()
+			c.stats.Dropped(1)
 			continue
 		}
 
@@ -223,6 +218,7 @@ func (r *msgRef) dec() {
 	}
 
 	debugf("finished kafka batch")
+	stats := r.client.stats
 
 	err := r.err
 	if err != nil {
@@ -230,17 +226,14 @@ func (r *msgRef) dec() {
 		success := r.total - failed
 		r.batch.RetryEvents(r.failed)
 
-		eventsNotAcked.Add(int64(failed))
+		stats.Failed(failed)
 		if success > 0 {
-			ackedEvents.Add(int64(success))
-			outputs.AckedEvents.Add(int64(success))
+			stats.Acked(success)
 		}
 
 		debugf("Kafka publish failed with: %v", err)
 	} else {
 		r.batch.ACK()
-
-		ackedEvents.Add(int64(r.total))
-		outputs.AckedEvents.Add(int64(r.total))
+		stats.Acked(r.total)
 	}
 }

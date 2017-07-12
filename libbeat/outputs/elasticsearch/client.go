@@ -12,7 +12,6 @@ import (
 	"time"
 
 	"github.com/elastic/beats/libbeat/logp"
-	"github.com/elastic/beats/libbeat/monitoring"
 	"github.com/elastic/beats/libbeat/outputs"
 	"github.com/elastic/beats/libbeat/outputs/outil"
 	"github.com/elastic/beats/libbeat/outputs/transport"
@@ -41,7 +40,7 @@ type Client struct {
 	compressionLevel int
 	proxyURL         *url.URL
 
-	stats *ClientStats
+	stats *outputs.Stats
 }
 
 // ClientSettings contains the settings for a client.
@@ -56,14 +55,7 @@ type ClientSettings struct {
 	Pipeline           *outil.Selector
 	Timeout            time.Duration
 	CompressionLevel   int
-	Stats              *ClientStats
-}
-
-type ClientStats struct {
-	PublishCallCount *monitoring.Int
-	EventsACKed      *monitoring.Int
-	EventsFailed     *monitoring.Int
-	IO               *transport.IOStats
+	Stats              *outputs.Stats
 }
 
 type connectCallback func(client *Client) error
@@ -139,9 +131,9 @@ func NewClient(
 		return nil, err
 	}
 
-	if st := s.Stats; st != nil && st.IO != nil {
-		dialer = transport.StatsDialer(dialer, st.IO)
-		tlsDialer = transport.StatsDialer(tlsDialer, st.IO)
+	if st := s.Stats; st != nil {
+		dialer = transport.StatsDialer(dialer, st)
+		tlsDialer = transport.StatsDialer(tlsDialer, st)
 	}
 
 	params := s.Parameters
@@ -251,8 +243,10 @@ func (client *Client) publishEvents(
 	data []publisher.Event,
 ) ([]publisher.Event, error) {
 	begin := time.Now()
-	if st := client.stats; st != nil && st.PublishCallCount != nil {
-		st.PublishCallCount.Add(1)
+	st := client.stats
+
+	if st != nil {
+		st.NewBatch(len(data))
 	}
 
 	if len(data) == 0 {
@@ -264,8 +258,14 @@ func (client *Client) publishEvents(
 
 	// encode events into bulk request buffer, dropping failed elements from
 	// events slice
+
+	origCount := len(data)
 	data = bulkEncodePublishRequest(body, client.index, client.pipeline, data)
-	if len(data) == 0 {
+	newCount := len(data)
+	if st != nil && origCount > newCount {
+		st.Dropped(origCount - newCount)
+	}
+	if newCount == 0 {
 		return nil, nil
 	}
 
@@ -290,22 +290,20 @@ func (client *Client) publishEvents(
 		failedEvents = bulkCollectPublishFails(&client.json, data)
 	}
 
+	failed := len(failedEvents)
 	if st := client.stats; st != nil {
-		countOK := int64(len(data) - len(failedEvents))
-		st.EventsACKed.Add(countOK)
-		outputs.AckedEvents.Add(countOK)
-		if failed := int64(len(failedEvents)); failed > 0 {
-			st.EventsFailed.Add(failed)
-		}
+		acked := len(data) - failed
+
+		st.Acked(acked)
+		st.Failed(failed)
 	}
 
-	if len(failedEvents) > 0 {
+	if failed > 0 {
 		if sendErr == nil {
 			sendErr = errTempBulkFailure
 		}
 		return failedEvents, sendErr
 	}
-
 	return nil, nil
 }
 

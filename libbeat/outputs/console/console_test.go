@@ -104,7 +104,7 @@ func TestConsoleOutput(t *testing.T) {
 
 func run(codec codec.Codec, batches ...publisher.Batch) (string, error) {
 	return withStdout(func() {
-		c, _ := newConsole("test", codec)
+		c, _ := newConsole("test", nil, codec)
 		for _, b := range batches {
 			c.Publish(b)
 		}

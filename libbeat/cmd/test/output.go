@@ -28,7 +28,7 @@ func GenTestOutputCmd(name, beatVersion string) *cobra.Command {
 				os.Exit(1)
 			}
 
-			output, err := outputs.Load(b.Info, b.Config.Output.Name(), b.Config.Output.Config())
+			output, err := outputs.Load(b.Info, nil, b.Config.Output.Name(), b.Config.Output.Config())
 			if err != nil {
 				fmt.Fprintf(os.Stderr, "Error initializing output: %s\n", err)
 				os.Exit(1)
