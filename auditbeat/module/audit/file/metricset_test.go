@@ -268,13 +268,13 @@ func assertSameFile(t testing.TB, f1, f2 string) {
 		return
 	}
 
-	info1, err := os.Stat(f1)
+	info1, err := os.Lstat(f1)
 	if err != nil {
 		t.Error(err)
 		return
 	}
 
-	info2, err := os.Stat(f2)
+	info2, err := os.Lstat(f2)
 	if err != nil {
 		t.Error(err)
 		return

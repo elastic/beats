@@ -106,7 +106,7 @@ func buildMapStr(e *Event) common.MapStr {
 		} else {
 			m["uid"] = info.UID
 			m["gid"] = info.GID
-			m["mode"] = fmt.Sprintf("%#o", uint32(info.Mode))
+			m["mode"] = fmt.Sprintf("%#04o", uint32(info.Mode))
 		}
 
 		if info.Owner != "" {

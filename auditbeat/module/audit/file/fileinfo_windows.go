@@ -22,7 +22,7 @@ func Stat(path string) (*Metadata, error) {
 
 	attrs, ok := info.Sys().(*syscall.Win32FileAttributeData)
 	if !ok {
-		return nil, errors.Errorf("unexpected fileinfo sys type %T", info.Sys())
+		return nil, errors.Errorf("unexpected fileinfo sys type %T for %v", info.Sys(), path)
 	}
 
 	state := file.GetOSState(info)
