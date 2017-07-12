@@ -44,37 +44,20 @@ func NewElasticsearchLoader(cfg *common.Config, dashboardsConfig *DashboardsConf
 
 	loader.statusMsg("Initialize the Elasticsearch %s loader", version)
 
-	// initialize the Kibana index
-	if err := loader.createKibanaIndex(); err != nil {
-		return nil, fmt.Errorf("fail to create the kibana index: %v", err)
-	}
-
 	return &loader, nil
 }
 
 // CreateKibanaIndex creates the kibana index if it doesn't exists and sets
 // some index properties which are needed as a workaround for:
 // https://github.com/elastic/beats-dashboards/issues/94
-func (loader ElasticsearchLoader) createKibanaIndex() error {
+func (loader ElasticsearchLoader) CreateKibanaIndex() error {
 	status, err := loader.client.IndexExists(loader.config.KibanaIndex)
 
 	if err != nil {
 		if status != 404 {
 			return err
 		} else {
-			var settings common.MapStr
-			// XXX: this can be removed when the dashboard loaded will no longer need to support 6.0,
-			// because the Kibana API is used instead
-			if strings.HasPrefix(loader.client.GetVersion(), "6.") {
-				settings = common.MapStr{
-					"settings": common.MapStr{
-						"index.mapping.single_type": false,
-					},
-				}
-			} else {
-				settings = nil
-			}
-			_, _, err = loader.client.CreateIndex(loader.config.KibanaIndex, settings)
+			_, _, err = loader.client.CreateIndex(loader.config.KibanaIndex, nil)
 			if err != nil {
 				return fmt.Errorf("Failed to create index: %v", err)
 			}
