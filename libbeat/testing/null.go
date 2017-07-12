@@ -16,3 +16,5 @@ func (d *nullDriver) Warn(field, reason string) {}
 func (d *nullDriver) Error(field string, err error) {}
 
 func (d *nullDriver) Fatal(field string, err error) {}
+
+func (d *nullDriver) Result(data string) {}
