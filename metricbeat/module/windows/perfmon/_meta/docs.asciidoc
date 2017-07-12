@@ -10,6 +10,10 @@ You must configure queries for the Windows performance counters that you wish
 to collect. The example below collects processor time and disk writes.
 With `format` you can set the output format for a specific counter. Possible values are
 `float` and `long`. If nothing is selected the default value is `float`.
+There is also an optional/required option `instance_name`.
+You have to set this in two cases. First if you want to name your instance other then it is computed. e.g `Total` instead of `_Total`.
+And second if you specify a counter which has no instance, for example: `\TCPIP Performance Diagnostics\IPv4 NBLs/sec indicated without prevalidation`.
+Then this option is required. For wildcard queries this option is needles.
 
 [source,yaml]
 ----
@@ -18,6 +22,7 @@ With `format` you can set the output format for a specific counter. Possible val
   period: 10s
   perfmon.counters:
     - instance_label: "processor.name"
+      instance_name: "Total"
       measurement_label: "processor.time.total.pct"
       query: '\Processor Information(_Total)\% Processor Time'
     - instance_label: "diskio.name"
