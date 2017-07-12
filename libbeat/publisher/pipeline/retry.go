@@ -13,8 +13,10 @@ import (
 // will the consumer be paused, until some batches have been processed by some
 // outputs.
 type retryer struct {
-	logger *logp.Logger
-	done   chan struct{}
+	logger   *logp.Logger
+	observer *observer
+
+	done chan struct{}
 
 	consumer *eventConsumer
 
@@ -50,9 +52,15 @@ const (
 	cancelledBatch
 )
 
-func newRetryer(log *logp.Logger, out workQueue, c *eventConsumer) *retryer {
+func newRetryer(
+	log *logp.Logger,
+	observer *observer,
+	out workQueue,
+	c *eventConsumer,
+) *retryer {
 	r := &retryer{
 		logger:   log,
+		observer: observer,
 		done:     make(chan struct{}),
 		sig:      make(chan retryerSignal, 3),
 		in:       retryQueue(make(chan batchEvent, 3)),
@@ -93,9 +101,10 @@ func (r *retryer) cancelled(b *Batch) {
 func (r *retryer) loop() {
 	var (
 		out             workQueue
-		active          *Batch
 		consumerBlocked bool
 
+		active     *Batch
+		activeSize int
 		buffer     []*Batch
 		numOutputs int
 
@@ -108,9 +117,22 @@ func (r *retryer) loop() {
 			return
 
 		case evt := <-r.in:
-			batch := evt.batch
+			var (
+				countFailed  int
+				countDropped int
+				batch        = evt.batch
+				countRetry   = len(batch.events)
+			)
+
 			if evt.tag == retryBatch {
+				countFailed = len(batch.events)
+				r.observer.eventsFailed(countFailed)
+
 				decBatch(batch)
+
+				countRetry = len(batch.events)
+				countDropped = countFailed - countRetry
+				r.observer.eventsDropped(countDropped)
 			}
 
 			if len(batch.events) == 0 {
@@ -121,6 +143,7 @@ func (r *retryer) loop() {
 				buffer = append(buffer, batch)
 				out = r.out
 				active = buffer[0]
+				activeSize = len(active.events)
 				if !consumerBlocked {
 					consumerBlocked = blockConsumer(numOutputs, len(buffer))
 					if consumerBlocked {
@@ -132,13 +155,16 @@ func (r *retryer) loop() {
 			}
 
 		case out <- active:
+			r.observer.eventsRetry(activeSize)
+
 			buffer = buffer[1:]
-			active = nil
+			active, activeSize = nil, 0
 
 			if len(buffer) == 0 {
 				out = nil
 			} else {
 				active = buffer[0]
+				activeSize = len(active.events)
 			}
 
 			if consumerBlocked {

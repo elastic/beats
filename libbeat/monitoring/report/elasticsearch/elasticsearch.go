@@ -110,10 +110,15 @@ func makeReporter(beat common.BeatInfo, cfg *common.Config) (report.Reporter, er
 			Events:  20,
 		}), nil
 	}
-	pipeline, err := pipeline.New(brokerFactory, out, pipeline.Settings{
-		WaitClose:     0,
-		WaitCloseMode: pipeline.NoWaitOnClose,
-	})
+
+	monitoring := monitoring.Default.NewRegistry("xpack.monitoring")
+
+	pipeline, err := pipeline.New(
+		monitoring,
+		brokerFactory, out, pipeline.Settings{
+			WaitClose:     0,
+			WaitCloseMode: pipeline.NoWaitOnClose,
+		})
 	if err != nil {
 		return nil, err
 	}

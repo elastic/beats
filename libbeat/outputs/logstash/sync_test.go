@@ -48,7 +48,7 @@ func makeTestClient(conn *transport.Client) testClientDriver {
 	config := defaultConfig
 	config.Timeout = 1 * time.Second
 	config.TTL = 5 * time.Second
-	client, err := newSyncClient(conn, &config)
+	client, err := newSyncClient(conn, nil, &config)
 	if err != nil {
 		panic(err)
 	}

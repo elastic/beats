@@ -6,6 +6,7 @@ import (
 
 	"github.com/elastic/beats/libbeat/common"
 	"github.com/elastic/beats/libbeat/logp"
+	"github.com/elastic/beats/libbeat/monitoring"
 	"github.com/elastic/beats/libbeat/outputs"
 	"github.com/elastic/beats/libbeat/processors"
 	"github.com/elastic/beats/libbeat/publisher/broker"
@@ -18,6 +19,12 @@ func createPipeline(
 	processors *processors.Processors,
 	outcfg common.ConfigNamespace,
 ) (*pipeline.Pipeline, error) {
+
+	reg := monitoring.Default.GetRegistry("libbeat")
+	if reg == nil {
+		reg = monitoring.Default.NewRegistry("libbeat")
+	}
+
 	var out outputs.Group
 	if !(*publishDisabled) {
 		var err error
@@ -28,10 +35,16 @@ func createPipeline(
 			return nil, errors.New(msg)
 		}
 
-		out, err = outputs.Load(beatInfo, outcfg.Name(), outcfg.Config())
+		// TODO: add support to unload/reassign outStats on output reloading
+		outReg := reg.NewRegistry("output")
+		outStats := outputs.MakeStats(outReg)
+
+		out, err = outputs.Load(beatInfo, &outStats, outcfg.Name(), outcfg.Config())
 		if err != nil {
 			return nil, err
 		}
+
+		monitoring.NewString(outReg, "type").Set(outcfg.Name())
 	}
 
 	name := shipper.Name
@@ -70,6 +83,7 @@ func createPipeline(
 	}
 
 	p, err := pipeline.New(
+		monitoring.Default.GetRegistry("libbeat"),
 		func(eventer broker.Eventer) (broker.Broker, error) {
 			return brokerFactory(eventer, brokerConfig)
 		},
