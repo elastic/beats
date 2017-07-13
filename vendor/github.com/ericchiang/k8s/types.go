@@ -50,7 +50,7 @@ func (c *CoreV1) CreateBinding(ctx context.Context, obj *apiv1.Binding) (*apiv1.
 	if md.Namespace != nil {
 		ns = *md.Namespace
 	}
-	if !true && ns != "" {
+	if !true && ns != ""{
 		return nil, fmt.Errorf("resource isn't namespaced")
 	}
 
@@ -128,7 +128,7 @@ func (c *CoreV1) CreateComponentStatus(ctx context.Context, obj *apiv1.Component
 	if md.Namespace != nil {
 		ns = *md.Namespace
 	}
-	if !false && ns != "" {
+	if !false && ns != ""{
 		return nil, fmt.Errorf("resource isn't namespaced")
 	}
 
@@ -244,7 +244,7 @@ func (c *CoreV1) CreateConfigMap(ctx context.Context, obj *apiv1.ConfigMap) (*ap
 	if md.Namespace != nil {
 		ns = *md.Namespace
 	}
-	if !true && ns != "" {
+	if !true && ns != ""{
 		return nil, fmt.Errorf("resource isn't namespaced")
 	}
 
@@ -360,7 +360,7 @@ func (c *CoreV1) CreateEndpoints(ctx context.Context, obj *apiv1.Endpoints) (*ap
 	if md.Namespace != nil {
 		ns = *md.Namespace
 	}
-	if !true && ns != "" {
+	if !true && ns != ""{
 		return nil, fmt.Errorf("resource isn't namespaced")
 	}
 
@@ -476,7 +476,7 @@ func (c *CoreV1) CreateEvent(ctx context.Context, obj *apiv1.Event) (*apiv1.Even
 	if md.Namespace != nil {
 		ns = *md.Namespace
 	}
-	if !true && ns != "" {
+	if !true && ns != ""{
 		return nil, fmt.Errorf("resource isn't namespaced")
 	}
 
@@ -592,7 +592,7 @@ func (c *CoreV1) CreateLimitRange(ctx context.Context, obj *apiv1.LimitRange) (*
 	if md.Namespace != nil {
 		ns = *md.Namespace
 	}
-	if !true && ns != "" {
+	if !true && ns != ""{
 		return nil, fmt.Errorf("resource isn't namespaced")
 	}
 
@@ -708,7 +708,7 @@ func (c *CoreV1) CreateNamespace(ctx context.Context, obj *apiv1.Namespace) (*ap
 	if md.Namespace != nil {
 		ns = *md.Namespace
 	}
-	if !false && ns != "" {
+	if !false && ns != ""{
 		return nil, fmt.Errorf("resource isn't namespaced")
 	}
 
@@ -824,7 +824,7 @@ func (c *CoreV1) CreateNode(ctx context.Context, obj *apiv1.Node) (*apiv1.Node, 
 	if md.Namespace != nil {
 		ns = *md.Namespace
 	}
-	if !false && ns != "" {
+	if !false && ns != ""{
 		return nil, fmt.Errorf("resource isn't namespaced")
 	}
 
@@ -940,7 +940,7 @@ func (c *CoreV1) CreatePersistentVolume(ctx context.Context, obj *apiv1.Persiste
 	if md.Namespace != nil {
 		ns = *md.Namespace
 	}
-	if !false && ns != "" {
+	if !false && ns != ""{
 		return nil, fmt.Errorf("resource isn't namespaced")
 	}
 
@@ -1056,7 +1056,7 @@ func (c *CoreV1) CreatePersistentVolumeClaim(ctx context.Context, obj *apiv1.Per
 	if md.Namespace != nil {
 		ns = *md.Namespace
 	}
-	if !true && ns != "" {
+	if !true && ns != ""{
 		return nil, fmt.Errorf("resource isn't namespaced")
 	}
 
@@ -1172,7 +1172,7 @@ func (c *CoreV1) CreatePod(ctx context.Context, obj *apiv1.Pod) (*apiv1.Pod, err
 	if md.Namespace != nil {
 		ns = *md.Namespace
 	}
-	if !true && ns != "" {
+	if !true && ns != ""{
 		return nil, fmt.Errorf("resource isn't namespaced")
 	}
 
@@ -1288,7 +1288,7 @@ func (c *CoreV1) CreatePodStatusResult(ctx context.Context, obj *apiv1.PodStatus
 	if md.Namespace != nil {
 		ns = *md.Namespace
 	}
-	if !true && ns != "" {
+	if !true && ns != ""{
 		return nil, fmt.Errorf("resource isn't namespaced")
 	}
 
@@ -1366,7 +1366,7 @@ func (c *CoreV1) CreatePodTemplate(ctx context.Context, obj *apiv1.PodTemplate) 
 	if md.Namespace != nil {
 		ns = *md.Namespace
 	}
-	if !true && ns != "" {
+	if !true && ns != ""{
 		return nil, fmt.Errorf("resource isn't namespaced")
 	}
 
@@ -1482,7 +1482,7 @@ func (c *CoreV1) CreatePodTemplateSpec(ctx context.Context, obj *apiv1.PodTempla
 	if md.Namespace != nil {
 		ns = *md.Namespace
 	}
-	if !true && ns != "" {
+	if !true && ns != ""{
 		return nil, fmt.Errorf("resource isn't namespaced")
 	}
 
@@ -1560,7 +1560,7 @@ func (c *CoreV1) CreateRangeAllocation(ctx context.Context, obj *apiv1.RangeAllo
 	if md.Namespace != nil {
 		ns = *md.Namespace
 	}
-	if !true && ns != "" {
+	if !true && ns != ""{
 		return nil, fmt.Errorf("resource isn't namespaced")
 	}
 
@@ -1638,7 +1638,7 @@ func (c *CoreV1) CreateReplicationController(ctx context.Context, obj *apiv1.Rep
 	if md.Namespace != nil {
 		ns = *md.Namespace
 	}
-	if !true && ns != "" {
+	if !true && ns != ""{
 		return nil, fmt.Errorf("resource isn't namespaced")
 	}
 
@@ -1754,7 +1754,7 @@ func (c *CoreV1) CreateResourceQuota(ctx context.Context, obj *apiv1.ResourceQuo
 	if md.Namespace != nil {
 		ns = *md.Namespace
 	}
-	if !true && ns != "" {
+	if !true && ns != ""{
 		return nil, fmt.Errorf("resource isn't namespaced")
 	}
 
@@ -1870,7 +1870,7 @@ func (c *CoreV1) CreateSecret(ctx context.Context, obj *apiv1.Secret) (*apiv1.Se
 	if md.Namespace != nil {
 		ns = *md.Namespace
 	}
-	if !true && ns != "" {
+	if !true && ns != ""{
 		return nil, fmt.Errorf("resource isn't namespaced")
 	}
 
@@ -1986,7 +1986,7 @@ func (c *CoreV1) CreateService(ctx context.Context, obj *apiv1.Service) (*apiv1.
 	if md.Namespace != nil {
 		ns = *md.Namespace
 	}
-	if !true && ns != "" {
+	if !true && ns != ""{
 		return nil, fmt.Errorf("resource isn't namespaced")
 	}
 
@@ -2102,7 +2102,7 @@ func (c *CoreV1) CreateServiceAccount(ctx context.Context, obj *apiv1.ServiceAcc
 	if md.Namespace != nil {
 		ns = *md.Namespace
 	}
-	if !true && ns != "" {
+	if !true && ns != ""{
 		return nil, fmt.Errorf("resource isn't namespaced")
 	}
 
@@ -2208,6 +2208,7 @@ func (c *CoreV1) ListServiceAccounts(ctx context.Context, namespace string, opti
 	return resp, nil
 }
 
+
 // AppsV1Alpha1 returns a client for interacting with the apps/v1alpha1 API group.
 func (c *Client) AppsV1Alpha1() *AppsV1Alpha1 {
 	return &AppsV1Alpha1{c}
@@ -2228,7 +2229,7 @@ func (c *AppsV1Alpha1) CreatePetSet(ctx context.Context, obj *appsv1alpha1.PetSe
 	if md.Namespace != nil {
 		ns = *md.Namespace
 	}
-	if !true && ns != "" {
+	if !true && ns != ""{
 		return nil, fmt.Errorf("resource isn't namespaced")
 	}
 
@@ -2334,6 +2335,7 @@ func (c *AppsV1Alpha1) ListPetSets(ctx context.Context, namespace string, option
 	return resp, nil
 }
 
+
 // AppsV1Beta1 returns a client for interacting with the apps/v1beta1 API group.
 func (c *Client) AppsV1Beta1() *AppsV1Beta1 {
 	return &AppsV1Beta1{c}
@@ -2354,7 +2356,7 @@ func (c *AppsV1Beta1) CreateDeployment(ctx context.Context, obj *appsv1beta1.Dep
 	if md.Namespace != nil {
 		ns = *md.Namespace
 	}
-	if !true && ns != "" {
+	if !true && ns != ""{
 		return nil, fmt.Errorf("resource isn't namespaced")
 	}
 
@@ -2470,7 +2472,7 @@ func (c *AppsV1Beta1) CreateScale(ctx context.Context, obj *appsv1beta1.Scale) (
 	if md.Namespace != nil {
 		ns = *md.Namespace
 	}
-	if !true && ns != "" {
+	if !true && ns != ""{
 		return nil, fmt.Errorf("resource isn't namespaced")
 	}
 
@@ -2548,7 +2550,7 @@ func (c *AppsV1Beta1) CreateStatefulSet(ctx context.Context, obj *appsv1beta1.St
 	if md.Namespace != nil {
 		ns = *md.Namespace
 	}
-	if !true && ns != "" {
+	if !true && ns != ""{
 		return nil, fmt.Errorf("resource isn't namespaced")
 	}
 
@@ -2654,6 +2656,7 @@ func (c *AppsV1Beta1) ListStatefulSets(ctx context.Context, namespace string, op
 	return resp, nil
 }
 
+
 // AuthenticationV1 returns a client for interacting with the authentication.k8s.io/v1 API group.
 func (c *Client) AuthenticationV1() *AuthenticationV1 {
 	return &AuthenticationV1{c}
@@ -2674,7 +2677,7 @@ func (c *AuthenticationV1) CreateTokenReview(ctx context.Context, obj *authentic
 	if md.Namespace != nil {
 		ns = *md.Namespace
 	}
-	if !false && ns != "" {
+	if !false && ns != ""{
 		return nil, fmt.Errorf("resource isn't namespaced")
 	}
 
@@ -2742,6 +2745,7 @@ func (c *AuthenticationV1) GetTokenReview(ctx context.Context, name string) (*au
 	return resp, nil
 }
 
+
 // AuthenticationV1Beta1 returns a client for interacting with the authentication.k8s.io/v1beta1 API group.
 func (c *Client) AuthenticationV1Beta1() *AuthenticationV1Beta1 {
 	return &AuthenticationV1Beta1{c}
@@ -2762,7 +2766,7 @@ func (c *AuthenticationV1Beta1) CreateTokenReview(ctx context.Context, obj *auth
 	if md.Namespace != nil {
 		ns = *md.Namespace
 	}
-	if !false && ns != "" {
+	if !false && ns != ""{
 		return nil, fmt.Errorf("resource isn't namespaced")
 	}
 
@@ -2830,6 +2834,7 @@ func (c *AuthenticationV1Beta1) GetTokenReview(ctx context.Context, name string)
 	return resp, nil
 }
 
+
 // AuthorizationV1 returns a client for interacting with the authorization.k8s.io/v1 API group.
 func (c *Client) AuthorizationV1() *AuthorizationV1 {
 	return &AuthorizationV1{c}
@@ -2850,7 +2855,7 @@ func (c *AuthorizationV1) CreateLocalSubjectAccessReview(ctx context.Context, ob
 	if md.Namespace != nil {
 		ns = *md.Namespace
 	}
-	if !true && ns != "" {
+	if !true && ns != ""{
 		return nil, fmt.Errorf("resource isn't namespaced")
 	}
 
@@ -2928,7 +2933,7 @@ func (c *AuthorizationV1) CreateSelfSubjectAccessReview(ctx context.Context, obj
 	if md.Namespace != nil {
 		ns = *md.Namespace
 	}
-	if !false && ns != "" {
+	if !false && ns != ""{
 		return nil, fmt.Errorf("resource isn't namespaced")
 	}
 
@@ -3006,7 +3011,7 @@ func (c *AuthorizationV1) CreateSubjectAccessReview(ctx context.Context, obj *au
 	if md.Namespace != nil {
 		ns = *md.Namespace
 	}
-	if !false && ns != "" {
+	if !false && ns != ""{
 		return nil, fmt.Errorf("resource isn't namespaced")
 	}
 
@@ -3074,6 +3079,7 @@ func (c *AuthorizationV1) GetSubjectAccessReview(ctx context.Context, name strin
 	return resp, nil
 }
 
+
 // AuthorizationV1Beta1 returns a client for interacting with the authorization.k8s.io/v1beta1 API group.
 func (c *Client) AuthorizationV1Beta1() *AuthorizationV1Beta1 {
 	return &AuthorizationV1Beta1{c}
@@ -3094,7 +3100,7 @@ func (c *AuthorizationV1Beta1) CreateLocalSubjectAccessReview(ctx context.Contex
 	if md.Namespace != nil {
 		ns = *md.Namespace
 	}
-	if !true && ns != "" {
+	if !true && ns != ""{
 		return nil, fmt.Errorf("resource isn't namespaced")
 	}
 
@@ -3172,7 +3178,7 @@ func (c *AuthorizationV1Beta1) CreateSelfSubjectAccessReview(ctx context.Context
 	if md.Namespace != nil {
 		ns = *md.Namespace
 	}
-	if !false && ns != "" {
+	if !false && ns != ""{
 		return nil, fmt.Errorf("resource isn't namespaced")
 	}
 
@@ -3250,7 +3256,7 @@ func (c *AuthorizationV1Beta1) CreateSubjectAccessReview(ctx context.Context, ob
 	if md.Namespace != nil {
 		ns = *md.Namespace
 	}
-	if !false && ns != "" {
+	if !false && ns != ""{
 		return nil, fmt.Errorf("resource isn't namespaced")
 	}
 
@@ -3318,6 +3324,7 @@ func (c *AuthorizationV1Beta1) GetSubjectAccessReview(ctx context.Context, name 
 	return resp, nil
 }
 
+
 // AutoscalingV1 returns a client for interacting with the autoscaling/v1 API group.
 func (c *Client) AutoscalingV1() *AutoscalingV1 {
 	return &AutoscalingV1{c}
@@ -3338,7 +3345,7 @@ func (c *AutoscalingV1) CreateHorizontalPodAutoscaler(ctx context.Context, obj *
 	if md.Namespace != nil {
 		ns = *md.Namespace
 	}
-	if !true && ns != "" {
+	if !true && ns != ""{
 		return nil, fmt.Errorf("resource isn't namespaced")
 	}
 
@@ -3454,7 +3461,7 @@ func (c *AutoscalingV1) CreateScale(ctx context.Context, obj *autoscalingv1.Scal
 	if md.Namespace != nil {
 		ns = *md.Namespace
 	}
-	if !true && ns != "" {
+	if !true && ns != ""{
 		return nil, fmt.Errorf("resource isn't namespaced")
 	}
 
@@ -3522,6 +3529,7 @@ func (c *AutoscalingV1) GetScale(ctx context.Context, name, namespace string) (*
 	return resp, nil
 }
 
+
 // AutoscalingV2Alpha1 returns a client for interacting with the autoscaling/v2alpha1 API group.
 func (c *Client) AutoscalingV2Alpha1() *AutoscalingV2Alpha1 {
 	return &AutoscalingV2Alpha1{c}
@@ -3542,7 +3550,7 @@ func (c *AutoscalingV2Alpha1) CreateHorizontalPodAutoscaler(ctx context.Context,
 	if md.Namespace != nil {
 		ns = *md.Namespace
 	}
-	if !true && ns != "" {
+	if !true && ns != ""{
 		return nil, fmt.Errorf("resource isn't namespaced")
 	}
 
@@ -3648,6 +3656,7 @@ func (c *AutoscalingV2Alpha1) ListHorizontalPodAutoscalers(ctx context.Context, 
 	return resp, nil
 }
 
+
 // BatchV1 returns a client for interacting with the batch/v1 API group.
 func (c *Client) BatchV1() *BatchV1 {
 	return &BatchV1{c}
@@ -3668,7 +3677,7 @@ func (c *BatchV1) CreateJob(ctx context.Context, obj *batchv1.Job) (*batchv1.Job
 	if md.Namespace != nil {
 		ns = *md.Namespace
 	}
-	if !true && ns != "" {
+	if !true && ns != ""{
 		return nil, fmt.Errorf("resource isn't namespaced")
 	}
 
@@ -3774,6 +3783,7 @@ func (c *BatchV1) ListJobs(ctx context.Context, namespace string, options ...Opt
 	return resp, nil
 }
 
+
 // BatchV2Alpha1 returns a client for interacting with the batch/v2alpha1 API group.
 func (c *Client) BatchV2Alpha1() *BatchV2Alpha1 {
 	return &BatchV2Alpha1{c}
@@ -3794,7 +3804,7 @@ func (c *BatchV2Alpha1) CreateCronJob(ctx context.Context, obj *batchv2alpha1.Cr
 	if md.Namespace != nil {
 		ns = *md.Namespace
 	}
-	if !true && ns != "" {
+	if !true && ns != ""{
 		return nil, fmt.Errorf("resource isn't namespaced")
 	}
 
@@ -3910,7 +3920,7 @@ func (c *BatchV2Alpha1) CreateJobTemplate(ctx context.Context, obj *batchv2alpha
 	if md.Namespace != nil {
 		ns = *md.Namespace
 	}
-	if !true && ns != "" {
+	if !true && ns != ""{
 		return nil, fmt.Errorf("resource isn't namespaced")
 	}
 
@@ -3978,6 +3988,7 @@ func (c *BatchV2Alpha1) GetJobTemplate(ctx context.Context, name, namespace stri
 	return resp, nil
 }
 
+
 // CertificatesV1Alpha1 returns a client for interacting with the certificates.k8s.io/v1alpha1 API group.
 func (c *Client) CertificatesV1Alpha1() *CertificatesV1Alpha1 {
 	return &CertificatesV1Alpha1{c}
@@ -3998,7 +4009,7 @@ func (c *CertificatesV1Alpha1) CreateCertificateSigningRequest(ctx context.Conte
 	if md.Namespace != nil {
 		ns = *md.Namespace
 	}
-	if !false && ns != "" {
+	if !false && ns != ""{
 		return nil, fmt.Errorf("resource isn't namespaced")
 	}
 
@@ -4104,6 +4115,7 @@ func (c *CertificatesV1Alpha1) ListCertificateSigningRequests(ctx context.Contex
 	return resp, nil
 }
 
+
 // CertificatesV1Beta1 returns a client for interacting with the certificates.k8s.io/v1beta1 API group.
 func (c *Client) CertificatesV1Beta1() *CertificatesV1Beta1 {
 	return &CertificatesV1Beta1{c}
@@ -4124,7 +4136,7 @@ func (c *CertificatesV1Beta1) CreateCertificateSigningRequest(ctx context.Contex
 	if md.Namespace != nil {
 		ns = *md.Namespace
 	}
-	if !false && ns != "" {
+	if !false && ns != ""{
 		return nil, fmt.Errorf("resource isn't namespaced")
 	}
 
@@ -4230,6 +4242,7 @@ func (c *CertificatesV1Beta1) ListCertificateSigningRequests(ctx context.Context
 	return resp, nil
 }
 
+
 // ExtensionsV1Beta1 returns a client for interacting with the extensions/v1beta1 API group.
 func (c *Client) ExtensionsV1Beta1() *ExtensionsV1Beta1 {
 	return &ExtensionsV1Beta1{c}
@@ -4250,7 +4263,7 @@ func (c *ExtensionsV1Beta1) CreateDaemonSet(ctx context.Context, obj *extensions
 	if md.Namespace != nil {
 		ns = *md.Namespace
 	}
-	if !true && ns != "" {
+	if !true && ns != ""{
 		return nil, fmt.Errorf("resource isn't namespaced")
 	}
 
@@ -4366,7 +4379,7 @@ func (c *ExtensionsV1Beta1) CreateDeployment(ctx context.Context, obj *extension
 	if md.Namespace != nil {
 		ns = *md.Namespace
 	}
-	if !true && ns != "" {
+	if !true && ns != ""{
 		return nil, fmt.Errorf("resource isn't namespaced")
 	}
 
@@ -4482,7 +4495,7 @@ func (c *ExtensionsV1Beta1) CreateIngress(ctx context.Context, obj *extensionsv1
 	if md.Namespace != nil {
 		ns = *md.Namespace
 	}
-	if !true && ns != "" {
+	if !true && ns != ""{
 		return nil, fmt.Errorf("resource isn't namespaced")
 	}
 
@@ -4598,7 +4611,7 @@ func (c *ExtensionsV1Beta1) CreateNetworkPolicy(ctx context.Context, obj *extens
 	if md.Namespace != nil {
 		ns = *md.Namespace
 	}
-	if !true && ns != "" {
+	if !true && ns != ""{
 		return nil, fmt.Errorf("resource isn't namespaced")
 	}
 
@@ -4714,7 +4727,7 @@ func (c *ExtensionsV1Beta1) CreatePodSecurityPolicy(ctx context.Context, obj *ex
 	if md.Namespace != nil {
 		ns = *md.Namespace
 	}
-	if !false && ns != "" {
+	if !false && ns != ""{
 		return nil, fmt.Errorf("resource isn't namespaced")
 	}
 
@@ -4830,7 +4843,7 @@ func (c *ExtensionsV1Beta1) CreateReplicaSet(ctx context.Context, obj *extension
 	if md.Namespace != nil {
 		ns = *md.Namespace
 	}
-	if !true && ns != "" {
+	if !true && ns != ""{
 		return nil, fmt.Errorf("resource isn't namespaced")
 	}
 
@@ -4946,7 +4959,7 @@ func (c *ExtensionsV1Beta1) CreateScale(ctx context.Context, obj *extensionsv1be
 	if md.Namespace != nil {
 		ns = *md.Namespace
 	}
-	if !true && ns != "" {
+	if !true && ns != ""{
 		return nil, fmt.Errorf("resource isn't namespaced")
 	}
 
@@ -5024,7 +5037,7 @@ func (c *ExtensionsV1Beta1) CreateThirdPartyResource(ctx context.Context, obj *e
 	if md.Namespace != nil {
 		ns = *md.Namespace
 	}
-	if !false && ns != "" {
+	if !false && ns != ""{
 		return nil, fmt.Errorf("resource isn't namespaced")
 	}
 
@@ -5140,7 +5153,7 @@ func (c *ExtensionsV1Beta1) CreateThirdPartyResourceData(ctx context.Context, ob
 	if md.Namespace != nil {
 		ns = *md.Namespace
 	}
-	if !true && ns != "" {
+	if !true && ns != ""{
 		return nil, fmt.Errorf("resource isn't namespaced")
 	}
 
@@ -5246,6 +5259,7 @@ func (c *ExtensionsV1Beta1) ListThirdPartyResourceDatas(ctx context.Context, nam
 	return resp, nil
 }
 
+
 // ImagepolicyV1Alpha1 returns a client for interacting with the imagepolicy/v1alpha1 API group.
 func (c *Client) ImagepolicyV1Alpha1() *ImagepolicyV1Alpha1 {
 	return &ImagepolicyV1Alpha1{c}
@@ -5266,7 +5280,7 @@ func (c *ImagepolicyV1Alpha1) CreateImageReview(ctx context.Context, obj *imagep
 	if md.Namespace != nil {
 		ns = *md.Namespace
 	}
-	if !false && ns != "" {
+	if !false && ns != ""{
 		return nil, fmt.Errorf("resource isn't namespaced")
 	}
 
@@ -5334,6 +5348,7 @@ func (c *ImagepolicyV1Alpha1) GetImageReview(ctx context.Context, name string) (
 	return resp, nil
 }
 
+
 // PolicyV1Alpha1 returns a client for interacting with the policy/v1alpha1 API group.
 func (c *Client) PolicyV1Alpha1() *PolicyV1Alpha1 {
 	return &PolicyV1Alpha1{c}
@@ -5354,7 +5369,7 @@ func (c *PolicyV1Alpha1) CreateEviction(ctx context.Context, obj *policyv1alpha1
 	if md.Namespace != nil {
 		ns = *md.Namespace
 	}
-	if !true && ns != "" {
+	if !true && ns != ""{
 		return nil, fmt.Errorf("resource isn't namespaced")
 	}
 
@@ -5432,7 +5447,7 @@ func (c *PolicyV1Alpha1) CreatePodDisruptionBudget(ctx context.Context, obj *pol
 	if md.Namespace != nil {
 		ns = *md.Namespace
 	}
-	if !true && ns != "" {
+	if !true && ns != ""{
 		return nil, fmt.Errorf("resource isn't namespaced")
 	}
 
@@ -5538,6 +5553,7 @@ func (c *PolicyV1Alpha1) ListPodDisruptionBudgets(ctx context.Context, namespace
 	return resp, nil
 }
 
+
 // PolicyV1Beta1 returns a client for interacting with the policy/v1beta1 API group.
 func (c *Client) PolicyV1Beta1() *PolicyV1Beta1 {
 	return &PolicyV1Beta1{c}
@@ -5558,7 +5574,7 @@ func (c *PolicyV1Beta1) CreateEviction(ctx context.Context, obj *policyv1beta1.E
 	if md.Namespace != nil {
 		ns = *md.Namespace
 	}
-	if !true && ns != "" {
+	if !true && ns != ""{
 		return nil, fmt.Errorf("resource isn't namespaced")
 	}
 
@@ -5636,7 +5652,7 @@ func (c *PolicyV1Beta1) CreatePodDisruptionBudget(ctx context.Context, obj *poli
 	if md.Namespace != nil {
 		ns = *md.Namespace
 	}
-	if !true && ns != "" {
+	if !true && ns != ""{
 		return nil, fmt.Errorf("resource isn't namespaced")
 	}
 
@@ -5742,6 +5758,7 @@ func (c *PolicyV1Beta1) ListPodDisruptionBudgets(ctx context.Context, namespace 
 	return resp, nil
 }
 
+
 // RBACV1Alpha1 returns a client for interacting with the rbac.authorization.k8s.io/v1alpha1 API group.
 func (c *Client) RBACV1Alpha1() *RBACV1Alpha1 {
 	return &RBACV1Alpha1{c}
@@ -5762,7 +5779,7 @@ func (c *RBACV1Alpha1) CreateClusterRole(ctx context.Context, obj *rbacv1alpha1.
 	if md.Namespace != nil {
 		ns = *md.Namespace
 	}
-	if !false && ns != "" {
+	if !false && ns != ""{
 		return nil, fmt.Errorf("resource isn't namespaced")
 	}
 
@@ -5878,7 +5895,7 @@ func (c *RBACV1Alpha1) CreateClusterRoleBinding(ctx context.Context, obj *rbacv1
 	if md.Namespace != nil {
 		ns = *md.Namespace
 	}
-	if !false && ns != "" {
+	if !false && ns != ""{
 		return nil, fmt.Errorf("resource isn't namespaced")
 	}
 
@@ -5994,7 +6011,7 @@ func (c *RBACV1Alpha1) CreateRole(ctx context.Context, obj *rbacv1alpha1.Role) (
 	if md.Namespace != nil {
 		ns = *md.Namespace
 	}
-	if !true && ns != "" {
+	if !true && ns != ""{
 		return nil, fmt.Errorf("resource isn't namespaced")
 	}
 
@@ -6110,7 +6127,7 @@ func (c *RBACV1Alpha1) CreateRoleBinding(ctx context.Context, obj *rbacv1alpha1.
 	if md.Namespace != nil {
 		ns = *md.Namespace
 	}
-	if !true && ns != "" {
+	if !true && ns != ""{
 		return nil, fmt.Errorf("resource isn't namespaced")
 	}
 
@@ -6216,6 +6233,7 @@ func (c *RBACV1Alpha1) ListRoleBindings(ctx context.Context, namespace string, o
 	return resp, nil
 }
 
+
 // RBACV1Beta1 returns a client for interacting with the rbac.authorization.k8s.io/v1beta1 API group.
 func (c *Client) RBACV1Beta1() *RBACV1Beta1 {
 	return &RBACV1Beta1{c}
@@ -6236,7 +6254,7 @@ func (c *RBACV1Beta1) CreateClusterRole(ctx context.Context, obj *rbacv1beta1.Cl
 	if md.Namespace != nil {
 		ns = *md.Namespace
 	}
-	if !false && ns != "" {
+	if !false && ns != ""{
 		return nil, fmt.Errorf("resource isn't namespaced")
 	}
 
@@ -6352,7 +6370,7 @@ func (c *RBACV1Beta1) CreateClusterRoleBinding(ctx context.Context, obj *rbacv1b
 	if md.Namespace != nil {
 		ns = *md.Namespace
 	}
-	if !false && ns != "" {
+	if !false && ns != ""{
 		return nil, fmt.Errorf("resource isn't namespaced")
 	}
 
@@ -6468,7 +6486,7 @@ func (c *RBACV1Beta1) CreateRole(ctx context.Context, obj *rbacv1beta1.Role) (*r
 	if md.Namespace != nil {
 		ns = *md.Namespace
 	}
-	if !true && ns != "" {
+	if !true && ns != ""{
 		return nil, fmt.Errorf("resource isn't namespaced")
 	}
 
@@ -6584,7 +6602,7 @@ func (c *RBACV1Beta1) CreateRoleBinding(ctx context.Context, obj *rbacv1beta1.Ro
 	if md.Namespace != nil {
 		ns = *md.Namespace
 	}
-	if !true && ns != "" {
+	if !true && ns != ""{
 		return nil, fmt.Errorf("resource isn't namespaced")
 	}
 
@@ -6690,6 +6708,7 @@ func (c *RBACV1Beta1) ListRoleBindings(ctx context.Context, namespace string, op
 	return resp, nil
 }
 
+
 // SettingsV1Alpha1 returns a client for interacting with the settings/v1alpha1 API group.
 func (c *Client) SettingsV1Alpha1() *SettingsV1Alpha1 {
 	return &SettingsV1Alpha1{c}
@@ -6710,7 +6729,7 @@ func (c *SettingsV1Alpha1) CreatePodPreset(ctx context.Context, obj *settingsv1a
 	if md.Namespace != nil {
 		ns = *md.Namespace
 	}
-	if !true && ns != "" {
+	if !true && ns != ""{
 		return nil, fmt.Errorf("resource isn't namespaced")
 	}
 
@@ -6816,6 +6835,7 @@ func (c *SettingsV1Alpha1) ListPodPresets(ctx context.Context, namespace string,
 	return resp, nil
 }
 
+
 // StorageV1 returns a client for interacting with the storage.k8s.io/v1 API group.
 func (c *Client) StorageV1() *StorageV1 {
 	return &StorageV1{c}
@@ -6836,7 +6856,7 @@ func (c *StorageV1) CreateStorageClass(ctx context.Context, obj *storagev1.Stora
 	if md.Namespace != nil {
 		ns = *md.Namespace
 	}
-	if !false && ns != "" {
+	if !false && ns != ""{
 		return nil, fmt.Errorf("resource isn't namespaced")
 	}
 
@@ -6942,6 +6962,7 @@ func (c *StorageV1) ListStorageClasses(ctx context.Context, options ...Option) (
 	return resp, nil
 }
 
+
 // StorageV1Beta1 returns a client for interacting with the storage.k8s.io/v1beta1 API group.
 func (c *Client) StorageV1Beta1() *StorageV1Beta1 {
 	return &StorageV1Beta1{c}
@@ -6962,7 +6983,7 @@ func (c *StorageV1Beta1) CreateStorageClass(ctx context.Context, obj *storagev1b
 	if md.Namespace != nil {
 		ns = *md.Namespace
 	}
-	if !false && ns != "" {
+	if !false && ns != ""{
 		return nil, fmt.Errorf("resource isn't namespaced")
 	}
 
@@ -7067,3 +7088,4 @@ func (c *StorageV1Beta1) ListStorageClasses(ctx context.Context, options ...Opti
 	}
 	return resp, nil
 }
+
