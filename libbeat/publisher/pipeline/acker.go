@@ -72,9 +72,8 @@ type gapCountACK struct {
 	drop chan struct{}
 	acks chan int
 
-	lst gapList
-
-	totalPublished uint64
+	events atomic.Uint32
+	lst    gapList
 }
 
 type gapList struct {
@@ -129,7 +128,7 @@ func (a *gapCountACK) ackLoop() {
 
 		case n := <-acks:
 			empty := a.handleACK(n)
-			if empty && closing {
+			if empty && closing && a.events.Load() == 0 {
 				// stop worker, iff all events accounted for have been ACKed
 				return
 			}
@@ -187,6 +186,7 @@ func (a *gapCountACK) handleACK(n int) bool {
 		current.Unlock()
 	}
 
+	a.events.Sub(uint32(total))
 	a.fn(total, acked)
 	return emptyLst
 }
@@ -199,12 +199,12 @@ func (a *gapCountACK) close() {
 func (a *gapCountACK) addEvent(_ beat.Event, published bool) bool {
 	// if gapList is empty and event is being dropped, forward drop event to ack
 	// loop worker:
+
+	a.events.Inc()
 	if !published {
 		a.addDropEvent()
 	} else {
 		a.addPublishedEvent()
-
-		a.totalPublished++
 	}
 
 	return true
