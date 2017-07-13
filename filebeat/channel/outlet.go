@@ -1,20 +1,18 @@
 package channel
 
 import (
-	"sync"
-
 	"github.com/elastic/beats/filebeat/util"
 	"github.com/elastic/beats/libbeat/common/atomic"
 	"github.com/elastic/beats/libbeat/publisher/beat"
 )
 
 type outlet struct {
-	wg     *sync.WaitGroup
+	wg     eventCounter
 	client beat.Client
 	isOpen atomic.Bool
 }
 
-func newOutlet(client beat.Client, wg *sync.WaitGroup) *outlet {
+func newOutlet(client beat.Client, wg eventCounter) *outlet {
 	o := &outlet{
 		wg:     wg,
 		client: client,

@@ -5,6 +5,7 @@ import (
 
 	"github.com/elastic/beats/filebeat/registrar"
 	"github.com/elastic/beats/filebeat/util"
+	"github.com/elastic/beats/libbeat/monitoring"
 )
 
 type registrarLogger struct {
@@ -13,7 +14,14 @@ type registrarLogger struct {
 }
 
 type finishedLogger struct {
-	wg *sync.WaitGroup
+	wg *eventCounter
+}
+
+type eventCounter struct {
+	added *monitoring.Uint
+	done  *monitoring.Uint
+	count *monitoring.Int
+	wg    sync.WaitGroup
 }
 
 func newRegistrarLogger(reg *registrar.Registrar) *registrarLogger {
@@ -38,7 +46,7 @@ func (l *registrarLogger) Published(events []*util.Data) bool {
 	}
 }
 
-func newFinishedLogger(wg *sync.WaitGroup) *finishedLogger {
+func newFinishedLogger(wg *eventCounter) *finishedLogger {
 	return &finishedLogger{wg}
 }
 
@@ -48,4 +56,20 @@ func (l *finishedLogger) Published(events []*util.Data) bool {
 	}
 
 	return true
+}
+
+func (c *eventCounter) Add(delta int) {
+	c.count.Add(int64(delta))
+	c.added.Add(uint64(delta))
+	c.wg.Add(delta)
+}
+
+func (c *eventCounter) Done() {
+	c.count.Dec()
+	c.done.Inc()
+	c.wg.Done()
+}
+
+func (c *eventCounter) Wait() {
+	c.wg.Wait()
 }
