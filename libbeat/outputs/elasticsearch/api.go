@@ -14,9 +14,10 @@ type QueryResult struct {
 	ID           string          `json:"_id"`
 	Source       json.RawMessage `json:"_source"`
 	Version      int             `json:"_version"`
-	Found        bool            `json:"found"`
 	Exists       bool            `json:"exists"`
-	Created      bool            `json:"created"`
+	Found        bool            `json:"found"`   // Only used prior to ES 6. You must also check for Result == "found".
+	Created      bool            `json:"created"` // Only used prior to ES 6. You must also check for Result == "created".
+	Result       string          `json:"result"`  // Only used in ES 6+.
 	Acknowledged bool            `json:"acknowledged"`
 	Matches      []string        `json:"matches"`
 }

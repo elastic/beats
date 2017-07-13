@@ -74,6 +74,7 @@ https://github.com/elastic/beats/compare/v6.0.0-alpha2...master[Check the HEAD d
 - Add `test output` command, to test Elasticsearch and Logstash output settings. {pull}4590[4590]
 - Introduce configurable event queue settings: queue.mem.events, queue.mem.flush.min_events and queue.mem.flush.timeout. {pull}4650[4650]
 - Enable pipelining in Logstash output by default. {pull}4650[4650]
+- Added 'result' field to Elasticsearch QueryResult struct for compatibility with 6.x Index and Delete API responses. {issue]4661[4661]
 
 *Filebeat*
 
