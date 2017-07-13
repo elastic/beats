@@ -6,13 +6,18 @@
     - name: path
       type: keyword
       description: The path to the file.
+    - name: target_path
+      type: keyword
+      description: The target path for symlinks.
     - name: action
       type: keyword
       example: attributes_modified
       description: >
         Action describes the change to the file. The possible values are:
-        attributes_modified, created, deleted, updated, moved_to,
-        collision_within, unmounted, root_changed.
+        attributes_modified, created, deleted, updated, and moved.
+    - name: type
+      type: keyword
+      description: The file type (file, dir, or symlink).
     - name: inode
       type: keyword
       description: The inode representing the file in the filesystem.
@@ -28,6 +33,9 @@
     - name: group
       type: keyword
       description: The primary group name of the file.
+    - name: sid
+      type: keyword
+      description: The security identifier (SID) of the file owner (Windows only).
     - name: mode
       type: keyword
       example: 0640
@@ -49,4 +57,14 @@
       description: >
         Boolean indicating if the event includes a file hashes. If true the
         md5, sha1, and sha256 fields will be present.
+    - name: md5
+      type: keyword
+      description: MD5 hash of the file.
+    - name: sha1
+      type: keyword
+      description: SHA1 hash of the file.
+    - name: sha256
+      type: keyword
+      description: SHA256 hash of the file.
+
 
