@@ -5,10 +5,6 @@
     "indexes": [
       "filebeat-*"
     ],
-    "types": [
-      "_default_",
-      "log"
-    ],
     "query": {
       "match_all": {
         "boost": 1
