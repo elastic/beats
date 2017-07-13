@@ -10,10 +10,11 @@ You must configure queries for the Windows performance counters that you wish
 to collect. The example below collects processor time and disk writes.
 With `format` you can set the output format for a specific counter. Possible values are
 `float` and `long`. If nothing is selected the default value is `float`.
-There is also an optional/required option `instance_name`.
-You have to set this in two cases. First if you want to name your instance other then it is computed. e.g `Total` instead of `_Total`.
-And second if you specify a counter which has no instance, for example: `\TCPIP Performance Diagnostics\IPv4 NBLs/sec indicated without prevalidation`.
-Then this option is required. For wildcard queries this option is needles.
+With `instance_name`, you can specify the name of the instance. Use this setting when:
+- You want to use an instance name that is different from the computed name. For example, `Total` instead of `_Total`.
+- You specify a counter that has no instance. For example, `\TCPIP Performance Diagnostics\IPv4 NBLs/sec indicated without prevalidation`.
+For wildcard queries this setting has no effect.
+
 
 [source,yaml]
 ----
