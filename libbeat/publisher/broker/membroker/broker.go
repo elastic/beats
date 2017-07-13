@@ -252,7 +252,7 @@ func (b *Broker) reportACK(states []clientState, start, N int) {
 		if count == 0 || count > math.MaxUint32/2 {
 			// seq number comparison did underflow. This happens only if st.seq has
 			// allready been acknowledged
-			b.logger.Debug("seq number already acked: ", st.seq)
+			// b.logger.Debug("seq number already acked: ", st.seq)
 
 			st.state = nil
 			continue
