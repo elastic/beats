@@ -3,13 +3,13 @@ package beater
 import (
 	"flag"
 	"fmt"
-	"sync"
 
 	"github.com/pkg/errors"
 
 	"github.com/elastic/beats/libbeat/beat"
 	"github.com/elastic/beats/libbeat/common"
 	"github.com/elastic/beats/libbeat/logp"
+	"github.com/elastic/beats/libbeat/monitoring"
 	"github.com/elastic/beats/libbeat/outputs/elasticsearch"
 	pub "github.com/elastic/beats/libbeat/publisher/beat"
 
@@ -151,7 +151,11 @@ func (fb *Filebeat) Run(b *beat.Beat) error {
 	waitEvents := newSignalWait()
 
 	// count active events for waiting on shutdown
-	wgEvents := &sync.WaitGroup{}
+	wgEvents := &eventCounter{
+		count: monitoring.NewInt(nil, "filebeat.events.active"),
+		added: monitoring.NewUint(nil, "filebeat.events.added"),
+		done:  monitoring.NewUint(nil, "filebeat.events.done"),
+	}
 	finishedLogger := newFinishedLogger(wgEvents)
 
 	// Setup registrar to persist state

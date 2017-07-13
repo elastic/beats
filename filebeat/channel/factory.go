@@ -1,8 +1,6 @@
 package channel
 
 import (
-	"sync"
-
 	"github.com/elastic/beats/libbeat/common"
 	"github.com/elastic/beats/libbeat/processors"
 	"github.com/elastic/beats/libbeat/publisher/bc/publisher"
@@ -14,12 +12,17 @@ type OutletFactory struct {
 	pipeline publisher.Publisher
 
 	eventer  beat.ClientEventer
-	wgEvents *sync.WaitGroup
+	wgEvents eventCounter
+}
+
+type eventCounter interface {
+	Add(n int)
+	Done()
 }
 
 // clientEventer adjusts wgEvents if events are dropped during shutdown.
 type clientEventer struct {
-	wgEvents *sync.WaitGroup
+	wgEvents eventCounter
 }
 
 // prospectorOutletConfig defines common prospector settings
@@ -46,7 +49,7 @@ type prospectorOutletConfig struct {
 func NewOutletFactory(
 	done <-chan struct{},
 	pipeline publisher.Publisher,
-	wgEvents *sync.WaitGroup,
+	wgEvents eventCounter,
 ) *OutletFactory {
 	o := &OutletFactory{
 		done:     done,
