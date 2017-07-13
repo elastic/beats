@@ -6,7 +6,9 @@ ARG DOWNLOAD_URL
 ARG ELASTIC_VERSION
 ARG XPACK
 
-HEALTHCHECK --retries=6 CMD curl -f http://localhost:5601
+RUN apt-get update && apt-get install -y jq && apt-get clean
+
+HEALTHCHECK --retries=6 CMD curl -f http://localhost:5601/api/status | jq '. | .status.overall.state' | grep -q green
 EXPOSE 5601
 
 WORKDIR /usr/share/kibana
