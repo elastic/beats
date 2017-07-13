@@ -5,15 +5,18 @@ import (
 	"crypto/sha1"
 	"crypto/sha256"
 	"encoding/hex"
+	"fmt"
 	"io"
 	"os"
+	"runtime"
+	"strconv"
 	"time"
 
-	"github.com/pkg/errors"
-
 	"github.com/elastic/beats/libbeat/common"
+	"github.com/pkg/errors"
 )
 
+// Action is a description of the change that occurred.
 type Action uint8
 
 func (a Action) String() string {
@@ -23,16 +26,14 @@ func (a Action) String() string {
 	return "unknown"
 }
 
+// List of possible Actions.
 const (
-	Unknown = iota << 1
+	Unknown Action = iota << 1
 	AttributesModified
 	Created
 	Deleted
 	Updated
-	MovedTo
-	CollisionWithin
-	Unmounted
-	RootChanged
+	Moved
 )
 
 var actionNames = map[Action]string{
@@ -40,30 +41,38 @@ var actionNames = map[Action]string{
 	Created:            "created",
 	Deleted:            "deleted",
 	Updated:            "updated",
-	MovedTo:            "moved_to",
-	CollisionWithin:    "collision_within",
-	Unmounted:          "unmounted",
-	RootChanged:        "root_changed",
+	Moved:              "moved",
 }
 
+// Event describe the filesystem change and includes metadata about the file.
 type Event struct {
-	Path      string    `structs:"path"`   // The path associated with the event.
-	Action    string    `structs:"action"` // Action (like created, updated).
-	Inode     uint64    `structs:"inode"`
-	UID       int32     `structs:"uid"`
-	GID       int32     `structs:"gid"`
-	Owner     string    `structs:"owner,omitempty"`
-	Group     string    `structs:"group,omitempty"`
-	Mode      string    `structs:"mode"`
-	Size      int64     `structs:"size"`
-	ATime     time.Time `structs:"atime"` // Last access time.
-	MTime     time.Time `structs:"mtime"` // Last modification time.
-	CTime     time.Time `structs:"ctime"` // Last status change time.
-	MD5       string    `structs:"md5,omitempty"`
-	SHA1      string    `structs:"sha1,omitempty"`
-	SHA256    string    `structs:"sha256,omitempty"`
-	Hashed    bool      `structs:"hashed"`     // True if hashed.
-	Timestamp time.Time `structs:"@timestamp"` // Time of event.
+	Timestamp  time.Time // Time of event.
+	Path       string    // The path associated with the event.
+	TargetPath string    // Target path for symlinks.
+	Action     string    // Action (like created, updated).
+	Info       *Metadata // File metadata (if the file exists).
+	Hashed     bool      // True if hashed.
+	MD5        string
+	SHA1       string
+	SHA256     string
+
+	errors []error
+}
+
+// Metadata contains file metadata.
+type Metadata struct {
+	Inode uint64
+	UID   uint32
+	GID   uint32
+	SID   string
+	Owner string
+	Group string
+	Mode  os.FileMode
+	Size  int64
+	ATime time.Time // Last access time.
+	MTime time.Time // Last modification time.
+	CTime time.Time // Last status change time.
+	Type  string    // File type (dir, file, symlink).
 }
 
 func buildMapStr(e *Event) common.MapStr {
@@ -71,23 +80,43 @@ func buildMapStr(e *Event) common.MapStr {
 		"@timestamp": e.Timestamp,
 		"path":       e.Path,
 		"action":     e.Action,
-		"inode":      e.Inode,
-		"uid":        e.UID,
-		"gid":        e.GID,
-		"mode":       e.Mode,
-		"size":       e.Size,
-		"atime":      e.ATime,
-		"mtime":      e.MTime,
-		"ctime":      e.CTime,
 		"hashed":     e.Hashed,
 	}
 
-	if e.Owner != "" {
-		m["owner"] = e.Owner
+	if e.TargetPath != "" {
+		m["target_path"] = e.TargetPath
 	}
-	if e.Group != "" {
-		m["group"] = e.Group
+
+	if e.Info != nil {
+		info := e.Info
+		m["inode"] = strconv.FormatUint(info.Inode, 10)
+		m["size"] = info.Size
+		m["atime"] = info.ATime
+		m["mtime"] = info.MTime
+		m["ctime"] = info.CTime
+
+		if info.Type != "" {
+			m["type"] = info.Type
+		}
+
+		if runtime.GOOS == "windows" {
+			if info.SID != "" {
+				m["sid"] = info.SID
+			}
+		} else {
+			m["uid"] = info.UID
+			m["gid"] = info.GID
+			m["mode"] = fmt.Sprintf("%#04o", uint32(info.Mode))
+		}
+
+		if info.Owner != "" {
+			m["owner"] = info.Owner
+		}
+		if info.Group != "" {
+			m["group"] = info.Group
+		}
 	}
+
 	if e.Hashed {
 		m["md5"] = e.MD5
 		m["sha1"] = e.SHA1

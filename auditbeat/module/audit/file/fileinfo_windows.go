@@ -3,45 +3,86 @@
 package file
 
 import (
+	"fmt"
 	"os"
-	"reflect"
 	"syscall"
 	"time"
+	"unsafe"
 
+	"github.com/elastic/beats/filebeat/input/file"
+	"github.com/joeshaw/multierror"
 	"github.com/pkg/errors"
 )
 
-func addFileAttributes(e *Event, maxFileSize int64) error {
-	info, err := os.Lstat(e.Path)
+func Stat(path string) (*Metadata, error) {
+	info, err := os.Lstat(path)
 	if err != nil {
-		return errors.Wrap(err, "failed to stat file")
+		return nil, errors.Wrap(err, "failed to stat path")
 	}
 
 	attrs, ok := info.Sys().(*syscall.Win32FileAttributeData)
 	if !ok {
-		return errors.Errorf("unexpected fileinfo sys type %T", info.Sys())
+		return nil, errors.Errorf("unexpected fileinfo sys type %T for %v", info.Sys(), path)
 	}
 
-	fileStat := reflect.ValueOf(info).Elem()
-	idxhi := uint32(fileStat.FieldByName("idxhi").Uint())
-	idxlo := uint32(fileStat.FieldByName("idxlo").Uint())
+	state := file.GetOSState(info)
 
-	e.Inode = uint64(idxhi<<32 + idxlo)
-	e.Size = info.Size()
-	// TODO: Add owner.
-	e.ATime = time.Unix(0, attrs.LastAccessTime.Nanoseconds())
-	e.MTime = time.Unix(0, attrs.LastWriteTime.Nanoseconds())
-	e.CTime = time.Unix(0, attrs.CreationTime.Nanoseconds())
-
-	if e.Size <= maxFileSize {
-		md5sum, sha1sum, sha256sum, err := hashFile(e.Path)
-		if err == nil {
-			e.MD5 = md5sum
-			e.SHA1 = sha1sum
-			e.SHA256 = sha256sum
-			e.Hashed = true
-		}
+	fileInfo := &Metadata{
+		Inode: uint64(state.IdxHi<<32 + state.IdxLo),
+		Mode:  info.Mode(),
+		Size:  info.Size(),
+		ATime: time.Unix(0, attrs.LastAccessTime.Nanoseconds()).UTC(),
+		MTime: time.Unix(0, attrs.LastWriteTime.Nanoseconds()).UTC(),
+		CTime: time.Unix(0, attrs.CreationTime.Nanoseconds()).UTC(),
 	}
 
-	return nil
+	switch {
+	case info.IsDir():
+		fileInfo.Type = "dir"
+	case info.Mode().IsRegular():
+		fileInfo.Type = "file"
+	case info.Mode()&os.ModeSymlink > 0:
+		fileInfo.Type = "symlink"
+	}
+
+	// fileOwner only works on files or symlinks to file because os.Open only
+	// works on files. To open a dir we need to use CreateFile with the
+	// FILE_FLAG_BACKUP_SEMANTICS flag.
+	if !info.IsDir() {
+		fileInfo.SID, fileInfo.Owner, err = fileOwner(path)
+	}
+	return fileInfo, err
+}
+
+func fileOwner(path string) (sid, owner string, err error) {
+	f, err := os.Open(path)
+	if err != nil {
+		return "", "", errors.Wrap(err, "failed to open file to get owner")
+	}
+	defer f.Close()
+
+	var securityID *syscall.SID
+	var securityDescriptor *SecurityDescriptor
+
+	if err := GetSecurityInfo(syscall.Handle(f.Fd()), FileObject,
+		OwnerSecurityInformation, &securityID, nil, nil, nil, &securityDescriptor); err != nil {
+		return "", "", errors.Wrapf(err, "failed on GetSecurityInfo for %v", path)
+	}
+	defer syscall.LocalFree((syscall.Handle)(unsafe.Pointer(securityDescriptor)))
+
+	// Covert SID to a string and lookup the username.
+	var errs multierror.Errors
+	sid, err = securityID.String()
+	if err != nil {
+		errs = append(errs, err)
+	}
+
+	account, domain, _, err := securityID.LookupAccount("")
+	if err != nil {
+		errs = append(errs, err)
+	} else {
+		owner = fmt.Sprintf(`%s\%s`, domain, account)
+	}
+
+	return sid, owner, errs.Err()
 }

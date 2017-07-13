@@ -30,6 +30,10 @@ type Config struct {
 	MaxFileSize int64               `config:"max_file_size"`
 }
 
+var defaultConfig = Config{
+	MaxFileSize: 1 << 30, // 1 Gibibyte
+}
+
 type EventReader interface {
 	Start(done <-chan struct{}) (<-chan Event, error)
 }
@@ -43,9 +47,7 @@ type MetricSet struct {
 func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
 	logp.Experimental("The %v metricset is an experimental feature", metricsetName)
 
-	config := Config{
-		MaxFileSize: 1 << 30, // 1 Gibibyte
-	}
+	config := defaultConfig
 	if err := base.Module().UnpackConfig(&config); err != nil {
 		return nil, err
 	}
@@ -76,6 +78,11 @@ func (ms *MetricSet) Run(reporter mb.PushReporter) {
 			return
 		case event := <-eventChan:
 			reporter.Event(buildMapStr(&event))
+
+			if len(event.errors) > 0 {
+				debugf("%v Errors on %v event for %v: %v",
+					logPrefix, event.Action, event.Path, event.errors)
+			}
 		}
 	}
 }

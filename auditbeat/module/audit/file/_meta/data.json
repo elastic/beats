@@ -1,20 +1,23 @@
 {
-    "@timestamp": "2017-06-27T02:47:41.347Z",
+    "@timestamp": "2017-07-10T18:13:08.197Z",
     "audit": {
         "file": {
             "action": "created",
-            "atime": "2017-06-26T22:47:40-04:00",
-            "ctime": "2017-06-26T22:47:40-04:00",
+            "atime": "2017-07-10T18:13:08Z",
+            "ctime": "2017-07-10T18:13:08Z",
             "gid": 20,
+            "group": "staff",
             "hashed": true,
-            "inode": 11290505,
+            "inode": "11706872",
             "md5": "5eb63bbbe01eeed093cb22bb8f5acdc3",
             "mode": "0600",
-            "mtime": "2017-06-26T22:47:40-04:00",
-            "path": "/private/var/folders/8x/rnyk6yxn6w97lddn3bs02gf00000gn/T/audit-file189170857/file.data",
+            "mtime": "2017-07-10T18:13:08Z",
+            "owner": "akroh",
+            "path": "/var/folders/8x/rnyk6yxn6w97lddn3bs02gf00000gn/T/audit-file232876074/file.data",
             "sha1": "2aae6c35c94fcfb415dbe95f408b9ce91ee846ed",
             "sha256": "b94d27b9934d3e08a52e52d7da7dabfac484efe37a5380ee9088f7ace2efcde9",
             "size": 11,
+            "type": "file",
             "uid": 501
         }
     },
