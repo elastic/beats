@@ -7,13 +7,14 @@ import (
 	"github.com/spf13/cobra"
 
 	"github.com/elastic/beats/libbeat/beat"
+	"github.com/elastic/beats/libbeat/cfgfile"
 )
 
 // ModulesManager interface provides all actions needed to implement modules command
 // (to list, enable & disable modules)
 type ModulesManager interface {
-	ListEnabled() []string
-	ListDisabled() []string
+	ListEnabled() []*cfgfile.CfgFile
+	ListDisabled() []*cfgfile.CfgFile
 	Exists(name string) bool
 	Enabled(name string) bool
 	Enable(name string) error
@@ -69,12 +70,12 @@ func genListModulesCmd(name, version string, modulesFactory ModulesManagerFactor
 
 			fmt.Println("Enabled:")
 			for _, module := range modules.ListEnabled() {
-				fmt.Println(module)
+				fmt.Println(module.Name)
 			}
 
 			fmt.Println("\nDisabled:")
 			for _, module := range modules.ListDisabled() {
-				fmt.Println(module)
+				fmt.Println(module.Name)
 			}
 		},
 	}
