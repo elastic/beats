@@ -22,8 +22,6 @@ func TestReadConfig2(t *testing.T) {
 	// Reads second config file
 	err = cfgfile.Read(config, absPath+"/config2.yml")
 	assert.Nil(t, err)
-
-	assert.Equal(t, uint64(0), config.SpoolSize)
 }
 
 func TestGetConfigFiles_File(t *testing.T) {

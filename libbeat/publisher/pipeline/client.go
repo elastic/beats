@@ -51,6 +51,8 @@ func (c *client) publish(e beat.Event) {
 		log     = c.pipeline.logger
 	)
 
+	c.onNewEvent()
+
 	if c.processors != nil {
 		var err error
 
@@ -113,7 +115,6 @@ func (c *client) Close() error {
 	log := c.pipeline.logger
 
 	c.onClosing()
-	defer c.onClosed()
 
 	log.Debug("client: closing acker")
 	c.acker.close()
@@ -130,34 +131,44 @@ func (c *client) Close() error {
 		}
 	}
 
+	c.onClosed()
 	return nil
 }
 
 func (c *client) onClosing() {
+	c.pipeline.observer.clientClosing()
 	if c.eventer != nil {
 		c.eventer.Closing()
 	}
 }
 
 func (c *client) onClosed() {
+	c.pipeline.observer.clientClosed()
 	if c.eventer != nil {
 		c.eventer.Closed()
 	}
 }
 
+func (c *client) onNewEvent() {
+	c.pipeline.observer.newEvent()
+}
+
 func (c *client) onPublished() {
+	c.pipeline.observer.publishedEvent()
 	if c.eventer != nil {
 		c.eventer.Published()
 	}
 }
 
 func (c *client) onFilteredOut(e beat.Event) {
+	c.pipeline.observer.filteredEvent()
 	if c.eventer != nil {
 		c.eventer.FilteredOut(e)
 	}
 }
 
 func (c *client) onDroppedOnPublish(e beat.Event) {
+	c.pipeline.observer.failedPublishEvent()
 	if c.eventer != nil {
 		c.eventer.DroppedOnPublish(e)
 	}

@@ -13,17 +13,14 @@ import (
 	"github.com/elastic/beats/libbeat/outputs/elasticsearch"
 )
 
-var KibanaApiStartingWith = "6.0.0-alpha2"
-
 type ElasticsearchLoader struct {
 	client       *elasticsearch.Client
-	config       *DashboardsConfig
+	config       *Config
 	version      string
-	msgOutputter *MessageOutputter
+	msgOutputter MessageOutputter
 }
 
-func NewElasticsearchLoader(cfg *common.Config, dashboardsConfig *DashboardsConfig, msgOutputter *MessageOutputter) (*ElasticsearchLoader, error) {
-
+func NewElasticsearchLoader(cfg *common.Config, dashboardsConfig *Config, msgOutputter MessageOutputter) (*ElasticsearchLoader, error) {
 	if cfg == nil || !cfg.Enabled() {
 		return nil, fmt.Errorf("Elasticsearch output is not configured/enabled")
 	}
@@ -44,57 +41,40 @@ func NewElasticsearchLoader(cfg *common.Config, dashboardsConfig *DashboardsConf
 
 	loader.statusMsg("Initialize the Elasticsearch %s loader", version)
 
-	// initialize the Kibana index
-	if err := loader.createKibanaIndex(); err != nil {
-		return nil, fmt.Errorf("fail to create the kibana index: %v", err)
-	}
-
 	return &loader, nil
 }
 
 // CreateKibanaIndex creates the kibana index if it doesn't exists and sets
 // some index properties which are needed as a workaround for:
 // https://github.com/elastic/beats-dashboards/issues/94
-func (loader ElasticsearchLoader) createKibanaIndex() error {
+func (loader ElasticsearchLoader) CreateKibanaIndex() error {
 	status, err := loader.client.IndexExists(loader.config.KibanaIndex)
 
 	if err != nil {
 		if status != 404 {
 			return err
-		} else {
-			var settings common.MapStr
-			// XXX: this can be removed when the dashboard loaded will no longer need to support 6.0,
-			// because the Kibana API is used instead
-			if strings.HasPrefix(loader.client.GetVersion(), "6.") {
-				settings = common.MapStr{
-					"settings": common.MapStr{
-						"index.mapping.single_type": false,
-					},
-				}
-			} else {
-				settings = nil
-			}
-			_, _, err = loader.client.CreateIndex(loader.config.KibanaIndex, settings)
-			if err != nil {
-				return fmt.Errorf("Failed to create index: %v", err)
-			}
+		}
 
-			_, _, err = loader.client.CreateIndex(loader.config.KibanaIndex+"/_mapping/search",
-				common.MapStr{
-					"search": common.MapStr{
-						"properties": common.MapStr{
-							"hits": common.MapStr{
-								"type": "integer",
-							},
-							"version": common.MapStr{
-								"type": "integer",
-							},
+		_, _, err = loader.client.CreateIndex(loader.config.KibanaIndex, nil)
+		if err != nil {
+			return fmt.Errorf("Failed to create index: %v", err)
+		}
+
+		_, _, err = loader.client.CreateIndex(loader.config.KibanaIndex+"/_mapping/search",
+			common.MapStr{
+				"search": common.MapStr{
+					"properties": common.MapStr{
+						"hits": common.MapStr{
+							"type": "integer",
+						},
+						"version": common.MapStr{
+							"type": "integer",
 						},
 					},
-				})
-			if err != nil {
-				return fmt.Errorf("Failed to set the mapping: %v", err)
-			}
+				},
+			})
+		if err != nil {
+			return fmt.Errorf("Failed to set the mapping: %v", err)
 		}
 	}
 
@@ -130,7 +110,6 @@ func (loader ElasticsearchLoader) ImportIndex(file string) error {
 }
 
 func (loader ElasticsearchLoader) importJSONFile(fileType string, file string) error {
-
 	path := "/" + loader.config.KibanaIndex + "/" + fileType
 
 	reader, err := ioutil.ReadFile(file)
@@ -150,7 +129,6 @@ func (loader ElasticsearchLoader) importJSONFile(fileType string, file string) e
 }
 
 func (loader ElasticsearchLoader) importPanelsFromDashboard(file string) (err error) {
-
 	// directory with the dashboards
 	dir := filepath.Dir(file)
 
@@ -177,7 +155,6 @@ func (loader ElasticsearchLoader) importPanelsFromDashboard(file string) (err er
 	json.Unmarshal([]byte(jsonContent.PanelsJSON), &widgets)
 
 	for _, widget := range widgets {
-
 		if widget.Type == "visualization" {
 			err = loader.importVisualization(path.Join(mainDir, "visualization", widget.ID+".json"))
 			if err != nil {
@@ -197,21 +174,15 @@ func (loader ElasticsearchLoader) importPanelsFromDashboard(file string) (err er
 }
 
 func (loader ElasticsearchLoader) importVisualization(file string) error {
-
 	loader.statusMsg("Import visualization %s", file)
 	if err := loader.importJSONFile("visualization", file); err != nil {
 		return err
 	}
 
-	err := loader.importSearchFromVisualization(file)
-	if err != nil {
-		return err
-	}
-	return nil
+	return loader.importSearchFromVisualization(file)
 }
 
 func (loader ElasticsearchLoader) importSearch(file string) error {
-
 	reader, err := ioutil.ReadFile(file)
 	if err != nil {
 		return err
@@ -225,7 +196,6 @@ func (loader ElasticsearchLoader) importSearch(file string) error {
 	}
 
 	if loader.config.Index != "" {
-
 		// change index pattern name
 		if savedObject, ok := searchContent["kibanaSavedObjectMeta"].(map[string]interface{}); ok {
 			if source, ok := savedObject["searchSourceJSON"].(string); ok {
@@ -246,7 +216,6 @@ func (loader ElasticsearchLoader) importSearch(file string) error {
 				savedObject["searchSourceJSON"] = string(searchSourceJSON)
 			}
 		}
-
 	}
 
 	path := "/" + loader.config.KibanaIndex + "/search/" + searchName
@@ -296,7 +265,6 @@ func (loader ElasticsearchLoader) importSearchFromVisualization(file string) err
 }
 
 func (loader ElasticsearchLoader) ImportDashboard(file string) error {
-
 	/* load dashboard */
 	err := loader.importJSONFile("dashboard", file)
 	if err != nil {
@@ -304,12 +272,7 @@ func (loader ElasticsearchLoader) ImportDashboard(file string) error {
 	}
 
 	/* load the visualizations and searches that depend on the dashboard */
-	err = loader.importPanelsFromDashboard(file)
-	if err != nil {
-		return err
-	}
-
-	return nil
+	return loader.importPanelsFromDashboard(file)
 }
 
 func (loader ElasticsearchLoader) Close() error {
@@ -318,9 +281,8 @@ func (loader ElasticsearchLoader) Close() error {
 
 func (loader ElasticsearchLoader) statusMsg(msg string, a ...interface{}) {
 	if loader.msgOutputter != nil {
-		(*loader.msgOutputter)(msg, a...)
+		loader.msgOutputter(msg, a...)
 	} else {
 		logp.Debug("dashboards", msg, a...)
 	}
-
 }

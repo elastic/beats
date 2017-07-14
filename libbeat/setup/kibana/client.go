@@ -1,6 +1,7 @@
 package kibana
 
 import (
+	"bytes"
 	"encoding/json"
 	"fmt"
 	"io"
@@ -8,6 +9,7 @@ import (
 	"net/http"
 	"net/url"
 	"path"
+	"strings"
 
 	"github.com/elastic/beats/libbeat/common"
 	"github.com/elastic/beats/libbeat/logp"
@@ -30,7 +32,6 @@ type Client struct {
 }
 
 func addPath(_url, _path string) (string, error) {
-
 	u, err := url.Parse(_url)
 	if err != nil {
 		return "", fmt.Errorf("fail to parse URL %s: %v", _url, err)
@@ -40,7 +41,6 @@ func addPath(_url, _path string) (string, error) {
 }
 
 func NewKibanaClient(cfg *common.Config) (*Client, error) {
-
 	config := defaultKibanaConfig
 	if err := cfg.Unpack(&config); err != nil {
 		return nil, err
@@ -106,7 +106,6 @@ func NewKibanaClient(cfg *common.Config) (*Client, error) {
 }
 
 func (conn *Connection) Request(method, extraPath string, params url.Values, body io.Reader) (int, []byte, error) {
-
 	reqURL, err := addPath(conn.URL, extraPath)
 	if err != nil {
 		return 0, nil, err
@@ -134,7 +133,6 @@ func (conn *Connection) Request(method, extraPath string, params url.Values, bod
 	if err != nil {
 		return 0, nil, fmt.Errorf("fail to execute the HTTP %s request: %v", method, err)
 	}
-
 	defer resp.Body.Close()
 
 	var retError error
@@ -151,7 +149,6 @@ func (conn *Connection) Request(method, extraPath string, params url.Values, bod
 }
 
 func (client *Client) SetVersion() error {
-
 	type kibanaVersionResponse struct {
 		Name    string `json:"name"`
 		Version struct {
@@ -162,13 +159,15 @@ func (client *Client) SetVersion() error {
 
 	_, result, err := client.Connection.Request("GET", "/api/status", nil, nil)
 	if err != nil {
-		return fmt.Errorf("HTTP GET request to /api/status fails: %v. Returns: %s.", err, result)
+		return fmt.Errorf("HTTP GET request to /api/status fails: %v. Response: %s.",
+			err, truncateString(result))
 	}
 
 	var kibanaVersion kibanaVersionResponse
 	err = json.Unmarshal(result, &kibanaVersion)
 	if err != nil {
-		return fmt.Errorf("fail to unmarshal the response from GET %s/api/status: %v", client.Connection.URL, err)
+		return fmt.Errorf("fail to unmarshal the response from GET %s/api/status: %v. Response: %s",
+			client.Connection.URL, err, truncateString(result))
 	}
 
 	client.version = kibanaVersion.Version.Number
@@ -181,16 +180,12 @@ func (client *Client) SetVersion() error {
 	return nil
 }
 
-func (client *Client) GetVersion() string {
-
-	return client.version
-}
+func (client *Client) GetVersion() string { return client.version }
 
 func (client *Client) ImportJSON(url string, params url.Values, body io.Reader) error {
-
 	statusCode, response, err := client.Connection.Request("POST", url, params, body)
 	if err != nil {
-		return fmt.Errorf("%v. Response: %s", err, response)
+		return fmt.Errorf("%v. Response: %s", err, truncateString(response))
 	}
 	if statusCode >= 300 {
 		return fmt.Errorf("returned %d to import file: %v. Response: %s", statusCode, err, response)
@@ -198,6 +193,20 @@ func (client *Client) ImportJSON(url string, params url.Values, body io.Reader) 
 	return nil
 }
 
-func (client *Client) Close() error {
-	return nil
+func (client *Client) Close() error { return nil }
+
+// truncateString returns a truncated string if the length is greater than 250
+// runes. If the string is truncated "... (truncated)" is appended. Newlines are
+// replaced by spaces in the returned string.
+//
+// This function is useful for logging raw HTTP responses with errors when those
+// responses can be very large (such as an HTML page with CSS content).
+func truncateString(b []byte) string {
+	const maxLength = 250
+	runes := bytes.Runes(b)
+	if len(runes) > maxLength {
+		runes = append(runes[:maxLength], []rune("... (truncated)")...)
+	}
+
+	return strings.Replace(string(runes), "\n", " ", -1)
 }

@@ -14,6 +14,7 @@ import (
 
 type asyncClient struct {
 	*transport.Client
+	stats  *outputs.Stats
 	client *v2.AsyncClient
 	win    window
 
@@ -21,6 +22,7 @@ type asyncClient struct {
 }
 
 type msgRef struct {
+	client    *asyncClient
 	count     atomic.Uint32
 	batch     publisher.Batch
 	slice     []publisher.Event
@@ -29,9 +31,14 @@ type msgRef struct {
 	batchSize int
 }
 
-func newAsyncClient(conn *transport.Client, config *Config) (*asyncClient, error) {
+func newAsyncClient(
+	conn *transport.Client,
+	stats *outputs.Stats,
+	config *Config,
+) (*asyncClient, error) {
 	c := &asyncClient{}
 	c.Client = conn
+	c.stats = stats
 	c.win.init(defaultStartMaxWindowSize, config.BulkMaxSize)
 
 	if config.TTL != 0 {
@@ -97,9 +104,10 @@ func (c *asyncClient) BatchSize() int {
 }
 
 func (c *asyncClient) Publish(batch publisher.Batch) error {
-	publishEventsCallCount.Add(1)
-
+	st := c.stats
 	events := batch.Events()
+	st.NewBatch(len(events))
+
 	if len(events) == 0 {
 		batch.ACK()
 		return nil
@@ -111,6 +119,7 @@ func (c *asyncClient) Publish(batch publisher.Batch) error {
 	}
 
 	ref := &msgRef{
+		client:    c,
 		count:     atomic.MakeUint32(1),
 		batch:     batch,
 		slice:     events,
@@ -177,22 +186,21 @@ func (r *msgRef) callback(seq uint32, err error) {
 }
 
 func (r *msgRef) done(n uint32) {
-	ackedEvents.Add(int64(n))
-	outputs.AckedEvents.Add(int64(n))
+	r.client.stats.Acked(int(n))
 	r.slice = r.slice[n:]
 	r.win.tryGrowWindow(r.batchSize)
 	r.dec()
 }
 
 func (r *msgRef) fail(n uint32, err error) {
-	ackedEvents.Add(int64(n))
-	outputs.AckedEvents.Add(int64(n))
-
 	if r.err == nil {
 		r.err = err
 	}
 	r.slice = r.slice[n:]
 	r.win.shrinkWindow()
+
+	r.client.stats.Acked(int(n))
+
 	r.dec()
 }
 
@@ -202,14 +210,16 @@ func (r *msgRef) dec() {
 		return
 	}
 
+	if L := len(r.slice); L > 0 {
+		r.client.stats.Failed(L)
+	}
+
 	err := r.err
 	if err == nil {
 		r.batch.ACK()
 		return
 	}
 
-	rest := int64(len(r.slice))
 	r.batch.RetryEvents(r.slice)
-	eventsNotAcked.Add(rest)
 	logp.Err("Failed to publish events caused by: %v", err)
 }

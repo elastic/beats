@@ -18,7 +18,7 @@ import (
 type MessageOutputter func(msg string, a ...interface{})
 
 type Importer struct {
-	cfg     *DashboardsConfig
+	cfg     *Config
 	version string
 
 	loader Loader
@@ -31,7 +31,7 @@ type Loader interface {
 	Close() error
 }
 
-func NewImporter(version string, cfg *DashboardsConfig, loader Loader) (*Importer, error) {
+func NewImporter(version string, cfg *Config, loader Loader) (*Importer, error) {
 	return &Importer{
 		cfg:     cfg,
 		version: version,
@@ -41,7 +41,6 @@ func NewImporter(version string, cfg *DashboardsConfig, loader Loader) (*Importe
 
 // Import imports the Kibana dashboards according to the configuration options.
 func (imp Importer) Import() error {
-
 	if imp.cfg.Dir != "" {
 		err := imp.ImportKibanaDir(imp.cfg.Dir)
 		if err != nil {
@@ -61,14 +60,12 @@ func (imp Importer) Import() error {
 }
 
 func (imp Importer) ImportDashboard(file string) error {
-
 	imp.loader.statusMsg("Import dashboard %s", file)
 
 	return imp.loader.ImportDashboard(file)
 }
 
 func (imp Importer) ImportFile(fileType string, file string) error {
-
 	imp.loader.statusMsg("Import %s from %s\n", fileType, file)
 
 	if fileType == "dashboard" {
@@ -80,21 +77,20 @@ func (imp Importer) ImportFile(fileType string, file string) error {
 }
 
 func (imp Importer) ImportDir(dirType string, dir string) error {
+	imp.loader.statusMsg("Import directory %s", dir)
 
 	dir = path.Join(dir, dirType)
-
-	imp.loader.statusMsg("Import directory %s", dir)
-	errors := []string{}
+	var errors []string
 
 	files, err := filepath.Glob(path.Join(dir, "*.json"))
 	if err != nil {
 		return fmt.Errorf("Failed to read directory %s. Error: %s", dir, err)
 	}
+
 	if len(files) == 0 {
 		return fmt.Errorf("The directory %s is empty, nothing to import", dir)
 	}
 	for _, file := range files {
-
 		err = imp.ImportFile(dirType, file)
 		if err != nil {
 			errors = append(errors, fmt.Sprintf("  error loading %s: %s", file, err))
@@ -104,11 +100,9 @@ func (imp Importer) ImportDir(dirType string, dir string) error {
 		return fmt.Errorf("Failed to load directory %s:\n%s", dir, strings.Join(errors, "\n"))
 	}
 	return nil
-
 }
 
 func (imp Importer) unzip(archive, target string) error {
-
 	imp.loader.statusMsg("Unzip archive %s", target)
 
 	reader, err := zip.OpenReader(archive)
@@ -121,8 +115,7 @@ func (imp Importer) unzip(archive, target string) error {
 		filePath := filepath.Join(target, file.Name)
 
 		if file.FileInfo().IsDir() {
-			os.MkdirAll(filePath, file.Mode())
-			return nil
+			return os.MkdirAll(filePath, file.Mode())
 		}
 		fileReader, err := file.Open()
 		if err != nil {
@@ -152,7 +145,6 @@ func (imp Importer) unzip(archive, target string) error {
 }
 
 func (imp Importer) ImportArchive() error {
-
 	var archive string
 
 	target, err := ioutil.TempDir("", "tmp")
@@ -215,7 +207,6 @@ func (imp Importer) ImportArchive() error {
 }
 
 func getDirectories(target string) ([]string, error) {
-
 	files, err := ioutil.ReadDir(target)
 	if err != nil {
 		return nil, err
@@ -231,7 +222,6 @@ func getDirectories(target string) ([]string, error) {
 }
 
 func (imp Importer) downloadFile(url string, target string) (string, error) {
-
 	fileName := filepath.Base(url)
 	targetPath := path.Join(target, fileName)
 	imp.loader.statusMsg("Downloading %s", url)
@@ -264,7 +254,6 @@ func (imp Importer) downloadFile(url string, target string) (string, error) {
 
 // import Kibana dashboards and index-pattern or only one of these
 func (imp Importer) ImportKibanaDir(dir string) error {
-
 	var err error
 
 	dir = path.Join(dir, imp.version)

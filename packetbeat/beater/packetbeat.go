@@ -103,9 +103,6 @@ func (pb *packetbeat) init(b *beat.Beat) error {
 		return err
 	}
 
-	// This is required as init Beat is called before the beat publisher is initialised
-	b.Config.Shipper.InitShipperConfig()
-
 	pb.pipeline = b.Publisher
 	pb.transPub, err = publish.NewTransactionPublisher(
 		b.Publisher,

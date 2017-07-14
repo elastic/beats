@@ -50,6 +50,6 @@ func TestProducerCancelRemovesEvents(t *testing.T) {
 
 func makeTestBroker(sz int) brokertest.BrokerFactory {
 	return func() broker.Broker {
-		return NewBroker(nil, sz, true)
+		return NewBroker(Settings{Events: sz, WaitOnClose: true})
 	}
 }

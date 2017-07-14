@@ -240,21 +240,10 @@ filebeat.prospectors:
 
 #========================= Filebeat global options ============================
 
-# Event count spool threshold - forces network flush if exceeded
-#filebeat.spool_size: 2048
-
-# Enable async publisher pipeline in filebeat (Experimental!)
-#filebeat.publish_async: false
-
-# Defines how often the spooler is flushed. After idle_timeout the spooler is
-# Flush even though spool_size is not reached.
-#filebeat.idle_timeout: 5s
-
 # Name of the registry file. If a relative path is used, it is considered relative to the
 # data path.
 #filebeat.registry_file: ${path.data}/registry
 
-#
 # These config files must have the full filebeat config part inside, but only
 # the prospector part is processed. All global options like spool_size are ignored.
 # The config_dir MUST point to a different directory then where the main filebeat config file is in.
