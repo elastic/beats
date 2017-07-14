@@ -241,14 +241,14 @@ start Heartbeat in the foreground.
 
 ["source","sh",subs="attributes"]
 ----------------------------------------------------------------------
-sudo /etc/init.d/heartbeat start
+sudo /etc/init.d/heartbeat-elastic start
 ----------------------------------------------------------------------
 
 *rpm:*
 
 ["source","sh",subs="attributes"]
 ----------------------------------------------------------------------
-sudo /etc/init.d/heartbeat start
+sudo /etc/init.d/heartbeat-elastic start
 ----------------------------------------------------------------------
 
 *mac:*

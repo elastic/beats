@@ -22,7 +22,6 @@ in <<configuration-metricbeat>>. Here is an example configuration:
 metricbeat.modules:
 - module: couchbase
   metricsets: ["bucket", "cluster", "node"]
-  enabled: false
   period: 10s
   hosts: ["localhost:8091"]
 ----

@@ -167,6 +167,18 @@ are permitted provided that the following conditions are met:"""),
    and/or other materials provided with the distribution.
 """)]
 
+BSD_LICENSE_3_CLAUSE = [
+    re.sub(r"\s+", " ", """Neither the name of"""),
+    re.sub(r"\s+", " ", """nor the
+      names of its contributors may be used to endorse or promote products
+      derived from this software without specific prior written permission.""")
+]
+
+BSD_LICENSE_4_CLAUSE = [
+    re.sub(r"\s+", " ", """All advertising materials mentioning features or use of this software
+   must display the following acknowledgement"""),
+]
+
 MPL_LICENSE_TITLES = [
     "Mozilla Public License Version 2.0",
     "Mozilla Public License, version 2.0"
@@ -181,7 +193,12 @@ def detect_license_summary(content):
     if any(sentence in content[0:1000] for sentence in MIT_LICENSES):
         return "MIT license"
     if all(sentence in content[0:1000] for sentence in BSD_LICENSE_CONTENTS):
-        return "BSD license"
+        if all(sentence in content[0:1000] for sentence in BSD_LICENSE_3_CLAUSE):
+            if all(sentence in content[0:1000] for sentence in BSD_LICENSE_4_CLAUSE):
+                return "BSD 4-clause license"
+            return "BSD 3-clause license"
+        else:
+            return "BSD 2-clause license"
     if any(sentence in content[0:300] for sentence in MPL_LICENSE_TITLES):
         return "Mozilla Public License 2.0"
 
@@ -209,8 +226,6 @@ if __name__ == "__main__":
     notice = os.path.join(cwd, "NOTICE")
     vendor_dirs = []
 
-    print(args.vendor)
-
     for root, dirs, files in os.walk(args.vendor):
 
         # Skips all hidden paths like ".git"
@@ -228,4 +243,4 @@ if __name__ == "__main__":
     print("Get the licenses available from {}".format(vendor_dirs))
     create_notice(notice, args.beat, args.copyright, vendor_dirs, args.csvfile)
 
-    print("Available at {}\n".format(notice))
+    print("Available at {}".format(notice))

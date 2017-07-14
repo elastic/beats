@@ -1,0 +1,146 @@
+{
+  "objects": [
+    {
+      "attributes": {
+        "description": "",
+        "kibanaSavedObjectMeta": {
+          "searchSourceJSON": "{\"filter\":[]}"
+        },
+        "savedSearchId": "Filebeat-MySQL-Slow-log",
+        "title": "MySQL slowest queries",
+        "uiStateJSON": "{\"vis\":{\"params\":{\"sort\":{\"columnIndex\":null,\"direction\":null}}}}",
+        "version": 1,
+        "visState": "{\"title\":\"MySQL slowest queries\",\"type\":\"table\",\"params\":{\"perPage\":10,\"showPartialRows\":false,\"showMeticsAtAllLevels\":false,\"sort\":{\"columnIndex\":null,\"direction\":null},\"showTotal\":false,\"totalFunc\":\"sum\"},\"aggs\":[{\"id\":\"1\",\"enabled\":true,\"type\":\"max\",\"schema\":\"metric\",\"params\":{\"field\":\"mysql.slowlog.query_time.sec\",\"customLabel\":\"Query time\"}},{\"id\":\"2\",\"enabled\":true,\"type\":\"terms\",\"schema\":\"bucket\",\"params\":{\"field\":\"mysql.slowlog.query\",\"size\":5,\"order\":\"desc\",\"orderBy\":\"1\",\"customLabel\":\"Query\"}},{\"id\":\"3\",\"enabled\":true,\"type\":\"terms\",\"schema\":\"bucket\",\"params\":{\"field\":\"mysql.slowlog.user\",\"size\":5,\"order\":\"desc\",\"orderBy\":\"1\",\"customLabel\":\"User\"}}],\"listeners\":{}}"
+      },
+      "id": "MySQL-slowest-queries",
+      "type": "visualization",
+      "version": 4
+    },
+    {
+      "attributes": {
+        "description": "",
+        "kibanaSavedObjectMeta": {
+          "searchSourceJSON": "{\"filter\":[]}"
+        },
+        "savedSearchId": "Filebeat-MySQL-Slow-log",
+        "title": "MySQL Slow queries over time",
+        "uiStateJSON": "{\"vis\":{\"colors\":{\"Slow queries\":\"#EF843C\"}}}",
+        "version": 1,
+        "visState": "{\"title\":\"MySQL Slow queries over time\",\"type\":\"histogram\",\"params\":{\"shareYAxis\":true,\"addTooltip\":true,\"addLegend\":true,\"legendPosition\":\"right\",\"scale\":\"linear\",\"mode\":\"stacked\",\"times\":[],\"addTimeMarker\":false,\"defaultYExtents\":false,\"setYExtents\":false,\"yAxis\":{}},\"aggs\":[{\"id\":\"1\",\"enabled\":true,\"type\":\"count\",\"schema\":\"metric\",\"params\":{\"customLabel\":\"Slow queries\"}},{\"id\":\"2\",\"enabled\":true,\"type\":\"date_histogram\",\"schema\":\"segment\",\"params\":{\"field\":\"@timestamp\",\"interval\":\"auto\",\"customInterval\":\"2h\",\"min_doc_count\":1,\"extended_bounds\":{}}}],\"listeners\":{}}"
+      },
+      "id": "MySQL-Slow-queries-over-time",
+      "type": "visualization",
+      "version": 4
+    },
+    {
+      "attributes": {
+        "description": "",
+        "kibanaSavedObjectMeta": {
+          "searchSourceJSON": "{\"filter\":[]}"
+        },
+        "savedSearchId": "Filebeat-MySQL-error-log",
+        "title": "MySQL error logs",
+        "uiStateJSON": "{\"vis\":{\"colors\":{\"Count\":\"#447EBC\",\"Error logs\":\"#1F78C1\"}}}",
+        "version": 1,
+        "visState": "{\"title\":\"MySQL error logs\",\"type\":\"histogram\",\"params\":{\"shareYAxis\":true,\"addTooltip\":true,\"addLegend\":true,\"legendPosition\":\"right\",\"scale\":\"linear\",\"mode\":\"stacked\",\"times\":[],\"addTimeMarker\":false,\"defaultYExtents\":false,\"setYExtents\":false,\"yAxis\":{}},\"aggs\":[{\"id\":\"1\",\"enabled\":true,\"type\":\"count\",\"schema\":\"metric\",\"params\":{\"customLabel\":\"Error logs\"}},{\"id\":\"2\",\"enabled\":true,\"type\":\"date_histogram\",\"schema\":\"segment\",\"params\":{\"field\":\"@timestamp\",\"interval\":\"auto\",\"customInterval\":\"2h\",\"min_doc_count\":1,\"extended_bounds\":{}}}],\"listeners\":{}}"
+      },
+      "id": "MySQL-error-logs",
+      "type": "visualization",
+      "version": 4
+    },
+    {
+      "attributes": {
+        "columns": [
+          "mysql.error.level",
+          "mysql.error.message"
+        ],
+        "description": "",
+        "hits": 0,
+        "kibanaSavedObjectMeta": {
+          "searchSourceJSON": "{\"index\":\"filebeat-*\",\"query\":{\"query_string\":{\"query\":\"_exists_:mysql.error\",\"analyze_wildcard\":true}},\"filter\":[],\"highlight\":{\"pre_tags\":[\"@kibana-highlighted-field@\"],\"post_tags\":[\"@/kibana-highlighted-field@\"],\"fields\":{\"*\":{}},\"require_field_match\":false,\"fragment_size\":2147483647}}"
+        },
+        "sort": [
+          "@timestamp",
+          "desc"
+        ],
+        "title": "Filebeat MySQL error log",
+        "version": 1
+      },
+      "id": "Filebeat-MySQL-error-log",
+      "type": "search",
+      "version": 12
+    },
+    {
+      "attributes": {
+        "description": "",
+        "kibanaSavedObjectMeta": {
+          "searchSourceJSON": "{\"filter\":[]}"
+        },
+        "savedSearchId": "Filebeat-MySQL-error-log",
+        "title": "MySQL Error logs levels",
+        "uiStateJSON": "{\"vis\":{\"colors\":{\"Note\":\"#9AC48A\",\"Warning\":\"#F9934E\",\"ERROR\":\"#E24D42\"}}}",
+        "version": 1,
+        "visState": "{\"title\":\"MySQL Error logs levels\",\"type\":\"pie\",\"params\":{\"shareYAxis\":true,\"addTooltip\":true,\"addLegend\":true,\"legendPosition\":\"bottom\",\"isDonut\":false},\"aggs\":[{\"id\":\"1\",\"enabled\":true,\"type\":\"count\",\"schema\":\"metric\",\"params\":{}},{\"id\":\"2\",\"enabled\":true,\"type\":\"terms\",\"schema\":\"segment\",\"params\":{\"field\":\"mysql.error.level\",\"size\":5,\"order\":\"desc\",\"orderBy\":\"1\"}}],\"listeners\":{}}"
+      },
+      "id": "MySQL-Error-logs-levels",
+      "type": "visualization",
+      "version": 4
+    },
+    {
+      "attributes": {
+        "description": "",
+        "kibanaSavedObjectMeta": {
+          "searchSourceJSON": "{\"filter\":[]}"
+        },
+        "savedSearchId": "Filebeat-MySQL-Slow-log",
+        "title": "MySQL Slow logs by count",
+        "uiStateJSON": "{}",
+        "version": 1,
+        "visState": "{\"title\":\"MySQL Slow logs by count\",\"type\":\"pie\",\"params\":{\"shareYAxis\":true,\"addTooltip\":true,\"addLegend\":true,\"legendPosition\":\"bottom\",\"isDonut\":false},\"aggs\":[{\"id\":\"1\",\"enabled\":true,\"type\":\"count\",\"schema\":\"metric\",\"params\":{}},{\"id\":\"2\",\"enabled\":true,\"type\":\"terms\",\"schema\":\"segment\",\"params\":{\"field\":\"mysql.slowlog.query\",\"size\":5,\"order\":\"desc\",\"orderBy\":\"1\"}}],\"listeners\":{}}"
+      },
+      "id": "MySQL-Slow-logs-by-count",
+      "type": "visualization",
+      "version": 4
+    },
+    {
+      "attributes": {
+        "columns": [
+          "_source"
+        ],
+        "description": "",
+        "hits": 0,
+        "kibanaSavedObjectMeta": {
+          "searchSourceJSON": "{\"index\":\"filebeat-*\",\"query\":{\"query_string\":{\"analyze_wildcard\":true,\"query\":\"_exists_:mysql.slowlog\"}},\"filter\":[],\"highlight\":{\"pre_tags\":[\"@kibana-highlighted-field@\"],\"post_tags\":[\"@/kibana-highlighted-field@\"],\"fields\":{\"*\":{}},\"require_field_match\":false,\"fragment_size\":2147483647}}"
+        },
+        "sort": [
+          "@timestamp",
+          "desc"
+        ],
+        "title": "Filebeat MySQL Slow log",
+        "version": 1
+      },
+      "id": "Filebeat-MySQL-Slow-log",
+      "type": "search",
+      "version": 12
+    },
+    {
+      "attributes": {
+        "description": "",
+        "hits": 0,
+        "kibanaSavedObjectMeta": {
+          "searchSourceJSON": "{\"filter\":[{\"query\":{\"query_string\":{\"analyze_wildcard\":true,\"query\":\"*\"}}}]}"
+        },
+        "optionsJSON": "{\"darkTheme\":false}",
+        "panelsJSON": "[{\"col\":1,\"id\":\"MySQL-slowest-queries\",\"panelIndex\":1,\"row\":8,\"size_x\":6,\"size_y\":4,\"type\":\"visualization\"},{\"col\":1,\"id\":\"MySQL-Slow-queries-over-time\",\"panelIndex\":2,\"row\":1,\"size_x\":6,\"size_y\":3,\"type\":\"visualization\"},{\"col\":7,\"id\":\"MySQL-error-logs\",\"panelIndex\":3,\"row\":1,\"size_x\":6,\"size_y\":3,\"type\":\"visualization\"},{\"col\":7,\"columns\":[\"mysql.error.level\",\"mysql.error.message\"],\"id\":\"Filebeat-MySQL-error-log\",\"panelIndex\":4,\"row\":8,\"size_x\":6,\"size_y\":5,\"sort\":[\"@timestamp\",\"desc\"],\"type\":\"search\"},{\"col\":7,\"id\":\"MySQL-Error-logs-levels\",\"panelIndex\":5,\"row\":4,\"size_x\":6,\"size_y\":4,\"type\":\"visualization\"},{\"col\":1,\"id\":\"MySQL-Slow-logs-by-count\",\"panelIndex\":6,\"row\":4,\"size_x\":6,\"size_y\":4,\"type\":\"visualization\"}]",
+        "timeRestore": false,
+        "title": "Filebeat MySQL Dashboard",
+        "uiStateJSON": "{\"P-1\":{\"vis\":{\"params\":{\"sort\":{\"columnIndex\":null,\"direction\":null}}}}}",
+        "version": 1
+      },
+      "id": "Filebeat-MySQL-Dashboard",
+      "type": "dashboard",
+      "version": 4
+    }
+  ],
+  "version": "6.0.0-alpha3-SNAPSHOT"
+}

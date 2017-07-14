@@ -22,7 +22,6 @@ in <<configuration-metricbeat>>. Here is an example configuration:
 metricbeat.modules:
 - module: jolokia
   metricsets: ["jmx"]
-  enabled: false
   period: 10s
   hosts: ["localhost"]
   namespace: "metrics"

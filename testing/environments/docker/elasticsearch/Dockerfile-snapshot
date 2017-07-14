@@ -1,13 +1,20 @@
 # Copy of https://github.com/elastic/elasticsearch-docker/blob/master/build/elasticsearch/Dockerfile
-FROM docker.elastic.co/elasticsearch/elasticsearch-alpine-base:latest
+#FROM docker.elastic.co/elasticsearch/elasticsearch-alpine-base:latest
+FROM centos:7
 MAINTAINER Elastic Docker Team <docker@elastic.co>
 
 ARG ELASTIC_VERSION
 ARG DOWNLOAD_URL
 ARG ES_JAVA_OPTS
+ARG XPACK
 
+ENV ELASTIC_CONTAINER true
 ENV PATH /usr/share/elasticsearch/bin:$PATH
 ENV JAVA_HOME /usr/lib/jvm/java-1.8-openjdk
+
+RUN yum update -y && yum install -y java-1.8.0-openjdk-headless wget which && yum clean all
+
+RUN groupadd -g 1000 elasticsearch && adduser -u 1000 -g 1000 -d /usr/share/elasticsearch elasticsearch
 
 WORKDIR /usr/share/elasticsearch
 
@@ -29,8 +36,7 @@ RUN set -ex && for esdirs in config data logs; do \
 USER elasticsearch
 
 # Install xpack
-#RUN eval ${ES_JAVA_OPTS:-} elasticsearch-plugin install --batch ${DOWNLOAD_URL}/packs/x-pack/x-pack-${ELASTIC_VERSION}.zip
-
+RUN if [ ${XPACK} = "1" ]; then elasticsearch-plugin install --batch ${DOWNLOAD_URL}/packs/x-pack/x-pack-${ELASTIC_VERSION}.zip; fi
 RUN elasticsearch-plugin install --batch ${DOWNLOAD_URL}/elasticsearch-plugins/ingest-user-agent/ingest-user-agent-${ELASTIC_VERSION}.zip
 RUN elasticsearch-plugin install --batch ${DOWNLOAD_URL}/elasticsearch-plugins/ingest-geoip/ingest-geoip-${ELASTIC_VERSION}.zip
 

@@ -260,7 +260,7 @@ class Test(BaseTest):
         # Wait until rotation is detected
         self.wait_until(
             lambda: self.log_contains_count(
-                "Registry file updated. 1 states written") == 1,
+                "Registry file updated. 1 states written") >= 1,
             max_timeout=10)
 
         data = self.get_registry()
@@ -1099,10 +1099,6 @@ class Test(BaseTest):
         # Wait until new state is written
 
         self.wait_until(
-            lambda: self.log_contains("Flushing spooler because of timeout. Events flushed: ",
-                                      logfile="filebeat2.log"), max_timeout=10)
-
-        self.wait_until(
             lambda: self.log_contains("Registry file updated",
                                       logfile="filebeat2.log"), max_timeout=10)
 
@@ -1161,11 +1157,6 @@ class Test(BaseTest):
 
         # Wait until new state is written
         self.wait_until(
-            lambda: self.log_contains(
-                "Flushing spooler because of timeout. Events flushed: ", logfile="filebeat2.log"),
-            max_timeout=10)
-
-        self.wait_until(
             lambda: self.log_contains("Registry file updated",
                                       logfile="filebeat2.log"), max_timeout=10)
 
@@ -1215,11 +1206,6 @@ class Test(BaseTest):
         filebeat = self.start_beat(output="filebeat2.log")
 
         # Wait until prospectors are started
-        self.wait_until(
-            lambda: self.log_contains(
-                "Flushing spooler because of timeout. Events flushed: ", logfile="filebeat2.log"),
-            max_timeout=10)
-
         self.wait_until(
             lambda: self.log_contains("Registry file updated",
                                       logfile="filebeat2.log"), max_timeout=10)

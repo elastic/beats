@@ -32,6 +32,8 @@ NOTE: At the moment, Filebeat modules require using the Elasticsearch
 be able to also configure Logstash as a more powerful alternative to Ingest
 Node.
 
+Filebeat modules require Elasticsearch 5.2 or later.
+
 === Tutorial
 
 This tutorial assumes you have Elasticsearch and Kibana installed and
@@ -108,7 +110,7 @@ Then you can start Filebeat simply with: `./filebeat -e`.
 
 Each module and fileset has a set of "variables" which allow adjusting their
 behaviour. To see the available variables, you can consult the
-`filebeat.full.yml` file. For example, all filesets allow setting a custom
+`filebeat.reference.yml` file. For example, all filesets allow setting a custom
 `paths` value, which is a list of Globs where the log files are searched.
 
 These variables have default values, sometimes depending on the operating

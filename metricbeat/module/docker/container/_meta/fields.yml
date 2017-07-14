@@ -11,18 +11,6 @@
       type: date
       description: >
         Date when the container was created.
-    - name: id
-      type: keyword
-      description: >
-        Unique container id.
-    - name: image
-      type: keyword
-      description: >
-        Name of the image the container was built on.
-    - name: name
-      type: keyword
-      description: >
-        Container name.
     - name: status
       type: keyword
       description: >
@@ -40,11 +28,6 @@
           type: long
           description: >
              Size of the files that have been created or changed since creation.
-    - name: labels
-      type: object
-      object_type: keyword
-      description: >
-        Image labels.
     - name: tags
       type: array
       description: >

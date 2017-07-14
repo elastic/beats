@@ -1,0 +1,12 @@
+###################### Auditbeat Configuration Example #########################
+
+# This is an example configuration file highlighting only the most common
+# options. The auditbeat.reference.yml file from the same directory contains all
+# the supported options with more comments. You can use it as a reference.
+#
+# You can find the full configuration reference here:
+# https://www.elastic.co/guide/en/beats/auditbeat/index.html
+
+#==========================  Modules configuration =============================
+auditbeat.modules:
+

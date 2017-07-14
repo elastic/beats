@@ -12,12 +12,12 @@ fi
 
 mkdir /{{.beat_name}}-${VERSION}-windows-{{.win_arch}}
 cp -a homedir/. /{{.beat_name}}-${VERSION}-windows-{{.win_arch}}/
-install -D -m 755 import_dashboards-windows-{{.arch}} /{{.beat_name}}-${VERSION}-windows-{{.win_arch}}/scripts/import_dashboards.exe
 cp {{.beat_name}}-windows-{{.arch}}.exe /{{.beat_name}}-${VERSION}-windows-{{.win_arch}}/{{.beat_name}}.exe
 unix2dos {{.beat_name}}-win.yml
 cp {{.beat_name}}-win.yml /{{.beat_name}}-${VERSION}-windows-{{.win_arch}}/{{.beat_name}}.yml
-cp {{.beat_name}}-win.full.yml /{{.beat_name}}-${VERSION}-windows-{{.win_arch}}/{{.beat_name}}.full.yml
+cp {{.beat_name}}-win.reference.yml /{{.beat_name}}-${VERSION}-windows-{{.win_arch}}/{{.beat_name}}.reference.yml
 cp fields.yml /{{.beat_name}}-${VERSION}-windows-{{.win_arch}}/
+cp -a modules.d-darwin/ /{{.beat_name}}-${VERSION}-windows-{{.win_arch}}/modules.d || true
 cp install-service-{{.beat_name}}.ps1 /{{.beat_name}}-${VERSION}-windows-{{.win_arch}}/
 cp uninstall-service-{{.beat_name}}.ps1 /{{.beat_name}}-${VERSION}-windows-{{.win_arch}}/
 

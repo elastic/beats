@@ -18,17 +18,26 @@ cp fields.yml $PREFIX/fields.yml
 # linux
 cp $BEAT_NAME.yml $PREFIX/$BEAT_NAME-linux.yml
 chmod 0600 $PREFIX/$BEAT_NAME-linux.yml
-cp $BEAT_NAME.full.yml $PREFIX/$BEAT_NAME-linux.full.yml
+cp $BEAT_NAME.reference.yml $PREFIX/$BEAT_NAME-linux.reference.yml
+rm -rf $PREFIX/modules.d-linux
+cp -r modules.d/ $PREFIX/modules.d-linux || true
+[ -d "$PREFIX/modules.d-linux" ] && chmod 0755 $PREFIX/modules.d-linux
 
 # darwin
 cp $BEAT_NAME.yml $PREFIX/$BEAT_NAME-darwin.yml
 chmod 0600 $PREFIX/$BEAT_NAME-darwin.yml
-cp $BEAT_NAME.full.yml $PREFIX/$BEAT_NAME-darwin.full.yml
+cp $BEAT_NAME.reference.yml $PREFIX/$BEAT_NAME-darwin.reference.yml
+rm -rf $PREFIX/modules.d-darwin
+cp -r modules.d/ $PREFIX/modules.d-darwin || true
+[ -d "$PREFIX/modules.d-darwin" ] && chmod 0755 $PREFIX/modules.d-darwin
 
 # win
 cp $BEAT_NAME.yml $PREFIX/$BEAT_NAME-win.yml
 chmod 0600 $PREFIX/$BEAT_NAME-win.yml
-cp $BEAT_NAME.full.yml $PREFIX/$BEAT_NAME-win.full.yml
+cp $BEAT_NAME.reference.yml $PREFIX/$BEAT_NAME-win.reference.yml
+rm -rf $PREFIX/modules.d-win
+cp -r modules.d/ $PREFIX/modules.d-win || true
+[ -d "$PREFIX/modules.d-win" ] && chmod 0755 $PREFIX/modules.d-win
 
 # Runs beat specific tasks which should be done before building
 PREFIX=$PREFIX make before-build
@@ -36,15 +45,6 @@ PREFIX=$PREFIX make before-build
 # Add data to the home directory
 mkdir -p $PREFIX/homedir
 make install-home HOME_PREFIX=$PREFIX/homedir
-
-# Build dashboards
-for TARGET in $TARGETS; do
-	echo "Compiling import_dashboards for $TARGET"
-	XGOOS=`echo $TARGET | cut -d '/' -f 1`
-	XGOARCH=`echo $TARGET | cut -d '/' -f 2`
-
-	GOOS=$XGOOS GOARCH=$XGOARCH go build -ldflags "-X main.beat=${BEAT_NAME}" -o $PREFIX/import_dashboards-$XGOOS-$XGOARCH ${ES_BEATS}/dev-tools/cmd/import_dashboards/import_dashboards.go
-done
 
 if [ -n "BUILDID" ]; then
     echo "$BUILDID" > $PREFIX/homedir/.build_hash.txt
@@ -58,4 +58,3 @@ sed -i -e 's/:doc-branch/doc_branch/g' ${PREFIX}/package.yml
 
 # Create README file
 /go/bin/gotpl /templates/readme.md.j2 < ${PREFIX}/package.yml > ${PREFIX}/homedir/README.md
-

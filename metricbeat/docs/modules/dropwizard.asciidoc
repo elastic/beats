@@ -20,7 +20,6 @@ in <<configuration-metricbeat>>. Here is an example configuration:
 metricbeat.modules:
 - module: dropwizard
   metricsets: ["collector"]
-  enabled: false
   period: 10s
   hosts: ["localhost:8080"]
   metrics_path: /metrics/metrics

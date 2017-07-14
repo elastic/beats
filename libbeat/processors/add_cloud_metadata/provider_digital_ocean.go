@@ -2,12 +2,12 @@ package add_cloud_metadata
 
 import (
 	"github.com/elastic/beats/libbeat/common"
-	s "github.com/elastic/beats/metricbeat/schema"
-	c "github.com/elastic/beats/metricbeat/schema/mapstriface"
+	s "github.com/elastic/beats/libbeat/common/schema"
+	c "github.com/elastic/beats/libbeat/common/schema/mapstriface"
 )
 
 // DigitalOcean Metadata Service
-func newDoMetadataFetcher(config common.Config) (*metadataFetcher, error) {
+func newDoMetadataFetcher(config *common.Config) (*metadataFetcher, error) {
 	doSchema := func(m map[string]interface{}) common.MapStr {
 		out, _ := s.Schema{
 			"instance_id": c.StrFromNum("droplet_id"),

@@ -1,0 +1,78 @@
+{
+  "objects": [
+    {
+      "attributes": {
+        "description": "",
+        "kibanaSavedObjectMeta": {
+          "searchSourceJSON": "{\"filter\":[]}"
+        },
+        "savedSearchId": "ffaf5a30-2413-11e7-a0d9-39604d45ca7f",
+        "title": "Icinga Mainlog Severity",
+        "uiStateJSON": "{\"vis\":{\"colors\":{\"warning\":\"#E5AC0E\",\"critical\":\"#BF1B00\"}}}",
+        "version": 1,
+        "visState": "{\"title\":\"Icinga Mainlog Severity\",\"type\":\"histogram\",\"params\":{\"addTooltip\":true,\"addLegend\":true,\"legendPosition\":\"right\",\"scale\":\"linear\",\"mode\":\"stacked\",\"times\":[],\"addTimeMarker\":false,\"defaultYExtents\":false,\"setYExtents\":false},\"aggs\":[{\"id\":\"1\",\"enabled\":true,\"type\":\"count\",\"schema\":\"metric\",\"params\":{}},{\"id\":\"2\",\"enabled\":true,\"type\":\"date_histogram\",\"schema\":\"segment\",\"params\":{\"field\":\"@timestamp\",\"interval\":\"auto\",\"customInterval\":\"2h\",\"min_doc_count\":1,\"extended_bounds\":{}}},{\"id\":\"3\",\"enabled\":true,\"type\":\"terms\",\"schema\":\"group\",\"params\":{\"field\":\"icinga.main.severity\",\"size\":5,\"order\":\"desc\",\"orderBy\":\"1\"}}],\"listeners\":{}}"
+      },
+      "id": "d8e5dc40-2417-11e7-a83b-d5f4cebac9ff",
+      "type": "visualization",
+      "version": 1
+    },
+    {
+      "attributes": {
+        "columns": [
+          "icinga.main.facility",
+          "icinga.main.severity",
+          "icinga.main.message"
+        ],
+        "description": "",
+        "hits": 0,
+        "kibanaSavedObjectMeta": {
+          "searchSourceJSON": "{\"index\":\"filebeat-*\",\"highlightAll\":true,\"query\":{\"query_string\":{\"query\":\"source:*icinga2.log\",\"analyze_wildcard\":true}},\"filter\":[]}"
+        },
+        "sort": [
+          "@timestamp",
+          "desc"
+        ],
+        "title": "Icinga Main Log",
+        "version": 1
+      },
+      "id": "ffaf5a30-2413-11e7-a0d9-39604d45ca7f",
+      "type": "search",
+      "version": 3
+    },
+    {
+      "attributes": {
+        "description": "",
+        "kibanaSavedObjectMeta": {
+          "searchSourceJSON": "{\"filter\":[]}"
+        },
+        "savedSearchId": "ffaf5a30-2413-11e7-a0d9-39604d45ca7f",
+        "title": "Icinga Mainlog Facility",
+        "uiStateJSON": "{}",
+        "version": 1,
+        "visState": "{\"title\":\"Icinga Mainlog Facility\",\"type\":\"histogram\",\"params\":{\"addTooltip\":true,\"addLegend\":true,\"legendPosition\":\"right\",\"scale\":\"linear\",\"mode\":\"stacked\",\"times\":[],\"addTimeMarker\":false,\"defaultYExtents\":false,\"setYExtents\":false},\"aggs\":[{\"id\":\"1\",\"enabled\":true,\"type\":\"count\",\"schema\":\"metric\",\"params\":{}},{\"id\":\"2\",\"enabled\":true,\"type\":\"date_histogram\",\"schema\":\"segment\",\"params\":{\"field\":\"@timestamp\",\"interval\":\"auto\",\"customInterval\":\"2h\",\"min_doc_count\":1,\"extended_bounds\":{}}},{\"id\":\"3\",\"enabled\":true,\"type\":\"terms\",\"schema\":\"group\",\"params\":{\"field\":\"icinga.main.facility\",\"size\":5,\"order\":\"desc\",\"orderBy\":\"1\"}}],\"listeners\":{}}"
+      },
+      "id": "2cf77780-2418-11e7-a83b-d5f4cebac9ff",
+      "type": "visualization",
+      "version": 1
+    },
+    {
+      "attributes": {
+        "description": "",
+        "hits": 0,
+        "kibanaSavedObjectMeta": {
+          "searchSourceJSON": "{\"filter\":[{\"query\":{\"query_string\":{\"analyze_wildcard\":true,\"query\":\"*\"}}}]}"
+        },
+        "optionsJSON": "{\"darkTheme\":false}",
+        "panelsJSON": "[{\"col\":7,\"id\":\"d8e5dc40-2417-11e7-a83b-d5f4cebac9ff\",\"panelIndex\":1,\"row\":1,\"size_x\":6,\"size_y\":3,\"type\":\"visualization\"},{\"col\":1,\"columns\":[\"icinga.main.facility\",\"icinga.main.severity\",\"icinga.main.message\"],\"id\":\"ffaf5a30-2413-11e7-a0d9-39604d45ca7f\",\"panelIndex\":2,\"row\":4,\"size_x\":12,\"size_y\":25,\"sort\":[\"@timestamp\",\"desc\"],\"type\":\"search\"},{\"size_x\":6,\"size_y\":3,\"panelIndex\":3,\"type\":\"visualization\",\"id\":\"2cf77780-2418-11e7-a83b-d5f4cebac9ff\",\"col\":1,\"row\":1}]",
+        "timeRestore": false,
+        "title": "Icinga Main Log",
+        "uiStateJSON": "{}",
+        "version": 1
+      },
+      "id": "f693d260-2417-11e7-a83b-d5f4cebac9ff",
+      "type": "dashboard",
+      "version": 1
+    }
+  ],
+  "version": "6.0.0-alpha3-SNAPSHOT"
+}

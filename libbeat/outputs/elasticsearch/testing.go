@@ -3,8 +3,10 @@ package elasticsearch
 import (
 	"math/rand"
 	"os"
+	"testing"
 	"time"
 
+	"github.com/elastic/beats/libbeat/outputs"
 	"github.com/elastic/beats/libbeat/outputs/outil"
 )
 
@@ -38,14 +40,17 @@ func GetEsPort() string {
 }
 
 // GetTestingElasticsearch creates a test client.
-func GetTestingElasticsearch() *Client {
+func GetTestingElasticsearch(t *testing.T) *Client {
 	var address = "http://" + GetEsHost() + ":" + GetEsPort()
 	username := os.Getenv("ES_USER")
 	pass := os.Getenv("ES_PASS")
 	client := newTestClientAuth(address, username, pass)
 
 	// Load version number
-	client.Connect(3 * time.Second)
+	err := client.Connect()
+	if err != nil {
+		t.Fatal(err)
+	}
 	return client
 }
 
@@ -64,13 +69,12 @@ func newTestClientAuth(url, user, pass string) *Client {
 	return client
 }
 
-func (t *elasticsearchOutput) randomClient() *Client {
-	switch len(t.clients) {
-	case 0:
-		return nil
-	case 1:
-		return t.clients[0].(*Client).Clone()
-	default:
-		return t.clients[rand.Intn(len(t.clients))].(*Client).Clone()
+func randomClient(grp outputs.Group) outputs.NetworkClient {
+	L := len(grp.Clients)
+	if L == 0 {
+		panic("no elasticsearch client")
 	}
+
+	client := grp.Clients[rand.Intn(L)]
+	return client.(outputs.NetworkClient)
 }

@@ -5,6 +5,7 @@ import (
 
 	"github.com/elastic/beats/libbeat/common"
 	"github.com/elastic/beats/libbeat/logp"
+	"github.com/elastic/beats/libbeat/publisher/beat"
 	"github.com/stretchr/testify/assert"
 )
 
@@ -190,13 +191,12 @@ func getActualValue(t *testing.T, config *common.Config, input common.MapStr) co
 		logp.LogInit(logp.LOG_DEBUG, "", false, true, []string{"*"})
 	}
 
-	p, err := newDecodeJSONFields(*config)
+	p, err := newDecodeJSONFields(config)
 	if err != nil {
 		logp.Err("Error initializing decode_json_fields")
 		t.Fatal(err)
 	}
 
-	actual, err := p.Run(input)
-
-	return actual
+	actual, _ := p.Run(&beat.Event{Fields: input})
+	return actual.Fields
 }

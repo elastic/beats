@@ -2,183 +2,139 @@ package publish
 
 import (
 	"errors"
-	"sync"
 
 	"github.com/elastic/beats/libbeat/common"
 	"github.com/elastic/beats/libbeat/logp"
-	"github.com/elastic/beats/libbeat/publisher"
+	"github.com/elastic/beats/libbeat/processors"
+	"github.com/elastic/beats/libbeat/publisher/bc/publisher"
+	"github.com/elastic/beats/libbeat/publisher/beat"
 )
 
-type Transactions interface {
-	PublishTransaction(common.MapStr) bool
+type TransactionPublisher struct {
+	done      chan struct{}
+	pipeline  publisher.Publisher
+	canDrop   bool
+	processor transProcessor
 }
 
-type Flows interface {
-	PublishFlows([]common.MapStr) bool
-}
-
-type PacketbeatPublisher struct {
-	beatPublisher *publisher.BeatPublisher
-	client        publisher.Client
-
+type transProcessor struct {
 	ignoreOutgoing bool
-
-	wg   sync.WaitGroup
-	done chan struct{}
-
-	trans chan common.MapStr
-	flows chan []common.MapStr
-}
-
-type ChanTransactions struct {
-	Channel chan common.MapStr
-}
-
-func (t *ChanTransactions) PublishTransaction(event common.MapStr) bool {
-	t.Channel <- event
-	return true
+	localIPs       []string
+	name           string
 }
 
 var debugf = logp.MakeDebug("publish")
 
-func NewPublisher(
-	pub publisher.Publisher,
-	hwm, bulkHWM int,
+func NewTransactionPublisher(
+	pipeline publisher.Publisher,
 	ignoreOutgoing bool,
-) (*PacketbeatPublisher, error) {
+	canDrop bool,
+) (*TransactionPublisher, error) {
+	localIPs, err := common.LocalIPAddrsAsStrings(false)
+	if err != nil {
+		return nil, err
+	}
 
-	return &PacketbeatPublisher{
-		beatPublisher:  pub.(*publisher.BeatPublisher),
-		ignoreOutgoing: ignoreOutgoing,
-		client:         pub.Connect(),
-		done:           make(chan struct{}),
-		trans:          make(chan common.MapStr, hwm),
-		flows:          make(chan []common.MapStr, bulkHWM),
+	name := pipeline.(*publisher.BeatPublisher).GetName()
+	p := &TransactionPublisher{
+		done:     make(chan struct{}),
+		pipeline: pipeline,
+		canDrop:  canDrop,
+		processor: transProcessor{
+			localIPs:       localIPs,
+			name:           name,
+			ignoreOutgoing: ignoreOutgoing,
+		},
+	}
+	return p, nil
+}
+
+func (p *TransactionPublisher) Stop() {
+	close(p.done)
+}
+
+func (p *TransactionPublisher) CreateReporter(
+	config *common.Config,
+) (func(beat.Event), error) {
+
+	// load and register the module it's fields, tags and processors settings
+	meta := struct {
+		Event      common.EventMetadata    `config:",inline"`
+		Processors processors.PluginConfig `config:"processors"`
+	}{}
+	if err := config.Unpack(&meta); err != nil {
+		return nil, err
+	}
+
+	processors, err := processors.New(meta.Processors)
+	if err != nil {
+		return nil, err
+	}
+
+	clientConfig := beat.ClientConfig{
+		EventMetadata: meta.Event,
+		Processor:     processors,
+	}
+	if p.canDrop {
+		clientConfig.PublishMode = beat.DropIfFull
+	}
+
+	client, err := p.pipeline.ConnectX(clientConfig)
+	if err != nil {
+		return nil, err
+	}
+
+	// start worker, so post-processing and processor-pipeline
+	// can work concurrently to sniffer acquiring new events
+	ch := make(chan beat.Event, 3)
+	go p.worker(ch, client)
+	return func(event beat.Event) {
+		ch <- event
 	}, nil
 }
 
-func (p *PacketbeatPublisher) PublishTransaction(event common.MapStr) bool {
-	select {
-	case p.trans <- event:
-		return true
-	default:
-		// drop event if queue is full
-		return false
+func (p *TransactionPublisher) worker(ch chan beat.Event, client beat.Client) {
+	go func() {
+		<-p.done
+		close(ch)
+	}()
+
+	for event := range ch {
+		pub, _ := p.processor.Run(&event)
+		if pub != nil {
+			client.Publish(*pub)
+		}
 	}
 }
 
-func (p *PacketbeatPublisher) PublishFlows(event []common.MapStr) bool {
-	select {
-	case p.flows <- event:
-		return true
-	case <-p.done:
-		// drop event, if worker has been stopped
-		return false
-	}
-}
-
-func (p *PacketbeatPublisher) Start() {
-	p.wg.Add(1)
-	go func() {
-		defer p.wg.Done()
-		for {
-			select {
-			case <-p.done:
-				return
-			case event := <-p.trans:
-				p.onTransaction(event)
-			}
-		}
-	}()
-
-	p.wg.Add(1)
-	go func() {
-		defer p.wg.Done()
-		for {
-			select {
-			case <-p.done:
-				return
-			case events := <-p.flows:
-				p.onFlow(events)
-			}
-		}
-	}()
-}
-
-func (p *PacketbeatPublisher) Stop() {
-	p.client.Close()
-	close(p.done)
-	p.wg.Wait()
-}
-
-func (p *PacketbeatPublisher) onTransaction(event common.MapStr) {
+func (p *transProcessor) Run(event *beat.Event) (*beat.Event, error) {
 	if err := validateEvent(event); err != nil {
 		logp.Warn("Dropping invalid event: %v", err)
-		return
+		return nil, nil
 	}
 
-	if !p.normalizeTransAddr(event) {
-		return
+	if !p.normalizeTransAddr(event.Fields) {
+		return nil, nil
 	}
 
-	p.client.PublishEvent(event)
-}
-
-func (p *PacketbeatPublisher) onFlow(events []common.MapStr) {
-	pub := events[:0]
-	for _, event := range events {
-		if err := validateEvent(event); err != nil {
-			logp.Warn("Dropping invalid event: %v", err)
-			continue
-		}
-
-		pub = append(pub, event)
-	}
-
-	p.client.PublishEvents(pub)
-}
-
-func (p *PacketbeatPublisher) IsPublisherIP(ip string) bool {
-
-	for _, myip := range p.beatPublisher.IPAddrs {
-		if myip == ip {
-			return true
-		}
-	}
-
-	return false
-}
-
-func (p *PacketbeatPublisher) GetServerName(ip string) string {
-
-	// in case the IP is localhost, return current shipper name
-	islocal, err := common.IsLoopback(ip)
-	if err != nil {
-		logp.Err("Parsing IP %s fails with: %s", ip, err)
-		return ""
-	}
-
-	if islocal {
-		return p.beatPublisher.GetName()
-	}
-
-	return ""
+	return event, nil
 }
 
 // filterEvent validates an event for common required fields with types.
 // If event is to be filtered out the reason is returned as error.
-func validateEvent(event common.MapStr) error {
-	ts, ok := event["@timestamp"]
-	if !ok {
-		return errors.New("missing '@timestamp' field from event")
+func validateEvent(event *beat.Event) error {
+	fields := event.Fields
+
+	if event.Timestamp.IsZero() {
+		return errors.New("missing '@timestamp'")
 	}
 
-	_, ok = ts.(common.Time)
-	if !ok {
-		return errors.New("invalid '@timestamp' field from event")
+	_, ok := fields["@timestamp"]
+	if ok {
+		return errors.New("duplicate '@timestamp' field from event")
 	}
 
-	t, ok := event["type"]
+	t, ok := fields["type"]
 	if !ok {
 		return errors.New("missing 'type' field from event")
 	}
@@ -191,7 +147,7 @@ func validateEvent(event common.MapStr) error {
 	return nil
 }
 
-func (p *PacketbeatPublisher) normalizeTransAddr(event common.MapStr) bool {
+func (p *transProcessor) normalizeTransAddr(event common.MapStr) bool {
 	debugf("normalize address for: %v", event)
 
 	var srcServer, dstServer string
@@ -238,4 +194,29 @@ func (p *PacketbeatPublisher) normalizeTransAddr(event common.MapStr) bool {
 	}
 
 	return true
+}
+
+func (p *transProcessor) IsPublisherIP(ip string) bool {
+	for _, myip := range p.localIPs {
+		if myip == ip {
+			return true
+		}
+	}
+	return false
+}
+
+func (p *transProcessor) GetServerName(ip string) string {
+
+	// in case the IP is localhost, return current shipper name
+	islocal, err := common.IsLoopback(ip)
+	if err != nil {
+		logp.Err("Parsing IP %s fails with: %s", ip, err)
+		return ""
+	}
+
+	if islocal {
+		return p.name
+	}
+
+	return ""
 }

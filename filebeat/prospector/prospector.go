@@ -13,6 +13,7 @@ import (
 	"github.com/elastic/beats/filebeat/prospector/log"
 	"github.com/elastic/beats/filebeat/prospector/redis"
 	"github.com/elastic/beats/filebeat/prospector/stdin"
+	"github.com/elastic/beats/filebeat/prospector/udp"
 	"github.com/elastic/beats/libbeat/common"
 	"github.com/elastic/beats/libbeat/logp"
 )
@@ -36,7 +37,12 @@ type Prospectorer interface {
 }
 
 // NewProspector instantiates a new prospector
-func NewProspector(conf *common.Config, outlet channel.Outleter, beatDone chan struct{}, states []file.State) (*Prospector, error) {
+func NewProspector(
+	conf *common.Config,
+	outlet channel.OutleterFactory,
+	beatDone chan struct{},
+	states []file.State,
+) (*Prospector, error) {
 	prospector := &Prospector{
 		config:   defaultConfig,
 		wg:       &sync.WaitGroup{},
@@ -65,7 +71,7 @@ func NewProspector(conf *common.Config, outlet channel.Outleter, beatDone chan s
 	return prospector, nil
 }
 
-func (p *Prospector) initProspectorer(outlet channel.Outleter, states []file.State, config *common.Config) error {
+func (p *Prospector) initProspectorer(outlet channel.OutleterFactory, states []file.State, config *common.Config) error {
 
 	var prospectorer Prospectorer
 	var err error
@@ -76,7 +82,9 @@ func (p *Prospector) initProspectorer(outlet channel.Outleter, states []file.Sta
 	case harvester.RedisType:
 		prospectorer, err = redis.NewProspector(config, outlet)
 	case harvester.LogType:
-		prospectorer, err = log.NewProspector(config, states, outlet, p.done)
+		prospectorer, err = log.NewProspector(config, states, outlet, p.done, p.beatDone)
+	case harvester.UdpType:
+		prospectorer, err = udp.NewProspector(config, outlet)
 	default:
 		return fmt.Errorf("invalid prospector type: %v. Change type", p.config.Type)
 	}

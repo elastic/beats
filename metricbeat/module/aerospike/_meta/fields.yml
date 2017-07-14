@@ -1,0 +1,11 @@
+- key: aerospike
+  title: "aerospike"
+  description: >
+    []experimental
+
+    aerospike Module
+  fields:
+    - name: aerospike
+      type: group
+      description: >
+      fields:

@@ -16,6 +16,7 @@ include::../../libbeat/docs/version.asciidoc[]
 :version: {stack-version}
 :beatname_lc: packetbeat
 :beatname_uc: Packetbeat
+:beatname_pkg: {beatname_lc}
 :security: X-Pack Security
 :dockerimage: docker.elastic.co/beats/{beatname_lc}:{version}
 
@@ -50,6 +51,9 @@ include::./packetbeat-geoip.asciidoc[]
 include::./configuring-logstash.asciidoc[]
 
 include::./flows.asciidoc[]
+
+:standalone:
+include::../../libbeat/docs/shared-env-vars.asciidoc[]
 
 include::./thrift.asciidoc[]
 

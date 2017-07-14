@@ -6,7 +6,7 @@ import (
 	"github.com/elastic/beats/libbeat/beat"
 	"github.com/elastic/beats/libbeat/common"
 	"github.com/elastic/beats/libbeat/logp"
-	"github.com/elastic/beats/libbeat/publisher"
+	"github.com/elastic/beats/libbeat/publisher/bc/publisher"
 	"github.com/elastic/beats/metricbeat/mb"
 	"github.com/elastic/beats/metricbeat/mb/module"
 
@@ -14,7 +14,7 @@ import (
 	"github.com/pkg/errors"
 
 	// Add metricbeat specific processors
-	_ "github.com/elastic/beats/metricbeat/processor/kubernetes"
+	_ "github.com/elastic/beats/metricbeat/processor/add_kubernetes_metadata"
 )
 
 // Metricbeat implements the Beater interface for metricbeat.
@@ -30,17 +30,15 @@ func New(b *beat.Beat, rawConfig *common.Config) (beat.Beater, error) {
 	// List all registered modules and metricsets.
 	logp.Info("%s", mb.Registry.String())
 
-	config := Config{}
-
-	err := rawConfig.Unpack(&config)
-	if err != nil {
+	config := defaultConfig
+	if err := rawConfig.Unpack(&config); err != nil {
 		return nil, errors.Wrap(err, "error reading configuration file")
 	}
 
-	modules, err := module.NewWrappers(config.Modules, mb.Registry)
+	modules, err := module.NewWrappers(config.MaxStartDelay, config.Modules, mb.Registry)
 	if err != nil {
 		// Empty config is fine if dynamic config is enabled
-		if !config.ReloadModules.Enabled() {
+		if !config.ConfigModules.Enabled() {
 			return nil, err
 		} else if err != mb.ErrEmptyConfig && err != mb.ErrAllModulesDisabled {
 			return nil, err
@@ -61,7 +59,6 @@ func New(b *beat.Beat, rawConfig *common.Config) (beat.Beater, error) {
 // that a single unresponsive host cannot inadvertently block other hosts
 // within the same Module and MetricSet from collection.
 func (bt *Metricbeat) Run(b *beat.Beat) error {
-
 	var wg sync.WaitGroup
 
 	for _, m := range bt.modules {
@@ -75,10 +72,9 @@ func (bt *Metricbeat) Run(b *beat.Beat) error {
 		}()
 	}
 
-	if bt.config.ReloadModules.Enabled() {
-		logp.Beta("feature dynamic configuration reloading is enabled.")
-		moduleReloader := cfgfile.NewReloader(bt.config.ReloadModules)
-		factory := module.NewFactory(b.Publisher)
+	if bt.config.ConfigModules.Enabled() {
+		moduleReloader := cfgfile.NewReloader(bt.config.ConfigModules)
+		factory := module.NewFactory(bt.config.MaxStartDelay, b.Publisher)
 
 		go moduleReloader.Run(factory)
 		wg.Add(1)

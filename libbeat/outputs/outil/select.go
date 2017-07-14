@@ -6,6 +6,7 @@ import (
 	"github.com/elastic/beats/libbeat/common"
 	"github.com/elastic/beats/libbeat/common/fmtstr"
 	"github.com/elastic/beats/libbeat/processors"
+	"github.com/elastic/beats/libbeat/publisher/beat"
 )
 
 type Selector struct {
@@ -27,7 +28,7 @@ type Settings struct {
 }
 
 type SelectorExpr interface {
-	sel(evt common.MapStr) (string, error)
+	sel(evt *beat.Event) (string, error)
 }
 
 type emptySelector struct{}
@@ -73,7 +74,7 @@ func MakeSelector(es ...SelectorExpr) Selector {
 // If no matching selector is found, an empty string is returned.
 // It's up to the caller to decide if an empty string is an error
 // or an expected result.
-func (s Selector) Select(evt common.MapStr) (string, error) {
+func (s Selector) Select(evt *beat.Event) (string, error) {
 	return s.sel.sel(evt)
 }
 
@@ -139,7 +140,7 @@ func BuildSelectorFromConfig(
 		}
 
 		if fmtstr.IsConst() {
-			str, err := fmtstr.Run(common.MapStr{})
+			str, err := fmtstr.Run(nil)
 			if err != nil {
 				return Selector{}, err
 			}
@@ -259,7 +260,7 @@ func buildSingle(cfg *common.Config, key string) (SelectorExpr, error) {
 	var sel SelectorExpr
 	if len(mapping.Table) > 0 {
 		if evtfmt.IsConst() {
-			str, err := evtfmt.Run(common.MapStr{})
+			str, err := evtfmt.Run(nil)
 			if err != nil {
 				return nil, err
 			}
@@ -283,7 +284,7 @@ func buildSingle(cfg *common.Config, key string) (SelectorExpr, error) {
 		}
 	} else {
 		if evtfmt.IsConst() {
-			str, err := evtfmt.Run(common.MapStr{})
+			str, err := evtfmt.Run(nil)
 			if err != nil {
 				return nil, err
 			}
@@ -304,11 +305,11 @@ func buildSingle(cfg *common.Config, key string) (SelectorExpr, error) {
 	return sel, nil
 }
 
-func (s *emptySelector) sel(evt common.MapStr) (string, error) {
+func (s *emptySelector) sel(evt *beat.Event) (string, error) {
 	return "", nil
 }
 
-func (s *listSelector) sel(evt common.MapStr) (string, error) {
+func (s *listSelector) sel(evt *beat.Event) (string, error) {
 	for _, sub := range s.selectors {
 		n, err := sub.sel(evt)
 		if err != nil { // TODO: try
@@ -323,18 +324,18 @@ func (s *listSelector) sel(evt common.MapStr) (string, error) {
 	return "", nil
 }
 
-func (s *condSelector) sel(evt common.MapStr) (string, error) {
+func (s *condSelector) sel(evt *beat.Event) (string, error) {
 	if !s.cond.Check(evt) {
 		return "", nil
 	}
 	return s.s.sel(evt)
 }
 
-func (s *constSelector) sel(_ common.MapStr) (string, error) {
+func (s *constSelector) sel(_ *beat.Event) (string, error) {
 	return s.s, nil
 }
 
-func (s *fmtSelector) sel(evt common.MapStr) (string, error) {
+func (s *fmtSelector) sel(evt *beat.Event) (string, error) {
 	n, err := s.f.Run(evt)
 	if err != nil {
 		// err will be set if not all keys present in event ->
@@ -348,7 +349,7 @@ func (s *fmtSelector) sel(evt common.MapStr) (string, error) {
 	return n, nil
 }
 
-func (s *mapSelector) sel(evt common.MapStr) (string, error) {
+func (s *mapSelector) sel(evt *beat.Event) (string, error) {
 	n, err := s.from.sel(evt)
 	if err != nil {
 		if s.otherwise == "" {

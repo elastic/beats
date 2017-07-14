@@ -1,0 +1,23 @@
+= Auditbeat Reference
+
+include::../../libbeat/docs/version.asciidoc[]
+
+:libbeat: http://www.elastic.co/guide/en/beats/libbeat/{doc-branch}
+:version: {stack-version}
+:beatname_lc: auditbeat
+:beatname_uc: Auditbeat
+:beatname_pkg: {beatname_lc}
+:security: X-Pack Security
+:dockerimage: docker.elastic.co/beats/{beatname_lc}:{version}
+
+include::../../libbeat/docs/contributing-to-beats.asciidoc[]
+
+include::../../libbeat/docs/repositories.asciidoc[]
+
+:standalone:
+include::../../libbeat/docs/shared-env-vars.asciidoc[]
+:standalone:
+:allplatforms:
+include::../../libbeat/docs/yaml.asciidoc[]
+
+include::./fields.asciidoc[]

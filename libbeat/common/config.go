@@ -12,7 +12,7 @@ import (
 
 	"github.com/elastic/beats/libbeat/common/file"
 	"github.com/elastic/beats/libbeat/logp"
-	"github.com/elastic/go-ucfg"
+	ucfg "github.com/elastic/go-ucfg"
 	"github.com/elastic/go-ucfg/cfgutil"
 	cfgflag "github.com/elastic/go-ucfg/flag"
 	"github.com/elastic/go-ucfg/yaml"
@@ -35,7 +35,8 @@ type Config ucfg.Config
 
 // ConfigNamespace storing at most one configuration section by name and sub-section.
 type ConfigNamespace struct {
-	C map[string]*Config `config:",inline"`
+	name   string
+	config *Config
 }
 
 type flagOverwrite struct {
@@ -327,33 +328,63 @@ func (f *flagOverwrite) Get() interface{} {
 	return f.value
 }
 
-// Validate checks at most one sub-namespace being set.
-func (ns *ConfigNamespace) Validate() error {
-	if len(ns.C) > 1 {
-		return errors.New("more then one namespace configured")
+// Unpack unpacks a configuration with at most one sub object. An sub object is
+// ignored if it is disabled by setting `enabled: false`. If the configuration
+// passed contains multiple active sub objects, Unpack will return an error.
+func (ns *ConfigNamespace) Unpack(cfg *Config) error {
+	fields := cfg.GetFields()
+	if len(fields) == 0 {
+		return nil
+	}
+
+	var (
+		err   error
+		found bool
+	)
+
+	for _, name := range fields {
+		var sub *Config
+
+		sub, err = cfg.Child(name, -1)
+		if err != nil {
+			// element is no configuration object -> continue so a namespace
+			// Config unpacked as a namespace can have other configuration
+			// values as well
+			continue
+		}
+
+		if !sub.Enabled() {
+			continue
+		}
+
+		if ns.name != "" {
+			return errors.New("more then one namespace configured")
+		}
+
+		ns.name = name
+		ns.config = sub
+		found = true
+	}
+
+	if !found {
+		return err
 	}
 	return nil
 }
 
 // Name returns the configuration sections it's name if a section has been set.
 func (ns *ConfigNamespace) Name() string {
-	for name := range ns.C {
-		return name
-	}
-	return ""
+	return ns.name
 }
 
 // Config return the sub-configuration section if a section has been set.
 func (ns *ConfigNamespace) Config() *Config {
-	for _, cfg := range ns.C {
-		return cfg
-	}
-	return nil
+	return ns.config
 }
 
 // IsSet returns true if a sub-configuration section has been set.
 func (ns *ConfigNamespace) IsSet() bool {
-	return len(ns.C) != 0
+	return ns.config != nil
 }
 
 func configDebugString(c *Config, filterPrivate bool) string {

@@ -8,6 +8,7 @@ import (
 	"github.com/stretchr/testify/assert"
 
 	"github.com/elastic/beats/libbeat/common"
+	"github.com/elastic/beats/libbeat/publisher/beat"
 )
 
 type memcacheTest struct {
@@ -56,12 +57,14 @@ func makeBinMessage(
 }
 
 func makeTransactionEvent(t *testing.T, trans *transaction) common.MapStr {
-	event := common.MapStr{}
-	err := trans.Event(event)
+	event := beat.Event{
+		Fields: common.MapStr{},
+	}
+	err := trans.Event(&event)
 	if err != nil {
 		t.Fatalf("serializing transaction failed with: %v", err)
 	}
-	return event
+	return event.Fields
 }
 
 func Test_TryMergeUnmergeableRespnses(t *testing.T) {

@@ -16,11 +16,13 @@ grouped in the following categories:
 * <<exported-fields-auditd>>
 * <<exported-fields-beat>>
 * <<exported-fields-cloud>>
+* <<exported-fields-docker-processor>>
 * <<exported-fields-icinga>>
 * <<exported-fields-kubernetes-processor>>
 * <<exported-fields-log>>
 * <<exported-fields-mysql>>
 * <<exported-fields-nginx>>
+* <<exported-fields-redis>>
 * <<exported-fields-system>>
 
 --
@@ -231,6 +233,22 @@ Country ISO code.
 type: geo_point
 
 The longitude and latitude.
+
+
+[float]
+=== apache2.access.geoip.region_name
+
+type: keyword
+
+The region name.
+
+
+[float]
+=== apache2.access.geoip.city_name
+
+type: keyword
+
+The city name.
 
 
 [float]
@@ -581,6 +599,47 @@ Name of the project in Google Cloud.
 === meta.cloud.region
 
 Region in which this host is running.
+
+
+[[exported-fields-docker-processor]]
+== docker Fields
+
+beta[]
+Docker stats collected from Docker.
+
+
+
+
+[float]
+=== docker.container.id
+
+type: keyword
+
+Unique container id.
+
+
+[float]
+=== docker.container.image
+
+type: keyword
+
+Name of the image the container was built on.
+
+
+[float]
+=== docker.container.name
+
+type: keyword
+
+Container name.
+
+
+[float]
+=== docker.container.labels
+
+type: object
+
+Image labels.
 
 
 [[exported-fields-icinga]]
@@ -960,11 +1019,19 @@ Contains fields for the Nginx access logs.
 
 
 [float]
+=== nginx.access.remote_ip_list
+
+type: array
+
+An array of remote IP addresses. It is a list because it is common to include, besides the client IP address, IP addresses from headers like `X-Forwarded-For`. See also the `remote_ip` field.
+
+
+[float]
 === nginx.access.remote_ip
 
 type: keyword
 
-Client IP address.
+Client IP address. The first public IP address from the `remote_ip_list` array. If no public IP addresses are present, this field contains the first private IP address from the `remote_ip_list` array.
 
 
 [float]
@@ -1148,6 +1215,22 @@ The longitude and latitude.
 
 
 [float]
+=== nginx.access.geoip.region_name
+
+type: keyword
+
+The region name.
+
+
+[float]
+=== nginx.access.geoip.city_name
+
+type: keyword
+
+The city name.
+
+
+[float]
 == error Fields
 
 Contains fields for the Nginx error logs.
@@ -1192,6 +1275,105 @@ Connection identifier.
 type: text
 
 The error message
+
+
+[[exported-fields-redis]]
+== redis Fields
+
+redis Module
+
+
+
+[float]
+== redis Fields
+
+
+
+
+[float]
+== log Fields
+
+Redis log files
+
+
+
+[float]
+=== redis.log.pid
+
+type: long
+
+The process ID of the Redis server.
+
+
+[float]
+=== redis.log.role
+
+type: keyword
+
+The role of the Redis instance. Can be one of `master`, `slave`, `child` (for RDF/AOF writing child), or `sentinel`.
+
+
+[float]
+=== redis.log.level
+
+type: keyword
+
+The log level. Can be one of `debug`, `verbose`, `notice`, or `warning`.
+
+
+[float]
+=== redis.log.message
+
+type: text
+
+The log message
+
+
+[float]
+== slowlog Fields
+
+Slow logs are retrieved from Redis via a network connection.
+
+
+
+[float]
+=== redis.slowlog.cmd
+
+type: keyword
+
+The command executed.
+
+
+[float]
+=== redis.slowlog.duration.us
+
+type: long
+
+How long it took to execute the command in microseconds.
+
+
+[float]
+=== redis.slowlog.id
+
+type: long
+
+The ID of the query.
+
+
+[float]
+=== redis.slowlog.key
+
+type: keyword
+
+The key on which the command was executed.
+
+
+[float]
+=== redis.slowlog.args
+
+type: keyword
+
+The arguments with which the command was called.
 
 
 [[exported-fields-system]]

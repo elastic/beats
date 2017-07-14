@@ -1,7 +1,7 @@
 ###################### Winlogbeat Configuration Example ##########################
 
 # This file is an example configuration file highlighting only the most common
-# options. The winlogbeat.full.yml file from the same directory contains all the
+# options. The winlogbeat.reference.yml file from the same directory contains all the
 # supported options with more comments. You can use it as a reference.
 #
 # You can find the full configuration reference here:
@@ -37,6 +37,31 @@ winlogbeat.event_logs:
 # output.
 #fields:
 #  env: staging
+
+
+#============================== Dashboards =====================================
+# These settings control loading the sample dashboards to the Kibana index. Loading
+# the dashboards is disabled by default and can be enabled either by setting the
+# options here, or by using the `-setup` CLI flag or the `setup` command.
+#setup.dashboards.enabled: false
+
+# The URL from where to download the dashboards archive. By default this URL
+# has a value which is computed based on the Beat name and version. For released
+# versions, this URL points to the dashboard archive on the artifacts.elastic.co
+# website.
+#setup.dashboards.url:
+
+#============================== Kibana =====================================
+
+# Starting with Beats version 6.0.0, the dashboards are loaded via the Kibana API. 
+# This requires a Kibana endpoint configuration.
+setup.kibana:
+
+  # Kibana Host
+  # Scheme and port can be left out and will be set to the default (http and 5601)
+  # In case you specify and additional path, the scheme is required: http://localhost:5601/path
+  # IPv6 addresses should always be defined as: https://[2001:db8::1]:5601
+  #host: "localhost:5601"
 
 #================================ Outputs =====================================
 

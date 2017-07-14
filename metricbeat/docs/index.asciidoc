@@ -11,6 +11,7 @@ include::../../libbeat/docs/version.asciidoc[]
 :version: {stack-version}
 :beatname_lc: metricbeat
 :beatname_uc: Metricbeat
+:beatname_pkg: {beatname_lc}
 :security: X-Pack Security
 :monitoringdoc: https://www.elastic.co/guide/en/x-pack/current
 :dockerimage: docker.elastic.co/beats/{beatname_lc}:{version}
@@ -41,6 +42,7 @@ include::../../libbeat/docs/shared-config-ingest.asciidoc[]
 
 include::./configuring-logstash.asciidoc[]
 
+:standalone:
 include::../../libbeat/docs/shared-env-vars.asciidoc[]
 
 :standalone:

@@ -474,15 +474,17 @@ package main
 
 import (
 	"os"
+	"github.com/spf13/cobra"
 
 	"github.com/elastic/beats/libbeat/beat"
 
 	"github.com/kimjmin/countbeat/beater"
 )
 
+var RootCmd = cmd.GenRootCmd("countbeat", "", beater.New)
+
 func main() {
-	err := beat.Run("countbeat", "", beater.New)
-	if err != nil {
+	if err := RootCmd.Execute(); err != nil {
 		os.Exit(1)
 	}
 }

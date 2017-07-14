@@ -2,15 +2,17 @@ package fileset
 
 import (
 	"encoding/json"
-	"errors"
 	"fmt"
 	"io/ioutil"
 	"os"
 	"path/filepath"
 	"strings"
 
+	"github.com/pkg/errors"
+
 	"github.com/elastic/beats/libbeat/common"
 	"github.com/elastic/beats/libbeat/logp"
+	mlimporter "github.com/elastic/beats/libbeat/ml-importer"
 	"github.com/elastic/beats/libbeat/paths"
 )
 
@@ -245,6 +247,9 @@ func (reg *ModuleRegistry) GetProspectorConfigs() ([]*common.Config, error) {
 	return result, nil
 }
 
+// PipelineLoader factory builds and returns a PipelineLoader
+type PipelineLoaderFactory func() (PipelineLoader, error)
+
 // PipelineLoader is a subset of the Elasticsearch client API capable of loading
 // the pipelines.
 type PipelineLoader interface {
@@ -416,6 +421,31 @@ func interpretError(initialErr error, body []byte) error {
 	}
 
 	return fmt.Errorf("couldn't load pipeline: %v. Response body: %s", initialErr, body)
+}
+
+// LoadML loads the machine-learning configurations into Elasticsearch, if Xpack is avaiable
+func (reg *ModuleRegistry) LoadML(esClient PipelineLoader) error {
+	haveXpack, err := mlimporter.HaveXpackML(esClient)
+	if err != nil {
+		return errors.Errorf("Error checking if xpack is available: %v", err)
+	}
+	if !haveXpack {
+		logp.Warn("Xpack Machine Learning is not enabled")
+		return nil
+	}
+
+	for module, filesets := range reg.registry {
+		for name, fileset := range filesets {
+			for _, mlConfig := range fileset.GetMLConfigs() {
+				err = mlimporter.ImportMachineLearningJob(esClient, &mlConfig)
+				if err != nil {
+					return errors.Errorf("Error loading ML config from %s/%s: %v", module, name, err)
+				}
+			}
+		}
+	}
+
+	return nil
 }
 
 func (reg *ModuleRegistry) Empty() bool {

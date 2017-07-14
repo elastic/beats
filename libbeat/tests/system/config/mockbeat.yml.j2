@@ -1,9 +1,5 @@
 ############################# Mockbeat ######################################
 mockbeat:
-
-
-
-
 ############################# General ############################################
 
 # The name of the shipper that publishes the network data. It can be used to group
@@ -23,11 +19,10 @@ tags: [
 {%- endif -%}]
 
 
-
 ############################# Output ############################################
 
-# Configure what outputs to use when sending the data collected by packetbeat.
-# Multiple outputs may be enabled.
+# Configure what outputs to use when sending the data collected by mockbeat.
+# Multiple outputs may NOT be enabled.
 output:
   {% if console -%}
   console:
@@ -36,12 +31,12 @@ output:
     {% endfor -%}
   {%- endif %}
 
-  # Elasticsearch as output
-  # Options:
-  # host, port: where Elasticsearch is listening on
-  #elasticsearch:
-  #  host: localhost
-  #  port: 9200
+  {% if elasticsearch -%}
+  elasticsearch:
+    {% for k, v in elasticsearch.items() -%}
+    {{ k }}: {{ v }}
+    {% endfor -%}
+  {%- endif %}
 
   # Redis as output
   # Options:
@@ -56,11 +51,20 @@ output:
   # filename: name of the files
   # rotate_every_kb: maximum size of the files in path
   # number of files: maximum number of files in path
+  {% if not (console or elasticsearch) -%}
   file:
     path: {{ output_file_path|default(beat.working_dir + "/output") }}
     filename: "{{ output_file_filename|default("mockbeat") }}"
     rotate_every_kb: 1000
     #number_of_files: 7
+  {%- endif %}
+
+#==================== Elasticsearch template setting ==========================
+setup.template:
+  fields: {{ fields|default("fields.yml") }}
+  settings:
+    index.number_of_shards: 1
+    index.codec: best_compression
 
 #================================ Logging =====================================
 

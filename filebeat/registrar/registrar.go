@@ -8,8 +8,8 @@ import (
 	"sync"
 
 	"github.com/elastic/beats/filebeat/input/file"
-	"github.com/elastic/beats/filebeat/publisher"
 	"github.com/elastic/beats/filebeat/util"
+	helper "github.com/elastic/beats/libbeat/common/file"
 	"github.com/elastic/beats/libbeat/logp"
 	"github.com/elastic/beats/libbeat/monitoring"
 	"github.com/elastic/beats/libbeat/paths"
@@ -17,11 +17,15 @@ import (
 
 type Registrar struct {
 	Channel      chan []*util.Data
-	out          publisher.SuccessLogger
+	out          successLogger
 	done         chan struct{}
 	registryFile string       // Path to the Registry File
 	states       *file.States // Map with all file paths inside and the corresponding state
 	wg           sync.WaitGroup
+}
+
+type successLogger interface {
+	Published(events []*util.Data) bool
 }
 
 var (
@@ -31,7 +35,7 @@ var (
 	registryWrites = monitoring.NewInt(nil, "registrar.writes")
 )
 
-func New(registryFile string, out publisher.SuccessLogger) (*Registrar, error) {
+func New(registryFile string, out successLogger) (*Registrar, error) {
 
 	r := &Registrar{
 		registryFile: registryFile,
@@ -152,32 +156,34 @@ func (r *Registrar) Run() {
 	}()
 
 	for {
-		var events []*util.Data
-
 		select {
 		case <-r.done:
 			logp.Info("Ending Registrar")
 			return
-		case events = <-r.Channel:
+		case events := <-r.Channel:
+			r.onEvents(events)
 		}
+	}
+}
 
-		r.processEventStates(events)
+// onEvents processes events received from the publisher pipeline
+func (r *Registrar) onEvents(events []*util.Data) {
+	r.processEventStates(events)
 
-		beforeCount := r.states.Count()
-		cleanedStates := r.states.Cleanup()
-		statesCleanup.Add(int64(cleanedStates))
+	beforeCount := r.states.Count()
+	cleanedStates := r.states.Cleanup()
+	statesCleanup.Add(int64(cleanedStates))
 
-		logp.Debug("registrar",
-			"Registrar states cleaned up. Before: %d, After: %d",
-			beforeCount, beforeCount-cleanedStates)
+	logp.Debug("registrar",
+		"Registrar states cleaned up. Before: %d, After: %d",
+		beforeCount, beforeCount-cleanedStates)
 
-		if err := r.writeRegistry(); err != nil {
-			logp.Err("Writing of registry returned error: %v. Continuing...", err)
-		}
+	if err := r.writeRegistry(); err != nil {
+		logp.Err("Writing of registry returned error: %v. Continuing...", err)
+	}
 
-		if r.out != nil {
-			r.out.Published(events)
-		}
+	if r.out != nil {
+		r.out.Published(events)
 	}
 }
 
@@ -228,7 +234,7 @@ func (r *Registrar) writeRegistry() error {
 	// Directly close file because of windows
 	f.Close()
 
-	err = file.SafeFileRotate(r.registryFile, tempfile)
+	err = helper.SafeFileRotate(r.registryFile, tempfile)
 
 	logp.Debug("registrar", "Registry file updated. %d states written.", len(states))
 	registryWrites.Add(1)

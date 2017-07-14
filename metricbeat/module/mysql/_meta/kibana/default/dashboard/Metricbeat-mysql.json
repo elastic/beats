@@ -1,0 +1,168 @@
+{
+  "objects": [
+    {
+      "attributes": {
+        "description": "",
+        "kibanaSavedObjectMeta": {
+          "searchSourceJSON": "{\"filter\":[]}"
+        },
+        "savedSearchId": "67e88e60-0005-11e7-aaf1-b342e4b94bb0",
+        "title": "MySQL active connections",
+        "uiStateJSON": "{}",
+        "version": 1,
+        "visState": "{\"title\":\"MySQL active connections\",\"type\":\"line\",\"params\":{\"addTooltip\":true,\"addLegend\":true,\"legendPosition\":\"bottom\",\"showCircles\":true,\"interpolate\":\"linear\",\"scale\":\"linear\",\"drawLinesBetweenPoints\":true,\"radiusRatio\":9,\"times\":[],\"addTimeMarker\":false,\"defaultYExtents\":false,\"setYExtents\":false},\"aggs\":[{\"id\":\"1\",\"enabled\":true,\"type\":\"avg\",\"schema\":\"metric\",\"params\":{\"field\":\"mysql.status.connections\"}},{\"id\":\"2\",\"enabled\":true,\"type\":\"date_histogram\",\"schema\":\"segment\",\"params\":{\"field\":\"@timestamp\",\"interval\":\"auto\",\"customInterval\":\"2h\",\"min_doc_count\":1,\"extended_bounds\":{}}}],\"listeners\":{}}"
+      },
+      "id": "e784dc50-0005-11e7-bf7f-c9acc3d3e306",
+      "type": "visualization",
+      "version": 1
+    },
+    {
+      "attributes": {
+        "description": "",
+        "kibanaSavedObjectMeta": {
+          "searchSourceJSON": "{\"filter\":[]}"
+        },
+        "savedSearchId": "67e88e60-0005-11e7-aaf1-b342e4b94bb0",
+        "title": "MySQL open files",
+        "uiStateJSON": "{}",
+        "version": 1,
+        "visState": "{\"title\":\"MySQL open files\",\"type\":\"line\",\"params\":{\"addTooltip\":true,\"addLegend\":true,\"legendPosition\":\"bottom\",\"showCircles\":true,\"interpolate\":\"linear\",\"scale\":\"linear\",\"drawLinesBetweenPoints\":true,\"radiusRatio\":9,\"times\":[],\"addTimeMarker\":false,\"defaultYExtents\":false,\"setYExtents\":false},\"aggs\":[{\"id\":\"1\",\"enabled\":true,\"type\":\"avg\",\"schema\":\"metric\",\"params\":{\"field\":\"mysql.status.open.files\"}},{\"id\":\"2\",\"enabled\":true,\"type\":\"date_histogram\",\"schema\":\"segment\",\"params\":{\"field\":\"@timestamp\",\"interval\":\"auto\",\"customInterval\":\"2h\",\"min_doc_count\":1,\"extended_bounds\":{}}}],\"listeners\":{}}"
+      },
+      "id": "0f506420-0006-11e7-bf7f-c9acc3d3e306",
+      "type": "visualization",
+      "version": 1
+    },
+    {
+      "attributes": {
+        "description": "",
+        "kibanaSavedObjectMeta": {
+          "searchSourceJSON": "{\"filter\":[]}"
+        },
+        "savedSearchId": "67e88e60-0005-11e7-aaf1-b342e4b94bb0",
+        "title": "MySQL open tables",
+        "uiStateJSON": "{}",
+        "version": 1,
+        "visState": "{\"title\":\"MySQL open tables\",\"type\":\"line\",\"params\":{\"addTooltip\":true,\"addLegend\":true,\"legendPosition\":\"bottom\",\"showCircles\":true,\"interpolate\":\"linear\",\"scale\":\"linear\",\"drawLinesBetweenPoints\":true,\"radiusRatio\":9,\"times\":[],\"addTimeMarker\":false,\"defaultYExtents\":false,\"setYExtents\":false},\"aggs\":[{\"id\":\"1\",\"enabled\":true,\"type\":\"avg\",\"schema\":\"metric\",\"params\":{\"field\":\"mysql.status.open.files\"}},{\"id\":\"2\",\"enabled\":true,\"type\":\"date_histogram\",\"schema\":\"segment\",\"params\":{\"field\":\"@timestamp\",\"interval\":\"auto\",\"customInterval\":\"2h\",\"min_doc_count\":1,\"extended_bounds\":{}}}],\"listeners\":{}}"
+      },
+      "id": "1a99f2b0-0006-11e7-bf7f-c9acc3d3e306",
+      "type": "visualization",
+      "version": 1
+    },
+    {
+      "attributes": {
+        "description": "",
+        "kibanaSavedObjectMeta": {
+          "searchSourceJSON": "{\"filter\":[]}"
+        },
+        "savedSearchId": "67e88e60-0005-11e7-aaf1-b342e4b94bb0",
+        "title": "MySQL running threads",
+        "uiStateJSON": "{}",
+        "version": 1,
+        "visState": "{\"title\":\"MySQL running threads\",\"type\":\"line\",\"params\":{\"addTooltip\":true,\"addLegend\":true,\"legendPosition\":\"bottom\",\"showCircles\":true,\"interpolate\":\"linear\",\"scale\":\"linear\",\"drawLinesBetweenPoints\":true,\"radiusRatio\":9,\"times\":[],\"addTimeMarker\":false,\"defaultYExtents\":false,\"setYExtents\":false},\"aggs\":[{\"id\":\"1\",\"enabled\":true,\"type\":\"avg\",\"schema\":\"metric\",\"params\":{\"field\":\"mysql.status.threads.running\"}},{\"id\":\"2\",\"enabled\":true,\"type\":\"date_histogram\",\"schema\":\"segment\",\"params\":{\"field\":\"@timestamp\",\"interval\":\"auto\",\"customInterval\":\"2h\",\"min_doc_count\":1,\"extended_bounds\":{}}}],\"listeners\":{}}"
+      },
+      "id": "45a00c10-0006-11e7-bf7f-c9acc3d3e306",
+      "type": "visualization",
+      "version": 1
+    },
+    {
+      "attributes": {
+        "description": "",
+        "kibanaSavedObjectMeta": {
+          "searchSourceJSON": "{\"query\":{\"query_string\":{\"analyze_wildcard\":true,\"query\":\"*\"}},\"filter\":[]}"
+        },
+        "title": "MySQL commands",
+        "uiStateJSON": "{}",
+        "version": 1,
+        "visState": "{\"title\":\"MySQL commands\",\"type\":\"timelion\",\"params\":{\"expression\":\".es(*, metric='avg:mysql.status.command.select').derivative().label(\\\"SELECT\\\"),.es(*, metric='avg:mysql.status.command.insert').derivative().label(\\\"INSERT\\\"),.es(*, metric='avg:mysql.status.command.insert').derivative().label(\\\"UPDATE\\\"),.es(*, metric='avg:mysql.status.command.insert').derivative().label(\\\"DELETE\\\")\",\"interval\":\"1m\"},\"aggs\":[],\"listeners\":{}}"
+      },
+      "id": "1eda2280-0008-11e7-82f3-2f380154876c",
+      "type": "visualization",
+      "version": 1
+    },
+    {
+      "attributes": {
+        "description": "",
+        "kibanaSavedObjectMeta": {
+          "searchSourceJSON": "{\"query\":{\"query_string\":{\"analyze_wildcard\":true,\"query\":\"*\"}},\"filter\":[]}"
+        },
+        "title": "MySQL threads created",
+        "uiStateJSON": "{}",
+        "version": 1,
+        "visState": "{\"title\":\"MySQL threads created\",\"type\":\"timelion\",\"params\":{\"expression\":\".es(*, metric='avg:mysql.status.threads.created').derivative().label(\\\"Threads created\\\")\",\"interval\":\"1m\"},\"aggs\":[],\"listeners\":{}}"
+      },
+      "id": "1ede99e0-0009-11e7-8cd4-73b67e9e3f3c",
+      "type": "visualization",
+      "version": 1
+    },
+    {
+      "attributes": {
+        "description": "",
+        "kibanaSavedObjectMeta": {
+          "searchSourceJSON": "{\"query\":{\"query_string\":{\"analyze_wildcard\":true,\"query\":\"*\"}},\"filter\":[]}"
+        },
+        "title": "MySQL table opens",
+        "uiStateJSON": "{}",
+        "version": 1,
+        "visState": "{\"aggs\":[],\"listeners\":{},\"params\":{\"expression\":\".es(*, metric='avg:mysql.status.opened_tables').derivative().label(\\\"Opened tables\\\")\",\"interval\":\"1m\"},\"title\":\"MySQL table opens\",\"type\":\"timelion\"}"
+      },
+      "id": "4c36c420-000a-11e7-8cd4-73b67e9e3f3c",
+      "type": "visualization",
+      "version": 1
+    },
+    {
+      "attributes": {
+        "description": "",
+        "kibanaSavedObjectMeta": {
+          "searchSourceJSON": "{\"query\":{\"query_string\":{\"analyze_wildcard\":true,\"query\":\"*\"}},\"filter\":[]}"
+        },
+        "title": "Mysql sent and received bytes",
+        "uiStateJSON": "{}",
+        "version": 1,
+        "visState": "{\"title\":\"Mysql sent and received bytes\",\"type\":\"timelion\",\"params\":{\"expression\":\".es(*,metric=\\\"avg:mysql.status.bytes.sent\\\").derivative().divide(1000).label(\\\"Sent bytes (KB)\\\"),.es(*,metric=\\\"avg:mysql.status.bytes.received\\\").derivative().multiply(-1).divide(1000).label(\\\"Received bytes (KB)\\\")\",\"interval\":\"1m\"},\"aggs\":[],\"listeners\":{}}"
+      },
+      "id": "a2175300-000a-11e7-b001-85aac4878445",
+      "type": "visualization",
+      "version": 1
+    },
+    {
+      "attributes": {
+        "columns": [
+          "_source"
+        ],
+        "description": "",
+        "hits": 0,
+        "kibanaSavedObjectMeta": {
+          "searchSourceJSON": "{\"index\":\"metricbeat-*\",\"highlightAll\":true,\"query\":{\"query_string\":{\"query\":\"_exists_:mysql.status\",\"analyze_wildcard\":true}},\"filter\":[]}"
+        },
+        "sort": [
+          "@timestamp",
+          "desc"
+        ],
+        "title": "Metricbeat MySQL status",
+        "version": 1
+      },
+      "id": "67e88e60-0005-11e7-aaf1-b342e4b94bb0",
+      "type": "search",
+      "version": 4
+    },
+    {
+      "attributes": {
+        "description": "",
+        "hits": 0,
+        "kibanaSavedObjectMeta": {
+          "searchSourceJSON": "{\"filter\":[{\"query\":{\"query_string\":{\"analyze_wildcard\":true,\"query\":\"*\"}}}]}"
+        },
+        "optionsJSON": "{\"darkTheme\":false}",
+        "panelsJSON": "[{\"col\":1,\"id\":\"e784dc50-0005-11e7-bf7f-c9acc3d3e306\",\"panelIndex\":1,\"row\":4,\"size_x\":6,\"size_y\":3,\"type\":\"visualization\"},{\"col\":7,\"id\":\"0f506420-0006-11e7-bf7f-c9acc3d3e306\",\"panelIndex\":2,\"row\":7,\"size_x\":6,\"size_y\":3,\"type\":\"visualization\"},{\"col\":7,\"id\":\"1a99f2b0-0006-11e7-bf7f-c9acc3d3e306\",\"panelIndex\":3,\"row\":10,\"size_x\":6,\"size_y\":3,\"type\":\"visualization\"},{\"col\":7,\"id\":\"45a00c10-0006-11e7-bf7f-c9acc3d3e306\",\"panelIndex\":4,\"row\":4,\"size_x\":6,\"size_y\":3,\"type\":\"visualization\"},{\"col\":1,\"id\":\"1eda2280-0008-11e7-82f3-2f380154876c\",\"panelIndex\":5,\"row\":1,\"size_x\":12,\"size_y\":3,\"type\":\"visualization\"},{\"col\":1,\"id\":\"1ede99e0-0009-11e7-8cd4-73b67e9e3f3c\",\"panelIndex\":7,\"row\":10,\"size_x\":6,\"size_y\":3,\"type\":\"visualization\"},{\"col\":1,\"id\":\"4c36c420-000a-11e7-8cd4-73b67e9e3f3c\",\"panelIndex\":8,\"row\":7,\"size_x\":6,\"size_y\":3,\"type\":\"visualization\"},{\"size_x\":12,\"size_y\":3,\"panelIndex\":9,\"type\":\"visualization\",\"id\":\"a2175300-000a-11e7-b001-85aac4878445\",\"col\":1,\"row\":13}]",
+        "timeRestore": false,
+        "title": "Metricbeat MySQL",
+        "uiStateJSON": "{}",
+        "version": 1
+      },
+      "id": "66881e90-0006-11e7-bf7f-c9acc3d3e306",
+      "type": "dashboard",
+      "version": 1
+    }
+  ],
+  "version": "6.0.0-alpha3-SNAPSHOT"
+}

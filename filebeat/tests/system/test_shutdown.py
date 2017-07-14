@@ -2,7 +2,6 @@ from filebeat import BaseTest
 import gzip
 import os
 import time
-import unittest
 
 """
 Tests that Filebeat shuts down cleanly.
@@ -29,7 +28,7 @@ class Test(BaseTest):
 
     def test_shutdown_wait_ok(self):
         """
-        Test stopping filebeat under load and wait for publisher queue to be emptied.
+        Test stopping filebeat under load: wait for all events being published.
         """
 
         self.nasa_logs()
@@ -43,29 +42,34 @@ class Test(BaseTest):
 
         # Wait until first flush
         self.wait_until(
-            lambda: self.log_contains_count("Flushing spooler") > 1,
+            lambda: self.log_contains_count("Publish event") > 200,
             max_timeout=15)
 
         filebeat.check_kill_and_wait()
 
-        log = self.get_log()
-        self.wait_until(
-            lambda: self.log_contains("Shutdown output timer started."),
+        self.get_log()
+        self.wait_log_contains(
+            "Shutdown output timer started.",
             max_timeout=15)
 
-        self.wait_until(
-            lambda: self.log_contains("Continue shutdown: All enqueued events being published."),
+        self.wait_log_contains(
+            "Continue shutdown: All enqueued events being published.",
             max_timeout=15)
 
         # validate registry entry offset matches last published event
         registry = self.get_registry()
-        output = self.read_output()[-1]
+        outputs = self.read_output()
+        offset = registry[0]["offset"]
         assert len(registry) == 1
-        assert registry[0]["offset"] == output["offset"]
+
+        # we allow for a potential race in the harvester shutdown here.
+        # In some cases the registry offset might match the penultimate offset.
+        assert (offset == outputs[-1]["offset"] or
+                offset == outputs[-2]["offset"])
 
     def test_shutdown_wait_timeout(self):
         """
-        Test stopping filebeat under load and wait for publisher queue to be emptied.
+        Test stopping filebeat under load: allow early shutdown.
         """
 
         self.nasa_logs()
@@ -80,7 +84,7 @@ class Test(BaseTest):
 
         # Wait until it tries the first time to publish
         self.wait_until(
-            lambda: self.log_contains("ERR Connecting error publishing events"),
+            lambda: self.log_contains("ERR Failed to connect"),
             max_timeout=15)
 
         filebeat.check_kill_and_wait()
@@ -89,12 +93,13 @@ class Test(BaseTest):
             lambda: self.log_contains("Shutdown output timer started."),
             max_timeout=15)
 
-        self.wait_until(
-            lambda: self.log_contains("Continue shutdown: Time out waiting for events being published."),
+        self.wait_log_contains(
+            "Continue shutdown: Time out waiting for events being published.",
             max_timeout=15)
 
         # check registry being really empty
-        assert self.get_registry() == []
+        reg = self.get_registry()
+        assert reg == [] or reg[0]["offset"] == 0
 
     def test_once(self):
         """
@@ -122,7 +127,9 @@ class Test(BaseTest):
         filebeat = self.start_beat(extra_args=["-once"])
 
         # Make sure all lines are read
-        self.wait_until(lambda: self.output_has(lines=iterations), max_timeout=10)
+        self.wait_until(
+            lambda: self.output_has(lines=iterations),
+            max_timeout=10)
 
         # Waits for filebeat to stop
         self.wait_until(
@@ -165,8 +172,9 @@ class Test(BaseTest):
         time.sleep(2)
 
         # Wait until first flush
+        msg = "No paths were defined for prospector"
         self.wait_until(
-            lambda: self.log_contains_count("No paths were defined for prospector") >= 1,
+            lambda: self.log_contains_count(msg) >= 1,
             max_timeout=5)
 
         filebeat.check_wait(exit_code=1)

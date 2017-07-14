@@ -4,29 +4,33 @@ package core
 
 import (
 	"testing"
-
 	"time"
 
 	mbtest "github.com/elastic/beats/metricbeat/mb/testing"
 )
 
 func TestData(t *testing.T) {
-	f := mbtest.NewEventsFetcher(t, getConfig())
+	f := mbtest.NewReportingMetricSet(t, getConfig())
 
-	// Fetch once in advance to have percentage values
-	f.Fetch()
-	time.Sleep(1 * time.Second)
+	mbtest.ReportingFetch(f)
+	time.Sleep(500 * time.Millisecond)
 
-	err := mbtest.WriteEvents(f, t)
-	if err != nil {
-		t.Fatal("write", err)
+	events, errs := mbtest.ReportingFetch(f)
+	if len(errs) > 0 {
+		t.Fatal(errs)
 	}
+	if len(events) == 0 {
+		t.Fatal("no events returned")
+	}
+
+	event := mbtest.CreateFullEvent(f, events[1])
+	mbtest.WriteEventToDataJSON(t, event)
 }
 
 func getConfig() map[string]interface{} {
 	return map[string]interface{}{
-		"module":     "system",
-		"metricsets": []string{"core"},
-		"cpu_ticks":  true,
+		"module":       "system",
+		"metricsets":   []string{"core"},
+		"core.metrics": []string{"percentages", "ticks"},
 	}
 }

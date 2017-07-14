@@ -5,12 +5,13 @@ import (
 	"testing"
 
 	"github.com/elastic/beats/libbeat/common"
+	"github.com/elastic/beats/libbeat/publisher/beat"
 	"github.com/stretchr/testify/assert"
 )
 
 type testFilterRule struct {
 	str func() string
-	run func(common.MapStr) (common.MapStr, error)
+	run func(*beat.Event) (*beat.Event, error)
 }
 
 func TestNamespace(t *testing.T) {
@@ -33,7 +34,7 @@ func TestNamespace(t *testing.T) {
 			test.name: nil,
 		})
 
-		filter, err := ns.Plugin()(*cfg)
+		filter, err := ns.Plugin()(cfg)
 
 		assert.NoError(t, err)
 		assert.NotNil(t, filter)
@@ -78,7 +79,7 @@ func TestNamespaceError(t *testing.T) {
 		},
 		{
 			"filter init fail",
-			func(_ common.Config) (Processor, error) {
+			func(_ *common.Config) (Processor, error) {
 				return nil, errors.New("test")
 			},
 			map[string]interface{}{
@@ -97,12 +98,12 @@ func TestNamespaceError(t *testing.T) {
 		config, err := common.NewConfigFrom(test.config)
 		fatalError(t, err)
 
-		_, err = ns.Plugin()(*config)
+		_, err = ns.Plugin()(config)
 		assert.Error(t, err)
 	}
 }
 
-func newTestFilterRule(_ common.Config) (Processor, error) {
+func newTestFilterRule(_ *common.Config) (Processor, error) {
 	return &testFilterRule{}, nil
 }
 
@@ -113,7 +114,7 @@ func (r *testFilterRule) String() string {
 	return r.str()
 }
 
-func (r *testFilterRule) Run(evt common.MapStr) (common.MapStr, error) {
+func (r *testFilterRule) Run(evt *beat.Event) (*beat.Event, error) {
 	if r.run == nil {
 		return evt, nil
 	}

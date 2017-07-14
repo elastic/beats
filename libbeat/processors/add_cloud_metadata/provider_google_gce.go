@@ -2,12 +2,12 @@ package add_cloud_metadata
 
 import (
 	"github.com/elastic/beats/libbeat/common"
-	s "github.com/elastic/beats/metricbeat/schema"
-	c "github.com/elastic/beats/metricbeat/schema/mapstriface"
+	s "github.com/elastic/beats/libbeat/common/schema"
+	c "github.com/elastic/beats/libbeat/common/schema/mapstriface"
 )
 
 // Google GCE Metadata Service
-func newGceMetadataFetcher(config common.Config) (*metadataFetcher, error) {
+func newGceMetadataFetcher(config *common.Config) (*metadataFetcher, error) {
 	gceMetadataURI := "/computeMetadata/v1/?recursive=true&alt=json"
 	gceHeaders := map[string]string{"Metadata-Flavor": "Google"}
 	gceSchema := func(m map[string]interface{}) common.MapStr {

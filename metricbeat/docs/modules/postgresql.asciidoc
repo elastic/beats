@@ -74,7 +74,6 @@ metricbeat.modules:
     # Stats about every PostgreSQL process
     - activity
 
-  enabled: false
   period: 10s
 
   # The host must be passed as PostgreSQL URL. Example:
@@ -88,7 +87,6 @@ metricbeat.modules:
 
   # Password to use when connecting to PostgreSQL. Empty by default.
   #password: pass
-
 ----
 
 [float]

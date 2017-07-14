@@ -6,14 +6,19 @@ import (
 
 	"github.com/elastic/beats/libbeat/common"
 	"github.com/elastic/beats/libbeat/logp"
+	"github.com/elastic/beats/libbeat/publisher/beat"
 )
 
 type Processors struct {
-	list []Processor
+	List []Processor
+}
+
+type Processor interface {
+	Run(event *beat.Event) (*beat.Event, error)
+	String() string
 }
 
 func New(config PluginConfig) (*Processors, error) {
-
 	procs := Processors{}
 
 	for _, processor := range config {
@@ -46,38 +51,66 @@ func New(config PluginConfig) (*Processors, error) {
 }
 
 func (procs *Processors) add(p Processor) {
-	procs.list = append(procs.list, p)
+	procs.List = append(procs.List, p)
+}
+
+// RunBC (run backwards-compatible) applies the processors, by providing the
+// old interface based on common.MapStr.
+// The event us temporarily converted to beat.Event. By this 'conversion' the
+// '@timestamp' field can not be accessed by processors.
+// Note: this method will be removed, when the publisher pipeline BC-API is to
+//       be removed.
+func (procs *Processors) RunBC(event common.MapStr) common.MapStr {
+	ret := procs.Run(&beat.Event{Fields: event})
+	if ret == nil {
+		return nil
+	}
+	return ret.Fields
+}
+
+func (procs *Processors) All() []beat.Processor {
+	if procs == nil || len(procs.List) == 0 {
+		return nil
+	}
+
+	ret := make([]beat.Processor, len(procs.List))
+	for i, p := range procs.List {
+		ret[i] = p
+	}
+	return ret
 }
 
 // Applies a sequence of processing rules and returns the filtered event
-func (procs *Processors) Run(event common.MapStr) common.MapStr {
-
+func (procs *Processors) Run(event *beat.Event) *beat.Event {
 	// Check if processors are set, just return event if not
-	if len(procs.list) == 0 {
+	if len(procs.List) == 0 {
 		return event
 	}
 
-	// clone the event at first, before starting filtering
-	filtered := event.Clone()
-	var err error
-
-	for _, p := range procs.list {
-		filtered, err = p.Run(filtered)
+	for _, p := range procs.List {
+		var err error
+		event, err = p.Run(event)
 		if err != nil {
+			// XXX: We don't drop the event, but continue filtering here iff the most
+			//      recent processor did return an event.
+			//      We want processors having this kind of implicit behavior
+			//      on errors?
+
 			logp.Debug("filter", "fail to apply processor %s: %s", p, err)
 		}
-		if filtered == nil {
+
+		if event == nil {
 			// drop event
 			return nil
 		}
 	}
 
-	return filtered
+	return event
 }
 
 func (procs Processors) String() string {
 	var s []string
-	for _, p := range procs.list {
+	for _, p := range procs.List {
 		s = append(s, p.String())
 	}
 	return strings.Join(s, ", ")

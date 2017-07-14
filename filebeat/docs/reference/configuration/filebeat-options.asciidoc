@@ -302,6 +302,29 @@ If you require log lines to be sent in near real time do not use a very low `sca
 
 The default setting is 10s.
 
+
+[[scan-sort]]
+===== scan.sort
+
+[]experimental
+
+ If you specify a value other than the empty string for this setting you can determine whether to use ascending or descending order using `scan.order`. Possible values are `modtime` and `filename`. To sort by file modification time, use `modtime`, otherwise use `filename`. Leave this option empty to disable it.
+
+If you specify a value for this setting, you can use `scan.order` to configure whether files are scanned in ascending or descending order.
+
+The default setting is disabled.
+
+
+[[scan-order]]
+===== scan.order
+
+[]experimental
+
+Specifies whether to use ascending or descending order when `scan.sort` is set to a value other than none. Possible values are `asc` or `desc`.
+
+The default setting is `asc`.
+
+
 ===== harvester_buffer_size
 
 The size in bytes of the buffer that each harvester uses when fetching a file. The default is 16384.
@@ -432,7 +455,7 @@ Because this option may lead to data loss, it is disabled by default.
 
 ===== backoff
 
-The backoff options specify how aggressively Filebeat crawls new files for updates.
+The backoff options specify how aggressively Filebeat crawls open files for updates.
 You can use the default values in most cases.
 
 The `backoff` option defines how long Filebeat

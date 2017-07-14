@@ -43,7 +43,8 @@ The supported processors are:
  * <<drop-event,`drop_event`>>
  * <<drop-fields,`drop_fields`>>
  * <<include-fields,`include_fields`>>
- * <<kubernetes,`kubernetes`>>
+ * <<add-kubernetes-metadata,`add_kubernetes_metadata`>>
+ * <<add-docker-metadata,`add_docker_metadata`>>
 
 [[conditions]]
 ==== Conditions
@@ -491,17 +492,18 @@ section.
 NOTE: If you define an empty list of fields under `include_fields`, then only
 the required fields, `@timestamp` and `type`, are exported.
 
-[[kubernetes]]
+[[add-kubernetes-metadata]]
 === Adding Kubernetes Metadata
 
-The `kubernetes` processor annotates each event with relevant metadata based on
-which Kubernetes pod the event originated from. Each event is annotated with:
+The `add_kubernetes_metadata` processor annotates each event with relevant
+metadata based on which Kubernetes pod the event originated from. Each event is
+annotated with:
 
 * Pod Name
 * Namespace
 * Labels
 
-The `kubernetes` processor has two basic building blocks which are:
+The `add_kubernetes_metadata` processor has two basic building blocks which are:
 
 * Indexers
 * Matchers
@@ -525,7 +527,7 @@ Kubernetes.
 [source,yaml]
 -------------------------------------------------------------------------------
 processors:
-- kubernetes:
+- add_kubernetes_metadata:
     in_cluster: true
 -------------------------------------------------------------------------------
 
@@ -535,7 +537,7 @@ the Kubernetes node.
 [source,yaml]
 -------------------------------------------------------------------------------
 processors:
-- kubernetes:
+- add_kubernetes_metadata:
     in_cluster: false
     host: <hostname>
     kube_config: ${HOME}/.kube/config
@@ -547,7 +549,7 @@ enables ones that the user is interested in.
 [source,yaml]
 -------------------------------------------------------------------------------
 processors:
-- kubernetes:
+- add_kubernetes_metadata:
     in_cluster: false
     host: <hostname>
     kube_config: ~/.kube/config
@@ -559,3 +561,42 @@ processors:
       - fields:
           lookup_fields: ["metricset.host"]
 -------------------------------------------------------------------------------
+
+[[add-docker-metadata]]
+=== Adding Docker metadata
+
+The `add_docker_metadata` processor annotates each event with relevant metadata
+from Docker containers:
+
+* Container ID
+* Name
+* Image
+* Labels
+
+[source,yaml]
+-------------------------------------------------------------------------------
+processors:
+- add_docker_metadata:
+    host: "unix:///var/run/docker.sock"
+    match_fields: ["system.process.cgroup.id"]
+    match_source: true
+    match_source_index: 4
+
+    # To connect to Docker over TLS you must specify a client and CA certificate.
+    #ssl:
+    #  certificate_authority: "/etc/pki/root/ca.pem"
+    #  certificate:           "/etc/pki/client/cert.pem"
+    #  key:                   "/etc/pki/client/cert.key"
+-------------------------------------------------------------------------------
+
+It has the following settings:
+
+`host`:: (Optional) Docker socket (UNIX or TCP socket). It uses
+  `unix:///var/run/docker.sock` by default.
+`match_fields`:: (Optional) A list of fields to match a container id, at least
+  one of them should hold a container id to get the event enriched.
+`match_source`:: (Optional) Match container id from a log path present in
+  `source` field. Enabled by default.
+`match_source_index`:: (Optional) Index in the source path split by / to look
+  for container id. It defaults to 4 to match
+  `/var/lib/docker/containers/<container_id>/*.log`

@@ -3,7 +3,7 @@ package elasticsearch
 import (
 	"encoding/json"
 
-	"github.com/elastic/beats/libbeat/logp"
+	"github.com/pkg/errors"
 )
 
 // QueryResult contains the result of a query.
@@ -14,9 +14,10 @@ type QueryResult struct {
 	ID           string          `json:"_id"`
 	Source       json.RawMessage `json:"_source"`
 	Version      int             `json:"_version"`
-	Found        bool            `json:"found"`
 	Exists       bool            `json:"exists"`
-	Created      bool            `json:"created"`
+	Found        bool            `json:"found"`   // Only used prior to ES 6. You must also check for Result == "found".
+	Created      bool            `json:"created"` // Only used prior to ES 6. You must also check for Result == "created".
+	Result       string          `json:"result"`  // Only used in ES 6+.
 	Acknowledged bool            `json:"acknowledged"`
 	Matches      []string        `json:"matches"`
 }
@@ -41,18 +42,9 @@ type CountResults struct {
 	Shards json.RawMessage `json:"_shards"`
 }
 
-func (r QueryResult) String() string {
-	out, err := json.Marshal(r)
-	if err != nil {
-		logp.Warn("failed to marshal QueryResult (%v): %#v", err, r)
-		return "ERROR"
-	}
-	return string(out)
-}
-
 func withQueryResult(status int, resp []byte, err error) (int, *QueryResult, error) {
 	if err != nil {
-		return status, nil, err
+		return status, nil, errors.Wrapf(err, "Elasticsearch response: %s", resp)
 	}
 	result, err := readQueryResult(resp)
 	return status, result, err
@@ -138,6 +130,14 @@ func (es *Connection) Refresh(index string) (int, *QueryResult, error) {
 //
 func (es *Connection) CreateIndex(index string, body interface{}) (int, *QueryResult, error) {
 	return withQueryResult(es.apiCall("PUT", index, "", "", "", nil, body))
+}
+
+// IndexExists checks if an index exists.
+// Implements: https://www.elastic.co/guide/en/elasticsearch/reference/current/indices-exists.html
+//
+func (es *Connection) IndexExists(index string) (int, error) {
+	status, _, err := es.apiCall("HEAD", index, "", "", "", nil, nil)
+	return status, err
 }
 
 // Delete deletes a typed JSON document from a specific index based on its id.

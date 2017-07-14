@@ -1,100 +1,13 @@
 ###################### Filebeat Configuration Example #########################
 
 # This file is an example configuration file highlighting only the most common
-# options. The filebeat.full.yml file from the same directory contains all the
+# options. The filebeat.reference.yml file from the same directory contains all the
 # supported options with more comments. You can use it as a reference.
 #
 # You can find the full configuration reference here:
 # https://www.elastic.co/guide/en/beats/filebeat/index.html
 
-
-#==========================  Modules configuration ============================
-filebeat.modules:
-
-#------------------------------- System Module -------------------------------
-#- module: system
-  # Syslog
-  #syslog:
-    #enabled: true
-
-    # Set custom paths for the log files. If left empty,
-    # Filebeat will choose the paths depending on your OS.
-    #var.paths:
-
-  # Authorization logs
-  #auth:
-    #enabled: true
-
-    # Set custom paths for the log files. If left empty,
-    # Filebeat will choose the paths depending on your OS.
-    #var.paths:
-
-#------------------------------- Apache2 Module ------------------------------
-#- module: apache2
-  # Access logs
-  #access:
-    #enabled: true
-
-    # Set custom paths for the log files. If left empty,
-    # Filebeat will choose the paths depending on your OS.
-    #var.paths:
-
-  # Error logs
-  #error:
-    #enabled: true
-
-    # Set custom paths for the log files. If left empty,
-    # Filebeat will choose the paths depending on your OS.
-    #var.paths:
-
-#------------------------------- Auditd Module -------------------------------
-#- module: auditd
-  #log:
-    #enabled: true
-
-    # Set custom paths for the log files. If left empty,
-    # Filebeat will choose the paths depending on your OS.
-    #var.paths:
-
-
-#-------------------------------- MySQL Module -------------------------------
-#- module: mysql
-  # Error logs
-  #error:
-    #enabled: true
-
-    # Set custom paths for the log files. If left empty,
-    # Filebeat will choose the paths depending on your OS.
-    #var.paths:
-
-  # Slow logs
-  #slowlog:
-    #enabled: true
-
-    # Set custom paths for the log files. If left empty,
-    # Filebeat will choose the paths depending on your OS.
-    #var.paths:
-
-#-------------------------------- Nginx Module -------------------------------
-#- module: nginx
-  # Access logs
-  #access:
-    #enabled: true
-
-    # Set custom paths for the log files. If left empty,
-    # Filebeat will choose the paths depending on your OS.
-    #var.paths:
-
-  # Error logs
-  #error:
-    #enabled: true
-
-    # Set custom paths for the log files. If left empty,
-    # Filebeat will choose the paths depending on your OS.
-    #var.paths:
-
-
-# For more available modules and options, please see the filebeat.full.yml sample
+# For more available modules and options, please see the filebeat.reference.yml sample
 # configuration file.
 
 #=========================== Filebeat prospectors =============================
@@ -127,7 +40,7 @@ filebeat.prospectors:
   # are matching any regular expression from the list. By default, no files are dropped.
   #exclude_files: ['.gz$']
 
-  # Optional additional fields. These field can be freely picked
+  # Optional additional fields. These fields can be freely picked
   # to add additional information to the crawled log files for filtering
   #fields:
   #  level: debug
@@ -150,6 +63,18 @@ filebeat.prospectors:
   #multiline.match: after
 
 
+#============================= Filebeat modules ===============================
+
+filebeat.config.modules:
+  # Glob pattern for configuration loading
+  path: ${path.config}/modules.d/*.yml
+
+  # Set to true to enable config reloading
+  reload.enabled: false
+
+  # Period on which files under path should be checked for changes
+  #reload.period: 10s
+
 #================================ General =====================================
 
 # The name of the shipper that publishes the network data. It can be used to group
@@ -164,6 +89,31 @@ filebeat.prospectors:
 # output.
 #fields:
 #  env: staging
+
+
+#============================== Dashboards =====================================
+# These settings control loading the sample dashboards to the Kibana index. Loading
+# the dashboards is disabled by default and can be enabled either by setting the
+# options here, or by using the `-setup` CLI flag or the `setup` command.
+#setup.dashboards.enabled: false
+
+# The URL from where to download the dashboards archive. By default this URL
+# has a value which is computed based on the Beat name and version. For released
+# versions, this URL points to the dashboard archive on the artifacts.elastic.co
+# website.
+#setup.dashboards.url:
+
+#============================== Kibana =====================================
+
+# Starting with Beats version 6.0.0, the dashboards are loaded via the Kibana API. 
+# This requires a Kibana endpoint configuration.
+setup.kibana:
+
+  # Kibana Host
+  # Scheme and port can be left out and will be set to the default (http and 5601)
+  # In case you specify and additional path, the scheme is required: http://localhost:5601/path
+  # IPv6 addresses should always be defined as: https://[2001:db8::1]:5601
+  #host: "localhost:5601"
 
 #================================ Outputs =====================================
 

@@ -1,0 +1,10 @@
+build
+_meta/kibana
+_meta/beat.yml
+_meta/beat.reference.yml
+module/*/_meta/config.yml
+
+/auditbeat
+/auditbeat.test
+/docs/html_docs
+

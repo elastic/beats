@@ -1,4 +1,4 @@
-# For more available modules and options, please see the filebeat.full.yml sample
+# For more available modules and options, please see the filebeat.reference.yml sample
 # configuration file.
 
 #=========================== Filebeat prospectors =============================
@@ -31,7 +31,7 @@ filebeat.prospectors:
   # are matching any regular expression from the list. By default, no files are dropped.
   #exclude_files: ['.gz$']
 
-  # Optional additional fields. These field can be freely picked
+  # Optional additional fields. These fields can be freely picked
   # to add additional information to the crawled log files for filtering
   #fields:
   #  level: debug
@@ -53,3 +53,15 @@ filebeat.prospectors:
   # Note: After is the equivalent to previous and before is the equivalent to to next in Logstash
   #multiline.match: after
 
+
+#============================= Filebeat modules ===============================
+
+filebeat.config.modules:
+  # Glob pattern for configuration loading
+  path: ${path.config}/modules.d/*.yml
+
+  # Set to true to enable config reloading
+  reload.enabled: false
+
+  # Period on which files under path should be checked for changes
+  #reload.period: 10s

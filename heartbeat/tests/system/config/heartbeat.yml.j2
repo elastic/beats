@@ -1,7 +1,60 @@
 heartbeat.monitors:
-- type: icmp
-  hosts: ["localhost"]
-  schedule: '@every 10s'
+{% for monitor in monitors -%}
+- type: {{ monitor.type }}
+  {%- if monitor.hosts is defined %}
+  hosts:
+    {%- for host in monitor.hosts %}
+    - '{{ host }}'
+    {% endfor -%}
+  {% endif -%}
+
+  {%- if monitor.urls is defined %}
+  urls:
+    {%- for url in monitor.urls %}
+    - '{{ url }}'
+    {% endfor %}
+  {% endif -%}
+
+  {%- if monitor.schedule is defined %}
+  schedule: '{{ monitor.schedule }}'
+  {%- else -%}
+  schedule: '@every 1s'
+  {% endif -%}
+
+  {%- if monitor.tags is defined %}
+  tags:
+    {% for tag in monitor.tags -%}
+    - '{{ tag }}'
+    {% endfor %}
+  {% endif -%}
+
+  {%- if monitor.fields is defined %}
+  {% if monitor.fields_under_root %}fields_under_root: true{% endif %}
+  fields:
+    {% for k, v in monitor.fields.items() -%}
+    {{ k }}: {{ v }}
+    {% endfor %}
+  {% endif %}
+{% endfor -%}
+
+{%- if shipper_name %}
+name: {{ shipper_name }}
+{% endif %}
+
+{%- if tags %}
+tags:
+  {% for tag in tags -%}
+  - {{ tag }}
+  {% endfor -%}
+{% endif %}
+
+{%- if fields %}
+{% if fields_under_root %}fields_under_root: true{% endif %}
+fields:
+  {% for k, v in fields.items() -%}
+  {{ k }}: {{ v }}
+  {% endfor -%}
+{% endif %}
 
 output.file:
   path: {{ output_file_path|default(beat.working_dir + "/output") }}

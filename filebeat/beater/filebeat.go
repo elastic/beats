@@ -1,27 +1,32 @@
 package beater
 
 import (
-	"errors"
 	"flag"
 	"fmt"
-	"sync"
+
+	"github.com/pkg/errors"
 
 	"github.com/elastic/beats/libbeat/beat"
 	"github.com/elastic/beats/libbeat/common"
 	"github.com/elastic/beats/libbeat/logp"
+	"github.com/elastic/beats/libbeat/monitoring"
 	"github.com/elastic/beats/libbeat/outputs/elasticsearch"
+	pub "github.com/elastic/beats/libbeat/publisher/beat"
 
 	"github.com/elastic/beats/filebeat/channel"
 	cfg "github.com/elastic/beats/filebeat/config"
 	"github.com/elastic/beats/filebeat/crawler"
 	"github.com/elastic/beats/filebeat/fileset"
-	"github.com/elastic/beats/filebeat/publisher"
 	"github.com/elastic/beats/filebeat/registrar"
-	"github.com/elastic/beats/filebeat/spooler"
 
 	// Add filebeat level processors
-	_ "github.com/elastic/beats/filebeat/processor/kubernetes"
+	_ "github.com/elastic/beats/filebeat/processor/add_kubernetes_metadata"
 )
+
+const pipelinesWarning = "Filebeat is unable to load the Ingest Node pipelines for the configured" +
+	" modules because the Elasticsearch output is not configured/enabled. If you have" +
+	" already loaded the Ingest Node pipelines or are using Logstash pipelines, you" +
+	" can ignore this warning."
 
 var (
 	once = flag.Bool("once", false, "Run filebeat only once until all harvesters reach EOF")
@@ -66,11 +71,16 @@ func New(b *beat.Beat, rawConfig *common.Config) (beat.Beater, error) {
 		}
 	}
 
-	if !config.ConfigProspector.Enabled() && !haveEnabledProspectors {
-		return nil, errors.New("No modules or prospectors enabled and configuration reloading disabled. What files do you want me to watch?")
+	if !config.ConfigProspector.Enabled() && !config.ConfigModules.Enabled() && !haveEnabledProspectors {
+		if !b.InSetupCmd {
+			return nil, errors.New("No modules or prospectors enabled and configuration reloading disabled. What files do you want me to watch?")
+		} else {
+			// in the `setup` command, log this only as a warning
+			logp.Warn("Setup called, but no modules enabled.")
+		}
 	}
 
-	if *once && config.ConfigProspector.Enabled() {
+	if *once && config.ConfigProspector.Enabled() && config.ConfigModules.Enabled() {
 		return nil, errors.New("prospector configs and -once cannot be used together")
 	}
 
@@ -79,32 +89,50 @@ func New(b *beat.Beat, rawConfig *common.Config) (beat.Beater, error) {
 		config:         &config,
 		moduleRegistry: moduleRegistry,
 	}
+
+	// register `setup` callback for ML jobs
+	if !moduleRegistry.Empty() {
+		b.SetupMLCallback = func(b *beat.Beat) error {
+			return fb.loadModulesML(b)
+		}
+	}
 	return fb, nil
 }
 
-// modulesSetup is called when modules are configured to do the initial
+// loadModulesPipelines is called when modules are configured to do the initial
 // setup.
-func (fb *Filebeat) modulesSetup(b *beat.Beat) error {
-	esConfig := b.Config.Output["elasticsearch"]
-	if esConfig == nil || !esConfig.Enabled() {
-		logp.Warn("Filebeat is unable to load the Ingest Node pipelines for the configured" +
-			" modules because the Elasticsearch output is not configured/enabled. If you have" +
-			" already loaded the Ingest Node pipelines or are using Logstash pipelines, you" +
-			" can ignore this warning.")
+func (fb *Filebeat) loadModulesPipelines(b *beat.Beat) error {
+	if b.Config.Output.Name() != "elasticsearch" {
+		logp.Warn(pipelinesWarning)
 		return nil
 	}
-	esClient, err := elasticsearch.NewConnectedClient(esConfig)
-	if err != nil {
-		return fmt.Errorf("Error creating ES client: %v", err)
-	}
-	defer esClient.Close()
 
-	err = fb.moduleRegistry.LoadPipelines(esClient)
-	if err != nil {
-		return err
+	// register pipeline loading to happen every time a new ES connection is
+	// established
+	callback := func(esClient *elasticsearch.Client) error {
+		return fb.moduleRegistry.LoadPipelines(esClient)
 	}
+	elasticsearch.RegisterConnectCallback(callback)
 
 	return nil
+}
+
+func (fb *Filebeat) loadModulesML(b *beat.Beat) error {
+	logp.Debug("machine-learning", "Setting up ML jobs for modules")
+
+	if b.Config.Output.Name() != "elasticsearch" {
+		logp.Warn("Filebeat is unable to load the Xpack Machine Learning configurations for the" +
+			" modules because the Elasticsearch output is not configured/enabled.")
+		return nil
+	}
+
+	esConfig := b.Config.Output.Config()
+	esClient, err := elasticsearch.NewConnectedClient(esConfig)
+	if err != nil {
+		return errors.Errorf("Error creating Elasticsearch client: %v", err)
+	}
+
+	return fb.moduleRegistry.LoadML(esClient)
 }
 
 // Run allows the beater to be run as a beat.
@@ -113,7 +141,7 @@ func (fb *Filebeat) Run(b *beat.Beat) error {
 	config := fb.config
 
 	if !fb.moduleRegistry.Empty() {
-		err = fb.modulesSetup(b)
+		err = fb.loadModulesPipelines(b)
 		if err != nil {
 			return err
 		}
@@ -123,7 +151,11 @@ func (fb *Filebeat) Run(b *beat.Beat) error {
 	waitEvents := newSignalWait()
 
 	// count active events for waiting on shutdown
-	wgEvents := &sync.WaitGroup{}
+	wgEvents := &eventCounter{
+		count: monitoring.NewInt(nil, "filebeat.events.active"),
+		added: monitoring.NewUint(nil, "filebeat.events.added"),
+		done:  monitoring.NewUint(nil, "filebeat.events.done"),
+	}
 	finishedLogger := newFinishedLogger(wgEvents)
 
 	// Setup registrar to persist state
@@ -136,20 +168,21 @@ func (fb *Filebeat) Run(b *beat.Beat) error {
 	// Make sure all events that were published in
 	registrarChannel := newRegistrarLogger(registrar)
 
-	// Channel from spooler to harvester
-	publisherChan := newPublisherChannel()
-
-	// Publishes event to output
-	publisher := publisher.New(config.PublishAsync, publisherChan.ch, registrarChannel, b.Publisher)
-
-	// Init and Start spooler: Harvesters dump events into the spooler.
-	spooler, err := spooler.New(config, publisherChan)
+	err = b.Publisher.SetACKHandler(pub.PipelineACKHandler{
+		ACKEvents: newEventACKer(registrarChannel).ackEvents,
+	})
 	if err != nil {
-		logp.Err("Could not init spooler: %v", err)
+		logp.Err("Failed to install the registry with the publisher pipeline: %v", err)
 		return err
 	}
 
-	crawler, err := crawler.New(channel.NewOutlet(fb.done, spooler.Channel, wgEvents), config.Prospectors, fb.done, *once)
+	outDone := make(chan struct{}) // outDone closes down all active pipeline connections
+	crawler, err := crawler.New(
+		channel.NewOutletFactory(outDone, b.Publisher, wgEvents).Create,
+		config.Prospectors,
+		b.Info.Version,
+		fb.done,
+		*once)
 	if err != nil {
 		logp.Err("Could not init crawler: %v", err)
 		return err
@@ -164,34 +197,30 @@ func (fb *Filebeat) Run(b *beat.Beat) error {
 	if err != nil {
 		return fmt.Errorf("Could not start registrar: %v", err)
 	}
+
 	// Stopping registrar will write last state
 	defer registrar.Stop()
 
-	// Start publisher
-	publisher.Start()
 	// Stopping publisher (might potentially drop items)
 	defer func() {
 		// Closes first the registrar logger to make sure not more events arrive at the registrar
 		// registrarChannel must be closed first to potentially unblock (pretty unlikely) the publisher
 		registrarChannel.Close()
-		publisher.Stop()
+		close(outDone) // finally close all active connections to publisher pipeline
 	}()
 
-	// Starting spooler
-	spooler.Start()
+	// Wait for all events to be processed or timeout
+	defer waitEvents.Wait()
 
-	// Stopping spooler will flush items
-	defer func() {
-		// Wait for all events to be processed or timeout
-		waitEvents.Wait()
+	// Create a ES connection factory for dynamic modules pipeline loading
+	var pipelineLoaderFactory fileset.PipelineLoaderFactory
+	if b.Config.Output.Name() == "elasticsearch" {
+		pipelineLoaderFactory = newPipelineLoaderFactory(b.Config.Output.Config())
+	} else {
+		logp.Warn(pipelinesWarning)
+	}
 
-		// Closes publisher so no further events can be sent
-		publisherChan.Close()
-		// Stopping spooler
-		spooler.Stop()
-	}()
-
-	err = crawler.Start(registrar, config.ConfigProspector)
+	err = crawler.Start(registrar, config.ConfigProspector, config.ConfigModules, pipelineLoaderFactory)
 	if err != nil {
 		crawler.Stop()
 		return err
@@ -243,4 +272,16 @@ func (fb *Filebeat) Stop() {
 
 	// Stop Filebeat
 	close(fb.done)
+}
+
+// Create a new pipeline loader (es client) factory
+func newPipelineLoaderFactory(esConfig *common.Config) fileset.PipelineLoaderFactory {
+	pipelineLoaderFactory := func() (fileset.PipelineLoader, error) {
+		esClient, err := elasticsearch.NewConnectedClient(esConfig)
+		if err != nil {
+			return nil, errors.Wrap(err, "Error creating Elasticsearch client")
+		}
+		return esClient, nil
+	}
+	return pipelineLoaderFactory
 }

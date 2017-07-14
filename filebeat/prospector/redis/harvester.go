@@ -7,6 +7,7 @@ import (
 	"github.com/elastic/beats/filebeat/util"
 	"github.com/elastic/beats/libbeat/common"
 	"github.com/elastic/beats/libbeat/logp"
+	"github.com/elastic/beats/libbeat/publisher/beat"
 
 	"strings"
 
@@ -125,17 +126,14 @@ func (h *Harvester) Run() error {
 
 		}
 
-		data.Event = common.MapStr{
-			"@timestamp": common.Time(time.Unix(log.timestamp, 0).UTC()),
-			"message":    strings.Join(args, " "),
-			"redis": common.MapStr{
-				"slowlog": subEvent,
-			},
-			"beat": common.MapStr{
-				"read_timestamp": common.Time(time.Now()),
-			},
-			"prospector": common.MapStr{
-				"type": "redis",
+		data.Event = beat.Event{
+			Timestamp: time.Unix(log.timestamp, 0).UTC(),
+			Fields: common.MapStr{
+				"message": strings.Join(args, " "),
+				"redis": common.MapStr{
+					"slowlog": subEvent,
+				},
+				"read_timestamp": common.Time(time.Now().UTC()),
 			},
 		}
 

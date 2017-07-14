@@ -26,43 +26,43 @@ import "C"
 
 import "fmt"
 
-// auditArch represents a machine architecture (i.e. arm, ppc, x86_64).
-type auditArch uint32
+// AuditArch represents a machine architecture (i.e. arm, ppc, x86_64).
+type AuditArch uint32
 
 // List of architectures constants used by then kernel.
 const (
-	AUDIT_ARCH_AARCH64     auditArch = C.AUDIT_ARCH_AARCH64
-	AUDIT_ARCH_ARM         auditArch = C.AUDIT_ARCH_ARM
-	AUDIT_ARCH_ARMEB       auditArch = C.AUDIT_ARCH_ARMEB
-	AUDIT_ARCH_CRIS        auditArch = C.AUDIT_ARCH_CRIS
-	AUDIT_ARCH_FRV         auditArch = C.AUDIT_ARCH_FRV
-	AUDIT_ARCH_I386        auditArch = C.AUDIT_ARCH_I386
-	AUDIT_ARCH_IA64        auditArch = C.AUDIT_ARCH_IA64
-	AUDIT_ARCH_M32R        auditArch = C.AUDIT_ARCH_M32R
-	AUDIT_ARCH_M68K        auditArch = C.AUDIT_ARCH_M68K
-	AUDIT_ARCH_MIPS        auditArch = C.AUDIT_ARCH_MIPS
-	AUDIT_ARCH_MIPS64      auditArch = C.AUDIT_ARCH_MIPS64
-	AUDIT_ARCH_MIPS64N32   auditArch = C.AUDIT_ARCH_MIPS64N32
-	AUDIT_ARCH_MIPSEL      auditArch = C.AUDIT_ARCH_MIPSEL
-	AUDIT_ARCH_MIPSEL64    auditArch = C.AUDIT_ARCH_MIPSEL64
-	AUDIT_ARCH_MIPSEL64N32 auditArch = C.AUDIT_ARCH_MIPSEL64N32
-	AUDIT_ARCH_PARISC      auditArch = C.AUDIT_ARCH_PARISC
-	AUDIT_ARCH_PARISC64    auditArch = C.AUDIT_ARCH_PARISC64
-	AUDIT_ARCH_PPC         auditArch = C.AUDIT_ARCH_PPC
-	AUDIT_ARCH_PPC64       auditArch = C.AUDIT_ARCH_PPC64
-	AUDIT_ARCH_PPC64LE     auditArch = C.AUDIT_ARCH_PPC64LE
-	AUDIT_ARCH_S390        auditArch = C.AUDIT_ARCH_S390
-	AUDIT_ARCH_S390X       auditArch = C.AUDIT_ARCH_S390X
-	AUDIT_ARCH_SH          auditArch = C.AUDIT_ARCH_SH
-	AUDIT_ARCH_SH64        auditArch = C.AUDIT_ARCH_SH64
-	AUDIT_ARCH_SHEL        auditArch = C.AUDIT_ARCH_SHEL
-	AUDIT_ARCH_SHEL64      auditArch = C.AUDIT_ARCH_SHEL64
-	AUDIT_ARCH_SPARC       auditArch = C.AUDIT_ARCH_SPARC
-	AUDIT_ARCH_SPARC64     auditArch = C.AUDIT_ARCH_SPARC64
-	AUDIT_ARCH_X86_64      auditArch = C.AUDIT_ARCH_X86_64
+	AUDIT_ARCH_AARCH64     AuditArch = C.AUDIT_ARCH_AARCH64
+	AUDIT_ARCH_ARM         AuditArch = C.AUDIT_ARCH_ARM
+	AUDIT_ARCH_ARMEB       AuditArch = C.AUDIT_ARCH_ARMEB
+	AUDIT_ARCH_CRIS        AuditArch = C.AUDIT_ARCH_CRIS
+	AUDIT_ARCH_FRV         AuditArch = C.AUDIT_ARCH_FRV
+	AUDIT_ARCH_I386        AuditArch = C.AUDIT_ARCH_I386
+	AUDIT_ARCH_IA64        AuditArch = C.AUDIT_ARCH_IA64
+	AUDIT_ARCH_M32R        AuditArch = C.AUDIT_ARCH_M32R
+	AUDIT_ARCH_M68K        AuditArch = C.AUDIT_ARCH_M68K
+	AUDIT_ARCH_MIPS        AuditArch = C.AUDIT_ARCH_MIPS
+	AUDIT_ARCH_MIPS64      AuditArch = C.AUDIT_ARCH_MIPS64
+	AUDIT_ARCH_MIPS64N32   AuditArch = C.AUDIT_ARCH_MIPS64N32
+	AUDIT_ARCH_MIPSEL      AuditArch = C.AUDIT_ARCH_MIPSEL
+	AUDIT_ARCH_MIPSEL64    AuditArch = C.AUDIT_ARCH_MIPSEL64
+	AUDIT_ARCH_MIPSEL64N32 AuditArch = C.AUDIT_ARCH_MIPSEL64N32
+	AUDIT_ARCH_PARISC      AuditArch = C.AUDIT_ARCH_PARISC
+	AUDIT_ARCH_PARISC64    AuditArch = C.AUDIT_ARCH_PARISC64
+	AUDIT_ARCH_PPC         AuditArch = C.AUDIT_ARCH_PPC
+	AUDIT_ARCH_PPC64       AuditArch = C.AUDIT_ARCH_PPC64
+	AUDIT_ARCH_PPC64LE     AuditArch = C.AUDIT_ARCH_PPC64LE
+	AUDIT_ARCH_S390        AuditArch = C.AUDIT_ARCH_S390
+	AUDIT_ARCH_S390X       AuditArch = C.AUDIT_ARCH_S390X
+	AUDIT_ARCH_SH          AuditArch = C.AUDIT_ARCH_SH
+	AUDIT_ARCH_SH64        AuditArch = C.AUDIT_ARCH_SH64
+	AUDIT_ARCH_SHEL        AuditArch = C.AUDIT_ARCH_SHEL
+	AUDIT_ARCH_SHEL64      AuditArch = C.AUDIT_ARCH_SHEL64
+	AUDIT_ARCH_SPARC       AuditArch = C.AUDIT_ARCH_SPARC
+	AUDIT_ARCH_SPARC64     AuditArch = C.AUDIT_ARCH_SPARC64
+	AUDIT_ARCH_X86_64      AuditArch = C.AUDIT_ARCH_X86_64
 )
 
-var auditArchNames = map[auditArch]string{
+var AuditArchNames = map[AuditArch]string{
 	AUDIT_ARCH_AARCH64:     "aarch64",
 	AUDIT_ARCH_ARM:         "arm",
 	AUDIT_ARCH_ARMEB:       "armeb",
@@ -94,8 +94,8 @@ var auditArchNames = map[auditArch]string{
 	AUDIT_ARCH_X86_64:      "x86_64",
 }
 
-func (a auditArch) String() string {
-	name, found := auditArchNames[a]
+func (a AuditArch) String() string {
+	name, found := AuditArchNames[a]
 	if found {
 		return name
 	}

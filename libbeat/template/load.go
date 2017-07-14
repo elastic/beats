@@ -1,9 +1,7 @@
 package template
 
 import (
-	"encoding/json"
 	"fmt"
-	"io/ioutil"
 
 	"github.com/elastic/beats/libbeat/common"
 	"github.com/elastic/beats/libbeat/logp"
@@ -26,7 +24,7 @@ type Loader struct {
 
 func NewLoader(cfg *common.Config, client ESClient, beatInfo common.BeatInfo) (*Loader, error) {
 
-	config := defaultConfig
+	config := DefaultConfig
 
 	err := cfg.Unpack(&config)
 	if err != nil {
@@ -79,43 +77,6 @@ func (l *Loader) Load() error {
 		logp.Info("Template already exists and will not be overwritten.")
 	}
 
-	return nil
-}
-
-// Generate generates the template and writes it to a file based on the configuration
-// from `output_to_file`.
-func (l *Loader) Generate() error {
-	if l.config.OutputToFile.Version == "" {
-		l.config.OutputToFile.Version = l.beatInfo.Version
-	}
-
-	if l.config.Name == "" {
-		l.config.Name = l.beatInfo.Beat
-	}
-
-	tmpl, err := New(l.beatInfo.Version, l.config.OutputToFile.Version, l.config.Name, l.config.Settings)
-	if err != nil {
-		return fmt.Errorf("error creating template instance: %v", err)
-	}
-
-	fieldsPath := paths.Resolve(paths.Config, l.config.Fields)
-
-	output, err := tmpl.Load(fieldsPath)
-	if err != nil {
-		return fmt.Errorf("error creating template from file %s: %v", fieldsPath, err)
-	}
-
-	jsonBytes, err := json.MarshalIndent(output, "", "  ")
-	if err != nil {
-		return fmt.Errorf("error marshaling template: %v", err)
-	}
-
-	err = ioutil.WriteFile(l.config.OutputToFile.Path, jsonBytes, 0644)
-	if err != nil {
-		return fmt.Errorf("error writing to file %s: %v", l.config.OutputToFile.Path, err)
-	}
-
-	logp.Info("Template for Elasticsearch %s written to: %s", l.config.OutputToFile.Version, l.config.OutputToFile.Path)
 	return nil
 }
 

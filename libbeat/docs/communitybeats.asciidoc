@@ -62,6 +62,7 @@ https://github.com/kozlice/phpfpmbeat[phpfpmbeat]:: Reads status from PHP-FPM.
 https://github.com/joshuar/pingbeat[pingbeat]:: Sends ICMP pings to a list
 of targets and stores the round trip time (RTT) in Elasticsearch.
 https://github.com/carlpett/prombeat[prombeat]:: Indexes https://prometheus.io[Prometheus] metrics.
+https://github.com/infonova/prometheusbeat[prometheusbeat]:: Send Prometheus metrics to Elasticsearch via the remote write feature.
 https://github.com/hartfordfive/protologbeat[protologbeat]:: Accepts structured and unstructured logs via UDP or TCP.  Can also be used to receive syslog messages or GELF formatted messages. (To be used as a successor to udplogbeat)
 https://github.com/voigt/redditbeat[redditbeat]:: Collects new Reddit Submissions of one or multiple Subreddits.
 https://github.com/chrsblck/redisbeat[redisbeat]:: Used for Redis monitoring.

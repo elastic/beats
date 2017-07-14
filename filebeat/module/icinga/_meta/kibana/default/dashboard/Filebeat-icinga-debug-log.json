@@ -1,0 +1,78 @@
+{
+  "objects": [
+    {
+      "attributes": {
+        "description": "",
+        "kibanaSavedObjectMeta": {
+          "searchSourceJSON": "{\"filter\":[]}"
+        },
+        "savedSearchId": "c876e6a0-2418-11e7-a83b-d5f4cebac9ff",
+        "title": "Icinga Debuglog Facility",
+        "uiStateJSON": "{}",
+        "version": 1,
+        "visState": "{\"title\":\"Icinga Debuglog Facility\",\"type\":\"histogram\",\"params\":{\"addTooltip\":true,\"addLegend\":true,\"legendPosition\":\"right\",\"scale\":\"linear\",\"mode\":\"stacked\",\"times\":[],\"addTimeMarker\":false,\"defaultYExtents\":false,\"setYExtents\":false},\"aggs\":[{\"id\":\"1\",\"enabled\":true,\"type\":\"count\",\"schema\":\"metric\",\"params\":{}},{\"id\":\"2\",\"enabled\":true,\"type\":\"date_histogram\",\"schema\":\"segment\",\"params\":{\"field\":\"@timestamp\",\"interval\":\"auto\",\"customInterval\":\"2h\",\"min_doc_count\":1,\"extended_bounds\":{}}},{\"id\":\"3\",\"enabled\":true,\"type\":\"terms\",\"schema\":\"group\",\"params\":{\"field\":\"icinga.debug.facility\",\"size\":5,\"order\":\"desc\",\"orderBy\":\"1\"}}],\"listeners\":{}}"
+      },
+      "id": "0bc34b60-2419-11e7-a83b-d5f4cebac9ff",
+      "type": "visualization",
+      "version": 2
+    },
+    {
+      "attributes": {
+        "description": "",
+        "kibanaSavedObjectMeta": {
+          "searchSourceJSON": "{\"filter\":[]}"
+        },
+        "savedSearchId": "c876e6a0-2418-11e7-a83b-d5f4cebac9ff",
+        "title": "Icinga Debuglog Severity",
+        "uiStateJSON": "{\"vis\":{\"colors\":{\"information\":\"#629E51\",\"warning\":\"#E5AC0E\",\"debug\":\"#BA43A9\",\"notice\":\"#6ED0E0\"}}}",
+        "version": 1,
+        "visState": "{\"title\":\"Icinga Debuglog Severity\",\"type\":\"histogram\",\"params\":{\"addTooltip\":true,\"addLegend\":true,\"legendPosition\":\"right\",\"scale\":\"linear\",\"mode\":\"stacked\",\"times\":[],\"addTimeMarker\":false,\"defaultYExtents\":false,\"setYExtents\":false},\"aggs\":[{\"id\":\"1\",\"enabled\":true,\"type\":\"count\",\"schema\":\"metric\",\"params\":{}},{\"id\":\"2\",\"enabled\":true,\"type\":\"date_histogram\",\"schema\":\"segment\",\"params\":{\"field\":\"@timestamp\",\"interval\":\"auto\",\"customInterval\":\"2h\",\"min_doc_count\":1,\"extended_bounds\":{}}},{\"id\":\"3\",\"enabled\":true,\"type\":\"terms\",\"schema\":\"group\",\"params\":{\"field\":\"icinga.debug.severity\",\"size\":5,\"order\":\"desc\",\"orderBy\":\"1\"}}],\"listeners\":{}}"
+      },
+      "id": "fb09d4b0-2418-11e7-a83b-d5f4cebac9ff",
+      "type": "visualization",
+      "version": 2
+    },
+    {
+      "attributes": {
+        "columns": [
+          "icinga.debug.facility",
+          "icinga.debug.severity",
+          "icinga.debug.message"
+        ],
+        "description": "",
+        "hits": 0,
+        "kibanaSavedObjectMeta": {
+          "searchSourceJSON": "{\"index\":\"filebeat-*\",\"highlightAll\":true,\"query\":{\"query_string\":{\"query\":\"source:*icinga2\\\\/debug.log\",\"analyze_wildcard\":true}},\"filter\":[]}"
+        },
+        "sort": [
+          "@timestamp",
+          "desc"
+        ],
+        "title": "Icinga Debug Log",
+        "version": 1
+      },
+      "id": "c876e6a0-2418-11e7-a83b-d5f4cebac9ff",
+      "type": "search",
+      "version": 4
+    },
+    {
+      "attributes": {
+        "description": "",
+        "hits": 0,
+        "kibanaSavedObjectMeta": {
+          "searchSourceJSON": "{\"filter\":[{\"query\":{\"query_string\":{\"query\":\"*\",\"analyze_wildcard\":true}}}]}"
+        },
+        "optionsJSON": "{\"darkTheme\":false}",
+        "panelsJSON": "[{\"size_x\":6,\"size_y\":3,\"panelIndex\":1,\"type\":\"visualization\",\"id\":\"0bc34b60-2419-11e7-a83b-d5f4cebac9ff\",\"col\":1,\"row\":1},{\"size_x\":6,\"size_y\":3,\"panelIndex\":2,\"type\":\"visualization\",\"id\":\"fb09d4b0-2418-11e7-a83b-d5f4cebac9ff\",\"col\":7,\"row\":1},{\"size_x\":12,\"size_y\":29,\"panelIndex\":3,\"type\":\"search\",\"id\":\"c876e6a0-2418-11e7-a83b-d5f4cebac9ff\",\"col\":1,\"row\":4,\"columns\":[\"icinga.debug.facility\",\"icinga.debug.severity\",\"icinga.debug.message\"],\"sort\":[\"@timestamp\",\"desc\"]}]",
+        "timeRestore": false,
+        "title": "Icinga Debug Log",
+        "uiStateJSON": "{}",
+        "version": 1
+      },
+      "id": "26309570-2419-11e7-a83b-d5f4cebac9ff",
+      "type": "dashboard",
+      "version": 2
+    }
+  ],
+  "version": "6.0.0-alpha3-SNAPSHOT"
+}

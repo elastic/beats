@@ -16,7 +16,7 @@ lines that match the specified regular expression are considered either continua
 
 * the `match` option, which specifies how Filebeat combines matching lines into an event. You can specify `before` or `after`.
 
-* the 'flush_pattern option, which specifies a regular expression, in which the current multiline will be flushed from memory, ending the multline-message.
+* the `flush_pattern` option, which specifies a regular expression, in which the current multiline will be flushed from memory, ending the multline-message.
 
 See the full documentation for <<multiline>> to learn more about these options. Also read <<yaml-tips>> and 
 <<regexp-support>> to avoid common mistakes.

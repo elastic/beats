@@ -28,7 +28,7 @@ func ExampleWrapper() {
 	}
 
 	// Create a new Wrapper based on the configuration.
-	m, err := module.NewWrapper(config, mb.Registry)
+	m, err := module.NewWrapper(0, config, mb.Registry)
 	if err != nil {
 		fmt.Println("Error:", err)
 		return
@@ -97,7 +97,7 @@ func ExampleRunner() {
 	}
 
 	// Create a new Wrapper based on the configuration.
-	m, err := module.NewWrapper(config, mb.Registry)
+	m, err := module.NewWrapper(0, config, mb.Registry)
 	if err != nil {
 		return
 	}

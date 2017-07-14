@@ -11,6 +11,31 @@ import (
 
 var _ unsafe.Pointer
 
+// Do the interface allocations only once for common
+// Errno values.
+const (
+	errnoERROR_IO_PENDING = 997
+)
+
+var (
+	errERROR_IO_PENDING error = syscall.Errno(errnoERROR_IO_PENDING)
+)
+
+// errnoErr returns common boxed Errno values, to prevent
+// allocations at runtime.
+func errnoErr(e syscall.Errno) error {
+	switch e {
+	case 0:
+		return nil
+	case errnoERROR_IO_PENDING:
+		return errERROR_IO_PENDING
+	}
+	// TODO: add more here, after collecting data on the common
+	// error values see on Windows. (perhaps when running
+	// all.bat?)
+	return e
+}
+
 var (
 	modpdh = windows.NewLazySystemDLL("pdh.dll")
 
@@ -18,7 +43,9 @@ var (
 	procPdhAddEnglishCounterW           = modpdh.NewProc("PdhAddEnglishCounterW")
 	procPdhCollectQueryData             = modpdh.NewProc("PdhCollectQueryData")
 	procPdhGetFormattedCounterValue     = modpdh.NewProc("PdhGetFormattedCounterValue")
+	procPdhGetFormattedCounterArrayW    = modpdh.NewProc("PdhGetFormattedCounterArrayW")
 	procPdhGetRawCounterValue           = modpdh.NewProc("PdhGetRawCounterValue")
+	procPdhGetRawCounterArray           = modpdh.NewProc("PdhGetRawCounterArray")
 	procPdhCalculateCounterFromRawValue = modpdh.NewProc("PdhCalculateCounterFromRawValue")
 	procPdhFormatFromRawValue           = modpdh.NewProc("PdhFormatFromRawValue")
 	procPdhCloseQuery                   = modpdh.NewProc("PdhCloseQuery")
@@ -65,8 +92,24 @@ func _PdhGetFormattedCounterValue(counter PdhCounterHandle, format PdhCounterFor
 	return
 }
 
+func _PdhGetFormattedCounterArray(counter PdhCounterHandle, format PdhCounterFormat, bufferSize *uint32, bufferCount *uint32, itemBuffer *PdhCounterValueItem) (errcode error) {
+	r0, _, _ := syscall.Syscall6(procPdhGetFormattedCounterArrayW.Addr(), 5, uintptr(counter), uintptr(format), uintptr(unsafe.Pointer(bufferSize)), uintptr(unsafe.Pointer(bufferCount)), uintptr(unsafe.Pointer(itemBuffer)), 0)
+	if r0 != 0 {
+		errcode = syscall.Errno(r0)
+	}
+	return
+}
+
 func _PdhGetRawCounterValue(counter PdhCounterHandle, counterType *uint32, value *PdhRawCounter) (errcode error) {
 	r0, _, _ := syscall.Syscall(procPdhGetRawCounterValue.Addr(), 3, uintptr(counter), uintptr(unsafe.Pointer(counterType)), uintptr(unsafe.Pointer(value)))
+	if r0 != 0 {
+		errcode = syscall.Errno(r0)
+	}
+	return
+}
+
+func _PdhGetRawCounterArray(counter PdhCounterHandle, bufferSize *uint32, bufferCount *uint32, itemBuffer *PdhRawCounterItem) (errcode error) {
+	r0, _, _ := syscall.Syscall6(procPdhGetRawCounterArray.Addr(), 4, uintptr(counter), uintptr(unsafe.Pointer(bufferSize)), uintptr(unsafe.Pointer(bufferCount)), uintptr(unsafe.Pointer(itemBuffer)), 0, 0)
 	if r0 != 0 {
 		errcode = syscall.Errno(r0)
 	}

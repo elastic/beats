@@ -9,11 +9,14 @@ services:
     build:
       context: ./docker/elasticsearch
       dockerfile: Dockerfile-snapshot
+      args:
+        XPACK: 1
     environment:
       - "ES_JAVA_OPTS=-Xms512m -Xmx512m"
       - "network.host="
       - "transport.host=127.0.0.1"
       - "http.host=0.0.0.0"
+      - "xpack.security.enabled=false"
 
   logstash:
     extends:
@@ -32,3 +35,5 @@ services:
     build:
       context: ./docker/kibana
       dockerfile: Dockerfile-snapshot
+      args:
+        XPACK: 1

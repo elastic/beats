@@ -19,23 +19,26 @@ import (
 	"github.com/pkg/errors"
 )
 
+var NumCPU = runtime.NumCPU()
+
 type ProcsMap map[int]*Process
 
 type Process struct {
-	Pid         int    `json:"pid"`
-	Ppid        int    `json:"ppid"`
-	Pgid        int    `json:"pgid"`
-	Name        string `json:"name"`
-	Username    string `json:"username"`
-	State       string `json:"state"`
-	CmdLine     string `json:"cmdline"`
-	Cwd         string `json:"cwd"`
-	Mem         sigar.ProcMem
-	Cpu         sigar.ProcTime
-	Ctime       time.Time
-	FD          sigar.ProcFDUsage
-	Env         common.MapStr
-	cpuTotalPct float64
+	Pid             int    `json:"pid"`
+	Ppid            int    `json:"ppid"`
+	Pgid            int    `json:"pgid"`
+	Name            string `json:"name"`
+	Username        string `json:"username"`
+	State           string `json:"state"`
+	CmdLine         string `json:"cmdline"`
+	Cwd             string `json:"cwd"`
+	Mem             sigar.ProcMem
+	Cpu             sigar.ProcTime
+	SampleTime      time.Time
+	FD              sigar.ProcFDUsage
+	Env             common.MapStr
+	cpuTotalPct     float64
+	cpuTotalPctNorm float64
 }
 
 type ProcStats struct {
@@ -73,7 +76,6 @@ func newProcess(pid int, cmdline string, env common.MapStr) (*Process, error) {
 		State:    getProcState(byte(state.State)),
 		CmdLine:  cmdline,
 		Cwd:      exe.Cwd,
-		Ctime:    time.Now(),
 		Env:      env,
 	}
 
@@ -86,6 +88,8 @@ func newProcess(pid int, cmdline string, env common.MapStr) (*Process, error) {
 // variable should be saved with the process. If the argument is nil then all
 // environment variables are stored.
 func (proc *Process) getDetails(envPredicate func(string) bool) error {
+	proc.SampleTime = time.Now()
+
 	proc.Mem = sigar.ProcMem{}
 	if err := proc.Mem.Get(proc.Pid); err != nil {
 		return fmt.Errorf("error getting process mem for pid=%d: %v", proc.Pid, err)
@@ -190,7 +194,7 @@ func GetProcMemPercentage(proc *Process, totalPhyMem uint64) float64 {
 
 	perc := (float64(proc.Mem.Resident) / float64(totalPhyMem))
 
-	return system.Round(perc, .5, 4)
+	return system.Round(perc)
 }
 
 func Pids() ([]int, error) {
@@ -253,13 +257,16 @@ func (procStats *ProcStats) getProcessEvent(process *Process) common.MapStr {
 	proc["cpu"] = common.MapStr{
 		"total": common.MapStr{
 			"pct": process.cpuTotalPct,
+			"norm": common.MapStr{
+				"pct": process.cpuTotalPctNorm,
+			},
 		},
 		"start_time": unixTimeMsToTime(process.Cpu.StartTime),
 	}
 
 	if procStats.CpuTicks {
-		proc.Put("cpu.user", process.Cpu.User)
-		proc.Put("cpu.system", process.Cpu.Sys)
+		proc.Put("cpu.user.ticks", process.Cpu.User)
+		proc.Put("cpu.system.ticks", process.Cpu.Sys)
 		proc.Put("cpu.total.ticks", process.Cpu.Total)
 	}
 
@@ -276,17 +283,29 @@ func (procStats *ProcStats) getProcessEvent(process *Process) common.MapStr {
 	return proc
 }
 
-func GetProcCpuPercentage(last *Process, current *Process) float64 {
+// GetProcCpuPercentage returns the percentage of total CPU time consumed by
+// the process during the period between the given samples. Two percentages are
+// returned (these must be multiplied by 100). The first is a normalized based
+// on the number of cores such that the value ranges on [0, 1]. The second is
+// not normalized and the value ranges on [0, number_of_cores].
+//
+// Implementation note: The total system CPU time (including idle) is not
+// provided so this method will resort to using the difference in wall-clock
+// time multiplied by the number of cores as the total amount of CPU time
+// available between samples. This could result in incorrect percentages if the
+// wall-clock is adjusted (prior to Go 1.9) or the machine is suspended.
+func GetProcCpuPercentage(s0, s1 *Process) (normalizedPct, pct float64) {
+	if s0 != nil && s1 != nil {
+		timeDelta := s1.SampleTime.Sub(s0.SampleTime)
+		timeDeltaMillis := timeDelta / time.Millisecond
+		totalCPUDeltaMillis := int64(s1.Cpu.Total - s0.Cpu.Total)
 
-	if last != nil && current != nil {
+		pct := float64(totalCPUDeltaMillis) / float64(timeDeltaMillis)
+		normalizedPct := pct / float64(NumCPU)
 
-		dCPU := int64(current.Cpu.Total - last.Cpu.Total)
-		dt := float64(current.Ctime.Sub(last.Ctime).Nanoseconds()) / float64(1e6) // in milliseconds
-		perc := float64(dCPU) / dt
-
-		return system.Round(perc, .5, 4)
+		return system.Round(normalizedPct), system.Round(pct)
 	}
-	return 0
+	return 0, 0
 }
 
 func (procStats *ProcStats) MatchProcess(name string) bool {
@@ -367,7 +386,7 @@ func (procStats *ProcStats) GetProcStats() ([]common.MapStr, error) {
 
 			newProcs[process.Pid] = process
 			last := procStats.ProcsMap[process.Pid]
-			process.cpuTotalPct = GetProcCpuPercentage(last, process)
+			process.cpuTotalPctNorm, process.cpuTotalPct = GetProcCpuPercentage(last, process)
 			processes = append(processes, *process)
 		}
 	}

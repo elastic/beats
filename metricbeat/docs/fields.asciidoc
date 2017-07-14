@@ -12,13 +12,14 @@ This file is generated! See _meta/fields.yml and scripts/generate_field_docs.py
 This document describes the fields that are exported by Metricbeat. They are
 grouped in the following categories:
 
+* <<exported-fields-aerospike>>
 * <<exported-fields-apache>>
-* <<exported-fields-audit>>
 * <<exported-fields-beat>>
 * <<exported-fields-ceph>>
 * <<exported-fields-cloud>>
 * <<exported-fields-common>>
 * <<exported-fields-couchbase>>
+* <<exported-fields-docker-processor>>
 * <<exported-fields-docker>>
 * <<exported-fields-dropwizard>>
 * <<exported-fields-elasticsearch>>
@@ -45,6 +46,307 @@ grouped in the following categories:
 * <<exported-fields-zookeeper>>
 
 --
+[[exported-fields-aerospike]]
+== aerospike Fields
+
+[]experimental
+aerospike Module
+
+
+
+[float]
+== aerospike Fields
+
+
+
+
+[float]
+== namespace Fields
+
+namespace
+
+
+
+[float]
+== client Fields
+
+Client stats.
+
+
+
+[float]
+== delete Fields
+
+Client delete transactions stats.
+
+
+
+[float]
+=== aerospike.namespace.client.delete.error
+
+type: long
+
+Number of client delete transactions that failed with an error.
+
+
+[float]
+=== aerospike.namespace.client.delete.not_found
+
+type: long
+
+Number of client delete transactions that resulted in a not found.
+
+
+[float]
+=== aerospike.namespace.client.delete.success
+
+type: long
+
+Number of successful client delete transactions.
+
+
+[float]
+=== aerospike.namespace.client.delete.timeout
+
+type: long
+
+Number of client delete transactions that timed out.
+
+
+[float]
+== read Fields
+
+Client read transactions stats.
+
+
+
+[float]
+=== aerospike.namespace.client.read.error
+
+type: long
+
+Number of client read transaction errors.
+
+
+[float]
+=== aerospike.namespace.client.read.not_found
+
+type: long
+
+Number of client read transaction that resulted in not found.
+
+
+[float]
+=== aerospike.namespace.client.read.success
+
+type: long
+
+Number of successful client read transactions.
+
+
+[float]
+=== aerospike.namespace.client.read.timeout
+
+type: long
+
+Number of client read transaction that timed out.
+
+
+[float]
+== write Fields
+
+Client write transactions stats.
+
+
+
+[float]
+=== aerospike.namespace.client.write.error
+
+type: long
+
+Number of client write transactions that failed with an error.
+
+
+[float]
+=== aerospike.namespace.client.write.success
+
+type: long
+
+Number of successful client write transactions.
+
+
+[float]
+=== aerospike.namespace.client.write.timeout
+
+type: long
+
+Number of client write transactions that timed out.
+
+
+[float]
+== device Fields
+
+Disk storage stats
+
+
+
+[float]
+=== aerospike.namespace.device.available.pct
+
+type: scaled_float
+
+format: percent
+
+Measures the minimum contiguous disk space across all disks in a namespace.
+
+
+[float]
+=== aerospike.namespace.device.free.pct
+
+type: scaled_float
+
+format: percent
+
+Percentage of disk capacity free for this namespace.
+
+
+[float]
+=== aerospike.namespace.device.total.bytes
+
+type: long
+
+format: bytes
+
+Total bytes of disk space allocated to this namespace on this node.
+
+
+[float]
+=== aerospike.namespace.device.used.bytes
+
+type: long
+
+format: bytes
+
+Total bytes of disk space used by this namespace on this node.
+
+
+[float]
+=== aerospike.namespace.hwm_breached
+
+type: boolean
+
+If true, Aerospike has breached 'high-water-[disk|memory]-pct' for this namespace.
+
+
+[float]
+== memory Fields
+
+Memory storage stats.
+
+
+
+[float]
+=== aerospike.namespace.memory.free.pct
+
+type: scaled_float
+
+format: percent
+
+Percentage of memory capacity free for this namespace on this node.
+
+
+[float]
+=== aerospike.namespace.memory.used.data.bytes
+
+type: long
+
+format: bytes
+
+Amount of memory occupied by data for this namespace on this node.
+
+
+[float]
+=== aerospike.namespace.memory.used.index.bytes
+
+type: long
+
+format: bytes
+
+Amount of memory occupied by the index for this namespace on this node.
+
+
+[float]
+=== aerospike.namespace.memory.used.sindex.bytes
+
+type: long
+
+format: bytes
+
+Amount of memory occupied by secondary indexes for this namespace on this node.
+
+
+[float]
+=== aerospike.namespace.memory.used.total.bytes
+
+type: long
+
+format: bytes
+
+Total bytes of memory used by this namespace on this node.
+
+
+[float]
+=== aerospike.namespace.name
+
+type: keyword
+
+Namespace name
+
+
+[float]
+=== aerospike.namespace.node.host
+
+type: keyword
+
+[float]
+=== aerospike.namespace.node.name
+
+type: keyword
+
+Node name
+
+
+[float]
+== objects Fields
+
+Records stats.
+
+
+
+[float]
+=== aerospike.namespace.objects.master
+
+type: long
+
+Number of records on this node which are active masters.
+
+
+[float]
+=== aerospike.namespace.objects.total
+
+type: long
+
+Number of records in this namespace for this node.
+
+
+[float]
+=== aerospike.namespace.stop_writes
+
+type: boolean
+
+If true this namespace is currently not allowing writes.
+
+
 [[exported-fields-apache]]
 == Apache Fields
 
@@ -371,1925 +673,6 @@ Waiting for connections.
 type: long
 
 Total.
-
-
-[[exported-fields-audit]]
-== Audit Fields
-
-The `audit` module reports security-relevant information based on data captured from the operating system (OS) or services running on the OS.
-
-
-
-[float]
-== audit Fields
-
-
-
-
-[float]
-== kernel Fields
-
-The kernel metricset distributes audit events received from the Linux Audit Framework that is a part of the Linux kernel.
-
-
-
-[float]
-== actor Fields
-
-The actor is the user that triggered the audit event.
-
-
-[float]
-== attrs Fields
-
-Attributes of the actor.
-
-
-[float]
-=== audit.kernel.actor.attrs.auid
-
-type: keyword
-
-login user ID
-
-[float]
-=== audit.kernel.actor.attrs.uid
-
-type: keyword
-
-user ID
-
-[float]
-=== audit.kernel.actor.attrs.euid
-
-type: keyword
-
-effective user ID
-
-[float]
-=== audit.kernel.actor.attrs.fsuid
-
-type: keyword
-
-file system user ID
-
-[float]
-=== audit.kernel.actor.attrs.suid
-
-type: keyword
-
-sent user ID
-
-[float]
-=== audit.kernel.actor.attrs.gid
-
-type: keyword
-
-group ID
-
-[float]
-=== audit.kernel.actor.attrs.egid
-
-type: keyword
-
-effective group ID
-
-[float]
-=== audit.kernel.actor.attrs.sgid
-
-type: keyword
-
-set group ID
-
-[float]
-=== audit.kernel.actor.attrs.fsgid
-
-type: keyword
-
-file system group ID
-
-[float]
-=== audit.kernel.actor.primary
-
-type: keyword
-
-The primary identity of the actor. This is the actor's original login ID. It will not change even if the user changes to another account.
-
-
-[float]
-=== audit.kernel.actor.secondary
-
-type: keyword
-
-The secondary identity of the actor. This is typically the same as the primary, except for when the user has used `su`.
-
-[float]
-== selinux Fields
-
-The SELinux identity of the actor.
-
-
-[float]
-=== audit.kernel.actor.selinux.user
-
-type: keyword
-
-account submitted for authentication
-
-[float]
-=== audit.kernel.actor.selinux.role
-
-type: keyword
-
-user's SELinux role
-
-[float]
-=== audit.kernel.actor.selinux.domain
-
-type: keyword
-
-The actor's SELinux domain or type.
-
-[float]
-=== audit.kernel.actor.selinux.level
-
-type: keyword
-
-example: s0
-
-The actor's SELinux level.
-
-[float]
-=== audit.kernel.actor.selinux.category
-
-type: keyword
-
-The actor's SELinux category or compartments.
-
-[float]
-=== audit.kernel.category
-
-type: keyword
-
-example: audit-rule
-
-The event's category is a value derived from the `record_type`.
-
-
-[float]
-=== audit.kernel.sequence
-
-type: long
-
-The sequence number of the event as assigned by the kernel. Sequence numbers are stored as a uint32 in the kernel and can rollover.
-
-
-[float]
-=== audit.kernel.session
-
-type: keyword
-
-The session ID assigned to a login. All events related to a login session will have the same value.
-
-
-[float]
-== paths Fields
-
-List of paths associated with the event.
-
-
-[float]
-=== audit.kernel.paths.inode
-
-type: keyword
-
-inode number
-
-[float]
-=== audit.kernel.paths.dev
-
-type: keyword
-
-device name as found in /dev
-
-[float]
-=== audit.kernel.paths.obj_user
-
-type: keyword
-
-
-
-[float]
-=== audit.kernel.paths.obj_role
-
-type: keyword
-
-
-
-[float]
-=== audit.kernel.paths.obj_domain
-
-type: keyword
-
-
-
-[float]
-=== audit.kernel.paths.obj_level
-
-type: keyword
-
-
-
-[float]
-=== audit.kernel.paths.objtype
-
-type: keyword
-
-
-
-[float]
-=== audit.kernel.paths.ouid
-
-type: keyword
-
-file owner user ID
-
-[float]
-=== audit.kernel.paths.rdev
-
-type: keyword
-
-the device identifier (special files only)
-
-[float]
-=== audit.kernel.paths.nametype
-
-type: keyword
-
-kind of file operation being referenced
-
-[float]
-=== audit.kernel.paths.ogid
-
-type: keyword
-
-file owner group ID
-
-[float]
-=== audit.kernel.paths.item
-
-type: keyword
-
-which item is being recorded
-
-[float]
-=== audit.kernel.paths.mode
-
-type: keyword
-
-mode flags on a file
-
-[float]
-=== audit.kernel.paths.name
-
-type: keyword
-
-file name in avcs
-
-[float]
-=== audit.kernel.record_type
-
-type: keyword
-
-The audit record's type.
-
-[float]
-== socket Fields
-
-Socket data from sockaddr messages.
-
-
-[float]
-=== audit.kernel.socket.port
-
-type: keyword
-
-The port number.
-
-[float]
-=== audit.kernel.socket.saddr
-
-type: keyword
-
-The raw socket address structure.
-
-[float]
-=== audit.kernel.socket.addr
-
-type: keyword
-
-The remote address.
-
-[float]
-=== audit.kernel.socket.family
-
-type: keyword
-
-example: unix
-
-The socket family (unix, ipv4, ipv6, netlink).
-
-[float]
-=== audit.kernel.socket.path
-
-type: keyword
-
-This is the path associated with a unix socket.
-
-[float]
-== thing Fields
-
-This is the thing or object being acted upon in the event.
-
-
-
-[float]
-=== audit.kernel.thing.what
-
-type: keyword
-
-A description of the what the "thing" is (e.g. file, socket, user-session).
-
-
-[float]
-=== audit.kernel.thing.primary
-
-type: keyword
-
-
-
-[float]
-=== audit.kernel.thing.secondary
-
-type: keyword
-
-
-
-[float]
-== selinux Fields
-
-The SELinux identity of the object.
-
-
-[float]
-=== audit.kernel.thing.selinux.user
-
-type: keyword
-
-The owner of the object.
-
-[float]
-=== audit.kernel.thing.selinux.role
-
-type: keyword
-
-The object's SELinux role.
-
-[float]
-=== audit.kernel.thing.selinux.domain
-
-type: keyword
-
-The object's SELinux domain or type.
-
-[float]
-=== audit.kernel.thing.selinux.level
-
-type: keyword
-
-example: s0
-
-The object's SELinux level.
-
-[float]
-=== audit.kernel.how
-
-type: keyword
-
-This describes how the action was performed. Usually this is the exe or command that was being executed that triggered the event.
-
-
-[float]
-=== audit.kernel.key
-
-type: keyword
-
-The key assigned to the audit rule that triggered the event.
-
-[float]
-=== audit.kernel.result
-
-type: keyword
-
-example: success or fail
-
-The result of the audited operation (success/fail).
-
-[float]
-== data Fields
-
-The data from the audit messages.
-
-
-[float]
-=== audit.kernel.data.action
-
-type: keyword
-
-netfilter packet disposition
-
-[float]
-=== audit.kernel.data.minor
-
-type: keyword
-
-device minor number
-
-[float]
-=== audit.kernel.data.acct
-
-type: keyword
-
-a user's account name
-
-[float]
-=== audit.kernel.data.addr
-
-type: keyword
-
-the remote address that the user is connecting from
-
-[float]
-=== audit.kernel.data.cipher
-
-type: keyword
-
-name of crypto cipher selected
-
-[float]
-=== audit.kernel.data.id
-
-type: keyword
-
-during account changes
-
-[float]
-=== audit.kernel.data.entries
-
-type: keyword
-
-number of entries in the netfilter table
-
-[float]
-=== audit.kernel.data.kind
-
-type: keyword
-
-server or client in crypto operation
-
-[float]
-=== audit.kernel.data.ksize
-
-type: keyword
-
-key size for crypto operation
-
-[float]
-=== audit.kernel.data.spid
-
-type: keyword
-
-sent process ID
-
-[float]
-=== audit.kernel.data.arch
-
-type: keyword
-
-the elf architecture flags
-
-[float]
-=== audit.kernel.data.argc
-
-type: keyword
-
-the number of arguments to an execve syscall
-
-[float]
-=== audit.kernel.data.major
-
-type: keyword
-
-device major number
-
-[float]
-=== audit.kernel.data.unit
-
-type: keyword
-
-systemd unit
-
-[float]
-=== audit.kernel.data.table
-
-type: keyword
-
-netfilter table name
-
-[float]
-=== audit.kernel.data.terminal
-
-type: keyword
-
-terminal name the user is running programs on
-
-[float]
-=== audit.kernel.data.comm
-
-type: keyword
-
-command line program name
-
-[float]
-=== audit.kernel.data.exe
-
-type: keyword
-
-executable name
-
-[float]
-=== audit.kernel.data.grantors
-
-type: keyword
-
-pam modules approving the action
-
-[float]
-=== audit.kernel.data.pid
-
-type: keyword
-
-process ID
-
-[float]
-=== audit.kernel.data.direction
-
-type: keyword
-
-direction of crypto operation
-
-[float]
-=== audit.kernel.data.op
-
-type: keyword
-
-the operation being performed that is audited
-
-[float]
-=== audit.kernel.data.tty
-
-type: keyword
-
-tty udevice the user is running programs on
-
-[float]
-=== audit.kernel.data.proctitle
-
-type: keyword
-
-process title and command line parameters
-
-[float]
-=== audit.kernel.data.syscall
-
-type: keyword
-
-syscall number in effect when the event occurred
-
-[float]
-=== audit.kernel.data.data
-
-type: keyword
-
-TTY text
-
-[float]
-=== audit.kernel.data.family
-
-type: keyword
-
-netfilter protocol
-
-[float]
-=== audit.kernel.data.mac
-
-type: keyword
-
-crypto MAC algorithm selected
-
-[float]
-=== audit.kernel.data.pfs
-
-type: keyword
-
-perfect forward secrecy method
-
-[float]
-=== audit.kernel.data.items
-
-type: keyword
-
-the number of path records in the event
-
-[float]
-=== audit.kernel.data.a0
-
-type: keyword
-
-
-
-[float]
-=== audit.kernel.data.a1
-
-type: keyword
-
-
-
-[float]
-=== audit.kernel.data.a2
-
-type: keyword
-
-
-
-[float]
-=== audit.kernel.data.a3
-
-type: keyword
-
-
-
-[float]
-=== audit.kernel.data.cwd
-
-type: keyword
-
-the current working directory
-
-[float]
-=== audit.kernel.data.hostname
-
-type: keyword
-
-the hostname that the user is connecting from
-
-[float]
-=== audit.kernel.data.lport
-
-type: keyword
-
-local network port
-
-[float]
-=== audit.kernel.data.ppid
-
-type: keyword
-
-parent process ID
-
-[float]
-=== audit.kernel.data.rport
-
-type: keyword
-
-remote port number
-
-[float]
-=== audit.kernel.data.cmdline
-
-type: keyword
-
-The full command line from the execve message.
-
-[float]
-=== audit.kernel.data.exit
-
-type: keyword
-
-syscall exit code
-
-[float]
-=== audit.kernel.data.fp
-
-type: keyword
-
-crypto key finger print
-
-[float]
-=== audit.kernel.data.laddr
-
-type: keyword
-
-local network address
-
-[float]
-=== audit.kernel.data.sport
-
-type: keyword
-
-local port number
-
-[float]
-=== audit.kernel.data.capability
-
-type: keyword
-
-posix capabilities
-
-[float]
-=== audit.kernel.data.nargs
-
-type: keyword
-
-the number of arguments to a socket call
-
-[float]
-=== audit.kernel.data.new-enabled
-
-type: keyword
-
-new TTY audit enabled setting
-
-[float]
-=== audit.kernel.data.audit_backlog_limit
-
-type: keyword
-
-audit system's backlog queue size
-
-[float]
-=== audit.kernel.data.dir
-
-type: keyword
-
-directory name
-
-[float]
-=== audit.kernel.data.cap_pe
-
-type: keyword
-
-process effective capability map
-
-[float]
-=== audit.kernel.data.model
-
-type: keyword
-
-security model being used for virt
-
-[float]
-=== audit.kernel.data.new_pp
-
-type: keyword
-
-new process permitted capability map
-
-[float]
-=== audit.kernel.data.old-enabled
-
-type: keyword
-
-present TTY audit enabled setting
-
-[float]
-=== audit.kernel.data.oauid
-
-type: keyword
-
-object's login user ID
-
-[float]
-=== audit.kernel.data.old
-
-type: keyword
-
-old value
-
-[float]
-=== audit.kernel.data.banners
-
-type: keyword
-
-banners used on printed page
-
-[float]
-=== audit.kernel.data.feature
-
-type: keyword
-
-kernel feature being changed
-
-[float]
-=== audit.kernel.data.vm-ctx
-
-type: keyword
-
-the vm's context string
-
-[float]
-=== audit.kernel.data.opid
-
-type: keyword
-
-object's process ID
-
-[float]
-=== audit.kernel.data.seperms
-
-type: keyword
-
-SELinux permissions being used
-
-[float]
-=== audit.kernel.data.seresult
-
-type: keyword
-
-SELinux AVC decision granted/denied
-
-[float]
-=== audit.kernel.data.new-rng
-
-type: keyword
-
-device name of rng being added from a vm
-
-[float]
-=== audit.kernel.data.old-net
-
-type: keyword
-
-present MAC address assigned to vm
-
-[float]
-=== audit.kernel.data.sigev_signo
-
-type: keyword
-
-signal number
-
-[float]
-=== audit.kernel.data.ino
-
-type: keyword
-
-inode number
-
-[float]
-=== audit.kernel.data.old_enforcing
-
-type: keyword
-
-old MAC enforcement status
-
-[float]
-=== audit.kernel.data.old-vcpu
-
-type: keyword
-
-present number of CPU cores
-
-[float]
-=== audit.kernel.data.range
-
-type: keyword
-
-user's SE Linux range
-
-[float]
-=== audit.kernel.data.res
-
-type: keyword
-
-result of the audited operation(success/fail)
-
-[float]
-=== audit.kernel.data.added
-
-type: keyword
-
-number of new files detected
-
-[float]
-=== audit.kernel.data.fam
-
-type: keyword
-
-socket address family
-
-[float]
-=== audit.kernel.data.nlnk-pid
-
-type: keyword
-
-pid of netlink packet sender
-
-[float]
-=== audit.kernel.data.subj
-
-type: keyword
-
-lspp subject's context string
-
-[float]
-=== audit.kernel.data.a[0-3]
-
-type: keyword
-
-the arguments to a syscall
-
-[float]
-=== audit.kernel.data.cgroup
-
-type: keyword
-
-path to cgroup in sysfs
-
-[float]
-=== audit.kernel.data.kernel
-
-type: keyword
-
-kernel's version number
-
-[float]
-=== audit.kernel.data.ocomm
-
-type: keyword
-
-object's command line name
-
-[float]
-=== audit.kernel.data.new-net
-
-type: keyword
-
-MAC address being assigned to vm
-
-[float]
-=== audit.kernel.data.permissive
-
-type: keyword
-
-SELinux is in permissive mode
-
-[float]
-=== audit.kernel.data.class
-
-type: keyword
-
-resource class assigned to vm
-
-[float]
-=== audit.kernel.data.compat
-
-type: keyword
-
-is_compat_task result
-
-[float]
-=== audit.kernel.data.fi
-
-type: keyword
-
-file assigned inherited capability map
-
-[float]
-=== audit.kernel.data.changed
-
-type: keyword
-
-number of changed files
-
-[float]
-=== audit.kernel.data.msg
-
-type: keyword
-
-the payload of the audit record
-
-[float]
-=== audit.kernel.data.dport
-
-type: keyword
-
-remote port number
-
-[float]
-=== audit.kernel.data.new-seuser
-
-type: keyword
-
-new SELinux user
-
-[float]
-=== audit.kernel.data.invalid_context
-
-type: keyword
-
-SELinux context
-
-[float]
-=== audit.kernel.data.dmac
-
-type: keyword
-
-remote MAC address
-
-[float]
-=== audit.kernel.data.ipx-net
-
-type: keyword
-
-IPX network number
-
-[float]
-=== audit.kernel.data.iuid
-
-type: keyword
-
-ipc object's user ID
-
-[float]
-=== audit.kernel.data.macproto
-
-type: keyword
-
-ethernet packet type ID field
-
-[float]
-=== audit.kernel.data.obj
-
-type: keyword
-
-lspp object context string
-
-[float]
-=== audit.kernel.data.a[[:digit:]+]\[.*\]
-
-type: keyword
-
-the arguments to the execve syscall
-
-[float]
-=== audit.kernel.data.ipid
-
-type: keyword
-
-IP datagram fragment identifier
-
-[float]
-=== audit.kernel.data.new-fs
-
-type: keyword
-
-file system being added to vm
-
-[float]
-=== audit.kernel.data.vm-pid
-
-type: keyword
-
-vm's process ID
-
-[float]
-=== audit.kernel.data.cap_pi
-
-type: keyword
-
-process inherited capability map
-
-[float]
-=== audit.kernel.data.old-auid
-
-type: keyword
-
-previous auid value
-
-[float]
-=== audit.kernel.data.oses
-
-type: keyword
-
-object's session ID
-
-[float]
-=== audit.kernel.data.fd
-
-type: keyword
-
-file descriptor number
-
-[float]
-=== audit.kernel.data.igid
-
-type: keyword
-
-ipc object's group ID
-
-[float]
-=== audit.kernel.data.new-disk
-
-type: keyword
-
-disk being added to vm
-
-[float]
-=== audit.kernel.data.parent
-
-type: keyword
-
-the inode number of the parent file
-
-[float]
-=== audit.kernel.data.len
-
-type: keyword
-
-length
-
-[float]
-=== audit.kernel.data.oflag
-
-type: keyword
-
-open syscall flags
-
-[float]
-=== audit.kernel.data.uuid
-
-type: keyword
-
-a UUID
-
-[float]
-=== audit.kernel.data.code
-
-type: keyword
-
-seccomp action code
-
-[float]
-=== audit.kernel.data.nlnk-grp
-
-type: keyword
-
-netlink group number
-
-[float]
-=== audit.kernel.data.cap_fp
-
-type: keyword
-
-file permitted capability map
-
-[float]
-=== audit.kernel.data.new-mem
-
-type: keyword
-
-new amount of memory in KB
-
-[float]
-=== audit.kernel.data.seperm
-
-type: keyword
-
-SELinux permission being decided on
-
-[float]
-=== audit.kernel.data.enforcing
-
-type: keyword
-
-new MAC enforcement status
-
-[float]
-=== audit.kernel.data.new-chardev
-
-type: keyword
-
-new character device being assigned to vm
-
-[float]
-=== audit.kernel.data.old-rng
-
-type: keyword
-
-device name of rng being removed from a vm
-
-[float]
-=== audit.kernel.data.outif
-
-type: keyword
-
-out interface number
-
-[float]
-=== audit.kernel.data.cmd
-
-type: keyword
-
-command being executed
-
-[float]
-=== audit.kernel.data.hook
-
-type: keyword
-
-netfilter hook that packet came from
-
-[float]
-=== audit.kernel.data.new-level
-
-type: keyword
-
-new run level
-
-[float]
-=== audit.kernel.data.sauid
-
-type: keyword
-
-sent login user ID
-
-[float]
-=== audit.kernel.data.sig
-
-type: keyword
-
-signal number
-
-[float]
-=== audit.kernel.data.audit_backlog_wait_time
-
-type: keyword
-
-audit system's backlog wait time
-
-[float]
-=== audit.kernel.data.printer
-
-type: keyword
-
-printer name
-
-[float]
-=== audit.kernel.data.old-mem
-
-type: keyword
-
-present amount of memory in KB
-
-[float]
-=== audit.kernel.data.perm
-
-type: keyword
-
-the file permission being used
-
-[float]
-=== audit.kernel.data.old_pi
-
-type: keyword
-
-old process inherited capability map
-
-[float]
-=== audit.kernel.data.state
-
-type: keyword
-
-audit daemon configuration resulting state
-
-[float]
-=== audit.kernel.data.format
-
-type: keyword
-
-audit log's format
-
-[float]
-=== audit.kernel.data.new_gid
-
-type: keyword
-
-new group ID being assigned
-
-[float]
-=== audit.kernel.data.tcontext
-
-type: keyword
-
-the target's or object's context string
-
-[float]
-=== audit.kernel.data.maj
-
-type: keyword
-
-device major number
-
-[float]
-=== audit.kernel.data.watch
-
-type: keyword
-
-file name in a watch record
-
-[float]
-=== audit.kernel.data.device
-
-type: keyword
-
-device name
-
-[float]
-=== audit.kernel.data.grp
-
-type: keyword
-
-group name
-
-[float]
-=== audit.kernel.data.bool
-
-type: keyword
-
-name of SELinux boolean
-
-[float]
-=== audit.kernel.data.icmp_type
-
-type: keyword
-
-type of icmp message
-
-[float]
-=== audit.kernel.data.new_lock
-
-type: keyword
-
-new value of feature lock
-
-[float]
-=== audit.kernel.data.old_prom
-
-type: keyword
-
-network promiscuity flag
-
-[float]
-=== audit.kernel.data.acl
-
-type: keyword
-
-access mode of resource assigned to vm
-
-[float]
-=== audit.kernel.data.ip
-
-type: keyword
-
-network address of a printer
-
-[float]
-=== audit.kernel.data.new_pi
-
-type: keyword
-
-new process inherited capability map
-
-[float]
-=== audit.kernel.data.default-context
-
-type: keyword
-
-default MAC context
-
-[float]
-=== audit.kernel.data.inode_gid
-
-type: keyword
-
-group ID of the inode's owner
-
-[float]
-=== audit.kernel.data.new-log_passwd
-
-type: keyword
-
-new value for TTY password logging
-
-[float]
-=== audit.kernel.data.new_pe
-
-type: keyword
-
-new process effective capability map
-
-[float]
-=== audit.kernel.data.selected-context
-
-type: keyword
-
-new MAC context assigned to session
-
-[float]
-=== audit.kernel.data.cap_fver
-
-type: keyword
-
-file system capabilities version number
-
-[float]
-=== audit.kernel.data.file
-
-type: keyword
-
-file name
-
-[float]
-=== audit.kernel.data.net
-
-type: keyword
-
-network MAC address
-
-[float]
-=== audit.kernel.data.virt
-
-type: keyword
-
-kind of virtualization being referenced
-
-[float]
-=== audit.kernel.data.cap_pp
-
-type: keyword
-
-process permitted capability map
-
-[float]
-=== audit.kernel.data.old-range
-
-type: keyword
-
-present SELinux range
-
-[float]
-=== audit.kernel.data.resrc
-
-type: keyword
-
-resource being assigned
-
-[float]
-=== audit.kernel.data.new-range
-
-type: keyword
-
-new SELinux range
-
-[float]
-=== audit.kernel.data.obj_gid
-
-type: keyword
-
-group ID of object
-
-[float]
-=== audit.kernel.data.proto
-
-type: keyword
-
-network protocol
-
-[float]
-=== audit.kernel.data.old-disk
-
-type: keyword
-
-disk being removed from vm
-
-[float]
-=== audit.kernel.data.audit_failure
-
-type: keyword
-
-audit system's failure mode
-
-[float]
-=== audit.kernel.data.inif
-
-type: keyword
-
-in interface number
-
-[float]
-=== audit.kernel.data.vm
-
-type: keyword
-
-virtual machine name
-
-[float]
-=== audit.kernel.data.flags
-
-type: keyword
-
-mmap syscall flags
-
-[float]
-=== audit.kernel.data.nlnk-fam
-
-type: keyword
-
-netlink protocol number
-
-[float]
-=== audit.kernel.data.old-fs
-
-type: keyword
-
-file system being removed from vm
-
-[float]
-=== audit.kernel.data.old-ses
-
-type: keyword
-
-previous ses value
-
-[float]
-=== audit.kernel.data.seqno
-
-type: keyword
-
-sequence number
-
-[float]
-=== audit.kernel.data.fver
-
-type: keyword
-
-file system capabilities version number
-
-[float]
-=== audit.kernel.data.qbytes
-
-type: keyword
-
-ipc objects quantity of bytes
-
-[float]
-=== audit.kernel.data.seuser
-
-type: keyword
-
-user's SE Linux user acct
-
-[float]
-=== audit.kernel.data.cap_fe
-
-type: keyword
-
-file assigned effective capability map
-
-[float]
-=== audit.kernel.data.new-vcpu
-
-type: keyword
-
-new number of CPU cores
-
-[float]
-=== audit.kernel.data.old-level
-
-type: keyword
-
-old run level
-
-[float]
-=== audit.kernel.data.old_pp
-
-type: keyword
-
-old process permitted capability map
-
-[float]
-=== audit.kernel.data.daddr
-
-type: keyword
-
-remote IP address
-
-[float]
-=== audit.kernel.data.old-role
-
-type: keyword
-
-present SELinux role
-
-[float]
-=== audit.kernel.data.ioctlcmd
-
-type: keyword
-
-The request argument to the ioctl syscall
-
-[float]
-=== audit.kernel.data.smac
-
-type: keyword
-
-local MAC address
-
-[float]
-=== audit.kernel.data.apparmor
-
-type: keyword
-
-apparmor event information
-
-[float]
-=== audit.kernel.data.fe
-
-type: keyword
-
-file assigned effective capability map
-
-[float]
-=== audit.kernel.data.perm_mask
-
-type: keyword
-
-file permission mask that triggered a watch event
-
-[float]
-=== audit.kernel.data.ses
-
-type: keyword
-
-login session ID
-
-[float]
-=== audit.kernel.data.cap_fi
-
-type: keyword
-
-file inherited capability map
-
-[float]
-=== audit.kernel.data.obj_uid
-
-type: keyword
-
-user ID of object
-
-[float]
-=== audit.kernel.data.reason
-
-type: keyword
-
-text string denoting a reason for the action
-
-[float]
-=== audit.kernel.data.list
-
-type: keyword
-
-the audit system's filter list number
-
-[float]
-=== audit.kernel.data.old_lock
-
-type: keyword
-
-present value of feature lock
-
-[float]
-=== audit.kernel.data.bus
-
-type: keyword
-
-name of subsystem bus a vm resource belongs to
-
-[float]
-=== audit.kernel.data.old_pe
-
-type: keyword
-
-old process effective capability map
-
-[float]
-=== audit.kernel.data.new-role
-
-type: keyword
-
-new SELinux role
-
-[float]
-=== audit.kernel.data.prom
-
-type: keyword
-
-network promiscuity flag
-
-[float]
-=== audit.kernel.data.uri
-
-type: keyword
-
-URI pointing to a printer
-
-[float]
-=== audit.kernel.data.audit_enabled
-
-type: keyword
-
-audit systems's enable/disable status
-
-[float]
-=== audit.kernel.data.old-log_passwd
-
-type: keyword
-
-present value for TTY password logging
-
-[float]
-=== audit.kernel.data.old-seuser
-
-type: keyword
-
-present SELinux user
-
-[float]
-=== audit.kernel.data.per
-
-type: keyword
-
-linux personality
-
-[float]
-=== audit.kernel.data.scontext
-
-type: keyword
-
-the subject's context string
-
-[float]
-=== audit.kernel.data.tclass
-
-type: keyword
-
-target's object classification
-
-[float]
-=== audit.kernel.data.ver
-
-type: keyword
-
-audit daemon's version number
-
-[float]
-=== audit.kernel.data.new
-
-type: keyword
-
-value being set in feature
-
-[float]
-=== audit.kernel.data.val
-
-type: keyword
-
-generic value associated with the operation
-
-[float]
-=== audit.kernel.data.img-ctx
-
-type: keyword
-
-the vm's disk image context string
-
-[float]
-=== audit.kernel.data.old-chardev
-
-type: keyword
-
-present character device assigned to vm
-
-[float]
-=== audit.kernel.data.old_val
-
-type: keyword
-
-current value of SELinux boolean
-
-[float]
-=== audit.kernel.data.success
-
-type: keyword
-
-whether the syscall was successful or not
-
-[float]
-=== audit.kernel.data.inode_uid
-
-type: keyword
-
-user ID of the inode's owner
-
-[float]
-=== audit.kernel.data.removed
-
-type: keyword
-
-number of deleted files
-
-[float]
-=== audit.kernel.messages
-
-type: text
-
-An ordered list of the raw messages received from the kernel that were used to construct this document. This field is present if an error occurred processing the data or if `kernel.include_raw_message` is set in the config.
-
-
-[float]
-=== audit.kernel.warnings
-
-type: keyword
-
-The warnings generated by the Beat during the construction of the event. These are disabled by default and are used for development and debug purposes only.
-
-
-[float]
-== geoip Fields
-
-Contains GeoIP information gathered based on the `os_events.audit.addr` field. Only present if the GeoIP Elasticsearch plugin is available and used.
-
-
-
-[float]
-=== audit.kernel.geoip.continent_name
-
-type: keyword
-
-The name of the continent.
-
-
-[float]
-=== audit.kernel.geoip.city_name
-
-type: keyword
-
-The name of the city.
-
-
-[float]
-=== audit.kernel.geoip.region_name
-
-type: keyword
-
-The name of the region.
-
-
-[float]
-=== audit.kernel.geoip.country_iso_code
-
-type: keyword
-
-Country ISO code.
-
-
-[float]
-=== audit.kernel.geoip.location
-
-type: geo_point
-
-The longitude and latitude.
 
 
 [[exported-fields-beat]]
@@ -3213,6 +1596,47 @@ type: long
 Number of items/documents that are replicas.
 
 
+[[exported-fields-docker-processor]]
+== docker Fields
+
+beta[]
+Docker stats collected from Docker.
+
+
+
+
+[float]
+=== docker.container.id
+
+type: keyword
+
+Unique container id.
+
+
+[float]
+=== docker.container.image
+
+type: keyword
+
+Name of the image the container was built on.
+
+
+[float]
+=== docker.container.name
+
+type: keyword
+
+Container name.
+
+
+[float]
+=== docker.container.labels
+
+type: object
+
+Image labels.
+
+
 [[exported-fields-docker]]
 == Docker Fields
 
@@ -3252,30 +1676,6 @@ Date when the container was created.
 
 
 [float]
-=== docker.container.id
-
-type: keyword
-
-Unique container id.
-
-
-[float]
-=== docker.container.image
-
-type: keyword
-
-Name of the image the container was built on.
-
-
-[float]
-=== docker.container.name
-
-type: keyword
-
-Container name.
-
-
-[float]
 === docker.container.status
 
 type: keyword
@@ -3304,14 +1704,6 @@ Total size of all the files in the container.
 type: long
 
 Size of the files that have been created or changed since creation.
-
-
-[float]
-=== docker.container.labels
-
-type: object
-
-Image labels.
 
 
 [float]
@@ -3671,6 +2063,8 @@ Total memory resident set size.
 
 type: scaled_float
 
+format: percentage
+
 Memory resident set size percentage.
 
 
@@ -3695,6 +2089,8 @@ Max memory usage.
 === docker.memory.usage.pct
 
 type: scaled_float
+
+format: percentage
 
 Memory usage percentage.
 
@@ -9860,7 +8256,7 @@ System status metrics, like CPU and memory usage, that are collected from the op
 [float]
 == core Fields
 
-`system-core` contains local CPU core stats.
+`system-core` contains CPU metrics for a single core of a multi-core system.
 
 
 
@@ -9879,7 +8275,7 @@ type: scaled_float
 
 format: percent
 
-The percentage of CPU time spent in user space. On multi-core systems, you can have percentages that are greater than 100%. For example, if 3 cores are at 60% use, then the `cpu.user_p` will be 180%.
+The percentage of CPU time spent in user space.
 
 
 [float]
@@ -10028,7 +8424,7 @@ The amount of CPU time spent in involuntary wait by the virtual CPU while the hy
 
 type: long
 
-The number of CPU cores.
+The number of CPU cores present on the host. The non-normalized percentages will have a maximum value of `100% * cores`. The normalized percentages already take this value into account and have a maximum value of 100%.
 
 
 [float]
@@ -10038,7 +8434,7 @@ type: scaled_float
 
 format: percent
 
-The percentage of CPU time spent in user space. On multi-core systems, you can have percentages that are greater than 100%. For example, if 3 cores are at 60% use, then the `cpu.user_p` will be 180%.
+The percentage of CPU time spent in user space. On multi-core systems, you can have percentages that are greater than 100%. For example, if 3 cores are at 60% use, then the `system.cpu.user.pct` will be 180%.
 
 
 [float]
@@ -10103,6 +8499,86 @@ The percentage of CPU time spent servicing and handling software interrupts.
 
 [float]
 === system.cpu.steal.pct
+
+type: scaled_float
+
+format: percent
+
+The percentage of CPU time spent in involuntary wait by the virtual CPU while the hypervisor was servicing another processor. Available only on Unix.
+
+
+[float]
+=== system.cpu.user.norm.pct
+
+type: scaled_float
+
+format: percent
+
+The percentage of CPU time spent in user space.
+
+
+[float]
+=== system.cpu.system.norm.pct
+
+type: scaled_float
+
+format: percent
+
+The percentage of CPU time spent in kernel space.
+
+
+[float]
+=== system.cpu.nice.norm.pct
+
+type: scaled_float
+
+format: percent
+
+The percentage of CPU time spent on low-priority processes.
+
+
+[float]
+=== system.cpu.idle.norm.pct
+
+type: scaled_float
+
+format: percent
+
+The percentage of CPU time spent idle.
+
+
+[float]
+=== system.cpu.iowait.norm.pct
+
+type: scaled_float
+
+format: percent
+
+The percentage of CPU time spent in wait (on disk).
+
+
+[float]
+=== system.cpu.irq.norm.pct
+
+type: scaled_float
+
+format: percent
+
+The percentage of CPU time spent servicing and handling hardware interrupts.
+
+
+[float]
+=== system.cpu.softirq.norm.pct
+
+type: scaled_float
+
+format: percent
+
+The percentage of CPU time spent servicing and handling software interrupts.
+
+
+[float]
+=== system.cpu.steal.norm.pct
 
 type: scaled_float
 
@@ -10409,7 +8885,7 @@ Total space (used plus free).
 [float]
 == load Fields
 
-Load averages.
+CPU load averages.
 
 
 
@@ -10442,7 +8918,7 @@ Load average for the last 15 minutes.
 
 type: scaled_float
 
-Load divided by the number of cores for the last minute.
+Load for the last minute divided by the number of cores.
 
 
 [float]
@@ -10450,7 +8926,7 @@ Load divided by the number of cores for the last minute.
 
 type: scaled_float
 
-Load divided by the number of cores for the last 5 minutes.
+Load for the last 5 minutes divided by the number of cores.
 
 
 [float]
@@ -10458,7 +8934,15 @@ Load divided by the number of cores for the last 5 minutes.
 
 type: scaled_float
 
-Load divided by the number of cores for the last 15 minutes.
+Load for the last 15 minutes divided by the number of cores.
+
+
+[float]
+=== system.load.cores
+
+type: long
+
+The number of CPU cores present on the host.
 
 
 [float]
@@ -10777,6 +9261,16 @@ type: scaled_float
 format: percent
 
 The percentage of CPU time spent by the process since the last update. Its value is similar to the %CPU value of the process displayed by the top command on Unix systems.
+
+
+[float]
+=== system.process.cpu.total.norm.pct
+
+type: scaled_float
+
+format: percent
+
+The percentage of CPU time spent by the process since the last event. This value is normalized by the number of CPU cores and it ranges from 0 to 100%.
 
 
 [float]

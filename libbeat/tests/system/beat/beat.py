@@ -239,7 +239,9 @@ class TestCase(unittest.TestCase):
                     # hit EOF
                     break
 
-                jsons.append(json.loads(line))
+                event = json.loads(line)
+                del event['@metadata']
+                jsons.append(event)
         return jsons
 
     def copy_files(self, files, source_dir="files/"):
@@ -298,6 +300,15 @@ class TestCase(unittest.TestCase):
             data = f.read()
 
         return data
+
+    def wait_log_contains(self, msg, logfile=None,
+                          max_timeout=10, poll_interval=0.1,
+                          name="log_contains"):
+        self.wait_until(
+            cond=lambda: self.log_contains(msg, logfile),
+            max_timeout=max_timeout,
+            poll_interval=poll_interval,
+            name=name)
 
     def log_contains(self, msg, logfile=None):
         """
@@ -392,7 +403,9 @@ class TestCase(unittest.TestCase):
         """
         for o in objs:
             for key in o.keys():
-                if key not in dict_fields and key not in expected_fields:
+                known = key in dict_fields or key in expected_fields
+                ismeta = key.startswith('@metadata.')
+                if not(known or ismeta):
                     raise Exception("Unexpected key '{}' found"
                                     .format(key))
 

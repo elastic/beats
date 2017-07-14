@@ -1,4 +1,5 @@
 BEAT_NAME=heartbeat
+BEAT_PACKAGE_NAME=heartbeat-elastic
 BEAT_DESCRIPTION?=Ping remote services for availability and log results to Elasticsearch or send to Logstash.
 SYSTEM_TESTS=true
 TEST_ENVIRONMENT=false
@@ -14,10 +15,9 @@ before-build:
 .PHONY: collect
 collect: fields
 
-
 # Collects all module and metricset fields
 .PHONY: fields
-fields: python-env
-	mkdir -p _meta/
-	cat ${ES_BEATS}/heartbeat/_meta/fields.common.yml > _meta/fields.generated.yml
-	cat ${ES_BEATS}/heartbeat/monitors/active/*/_meta/fields.yml >> _meta/fields.generated.yml
+fields:
+	@mkdir -p _meta/
+	@cp ${ES_BEATS}/heartbeat/_meta/fields.common.yml _meta/fields.generated.yml
+	@cat ${ES_BEATS}/heartbeat/monitors/active/*/_meta/fields.yml >> _meta/fields.generated.yml

@@ -1,42 +1,22 @@
 ###################### Metricbeat Configuration Example #######################
 
 # This file is an example configuration file highlighting only the most common
-# options. The metricbeat.full.yml file from the same directory contains all the
+# options. The metricbeat.reference.yml file from the same directory contains all the
 # supported options with more comments. You can use it as a reference.
 #
 # You can find the full configuration reference here:
 # https://www.elastic.co/guide/en/beats/metricbeat/index.html
 
 #==========================  Modules configuration ============================
-metricbeat.modules:
+metricbeat.config.modules:
+  # Glob pattern for configuration loading
+  path: ${path.config}/modules.d/*.yml
 
-#------------------------------- System Module -------------------------------
-- module: system
-  enabled: true
-  period: 10s
-  metricsets:
-    - cpu
-    - load
-    - memory
-    #- core
-    #- diskio
-    - network
-    - process_summary
-    - process
-    #- socket
-  processes: ['.*']
-  process.include_top_n:
-    by_cpu: 5      # include top 5 processes by CPU
-    by_memory: 5   # include top 5 processes by memory
-- module: system
-  enabled: true
-  period: 1m
-  metricsets:
-    - filesystem
-    - fsstat
-  filters:
-    - drop_event.when.regexp.mount_point: '^/(sys|cgroup|proc|dev|etc|host|lib)($|/)'
+  # Set to true to enable config reloading
+  reload.enabled: false
 
+  # Period on which files under path should be checked for changes
+  #reload.period: 10s
 
 #==================== Elasticsearch template setting ==========================
 setup.template.settings:
@@ -58,6 +38,31 @@ setup.template.settings:
 # output.
 #fields:
 #  env: staging
+
+
+#============================== Dashboards =====================================
+# These settings control loading the sample dashboards to the Kibana index. Loading
+# the dashboards is disabled by default and can be enabled either by setting the
+# options here, or by using the `-setup` CLI flag or the `setup` command.
+#setup.dashboards.enabled: false
+
+# The URL from where to download the dashboards archive. By default this URL
+# has a value which is computed based on the Beat name and version. For released
+# versions, this URL points to the dashboard archive on the artifacts.elastic.co
+# website.
+#setup.dashboards.url:
+
+#============================== Kibana =====================================
+
+# Starting with Beats version 6.0.0, the dashboards are loaded via the Kibana API. 
+# This requires a Kibana endpoint configuration.
+setup.kibana:
+
+  # Kibana Host
+  # Scheme and port can be left out and will be set to the default (http and 5601)
+  # In case you specify and additional path, the scheme is required: http://localhost:5601/path
+  # IPv6 addresses should always be defined as: https://[2001:db8::1]:5601
+  #host: "localhost:5601"
 
 #================================ Outputs =====================================
 

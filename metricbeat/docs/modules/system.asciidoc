@@ -86,24 +86,23 @@ in <<configuration-metricbeat>>. Here is an example configuration:
 ----
 metricbeat.modules:
 - module: system
-  enabled: true
   period: 10s
   metricsets:
     - cpu
     - load
     - memory
+    - network
+    - process
+    - process_summary
     #- core
     #- diskio
-    - network
-    - process_summary
-    - process
     #- socket
   processes: ['.*']
   process.include_top_n:
     by_cpu: 5      # include top 5 processes by CPU
     by_memory: 5   # include top 5 processes by memory
+
 - module: system
-  enabled: true
   period: 1m
   metricsets:
     - filesystem

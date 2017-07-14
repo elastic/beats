@@ -11,6 +11,9 @@ import (
 	"github.com/elastic/beats/libbeat/common"
 	"github.com/elastic/beats/libbeat/common/droppriv"
 	"github.com/elastic/beats/libbeat/logp"
+	"github.com/elastic/beats/libbeat/processors"
+	"github.com/elastic/beats/libbeat/publisher/bc/publisher"
+	pub "github.com/elastic/beats/libbeat/publisher/beat"
 	"github.com/elastic/beats/libbeat/service"
 	"github.com/tsg/gopacket/layers"
 
@@ -30,8 +33,11 @@ import (
 type packetbeat struct {
 	config      config.Config
 	cmdLineArgs flags
-	pub         *publish.PacketbeatPublisher
 	sniff       *sniffer.SnifferSetup
+
+	// publisher/pipeline
+	pipeline publisher.Publisher
+	transPub *publish.TransactionPublisher
 
 	services []interface {
 		Start()
@@ -97,16 +103,18 @@ func (pb *packetbeat) init(b *beat.Beat) error {
 		return err
 	}
 
-	// This is required as init Beat is called before the beat publisher is initialised
-	b.Config.Shipper.InitShipperConfig()
-
-	pb.pub, err = publish.NewPublisher(b.Publisher, *b.Config.Shipper.QueueSize, *b.Config.Shipper.BulkQueueSize, pb.config.IgnoreOutgoing)
+	pb.pipeline = b.Publisher
+	pb.transPub, err = publish.NewTransactionPublisher(
+		b.Publisher,
+		pb.config.IgnoreOutgoing,
+		pb.config.Interfaces.File == "",
+	)
 	if err != nil {
-		return fmt.Errorf("Initializing publisher failed: %v", err)
+		return err
 	}
 
 	logp.Debug("main", "Initializing protocol plugins")
-	err = protos.Protos.Init(false, pb.pub, cfg.Protocols, cfg.ProtocolsList)
+	err = protos.Protos.Init(false, pb.transPub, cfg.Protocols, cfg.ProtocolsList)
 	if err != nil {
 		return fmt.Errorf("Initializing protocol analyzers failed: %v", err)
 	}
@@ -127,12 +135,7 @@ func (pb *packetbeat) Run(b *beat.Beat) error {
 			time.Sleep(time.Duration(float64(protos.DefaultTransactionExpiration) * 1.2))
 			logp.Debug("main", "Streams and transactions should all be expired now.")
 		}
-
-		// TODO:
-		// pb.TransPub.Stop()
 	}()
-
-	pb.pub.Start()
 
 	// This needs to be after the sniffer Init but before the sniffer Run.
 	if err := droppriv.DropPrivileges(pb.config.RunOptions); err != nil {
@@ -151,6 +154,9 @@ func (pb *packetbeat) Run(b *beat.Beat) error {
 	wg.Add(1)
 	go func() {
 		defer wg.Done()
+
+		defer pb.transPub.Stop()
+
 		err := pb.sniff.Run()
 		if err != nil {
 			errC <- fmt.Errorf("Sniffer main loop failed: %v", err)
@@ -182,7 +188,6 @@ func (pb *packetbeat) Run(b *beat.Beat) error {
 func (pb *packetbeat) Stop() {
 	logp.Info("Packetbeat send stop signal")
 	pb.sniff.Stop()
-	pb.pub.Stop()
 }
 
 func (pb *packetbeat) setupSniffer() error {
@@ -211,7 +216,20 @@ func (pb *packetbeat) createWorker(dl layers.LinkType) (sniffer.Worker, error) {
 	config := &pb.config
 
 	if config.Flows.IsEnabled() {
-		f, err = flows.NewFlows(pb.pub, config.Flows)
+		processors, err := processors.New(config.Flows.Processors)
+		if err != nil {
+			return nil, err
+		}
+
+		client, err := pb.pipeline.ConnectX(pub.ClientConfig{
+			EventMetadata: config.Flows.EventMetadata,
+			Processor:     processors,
+		})
+		if err != nil {
+			return nil, err
+		}
+
+		f, err = flows.NewFlows(client.PublishAll, config.Flows)
 		if err != nil {
 			return nil, err
 		}
@@ -224,7 +242,12 @@ func (pb *packetbeat) createWorker(dl layers.LinkType) (sniffer.Worker, error) {
 		return nil, err
 	}
 	if cfg.Enabled() {
-		icmp, err := icmp.New(false, pb.pub, cfg)
+		reporter, err := pb.transPub.CreateReporter(cfg)
+		if err != nil {
+			return nil, err
+		}
+
+		icmp, err := icmp.New(false, reporter, cfg)
 		if err != nil {
 			return nil, err
 		}

@@ -11,7 +11,7 @@ metricset by running `make create-metricset`, default versions of these files ar
 [float]
 ==== Module Files
 
-* `config.yml` and `config.full.yml`
+* `config.yml` and `config.reference.yml`
 * `docs.asciidoc`
 * `fields.yml`
 
@@ -20,7 +20,7 @@ files are updated.
 
 
 [float]
-===== config.yml and config.full.yml
+===== config.yml and config.reference.yml
 
 The `config.yml` file contains the basic configuration options and looks like this:
 

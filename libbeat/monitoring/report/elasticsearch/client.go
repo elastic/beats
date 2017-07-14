@@ -3,29 +3,19 @@ package elasticsearch
 import (
 	"encoding/json"
 	"fmt"
-	"time"
 
 	"github.com/elastic/beats/libbeat/common"
-	"github.com/elastic/beats/libbeat/outputs"
 	esout "github.com/elastic/beats/libbeat/outputs/elasticsearch"
+	"github.com/elastic/beats/libbeat/publisher"
+	"github.com/elastic/beats/libbeat/testing"
 )
 
 type publishClient struct {
-	es         *esout.Client
-	params     map[string]string
-	windowSize int
+	es     *esout.Client
+	params map[string]string
 }
 
 var (
-	// monitoring data action
-	actMonitoringData = common.MapStr{
-		"index": common.MapStr{
-			"_index":   "_data",
-			"_type":    "beats",
-			"_routing": nil,
-		},
-	}
-
 	// monitoring beats action
 	actMonitoringBeats = common.MapStr{
 		"index": common.MapStr{
@@ -39,17 +29,15 @@ var (
 func newPublishClient(
 	es *esout.Client,
 	params map[string]string,
-	windowSize int,
 ) *publishClient {
 	p := &publishClient{
-		es:         es,
-		params:     params,
-		windowSize: windowSize,
+		es:     es,
+		params: params,
 	}
 	return p
 }
 
-func (c *publishClient) Connect(timeout time.Duration) error {
+func (c *publishClient) Connect() error {
 	debugf("Monitoring client: connect.")
 
 	params := map[string]string{
@@ -91,41 +79,23 @@ func (c *publishClient) Close() error {
 	return c.es.Close()
 }
 
-func (c *publishClient) PublishEvent(data outputs.Data) error {
-	_, err := c.PublishEvents([]outputs.Data{data})
-	return err
-}
-
-func (c *publishClient) PublishEvents(data []outputs.Data) (nextEvents []outputs.Data, err error) {
-
-	for len(data) > 0 {
-		windowSize := c.windowSize / 2 // events are send twice right now -> split default windows size in half
-		if len(data) < windowSize {
-			windowSize = len(data)
-		}
-
-		err := c.publish(data[:windowSize])
-		if err != nil {
-			return data, err
-		}
-
-		data = data[windowSize:]
-	}
-
-	return nil, nil
-}
-
-func (c *publishClient) publish(data []outputs.Data) error {
-	// TODO: add event id to reduce chance of duplicates in case of send retry
-
-	bulk := make([]interface{}, 0, 4*len(data))
-	for _, d := range data {
+func (c *publishClient) Publish(batch publisher.Batch) error {
+	events := batch.Events()
+	bulk := make([]interface{}, 0, 2*len(events))
+	for _, event := range events {
 		bulk = append(bulk,
-			actMonitoringData, d.Event,
-			actMonitoringBeats, d.Event)
+			actMonitoringBeats, event.Content,
+		)
 	}
 
 	_, err := c.es.BulkWith("_xpack", "monitoring", c.params, nil, bulk)
-	// TODO: extend error message with details from response
+	if err != nil {
+		batch.Retry()
+	}
+	batch.ACK()
 	return err
+}
+
+func (c *publishClient) Test(d testing.Driver) {
+	c.es.Test(d)
 }

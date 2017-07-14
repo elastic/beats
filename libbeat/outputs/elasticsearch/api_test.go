@@ -2,8 +2,10 @@
 package elasticsearch
 
 import (
+	"encoding/json"
 	"testing"
 
+	"github.com/elastic/beats/libbeat/logp"
 	"github.com/stretchr/testify/assert"
 )
 
@@ -133,4 +135,13 @@ func TestReadSearchResult_invalid(t *testing.T) {
 
 func newTestClient(url string) *Client {
 	return newTestClientAuth(url, "", "")
+}
+
+func (r QueryResult) String() string {
+	out, err := json.Marshal(r)
+	if err != nil {
+		logp.Warn("failed to marshal QueryResult (%v): %#v", err, r)
+		return "ERROR"
+	}
+	return string(out)
 }

@@ -35,7 +35,7 @@ type Event struct {
 	Sequence  uint32                   `json:"sequence"         yaml:"sequence"`
 	Category  AuditEventType           `json:"category"         yaml:"category"`
 	Type      auparse.AuditMessageType `json:"record_type"      yaml:"type"`
-	Result    string                   `json:"result,omitempty" yaml"result,omitempty"`
+	Result    string                   `json:"result,omitempty" yaml:"result,omitempty"`
 	Session   string                   `json:"session"          yaml:"session"`
 	Subject   Subject                  `json:"actor"            yaml:"actor"`
 	Action    string                   `json:"action,omitempty" yaml:"action,omitempty"`

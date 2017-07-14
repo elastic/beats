@@ -22,16 +22,19 @@ type Prospector struct {
 
 // NewStdin creates a new stdin prospector
 // This prospector contains one harvester which is reading from stdin
-func NewProspector(cfg *common.Config, outlet channel.Outleter) (*Prospector, error) {
+func NewProspector(cfg *common.Config, outlet channel.OutleterFactory) (*Prospector, error) {
+
+	out, err := outlet(cfg)
+	if err != nil {
+		return nil, err
+	}
 
 	p := &Prospector{
 		started:  false,
 		cfg:      cfg,
-		outlet:   outlet,
+		outlet:   out,
 		registry: harvester.NewRegistry(),
 	}
-
-	var err error
 
 	p.harvester, err = p.createHarvester(file.State{Source: "-"})
 	if err != nil {
@@ -58,14 +61,11 @@ func (p *Prospector) Run() {
 
 // createHarvester creates a new harvester instance from the given state
 func (p *Prospector) createHarvester(state file.State) (*log.Harvester, error) {
-
 	// Each harvester gets its own copy of the outlet
-	outlet := p.outlet.Copy()
 	h, err := log.NewHarvester(
 		p.cfg,
-		state,
-		nil,
-		outlet,
+		state, nil, nil,
+		p.outlet,
 	)
 
 	return h, err
@@ -76,5 +76,5 @@ func (p *Prospector) Wait() {}
 
 // Stop stops the prospector.
 func (p *Prospector) Stop() {
-
+	p.outlet.Close()
 }

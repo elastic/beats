@@ -15,6 +15,7 @@ include::../../libbeat/docs/version.asciidoc[]
 :version: {stack-version}
 :beatname_lc: heartbeat
 :beatname_uc: Heartbeat
+:beatname_pkg: heartbeat-elastic
 :security: X-Pack Security
 :dockerimage: docker.elastic.co/beats/{beatname_lc}:{version}
 
@@ -47,6 +48,7 @@ include::../../libbeat/docs/shared-config-ingest.asciidoc[]
 //points to shared topic because configuring-logstash.asciidoc is just a wrapper
 include::./configuring-logstash.asciidoc[]
 
+:standalone:
 include::../../libbeat/docs/shared-env-vars.asciidoc[]
 
 :standalone:

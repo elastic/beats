@@ -20,7 +20,6 @@ in <<configuration-metricbeat>>. Here is an example configuration:
 metricbeat.modules:
 - module: vsphere
   metricsets: ["datastore, host, virtualmachine"]
-  enabled: false
   period: 10s
   hosts: ["https://localhost/sdk"]
 

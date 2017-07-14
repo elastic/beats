@@ -5,6 +5,7 @@ import (
 	"sync"
 
 	"github.com/elastic/beats/filebeat/channel"
+	"github.com/elastic/beats/filebeat/fileset"
 	"github.com/elastic/beats/filebeat/input/file"
 	"github.com/elastic/beats/filebeat/prospector"
 	"github.com/elastic/beats/filebeat/registrar"
@@ -16,26 +17,28 @@ import (
 type Crawler struct {
 	prospectors       map[uint64]*prospector.Prospector
 	prospectorConfigs []*common.Config
-	out               channel.Outleter
+	out               channel.OutleterFactory
 	wg                sync.WaitGroup
 	reloader          *cfgfile.Reloader
 	once              bool
+	beatVersion       string
 	beatDone          chan struct{}
 }
 
-func New(out channel.Outleter, prospectorConfigs []*common.Config, beatDone chan struct{}, once bool) (*Crawler, error) {
-
+func New(out channel.OutleterFactory, prospectorConfigs []*common.Config, beatVersion string, beatDone chan struct{}, once bool) (*Crawler, error) {
 	return &Crawler{
 		out:               out,
 		prospectors:       map[uint64]*prospector.Prospector{},
 		prospectorConfigs: prospectorConfigs,
 		once:              once,
+		beatVersion:       beatVersion,
 		beatDone:          beatDone,
 	}, nil
 }
 
 // Start starts the crawler with all prospectors
-func (c *Crawler) Start(r *registrar.Registrar, configProspectors *common.Config) error {
+func (c *Crawler) Start(r *registrar.Registrar, configProspectors *common.Config,
+	configModules *common.Config, pipelineLoaderFactory fileset.PipelineLoaderFactory) error {
 
 	logp.Info("Loading Prospectors: %v", len(c.prospectorConfigs))
 
@@ -52,6 +55,16 @@ func (c *Crawler) Start(r *registrar.Registrar, configProspectors *common.Config
 
 		c.reloader = cfgfile.NewReloader(configProspectors)
 		factory := prospector.NewFactory(c.out, r, c.beatDone)
+		go func() {
+			c.reloader.Run(factory)
+		}()
+	}
+
+	if configModules.Enabled() {
+		logp.Beta("Loading separate modules is enabled.")
+
+		c.reloader = cfgfile.NewReloader(configModules)
+		factory := fileset.NewFactory(c.out, r, c.beatVersion, pipelineLoaderFactory, c.beatDone)
 		go func() {
 			c.reloader.Run(factory)
 		}()

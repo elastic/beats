@@ -61,9 +61,15 @@ class BaseTest(TestCase):
                                     stdout=outputfile,
                                     stderr=subprocess.STDOUT)
             actual_exit_code = proc.wait()
-            assert actual_exit_code == exit_code, "Expected exit code to be %d, but it was %d" % (
-                exit_code, actual_exit_code)
-            return actual_exit_code
+
+        if actual_exit_code != exit_code:
+            print("============ Log Output =====================")
+            with open(os.path.join(self.working_dir, output)) as f:
+                print(f.read())
+            print("============ Log End Output =====================")
+        assert actual_exit_code == exit_code, "Expected exit code to be %d, but it was %d" % (
+            exit_code, actual_exit_code)
+        return actual_exit_code
 
     def start_packetbeat(self,
                          cmd="../../packetbeat.test",

@@ -26,7 +26,6 @@ in <<configuration-metricbeat>>. Here is an example configuration:
 metricbeat.modules:
 - module: nginx
   metricsets: ["stubstatus"]
-  enabled: false
   period: 10s
 
   # Nginx hosts

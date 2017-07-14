@@ -8,11 +8,11 @@ import (
 	"github.com/elastic/beats/libbeat/common"
 	"github.com/elastic/beats/libbeat/logp"
 	"github.com/elastic/beats/libbeat/monitoring"
+	"github.com/elastic/beats/libbeat/publisher/beat"
 
 	"github.com/elastic/beats/packetbeat/procs"
 	"github.com/elastic/beats/packetbeat/protos"
 	"github.com/elastic/beats/packetbeat/protos/tcp"
-	"github.com/elastic/beats/packetbeat/publish"
 )
 
 type pgsqlPlugin struct {
@@ -27,7 +27,7 @@ type pgsqlPlugin struct {
 	transactions       *common.Cache
 	transactionTimeout time.Duration
 
-	results publish.Transactions
+	results protos.Reporter
 
 	// function pointer for mocking
 	handlePgsql func(pgsql *pgsqlPlugin, m *pgsqlMessage, tcp *common.TCPTuple,
@@ -122,7 +122,7 @@ func init() {
 
 func New(
 	testMode bool,
-	results publish.Transactions,
+	results protos.Reporter,
 	cfg *common.Config,
 ) (protos.Plugin, error) {
 	p := &pgsqlPlugin{}
@@ -139,7 +139,7 @@ func New(
 	return p, nil
 }
 
-func (pgsql *pgsqlPlugin) init(results publish.Transactions, config *pgsqlConfig) error {
+func (pgsql *pgsqlPlugin) init(results protos.Reporter, config *pgsqlConfig) error {
 	pgsql.setFromConfig(config)
 
 	pgsql.transactions = common.NewCache(
@@ -448,36 +448,38 @@ func (pgsql *pgsqlPlugin) publishTransaction(t *pgsqlTransaction) {
 		return
 	}
 
-	event := common.MapStr{}
+	fields := common.MapStr{}
 
-	event["type"] = "pgsql"
+	fields["type"] = "pgsql"
 	if t.pgsql["iserror"].(bool) {
-		event["status"] = common.ERROR_STATUS
+		fields["status"] = common.ERROR_STATUS
 	} else {
-		event["status"] = common.OK_STATUS
+		fields["status"] = common.OK_STATUS
 	}
-	event["responsetime"] = t.responseTime
+	fields["responsetime"] = t.responseTime
 	if pgsql.sendRequest {
-		event["request"] = t.requestRaw
+		fields["request"] = t.requestRaw
 	}
 	if pgsql.sendResponse {
-		event["response"] = t.responseRaw
+		fields["response"] = t.responseRaw
 	}
-	event["query"] = t.query
-	event["method"] = t.method
-	event["bytes_out"] = t.bytesOut
-	event["bytes_in"] = t.bytesIn
-	event["pgsql"] = t.pgsql
+	fields["query"] = t.query
+	fields["method"] = t.method
+	fields["bytes_out"] = t.bytesOut
+	fields["bytes_in"] = t.bytesIn
+	fields["pgsql"] = t.pgsql
 
-	event["@timestamp"] = common.Time(t.ts)
-	event["src"] = &t.src
-	event["dst"] = &t.dst
+	fields["src"] = &t.src
+	fields["dst"] = &t.dst
 
 	if len(t.notes) > 0 {
-		event["notes"] = t.notes
+		fields["notes"] = t.notes
 	}
 
-	pgsql.results.PublishTransaction(event)
+	pgsql.results(beat.Event{
+		Timestamp: t.ts,
+		Fields:    fields,
+	})
 }
 
 func (pgsql *pgsqlPlugin) removeTransaction(transList []*pgsqlTransaction,

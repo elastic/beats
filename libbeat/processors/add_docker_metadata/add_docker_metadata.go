@@ -7,6 +7,8 @@ import (
 	"github.com/elastic/beats/libbeat/common"
 	"github.com/elastic/beats/libbeat/logp"
 	"github.com/elastic/beats/libbeat/processors"
+	"github.com/elastic/beats/libbeat/processors/actions"
+	"github.com/elastic/beats/libbeat/publisher/beat"
 )
 
 func init() {
@@ -14,15 +16,16 @@ func init() {
 }
 
 type addDockerMetadata struct {
-	watcher Watcher
-	fields  []string
+	watcher         Watcher
+	fields          []string
+	sourceProcessor processors.Processor
 }
 
-func newDockerMetadataProcessor(cfg common.Config) (processors.Processor, error) {
+func newDockerMetadataProcessor(cfg *common.Config) (processors.Processor, error) {
 	return buildDockerMetadataProcessor(cfg, NewWatcher)
 }
 
-func buildDockerMetadataProcessor(cfg common.Config, watcherConstructor WatcherConstructor) (processors.Processor, error) {
+func buildDockerMetadataProcessor(cfg *common.Config, watcherConstructor WatcherConstructor) (processors.Processor, error) {
 	logp.Beta("The add_docker_metadata processor is beta")
 
 	config := defaultConfig()
@@ -41,14 +44,45 @@ func buildDockerMetadataProcessor(cfg common.Config, watcherConstructor WatcherC
 		return nil, err
 	}
 
+	// Use extract_field processor to get container id from source file path
+	var sourceProcessor processors.Processor
+	if config.MatchSource {
+		var procConf, _ = common.NewConfigFrom(map[string]interface{}{
+			"field":     "source",
+			"separator": "/",
+			"index":     config.SourceIndex,
+			"target":    "docker.container.id",
+		})
+		sourceProcessor, err = actions.NewExtractField(procConf)
+		if err != nil {
+			return nil, err
+		}
+
+		// Ensure `docker.container.id` is matched:
+		config.Fields = append(config.Fields, "docker.container.id")
+	}
+
 	return &addDockerMetadata{
-		watcher: watcher,
-		fields:  config.Fields,
+		watcher:         watcher,
+		fields:          config.Fields,
+		sourceProcessor: sourceProcessor,
 	}, nil
 }
 
-func (d *addDockerMetadata) Run(event common.MapStr) (common.MapStr, error) {
+func (d *addDockerMetadata) Run(event *beat.Event) (*beat.Event, error) {
 	var cid string
+	var err error
+
+	// Process source field
+	if d.sourceProcessor != nil {
+		if event.Fields["source"] != nil {
+			event, err = d.sourceProcessor.Run(event)
+			if err != nil {
+				return nil, err
+			}
+		}
+	}
+
 	for _, field := range d.fields {
 		value, err := event.GetValue(field)
 		if err != nil {
@@ -67,7 +101,7 @@ func (d *addDockerMetadata) Run(event common.MapStr) (common.MapStr, error) {
 	container := d.watcher.Container(cid)
 	if container != nil {
 		meta := common.MapStr{}
-		metaIface, ok := event["docker"]
+		metaIface, ok := event.Fields["docker"]
 		if ok {
 			meta = metaIface.(common.MapStr)
 		}
@@ -83,7 +117,7 @@ func (d *addDockerMetadata) Run(event common.MapStr) (common.MapStr, error) {
 		meta.Put("container.id", container.ID)
 		meta.Put("container.image", container.Image)
 		meta.Put("container.name", container.Name)
-		event["docker"] = meta
+		event.Fields["docker"] = meta
 	} else {
 		logp.Debug("docker", "Container not found: %s", cid)
 	}
