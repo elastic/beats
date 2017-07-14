@@ -3,13 +3,13 @@ package redis
 import (
 	"time"
 
+	rd "github.com/garyburd/redigo/redis"
+
 	"github.com/elastic/beats/filebeat/channel"
+	"github.com/elastic/beats/filebeat/harvester"
 	"github.com/elastic/beats/filebeat/input/file"
 	"github.com/elastic/beats/libbeat/common"
 	"github.com/elastic/beats/libbeat/logp"
-
-	"github.com/elastic/beats/filebeat/harvester"
-	rd "github.com/garyburd/redigo/redis"
 )
 
 // Prospector is a prospector for redis

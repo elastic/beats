@@ -4,11 +4,11 @@ package log
 
 import (
 	"testing"
-
 	"time"
 
-	"github.com/elastic/beats/filebeat/harvester"
 	"github.com/stretchr/testify/assert"
+
+	"github.com/elastic/beats/filebeat/harvester"
 )
 
 func TestCleanOlderError(t *testing.T) {

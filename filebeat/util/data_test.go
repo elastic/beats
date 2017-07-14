@@ -3,9 +3,10 @@ package util
 import (
 	"testing"
 
+	"github.com/stretchr/testify/assert"
+
 	"github.com/elastic/beats/filebeat/input/file"
 	"github.com/elastic/beats/libbeat/common"
-	"github.com/stretchr/testify/assert"
 )
 
 func TestNewData(t *testing.T) {

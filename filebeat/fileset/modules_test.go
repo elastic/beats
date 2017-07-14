@@ -8,9 +8,10 @@ import (
 	"path/filepath"
 	"testing"
 
+	"github.com/stretchr/testify/assert"
+
 	"github.com/elastic/beats/libbeat/common"
 	"github.com/elastic/beats/libbeat/paths"
-	"github.com/stretchr/testify/assert"
 )
 
 func load(t *testing.T, from interface{}) *common.Config {

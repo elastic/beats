@@ -5,9 +5,10 @@ package dbstats
 import (
 	"testing"
 
+	"github.com/stretchr/testify/assert"
+
 	mbtest "github.com/elastic/beats/metricbeat/mb/testing"
 	"github.com/elastic/beats/metricbeat/module/mongodb"
-	"github.com/stretchr/testify/assert"
 )
 
 func TestFetch(t *testing.T) {

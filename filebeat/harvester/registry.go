@@ -3,8 +3,9 @@ package harvester
 import (
 	"sync"
 
-	"github.com/elastic/beats/libbeat/logp"
 	uuid "github.com/satori/go.uuid"
+
+	"github.com/elastic/beats/libbeat/logp"
 )
 
 // Registry struct manages (start / stop) a list of harvesters

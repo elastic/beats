@@ -11,10 +11,11 @@ import (
 	"testing"
 
 	elog "github.com/andrewkroh/sys/windows/svc/eventlog"
-	"github.com/elastic/beats/libbeat/logp"
-	"github.com/elastic/beats/winlogbeat/sys/eventlogging"
 	"github.com/joeshaw/multierror"
 	"github.com/stretchr/testify/assert"
+
+	"github.com/elastic/beats/libbeat/logp"
+	"github.com/elastic/beats/winlogbeat/sys/eventlogging"
 )
 
 // Names that are registered by the test for logging events.

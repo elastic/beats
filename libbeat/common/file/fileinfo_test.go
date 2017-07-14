@@ -12,8 +12,9 @@ import (
 	"path/filepath"
 	"testing"
 
-	"github.com/elastic/beats/libbeat/common/file"
 	"github.com/stretchr/testify/assert"
+
+	"github.com/elastic/beats/libbeat/common/file"
 )
 
 func TestStat(t *testing.T) {

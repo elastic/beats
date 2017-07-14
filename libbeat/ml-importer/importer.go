@@ -6,9 +6,10 @@ import (
 	"fmt"
 	"io/ioutil"
 
+	"github.com/pkg/errors"
+
 	"github.com/elastic/beats/libbeat/common"
 	"github.com/elastic/beats/libbeat/logp"
-	"github.com/pkg/errors"
 )
 
 // MLConfig contains the required configuration for loading one job and the associated

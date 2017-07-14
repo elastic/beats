@@ -7,6 +7,8 @@ import (
 	"sync"
 	"time"
 
+	"github.com/tsg/gopacket/layers"
+
 	"github.com/elastic/beats/libbeat/beat"
 	"github.com/elastic/beats/libbeat/common"
 	"github.com/elastic/beats/libbeat/common/droppriv"
@@ -15,8 +17,6 @@ import (
 	"github.com/elastic/beats/libbeat/publisher/bc/publisher"
 	pub "github.com/elastic/beats/libbeat/publisher/beat"
 	"github.com/elastic/beats/libbeat/service"
-	"github.com/tsg/gopacket/layers"
-
 	"github.com/elastic/beats/packetbeat/config"
 	"github.com/elastic/beats/packetbeat/decoder"
 	"github.com/elastic/beats/packetbeat/flows"

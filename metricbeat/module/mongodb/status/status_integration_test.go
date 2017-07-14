@@ -5,10 +5,11 @@ package status
 import (
 	"testing"
 
+	"github.com/stretchr/testify/assert"
+
 	"github.com/elastic/beats/libbeat/common"
 	mbtest "github.com/elastic/beats/metricbeat/mb/testing"
 	"github.com/elastic/beats/metricbeat/module/mongodb"
-	"github.com/stretchr/testify/assert"
 )
 
 func TestFetch(t *testing.T) {

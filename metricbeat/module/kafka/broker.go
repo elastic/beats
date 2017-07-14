@@ -11,6 +11,7 @@ import (
 	"time"
 
 	"github.com/Shopify/sarama"
+
 	"github.com/elastic/beats/libbeat/common"
 )
 

@@ -9,10 +9,11 @@ import (
 	"unicode/utf16"
 	"unsafe"
 
-	"github.com/elastic/beats/libbeat/common"
 	"github.com/joeshaw/multierror"
 	"github.com/pkg/errors"
 	"golang.org/x/sys/windows"
+
+	"github.com/elastic/beats/libbeat/common"
 )
 
 // Windows API calls

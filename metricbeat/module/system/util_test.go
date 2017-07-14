@@ -7,8 +7,9 @@ import (
 	"runtime"
 	"testing"
 
-	"github.com/elastic/gosigar"
 	"github.com/stretchr/testify/assert"
+
+	"github.com/elastic/gosigar"
 )
 
 func TestCPUMonitorSample(t *testing.T) {
