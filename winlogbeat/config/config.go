@@ -3,8 +3,6 @@ package config
 
 import (
 	"fmt"
-	"sort"
-	"strings"
 
 	"github.com/joeshaw/multierror"
 )
@@ -40,31 +38,7 @@ var (
 // Validate validates the Settings data and returns an error describing
 // all problems or nil if there are none.
 func (s Settings) Validate() error {
-	// TODO: winlogbeat should not try to validate top-level beats config
-
-	validKeys := []string{
-		"fields", "fields_under_root", "tags", "name", "queue", "max_procs",
-		"processors", "logging", "output", "path", "winlogbeat", "dashboards",
-	}
-	sort.Strings(validKeys)
-
-	// Check for invalid top-level keys.
-	var errs multierror.Errors
-	for k := range s.Raw {
-		k = strings.ToLower(k)
-		i := sort.SearchStrings(validKeys, k)
-		if i >= len(validKeys) || validKeys[i] != k {
-			errs = append(errs, fmt.Errorf("Invalid top-level key '%s' "+
-				"found. Valid keys are %s", k, strings.Join(validKeys, ", ")))
-		}
-	}
-
-	err := s.Winlogbeat.Validate()
-	if err != nil {
-		errs = append(errs, err)
-	}
-
-	return errs.Err()
+	return s.Winlogbeat.Validate()
 }
 
 // WinlogbeatConfig contains all of Winlogbeat configuration data.
