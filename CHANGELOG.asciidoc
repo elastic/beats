@@ -30,6 +30,10 @@ https://github.com/elastic/beats/compare/v5.4.1...master[Check the HEAD diff]
 - Fix console output {pull}4045[4045]
 
 - Usage of field `_type` is now ignored and hardcoded to `doc`. {pull}3757[3757]
+- Don't stop with error loading the ES template if the ES output is not enabled. {pull}4436[4436]
+- Fix race condition in internal logging rotator. {pull}4519[4519]
+- Normalize all times to UTC to ensure proper index naming. {issue}4569[4569]
+- Fix issue with loading dashboards to ES 6.0 when .kibana index did not already exist. {issue}4659[4659]
 
 *Filebeat*
 
