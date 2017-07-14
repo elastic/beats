@@ -64,6 +64,9 @@ https://github.com/elastic/beats/compare/v6.0.0-alpha2...master[Check the HEAD d
 
 *Winlogbeat*
 
+- Removed validation of top-level config keys. This behavior was inconsistent with other Beats
+  and caused maintainability issues. {pull}4657[4657]
+
 ==== Added
 
 *Affecting all Beats*
