@@ -27,7 +27,7 @@ The following topics describe how to configure Metricbeat:
 * <<regexp-support>>
 
 [float]
-== Basic Configuration
+== Basic configuration
 
 A Metricbeat configuration contains a list of modules. Each module contains the following config options:
 

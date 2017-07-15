@@ -61,7 +61,7 @@ collect-docs: python-env
 	@rm -rf docs/modules
 	@mkdir -p docs/modules
 	@go run scripts/generate_config.go -os linux
-	@${PYTHON_ENV}/bin/python ${ES_BEATS}/metricbeat/scripts/docs_collector.py --beat ${BEAT_NAME}
+	@${PYTHON_ENV}/bin/python ${ES_BEATS}/auditbeat/scripts/docs_collector.py --beat ${BEAT_NAME}
 
 # Collects all module dashboards
 .PHONY: kibana

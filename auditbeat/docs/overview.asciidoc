@@ -1,0 +1,15 @@
+[[auditbeat-overview]]
+== Auditbeat overview
+
+++++
+<titleabbrev>Overview</titleabbrev>
+++++
+
+{beatname_uc} is a lightweight shipper that you can install on your servers to
+periodically collect security-relevant information from the operating system
+and services running on the server. For example, you can use {beatname_uc} to
+collect and centralize audit events from the Linux Audit Framework. You can also
+use {beatname_uc} to detect and monitor changes to critical files, like binaries
+and configuration files, and identify potential security policy violations.
+
+//TODO: Need to flesh out this description.
