@@ -41,19 +41,16 @@ func NewImporter(version string, cfg *Config, loader Loader) (*Importer, error) 
 
 // Import imports the Kibana dashboards according to the configuration options.
 func (imp Importer) Import() error {
-	if imp.cfg.Dir != "" {
+
+	if imp.cfg.URL != "" || imp.cfg.File != "" {
+		err := imp.ImportArchive()
+		if err != nil {
+			return fmt.Errorf("Error importing URL/file: %v", err)
+		}
+	} else {
 		err := imp.ImportKibanaDir(imp.cfg.Dir)
 		if err != nil {
 			return fmt.Errorf("Error importing directory %s: %v", imp.cfg.Dir, err)
-		}
-	} else {
-		if imp.cfg.URL != "" || imp.cfg.Snapshot || imp.cfg.File != "" {
-			err := imp.ImportArchive()
-			if err != nil {
-				return fmt.Errorf("Error importing URL/file: %v", err)
-			}
-		} else {
-			return fmt.Errorf("No URL and no file specify. Nothing to import")
 		}
 	}
 	return nil
@@ -161,13 +158,6 @@ func (imp Importer) ImportArchive() error {
 	imp.loader.statusMsg("Created temporary directory %s", target)
 	if imp.cfg.File != "" {
 		archive = imp.cfg.File
-	} else if imp.cfg.Snapshot {
-		// In case snapshot is set, snapshot version is fetched
-		url := imp.cfg.SnapshotURL
-		archive, err = imp.downloadFile(url, target)
-		if err != nil {
-			return fmt.Errorf("Failed to download snapshot file: %s. Error: %v", url, err)
-		}
 	} else if imp.cfg.URL != "" {
 		archive, err = imp.downloadFile(imp.cfg.URL, target)
 		if err != nil {
