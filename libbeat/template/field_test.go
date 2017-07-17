@@ -9,7 +9,7 @@ import (
 
 func TestField(t *testing.T) {
 
-	esVersion2, err := NewVersion("2.0.0")
+	esVersion2, err := common.NewVersion("2.0.0")
 	assert.NoError(t, err)
 
 	falseVar := false

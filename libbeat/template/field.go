@@ -25,7 +25,7 @@ type Field struct {
 	Norms          bool   `config:"norms"`
 
 	path      string
-	esVersion Version
+	esVersion common.Version
 }
 
 // This includes all entries without special handling for different versions.

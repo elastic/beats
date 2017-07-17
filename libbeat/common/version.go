@@ -1,4 +1,4 @@
-package template
+package common
 
 import (
 	"fmt"
@@ -8,10 +8,10 @@ import (
 
 type Version struct {
 	version string
-	major   int
-	minor   int
-	bugfix  int
-	meta    string
+	Major   int
+	Minor   int
+	Bugfix  int
+	Meta    string
 }
 
 // NewVersion expects a string in the format:
@@ -26,7 +26,7 @@ func NewVersion(version string) (*Version, error) {
 	if strings.Contains(version, "-") {
 		tmp := strings.Split(version, "-")
 		version = tmp[0]
-		v.meta = tmp[1]
+		v.Meta = tmp[1]
 	}
 
 	versions := strings.Split(version, ".")
@@ -35,17 +35,17 @@ func NewVersion(version string) (*Version, error) {
 	}
 
 	var err error
-	v.major, err = strconv.Atoi(versions[0])
+	v.Major, err = strconv.Atoi(versions[0])
 	if err != nil {
 		return nil, fmt.Errorf("Could not convert major to integer: %s", versions[0])
 	}
 
-	v.minor, err = strconv.Atoi(versions[1])
+	v.Minor, err = strconv.Atoi(versions[1])
 	if err != nil {
 		return nil, fmt.Errorf("Could not convert minor to integer: %s", versions[1])
 	}
 
-	v.bugfix, err = strconv.Atoi(versions[2])
+	v.Bugfix, err = strconv.Atoi(versions[2])
 	if err != nil {
 		return nil, fmt.Errorf("Could not convert bugfix to integer: %s", versions[2])
 	}
@@ -54,7 +54,24 @@ func NewVersion(version string) (*Version, error) {
 }
 
 func (v *Version) IsMajor(major int) bool {
-	return major == v.major
+	return major == v.Major
+}
+
+// LessThan returns true if v is strictly smaller than v1. When comparing, the major,
+// minor and bugfix numbers are compared in order. The meta part is not taken into account.
+func (v *Version) LessThan(v1 *Version) bool {
+	if v.Major < v1.Major {
+		return true
+	} else if v.Major == v1.Major {
+		if v.Minor < v1.Minor {
+			return true
+		} else if v.Minor == v1.Minor {
+			if v.Bugfix < v1.Bugfix {
+				return true
+			}
+		}
+	}
+	return false
 }
 
 func (v *Version) String() string {
