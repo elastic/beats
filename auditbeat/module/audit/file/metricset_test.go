@@ -98,25 +98,20 @@ func TestEventReader(t *testing.T) {
 			t.Fatal(err)
 		}
 
-		if runtime.GOOS == "windows" {
-			updated := readTimeout(t, events)
-			assert.Equal(t, Updated.String(), updated.Action)
+		received := readMax(t, 3, events)
+		if len(received) == 0 {
+			t.Fatal("no events received")
 		}
-
-		// The order isn't guaranteed.
-		created := readTimeout(t, events)
-		moved := readTimeout(t, events)
-		if created.Action != Created.String() {
-			tmp := moved
-			moved = created
-			created = tmp
+		for _, e := range received {
+			switch e.Action {
+			case "moved", "updated":
+				assert.Equal(t, txt1, e.Path)
+			case "created":
+				assertSameFile(t, txt2, e.Path)
+			default:
+				t.Errorf("unexpected event: %+v", e)
+			}
 		}
-
-		assert.Equal(t, Moved.String(), moved.Action)
-		assert.Equal(t, txt1, moved.Path)
-
-		assert.Equal(t, Created.String(), created.Action)
-		assertSameFile(t, txt2, created.Path)
 	})
 
 	// Chmod the file.
@@ -239,17 +234,41 @@ func TestEventReader(t *testing.T) {
 // not receive an event after one second it will time-out and fail the test.
 func readTimeout(t testing.TB, events <-chan Event) Event {
 	select {
+	case <-time.After(time.Second):
+		t.Fatalf("%+v", errors.Errorf("timed-out waiting for event"))
 	case e, ok := <-events:
 		if !ok {
 			t.Fatal("failed reading from event channel")
 		}
 		t.Logf("%+v", buildMapStr(&e).StringToPrint())
 		return e
-	case <-time.After(time.Second):
-		t.Fatalf("%+v", errors.Errorf("timed-out waiting for event"))
 	}
 
 	return Event{}
+}
+
+// readMax reads events from the channel over a period of one second and returns
+// the events. If the max number of events is received it returns early.
+func readMax(t testing.TB, max int, events <-chan Event) []Event {
+	timer := time.NewTimer(time.Second)
+	defer timer.Stop()
+
+	var received []Event
+	for {
+		select {
+		case <-timer.C:
+			return received
+		case e, ok := <-events:
+			if !ok {
+				t.Fatal("failed reading from event channel")
+			}
+			t.Logf("%+v", buildMapStr(&e).StringToPrint())
+			received = append(received, e)
+			if len(received) >= max {
+				return received
+			}
+		}
+	}
 }
 
 // assertNoEvent asserts that no event is received on the channel. It waits for
