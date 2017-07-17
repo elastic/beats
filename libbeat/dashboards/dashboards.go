@@ -2,6 +2,7 @@ package dashboards
 
 import (
 	"fmt"
+	"path/filepath"
 	"strconv"
 	"strings"
 
@@ -9,7 +10,7 @@ import (
 	"github.com/elastic/beats/libbeat/logp"
 )
 
-func ImportDashboards(beatName, beatVersion string, kibanaConfig *common.Config, esConfig *common.Config,
+func ImportDashboards(beatName, beatVersion, homePath string, kibanaConfig *common.Config, esConfig *common.Config,
 	dashboardsConfig *common.Config) error {
 	if dashboardsConfig == nil || !dashboardsConfig.Enabled() {
 		return nil
@@ -17,8 +18,9 @@ func ImportDashboards(beatName, beatVersion string, kibanaConfig *common.Config,
 
 	dashConfig := defaultConfig
 	dashConfig.Beat = beatName
-	dashConfig.URL = fmt.Sprintf(defaultURLPattern, beatVersion)
-	dashConfig.SnapshotURL = fmt.Sprintf(snapshotURLPattern, beatVersion)
+	if dashConfig.Dir == "" {
+		dashConfig.Dir = filepath.Join(homePath, defaultDirectory)
+	}
 
 	err := dashboardsConfig.Unpack(&dashConfig)
 	if err != nil {

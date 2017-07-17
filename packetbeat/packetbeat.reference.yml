@@ -1028,26 +1028,17 @@ output.elasticsearch:
 # options here, or by using the `-setup` CLI flag or the `setup` command.
 #setup.dashboards.enabled: false
 
-# The URL from where to download the dashboards archive. By default this URL
-# has a value which is computed based on the Beat name and version. For released
-# versions, this URL points to the dashboard archive on the artifacts.elastic.co
-# website.
+# The directory from where to read the dashboards. The default is the `kibana`
+# folder in the home path.
+#setup.dashboards.directory: ${path.home}/kibana
+
+# The URL from where to download the dashboards archive. It is used instead of
+# the directory if it has a value.
 #setup.dashboards.url:
 
-# The directory from where to read the dashboards. It is used instead of the URL
-# when it has a value.
-#setup.dashboards.directory:
-
 # The file archive (zip file) from where to read the dashboards. It is used instead
-# of the URL when it has a value.
+# of the directory when it has a value.
 #setup.dashboards.file:
-
-# If this option is enabled, the snapshot URL is used instead of the default URL.
-#setup.dashboards.snapshot: false
-
-# The URL from where to download the snapshot version of the dashboards. By default
-# this has a value which is computed based on the Beat name and version.
-#setup.dashboards.snapshot_url
 
 # In case the archive contains the dashboards from multiple Beats, this lets you
 # select which one to load. You can load all the dashboards in the archive by

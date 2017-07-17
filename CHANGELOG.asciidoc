@@ -20,6 +20,8 @@ https://github.com/elastic/beats/compare/v6.0.0-alpha2...master[Check the HEAD d
 - Change format of the saved kibana dashboards to have a single JSON file for each dashboard {pull}4413[4413]
 - Rename `configtest` command to `test config`. {pull}4590[4590]
 - Remove setting `queue_size` and `bulk_queue_size`. {pull}4650[4650]
+- Remove setting `dashboard.snapshot` and `dashboard.snapshot_url`. They are no longer needed because the
+  dashboards are included in the packages by default. {pull}4675[4675]
 
 *Filebeat*
 
@@ -79,6 +81,7 @@ https://github.com/elastic/beats/compare/v6.0.0-alpha2...master[Check the HEAD d
 - Introduce configurable event queue settings: queue.mem.events, queue.mem.flush.min_events and queue.mem.flush.timeout. {pull}4650[4650]
 - Enable pipelining in Logstash output by default. {pull}4650[4650]
 - Added 'result' field to Elasticsearch QueryResult struct for compatibility with 6.x Index and Delete API responses. {issue]4661[4661]
+- The sample dashboards are now included in the Beats packages. {pull}4675[4675]
 
 *Filebeat*
 

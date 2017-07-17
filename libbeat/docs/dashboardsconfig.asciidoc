@@ -43,49 +43,32 @@ You can specify the following options in the `dashboards` section of the
 ===== enabled
 
 If this option is set to true, {beatname_uc} loads the sample Kibana dashboards
-automatically on startup. If no other options are set, the dashboard archive is
-downloaded from the elastic.co website.
+automatically on startup. If no other options are set, the dashboard are loaded
+from the local `kibana` directory in the home path of the installation.
 
-To load dashboards from a different location, you can
-configure one of the following options: <<url-option,`url`>>,
-<<directory-option,`directory`>>, or <<file-option,`file`>>.
-
-To load dashboards from a snapshot URL, use the <<snapshot-option,`snapshot`>>
-option and optionally <<snapshot-url-option,`snapshot-url`>>.
-
-[[url-option]]
-===== url
-
-The URL to use for downloading the dashboard archive. By default this URL
-is computed based on the Beat name and version. For released versions,
-this URL points to the dashboard archive on the artifacts.elastic.co
-website.
+To load dashboards from a different location, you can configure one of the
+following options: <<url-option,`url`>>, or <<file-option,`file`>>.
 
 [[directory-option]]
 ===== directory
 
-The directory that contains the dashboards to load. If this option is set,
-{beatname_uc} looks for dashboards in the specified directory instead of
-downloading an archive from a URL. 
+The directory that contains the dashboards to load. The default is the `kibana`
+folder in the home path.
+
+[[url-option]]
+===== url
+
+The URL to use for downloading the dashboard archive. If this option
+is set, {beatname_uc} downloads the dashboard archive from the specified URL
+instead of using the local directory.
+
 
 [[file-option]]
 ===== file
 
 The file archive (zip file) that contains the dashboards to load. If this option
 is set, {beatname_uc} looks for a dashboard archive in the specified path
-instead of downloading the archive from a URL. 
-
-[[snapshot-option]]
-===== snapshot
-
-If this option is set to true, the snapshot URL is used instead of the default
-URL.
-
-[[snapshot-url-option]]
-===== snapshot_url
-
-The URL to use for downloading the snapshot version of the dashboards. By
-default the snapshot URL is computed based on the Beat name and version.
+instead of using the local directory.
 
 ===== beat
 

@@ -356,6 +356,10 @@ install-home:
 		rsync -av _meta/module.generated/ ${HOME_PREFIX}/module/; \
 		chmod -R go-w ${HOME_PREFIX}/module/; \
 	fi
+	if [ -d _meta/kibana ]; then \
+		install -d -m 755 ${HOME_PREFIX}/kibana; \
+		rsync -av _meta/kibana/ ${HOME_PREFIX}/kibana/; \
+	fi
 
 # Prepares for packaging. Builds binaries and creates homedir data
 .PHONY: prepare-package
