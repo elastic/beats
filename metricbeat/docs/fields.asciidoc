@@ -10332,6 +10332,11 @@ format: bytes
 Free Memory of Guest in bytes
 
 
+[float]
+=== vsphere.virtualmachine.custom_fields
+
+type: object
+
 [[exported-fields-windows]]
 == Windows Fields
 
