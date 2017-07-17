@@ -121,7 +121,6 @@ class TestCommands(metricbeat.BaseTest):
 
         assert exit_code == 0
         assert self.log_contains("cpu...OK")
-        assert self.log_contains("load...OK")
         assert self.log_contains("memory...OK")
 
     def test_modules_test_error(self):
@@ -137,7 +136,6 @@ class TestCommands(metricbeat.BaseTest):
         assert exit_code == 0
         assert self.log_contains("ERROR error making http request")
         assert self.log_contains("cpu...OK")
-        assert self.log_contains("load...OK")
         assert self.log_contains("memory...OK")
 
     def test_modules_test_filter_no_result(self):
@@ -164,7 +162,6 @@ class TestCommands(metricbeat.BaseTest):
 
         assert exit_code == 0
         assert self.log_contains("cpu...OK")
-        assert not self.log_contains("load...OK")
         assert not self.log_contains("memory...OK")
 
     def touch(self, path):
@@ -177,7 +174,6 @@ class TestCommands(metricbeat.BaseTest):
   period: 10s
   metricsets:
     - cpu
-    - load
     - memory""")
 
     def write_nginx_yml(self):
