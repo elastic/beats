@@ -1,0 +1,118 @@
+{
+  "objects": [
+    {
+      "attributes": {
+        "description": "",
+        "kibanaSavedObjectMeta": {
+          "searchSourceJSON": "{\"filter\":[]}"
+        },
+        "savedSearchId": "DNS",
+        "title": "DNS Count and Response Time",
+        "uiStateJSON": "{}",
+        "version": 1,
+        "visState": "{\"title\":\"DNS Count and Response Time\",\"type\":\"histogram\",\"params\":{\"shareYAxis\":true,\"addTooltip\":true,\"addLegend\":true,\"scale\":\"linear\",\"mode\":\"stacked\",\"times\":[],\"addTimeMarker\":false,\"defaultYExtents\":false,\"setYExtents\":false,\"yAxis\":{},\"legendPosition\":\"right\"},\"aggs\":[{\"id\":\"1\",\"enabled\":true,\"type\":\"count\",\"schema\":\"metric\",\"params\":{}},{\"id\":\"2\",\"enabled\":true,\"type\":\"date_histogram\",\"schema\":\"segment\",\"params\":{\"field\":\"@timestamp\",\"interval\":\"auto\",\"customInterval\":\"2h\",\"min_doc_count\":1,\"extended_bounds\":{}}},{\"id\":\"3\",\"enabled\":true,\"type\":\"histogram\",\"schema\":\"group\",\"params\":{\"field\":\"responsetime\",\"interval\":50,\"min_doc_count\":false,\"extended_bounds\":{}}}],\"listeners\":{}}"
+      },
+      "id": "DNS-Count-and-Response-Time",
+      "type": "visualization",
+      "version": 2
+    },
+    {
+      "attributes": {
+        "description": "",
+        "kibanaSavedObjectMeta": {
+          "searchSourceJSON": "{\"filter\":[]}"
+        },
+        "savedSearchId": "DNS",
+        "title": "DNS Query Summary",
+        "uiStateJSON": "{}",
+        "version": 1,
+        "visState": "{\"title\":\"DNS Query Summary\",\"type\":\"metric\",\"params\":{\"fontSize\":\"17\",\"handleNoResults\":true},\"aggs\":[{\"id\":\"1\",\"enabled\":true,\"type\":\"count\",\"schema\":\"metric\",\"params\":{}},{\"id\":\"2\",\"enabled\":true,\"type\":\"sum\",\"schema\":\"metric\",\"params\":{\"field\":\"bytes_in\",\"customLabel\":\"Bytes In\"}},{\"id\":\"3\",\"enabled\":true,\"type\":\"sum\",\"schema\":\"metric\",\"params\":{\"field\":\"bytes_out\",\"customLabel\":\"Bytes Out\"}},{\"id\":\"4\",\"enabled\":true,\"type\":\"avg\",\"schema\":\"metric\",\"params\":{\"field\":\"responsetime\",\"customLabel\":\"Avg Response Time (ms)\"}}],\"listeners\":{}}"
+      },
+      "id": "DNS-Query-Summary",
+      "type": "visualization",
+      "version": 2
+    },
+    {
+      "attributes": {
+        "description": "",
+        "kibanaSavedObjectMeta": {
+          "searchSourceJSON": "{\"index\":\"packetbeat-*\",\"query\":{\"query_string\":{\"query\":\"*\",\"analyze_wildcard\":true}},\"filter\":[]}"
+        },
+        "title": "DNS Question Types",
+        "uiStateJSON": "{}",
+        "version": 1,
+        "visState": "{\"title\":\"DNS Question Types\",\"type\":\"pie\",\"params\":{\"shareYAxis\":true,\"addTooltip\":true,\"addLegend\":true,\"legendPosition\":\"right\",\"isDonut\":false},\"aggs\":[{\"id\":\"1\",\"enabled\":true,\"type\":\"count\",\"schema\":\"metric\",\"params\":{}},{\"id\":\"2\",\"enabled\":true,\"type\":\"terms\",\"schema\":\"segment\",\"params\":{\"field\":\"dns.question.type\",\"size\":5,\"order\":\"desc\",\"orderBy\":\"1\"}}],\"listeners\":{}}"
+      },
+      "id": "DNS-Question-Types",
+      "type": "visualization",
+      "version": 2
+    },
+    {
+      "attributes": {
+        "description": "",
+        "kibanaSavedObjectMeta": {
+          "searchSourceJSON": "{\"index\":\"packetbeat-*\",\"query\":{\"query_string\":{\"analyze_wildcard\":true,\"query\":\"type: dns\"}},\"filter\":[]}"
+        },
+        "title": "DNS Request Status Over Time",
+        "uiStateJSON": "{\"vis\":{\"colors\":{\"Error\":\"#890F02\",\"OK\":\"#0A50A1\"}}}",
+        "version": 1,
+        "visState": "{\"title\":\"DNS Request Status Over Time\",\"type\":\"area\",\"params\":{\"addLegend\":true,\"addTimeMarker\":false,\"addTooltip\":true,\"defaultYExtents\":false,\"interpolate\":\"linear\",\"mode\":\"stacked\",\"scale\":\"linear\",\"setYExtents\":false,\"shareYAxis\":true,\"smoothLines\":false,\"times\":[],\"yAxis\":{},\"legendPosition\":\"right\"},\"aggs\":[{\"id\":\"1\",\"enabled\":true,\"type\":\"count\",\"schema\":\"metric\",\"params\":{}},{\"id\":\"2\",\"enabled\":true,\"type\":\"date_histogram\",\"schema\":\"segment\",\"params\":{\"field\":\"@timestamp\",\"interval\":\"auto\",\"customInterval\":\"2h\",\"min_doc_count\":1,\"extended_bounds\":{}}},{\"id\":\"3\",\"enabled\":true,\"type\":\"terms\",\"schema\":\"group\",\"params\":{\"field\":\"status\",\"size\":5,\"order\":\"desc\",\"orderBy\":\"1\"}}],\"listeners\":{}}"
+      },
+      "id": "DNS-Request-Status-Over-Time",
+      "type": "visualization",
+      "version": 2
+    },
+    {
+      "attributes": {
+        "description": "",
+        "kibanaSavedObjectMeta": {
+          "searchSourceJSON": "{\"filter\":[],\"index\":\"packetbeat-*\",\"query\":{\"query_string\":{\"query\":\"type: dns AND status: OK\",\"analyze_wildcard\":true}},\"highlight\":{\"pre_tags\":[\"@kibana-highlighted-field@\"],\"post_tags\":[\"@/kibana-highlighted-field@\"],\"fields\":{\"*\":{}},\"require_field_match\":false,\"fragment_size\":2147483647}}"
+        },
+        "title": "DNS Top 10 Questions",
+        "uiStateJSON": "{\"vis\":{\"params\":{\"sort\":{\"columnIndex\":null,\"direction\":null}}}}",
+        "version": 1,
+        "visState": "{\"title\":\"DNS Top 10 Questions\",\"type\":\"table\",\"params\":{\"perPage\":10,\"showPartialRows\":false,\"showMeticsAtAllLevels\":false,\"sort\":{\"columnIndex\":null,\"direction\":null},\"showTotal\":false,\"totalFunc\":\"sum\"},\"aggs\":[{\"id\":\"1\",\"enabled\":true,\"type\":\"count\",\"schema\":\"metric\",\"params\":{}},{\"id\":\"2\",\"enabled\":true,\"type\":\"terms\",\"schema\":\"bucket\",\"params\":{\"field\":\"dns.question.name\",\"size\":30,\"order\":\"desc\",\"orderBy\":\"1\",\"customLabel\":\"Question\"}}],\"listeners\":{}}"
+      },
+      "id": "DNS-Top-10-Questions",
+      "type": "visualization",
+      "version": 2
+    },
+    {
+      "attributes": {
+        "description": "",
+        "kibanaSavedObjectMeta": {
+          "searchSourceJSON": "{\"filter\":[],\"index\":\"packetbeat-*\",\"query\":{\"query_string\":{\"query\":\"type: dns\",\"analyze_wildcard\":true}},\"highlight\":{\"pre_tags\":[\"@kibana-highlighted-field@\"],\"post_tags\":[\"@/kibana-highlighted-field@\"],\"fields\":{\"*\":{}},\"require_field_match\":false,\"fragment_size\":2147483647}}"
+        },
+        "title": "DNS Response Codes",
+        "uiStateJSON": "{\"vis\":{\"params\":{\"sort\":{\"columnIndex\":null,\"direction\":null}}}}",
+        "version": 1,
+        "visState": "{\"title\":\"DNS Response Codes\",\"type\":\"table\",\"params\":{\"perPage\":10,\"showMeticsAtAllLevels\":false,\"showPartialRows\":false,\"sort\":{\"columnIndex\":null,\"direction\":null},\"showTotal\":false,\"totalFunc\":\"sum\"},\"aggs\":[{\"id\":\"1\",\"enabled\":true,\"type\":\"count\",\"schema\":\"metric\",\"params\":{}},{\"id\":\"2\",\"enabled\":true,\"type\":\"terms\",\"schema\":\"bucket\",\"params\":{\"field\":\"dns.response_code\",\"size\":5,\"order\":\"desc\",\"orderBy\":\"1\",\"customLabel\":\"Response Code\"}}],\"listeners\":{}}"
+      },
+      "id": "DNS-Response-Codes",
+      "type": "visualization",
+      "version": 2
+    },
+    {
+      "attributes": {
+        "columns": [
+          "_source"
+        ],
+        "description": "",
+        "hits": 0,
+        "kibanaSavedObjectMeta": {
+          "searchSourceJSON": "{\"index\":\"packetbeat-*\",\"query\":{\"query_string\":{\"query\":\"type: dns\",\"analyze_wildcard\":true}},\"filter\":[],\"highlight\":{\"pre_tags\":[\"@kibana-highlighted-field@\"],\"post_tags\":[\"@/kibana-highlighted-field@\"],\"fields\":{\"*\":{}},\"require_field_match\":false,\"fragment_size\":2147483647}}"
+        },
+        "sort": [
+          "@timestamp",
+          "desc"
+        ],
+        "title": "DNS",
+        "version": 1
+      },
+      "id": "DNS",
+      "type": "search",
+      "version": 10
+    }
+  ],
+  "version": "6.0.0-alpha3-SNAPSHOT"
+}

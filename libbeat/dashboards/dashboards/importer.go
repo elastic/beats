@@ -2,7 +2,6 @@ package dashboards
 
 import (
 	"archive/zip"
-	"encoding/json"
 	"errors"
 	"fmt"
 	"io"
@@ -12,9 +11,6 @@ import (
 	"path"
 	"path/filepath"
 	"strings"
-
-	"github.com/elastic/beats/libbeat/common"
-	"github.com/elastic/beats/libbeat/logp"
 )
 
 // MessageOutputter is a function type for injecting status logging
@@ -22,43 +18,37 @@ import (
 type MessageOutputter func(msg string, a ...interface{})
 
 type Importer struct {
-	cfg          *DashboardsConfig
-	client       DashboardLoader
-	msgOutputter *MessageOutputter
+	cfg     *Config
+	version string
+
+	loader Loader
 }
 
-func NewImporter(cfg *DashboardsConfig, client DashboardLoader, msgOutputter *MessageOutputter) (*Importer, error) {
+type Loader interface {
+	ImportIndex(file string) error
+	ImportDashboard(file string) error
+	statusMsg(msg string, a ...interface{})
+	Close() error
+}
+
+func NewImporter(version string, cfg *Config, loader Loader) (*Importer, error) {
 	return &Importer{
-		cfg:          cfg,
-		client:       client,
-		msgOutputter: msgOutputter,
+		cfg:     cfg,
+		version: version,
+		loader:  loader,
 	}, nil
-}
-
-func (imp Importer) statusMsg(msg string, a ...interface{}) {
-	if imp.msgOutputter != nil {
-		(*imp.msgOutputter)(msg, a...)
-	} else {
-		logp.Debug("dashboards", msg, a...)
-	}
 }
 
 // Import imports the Kibana dashboards according to the configuration options.
 func (imp Importer) Import() error {
-
-	err := imp.CreateKibanaIndex()
-	if err != nil {
-		return fmt.Errorf("Error creating Kibana index: %v", err)
-	}
-
 	if imp.cfg.Dir != "" {
-		err = imp.ImportKibana(imp.cfg.Dir)
+		err := imp.ImportKibanaDir(imp.cfg.Dir)
 		if err != nil {
 			return fmt.Errorf("Error importing directory %s: %v", imp.cfg.Dir, err)
 		}
 	} else {
 		if imp.cfg.URL != "" || imp.cfg.Snapshot || imp.cfg.File != "" {
-			err = imp.ImportArchive()
+			err := imp.ImportArchive()
 			if err != nil {
 				return fmt.Errorf("Error importing URL/file: %v", err)
 			}
@@ -69,276 +59,38 @@ func (imp Importer) Import() error {
 	return nil
 }
 
-// CreateKibanaIndex creates the kibana index if it doesn't exists and sets
-// some index properties which are needed as a workaround for:
-// https://github.com/elastic/beats-dashboards/issues/94
-func (imp Importer) CreateKibanaIndex() error {
-	imp.client.CreateIndex(imp.cfg.KibanaIndex,
-		common.MapStr{
-			"settings": common.MapStr{
-				"index.mapping.single_type": false,
-			},
-		})
-	_, _, err := imp.client.CreateIndex(imp.cfg.KibanaIndex+"/_mapping/search",
-		common.MapStr{
-			"search": common.MapStr{
-				"properties": common.MapStr{
-					"hits": common.MapStr{
-						"type": "integer",
-					},
-					"version": common.MapStr{
-						"type": "integer",
-					},
-				},
-			},
-		})
-	if err != nil {
-		imp.statusMsg("Failed to set the mapping: %v", err)
-	}
-	return nil
-}
-
-func (imp Importer) ImportJSONFile(fileType string, file string) error {
-
-	path := "/" + imp.cfg.KibanaIndex + "/" + fileType
-
-	reader, err := ioutil.ReadFile(file)
-	if err != nil {
-		return fmt.Errorf("Failed to read %s. Error: %s", file, err)
-	}
-	var jsonContent map[string]interface{}
-	json.Unmarshal(reader, &jsonContent)
-	fileBase := strings.TrimSuffix(filepath.Base(file), filepath.Ext(file))
-
-	body, err := imp.client.LoadJSON(path+"/"+fileBase, jsonContent)
-	if err != nil {
-		return fmt.Errorf("Failed to load %s under %s/%s: %s. Response body: %s", file, path, fileBase, err, body)
-	}
-
-	return nil
-}
-
 func (imp Importer) ImportDashboard(file string) error {
+	imp.loader.statusMsg("Import dashboard %s", file)
 
-	imp.statusMsg("Import dashboard %s", file)
-
-	/* load dashboard */
-	err := imp.ImportJSONFile("dashboard", file)
-	if err != nil {
-		return err
-	}
-
-	/* load the visualizations and searches that depend on the dashboard */
-	err = imp.importPanelsFromDashboard(file)
-	if err != nil {
-		return err
-	}
-
-	return nil
-}
-
-func (imp Importer) importPanelsFromDashboard(file string) (err error) {
-
-	// directory with the dashboards
-	dir := filepath.Dir(file)
-
-	// main directory with dashboard, search, visualizations directories
-	mainDir := filepath.Dir(dir)
-
-	reader, err := ioutil.ReadFile(file)
-	if err != nil {
-		return
-	}
-	type record struct {
-		Title      string `json:"title"`
-		PanelsJSON string `json:"panelsJSON"`
-	}
-	type panel struct {
-		ID   string `json:"id"`
-		Type string `json:"type"`
-	}
-
-	var jsonContent record
-	json.Unmarshal(reader, &jsonContent)
-
-	var widgets []panel
-	json.Unmarshal([]byte(jsonContent.PanelsJSON), &widgets)
-
-	for _, widget := range widgets {
-
-		if widget.Type == "visualization" {
-			err = imp.ImportVisualization(path.Join(mainDir, "visualization", widget.ID+".json"))
-			if err != nil {
-				return err
-			}
-		} else if widget.Type == "search" {
-			err = imp.ImportSearch(path.Join(mainDir, "search", widget.ID+".json"))
-			if err != nil {
-				return err
-			}
-		} else {
-			imp.statusMsg("Widgets: %v", widgets)
-			return fmt.Errorf("Unknown panel type %s in %s", widget.Type, file)
-		}
-	}
-	return
-}
-
-func (imp Importer) importSearchFromVisualization(file string) error {
-	type record struct {
-		Title         string `json:"title"`
-		SavedSearchID string `json:"savedSearchId"`
-	}
-
-	reader, err := ioutil.ReadFile(file)
-	if err != nil {
-		return nil
-	}
-
-	var jsonContent record
-	json.Unmarshal(reader, &jsonContent)
-	id := jsonContent.SavedSearchID
-	if len(id) == 0 {
-		// no search used
-		return nil
-	}
-
-	// directory with the visualizations
-	dir := filepath.Dir(file)
-
-	// main directory
-	mainDir := filepath.Dir(dir)
-
-	searchFile := path.Join(mainDir, "search", id+".json")
-
-	if searchFile != "" {
-		// visualization depends on search
-		if err := imp.ImportSearch(searchFile); err != nil {
-			return err
-		}
-	}
-	return nil
-}
-
-func (imp Importer) ImportVisualization(file string) error {
-
-	imp.statusMsg("Import visualization %s", file)
-	if err := imp.ImportJSONFile("visualization", file); err != nil {
-		return err
-	}
-
-	err := imp.importSearchFromVisualization(file)
-	if err != nil {
-		return err
-	}
-	return nil
-}
-
-func (imp Importer) ImportSearch(file string) error {
-
-	reader, err := ioutil.ReadFile(file)
-	if err != nil {
-		return err
-	}
-	searchName := strings.TrimSuffix(filepath.Base(file), filepath.Ext(file))
-
-	var searchContent common.MapStr
-	err = json.Unmarshal(reader, &searchContent)
-	if err != nil {
-		return fmt.Errorf("Failed to unmarshal search content %s: %v", searchName, err)
-	}
-
-	if imp.cfg.Index != "" {
-
-		// change index pattern name
-		if savedObject, ok := searchContent["kibanaSavedObjectMeta"].(map[string]interface{}); ok {
-			if source, ok := savedObject["searchSourceJSON"].(string); ok {
-				var record common.MapStr
-				err = json.Unmarshal([]byte(source), &record)
-				if err != nil {
-					return fmt.Errorf("Failed to unmarshal searchSourceJSON from search %s: %v", searchName, err)
-				}
-
-				if _, ok := record["index"]; ok {
-					record["index"] = imp.cfg.Index
-				}
-				searchSourceJSON, err := json.Marshal(record)
-				if err != nil {
-					return fmt.Errorf("Failed to marshal searchSourceJSON: %v", err)
-				}
-
-				savedObject["searchSourceJSON"] = string(searchSourceJSON)
-			}
-		}
-
-	}
-
-	path := "/" + imp.cfg.KibanaIndex + "/search/" + searchName
-	imp.statusMsg("Import search %s", file)
-
-	if _, err = imp.client.LoadJSON(path, searchContent); err != nil {
-		return err
-	}
-
-	return nil
-}
-
-func (imp Importer) ImportIndex(file string) error {
-
-	reader, err := ioutil.ReadFile(file)
-	if err != nil {
-		return err
-	}
-	var indexContent common.MapStr
-	json.Unmarshal(reader, &indexContent)
-
-	indexName, ok := indexContent["title"].(string)
-	if !ok {
-		return errors.New(fmt.Sprintf("Missing title in the index-pattern file at %s", file))
-	}
-
-	if imp.cfg.Index != "" {
-		// change index pattern name
-		imp.statusMsg("Change index in index-pattern %s", indexName)
-		indexContent["title"] = imp.cfg.Index
-	}
-
-	path := "/" + imp.cfg.KibanaIndex + "/index-pattern/" + indexName
-	imp.statusMsg("Import index to %s from %s\n", path, file)
-
-	if _, err = imp.client.LoadJSON(path, indexContent); err != nil {
-		return err
-	}
-	return nil
-
+	return imp.loader.ImportDashboard(file)
 }
 
 func (imp Importer) ImportFile(fileType string, file string) error {
+	imp.loader.statusMsg("Import %s from %s\n", fileType, file)
 
 	if fileType == "dashboard" {
-		return imp.ImportDashboard(file)
+		return imp.loader.ImportDashboard(file)
 	} else if fileType == "index-pattern" {
-		return imp.ImportIndex(file)
+		return imp.loader.ImportIndex(file)
 	}
 	return fmt.Errorf("Unexpected file type %s", fileType)
 }
 
 func (imp Importer) ImportDir(dirType string, dir string) error {
+	imp.loader.statusMsg("Import directory %s", dir)
 
 	dir = path.Join(dir, dirType)
-
-	imp.statusMsg("Import directory %s", dir)
-	errors := []string{}
+	var errors []string
 
 	files, err := filepath.Glob(path.Join(dir, "*.json"))
 	if err != nil {
 		return fmt.Errorf("Failed to read directory %s. Error: %s", dir, err)
 	}
+
 	if len(files) == 0 {
 		return fmt.Errorf("The directory %s is empty, nothing to import", dir)
 	}
 	for _, file := range files {
-
 		err = imp.ImportFile(dirType, file)
 		if err != nil {
 			errors = append(errors, fmt.Sprintf("  error loading %s: %s", file, err))
@@ -348,12 +100,10 @@ func (imp Importer) ImportDir(dirType string, dir string) error {
 		return fmt.Errorf("Failed to load directory %s:\n%s", dir, strings.Join(errors, "\n"))
 	}
 	return nil
-
 }
 
 func (imp Importer) unzip(archive, target string) error {
-
-	imp.statusMsg("Unzip archive %s", target)
+	imp.loader.statusMsg("Unzip archive %s", target)
 
 	reader, err := zip.OpenReader(archive)
 	if err != nil {
@@ -365,8 +115,7 @@ func (imp Importer) unzip(archive, target string) error {
 		filePath := filepath.Join(target, file.Name)
 
 		if file.FileInfo().IsDir() {
-			os.MkdirAll(filePath, file.Mode())
-			return nil
+			return os.MkdirAll(filePath, file.Mode())
 		}
 		fileReader, err := file.Open()
 		if err != nil {
@@ -396,7 +145,6 @@ func (imp Importer) unzip(archive, target string) error {
 }
 
 func (imp Importer) ImportArchive() error {
-
 	var archive string
 
 	target, err := ioutil.TempDir("", "tmp")
@@ -410,7 +158,7 @@ func (imp Importer) ImportArchive() error {
 
 	defer os.RemoveAll(target) // clean up
 
-	imp.statusMsg("Created temporary directory %s", target)
+	imp.loader.statusMsg("Created temporary directory %s", target)
 	if imp.cfg.File != "" {
 		archive = imp.cfg.File
 	} else if imp.cfg.Snapshot {
@@ -447,9 +195,9 @@ func (imp Importer) ImportArchive() error {
 	}
 
 	for _, dir := range dirs {
-		imp.statusMsg("Importing Kibana from %s", dir)
+		imp.loader.statusMsg("Importing Kibana from %s", dir)
 		if imp.cfg.Beat == "" || filepath.Base(dir) == imp.cfg.Beat {
-			err = imp.ImportKibana(dir)
+			err = imp.ImportKibanaDir(dir)
 			if err != nil {
 				return err
 			}
@@ -459,7 +207,6 @@ func (imp Importer) ImportArchive() error {
 }
 
 func getDirectories(target string) ([]string, error) {
-
 	files, err := ioutil.ReadDir(target)
 	if err != nil {
 		return nil, err
@@ -475,10 +222,9 @@ func getDirectories(target string) ([]string, error) {
 }
 
 func (imp Importer) downloadFile(url string, target string) (string, error) {
-
 	fileName := filepath.Base(url)
 	targetPath := path.Join(target, fileName)
-	imp.statusMsg("Downloading %s", url)
+	imp.loader.statusMsg("Downloading %s", url)
 
 	// Create the file
 	out, err := os.Create(targetPath)
@@ -492,6 +238,9 @@ func (imp Importer) downloadFile(url string, target string) (string, error) {
 	if err != nil {
 		return targetPath, err
 	}
+	if resp.StatusCode != 200 {
+		return targetPath, fmt.Errorf("Server returned: %s", resp.Status)
+	}
 	defer resp.Body.Close()
 
 	// Writer the body to file
@@ -504,9 +253,12 @@ func (imp Importer) downloadFile(url string, target string) (string, error) {
 }
 
 // import Kibana dashboards and index-pattern or only one of these
-func (imp Importer) ImportKibana(dir string) error {
-
+func (imp Importer) ImportKibanaDir(dir string) error {
 	var err error
+
+	dir = path.Join(dir, imp.version)
+
+	imp.loader.statusMsg("Importing directory %v", dir)
 
 	if _, err := os.Stat(dir); err != nil {
 		return fmt.Errorf("No directory %s", dir)
@@ -531,7 +283,6 @@ func (imp Importer) ImportKibana(dir string) error {
 		return fmt.Errorf("The directory %s does not contain the %s subdirectory."+
 			" There is nothing to import into Kibana.", dir, strings.Join(check, " or "))
 	}
-
 	for _, t := range types {
 		err = imp.ImportDir(t, dir)
 		if err != nil {

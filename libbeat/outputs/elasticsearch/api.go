@@ -127,6 +127,14 @@ func (es *Connection) Refresh(index string) (int, *QueryResult, error) {
 	return withQueryResult(es.apiCall("POST", index, "", "_refresh", "", nil, nil))
 }
 
+// IndexExists checks if an index exists.
+// Implements: https://www.elastic.co/guide/en/elasticsearch/reference/current/indices-exists.html
+//
+func (es *Connection) IndexExists(index string) (int, error) {
+	status, _, err := es.apiCall("HEAD", index, "", "", "", nil, nil)
+	return status, err
+}
+
 // CreateIndex creates a new index, optionally with settings and mappings passed in
 // the body.
 // Implements: https://www.elastic.co/guide/en/elasticsearch/reference/current/indices-create-index.html

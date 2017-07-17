@@ -1,0 +1,151 @@
+{
+  "objects": [
+    {
+      "attributes": {
+        "description": "",
+        "kibanaSavedObjectMeta": {
+          "searchSourceJSON": "{\n  \"index\": \"filebeat-*\",\n  \"query\": {\n    \"query_string\": {\n      \"query\": \"*\",\n      \"analyze_wildcard\": true\n    }\n  },\n  \"filter\": []\n}"
+        },
+        "title": "Nginx Errors over time",
+        "uiStateJSON": "{}",
+        "version": 1,
+        "visState": "{\n  \"title\": \"Errors over time\",\n  \"type\": \"area\",\n  \"params\": {\n    \"shareYAxis\": true,\n    \"addTooltip\": true,\n    \"addLegend\": true,\n    \"legendPosition\": \"right\",\n    \"smoothLines\": false,\n    \"scale\": \"linear\",\n    \"interpolate\": \"linear\",\n    \"mode\": \"stacked\",\n    \"times\": [],\n    \"addTimeMarker\": false,\n    \"defaultYExtents\": false,\n    \"setYExtents\": false,\n    \"yAxis\": {}\n  },\n  \"aggs\": [\n    {\n      \"id\": \"1\",\n      \"enabled\": true,\n      \"type\": \"count\",\n      \"schema\": \"metric\",\n      \"params\": {}\n    },\n    {\n      \"id\": \"2\",\n      \"enabled\": true,\n      \"type\": \"date_histogram\",\n      \"schema\": \"segment\",\n      \"params\": {\n        \"field\": \"@timestamp\",\n        \"interval\": \"auto\",\n        \"customInterval\": \"2h\",\n        \"min_doc_count\": 1,\n        \"extended_bounds\": {}\n      }\n    },\n    {\n      \"id\": \"3\",\n      \"enabled\": true,\n      \"type\": \"terms\",\n      \"schema\": \"group\",\n      \"params\": {\n        \"field\": \"nginx.error.level\",\n        \"size\": 5,\n        \"order\": \"desc\",\n        \"orderBy\": \"1\"\n      }\n    }\n  ],\n  \"listeners\": {}\n}"
+      },
+      "id": "Errors-over-time",
+      "type": "visualization",
+      "version": 2
+    },
+    {
+      "attributes": {
+        "description": "",
+        "kibanaSavedObjectMeta": {
+          "searchSourceJSON": "{\"index\":\"filebeat-*\",\"query\":{\"query_string\":{\"query\":\"*\",\"analyze_wildcard\":true}},\"filter\":[]}"
+        },
+        "title": "Nginx Access Browsers",
+        "uiStateJSON": "{}",
+        "version": 1,
+        "visState": "{\"title\":\"Nginx Access Browsers\",\"type\":\"pie\",\"params\":{\"shareYAxis\":true,\"addTooltip\":true,\"addLegend\":true,\"legendPosition\":\"bottom\",\"isDonut\":true},\"aggs\":[{\"id\":\"1\",\"enabled\":true,\"type\":\"count\",\"schema\":\"metric\",\"params\":{}},{\"id\":\"2\",\"enabled\":true,\"type\":\"terms\",\"schema\":\"segment\",\"params\":{\"field\":\"nginx.access.user_agent.name\",\"size\":5,\"order\":\"desc\",\"orderBy\":\"1\"}},{\"id\":\"3\",\"enabled\":true,\"type\":\"terms\",\"schema\":\"segment\",\"params\":{\"field\":\"nginx.access.user_agent.major\",\"size\":5,\"order\":\"desc\",\"orderBy\":\"1\"}}],\"listeners\":{}}"
+      },
+      "id": "Nginx-Access-Browsers",
+      "type": "visualization",
+      "version": 2
+    },
+    {
+      "attributes": {
+        "description": "",
+        "kibanaSavedObjectMeta": {
+          "searchSourceJSON": "{\"index\":\"filebeat-*\",\"query\":{\"query_string\":{\"query\":\"*\",\"analyze_wildcard\":true}},\"filter\":[]}"
+        },
+        "title": "Nginx Access OSes",
+        "uiStateJSON": "{}",
+        "version": 1,
+        "visState": "{\"title\":\"Nginx Access OSes\",\"type\":\"pie\",\"params\":{\"shareYAxis\":true,\"addTooltip\":true,\"addLegend\":true,\"legendPosition\":\"bottom\",\"isDonut\":true},\"aggs\":[{\"id\":\"1\",\"enabled\":true,\"type\":\"count\",\"schema\":\"metric\",\"params\":{}},{\"id\":\"2\",\"enabled\":true,\"type\":\"terms\",\"schema\":\"segment\",\"params\":{\"field\":\"nginx.access.user_agent.os_name\",\"size\":5,\"order\":\"desc\",\"orderBy\":\"1\"}},{\"id\":\"3\",\"enabled\":true,\"type\":\"terms\",\"schema\":\"segment\",\"params\":{\"field\":\"nginx.access.user_agent.os_major\",\"size\":5,\"order\":\"desc\",\"orderBy\":\"1\"}}],\"listeners\":{}}"
+      },
+      "id": "Nginx-Access-OSes",
+      "type": "visualization",
+      "version": 2
+    },
+    {
+      "attributes": {
+        "description": "",
+        "kibanaSavedObjectMeta": {
+          "searchSourceJSON": "{\n  \"filter\": []\n}"
+        },
+        "savedSearchId": "Filebeat-Nginx-module",
+        "title": "Nginx Access over time",
+        "uiStateJSON": "{\n  \"vis\": {\n    \"colors\": {\n      \"200\": \"#7EB26D\",\n      \"404\": \"#614D93\"\n    }\n  }\n}",
+        "version": 1,
+        "visState": "{\n  \"title\": \"New Visualization\",\n  \"type\": \"histogram\",\n  \"params\": {\n    \"shareYAxis\": true,\n    \"addTooltip\": true,\n    \"addLegend\": true,\n    \"legendPosition\": \"right\",\n    \"scale\": \"linear\",\n    \"mode\": \"stacked\",\n    \"times\": [],\n    \"addTimeMarker\": false,\n    \"defaultYExtents\": false,\n    \"setYExtents\": false,\n    \"yAxis\": {}\n  },\n  \"aggs\": [\n    {\n      \"id\": \"1\",\n      \"enabled\": true,\n      \"type\": \"count\",\n      \"schema\": \"metric\",\n      \"params\": {}\n    },\n    {\n      \"id\": \"2\",\n      \"enabled\": true,\n      \"type\": \"date_histogram\",\n      \"schema\": \"segment\",\n      \"params\": {\n        \"field\": \"@timestamp\",\n        \"interval\": \"auto\",\n        \"customInterval\": \"2h\",\n        \"min_doc_count\": 1,\n        \"extended_bounds\": {}\n      }\n    },\n    {\n      \"id\": \"3\",\n      \"enabled\": true,\n      \"type\": \"terms\",\n      \"schema\": \"group\",\n      \"params\": {\n        \"field\": \"nginx.access.response_code\",\n        \"size\": 5,\n        \"order\": \"desc\",\n        \"orderBy\": \"1\"\n      }\n    }\n  ],\n  \"listeners\": {}\n}"
+      },
+      "id": "New-Visualization",
+      "type": "visualization",
+      "version": 2
+    },
+    {
+      "attributes": {
+        "description": "",
+        "kibanaSavedObjectMeta": {
+          "searchSourceJSON": "{\"index\":\"filebeat-*\",\"query\":{\"query_string\":{\"query\":\"*\",\"analyze_wildcard\":true}},\"filter\":[]}"
+        },
+        "title": "Nginx Access Response codes by top URLs",
+        "uiStateJSON": "{\"vis\":{\"colors\":{\"200\":\"#629E51\",\"404\":\"#0A50A1\"}}}",
+        "version": 1,
+        "visState": "{\"title\":\"Nginx Access Response codes by top URLs\",\"type\":\"pie\",\"params\":{\"shareYAxis\":true,\"addTooltip\":true,\"addLegend\":true,\"legendPosition\":\"right\",\"isDonut\":false},\"aggs\":[{\"id\":\"1\",\"enabled\":true,\"type\":\"count\",\"schema\":\"metric\",\"params\":{}},{\"id\":\"2\",\"enabled\":true,\"type\":\"terms\",\"schema\":\"split\",\"params\":{\"field\":\"nginx.access.url\",\"size\":5,\"order\":\"desc\",\"orderBy\":\"1\",\"row\":false}},{\"id\":\"3\",\"enabled\":true,\"type\":\"terms\",\"schema\":\"segment\",\"params\":{\"field\":\"nginx.access.response_code\",\"size\":5,\"order\":\"desc\",\"orderBy\":\"1\"}}],\"listeners\":{}}"
+      },
+      "id": "Nginx-Access-Response-codes-by-top-URLs",
+      "type": "visualization",
+      "version": 2
+    },
+    {
+      "attributes": {
+        "description": "",
+        "kibanaSavedObjectMeta": {
+          "searchSourceJSON": "{\n  \"filter\": [],\n  \"index\": \"filebeat-*\",\n  \"query\": {\n    \"query_string\": {\n      \"query\": \"_exists_:nginx.access\",\n      \"analyze_wildcard\": true\n    }\n  },\n  \"highlight\": {\n    \"pre_tags\": [\n      \"@kibana-highlighted-field@\"\n    ],\n    \"post_tags\": [\n      \"@/kibana-highlighted-field@\"\n    ],\n    \"fields\": {\n      \"*\": {}\n    },\n    \"require_field_match\": false,\n    \"fragment_size\": 2147483647\n  }\n}"
+        },
+        "title": "Nginx Sent Byte Size",
+        "uiStateJSON": "{}",
+        "version": 1,
+        "visState": "{\n  \"title\": \"Sent sizes\",\n  \"type\": \"line\",\n  \"params\": {\n    \"shareYAxis\": true,\n    \"addTooltip\": true,\n    \"addLegend\": true,\n    \"legendPosition\": \"right\",\n    \"showCircles\": true,\n    \"smoothLines\": true,\n    \"interpolate\": \"linear\",\n    \"scale\": \"linear\",\n    \"drawLinesBetweenPoints\": true,\n    \"radiusRatio\": \"17\",\n    \"times\": [],\n    \"addTimeMarker\": false,\n    \"defaultYExtents\": false,\n    \"setYExtents\": false,\n    \"yAxis\": {}\n  },\n  \"aggs\": [\n    {\n      \"id\": \"1\",\n      \"enabled\": true,\n      \"type\": \"sum\",\n      \"schema\": \"metric\",\n      \"params\": {\n        \"field\": \"nginx.access.body_sent.bytes\",\n        \"customLabel\": \"Data sent\"\n      }\n    },\n    {\n      \"id\": \"2\",\n      \"enabled\": true,\n      \"type\": \"date_histogram\",\n      \"schema\": \"segment\",\n      \"params\": {\n        \"field\": \"@timestamp\",\n        \"interval\": \"auto\",\n        \"customInterval\": \"2h\",\n        \"min_doc_count\": 1,\n        \"extended_bounds\": {}\n      }\n    },\n    {\n      \"id\": \"3\",\n      \"enabled\": true,\n      \"type\": \"count\",\n      \"schema\": \"radius\",\n      \"params\": {}\n    }\n  ],\n  \"listeners\": {}\n}"
+      },
+      "id": "Sent-sizes",
+      "type": "visualization",
+      "version": 2
+    },
+    {
+      "attributes": {
+        "description": "",
+        "kibanaSavedObjectMeta": {
+          "searchSourceJSON": "{\"filter\":[]}"
+        },
+        "savedSearchId": "Filebeat-Nginx-module",
+        "title": "Nginx Access Map",
+        "uiStateJSON": "{\"mapCenter\":[12.039320557540572,-0.17578125]}",
+        "version": 1,
+        "visState": "{\"aggs\":[{\"enabled\":true,\"id\":\"1\",\"params\":{},\"schema\":\"metric\",\"type\":\"count\"},{\"enabled\":true,\"id\":\"2\",\"params\":{\"autoPrecision\":true,\"field\":\"nginx.access.geoip.location\"},\"schema\":\"segment\",\"type\":\"geohash_grid\"}],\"listeners\":{},\"params\":{\"addTooltip\":true,\"heatBlur\":15,\"heatMaxZoom\":16,\"heatMinOpacity\":0.1,\"heatNormalizeData\":true,\"heatRadius\":25,\"isDesaturated\":true,\"legendPosition\":\"bottomright\",\"mapCenter\":[15,5],\"mapType\":\"Scaled Circle Markers\",\"mapZoom\":2,\"wms\":{\"enabled\":false,\"options\":{\"attribution\":\"Maps provided by USGS\",\"format\":\"image/png\",\"layers\":\"0\",\"styles\":\"\",\"transparent\":true,\"version\":\"1.3.0\"},\"url\":\"https://basemap.nationalmap.gov/arcgis/services/USGSTopo/MapServer/WMSServer\"}},\"title\":\"Nginx Access Map\",\"type\":\"tile_map\"}"
+      },
+      "id": "Nginx-Access-Map",
+      "type": "visualization",
+      "version": 2
+    },
+    {
+      "attributes": {
+        "columns": [
+          "_source"
+        ],
+        "description": "",
+        "hits": 0,
+        "kibanaSavedObjectMeta": {
+          "searchSourceJSON": "{\"index\":\"filebeat-*\",\"query\":{\"query_string\":{\"query\":\"_exists_:nginx\",\"analyze_wildcard\":true}},\"filter\":[],\"highlight\":{\"pre_tags\":[\"@kibana-highlighted-field@\"],\"post_tags\":[\"@/kibana-highlighted-field@\"],\"fields\":{\"*\":{}},\"require_field_match\":false,\"fragment_size\":2147483647}}"
+        },
+        "sort": [
+          "@timestamp",
+          "desc"
+        ],
+        "title": "Filebeat Nginx module",
+        "version": 1
+      },
+      "id": "Filebeat-Nginx-module",
+      "type": "search",
+      "version": 3
+    },
+    {
+      "attributes": {
+        "description": "",
+        "hits": 0,
+        "kibanaSavedObjectMeta": {
+          "searchSourceJSON": "{\"filter\":[{\"query\":{\"query_string\":{\"analyze_wildcard\":true,\"query\":\"*\"}}}]}"
+        },
+        "optionsJSON": "{\"darkTheme\":false}",
+        "panelsJSON": "[{\"col\":9,\"id\":\"Errors-over-time\",\"panelIndex\":2,\"row\":4,\"size_x\":4,\"size_y\":3,\"type\":\"visualization\"},{\"col\":1,\"id\":\"Nginx-Access-Browsers\",\"panelIndex\":3,\"row\":10,\"size_x\":4,\"size_y\":4,\"type\":\"visualization\"},{\"col\":5,\"id\":\"Nginx-Access-OSes\",\"panelIndex\":4,\"row\":10,\"size_x\":4,\"size_y\":4,\"type\":\"visualization\"},{\"col\":1,\"id\":\"New-Visualization\",\"panelIndex\":5,\"row\":4,\"size_x\":8,\"size_y\":3,\"type\":\"visualization\"},{\"col\":1,\"id\":\"Nginx-Access-Response-codes-by-top-URLs\",\"panelIndex\":6,\"row\":7,\"size_x\":12,\"size_y\":3,\"type\":\"visualization\"},{\"col\":9,\"id\":\"Sent-sizes\",\"panelIndex\":7,\"row\":10,\"size_x\":4,\"size_y\":4,\"type\":\"visualization\"},{\"id\":\"Nginx-Access-Map\",\"type\":\"visualization\",\"panelIndex\":8,\"size_x\":12,\"size_y\":3,\"col\":1,\"row\":1}]",
+        "timeRestore": false,
+        "title": "Filebeat Nginx Dashboard",
+        "uiStateJSON": "{\"P-4\":{\"vis\":{\"legendOpen\":true}},\"P-8\":{\"mapCenter\":[50.51342652633956,-0.17578125]}}",
+        "version": 1
+      },
+      "id": "Filebeat-Nginx-Dashboard",
+      "type": "dashboard",
+      "version": 2
+    }
+  ],
+  "version": "6.0.0-alpha3-SNAPSHOT"
+}
