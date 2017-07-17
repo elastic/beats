@@ -79,8 +79,8 @@ func TestFormat(t *testing.T) {
 
 		// beats timestamp
 		{mkDateTime(2017, 1, 2, 4, 6, 7, 123),
-			"yyyy-MM-dd'T'hh:mm:ss.SSS'Z'",
-			"2017-01-02T05:06:07.123Z"},
+			"yyyy-MM-dd'T'HH:mm:ss.SSS'Z'",
+			"2017-01-02T04:06:07.123Z"},
 	}
 
 	for i, test := range tests {
