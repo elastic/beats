@@ -3,6 +3,7 @@ package pipeline
 import (
 	"sync"
 
+	"github.com/elastic/beats/libbeat/common/atomic"
 	"github.com/elastic/beats/libbeat/publisher"
 	"github.com/elastic/beats/libbeat/publisher/beat"
 	"github.com/elastic/beats/libbeat/publisher/broker"
@@ -24,6 +25,8 @@ type client struct {
 	eventFlags   publisher.EventFlags
 	canDrop      bool
 	reportEvents bool
+
+	isOpen atomic.Bool
 
 	eventer beat.ClientEventer
 }
@@ -52,6 +55,12 @@ func (c *client) publish(e beat.Event) {
 	)
 
 	c.onNewEvent()
+
+	if !c.isOpen.Load() {
+		// client is closing down -> report event as dropped and return
+		c.onDroppedOnPublish(e)
+		return
+	}
 
 	if c.processors != nil {
 		var err error
@@ -113,6 +122,10 @@ func (c *client) Close() error {
 	// for pending events to be ACKed.
 
 	log := c.pipeline.logger
+
+	if !c.isOpen.Swap(false) {
+		return nil // closed or already closing
+	}
 
 	c.onClosing()
 
