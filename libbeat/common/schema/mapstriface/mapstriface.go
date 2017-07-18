@@ -142,6 +142,19 @@ func Str(key string, opts ...schema.SchemaOption) schema.Conv {
 	return schema.SetOptions(schema.Conv{Key: key, Func: toStr}, opts)
 }
 
+func toIfc(key string, data map[string]interface{}) (interface{}, error) {
+	intf, err := common.MapStr(data).GetValue(key)
+	if err != nil {
+		return "", fmt.Errorf("Key %s not found: %s", key, err.Error())
+	}
+	return intf, nil
+}
+
+// Ifc creates a schema.Conv object for converting the given data to interface.
+func Ifc(key string, opts ...schema.SchemaOption) schema.Conv {
+	return schema.SetOptions(schema.Conv{Key: key, Func: toIfc}, opts)
+}
+
 func toBool(key string, data map[string]interface{}) (interface{}, error) {
 	emptyIface, exists := data[key]
 	if !exists {
