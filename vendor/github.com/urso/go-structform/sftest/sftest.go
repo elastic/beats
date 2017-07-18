@@ -6,7 +6,7 @@ import (
 	"fmt"
 	"testing"
 
-	"github.com/json-iterator/go/assert"
+	"github.com/stretchr/testify/assert"
 	structform "github.com/urso/go-structform"
 )
 
