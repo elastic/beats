@@ -4,6 +4,7 @@ package config
 import (
 	"fmt"
 
+	"github.com/elastic/beats/libbeat/common"
 	"github.com/joeshaw/multierror"
 )
 
@@ -43,8 +44,8 @@ func (s Settings) Validate() error {
 
 // WinlogbeatConfig contains all of Winlogbeat configuration data.
 type WinlogbeatConfig struct {
-	EventLogs    []map[string]interface{} `config:"event_logs"`
-	RegistryFile string                   `config:"registry_file"`
+	EventLogs    []*common.Config `config:"event_logs"`
+	RegistryFile string           `config:"registry_file"`
 }
 
 // Validate validates the WinlogbeatConfig data and returns an error describing
