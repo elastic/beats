@@ -5,6 +5,7 @@ package config
 import (
 	"testing"
 
+	"github.com/elastic/beats/libbeat/common"
 	"github.com/stretchr/testify/assert"
 )
 
@@ -31,8 +32,10 @@ func TestConfigValidate(t *testing.T) {
 		// Top-level config
 		{
 			WinlogbeatConfig{
-				EventLogs: []map[string]interface{}{
-					{"Name": "App"},
+				EventLogs: []*common.Config{
+					newConfig(map[string]interface{}{
+						"Name": "App",
+					}),
 				},
 			},
 			"", // No Error
@@ -47,4 +50,12 @@ func TestConfigValidate(t *testing.T) {
 	for _, test := range testCases {
 		test.run(t)
 	}
+}
+
+func newConfig(from map[string]interface{}) *common.Config {
+	cfg, err := common.NewConfigFrom(from)
+	if err != nil {
+		panic(err)
+	}
+	return cfg
 }
