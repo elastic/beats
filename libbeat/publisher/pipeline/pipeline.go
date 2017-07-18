@@ -380,6 +380,7 @@ func (p *Pipeline) ConnectWith(cfg beat.ClientConfig) (beat.Client, error) {
 	producer := p.broker.Producer(producerCfg)
 	client := &client{
 		pipeline:     p,
+		isOpen:       atomic.MakeBool(true),
 		eventer:      cfg.Events,
 		processors:   processors,
 		producer:     producer,
