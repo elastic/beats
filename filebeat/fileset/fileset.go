@@ -80,9 +80,10 @@ type manifest struct {
 	IngestPipeline  string                   `config:"ingest_pipeline"`
 	Prospector      string                   `config:"prospector"`
 	MachineLearning []struct {
-		Name     string `config:"name"`
-		Job      string `config:"job"`
-		Datafeed string `config:"datafeed"`
+		Name       string `config:"name"`
+		Job        string `config:"job"`
+		Datafeed   string `config:"datafeed"`
+		MinVersion string `config:"min_version"`
 	} `config:"machine_learning"`
 	Requires struct {
 		Processors []ProcessorRequirement `config:"processors"`
@@ -326,6 +327,7 @@ func (fs *Fileset) GetMLConfigs() []mlimporter.MLConfig {
 			ID:           fmt.Sprintf("filebeat-%s-%s-%s", fs.mcfg.Module, fs.name, ml.Name),
 			JobPath:      filepath.Join(fs.modulePath, fs.name, ml.Job),
 			DatafeedPath: filepath.Join(fs.modulePath, fs.name, ml.Datafeed),
+			MinVersion:   ml.MinVersion,
 		})
 	}
 	return mlConfigs
