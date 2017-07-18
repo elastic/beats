@@ -3,6 +3,7 @@ package common
 import (
 	"encoding/json"
 	"testing"
+	"time"
 
 	"github.com/elastic/beats/libbeat/logp"
 	"github.com/stretchr/testify/assert"
@@ -313,6 +314,27 @@ func TestMarshalFloatValues(t *testing.T) {
 	b, err := json.Marshal(a)
 	assert.Nil(err)
 	assert.Equal(string(b), "{\"f\":5.000000}")
+}
+
+func TestNormalizeTime(t *testing.T) {
+	ny, err := time.LoadLocation("America/New_York")
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	now := time.Now().In(ny)
+	v, errs := normalizeValue(now, "@timestamp")
+	if len(errs) > 0 {
+		t.Fatal(errs)
+	}
+
+	utcCommonTime, ok := v.(Time)
+	if !ok {
+		t.Fatalf("expected common.Time, but got %T (%v)", v, v)
+	}
+
+	assert.Equal(t, time.UTC, time.Time(utcCommonTime).Location())
+	assert.True(t, now.Equal(time.Time(utcCommonTime)))
 }
 
 // Uses TextMarshaler interface.

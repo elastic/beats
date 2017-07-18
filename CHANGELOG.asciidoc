@@ -28,6 +28,8 @@ https://github.com/elastic/beats/compare/v5.5.0...master[Check the HEAD diff]
 
 *Affecting all Beats*
 
+- Normalize all times to UTC to ensure proper index naming. {issue}4569[4569]
+
 *Filebeat*
 
 *Heartbeat*
