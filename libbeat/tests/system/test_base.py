@@ -53,7 +53,7 @@ class Test(BaseTest):
         # first run with default config, validating config being
         # actually correct.
         proc = self.start_beat()
-        self.wait_until(lambda: self.log_contains("Setup Beat"))
+        self.wait_until(lambda: self.log_contains("mockbeat start running."))
         proc.check_kill_and_wait()
 
         # start beat with invalid config setting on command line
