@@ -976,7 +976,7 @@ output.file:
   filename: {beatname_lc}
   #rotate_every_kb: 10000
   #number_of_files: 7
-  #permissions: 0666
+  #permissions: 0600
 ------------------------------------------------------------------------------
 
 ==== Configuration options

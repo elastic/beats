@@ -1005,7 +1005,7 @@ output.elasticsearch:
   #number_of_files: 7
 
   # Permissions to use for file creation. The default is 0600.
-  #permissions: 0666
+  #permissions: 0600
 
 
 #----------------------------- Console output ---------------------------------
