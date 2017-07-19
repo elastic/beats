@@ -32,18 +32,13 @@ type TransactionalEventPublisher interface {
 
 type Publisher interface {
 	Connect() Client
+	ConnectX(beat.ClientConfig) (beat.Client, error)
+	SetACKHandler(beat.PipelineACKHandler) error
 }
 
 type BeatPublisher struct {
-	shipperName string // Shipper name as set in the configuration file
-	hostname    string // Host name as returned by the operation system
-	name        string // The shipperName if configured, the hostname otherwise
-	version     string
-
-	disabled   bool
-	processors *processors.Processors
-
-	globalEventMetadata common.EventMetadata // Fields and tags to add to each event.
+	disabled bool
+	name     string
 
 	// keep count of clients connected to publisher. A publisher is allowed to
 	// Stop only if all clients have been disconnected
@@ -53,19 +48,13 @@ type BeatPublisher struct {
 }
 
 type ShipperConfig struct {
-	common.EventMetadata `config:",inline"` // Fields and tags to add to each event.
-	Name                 string             `config:"name"`
+	common.EventMetadata `config:",inline"`     // Fields and tags to add to each event.
+	Name                 string                 `config:"name"`
+	Queue                common.ConfigNamespace `config:"queue"`
 
 	// internal publisher queue sizes
-	QueueSize     *int `config:"queue_size"`
-	BulkQueueSize *int `config:"bulk_queue_size"`
-	MaxProcs      *int `config:"max_procs"`
+	MaxProcs *int `config:"max_procs"`
 }
-
-const (
-	DefaultQueueSize     = 1000
-	DefaultBulkQueueSize = 0
-)
 
 func init() {
 	publishDisabled = flag.Bool("N", false, "Disable actual publishing for testing")
@@ -93,31 +82,22 @@ func (publisher *BeatPublisher) init(
 	processors *processors.Processors,
 ) error {
 	var err error
-	publisher.processors = processors
-
 	publisher.disabled = *publishDisabled
 	if publisher.disabled {
 		logp.Info("Dry run mode. All output types except the file based one are disabled.")
 	}
 
-	shipper.InitShipperConfig()
-	publisher.shipperName = shipper.Name
-	publisher.hostname = beat.Hostname
-	publisher.version = beat.Version
-	if len(publisher.shipperName) > 0 {
-		publisher.name = publisher.shipperName
-	} else {
-		publisher.name = publisher.hostname
+	publisher.name = shipper.Name
+	if publisher.name == "" {
+		publisher.name = beat.Hostname
 	}
 
-	publisher.pipeline, err = createPipeline(beat, shipper, outConfig)
+	publisher.pipeline, err = createPipeline(beat, shipper, processors, outConfig)
 	if err != nil {
 		return err
 	}
 
 	logp.Info("Publisher name: %s", publisher.name)
-
-	publisher.globalEventMetadata = shipper.EventMetadata
 	return nil
 }
 
@@ -134,20 +114,14 @@ func (publisher *BeatPublisher) Connect() Client {
 	return newClient(publisher)
 }
 
-func (publisher *BeatPublisher) GetName() string {
-	return publisher.name
+func (publisher *BeatPublisher) ConnectX(config beat.ClientConfig) (beat.Client, error) {
+	return publisher.pipeline.ConnectWith(config)
 }
 
-func (config *ShipperConfig) InitShipperConfig() {
+func (publisher *BeatPublisher) SetACKHandler(h beat.PipelineACKHandler) error {
+	return publisher.pipeline.SetACKHandler(h)
+}
 
-	// TODO: replace by ucfg
-	if config.QueueSize == nil || *config.QueueSize <= 0 {
-		queueSize := DefaultQueueSize
-		config.QueueSize = &queueSize
-	}
-
-	if config.BulkQueueSize == nil || *config.BulkQueueSize < 0 {
-		bulkQueueSize := DefaultBulkQueueSize
-		config.BulkQueueSize = &bulkQueueSize
-	}
+func (publisher *BeatPublisher) GetName() string {
+	return publisher.name
 }

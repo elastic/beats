@@ -35,3 +35,8 @@
       description: >
         Free Memory of Guest in bytes
       format: bytes
+    - name: custom_fields
+      type: object
+      object_type: keyword
+      descripton: >
+        Custom fields      

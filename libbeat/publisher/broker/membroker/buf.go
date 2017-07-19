@@ -219,7 +219,13 @@ func (b *brokerBuffer) ack(sz int) {
 		))
 	}
 
-	b.regA.index += sz
+	// clear region, so published events can be collected by the garbage collector:
+	end := b.regA.index + sz
+	for i := b.regA.index; i < end; i++ {
+		b.buf.events[i] = publisher.Event{}
+	}
+
+	b.regA.index = end
 	b.regA.size -= sz
 	b.reserved -= sz
 	if b.regA.size == 0 {
@@ -234,6 +240,14 @@ func (b *brokerBuffer) Empty() bool {
 	return (b.regA.size - b.reserved) == 0
 }
 
+func (b *brokerBuffer) Avail() int {
+	return b.regA.size - b.reserved
+}
+
+func (b *brokerBuffer) TotalAvail() int {
+	return b.regA.size + b.regB.size - b.reserved
+}
+
 func (b *brokerBuffer) Full() bool {
 	var avail int
 	if b.regB.size > 0 {
@@ -242,6 +256,10 @@ func (b *brokerBuffer) Full() bool {
 		avail = b.buf.Len() - b.regA.index - b.regA.size
 	}
 	return avail == 0
+}
+
+func (b *brokerBuffer) Size() int {
+	return b.buf.Len()
 }
 
 func (b *eventBuffer) init(size int) {
@@ -254,7 +272,7 @@ func (b *eventBuffer) Len() int {
 }
 
 func (b *eventBuffer) Set(idx int, event publisher.Event, st clientState) {
-	b.logger.Debugf("insert event: idx=%v, seq=%v\n", idx, st.seq)
+	// b.logger.Debugf("insert event: idx=%v, seq=%v\n", idx, st.seq)
 
 	b.events[idx] = event
 	b.clients[idx] = st

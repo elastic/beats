@@ -11,7 +11,9 @@ import (
 // - stop
 // - reload
 type outputController struct {
-	logger *logp.Logger
+	logger   *logp.Logger
+	observer *observer
+
 	broker broker.Broker
 
 	retryer  *retryer
@@ -38,16 +40,19 @@ type outputWorker interface {
 
 func newOutputController(
 	log *logp.Logger,
+	observer *observer,
 	b broker.Broker,
 ) *outputController {
 	c := &outputController{
-		logger: log,
-		broker: b,
+		logger:   log,
+		observer: observer,
+		broker:   b,
 	}
 
 	ctx := &batchContext{}
 	c.consumer = newEventConsumer(log, b, ctx)
-	c.retryer = newRetryer(log, nil, c.consumer)
+	c.retryer = newRetryer(log, observer, nil, c.consumer)
+	ctx.observer = c.observer
 	ctx.retryer = c.retryer
 
 	c.consumer.sigContinue()
@@ -77,7 +82,7 @@ func (c *outputController) Set(outGrp outputs.Group) {
 	queue := makeWorkQueue()
 	worker := make([]outputWorker, len(clients))
 	for i, client := range clients {
-		worker[i] = makeClientWorker(queue, client)
+		worker[i] = makeClientWorker(c.observer, queue, client)
 	}
 	grp := &outputGroup{
 		workQueue:  queue,
@@ -108,6 +113,8 @@ func (c *outputController) Set(outGrp outputs.Group) {
 
 	// restart consumer (potentially blocked by retryer)
 	c.consumer.sigContinue()
+
+	c.observer.updateOutputGroup()
 }
 
 func makeWorkQueue() workQueue {

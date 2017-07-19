@@ -301,6 +301,15 @@ class TestCase(unittest.TestCase):
 
         return data
 
+    def wait_log_contains(self, msg, logfile=None,
+                          max_timeout=10, poll_interval=0.1,
+                          name="log_contains"):
+        self.wait_until(
+            cond=lambda: self.log_contains(msg, logfile),
+            max_timeout=max_timeout,
+            poll_interval=poll_interval,
+            name=name)
+
     def log_contains(self, msg, logfile=None):
         """
         Returns true if the give logfile contains the given message.

@@ -1,10 +1,13 @@
 package membroker
 
 import (
+	"fmt"
 	"math"
 	"sync"
+	"time"
 
 	"github.com/elastic/beats/libbeat/common"
+	"github.com/elastic/beats/libbeat/publisher"
 	"github.com/elastic/beats/libbeat/publisher/broker"
 )
 
@@ -13,7 +16,9 @@ type Broker struct {
 
 	logger logger
 
-	buf brokerBuffer
+	buf         brokerBuffer
+	minEvents   int
+	idleTimeout time.Duration
 
 	// api channels
 	events    chan pushRequest
@@ -24,11 +29,19 @@ type Broker struct {
 	acks          chan int
 	scheduledACKs chan chanList
 
-	ackSeq uint
+	eventer broker.Eventer
 
 	// wait group for worker shutdown
 	wg          sync.WaitGroup
 	waitOnClose bool
+}
+
+type Settings struct {
+	Eventer        broker.Eventer
+	Events         int
+	FlushMinEvents int
+	FlushTimeout   time.Duration
+	WaitOnClose    bool
 }
 
 type ackChan struct {
@@ -47,21 +60,46 @@ func init() {
 	broker.RegisterType("mem", create)
 }
 
-func create(cfg *common.Config) (broker.Broker, error) {
+func create(eventer broker.Eventer, cfg *common.Config) (broker.Broker, error) {
 	config := defaultConfig
 	if err := cfg.Unpack(&config); err != nil {
 		return nil, err
 	}
 
-	b := NewBroker(config.Events, false)
-	return b, nil
+	return NewBroker(Settings{
+		Eventer:        eventer,
+		Events:         config.Events,
+		FlushMinEvents: config.FlushMinEvents,
+		FlushTimeout:   config.FlushTimeout,
+	}), nil
 }
 
 // NewBroker creates a new in-memory broker holding up to sz number of events.
 // If waitOnClose is set to true, the broker will block on Close, until all internal
 // workers handling incoming messages and ACKs have been shut down.
-func NewBroker(sz int, waitOnClose bool) *Broker {
+func NewBroker(
+	settings Settings,
+) *Broker {
+	// define internal channel size for procuder/client requests
+	// to the broker
 	chanSize := 20
+
+	var (
+		sz           = settings.Events
+		minEvents    = settings.FlushMinEvents
+		flushTimeout = settings.FlushTimeout
+	)
+
+	if minEvents < 1 {
+		minEvents = 1
+	}
+	if minEvents > 1 && flushTimeout <= 0 {
+		minEvents = 1
+		flushTimeout = 0
+	}
+	if minEvents > sz {
+		minEvents = sz
+	}
 
 	logger := defaultLogger
 	b := &Broker{
@@ -77,16 +115,21 @@ func NewBroker(sz int, waitOnClose bool) *Broker {
 		acks:          make(chan int),
 		scheduledACKs: make(chan chanList),
 
-		waitOnClose: waitOnClose,
+		waitOnClose: settings.WaitOnClose,
+
+		eventer: settings.Eventer,
 	}
 	b.buf.init(logger, sz)
+	b.minEvents = minEvents
+	b.idleTimeout = flushTimeout
 
+	eventLoop := newEventLoop(b)
 	ack := &ackLoop{broker: b}
 
 	b.wg.Add(2)
 	go func() {
 		defer b.wg.Done()
-		b.eventLoop()
+		eventLoop.run()
 	}()
 	go func() {
 		defer b.wg.Done()
@@ -104,118 +147,21 @@ func (b *Broker) Close() error {
 	return nil
 }
 
+func (b *Broker) BufferConfig() broker.BufferConfig {
+	return broker.BufferConfig{
+		Events: b.buf.Size(),
+	}
+}
+
 func (b *Broker) Producer(cfg broker.ProducerConfig) broker.Producer {
-	return newProducer(b, cfg.ACK, cfg.OnDrop)
+	return newProducer(b, cfg.ACK, cfg.OnDrop, cfg.DropOnCancel)
 }
 
 func (b *Broker) Consumer() broker.Consumer {
 	return newConsumer(b)
 }
 
-func (b *Broker) eventLoop() {
-	var (
-		events = b.events
-		get    chan getRequest
-
-		activeEvents int
-
-		totalGet   uint64
-		totalACK   uint64
-		batchesGen uint64
-
-		// log = b.logger
-
-		// Buffer and send pending batches to ackloop.
-		pendingACKs chanList
-		schedACKS   chan chanList
-	)
-
-	for {
-		select {
-		case <-b.done:
-			return
-
-		// receiving new events into the buffer
-		case req := <-events:
-			// log.Debugf("push event: %v\t%v\t%p\n", req.event, req.seq, req.state)
-
-			avail, ok := b.insert(req)
-			if !ok {
-				break
-			}
-			if avail == 0 {
-				// log.Debugf("buffer: all regions full")
-				events = nil
-			}
-
-		case req := <-b.pubCancel:
-			// log.Debug("handle cancel request")
-			var removed int
-			if st := req.state; st != nil {
-				st.cancelled = true
-				removed = b.buf.cancel(st)
-			}
-
-			// signal cancel request being finished
-			if req.resp != nil {
-				req.resp <- producerCancelResponse{
-					removed: removed,
-				}
-			}
-
-			// re-enable pushRequest if buffer can take new events
-			if !b.buf.Full() {
-				events = b.events
-			}
-
-		case req := <-get:
-			start, buf := b.buf.reserve(req.sz)
-			count := len(buf)
-			if count == 0 {
-				panic("empty batch returned")
-			}
-
-			// log.Debug("newACKChan: ", b.ackSeq, count)
-			ackCH := newACKChan(b.ackSeq, start, count)
-			b.ackSeq++
-
-			activeEvents += ackCH.count
-			totalGet += uint64(ackCH.count)
-			batchesGen++
-			// log.Debug("broker: total events get = ", totalGet)
-			// log.Debug("broker: total batches generated = ", batchesGen)
-
-			req.resp <- getResponse{buf, ackCH}
-			pendingACKs.append(ackCH)
-			schedACKS = b.scheduledACKs
-
-		case schedACKS <- pendingACKs:
-			schedACKS = nil
-			pendingACKs = chanList{}
-
-		case count := <-b.acks:
-			// log.Debug("receive buffer ack:", count)
-
-			activeEvents -= count
-			totalACK += uint64(count)
-			// log.Debug("broker: total events ack = ", totalACK)
-
-			b.buf.ack(count)
-			// after ACK some buffer has been freed up, reenable publisher
-			events = b.events
-		}
-
-		b.logger.Debug("active events: ", activeEvents)
-		if b.buf.Empty() {
-			b.logger.Debugf("no event available in active region")
-			get = nil
-		} else {
-			get = b.requests
-		}
-	}
-}
-
-func (b *Broker) insert(req pushRequest) (int, bool) {
+func (b *Broker) insert(req *pushRequest) (int, bool) {
 	var avail int
 	if req.state == nil {
 		_, avail = b.buf.insert(req.event, clientState{})
@@ -227,7 +173,7 @@ func (b *Broker) insert(req pushRequest) (int, bool) {
 			// do not add waiting events if producer did send cancel signal
 
 			if cb := st.dropCB; cb != nil {
-				cb(1)
+				cb(req.event.Content)
 			}
 
 			return -1, false
@@ -242,10 +188,52 @@ func (b *Broker) insert(req pushRequest) (int, bool) {
 	return avail, true
 }
 
-func (b *Broker) reportACK(states []clientState, start, end int) {
-	N := end - start
-	b.logger.Debug("handle ACKs: ", N)
-	idx := end - 1
+func (b *Broker) get(max int) (startIndex int, events []publisher.Event) {
+	return b.buf.reserve(max)
+}
+
+func (b *Broker) cancel(st *produceState) int {
+	return b.buf.cancel(st)
+}
+
+func (b *Broker) full() bool {
+	return b.buf.Full()
+}
+
+func (b *Broker) avail() int {
+	return b.buf.Avail()
+}
+
+func (b *Broker) totalAvail() int {
+	return b.buf.TotalAvail()
+}
+
+func (b *Broker) cleanACKs(count int) {
+	b.buf.ack(count)
+}
+
+func (b *Broker) reportACK(states []clientState, start, N int) {
+	{
+		start := time.Now()
+		b.logger.Debug("handle ACKs: ", N)
+		defer func() {
+			b.logger.Debug("handle ACK took: ", time.Since(start))
+		}()
+	}
+
+	if e := b.eventer; e != nil {
+		e.OnACK(N)
+	}
+
+	// TODO: global boolean to check if clients will need an ACK
+	//       no need to report ACKs if no client is interested in ACKs
+
+	idx := start + N - 1
+	if idx >= len(states) {
+		idx -= len(states)
+	}
+
+	total := 0
 	for i := N - 1; i >= 0; i-- {
 		if idx < 0 {
 			idx = len(states) - 1
@@ -264,7 +252,7 @@ func (b *Broker) reportACK(states []clientState, start, end int) {
 		if count == 0 || count > math.MaxUint32/2 {
 			// seq number comparison did underflow. This happens only if st.seq has
 			// allready been acknowledged
-			b.logger.Debug("seq number already acked: ", st.seq)
+			// b.logger.Debug("seq number already acked: ", st.seq)
 
 			st.state = nil
 			continue
@@ -275,6 +263,14 @@ func (b *Broker) reportACK(states []clientState, start, end int) {
 			st.state.lastACK+1,
 			st.seq,
 		)
+
+		total += int(count)
+		if total > N {
+			panic(fmt.Sprintf("Too many events acked (expected=%v, total=%v)",
+				count, total,
+			))
+		}
+
 		st.state.cb(int(count))
 		st.state.lastACK = st.seq
 		st.state = nil

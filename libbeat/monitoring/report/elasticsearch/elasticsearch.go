@@ -17,6 +17,7 @@ import (
 	"github.com/elastic/beats/libbeat/outputs/outil"
 	"github.com/elastic/beats/libbeat/outputs/transport"
 	"github.com/elastic/beats/libbeat/publisher/beat"
+	"github.com/elastic/beats/libbeat/publisher/broker"
 	"github.com/elastic/beats/libbeat/publisher/broker/membroker"
 	"github.com/elastic/beats/libbeat/publisher/pipeline"
 )
@@ -103,11 +104,22 @@ func makeReporter(beat common.BeatInfo, cfg *common.Config) (report.Reporter, er
 		out.Clients = append(out.Clients, client)
 	}
 
-	broker := membroker.NewBroker(20, false)
-	settings := pipeline.Settings{}
-	pipeline, err := pipeline.New(broker, nil, out, settings)
+	brokerFactory := func(e broker.Eventer) (broker.Broker, error) {
+		return membroker.NewBroker(membroker.Settings{
+			Eventer: e,
+			Events:  20,
+		}), nil
+	}
+
+	monitoring := monitoring.Default.NewRegistry("xpack.monitoring")
+
+	pipeline, err := pipeline.New(
+		monitoring,
+		brokerFactory, out, pipeline.Settings{
+			WaitClose:     0,
+			WaitCloseMode: pipeline.NoWaitOnClose,
+		})
 	if err != nil {
-		broker.Close()
 		return nil, err
 	}
 
@@ -205,7 +217,7 @@ func makeClient(
 	tlsConfig *transport.TLSConfig,
 	config *config,
 ) (outputs.NetworkClient, error) {
-	url, err := esout.MakeURL(config.Protocol, "", host)
+	url, err := common.MakeURL(config.Protocol, "", host, 9200)
 	if err != nil {
 		return nil, err
 	}

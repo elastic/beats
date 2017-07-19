@@ -23,4 +23,5 @@ func init() {
 	runFlags.AddGoFlag(flag.CommandLine.Lookup("system.hostfs"))
 
 	RootCmd = cmd.GenRootCmdWithRunFlags(Name, "", beater.New, runFlags)
+	RootCmd.AddCommand(cmd.GenModulesCmd(Name, "", buildModulesManager))
 }

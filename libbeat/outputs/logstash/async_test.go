@@ -35,7 +35,7 @@ func makeAsyncTestClient(conn *transport.Client) testClientDriver {
 	config := defaultConfig
 	config.Timeout = 1 * time.Second
 	config.Pipelining = 3
-	client, err := newAsyncClient(conn, &config)
+	client, err := newAsyncClient(conn, nil, &config)
 	if err != nil {
 		panic(err)
 	}

@@ -8,7 +8,7 @@ import (
 	"testing"
 	"time"
 
-	"github.com/armon/go-socks5"
+	socks5 "github.com/armon/go-socks5"
 	"github.com/stretchr/testify/assert"
 
 	"github.com/elastic/beats/libbeat/outputs/transport"

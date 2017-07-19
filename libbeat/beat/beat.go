@@ -126,6 +126,7 @@ type BeatConfig struct {
 	Path       paths.Path              `config:"path"`
 	Dashboards *common.Config          `config:"setup.dashboards"`
 	Template   *common.Config          `config:"setup.template"`
+	Kibana     *common.Config          `config:"setup.kibana"`
 	Http       *common.Config          `config:"http"`
 }
 
@@ -212,8 +213,8 @@ func (b *Beat) Init() error {
 	return nil
 }
 
-// load the beats config section
-func (b *Beat) config() (*common.Config, error) {
+// BeatConfig returns config section for this beat
+func (b *Beat) BeatConfig() (*common.Config, error) {
 	configName := strings.ToLower(b.Info.Beat)
 	if b.RawConfig.HasField(configName) {
 		sub, err := b.RawConfig.Child(configName, -1)
@@ -230,7 +231,7 @@ func (b *Beat) config() (*common.Config, error) {
 // create and return the beater, this method also initializes all needed items,
 // including template registering, publisher, xpack monitoring
 func (b *Beat) createBeater(bt Creator) (Beater, error) {
-	sub, err := b.config()
+	sub, err := b.BeatConfig()
 	if err != nil {
 		return nil, err
 	}
@@ -568,18 +569,14 @@ func (b *Beat) loadDashboards(force bool) error {
 		}
 	}
 
-	if b.Config.Dashboards != nil && b.Config.Dashboards.Enabled() && b.Config.Output.Name() == "elasticsearch" {
-		esConfig := b.Config.Output.Config()
-		if esConfig == nil || !esConfig.Enabled() {
-			return fmt.Errorf("Dashboard loading requested but the Elasticsearch output is not configured/enabled")
-		}
-		esClient, err := elasticsearch.NewConnectedClient(esConfig)
-		if err != nil {
-			return fmt.Errorf("Error creating ES client: %v", err)
-		}
-		defer esClient.Close()
+	if b.Config.Dashboards != nil && b.Config.Dashboards.Enabled() {
+		var esConfig *common.Config
 
-		err = dashboards.ImportDashboards(b.Info.Beat, b.Info.Version, esClient, b.Config.Dashboards)
+		if b.Config.Output.Name() == "elasticsearch" {
+			esConfig = b.Config.Output.Config()
+		}
+		err := dashboards.ImportDashboards(b.Info.Beat, b.Info.Version, paths.Resolve(paths.Home, ""),
+			b.Config.Kibana, esConfig, b.Config.Dashboards)
 		if err != nil {
 			return fmt.Errorf("Error importing Kibana dashboards: %v", err)
 		}

@@ -96,15 +96,9 @@ func (l *ackLoop) handleBatchSig() int {
 		}
 	}
 
-	// return acks to waiting clients
-	// TODO: global boolean to check if clients will need an ACK
-	//       no need to report ACKs if no client is interested in ACKs
+	// report acks to waiting clients
 	states := l.broker.buf.buf.clients
-	end := start + count
-	if end > len(states) {
-		end -= len(states)
-	}
-	l.broker.reportACK(states, start, end)
+	l.broker.reportACK(states, start, count)
 
 	// return final ACK to EventLoop, in order to clean up internal buffer
 	l.broker.logger.Debug("ackloop: return ack to broker loop:", count)

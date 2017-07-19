@@ -1,6 +1,6 @@
 package dashboards
 
-type DashboardsConfig struct {
+type Config struct {
 	Enabled        bool   `config:"enabled"`
 	KibanaIndex    string `config:"kibana_index"`
 	Index          string `config:"index"`
@@ -10,14 +10,11 @@ type DashboardsConfig struct {
 	URL            string `config:"url"`
 	OnlyDashboards bool   `config:"only_dashboards"`
 	OnlyIndex      bool   `config:"only_index"`
-	Snapshot       bool   `config:"snapshot"`
-	SnapshotURL    string `config:"snapshot_url"`
 }
 
-var defaultDashboardsConfig = DashboardsConfig{
+var defaultConfig = Config{
 	KibanaIndex: ".kibana",
 }
 var (
-	defaultURLPattern  = "https://artifacts.elastic.co/downloads/beats/beats-dashboards/beats-dashboards-%s.zip"
-	snapshotURLPattern = "https://beats-nightlies.s3.amazonaws.com/dashboards/beats-dashboards-%s-SNAPSHOT.zip"
+	defaultDirectory = "kibana"
 )

@@ -1,60 +1,79 @@
 package membroker
 
 import (
+	"github.com/elastic/beats/libbeat/common/atomic"
 	"github.com/elastic/beats/libbeat/publisher"
+	"github.com/elastic/beats/libbeat/publisher/beat"
 	"github.com/elastic/beats/libbeat/publisher/broker"
 )
 
 type forgetfullProducer struct {
-	broker *Broker
+	broker    *Broker
+	openState openState
 }
 
 type ackProducer struct {
-	broker *Broker
-	cancel bool
-	seq    uint32
-	state  produceState
+	broker    *Broker
+	cancel    bool
+	seq       uint32
+	state     produceState
+	openState openState
+}
+
+type openState struct {
+	isOpen atomic.Bool
+	done   chan struct{}
+	events chan pushRequest
 }
 
 type produceState struct {
 	cb        ackHandler
-	dropCB    func(int)
+	dropCB    func(beat.Event)
 	cancelled bool
 	lastACK   uint32
 }
 
 type ackHandler func(count int)
 
-func newProducer(b *Broker, cb ackHandler, dropCB func(int)) broker.Producer {
+func newProducer(b *Broker, cb ackHandler, dropCB func(beat.Event), dropOnCancel bool) broker.Producer {
+	openState := openState{
+		isOpen: atomic.MakeBool(true),
+		done:   make(chan struct{}),
+		events: b.events,
+	}
+
 	if cb != nil {
-		p := &ackProducer{broker: b, seq: 1, cancel: true}
+		p := &ackProducer{broker: b, seq: 1, cancel: dropOnCancel, openState: openState}
 		p.state.cb = cb
 		p.state.dropCB = dropCB
 		return p
 	}
-	return &forgetfullProducer{broker: b}
+	return &forgetfullProducer{broker: b, openState: openState}
 }
 
-func (p *forgetfullProducer) Publish(event publisher.Event) {
-	p.broker.publish(p.makeRequest(event))
+func (p *forgetfullProducer) Publish(event publisher.Event) bool {
+	return p.openState.publish(p.makeRequest(event))
 }
 
 func (p *forgetfullProducer) TryPublish(event publisher.Event) bool {
-	return p.broker.tryPublish(p.makeRequest(event))
+	return p.openState.tryPublish(p.makeRequest(event))
 }
 
 func (p *forgetfullProducer) makeRequest(event publisher.Event) pushRequest {
 	return pushRequest{event: event}
 }
 
-func (*forgetfullProducer) Cancel() int { return 0 }
+func (p *forgetfullProducer) Cancel() int {
+	p.openState.Close()
+	return 0
+}
 
-func (p *ackProducer) Publish(event publisher.Event) {
-	p.broker.publish(p.makeRequest(event))
+func (p *ackProducer) Publish(event publisher.Event) bool {
+	return p.openState.publish(p.makeRequest(event))
 }
 
 func (p *ackProducer) TryPublish(event publisher.Event) bool {
-	return p.broker.tryPublish(p.makeRequest(event))
+	return p.openState.tryPublish(p.makeRequest(event))
 }
 
 func (p *ackProducer) makeRequest(event publisher.Event) pushRequest {
@@ -68,6 +87,8 @@ func (p *ackProducer) makeRequest(event publisher.Event) pushRequest {
 }
 
 func (p *ackProducer) Cancel() int {
+	p.openState.Close()
+
 	if p.cancel {
 		ch := make(chan producerCancelResponse)
 		p.broker.pubCancel <- producerCancelRequest{
@@ -82,11 +103,28 @@ func (p *ackProducer) Cancel() int {
 	return 0
 }
 
-func (b *Broker) publish(req pushRequest) { b.events <- req }
-func (b *Broker) tryPublish(req pushRequest) bool {
+func (st *openState) Close() {
+	st.isOpen.Store(false)
+	close(st.done)
+}
+
+func (st *openState) publish(req pushRequest) bool {
 	select {
-	case b.events <- req:
+	case st.events <- req:
 		return true
+	case <-st.done:
+		st.events = nil
+		return false
+	}
+}
+
+func (st *openState) tryPublish(req pushRequest) bool {
+	select {
+	case st.events <- req:
+		return true
+	case <-st.done:
+		st.events = nil
+		return false
 	default:
 		return false
 	}

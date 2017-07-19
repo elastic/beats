@@ -320,10 +320,9 @@ class Test(BaseTest):
 
         filebeat = self.start_beat()
 
-        # wait until events are sent for the first time
+        # wait until first 3 scans
         self.wait_until(
-            lambda: self.log_contains(
-                "Events flushed"),
+            lambda: self.log_contains_count("Start next scan") > 3,
             max_timeout=10)
 
         testfile = self.working_dir + "/log/test.log"
@@ -612,19 +611,15 @@ class Test(BaseTest):
 
         # check that not all harvesters were started
         self.wait_until(
-            lambda: self.log_contains("Harvester limit reached"),
-            max_timeout=10)
+            lambda: self.log_contains("Harvester limit reached"))
 
-        # wait for registry to be written
-        self.wait_until(
-            lambda: self.log_contains_count("Registry file updated") > 1,
-            max_timeout=10)
+        self.wait_until(lambda: self.output_lines() > 0)
 
         # Make sure not all events were written so far
         data = self.read_output()
         assert len(data) < 3
 
-        self.wait_until(lambda: self.output_has(lines=3), max_timeout=15)
+        self.wait_until(lambda: self.output_has(lines=3))
 
         data = self.read_output()
         assert len(data) == 3

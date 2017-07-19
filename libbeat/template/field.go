@@ -11,17 +11,21 @@ var (
 )
 
 type Field struct {
-	Name          string `config:"name"`
-	Type          string `config:"type"`
-	Description   string `config:"description"`
-	Format        string `config:"format"`
-	ScalingFactor int    `config:"scaling_factor"`
-	Fields        Fields `config:"fields"`
-	ObjectType    string `config:"object_type"`
-	Enabled       *bool  `config:"enabled"`
+	Name           string `config:"name"`
+	Type           string `config:"type"`
+	Description    string `config:"description"`
+	Format         string `config:"format"`
+	ScalingFactor  int    `config:"scaling_factor"`
+	Fields         Fields `config:"fields"`
+	MultiFields    Fields `config:"multi_fields"`
+	ObjectType     string `config:"object_type"`
+	Enabled        *bool  `config:"enabled"`
+	Analyzer       string `config:"analyzer"`
+	SearchAnalyzer string `config:"search_analyzer"`
+	Norms          bool   `config:"norms"`
 
 	path      string
-	esVersion Version
+	esVersion common.Version
 }
 
 // This includes all entries without special handling for different versions.
@@ -94,20 +98,37 @@ func (f *Field) keyword() common.MapStr {
 }
 
 func (f *Field) text() common.MapStr {
-	property := f.getDefaultProperties()
+	properties := f.getDefaultProperties()
 
-	property["type"] = "text"
+	properties["type"] = "text"
 
 	if f.esVersion.IsMajor(2) {
-		property["type"] = "string"
-		property["index"] = "analyzed"
-		property["norms"] = common.MapStr{
-			"enabled": false,
+		properties["type"] = "string"
+		properties["index"] = "analyzed"
+		if !f.Norms {
+			properties["norms"] = common.MapStr{
+				"enabled": false,
+			}
 		}
 	} else {
-		property["norms"] = false
+		if !f.Norms {
+			properties["norms"] = false
+		}
 	}
-	return property
+
+	if f.Analyzer != "" {
+		properties["analyzer"] = f.Analyzer
+	}
+
+	if f.SearchAnalyzer != "" {
+		properties["search_analyzer"] = f.SearchAnalyzer
+	}
+
+	if len(f.MultiFields) > 0 {
+		properties["fields"] = f.MultiFields.process("", f.esVersion)
+	}
+
+	return properties
 }
 
 func (f *Field) array() common.MapStr {
@@ -116,8 +137,10 @@ func (f *Field) array() common.MapStr {
 
 func (f *Field) object() common.MapStr {
 
-	if f.ObjectType == "text" {
-		dynProperties := f.getDefaultProperties()
+	dynProperties := f.getDefaultProperties()
+
+	switch f.ObjectType {
+	case "text":
 		dynProperties["type"] = "text"
 
 		if f.esVersion.IsMajor(2) {
@@ -125,12 +148,12 @@ func (f *Field) object() common.MapStr {
 			dynProperties["index"] = "analyzed"
 		}
 		f.addDynamicTemplate(dynProperties, "string")
-	}
-
-	if f.ObjectType == "long" {
-		dynProperties := f.getDefaultProperties()
-		dynProperties["type"] = "long"
+	case "long":
+		dynProperties["type"] = f.ObjectType
 		f.addDynamicTemplate(dynProperties, "long")
+	case "keyword":
+		dynProperties["type"] = f.ObjectType
+		f.addDynamicTemplate(dynProperties, "string")
 	}
 
 	properties := f.getDefaultProperties()
@@ -140,16 +163,30 @@ func (f *Field) object() common.MapStr {
 
 func (f *Field) addDynamicTemplate(properties common.MapStr, matchType string) {
 
+	path := ""
+	if len(f.path) > 0 {
+		path = f.path + "."
+	}
 	template := common.MapStr{
 		// Set the path of the field as name
-		f.path + "." + f.Name: common.MapStr{
+		path + f.Name: common.MapStr{
 			"mapping":            properties,
 			"match_mapping_type": matchType,
-			"path_match":         f.path + "." + f.Name + ".*",
+			"path_match":         path + f.Name + ".*",
 		},
 	}
 
 	dynamicTemplates = append(dynamicTemplates, template)
+}
+
+func (f *Field) getDefaultProperties() common.MapStr {
+	// Currently no defaults exist
+	property := common.MapStr{}
+	if f.Enabled != nil {
+		property["enabled"] = *f.Enabled
+	}
+
+	return property
 }
 
 // Recursively generates the correct key based on the dots
@@ -160,13 +197,4 @@ func generateKey(key string) string {
 		key = keys[0] + ".properties." + generateKey(keys[1])
 	}
 	return key
-}
-
-func (f *Field) getDefaultProperties() common.MapStr {
-	// Currently no defaults exist
-	property := common.MapStr{}
-	if f.Enabled != nil {
-		property["enabled"] = *f.Enabled
-	}
-	return property
 }

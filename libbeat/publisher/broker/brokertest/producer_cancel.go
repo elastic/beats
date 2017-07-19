@@ -30,7 +30,8 @@ func TestProducerCancelRemovesEvents(t *testing.T, factory BrokerFactory) {
 
 		log.Debug("create first producer")
 		producer := b.Producer(broker.ProducerConfig{
-			ACK: func(int) {}, // install function pointer, so 'cancel' will remove events
+			ACK:          func(int) {}, // install function pointer, so 'cancel' will remove events
+			DropOnCancel: true,
 		})
 
 		for ; i < N1; i++ {

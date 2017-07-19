@@ -7,7 +7,7 @@ import (
 )
 
 // AWS EC2 Metadata Service
-func newEc2MetadataFetcher(config common.Config) (*metadataFetcher, error) {
+func newEc2MetadataFetcher(config *common.Config) (*metadataFetcher, error) {
 	ec2InstanceIdentityURI := "/2014-02-25/dynamic/instance-identity/document"
 	ec2Schema := func(m map[string]interface{}) common.MapStr {
 		out, _ := s.Schema{

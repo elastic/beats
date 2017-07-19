@@ -15,7 +15,6 @@ import (
 
 	"github.com/elastic/beats/packetbeat/protos"
 	"github.com/elastic/beats/packetbeat/protos/tcp"
-	"github.com/elastic/beats/packetbeat/publish"
 )
 
 var debugf = logp.MakeDebug("rpc")
@@ -45,7 +44,7 @@ type rpc struct {
 	callsSeen          *common.Cache
 	transactionTimeout time.Duration
 
-	results publish.Transactions // Channel where results are pushed.
+	results protos.Reporter // Channel where results are pushed.
 }
 
 func init() {
@@ -54,7 +53,7 @@ func init() {
 
 func New(
 	testMode bool,
-	results publish.Transactions,
+	results protos.Reporter,
 	cfg *common.Config,
 ) (protos.Plugin, error) {
 	p := &rpc{}
@@ -73,7 +72,7 @@ func New(
 	return p, nil
 }
 
-func (r *rpc) init(results publish.Transactions, config *rpcConfig) error {
+func (r *rpc) init(results protos.Reporter, config *rpcConfig) error {
 	r.setFromConfig(config)
 	r.results = results
 	r.callsSeen = common.NewCacheWithRemovalListener(

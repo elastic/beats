@@ -107,7 +107,7 @@ type Client struct {
 	Client *http.Client
 }
 
-func (c *Client) newRequest(verb, url string, body io.Reader) (*http.Request, error) {
+func (c *Client) newRequest(ctx context.Context, verb, url string, body io.Reader) (*http.Request, error) {
 	req, err := http.NewRequest(verb, url, body)
 	if err != nil {
 		return nil, err
@@ -117,7 +117,7 @@ func (c *Client) newRequest(verb, url string, body io.Reader) (*http.Request, er
 			return nil, err
 		}
 	}
-	return req, nil
+	return req.WithContext(ctx), nil
 }
 
 // Option represents optional call parameters, such as label selectors.
@@ -134,7 +134,7 @@ func (o queryParam) queryParam() (string, string) {
 	return o.paramName, o.paramValue
 }
 
-// QueryParam lets you define any filter for watch operations.
+// QueryParam can be used to manually set a URL query parameter by name.
 func QueryParam(name, value string) Option {
 	return queryParam{
 		paramName:  name,
@@ -455,7 +455,7 @@ func (c *Client) create(ctx context.Context, codec *codec, verb, url string, req
 		return err
 	}
 
-	r, err := c.newRequest(verb, url, bytes.NewReader(body))
+	r, err := c.newRequest(ctx, verb, url, bytes.NewReader(body))
 	if err != nil {
 		return err
 	}
@@ -480,7 +480,7 @@ func (c *Client) create(ctx context.Context, codec *codec, verb, url string, req
 }
 
 func (c *Client) delete(ctx context.Context, codec *codec, url string) error {
-	r, err := c.newRequest("DELETE", url, nil)
+	r, err := c.newRequest(ctx, "DELETE", url, nil)
 	if err != nil {
 		return err
 	}
@@ -505,7 +505,7 @@ func (c *Client) delete(ctx context.Context, codec *codec, url string) error {
 
 // get can be used to either get or list a given resource.
 func (c *Client) get(ctx context.Context, codec *codec, url string, resp interface{}) error {
-	r, err := c.newRequest("GET", url, nil)
+	r, err := c.newRequest(ctx, "GET", url, nil)
 	if err != nil {
 		return err
 	}
@@ -591,7 +591,7 @@ func (c *Client) watch(ctx context.Context, url string) (*watcher, error) {
 	} else {
 		url = url + "?watch=true"
 	}
-	r, err := c.newRequest("GET", url, nil)
+	r, err := c.newRequest(ctx, "GET", url, nil)
 	if err != nil {
 		return nil, err
 	}

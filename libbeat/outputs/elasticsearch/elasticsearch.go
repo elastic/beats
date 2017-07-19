@@ -7,10 +7,8 @@ import (
 
 	"github.com/elastic/beats/libbeat/common"
 	"github.com/elastic/beats/libbeat/logp"
-	"github.com/elastic/beats/libbeat/monitoring"
 	"github.com/elastic/beats/libbeat/outputs"
 	"github.com/elastic/beats/libbeat/outputs/outil"
-	"github.com/elastic/beats/libbeat/outputs/transport"
 )
 
 func init() {
@@ -40,20 +38,6 @@ type callbacksRegistry struct {
 // XXX: it would be fantastic to do this without a package global
 var connectCallbackRegistry callbacksRegistry
 
-// Metrics that can retrieved through the expvar web interface.
-var (
-	esMetrics = outputs.Metrics.NewRegistry("elasticsearch")
-
-	ackedEvents            = monitoring.NewInt(esMetrics, "events.acked")
-	eventsNotAcked         = monitoring.NewInt(esMetrics, "events.not_acked")
-	publishEventsCallCount = monitoring.NewInt(esMetrics, "publishEvents.call.count")
-
-	statReadBytes   = monitoring.NewInt(esMetrics, "read.bytes")
-	statWriteBytes  = monitoring.NewInt(esMetrics, "write.bytes")
-	statReadErrors  = monitoring.NewInt(esMetrics, "read.errors")
-	statWriteErrors = monitoring.NewInt(esMetrics, "write.errors")
-)
-
 // RegisterConnectCallback registers a callback for the elasticsearch output
 // The callback is called each time the client connects to elasticsearch.
 func RegisterConnectCallback(callback connectCallback) {
@@ -62,7 +46,11 @@ func RegisterConnectCallback(callback connectCallback) {
 	connectCallbackRegistry.callbacks = append(connectCallbackRegistry.callbacks, callback)
 }
 
-func makeES(beat common.BeatInfo, cfg *common.Config) (outputs.Group, error) {
+func makeES(
+	beat common.BeatInfo,
+	stats *outputs.Stats,
+	cfg *common.Config,
+) (outputs.Group, error) {
 	if !cfg.HasField("bulk_max_size") {
 		cfg.SetInt("bulk_max_size", -1, defaultBulkSize)
 	}
@@ -125,23 +113,9 @@ func makeES(beat common.BeatInfo, cfg *common.Config) (outputs.Group, error) {
 		params = nil
 	}
 
-	stats := &ClientStats{
-		PublishCallCount: publishEventsCallCount,
-		EventsACKed:      ackedEvents,
-		EventsFailed:     eventsNotAcked,
-		IO: &transport.IOStats{
-			Read:               statReadBytes,
-			Write:              statWriteBytes,
-			ReadErrors:         statReadErrors,
-			WriteErrors:        statWriteErrors,
-			OutputsWrite:       outputs.WriteBytes,
-			OutputsWriteErrors: outputs.WriteErrors,
-		},
-	}
-
 	clients := make([]outputs.NetworkClient, len(hosts))
 	for i, host := range hosts {
-		esURL, err := MakeURL(config.Protocol, config.Path, host)
+		esURL, err := common.MakeURL(config.Protocol, config.Path, host, 9200)
 		if err != nil {
 			logp.Err("Invalid host param set: %s, Error: %v", host, err)
 			return outputs.Fail(err)
@@ -185,7 +159,7 @@ func NewConnectedClient(cfg *common.Config) (*Client, error) {
 	for _, client := range clients {
 		err = client.Connect()
 		if err != nil {
-			logp.Err("Error connecting to Elasticsearch: %s", client.Connection.URL)
+			logp.Err("Error connecting to Elasticsearch at %v: %v", client.Connection.URL, err)
 			continue
 		}
 		return &client, nil
@@ -230,7 +204,7 @@ func NewElasticsearchClients(cfg *common.Config) ([]Client, error) {
 
 	clients := []Client{}
 	for _, host := range hosts {
-		esURL, err := MakeURL(config.Protocol, config.Path, host)
+		esURL, err := common.MakeURL(config.Protocol, config.Path, host, 9200)
 		if err != nil {
 			logp.Err("Invalid host param set: %s, Error: %v", host, err)
 			return nil, err

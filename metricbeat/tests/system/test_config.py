@@ -18,7 +18,7 @@ class ConfigTest(metricbeat.BaseTest):
 
         # Copy over full and normal config
 
-        self.copy_files(["metricbeat.yml", "metricbeat.full.yml"],
+        self.copy_files(["metricbeat.yml", "metricbeat.reference.yml"],
                         source_dir="../../",
                         target_dir=".")
 
@@ -27,7 +27,7 @@ class ConfigTest(metricbeat.BaseTest):
         time.sleep(1)
         proc.check_kill_and_wait()
 
-        proc = self.start_beat(config="metricbeat.full.yml", output="full.log",
+        proc = self.start_beat(config="metricbeat.reference.yml", output="full.log",
                                extra_args=["-E", "output.elasticsearch.hosts=['" + self.get_host() + "']"])
         time.sleep(1)
         proc.check_kill_and_wait()

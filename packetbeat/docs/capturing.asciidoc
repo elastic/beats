@@ -11,9 +11,9 @@ The first option has the big advantage that there is no overhead of any kind on
 your application servers. But it requires dedicated networking gear, which is
 generally not available on cloud setups.
 
-In both cases, the sniffing performance (reading packets passively from the network) 
+In both cases, the sniffing performance (reading packets passively from the network)
 is very important. In the case of a dedicated server, better
-sniffing performance means that less hardware is required. When Packetbeat is installed 
+sniffing performance means that less hardware is required. When Packetbeat is installed
 on an existing application server, better sniffing performance means less overhead.
 
 Currently Packetbeat has several options for traffic capturing:
@@ -22,15 +22,6 @@ Currently Packetbeat has several options for traffic capturing:
    it's not the fastest option.
  * `af_packet`, which uses memory mapped sniffing. This option is faster than libpcap
     and doesn't require a kernel module, but it's Linux-specific.
- * `pf_ring`, which makes use of an ntop.org
-   http://www.ntop.org/products/pf_ring/[project]. This setting provides the best
-   sniffing speed, but it requires recompilation and a kernel module, and it's
-   Linux-specific.
-
-The `pf_ring` option provides sniffing speeds in the order of Gigabits per
-second using only standard hardware, but it requires you to recompile Packetbeat
-against the ntop libraries and is therefore currently not officially supported
-by Elastic.
 
 The `af_packet` option, also known as "memory-mapped sniffing," makes use of a
 Linux-specific
@@ -45,10 +36,6 @@ reads from it. The poll system call is used for getting a notification for the
 first packet available, but the remaining available packets can be simply read
 via memory access.
 
-This option is not quite as fast as `pf_ring` (it works to up to 200k packets
-per second before dropping packets), but it requires no recompilation and no
-kernel modules, and it's still a significant improvement over libpcap.
-
 The `af_packet` sniffer can be further tuned to use more memory in exchange for
 better performance. The larger the size of the circular buffer, the fewer
 system calls are needed, which means that fewer CPU cycles are consumed. The default size
@@ -61,5 +48,5 @@ packetbeat.interfaces.type: af_packet
 packetbeat.interfaces.buffer_size_mb: 100
 ------------------------------------------------------------------------------
 
-Please see the <<configuration-interfaces>> section for more 
+Please see the <<configuration-interfaces>> section for more
 configuration options.

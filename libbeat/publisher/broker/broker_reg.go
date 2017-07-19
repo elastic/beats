@@ -24,7 +24,7 @@ func FindFactory(name string) Factory {
 }
 
 // Load instantiates a new broker.
-func Load(config common.ConfigNamespace) (Broker, error) {
+func Load(eventer Eventer, config common.ConfigNamespace) (Broker, error) {
 	t, cfg := config.Name(), config.Config()
 	if t == "" {
 		t = "mem"
@@ -34,5 +34,5 @@ func Load(config common.ConfigNamespace) (Broker, error) {
 	if factory == nil {
 		return nil, fmt.Errorf("broker type %v undefined", t)
 	}
-	return factory(cfg)
+	return factory(eventer, cfg)
 }

@@ -226,8 +226,6 @@ if __name__ == "__main__":
     notice = os.path.join(cwd, "NOTICE")
     vendor_dirs = []
 
-    print(args.vendor)
-
     for root, dirs, files in os.walk(args.vendor):
 
         # Skips all hidden paths like ".git"
@@ -245,4 +243,4 @@ if __name__ == "__main__":
     print("Get the licenses available from {}".format(vendor_dirs))
     create_notice(notice, args.beat, args.copyright, vendor_dirs, args.csvfile)
 
-    print("Available at {}\n".format(notice))
+    print("Available at {}".format(notice))

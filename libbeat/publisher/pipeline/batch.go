@@ -15,7 +15,8 @@ type Batch struct {
 }
 
 type batchContext struct {
-	retryer *retryer
+	observer *observer
+	retryer  *retryer
 }
 
 var batchPool = sync.Pool{
@@ -49,6 +50,7 @@ func (b *Batch) Events() []publisher.Event {
 }
 
 func (b *Batch) ACK() {
+	b.ctx.observer.outBatchACKed(len(b.events))
 	b.original.ACK()
 	releaseBatch(b)
 }
@@ -67,11 +69,22 @@ func (b *Batch) Cancelled() {
 }
 
 func (b *Batch) RetryEvents(events []publisher.Event) {
-	b.events = events
+	b.updEvents(events)
 	b.Retry()
 }
 
 func (b *Batch) CancelledEvents(events []publisher.Event) {
-	b.events = events
+	b.updEvents(events)
 	b.Cancelled()
+}
+
+func (b *Batch) updEvents(events []publisher.Event) {
+	l1 := len(b.events)
+	l2 := len(events)
+	if l1 > l2 {
+		// report subset of events not to be retried as ACKed
+		b.ctx.observer.outBatchACKed(l1 - l2)
+	}
+
+	b.events = events
 }

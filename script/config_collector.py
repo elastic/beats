@@ -35,7 +35,7 @@ def collect(beat_name, beat_path, full=False):
 
         # Check if full config exists
         if full:
-            full_module_config = beat_path + "/config.full.yml"
+            full_module_config = beat_path + "/config.reference.yml"
             if os.path.isfile(full_module_config):
                 module_configs = full_module_config
 

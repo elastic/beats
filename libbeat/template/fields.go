@@ -8,7 +8,7 @@ var (
 
 type Fields []Field
 
-func (f Fields) process(path string, esVersion Version) common.MapStr {
+func (f Fields) process(path string, esVersion common.Version) common.MapStr {
 	output := common.MapStr{}
 
 	for _, field := range f {

@@ -19,6 +19,11 @@ func getReflectFoldMapKeys(c *foldContext, t reflect.Type) (reFoldFn, error) {
 		return nil, errMapRequiresStringKey
 	}
 
+	f := getMapInlineByPrimitiveElem(t.Elem())
+	if f != nil {
+		return f, nil
+	}
+
 	elemVisitor, err := getReflectFold(c, t.Elem())
 	if err != nil {
 		return nil, err
@@ -48,27 +53,15 @@ func makeMapKeysFold(elemVisitor reFoldFn) reFoldFn {
 // getReflectFoldInlineInterface create an inline folder for an yet unknown type.
 // The actual types folder must open/close an object
 func getReflectFoldInlineInterface(C *foldContext, t reflect.Type) (reFoldFn, error) {
-
 	var (
-		ctx = *C
-		vs  = &expectObjVisitor{}
-
 		// cache last used folder
 		lastType    reflect.Type
 		lastVisitor reFoldFn
 	)
 
-	ctx.visitor = structform.EnsureExtVisitor(vs).(visitor)
-	return func(C *foldContext, rv reflect.Value) error {
-		vs.active = C.visitor
-
-		// don't inline missing object
-		if rv.IsNil() || !rv.IsValid() {
-			return nil
-		}
-
+	return embeddObjReFold(C, func(C *foldContext, rv reflect.Value) error {
 		if rv.Type() != lastType {
-			elemVisitor, err := getReflectFold(&ctx, rv.Type())
+			elemVisitor, err := getReflectFold(C, rv.Type())
 			if err != nil {
 				return err
 			}
@@ -76,9 +69,28 @@ func getReflectFoldInlineInterface(C *foldContext, t reflect.Type) (reFoldFn, er
 			lastVisitor = elemVisitor
 			lastType = rv.Type()
 		}
+		return lastVisitor(C, rv)
+	}), nil
+}
+
+func embeddObjReFold(C *foldContext, objFold reFoldFn) reFoldFn {
+	var (
+		ctx = *C
+		vs  = &expectObjVisitor{}
+	)
+
+	ctx.visitor = structform.EnsureExtVisitor(vs).(visitor)
+	return func(C *foldContext, rv reflect.Value) error {
+		// don't inline missing/empty object
+		if rv.IsNil() || !rv.IsValid() {
+			return nil
+		}
+
+		vs.active = C.visitor
+		defer func() { vs.active = nil }()
 
 		vs.depth = 0
-		if err := lastVisitor(&ctx, rv); err != nil {
+		if err := objFold(&ctx, rv); err != nil {
 			return err
 		}
 
@@ -87,7 +99,7 @@ func getReflectFoldInlineInterface(C *foldContext, t reflect.Type) (reFoldFn, er
 		}
 
 		return nil
-	}, nil
+	}
 }
 
 func (v *expectObjVisitor) OnObjectStart(len int, baseType structform.BaseType) error {

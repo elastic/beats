@@ -8,6 +8,7 @@ import (
 	"github.com/elastic/beats/filebeat/util"
 	"github.com/elastic/beats/libbeat/common"
 	"github.com/elastic/beats/libbeat/logp"
+	"github.com/elastic/beats/libbeat/publisher/beat"
 )
 
 type Harvester struct {
@@ -56,11 +57,12 @@ func (h *Harvester) Run() error {
 			continue
 		}
 		data := util.NewData()
-		event := common.MapStr{
-			"message":    string(buffer[:length]),
-			"@timestamp": time.Now(),
+		data.Event = beat.Event{
+			Timestamp: time.Now(),
+			Fields: common.MapStr{
+				"message": string(buffer[:length]),
+			},
 		}
-		data.Event = event
 		h.forwarder.Send(data)
 	}
 }

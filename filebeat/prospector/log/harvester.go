@@ -20,6 +20,7 @@ import (
 	"sync"
 	"time"
 
+	"github.com/elastic/beats/filebeat/channel"
 	"github.com/elastic/beats/filebeat/harvester"
 	"github.com/elastic/beats/filebeat/harvester/encoding"
 	"github.com/elastic/beats/filebeat/harvester/reader"
@@ -28,6 +29,7 @@ import (
 	"github.com/elastic/beats/libbeat/common"
 	"github.com/elastic/beats/libbeat/logp"
 	"github.com/elastic/beats/libbeat/monitoring"
+	"github.com/elastic/beats/libbeat/publisher/beat"
 
 	"github.com/satori/go.uuid"
 	"golang.org/x/text/transform"
@@ -50,19 +52,28 @@ var (
 
 // Harvester contains all harvester related data
 type Harvester struct {
-	forwarder       *harvester.Forwarder
-	config          config
-	state           file.State
-	states          *file.States
-	source          harvester.Source // the source being watched
-	log             *Log
+	id     uuid.UUID
+	config config
+	source harvester.Source // the source being watched
+
+	// shutdown handling
+	done     chan struct{}
+	stopOnce sync.Once
+	stopWg   *sync.WaitGroup
+
+	// internal harvester state
+	state  file.State
+	states *file.States
+	log    *Log
+
+	// file reader pipeline
+	reader          reader.Reader
 	encodingFactory encoding.EncodingFactory
 	encoding        encoding.Encoding
-	done            chan struct{}
-	stopOnce        sync.Once
-	stopWg          *sync.WaitGroup
-	id              uuid.UUID
-	reader          reader.Reader
+
+	// event/state publishing
+	forwarder    *harvester.Forwarder
+	publishState func(*util.Data) bool
 }
 
 // NewHarvester creates a new harvester
@@ -70,16 +81,18 @@ func NewHarvester(
 	config *common.Config,
 	state file.State,
 	states *file.States,
-	outlet harvester.Outlet,
+	publishState func(*util.Data) bool,
+	outlet channel.Outleter,
 ) (*Harvester, error) {
 
 	h := &Harvester{
-		config: defaultConfig,
-		state:  state,
-		states: states,
-		done:   make(chan struct{}),
-		stopWg: &sync.WaitGroup{},
-		id:     uuid.NewV4(),
+		config:       defaultConfig,
+		state:        state,
+		states:       states,
+		publishState: publishState,
+		done:         make(chan struct{}),
+		stopWg:       &sync.WaitGroup{},
+		id:           uuid.NewV4(),
 	}
 
 	if err := config.Unpack(&h.config); err != nil {
@@ -98,14 +111,8 @@ func NewHarvester(
 	}
 
 	// Add outlet signal so harvester can also stop itself
-	outlet.SetSignal(h.done)
-
-	var err error
-	h.forwarder, err = harvester.NewForwarder(config, outlet)
-	if err != nil {
-		return nil, err
-	}
-
+	outlet = channel.CloseOnSignal(outlet, h.done)
+	h.forwarder = harvester.NewForwarder(outlet)
 	return h, nil
 }
 
@@ -164,8 +171,9 @@ func (h *Harvester) Run() error {
 	defer func() {
 		// Channel to stop internal harvester routines
 		h.stop()
+
 		// Makes sure file is properly closed when the harvester is stopped
-		h.close()
+		h.cleanup()
 
 		harvesterRunning.Add(-1)
 
@@ -252,27 +260,30 @@ func (h *Harvester) Run() error {
 
 		// Check if data should be added to event. Only export non empty events.
 		if !message.IsEmpty() && h.shouldExportLine(text) {
-
-			data.Event = common.MapStr{
-				"@timestamp": common.Time(message.Ts),
-				"source":     state.Source,
-				"offset":     state.Offset, // Offset here is the offset before the starting char.
+			fields := common.MapStr{
+				"source": state.Source,
+				"offset": state.Offset, // Offset here is the offset before the starting char.
 			}
-			data.Event.DeepUpdate(message.Fields)
+			fields.DeepUpdate(message.Fields)
 
 			// Check if json fields exist
 			var jsonFields common.MapStr
-			if fields, ok := data.Event["json"]; ok {
-				jsonFields = fields.(common.MapStr)
+			if f, ok := fields["json"]; ok {
+				jsonFields = f.(common.MapStr)
 			}
 
 			if h.config.JSON != nil && len(jsonFields) > 0 {
-				reader.MergeJSONFields(data.Event, jsonFields, &text, *h.config.JSON)
+				reader.MergeJSONFields(fields, jsonFields, &text, *h.config.JSON)
 			} else if &text != nil {
-				if data.Event == nil {
-					data.Event = common.MapStr{}
+				if fields == nil {
+					fields = common.MapStr{}
 				}
-				data.Event["message"] = text
+				fields["message"] = text
+			}
+
+			data.Event = beat.Event{
+				Timestamp: message.Ts,
+				Fields:    fields,
 			}
 		}
 
@@ -281,6 +292,7 @@ func (h *Harvester) Run() error {
 		if !h.sendEvent(data) {
 			return nil
 		}
+
 		// Update state of harvester as successfully sent
 		h.state = state
 	}
@@ -326,7 +338,7 @@ func (h *Harvester) SendStateUpdate() {
 
 	d := util.NewData()
 	d.SetState(h.state)
-	h.forwarder.Outlet.OnEvent(d)
+	h.publishState(d)
 }
 
 // shouldExportLine decides if the line is exported or not based on
@@ -442,12 +454,13 @@ func (h *Harvester) getState() file.State {
 	return state
 }
 
-func (h *Harvester) close() {
+func (h *Harvester) cleanup() {
 
 	// Mark harvester as finished
 	h.state.Finished = true
 
 	logp.Debug("harvester", "Stopping harvester for file: %s", h.state.Source)
+	defer logp.Debug("harvester", "harvester cleanup finished for file: %s", h.state.Source)
 
 	// Make sure file is closed as soon as harvester exits
 	// If file was never opened, it can't be closed

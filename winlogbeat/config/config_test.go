@@ -38,19 +38,6 @@ func TestConfigValidate(t *testing.T) {
 			"", // No Error
 		},
 		{
-			Settings{
-				WinlogbeatConfig{
-					EventLogs: []map[string]interface{}{
-						{"Name": "App"},
-					},
-				},
-				map[string]interface{}{"other": "value"},
-			},
-			"1 error: Invalid top-level key 'other' found. Valid keys are bulk_queue_size, dashboards, " +
-				"fields, fields_under_root, logging, max_procs, " +
-				"name, output, path, processors, queue_size, tags, winlogbeat",
-		},
-		{
 			WinlogbeatConfig{},
 			"1 error: At least one event log must be configured as part of " +
 				"event_logs",

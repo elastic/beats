@@ -36,8 +36,8 @@ func TestIndex(t *testing.T) {
 	if err != nil {
 		t.Fatalf("Index() returns error: %s", err)
 	}
-	if !resp.Created {
-		t.Errorf("Index() fails: %s", resp)
+	if !resp.Created && resp.Result != "created" {
+		t.Fatalf("Index() fails: %s", resp)
 	}
 
 	params = map[string]string{
@@ -103,7 +103,7 @@ func TestIngest(t *testing.T) {
 	if err != nil {
 		t.Fatalf("Ingest() returns error: %s", err)
 	}
-	if !resp.Created {
+	if !resp.Created && resp.Result != "created" {
 		t.Errorf("Ingest() fails: %s", resp)
 	}
 

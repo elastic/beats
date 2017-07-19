@@ -94,7 +94,11 @@ func kafkaMetricsRegistry() gometrics.Registry {
 	return kafkaMetricsRegistryInstance
 }
 
-func makeKafka(beat common.BeatInfo, cfg *common.Config) (outputs.Group, error) {
+func makeKafka(
+	beat common.BeatInfo,
+	stats *outputs.Stats,
+	cfg *common.Config,
+) (outputs.Group, error) {
 	debugf("initialize kafka output")
 
 	config := defaultConfig
@@ -127,7 +131,7 @@ func makeKafka(beat common.BeatInfo, cfg *common.Config) (outputs.Group, error) 
 		return outputs.Fail(err)
 	}
 
-	client, err := newKafkaClient(hosts, beat.Beat, config.Key, topic, codec, libCfg)
+	client, err := newKafkaClient(stats, hosts, beat.Beat, config.Key, topic, codec, libCfg)
 	if err != nil {
 		return outputs.Fail(err)
 	}

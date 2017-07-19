@@ -65,7 +65,6 @@ in <<configuration-metricbeat>>. Here is an example configuration:
 metricbeat.modules:
 - module: mongodb
   metricsets: ["dbstats", "status"]
-  enabled: false
   period: 10s
 
   # The hosts must be passed as MongoDB URLs in the format:

@@ -2,12 +2,15 @@ package beat
 
 import (
 	"time"
+
+	"github.com/elastic/beats/libbeat/common"
 )
 
 type Pipeline interface {
+	Close() error
 	Connect() (Client, error)
 	ConnectWith(ClientConfig) (Client, error)
-	Close() error
+	SetACKHandler(PipelineACKHandler) error
 }
 
 // Client holds a connection to the beats publisher pipeline
@@ -22,15 +25,28 @@ type Client interface {
 type ClientConfig struct {
 	PublishMode PublishMode
 
+	// EventMetadata configures additional fields/tags to be added to published events.
+	EventMetadata common.EventMetadata
+
+	// Meta provides additional meta data to be added to the Meta field in the beat.Event
+	// structure.
+	Meta common.MapStr
+
+	// Fields provides additional 'global' fields to be added to every event
+	Fields common.MapStr
+
 	// Processors passes additional processor to the client, to be executed before
 	// the pipeline processors.
-	Processor Processor
+	Processor ProcessorList
 
 	// WaitClose sets the maximum duration to wait on ACK, if client still has events
 	// active non-acknowledged events in the publisher pipeline.
 	// WaitClose is only effective if one of ACKCount, ACKEvents and ACKLastEvents
 	// is configured
 	WaitClose time.Duration
+
+	// Events configures callbacks for common client callbacks
+	Events ClientEventer
 
 	// ACK handler strategies.
 	// Note: ack handlers are run in another go-routine owned by the publisher pipeline.
@@ -52,11 +68,38 @@ type ClientConfig struct {
 	ACKLastEvent func(Event)
 }
 
+// ClientEventer provides access to internal client events.
+type ClientEventer interface {
+	Closing() // Closing indicates the client is being shutdown next
+	Closed()  // Closed indicates the client being fully shutdown
+
+	Published()             // event been has successfully forwarded to the publisher pipeline
+	FilteredOut(Event)      // event has been filtered out/dropped by processors
+	DroppedOnPublish(Event) // event has been dropped, while waiting for the broker
+}
+
+// PipelineACKHandler configures some pipeline-wide event ACK handler.
+type PipelineACKHandler struct {
+	// ACKCount reports the number of published events recently acknowledged
+	// by the pipeline.
+	ACKCount func(int)
+
+	// ACKEvents reports the events recently acknowledged by the pipeline.
+	ACKEvents func([]Event)
+
+	// ACKLastEvent reports the last ACKed event per pipeline client.
+	ACKLastEvents func([]Event)
+}
+
+type ProcessorList interface {
+	All() []Processor
+}
+
 // Processor defines the minimal required interface for processor, that can be
 // registered with the publisher pipeline.
 type Processor interface {
 	String() string // print full processor description
-	Run(in Event) (event Event, publish bool, err error)
+	Run(in *Event) (event *Event, err error)
 }
 
 // PublishMode enum sets some requirements on the client connection to the beats

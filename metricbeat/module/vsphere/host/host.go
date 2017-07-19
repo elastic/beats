@@ -116,7 +116,7 @@ func (m *MetricSet) Fetch() ([]common.MapStr, error) {
 				},
 				"memory": common.MapStr{
 					"used": common.MapStr{
-						"bytes": hs.Summary.QuickStats.OverallMemoryUsage * 1024 * 1024,
+						"bytes": (int64(hs.Summary.QuickStats.OverallMemoryUsage) * 1024 * 1024),
 					},
 					"total": common.MapStr{
 						"bytes": hs.Summary.Hardware.MemorySize,

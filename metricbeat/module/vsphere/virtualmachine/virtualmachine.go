@@ -3,6 +3,7 @@ package virtualmachine
 import (
 	"context"
 	"net/url"
+	"strings"
 	"sync"
 
 	"github.com/elastic/beats/libbeat/common"
@@ -12,6 +13,7 @@ import (
 	"github.com/pkg/errors"
 	"github.com/vmware/govmomi"
 	"github.com/vmware/govmomi/find"
+	"github.com/vmware/govmomi/object"
 	"github.com/vmware/govmomi/property"
 	"github.com/vmware/govmomi/vim25"
 	"github.com/vmware/govmomi/vim25/mo"
@@ -26,17 +28,21 @@ func init() {
 
 type MetricSet struct {
 	mb.BaseMetricSet
-	Client *vim25.Client
+	Client          *vim25.Client
+	GetCustomFields bool
 }
 
 func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
 	logp.Experimental("The vsphere virtualmachine metricset is experimental")
 
 	config := struct {
-		Username string `config:"username"`
-		Password string `config:"password"`
-		Insecure bool   `config:"insecure"`
-	}{}
+		Username        string `config:"username"`
+		Password        string `config:"password"`
+		Insecure        bool   `config:"insecure"`
+		GetCustomFields bool   `config:"get_custom_fields"`
+	}{
+		GetCustomFields: false,
+	}
 
 	if err := base.Module().UnpackConfig(&config); err != nil {
 		return nil, err
@@ -55,8 +61,9 @@ func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
 	}
 
 	return &MetricSet{
-		BaseMetricSet: base,
-		Client:        c.Client,
+		BaseMetricSet:   base,
+		Client:          c.Client,
+		GetCustomFields: config.GetCustomFields,
 	}, nil
 }
 
@@ -65,6 +72,16 @@ func (m *MetricSet) Fetch() ([]common.MapStr, error) {
 
 	ctx, cancel := context.WithCancel(context.Background())
 	defer cancel()
+
+	// Get custom fields (attributes) names if get_custom_fields is true.
+	customFieldsMap := make(map[int32]string)
+	if m.GetCustomFields {
+		var err error
+		customFieldsMap, err = setCustomFieldsMap(ctx, m.Client)
+		if err != nil {
+			return nil, err
+		}
+	}
 
 	// Get all data centers.
 	dcs, err := f.DatacenterList(ctx, "*")
@@ -121,15 +138,15 @@ func (m *MetricSet) Fetch() ([]common.MapStr, error) {
 					"memory": common.MapStr{
 						"used": common.MapStr{
 							"guest": common.MapStr{
-								"bytes": vm.Summary.QuickStats.GuestMemoryUsage * 1024 * 1024,
+								"bytes": (int64(vm.Summary.QuickStats.GuestMemoryUsage) * 1024 * 1024),
 							},
 							"host": common.MapStr{
-								"bytes": vm.Summary.QuickStats.HostMemoryUsage * 1024 * 1024,
+								"bytes": (int64(vm.Summary.QuickStats.HostMemoryUsage) * 1024 * 1024),
 							},
 						},
 						"total": common.MapStr{
 							"guest": common.MapStr{
-								"bytes": vm.Summary.Config.MemorySizeMB * 1024 * 1024,
+								"bytes": (int64(vm.Summary.Config.MemorySizeMB) * 1024 * 1024),
 							},
 						},
 						"free": common.MapStr{
@@ -138,6 +155,15 @@ func (m *MetricSet) Fetch() ([]common.MapStr, error) {
 							},
 						},
 					},
+				}
+
+				// Get custom fields (attributes) values if get_custom_fields is true.
+				if m.GetCustomFields {
+					customFields := getCustomFields(vm.Summary.CustomValue, customFieldsMap)
+
+					if len(customFields) > 0 {
+						event["custom_fields"] = customFields
+					}
 				}
 
 				mutex.Lock()
@@ -150,4 +176,40 @@ func (m *MetricSet) Fetch() ([]common.MapStr, error) {
 	wg.Wait()
 
 	return events, nil
+}
+
+func getCustomFields(customFields []types.BaseCustomFieldValue, customFieldsMap map[int32]string) common.MapStr {
+	outputFields := common.MapStr{}
+	for _, v := range customFields {
+		customFieldString := v.(*types.CustomFieldStringValue)
+		key, ok := customFieldsMap[v.GetCustomFieldValue().Key]
+		if ok {
+			// If key has '.', is replaced with '_' to be compatible with ES2.x.
+			fmtKey := strings.Replace(key, ".", "_", -1)
+			outputFields.Put(fmtKey, customFieldString.Value)
+		}
+	}
+
+	return outputFields
+}
+
+func setCustomFieldsMap(ctx context.Context, client *vim25.Client) (map[int32]string, error) {
+	customFieldsMap := make(map[int32]string)
+
+	customFieldsManager, err := object.GetCustomFieldsManager(client)
+
+	if err != nil {
+		return nil, errors.Wrap(err, "failed to get custom fields manager")
+	} else {
+		field, err := customFieldsManager.Field(ctx)
+		if err != nil {
+			return nil, errors.Wrap(err, "failed to get custom fields")
+		}
+
+		for _, def := range field {
+			customFieldsMap[def.Key] = def.Name
+		}
+	}
+
+	return customFieldsMap, nil
 }

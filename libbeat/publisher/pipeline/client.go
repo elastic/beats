@@ -1,6 +1,8 @@
 package pipeline
 
 import (
+	"sync"
+
 	"github.com/elastic/beats/libbeat/publisher"
 	"github.com/elastic/beats/libbeat/publisher/beat"
 	"github.com/elastic/beats/libbeat/publisher/broker"
@@ -16,63 +18,93 @@ type client struct {
 	pipeline   *Pipeline
 	processors beat.Processor
 	producer   broker.Producer
+	mutex      sync.Mutex
 	acker      acker
 
 	eventFlags   publisher.EventFlags
 	canDrop      bool
-	cancelEvents bool
 	reportEvents bool
+
+	eventer beat.ClientEventer
 }
 
 func (c *client) PublishAll(events []beat.Event) {
+	c.mutex.Lock()
+	defer c.mutex.Unlock()
+
 	for _, e := range events {
-		c.Publish(e)
+		c.publish(e)
 	}
 }
 
 func (c *client) Publish(e beat.Event) {
-	publish := true
+	c.mutex.Lock()
+	defer c.mutex.Unlock()
+
+	c.publish(e)
+}
+
+func (c *client) publish(e beat.Event) {
+	var (
+		event   = &e
+		publish = true
+		log     = c.pipeline.logger
+	)
+
+	c.onNewEvent()
 
 	if c.processors != nil {
 		var err error
 
-		e, publish, err = c.processors.Run(e)
+		event, err = c.processors.Run(event)
+		publish = event != nil
 		if err != nil {
 			// TODO: introduce dead-letter queue?
 
-			log := c.pipeline.logger
 			log.Errf("Failed to publish event: %v", err)
-
-			// set publish to false, so event dropped/failed event can
-			// be account on ACK for.
-			publish = false
 		}
 	}
 
-	c.acker.addEvent(e, publish)
-	if !publish {
+	if event != nil {
+		e = *event
+	}
+
+	open := c.acker.addEvent(e, publish)
+	if !open {
+		// client is closing down -> report event as dropped and return
+		c.onDroppedOnPublish(e)
 		return
 	}
 
-	event := publisher.Event{
+	if !publish {
+		c.onFilteredOut(e)
+		return
+	}
+
+	e = *event
+	pubEvent := publisher.Event{
 		Content: e,
 		Flags:   c.eventFlags,
 	}
 
-	dropped := false
+	if c.reportEvents {
+		c.pipeline.waitCloser.inc()
+	}
+
+	var published bool
 	if c.canDrop {
-		if c.reportEvents {
-			c.pipeline.events.Add(1)
-		}
-		dropped = !c.producer.TryPublish(event)
-		if dropped && c.reportEvents {
-			c.pipeline.activeEventsDone(1)
-		}
+		published = c.producer.TryPublish(pubEvent)
 	} else {
+		published = c.producer.Publish(pubEvent)
+	}
+
+	if published {
+		c.onPublished()
+	} else {
+		c.onDroppedOnPublish(e)
 		if c.reportEvents {
-			c.pipeline.activeEventsAdd(1)
+			c.pipeline.waitCloser.dec(1)
 		}
-		c.producer.Publish(event)
 	}
 }
 
@@ -82,21 +114,62 @@ func (c *client) Close() error {
 
 	log := c.pipeline.logger
 
+	c.onClosing()
+
 	log.Debug("client: closing acker")
 	c.acker.close()
 	log.Debug("client: done closing acker")
 
 	// finally disconnect client from broker
-	if c.cancelEvents {
+	n := c.producer.Cancel()
+	log.Debugf("client: cancelled %v events", n)
 
-		n := c.producer.Cancel()
-		log.Debugf("client: cancelled %v events", n)
-
-		if c.reportEvents {
-			log.Debugf("client: remove client events")
-			c.pipeline.activeEventsDone(n)
+	if c.reportEvents {
+		log.Debugf("client: remove client events")
+		if n > 0 {
+			c.pipeline.waitCloser.dec(n)
 		}
 	}
 
+	c.onClosed()
 	return nil
+}
+
+func (c *client) onClosing() {
+	c.pipeline.observer.clientClosing()
+	if c.eventer != nil {
+		c.eventer.Closing()
+	}
+}
+
+func (c *client) onClosed() {
+	c.pipeline.observer.clientClosed()
+	if c.eventer != nil {
+		c.eventer.Closed()
+	}
+}
+
+func (c *client) onNewEvent() {
+	c.pipeline.observer.newEvent()
+}
+
+func (c *client) onPublished() {
+	c.pipeline.observer.publishedEvent()
+	if c.eventer != nil {
+		c.eventer.Published()
+	}
+}
+
+func (c *client) onFilteredOut(e beat.Event) {
+	c.pipeline.observer.filteredEvent()
+	if c.eventer != nil {
+		c.eventer.FilteredOut(e)
+	}
+}
+
+func (c *client) onDroppedOnPublish(e beat.Event) {
+	c.pipeline.observer.failedPublishEvent()
+	if c.eventer != nil {
+		c.eventer.DroppedOnPublish(e)
+	}
 }

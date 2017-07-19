@@ -89,16 +89,13 @@ filebeat.prospectors:
 {{prospector_raw}}
 {% endif %}
 
-filebeat.spool_size:
 filebeat.shutdown_timeout: {{ shutdown_timeout|default(0) }}
-filebeat.idle_timeout: 0.1s
 {% if not skip_registry_config %}
 filebeat.registry_file: {{ beat.working_dir + '/' }}{{ registryFile|default("registry")}}
 {%endif%}
-filebeat.publish_async: {{publish_async}}
 
 {% if reload or reload_path -%}
-filebeat.config.prospectors:
+filebeat.config.{{ reload_type|default("prospectors") }}:
   enabled: true
   path: {{ reload_path }}
   {% if reload  -%}
@@ -164,8 +161,12 @@ processors:
 #------------------------------- Elasticsearch output ----------------------------
 output.elasticsearch:
   hosts: ["{{ elasticsearch.host }}"]
+{% if elasticsearch.pipeline %}
   pipeline: {{elasticsearch.pipeline}}
+{% endif %}
+{% if elasticsearch.index %}
   index: {{elasticsearch.index}}
+{% endif %}
 {%- elif logstash %}
 #------------------------------- Logstash output ---------------------------------
 output.logstash:

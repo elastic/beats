@@ -11,7 +11,12 @@ import (
 
 type typeFoldRegistry struct {
 	// mu sync.RWMutex
-	m map[reflect.Type]reFoldFn
+	m map[typeFoldKey]reFoldFn
+}
+
+type typeFoldKey struct {
+	ty     reflect.Type
+	inline bool
 }
 
 var _foldRegistry = newTypeFoldRegistry()
@@ -177,7 +182,7 @@ func makeFieldsFold(fields []reFoldFn) reFoldFn {
 	}
 }
 
-func fieldFold(c *foldContext, t reflect.Type, idx int) (reFoldFn, error) {
+func fieldFold(C *foldContext, t reflect.Type, idx int) (reFoldFn, error) {
 	st := t.Field(idx)
 
 	name := st.Name
@@ -187,44 +192,73 @@ func fieldFold(c *foldContext, t reflect.Type, idx int) (reFoldFn, error) {
 		return nil, nil
 	}
 
-	tagName, tagOpts := parseTags(st.Tag.Get(c.opts.tag))
-	if !tagOpts.squash {
-		if tagName != "" {
-			name = tagName
-		} else {
-			name = strings.ToLower(name)
-		}
-
-		valueVisitor, err := getReflectFold(c, st.Type)
-		if err != nil {
-			return nil, err
-		}
-
-		return makeFieldFold(name, idx, valueVisitor)
+	tagName, tagOpts := parseTags(st.Tag.Get(C.opts.tag))
+	if tagOpts.squash {
+		return fieldFoldInline(C, t, idx)
 	}
 
+	valueVisitor, err := getReflectFold(C, st.Type)
+	if err != nil {
+		return nil, err
+	}
+
+	if tagName != "" {
+		name = tagName
+	} else {
+		name = strings.ToLower(name)
+	}
+	return makeFieldFold(name, idx, valueVisitor)
+}
+
+func fieldFoldInline(C *foldContext, t reflect.Type, idx int) (reFoldFn, error) {
 	var (
+		st          = t.Field(idx)
 		N, bt       = baseType(st.Type)
 		baseVisitor reFoldFn
 		err         error
 	)
 
-	switch bt.Kind() {
-	case reflect.Struct:
-		baseVisitor, err = getReflectFoldStruct(c, bt, true)
-	case reflect.Map:
-		baseVisitor, err = getReflectFoldMapKeys(c, bt)
-	case reflect.Interface:
-		baseVisitor, err = getReflectFoldInlineInterface(c, bt)
-	default:
-		err = errSquashNeedObject
-	}
-	if err != nil {
-		return nil, err
+	f := C.reg.findInline(st.Type)
+	if f != nil {
+		return makeFieldInlineFold(idx, f), nil
 	}
 
-	valueVisitor := makePointerFold(N, baseVisitor)
-	return makeFieldInlineFold(idx, valueVisitor)
+	baseVisitor = C.reg.findInline(bt)
+	if baseVisitor == nil {
+		baseVisitor, err = fieldFoldGenInline(C, bt)
+		if err != nil {
+			return nil, err
+		}
+		C.reg.setInline(bt, baseVisitor)
+	}
+
+	f = makePointerFold(N, baseVisitor)
+	C.reg.setInline(st.Type, f)
+
+	return makeFieldInlineFold(idx, f), nil
+}
+
+func fieldFoldGenInline(C *foldContext, t reflect.Type) (reFoldFn, error) {
+	if C.userReg != nil {
+		if f := C.userReg[t]; f != nil {
+			f = embeddObjReFold(C, f)
+		}
+	}
+
+	if t.Implements(tFolder) {
+		return embeddObjReFold(C, reFoldFolderIfc), nil
+	}
+
+	switch t.Kind() {
+	case reflect.Struct:
+		return getReflectFoldStruct(C, t, true)
+	case reflect.Map:
+		return getReflectFoldMapKeys(C, t)
+	case reflect.Interface:
+		return getReflectFoldInlineInterface(C, t)
+	}
+
+	return nil, errSquashNeedObject
 }
 
 func makeFieldFold(name string, idx int, fn reFoldFn) (reFoldFn, error) {
@@ -236,10 +270,10 @@ func makeFieldFold(name string, idx int, fn reFoldFn) (reFoldFn, error) {
 	}, nil
 }
 
-func makeFieldInlineFold(idx int, fn reFoldFn) (reFoldFn, error) {
+func makeFieldInlineFold(idx int, fn reFoldFn) reFoldFn {
 	return func(C *foldContext, v reflect.Value) error {
 		return fn(C, v.Field(idx))
-	}, nil
+	}
 }
 
 func getReflectFoldSlice(c *foldContext, t reflect.Type) (reFoldFn, error) {
@@ -384,19 +418,31 @@ func foldAnyReflect(C *foldContext, v reflect.Value) error {
 }
 
 func newTypeFoldRegistry() *typeFoldRegistry {
-	return &typeFoldRegistry{m: map[reflect.Type]reFoldFn{}}
+	return &typeFoldRegistry{m: map[typeFoldKey]reFoldFn{}}
 }
 
 func (r *typeFoldRegistry) find(t reflect.Type) reFoldFn {
 	// r.mu.RLock()
 	// defer r.mu.RUnlock()
-	return r.m[t]
+	return r.m[typeFoldKey{ty: t, inline: false}]
+}
+
+func (r *typeFoldRegistry) findInline(t reflect.Type) reFoldFn {
+	// r.mu.RLock()
+	// defer r.mu.RUnlock()
+	return r.m[typeFoldKey{ty: t, inline: true}]
 }
 
 func (r *typeFoldRegistry) set(t reflect.Type, f reFoldFn) {
 	// r.mu.Lock()
 	// defer r.mu.Unlock()
-	r.m[t] = f
+	r.m[typeFoldKey{ty: t, inline: false}] = f
+}
+
+func (r *typeFoldRegistry) setInline(t reflect.Type, f reFoldFn) {
+	// r.mu.Lock()
+	// defer r.mu.Unlock()
+	r.m[typeFoldKey{ty: t, inline: true}] = f
 }
 
 func liftFold(sample interface{}, fn foldFn) reFoldFn {

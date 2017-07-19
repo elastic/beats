@@ -17,9 +17,11 @@ With `format` you can set the output format for a specific counter. Possible val
   metricsets: ["perfmon"]
   period: 10s
   perfmon.counters:
-    - alias: "processor.time.total.pct"
+    - instance_label: "processor.name"
+      measurement_label: "processor.time.total.pct"
       query: '\Processor Information(_Total)\% Processor Time'
-    - alias: "diskio.write.bytes"
-      query: '\PhysicalDisk(_Total)\Disk Writes/sec'
+    - instance_label: "diskio.name"
+      measurement_label: "diskio.write.bytes"
+      query: '\PhysicalDisk(*)\Disk Writes/sec'
       format: "long"
 ----

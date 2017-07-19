@@ -93,7 +93,7 @@ metricbeat.modules:
 
 {% if reload -%}
 metricbeat.config.modules:
-  path: {{ reload_path }}
+  path: {{ reload_path|default("${path.config}/modules.d/*.yml") }}
   reload.period: 1s
   reload.enabled: true
 {% endif -%}

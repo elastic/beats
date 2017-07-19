@@ -22,10 +22,10 @@ type ConditionFields struct {
 	fields map[string]interface{}
 }
 
-type PluginConfig []map[string]common.Config
+type PluginConfig []map[string]*common.Config
 
 // fields that should be always exported
-var MandatoryExportedFields = []string{"@timestamp", "type"}
+var MandatoryExportedFields = []string{"type"}
 
 func (f *ConditionFields) Unpack(to interface{}) error {
 	m, ok := to.(map[string]interface{})

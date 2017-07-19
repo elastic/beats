@@ -9,7 +9,6 @@ PREPARE_COMMAND?=
 # Runs test build for mock beat
 .PHONY: test
 test: prepare-test
-
 	. ${PYTHON_ENV}/bin/activate; \
 	export GOPATH=${PWD}/build ; \
 	export PATH=${PATH}:${PWD}/build/bin; \
@@ -33,7 +32,6 @@ prepare-test: python-env
 # Runs test build for the created beat
 .PHONY: test-build
 test-build: test
-
 	# Copy dev tools
 	cp -r ${PWD}/../../../dev-tools ${BEAT_PATH}/vendor/github.com/elastic/beats/
 
@@ -44,10 +42,10 @@ test-build: test
 # Sets up the virtual python environment
 .PHONY: python-env
 python-env:
-	test -d ${PYTHON_ENV} || virtualenv ${PYTHON_ENV}
-	. ${PYTHON_ENV}/bin/activate && pip install --upgrade pip PyYAML
+	@test -d ${PYTHON_ENV} || virtualenv ${PYTHON_ENV}
+	@${PYTHON_ENV}/bin/pip install --upgrade pip PyYAML
 
 # Cleans up environment
 .PHONY: clean
 clean:
-	rm -rf build
+	@rm -rf build

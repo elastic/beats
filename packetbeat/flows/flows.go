@@ -4,8 +4,8 @@ import (
 	"time"
 
 	"github.com/elastic/beats/libbeat/logp"
+	"github.com/elastic/beats/libbeat/publisher/beat"
 	"github.com/elastic/beats/packetbeat/config"
-	"github.com/elastic/beats/packetbeat/publish"
 )
 
 type Flows struct {
@@ -14,6 +14,9 @@ type Flows struct {
 	counterReg *counterReg
 }
 
+// Reporter callback type, to report flow events to.
+type Reporter func([]beat.Event)
+
 var debugf = logp.MakeDebug("flows")
 
 const (
@@ -21,7 +24,7 @@ const (
 	defaultPeriod  = 10 * time.Second
 )
 
-func NewFlows(pub publish.Flows, config *config.Flows) (*Flows, error) {
+func NewFlows(pub Reporter, config *config.Flows) (*Flows, error) {
 	duration := func(s string, d time.Duration) (time.Duration, error) {
 		if s == "" {
 			return d, nil

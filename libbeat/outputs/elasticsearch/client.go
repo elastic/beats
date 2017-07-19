@@ -12,12 +12,12 @@ import (
 	"time"
 
 	"github.com/elastic/beats/libbeat/logp"
-	"github.com/elastic/beats/libbeat/monitoring"
 	"github.com/elastic/beats/libbeat/outputs"
 	"github.com/elastic/beats/libbeat/outputs/outil"
 	"github.com/elastic/beats/libbeat/outputs/transport"
 	"github.com/elastic/beats/libbeat/publisher"
 	"github.com/elastic/beats/libbeat/publisher/beat"
+	"github.com/elastic/beats/libbeat/testing"
 )
 
 // Client is an elasticsearch client.
@@ -40,7 +40,7 @@ type Client struct {
 	compressionLevel int
 	proxyURL         *url.URL
 
-	stats *ClientStats
+	stats *outputs.Stats
 }
 
 // ClientSettings contains the settings for a client.
@@ -55,14 +55,7 @@ type ClientSettings struct {
 	Pipeline           *outil.Selector
 	Timeout            time.Duration
 	CompressionLevel   int
-	Stats              *ClientStats
-}
-
-type ClientStats struct {
-	PublishCallCount *monitoring.Int
-	EventsACKed      *monitoring.Int
-	EventsFailed     *monitoring.Int
-	IO               *transport.IOStats
+	Stats              *outputs.Stats
 }
 
 type connectCallback func(client *Client) error
@@ -138,9 +131,9 @@ func NewClient(
 		return nil, err
 	}
 
-	if st := s.Stats; st != nil && st.IO != nil {
-		dialer = transport.StatsDialer(dialer, st.IO)
-		tlsDialer = transport.StatsDialer(tlsDialer, st.IO)
+	if st := s.Stats; st != nil {
+		dialer = transport.StatsDialer(dialer, st)
+		tlsDialer = transport.StatsDialer(tlsDialer, st)
 	}
 
 	params := s.Parameters
@@ -250,8 +243,10 @@ func (client *Client) publishEvents(
 	data []publisher.Event,
 ) ([]publisher.Event, error) {
 	begin := time.Now()
-	if st := client.stats; st != nil && st.PublishCallCount != nil {
-		st.PublishCallCount.Add(1)
+	st := client.stats
+
+	if st != nil {
+		st.NewBatch(len(data))
 	}
 
 	if len(data) == 0 {
@@ -263,8 +258,14 @@ func (client *Client) publishEvents(
 
 	// encode events into bulk request buffer, dropping failed elements from
 	// events slice
+
+	origCount := len(data)
 	data = bulkEncodePublishRequest(body, client.index, client.pipeline, data)
-	if len(data) == 0 {
+	newCount := len(data)
+	if st != nil && origCount > newCount {
+		st.Dropped(origCount - newCount)
+	}
+	if newCount == 0 {
 		return nil, nil
 	}
 
@@ -289,22 +290,20 @@ func (client *Client) publishEvents(
 		failedEvents = bulkCollectPublishFails(&client.json, data)
 	}
 
+	failed := len(failedEvents)
 	if st := client.stats; st != nil {
-		countOK := int64(len(data) - len(failedEvents))
-		st.EventsACKed.Add(countOK)
-		outputs.AckedEvents.Add(countOK)
-		if failed := int64(len(failedEvents)); failed > 0 {
-			st.EventsFailed.Add(failed)
-		}
+		acked := len(data) - failed
+
+		st.Acked(acked)
+		st.Failed(failed)
 	}
 
-	if len(failedEvents) > 0 {
+	if failed > 0 {
 		if sendErr == nil {
 			sendErr = errTempBulkFailure
 		}
 		return failedEvents, sendErr
 	}
-
 	return nil, nil
 }
 
@@ -577,6 +576,38 @@ func (client *Client) GetVersion() string {
 	return client.Connection.version
 }
 
+func (client *Client) Test(d testing.Driver) {
+	d.Run("elasticsearch: "+client.URL, func(d testing.Driver) {
+		u, err := url.Parse(client.URL)
+		d.Fatal("parse url", err)
+
+		address := u.Hostname()
+		if u.Port() != "" {
+			address += ":" + u.Port()
+		}
+		d.Run("connection", func(d testing.Driver) {
+			netDialer := transport.TestNetDialer(d, client.timeout)
+			_, err = netDialer.Dial("tcp", address)
+			d.Fatal("dial up", err)
+		})
+
+		if u.Scheme != "https" {
+			d.Warn("TLS", "secure connection disabled")
+		} else {
+			d.Run("TLS", func(d testing.Driver) {
+				netDialer := transport.NetDialer(client.timeout)
+				tlsDialer, err := transport.TestTLSDialer(d, netDialer, client.tlsConfig, client.timeout)
+				_, err = tlsDialer.Dial("tcp", address)
+				d.Fatal("dial up", err)
+			})
+		}
+
+		err = client.Connect()
+		d.Fatal("talk to server", err)
+		d.Info("version", client.version)
+	})
+}
+
 // Connect connects the client.
 func (conn *Connection) Connect() error {
 	var err error
@@ -699,6 +730,10 @@ func (conn *Connection) execHTTPRequest(req *http.Request) (int, []byte, error) 
 		return status, nil, retErr
 	}
 	return status, obj, retErr
+}
+
+func (conn *Connection) GetVersion() string {
+	return conn.version
 }
 
 func closing(c io.Closer) {

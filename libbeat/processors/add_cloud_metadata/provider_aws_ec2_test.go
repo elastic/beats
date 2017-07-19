@@ -7,6 +7,7 @@ import (
 
 	"github.com/elastic/beats/libbeat/common"
 	"github.com/elastic/beats/libbeat/logp"
+	"github.com/elastic/beats/libbeat/publisher/beat"
 	"github.com/stretchr/testify/assert"
 )
 
@@ -53,12 +54,12 @@ func TestRetrieveAWSMetadata(t *testing.T) {
 		t.Fatal(err)
 	}
 
-	p, err := newCloudMetadata(*config)
+	p, err := newCloudMetadata(config)
 	if err != nil {
 		t.Fatal(err)
 	}
 
-	actual, err := p.Run(common.MapStr{})
+	actual, err := p.Run(&beat.Event{Fields: common.MapStr{}})
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -74,5 +75,5 @@ func TestRetrieveAWSMetadata(t *testing.T) {
 			},
 		},
 	}
-	assert.Equal(t, expected, actual)
+	assert.Equal(t, expected, actual.Fields)
 }

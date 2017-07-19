@@ -7,17 +7,25 @@ import (
 
 	"github.com/elastic/beats/libbeat/common"
 	"github.com/elastic/beats/libbeat/logp"
+	"github.com/elastic/beats/libbeat/publisher/beat"
 	"github.com/elastic/beats/packetbeat/protos"
-	"github.com/elastic/beats/packetbeat/publish"
 	"github.com/stretchr/testify/assert"
 )
 
-func amqpModForTests() *amqpPlugin {
+type eventStore struct {
+	events []beat.Event
+}
+
+func (e *eventStore) publish(event beat.Event) {
+	e.events = append(e.events, event)
+}
+
+func amqpModForTests() (*eventStore, *amqpPlugin) {
 	var amqp amqpPlugin
-	results := &publish.ChanTransactions{Channel: make(chan common.MapStr, 10)}
+	results := &eventStore{}
 	config := defaultConfig
-	amqp.init(results, &config)
-	return &amqp
+	amqp.init(results.publish, &config)
+	return results, &amqp
 }
 
 func testTCPTuple() *common.TCPTuple {
@@ -30,15 +38,15 @@ func testTCPTuple() *common.TCPTuple {
 	return t
 }
 
-func expectTransaction(t *testing.T, amqp *amqpPlugin) common.MapStr {
-	client := amqp.results.(*publish.ChanTransactions)
-	select {
-	case trans := <-client.Channel:
-		return trans
-	default:
+func expectTransaction(t *testing.T, e *eventStore) common.MapStr {
+	if len(e.events) == 0 {
 		t.Error("No transaction")
+		return nil
 	}
-	return nil
+
+	event := e.events[0]
+	e.events = e.events[1:]
+	return event.Fields
 }
 
 func TestAmqp_UnknownMethod(t *testing.T) {
@@ -46,7 +54,7 @@ func TestAmqp_UnknownMethod(t *testing.T) {
 		logp.LogInit(logp.LOG_DEBUG, "", false, true, []string{"amqp", "amqpdetailed"})
 	}
 
-	amqp := amqpModForTests()
+	_, amqp := amqpModForTests()
 
 	data, err := hex.DecodeString("0100010000000f006e000c0000075465737447657401ce")
 	assert.Nil(t, err)
@@ -66,7 +74,7 @@ func TestAmqp_FrameSize(t *testing.T) {
 		logp.LogInit(logp.LOG_DEBUG, "", false, true, []string{"amqp", "amqpdetailed"})
 	}
 
-	amqp := amqpModForTests()
+	_, amqp := amqpModForTests()
 
 	//incomplete frame
 	data, err := hex.DecodeString("0100000000000c000a001fffff000200")
@@ -88,7 +96,7 @@ func TestAmqp_WrongShortStringSize(t *testing.T) {
 		logp.LogInit(logp.LOG_DEBUG, "", false, true, []string{"amqp", "amqpdetailed"})
 	}
 
-	amqp := amqpModForTests()
+	_, amqp := amqpModForTests()
 
 	data, err := hex.DecodeString("02000100000019003c000000000000000000058000ac" +
 		"746578742f706c61696ece")
@@ -107,7 +115,7 @@ func TestAmqp_QueueDeclaration(t *testing.T) {
 		logp.LogInit(logp.LOG_DEBUG, "", false, true, []string{"amqp", "amqpdetailed"})
 	}
 
-	amqp := amqpModForTests()
+	_, amqp := amqpModForTests()
 
 	data, err := hex.DecodeString("0100010000001a0032000a00000e5468697320697" +
 		"3206120544553541800000000ce")
@@ -141,7 +149,7 @@ func TestAmqp_ExchangeDeclaration(t *testing.T) {
 		logp.LogInit(logp.LOG_DEBUG, "", false, true, []string{"amqp", "amqpdetailed"})
 	}
 
-	amqp := amqpModForTests()
+	_, amqp := amqpModForTests()
 
 	data, err := hex.DecodeString("0100010000001c0028000a00000a6c6f67735f746f7" +
 		"0696305746f7069630200000000ce")
@@ -176,7 +184,7 @@ func TestAmqp_BasicConsume(t *testing.T) {
 		logp.LogInit(logp.LOG_DEBUG, "", false, true, []string{"amqp", "amqpdetailed"})
 	}
 
-	amqp := amqpModForTests()
+	_, amqp := amqpModForTests()
 
 	data, err := hex.DecodeString("01000100000028003c001400000e4957616e74" +
 		"546f436f6e73756d650d6d6973746572436f6e73756d650300000000ce")
@@ -211,7 +219,7 @@ func TestAmqp_ExchangeDeletion(t *testing.T) {
 		logp.LogInit(logp.LOG_DEBUG, "", false, true, []string{"amqp", "amqpdetailed"})
 	}
 
-	amqp := amqpModForTests()
+	_, amqp := amqpModForTests()
 
 	data, err := hex.DecodeString("010001000000100028001400000844656c65746" +
 		"54d6501ce")
@@ -241,7 +249,7 @@ func TestAmqp_ExchangeBind(t *testing.T) {
 		logp.LogInit(logp.LOG_DEBUG, "", false, true, []string{"amqp", "amqpdetailed"})
 	}
 
-	amqp := amqpModForTests()
+	_, amqp := amqpModForTests()
 
 	data, err := hex.DecodeString("0100010000001c0028001e0000057465737431" +
 		"057465737432044d5346540000000000ce")
@@ -276,7 +284,7 @@ func TestAmqp_ExchangeUnbindTransaction(t *testing.T) {
 		logp.LogInit(logp.LOG_DEBUG, "", false, true, []string{"amqp", "amqpdetailed"})
 	}
 
-	amqp := amqpModForTests()
+	results, amqp := amqpModForTests()
 	amqp.sendRequest = true
 
 	data, err := hex.DecodeString("0100010000001c00280028000005746573743105" +
@@ -293,7 +301,7 @@ func TestAmqp_ExchangeUnbindTransaction(t *testing.T) {
 	req = protos.Packet{Payload: data2}
 	amqp.Parse(&req, tcptuple, 1, private)
 
-	trans := expectTransaction(t, amqp)
+	trans := expectTransaction(t, results)
 	assert.Equal(t, "exchange.unbind", trans["method"])
 	assert.Equal(t, "exchange.unbind test2 test1", trans["request"])
 	assert.Equal(t, "amqp", trans["type"])
@@ -314,7 +322,7 @@ func TestAmqp_PublishMessage(t *testing.T) {
 		logp.LogInit(logp.LOG_DEBUG, "", false, true, []string{"amqp", "amqpdetailed"})
 	}
 
-	amqp := amqpModForTests()
+	results, amqp := amqpModForTests()
 	amqp.sendRequest = true
 
 	data, err := hex.DecodeString("0100010000001b003c002800000a6c6f67735f746f70" +
@@ -341,7 +349,7 @@ func TestAmqp_PublishMessage(t *testing.T) {
 	//body frame
 	amqp.Parse(&req, tcptuple, 0, private)
 
-	trans := expectTransaction(t, amqp)
+	trans := expectTransaction(t, results)
 
 	body := "Hello Darling I'm home again"
 
@@ -365,7 +373,7 @@ func TestAmqp_DeliverMessage(t *testing.T) {
 		logp.LogInit(logp.LOG_DEBUG, "", false, true, []string{"amqp", "amqpdetailed"})
 	}
 
-	amqp := amqpModForTests()
+	results, amqp := amqpModForTests()
 	amqp.sendResponse = true
 
 	data, err := hex.DecodeString("01000100000034003c003c0d6d6973746572436f6e73" +
@@ -392,7 +400,7 @@ func TestAmqp_DeliverMessage(t *testing.T) {
 	//body frame
 	amqp.Parse(&req, tcptuple, 0, private)
 
-	trans := expectTransaction(t, amqp)
+	trans := expectTransaction(t, results)
 
 	assert.Equal(t, "basic.deliver", trans["method"])
 	assert.Equal(t, "amqp", trans["type"])
@@ -413,7 +421,7 @@ func TestAmqp_MessagePropertiesFields(t *testing.T) {
 		logp.LogInit(logp.LOG_DEBUG, "", false, true, []string{"amqp", "amqpdetailed"})
 	}
 
-	amqp := amqpModForTests()
+	_, amqp := amqpModForTests()
 	amqp.sendResponse = true
 
 	data, err := hex.DecodeString("01000100000013003c00280000000a546573744865" +
@@ -460,7 +468,7 @@ func TestAmqp_ChannelError(t *testing.T) {
 		logp.LogInit(logp.LOG_DEBUG, "", false, true, []string{"amqp", "amqpdetailed"})
 	}
 
-	amqp := amqpModForTests()
+	_, amqp := amqpModForTests()
 
 	data1, err := hex.DecodeString("0100010000009000140028019685505245434f4e444" +
 		"954494f4e5f4641494c4544202d20696e6571756976616c656e74206172672027617574" +
@@ -509,7 +517,7 @@ func TestAmqp_NoWaitQueueDeleteMethod(t *testing.T) {
 		logp.LogInit(logp.LOG_DEBUG, "", false, true, []string{"amqp", "amqpdetailed"})
 	}
 
-	amqp := amqpModForTests()
+	results, amqp := amqpModForTests()
 	amqp.sendRequest = true
 
 	data, err := hex.DecodeString("010001000000120032002800000a546573745468" +
@@ -523,7 +531,7 @@ func TestAmqp_NoWaitQueueDeleteMethod(t *testing.T) {
 
 	amqp.Parse(&req, tcptuple, 0, private)
 
-	trans := expectTransaction(t, amqp)
+	trans := expectTransaction(t, results)
 
 	assert.Equal(t, "queue.delete", trans["method"])
 	assert.Equal(t, "queue.delete TestThomas", trans["request"])
@@ -543,7 +551,7 @@ func TestAmqp_RejectMessage(t *testing.T) {
 		logp.LogInit(logp.LOG_DEBUG, "", false, true, []string{"amqp", "amqpdetailed"})
 	}
 
-	amqp := amqpModForTests()
+	results, amqp := amqpModForTests()
 	amqp.sendRequest = true
 
 	data, err := hex.DecodeString("0100010000000d003c005a000000000000000101ce")
@@ -557,7 +565,7 @@ func TestAmqp_RejectMessage(t *testing.T) {
 	//method frame
 	amqp.Parse(&req, tcptuple, 0, private)
 
-	trans := expectTransaction(t, amqp)
+	trans := expectTransaction(t, results)
 
 	assert.Equal(t, "basic.reject", trans["method"])
 	assert.Equal(t, "basic.reject 1", trans["request"])
@@ -575,7 +583,7 @@ func TestAmqp_GetEmptyMethod(t *testing.T) {
 		logp.LogInit(logp.LOG_DEBUG, "", false, true, []string{"amqp", "amqpdetailed"})
 	}
 
-	amqp := amqpModForTests()
+	results, amqp := amqpModForTests()
 	amqp.sendRequest = true
 
 	data, err := hex.DecodeString("01000100000013003c004600000b526f626269" +
@@ -592,7 +600,7 @@ func TestAmqp_GetEmptyMethod(t *testing.T) {
 	req = protos.Packet{Payload: data2}
 	amqp.Parse(&req, tcptuple, 1, private)
 
-	trans := expectTransaction(t, amqp)
+	trans := expectTransaction(t, results)
 	assert.Equal(t, "basic.get-empty", trans["method"])
 	assert.Equal(t, "basic.get RobbieKeane", trans["request"])
 	assert.Equal(t, "amqp", trans["type"])
@@ -604,7 +612,7 @@ func TestAmqp_GetMethod(t *testing.T) {
 		logp.LogInit(logp.LOG_DEBUG, "", false, true, []string{"amqp", "amqpdetailed"})
 	}
 
-	amqp := amqpModForTests()
+	results, amqp := amqpModForTests()
 	amqp.sendRequest = true
 	amqp.sendResponse = true
 
@@ -625,7 +633,7 @@ func TestAmqp_GetMethod(t *testing.T) {
 	req = protos.Packet{Payload: data2}
 	amqp.Parse(&req, tcptuple, 1, private)
 
-	trans := expectTransaction(t, amqp)
+	trans := expectTransaction(t, results)
 	assert.Equal(t, "basic.get", trans["method"])
 	assert.Equal(t, "basic.get TestGet", trans["request"])
 	assert.Equal(t, "amqp", trans["type"])
@@ -638,7 +646,7 @@ func TestAmqp_MaxBodyLength(t *testing.T) {
 		logp.LogInit(logp.LOG_DEBUG, "", false, true, []string{"amqp", "amqpdetailed"})
 	}
 
-	amqp := amqpModForTests()
+	results, amqp := amqpModForTests()
 	amqp.maxBodyLength = 10
 	amqp.sendRequest = true
 
@@ -655,7 +663,7 @@ func TestAmqp_MaxBodyLength(t *testing.T) {
 	//method frame
 	private = amqp.Parse(&req, tcptuple, 0, private)
 
-	trans := expectTransaction(t, amqp)
+	trans := expectTransaction(t, results)
 
 	assert.Equal(t, "basic.publish", trans["method"])
 	assert.Equal(t, "amqp", trans["type"])
@@ -686,7 +694,7 @@ func TestAmqp_MaxBodyLength(t *testing.T) {
 	//method frame
 	amqp.Parse(&req, tcptuple, 0, private)
 
-	trans = expectTransaction(t, amqp)
+	trans = expectTransaction(t, results)
 
 	assert.Equal(t, "basic.publish", trans["method"])
 	assert.Equal(t, "amqp", trans["type"])
@@ -709,7 +717,7 @@ func TestAmqp_HideArguments(t *testing.T) {
 		logp.LogInit(logp.LOG_DEBUG, "", false, true, []string{"amqp", "amqpdetailed"})
 	}
 
-	amqp := amqpModForTests()
+	results, amqp := amqpModForTests()
 	amqp.sendRequest = true
 	amqp.parseHeaders = false
 	amqp.parseArguments = false
@@ -724,7 +732,7 @@ func TestAmqp_HideArguments(t *testing.T) {
 	private := protos.ProtocolData(new(amqpPrivateData))
 	private = amqp.Parse(&req, tcptuple, 0, private)
 
-	trans := expectTransaction(t, amqp)
+	trans := expectTransaction(t, results)
 	assert.Equal(t, "queue.declare", trans["method"])
 	assert.Equal(t, "amqp", trans["type"])
 	assert.Equal(t, "queue.declare TestHeader", trans["request"])
@@ -749,7 +757,7 @@ func TestAmqp_HideArguments(t *testing.T) {
 	req = protos.Packet{Payload: data}
 	private = protos.ProtocolData(new(amqpPrivateData))
 	amqp.Parse(&req, tcptuple, 0, private)
-	trans = expectTransaction(t, amqp)
+	trans = expectTransaction(t, results)
 	assert.Equal(t, "basic.publish", trans["method"])
 	assert.Equal(t, "amqp", trans["type"])
 	fields, ok = trans["amqp"].(common.MapStr)
@@ -772,7 +780,7 @@ func TestAmqp_RecoverMethod(t *testing.T) {
 		logp.LogInit(logp.LOG_DEBUG, "", false, true, []string{"amqp", "amqpdetailed"})
 	}
 
-	amqp := amqpModForTests()
+	results, amqp := amqpModForTests()
 	amqp.sendRequest = true
 
 	data, err := hex.DecodeString("01000100000005003c006e01ce")
@@ -788,7 +796,7 @@ func TestAmqp_RecoverMethod(t *testing.T) {
 	req = protos.Packet{Payload: data2}
 	amqp.Parse(&req, tcptuple, 1, private)
 
-	trans := expectTransaction(t, amqp)
+	trans := expectTransaction(t, results)
 	assert.Equal(t, "basic.recover", trans["method"])
 	assert.Equal(t, "basic.recover", trans["request"])
 	assert.Equal(t, "amqp", trans["type"])
@@ -802,7 +810,7 @@ func TestAmqp_BasicNack(t *testing.T) {
 		logp.LogInit(logp.LOG_DEBUG, "", false, true, []string{"amqp", "amqpdetailed"})
 	}
 
-	amqp := amqpModForTests()
+	_, amqp := amqpModForTests()
 
 	data1, err := hex.DecodeString("0100010000000d003c0078000000000000000102ce")
 	assert.Nil(t, err)
@@ -827,7 +835,7 @@ func TestAmqp_GetTable(t *testing.T) {
 		logp.LogInit(logp.LOG_DEBUG, "", false, true, []string{"amqp", "amqpdetailed"})
 	}
 
-	amqp := amqpModForTests()
+	_, amqp := amqpModForTests()
 
 	data, err := hex.DecodeString("010001000000890032000a00000a5465737448656164" +
 		"657218000000730974696d657374616d70540000000055f7e40903626974620507646563" +
@@ -888,7 +896,7 @@ func TestAmqp_TableInception(t *testing.T) {
 		logp.LogInit(logp.LOG_DEBUG, "", false, true, []string{"amqp", "amqpdetailed"})
 	}
 
-	amqp := amqpModForTests()
+	_, amqp := amqpModForTests()
 
 	data, err := hex.DecodeString("010001000000860028000a000005746573743105" +
 		"746f706963020000006f09696e63657074696f6e460000005006696e636570315300" +
@@ -942,7 +950,7 @@ func TestAmqp_ArrayFields(t *testing.T) {
 		logp.LogInit(logp.LOG_DEBUG, "", false, true, []string{"amqp", "amqpdetailed"})
 	}
 
-	amqp := amqpModForTests()
+	_, amqp := amqpModForTests()
 
 	//byte array, rabbitMQ specific field
 	data, err := hex.DecodeString("010001000000260028000a0000057465737431057" +
@@ -1021,7 +1029,7 @@ func TestAmqp_WrongTable(t *testing.T) {
 		logp.LogInit(logp.LOG_DEBUG, "", false, true, []string{"amqp", "amqpdetailed"})
 	}
 
-	amqp := amqpModForTests()
+	_, amqp := amqpModForTests()
 
 	//declared table size too big
 	data, err := hex.DecodeString("010001000000890032000a00000a54657374486561646" +
@@ -1095,7 +1103,7 @@ func TestAmqp_ChannelCloseErrorMethod(t *testing.T) {
 		logp.LogInit(logp.LOG_DEBUG, "", false, true, []string{"amqp", "amqpdetailed"})
 	}
 
-	amqp := amqpModForTests()
+	results, amqp := amqpModForTests()
 
 	data, err := hex.DecodeString("0100010000009000140028019685505245434f4e444" +
 		"954494f4e5f4641494c4544202d20696e6571756976616c656e74206172672027617574" +
@@ -1114,7 +1122,7 @@ func TestAmqp_ChannelCloseErrorMethod(t *testing.T) {
 	req = protos.Packet{Payload: data2}
 	amqp.Parse(&req, tcptuple, 1, private)
 
-	trans := expectTransaction(t, amqp)
+	trans := expectTransaction(t, results)
 	assert.Equal(t, "channel.close", trans["method"])
 	assert.Equal(t, "amqp", trans["type"])
 	assert.Equal(t, common.ERROR_STATUS, trans["status"])
@@ -1126,7 +1134,7 @@ func TestAmqp_ConnectionCloseNoError(t *testing.T) {
 		logp.LogInit(logp.LOG_DEBUG, "", false, true, []string{"amqp", "amqpdetailed"})
 	}
 
-	amqp := amqpModForTests()
+	results, amqp := amqpModForTests()
 	amqp.hideConnectionInformation = false
 
 	data, err := hex.DecodeString("01000000000012000a003200c8076b74687862616900000000ce")
@@ -1142,7 +1150,7 @@ func TestAmqp_ConnectionCloseNoError(t *testing.T) {
 	req = protos.Packet{Payload: data2}
 	amqp.Parse(&req, tcptuple, 1, private)
 
-	trans := expectTransaction(t, amqp)
+	trans := expectTransaction(t, results)
 	assert.Equal(t, "connection.close", trans["method"])
 	assert.Equal(t, "amqp", trans["type"])
 	assert.Equal(t, common.OK_STATUS, trans["status"])
@@ -1160,7 +1168,7 @@ func TestAmqp_MultipleBodyFrames(t *testing.T) {
 		logp.LogInit(logp.LOG_DEBUG, "", false, true, []string{"amqp", "amqpdetailed"})
 	}
 
-	amqp := amqpModForTests()
+	results, amqp := amqpModForTests()
 	amqp.sendRequest = true
 	data, err := hex.DecodeString("0100010000000e003c00280000000568656c6c6f00ce" +
 		"02000100000021003c0000000000000000002a80400a746578742f706c61696e00000000" +
@@ -1176,7 +1184,7 @@ func TestAmqp_MultipleBodyFrames(t *testing.T) {
 	private = amqp.Parse(&req, tcptuple, 0, private)
 	req = protos.Packet{Payload: data2}
 	amqp.Parse(&req, tcptuple, 0, private)
-	trans := expectTransaction(t, amqp)
+	trans := expectTransaction(t, results)
 	assert.Equal(t, "basic.publish", trans["method"])
 	assert.Equal(t, "***hello I like to publish big messages***", trans["request"])
 }

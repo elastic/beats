@@ -10,7 +10,7 @@ import (
 type Config struct {
 	// Modules is a list of module specific configuration data.
 	Modules       []*common.Config `config:"modules"`
-	ReloadModules *common.Config   `config:"config.modules"`
+	ConfigModules *common.Config   `config:"config.modules"`
 	MaxStartDelay time.Duration    `config:"max_start_delay"` // Upper bound on the random startup delay for metricsets (use 0 to disable startup delay).
 }
 

@@ -8,7 +8,7 @@ import (
 	"time"
 
 	"github.com/elastic/beats/libbeat/common"
-	"github.com/elastic/beats/packetbeat/publish"
+	"github.com/elastic/beats/libbeat/publisher/beat"
 )
 
 type flowsProcessor struct {
@@ -24,7 +24,7 @@ var (
 )
 
 func newFlowsWorker(
-	pub publish.Flows,
+	pub Reporter,
 	table *flowMetaTable,
 	counters *counterReg,
 	timeout, period time.Duration,
@@ -176,19 +176,18 @@ func (fw *flowsProcessor) report(
 	intNames, uintNames, floatNames []string,
 ) {
 	event := createEvent(ts, flow, isOver, intNames, uintNames, floatNames)
-	if event != nil {
-		debugf("add event: %v", event)
-		fw.spool.publish(event)
-	}
+
+	debugf("add event: %v", event)
+	fw.spool.publish(event)
 }
 
 func createEvent(
 	ts time.Time, f *biFlow,
 	isOver bool,
 	intNames, uintNames, floatNames []string,
-) common.MapStr {
-	event := common.MapStr{
-		"@timestamp": common.Time(ts),
+) beat.Event {
+	timestamp := ts
+	fields := common.MapStr{
 		"start_time": common.Time(f.createTS),
 		"last_time":  common.Time(f.ts),
 		"type":       "flow",
@@ -207,17 +206,17 @@ func createEvent(
 
 	// add vlan
 	if vlan := f.id.OutterVLan(); vlan != nil {
-		event["outer_vlan"] = binary.LittleEndian.Uint16(vlan)
+		fields["outer_vlan"] = binary.LittleEndian.Uint16(vlan)
 	}
 	if vlan := f.id.VLan(); vlan != nil {
-		event["vlan"] = binary.LittleEndian.Uint16(vlan)
+		fields["vlan"] = binary.LittleEndian.Uint16(vlan)
 	}
 
 	// add icmp
 	if icmp := f.id.ICMPv4(); icmp != nil {
-		event["icmp_id"] = binary.LittleEndian.Uint16(icmp)
+		fields["icmp_id"] = binary.LittleEndian.Uint16(icmp)
 	} else if icmp := f.id.ICMPv6(); icmp != nil {
-		event["icmp_id"] = binary.LittleEndian.Uint16(icmp)
+		fields["icmp_id"] = binary.LittleEndian.Uint16(icmp)
 	}
 
 	// ipv4 layer meta data
@@ -244,18 +243,18 @@ func createEvent(
 	if src, dst, ok := f.id.UDPAddr(); ok {
 		source["port"] = binary.LittleEndian.Uint16(src)
 		dest["port"] = binary.LittleEndian.Uint16(dst)
-		event["transport"] = "udp"
+		fields["transport"] = "udp"
 	}
 
 	// tcp layer meta data
 	if src, dst, ok := f.id.TCPAddr(); ok {
 		source["port"] = binary.LittleEndian.Uint16(src)
 		dest["port"] = binary.LittleEndian.Uint16(dst)
-		event["transport"] = "tcp"
+		fields["transport"] = "tcp"
 	}
 
 	if id := f.id.ConnectionID(); id != nil {
-		event["connection_id"] = base64.StdEncoding.EncodeToString(id)
+		fields["connection_id"] = base64.StdEncoding.EncodeToString(id)
 	}
 
 	if f.stats[0] != nil {
@@ -265,10 +264,13 @@ func createEvent(
 		dest["stats"] = encodeStats(f.stats[1], intNames, uintNames, floatNames)
 	}
 
-	event["source"] = source
-	event["dest"] = dest
+	fields["source"] = source
+	fields["dest"] = dest
 
-	return event
+	return beat.Event{
+		Timestamp: timestamp,
+		Fields:    fields,
+	}
 }
 
 func encodeStats(
