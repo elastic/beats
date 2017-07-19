@@ -85,7 +85,7 @@ func (b EventBuilder) Build() (beat.Event, error) {
 
 	// Adds error to event in case error happened
 	if b.fetchErr != nil {
-		fields["error"] = common.MapStr{
+		event.Fields["error"] = common.MapStr{
 			"message": b.fetchErr.Error(),
 		}
 	}

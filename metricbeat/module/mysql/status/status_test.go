@@ -67,7 +67,7 @@ func TestConfigValidation(t *testing.T) {
 			t.Fatal(err)
 		}
 
-		_, err = mb.NewModules([]*common.Config{c}, mb.Registry)
+		_, _, err = mb.NewModule(c, mb.Registry)
 		if err != nil && test.err == "" {
 			t.Errorf("unexpected error in testcase %d: %v", i, err)
 			continue
