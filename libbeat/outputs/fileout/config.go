@@ -20,6 +20,7 @@ var (
 	defaultConfig = config{
 		NumberOfFiles: 7,
 		RotateEveryKb: 10 * 1024,
+		Permissions:   0600,
 	}
 )
 

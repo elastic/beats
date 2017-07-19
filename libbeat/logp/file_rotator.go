@@ -12,6 +12,7 @@ import (
 const RotatorMaxFiles = 1024
 const DefaultKeepFiles = 7
 const DefaultRotateEveryBytes = 10 * 1024 * 1024
+const DefaultPermissions = 0600
 
 type FileRotator struct {
 	Path             string
@@ -54,6 +55,11 @@ func (rotator *FileRotator) CheckIfConfigSane() error {
 	if rotator.RotateEveryBytes == nil {
 		rotator.RotateEveryBytes = new(uint64)
 		*rotator.RotateEveryBytes = DefaultRotateEveryBytes
+	}
+
+	if rotator.Permissions == nil {
+		rotator.Permissions = new(uint32)
+		*rotator.Permissions = DefaultPermissions
 	}
 
 	if *rotator.KeepFiles < 2 || *rotator.KeepFiles >= RotatorMaxFiles {
@@ -164,7 +170,7 @@ func (rotator *FileRotator) Rotate() error {
 
 	// create the new file
 	path := rotator.FilePath(0)
-	current, err := os.OpenFile(path, os.O_RDWR|os.O_CREATE|os.O_TRUNC, os.FileMode(rotator.getPermissions()))
+	current, err := os.OpenFile(path, os.O_RDWR|os.O_CREATE|os.O_TRUNC, os.FileMode(*rotator.Permissions))
 	if err != nil {
 		return err
 	}
@@ -176,11 +182,4 @@ func (rotator *FileRotator) Rotate() error {
 	os.Remove(path)
 
 	return nil
-}
-
-func (rotator *FileRotator) getPermissions() uint32 {
-	if rotator.Permissions == nil {
-		return 0600
-	}
-	return *rotator.Permissions
 }
