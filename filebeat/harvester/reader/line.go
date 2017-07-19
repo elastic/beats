@@ -39,15 +39,15 @@ func NewLine(input io.Reader, codec encoding.Encoding, bufferSize int) (*Line, e
 	}
 
 	return &Line{
-		reader:     input,
-		codec:      codec,
-		bufferSize: bufferSize,
-		nl:         nl,
-		decoder:    codec.NewDecoder(),
-		inBuffer:   streambuf.New(nil),
-		outBuffer:  streambuf.New(nil),
+		reader:        input,
+		codec:         codec,
+		bufferSize:    bufferSize,
+		nl:            nl,
+		decoder:       codec.NewDecoder(),
+		inBuffer:      streambuf.New(nil),
+		outBuffer:     streambuf.New(nil),
 		advanceBuffer: make([]byte, bufferSize),
-		decodeBuffer: make([]byte, 1024),
+		decodeBuffer:  make([]byte, 1024),
 	}, nil
 }
 
@@ -73,10 +73,10 @@ func (l *Line) Next() ([]byte, int, error) {
 			continue
 		}
 
-		if buf[len(buf) - 1] == '\n' {
+		if buf[len(buf)-1] == '\n' {
 			break
 		} else {
-			logp.Debug("line", "Line ending char found which wasn't one: %s", buf[len(buf) - 1])
+			logp.Debug("line", "Line ending char found which wasn't one: %s", buf[len(buf)-1])
 		}
 	}
 
