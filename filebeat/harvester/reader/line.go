@@ -14,15 +14,17 @@ import (
 // using the configured codec. The reader keeps track of bytes consumed
 // from raw input stream for every decoded line.
 type Line struct {
-	reader     io.Reader
-	codec      encoding.Encoding
-	bufferSize int
-	nl         []byte
-	inBuffer   *streambuf.Buffer
-	outBuffer  *streambuf.Buffer
-	inOffset   int // input buffer read offset
-	byteCount  int // number of bytes decoded from input buffer into output buffer
-	decoder    transform.Transformer
+	reader        io.Reader
+	codec         encoding.Encoding
+	bufferSize    int
+	nl            []byte
+	inBuffer      *streambuf.Buffer
+	outBuffer     *streambuf.Buffer
+	advanceBuffer []byte
+	decodeBuffer  []byte
+	inOffset      int // input buffer read offset
+	byteCount     int // number of bytes decoded from input buffer into output buffer
+	decoder       transform.Transformer
 }
 
 // NewLine creates a new Line reader object
@@ -44,6 +46,8 @@ func NewLine(input io.Reader, codec encoding.Encoding, bufferSize int) (*Line, e
 		decoder:    codec.NewDecoder(),
 		inBuffer:   streambuf.New(nil),
 		outBuffer:  streambuf.New(nil),
+		advanceBuffer: make([]byte, bufferSize),
+		decodeBuffer: make([]byte, 1024),
 	}, nil
 }
 
@@ -69,10 +73,10 @@ func (l *Line) Next() ([]byte, int, error) {
 			continue
 		}
 
-		if buf[len(buf)-1] == '\n' {
+		if buf[len(buf) - 1] == '\n' {
 			break
 		} else {
-			logp.Debug("line", "Line ending char found which wasn't one: %s", buf[len(buf)-1])
+			logp.Debug("line", "Line ending char found which wasn't one: %s", buf[len(buf) - 1])
 		}
 	}
 
@@ -106,13 +110,11 @@ func (l *Line) advance() error {
 			l.inOffset = newOffset
 		}
 
-		buf := make([]byte, l.bufferSize)
-
 		// try to read more bytes into buffer
-		n, err := l.reader.Read(buf)
+		n, err := l.reader.Read(l.advanceBuffer)
 
 		// Appends buffer also in case of err
-		l.inBuffer.Append(buf[:n])
+		l.inBuffer.Append(l.advanceBuffer[:n])
 		if err != nil {
 			return err
 		}
@@ -151,14 +153,13 @@ func (l *Line) advance() error {
 
 func (l *Line) decode(end int) (int, error) {
 	var err error
-	buffer := make([]byte, 1024)
 	inBytes := l.inBuffer.Bytes()
 	start := 0
 
 	for start < end {
 		var nDst, nSrc int
 
-		nDst, nSrc, err = l.decoder.Transform(buffer, inBytes[start:end], false)
+		nDst, nSrc, err = l.decoder.Transform(l.decodeBuffer, inBytes[start:end], false)
 		if err != nil {
 			// Check if error is different from destination buffer too short
 			if err != transform.ErrShortDst {
@@ -172,7 +173,7 @@ func (l *Line) decode(end int) (int, error) {
 		}
 
 		start += nSrc
-		l.outBuffer.Write(buffer[:nDst])
+		l.outBuffer.Write(l.decodeBuffer[:nDst])
 	}
 
 	l.byteCount += start
