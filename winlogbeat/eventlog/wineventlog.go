@@ -163,6 +163,8 @@ func (l *winEventLog) Read() ([]Record, error) {
 
 func (l *winEventLog) Close() error {
 	debugf("%s Closing handle", l.logPrefix)
+	windows.SetEvent(l.evt)
+	//windows.CloseHandle(l.evt)
 	return win.Close(l.subscription)
 }
 
@@ -177,11 +179,8 @@ func (l *winEventLog) eventHandles(maxRead int) ([]win.EvtHandle, int, error) {
 		return handles, maxRead, nil
 	case win.ERROR_NO_MORE_ITEMS:
 		detailf("%s No more events. Waiting...", l.logPrefix)
-		res, err := windows.WaitForSingleObject(l.evt, windows.INFINITE)
-		if err != nil || res != syscall.WAIT_OBJECT_0 {
-			return nil, maxRead, nil
-		}
-		return l.eventHandles(maxRead)
+		_, err := windows.WaitForSingleObject(l.evt, windows.INFINITE)
+		return nil, 0, err
 	case win.RPC_S_INVALID_BOUND:
 		incrementMetric(readErrors, err)
 		if err := l.Close(); err != nil {
