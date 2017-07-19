@@ -81,9 +81,9 @@ class Test(metricbeat.BaseTest):
 
     @unittest.skipUnless(metricbeat.INTEGRATION_TESTS, "integration test")
     @attr('integration')
-    def test_filters(self):
+    def test_module_processors(self):
         """
-        Test filters for Redis info event.
+        Test local processors for Redis info event.
         """
         fields = ["clients", "cpu"]
         self.render_config_template(modules=[{
@@ -91,7 +91,7 @@ class Test(metricbeat.BaseTest):
             "metricsets": ["info"],
             "hosts": self.get_hosts(),
             "period": "5s",
-            "filters": [{
+            "processors": [{
                 "include_fields": fields,
             }],
         }])
