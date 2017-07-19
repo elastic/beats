@@ -3,26 +3,26 @@
 
 The files harvested by {beatname_uc} may contain messages that span multiple lines of text. In order to correctly handle
 these multiline events, you need to configure `multiline` settings in the +{beatname_lc}.yml+ file to specify which
-lines are part of a single event. 
+lines are part of a single event.
 
 IMPORTANT: If you are sending multiline events to Logstash, use the options described here to handle multiline events
 before sending the event data to Logstash. Trying to implement multiline event handling in Logstash (for example, by
-using the Logstash multiline codec) may result in the mixing of streams and corrupted data. 
+using the Logstash multiline codec) may result in the mixing of streams and corrupted data.
 
 At a minimum, you need to configure these `multiline` options:
 
-* the `pattern` option, which specifies a regular expression. Depending on how you configure other multiline options, 
+* the `pattern` option, which specifies a regular expression. Depending on how you configure other multiline options,
 lines that match the specified regular expression are considered either continuations of a previous line or the start of a new multiline event. You can set the `negate` option to negate the pattern.
 
 * the `match` option, which specifies how Filebeat combines matching lines into an event. You can specify `before` or `after`.
 
-See the full documentation for <<multiline>> to learn more about these options. Also read <<yaml-tips>> and 
+See the full documentation for <<multiline>> to learn more about these options. Also read <<yaml-tips>> and
 <<regexp-support>> to avoid common mistakes.
 
 [float]
 === Testing Your Regexp Pattern for Multiline
 
-To make it easier for you to test the regexp patterns in your multiline config, we've created a 
+To make it easier for you to test the regexp patterns in your multiline config, we've created a
 https://play.golang.org/p/uAd5XHxscu[Go Playground]. You can simply plug in the regexp pattern along with
 the `negate` setting that you plan to use, and paste a sample message between the content backticks (` `).
 Then click Run, and you'll see which lines in the message match your specified configuration. For example:
@@ -63,7 +63,7 @@ multiline.match: after
 
 This configuration merges any line that begins with whitespace up to the previous line.
 
-Here's a Java stack trace that presents a slightly more complex example: 
+Here's a Java stack trace that presents a slightly more complex example:
 
 ["source","sh",subs="attributes,callouts"]
 -------------------------------------------------------------------------------------
@@ -93,7 +93,7 @@ In this example, the pattern matches the following lines:
 [float]
 ==== Line Continuations
 
-Several programming languages use the backslash (`\`) character at the end of a line to denote that the line continues, 
+Several programming languages use the backslash (`\`) character at the end of a line to denote that the line continues,
 as in this example:
 
 [source,c]
@@ -134,7 +134,7 @@ multiline.negate: true
 multiline.match: after
 -------------------------------------------------------------------------------------
 
-This configuration uses the `negate: true` and `match: after` settings to specify that any line that does not match the 
+This configuration uses the `negate: true` and `match: after` settings to specify that any line that does not match the
 specified pattern belongs to the previous line.
 
 

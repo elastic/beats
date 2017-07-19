@@ -36,9 +36,6 @@
             }
           }
         },
-        "fields": {
-          "properties": {}
-        },
         "meta": {
           "properties": {
             "cloud": {
