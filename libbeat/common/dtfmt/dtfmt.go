@@ -1,6 +1,8 @@
 package dtfmt
 
-import "time"
+import (
+	"time"
+)
 
 // Format applies the format-pattern to the given timestamp.
 // Returns the formatted string or an error if pattern is invalid.

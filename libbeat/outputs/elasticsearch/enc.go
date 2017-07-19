@@ -66,7 +66,9 @@ func (b *jsonEncoder) resetState() {
 	var err error
 	visitor := json.NewVisitor(b.buf)
 	b.folder, err = gotype.NewIterator(visitor,
-		gotype.Folders(codec.TimestampEncoder, codec.BcTimestampEncoder))
+		gotype.Folders(
+			codec.MakeTimestampEncoder(),
+			codec.MakeBCTimestampEncoder()))
 	if err != nil {
 		panic(err)
 	}
@@ -136,7 +138,9 @@ func (g *gzipEncoder) resetState() {
 	var err error
 	visitor := json.NewVisitor(g.gzip)
 	g.folder, err = gotype.NewIterator(visitor,
-		gotype.Folders(codec.TimestampEncoder, codec.BcTimestampEncoder))
+		gotype.Folders(
+			codec.MakeTimestampEncoder(),
+			codec.MakeBCTimestampEncoder()))
 	if err != nil {
 		panic(err)
 	}
