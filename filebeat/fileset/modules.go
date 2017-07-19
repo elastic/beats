@@ -252,6 +252,7 @@ func (reg *ModuleRegistry) GetProspectorConfigs() ([]*common.Config, error) {
 type PipelineLoader interface {
 	LoadJSON(path string, json map[string]interface{}) ([]byte, error)
 	Request(method, path string, pipeline string, params map[string]string, body interface{}) (int, []byte, error)
+	GetVersion() string
 }
 
 // LoadPipelines loads the pipelines for each configured fileset.

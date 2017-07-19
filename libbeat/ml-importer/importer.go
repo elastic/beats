@@ -17,6 +17,7 @@ type MLConfig struct {
 	ID           string `config:"id"`
 	JobPath      string `config:"job"`
 	DatafeedPath string `config:"datafeed"`
+	MinVersion   string `config:"min_version"`
 }
 
 // MLLoader is a subset of the Elasticsearch client API capable of
@@ -24,6 +25,7 @@ type MLConfig struct {
 type MLLoader interface {
 	Request(method, path string, pipeline string, params map[string]string, body interface{}) (int, []byte, error)
 	LoadJSON(path string, json map[string]interface{}) ([]byte, error)
+	GetVersion() string
 }
 
 func readJSONFile(path string) (common.MapStr, error) {
@@ -40,6 +42,23 @@ func readJSONFile(path string) (common.MapStr, error) {
 func ImportMachineLearningJob(esClient MLLoader, cfg *MLConfig) error {
 	jobURL := fmt.Sprintf("/_xpack/ml/anomaly_detectors/%s", cfg.ID)
 	datafeedURL := fmt.Sprintf("/_xpack/ml/datafeeds/datafeed-%s", cfg.ID)
+
+	if len(cfg.MinVersion) > 0 {
+		esVersion, err := common.NewVersion(esClient.GetVersion())
+		if err != nil {
+			return errors.Errorf("Error parsing ES version: %s: %v", esClient.GetVersion(), err)
+		}
+		minVersion, err := common.NewVersion(cfg.MinVersion)
+		if err != nil {
+			return errors.Errorf("Error parsing min_version: %s: %v", minVersion, err)
+		}
+
+		if esVersion.LessThan(minVersion) {
+			logp.Debug("machine-learning", "Skipping job %s, because ES version (%s) is smaller than min version (%s)",
+				cfg.ID, esVersion, minVersion)
+			return nil
+		}
+	}
 
 	// We always overwrite ML job configs, so delete them before loading
 	status, response, err := esClient.Request("GET", jobURL, "", nil, nil)

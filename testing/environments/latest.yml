@@ -4,7 +4,7 @@
 version: '2'
 services:
   elasticsearch:
-    image: docker.elastic.co/elasticsearch/elasticsearch:5.1.2
+    image: docker.elastic.co/elasticsearch/elasticsearch:5.4.1
     environment:
       - "ES_JAVA_OPTS=-Xms512m -Xmx512m"
       - "network.host="
@@ -17,10 +17,10 @@ services:
       context: docker/logstash
       dockerfile: Dockerfile
       args:
-        ELASTIC_VERSION: 5.1.2
+        ELASTIC_VERSION: 5.4.1
         DOWNLOAD_URL: https://artifacts.elastic.co/downloads
     environment:
       - ES_HOST=elasticsearch
 
   kibana:
-    image: docker.elastic.co/kibana/kibana:5.1.2
+    image: docker.elastic.co/kibana/kibana:5.4.1
