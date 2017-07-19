@@ -1,5 +1,5 @@
 [[filebeat-configuration-reloading]]
-=== Reload Configuration
+== Reload the configuration dynamically
 
 beta[]
 
@@ -13,7 +13,8 @@ This feature is especially useful in container environments where one container
 is used to tail logs for services running in other containers on the same host.
 
 To enable dynamic config reloading, you specify the `path` and `reload` options
-in the main `filebeat.yml` config file. For example:
+in the `filebeat.config.prospectors` section of the main `filebeat.yml` config
+file. For example:
 
 [source,yaml]
 ------------------------------------------------------------------------------

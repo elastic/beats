@@ -4,7 +4,7 @@
 //////////////////////////////////////////////////////////////////////////
 
 [[community-beats]]
-== Community Beats
+== Community beats
 
 The open source community has been hard at work developing new Beats. You can check
 out some of them here.

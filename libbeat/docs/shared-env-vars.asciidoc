@@ -15,7 +15,7 @@
 ifdef::standalone[]
 
 [[using-environ-vars]]
-== Using Environment Variables in the Configuration
+== Use environment variables in the configuration
 
 endif::[]
 
@@ -78,7 +78,7 @@ and what each configuration looks like after replacement:
 |==================================
 
 [float]
-=== Specifying Complex Objects in Environment Variables
+=== Specify complex objects in environment variables
 
 You can specify complex objects, such as lists or dictionaries, in environment
 variables by using a JSON-like syntax.

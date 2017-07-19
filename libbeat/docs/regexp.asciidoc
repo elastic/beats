@@ -10,7 +10,7 @@
 //////////////////////////////////////////////////////////////////////////
 
 [[regexp-support]]
-== Regular Expression Support
+== Regular expression support
 
 {beatname_uc} regular expression support is based on https://godoc.org/regexp/syntax[RE2].
 
