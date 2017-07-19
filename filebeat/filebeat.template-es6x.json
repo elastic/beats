@@ -37,6 +37,10 @@
                 },
                 "geoip": {
                   "properties": {
+                    "city_name": {
+                      "ignore_above": 1024,
+                      "type": "keyword"
+                    },
                     "continent_name": {
                       "ignore_above": 1024,
                       "type": "keyword"
@@ -47,6 +51,10 @@
                     },
                     "location": {
                       "type": "geo_point"
+                    },
+                    "region_name": {
+                      "ignore_above": 1024,
+                      "type": "keyword"
                     }
                   }
                 },
@@ -386,6 +394,10 @@
                 },
                 "geoip": {
                   "properties": {
+                    "city_name": {
+                      "ignore_above": 1024,
+                      "type": "keyword"
+                    },
                     "continent_name": {
                       "ignore_above": 1024,
                       "type": "keyword"
@@ -396,6 +408,10 @@
                     },
                     "location": {
                       "type": "geo_point"
+                    },
+                    "region_name": {
+                      "ignore_above": 1024,
+                      "type": "keyword"
                     }
                   }
                 },
@@ -414,6 +430,9 @@
                 "remote_ip": {
                   "ignore_above": 1024,
                   "type": "keyword"
+                },
+                "remote_ip_list": {
+                  "properties": {}
                 },
                 "response_code": {
                   "type": "long"
