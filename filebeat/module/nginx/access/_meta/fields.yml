@@ -4,7 +4,7 @@
     Contains fields for the Nginx access logs.
   fields:
     - name: remote_ip_list
-      type: array
+      type: list
       description: >
         An array of remote IP addresses. It is a list because it is common to include, besides the client
         IP address, IP addresses from headers like `X-Forwarded-For`. See also the `remote_ip` field.

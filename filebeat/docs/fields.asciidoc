@@ -784,7 +784,7 @@ Contains fields for the Nginx access logs.
 [float]
 === nginx.access.remote_ip_list
 
-type: array
+type: list
 
 An array of remote IP addresses. It is a list because it is common to include, besides the client IP address, IP addresses from headers like `X-Forwarded-For`. See also the `remote_ip` field.
 
