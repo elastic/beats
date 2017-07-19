@@ -9,6 +9,9 @@ import (
 	sigar "github.com/elastic/gosigar"
 )
 
+// NumCPU is the number of CPU cores the system has.
+var NumCPU = runtime.NumCPU()
+
 type CPU struct {
 	CpuPerCore       bool
 	LastCpuTimes     *CpuTimes
@@ -72,7 +75,7 @@ func GetCpuPercentage(last *CpuTimes, current *CpuTimes) *CpuTimes {
 			perc := 0.0
 			delta := int64(field2 - field1)
 			perc = float64(delta) / float64(allDelta)
-			return system.Round(perc, .5, 4)
+			return system.Round(perc*float64(NumCPU), .5, 4)
 		}
 
 		current.UserPercent = calculate(current.Cpu.User, last.Cpu.User)

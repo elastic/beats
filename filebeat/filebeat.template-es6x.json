@@ -253,9 +253,6 @@
           "ignore_above": 1024,
           "type": "keyword"
         },
-        "fields": {
-          "properties": {}
-        },
         "fileset": {
           "properties": {
             "module": {

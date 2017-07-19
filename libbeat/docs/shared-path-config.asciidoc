@@ -26,12 +26,12 @@ Here is an example configuration:
 [source,yaml]
 ------------------------------------------------------------------------------
 path.home: /usr/share/beat
-path.conf: /etc/beat
+path.config: /etc/beat
 path.data: /var/lib/beat
 path.logs: /var/log/
 ------------------------------------------------------------------------------
 
-Note that it is possible to override these options by using command line flags. 
+Note that it is possible to override these options by using command line flags.
 
 ==== Path Options
 
@@ -51,7 +51,7 @@ Example:
 path.home: /usr/share/beats
 ------------------------------------------------------------------------------
 
-===== conf
+===== config
 
 The configuration path for the {beatname_uc} installation. This is the default base path
 for configuration files, including the main YAML configuration file and the
@@ -62,7 +62,7 @@ Example:
 
 [source,yaml]
 ------------------------------------------------------------------------------
-path.conf: /usr/share/beats/config
+path.config: /usr/share/beats/config
 ------------------------------------------------------------------------------
 
 ===== data

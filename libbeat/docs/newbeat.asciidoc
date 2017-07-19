@@ -352,7 +352,7 @@ countbeat:
 
 The config file is generated when you run `make setup` to <<setting-up-beat,set up the beat>>. The file contains
 basic configuration information. To add configuration options to your Beat, you need to update the Go structures in
-`config/config.go` and add the corresponding config options to `etc/beat.yml`.
+`config/config.go` and add the corresponding config options to `_meta/beat.yml`.
 
 For example, if you add a config option called `path` to the Go structures:
 
@@ -370,7 +370,7 @@ var DefaultConfig = Config{
 
 ----------------------------------------------------------------------
 
-You also need to add `path` to `etc/beat.yml`:
+You also need to add `path` to `_meta/beat.yml`:
 
 [source,yml]
 ----------------------------------------------------------------------
@@ -428,7 +428,7 @@ through the `client` variable.
 The `event := common.MapStr{}` stores the event in a json format, and `bt.client.PublishEvent(event)` publishes data to Elasticsearch.
 In the generated Beat, there are three fields in the event: @timestamp, type, and counter.
 
-When you add fields to the event object, you also need to add them to the `etc/fields.yml` file:
+When you add fields to the event object, you also need to add them to the `_meta/fields.yml` file:
 
 [source,yaml]
 ----------------------------------------------------------------------

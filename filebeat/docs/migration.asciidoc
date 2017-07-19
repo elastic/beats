@@ -304,7 +304,7 @@ options with Logstash Forwarder, make sure that you add your options to the
 configuration file. For naming changes, see <<renamed-options>>.
 
 Filebeat does provide command line options that are common to all Beats. For more details about
-these options, see <<filebeat-command-line>>.
+these options, see <<command-line-options>>.
 
 [[renamed-options]]
 [float]

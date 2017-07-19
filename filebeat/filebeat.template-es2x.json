@@ -303,9 +303,6 @@
           "index": "not_analyzed",
           "type": "string"
         },
-        "fields": {
-          "properties": {}
-        },
         "fileset": {
           "properties": {
             "module": {
