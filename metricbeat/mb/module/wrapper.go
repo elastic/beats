@@ -324,11 +324,8 @@ func (msw *metricSetWrapper) Test(d testing.Driver) {
 // Reporter implementation
 
 type reporter interface {
+	mb.PushReporter
 	StartFetchTimer()
-	Done() <-chan struct{}
-	Event(event common.MapStr) bool
-	Error(err error) bool
-	ErrorWith(err error, meta common.MapStr) bool
 }
 
 // eventReporter implements the Reporter interface which is a callback interface
