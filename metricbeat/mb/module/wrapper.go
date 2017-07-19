@@ -9,12 +9,10 @@ import (
 	"github.com/elastic/beats/libbeat/common"
 	"github.com/elastic/beats/libbeat/logp"
 	"github.com/elastic/beats/libbeat/monitoring"
-	"github.com/elastic/beats/libbeat/processors"
+	"github.com/elastic/beats/libbeat/publisher/beat"
 	"github.com/elastic/beats/metricbeat/mb"
 
-	"github.com/joeshaw/multierror"
 	"github.com/mitchellh/hashstructure"
-	"github.com/pkg/errors"
 )
 
 // Expvar metric names.
@@ -37,7 +35,6 @@ var (
 // Use NewWrapper or NewWrappers to construct new Wrappers.
 type Wrapper struct {
 	mb.Module
-	filters       *processors.Processors
 	metricSets    []*metricSetWrapper // List of pointers to its associated MetricSets.
 	configHash    uint64
 	maxStartDelay time.Duration
@@ -61,64 +58,28 @@ type stats struct {
 }
 
 // NewWrapper create a new Module and its associated MetricSets based
-// on the given configuration. It constructs the supporting filters and stores
-// them in the Wrapper.
-func NewWrapper(maxStartDelay time.Duration, moduleConfig *common.Config, r *mb.Register) (*Wrapper, error) {
-	mws, err := NewWrappers(maxStartDelay, []*common.Config{moduleConfig}, r)
+// on the given configuration.
+func NewWrapper(maxStartDelay time.Duration, config *common.Config, r *mb.Register) (*Wrapper, error) {
+	module, metricsets, err := mb.NewModule(config, r)
 	if err != nil {
 		return nil, err
 	}
 
-	if len(mws) == 0 {
-		return nil, fmt.Errorf("module not created")
+	wrapper := &Wrapper{
+		Module:        module,
+		maxStartDelay: maxStartDelay,
+		metricSets:    make([]*metricSetWrapper, len(metricsets)),
 	}
 
-	return mws[0], nil
-}
-
-// NewWrappers creates new Modules and their associated MetricSets based
-// on the given configuration. It constructs the supporting filters and stores
-// them all in a Wrapper.
-func NewWrappers(maxStartDelay time.Duration, modulesConfig []*common.Config, r *mb.Register) ([]*Wrapper, error) {
-	modules, err := mb.NewModules(modulesConfig, r)
-	if err != nil {
-		return nil, err
+	for i, ms := range metricsets {
+		wrapper.metricSets[i] = &metricSetWrapper{
+			MetricSet: ms,
+			module:    wrapper,
+			stats:     getMetricSetStats(wrapper.Name(), ms.Name()),
+		}
 	}
 
-	// Wrap the Modules and MetricSet's.
-	var wrappers []*Wrapper
-	var errs multierror.Errors
-	for k, v := range modules {
-		debugf("Initializing Module type '%s': %T=%+v", k.Name(), k, k)
-		f, err := processors.New(k.Config().Filters)
-		if err != nil {
-			errs = append(errs, errors.Wrapf(err, "module %s", k.Name()))
-			continue
-		}
-
-		mw := &Wrapper{
-			Module:        k,
-			filters:       f,
-			maxStartDelay: maxStartDelay,
-		}
-		wrappers = append(wrappers, mw)
-
-		msws := make([]*metricSetWrapper, 0, len(v))
-		for _, ms := range v {
-			debugf("Initializing MetricSet type '%s/%s' for host '%s': %T=%+v",
-				ms.Module().Name(), ms.Name(), ms.Host(), ms, ms)
-
-			msw := &metricSetWrapper{
-				MetricSet: ms,
-				module:    mw,
-				stats:     getMetricSetStats(mw.Name(), ms.Name()),
-			}
-			msws = append(msws, msw)
-		}
-		mw.metricSets = msws
-	}
-
-	return wrappers, errs.Err()
+	return wrapper, nil
 }
 
 // Wrapper methods
@@ -132,10 +93,10 @@ func NewWrappers(maxStartDelay time.Duration, modulesConfig []*common.Config, r 
 // prevent blocking the operation of the MetricSets.
 //
 // Start should be called only once in the life of a Wrapper.
-func (mw *Wrapper) Start(done <-chan struct{}) <-chan common.MapStr {
+func (mw *Wrapper) Start(done <-chan struct{}) <-chan beat.Event {
 	debugf("Starting %s", mw)
 
-	out := make(chan common.MapStr, 1)
+	out := make(chan beat.Event, 1)
 
 	// Start one worker per MetricSet + host combination.
 	var wg sync.WaitGroup
@@ -187,7 +148,7 @@ func (mw *Wrapper) Hash() uint64 {
 
 // metricSetWrapper methods
 
-func (msw *metricSetWrapper) run(done <-chan struct{}, out chan<- common.MapStr) {
+func (msw *metricSetWrapper) run(done <-chan struct{}, out chan<- beat.Event) {
 	defer logp.Recover(fmt.Sprintf("recovered from panic while fetching "+
 		"'%s/%s' for host '%s'", msw.module.Name(), msw.Name(), msw.Host()))
 
@@ -306,7 +267,7 @@ func (msw *metricSetWrapper) String() string {
 type eventReporter struct {
 	msw   *metricSetWrapper
 	done  <-chan struct{}
-	out   chan<- common.MapStr
+	out   chan<- beat.Event
 	start time.Time // Start time of the current fetch (or zero for push sources).
 }
 
@@ -354,19 +315,17 @@ func (r *eventReporter) ErrorWith(err error, meta common.MapStr) bool {
 		return false
 	}
 
-	if event != nil { // event can be nil if it was dropped by processors
-		if !writeEvent(r.done, r.out, event) {
-			return false
-		}
-		r.msw.stats.events.Add(1)
+	if !writeEvent(r.done, r.out, event) {
+		return false
 	}
+	r.msw.stats.events.Add(1)
 
 	return true
 }
 
 // other utility functions
 
-func writeEvent(done <-chan struct{}, out chan<- common.MapStr, event common.MapStr) bool {
+func writeEvent(done <-chan struct{}, out chan<- beat.Event, event beat.Event) bool {
 	select {
 	case <-done:
 		return false

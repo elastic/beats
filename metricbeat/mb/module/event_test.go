@@ -45,15 +45,16 @@ func TestEventBuilder(t *testing.T) {
 		t.Fatal(err)
 	}
 
-	assert.Equal(t, common.Time(startTime), event["@timestamp"])
+	assert.Equal(t, startTime, event.Timestamp)
 
-	metricset := event["metricset"].(common.MapStr)
+	module := event.Fields[moduleName].(common.MapStr)
+	metricset := event.Fields["metricset"].(common.MapStr)
 	assert.Equal(t, moduleName, metricset["module"])
 	assert.Equal(t, metricSetName, metricset["name"])
 	assert.Equal(t, int64(500000), metricset["rtt"])
 	assert.Equal(t, host, metricset["host"])
-	assert.Equal(t, common.MapStr{}, event[moduleName].(common.MapStr)[metricSetName])
-	assert.Nil(t, event["error"])
+	assert.Equal(t, common.MapStr{}, module[metricSetName])
+	assert.Nil(t, event.Fields["error"])
 }
 
 func TestEventBuilderError(t *testing.T) {
@@ -64,7 +65,8 @@ func TestEventBuilderError(t *testing.T) {
 		t.Fatal(err)
 	}
 
-	assert.Equal(t, errFetch.Error(), event["error"].(common.MapStr)["message"])
+	errDoc := event.Fields["error"].(common.MapStr)
+	assert.Equal(t, errFetch.Error(), errDoc["message"])
 }
 
 func TestEventBuilderNoHost(t *testing.T) {
@@ -74,7 +76,7 @@ func TestEventBuilderNoHost(t *testing.T) {
 		t.Fatal(err)
 	}
 
-	_, found := event["metricset-host"]
+	_, found := event.Fields["metricset-host"]
 	assert.False(t, found)
 }
 
@@ -87,7 +89,7 @@ func TestEventBuildNoRTT(t *testing.T) {
 		t.Fatal(err)
 	}
 
-	metricset := event["metricset"].(common.MapStr)
+	metricset := event.Fields["metricset"].(common.MapStr)
 	_, found := metricset["rtt"]
 	assert.False(t, found, "found rtt")
 }

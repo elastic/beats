@@ -6,9 +6,9 @@ import (
 	"github.com/elastic/beats/libbeat/beat"
 	"github.com/elastic/beats/libbeat/common"
 	"github.com/elastic/beats/libbeat/logp"
-	"github.com/elastic/beats/libbeat/publisher/bc/publisher"
 	"github.com/elastic/beats/metricbeat/mb"
 	"github.com/elastic/beats/metricbeat/mb/module"
+	"github.com/joeshaw/multierror"
 
 	"github.com/elastic/beats/libbeat/cfgfile"
 	"github.com/pkg/errors"
@@ -19,10 +19,14 @@ import (
 
 // Metricbeat implements the Beater interface for metricbeat.
 type Metricbeat struct {
-	done    chan struct{}     // Channel used to initiate shutdown.
-	modules []*module.Wrapper // Active list of modules.
-	client  publisher.Client  // Publisher client.
+	done    chan struct{}  // Channel used to initiate shutdown.
+	modules []staticModule // Active list of modules.
 	config  Config
+}
+
+type staticModule struct {
+	connector *module.Connector
+	module    *module.Wrapper
 }
 
 // New creates and returns a new Metricbeat instance.
@@ -35,14 +39,45 @@ func New(b *beat.Beat, rawConfig *common.Config) (beat.Beater, error) {
 		return nil, errors.Wrap(err, "error reading configuration file")
 	}
 
-	modules, err := module.NewWrappers(config.MaxStartDelay, config.Modules, mb.Registry)
-	if err != nil {
-		// Empty config is fine if dynamic config is enabled
-		if !config.ConfigModules.Enabled() {
-			return nil, err
-		} else if err != mb.ErrEmptyConfig && err != mb.ErrAllModulesDisabled {
-			return nil, err
+	dynamicCfgEnabled := config.ConfigModules.Enabled()
+	if !dynamicCfgEnabled && len(config.Modules) == 0 {
+		return nil, mb.ErrEmptyConfig
+	}
+
+	var errs multierror.Errors
+	var modules []staticModule
+	for _, moduleCfg := range config.Modules {
+		if !moduleCfg.Enabled() {
+			continue
 		}
+
+		failed := false
+		connector, err := module.NewConnector(b.Publisher, moduleCfg)
+		if err != nil {
+			errs = append(errs, err)
+			failed = true
+		}
+
+		module, err := module.NewWrapper(config.MaxStartDelay, moduleCfg, mb.Registry)
+		if err != nil {
+			errs = append(errs, err)
+			failed = true
+		}
+
+		if failed {
+			continue
+		}
+		modules = append(modules, staticModule{
+			connector: connector,
+			module:    module,
+		})
+	}
+
+	if err := errs.Err(); err != nil {
+		return nil, err
+	}
+	if len(modules) == 0 && !dynamicCfgEnabled {
+		return nil, mb.ErrAllModulesDisabled
 	}
 
 	mb := &Metricbeat{
@@ -62,7 +97,12 @@ func (bt *Metricbeat) Run(b *beat.Beat) error {
 	var wg sync.WaitGroup
 
 	for _, m := range bt.modules {
-		r := module.NewRunner(b.Publisher.Connect, m)
+		client, err := m.connector.Connect()
+		if err != nil {
+			return err
+		}
+
+		r := module.NewRunner(client, m.module)
 		r.Start()
 		wg.Add(1)
 		go func() {
