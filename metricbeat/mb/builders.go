@@ -20,16 +20,19 @@ var (
 	// ErrAllModulesDisabled indicates that all modules are disabled. At least
 	// one module must be enabled.
 	ErrAllModulesDisabled = errors.New("all modules are disabled")
+
+	// ErrModuleDisabled indicates a disabled module has been tried to instantiate.
+	ErrModuleDisabled = errors.New("disabled module")
 )
 
 // NewModule builds a new Module and its associated MetricSets based on the
 // provided configuration data. config contains config data (the data
 // will be unpacked into ModuleConfig structs). r is the Register where the
 // ModuleFactory's and MetricSetFactory's will be obtained from. This method
-// returns a the Modules and its configured MetricSets or an error.
+// returns a Module and its configured MetricSets or an error.
 func NewModule(config *common.Config, r *Register) (Module, []MetricSet, error) {
 	if !config.Enabled() {
-		return nil, nil, nil
+		return nil, nil, ErrModuleDisabled
 	}
 
 	bm, err := newBaseModuleFromConfig(config)

@@ -65,10 +65,6 @@ func NewWrapper(maxStartDelay time.Duration, config *common.Config, r *mb.Regist
 		return nil, err
 	}
 
-	if module == nil {
-		return nil, fmt.Errorf("module not created")
-	}
-
 	wrapper := &Wrapper{
 		Module:        module,
 		maxStartDelay: maxStartDelay,

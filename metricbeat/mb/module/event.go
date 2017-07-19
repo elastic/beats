@@ -28,7 +28,7 @@ func (b EventBuilder) Build() (beat.Event, error) {
 	// event may be nil when there was an error fetching.
 	fields := b.Event
 	if fields == nil {
-		fields = common.MapStr{} // TODO (akroh): do we want to send an empty event field?
+		fields = common.MapStr{}
 	}
 
 	// Get and remove meta fields from the event created by the MetricSet.
