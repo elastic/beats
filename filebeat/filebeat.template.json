@@ -431,9 +431,6 @@
                   "ignore_above": 1024,
                   "type": "keyword"
                 },
-                "remote_ip_list": {
-                  "properties": {}
-                },
                 "response_code": {
                   "type": "long"
                 },
