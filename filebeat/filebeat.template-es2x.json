@@ -510,9 +510,6 @@
                   "index": "not_analyzed",
                   "type": "string"
                 },
-                "remote_ip_list": {
-                  "properties": {}
-                },
                 "response_code": {
                   "type": "long"
                 },
