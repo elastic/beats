@@ -53,10 +53,10 @@ metricbeat.modules:
   processes: {{ m.processes }}
   {% endif -%}
 
-  {% if m.filters is defined -%}
-  filters:
-    {% for f in m.filters -%}
-    {% for k, v in f.items() -%}
+  {% if m.processors is defined -%}
+  processors:
+    {% for p in m.processors -%}
+    {% for k, v in p.items() -%}
     - {{ k }}.fields: [
       {%- for field in v -%}
       '{{ field }}' {%- if not loop.last %}, {% endif -%}
