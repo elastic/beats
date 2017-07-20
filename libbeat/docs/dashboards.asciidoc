@@ -21,7 +21,7 @@ pattern, +{beatname_lc}-*+, and load the dashboards into the Kibana index.
 
 NOTE: Starting with Beats 6.0.0, the dashboards are loaded via the Kibana API.
 This requires a Kibana endpoint configuration. You should have configured the
-endpoint in <<{beatname_lc}-configuration>>. If you didn't, configure it now.
+endpoint earlier. If you didn't, configure it now.
 
 To set up the Kibana dashboards for {beatname_uc}:
 
