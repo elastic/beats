@@ -40,7 +40,7 @@ REVIEWDOG_OPTIONS?=-diff "git diff master"
 REVIEWDOG_REPO=github.com/haya14busa/reviewdog/cmd/reviewdog
 PROCESSES?= 4
 TIMEOUT?= 90
-NOSETESTS_OPTIONS?=--process-timeout=$(TIMEOUT) --with-timer -v ## @testing the options to pass when calling nosetests
+NOSETESTS_OPTIONS?=--process-timeout=$(TIMEOUT) --with-timer -v --with-xunit --xunit-file=${BUILD_DIR}/TEST-system.xml ## @testing the options to pass when calling nosetests
 TEST_ENVIRONMENT?=false ## @testing if true, "make testsuite" runs integration tests and system tests in a dockerized test environment
 SYSTEM_TESTS?=false ## @testing if true, "make test" and "make testsuite" run unit tests and system tests
 GOX_OS?=linux darwin windows solaris freebsd netbsd openbsd ## @Building List of all OS to be supported by "make crosscompile".
