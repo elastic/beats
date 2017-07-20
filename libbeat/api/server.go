@@ -7,13 +7,14 @@ import (
 	"strconv"
 
 	"github.com/elastic/beats/libbeat/common"
+	"github.com/elastic/beats/libbeat/common/cfgwarn"
 	"github.com/elastic/beats/libbeat/logp"
 	"github.com/elastic/beats/libbeat/monitoring"
 )
 
 // Start starts the metrics api endpoint on the configured host and port
 func Start(cfg *common.Config, info common.BeatInfo) {
-	logp.Beta("Metrics endpoint is enabled.")
+	cfgwarn.Beta("Metrics endpoint is enabled.")
 	config := DefaultConfig
 	cfg.Unpack(&config)
 

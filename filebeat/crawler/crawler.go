@@ -11,6 +11,7 @@ import (
 	"github.com/elastic/beats/filebeat/registrar"
 	"github.com/elastic/beats/libbeat/cfgfile"
 	"github.com/elastic/beats/libbeat/common"
+	"github.com/elastic/beats/libbeat/common/cfgwarn"
 	"github.com/elastic/beats/libbeat/logp"
 )
 
@@ -51,7 +52,7 @@ func (c *Crawler) Start(r *registrar.Registrar, configProspectors *common.Config
 	}
 
 	if configProspectors.Enabled() {
-		logp.Beta("Loading separate prospectors is enabled.")
+		cfgwarn.Beta("Loading separate prospectors is enabled.")
 
 		c.reloader = cfgfile.NewReloader(configProspectors)
 		factory := prospector.NewFactory(c.out, r, c.beatDone)
@@ -61,7 +62,7 @@ func (c *Crawler) Start(r *registrar.Registrar, configProspectors *common.Config
 	}
 
 	if configModules.Enabled() {
-		logp.Beta("Loading separate modules is enabled.")
+		cfgwarn.Beta("Loading separate modules is enabled.")
 
 		c.reloader = cfgfile.NewReloader(configModules)
 		factory := fileset.NewFactory(c.out, r, c.beatVersion, pipelineLoaderFactory, c.beatDone)

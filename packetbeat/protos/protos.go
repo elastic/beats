@@ -8,6 +8,7 @@ import (
 	"time"
 
 	"github.com/elastic/beats/libbeat/common"
+	"github.com/elastic/beats/libbeat/common/cfgwarn"
 	"github.com/elastic/beats/libbeat/logp"
 	"github.com/elastic/beats/libbeat/publisher/beat"
 )
@@ -97,7 +98,7 @@ func (s ProtocolsStruct) Init(
 	listConfigs []*common.Config,
 ) error {
 	if len(configs) > 0 {
-		logp.Deprecate("7.0.0", "dictionary style protocols configuration has been deprecated. Please use list-style protocols configuration.")
+		cfgwarn.Deprecate("7.0.0", "dictionary style protocols configuration has been deprecated. Please use list-style protocols configuration.")
 	}
 
 	for proto := range protocolSyms {

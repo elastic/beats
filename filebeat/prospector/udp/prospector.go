@@ -4,6 +4,7 @@ import (
 	"github.com/elastic/beats/filebeat/channel"
 	"github.com/elastic/beats/filebeat/harvester"
 	"github.com/elastic/beats/libbeat/common"
+	"github.com/elastic/beats/libbeat/common/cfgwarn"
 	"github.com/elastic/beats/libbeat/logp"
 )
 
@@ -14,7 +15,7 @@ type Prospector struct {
 }
 
 func NewProspector(cfg *common.Config, outlet channel.OutleterFactory) (*Prospector, error) {
-	logp.Experimental("UDP prospector type is used")
+	cfgwarn.Experimental("UDP prospector type is used")
 
 	out, err := outlet(cfg)
 	if err != nil {

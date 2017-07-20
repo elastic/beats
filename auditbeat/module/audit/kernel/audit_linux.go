@@ -8,6 +8,7 @@ import (
 	"github.com/pkg/errors"
 
 	"github.com/elastic/beats/libbeat/common"
+	"github.com/elastic/beats/libbeat/common/cfgwarn"
 	"github.com/elastic/beats/libbeat/logp"
 	"github.com/elastic/beats/libbeat/monitoring"
 	"github.com/elastic/beats/metricbeat/mb"
@@ -47,7 +48,7 @@ type MetricSet struct {
 
 // New constructs a new MetricSet.
 func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
-	logp.Beta("The %v metricset is a beta feature", metricsetName)
+	cfgwarn.Experimental("The %v metricset is a beta feature", metricsetName)
 
 	config := defaultConfig
 	if err := base.Module().UnpackConfig(&config); err != nil {
