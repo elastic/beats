@@ -1,7 +1,5 @@
 === Audit kernel metricset
 
-experimental[]
-
 The `kernel` metricset receives audit events from the Linux Audit Framework that
 is a part of the Linux kernel.
 

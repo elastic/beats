@@ -1,15 +1,15 @@
 === Audit file metricset
 
-experimental[]
-
 The `file` metricset sends events when a file is changed (created, updated, or
 deleted) on disk. The events contain file metadata and hashes (MD5, SHA1, and
 SHA256).
 
+////
 [float]
 === How it works
 
 This metricset...
+////
 
 [float]
 === Configuration options
@@ -32,11 +32,5 @@ following example shows all configuration options with their default values.
 ----
 
 
-//REVIEWERS: Should the following desc say glob-based paths?
-
-*`file.paths.binaries`*:: A list of paths containing binary files to monitor for
-changes.
-
-*`file.paths.conf`*:: A list of paths containing config files to monitor for
-changes.
-
+*`file.paths`*:: A dictionary of arbitrary names (strings) to a list of paths
+(directories or files).

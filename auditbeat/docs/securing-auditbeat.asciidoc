@@ -22,6 +22,6 @@ include::../../libbeat/docs/https.asciidoc[]
 //sets block macro for shared-ssl-logstash-config.asciidoc included in next section
 
 [[configuring-ssl-logstash]]
-== Securing communication with Logstash by using SSL
+== Secure communication with Logstash by using SSL
 
 include::../../libbeat/docs/shared-ssl-logstash-config.asciidoc[]

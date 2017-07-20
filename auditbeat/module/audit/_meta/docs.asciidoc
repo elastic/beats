@@ -4,29 +4,3 @@ The `audit` module reports security-relevant information based on data captured
 from the operating system (OS) or services running on the OS. Although this
 feature doesn’t provide additional security to your system, it does make it
 easier for you to discover and track security policy violations.
-
-[float]
-=== Index Management
-
-The data produced by this metricset may contain sensitive information and may
-have different access and retention requirements than other data produced by
-{beatname_uc}. For these reasons you may wish to store the data in a separate
-index. Below is an example configuration demonstrating how to store the data
-from the `audit` module in its own index.
-
-[source,yaml]
-----
-auditbeat.modules:
-- module: audit
-  metricsets: ["kernel"]
-
-output.elasticsearch:
-  hosts: ["http://localhost:9200"]
-  indices:
-  - index: "auditbeat-%{[beat.version]}-audit-%{+yyyy.MM.dd}"
-    when.equals.metricset.module: "audit"
-----
-
-The default index template applied by {beatname_uc} will also apply to this
-index because the pattern in the template matches the
-`auditbeat-%{[beat.version]}` prefix.

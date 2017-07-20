@@ -27,11 +27,8 @@ auditbeat.modules:
     - /sbin
     - /usr/sbin
     conf:
-- /etc
+    - /etc
 ----
-
-Notice that that the `audit` module is specified twice in the example because
-the `kernel` and `file` metricsets require different settings.
 
 The configuration details vary by module. See the
 <<{beatname_lc}-modules,module documentation>> for more detail about

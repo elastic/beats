@@ -9,12 +9,6 @@ there are changes. To do this, you specify a path
 configuration changes. When the files found by the Glob change, new modules are
 started/stopped according to changes in the configuration files.
 
-This feature is especially useful in container environments where one container
-is used to monitor all services running in other containers on the same host.
-Because new containers appear and disappear dynamically, you may need to change
-the {beatname_uc} configuration frequently to specify which modules are needed and
-which hosts must be monitored.
-
 To enable dynamic config reloading, you specify the `path` and `reload` options
 in the main +{beatname_lc}.yml+ config file. For example:
 
@@ -43,19 +37,11 @@ definitions. For example:
 auditbeat.modules:
 
 - module: audit
-  metricsets: [kernel]
-  kernel.audit_rules: |
-    -w /etc/passwd -p wa -k identity
-    -a always,exit -F arch=b32 -S open,creat,truncate,ftruncate,openat,open_by_handle_at -F exit=-EPERM -k access
-
-- module: audit
   metricsets: [file]
   file.paths:
-    binaries:
-    - /bin
-    - /usr/bin
-    - /sbin
-    - /usr/sbin
-    conf:
-- /etc
+    wordpress:
+    - /www/wordpress
+    - /www/wordpress/wp-admin
+    - /www/wordpress/wp-content
+    - /www/wordpress/wp-includes
 ------------------------------------------------------------------------------

@@ -21,10 +21,7 @@ pattern, +{beatname_lc}-*+, and load the dashboards into the Kibana index.
 
 NOTE: Starting with Beats 6.0.0, the dashboards are loaded via the Kibana API.
 This requires a Kibana endpoint configuration. You should have configured the
-endpoint in <<{beatname_lc}-configuration>>. If you did't, configure it now
-and then restart {beatname_uc} before proceeding.
-
-//I'm just assuming that a restart is required.
+endpoint in <<{beatname_lc}-configuration>>. If you didn't, configure it now.
 
 To set up the Kibana dashboards for {beatname_uc}:
 
@@ -33,8 +30,6 @@ ifdef::allplatforms[]
 *deb, rpm, and mac:*
 
 From the directory where you installed {beatname_uc}, run:
-
-//TODO: I'm just guessing at these commands. I need to see how they really work.
 
 ["source","sh",subs="attributes,callouts"]
 ----------------------------------------------------------------------
@@ -47,7 +42,7 @@ ifeval::["{beatname_lc}"!="auditbeat"]
 
 ["source","sh",subs="attributes"]
 ----------------------------------------------------------------------
-docker run {dockerimage} ./{beatname_lc} setup
+docker run {dockerimage} setup
 ----------------------------------------------------------------------
 
 endif::[]
