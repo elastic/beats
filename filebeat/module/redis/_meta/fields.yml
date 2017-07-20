@@ -1,7 +1,7 @@
 - key: redis
-  title: "redis"
+  title: "Redis"
   description: >
-    redis Module
+    Redis Module
   fields:
     - name: redis
       type: group

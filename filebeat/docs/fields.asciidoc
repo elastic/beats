@@ -1278,9 +1278,9 @@ The error message
 
 
 [[exported-fields-redis]]
-== redis Fields
+== Redis Fields
 
-redis Module
+Redis Module
 
 
 
