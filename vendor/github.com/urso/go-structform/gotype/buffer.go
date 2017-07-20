@@ -35,9 +35,8 @@ func (b *buffer) init(alloc int) {
 func (b *buffer) allocStride() []byte {
 	if bytesIfc := stridePool.Get(); bytesIfc != nil {
 		return bytesIfc.([]byte)
-	} else {
-		return make([]byte, b.preAlloc)
 	}
+	return make([]byte, b.preAlloc)
 }
 
 func (b *buffer) alloc(sz int) unsafe.Pointer {

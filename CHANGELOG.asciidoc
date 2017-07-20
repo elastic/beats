@@ -34,6 +34,7 @@ https://github.com/elastic/beats/compare/v6.0.0-alpha2...master[Check the HEAD d
   This will make the CPU usage percentages from the system cpu metricset consistent
   with the system process metricset. The documentation for these metrics already
   stated that on multi-core systems the percentages could be greater than 100%. {pull}4544[4544]
+- Remove filters setting from metricbeat modules. {pull}4699[4699]
 
 *Packetbeat*
 
@@ -106,10 +107,12 @@ https://github.com/elastic/beats/compare/v6.0.0-alpha2...master[Check the HEAD d
 - Add experimental Aerospike module. {pull}4560[4560]
 - Vsphere module: collect custom fields from virtual machines. {issue}4464[4464]
 - Add `test modules` command, to test modules expected output. {pull}4656[4656]
+- Add `processors` setting to metricbeat modules. {pull}4699[4699]
 
 *Packetbeat*
 
 *Winlogbeat*
+- Add the ability to use LevelRaw if Level isn't populated in the event XML. {pull}4257[4257]
 
 *Auditbeat*
 - Add file integrity metricset to the audit module. {pull}4486[4486]

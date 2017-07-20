@@ -81,7 +81,21 @@ func (b *builder) add(e element) {
 }
 
 func (b *builder) millisOfSecond(digits int) {
-	b.appendDecimal(ftMillisOfSecond, digits, 3)
+	if digits <= 0 {
+		return
+	}
+
+	switch digits {
+	case 1:
+		b.appendExtDecimal(ftMillisOfSecond, 100, 1, 1)
+	case 2:
+		b.appendExtDecimal(ftMillisOfSecond, 10, 2, 2)
+	case 3:
+		b.appendExtDecimal(ftMillisOfSecond, 0, 3, 3)
+	default:
+		b.appendExtDecimal(ftMillisOfSecond, 0, 3, 3)
+		b.appendZeros(digits - 3)
+	}
 }
 
 func (b *builder) millisOfDay(digits int) {
@@ -200,8 +214,12 @@ func (b *builder) appendDecimalValue(ft fieldType, minDigits, maxDigits int, sig
 	if minDigits <= 1 {
 		b.add(unpaddedNumber{ft, maxDigits, signed})
 	} else {
-		b.add(paddedNumber{ft, minDigits, maxDigits, signed})
+		b.add(paddedNumber{ft, 0, minDigits, maxDigits, signed})
 	}
+}
+
+func (b *builder) appendExtDecimal(ft fieldType, div, minDigits, maxDigits int) {
+	b.add(paddedNumber{ft, div, minDigits, maxDigits, false})
 }
 
 func (b *builder) appendDecimal(ft fieldType, minDigits, maxDigits int) {
@@ -210,6 +228,10 @@ func (b *builder) appendDecimal(ft fieldType, minDigits, maxDigits int) {
 
 func (b *builder) appendSigned(ft fieldType, minDigits, maxDigits int) {
 	b.appendDecimalValue(ft, minDigits, maxDigits, true)
+}
+
+func (b *builder) appendZeros(count int) {
+	b.add(paddingZeros{count})
 }
 
 func (b *builder) appendText(ft fieldType) {

@@ -1,6 +1,7 @@
 package dtfmt
 
 import (
+	"fmt"
 	"testing"
 	"time"
 
@@ -48,22 +49,26 @@ func TestFormat(t *testing.T) {
 		{mkDate(2014, 12, 31), "xxxx.w.EEEE", "2015.1.Wednesday"},
 
 		// time
-		{mkTime(8, 5, 24), "K:m:s a", "8:5:24 AM"},
-		{mkTime(8, 5, 24), "KK:mm:ss aa", "08:05:24 AM"},
-		{mkTime(20, 5, 24), "K:m:s a", "8:5:24 PM"},
-		{mkTime(20, 5, 24), "KK:mm:ss aa", "08:05:24 PM"},
-		{mkTime(8, 5, 24), "h:m:s a", "9:5:24 AM"},
-		{mkTime(8, 5, 24), "hh:mm:ss aa", "09:05:24 AM"},
-		{mkTime(20, 5, 24), "h:m:s a", "9:5:24 PM"},
-		{mkTime(20, 5, 24), "hh:mm:ss aa", "09:05:24 PM"},
-		{mkTime(8, 5, 24), "H:m:s a", "8:5:24 AM"},
-		{mkTime(8, 5, 24), "HH:mm:ss aa", "08:05:24 AM"},
-		{mkTime(20, 5, 24), "H:m:s a", "20:5:24 PM"},
-		{mkTime(20, 5, 24), "HH:mm:ss aa", "20:05:24 PM"},
-		{mkTime(8, 5, 24), "k:m:s a", "9:5:24 AM"},
-		{mkTime(8, 5, 24), "kk:mm:ss aa", "09:05:24 AM"},
-		{mkTime(20, 5, 24), "k:m:s a", "21:5:24 PM"},
-		{mkTime(20, 5, 24), "kk:mm:ss aa", "21:05:24 PM"},
+		{mkTime(8, 5, 24, 0), "K:m:s a", "8:5:24 AM"},
+		{mkTime(8, 5, 24, 0), "KK:mm:ss aa", "08:05:24 AM"},
+		{mkTime(20, 5, 24, 0), "K:m:s a", "8:5:24 PM"},
+		{mkTime(20, 5, 24, 0), "KK:mm:ss aa", "08:05:24 PM"},
+		{mkTime(8, 5, 24, 0), "h:m:s a", "9:5:24 AM"},
+		{mkTime(8, 5, 24, 0), "hh:mm:ss aa", "09:05:24 AM"},
+		{mkTime(20, 5, 24, 0), "h:m:s a", "9:5:24 PM"},
+		{mkTime(20, 5, 24, 0), "hh:mm:ss aa", "09:05:24 PM"},
+		{mkTime(8, 5, 24, 0), "H:m:s a", "8:5:24 AM"},
+		{mkTime(8, 5, 24, 0), "HH:mm:ss aa", "08:05:24 AM"},
+		{mkTime(20, 5, 24, 0), "H:m:s a", "20:5:24 PM"},
+		{mkTime(20, 5, 24, 0), "HH:mm:ss aa", "20:05:24 PM"},
+		{mkTime(8, 5, 24, 0), "k:m:s a", "9:5:24 AM"},
+		{mkTime(8, 5, 24, 0), "kk:mm:ss aa", "09:05:24 AM"},
+		{mkTime(20, 5, 24, 0), "k:m:s a", "21:5:24 PM"},
+		{mkTime(20, 5, 24, 0), "kk:mm:ss aa", "21:05:24 PM"},
+		{mkTime(1, 2, 3, 123), "S", "1"},
+		{mkTime(1, 2, 3, 123), "SS", "12"},
+		{mkTime(1, 2, 3, 123), "SSS", "123"},
+		{mkTime(1, 2, 3, 123), "SSSS", "1230"},
 
 		// literals
 		{time.Now(), "--=++,_!/?\\[]{}@#$%^&*()", "--=++,_!/?\\[]{}@#$%^&*()"},
@@ -71,25 +76,35 @@ func TestFormat(t *testing.T) {
 		{time.Now(), "'plain' 'text'", "plain text"},
 		{time.Now(), "'plain' '' 'text'", "plain ' text"},
 		{time.Now(), "'plain '' text'", "plain ' text"},
+
+		// beats timestamp
+		{mkDateTime(2017, 1, 2, 4, 6, 7, 123),
+			"yyyy-MM-dd'T'HH:mm:ss.SSS'Z'",
+			"2017-01-02T04:06:07.123Z"},
 	}
 
 	for i, test := range tests {
-		t.Logf("run (%v): %v -> %v", i, test.pattern, test.expected)
+		name := fmt.Sprintf("run (%v): %v -> %v", i, test.pattern, test.expected)
+		t.Run(name, func(t *testing.T) {
+			actual, err := Format(test.time, test.pattern)
+			if err != nil {
+				t.Error(err)
+				return
+			}
 
-		actual, err := Format(test.time, test.pattern)
-		if err != nil {
-			t.Error(err)
-			continue
-		}
-
-		assert.Equal(t, test.expected, actual)
+			assert.Equal(t, test.expected, actual)
+		})
 	}
 }
 
 func mkDate(y, m, d int) time.Time {
-	return time.Date(y, time.Month(m), d, 0, 0, 0, 0, time.Local)
+	return mkDateTime(y, m, d, 0, 0, 0, 0)
 }
 
-func mkTime(h, m, s int) time.Time {
-	return time.Date(2000, 1, 1, h, m, s, 0, time.Local)
+func mkTime(h, m, s, S int) time.Time {
+	return mkDateTime(2000, 1, 1, h, m, s, S)
+}
+
+func mkDateTime(y, M, d, h, m, s, S int) time.Time {
+	return time.Date(y, time.Month(M), d, h, m, s, S*1000000, time.UTC)
 }

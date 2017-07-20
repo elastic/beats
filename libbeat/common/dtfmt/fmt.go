@@ -192,7 +192,7 @@ func parsePatternTo(b *builder, pattern string) error {
 			b.secondOfMinute(tokLen)
 
 		case 'S': // fraction of second
-			return errors.New("time formatter 'S' not supported")
+			b.millisOfSecond(tokLen)
 
 		case '\'': // literal
 			if tokLen == 1 {
