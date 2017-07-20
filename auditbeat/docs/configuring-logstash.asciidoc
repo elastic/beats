@@ -1,0 +1,5 @@
+[id="config-{beatname_lc}-logstash"]
+== Configuring {beatname_uc} to use Logstash
+
+:allplatforms:
+include::../../libbeat/docs/shared-logstash-config.asciidoc[]
