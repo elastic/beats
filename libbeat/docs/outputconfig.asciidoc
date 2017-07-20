@@ -16,7 +16,7 @@
 You configure {beatname_uc} to write to a specific output by setting options
 in the `output` section of the +{beatname_lc}.yml+ config file.
 
-The following topics describe how to configure all supported outputs:
+The following topics describe how to configure each supported output:
 
 * <<elasticsearch-output>>
 * <<logstash-output>>
@@ -26,7 +26,11 @@ The following topics describe how to configure all supported outputs:
 * <<console-output>>
 
 [[elasticsearch-output]]
-=== Elasticsearch
+=== Configure the Elasticsearch output
+
+++++
+<titleabbrev>Elasticsearch</titleabbrev>
+++++
 
 When you specify Elasticsearch for the output, the Beat sends the transactions directly to Elasticsearch by using the Elasticsearch HTTP API.
 
@@ -304,23 +308,18 @@ See <<configuration-output-ssl>> for more information.
 
 
 [[logstash-output]]
-=== Logstash
+=== Configure the Logstash output
 
-*Prerequisite:* To use Logstash as an output, you must
-{libbeat}/logstash-installation.html#logstash-setup[install and configure] the Beats input
-plugin for Logstash.
+++++
+<titleabbrev>Logstash</titleabbrev>
+++++
 
-The Logstash output sends the events directly to Logstash by using the lumberjack
+The Logstash output sends events directly to Logstash by using the lumberjack
 protocol, which runs over TCP. Logstash allows for additional processing and routing of
 generated events.
 
-Here is an example of how to configure {beatname_uc} to use Logstash:
-
-["source","yaml",subs="attributes"]
-------------------------------------------------------------------------------
-output.logstash:
-  hosts: ["localhost:5044"]
-------------------------------------------------------------------------------
+:allplatforms:
+include::../../libbeat/docs/shared-logstash-config.asciidoc[]
 
 ==== Accessing Metadata Fields
 
@@ -541,7 +540,11 @@ Elasticsearch. Beats that publish data in batches (such as Filebeat) send events
 spooler size.
 
 [[kafka-output]]
-=== Kafka
+=== Configure the Kafka output
+
+++++
+<titleabbrev>Kafka</titleabbrev>
+++++
 
 The Kafka output sends the events to Apache Kafka.
 
@@ -739,7 +742,11 @@ Configuration options for SSL parameters like the root CA for Kafka connections.
 <<configuration-output-ssl>> for more information.
 
 [[redis-output]]
-=== Redis
+=== Configure the Redis output
+
+++++
+<titleabbrev>Redis</titleabbrev>
+++++
 
 The Redis output inserts the events into a Redis list or a Redis channel.
 This output plugin is compatible with
@@ -960,7 +967,11 @@ This option determines whether Redis hostnames are resolved locally when using a
 The default value is false, which means that name resolution occurs on the proxy server.
 
 [[file-output]]
-=== File
+=== Configure the File output
+
+++++
+<titleabbrev>File</titleabbrev>
+++++
 
 The File output dumps the transactions into a file where each transaction is in a JSON format.
 Currently, this output is used for testing, but it can be used as input for
@@ -1015,7 +1026,11 @@ Output codec configuration. If the `codec` section is missing, events will be js
 See <<configuration-output-codec>> for more information.
 
 [[console-output]]
-=== Console
+=== Configure the Console output
+
+++++
+<titleabbrev>Console</titleabbrev>
+++++
 
 The Console output writes events in JSON format to stdout.
 
@@ -1058,7 +1073,11 @@ Setting `bulk_max_size` to 0 disables buffering in libbeat.
 
 [[configuration-output-ssl]]
 
-=== Specify SSL options
+=== Configure SSL options
+
+++++
+<titleabbrev>SSL options</titleabbrev>
+++++
 
 You can specify SSL options for any output that supports SSL.
 
@@ -1194,7 +1213,11 @@ The following elliptic curve types are available:
 * P-521
 
 [[configuration-output-codec]]
-=== Change the ouput codec
+=== Configure the ouput codec
+
+++++
+<titleabbrev>Output codec</titleabbrev>
+++++
 
 For outputs that do not require a specific encoding, you can change the encoding
 by using the codec configuration. You can specify either the `json` or `format`
