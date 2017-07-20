@@ -31,13 +31,18 @@ type Client struct {
 	Connection
 }
 
-func addPath(_url, _path string) (string, error) {
+func addPath(_url, _path string, params url.Values) (string, error) {
 	u, err := url.Parse(_url)
 	if err != nil {
 		return "", fmt.Errorf("fail to parse URL %s: %v", _url, err)
 	}
 	u.Path = path.Join(u.Path, _path)
-	return u.String(), nil
+
+	if params == nil {
+		return u.String(), nil
+	}
+
+	return strings.Join([]string{u.String(), "?", params.Encode()}, ""), nil
 }
 
 func NewKibanaClient(cfg *common.Config) (*Client, error) {
@@ -106,7 +111,7 @@ func NewKibanaClient(cfg *common.Config) (*Client, error) {
 }
 
 func (conn *Connection) Request(method, extraPath string, params url.Values, body io.Reader) (int, []byte, error) {
-	reqURL, err := addPath(conn.URL, extraPath)
+	reqURL, err := addPath(conn.URL, extraPath, params)
 	if err != nil {
 		return 0, nil, err
 	}
