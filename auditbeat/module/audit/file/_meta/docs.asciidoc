@@ -1,0 +1,36 @@
+=== Audit file metricset
+
+The `file` metricset sends events when a file is changed (created, updated, or
+deleted) on disk. The events contain file metadata and hashes (MD5, SHA1, and
+SHA256).
+
+////
+[float]
+=== How it works
+
+This metricset...
+////
+
+[float]
+=== Configuration options
+
+This metricset has some configuration options for tuning its behavior. The
+following example shows all configuration options with their default values.
+
+[source,yaml]
+----
+- module: audit
+  metricsets: [file]
+  file.paths:
+    binaries:
+    - /bin
+    - /usr/bin
+    - /sbin
+    - /usr/sbin
+    conf:
+    - /etc
+----
+
+
+*`file.paths`*:: A dictionary of arbitrary names (strings) to a list of paths
+(directories or files).
