@@ -30,50 +30,9 @@ auditbeat.modules:
 - /etc
 ----
 
-Notice that that the `audit` module is specified twice in the example because the
-`kernel` and `file` metricsets required different settings.
+Notice that that the `audit` module is specified twice in the example because
+the `kernel` and `file` metricsets require different settings.
 
-==== Common config options
-
-You can specify the following options for any {beatname_uc} module. Some modules
-require additional configuration settings. See the <<{beatname_lc}-modules>>
-section for more information.
-
-*`module`*::
-
-The name of the module to run.
-
-*`metricsets`*::
-
-A list of metricsets to execute. Make sure that you only list metricsets
-that are available in the module. It is not possible to reference metricsets from other modules.
-
-
-////
-*`enabled`*::
-
-A Boolean value that specifies whether the module is enabled. If you use the default config file, +{beatname_lc.yml}+,
-the System module is enabled (set to `enabled: true`) by default. If the `enabled` option is missing from the
-configuration block, the module is enabled by default.
-
-
-REVIEWERS: WILL AUDITBEAT HAVE ANY SHARED OHTER SETTINGS LIKE WE ONES LISTED BELOW FOR THE METRICBEAT MODULE?
-===== period
-
-How often the metricsets are executed. If a system is not reachable, Metricbeat returns an error for each period. This setting is required.
-
-===== hosts
-
-A list of hosts to fetch information from. For some metricsets, this setting is optional.
-
-===== fields
-
-A dictionary of fields that will be sent with the metricset event. This setting is optional.
-
-===== tags
-
-A list of tags that will be sent with the metricset event. This setting is optional.
-
-//////
-
-
+The configuration details vary by module. See the
+<<{beatname_lc}-modules,module documentation>> for more detail about
+configuring the available modules and metricsets.

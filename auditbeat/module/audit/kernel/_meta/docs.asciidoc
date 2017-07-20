@@ -1,4 +1,4 @@
-=== Audit Kernel Metricset
+=== Audit kernel metricset
 
 experimental[]
 
@@ -8,7 +8,7 @@ is a part of the Linux kernel.
 This metricset is available only for Linux.
 
 [float]
-=== How it Works
+=== How it works
 
 This metricset establishes a subscription to the `kernel` to receive the events
 as they occur. So unlike most other metricsets, the `period` configuration
@@ -33,10 +33,10 @@ metricset will buffer the messages in order to combine related messages into a
 single event even if they arrive interleaved or out of order.
 
 [float]
-=== Configuration Options
+=== Configuration options
 
-This metricset has some configuration options for tuning its behavior. Below
-is example showing all configuration options with their default values.
+This metricset has some configuration options for tuning its behavior. The
+following example shows all configuration options with their default values.
 
 [source,yaml]
 ----
@@ -87,7 +87,7 @@ used by the Linux `auditctl` utility. {beatname_uc} supports adding file watches
 (`-w`) and syscall rules (`-a` or `-A`).
 
 [float]
-=== Audit Rules
+=== Audit rules
 
 The audit rules are where you configure the activities that are audited. These
 rules are configured as either syscalls or files that should be monitored. For

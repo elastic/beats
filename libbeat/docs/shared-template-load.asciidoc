@@ -78,12 +78,16 @@ cd {beatname_lc}-{version}-darwin-x86_64
 curl -H 'Content-Type: application/json' -XPUT 'http://localhost:9200/_template/{beatname_lc}' -d@{beatname_lc}.template.json
 ----------------------------------------------------------------------
 
+ifeval::["{beatname_lc}"!="auditbeat"]
+
 *docker:*
 
 ["source", "sh", subs="attributes"]
 ----------------------------------------------------------------------
 docker run --rm {dockerimage} curl -H 'Content-Type: application/json' -XPUT 'http://localhost:9200/_template/{beatname_lc}' -d@{beatname_lc}.template.json
 ----------------------------------------------------------------------
+
+endif::[]
 
 *win:*
 

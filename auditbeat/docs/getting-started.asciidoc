@@ -1,9 +1,7 @@
 [id="{beatname_lc}-getting-started"]
 == Getting started with {beatname_uc}
 
-//TODO: Need to add summary here.
-
-//QUESTION: We've made some recent enhancements that should make the getting started experience easier. We should remove whatever is no longer required (because it happens by default) and instead explain what happens. Then we can point the user for info somewhere else if they want to override the default behavior. I think we make it seem like there are more steps than are actually required now.
+//TODO: The getting started content needs to be changed to reflect changes in command-line syntax, dashboard loading, etc.
 
 To get started with your own {beatname_uc} setup, install and configure these
 related products:
@@ -30,8 +28,6 @@ install, configure, and run {beatname_uc}:
 === Step 1: Install {beatname_uc}
 
 You should install {beatname_uc} on all the servers you want to monitor.
-
-//QUESTION: WHAT ELSE DO WE WANT TO SAY ABOUT WHERE TO INSTALL?
 
 include::../../libbeat/docs/shared-download-and-install.asciidoc[]
 
@@ -92,24 +88,6 @@ tar xzvf {beatname_lc}-{version}-darwin-x86_64.tar.gz
 
 endif::[]
 
-[[docker]]
-*docker:*
-
-ifeval::["{release-state}"=="unreleased"]
-
-Version {stack-version} of {beatname_uc} has not yet been released.
-
-endif::[]
-
-ifeval::["{release-state}"!="unreleased"]
-
-["source","sh",subs="attributes"]
-------------------------------------------------
-docker pull {dockerimage}
-------------------------------------------------
-
-endif::[]
-
 [[win]]
 *win:*
 
@@ -158,14 +136,15 @@ For more information about these options, see
 
 include::../../libbeat/docs/shared-configuring.asciidoc[]
 
-{beatname_uc} uses <<{beatname_lc}-modules,modules>> to collect audit
-information. You configure each module individually. The following example shows
-the default configuration in the +{beatname_lc}.yml+ file. The audit module is
-enabled by default to collect audit information
+To configure {beatname_uc}:
 
-The following example shows the `file` metricset configured to generate events
-when a file changes on disk in one of the specified locations.
-
+. Define the {beatname_uc} modules that you want to enable. {beatname_uc} uses
+modules to collect the audit information. For each module, specify the
+metricsets that you want to collect.
++
+The following example shows the `file` metricset configured to generate
+events whenever a file in one of the specified paths changes on disk:
++
 ["source","sh",subs="attributes"]
 -------------------------------------
 auditbeat.modules:
@@ -181,12 +160,12 @@ auditbeat.modules:
     conf:
     - /etc
 -------------------------------------
-
-To configure {beatname_uc}:
-
-. Define the {beatname_uc} modules that you want to enable. For each module, specify
-the metricsets that you want to collect. See <<configuring-howto-{beatname_lc}>> for
-more details about configuring modules.
++
+If you accept the default configuration without specifying additional modules,
+{beatname_uc} uses a default configuration that's tailored to the operating system
+where {beatname_uc} is running.
++
+See <<configuring-howto-{beatname_lc}>> for more details about configuring modules.
 
 . If you are sending output to Elasticsearch, set the IP address and port where
 {beatname_uc} can find the Elasticsearch installation:
@@ -199,6 +178,28 @@ output.elasticsearch:
 +
 If you are sending output to Logstash, see <<config-{beatname_lc}-logstash>>
 instead.
+
+. If you plan to use the sample Kibana dashboards provided with {beatname_uc},
+configure the Kibana endpoint:
++
+[source,yaml]
+----------------------------------------------------------------------
+setup.kibana:
+  host: "localhost:5601"
+----------------------------------------------------------------------
++
+--
+Where `host` is the hostname and port of the machine where Kibana is running,
+for example, `localhost:5601`.
+
+TIP: If you specify a path after the port number, you need to include
+the scheme and port: `http://localhost:5601/path`.
+
+--
+
+//TODO: Add link that mentions security settings and points to docs about setup.kibana for more info.
+
+//REVIEWERS: Wondering if I should protocol, username, and password in the example. We tend to leave that out, but not sure if that's the best thing to do.
 
 [id="{beatname_lc}-template"]
 === Step 3: Load the index template in Elasticsearch
@@ -229,13 +230,6 @@ sudo /etc/init.d/{beatname_lc} start
 sudo /etc/init.d/{beatname_lc} start
 ----------------------------------------------------------------------
 
-*docker:*
-
-["source","sh",subs="attributes"]
-----------------------------------------------------------------------
-docker run {dockerimage}
-----------------------------------------------------------------------
-
 *mac:*
 
 ["source","sh",subs="attributes"]
@@ -243,8 +237,8 @@ docker run {dockerimage}
 sudo chown root {beatname_lc}.yml <1>
 sudo ./{beatname_lc} -e -c {beatname_lc}.yml -d "publish"
 ----------------------------------------------------------------------
-<1> You'll be running {beatname_uc} as root, so you need to change ownership
-of the configuration file (see
+<1> To monitor system files, you'll be running {beatname_uc} as root, so you
+need to change ownership of the configuration file (see
 {libbeat}/config-file-permissions.html[Config File Ownership and Permissions]
 in the _Beats Platform Reference_).
 
@@ -255,7 +249,7 @@ in the _Beats Platform Reference_).
 PS C:{backslash}Program Files{backslash}{beatname_uc}> Start-Service {beatname_lc}
 ----------------------------------------------------------------------
 
-By default the log files are stored in +C:\ProgramData\{beatname_lc}\Logs+.
+By default the log files are stored in +C:{backslash}ProgramData{backslash}{beatname_lc}{backslash}Logs+.
 
 ==== Test the {beatname_uc} installation
 
@@ -276,9 +270,9 @@ URL.
 [id="{beatname_lc}-sample-dashboards"]
 === Step 5: Load sample Kibana dashboards
 
-To make it easier for you to start monitoring potential security policy
-violations and track them in Kibana, we have created sample {beatname_uc}
-dashboards. The dashboards are provided as examples. We recommend that you
+To make it easier for you to start auditing the activities of users and
+processes on your system, we have created sample {beatname_uc} dashboards.
+The dashboards are provided as examples. We recommend that you
 {kibana-ref}/dashboard.html[customize] them to meet your needs.
 
 image:./images/auditbeat-file-integrity-dashboard.png[Auditbeat File Integrity Dashboard]
