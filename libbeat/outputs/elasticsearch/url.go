@@ -6,7 +6,7 @@ import (
 	"strings"
 )
 
-func makeURL(url, path, pipeline string, params map[string]string) string {
+func addToURL(url, path, pipeline string, params map[string]string) string {
 	if len(params) == 0 && pipeline == "" {
 		return url + path
 	}
