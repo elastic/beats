@@ -19,8 +19,8 @@ After installing the Elastic Stack, read the following topics to learn how to in
 * <<winlogbeat-template>>
 * <<winlogbeat-starting>>
 * <<winlogbeat-sample-dashboards>>
-* <<command-line-options>>
-* <<directory-layout>>
+* {winlogbeat}/command-line-options.html[Command Line Options]
+* {winlogbeat}/directory-layout.html[Directory Layout]
 
 [[winlogbeat-installation]]
 === Step 1: Installing Winlogbeat
@@ -59,7 +59,7 @@ Before starting Winlogbeat, you should look at the configuration options in the
 configuration file, for example `C:\Program Files\Winlogbeat\winlogbeat.yml`.
 There’s also a full example configuration file called `winlogbeat.full.yml` that
 shows all non-deprecated options. For more information about these options, see
-<<winlogbeat-configuration-details>>. 
+{winlogbeat}/winlogbeat-configuration-details.html[Configuration Options]. 
 
 [[winlogbeat-configuration]]
 === Step 2: Configuring Winlogbeat
@@ -102,7 +102,7 @@ winlogbeat.event_logs:
 +
 To obtain a list of available event logs, run `Get-EventLog *` in PowerShell.
 For more information about this command, see the configuration details for
-<<configuration-winlogbeat-options-event_logs-name,event_logs.name>>.
+{winlogbeat}/configuration-winlogbeat-options.html#configuration-winlogbeat-options-event_logs-name[event_logs.name].
 
 . If you are sending output to Elasticsearch, set the IP address and port where
 Winlogbeat can find the Elasticsearch installation:

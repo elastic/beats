@@ -18,8 +18,8 @@ install, configure, and run Heartbeat:
 * <<heartbeat-configuration>>
 * <<heartbeat-template>>
 * <<heartbeat-starting>>
-* <<command-line-options>>
-* <<directory-layout>>
+* {heartbeat}/command-line-options.html[Command Line Options]
+* {heartbeat}/directory-layout.html[Directory Layout]
 
 
 [[heartbeat-installation]]
@@ -151,7 +151,7 @@ endif::[]
 Before starting Heartbeat, you should look at the configuration options in
 the configuration file, for example +C:\Program Files\Heartbeat\heartbeat.yml+
 or +/etc/heartbeat/heartbeat.yml+. For more information about these
-options, see <<heartbeat-configuration-details>>.
+options, see {heartbeat}/heartbeat-configuration-details.html[Configuration Options].
 
 [[heartbeat-configuration]]
 === Step 2: Configuring Heartbeat
@@ -200,8 +200,8 @@ was started. Heartbeat adds the `@every` keyword to the syntax provided by the
 <3> The `mode` specifies whether to ping one IP (`any`) or all resolvable IPs
 (`all`).
 +
-See <<heartbeat-configuration-details>> for a full description of each
-configuration option.
+See {heartbeat}/heartbeat-configuration-details.html[Configuration Options]
+for a full description of each configuration option.
 
 . If you are sending output to Elasticsearch, set the IP address and port where
 Heartbeat can find the Elasticsearch installation:
@@ -212,14 +212,14 @@ output.elasticsearch:
   hosts: ["192.168.1.42:9200"]
 ----------------------------------------------------------------------
 +
-If you are sending output to Logstash, see <<config-heartbeat-logstash>>
-instead.
+If you are sending output to Logstash, see {heartbeat}/config-heartbeat-logstash.html[
+Configuring Heartbeat to use Logstash] instead.
 
 TIP: To test your configuration file, change to the directory where the
 Heartbeat binary is installed, and run Heartbeat in the foreground with
 the following options specified: +./heartbeat -configtest -e+. Make sure
 your config files are in the path expected by Heartbeat
-(see <<directory-layout>>). If you installed from DEB or RPM packages, run
+(see {heartbeat}/directory-layout.html[Directory Layout]). If you installed from DEB or RPM packages, run
 +./heartbeat.sh -configtest -e+.
 
 [[heartbeat-template]]
@@ -234,7 +234,7 @@ include::../../libbeat/docs/shared-template-load.asciidoc[]
 Start Heartbeat by issuing the appropriate command for your platform.
 
 NOTE: If you use an init.d script to start Heartbeat on deb or rpm, you can't
-specify command line flags (see <<command-line-options>>). To specify flags,
+specify command line flags (see {heartbeat}/command-line-options.html[Command Line Options]). To specify flags,
 start Heartbeat in the foreground.
 
 *deb:*

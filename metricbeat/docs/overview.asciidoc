@@ -9,15 +9,15 @@ ships them to the output that you specify, such as Elasticsearch or Logstash.
 Metricbeat helps you monitor your servers by collecting metrics from the system
 and the following services:
 
-  * <<metricbeat-module-apache,Apache>>
-  * <<metricbeat-module-haproxy,HAProxy>>
-  * <<metricbeat-module-mongodb,MongoDB>>
-  * <<metricbeat-module-mysql,MySQL>>
-  * <<metricbeat-module-nginx,Nginx>>
-  * <<metricbeat-module-postgresql,PostgreSQL>>
-  * <<metricbeat-module-redis,Redis>>
-  * <<metricbeat-module-system,System>>
-  * <<metricbeat-module-zookeeper,Zookeeper>>
+  * {metricbeat}/metricbeat-module-apache.html[Apache]
+  * {metricbeat}/metricbeat-module-haproxy.html[HAProxy]
+  * {metricbeat}/metricbeat-module-mongodb.html[MongoDB]
+  * {metricbeat}/metricbeat-module-mysql.html[MySQL]
+  * {metricbeat}/metricbeat-module-nginx.html[Nginx]
+  * {metricbeat}/metricbeat-module-postgresql.html[PostgreSQL]
+  * {metricbeat}/metricbeat-module-redis.html[Redis]
+  * {metricbeat}/metricbeat-module-system.html[System]
+  * {metricbeat}/metricbeat-module-zookeeper.html[Zookeeper]
 
 Metricbeat can insert the collected metrics directly into Elasticsearch
 or send them to Logstash, Redis, or Kafka.

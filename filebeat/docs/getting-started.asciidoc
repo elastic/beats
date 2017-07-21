@@ -17,9 +17,9 @@ After installing the Elastic Stack, read the following topics to learn how to in
 * <<filebeat-template>>
 * <<filebeat-starting>>
 * <<filebeat-index-pattern>>
-* <<filebeat-modules-quickstart>>
-* <<command-line-options>>
-* <<directory-layout>>
+* {filebeat}/filebeat-modules-quickstart.html[Quick Start for Common Log Formats]
+* {filebeat}/command-line-options.html[Command Line Options]
+* {filebeat}/directory-layout.html[Directory Layout]
 
 [[filebeat-installation]]
 === Step 1: Installing Filebeat
@@ -140,12 +140,11 @@ endif::[]
 [[filebeat-configuration]]
 === Step 2: Configuring Filebeat
 
-TIP: <<filebeat-modules-overview,Filebeat modules>> provide the fastest getting
-started experience for common log formats. See <<filebeat-modules-quickstart>>
-to learn how to get started with modules. If you use Filebeat modules to get
+TIP: {filebeat}/filebeat-modules-overview.html[Filebeat modules] provide the fastest getting
+started experience for common log formats. See {filebeat}/filebeat-modules-quickstart.html[Quick
+Start for Common Log Formats] to learn how to get started with modules. If you use Filebeat modules to get
 started, you can skip the content in this section, including the remaining
-getting started steps, and go directly to the <<filebeat-modules-quickstart>>
-page. 
+getting started steps, and go directly to the {filebeat}/filebeat-modules-quickstart.html[Quick Start for Common Log Formats] page. 
 
 include::../../libbeat/docs/shared-configuring.asciidoc[]
 
@@ -197,13 +196,13 @@ If you are sending output to Logstash, see <<config-filebeat-logstash>> instead.
 TIP: To test your configuration file, change to the directory where the Filebeat
 binary is installed, and run Filebeat in the foreground with the following
 options specified: +./filebeat -configtest -e+. Make sure your config files are
-in the path expected by Filebeat (see <<directory-layout>>). If you
+in the path expected by Filebeat (see {filebeat}/directory-layout.html[Directory Layout]). If you
 installed from DEB or RPM packages, run +./filebeat.sh -configtest -e+.
 
 Before starting Filebeat, you should look at the configuration options in the
 configuration file, for example `C:\Program Files\Filebeat\filebeat.yml` or
 `/etc/filebeat/filebeat.yml`. For more information about these options,
-see <<filebeat-configuration-details>>.
+see {filebeat}/filebeat-configuration-details.html[Configuration Options].
 
 [[config-filebeat-logstash]]
 === Step 3: Configuring Filebeat to Use Logstash
@@ -223,7 +222,7 @@ include::../../libbeat/docs/shared-template-load.asciidoc[]
 Start Filebeat by issuing the appropriate command for your platform. 
 
 NOTE: If you use an init.d script to start Filebeat on deb or rpm, you can't
-specify command line flags (see <<command-line-options>>). To specify flags,
+specify command line flags (see {filebeat}/command-line-options.html[Command Line Options]). To specify flags,
 start Filebeat in the foreground.
 
 *deb:*
