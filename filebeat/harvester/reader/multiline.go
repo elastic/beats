@@ -248,7 +248,6 @@ func (mlr *Multiline) clear() {
 
 // finalize writes the existing content into the returned message and resets all reader variables.
 func (mlr *Multiline) finalize() Message {
-
 	// Copy message from existing content
 	msg := mlr.message
 	mlr.clear()

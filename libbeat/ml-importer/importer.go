@@ -97,7 +97,6 @@ func ImportMachineLearningJob(esClient MLLoader, cfg *MLConfig) error {
 
 // HaveXpackML checks whether X-pack is installed and has Machine Learning enabled.
 func HaveXpackML(esClient MLLoader) (bool, error) {
-
 	status, response, err := esClient.Request("GET", "/_xpack", "", nil, nil)
 	if status == 404 || status == 400 {
 		return false, nil

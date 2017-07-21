@@ -91,5 +91,4 @@ func (m *MetricSet) Fetch() ([]common.MapStr, error) {
 	}
 
 	return events, err
-
 }

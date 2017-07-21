@@ -314,7 +314,6 @@ func TestAmqp_ExchangeUnbindTransaction(t *testing.T) {
 	assert.Equal(t, "test2", fields["source"])
 	assert.Equal(t, "MSFT", fields["routing-key"])
 	assert.Equal(t, false, fields["no-wait"])
-
 }
 
 func TestAmqp_PublishMessage(t *testing.T) {
@@ -460,7 +459,6 @@ func TestAmqp_MessagePropertiesFields(t *testing.T) {
 	assert.Equal(t, "hihi", headers["yop"])
 	assert.Equal(t, nil, headers["nil"])
 	assert.Equal(t, 40.5, headers["number"])
-
 }
 
 func TestAmqp_ChannelError(t *testing.T) {

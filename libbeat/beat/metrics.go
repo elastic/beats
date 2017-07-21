@@ -13,7 +13,6 @@ var (
 )
 
 func init() {
-
 	var ms memstatsVar
 	metrics.Add("memstats", ms, monitoring.Reported)
 }

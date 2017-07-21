@@ -28,5 +28,4 @@ func TestLogsPathMatcher(t *testing.T) {
 	output = logMatcher.MetadataIndex(input)
 
 	assert.Equal(t, output, cid)
-
 }

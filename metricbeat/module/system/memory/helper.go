@@ -15,7 +15,6 @@ type MemStat struct {
 }
 
 func GetMemory() (*MemStat, error) {
-
 	mem := sigar.Mem{}
 	err := mem.Get()
 	if err != nil {
@@ -26,7 +25,6 @@ func GetMemory() (*MemStat, error) {
 }
 
 func AddMemPercentage(m *MemStat) {
-
 	if m.Mem.Total == 0 {
 		return
 	}
@@ -44,7 +42,6 @@ type SwapStat struct {
 }
 
 func GetSwap() (*SwapStat, error) {
-
 	swap := sigar.Swap{}
 	err := swap.Get()
 	if err != nil {
@@ -52,7 +49,6 @@ func GetSwap() (*SwapStat, error) {
 	}
 
 	return &SwapStat{Swap: swap}, nil
-
 }
 
 func GetMemoryEvent(memStat *MemStat) common.MapStr {

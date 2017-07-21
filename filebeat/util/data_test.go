@@ -9,7 +9,6 @@ import (
 )
 
 func TestNewData(t *testing.T) {
-
 	data := NewData()
 
 	assert.False(t, data.HasEvent())
@@ -27,7 +26,6 @@ func TestNewData(t *testing.T) {
 }
 
 func TestGetEvent(t *testing.T) {
-
 	data := NewData()
 	data.Event.Fields = common.MapStr{"hello": "world"}
 	out := common.MapStr{"hello": "world"}

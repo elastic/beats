@@ -110,7 +110,6 @@ var (
 
 // Map data to MapStr.
 func eventMapping(info []*haproxy.Stat) []common.MapStr {
-
 	var events []common.MapStr
 
 	for _, evt := range info {

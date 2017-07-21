@@ -12,7 +12,6 @@ import (
 
 // main generates index templates for the beats
 func main() {
-
 	beatVersion := version.GetDefaultVersion()
 	index := flag.String("index", "", "Base index name. Normally {beat_name} (required)")
 	output := flag.String("output", "", "Required: Full path to the output file (required)")

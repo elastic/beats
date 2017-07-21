@@ -103,7 +103,6 @@ func TestDataPath(t *testing.T) {
 
 		assert.Equal(t, test.ResultData, Resolve(Data, test.Path), "failed on %+v", test)
 	}
-
 }
 
 func TestLogsPath(t *testing.T) {
@@ -149,7 +148,6 @@ func TestLogsPath(t *testing.T) {
 
 		assert.Equal(t, test.ResultLogs, Resolve(Logs, test.Path))
 	}
-
 }
 
 // rootDir builds an OS specific absolute root directory.

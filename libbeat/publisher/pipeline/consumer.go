@@ -178,7 +178,6 @@ func (c *eventConsumer) loop(consumer broker.Consumer) {
 			batch = nil
 		}
 	}
-
 }
 
 func (c *eventConsumer) paused() bool {

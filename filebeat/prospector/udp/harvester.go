@@ -27,7 +27,6 @@ func NewHarvester(forwarder *harvester.Forwarder, cfg *common.Config) *Harvester
 }
 
 func (h *Harvester) Run() error {
-
 	config := defaultConfig
 	err := h.cfg.Unpack(&config)
 	if err != nil {

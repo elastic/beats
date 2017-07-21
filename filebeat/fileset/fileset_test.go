@@ -63,7 +63,6 @@ func TestEvaluateVarsNginx(t *testing.T) {
 }
 
 func TestEvaluateVarsNginxOverride(t *testing.T) {
-
 	modulesPath, err := filepath.Abs("../module")
 	assert.NoError(t, err)
 	fs, err := New(modulesPath, "access", &ModuleConfig{Module: "nginx"}, &FilesetConfig{
@@ -188,7 +187,6 @@ func TestGetProspectorConfigNginxOverrides(t *testing.T) {
 	filesetName, err := cfg.String("_fileset_name", -1)
 	assert.NoError(t, err)
 	assert.Equal(t, "access", filesetName)
-
 }
 
 func TestGetPipelineNginx(t *testing.T) {

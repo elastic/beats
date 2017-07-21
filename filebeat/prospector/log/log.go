@@ -47,7 +47,6 @@ func NewLog(
 // Read reads from the reader and updates the offset
 // The total number of bytes read is returned.
 func (f *Log) Read(buf []byte) (int, error) {
-
 	totalN := 0
 
 	for {
@@ -90,7 +89,6 @@ func (f *Log) Read(buf []byte) (int, error) {
 
 // errorChecks checks how the given error should be handled based on the config options
 func (f *Log) errorChecks(err error) error {
-
 	if err != io.EOF {
 		logp.Err("Unexpected state reading from %s; error: %s", f.fs.Name(), err)
 		return err
@@ -149,7 +147,6 @@ func (f *Log) errorChecks(err error) error {
 }
 
 func (f *Log) wait() {
-
 	// Wait before trying to read file again. File reached EOF.
 	select {
 	case <-f.done:

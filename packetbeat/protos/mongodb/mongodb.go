@@ -362,7 +362,6 @@ func reconstructQuery(t *transaction, full bool) (query string) {
 }
 
 func (mongodb *mongodbPlugin) publishTransaction(t *transaction) {
-
 	if mongodb.results == nil {
 		debugf("Try to publish transaction with null results")
 		return

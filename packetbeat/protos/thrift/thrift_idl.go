@@ -44,7 +44,6 @@ func fieldsToArrayByID(fields []*parser.Field) []*string {
 }
 
 func buildMethodsMap(thriftFiles map[string]parser.Thrift) map[string]*thriftIdlMethod {
-
 	output := make(map[string]*thriftIdlMethod)
 
 	for _, thrift := range thriftFiles {
@@ -91,7 +90,6 @@ func (thriftidl *thriftIdl) findMethod(name string) *thriftIdlMethod {
 }
 
 func newThriftIdl(idlFiles []string) (*thriftIdl, error) {
-
 	if len(idlFiles) == 0 {
 		return nil, nil
 	}

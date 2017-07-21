@@ -158,7 +158,6 @@ func (c *client) PublishEvents(events []common.MapStr, opts ...ClientOption) boo
 }
 
 func (c *client) getPipeline(opts []ClientOption) ([]common.MapStr, Context, sender, error) {
-
 	var err error
 	values, ctx := MakeContext(opts)
 

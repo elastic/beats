@@ -27,7 +27,6 @@ type parserConfig struct {
 
 // check whether this ops is enabled or not
 func (p *parser) CheckFrameOpsIgnored() bool {
-
 	if p.config.ignoredOps != nil && len(p.config.ignoredOps) > 0 {
 		//default map value is false
 		v := p.config.ignoredOps[p.framer.Header.Op]
@@ -131,7 +130,6 @@ func (p *parser) newMessage(ts time.Time) *message {
 }
 
 func (p *parser) parserBody() (bool, error) {
-
 	headLen := p.framer.Header.HeadLength
 	bdyLen := p.framer.Header.BodyLength
 	if bdyLen <= 0 {
@@ -191,7 +189,6 @@ func (p *parser) parserBody() (bool, error) {
 }
 
 func (p *parser) parse() (*message, error) {
-
 	// if p.frame is nil then create a new framer, or continue to process the last message
 	if p.framer == nil {
 		if isDebug {

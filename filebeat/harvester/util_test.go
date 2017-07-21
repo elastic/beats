@@ -30,7 +30,6 @@ func TestMatchAnyRegexps(t *testing.T) {
 	matchers, err := InitMatchers("\\.gz$")
 	assert.Nil(t, err)
 	assert.Equal(t, MatchAny(matchers, "/var/log/log.gz"), true)
-
 }
 
 func TestExcludeLine(t *testing.T) {

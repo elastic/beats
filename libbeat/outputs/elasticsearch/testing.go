@@ -19,7 +19,6 @@ const (
 
 // GetEsHost returns the elasticsearch host.
 func GetEsHost() string {
-
 	host := os.Getenv("ES_HOST")
 
 	if len(host) == 0 {

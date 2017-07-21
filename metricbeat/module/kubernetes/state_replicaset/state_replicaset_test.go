@@ -18,7 +18,6 @@ import (
 const testFile = "../_meta/test/kube-state-metrics"
 
 func TestEventMapping(t *testing.T) {
-
 	file, err := os.Open(testFile)
 	assert.NoError(t, err, "cannot open test file "+testFile)
 

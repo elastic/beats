@@ -12,7 +12,6 @@ import (
 )
 
 func TestSafeFileRotateExistingFile(t *testing.T) {
-
 	tempdir, err := ioutil.TempDir("", "")
 	assert.NoError(t, err)
 	defer func() {

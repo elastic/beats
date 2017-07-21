@@ -36,7 +36,6 @@ func (r *rpc) handleExpiredPacket(nfs *nfs) {
 
 // called when we process a RPC call
 func (r *rpc) handleCall(xid string, xdr *xdr, ts time.Time, tcptuple *common.TCPTuple, dir uint8) {
-
 	// eat rpc version number
 	xdr.getUInt()
 	rpcProg := xdr.getUInt()

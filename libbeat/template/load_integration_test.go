@@ -15,7 +15,6 @@ import (
 )
 
 func TestCheckTemplate(t *testing.T) {
-
 	client := elasticsearch.GetTestingElasticsearch(t)
 	if err := client.Connect(); err != nil {
 		t.Fatal(err)
@@ -30,7 +29,6 @@ func TestCheckTemplate(t *testing.T) {
 }
 
 func TestLoadTemplate(t *testing.T) {
-
 	// Setup ES
 	client := elasticsearch.GetTestingElasticsearch(t)
 	if err := client.Connect(); err != nil {
@@ -69,7 +67,6 @@ func TestLoadTemplate(t *testing.T) {
 }
 
 func TestLoadInvalidTemplate(t *testing.T) {
-
 	// Invalid Template
 	template := map[string]interface{}{
 		"json": "invalid",
@@ -96,7 +93,6 @@ func TestLoadInvalidTemplate(t *testing.T) {
 }
 
 func getTemplate(t *testing.T, client ESClient, templateName string) common.MapStr {
-
 	status, body, err := client.Request("GET", "/_template/"+templateName, "", nil, nil)
 	assert.NoError(t, err)
 	assert.Equal(t, status, 200)
@@ -116,7 +112,6 @@ func newConfigFrom(t *testing.T, from interface{}) *common.Config {
 
 // Tests loading the templates for each beat
 func TestLoadBeatsTemplate(t *testing.T) {
-
 	beats := []string{
 		"libbeat",
 	}
@@ -161,7 +156,6 @@ func TestLoadBeatsTemplate(t *testing.T) {
 }
 
 func TestTemplateSettings(t *testing.T) {
-
 	// Setup ES
 	client := elasticsearch.GetTestingElasticsearch(t)
 	if err := client.Connect(); err != nil {
@@ -214,7 +208,6 @@ func TestTemplateSettings(t *testing.T) {
 }
 
 func TestOverwrite(t *testing.T) {
-
 	// Setup ES
 	client := elasticsearch.GetTestingElasticsearch(t)
 	if err := client.Connect(); err != nil {
@@ -334,7 +327,6 @@ var dataTests = []struct {
 
 // Tests if data can be loaded into elasticsearch with right types
 func TestTemplateWithData(t *testing.T) {
-
 	fieldsPath, err := filepath.Abs("./testdata/fields.yml")
 	assert.NotNil(t, fieldsPath)
 	assert.Nil(t, err)

@@ -82,7 +82,6 @@ func ImportDashboardsViaKibana(config *common.Config, dashConfig *Config, msgOut
 }
 
 func ImportDashboardsViaElasticsearch(config *common.Config, dashConfig *Config, msgOutputter MessageOutputter) (bool, error) {
-
 	esLoader, err := NewElasticsearchLoader(config, dashConfig, msgOutputter)
 	if err != nil {
 		return false, fmt.Errorf("fail to create the Elasticsearch loader: %v", err)
@@ -118,7 +117,6 @@ func ImportDashboardsViaElasticsearch(config *common.Config, dashConfig *Config,
 }
 
 func getMajorAndMinorVersion(version string) (int, int, error) {
-
 	fields := strings.Split(version, ".")
 	if len(fields) != 3 {
 		return 0, 0, fmt.Errorf("wrong version %s", version)
@@ -140,7 +138,6 @@ func getMajorAndMinorVersion(version string) (int, int, error) {
 }
 
 func isKibanaAPIavailable(version string) bool {
-
 	majorVersion, minorVersion, err := getMajorAndMinorVersion(version)
 	if err != nil {
 		return false

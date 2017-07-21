@@ -12,7 +12,6 @@ type nfs struct {
 }
 
 func (nfs *nfs) getRequestInfo(xdr *xdr) common.MapStr {
-
 	nfsInfo := common.MapStr{}
 	nfsInfo["version"] = nfs.vers
 

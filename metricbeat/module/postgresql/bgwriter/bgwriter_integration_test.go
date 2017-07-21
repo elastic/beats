@@ -37,7 +37,6 @@ func TestFetch(t *testing.T) {
 	assert.Contains(t, buffers, "backend")
 	assert.Contains(t, buffers, "backend_fsync")
 	assert.Contains(t, buffers, "allocated")
-
 }
 
 func TestData(t *testing.T) {

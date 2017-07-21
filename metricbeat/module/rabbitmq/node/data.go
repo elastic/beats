@@ -130,7 +130,6 @@ var (
 )
 
 func eventsMapping(content []byte) ([]common.MapStr, error) {
-
 	var nodes []map[string]interface{}
 	err := json.Unmarshal(content, &nodes)
 	if err != nil {

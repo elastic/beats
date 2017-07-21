@@ -50,7 +50,6 @@ func (r *Registry) Stop() {
 			h.Stop()
 		}(hv)
 	}
-
 }
 
 // WaitForCompletion can be used to wait until all harvesters are stopped
@@ -60,7 +59,6 @@ func (r *Registry) WaitForCompletion() {
 
 // Start starts the given harvester and add its to the registry
 func (r *Registry) Start(h Harvester) {
-
 	// Make sure stop is not called during starting a harvester
 	r.Lock()
 	defer r.Unlock()

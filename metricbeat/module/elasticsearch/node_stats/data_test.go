@@ -13,7 +13,6 @@ import (
 )
 
 func TestStats(t *testing.T) {
-
 	files, err := filepath.Glob("./_meta/test/node_stats.*.json")
 	assert.NoError(t, err)
 

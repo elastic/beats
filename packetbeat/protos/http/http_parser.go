@@ -466,7 +466,6 @@ func (*parser) parseBodyChunkedStart(s *stream, m *message) (cont, ok, complete 
 }
 
 func (*parser) parseBodyChunked(s *stream, m *message) (cont, ok, complete bool) {
-
 	if len(s.data[s.parseOffset:]) >= m.chunkedLength-s.bodyReceived+2 /*\r\n*/ {
 		// Received more data than expected
 		m.chunkedBody = append(m.chunkedBody, s.data[s.parseOffset:s.parseOffset+m.chunkedLength-s.bodyReceived]...)

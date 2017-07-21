@@ -116,7 +116,6 @@ func unconcat(r *syntax.Regexp) (bool, *syntax.Regexp) {
 // concatRepetition concatenates 2 consecutive repeated sub-patterns into a
 // repetition of length 2.
 func concatRepetition(r *syntax.Regexp) (bool, *syntax.Regexp) {
-
 	if r.Op != syntax.OpConcat {
 		// don't iterate sub-expressions if top-level is no OpConcat
 		return false, r

@@ -13,7 +13,6 @@ import (
 )
 
 func Test_Rotator(t *testing.T) {
-
 	if testing.Verbose() {
 		LogInit(LOG_DEBUG, "", false, true, []string{"rotator"})
 	}
@@ -107,7 +106,6 @@ func Test_Rotator(t *testing.T) {
 }
 
 func Test_Rotator_By_Bytes(t *testing.T) {
-
 	if testing.Verbose() {
 		LogInit(LOG_DEBUG, "", false, true, []string{"rotator"})
 	}
