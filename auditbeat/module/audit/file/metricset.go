@@ -45,7 +45,7 @@ type MetricSet struct {
 }
 
 func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
-	logp.Experimental("The %v metricset is an experimental feature", metricsetName)
+	logp.Beta("The %v metricset is an beta feature", metricsetName)
 
 	config := defaultConfig
 	if err := base.Module().UnpackConfig(&config); err != nil {

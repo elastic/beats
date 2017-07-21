@@ -4,6 +4,7 @@ import (
 	"bufio"
 	"bytes"
 	"strings"
+	"time"
 
 	"github.com/joeshaw/multierror"
 	"github.com/pkg/errors"
@@ -21,6 +22,11 @@ type Config struct {
 	RawMessage   bool   `config:"kernel.include_raw_message"` // Include the list of raw audit messages in the event.
 	Warnings     bool   `config:"kernel.include_warnings"`    // Include warnings in the event (for dev/debug purposes only).
 	RulesBlob    string `config:"kernel.audit_rules"`         // Audit rules. One rule per line.
+
+	// Tuning options (advanced, use with care)
+	ReassemblerMaxInFlight uint32        `config:"kernel.reassembler.max_in_flight"`
+	ReassemblerTimeout     time.Duration `config:"kernel.reassembler.timeout"`
+	StreamBufferQueueSize  uint32        `config:"kernel.reassembler.queue_size"`
 }
 
 type auditRule struct {
@@ -100,10 +106,13 @@ func (c Config) failureMode() (uint32, error) {
 }
 
 var defaultConfig = Config{
-	ResolveIDs:   true,
-	FailureMode:  "silent",
-	BacklogLimit: 8192,
-	RateLimit:    0,
-	RawMessage:   false,
-	Warnings:     false,
+	ResolveIDs:             true,
+	FailureMode:            "silent",
+	BacklogLimit:           8192,
+	RateLimit:              0,
+	RawMessage:             false,
+	Warnings:               false,
+	ReassemblerMaxInFlight: 50,
+	ReassemblerTimeout:     2 * time.Second,
+	StreamBufferQueueSize:  64,
 }
