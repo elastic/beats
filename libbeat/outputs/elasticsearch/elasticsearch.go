@@ -156,15 +156,19 @@ func NewConnectedClient(cfg *common.Config) (*Client, error) {
 		return nil, err
 	}
 
+	errors := []string{}
+
 	for _, client := range clients {
 		err = client.Connect()
 		if err != nil {
 			logp.Err("Error connecting to Elasticsearch at %v: %v", client.Connection.URL, err)
+			err = fmt.Errorf("Error connection to Elasticsearch %v: %v", client.Connection.URL, err)
+			errors = append(errors, err.Error())
 			continue
 		}
 		return &client, nil
 	}
-	return nil, fmt.Errorf("Couldn't connect to any of the configured Elasticsearch hosts")
+	return nil, fmt.Errorf("Couldn't connect to any of the configured Elasticsearch hosts. Errors: %v", errors)
 }
 
 // NewElasticsearchClients returns a list of Elasticsearch clients based on the given
