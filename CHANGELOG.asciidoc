@@ -83,6 +83,7 @@ https://github.com/elastic/beats/compare/v6.0.0-alpha2...master[Check the HEAD d
 - Enable pipelining in Logstash output by default. {pull}4650[4650]
 - Added 'result' field to Elasticsearch QueryResult struct for compatibility with 6.x Index and Delete API responses. {issue]4661[4661]
 - The sample dashboards are now included in the Beats packages. {pull}4675[4675]
+- Add `pattern` option to be used in the fields.yml to specify the pattern for a number field. {pull}4731[4731]
 
 *Filebeat*
 
