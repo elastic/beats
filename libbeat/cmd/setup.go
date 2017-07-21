@@ -12,11 +12,12 @@ import (
 func genSetupCmd(name, version string, beatCreator beat.Creator) *cobra.Command {
 	setup := cobra.Command{
 		Use:   "setup",
-		Short: "Setup index template and dashboards",
+		Short: "Setup index template, dashboards and ML jobs",
 		Long: `This command does initial setup of the environment:
 
  * Index mapping template in Elasticsearch to ensure fields are mapped.
  * Kibana dashboards (where available).
+ * ML jobs (where available).
 `,
 		Run: func(cmd *cobra.Command, args []string) {
 			beat, err := beat.New(name, version)
