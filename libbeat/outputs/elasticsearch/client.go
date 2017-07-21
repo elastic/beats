@@ -665,7 +665,8 @@ func (conn *Connection) Request(
 	params map[string]string,
 	body interface{},
 ) (int, []byte, error) {
-	url := makeURL(conn.URL, path, pipeline, params)
+
+	url := addToURL(conn.URL, path, pipeline, params)
 	debugf("%s %s %s %v", method, url, pipeline, body)
 
 	return conn.RequestURL(method, url, body)
