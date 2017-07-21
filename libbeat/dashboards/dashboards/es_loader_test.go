@@ -3,6 +3,7 @@
 package dashboards
 
 import (
+	"strings"
 	"testing"
 
 	"github.com/elastic/beats/libbeat/logp"
@@ -15,13 +16,27 @@ func TestImporter(t *testing.T) {
 		logp.LogInit(logp.LOG_DEBUG, "", false, true, []string{"*"})
 	}
 
-	client := elasticsearch.GetTestingElasticsearch()
-
-	imp, err := NewImporter(&DashboardsConfig{
+	dashboardsConfig := Config{
 		KibanaIndex: ".kibana-test",
 		File:        "testdata/testbeat-dashboards.zip",
 		Beat:        "testbeat",
-	}, client, nil)
+	}
+
+	client := elasticsearch.GetTestingElasticsearch()
+	if strings.HasPrefix(client.Connection.GetVersion(), "6.") {
+		t.Skip("Skipping tests for Elasticsearch 6.x releases")
+	}
+
+	loader := ElasticsearchLoader{
+		client: client,
+		config: &dashboardsConfig,
+	}
+
+	err := loader.CreateKibanaIndex()
+
+	assert.NoError(t, err)
+
+	imp, err := NewImporter("5.x", &dashboardsConfig, loader)
 
 	assert.NoError(t, err)
 
@@ -37,13 +52,23 @@ func TestImporterEmptyBeat(t *testing.T) {
 		logp.LogInit(logp.LOG_DEBUG, "", false, true, []string{"*"})
 	}
 
-	client := elasticsearch.GetTestingElasticsearch()
-
-	imp, err := NewImporter(&DashboardsConfig{
+	dashboardsConfig := Config{
 		KibanaIndex: ".kibana-test-nobeat",
 		File:        "testdata/testbeat-dashboards.zip",
 		Beat:        "",
-	}, client, nil)
+	}
+
+	client := elasticsearch.GetTestingElasticsearch()
+	if strings.HasPrefix(client.Connection.GetVersion(), "6.") {
+		t.Skip("Skipping tests for Elasticsearch 6.x releases")
+	}
+
+	loader := ElasticsearchLoader{
+		client: client,
+		config: &dashboardsConfig,
+	}
+
+	imp, err := NewImporter("5.x", &dashboardsConfig, loader)
 
 	assert.NoError(t, err)
 

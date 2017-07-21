@@ -46,7 +46,6 @@ import (
 	"github.com/elastic/beats/libbeat/common"
 	"github.com/elastic/beats/libbeat/dashboards/dashboards"
 	"github.com/elastic/beats/libbeat/logp"
-	"github.com/elastic/beats/libbeat/outputs/elasticsearch"
 	"github.com/elastic/beats/libbeat/paths"
 	"github.com/elastic/beats/libbeat/plugin"
 	"github.com/elastic/beats/libbeat/processors"
@@ -324,13 +323,8 @@ func (b *Beat) loadDashboards() error {
 		if esConfig == nil || !esConfig.Enabled() {
 			return fmt.Errorf("Dashboard loading requested but the Elasticsearch output is not configured/enabled")
 		}
-		esClient, err := elasticsearch.NewConnectedClient(esConfig)
-		if err != nil {
-			return fmt.Errorf("Error creating ES client: %v", err)
-		}
-		defer esClient.Close()
 
-		err = dashboards.ImportDashboards(b.Name, b.Version, esClient, b.Config.Dashboards)
+		err := dashboards.ImportDashboards(b.Name, b.Version, nil, esConfig, b.Config.Dashboards)
 		if err != nil {
 			return fmt.Errorf("Error importing Kibana dashboards: %v", err)
 		}

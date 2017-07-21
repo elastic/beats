@@ -5,15 +5,11 @@ import (
 	"flag"
 	"fmt"
 	"os"
-	"time"
 
 	lbeat "github.com/elastic/beats/libbeat/beat"
-	"github.com/elastic/beats/libbeat/common/fmtstr"
+	"github.com/elastic/beats/libbeat/common"
 	"github.com/elastic/beats/libbeat/dashboards/dashboards"
-	"github.com/elastic/beats/libbeat/outputs"
 	"github.com/elastic/beats/libbeat/outputs/elasticsearch"
-	"github.com/elastic/beats/libbeat/outputs/outil"
-	"github.com/elastic/beats/libbeat/outputs/transport"
 )
 
 var usage = fmt.Sprintf(`
@@ -37,6 +33,7 @@ var beat string
 
 type Options struct {
 	KibanaIndex          string
+	Kibana               string
 	ES                   string
 	Index                string
 	Dir                  string
@@ -76,10 +73,11 @@ func DefineCommandLine() (*CommandLine, error) {
 		cl.flagSet.PrintDefaults()
 	}
 
-	cl.flagSet.StringVar(&cl.opt.KibanaIndex, "k", ".kibana", "Kibana index")
-	cl.flagSet.StringVar(&cl.opt.ES, "es", "http://127.0.0.1:9200", "Elasticsearch URL")
-	cl.flagSet.StringVar(&cl.opt.User, "user", "", "Username to connect to Elasticsearch. By default no username is passed.")
-	cl.flagSet.StringVar(&cl.opt.Pass, "pass", "", "Password to connect to Elasticsearch. By default no password is passed.")
+	cl.flagSet.StringVar(&cl.opt.KibanaIndex, "k", ".kibana", "Kibana index where to store the dashboards in Elasticsearch. This is set only in case the dashboards are loaded to Elasticsearch.")
+	cl.flagSet.StringVar(&cl.opt.Kibana, "kibana", "", "Kibana URL")
+	cl.flagSet.StringVar(&cl.opt.ES, "es", "http://127.0.0.1:9200", "Elasticsearch URL. The dashboards are loaded by default to Elasticsearch.")
+	cl.flagSet.StringVar(&cl.opt.User, "user", "", "Username to connect to Elasticsearch or Kibana API. By default no username is passed.")
+	cl.flagSet.StringVar(&cl.opt.Pass, "pass", "", "Password to connect to Elasticsearch or Kibana API. By default no password is passed.")
 	cl.flagSet.StringVar(&cl.opt.Index, "i", "", "The Elasticsearch index name. This overwrites the index name defined in the dashboards and index pattern. Example: metricbeat-*")
 	cl.flagSet.StringVar(&cl.opt.Dir, "dir", "", "Directory containing the subdirectories: dashboard, visualization, search, index-pattern. Example: etc/kibana/")
 	cl.flagSet.StringVar(&cl.opt.File, "file", "", "Zip archive file containing the Beats dashboards. The archive contains a directory for each Beat.")
@@ -122,20 +120,28 @@ func (cl *CommandLine) ParseCommandLine() error {
 	return nil
 }
 
-func New() (*dashboards.Importer, error) {
+func ImportDashboards() error {
 	/* define the command line arguments */
 	cl, err := DefineCommandLine()
 	if err != nil {
 		cl.flagSet.Usage()
-		return nil, err
+		return err
 	}
 	/* parse command line arguments */
 	err = cl.ParseCommandLine()
 	if err != nil {
-		return nil, err
+		return err
 	}
 
-	cfg := dashboards.DashboardsConfig{
+	/* prepare the Elasticsearch index pattern */
+	//fmtstr, err := fmtstr.CompileEvent(cl.opt.Index)
+	//if err != nil {
+	//	return fmt.Errorf("Failed to build the Elasticsearch index pattern: %s", err)
+	//}
+	//indexSel := outil.MakeSelector(outil.FmtSelectorExpr(fmtstr, ""))
+
+	/* Dashboards config */
+	cfg := dashboards.Config{
 		Enabled:        true,
 		KibanaIndex:    cl.opt.KibanaIndex,
 		Index:          cl.opt.Index,
@@ -149,50 +155,51 @@ func New() (*dashboards.Importer, error) {
 		SnapshotURL:    fmt.Sprintf("https://beats-nightlies.s3.amazonaws.com/dashboards/beats-dashboards-%s-SNAPSHOT.zip", lbeat.GetDefaultVersion()),
 	}
 
-	/* prepare the Elasticsearch index pattern */
-	fmtstr, err := fmtstr.CompileEvent(cl.opt.Index)
-	if err != nil {
-		return nil, fmt.Errorf("Failed to build the Elasticsearch index pattern: %s", err)
-	}
-	indexSel := outil.MakeSelector(outil.FmtSelectorExpr(fmtstr, ""))
-
-	var tlsConfig outputs.TLSConfig
-	var tls *transport.TLSConfig
-
+	/* TLS config */
+	tlsConfig := common.MapStr{}
 	if cl.opt.Insecure {
-		tlsConfig.VerificationMode = transport.VerifyNone
+		tlsConfig["verification_mode"] = "none"
 	}
 
 	if len(cl.opt.Certificate) > 0 && len(cl.opt.CertificateKey) > 0 {
-		tlsConfig.Certificate = outputs.CertificateConfig{
-			Certificate: cl.opt.Certificate,
-			Key:         cl.opt.CertificateKey,
-		}
+		tlsConfig["certificate"] = cl.opt.Certificate
+		tlsConfig["key"] = cl.opt.CertificateKey
 	}
 
 	if len(cl.opt.CertificateAuthority) > 0 {
-		tlsConfig.CAs = []string{cl.opt.CertificateAuthority}
+		tlsConfig["certificate_authorities"] = fmt.Sprintf("[%s]", cl.opt.CertificateAuthority)
 	}
 
-	tls, err = outputs.LoadTLSConfig(&tlsConfig)
-	if err != nil {
-		return nil, fmt.Errorf("Failed to load the SSL certificate: %s", err)
+	if len(tlsConfig) > 0 {
+		tlsConfig["enabled"] = "true"
 	}
 
-	/* connect to Elasticsearch */
-	client, err := elasticsearch.NewClient(
-		elasticsearch.ClientSettings{
-			URL:      cl.opt.ES,
-			Index:    indexSel,
-			TLS:      tls,
-			Username: cl.opt.User,
-			Password: cl.opt.Pass,
-			Timeout:  60 * time.Second,
-		},
-		nil,
-	)
-	if err != nil {
-		return nil, fmt.Errorf("Failed to connect to Elasticsearch: %s", err)
+	optionsES := struct {
+		Hosts []string `config:"hosts"`
+
+		Username string `config:"username"`
+		Password string `config:"password"`
+
+		TLS common.MapStr `config:"ssl"`
+	}{
+		Hosts:    []string{cl.opt.ES},
+		Username: cl.opt.User,
+		Password: cl.opt.Pass,
+		TLS:      tlsConfig,
+	}
+
+	optionsKibana := struct {
+		Host string `config:"host"`
+
+		Username string `config:"username"`
+		Password string `config:"password"`
+
+		TLS common.MapStr `config:"ssl"`
+	}{
+		Host:     cl.opt.Kibana,
+		Username: cl.opt.User,
+		Password: cl.opt.Pass,
+		TLS:      tlsConfig,
 	}
 
 	statusMsg := dashboards.MessageOutputter(func(msg string, a ...interface{}) {
@@ -206,19 +213,32 @@ func New() (*dashboards.Importer, error) {
 			fmt.Println(fmt.Sprintf(msg, a...))
 		}
 	})
+	cfgKibana, err := common.NewConfigFrom(optionsKibana)
+	if err != nil {
+		return fmt.Errorf("Fail to create a common.Config from the Kibana options: %v", err)
+	}
+	cfgES, err := common.NewConfigFrom(optionsES)
+	if err != nil {
+		return fmt.Errorf("Fail to create a common.Config from the Elasticsearch options: %v", err)
+	}
 
-	return dashboards.NewImporter(&cfg, client, &statusMsg)
+	if cl.opt.Kibana != "" {
+		return dashboards.ImportDashboardsViaKibana(cfgKibana, &cfg, statusMsg)
+	}
+
+	if cl.opt.ES != "" {
+		_, err = dashboards.ImportDashboardsViaElasticsearch(cfgES, &cfg, statusMsg)
+		if err != nil {
+			return err
+
+		}
+	}
+	return nil
 }
 
 func main() {
 
-	importer, err := New()
-	if err != nil {
-		fmt.Fprintln(os.Stderr, err)
-		fmt.Fprintln(os.Stderr, "Exiting")
-		os.Exit(1)
-	}
-	err = importer.Import()
+	err := ImportDashboards()
 	if err != nil {
 		fmt.Fprintln(os.Stderr, err)
 		fmt.Fprintln(os.Stderr, "Exiting")

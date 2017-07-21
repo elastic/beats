@@ -1,0 +1,94 @@
+{
+  "objects": [
+    {
+      "attributes": {
+        "description": "",
+        "kibanaSavedObjectMeta": {
+          "searchSourceJSON": "{\"filter\":[]}"
+        },
+        "savedSearchId": "b6f321e0-fa25-11e6-bbd3-29c986c96e5a",
+        "title": "Sudo commands by user",
+        "uiStateJSON": "{}",
+        "version": 1,
+        "visState": "{\"title\":\"Sudo commands by user\",\"type\":\"histogram\",\"params\":{\"addTooltip\":true,\"addLegend\":true,\"legendPosition\":\"right\",\"scale\":\"linear\",\"mode\":\"stacked\",\"times\":[],\"addTimeMarker\":false,\"defaultYExtents\":false,\"setYExtents\":false},\"aggs\":[{\"id\":\"1\",\"enabled\":true,\"type\":\"count\",\"schema\":\"metric\",\"params\":{}},{\"id\":\"2\",\"enabled\":true,\"type\":\"date_histogram\",\"schema\":\"segment\",\"params\":{\"field\":\"@timestamp\",\"interval\":\"auto\",\"customInterval\":\"2h\",\"min_doc_count\":1,\"extended_bounds\":{}}},{\"id\":\"3\",\"enabled\":true,\"type\":\"terms\",\"schema\":\"group\",\"params\":{\"field\":\"system.auth.user\",\"size\":5,\"order\":\"desc\",\"orderBy\":\"1\"}}],\"listeners\":{}}"
+      },
+      "id": "5c7af030-fa2a-11e6-bbd3-29c986c96e5a",
+      "type": "visualization",
+      "version": 2
+    },
+    {
+      "attributes": {
+        "description": "",
+        "kibanaSavedObjectMeta": {
+          "searchSourceJSON": "{\"filter\":[],\"index\":\"filebeat-*\",\"highlightAll\":true,\"query\":{\"query_string\":{\"query\":\"_exists_:system.auth.sudo.error\",\"analyze_wildcard\":true}}}"
+        },
+        "title": "Sudo errors",
+        "uiStateJSON": "{}",
+        "version": 1,
+        "visState": "{\"title\":\"Sudo errors\",\"type\":\"histogram\",\"params\":{\"addTooltip\":true,\"addLegend\":true,\"legendPosition\":\"right\",\"scale\":\"linear\",\"mode\":\"stacked\",\"times\":[],\"addTimeMarker\":false,\"defaultYExtents\":false,\"setYExtents\":false},\"aggs\":[{\"id\":\"1\",\"enabled\":true,\"type\":\"count\",\"schema\":\"metric\",\"params\":{}},{\"id\":\"2\",\"enabled\":true,\"type\":\"date_histogram\",\"schema\":\"segment\",\"params\":{\"field\":\"@timestamp\",\"interval\":\"auto\",\"customInterval\":\"2h\",\"min_doc_count\":1,\"extended_bounds\":{}}},{\"id\":\"3\",\"enabled\":true,\"type\":\"terms\",\"schema\":\"group\",\"params\":{\"field\":\"system.auth.sudo.error\",\"size\":5,\"order\":\"desc\",\"orderBy\":\"1\"}}],\"listeners\":{}}"
+      },
+      "id": "51164310-fa2b-11e6-bbd3-29c986c96e5a",
+      "type": "visualization",
+      "version": 2
+    },
+    {
+      "attributes": {
+        "description": "",
+        "kibanaSavedObjectMeta": {
+          "searchSourceJSON": "{\"filter\":[]}"
+        },
+        "savedSearchId": "b6f321e0-fa25-11e6-bbd3-29c986c96e5a",
+        "title": "Top sudo commands",
+        "uiStateJSON": "{\"vis\":{\"params\":{\"sort\":{\"columnIndex\":null,\"direction\":null}}}}",
+        "version": 1,
+        "visState": "{\"title\":\"Top sudo commands\",\"type\":\"table\",\"params\":{\"perPage\":10,\"showPartialRows\":false,\"showMeticsAtAllLevels\":false,\"sort\":{\"columnIndex\":null,\"direction\":null},\"showTotal\":false,\"totalFunc\":\"sum\"},\"aggs\":[{\"id\":\"1\",\"enabled\":true,\"type\":\"count\",\"schema\":\"metric\",\"params\":{}},{\"id\":\"2\",\"enabled\":true,\"type\":\"terms\",\"schema\":\"bucket\",\"params\":{\"field\":\"system.auth.sudo.command\",\"size\":5,\"order\":\"desc\",\"orderBy\":\"1\"}},{\"id\":\"3\",\"enabled\":true,\"type\":\"terms\",\"schema\":\"bucket\",\"params\":{\"field\":\"system.auth.user\",\"size\":5,\"order\":\"desc\",\"orderBy\":\"1\"}}],\"listeners\":{}}"
+      },
+      "id": "dc589770-fa2b-11e6-bbd3-29c986c96e5a",
+      "type": "visualization",
+      "version": 2
+    },
+    {
+      "attributes": {
+        "columns": [
+          "system.auth.user",
+          "system.auth.sudo.user",
+          "system.auth.sudo.pwd",
+          "system.auth.sudo.command"
+        ],
+        "description": "",
+        "hits": 0,
+        "kibanaSavedObjectMeta": {
+          "searchSourceJSON": "{\"index\":\"filebeat-*\",\"highlightAll\":true,\"query\":{\"query_string\":{\"query\":\"_exists_:system.auth.sudo\",\"analyze_wildcard\":true}},\"filter\":[]}"
+        },
+        "sort": [
+          "@timestamp",
+          "desc"
+        ],
+        "title": "Sudo commands",
+        "version": 1
+      },
+      "id": "b6f321e0-fa25-11e6-bbd3-29c986c96e5a",
+      "type": "search",
+      "version": 3
+    },
+    {
+      "attributes": {
+        "description": "",
+        "hits": 0,
+        "kibanaSavedObjectMeta": {
+          "searchSourceJSON": "{\"filter\":[{\"query\":{\"query_string\":{\"analyze_wildcard\":true,\"query\":\"*\"}}}]}"
+        },
+        "optionsJSON": "{\"darkTheme\":false}",
+        "panelsJSON": "[{\"col\":1,\"id\":\"5c7af030-fa2a-11e6-bbd3-29c986c96e5a\",\"panelIndex\":1,\"row\":5,\"size_x\":12,\"size_y\":4,\"type\":\"visualization\"},{\"col\":1,\"id\":\"51164310-fa2b-11e6-bbd3-29c986c96e5a\",\"panelIndex\":2,\"row\":9,\"size_x\":12,\"size_y\":3,\"type\":\"visualization\"},{\"col\":1,\"id\":\"dc589770-fa2b-11e6-bbd3-29c986c96e5a\",\"panelIndex\":3,\"row\":1,\"size_x\":12,\"size_y\":4,\"type\":\"visualization\"}]",
+        "timeRestore": false,
+        "title": "Filebeat Auth - Sudo commands",
+        "uiStateJSON": "{\"P-3\":{\"vis\":{\"params\":{\"sort\":{\"columnIndex\":null,\"direction\":null}}}}}",
+        "version": 1
+      },
+      "id": "277876d0-fa2c-11e6-bbd3-29c986c96e5a",
+      "type": "dashboard",
+      "version": 2
+    }
+  ],
+  "version": "6.0.0-alpha3-SNAPSHOT"
+}

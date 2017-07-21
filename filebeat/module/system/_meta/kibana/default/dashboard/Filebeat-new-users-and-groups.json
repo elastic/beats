@@ -1,0 +1,166 @@
+{
+  "objects": [
+    {
+      "attributes": {
+        "description": "",
+        "kibanaSavedObjectMeta": {
+          "searchSourceJSON": "{\"filter\":[]}"
+        },
+        "savedSearchId": "8030c1b0-fa77-11e6-ae9b-81e5311e8cab",
+        "title": "New users",
+        "uiStateJSON": "{\"vis\":{\"params\":{\"sort\":{\"columnIndex\":null,\"direction\":null}}}}",
+        "version": 1,
+        "visState": "{\"title\":\"New users\",\"type\":\"table\",\"params\":{\"perPage\":10,\"showPartialRows\":false,\"showMeticsAtAllLevels\":false,\"sort\":{\"columnIndex\":null,\"direction\":null},\"showTotal\":false,\"totalFunc\":\"sum\"},\"aggs\":[{\"id\":\"1\",\"enabled\":true,\"type\":\"count\",\"schema\":\"metric\",\"params\":{}},{\"id\":\"2\",\"enabled\":true,\"type\":\"terms\",\"schema\":\"bucket\",\"params\":{\"field\":\"system.auth.hostname\",\"size\":5,\"order\":\"desc\",\"orderBy\":\"1\",\"customLabel\":\"Host\"}},{\"id\":\"3\",\"enabled\":true,\"type\":\"terms\",\"schema\":\"bucket\",\"params\":{\"field\":\"system.auth.useradd.name\",\"size\":5,\"order\":\"desc\",\"orderBy\":\"1\",\"customLabel\":\"User\"}},{\"id\":\"4\",\"enabled\":true,\"type\":\"terms\",\"schema\":\"bucket\",\"params\":{\"field\":\"system.auth.useradd.uid\",\"size\":5,\"order\":\"desc\",\"orderBy\":\"1\",\"customLabel\":\"UID\"}},{\"id\":\"5\",\"enabled\":true,\"type\":\"terms\",\"schema\":\"bucket\",\"params\":{\"field\":\"system.auth.useradd.gid\",\"size\":5,\"order\":\"desc\",\"orderBy\":\"1\",\"customLabel\":\"GID\"}},{\"id\":\"6\",\"enabled\":true,\"type\":\"terms\",\"schema\":\"bucket\",\"params\":{\"field\":\"system.auth.useradd.home\",\"size\":5,\"order\":\"desc\",\"orderBy\":\"1\",\"customLabel\":\"Home\"}},{\"id\":\"7\",\"enabled\":true,\"type\":\"terms\",\"schema\":\"bucket\",\"params\":{\"field\":\"system.auth.useradd.shell\",\"size\":5,\"order\":\"desc\",\"orderBy\":\"1\",\"customLabel\":\"Shell\"}}],\"listeners\":{}}"
+      },
+      "id": "f398d2f0-fa77-11e6-ae9b-81e5311e8cab",
+      "type": "visualization",
+      "version": 1
+    },
+    {
+      "attributes": {
+        "description": "",
+        "kibanaSavedObjectMeta": {
+          "searchSourceJSON": "{\"filter\":[]}"
+        },
+        "savedSearchId": "8030c1b0-fa77-11e6-ae9b-81e5311e8cab",
+        "title": "New users over time",
+        "uiStateJSON": "{}",
+        "version": 1,
+        "visState": "{\"title\":\"New users over time\",\"type\":\"histogram\",\"params\":{\"addTooltip\":true,\"addLegend\":true,\"legendPosition\":\"bottom\",\"scale\":\"linear\",\"mode\":\"stacked\",\"times\":[],\"addTimeMarker\":false,\"defaultYExtents\":false,\"setYExtents\":false},\"aggs\":[{\"id\":\"1\",\"enabled\":true,\"type\":\"count\",\"schema\":\"metric\",\"params\":{}},{\"id\":\"2\",\"enabled\":true,\"type\":\"date_histogram\",\"schema\":\"segment\",\"params\":{\"field\":\"@timestamp\",\"interval\":\"auto\",\"customInterval\":\"2h\",\"min_doc_count\":1,\"extended_bounds\":{}}},{\"id\":\"3\",\"enabled\":true,\"type\":\"terms\",\"schema\":\"group\",\"params\":{\"field\":\"system.auth.useradd.name\",\"size\":5,\"order\":\"desc\",\"orderBy\":\"1\"}}],\"listeners\":{}}"
+      },
+      "id": "5dd15c00-fa78-11e6-ae9b-81e5311e8cab",
+      "type": "visualization",
+      "version": 1
+    },
+    {
+      "attributes": {
+        "description": "",
+        "kibanaSavedObjectMeta": {
+          "searchSourceJSON": "{\"filter\":[]}"
+        },
+        "savedSearchId": "8030c1b0-fa77-11e6-ae9b-81e5311e8cab",
+        "title": "New users by shell",
+        "uiStateJSON": "{\"vis\":{\"colors\":{\"/bin/bash\":\"#E24D42\",\"/bin/false\":\"#508642\",\"/sbin/nologin\":\"#7EB26D\"},\"legendOpen\":true}}",
+        "version": 1,
+        "visState": "{\"title\":\"New users by shell\",\"type\":\"pie\",\"params\":{\"addTooltip\":true,\"addLegend\":true,\"legendPosition\":\"right\",\"isDonut\":false},\"aggs\":[{\"id\":\"1\",\"enabled\":true,\"type\":\"count\",\"schema\":\"metric\",\"params\":{}},{\"id\":\"2\",\"enabled\":true,\"type\":\"terms\",\"schema\":\"segment\",\"params\":{\"field\":\"system.auth.useradd.shell\",\"size\":5,\"order\":\"desc\",\"orderBy\":\"1\"}},{\"id\":\"3\",\"enabled\":true,\"type\":\"terms\",\"schema\":\"segment\",\"params\":{\"field\":\"system.auth.useradd.name\",\"size\":5,\"order\":\"desc\",\"orderBy\":\"1\"}}],\"listeners\":{}}"
+      },
+      "id": "e121b140-fa78-11e6-a1df-a78bd7504d38",
+      "type": "visualization",
+      "version": 1
+    },
+    {
+      "attributes": {
+        "description": "",
+        "kibanaSavedObjectMeta": {
+          "searchSourceJSON": "{\"filter\":[]}"
+        },
+        "savedSearchId": "8030c1b0-fa77-11e6-ae9b-81e5311e8cab",
+        "title": "New users by home directory",
+        "uiStateJSON": "{\"vis\":{\"colors\":{\"/bin/bash\":\"#E24D42\",\"/bin/false\":\"#508642\",\"/sbin/nologin\":\"#7EB26D\",\"/nonexistent\":\"#629E51\"},\"legendOpen\":true}}",
+        "version": 1,
+        "visState": "{\"title\":\"New users by home directory\",\"type\":\"pie\",\"params\":{\"addTooltip\":true,\"addLegend\":true,\"legendPosition\":\"right\",\"isDonut\":false},\"aggs\":[{\"id\":\"1\",\"enabled\":true,\"type\":\"count\",\"schema\":\"metric\",\"params\":{}},{\"id\":\"2\",\"enabled\":true,\"type\":\"terms\",\"schema\":\"segment\",\"params\":{\"field\":\"system.auth.useradd.home\",\"size\":5,\"order\":\"desc\",\"orderBy\":\"1\"}},{\"id\":\"3\",\"enabled\":true,\"type\":\"terms\",\"schema\":\"segment\",\"params\":{\"field\":\"system.auth.useradd.name\",\"size\":5,\"order\":\"desc\",\"orderBy\":\"1\"}}],\"listeners\":{}}"
+      },
+      "id": "d56ee420-fa79-11e6-a1df-a78bd7504d38",
+      "type": "visualization",
+      "version": 1
+    },
+    {
+      "attributes": {
+        "description": "",
+        "kibanaSavedObjectMeta": {
+          "searchSourceJSON": "{\"filter\":[]}"
+        },
+        "savedSearchId": "eb0039f0-fa7f-11e6-a1df-a78bd7504d38",
+        "title": "New groups",
+        "uiStateJSON": "{\"vis\":{\"params\":{\"sort\":{\"columnIndex\":null,\"direction\":null}}}}",
+        "version": 1,
+        "visState": "{\"title\":\"New groups\",\"type\":\"table\",\"params\":{\"perPage\":10,\"showPartialRows\":false,\"showMeticsAtAllLevels\":false,\"sort\":{\"columnIndex\":null,\"direction\":null},\"showTotal\":false,\"totalFunc\":\"sum\"},\"aggs\":[{\"id\":\"1\",\"enabled\":true,\"type\":\"count\",\"schema\":\"metric\",\"params\":{}},{\"id\":\"2\",\"enabled\":true,\"type\":\"terms\",\"schema\":\"bucket\",\"params\":{\"field\":\"system.auth.groupadd.name\",\"size\":5,\"order\":\"desc\",\"orderBy\":\"1\"}},{\"id\":\"3\",\"enabled\":true,\"type\":\"terms\",\"schema\":\"bucket\",\"params\":{\"field\":\"system.auth.groupadd.gid\",\"size\":5,\"order\":\"desc\",\"orderBy\":\"1\"}}],\"listeners\":{}}"
+      },
+      "id": "12667040-fa80-11e6-a1df-a78bd7504d38",
+      "type": "visualization",
+      "version": 1
+    },
+    {
+      "attributes": {
+        "description": "",
+        "kibanaSavedObjectMeta": {
+          "searchSourceJSON": "{\"filter\":[]}"
+        },
+        "savedSearchId": "eb0039f0-fa7f-11e6-a1df-a78bd7504d38",
+        "title": "New groups over time",
+        "uiStateJSON": "{}",
+        "version": 1,
+        "visState": "{\"title\":\"New groups over time\",\"type\":\"histogram\",\"params\":{\"addTooltip\":true,\"addLegend\":true,\"legendPosition\":\"bottom\",\"scale\":\"linear\",\"mode\":\"stacked\",\"times\":[],\"addTimeMarker\":false,\"defaultYExtents\":false,\"setYExtents\":false},\"aggs\":[{\"id\":\"1\",\"enabled\":true,\"type\":\"count\",\"schema\":\"metric\",\"params\":{}},{\"id\":\"2\",\"enabled\":true,\"type\":\"date_histogram\",\"schema\":\"segment\",\"params\":{\"field\":\"@timestamp\",\"interval\":\"auto\",\"customInterval\":\"2h\",\"min_doc_count\":1,\"extended_bounds\":{}}},{\"id\":\"3\",\"enabled\":true,\"type\":\"terms\",\"schema\":\"group\",\"params\":{\"field\":\"system.auth.groupadd.name\",\"size\":5,\"order\":\"desc\",\"orderBy\":\"1\"}}],\"listeners\":{}}"
+      },
+      "id": "346bb290-fa80-11e6-a1df-a78bd7504d38",
+      "type": "visualization",
+      "version": 1
+    },
+    {
+      "attributes": {
+        "columns": [
+          "system.auth.useradd.name",
+          "system.auth.useradd.uid",
+          "system.auth.useradd.gid",
+          "system.auth.useradd.home",
+          "system.auth.useradd.shell"
+        ],
+        "description": "",
+        "hits": 0,
+        "kibanaSavedObjectMeta": {
+          "searchSourceJSON": "{\"index\":\"filebeat-*\",\"highlightAll\":true,\"query\":{\"query_string\":{\"analyze_wildcard\":true,\"query\":\"_exists_:system.auth.useradd\"}},\"filter\":[]}"
+        },
+        "sort": [
+          "@timestamp",
+          "desc"
+        ],
+        "title": "useradd logs",
+        "version": 1
+      },
+      "id": "8030c1b0-fa77-11e6-ae9b-81e5311e8cab",
+      "type": "search",
+      "version": 4
+    },
+    {
+      "attributes": {
+        "columns": [
+          "system.auth.groupadd.name",
+          "system.auth.groupadd.gid"
+        ],
+        "description": "",
+        "hits": 0,
+        "kibanaSavedObjectMeta": {
+          "searchSourceJSON": "{\"index\":\"filebeat-*\",\"highlightAll\":true,\"query\":{\"query_string\":{\"query\":\"_exists_:system.auth.groupadd\",\"analyze_wildcard\":true}},\"filter\":[]}"
+        },
+        "sort": [
+          "@timestamp",
+          "desc"
+        ],
+        "title": "groupadd logs",
+        "version": 1
+      },
+      "id": "eb0039f0-fa7f-11e6-a1df-a78bd7504d38",
+      "type": "search",
+      "version": 2
+    },
+    {
+      "attributes": {
+        "description": "",
+        "hits": 0,
+        "kibanaSavedObjectMeta": {
+          "searchSourceJSON": "{\"filter\":[{\"query\":{\"query_string\":{\"analyze_wildcard\":true,\"query\":\"*\"}}}]}"
+        },
+        "optionsJSON": "{\"darkTheme\":false}",
+        "panelsJSON": "[{\"col\":1,\"id\":\"f398d2f0-fa77-11e6-ae9b-81e5311e8cab\",\"panelIndex\":1,\"row\":1,\"size_x\":6,\"size_y\":3,\"type\":\"visualization\"},{\"col\":7,\"id\":\"5dd15c00-fa78-11e6-ae9b-81e5311e8cab\",\"panelIndex\":2,\"row\":1,\"size_x\":6,\"size_y\":3,\"type\":\"visualization\"},{\"col\":1,\"id\":\"e121b140-fa78-11e6-a1df-a78bd7504d38\",\"panelIndex\":3,\"row\":4,\"size_x\":6,\"size_y\":3,\"type\":\"visualization\"},{\"col\":7,\"id\":\"d56ee420-fa79-11e6-a1df-a78bd7504d38\",\"panelIndex\":4,\"row\":4,\"size_x\":6,\"size_y\":3,\"type\":\"visualization\"},{\"col\":1,\"id\":\"12667040-fa80-11e6-a1df-a78bd7504d38\",\"panelIndex\":5,\"row\":7,\"size_x\":6,\"size_y\":3,\"type\":\"visualization\"},{\"size_x\":6,\"size_y\":3,\"panelIndex\":6,\"type\":\"visualization\",\"id\":\"346bb290-fa80-11e6-a1df-a78bd7504d38\",\"col\":7,\"row\":7}]",
+        "timeRestore": false,
+        "title": "Filebeat New users and groups",
+        "uiStateJSON": "{\"P-1\":{\"vis\":{\"params\":{\"sort\":{\"columnIndex\":null,\"direction\":null}}}},\"P-5\":{\"vis\":{\"params\":{\"sort\":{\"columnIndex\":null,\"direction\":null}}}}}",
+        "version": 1
+      },
+      "id": "0d3f2380-fa78-11e6-ae9b-81e5311e8cab",
+      "type": "dashboard",
+      "version": 1
+    }
+  ],
+  "version": "6.0.0-alpha3-SNAPSHOT"
+}
