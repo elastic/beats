@@ -33,6 +33,7 @@ COVERAGE_TOOL_REPO=github.com/elastic/beats/vendor/github.com/pierrre/gotestcove
 TESTIFY_TOOL_REPO=github.com/elastic/beats/vendor/github.com/stretchr/testify
 GOIMPORTS=goimports
 GOIMPORTS_REPO=golang.org/x/tools/cmd/goimports
+GOIMPORTS_LOCAL_PREFIX?=github.com/elastic
 GOLINT=golint
 GOLINT_REPO=github.com/golang/lint/golint
 REVIEWDOG=reviewdog -conf ${ES_BEATS}/reviewdog.yml
@@ -99,12 +100,12 @@ crosscompile: $(GOFILES)
 check: python-env ## @build Checks project and source code if everything is according to standard
 	@go vet ${GOPACKAGES}
 	@go get $(GOIMPORTS_REPO)
-	@goimports -l ${GOFILES_NOVENDOR} | (! grep . -q) || (echo "Code differs from goimports' style" && false)
+	@goimports -local ${GOIMPORTS_LOCAL_PREFIX} -l ${GOFILES_NOVENDOR} | (! grep . -q) || (echo "Code differs from goimports' style" && false)
 	@${FIND} -name *.py -exec autopep8 -d --max-line-length 120  {} \; | (! grep . -q) || (echo "Code differs from autopep8's style" && false)
 
 .PHONY: fmt
 fmt: python-env ## @build Runs `goimports -l -w` and `autopep8`on the project's source code, modifying any files that do not match its style.
-	@goimports -l -w ${GOFILES_NOVENDOR}
+	@goimports -local ${GOIMPORTS_LOCAL_PREFIX} -l -w ${GOFILES_NOVENDOR}
 	@${FIND} -name *.py -exec ${PYTHON_ENV}/bin/autopep8 --in-place --max-line-length 120  {} \;
 
 .PHONY: lint

@@ -3,13 +3,13 @@ package namespace
 import (
 	"strings"
 
+	as "github.com/aerospike/aerospike-client-go"
+	"github.com/pkg/errors"
+
 	"github.com/elastic/beats/libbeat/common"
 	"github.com/elastic/beats/libbeat/logp"
 	"github.com/elastic/beats/metricbeat/mb"
 	"github.com/elastic/beats/metricbeat/module/aerospike"
-	"github.com/pkg/errors"
-
-	as "github.com/aerospike/aerospike-client-go"
 )
 
 // init registers the MetricSet with the central registry.

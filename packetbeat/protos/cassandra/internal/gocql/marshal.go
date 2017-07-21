@@ -6,16 +6,16 @@ package cassandra
 
 import (
 	"bytes"
+	"errors"
 	"fmt"
 	"math/big"
 	"reflect"
+	"strings"
 	"time"
 
-	"errors"
-	"strings"
+	"gopkg.in/inf.v0"
 
 	"github.com/elastic/beats/libbeat/logp"
-	"gopkg.in/inf.v0"
 )
 
 // TypeInfo describes a Cassandra specific data type.

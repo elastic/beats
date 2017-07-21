@@ -4,9 +4,10 @@ import (
 	"os"
 	"time"
 
-	"github.com/elastic/beats/libbeat/logp"
 	"golang.org/x/sys/windows/svc"
 	"golang.org/x/sys/windows/svc/debug"
+
+	"github.com/elastic/beats/libbeat/logp"
 )
 
 type beatService struct{}

@@ -4,15 +4,15 @@ import (
 	"sync"
 	"time"
 
+	"github.com/joeshaw/multierror"
+	"github.com/pkg/errors"
+
 	"github.com/elastic/beats/libbeat/beat"
 	"github.com/elastic/beats/libbeat/cfgfile"
 	"github.com/elastic/beats/libbeat/common"
 	"github.com/elastic/beats/libbeat/logp"
 	"github.com/elastic/beats/metricbeat/mb"
 	"github.com/elastic/beats/metricbeat/mb/module"
-	"github.com/joeshaw/multierror"
-
-	"github.com/pkg/errors"
 
 	// Add metricbeat specific processors
 	_ "github.com/elastic/beats/metricbeat/processor/add_kubernetes_metadata"

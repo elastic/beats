@@ -10,9 +10,10 @@ import (
 	"testing"
 	"time"
 
+	"github.com/stretchr/testify/assert"
+
 	"github.com/elastic/beats/filebeat/harvester/encoding"
 	"github.com/elastic/beats/libbeat/common/match"
-	"github.com/stretchr/testify/assert"
 )
 
 type bufferSource struct{ buf *bytes.Buffer }

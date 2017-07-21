@@ -9,9 +9,10 @@ import (
 	"time"
 	"unsafe"
 
-	"github.com/elastic/beats/filebeat/input/file"
 	"github.com/joeshaw/multierror"
 	"github.com/pkg/errors"
+
+	"github.com/elastic/beats/filebeat/input/file"
 )
 
 func Stat(path string) (*Metadata, error) {

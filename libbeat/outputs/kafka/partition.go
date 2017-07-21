@@ -10,6 +10,7 @@ import (
 	"strconv"
 
 	"github.com/Shopify/sarama"
+
 	"github.com/elastic/beats/libbeat/common"
 	"github.com/elastic/beats/libbeat/logp"
 )

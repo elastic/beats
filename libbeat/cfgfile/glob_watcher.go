@@ -5,8 +5,9 @@ import (
 	"path/filepath"
 	"time"
 
-	"github.com/elastic/beats/libbeat/logp"
 	"github.com/mitchellh/hashstructure"
+
+	"github.com/elastic/beats/libbeat/logp"
 )
 
 type GlobWatcher struct {
