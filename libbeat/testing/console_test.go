@@ -63,7 +63,18 @@ func TestConsoleDriverRun(t *testing.T) {
 
 	output.Flush()
 	assert.True(t, called)
-	assert.Equal(t, buffer.String(), "test...\nOK\n")
+	assert.Equal(t, buffer.String(), "test...OK\n")
+}
+
+func TestConsoleDriverResult(t *testing.T) {
+	buffer, output, driver := createDriver(nil)
+
+	driver.Run("test", func(d Driver) {
+		d.Result("This is a multiline\nresult")
+	})
+
+	output.Flush()
+	assert.Equal(t, buffer.String(), "test...OK\n  result: \n   This is a multiline\n   result\n\n")
 }
 
 func TestConsoleDriverRunWithReports(t *testing.T) {

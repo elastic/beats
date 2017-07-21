@@ -10,6 +10,7 @@ import (
 
 	cmd "github.com/elastic/beats/libbeat/cmd"
 	"github.com/elastic/beats/metricbeat/beater"
+	"github.com/elastic/beats/metricbeat/cmd/test"
 )
 
 // Name of this beat
@@ -24,4 +25,5 @@ func init() {
 
 	RootCmd = cmd.GenRootCmdWithRunFlags(Name, "", beater.New, runFlags)
 	RootCmd.AddCommand(cmd.GenModulesCmd(Name, "", buildModulesManager))
+	RootCmd.TestCmd.AddCommand(test.GenTestModulesCmd(Name, ""))
 }

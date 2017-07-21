@@ -2,15 +2,16 @@ package beater
 
 import (
 	"sync"
+	"time"
 
 	"github.com/elastic/beats/libbeat/beat"
+	"github.com/elastic/beats/libbeat/cfgfile"
 	"github.com/elastic/beats/libbeat/common"
 	"github.com/elastic/beats/libbeat/logp"
 	"github.com/elastic/beats/metricbeat/mb"
 	"github.com/elastic/beats/metricbeat/mb/module"
 	"github.com/joeshaw/multierror"
 
-	"github.com/elastic/beats/libbeat/cfgfile"
 	"github.com/pkg/errors"
 
 	// Add metricbeat specific processors
@@ -136,4 +137,40 @@ func (bt *Metricbeat) Run(b *beat.Beat) error {
 // result in undefined behavior.
 func (bt *Metricbeat) Stop() {
 	close(bt.done)
+}
+
+// Modules return a list of all configured modules, including anyone present
+// under dynamic config settings
+func (bt *Metricbeat) Modules() ([]*module.Wrapper, error) {
+	var modules []*module.Wrapper
+	for _, m := range bt.modules {
+		modules = append(modules, m.module)
+	}
+
+	// Add dynamic modules
+	if bt.config.ConfigModules.Enabled() {
+		config := cfgfile.DefaultDynamicConfig
+		bt.config.ConfigModules.Unpack(&config)
+
+		modulesManager, err := cfgfile.NewGlobManager(config.Path, ".yml", ".disabled")
+		if err != nil {
+			return nil, errors.Wrap(err, "initialization error")
+		}
+
+		for _, file := range modulesManager.ListEnabled() {
+			confs, err := cfgfile.LoadList(file.Path)
+			if err != nil {
+				return nil, errors.Wrap(err, "error loading config files")
+			}
+			for _, conf := range confs {
+				m, err := module.NewWrapper(time.Duration(0), conf, mb.Registry)
+				if err != nil {
+					return nil, errors.Wrap(err, "module initialization error")
+				}
+				modules = append(modules, m)
+			}
+		}
+	}
+
+	return modules, nil
 }
