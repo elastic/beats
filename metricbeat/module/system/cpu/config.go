@@ -3,8 +3,9 @@ package cpu
 import (
 	"strings"
 
-	"github.com/elastic/beats/libbeat/logp"
 	"github.com/pkg/errors"
+
+	"github.com/elastic/beats/libbeat/logp"
 )
 
 // CPU metric types.

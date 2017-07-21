@@ -6,10 +6,11 @@ import (
 	"testing"
 	"time"
 
+	"github.com/stretchr/testify/assert"
+
 	"github.com/elastic/beats/libbeat/common"
 	"github.com/elastic/beats/libbeat/publisher/bc/publisher"
 	"github.com/elastic/beats/libbeat/publisher/beat"
-	"github.com/stretchr/testify/assert"
 )
 
 func testEvent() beat.Event {

@@ -5,8 +5,9 @@ import (
 	"strconv"
 	"strings"
 
-	"github.com/elastic/procfs"
 	"github.com/joeshaw/multierror"
+
+	"github.com/elastic/procfs"
 )
 
 // process tools

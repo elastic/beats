@@ -12,8 +12,9 @@ import (
 	"strconv"
 	"time"
 
-	"github.com/elastic/beats/libbeat/common"
 	"github.com/pkg/errors"
+
+	"github.com/elastic/beats/libbeat/common"
 )
 
 // Action is a description of the change that occurred.

@@ -3,9 +3,10 @@ package system
 import (
 	"syscall"
 
+	"github.com/pkg/errors"
+
 	"github.com/elastic/beats/libbeat/logp"
 	"github.com/elastic/gosigar/sys/windows"
-	"github.com/pkg/errors"
 )
 
 // errMissingSeDebugPrivilege indicates that the SeDebugPrivilege is not

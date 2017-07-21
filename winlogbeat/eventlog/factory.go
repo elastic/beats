@@ -5,8 +5,9 @@ import (
 	"sort"
 	"strings"
 
-	"github.com/elastic/beats/libbeat/common"
 	"github.com/joeshaw/multierror"
+
+	"github.com/elastic/beats/libbeat/common"
 )
 
 var commonConfigKeys = []string{"api", "name", "fields", "fields_under_root", "tags"}

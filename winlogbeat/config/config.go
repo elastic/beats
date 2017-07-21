@@ -4,8 +4,9 @@ package config
 import (
 	"fmt"
 
-	"github.com/elastic/beats/libbeat/common"
 	"github.com/joeshaw/multierror"
+
+	"github.com/elastic/beats/libbeat/common"
 )
 
 const (

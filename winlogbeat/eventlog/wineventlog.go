@@ -8,13 +8,14 @@ import (
 	"syscall"
 	"time"
 
+	"github.com/joeshaw/multierror"
+	"github.com/pkg/errors"
+	"golang.org/x/sys/windows"
+
 	"github.com/elastic/beats/libbeat/common"
 	"github.com/elastic/beats/libbeat/logp"
 	"github.com/elastic/beats/winlogbeat/sys"
 	win "github.com/elastic/beats/winlogbeat/sys/wineventlog"
-	"github.com/joeshaw/multierror"
-	"github.com/pkg/errors"
-	"golang.org/x/sys/windows"
 )
 
 const (

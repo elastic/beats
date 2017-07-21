@@ -4,12 +4,13 @@ import (
 	"bytes"
 	stdjson "encoding/json"
 
+	"github.com/urso/go-structform/gotype"
+	"github.com/urso/go-structform/json"
+
 	"github.com/elastic/beats/libbeat/common"
 	"github.com/elastic/beats/libbeat/logp"
 	"github.com/elastic/beats/libbeat/outputs/codec"
 	"github.com/elastic/beats/libbeat/publisher/beat"
-	"github.com/urso/go-structform/gotype"
-	"github.com/urso/go-structform/json"
 )
 
 type Encoder struct {

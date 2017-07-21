@@ -7,8 +7,9 @@ import (
 	"syscall"
 	"time"
 
-	"github.com/elastic/beats/libbeat/logp"
 	"github.com/fsnotify/fsnotify"
+
+	"github.com/elastic/beats/libbeat/logp"
 )
 
 // NewEventReader creates a new EventReader backed by fsnotify.

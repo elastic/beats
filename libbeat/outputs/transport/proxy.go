@@ -4,8 +4,9 @@ import (
 	"net"
 	"net/url"
 
-	"github.com/elastic/beats/libbeat/logp"
 	"golang.org/x/net/proxy"
+
+	"github.com/elastic/beats/libbeat/logp"
 )
 
 // ProxyConfig holds the configuration information required to proxy

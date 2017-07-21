@@ -5,8 +5,9 @@ package log
 import (
 	"testing"
 
-	"github.com/elastic/beats/libbeat/common/match"
 	"github.com/stretchr/testify/assert"
+
+	"github.com/elastic/beats/libbeat/common/match"
 )
 
 var matchTestsWindows = []struct {
