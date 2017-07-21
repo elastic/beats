@@ -14,6 +14,8 @@ include::../../libbeat/docs/version.asciidoc[]
 :version: {stack-version}
 :beatname_lc: filebeat
 :beatname_uc: Filebeat
+:directory-layout: http://www.elastic.co/guide/en/beats/{beatname_lc}/{doc-branch}/directory-layout.html
+:setup-repositories: http://www.elastic.co/guide/en/beats/{beatname_lc}/{doc-branch}/setup-repositories.html
 :security: X-Pack Security
 :dockerimage: docker.elastic.co/beats/{beatname_lc}:{version}
 

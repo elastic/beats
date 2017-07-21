@@ -13,6 +13,8 @@ include::../../libbeat/docs/version.asciidoc[]
 :version: {stack-version}
 :beatname_lc: winlogbeat
 :beatname_uc: Winlogbeat
+:directory-layout: http://www.elastic.co/guide/en/beats/{beatname_lc}/{doc-branch}/directory-layout.html
+:setup-repositories: http://www.elastic.co/guide/en/beats/{beatname_lc}/{doc-branch}/setup-repositories.html
 :security: X-Pack Security
 
 include::./overview.asciidoc[]
