@@ -38,7 +38,7 @@ ifdef::allplatforms[]
 TIP: To test your configuration file, change to the directory where the {beatname_uc} 
 binary is installed, and run {beatname_uc} in the foreground with the following
 options specified: +./{beatname_lc} -configtest -e+. Make sure your config files are
-in the path expected by {beatname_uc} (see <<directory-layout>>). If you
+in the path expected by {beatname_uc} (see {directory-layout}[Directory Layout]). If you
 installed from DEB or RPM packages, run +./{beatname_lc}.sh -configtest -e+.
 
 endif::allplatforms[]

@@ -1,0 +1,41 @@
+[[beats-reference]]
+= Beats Reference
+
+include::./version.asciidoc[]
+
+:packetbeat: http://www.elastic.co/guide/en/beats/packetbeat/{doc-branch}
+:metricbeat: http://www.elastic.co/guide/en/beats/metricbeat/{doc-branch}
+:filebeat: http://www.elastic.co/guide/en/beats/filebeat/{doc-branch}
+:winlogbeat: http://www.elastic.co/guide/en/beats/winlogbeat/{doc-branch}
+:heartbeat: http://www.elastic.co/guide/en/beats/heartbeat/{doc-branch}
+:securitydoc: https://www.elastic.co/guide/en/x-pack/5.2
+:beatname_lc: beatname
+:beatname_uc: a Beat
+:directory-layout: http://www.elastic.co/guide/en/beats/{beatname_lc}/{doc-branch}/directory-layout.html
+:setup-repositories: http://www.elastic.co/guide/en/beats/{beatname_lc}/{doc-branch}/setup-repositories.html
+:security: X-Pack Security
+:ES-version: {stack-version}
+:LS-version: {stack-version}
+:Kibana-version: {stack-version}
+:dashboards: https://artifacts.elastic.co/downloads/beats/beats-dashboards/beats-dashboards-{stack-version}.zip
+
+include::./overview.asciidoc[]
+
+include::./communitybeats.asciidoc[]
+
+include::./gettingstarted.asciidoc[]
+
+include::./installing-beats.asciidoc[]
+
+include::../../packetbeat/docs/overview.asciidoc[]
+include::../../packetbeat/docs/gettingstarted.asciidoc[]
+include::../../metricbeat/docs/overview.asciidoc[]
+include::../../metricbeat/docs/gettingstarted.asciidoc[]
+include::../../filebeat/docs/overview.asciidoc[]
+include::../../filebeat/docs/getting-started.asciidoc[]
+include::../../winlogbeat/docs/overview.asciidoc[]
+include::../../winlogbeat/docs/getting-started.asciidoc[]
+include::../../heartbeat/docs/overview.asciidoc[]
+include::../../heartbeat/docs/getting-started.asciidoc[]
+
+

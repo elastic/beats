@@ -19,8 +19,8 @@ After installing the Elastic Stack, read the following topics to learn how to in
 * <<packetbeat-template>>
 * <<packetbeat-starting>>
 * <<packetbeat-sample-dashboards>>
-* <<command-line-options>>
-* <<directory-layout>>
+* {packetbeat}/command-line-options.html[Command Line Options]
+* {packetbeat}/directory-layout.html[Directory Layout]
 
 [[packetbeat-installation]]
 === Step 1: Installing Packetbeat
@@ -142,7 +142,7 @@ endif::[]
 
 Before starting Packetbeat, you should look at the configuration options in the
 configuration file, for example `C:\Program Files\Packetbeat\packetbeat.yml` or `/etc/packetbeat/packetbeat.yml`. For
-more information about these options, see <<packetbeat-configuration>>.
+more information about these options, see {packetbeat}/packetbeat-configuration.html[Configuration Options].
 
 [[configuring-packetbeat]]
 === Step 2: Configuring Packetbeat
@@ -234,12 +234,13 @@ output.elasticsearch:
   hosts: ["192.168.1.42:9200"]
 ----------------------------------------------------------------------
 +
-If you are sending output to Logstash, see <<config-packetbeat-logstash>> instead.
+If you are sending output to Logstash, see {packetbeat}/config-packetbeat-logstash.html[
+Configuring Packetbeat to use Logstash] instead.
 
 TIP: To test your configuration file, change to the directory where the Packetbeat
 binary is installed, and run Packetbeat in the foreground with the following
 options specified: +sudo ./packetbeat -configtest -e+. Make sure your config files are
-in the path expected by Packetbeat (see <<directory-layout>>). If you
+in the path expected by Packetbeat (see {packetbeat}/directory-layout.html[Directory Layout]). If you
 installed from DEB or RPM packages, run +sudo ./packetbeat.sh -configtest -e+.
 Depending on your OS, you might run into file ownership issues when you run this
 test. See {libbeat}/config-file-permissions.html[Config File Ownership and Permissions]
@@ -257,7 +258,7 @@ include::../../libbeat/docs/shared-template-load.asciidoc[]
 Run Packetbeat by issuing the command that is appropriate for your platform.
 
 NOTE: If you use an init.d script to start Packetbeat on deb or rpm, you can't
-specify command line flags (see <<command-line-options>>). To specify flags,
+specify command line flags (see {packetbeat}/command-line-options.html[Command Line Options]). To specify flags,
 start Packetbeat in the foreground.
 
 *deb:*

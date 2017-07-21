@@ -20,8 +20,8 @@ After installing the Elastic Stack, read the following topics to learn how to in
 * <<metricbeat-template>>
 * <<metricbeat-starting>>
 * <<metricbeat-sample-dashboards>>
-* <<command-line-options>>
-* <<directory-layout>>
+* {metricbeat}/command-line-options.html[Command Line Options]
+* {metricbeat}/directory-layout.html[Directory Layout]
 
 [[metricbeat-installation]]
 === Step 1: Installing Metricbeat
@@ -152,14 +152,14 @@ endif::[]
 Before starting Metricbeat, you should look at the configuration options in the
 configuration file, for example `C:\Program Files\Metricbeat\metricbeat.yml`.
 For more information about these options, see
-<<metricbeat-configuration-options>>.
+{metricbeat}/metricbeat-configuration-options.html[Configuration Options].
 
 [[metricbeat-configuration]]
 === Step 2: Configuring Metricbeat
 
 include::../../libbeat/docs/shared-configuring.asciidoc[]
 
-Metricbeat uses <<metricbeat-modules,modules>> to collect metrics. You configure
+Metricbeat uses {metricbeat}/metricbeat-modules.html[modules] to collect metrics. You configure
 each module individually. The following example shows the default configuration
 in the `metricbeat.yml` file. The system status module is enabled by default to
 collect metrics about your server, such as CPU usage, memory usage, network IO
@@ -208,8 +208,8 @@ metricbeat.modules:
 To configure Metricbeat:
 
 . Define the Metricbeat modules that you want to enable. For each module, specify
-the metricsets that you want to collect. See <<configuring-howto-metricbeat>> for
-more details about configuring modules.
+the metricsets that you want to collect. See {metricbeat}/configuring-howto-metricbeat.html[
+Configuring {beatname_uc}] for more details about configuring modules.
 +
 If you accept the default configuration without specifying additional modules,
 Metricbeat will collect system metrics only.
@@ -223,8 +223,8 @@ output.elasticsearch:
   hosts: ["192.168.1.42:9200"]
 ----------------------------------------------------------------------
 +
-If you are sending output to Logstash, see <<config-metricbeat-logstash>>
-instead.
+If you are sending output to Logstash, see {metricbeat}/config-metricbeat-logstash.html[
+Configuring Metricbeat to use Logstash] instead.
 
 [[metricbeat-template]]
 === Step 3: Loading the Index Template in Elasticsearch
@@ -238,7 +238,7 @@ include::../../libbeat/docs/shared-template-load.asciidoc[]
 Run Metricbeat by issuing the appropriate command for your platform.
 
 NOTE: If you use an init.d script to start Metricbeat on deb or rpm, you can't
-specify command line flags (see <<command-line-options>>). To specify flags,
+specify command line flags (see {metricbeat}/command-line-options.html[Command Line Options]). To specify flags,
 start Metricbeat in the foreground.
 
 *deb:*

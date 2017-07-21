@@ -84,4 +84,4 @@ https://discuss.elastic.co/c/beats/community-beats[Community Beats] category of 
 [[contributing-beats]]
 === Contributing to Beats
 
-Remember, you can be a Beats developer, too. <<new-beat, Learn how>>
+Remember, you can be a Beats developer, too. {libbeat}/new-beat.html[Learn how]
