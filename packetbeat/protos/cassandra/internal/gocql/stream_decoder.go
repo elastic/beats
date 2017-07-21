@@ -16,7 +16,6 @@ func (f StreamDecoder) ReadByte() (byte, error) {
 }
 
 func (f StreamDecoder) ReadInt() (n int) {
-
 	data, err := f.r.ReadNetUint32()
 	if err != nil {
 		panic(err)
@@ -27,7 +26,6 @@ func (f StreamDecoder) ReadInt() (n int) {
 }
 
 func (f StreamDecoder) ReadShort() (n uint16) {
-
 	data, err := f.r.ReadNetUint16()
 	if err != nil {
 		panic(err)
@@ -38,7 +36,6 @@ func (f StreamDecoder) ReadShort() (n uint16) {
 }
 
 func (f StreamDecoder) ReadLong() (n int64) {
-
 	data, err := f.r.ReadNetUint64()
 	if err != nil {
 		panic(err)
@@ -62,7 +59,6 @@ func (f StreamDecoder) ReadString() (s string) {
 }
 
 func (f StreamDecoder) ReadLongString() (s string) {
-
 	size := f.ReadInt()
 
 	if !f.r.Avail(size) {
@@ -79,7 +75,6 @@ func (f StreamDecoder) ReadLongString() (s string) {
 }
 
 func (f StreamDecoder) ReadUUID() *UUID {
-
 	bytes := make([]byte, 16)
 	_, err := f.r.Read(bytes)
 	if err != nil {
@@ -88,7 +83,6 @@ func (f StreamDecoder) ReadUUID() *UUID {
 
 	u, _ := UUIDFromBytes(bytes)
 	return &u
-
 }
 
 func (f StreamDecoder) ReadStringList() []string {
@@ -114,7 +108,6 @@ func (f StreamDecoder) ReadBytesInternal() []byte {
 		panic(err)
 	}
 	return bytes
-
 }
 
 func (f StreamDecoder) ReadBytes() []byte {
@@ -131,11 +124,9 @@ func (f StreamDecoder) ReadShortBytes() []byte {
 		panic(err)
 	}
 	return bytes
-
 }
 
 func (f StreamDecoder) ReadInet() (net.IP, int) {
-
 	size, err := f.ReadByte()
 	if err != nil {
 		panic(err)
@@ -152,7 +143,6 @@ func (f StreamDecoder) ReadInet() (net.IP, int) {
 	}
 	port := f.ReadInt()
 	return net.IP(ip), port
-
 }
 
 func (f StreamDecoder) ReadConsistency() Consistency {

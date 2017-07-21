@@ -7,7 +7,6 @@ import (
 )
 
 func TestHasKey(t *testing.T) {
-
 	tests := []struct {
 		key    string
 		fields Fields

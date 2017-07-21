@@ -492,7 +492,6 @@ func addDNSToMapStr(m common.MapStr, dns *mkdns.Msg, authority bool, additional 
 			m["additionals"] = rrsMapStrs
 		}
 	}
-
 }
 
 func optToMapStr(rrOPT *mkdns.OPT) common.MapStr {

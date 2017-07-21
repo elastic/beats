@@ -63,7 +63,6 @@ func (s *amqpStream) prepareForNewMessage() {
 }
 
 func isProtocolHeader(data []byte) (isHeader bool, version string) {
-
 	if (string(data[:4]) == "AMQP") && data[4] == 0 {
 		return true, string(data[5:8])
 	}

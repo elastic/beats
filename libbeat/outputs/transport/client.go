@@ -152,7 +152,6 @@ func (c *Client) LocalAddr() net.Addr {
 		return c.conn.LocalAddr()
 	}
 	return nil
-
 }
 
 func (c *Client) RemoteAddr() net.Addr {

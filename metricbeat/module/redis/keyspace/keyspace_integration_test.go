@@ -16,7 +16,6 @@ import (
 var host = redis.GetRedisEnvHost() + ":" + redis.GetRedisEnvPort()
 
 func TestFetch(t *testing.T) {
-
 	addEntry(t)
 
 	// Fetch data

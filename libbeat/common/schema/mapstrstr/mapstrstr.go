@@ -51,7 +51,6 @@ import (
 
 // toBool converts value to bool. In case of error, returns false
 func toBool(key string, data map[string]interface{}) (interface{}, error) {
-
 	str, err := getString(key, data)
 	if err != nil {
 		return false, err
@@ -72,7 +71,6 @@ func Bool(key string, opts ...schema.SchemaOption) schema.Conv {
 
 // toFloat converts value to float64. In case of error, returns 0.0
 func toFloat(key string, data map[string]interface{}) (interface{}, error) {
-
 	str, err := getString(key, data)
 	if err != nil {
 		return false, err
@@ -93,7 +91,6 @@ func Float(key string, opts ...schema.SchemaOption) schema.Conv {
 
 // toInt converts value to int. In case of error, returns 0
 func toInt(key string, data map[string]interface{}) (interface{}, error) {
-
 	str, err := getString(key, data)
 	if err != nil {
 		return false, err

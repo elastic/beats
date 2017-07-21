@@ -118,13 +118,11 @@ func (trans *transactions) tryMergeRequests(
 }
 
 func (trans *transactions) tryMergeResponses(prev, msg *message) (merged bool, err error) {
-
 	msg.isComplete = true
 	return false, nil
 }
 
 func (trans *transactions) correlate() error {
-
 	requests := &trans.requests
 	responses := &trans.responses
 

@@ -81,7 +81,6 @@ func debugMessage(calldepth int, selector, format string, v ...interface{}) {
 }
 
 func send(calldepth int, level Priority, prefix string, format string, v ...interface{}) {
-
 	message := fmt.Sprintf(format, v...)
 	timestamp := time.Now().Format(time.RFC3339)
 	var bytes []byte

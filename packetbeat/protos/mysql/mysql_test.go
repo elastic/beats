@@ -51,7 +51,6 @@ func Test_parseStateNames(t *testing.T) {
 }
 
 func TestMySQLParser_simpleRequest(t *testing.T) {
-
 	data := []byte(
 		"6f00000003494e5345525420494e544f20706f737" +
 			"42028757365726e616d652c207469746c652c2062" +
@@ -87,7 +86,6 @@ func TestMySQLParser_simpleRequest(t *testing.T) {
 	}
 }
 func TestMySQLParser_OKResponse(t *testing.T) {
-
 	data := []byte(
 		"0700000100010401000000")
 
@@ -124,7 +122,6 @@ func TestMySQLParser_OKResponse(t *testing.T) {
 }
 
 func TestMySQLParser_errorResponse(t *testing.T) {
-
 	data := []byte(
 		"2e000001ff7a042334325330325461626c6520276d696e69747769742e706f737373742720646f65736e2774206578697374")
 

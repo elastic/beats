@@ -393,7 +393,6 @@ func getPipeline(event *beat.Event, pipelineSel *outil.Selector) (string, error)
 // Index is either defined in the config as part of the output
 // or can be overload by the event through setting index
 func getIndex(event *beat.Event, index outil.Selector) string {
-
 	if event.Meta != nil {
 		if str, exists := event.Meta["index"]; exists {
 			idx, ok := str.(string)

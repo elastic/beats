@@ -38,7 +38,6 @@ func GetValidQueryResult() QueryResult {
 }
 
 func GetValidSearchResults() SearchResults {
-
 	hits := Hits{
 		Total: 0,
 		Hits:  nil,
@@ -59,7 +58,6 @@ func GetValidSearchResults() SearchResults {
 }
 
 func TestReadQueryResult(t *testing.T) {
-
 	queryResult := GetValidQueryResult()
 
 	json := queryResult.Source
@@ -85,7 +83,6 @@ func TestReadQueryResult_empty(t *testing.T) {
 
 // Check invalid query result object
 func TestReadQueryResult_invalid(t *testing.T) {
-
 	// Invalid json string
 	json := []byte(`{"name":"ruflin","234"}`)
 
@@ -124,7 +121,6 @@ func TestReadSearchResult_empty(t *testing.T) {
 }
 
 func TestReadSearchResult_invalid(t *testing.T) {
-
 	// Invalid json string
 	json := []byte(`{"took":"19","234"}`)
 

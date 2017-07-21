@@ -177,7 +177,6 @@ func NewConnectedClient(cfg *common.Config) (*Client, error) {
 // template) .If multiple hosts are defined in the configuration, a client is returned
 // for each of them.
 func NewElasticsearchClients(cfg *common.Config) ([]Client, error) {
-
 	hosts, err := outputs.ReadHostList(cfg)
 	if err != nil {
 		return nil, err

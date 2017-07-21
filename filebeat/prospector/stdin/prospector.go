@@ -23,7 +23,6 @@ type Prospector struct {
 // NewStdin creates a new stdin prospector
 // This prospector contains one harvester which is reading from stdin
 func NewProspector(cfg *common.Config, outlet channel.OutleterFactory) (*Prospector, error) {
-
 	out, err := outlet(cfg)
 	if err != nil {
 		return nil, err
@@ -46,7 +45,6 @@ func NewProspector(cfg *common.Config, outlet channel.OutleterFactory) (*Prospec
 
 // Run runs the prospector
 func (p *Prospector) Run() {
-
 	// Make sure stdin harvester is only started once
 	if !p.started {
 		err := p.harvester.Setup()

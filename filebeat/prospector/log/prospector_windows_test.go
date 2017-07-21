@@ -56,7 +56,6 @@ var matchTestsWindows = []struct {
 // TestMatchFileWindows test if match works correctly on windows
 // Separate test are needed on windows because of automated path conversion
 func TestMatchFileWindows(t *testing.T) {
-
 	for _, test := range matchTestsWindows {
 
 		p := Prospector{

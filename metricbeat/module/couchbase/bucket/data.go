@@ -30,7 +30,6 @@ type Buckets []struct {
 }
 
 func eventsMapping(content []byte) []common.MapStr {
-
 	var d Buckets
 	err := json.Unmarshal(content, &d)
 	if err != nil {

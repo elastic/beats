@@ -18,7 +18,6 @@ import (
 )
 
 func TestReadLine(t *testing.T) {
-
 	absPath, err := filepath.Abs("../../tests/files/logs/")
 	// All files starting with tmp are ignored
 	logFile := absPath + "/tmp" + strconv.Itoa(rand.Int()) + ".log"

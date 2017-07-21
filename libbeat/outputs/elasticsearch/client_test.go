@@ -171,7 +171,6 @@ func TestCollectPipelinePublishFail(t *testing.T) {
 }
 
 func TestGetIndexStandard(t *testing.T) {
-
 	ts := time.Now().UTC()
 	extension := fmt.Sprintf("%d.%02d.%02d", ts.Year(), ts.Month(), ts.Day())
 	fields := common.MapStr{"field": 1}
@@ -186,7 +185,6 @@ func TestGetIndexStandard(t *testing.T) {
 }
 
 func TestGetIndexOverwrite(t *testing.T) {
-
 	time := time.Now().UTC()
 	extension := fmt.Sprintf("%d.%02d.%02d", time.Year(), time.Month(), time.Day())
 

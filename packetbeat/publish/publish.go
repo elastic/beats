@@ -206,7 +206,6 @@ func (p *transProcessor) IsPublisherIP(ip string) bool {
 }
 
 func (p *transProcessor) GetServerName(ip string) string {
-
 	// in case the IP is localhost, return current shipper name
 	islocal, err := common.IsLoopback(ip)
 	if err != nil {

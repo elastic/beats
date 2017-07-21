@@ -31,7 +31,6 @@ type Client struct {
 }
 
 func addToURL(_url, _path string, params url.Values) string {
-
 	if len(params) == 0 {
 		return _url + _path
 	}
@@ -145,7 +144,6 @@ func (conn *Connection) Request(method, extraPath string,
 }
 
 func (client *Client) SetVersion() error {
-
 	type kibanaVersionResponse struct {
 		Name    string `json:"name"`
 		Version struct {

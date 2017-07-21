@@ -5,7 +5,6 @@ package elasticsearch
 import "testing"
 
 func TestUrlEncode(t *testing.T) {
-
 	params := map[string]string{
 		"q": "agent:appserver1",
 	}
@@ -58,5 +57,4 @@ func TestMakePath(t *testing.T) {
 	if path != "/twitter" {
 		t.Errorf("Wrong path created: %s", path)
 	}
-
 }

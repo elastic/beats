@@ -7,7 +7,6 @@ import (
 )
 
 func eventMapping(hs mo.HostSystem, datacenterName string) common.MapStr {
-
 	totalCpu := int64(hs.Summary.Hardware.CpuMhz) * int64(hs.Summary.Hardware.NumCpuCores)
 	freeCpu := int64(totalCpu) - int64(hs.Summary.QuickStats.OverallCpuUsage)
 	usedMemory := int64(hs.Summary.QuickStats.OverallMemoryUsage) * 1024 * 1024
@@ -41,5 +40,4 @@ func eventMapping(hs mo.HostSystem, datacenterName string) common.MapStr {
 	}
 
 	return event
-
 }

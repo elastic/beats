@@ -25,7 +25,6 @@ func TestGetMemory(t *testing.T) {
 }
 
 func TestGetSwap(t *testing.T) {
-
 	if runtime.GOOS == "windows" {
 		return //no load data on windows
 	}
@@ -41,7 +40,6 @@ func TestGetSwap(t *testing.T) {
 }
 
 func TestMemPercentage(t *testing.T) {
-
 	m := MemStat{
 		Mem: gosigar.Mem{
 			Total: 7,
@@ -60,7 +58,6 @@ func TestMemPercentage(t *testing.T) {
 }
 
 func TestActualMemPercentage(t *testing.T) {
-
 	m := MemStat{
 		Mem: gosigar.Mem{
 			Total:      7,

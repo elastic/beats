@@ -92,7 +92,6 @@ func (s *States) FindPrevious(newState State) State {
 // findPreviousState returns the previous state fo the file
 // In case no previous state exists, index -1 is returned
 func (s *States) findPrevious(newState State) (int, State) {
-
 	// TODO: This could be made potentially more performance by using an index (harvester id) and only use iteration as fall back
 	for index, oldState := range s.states {
 		// This is using the FileStateOS for comparison as FileInfo identifiers can only be fetched for existing files
@@ -107,7 +106,6 @@ func (s *States) findPrevious(newState State) (int, State) {
 // Cleanup cleans up the state array. All states which are older then `older` are removed
 // The number of states that were cleaned up is returned
 func (s *States) Cleanup() int {
-
 	s.Lock()
 	defer s.Unlock()
 

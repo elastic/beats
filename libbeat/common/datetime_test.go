@@ -11,7 +11,6 @@ import (
 )
 
 func TestParseTime(t *testing.T) {
-
 	type inputOutput struct {
 		Input  string
 		Output time.Time

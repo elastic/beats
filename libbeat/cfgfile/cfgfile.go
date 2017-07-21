@@ -63,7 +63,6 @@ func ChangeDefaultCfgfileFlag(beatName string) error {
 
 // HandleFlags adapts default config settings based on command line flags.
 func HandleFlags() error {
-
 	// default for the home path is the binary location
 	home, err := filepath.Abs(filepath.Dir(os.Args[0]))
 	if err != nil {

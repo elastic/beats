@@ -228,7 +228,6 @@ func (r *rpc) handleRPCFragment(
 }
 
 func (r *rpc) handleRPCPacket(xdr *xdr, ts time.Time, tcptuple *common.TCPTuple, dir uint8) {
-
 	xid := fmt.Sprintf("%.8x", xdr.getUInt())
 
 	msgType := xdr.getUInt()

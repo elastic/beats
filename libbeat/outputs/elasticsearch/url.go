@@ -33,7 +33,6 @@ func urlEncode(pipeline string, params map[string]string) string {
 
 // Create path out of index, docType and id that is used for querying Elasticsearch
 func makePath(index string, docType string, id string) (string, error) {
-
 	var path string
 	if len(docType) > 0 {
 		if len(id) > 0 {

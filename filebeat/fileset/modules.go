@@ -289,7 +289,6 @@ func (reg *ModuleRegistry) LoadPipelines(esClient PipelineLoader) error {
 // in the requiredProcessors list are available in Elasticsearch. Returns nil if all required
 // processors are available.
 func checkAvailableProcessors(esClient PipelineLoader, requiredProcessors []ProcessorRequirement) error {
-
 	var response struct {
 		Nodes map[string]struct {
 			Ingest struct {

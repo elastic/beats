@@ -93,7 +93,6 @@ func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
 // It returns the event which is then forward to the output. In case of an error, a
 // descriptive error must be returned.
 func (m *MetricSet) Fetch() (common.MapStr, error) {
-
 	response, err := m.http.FetchResponse()
 	if err != nil {
 		return nil, err
@@ -140,7 +139,6 @@ func (m *MetricSet) Fetch() (common.MapStr, error) {
 }
 
 func (m *MetricSet) getHeaders(header http.Header) map[string]string {
-
 	headers := make(map[string]string)
 	for k, v := range header {
 		value := ""

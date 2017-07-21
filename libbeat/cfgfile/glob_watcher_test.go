@@ -12,7 +12,6 @@ import (
 )
 
 func TestGlobWatcher(t *testing.T) {
-
 	// Create random temp directory
 	id := strconv.Itoa(rand.New(rand.NewSource(int64(time.Now().Nanosecond()))).Int())
 	dir, err := ioutil.TempDir("", id)

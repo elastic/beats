@@ -72,7 +72,6 @@ func NewProspector(
 }
 
 func (p *Prospector) initProspectorer(outlet channel.OutleterFactory, states []file.State, config *common.Config) error {
-
 	var prospectorer Prospectorer
 	var err error
 
@@ -124,7 +123,6 @@ func (p *Prospector) Start() {
 
 // Run starts scanning through all the file paths and fetch the related files. Start a harvester for each file
 func (p *Prospector) Run() {
-
 	// Initial prospector run
 	p.prospectorer.Run()
 
