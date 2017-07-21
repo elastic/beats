@@ -2,12 +2,14 @@ package dashboards
 
 import (
 	"fmt"
+	"io"
 	"path/filepath"
 	"strconv"
 	"strings"
 
 	"github.com/elastic/beats/libbeat/common"
 	"github.com/elastic/beats/libbeat/logp"
+	"github.com/pkg/errors"
 )
 
 func ImportDashboards(beatName, beatVersion, homePath string, kibanaConfig *common.Config, esConfig *common.Config,
@@ -115,6 +117,40 @@ func ImportDashboardsViaElasticsearch(config *common.Config, dashConfig *Config)
 	}
 
 	return true, nil
+}
+
+func ExportDashboards(beatName, beatVersion, homePath string, kibanaConfig *common.Config,
+	dashboardsConfig *common.Config, dashboardId string, out io.Writer) error {
+	dashConfig := defaultConfig
+	dashConfig.Beat = beatName
+	if dashConfig.Dir == "" {
+		dashConfig.Dir = filepath.Join(homePath, defaultDirectory)
+	}
+
+	if dashboardsConfig != nil {
+		err := dashboardsConfig.Unpack(&dashConfig)
+		if err != nil {
+			return err
+		}
+	}
+
+	kibanaLoader, err := NewKibanaLoader(kibanaConfig, &dashConfig, nil)
+	if err != nil {
+		return errors.Wrap(err, "fail to create the Kibana loader")
+	}
+
+	defer kibanaLoader.Close()
+
+	version, err := getMajorVersion(kibanaLoader.version)
+	if err != nil {
+		return fmt.Errorf("wrong Kibana version: %v", err)
+	}
+
+	if version < 6 {
+		return fmt.Errorf("Kibana API is not available in Kibana version %s", kibanaLoader.version)
+	}
+
+	return kibanaLoader.ExportDashboard(dashboardId, out)
 }
 
 func getMajorVersion(version string) (int, error) {
