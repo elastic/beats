@@ -106,6 +106,7 @@ https://github.com/elastic/beats/compare/v6.0.0-alpha2...master[Check the HEAD d
 - Add the ability to configure kernel's audit failure mode. {pull}4516[4516]
 - Add experimental Aerospike module. {pull}4560[4560]
 - Vsphere module: collect custom fields from virtual machines. {issue}4464[4464]
+- Add `test modules` command, to test modules expected output. {pull}4656[4656]
 - Add `processors` setting to metricbeat modules. {pull}4699[4699]
 
 *Packetbeat*

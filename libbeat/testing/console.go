@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"io"
 	"os"
+	"strings"
 
 	"github.com/fatih/color"
 )
@@ -14,6 +15,7 @@ type ConsoleDriver struct {
 	level    int
 	reported bool
 	killer   func()
+	result   string
 }
 
 // NewConsoleDriver initializes and returns a new console driver with output to given file
@@ -25,14 +27,18 @@ func NewConsoleDriver(stdout io.Writer) *ConsoleDriver {
 // Killer function will be called on fatal errors
 func NewConsoleDriverWithKiller(stdout io.Writer, killer func()) *ConsoleDriver {
 	return &ConsoleDriver{
-		Stdout: stdout,
-		level:  0,
-		killer: killer,
+		Stdout:   stdout,
+		level:    0,
+		killer:   killer,
+		reported: true,
 	}
 }
 
 func (d *ConsoleDriver) Run(name string, f func(Driver)) {
-	d.printf("%s...\n", name)
+	if !d.reported {
+		fmt.Fprintln(d.Stdout, "")
+	}
+	d.printf("%s...", name)
 
 	// Run sub func
 	driver := &ConsoleDriver{
@@ -43,53 +49,72 @@ func (d *ConsoleDriver) Run(name string, f func(Driver)) {
 	f(driver)
 
 	if !driver.reported {
-		driver.ok()
+		color.New(color.FgGreen).Fprintf(driver.Stdout, "OK\n")
+		driver.reported = true
 	}
+
+	if driver.result != "" {
+		driver.Info("result", driver.indent(driver.result))
+	}
+
+	d.reported = true
 }
 
 func (d *ConsoleDriver) Info(field, value string) {
+	if !d.reported {
+		fmt.Fprintln(d.Stdout, "")
+	}
 	d.printf("%s: %s\n", field, value)
 	d.reported = true
 }
 
 func (d *ConsoleDriver) Warn(field, reason string) {
+	if !d.reported {
+		fmt.Fprintln(d.Stdout, "")
+	}
 	d.printf("%s... ", field)
-	d.warn(reason)
+	color.New(color.FgYellow).Fprintf(d.Stdout, "WARN ")
+	fmt.Fprintln(d.Stdout, reason)
+	d.reported = true
 }
 
 func (d *ConsoleDriver) Error(field string, err error) {
-	d.printf("%s... ", field)
 	if err == nil {
-		d.ok()
+		d.ok(field)
 		return
 	}
-	d.error(err)
+	d.error(field, err)
 }
 
 func (d *ConsoleDriver) Fatal(field string, err error) {
-	d.printf("%s... ", field)
 	if err == nil {
-		d.ok()
+		d.ok(field)
 		return
 	}
-	d.error(err)
+	d.error(field, err)
 	d.killer()
 }
 
-func (d *ConsoleDriver) ok() {
+func (d *ConsoleDriver) Result(data string) {
+	d.result = data
+}
+
+func (d *ConsoleDriver) ok(field string) {
+	if !d.reported {
+		fmt.Fprintln(d.Stdout, "")
+	}
+	d.printf("%s... ", field)
 	color.New(color.FgGreen).Fprintf(d.Stdout, "OK\n")
 	d.reported = true
 }
 
-func (d *ConsoleDriver) error(err error) {
+func (d *ConsoleDriver) error(field string, err error) {
+	if !d.reported {
+		fmt.Fprintln(d.Stdout, "")
+	}
+	d.printf("%s... ", field)
 	color.New(color.FgRed).Fprintf(d.Stdout, "ERROR ")
 	fmt.Fprintln(d.Stdout, err.Error())
-	d.reported = true
-}
-
-func (d *ConsoleDriver) warn(reason string) {
-	color.New(color.FgYellow).Fprintf(d.Stdout, "WARN ")
-	fmt.Fprintln(d.Stdout, reason)
 	d.reported = true
 }
 
@@ -98,4 +123,12 @@ func (d *ConsoleDriver) printf(format string, args ...interface{}) {
 		fmt.Fprint(d.Stdout, "  ")
 	}
 	fmt.Fprintf(d.Stdout, format, args...)
+}
+
+func (d *ConsoleDriver) indent(data string) string {
+	res := "\n"
+	for _, line := range strings.Split(data, "\n") {
+		res += strings.Repeat(" ", d.level+2) + line + "\n"
+	}
+	return res
 }

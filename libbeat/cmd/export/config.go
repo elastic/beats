@@ -10,7 +10,7 @@ import (
 	"github.com/elastic/beats/libbeat/beat"
 )
 
-func GenExportConfigCmd(name, beatVersion string, beatCreator beat.Creator) *cobra.Command {
+func GenExportConfigCmd(name, beatVersion string) *cobra.Command {
 	return &cobra.Command{
 		Use:   "config",
 		Short: "Export current config to stdout",

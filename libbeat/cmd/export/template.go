@@ -10,7 +10,7 @@ import (
 	"github.com/elastic/beats/libbeat/template"
 )
 
-func GenTemplateConfigCmd(name, beatVersion string, beatCreator beat.Creator) *cobra.Command {
+func GenTemplateConfigCmd(name, beatVersion string) *cobra.Command {
 	genTemplateConfigCmd := &cobra.Command{
 		Use:   "template",
 		Short: "Export index template to stdout",
