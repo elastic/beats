@@ -51,7 +51,6 @@ func TestBuildMetricsOutput(t *testing.T) {
 }
 
 func TestBuildMetricsOutputMissing(t *testing.T) {
-
 	prevVals := snapshotMetrics()
 
 	test := expvar.NewInt("testLogEmpty")

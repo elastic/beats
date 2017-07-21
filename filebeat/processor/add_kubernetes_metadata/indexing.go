@@ -47,7 +47,6 @@ func newLogsPathMatcher(cfg common.Config) (add_kubernetes_metadata.Matcher, err
 }
 
 func (f *LogPathMatcher) MetadataIndex(event common.MapStr) string {
-
 	if value, ok := event["source"]; ok {
 		source := value.(string)
 		logp.Debug("kubernetes", "Incoming source value: ", source)

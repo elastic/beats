@@ -261,7 +261,6 @@ func TestReconstructQuery(t *testing.T) {
 
 // max_docs option should be respected
 func TestMaxDocs(t *testing.T) {
-
 	if testing.Verbose() {
 		logp.LogInit(logp.LOG_DEBUG, "", false, true, []string{"mongodb", "mongodbdetailed"})
 	}

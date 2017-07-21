@@ -117,7 +117,6 @@ func TestConvertNestedMapStr(t *testing.T) {
 	for i, test := range tests {
 		assert.Equal(t, test.Output, ConvertToGenericEvent(test.Input), "Test case %d", i)
 	}
-
 }
 
 func TestConvertNestedStruct(t *testing.T) {
@@ -300,7 +299,6 @@ func TestMarshalUnmarshalArray(t *testing.T) {
 }
 
 func TestMarshalFloatValues(t *testing.T) {
-
 	assert := assert.New(t)
 
 	var f float64

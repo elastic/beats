@@ -11,7 +11,6 @@ import (
 
 // Map data to MapStr
 func eventsMapping(info map[string]string) []common.MapStr {
-
 	events := []common.MapStr{}
 	for key, space := range getKeyspaceStats(info) {
 		space["id"] = key

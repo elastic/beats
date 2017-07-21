@@ -43,7 +43,6 @@ func TestFieldNotString(t *testing.T) {
 	}
 
 	assert.Equal(t, expected.String(), actual.String())
-
 }
 
 func TestInvalidJSON(t *testing.T) {
@@ -59,7 +58,6 @@ func TestInvalidJSON(t *testing.T) {
 		"pipeline": "us1",
 	}
 	assert.Equal(t, expected.String(), actual.String())
-
 }
 
 func TestInvalidJSONMultiple(t *testing.T) {
@@ -75,7 +73,6 @@ func TestInvalidJSONMultiple(t *testing.T) {
 		"pipeline": "us1",
 	}
 	assert.Equal(t, expected.String(), actual.String())
-
 }
 
 func TestValidJSONDepthOne(t *testing.T) {
@@ -96,7 +93,6 @@ func TestValidJSONDepthOne(t *testing.T) {
 	}
 
 	assert.Equal(t, expected.String(), actual.String())
-
 }
 
 func TestValidJSONDepthTwo(t *testing.T) {
@@ -125,7 +121,6 @@ func TestValidJSONDepthTwo(t *testing.T) {
 	}
 
 	assert.Equal(t, expected.String(), actual.String())
-
 }
 
 func TestTargetOption(t *testing.T) {

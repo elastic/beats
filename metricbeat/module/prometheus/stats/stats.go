@@ -43,7 +43,6 @@ func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
 }
 
 func (m *MetricSet) Fetch() (common.MapStr, error) {
-
 	scanner, err := m.http.FetchScanner()
 	if err != nil {
 		return nil, err

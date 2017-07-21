@@ -14,7 +14,6 @@ import (
 )
 
 func GetProcessors(t *testing.T, yml []map[string]interface{}) *processors.Processors {
-
 	config := processors.PluginConfig{}
 
 	for _, action := range yml {
@@ -34,11 +33,9 @@ func GetProcessors(t *testing.T, yml []map[string]interface{}) *processors.Proce
 	assert.Nil(t, err)
 
 	return list
-
 }
 
 func TestBadConfig(t *testing.T) {
-
 	if testing.Verbose() {
 		logp.LogInit(logp.LOG_DEBUG, "", false, true, []string{"*"})
 	}
@@ -75,11 +72,9 @@ func TestBadConfig(t *testing.T) {
 
 	_, err := processors.New(config)
 	assert.NotNil(t, err)
-
 }
 
 func TestIncludeFields(t *testing.T) {
-
 	if testing.Verbose() {
 		logp.LogInit(logp.LOG_DEBUG, "", false, true, []string{"*"})
 	}
@@ -148,7 +143,6 @@ func TestIncludeFields(t *testing.T) {
 }
 
 func TestIncludeFields1(t *testing.T) {
-
 	if testing.Verbose() {
 		logp.LogInit(logp.LOG_DEBUG, "", false, true, []string{"*"})
 	}
@@ -206,7 +200,6 @@ func TestIncludeFields1(t *testing.T) {
 }
 
 func TestDropFields(t *testing.T) {
-
 	yml := []map[string]interface{}{
 		{
 			"drop_fields": map[string]interface{}{
@@ -268,7 +261,6 @@ func TestDropFields(t *testing.T) {
 }
 
 func TestMultipleIncludeFields(t *testing.T) {
-
 	if testing.Verbose() {
 		logp.LogInit(logp.LOG_DEBUG, "", false, true, []string{"*"})
 	}
@@ -368,7 +360,6 @@ func TestMultipleIncludeFields(t *testing.T) {
 }
 
 func TestDropEvent(t *testing.T) {
-
 	if testing.Verbose() {
 		logp.LogInit(logp.LOG_DEBUG, "", false, true, []string{"*"})
 	}
@@ -423,7 +414,6 @@ func TestDropEvent(t *testing.T) {
 }
 
 func TestEmptyCondition(t *testing.T) {
-
 	if testing.Verbose() {
 		logp.LogInit(logp.LOG_DEBUG, "", false, true, []string{"*"})
 	}
@@ -470,7 +460,6 @@ func TestEmptyCondition(t *testing.T) {
 }
 
 func TestBadCondition(t *testing.T) {
-
 	if testing.Verbose() {
 		logp.LogInit(logp.LOG_DEBUG, "", false, true, []string{"*"})
 	}
@@ -505,11 +494,9 @@ func TestBadCondition(t *testing.T) {
 
 	_, err := processors.New(config)
 	assert.Error(t, err)
-
 }
 
 func TestMissingFields(t *testing.T) {
-
 	if testing.Verbose() {
 		logp.LogInit(logp.LOG_DEBUG, "", false, true, []string{"*"})
 	}
@@ -542,11 +529,9 @@ func TestMissingFields(t *testing.T) {
 
 	_, err := processors.New(config)
 	assert.NotNil(t, err)
-
 }
 
 func TestBadConditionConfig(t *testing.T) {
-
 	if testing.Verbose() {
 		logp.LogInit(logp.LOG_DEBUG, "", false, true, []string{"*"})
 	}
@@ -580,11 +565,9 @@ func TestBadConditionConfig(t *testing.T) {
 
 	_, err := processors.New(config)
 	assert.NotNil(t, err)
-
 }
 
 func TestDropMissingFields(t *testing.T) {
-
 	yml := []map[string]interface{}{
 		{
 			"drop_fields": map[string]interface{}{

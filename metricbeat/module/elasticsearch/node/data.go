@@ -25,7 +25,6 @@ var (
 )
 
 func eventsMapping(content []byte) ([]common.MapStr, error) {
-
 	nodesStruct := struct {
 		ClusterName string                            `json:"cluster_name"`
 		Nodes       map[string]map[string]interface{} `json:"nodes"`

@@ -18,7 +18,6 @@ import (
 )
 
 func TestClientConnect(t *testing.T) {
-
 	client := GetTestingElasticsearch(t)
 	err := client.Connect()
 	assert.NoError(t, err)

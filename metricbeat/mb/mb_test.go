@@ -218,7 +218,6 @@ func TestNewModulesHostParser(t *testing.T) {
 		assert.Equal(t, host, ms.Host())
 		assert.Equal(t, HostData{URI: uri, Host: host}, ms.HostData())
 	})
-
 }
 
 func TestNewModulesMetricSetTypes(t *testing.T) {

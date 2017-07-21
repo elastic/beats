@@ -250,7 +250,6 @@ func getSRedisAddr() string {
 }
 
 func newRedisTestingOutput(t *testing.T, cfg map[string]interface{}) *client {
-
 	config, err := common.NewConfigFrom(cfg)
 	if err != nil {
 		t.Fatalf("Error reading config: %v", err)

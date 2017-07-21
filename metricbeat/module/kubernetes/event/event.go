@@ -143,5 +143,4 @@ func generateMapStrFromEvent(eve *Event) common.MapStr {
 		},
 		"metadata": eventMeta,
 	}
-
 }

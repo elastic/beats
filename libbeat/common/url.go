@@ -14,7 +14,6 @@ var hasScheme = regexp.MustCompile(`^([a-z][a-z0-9+\-.]*)://`)
 // MakeURL creates the url based on the url configuration.
 // Adds missing parts with defaults (scheme, host, port)
 func MakeURL(defaultScheme string, defaultPath string, rawURL string, defaultPort int) (string, error) {
-
 	if defaultScheme == "" {
 		defaultScheme = "http"
 	}
@@ -61,7 +60,6 @@ func MakeURL(defaultScheme string, defaultPath string, rawURL string, defaultPor
 }
 
 func EncodeURLParams(url string, params url.Values) string {
-
 	if len(params) == 0 {
 		return url
 	}

@@ -30,7 +30,6 @@ func NewGlobWatcher(glob string) *GlobWatcher {
 // The modtime is compared based on second as normally mod-time is in seconds. If it is unclear if something changed
 // the method will return true for the changes. It is strongly recommend to call scan not more frequent then 1s.
 func (gw *GlobWatcher) Scan() ([]string, bool, error) {
-
 	globList, err := filepath.Glob(gw.glob)
 	if err != nil {
 		return nil, false, err

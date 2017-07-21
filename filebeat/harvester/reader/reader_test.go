@@ -26,7 +26,6 @@ func TestIsLine(t *testing.T) {
 }
 
 func TestLineEndingChars(t *testing.T) {
-
 	line := []byte("Not ending line")
 	assert.Equal(t, 0, lineEndingChars(line))
 

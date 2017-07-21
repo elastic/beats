@@ -708,7 +708,6 @@ func TestHttpParser_censorPasswordURL(t *testing.T) {
 }
 
 func TestHttpParser_censorPasswordPOST(t *testing.T) {
-
 	if testing.Verbose() {
 		logp.LogInit(logp.LOG_DEBUG, "", false, true, []string{"http", "httpdetailed"})
 	}
@@ -785,7 +784,6 @@ func TestHttpParser_censorPasswordGET(t *testing.T) {
 }
 
 func TestHttpParser_RedactAuthorization(t *testing.T) {
-
 	if testing.Verbose() {
 		logp.LogInit(logp.LOG_DEBUG, "", false, true, []string{"http", "httpdetailed"})
 	}
@@ -831,7 +829,6 @@ func TestHttpParser_RedactAuthorization(t *testing.T) {
 }
 
 func TestHttpParser_RedactAuthorization_raw(t *testing.T) {
-
 	http := httpModForTests(nil)
 	http.redactAuthorization = true
 	http.parserConfig.sendHeaders = false
@@ -868,7 +865,6 @@ func TestHttpParser_RedactAuthorization_raw(t *testing.T) {
 }
 
 func TestHttpParser_RedactAuthorization_Proxy_raw(t *testing.T) {
-
 	http := httpModForTests(nil)
 	http.redactAuthorization = true
 	http.parserConfig.sendHeaders = false
@@ -983,7 +979,6 @@ func Test_splitCookiesHeader(t *testing.T) {
 // If a TCP gap (lost packets) happen while we're waiting for
 // headers, drop the stream.
 func Test_gap_in_headers(t *testing.T) {
-
 	http := httpModForTests(nil)
 
 	data1 := []byte("HTTP/1.1 200 OK\r\n" +
@@ -1005,7 +1000,6 @@ func Test_gap_in_headers(t *testing.T) {
 // If a TCP gap (lost packets) happen while we're waiting for
 // parts of the body, it's ok.
 func Test_gap_in_body(t *testing.T) {
-
 	http := httpModForTests(nil)
 
 	data1 := []byte("HTTP/1.1 200 OK\r\n" +
@@ -1038,7 +1032,6 @@ func Test_gap_in_body(t *testing.T) {
 // If a TCP gap (lost packets) happen while we're waiting for
 // parts of the body, it's ok.
 func Test_gap_in_body_http1dot0(t *testing.T) {
-
 	http := httpModForTests(nil)
 
 	data1 := []byte("HTTP/1.0 200 OK\r\n" +
@@ -1061,7 +1054,6 @@ func Test_gap_in_body_http1dot0(t *testing.T) {
 	ok, complete = http.messageGap(st, 10)
 	assert.Equal(t, true, ok)
 	assert.Equal(t, false, complete)
-
 }
 
 func testCreateTCPTuple() *common.TCPTuple {
@@ -1132,7 +1124,6 @@ func Test_gap_in_body_http1dot0_fin(t *testing.T) {
 }
 
 func TestHttp_configsSettingAll(t *testing.T) {
-
 	http := httpModForTests(nil)
 	config := defaultConfig
 
@@ -1164,7 +1155,6 @@ func TestHttp_configsSettingAll(t *testing.T) {
 }
 
 func TestHttp_configsSettingHeaders(t *testing.T) {
-
 	http := httpModForTests(nil)
 	config := defaultConfig
 

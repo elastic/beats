@@ -80,7 +80,6 @@ func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
 		namespace:     config.Namespace,
 		http:          http,
 	}, nil
-
 }
 
 // Fetch methods implements the data gathering and data conversion to the right format

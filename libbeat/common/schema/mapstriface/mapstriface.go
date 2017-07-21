@@ -71,7 +71,6 @@ type ConvMap struct {
 
 // Map drills down in the data dictionary by using the key
 func (convMap ConvMap) Map(key string, event common.MapStr, data map[string]interface{}) *schema.Errors {
-
 	subData, ok := data[convMap.Key].(map[string]interface{})
 	if !ok {
 		err := schema.NewError(convMap.Key, "Error accessing sub-dictionary")
@@ -226,7 +225,6 @@ func toTime(key string, data map[string]interface{}) (interface{}, error) {
 	}
 
 	return common.Time(time.Unix(0, 0)), fmt.Errorf("Expected date, found %T", emptyIface)
-
 }
 
 // Time creates a Conv object for converting Time objects.

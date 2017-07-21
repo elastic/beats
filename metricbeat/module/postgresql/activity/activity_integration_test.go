@@ -35,7 +35,6 @@ func TestFetch(t *testing.T) {
 	assert.Contains(t, event, "user")
 	assert.Contains(t, event["user"].(common.MapStr), "name")
 	assert.Contains(t, event["user"].(common.MapStr), "id")
-
 }
 
 func TestData(t *testing.T) {

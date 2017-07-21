@@ -14,7 +14,6 @@ type beatService struct{}
 // Execute runs the beat service with the arguments and manages changes that
 // occur in the environment or runtime that may affect the beat.
 func (m *beatService) Execute(args []string, r <-chan svc.ChangeRequest, changes chan<- svc.Status) (ssec bool, errno uint32) {
-
 	const cmdsAccepted = svc.AcceptStop | svc.AcceptShutdown
 	changes <- svc.Status{State: svc.StartPending}
 	changes <- svc.Status{State: svc.Running, Accepts: cmdsAccepted}

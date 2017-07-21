@@ -295,7 +295,6 @@ func TestSendMultipleViaLogstashTLS(t *testing.T) {
 }
 
 func testSendMultipleViaLogstash(t *testing.T, name string, tls bool) {
-
 	ls := newTestLogstashOutput(t, name, tls)
 	defer ls.Cleanup()
 	for i := 0; i < 10; i++ {
@@ -403,7 +402,6 @@ func TestLogstashElasticOutputPluginCompatibleMessageTLS(t *testing.T) {
 }
 
 func testLogstashElasticOutputPluginCompatibleMessage(t *testing.T, name string, tls bool) {
-
 	timeout := 10 * time.Second
 
 	ls := newTestLogstashOutput(t, name, tls)

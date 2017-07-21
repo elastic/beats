@@ -136,7 +136,6 @@ func (f *Field) array() common.MapStr {
 }
 
 func (f *Field) object() common.MapStr {
-
 	dynProperties := f.getDefaultProperties()
 
 	switch f.ObjectType {
@@ -162,7 +161,6 @@ func (f *Field) object() common.MapStr {
 }
 
 func (f *Field) addDynamicTemplate(properties common.MapStr, matchType string) {
-
 	path := ""
 	if len(f.path) > 0 {
 		path = f.path + "."

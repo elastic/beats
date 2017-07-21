@@ -39,7 +39,6 @@ var (
 // In case path is a file, it will be directly returned.
 // In case it is a directory, it will fetch all .yml files inside this directory
 func getConfigFiles(path string) (configFiles []string, err error) {
-
 	// Check if path is valid file or dir
 	stat, err := os.Stat(path)
 	if err != nil {
@@ -68,7 +67,6 @@ func getConfigFiles(path string) (configFiles []string, err error) {
 
 // mergeConfigFiles reads in all config files given by list configFiles and merges them into config
 func mergeConfigFiles(configFiles []string, config *Config) error {
-
 	for _, file := range configFiles {
 		logp.Info("Additional configs loaded from: %s", file)
 
@@ -88,7 +86,6 @@ func mergeConfigFiles(configFiles []string, config *Config) error {
 
 // Fetches and merges all config files given by configDir. All are put into one config object
 func (config *Config) FetchConfigs() error {
-
 	configDir := config.ConfigDir
 
 	// If option not set, do nothing

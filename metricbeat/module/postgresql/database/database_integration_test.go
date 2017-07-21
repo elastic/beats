@@ -37,7 +37,6 @@ func TestFetch(t *testing.T) {
 	assert.Contains(t, rows, "inserted")
 	assert.Contains(t, rows, "updated")
 	assert.Contains(t, rows, "deleted")
-
 }
 
 func TestData(t *testing.T) {

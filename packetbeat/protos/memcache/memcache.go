@@ -320,7 +320,6 @@ func checkResponseComplete(msg *message) bool {
 }
 
 func newTransaction(requ, resp *message) *transaction {
-
 	if requ == nil && resp == nil {
 		return nil
 	}

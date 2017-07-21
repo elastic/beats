@@ -99,7 +99,6 @@ func (p *PodWatcher) watchPods() {
 			p.podQueue <- pod
 		}
 	}
-
 }
 
 func (p *PodWatcher) Run() bool {
@@ -172,7 +171,6 @@ func (p *PodWatcher) getPodMeta(pod *corev1.Pod) *Pod {
 	}
 
 	return po
-
 }
 
 func (p *PodWatcher) worker() {
@@ -189,7 +187,6 @@ func (p *PodWatcher) worker() {
 			}
 		}
 	}
-
 }
 
 func (p *PodWatcher) GetMetaData(arg string) common.MapStr {

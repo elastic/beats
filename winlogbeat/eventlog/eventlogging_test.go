@@ -157,7 +157,6 @@ func setLogSize(t testing.TB, provider string, sizeBytes int) {
 
 // Verify that all messages are read from the event log.
 func TestRead(t *testing.T) {
-
 	configureLogp()
 	log, err := initLog(providerName, sourceName, eventCreateMsgFile)
 	if err != nil {
@@ -256,7 +255,6 @@ func TestFormatMessageWithLargeMessage(t *testing.T) {
 // Test that when an unknown Event ID is found, that a message containing the
 // insert strings (the message parameters) is returned.
 func TestReadUnknownEventId(t *testing.T) {
-
 	configureLogp()
 	log, err := initLog(providerName, sourceName, servicesMsgFile)
 	if err != nil {
@@ -301,7 +299,6 @@ func TestReadUnknownEventId(t *testing.T) {
 // separated list of files. If the message for an event ID is not found in one
 // of the files then the next file should be checked.
 func TestReadTriesMultipleEventMsgFiles(t *testing.T) {
-
 	configureLogp()
 	log, err := initLog(providerName, sourceName,
 		servicesMsgFile+";"+eventCreateMsgFile)
@@ -342,7 +339,6 @@ func TestReadTriesMultipleEventMsgFiles(t *testing.T) {
 
 // Test event messages that require more than one message parameter.
 func TestReadMultiParameterMsg(t *testing.T) {
-
 	configureLogp()
 	log, err := initLog(providerName, sourceName, servicesMsgFile)
 	if err != nil {
@@ -389,7 +385,6 @@ func TestReadMultiParameterMsg(t *testing.T) {
 // Verify that opening an invalid provider succeeds. Windows opens the
 // Application event log provider when this happens (unfortunately).
 func TestOpenInvalidProvider(t *testing.T) {
-
 	configureLogp()
 
 	el := newTestEventLogging(t, map[string]interface{}{"name": "nonExistentProvider"})
@@ -401,7 +396,6 @@ func TestOpenInvalidProvider(t *testing.T) {
 
 // Test event messages that require no parameters.
 func TestReadNoParameterMsg(t *testing.T) {
-
 	configureLogp()
 	log, err := initLog(providerName, sourceName, netEventMsgFile)
 	if err != nil {
@@ -444,7 +438,6 @@ func TestReadNoParameterMsg(t *testing.T) {
 // TestReadWhileCleared tests that the Read method recovers from the event log
 // being cleared or reset while reading.
 func TestReadWhileCleared(t *testing.T) {
-
 	configureLogp()
 	log, err := initLog(providerName, sourceName, eventCreateMsgFile)
 	if err != nil {

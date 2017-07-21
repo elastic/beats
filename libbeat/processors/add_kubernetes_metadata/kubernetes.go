@@ -37,7 +37,6 @@ func init() {
 	Indexing.AddIndexer(PodNameIndexerName, NewPodNameIndexer)
 	Indexing.AddIndexer(ContainerIndexerName, NewContainerIndexer)
 	Indexing.AddMatcher(FieldMatcherName, NewFieldMatcher)
-
 }
 
 func newKubernetesAnnotator(cfg *common.Config) (processors.Processor, error) {

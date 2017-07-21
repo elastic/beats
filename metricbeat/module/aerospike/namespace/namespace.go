@@ -33,7 +33,6 @@ type MetricSet struct {
 // Part of new is also setting up the configuration by processing additional
 // configuration entries if needed.
 func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
-
 	config := struct{}{}
 
 	logp.Experimental("The aerospike namespace metricset is experimental")

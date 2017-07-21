@@ -60,7 +60,6 @@ type Reloader struct {
 
 // NewReloader creates new Reloader instance for the given config
 func NewReloader(cfg *common.Config) *Reloader {
-
 	config := DefaultDynamicConfig
 	cfg.Unpack(&config)
 
@@ -73,7 +72,6 @@ func NewReloader(cfg *common.Config) *Reloader {
 
 // Run runs the reloader
 func (rl *Reloader) Run(runnerFactory RunnerFactory) {
-
 	logp.Info("Config reloader started")
 
 	rl.wg.Add(1)
@@ -191,7 +189,6 @@ func (rl *Reloader) Stop() {
 }
 
 func (rl *Reloader) startRunners(list map[uint64]Runner) {
-
 	if len(list) == 0 {
 		return
 	}
@@ -208,7 +205,6 @@ func (rl *Reloader) startRunners(list map[uint64]Runner) {
 }
 
 func (rl *Reloader) stopRunners(list map[uint64]Runner) {
-
 	if len(list) == 0 {
 		return
 	}

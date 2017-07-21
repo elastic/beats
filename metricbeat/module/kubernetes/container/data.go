@@ -99,5 +99,4 @@ func eventMapping(content []byte) ([]common.MapStr, error) {
 	}
 
 	return events, nil
-
 }

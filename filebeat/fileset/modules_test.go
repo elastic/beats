@@ -101,7 +101,6 @@ func TestNewModuleRegistryConfig(t *testing.T) {
 }
 
 func TestApplyOverrides(t *testing.T) {
-
 	falseVar := false
 	trueVar := true
 

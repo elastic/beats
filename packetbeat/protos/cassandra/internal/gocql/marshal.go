@@ -679,7 +679,6 @@ func (u UUID) String() string {
 	r[18] = '-'
 	r[23] = '-'
 	return string(r)
-
 }
 
 // UUIDFromBytes converts a raw byte slice to an UUID.

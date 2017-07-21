@@ -8,7 +8,6 @@ import (
 )
 
 func TestField(t *testing.T) {
-
 	esVersion2, err := common.NewVersion("2.0.0")
 	assert.NoError(t, err)
 
@@ -141,7 +140,6 @@ func TestField(t *testing.T) {
 }
 
 func TestDynamicTemplate(t *testing.T) {
-
 	tests := []struct {
 		field  Field
 		method func(f Field) common.MapStr
