@@ -321,7 +321,7 @@ generated events.
 :allplatforms:
 include::../../libbeat/docs/shared-logstash-config.asciidoc[]
 
-==== Accessing Metadata Fields
+==== Accessing metadata fields
 
 Every event sent to Logstash contains the following metadata fields that you can
 use in Logstash for indexing and filtering:

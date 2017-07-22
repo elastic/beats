@@ -1,11 +1,11 @@
 [[configuration-run-options]]
-=== Run Options
+== Set run options
 
-The Beat can drop privileges after creating the sniffing socket.
+Packetbeat can drop privileges after creating the sniffing socket.
 Root access is required for opening the socket, but everything else requires no
 privileges. Therefore, it is recommended that you have the Beat switch users after
 the initialization phase. The `uid` and `gid` settings set the User Id and Group
-Id under which the Beat runs.
+Id under which {beatname_uc} runs.
 
 WARNING: On Linux, Setuid doesn't change the uid of all threads, so the Go
          garbage collector will continue to run as root. Also note that process
