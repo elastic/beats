@@ -21,9 +21,9 @@
   #maxconn: 10
 
   # Filters can be used to reduce the number of fields sent.
-  #filters:
+  #processors:
   #  - include_fields:
-  #      fields: ["stats"]
+  #      fields: ["beat", "metricset", "redis.info.stats"]
 
   # Redis AUTH password. Empty by default.
   #password: foobared

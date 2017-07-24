@@ -5,7 +5,7 @@ import (
 	"fmt"
 
 	"github.com/elastic/beats/libbeat/common"
-	"github.com/elastic/beats/libbeat/logp"
+	"github.com/elastic/beats/libbeat/common/cfgwarn"
 	"github.com/elastic/beats/metricbeat/helper"
 	"github.com/elastic/beats/metricbeat/mb"
 	"github.com/elastic/beats/metricbeat/mb/parse"
@@ -39,7 +39,7 @@ type MetricSet struct {
 
 // New create a new instance of the MetricSet
 func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
-	logp.Beta("The php_fpm pool metricset is beta")
+	cfgwarn.Beta("The php_fpm pool metricset is beta")
 
 	return &MetricSet{
 		base,

@@ -10,6 +10,7 @@ import (
 	"github.com/elastic/beats/libbeat/beat"
 	"github.com/elastic/beats/libbeat/cfgfile"
 	"github.com/elastic/beats/libbeat/common"
+	"github.com/elastic/beats/libbeat/common/cfgwarn"
 	"github.com/elastic/beats/libbeat/logp"
 	"github.com/elastic/beats/metricbeat/mb"
 	"github.com/elastic/beats/metricbeat/mb/module"
@@ -53,6 +54,13 @@ func New(b *beat.Beat, rawConfig *common.Config) (beat.Beater, error) {
 		}
 
 		failed := false
+
+		err := cfgwarn.CheckRemoved5xSettings(moduleCfg, "filters")
+		if err != nil {
+			errs = append(errs, err)
+			failed = true
+		}
+
 		connector, err := module.NewConnector(b.Publisher, moduleCfg)
 		if err != nil {
 			errs = append(errs, err)
@@ -68,6 +76,7 @@ func New(b *beat.Beat, rawConfig *common.Config) (beat.Beater, error) {
 		if failed {
 			continue
 		}
+
 		modules = append(modules, staticModule{
 			connector: connector,
 			module:    module,

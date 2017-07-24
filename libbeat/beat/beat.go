@@ -48,6 +48,7 @@ import (
 	"github.com/elastic/beats/libbeat/api"
 	"github.com/elastic/beats/libbeat/cfgfile"
 	"github.com/elastic/beats/libbeat/common"
+	"github.com/elastic/beats/libbeat/common/cfgwarn"
 	"github.com/elastic/beats/libbeat/common/file"
 	"github.com/elastic/beats/libbeat/dashboards"
 	"github.com/elastic/beats/libbeat/logp"
@@ -290,7 +291,7 @@ func (b *Beat) launch(bt Creator) error {
 
 	// If -configtest was specified, exit now prior to run.
 	if cfgfile.IsTestConfig() {
-		logp.Deprecate("6.0", "-configtest flag has been deprecated, use configtest subcommand")
+		cfgwarn.Deprecate("6.0", "-configtest flag has been deprecated, use configtest subcommand")
 		fmt.Println("Config OK")
 		return GracefulExit
 	}
@@ -299,7 +300,7 @@ func (b *Beat) launch(bt Creator) error {
 
 	// TODO Deprecate this in favor of setup subcommand (7.0)
 	if *setup {
-		logp.Deprecate("6.0", "-setup flag has been deprectad, use setup subcommand")
+		cfgwarn.Deprecate("6.0", "-setup flag has been deprectad, use setup subcommand")
 	}
 	err = b.loadDashboards(false)
 	if err != nil {
@@ -419,7 +420,7 @@ func (b *Beat) handleFlags() error {
 	flag.Parse()
 
 	if *printVersion {
-		logp.Deprecate("6.0", "-version flag has been deprectad, use version subcommand")
+		cfgwarn.Deprecate("6.0", "-version flag has been deprectad, use version subcommand")
 		fmt.Printf("%s version %s (%s), libbeat %s\n",
 			b.Info.Beat, b.Info.Version, runtime.GOARCH, version.GetDefaultVersion())
 		return GracefulExit
@@ -450,6 +451,11 @@ func (b *Beat) configure() error {
 	err = cfg.Unpack(&b.Config)
 	if err != nil {
 		return fmt.Errorf("error unpacking config data: %v", err)
+	}
+
+	err = cfgwarn.CheckRemoved5xSettings(cfg, "queue_size", "bulk_queue_size")
+	if err != nil {
+		return err
 	}
 
 	if name := b.Config.Shipper.Name; name != "" {

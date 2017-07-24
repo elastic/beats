@@ -10,6 +10,7 @@ import (
 	"github.com/elastic/beats/filebeat/harvester"
 	"github.com/elastic/beats/filebeat/harvester/reader"
 	"github.com/elastic/beats/filebeat/input/file"
+	"github.com/elastic/beats/libbeat/common/cfgwarn"
 	"github.com/elastic/beats/libbeat/common/match"
 	"github.com/elastic/beats/libbeat/logp"
 )
@@ -151,7 +152,7 @@ func (c *config) Validate() error {
 	}
 
 	if c.ScanSort != "" {
-		logp.Experimental("scan_sort is used.")
+		cfgwarn.Experimental("scan_sort is used.")
 
 		// Check input type
 		if _, ok := ValidScanSort[c.ScanSort]; !ok {

@@ -9,7 +9,7 @@ import (
 	"github.com/pkg/errors"
 
 	"github.com/elastic/beats/libbeat/common"
-	"github.com/elastic/beats/libbeat/logp"
+	"github.com/elastic/beats/libbeat/common/cfgwarn"
 	"github.com/elastic/beats/metricbeat/mb"
 )
 
@@ -33,7 +33,7 @@ type MetricSet struct {
 
 // New create a new instance of the MetricSet.
 func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
-	logp.Beta("The perfmon metricset is beta")
+	cfgwarn.Beta("The perfmon metricset is beta")
 
 	config := struct {
 		CounterConfig []CounterConfig `config:"perfmon.counters" validate:"required"`

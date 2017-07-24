@@ -107,8 +107,9 @@ metricbeat.modules:
   metricsets:
     - filesystem
     - fsstat
-  filters:
-    - drop_event.when.regexp.mount_point: '^/(sys|cgroup|proc|dev|etc|host|lib)($|/)'
+  processors:
+  - drop_event.when.regexp:
+      system.filesystem.mount_point: '^/(sys|cgroup|proc|dev|etc|host|lib)($|/)'
 ----
 
 [float]
