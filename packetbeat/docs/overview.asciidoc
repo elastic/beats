@@ -9,7 +9,7 @@ by providing visibility between the servers of your network.
 Packetbeat works by capturing the network traffic between your application servers,
 decoding the application layer protocols (HTTP, MySQL, Redis, and so on),
 correlating the requests with the responses, and recording the
-interesting {packetbeat}/exported-fields[fields] for each transaction.
+interesting {packetbeat}/exported-fields.html[fields] for each transaction.
 
 Packetbeat can help you easily notice issues with your back-end application, such as bugs
 or performance problems, and it makes troubleshooting them - and therefore
