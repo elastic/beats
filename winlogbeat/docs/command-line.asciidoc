@@ -1,5 +1,5 @@
 [[command-line-options]]
-=== Command Line Options
+=== Command line options
 
 Winlogbeat does not have any Winlogbeat-specific command line options. Instead,
 you configure the behavior of Winlogbeat by specifying options in the

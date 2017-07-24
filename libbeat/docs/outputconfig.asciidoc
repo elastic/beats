@@ -318,7 +318,6 @@ The Logstash output sends events directly to Logstash by using the lumberjack
 protocol, which runs over TCP. Logstash allows for additional processing and routing of
 generated events.
 
-:allplatforms:
 include::../../libbeat/docs/shared-logstash-config.asciidoc[]
 
 ==== Accessing metadata fields
@@ -1092,7 +1091,9 @@ output.elasticsearch:
   ssl.key: "/etc/pki/client/cert.key"
 ------------------------------------------------------------------------------
 
-==== SSL Options
+Also see <<configuring-ssl-logstash>>.
+
+==== Configuration options
 
 You can specify the following options in the `ssl` section of the +{beatname_lc}.yml+ config file:
 

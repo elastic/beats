@@ -42,6 +42,7 @@ include::./heartbeat-general-options.asciidoc[]
 
 include::../../libbeat/docs/generalconfig.asciidoc[]
 
+:allplatforms:
 include::../../libbeat/docs/outputconfig.asciidoc[]
 
 include::./heartbeat-filtering.asciidoc[]

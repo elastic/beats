@@ -49,6 +49,7 @@ include::../../libbeat/docs/generalconfig.asciidoc[]
 
 include::./reload-configuration.asciidoc[]
 
+:allplatforms:
 include::../../libbeat/docs/outputconfig.asciidoc[]
 
 include::./load-balancing.asciidoc[]
