@@ -1,0 +1,4 @@
+- module: graphite
+  metricsets: ["server"]
+  enabled: true
+

@@ -155,6 +155,12 @@ metricbeat.modules:
     namespace: "example"
     path: "/debug/vars"
 
+#------------------------------ graphite Module ------------------------------
+- module: graphite
+  metricsets: ["server"]
+  enabled: true
+
+
 #------------------------------- HAProxy Module ------------------------------
 - module: haproxy
   metricsets: ["info", "stat"]
