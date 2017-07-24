@@ -292,6 +292,8 @@ func enrichData(msg *AuditMessage) error {
 	// Normalize keys that are of the form key="key=user_command".
 	auditRuleKey(msg.data)
 
+	hexDecode("cwd", msg.data)
+
 	switch msg.RecordType {
 	case AUDIT_SYSCALL:
 		if err := arch(msg.data); err != nil {
