@@ -8,7 +8,7 @@ Here's how Filebeat works: When you start Filebeat, it starts one or more prospe
 
 image:./images/filebeat.png[Beats design]
 
-For more information about prospectors and harvesters, see {filebeat}/how-filebeat-works[
+For more information about prospectors and harvesters, see {filebeat}/how-filebeat-works.html[
 How Filebeat Works].
 
 Filebeat is a https://www.elastic.co/products/beats[Beat], and it is based on the libbeat framework.
