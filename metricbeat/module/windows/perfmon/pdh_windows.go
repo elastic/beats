@@ -164,8 +164,9 @@ func PdhCloseQuery(query PdhQueryHandle) error {
 }
 
 type Counter struct {
-	handle PdhCounterHandle
-	format PdhCounterFormat
+	handle       PdhCounterHandle
+	format       PdhCounterFormat
+	instanceName *string
 }
 
 type Counters map[string]*Counter
@@ -194,7 +195,7 @@ func NewQuery(dataSource string) (*Query, error) {
 	}, nil
 }
 
-func (q *Query) AddCounter(counterPath string, format Format) error {
+func (q *Query) AddCounter(counterPath string, format Format, instanceName *string) error {
 	if _, found := q.counters[counterPath]; found {
 		return errors.New("counter already added")
 	}
@@ -205,6 +206,7 @@ func (q *Query) AddCounter(counterPath string, format Format) error {
 	}
 
 	q.counters[counterPath] = &Counter{handle: h}
+	q.counters[counterPath].instanceName = instanceName
 	switch format {
 	case FloatFlormat:
 		q.counters[counterPath].format = PdhFmtDouble
@@ -256,9 +258,17 @@ func (q *Query) Values() (map[string][]Value, error) {
 				continue
 			}
 
-			re := regexp.MustCompile("\\((.*)\\)")
-			match := re.FindStringSubmatch(path)
-			name := match[1]
+			var name string
+			if counter.instanceName != nil {
+				name = *counter.instanceName
+			} else {
+				re := regexp.MustCompile("\\((.*)\\)")
+				match := re.FindStringSubmatch(path)
+				if cap(match) <= 0 {
+					return nil, errors.New("Your query doesn't contain an instance name. In this case you have to define one per `instance_name`")
+				}
+				name = match[1]
+			}
 
 			switch counter.format {
 			case PdhFmtDouble:
@@ -278,10 +288,10 @@ func (q *Query) Close() error {
 }
 
 type PerfmonReader struct {
-	query       *Query            // PDH Query
-	instance    map[string]string // Mapping of counter path to key used in output.
-	measurement map[string]string
-	executed    bool // Indicates if the query has been executed.
+	query         *Query            // PDH Query
+	instanceLabel map[string]string // Mapping of counter path to key used in output.
+	measurement   map[string]string
+	executed      bool // Indicates if the query has been executed.
 }
 
 func NewPerfmonReader(config []CounterConfig) (*PerfmonReader, error) {
@@ -291,9 +301,9 @@ func NewPerfmonReader(config []CounterConfig) (*PerfmonReader, error) {
 	}
 
 	r := &PerfmonReader{
-		query:       query,
-		instance:    map[string]string{},
-		measurement: map[string]string{},
+		query:         query,
+		instanceLabel: map[string]string{},
+		measurement:   map[string]string{},
 	}
 
 	for _, counter := range config {
@@ -304,12 +314,12 @@ func NewPerfmonReader(config []CounterConfig) (*PerfmonReader, error) {
 		case "long":
 			format = LongFormat
 		}
-		if err := query.AddCounter(counter.Query, format); err != nil {
+		if err := query.AddCounter(counter.Query, format, counter.InstanceName); err != nil {
 			query.Close()
 			return nil, err
 		}
 
-		r.instance[counter.Query] = counter.InstanceLabel
+		r.instanceLabel[counter.Query] = counter.InstanceLabel
 		r.measurement[counter.Query] = counter.MeasurementLabel
 
 	}
@@ -335,7 +345,7 @@ func (r *PerfmonReader) Read() ([]common.MapStr, error) {
 	for counterPath, counter := range values {
 		for _, val := range counter {
 			ev := common.MapStr{}
-			instanceKey := r.instance[counterPath]
+			instanceKey := r.instanceLabel[counterPath]
 			ev.Put(instanceKey, val.Instance)
 			measurementKey := r.measurement[counterPath]
 			ev.Put(measurementKey, val.Measurement)
