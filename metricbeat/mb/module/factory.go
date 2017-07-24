@@ -3,8 +3,11 @@ package module
 import (
 	"time"
 
+	"github.com/joeshaw/multierror"
+
 	"github.com/elastic/beats/libbeat/cfgfile"
 	"github.com/elastic/beats/libbeat/common"
+	"github.com/elastic/beats/libbeat/common/cfgwarn"
 	"github.com/elastic/beats/libbeat/publisher/bc/publisher"
 	"github.com/elastic/beats/metricbeat/mb"
 )
@@ -25,13 +28,22 @@ func NewFactory(maxStartDelay time.Duration, p publisher.Publisher) *Factory {
 }
 
 func (r *Factory) Create(c *common.Config) (cfgfile.Runner, error) {
+	var errs multierror.Errors
+
+	err := cfgwarn.CheckRemoved5xSettings(c, "filters")
+	if err != nil {
+		errs = append(errs, err)
+	}
 	connector, err := NewConnector(r.pipeline, c)
 	if err != nil {
-		return nil, err
+		errs = append(errs, err)
 	}
-
 	w, err := NewWrapper(r.maxStartDelay, c, mb.Registry)
 	if err != nil {
+		errs = append(errs, err)
+	}
+
+	if err := errs.Err(); err != nil {
 		return nil, err
 	}
 

@@ -5,7 +5,6 @@ filebeat.prospectors:
   scan_frequency: 0.5s
   encoding: {{prospector.encoding | default("plain") }}
 {% endfor %}
-filebeat.idle_timeout: 0.5s
 filebeat.registry_file: {{ beat.working_dir + '/' }}{{ registryFile|default("registry")}}
 
 output.file:
