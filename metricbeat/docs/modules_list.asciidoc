@@ -8,8 +8,8 @@ This file is generated! See scripts/docs_collector.py
   * <<metricbeat-module-couchbase,Couchbase>>
   * <<metricbeat-module-docker,Docker>>
   * <<metricbeat-module-dropwizard,Dropwizard>>
-  * <<metricbeat-module-elasticsearch,elasticsearch>>
-  * <<metricbeat-module-golang,golang>>
+  * <<metricbeat-module-elasticsearch,Elasticsearch>>
+  * <<metricbeat-module-golang,Golang>>
   * <<metricbeat-module-graphite,graphite>>
   * <<metricbeat-module-haproxy,HAProxy>>
   * <<metricbeat-module-http,HTTP>>

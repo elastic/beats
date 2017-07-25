@@ -65,13 +65,14 @@ func (g *TcpServer) WatchMetrics() {
 	for {
 		select {
 		case <-g.done:
-			break
+			return
 		default:
 		}
 
 		conn, err := g.listener.Accept()
 		if err != nil {
 			logp.Err("Unable to accept connection due to error: %v", err)
+			continue
 		}
 		defer func() {
 			if conn != nil {
@@ -97,7 +98,7 @@ func (g *TcpServer) GetEvents() chan server.Event {
 }
 
 func (g *TcpServer) Stop() {
-	g.listener.Close()
 	close(g.done)
+	g.listener.Close()
 	close(g.eventQueue)
 }

@@ -44,6 +44,7 @@ func TestTcpServer(t *testing.T) {
 	}
 
 	svc.Start()
+	defer svc.Stop()
 	writeToServer(t, "test1", host, port)
 	msg := <-svc.GetEvents()
 
@@ -52,7 +53,6 @@ func TestTcpServer(t *testing.T) {
 	assert.True(t, ok)
 	bytes, _ := msg.GetEvent()["data"].([]byte)
 	assert.True(t, string(bytes) == "test1")
-	defer svc.Stop()
 
 }
 

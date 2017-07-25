@@ -66,7 +66,7 @@ func (g *UdpServer) WatchMetrics() {
 	for {
 		select {
 		case <-g.done:
-			break
+			return
 		default:
 		}
 
@@ -92,7 +92,7 @@ func (g *UdpServer) GetEvents() chan server.Event {
 }
 
 func (g *UdpServer) Stop() {
-	g.listener.Close()
 	close(g.done)
+	g.listener.Close()
 	close(g.eventQueue)
 }

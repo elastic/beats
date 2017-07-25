@@ -1,3 +1,5 @@
+// +build !integration
+
 package udp
 
 import (
@@ -51,7 +53,6 @@ func TestUdpServer(t *testing.T) {
 	assert.True(t, ok)
 	bytes, _ := msg.GetEvent()["data"].([]byte)
 	assert.True(t, string(bytes) == "test1")
-
 }
 
 func writeToServer(t *testing.T, message, host string, port int) {
