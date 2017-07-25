@@ -1,4 +1,4 @@
-=== System Process Summary MetricSet
+=== System process summary metricset
 
-This is the `process_summary` metricset of the module system. It collects high
-level statistics about the running processes.
+The `process_summary` metricset collects high level statistics about the running
+processes.

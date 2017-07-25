@@ -47,10 +47,10 @@ grouped in the following categories:
 
 --
 [[exported-fields-aerospike]]
-== aerospike Fields
+== Aerospike Fields
 
 []experimental
-aerospike Module
+Aerospike module
 
 
 
@@ -766,10 +766,10 @@ Error type.
 
 
 [[exported-fields-ceph]]
-== ceph Fields
+== Ceph Fields
 
 beta[]
-ceph Module
+Ceph module
 
 
 
@@ -2216,10 +2216,10 @@ Stats collected from Dropwizard.
 
 
 [[exported-fields-elasticsearch]]
-== elasticsearch Fields
+== Elasticsearch Fields
 
 []experimental
-elasticsearch Module
+Elasticsearch module
 
 
 
@@ -2520,9 +2520,9 @@ type: long
 
 
 [[exported-fields-golang]]
-== golang Fields
+== Golang Fields
 
-golang Module
+Golang module
 
 
 
@@ -3766,7 +3766,7 @@ The average queue time in ms over the last 1024 requests.
 [[exported-fields-http]]
 == HTTP Fields
 
-http Module
+HTTP module
 
 
 
@@ -3848,7 +3848,7 @@ json metricset
 == Jolokia Fields
 
 []beta
-Jolokia Module
+Jolokia module
 
 
 
@@ -3859,9 +3859,9 @@ jolokia contains metrics exposed via jolokia agent
 
 
 [[exported-fields-kafka]]
-== kafka Fields
+== Kafka Fields
 
-kafka Module
+Kafka module
 beta[]
 
 
@@ -4091,10 +4091,10 @@ Broker address
 
 
 [[exported-fields-kibana]]
-== kibana Fields
+== Kibana Fields
 
 []experimental
-kibana Module
+Kibana module
 
 
 
@@ -4239,10 +4239,10 @@ Kubernetes container image
 
 
 [[exported-fields-kubernetes]]
-== kubernetes Fields
+== Kubernetes Fields
 
 beta[]
-kubernetes metrics
+Kubernetes metrics
 
 
 
@@ -5415,10 +5415,10 @@ Total inodes
 
 
 [[exported-fields-memcached]]
-== memcached Fields
+== Memcached Fields
 
 []beta
-memcached Module
+Memcached module
 
 
 
@@ -6728,7 +6728,7 @@ The current number of idle client connections waiting for a request.
 
 
 [[exported-fields-php_fpm]]
-== php_fpm Fields
+== PHP-FPM Fields
 
 beta[]
 PHP-FPM server status metrics collected from PHP-FPM.
@@ -7273,10 +7273,10 @@ Number of memory chunks that are not yet persisted to disk.
 
 
 [[exported-fields-rabbitmq]]
-== rabbitmq Fields
+== RabbitMQ Fields
 
 []experimental
-rabbitmq Module
+RabbitMQ module
 
 
 
@@ -10101,9 +10101,9 @@ Name of the user running the process.
 
 
 [[exported-fields-vsphere]]
-== vsphere Fields
+== vSphere Fields
 
-vsphere Module
+vSphere module
 
 
 

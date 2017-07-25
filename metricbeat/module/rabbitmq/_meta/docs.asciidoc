@@ -1,4 +1,4 @@
-== rabbitmq Module
+== RabbitMQ module
 
-This is the rabbitmq Module. It uses http://www.rabbitmq.com/management.html [HTTP API] created by the management plugin to collect metrics.
+The RabbitMQ module uses http://www.rabbitmq.com/management.html[HTTP API] created by the management plugin to collect metrics.
 

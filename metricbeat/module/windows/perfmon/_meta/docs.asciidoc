@@ -1,6 +1,6 @@
-=== Windows Perfmon MetricSet
+=== Windows perfmon metricset
 
-This is the perfmon metricset of the Windows module. It reads Windows
+The `perfmon` metricset of the Windows module reads Windows
 performance counters.
 
 [float]
