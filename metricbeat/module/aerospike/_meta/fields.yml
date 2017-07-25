@@ -1,7 +1,7 @@
 - key: aerospike
   title: "Aerospike"
   description: >
-    []experimental
+    experimental[]
 
     Aerospike module
   fields:
