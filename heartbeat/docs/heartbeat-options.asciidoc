@@ -1,8 +1,12 @@
 [[configuration-heartbeat-options]]
-=== Heartbeat
+== Set up monitors
 
-The `heartbeat` section of the +heartbeat.yml+ config file specifies the
-list of `monitors` that Heartbeat uses to check your remote hosts to
+++++
+<titleabbrev>Set up Heartbeat monitors</titleabbrev>
+++++
+
+The `heartbeat.monitors` section of the +heartbeat.yml+ config file specifies
+the list of `monitors` that Heartbeat uses to check your remote hosts to
 determine if they are available. Each `monitor` item begins with a dash (-) and
 specifies the type of monitor to use, the hosts to check, and other settings
 that control Heartbeat behavior.
@@ -29,17 +33,18 @@ heartbeat.scheduler:
   limit: 10
 ----------------------------------------------------------------------
 
+[float]
 [[monitor-options]]
-==== Monitor Options
+=== Monitor options
 
-You can specify the following options in the `monitors` section of the
+You can specify the following options in the `heartbeat.monitors` section of the
 +heartbeat.yml+ config file. These options are the same for all monitors.
 Each monitor type has additional configuration options that are specific to that
 monitor type.
 
-
+[float]
 [[monitor-type]]
-===== type
+==== `type`
 
 The type of monitor to run. One of:
 
@@ -54,21 +59,24 @@ The `tcp` and `http` monitor types both support SSL/TLS and some proxy
 settings.
 
 
+[float]
 [[monitor-name]]
-===== name
+==== `name`
 
 The monitor name. This value appears in the <<exported-fields,exported fields>>
 under the `monitor` field as the job name and the `type` field as the job type.
 
+[float]
 [[monitor-enabled]]
-===== enabled
+==== `enabled`
 
 A Boolean value that specifies whether the module is enabled. If the `enabled`
 option is missing from the configuration block, the module is enabled by
 default.
 
+[float]
 [[monitor-schedule]]
-===== schedule
+==== `schedule`
 
 A cron-like expression that specifies the task schedule. For example:
 
@@ -80,28 +88,32 @@ started.
 The `schedule` option uses a cron-like syntax based on https://github.com/gorhill/cronexpr#implementation[this `cronexpr` implementation],
 but adds the `@every` keyword.
 
+[float]
 [[monitor-ipv4]]
-===== ipv4
+==== `ipv4`
 
 A Boolean value that specifies whether to ping using the ipv4 protocol if
 hostnames are configured. The default is `true`.
 
+[float]
 [[monitor-ipv6]]
-===== ipv6
+==== `ipv6`
 
 A Boolean value that specifies whether to ping using the ipv6 protocol
 if hostnames are configured. The default is `true`.
 
+[float]
 [[monitor-mode]]
-===== mode
+==== `mode`
 
 If `mode` is `any`, the monitor pings only one IP address for a hostname. If
 `mode` is `all`, the monitor pings all resolvable IPs for a hostname. The
 `mode: all` setting is useful if you are using a DNS-load balancer and want to
 ping every IP address for the specified hostname. The default is `any`.
 
+[float]
 [[monitor-timieout]]
-===== timeout
+==== `timeout`
 
 The total running time for each ping test. This is the total time allowed for
 testing the connection and exchanging data. The default is 16 seconds (16s).
@@ -110,8 +122,9 @@ If the timeout is exceeded, Heartbeat publishes a `service-down` event. If the
 value specified for `timeout` is greater than `schedule`, intermediate checks
 will not be executed by the scheduler.
 
+[float]
 [[monitor-watch-poll-file]]
-===== watch.poll_file
+==== `watch.poll_file`
 
 experimental[]
 
@@ -164,33 +177,38 @@ restarts it with a schedule of 15 seconds between checks.
 <2> Heartbeat starts a new monitor that uses a TLS-based connection with a
 custom CA certificate.
 
+[float]
 [[monitor-icmp-options]]
-==== ICMP Options
+=== ICMP options
 
 These options configure Heartbeat to use ICMP (v4 and v6) Echo Requests to check
 the configured hosts. These options are valid when the <<monitor-type,`type`>> is
 `icmp`.
 
+[float]
 [[monitor-icmp-hosts]]
-===== hosts
+==== `hosts`
 
 A list of hosts to ping.
 
+[float]
 [[monitor-icmp-wait]]
-===== wait
+==== `wait`
 
 The duration to wait before emitting another ICMP Echo Request. The default is 1
 second (1s).
 
+[float]
 [[monitor-tcp-options]]
-==== TCP Options
+=== TCP options
 
 These options configure Heartbeat to connect via TCP and optionally verify the
 endpoint by sending and/or receiving a custom payload. These options are valid when
 the <<monitor-type,`type`>> is `tcp`.
 
+[float]
 [[monitor-tcp-hosts]]
-===== hosts
+==== `hosts`
 
 A list of hosts to ping. The entries in the list can be:
 
@@ -212,8 +230,9 @@ system defaults are used (currently not supported on Windows).
 ** `port` is the port number. If `port` is missing in the URL, the
 <<monitor-tcp-ports,`ports`>> setting is required.
 
+[float]
 [[monitor-tcp-ports]]
-===== ports
+==== `ports`
 
 A list of ports to ping if the host specified in <<monitor-tcp-hosts,`hosts`>>
 does not contain a port number.
@@ -228,8 +247,9 @@ Example configuration:
   ports: [80, 9200, 5044]
 -------------------------------------------------------------------------------
 
+[float]
 [[monitor-tcp-check]]
-===== check
+==== `check`
 
 An optional payload string to send to the remote host and the expected answer.
 If no payload is specified, the endpoint is assumed to be available if the
@@ -251,8 +271,9 @@ Example configuration:
 -------------------------------------------------------------------------------
 
 
+[float]
 [[monitor-tcp-proxy-url]]
-===== proxy_url
+==== `proxy_url`
 
 The URL of the SOCKS5 proxy to use when connecting to the server. The value
 must be a URL with a scheme of socks5://.
@@ -269,15 +290,17 @@ When using a proxy, hostnames are resolved on the proxy server instead of on
 the client. You can change this behavior by setting the
 `proxy_use_local_resolver` option.
 
+[float]
 [[monitor-tcp-proxy-use-local-resolver]]
-===== proxy_use_local_resolver
+==== `proxy_use_local_resolver`
 
 A Boolean value that determines whether hostnames are resolved locally instead
 of being resolved on the proxy server. The default value is false, which means
 that name resolution occurs on the proxy server.
 
+[float]
 [[monitor-tcp-tls-ssl]]
-===== ssl
+==== `ssl`
 
 The TLS/SSL connection settings.  If the monitor is
 <<configuration-output-ssl,configured to use SSL>>, it will attempt an SSL
@@ -299,15 +322,17 @@ Example configuration:
 -------------------------------------------------------------------------------
 
 
+[float]
 [[monitor-http-options]]
-==== HTTP Options
+=== HTTP options
 
 These options configure Heartbeat to connect via HTTP and optionally verify that
 the host returns the expected response. These options are valid when the
 <<monitor-type,`type`>> is `http`.
 
+[float]
 [[monitor-http-urls]]
-===== urls
+==== `urls`
 
 A list of URLs to ping.
 
@@ -321,14 +346,16 @@ Example configuration:
 -------------------------------------------------------------------------------
 
 
+[float]
 [[monitor-http-proxy-url]]
-===== proxy_url
+==== `proxy_url`
 
 The HTTP proxy URL. This setting is optional. If not set, the HTTP_PROXY
 environment variable is used.
 
+[float]
 [[monitor-http-username]]
-===== username
+==== `username`
 
 The username for authenticating with the server. The credentials are passed
 with the request. This setting is optional.
@@ -337,13 +364,15 @@ You need to specify credentials when your `check.response` settings require it.
 For example, you can check for a 403 response (`check.response.status: 403`)
 without setting credentials.
 
+[float]
 [[monitor-http-password]]
-===== password
+==== `password`
 
 The password for authenticating with the server. This setting is optional.
 
+[float]
 [[monitor-http-tls-ssl]]
-===== ssl
+==== `ssl`
 
 The TLS/SSL connection settings for use with the HTTPS endpoint. If you don't
 specify settings, the system defaults are used.
@@ -362,8 +391,9 @@ Example configuration:
 -------------------------------------------------------------------------------
 
 
+[float]
 [[monitor-http-check]]
-===== check
+==== `check`
 
 An optional `request` to send to the remote host and the expected `response`.
 
@@ -411,10 +441,11 @@ check.response:
 -------------------------------------------------------------------------------
 
 
+[float]
 [[monitors-scheduler]]
-==== Scheduler Options
+=== Scheduler options
 
-You specify options under `scheduler` to control the behavior of the task
+You specify options under `heartbeat.scheduler` to control the behavior of the task
 scheduler.
 
 Example configuration:
@@ -430,8 +461,9 @@ In the example, setting `limit` to 10 guarantees that only 10 concurrent
 I/O tasks will be active. An I/O task can be the actual check or resolving an
 address via DNS.
 
+[float]
 [[heartbeat-scheduler-limit]]
-===== limit
+==== `limit`
 
 The number of concurrent I/O tasks that Heartbeat is allowed to execute. If set
 to 0, there is no limit. The default is 0.
@@ -441,20 +473,11 @@ operate correctly and not accidentally block libbeat output, the value that you
 specify for `limit` should be below the configured ulimit.
 
 
+[float]
 [[heartbeat-scheduler-location]]
-===== location
+==== `location`
 
 The timezone for the scheduler. By default the scheduler uses localtime.
 
-include::../../../../libbeat/docs/generalconfig.asciidoc[]
 
-include::../../../../libbeat/docs/processors-config.asciidoc[]
-
-include::../../../../libbeat/docs/outputconfig.asciidoc[]
-
-include::../../../../libbeat/docs/shared-path-config.asciidoc[]
-
-include::../../../../libbeat/docs/setup-config.asciidoc[]
-
-include::../../../../libbeat/docs/loggingconfig.asciidoc[]
 

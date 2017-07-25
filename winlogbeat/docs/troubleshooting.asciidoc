@@ -14,7 +14,7 @@ If you have issues installing or running Winlogbeat, read the following tips:
 --
 
 [[getting-help]]
-== Getting Help
+== Get Help
 
 include::../../libbeat/docs/getting-help.asciidoc[]
 
@@ -22,6 +22,6 @@ include::../../libbeat/docs/getting-help.asciidoc[]
 
 
 [[enable-winlogbeat-debugging]]
-== Debugging
+== Debug
 
 include::../../libbeat/docs/debugging.asciidoc[]

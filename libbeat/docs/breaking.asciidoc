@@ -1,5 +1,5 @@
 [[breaking-changes]]
-== Breaking Changes
+== Breaking changes
 
 As a general rule, we strive to keep backwards compatibility between minor
 versions (e.g.  5.x to 5.y) so you can upgrade without any configuration file
@@ -12,18 +12,18 @@ We also list the breaking changes at the top of the <<release-notes,release note
 for each version.
 
 [[breaking-changes-5.0]]
-=== Breaking Changes in 5.0
+=== Breaking changes in 5.0
 
 This section discusses the changes that you should be aware of if you upgrade
 the Beats from version 1.x to 5.x.
 
 ==== URL changes for DEB/RPM packages
 
-The previous `packages.elastic.co` URL has been altered to `artifacts.elastic.co`. 
-Ensure you update your repository files before running the upgrade process, or 
+The previous `packages.elastic.co` URL has been altered to `artifacts.elastic.co`.
+Ensure you update your repository files before running the upgrade process, or
 your operating system may not see the new packages.
 
-==== Configuration File Changes
+==== Configuration file changes
 
 Beats 5.0 comes with a more powerful and more robust <<config-file-format,file
 configuration format>>. While this necessarily causes a few breaking changes, we
@@ -57,7 +57,7 @@ changed or replaced with options from the `close_*` group. See the
 {filebeat}/how-filebeat-works.html[How Filebeat Works] docs for details. These
 changes are not made automatically by the migration script.
 
-==== Field Renames
+==== Field renames
 
 Beats 5.0 also comes with several changes in the exported fields. If you are
 using these fields in Kibana dashboards, you will likely need to adjust the
@@ -81,7 +81,7 @@ Changes:
 
 In addition, the unused `count` field was removed from all Packetbeat modules.
 
-==== Installation Paths
+==== Installation paths
 
 For 5.0 we have refactored the {filebeat}/directory-layout.html[directory
 layout] of the Beats, so they are more consistent and in-line with the best

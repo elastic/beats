@@ -1,5 +1,5 @@
 [[faq]]
-== Frequently Asked Questions
+== Frequently asked questions
 
 This section contains frequently asked questions about Metricbeat. Also check out the
 https://discuss.elastic.co/c/beats/metricbeat[Metricbeat discussion forum].
@@ -21,4 +21,5 @@ sudo mount -t linprocfs /dev/null /compat/linux/proc
 ----
 
 include::../../libbeat/docs/faq-limit-bandwidth.asciidoc[]
+
 include::../../libbeat/docs/shared-faq.asciidoc[]

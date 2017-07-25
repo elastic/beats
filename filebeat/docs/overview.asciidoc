@@ -1,5 +1,9 @@
 [[filebeat-overview]]
-== Overview
+== Filebeat overview
+
+++++
+<titleabbrev>Overview</titleabbrev>
+++++
 
 Filebeat is a log data shipper for local files. Installed as an agent on your servers, Filebeat monitors the log directories or specific log files, tails the files,
 and forwards them either to https://www.elastic.co/products/elasticsearch[Elasticsearch] or https://www.elastic.co/products/logstash[Logstash] for indexing.

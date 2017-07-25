@@ -1,5 +1,5 @@
 [[multiple-prospectors]]
-== Specifying Multiple Prospectors
+=== Specify multiple prospectors
 
 When you need to collect lines from multiple files, you can simply configure a single prospector and specify multiple
 paths to start a harvester for each file. However, if you want to apply additional prospector-specific

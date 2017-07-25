@@ -1,0 +1,65 @@
+[[configuration-filebeat-modules]]
+== Specify which modules to run
+
+//REVIEWERS: I created this topic because I think it might be confusing to have no mention of this modules config section in the docs. However, I think that adding the info might also be confusing becasue users might try to configure othe things (like prospectors). Note that this topic uses the old command syntax, but would be updated to reflect the new.
+
+Filebeat <<filebeat-modules,modules>> provide a quick way for you to get started
+processing common log formats. They contain default configurations,
+Elasticsearch ingest node pipeline definitions, and Kibana dashboards to help
+you implement and deploy a log monitoring solution.
+
+Using modules is optional. You may decide to configure Filebeat manaully if
+you are using a log file type that isn't supported or you want to use a
+different setup.
+
+To enable specific modules, you can add entries to the `filebeat.modules` list
+in the +{beatname_lc}.yml+ config file. Each entry in the list begins with a dash
+(-) and is followed by settings for that module.
+
+Filebeat also provides command-line options for enabling and disabling modules.
+See <<filebeat-modules-overview>> for more about running modules.
+
+The following example shows a configuration that runs the `nginx`,`mysql`, and
+`system` modules.
+
+//QUESTION: Are we doing something like the modules.d layout for Filebeat?
+
+[source,yaml]
+----
+filebeat.modules:
+- module: nginx
+- module: mysql
+- module: system
+----
+
+To enable this same configuration from the command line, you use:
+
+[source,shell]
+----
+./filebeat -e -modules=nginx,mysql,system
+----
+
+The configuration in the example assumes that the logs you’re harvesting are
+in the location expected for your OS and that the default behavior of Filebeat
+is appropriate for your environment. Each module provides variables that you
+can set to fine tune the behavior of Filebeat, including the location
+where it looks for log files. For example, the following configuration sets
+the path for `nginx` log files:
+
+[source,yaml]
+----
+filebeat.modules:
+- module: nginx
+  access:
+    var.paths: ["/var/log/nginx/access.log*"]
+----
+
+To set the same configuration from the command line, you use:
+
+[source,shell]
+----
+./filebeat -e -modules=nginx -M "nginx.access.var.paths=[/var/log/nginx/access.log*]"
+----
+
+See the <<filebeat-modules,documentation for the modules>> you are using for
+more information.

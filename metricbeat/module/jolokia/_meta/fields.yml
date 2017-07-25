@@ -3,7 +3,7 @@
   description: >
     []beta
 
-    Jolokia Module
+    Jolokia module
   short_config: false
   fields:
     - name: jolokia

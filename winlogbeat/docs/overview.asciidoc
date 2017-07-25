@@ -1,4 +1,8 @@
-== Overview
+== Winlogbeat Overview
+
+++++
+<titleabbrev>Overview</titleabbrev>
+++++
 
 Winlogbeat ships Windows event logs to Elasticsearch or Logstash. You can
 install it as a Windows service on Windows XP or later.

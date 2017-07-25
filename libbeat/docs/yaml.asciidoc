@@ -15,7 +15,7 @@
 ifdef::standalone[]
 
 [[yaml-tips]]
-== YAML Tips and Gotchas
+== YAML tips and gotchas
 
 endif::[]
 
@@ -23,7 +23,7 @@ The configuration file uses http://yaml.org/[YAML] for its syntax. When you edit
 file to modify configuration settings, there are a few things that you should know.
 
 [float]
-=== Use Spaces for Indentation
+=== Use spaces for indentation
 
 Indentation is meaningful in YAML. Make sure that you use spaces, rather than tab characters, to indent sections.
 
@@ -31,7 +31,7 @@ In the default configuration files and in all the examples in the documentation,
 we use 2 spaces per indentation level. We recommend you do the same.
 
 [float]
-=== Look at the Default Config File for Structure
+=== Look at the default config file for structure
 
 The best way to understand where to define a configuration option is by looking
 at the provided sample configuration files. The configuration files contain most
@@ -39,7 +39,7 @@ of the default configurations that are available for the Beat. To change a setti
 simply uncomment the line and change the values.
 
 [float]
-=== Test Your Config File
+=== Test your config file
 
 You can test your configuration file to verify that the structure is valid.
 Simply change to the directory where the binary is installed, and run
@@ -66,7 +66,7 @@ endif::win[]
 You'll see a message if the Beat finds an error in the file.
 
 [float]
-=== Wrap Regular Expressions in Single Quotation Marks
+=== Wrap regular expressions in single quotation marks
 
 If you need to specify a regular expression in a YAML file, it's a good idea to wrap the regular expression in single quotation marks to work around YAML's tricky rules for string escaping.
 
@@ -74,7 +74,7 @@ For more information about YAML, see http://yaml.org/.
 
 [float]
 [[wrap-paths-in-quotes]]
-=== Wrap Paths in Single Quotation Marks
+=== Wrap paths in single quotation marks
 
 Windows paths in particular sometimes contain spaces or characters, such as drive
 letters or triple dots, that may be misinterpreted by the YAML parser.
@@ -83,7 +83,7 @@ To avoid this problem, it's a good idea to wrap paths in single quotation marks.
 
 [float]
 [[avoid-leading-zeros]]
-=== Avoid Using Leading Zeros in Numeric Values
+=== Avoid using leading zeros in numeric values
 
 If you use a leading zero (for example, `09`) in a numeric field without
 wrapping the value in single quotation marks, the value may be interpreted
