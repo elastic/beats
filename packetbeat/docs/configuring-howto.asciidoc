@@ -68,5 +68,5 @@ include::../../libbeat/docs/shared-env-vars.asciidoc[]
 :allplatforms:
 include::../../libbeat/docs/yaml.asciidoc[]
 
-include::./packetbeat-reference-yml.asciidoc[]
+include::../../libbeat/docs/reference-yml.asciidoc[]
 

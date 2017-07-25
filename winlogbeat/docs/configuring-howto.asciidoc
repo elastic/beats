@@ -55,4 +55,4 @@ include::../../libbeat/docs/shared-env-vars.asciidoc[]
 :win:
 include::../../libbeat/docs/yaml.asciidoc[]
 
-
+include::../../libbeat/docs/reference-yml.asciidoc[]
