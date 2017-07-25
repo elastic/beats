@@ -45,8 +45,6 @@ include::./multiline.asciidoc[]
 
 include::./filebeat-general-options.asciidoc[]
 
-include::../../libbeat/docs/generalconfig.asciidoc[]
-
 include::./reload-configuration.asciidoc[]
 
 :allplatforms:
