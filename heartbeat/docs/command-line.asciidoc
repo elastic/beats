@@ -1,5 +1,5 @@
 [[command-line-options]]
-=== Command Line Options
+=== Command line options
 
 Heartbeat does not have any Heartbeat-specific command line options.
 Instead, you configure the behaviour of Heartbeat by specifying options in

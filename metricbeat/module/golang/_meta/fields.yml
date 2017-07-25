@@ -1,7 +1,7 @@
 - key: golang
-  title: "golang"
+  title: "Golang"
   description: >
-    golang Module
+    Golang module
   short_config: false
   fields:
     - name: golang

@@ -1,5 +1,5 @@
 [[heartbeat-developer-guide]]
-= Heartbeat Developer Guide
+= Heartbeat developer guide
 
 [partintro]
 --

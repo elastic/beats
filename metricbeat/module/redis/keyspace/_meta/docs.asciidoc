@@ -1,4 +1,4 @@
-=== Redis Keyspace Metricset
+=== Redis keyspace metricset
 
 The Redis `keyspace` metricset collects information about the Redis keyspaces.
 For each keyspace, an event is sent to Elasticsearch.

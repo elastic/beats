@@ -1,5 +1,0 @@
-[[config-metricbeat-logstash]]
-== Configuring Metricbeat to Use Logstash
-
-:allplatforms:
-include::../../libbeat/docs/shared-logstash-config.asciidoc[]

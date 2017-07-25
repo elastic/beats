@@ -1,5 +1,0 @@
-[[config-packetbeat-logstash]]
-== Configuring Packetbeat to Use Logstash
-
-:allplatforms:
-include::../../libbeat/docs/shared-logstash-config.asciidoc[]

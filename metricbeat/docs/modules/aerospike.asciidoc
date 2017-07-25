@@ -3,9 +3,9 @@ This file is generated! See scripts/docs_collector.py
 ////
 
 [[metricbeat-module-aerospike]]
-== aerospike Module
+== Aerospike module
 
-This is the aerospike Module. It uses http://www.aerospike.com/docs/reference/info[Info command] to collect metrics.
+The Aerospike module uses the http://www.aerospike.com/docs/reference/info[Info command] to collect metrics.
 
 [float]
 === Compatibility
@@ -14,9 +14,9 @@ The Aeropsike metricsets were tested with Aerospike 3.9 and are expected to work
 
 
 [float]
-=== Example Configuration
+=== Example configuration
 
-The aerospike module supports the standard configuration options that are described
+The Aerospike module supports the standard configuration options that are described
 in <<configuration-metricbeat>>. Here is an example configuration:
 
 [source,yaml]

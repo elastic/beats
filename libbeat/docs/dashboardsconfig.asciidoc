@@ -11,7 +11,7 @@
 //////////////////////////////////////////////////////////////////////////
 
 [[configuration-dashboards]]
-=== Dashboards
+== Load Kibana dashboards
 
 beta[]
 
@@ -35,12 +35,14 @@ Here is an example configuration:
 dashboards.enabled: true
 ------------------------------------------------------------------------------
 
-==== Dashboards Loading Options
+[float]
+=== Configuration options
 
 You can specify the following options in the `dashboards` section of the
 +{beatname_lc}.yml+ config file:
 
-===== enabled
+[float]
+==== `enabled`
 
 If this option is set to true, {beatname_uc} loads the sample Kibana dashboards
 automatically on startup. If no other options are set, the dashboard are loaded
@@ -49,40 +51,46 @@ from the local `kibana` directory in the home path of the installation.
 To load dashboards from a different location, you can configure one of the
 following options: <<url-option,`url`>>, or <<file-option,`file`>>.
 
+[float]
 [[directory-option]]
-===== directory
+==== `directory`
 
 The directory that contains the dashboards to load. The default is the `kibana`
 folder in the home path.
 
+[float]
 [[url-option]]
-===== url
+==== `url`
 
 The URL to use for downloading the dashboard archive. If this option
 is set, {beatname_uc} downloads the dashboard archive from the specified URL
 instead of using the local directory.
 
-
+[float]
 [[file-option]]
-===== file
+==== `file`
 
 The file archive (zip file) that contains the dashboards to load. If this option
 is set, {beatname_uc} looks for a dashboard archive in the specified path
 instead of using the local directory.
 
-===== beat
+[float]
+==== `beat`
 
 In case the archive contains the dashboards for multiple Beats, this setting
 lets you select the Beat for which you want to load dashboards. To load all the
 dashboards in the archive, set this option to an empty string. The default is
 +"{beatname_lc}"+.
 
-===== kibana_index
+[float]
+==== `kibana_index`
 
 The name of the Kibana index to use for setting the configuration. The default
 is `".kibana"`
 
-===== index
+
+[float]
+==== `index`
 
 The Elasticsearch index name. This setting overwrites the index name defined
 in the dashboards and index pattern. Example: `"testbeat-*"`

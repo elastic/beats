@@ -1,5 +1,5 @@
 [[command-line-options]]
-=== Command Line Options
+=== Command line options
 
 The following command line option is specific to Filebeat.
 

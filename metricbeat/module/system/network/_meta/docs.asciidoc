@@ -1,4 +1,4 @@
-=== System Network Metricset
+=== System network metricset
 
 The System `network` metricset provides network IO metrics collected from the
 operating system. One event is created for each network interface.

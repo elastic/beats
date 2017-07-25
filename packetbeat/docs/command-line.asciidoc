@@ -1,12 +1,12 @@
 [[command-line-options]]
-=== Command Line Options
+=== Command line options
 
 The following command line options are available for Packetbeat. To use these options,
 you need to start Packetbeat in the foreground.
 
 TIP: Run `./packetbeat -h` to see the full list of options from the command line.
 
-==== Packet-Beat Specific Options
+==== Packetbeat-specific options
 These command line options are specific to Packetbeat:
 
 *`-I <file>`*::
@@ -29,7 +29,7 @@ For an infinite loop, use _0_. The `-l` option is useful only for testing Packet
 *`-t`*::
 Read the packets from the pcap file as fast as possible without sleeping. Use this option in combination with the `-I` option. The `-t` option is useful only for testing Packetbeat.
 
-==== Other Options
+==== Other options
 
 These command line options from libbeat are also available for Packetbeat:
 

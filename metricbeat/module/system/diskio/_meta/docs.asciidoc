@@ -1,4 +1,4 @@
-=== System Diskio Metricset
+=== System diskio metricset
 
 The System `diskio` metricset provides disk IO metrics collected from the operating
 system. One event is created for each disk mounted on the system.

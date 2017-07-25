@@ -3,13 +3,13 @@ This file is generated! See scripts/docs_collector.py
 ////
 
 [[metricbeat-module-windows]]
-== Windows Module
+== Windows module
 
 This is the Windows module.
 
 
 [float]
-=== Example Configuration
+=== Example configuration
 
 The Windows module supports the standard configuration options that are described
 in <<configuration-metricbeat>>. Here is an example configuration:
