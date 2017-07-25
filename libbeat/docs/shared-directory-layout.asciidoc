@@ -10,7 +10,7 @@
 //////////////////////////////////////////////////////////////////////////
 
 [[directory-layout]]
-=== Directory Layout
+=== Directory layout
 
 The directory layout of an installation is as follows:
 

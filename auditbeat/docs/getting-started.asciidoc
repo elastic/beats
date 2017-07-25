@@ -176,8 +176,8 @@ output.elasticsearch:
   hosts: ["192.168.1.42:9200"]
 ----------------------------------------------------------------------
 +
-If you are sending output to Logstash, see <<config-{beatname_lc}-logstash>>
-instead.
+If you are sending output to Logstash, see
+<<logstash-output,Configure the Logstash output>> instead.
 
 . If you plan to use the sample Kibana dashboards provided with {beatname_uc},
 configure the Kibana endpoint:

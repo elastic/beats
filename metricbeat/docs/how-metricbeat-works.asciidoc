@@ -1,5 +1,5 @@
 [[how-metricbeat-works]]
-== How Metricbeat Works
+== How Metricbeat works
 
 Metricbeat consists of modules and metricsets. A Metricbeat _module_ defines the
 basic logic for collecting data from a specific service, such as Redis, MySQL,
@@ -41,7 +41,7 @@ The following topics provide more detail about the structure of Metricbeat event
 For more about the benefits of using Metricbeat, see <<key-features>>.
 
 [[metricbeat-event-structure]]
-===  Event Structure
+===  Event structure
 
 Every event sent by Metricbeat has the same basic structure. It contains the following fields:
 
@@ -79,7 +79,7 @@ For example:
 For more information about the exported fields, see <<exported-fields>>.
 
 [[error-event-structure]]
-===  Error Event Structure
+===  Error event structure
 
 Metricbeat sends an error event when the service is not reachable. The error event
 has the same structure as the <<metricbeat-event-structure,base event>>, but also
@@ -114,7 +114,7 @@ reachable:
 ----
 
 [[key-features]]
-=== Key Metricbeat Features
+=== Key metricbeat features
 
 Metricbeat has some key features that are critical to how it works:
 
@@ -124,7 +124,7 @@ Metricbeat has some key features that are critical to how it works:
 * <<multiple-events-in-one>>
 
 [[metricbeat-error-events]]
-==== Metricbeat Error Events
+==== Metricbeat error events
 
 Metricbeat sends more than just metrics. When it cannot retrieve metrics, it
 sends error events. The error is not simply a flag, but a full error string that is
@@ -140,7 +140,7 @@ retrieve metrics for more than one interval, you can infer that there is potenti
 something wrong with the host or host connectivity.
 
 [[no-aggregations]]
-==== No Aggregations When Data is Fetched
+==== No aggregations when data is fetched
 
 Metricbeat doesn't do aggregations like gauge, sum, counters, and so on. Metricbeat
 sends the raw data retrieved from the host to the output for processing. When using
@@ -149,7 +149,7 @@ Elasticsearch host for drilling down into the details, and the data can be
 reprocessed at any time. It also reduces the complexity of Metricbeat.
 
 [[more-than-numbers]]
-==== Sends More Than Just Numbers
+==== Sends more than just numbers
 
 Metricbeat sends more than just numbers. The metrics that Metricbeat sends can also
 contain strings to report status information. This is useful when you're using
@@ -161,7 +161,7 @@ Basic meta information about each metric (such as the host) is also sent as part
 of each event.
 
 [[multiple-events-in-one]]
-==== Multiple Metrics in One Event
+==== Multiple metrics in one event
 
 Rather than containing a single metric, each event created by Metricbeat
 contains a list of metrics. This means that you can retrieve all the metrics

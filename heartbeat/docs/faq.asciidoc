@@ -1,5 +1,5 @@
 [[faq]]
-== Frequently Asked Questions
+== Frequently asked questions
 
 This section contains frequently asked questions about Heartbeat. Also check
 out the

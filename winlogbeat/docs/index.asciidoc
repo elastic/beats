@@ -31,17 +31,6 @@ include::./upgrading.asciidoc[]
 
 include::./configuring-howto.asciidoc[]
 
-include::./winlogbeat-filtering.asciidoc[]
-
-include::../../libbeat/docs/shared-config-ingest.asciidoc[]
-
-:standalone:
-include::../../libbeat/docs/shared-env-vars.asciidoc[]
-
-:standalone:
-:win:
-include::../../libbeat/docs/yaml.asciidoc[]
-
 include::./fields.asciidoc[]
 
 include::./securing-winlogbeat.asciidoc[]

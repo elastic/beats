@@ -1,16 +1,15 @@
-== System Module
+== System module
 
 The System module allows you to monitor your servers. Because the System module always applies to the local
 server, the `hosts` config option is not needed.
 
 [float]
-=== Module-Specific Configuration Notes
+=== Module-specific configuration notes
 
 The System module has these additional config options:
 
 *`processes`*:: When the `process` metricset is enabled, you can use the `processes` option to define a list of
-regexp expressions to filter the processes that are reported. For more complex filtering, you should use the
-<<configuration-processors, processors>> configuration option.
+regexp expressions to filter the processes that are reported. For more complex filtering, you should use the `processors` configuration option. See <<filtering-and-enhancing-data>> for more information.
 +
 The following example config returns metrics for all processes:
 +

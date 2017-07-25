@@ -65,7 +65,7 @@ PS > {beatname_lc} setup
 
 
 [[view-kibana-dashboards]]
-==== Opening the Dashboards in Kibana
+==== Open the dashboards in Kibana
 
 After loading the dashboards, launch the Kibana web interface by pointing your browser
 to port 5601. For example, http://127.0.0.1:5601[http://127.0.0.1:5601].

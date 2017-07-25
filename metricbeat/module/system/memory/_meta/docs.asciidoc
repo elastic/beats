@@ -1,4 +1,4 @@
-=== System Memory Metricset
+=== System memory metricset
 
 The System `memory` metricset provides memory statistics.
 

@@ -1,9 +1,13 @@
 [[packetbeat-overview]]
-== Overview
+== Packetbeat overview
 
-Packetbeat is a real-time network packet analyzer that you can use 
+++++
+<titleabbrev>Overview</titleabbrev>
+++++
+
+Packetbeat is a real-time network packet analyzer that you can use
 with Elasticsearch to provide an _application monitoring and performance
-analytics system_. Packetbeat completes the {libbeat}/index.html[Beats platform] 
+analytics system_. Packetbeat completes the {libbeat}/index.html[Beats platform]
 by providing visibility between the servers of your network.
 
 Packetbeat works by capturing the network traffic between your application servers,
@@ -22,16 +26,16 @@ Currently, Packetbeat supports the following protocols:
 include::shared-protocol-list.asciidoc[]
 
 Packetbeat can insert the correlated transactions directly into Elasticsearch
-or into a central queue created with Redis and Logstash. 
+or into a central queue created with Redis and Logstash.
 
 Packetbeat can run on the same servers as your application processes or
 on its own servers. When running on dedicated servers, Packetbeat can get the
 traffic from the switch's mirror ports or from tapping devices. In such a
 deployment, there is zero overhead on the monitored application. See
-<<capturing-options>> for details.
+<<configuration-interfaces>> for details.
 
 After decoding the Layer 7 messages, Packetbeat correlates the requests with
-the responses in what we call _transactions_. For each transaction, Packetbeat 
+the responses in what we call _transactions_. For each transaction, Packetbeat
 inserts a JSON document into Elasticsearch. See the <<exported-fields>> section
 for details about which fields are indexed.
 

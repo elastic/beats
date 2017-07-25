@@ -1,5 +1,5 @@
 [id="{beatname_lc}-configuration-reloading"]
-=== Reload the configuration dynamically
+== Reload the configuration dynamically
 
 beta[]
 

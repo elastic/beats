@@ -1,4 +1,4 @@
-=== System Fsstat Metricset
+=== System fsstat metricset
 
 The System `fsstat` metricset provides overall file system statistics.
 

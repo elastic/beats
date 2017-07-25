@@ -23,7 +23,7 @@ install, configure, and run Heartbeat:
 
 
 [[heartbeat-installation]]
-=== Step 1: Installing Heartbeat
+=== Step 1: Install Heartbeat
 
 Unlike most Beats, which you install on edge nodes, you typically install
 Heartbeat as part of monitoring service that runs on a separate machine
@@ -151,10 +151,10 @@ endif::[]
 Before starting Heartbeat, you should look at the configuration options in
 the configuration file, for example +C:\Program Files\Heartbeat\heartbeat.yml+
 or +/etc/heartbeat/heartbeat.yml+. For more information about these
-options, see <<heartbeat-configuration-details>>.
+options, see <<configuring-howto-heartbeat>>.
 
 [[heartbeat-configuration]]
-=== Step 2: Configuring Heartbeat
+=== Step 2: Configure Heartbeat
 
 include::../../libbeat/docs/shared-configuring.asciidoc[]
 
@@ -200,7 +200,7 @@ was started. Heartbeat adds the `@every` keyword to the syntax provided by the
 <3> The `mode` specifies whether to ping one IP (`any`) or all resolvable IPs
 (`all`).
 +
-See <<heartbeat-configuration-details>> for a full description of each
+See <<configuring-howto-heartbeat>> for a full description of each
 configuration option.
 
 . If you are sending output to Elasticsearch, set the IP address and port where
@@ -212,8 +212,7 @@ output.elasticsearch:
   hosts: ["192.168.1.42:9200"]
 ----------------------------------------------------------------------
 +
-If you are sending output to Logstash, see <<config-heartbeat-logstash>>
-instead.
+If you are sending output to Logstash, see <<logstash-output>> instead.
 
 TIP: To test your configuration file, change to the directory where the
 Heartbeat binary is installed, and run Heartbeat in the foreground with
@@ -223,13 +222,13 @@ your config files are in the path expected by Heartbeat
 +./heartbeat.sh -configtest -e+.
 
 [[heartbeat-template]]
-=== Step 3: Loading the Index Template in Elasticsearch
+=== Step 3: Load the index template in Elasticsearch
 
 :allplatforms:
 include::../../libbeat/docs/shared-template-load.asciidoc[]
 
 [[heartbeat-starting]]
-=== Step 4: Starting Heartbeat
+=== Step 4: Start Heartbeat
 
 Start Heartbeat by issuing the appropriate command for your platform.
 
@@ -276,7 +275,7 @@ Heartbeat is now ready to check the status of your services and send
 events to your defined output.
 
 [[heartbeat-sample-dashboards]]
-=== Step 5: Loading Sample Kibana Dashboards
+=== Step 5: Load sample Kibana dashboards
 
 To make it easier for you to visualize the status of your services, we have
 created sample Heartbeat dashboards. The dashboards are provided as
