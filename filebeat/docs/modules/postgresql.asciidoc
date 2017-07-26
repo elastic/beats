@@ -1,0 +1,37 @@
+////
+This file is generated! See scripts/docs_collector.py
+////
+
+[[filebeat-module-postgresql]]
+== PostgreSQL module
+
+This module collects and parses the logs created by https://www.postgresql.org/[PostgreSQL].
+
+[float]
+=== Compatibility
+
+The PostgreSQL module was tested with logs from versions 9.5 on Debian.
+
+[float]
+=== Dashboard
+
+This module comes with a sample dashboard.
+
+image::./images/filebeat-postgresql-overview.png[]
+
+[float]
+=== Logs fileset settings
+
+[float]
+==== var.paths
+
+An array of paths where to look for the log files. If left empty, Filebeat
+will choose the paths depending on your operating systems.
+
+
+[float]
+=== Fields
+
+For a description of each field in the metricset, see the
+<<exported-fields-postgresql,exported fields>> section.
+

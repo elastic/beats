@@ -1,0 +1,64 @@
+{
+  "objects": [
+    {
+      "attributes": {
+        "description": "",
+        "kibanaSavedObjectMeta": {
+          "searchSourceJSON": "{\"filter\":[]}"
+        },
+        "savedSearchId": "ef9da9b0-776c-11e7-9e03-393c0d1aa325",
+        "title": "PostgreSQL Log Level Count",
+        "uiStateJSON": "{\"vis\":{\"params\":{\"sort\":{\"columnIndex\":null,\"direction\":null}}}}",
+        "version": 1,
+        "visState": "{\"title\":\"PostgreSQL Log Level Count\",\"type\":\"table\",\"params\":{\"perPage\":10,\"showPartialRows\":false,\"showMeticsAtAllLevels\":false,\"sort\":{\"columnIndex\":null,\"direction\":null},\"showTotal\":false,\"totalFunc\":\"sum\"},\"aggs\":[{\"id\":\"1\",\"enabled\":true,\"type\":\"count\",\"schema\":\"metric\",\"params\":{}},{\"id\":\"2\",\"enabled\":true,\"type\":\"terms\",\"schema\":\"bucket\",\"params\":{\"field\":\"postgresql.log.level\",\"size\":12,\"order\":\"desc\",\"orderBy\":\"1\"}}]}"
+      },
+      "id": "28563b50-776d-11e7-9e03-393c0d1aa325",
+      "type": "visualization",
+      "version": 1
+    },
+    {
+      "attributes": {
+        "columns": [
+          "postgresql.log.user",
+          "postgresql.log.database",
+          "postgresql.log.level",
+          "postgresql.log.message",
+          "postgresql.log.query"
+        ],
+        "description": "",
+        "hits": 0,
+        "kibanaSavedObjectMeta": {
+          "searchSourceJSON": "{\"index\":\"a0b887a0-763d-11e7-9e03-393c0d1aa325\",\"highlightAll\":true,\"version\":true,\"query\":{\"query\":\"postgresql.log.level:*\",\"language\":\"lucene\"},\"filter\":[]}"
+        },
+        "sort": [
+          "@timestamp",
+          "desc"
+        ],
+        "title": "PostgreSQL All Logs",
+        "version": 1
+      },
+      "id": "ef9da9b0-776c-11e7-9e03-393c0d1aa325",
+      "type": "search",
+      "version": 1
+    },
+    {
+      "attributes": {
+        "description": "",
+        "hits": 0,
+        "kibanaSavedObjectMeta": {
+          "searchSourceJSON": "{\"query\":{\"query\":\"\",\"language\":\"lucene\"},\"filter\":[],\"highlightAll\":true,\"version\":true}"
+        },
+        "optionsJSON": "{\"darkTheme\":false}",
+        "panelsJSON": "[{\"size_x\":6,\"size_y\":3,\"panelIndex\":1,\"type\":\"visualization\",\"id\":\"28563b50-776d-11e7-9e03-393c0d1aa325\",\"col\":1,\"row\":4},{\"size_x\":12,\"size_y\":3,\"panelIndex\":2,\"type\":\"search\",\"id\":\"ef9da9b0-776c-11e7-9e03-393c0d1aa325\",\"col\":1,\"row\":1,\"columns\":[\"postgresql.log.user\",\"postgresql.log.database\",\"postgresql.log.level\",\"postgresql.log.message\",\"postgresql.log.query\"],\"sort\":[\"@timestamp\",\"desc\"]}]",
+        "timeRestore": false,
+        "title": "PostgreSQL All Logs",
+        "uiStateJSON": "{\"P-1\":{\"vis\":{\"params\":{\"sort\":{\"columnIndex\":null,\"direction\":null}}}}}",
+        "version": 1
+      },
+      "id": "a21284c0-776e-11e7-9e03-393c0d1aa325",
+      "type": "dashboard",
+      "version": 1
+    }
+  ],
+  "version": "6.0.0-beta1-SNAPSHOT"
+}
