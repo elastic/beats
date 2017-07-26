@@ -8,7 +8,72 @@
 // Template, add newest changes here
 
 === Beats version HEAD
-https://github.com/elastic/beats/compare/v6.0.0-alpha2...master[Check the HEAD diff]
+https://github.com/elastic/beats/compare/v6.0.0-beta1...master[Check the HEAD diff]
+
+==== Breaking changes
+
+*Affecting all Beats*
+
+*Filebeat*
+
+*Heartbeat*
+
+*Metricbeat*
+
+*Packetbeat*
+
+*Winlogbeat*
+
+==== Bugfixes
+
+*Filebeat*
+
+*Heartbeat*
+
+*Metricbeat*
+
+*Packetbeat*
+
+*Winlogbeat*
+
+==== Added
+
+*Affecting all Beats*
+
+*Filebeat*
+
+*Heartbeat*
+
+*Metricbeat*
+
+*Packetbeat*
+
+*Winlogbeat*
+
+*Auditbeat*
+
+==== Deprecated
+
+*Affecting all Beats*
+
+*Filebeat*
+
+*Heartbeat*
+
+*Metricbeat*
+
+*Packetbeat*
+
+*Winlogbeat*
+
+==== Known Issue
+
+
+////////////////////////////////////////////////////////////
+
+[[release-notes-6.0.0-beta1]]
+=== Beats version 6.0.0-beta1
+https://github.com/elastic/beats/compare/v6.0.0-alpha2...v6.0.0-beta1[View commits]
 
 ==== Breaking changes
 
@@ -23,13 +88,12 @@ https://github.com/elastic/beats/compare/v6.0.0-alpha2...master[Check the HEAD d
 - Remove setting `dashboard.snapshot` and `dashboard.snapshot_url`. They are no longer needed because the
   dashboards are included in the packages by default. {pull}4675[4675]
 
-*Filebeat*
-
 *Heartbeat*
 
 - Renamed the heartbeat RPM/DEB name to `heartbeat-elastic`. {pull}4601[4601]
 
 *Metricbeat*
+
 - Change all `system.cpu.*.pct` metrics to be scaled by the number of CPU cores.
   This will make the CPU usage percentages from the system cpu metricset consistent
   with the system process metricset. The documentation for these metrics already
@@ -40,8 +104,6 @@ https://github.com/elastic/beats/compare/v6.0.0-alpha2...master[Check the HEAD d
 
 - Remove the already unsupported `pf_ring` sniffer option. {pull}4608[4608]
 
-*Winlogbeat*
-
 ==== Bugfixes
 
 *Affecting all Beats*
@@ -50,10 +112,6 @@ https://github.com/elastic/beats/compare/v6.0.0-alpha2...master[Check the HEAD d
 - Fix race condition in internal logging rotator. {pull}4519[4519]
 - Normalize all times to UTC to ensure proper index naming. {issue}4569[4569]
 - Fix issue with loading dashboards to ES 6.0 when .kibana index did not already exist. {issue}4659[4659]
-
-*Filebeat*
-
-*Heartbeat*
 
 *Metricbeat*
 
@@ -102,6 +160,7 @@ https://github.com/elastic/beats/compare/v6.0.0-alpha2...master[Check the HEAD d
 - Enabled Cgo which means libc is dynamically compiled. {pull}4546[4546]
 
 *Metricbeat*
+
 - Add random startup delay to each metricset to avoid the thundering herd problem. {issue}4010[4010]
 - Add the ability to configure audit rules to the kernel module. {pull}4482[4482]
 - Add the ability to configure kernel's audit failure mode. {pull}4516[4516]
@@ -110,32 +169,13 @@ https://github.com/elastic/beats/compare/v6.0.0-alpha2...master[Check the HEAD d
 - Add `test modules` command, to test modules expected output. {pull}4656[4656]
 - Add `processors` setting to metricbeat modules. {pull}4699[4699]
 
-*Packetbeat*
-
 *Winlogbeat*
+
 - Add the ability to use LevelRaw if Level isn't populated in the event XML. {pull}4257[4257]
 
 *Auditbeat*
+
 - Add file integrity metricset to the audit module. {pull}4486[4486]
-
-==== Deprecated
-
-*Affecting all Beats*
-
-*Filebeat*
-
-*Heartbeat*
-
-*Metricbeat*
-
-*Packetbeat*
-
-*Winlogbeat*
-
-==== Known Issue
-
-
-////////////////////////////////////////////////////////////
 
 [[release-notes-6.0.0-alpha2]]
 === Beats version 6.0.0-alpha2
@@ -351,6 +391,81 @@ https://github.com/elastic/beats/compare/v5.4.0...v6.0.0-alpha1[View commits]
 *Filebeat*
 
 - Prospector reloading only works properly with new files. {pull}3546[3546]
+
+[[release-notes-5.5.1]]
+=== Beats version 5.5.1
+https://github.com/elastic/beats/compare/v5.5.0...v5.5.1[View commits]
+
+==== Bugfixes
+
+*Affecting all Beats*
+
+- Normalize all times to UTC to ensure proper index naming. {issue}4569[4569]
+
+[[release-notes-5.5.0]]
+=== Beats version 5.5.0
+https://github.com/elastic/beats/compare/v5.4.2...v5.5.0[View commits]
+
+==== Breaking changes
+
+*Affecting all Beats*
+
+- Usage of field `_type` is now ignored and hardcoded to `doc`. {pull}3757[3757]
+
+*Metricbeat*
+- Change all `system.cpu.*.pct` metrics to be scaled by the number of CPU cores.
+  This will make the CPU usage percentages from the system cpu metricset consistent
+  with the system process metricset. The documentation for these metrics already
+  stated that on multi-core systems the percentages could be greater than 100%. {pull}4544[4544]
+
+==== Bugfixes
+
+*Affecting all Beats*
+
+- Fix console output. {pull}4045[4045]
+
+*Filebeat*
+
+- Allow string characters in user agent patch version (NGINX and Apache) {pull}4415[4415]
+
+*Metricbeat*
+
+- Fix type of field `haproxy.stat.check.health.last`. {issue}4407[4407]
+
+*Packetbeat*
+
+- Fix `packetbeat.interface` options that contain underscores (e.g. `with_vlans` or `bpf_filter`). {pull}4378[4378]
+- Enabled /proc/net/tcp6 scanning and fixed ip v6 parsing. {pull}4442[4442]
+
+==== Deprecated
+
+*Filebeat*
+
+- Deprecate `document_type` prospector config option as _type is removed in elasticsearch 6.0. Use fields instead. {pull}4225[4225]
+
+*Winlogbeat*
+
+- Deprecated metrics endpoint. It is superseded by a libbeat feature that can serve metrics on an HTTP endpoint. {pull}4145[4145]
+
+[[release-notes-5.4.2]]
+=== Beats version 5.4.2
+https://github.com/elastic/beats/compare/v5.4.1...v5.4.2[View commits]
+
+==== Bugfixes
+
+*Affecting all Beats*
+
+- Removed empty sections from the template files, causing indexing errors for array objects. {pull}4488[4488]
+
+*Metricbeat*
+
+- Fix issue affecting Windows services timing out at startup. {pull}4491[4491]
+- Add filtering to system filesystem metricset to remove relative mountpoints like those
+  from Linux network namespaces. {pull}4370[4370]
+
+*Packetbeat*
+
+- Clean configured geoip.paths before attempting to open the database. {pull}4306[4306]
 
 [[release-notes-5.4.1]]
 === Beats version 5.4.1
