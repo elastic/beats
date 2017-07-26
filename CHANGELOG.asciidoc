@@ -26,11 +26,15 @@ https://github.com/elastic/beats/compare/v6.0.0-beta1...master[Check the HEAD di
 
 ==== Bugfixes
 
+*Affecting all Beats*
+
 *Filebeat*
 
 *Heartbeat*
 
 *Metricbeat*
+
+- Support `npipe` protocol (Windows) in Docker module. {pull}4751[4751]
 
 *Packetbeat*
 
