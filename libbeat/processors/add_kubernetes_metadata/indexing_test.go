@@ -209,3 +209,49 @@ func TestFilteredGenMeta(t *testing.T) {
 	ok, _ = annotationsMap.HasKey("a")
 	assert.Equal(t, ok, true)
 }
+
+func TestFilteredGenMetaExclusion(t *testing.T) {
+	var testConfig = common.NewConfig()
+
+	filteredGen := &GenDefaultMeta{
+		labelsExclude: []string{"x"},
+	}
+	podIndexer, err := NewPodNameIndexer(*testConfig, filteredGen)
+	assert.Nil(t, err)
+
+	podName := "testpod"
+	ns := "testns"
+	pod := Pod{
+		Metadata: ObjectMeta{
+			Name:      podName,
+			Namespace: ns,
+			Labels: map[string]string{
+				"foo": "bar",
+				"x":   "y",
+			},
+			Annotations: map[string]string{
+				"a": "b",
+				"c": "d",
+			},
+		},
+		Spec: PodSpec{},
+	}
+
+	assert.Nil(t, err)
+
+	indexers := podIndexer.GetMetadata(&pod)
+	assert.Equal(t, len(indexers), 1)
+
+	rawLabels, _ := indexers[0].Data["labels"]
+	assert.NotNil(t, rawLabels)
+
+	labelMap, ok := rawLabels.(common.MapStr)
+	assert.Equal(t, ok, true)
+	assert.Equal(t, len(labelMap), 1)
+
+	ok, _ = labelMap.HasKey("foo")
+	assert.Equal(t, ok, true)
+
+	ok, _ = labelMap.HasKey("x")
+	assert.Equal(t, ok, false)
+}
