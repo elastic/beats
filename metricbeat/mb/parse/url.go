@@ -61,7 +61,8 @@ func (b URLHostParserBuilder) Build() mb.HostParser {
 
 // NewHostDataFromURL returns a new HostData based on the contents of the URL.
 // If the URLs scheme is "unix" or end is "unix" (e.g. "http+unix://") then
-// the HostData.Host field is set to the URLs path instead of the URLs host.
+// the HostData.Host field is set to the URLs path instead of the URLs host,
+// the same happens for "npipe".
 func NewHostDataFromURL(u *url.URL) mb.HostData {
 	var user, pass string
 	if u.User != nil {
@@ -70,7 +71,7 @@ func NewHostDataFromURL(u *url.URL) mb.HostData {
 	}
 
 	host := u.Host
-	if strings.HasSuffix(u.Scheme, "unix") {
+	if strings.HasSuffix(u.Scheme, "unix") || strings.HasSuffix(u.Scheme, "npipe") {
 		host = u.Path
 	}
 
@@ -140,7 +141,7 @@ func getURL(rawURL, scheme, username, password, path, query string) (*url.URL, e
 
 	SetURLUser(u, username, password)
 
-	if !strings.HasSuffix(u.Scheme, "unix") {
+	if !strings.HasSuffix(u.Scheme, "unix") && !strings.HasSuffix(u.Scheme, "npipe") {
 		if u.Host == "" {
 			return nil, fmt.Errorf("error parsing URL: empty host")
 		}
