@@ -74,8 +74,9 @@ func newKubernetesAnnotator(cfg *common.Config) (processors.Processor, error) {
 	}
 
 	metaGen := &GenDefaultMeta{
-		labels:      config.IncludeLabels,
-		annotations: config.IncludeAnnotations,
+		labels:        config.IncludeLabels,
+		annotations:   config.IncludeAnnotations,
+		labelsExclude: config.ExcludeLabels,
 	}
 
 	indexers := Indexers{
