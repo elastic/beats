@@ -1,4 +1,4 @@
-package membroker
+package memqueue
 
 import (
 	"fmt"

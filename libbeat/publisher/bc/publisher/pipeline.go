@@ -9,8 +9,8 @@ import (
 	"github.com/elastic/beats/libbeat/monitoring"
 	"github.com/elastic/beats/libbeat/outputs"
 	"github.com/elastic/beats/libbeat/processors"
-	"github.com/elastic/beats/libbeat/publisher/broker"
 	"github.com/elastic/beats/libbeat/publisher/pipeline"
+	"github.com/elastic/beats/libbeat/publisher/queue"
 )
 
 func createPipeline(
@@ -67,25 +67,25 @@ func createPipeline(
 		},
 	}
 
-	brokerType := "mem"
+	queueType := "mem"
 	if b := shipper.Queue.Name(); b != "" {
-		brokerType = b
+		queueType = b
 	}
 
-	brokerFactory := broker.FindFactory(brokerType)
-	if brokerFactory == nil {
-		return nil, fmt.Errorf("'%v' is no valid queue type", brokerType)
+	queueFactory := queue.FindFactory(queueType)
+	if queueFactory == nil {
+		return nil, fmt.Errorf("'%v' is no valid queue type", queueType)
 	}
 
-	brokerConfig := shipper.Queue.Config()
-	if brokerConfig == nil {
-		brokerConfig = common.NewConfig()
+	queueConfig := shipper.Queue.Config()
+	if queueConfig == nil {
+		queueConfig = common.NewConfig()
 	}
 
 	p, err := pipeline.New(
 		monitoring.Default.GetRegistry("libbeat"),
-		func(eventer broker.Eventer) (broker.Broker, error) {
-			return brokerFactory(eventer, brokerConfig)
+		func(eventer queue.Eventer) (queue.Queue, error) {
+			return queueFactory(eventer, queueConfig)
 		},
 		out, settings,
 	)

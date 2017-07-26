@@ -12,7 +12,7 @@ import (
 // Config object for loading a pipeline instance via Load.
 type Config struct {
 	WaitShutdown time.Duration          `config:"wait_shutdown"`
-	Broker       common.ConfigNamespace `config:"broker"`
+	Queue        common.ConfigNamespace `config:"queue"`
 	Output       common.ConfigNamespace `config:"output"`
 }
 
