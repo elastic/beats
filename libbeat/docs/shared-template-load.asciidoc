@@ -37,21 +37,21 @@ For more information, see:
 
 By default, {beatname_uc} automatically loads the recommended template file, +fields.yml+,
 if Elasticsearch output is enabled. You can configure {beatname_lc} to load a different template
-by adjusting the `template.name` and `template.fields` options in +{beatname_lc}.yml+ file:
+by adjusting the `setup.template.name` and `setup.template.fields` options in
++{beatname_lc}.yml+ file:
 
 ["source","yaml",subs="attributes,callouts"]
 ----------------------------------------------------------------------
-output.elasticsearch:
-  hosts: ["localhost:9200"]
-  template.name: "{beatname_lc}"
-  template.fields: "fields.yml"
-  template.overwrite: false
+setup.template.name: "{beatname_lc}"
+setup.template.fields: "path/to/fields.yml"
+setup.template.overwrite: false
 ----------------------------------------------------------------------
 
 By default, if a template already exists in the index, it is not overwritten. To overwrite an existing
-template, set `template.overwrite: true` in the configuration file.
+template, set `setup.template.overwrite: true` in the configuration file.
 
-To disable automatic template loading, comment out the template part under the Elasticsearch output.
+To disable automatic template loading, either comment out the `setup.template`
+fields, or set `setup.template.enabled: true`.
 
 The options for auto loading the template are not supported if you are using the
 Logstash output.

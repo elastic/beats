@@ -162,8 +162,8 @@ auditbeat.modules:
 -------------------------------------
 +
 If you accept the default configuration without specifying additional modules,
-{beatname_uc} uses a default configuration that's tailored to the operating system
-where {beatname_uc} is running.
+{beatname_uc} uses a configuration that's tailored to the operating system where
+{beatname_uc} is running.
 +
 See <<configuring-howto-{beatname_lc}>> for more details about configuring modules.
 
@@ -173,7 +173,7 @@ See <<configuring-howto-{beatname_lc}>> for more details about configuring modul
 [source,yaml]
 ----------------------------------------------------------------------
 output.elasticsearch:
-  hosts: ["192.168.1.42:9200"]
+  hosts: ["127.0.0.1:9200"]
 ----------------------------------------------------------------------
 +
 If you are sending output to Logstash, see
@@ -241,6 +241,9 @@ sudo ./{beatname_lc} -e -c {beatname_lc}.yml -d "publish"
 need to change ownership of the configuration file (see
 {libbeat}/config-file-permissions.html[Config File Ownership and Permissions]
 in the _Beats Platform Reference_).
+
+If you see a warning about too many open files, you need to increase the
+`ulimit`. See the <<ulimit,FAQ>> for more details.
 
 *win:*
 

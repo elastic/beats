@@ -14,6 +14,8 @@
 [[load-kibana-dashboards]]
 ==== Set up the dashboards
 
+//TODO: Move this section to appear before the step where you run the beat. The section aobut opening the dashboard should be moved to a separate file so it can be shown as the final step.
+
 {beatname_uc} comes packaged with example Kibana dashboards, visualizations,
 and searches for visualizing {beatname_uc} data in Kibana. Before you can use
 the dashboards, you need to run the `setup` command to create the index
@@ -22,6 +24,8 @@ pattern, +{beatname_lc}-*+, and load the dashboards into the Kibana index.
 NOTE: Starting with Beats 6.0.0, the dashboards are loaded via the Kibana API.
 This requires a Kibana endpoint configuration. You should have configured the
 endpoint earlier. If you didn't, configure it now.
+
+Make sure Kibana is running before you perform this step.
 
 To set up the Kibana dashboards for {beatname_uc}:
 
