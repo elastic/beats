@@ -1,4 +1,4 @@
-== Prometheus Module
+== Prometheus module
 
 beta[]
 

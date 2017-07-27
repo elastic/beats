@@ -1,4 +1,4 @@
-=== System CPU Metricset
+=== System cpu metricset
 
 The System `cpu` metricset provides CPU statistics.
 

@@ -1,6 +1,6 @@
-== Jolokia Module
+== Jolokia module
 
 beta[]
 
-This is the Jolokia Module.
+This is the Jolokia module.
 

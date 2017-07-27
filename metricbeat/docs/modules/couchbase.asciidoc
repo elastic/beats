@@ -3,7 +3,7 @@ This file is generated! See scripts/docs_collector.py
 ////
 
 [[metricbeat-module-couchbase]]
-== Couchbase Module
+== Couchbase module
 
 beta[]
 
@@ -12,7 +12,7 @@ servers.
 
 
 [float]
-=== Example Configuration
+=== Example configuration
 
 The Couchbase module supports the standard configuration options that are described
 in <<configuration-metricbeat>>. Here is an example configuration:

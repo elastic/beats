@@ -20,9 +20,10 @@ After installing the Elastic Stack, read the following topics to learn how to in
 * <<filebeat-modules-quickstart>>
 * <<command-line-options>>
 * <<directory-layout>>
+* <<setup-repositories>>
 
 [[filebeat-installation]]
-=== Step 1: Installing Filebeat
+=== Step 1: Install Filebeat
 
 Before running Filebeat, you need to install and configure the Elastic stack. See
 {libbeat}/getting-started.html[Getting Started with Beats and the Elastic Stack].
@@ -138,7 +139,7 @@ NOTE: If script execution is disabled on your system, you need to set the execut
 endif::[]
 
 [[filebeat-configuration]]
-=== Step 2: Configuring Filebeat
+=== Step 2: Configure Filebeat
 
 TIP: <<filebeat-modules-overview,Filebeat modules>> provide the fastest getting
 started experience for common log formats. See <<filebeat-modules-quickstart>>
@@ -203,22 +204,22 @@ installed from DEB or RPM packages, run +./filebeat.sh -configtest -e+.
 Before starting Filebeat, you should look at the configuration options in the
 configuration file, for example `C:\Program Files\Filebeat\filebeat.yml` or
 `/etc/filebeat/filebeat.yml`. For more information about these options,
-see <<filebeat-configuration-details>>.
+see <<configuring-howto-filebeat>>.
 
 [[config-filebeat-logstash]]
-=== Step 3: Configuring Filebeat to Use Logstash
+=== Step 3: Configure Filebeat to use Logstash
 
 :allplatforms:
 include::../../libbeat/docs/shared-logstash-config.asciidoc[]
 
 [[filebeat-template]]
-=== Step 4: Loading the Index Template in Elasticsearch
+=== Step 4: Load the index template in Elasticsearch
 
 :allplatforms:
 include::../../libbeat/docs/shared-template-load.asciidoc[]
 
 [[filebeat-starting]]
-=== Step 5: Starting Filebeat
+=== Step 5: Start Filebeat
 
 Start Filebeat by issuing the appropriate command for your platform.
 
@@ -271,7 +272,7 @@ By default, Windows log files are stored in `C:\ProgramData\filebeat\Logs`.
 Filebeat is now ready to send log files to your defined output.
 
 [[filebeat-index-pattern]]
-=== Step 6: Loading the Kibana Index Pattern
+=== Step 6: Load the Kibana index pattern
 
 We don't offer prebuilt dashboards for visualizing Filebeat data. However, to make it easier for you to explore Filebeat
 data in Kibana, we've created a Filebeat index pattern: `filebeat-*`. To load this pattern, you can use the script

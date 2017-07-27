@@ -3,15 +3,15 @@ This file is generated! See scripts/docs_collector.py
 ////
 
 [[metricbeat-module-golang]]
-== golang Module
+== Golang module
 
-This is the golang Module. Metrics are collected submitting HTTP GET requests to golang-expvar-api.
-Reference: https://golang.org/pkg/expvar/
+The golang module collects metrics by submitting HTTP GET requests to https://golang.org/pkg/expvar/[golang-expvar-api].
+
 
 [float]
-=== Example Configuration
+=== Example configuration
 
-The golang module supports the standard configuration options that are described
+The Golang module supports the standard configuration options that are described
 in <<configuration-metricbeat>>. Here is an example configuration:
 
 [source,yaml]

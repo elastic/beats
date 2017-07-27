@@ -1,4 +1,4 @@
-=== HAProxy Stat Metricset
+=== HAProxy stat metricset
 
 The HAProxy `stat` metricset collects 'stat' fields from HAProxy processes.
 

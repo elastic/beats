@@ -15,14 +15,14 @@ following tips:
 --
 
 [[getting-help]]
-== Getting Help
+== Get help
 
 include::../../libbeat/docs/getting-help.asciidoc[]
 
 //sets block macro for debugging.asciidoc included in next section
 
 [[enable-heartbeat-debugging]]
-== Debugging
+== Debug
 
 include::../../libbeat/docs/debugging.asciidoc[]
 

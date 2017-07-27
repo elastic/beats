@@ -1,4 +1,4 @@
-== HAProxy Module
+== HAProxy module
 
 This module collects stats from http://www.haproxy.org/[HAProxy]. To configure
 HAProxy to collect stats, you must enable the stats socket via TCP. For example,

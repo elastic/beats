@@ -3,7 +3,7 @@ This file is generated! See scripts/docs_collector.py
 ////
 
 [[metricbeat-module-nginx]]
-== Nginx Module
+== Nginx module
 
 This module periodically fetches metrics from https://nginx.org/[Nginx] servers.
 
@@ -16,7 +16,7 @@ The Nginx metricsets were tested with Nginx 1.9 and are expected to work with al
 
 
 [float]
-=== Example Configuration
+=== Example configuration
 
 The Nginx module supports the standard configuration options that are described
 in <<configuration-metricbeat>>. Here is an example configuration:

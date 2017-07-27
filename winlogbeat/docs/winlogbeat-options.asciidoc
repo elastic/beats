@@ -2,7 +2,7 @@
   supporting the Windows Event Log API (Microsoft Windows Vista and newer).
 
 [[configuration-winlogbeat-options]]
-=== Winlogbeat
+== Set up Winlogbeat
 
 The `winlogbeat` section of the +{beatname_lc}.yml+ config file specifies all options that are specific to Winlogbeat.
 Most importantly, it contains the list of event logs to monitor.
@@ -18,11 +18,13 @@ winlogbeat.event_logs:
   - name: System
 --------------------------------------------------------------------------------
 
-==== Winlogbeat Options
+[float]
+=== Configuration options
 
 You can specify the following options in the `winlogbeat` section of the +{beatname_lc}.yml+ config file:
 
-===== registry_file
+[float]
+==== `registry_file`
 
 The name of the file where Winlogbeat stores information that it uses to resume
 monitoring after a restart. By default the file is stored as `.winlogbeat.yml`
@@ -40,7 +42,8 @@ backslashes (\) for Windows compatibility. You can use either forward or
 backslashes. Forward slashes are easier to work with in YAML because there is no
 need to escape them.
 
-===== event_logs
+[float]
+==== `event_logs`
 
 A list of entries (called 'dictionaries' in YAML) that specify which event logs
 to monitor. Each entry in the list defines an event log to monitor as well as
@@ -53,7 +56,8 @@ winlogbeat.event_logs:
   - name: Application
 --------------------------------------------------------------------------------
 
-===== event_logs.batch_read_size
+[float]
+==== `event_logs.batch_read_size`
 
 experimental[]
 
@@ -67,8 +71,9 @@ Windows API, applies any processors to the events, publishes them to the
 configured outputs, and waits for an acknowledgement from the outputs before
 reading additional event log records.
 
+[float]
 [[configuration-winlogbeat-options-event_logs-name]]
-===== event_logs.name
+==== `event_logs.name`
 
 The name of the event log to monitor. Each dictionary under `event_logs` must
 have a `name` field. You can get a list of available event logs by running
@@ -121,7 +126,8 @@ winlogbeat.event_logs:
   - name: Microsoft-Windows-Windows Firewall With Advanced Security/Firewall
 --------------------------------------------------------------------------------
 
-===== event_logs.ignore_older
+[float]
+==== `event_logs.ignore_older`
 
 If this option is specified, Winlogbeat filters events that are older than the
 specified amount of time. Valid time units are "ns", "us" (or "µs"), "ms", "s",
@@ -136,7 +142,8 @@ winlogbeat.event_logs:
     ignore_older: 168h
 --------------------------------------------------------------------------------
 
-===== event_logs.forwarded
+[float]
+==== `event_logs.forwarded`
 
 A boolean flag to indicate that the log contains only events collected from
 remote hosts using the Windows Event Collector. The value defaults to true for
@@ -149,7 +156,8 @@ Collector subscription should be configured to use the "RenderedText" format
 (this is the default) to ensure that the events are distributed with messages
 and descriptions.
 
-===== event_logs.event_id
+[float]
+==== `event_logs.event_id`
 
 A whitelist and blacklist of event IDs. The value is a comma-separated list. The
 accepted values are single event IDs to include (e.g. 4624), a range of event
@@ -195,7 +203,8 @@ processors:
 =======================================
 
 
-===== event_logs.level
+[float]
+==== `event_logs.level`
 
 A list of event levels to include. The value is a comma-separated list of
 levels. *{vista_and_newer}*
@@ -228,7 +237,8 @@ winlogbeat.event_logs:
     level: critical, error, warning
 --------------------------------------------------------------------------------
 
-===== event_logs.provider
+[float]
+==== `event_logs.provider`
 
 A list of providers (source names) to include. The value is a YAML list.
 *{vista_and_newer}*
@@ -263,7 +273,8 @@ Microsoft-Windows-Security-Auditing
 Microsoft-Windows-Eventlog
 --------------------------------------------------------------------------------
 
-===== event_logs.include_xml
+[float]
+==== `event_logs.include_xml`
 
 Boolean option that controls if the raw XML representation of an event is
 included in the data sent by Winlogbeat. The default is false.
@@ -282,7 +293,8 @@ winlogbeat.event_logs:
     include_xml: true
 --------------------------------------------------------------------------------
 
-===== event_logs.tags
+[float]
+==== `event_logs.tags`
 
 A list of tags that the Beat includes in the `tags` field of each published
 event. Tags make it easy to select specific events in Kibana or apply
@@ -298,8 +310,9 @@ winlogbeat.event_logs:
     tags: ["web"]
 --------------------------------------------------------------------------------
 
+[float]
 [[winlogbeat-configuration-fields]]
-===== event_logs.fields
+==== `event_logs.fields`
 
 Optional fields that you can specify to add additional information to the
 output. For example, you might add fields that you can use for filtering event
@@ -318,24 +331,12 @@ winlogbeat.event_logs:
       customer_id: 51415432
 --------------------------------------------------------------------------------
 
-===== event_logs.fields_under_root
+[float]
+==== `event_logs.fields_under_root`
 
 If this option is set to true, the custom <<winlogbeat-configuration-fields>>
 are stored as top-level fields in the output document instead of being grouped
 under a `fields` sub-dictionary. If the custom field names conflict with other
 field names added by Winlogbeat, then the custom fields overwrite the other
 fields.
-
-include::../../../../libbeat/docs/generalconfig.asciidoc[]
-
-include::../../../../libbeat/docs/processors-config.asciidoc[]
-
-include::../../../../libbeat/docs/outputconfig.asciidoc[]
-
-include::../../../../libbeat/docs/shared-path-config.asciidoc[]
-
-include::../../../../libbeat/docs/setup-config.asciidoc[]
-
-include::../../../../libbeat/docs/loggingconfig.asciidoc[]
-
 

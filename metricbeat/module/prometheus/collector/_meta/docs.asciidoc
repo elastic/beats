@@ -1,4 +1,4 @@
-=== Prometheus Collector Metricset
+=== Prometheus collector metricset
 
 The Prometheus `collector` metricset fetches data from https://prometheus.io/docs/instrumenting/exporters/[prometheus exporters].
 
