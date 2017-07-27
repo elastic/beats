@@ -7,7 +7,6 @@ import (
 )
 
 type Pipeline interface {
-	Close() error
 	Connect() (Client, error)
 	ConnectWith(ClientConfig) (Client, error)
 	SetACKHandler(PipelineACKHandler) error

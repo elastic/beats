@@ -47,11 +47,7 @@ func createPipeline(
 		monitoring.NewString(outReg, "type").Set(outcfg.Name())
 	}
 
-	name := shipper.Name
-	if name == "" {
-		name = beatInfo.Hostname
-	}
-
+	name := beatInfo.Name
 	settings := pipeline.Settings{
 		WaitClose:     0,
 		WaitCloseMode: pipeline.NoWaitOnClose,

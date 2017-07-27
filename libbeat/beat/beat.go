@@ -58,6 +58,7 @@ import (
 	"github.com/elastic/beats/libbeat/plugin"
 	"github.com/elastic/beats/libbeat/processors"
 	"github.com/elastic/beats/libbeat/publisher/bc/publisher"
+	"github.com/elastic/beats/libbeat/publisher/beat"
 	svc "github.com/elastic/beats/libbeat/service"
 	"github.com/elastic/beats/libbeat/template"
 	"github.com/elastic/beats/libbeat/version"
@@ -108,10 +109,10 @@ type SetupMLCallback func(*Beat) error
 // Beat contains the basic beat data and the publisher client used to publish
 // events.
 type Beat struct {
-	Info      common.BeatInfo     // beat metadata.
-	RawConfig *common.Config      // Raw config that can be unpacked to get Beat specific config data.
-	Config    BeatConfig          // Common Beat configuration data.
-	Publisher publisher.Publisher // Publisher
+	Info      common.BeatInfo // beat metadata.
+	RawConfig *common.Config  // Raw config that can be unpacked to get Beat specific config data.
+	Config    BeatConfig      // Common Beat configuration data.
+	Publisher beat.Pipeline   // Publisher pipeline
 
 	SetupMLCallback SetupMLCallback // setup callback for ML job configs
 	InSetupCmd      bool            // this is set to true when the `setup` command is called
@@ -249,16 +250,16 @@ func (b *Beat) createBeater(bt Creator) (Beater, error) {
 	}
 
 	debugf("Initializing output plugins")
-	publisher, err := publisher.New(b.Info, b.Config.Output, b.Config.Shipper, processors)
+	pipeline, err := publisher.New(b.Info, b.Config.Output, b.Config.Shipper, processors)
 	if err != nil {
 		return nil, fmt.Errorf("error initializing publisher: %v", err)
 	}
 
 	// TODO: some beats race on shutdown with publisher.Stop -> do not call Stop yet,
 	//       but refine publisher to disconnect clients on stop automatically
-	// defer publisher.Stop()
+	// defer pipeline.Close()
 
-	b.Publisher = publisher
+	b.Publisher = pipeline
 	beater, err := bt(b, sub)
 	if err != nil {
 		return nil, err
