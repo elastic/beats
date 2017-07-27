@@ -21,7 +21,7 @@ This file is generated! See scripts/docs_collector.py
   * <<metricbeat-module-mongodb,MongoDB>>
   * <<metricbeat-module-mysql,MySQL>>
   * <<metricbeat-module-nginx,Nginx>>
-  * <<metricbeat-module-php_fpm,PHP-FPM>>
+  * <<metricbeat-module-php_fpm,PHP_FPM>>
   * <<metricbeat-module-postgresql,PostgreSQL>>
   * <<metricbeat-module-prometheus,Prometheus>>
   * <<metricbeat-module-rabbitmq,RabbitMQ>>
