@@ -321,11 +321,11 @@ replaced by options specified in libbeat.
 The `config_dir` option specifies the path to the directory that contains additional configuration files. This option MUST point to a directory other than the directory where the main Filebeat config file resides.
 
 |`-idle-timeout`
-|`idle_timeout`
-|`idle_timeout` was moved to the config file and removed as a flag.
+|
+|`idle_timeout` was removed. Libbeat is used for publishing logs.
 
 |`-spool-size`
-|`spool_size`
+|`queue.mem.events`
 |`spool_size` was moved to the config file and removed as a flag.
 
 |`-harvester-buff-size`
