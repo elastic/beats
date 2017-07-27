@@ -244,14 +244,14 @@ func (p *PodNameIndexer) GetMetadata(pod *Pod) []MetadataIndex {
 	data := p.genMeta.GenerateMetaData(pod)
 	return []MetadataIndex{
 		{
-			Index: pod.Metadata.Name,
+			Index: fmt.Sprintf("%s/%s", pod.Metadata.Namespace, pod.Metadata.Name),
 			Data:  data,
 		},
 	}
 }
 
 func (p *PodNameIndexer) GetIndexes(pod *Pod) []string {
-	return []string{pod.Metadata.Name}
+	return []string{fmt.Sprintf("%s/%s", pod.Metadata.Namespace, pod.Metadata.Name)}
 }
 
 // ContainerIndexer indexes pods based on all their containers IDs

@@ -1,6 +1,7 @@
 package add_kubernetes_metadata
 
 import (
+	"fmt"
 	"testing"
 
 	"github.com/stretchr/testify/assert"
@@ -31,7 +32,7 @@ func TestPodIndexer(t *testing.T) {
 
 	indexers := podIndexer.GetMetadata(&pod)
 	assert.Equal(t, len(indexers), 1)
-	assert.Equal(t, indexers[0].Index, podName)
+	assert.Equal(t, indexers[0].Index, fmt.Sprintf("%s/%s", ns, podName))
 
 	expected := common.MapStr{
 		"pod": common.MapStr{
@@ -47,7 +48,7 @@ func TestPodIndexer(t *testing.T) {
 
 	indices := podIndexer.GetIndexes(&pod)
 	assert.Equal(t, len(indices), 1)
-	assert.Equal(t, indices[0], podName)
+	assert.Equal(t, indices[0], fmt.Sprintf("%s/%s", ns, podName))
 }
 
 func TestContainerIndexer(t *testing.T) {
