@@ -13,6 +13,7 @@ https://github.com/elastic/beats/compare/v6.0.0-beta1...master[Check the HEAD di
 ==== Breaking changes
 
 *Affecting all Beats*
+- The log directory (`path.log`) for Windows services is now set to `C:\ProgramData\[beatname]\logs`. {issue}4764[4764]
 
 *Auditbeat*
 
