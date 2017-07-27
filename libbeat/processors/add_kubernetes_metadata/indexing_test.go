@@ -256,3 +256,49 @@ func TestFilteredGenMetaExclusion(t *testing.T) {
 	ok, _ = labelMap.HasKey("x")
 	assert.Equal(t, ok, false)
 }
+
+func TestFieldFormatMatcher(t *testing.T) {
+	testCfg := map[string]interface{}{}
+	fieldCfg, err := common.NewConfigFrom(testCfg)
+
+	assert.Nil(t, err)
+	matcher, err := NewFieldFormatMatcher(*fieldCfg)
+	assert.NotNil(t, err)
+
+	testCfg["format"] = `%{[namespace]}/%{[pod]}`
+	fieldCfg, _ = common.NewConfigFrom(testCfg)
+
+	matcher, err = NewFieldFormatMatcher(*fieldCfg)
+	assert.NotNil(t, matcher)
+	assert.Nil(t, err)
+
+	event := common.MapStr{
+		"namespace": "foo",
+		"pod":       "bar",
+	}
+
+	out := matcher.MetadataIndex(event)
+	assert.Equal(t, "foo/bar", out)
+
+	event = common.MapStr{
+		"foo": "bar",
+	}
+	out = matcher.MetadataIndex(event)
+	assert.Empty(t, out)
+
+	testCfg["format"] = `%{[dimensions.namespace]}/%{[dimensions.pod]}`
+	fieldCfg, _ = common.NewConfigFrom(testCfg)
+	matcher, err = NewFieldFormatMatcher(*fieldCfg)
+	assert.NotNil(t, matcher)
+	assert.Nil(t, err)
+
+	event = common.MapStr{
+		"dimensions": common.MapStr{
+			"pod":       "bar",
+			"namespace": "foo",
+		},
+	}
+
+	out = matcher.MetadataIndex(event)
+	assert.Equal(t, "foo/bar", out)
+}
