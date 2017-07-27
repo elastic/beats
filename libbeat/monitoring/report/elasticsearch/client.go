@@ -91,9 +91,11 @@ func (c *publishClient) Publish(batch publisher.Batch) error {
 	_, err := c.es.BulkWith("_xpack", "monitoring", c.params, nil, bulk)
 	if err != nil {
 		batch.Retry()
+		return err
 	}
+
 	batch.ACK()
-	return err
+	return nil
 }
 
 func (c *publishClient) Test(d testing.Driver) {
