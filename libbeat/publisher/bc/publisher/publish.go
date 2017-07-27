@@ -2,6 +2,7 @@ package publisher
 
 import (
 	"flag"
+	"fmt"
 
 	"github.com/elastic/beats/libbeat/common"
 	"github.com/elastic/beats/libbeat/logp"
@@ -15,12 +16,12 @@ var publishDisabled *bool
 var debug = logp.MakeDebug("publish")
 
 type ShipperConfig struct {
-	common.EventMetadata `config:",inline"`     // Fields and tags to add to each event.
-	Name                 string                 `config:"name"`
-	Queue                common.ConfigNamespace `config:"queue"`
+	// Event processing configurations
+	common.EventMetadata `config:",inline"`      // Fields and tags to add to each event.
+	Processors           processors.PluginConfig `config:"processors"`
 
-	// internal publisher queue sizes
-	MaxProcs *int `config:"max_procs"`
+	// Event queue
+	Queue common.ConfigNamespace `config:"queue"`
 }
 
 func init() {
@@ -32,10 +33,14 @@ func New(
 	beat common.BeatInfo,
 	output common.ConfigNamespace,
 	shipper ShipperConfig,
-	processors *processors.Processors,
 ) (*pipeline.Pipeline, error) {
 	if *publishDisabled {
 		logp.Info("Dry run mode. All output types except the file based one are disabled.")
+	}
+
+	processors, err := processors.New(shipper.Processors)
+	if err != nil {
+		return nil, fmt.Errorf("error initializing processors: %v", err)
 	}
 
 	return createPipeline(beat, shipper, processors, output)
