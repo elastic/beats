@@ -44,7 +44,7 @@ func TestLoadTemplate(t *testing.T) {
 	fieldsPath := absPath + "/fields.yml"
 	index := "testbeat"
 
-	tmpl, err := New(version.GetDefaultVersion(), client.GetVersion(), index, TemplateSettings{})
+	tmpl, err := New(version.GetDefaultVersion(), index, client.GetVersion(), TemplateConfig{})
 	assert.NoError(t, err)
 	content, err := tmpl.Load(fieldsPath)
 	assert.NoError(t, err)
@@ -132,7 +132,7 @@ func TestLoadBeatsTemplate(t *testing.T) {
 		fieldsPath := absPath + "/fields.yml"
 		index := beat
 
-		tmpl, err := New(version.GetDefaultVersion(), client.GetVersion(), index, TemplateSettings{})
+		tmpl, err := New(version.GetDefaultVersion(), index, client.GetVersion(), TemplateConfig{})
 		assert.NoError(t, err)
 		content, err := tmpl.Load(fieldsPath)
 		assert.NoError(t, err)
@@ -178,7 +178,10 @@ func TestTemplateSettings(t *testing.T) {
 			"enabled": false,
 		},
 	}
-	tmpl, err := New(version.GetDefaultVersion(), client.GetVersion(), "testbeat", settings)
+	config := TemplateConfig{
+		Settings: settings,
+	}
+	tmpl, err := New(version.GetDefaultVersion(), "testbeat", client.GetVersion(), config)
 	assert.NoError(t, err)
 	content, err := tmpl.Load(fieldsPath)
 	assert.NoError(t, err)
@@ -335,7 +338,7 @@ func TestTemplateWithData(t *testing.T) {
 	// Setup ES
 	client := elasticsearch.GetTestingElasticsearch(t)
 
-	tmpl, err := New(version.GetDefaultVersion(), client.GetVersion(), "testindex", TemplateSettings{})
+	tmpl, err := New(version.GetDefaultVersion(), "testindex", client.GetVersion(), TemplateConfig{})
 	assert.NoError(t, err)
 	content, err := tmpl.Load(fieldsPath)
 	assert.NoError(t, err)

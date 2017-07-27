@@ -3,6 +3,7 @@ package template
 type TemplateConfig struct {
 	Enabled   bool             `config:"enabled"`
 	Name      string           `config:"name"`
+	Pattern   string           `config:"pattern"`
 	Fields    string           `config:"fields"`
 	Overwrite bool             `config:"overwrite"`
 	Settings  TemplateSettings `config:"settings"`
