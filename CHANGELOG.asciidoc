@@ -51,6 +51,7 @@ https://github.com/elastic/beats/compare/v6.0.0-beta1...master[Check the HEAD di
 *Metricbeat*
 
 - Add support to exclude labels from kubernetes pod metadata. {pull}4757[4757]
+- Add graphite protocol metricbeat module. {pull}4734[4734]
 
 *Packetbeat*
 
@@ -174,6 +175,8 @@ https://github.com/elastic/beats/compare/v6.0.0-alpha2...v6.0.0-beta1[View commi
 - Vsphere module: collect custom fields from virtual machines. {issue}4464[4464]
 - Add `test modules` command, to test modules expected output. {pull}4656[4656]
 - Add `processors` setting to metricbeat modules. {pull}4699[4699]
+
+*Packetbeat*
 
 *Winlogbeat*
 

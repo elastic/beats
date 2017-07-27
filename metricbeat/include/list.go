@@ -38,6 +38,8 @@ import (
 	_ "github.com/elastic/beats/metricbeat/module/golang"
 	_ "github.com/elastic/beats/metricbeat/module/golang/expvar"
 	_ "github.com/elastic/beats/metricbeat/module/golang/heap"
+	_ "github.com/elastic/beats/metricbeat/module/graphite"
+	_ "github.com/elastic/beats/metricbeat/module/graphite/server"
 	_ "github.com/elastic/beats/metricbeat/module/haproxy"
 	_ "github.com/elastic/beats/metricbeat/module/haproxy/info"
 	_ "github.com/elastic/beats/metricbeat/module/haproxy/stat"
