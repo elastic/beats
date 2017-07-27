@@ -1,5 +1,5 @@
 - key: php_fpm
-  title: "PHP-FPM"
+  title: "PHP_FPM"
   description: >
     beta[]
 

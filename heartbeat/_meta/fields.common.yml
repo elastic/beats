@@ -1,5 +1,5 @@
 - key: common
-  title: "Common Heartbeat Monitor"
+  title: "Common heartbeat monitor"
   description:
   fields:
     - name: monitor
@@ -55,7 +55,7 @@
             Indicator if monitor could validate the service to be available.
 
 - key: resolve
-  title: "Host Lookup"
+  title: "Host lookup"
   description:
   fields:
     - name: resolve

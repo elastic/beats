@@ -1,5 +1,5 @@
 - key: http
-  title: "HTTP Monitor"
+  title: "HTTP monitor"
   description:
   fields:
     - name: http
