@@ -24,6 +24,7 @@ grouped in the following categories:
 * <<exported-fields-dropwizard>>
 * <<exported-fields-elasticsearch>>
 * <<exported-fields-golang>>
+* <<exported-fields-graphite>>
 * <<exported-fields-haproxy>>
 * <<exported-fields-http>>
 * <<exported-fields-jolokia>>
@@ -2786,6 +2787,35 @@ type: long
 format: bytes
 
 Bytes in non-idle span.
+
+
+[[exported-fields-graphite]]
+== graphite Fields
+
+[]experimental
+graphite Module
+
+
+
+[float]
+== graphite Fields
+
+
+
+
+[float]
+== server Fields
+
+server
+
+
+
+[float]
+=== graphite.server.example
+
+type: keyword
+
+Example field
 
 
 [[exported-fields-haproxy]]

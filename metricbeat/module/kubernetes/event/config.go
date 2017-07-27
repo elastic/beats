@@ -3,8 +3,6 @@ package event
 import (
 	"errors"
 	"time"
-
-	"github.com/elastic/beats/libbeat/common"
 )
 
 type kubeEventsConfig struct {
@@ -17,8 +15,6 @@ type kubeEventsConfig struct {
 type Enabled struct {
 	Enabled bool `config:"enabled"`
 }
-
-type PluginConfig []map[string]common.Config
 
 func defaultKuberentesEventsConfig() kubeEventsConfig {
 	return kubeEventsConfig{
