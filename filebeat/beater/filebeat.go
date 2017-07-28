@@ -42,6 +42,9 @@ func New(b *beat.Beat, rawConfig *common.Config) (beat.Beater, error) {
 	if err != nil {
 		return nil, err
 	}
+	if !moduleRegistry.Empty() {
+		logp.Info("Enabled modules/filesets: %s", moduleRegistry.InfoString())
+	}
 
 	moduleProspectors, err := moduleRegistry.GetProspectorConfigs()
 	if err != nil {
