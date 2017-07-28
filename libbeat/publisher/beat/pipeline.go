@@ -72,9 +72,9 @@ type ClientEventer interface {
 	Closing() // Closing indicates the client is being shutdown next
 	Closed()  // Closed indicates the client being fully shutdown
 
-	Published()             // event been has successfully forwarded to the publisher pipeline
+	Published()             // event has been successfully forwarded to the publisher pipeline
 	FilteredOut(Event)      // event has been filtered out/dropped by processors
-	DroppedOnPublish(Event) // event has been dropped, while waiting for the broker
+	DroppedOnPublish(Event) // event has been dropped, while waiting for the queue
 }
 
 // PipelineACKHandler configures some pipeline-wide event ACK handler.
