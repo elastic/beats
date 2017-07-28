@@ -101,7 +101,7 @@ crosscompile: $(GOFILES)
 check: python-env ## @build Checks project and source code if everything is according to standard
 	@go vet ${GOPACKAGES}
 	@go get $(GOIMPORTS_REPO)
-	@goimports -local ${GOIMPORTS_LOCAL_PREFIX} -l ${GOFILES_NOVENDOR} | (! grep . -q) || (echo "Code differs from goimports' style" && false)
+	@goimports -local ${GOIMPORTS_LOCAL_PREFIX} -l ${GOFILES_NOVENDOR} | (! grep .) || (echo "Code differs from goimports' style ^" && false)
 	@${FIND} -name *.py -exec autopep8 -d --max-line-length 120  {} \; | (! grep . -q) || (echo "Code differs from autopep8's style" && false)
 
 .PHONY: fmt
