@@ -124,41 +124,6 @@ type waitCloser struct {
 
 type queueFactory func(queue.Eventer) (queue.Queue, error)
 
-// Load uses a Config object to create a new complete Pipeline instance with
-// configured queue and outputs.
-func Load(
-	beatInfo common.BeatInfo,
-	monitoring *monitoring.Registry,
-	config Config,
-) (*Pipeline, error) {
-	if !config.Output.IsSet() {
-		return nil, errors.New("no output configured")
-	}
-
-	queueFactory := func(e queue.Eventer) (queue.Queue, error) {
-		return queue.Load(e, config.Queue)
-	}
-
-	output, err := outputs.Load(beatInfo, nil, config.Output.Name(), config.Output.Config())
-	if err != nil {
-		return nil, err
-	}
-
-	// TODO: configure pipeline processors
-	pipeline, err := New(monitoring, queueFactory, output, Settings{
-		WaitClose:     config.WaitShutdown,
-		WaitCloseMode: WaitOnPipelineClose,
-	})
-	if err != nil {
-		for _, c := range output.Clients {
-			c.Close()
-		}
-		return nil, err
-	}
-
-	return pipeline, nil
-}
-
 // New create a new Pipeline instance from a queue instance and a set of outputs.
 // The new pipeline will take ownership of queue and outputs. On Close, the
 // queue and outputs will be closed.

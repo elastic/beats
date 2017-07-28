@@ -56,8 +56,8 @@ import (
 	"github.com/elastic/beats/libbeat/outputs/elasticsearch"
 	"github.com/elastic/beats/libbeat/paths"
 	"github.com/elastic/beats/libbeat/plugin"
-	"github.com/elastic/beats/libbeat/publisher/bc/publisher"
 	"github.com/elastic/beats/libbeat/publisher/beat"
+	"github.com/elastic/beats/libbeat/publisher/pipeline"
 	svc "github.com/elastic/beats/libbeat/service"
 	"github.com/elastic/beats/libbeat/template"
 	"github.com/elastic/beats/libbeat/version"
@@ -129,9 +129,9 @@ type BeatConfig struct {
 	Logging logp.Logging   `config:"logging"`
 
 	// output/publishing related configurations
-	Shipper    publisher.ShipperConfig `config:",inline"`
-	Monitoring *common.Config          `config:"xpack.monitoring"`
-	Output     common.ConfigNamespace  `config:"output"`
+	Pipeline   pipeline.Config        `config:",inline"`
+	Monitoring *common.Config         `config:"xpack.monitoring"`
+	Output     common.ConfigNamespace `config:"output"`
 
 	// 'setup' configurations
 	Dashboards *common.Config `config:"setup.dashboards"`
@@ -253,7 +253,7 @@ func (b *Beat) createBeater(bt Creator) (Beater, error) {
 	}
 
 	debugf("Initializing output plugins")
-	pipeline, err := publisher.New(b.Info, b.Config.Output, b.Config.Shipper)
+	pipeline, err := pipeline.Load(b.Info, b.Config.Pipeline, b.Config.Output)
 	if err != nil {
 		return nil, fmt.Errorf("error initializing publisher: %v", err)
 	}
