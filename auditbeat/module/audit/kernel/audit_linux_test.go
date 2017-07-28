@@ -28,7 +28,7 @@ func TestData(t *testing.T) {
 	ms := mbtest.NewPushMetricSet(t, getConfig())
 	auditMetricSet := ms.(*MetricSet)
 	auditMetricSet.client.Close()
-	auditMetricSet.client = &libaudit.AuditClient{mock}
+	auditMetricSet.client = &libaudit.AuditClient{Netlink: mock}
 
 	events, errs := mbtest.RunPushMetricSet(time.Second, ms)
 	if len(errs) > 0 {
