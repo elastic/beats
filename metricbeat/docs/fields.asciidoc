@@ -2790,7 +2790,7 @@ Bytes in non-idle span.
 
 
 [[exported-fields-graphite]]
-== graphite Fields
+== graphite fields
 
 []experimental
 graphite Module
@@ -2798,20 +2798,20 @@ graphite Module
 
 
 [float]
-== graphite Fields
+== graphite fields
 
 
 
 
 [float]
-== server Fields
+== server fields
 
 server
 
 
 
 [float]
-=== graphite.server.example
+=== `graphite.server.example`
 
 type: keyword
 
