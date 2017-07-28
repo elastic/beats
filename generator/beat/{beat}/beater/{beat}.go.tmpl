@@ -7,7 +7,7 @@ import (
 	"github.com/elastic/beats/libbeat/beat"
 	"github.com/elastic/beats/libbeat/common"
 	"github.com/elastic/beats/libbeat/logp"
-	"github.com/elastic/beats/libbeat/publisher/bc/publisher"
+	pub "github.com/elastic/beats/libbeat/publisher/beat"
 
 	"{beat_path}/config"
 )
@@ -15,7 +15,7 @@ import (
 type {Beat} struct {
 	done   chan struct{}
 	config config.Config
-	client publisher.Client
+	client pub.Client
 }
 
 // Creates beater
@@ -45,12 +45,14 @@ func (bt *{Beat}) Run(b *beat.Beat) error {
 		case <-ticker.C:
 		}
 
-		event := common.MapStr{
-			"@timestamp": common.Time(time.Now()),
-			"type":       b.Info.Name,
-			"counter":    counter,
+		event := pub.Event{
+			Timestamp: time.Now(),
+			Fields: common.MapStr{
+				"type":       b.Info.Name,
+				"counter":    counter,
+			},
 		}
-		bt.client.PublishEvent(event)
+		bt.client.Publish(event)
 		logp.Info("Event sent")
 		counter++
 	}
