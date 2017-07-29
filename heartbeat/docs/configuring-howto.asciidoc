@@ -27,6 +27,7 @@ The following topics describe how to configure Heartbeat:
 * <<filtering-and-enhancing-data>>
 * <<configuring-ingest-node>>
 * <<configuration-path>>
+* <<setup-kibana-endpoint>>
 * <<configuration-dashboards>>
 * <<configuration-template>>
 * <<configuration-logging>>
@@ -48,6 +49,8 @@ include::./heartbeat-filtering.asciidoc[]
 include::../../libbeat/docs/shared-config-ingest.asciidoc[]
 
 include::../../libbeat/docs/shared-path-config.asciidoc[]
+
+include::../../libbeat/docs/shared-kibana-config.asciidoc[]
 
 include::../../libbeat/docs/setup-config.asciidoc[]
 

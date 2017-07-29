@@ -1,0 +1,5 @@
+The following elliptic curve types are available:
+
+* P-256
+* P-384
+* P-521

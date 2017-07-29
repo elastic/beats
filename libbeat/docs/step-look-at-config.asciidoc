@@ -1,0 +1,2 @@
+Before starting {beatname_lc}, you should look at the configuration options in the
+configuration file. For more information about these options, see <<configuring-howto-{beatname_lc}>>.
