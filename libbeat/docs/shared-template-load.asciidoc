@@ -51,7 +51,7 @@ By default, if a template already exists in the index, it is not overwritten. To
 template, set `setup.template.overwrite: true` in the configuration file.
 
 To disable automatic template loading, either comment out the `setup.template`
-fields, or set `setup.template.enabled: true`.
+fields, or set `setup.template.enabled: false`.
 
 The options for auto loading the template are not supported if you are using the
 Logstash output.
