@@ -357,7 +357,7 @@ metricbeat.modules:
 
 #------------------------------ RabbitMQ Module ------------------------------
 - module: rabbitmq
-  metricsets: ["node"]
+  metricsets: ["node", "queues"]
   period: 10s
   hosts: ["localhost:15672"]
 
