@@ -81,6 +81,8 @@ https://github.com/elastic/beats/compare/v6.0.0-beta1...master[Check the HEAD di
 
 *Affecting all Beats*
 
+- Fix pod name indexer to use both namespace, pod name to frame index key {pull}4775[4775]
+
 *Filebeat*
 
 *Heartbeat*
