@@ -1087,6 +1087,21 @@ output.elasticsearch:
 # Overwrite existing template
 #setup.template.overwrite: false
 
+# Elasticsearch template settings
+setup.template.settings:
+
+  # A dictionary of settings to place into the settings.index dictionary
+  # of the Elasticsearch template. For more details, please check
+  # https://www.elastic.co/guide/en/elasticsearch/reference/current/mapping.html
+  #index:
+    #number_of_shards: 1
+    #codec: best_compression
+
+  # A dictionary of settings for the _source field. For more details, please check
+  # https://www.elastic.co/guide/en/elasticsearch/reference/current/mapping-source-field.html
+  #_source:
+    #enabled: false
+
 #============================== Kibana =====================================
 
 # Starting with Beats version 6.0.0, the dashboards are loaded via the Kibana API.
