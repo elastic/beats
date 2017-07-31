@@ -14,7 +14,6 @@ import (
 	"github.com/elastic/beats/libbeat/common"
 	"github.com/elastic/beats/libbeat/logp"
 	"github.com/elastic/beats/libbeat/paths"
-	"github.com/elastic/beats/libbeat/publisher/bc/publisher"
 	pub "github.com/elastic/beats/libbeat/publisher/beat"
 
 	"github.com/elastic/beats/winlogbeat/checkpoint"
@@ -40,7 +39,7 @@ type Winlogbeat struct {
 	config     *config.Settings       // Configuration settings.
 	eventLogs  []*eventLogger         // List of all event logs being monitored.
 	done       chan struct{}          // Channel to initiate shutdown of main event loop.
-	pipeline   publisher.Publisher    // Interface to publish event.
+	pipeline   pub.Pipeline           // Interface to publish event.
 	checkpoint *checkpoint.Checkpoint // Persists event log state to disk.
 }
 

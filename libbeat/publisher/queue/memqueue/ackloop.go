@@ -1,4 +1,4 @@
-package membroker
+package memqueue
 
 // ackLoop implements the brokers asynchronous ACK worker.
 // Multiple concurrent ACKs from consecutive published batches will be batched up by the

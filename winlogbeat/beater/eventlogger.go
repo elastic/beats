@@ -6,7 +6,6 @@ import (
 	"github.com/elastic/beats/libbeat/common"
 	"github.com/elastic/beats/libbeat/logp"
 	"github.com/elastic/beats/libbeat/processors"
-	"github.com/elastic/beats/libbeat/publisher/bc/publisher"
 	"github.com/elastic/beats/libbeat/publisher/beat"
 	"github.com/elastic/beats/winlogbeat/checkpoint"
 	"github.com/elastic/beats/winlogbeat/eventlog"
@@ -44,9 +43,9 @@ func newEventLogger(
 	}, nil
 }
 
-func (e *eventLogger) connect(pipeline publisher.Publisher) (beat.Client, error) {
+func (e *eventLogger) connect(pipeline beat.Pipeline) (beat.Client, error) {
 	api := e.source.Name()
-	return pipeline.ConnectX(beat.ClientConfig{
+	return pipeline.ConnectWith(beat.ClientConfig{
 		PublishMode:   beat.GuaranteedSend,
 		EventMetadata: e.eventMeta,
 		Meta:          nil, // TODO: configure modules/ES ingest pipeline?
@@ -60,7 +59,7 @@ func (e *eventLogger) connect(pipeline publisher.Publisher) (beat.Client, error)
 
 func (e *eventLogger) run(
 	done <-chan struct{},
-	pipeline publisher.Publisher,
+	pipeline beat.Pipeline,
 	state checkpoint.EventLogState,
 ) {
 	api := e.source

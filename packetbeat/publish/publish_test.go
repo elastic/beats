@@ -9,7 +9,6 @@ import (
 	"github.com/stretchr/testify/assert"
 
 	"github.com/elastic/beats/libbeat/common"
-	"github.com/elastic/beats/libbeat/publisher/bc/publisher"
 	"github.com/elastic/beats/libbeat/publisher/beat"
 )
 
@@ -140,11 +139,6 @@ func TestDirectionIn(t *testing.T) {
 	}
 	assert.True(t, event.Fields["client_ip"] == "192.145.2.4")
 	assert.True(t, event.Fields["direction"] == "in")
-}
-
-func newTestPublisher() *publisher.BeatPublisher {
-	p := &publisher.BeatPublisher{}
-	return p
 }
 
 func TestNoDirection(t *testing.T) {

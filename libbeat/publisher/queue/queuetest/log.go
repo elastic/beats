@@ -1,4 +1,4 @@
-package brokertest
+package queuetest
 
 import (
 	"bufio"

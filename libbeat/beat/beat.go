@@ -57,8 +57,8 @@ import (
 	"github.com/elastic/beats/libbeat/outputs/elasticsearch"
 	"github.com/elastic/beats/libbeat/paths"
 	"github.com/elastic/beats/libbeat/plugin"
-	"github.com/elastic/beats/libbeat/processors"
-	"github.com/elastic/beats/libbeat/publisher/bc/publisher"
+	"github.com/elastic/beats/libbeat/publisher/beat"
+	"github.com/elastic/beats/libbeat/publisher/pipeline"
 	svc "github.com/elastic/beats/libbeat/service"
 	"github.com/elastic/beats/libbeat/template"
 	"github.com/elastic/beats/libbeat/version"
@@ -109,10 +109,10 @@ type SetupMLCallback func(*Beat) error
 // Beat contains the basic beat data and the publisher client used to publish
 // events.
 type Beat struct {
-	Info      common.BeatInfo     // beat metadata.
-	RawConfig *common.Config      // Raw config that can be unpacked to get Beat specific config data.
-	Config    BeatConfig          // Common Beat configuration data.
-	Publisher publisher.Publisher // Publisher
+	Info      common.BeatInfo // beat metadata.
+	RawConfig *common.Config  // Raw config that can be unpacked to get Beat specific config data.
+	Config    BeatConfig      // Common Beat configuration data.
+	Publisher beat.Pipeline   // Publisher pipeline
 
 	SetupMLCallback SetupMLCallback // setup callback for ML job configs
 	InSetupCmd      bool            // this is set to true when the `setup` command is called
@@ -120,16 +120,24 @@ type Beat struct {
 
 // BeatConfig struct contains the basic configuration of every beat
 type BeatConfig struct {
-	Shipper    publisher.ShipperConfig `config:",inline"`
-	Output     common.ConfigNamespace  `config:"output"`
-	Monitoring *common.Config          `config:"xpack.monitoring"`
-	Logging    logp.Logging            `config:"logging"`
-	Processors processors.PluginConfig `config:"processors"`
-	Path       paths.Path              `config:"path"`
-	Dashboards *common.Config          `config:"setup.dashboards"`
-	Template   *common.Config          `config:"setup.template"`
-	Kibana     *common.Config          `config:"setup.kibana"`
-	Http       *common.Config          `config:"http"`
+	// beat top-level settings
+	Name     string `config:"name"`
+	MaxProcs int    `config:"max_procs"`
+
+	// beat internal components configurations
+	HTTP    *common.Config `config:"http"`
+	Path    paths.Path     `config:"path"`
+	Logging logp.Logging   `config:"logging"`
+
+	// output/publishing related configurations
+	Pipeline   pipeline.Config        `config:",inline"`
+	Monitoring *common.Config         `config:"xpack.monitoring"`
+	Output     common.ConfigNamespace `config:"output"`
+
+	// 'setup' configurations
+	Dashboards *common.Config `config:"setup.dashboards"`
+	Template   *common.Config `config:"setup.template"`
+	Kibana     *common.Config `config:"setup.kibana"`
 }
 
 var (
@@ -239,10 +247,6 @@ func (b *Beat) createBeater(bt Creator) (Beater, error) {
 	}
 
 	logp.Info("Setup Beat: %s; Version: %s", b.Info.Beat, b.Info.Version)
-	processors, err := processors.New(b.Config.Processors)
-	if err != nil {
-		return nil, fmt.Errorf("error initializing processors: %v", err)
-	}
 
 	err = b.registerTemplateLoading()
 	if err != nil {
@@ -250,16 +254,16 @@ func (b *Beat) createBeater(bt Creator) (Beater, error) {
 	}
 
 	debugf("Initializing output plugins")
-	publisher, err := publisher.New(b.Info, b.Config.Output, b.Config.Shipper, processors)
+	pipeline, err := pipeline.Load(b.Info, b.Config.Pipeline, b.Config.Output)
 	if err != nil {
 		return nil, fmt.Errorf("error initializing publisher: %v", err)
 	}
 
 	// TODO: some beats race on shutdown with publisher.Stop -> do not call Stop yet,
 	//       but refine publisher to disconnect clients on stop automatically
-	// defer publisher.Stop()
+	// defer pipeline.Close()
 
-	b.Publisher = publisher
+	b.Publisher = pipeline
 	beater, err := bt(b, sub)
 	if err != nil {
 		return nil, err
@@ -314,8 +318,8 @@ func (b *Beat) launch(bt Creator) error {
 	defer logp.Info("%s stopped.", b.Info.Beat)
 	defer logp.LogTotalExpvars(&b.Config.Logging)
 
-	if b.Config.Http.Enabled() {
-		api.Start(b.Config.Http, b.Info)
+	if b.Config.HTTP.Enabled() {
+		api.Start(b.Config.HTTP, b.Info)
 	}
 
 	return beater.Run(b)
@@ -460,7 +464,7 @@ func (b *Beat) configure() error {
 		return err
 	}
 
-	if name := b.Config.Shipper.Name; name != "" {
+	if name := b.Config.Name; name != "" {
 		b.Info.Name = name
 	}
 
@@ -484,11 +488,8 @@ func (b *Beat) configure() error {
 
 	logp.Info("Beat UUID: %v", b.Info.UUID)
 
-	if b.Config.Shipper.MaxProcs != nil {
-		maxProcs := *b.Config.Shipper.MaxProcs
-		if maxProcs > 0 {
-			runtime.GOMAXPROCS(maxProcs)
-		}
+	if maxProcs := b.Config.MaxProcs; maxProcs > 0 {
+		runtime.GOMAXPROCS(maxProcs)
 	}
 
 	return nil

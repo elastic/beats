@@ -1,10 +1,10 @@
-package membroker
+package memqueue
 
 import (
 	"github.com/elastic/beats/libbeat/common/atomic"
 	"github.com/elastic/beats/libbeat/publisher"
 	"github.com/elastic/beats/libbeat/publisher/beat"
-	"github.com/elastic/beats/libbeat/publisher/broker"
+	"github.com/elastic/beats/libbeat/publisher/queue"
 )
 
 type forgetfullProducer struct {
@@ -35,7 +35,7 @@ type produceState struct {
 
 type ackHandler func(count int)
 
-func newProducer(b *Broker, cb ackHandler, dropCB func(beat.Event), dropOnCancel bool) broker.Producer {
+func newProducer(b *Broker, cb ackHandler, dropCB func(beat.Event), dropOnCancel bool) queue.Producer {
 	openState := openState{
 		isOpen: atomic.MakeBool(true),
 		done:   make(chan struct{}),
