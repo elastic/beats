@@ -18,7 +18,7 @@
 
 
 - key: eventlog
-  title: Event Log Record
+  title: Event log record
   description: >
     Contains data from a Windows event log record.
   fields:

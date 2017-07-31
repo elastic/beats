@@ -1,7 +1,7 @@
 - key: elasticsearch
   title: "Elasticsearch"
   description: >
-    []experimental
+    experimental[]
 
     Elasticsearch module
   short_config: false

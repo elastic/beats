@@ -1,7 +1,7 @@
 - key: jolokia
   title: "Jolokia"
   description: >
-    []beta
+    beta[]
 
     Jolokia module
   short_config: false

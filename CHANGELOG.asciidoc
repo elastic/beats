@@ -32,6 +32,8 @@ https://github.com/elastic/beats/compare/v6.0.0-beta1...master[Check the HEAD di
 
 *Filebeat*
 
+- Fix issue where the `fileset.module` could have the wrong value. {issue}4761[4761]
+
 *Heartbeat*
 
 *Metricbeat*

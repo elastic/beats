@@ -314,7 +314,7 @@ metricbeat.modules:
   # Path to server status. Default server-status
   #server_status_path: "server-status"
 
-#------------------------------- PHP-FPM Module ------------------------------
+#------------------------------- PHP_FPM Module ------------------------------
 - module: php_fpm
   metricsets: ["pool"]
   period: 10s

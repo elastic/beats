@@ -1,5 +1,5 @@
 - key: tcp
-  title: "TCP Layer"
+  title: "TCP layer"
   description:
   fields:
     - name: tcp
