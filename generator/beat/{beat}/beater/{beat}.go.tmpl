@@ -35,7 +35,12 @@ func New(b *beat.Beat, cfg *common.Config) (beat.Beater, error) {
 func (bt *{Beat}) Run(b *beat.Beat) error {
 	logp.Info("{beat} is running! Hit CTRL-C to stop it.")
 
-	bt.client = b.Publisher.Connect()
+	var err error
+	bt.client, err = b.Publisher.Connect()
+	if err != nil {
+		return err
+	}
+
 	ticker := time.NewTicker(bt.config.Period)
 	counter := 1
 	for {
