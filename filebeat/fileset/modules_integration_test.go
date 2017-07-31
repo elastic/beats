@@ -58,8 +58,8 @@ func TestSetupNginx(t *testing.T) {
 	modulesPath, err := filepath.Abs("../module")
 	assert.NoError(t, err)
 
-	configs := []ModuleConfig{
-		{Module: "nginx"},
+	configs := []*ModuleConfig{
+		&ModuleConfig{Module: "nginx"},
 	}
 
 	reg, err := newModuleRegistry(modulesPath, configs, nil, "5.2.0")

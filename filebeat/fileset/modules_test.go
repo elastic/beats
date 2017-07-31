@@ -25,11 +25,11 @@ func TestNewModuleRegistry(t *testing.T) {
 	modulesPath, err := filepath.Abs("../module")
 	assert.NoError(t, err)
 
-	configs := []ModuleConfig{
-		{Module: "nginx"},
-		{Module: "mysql"},
-		{Module: "system"},
-		{Module: "auditd"},
+	configs := []*ModuleConfig{
+		&ModuleConfig{Module: "nginx"},
+		&ModuleConfig{Module: "mysql"},
+		&ModuleConfig{Module: "system"},
+		&ModuleConfig{Module: "auditd"},
 	}
 
 	reg, err := newModuleRegistry(modulesPath, configs, nil, "5.2.0")
@@ -57,8 +57,16 @@ func TestNewModuleRegistry(t *testing.T) {
 
 	for module, filesets := range reg.registry {
 		for name, fileset := range filesets {
-			_, err = fileset.getProspectorConfig()
+			cfg, err := fileset.getProspectorConfig()
 			assert.NoError(t, err, fmt.Sprintf("module: %s, fileset: %s", module, name))
+
+			moduleName, err := cfg.String("_module_name", -1)
+			assert.NoError(t, err)
+			assert.Equal(t, module, moduleName)
+
+			filesetName, err := cfg.String("_fileset_name", -1)
+			assert.NoError(t, err)
+			assert.Equal(t, name, filesetName)
 		}
 	}
 }
@@ -69,8 +77,8 @@ func TestNewModuleRegistryConfig(t *testing.T) {
 
 	falseVar := false
 
-	configs := []ModuleConfig{
-		{
+	configs := []*ModuleConfig{
+		&ModuleConfig{
 			Module: "nginx",
 			Filesets: map[string]*FilesetConfig{
 				"access": {
@@ -83,7 +91,7 @@ func TestNewModuleRegistryConfig(t *testing.T) {
 				},
 			},
 		},
-		{
+		&ModuleConfig{
 			Module:  "mysql",
 			Enabled: &falseVar,
 		},
@@ -191,24 +199,24 @@ func TestAppendWithoutDuplicates(t *testing.T) {
 	falseVar := false
 	tests := []struct {
 		name     string
-		configs  []ModuleConfig
+		configs  []*ModuleConfig
 		modules  []string
-		expected []ModuleConfig
+		expected []*ModuleConfig
 	}{
 		{
 			name:    "just modules",
-			configs: []ModuleConfig{},
+			configs: []*ModuleConfig{},
 			modules: []string{"moduleA", "moduleB", "moduleC"},
-			expected: []ModuleConfig{
-				{Module: "moduleA"},
-				{Module: "moduleB"},
-				{Module: "moduleC"},
+			expected: []*ModuleConfig{
+				&ModuleConfig{Module: "moduleA"},
+				&ModuleConfig{Module: "moduleB"},
+				&ModuleConfig{Module: "moduleC"},
 			},
 		},
 		{
 			name: "eliminate a duplicate, no override",
-			configs: []ModuleConfig{
-				{
+			configs: []*ModuleConfig{
+				&ModuleConfig{
 					Module: "moduleB",
 					Filesets: map[string]*FilesetConfig{
 						"fileset": {
@@ -220,8 +228,8 @@ func TestAppendWithoutDuplicates(t *testing.T) {
 				},
 			},
 			modules: []string{"moduleA", "moduleB", "moduleC"},
-			expected: []ModuleConfig{
-				{
+			expected: []*ModuleConfig{
+				&ModuleConfig{
 					Module: "moduleB",
 					Filesets: map[string]*FilesetConfig{
 						"fileset": {
@@ -231,14 +239,14 @@ func TestAppendWithoutDuplicates(t *testing.T) {
 						},
 					},
 				},
-				{Module: "moduleA"},
-				{Module: "moduleC"},
+				&ModuleConfig{Module: "moduleA"},
+				&ModuleConfig{Module: "moduleC"},
 			},
 		},
 		{
 			name: "disabled config",
-			configs: []ModuleConfig{
-				{
+			configs: []*ModuleConfig{
+				&ModuleConfig{
 					Module:  "moduleB",
 					Enabled: &falseVar,
 					Filesets: map[string]*FilesetConfig{
@@ -251,8 +259,8 @@ func TestAppendWithoutDuplicates(t *testing.T) {
 				},
 			},
 			modules: []string{"moduleA", "moduleB", "moduleC"},
-			expected: []ModuleConfig{
-				{
+			expected: []*ModuleConfig{
+				&ModuleConfig{
 					Module:  "moduleB",
 					Enabled: &falseVar,
 					Filesets: map[string]*FilesetConfig{
@@ -263,9 +271,9 @@ func TestAppendWithoutDuplicates(t *testing.T) {
 						},
 					},
 				},
-				{Module: "moduleA"},
-				{Module: "moduleB"},
-				{Module: "moduleC"},
+				&ModuleConfig{Module: "moduleA"},
+				&ModuleConfig{Module: "moduleB"},
+				&ModuleConfig{Module: "moduleC"},
 			},
 		},
 	}
