@@ -29,7 +29,7 @@ https://github.com/elastic/beats/compare/v6.0.0-beta1...master[Check the HEAD di
 ==== Bugfixes
 
 *Affecting all Beats*
-
+- Fix go plugins not loaded when beat starts {pull}4799[4799]
 *Filebeat*
 
 - Fix issue where the `fileset.module` could have the wrong value. {issue}4761[4761]
