@@ -46,21 +46,22 @@ auditbeat.modules:
     #-a always,exit -F arch=b32 -S open,creat,truncate,ftruncate,openat,open_by_handle_at -F exit=-EPERM -k access
 
 # The file integrity metricset sends events when files are changed (created,
-# updated, deleted). The events contain file metadata and hashes (MD5, SHA1, and
-# SHA256).
+# updated, deleted). The events contain file metadata and hashes.
 - module: audit
   metricsets: [file]
   file.paths:
-    binaries:
-    - /bin
-    - /usr/bin
-    - /sbin
-    - /usr/sbin
-    conf:
-    - /etc
+  - /bin
+  - /usr/bin
+  - /sbin
+  - /usr/sbin
+  - /etc
   
-  # Limit in bytes on the size of files that will be hashed.
-  file.max_file_size: 1073741824 # 1 GiB
+  # Limit on the size of files that will be hashed. Default is 100 MiB.
+  file.max_file_size: 100 MiB
+
+  # Hash types to compute when the file changes. Supported types are md5, sha1,
+  # sha224, sha256, sha384, sha512, sha512_224, and sha512_256. Default is sha1.
+  file.hash_types: [sha1]
 
 
 #================================ General ======================================
