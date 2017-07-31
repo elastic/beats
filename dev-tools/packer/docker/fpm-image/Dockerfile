@@ -8,4 +8,4 @@ RUN \
     apt-get install -y --no-install-recommends \
         build-essential ruby-dev rpm zip dos2unix libgmp3-dev
 
-RUN gem install fpm
+RUN gem install fpm -v 1.9.2
