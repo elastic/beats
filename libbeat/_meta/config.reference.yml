@@ -620,6 +620,12 @@ output.elasticsearch:
 # Overwrite existing template
 #setup.template.overwrite: false
 
+# Elasticsearch template settings
+setup.template.settings:
+  index.number_of_shards: 1
+  index.codec: best_compression
+  #_source.enabled: false
+
 #============================== Kibana =====================================
 
 # Starting with Beats version 6.0.0, the dashboards are loaded via the Kibana API.
