@@ -1,21 +1,21 @@
-package brokertest
+package queuetest
 
 import (
 	"sync"
 	"testing"
 
 	"github.com/elastic/beats/libbeat/common"
-	"github.com/elastic/beats/libbeat/publisher/broker"
+	"github.com/elastic/beats/libbeat/publisher/queue"
 )
 
-type BrokerFactory func() broker.Broker
+type QueueFactory func() queue.Queue
 
-type workerFactory func(*sync.WaitGroup, interface{}, *TestLogger, broker.Broker) func()
+type workerFactory func(*sync.WaitGroup, interface{}, *TestLogger, queue.Queue) func()
 
 func TestSingleProducerConsumer(
 	t *testing.T,
 	events, batchSize int,
-	factory BrokerFactory,
+	factory QueueFactory,
 ) {
 	tests := []struct {
 		name                 string
@@ -49,9 +49,9 @@ func TestSingleProducerConsumer(
 			log := NewTestLogger(t)
 			log.Debug("run test: ", test.name)
 
-			broker := factory()
+			queue := factory()
 			defer func() {
-				err := broker.Close()
+				err := queue.Close()
 				if err != nil {
 					t.Error(err)
 				}
@@ -59,8 +59,8 @@ func TestSingleProducerConsumer(
 
 			var wg sync.WaitGroup
 
-			go test.producers(&wg, nil, log, broker)()
-			go test.consumers(&wg, nil, log, broker)()
+			go test.producers(&wg, nil, log, queue)()
+			go test.consumers(&wg, nil, log, queue)()
 
 			wg.Wait()
 		}))
@@ -71,7 +71,7 @@ func TestSingleProducerConsumer(
 func TestMultiProducerConsumer(
 	t *testing.T,
 	events, batchSize int,
-	factory BrokerFactory,
+	factory QueueFactory,
 ) {
 	tests := []struct {
 		name                 string
@@ -192,9 +192,9 @@ func TestMultiProducerConsumer(
 			log := NewTestLogger(t)
 			log.Debug("run test: ", test.name)
 
-			broker := factory()
+			queue := factory()
 			defer func() {
-				err := broker.Close()
+				err := queue.Close()
 				if err != nil {
 					t.Error(err)
 				}
@@ -202,8 +202,8 @@ func TestMultiProducerConsumer(
 
 			var wg sync.WaitGroup
 
-			go test.producers(&wg, nil, log, broker)()
-			go test.consumers(&wg, nil, log, broker)()
+			go test.producers(&wg, nil, log, queue)()
+			go test.consumers(&wg, nil, log, queue)()
 
 			wg.Wait()
 		}))
@@ -213,10 +213,10 @@ func TestMultiProducerConsumer(
 func multiple(
 	fns ...workerFactory,
 ) workerFactory {
-	return func(wg *sync.WaitGroup, info interface{}, log *TestLogger, broker broker.Broker) func() {
+	return func(wg *sync.WaitGroup, info interface{}, log *TestLogger, queue queue.Queue) func() {
 		runners := make([]func(), len(fns))
 		for i, gen := range fns {
-			runners[i] = gen(wg, info, log, broker)
+			runners[i] = gen(wg, info, log, queue)
 		}
 
 		return func() {
@@ -231,8 +231,8 @@ func makeProducer(
 	maxEvents int,
 	waitACK bool,
 	makeFields func(int) common.MapStr,
-) func(*sync.WaitGroup, interface{}, *TestLogger, broker.Broker) func() {
-	return func(wg *sync.WaitGroup, info interface{}, log *TestLogger, b broker.Broker) func() {
+) func(*sync.WaitGroup, interface{}, *TestLogger, queue.Queue) func() {
+	return func(wg *sync.WaitGroup, info interface{}, log *TestLogger, b queue.Queue) func() {
 		wg.Add(1)
 		return func() {
 			defer wg.Done()
@@ -259,7 +259,7 @@ func makeProducer(
 				}
 			}
 
-			producer := b.Producer(broker.ProducerConfig{
+			producer := b.Producer(queue.ProducerConfig{
 				ACK: ackCB,
 			})
 			for i := 0; i < maxEvents; i++ {
@@ -276,14 +276,14 @@ func makeConsumer(maxEvents, batchSize int) workerFactory {
 }
 
 func multiConsumer(numConsumers, maxEvents, batchSize int) workerFactory {
-	return func(wg *sync.WaitGroup, info interface{}, log *TestLogger, b broker.Broker) func() {
+	return func(wg *sync.WaitGroup, info interface{}, log *TestLogger, b queue.Queue) func() {
 		wg.Add(1)
 		return func() {
 			defer wg.Done()
 
 			var events sync.WaitGroup
 
-			consumers := make([]broker.Consumer, numConsumers)
+			consumers := make([]queue.Consumer, numConsumers)
 			for i := range consumers {
 				consumers[i] = b.Consumer()
 			}

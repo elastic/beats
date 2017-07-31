@@ -1,4 +1,4 @@
-package membroker
+package memqueue
 
 import (
 	"fmt"
@@ -8,7 +8,7 @@ import (
 
 	"github.com/elastic/beats/libbeat/common"
 	"github.com/elastic/beats/libbeat/publisher"
-	"github.com/elastic/beats/libbeat/publisher/broker"
+	"github.com/elastic/beats/libbeat/publisher/queue"
 )
 
 type Broker struct {
@@ -29,7 +29,7 @@ type Broker struct {
 	acks          chan int
 	scheduledACKs chan chanList
 
-	eventer broker.Eventer
+	eventer queue.Eventer
 
 	// wait group for worker shutdown
 	wg          sync.WaitGroup
@@ -37,7 +37,7 @@ type Broker struct {
 }
 
 type Settings struct {
-	Eventer        broker.Eventer
+	Eventer        queue.Eventer
 	Events         int
 	FlushMinEvents int
 	FlushTimeout   time.Duration
@@ -57,10 +57,10 @@ type chanList struct {
 }
 
 func init() {
-	broker.RegisterType("mem", create)
+	queue.RegisterType("mem", create)
 }
 
-func create(eventer broker.Eventer, cfg *common.Config) (broker.Broker, error) {
+func create(eventer queue.Eventer, cfg *common.Config) (queue.Queue, error) {
 	config := defaultConfig
 	if err := cfg.Unpack(&config); err != nil {
 		return nil, err
@@ -74,7 +74,7 @@ func create(eventer broker.Eventer, cfg *common.Config) (broker.Broker, error) {
 	}), nil
 }
 
-// NewBroker creates a new in-memory broker holding up to sz number of events.
+// NewBroker creates a new broker based in-memory queue holding up to sz number of events.
 // If waitOnClose is set to true, the broker will block on Close, until all internal
 // workers handling incoming messages and ACKs have been shut down.
 func NewBroker(
@@ -147,17 +147,17 @@ func (b *Broker) Close() error {
 	return nil
 }
 
-func (b *Broker) BufferConfig() broker.BufferConfig {
-	return broker.BufferConfig{
+func (b *Broker) BufferConfig() queue.BufferConfig {
+	return queue.BufferConfig{
 		Events: b.buf.Size(),
 	}
 }
 
-func (b *Broker) Producer(cfg broker.ProducerConfig) broker.Producer {
+func (b *Broker) Producer(cfg queue.ProducerConfig) queue.Producer {
 	return newProducer(b, cfg.ACK, cfg.OnDrop, cfg.DropOnCancel)
 }
 
-func (b *Broker) Consumer() broker.Consumer {
+func (b *Broker) Consumer() queue.Consumer {
 	return newConsumer(b)
 }
 

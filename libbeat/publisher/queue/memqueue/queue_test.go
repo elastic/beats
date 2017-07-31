@@ -1,4 +1,4 @@
-package membroker
+package memqueue
 
 import (
 	"flag"
@@ -6,8 +6,8 @@ import (
 	"testing"
 	"time"
 
-	"github.com/elastic/beats/libbeat/publisher/broker"
-	"github.com/elastic/beats/libbeat/publisher/broker/brokertest"
+	"github.com/elastic/beats/libbeat/publisher/queue"
+	"github.com/elastic/beats/libbeat/publisher/queue/queuetest"
 )
 
 var seed int64
@@ -34,22 +34,22 @@ func TestProduceConsumer(t *testing.T) {
 	t.Log("batchSize: ", batchSize)
 	t.Log("bufferSize: ", bufferSize)
 
-	factory := makeTestBroker(bufferSize)
+	factory := makeTestQueue(bufferSize)
 
 	t.Run("single", func(t *testing.T) {
-		brokertest.TestSingleProducerConsumer(t, events, batchSize, factory)
+		queuetest.TestSingleProducerConsumer(t, events, batchSize, factory)
 	})
 	t.Run("multi", func(t *testing.T) {
-		brokertest.TestMultiProducerConsumer(t, events, batchSize, factory)
+		queuetest.TestMultiProducerConsumer(t, events, batchSize, factory)
 	})
 }
 
 func TestProducerCancelRemovesEvents(t *testing.T) {
-	brokertest.TestProducerCancelRemovesEvents(t, makeTestBroker(1024))
+	queuetest.TestProducerCancelRemovesEvents(t, makeTestQueue(1024))
 }
 
-func makeTestBroker(sz int) brokertest.BrokerFactory {
-	return func() broker.Broker {
+func makeTestQueue(sz int) queuetest.QueueFactory {
+	return func() queue.Queue {
 		return NewBroker(Settings{Events: sz, WaitOnClose: true})
 	}
 }
