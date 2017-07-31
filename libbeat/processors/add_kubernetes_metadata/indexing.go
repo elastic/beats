@@ -6,13 +6,19 @@ import (
 	"sync"
 
 	"github.com/elastic/beats/libbeat/common"
+	"github.com/elastic/beats/libbeat/common/fmtstr"
+	"github.com/elastic/beats/libbeat/logp"
+	"github.com/elastic/beats/libbeat/outputs/codec"
+	"github.com/elastic/beats/libbeat/outputs/codec/format"
+	"github.com/elastic/beats/libbeat/publisher/beat"
 )
 
 //Names of indexers and matchers that have been defined.
 const (
-	PodNameIndexerName   = "pod_name"
-	FieldMatcherName     = "fields"
-	ContainerIndexerName = "container"
+	ContainerIndexerName   = "container"
+	PodNameIndexerName     = "pod_name"
+	FieldMatcherName       = "fields"
+	FieldFormatMatcherName = "field_format"
 )
 
 // Indexing is the singleton Register instance where all Indexers and Matchers
@@ -238,14 +244,14 @@ func (p *PodNameIndexer) GetMetadata(pod *Pod) []MetadataIndex {
 	data := p.genMeta.GenerateMetaData(pod)
 	return []MetadataIndex{
 		{
-			Index: pod.Metadata.Name,
+			Index: fmt.Sprintf("%s/%s", pod.Metadata.Namespace, pod.Metadata.Name),
 			Data:  data,
 		},
 	}
 }
 
 func (p *PodNameIndexer) GetIndexes(pod *Pod) []string {
-	return []string{pod.Metadata.Name}
+	return []string{fmt.Sprintf("%s/%s", pod.Metadata.Namespace, pod.Metadata.Name)}
 }
 
 // ContainerIndexer indexes pods based on all their containers IDs
@@ -322,4 +328,44 @@ func (f *FieldMatcher) MetadataIndex(event common.MapStr) string {
 	}
 
 	return ""
+}
+
+type FieldFormatMatcher struct {
+	Codec codec.Codec
+}
+
+func NewFieldFormatMatcher(cfg common.Config) (Matcher, error) {
+	config := struct {
+		Format string `config:"format"`
+	}{}
+
+	err := cfg.Unpack(&config)
+	if err != nil {
+		return nil, fmt.Errorf("fail to unpack the `format` configuration of `field_format` matcher: %s", err)
+	}
+
+	if config.Format == "" {
+		return nil, fmt.Errorf("`format` of `field_format` matcher can't be empty")
+	}
+
+	return &FieldFormatMatcher{
+		Codec: format.New(fmtstr.MustCompileEvent(config.Format)),
+	}, nil
+
+}
+
+func (f *FieldFormatMatcher) MetadataIndex(event common.MapStr) string {
+	bytes, err := f.Codec.Encode("", &beat.Event{
+		Fields: event,
+	})
+
+	if err != nil {
+		logp.Debug("kubernetes", "Unable to apply field format pattern on event")
+	}
+
+	if len(bytes) == 0 {
+		return ""
+	}
+
+	return string(bytes)
 }
