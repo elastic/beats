@@ -3,13 +3,12 @@ package channel
 import (
 	"github.com/elastic/beats/libbeat/common"
 	"github.com/elastic/beats/libbeat/processors"
-	"github.com/elastic/beats/libbeat/publisher/bc/publisher"
 	"github.com/elastic/beats/libbeat/publisher/beat"
 )
 
 type OutletFactory struct {
 	done     <-chan struct{}
-	pipeline publisher.Publisher
+	pipeline beat.Pipeline
 
 	eventer  beat.ClientEventer
 	wgEvents eventCounter
@@ -48,7 +47,7 @@ type prospectorOutletConfig struct {
 // connecting a prospector to the publisher pipeline.
 func NewOutletFactory(
 	done <-chan struct{},
-	pipeline publisher.Publisher,
+	pipeline beat.Pipeline,
 	wgEvents eventCounter,
 ) *OutletFactory {
 	o := &OutletFactory{
@@ -102,7 +101,7 @@ func (f *OutletFactory) Create(cfg *common.Config) (Outleter, error) {
 		}
 	}
 
-	client, err := f.pipeline.ConnectX(beat.ClientConfig{
+	client, err := f.pipeline.ConnectWith(beat.ClientConfig{
 		PublishMode:   beat.GuaranteedSend,
 		EventMetadata: config.EventMetadata,
 		Meta:          meta,

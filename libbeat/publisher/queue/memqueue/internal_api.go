@@ -1,4 +1,4 @@
-package membroker
+package memqueue
 
 import "github.com/elastic/beats/libbeat/publisher"
 

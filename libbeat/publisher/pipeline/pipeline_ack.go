@@ -111,8 +111,8 @@ func (b *pipelineEventsACK) createEventACKer(canDrop bool, sema *sema, fn func([
 }
 
 // pipelineEventCB internally handles active ACKs in the pipeline.
-// It receives ACK events from the broker and the individual clients.
-// Once the broker returns an ACK to the pipelineEventCB, the worker loop will collect
+// It receives ACK events from the queue and the individual clients.
+// Once the queue returns an ACK to the pipelineEventCB, the worker loop will collect
 // events from all clients having published events in the last batch of events
 // being ACKed.
 // the PipelineACKHandler will be notified, once all events being ACKed
@@ -194,7 +194,7 @@ func (p *pipelineEventCB) close() {
 // Note: the call blocks, until the ACK handler has collected all active events
 //       from all clients. This ensure an ACK event being fully 'captured'
 //       by the pipeline, before receiving/processing another ACK event.
-//       In the meantime the broker has the chance of batching-up more ACK events,
+//       In the meantime the queue has the chance of batching-up more ACK events,
 //       such that only one ACK event is being reported to the pipeline handler
 func (p *pipelineEventCB) onEvents(events []beat.Event, acked int) {
 	p.pushMsg(eventsMsg{events: events, total: len(events), acked: acked})
@@ -215,7 +215,7 @@ func (p *pipelineEventCB) pushMsg(msg eventsMsg) {
 }
 
 // Starts a new ACKed event.
-func (p *pipelineEventCB) reportBrokerACK(acked int) {
+func (p *pipelineEventCB) reportQueueACK(acked int) {
 	p.acks <- acked
 }
 
@@ -285,7 +285,7 @@ func (p *pipelineEventCB) collect(count int) (exit bool) {
 		}
 	}
 
-	// signal clients we processed all active ACKs, as reported by broker
+	// signal clients we processed all active ACKs, as reported by queue
 	for _, sig := range signalers {
 		close(sig)
 	}
