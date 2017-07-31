@@ -1341,6 +1341,22 @@ example: FATAL
 The log level.
 
 [float]
+=== `postgresql.log.duration`
+
+type: float
+
+example: 30.0
+
+Duration of a query.
+
+[float]
+=== `postgresql.log.query`
+
+example: SELECT * FROM users;
+
+Query statment.
+
+[float]
 === `postgresql.log.message`
 
 type: text

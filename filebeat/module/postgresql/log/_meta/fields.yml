@@ -25,6 +25,15 @@
       example: "FATAL"
       description:
         The log level.
+    - name: duration
+      type: float
+      example: "30.0"
+      description:
+        Duration of a query.
+    - name: query
+      example: "SELECT * FROM users;"
+      description:
+        Query statment.
     - name: message
       type: text
       description: >

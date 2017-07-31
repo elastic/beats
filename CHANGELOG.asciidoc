@@ -66,6 +66,8 @@ https://github.com/elastic/beats/compare/v6.0.0-beta1...master[Check the HEAD di
 
 *Filebeat*
 
+- Add PostgreSQL module with slowlog support. {pull}4763[4763]
+
 *Heartbeat*
 
 *Metricbeat*

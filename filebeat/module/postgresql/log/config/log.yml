@@ -4,3 +4,7 @@ paths:
  - {{$path}}
 {{ end }}
 exclude_files: [".gz$"]
+multiline:
+  pattern: '^[-0-9]* '
+  negate: true
+  match: after
