@@ -7,6 +7,7 @@ import (
 	"github.com/spf13/cobra"
 
 	"github.com/elastic/beats/libbeat/beat"
+	"github.com/elastic/beats/libbeat/cmd/instance"
 )
 
 func genSetupCmd(name, version string, beatCreator beat.Creator) *cobra.Command {
@@ -20,7 +21,7 @@ func genSetupCmd(name, version string, beatCreator beat.Creator) *cobra.Command 
  * ML jobs (where available).
 `,
 		Run: func(cmd *cobra.Command, args []string) {
-			beat, err := beat.New(name, version)
+			beat, err := instance.NewBeat(name, version)
 			if err != nil {
 				fmt.Fprintf(os.Stderr, "Error initializing beat: %s\n", err)
 				os.Exit(1)

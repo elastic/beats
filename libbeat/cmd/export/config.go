@@ -7,7 +7,7 @@ import (
 	"github.com/spf13/cobra"
 	"gopkg.in/yaml.v2"
 
-	"github.com/elastic/beats/libbeat/beat"
+	"github.com/elastic/beats/libbeat/cmd/instance"
 )
 
 func GenExportConfigCmd(name, beatVersion string) *cobra.Command {
@@ -15,7 +15,7 @@ func GenExportConfigCmd(name, beatVersion string) *cobra.Command {
 		Use:   "config",
 		Short: "Export current config to stdout",
 		Run: func(cmd *cobra.Command, args []string) {
-			b, err := beat.New(name, beatVersion)
+			b, err := instance.NewBeat(name, beatVersion)
 			if err != nil {
 				fmt.Fprintf(os.Stderr, "Error initializing beat: %s\n", err)
 				os.Exit(1)

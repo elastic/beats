@@ -35,12 +35,12 @@ var startTime = time.Now().UTC()
 
 // Winlogbeat is used to conform to the beat interface
 type Winlogbeat struct {
-	beat       *beat.Beat             // Common beat information.
-	config     *config.Settings       // Configuration settings.
-	eventLogs  []*eventLogger         // List of all event logs being monitored.
-	done       chan struct{}          // Channel to initiate shutdown of main event loop.
-	pipeline   pub.Pipeline           // Interface to publish event.
-	checkpoint *checkpoint.Checkpoint // Persists event log state to disk.
+	beat       *beat.Beat              // Common beat information.
+	config     config.WinlogbeatConfig // Configuration settings.
+	eventLogs  []*eventLogger          // List of all event logs being monitored.
+	done       chan struct{}           // Channel to initiate shutdown of main event loop.
+	pipeline   pub.Pipeline            // Interface to publish event.
+	checkpoint *checkpoint.Checkpoint  // Persists event log state to disk.
 }
 
 // New returns a new Winlogbeat.
@@ -49,21 +49,19 @@ func New(b *beat.Beat, _ *common.Config) (beat.Beater, error) {
 	// XXX: winlogbeat validates top-level config -> ignore beater config and
 	//      parse complete top-level config
 	config := config.DefaultSettings
-	rawConfig := b.RawConfig
-	err := rawConfig.Unpack(&config)
+	err := b.BeatConfig.Unpack(&config)
 	if err != nil {
 		return nil, fmt.Errorf("Error reading configuration file. %v", err)
 	}
 
 	// resolve registry file path
-	config.Winlogbeat.RegistryFile = paths.Resolve(
-		paths.Data, config.Winlogbeat.RegistryFile)
+	config.RegistryFile = paths.Resolve(paths.Data, config.RegistryFile)
 	logp.Info("State will be read from and persisted to %s",
-		config.Winlogbeat.RegistryFile)
+		config.RegistryFile)
 
 	eb := &Winlogbeat{
 		beat:   b,
-		config: &config,
+		config: config,
 		done:   make(chan struct{}),
 	}
 
@@ -75,7 +73,7 @@ func New(b *beat.Beat, _ *common.Config) (beat.Beater, error) {
 }
 
 func (eb *Winlogbeat) init(b *beat.Beat) error {
-	config := &eb.config.Winlogbeat
+	config := &eb.config
 
 	// Create the event logs. This will validate the event log specific
 	// configuration.
@@ -101,7 +99,7 @@ func (eb *Winlogbeat) init(b *beat.Beat) error {
 // Setup uses the loaded config and creates necessary markers and environment
 // settings to allow the beat to be used.
 func (eb *Winlogbeat) setup(b *beat.Beat) error {
-	config := &eb.config.Winlogbeat
+	config := &eb.config
 
 	var err error
 	eb.checkpoint, err = checkpoint.NewCheckpoint(config.RegistryFile, 10, 5*time.Second)

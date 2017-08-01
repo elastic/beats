@@ -32,11 +32,10 @@ var winEventLogConfigKeys = append(commonConfigKeys, "batch_read_size",
 
 type winEventLogConfig struct {
 	ConfigCommon  `config:",inline"`
-	BatchReadSize int                    `config:"batch_read_size"` // Maximum number of events that Read will return.
-	IncludeXML    bool                   `config:"include_xml"`
-	Forwarded     *bool                  `config:"forwarded"`
-	SimpleQuery   query                  `config:",inline"`
-	Raw           map[string]interface{} `config:",inline"`
+	BatchReadSize int   `config:"batch_read_size"` // Maximum number of events that Read will return.
+	IncludeXML    bool  `config:"include_xml"`
+	Forwarded     *bool `config:"forwarded"`
+	SimpleQuery   query `config:",inline"`
 }
 
 // defaultWinEventLogConfig is the default configuration for new wineventlog readers.

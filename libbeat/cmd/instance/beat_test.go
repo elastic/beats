@@ -1,6 +1,6 @@
 // +build !integration
 
-package beat
+package instance
 
 import (
 	"testing"
@@ -10,7 +10,7 @@ import (
 )
 
 func TestNewInstance(t *testing.T) {
-	b, err := New("testbeat", "0.9")
+	b, err := NewBeat("testbeat", "0.9")
 	if err != nil {
 		panic(err)
 	}
@@ -24,7 +24,7 @@ func TestNewInstance(t *testing.T) {
 }
 
 func TestNewInstanceUUID(t *testing.T) {
-	b, err := New("testbeat", "0.9")
+	b, err := NewBeat("testbeat", "0.9")
 	if err != nil {
 		panic(err)
 	}

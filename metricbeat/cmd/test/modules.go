@@ -6,7 +6,7 @@ import (
 
 	"github.com/spf13/cobra"
 
-	"github.com/elastic/beats/libbeat/beat"
+	"github.com/elastic/beats/libbeat/cmd/instance"
 	"github.com/elastic/beats/libbeat/testing"
 	"github.com/elastic/beats/metricbeat/beater"
 )
@@ -25,7 +25,7 @@ func GenTestModulesCmd(name, beatVersion string) *cobra.Command {
 				filter_metricset = args[1]
 			}
 
-			b, err := beat.New(name, beatVersion)
+			b, err := instance.NewBeat(name, beatVersion)
 			if err != nil {
 				fmt.Fprintf(os.Stderr, "Error initializing beat: %s\n", err)
 				os.Exit(1)
@@ -37,13 +37,7 @@ func GenTestModulesCmd(name, beatVersion string) *cobra.Command {
 				os.Exit(1)
 			}
 
-			config, err := b.BeatConfig()
-			if err != nil {
-				fmt.Fprintf(os.Stderr, "Error initializing beat: %s\n", err)
-				os.Exit(1)
-			}
-
-			mb, err := beater.New(b, config)
+			mb, err := beater.New(&b.Beat, b.Beat.BeatConfig)
 			if err != nil {
 				fmt.Fprintf(os.Stderr, "Error initializing metricbeat: %s\n", err)
 				os.Exit(1)

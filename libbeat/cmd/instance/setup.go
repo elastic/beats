@@ -1,4 +1,4 @@
-package beat
+package instance
 
 type TemplateConfig struct {
 	Enabled   bool              `config:"enabled"`
