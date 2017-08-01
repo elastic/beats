@@ -26,10 +26,9 @@ var eventLoggingConfigKeys = append(commonConfigKeys, "ignore_older",
 
 type eventLoggingConfig struct {
 	ConfigCommon     `config:",inline"`
-	IgnoreOlder      time.Duration          `config:"ignore_older"`
-	ReadBufferSize   uint                   `config:"read_buffer_size"   validate:"min=1"`
-	FormatBufferSize uint                   `config:"format_buffer_size" validate:"min=1"`
-	Raw              map[string]interface{} `config:",inline"`
+	IgnoreOlder      time.Duration `config:"ignore_older"`
+	ReadBufferSize   uint          `config:"read_buffer_size"   validate:"min=1"`
+	FormatBufferSize uint          `config:"format_buffer_size" validate:"min=1"`
 }
 
 // Validate validates the eventLoggingConfig data and returns an error
