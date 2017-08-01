@@ -30,12 +30,7 @@ type reader struct {
 }
 
 func (r *reader) Start(done <-chan struct{}) (<-chan Event, error) {
-	var paths []string
-	for _, filePaths := range r.config.Paths {
-		paths = append(paths, filePaths...)
-	}
-
-	for _, p := range paths {
+	for _, p := range r.config.Paths {
 		if err := r.watcher.Add(p); err != nil {
 			if err == syscall.EMFILE {
 				logp.Warn("%v Failed to watch %v: %v (check the max number of "+
@@ -56,7 +51,7 @@ func (r *reader) Start(done <-chan struct{}) (<-chan Event, error) {
 				if event.Name == "" {
 					continue
 				}
-				r.outC <- convertToFileEvent(event, r.config.MaxFileSize)
+				r.outC <- convertToFileEvent(event, r.config.MaxFileSizeBytes, r.config.HashTypes)
 			case err := <-r.watcher.Errors:
 				r.errC <- err
 			}
@@ -66,7 +61,7 @@ func (r *reader) Start(done <-chan struct{}) (<-chan Event, error) {
 	return r.outC, nil
 }
 
-func convertToFileEvent(e fsnotify.Event, maxFileSize int64) Event {
+func convertToFileEvent(e fsnotify.Event, maxFileSize uint64, hashTypes []string) Event {
 	event := Event{
 		Timestamp: time.Now().UTC(),
 		Path:      e.Name,
@@ -84,15 +79,12 @@ func convertToFileEvent(e fsnotify.Event, maxFileSize int64) Event {
 
 	switch event.Info.Type {
 	case "file":
-		if event.Info.Size <= maxFileSize {
-			md5sum, sha1sum, sha256sum, err := hashFile(event.Path)
+		if uint64(event.Info.Size) <= maxFileSize {
+			hashes, err := hashFile(event.Path, hashTypes...)
 			if err != nil {
 				event.errors = append(event.errors, err)
 			} else {
-				event.MD5 = md5sum
-				event.SHA1 = sha1sum
-				event.SHA256 = sha256sum
-				event.Hashed = true
+				event.Hashes = hashes
 			}
 		}
 	case "symlink":
