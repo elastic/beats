@@ -99,6 +99,8 @@ services:
     extends:
       file: ${ES_BEATS}/testing/environments/${TESTING_ENVIRONMENT}.yml
       service: elasticsearch
+    environment:
+      - "ES_JAVA_OPTS=-Xms90m -Xmx90m"
 
   haproxy:
     build: ${PWD}/module/haproxy/_meta
