@@ -6,14 +6,14 @@ import (
 	"runtime"
 
 	"github.com/elastic/beats/libbeat/beat"
-
+	"github.com/elastic/beats/libbeat/cmd/instance"
 	"github.com/elastic/beats/packetbeat/sniffer"
 )
 
 func init() {
 	printDevices := flag.Bool("devices", false, "Print the list of devices and exit")
 
-	beat.AddFlagsCallback(func(_ *beat.Beat) error {
+	instance.AddFlagsCallback(func(_ *beat.Beat) error {
 		if *printDevices == false {
 			return nil
 		}
