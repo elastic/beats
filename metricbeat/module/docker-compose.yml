@@ -1,0 +1,15 @@
+version: '2.1'
+services:
+  # This is a proxy used to block starting until all services are healthy.
+  # See: https://github.com/docker/compose/issues/4369
+  proxy:
+    image: busybox
+    depends_on:
+      module:
+        condition: service_healthy
+
+  module:
+    build: ${PWD}/module/${MODULE}/_meta
+    ports:
+      - ${PORT}:${PORT}
+

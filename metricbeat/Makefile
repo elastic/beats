@@ -93,3 +93,7 @@ test-module: ## @testing Tests the given module. Needs $MODULE as param an run-m
 test-module: python-env
 	go test -tags=integration ${BEAT_PATH}/module/${MODULE}/... -v
 	. ${PYTHON_ENV}/bin/activate && INTEGRATION_TESTS=1 nosetests tests/system/test_${MODULE}.py
+
+modules-tests:
+	./scripts/module_tests.sh
+
