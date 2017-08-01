@@ -16,6 +16,10 @@ https://github.com/elastic/beats/compare/v6.0.0-beta1...master[Check the HEAD di
 
 - The log directory (`path.log`) for Windows services is now set to `C:\ProgramData\[beatname]\logs`. {issue}4764[4764]
 
+*Auditbeat*
+
+- Changed file metricset config to make `file.paths` a list instead of a dictionary. {pull}4796[4796]
+
 *Filebeat*
 
 *Heartbeat*
@@ -30,6 +34,11 @@ https://github.com/elastic/beats/compare/v6.0.0-beta1...master[Check the HEAD di
 
 *Affecting all Beats*
 - Fix go plugins not loaded when beat starts {pull}4799[4799]
+
+*Auditbeat*
+
+- Fix `file.max_file_size` config option for the audit file metricset. {pull}4796[4796]
+
 *Filebeat*
 
 - Fix issue where the `fileset.module` could have the wrong value. {issue}4761[4761]
@@ -47,6 +56,11 @@ https://github.com/elastic/beats/compare/v6.0.0-beta1...master[Check the HEAD di
 ==== Added
 
 *Affecting all Beats*
+
+*Auditbeat*
+
+- Added `file.hash_types` config option for controlling the hash types. {pull}4796[4796]
+- Added the ability to specify byte unit suffixes to `file.max_file_size`. {pull}4796[4796]
 
 *Filebeat*
 

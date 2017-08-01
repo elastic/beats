@@ -8,7 +8,7 @@ This metricset is available only for Linux.
 [float]
 === How it works
 
-This metricset establishes a subscription to the `kernel` to receive the events
+This metricset establishes a subscription to the kernel to receive the events
 as they occur. So unlike most other metricsets, the `period` configuration
 option is unused because it is not implemented using polling.
 
@@ -16,8 +16,8 @@ The Linux kernel only supports a single subscriber to the audit events so this
 metricset cannot be used simultaneously with a service like `auditd`. `auditd`
 should be disabled if this metricset is being used. If you wish to continue to
 use `auditd` instead of this metricset to receive audit messages from the kernel
-then consider using {filebeat}/filebeat-module-auditd.html[Filebeat] to collect the daemon's
-log files.
+then consider using {filebeat}/filebeat-module-auditd.html[Filebeat] to collect
+the daemon's log files.
 
 The Linux Audit Framework can send multiple messages for a single auditable
 event. For example, a `rename` syscall causes the kernel to send eight separate
@@ -73,10 +73,12 @@ include each of the raw messages that contributed to the event in the document
 as a field called `messages`. The default value is false. This setting is
 primarily used for development and debugging purposes.
 
-*`kernel.include_warnings`*:: This boolean setting causes {beatname_uc} to include
-as warnings any issues that were encountered while parsing the raw messages.
-The default value is false. This setting is primarily used for development and
-debugging purposes.
+*`kernel.include_warnings`*:: This boolean setting causes {beatname_uc} to
+include as warnings any issues that were encountered while parsing the raw
+messages. The default value is false. When this setting is enabled the raw
+messages will be included in the event regardless of the
+`kernel.include_raw_message` config setting. This setting is primarily used for
+development and debugging purposes.
 
 *`kernel.audit_rules`*:: A string containing the audit rules that should be
 installed to the kernel. There should be one rule per line. Comments can be
@@ -102,9 +104,9 @@ the most active rules first in order to speed up evaluation.
 You can assign keys to each rule for better identification of the rule that
 triggered an event and easier filtering later in Elasticsearch.
 
-Defining any audit rules in the config causes {beatname_uc} to purge all existing
-audit rules prior to adding the rules specified in the config. Therefore it is
-unnecessary and unsupported to include a `-D` (delete all) rule.
+Defining any audit rules in the config causes {beatname_uc} to purge all
+existing audit rules prior to adding the rules specified in the config.
+Therefore it is unnecessary and unsupported to include a `-D` (delete all) rule.
 
 ["source","sh",subs="attributes"]
 ----
