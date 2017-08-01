@@ -266,7 +266,7 @@ sudo /etc/init.d/heartbeat-elastic start
 ["source","sh",subs="attributes"]
 ----------------------------------------------------------------------
 sudo chown root heartbeat.yml <1>
-sudo ./heartbeat run -e -c heartbeat.yml -d "publish"
+sudo ./heartbeat -e -c heartbeat.yml -d "publish"
 ----------------------------------------------------------------------
 <1> You'll be running Heartbeat as root, so you need to change ownership
 of the configuration file (see
