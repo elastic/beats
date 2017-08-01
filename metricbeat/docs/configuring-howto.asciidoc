@@ -23,6 +23,7 @@ The following topics describe how to configure Metricbeat:
 * <<configuration-general-options>>
 * <<metricbeat-configuration-reloading>>
 * <<configuring-output>>
+* <<configuration-ssl>>
 * <<filtering-and-enhancing-data>>
 * <<configuring-ingest-node>>
 * <<configuration-path>>
@@ -44,6 +45,8 @@ include::./reload-configuration.asciidoc[]
 
 :allplatforms:
 include::../../libbeat/docs/outputconfig.asciidoc[]
+
+include::../../libbeat/docs/shared-ssl-config.asciidoc[]
 
 include::./metricbeat-filtering.asciidoc[]
 

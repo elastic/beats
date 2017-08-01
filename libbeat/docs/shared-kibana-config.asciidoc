@@ -31,27 +31,27 @@ setup.kibana.host: "localhost:5601"
 You can specify the following options in the `setup.kibana` section of the
 +{beatname_lc}.yml+ config file:
 
-//REVIEWERS: I've decided to use full paths when referring to options rather than using indentation in examples. WDYT? Makes the examples a tad harder to read but will help immensely with users who don't know where to put stuff in the yaml hierarchy.
-
 [float]
 ==== `setup.kibana.host`
 
-The Kibana host where the dashboards will be loaded. This setting is required.
-The scheme and port default to `http` and `5601` if you don't set them
-explicitly. If you use a path after the port number, you must specify
-the scheme and port. For example: `http://localhost:5601/path`.
+The Kibana host where the dashboards will be loaded. The default is
+`127.0.0.1:5601`. The value of `host` can be a `URL` or `IP:PORT`. For example: `http://192.15.3.2`, `192:15.3.2:5601` or `http://192.15.3.2:6701/path`. If no
+port is specified, `5601` is used.
+
+NOTE: When a node is defined as an `IP:PORT`, the _scheme_ and _path_ are taken
+from the <<kibana-protocol-option,setup.kibana.protocol>> and
+<<kibana-path-option,setup.kibana.path>> config options.
 
 IPv6 addresses must be defined using the following format:
 `https://[2001:db8::1]:5601`.
 
 [float]
+[[kibana-protocol-option]]
 ==== `setup.kibana.protocol`
 
 The name of the protocol Kibana is reachable on. The options are: `http` or
 `https`. The default is `http`. However, if you specify a URL for host, the
 value of `protocol` is overridden by whatever scheme you specify in the URL.
-
-//REVIEWERS: Please check this example. I have not tested it.
 
 Example config:
 
@@ -74,6 +74,7 @@ The basic authentication username for connecting to Kibana.
 The basic authentication password for connecting to Elasticsearch.
 
 [float]
+[[kibana-path-option]]
 ==== `setup.kibana.path`
 
 An HTTP path prefix that is prepended to the HTTP API calls. This is useful for
@@ -84,12 +85,10 @@ under a custom prefix.
 ==== `setup.kibana.ssl.enabled`
 
 Enables {beatname_uc} to use SSL settings when connecting to Kibana via HTTPS.
-
-//REVIEWERS: The reference config file said that the ssl.enabled: true is the default, but that doesn't seem quite right. Do you mean that this setting defaults to true when https is configured?
+If you configure the Beat to connect over HTTPS, this setting defaults to
+`true` and {beatname_uc} uses the default SSL settings.
 
 Example configuration:
-
-//REVIEWERS: Please confirm this example. I did not test it.
 
 [source,yaml]
 ----
@@ -101,113 +100,5 @@ setup.kibana.ssl.certificate: "/etc/pki/client/cert.pem"
 setup.kibana.ssl.key: "/etc/pki/client/cert.key
 ----
 
-[float]
-==== `setup.kibana.ssl.verification_mode`
-
-//REVEIWERS: Most of this content is copied from the section about configuring outputs. We should probably centralize our descriptions of these options at some point, but copy/paste is faster, so I'm doing that for now
-
-This option controls whether the client verifies server certificates and host
-names. Valid values are `none` and `full`. If `verification_mode` is set
-to `none`, all server host names and certificates are accepted. In this mode,
-TLS-based connections are susceptible to man-in-the-middle attacks. Use this
-option for testing only. The default is `full`.
-
-Example config:
-
-[source,yaml]
-----
-setup.kibana.ssl.verification_mode: full
-----
-
-[float]
-==== `setup.kibana.ssl.supported_protocols`
-
-//REVIEWERS: This description is kind of garbled. Can we fix the language, but maybe without going into details about how the client and server negotiate which version to use?
-
-List of allowed SSL/TLS versions. If the SSL/TLS server decides for protocol
-versions not configured, the connection will be dropped during or after the
-handshake. By default all TLS versions 1.0 up to 1.2 are enabled.
-
-Example config:
-
-[source,yaml]
-----
-setup.kibana.ssl.supported_protocols: [TLSv1.0, TLSv1.1, TLSv1.2]
-----
-
-[float]
-==== `setup.kibana.ssl.certificate_authorities`
-
-The list of root certificates for server verifications. If
-`certificate_authorities` is empty or not set, the trusted certificate
-authorities of the host system are used.
-
-Example config:
-
-[source,yaml]
-----
-setup.kibana.ssl.certificate_authorities: ["/etc/pki/root/ca.pem"]
-----
-
-[float]
-[[certificate-kibana-config]]
-==== `setup.kibana.ssl.certificate`
-
-The path to the certificate for SSL client authentication. If the certificate
-is not specified, client authentication is not available. The connection
-might fail if the server requests client authentication. If the SSL server does
-not require client authentication, the certificate will be loaded, but not
-requested or used by the server.
-
-When this option is configured, the
-<<certificate_key,`certificate-key-kibana-config`>> option is also required.
-
-Example config:
-
-[source,yaml]
-----
-setup.kibana.ssl.certificate: "/etc/pki/client/cert.pem"
-----
-
-[float]
-[[certificate-key-kibana-config]]
-==== `setup.kibana.ssl.key`
-
-The client certificate key used for client authentication. This option is required if <<certificate,`certificate-kibana-config`>> is specified.
-
-Example config:
-
-[source,yaml]
-----
-setup.kibana.ssl.key: "/etc/pki/client/cert.key"
-----
-
-[float]
-===== `setup.kibana.ssl.key_passphrase`
-
-The passphrase used to decrypt an encrypted key stored in the configured `key` file.
-
-Example config:
-
-[source,yaml]
-----
-setup.kibana.ssl.key_passphrase: ''
-----
-
-[float]
-===== `setup.kibana.ssl.cipher_suites`
-
-The list of cipher suites to use for SSL connections. The first entry has the
-highest priority.
-If this option is omitted, the Go crypto library's default
-suites are used (recommended).
-
-include::./shared-cipher-suites.asciidoc[]
-
-[float]
-===== `setup.kibana.ssl.curve_types`
-
-The list of curve types for ECDHE (Elliptic Curve Diffie-Hellman ephemeral key exchange).
-
-include::./shared-curve-types.asciidoc[]
+See <<configuration-ssl>> for more information.
 

@@ -25,6 +25,7 @@ The following topics describe how to configure Packetbeat:
 * <<configuration-processes>>
 * <<configuration-general-options>>
 * <<configuring-output>>
+* <<configuration-ssl>>
 * <<filtering-and-enhancing-data>>
 * <<configuring-ingest-node>>
 * <<packetbeat-geoip>>
@@ -45,6 +46,8 @@ include::./packetbeat-general-options.asciidoc[]
 
 :allplatforms:
 include::../../libbeat/docs/outputconfig.asciidoc[]
+
+include::../../libbeat/docs/shared-ssl-config.asciidoc[]
 
 include::./packetbeat-filtering.asciidoc[]
 

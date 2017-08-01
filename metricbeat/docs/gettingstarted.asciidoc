@@ -289,8 +289,6 @@ directory (see
 {libbeat}/config-file-permissions.html[Config File Ownership and Permissions]
 in the _Beats Platform Reference_).
 
-//REVIEWERS: It seems really inconvenient to users to expect them to change ownership on all the files in `modules.d`. This is something I had to do, but not 100% sure if there is a better way. Please advise.
-
 *win:*
 
 [source,shell]

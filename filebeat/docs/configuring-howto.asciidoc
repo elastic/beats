@@ -24,6 +24,7 @@ The following topics describe how to configure Filebeat:
 * <<configuration-general-options>>
 * <<filebeat-configuration-reloading>>
 * <<configuring-output>>
+* <<configuration-ssl>>
 * <<filtering-and-enhancing-data>>
 * <<configuring-ingest-node>>
 * <<configuration-path>>
@@ -50,6 +51,8 @@ include::./reload-configuration.asciidoc[]
 
 :allplatforms:
 include::../../libbeat/docs/outputconfig.asciidoc[]
+
+include::../../libbeat/docs/shared-ssl-config.asciidoc[]
 
 include::./load-balancing.asciidoc[]
 
