@@ -3874,6 +3874,12 @@ The HTTP payload received
 json metricset
 
 
+[float]
+== server fields
+
+server
+
+
 [[exported-fields-jolokia]]
 == Jolokia fields
 
