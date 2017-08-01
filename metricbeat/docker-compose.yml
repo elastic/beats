@@ -55,6 +55,7 @@ services:
       haproxy:        { condition: service_healthy }
       http:           { condition: service_healthy }
 
+
   proxy_dep2:
     image: busybox
     depends_on:
@@ -107,14 +108,20 @@ services:
 
   jolokia:
     build: ${PWD}/module/jolokia/_meta
+    depends_on:
+      - proxy_dep1
 
   kafka:
     build: ${PWD}/module/kafka/_meta
+    depends_on:
+      - proxy_dep1
 
   kibana:
     extends:
       file: ${ES_BEATS}/testing/environments/${TESTING_ENVIRONMENT}.yml
       service: kibana
+    depends_on:
+      - proxy_dep1
 
   kubernetes:
     build: ${PWD}/module/kubernetes/_meta
@@ -126,38 +133,62 @@ services:
       - /sys:/sys
       - /var/lib/docker:/var/lib/docker
       - /var/run:/var/run
+    depends_on:
+      - proxy_dep1
 
   kube-state:
     build:
       context: ${PWD}/module/kubernetes/_meta/
       dockerfile: Dockerfile.kube-state
+    depends_on:
+      - proxy_dep1
 
   memcached:
     build: ${PWD}/module/memcached/_meta
+    depends_on:
+      - proxy_dep1
 
   mongodb:
     build: ${PWD}/module/mongodb/_meta
+    depends_on:
+      - proxy_dep1
 
   mysql:
     build: ${PWD}/module/mysql/_meta
+    depends_on:
+      - proxy_dep2
 
   nginx:
     build: ${PWD}/module/nginx/_meta
+    depends_on:
+      - proxy_dep2
 
   phpfpm:
     build: ${PWD}/module/php_fpm/_meta
+    depends_on:
+      - proxy_dep2
 
   postgresql:
     build: ${PWD}/module/postgresql/_meta
+    depends_on:
+      - proxy_dep2
 
   prometheus:
     build: ${PWD}/module/prometheus/_meta
+    depends_on:
+      - proxy_dep2
 
   rabbitmq:
     build: ${PWD}/module/rabbitmq/_meta
+    depends_on:
+      - proxy_dep2
 
   redis:
     build: ${PWD}/module/redis/_meta
+    depends_on:
+      - proxy_dep2
 
   zookeeper:
     build: ${PWD}/module/zookeeper/_meta
+    depends_on:
+      - proxy_dep2
