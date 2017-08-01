@@ -30,4 +30,5 @@ func init() {
 	runFlags.AddGoFlag(flag.CommandLine.Lookup("devices"))
 
 	RootCmd = cmd.GenRootCmdWithRunFlags(Name, "", beater.New, runFlags)
+	RootCmd.AddCommand(genDevicesCommand())
 }
