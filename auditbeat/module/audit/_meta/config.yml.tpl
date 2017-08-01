@@ -23,39 +23,37 @@
 
 {{ if .reference -}}
 # The file integrity metricset sends events when files are changed (created,
-# updated, deleted). The events contain file metadata and hashes (MD5, SHA1, and
-# SHA256).
+# updated, deleted). The events contain file metadata and hashes.
 {{ end -}}
 - module: audit
   metricsets: [file]
   {{ if eq .goos "darwin" -}}
   file.paths:
-    binaries:
-    - /bin
-    - /usr/bin
-    - /usr/local/bin
-    - /sbin
-    - /usr/sbin
-    - /usr/local/sbin
+  - /bin
+  - /usr/bin
+  - /usr/local/bin
+  - /sbin
+  - /usr/sbin
+  - /usr/local/sbin
   {{ else if eq .goos "windows" -}}
   file.paths:
-    windows:
-    - C:/windows
-    - C:/windows/system32
-    programs:
-    - C:/Program Files
-    - C:/Program Files (x86)
+  - C:/windows
+  - C:/windows/system32
+  - C:/Program Files
+  - C:/Program Files (x86)
   {{ else -}}
   file.paths:
-    binaries:
-    - /bin
-    - /usr/bin
-    - /sbin
-    - /usr/sbin
-    conf:
-    - /etc
+  - /bin
+  - /usr/bin
+  - /sbin
+  - /usr/sbin
+  - /etc
   {{ end -}}
   {{ if .reference }}
-  # Limit in bytes on the size of files that will be hashed.
-  file.max_file_size: 1073741824 # 1 GiB
+  # Limit on the size of files that will be hashed. Default is 100 MiB.
+  file.max_file_size: 100 MiB
+
+  # Hash types to compute when the file changes. Supported types are md5, sha1,
+  # sha224, sha256, sha384, sha512, sha512_224, and sha512_256. Default is sha1.
+  file.hash_types: [sha1]
   {{- end }}

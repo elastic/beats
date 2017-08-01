@@ -26,15 +26,6 @@ func init() {
 	}
 }
 
-type Config struct {
-	Paths       map[string][]string `config:"file.paths"`
-	MaxFileSize int64               `config:"max_file_size"`
-}
-
-var defaultConfig = Config{
-	MaxFileSize: 1 << 30, // 1 Gibibyte
-}
-
 type EventReader interface {
 	Start(done <-chan struct{}) (<-chan Event, error)
 }

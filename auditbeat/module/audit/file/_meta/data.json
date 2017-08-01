@@ -1,33 +1,35 @@
 {
-    "@timestamp": "2017-07-10T18:13:08.197Z",
-    "audit": {
-        "file": {
-            "action": "created",
-            "atime": "2017-07-10T18:13:08Z",
-            "ctime": "2017-07-10T18:13:08Z",
-            "gid": 20,
-            "group": "staff",
-            "hashed": true,
-            "inode": "11706872",
-            "md5": "5eb63bbbe01eeed093cb22bb8f5acdc3",
-            "mode": "0600",
-            "mtime": "2017-07-10T18:13:08Z",
-            "owner": "akroh",
-            "path": "/var/folders/8x/rnyk6yxn6w97lddn3bs02gf00000gn/T/audit-file232876074/file.data",
-            "sha1": "2aae6c35c94fcfb415dbe95f408b9ce91ee846ed",
-            "sha256": "b94d27b9934d3e08a52e52d7da7dabfac484efe37a5380ee9088f7ace2efcde9",
-            "size": 11,
-            "type": "file",
-            "uid": 501
-        }
-    },
-    "beat": {
-        "hostname": "host.example.com",
-        "name": "host.example.com"
-    },
-    "metricset": {
-        "module": "audit",
-        "name": "file",
-        "rtt": 115
+  "@timestamp": "2017-07-31T14:40:28.173Z",
+  "@metadata": {
+    "beat": "noindex",
+    "type": "doc"
+  },
+  "audit": {
+    "file": {
+      "hashed": true,
+      "group": "staff",
+      "path": "/var/folders/8x/rnyk6yxn6w97lddn3bs02gf00000gn/T/audit-file927187403/file.data",
+      "inode": "12512120",
+      "size": 11,
+      "ctime": "2017-07-31T14:40:28.000Z",
+      "mode": "0600",
+      "owner": "akroh",
+      "atime": "2017-07-31T14:40:28.000Z",
+      "sha1": "2aae6c35c94fcfb415dbe95f408b9ce91ee846ed",
+      "action": "created",
+      "mtime": "2017-07-31T14:40:28.000Z",
+      "type": "file",
+      "uid": 501,
+      "gid": 20
     }
+  },
+  "metricset": {
+    "module": "audit",
+    "name": "file",
+    "rtt": 115
+  },
+  "beat": {
+    "name": "host.example.com",
+    "hostname": "host.example.com"
+  }
 }
