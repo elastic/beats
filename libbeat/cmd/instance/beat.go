@@ -46,6 +46,7 @@ import (
 	_ "github.com/elastic/beats/libbeat/monitoring/report/elasticsearch"
 )
 
+// Beat provides the runnable and configurable instance of a beat.
 type Beat struct {
 	beat.Beat
 
@@ -97,7 +98,7 @@ func Run(name, version string, bt beat.Creator) error {
 	}())
 }
 
-// New creates a new beat instance
+// NewBeat creates a new beat instance
 func NewBeat(name, v string) (*Beat, error) {
 	if v == "" {
 		v = version.GetDefaultVersion()
@@ -350,11 +351,8 @@ func (b *Beat) handleFlags() error {
 	if err := logp.HandleFlags(b.Info.Beat); err != nil {
 		return err
 	}
-	if err := cfgfile.HandleFlags(); err != nil {
-		return err
-	}
 
-	return handleFlags(&b.Beat)
+	return cfgfile.HandleFlags()
 }
 
 // config reads the configuration file from disk, parses the common options
