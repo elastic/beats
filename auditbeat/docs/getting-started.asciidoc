@@ -209,14 +209,14 @@ start {beatname_uc} in the foreground.
 
 ["source","sh",subs="attributes"]
 ----------------------------------------------------------------------
-sudo /etc/init.d/{beatname_lc} start
+sudo service {beatname_lc} start
 ----------------------------------------------------------------------
 
 *rpm:*
 
 ["source","sh",subs="attributes"]
 ----------------------------------------------------------------------
-sudo /etc/init.d/{beatname_lc} start
+sudo service {beatname_lc} start
 ----------------------------------------------------------------------
 
 *mac:*

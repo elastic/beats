@@ -233,20 +233,18 @@ NOTE: If you use an init.d script to start Filebeat on deb or rpm, you can't
 specify command line flags (see <<command-line-options>>). To specify flags,
 start Filebeat in the foreground.
 
-//REVIEWERS: With the new command syntax, should the deb and rpm instructions here say run instead of start?
-
 *deb:*
 
-[source,shell]
+["source","sh",subs="attributes"]
 ----------------------------------------------------------------------
-sudo /etc/init.d/filebeat start
+sudo service {beatname_lc} start
 ----------------------------------------------------------------------
 
 *rpm:*
 
-[source,shell]
+["source","sh",subs="attributes"]
 ----------------------------------------------------------------------
-sudo /etc/init.d/filebeat start
+sudo service {beatname_lc} start
 ----------------------------------------------------------------------
 
 *docker:*

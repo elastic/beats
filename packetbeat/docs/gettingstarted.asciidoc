@@ -273,21 +273,21 @@ start Packetbeat in the foreground.
 
 *deb:*
 
-[source,shell]
+["source","sh",subs="attributes"]
 ----------------------------------------------------------------------
-sudo /etc/init.d/packetbeat start
+sudo service {beatname_lc} start
 ----------------------------------------------------------------------
 
 *rpm:*
 
-[source,shell]
+["source","sh",subs="attributes"]
 ----------------------------------------------------------------------
-sudo /etc/init.d/packetbeat start
+sudo service {beatname_lc} start
 ----------------------------------------------------------------------
 
 *docker:*
 
-["source", "shell", subs="attributes"]
+["source","sh",subs="attributes"]
 ----------------------------------------------------------------------
 docker run {dockerimage}
 ----------------------------------------------------------------------

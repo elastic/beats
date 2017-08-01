@@ -256,16 +256,16 @@ start Metricbeat in the foreground.
 
 *deb:*
 
-[source,shell]
+["source","sh",subs="attributes"]
 ----------------------------------------------------------------------
-sudo /etc/init.d/metricbeat start
+sudo service {beatname_lc} start
 ----------------------------------------------------------------------
 
 *rpm:*
 
-[source,shell]
+["source","sh",subs="attributes"]
 ----------------------------------------------------------------------
-sudo /etc/init.d/metricbeat start
+sudo service {beatname_lc} start
 ----------------------------------------------------------------------
 
 *docker:*
