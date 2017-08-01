@@ -227,9 +227,10 @@ sudo chown root {beatname_lc}.yml <1>
 sudo ./{beatname_lc} -e -c {beatname_lc}.yml -d "publish"
 ----------------------------------------------------------------------
 <1> To monitor system files, you'll be running {beatname_uc} as root, so you
-need to change ownership of the configuration file (see
+need to change ownership of the configuration file, or run {beatname_uc} with
+`-strict.perms=false` specified. See
 {libbeat}/config-file-permissions.html[Config File Ownership and Permissions]
-in the _Beats Platform Reference_).
+in the _Beats Platform Reference_.
 
 If you see a warning about too many open files, you need to increase the
 `ulimit`. See the <<ulimit,FAQ>> for more details.
