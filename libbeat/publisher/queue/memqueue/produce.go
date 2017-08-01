@@ -1,9 +1,9 @@
 package memqueue
 
 import (
+	"github.com/elastic/beats/libbeat/beat"
 	"github.com/elastic/beats/libbeat/common/atomic"
 	"github.com/elastic/beats/libbeat/publisher"
-	"github.com/elastic/beats/libbeat/publisher/beat"
 	"github.com/elastic/beats/libbeat/publisher/queue"
 )
 

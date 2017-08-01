@@ -12,13 +12,13 @@ import (
 
 	"github.com/stretchr/testify/assert"
 
+	"github.com/elastic/beats/libbeat/beat"
 	"github.com/elastic/beats/libbeat/common"
 	"github.com/elastic/beats/libbeat/common/fmtstr"
 	"github.com/elastic/beats/libbeat/logp"
 	"github.com/elastic/beats/libbeat/outputs/outest"
 	"github.com/elastic/beats/libbeat/outputs/outil"
 	"github.com/elastic/beats/libbeat/publisher"
-	"github.com/elastic/beats/libbeat/publisher/beat"
 )
 
 func readStatusItem(in []byte) (int, string, error) {

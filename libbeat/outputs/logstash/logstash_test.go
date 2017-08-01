@@ -11,11 +11,11 @@ import (
 
 	"github.com/elastic/go-lumber/server/v2"
 
+	"github.com/elastic/beats/libbeat/beat"
 	"github.com/elastic/beats/libbeat/common"
 	"github.com/elastic/beats/libbeat/outputs"
 	"github.com/elastic/beats/libbeat/outputs/outest"
 	"github.com/elastic/beats/libbeat/outputs/transport/transptest"
-	"github.com/elastic/beats/libbeat/publisher/beat"
 )
 
 const (
@@ -164,7 +164,7 @@ func newTestLumberjackOutput(
 	}
 
 	cfg, _ := common.NewConfigFrom(config)
-	grp, err := outputs.Load(common.BeatInfo{}, nil, "logstash", cfg)
+	grp, err := outputs.Load(beat.Info{}, nil, "logstash", cfg)
 	if err != nil {
 		t.Fatalf("init logstash output plugin failed: %v", err)
 	}

@@ -6,9 +6,9 @@ import (
 
 	"github.com/pkg/errors"
 
+	"github.com/elastic/beats/libbeat/beat"
 	"github.com/elastic/beats/libbeat/common"
 	"github.com/elastic/beats/libbeat/processors"
-	"github.com/elastic/beats/libbeat/publisher/beat"
 )
 
 type includeFields struct {

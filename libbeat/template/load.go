@@ -3,6 +3,7 @@ package template
 import (
 	"fmt"
 
+	"github.com/elastic/beats/libbeat/beat"
 	"github.com/elastic/beats/libbeat/common"
 	"github.com/elastic/beats/libbeat/logp"
 	"github.com/elastic/beats/libbeat/paths"
@@ -19,10 +20,10 @@ type ESClient interface {
 type Loader struct {
 	config   TemplateConfig
 	client   ESClient
-	beatInfo common.BeatInfo
+	beatInfo beat.Info
 }
 
-func NewLoader(cfg *common.Config, client ESClient, beatInfo common.BeatInfo) (*Loader, error) {
+func NewLoader(cfg *common.Config, client ESClient, beatInfo beat.Info) (*Loader, error) {
 	config := DefaultConfig
 
 	err := cfg.Unpack(&config)

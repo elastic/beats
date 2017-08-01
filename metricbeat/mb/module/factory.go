@@ -5,10 +5,10 @@ import (
 
 	"github.com/joeshaw/multierror"
 
+	"github.com/elastic/beats/libbeat/beat"
 	"github.com/elastic/beats/libbeat/cfgfile"
 	"github.com/elastic/beats/libbeat/common"
 	"github.com/elastic/beats/libbeat/common/cfgwarn"
-	"github.com/elastic/beats/libbeat/publisher/beat"
 	"github.com/elastic/beats/metricbeat/mb"
 )
 
