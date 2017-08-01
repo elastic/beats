@@ -17,7 +17,7 @@ unix2dos {{.beat_name}}-win.yml
 cp {{.beat_name}}-win.yml /{{.beat_name}}-${VERSION}-windows-{{.win_arch}}/{{.beat_name}}.yml
 cp {{.beat_name}}-win.reference.yml /{{.beat_name}}-${VERSION}-windows-{{.win_arch}}/{{.beat_name}}.reference.yml
 cp fields.yml /{{.beat_name}}-${VERSION}-windows-{{.win_arch}}/
-cp -a modules.d-darwin/ /{{.beat_name}}-${VERSION}-windows-{{.win_arch}}/modules.d || true
+cp -a modules.d-win/ /{{.beat_name}}-${VERSION}-windows-{{.win_arch}}/modules.d || true
 cp install-service-{{.beat_name}}.ps1 /{{.beat_name}}-${VERSION}-windows-{{.win_arch}}/
 cp uninstall-service-{{.beat_name}}.ps1 /{{.beat_name}}-${VERSION}-windows-{{.win_arch}}/
 
