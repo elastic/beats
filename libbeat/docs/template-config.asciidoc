@@ -21,8 +21,6 @@ section for details.
 *`setup.template.overwrite`*:: A boolean that specifies whether to overwrite the existing template. The default
 is false.
 
-//REVIEWERS: I don't see the following options in the reference.yml file. Are they still available/valid?
-
 *`setup.template.settings`*:: A dictionary of settings to place into the `settings.index` dictionary of the
 Elasticsearch template. For more details about the available Elasticsearch mapping options, please
 see the Elasticsearch {elasticsearch}/mapping.html[mapping reference].

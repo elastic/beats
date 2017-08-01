@@ -154,8 +154,6 @@ include::../../libbeat/docs/shared-configuring.asciidoc[]
 Here is a sample of the `filebeat` section of the `filebeat.yml` file. Filebeat uses predefined
 default values for most configuration options.
 
-//REVIEWERS: I'm adding the enabled settings to the examples because they show up in the default config
-
 [source,yaml]
 -------------------------------------------------------------------------------------
 filebeat.prospectors:
