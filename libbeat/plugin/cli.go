@@ -18,8 +18,12 @@ func (p *pluginList) String() string {
 }
 
 func (p *pluginList) Set(v string) error {
-	// TODO: check file exists
-
+	for _, path := range p.paths {
+		if path == v {
+			logp.Warn("%s is already a registered plugin")
+			return nil
+		}
+	}
 	p.paths = append(p.paths, v)
 	return nil
 }

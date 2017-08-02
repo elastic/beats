@@ -32,13 +32,11 @@ auditbeat.modules:
 - module: audit
   metricsets: [file]
   file.paths:
-    binaries:
-    - /bin
-    - /usr/bin
-    - /sbin
-    - /usr/sbin
-    conf:
-    - /etc
+  - /bin
+  - /usr/bin
+  - /sbin
+  - /usr/sbin
+  - /etc
   
 ----
 
