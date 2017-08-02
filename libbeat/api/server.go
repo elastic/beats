@@ -6,6 +6,7 @@ import (
 	"net/url"
 	"strconv"
 
+	"github.com/elastic/beats/libbeat/beat"
 	"github.com/elastic/beats/libbeat/common"
 	"github.com/elastic/beats/libbeat/common/cfgwarn"
 	"github.com/elastic/beats/libbeat/logp"
@@ -13,7 +14,7 @@ import (
 )
 
 // Start starts the metrics api endpoint on the configured host and port
-func Start(cfg *common.Config, info common.BeatInfo) {
+func Start(cfg *common.Config, info beat.Info) {
 	cfgwarn.Beta("Metrics endpoint is enabled.")
 	config := DefaultConfig
 	cfg.Unpack(&config)
@@ -33,7 +34,7 @@ func Start(cfg *common.Config, info common.BeatInfo) {
 	}()
 }
 
-func rootHandler(info common.BeatInfo) func(http.ResponseWriter, *http.Request) {
+func rootHandler(info beat.Info) func(http.ResponseWriter, *http.Request) {
 	return func(w http.ResponseWriter, r *http.Request) {
 		// Return error page
 		if r.URL.Path != "/" {

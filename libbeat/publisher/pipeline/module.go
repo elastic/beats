@@ -5,6 +5,7 @@ import (
 	"flag"
 	"fmt"
 
+	"github.com/elastic/beats/libbeat/beat"
 	"github.com/elastic/beats/libbeat/common"
 	"github.com/elastic/beats/libbeat/logp"
 	"github.com/elastic/beats/libbeat/monitoring"
@@ -27,7 +28,7 @@ func init() {
 // Load uses a Config object to create a new complete Pipeline instance with
 // configured queue and outputs.
 func Load(
-	beatInfo common.BeatInfo,
+	beatInfo beat.Info,
 	config Config,
 	outcfg common.ConfigNamespace,
 ) (*Pipeline, error) {
@@ -81,7 +82,7 @@ func Load(
 }
 
 func loadOutput(
-	beatInfo common.BeatInfo,
+	beatInfo beat.Info,
 	reg *monitoring.Registry,
 	outcfg common.ConfigNamespace,
 ) (outputs.Group, error) {

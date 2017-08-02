@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"sync"
 
+	"github.com/elastic/beats/libbeat/beat"
 	"github.com/elastic/beats/libbeat/common"
 	"github.com/elastic/beats/libbeat/logp"
 	"github.com/elastic/beats/libbeat/outputs"
@@ -47,7 +48,7 @@ func RegisterConnectCallback(callback connectCallback) {
 }
 
 func makeES(
-	beat common.BeatInfo,
+	beat beat.Info,
 	stats *outputs.Stats,
 	cfg *common.Config,
 ) (outputs.Group, error) {

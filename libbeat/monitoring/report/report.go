@@ -4,6 +4,7 @@ import (
 	"errors"
 	"fmt"
 
+	"github.com/elastic/beats/libbeat/beat"
 	"github.com/elastic/beats/libbeat/common"
 )
 
@@ -16,7 +17,7 @@ type Reporter interface {
 	Stop()
 }
 
-type ReporterFactory func(common.BeatInfo, *common.Config) (Reporter, error)
+type ReporterFactory func(beat.Info, *common.Config) (Reporter, error)
 
 var (
 	defaultConfig = config{}
@@ -32,7 +33,7 @@ func RegisterReporterFactory(name string, f ReporterFactory) {
 }
 
 func New(
-	beat common.BeatInfo,
+	beat beat.Info,
 	cfg *common.Config,
 	outputs common.ConfigNamespace,
 ) (Reporter, error) {

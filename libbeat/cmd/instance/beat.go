@@ -135,7 +135,7 @@ func NewBeat(name, v string) (*Beat, error) {
 	}
 
 	b := beat.Beat{
-		Info: common.BeatInfo{
+		Info: beat.Info{
 			Beat:     name,
 			Version:  v,
 			Name:     hostname,

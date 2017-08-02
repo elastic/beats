@@ -185,7 +185,7 @@ func TestKafkaPublish(t *testing.T) {
 		}
 
 		t.Run(name, func(t *testing.T) {
-			grp, err := makeKafka(common.BeatInfo{Beat: "libbeat"}, nil, cfg)
+			grp, err := makeKafka(beat.Info{Beat: "libbeat"}, nil, cfg)
 			if err != nil {
 				t.Fatal(err)
 			}

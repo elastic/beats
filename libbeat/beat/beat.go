@@ -32,8 +32,8 @@ type Beater interface {
 // Beat contains the basic beat data and the publisher client used to publish
 // events.
 type Beat struct {
-	Info      common.BeatInfo // beat metadata.
-	Publisher Pipeline        // Publisher pipeline
+	Info      Info     // beat metadata.
+	Publisher Pipeline // Publisher pipeline
 
 	SetupMLCallback SetupMLCallback // setup callback for ML job configs
 	InSetupCmd      bool            // this is set to true when the `setup` command is called
