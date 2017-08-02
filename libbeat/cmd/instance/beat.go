@@ -71,6 +71,11 @@ type beatConfig struct {
 	// output/publishing related configurations
 	Pipeline   pipeline.Config `config:",inline"`
 	Monitoring *common.Config  `config:"xpack.monitoring"`
+
+	// elastic stack 'setup' configurations
+	Dashboards *common.Config `config:"setup.dashboards"`
+	Template   *common.Config `config:"setup.template"`
+	Kibana     *common.Config `config:"setup.kibana"`
 }
 
 var (
