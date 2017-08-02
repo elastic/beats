@@ -48,11 +48,6 @@ type Beat struct {
 type BeatConfig struct {
 	// output/publishing related configurations
 	Output common.ConfigNamespace `config:"output"`
-
-	// 'setup' configurations
-	Dashboards *common.Config `config:"setup.dashboards"`
-	Template   *common.Config `config:"setup.template"`
-	Kibana     *common.Config `config:"setup.kibana"`
 }
 
 // SetupMLCallback can be used by the Beat to register MachineLearning configurations
