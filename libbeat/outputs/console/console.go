@@ -7,6 +7,7 @@ import (
 	"runtime"
 	"time"
 
+	"github.com/elastic/beats/libbeat/beat"
 	"github.com/elastic/beats/libbeat/common"
 	"github.com/elastic/beats/libbeat/logp"
 	"github.com/elastic/beats/libbeat/outputs"
@@ -35,7 +36,7 @@ func init() {
 }
 
 func makeConsole(
-	beat common.BeatInfo,
+	beat beat.Info,
 	stats *outputs.Stats,
 	cfg *common.Config,
 ) (outputs.Group, error) {
