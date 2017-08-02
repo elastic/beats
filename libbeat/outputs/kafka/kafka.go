@@ -10,6 +10,7 @@ import (
 	"github.com/Shopify/sarama"
 	gometrics "github.com/rcrowley/go-metrics"
 
+	"github.com/elastic/beats/libbeat/beat"
 	"github.com/elastic/beats/libbeat/common"
 	"github.com/elastic/beats/libbeat/logp"
 	"github.com/elastic/beats/libbeat/monitoring"
@@ -95,7 +96,7 @@ func kafkaMetricsRegistry() gometrics.Registry {
 }
 
 func makeKafka(
-	beat common.BeatInfo,
+	beat beat.Info,
 	stats *outputs.Stats,
 	cfg *common.Config,
 ) (outputs.Group, error) {

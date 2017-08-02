@@ -7,6 +7,7 @@ import (
 	"path/filepath"
 	"testing"
 
+	"github.com/elastic/beats/libbeat/beat"
 	"github.com/elastic/beats/libbeat/common"
 	"github.com/elastic/beats/libbeat/outputs/elasticsearch"
 	"github.com/elastic/beats/libbeat/version"
@@ -214,7 +215,7 @@ func TestOverwrite(t *testing.T) {
 		t.Fatal(err)
 	}
 
-	beatInfo := common.BeatInfo{
+	beatInfo := beat.Info{
 		Beat:    "testbeat",
 		Version: version.GetDefaultVersion(),
 	}

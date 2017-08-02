@@ -4,6 +4,7 @@ import (
 	"errors"
 	"time"
 
+	"github.com/elastic/beats/libbeat/beat"
 	"github.com/elastic/beats/libbeat/common"
 	"github.com/elastic/beats/libbeat/logp"
 	"github.com/elastic/beats/libbeat/outputs"
@@ -13,7 +14,7 @@ import (
 )
 
 type redisOut struct {
-	beat common.BeatInfo
+	beat beat.Info
 }
 
 var debugf = logp.MakeDebug("redis")
@@ -28,7 +29,7 @@ func init() {
 }
 
 func makeRedis(
-	beat common.BeatInfo,
+	beat beat.Info,
 	stats *outputs.Stats,
 	cfg *common.Config,
 ) (outputs.Group, error) {
