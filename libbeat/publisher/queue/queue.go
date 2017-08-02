@@ -3,9 +3,9 @@ package queue
 import (
 	"io"
 
+	"github.com/elastic/beats/libbeat/beat"
 	"github.com/elastic/beats/libbeat/common"
 	"github.com/elastic/beats/libbeat/publisher"
-	"github.com/elastic/beats/libbeat/publisher/beat"
 )
 
 // Factory for creating a queue used by a pipeline instance.

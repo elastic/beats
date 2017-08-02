@@ -1,7 +1,7 @@
 package publisher
 
 import (
-	"github.com/elastic/beats/libbeat/publisher/beat"
+	"github.com/elastic/beats/libbeat/beat"
 )
 
 // Batch is used to pass a batch of events to the outputs and asynchronously listening

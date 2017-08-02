@@ -3,8 +3,8 @@ package protos
 import (
 	"time"
 
+	"github.com/elastic/beats/libbeat/beat"
 	"github.com/elastic/beats/libbeat/common"
-	"github.com/elastic/beats/libbeat/publisher/beat"
 )
 
 type ProtocolPlugin func(

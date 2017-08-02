@@ -50,7 +50,27 @@ import (
 type Beat struct {
 	beat.Beat
 
+	Config    beatConfig
 	RawConfig *common.Config // Raw config that can be unpacked to get Beat specific config data.
+}
+
+type beatConfig struct {
+	beat.BeatConfig `config:",inline"`
+
+	// instance internal configs
+
+	// beat top-level settings
+	Name     string `config:"name"`
+	MaxProcs int    `config:"max_procs"`
+
+	// beat internal components configurations
+	HTTP    *common.Config `config:"http"`
+	Path    paths.Path     `config:"path"`
+	Logging logp.Logging   `config:"logging"`
+
+	// output/publishing related configurations
+	Pipeline   pipeline.Config `config:",inline"`
+	Monitoring *common.Config  `config:"xpack.monitoring"`
 }
 
 var (
@@ -283,12 +303,14 @@ func (b *Beat) Setup(bt beat.Creator, template, dashboards, machineLearning bool
 		}
 
 		if template {
-			if b.Config.Output.Name() != "elasticsearch" {
+			outCfg := b.Config.Output
+
+			if outCfg.Name() != "elasticsearch" {
 				return fmt.Errorf("Template loading requested but the Elasticsearch output is not configured/enabled")
 			}
 
-			esConfig := b.Config.Output.Config()
-			if b.Config.Template == nil || (b.Config.Template != nil && b.Config.Template.Enabled()) {
+			esConfig := outCfg.Config()
+			if tmplCfg := b.Config.Template; tmplCfg == nil || tmplCfg.Enabled() {
 				loadCallback, err := b.templateLoadingCallback()
 				if err != nil {
 					return err
@@ -371,6 +393,8 @@ func (b *Beat) configure() error {
 	if err != nil {
 		return fmt.Errorf("error unpacking config data: %v", err)
 	}
+
+	b.Beat.Config = &b.Config.BeatConfig
 
 	err = cfgwarn.CheckRemoved5xSettings(cfg, "queue_size", "bulk_queue_size")
 	if err != nil {
