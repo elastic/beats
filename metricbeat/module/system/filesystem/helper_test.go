@@ -37,6 +37,10 @@ func TestFileSystemList(t *testing.T) {
 			assert.True(t, (stat.Free >= 0))
 			assert.True(t, (stat.Avail >= 0))
 			assert.True(t, (stat.Used >= 0))
+
+			if runtime.GOOS != "windows" {
+				assert.NotEqual(t, "", stat.SysTypeName)
+			}
 		}
 	}
 }
