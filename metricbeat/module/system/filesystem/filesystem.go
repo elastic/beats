@@ -22,12 +22,19 @@ func init() {
 // MetricSet for fetching filesystem metrics.
 type MetricSet struct {
 	mb.BaseMetricSet
+	config Config
 }
 
 // New creates and returns a new instance of MetricSet.
 func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
+	var config Config
+	if err := base.Module().UnpackConfig(&config); err != nil {
+		return nil, err
+	}
+
 	return &MetricSet{
 		BaseMetricSet: base,
+		config:        config,
 	}, nil
 }
 
@@ -37,6 +44,10 @@ func (m *MetricSet) Fetch() ([]common.MapStr, error) {
 	fss, err := GetFileSystemList()
 	if err != nil {
 		return nil, errors.Wrap(err, "filesystem list")
+	}
+
+	if len(m.config.IgnoreTypes) > 0 {
+		fss = Filter(fss, BuildTypeFilter(m.config.IgnoreTypes...))
 	}
 
 	filesSystems := make([]common.MapStr, 0, len(fss))
