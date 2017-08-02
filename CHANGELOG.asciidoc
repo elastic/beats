@@ -117,6 +117,7 @@ https://github.com/elastic/beats/compare/v6.0.0-alpha2...v6.0.0-beta1[View commi
 - Remove setting `queue_size` and `bulk_queue_size`. {pull}4650[4650]
 - Remove setting `dashboard.snapshot` and `dashboard.snapshot_url`. They are no longer needed because the
   dashboards are included in the packages by default. {pull}4675[4675]
+- Beats can no longer be launched from Windows Explorer (GUI), command line is required. {pull}4420[4420]
 
 *Heartbeat*
 
