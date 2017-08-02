@@ -16,7 +16,9 @@ This metricset is available on:
 
 Often there are mounted filesystems that you do not want Metricbeat to report
 metrics on. A simple strategy to deal with these filesystems is to configure a
-drop_event filter that matches the `mount_point` using a regular expression.
+drop_event filter that matches the `mount_point` or `type` using a regular
+expression.
+
 Below is an example.
 
 [source,yaml]

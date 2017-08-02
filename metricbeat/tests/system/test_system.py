@@ -27,7 +27,7 @@ SYSTEM_CORE_FIELDS_ALL = SYSTEM_CORE_FIELDS + ["idle.ticks", "iowait.ticks", "ir
 SYSTEM_DISKIO_FIELDS = ["name", "read.count", "write.count", "read.bytes",
                         "write.bytes", "read.time", "write.time", "io.time"]
 
-SYSTEM_FILESYSTEM_FIELDS = ["available", "device_name", "files", "free",
+SYSTEM_FILESYSTEM_FIELDS = ["available", "device_name", "type", "files", "free",
                             "free_files", "mount_point", "total", "used.bytes",
                             "used.pct"]
 
