@@ -2,8 +2,6 @@
 
 include::../../libbeat/docs/version.asciidoc[]
 
-:release-state: unreleased
-
 :libbeat: http://www.elastic.co/guide/en/beats/libbeat/{doc-branch}
 :kibana-ref: https://www.elastic.co/guide/en/kibana/{doc-branch}
 :beatsdevguide: http://www.elastic.co/guide/en/beats/devguide/{doc-branch}

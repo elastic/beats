@@ -20,9 +20,11 @@ The following topics describe how to configure Winlogbeat:
 * <<configuration-winlogbeat-options>>
 * <<configuration-general-options>>
 * <<configuring-output>>
+* <<configuration-ssl>>
 * <<filtering-and-enhancing-data>>
 * <<configuring-ingest-node>>
 * <<configuration-path>>
+* <<setup-kibana-endpoint>>
 * <<configuration-dashboards>>
 * <<configuration-template>>
 * <<configuration-logging>>
@@ -38,11 +40,15 @@ include::./winlogbeat-general-options.asciidoc[]
 :win:
 include::../../libbeat/docs/outputconfig.asciidoc[]
 
+include::../../libbeat/docs/shared-ssl-config.asciidoc[]
+
 include::./winlogbeat-filtering.asciidoc[]
 
 include::../../libbeat/docs/shared-config-ingest.asciidoc[]
 
 include::../../libbeat/docs/shared-path-config.asciidoc[]
+
+include::../../libbeat/docs/shared-kibana-config.asciidoc[]
 
 include::../../libbeat/docs/setup-config.asciidoc[]
 
