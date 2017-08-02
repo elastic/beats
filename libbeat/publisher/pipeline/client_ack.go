@@ -3,8 +3,8 @@ package pipeline
 import (
 	"time"
 
+	"github.com/elastic/beats/libbeat/beat"
 	"github.com/elastic/beats/libbeat/common/atomic"
-	"github.com/elastic/beats/libbeat/publisher/beat"
 )
 
 type clientACKer struct {

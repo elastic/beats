@@ -14,8 +14,8 @@ import (
 	"github.com/elastic/beats/libbeat/common/droppriv"
 	"github.com/elastic/beats/libbeat/logp"
 	"github.com/elastic/beats/libbeat/processors"
-	pub "github.com/elastic/beats/libbeat/publisher/beat"
 	"github.com/elastic/beats/libbeat/service"
+
 	"github.com/elastic/beats/packetbeat/config"
 	"github.com/elastic/beats/packetbeat/decoder"
 	"github.com/elastic/beats/packetbeat/flows"
@@ -35,7 +35,7 @@ type packetbeat struct {
 	sniff       *sniffer.SnifferSetup
 
 	// publisher/pipeline
-	pipeline pub.Pipeline
+	pipeline beat.Pipeline
 	transPub *publish.TransactionPublisher
 
 	services []interface {
@@ -220,7 +220,7 @@ func (pb *packetbeat) createWorker(dl layers.LinkType) (sniffer.Worker, error) {
 			return nil, err
 		}
 
-		client, err := pb.pipeline.ConnectWith(pub.ClientConfig{
+		client, err := pb.pipeline.ConnectWith(beat.ClientConfig{
 			EventMetadata: config.Flows.EventMetadata,
 			Processor:     processors,
 		})

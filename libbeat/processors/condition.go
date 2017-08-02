@@ -7,10 +7,10 @@ import (
 	"strconv"
 	"strings"
 
+	"github.com/elastic/beats/libbeat/beat"
 	"github.com/elastic/beats/libbeat/common"
 	"github.com/elastic/beats/libbeat/common/match"
 	"github.com/elastic/beats/libbeat/logp"
-	"github.com/elastic/beats/libbeat/publisher/beat"
 )
 
 type RangeValue struct {

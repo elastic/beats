@@ -4,8 +4,8 @@ import (
 	"sync"
 	"time"
 
+	"github.com/elastic/beats/libbeat/beat"
 	"github.com/elastic/beats/libbeat/common/atomic"
-	"github.com/elastic/beats/libbeat/publisher/beat"
 )
 
 // acker is used to account for published and non-published events to be ACKed
