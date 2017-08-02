@@ -8782,6 +8782,14 @@ The disk name. For example: `/dev/disk1`
 
 
 [float]
+=== system.filesystem.type
+
+type: keyword
+
+The disk type. For example: `ext4`
+
+
+[float]
 === system.filesystem.mount_point
 
 type: keyword

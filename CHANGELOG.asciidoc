@@ -140,6 +140,7 @@ https://github.com/elastic/beats/compare/v6.0.0-alpha2...v6.0.0-beta1[View commi
   with the system process metricset. The documentation for these metrics already
   stated that on multi-core systems the percentages could be greater than 100%. {pull}4544[4544]
 - Remove filters setting from metricbeat modules. {pull}4699[4699]
+- Added `type` field to filesystem metrics. {pull}4717[4717]
 
 *Packetbeat*
 
