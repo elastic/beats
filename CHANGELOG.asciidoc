@@ -70,6 +70,8 @@ https://github.com/elastic/beats/compare/v6.0.0-beta1...master[Check the HEAD di
 
 *Auditbeat*
 
+*Auditbeat*
+
 *Filebeat*
 
 *Heartbeat*
