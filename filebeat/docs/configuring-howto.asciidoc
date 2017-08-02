@@ -24,9 +24,11 @@ The following topics describe how to configure Filebeat:
 * <<configuration-general-options>>
 * <<filebeat-configuration-reloading>>
 * <<configuring-output>>
+* <<configuration-ssl>>
 * <<filtering-and-enhancing-data>>
 * <<configuring-ingest-node>>
 * <<configuration-path>>
+* <<setup-kibana-endpoint>>
 * <<configuration-dashboards>>
 * <<configuration-template>>
 * <<configuration-logging>>
@@ -50,6 +52,8 @@ include::./reload-configuration.asciidoc[]
 :allplatforms:
 include::../../libbeat/docs/outputconfig.asciidoc[]
 
+include::../../libbeat/docs/shared-ssl-config.asciidoc[]
+
 include::./load-balancing.asciidoc[]
 
 include::./filebeat-filtering.asciidoc[]
@@ -57,6 +61,8 @@ include::./filebeat-filtering.asciidoc[]
 include::../../libbeat/docs/shared-config-ingest.asciidoc[]
 
 include::../../libbeat/docs/shared-path-config.asciidoc[]
+
+include::../../libbeat/docs/shared-kibana-config.asciidoc[]
 
 include::../../libbeat/docs/setup-config.asciidoc[]
 
