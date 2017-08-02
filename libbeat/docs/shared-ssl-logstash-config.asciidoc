@@ -42,7 +42,7 @@ output.logstash:
   ssl.key: "/etc/client.key"
 ------------------------------------------------------------------------------
 +
-For more information about these configuration options, see <<configuration-output-ssl>>.
+For more information about these configuration options, see <<configuration-ssl>>.
 
 . Configure Logstash to use SSL. In the Logstash config file, specify the following settings for the https://www.elastic.co/guide/en/logstash/current/plugins-inputs-beats.html[Beats input plugin for Logstash]:
 +

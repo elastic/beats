@@ -256,7 +256,7 @@ monitor is configured to use SSL, Heartbeat establishes an SSL/TLS-based
 connection. Otherwise, it establishes a plain TCP connection.
 * A hostname and port, such as `localhost:12345`. Heartbeat connects
 to the port on the specified host. If the monitor is
-<<configuration-output-ssl,configured to use SSL>>, Heartbeat establishes an
+<<configuration-ssl,configured to use SSL>>, Heartbeat establishes an
 SSL/TLS-based connection. Otherwise, it establishes a TCP connection.
 * A full URL using the syntax `scheme://<host>:[port]`, where:
 ** `scheme` is one of `tcp`, `plain`, `ssl` or `tls`. If `tcp` or `plain` is
@@ -341,7 +341,7 @@ that name resolution occurs on the proxy server.
 ==== `ssl`
 
 The TLS/SSL connection settings.  If the monitor is
-<<configuration-output-ssl,configured to use SSL>>, it will attempt an SSL
+<<configuration-ssl,configured to use SSL>>, it will attempt an SSL
 handshake. If `check` is not configured, the monitor will only check to see if
 it can establish an SSL/TLS connection. This check can fail either at TCP level
 or during certificate validation.
