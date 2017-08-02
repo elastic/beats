@@ -57,6 +57,8 @@ https://github.com/elastic/beats/compare/v6.0.0-beta1...master[Check the HEAD di
 
 *Affecting all Beats*
 
+- Update init scripts to use the `test config` subcommand instead of the deprecated `-configtest` flag. {issue}4600[4600]
+
 *Auditbeat*
 
 - Added `file.hash_types` config option for controlling the hash types. {pull}4796[4796]
