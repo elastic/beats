@@ -13,13 +13,13 @@ import (
 )
 
 type metricProcessor struct {
-	paths       map[string]pathConfig
-	defaultPath pathConfig
+	paths       map[string]PathConfig
+	defaultPath PathConfig
 	sync.RWMutex
 }
 
-func NewMetricProcessor(paths []pathConfig, defaultPath pathConfig) *metricProcessor {
-	pathMap := map[string]pathConfig{}
+func NewMetricProcessor(paths []PathConfig, defaultPath PathConfig) *metricProcessor {
+	pathMap := map[string]PathConfig{}
 	for _, path := range paths {
 		pathMap[path.Path] = path
 	}
@@ -30,13 +30,13 @@ func NewMetricProcessor(paths []pathConfig, defaultPath pathConfig) *metricProce
 	}
 }
 
-func (m *metricProcessor) AddPath(path pathConfig) {
+func (m *metricProcessor) AddPath(path PathConfig) {
 	m.Lock()
 	m.paths[path.Path] = path
 	m.Unlock()
 }
 
-func (m *metricProcessor) RemovePath(path pathConfig) {
+func (m *metricProcessor) RemovePath(path PathConfig) {
 	m.Lock()
 	delete(m.paths, path.Path)
 	m.Unlock()
@@ -85,7 +85,7 @@ func (p *metricProcessor) Process(event server.Event) (common.MapStr, error) {
 	return out, nil
 }
 
-func (p *metricProcessor) findPath(url string) *pathConfig {
+func (p *metricProcessor) findPath(url string) *PathConfig {
 	for path, conf := range p.paths {
 		if strings.Index(url, path) == 0 {
 			return &conf

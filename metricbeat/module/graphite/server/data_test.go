@@ -13,7 +13,7 @@ import (
 )
 
 func GetMetricProcessor() *metricProcessor {
-	templates := []templateConfig{
+	templates := []TemplateConfig{
 		{
 			Namespace: "foo",
 			Filter:    "test.localhost.*",
@@ -31,13 +31,13 @@ func GetMetricProcessor() *metricProcessor {
 		},
 	}
 
-	defaultTemplate := defaultGraphiteCollectorConfig().DefaultTemplate
+	defaultTemplate := DefaultGraphiteCollectorConfig().DefaultTemplate
 	return NewMetricProcessor(templates, defaultTemplate)
 }
 
 func TestMetricProcessorAddTemplate(t *testing.T) {
 	processor := GetMetricProcessor()
-	temp := templateConfig{
+	temp := TemplateConfig{
 		Namespace: "xyz",
 		Filter:    "a.b.*",
 		Template:  ".host.shell.metric",
@@ -51,7 +51,7 @@ func TestMetricProcessorAddTemplate(t *testing.T) {
 
 func TestMetricProcessorDeleteTemplate(t *testing.T) {
 	processor := GetMetricProcessor()
-	temp := templateConfig{
+	temp := TemplateConfig{
 		Namespace: "xyz",
 		Filter:    "a.b.*",
 		Template:  ".host.shell.metric",

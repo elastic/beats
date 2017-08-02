@@ -6,27 +6,27 @@ import (
 	"github.com/elastic/beats/libbeat/common"
 )
 
-type httpServerConfig struct {
-	Paths       []pathConfig `config:"paths"`
-	DefaultPath pathConfig   `config:"default_path"`
+type HttpServerConfig struct {
+	Paths       []PathConfig `config:"paths"`
+	DefaultPath PathConfig   `config:"default_path"`
 }
 
-type pathConfig struct {
+type PathConfig struct {
 	Path      string        `config:"path"`
 	Fields    common.MapStr `config:"fields"`
 	Namespace string        `config:"namespace"`
 }
 
-func defaultHttpServerConfig() httpServerConfig {
-	return httpServerConfig{
-		DefaultPath: pathConfig{
+func defaultHttpServerConfig() HttpServerConfig {
+	return HttpServerConfig{
+		DefaultPath: PathConfig{
 			Path:      "/",
 			Namespace: "http",
 		},
 	}
 }
 
-func (p pathConfig) Validate() error {
+func (p PathConfig) Validate() error {
 	if p.Namespace == "" {
 		return errors.New("`namespace` can not be empty in path configuration")
 	}
