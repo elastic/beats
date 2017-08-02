@@ -4,9 +4,9 @@ import (
 	"errors"
 	"fmt"
 
+	"github.com/elastic/beats/libbeat/beat"
 	"github.com/elastic/beats/libbeat/common"
 	"github.com/elastic/beats/libbeat/processors"
-	"github.com/elastic/beats/libbeat/publisher/beat"
 )
 
 // Config object for loading a pipeline instance via Load.

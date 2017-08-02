@@ -6,7 +6,6 @@ import (
 	"github.com/elastic/beats/libbeat/beat"
 	"github.com/elastic/beats/libbeat/common"
 	"github.com/elastic/beats/libbeat/logp"
-	pub "github.com/elastic/beats/libbeat/publisher/beat"
 )
 
 ///*** Mock Beat Setup ***///
@@ -16,7 +15,7 @@ var Name = "mockbeat"
 
 type Mockbeat struct {
 	done   chan struct{}
-	client pub.Client
+	client beat.Client
 }
 
 // Creates beater
@@ -37,7 +36,7 @@ func (mb *Mockbeat) Run(b *beat.Beat) error {
 	}
 
 	// Wait until mockbeat is done
-	mb.client.Publish(pub.Event{
+	mb.client.Publish(beat.Event{
 		Timestamp: time.Now(),
 		Fields: common.MapStr{
 			"type":    "mock",

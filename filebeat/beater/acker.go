@@ -1,8 +1,9 @@
 package beater
 
 import (
+	"github.com/elastic/beats/libbeat/beat"
+
 	"github.com/elastic/beats/filebeat/util"
-	"github.com/elastic/beats/libbeat/publisher/beat"
 )
 
 // eventAcker handles publisher pipeline ACKs and forwards

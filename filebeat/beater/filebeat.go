@@ -12,7 +12,6 @@ import (
 	"github.com/elastic/beats/libbeat/logp"
 	"github.com/elastic/beats/libbeat/monitoring"
 	"github.com/elastic/beats/libbeat/outputs/elasticsearch"
-	pub "github.com/elastic/beats/libbeat/publisher/beat"
 
 	"github.com/elastic/beats/filebeat/channel"
 	cfg "github.com/elastic/beats/filebeat/config"
@@ -177,7 +176,7 @@ func (fb *Filebeat) Run(b *beat.Beat) error {
 	// Make sure all events that were published in
 	registrarChannel := newRegistrarLogger(registrar)
 
-	err = b.Publisher.SetACKHandler(pub.PipelineACKHandler{
+	err = b.Publisher.SetACKHandler(beat.PipelineACKHandler{
 		ACKEvents: newEventACKer(registrarChannel).ackEvents,
 	})
 	if err != nil {

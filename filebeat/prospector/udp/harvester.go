@@ -4,11 +4,12 @@ import (
 	"net"
 	"time"
 
-	"github.com/elastic/beats/filebeat/harvester"
-	"github.com/elastic/beats/filebeat/util"
+	"github.com/elastic/beats/libbeat/beat"
 	"github.com/elastic/beats/libbeat/common"
 	"github.com/elastic/beats/libbeat/logp"
-	"github.com/elastic/beats/libbeat/publisher/beat"
+
+	"github.com/elastic/beats/filebeat/harvester"
+	"github.com/elastic/beats/filebeat/util"
 )
 
 type Harvester struct {

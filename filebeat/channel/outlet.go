@@ -2,8 +2,8 @@ package channel
 
 import (
 	"github.com/elastic/beats/filebeat/util"
+	"github.com/elastic/beats/libbeat/beat"
 	"github.com/elastic/beats/libbeat/common/atomic"
-	"github.com/elastic/beats/libbeat/publisher/beat"
 )
 
 type outlet struct {

@@ -2,10 +2,6 @@ package beat
 
 import (
 	"github.com/elastic/beats/libbeat/common"
-	"github.com/elastic/beats/libbeat/logp"
-	"github.com/elastic/beats/libbeat/paths"
-	"github.com/elastic/beats/libbeat/publisher/beat"
-	"github.com/elastic/beats/libbeat/publisher/pipeline"
 )
 
 // Creator initializes and configures a new Beater instance used to execute
@@ -37,32 +33,21 @@ type Beater interface {
 // events.
 type Beat struct {
 	Info      common.BeatInfo // beat metadata.
-	Publisher beat.Pipeline   // Publisher pipeline
+	Publisher Pipeline        // Publisher pipeline
 
 	SetupMLCallback SetupMLCallback // setup callback for ML job configs
 	InSetupCmd      bool            // this is set to true when the `setup` command is called
 
 	// XXX: remove Config from public interface
-	Config BeatConfig // Common Beat configuration data.
+	Config *BeatConfig // Common Beat configuration data.
 
 	BeatConfig *common.Config // The beats it's own configuration section
 }
 
 // BeatConfig struct contains the basic configuration of every beat
 type BeatConfig struct {
-	// beat top-level settings
-	Name     string `config:"name"`
-	MaxProcs int    `config:"max_procs"`
-
-	// beat internal components configurations
-	HTTP    *common.Config `config:"http"`
-	Path    paths.Path     `config:"path"`
-	Logging logp.Logging   `config:"logging"`
-
 	// output/publishing related configurations
-	Pipeline   pipeline.Config        `config:",inline"`
-	Monitoring *common.Config         `config:"xpack.monitoring"`
-	Output     common.ConfigNamespace `config:"output"`
+	Output common.ConfigNamespace `config:"output"`
 
 	// 'setup' configurations
 	Dashboards *common.Config `config:"setup.dashboards"`

@@ -10,9 +10,9 @@ import (
 	"github.com/urso/go-structform/gotype"
 	"github.com/urso/go-structform/json"
 
+	"github.com/elastic/beats/libbeat/beat"
 	"github.com/elastic/beats/libbeat/common"
 	"github.com/elastic/beats/libbeat/outputs/codec"
-	"github.com/elastic/beats/libbeat/publisher/beat"
 )
 
 type bodyEncoder interface {
