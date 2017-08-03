@@ -10,7 +10,7 @@ import (
 )
 
 func GetMetricProcessor() *metricProcessor {
-	paths := []pathConfig{
+	paths := []PathConfig{
 		{
 			Namespace: "foo",
 			Path:      "/foo",
@@ -30,7 +30,7 @@ func GetMetricProcessor() *metricProcessor {
 
 func TestMetricProcessorAddPath(t *testing.T) {
 	processor := GetMetricProcessor()
-	temp := pathConfig{
+	temp := PathConfig{
 		Namespace: "xyz",
 		Path:      "/abc",
 	}
@@ -51,7 +51,7 @@ func TestFindPath(t *testing.T) {
 	processor := GetMetricProcessor()
 	tests := []struct {
 		a        string
-		expected pathConfig
+		expected PathConfig
 	}{
 		{
 			a:        "/foo/bar",
