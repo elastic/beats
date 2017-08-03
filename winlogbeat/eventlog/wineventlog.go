@@ -94,6 +94,11 @@ func (l *winEventLog) Name() string {
 func (l *winEventLog) Open(_ uint64) error {
 	var err error
 
+	flags := win.EvtSubscribeToFutureEvents
+	if l.config.SimpleQuery.IgnoreOlder > 0 {
+		flags = win.EvtSubscribeStartAtOldestRecord
+	}
+
 	// Using a pull subscription to receive events. See:
 	// https://msdn.microsoft.com/en-us/library/windows/desktop/aa385771(v=vs.85).aspx#pull
 	l.evt, err = windows.CreateEvent(nil, 0, 0, nil)
@@ -108,7 +113,7 @@ func (l *winEventLog) Open(_ uint64) error {
 		"",      // Channel - empty b/c channel is in the query
 		l.query, // Query - nil means all events
 		0,       // Bookmark - for resuming from a specific event
-		win.EvtSubscribeToFutureEvents, //win.EvtSubscribeStartAfterBookmark to work with bookmarks
+		flags,   //win.EvtSubscribeStartAfterBookmark to work with bookmarks
 	)
 	if err != nil {
 		return err
