@@ -8,13 +8,13 @@ const (
 	defaultDelimiter = "."
 )
 
-type graphiteCollectorConfig struct {
+type GraphiteServerConfig struct {
 	Protocol        string           `config:"protocol"`
-	Templates       []templateConfig `config:"templates"`
-	DefaultTemplate templateConfig   `config:"default_template"`
+	Templates       []TemplateConfig `config:"templates"`
+	DefaultTemplate TemplateConfig   `config:"default_template"`
 }
 
-type templateConfig struct {
+type TemplateConfig struct {
 	Filter    string            `config:"filter"`
 	Template  string            `config:"template"`
 	Namespace string            `config:"namespace"`
@@ -22,10 +22,10 @@ type templateConfig struct {
 	Tags      map[string]string `config:"tags"`
 }
 
-func defaultGraphiteCollectorConfig() graphiteCollectorConfig {
-	return graphiteCollectorConfig{
+func DefaultGraphiteCollectorConfig() GraphiteServerConfig {
+	return GraphiteServerConfig{
 		Protocol: "udp",
-		DefaultTemplate: templateConfig{
+		DefaultTemplate: TemplateConfig{
 			Filter:    "*",
 			Template:  "metric*",
 			Namespace: "graphite",
@@ -34,14 +34,14 @@ func defaultGraphiteCollectorConfig() graphiteCollectorConfig {
 	}
 }
 
-func (c graphiteCollectorConfig) Validate() error {
+func (c GraphiteServerConfig) Validate() error {
 	if c.Protocol != "tcp" && c.Protocol != "udp" {
 		return errors.New("`protocol` can only be tcp or udp")
 	}
 	return nil
 }
 
-func (t *templateConfig) Validate() error {
+func (t *TemplateConfig) Validate() error {
 	if t.Namespace == "" {
 		return errors.New("`namespace` can not be empty in template configuration")
 	}
