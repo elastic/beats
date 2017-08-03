@@ -24,9 +24,7 @@ include::../../libbeat/docs/contributing-to-beats.asciidoc[]
 
 include::./getting-started.asciidoc[]
 
-include::./command-line.asciidoc[]
-
-include::../../libbeat/docs/shared-directory-layout.asciidoc[]
+include::./setting-up-running.asciidoc[]
 
 include::./upgrading.asciidoc[]
 
