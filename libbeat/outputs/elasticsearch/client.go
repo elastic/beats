@@ -719,19 +719,18 @@ func (conn *Connection) execHTTPRequest(req *http.Request) (int, []byte, error) 
 	}
 	defer closing(resp.Body)
 
-	var retErr error
 	status := resp.StatusCode
 	obj, err := ioutil.ReadAll(resp.Body)
 	if err != nil {
-		return status, nil, retErr
+		return status, nil, err
 	}
 
 	if status >= 300 {
 		// add the response body with the error returned by Elasticsearch
-		retErr = fmt.Errorf("%v: %s", resp.Status, obj)
+		err = fmt.Errorf("%v: %s", resp.Status, obj)
 	}
 
-	return status, obj, retErr
+	return status, obj, err
 }
 
 func (conn *Connection) GetVersion() string {
