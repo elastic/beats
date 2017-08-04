@@ -33,7 +33,7 @@ https://github.com/icinga/icingabeat[icingabeat]:: Icingabeat ships events and s
 https://github.com/devopsmakers/iobeat[iobeat]:: Reads IO stats from /proc/diskstats on Linux.
 https://github.com/radoondas/jmxproxybeat[jmxproxybeat]:: Reads Tomcat JMX metrics exposed over 'JMX Proxy Servlet' to HTTP.
 https://github.com/mheese/journalbeat[journalbeat]:: Used for log shipping from systemd/journald based Linux systems.
-https://github.com/dearcode/kafkabeat[kafkabeat]:: read data from kafka with Consumer-groups.
+https://github.com/justsocialapps/kafkabeat[kafkabeat]:: Reads data from Kafka topics.
 https://github.com/eskibars/lmsensorsbeat[lmsensorsbeat]:: Collects data from lm-sensors (such as CPU temperatures, fan speeds, and voltages from i2c and smbus).
 https://github.com/consulthys/logstashbeat[logstashbeat]:: Collects data from Logstash monitoring API (v5 onwards) and indexes them in Elasticsearch.
 https://github.com/yedamao/mcqbeat[mcqbeat]:: Reads the status of queues from memcacheq.
