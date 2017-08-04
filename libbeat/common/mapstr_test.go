@@ -221,6 +221,60 @@ func TestMapStrPut(t *testing.T) {
 	assert.Equal(t, MapStr{"subMap": MapStr{"newMap": MapStr{"a": 1}}}, m)
 }
 
+func TestMapStrSet(t *testing.T) {
+	m := MapStr{
+		"i1": 123,
+		"s1": "123",
+		"b1": false,
+		"x3": MapStr{
+			"b41": "val.b41",
+		},
+	}
+	type io struct {
+		Key      string
+		Val      interface{}
+		Fetch    string
+		Expected interface{}
+	}
+
+	mapVal := MapStr{"newKey": "newVal"}
+	arrStrVal := []string{"v1", "v2"}
+	arrIntVal := []int{1, 2, 3}
+	str := "strPtr"
+	var emptyStrPtr *string
+	i := 44
+	var emptyIntPtr *int
+	b := false
+	var emptyBoolPtr *bool
+	tests := []io{
+		{Key: "x3.b42", Val: "b42New", Fetch: "x3", Expected: MapStr{"b41": "val.b41", "b42": "b42New"}},
+		{Key: "m1", Val: mapVal, Fetch: "m1", Expected: mapVal},
+		{Key: "m2", Val: MapStr{}, Fetch: "m2", Expected: nil},
+		{Key: "a1", Val: arrStrVal, Fetch: "a1", Expected: arrStrVal},
+		{Key: "a2", Val: []string{}, Fetch: "a2", Expected: nil},
+		{Key: "a3", Val: arrIntVal, Fetch: "a3", Expected: arrIntVal},
+		{Key: "a4", Val: []int{}, Fetch: "a2", Expected: nil},
+		{Key: "s1", Val: nil, Fetch: "s1", Expected: "123"},
+		{Key: "s1", Val: "s1New", Fetch: "s1", Expected: "s1New"},
+		{Key: "s2", Val: emptyStrPtr, Fetch: "s2", Expected: nil},
+		{Key: "s3", Val: &str, Fetch: "s3", Expected: "strPtr"},
+		{Key: "i1", Val: nil, Fetch: "i1", Expected: 123},
+		{Key: "i1", Val: 456, Fetch: "i1", Expected: 456},
+		{Key: "i2", Val: emptyIntPtr, Fetch: "i2", Expected: nil},
+		{Key: "i3", Val: &i, Fetch: "i3", Expected: 44},
+		{Key: "b1", Val: nil, Fetch: "b1", Expected: false},
+		{Key: "b1", Val: true, Fetch: "b1", Expected: true},
+		{Key: "b2", Val: emptyBoolPtr, Fetch: "b2", Expected: nil},
+		{Key: "b3", Val: &b, Fetch: "b3", Expected: false},
+	}
+	for idx, test := range tests {
+		m.SetValue(test.Key, test.Val)
+		fetched, _ := m.GetValue(test.Fetch)
+		errMsg := fmt.Sprintf("Failed for %v: Expected %v, Received %v", idx, test.Expected, fetched)
+		assert.Equal(t, test.Expected, fetched, errMsg)
+	}
+}
+
 func TestClone(t *testing.T) {
 	assert := assert.New(t)
 
