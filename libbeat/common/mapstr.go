@@ -138,13 +138,13 @@ func (m MapStr) Put(key string, value interface{}) (interface{}, error) {
 	return walkMap(key, m, mapStrOperation{putOperation{value}, true})
 }
 
-// Dereferences a value if it is a pointer. Sets the dereferenced value if not nil.
+// SetValue dereferences a value if it is a pointer. Sets the dereferenced value if not nil.
 // If value is a MapStr or an array, the value is set if not empty.
 // Supported data types so far: *string, *int, *boolean, common.MapStr, array[]int, array[]string.
 // Values of unsupported types are set if they are not nil.
 // Sets a value for a given key if the (dereferenced) value is not nil or empty.
 func (m MapStr) SetValue(key string, value interface{}) {
-	walkMap(key, m, mapStrOperation{setOperation{value}, true})
+	walkMap(key, m, mapStrOperation{setValueOperation{value}, true})
 }
 
 // StringToPrint returns the MapStr as pretty JSON.
@@ -390,11 +390,11 @@ func (op putOperation) Do(key string, data MapStr) (interface{}, error) {
 	return existingValue, nil
 }
 
-type setOperation struct {
+type setValueOperation struct {
 	Value interface{}
 }
 
-func (op setOperation) Do(key string, data MapStr) (interface{}, error) {
+func (op setValueOperation) Do(key string, data MapStr) (interface{}, error) {
 	if op.Value == nil {
 		return data, nil
 	}
