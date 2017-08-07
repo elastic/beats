@@ -1,6 +1,7 @@
 package template
 
 import (
+	"fmt"
 	"strings"
 
 	"github.com/elastic/beats/libbeat/common"
@@ -11,18 +12,19 @@ var (
 )
 
 type Field struct {
-	Name           string `config:"name"`
-	Type           string `config:"type"`
-	Description    string `config:"description"`
-	Format         string `config:"format"`
-	ScalingFactor  int    `config:"scaling_factor"`
-	Fields         Fields `config:"fields"`
-	MultiFields    Fields `config:"multi_fields"`
-	ObjectType     string `config:"object_type"`
-	Enabled        *bool  `config:"enabled"`
-	Analyzer       string `config:"analyzer"`
-	SearchAnalyzer string `config:"search_analyzer"`
-	Norms          bool   `config:"norms"`
+	Name           string      `config:"name"`
+	Type           string      `config:"type"`
+	Description    string      `config:"description"`
+	Format         string      `config:"format"`
+	ScalingFactor  int         `config:"scaling_factor"`
+	Fields         Fields      `config:"fields"`
+	MultiFields    Fields      `config:"multi_fields"`
+	ObjectType     string      `config:"object_type"`
+	Enabled        *bool       `config:"enabled"`
+	Analyzer       string      `config:"analyzer"`
+	SearchAnalyzer string      `config:"search_analyzer"`
+	Norms          bool        `config:"norms"`
+	Dynamic        dynamicType `config:"dynamic"`
 
 	path      string
 	esVersion common.Version
@@ -33,7 +35,9 @@ type Field struct {
 // long, geo_point, date, short, byte, float, double, boolean
 func (f *Field) other() common.MapStr {
 	property := f.getDefaultProperties()
-	property["type"] = f.Type
+	if f.Type != "" {
+		property["type"] = f.Type
+	}
 
 	return property
 }
@@ -184,6 +188,10 @@ func (f *Field) getDefaultProperties() common.MapStr {
 		property["enabled"] = *f.Enabled
 	}
 
+	if f.Dynamic.value != nil {
+		property["dynamic"] = f.Dynamic.value
+	}
+
 	return property
 }
 
@@ -195,4 +203,20 @@ func generateKey(key string) string {
 		key = keys[0] + ".properties." + generateKey(keys[1])
 	}
 	return key
+}
+
+type dynamicType struct{ value interface{} }
+
+func (d *dynamicType) Unpack(s string) error {
+	switch s {
+	case "true":
+		d.value = true
+	case "false":
+		d.value = false
+	case "strict":
+		d.value = s
+	default:
+		return fmt.Errorf("'%v' is invalid dynamic setting", s)
+	}
+	return nil
 }
