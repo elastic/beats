@@ -61,6 +61,10 @@ Logstash output.
 If you disable automatic template loading, you can run the `setup` command to
 load the template manually.
 
+ifdef::allplatforms[]
+
+*deb, rpm, and mac:*
+
 ["source","sh",subs="attributes"]
 ----
 ./{beatname_lc} setup --template
@@ -73,6 +77,36 @@ command with `sudo`.
 
 endif::[]
 
+ifeval::["{beatname_lc}"!="auditbeat"]
+
+*docker:*
+
+["source","sh",subs="attributes"]
+----------------------------------------------------------------------
+docker run {dockerimage} setup --template
+----------------------------------------------------------------------
+
+endif::[]
+
+*win:*
+
+endif::allplatforms[]
+
+Open a PowerShell prompt as an Administrator (right-click the PowerShell icon
+and select *Run As Administrator*). If you are running Windows XP, you may need
+to download and install PowerShell.
+
+From the PowerShell prompt, change to the directory where you installed {beatname_uc},
+and run:
+
+["source","sh",subs="attributes,callouts"]
+----------------------------------------------------------------------
+PS > {beatname_lc} setup --template
+----------------------------------------------------------------------
+
+
+//REVIEWERS: Is the following step still necessary?
+
 NOTE: If you've already used {beatname_uc} to index data into Elasticsearch,
 the index may contain old documents. After you load the index template,
 you can delete the old documents from {beatname_lc}-* to force Kibana to look
@@ -82,3 +116,12 @@ at the newest documents. Use this command:
 ----------------------------------------------------------------------
 curl -XDELETE 'http://localhost:9200/{beatname_lc}-*'
 ----------------------------------------------------------------------
+
+[[passing-credentials-template-loading]]
+==== Pass credentials
+
+//REVIEWERS: How do you do this when you are using Winlogbeat and starting as a service? Do you need to configure username/password in the config file? I haven't mentioned the config options in the GS because I think it's better for users not to store the passwords in config files. Is that a correct assumption?
+
+:start-type: setup-index
+include::./shared-passing-credentials-setup.asciidoc[]
+

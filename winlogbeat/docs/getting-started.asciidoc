@@ -167,6 +167,13 @@ this command:
 PS C:\Program Files\Winlogbeat> services.msc
 ----------------------------------------------------------------------
 
+[id="{beatname_lc}-passing-credentials"]
+==== Pass credentials
+
+:start-type: start
+include::../../libbeat/docs/shared-passing-credentials-setup.asciidoc[]
+
+
 ==== Stop Winlogbeat
 
 Stop the Winlogbeat service with the following command:

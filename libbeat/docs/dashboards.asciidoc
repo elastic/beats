@@ -72,3 +72,9 @@ and run:
 ----------------------------------------------------------------------
 PS > {beatname_lc} setup --dashboards
 ----------------------------------------------------------------------
+
+[[passing-credentials-dashboard-loading]]
+==== Pass credentials
+
+:start-type: setup-dashboards
+include::./shared-passing-credentials-setup.asciidoc[]

@@ -285,6 +285,12 @@ By default, Windows log files are stored in +C:\ProgramData\heartbeat\Logs+.
 Heartbeat is now ready to check the status of your services and send
 events to your defined output.
 
+[id="{beatname_lc}-passing-credentials"]
+==== Pass credentials
+
+:start-type: start
+include::../../libbeat/docs/shared-passing-credentials-setup.asciidoc[]
+
 [[view-kibana-dashboards]]
 === Step 6: View the sample Kibana dashboards
 

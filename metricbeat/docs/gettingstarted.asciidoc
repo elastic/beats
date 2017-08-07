@@ -301,6 +301,12 @@ By default the log files are stored in `C:\ProgramData\metricbeat\Logs`.
 NOTE: On Windows, statistics about system load and swap usage are currently
 not captured.
 
+[id="{beatname_lc}-passing-credentials"]
+==== Pass credentials
+
+:start-type: start
+include::../../libbeat/docs/shared-passing-credentials-setup.asciidoc[]
+
 ==== Test the Metricbeat installation
 
 To verify that your server's statistics are present in Elasticsearch, issue
