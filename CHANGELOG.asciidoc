@@ -14,11 +14,7 @@ https://github.com/elastic/beats/compare/v6.0.0-beta1...master[Check the HEAD di
 
 *Affecting all Beats*
 
-- The log directory (`path.log`) for Windows services is now set to `C:\ProgramData\[beatname]\logs`. {issue}4764[4764]
-
 *Auditbeat*
-
-- Changed file metricset config to make `file.paths` a list instead of a dictionary. {pull}4796[4796]
 
 *Filebeat*
 
@@ -33,23 +29,16 @@ https://github.com/elastic/beats/compare/v6.0.0-beta1...master[Check the HEAD di
 ==== Bugfixes
 
 *Affecting all Beats*
-- Fix go plugins not loaded when beat starts {pull}4799[4799]
 
 *Auditbeat*
 
-- Fix `file.max_file_size` config option for the audit file metricset. {pull}4796[4796]
-
 *Filebeat*
 
 *Filebeat*
-
-- Fix issue where the `fileset.module` could have the wrong value. {issue}4761[4761]
 
 *Heartbeat*
 
 *Metricbeat*
-
-- Support `npipe` protocol (Windows) in Docker module. {pull}4751[4751]
 
 *Packetbeat*
 
@@ -60,9 +49,6 @@ https://github.com/elastic/beats/compare/v6.0.0-beta1...master[Check the HEAD di
 *Affecting all Beats*
 
 *Auditbeat*
-
-- Added `file.hash_types` config option for controlling the hash types. {pull}4796[4796]
-- Added the ability to specify byte unit suffixes to `file.max_file_size`. {pull}4796[4796]
 
 *Filebeat*
 
@@ -113,6 +99,10 @@ https://github.com/elastic/beats/compare/v6.0.0-alpha2...v6.0.0-beta1[View commi
   dashboards are included in the packages by default. {pull}4675[4675]
 - Beats can no longer be launched from Windows Explorer (GUI), command line is required. {pull}4420[4420]
 
+*Auditbeat*
+
+- Changed file metricset config to make `file.paths` a list instead of a dictionary. {pull}4796[4796]
+
 *Heartbeat*
 
 - Renamed the heartbeat RPM/DEB name to `heartbeat-elastic`. {pull}4601[4601]
@@ -137,6 +127,14 @@ https://github.com/elastic/beats/compare/v6.0.0-alpha2...v6.0.0-beta1[View commi
 - Fix race condition in internal logging rotator. {pull}4519[4519]
 - Normalize all times to UTC to ensure proper index naming. {issue}4569[4569]
 - Fix issue with loading dashboards to ES 6.0 when .kibana index did not already exist. {issue}4659[4659]
+
+*Auditbeat*
+
+- Fix `file.max_file_size` config option for the audit file metricset. {pull}4796[4796]
+
+*Filebeat*
+
+- Fix issue where the `fileset.module` could have the wrong value. {issue}4761[4761]
 
 *Metricbeat*
 
@@ -168,6 +166,11 @@ https://github.com/elastic/beats/compare/v6.0.0-alpha2...v6.0.0-beta1[View commi
 - The sample dashboards are now included in the Beats packages. {pull}4675[4675]
 - Add `pattern` option to be used in the fields.yml to specify the pattern for a number field. {pull}4731[4731]
 
+*Auditbeat*
+
+- Added `file.hash_types` config option for controlling the hash types. {pull}4796[4796]
+- Added the ability to specify byte unit suffixes to `file.max_file_size`. {pull}4796[4796]
+
 *Filebeat*
 
 - Add experimental Redis module. {pull}4441[4441]
@@ -193,6 +196,7 @@ https://github.com/elastic/beats/compare/v6.0.0-alpha2...v6.0.0-beta1[View commi
 - Vsphere module: collect custom fields from virtual machines. {issue}4464[4464]
 - Add `test modules` command, to test modules expected output. {pull}4656[4656]
 - Add `processors` setting to metricbeat modules. {pull}4699[4699]
+- Support `npipe` protocol (Windows) in Docker module. {pull}4751[4751]
 
 *Winlogbeat*
 
