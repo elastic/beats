@@ -366,7 +366,8 @@ arrays. The default is false.
 `target`:: (Optional) The field under which the decoded JSON will be written. By
 default the decoded JSON object replaces the string field from which it was
 read. To merge the decoded JSON fields into the root of the event, specify
-`target` with an empty value (`target:`).
+`target` with an empty string (`target:""`). Note that the `null` value (`target:`)
+is treated as if the field was not set at all.
 `overwrite_keys`:: (Optional) A boolean that specifies whether keys that already
 exist in the event are overwritten by keys from the decoded JSON object. The
 default value is false.
