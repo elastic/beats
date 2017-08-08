@@ -18,7 +18,7 @@ image::./images/filebeat-postgresql-overview.png[]
 
 The second one shows the slowlogs of PostgreSQL.
 
-image::./images/filebeat-postgresql-postgresql-overview.png[]
+image::./images/filebeat-postgresql-slowlog-overview.png[]
 
 [float]
 === Logs fileset settings
