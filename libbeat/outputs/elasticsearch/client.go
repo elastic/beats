@@ -720,16 +720,17 @@ func (conn *Connection) execHTTPRequest(req *http.Request) (int, []byte, error) 
 	defer closing(resp.Body)
 
 	status := resp.StatusCode
-	var retErr error
-	if status >= 300 {
-		retErr = fmt.Errorf("%v", resp.Status)
-	}
-
 	obj, err := ioutil.ReadAll(resp.Body)
 	if err != nil {
-		return status, nil, retErr
+		return status, nil, err
 	}
-	return status, obj, retErr
+
+	if status >= 300 {
+		// add the response body with the error returned by Elasticsearch
+		err = fmt.Errorf("%v: %s", resp.Status, obj)
+	}
+
+	return status, obj, err
 }
 
 func (conn *Connection) GetVersion() string {
