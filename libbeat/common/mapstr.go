@@ -138,6 +138,15 @@ func (m MapStr) Put(key string, value interface{}) (interface{}, error) {
 	return walkMap(key, m, mapStrOperation{putOperation{value}, true})
 }
 
+// SetValue dereferences a value if it is a pointer. Sets the dereferenced value if not nil.
+// If value is a MapStr or an array, the value is set if not empty.
+// Supported data types so far: *string, *int, *boolean, common.MapStr, array[]int, array[]string.
+// Values of unsupported types are set if they are not nil.
+// Sets a value for a given key if the (dereferenced) value is not nil or empty.
+func (m MapStr) SetValue(key string, value interface{}) {
+	walkMap(key, m, mapStrOperation{setValueOperation{value}, true})
+}
+
 // StringToPrint returns the MapStr as pretty JSON.
 func (m MapStr) StringToPrint() string {
 	json, err := json.MarshalIndent(m, "", "  ")
@@ -379,4 +388,44 @@ func (op putOperation) Do(key string, data MapStr) (interface{}, error) {
 	existingValue, _ := data[key]
 	data[key] = op.Value
 	return existingValue, nil
+}
+
+type setValueOperation struct {
+	Value interface{}
+}
+
+func (op setValueOperation) Do(key string, data MapStr) (interface{}, error) {
+	if op.Value == nil {
+		return data, nil
+	}
+
+	switch op.Value.(type) {
+	case *bool:
+		if newVal := op.Value.(*bool); newVal != nil {
+			data[key] = *newVal
+		}
+	case *int:
+		if newVal := op.Value.(*int); newVal != nil {
+			data[key] = *newVal
+		}
+	case *string:
+		if newVal := op.Value.(*string); newVal != nil {
+			data[key] = *newVal
+		}
+	case MapStr:
+		if valMap := op.Value.(MapStr); len(valMap) > 0 {
+			data[key] = valMap
+		}
+	case []int:
+		if valArr := op.Value.([]int); len(valArr) > 0 {
+			data[key] = valArr
+		}
+	case []string:
+		if valArr := op.Value.([]string); len(valArr) > 0 {
+			data[key] = valArr
+		}
+	default:
+		data[key] = op.Value
+	}
+	return data, nil
 }
