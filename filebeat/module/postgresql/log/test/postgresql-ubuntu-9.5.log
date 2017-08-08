@@ -1,0 +1,78 @@
+2017-04-03 22:32:14.322 CEST [31225] postgres@mydb LOG:  could not receive data from client: Connection reset by peer
+2017-04-03 22:32:14.322 CEST [31225] postgres@mydb LOG:  unexpected EOF on client connection with an open transaction
+2017-04-03 22:35:22.389 CEST [3474] postgres@mydb LOG:  could not receive data from client: Connection reset by peer
+2017-04-03 22:36:56.464 CEST [3525] postgres@mydb LOG:  could not receive data from client: Connection reset by peer
+2017-04-03 22:37:12.961 CEST [3570] postgres@mydb LOG:  could not receive data from client: Connection reset by peer
+2017-04-07 21:05:28.549 CEST [21483] postgres@mydb LOG:  could not receive data from client: Connection reset by peer
+2017-04-07 21:09:41.345 CEST [21597] postgres@mydb LOG:  could not receive data from client: Connection reset by peer
+2017-04-07 22:45:30.218 CEST [22603] postgres@mydb ERROR:  operator does not exist: jsonb @> at character 49
+2017-04-07 22:45:30.218 CEST [22603] postgres@mydb HINT:  No operator matches the given name and argument type(s). You might need to add explicit type casts.
+2017-04-07 22:45:30.218 CEST [22603] postgres@mydb STATEMENT:  SELECT id, user FROM users WHERE NOT user @> %s
+2017-04-07 22:46:09.751 CEST [22608] postgres@mydb ERROR:  column "%s" does not exist at character 52
+2017-04-07 22:46:09.751 CEST [22608] postgres@mydb STATEMENT:  SELECT id, user FROM users WHERE NOT user @> "%s"
+2017-04-07 23:02:51.199 CEST [24341] postgres@mydb LOG:  could not receive data from client: Connection reset by peer
+2017-04-07 23:02:51.199 CEST [24341] postgres@mydb LOG:  unexpected EOF on client connection with an open transaction
+2017-04-07 23:04:36.087 CEST [20730] postgres@mydb ERROR:  syntax error at or near "{" at character 49
+2017-04-07 23:04:36.087 CEST [20730] postgres@mydb STATEMENT:  INSERT INTO users (id, user) VALUES (1, {"attr": "yes"});
+2017-04-07 23:04:51.462 CEST [20730] postgres@mydb ERROR:  syntax error at or near "{" at character 49
+2017-04-07 23:04:51.462 CEST [20730] postgres@mydb STATEMENT:  INSERT INTO users (id, user) VALUES (1, {attr: "yes"});
+2017-04-07 23:05:06.217 CEST [20730] postgres@mydb ERROR:  column "a" does not exist at character 42
+2017-04-07 23:05:06.217 CEST [20730] postgres@mydb STATEMENT:  INSERT INTO users (id, user) VALUES (1, '{"attr": "yes"}');
+2017-04-07 23:05:18.295 CEST [20730] postgres@mydb ERROR:  column "attr" does not exist at character 42
+2017-04-07 23:05:18.295 CEST [20730] postgres@mydb STATEMENT:  INSERT INTO users (id, user) VALUES ("1", '{"attr": "no"}');
+2017-04-07 23:13:47.505 CEST [24489] postgres@mydb LOG:  could not receive data from client: Connection reset by peer
+2017-04-07 23:13:47.505 CEST [24489] postgres@mydb LOG:  unexpected EOF on client connection with an open transaction
+2017-04-08 12:32:51.056 CEST [20730] postgres@mydb ERROR:  duplicate key value violates unique constraint "users_pkey"
+2017-04-08 12:32:51.056 CEST [20730] postgres@mydb DETAIL:  Key (id)=(1) already exists.
+2017-04-08 12:32:51.056 CEST [20730] postgres@mydb STATEMENT:  INSERT INTO users (id, user) VALUES ('1', '{"attr": "yes"}');
+2017-04-08 21:54:37.443 CEST [30630] postgres@mydb LOG:  could not receive data from client: Connection reset by peer
+2017-04-08 21:54:37.468 CEST [30502] postgres@mydb LOG:  could not receive data from client: Connection reset by peer
+2017-04-08 21:54:37.618 CEST [20769] LOG:  received fast shutdown request
+2017-04-08 21:54:37.618 CEST [20769] LOG:  aborting any active transactions
+2017-04-08 21:54:37.618 CEST [20774] LOG:  autovacuum launcher shutting down
+2017-04-08 21:54:37.622 CEST [20771] LOG:  shutting down
+2017-04-08 21:54:37.644 CEST [20769] LOG:  database system is shut down
+2017-04-08 21:56:02.932 CEST [797] LOG:  database system was shut down at 2017-04-08 21:54:37 CEST
+2017-04-08 21:56:02.944 CEST [797] LOG:  MultiXact member wraparound protections are now enabled
+2017-04-08 21:56:02.946 CEST [780] LOG:  database system is ready to accept connections
+2017-04-08 21:56:02.947 CEST [802] LOG:  autovacuum launcher started
+2017-04-08 21:56:03.362 CEST [891] [unknown]@[unknown] LOG:  incomplete startup packet
+2017-05-27 14:07:53.007 UTC [32567] LOG:  database system was shut down at 2017-05-27 14:07:52 UTC
+2017-05-27 14:07:53.010 UTC [32567] LOG:  MultiXact member wraparound protections are now enabled
+2017-05-27 14:07:53.015 UTC [32566] LOG:  database system is ready to accept connections
+2017-05-27 14:07:53.016 UTC [32571] LOG:  autovacuum launcher started
+2017-05-27 14:07:53.463 UTC [32573] [unknown]@[unknown] LOG:  incomplete startup packet
+2017-05-27 14:08:13.661 UTC [1308] postgres@mydb FATAL:  database "mydb" does not exist
+2017-05-27 14:59:26.553 UTC [1994] postgres@mydb LOG:  could not receive data from client: Connection reset by peer
+2017-05-27 14:59:26.555 UTC [1989] postgres@mydb LOG:  could not receive data from client: Connection reset by peer
+2017-06-06 07:54:13.753 CEST [9110] LOG:  received fast shutdown request
+2017-06-06 07:54:13.753 CEST [9110] LOG:  aborting any active transactions
+2017-06-06 07:54:13.753 CEST [9115] LOG:  autovacuum launcher shutting down
+2017-06-06 07:54:13.755 CEST [9112] LOG:  shutting down
+2017-06-06 07:54:13.816 CEST [9110] LOG:  database system is shut down
+2017-06-06 07:55:39.725 CEST [12969] LOG:  database system was shut down at 2017-06-06 07:54:13 CEST
+2017-06-06 07:55:39.736 CEST [12969] LOG:  MultiXact member wraparound protections are now enabled
+2017-06-06 07:55:39.739 CEST [12968] LOG:  database system is ready to accept connections
+2017-06-06 07:55:39.739 CEST [12973] LOG:  autovacuum launcher started
+2017-06-06 07:55:40.155 CEST [12975] [unknown]@[unknown] LOG:  incomplete startup packet
+2017-06-06 07:55:40.156 CEST [12975] [unknown]@[unknown] LOG:  incomplete startup packet
+2017-06-10 19:37:30.681 CEST [17398] LOG:  database system was shut down at 2017-06-10 19:37:29 CEST
+2017-06-10 19:37:30.695 CEST [17398] LOG:  MultiXact member wraparound protections are now enabled
+2017-06-10 19:37:30.702 CEST [17397] LOG:  database system is ready to accept connections
+2017-06-10 19:37:30.702 CEST [17402] LOG:  autovacuum launcher started
+2017-06-10 19:37:31.104 CEST [17404] [unknown]@[unknown] LOG:  incomplete startup packet
+2017-06-10 20:27:55.911 CEST [17397] LOG:  received fast shutdown request
+2017-06-10 20:27:55.911 CEST [17397] LOG:  aborting any active transactions
+2017-06-10 20:27:55.911 CEST [17402] LOG:  autovacuum launcher shutting down
+2017-06-10 20:27:55.914 CEST [17399] LOG:  shutting down
+2017-06-10 20:27:55.973 CEST [17397] LOG:  database system is shut down
+2017-06-10 20:27:57.022 CEST [24490] LOG:  database system was shut down at 2017-06-10 20:27:55 CEST
+2017-06-10 20:27:57.032 CEST [24490] LOG:  MultiXact member wraparound protections are now enabled
+2017-06-10 20:27:57.035 CEST [24494] LOG:  autovacuum launcher started
+2017-06-10 20:27:57.035 CEST [24489] LOG:  database system is ready to accept connections
+2017-06-10 20:27:57.475 CEST [24496] [unknown]@[unknown] LOG:  incomplete startup packet
+2017-06-17 16:58:03.937 CEST [24489] LOG:  received fast shutdown request
+2017-06-17 16:58:03.937 CEST [24489] LOG:  aborting any active transactions
+2017-06-17 16:58:03.938 CEST [24494] LOG:  autovacuum launcher shutting down
+2017-06-17 16:58:03.940 CEST [24491] LOG:  shutting down
+2017-06-17 16:58:04.040 CEST [24489] LOG:  database system is shut down
