@@ -5,7 +5,7 @@ import (
 )
 
 // Creator initializes and configures a new Beater instance used to execute
-// the beat its run-loop.
+// the beat's run-loop.
 type Creator func(*Beat, *common.Config) (Beater, error)
 
 // Beater is the interface that must be implemented by every Beat. A Beater
@@ -38,10 +38,12 @@ type Beat struct {
 	SetupMLCallback SetupMLCallback // setup callback for ML job configs
 	InSetupCmd      bool            // this is set to true when the `setup` command is called
 
-	// XXX: remove Config from public interface
+	// XXX: remove Config from public interface.
+	//      It's currently used by filebeat modules to setup the Ingest Node
+	//      pipeline and ML jobs.
 	Config *BeatConfig // Common Beat configuration data.
 
-	BeatConfig *common.Config // The beats it's own configuration section
+	BeatConfig *common.Config // The beat's own configuration section
 }
 
 // BeatConfig struct contains the basic configuration of every beat

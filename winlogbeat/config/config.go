@@ -14,15 +14,6 @@ const (
 	DefaultRegistryFile = ".winlogbeat.yml"
 )
 
-// Validator is the interface for configuration data that can be validating.
-//
-// Validate reads the configuration and validates all fields. An error
-// describing all problems is returned (versus returning an error only for the
-// first problem encountered).
-type Validator interface {
-	Validate() error
-}
-
 var (
 	DefaultSettings = WinlogbeatConfig{
 		RegistryFile: DefaultRegistryFile,

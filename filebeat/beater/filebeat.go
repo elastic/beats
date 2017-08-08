@@ -82,10 +82,10 @@ func New(b *beat.Beat, rawConfig *common.Config) (beat.Beater, error) {
 	if !config.ConfigProspector.Enabled() && !config.ConfigModules.Enabled() && !haveEnabledProspectors {
 		if !b.InSetupCmd {
 			return nil, errors.New("No modules or prospectors enabled and configuration reloading disabled. What files do you want me to watch?")
-		} else {
-			// in the `setup` command, log this only as a warning
-			logp.Warn("Setup called, but no modules enabled.")
 		}
+
+		// in the `setup` command, log this only as a warning
+		logp.Warn("Setup called, but no modules enabled.")
 	}
 
 	if *once && config.ConfigProspector.Enabled() && config.ConfigModules.Enabled() {
