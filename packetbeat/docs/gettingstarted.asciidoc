@@ -243,6 +243,8 @@ If you are sending output to Logstash, make sure you
 
 include::../../libbeat/docs/step-configure-kibana-endpoint.asciidoc[]
 
+include::../../libbeat/docs/step-configure-credentials.asciidoc[]
+
 :requires-sudo: yes
 include::../../libbeat/docs/step-test-config.asciidoc[]
 

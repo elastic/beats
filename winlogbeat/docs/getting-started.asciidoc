@@ -121,6 +121,8 @@ If you are sending output to Logstash, make sure you
 
 include::../../libbeat/docs/step-configure-kibana-endpoint.asciidoc[]
 
+include::../../libbeat/docs/step-configure-credentials.asciidoc[]
+
 . After you save your configuration file, test it with the following command.
 +
 [source,shell]
