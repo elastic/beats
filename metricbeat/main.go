@@ -11,6 +11,9 @@ import (
 	"os"
 
 	"github.com/elastic/beats/metricbeat/cmd"
+
+	// import modules
+	_ "github.com/elastic/beats/metricbeat/include"
 )
 
 func main() {
