@@ -22,6 +22,7 @@ grouped in the following categories:
 * <<exported-fields-log>>
 * <<exported-fields-mysql>>
 * <<exported-fields-nginx>>
+* <<exported-fields-postgresql>>
 * <<exported-fields-redis>>
 * <<exported-fields-system>>
 
@@ -1275,6 +1276,92 @@ Connection identifier.
 type: text
 
 The error message
+
+
+[[exported-fields-postgresql]]
+== PostgreSQL fields
+
+Module for parsing the PostgreSQL log files.
+
+
+
+[float]
+== postgresql fields
+
+Fields from PostgreSQL logs.
+
+
+
+[float]
+== log fields
+
+Fields from the PostgreSQL log files.
+
+
+
+[float]
+=== `postgresql.log.timestamp`
+
+The timestamp from the log line.
+
+
+[float]
+=== `postgresql.log.timezone`
+
+The timezone of timestamp.
+
+
+[float]
+=== `postgresql.log.thread_id`
+
+type: long
+
+Processs id
+
+
+[float]
+=== `postgresql.log.user`
+
+example: admin
+
+Name of user
+
+[float]
+=== `postgresql.log.database`
+
+example: mydb
+
+Name of database
+
+[float]
+=== `postgresql.log.level`
+
+example: FATAL
+
+The log level.
+
+[float]
+=== `postgresql.log.duration`
+
+type: float
+
+example: 30.0
+
+Duration of a query.
+
+[float]
+=== `postgresql.log.query`
+
+example: SELECT * FROM users;
+
+Query statment.
+
+[float]
+=== `postgresql.log.message`
+
+type: text
+
+The logged message.
 
 
 [[exported-fields-redis]]
