@@ -39,6 +39,8 @@ https://github.com/elastic/beats/compare/v6.0.0-beta1...master[Check the HEAD di
 
 *Heartbeat*
 
+- Fix wrong event timestamps. {issue}4851[4851]
+
 *Metricbeat*
 
 *Packetbeat*
