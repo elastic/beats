@@ -442,8 +442,11 @@ class Test(metricbeat.BaseTest):
         self.check_username(output["system.process.username"])
 
     def check_username(self, observed, expected=None):
-        if expected == None:
-            expected = getpass.getuser()
+        if expected is None:
+            try:
+                expected = getpass.getuser()
+            except:
+                expected = str(os.getuid())
 
         if os.name == 'nt':
             parts = observed.split("\\", 2)
