@@ -39,6 +39,8 @@ https://github.com/elastic/beats/compare/v6.0.0-beta1...master[Check the HEAD di
 
 *Heartbeat*
 
+- Fix monitor.name being empty by default. {issue}4852[4852]
+
 *Metricbeat*
 
 *Packetbeat*
