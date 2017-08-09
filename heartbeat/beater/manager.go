@@ -270,7 +270,7 @@ func createWatchUpdater(monitor *monitor) func(content []byte) {
 func (m *monitorTask) createJob(client beat.Client) scheduler.TaskFunc {
 	name := m.config.Name
 	if name == "" {
-		name = m.config.Name
+		name = m.config.Type
 	}
 
 	meta := common.MapStr{
