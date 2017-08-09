@@ -1,0 +1,10 @@
+version: '2.1'
+services:
+  beat:
+    build: ${PWD}/.
+    env_file:
+      - ${PWD}/build/test.env
+    working_dir: /go/src/github.com/elastic/beats/heartbeat
+    volumes:
+      - ${PWD}/..:/go/src/github.com/elastic/beats/
+    command: make
