@@ -98,10 +98,17 @@ func (t *Template) generate(properties common.MapStr, dynamicTemplates []common.
 	}
 	indexSettings.DeepUpdate(t.settings.Index)
 
+	var mappingName string
+	if t.esVersion.Major >= 6 {
+		mappingName = "doc"
+	} else {
+		mappingName = "_default_"
+	}
+
 	// Load basic structure
 	basicStructure := common.MapStr{
 		"mappings": common.MapStr{
-			"_default_": common.MapStr{
+			mappingName: common.MapStr{
 				"_meta": common.MapStr{
 					"version": t.beatVersion.String(),
 				},
@@ -117,7 +124,8 @@ func (t *Template) generate(properties common.MapStr, dynamicTemplates []common.
 	}
 
 	if len(t.settings.Source) > 0 {
-		basicStructure.Put("mappings._default_._source", t.settings.Source)
+		key := fmt.Sprintf("mappings.%s._source", mappingName)
+		basicStructure.Put(key, t.settings.Source)
 	}
 
 	// ES 6 moved from template to index_patterns: https://github.com/elastic/elasticsearch/pull/21009
