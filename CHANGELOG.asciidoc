@@ -40,6 +40,8 @@ https://github.com/elastic/beats/compare/v6.0.0-beta1...master[Check the HEAD di
 - Register kubernetes `field_format` matcher and remove logger in `Encode` API {pull}4888[4888]
 - Fix go plugins not loaded when beat starts {pull}4799[4799]
 
+- Eliminate deprecated _default_ mapping in 6.x {pull}4864[4864]
+
 *Auditbeat*
 
 *Filebeat*
