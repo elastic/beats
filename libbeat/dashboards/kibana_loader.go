@@ -21,6 +21,11 @@ type KibanaLoader struct {
 }
 
 func NewKibanaLoader(cfg *common.Config, dashboardsConfig *Config, msgOutputter MessageOutputter) (*KibanaLoader, error) {
+
+	if cfg == nil || !cfg.Enabled() {
+		return nil, fmt.Errorf("Kibana is not configured or enabled")
+	}
+
 	client, err := kibana.NewKibanaClient(cfg)
 	if err != nil {
 		return nil, fmt.Errorf("Error creating Kibana client: %v", err)
