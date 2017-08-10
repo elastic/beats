@@ -5,6 +5,11 @@ services:
     depends_on:
       - proxy_dep
     environment:
+      # internal
+      - GIT_COMMITTER_NAME=beats
+      - GIT_COMMITTER_EMAIL=beats@elastic.co
+
+      # services
       - REDIS_HOST=redis
       - REDIS_PORT=6379
       - SREDIS_HOST=sredis
