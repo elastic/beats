@@ -39,7 +39,7 @@ metricbeat.modules:
 Another strategy to deal with these filesystems is to configure a `drop_event`
 filter that matches the `mount_point` using a regular expression. This type of
 filtering occurs after the data has been collected so it can be less efficient
-that the previous method.
+than the previous method.
 
 [source,yaml]
 ----
