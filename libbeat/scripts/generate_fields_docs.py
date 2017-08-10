@@ -54,6 +54,14 @@ def document_field(output, field, path):
     if "description" in field:
         output.write("{}\n\n".format(field["description"]))
 
+    if "index" in field:
+        if not field["index"]:
+            output.write("{}\n\n".format("Field is not indexed."))
+
+    if "enable" in field:
+        if not field["enable"]:
+            output.write("{}\n\n".format("Object is not enabled."))
+
 
 def fields_to_asciidoc(input, output, beat):
 
