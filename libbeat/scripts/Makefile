@@ -290,13 +290,12 @@ endif
 
 .PHONY: docs
 docs:  ## @build Builds the documents for the beat
-	sh ${ES_BEATS}/libbeat/scripts/build_docs.sh ${BEAT_NAME}
+	sh ${ES_BEATS}/script/build_docs.sh ${BEAT_NAME} ${BEAT_PATH}/docs ${BUILD_DIR}
 
 
 .PHONY: docs-preview
 docs-preview:  ## @build Preview the documents for the beat in the browser
-	if [ ! -d "build/docs" ]; then $(MAKE) docs; fi;
-	${BUILD_DIR}/docs/build_docs.pl --chunk=1 -open chunk=1 -open --doc ${BEAT_GOPATH}/src/github.com/elastic/beats/${BEAT_NAME}/docs/index.asciidoc -out ${BUILD_DIR}/html_docs
+	PREVIEW=1 $(MAKE) docs
 
 .PHONY: index-template
 index-template: ## @build Generate index templates for the given $VERSION. This is for manual testing.
