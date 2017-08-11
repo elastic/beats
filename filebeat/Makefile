@@ -41,7 +41,7 @@ configs: python-env
 	@${PYTHON_ENV}/bin/python  ${ES_BEATS}/script/config_collector.py --beat ${BEAT_NAME} --full $(PWD) >> _meta/beat.reference.yml
 	@cat ${ES_BEATS}/filebeat/_meta/common.reference.p2.yml >> _meta/beat.reference.yml
 	@rm -rf modules.d && mkdir -p modules.d
-	@for MODULE in `ls module | grep -v .go`; do cp -a $(PWD)/module/$$MODULE/_meta/config.yml modules.d/$$MODULE.yml.disabled; done
+	@for MODULE in `find module -type d -maxdepth 1 -mindepth 1 -exec basename {} \;`; do cp -a $(PWD)/module/$$MODULE/_meta/config.yml modules.d/$$MODULE.yml.disabled; done
 	@chmod go-w modules.d/*
 
 # Collects all module docs
