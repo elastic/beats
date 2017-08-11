@@ -39,6 +39,6 @@ func getConfig() map[string]interface{} {
 	return map[string]interface{}{
 		"module":     "apache",
 		"metricsets": []string{"status"},
-		"hosts":      []string{apache.GetApacheEnvHost()},
+		"hosts":      []string{apache.GetApacheEnvHost(): apache.GetApacheEnvPort()},
 	}
 }
