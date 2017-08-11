@@ -11,5 +11,5 @@ services:
   module:
     build: ${PWD}/module/${MODULE}/_meta
     ports:
-      - ${PORT}:${PORT}
+      - 12345:${PORT}
 

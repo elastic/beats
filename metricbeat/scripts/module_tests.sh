@@ -23,12 +23,13 @@ for d in * ; do
         # Only modules with a port are expected to have system tests
         if [ "$PORT" -ne "0" ]; then
             cd ..
+
+            export "${VAR_NAME}"="12345"
             # Using docker compose to wait for healthy container
             MODULE=$d PORT=${PORT} docker-compose -f module/docker-compose.yml up -d
             go test -tags=integration ${BEAT_PATH}/module/${d}/... -v
             MODULE=$d PORT=${PORT} docker-compose -f module/docker-compose.yml down
             cd module
-
 
             #docker build -t ${d}:metricbeat ../module/${d}/_meta/
             #docker run -p ${PORT}:${PORT} -d --name metricbeat-${MODULE} ${d}:metricbeat
