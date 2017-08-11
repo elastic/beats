@@ -292,12 +292,6 @@ spooler size.
 
 The http request timeout in seconds for the Elasticsearch request. The default is 90.
 
-===== `flush_interval`
-
-The number of seconds to wait for new events between two bulk API index requests.
-If `bulk_max_size` is reached before this interval expires, additional bulk index
-requests are made.
-
 ===== `ssl`
 
 Configuration options for SSL parameters like the certificate authority to use
@@ -730,10 +724,6 @@ The maximum permitted size of JSON-encoded messages. Bigger messages will be dro
 The ACK reliability level required from broker. 0=no response, 1=wait for local commit, -1=wait for all replicas to commit. The default is 1.
 
 Note: If set to 0, no ACKs are returned by Kafka. Messages might be lost silently on error.
-
-===== `flush_interval`
-
-The number of seconds to wait for new events between two producer API calls.
 
 ===== `ssl`
 
