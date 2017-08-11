@@ -1134,7 +1134,7 @@ Apache License 2.0
 
 --------------------------------------------------------------------
 Dependency: github.com/google/uuid
-Revision: 6a5e28554805e78ea6141142aba763936c4761c0
+Revision: 281f560d28af7174109514e936f94c2ab2cb2823
 License type (autodetected): BSD 3-clause license
 ./metricbeat/module/vsphere/vendor/github.com/google/uuid/LICENSE:
 --------------------------------------------------------------------
@@ -3501,7 +3501,7 @@ Apache License 2.0
 
 --------------------------------------------------------------------
 Dependency: github.com/vmware/govmomi
-Revision: 9bfdc5ce62c0585b48b154cc460f8664dcd124c3
+Revision: 2cad15190b417804d82edb4981e7b3e62907c4ee
 License type (autodetected): Apache License 2.0
 ./metricbeat/module/vsphere/vendor/github.com/vmware/govmomi/LICENSE.txt:
 --------------------------------------------------------------------
@@ -3510,7 +3510,7 @@ Apache License 2.0
 
 --------------------------------------------------------------------
 Dependency: github.com/vmware/govmomi/vim25/xml
-Revision: 5072cda664c79ada30834d171d2ed1f76317d3b2
+Revision: 2cad15190b417804d82edb4981e7b3e62907c4ee
 License type (autodetected): BSD 3-clause license
 ./metricbeat/module/vsphere/vendor/github.com/vmware/govmomi/vim25/xml/LICENSE:
 --------------------------------------------------------------------
@@ -3541,15 +3541,6 @@ DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY
 THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
 (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
-
---------------------------------------------------------------------
-Dependency: github.com/vmware/vic
-Revision: a2b2afb419d70009cd4d0b58f37b1a095c58b526
-License type (autodetected): Apache License 2.0
-./metricbeat/module/vsphere/vendor/github.com/vmware/vic/LICENSE:
---------------------------------------------------------------------
-Apache License 2.0
-
 
 --------------------------------------------------------------------
 Dependency: github.com/yuin/gopher-lua

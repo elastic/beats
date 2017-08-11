@@ -8,13 +8,10 @@ import (
 	"github.com/elastic/beats/libbeat/common/cfgwarn"
 	"github.com/elastic/beats/metricbeat/mb"
 
-	"github.com/pkg/errors"
 	"github.com/vmware/govmomi"
-	"github.com/vmware/govmomi/find"
-	"github.com/vmware/govmomi/property"
+	"github.com/vmware/govmomi/view"
 	"github.com/vmware/govmomi/vim25"
 	"github.com/vmware/govmomi/vim25/mo"
-	"github.com/vmware/govmomi/vim25/types"
 )
 
 func init() {
@@ -60,75 +57,63 @@ func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
 }
 
 func (m *MetricSet) Fetch() ([]common.MapStr, error) {
-	f := find.NewFinder(m.Client, true)
 
 	ctx, cancel := context.WithCancel(context.Background())
 	defer cancel()
 
-	// Get all data centers.
-	dcs, err := f.DatacenterList(ctx, "*")
+	events := []common.MapStr{}
+
+	c := m.Client
+
+	// Create a view of HostSystem objects.
+	mgr := view.NewManager(c)
+
+	v, err := mgr.CreateContainerView(ctx, c.ServiceContent.RootFolder, []string{"HostSystem"}, true)
 	if err != nil {
 		return nil, err
 	}
 
-	events := []common.MapStr{}
-	for _, dc := range dcs {
-		f.SetDatacenter(dc)
+	defer v.Destroy(ctx)
 
-		hss, err := f.HostSystemList(ctx, "*")
-		if err != nil {
-			return nil, errors.Wrap(err, "failed to get hostsystem list")
-		}
+	// Retrieve summary property for all hosts.
+	var hst []mo.HostSystem
+	err = v.Retrieve(ctx, []string{"HostSystem"}, []string{"summary"}, &hst)
+	if err != nil {
+		return nil, err
+	}
 
-		pc := property.DefaultCollector(m.Client)
+	for _, hs := range hst {
+		totalCpu := int64(hs.Summary.Hardware.CpuMhz) * int64(hs.Summary.Hardware.NumCpuCores)
+		freeCpu := int64(totalCpu) - int64(hs.Summary.QuickStats.OverallCpuUsage)
+		freeMemory := int64(hs.Summary.Hardware.MemorySize) - (int64(hs.Summary.QuickStats.OverallMemoryUsage) * 1024 * 1024)
 
-		// Convert hosts into list of references.
-		var refs []types.ManagedObjectReference
-		for _, hs := range hss {
-			refs = append(refs, hs.Reference())
-		}
-
-		// Retrieve summary property (HostListSummary).
-		var hst []mo.HostSystem
-		err = pc.Retrieve(ctx, refs, []string{"summary"}, &hst)
-		if err != nil {
-			return nil, err
-		}
-
-		for _, hs := range hst {
-			totalCpu := int64(hs.Summary.Hardware.CpuMhz) * int64(hs.Summary.Hardware.NumCpuCores)
-			freeCpu := int64(totalCpu) - int64(hs.Summary.QuickStats.OverallCpuUsage)
-			freeMemory := int64(hs.Summary.Hardware.MemorySize) - (int64(hs.Summary.QuickStats.OverallMemoryUsage) * 1024 * 1024)
-
-			event := common.MapStr{
-				"datacenter": dc.Name(),
-				"name":       hs.Summary.Config.Name,
-				"cpu": common.MapStr{
-					"used": common.MapStr{
-						"mhz": hs.Summary.QuickStats.OverallCpuUsage,
-					},
-					"total": common.MapStr{
-						"mhz": totalCpu,
-					},
-					"free": common.MapStr{
-						"mhz": freeCpu,
-					},
+		event := common.MapStr{
+			"name": hs.Summary.Config.Name,
+			"cpu": common.MapStr{
+				"used": common.MapStr{
+					"mhz": hs.Summary.QuickStats.OverallCpuUsage,
 				},
-				"memory": common.MapStr{
-					"used": common.MapStr{
-						"bytes": (int64(hs.Summary.QuickStats.OverallMemoryUsage) * 1024 * 1024),
-					},
-					"total": common.MapStr{
-						"bytes": hs.Summary.Hardware.MemorySize,
-					},
-					"free": common.MapStr{
-						"bytes": freeMemory,
-					},
+				"total": common.MapStr{
+					"mhz": totalCpu,
 				},
-			}
-
-			events = append(events, event)
+				"free": common.MapStr{
+					"mhz": freeCpu,
+				},
+			},
+			"memory": common.MapStr{
+				"used": common.MapStr{
+					"bytes": (int64(hs.Summary.QuickStats.OverallMemoryUsage) * 1024 * 1024),
+				},
+				"total": common.MapStr{
+					"bytes": hs.Summary.Hardware.MemorySize,
+				},
+				"free": common.MapStr{
+					"bytes": freeMemory,
+				},
+			},
 		}
+
+		events = append(events, event)
 	}
 
 	return events, nil

@@ -11288,14 +11288,6 @@ datastore
 
 
 [float]
-=== `vsphere.datastore.datacenter`
-
-type: keyword
-
-Datacenter name
-
-
-[float]
 === `vsphere.datastore.name`
 
 type: keyword
@@ -11356,14 +11348,6 @@ Used percent of the datastore
 
 host
 
-
-
-[float]
-=== `vsphere.host.datacenter`
-
-type: keyword
-
-Datacenter name
 
 
 [float]
@@ -11436,11 +11420,11 @@ virtualmachine
 
 
 [float]
-=== `vsphere.virtualmachine.datacenter`
+=== `vsphere.virtualmachine.host`
 
 type: keyword
 
-Datacenter name
+Host name
 
 
 [float]

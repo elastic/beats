@@ -1,5 +1,5 @@
 /*
-Copyright (c) 2014-2015 VMware, Inc. All Rights Reserved.
+Copyright (c) 2014-2017 VMware, Inc. All Rights Reserved.
 
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.
@@ -655,7 +655,40 @@ func (c *Client) Download(u *url.URL, param *Download) (io.ReadCloser, int64, er
 		return nil, 0, err
 	}
 
-	return res.Body, res.ContentLength, nil
+	r := res.Body
+
+	return r, res.ContentLength, nil
+}
+
+func (c *Client) WriteFile(file string, src io.Reader, size int64, s progress.Sinker) error {
+	var err error
+
+	r := src
+
+	fh, err := os.Create(file)
+	if err != nil {
+		return err
+	}
+
+	if s != nil {
+		pr := progress.NewReader(s, src, size)
+		src = pr
+
+		// Mark progress reader as done when returning from this function.
+		defer func() {
+			pr.Done(err)
+		}()
+	}
+
+	_, err = io.Copy(fh, r)
+
+	cerr := fh.Close()
+
+	if err == nil {
+		err = cerr
+	}
+
+	return err
 }
 
 // DownloadFile GETs the given URL to a local file
@@ -669,37 +702,6 @@ func (c *Client) DownloadFile(file string, u *url.URL, param *Download) error {
 	if err != nil {
 		return err
 	}
-	defer rc.Close()
 
-	var r io.Reader = rc
-
-	fh, err := os.Create(file)
-	if err != nil {
-		return err
-	}
-	defer fh.Close()
-
-	if param.Progress != nil {
-		pr := progress.NewReader(param.Progress, r, contentLength)
-		r = pr
-
-		// Mark progress reader as done when returning from this function.
-		defer func() {
-			pr.Done(err)
-		}()
-	}
-
-	_, err = io.Copy(fh, r)
-	if err != nil {
-		return err
-	}
-
-	// Assign error before returning so that it gets picked up by the deferred
-	// function marking the progress reader as done.
-	err = fh.Close()
-	if err != nil {
-		return err
-	}
-
-	return nil
+	return c.WriteFile(file, rc, contentLength, param.Progress)
 }
