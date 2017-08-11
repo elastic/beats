@@ -101,6 +101,7 @@ import (
 	_ "github.com/elastic/beats/metricbeat/module/system/process"
 	_ "github.com/elastic/beats/metricbeat/module/system/process_summary"
 	_ "github.com/elastic/beats/metricbeat/module/system/socket"
+	_ "github.com/elastic/beats/metricbeat/module/system/uptime"
 	_ "github.com/elastic/beats/metricbeat/module/vsphere"
 	_ "github.com/elastic/beats/metricbeat/module/vsphere/datastore"
 	_ "github.com/elastic/beats/metricbeat/module/vsphere/host"

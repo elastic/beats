@@ -10144,6 +10144,23 @@ type: keyword
 Name of the user running the process.
 
 
+[float]
+== uptime fields
+
+`uptime` contains the operating system uptime metric.
+
+
+
+[float]
+=== `system.uptime.duration.ms`
+
+type: long
+
+format: duration
+
+The OS uptime in milliseconds.
+
+
 [[exported-fields-vsphere]]
 == vSphere fields
 
