@@ -41,6 +41,9 @@ RUN if [ ${XPACK} = "1" ]; then elasticsearch-plugin install --batch ${DOWNLOAD_
 RUN elasticsearch-plugin install --batch ${DOWNLOAD_URL}/elasticsearch-plugins/ingest-user-agent/ingest-user-agent-${ELASTIC_VERSION}.zip?c=${CACHE_BUST}
 RUN elasticsearch-plugin install --batch ${DOWNLOAD_URL}/elasticsearch-plugins/ingest-geoip/ingest-geoip-${ELASTIC_VERSION}.zip?c=${CACHE_BUST}
 
+# Set bootstrap password (for when security is used)
+RUN if [ ${XPACK} = "1" ]; then elasticsearch-keystore create; echo "changeme" | elasticsearch-keystore add -x 'bootstrap.password'; fi
+
 COPY config/elasticsearch.yml config/
 COPY config/log4j2.properties config/
 COPY bin/es-docker bin/es-docker

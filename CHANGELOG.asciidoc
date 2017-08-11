@@ -35,6 +35,8 @@ https://github.com/elastic/beats/compare/v6.0.0-beta1...master[Check the HEAD di
 *Affecting all Beats*
 - Fix go plugins not loaded when beat starts {pull}4799[4799]
 
+- Eliminate deprecated _default_ mapping in 6.x {pull}4864[4864]
+
 *Auditbeat*
 
 - Fix `file.max_file_size` config option for the audit file metricset. {pull}4796[4796]
@@ -45,9 +47,13 @@ https://github.com/elastic/beats/compare/v6.0.0-beta1...master[Check the HEAD di
 
 *Heartbeat*
 
+- Fix monitor.name being empty by default. {issue}4852[4852]
+- Fix wrong event timestamps. {issue}4851[4851]
+
 *Metricbeat*
 
 - Support `npipe` protocol (Windows) in Docker module. {pull}4751[4751]
+- Added missing mongodb configuration file to the `modules.d` folder. {pull}4870[4870]
 - Fix wrong MySQL CRUD queries timelion visualization {pull}4857[4857]
 
 *Packetbeat*
@@ -77,7 +83,7 @@ https://github.com/elastic/beats/compare/v6.0.0-beta1...master[Check the HEAD di
 - Add graphite protocol metricbeat module. {pull}4734[4734]
 - Add http server metricset to support push metrics via http. {pull}4770[4770]
 - Make config object public for graphite and http server {pull}4820[4820]
- 
+
 *Packetbeat*
 
 *Winlogbeat*

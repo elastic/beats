@@ -25,6 +25,7 @@ type Field struct {
 	SearchAnalyzer string      `config:"search_analyzer"`
 	Norms          bool        `config:"norms"`
 	Dynamic        dynamicType `config:"dynamic"`
+	Index          *bool       `config:"index"`
 
 	path      string
 	esVersion common.Version
@@ -161,6 +162,14 @@ func (f *Field) object() common.MapStr {
 
 	properties := f.getDefaultProperties()
 	properties["type"] = "object"
+	if f.Enabled != nil {
+		properties["enabled"] = *f.Enabled
+	}
+
+	if f.Dynamic.value != nil {
+		properties["dynamic"] = f.Dynamic.value
+	}
+
 	return properties
 }
 
@@ -183,16 +192,13 @@ func (f *Field) addDynamicTemplate(properties common.MapStr, matchType string) {
 
 func (f *Field) getDefaultProperties() common.MapStr {
 	// Currently no defaults exist
-	property := common.MapStr{}
-	if f.Enabled != nil {
-		property["enabled"] = *f.Enabled
+	properties := common.MapStr{}
+
+	if f.Index != nil {
+		properties["index"] = *f.Index
 	}
 
-	if f.Dynamic.value != nil {
-		property["dynamic"] = f.Dynamic.value
-	}
-
-	return property
+	return properties
 }
 
 // Recursively generates the correct key based on the dots

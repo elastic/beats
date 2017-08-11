@@ -1,4 +1,4 @@
-BUILD_DIR=build
+BUILD_DIR=$(CURDIR)/build
 COVERAGE_DIR=$(BUILD_DIR)/coverage
 BEATS=packetbeat filebeat winlogbeat metricbeat heartbeat auditbeat
 PROJECTS=libbeat $(BEATS)
@@ -94,7 +94,8 @@ beats-dashboards:
 # Builds the documents for each beat
 .PHONY: docs
 docs:
-	@sh libbeat/scripts/build_docs.sh $(PROJECTS)
+	@$(foreach var,$(PROJECTS),BUILD_DIR=${BUILD_DIR} $(MAKE) -C $(var) docs || exit 1;)
+	sh ./script/build_docs.sh dev-guide github.com/elastic/beats/docs/dev-guide ${BUILD_DIR}
 
 .PHONY: package
 package: update beats-dashboards
@@ -102,7 +103,7 @@ package: update beats-dashboards
 
 	@echo "Start building the dashboards package"
 	@mkdir -p build/upload/
-	@BUILD_DIR=$(CURDIR)/build SNAPSHOT=$(SNAPSHOT) $(MAKE) -C dev-tools/packer package-dashboards $(CURDIR)/build/upload/build_id.txt
+	@BUILD_DIR=${BUILD_DIR} SNAPSHOT=$(SNAPSHOT) $(MAKE) -C dev-tools/packer package-dashboards ${BUILD_DIR}/upload/build_id.txt
 	@mv build/upload build/dashboards-upload
 
 	@# Copy build files over to top build directory
@@ -110,7 +111,7 @@ package: update beats-dashboards
 	@$(foreach var,$(BEATS),cp -r $(var)/build/upload/ build/upload/$(var)  || exit 1;)
 	@cp -r build/dashboards-upload build/upload/dashboards
 	@# Run tests on the generated packages.
-	@go test ./dev-tools/package_test.go -files "$(CURDIR)/build/upload/*/*"
+	@go test ./dev-tools/package_test.go -files "${BUILD_DIR}/upload/*/*"
 
 # Upload nightly builds to S3
 .PHONY: upload-nightlies-s3
