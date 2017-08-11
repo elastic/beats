@@ -27,7 +27,7 @@ for d in * ; do
             export "${VAR_NAME}"="12345"
             # Using docker compose to wait for healthy container
             MODULE=$d PORT=${PORT} docker-compose -f module/docker-compose.yml up -d
-            go test -tags=integration ${BEAT_PATH}/module/${d}/... -v
+            source module/$d/_meta/env || true; go test -tags=integration ${BEAT_PATH}/module/${d}/... -v
             MODULE=$d PORT=${PORT} docker-compose -f module/docker-compose.yml down
             cd module
 
