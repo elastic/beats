@@ -104,9 +104,6 @@ Exports the index template to stdout. You can specify the `--es.version` and
 When specified along with <<template-subcommand,`template`>>, exports an index
 template that is compatible with the specified version.
 
-
-//REVIEWERS: Is the above statement true? The command-line help was too vague (said "Elastic version"). When I run export template with --es.version specified, nothing seems to happen.
-
 *`-h, --help`*::
 Shows help for the `export` command.
 
@@ -178,8 +175,6 @@ and disabled, run the `list` subcommand.
 
 *`disable MODULE_LIST`*::
 Disables the modules specified in the space-separated list.
-
-//REVIEWERS: It seems odd to me that we usually expect comma-separated lists, but here we expect a space-separated list.
 
 *`enable MODULE_LIST`*::
 Enables the modules specified in the space-separated list.
@@ -303,8 +298,6 @@ for troubleshooting {beatname_uc}.
 
 ifeval::["{beatname_lc}"=="filebeat"]
 
-//REVIEWERS: I've written this topic to be consitent to what I see when I run -help, but I'm wondering why we aren't also showing the options that begin with a dash. For example, in the modules doc we show: -modules=nginx,mysql,system. Is --modules preferred?
-
 *`--modules MODULE_LIST`*::
 Specifies a comma-separate list of modules to run. For example:
 +
@@ -317,8 +310,6 @@ Rather than specifying the list of modules every time you run {beatname_uc},
 you can use the <<modules-command,`modules`>> command to enable and disable
 specific modules. Then when you run {beatname_uc}, it will run any modules
 that are enabled.
-
-//REVIEWERS: Is the above syntax correct for --modules? We used to say -modules=nginx,mysql,system. Not sure if it makes a difference, but I'm trying to be consistent with what users see when they view --help.
 
 endif::[]
 
@@ -336,7 +327,9 @@ after `close_inactive` is reached.
 
 endif::[]
 
-//REVIEWERS: I'm not documenting --setup because it will be removed in 6.0. Are there any other flags that I need to remove? Or mention that they're being maintained for backwards compability?
+*`--setup`*::
+Loads the sample Kibana dashboards. If you want to load the dashboards without
+running {beatname_uc}, use the <<setup-command,`setup`>> command instead.
 
 ifeval::["{beatname_lc}"=="metricbeat"]
 
@@ -438,14 +431,14 @@ Sets up the index template only.
 *`config`*::
 Tests the configuration settings.
 
-//REVIEWERS: For each of the tests described here, should we say more about what we test?
-
 ifeval::["{beatname_lc}"=="metricbeat"]
 
 *`modules [MODULE_NAME] [METRICSET_NAME]`*::
-Tests module settings for all configured modules. To test the settings for a
-specific module, specify `MODULE_NAME`. To test the settings for a specific
-metricset in the module, also specify `METRICSET_NAME`.
+Tests module settings for all configured modules. When you run this command,
+{beatname_uc} does a test run that applies the current settings, retrieves the
+metrics, and shows them as output. To test the settings for a specific module,
+specify `MODULE_NAME`. To test the settings for a specific metricset in the
+module, also specify `METRICSET_NAME`.
 
 endif::[]
 
@@ -453,11 +446,7 @@ endif::[]
 Tests that {beatname_uc} can connect to the output by using the
 current settings.
 
-//REVIEWERS: The help (-h) says "Test output works with current settings". It seems too vague to say "works". Is it correct to say that the command tests that the beat can connect to the output? If we aren't specific here, users might expect the command to do more.
-
 *FLAGS*
-
-//REVIEWERS: Is --modules a valid flag when running the test command in Filebeat? --modules shows up as a valid flag in the help, but when I try to specify the flag, I see "Error: unknown flag: --modules". Is there a mistake in the help panel? Or maybe I'm doing something wrong when I try to use it?
 
 *`-h, --help`*:: Shows help for the `test` command.
 
