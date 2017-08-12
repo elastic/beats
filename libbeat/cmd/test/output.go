@@ -14,7 +14,7 @@ import (
 func GenTestOutputCmd(name, beatVersion string) *cobra.Command {
 	return &cobra.Command{
 		Use:   "output",
-		Short: "Test output works with current settings",
+		Short: "Test " + name + " can connect to the output by using the current settings",
 		Run: func(cmd *cobra.Command, args []string) {
 			b, err := instance.NewBeat(name, beatVersion)
 			if err != nil {
