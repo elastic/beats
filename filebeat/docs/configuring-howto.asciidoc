@@ -23,6 +23,7 @@ The following topics describe how to configure Filebeat:
 * <<multiline-examples>>
 * <<configuration-general-options>>
 * <<filebeat-configuration-reloading>>
+* <<configuring-internal-queue>>
 * <<configuring-output>>
 * <<configuration-ssl>>
 * <<filtering-and-enhancing-data>>
@@ -50,6 +51,8 @@ include::./filebeat-general-options.asciidoc[]
 include::./reload-configuration.asciidoc[]
 
 :allplatforms:
+include::../../libbeat/docs/queueconfig.asciidoc[]
+
 include::../../libbeat/docs/outputconfig.asciidoc[]
 
 include::../../libbeat/docs/shared-ssl-config.asciidoc[]
