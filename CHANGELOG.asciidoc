@@ -82,7 +82,6 @@ https://github.com/elastic/beats/compare/v6.0.0-beta1...master[Check the HEAD di
 - Add graphite protocol metricbeat module. {pull}4734[4734]
 - Add http server metricset to support push metrics via http. {pull}4770[4770]
 - Make config object public for graphite and http server {pull}4820[4820]
-
 - Add system uptime metricset. {issue}[4848[4848]
  
 *Packetbeat*
