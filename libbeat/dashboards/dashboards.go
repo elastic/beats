@@ -29,34 +29,40 @@ func ImportDashboards(beatName, beatVersion, homePath string,
 		return err
 	}
 
-	if esConfig != nil {
-		status, err := ImportDashboardsViaElasticsearch(esConfig, &dashConfig, msgOutputter)
-		if err != nil {
-			return err
-		}
-		if status {
-			// the dashboards were imported via Elasticsearch
-			return nil
-		}
-	}
-
-	err = ImportDashboardsViaKibana(kibanaConfig, &dashConfig, msgOutputter)
+	esLoader, err := NewElasticsearchLoader(esConfig, &dashConfig, msgOutputter)
 	if err != nil {
-		return err
+		return fmt.Errorf("fail to create the Elasticsearch loader: %v", err)
+	}
+	defer esLoader.Close()
+
+	esLoader.statusMsg("Elasticsearch URL %v", esLoader.client.Connection.URL)
+
+	majorVersion, _, err := getMajorAndMinorVersion(esLoader.version)
+	if err != nil {
+		return fmt.Errorf("wrong Elasticsearch version: %v", err)
 	}
 
-	return nil
-}
-
-func ImportDashboardsViaKibana(config *common.Config, dashConfig *Config, msgOutputter MessageOutputter) error {
-	if config == nil {
-		config = common.NewConfig()
-	}
-	if !config.Enabled() {
-		return nil
+	if majorVersion < 6 {
+		return ImportDashboardsViaElasticsearch(esLoader)
 	}
 
-	kibanaLoader, err := NewKibanaLoader(config, dashConfig, msgOutputter)
+	logp.Info("For Elasticsearch version >= 6.0.0, the Kibana dashboards need to be imported via the Kibana API.")
+
+	if kibanaConfig == nil {
+		kibanaConfig = common.NewConfig()
+	}
+
+	// In Cloud, the Kibana URL is different than the Elasticsearch URL,
+	// but the credentials are the same.
+	// So, by default, use same credentials for connecting to Kibana as to Elasticsearch
+	if !kibanaConfig.HasField("username") && len(esLoader.client.Username) > 0 {
+		kibanaConfig.SetString("username", -1, esLoader.client.Username)
+	}
+	if !kibanaConfig.HasField("password") && len(esLoader.client.Password) > 0 {
+		kibanaConfig.SetString("password", -1, esLoader.client.Password)
+	}
+
+	kibanaLoader, err := NewKibanaLoader(kibanaConfig, &dashConfig, msgOutputter)
 	if err != nil {
 		return fmt.Errorf("fail to create the Kibana loader: %v", err)
 	}
@@ -65,11 +71,16 @@ func ImportDashboardsViaKibana(config *common.Config, dashConfig *Config, msgOut
 
 	kibanaLoader.statusMsg("Kibana URL %v", kibanaLoader.client.Connection.URL)
 
+	return ImportDashboardsViaKibana(kibanaLoader)
+}
+
+func ImportDashboardsViaKibana(kibanaLoader *KibanaLoader) error {
+
 	if !isKibanaAPIavailable(kibanaLoader.version) {
 		return fmt.Errorf("Kibana API is not available in Kibana version %s", kibanaLoader.version)
 	}
 
-	importer, err := NewImporter("default", dashConfig, *kibanaLoader)
+	importer, err := NewImporter("default", kibanaLoader.config, kibanaLoader)
 	if err != nil {
 		return fmt.Errorf("fail to create a Kibana importer for loading the dashboards: %v", err)
 	}
@@ -81,39 +92,22 @@ func ImportDashboardsViaKibana(config *common.Config, dashConfig *Config, msgOut
 	return nil
 }
 
-func ImportDashboardsViaElasticsearch(config *common.Config, dashConfig *Config, msgOutputter MessageOutputter) (bool, error) {
-	esLoader, err := NewElasticsearchLoader(config, dashConfig, msgOutputter)
-	if err != nil {
-		return false, fmt.Errorf("fail to create the Elasticsearch loader: %v", err)
-	}
-	defer esLoader.Close()
-
-	esLoader.statusMsg("Elasticsearch URL %v", esLoader.client.Connection.URL)
-
-	majorVersion, _, err := getMajorAndMinorVersion(esLoader.version)
-	if err != nil {
-		return false, fmt.Errorf("wrong Elasticsearch version: %v", err)
-	}
-
-	if majorVersion >= 6 {
-		logp.Info("For Elasticsearch version >= 6.0.0, the Kibana dashboards need to be imported via the Kibana API.")
-		return false, nil
-	}
+func ImportDashboardsViaElasticsearch(esLoader *ElasticsearchLoader) error {
 
 	if err := esLoader.CreateKibanaIndex(); err != nil {
-		return false, fmt.Errorf("fail to create the kibana index: %v", err)
+		return fmt.Errorf("fail to create the kibana index: %v", err)
 	}
 
-	importer, err := NewImporter("5.x", dashConfig, *esLoader)
+	importer, err := NewImporter("5.x", esLoader.config, esLoader)
 	if err != nil {
-		return false, fmt.Errorf("fail to create an Elasticsearch importer for loading the dashboards: %v", err)
+		return fmt.Errorf("fail to create an Elasticsearch importer for loading the dashboards: %v", err)
 	}
 
 	if err := importer.Import(); err != nil {
-		return false, fmt.Errorf("fail to import the dashboards in Elasticsearch: %v", err)
+		return fmt.Errorf("fail to import the dashboards in Elasticsearch: %v", err)
 	}
 
-	return true, nil
+	return nil
 }
 
 func getMajorAndMinorVersion(version string) (int, int, error) {
