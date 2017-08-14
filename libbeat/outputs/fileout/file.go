@@ -31,7 +31,6 @@ func makeFileout(
 	}
 
 	// disable bulk support in publisher pipeline
-	cfg.SetInt("flush_interval", -1, -1)
 	cfg.SetInt("bulk_max_size", -1, -1)
 
 	fo := &fileOutput{beat: beat, stats: stats}

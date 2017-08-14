@@ -148,12 +148,10 @@ func newTestElasticsearchOutput(t *testing.T, test string) *testOutputer {
 	index := testElasticsearchIndex(test)
 	connection := esConnect(t, index)
 
-	flushInterval := 0
 	bulkSize := 0
 	config, _ := common.NewConfigFrom(map[string]interface{}{
 		"hosts":            []string{getElasticsearchHost()},
 		"index":            connection.index,
-		"flush_interval":   &flushInterval,
 		"bulk_max_size":    &bulkSize,
 		"username":         os.Getenv("ES_USER"),
 		"password":         os.Getenv("ES_PASS"),
