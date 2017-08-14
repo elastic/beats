@@ -46,13 +46,16 @@ def generate_module(base_path, metricbeat_path, module, fileset):
 
     module_path = base_path + "/module/" + module
     meta_path = module_path + "/_meta"
+    kibana_default_path = meta_path + "/kibana/default"
 
     if os.path.isdir(module_path):
         print("Module already exists. Skipping creating module {}"
               .format(module))
         return
 
-    os.makedirs(meta_path)
+    paths_to_create = [meta_path, kibana_default_path]
+    for path_to_create in paths_to_create:
+        os.makedirs(path_to_create)
 
     templates = metricbeat_path + "/scripts/module/"
 

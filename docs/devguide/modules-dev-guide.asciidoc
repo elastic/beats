@@ -52,6 +52,8 @@ module/{module}/{fileset}
 │   └── pipeline.json
 ├── _meta
 │   └── fields.yml
+│   └── kibana
+│       └── default
 └── test
 ----
 
@@ -306,11 +308,24 @@ them, you can build them visually in Kibana and then run the following command:
 
 [source,shell]
 ----
-$ cd filebeat/module/{module}/
-python ../../../dev-tools/export_dashboards.py --regex {module} --dir _meta/kibana
+$ cd dev-tools/cmd/dashboards
+$ make # if export_dashboard is not built
+$ ./export_dashboards -dashboard '{dashboard-id}' -output '../../../filebeat/module/{module}/_meta/kibana/default/dashboard'
+----
+
+New Filebeat modules might not be compatible with Kibana 5.x. To export dashboards that are compatible with 5.x, run the following command inside the developer virtualenv:
+
+[source,shell]
+----
+$ cd filebeat
+$ make python-env
+$ cd module/{module}/
+$ python ../../../dev-tools/export_5x_dashboards.py --regex {module} --dir _meta/kibana/5.x
 ----
 
 Where the `--regex` parameter should match the dashboard you want to export.
+
+Please note that dashboards exported from Kibana 5.x are not compatible with Kibana 6.x.
 
 You can find more details about the process of creating and exporting the Kibana
 dashboards by reading {beatsdevguide}/new-dashboards.html[this guide].
