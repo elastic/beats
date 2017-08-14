@@ -298,10 +298,6 @@ func (b *Beat) launch(bt Creator) error {
 
 	svc.HandleSignals(beater.Stop)
 
-	// TODO Deprecate this in favor of setup subcommand (7.0)
-	if *setup {
-		cfgwarn.Deprecate("6.0", "-setup flag has been deprectad, use setup subcommand")
-	}
 	err = b.loadDashboards(false)
 	if err != nil {
 		return err
