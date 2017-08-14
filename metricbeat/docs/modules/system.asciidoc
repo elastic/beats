@@ -112,7 +112,8 @@ metricbeat.modules:
 
 - module: system
   period: 15m
-  metricsets: [uptime]
+  metricsets:
+    - uptime
 ----
 
 [float]
