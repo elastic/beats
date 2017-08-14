@@ -137,7 +137,11 @@ func (f *Field) text() common.MapStr {
 }
 
 func (f *Field) array() common.MapStr {
-	return f.getDefaultProperties()
+	properties := f.getDefaultProperties()
+	if f.ObjectType != "" {
+		properties["type"] = f.ObjectType
+	}
+	return properties
 }
 
 func (f *Field) object() common.MapStr {
