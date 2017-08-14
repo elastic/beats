@@ -79,6 +79,11 @@ def field_to_json(fields, desc, path, output,
         if "format" in desc:
             fieldFormat["id"] = desc["format"]
 
+            if "input_format" in desc:
+                fieldFormat["params"] = {
+                    "inputFormat": desc["input_format"]
+                }
+
         if "pattern" in desc:
             fieldFormat["params"] = {
                 "pattern": desc["pattern"]

@@ -109,6 +109,11 @@ metricbeat.modules:
   processors:
   - drop_event.when.regexp:
       system.filesystem.mount_point: '^/(sys|cgroup|proc|dev|etc|host|lib)($|/)'
+
+- module: system
+  period: 15m
+  metricsets:
+    - uptime
 ----
 
 [float]
@@ -138,6 +143,8 @@ The following metricsets are available:
 
 * <<metricbeat-metricset-system-socket,socket>>
 
+* <<metricbeat-metricset-system-uptime,uptime>>
+
 include::system/core.asciidoc[]
 
 include::system/cpu.asciidoc[]
@@ -159,4 +166,6 @@ include::system/process.asciidoc[]
 include::system/process_summary.asciidoc[]
 
 include::system/socket.asciidoc[]
+
+include::system/uptime.asciidoc[]
 

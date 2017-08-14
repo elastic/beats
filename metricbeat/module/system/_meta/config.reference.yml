@@ -8,6 +8,7 @@
     - network         # Network IO
     - process         # Per process metrics
     - process_summary # Process summary
+    - uptime          # System Uptime
     #- core           # Per CPU core usage
     #- diskio         # Disk IO
     #- socket         # Sockets and connection info (linux only)
