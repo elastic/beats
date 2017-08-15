@@ -87,6 +87,7 @@ https://github.com/elastic/beats/compare/v5.4.1...master[Check the HEAD diff]
 ==== Deprecated
 
 *Affecting all Beats*
+- Loading more than one output is deprecated. {pull}4907[4907]
 
 *Filebeat*
 - Deprecate `document_type` prospector config option as _type is removed in elasticsearch 6.0. Use fields instead. {pull}4225[4225]
