@@ -9,3 +9,10 @@ This metricset is available on:
 - Linux
 - OpenBSD
 - Windows
+
+[float]
+=== Configuration
+
+*`filesystem.ignore_types`* - A list of filesystem types to ignore. Metrics will
+not be collected from filesystems matching these types. This setting also
+affects the `filesystem` metricset.
