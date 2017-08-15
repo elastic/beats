@@ -20,14 +20,9 @@ func GetTestTcpServer(host string, port int) (server.Server, error) {
 		return nil, err
 	}
 
-	listener, err := net.ListenTCP("tcp", addr)
-	if err != nil {
-		return nil, err
-	}
-
 	logp.Info("Started listening for TCP on: %s:%d", host, port)
 	return &TcpServer{
-		listener:          listener,
+		tcpAddr:           addr,
 		receiveBufferSize: 1024,
 		done:              make(chan struct{}),
 		eventQueue:        make(chan server.Event),
@@ -43,7 +38,12 @@ func TestTcpServer(t *testing.T) {
 		t.FailNow()
 	}
 
-	svc.Start()
+	err = svc.Start()
+	if err != nil {
+		t.Error(err)
+		t.FailNow()
+	}
+
 	defer svc.Stop()
 	writeToServer(t, "test1", host, port)
 	msg := <-svc.GetEvents()

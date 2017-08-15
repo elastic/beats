@@ -11,7 +11,7 @@ const (
 // Server is an interface that can be used to implement servers which can accept data.
 type Server interface {
 	// Start is used to start the server at a well defined port.
-	Start()
+	Start() error
 	// Stop the server.
 	Stop()
 	// Get a channel of events.
