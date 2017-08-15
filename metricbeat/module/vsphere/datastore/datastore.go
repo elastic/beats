@@ -10,7 +10,6 @@ import (
 
 	"github.com/vmware/govmomi"
 	"github.com/vmware/govmomi/view"
-	"github.com/vmware/govmomi/vim25"
 	"github.com/vmware/govmomi/vim25/mo"
 )
 
@@ -22,7 +21,8 @@ func init() {
 
 type MetricSet struct {
 	mb.BaseMetricSet
-	Client *vim25.Client
+	HostURL  *url.URL
+	Insecure bool
 }
 
 func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
@@ -45,14 +45,10 @@ func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
 
 	u.User = url.UserPassword(config.Username, config.Password)
 
-	c, err := govmomi.NewClient(context.TODO(), u, config.Insecure)
-	if err != nil {
-		return nil, err
-	}
-
 	return &MetricSet{
 		BaseMetricSet: base,
-		Client:        c.Client,
+		HostURL:       u,
+		Insecure:      config.Insecure,
 	}, nil
 }
 
@@ -63,7 +59,14 @@ func (m *MetricSet) Fetch() ([]common.MapStr, error) {
 
 	events := []common.MapStr{}
 
-	c := m.Client
+	client, err := govmomi.NewClient(ctx, m.HostURL, m.Insecure)
+	if err != nil {
+		return nil, err
+	}
+
+	defer client.Logout(ctx)
+
+	c := client.Client
 
 	// Create a view of Datastore objects
 	mgr := view.NewManager(c)

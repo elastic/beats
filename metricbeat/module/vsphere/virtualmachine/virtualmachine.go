@@ -27,7 +27,8 @@ func init() {
 
 type MetricSet struct {
 	mb.BaseMetricSet
-	Client          *vim25.Client
+	HostURL         *url.URL
+	Insecure        bool
 	GetCustomFields bool
 }
 
@@ -54,14 +55,10 @@ func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
 
 	u.User = url.UserPassword(config.Username, config.Password)
 
-	c, err := govmomi.NewClient(context.TODO(), u, config.Insecure)
-	if err != nil {
-		return nil, err
-	}
-
 	return &MetricSet{
 		BaseMetricSet:   base,
-		Client:          c.Client,
+		HostURL:         u,
+		Insecure:        config.Insecure,
 		GetCustomFields: config.GetCustomFields,
 	}, nil
 }
@@ -70,19 +67,26 @@ func (m *MetricSet) Fetch() ([]common.MapStr, error) {
 	ctx, cancel := context.WithCancel(context.Background())
 	defer cancel()
 
+	events := []common.MapStr{}
+
+	client, err := govmomi.NewClient(ctx, m.HostURL, m.Insecure)
+	if err != nil {
+		return nil, err
+	}
+
+	defer client.Logout(ctx)
+
+	c := client.Client
+
 	// Get custom fields (attributes) names if get_custom_fields is true.
 	customFieldsMap := make(map[int32]string)
 	if m.GetCustomFields {
 		var err error
-		customFieldsMap, err = setCustomFieldsMap(ctx, m.Client)
+		customFieldsMap, err = setCustomFieldsMap(ctx, c)
 		if err != nil {
 			return nil, err
 		}
 	}
-
-	events := []common.MapStr{}
-
-	c := m.Client
 
 	// Create view of VirtualMachine objects
 	mgr := view.NewManager(c)
