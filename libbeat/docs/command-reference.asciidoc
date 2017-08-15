@@ -264,7 +264,7 @@ troubleshooting {beatname_uc}.
 ifeval::["{beatname_lc}"=="packetbeat"]
 
 *`-devices`*::
-Prints the list of devices that are available for sniffing and then extis.
+Prints the list of devices that are available for sniffing and then exits.
 
 endif::[]
 
@@ -299,7 +299,7 @@ for troubleshooting {beatname_uc}.
 ifeval::["{beatname_lc}"=="filebeat"]
 
 *`--modules MODULE_LIST`*::
-Specifies a comma-separate list of modules to run. For example:
+Specifies a comma-separated list of modules to run. For example:
 +
 ["source","sh",subs="attributes"]
 -----
@@ -321,9 +321,6 @@ and prospectors, and runs each prospector until the harvesters are closed. If
 you set the `--once` flag, you should also set `close_eof` so the harvester is
 closed when the end of the file is reached. By default harvesters are closed
 after `close_inactive` is reached.
-
-
-//REVIEWERS: Is the behavior of the harvesters/prospectors described above still true?
 
 endif::[]
 
@@ -370,8 +367,6 @@ in Kibana.
 * The machine learning jobs contain the configuration information and metadata
 necessary to analyze data for anomalies.
 
-//REVIEWERS: What are the requirements/permissions for users who want to load machine learning jobs? We need to document that here.
-
 *SYNOPSIS*
 
 ["source","sh",subs="attributes"]
@@ -394,10 +389,8 @@ Sets up machine learning job configurations only.
 ifeval::["{beatname_lc}"=="filebeat"]
 
 *`--modules MODULE_LIST`*::
-Sets up the environment (index template, dashboards, etc) for the modules
-specified in the comma-separated list.
-
-//REVIEWERS: Is the above description correct? The help is unclear on what this sets up. Makes it sound like the command enables the modules. (Ran out of time to test this on my own...my apologies.)
+Specifies a comma-separated list of modules. Use this flag to avoid errors when
+there are no modules defined in the +{beatname_lc}.yml+ file.
 
 endif::[]
 
