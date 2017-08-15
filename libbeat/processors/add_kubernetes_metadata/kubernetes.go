@@ -38,6 +38,7 @@ func init() {
 	Indexing.AddIndexer(PodNameIndexerName, NewPodNameIndexer)
 	Indexing.AddIndexer(ContainerIndexerName, NewContainerIndexer)
 	Indexing.AddMatcher(FieldMatcherName, NewFieldMatcher)
+	Indexing.AddMatcher(FieldFormatMatcherName, NewFieldFormatMatcher)
 }
 
 func newKubernetesAnnotator(cfg *common.Config) (processors.Processor, error) {
@@ -112,6 +113,7 @@ func newKubernetesAnnotator(cfg *common.Config) (processors.Processor, error) {
 			matchFunc := Indexing.GetMatcher(name)
 			if matchFunc == nil {
 				logp.Warn("Unable to find matcher plugin %s", name)
+				continue
 			}
 
 			matcher, err := matchFunc(pluginConfig)
