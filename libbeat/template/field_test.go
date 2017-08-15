@@ -184,6 +184,20 @@ func TestField(t *testing.T) {
 				"type": "text", "index": true,
 			},
 		},
+		{
+			field:  Field{Type: "long", DocValues: &falseVar},
+			method: func(f Field) common.MapStr { return f.other() },
+			output: common.MapStr{
+				"type": "long", "doc_values": false,
+			},
+		},
+		{
+			field:  Field{Type: "text", DocValues: &trueVar},
+			method: func(f Field) common.MapStr { return f.other() },
+			output: common.MapStr{
+				"type": "text", "doc_values": true,
+			},
+		},
 	}
 
 	for _, test := range tests {
