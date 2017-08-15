@@ -12,12 +12,34 @@ This metricset is available on:
 - Windows
 
 [float]
+=== Configuration
+
+*`filesystem.ignore_types`* - A list of filesystem types to ignore. Metrics will
+not be collected from filesystems matching these types. This setting also
+affects the `fsstats` metricset.
+
+[float]
 === Filtering
 
 Often there are mounted filesystems that you do not want Metricbeat to report
-metrics on. A simple strategy to deal with these filesystems is to configure a
-drop_event filter that matches the `mount_point` using a regular expression.
-Below is an example.
+metrics on. One option is to configure Metricbeat to ignore specific filesystem
+types. This can be accomplished by configuring `filesystem.ignore_types` with
+a list of filesystem types to ignore. In this example we are ignoring three
+types of filesystems.
+
+[source,yaml]
+----
+metricbeat.modules:
+  - module: system
+    period: 30s
+    metricsets: ["filesystem"]
+    filesystem.ignore_types: [nfs, smbfs, autofs]
+----
+
+Another strategy to deal with these filesystems is to configure a `drop_event`
+filter that matches the `mount_point` using a regular expression. This type of
+filtering occurs after the data has been collected so it can be less efficient
+than the previous method.
 
 [source,yaml]
 ----

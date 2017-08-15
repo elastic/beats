@@ -36,6 +36,11 @@
   # if true, exports the CPU usage in ticks, together with the percentage values
   #cpu_ticks: false
 
+  # A list of filesystem types to ignore. The filesystem metricset will not
+  # collect data from filesystems matching any of the specified types, and
+  # fsstats will not include data from these filesystems in its summary stats.
+  #filesystem.ignore_types: []
+
   # Enable collection of cgroup metrics from processes on Linux.
   #process.cgroups.enabled: true
 
