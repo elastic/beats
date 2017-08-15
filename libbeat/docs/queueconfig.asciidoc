@@ -22,14 +22,14 @@ queue.mem:
 
 The memory queue keeps all events in memory. It is the only queue type
 supported right now.  By default no flush interval is configured. All events
-published to this queue will be directly consumed by the outputs. An output
-will consume up to the outputs `bulk_max_size` events at once.
+published to this queue will be directly consumed by the outputs.
+The output's `bulk_max_size` setting limits the number of events being processed at once.
 
-Only after an event is dropped or acknowledged by the output, a new slot will
-be available in the queue.
+The memory queue is waiting for the output to acknowledge or drop an events. If
+the queue is full, no new events can be inserted into the memeory queue. Only
+after the signal from the output will the queue free up space for more events to be accepted.
 
-To enforce spooling in the queue, set the `flush.min_events` and
-`flush.timeout` options.
+To enforce spooling in the queue, set the `flush.min_events` and `flush.timeout` options.
 
 This sample configuration forwards events to the output if 512 events are
 available or the oldest available event is already waiting for 5s in the queue:
