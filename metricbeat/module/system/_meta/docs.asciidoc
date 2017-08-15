@@ -1,66 +1,7 @@
 == System module
 
-The System module allows you to monitor your servers. Because the System module always applies to the local
-server, the `hosts` config option is not needed.
-
-[float]
-=== Module-specific configuration notes
-
-The System module has these additional config options:
-
-*`processes`*:: When the `process` metricset is enabled, you can use the `processes` option to define a list of
-regexp expressions to filter the processes that are reported. For more complex filtering, you should use the `processors` configuration option. See <<filtering-and-enhancing-data>> for more information.
-+
-The following example config returns metrics for all processes:
-+
-[source,yaml]
-----
-metricbeat.modules:
-- module: system
-  metricsets: ["process"]
-  processes: ['.*']
-----
-
-*`process.include_top_n`*:: These options allow you to filter out all processes
-that are not in the top N by CPU or memory, in order to reduce the number of
-documents created. If both the `by_cpu` and `by_memory` options are used, the
-union of the two sets is included.
-
-*`process.include_top_n.enabled`*:: Set to false to disable the top N feature and
-include all processes, regardless of the other options. The default is `true`,
-but nothing is filtered unless one of the other options (`by_cpu` or `by_memory`)
-is set to a non-zero value.
-
-*`process.include_top_n.by_cpu`*::  How many processes to include from the top
-by CPU. The processes are sorted by the `system.process.cpu.total.pct` field.
-The default is 0.
-
-*`process.include_top_n.by_memory`*:: How many processes to include from the top
-by memory. The processes are sorted by the `system.process.memory.rss.bytes`
-field. The default is 0.
-
-*`process.cgroups.enabled`*:: When the `process` metricset is enabled, you can
-use this boolean configuration option to disable cgroup metrics. By default
-cgroup metrics collection is enabled.
-+
-The following example config disables cgroup metrics on Linux.
-+
-[source,yaml]
-----
-metricbeat.modules:
-- module: system
-  metricsets: ["process"]
-  process.cgroups.enabled: false
-----
-*`cpu_ticks`*:: When the `cpu` or `core` metricset is enabled, you can specify `cpu_ticks: true` to report CPU ticks in addition to CPU percentages stats. For example:
-+
-[source,yaml]
-----
-metricbeat.modules:
-- module: system
-  metricsets: ["cpu", "core"]
-  cpu_ticks: true
-----
+The System module allows you to monitor your servers. Because the System module
+always applies to the local server, the `hosts` config option is not needed.
 
 [float]
 === Dashboard
