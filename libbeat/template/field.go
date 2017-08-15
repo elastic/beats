@@ -26,6 +26,7 @@ type Field struct {
 	Norms          bool        `config:"norms"`
 	Dynamic        dynamicType `config:"dynamic"`
 	Index          *bool       `config:"index"`
+	DocValues      *bool       `config:"doc_values"`
 
 	path      string
 	esVersion common.Version
@@ -202,6 +203,9 @@ func (f *Field) getDefaultProperties() common.MapStr {
 		properties["index"] = *f.Index
 	}
 
+	if f.DocValues != nil {
+		properties["doc_values"] = *f.DocValues
+	}
 	return properties
 }
 
