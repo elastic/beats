@@ -17,5 +17,3 @@ For rpm and deb, you'll find the configuration file at
 extracted when you installed Filebeat.
 
 ===============================================================================
-
-//REVIEWERS: Is the above statement still true, or can we remove it?

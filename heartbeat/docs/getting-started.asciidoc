@@ -247,8 +247,6 @@ NOTE: If you use an init.d script to start Heartbeat on deb or rpm, you can't
 specify command line flags (see <<command-line-options>>). To specify flags,
 start Heartbeat in the foreground.
 
-//REVIEWERS: Should the deb and rpm examples say start or run?
-
 *deb:*
 
 ["source","sh",subs="attributes"]

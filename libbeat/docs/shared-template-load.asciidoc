@@ -105,8 +105,6 @@ PS > {beatname_lc} setup --template
 ----------------------------------------------------------------------
 
 
-//REVIEWERS: Is the following step still necessary?
-
 NOTE: If you've already used {beatname_uc} to index data into Elasticsearch,
 the index may contain old documents. After you load the index template,
 you can delete the old documents from {beatname_lc}-* to force Kibana to look
@@ -119,8 +117,6 @@ curl -XDELETE 'http://localhost:9200/{beatname_lc}-*'
 
 [[passing-credentials-template-loading]]
 ==== Pass credentials
-
-//REVIEWERS: How do you do this when you are using Winlogbeat and starting as a service? Do you need to configure username/password in the config file? I haven't mentioned the config options in the GS because I think it's better for users not to store the passwords in config files. Is that a correct assumption?
 
 :start-type: setup-index
 include::./shared-passing-credentials-setup.asciidoc[]
