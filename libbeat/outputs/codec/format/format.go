@@ -5,7 +5,6 @@ import (
 
 	"github.com/elastic/beats/libbeat/common"
 	"github.com/elastic/beats/libbeat/common/fmtstr"
-	"github.com/elastic/beats/libbeat/logp"
 	"github.com/elastic/beats/libbeat/outputs/codec"
 	"github.com/elastic/beats/libbeat/publisher/beat"
 )
@@ -38,9 +37,5 @@ func New(fmt *fmtstr.EventFormatString) *Encoder {
 }
 
 func (e *Encoder) Encode(_ string, event *beat.Event) ([]byte, error) {
-	serializedEvent, err := e.Format.RunBytes(event)
-	if err != nil {
-		logp.Err("Fail to format event (%v): %#v", err, event)
-	}
-	return serializedEvent, err
+	return e.Format.RunBytes(event)
 }
