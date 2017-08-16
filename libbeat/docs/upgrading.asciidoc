@@ -149,3 +149,7 @@ template when you move to a new version.
 
 One exception is when upgrading from 5.x, in which case you should make sure to
 read the <<upgrading-to-5.6>> section.
+
+If downtime is not acceptable, another possible approach is to configure a
+different index pattern in the new Beat version, but this will likely require
+adjustments to your Kibana dashboards.
