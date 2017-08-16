@@ -31,9 +31,10 @@ https://github.com/elastic/beats/compare/v6.0.0-beta1...master[Check the HEAD di
 
 *Affecting all Beats*
 
+- Fix go plugins not loaded when beat starts {pull}4799[4799]
+
 *Auditbeat*
 
-- Fix go plugins not loaded when beat starts {pull}4799[4799]
 *Filebeat*
 
 *Filebeat*
