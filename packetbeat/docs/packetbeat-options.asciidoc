@@ -369,7 +369,7 @@ will be overwritten by the value declared here.
 [float]
 ==== `fields_under_root`
 
-If this option is set to true, the custom <<packetbeat-configuration-flows-fields>>
+If this option is set to true, the custom <<packetbeat-configuration-flows-fields,fields>>
 are stored as top-level fields in the output document instead of being grouped
 under a `fields` sub-dictionary. If the custom field names conflict with other
 field names added by Packetbeat, then the custom fields overwrite the other
@@ -514,7 +514,7 @@ packetbeat.protocols:
 [[packetbeat-fields-under-root]]
 ==== `fields_under_root`
 
-If this option is set to true, the custom <<packetbeat-configuration-fields>>
+If this option is set to true, the custom <<packetbeat-configuration-fields,fields>>
 are stored as top-level fields in the output document instead of being grouped
 under a `fields` sub-dictionary. If the custom field names conflict with other
 field names added by Packetbeat, then the custom fields overwrite the other

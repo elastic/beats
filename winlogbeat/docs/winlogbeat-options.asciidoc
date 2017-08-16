@@ -335,7 +335,7 @@ winlogbeat.event_logs:
 [float]
 ==== `event_logs.fields_under_root`
 
-If this option is set to true, the custom <<winlogbeat-configuration-fields>>
+If this option is set to true, the custom <<winlogbeat-configuration-fields,fields>>
 are stored as top-level fields in the output document instead of being grouped
 under a `fields` sub-dictionary. If the custom field names conflict with other
 field names added by Winlogbeat, then the custom fields overwrite the other
