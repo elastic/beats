@@ -46,6 +46,10 @@
   # reported with the process metricset's events. Defaults to empty.
   #process.env.whitelist: []
 
+  # Include the cumulative CPU tick values with the process metrics. Defaults
+  # to false.
+  #process.include_cpu_ticks: false
+
   # Configure reverse DNS lookup on remote IP addresses in the socket metricset.
   #socket.reverse_lookup.enabled: false
   #socket.reverse_lookup.success_ttl: 60s
