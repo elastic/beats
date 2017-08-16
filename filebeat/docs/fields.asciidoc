@@ -18,6 +18,7 @@ grouped in the following categories:
 * <<exported-fields-cloud>>
 * <<exported-fields-docker-processor>>
 * <<exported-fields-icinga>>
+* <<exported-fields-kafka>>
 * <<exported-fields-kubernetes-processor>>
 * <<exported-fields-log>>
 * <<exported-fields-mysql>>
@@ -747,6 +748,95 @@ Possible values are "debug", "notice", "information", "warning" or "critical".
 type: text
 
 The logged message.
+
+
+[[exported-fields-kafka]]
+== Kafka fields
+
+Kafka module
+
+
+
+[float]
+== kafka fields
+
+
+
+
+[float]
+== log fields
+
+Kafka log lines.
+
+
+
+[float]
+=== `kafka.log.timestamp`
+
+The timestamp from the log line.
+
+
+[float]
+=== `kafka.log.level`
+
+example: WARN
+
+The log level.
+
+
+[float]
+=== `kafka.log.message`
+
+type: text
+
+The logged message.
+
+
+[float]
+=== `kafka.log.component`
+
+type: keyword
+
+Component the log is coming from.
+
+
+[float]
+=== `kafka.log.class`
+
+type: text
+
+Java class the log is coming from.
+
+
+[float]
+== trace fields
+
+Trace in the log line.
+
+
+
+[float]
+=== `kafka.log.trace.class`
+
+type: keyword
+
+Java class the trace is coming from.
+
+
+[float]
+=== `kafka.log.trace.message`
+
+type: text
+
+Message part of the trace.
+
+
+[float]
+=== `kafka.log.trace.full`
+
+type: text
+
+The full trace in the log line.
 
 
 [[exported-fields-kubernetes-processor]]
