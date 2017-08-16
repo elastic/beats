@@ -243,6 +243,8 @@ If you are sending output to Logstash, make sure you
 
 include::../../libbeat/docs/step-configure-kibana-endpoint.asciidoc[]
 
+include::../../libbeat/docs/step-configure-credentials.asciidoc[]
+
 :requires-sudo: yes
 include::../../libbeat/docs/step-test-config.asciidoc[]
 
@@ -313,8 +315,13 @@ PS C:\Program Files\Packetbeat> Start-Service packetbeat
 
 By default the log files are stored in `C:\ProgramData\packetbeat\Logs`.
 
-[float]
-=== Test the Packetbeat installation
+[id="{beatname_lc}-passing-credentials"]
+==== Pass credentials
+
+:start-type: start
+include::../../libbeat/docs/shared-passing-credentials-setup.asciidoc[]
+
+==== Test the Packetbeat installation
 
 Packetbeat is now ready to capture data from your network traffic. You can test
 that it works by creating a simple HTTP request. For example:
