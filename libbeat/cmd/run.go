@@ -30,11 +30,10 @@ func genRunCmd(name, version string, beatCreator beat.Creator, runFlags *pflag.F
 
 	// TODO deprecate in favor of subcommands (7.0):
 	runCmd.Flags().AddGoFlag(flag.CommandLine.Lookup("configtest"))
-	runCmd.Flags().AddGoFlag(flag.CommandLine.Lookup("setup"))
 	runCmd.Flags().AddGoFlag(flag.CommandLine.Lookup("version"))
 
 	runCmd.Flags().MarkDeprecated("version", "version flag has been deprectad, use version subcommand")
-	runCmd.Flags().MarkDeprecated("configtest", "setup flag has been deprectad, use configtest subcommand")
+	runCmd.Flags().MarkDeprecated("configtest", "configtest flag has been deprectad, use test config subcommand")
 
 	if runFlags != nil {
 		runCmd.Flags().AddFlagSet(runFlags)
