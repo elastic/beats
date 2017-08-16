@@ -6,8 +6,6 @@ the following options specified: +./{beatname_lc} test config -e+. Make sure you
 config files are in the path expected by {beatname_uc} (see <<directory-layout>>),
 or use the `-c` flag to specify the path to the config file.
 
-//REVIEWERS: I'm assuming that the test command works the same on all platforms
-
 endif::[]
 
 ifeval::["{requires-sudo}"=="yes"]

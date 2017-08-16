@@ -202,6 +202,8 @@ configure the Logstash output in <<config-filebeat-logstash>>.
 
 include::../../libbeat/docs/step-configure-kibana-endpoint.asciidoc[]
 
+include::../../libbeat/docs/step-configure-credentials.asciidoc[]
+
 include::../../libbeat/docs/step-test-config.asciidoc[]
 
 include::../../libbeat/docs/step-look-at-config.asciidoc[]
@@ -278,6 +280,12 @@ PS C:\Program Files\Filebeat> Start-Service filebeat
 By default, Windows log files are stored in `C:\ProgramData\filebeat\Logs`.
 
 Filebeat is now ready to send log files to your defined output.
+
+[id="{beatname_lc}-passing-credentials"]
+==== Pass credentials
+
+:start-type: start
+include::../../libbeat/docs/shared-passing-credentials-setup.asciidoc[]
 
 [[view-kibana-dashboards]]
 === Step 7: View the sample Kibana dashboards

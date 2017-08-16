@@ -13,8 +13,6 @@
 [[configuration-path]]
 == Set up project paths
 
-//REVIEWERS: I'm not sure if "project paths" is the right way to describe these settings, but I want to differentiate the path users set here from other paths (like the prospector setting).
-
 The `path` section of the +{beatname_lc}.yml+ config file contains configuration
 options that define where the Beat looks for its files. For example, all Beats
 look for the Elasticsearch template file in the configuration path, Filebeat and

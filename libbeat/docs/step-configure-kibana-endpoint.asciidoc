@@ -14,7 +14,4 @@ for example, `localhost:5601`.
 NOTE: If you specify a path after the port number, you need to include
 the scheme and port: `http://localhost:5601/path`.
 
-Also see the security-related options in <<setup-kibana-endpoint>> if you are
-connecting to a secured instance of Kibana.
-
 --

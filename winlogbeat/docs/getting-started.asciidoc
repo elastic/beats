@@ -121,6 +121,8 @@ If you are sending output to Logstash, make sure you
 
 include::../../libbeat/docs/step-configure-kibana-endpoint.asciidoc[]
 
+include::../../libbeat/docs/step-configure-credentials.asciidoc[]
+
 . After you save your configuration file, test it with the following command.
 +
 [source,shell]
@@ -166,6 +168,13 @@ this command:
 ----------------------------------------------------------------------
 PS C:\Program Files\Winlogbeat> services.msc
 ----------------------------------------------------------------------
+
+[id="{beatname_lc}-passing-credentials"]
+==== Pass credentials
+
+:start-type: start
+include::../../libbeat/docs/shared-passing-credentials-setup.asciidoc[]
+
 
 ==== Stop Winlogbeat
 
