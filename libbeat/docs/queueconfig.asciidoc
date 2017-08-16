@@ -1,7 +1,7 @@
 [[configuring-internal-queue]]
 == Configure the internal queue
 
-The {beatname_uc} uses an internal queue to store events before publishing them. The
+{beatname_uc} uses an internal queue to store events before publishing them. The
 queue is responsible for buffering and combining events into batches that can
 be consumed by the outputs. The outputs will use bulk operations to send a
 batch of events in one transaction.
@@ -17,6 +17,7 @@ queue.mem:
   events: 4096
 ------------------------------------------------------------------------------
 
+[float]
 [[configuration-internal-queue-memory]]
 === Configure the memory qeueue
 
@@ -42,16 +43,19 @@ queue.mem:
   flush.timeout: 5s
 ------------------------------------------------------------------------------
 
+[float]
 ==== Configuration options
 
 You can specify the following options in the `queue.mem` section of the +{beatname_lc}.yml+ config file:
 
+[float]
 ===== `events`
 
 Number of events the queue can store. 
 
 The default value is 4096 events.
 
+[float]
 ===== `flush.min_events`
 
 Minimum number of events required for publishing. If this value is set to 0, the
@@ -60,6 +64,7 @@ the output has to wait for more events to become available.
 
 The default value is 0.
 
+[float]
 ===== `flush.timeout`
 
 Maximum wait time for `flush.min_events` to be fulfilled. If set to 0s, events
