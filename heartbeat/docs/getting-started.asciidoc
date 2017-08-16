@@ -220,6 +220,8 @@ If you are sending output to Logstash, make sure you
 
 include::../../libbeat/docs/step-configure-kibana-endpoint.asciidoc[]
 
+include::../../libbeat/docs/step-configure-credentials.asciidoc[]
+
 include::../../libbeat/docs/step-test-config.asciidoc[]
 
 include::../../libbeat/docs/step-look-at-config.asciidoc[]
@@ -244,8 +246,6 @@ Start Heartbeat by issuing the appropriate command for your platform.
 NOTE: If you use an init.d script to start Heartbeat on deb or rpm, you can't
 specify command line flags (see <<command-line-options>>). To specify flags,
 start Heartbeat in the foreground.
-
-//REVIEWERS: Should the deb and rpm examples say start or run?
 
 *deb:*
 
@@ -284,6 +284,12 @@ By default, Windows log files are stored in +C:\ProgramData\heartbeat\Logs+.
 
 Heartbeat is now ready to check the status of your services and send
 events to your defined output.
+
+[id="{beatname_lc}-passing-credentials"]
+==== Pass credentials
+
+:start-type: start
+include::../../libbeat/docs/shared-passing-credentials-setup.asciidoc[]
 
 [[view-kibana-dashboards]]
 === Step 6: View the sample Kibana dashboards
