@@ -4,7 +4,12 @@ The System `uptime` metricset provides the uptime of the host operating system.
 
 This metricset is available on:
 
-- Darwin
 - Linux
+- macOS
 - OpenBSD
 - Windows
+
+[float]
+=== Configuration
+
+There are no configuration options for this metricset.
