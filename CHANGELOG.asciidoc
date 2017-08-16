@@ -44,6 +44,8 @@ https://github.com/elastic/beats/compare/v6.0.0-beta1...master[Check the HEAD di
 
 *Metricbeat*
 
+- Fix wrong MySQL CRUD queries timelion visualization {pull}4857[4857]
+
 *Packetbeat*
 
 *Winlogbeat*
