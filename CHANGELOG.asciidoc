@@ -45,6 +45,7 @@ https://github.com/elastic/beats/compare/v6.0.0-beta1...master[Check the HEAD di
 *Metricbeat*
 
 - Added missing mongodb configuration file to the `modules.d` folder. {pull}4870[4870]
+- Fix wrong MySQL CRUD queries timelion visualization {pull}4857[4857]
 
 *Packetbeat*
 

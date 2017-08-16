@@ -73,7 +73,7 @@
         "title": "MySQL commands",
         "uiStateJSON": "{}",
         "version": 1,
-        "visState": "{\"title\":\"MySQL commands\",\"type\":\"timelion\",\"params\":{\"expression\":\".es(*, metric='avg:mysql.status.command.select').derivative().label(\\\"SELECT\\\"),.es(*, metric='avg:mysql.status.command.insert').derivative().label(\\\"INSERT\\\"),.es(*, metric='avg:mysql.status.command.insert').derivative().label(\\\"UPDATE\\\"),.es(*, metric='avg:mysql.status.command.insert').derivative().label(\\\"DELETE\\\")\",\"interval\":\"1m\"},\"aggs\":[],\"listeners\":{}}"
+        "visState": "{\"title\":\"MySQL commands\",\"type\":\"timelion\",\"params\":{\"expression\":\".es(*, metric='avg:mysql.status.command.select').derivative().label(\\\"SELECT\\\"),.es(*, metric='avg:mysql.status.command.insert').derivative().label(\\\"INSERT\\\"),.es(*, metric='avg:mysql.status.command.update').derivative().label(\\\"UPDATE\\\"),.es(*, metric='avg:mysql.status.command.delete').derivative().label(\\\"DELETE\\\")\",\"interval\":\"1m\"},\"aggs\":[],\"listeners\":{}}"
       },
       "id": "1eda2280-0008-11e7-82f3-2f380154876c",
       "type": "visualization",
