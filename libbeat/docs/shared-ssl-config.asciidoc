@@ -74,8 +74,6 @@ The passphrase used to decrypt an encrypted key stored in the configured `key` f
 [float]
 ==== `supported_protocols`
 
-//REVIEWERS: This description is kind of garbled. Can we fix the language, but maybe without going into details about how the client and server negotiate which version to use?
-
 List of allowed SSL/TLS versions. If SSL/TLS server decides for protocol versions
 not configured, the connection will be dropped during or after the handshake. The
 setting is a list of allowed protocol versions:
