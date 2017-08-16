@@ -17,43 +17,6 @@ Beats.
 These options are in the `filebeat` namespace.
 
 [float]
-==== `spool_size`
-
-The event count spool threshold. This setting forces a network flush if the number of events in the spooler exceeds
-the specified value.
-
-[source,yaml]
--------------------------------------------------------------------------------------
-filebeat.spool_size: 2048
--------------------------------------------------------------------------------------
-
-See <<load-balancing>> for more information about how this setting affects load balancing.
-
-[float]
-==== `publish_async`
-
-experimental[]
-deprecated[5.3.0]
-
-If enabled, the publisher pipeline in Filebeat operates in async mode preparing
-a new batch of lines while waiting for ACK. This option can improve load-balancing
-throughput at the cost of increased memory usage. The default value is false.
-
-See <<load-balancing>> for more information about how this setting affects load balancing.
-
-[float]
-==== `idle_timeout`
-
-A duration string that specifies how often the spooler is flushed. After the
-`idle_timeout` is reached, the spooler is flushed even if the `spool_size` has not been reached.
-
-[source,yaml]
--------------------------------------------------------------------------------------
-filebeat.idle_timeout: 5s
--------------------------------------------------------------------------------------
-
-
-[float]
 ==== `registry_file`
 
 The name of the registry file. If a relative path is used, it is considered relative to the
@@ -76,7 +39,7 @@ That means in case there are some states where the TTL expired, these are only r
 The full path to the directory that contains additional prospector configuration files.
 Each configuration file must end with `.yml`. Each config file must also specify the full Filebeat
 config hierarchy even though only the prospector part of the file is processed. All global
-options, such as `spool_size`, are ignored.
+options, such as `registry_file`, are ignored.
 
 The `config_dir` option MUST point to a directory other than the directory where the main Filebeat config file resides.
 
