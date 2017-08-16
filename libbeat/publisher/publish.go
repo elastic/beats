@@ -7,12 +7,13 @@ import (
 	"sync/atomic"
 	"time"
 
+	"github.com/nranchev/go-libGeoIP"
+
 	"github.com/elastic/beats/libbeat/common"
 	"github.com/elastic/beats/libbeat/common/op"
 	"github.com/elastic/beats/libbeat/logp"
 	"github.com/elastic/beats/libbeat/outputs"
 	"github.com/elastic/beats/libbeat/processors"
-	"github.com/nranchev/go-libGeoIP"
 
 	// load supported output plugins
 	_ "github.com/elastic/beats/libbeat/outputs/console"
@@ -222,6 +223,10 @@ func (publisher *BeatPublisher) init(
 
 	publisher.wsPublisher.Init()
 	publisher.wsOutput.Init()
+
+	if len(configs) > 1 {
+		logp.Warn("Support for loading more than one output is deprecated and will not be supported in version 6.0.")
+	}
 
 	if !publisher.disabled {
 		plugins, err := outputs.InitOutputs(beatName, configs, shipper.TopologyExpire)
