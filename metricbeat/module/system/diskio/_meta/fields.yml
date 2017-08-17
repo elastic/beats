@@ -55,12 +55,12 @@
       description: >
         The total number of of milliseconds spent doing I/Os.
 
-    - name: iostat.read.request.merged_per_sec
+    - name: iostat.read.request.merges_per_sec
       type: float
       description: >
           The number of read requests merged per second that were queued to the device.
 
-    - name: iostat.write.request.merged_per_sec
+    - name: iostat.write.request.merges_per_sec
       type: float
       description: >
           The number of write requests merged per second that were queued to the device.

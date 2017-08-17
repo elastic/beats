@@ -67,8 +67,8 @@ func (m *MetricSet) Fetch() ([]common.MapStr, error) {
 			event["iostat"] = common.MapStr{
 				"read": common.MapStr{
 					"request": common.MapStr{
-						"merge_per_sec": extraMetrics.ReadRequestMergeCountPerSec,
-						"per_sec":       extraMetrics.ReadRequestCountPerSec,
+						"merges_per_sec": extraMetrics.ReadRequestMergeCountPerSec,
+						"per_sec":        extraMetrics.ReadRequestCountPerSec,
 					},
 					"per_sec": common.MapStr{
 						"bytes": extraMetrics.ReadBytesPerSec,
@@ -76,8 +76,8 @@ func (m *MetricSet) Fetch() ([]common.MapStr, error) {
 				},
 				"write": common.MapStr{
 					"request": common.MapStr{
-						"merge_per_sec": extraMetrics.WriteRequestMergeCountPerSec,
-						"per_sec":       extraMetrics.WriteRequestCountPerSec,
+						"merges_per_sec": extraMetrics.WriteRequestMergeCountPerSec,
+						"per_sec":        extraMetrics.WriteRequestCountPerSec,
 					},
 					"per_sec": common.MapStr{
 						"bytes": extraMetrics.WriteBytesPerSec,
