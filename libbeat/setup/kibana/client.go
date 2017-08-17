@@ -196,8 +196,15 @@ func (client *Client) SetVersion() error {
 
 func (client *Client) GetVersion() string { return client.version }
 
-func (client *Client) ImportJSON(url string, params url.Values, body io.Reader) error {
-	statusCode, response, err := client.Connection.Request("POST", url, params, body)
+func (client *Client) ImportJSON(url string, params url.Values, jsonBody map[string]interface{}) error {
+
+	body, err := json.Marshal(jsonBody)
+	if err != nil {
+		logp.Err("Failed to json encode body (%v): %#v", err, jsonBody)
+		return fmt.Errorf("fail to marshal the json content: %v", err)
+	}
+
+	statusCode, response, err := client.Connection.Request("POST", url, params, bytes.NewBuffer(body))
 	if err != nil {
 		return fmt.Errorf("%v. Response: %s", err, truncateString(response))
 	}
