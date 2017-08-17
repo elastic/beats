@@ -32,7 +32,7 @@ import (
 type packetbeat struct {
 	config      config.Config
 	cmdLineArgs flags
-	sniff       *sniffer.SnifferSetup
+	sniff       *sniffer.Sniffer
 
 	// publisher/pipeline
 	pipeline beat.Pipeline
@@ -118,13 +118,27 @@ func (pb *packetbeat) init(b *beat.Beat) error {
 		return fmt.Errorf("Initializing protocol analyzers failed: %v", err)
 	}
 
-	logp.Debug("main", "Initializing sniffer")
-	err = pb.setupSniffer()
+	return pb.setupSniffer()
+}
+
+func (pb *packetbeat) setupSniffer() error {
+	config := &pb.config
+
+	icmp, err := pb.icmpConfig()
 	if err != nil {
-		return fmt.Errorf("Initializing sniffer failed: %v", err)
+		return err
 	}
 
-	return nil
+	withVlans := config.Interfaces.WithVlans
+	withICMP := icmp.Enabled()
+
+	filter := config.Interfaces.BpfFilter
+	if filter == "" && !config.Flows.IsEnabled() {
+		filter = protos.Protos.BpfFilter(withVlans, withICMP)
+	}
+
+	pb.sniff, err = sniffer.New(false, filter, pb.createWorker, config.Interfaces)
+	return err
 }
 
 func (pb *packetbeat) Run(b *beat.Beat) error {
@@ -187,26 +201,6 @@ func (pb *packetbeat) Run(b *beat.Beat) error {
 func (pb *packetbeat) Stop() {
 	logp.Info("Packetbeat send stop signal")
 	pb.sniff.Stop()
-}
-
-func (pb *packetbeat) setupSniffer() error {
-	config := &pb.config
-
-	icmp, err := pb.icmpConfig()
-	if err != nil {
-		return err
-	}
-
-	withVlans := config.Interfaces.WithVlans
-	withICMP := icmp.Enabled()
-
-	filter := config.Interfaces.BpfFilter
-	if filter == "" && !config.Flows.IsEnabled() {
-		filter = protos.Protos.BpfFilter(withVlans, withICMP)
-	}
-
-	pb.sniff = &sniffer.SnifferSetup{}
-	return pb.sniff.Init(false, filter, pb.createWorker, &config.Interfaces)
 }
 
 func (pb *packetbeat) createWorker(dl layers.LinkType) (sniffer.Worker, error) {
