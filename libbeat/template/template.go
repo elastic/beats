@@ -135,7 +135,7 @@ func (t *Template) generate(properties common.MapStr, dynamicTemplates []common.
 		basicStructure.Put("template", t.GetName()+"-*")
 	}
 
-	if t.esVersion.IsMajor(2) || t.esVersion.IsMajor(5) {
+	if t.esVersion.IsMajor(2) {
 		basicStructure.Put("mappings._default_._all.norms.enabled", false)
 	}
 
