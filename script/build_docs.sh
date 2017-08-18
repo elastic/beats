@@ -20,13 +20,14 @@ fi
 
 index="${GOPATH%%:*}/src/${path}/index.asciidoc"
 
-if [ -f "$index" ]; then
-  echo "Building docs for ${name}..."
-  dest_dir="$html_dir/${name}"
-  mkdir -p "$dest_dir"
-  params=""
-  if [ "$PREVIEW" = "1" ]; then
-    params="--chunk=1 -open chunk=1 -open"
-  fi
-  $docs_dir/build_docs.pl $params --doc "$index" -out "$dest_dir"
+echo "Building docs for ${name}..."
+echo "Index document: ${index}"
+
+dest_dir="$html_dir/${name}"
+mkdir -p "$dest_dir"
+params=""
+if [ "$PREVIEW" = "1" ]; then
+  params="--chunk=1 -open chunk=1 -open"
 fi
+$docs_dir/build_docs.pl $params --doc "$index" -out "$dest_dir"
+
