@@ -3,26 +3,21 @@
 
 beta[]
 
-You can configure Filebeat to dynamically reload prospector configuration files
-when there are changes. To do this, you specify a path
-(https://golang.org/pkg/path/filepath/#Glob[Glob]) to watch for prospector
-configuration changes. When the files found by the Glob change, new prospectors
-are started/stopped according to changes in the configuration files.
+You can configure Filebeat to dynamically reload configuration files when there
+are changes. This feature is available for prospector and module configuration
+files only.
+
+To configure this feature, you specify a path
+(https://golang.org/pkg/path/filepath/#Glob[Glob]) to watch for configuration
+changes. When the files found by the Glob change, new prospectors and/or
+modules are started and stopped according to changes in the configuration files.
 
 This feature is especially useful in container environments where one container
 is used to tail logs for services running in other containers on the same host.
 
-To enable dynamic config reloading, you specify the `path` and `reload` options
-in the `filebeat.config.prospectors` section of the main `filebeat.yml` config
-file. For example:
-
-[source,yaml]
-------------------------------------------------------------------------------
-filebeat.config.prospectors:
-  path: configs/*.yml
-  reload.enabled: true
-  reload.period: 10s
-------------------------------------------------------------------------------
+To enable dynamic config reloading, you specify the following options under
+`filebeat.config.prospectors` (for prospector configs) or
+`filebeat.config.modules` (for module configs):
 
 `path`:: A Glob that defines the files to check for changes.
 `reload.enabled`:: When set to `true`, enables dynamic config reload.
@@ -30,6 +25,26 @@ filebeat.config.prospectors:
 set the `period` to less than 1s because the modification time of files is often
 stored in seconds. Setting the `period` to less than 1s will result in
 unnecessary overhead.
+
+See <<reload-prospector-config>> and <<reload-module-config>> for examples.
+
+
+[float]
+[[reload-prospector-config]]
+=== Prospector config
+
+For prospector configurations, you specify reload options in the
+`filebeat.config.prospectors` section of the +{beatname_lc}.yml+ file. For
+example:
+
+[source,yaml]
+------------------------------------------------------------------------------
+filebeat.config.prospectors:
+  enabled: true
+  path: configs/*.yml
+  reload.enabled: true
+  reload.period: 10s
+------------------------------------------------------------------------------
 
 Each file found by the Glob must contain a list of one or more prospector
 definitions. For example:
@@ -47,6 +62,50 @@ definitions. For example:
   scan_frequency: 5s
 ------------------------------------------------------------------------------
 
+
 WARNING: It is critical that two running prospectors DO NOT have overlapping
 file paths defined. If more than one prospector harvests the same file at the
 same time, it can lead to unexpected behaviour.
+
+[float]
+[[reload-module-config]]
+=== Module config
+
+For module configurations, you specify reload options in the
+`filebeat.config.modules` section of the +{beatname_lc}.yml+ file. For example:
+
+[source,yaml]
+------------------------------------------------------------------------------
+filebeat.config.modules:
+  enabled: true
+  path: configs/*.yml
+  reload.enabled: true
+  reload.period: 10s
+------------------------------------------------------------------------------
+
+TIP: If you are using the <<modules-command,`modules`>> command to enable and
+disable configurations, you can enable config reloading for the `modules.d`
+directory by specifying `path: ${path.config}/modules.d/*.yml`.
+
+Each file found by the Glob must contain a list of one or more module
+definitions. For example:
+
+//REVIEWERS: I got an error when I tried to have an empty line before the -module: mysql entry below. Shouldn't whitespace be allowed there?
+
+[source,yaml]
+------------------------------------------------------------------------------
+- module: apache2
+  access:
+    enabled: true
+    var.paths: [/var/log/apache2/access.log*]
+  error:
+    enabled: true
+    var.paths: [/var/log/apache2/error.log*]
+- module: mysql
+  error:
+    enabled: true
+    var.paths: [/var/log/mysql/error.log*]
+  slowlog:
+    enabled: true
+    var.paths: [/var/log/mysql/mysql-slow.log*]
+------------------------------------------------------------------------------
