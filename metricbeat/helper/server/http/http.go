@@ -57,7 +57,7 @@ func NewHttpServer(mb mb.BaseMetricSet) (server.Server, error) {
 	return h, nil
 }
 
-func (h *HttpServer) Start() {
+func (h *HttpServer) Start() error {
 	go func() {
 
 		logp.Info("Starting http server on %s", h.server.Addr)
@@ -67,6 +67,7 @@ func (h *HttpServer) Start() {
 		}
 	}()
 
+	return nil
 }
 
 func (h *HttpServer) Stop() {
