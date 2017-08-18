@@ -53,6 +53,8 @@ func (h *fileHandler) ReadPacketData() ([]byte, gopacket.CaptureInfo, error) {
 		}
 
 		h.pcapHandle.Close()
+		h.pcapHandle = nil
+
 		h.loopCount++
 		if h.loopCount >= h.maxLoopCount {
 			return data, ci, err

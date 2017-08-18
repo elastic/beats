@@ -2,6 +2,7 @@ package sniffer
 
 import (
 	"fmt"
+	"io"
 	"os"
 	"runtime"
 	"syscall"
@@ -169,6 +170,11 @@ func (s *Sniffer) Run() error {
 		}
 
 		if err != nil {
+			// ignore EOF, if sniffer was driven from file
+			if err == io.EOF && s.config.File != "" {
+				return nil
+			}
+
 			s.state.Store(snifferInactive)
 			return fmt.Errorf("Sniffing error: %s", err)
 		}
