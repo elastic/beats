@@ -4,97 +4,97 @@
       "attributes": {
         "description": "",
         "kibanaSavedObjectMeta": {
-          "searchSourceJSON": "{\"filter\":[]}"
+          "searchSourceJSON": "{\n  \"filter\": []\n}"
         },
         "savedSearchId": "Apache2-access-logs",
-        "title": "Apache2 access unique IPs map",
-        "uiStateJSON": "{\"mapCenter\":[14.944784875088372,5.09765625]}",
+        "title": "Unique IPs map [Filebeat Apache2]",
+        "uiStateJSON": "{\n  \"mapCenter\": [\n    14.944784875088372,\n    5.09765625\n  ]\n}",
         "version": 1,
-        "visState": "{\"title\":\"Apache2 access unique IPs map\",\"type\":\"tile_map\",\"params\":{\"mapType\":\"Scaled Circle Markers\",\"isDesaturated\":true,\"addTooltip\":true,\"heatMaxZoom\":16,\"heatMinOpacity\":0.1,\"heatRadius\":25,\"heatBlur\":15,\"heatNormalizeData\":true,\"legendPosition\":\"bottomright\",\"mapZoom\":2,\"mapCenter\":[15,5],\"wms\":{\"enabled\":false,\"url\":\"https://basemap.nationalmap.gov/arcgis/services/USGSTopo/MapServer/WMSServer\",\"options\":{\"version\":\"1.3.0\",\"layers\":\"0\",\"format\":\"image/png\",\"transparent\":true,\"attribution\":\"Maps provided by USGS\",\"styles\":\"\"}}},\"aggs\":[{\"id\":\"1\",\"enabled\":true,\"type\":\"cardinality\",\"schema\":\"metric\",\"params\":{\"field\":\"apache2.access.remote_ip\"}},{\"id\":\"2\",\"enabled\":true,\"type\":\"geohash_grid\",\"schema\":\"segment\",\"params\":{\"field\":\"apache2.access.geoip.location\",\"autoPrecision\":true}}],\"listeners\":{}}"
+        "visState": "{\n  \"title\": \"Apache2 access unique IPs map\",\n  \"type\": \"tile_map\",\n  \"params\": {\n    \"mapType\": \"Scaled Circle Markers\",\n    \"isDesaturated\": true,\n    \"addTooltip\": true,\n    \"heatMaxZoom\": 16,\n    \"heatMinOpacity\": 0.1,\n    \"heatRadius\": 25,\n    \"heatBlur\": 15,\n    \"heatNormalizeData\": true,\n    \"legendPosition\": \"bottomright\",\n    \"mapZoom\": 2,\n    \"mapCenter\": [\n      15,\n      5\n    ],\n    \"wms\": {\n      \"enabled\": false,\n      \"url\": \"https://basemap.nationalmap.gov/arcgis/services/USGSTopo/MapServer/WMSServer\",\n      \"options\": {\n        \"version\": \"1.3.0\",\n        \"layers\": \"0\",\n        \"format\": \"image/png\",\n        \"transparent\": true,\n        \"attribution\": \"Maps provided by USGS\",\n        \"styles\": \"\"\n      }\n    }\n  },\n  \"aggs\": [\n    {\n      \"id\": \"1\",\n      \"enabled\": true,\n      \"type\": \"cardinality\",\n      \"schema\": \"metric\",\n      \"params\": {\n        \"field\": \"apache2.access.remote_ip\"\n      }\n    },\n    {\n      \"id\": \"2\",\n      \"enabled\": true,\n      \"type\": \"geohash_grid\",\n      \"schema\": \"segment\",\n      \"params\": {\n        \"field\": \"apache2.access.geoip.location\",\n        \"autoPrecision\": true\n      }\n    }\n  ],\n  \"listeners\": {}\n}"
       },
       "id": "Apache2-access-unique-IPs-map",
       "type": "visualization",
-      "version": 4
+      "version": 2
     },
     {
       "attributes": {
         "description": "",
         "kibanaSavedObjectMeta": {
-          "searchSourceJSON": "{\"filter\":[]}"
+          "searchSourceJSON": "{\n  \"filter\": []\n}"
         },
         "savedSearchId": "Apache2-access-logs",
-        "title": "Apache2 response codes of top URLs",
-        "uiStateJSON": "{\"vis\":{\"colors\":{\"200\":\"#7EB26D\",\"404\":\"#EF843C\"}}}",
+        "title": "Top URLs by response code [Filebeat Apache2]",
+        "uiStateJSON": "{\n  \"vis\": {\n    \"colors\": {\n      \"200\": \"#7EB26D\",\n      \"404\": \"#EF843C\"\n    }\n  }\n}",
         "version": 1,
-        "visState": "{\"title\":\"Apache2 response codes of top URLs\",\"type\":\"pie\",\"params\":{\"shareYAxis\":true,\"addTooltip\":true,\"addLegend\":true,\"legendPosition\":\"right\",\"isDonut\":false},\"aggs\":[{\"id\":\"1\",\"enabled\":true,\"type\":\"count\",\"schema\":\"metric\",\"params\":{}},{\"id\":\"3\",\"enabled\":true,\"type\":\"terms\",\"schema\":\"split\",\"params\":{\"field\":\"apache2.access.url\",\"size\":5,\"order\":\"desc\",\"orderBy\":\"1\",\"customLabel\":\"URL\",\"row\":false}},{\"id\":\"2\",\"enabled\":true,\"type\":\"terms\",\"schema\":\"segment\",\"params\":{\"field\":\"apache2.access.response_code\",\"size\":5,\"order\":\"desc\",\"orderBy\":\"1\"}}],\"listeners\":{}}"
+        "visState": "{\n  \"title\": \"Apache2 response codes of top URLs\",\n  \"type\": \"pie\",\n  \"params\": {\n    \"shareYAxis\": true,\n    \"addTooltip\": true,\n    \"addLegend\": true,\n    \"legendPosition\": \"right\",\n    \"isDonut\": false\n  },\n  \"aggs\": [\n    {\n      \"id\": \"1\",\n      \"enabled\": true,\n      \"type\": \"count\",\n      \"schema\": \"metric\",\n      \"params\": {}\n    },\n    {\n      \"id\": \"3\",\n      \"enabled\": true,\n      \"type\": \"terms\",\n      \"schema\": \"split\",\n      \"params\": {\n        \"field\": \"apache2.access.url\",\n        \"size\": 5,\n        \"order\": \"desc\",\n        \"orderBy\": \"1\",\n        \"customLabel\": \"URL\",\n        \"row\": false\n      }\n    },\n    {\n      \"id\": \"2\",\n      \"enabled\": true,\n      \"type\": \"terms\",\n      \"schema\": \"segment\",\n      \"params\": {\n        \"field\": \"apache2.access.response_code\",\n        \"size\": 5,\n        \"order\": \"desc\",\n        \"orderBy\": \"1\"\n      }\n    }\n  ],\n  \"listeners\": {}\n}"
       },
       "id": "Apache2-response-codes-of-top-URLs",
       "type": "visualization",
-      "version": 4
+      "version": 2
     },
     {
       "attributes": {
         "description": "",
         "kibanaSavedObjectMeta": {
-          "searchSourceJSON": "{\"filter\":[]}"
+          "searchSourceJSON": "{\n  \"filter\": []\n}"
         },
         "savedSearchId": "Apache2-access-logs",
-        "title": "Apache2 browsers",
+        "title": "Browsers breakdown [Filebeat Apache2]",
         "uiStateJSON": "{}",
         "version": 1,
-        "visState": "{\"title\":\"Apache2 browsers\",\"type\":\"pie\",\"params\":{\"shareYAxis\":true,\"addTooltip\":true,\"addLegend\":true,\"legendPosition\":\"bottom\",\"isDonut\":true},\"aggs\":[{\"id\":\"1\",\"enabled\":true,\"type\":\"cardinality\",\"schema\":\"metric\",\"params\":{\"field\":\"apache2.access.remote_ip\"}},{\"id\":\"2\",\"enabled\":true,\"type\":\"terms\",\"schema\":\"segment\",\"params\":{\"field\":\"apache2.access.user_agent.name\",\"size\":5,\"order\":\"desc\",\"orderBy\":\"1\"}},{\"id\":\"3\",\"enabled\":true,\"type\":\"terms\",\"schema\":\"segment\",\"params\":{\"field\":\"apache2.access.user_agent.major\",\"size\":5,\"order\":\"desc\",\"orderBy\":\"1\"}}],\"listeners\":{}}"
+        "visState": "{\n  \"title\": \"Apache2 browsers\",\n  \"type\": \"pie\",\n  \"params\": {\n    \"shareYAxis\": true,\n    \"addTooltip\": true,\n    \"addLegend\": true,\n    \"legendPosition\": \"bottom\",\n    \"isDonut\": true\n  },\n  \"aggs\": [\n    {\n      \"id\": \"1\",\n      \"enabled\": true,\n      \"type\": \"cardinality\",\n      \"schema\": \"metric\",\n      \"params\": {\n        \"field\": \"apache2.access.remote_ip\"\n      }\n    },\n    {\n      \"id\": \"2\",\n      \"enabled\": true,\n      \"type\": \"terms\",\n      \"schema\": \"segment\",\n      \"params\": {\n        \"field\": \"apache2.access.user_agent.name\",\n        \"size\": 5,\n        \"order\": \"desc\",\n        \"orderBy\": \"1\"\n      }\n    },\n    {\n      \"id\": \"3\",\n      \"enabled\": true,\n      \"type\": \"terms\",\n      \"schema\": \"segment\",\n      \"params\": {\n        \"field\": \"apache2.access.user_agent.major\",\n        \"size\": 5,\n        \"order\": \"desc\",\n        \"orderBy\": \"1\"\n      }\n    }\n  ],\n  \"listeners\": {}\n}"
       },
       "id": "Apache2-browsers",
       "type": "visualization",
-      "version": 4
+      "version": 3
     },
     {
       "attributes": {
         "description": "",
         "kibanaSavedObjectMeta": {
-          "searchSourceJSON": "{\"filter\":[]}"
+          "searchSourceJSON": "{\n  \"filter\": []\n}"
         },
         "savedSearchId": "Apache2-access-logs",
-        "title": "Apache2 operating systems",
+        "title": "Operating systems breakdown [Filebeat Apache2]",
         "uiStateJSON": "{}",
         "version": 1,
-        "visState": "{\"title\":\"Apache2 operating systems\",\"type\":\"pie\",\"params\":{\"shareYAxis\":true,\"addTooltip\":true,\"addLegend\":true,\"legendPosition\":\"bottom\",\"isDonut\":true},\"aggs\":[{\"id\":\"1\",\"enabled\":true,\"type\":\"cardinality\",\"schema\":\"metric\",\"params\":{\"field\":\"apache2.access.remote_ip\"}},{\"id\":\"2\",\"enabled\":true,\"type\":\"terms\",\"schema\":\"segment\",\"params\":{\"field\":\"apache2.access.user_agent.os_name\",\"size\":5,\"order\":\"desc\",\"orderBy\":\"1\"}},{\"id\":\"3\",\"enabled\":true,\"type\":\"terms\",\"schema\":\"segment\",\"params\":{\"field\":\"apache2.access.user_agent.os_major\",\"size\":5,\"order\":\"desc\",\"orderBy\":\"1\"}}],\"listeners\":{}}"
+        "visState": "{\n  \"title\": \"Apache2 operating systems\",\n  \"type\": \"pie\",\n  \"params\": {\n    \"shareYAxis\": true,\n    \"addTooltip\": true,\n    \"addLegend\": true,\n    \"legendPosition\": \"bottom\",\n    \"isDonut\": true\n  },\n  \"aggs\": [\n    {\n      \"id\": \"1\",\n      \"enabled\": true,\n      \"type\": \"cardinality\",\n      \"schema\": \"metric\",\n      \"params\": {\n        \"field\": \"apache2.access.remote_ip\"\n      }\n    },\n    {\n      \"id\": \"2\",\n      \"enabled\": true,\n      \"type\": \"terms\",\n      \"schema\": \"segment\",\n      \"params\": {\n        \"field\": \"apache2.access.user_agent.os_name\",\n        \"size\": 5,\n        \"order\": \"desc\",\n        \"orderBy\": \"1\"\n      }\n    },\n    {\n      \"id\": \"3\",\n      \"enabled\": true,\n      \"type\": \"terms\",\n      \"schema\": \"segment\",\n      \"params\": {\n        \"field\": \"apache2.access.user_agent.os_major\",\n        \"size\": 5,\n        \"order\": \"desc\",\n        \"orderBy\": \"1\"\n      }\n    }\n  ],\n  \"listeners\": {}\n}"
       },
       "id": "Apache2-operating-systems",
       "type": "visualization",
-      "version": 4
+      "version": 2
     },
     {
       "attributes": {
         "description": "",
         "kibanaSavedObjectMeta": {
-          "searchSourceJSON": "{\"filter\":[]}"
+          "searchSourceJSON": "{\n  \"filter\": []\n}"
         },
         "savedSearchId": "Apache2-errors-log",
-        "title": "Apache2 error logs over time",
+        "title": "Error logs over time [Filebeat Apache2]",
         "uiStateJSON": "{}",
         "version": 1,
-        "visState": "{\"title\":\"Apache2 error logs over time\",\"type\":\"histogram\",\"params\":{\"shareYAxis\":true,\"addTooltip\":true,\"addLegend\":true,\"legendPosition\":\"right\",\"scale\":\"linear\",\"mode\":\"stacked\",\"times\":[],\"addTimeMarker\":false,\"defaultYExtents\":false,\"setYExtents\":false,\"yAxis\":{}},\"aggs\":[{\"id\":\"1\",\"enabled\":true,\"type\":\"count\",\"schema\":\"metric\",\"params\":{}},{\"id\":\"2\",\"enabled\":true,\"type\":\"date_histogram\",\"schema\":\"segment\",\"params\":{\"field\":\"@timestamp\",\"interval\":\"auto\",\"customInterval\":\"2h\",\"min_doc_count\":1,\"extended_bounds\":{}}},{\"id\":\"3\",\"enabled\":true,\"type\":\"terms\",\"schema\":\"group\",\"params\":{\"field\":\"apache2.error.level\",\"size\":5,\"order\":\"desc\",\"orderBy\":\"1\"}}],\"listeners\":{}}"
+        "visState": "{\n  \"title\": \"Apache2 error logs over time\",\n  \"type\": \"histogram\",\n  \"params\": {\n    \"shareYAxis\": true,\n    \"addTooltip\": true,\n    \"addLegend\": true,\n    \"legendPosition\": \"right\",\n    \"scale\": \"linear\",\n    \"mode\": \"stacked\",\n    \"times\": [],\n    \"addTimeMarker\": false,\n    \"defaultYExtents\": false,\n    \"setYExtents\": false,\n    \"yAxis\": {}\n  },\n  \"aggs\": [\n    {\n      \"id\": \"1\",\n      \"enabled\": true,\n      \"type\": \"count\",\n      \"schema\": \"metric\",\n      \"params\": {}\n    },\n    {\n      \"id\": \"2\",\n      \"enabled\": true,\n      \"type\": \"date_histogram\",\n      \"schema\": \"segment\",\n      \"params\": {\n        \"field\": \"@timestamp\",\n        \"interval\": \"auto\",\n        \"customInterval\": \"2h\",\n        \"min_doc_count\": 1,\n        \"extended_bounds\": {}\n      }\n    },\n    {\n      \"id\": \"3\",\n      \"enabled\": true,\n      \"type\": \"terms\",\n      \"schema\": \"group\",\n      \"params\": {\n        \"field\": \"apache2.error.level\",\n        \"size\": 5,\n        \"order\": \"desc\",\n        \"orderBy\": \"1\"\n      }\n    }\n  ],\n  \"listeners\": {}\n}"
       },
       "id": "Apache2-error-logs-over-time",
       "type": "visualization",
-      "version": 4
+      "version": 2
     },
     {
       "attributes": {
         "description": "",
         "kibanaSavedObjectMeta": {
-          "searchSourceJSON": "{\"filter\":[]}"
+          "searchSourceJSON": "{\n  \"filter\": []\n}"
         },
         "savedSearchId": "Apache2-access-logs",
-        "title": "Apache2 response codes over time",
-        "uiStateJSON": "{\"vis\":{\"colors\":{\"200\":\"#629E51\",\"404\":\"#EF843C\"}}}",
+        "title": "Response codes over time [Filebeat Apache2]",
+        "uiStateJSON": "{\n  \"vis\": {\n    \"colors\": {\n      \"200\": \"#629E51\",\n      \"404\": \"#EF843C\"\n    }\n  }\n}",
         "version": 1,
-        "visState": "{\"title\":\"Apache2 response codes over time\",\"type\":\"histogram\",\"params\":{\"shareYAxis\":true,\"addTooltip\":true,\"addLegend\":true,\"legendPosition\":\"right\",\"scale\":\"linear\",\"mode\":\"stacked\",\"times\":[],\"addTimeMarker\":false,\"defaultYExtents\":false,\"setYExtents\":false,\"yAxis\":{}},\"aggs\":[{\"id\":\"1\",\"enabled\":true,\"type\":\"count\",\"schema\":\"metric\",\"params\":{}},{\"id\":\"2\",\"enabled\":true,\"type\":\"date_histogram\",\"schema\":\"segment\",\"params\":{\"field\":\"@timestamp\",\"interval\":\"auto\",\"customInterval\":\"2h\",\"min_doc_count\":1,\"extended_bounds\":{}}},{\"id\":\"3\",\"enabled\":true,\"type\":\"terms\",\"schema\":\"group\",\"params\":{\"field\":\"apache2.access.response_code\",\"size\":5,\"order\":\"desc\",\"orderBy\":\"1\"}}],\"listeners\":{}}"
+        "visState": "{\n  \"title\": \"Apache2 response codes over time\",\n  \"type\": \"histogram\",\n  \"params\": {\n    \"shareYAxis\": true,\n    \"addTooltip\": true,\n    \"addLegend\": true,\n    \"legendPosition\": \"right\",\n    \"scale\": \"linear\",\n    \"mode\": \"stacked\",\n    \"times\": [],\n    \"addTimeMarker\": false,\n    \"defaultYExtents\": false,\n    \"setYExtents\": false,\n    \"yAxis\": {}\n  },\n  \"aggs\": [\n    {\n      \"id\": \"1\",\n      \"enabled\": true,\n      \"type\": \"count\",\n      \"schema\": \"metric\",\n      \"params\": {}\n    },\n    {\n      \"id\": \"2\",\n      \"enabled\": true,\n      \"type\": \"date_histogram\",\n      \"schema\": \"segment\",\n      \"params\": {\n        \"field\": \"@timestamp\",\n        \"interval\": \"auto\",\n        \"customInterval\": \"2h\",\n        \"min_doc_count\": 1,\n        \"extended_bounds\": {}\n      }\n    },\n    {\n      \"id\": \"3\",\n      \"enabled\": true,\n      \"type\": \"terms\",\n      \"schema\": \"group\",\n      \"params\": {\n        \"field\": \"apache2.access.response_code\",\n        \"size\": 5,\n        \"order\": \"desc\",\n        \"orderBy\": \"1\"\n      }\n    }\n  ],\n  \"listeners\": {}\n}"
       },
       "id": "Apache2-response-codes-over-time",
       "type": "visualization",
-      "version": 4
+      "version": 2
     },
     {
       "attributes": {
@@ -107,18 +107,18 @@
         "description": "",
         "hits": 0,
         "kibanaSavedObjectMeta": {
-          "searchSourceJSON": "{\"index\":\"filebeat-*\",\"query\":{\"query_string\":{\"query\":\"_exists_:apache2.error\",\"analyze_wildcard\":true}},\"filter\":[],\"highlight\":{\"pre_tags\":[\"@kibana-highlighted-field@\"],\"post_tags\":[\"@/kibana-highlighted-field@\"],\"fields\":{\"*\":{}},\"require_field_match\":false,\"fragment_size\":2147483647}}"
+          "searchSourceJSON": "{\n  \"index\": \"filebeat-*\",\n  \"query\": {\n    \"query_string\": {\n      \"query\": \"_exists_:apache2.error\",\n      \"analyze_wildcard\": true\n    }\n  },\n  \"filter\": [],\n  \"highlight\": {\n    \"pre_tags\": [\n      \"@kibana-highlighted-field@\"\n    ],\n    \"post_tags\": [\n      \"@/kibana-highlighted-field@\"\n    ],\n    \"fields\": {\n      \"*\": {}\n    },\n    \"require_field_match\": false,\n    \"fragment_size\": 2147483647\n  }\n}"
         },
         "sort": [
           "@timestamp",
           "desc"
         ],
-        "title": "Apache2 errors log",
+        "title": "Apache errors log [Filebeat Apache2]",
         "version": 1
       },
       "id": "Apache2-errors-log",
       "type": "search",
-      "version": 8
+      "version": 2
     },
     {
       "attributes": {
@@ -131,37 +131,44 @@
         "description": "",
         "hits": 0,
         "kibanaSavedObjectMeta": {
-          "searchSourceJSON": "{\"index\":\"filebeat-*\",\"query\":{\"query_string\":{\"query\":\"_exists_:apache2.access\",\"analyze_wildcard\":true}},\"filter\":[],\"highlight\":{\"pre_tags\":[\"@kibana-highlighted-field@\"],\"post_tags\":[\"@/kibana-highlighted-field@\"],\"fields\":{\"*\":{}},\"require_field_match\":false,\"fragment_size\":2147483647}}"
+          "searchSourceJSON": "{\n  \"index\": \"filebeat-*\",\n  \"query\": {\n    \"query_string\": {\n      \"query\": \"_exists_:apache2.access\",\n      \"analyze_wildcard\": true\n    }\n  },\n  \"filter\": [],\n  \"highlight\": {\n    \"pre_tags\": [\n      \"@kibana-highlighted-field@\"\n    ],\n    \"post_tags\": [\n      \"@/kibana-highlighted-field@\"\n    ],\n    \"fields\": {\n      \"*\": {}\n    },\n    \"require_field_match\": false,\n    \"fragment_size\": 2147483647\n  }\n}"
         },
         "sort": [
           "@timestamp",
           "desc"
         ],
-        "title": "Apache2 access logs",
+        "title": "Apache access logs [Filebeat Apache2]",
         "version": 1
       },
       "id": "Apache2-access-logs",
       "type": "search",
-      "version": 20
+      "version": 3
     },
     {
       "attributes": {
-        "description": "",
+        "description": "Filebeat Apache2 module dashboard",
         "hits": 0,
         "kibanaSavedObjectMeta": {
-          "searchSourceJSON": "{\"filter\":[{\"query\":{\"query_string\":{\"analyze_wildcard\":true,\"query\":\"*\"}}}]}"
+          "searchSourceJSON": "{\"filter\":[],\"query\":{\"language\":\"lucene\",\"query\":{\"query_string\":{\"analyze_wildcard\":true,\"default_field\":\"*\",\"query\":\"*\"}}},\"highlightAll\":true,\"version\":true}"
         },
         "optionsJSON": "{\"darkTheme\":false}",
-        "panelsJSON": "[{\"col\":1,\"id\":\"Apache2-access-unique-IPs-map\",\"panelIndex\":1,\"row\":1,\"size_x\":12,\"size_y\":3,\"type\":\"visualization\"},{\"col\":1,\"id\":\"Apache2-response-codes-of-top-URLs\",\"panelIndex\":2,\"row\":6,\"size_x\":8,\"size_y\":3,\"type\":\"visualization\"},{\"col\":9,\"id\":\"Apache2-browsers\",\"panelIndex\":3,\"row\":6,\"size_x\":4,\"size_y\":3,\"type\":\"visualization\"},{\"col\":11,\"id\":\"Apache2-operating-systems\",\"panelIndex\":4,\"row\":4,\"size_x\":2,\"size_y\":2,\"type\":\"visualization\"},{\"col\":1,\"id\":\"Apache2-error-logs-over-time\",\"panelIndex\":5,\"row\":9,\"size_x\":12,\"size_y\":2,\"type\":\"visualization\"},{\"col\":1,\"id\":\"Apache2-response-codes-over-time\",\"panelIndex\":6,\"row\":4,\"size_x\":10,\"size_y\":2,\"type\":\"visualization\"},{\"id\":\"Apache2-errors-log\",\"type\":\"search\",\"panelIndex\":7,\"size_x\":12,\"size_y\":3,\"col\":1,\"row\":11,\"columns\":[\"apache2.error.client\",\"apache2.error.level\",\"apache2.error.module\",\"apache2.error.message\"],\"sort\":[\"@timestamp\",\"desc\"]}]",
-        "timeRestore": false,
-        "title": "Filebeat Apache2 Dashboard",
-        "uiStateJSON": "{\"P-1\":{\"mapCenter\":[40.713955826286046,-0.17578125]}}",
+        "panelsJSON": "[{\"col\":1,\"id\":\"Apache2-access-unique-IPs-map\",\"panelIndex\":1,\"row\":1,\"size_x\":12,\"size_y\":3,\"type\":\"visualization\"},{\"col\":1,\"id\":\"Apache2-response-codes-of-top-URLs\",\"panelIndex\":2,\"row\":6,\"size_x\":8,\"size_y\":3,\"type\":\"visualization\"},{\"col\":9,\"id\":\"Apache2-browsers\",\"panelIndex\":3,\"row\":6,\"size_x\":4,\"size_y\":3,\"type\":\"visualization\"},{\"col\":11,\"id\":\"Apache2-operating-systems\",\"panelIndex\":4,\"row\":4,\"size_x\":2,\"size_y\":2,\"type\":\"visualization\"},{\"col\":1,\"id\":\"Apache2-error-logs-over-time\",\"panelIndex\":5,\"row\":9,\"size_x\":12,\"size_y\":2,\"type\":\"visualization\"},{\"col\":1,\"id\":\"Apache2-response-codes-over-time\",\"panelIndex\":6,\"row\":4,\"size_x\":10,\"size_y\":2,\"type\":\"visualization\"},{\"col\":1,\"columns\":[\"apache2.error.client\",\"apache2.error.level\",\"apache2.error.module\",\"apache2.error.message\"],\"id\":\"Apache2-errors-log\",\"panelIndex\":7,\"row\":11,\"size_x\":12,\"size_y\":3,\"sort\":[\"@timestamp\",\"desc\"],\"type\":\"search\"}]",
+        "refreshInterval": {
+          "display": "Off",
+          "pause": false,
+          "value": 0
+        },
+        "timeFrom": "now-30d",
+        "timeRestore": true,
+        "timeTo": "now",
+        "title": "[Filebeat Apache2] Access and error logs",
+        "uiStateJSON": "{\"P-1\":{\"mapBounds\":{\"bottom_right\":{\"lat\":-3.864254615721396,\"lon\":301.2890625},\"top_left\":{\"lat\":67.7427590666639,\"lon\":-301.64062499999994}},\"mapCenter\":[40.713955826286046,-0.17578125],\"mapCollar\":{\"top_left\":{\"lat\":90,\"lon\":-180},\"bottom_right\":{\"lat\":-39.667755,\"lon\":180},\"zoom\":2},\"mapZoom\":2}}",
         "version": 1
       },
       "id": "Filebeat-Apache2-Dashboard",
       "type": "dashboard",
-      "version": 4
+      "version": 5
     }
   ],
-  "version": "6.0.0-alpha3-SNAPSHOT"
+  "version": "6.0.0-beta1-SNAPSHOT"
 }
