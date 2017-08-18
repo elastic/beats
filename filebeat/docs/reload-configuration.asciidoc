@@ -78,19 +78,16 @@ For module configurations, you specify reload options in the
 ------------------------------------------------------------------------------
 filebeat.config.modules:
   enabled: true
-  path: configs/*.yml
+  path: prospectors.d/*.yml <1>
   reload.enabled: true
   reload.period: 10s
 ------------------------------------------------------------------------------
-
-TIP: If you are using the <<modules-command,`modules`>> command to enable and
-disable configurations, you can enable config reloading for the `modules.d`
-directory by specifying `path: ${path.config}/modules.d/*.yml`.
+<1> If you change the path setting to look for config changes in a different
+directory, you will not be able to use the <<modules-command,`modules`>> command
+to enable and disable module configurations.
 
 Each file found by the Glob must contain a list of one or more module
 definitions. For example:
-
-//REVIEWERS: I got an error when I tried to have an empty line before the -module: mysql entry below. Shouldn't whitespace be allowed there?
 
 [source,yaml]
 ------------------------------------------------------------------------------
@@ -101,11 +98,4 @@ definitions. For example:
   error:
     enabled: true
     var.paths: [/var/log/apache2/error.log*]
-- module: mysql
-  error:
-    enabled: true
-    var.paths: [/var/log/mysql/error.log*]
-  slowlog:
-    enabled: true
-    var.paths: [/var/log/mysql/mysql-slow.log*]
 ------------------------------------------------------------------------------
