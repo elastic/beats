@@ -72,13 +72,6 @@ def fields_to_es_template(args, input, output, index, version):
         # limit shouldn't be that bad.
         template["settings"]["index.mapping.total_fields.limit"] = 10000
 
-        if not args.es6x:
-            # should be done only for es5x. For es6x, any "_all" setting results
-            # in an error.
-            template["mappings"]["_default_"]["_all"] = {
-                "norms": False
-            }
-
     properties = {}
     dynamic_templates = []
 
