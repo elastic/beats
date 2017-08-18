@@ -5,9 +5,9 @@ system, one document is provided.
 
 This metricset is available on:
 
-- Darwin
 - FreeBSD
 - Linux
+- macOS
 - OpenBSD
 - Windows
 
