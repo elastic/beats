@@ -8773,7 +8773,7 @@ The total number of of milliseconds spent doing I/Os.
 
 
 [float]
-=== `system.diskio.iostat.read_request_merged_per_sec`
+=== `system.diskio.iostat.read.request.merges_per_sec`
 
 type: float
 
@@ -8781,7 +8781,7 @@ The number of read requests merged per second that were queued to the device.
 
 
 [float]
-=== `system.diskio.iostat.write_request_merged_per_sec`
+=== `system.diskio.iostat.write.request.merges_per_sec`
 
 type: float
 
@@ -8789,7 +8789,7 @@ The number of write requests merged per second that were queued to the device.
 
 
 [float]
-=== `system.diskio.iostat.read_request_per_sec`
+=== `system.diskio.iostat.read.request.per_sec`
 
 type: float
 
@@ -8797,7 +8797,7 @@ The number of read requests that were issued to the device per second
 
 
 [float]
-=== `system.diskio.iostat.write_request_per_sec`
+=== `system.diskio.iostat.write.request.per_sec`
 
 type: float
 
@@ -8805,23 +8805,27 @@ The number of write requests that were issued to the device per second
 
 
 [float]
-=== `system.diskio.iostat.read_byte_per_sec`
+=== `system.diskio.iostat.read.per_sec.bytes`
 
 type: float
+
+format: bytes
 
 The number of Bytes read from the device per second.
 
 
 [float]
-=== `system.diskio.iostat.write_byte_per_sec`
+=== `system.diskio.iostat.write.per_sec.bytes`
 
 type: float
+
+format: bytes
 
 The number of Bytes write from the device per second.
 
 
 [float]
-=== `system.diskio.iostat.avg_request_size`
+=== `system.diskio.iostat.request.avg_size`
 
 type: float
 
@@ -8829,7 +8833,7 @@ The average size (in sectors) of the requests that were issued to the device.
 
 
 [float]
-=== `system.diskio.iostat.avg_queue_size`
+=== `system.diskio.iostat.queue.avg_size`
 
 type: float
 
