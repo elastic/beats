@@ -8,7 +8,7 @@ packetbeat.interfaces.device: {{ iface_device|default("any") }}
 #================================== Flows =====================================
 # Set network flow timeout. Flow is killed if no packet is received before being
 # timed out.
-packetbeat.flows.timeout: 10s
+packetbeat.flows.timeout: 2s
 
 # Configure reporting period. If set to -1, only killed flows will be reported
 packetbeat.flows.period: -1s
