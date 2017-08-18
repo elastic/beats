@@ -4,6 +4,8 @@ import (
 	"fmt"
 	"net"
 
+	"github.com/pkg/errors"
+
 	"github.com/elastic/beats/libbeat/common"
 	"github.com/elastic/beats/libbeat/logp"
 	"github.com/elastic/beats/metricbeat/helper/server"
@@ -11,6 +13,7 @@ import (
 )
 
 type TcpServer struct {
+	tcpAddr           *net.TCPAddr
 	listener          *net.TCPListener
 	receiveBufferSize int
 	done              chan struct{}
@@ -42,25 +45,27 @@ func NewTcpServer(base mb.BaseMetricSet) (server.Server, error) {
 		return nil, err
 	}
 
-	listener, err := net.ListenTCP("tcp", addr)
-	if err != nil {
-		return nil, err
-	}
-
-	logp.Info("Started listening for TCP on: %s:%d", config.Host, config.Port)
 	return &TcpServer{
-		listener:          listener,
+		tcpAddr:           addr,
 		receiveBufferSize: config.ReceiveBufferSize,
 		done:              make(chan struct{}),
 		eventQueue:        make(chan server.Event),
 	}, nil
 }
 
-func (g *TcpServer) Start() {
-	go g.WatchMetrics()
+func (g *TcpServer) Start() error {
+	listener, err := net.ListenTCP("tcp", g.tcpAddr)
+	if err != nil {
+		return errors.Wrap(err, "failed to start TCP server")
+	}
+	g.listener = listener
+	logp.Info("Started listening for TCP on: %s", g.tcpAddr.String())
+
+	go g.watchMetrics()
+	return nil
 }
 
-func (g *TcpServer) WatchMetrics() {
+func (g *TcpServer) watchMetrics() {
 	buffer := make([]byte, g.receiveBufferSize)
 	for {
 		select {
