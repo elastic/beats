@@ -155,10 +155,18 @@ func (pb *packetbeat) Run(b *beat.Beat) error {
 		return err
 	}
 
+	defer pb.transPub.Stop()
+
 	// start services
 	for _, service := range pb.services {
 		service.Start()
 	}
+	defer func() {
+		// kill services
+		for _, service := range pb.services {
+			service.Stop()
+		}
+	}()
 
 	var wg sync.WaitGroup
 	errC := make(chan error, 1)
@@ -167,8 +175,6 @@ func (pb *packetbeat) Run(b *beat.Beat) error {
 	wg.Add(1)
 	go func() {
 		defer wg.Done()
-
-		defer pb.transPub.Stop()
 
 		err := pb.sniff.Run()
 		if err != nil {
@@ -182,11 +188,6 @@ func (pb *packetbeat) Run(b *beat.Beat) error {
 	default:
 	case err := <-errC:
 		return err
-	}
-
-	// kill services
-	for _, service := range pb.services {
-		service.Stop()
 	}
 
 	timeout := pb.config.ShutdownTimeout
