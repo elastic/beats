@@ -37,11 +37,7 @@ type packetbeat struct {
 	// publisher/pipeline
 	pipeline beat.Pipeline
 	transPub *publish.TransactionPublisher
-
-	services []interface {
-		Start()
-		Stop()
-	}
+	flows    *flows.Flows
 }
 
 type flags struct {
@@ -118,6 +114,10 @@ func (pb *packetbeat) init(b *beat.Beat) error {
 		return fmt.Errorf("Initializing protocol analyzers failed: %v", err)
 	}
 
+	if err := pb.setupFlows(); err != nil {
+		return err
+	}
+
 	return pb.setupSniffer()
 }
 
@@ -141,6 +141,33 @@ func (pb *packetbeat) setupSniffer() error {
 	return err
 }
 
+func (pb *packetbeat) setupFlows() error {
+	config := &pb.config
+	if !config.Flows.IsEnabled() {
+		return nil
+	}
+
+	processors, err := processors.New(config.Flows.Processors)
+	if err != nil {
+		return err
+	}
+
+	client, err := pb.pipeline.ConnectWith(beat.ClientConfig{
+		EventMetadata: config.Flows.EventMetadata,
+		Processor:     processors,
+	})
+	if err != nil {
+		return err
+	}
+
+	pb.flows, err = flows.NewFlows(client.PublishAll, config.Flows)
+	if err != nil {
+		return err
+	}
+
+	return nil
+}
+
 func (pb *packetbeat) Run(b *beat.Beat) error {
 	defer func() {
 		if service.ProfileEnabled() {
@@ -156,17 +183,10 @@ func (pb *packetbeat) Run(b *beat.Beat) error {
 	}
 
 	defer pb.transPub.Stop()
-
-	// start services
-	for _, service := range pb.services {
-		service.Start()
+	if pb.flows != nil {
+		pb.flows.Start()
+		defer pb.flows.Stop()
 	}
-	defer func() {
-		// kill services
-		for _, service := range pb.services {
-			service.Stop()
-		}
-	}()
 
 	var wg sync.WaitGroup
 	errC := make(chan error, 1)
@@ -205,30 +225,6 @@ func (pb *packetbeat) Stop() {
 }
 
 func (pb *packetbeat) createWorker(dl layers.LinkType) (sniffer.Worker, error) {
-	var f *flows.Flows
-	var err error
-	config := &pb.config
-
-	if config.Flows.IsEnabled() {
-		processors, err := processors.New(config.Flows.Processors)
-		if err != nil {
-			return nil, err
-		}
-
-		client, err := pb.pipeline.ConnectWith(beat.ClientConfig{
-			EventMetadata: config.Flows.EventMetadata,
-			Processor:     processors,
-		})
-		if err != nil {
-			return nil, err
-		}
-
-		f, err = flows.NewFlows(client.PublishAll, config.Flows)
-		if err != nil {
-			return nil, err
-		}
-	}
-
 	var icmp4 icmp.ICMPv4Processor
 	var icmp6 icmp.ICMPv6Processor
 	cfg, err := pb.icmpConfig()
@@ -260,14 +256,11 @@ func (pb *packetbeat) createWorker(dl layers.LinkType) (sniffer.Worker, error) {
 		return nil, err
 	}
 
-	worker, err := decoder.New(f, dl, icmp4, icmp6, tcp, udp)
+	worker, err := decoder.New(pb.flows, dl, icmp4, icmp6, tcp, udp)
 	if err != nil {
 		return nil, err
 	}
 
-	if f != nil {
-		pb.services = append(pb.services, f)
-	}
 	return worker, nil
 }
 
