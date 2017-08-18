@@ -29,8 +29,8 @@ SYSTEM_DISKIO_FIELDS = ["name", "read.count", "write.count", "read.bytes",
 
 SYSTEM_DISKIO_FIELDS_LINUX = ["name", "read.count", "write.count", "read.bytes",
                               "write.bytes", "read.time", "write.time", "io.time",
-                              "iostat.read_request_merged_per_sec", "iostat.write_request_merged_per_sec", "iostat.read_request_per_sec", "iostat.write_request_per_sec", "iostat.read_byte_per_sec", "iostat.write_byte_per_sec"
-                              "iostat.avg_request_size", "iostat.avg_queue_size", "iostat.await", "iostat.service_time", "iostat.busy"]
+                              "iostat.read.request.merges_per_sec", "iostat.write.request.merges_per_sec", "iostat.read.request.per_sec", "iostat.write.request.per_sec", "iostat.read.per_sec.bytes", "iostat.write.per_sec.bytes"
+                              "iostat.request.avg_size", "iostat.queue.avg_size", "iostat.await", "iostat.service_time", "iostat.busy"]
 
 SYSTEM_FILESYSTEM_FIELDS = ["available", "device_name", "type", "files", "free",
                             "free_files", "mount_point", "total", "used.bytes",
