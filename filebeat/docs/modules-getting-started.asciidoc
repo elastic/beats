@@ -40,6 +40,9 @@ sudo bin/elasticsearch-plugin install ingest-user-agent
 ----------------------------------------------------------------------
 +
 You need to restart Elasticsearch after running these commands.
++
+If you are using an https://cloud.elastic.co/[Elastic Cloud] instance, you can
+enable the two plugins from the configuration page.
 
 * Verify that Elasticsearch and Kibana are running and that Elasticsearch is
 ready to receive data from Filebeat.
@@ -81,7 +84,17 @@ example:
 ----------------------------------------------------------------------
 ./filebeat -e -modules=system,nginx,mysql
 ----------------------------------------------------------------------
-
++
+When you start Filebeat, you should see messages indicating that Filebeat
+has started harvesters for all enabled modules. For example:
++
+[source,shell]
+----------------------------------------------------------------------
+2017/08/16 23:39:15.414375 harvester.go:206: INFO Harvester started for file: /var/log/displaypolicyd.stdout.log
+----------------------------------------------------------------------
++
+If you don't see this message for each log file that needs to be read,
+see <<setting-variables>> to find out how to set the path the files.
 
 NOTE: Depending on how you've installed Filebeat, you might see errors
 related to file ownership or permissions when you try to run Filebeat modules.
@@ -89,12 +102,10 @@ See {libbeat}/config-file-permissions.html[Config File Ownership and Permissions
 in the _Beats Platform Reference_ if you encounter errors related to file
 ownership or permissions.
 
-//include::system-module-note.asciidoc[]
-
-
-TIP: In a production environment, you'll probably want to use a configuration
-file, rather than command-line flags, to specify which modules to run. See the
-detailed documentation for more about configuring and running modules.
+This getting started guide uses the `-modules` flag to enable modules
+at the command line when you run Filebeat. In a production environment, you'll
+probably want to use the configs in the `modules.d` directory instead. See
+<<configuration-filebeat-modules>> for more information.
 
 [[setting-variables]]
 ==== Set the path variable
@@ -111,8 +122,8 @@ logs:
 ./filebeat -e -modules=nginx -M "nginx.access.var.paths=[/var/log/nginx/access.log*]"
 ----
 
-See the <<modules-tutorial>> for more information about setting variables and
-advanced options.
+See <<configuration-filebeat-modules>> for more information about setting
+variables and advanced options.
 
 [[passing-credentials-modules]]
 ==== Pass credentials

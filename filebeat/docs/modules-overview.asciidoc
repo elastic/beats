@@ -34,8 +34,19 @@ Node.
 
 Filebeat modules require Elasticsearch 5.2 or later.
 
+[float]
+=== Get started
+
+To learn how to configure and run Filebeat modules:
+
+* Get started by reading <<filebeat-modules-quickstart>>.
+* Try out the extended <<modules-tutorial>> for a more in-depth introduction.
+* Learn about the different ways to enable modules in <<configuration-filebeat-modules>>.
+
 [[modules-tutorial]]
 === Tutorial
+
+//REVIEWERS: Now that we have a section about specifying which modules to run (where I describe how to override settings) plus a Quick start for common log formats, the info in this tutorial is a bit redundant. I do think a more in-depth tutorial that shows a realistic use case would be pretty useful here. It could even show path overrides and prospector settings, but it wouldn't have to describe all the permutations because we do that in the reference section. IMO a streamlined version of this tutorial focused on specific user goals and built around a compelling story would be more useful. If someone can provide me with the "story" for this tutorial, I can write it up. Any volunteers?
 
 This tutorial assumes you have Elasticsearch and Kibana installed and
 accessible from Filebeat (see the <<filebeat-getting-started,getting started>>
@@ -89,7 +100,8 @@ You can also start multiple modules at once:
 ./filebeat -e -modules=nginx,mysql,system
 ----------------------------------------------------------------------
 
-include::system-module-note.asciidoc[]
+
+//include::system-module-note.asciidoc[]
 
 While enabling the modules from the CLI file is handy for getting started and
 for testing, you will probably want to use the configuration file for the
@@ -147,6 +159,9 @@ cannot install the plugins, you can use the following:
 ----------------------------------------------------------------------
 ./filebeat -e -modules=nginx -M "nginx.access.var.pipeline=no_plugins"
 ----------------------------------------------------------------------
+
+
+//REVIEWERS: Is no_plugins still a thing?
 
 ==== Advanced settings
 
