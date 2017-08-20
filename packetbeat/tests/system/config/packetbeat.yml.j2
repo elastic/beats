@@ -168,7 +168,7 @@ tags: [
   {%- endif -%}
 ]
 
-packetbeat.shutdown_timeout: {{ shutdown_timeout|default(0) }}
+packetbeat.shutdown_timeout: {{ shutdown_timeout|default('400ms') }}
 
 {%- if processors %}
 

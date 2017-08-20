@@ -55,12 +55,6 @@ func (h *fileHandler) ReadPacketData() ([]byte, gopacket.CaptureInfo, error) {
 		h.pcapHandle.Close()
 		h.pcapHandle = nil
 
-		// TODO: Remove me.  still required to keep system tests working.
-		//
-		// give a bit of time to the publish goroutine
-		// to flush
-		time.Sleep(300 * time.Millisecond)
-
 		h.loopCount++
 		if h.loopCount >= h.maxLoopCount {
 			return data, ci, err
