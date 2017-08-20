@@ -61,6 +61,8 @@ https://github.com/elastic/beats/compare/v6.0.0-beta1...master[Check the HEAD di
 
 *Packetbeat*
 
+- Update flow timestamp on each packet being received. {issue}4895[4895]
+
 *Winlogbeat*
 
 ==== Added
