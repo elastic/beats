@@ -42,14 +42,14 @@ https://github.com/elastic/beats/compare/v5.4.1...master[Check the HEAD diff]
 - Properly shut down crawler in case one prospector is misconfigured. {pull}4037[4037]
 - Fix importing the dashboards when the limit for max open files is too low. {issue}4244[4244]
 - Fix issue where the `fileset.module` could have the wrong value. {issue}4761[4761]
-
-*Filebeat*
 - Fix issue that new prospector was not reloaded on conflict {pull}4128[4128]
 - Fix grok pattern in filebeat module system/auth without hostname. {pull}4224[4224]
 - Fix the Mysql slowlog parsing of IP addresses. {pull}4183[4183]
 - Allow string characters in user agent patch version (NGINX and Apache) {pull}4415[4415]
 
-*Filebeat*
+*Packetbeat*
+
+- Update flow timestamp on each packet being received. {issue}4895[4895]
 
 *Heartbeat*
 
