@@ -2,3 +2,6 @@ filebeat.registry_file: {{ beat.working_dir + '/' }}{{ registryFile|default("reg
 
 output.elasticsearch.hosts: ["{{ elasticsearch_url }}"]
 output.elasticsearch.index: {{ index_name }}
+
+setup.template.name: {{ index_name }}
+setup.template.pattern: {{ index_name }}*
