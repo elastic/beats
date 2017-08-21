@@ -209,6 +209,7 @@ output.elasticsearch:
 
   # Optional index name. The default is "auditbeat" plus date
   # and generates [auditbeat-]YYYY.MM.DD keys.
+  # In case you modify this pattern you must update setup.template.name and setup.template.pattern accordingly.
   #index: "auditbeat-%{[beat.version]}-%{+yyyy.MM.dd}"
 
   # Optional ingest node pipeline. By default no pipeline will be used.
@@ -666,10 +667,14 @@ output.elasticsearch:
 # Set to false to disable template loading.
 #setup.template.enabled: true
 
-# Template name. By default the template name is auditbeat.
-# The version of the beat will always be appended to the given name
-# so the final name is auditbeat-%{[beat.version]}.
-#setup.template.name: "auditbeat"
+# Template name. By default the template name is "auditbeat-%{[beat.version]}"
+# The template name and pattern has to be set in case the elasticsearch index pattern is modified.
+#setup.template.name: "auditbeat-%{[beat.version]}"
+
+# Template patttern. By default the template patter is "-%{[beat.version]}-*" to apply to the default index settings.
+# The first part is the version of the beat and then -* is used to match all daily indicies.
+# The template name and pattern has to be set in case the elasticsearch index pattern is modified.
+#setup.template.pattern: "auditbeat-%{[beat.version]}-*"
 
 # Path to fields.yml file to generate the template
 #setup.template.fields: "${path.config}/fields.yml"
