@@ -1,4 +1,4 @@
-package queues
+package queue
 
 import (
 	"io/ioutil"
@@ -16,7 +16,7 @@ import (
 func TestFetchEventContents(t *testing.T) {
 	absPath, err := filepath.Abs("../_meta/testdata/")
 
-	response, err := ioutil.ReadFile(absPath + "/queues_sample_response.json")
+	response, err := ioutil.ReadFile(absPath + "/queue_sample_response.json")
 	server := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		w.WriteHeader(200)
 		w.Header().Set("Content-Type", "application/json;")
@@ -26,7 +26,7 @@ func TestFetchEventContents(t *testing.T) {
 
 	config := map[string]interface{}{
 		"module":     "rabbitmq",
-		"metricsets": []string{"queues"},
+		"metricsets": []string{"queue"},
 		"hosts":      []string{server.URL},
 	}
 

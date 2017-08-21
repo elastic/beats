@@ -1,3 +1,0 @@
-=== rabbitmq queues MetricSet
-
-This is the queues metricset of the module rabbitmq.

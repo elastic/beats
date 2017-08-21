@@ -7,12 +7,12 @@
     "metricset":{
         "host":"localhost",
         "module":"rabbitmq",
-        "name":"queues",
+        "name":"queue",
         "rtt":44269
     },
     "rabbitmq":{
-        "queues":{
-            "example": "queues"
+        "queue":{
+            "example": "queue"
         }
     },
     "type":"metricsets"

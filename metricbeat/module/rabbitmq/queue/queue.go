@@ -1,4 +1,4 @@
-package queues
+package queue
 
 import (
 	"github.com/elastic/beats/libbeat/common"
@@ -21,7 +21,7 @@ var (
 )
 
 func init() {
-	if err := mb.Registry.AddMetricSet("rabbitmq", "queues", New, hostParser); err != nil {
+	if err := mb.Registry.AddMetricSet("rabbitmq", "queue", New, hostParser); err != nil {
 		panic(err)
 	}
 }
@@ -32,7 +32,7 @@ type MetricSet struct {
 }
 
 func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
-	cfgwarn.Experimental("The rabbitmq queues metricset is experimental")
+	cfgwarn.Experimental("The rabbitmq queue metricset is experimental")
 
 	http := helper.NewHTTP(base)
 	http.SetHeader("Accept", "application/json")

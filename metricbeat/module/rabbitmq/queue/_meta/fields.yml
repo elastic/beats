@@ -1,7 +1,7 @@
-- name: queues
+- name: queue
   type: group
   description: >
-    queues
+    queue
   fields:
     - name: name
       type: keyword

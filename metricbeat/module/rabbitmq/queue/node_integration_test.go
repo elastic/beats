@@ -1,4 +1,4 @@
-package queues
+package queue
 
 import (
 	"fmt"
@@ -19,7 +19,7 @@ func TestData(t *testing.T) {
 func getConfig() map[string]interface{} {
 	return map[string]interface{}{
 		"module":     "rabbitmq",
-		"metricsets": []string{"queues"},
+		"metricsets": []string{"queue"},
 		"hosts":      getTestRabbitMQHost(),
 		"username":   getTestRabbitMQUsername(),
 		"password":   getTestRabbitMQPassword(),
