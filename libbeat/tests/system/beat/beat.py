@@ -11,6 +11,7 @@ import time
 import yaml
 from datetime import datetime, timedelta
 
+
 BEAT_REQUIRED_FIELDS = ["@timestamp",
                         "beat.name", "beat.hostname", "beat.version"]
 
@@ -168,7 +169,7 @@ class TestCase(unittest.TestCase):
                 "-test.coverprofile",
                 os.path.join(self.working_dir, "coverage.cov"),
                 "-path.home", os.path.normpath(self.working_dir),
-                "-c", os.path.join(self.working_dir, config)
+                "-c", os.path.join(self.working_dir, config),
                 ]
 
         if logging_args:
@@ -261,6 +262,11 @@ class TestCase(unittest.TestCase):
         if os.path.exists(self.working_dir):
             shutil.rmtree(self.working_dir)
         os.makedirs(self.working_dir)
+
+        fields_yml = os.path.join(self.beat_path, "fields.yml")
+        # Only add it if it exists
+        if os.path.isfile(fields_yml):
+            shutil.copyfile(fields_yml, os.path.join(self.working_dir, "fields.yml"))
 
         try:
             # update the last_run link
