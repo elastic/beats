@@ -112,7 +112,7 @@ def write_notice_file(f, beat, copyright, dependencies):
                 # it's an Apache License, so include only the NOTICE file
                 f.write("Apache License 2.0\n\n")
 
-                # Skipe NOTICE files not needed
+                # Skip NOTICE files which are not needed
                 if os.path.join(os.path.dirname(lib["license_file"])) in SKIP_NOTICE:
                     continue
 
