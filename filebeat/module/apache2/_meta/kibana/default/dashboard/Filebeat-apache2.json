@@ -14,7 +14,7 @@
       },
       "id": "Apache2-access-unique-IPs-map",
       "type": "visualization",
-      "version": 2
+      "version": 1
     },
     {
       "attributes": {
@@ -30,7 +30,7 @@
       },
       "id": "Apache2-response-codes-of-top-URLs",
       "type": "visualization",
-      "version": 2
+      "version": 1
     },
     {
       "attributes": {
@@ -46,7 +46,7 @@
       },
       "id": "Apache2-browsers",
       "type": "visualization",
-      "version": 3
+      "version": 1
     },
     {
       "attributes": {
@@ -62,7 +62,7 @@
       },
       "id": "Apache2-operating-systems",
       "type": "visualization",
-      "version": 2
+      "version": 1
     },
     {
       "attributes": {
@@ -78,7 +78,7 @@
       },
       "id": "Apache2-error-logs-over-time",
       "type": "visualization",
-      "version": 2
+      "version": 1
     },
     {
       "attributes": {
@@ -94,7 +94,7 @@
       },
       "id": "Apache2-response-codes-over-time",
       "type": "visualization",
-      "version": 2
+      "version": 1
     },
     {
       "attributes": {
@@ -118,7 +118,7 @@
       },
       "id": "Apache2-errors-log",
       "type": "search",
-      "version": 2
+      "version": 1
     },
     {
       "attributes": {
@@ -142,7 +142,7 @@
       },
       "id": "Apache2-access-logs",
       "type": "search",
-      "version": 3
+      "version": 1
     },
     {
       "attributes": {
@@ -153,21 +153,14 @@
         },
         "optionsJSON": "{\"darkTheme\":false}",
         "panelsJSON": "[{\"col\":1,\"id\":\"Apache2-access-unique-IPs-map\",\"panelIndex\":1,\"row\":1,\"size_x\":12,\"size_y\":3,\"type\":\"visualization\"},{\"col\":1,\"id\":\"Apache2-response-codes-of-top-URLs\",\"panelIndex\":2,\"row\":6,\"size_x\":8,\"size_y\":3,\"type\":\"visualization\"},{\"col\":9,\"id\":\"Apache2-browsers\",\"panelIndex\":3,\"row\":6,\"size_x\":4,\"size_y\":3,\"type\":\"visualization\"},{\"col\":11,\"id\":\"Apache2-operating-systems\",\"panelIndex\":4,\"row\":4,\"size_x\":2,\"size_y\":2,\"type\":\"visualization\"},{\"col\":1,\"id\":\"Apache2-error-logs-over-time\",\"panelIndex\":5,\"row\":9,\"size_x\":12,\"size_y\":2,\"type\":\"visualization\"},{\"col\":1,\"id\":\"Apache2-response-codes-over-time\",\"panelIndex\":6,\"row\":4,\"size_x\":10,\"size_y\":2,\"type\":\"visualization\"},{\"col\":1,\"columns\":[\"apache2.error.client\",\"apache2.error.level\",\"apache2.error.module\",\"apache2.error.message\"],\"id\":\"Apache2-errors-log\",\"panelIndex\":7,\"row\":11,\"size_x\":12,\"size_y\":3,\"sort\":[\"@timestamp\",\"desc\"],\"type\":\"search\"}]",
-        "refreshInterval": {
-          "display": "Off",
-          "pause": false,
-          "value": 0
-        },
-        "timeFrom": "now-30d",
-        "timeRestore": true,
-        "timeTo": "now",
+        "timeRestore": false,
         "title": "[Filebeat Apache2] Access and error logs",
-        "uiStateJSON": "{\"P-1\":{\"mapBounds\":{\"bottom_right\":{\"lat\":-3.864254615721396,\"lon\":301.2890625},\"top_left\":{\"lat\":67.7427590666639,\"lon\":-301.64062499999994}},\"mapCenter\":[40.713955826286046,-0.17578125],\"mapCollar\":{\"top_left\":{\"lat\":90,\"lon\":-180},\"bottom_right\":{\"lat\":-39.667755,\"lon\":180},\"zoom\":2},\"mapZoom\":2}}",
+        "uiStateJSON": "{\"P-1\":{\"mapBounds\":{\"bottom_right\":{\"lat\":-3.864254615721396,\"lon\":205.3125},\"top_left\":{\"lat\":67.7427590666639,\"lon\":-205.6640625}},\"mapCenter\":[40.713955826286046,-0.17578125],\"mapCollar\":{\"top_left\":{\"lat\":90,\"lon\":-180},\"bottom_right\":{\"lat\":-39.667755,\"lon\":180},\"zoom\":2},\"mapZoom\":2}}",
         "version": 1
       },
       "id": "Filebeat-Apache2-Dashboard",
       "type": "dashboard",
-      "version": 5
+      "version": 2
     }
   ],
   "version": "6.0.0-beta1-SNAPSHOT"
