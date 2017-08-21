@@ -1,0 +1,11 @@
+{
+  "title": "RabbitMQ Number of Nodes",
+  "visState": "{\n  \"title\": \"Rabbitmq-Number-of-Nodes\",\n  \"type\": \"metric\",\n  \"params\": {\n    \"handleNoResults\": true,\n    \"fontSize\": 60\n  },\n  \"aggs\": [\n    {\n      \"id\": \"1\",\n      \"enabled\": true,\n      \"type\": \"cardinality\",\n      \"schema\": \"metric\",\n      \"params\": {\n        \"field\": \"rabbitmq.node.name.keyword\",\n        \"customLabel\": \"RabbitMQ Nodes\"\n      }\n    }\n  ],\n  \"listeners\": {}\n}",
+  "uiStateJSON": "{}",
+  "description": "",
+  "savedSearchId": "Metricbeat-Rabbitmq",
+  "version": 1,
+  "kibanaSavedObjectMeta": {
+    "searchSourceJSON": "{\n  \"filter\": []\n}"
+  }
+}
