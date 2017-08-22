@@ -38,7 +38,7 @@ func GenTemplateConfigCmd(name, beatVersion string) *cobra.Command {
 				}
 			}
 
-			tmpl, err := template.New(b.Info.Version, version, index, cfg.Settings)
+			tmpl, err := template.New(b.Info.Version, index, version, cfg)
 			if err != nil {
 				fmt.Fprintf(os.Stderr, "Error generating template: %+v", err)
 				os.Exit(1)

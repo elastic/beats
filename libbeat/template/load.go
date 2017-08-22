@@ -41,11 +41,8 @@ func NewLoader(cfg *common.Config, client ESClient, beatInfo common.BeatInfo) (*
 // In case the template is not already loaded or overwriting is enabled, the
 // template is written to index
 func (l *Loader) Load() error {
-	if l.config.Name == "" {
-		l.config.Name = l.beatInfo.Beat
-	}
 
-	tmpl, err := New(l.beatInfo.Version, l.client.GetVersion(), l.config.Name, l.config.Settings)
+	tmpl, err := New(l.beatInfo.Version, l.beatInfo.Beat, l.client.GetVersion(), l.config)
 	if err != nil {
 		return fmt.Errorf("error creating template instance: %v", err)
 	}

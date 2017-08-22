@@ -592,9 +592,12 @@ func (b *Beat) loadDashboards(force bool) error {
 // the elasticsearch output. It is important the the registration happens before
 // the publisher is created.
 func (b *Beat) registerTemplateLoading() error {
+
+	var cfg template.TemplateConfig
+
 	// Check if outputting to file is enabled, and output to file if it is
-	if b.Config.Template != nil && b.Config.Template.Enabled() {
-		var cfg template.TemplateConfig
+	if b.Config.Template.Enabled() {
+
 		err := b.Config.Template.Unpack(&cfg)
 		if err != nil {
 			return fmt.Errorf("unpacking template config fails: %v", err)
@@ -603,6 +606,20 @@ func (b *Beat) registerTemplateLoading() error {
 
 	// Loads template by default if esOutput is enabled
 	if b.Config.Output.Name() == "elasticsearch" {
+
+		// Get ES Index name for comparison
+		esCfg := struct {
+			Index string `config:"index"`
+		}{}
+		err := b.Config.Output.Config().Unpack(&esCfg)
+		if err != nil {
+			return err
+		}
+
+		if esCfg.Index != "" && (cfg.Name == "" || cfg.Pattern == "") {
+			return fmt.Errorf("setup.template.name and setup.template.pattern have to be set if index name is modified.")
+		}
+
 		if b.Config.Template == nil || (b.Config.Template != nil && b.Config.Template.Enabled()) {
 			// load template through callback to make sure it is also loaded
 			// on reconnecting
