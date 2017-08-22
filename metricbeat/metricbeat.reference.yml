@@ -677,6 +677,11 @@ output.elasticsearch:
   # new batches.
   #pipelining: 5
 
+  # If enabled only a subset of events in a batch of events is transfered per
+  # transaction.  The number of events to sent increases up to `bulk_max_size`
+  # if no error is encountered.
+  #slow_start: false
+
   # Optional index name. The default index name is set to name of the beat
   # in all lowercase.
   #index: 'metricbeat'
