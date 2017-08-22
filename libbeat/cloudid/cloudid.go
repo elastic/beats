@@ -29,14 +29,14 @@ func OverwriteSettings(cfg *common.Config) error {
 	}
 
 	logp.Debug("cloudid", "cloud.id: %s, cloud.auth: %s", cloudID, cloudAuth)
-	if cloudID == "" || cloudAuth == "" {
-		return errors.New("You need to specify either both of cloud.id and cloud.auth or none of them")
+	if cloudID == "" {
+		return errors.New("cloud.auth specified but cloud.id is empty. Please specify both.")
 	}
 
 	// cloudID overwrites
 	esURL, kibanaURL, err := decodeCloudID(cloudID)
 	if err != nil {
-		return errors.Errorf("Error decoding cloudID: %v", err)
+		return errors.Errorf("Error decoding cloud.id: %v", err)
 	}
 
 	logp.Info("Setting Elasticsearch and Kibana URLs based on the cloud id: output.elasticsearch.hosts=%s and setup.kibana.host=%s", esURL, kibanaURL)
@@ -56,20 +56,22 @@ func OverwriteSettings(cfg *common.Config) error {
 		return err
 	}
 
-	// cloudAuth overwrites
-	username, password, err := decodeCloudAuth(cloudAuth)
-	if err != nil {
-		return err
-	}
+	if cloudAuth != "" {
+		// cloudAuth overwrites
+		username, password, err := decodeCloudAuth(cloudAuth)
+		if err != nil {
+			return err
+		}
 
-	err = cfg.SetString("output.elasticsearch.username", -1, username)
-	if err != nil {
-		return err
-	}
+		err = cfg.SetString("output.elasticsearch.username", -1, username)
+		if err != nil {
+			return err
+		}
 
-	err = cfg.SetString("output.elasticsearch.password", -1, password)
-	if err != nil {
-		return err
+		err = cfg.SetString("output.elasticsearch.password", -1, password)
+		if err != nil {
+			return err
+		}
 	}
 
 	return nil

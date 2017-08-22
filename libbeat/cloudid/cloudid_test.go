@@ -98,6 +98,29 @@ func TestOverwriteSettings(t *testing.T) {
 				"cloud.auth":                    "elastic:changeme",
 			},
 		},
+		{
+			name: "only cloudid specified",
+			inCfg: map[string]interface{}{
+				"output.elasticsearch.hosts": "localhost:9200",
+				"cloud.id":                   "cloudidtest:dXMtZWFzdC0xLmF3cy5mb3VuZC5pbyQyNDlmM2FmMWY0ZWVlMjRhODRlM2I0MDFlNjhhMWIyYSRkNGFjNzU1OWQ0Njc0YjdjOTFhYmUxMDg1NmQ4NDMwNA==",
+			},
+			outCfg: map[string]interface{}{
+				"output.elasticsearch.hosts": []interface{}{"https://249f3af1f4eee24a84e3b401e68a1b2a.us-east-1.aws.found.io:443"},
+				"setup.kibana.host":          "https://d4ac7559d4674b7c91abe10856d84304.us-east-1.aws.found.io:443",
+				"cloud.id":                   "cloudidtest:dXMtZWFzdC0xLmF3cy5mb3VuZC5pbyQyNDlmM2FmMWY0ZWVlMjRhODRlM2I0MDFlNjhhMWIyYSRkNGFjNzU1OWQ0Njc0YjdjOTFhYmUxMDg1NmQ4NDMwNA==",
+			},
+		},
+		{
+			name: "no output.elasticsearch.hosts defined",
+			inCfg: map[string]interface{}{
+				"cloud.id": "cloudidtest:dXMtZWFzdC0xLmF3cy5mb3VuZC5pbyQyNDlmM2FmMWY0ZWVlMjRhODRlM2I0MDFlNjhhMWIyYSRkNGFjNzU1OWQ0Njc0YjdjOTFhYmUxMDg1NmQ4NDMwNA==",
+			},
+			outCfg: map[string]interface{}{
+				"output.elasticsearch.hosts": []interface{}{"https://249f3af1f4eee24a84e3b401e68a1b2a.us-east-1.aws.found.io:443"},
+				"setup.kibana.host":          "https://d4ac7559d4674b7c91abe10856d84304.us-east-1.aws.found.io:443",
+				"cloud.id":                   "cloudidtest:dXMtZWFzdC0xLmF3cy5mb3VuZC5pbyQyNDlmM2FmMWY0ZWVlMjRhODRlM2I0MDFlNjhhMWIyYSRkNGFjNzU1OWQ0Njc0YjdjOTFhYmUxMDg1NmQ4NDMwNA==",
+			},
+		},
 	}
 
 	for _, test := range tests {
@@ -120,5 +143,47 @@ func TestOverwriteSettings(t *testing.T) {
 		assert.NoError(t, err)
 
 		assert.Equal(t, res, expected)
+	}
+}
+
+func TestOverwriteErrors(t *testing.T) {
+	tests := []struct {
+		name   string
+		inCfg  map[string]interface{}
+		errMsg string
+	}{
+		{
+			name: "cloud.auth specified by cloud.id not",
+			inCfg: map[string]interface{}{
+				"cloud.auth": "elastic:changeme",
+			},
+			errMsg: "cloud.auth specified but cloud.id is empty",
+		},
+		{
+			name: "invalid cloud.id",
+			inCfg: map[string]interface{}{
+				"cloud.id": "blah",
+			},
+			errMsg: "Error decoding cloud.id",
+		},
+		{
+			name: "invalid cloud.auth",
+			inCfg: map[string]interface{}{
+				"cloud.id":   "cloudidtest:dXMtZWFzdC0xLmF3cy5mb3VuZC5pbyQyNDlmM2FmMWY0ZWVlMjRhODRlM2I0MDFlNjhhMWIyYSRkNGFjNzU1OWQ0Njc0YjdjOTFhYmUxMDg1NmQ4NDMwNA==",
+				"cloud.auth": "blah",
+			},
+			errMsg: "cloud.auth setting doesn't contain `:`",
+		},
+	}
+
+	for _, test := range tests {
+		t.Logf("Executing test: %s", test.name)
+
+		cfg, err := common.NewConfigFrom(test.inCfg)
+		assert.NoError(t, err)
+
+		err = OverwriteSettings(cfg)
+		assert.Error(t, err)
+		assert.Contains(t, err.Error(), test.errMsg)
 	}
 }
