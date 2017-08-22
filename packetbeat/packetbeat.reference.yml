@@ -564,7 +564,7 @@ packetbeat.protocols:
 
 #============================= Elastic Cloud ==================================
 
-# These settings simplify using Beatname with the Elastic Cloud (https://cloud.elastic.co/).
+# These settings simplify using packetbeat with the Elastic Cloud (https://cloud.elastic.co/).
 
 # The cloud.id setting overwrites the `output.elasticsearch.hosts` and
 # `setup.kibana.host` options.

@@ -121,6 +121,18 @@ func TestOverwriteSettings(t *testing.T) {
 				"cloud.id":                   "cloudidtest:dXMtZWFzdC0xLmF3cy5mb3VuZC5pbyQyNDlmM2FmMWY0ZWVlMjRhODRlM2I0MDFlNjhhMWIyYSRkNGFjNzU1OWQ0Njc0YjdjOTFhYmUxMDg1NmQ4NDMwNA==",
 			},
 		},
+		{
+			name: "multiple hosts to overwrite",
+			inCfg: map[string]interface{}{
+				"output.elasticsearch.hosts": []string{"localhost:9200", "test", "test1"},
+				"cloud.id":                   "cloudidtest:dXMtZWFzdC0xLmF3cy5mb3VuZC5pbyQyNDlmM2FmMWY0ZWVlMjRhODRlM2I0MDFlNjhhMWIyYSRkNGFjNzU1OWQ0Njc0YjdjOTFhYmUxMDg1NmQ4NDMwNA==",
+			},
+			outCfg: map[string]interface{}{
+				"output.elasticsearch.hosts": []interface{}{"https://249f3af1f4eee24a84e3b401e68a1b2a.us-east-1.aws.found.io:443"},
+				"setup.kibana.host":          "https://d4ac7559d4674b7c91abe10856d84304.us-east-1.aws.found.io:443",
+				"cloud.id":                   "cloudidtest:dXMtZWFzdC0xLmF3cy5mb3VuZC5pbyQyNDlmM2FmMWY0ZWVlMjRhODRlM2I0MDFlNjhhMWIyYSRkNGFjNzU1OWQ0Njc0YjdjOTFhYmUxMDg1NmQ4NDMwNA==",
+			},
+		},
 	}
 
 	for _, test := range tests {
@@ -153,7 +165,7 @@ func TestOverwriteErrors(t *testing.T) {
 		errMsg string
 	}{
 		{
-			name: "cloud.auth specified by cloud.id not",
+			name: "cloud.auth specified but cloud.id not",
 			inCfg: map[string]interface{}{
 				"cloud.auth": "elastic:changeme",
 			},
