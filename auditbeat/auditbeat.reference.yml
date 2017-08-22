@@ -175,6 +175,19 @@ auditbeat.modules:
 #processors:
 #- add_docker_metadata: ~
 
+#============================= Elastic Cloud ==================================
+
+# These settings simplify using Beatname with the Elastic Cloud (https://cloud.elastic.co/).
+
+# The cloud.id setting overwrites the `output.elasticsearch.hosts` and
+# `setup.kibana.host` options.
+# You can find the `cloud.id` in the Elastic Cloud web UI.
+#cloud.id:
+
+# The cloud.auth setting overwrites the `output.elasticsearch.username` and
+# `output.elasticsearch.password` settings. The format is `<user>:<pass>`.
+#cloud.auth:
+
 #================================ Outputs ======================================
 
 # Configure what outputs to use when sending the data collected by the beat.

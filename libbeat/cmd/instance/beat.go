@@ -18,6 +18,7 @@ import (
 	"github.com/elastic/beats/libbeat/api"
 	"github.com/elastic/beats/libbeat/beat"
 	"github.com/elastic/beats/libbeat/cfgfile"
+	"github.com/elastic/beats/libbeat/cloudid"
 	"github.com/elastic/beats/libbeat/common"
 	"github.com/elastic/beats/libbeat/common/cfgwarn"
 	"github.com/elastic/beats/libbeat/common/file"
@@ -387,6 +388,11 @@ func (b *Beat) configure() error {
 	cfg, err := cfgfile.Load("")
 	if err != nil {
 		return fmt.Errorf("error loading config file: %v", err)
+	}
+
+	err = cloudid.OverwriteSettings(cfg)
+	if err != nil {
+		return err
 	}
 
 	b.RawConfig = cfg
