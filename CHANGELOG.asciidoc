@@ -56,6 +56,7 @@ https://github.com/elastic/beats/compare/v6.0.0-beta1...master[Check the HEAD di
 
 - Add support to exclude labels from kubernetes pod metadata. {pull}4757[4757]
 - Add graphite protocol metricbeat module. {pull}4734[4734]
+- Add experimental `queue` metricset to RabbitMQ module. {pull}4788[4788]
 
 *Packetbeat*
 
