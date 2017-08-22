@@ -65,6 +65,7 @@ func (m *MetricSet) Fetch() (common.MapStr, error) {
 			event.Put("nice.pct", pct.Nice)
 			event.Put("softirq.pct", pct.SoftIRQ)
 			event.Put("steal.pct", pct.Steal)
+			event.Put("total.pct", pct.Total)
 		case normalizedPercentages:
 			normalizedPct := sample.NormalizedPercentages()
 			event.Put("user.norm.pct", normalizedPct.User)
@@ -75,6 +76,7 @@ func (m *MetricSet) Fetch() (common.MapStr, error) {
 			event.Put("nice.norm.pct", normalizedPct.Nice)
 			event.Put("softirq.norm.pct", normalizedPct.SoftIRQ)
 			event.Put("steal.norm.pct", normalizedPct.Steal)
+			event.Put("total.norm.pct", normalizedPct.Total)
 		case ticks:
 			ticks := sample.Ticks()
 			event.Put("user.ticks", ticks.User)

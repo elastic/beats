@@ -64,6 +64,12 @@
         was servicing another processor.
         Available only on Unix.
 
+    - name: total.pct
+      type: scaled_float
+      format: percent
+      description: >
+        The percentage of CPU time spent in non-idle state.
+
     # Normalized Percentages
     - name: user.norm.pct
       type: scaled_float
@@ -114,6 +120,13 @@
         The percentage of CPU time spent in involuntary wait by the virtual CPU while the hypervisor
         was servicing another processor.
         Available only on Unix.
+
+    - name: total.norm.pct
+      type: scaled_float
+      format: percent
+      description: >
+        The percentage of CPU time spent in non-idle state.
+
 
     # Ticks
     - name: user.ticks
