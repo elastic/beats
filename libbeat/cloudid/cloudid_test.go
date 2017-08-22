@@ -3,8 +3,9 @@ package cloudid
 import (
 	"testing"
 
-	"github.com/elastic/beats/libbeat/common"
 	"github.com/stretchr/testify/assert"
+
+	"github.com/elastic/beats/libbeat/common"
 )
 
 func TestDecode(t *testing.T) {

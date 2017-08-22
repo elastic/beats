@@ -8,9 +8,10 @@ import (
 	"net/url"
 	"strings"
 
+	"github.com/pkg/errors"
+
 	"github.com/elastic/beats/libbeat/common"
 	"github.com/elastic/beats/libbeat/logp"
-	"github.com/pkg/errors"
 )
 
 // OverwriteSettings modifies the received config object by overwriting the
