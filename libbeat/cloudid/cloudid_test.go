@@ -111,7 +111,7 @@ func TestOverwriteSettings(t *testing.T) {
 			},
 		},
 		{
-			name: "no output.elasticsearch.hosts defined",
+			name: "no output defined",
 			inCfg: map[string]interface{}{
 				"cloud.id": "cloudidtest:dXMtZWFzdC0xLmF3cy5mb3VuZC5pbyQyNDlmM2FmMWY0ZWVlMjRhODRlM2I0MDFlNjhhMWIyYSRkNGFjNzU1OWQ0Njc0YjdjOTFhYmUxMDg1NmQ4NDMwNA==",
 			},
@@ -185,6 +185,14 @@ func TestOverwriteErrors(t *testing.T) {
 				"cloud.auth": "blah",
 			},
 			errMsg: "cloud.auth setting doesn't contain `:`",
+		},
+		{
+			name: "logstash output enabled",
+			inCfg: map[string]interface{}{
+				"cloud.id":              "cloudidtest:dXMtZWFzdC0xLmF3cy5mb3VuZC5pbyQyNDlmM2FmMWY0ZWVlMjRhODRlM2I0MDFlNjhhMWIyYSRkNGFjNzU1OWQ0Njc0YjdjOTFhYmUxMDg1NmQ4NDMwNA==",
+				"output.logstash.hosts": "localhost:544",
+			},
+			errMsg: "The cloud.id setting enables the Elasticsearch output, but you already have the logstash output enabled",
 		},
 	}
 
