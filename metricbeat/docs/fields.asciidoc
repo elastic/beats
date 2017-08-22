@@ -3874,6 +3874,12 @@ The HTTP payload received
 json metricset
 
 
+[float]
+== server fields
+
+server
+
+
 [[exported-fields-jolokia]]
 == Jolokia fields
 
@@ -8767,6 +8773,98 @@ The total number of of milliseconds spent doing I/Os.
 
 
 [float]
+=== `system.diskio.iostat.read.request.merges_per_sec`
+
+type: float
+
+The number of read requests merged per second that were queued to the device.
+
+
+[float]
+=== `system.diskio.iostat.write.request.merges_per_sec`
+
+type: float
+
+The number of write requests merged per second that were queued to the device.
+
+
+[float]
+=== `system.diskio.iostat.read.request.per_sec`
+
+type: float
+
+The number of read requests that were issued to the device per second
+
+
+[float]
+=== `system.diskio.iostat.write.request.per_sec`
+
+type: float
+
+The number of write requests that were issued to the device per second
+
+
+[float]
+=== `system.diskio.iostat.read.per_sec.bytes`
+
+type: float
+
+format: bytes
+
+The number of Bytes read from the device per second.
+
+
+[float]
+=== `system.diskio.iostat.write.per_sec.bytes`
+
+type: float
+
+format: bytes
+
+The number of Bytes write from the device per second.
+
+
+[float]
+=== `system.diskio.iostat.request.avg_size`
+
+type: float
+
+The average size (in sectors) of the requests that were issued to the device.
+
+
+[float]
+=== `system.diskio.iostat.queue.avg_size`
+
+type: float
+
+The average queue length of the requests that were issued to the device.
+
+
+[float]
+=== `system.diskio.iostat.await`
+
+type: float
+
+The average queue length of the requests that were issued to the device.
+
+
+[float]
+=== `system.diskio.iostat.service_time`
+
+type: float
+
+The average service time (in milliseconds) for I/O requests that were issued to the device.
+
+
+[float]
+=== `system.diskio.iostat.busy`
+
+type: float
+
+Percentage of CPU time during which I/O requests were issued to the device (bandwidth utilization for the device). Device saturation occurs when this value is close to 100%.
+
+
+[float]
 == filesystem fields
 
 `filesystem` contains local filesystem stats.
@@ -8789,6 +8887,14 @@ The disk space available to an unprivileged user in bytes.
 type: keyword
 
 The disk name. For example: `/dev/disk1`
+
+
+[float]
+=== `system.filesystem.type`
+
+type: keyword
+
+The disk type. For example: `ext4`
 
 
 [float]
@@ -10128,6 +10234,23 @@ UID of the user running the process.
 type: keyword
 
 Name of the user running the process.
+
+
+[float]
+== uptime fields
+
+`uptime` contains the operating system uptime metric.
+
+
+
+[float]
+=== `system.uptime.duration.ms`
+
+type: long
+
+format: duration
+
+The OS uptime in milliseconds.
 
 
 [[exported-fields-vsphere]]

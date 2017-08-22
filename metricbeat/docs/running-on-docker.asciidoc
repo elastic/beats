@@ -2,7 +2,7 @@ include::../../libbeat/docs/shared-docker.asciidoc[]
 
 [float]
 [[monitoring-host]]
-=== Monitor the host machine
+==== Monitor the host machine
 When executing Metricbeat in a container, there are some important
 things to be aware of if you want to monitor the host machine or other
 containers. Let's walk-through some examples using Docker as our container
@@ -48,7 +48,7 @@ fail on Windows and MacOS.
 
 [float]
 [[monitoring-service]]
-=== Monitor a service in another container
+==== Monitor a service in another container
 
 Next, let's look at an example of monitoring a containerized service from a
 Metricbeat container.

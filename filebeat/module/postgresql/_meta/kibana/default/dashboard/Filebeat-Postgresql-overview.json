@@ -1,0 +1,64 @@
+{
+  "objects": [
+    {
+      "attributes": {
+        "description": "",
+        "kibanaSavedObjectMeta": {
+          "searchSourceJSON": "{\"filter\":[]}"
+        },
+        "savedSearchId": "PostgreSQL All Logs",
+        "title": "PostgreSQL Log Level Count",
+        "uiStateJSON": "{\"vis\":{\"params\":{\"sort\":{\"columnIndex\":null,\"direction\":null}}}}",
+        "version": 1,
+        "visState": "{\"title\":\"PostgreSQL Log Level Count\",\"type\":\"table\",\"params\":{\"perPage\":10,\"showPartialRows\":false,\"showMeticsAtAllLevels\":false,\"sort\":{\"columnIndex\":null,\"direction\":null},\"showTotal\":false,\"totalFunc\":\"sum\"},\"aggs\":[{\"id\":\"1\",\"enabled\":true,\"type\":\"count\",\"schema\":\"metric\",\"params\":{}},{\"id\":\"2\",\"enabled\":true,\"type\":\"terms\",\"schema\":\"bucket\",\"params\":{\"field\":\"postgresql.log.level\",\"size\":12,\"order\":\"desc\",\"orderBy\":\"1\"}}]}"
+      },
+      "id": "PostgreSQL Log Level Count",
+      "type": "visualization",
+      "version": 1
+    },
+    {
+      "attributes": {
+        "columns": [
+          "postgresql.log.user",
+          "postgresql.log.database",
+          "postgresql.log.level",
+          "postgresql.log.message",
+          "postgresql.log.query"
+        ],
+        "description": "",
+        "hits": 0,
+        "kibanaSavedObjectMeta": {
+          "searchSourceJSON": "{\"index\":\"filebeat-*\",\"highlightAll\":true,\"version\":true,\"query\":{\"query\":\"postgresql.log.level:*\",\"language\":\"lucene\"},\"filter\":[]}"
+        },
+        "sort": [
+          "@timestamp",
+          "desc"
+        ],
+        "title": "PostgreSQL All Logs",
+        "version": 1
+      },
+      "id": "PostgreSQL All Logs",
+      "type": "search",
+      "version": 1
+    },
+    {
+      "attributes": {
+        "description": "",
+        "hits": 0,
+        "kibanaSavedObjectMeta": {
+          "searchSourceJSON": "{\"query\":{\"query\":\"\",\"language\":\"lucene\"},\"filter\":[],\"highlightAll\":true,\"version\":true}"
+        },
+        "optionsJSON": "{\"darkTheme\":false}",
+        "panelsJSON": "[{\"size_x\":6,\"size_y\":3,\"panelIndex\":1,\"type\":\"visualization\",\"id\":\"PostgreSQL Log Level Count\",\"col\":1,\"row\":4},{\"size_x\":12,\"size_y\":3,\"panelIndex\":2,\"type\":\"search\",\"id\":\"PostgreSQL All Logs\",\"col\":1,\"row\":1,\"columns\":[\"postgresql.log.user\",\"postgresql.log.database\",\"postgresql.log.level\",\"postgresql.log.message\",\"postgresql.log.query\"],\"sort\":[\"@timestamp\",\"desc\"]}]",
+        "timeRestore": false,
+        "title": "PostgreSQL All Logs",
+        "uiStateJSON": "{\"P-1\":{\"vis\":{\"params\":{\"sort\":{\"columnIndex\":null,\"direction\":null}}}}}",
+        "version": 1
+      },
+      "id": "PostgreSQL All Logs",
+      "type": "dashboard",
+      "version": 1
+    }
+  ],
+  "version": "6.0.0-beta1-SNAPSHOT"
+}

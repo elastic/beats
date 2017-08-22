@@ -1,6 +1,7 @@
 package add_kubernetes_metadata
 
 import (
+	"fmt"
 	"testing"
 
 	"github.com/stretchr/testify/assert"
@@ -31,7 +32,7 @@ func TestPodIndexer(t *testing.T) {
 
 	indexers := podIndexer.GetMetadata(&pod)
 	assert.Equal(t, len(indexers), 1)
-	assert.Equal(t, indexers[0].Index, podName)
+	assert.Equal(t, indexers[0].Index, fmt.Sprintf("%s/%s", ns, podName))
 
 	expected := common.MapStr{
 		"pod": common.MapStr{
@@ -47,7 +48,7 @@ func TestPodIndexer(t *testing.T) {
 
 	indices := podIndexer.GetIndexes(&pod)
 	assert.Equal(t, len(indices), 1)
-	assert.Equal(t, indices[0], podName)
+	assert.Equal(t, indices[0], fmt.Sprintf("%s/%s", ns, podName))
 }
 
 func TestContainerIndexer(t *testing.T) {
@@ -59,6 +60,7 @@ func TestContainerIndexer(t *testing.T) {
 	podName := "testpod"
 	ns := "testns"
 	container := "container"
+	initContainer := "initcontainer"
 
 	pod := Pod{
 		Metadata: ObjectMeta{
@@ -69,7 +71,8 @@ func TestContainerIndexer(t *testing.T) {
 			},
 		},
 		Status: PodStatus{
-			ContainerStatuses: make([]PodContainerStatus, 0),
+			ContainerStatuses:     make([]PodContainerStatus, 0),
+			InitContainerStatuses: make([]PodContainerStatus, 0),
 		},
 	}
 
@@ -87,27 +90,38 @@ func TestContainerIndexer(t *testing.T) {
 		},
 	}
 
-	cid := "docker://abcde"
-
 	pod.Status.ContainerStatuses = []PodContainerStatus{
 		{
 			Name:        container,
-			ContainerID: cid,
+			ContainerID: "docker://abcde",
 		},
 	}
-	expected["container"] = common.MapStr{
-		"name": container,
+	pod.Status.InitContainerStatuses = []PodContainerStatus{
+		{
+			Name:        initContainer,
+			ContainerID: "docker://fghij",
+		},
 	}
 
 	indexers = conIndexer.GetMetadata(&pod)
-	assert.Equal(t, len(indexers), 1)
+	assert.Equal(t, len(indexers), 2)
 	assert.Equal(t, indexers[0].Index, "abcde")
+	assert.Equal(t, indexers[1].Index, "fghij")
 
 	indices = conIndexer.GetIndexes(&pod)
-	assert.Equal(t, len(indices), 1)
+	assert.Equal(t, len(indices), 2)
 	assert.Equal(t, indices[0], "abcde")
+	assert.Equal(t, indices[1], "fghij")
 
+	expected["container"] = common.MapStr{
+		"name": container,
+	}
 	assert.Equal(t, expected.String(), indexers[0].Data.String())
+
+	expected["container"] = common.MapStr{
+		"name": initContainer,
+	}
+	assert.Equal(t, expected.String(), indexers[1].Data.String())
 }
 
 func TestFieldMatcher(t *testing.T) {
@@ -254,4 +268,50 @@ func TestFilteredGenMetaExclusion(t *testing.T) {
 
 	ok, _ = labelMap.HasKey("x")
 	assert.Equal(t, ok, false)
+}
+
+func TestFieldFormatMatcher(t *testing.T) {
+	testCfg := map[string]interface{}{}
+	fieldCfg, err := common.NewConfigFrom(testCfg)
+
+	assert.Nil(t, err)
+	matcher, err := NewFieldFormatMatcher(*fieldCfg)
+	assert.NotNil(t, err)
+
+	testCfg["format"] = `%{[namespace]}/%{[pod]}`
+	fieldCfg, _ = common.NewConfigFrom(testCfg)
+
+	matcher, err = NewFieldFormatMatcher(*fieldCfg)
+	assert.NotNil(t, matcher)
+	assert.Nil(t, err)
+
+	event := common.MapStr{
+		"namespace": "foo",
+		"pod":       "bar",
+	}
+
+	out := matcher.MetadataIndex(event)
+	assert.Equal(t, "foo/bar", out)
+
+	event = common.MapStr{
+		"foo": "bar",
+	}
+	out = matcher.MetadataIndex(event)
+	assert.Empty(t, out)
+
+	testCfg["format"] = `%{[dimensions.namespace]}/%{[dimensions.pod]}`
+	fieldCfg, _ = common.NewConfigFrom(testCfg)
+	matcher, err = NewFieldFormatMatcher(*fieldCfg)
+	assert.NotNil(t, matcher)
+	assert.Nil(t, err)
+
+	event = common.MapStr{
+		"dimensions": common.MapStr{
+			"pod":       "bar",
+			"namespace": "foo",
+		},
+	}
+
+	out = matcher.MetadataIndex(event)
+	assert.Equal(t, "foo/bar", out)
 }

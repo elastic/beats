@@ -25,7 +25,7 @@ type metricProcessor struct {
 	sync.RWMutex
 }
 
-func NewMetricProcessor(templates []templateConfig, defaultTemplate templateConfig) *metricProcessor {
+func NewMetricProcessor(templates []TemplateConfig, defaultTemplate TemplateConfig) *metricProcessor {
 	templateTree := NewTree(getTemplateFromConfig(defaultTemplate))
 	for _, t := range templates {
 		templateTree.Insert(t.Filter, getTemplateFromConfig(t))
@@ -37,7 +37,7 @@ func NewMetricProcessor(templates []templateConfig, defaultTemplate templateConf
 	}
 }
 
-func getTemplateFromConfig(config templateConfig) template {
+func getTemplateFromConfig(config TemplateConfig) template {
 	return template{
 		Namespace: config.Namespace,
 		Tags:      config.Tags,
@@ -46,14 +46,14 @@ func getTemplateFromConfig(config templateConfig) template {
 	}
 }
 
-func (m *metricProcessor) AddTemplate(t templateConfig) {
+func (m *metricProcessor) AddTemplate(t TemplateConfig) {
 	m.Lock()
 	template := getTemplateFromConfig(t)
 	m.templates.Insert(t.Filter, template)
 	m.Unlock()
 }
 
-func (m *metricProcessor) RemoveTemplate(template templateConfig) {
+func (m *metricProcessor) RemoveTemplate(template TemplateConfig) {
 	m.Lock()
 	m.templates.Delete(template.Filter)
 	m.Unlock()

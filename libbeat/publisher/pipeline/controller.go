@@ -3,7 +3,7 @@ package pipeline
 import (
 	"github.com/elastic/beats/libbeat/logp"
 	"github.com/elastic/beats/libbeat/outputs"
-	"github.com/elastic/beats/libbeat/publisher/broker"
+	"github.com/elastic/beats/libbeat/publisher/queue"
 )
 
 // outputController manages the pipelines output capabilites, like:
@@ -14,7 +14,7 @@ type outputController struct {
 	logger   *logp.Logger
 	observer *observer
 
-	broker broker.Broker
+	queue queue.Queue
 
 	retryer  *retryer
 	consumer *eventConsumer
@@ -41,12 +41,12 @@ type outputWorker interface {
 func newOutputController(
 	log *logp.Logger,
 	observer *observer,
-	b broker.Broker,
+	b queue.Queue,
 ) *outputController {
 	c := &outputController{
 		logger:   log,
 		observer: observer,
-		broker:   b,
+		queue:    b,
 	}
 
 	ctx := &batchContext{}

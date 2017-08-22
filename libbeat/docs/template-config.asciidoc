@@ -8,19 +8,20 @@ Elasticsearch.
 
 You can adjust the following settings to load your own template or overwrite an existing one:
 
-*`enabled`*:: Set to false to disable template loading. If set this to false,
+*`setup.template.enabled`*:: Set to false to disable template loading. If set this to false,
 you must <<load-template-manually,load the template manually>>.
 
-*`name`*:: The name of the template. The default is +{beatname_lc}+.
+*`setup.template.name`*:: The name of the template. The default is +{beatname_lc}+. The version of the Beat will always be appended to the given name
+so the final name is `filebeat-%{[beat.version]}`
 
-*`fields`*:: The path to the YAML file describing the fields. The default is +fields.yml+. If a
+*`setup.template.fields`*:: The path to the YAML file describing the fields. The default is +fields.yml+. If a
 relative path is set, it is considered relative to the config path. See the <<directory-layout>>
 section for details.
 
-*`overwrite`*:: A boolean that specifies whether to overwrite the existing template. The default
+*`setup.template.overwrite`*:: A boolean that specifies whether to overwrite the existing template. The default
 is false.
 
-*`settings.index`*:: A dictionary of settings to place into the `settings.index` dictionary of the
+*`setup.template.settings`*:: A dictionary of settings to place into the `settings.index` dictionary of the
 Elasticsearch template. For more details about the available Elasticsearch mapping options, please
 see the Elasticsearch {elasticsearch}/mapping.html[mapping reference].
 +
@@ -36,7 +37,7 @@ setup.template.settings:
   index.number_of_replicas: 1
 ----------------------------------------------------------------------
 
-*`settings._source`*:: A dictionary of settings for the `_source` field. For the available settings,
+*`setup.template.settings._source`*:: A dictionary of settings for the `_source` field. For the available settings,
 please see the Elasticsearch {elasticsearch}/mapping-source-field.html[reference].
 +
 Example:

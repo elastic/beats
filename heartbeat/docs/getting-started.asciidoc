@@ -17,7 +17,9 @@ install, configure, and run Heartbeat:
 * <<heartbeat-installation>>
 * <<heartbeat-configuration>>
 * <<heartbeat-template>>
+* <<load-kibana-dashboards>>
 * <<heartbeat-starting>>
+* <<view-kibana-dashboards>>
 * <<command-line-options>>
 * <<directory-layout>>
 
@@ -171,7 +173,7 @@ heartbeat.monitors:
   schedule: '*/5 * * * * * *'
   hosts: ["myhost"]
 output.elasticsearch:
-  hosts: ["myhost:9200"]
+  hosts: ["myEShost:9200"]
 ----------------------------------------------------------------------
 
 To configure Heartbeat:
@@ -203,8 +205,9 @@ was started. Heartbeat adds the `@every` keyword to the syntax provided by the
 See <<configuring-howto-heartbeat>> for a full description of each
 configuration option.
 
-. If you are sending output to Elasticsearch, set the IP address and port where
-Heartbeat can find the Elasticsearch installation:
+. If you are sending output directly to Elasticsearch (and not using Logstash),
+set the IP address and port where Heartbeat can find the Elasticsearch
+installation:
 +
 [source,yaml]
 ----------------------------------------------------------------------
@@ -212,14 +215,16 @@ output.elasticsearch:
   hosts: ["192.168.1.42:9200"]
 ----------------------------------------------------------------------
 +
-If you are sending output to Logstash, see <<logstash-output>> instead.
+If you are sending output to Logstash, make sure you
+<<logstash-output,Configure the Logstash output>> instead.
 
-TIP: To test your configuration file, change to the directory where the
-Heartbeat binary is installed, and run Heartbeat in the foreground with
-the following options specified: +./heartbeat -configtest -e+. Make sure
-your config files are in the path expected by Heartbeat
-(see <<directory-layout>>). If you installed from DEB or RPM packages, run
-+./heartbeat.sh -configtest -e+.
+include::../../libbeat/docs/step-configure-kibana-endpoint.asciidoc[]
+
+include::../../libbeat/docs/step-configure-credentials.asciidoc[]
+
+include::../../libbeat/docs/step-test-config.asciidoc[]
+
+include::../../libbeat/docs/step-look-at-config.asciidoc[]
 
 [[heartbeat-template]]
 === Step 3: Load the index template in Elasticsearch
@@ -227,8 +232,14 @@ your config files are in the path expected by Heartbeat
 :allplatforms:
 include::../../libbeat/docs/shared-template-load.asciidoc[]
 
+[[load-kibana-dashboards]]
+=== Step 4: Set up the Kibana dashboards
+
+:allplatforms:
+include::../../libbeat/docs/dashboards.asciidoc[]
+
 [[heartbeat-starting]]
-=== Step 4: Start Heartbeat
+=== Step 5: Start Heartbeat
 
 Start Heartbeat by issuing the appropriate command for your platform.
 
@@ -240,14 +251,14 @@ start Heartbeat in the foreground.
 
 ["source","sh",subs="attributes"]
 ----------------------------------------------------------------------
-sudo /etc/init.d/heartbeat-elastic start
+sudo service {beatname_lc}-elastic start
 ----------------------------------------------------------------------
 
 *rpm:*
 
 ["source","sh",subs="attributes"]
 ----------------------------------------------------------------------
-sudo /etc/init.d/heartbeat-elastic start
+sudo service {beatname_lc}-elastic start
 ----------------------------------------------------------------------
 
 *mac:*
@@ -257,10 +268,10 @@ sudo /etc/init.d/heartbeat-elastic start
 sudo chown root heartbeat.yml <1>
 sudo ./heartbeat -e -c heartbeat.yml -d "publish"
 ----------------------------------------------------------------------
-<1> You'll be running Heartbeat as root, so you need to change ownership
-of the configuration file (see
+<1> You'll be running Heartbeat as root, so you need to change ownership of the
+configuration file, or run Heartbeat with `-strict.perms=false` specified. See
 {libbeat}/config-file-permissions.html[Config File Ownership and Permissions]
-in the _Beats Platform Reference_).
+in the _Beats Platform Reference_.
 
 *win:*
 
@@ -274,16 +285,22 @@ By default, Windows log files are stored in +C:\ProgramData\heartbeat\Logs+.
 Heartbeat is now ready to check the status of your services and send
 events to your defined output.
 
-[[heartbeat-sample-dashboards]]
-=== Step 5: Load sample Kibana dashboards
+[id="{beatname_lc}-passing-credentials"]
+==== Pass credentials
+
+:start-type: start
+include::../../libbeat/docs/shared-passing-credentials-setup.asciidoc[]
+
+[[view-kibana-dashboards]]
+=== Step 6: View the sample Kibana dashboards
 
 To make it easier for you to visualize the status of your services, we have
-created sample Heartbeat dashboards. The dashboards are provided as
-examples. We recommend that you
-http://www.elastic.co/guide/en/kibana/current/dashboard.html[customize] them
-to meet your needs.
+created example {beatname_uc} dashboards. You loaded the dashboards earlier when
+you ran the `setup` command.
+
+include::../../libbeat/docs/opendashboards.asciidoc[]
+
+The dashboards are provided as examples. We recommend that you
+{kibana-ref}/dashboard.html[customize] them to meet your needs.
 
 image:./images/heartbeat-statistics.png[Heartbeat statistics]
-
-:allplatforms:
-include::../../libbeat/docs/dashboards.asciidoc[]

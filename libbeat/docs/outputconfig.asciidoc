@@ -292,19 +292,13 @@ spooler size.
 
 The http request timeout in seconds for the Elasticsearch request. The default is 90.
 
-===== `flush_interval`
-
-The number of seconds to wait for new events between two bulk API index requests.
-If `bulk_max_size` is reached before this interval expires, additional bulk index
-requests are made.
-
 ===== `ssl`
 
 Configuration options for SSL parameters like the certificate authority to use
-for HTTPS-based connections. If the `tls` section is missing, the host CAs are used for HTTPS connections to
+for HTTPS-based connections. If the `ssl` section is missing, the host CAs are used for HTTPS connections to
 Elasticsearch.
 
-See <<configuration-output-ssl>> for more information.
+See <<configuration-ssl>> for more information.
 
 
 [[logstash-output]]
@@ -502,7 +496,7 @@ For example "{beatname_lc}" generates "[{beatname_lc}-]YYYY.MM.DD" indexes (for 
 ===== `ssl`
 
 Configuration options for SSL parameters like the root CA for Logstash connections. See
-<<configuration-output-ssl>> for more information. To use SSL, you must also configure the
+<<configuration-ssl>> for more information. To use SSL, you must also configure the
 https://www.elastic.co/guide/en/logstash/current/plugins-inputs-beats.html[Beats input plugin for Logstash] to use SSL/TLS.
 
 ===== `timeout`
@@ -731,14 +725,10 @@ The ACK reliability level required from broker. 0=no response, 1=wait for local 
 
 Note: If set to 0, no ACKs are returned by Kafka. Messages might be lost silently on error.
 
-===== `flush_interval`
-
-The number of seconds to wait for new events between two producer API calls.
-
 ===== `ssl`
 
 Configuration options for SSL parameters like the root CA for Kafka connections. See
-<<configuration-output-ssl>> for more information.
+<<configuration-ssl>> for more information.
 
 [[redis-output]]
 === Configure the Redis output
@@ -944,7 +934,7 @@ size.
 
 Configuration options for SSL parameters like the root CA for Redis connections
 guarded by SSL proxies (for example https://www.stunnel.org[stunnel]). See
-<<configuration-output-ssl>> for more information.
+<<configuration-ssl>> for more information.
 
 ===== `proxy_url`
 
@@ -1070,149 +1060,6 @@ setting does not affect how events are published.
 
 Setting `bulk_max_size` to 0 disables buffering in libbeat.
 
-[[configuration-output-ssl]]
-
-=== Configure SSL options
-
-++++
-<titleabbrev>SSL options</titleabbrev>
-++++
-
-You can specify SSL options for any output that supports SSL.
-
-Example configuration:
-
-[source,yaml]
-------------------------------------------------------------------------------
-output.elasticsearch:
-  hosts: ["192.168.1.42:9200"]
-  ssl.certificate_authorities: ["/etc/pki/root/ca.pem"]
-  ssl.certificate: "/etc/pki/client/cert.pem"
-  ssl.key: "/etc/pki/client/cert.key"
-------------------------------------------------------------------------------
-
-Also see <<configuring-ssl-logstash>>.
-
-==== Configuration options
-
-You can specify the following options in the `ssl` section of the +{beatname_lc}.yml+ config file:
-
-===== `enabled`
-
-The `enabled` setting can be used to disable the ssl configuration by setting
-it to `false`. The default value is `true`.
-
-Note: SSL settings are disabled if either `enabled` is set to `false` or the
-`ssl` section is missing.
-
-===== `certificate_authorities`
-
-The list of root certificates for server verifications. If `certificate_authorities` is empty or not set, the trusted certificate authorities of the host system are used.
-
-[[certificate]]
-
-===== `certificate: "/etc/pki/client/cert.pem"`
-
-The path to the certificate for SSL client authentication. If the certificate
-is not specified, client authentication is not available. The connection
-might fail if the server requests client authentication. If the SSL server does not
-require client authentication, the certificate will be loaded, but not requested or used
-by the server.
-
-When this option is configured, the <<certificate_key,`certificate_key`>> option is also required.
-
-[[certificate_key]]
-===== `key: "/etc/pki/client/cert.key"`
-
-The client certificate key used for client authentication. This option is required if <<certificate,`certificate`>> is specified.
-
-===== `key_passphrase`
-
-The passphrase used to decrypt an encrypted key stored in the configured `key` file.
-
-===== `supported_protocols`
-
-List of allowed SSL/TLS versions. If SSL/TLS server decides for protocol versions
-not configured, the connection will be dropped during or after the handshake. The
-setting is a list of allowed protocol versions:
-`SSLv3`, `TLSv1` for TLS version 1.0, `TLSv1.0`, `TLSv1.1` and `TLSv1.2`.
-
-The default value is `[TLSv1.0, TLSv1.1, TLSv1.2]`.
-
-===== `verification_mode`
-
-This option controls whether the client verifies server certificates and host
-names. The values `none` and `full` can be used. If `verification_mode` is set
-to `none`, all server host names and certificates are accepted. In this mode,
-TLS-based connections are susceptible to man-in-the-middle attacks. Use this
-option for testing only.
-
-The default is `full`.
-
-===== `cipher_suites`
-
-The list of cipher suites to use. The first entry has the highest priority.
-If this option is omitted, the Go crypto library's default
-suites are used (recommended).
-
-The following cipher suites are available:
-
-* RSA-RC4-128-SHA (disabled by default - RC4 not recommended)
-* RSA-3DES-CBC3-SHA
-* RSA-AES-128-CBC-SHA
-* RSA-AES-256-CBC-SHA
-* ECDHE-ECDSA-RC4-128-SHA (disabled by default - RC4 not recommended)
-* ECDHE-ECDSA-AES-128-CBC-SHA
-* ECDHE-ECDSA-AES-256-CBC-SHA
-* ECDHE-RSA-RC4-128-SHA (disabled by default- RC4 not recommended)
-* ECDHE-RSA-3DES-CBC3-SHA
-* ECDHE-RSA-AES-128-CBC-SHA
-* ECDHE-RSA-AES-256-CBC-SHA
-* ECDHE-RSA-AES-128-GCM-SHA256 (TLS 1.2 only)
-* ECDHE-ECDSA-AES-128-GCM-SHA256 (TLS 1.2 only)
-* ECDHE-RSA-AES-256-GCM-SHA384 (TLS 1.2 only)
-* ECDHE-ECDSA-AES-256-GCM-SHA384 (TLS 1.2 only)
-
-Here is a list of acronyms used in defining the cipher suites:
-
-* 3DES:
-  Cipher suites using triple DES
-
-* AES-128/256:
-  Cipher suites using AES with 128/256-bit keys.
-
-* CBC:
-  Cipher using Cipher Block Chaining as block cipher mode.
-
-* ECDHE:
-  Cipher suites using Elliptic Curve Diffie-Hellman (DH) ephemeral key exchange.
-
-* ECDSA:
-  Cipher suites using Elliptic Curve Digital Signature Algorithm for authentication.
-
-* GCM:
-  Galois/Counter mode is used for symmetric key cryptography.
-
-* RC4:
-  Cipher suites using RC4.
-
-* RSA:
-  Cipher suites using RSA.
-
-* SHA, SHA256, SHA384:
-  Cipher suites using SHA-1, SHA-256 or SHA-384.
-
-
-===== `curve_types`
-
-The list of curve types for ECDHE (Elliptic Curve Diffie-Hellman ephemeral key exchange).
-
-The following elliptic curve types are available:
-
-* P-256
-* P-384
-* P-521
-
 [[configuration-output-codec]]
 === Configure the ouput codec
 
@@ -1245,3 +1092,4 @@ output.console:
   codec.format:
     string: '%{[@timestamp]} %{[message]}'
 ------------------------------------------------------------------------------
+

@@ -37,11 +37,7 @@ because the options for auto loading the template are only available for the Ela
 
 ifdef::allplatforms[]
 
-TIP: To test your configuration file, change to the directory where the {beatname_uc}
-binary is installed, and run {beatname_uc} in the foreground with the following
-options specified: +./{beatname_lc} -configtest -e+. Make sure your config files are
-in the path expected by {beatname_uc} (see <<directory-layout>>). If you
-installed from DEB or RPM packages, run +./{beatname_lc}.sh -configtest -e+.
+include::../../libbeat/docs/step-test-config.asciidoc[]
 
 endif::allplatforms[]
 
@@ -49,7 +45,7 @@ ifdef::win[]
 
 TIP: To test your configuration file, change to the directory where the {beatname_uc}
 binary is installed, and run {beatname_uc} in the foreground with the following
-options specified: +.\winlogbeat.exe -c .\winlogbeat.yml -configtest -e+.
+options specified: +.\winlogbeat.exe test config -c .\winlogbeat.yml -e+.
 
 endif::win[]
 

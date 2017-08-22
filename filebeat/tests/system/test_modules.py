@@ -46,7 +46,8 @@ class Test(BaseTest):
             template_name="filebeat_modules",
             output=cfgfile,
             index_name=self.index_name,
-            elasticsearch_url=self.elasticsearch_url)
+            elasticsearch_url=self.elasticsearch_url
+        )
 
         for module in modules:
             path = os.path.join(self.modules_path, module)
@@ -63,6 +64,26 @@ class Test(BaseTest):
                         fileset=fileset,
                         test_file=test_file,
                         cfgfile=cfgfile)
+
+    def _test_expected_events(self, module, test_file, res, objects):
+        with open(test_file + "-expected.json", "r") as f:
+            expected = json.load(f)
+
+        if len(expected) > len(objects):
+            res = self.es.search(index=self.index_name,
+                                 body={"query": {"match_all": {}},
+                                       "size": len(expected)})
+            objects = [o["_source"] for o in res["hits"]["hits"]]
+
+        assert len(expected) == res['hits']['total'], "expected {} but got {}".format(len(expected), len(objects))
+
+        for ev in expected:
+            found = False
+            for obj in objects:
+                if ev["_source"][module] == obj[module]:
+                    found = True
+                    break
+            assert found, "The following expected object was not found: {}".format(obj)
 
     def run_on_file(self, module, fileset, test_file, cfgfile):
         print("Testing {}/{} on {}".format(module, fileset, test_file))
@@ -116,18 +137,7 @@ class Test(BaseTest):
                 self.assert_fields_are_documented(obj)
 
         if os.path.exists(test_file + "-expected.json"):
-            with open(test_file + "-expected.json", "r") as f:
-                expected = json.load(f)
-                assert len(expected) == len(objects), "expected {} but got {}".format(len(expected), len(objects))
-                for ev in expected:
-                    found = False
-                    for obj in objects:
-                        if ev["_source"][module] == obj[module]:
-                            found = True
-                            break
-                    if not found:
-                        raise Exception("The following expected object was" +
-                                        " not found: {}".format(obj))
+            self._test_expected_events(module, test_file, res, objects)
 
     @unittest.skipIf(not INTEGRATION_TESTS or
                      os.getenv("TESTING_ENVIRONMENT") == "2x",
@@ -152,6 +162,8 @@ class Test(BaseTest):
                 pipeline="estest",
                 index=index_name),
             pipeline="test",
+            setup_template_name=index_name,
+            setup_template_pattern=index_name + "*",
         )
 
         os.mkdir(self.working_dir + "/log/")

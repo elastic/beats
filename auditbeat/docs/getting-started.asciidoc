@@ -1,8 +1,6 @@
 [id="{beatname_lc}-getting-started"]
 == Getting started with {beatname_uc}
 
-//TODO: The getting started content needs to be changed to reflect changes in command-line syntax, dashboard loading, etc.
-
 To get started with your own {beatname_uc} setup, install and configure these
 related products:
 
@@ -19,8 +17,9 @@ install, configure, and run {beatname_uc}:
 * <<{beatname_lc}-installation>>
 * <<{beatname_lc}-configuration>>
 * <<{beatname_lc}-template>>
+* <<load-kibana-dashboards>>
 * <<{beatname_lc}-starting>>
-* <<{beatname_lc}-sample-dashboards>>
+* <<view-kibana-dashboards>>
 * <<command-line-options>>
 * <<directory-layout>>
 
@@ -152,54 +151,38 @@ auditbeat.modules:
 - module: audit
   metricsets: [file]
   file.paths:
-    binaries:
-    - /bin
-    - /usr/bin
-    - /sbin
-    - /usr/sbin
-    conf:
-    - /etc
+  - /bin
+  - /usr/bin
+  - /sbin
+  - /usr/sbin
+  - /etc
 -------------------------------------
 +
 If you accept the default configuration without specifying additional modules,
-{beatname_uc} uses a default configuration that's tailored to the operating system
-where {beatname_uc} is running.
+{beatname_uc} uses a configuration that's tailored to the operating system where
+{beatname_uc} is running.
 +
 See <<configuring-howto-{beatname_lc}>> for more details about configuring modules.
 
-. If you are sending output to Elasticsearch, set the IP address and port where
-{beatname_uc} can find the Elasticsearch installation:
+. If you are sending output to Elasticsearch (and not using Logstash), set the
+IP address and port where {beatname_uc} can find the Elasticsearch installation:
 +
 [source,yaml]
 ----------------------------------------------------------------------
 output.elasticsearch:
-  hosts: ["192.168.1.42:9200"]
+  hosts: ["127.0.0.1:9200"]
 ----------------------------------------------------------------------
 +
-If you are sending output to Logstash, see
+If you are sending output to Logstash, make sure you
 <<logstash-output,Configure the Logstash output>> instead.
 
-. If you plan to use the sample Kibana dashboards provided with {beatname_uc},
-configure the Kibana endpoint:
-+
-[source,yaml]
-----------------------------------------------------------------------
-setup.kibana:
-  host: "localhost:5601"
-----------------------------------------------------------------------
-+
---
-Where `host` is the hostname and port of the machine where Kibana is running,
-for example, `localhost:5601`.
+include::../../libbeat/docs/step-configure-kibana-endpoint.asciidoc[]
 
-TIP: If you specify a path after the port number, you need to include
-the scheme and port: `http://localhost:5601/path`.
+include::../../libbeat/docs/step-configure-credentials.asciidoc[]
 
---
+include::../../libbeat/docs/step-test-config.asciidoc[]
 
-//TODO: Add link that mentions security settings and points to docs about setup.kibana for more info.
-
-//REVIEWERS: Wondering if I should protocol, username, and password in the example. We tend to leave that out, but not sure if that's the best thing to do.
+include::../../libbeat/docs/step-look-at-config.asciidoc[]
 
 [id="{beatname_lc}-template"]
 === Step 3: Load the index template in Elasticsearch
@@ -207,8 +190,14 @@ the scheme and port: `http://localhost:5601/path`.
 :allplatforms:
 include::../../libbeat/docs/shared-template-load.asciidoc[]
 
+[[load-kibana-dashboards]]
+=== Step 4: Set up the Kibana dashboards
+
+:allplatforms:
+include::../../libbeat/docs/dashboards.asciidoc[]
+
 [id="{beatname_lc}-starting"]
-=== Step 4: Start {beatname_uc}
+=== Step 5: Start {beatname_uc}
 
 Run {beatname_uc} by issuing the appropriate command for your platform.
 
@@ -220,14 +209,14 @@ start {beatname_uc} in the foreground.
 
 ["source","sh",subs="attributes"]
 ----------------------------------------------------------------------
-sudo /etc/init.d/{beatname_lc} start
+sudo service {beatname_lc} start
 ----------------------------------------------------------------------
 
 *rpm:*
 
 ["source","sh",subs="attributes"]
 ----------------------------------------------------------------------
-sudo /etc/init.d/{beatname_lc} start
+sudo service {beatname_lc} start
 ----------------------------------------------------------------------
 
 *mac:*
@@ -238,9 +227,13 @@ sudo chown root {beatname_lc}.yml <1>
 sudo ./{beatname_lc} -e -c {beatname_lc}.yml -d "publish"
 ----------------------------------------------------------------------
 <1> To monitor system files, you'll be running {beatname_uc} as root, so you
-need to change ownership of the configuration file (see
+need to change ownership of the configuration file, or run {beatname_uc} with
+`-strict.perms=false` specified. See
 {libbeat}/config-file-permissions.html[Config File Ownership and Permissions]
-in the _Beats Platform Reference_).
+in the _Beats Platform Reference_.
+
+If you see a warning about too many open files, you need to increase the
+`ulimit`. See the <<ulimit,FAQ>> for more details.
 
 *win:*
 
@@ -250,6 +243,12 @@ PS C:{backslash}Program Files{backslash}{beatname_uc}> Start-Service {beatname_l
 ----------------------------------------------------------------------
 
 By default the log files are stored in +C:{backslash}ProgramData{backslash}{beatname_lc}{backslash}Logs+.
+
+[id="{beatname_lc}-passing-credentials"]
+==== Pass credentials
+
+:start-type: start
+include::../../libbeat/docs/shared-passing-credentials-setup.asciidoc[]
 
 ==== Test the {beatname_uc} installation
 
@@ -267,15 +266,18 @@ Elasticsearch instance.
 On Windows, if you don't have cURL installed, simply point your browser to the
 URL.
 
-[id="{beatname_lc}-sample-dashboards"]
-=== Step 5: Load sample Kibana dashboards
+[[view-kibana-dashboards]]
+=== Step 6: View the sample Kibana dashboards
 
 To make it easier for you to start auditing the activities of users and
-processes on your system, we have created sample {beatname_uc} dashboards.
+processes on your system, we have created example {beatname_uc} dashboards.
+You loaded the dashboards earlier when you ran the `setup` command.
+
+include::../../libbeat/docs/opendashboards.asciidoc[]
+
 The dashboards are provided as examples. We recommend that you
 {kibana-ref}/dashboard.html[customize] them to meet your needs.
 
 image:./images/auditbeat-file-integrity-dashboard.png[Auditbeat File Integrity Dashboard]
 
-:allplatforms:
-include::../../libbeat/docs/dashboards.asciidoc[]
+

@@ -4,24 +4,27 @@
 //// this file. When using cross references, make sure that the cross
 //// references resolve correctly for any files that include this one.
 //// Use the appropriate variables defined in the index.asciidoc file to
-//// resolve Beat names: beatname_uc and beatname_lc. This topic must
-//// be included under a level 3 header.
+//// resolve Beat names: beatname_uc and beatname_lc.
 //// Use the following include to pull this content into a doc file:
 //// include::../../libbeat/docs/dashboards.asciidoc[]
 //////////////////////////////////////////////////////////////////////////
 
 
-[[load-kibana-dashboards]]
-==== Set up the dashboards
-
 {beatname_uc} comes packaged with example Kibana dashboards, visualizations,
 and searches for visualizing {beatname_uc} data in Kibana. Before you can use
-the dashboards, you need to run the `setup` command to create the index
-pattern, +{beatname_lc}-*+, and load the dashboards into the Kibana index.
+the dashboards, you need to create the index  pattern, +{beatname_lc}-*+, and
+load the dashboards into Kibana. To do this, you can either run the `setup`
+command (as described here) or
+<<configuration-dashboards,configure dashboard loading>> in the
++{beatname_lc}.yml+ config file.
 
 NOTE: Starting with Beats 6.0.0, the dashboards are loaded via the Kibana API.
 This requires a Kibana endpoint configuration. You should have configured the
-endpoint earlier. If you didn't, configure it now.
+endpoint earlier when you
+<<{beatname_lc}-configuration,configured {beatname_uc}>>. If you didn't,
+configure it now.
+
+Make sure Kibana is running before you perform this step.
 
 To set up the Kibana dashboards for {beatname_uc}:
 
@@ -33,8 +36,15 @@ From the directory where you installed {beatname_uc}, run:
 
 ["source","sh",subs="attributes,callouts"]
 ----------------------------------------------------------------------
-./{beatname_lc} setup
+./{beatname_lc} setup --dashboards
 ----------------------------------------------------------------------
+
+ifeval::["{requires-sudo}"=="yes"]
+
+If you changed ownership of the config file to root, you'll need preface this
+command with `sudo`.
+
+endif::[]
 
 ifeval::["{beatname_lc}"!="auditbeat"]
 
@@ -42,7 +52,7 @@ ifeval::["{beatname_lc}"!="auditbeat"]
 
 ["source","sh",subs="attributes"]
 ----------------------------------------------------------------------
-docker run {dockerimage} setup
+docker run {dockerimage} setup --dashboards
 ----------------------------------------------------------------------
 
 endif::[]
@@ -60,24 +70,11 @@ and run:
 
 ["source","sh",subs="attributes,callouts"]
 ----------------------------------------------------------------------
-PS > {beatname_lc} setup
+PS > {beatname_lc} setup --dashboards
 ----------------------------------------------------------------------
 
+[[passing-credentials-dashboard-loading]]
+==== Pass credentials
 
-[[view-kibana-dashboards]]
-==== Open the dashboards in Kibana
-
-After loading the dashboards, launch the Kibana web interface by pointing your browser
-to port 5601. For example, http://127.0.0.1:5601[http://127.0.0.1:5601].
-
-On the *Discover* page, make sure that the predefined +{beatname_lc}-*+ index
-pattern is selected to see {beatname_uc} data.
-
-image:./images/kibana-created-indexes.png[Discover tab with index selected]
-
-To open the loaded dashboards, go to the *Dashboard* page and select the
-dashboard that you want to open.
-
-image:./images/kibana-navigation-vis.png[Navigation widget in Kibana]
-
-
+:start-type: setup-dashboards
+include::./shared-passing-credentials-setup.asciidoc[]

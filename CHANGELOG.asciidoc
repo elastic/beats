@@ -15,6 +15,13 @@ https://github.com/elastic/beats/compare/v6.0.0-beta1...master[Check the HEAD di
 *Affecting all Beats*
 
 - The log directory (`path.log`) for Windows services is now set to `C:\ProgramData\[beatname]\logs`. {issue}4764[4764]
+- Fail if removed setting output.X.flush_interval is explicitly configured.
+- Rename the `/usr/bin/beatname.sh` script (e.g. `metricbeat.sh`) to `/usr/bin/beatname`. {pull}4933[4933]
+- Beat does not start if elasticsearch index pattern was modified but not the template name and pattern. {issue}4769[4769]
+
+*Auditbeat*
+
+- Changed file metricset config to make `file.paths` a list instead of a dictionary. {pull}4796[4796]
 
 *Filebeat*
 
@@ -29,6 +36,14 @@ https://github.com/elastic/beats/compare/v6.0.0-beta1...master[Check the HEAD di
 ==== Bugfixes
 
 *Affecting all Beats*
+- Fix go plugins not loaded when beat starts {pull}4799[4799]
+- Eliminate deprecated _default_ mapping in 6.x {pull}4864[4864]
+- Register kubernetes `field_format` matcher and remove logger in `Encode` API {pull}4888[4888]
+- Add support for `initContainers` in `add_kubernetes_metadata` processor. {issue}4825[4825]
+
+*Auditbeat*
+
+- Fix `file.max_file_size` config option for the audit file metricset. {pull}4796[4796]
 
 *Filebeat*
 
@@ -36,11 +51,18 @@ https://github.com/elastic/beats/compare/v6.0.0-beta1...master[Check the HEAD di
 
 *Heartbeat*
 
+- Fix monitor.name being empty by default. {issue}4852[4852]
+- Fix wrong event timestamps. {issue}4851[4851]
+
 *Metricbeat*
 
 - Support `npipe` protocol (Windows) in Docker module. {pull}4751[4751]
+- Added missing mongodb configuration file to the `modules.d` folder. {pull}4870[4870]
+- Fix wrong MySQL CRUD queries timelion visualization {pull}4857[4857]
 
 *Packetbeat*
+
+- Update flow timestamp on each packet being received. {issue}4895[4895]
 
 *Winlogbeat*
 
@@ -48,7 +70,19 @@ https://github.com/elastic/beats/compare/v6.0.0-beta1...master[Check the HEAD di
 
 *Affecting all Beats*
 
+- Update init scripts to use the `test config` subcommand instead of the deprecated `-configtest` flag. {issue}4600[4600]
+- Get by default the credentials for connecting to Kibana from the Elasticsearch output configuration. {pull}4867[4867]
+- Move TCP UDP start up into `server.Start()` {pull}4903[4903]
+
+*Auditbeat*
+
+- Added `file.hash_types` config option for controlling the hash types. {pull}4796[4796]
+- Added the ability to specify byte unit suffixes to `file.max_file_size`. {pull}4796[4796]
+
 *Filebeat*
+
+- Add PostgreSQL module with slowlog support. {pull}4763[4763]
+- Add Kafka log module. {pull}4885[4885]
 
 *Heartbeat*
 
@@ -56,6 +90,10 @@ https://github.com/elastic/beats/compare/v6.0.0-beta1...master[Check the HEAD di
 
 - Add support to exclude labels from kubernetes pod metadata. {pull}4757[4757]
 - Add graphite protocol metricbeat module. {pull}4734[4734]
+- Add http server metricset to support push metrics via http. {pull}4770[4770]
+- Make config object public for graphite and http server {pull}4820[4820]
+- Add system uptime metricset. {issue}[4848[4848]
+- Add `filesystem.ignore_types` to system module for ignoring filesystem types. {issue}4685[4685]
 - Add experimental `queue` metricset to RabbitMQ module. {pull}4788[4788]
 
 *Packetbeat*
@@ -67,6 +105,8 @@ https://github.com/elastic/beats/compare/v6.0.0-beta1...master[Check the HEAD di
 ==== Deprecated
 
 *Affecting all Beats*
+
+- Fix pod name indexer to use both namespace, pod name to frame index key {pull}4775[4775]
 
 *Filebeat*
 
@@ -99,6 +139,7 @@ https://github.com/elastic/beats/compare/v6.0.0-alpha2...v6.0.0-beta1[View commi
 - Remove setting `queue_size` and `bulk_queue_size`. {pull}4650[4650]
 - Remove setting `dashboard.snapshot` and `dashboard.snapshot_url`. They are no longer needed because the
   dashboards are included in the packages by default. {pull}4675[4675]
+- Beats can no longer be launched from Windows Explorer (GUI), command line is required. {pull}4420[4420]
 
 *Heartbeat*
 
@@ -111,6 +152,7 @@ https://github.com/elastic/beats/compare/v6.0.0-alpha2...v6.0.0-beta1[View commi
   with the system process metricset. The documentation for these metrics already
   stated that on multi-core systems the percentages could be greater than 100%. {pull}4544[4544]
 - Remove filters setting from metricbeat modules. {pull}4699[4699]
+- Added `type` field to filesystem metrics. {pull}4717[4717]
 
 *Packetbeat*
 

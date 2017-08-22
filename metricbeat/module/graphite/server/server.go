@@ -1,7 +1,10 @@
 package server
 
 import (
+	"github.com/pkg/errors"
+
 	"github.com/elastic/beats/libbeat/common/cfgwarn"
+	"github.com/elastic/beats/libbeat/logp"
 	serverhelper "github.com/elastic/beats/metricbeat/helper/server"
 	"github.com/elastic/beats/metricbeat/helper/server/tcp"
 	"github.com/elastic/beats/metricbeat/helper/server/udp"
@@ -32,7 +35,7 @@ type MetricSet struct {
 func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
 	cfgwarn.Experimental("The graphite server metricset is experimental")
 
-	config := defaultGraphiteCollectorConfig()
+	config := DefaultGraphiteCollectorConfig()
 	if err := base.Module().UnpackConfig(&config); err != nil {
 		return nil, err
 	}
@@ -61,7 +64,12 @@ func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
 // Run method provides the Graphite server with a reporter with which events can be reported.
 func (m *MetricSet) Run(reporter mb.PushReporter) {
 	// Start event watcher
-	m.server.Start()
+	if err := m.server.Start(); err != nil {
+		err = errors.Wrap(err, "failed to start graphite server")
+		logp.Err("%v", err)
+		reporter.Error(err)
+		return
+	}
 
 	for {
 		select {

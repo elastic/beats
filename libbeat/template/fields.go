@@ -50,9 +50,11 @@ func (f Fields) process(path string, esVersion common.Version) common.MapStr {
 			} else {
 				newPath = path + "." + field.Name
 			}
-			mapping = common.MapStr{
-				"properties": field.Fields.process(newPath, esVersion),
+			mapping = common.MapStr{}
+			if field.Dynamic.value != nil {
+				mapping["dynamic"] = field.Dynamic.value
 			}
+			mapping["properties"] = field.Fields.process(newPath, esVersion)
 		default:
 			mapping = field.other()
 		}

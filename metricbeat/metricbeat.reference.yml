@@ -40,6 +40,7 @@ metricbeat.modules:
     - network         # Network IO
     - process         # Per process metrics
     - process_summary # Process summary
+    - uptime          # System Uptime
     #- core           # Per CPU core usage
     #- diskio         # Disk IO
     #- socket         # Sockets and connection info (linux only)
@@ -50,6 +51,11 @@ metricbeat.modules:
   # Configure the metric types that are included by these metricsets.
   cpu.metrics:  ["percentages"]  # The other available options are normalized_percentages and ticks.
   core.metrics: ["percentages"]  # The other available option is ticks.
+
+  # A list of filesystem types to ignore. The filesystem metricset will not
+  # collect data from filesystems matching any of the specified types, and
+  # fsstats will not include data from these filesystems in its summary stats.
+  #filesystem.ignore_types: []
 
   # These options allow you to filter out all processes that are not
   # in the top N by CPU or memory, in order to reduce the number of documents created.
@@ -77,6 +83,10 @@ metricbeat.modules:
   # A list of regular expressions used to whitelist environment variables
   # reported with the process metricset's events. Defaults to empty.
   #process.env.whitelist: []
+
+  # Include the cumulative CPU tick values with the process metrics. Defaults
+  # to false.
+  #process.include_cpu_ticks: false
 
   # Configure reverse DNS lookup on remote IP addresses in the socket metricset.
   #socket.reverse_lookup.enabled: false
@@ -184,6 +194,17 @@ metricbeat.modules:
   #method: "GET"
   #request.enabled: false
   #response.enabled: false
+
+- module: http
+  metricsets: ["server"]
+  host: "localhost"
+  port: "8080"
+  enabled: false
+#  paths:
+#    - path: "/foo"
+#      namespace: "foo"
+#      fields: # added to the the response in root. overwrites existing fields
+#        key: "value"
 
 #------------------------------- Jolokia Module ------------------------------
 - module: jolokia
@@ -567,6 +588,7 @@ output.elasticsearch:
 
   # Optional index name. The default is "metricbeat" plus date
   # and generates [metricbeat-]YYYY.MM.DD keys.
+  # In case you modify this pattern you must update setup.template.name and setup.template.pattern accordingly.
   #index: "metricbeat-%{[beat.version]}-%{+yyyy.MM.dd}"
 
   # Optional ingest node pipeline. By default no pipeline will be used.
@@ -593,11 +615,6 @@ output.elasticsearch:
 
   # Configure http request timeout before failing an request to Elasticsearch.
   #timeout: 90
-
-  # The number of seconds to wait for new events between two bulk API index requests.
-  # If `bulk_max_size` is reached before this interval expires, addition bulk index
-  # requests are made.
-  #flush_interval: 1s
 
   # Use SSL settings for HTTPS. Default is true.
   #ssl.enabled: true
@@ -797,9 +814,6 @@ output.elasticsearch:
   # If set to 0, no ACKs are returned by Kafka. Messages might be lost silently
   # on error.
   #required_acks: 1
-
-  # The number of seconds to wait for new events between two producer API calls.
-  #flush_interval: 1s
 
   # The configurable ClientID used for logging, debugging, and auditing
   # purposes.  The default is "beats".
@@ -1032,16 +1046,35 @@ output.elasticsearch:
 # Set to false to disable template loading.
 #setup.template.enabled: true
 
-# Template name. By default the template name is metricbeat.
-# The version of the beat will always be appended to the given name
-# so the final name is metricbeat-%{[beat.version]}.
-#setup.template.name: "metricbeat"
+# Template name. By default the template name is "metricbeat-%{[beat.version]}"
+# The template name and pattern has to be set in case the elasticsearch index pattern is modified.
+#setup.template.name: "metricbeat-%{[beat.version]}"
+
+# Template patttern. By default the template patter is "-%{[beat.version]}-*" to apply to the default index settings.
+# The first part is the version of the beat and then -* is used to match all daily indicies.
+# The template name and pattern has to be set in case the elasticsearch index pattern is modified.
+#setup.template.pattern: "metricbeat-%{[beat.version]}-*"
 
 # Path to fields.yml file to generate the template
 #setup.template.fields: "${path.config}/fields.yml"
 
 # Overwrite existing template
 #setup.template.overwrite: false
+
+# Elasticsearch template settings
+setup.template.settings:
+
+  # A dictionary of settings to place into the settings.index dictionary
+  # of the Elasticsearch template. For more details, please check
+  # https://www.elastic.co/guide/en/elasticsearch/reference/current/mapping.html
+  #index:
+    #number_of_shards: 1
+    #codec: best_compression
+
+  # A dictionary of settings for the _source field. For more details, please check
+  # https://www.elastic.co/guide/en/elasticsearch/reference/current/mapping-source-field.html
+  #_source:
+    #enabled: false
 
 #============================== Kibana =====================================
 

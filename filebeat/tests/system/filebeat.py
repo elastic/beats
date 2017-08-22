@@ -19,7 +19,7 @@ class BaseTest(TestCase):
     def get_registry(self):
         # Returns content of the registry file
         dotFilebeat = self.working_dir + '/registry'
-        assert os.path.isfile(dotFilebeat) is True
+        self.wait_until(cond=lambda: os.path.isfile(dotFilebeat))
 
         with open(dotFilebeat) as file:
             return json.load(file)

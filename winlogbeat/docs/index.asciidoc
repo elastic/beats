@@ -3,6 +3,7 @@
 include::../../libbeat/docs/version.asciidoc[]
 
 :libbeat: http://www.elastic.co/guide/en/beats/libbeat/{doc-branch}
+:kibana-ref: https://www.elastic.co/guide/en/kibana/{doc-branch}
 :beatsdevguide: http://www.elastic.co/guide/en/beats/devguide/{doc-branch}
 :packetbeat: http://www.elastic.co/guide/en/beats/packetbeat/{doc-branch}
 :metricbeat: http://www.elastic.co/guide/en/beats/metricbeat/{doc-branch}
@@ -23,9 +24,7 @@ include::../../libbeat/docs/contributing-to-beats.asciidoc[]
 
 include::./getting-started.asciidoc[]
 
-include::./command-line.asciidoc[]
-
-include::../../libbeat/docs/shared-directory-layout.asciidoc[]
+include::./setting-up-running.asciidoc[]
 
 include::./upgrading.asciidoc[]
 

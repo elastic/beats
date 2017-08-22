@@ -12,7 +12,6 @@ import (
 	"github.com/elastic/beats/libbeat/logp"
 	"github.com/elastic/beats/libbeat/monitoring"
 	"github.com/elastic/beats/libbeat/outputs/elasticsearch"
-	pub "github.com/elastic/beats/libbeat/publisher/beat"
 
 	"github.com/elastic/beats/filebeat/channel"
 	cfg "github.com/elastic/beats/filebeat/config"
@@ -83,10 +82,10 @@ func New(b *beat.Beat, rawConfig *common.Config) (beat.Beater, error) {
 	if !config.ConfigProspector.Enabled() && !config.ConfigModules.Enabled() && !haveEnabledProspectors {
 		if !b.InSetupCmd {
 			return nil, errors.New("No modules or prospectors enabled and configuration reloading disabled. What files do you want me to watch?")
-		} else {
-			// in the `setup` command, log this only as a warning
-			logp.Warn("Setup called, but no modules enabled.")
 		}
+
+		// in the `setup` command, log this only as a warning
+		logp.Warn("Setup called, but no modules enabled.")
 	}
 
 	if *once && config.ConfigProspector.Enabled() && config.ConfigModules.Enabled() {
@@ -177,7 +176,7 @@ func (fb *Filebeat) Run(b *beat.Beat) error {
 	// Make sure all events that were published in
 	registrarChannel := newRegistrarLogger(registrar)
 
-	err = b.Publisher.SetACKHandler(pub.PipelineACKHandler{
+	err = b.Publisher.SetACKHandler(beat.PipelineACKHandler{
 		ACKEvents: newEventACKer(registrarChannel).ackEvents,
 	})
 	if err != nil {

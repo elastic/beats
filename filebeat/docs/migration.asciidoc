@@ -220,7 +220,7 @@ output.logstash:
     <<loadbalance>> configuration option.
 <2> Note that if the `ssl` settings are missing, then SSL is disabled. SSL is
     automatically enabled when you add any of the `ssl` options. For more information about
-    specific configuration options, see <<configuration-output-ssl>>.
+    specific configuration options, see <<configuration-ssl>>.
 
 
 [[changed-configuration-options]]

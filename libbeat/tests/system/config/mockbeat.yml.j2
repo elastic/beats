@@ -65,7 +65,8 @@ setup.template:
   settings:
     index.number_of_shards: 1
     index.codec: best_compression
-
+  name: {{ es_template_name }}
+  pattern: {{ es_template_pattern }}
 #================================ Logging =====================================
 
 {% if metrics_period -%}

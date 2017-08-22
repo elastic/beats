@@ -13,7 +13,9 @@ services:
 
     # Wait for all services to be up and healthy.
     depends_on:
-      - proxy_dep
+      - proxy_dep1
+      - proxy_dep2
+      - proxy_dep3
 
     env_file:
       - ${PWD}/module/aerospike/_meta/env
@@ -41,7 +43,7 @@ services:
 
   # This is a proxy used to block beats until all services are healthy.
   # See: https://github.com/docker/compose/issues/4369
-  proxy_dep:
+  proxy_dep1:
     image: busybox
     depends_on:
       aerospike:      { condition: service_healthy }
@@ -52,6 +54,11 @@ services:
       elasticsearch:  { condition: service_healthy }
       haproxy:        { condition: service_healthy }
       http:           { condition: service_healthy }
+
+
+  proxy_dep2:
+    image: busybox
+    depends_on:
       jolokia:        { condition: service_healthy }
       kafka:          { condition: service_healthy }
       kibana:         { condition: service_healthy }
@@ -59,6 +66,10 @@ services:
       kube-state:     { condition: service_started }
       memcached:      { condition: service_healthy }
       mongodb:        { condition: service_healthy }
+
+  proxy_dep3:
+    image: busybox
+    depends_on:
       mysql:          { condition: service_healthy }
       nginx:          { condition: service_healthy }
       phpfpm:         { condition: service_healthy }
@@ -88,6 +99,8 @@ services:
     extends:
       file: ${ES_BEATS}/testing/environments/${TESTING_ENVIRONMENT}.yml
       service: elasticsearch
+    environment:
+      - "ES_JAVA_OPTS=-Xms90m -Xmx90m"
 
   haproxy:
     build: ${PWD}/module/haproxy/_meta
@@ -97,14 +110,20 @@ services:
 
   jolokia:
     build: ${PWD}/module/jolokia/_meta
+    depends_on:
+      - proxy_dep1
 
   kafka:
     build: ${PWD}/module/kafka/_meta
+    depends_on:
+      - proxy_dep1
 
   kibana:
     extends:
       file: ${ES_BEATS}/testing/environments/${TESTING_ENVIRONMENT}.yml
       service: kibana
+    depends_on:
+      - proxy_dep1
 
   kubernetes:
     build: ${PWD}/module/kubernetes/_meta
@@ -116,38 +135,62 @@ services:
       - /sys:/sys
       - /var/lib/docker:/var/lib/docker
       - /var/run:/var/run
+    depends_on:
+      - proxy_dep1
 
   kube-state:
     build:
       context: ${PWD}/module/kubernetes/_meta/
       dockerfile: Dockerfile.kube-state
+    depends_on:
+      - proxy_dep1
 
   memcached:
     build: ${PWD}/module/memcached/_meta
+    depends_on:
+      - proxy_dep1
 
   mongodb:
     build: ${PWD}/module/mongodb/_meta
+    depends_on:
+      - proxy_dep1
 
   mysql:
     build: ${PWD}/module/mysql/_meta
+    depends_on:
+      - proxy_dep2
 
   nginx:
     build: ${PWD}/module/nginx/_meta
+    depends_on:
+      - proxy_dep2
 
   phpfpm:
     build: ${PWD}/module/php_fpm/_meta
+    depends_on:
+      - proxy_dep2
 
   postgresql:
     build: ${PWD}/module/postgresql/_meta
+    depends_on:
+      - proxy_dep2
 
   prometheus:
     build: ${PWD}/module/prometheus/_meta
+    depends_on:
+      - proxy_dep2
 
   rabbitmq:
     build: ${PWD}/module/rabbitmq/_meta
+    depends_on:
+      - proxy_dep2
 
   redis:
     build: ${PWD}/module/redis/_meta
+    depends_on:
+      - proxy_dep2
 
   zookeeper:
     build: ${PWD}/module/zookeeper/_meta
+    depends_on:
+      - proxy_dep2

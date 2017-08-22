@@ -4,7 +4,7 @@
 [partintro]
 --
 Before modifying configuration settings, make sure you've completed the
-<<configuring-packetbeat,configuration steps>> in the Getting Started.
+<<packetbeat-configuration,configuration steps>> in the Getting Started.
 This section describes some common use cases for changing configuration options.
 
 To configure {beatname_uc}, you edit the configuration file. For rpm and deb,
@@ -25,10 +25,12 @@ The following topics describe how to configure Packetbeat:
 * <<configuration-processes>>
 * <<configuration-general-options>>
 * <<configuring-output>>
+* <<configuration-ssl>>
 * <<filtering-and-enhancing-data>>
 * <<configuring-ingest-node>>
 * <<packetbeat-geoip>>
 * <<configuration-path>>
+* <<setup-kibana-endpoint>>
 * <<configuration-dashboards>>
 * <<configuration-template>>
 * <<configuration-logging>>
@@ -45,6 +47,8 @@ include::./packetbeat-general-options.asciidoc[]
 :allplatforms:
 include::../../libbeat/docs/outputconfig.asciidoc[]
 
+include::../../libbeat/docs/shared-ssl-config.asciidoc[]
+
 include::./packetbeat-filtering.asciidoc[]
 
 include::../../libbeat/docs/shared-config-ingest.asciidoc[]
@@ -52,6 +56,8 @@ include::../../libbeat/docs/shared-config-ingest.asciidoc[]
 include::./packetbeat-geoip.asciidoc[]
 
 include::../../libbeat/docs/shared-path-config.asciidoc[]
+
+include::../../libbeat/docs/shared-kibana-config.asciidoc[]
 
 include::../../libbeat/docs/setup-config.asciidoc[]
 
