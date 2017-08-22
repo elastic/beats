@@ -47,13 +47,14 @@ func OverwriteSettings(cfg *common.Config) error {
 	}
 
 	// Before enabling the ES output, check that no other output is enabled
-	outputCfg, _ := cfg.Child("output", -1)
-	if outputCfg != nil {
-		var namespace common.ConfigNamespace
-		outputCfg.Unpack(&namespace)
-		if namespace.Name() != "" && namespace.Name() != "elasticsearch" {
-			return errors.Errorf("The cloud.id setting enables the Elasticsearch output, but you already have the %s output enabled in the config", namespace.Name())
-		}
+	tmp := struct {
+		Output common.ConfigNamespace `config:"output"`
+	}{}
+	if err := cfg.Unpack(&tmp); err != nil {
+		return err
+	}
+	if out := tmp.Output; out.IsSet() && out.Name() != "elasticsearch" {
+		return errors.Errorf("The cloud.id setting enables the Elasticsearch output, but you already have the %s output enabled in the config", out.Name())
 	}
 
 	err = cfg.SetChild("output.elasticsearch.hosts", -1, esURLConfig)
