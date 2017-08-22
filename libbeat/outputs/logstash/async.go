@@ -16,7 +16,7 @@ type asyncClient struct {
 	*transport.Client
 	stats  *outputs.Stats
 	client *v2.AsyncClient
-	win    window
+	win    *window
 
 	connect func() error
 }
@@ -36,10 +36,14 @@ func newAsyncClient(
 	stats *outputs.Stats,
 	config *Config,
 ) (*asyncClient, error) {
-	c := &asyncClient{}
-	c.Client = conn
-	c.stats = stats
-	c.win.init(defaultStartMaxWindowSize, config.BulkMaxSize)
+	c := &asyncClient{
+		Client: conn,
+		stats:  stats,
+	}
+
+	if config.SlowStart {
+		c.win = newWindower(defaultStartMaxWindowSize, config.BulkMaxSize)
+	}
 
 	if config.TTL != 0 {
 		logp.Warn(`The async Logstash client does not support the "ttl" option`)
@@ -99,9 +103,11 @@ func (c *asyncClient) Close() error {
 	return c.Client.Close()
 }
 
+/*
 func (c *asyncClient) BatchSize() int {
 	return c.win.get()
 }
+*/
 
 func (c *asyncClient) Publish(batch publisher.Batch) error {
 	st := c.stats
@@ -113,24 +119,29 @@ func (c *asyncClient) Publish(batch publisher.Batch) error {
 		return nil
 	}
 
-	window := make([]interface{}, len(events))
-	for i := range events {
-		window[i] = &events[i]
-	}
-
 	ref := &msgRef{
 		client:    c,
 		count:     atomic.MakeUint32(1),
 		batch:     batch,
 		slice:     events,
 		batchSize: len(events),
-		win:       &c.win,
+		win:       c.win,
 		err:       nil,
 	}
 	defer ref.dec()
 
 	for len(events) > 0 {
-		n, err := c.publishWindowed(ref, events)
+		var (
+			n   int
+			err error
+		)
+
+		if c.win == nil {
+			n = len(events)
+			err = c.sendEvents(ref, events)
+		} else {
+			n, err = c.publishWindowed(ref, events)
+		}
 
 		debugf("%v events out of %v events sent to logstash. Continue sending",
 			n, len(events))
@@ -188,7 +199,9 @@ func (r *msgRef) callback(seq uint32, err error) {
 func (r *msgRef) done(n uint32) {
 	r.client.stats.Acked(int(n))
 	r.slice = r.slice[n:]
-	r.win.tryGrowWindow(r.batchSize)
+	if r.win != nil {
+		r.win.tryGrowWindow(r.batchSize)
+	}
 	r.dec()
 }
 
@@ -197,7 +210,9 @@ func (r *msgRef) fail(n uint32, err error) {
 		r.err = err
 	}
 	r.slice = r.slice[n:]
-	r.win.shrinkWindow()
+	if r.win != nil {
+		r.win.shrinkWindow()
+	}
 
 	r.client.stats.Acked(int(n))
 
