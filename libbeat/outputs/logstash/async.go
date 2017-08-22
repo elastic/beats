@@ -103,12 +103,6 @@ func (c *asyncClient) Close() error {
 	return c.Client.Close()
 }
 
-/*
-func (c *asyncClient) BatchSize() int {
-	return c.win.get()
-}
-*/
-
 func (c *asyncClient) Publish(batch publisher.Batch) error {
 	st := c.stats
 	events := batch.Events()
