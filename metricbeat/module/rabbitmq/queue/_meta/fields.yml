@@ -41,6 +41,7 @@
         Number of consumers.
     - name: consumers.utilisation.pct
       type: long
+      format: percentage
       description: >
         Fraction of the time (between 0.0 and 1.0) that the queue is able to immediately deliver messages to consumers. This can be less than 1.0 if consumers are limited by network congestion or prefetch count.
     - name: messages.total.count
@@ -61,6 +62,7 @@
         Total number of persistent messages in the queue (will always be 0 for transient queues).
     - name: memory.bytes
       type: long
+      format: bytes
       description: >
         Bytes of memory consumed by the Erlang process associated with the queue, including stack, heap and internal structures.
     - name: disk.reads.count
