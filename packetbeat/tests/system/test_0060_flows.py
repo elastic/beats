@@ -1,6 +1,7 @@
 from packetbeat import (BaseTest, FLOWS_REQUIRED_FIELDS)
 
 from pprint import PrettyPrinter
+from datetime import datetime
 
 
 pprint = lambda x: PrettyPrinter().pprint(x)
@@ -9,6 +10,10 @@ pprint = lambda x: PrettyPrinter().pprint(x)
 def check_fields(flow, fields):
     for k, v in fields.iteritems():
         assert flow[k] == v
+
+
+def parse_timestamp(ts):
+    return datetime.strptime(ts, "%Y-%m-%dT%H:%M:%S.%fZ")
 
 
 class Test(BaseTest):
@@ -42,6 +47,10 @@ class Test(BaseTest):
             'dest.stats.net_packets_total': 10,
             'dest.stats.net_bytes_total': 181133,
         })
+
+        start_ts = parse_timestamp(objs[0]['start_time'])
+        last_ts = parse_timestamp(objs[0]['last_time'])
+        assert last_ts > start_ts
 
     def test_memcache_udp_flow(self):
         self.render_config_template(
