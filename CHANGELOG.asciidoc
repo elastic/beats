@@ -70,6 +70,7 @@ https://github.com/elastic/beats/compare/v6.0.0-beta1...master[Check the HEAD di
 
 *Affecting all Beats*
 
+- Add setting to enable/disable the slow start in logstash output. {pull}4972[4972]
 - Update init scripts to use the `test config` subcommand instead of the deprecated `-configtest` flag. {issue}4600[4600]
 - Get by default the credentials for connecting to Kibana from the Elasticsearch output configuration. {pull}4867[4867]
 - Move TCP UDP start up into `server.Start()` {pull}4903[4903]
