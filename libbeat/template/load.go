@@ -80,7 +80,7 @@ func (l *Loader) Load() error {
 // template if it exists. If you wish to not overwrite an existing template
 // then use CheckTemplate prior to calling this method.
 func (l *Loader) LoadTemplate(templateName string, template map[string]interface{}) error {
-	logp.Info("load template: %s", templateName)
+	logp.Debug("template", "Try loading template with name: %s", templateName)
 	path := "/_template/" + templateName
 	body, err := l.client.LoadJSON(path, template)
 	if err != nil {
