@@ -41,7 +41,7 @@ class TestProcessors(metricbeat.BaseTest):
         print(cpu.keys())
         self.assertItemsEqual(self.de_dot([
             "system", "cores", "user", "softirq", "iowait",
-            "idle", "irq", "steal", "nice"
+            "idle", "irq", "steal", "nice", "total"
         ]), cpu.keys())
 
     def test_dropfields_with_condition(self):
