@@ -14,7 +14,7 @@
       },
       "id": "PostgreSQL Query Count and Duration",
       "type": "visualization",
-      "version": 2
+      "version": 1
     },
     {
       "attributes": {
@@ -38,7 +38,7 @@
       },
       "id": "Slow PostgreSQL Queries",
       "type": "search",
-      "version": 3
+      "version": 1
     },
     {
       "attributes": {
@@ -62,7 +62,7 @@
       },
       "id": "PostgreSQL Query Durations",
       "type": "search",
-      "version": 2
+      "version": 1
     },
     {
       "attributes": {
@@ -80,7 +80,7 @@
       },
       "id": "e4c5f230-87f3-11e7-ad9c-db80de0bf8d3",
       "type": "dashboard",
-      "version": 2
+      "version": 1
     }
   ],
   "version": "6.0.0-beta1-SNAPSHOT"

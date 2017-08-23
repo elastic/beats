@@ -7,14 +7,14 @@
           "searchSourceJSON": "{\"filter\":[]}"
         },
         "savedSearchId": "PostgreSQL All Logs",
-        "title": "PostgreSQL Log Level Count",
+        "title": "Log Level Count [Filebeat PostgreSQL]",
         "uiStateJSON": "{\"vis\":{\"params\":{\"sort\":{\"columnIndex\":null,\"direction\":null}}}}",
         "version": 1,
-        "visState": "{\"title\":\"PostgreSQL Log Level Count\",\"type\":\"table\",\"params\":{\"perPage\":10,\"showPartialRows\":false,\"showMeticsAtAllLevels\":false,\"sort\":{\"columnIndex\":null,\"direction\":null},\"showTotal\":false,\"totalFunc\":\"sum\"},\"aggs\":[{\"id\":\"1\",\"enabled\":true,\"type\":\"count\",\"schema\":\"metric\",\"params\":{}},{\"id\":\"2\",\"enabled\":true,\"type\":\"terms\",\"schema\":\"bucket\",\"params\":{\"field\":\"postgresql.log.level\",\"size\":12,\"order\":\"desc\",\"orderBy\":\"1\"}}]}"
+        "visState": "{\"title\":\"Log Level Count [Filebeat PostgreSQL]\",\"type\":\"table\",\"params\":{\"perPage\":10,\"showPartialRows\":false,\"showMeticsAtAllLevels\":false,\"sort\":{\"columnIndex\":null,\"direction\":null},\"showTotal\":false,\"totalFunc\":\"sum\"},\"aggs\":[{\"id\":\"1\",\"enabled\":true,\"type\":\"count\",\"schema\":\"metric\",\"params\":{}},{\"id\":\"2\",\"enabled\":true,\"type\":\"terms\",\"schema\":\"bucket\",\"params\":{\"field\":\"postgresql.log.level\",\"size\":12,\"order\":\"desc\",\"orderBy\":\"1\"}}]}"
       },
       "id": "PostgreSQL Log Level Count",
       "type": "visualization",
-      "version": 1
+      "version": 2
     },
     {
       "attributes": {
@@ -39,7 +39,7 @@
       },
       "id": "PostgreSQL All Logs",
       "type": "search",
-      "version": 2
+      "version": 1
     },
     {
       "attributes": {
