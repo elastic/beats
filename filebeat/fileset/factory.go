@@ -14,7 +14,7 @@ import (
 
 // Factory for modules
 type Factory struct {
-	outlet                channel.OutleterFactory
+	outlet                channel.Factory
 	registrar             *registrar.Registrar
 	beatVersion           string
 	pipelineLoaderFactory PipelineLoaderFactory
@@ -30,7 +30,7 @@ type prospectorsRunner struct {
 }
 
 // NewFactory instantiates a new Factory
-func NewFactory(outlet channel.OutleterFactory, registrar *registrar.Registrar, beatVersion string,
+func NewFactory(outlet channel.Factory, registrar *registrar.Registrar, beatVersion string,
 	pipelineLoaderFactory PipelineLoaderFactory, beatDone chan struct{}) *Factory {
 	return &Factory{
 		outlet:                outlet,

@@ -31,7 +31,7 @@ type Prospector struct {
 }
 
 // NewProspector creates a new redis prospector
-func NewProspector(cfg *common.Config, outletFactory channel.OutleterFactory, context prospector.Context) (prospector.Prospectorer, error) {
+func NewProspector(cfg *common.Config, outletFactory channel.Factory, context prospector.Context) (prospector.Prospectorer, error) {
 	cfgwarn.Experimental("Redis slowlog prospector is enabled.")
 
 	config := defaultConfig

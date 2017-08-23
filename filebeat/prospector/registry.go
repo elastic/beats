@@ -15,7 +15,7 @@ type Context struct {
 	BeatDone chan struct{}
 }
 
-type Factory func(config *common.Config, outletFactory channel.OutleterFactory, context Context) (Prospectorer, error)
+type Factory func(config *common.Config, outletFactory channel.Factory, context Context) (Prospectorer, error)
 
 var registry = make(map[string]Factory)
 

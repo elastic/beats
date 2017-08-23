@@ -50,7 +50,7 @@ type Prospector struct {
 // NewProspector instantiates a new Log
 func NewProspector(
 	cfg *common.Config,
-	outlet channel.OutleterFactory,
+	outlet channel.Factory,
 	context prospector.Context,
 ) (prospector.Prospectorer, error) {
 

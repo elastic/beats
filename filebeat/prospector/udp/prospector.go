@@ -22,7 +22,7 @@ type Prospector struct {
 	outlet    channel.Outleter
 }
 
-func NewProspector(cfg *common.Config, outlet channel.OutleterFactory, context prospector.Context) (prospector.Prospectorer, error) {
+func NewProspector(cfg *common.Config, outlet channel.Factory, context prospector.Context) (prospector.Prospectorer, error) {
 	cfgwarn.Experimental("UDP prospector type is used")
 
 	out, err := outlet(cfg)

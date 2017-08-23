@@ -10,13 +10,13 @@ import (
 
 // RegistrarContext is a factory for registrars
 type RegistrarContext struct {
-	outlet    channel.OutleterFactory
+	outlet    channel.Factory
 	registrar *registrar.Registrar
 	beatDone  chan struct{}
 }
 
 // NewRegistrarContext instantiates a new RegistrarContext
-func NewRegistrarContext(outlet channel.OutleterFactory, registrar *registrar.Registrar, beatDone chan struct{}) *RegistrarContext {
+func NewRegistrarContext(outlet channel.Factory, registrar *registrar.Registrar, beatDone chan struct{}) *RegistrarContext {
 	return &RegistrarContext{
 		outlet:    outlet,
 		registrar: registrar,

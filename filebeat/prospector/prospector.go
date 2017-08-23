@@ -33,7 +33,7 @@ type Prospector struct {
 // NewProspector instantiates a new prospector
 func NewProspector(
 	conf *common.Config,
-	outlet channel.OutleterFactory,
+	outlet channel.Factory,
 	beatDone chan struct{},
 	states []file.State,
 ) (*Prospector, error) {
