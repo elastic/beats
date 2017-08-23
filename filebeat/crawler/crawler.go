@@ -13,6 +13,8 @@ import (
 	"github.com/elastic/beats/libbeat/common"
 	"github.com/elastic/beats/libbeat/common/cfgwarn"
 	"github.com/elastic/beats/libbeat/logp"
+
+	_ "github.com/elastic/beats/filebeat/include"
 )
 
 type Crawler struct {
@@ -56,9 +58,9 @@ func (c *Crawler) Start(r *registrar.Registrar, configProspectors *common.Config
 		cfgwarn.Beta("Loading separate prospectors is enabled.")
 
 		c.prospectorsReloader = cfgfile.NewReloader(configProspectors)
-		prospectorsFactory := prospector.NewFactory(c.out, r, c.beatDone)
+		registrarContext := prospector.NewRegistrarContext(c.out, r, c.beatDone)
 		go func() {
-			c.prospectorsReloader.Run(prospectorsFactory)
+			c.prospectorsReloader.Run(registrarContext)
 		}()
 	}
 
