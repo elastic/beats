@@ -76,6 +76,8 @@ https://github.com/elastic/beats/compare/v6.0.0-beta1...master[Check the HEAD di
 - Get by default the credentials for connecting to Kibana from the Elasticsearch output configuration. {pull}4867[4867]
 - Move TCP UDP start up into `server.Start()` {pull}4903[4903]
 - Added `cloud.id` and `cloud.auth` settings, for simplifying using Beats with the Elastic Cloud. {issue}4959[4959]
+- Add lz4 compression support to kafka output. {pull}4977[4977]
+- Add newer kafka versions to kafka output. {pull}4977[4977]
 
 *Auditbeat*
 
