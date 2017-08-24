@@ -160,8 +160,8 @@ func (*parser) parseHTTPLine(s *stream, m *message) (cont, ok, complete bool) {
 		}
 	} else {
 		// REQUEST
-		slices := bytes.Fields(fline)
-		if len(slices) != 3 {
+			slices := bytes.Fields(fline)
+		if len(slices) < 2 {
 			if isDebug {
 				debugf("Couldn't understand HTTP request: %s", fline)
 			}
@@ -169,11 +169,18 @@ func (*parser) parseHTTPLine(s *stream, m *message) (cont, ok, complete bool) {
 		}
 
 		m.method = common.NetString(slices[0])
-		m.requestURI = common.NetString(slices[1])
-
-		if bytes.Equal(slices[2][:5], []byte("HTTP/")) {
+		if len(slices) > 3 {
+			for k := 1; k < len(slices)-1; k++ {
+				m.requestURI += slices[k] + " "
+			}
+		}
+		else {
+			m.requestURI = common.NetString(slices[1:2])
+		}
+		
+		if bytes.Equal(slices[len(slice1)-1][:5], []byte("HTTP/")) {
 			m.isRequest = true
-			version = slices[2][5:]
+			version = slices[len(slice1)-1]][5:]
 		} else {
 			if isDebug {
 				debugf("Couldn't understand HTTP version: %s", fline)
