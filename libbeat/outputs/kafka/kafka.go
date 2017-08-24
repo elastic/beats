@@ -48,7 +48,7 @@ var (
 // TODO: remove me.
 // Compat version overwrite for missing versions in sarama
 // Public API is compatible between these versions.
-const (
+var (
 	v0_10_2_1 = sarama.V0_10_2_0
 	v0_11_0_0 = sarama.V0_10_2_0
 )
