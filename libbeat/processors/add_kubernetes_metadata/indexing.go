@@ -178,8 +178,9 @@ func (m *Matchers) MetadataIndex(event common.MapStr) string {
 }
 
 type GenDefaultMeta struct {
-	annotations []string
-	labels      []string
+	annotations   []string
+	labels        []string
+	labelsExclude []string
 }
 
 // GenerateMetaData generates default metadata for the given pod taking to account certain filters
@@ -193,6 +194,11 @@ func (g *GenDefaultMeta) GenerateMetaData(pod *Pod) common.MapStr {
 		}
 	} else {
 		labelMap = generateMapSubset(pod.Metadata.Labels, g.labels)
+	}
+
+	// Exclude any labels that are present in the exclude_labels config
+	for _, label := range g.labelsExclude {
+		delete(labelMap, label)
 	}
 
 	annotationsMap = generateMapSubset(pod.Metadata.Annotations, g.annotations)

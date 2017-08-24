@@ -78,6 +78,7 @@ https://github.com/elastic/beats/compare/v6.0.0-beta1...master[Check the HEAD di
 *Metricbeat*
 
 - Add `filesystem.ignore_types` to system module for ignoring filesystem types. {issue}4685[4685]
+- Add support to exclude labels from kubernetes pod metadata. {pull}4757[4757]
 
 *Packetbeat*
 
