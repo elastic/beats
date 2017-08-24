@@ -13,8 +13,8 @@
         "epoch": 272
       },
       "traffic": {
-        "read_bytes_sec": 0,
-        "read_op_per_sec": 0,
+        "read_bytes_sec": 55667788,
+        "read_op_per_sec": 1234,
         "write_bytes_sec": 11996158,
         "write_op_per_sec": 10
       },
@@ -34,10 +34,10 @@
         "bytes_total": 12838682624,
         "bytes_used": 2822270976
       },
-	  "cluster_status": {
-        "count": 67,
-        "state_name": "active+remapped",
-	    "version": 806
+	  "pg_state": {
+          "state_name": "undersized+degraded+peered",
+          "version": 856,
+          "count": 214
       }
     }
   },
