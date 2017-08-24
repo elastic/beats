@@ -36,7 +36,7 @@ func (o *outlet) OnEvent(d *util.Data) bool {
 
 	event := d.GetEvent()
 	if d.HasState() {
-		event.Private = d
+		event.Private = d.GetState()
 	}
 
 	if o.wg != nil {

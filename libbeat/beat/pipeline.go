@@ -58,13 +58,14 @@ type ClientConfig struct {
 	// by the pipeline.
 	ACKCount func(int)
 
-	// ACKEvents reports the events recently acknowledged by the pipeline.
+	// ACKEvents reports the events private data of recently acknowledged events.
 	// Note: The slice passed must be copied if the events are to be processed
 	//       after the handler returns.
-	ACKEvents func([]Event)
+	ACKEvents func([]interface{})
 
 	// ACKLastEvent reports the last ACKed event out of a batch of ACKed events only.
-	ACKLastEvent func(Event)
+	// Only the events 'Private' field will be reported.
+	ACKLastEvent func(interface{})
 }
 
 // ClientEventer provides access to internal client events.
@@ -84,10 +85,12 @@ type PipelineACKHandler struct {
 	ACKCount func(int)
 
 	// ACKEvents reports the events recently acknowledged by the pipeline.
-	ACKEvents func([]Event)
+	// Only the events 'Private' field will be reported.
+	ACKEvents func([]interface{})
 
 	// ACKLastEvent reports the last ACKed event per pipeline client.
-	ACKLastEvents func([]Event)
+	// Only the events 'Private' field will be reported.
+	ACKLastEvents func([]interface{})
 }
 
 type ProcessorList interface {
