@@ -14,7 +14,7 @@ type syncClient struct {
 	*transport.Client
 	client *v2.SyncClient
 	stats  *outputs.Stats
-	win    window
+	win    *window
 	ttl    time.Duration
 	ticker *time.Ticker
 }
@@ -24,11 +24,15 @@ func newSyncClient(
 	stats *outputs.Stats,
 	config *Config,
 ) (*syncClient, error) {
-	c := &syncClient{}
-	c.Client = conn
-	c.ttl = config.TTL
-	c.stats = stats
-	c.win.init(defaultStartMaxWindowSize, config.BulkMaxSize)
+	c := &syncClient{
+		Client: conn,
+		stats:  stats,
+		ttl:    config.TTL,
+	}
+
+	if config.SlowStart {
+		c.win = newWindower(defaultStartMaxWindowSize, config.BulkMaxSize)
+	}
 	if c.ttl > 0 {
 		c.ticker = time.NewTicker(c.ttl)
 	}
@@ -95,13 +99,25 @@ func (c *syncClient) Publish(batch publisher.Batch) error {
 					batch.Retry()
 					return err
 				}
+
 				// reset window size on reconnect
-				c.win.windowSize = int32(defaultStartMaxWindowSize)
+				if c.win != nil {
+					c.win.windowSize = int32(defaultStartMaxWindowSize)
+				}
 			default:
 			}
 		}
 
-		n, err := c.publishWindowed(events)
+		var (
+			n   int
+			err error
+		)
+
+		if c.win == nil {
+			n, err = c.sendEvents(events)
+		} else {
+			n, err = c.publishWindowed(events)
+		}
 		events = events[n:]
 		st.Acked(n)
 
@@ -112,7 +128,9 @@ func (c *syncClient) Publish(batch publisher.Batch) error {
 			// return batch to pipeline before reporting/counting error
 			batch.RetryEvents(events)
 
-			c.win.shrinkWindow()
+			if c.win != nil {
+				c.win.shrinkWindow()
+			}
 			_ = c.Close()
 
 			logp.Err("Failed to publish events caused by: %v", err)
