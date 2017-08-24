@@ -8,7 +8,6 @@ import (
 	"sync"
 
 	"github.com/elastic/beats/filebeat/input/file"
-	"github.com/elastic/beats/filebeat/util"
 	helper "github.com/elastic/beats/libbeat/common/file"
 	"github.com/elastic/beats/libbeat/logp"
 	"github.com/elastic/beats/libbeat/monitoring"
@@ -16,7 +15,7 @@ import (
 )
 
 type Registrar struct {
-	Channel      chan []*util.Data
+	Channel      chan []file.State
 	out          successLogger
 	done         chan struct{}
 	registryFile string       // Path to the Registry File
@@ -25,7 +24,7 @@ type Registrar struct {
 }
 
 type successLogger interface {
-	Published(events []*util.Data) bool
+	Published(n int) bool
 }
 
 var (
@@ -40,7 +39,7 @@ func New(registryFile string, out successLogger) (*Registrar, error) {
 		registryFile: registryFile,
 		done:         make(chan struct{}),
 		states:       file.NewStates(),
-		Channel:      make(chan []*util.Data, 1),
+		Channel:      make(chan []file.State, 1),
 		out:          out,
 		wg:           sync.WaitGroup{},
 	}
@@ -155,15 +154,15 @@ func (r *Registrar) Run() {
 		case <-r.done:
 			logp.Info("Ending Registrar")
 			return
-		case events := <-r.Channel:
-			r.onEvents(events)
+		case states := <-r.Channel:
+			r.onEvents(states)
 		}
 	}
 }
 
 // onEvents processes events received from the publisher pipeline
-func (r *Registrar) onEvents(events []*util.Data) {
-	r.processEventStates(events)
+func (r *Registrar) onEvents(states []file.State) {
+	r.processEventStates(states)
 
 	beforeCount := r.states.Count()
 	cleanedStates := r.states.Cleanup()
@@ -178,21 +177,16 @@ func (r *Registrar) onEvents(events []*util.Data) {
 	}
 
 	if r.out != nil {
-		r.out.Published(events)
+		r.out.Published(len(states))
 	}
 }
 
 // processEventStates gets the states from the events and writes them to the registrar state
-func (r *Registrar) processEventStates(events []*util.Data) {
-	logp.Debug("registrar", "Processing %d events", len(events))
+func (r *Registrar) processEventStates(states []file.State) {
+	logp.Debug("registrar", "Processing %d events", len(states))
 
-	for _, data := range events {
-
-		// skip events without state
-		if !data.HasState() {
-			continue
-		}
-		r.states.Update(data.GetState())
+	for i := range states {
+		r.states.Update(states[i])
 		statesUpdate.Add(1)
 	}
 }
