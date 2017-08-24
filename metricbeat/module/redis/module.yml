@@ -1,0 +1,3 @@
+dashboards:
+    - id: Metricbeat-Redis
+      file: Metricbeat-redis-overview.json

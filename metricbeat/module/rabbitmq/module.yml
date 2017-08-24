@@ -1,0 +1,3 @@
+dashboards:
+    - id: Metricbeat-Rabbitmq
+      file: Metricbeat-rabbitmq-overview.json
