@@ -6,5 +6,4 @@ dashboards:
   file: Metricbeat-host-overview.json
 
 - id: CPU-slash-Memory-per-container
-  file: Metricbeat-docker-overview.json
-
+  file: Metricbeat-containers-overview.json
