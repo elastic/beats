@@ -182,6 +182,17 @@ metricbeat.modules:
   #request.enabled: false
   #response.enabled: false
 
+- module: http
+  metricsets: ["server"]
+  host: "localhost"
+  port: "8080"
+  enabled: false
+#  paths:
+#    - path: "/foo"
+#      namespace: "foo"
+#      fields: # added to the the response in root. overwrites existing fields
+#        key: "value"
+
 #------------------------------- Jolokia Module ------------------------------
 - module: jolokia
   metricsets: ["jmx"]
