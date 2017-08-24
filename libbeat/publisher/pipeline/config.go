@@ -3,17 +3,20 @@ package pipeline
 import (
 	"errors"
 	"fmt"
-	"time"
 
 	"github.com/elastic/beats/libbeat/common"
+	"github.com/elastic/beats/libbeat/processors"
 	"github.com/elastic/beats/libbeat/publisher/beat"
 )
 
 // Config object for loading a pipeline instance via Load.
 type Config struct {
-	WaitShutdown time.Duration          `config:"wait_shutdown"`
-	Broker       common.ConfigNamespace `config:"broker"`
-	Output       common.ConfigNamespace `config:"output"`
+	// Event processing configurations
+	common.EventMetadata `config:",inline"`      // Fields and tags to add to each event.
+	Processors           processors.PluginConfig `config:"processors"`
+
+	// Event queue
+	Queue common.ConfigNamespace `config:"queue"`
 }
 
 // validateClientConfig checks a ClientConfig can be used with (*Pipeline).ConnectWith.

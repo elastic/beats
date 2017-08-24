@@ -1,4 +1,4 @@
-package membroker
+package memqueue
 
 import (
 	"errors"
@@ -6,7 +6,7 @@ import (
 
 	"github.com/elastic/beats/libbeat/common/atomic"
 	"github.com/elastic/beats/libbeat/publisher"
-	"github.com/elastic/beats/libbeat/publisher/broker"
+	"github.com/elastic/beats/libbeat/publisher/queue"
 )
 
 type consumer struct {
@@ -45,7 +45,7 @@ func newConsumer(b *Broker) *consumer {
 	}
 }
 
-func (c *consumer) Get(sz int) (broker.Batch, error) {
+func (c *consumer) Get(sz int) (queue.Batch, error) {
 	// log := c.broker.logger
 
 	if c.closed.Load() {

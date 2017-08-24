@@ -17,9 +17,9 @@ import (
 	"github.com/elastic/beats/libbeat/outputs/outil"
 	"github.com/elastic/beats/libbeat/outputs/transport"
 	"github.com/elastic/beats/libbeat/publisher/beat"
-	"github.com/elastic/beats/libbeat/publisher/broker"
-	"github.com/elastic/beats/libbeat/publisher/broker/membroker"
 	"github.com/elastic/beats/libbeat/publisher/pipeline"
+	"github.com/elastic/beats/libbeat/publisher/queue"
+	"github.com/elastic/beats/libbeat/publisher/queue/memqueue"
 )
 
 type reporter struct {
@@ -104,8 +104,8 @@ func makeReporter(beat common.BeatInfo, cfg *common.Config) (report.Reporter, er
 		out.Clients = append(out.Clients, client)
 	}
 
-	brokerFactory := func(e broker.Eventer) (broker.Broker, error) {
-		return membroker.NewBroker(membroker.Settings{
+	queueFactory := func(e queue.Eventer) (queue.Queue, error) {
+		return memqueue.NewBroker(memqueue.Settings{
 			Eventer: e,
 			Events:  20,
 		}), nil
@@ -115,7 +115,7 @@ func makeReporter(beat common.BeatInfo, cfg *common.Config) (report.Reporter, er
 
 	pipeline, err := pipeline.New(
 		monitoring,
-		brokerFactory, out, pipeline.Settings{
+		queueFactory, out, pipeline.Settings{
 			WaitClose:     0,
 			WaitCloseMode: pipeline.NoWaitOnClose,
 		})

@@ -1,4 +1,4 @@
-package broker
+package queue
 
 import (
 	"io"
@@ -8,24 +8,24 @@ import (
 	"github.com/elastic/beats/libbeat/publisher/beat"
 )
 
-// Factory for creating a broker used by a pipeline instance.
-type Factory func(Eventer, *common.Config) (Broker, error)
+// Factory for creating a queue used by a pipeline instance.
+type Factory func(Eventer, *common.Config) (Queue, error)
 
-// Eventer listens to special events to be send by broker implementations.
+// Eventer listens to special events to be send by queue implementations.
 type Eventer interface {
 	OnACK(int) // number of consecutively published messages, acked by producers
 }
 
-// Broker is responsible for accepting, forwarding and ACKing events.
-// A broker will receive and buffer single events from its producers.
-// Consumers will receive events in batches from the brokers buffers.
+// Queue is responsible for accepting, forwarding and ACKing events.
+// A queue will receive and buffer single events from its producers.
+// Consumers will receive events in batches from the queues buffers.
 // Once a consumer has finished processing a batch, it must ACK the batch, for
-// the broker to advance its buffers. Events in progress or ACKed are not readable
-// from the broker.
-// When the broker decides it is safe to progress (events have been ACKed by
+// the queue to advance its buffers. Events in progress or ACKed are not readable
+// from the queue.
+// When the queue decides it is safe to progress (events have been ACKed by
 // consumer or flush to some other intermediate storage), it will send an ACK signal
 // with the number of ACKed events to the Producer (ACK happens in batches).
-type Broker interface {
+type Queue interface {
 	io.Closer
 
 	BufferConfig() BufferConfig
@@ -40,33 +40,33 @@ type Broker interface {
 // but still dropping events, the pipeline can use the buffer information,
 // to define an upper bound of events being active in the pipeline.
 type BufferConfig struct {
-	Events int // can be <= 0, if broker can not determine limit
+	Events int // can be <= 0, if queue can not determine limit
 }
 
 // ProducerConfig as used by the Pipeline to configure some custom callbacks
-// between pipeline and broker.
+// between pipeline and queue.
 type ProducerConfig struct {
 	// if ACK is set, the callback will be called with number of events produced
-	// by the producer instance and being ACKed by the broker.
+	// by the producer instance and being ACKed by the queue.
 	ACK func(count int)
 
-	// OnDrop provided to the broker, to report events being silently dropped by
-	// the broker. For example an async producer close and publish event,
+	// OnDrop provided to the queue, to report events being silently dropped by
+	// the queue. For example an async producer close and publish event,
 	// with close happening early might result in the event being dropped. The callback
-	// gives a brokers user a chance to keep track of total number of events
-	// being buffered by the broker.
+	// gives a queue user a chance to keep track of total number of events
+	// being buffered by the queue.
 	OnDrop func(beat.Event)
 
-	// DropOnCancel is a hint to the broker to drop events if the producer disconnects
+	// DropOnCancel is a hint to the queue to drop events if the producer disconnects
 	// via Cancel.
 	DropOnCancel bool
 }
 
 // Producer interface to be used by the pipelines client to forward events to be
-// published to the broker.
-// When a producer calls `Cancel`, it's up to the broker to send or remove
+// published to the queue.
+// When a producer calls `Cancel`, it's up to the queue to send or remove
 // events not yet ACKed.
-// Note: A broker is still allowed to send the ACK signal after Cancel. The
+// Note: A queue is still allowed to send the ACK signal after Cancel. The
 //       pipeline client must filter out ACKs after cancel.
 type Producer interface {
 	Publish(event publisher.Event) bool
@@ -76,14 +76,14 @@ type Producer interface {
 
 // Consumer interface to be used by the pipeline output workers.
 // The `Get` method retrieves a batch of events up to size `sz`. If sz <= 0,
-// the batch size is up to the broker.
+// the batch size is up to the queue.
 type Consumer interface {
 	Get(sz int) (Batch, error)
 	Close() error
 }
 
 // Batch of events to be returned to Consumers. The `ACK` method will send the
-// ACK signal to the broker.
+// ACK signal to the queue.
 type Batch interface {
 	Events() []publisher.Event
 	ACK()

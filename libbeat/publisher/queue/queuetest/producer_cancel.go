@@ -1,4 +1,4 @@
-package brokertest
+package queuetest
 
 import (
 	"testing"
@@ -7,16 +7,16 @@ import (
 
 	"github.com/elastic/beats/libbeat/common"
 	"github.com/elastic/beats/libbeat/publisher"
-	"github.com/elastic/beats/libbeat/publisher/broker"
+	"github.com/elastic/beats/libbeat/publisher/queue"
 )
 
 // TestSingleProducerConsumer tests buffered events for a producer getting
 // cancelled will not be consumed anymore. Concurrent producer/consumer pairs
 // might still have active events not yet ACKed (not tested here).
 //
-// Note: brokers not requiring consumers to ACK a events in order to
+// Note: queues not requiring consumers to ACK a events in order to
 //       return ACKs to the producer are not supported by this test.
-func TestProducerCancelRemovesEvents(t *testing.T, factory BrokerFactory) {
+func TestProducerCancelRemovesEvents(t *testing.T, factory QueueFactory) {
 	fn := withLogOutput(func(t *testing.T) {
 		var (
 			i  int
@@ -29,7 +29,7 @@ func TestProducerCancelRemovesEvents(t *testing.T, factory BrokerFactory) {
 		defer b.Close()
 
 		log.Debug("create first producer")
-		producer := b.Producer(broker.ProducerConfig{
+		producer := b.Producer(queue.ProducerConfig{
 			ACK:          func(int) {}, // install function pointer, so 'cancel' will remove events
 			DropOnCancel: true,
 		})
@@ -47,7 +47,7 @@ func TestProducerCancelRemovesEvents(t *testing.T, factory BrokerFactory) {
 
 		// reconnect and send some more events
 		log.Debug("connect new producer")
-		producer = b.Producer(broker.ProducerConfig{})
+		producer = b.Producer(queue.ProducerConfig{})
 		for ; i < N2; i++ {
 			log.Debugf("send event %v to new producer", i)
 			producer.Publish(makeEvent(common.MapStr{
