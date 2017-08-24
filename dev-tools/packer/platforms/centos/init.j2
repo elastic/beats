@@ -26,7 +26,7 @@ export PATH
 pidfile=${PIDFILE-/var/run/{{.beat_pkg_name}}.pid}
 agent=${BEATS_AGENT-/usr/share/{{.beat_name}}/bin/{{.beat_name}}}
 args="-c /etc/{{.beat_name}}/{{.beat_name}}.yml -path.home /usr/share/{{.beat_name}} -path.config /etc/{{.beat_name}} -path.data /var/lib/{{.beat_name}} -path.logs /var/log/{{.beat_name}}"
-test_args="-e -configtest"
+test_args="-e test config"
 beat_user="${BEAT_USER:-root}"
 wrapper="/usr/share/{{.beat_name}}/bin/{{.beat_name}}-god"
 wrapperopts="-r / -n -p $pidfile"
