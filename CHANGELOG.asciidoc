@@ -19,6 +19,7 @@ https://github.com/elastic/beats/compare/v6.0.0-beta1...master[Check the HEAD di
 - Fail if removed setting output.X.flush_interval is explicitly configured.
 - Rename the `/usr/bin/beatname.sh` script (e.g. `metricbeat.sh`) to `/usr/bin/beatname`. {pull}4933[4933]
 - Beat does not start if elasticsearch index pattern was modified but not the template name and pattern. {issue}4769[4769]
+- Fail if removed setting output.X.flush_interval is explicitly configured.
 
 *Auditbeat*
 

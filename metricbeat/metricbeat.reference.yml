@@ -605,11 +605,6 @@ output.elasticsearch:
   # Configure http request timeout before failing an request to Elasticsearch.
   #timeout: 90
 
-  # The number of seconds to wait for new events between two bulk API index requests.
-  # If `bulk_max_size` is reached before this interval expires, addition bulk index
-  # requests are made.
-  #flush_interval: 1s
-
   # Use SSL settings for HTTPS. Default is true.
   #ssl.enabled: true
 
@@ -808,9 +803,6 @@ output.elasticsearch:
   # If set to 0, no ACKs are returned by Kafka. Messages might be lost silently
   # on error.
   #required_acks: 1
-
-  # The number of seconds to wait for new events between two producer API calls.
-  #flush_interval: 1s
 
   # The configurable ClientID used for logging, debugging, and auditing
   # purposes.  The default is "beats".
