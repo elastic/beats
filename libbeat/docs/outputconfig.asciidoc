@@ -532,6 +532,14 @@ Beats that publish single events (such as Packetbeat) send each event directly t
 Elasticsearch. Beats that publish data in batches (such as Filebeat) send events in batches based on the
 spooler size.
 
+===== `slow_start`
+
+If enabled only a subset of events in a batch of events is transfered per transaction.
+The number of events to be sent increases up to `bulk_max_size` if no error is encountered.
+On error the number of events per transaction is reduced again.
+
+The default is `false`.
+
 [[kafka-output]]
 === Configure the Kafka output
 
