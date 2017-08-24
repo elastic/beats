@@ -89,20 +89,24 @@ func (p *TransactionPublisher) CreateReporter(
 	ch := make(chan beat.Event, 3)
 	go p.worker(ch, client)
 	return func(event beat.Event) {
-		ch <- event
+		select {
+		case ch <- event:
+		case <-p.done:
+			ch = nil // stop serving more send requests
+		}
 	}, nil
 }
 
 func (p *TransactionPublisher) worker(ch chan beat.Event, client beat.Client) {
-	go func() {
-		<-p.done
-		close(ch)
-	}()
-
-	for event := range ch {
-		pub, _ := p.processor.Run(&event)
-		if pub != nil {
-			client.Publish(*pub)
+	for {
+		select {
+		case <-p.done:
+			return
+		case event := <-ch:
+			pub, _ := p.processor.Run(&event)
+			if pub != nil {
+				client.Publish(*pub)
+			}
 		}
 	}
 }
