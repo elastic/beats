@@ -43,11 +43,11 @@ func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
 	}, nil
 }
 
-func (m *MetricSet) Fetch() (common.MapStr, error) {
+func (m *MetricSet) Fetch() ([]common.MapStr, error) {
 	content, err := m.HTTP.FetchContent()
 	if err != nil {
 		return nil, err
 	}
 
-	return eventMapping(content), nil
+	return eventsMapping(content), nil
 }

@@ -2,7 +2,6 @@ package cluster_status
 
 import (
 	"encoding/json"
-	"time"
 
 	"github.com/elastic/beats/libbeat/common"
 	"github.com/elastic/beats/libbeat/logp"
@@ -37,8 +36,23 @@ type Pgmap struct {
 	PgStates []PgState `json:"pgs_by_state"`
 }
 
+type Osdmap struct {
+	Epoch      int64 `json:"epoch"`
+	Full       bool  `json:"full"`
+	Nearfull   bool  `json:"nearfull"`
+	OsdNum     int64 `json:"num_osds"`
+	UpOsds     int64 `json:"num_up_osds"`
+	InOsds     int64 `json:"num_in_osds"`
+	RemapedPgs int64 `json:"num_remapped_pgs"`
+}
+
+type Osdmap_ struct {
+	Osdmap Osdmap `json:"osdmap"`
+}
+
 type Output struct {
-	Pgmap Pgmap `json:"pgmap"`
+	Pgmap  Pgmap   `json:"pgmap"`
+	Osdmap Osdmap_ `json:"osdmap"`
 }
 
 type HealthRequest struct {
@@ -46,13 +60,26 @@ type HealthRequest struct {
 	Output Output `json:"output"`
 }
 
-func eventMapping(content []byte) []common.MapStr {
+func eventsMapping(content []byte) []common.MapStr {
 	var d HealthRequest
 	err := json.Unmarshal(content, &d)
 	if err != nil {
 		logp.Err("Error: ", err)
 	}
 
+	//osd map info
+	osdmap := d.Output.Osdmap.Osdmap
+
+	osdState := common.MapStr{}
+	osdState["epoch"] = osdmap.Epoch
+	osdState["full"] = osdmap.Full
+	osdState["nearfull"] = osdmap.Nearfull
+	osdState["num_osds"] = osdmap.OsdNum
+	osdState["num_up_osds"] = osdmap.UpOsds
+	osdState["num_in_osds"] = osdmap.InOsds
+	osdState["num_remapped_pgs"] = osdmap.RemapedPgs
+
+	//pg map info
 	pgmap := d.Output.Pgmap
 
 	traffic := common.MapStr{}
@@ -77,22 +104,28 @@ func eventMapping(content []byte) []common.MapStr {
 	pg["bytes_used"] = pgmap.UsedByte
 	pg["data_bytes"] = pgmap.DataByte
 
-	pg_event := common.MapStr{}
-	pg_event["traffic"] = traffic
-	pg_event["misplace"] = misplace
-	pg_event["degraded"] = degraded
-	pg_event["pg"] = pg
-	pg_event["version"] = pgmap.Version
+	state_event := common.MapStr{}
+	state_event["osd"] = osdState
+	state_event["traffic"] = traffic
+	state_event["misplace"] = misplace
+	state_event["degraded"] = degraded
+	state_event["pg"] = pg
+	state_event["version"] = pgmap.Version
 
 	events := []common.MapStr{}
-	events = append(events, pg_event)
+	events = append(events, state_event)
 
+	//pg state info
 	for _, state := range pgmap.PgStates {
 		state_evn := common.MapStr{
 			"count":      state.Count,
 			"state_name": state.StateName,
+			"version":    pgmap.Version,
 		}
-		events = append(events, state_evn)
+		evt := common.MapStr{
+			"pg_state": state_evn,
+		}
+		events = append(events, evt)
 	}
 
 	return events
