@@ -66,19 +66,17 @@ func (f *LogPathMatcher) MetadataIndex(event common.MapStr) string {
 
 		// In case of the Kubernetes log path "/var/log/containers/",
 		// the container ID will be located right before the ".log" extension.
-		if strings.HasPrefix(f.LogsPath, "/var/log/containers/") &&
-		   strings.HasSuffix(source, ".log") &&
-		   sourceLen >= containerIdLen + 4 {
+		if strings.HasPrefix(f.LogsPath, "/var/log/containers/") && strings.HasSuffix(source, ".log") && sourceLen >= containerIdLen+4 {
 			containerIdEnd := sourceLen - 4
-			cid := source[containerIdEnd - containerIdLen : containerIdEnd]
+			cid := source[containerIdEnd-containerIdLen : containerIdEnd]
 			logp.Debug("kubernetes", "Using container id: %s", cid)
 			return cid
 		}
 
 		// In any other case, we assume the container ID will follow right after the log path.
 		// However we need to check the length to prevent "slice bound out of range" runtime errors.
-		if sourceLen >= logsPathLen + containerIdLen {
-			cid := source[logsPathLen : logsPathLen + containerIdLen]
+		if sourceLen >= logsPathLen+containerIdLen {
+			cid := source[logsPathLen : logsPathLen+containerIdLen]
 			logp.Debug("kubernetes", "Using container id: %s", cid)
 			return cid
 		}
