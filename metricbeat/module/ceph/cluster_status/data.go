@@ -75,34 +75,34 @@ func eventsMapping(content []byte) ([]common.MapStr, error) {
 	osdState["epoch"] = osdmap.Epoch
 	osdState["full"] = osdmap.Full
 	osdState["nearfull"] = osdmap.Nearfull
-	osdState["num_osds"] = osdmap.OsdNum
-	osdState["num_up_osds"] = osdmap.UpOsds
-	osdState["num_in_osds"] = osdmap.InOsds
-	osdState["num_remapped_pgs"] = osdmap.RemapedPgs
+	osdState["osd_count"] = osdmap.OsdNum
+	osdState["up_osd_count"] = osdmap.UpOsds
+	osdState["in_osd_count"] = osdmap.InOsds
+	osdState["remapped_pg_count"] = osdmap.RemapedPgs
 
 	//pg map info
 	pgmap := d.Output.Pgmap
 
 	traffic := common.MapStr{}
-	traffic["read_bytes_sec"] = pgmap.ReadByteSec
+	traffic["read_bytes"] = pgmap.ReadByteSec
 	traffic["read_op_per_sec"] = pgmap.ReadOpSec
-	traffic["write_bytes_sec"] = pgmap.WriteByteSec
+	traffic["write_bytes"] = pgmap.WriteByteSec
 	traffic["write_op_per_sec"] = pgmap.WriteOpSec
 
 	misplace := common.MapStr{}
 	misplace["objects"] = pgmap.MisplacedObjs
-	misplace["ratio"] = pgmap.MisplacedRatio
+	misplace["pct"] = pgmap.MisplacedRatio
 	misplace["total"] = pgmap.MisplacedTotal
 
 	degraded := common.MapStr{}
 	degraded["objects"] = pgmap.DegradedObjs
-	degraded["ratio"] = pgmap.DegradedRatio
+	degraded["pct"] = pgmap.DegradedRatio
 	degraded["total"] = pgmap.DegradedTotal
 
 	pg := common.MapStr{}
-	pg["bytes_avail"] = pgmap.AvailByte
-	pg["bytes_total"] = pgmap.TotalByte
-	pg["bytes_used"] = pgmap.UsedByte
+	pg["avail_bytes"] = pgmap.AvailByte
+	pg["total_bytes"] = pgmap.TotalByte
+	pg["used_bytes"] = pgmap.UsedByte
 	pg["data_bytes"] = pgmap.DataByte
 
 	state_event := common.MapStr{}

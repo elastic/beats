@@ -7,12 +7,12 @@
       type: long
       description: >
         Ceph Status version
-    - name: traffic.read_bytes_sec
+    - name: traffic.read_bytes
       type: long
       format: bytes
       description: >
         Cluster read throughput per second
-    - name: traffic.write_bytes_sec
+    - name: traffic.write_bytes
       type: long
       format: bytes
       description: >
@@ -56,17 +56,17 @@
       format: bytes
       description: >
         Cluster pg data bytes
-    - name: pg.bytes_avail
+    - name: pg.avail_bytes
       type: long
       format: bytes
       description: >
         Cluster available bytes
-    - name: pg.bytes_total
+    - name: pg.total_bytes
       type: long
       format: bytes
       description: >
         Cluster total bytes
-    - name: pg.bytes_used
+    - name: pg.used_bytes
       type: long
       format: bytes
       description: >

@@ -873,7 +873,7 @@ Ceph Status version
 
 
 [float]
-=== `ceph.cluster_status.traffic.read_bytes_sec`
+=== `ceph.cluster_status.traffic.read_bytes`
 
 type: long
 
@@ -883,7 +883,7 @@ Cluster read throughput per second
 
 
 [float]
-=== `ceph.cluster_status.traffic.write_bytes_sec`
+=== `ceph.cluster_status.traffic.write_bytes`
 
 type: long
 
@@ -971,7 +971,7 @@ Cluster pg data bytes
 
 
 [float]
-=== `ceph.cluster_status.pg.bytes_avail`
+=== `ceph.cluster_status.pg.avail_bytes`
 
 type: long
 
@@ -981,7 +981,7 @@ Cluster available bytes
 
 
 [float]
-=== `ceph.cluster_status.pg.bytes_total`
+=== `ceph.cluster_status.pg.total_bytes`
 
 type: long
 
@@ -991,7 +991,7 @@ Cluster total bytes
 
 
 [float]
-=== `ceph.cluster_status.pg.bytes_used`
+=== `ceph.cluster_status.pg.used_bytes`
 
 type: long
 

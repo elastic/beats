@@ -46,37 +46,37 @@ func TestFetchEventContents(t *testing.T) {
 	osdmap := event["osd"].(common.MapStr)
 	assert.EqualValues(t, false, osdmap["full"])
 	assert.EqualValues(t, false, osdmap["nearfull"])
-	assert.EqualValues(t, 6, osdmap["num_osds"])
-	assert.EqualValues(t, 3, osdmap["num_up_osds"])
-	assert.EqualValues(t, 4, osdmap["num_in_osds"])
-	assert.EqualValues(t, 240, osdmap["num_remapped_pgs"])
+	assert.EqualValues(t, 6, osdmap["osd_count"])
+	assert.EqualValues(t, 3, osdmap["up_osd_count"])
+	assert.EqualValues(t, 4, osdmap["in_osd_count"])
+	assert.EqualValues(t, 240, osdmap["remapped_pg_count"])
 	assert.EqualValues(t, 264, osdmap["epoch"])
 
 	//check traffic info
 	trafficInfo := event["traffic"].(common.MapStr)
-	assert.EqualValues(t, 55667788, trafficInfo["read_bytes_sec"])
+	assert.EqualValues(t, 55667788, trafficInfo["read_bytes"])
 	assert.EqualValues(t, 1234, trafficInfo["read_op_per_sec"])
-	assert.EqualValues(t, 11996158, trafficInfo["write_bytes_sec"])
+	assert.EqualValues(t, 11996158, trafficInfo["write_bytes"])
 	assert.EqualValues(t, 10, trafficInfo["write_op_per_sec"])
 
 	//check misplace info
 	misplaceInfo := event["misplace"].(common.MapStr)
 	assert.EqualValues(t, 768, misplaceInfo["total"])
 	assert.EqualValues(t, 88, misplaceInfo["objects"])
-	assert.EqualValues(t, 0.114583, misplaceInfo["ratio"])
+	assert.EqualValues(t, 0.114583, misplaceInfo["pct"])
 
 	//check degraded info
 	degradedInfo := event["degraded"].(common.MapStr)
 	assert.EqualValues(t, 768, degradedInfo["total"])
 	assert.EqualValues(t, 294, degradedInfo["objects"])
-	assert.EqualValues(t, 0.382812, degradedInfo["ratio"])
+	assert.EqualValues(t, 0.382812, degradedInfo["pct"])
 
 	//check pg info
 	pgInfo := event["pg"].(common.MapStr)
 	assert.EqualValues(t, 1054023794, pgInfo["data_bytes"])
-	assert.EqualValues(t, 9965821952, pgInfo["bytes_avail"])
-	assert.EqualValues(t, 12838682624, pgInfo["bytes_total"])
-	assert.EqualValues(t, 2872860672, pgInfo["bytes_used"])
+	assert.EqualValues(t, 9965821952, pgInfo["avail_bytes"])
+	assert.EqualValues(t, 12838682624, pgInfo["total_bytes"])
+	assert.EqualValues(t, 2872860672, pgInfo["used_bytes"])
 
 	//check pg_state info
 	pg_stateInfo := events[1]["pg_state"].(common.MapStr)
