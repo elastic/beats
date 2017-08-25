@@ -48,21 +48,26 @@ func newLogsPathMatcher(cfg common.Config) (add_kubernetes_metadata.Matcher, err
 	return &LogPathMatcher{LogsPath: logPath}, nil
 }
 
+// Docker container ID is a 64-character-long hexadecimal string
+const containerIdLen = 64
+
 func (f *LogPathMatcher) MetadataIndex(event common.MapStr) string {
 	if value, ok := event["source"]; ok {
 		source := value.(string)
 		logp.Debug("kubernetes", "Incoming source value: %s", source)
 		cid := ""
 		if strings.Contains(source, f.LogsPath) {
-			if f.LogsPath == "/var/log/containers/" && strings.HasSuffix(source, ".log") {
+			sourceLen := len(source)
+			logsPathLen := len(f.LogsPath)
+
+			if f.LogsPath == "/var/log/containers/" && strings.HasSuffix(source, ".log") && sourceLen >= containerIdLen + 4 {
 				// In case of the Kubernetes log path "/var/log/containers/",
 				// the container ID will be located right before the ".log" ending.
-				sourceLen := len(source)
-				cid = source[sourceLen-68 : sourceLen-4]
-			} else {
+				containerIdEnd := sourceLen - 4
+				cid = source[containerIdEnd - containerIdLen : containerIdEnd]
+			} else if sourceLen >= logsPathLen + containerIdLen {
 				// In any other case, we assume the container ID will follow right after the log path.
-				//Docker container is 64 chars in length
-				cid = source[len(f.LogsPath) : len(f.LogsPath)+64]
+				cid = source[logsPathLen : logsPathLen + containerIdLen]
 			}
 			logp.Debug("kubernetes", "Using container id: %s", cid)
 		} else {
