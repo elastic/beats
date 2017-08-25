@@ -9,10 +9,12 @@
         Ceph Status version
     - name: traffic.read_bytes_sec
       type: long
+      format: bytes
       description: >
         Cluster read throughput per second
     - name: traffic.write_bytes_sec
       type: long
+      format: bytes
       description: >
         Cluster write throughput per second
     - name: traffic.read_op_per_sec
@@ -32,7 +34,8 @@
       description: >
         Cluster misplace objects number
     - name: misplace.ratio
-      type: long
+      type: scaled_float
+      format: percent
       description: >
         Cluster misplace ratio
     - name: degraded.total
@@ -44,23 +47,28 @@
       description: >
         Cluster degraded objects number
     - name: degraded.ratio
-      type: long
+      type: scaled_float
+      format: percent
       description: >
         Cluster degraded ratio
     - name: pg.data_bytes
       type: long
+      format: bytes
       description: >
         Cluster pg data bytes
     - name: pg.bytes_avail
       type: long
+      format: bytes
       description: >
         Cluster available bytes
     - name: pg.bytes_total
       type: long
+      format: bytes
       description: >
         Cluster total bytes
     - name: pg.bytes_used
       type: long
+      format: bytes
       description: >
         Cluster used bytes
     - name: pg_state.state_name

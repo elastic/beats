@@ -60,11 +60,12 @@ type HealthRequest struct {
 	Output Output `json:"output"`
 }
 
-func eventsMapping(content []byte) []common.MapStr {
+func eventsMapping(content []byte) ([]common.MapStr, error) {
 	var d HealthRequest
 	err := json.Unmarshal(content, &d)
 	if err != nil {
 		logp.Err("Error: ", err)
+		return nil, err
 	}
 
 	//osd map info
@@ -128,5 +129,5 @@ func eventsMapping(content []byte) []common.MapStr {
 		events = append(events, evt)
 	}
 
-	return events
+	return events, nil
 }

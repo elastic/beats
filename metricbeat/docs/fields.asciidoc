@@ -877,6 +877,8 @@ Ceph Status version
 
 type: long
 
+format: bytes
+
 Cluster read throughput per second
 
 
@@ -884,6 +886,8 @@ Cluster read throughput per second
 === `ceph.cluster_status.traffic.write_bytes_sec`
 
 type: long
+
+format: bytes
 
 Cluster write throughput per second
 
@@ -923,7 +927,9 @@ Cluster misplace objects number
 [float]
 === `ceph.cluster_status.misplace.ratio`
 
-type: long
+type: scaled_float
+
+format: percent
 
 Cluster misplace ratio
 
@@ -947,7 +953,9 @@ Cluster degraded objects number
 [float]
 === `ceph.cluster_status.degraded.ratio`
 
-type: long
+type: scaled_float
+
+format: percent
 
 Cluster degraded ratio
 
@@ -957,6 +965,8 @@ Cluster degraded ratio
 
 type: long
 
+format: bytes
+
 Cluster pg data bytes
 
 
@@ -964,6 +974,8 @@ Cluster pg data bytes
 === `ceph.cluster_status.pg.bytes_avail`
 
 type: long
+
+format: bytes
 
 Cluster available bytes
 
@@ -973,6 +985,8 @@ Cluster available bytes
 
 type: long
 
+format: bytes
+
 Cluster total bytes
 
 
@@ -980,6 +994,8 @@ Cluster total bytes
 === `ceph.cluster_status.pg.bytes_used`
 
 type: long
+
+format: bytes
 
 Cluster used bytes
 
