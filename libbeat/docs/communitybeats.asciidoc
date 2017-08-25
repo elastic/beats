@@ -13,6 +13,7 @@ https://github.com/verticle-io/apexbeat[apexbeat]:: Extracts configurable contex
 https://github.com/goomzee/burrowbeat[burrowbeat]:: Monitors Kafka consumer lag using Burrow.
 https://github.com/goomzee/cassandrabeat[cassandrabeat]:: Uses Cassandra's nodetool cfstats utility to monitor Cassandra database nodes and lag.
 https://github.com/hartfordfive/cloudflarebeat[cloudflarebeat]:: Indexes log entries from the Cloudflare Enterprise Log Share API.
+https://github.com/jarl-tornroos/cloudfrontbeat[cloudfrontbeat]:: Reads log events from Amazon Web Services https://aws.amazon.com/cloudfront/[CloudFront].
 https://github.com/aidan-/cloudtrailbeat[cloudtrailbeat]:: Reads events from Amazon Web Services' https://aws.amazon.com/cloudtrail/[CloudTrail].
 https://github.com/raboof/connbeat[connbeat]:: Exposes metadata about TCP connections.
 https://github.com/Pravoru/consulbeat[consulbeat]:: Reads services health checks from consul and pushes them to Elastic.
