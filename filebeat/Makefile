@@ -51,9 +51,15 @@ collect-docs: python-env
 	@mkdir -p docs/modules
 	@${PYTHON_ENV}/bin/python ${ES_BEATS}/filebeat/scripts/docs_collector.py --beat ${BEAT_NAME}
 
+# Generate imports for prospectors
+.PHONY: imports
+imports: python-env
+	@mkdir -p include
+	@${PYTHON_ENV}/bin/python ${ES_BEATS}/script/generate_imports.py ${BEAT_PATH}
+
 # Runs all collection steps and updates afterwards
 .PHONY: collect
-collect: fields kibana modules configs collect-docs
+collect: fields kibana modules configs collect-docs imports
 
 # Creates a new fileset. Requires the params MODULE and FILESET
 .PHONY: create-fileset
