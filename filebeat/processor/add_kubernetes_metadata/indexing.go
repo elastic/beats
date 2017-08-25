@@ -2,14 +2,23 @@ package add_kubernetes_metadata
 
 import (
 	"fmt"
-	"strings"
+	"regexp"
 
 	"github.com/elastic/beats/libbeat/common"
 	"github.com/elastic/beats/libbeat/logp"
 	"github.com/elastic/beats/libbeat/processors/add_kubernetes_metadata"
 )
 
+var regexpKubernetes *regexp.Regexp
+var regexpDocker *regexp.Regexp
+var regexpGeneric *regexp.Regexp
+
 func init() {
+	// Regular expressions used in the path matcher
+	regexpKubernetes = regexp.MustCompile("\\/var\\/log\\/containers\\/.+-([A-Fa-f0-9]{64})\\.log")
+	regexpDocker = regexp.MustCompile("\\/var\\/lib\\/docker\\/containers\\/([A-Fa-f0-9]{64})\\/.+\\.log")
+	regexpGeneric = regexp.MustCompile("[A-Fa-f0-9]{64}")
+
 	add_kubernetes_metadata.Indexing.AddMatcher(LogPathMatcherName, newLogsPathMatcher)
 	cfg := common.NewConfig()
 
@@ -49,17 +58,32 @@ func newLogsPathMatcher(cfg common.Config) (add_kubernetes_metadata.Matcher, err
 func (f *LogPathMatcher) MetadataIndex(event common.MapStr) string {
 	if value, ok := event["source"]; ok {
 		source := value.(string)
-		logp.Debug("kubernetes", "Incoming source value: ", source)
-		cid := ""
-		if strings.Contains(source, f.LogsPath) {
-			//Docker container is 64 chars in length
-			cid = source[len(f.LogsPath) : len(f.LogsPath)+64]
-		}
-		logp.Debug("kubernetes", "Using container id: ", cid)
+		logp.Debug("kubernetes", "Incoming source value: %s", source)
 
-		if cid != "" {
-			return cid
+		// Variant 1: Kubernetes log path "/var/log/containers/"
+		matches := regexpKubernetes.FindStringSubmatch(source)
+		if matches != nil {
+			cid := matches[1]
+			logp.Debug("kubernetes", "Using container id: %s", cid)
+			return cid;
 		}
+
+		// Variant 2: Docker log path "/var/lib/docker/containers/"
+		matches = regexpDocker.FindStringSubmatch(source)
+		if matches != nil {
+			cid := matches[1]
+			logp.Debug("kubernetes", "Using container id: %s", cid)
+			return cid;
+		}
+
+		// Variant 3: Generic fallback
+		cid := regexpGeneric.FindString(source)
+		if cid != "" {
+			logp.Debug("kubernetes", "Using container id: %s", cid)
+			return cid;
+		}
+
+		logp.Debug("kubernetes", "No container id found in source.")
 	}
 
 	return ""
