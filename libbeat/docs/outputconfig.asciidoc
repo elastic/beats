@@ -596,8 +596,7 @@ supported stable version (currently version 0.8.2.0).
 
 Event timestamps will be added, if version 0.10.0.0+ is enabled.
 
-Valid values are `0.8.2.0`, `0.8.2.1`, `0.8.2.2`, `0.8.2`, `0.8`, `0.9.0.0`,
-`0.9.0.1`, `0.9.0`, `0.9`, `0.10.0.0`, `0.10.0`, and `0.10`.
+Valid values are all kafka releases in between `0.8.2.0` and `0.11.0.0`.
 
 ===== `username`
 
@@ -720,7 +719,7 @@ The keep-alive period for an active network connection. If 0s, keep-alives are d
 
 ===== `compression`
 
-Sets the output compression codec. Must be one of `none`, `snappy` and `gzip`. The default is `gzip`.
+Sets the output compression codec. Must be one of `none`, `snappy`, `lz4` and `gzip`. The default is `gzip`.
 
 [[kafka-max_message_bytes]]
 ===== `max_message_bytes`
