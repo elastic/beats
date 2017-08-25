@@ -73,6 +73,7 @@ https://github.com/elastic/beats/compare/v6.0.0-beta1...master[Check the HEAD di
 - Added `cloud.id` and `cloud.auth` settings, for simplifying using Beats with the Elastic Cloud. {issue}4959[4959]
 - Add lz4 compression support to kafka output. {pull}4977[4977]
 - Add newer kafka versions to kafka output. {pull}4977[4977]
+- Configure the index name when loading the dashboards and the index pattern. {pull}4949[4949]
 
 *Auditbeat*
 
