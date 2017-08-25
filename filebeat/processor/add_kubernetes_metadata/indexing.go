@@ -55,28 +55,35 @@ func (f *LogPathMatcher) MetadataIndex(event common.MapStr) string {
 	if value, ok := event["source"]; ok {
 		source := value.(string)
 		logp.Debug("kubernetes", "Incoming source value: %s", source)
-		cid := ""
-		if strings.Contains(source, f.LogsPath) {
-			sourceLen := len(source)
-			logsPathLen := len(f.LogsPath)
 
-			if f.LogsPath == "/var/log/containers/" && strings.HasSuffix(source, ".log") && sourceLen >= containerIdLen + 4 {
-				// In case of the Kubernetes log path "/var/log/containers/",
-				// the container ID will be located right before the ".log" ending.
-				containerIdEnd := sourceLen - 4
-				cid = source[containerIdEnd - containerIdLen : containerIdEnd]
-			} else if sourceLen >= logsPathLen + containerIdLen {
-				// In any other case, we assume the container ID will follow right after the log path.
-				cid = source[logsPathLen : logsPathLen + containerIdLen]
-			}
-			logp.Debug("kubernetes", "Using container id: %s", cid)
-		} else {
-			logp.Debug("kubernetes", "Error extracting container id - source value does not contain log path.")
+		if !strings.Contains(source, f.LogsPath) {
+			logp.Debug("kubernetes", "Error extracting container id - source value does not contain matcher's logs_path '%s'.", f.LogsPath)
+			return ""
 		}
 
-		if cid != "" {
+		sourceLen := len(source)
+		logsPathLen := len(f.LogsPath)
+
+		// In case of the Kubernetes log path "/var/log/containers/",
+		// the container ID will be located right before the ".log" extension.
+		if strings.HasPrefix(f.LogsPath, "/var/log/containers/") &&
+		   strings.HasSuffix(source, ".log") &&
+		   sourceLen >= containerIdLen + 4 {
+			containerIdEnd := sourceLen - 4
+			cid := source[containerIdEnd - containerIdLen : containerIdEnd]
+			logp.Debug("kubernetes", "Using container id: %s", cid)
 			return cid
 		}
+
+		// In any other case, we assume the container ID will follow right after the log path.
+		// However we need to check the length to prevent "slice bound out of range" runtime errors.
+		if sourceLen >= logsPathLen + containerIdLen {
+			cid := source[logsPathLen : logsPathLen + containerIdLen]
+			logp.Debug("kubernetes", "Using container id: %s", cid)
+			return cid
+		}
+
+		logp.Debug("kubernetes", "Error extracting container id - source value contains matcher's logs_path, however it is too short to contain a Docker container ID.")
 	}
 
 	return ""
