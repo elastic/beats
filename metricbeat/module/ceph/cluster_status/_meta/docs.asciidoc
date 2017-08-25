@@ -1,0 +1,3 @@
+=== Ceph cluster_health metricset
+
+This is the `cluster_status` metricset of the Ceph module.
