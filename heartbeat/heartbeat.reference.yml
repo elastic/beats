@@ -838,7 +838,7 @@ output.elasticsearch:
 # The template name and pattern has to be set in case the elasticsearch index pattern is modified.
 #setup.template.name: "heartbeat-%{[beat.version]}"
 
-# Template patttern. By default the template patter is "-%{[beat.version]}-*" to apply to the default index settings.
+# Template patttern. By default the template pattern is "-%{[beat.version]}-*" to apply to the default index settings.
 # The first part is the version of the beat and then -* is used to match all daily indicies.
 # The template name and pattern has to be set in case the elasticsearch index pattern is modified.
 #setup.template.pattern: "heartbeat-%{[beat.version]}-*"
