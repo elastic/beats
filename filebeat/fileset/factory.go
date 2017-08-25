@@ -4,7 +4,7 @@ import (
 	"github.com/mitchellh/hashstructure"
 
 	"github.com/elastic/beats/filebeat/channel"
-	"github.com/elastic/beats/filebeat/prospector"
+	pros "github.com/elastic/beats/filebeat/prospector"
 	"github.com/elastic/beats/filebeat/registrar"
 	"github.com/elastic/beats/libbeat/cfgfile"
 	"github.com/elastic/beats/libbeat/common"
@@ -14,7 +14,7 @@ import (
 
 // Factory for modules
 type Factory struct {
-	outlet                channel.OutleterFactory
+	outlet                channel.Factory
 	registrar             *registrar.Registrar
 	beatVersion           string
 	pipelineLoaderFactory PipelineLoaderFactory
@@ -25,12 +25,12 @@ type Factory struct {
 type prospectorsRunner struct {
 	id                    uint64
 	moduleRegistry        *ModuleRegistry
-	prospectors           []*prospector.Prospector
+	prospectors           []*pros.Prospector
 	pipelineLoaderFactory PipelineLoaderFactory
 }
 
 // NewFactory instantiates a new Factory
-func NewFactory(outlet channel.OutleterFactory, registrar *registrar.Registrar, beatVersion string,
+func NewFactory(outlet channel.Factory, registrar *registrar.Registrar, beatVersion string,
 	pipelineLoaderFactory PipelineLoaderFactory, beatDone chan struct{}) *Factory {
 	return &Factory{
 		outlet:                outlet,
@@ -62,9 +62,9 @@ func (f *Factory) Create(c *common.Config) (cfgfile.Runner, error) {
 		return nil, err
 	}
 
-	prospectors := make([]*prospector.Prospector, len(pConfigs))
+	prospectors := make([]*pros.Prospector, len(pConfigs))
 	for i, pConfig := range pConfigs {
-		prospectors[i], err = prospector.NewProspector(pConfig, f.outlet, f.beatDone, f.registrar.GetStates())
+		prospectors[i], err = pros.NewProspector(pConfig, f.outlet, f.beatDone, f.registrar.GetStates())
 		if err != nil {
 			logp.Err("Error creating prospector: %s", err)
 			return nil, err
