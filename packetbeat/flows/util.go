@@ -4,8 +4,8 @@ import (
 	"sync"
 	"time"
 
+	"github.com/elastic/beats/libbeat/beat"
 	"github.com/elastic/beats/libbeat/logp"
-	"github.com/elastic/beats/libbeat/publisher/beat"
 )
 
 type worker struct {

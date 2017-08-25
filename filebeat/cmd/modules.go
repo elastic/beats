@@ -11,10 +11,7 @@ import (
 )
 
 func buildModulesManager(beat *beat.Beat) (cmd.ModulesManager, error) {
-	config, err := beat.BeatConfig()
-	if err != nil {
-		return nil, errors.Wrap(err, "initialization error")
-	}
+	config := beat.BeatConfig
 
 	glob, err := config.String("config.modules.path", -1)
 	if err != nil {

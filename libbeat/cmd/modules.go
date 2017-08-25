@@ -8,6 +8,7 @@ import (
 
 	"github.com/elastic/beats/libbeat/beat"
 	"github.com/elastic/beats/libbeat/cfgfile"
+	"github.com/elastic/beats/libbeat/cmd/instance"
 )
 
 // ModulesManager interface provides all actions needed to implement modules command
@@ -21,12 +22,12 @@ type ModulesManager interface {
 	Disable(name string) error
 }
 
-// ModulesManagerFactory builds and return a ModulesManager for the given Beat
-type ModulesManagerFactory func(beat *beat.Beat) (ModulesManager, error)
+// modulesManagerFactory builds and return a ModulesManager for the given Beat
+type modulesManagerFactory func(beat *beat.Beat) (ModulesManager, error)
 
 // GenModulesCmd initializes a command to manage a modules.d folder, it offers
 // list, enable and siable actions
-func GenModulesCmd(name, version string, modulesFactory ModulesManagerFactory) *cobra.Command {
+func GenModulesCmd(name, version string, modulesFactory modulesManagerFactory) *cobra.Command {
 	modulesCmd := cobra.Command{
 		Use:   "modules",
 		Short: "Manage configured modules",
@@ -40,8 +41,8 @@ func GenModulesCmd(name, version string, modulesFactory ModulesManagerFactory) *
 }
 
 // Instantiate a modules manager or die trying
-func getModules(name, version string, modulesFactory ModulesManagerFactory) ModulesManager {
-	b, err := beat.New(name, version)
+func getModules(name, version string, modulesFactory modulesManagerFactory) ModulesManager {
+	b, err := instance.NewBeat(name, version)
 	if err != nil {
 		fmt.Fprintf(os.Stderr, "Error initializing beat: %s\n", err)
 		os.Exit(1)
@@ -52,7 +53,7 @@ func getModules(name, version string, modulesFactory ModulesManagerFactory) Modu
 		os.Exit(1)
 	}
 
-	manager, err := modulesFactory(b)
+	manager, err := modulesFactory(&b.Beat)
 	if err != nil {
 		fmt.Fprintf(os.Stderr, "Error in modules manager: %s\n", err)
 		os.Exit(1)
@@ -61,7 +62,7 @@ func getModules(name, version string, modulesFactory ModulesManagerFactory) Modu
 	return manager
 }
 
-func genListModulesCmd(name, version string, modulesFactory ModulesManagerFactory) *cobra.Command {
+func genListModulesCmd(name, version string, modulesFactory modulesManagerFactory) *cobra.Command {
 	return &cobra.Command{
 		Use:   "list",
 		Short: "List modules",
@@ -81,7 +82,7 @@ func genListModulesCmd(name, version string, modulesFactory ModulesManagerFactor
 	}
 }
 
-func genEnableModulesCmd(name, version string, modulesFactory ModulesManagerFactory) *cobra.Command {
+func genEnableModulesCmd(name, version string, modulesFactory modulesManagerFactory) *cobra.Command {
 	return &cobra.Command{
 		Use:   "enable MODULE...",
 		Short: "Enable one or more given modules",
@@ -110,7 +111,7 @@ func genEnableModulesCmd(name, version string, modulesFactory ModulesManagerFact
 	}
 }
 
-func genDisableModulesCmd(name, version string, modulesFactory ModulesManagerFactory) *cobra.Command {
+func genDisableModulesCmd(name, version string, modulesFactory modulesManagerFactory) *cobra.Command {
 	return &cobra.Command{
 		Use:   "disable MODULE...",
 		Short: "Disable one or more given modules",

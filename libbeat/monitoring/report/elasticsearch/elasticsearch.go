@@ -8,6 +8,7 @@ import (
 	"strings"
 	"time"
 
+	"github.com/elastic/beats/libbeat/beat"
 	"github.com/elastic/beats/libbeat/common"
 	"github.com/elastic/beats/libbeat/logp"
 	"github.com/elastic/beats/libbeat/monitoring"
@@ -16,7 +17,6 @@ import (
 	esout "github.com/elastic/beats/libbeat/outputs/elasticsearch"
 	"github.com/elastic/beats/libbeat/outputs/outil"
 	"github.com/elastic/beats/libbeat/outputs/transport"
-	"github.com/elastic/beats/libbeat/publisher/beat"
 	"github.com/elastic/beats/libbeat/publisher/pipeline"
 	"github.com/elastic/beats/libbeat/publisher/queue"
 	"github.com/elastic/beats/libbeat/publisher/queue/memqueue"
@@ -52,7 +52,7 @@ func init() {
 	report.RegisterReporterFactory("elasticsearch", makeReporter)
 }
 
-func makeReporter(beat common.BeatInfo, cfg *common.Config) (report.Reporter, error) {
+func makeReporter(beat beat.Info, cfg *common.Config) (report.Reporter, error) {
 	config := defaultConfig
 	if err := cfg.Unpack(&config); err != nil {
 		return nil, err
@@ -264,7 +264,7 @@ func parseProxyURL(raw string) (*url.URL, error) {
 	return url.Parse("http://" + raw)
 }
 
-func makeMeta(beat common.BeatInfo) common.MapStr {
+func makeMeta(beat beat.Info) common.MapStr {
 	return common.MapStr{
 		"type":    beat.Beat,
 		"version": beat.Version,

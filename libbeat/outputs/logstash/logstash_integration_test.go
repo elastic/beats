@@ -12,13 +12,13 @@ import (
 
 	"github.com/stretchr/testify/assert"
 
+	"github.com/elastic/beats/libbeat/beat"
 	"github.com/elastic/beats/libbeat/common"
 	"github.com/elastic/beats/libbeat/common/fmtstr"
 	"github.com/elastic/beats/libbeat/outputs"
 	"github.com/elastic/beats/libbeat/outputs/elasticsearch"
 	"github.com/elastic/beats/libbeat/outputs/outest"
 	"github.com/elastic/beats/libbeat/outputs/outil"
-	"github.com/elastic/beats/libbeat/publisher/beat"
 )
 
 const (
@@ -158,7 +158,7 @@ func newTestElasticsearchOutput(t *testing.T, test string) *testOutputer {
 		"template.enabled": false,
 	})
 
-	grp, err := plugin(common.BeatInfo{Beat: "libbeat"}, nil, config)
+	grp, err := plugin(beat.Info{Beat: "libbeat"}, nil, config)
 	if err != nil {
 		t.Fatalf("init elasticsearch output plugin failed: %v", err)
 	}

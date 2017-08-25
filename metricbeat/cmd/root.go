@@ -5,12 +5,12 @@ import (
 
 	"github.com/spf13/pflag"
 
-	// import modules
-	_ "github.com/elastic/beats/metricbeat/include"
-
 	cmd "github.com/elastic/beats/libbeat/cmd"
 	"github.com/elastic/beats/metricbeat/beater"
 	"github.com/elastic/beats/metricbeat/cmd/test"
+
+	// import modules
+	_ "github.com/elastic/beats/metricbeat/include"
 )
 
 // Name of this beat
