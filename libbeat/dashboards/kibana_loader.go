@@ -1,7 +1,7 @@
 package dashboards
 
 import (
-	"bytes"
+	"encoding/json"
 	"fmt"
 	"io/ioutil"
 	"net/url"
@@ -48,12 +48,20 @@ func (loader KibanaLoader) ImportIndex(file string) error {
 	params.Set("force", "true") //overwrite the existing dashboards
 
 	// read json file
-	content, err := ioutil.ReadFile(file)
+	reader, err := ioutil.ReadFile(file)
 	if err != nil {
 		return fmt.Errorf("fail to read index-pattern: %v", err)
 	}
 
-	return loader.client.ImportJSON(importAPI, params, bytes.NewBuffer(content))
+	var indexContent common.MapStr
+	err = json.Unmarshal(reader, &indexContent)
+	if err != nil {
+		return fmt.Errorf("fail to unmarshal the index content: %v", err)
+	}
+
+	indexContent = ReplaceIndexInIndexPattern(loader.config.Index, indexContent)
+
+	return loader.client.ImportJSON(importAPI, params, indexContent)
 }
 
 func (loader KibanaLoader) ImportDashboard(file string) error {
@@ -62,12 +70,19 @@ func (loader KibanaLoader) ImportDashboard(file string) error {
 	params.Add("exclude", "index-pattern") //don't import the index pattern from the dashboards
 
 	// read json file
-	content, err := ioutil.ReadFile(file)
+	reader, err := ioutil.ReadFile(file)
 	if err != nil {
 		return fmt.Errorf("fail to read index-pattern: %v", err)
 	}
+	var content common.MapStr
+	err = json.Unmarshal(reader, &content)
+	if err != nil {
+		return fmt.Errorf("fail to unmarshal the index content: %v", err)
+	}
 
-	return loader.client.ImportJSON(importAPI, params, bytes.NewBuffer(content))
+	content = ReplaceIndexInDashboardObject(loader.config.Index, content)
+
+	return loader.client.ImportJSON(importAPI, params, content)
 }
 
 func (loader KibanaLoader) Close() error {
