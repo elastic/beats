@@ -121,19 +121,11 @@ func (eb *Winlogbeat) Run(b *beat.Beat) error {
 
 	// setup global event ACK handler
 	err := eb.pipeline.SetACKHandler(beat.PipelineACKHandler{
-		ACKLastEvents: func(events []beat.Event) {
-			for _, event := range events {
-				priv := event.Private
-				if priv == nil {
-					continue
+		ACKLastEvents: func(data []interface{}) {
+			for _, datum := range data {
+				if st, ok := datum.(checkpoint.EventLogState); ok {
+					eb.checkpoint.PersistState(st)
 				}
-
-				st, ok := priv.(checkpoint.EventLogState)
-				if !ok {
-					continue
-				}
-
-				eb.checkpoint.PersistState(st)
 			}
 		},
 	})
