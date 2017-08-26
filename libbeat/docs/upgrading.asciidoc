@@ -6,6 +6,7 @@ This section gives general recommendations for upgrading the Beats:
 * <<upgrading-minor-versions>>
 * <<upgrading-1-to-5>>
 * <<upgrade-mapping-template>>
+* <<upgrade-5-5-dashboards>>
 
 [[upgrading-minor-versions]]
 === Upgrade between minor versions
@@ -215,3 +216,39 @@ order of operations should be:
 If downtime is not acceptable, another possible approach is to configure a
 different index pattern in the new Beat version, but this will likely require
 adjustments to your Kibana dashboards.
+
+[[upgrade-5-5-dashboards]]
+=== Upgrade Kibana dashboards
+
+In previous versions of Beats, when you ran the `import_dashboards` command, the
+Beats dashboards were automatically loaded into the `.kibana` index in
+Elasticsearch. This design made it more difficult for Beats developers to
+provide dashboards that were compatible with each new version of Kibana.
+
+In version 5.6, the Beats dashboards are still loaded by default into the
+`.kibana` index in Elasticsearch, but support has been added for loading
+dashboards via the Kibana API. Regardless of how you import the dashboards
+in version 5.6, they will work when you upgrade to Kibana 6.0. 
+
+However, if you have Beats 5.5 dashboards and plan to use them with Kibana 6.0,
+you need to import them into 5.6 now by using the Kibana API, or they will no
+longer work in Kibana 6.0.
+
+To upgrade the dashboards:
+
+. In Beats version 5.5, export the dashboards you want to upgrade.
+. Download and install the latest 5.6 version of Beats.
+. In Beats version 5.6, run the `import_dashboards` command with the `-kibana`
+option specified, and pass in the dashboards that you exported earlier. For
+example:
++
+[source,shell]
+-----
+./scripts/import_dashboards -kibana URL -file my_dashboard_archive.zip
+-----
++
+Where `URL` is the URL where Kibana is running, for example,
+`-kibana http://localhost:5601`, and `my_dashboard_archive.zip` is the archive
+that you created when you exported the dashboards.
+
+//REVIEWERS: How do we expect users to export the dashboards? That is unclear to me. I'm sort of assuming the export will create a zip archive, but maybe we should show the dir option instead? Not sure.
