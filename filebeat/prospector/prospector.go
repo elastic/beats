@@ -31,7 +31,7 @@ type Prospector struct {
 }
 
 // NewProspector instantiates a new prospector
-func NewProspector(
+func New(
 	conf *common.Config,
 	outlet channel.Factory,
 	beatDone chan struct{},
