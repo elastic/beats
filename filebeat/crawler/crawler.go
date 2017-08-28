@@ -58,9 +58,9 @@ func (c *Crawler) Start(r *registrar.Registrar, configProspectors *common.Config
 		cfgwarn.Beta("Loading separate prospectors is enabled.")
 
 		c.prospectorsReloader = cfgfile.NewReloader(configProspectors)
-		registrarContext := prospector.NewRegistrarContext(c.out, r, c.beatDone)
+		runnerFactory := prospector.NewRunnerFactory(c.out, r, c.beatDone)
 		go func() {
-			c.prospectorsReloader.Run(registrarContext)
+			c.prospectorsReloader.Run(runnerFactory)
 		}()
 	}
 
@@ -83,7 +83,7 @@ func (c *Crawler) startProspector(config *common.Config, states []file.State) er
 	if !config.Enabled() {
 		return nil
 	}
-	p, err := prospector.NewProspector(config, c.out, c.beatDone, states)
+	p, err := prospector.New(config, c.out, c.beatDone, states)
 	if err != nil {
 		return fmt.Errorf("Error in initing prospector: %s", err)
 	}

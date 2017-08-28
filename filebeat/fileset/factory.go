@@ -4,7 +4,7 @@ import (
 	"github.com/mitchellh/hashstructure"
 
 	"github.com/elastic/beats/filebeat/channel"
-	pros "github.com/elastic/beats/filebeat/prospector"
+	"github.com/elastic/beats/filebeat/prospector"
 	"github.com/elastic/beats/filebeat/registrar"
 	"github.com/elastic/beats/libbeat/cfgfile"
 	"github.com/elastic/beats/libbeat/common"
@@ -25,7 +25,7 @@ type Factory struct {
 type prospectorsRunner struct {
 	id                    uint64
 	moduleRegistry        *ModuleRegistry
-	prospectors           []*pros.Prospector
+	prospectors           []*prospector.Prospector
 	pipelineLoaderFactory PipelineLoaderFactory
 }
 
@@ -62,9 +62,9 @@ func (f *Factory) Create(c *common.Config) (cfgfile.Runner, error) {
 		return nil, err
 	}
 
-	prospectors := make([]*pros.Prospector, len(pConfigs))
+	prospectors := make([]*prospector.Prospector, len(pConfigs))
 	for i, pConfig := range pConfigs {
-		prospectors[i], err = pros.NewProspector(pConfig, f.outlet, f.beatDone, f.registrar.GetStates())
+		prospectors[i], err = prospector.New(pConfig, f.outlet, f.beatDone, f.registrar.GetStates())
 		if err != nil {
 			logp.Err("Error creating prospector: %s", err)
 			return nil, err
