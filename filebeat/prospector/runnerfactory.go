@@ -8,16 +8,16 @@ import (
 	"github.com/elastic/beats/libbeat/logp"
 )
 
-// RegistrarContext is a factory for registrars
-type RegistrarContext struct {
+// RunnerFactory is a factory for registrars
+type RunnerFactory struct {
 	outlet    channel.Factory
 	registrar *registrar.Registrar
 	beatDone  chan struct{}
 }
 
-// NewRegistrarContext instantiates a new RegistrarContext
-func NewRegistrarContext(outlet channel.Factory, registrar *registrar.Registrar, beatDone chan struct{}) *RegistrarContext {
-	return &RegistrarContext{
+// NewRunnerFactory instantiates a new RunnerFactory
+func NewRunnerFactory(outlet channel.Factory, registrar *registrar.Registrar, beatDone chan struct{}) *RunnerFactory {
+	return &RunnerFactory{
 		outlet:    outlet,
 		registrar: registrar,
 		beatDone:  beatDone,
@@ -25,8 +25,8 @@ func NewRegistrarContext(outlet channel.Factory, registrar *registrar.Registrar,
 }
 
 // Create creates a prospector based on a config
-func (r *RegistrarContext) Create(c *common.Config) (cfgfile.Runner, error) {
-	p, err := NewProspector(c, r.outlet, r.beatDone, r.registrar.GetStates())
+func (r *RunnerFactory) Create(c *common.Config) (cfgfile.Runner, error) {
+	p, err := New(c, r.outlet, r.beatDone, r.registrar.GetStates())
 	if err != nil {
 		logp.Err("Error creating prospector: %s", err)
 		// In case of error with loading state, prospector is still returned
