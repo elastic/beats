@@ -53,6 +53,10 @@ func (l *argList) Set(v string) error {
 	return nil
 }
 
+func (l *argList) IsSet() bool {
+	return l.isDefault == false
+}
+
 func (l *argList) Get() interface{} {
 	return l.list
 }
