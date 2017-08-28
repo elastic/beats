@@ -8,18 +8,11 @@
 // Template, add newest changes here
 
 === Beats version HEAD
-https://github.com/elastic/beats/compare/v6.0.0-beta1...master[Check the HEAD diff]
+https://github.com/elastic/beats/compare/v6.0.0-beta2...master[Check the HEAD diff]
 
 ==== Breaking changes
 
 *Affecting all Beats*
-- The log directory (`path.log`) for Windows services is now set to `C:\ProgramData\[beatname]\logs`. {issue}4764[4764]
-- The _all field is disabled in 6.0. This means that searching by individual
-  words only work on text fields. {issue}4901[4901]
-- Fail if removed setting output.X.flush_interval is explicitly configured.
-- Rename the `/usr/bin/beatname.sh` script (e.g. `metricbeat.sh`) to `/usr/bin/beatname`. {pull}4933[4933]
-- Beat does not start if elasticsearch index pattern was modified but not the template name and pattern. {issue}4769[4769]
-- Fail if removed setting output.X.flush_interval is explicitly configured.
 
 *Auditbeat*
 
@@ -37,17 +30,81 @@ https://github.com/elastic/beats/compare/v6.0.0-beta1...master[Check the HEAD di
 
 *Affecting all Beats*
 
-- Register kubernetes `field_format` matcher and remove logger in `Encode` API {pull}4888[4888]
-- Fix go plugins not loaded when beat starts {pull}4799[4799]
-- Add support for `initContainers` in `add_kubernetes_metadata` processor. {issue}4825[4825]
-
-- Eliminate deprecated _default_ mapping in 6.x {pull}4864[4864]
-
 *Auditbeat*
 
 *Filebeat*
 
 *Filebeat*
+
+*Heartbeat*
+
+*Metricbeat*
+
+*Packetbeat*
+
+*Winlogbeat*
+
+==== Added
+
+*Affecting all Beats*
+
+*Auditbeat*
+
+*Filebeat*
+
+*Heartbeat*
+
+*Metricbeat*
+
+*Packetbeat*
+
+*Winlogbeat*
+
+*Auditbeat*
+
+==== Deprecated
+
+*Affecting all Beats*
+
+*Filebeat*
+
+*Heartbeat*
+
+*Metricbeat*
+
+*Packetbeat*
+
+*Winlogbeat*
+
+==== Known Issue
+
+
+////////////////////////////////////////////////////////////
+
+[[release-notes-6.0.0-beta2]]
+=== Beats version 6.0.0-beta2
+https://github.com/elastic/beats/compare/v6.0.0-beta1...v6.0.0-beta1[View commits]
+
+==== Breaking changes
+
+*Affecting all Beats*
+
+- The log directory (`path.log`) for Windows services is now set to `C:\ProgramData\[beatname]\logs`. {issue}4764[4764]
+- The _all field is disabled in Elasticsearch 6.0. This means that searching by individual
+  words only work on text fields. {issue}4901[4901]
+- Fail if removed setting output.X.flush_interval is explicitly configured.
+- Rename the `/usr/bin/beatname.sh` script (e.g. `metricbeat.sh`) to `/usr/bin/beatname`. {pull}4933[4933]
+- Beat does not start if elasticsearch index pattern was modified but not the template name and pattern. {issue}4769[4769]
+- Fail if removed setting output.X.flush_interval is explicitly configured. {pull}4880[4880]
+
+==== Bugfixes
+
+*Affecting all Beats*
+
+- Register kubernetes `field_format` matcher and remove logger in `Encode` API {pull}4888[4888]
+- Fix go plugins not loaded when beat starts {pull}4799[4799]
+- Add support for `initContainers` in `add_kubernetes_metadata` processor. {issue}4825[4825]
+- Eliminate deprecated _default_ mapping in 6.x {pull}4864[4864]
 
 *Heartbeat*
 
@@ -64,8 +121,6 @@ https://github.com/elastic/beats/compare/v6.0.0-beta1...master[Check the HEAD di
 
 - Update flow timestamp on each packet being received. {issue}4895[4895]
 
-*Winlogbeat*
-
 ==== Added
 
 *Affecting all Beats*
@@ -78,43 +133,16 @@ https://github.com/elastic/beats/compare/v6.0.0-beta1...master[Check the HEAD di
 - Add newer kafka versions to kafka output. {pull}4977[4977]
 - Configure the index name when loading the dashboards and the index pattern. {pull}4949[4949]
 
-*Auditbeat*
-
-*Filebeat*
-
-*Heartbeat*
-
 *Metricbeat*
 
 - Add `filesystem.ignore_types` to system module for ignoring filesystem types. {issue}4685[4685]
 - Add support to exclude labels from kubernetes pod metadata. {pull}4757[4757]
-
-*Packetbeat*
-
-*Winlogbeat*
-
-*Auditbeat*
 
 ==== Deprecated
 
 *Affecting all Beats*
 
 - Fix pod name indexer to use both namespace, pod name to frame index key {pull}4775[4775]
-
-*Filebeat*
-
-*Heartbeat*
-
-*Metricbeat*
-
-*Packetbeat*
-
-*Winlogbeat*
-
-==== Known Issue
-
-
-////////////////////////////////////////////////////////////
 
 [[release-notes-6.0.0-beta1]]
 === Beats version 6.0.0-beta1
