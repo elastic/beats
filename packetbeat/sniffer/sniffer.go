@@ -258,7 +258,10 @@ func validatePcapFilter(expr string) error {
 	defer p.Close()
 
 	_, err = p.NewBPF(expr)
-	return fmt.Errorf("invalid filter: %s", err)
+	if err != nil {
+		return fmt.Errorf("invalid filter '%s': %v", expr, err)
+	}
+	return nil
 }
 
 func openPcap(filter string, cfg *config.InterfacesConfig) (snifferHandle, error) {

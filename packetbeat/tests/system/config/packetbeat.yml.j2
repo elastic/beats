@@ -4,6 +4,10 @@
 # keyword to sniff on all connected interfaces.
 packetbeat.interfaces.device: {{ iface_device|default("any") }}
 
+{% if bpf_filter %}
+packetbeat.interfaces.bpf_filter: {{ bpf_filter }}
+{% endif %}
+
 {% if flows %}
 #================================== Flows =====================================
 # Set network flow timeout. Flow is killed if no packet is received before being
