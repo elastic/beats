@@ -5,6 +5,7 @@ package status
 import (
 	"testing"
 
+	"github.com/elastic/beats/libbeat/tests/compose"
 	mbtest "github.com/elastic/beats/metricbeat/mb/testing"
 	"github.com/elastic/beats/metricbeat/module/apache"
 
@@ -12,6 +13,8 @@ import (
 )
 
 func TestFetch(t *testing.T) {
+	compose.EnsureUp(t, "apache")
+
 	f := mbtest.NewEventFetcher(t, getConfig())
 	event, err := f.Fetch()
 	if !assert.NoError(t, err) {
@@ -27,6 +30,8 @@ func TestFetch(t *testing.T) {
 }
 
 func TestData(t *testing.T) {
+	compose.EnsureUp(t, "apache")
+
 	f := mbtest.NewEventFetcher(t, getConfig())
 
 	err := mbtest.WriteEvent(f, t)
