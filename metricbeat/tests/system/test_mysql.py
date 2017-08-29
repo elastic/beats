@@ -11,6 +11,8 @@ MYSQL_STATUS_FIELDS = ["clients", "cluster", "cpu", "keyspace", "memory",
 
 class Test(metricbeat.BaseTest):
 
+    COMPOSE_SERVICES = ['mysql']
+
     @unittest.skipUnless(metricbeat.INTEGRATION_TESTS, "integration test")
     @attr('integration')
     def test_status(self):
