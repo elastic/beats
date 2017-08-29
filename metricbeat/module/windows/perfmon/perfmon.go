@@ -14,11 +14,11 @@ import (
 )
 
 type CounterConfig struct {
-	InstanceLabel    string  `config:"instance_label" validate:"required"`
-	InstanceName     *string `config:"instance_name"`
-	MeasurementLabel string  `config:"measurement_label" validate:"required"`
-	Query            string  `config:"query" validate:"required"`
-	Format           string  `config:"format"`
+	InstanceLabel    string `config:"instance_label" validate:"required"`
+	InstanceName     string `config:"instance_name"`
+	MeasurementLabel string `config:"measurement_label" validate:"required"`
+	Query            string `config:"query" validate:"required"`
+	Format           string `config:"format"`
 }
 
 func init() {

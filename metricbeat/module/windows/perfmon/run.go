@@ -36,7 +36,7 @@ func run() error {
 	cmd.Env = os.Environ()
 
 	if *goarch != "" {
-		cmd.Env = append(cmd.Env, "GOARCH"+*goarch)
+		cmd.Env = append(cmd.Env, "GOARCH="+*goarch)
 	}
 
 	if *output != "" {
