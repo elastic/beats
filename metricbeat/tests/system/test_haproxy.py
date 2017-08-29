@@ -8,6 +8,8 @@ HAPROXY_FIELDS = metricbeat.COMMON_FIELDS + ["haproxy"]
 
 class Test(metricbeat.BaseTest):
 
+    COMPOSE_SERVICES = ['haproxy']
+
     @unittest.skipUnless(metricbeat.INTEGRATION_TESTS, "integration test")
     def test_info(self):
         """
