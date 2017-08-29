@@ -283,8 +283,9 @@ func (p *Pipeline) Connect() (beat.Client, error) {
 // the appropriate fields in the passed ClientConfig.
 func (p *Pipeline) ConnectWith(cfg beat.ClientConfig) (beat.Client, error) {
 	var (
-		canDrop    bool
-		eventFlags publisher.EventFlags
+		canDrop      bool
+		dropOnCancel bool
+		eventFlags   publisher.EventFlags
 	)
 
 	err := validateClientConfig(&cfg)
@@ -299,6 +300,7 @@ func (p *Pipeline) ConnectWith(cfg beat.ClientConfig) (beat.Client, error) {
 	switch cfg.PublishMode {
 	case beat.GuaranteedSend:
 		eventFlags = publisher.GuaranteedSend
+		dropOnCancel = true
 	case beat.DropIfFull:
 		canDrop = true
 	}
@@ -319,9 +321,9 @@ func (p *Pipeline) ConnectWith(cfg beat.ClientConfig) (beat.Client, error) {
 
 	acker := p.makeACKer(processors != nil, &cfg, waitClose)
 	producerCfg := queue.ProducerConfig{
-		// only cancel events from queue if acker is configured
-		// and no pipeline-wide ACK handler is registered
-		DropOnCancel: acker != nil && p.eventer.cb == nil,
+		// Cancel events from queue if acker is configured
+		// and no pipeline-wide ACK handler is registered.
+		DropOnCancel: dropOnCancel && acker != nil && p.eventer.cb == nil,
 	}
 
 	if reportEvents || cfg.Events != nil {
