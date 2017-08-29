@@ -6,6 +6,7 @@ import (
 	"testing"
 
 	"github.com/elastic/beats/libbeat/common"
+	"github.com/elastic/beats/libbeat/tests/compose"
 	mbtest "github.com/elastic/beats/metricbeat/mb/testing"
 	"github.com/elastic/beats/metricbeat/module/redis"
 
@@ -20,6 +21,8 @@ const (
 var redisHost = redis.GetRedisEnvHost() + ":" + redis.GetRedisEnvPort()
 
 func TestFetch(t *testing.T) {
+	compose.EnsureUp(t, "redis")
+
 	f := mbtest.NewEventFetcher(t, getConfig(""))
 	event, err := f.Fetch()
 	if err != nil {
@@ -35,6 +38,8 @@ func TestFetch(t *testing.T) {
 }
 
 func TestData(t *testing.T) {
+	compose.EnsureUp(t, "redis")
+
 	f := mbtest.NewEventFetcher(t, getConfig(""))
 
 	err := mbtest.WriteEvent(f, t)
@@ -44,6 +49,8 @@ func TestData(t *testing.T) {
 }
 
 func TestPasswords(t *testing.T) {
+	compose.EnsureUp(t, "redis")
+
 	// Add password and ensure it gets reset
 	defer func() {
 		err := resetPassword(redisHost, password)

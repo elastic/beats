@@ -7,12 +7,15 @@ import (
 	"testing"
 
 	"github.com/elastic/beats/libbeat/common"
+	"github.com/elastic/beats/libbeat/tests/compose"
 	mbtest "github.com/elastic/beats/metricbeat/mb/testing"
 
 	"github.com/stretchr/testify/assert"
 )
 
 func TestFetch(t *testing.T) {
+	compose.EnsureUp(t, "prometheus")
+
 	f := mbtest.NewEventFetcher(t, getConfig())
 	event, err := f.Fetch()
 	if !assert.NoError(t, err) {
@@ -27,6 +30,8 @@ func TestFetch(t *testing.T) {
 }
 
 func TestData(t *testing.T) {
+	compose.EnsureUp(t, "prometheus")
+
 	f := mbtest.NewEventFetcher(t, getConfig())
 
 	err := mbtest.WriteEvent(f, t)
