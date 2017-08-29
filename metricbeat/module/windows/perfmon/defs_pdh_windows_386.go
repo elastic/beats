@@ -206,16 +206,6 @@ type PdhCounterValue struct {
 	Pad_cgo_1 [4]byte
 }
 
-type PdhCounterValueItem struct {
-	SzName   *int8
-	FmtValue PdhCounterValue
-}
-
-type PdhRawCounterItem struct {
-	SzName   *int8
-	RawValue PdhRawCounter
-}
-
 type PdhRawCounter struct {
 	CStatus     uint32
 	TimeStamp   PdhFileTime
