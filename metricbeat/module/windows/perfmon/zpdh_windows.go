@@ -92,7 +92,7 @@ func _PdhGetFormattedCounterValue(counter PdhCounterHandle, format PdhCounterFor
 	return
 }
 
-func _PdhGetFormattedCounterArray(counter PdhCounterHandle, format PdhCounterFormat, bufferSize *uint32, bufferCount *uint32, itemBuffer *PdhCounterValueItem) (errcode error) {
+func _PdhGetFormattedCounterArray(counter PdhCounterHandle, format PdhCounterFormat, bufferSize *uint32, bufferCount *uint32, itemBuffer *byte) (errcode error) {
 	r0, _, _ := syscall.Syscall6(procPdhGetFormattedCounterArrayW.Addr(), 5, uintptr(counter), uintptr(format), uintptr(unsafe.Pointer(bufferSize)), uintptr(unsafe.Pointer(bufferCount)), uintptr(unsafe.Pointer(itemBuffer)), 0)
 	if r0 != 0 {
 		errcode = syscall.Errno(r0)
@@ -108,7 +108,7 @@ func _PdhGetRawCounterValue(counter PdhCounterHandle, counterType *uint32, value
 	return
 }
 
-func _PdhGetRawCounterArray(counter PdhCounterHandle, bufferSize *uint32, bufferCount *uint32, itemBuffer *PdhRawCounterItem) (errcode error) {
+func _PdhGetRawCounterArray(counter PdhCounterHandle, bufferSize *uint32, bufferCount *uint32, itemBuffer *pdhRawCounterItem) (errcode error) {
 	r0, _, _ := syscall.Syscall6(procPdhGetRawCounterArray.Addr(), 4, uintptr(counter), uintptr(unsafe.Pointer(bufferSize)), uintptr(unsafe.Pointer(bufferCount)), uintptr(unsafe.Pointer(itemBuffer)), 0, 0)
 	if r0 != 0 {
 		errcode = syscall.Errno(r0)

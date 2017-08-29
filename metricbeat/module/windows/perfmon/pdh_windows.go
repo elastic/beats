@@ -3,6 +3,7 @@
 package perfmon
 
 import (
+	"bytes"
 	"regexp"
 	"strconv"
 	"syscall"
@@ -14,6 +15,7 @@ import (
 	"golang.org/x/sys/windows"
 
 	"github.com/elastic/beats/libbeat/common"
+	"github.com/elastic/beats/winlogbeat/sys"
 )
 
 // Windows API calls
@@ -21,12 +23,18 @@ import (
 //sys _PdhAddCounter(query PdhQueryHandle, counterPath string, userData uintptr, counter *PdhCounterHandle) (errcode error) [failretval!=0] = pdh.PdhAddEnglishCounterW
 //sys _PdhCollectQueryData(query PdhQueryHandle) (errcode error) [failretval!=0] = pdh.PdhCollectQueryData
 //sys _PdhGetFormattedCounterValue(counter PdhCounterHandle, format PdhCounterFormat, counterType *uint32, value *PdhCounterValue) (errcode error) [failretval!=0] = pdh.PdhGetFormattedCounterValue
-//sys _PdhGetFormattedCounterArray(counter PdhCounterHandle, format PdhCounterFormat, bufferSize *uint32, bufferCount *uint32, itemBuffer *PdhCounterValueItem) (errcode error) [failretval!=0] = pdh.PdhGetFormattedCounterArrayW
+//sys _PdhGetFormattedCounterArray(counter PdhCounterHandle, format PdhCounterFormat, bufferSize *uint32, bufferCount *uint32, itemBuffer *byte) (errcode error) [failretval!=0] = pdh.PdhGetFormattedCounterArrayW
 //sys _PdhGetRawCounterValue(counter PdhCounterHandle, counterType *uint32, value *PdhRawCounter) (errcode error) [failretval!=0] = pdh.PdhGetRawCounterValue
-//sys _PdhGetRawCounterArray(counter PdhCounterHandle, bufferSize *uint32, bufferCount *uint32, itemBuffer *PdhRawCounterItem) (errcode error) [failretval!=0] = pdh.PdhGetRawCounterArray
+//sys _PdhGetRawCounterArray(counter PdhCounterHandle, bufferSize *uint32, bufferCount *uint32, itemBuffer *pdhRawCounterItem) (errcode error) [failretval!=0] = pdh.PdhGetRawCounterArray
 //sys _PdhCalculateCounterFromRawValue(counter PdhCounterHandle, format PdhCounterFormat, rawValue1 *PdhRawCounter, rawValue2 *PdhRawCounter, value *PdhCounterValue) (errcode error) [failretval!=0] = pdh.PdhCalculateCounterFromRawValue
 //sys _PdhFormatFromRawValue(counterType uint32, format PdhCounterFormat, timeBase *uint64, rawValue1 *PdhRawCounter, rawValue2 *PdhRawCounter, value *PdhCounterValue) (errcode error) [failretval!=0] = pdh.PdhFormatFromRawValue
 //sys _PdhCloseQuery(query PdhQueryHandle) (errcode error) [failretval!=0] = pdh.PdhCloseQuery
+
+var (
+	sizeofPdhCounterValueItem = (int)(unsafe.Sizeof(pdhCounterValueItem{}))
+	wildcardRegexp            = regexp.MustCompile(`.*\(\*\).*`)
+	instanceNameRegexp        = regexp.MustCompile(`.*\((.*)\).*`)
+)
 
 type PdhQueryHandle uintptr
 
@@ -35,6 +43,16 @@ var InvalidQueryHandle = ^PdhQueryHandle(0)
 type PdhCounterHandle uintptr
 
 var InvalidCounterHandle = ^PdhCounterHandle(0)
+
+type pdhCounterValueItem struct {
+	SzName   uintptr
+	FmtValue PdhCounterValue
+}
+
+type pdhRawCounterItem struct {
+	SzName   uintptr
+	RawValue PdhRawCounter
+}
 
 type CounterValueItem struct {
 	Name  string
@@ -91,35 +109,36 @@ func PdhGetFormattedCounterArray(counter PdhCounterHandle, format PdhCounterForm
 	var bufferCount uint32
 
 	if err := _PdhGetFormattedCounterArray(counter, format, &bufferSize, &bufferCount, nil); err != nil {
-		//From MSDN: You should call this function twice, the first time to get the required buffer size (set ItemBuffer to NULL and lpdwBufferSize to 0), and the second time to get the data.
-		if PdhErrno(err.(syscall.Errno)) == PDH_MORE_DATA {
-			pdhValues := make([]PdhCounterValueItem, bufferSize)
-			if err := _PdhGetFormattedCounterArray(counter, format, &bufferSize, &bufferCount, &pdhValues[0]); err != nil {
-				return nil, PdhErrno(err.(syscall.Errno))
-			}
-
-			values := make([]CounterValueItem, bufferCount)
-			var i uint32
-
-			for i = 0; i < bufferCount; i++ {
-				value := CounterValueItem{}
-				a := (*[1<<30 - 1]uint16)(unsafe.Pointer(pdhValues[i].SzName))
-				size := 0
-				for ; size < len(a); size++ {
-					if a[size] == uint16(0) {
-						break
-					}
-				}
-				runes := utf16.Decode(a[:size])
-				name := string(runes)
-				value.Name = name
-				value.Value = pdhValues[i].FmtValue
-				values[i] = value
-			}
-
-			return values, nil
+		// From MSDN: You should call this function twice, the first time to get the required
+		// buffer size (set ItemBuffer to NULL and lpdwBufferSize to 0), and the second time to get the data.
+		if PdhErrno(err.(syscall.Errno)) != PDH_MORE_DATA {
+			return nil, PdhErrno(err.(syscall.Errno))
 		}
-		return nil, PdhErrno(err.(syscall.Errno))
+
+		// Buffer holds PdhCounterValueItems at the beginning and then null-terminated
+		// strings at the end.
+		buffer := make([]byte, bufferSize)
+		if err := _PdhGetFormattedCounterArray(counter, format, &bufferSize, &bufferCount, &buffer[0]); err != nil {
+			return nil, PdhErrno(err.(syscall.Errno))
+		}
+
+		values := make([]CounterValueItem, bufferCount)
+		nameBuffer := new(bytes.Buffer)
+		for i := 0; i < len(values); i++ {
+			pdhValueItem := (*pdhCounterValueItem)(unsafe.Pointer(&buffer[i*sizeofPdhCounterValueItem]))
+
+			// The strings are appended to the end of the buffer.
+			nameOffset := pdhValueItem.SzName - (uintptr)(unsafe.Pointer(&buffer[0]))
+			nameBuffer.Reset()
+			if err := sys.UTF16ToUTF8Bytes(buffer[nameOffset:], nameBuffer); err != nil {
+				return nil, err
+			}
+
+			values[i].Name = nameBuffer.String()
+			values[i].Value = pdhValueItem.FmtValue
+		}
+
+		return values, nil
 	}
 
 	return nil, nil
@@ -166,7 +185,8 @@ func PdhCloseQuery(query PdhQueryHandle) error {
 type Counter struct {
 	handle       PdhCounterHandle
 	format       PdhCounterFormat
-	instanceName *string
+	instanceName string
+	wildcard     bool // wildcard indicates that the path contains a wildcard.
 }
 
 type Counters map[string]*Counter
@@ -195,7 +215,7 @@ func NewQuery(dataSource string) (*Query, error) {
 	}, nil
 }
 
-func (q *Query) AddCounter(counterPath string, format Format, instanceName *string) error {
+func (q *Query) AddCounter(counterPath string, format Format, instanceName string) error {
 	if _, found := q.counters[counterPath]; found {
 		return errors.New("counter already added")
 	}
@@ -205,8 +225,22 @@ func (q *Query) AddCounter(counterPath string, format Format, instanceName *stri
 		return errors.Wrapf(err, `failed to add counter (path="%v")`, counterPath)
 	}
 
-	q.counters[counterPath] = &Counter{handle: h}
-	q.counters[counterPath].instanceName = instanceName
+	wildcard := wildcardRegexp.MatchString(counterPath)
+
+	// Extract the instance name from the counterPath for non-wildcard paths.
+	if !wildcard && instanceName == "" {
+		matches := instanceNameRegexp.FindStringSubmatch(counterPath)
+		if len(matches) != 2 {
+			return errors.New("query doesn't contain an instance name. In this case you have to define 'instance_name'")
+		}
+		instanceName = matches[1]
+	}
+
+	q.counters[counterPath] = &Counter{
+		handle:       h,
+		instanceName: instanceName,
+		wildcard:     wildcard,
+	}
 	switch format {
 	case FloatFlormat:
 		q.counters[counterPath].format = PdhFmtDouble
@@ -230,8 +264,7 @@ func (q *Query) Values() (map[string][]Value, error) {
 	rtn := make(map[string][]Value, len(q.counters))
 
 	for path, counter := range q.counters {
-
-		if match, _ := regexp.MatchString(".*\\(\\*\\)\\.*", path); match {
+		if counter.wildcard {
 			values, err := PdhGetFormattedCounterArray(counter.handle, counter.format|PdhFmtNoCap100)
 			if err != nil {
 				rtn[path] = append(rtn[path], Value{Err: err})
@@ -249,7 +282,6 @@ func (q *Query) Values() (map[string][]Value, error) {
 				}
 
 				rtn[path] = append(rtn[path], Value{Instance: values[i].Name, Measurement: val})
-
 			}
 		} else {
 			_, value, err := PdhGetFormattedCounterValue(counter.handle, counter.format|PdhFmtNoCap100)
@@ -258,23 +290,11 @@ func (q *Query) Values() (map[string][]Value, error) {
 				continue
 			}
 
-			var name string
-			if counter.instanceName != nil {
-				name = *counter.instanceName
-			} else {
-				re := regexp.MustCompile("\\((.*)\\)")
-				match := re.FindStringSubmatch(path)
-				if cap(match) <= 0 {
-					return nil, errors.New("Your query doesn't contain an instance name. In this case you have to define one per `instance_name`")
-				}
-				name = match[1]
-			}
-
 			switch counter.format {
 			case PdhFmtDouble:
-				rtn[path] = append(rtn[path], Value{Measurement: *(*float64)(unsafe.Pointer(&value.LongValue)), Instance: name})
+				rtn[path] = append(rtn[path], Value{Measurement: *(*float64)(unsafe.Pointer(&value.LongValue)), Instance: counter.instanceName})
 			case PdhFmtLarge:
-				rtn[path] = append(rtn[path], Value{Measurement: *(*int64)(unsafe.Pointer(&value.LongValue)), Instance: name})
+				rtn[path] = append(rtn[path], Value{Measurement: *(*int64)(unsafe.Pointer(&value.LongValue)), Instance: counter.instanceName})
 			}
 		}
 	}
@@ -339,7 +359,7 @@ func (r *PerfmonReader) Read() ([]common.MapStr, error) {
 	}
 
 	// Write the values into the map.
-	result := []common.MapStr{}
+	result := make([]common.MapStr, 0, len(values))
 	var errs multierror.Errors
 
 	for counterPath, counter := range values {
