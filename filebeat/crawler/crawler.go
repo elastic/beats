@@ -59,6 +59,10 @@ func (c *Crawler) Start(r *registrar.Registrar, configProspectors *common.Config
 
 		c.prospectorsReloader = cfgfile.NewReloader(configProspectors)
 		registrarContext := prospector.NewRegistrarContext(c.out, r, c.beatDone)
+		if err := c.prospectorsReloader.Check(registrarContext); err != nil {
+			return err
+		}
+
 		go func() {
 			c.prospectorsReloader.Run(registrarContext)
 		}()
@@ -69,6 +73,10 @@ func (c *Crawler) Start(r *registrar.Registrar, configProspectors *common.Config
 
 		c.modulesReloader = cfgfile.NewReloader(configModules)
 		modulesFactory := fileset.NewFactory(c.out, r, c.beatVersion, pipelineLoaderFactory, c.beatDone)
+		if err := c.modulesReloader.Check(modulesFactory); err != nil {
+			return err
+		}
+
 		go func() {
 			c.modulesReloader.Run(modulesFactory)
 		}()
