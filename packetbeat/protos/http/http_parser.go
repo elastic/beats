@@ -169,11 +169,17 @@ func (*parser) parseHTTPLine(s *stream, m *message) (cont, ok, complete bool) {
 		}
 
 		m.method = common.NetString(slices[0])
-		m.requestURI = common.NetString(slices[1])
-
-		if bytes.Equal(slices[2][:5], []byte("HTTP/")) {
+		buf:=bytes.NewBuffer(slices[1])
+		if len(slices) > 3 {
+			for k := 2; k < len(slices)-1; k++ {
+			buf.Write([]byte(" "))
+			buf.Write(slices[k])
+			}
+		}
+		m.requestURI=buf.Bytes()
+		if bytes.Equal(slices[len(slices)-1][:5], []byte("HTTP/")) {
 			m.isRequest = true
-			version = slices[2][5:]
+			version = slices[len(slices)-1][5:]
 		} else {
 			if isDebug {
 				debugf("Couldn't understand HTTP version: %s", fline)
