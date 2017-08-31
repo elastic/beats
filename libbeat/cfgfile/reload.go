@@ -150,8 +150,9 @@ func (rl *Reloader) Run(runnerFactory RunnerFactory) {
 					if runner != nil && rl.registry.Has(runner.ID()) {
 						debugf("Remove module from stoplist: %v", runner.ID())
 						delete(stopList, runner.ID())
+					} else {
+						logp.Err("Error creating module: %s", err)
 					}
-					logp.Err("Error creating module: %s", err)
 					continue
 				}
 
