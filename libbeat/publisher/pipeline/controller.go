@@ -12,7 +12,7 @@ import (
 // - reload
 type outputController struct {
 	logger   *logp.Logger
-	observer *observer
+	observer outputObserver
 
 	queue queue.Queue
 
@@ -40,7 +40,7 @@ type outputWorker interface {
 
 func newOutputController(
 	log *logp.Logger,
-	observer *observer,
+	observer outputObserver,
 	b queue.Queue,
 ) *outputController {
 	c := &outputController{
