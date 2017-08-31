@@ -12,13 +12,13 @@ import (
 
 	"github.com/stretchr/testify/assert"
 
+	"github.com/elastic/beats/libbeat/beat"
 	"github.com/elastic/beats/libbeat/common"
 	"github.com/elastic/beats/libbeat/common/fmtstr"
 	"github.com/elastic/beats/libbeat/outputs"
 	"github.com/elastic/beats/libbeat/outputs/elasticsearch"
 	"github.com/elastic/beats/libbeat/outputs/outest"
 	"github.com/elastic/beats/libbeat/outputs/outil"
-	"github.com/elastic/beats/libbeat/publisher/beat"
 )
 
 const (
@@ -148,19 +148,17 @@ func newTestElasticsearchOutput(t *testing.T, test string) *testOutputer {
 	index := testElasticsearchIndex(test)
 	connection := esConnect(t, index)
 
-	flushInterval := 0
 	bulkSize := 0
 	config, _ := common.NewConfigFrom(map[string]interface{}{
 		"hosts":            []string{getElasticsearchHost()},
 		"index":            connection.index,
-		"flush_interval":   &flushInterval,
 		"bulk_max_size":    &bulkSize,
 		"username":         os.Getenv("ES_USER"),
 		"password":         os.Getenv("ES_PASS"),
 		"template.enabled": false,
 	})
 
-	grp, err := plugin(common.BeatInfo{Beat: "libbeat"}, nil, config)
+	grp, err := plugin(beat.Info{Beat: "libbeat"}, nil, config)
 	if err != nil {
 		t.Fatalf("init elasticsearch output plugin failed: %v", err)
 	}

@@ -1,5 +1,5 @@
 - key: log
-  title: Log File Content
+  title: Log file content
   description: >
     Contains log file lines.
   fields:

@@ -34,6 +34,7 @@ Node.
 
 Filebeat modules require Elasticsearch 5.2 or later.
 
+[[modules-tutorial]]
 === Tutorial
 
 This tutorial assumes you have Elasticsearch and Kibana installed and

@@ -1,0 +1,67 @@
+[[testing]]
+=== Testing
+
+Beats has a various sets of tests. This guide should help to understand how the different test suites work, how they are used and new tests are added.
+
+In general there are two major test suites:
+
+* Tests written in Golang
+* Tests written in Python
+
+The tests written in Golang use the https://golang.org/pkg/testing/[Golang Testing package]. The tests written in Python depend on http://nose.readthedocs.io/en/latest/[nosetests] and require a compiled and executable binary from the Golang code. The python test run a beat with a specific config and params and either check if the output is as expected or if the correct things show up in the logs.
+
+For both of the above test suites so called integration tests exists. Integration tests in Beats are tests which require an external system like Elasticsearch to test if the integration with this service works as expected. Beats provides in its testsuite docker containers and docker-compose files to start these environments but a developer can run the required services also locally.
+
+==== Running Golang Tests
+
+The golang tests can be executed in each Golang package by running `go test .`. This will execute all tests which don't don't require an external service to be running. To also run the Golang integration tests run `go test -tags=integration .`. It will require you to run the expected services on localhost.
+
+To run all non integration tests for a beat run `make unit`. This will execute all the tests which are not inside a `vendor` directory. If you want to have a coverage report for the tests which were run use `make unit-tests`. A coverage report will be generated under `build/coverage` directory.
+
+All Golang tests are in the same package as the tested code itself and have the postfix `_test` in the file name. Most of the tests are in the same package as the rest of the code. Some of the tests which should be sepearate from the rest of the code or should not use private variables go under `{packagename}_test`.
+
+
+==== Running Python Tests
+
+The system tests require a testing binary to be available and the python environment to be set up. To create the testing binary run `make {beatname}.test`. This will create the test binary in the beat directory. To setup the testing environment `make python-env` can be run which will use `virtualenv` to load the dependencies. Then `nosetests` has to be run inside `tests/system`.
+
+To automate all these steps into one `make system-tests` can be run. This creates the binary, the environment and runs all tests which do not require and external service.
+
+For the tests which require an external service like Elasticsearch to be running use `INTEGRATION_TESTS=1 make system-tests`. This will assume the services are running on localhost.
+
+To run the tests without the services running locally, the command `make system-tests-environment` can be used. This will start up the required environment in docker and will run all tests including the testing binary inside the docker environment.
+
+All Python tests are under `tests/system` directory.
+
+==== Test commands
+
+This is a quick summary of the available test commands:
+
+* `unit`: Golang tests
+* `unit-tests`: Golang tests with coverage reports
+* `integration-tests`: Golang tests with services in local docker
+* `integration-tests-environment`: Golang tests inside docker with service in docker
+* `fast-system-tests`: Python tests
+* `system-tests`: Python tests with coverage report
+* `INTEGRATION_TESTS=1 system-tests`: Python tests with local services
+* `system-tests-environment`: Python tests inside docker with service in docker
+* `testsuite`: Complete test suite in docker environment is run
+* `test`: Runs testsuite without environment
+
+There are two experimental test commands:
+
+* `benchmark-tests`: Running golang tests with `-bench` flag
+* `load-tests`: Running system tests with `LOAD_TESTS=1` flag
+
+
+==== Coverage report
+
+If the tests were run to create a test coverage, the coverage report files can be found under `build/docs`. To create a more human readable file out of the `.cov` file `make coverage-report` can be used. It creates a `.html` file for each report and a `full.html` as summary of all reports together in the directory `build/coverage`.
+
+==== Race detection
+
+All tests can be run with the Golang race detector enabled by setting the environment variable `RACE_DETECTOR=1`. This applies to tests in Golang and Python. For Python the test binary has to be recompile when the flag is changed. Having the race detection enabled will slow down the tests.
+
+==== Docker environment
+
+Running the tests inside the docker environment is useful to not have to setup all services locally. It has the disadvantage that also the binary is run inside the docker container and not on the local machine.

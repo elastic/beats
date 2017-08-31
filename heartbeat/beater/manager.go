@@ -7,11 +7,10 @@ import (
 	"fmt"
 	"time"
 
+	"github.com/elastic/beats/libbeat/beat"
 	"github.com/elastic/beats/libbeat/common"
 	"github.com/elastic/beats/libbeat/logp"
 	"github.com/elastic/beats/libbeat/processors"
-	"github.com/elastic/beats/libbeat/publisher/bc/publisher"
-	"github.com/elastic/beats/libbeat/publisher/beat"
 
 	"github.com/elastic/beats/heartbeat/monitors"
 	"github.com/elastic/beats/heartbeat/scheduler"
@@ -35,7 +34,7 @@ type monitor struct {
 
 	active map[string]monitorTask
 
-	pipeline publisher.Publisher
+	pipeline beat.Pipeline
 }
 
 type monitorTask struct {
@@ -66,7 +65,7 @@ var defaultFilePollInterval = 5 * time.Second
 const defaultEventType = "monitor"
 
 func newMonitorManager(
-	pipeline publisher.Publisher,
+	pipeline beat.Pipeline,
 	jobControl jobControl,
 	registry *monitors.Registrar,
 	configs []*common.Config,
@@ -207,7 +206,7 @@ func (m *monitor) Update(configs []*common.Config) error {
 		}
 
 		// create connection per monitorTask
-		client, err := m.pipeline.ConnectX(beat.ClientConfig{
+		client, err := m.pipeline.ConnectWith(beat.ClientConfig{
 			EventMetadata: t.config.EventMetadata,
 			Processor:     processors,
 		})
@@ -271,7 +270,7 @@ func createWatchUpdater(monitor *monitor) func(content []byte) {
 func (m *monitorTask) createJob(client beat.Client) scheduler.TaskFunc {
 	name := m.config.Name
 	if name == "" {
-		name = m.config.Name
+		name = m.config.Type
 	}
 
 	meta := common.MapStr{

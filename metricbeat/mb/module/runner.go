@@ -3,7 +3,7 @@ package module
 import (
 	"sync"
 
-	"github.com/elastic/beats/libbeat/publisher/beat"
+	"github.com/elastic/beats/libbeat/beat"
 )
 
 // Runner is a facade for a Wrapper that provides a simple interface

@@ -4,7 +4,7 @@
 //////////////////////////////////////////////////////////////////////////
 
 [[community-beats]]
-== Community Beats
+== Community beats
 
 The open source community has been hard at work developing new Beats. You can check
 out some of them here.
@@ -25,12 +25,15 @@ https://github.com/verticle-io/apexbeat[apexbeat]:: Extracts configurable contex
 https://github.com/goomzee/burrowbeat[burrowbeat]:: Monitors Kafka consumer lag using Burrow.
 https://github.com/goomzee/cassandrabeat[cassandrabeat]:: Uses Cassandra's nodetool cfstats utility to monitor Cassandra database nodes and lag.
 https://github.com/hartfordfive/cloudflarebeat[cloudflarebeat]:: Indexes log entries from the Cloudflare Enterprise Log Share API.
+https://github.com/jarl-tornroos/cloudfrontbeat[cloudfrontbeat]:: Reads log events from Amazon Web Services https://aws.amazon.com/cloudfront/[CloudFront].
 https://github.com/aidan-/cloudtrailbeat[cloudtrailbeat]:: Reads events from Amazon Web Services' https://aws.amazon.com/cloudtrail/[CloudTrail].
+https://github.com/e-travel/cloudwatchlogsbeat[cloudwatchlogsbeat]:: Reads log events from Amazon Web Services' https://aws.amazon.com/cloudwatch/details/#log-monitoring[CloudWatch Logs].
 https://github.com/raboof/connbeat[connbeat]:: Exposes metadata about TCP connections.
 https://github.com/Pravoru/consulbeat[consulbeat]:: Reads services health checks from consul and pushes them to Elastic.
 https://github.com/Ingensi/dockbeat[dockbeat]:: Reads Docker container
 statistics and indexes them in Elasticsearch.
 https://github.com/radoondas/elasticbeat[elasticbeat]:: Reads status from an Elasticsearch cluster and indexes them in Elasticsearch.
+https://github.com/gamegos/etcdbeat[etcdbeat]:: Reads stats from the Etcd v2 API and indexes them into Elasticsearch.
 https://github.com/christiangalsterer/execbeat[execbeat]:: Periodically executes shell commands and sends the standard output and standard error to
 Logstash or Elasticsearch.
 https://github.com/jarpy/factbeat[factbeat]:: Collects facts from https://puppetlabs.com/facter[Facter].
@@ -46,7 +49,7 @@ https://github.com/icinga/icingabeat[icingabeat]:: Icingabeat ships events and s
 https://github.com/devopsmakers/iobeat[iobeat]:: Reads IO stats from /proc/diskstats on Linux.
 https://github.com/radoondas/jmxproxybeat[jmxproxybeat]:: Reads Tomcat JMX metrics exposed over 'JMX Proxy Servlet' to HTTP.
 https://github.com/mheese/journalbeat[journalbeat]:: Used for log shipping from systemd/journald based Linux systems.
-https://github.com/dearcode/kafkabeat[kafkabeat]:: read data from kafka with Consumer-groups.
+https://github.com/justsocialapps/kafkabeat[kafkabeat]:: Reads data from Kafka topics.
 https://github.com/eskibars/lmsensorsbeat[lmsensorsbeat]:: Collects data from lm-sensors (such as CPU temperatures, fan speeds, and voltages from i2c and smbus).
 https://github.com/consulthys/logstashbeat[logstashbeat]:: Collects data from Logstash monitoring API (v5 onwards) and indexes them in Elasticsearch.
 https://github.com/yedamao/mcqbeat[mcqbeat]:: Reads the status of queues from memcacheq.

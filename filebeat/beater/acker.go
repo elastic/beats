@@ -1,8 +1,7 @@
 package beater
 
 import (
-	"github.com/elastic/beats/filebeat/util"
-	"github.com/elastic/beats/libbeat/publisher/beat"
+	"github.com/elastic/beats/filebeat/input/file"
 )
 
 // eventAcker handles publisher pipeline ACKs and forwards
@@ -12,30 +11,29 @@ type eventACKer struct {
 }
 
 type successLogger interface {
-	Published(events []*util.Data) bool
+	Published(states []file.State)
 }
 
 func newEventACKer(out successLogger) *eventACKer {
 	return &eventACKer{out: out}
 }
 
-func (a *eventACKer) ackEvents(events []beat.Event) {
-	data := make([]*util.Data, 0, len(events))
-	for _, event := range events {
-		p := event.Private
-		if p == nil {
+func (a *eventACKer) ackEvents(data []interface{}) {
+	states := make([]file.State, 0, len(data))
+	for _, datum := range data {
+		if datum == nil {
 			continue
 		}
 
-		datum, ok := p.(*util.Data)
-		if !ok || !datum.HasState() {
+		st, ok := datum.(file.State)
+		if !ok {
 			continue
 		}
 
-		data = append(data, datum)
+		states = append(states, st)
 	}
 
-	if len(data) > 0 {
-		a.out.Published(data)
+	if len(states) > 0 {
+		a.out.Published(states)
 	}
 }

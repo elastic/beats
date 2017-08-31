@@ -1,9 +1,9 @@
 - key: kibana
-  title: "kibana"
+  title: "Kibana"
   description: >
-    []experimental
+    experimental[]
 
-    kibana Module
+    Kibana module
   short_config: false
   fields:
     - name: kibana

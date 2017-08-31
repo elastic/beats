@@ -1,6 +1,6 @@
-=== Windows Perfmon MetricSet
+=== Windows perfmon metricset
 
-This is the perfmon metricset of the Windows module. It reads Windows
+The `perfmon` metricset of the Windows module reads Windows
 performance counters.
 
 [float]
@@ -22,11 +22,13 @@ For wildcard queries this setting has no effect.
   metricsets: ["perfmon"]
   period: 10s
   perfmon.counters:
-    - instance_label: "processor.name"
+    - alias: "procesor.name.stats"
+      instance_label: "processor.name"
       instance_name: "Total"
       measurement_label: "processor.time.total.pct"
       query: '\Processor Information(_Total)\% Processor Time'
-    - instance_label: "diskio.name"
+    - alias: "diskio.name.stats"
+      instance_label: "diskio.name"
       measurement_label: "diskio.write.bytes"
       query: '\PhysicalDisk(*)\Disk Writes/sec'
       format: "long"

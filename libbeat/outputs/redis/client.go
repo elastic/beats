@@ -8,6 +8,7 @@ import (
 
 	"github.com/garyburd/redigo/redis"
 
+	"github.com/elastic/beats/libbeat/beat"
 	"github.com/elastic/beats/libbeat/common"
 	"github.com/elastic/beats/libbeat/logp"
 	"github.com/elastic/beats/libbeat/outputs"
@@ -15,7 +16,6 @@ import (
 	"github.com/elastic/beats/libbeat/outputs/outil"
 	"github.com/elastic/beats/libbeat/outputs/transport"
 	"github.com/elastic/beats/libbeat/publisher"
-	"github.com/elastic/beats/libbeat/publisher/beat"
 )
 
 var (
@@ -287,6 +287,7 @@ func serializeEvents(
 	for _, d := range data {
 		serializedEvent, err := codec.Encode(index, &d.Content)
 		if err != nil {
+			logp.Err("Encoding event failed with error: %v", err)
 			goto failLoop
 		}
 
@@ -303,6 +304,7 @@ failLoop:
 	for _, d := range rest {
 		serializedEvent, err := codec.Encode(index, &d.Content)
 		if err != nil {
+			logp.Err("Encoding event failed with error: %v", err)
 			i++
 			continue
 		}

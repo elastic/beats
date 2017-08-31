@@ -58,6 +58,10 @@ class Test(BaseTest):
         self.wait_until(
             lambda: self.output_has(lines=iterations1 + 1), max_timeout=10)
 
+        # Wait until registry file is created
+        self.wait_until(
+            lambda: self.log_contains_count("Registry file updated") > 1)
+
         # Make sure new file was picked up. As it has the same file name,
         # one entry for the new and one for the old should exist
         self.wait_until(

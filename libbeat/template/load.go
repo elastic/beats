@@ -3,6 +3,7 @@ package template
 import (
 	"fmt"
 
+	"github.com/elastic/beats/libbeat/beat"
 	"github.com/elastic/beats/libbeat/common"
 	"github.com/elastic/beats/libbeat/logp"
 	"github.com/elastic/beats/libbeat/paths"
@@ -19,10 +20,10 @@ type ESClient interface {
 type Loader struct {
 	config   TemplateConfig
 	client   ESClient
-	beatInfo common.BeatInfo
+	beatInfo beat.Info
 }
 
-func NewLoader(cfg *common.Config, client ESClient, beatInfo common.BeatInfo) (*Loader, error) {
+func NewLoader(cfg *common.Config, client ESClient, beatInfo beat.Info) (*Loader, error) {
 	config := DefaultConfig
 
 	err := cfg.Unpack(&config)
@@ -41,11 +42,8 @@ func NewLoader(cfg *common.Config, client ESClient, beatInfo common.BeatInfo) (*
 // In case the template is not already loaded or overwriting is enabled, the
 // template is written to index
 func (l *Loader) Load() error {
-	if l.config.Name == "" {
-		l.config.Name = l.beatInfo.Beat
-	}
 
-	tmpl, err := New(l.beatInfo.Version, l.client.GetVersion(), l.config.Name, l.config.Settings)
+	tmpl, err := New(l.beatInfo.Version, l.beatInfo.Beat, l.client.GetVersion(), l.config)
 	if err != nil {
 		return fmt.Errorf("error creating template instance: %v", err)
 	}
@@ -82,7 +80,7 @@ func (l *Loader) Load() error {
 // template if it exists. If you wish to not overwrite an existing template
 // then use CheckTemplate prior to calling this method.
 func (l *Loader) LoadTemplate(templateName string, template map[string]interface{}) error {
-	logp.Info("load template: %s", templateName)
+	logp.Debug("template", "Try loading template with name: %s", templateName)
 	path := "/_template/" + templateName
 	body, err := l.client.LoadJSON(path, template)
 	if err != nil {

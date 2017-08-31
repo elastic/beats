@@ -5,14 +5,20 @@ import (
 	"strings"
 	"sync"
 
+	"github.com/elastic/beats/libbeat/beat"
 	"github.com/elastic/beats/libbeat/common"
+	"github.com/elastic/beats/libbeat/common/fmtstr"
+	"github.com/elastic/beats/libbeat/logp"
+	"github.com/elastic/beats/libbeat/outputs/codec"
+	"github.com/elastic/beats/libbeat/outputs/codec/format"
 )
 
 //Names of indexers and matchers that have been defined.
 const (
-	PodNameIndexerName   = "pod_name"
-	FieldMatcherName     = "fields"
-	ContainerIndexerName = "container"
+	ContainerIndexerName   = "container"
+	PodNameIndexerName     = "pod_name"
+	FieldMatcherName       = "fields"
+	FieldFormatMatcherName = "field_format"
 )
 
 // Indexing is the singleton Register instance where all Indexers and Matchers
@@ -172,8 +178,9 @@ func (m *Matchers) MetadataIndex(event common.MapStr) string {
 }
 
 type GenDefaultMeta struct {
-	annotations []string
-	labels      []string
+	annotations   []string
+	labels        []string
+	labelsExclude []string
 }
 
 // GenerateMetaData generates default metadata for the given pod taking to account certain filters
@@ -187,6 +194,11 @@ func (g *GenDefaultMeta) GenerateMetaData(pod *Pod) common.MapStr {
 		}
 	} else {
 		labelMap = generateMapSubset(pod.Metadata.Labels, g.labels)
+	}
+
+	// Exclude any labels that are present in the exclude_labels config
+	for _, label := range g.labelsExclude {
+		delete(labelMap, label)
 	}
 
 	annotationsMap = generateMapSubset(pod.Metadata.Annotations, g.annotations)
@@ -238,14 +250,14 @@ func (p *PodNameIndexer) GetMetadata(pod *Pod) []MetadataIndex {
 	data := p.genMeta.GenerateMetaData(pod)
 	return []MetadataIndex{
 		{
-			Index: pod.Metadata.Name,
+			Index: fmt.Sprintf("%s/%s", pod.Metadata.Namespace, pod.Metadata.Name),
 			Data:  data,
 		},
 	}
 }
 
 func (p *PodNameIndexer) GetIndexes(pod *Pod) []string {
-	return []string{pod.Metadata.Name}
+	return []string{fmt.Sprintf("%s/%s", pod.Metadata.Namespace, pod.Metadata.Name)}
 }
 
 // ContainerIndexer indexes pods based on all their containers IDs
@@ -259,15 +271,19 @@ func NewContainerIndexer(_ common.Config, genMeta GenMeta) (Indexer, error) {
 
 func (c *ContainerIndexer) GetMetadata(pod *Pod) []MetadataIndex {
 	commonMeta := c.genMeta.GenerateMetaData(pod)
-	containers := c.GetIndexes(pod)
 	var metadata []MetadataIndex
-	for i := 0; i < len(containers); i++ {
+	for _, status := range append(pod.Status.ContainerStatuses, pod.Status.InitContainerStatuses...) {
+		cID := containerID(status)
+		if cID == "" {
+			continue
+		}
+
 		containerMeta := commonMeta.Clone()
 		containerMeta["container"] = common.MapStr{
-			"name": pod.Status.ContainerStatuses[i].Name,
+			"name": status.Name,
 		}
 		metadata = append(metadata, MetadataIndex{
-			Index: containers[i],
+			Index: cID,
 			Data:  containerMeta,
 		})
 	}
@@ -277,16 +293,25 @@ func (c *ContainerIndexer) GetMetadata(pod *Pod) []MetadataIndex {
 
 func (c *ContainerIndexer) GetIndexes(pod *Pod) []string {
 	var containers []string
-	for _, status := range pod.Status.ContainerStatuses {
-		cID := status.ContainerID
-		if cID != "" {
-			parts := strings.Split(cID, "//")
-			if len(parts) == 2 {
-				containers = append(containers, parts[1])
-			}
+	for _, status := range append(pod.Status.ContainerStatuses, pod.Status.InitContainerStatuses...) {
+		cID := containerID(status)
+		if cID == "" {
+			continue
 		}
+		containers = append(containers, cID)
 	}
 	return containers
+}
+
+func containerID(status PodContainerStatus) string {
+	cID := status.ContainerID
+	if cID != "" {
+		parts := strings.Split(cID, "//")
+		if len(parts) == 2 {
+			return parts[1]
+		}
+	}
+	return ""
 }
 
 type FieldMatcher struct {
@@ -322,4 +347,44 @@ func (f *FieldMatcher) MetadataIndex(event common.MapStr) string {
 	}
 
 	return ""
+}
+
+type FieldFormatMatcher struct {
+	Codec codec.Codec
+}
+
+func NewFieldFormatMatcher(cfg common.Config) (Matcher, error) {
+	config := struct {
+		Format string `config:"format"`
+	}{}
+
+	err := cfg.Unpack(&config)
+	if err != nil {
+		return nil, fmt.Errorf("fail to unpack the `format` configuration of `field_format` matcher: %s", err)
+	}
+
+	if config.Format == "" {
+		return nil, fmt.Errorf("`format` of `field_format` matcher can't be empty")
+	}
+
+	return &FieldFormatMatcher{
+		Codec: format.New(fmtstr.MustCompileEvent(config.Format)),
+	}, nil
+
+}
+
+func (f *FieldFormatMatcher) MetadataIndex(event common.MapStr) string {
+	bytes, err := f.Codec.Encode("", &beat.Event{
+		Fields: event,
+	})
+
+	if err != nil {
+		logp.Debug("kubernetes", "Unable to apply field format pattern on event")
+	}
+
+	if len(bytes) == 0 {
+		return ""
+	}
+
+	return string(bytes)
 }

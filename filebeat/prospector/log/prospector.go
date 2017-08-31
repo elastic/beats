@@ -12,6 +12,7 @@ import (
 	"github.com/elastic/beats/filebeat/channel"
 	"github.com/elastic/beats/filebeat/harvester"
 	"github.com/elastic/beats/filebeat/input/file"
+	"github.com/elastic/beats/filebeat/prospector"
 	"github.com/elastic/beats/filebeat/util"
 	"github.com/elastic/beats/libbeat/common"
 	"github.com/elastic/beats/libbeat/logp"
@@ -28,6 +29,13 @@ var (
 	harvesterSkipped = monitoring.NewInt(nil, "filebeat.harvester.skipped")
 )
 
+func init() {
+	err := prospector.Register("log", NewProspector)
+	if err != nil {
+		panic(err)
+	}
+}
+
 // Prospector contains the prospector and its config
 type Prospector struct {
 	cfg         *common.Config
@@ -42,10 +50,9 @@ type Prospector struct {
 // NewProspector instantiates a new Log
 func NewProspector(
 	cfg *common.Config,
-	states []file.State,
-	outlet channel.OutleterFactory,
-	done, beatDone chan struct{},
-) (*Prospector, error) {
+	outlet channel.Factory,
+	context prospector.Context,
+) (prospector.Prospectorer, error) {
 
 	// Note: underlying output.
 	//  The prospector and harvester do have different requirements
@@ -61,7 +68,7 @@ func NewProspector(
 	// stateOut will only be unblocked if the beat is shut down.
 	// otherwise it can block on a full publisher pipeline, so state updates
 	// can be forwarded correctly to the registrar.
-	stateOut := channel.CloseOnSignal(channel.SubOutlet(out), beatDone)
+	stateOut := channel.CloseOnSignal(channel.SubOutlet(out), context.BeatDone)
 
 	p := &Prospector{
 		config:      defaultConfig,
@@ -70,7 +77,7 @@ func NewProspector(
 		outlet:      out,
 		stateOutlet: stateOut,
 		states:      &file.States{},
-		done:        done,
+		done:        context.Done,
 	}
 
 	if err := cfg.Unpack(&p.config); err != nil {
@@ -92,7 +99,7 @@ func NewProspector(
 		return nil, fmt.Errorf("each prospector must have at least one path defined")
 	}
 
-	err = p.loadStates(states)
+	err = p.loadStates(context.States)
 	if err != nil {
 		return nil, err
 	}

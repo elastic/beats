@@ -3,22 +3,21 @@ package pipeline
 import (
 	"sync"
 
+	"github.com/elastic/beats/libbeat/beat"
 	"github.com/elastic/beats/libbeat/common/atomic"
 	"github.com/elastic/beats/libbeat/publisher"
-	"github.com/elastic/beats/libbeat/publisher/beat"
-	"github.com/elastic/beats/libbeat/publisher/broker"
+	"github.com/elastic/beats/libbeat/publisher/queue"
 )
 
-// client connects a beat with the processors and pipeline broker.
+// client connects a beat with the processors and pipeline queue.
 //
 // TODO: All ackers currently drop any late incoming ACK. Some beats still might
 //       be interested in handling/waiting for event ACKs more globally
 //       -> add support for not dropping pending ACKs
 type client struct {
-	// active connection to broker
 	pipeline   *Pipeline
 	processors beat.Processor
-	producer   broker.Producer
+	producer   queue.Producer
 	mutex      sync.Mutex
 	acker      acker
 

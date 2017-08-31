@@ -20,22 +20,17 @@ _Beats Platform Reference_ for more about the structure of the config file.
 The following topics describe how to configure {beatname_uc}:
 
 * <<configuration-{beatname_lc}>>
-* <<configuration-general>>
-* <<elasticsearch-output>>
-* <<logstash-output>>
-* <<kafka-output>>
-* <<redis-output>>
-* <<file-output>>
-* <<console-output>>
-* <<configuration-output-ssl>>
-* <<configuration-output-codec>>
-* <<configuration-path>>
-* <<configuration-dashboards>>
-* <<configuration-logging>>
-* <<configuration-processors>>
+* <<configuration-general-options>>
+* <<{beatname_lc}-configuration-reloading>>
+* <<configuring-output>>
+* <<configuration-ssl>>
 * <<filtering-and-enhancing-data>>
 * <<configuring-ingest-node>>
-* <<config-{beatname_lc}-logstash>>
+* <<configuration-path>>
+* <<setup-kibana-endpoint>>
+* <<configuration-dashboards>>
+* <<configuration-template>>
+* <<configuration-logging>>
 * <<using-environ-vars>>
 * <<yaml-tips>>
 
@@ -44,26 +39,35 @@ pick up the changes.
 
 --
 
-[[configuration-container]]
-== Configuration Options
-
-This section describes configuration options.
-
-//REVIEWERS: THIS CONTAINER IS A TEMPORARY PLACEHOLDER SO I CAN GET THE AUDITBEAT DOCS BUILDING WITHOUT ERRORS. I PLAN TO REMOVE THIS CONTAINER AND POP EVERYTHING UP A LEVEL IN THE HIERARCHY TO CREATE A STRUCTURE SIMILAR TO THE ONE DESCRIBED IN THIS FILEBEAT ISSUE: https://github.com/elastic/beats/issues/4422
-
 include::./auditbeat-modules-config.asciidoc[]
 
-include::../../libbeat/docs/generalconfig.asciidoc[]
+include::./auditbeat-general-options.asciidoc[]
 
-include::../../libbeat/docs/processors-config.asciidoc[]
+include::./reload-configuration.asciidoc[]
 
+:allplatforms:
 include::../../libbeat/docs/outputconfig.asciidoc[]
 
+include::../../libbeat/docs/shared-ssl-config.asciidoc[]
+
+include::./auditbeat-filtering.asciidoc[]
+
+include::../../libbeat/docs/shared-config-ingest.asciidoc[]
+
 include::../../libbeat/docs/shared-path-config.asciidoc[]
+
+include::../../libbeat/docs/shared-kibana-config.asciidoc[]
 
 include::../../libbeat/docs/setup-config.asciidoc[]
 
 include::../../libbeat/docs/loggingconfig.asciidoc[]
 
-include::./reload-configuration.asciidoc[]
+:standalone:
+include::../../libbeat/docs/shared-env-vars.asciidoc[]
+
+:standalone:
+:allplatforms:
+include::../../libbeat/docs/yaml.asciidoc[]
+
+include::../../libbeat/docs/reference-yml.asciidoc[]
 

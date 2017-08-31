@@ -1,5 +1,5 @@
 [[getting-started]]
-== Getting Started with Beats and the Elastic Stack
+== Getting started with Beats and the Elastic Stack
 
 Looking for an "ELK tutorial" that shows how to set up the Elastic stack for Beats? You've
 come to the right place. The topics in this section describe how to install and configure
@@ -24,7 +24,7 @@ a cluster. You'll probably also want to automate the installation process.
 
 
 [[elasticsearch-installation]]
-=== Installing Elasticsearch
+=== Install Elasticsearch
 
 https://www.elastic.co/products/elasticsearch[Elasticsearch] is a real-time,
 distributed storage, search, and analytics engine. It can be used for many
@@ -134,7 +134,7 @@ endif::[]
 You can learn more about installing, configuring, and running Elasticsearch in the
 https://www.elastic.co/guide/en/elasticsearch/reference/current/index.html[Elasticsearch Reference].
 
-==== Making Sure Elasticsearch is Up and Running
+==== Make sure Elasticsearch is up and running
 
 
 To test that the Elasticsearch daemon is up and running, try sending an HTTP GET
@@ -167,7 +167,7 @@ You should see a response similar to this:
 ----------------------------------------------------------------------
 
 [[logstash-installation]]
-=== Installing Logstash (Optional)
+=== Install Logstash (Optional)
 
 The simplest architecture for the Beats platform setup consists of one or more Beats,
 Elasticsearch, and Kibana. This architecture is easy to get started
@@ -264,7 +264,7 @@ Don't start Logstash yet. You need to set a couple of configuration options firs
 endif::[]
 
 [[logstash-setup]]
-==== Setting Up Logstash
+==== Set up Logstash
 
 In this setup, the Beat sends events to Logstash. Logstash receives
 these events by using the
@@ -318,7 +318,7 @@ To use this setup, you'll also need to configure your Beat to use Logstash.
 For more information, see the documentation for the Beat.
 
 [[logstash-input-update]]
-===== Updating the Beats Input Plugin for Logstash
+===== Update the Beats input plugin for Logstash
 
 Plugins have their own release cycle and are often released independent of
 Logstash’s core release cycle. To ensure that you have the latest version of
@@ -345,7 +345,7 @@ with input plugins in Logstash are available
 https://www.elastic.co/guide/en/logstash/current/working-with-plugins.html[here].
 
 
-==== Starting Logstash
+==== Start Logstash
 
 Now you can start Logstash. Use the command that works with your system. If you
 installed Logstash as a deb or rpm package, make sure the config file is in the
@@ -386,7 +386,7 @@ You can learn more about installing, configuring, and running Logstash
 https://www.elastic.co/guide/en/logstash/current/getting-started-with-logstash.html[here].
 
 [[kibana-installation]]
-=== Installing Kibana
+=== Install Kibana
 
 https://www.elastic.co/products/kibana[Kibana] is a visualization application
 that gets its data from Elasticsearch. It provides a customizable and
@@ -475,7 +475,7 @@ endif::[]
 You can find Kibana binaries for other operating systems on the
 https://www.elastic.co/downloads/kibana[Kibana downloads page].
 
-==== Launching the Kibana Web Interface
+==== Launch the Kibana web interface
 
 To launch the Kibana web interface, point your browser to port 5601. For example,
 http://127.0.0.1:5601[http://127.0.0.1:5601].

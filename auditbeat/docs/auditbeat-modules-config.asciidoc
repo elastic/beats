@@ -1,5 +1,5 @@
 [id="configuration-{beatname_lc}"]
-=== Specify which modules to run
+== Specify which modules to run
 
 To enable specific modules and metricsets, you add entries to the
 `auditbeat.modules` list in the +{beatname_lc}.yml+ config file. Each entry in
@@ -21,13 +21,11 @@ auditbeat.modules:
 - module: audit
   metricsets: [file]
   file.paths:
-    binaries:
-    - /bin
-    - /usr/bin
-    - /sbin
-    - /usr/sbin
-    conf:
-    - /etc
+  - /bin
+  - /usr/bin
+  - /sbin
+  - /usr/sbin
+  - /etc
 ----
 
 The configuration details vary by module. See the

@@ -49,7 +49,7 @@ const sampleDatafeed = `
       "filebeat-*"
     ],
     "types": [
-      "_default_",
+      "doc",
       "log"
     ],
     "query": {

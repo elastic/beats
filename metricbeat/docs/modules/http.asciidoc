@@ -3,7 +3,7 @@ This file is generated! See scripts/docs_collector.py
 ////
 
 [[metricbeat-module-http]]
-== HTTP Module
+== HTTP module
 
 The HTTP module is a Metricbeat module used to call arbitrary HTTP endpoints for which a dedicated Metricbeat module is not available.
 
@@ -15,7 +15,7 @@ This is often necessary in security restricted network setups, where Logstash is
 
 
 [float]
-=== Example Configuration
+=== Example configuration
 
 The HTTP module supports the standard configuration options that are described
 in <<configuration-metricbeat>>. Here is an example configuration:
@@ -33,6 +33,17 @@ metricbeat.modules:
   #method: "GET"
   #request.enabled: false
   #response.enabled: false
+
+- module: http
+  metricsets: ["server"]
+  host: "localhost"
+  port: "8080"
+  enabled: false
+#  paths:
+#    - path: "/foo"
+#      namespace: "foo"
+#      fields: # added to the the response in root. overwrites existing fields
+#        key: "value"
 ----
 
 [float]
@@ -42,5 +53,9 @@ The following metricsets are available:
 
 * <<metricbeat-metricset-http-json,json>>
 
+* <<metricbeat-metricset-http-server,server>>
+
 include::http/json.asciidoc[]
+
+include::http/server.asciidoc[]
 

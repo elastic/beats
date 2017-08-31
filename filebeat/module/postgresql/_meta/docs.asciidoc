@@ -1,0 +1,30 @@
+== PostgreSQL module
+
+This module collects and parses the logs created by https://www.postgresql.org/[PostgreSQL].
+
+[float]
+=== Compatibility
+
+The PostgreSQL module was tested with logs from versions 9.5 on Ubuntu and 9.6 on Debian.
+
+[float]
+=== Dashboard
+
+This module comes with two sample dashboards.
+
+The first dashboard is for regulars logs.
+
+image::./images/filebeat-postgresql-overview.png[]
+
+The second one shows the slowlogs of PostgreSQL.
+
+image::./images/filebeat-postgresql-slowlog-overview.png[]
+
+[float]
+=== Logs fileset settings
+
+[float]
+==== var.paths
+
+An array of paths where to look for the log files. If left empty, Filebeat
+will choose the paths depending on your operating systems.

@@ -1,0 +1,11 @@
+- key: postgresql
+  title: "PostgreSQL"
+  description: >
+    Module for parsing the PostgreSQL log files.
+  short_config: true
+  fields:
+    - name: postgresql
+      type: group
+      description: >
+          Fields from PostgreSQL logs.
+      fields:

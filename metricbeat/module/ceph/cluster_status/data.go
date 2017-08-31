@@ -1,0 +1,133 @@
+package cluster_status
+
+import (
+	"encoding/json"
+
+	"github.com/elastic/beats/libbeat/common"
+	"github.com/elastic/beats/libbeat/logp"
+)
+
+type PgState struct {
+	Count     int64  `json:"count"`
+	StateName string `json:"state_name"`
+}
+
+type Pgmap struct {
+	AvailByte int64 `json:"bytes_avail"`
+	TotalByte int64 `json:"bytes_total"`
+	UsedByte  int64 `json:"bytes_used"`
+	DataByte  int64 `json:"data_bytes"`
+
+	DegradedObjs  int64   `json:"degraded_objects"`
+	DegradedRatio float64 `json:"degraded_ratio"`
+	DegradedTotal int64   `json:"degraded_total"`
+
+	MisplacedObjs  int64   `json:"misplaced_objects"`
+	MisplacedRatio float64 `json:"misplaced_ratio"`
+	MisplacedTotal int64   `json:"misplaced_total"`
+
+	ReadByteSec  int64 `json:"read_bytes_sec"`
+	ReadOpSec    int64 `json:"read_op_per_sec"`
+	WriteByteSec int64 `json:"write_bytes_sec"`
+	WriteOpSec   int64 `json:"write_op_per_sec"`
+	Version      int64 `json:"version"`
+
+	PgNum    int64     `json:"num_pgs"`
+	PgStates []PgState `json:"pgs_by_state"`
+}
+
+type Osdmap struct {
+	Epoch      int64 `json:"epoch"`
+	Full       bool  `json:"full"`
+	Nearfull   bool  `json:"nearfull"`
+	OsdNum     int64 `json:"num_osds"`
+	UpOsds     int64 `json:"num_up_osds"`
+	InOsds     int64 `json:"num_in_osds"`
+	RemapedPgs int64 `json:"num_remapped_pgs"`
+}
+
+type Osdmap_ struct {
+	Osdmap Osdmap `json:"osdmap"`
+}
+
+type Output struct {
+	Pgmap  Pgmap   `json:"pgmap"`
+	Osdmap Osdmap_ `json:"osdmap"`
+}
+
+type HealthRequest struct {
+	Status string `json:"status"`
+	Output Output `json:"output"`
+}
+
+func eventsMapping(content []byte) ([]common.MapStr, error) {
+	var d HealthRequest
+	err := json.Unmarshal(content, &d)
+	if err != nil {
+		logp.Err("Error: ", err)
+		return nil, err
+	}
+
+	//osd map info
+	osdmap := d.Output.Osdmap.Osdmap
+
+	osdState := common.MapStr{}
+	osdState["epoch"] = osdmap.Epoch
+	osdState["full"] = osdmap.Full
+	osdState["nearfull"] = osdmap.Nearfull
+	osdState["osd_count"] = osdmap.OsdNum
+	osdState["up_osd_count"] = osdmap.UpOsds
+	osdState["in_osd_count"] = osdmap.InOsds
+	osdState["remapped_pg_count"] = osdmap.RemapedPgs
+
+	//pg map info
+	pgmap := d.Output.Pgmap
+
+	traffic := common.MapStr{}
+	traffic["read_bytes"] = pgmap.ReadByteSec
+	traffic["read_op_per_sec"] = pgmap.ReadOpSec
+	traffic["write_bytes"] = pgmap.WriteByteSec
+	traffic["write_op_per_sec"] = pgmap.WriteOpSec
+
+	misplace := common.MapStr{}
+	misplace["objects"] = pgmap.MisplacedObjs
+	misplace["pct"] = pgmap.MisplacedRatio
+	misplace["total"] = pgmap.MisplacedTotal
+
+	degraded := common.MapStr{}
+	degraded["objects"] = pgmap.DegradedObjs
+	degraded["pct"] = pgmap.DegradedRatio
+	degraded["total"] = pgmap.DegradedTotal
+
+	pg := common.MapStr{}
+	pg["avail_bytes"] = pgmap.AvailByte
+	pg["total_bytes"] = pgmap.TotalByte
+	pg["used_bytes"] = pgmap.UsedByte
+	pg["data_bytes"] = pgmap.DataByte
+
+	state_event := common.MapStr{}
+	state_event["osd"] = osdState
+	state_event["traffic"] = traffic
+	state_event["misplace"] = misplace
+	state_event["degraded"] = degraded
+	state_event["pg"] = pg
+	state_event["version"] = pgmap.Version
+
+	events := []common.MapStr{}
+	events = append(events, state_event)
+
+	//pg state info
+	for _, state := range pgmap.PgStates {
+		state_evn := common.MapStr{
+			"count":      state.Count,
+			"state_name": state.StateName,
+			"version":    pgmap.Version,
+		}
+		evt := common.MapStr{
+			"pg_state": state_evn,
+		}
+		events = append(events, evt)
+	}
+
+	return events, nil
+}

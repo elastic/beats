@@ -3,9 +3,9 @@ package format
 import (
 	"testing"
 
+	"github.com/elastic/beats/libbeat/beat"
 	"github.com/elastic/beats/libbeat/common"
 	"github.com/elastic/beats/libbeat/common/fmtstr"
-	"github.com/elastic/beats/libbeat/publisher/beat"
 )
 
 func TestFormatStringWriter(t *testing.T) {

@@ -3,7 +3,7 @@ This file is generated! See scripts/docs_collector.py
 ////
 
 [[metricbeat-module-prometheus]]
-== Prometheus Module
+== Prometheus module
 
 beta[]
 
@@ -12,7 +12,7 @@ https://prometheus.io/docs/[Prometheus].
 
 
 [float]
-=== Example Configuration
+=== Example configuration
 
 The Prometheus module supports the standard configuration options that are described
 in <<configuration-metricbeat>>. Here is an example configuration:

@@ -8,11 +8,11 @@ import (
 	"os"
 	"time"
 
+	"github.com/elastic/beats/libbeat/beat"
 	"github.com/elastic/beats/libbeat/common"
 	"github.com/elastic/beats/libbeat/common/cfgwarn"
 	"github.com/elastic/beats/libbeat/logp"
 	"github.com/elastic/beats/libbeat/processors"
-	"github.com/elastic/beats/libbeat/publisher/beat"
 
 	"github.com/ericchiang/k8s"
 	"github.com/ghodss/yaml"
@@ -38,6 +38,7 @@ func init() {
 	Indexing.AddIndexer(PodNameIndexerName, NewPodNameIndexer)
 	Indexing.AddIndexer(ContainerIndexerName, NewContainerIndexer)
 	Indexing.AddMatcher(FieldMatcherName, NewFieldMatcher)
+	Indexing.AddMatcher(FieldFormatMatcherName, NewFieldFormatMatcher)
 }
 
 func newKubernetesAnnotator(cfg *common.Config) (processors.Processor, error) {
@@ -74,8 +75,9 @@ func newKubernetesAnnotator(cfg *common.Config) (processors.Processor, error) {
 	}
 
 	metaGen := &GenDefaultMeta{
-		labels:      config.IncludeLabels,
-		annotations: config.IncludeAnnotations,
+		labels:        config.IncludeLabels,
+		annotations:   config.IncludeAnnotations,
+		labelsExclude: config.ExcludeLabels,
 	}
 
 	indexers := Indexers{
@@ -111,6 +113,7 @@ func newKubernetesAnnotator(cfg *common.Config) (processors.Processor, error) {
 			matchFunc := Indexing.GetMatcher(name)
 			if matchFunc == nil {
 				logp.Warn("Unable to find matcher plugin %s", name)
+				continue
 			}
 
 			matcher, err := matchFunc(pluginConfig)

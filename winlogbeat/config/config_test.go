@@ -11,7 +11,7 @@ import (
 )
 
 type validationTestCase struct {
-	config Validator
+	config WinlogbeatConfig
 	errMsg string
 }
 

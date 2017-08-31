@@ -1,9 +1,9 @@
 - key: elasticsearch
-  title: "elasticsearch"
+  title: "Elasticsearch"
   description: >
-    []experimental
+    experimental[]
 
-    elasticsearch Module
+    Elasticsearch module
   short_config: false
   fields:
     - name: elasticsearch

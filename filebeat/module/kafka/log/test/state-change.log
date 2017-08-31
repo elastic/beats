@@ -1,0 +1,1 @@
+[2017-08-04 10:48:21,428] TRACE Controller 0 epoch 1 received response {error_code=0} for a request sent to broker baldur:9092 (id: 0 rack: null) (state.change.logger)

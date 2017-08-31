@@ -1,4 +1,4 @@
-== Couchbase Module
+== Couchbase module
 
 beta[]
 

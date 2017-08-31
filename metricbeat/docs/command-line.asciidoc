@@ -1,7 +1,0 @@
-[[command-line-options]]
-=== Command Line Options
-
-The following command line options are available for Metricbeat. To use these
-options, you need to start Metricbeat in the foreground.
-
-include::../../libbeat/docs/shared-command-line.asciidoc[]

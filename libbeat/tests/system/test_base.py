@@ -154,7 +154,6 @@ class Test(BaseTest):
             console={
                 "pretty": "false",
                 "bulk_max_size": 1,
-                "flush_interval": "1h"
             }
         )
 

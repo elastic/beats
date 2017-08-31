@@ -3,8 +3,8 @@ package pipeline
 import (
 	"time"
 
+	"github.com/elastic/beats/libbeat/beat"
 	"github.com/elastic/beats/libbeat/common/atomic"
-	"github.com/elastic/beats/libbeat/publisher/beat"
 )
 
 type clientACKer struct {
@@ -44,8 +44,8 @@ func (p *Pipeline) makeACKer(
 	return newWaitACK(acker, waitClose)
 }
 
-func lastEventACK(fn func(beat.Event)) func([]beat.Event) {
-	return func(events []beat.Event) {
+func lastEventACK(fn func(interface{})) func([]interface{}) {
+	return func(events []interface{}) {
 		fn(events[len(events)-1])
 	}
 }
@@ -91,7 +91,7 @@ func buildClientEventACK(
 	pipeline *Pipeline,
 	canDrop bool,
 	sema *sema,
-	mk func(*clientACKer) func([]beat.Event, int),
+	mk func(*clientACKer) func([]interface{}, int),
 ) acker {
 	guard := &clientACKer{}
 	guard.lift(newEventACK(pipeline, canDrop, sema, mk(guard)))

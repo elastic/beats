@@ -1,7 +1,7 @@
 - key: vsphere
-  title: "vsphere"
+  title: "vSphere"
   description: >
-    vsphere Module
+    vSphere module
   fields:
     - name: vsphere
       type: group

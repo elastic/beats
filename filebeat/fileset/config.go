@@ -15,5 +15,3 @@ type FilesetConfig struct {
 	Var        map[string]interface{} `config:"var"`
 	Prospector map[string]interface{} `config:"prospector"`
 }
-
-var defaultFilesetConfig = FilesetConfig{}

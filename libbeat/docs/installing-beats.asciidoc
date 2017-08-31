@@ -15,7 +15,7 @@
 ////////////////////////////////////////////////////////////////////
 
 [[installing-beats]]
-=== Installing Beats
+=== Install Beats
 
 After <<getting-started,installing and configuring>> the Elastic stack, you need to install and configure your Beat.
 
