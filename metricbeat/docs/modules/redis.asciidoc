@@ -3,12 +3,12 @@ This file is generated! See scripts/docs_collector.py
 ////
 
 [[metricbeat-module-redis]]
-== Redis Module
+== Redis module
 
 This module periodically fetches metrics from http://redis.io/[Redis] servers.
 
 [float]
-=== Module-Specific Configuration Notes
+=== Module-specific configuration notes
 
 The Redis module has these additional config options:
 
@@ -32,7 +32,7 @@ The Redis metricsets were tested with Redis 3.2.4 and are expected to work with 
 
 
 [float]
-=== Example Configuration
+=== Example configuration
 
 The Redis module supports the standard configuration options that are described
 in <<configuration-metricbeat>>. Here is an example configuration:

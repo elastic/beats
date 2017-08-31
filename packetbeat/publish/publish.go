@@ -3,16 +3,15 @@ package publish
 import (
 	"errors"
 
+	"github.com/elastic/beats/libbeat/beat"
 	"github.com/elastic/beats/libbeat/common"
 	"github.com/elastic/beats/libbeat/logp"
 	"github.com/elastic/beats/libbeat/processors"
-	"github.com/elastic/beats/libbeat/publisher/bc/publisher"
-	"github.com/elastic/beats/libbeat/publisher/beat"
 )
 
 type TransactionPublisher struct {
 	done      chan struct{}
-	pipeline  publisher.Publisher
+	pipeline  beat.Pipeline
 	canDrop   bool
 	processor transProcessor
 }
@@ -26,7 +25,8 @@ type transProcessor struct {
 var debugf = logp.MakeDebug("publish")
 
 func NewTransactionPublisher(
-	pipeline publisher.Publisher,
+	name string,
+	pipeline beat.Pipeline,
 	ignoreOutgoing bool,
 	canDrop bool,
 ) (*TransactionPublisher, error) {
@@ -35,7 +35,6 @@ func NewTransactionPublisher(
 		return nil, err
 	}
 
-	name := pipeline.(*publisher.BeatPublisher).GetName()
 	p := &TransactionPublisher{
 		done:     make(chan struct{}),
 		pipeline: pipeline,
@@ -79,7 +78,7 @@ func (p *TransactionPublisher) CreateReporter(
 		clientConfig.PublishMode = beat.DropIfFull
 	}
 
-	client, err := p.pipeline.ConnectX(clientConfig)
+	client, err := p.pipeline.ConnectWith(clientConfig)
 	if err != nil {
 		return nil, err
 	}
@@ -89,20 +88,24 @@ func (p *TransactionPublisher) CreateReporter(
 	ch := make(chan beat.Event, 3)
 	go p.worker(ch, client)
 	return func(event beat.Event) {
-		ch <- event
+		select {
+		case ch <- event:
+		case <-p.done:
+			ch = nil // stop serving more send requests
+		}
 	}, nil
 }
 
 func (p *TransactionPublisher) worker(ch chan beat.Event, client beat.Client) {
-	go func() {
-		<-p.done
-		close(ch)
-	}()
-
-	for event := range ch {
-		pub, _ := p.processor.Run(&event)
-		if pub != nil {
-			client.Publish(*pub)
+	for {
+		select {
+		case <-p.done:
+			return
+		case event := <-ch:
+			pub, _ := p.processor.Run(&event)
+			if pub != nil {
+				client.Publish(*pub)
+			}
 		}
 	}
 }

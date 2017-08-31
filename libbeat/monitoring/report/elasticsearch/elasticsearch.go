@@ -8,6 +8,7 @@ import (
 	"strings"
 	"time"
 
+	"github.com/elastic/beats/libbeat/beat"
 	"github.com/elastic/beats/libbeat/common"
 	"github.com/elastic/beats/libbeat/logp"
 	"github.com/elastic/beats/libbeat/monitoring"
@@ -16,10 +17,9 @@ import (
 	esout "github.com/elastic/beats/libbeat/outputs/elasticsearch"
 	"github.com/elastic/beats/libbeat/outputs/outil"
 	"github.com/elastic/beats/libbeat/outputs/transport"
-	"github.com/elastic/beats/libbeat/publisher/beat"
-	"github.com/elastic/beats/libbeat/publisher/broker"
-	"github.com/elastic/beats/libbeat/publisher/broker/membroker"
 	"github.com/elastic/beats/libbeat/publisher/pipeline"
+	"github.com/elastic/beats/libbeat/publisher/queue"
+	"github.com/elastic/beats/libbeat/publisher/queue/memqueue"
 )
 
 type reporter struct {
@@ -45,14 +45,14 @@ var errNoMonitoring = errors.New("xpack monitoring not available")
 // default monitoring api parameters
 var defaultParams = map[string]string{
 	"system_id":          "beats",
-	"system_api_version": "2",
+	"system_api_version": "6",
 }
 
 func init() {
 	report.RegisterReporterFactory("elasticsearch", makeReporter)
 }
 
-func makeReporter(beat common.BeatInfo, cfg *common.Config) (report.Reporter, error) {
+func makeReporter(beat beat.Info, cfg *common.Config) (report.Reporter, error) {
 	config := defaultConfig
 	if err := cfg.Unpack(&config); err != nil {
 		return nil, err
@@ -104,8 +104,8 @@ func makeReporter(beat common.BeatInfo, cfg *common.Config) (report.Reporter, er
 		out.Clients = append(out.Clients, client)
 	}
 
-	brokerFactory := func(e broker.Eventer) (broker.Broker, error) {
-		return membroker.NewBroker(membroker.Settings{
+	queueFactory := func(e queue.Eventer) (queue.Queue, error) {
+		return memqueue.NewBroker(memqueue.Settings{
 			Eventer: e,
 			Events:  20,
 		}), nil
@@ -115,7 +115,7 @@ func makeReporter(beat common.BeatInfo, cfg *common.Config) (report.Reporter, er
 
 	pipeline, err := pipeline.New(
 		monitoring,
-		brokerFactory, out, pipeline.Settings{
+		queueFactory, out, pipeline.Settings{
 			WaitClose:     0,
 			WaitCloseMode: pipeline.NoWaitOnClose,
 		})
@@ -264,7 +264,7 @@ func parseProxyURL(raw string) (*url.URL, error) {
 	return url.Parse("http://" + raw)
 }
 
-func makeMeta(beat common.BeatInfo) common.MapStr {
+func makeMeta(beat beat.Info) common.MapStr {
 	return common.MapStr{
 		"type":    beat.Beat,
 		"version": beat.Version,

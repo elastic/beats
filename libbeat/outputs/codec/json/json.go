@@ -7,10 +7,9 @@ import (
 	"github.com/urso/go-structform/gotype"
 	"github.com/urso/go-structform/json"
 
+	"github.com/elastic/beats/libbeat/beat"
 	"github.com/elastic/beats/libbeat/common"
-	"github.com/elastic/beats/libbeat/logp"
 	"github.com/elastic/beats/libbeat/outputs/codec"
-	"github.com/elastic/beats/libbeat/publisher/beat"
 )
 
 type Encoder struct {
@@ -41,8 +40,6 @@ func init() {
 }
 
 func New(pretty bool) *Encoder {
-	logp.Info("load json codec")
-
 	e := &Encoder{pretty: pretty}
 	e.reset()
 	return e

@@ -6,8 +6,8 @@ import (
 	"net"
 	"time"
 
+	"github.com/elastic/beats/libbeat/beat"
 	"github.com/elastic/beats/libbeat/common"
-	"github.com/elastic/beats/libbeat/publisher/beat"
 
 	"github.com/elastic/beats/heartbeat/look"
 )
@@ -97,7 +97,11 @@ func MakeJob(settings JobSettings, f func() (common.MapStr, []TaskRunner, error)
 		},
 	})
 
-	return &funcJob{settings, annotated(settings, time.Now(), f)}
+	return &funcJob{settings, func() (beat.Event, []JobRunner, error) {
+		// Create and run new annotated Job whenever the Jobs root is Task is executed.
+		// This will set the jobs active start timestamp to the time.Now().
+		return annotated(settings, time.Now(), f)()
+	}}
 }
 
 // annotated lifts a TaskRunner into a job, annotating events with common fields and start timestamp.
@@ -405,12 +409,6 @@ func (f *funcJob) Name() string { return f.settings.Name }
 func (f *funcJob) Run() (beat.Event, []JobRunner, error) { return f.run() }
 
 func (f funcTask) Run() (common.MapStr, []TaskRunner, error) { return f.run() }
-
-/*
-func (f funcTask) annotated(settings JobSettings, start time.Time) TaskRunner {
-	return annotated(settings, start, f.run)
-}
-*/
 
 // Unpack sets PingMode from a constant string. Unpack will be called by common.Unpack when
 // unpacking into an IPSettings type.

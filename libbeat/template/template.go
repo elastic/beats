@@ -2,8 +2,11 @@ package template
 
 import (
 	"fmt"
+	"time"
 
+	"github.com/elastic/beats/libbeat/beat"
 	"github.com/elastic/beats/libbeat/common"
+	"github.com/elastic/beats/libbeat/common/fmtstr"
 	"github.com/elastic/go-ucfg/yaml"
 )
 
@@ -17,15 +20,54 @@ var (
 )
 
 type Template struct {
-	index       string
+	name        string
+	pattern     string
 	beatVersion common.Version
 	esVersion   common.Version
 	settings    TemplateSettings
 }
 
 // New creates a new template instance
-func New(beatVersion string, esVersion string, index string, settings TemplateSettings) (*Template, error) {
+func New(beatVersion string, beatName string, esVersion string, config TemplateConfig) (*Template, error) {
 	bV, err := common.NewVersion(beatVersion)
+	if err != nil {
+		return nil, err
+	}
+
+	name := config.Name
+	if name == "" {
+		name = fmt.Sprintf("%s-%s", beatName, bV.String())
+	}
+
+	pattern := config.Pattern
+	if pattern == "" {
+		pattern = name + "-*"
+	}
+
+	event := &beat.Event{
+		Fields: common.MapStr{
+			"beat": common.MapStr{
+				"name":    beatName,
+				"version": bV.String(),
+			},
+		},
+		Timestamp: time.Now(),
+	}
+
+	nameFormatter, err := fmtstr.CompileEvent(name)
+	if err != nil {
+		return nil, err
+	}
+	name, err = nameFormatter.Run(event)
+	if err != nil {
+		return nil, err
+	}
+
+	patternFormatter, err := fmtstr.CompileEvent(pattern)
+	if err != nil {
+		return nil, err
+	}
+	pattern, err = patternFormatter.Run(event)
 	if err != nil {
 		return nil, err
 	}
@@ -41,10 +83,11 @@ func New(beatVersion string, esVersion string, index string, settings TemplateSe
 	}
 
 	return &Template{
-		index:       index,
+		pattern:     pattern,
+		name:        name,
 		beatVersion: *bV,
 		esVersion:   *esV,
-		settings:    settings,
+		settings:    config.Settings,
 	}, nil
 }
 
@@ -62,9 +105,14 @@ func (t *Template) Load(file string) (common.MapStr, error) {
 	return output, nil
 }
 
-// GetName returns the name of the template which is {index}-{version}
+// GetName returns the name of the template
 func (t *Template) GetName() string {
-	return fmt.Sprintf("%s-%s", t.index, t.beatVersion.String())
+	return t.name
+}
+
+// GetPattern returns the pattern of the template
+func (t *Template) GetPattern() string {
+	return t.pattern
 }
 
 // generate generates the full template
@@ -98,10 +146,17 @@ func (t *Template) generate(properties common.MapStr, dynamicTemplates []common.
 	}
 	indexSettings.DeepUpdate(t.settings.Index)
 
+	var mappingName string
+	if t.esVersion.Major >= 6 {
+		mappingName = "doc"
+	} else {
+		mappingName = "_default_"
+	}
+
 	// Load basic structure
 	basicStructure := common.MapStr{
 		"mappings": common.MapStr{
-			"_default_": common.MapStr{
+			mappingName: common.MapStr{
 				"_meta": common.MapStr{
 					"version": t.beatVersion.String(),
 				},
@@ -117,17 +172,18 @@ func (t *Template) generate(properties common.MapStr, dynamicTemplates []common.
 	}
 
 	if len(t.settings.Source) > 0 {
-		basicStructure.Put("mappings._default_._source", t.settings.Source)
+		key := fmt.Sprintf("mappings.%s._source", mappingName)
+		basicStructure.Put(key, t.settings.Source)
 	}
 
 	// ES 6 moved from template to index_patterns: https://github.com/elastic/elasticsearch/pull/21009
 	if t.esVersion.Major >= 6 {
-		basicStructure.Put("index_patterns", []string{t.GetName() + "-*"})
+		basicStructure.Put("index_patterns", []string{t.GetPattern()})
 	} else {
-		basicStructure.Put("template", t.GetName()+"-*")
+		basicStructure.Put("template", t.GetPattern())
 	}
 
-	if t.esVersion.IsMajor(2) || t.esVersion.IsMajor(5) {
+	if t.esVersion.IsMajor(2) {
 		basicStructure.Put("mappings._default_._all.norms.enabled", false)
 	}
 

@@ -3,7 +3,7 @@ This file is generated! See scripts/docs_collector.py
 ////
 
 [[metricbeat-module-kubernetes]]
-== kubernetes Module
+== Kubernetes module
 
 beta[]
 
@@ -16,9 +16,9 @@ example configuration on how to do it.
 
 
 [float]
-=== Example Configuration
+=== Example configuration
 
-The kubernetes module supports the standard configuration options that are described
+The Kubernetes module supports the standard configuration options that are described
 in <<configuration-metricbeat>>. Here is an example configuration:
 
 [source,yaml]

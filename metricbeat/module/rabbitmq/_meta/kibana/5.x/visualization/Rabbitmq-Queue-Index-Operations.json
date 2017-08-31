@@ -1,0 +1,11 @@
+{
+  "visState": "{\"title\":\"RabbitMQ Queue Index Operations\",\"type\":\"line\",\"params\":{\"shareYAxis\":true,\"addTooltip\":true,\"addLegend\":true,\"legendPosition\":\"top\",\"showCircles\":false,\"smoothLines\":false,\"interpolate\":\"linear\",\"scale\":\"linear\",\"drawLinesBetweenPoints\":true,\"radiusRatio\":9,\"times\":[],\"addTimeMarker\":false,\"defaultYExtents\":false,\"setYExtents\":false,\"yAxis\":{}},\"aggs\":[{\"id\":\"1\",\"enabled\":true,\"type\":\"max\",\"schema\":\"metric\",\"params\":{\"field\":\"rabbitmq.node.queue.index.read.count\",\"customLabel\":\"Queue Index Read\"}},{\"id\":\"2\",\"enabled\":true,\"type\":\"date_histogram\",\"schema\":\"segment\",\"params\":{\"field\":\"@timestamp\",\"interval\":\"custom\",\"customInterval\":\"30s\",\"min_doc_count\":1,\"extended_bounds\":{}}},{\"id\":\"3\",\"enabled\":true,\"type\":\"max\",\"schema\":\"metric\",\"params\":{\"field\":\"rabbitmq.node.queue.index.journal_write.count\",\"customLabel\":\"Queue Index Jornal Write\"}},{\"id\":\"4\",\"enabled\":true,\"type\":\"max\",\"schema\":\"metric\",\"params\":{\"field\":\"rabbitmq.node.queue.index.write.count\",\"customLabel\":\"Queue Index Write\"}}],\"listeners\":{}}", 
+  "description": "", 
+  "title": "RabbitMQ Queue Index Operations", 
+  "uiStateJSON": "{}", 
+  "version": 1, 
+  "savedSearchId": "Metricbeat-Rabbitmq", 
+  "kibanaSavedObjectMeta": {
+    "searchSourceJSON": "{\"filter\":[]}"
+  }
+}

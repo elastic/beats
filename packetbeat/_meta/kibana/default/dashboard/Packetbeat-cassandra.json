@@ -13,7 +13,7 @@
       },
       "id": "Cassandra-ResponseKeyspace",
       "type": "visualization",
-      "version": 2
+      "version": 1
     },
     {
       "attributes": {
@@ -28,7 +28,7 @@
       },
       "id": "Cassandra-ResponseType",
       "type": "visualization",
-      "version": 2
+      "version": 1
     },
     {
       "attributes": {
@@ -43,7 +43,7 @@
       },
       "id": "Cassandra-ResponseTime",
       "type": "visualization",
-      "version": 2
+      "version": 1
     },
     {
       "attributes": {
@@ -58,7 +58,7 @@
       },
       "id": "Cassandra-RequestCount",
       "type": "visualization",
-      "version": 2
+      "version": 1
     },
     {
       "attributes": {
@@ -73,7 +73,7 @@
       },
       "id": "Cassandra-Ops",
       "type": "visualization",
-      "version": 2
+      "version": 1
     },
     {
       "attributes": {
@@ -88,7 +88,7 @@
       },
       "id": "Cassandra-RequestCountStackByType",
       "type": "visualization",
-      "version": 2
+      "version": 1
     },
     {
       "attributes": {
@@ -103,7 +103,7 @@
       },
       "id": "Cassandra-ResponseCountStackByType",
       "type": "visualization",
-      "version": 2
+      "version": 1
     },
     {
       "attributes": {
@@ -118,7 +118,7 @@
       },
       "id": "Cassandra-RequestCountByType",
       "type": "visualization",
-      "version": 2
+      "version": 1
     },
     {
       "attributes": {
@@ -133,22 +133,22 @@
       },
       "id": "Cassandra-ResponseCountByType",
       "type": "visualization",
-      "version": 2
+      "version": 1
     },
     {
       "attributes": {
         "description": "",
         "kibanaSavedObjectMeta": {
-          "searchSourceJSON": "{\"query\":{\"query_string\":{\"analyze_wildcard\":true,\"query\":\"*\"}},\"filter\":[]}"
+          "searchSourceJSON": "{\"query\":{\"query\":{\"query_string\":{\"analyze_wildcard\":true,\"query\":\"*\"}},\"language\":\"lucene\"},\"filter\":[]}"
         },
         "title": "Navigation",
         "uiStateJSON": "{}",
         "version": 1,
-        "visState": "{\"title\":\"Navigation\",\"type\":\"markdown\",\"params\":{\"markdown\":\"### Packetbeat:\\n\\n[Overview](#/dashboard/Packetbeat-Dashboard)\\n\\n[Flows](#/dashboard/Packetbeat-Flows)\\n\\n[Web transactions](#/dashboard/Packetbeat-HTTP)\\n\\n[MySQL performance](#/dashboard/Packetbeat-MySQL-performance)\\n\\n[PostgreSQL performance](#/dashboard/Packetbeat-PgSQL-performance)\\n\\n[MongoDB performance](#/dashboard/Packetbeat-MongoDB-performance)\\n\\n[Thrift-RPC performance](#/dashboard/Packetbeat-Thrift-performance)\\n\\n[NFS transactions](#/dashboard/Packetbeat-NFS)\\n\\n[Cassandra performance](#/dashboard/Packetbeat-Cassandra)\"},\"aggs\":[],\"listeners\":{}}"
+        "visState": "{\"title\":\"Navigation\",\"type\":\"markdown\",\"params\":{\"markdown\":\"### Packetbeat:\\n\\n[Overview](#/dashboard/Packetbeat-Dashboard)\\n\\n[Flows](#/dashboard/Packetbeat-Flows)\\n\\n[Web transactions](#/dashboard/Packetbeat-HTTP)\\n\\n[MySQL performance](#/dashboard/Packetbeat-MySQL-performance)\\n\\n[PostgreSQL performance](#/dashboard/Packetbeat-PgSQL-performance)\\n\\n[MongoDB performance](#/dashboard/Packetbeat-MongoDB-performance)\\n\\n[Thrift-RPC performance](#/dashboard/Packetbeat-Thrift-performance)\\n\\n[NFS transactions](#/dashboard/Packetbeat-NFS)\\n\\n[Cassandra performance](#/dashboard/Packetbeat-Cassandra)\",\"fontSize\":\"10\"},\"aggs\":[]}"
       },
       "id": "Navigation",
       "type": "visualization",
-      "version": 18
+      "version": 10
     },
     {
       "attributes": {
@@ -172,19 +172,19 @@
       },
       "id": "Cassandra-QueryView",
       "type": "search",
-      "version": 2
+      "version": 1
     },
     {
       "attributes": {
         "description": "",
         "hits": 0,
         "kibanaSavedObjectMeta": {
-          "searchSourceJSON": "{\"filter\":[{\"query\":{\"query_string\":{\"analyze_wildcard\":true,\"query\":\"*\"}}}]}"
+          "searchSourceJSON": "{\"filter\":[],\"query\":{\"query\":{\"query_string\":{\"analyze_wildcard\":true,\"query\":\"*\",\"default_field\":\"*\"}},\"language\":\"lucene\"},\"highlightAll\":true,\"version\":true}"
         },
         "optionsJSON": "{\"darkTheme\":false}",
         "panelsJSON": "[{\"col\":10,\"id\":\"Cassandra-ResponseKeyspace\",\"panelIndex\":3,\"row\":3,\"size_x\":3,\"size_y\":2,\"type\":\"visualization\"},{\"col\":7,\"id\":\"Cassandra-ResponseType\",\"panelIndex\":4,\"row\":3,\"size_x\":3,\"size_y\":2,\"type\":\"visualization\"},{\"col\":1,\"id\":\"Cassandra-ResponseTime\",\"panelIndex\":9,\"row\":5,\"size_x\":12,\"size_y\":2,\"type\":\"visualization\"},{\"col\":4,\"id\":\"Cassandra-RequestCount\",\"panelIndex\":10,\"row\":1,\"size_x\":9,\"size_y\":2,\"type\":\"visualization\"},{\"col\":4,\"id\":\"Cassandra-Ops\",\"panelIndex\":11,\"row\":3,\"size_x\":3,\"size_y\":2,\"type\":\"visualization\"},{\"col\":1,\"id\":\"Cassandra-RequestCountStackByType\",\"panelIndex\":15,\"row\":7,\"size_x\":12,\"size_y\":2,\"type\":\"visualization\"},{\"col\":1,\"id\":\"Cassandra-ResponseCountStackByType\",\"panelIndex\":16,\"row\":9,\"size_x\":12,\"size_y\":2,\"type\":\"visualization\"},{\"col\":1,\"id\":\"Cassandra-RequestCountByType\",\"panelIndex\":17,\"row\":11,\"size_x\":6,\"size_y\":3,\"type\":\"visualization\"},{\"col\":7,\"id\":\"Cassandra-ResponseCountByType\",\"panelIndex\":18,\"row\":11,\"size_x\":6,\"size_y\":3,\"type\":\"visualization\"},{\"col\":1,\"id\":\"Navigation\",\"panelIndex\":19,\"row\":1,\"size_x\":3,\"size_y\":4,\"type\":\"visualization\"},{\"id\":\"Cassandra-QueryView\",\"type\":\"search\",\"panelIndex\":20,\"size_x\":12,\"size_y\":3,\"col\":1,\"row\":14,\"columns\":[\"cassandra.request.query\",\"cassandra.response.result.rows.meta.keyspace\",\"cassandra.response.result.rows.meta.table\",\"cassandra.response.result.rows.num_rows\"],\"sort\":[\"@timestamp\",\"desc\"]}]",
         "timeRestore": false,
-        "title": "Packetbeat Cassandra",
+        "title": "[Packetbeat] Cassandra",
         "uiStateJSON": "{\"P-10\":{\"vis\":{\"legendOpen\":false}},\"P-17\":{\"vis\":{\"legendOpen\":false}},\"P-18\":{\"vis\":{\"legendOpen\":false}}}",
         "version": 1
       },
@@ -193,5 +193,5 @@
       "version": 2
     }
   ],
-  "version": "6.0.0-alpha3-SNAPSHOT"
+  "version": "6.0.0-beta1-SNAPSHOT"
 }

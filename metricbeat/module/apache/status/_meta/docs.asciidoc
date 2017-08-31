@@ -1,4 +1,4 @@
-=== Apache Status Metricset
+=== Apache status metricset
 
 The Apache `status` metricset collects data from the Apache
 https://httpd.apache.org/docs/current/mod/mod_status.html[mod_status] module. It

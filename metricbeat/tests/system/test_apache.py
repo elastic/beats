@@ -18,6 +18,8 @@ CPU_FIELDS = ["load", "user", "system", "children_user",
 
 class ApacheStatusTest(metricbeat.BaseTest):
 
+    COMPOSE_SERVICES = ['apache']
+
     @unittest.skipUnless(metricbeat.INTEGRATION_TESTS, "integration test")
     @attr('integration')
     def test_output(self):

@@ -8,6 +8,8 @@ HTTP_FIELDS = metricbeat.COMMON_FIELDS + ["http"]
 
 class Test(metricbeat.BaseTest):
 
+    COMPOSE_SERVICES = ['http']
+
     @unittest.skipUnless(metricbeat.INTEGRATION_TESTS, "integration test")
     def test_json(self):
         """

@@ -84,7 +84,7 @@ func (p *PodWatcher) watchPods() {
 		if err != nil {
 			//watch pod failures should be logged and gracefully failed over as metadata retrieval
 			//should never stop.
-			logp.Err("kubernetes: Watching API eror %v", err)
+			logp.Err("kubernetes: Watching API error %v", err)
 			time.Sleep(time.Second)
 			continue
 		}

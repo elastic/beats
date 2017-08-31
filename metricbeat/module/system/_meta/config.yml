@@ -23,3 +23,8 @@
   processors:
   - drop_event.when.regexp:
       system.filesystem.mount_point: '^/(sys|cgroup|proc|dev|etc|host|lib)($|/)'
+
+- module: system
+  period: 15m
+  metricsets:
+    - uptime

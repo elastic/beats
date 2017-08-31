@@ -9,15 +9,17 @@
 //// include::../../libbeat/docs/shared-logstash-config.asciidoc[]
 //////////////////////////////////////////////////////////////////////////
 
-*Prerequisite:* To use Logstash as an output, you must also
-{libbeat}/logstash-installation.html#logstash-setup[set up Logstash] to receive events
-from Beats. 
+[IMPORTANT]
+.Prerequisite
+To use Logstash as an output, you must
+{libbeat}/logstash-installation.html#logstash-setup[install and configure] the Beats input
+plugin for Logstash.
 
 If you want to use Logstash to perform additional processing on the data collected by
 {beatname_uc}, you need to configure {beatname_uc} to use Logstash.
 
 To do this, you edit the {beatname_uc} configuration file to disable the Elasticsearch
-output by commenting it out and enable the Logstash output by uncommenting the 
+output by commenting it out and enable the Logstash output by uncommenting the
 logstash section:
 
 [source,yaml]
@@ -35,19 +37,15 @@ because the options for auto loading the template are only available for the Ela
 
 ifdef::allplatforms[]
 
-TIP: To test your configuration file, change to the directory where the {beatname_uc} 
-binary is installed, and run {beatname_uc} in the foreground with the following
-options specified: +./{beatname_lc} -configtest -e+. Make sure your config files are
-in the path expected by {beatname_uc} (see <<directory-layout>>). If you
-installed from DEB or RPM packages, run +./{beatname_lc}.sh -configtest -e+.
+include::../../libbeat/docs/step-test-config.asciidoc[]
 
 endif::allplatforms[]
 
 ifdef::win[]
 
-TIP: To test your configuration file, change to the directory where the {beatname_uc} 
+TIP: To test your configuration file, change to the directory where the {beatname_uc}
 binary is installed, and run {beatname_uc} in the foreground with the following
-options specified: +.\winlogbeat.exe -c .\winlogbeat.yml -configtest -e+.
+options specified: +.\winlogbeat.exe test config -c .\winlogbeat.yml -e+.
 
 endif::win[]
 

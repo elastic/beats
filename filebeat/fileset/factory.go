@@ -14,7 +14,7 @@ import (
 
 // Factory for modules
 type Factory struct {
-	outlet                channel.OutleterFactory
+	outlet                channel.Factory
 	registrar             *registrar.Registrar
 	beatVersion           string
 	pipelineLoaderFactory PipelineLoaderFactory
@@ -30,7 +30,7 @@ type prospectorsRunner struct {
 }
 
 // NewFactory instantiates a new Factory
-func NewFactory(outlet channel.OutleterFactory, registrar *registrar.Registrar, beatVersion string,
+func NewFactory(outlet channel.Factory, registrar *registrar.Registrar, beatVersion string,
 	pipelineLoaderFactory PipelineLoaderFactory, beatDone chan struct{}) *Factory {
 	return &Factory{
 		outlet:                outlet,
@@ -64,7 +64,7 @@ func (f *Factory) Create(c *common.Config) (cfgfile.Runner, error) {
 
 	prospectors := make([]*prospector.Prospector, len(pConfigs))
 	for i, pConfig := range pConfigs {
-		prospectors[i], err = prospector.NewProspector(pConfig, f.outlet, f.beatDone, f.registrar.GetStates())
+		prospectors[i], err = prospector.New(pConfig, f.outlet, f.beatDone, f.registrar.GetStates())
 		if err != nil {
 			logp.Err("Error creating prospector: %s", err)
 			return nil, err

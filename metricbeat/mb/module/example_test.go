@@ -11,7 +11,7 @@ import (
 	"github.com/elastic/beats/libbeat/beat"
 	"github.com/elastic/beats/libbeat/common"
 	"github.com/elastic/beats/libbeat/outputs/codec/json"
-	pub "github.com/elastic/beats/libbeat/publisher/beat"
+
 	"github.com/elastic/beats/metricbeat/mb"
 	"github.com/elastic/beats/metricbeat/mb/module"
 )
@@ -129,7 +129,7 @@ func ExampleRunner() {
 	runner.Stop()
 }
 
-func encodeEvent(event pub.Event) (string, error) {
+func encodeEvent(event beat.Event) (string, error) {
 	output, err := json.New(false).Encode("noindex", &event)
 	if err != nil {
 		return "", nil

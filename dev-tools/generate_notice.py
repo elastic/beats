@@ -91,7 +91,7 @@ def write_notice_file(f, beat, copyright, dependencies):
 
     # Add licenses for 3rd party libraries
     f.write("==========================================================================\n")
-    f.write("Third party libraries used by the Beats project:\n")
+    f.write("Third party libraries used by the {} project:\n".format(beat))
     f.write("==========================================================================\n\n")
 
     # Sort licenses by package path, ignore upper / lower case
@@ -111,6 +111,11 @@ def write_notice_file(f, beat, copyright, dependencies):
             else:
                 # it's an Apache License, so include only the NOTICE file
                 f.write("Apache License 2.0\n\n")
+
+                # Skip NOTICE files which are not needed
+                if os.path.join(os.path.dirname(lib["license_file"])) in SKIP_NOTICE:
+                    continue
+
                 for notice_file in glob.glob(os.path.join(os.path.dirname(lib["license_file"]), "NOTICE*")):
                     notice_file_hdr = "-------{}-----\n".format(os.path.basename(notice_file))
                     f.write(notice_file_hdr)
@@ -205,7 +210,7 @@ def detect_license_summary(content):
     return "Unknown"
 
 
-EXCLUDES = ["dev-tools"]
+SKIP_NOTICE = []
 
 if __name__ == "__main__":
 
@@ -219,12 +224,20 @@ if __name__ == "__main__":
                         help="copyright owner")
     parser.add_argument("--csv", dest="csvfile",
                         help="Output to a csv file")
-
+    parser.add_argument("-e", "--excludes", default=["dev-tools", "build"],
+                        help="List of top directories to exclude")
+    parser.add_argument("-s", "--skip-notice", default=[],
+                        help="List of NOTICE files to skip")
     args = parser.parse_args()
 
     cwd = os.getcwd()
     notice = os.path.join(cwd, "NOTICE")
     vendor_dirs = []
+
+    excludes = args.excludes
+    if not isinstance(excludes, list):
+        excludes = [excludes]
+    SKIP_NOTICE = args.skip_notice
 
     for root, dirs, files in os.walk(args.vendor):
 
@@ -236,7 +249,7 @@ if __name__ == "__main__":
             vendor_dirs.append(os.path.join(root, 'vendor'))
             dirs.remove('vendor')   # don't walk down into sub-vendors
 
-        for exclude in EXCLUDES:
+        for exclude in excludes:
             if exclude in dirs:
                 dirs.remove(exclude)
 

@@ -11,7 +11,7 @@
 //////////////////////////////////////////////////////////////////////////
 
 [[configuration-logging]]
-=== Logging
+== Set up logging
 
 The `logging` section of the +{beatname_lc}.yml+ config file contains options
 for configuring the Beats logging output. The logging system can write logs to
@@ -34,15 +34,18 @@ TIP: In addition to setting logging options in the config file, you can modify
 the logging output configuration from the command line. See
 <<command-line-options>>.
 
-==== Logging Options
+[float]
+=== Configuration options
 
 You can specify the following options in the `logging` section of the +{beatname_lc}.yml+ config file:
 
-===== to_syslog
+[float]
+==== `to_syslog`
 
 When true, writes all logging output to the syslog.
 
-===== to_files
+[float]
+==== `to_files`
 
 When true, writes all logging output to files. The log files are automatically
 rotated when the log file size limit is reached.
@@ -51,8 +54,9 @@ NOTE: {beatname_uc} only creates a log file if there is logging output. For
 example, if you set the log <<level,`level`>> to `error` and there are no errors,
 there will be no log file in the directory specified for logs.
 
+[float]
 [[level]]
-===== level
+==== `level`
 
 Minimum log level. One of `debug`, `info`, `warning`, `error`, or `critical`.
 The default log level is `info`.
@@ -73,8 +77,9 @@ that are published. Also logs any warnings, errors, or critical errors.
 
 `critical`:: Logs critical errors only.
 
+[float]
 [[selectors]]
-===== selectors
+==== `selectors`
 
 The list of debugging-only selector tags used by different Beats components. Use `*`
 to enable debug output for all components. For example add `publish` to display
@@ -82,7 +87,8 @@ all the debug messages related to event publishing. When starting the Beat,
 selectors can be overwritten using the `-d` command line option (`-d` also sets
 the debug log level).
 
-===== metrics.enabled
+[float]
+==== `metrics.enabled`
 
 If enabled, {beatname_uc} periodically logs its internal metrics that have
 changed in the last period. For each metric that changed, the delta from the
@@ -100,44 +106,51 @@ Note that we currently offer no backwards compatible guarantees for the internal
 metrics and for this reason they are also not documented.
 
 
-===== metrics.period
+[float]
+==== `metrics.period`
 
 The period after which to log the internal metrics. The default is 30s.
 
-===== files.path
+[float]
+==== `files.path`
 
 The directory that log files are written to. The default is the logs path. See the
 <<directory-layout>> section for details.
 
-===== files.name
+[float]
+==== `files.name`
 
 The name of the file that logs are written to. By default, the name of the Beat
 is used.
 
-===== files.rotateeverybytes
+[float]
+==== `files.rotateeverybytes`
 
 The maximum size of a log file. If the limit is reached, a new log file is generated.
 The default size limit is 10485760 (10 MB).
 
-===== files.keepfiles
+[float]
+==== `files.keepfiles`
 
 The number of most recent rotated log files to keep on disk. Older files are
 deleted during log rotation. The default value is 7. The `keepfiles` options has to be
 in the range of 2 to 1024 files.
 
-===== files.permissions
+[float]
+==== `files.permissions`
 
 The permission mask to apply when rotating log files. The default value is 0600. The
- `permissions` options must be a valid Unix-style file permissions mask expressed 
+ `permissions` options must be a valid Unix-style file permissions mask expressed
  in octal notation. In Go, numbers in octal notation must start with '0'.
- 
+
 Examples:
 * 0644: give read and write access to the file owner, and read access to all others.
 * 0600: give read and write access to the file owner, and no access to all others.
-* 0664: give read and write access to the file owner and members of the group 
+* 0664: give read and write access to the file owner and members of the group
 associated with the file, as well as read access to all other users.
 
-==== Logging Format
+[float]
+=== Logging format
 
 The logging format is different for each logging type:
 

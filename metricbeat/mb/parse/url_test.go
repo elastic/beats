@@ -41,6 +41,18 @@ func TestParseURL(t *testing.T) {
 		}
 	})
 
+	t.Run("npipe", func(t *testing.T) {
+		rawURL := "npipe://./pipe/docker_engine"
+		hostData, err := ParseURL(rawURL, "tcp", "", "", "", "")
+		if assert.NoError(t, err) {
+			assert.Equal(t, "npipe://./pipe/docker_engine", hostData.URI)
+			assert.Equal(t, "npipe://./pipe/docker_engine", hostData.SanitizedURI)
+			assert.Equal(t, "/pipe/docker_engine", hostData.Host)
+			assert.Equal(t, "", hostData.User)
+			assert.Equal(t, "", hostData.Password)
+		}
+	})
+
 	t.Run("set default user", func(t *testing.T) {
 		rawURL := "http://:secret@localhost"
 		h, err := ParseURL(rawURL, "https", "root", "passwd", "", "")

@@ -1,6 +1,6 @@
-=== http json MetricSet
+=== HTTP json metricset
 
-This is the json metricset of the module http.
+This is the `json` metricset of the HTTP module.
 
 [float]
 === Features and Configuration

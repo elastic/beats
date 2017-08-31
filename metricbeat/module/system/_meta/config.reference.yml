@@ -8,6 +8,7 @@
     - network         # Network IO
     - process         # Per process metrics
     - process_summary # Process summary
+    - uptime          # System Uptime
     #- core           # Per CPU core usage
     #- diskio         # Disk IO
     #- socket         # Sockets and connection info (linux only)
@@ -18,6 +19,11 @@
   # Configure the metric types that are included by these metricsets.
   cpu.metrics:  ["percentages"]  # The other available options are normalized_percentages and ticks.
   core.metrics: ["percentages"]  # The other available option is ticks.
+
+  # A list of filesystem types to ignore. The filesystem metricset will not
+  # collect data from filesystems matching any of the specified types, and
+  # fsstats will not include data from these filesystems in its summary stats.
+  #filesystem.ignore_types: []
 
   # These options allow you to filter out all processes that are not
   # in the top N by CPU or memory, in order to reduce the number of documents created.
@@ -45,6 +51,10 @@
   # A list of regular expressions used to whitelist environment variables
   # reported with the process metricset's events. Defaults to empty.
   #process.env.whitelist: []
+
+  # Include the cumulative CPU tick values with the process metrics. Defaults
+  # to false.
+  #process.include_cpu_ticks: false
 
   # Configure reverse DNS lookup on remote IP addresses in the socket metricset.
   #socket.reverse_lookup.enabled: false

@@ -1,5 +1,5 @@
 [[how-filebeat-works]]
-== How Filebeat Works
+== How Filebeat works
 
 In this topic, you learn about the key building blocks of Filebeat and how they work together. Understanding these concepts will help you make informed decisions about configuring Filebeat for specific use cases.
 
@@ -8,7 +8,7 @@ Filebeat consists of two main components: <<prospector,prospectors>> and <<harve
 
 [float]
 [[harvester]]
-=== What is a Harvester?
+=== What is a harvester?
 
 A harvester is responsible for reading the content of a single file. The harvester reads each file, line by line, and sends the content to the output. One harvester is started for each file. The harvester is responsible for opening and closing the file, which means that the file descriptor remains open while the harvester is running. If a file is removed or renamed while it's being harvested, Filebeat continues to read the file. This has the side effect that the space on your disk is reserved until the harvester closes. By default, Filebeat keeps the file open until <<close-inactive,`close_inactive`>> is reached.
 
@@ -22,7 +22,7 @@ To control when a harvester is closed, use the <<close-options,`close_*`>> confi
 
 [float]
 [[prospector]]
-=== What is a Prospector?
+=== What is a prospector?
 
 A prospector is responsible for managing the harvesters and finding all sources to read from.
 
@@ -44,7 +44,7 @@ Filebeat currently supports two `prospector` types: `log` and `stdin`. Each pros
 NOTE: Filebeat prospectors can only read local files. There is no functionality to connect to remote hosts to read stored files or logs.
 
 [float]
-=== How Does Filebeat Keep the State of Files?
+=== How does Filebeat keep the state of files?
 
 Filebeat keeps the state of each file and frequently flushes the state to disk in the registry file. The state is used to remember the last offset a harvester was reading from and to ensure all log lines are sent. If the output, such as Elasticsearch or Logstash, is not reachable, Filebeat keeps track of the last lines sent and will continue reading the files as soon as the output becomes available again. While Filebeat is running, the state information is also kept in memory by each prospector. When Filebeat is restarted, data from the registry file is used to rebuild the state, and Filebeat continues each harvester at the last known position.
 
@@ -54,7 +54,7 @@ If your use case involves creating a large number of new files every day, you mi
 
 [float]
 [[at-least-once-delivery]]
-=== How Does Filebeat Ensure At-Least-Once Delivery?
+=== How does Filebeat ensure at-least-once delivery?
 
 Filebeat guarantees that events will be delivered to the configured output at
 least once and with no data loss. Filebeat is able to achieve this behavior

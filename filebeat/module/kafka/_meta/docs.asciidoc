@@ -1,0 +1,24 @@
+== Kafka module
+
+This module collects and parses the logs created by https://kafka.apache.org/[Kafka].
+
+[float]
+=== Compatibility
+
+The Kafka module was tested with logs from versions 2.11.
+
+[float]
+=== Dashboard
+
+This module comes with a sample dashboard to see Kafka logs and stacktraces.
+
+image::./images/filebeat-kafka-logs-overview.png[]
+
+[float]
+=== Logs fileset settings
+
+[float]
+==== var.paths
+
+An array of paths where to look for the log files. If left empty, Filebeat
+will choose the paths depending on your operating systems.

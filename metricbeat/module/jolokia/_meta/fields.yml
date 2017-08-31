@@ -1,9 +1,9 @@
 - key: jolokia
   title: "Jolokia"
   description: >
-    []beta
+    beta[]
 
-    Jolokia Module
+    Jolokia module
   short_config: false
   fields:
     - name: jolokia

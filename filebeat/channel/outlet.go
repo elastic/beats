@@ -2,8 +2,8 @@ package channel
 
 import (
 	"github.com/elastic/beats/filebeat/util"
+	"github.com/elastic/beats/libbeat/beat"
 	"github.com/elastic/beats/libbeat/common/atomic"
-	"github.com/elastic/beats/libbeat/publisher/beat"
 )
 
 type outlet struct {
@@ -36,7 +36,7 @@ func (o *outlet) OnEvent(d *util.Data) bool {
 
 	event := d.GetEvent()
 	if d.HasState() {
-		event.Private = d
+		event.Private = d.GetState()
 	}
 
 	if o.wg != nil {

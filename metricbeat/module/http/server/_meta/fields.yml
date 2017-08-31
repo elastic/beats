@@ -1,0 +1,5 @@
+- name: server
+  type: group
+  description: >
+    server
+  fields:

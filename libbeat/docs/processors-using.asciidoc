@@ -1,5 +1,5 @@
 [[defining-processors]]
-=== Defining Processors
+=== Define processors
 
 You define processors in the +{beatname_lc}.yml+ file to filter and enhance the
 data before sending events to the configured output.
@@ -24,13 +24,13 @@ processors:
 
 Where:
 
-* <processor_name> specifies a <<processors,processor>> that performs some kind
+* `<processor_name>` specifies a <<processors,processor>> that performs some kind
 of action, such as selecting the fields that are exported or adding metadata to
 the event.
-* <when: condition> specifies an optional <<conditions,condition>>. If the
+* `<when: condition>` specifies an optional <<conditions,condition>>. If the
 condition is present, then the action is executed only if the condition is
 fulfilled. If no condition is passed, then the action is always executed.
-* <parameters> is the list of parameters to pass to the processor.
+* `<parameters>` is the list of parameters to pass to the processor.
 
 [[processors]]
 ==== Processors
@@ -72,7 +72,7 @@ The supported conditions are:
 
 [float]
 [[condition-equals]]
-===== equals
+===== `equals`
 
 With the `equals` condition, you can compare if a field has a certain value.
 The condition accepts only an integer or a string value.
@@ -88,7 +88,7 @@ equals:
 
 [float]
 [[condition-contains]]
-===== contains
+===== `contains`
 
 The `contains` condition checks if a value is part of a field. The field can be
 a string or an array of strings. The condition accepts only a string value.
@@ -104,7 +104,7 @@ contains:
 
 [float]
 [[condition-regexp]]
-===== regexp
+===== `regexp`
 
 The `regexp` condition checks the field against a regular expression. The
 condition accepts only strings.
@@ -120,7 +120,7 @@ regexp:
 
 [float]
 [[condition-range]]
-===== range
+===== `range`
 
 The `range` condition checks if the field is in a certain range of values. The
 condition supports `lt`, `lte`, `gt` and `gte`. The condition accepts only
@@ -158,7 +158,7 @@ range:
 
 [float]
 [[condition-or]]
-===== OR
+===== `or`
 
 The `or` operator receives a list of conditions.
 
@@ -186,7 +186,7 @@ or:
 
 [float]
 [[condition-and]]
-===== AND
+===== `and`
 
 The `and` operator receives a list of conditions.
 
@@ -226,7 +226,7 @@ or:
 
 [float]
 [[condition-not]]
-===== NOT
+===== `not`
 
 The `not` operator receives the condition to negate.
 
@@ -247,7 +247,7 @@ not:
 ------
 
 [[add-cloud-metadata]]
-=== Adding Cloud Metadata
+=== Add cloud metadata
 
 The `add_cloud_metadata` processor enriches each event with instance metadata
 from the machine's hosting provider. At startup it will detect the hosting
@@ -366,7 +366,7 @@ ECS instance.
 -------------------------------------------------------------------------------
 
 [[add-locale]]
-=== Adding the Local Time Zone
+=== Add the local time zone
 
 The `add_locale` processor enriches each event with the machine's time zone
 offset from UTC or with the name of the time zone. It supports one configuration
@@ -398,7 +398,7 @@ regular time.
 
 
 [[decode-json-fields]]
-=== Decoding JSON Fields
+=== Decode JSON fields
 
 The `decode_json_fields` processor decodes fields containing JSON strings and
 replaces the strings with valid JSON objects.
@@ -429,7 +429,7 @@ exist in the event are overwritten by keys from the decoded JSON object. The
 default value is false.
 
 [[drop-event]]
-=== Dropping Events
+=== Drop events
 
 The `drop_event` processor drops the entire event if the associated condition
 is fulfilled. The condition is mandatory, because without one, all the events
@@ -446,7 +446,7 @@ processors:
 See <<conditions>> for a list of supported conditions.
 
 [[drop-fields]]
-=== Dropping Fields from Events
+=== Drop fields from events
 
 The `drop_fields` processor specifies which fields to drop if a certain
 condition is fulfilled. The condition is optional. If it's missing, the
@@ -468,7 +468,7 @@ NOTE: If you define an empty list of fields under `drop_fields`, then no fields
 are dropped.
 
 [[include-fields]]
-=== Adding Additional Fields to Events
+=== Add additional fields to events
 
 The `include_fields` processor specifies which fields to export if a certain
 condition is fulfilled. The condition is optional. If it's missing, the
@@ -493,7 +493,7 @@ NOTE: If you define an empty list of fields under `include_fields`, then only
 the required fields, `@timestamp` and `type`, are exported.
 
 [[add-kubernetes-metadata]]
-=== Adding Kubernetes Metadata
+=== Add Kubernetes metadata
 
 The `add_kubernetes_metadata` processor annotates each event with relevant
 metadata based on which Kubernetes pod the event originated from. Each event is
@@ -563,7 +563,7 @@ processors:
 -------------------------------------------------------------------------------
 
 [[add-docker-metadata]]
-=== Adding Docker metadata
+=== Add Docker metadata
 
 The `add_docker_metadata` processor annotates each event with relevant metadata
 from Docker containers:

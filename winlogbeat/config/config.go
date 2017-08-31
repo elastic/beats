@@ -14,34 +14,11 @@ const (
 	DefaultRegistryFile = ".winlogbeat.yml"
 )
 
-// Validator is the interface for configuration data that can be validating.
-//
-// Validate reads the configuration and validates all fields. An error
-// describing all problems is returned (versus returning an error only for the
-// first problem encountered).
-type Validator interface {
-	Validate() error
-}
-
-// Settings is the root of the Winlogbeat configuration data hierarchy.
-type Settings struct {
-	Winlogbeat WinlogbeatConfig       `config:"winlogbeat"`
-	Raw        map[string]interface{} `config:",inline"`
-}
-
 var (
-	DefaultSettings = Settings{
-		Winlogbeat: WinlogbeatConfig{
-			RegistryFile: DefaultRegistryFile,
-		},
+	DefaultSettings = WinlogbeatConfig{
+		RegistryFile: DefaultRegistryFile,
 	}
 )
-
-// Validate validates the Settings data and returns an error describing
-// all problems or nil if there are none.
-func (s Settings) Validate() error {
-	return s.Winlogbeat.Validate()
-}
 
 // WinlogbeatConfig contains all of Winlogbeat configuration data.
 type WinlogbeatConfig struct {

@@ -5,6 +5,8 @@ import unittest
 
 class Test(metricbeat.BaseTest):
 
+    COMPOSE_SERVICES = ['couchbase']
+
     @unittest.skipUnless(metricbeat.INTEGRATION_TESTS, "integration test")
     def test_bucket(self):
         """

@@ -6,6 +6,7 @@ import (
 	"testing"
 
 	"github.com/elastic/beats/libbeat/common"
+	"github.com/elastic/beats/libbeat/tests/compose"
 	mbtest "github.com/elastic/beats/metricbeat/mb/testing"
 	"github.com/elastic/beats/metricbeat/module/postgresql"
 
@@ -13,6 +14,8 @@ import (
 )
 
 func TestFetch(t *testing.T) {
+	compose.EnsureUp(t, "postgresql")
+
 	f := mbtest.NewEventsFetcher(t, getConfig())
 	events, err := f.Fetch()
 	if !assert.NoError(t, err) {
@@ -40,6 +43,8 @@ func TestFetch(t *testing.T) {
 }
 
 func TestData(t *testing.T) {
+	compose.EnsureUp(t, "postgresql")
+
 	f := mbtest.NewEventsFetcher(t, getConfig())
 
 	err := mbtest.WriteEvents(f, t)

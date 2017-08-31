@@ -5,4 +5,4 @@ RUN apk update
 RUN apk add netcat-openbsd
 USER memcache
 
-HEALTHCHECK CMD nc -z localhost 11211
+HEALTHCHECK --interval=1s --retries=90 CMD nc -z localhost 11211

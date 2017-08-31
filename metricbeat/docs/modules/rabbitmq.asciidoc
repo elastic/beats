@@ -3,16 +3,16 @@ This file is generated! See scripts/docs_collector.py
 ////
 
 [[metricbeat-module-rabbitmq]]
-== rabbitmq Module
+== RabbitMQ module
 
-This is the rabbitmq Module. It uses http://www.rabbitmq.com/management.html [HTTP API] created by the management plugin to collect metrics.
+The RabbitMQ module uses http://www.rabbitmq.com/management.html[HTTP API] created by the management plugin to collect metrics.
 
 
 
 [float]
-=== Example Configuration
+=== Example configuration
 
-The rabbitmq module supports the standard configuration options that are described
+The RabbitMQ module supports the standard configuration options that are described
 in <<configuration-metricbeat>>. Here is an example configuration:
 
 [source,yaml]

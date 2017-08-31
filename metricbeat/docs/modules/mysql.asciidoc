@@ -3,13 +3,13 @@ This file is generated! See scripts/docs_collector.py
 ////
 
 [[metricbeat-module-mysql]]
-== MySQL Module
+== MySQL module
 
 This module periodically fetches metrics from https://www.mysql.com/[MySQL]
 servers.
 
 [float]
-=== Module-Specific Configuration Notes
+=== Module-specific configuration notes
 
 When configuring the `hosts` option, you must use a MySQL Data Source Name (DSN)
 of the following format:
@@ -38,7 +38,7 @@ all versions >= 5.7.0.
 
 
 [float]
-=== Example Configuration
+=== Example configuration
 
 The MySQL module supports the standard configuration options that are described
 in <<configuration-metricbeat>>. Here is an example configuration:

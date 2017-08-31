@@ -1,4 +1,4 @@
-=== Nginx StubStatus Metricset
+=== Nginx stubstatus metricset
 
 The Nginx `stubstatus` metricset collects data from the Nginx
 http://nginx.org/en/docs/http/ngx_http_stub_status_module.html[ngx_http_stub_status] module. It

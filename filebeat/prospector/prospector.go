@@ -1,22 +1,23 @@
 package prospector
 
 import (
-	"fmt"
 	"sync"
 	"time"
 
 	"github.com/mitchellh/hashstructure"
 
 	"github.com/elastic/beats/filebeat/channel"
-	"github.com/elastic/beats/filebeat/harvester"
 	"github.com/elastic/beats/filebeat/input/file"
-	"github.com/elastic/beats/filebeat/prospector/log"
-	"github.com/elastic/beats/filebeat/prospector/redis"
-	"github.com/elastic/beats/filebeat/prospector/stdin"
-	"github.com/elastic/beats/filebeat/prospector/udp"
 	"github.com/elastic/beats/libbeat/common"
 	"github.com/elastic/beats/libbeat/logp"
 )
+
+// Prospectorer is the interface common to all prospectors
+type Prospectorer interface {
+	Run()
+	Stop()
+	Wait()
+}
 
 // Prospector contains the prospector
 type Prospector struct {
@@ -29,17 +30,10 @@ type Prospector struct {
 	beatDone     chan struct{}
 }
 
-// Prospectorer is the interface common to all prospectors
-type Prospectorer interface {
-	Run()
-	Stop()
-	Wait()
-}
-
 // NewProspector instantiates a new prospector
-func NewProspector(
+func New(
 	conf *common.Config,
-	outlet channel.OutleterFactory,
+	outlet channel.Factory,
 	beatDone chan struct{},
 	states []file.State,
 ) (*Prospector, error) {
@@ -63,38 +57,25 @@ func NewProspector(
 		return nil, err
 	}
 
-	err = prospector.initProspectorer(outlet, states, conf)
+	var f Factory
+	f, err = GetFactory(prospector.config.Type)
 	if err != nil {
 		return prospector, err
 	}
 
-	return prospector, nil
-}
-
-func (p *Prospector) initProspectorer(outlet channel.OutleterFactory, states []file.State, config *common.Config) error {
+	context := Context{
+		States:   states,
+		Done:     prospector.done,
+		BeatDone: prospector.beatDone,
+	}
 	var prospectorer Prospectorer
-	var err error
-
-	switch p.config.Type {
-	case harvester.StdinType:
-		prospectorer, err = stdin.NewProspector(config, outlet)
-	case harvester.RedisType:
-		prospectorer, err = redis.NewProspector(config, outlet)
-	case harvester.LogType:
-		prospectorer, err = log.NewProspector(config, states, outlet, p.done, p.beatDone)
-	case harvester.UdpType:
-		prospectorer, err = udp.NewProspector(config, outlet)
-	default:
-		return fmt.Errorf("invalid prospector type: %v. Change type", p.config.Type)
-	}
-
+	prospectorer, err = f(conf, outlet, context)
 	if err != nil {
-		return err
+		return prospector, err
 	}
+	prospector.prospectorer = prospectorer
 
-	p.prospectorer = prospectorer
-
-	return nil
+	return prospector, nil
 }
 
 // Start starts the prospector

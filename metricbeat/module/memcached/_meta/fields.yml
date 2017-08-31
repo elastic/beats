@@ -1,9 +1,9 @@
 - key: memcached
-  title: "memcached"
+  title: "Memcached"
   description: >
-    []beta
+    beta[]
 
-    memcached Module
+    Memcached module
   short_config: false
   fields:
     - name: memcached

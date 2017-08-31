@@ -7,6 +7,7 @@ import (
 
 	"github.com/tsg/gopacket"
 	"github.com/tsg/gopacket/afpacket"
+	"github.com/tsg/gopacket/layers"
 )
 
 type afpacketHandle struct {
@@ -43,6 +44,10 @@ func (h *afpacketHandle) ReadPacketData() (data []byte, ci gopacket.CaptureInfo,
 
 func (h *afpacketHandle) SetBPFFilter(expr string) (_ error) {
 	return h.TPacket.SetBPFFilter(expr)
+}
+
+func (h *afpacketHandle) LinkType() layers.LinkType {
+	return layers.LinkTypeEthernet
 }
 
 func (h *afpacketHandle) Close() {

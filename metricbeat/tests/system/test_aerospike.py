@@ -8,6 +8,8 @@ AEROSPIKE_FIELDS = metricbeat.COMMON_FIELDS + ["aerospike"]
 
 class Test(metricbeat.BaseTest):
 
+    COMPOSE_SERVICES = ['aerospike']
+
     @unittest.skipUnless(metricbeat.INTEGRATION_TESTS, "integration test")
     def test_namespace(self):
         """

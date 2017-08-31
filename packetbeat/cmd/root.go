@@ -26,8 +26,6 @@ func init() {
 	runFlags.AddGoFlag(flag.CommandLine.Lookup("l"))
 	runFlags.AddGoFlag(flag.CommandLine.Lookup("dump"))
 
-	// TODO Deprecate this one in favor of subcommand
-	runFlags.AddGoFlag(flag.CommandLine.Lookup("devices"))
-
 	RootCmd = cmd.GenRootCmdWithRunFlags(Name, "", beater.New, runFlags)
+	RootCmd.AddCommand(genDevicesCommand())
 }

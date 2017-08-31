@@ -1,16 +1,15 @@
 package module
 
 import (
+	"github.com/elastic/beats/libbeat/beat"
 	"github.com/elastic/beats/libbeat/common"
 	"github.com/elastic/beats/libbeat/processors"
-	"github.com/elastic/beats/libbeat/publisher/bc/publisher"
-	"github.com/elastic/beats/libbeat/publisher/beat"
 )
 
 // Connector configures ann establishes a beat.Client for publishing events
 // to the publisher pipeline.
 type Connector struct {
-	pipeline   publisher.Publisher
+	pipeline   beat.Pipeline
 	processors *processors.Processors
 	eventMeta  common.EventMetadata
 }
@@ -20,7 +19,7 @@ type connectorConfig struct {
 	common.EventMetadata `config:",inline"`      // Fields and tags to add to events.
 }
 
-func NewConnector(pipeline publisher.Publisher, c *common.Config) (*Connector, error) {
+func NewConnector(pipeline beat.Pipeline, c *common.Config) (*Connector, error) {
 	config := connectorConfig{}
 	if err := c.Unpack(&config); err != nil {
 		return nil, err
@@ -39,7 +38,7 @@ func NewConnector(pipeline publisher.Publisher, c *common.Config) (*Connector, e
 }
 
 func (c *Connector) Connect() (beat.Client, error) {
-	return c.pipeline.ConnectX(beat.ClientConfig{
+	return c.pipeline.ConnectWith(beat.ClientConfig{
 		EventMetadata: c.eventMeta,
 		Processor:     c.processors,
 	})

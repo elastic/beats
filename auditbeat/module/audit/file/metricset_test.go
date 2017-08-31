@@ -47,9 +47,7 @@ func getConfig(path string) map[string]interface{} {
 	return map[string]interface{}{
 		"module":     "audit",
 		"metricsets": []string{"file"},
-		"file.paths": map[string][]string{
-			"binaries": {path},
-		},
+		"file.paths": []string{path},
 	}
 }
 
@@ -63,9 +61,7 @@ func TestEventReader(t *testing.T) {
 
 	// Create a new EventReader.
 	config := defaultConfig
-	config.Paths = map[string][]string{
-		"testdir": {dir},
-	}
+	config.Paths = []string{dir}
 	r, err := NewEventReader(config)
 	if err != nil {
 		t.Fatal(err)
@@ -351,5 +347,29 @@ func rename(t *testing.T, oldPath, newPath string) {
 		}
 
 		t.Fatal(err)
+	}
+}
+
+func BenchmarkHashFile(b *testing.B) {
+	f, err := ioutil.TempFile("", "hash")
+	if err != nil {
+		b.Fatal(err)
+	}
+	defer os.Remove(f.Name())
+
+	zeros := make([]byte, 100)
+	for i := 0; i < 1024*1024; i++ {
+		if _, err = f.Write(zeros); err != nil {
+			b.Fatal(err)
+		}
+	}
+	f.Close()
+	b.ResetTimer()
+
+	for i := 0; i < b.N; i++ {
+		_, err = hashFile(f.Name(), "sha256")
+		if err != nil {
+			b.Fatal(err)
+		}
 	}
 }

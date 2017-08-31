@@ -2,8 +2,6 @@
 
 include::../../libbeat/docs/version.asciidoc[]
 
-:release-state: unreleased
-
 :libbeat: http://www.elastic.co/guide/en/beats/libbeat/{doc-branch}
 :kibana-ref: https://www.elastic.co/guide/en/kibana/{doc-branch}
 :beatsdevguide: http://www.elastic.co/guide/en/beats/devguide/{doc-branch}
@@ -25,26 +23,11 @@ include::../../libbeat/docs/contributing-to-beats.asciidoc[]
 
 include::./getting-started.asciidoc[]
 
-include::./command-line.asciidoc[]
-
-include::../../libbeat/docs/shared-directory-layout.asciidoc[]
-
 include::../../libbeat/docs/repositories.asciidoc[]
 
+include::./setting-up-running.asciidoc[]
+
 include::./configuring-howto.asciidoc[]
-
-include::./auditbeat-filtering.asciidoc[]
-
-include::../../libbeat/docs/shared-config-ingest.asciidoc[]
-
-include::./configuring-logstash.asciidoc[]
-
-:standalone:
-include::../../libbeat/docs/shared-env-vars.asciidoc[]
-
-:standalone:
-:allplatforms:
-include::../../libbeat/docs/yaml.asciidoc[]
 
 include::./modules.asciidoc[]
 

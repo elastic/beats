@@ -102,11 +102,13 @@ func echo(sock net.Conn) {
 Create analyzer skeleton from code generator template. 
 
 ```
-  $ cd ${GOPATH}/src/github.com/elastic/beats/packetbeat/protos
-  $ python ${GOPATH}/src/github.com/elastic/beats/packetbeat/script/create_tcp_protocol.py
+  $ cd ${GOPATH}/src/github.com/elastic/beats/packetbeat
+  $ python ${GOPATH}/src/github.com/elastic/beats/packetbeat/scripts/create_tcp_protocol.py
 ```
 
-Load plugin into packetbeat by adding `_ "github.com/elastic/beats/packetbeat/protos/echo"` to packetbeat import list in `$GOPATH/src/github.com/elastic/beats/packetbeat/main.go`
+Load plugin into packetbeat by running `make update`. Or add `_
+"github.com/elastic/beats/packetbeat/protos/echo"` to the import list in
+`$GOPATH/src/github.com/elastic/beats/packetbeat/include/list.go`.
 
 ### 2.2 Standalone beat with protocol analyzer (echo):
 
@@ -114,7 +116,7 @@ Use packetbeat as framework to build custom beat (e.g. for testing) with
 selected protocol plugins only. A protocol plugin can still be added to
 packetbeat later by copying the final plugin to
 `$GOPATH/src/github.com/elastic/beats/packetbeat/protos` and importing module in
-`$GOPATH/src/github.com/elastic/beats/packetbeat/main.go`.
+`$GOPATH/src/github.com/elastic/beats/packetbeat/include/list.go`.
 
 Create custom beat (e.g. github.com/<username>/pb_echo):
 
@@ -134,7 +136,7 @@ import (
 	"github.com/elastic/beats/packetbeat/beater"
 
 	// import supported protocol modules
-    _ "github.com/urso/pb_echo/protos/echo"
+	_ "github.com/urso/pb_echo/protos/echo"
 )
 
 var Name = "pb_echo"
@@ -152,7 +154,7 @@ Create protocol analyzer module (use name ‘echo’ for new protocol):
 ```
 $ mkdir proto
 $ cd proto
-$ python ${GOPATH}/src/github.com/elastic/beats/packetbeat/script/create_tcp_protocol.py
+$ python ${GOPATH}/src/github.com/elastic/beats/packetbeat/scripts/create_tcp_protocol.py
 ```
 
 ### 3 Implement application layer analyzer
@@ -226,7 +228,7 @@ If possible you can use third-party libraries for parsing messages. This might r
 ### 3.2 Add additional fields to transaction event
 
 ```
-func (pub *transPub) createEvent(requ, resp *message) common.MapStr {
+func (pub *transPub) createEvent(requ, resp *message) beat.Event {
 	status := common.OK_STATUS
 	if resp.failed {
 		status = common.ERROR_STATUS
@@ -246,8 +248,7 @@ func (pub *transPub) createEvent(requ, resp *message) common.MapStr {
 		Proc: string(requ.CmdlineTuple.Dst),
 	}
 
-	event := common.MapStr{
-		"@timestamp":   common.Time(requ.Ts),
+	fields := common.MapStr{
 		"type":         "echo",
 		"status":       status,
 		"responsetime": responseTime,
@@ -259,17 +260,20 @@ func (pub *transPub) createEvent(requ, resp *message) common.MapStr {
 
 	// add processing notes/errors to event
 	if len(requ.Notes)+len(resp.Notes) > 0 {
-		event["notes"] = append(requ.Notes, resp.Notes...)
+		fields["notes"] = append(requ.Notes, resp.Notes...)
 	}
 
 	if pub.sendRequest {
-		event["request"] = requ.content
+		fields["request"] = requ.content
 	}
 	if pub.sendResponse {
-		event["response"] = requ.content
+		fields["response"] = requ.content
 	}
 
-	return event
+	return beat.Event{
+		Timestamp: requ.Ts,
+		Fields: fields,
+	}
 }
 ```
 
