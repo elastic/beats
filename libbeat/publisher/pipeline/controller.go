@@ -52,7 +52,7 @@ func newOutputController(
 	ctx := &batchContext{}
 	c.consumer = newEventConsumer(log, b, ctx)
 	c.retryer = newRetryer(log, observer, nil, c.consumer)
-	ctx.observer = c.observer
+	ctx.observer = observer
 	ctx.retryer = c.retryer
 
 	c.consumer.sigContinue()

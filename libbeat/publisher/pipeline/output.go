@@ -31,7 +31,7 @@ func makeClientWorker(observer outputObserver, qu workQueue, client outputs.Clie
 		go c.run()
 		return c
 	}
-	c := &clientWorker{qu: qu, client: client}
+	c := &clientWorker{observer: observer, qu: qu, client: client}
 	go c.run()
 	return c
 }

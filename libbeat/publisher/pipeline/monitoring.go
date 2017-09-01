@@ -165,7 +165,7 @@ func (o *metricsObserver) outBatchACKed(int) {}
 
 type emptyObserver struct{}
 
-var nilObserver observer = &emptyObserver{}
+var nilObserver observer = (*emptyObserver)(nil)
 
 func (*emptyObserver) cleanup()            {}
 func (*emptyObserver) clientConnected()    {}

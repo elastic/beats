@@ -157,6 +157,7 @@ func New(
 	log := defaultLogger
 	p := &Pipeline{
 		logger:           log,
+		observer:         nilObserver,
 		waitCloseMode:    settings.WaitCloseMode,
 		waitCloseTimeout: settings.WaitClose,
 		processors: pipelineProcessors{
@@ -171,8 +172,6 @@ func New(
 
 	if metrics != nil {
 		p.observer = newMetricsObserver(metrics)
-	} else {
-		p.observer = nilObserver
 	}
 	p.eventer.observer = p.observer
 	p.eventer.modifyable = true
