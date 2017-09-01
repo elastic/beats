@@ -7,11 +7,14 @@ import (
 )
 
 type kubeAnnotatorConfig struct {
-	InCluster          bool          `config:"in_cluster"`
-	KubeConfig         string        `config:"kube_config"`
-	Host               string        `config:"host"`
-	Namespace          string        `config:"namespace"`
-	SyncPeriod         time.Duration `config:"sync_period"`
+	InCluster  bool          `config:"in_cluster"`
+	KubeConfig string        `config:"kube_config"`
+	Host       string        `config:"host"`
+	Namespace  string        `config:"namespace"`
+	SyncPeriod time.Duration `config:"sync_period"`
+	// Annotations are kept after pod is removed, until they haven't been accessed
+	// for a full `cleanup_timeout`:
+	CleanupTimeout     time.Duration `config:"cleanup_timeout"`
 	Indexers           PluginConfig  `config:"indexers"`
 	Matchers           PluginConfig  `config:"matchers"`
 	DefaultMatchers    Enabled       `config:"default_matchers"`
@@ -31,6 +34,7 @@ func defaultKuberentesAnnotatorConfig() kubeAnnotatorConfig {
 	return kubeAnnotatorConfig{
 		InCluster:       true,
 		SyncPeriod:      1 * time.Second,
+		CleanupTimeout:  60 * time.Second,
 		Namespace:       "kube-system",
 		DefaultMatchers: Enabled{true},
 		DefaultIndexers: Enabled{true},

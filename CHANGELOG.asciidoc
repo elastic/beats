@@ -35,6 +35,7 @@ https://github.com/elastic/beats/compare/v6.0.0-beta2...master[Check the HEAD di
 - Add support for `initContainers` in `add_kubernetes_metadata` processor. {issue}4825[4825]
 - Fix the `/usr/bin/beatname` script to accept `-d "*"` as a parameter. {issue}5040[5040]
 - Combine `fields.yml` properties when they are defined in different sources. {issue}5075[5075]
+- Keep Docker & Kubernetes pod metadata after container dies while they are needed by processors. {pull}5084[5084]
 - Fix `fields.yml` lookup when using `export template` with a custom `path.config` param. {issue}5089[5089]
 
 *Auditbeat*
@@ -77,6 +78,7 @@ https://github.com/elastic/beats/compare/v6.0.0-beta2...master[Check the HEAD di
 - Don't start filebeat if external modules/prospectors config is wrong and reload is disabled {pull}5053[5053]
 - Remove error log from runnerfactory as error is returned by API. {pull}5085[5085]
 - Changed the number of shards in the default configuration to 3. {issue}5095[5095]
+- Remove error log from runnerfactory as error is returned by API. {pull}5085[5085]
 
 *Heartbeat*
 

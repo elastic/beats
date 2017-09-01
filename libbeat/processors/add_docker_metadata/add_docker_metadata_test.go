@@ -191,6 +191,8 @@ func (m *mockWatcher) Start() error {
 	return nil
 }
 
+func (m *mockWatcher) Stop() {}
+
 func (m *mockWatcher) Container(ID string) *Container {
 	return m.containers[ID]
 }
