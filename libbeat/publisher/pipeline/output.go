@@ -8,7 +8,7 @@ import (
 
 // clientWorker manages output client of type outputs.Client, not supporting reconnect.
 type clientWorker struct {
-	observer *observer
+	observer outputObserver
 	qu       workQueue
 	client   outputs.Client
 	closed   atomic.Bool
@@ -16,7 +16,7 @@ type clientWorker struct {
 
 // netClientWorker manages reconnectable output clients of type outputs.NetworkClient.
 type netClientWorker struct {
-	observer *observer
+	observer outputObserver
 	qu       workQueue
 	client   outputs.NetworkClient
 	closed   atomic.Bool
@@ -25,13 +25,13 @@ type netClientWorker struct {
 	batchSizer func() int
 }
 
-func makeClientWorker(observer *observer, qu workQueue, client outputs.Client) outputWorker {
+func makeClientWorker(observer outputObserver, qu workQueue, client outputs.Client) outputWorker {
 	if nc, ok := client.(outputs.NetworkClient); ok {
 		c := &netClientWorker{observer: observer, qu: qu, client: nc}
 		go c.run()
 		return c
 	}
-	c := &clientWorker{qu: qu, client: client}
+	c := &clientWorker{observer: observer, qu: qu, client: client}
 	go c.run()
 	return c
 }
