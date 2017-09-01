@@ -1027,7 +1027,7 @@ Cluster status version
 [float]
 === `ceph.cluster_status.osd.full`
 
-type: bool
+type: boolean
 
 Is osd full
 
@@ -1035,7 +1035,7 @@ Is osd full
 [float]
 === `ceph.cluster_status.osd.nearfull`
 
-type: bool
+type: boolean
 
 Is osd near full
 
