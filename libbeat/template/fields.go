@@ -1,6 +1,7 @@
 package template
 
 import (
+	"errors"
 	"strings"
 
 	"github.com/elastic/beats/libbeat/common"
@@ -12,9 +13,7 @@ var (
 
 type Fields []Field
 
-func (f Fields) process(path string, esVersion common.Version) common.MapStr {
-	output := common.MapStr{}
-
+func (f Fields) process(path string, esVersion common.Version, output common.MapStr) error {
 	for _, field := range f {
 
 		var mapping common.MapStr
@@ -50,9 +49,26 @@ func (f Fields) process(path string, esVersion common.Version) common.MapStr {
 			} else {
 				newPath = path + "." + field.Name
 			}
-			mapping = common.MapStr{
-				"properties": field.Fields.process(newPath, esVersion),
+			mapping = common.MapStr{}
+
+			// Combine properties with previous field definitions (if any)
+			properties := common.MapStr{}
+			key := generateKey(field.Name) + ".properties"
+			currentProperties, err := output.GetValue(key)
+			if err == nil {
+				var ok bool
+				properties, ok = currentProperties.(common.MapStr)
+				if !ok {
+					// This should never happen
+					return errors.New(key + " is expected to be a MapStr")
+				}
 			}
+
+			if err := field.Fields.process(newPath, esVersion, properties); err != nil {
+				return err
+			}
+			mapping["properties"] = properties
+
 		default:
 			mapping = field.other()
 		}
@@ -62,7 +78,7 @@ func (f Fields) process(path string, esVersion common.Version) common.MapStr {
 		}
 	}
 
-	return output
+	return nil
 }
 
 // HasKey checks if inside fields the given key exists
