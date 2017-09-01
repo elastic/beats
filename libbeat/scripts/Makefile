@@ -347,8 +347,6 @@ env-logs:
 HOME_PREFIX?=/tmp/${BEAT_NAME}
 .PHONY: install-home
 install-home:
-	install -d -m 755 ${HOME_PREFIX}/scripts/
-	install -m 755 ${ES_BEATS}/libbeat/scripts/migrate_beat_config_1_x_to_5_0.py ${HOME_PREFIX}/scripts/
 	if [ -a ${NOTICE_FILE} ]; then \
 		install -m 644 ${NOTICE_FILE} ${HOME_PREFIX}/; \
 	fi
