@@ -61,17 +61,17 @@ the sample dashboards for visualizing the data in Kibana. For example:
 ./filebeat setup -e
 ----------------------------------------------------------------------
 +
-The value that you pass with the `-modules` flag is a comma-separated list of
+The value that you pass with the `--modules` flag is a comma-separated list of
 modules that you want to set up. The `-e` flag is optional and sends output
 to standard error instead of syslog.
 
-. Start Filebeat and use the `-modules` flag to specify the list of modules
+. Start Filebeat and use the `--modules` flag to specify the list of modules
 you want to run. The following example starts Filebeat with the `system` module
 enabled (it's assumed that you've already loaded the sample dashboards):
 +
 [source,shell]
 ----------------------------------------------------------------------
-./filebeat -e -modules=system
+./filebeat -e --modules system
 ----------------------------------------------------------------------
 +
 This command takes care of configuring Filebeat and loading the ingest node
@@ -82,7 +82,7 @@ example:
 +
 [source,shell]
 ----------------------------------------------------------------------
-./filebeat -e -modules=system,nginx,mysql
+./filebeat -e --modules system,nginx,mysql
 ----------------------------------------------------------------------
 +
 When you start Filebeat, you should see messages indicating that Filebeat
@@ -102,7 +102,7 @@ See {libbeat}/config-file-permissions.html[Config File Ownership and Permissions
 in the _Beats Platform Reference_ if you encounter errors related to file
 ownership or permissions.
 
-This getting started guide uses the `-modules` flag to enable modules
+This getting started guide uses the `--modules` flag to enable modules
 at the command line when you run Filebeat. In a production environment, you'll
 probably want to use the configs in the `modules.d` directory instead. See
 <<configuration-filebeat-modules>> for more information.
@@ -119,7 +119,7 @@ logs:
 
 [source,shell]
 ----
-./filebeat -e -modules=nginx -M "nginx.access.var.paths=[/var/log/nginx/access.log*]"
+./filebeat -e --modules nginx -M "nginx.access.var.paths=[/var/log/nginx/access.log*]"
 ----
 
 See <<configuration-filebeat-modules>> for more information about setting

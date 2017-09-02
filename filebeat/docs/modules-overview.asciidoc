@@ -46,7 +46,7 @@ To learn how to configure and run Filebeat modules:
 [[modules-tutorial]]
 === Tutorial
 
-//REVIEWERS: Now that we have a section about specifying which modules to run (where I describe how to override settings) plus a Quick start for common log formats, the info in this tutorial is a bit redundant. I do think a more in-depth tutorial that shows a realistic use case would be pretty useful here. It could even show path overrides and prospector settings, but it wouldn't have to describe all the permutations because we do that in the reference section. IMO a streamlined version of this tutorial focused on specific user goals and built around a compelling story would be more useful. If someone can provide me with the "story" for this tutorial, I can write it up. Any volunteers?
+//TODO: Replace this content with a more in-depth tutorial or remove it. 
 
 This tutorial assumes you have Elasticsearch and Kibana installed and
 accessible from Filebeat (see the <<filebeat-getting-started,getting started>>
@@ -74,13 +74,13 @@ You can start Filebeat with the following command:
 
 [source,shell]
 ----------------------------------------------------------------------
-./filebeat -e -modules=nginx -setup
+./filebeat -e --modules nginx -setup
 ----------------------------------------------------------------------
 
 The `-e` flag tells Filebeat to output its logs to standard error, instead of
 syslog.
 
-The `-modules=nginx` flag loads the Nginx module.
+The `--modules nginx` flag loads the Nginx module.
 
 The `-setup` flag tells Filebeat to load the associated sample Kibana
 dashboards. This setup phase, in which the dashboards are loaded, doesn't have
@@ -97,11 +97,9 @@ You can also start multiple modules at once:
 
 [source,shell]
 ----------------------------------------------------------------------
-./filebeat -e -modules=nginx,mysql,system
+./filebeat -e --modules nginx,mysql,system
 ----------------------------------------------------------------------
 
-
-//include::system-module-note.asciidoc[]
 
 While enabling the modules from the CLI file is handy for getting started and
 for testing, you will probably want to use the configuration file for the
@@ -135,7 +133,7 @@ files are in a custom location:
 
 [source,shell]
 ----------------------------------------------------------------------
-./filebeat -e -modules=nginx -M "nginx.access.var.paths=[/var/log/nginx/access.log*]"
+./filebeat -e --modules nginx -M "nginx.access.var.paths=[/var/log/nginx/access.log*]"
 ----------------------------------------------------------------------
 
 Or via the configuration file:
@@ -148,20 +146,6 @@ filebeat.modules:
     var.paths: ["/var/log/nginx/access.log*"]
 ----------------------------------------------------------------------
 
-The Nginx `access` fileset also has a `pipeline` variable which allows
-selecting which of the available Ingest Node pipelines is used for parsing. At
-the moment, two such pipelines are available, one that requires the two ingest
-plugins (`ingest-geoip` and `ingest-user-agent`) and one that doesn't. If you
-cannot install the plugins, you can use the following:
-
-
-[source,shell]
-----------------------------------------------------------------------
-./filebeat -e -modules=nginx -M "nginx.access.var.pipeline=no_plugins"
-----------------------------------------------------------------------
-
-
-//REVIEWERS: Is no_plugins still a thing?
 
 ==== Advanced settings
 
@@ -184,7 +168,7 @@ Or like this:
 
 [source,shell]
 ----------------------------------------------------------------------
-./filebeat -e -modules=nginx -M "nginx.access.prospector.close_eof=true"
+./filebeat -e --modules nginx -M "nginx.access.prospector.close_eof=true"
 ----------------------------------------------------------------------
 
 From the CLI, it's possible to change variables or settings for multiple
@@ -193,7 +177,7 @@ modules/fileset at once. For example, the following works and will enable
 
 [source,shell]
 ----------------------------------------------------------------------
-./filebeat -e -modules=nginx -M "nginx.*.prospector.close_eof=true"
+./filebeat -e --modules nginx -M "nginx.*.prospector.close_eof=true"
 ----------------------------------------------------------------------
 
 The following also works and will enable `close_eof` for all prospectors
@@ -201,5 +185,5 @@ created by any of the modules:
 
 [source,shell]
 ----------------------------------------------------------------------
-./filebeat -e -modules=nginx,mysql -M "*.*.prospector.close_eof=true"
+./filebeat -e --modules nginx,mysql -M "*.*.prospector.close_eof=true"
 ----------------------------------------------------------------------

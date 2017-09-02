@@ -17,12 +17,12 @@ Filebeat provides a few different ways to enable modules. You can:
 * <<enable-modules-config-file>>
 
 When you enable modules, you can also
-<<override-variables,set variable overrides>> to change default settings, and
-you can specify <<advanced-settings,advanced settings>> to override prospector
-settings.
+<<specify-variable-settings,specify variable settings>> to change the default
+behavior of the modules, and you can specify
+<<advanced-settings,advanced settings>> to override prospector settings.
 
 Before running Filebeat with modules enabled, make sure you also set up the
-enviroment to use Kibana dashboards. See <<filebeat-modules-quickstart>> for
+environment to use Kibana dashboards. See <<filebeat-modules-quickstart>> for
 more information.
 
 [float]
@@ -54,9 +54,9 @@ To see a list of enabled and disabled modules, run:
 ----
 
 The default module configurations assume that the logs you’re harvesting are
-in the location expected for your OS and that the default behavior of Filebeat
-is appropriate for your environment. To change the default settings, you need
-to specify variable overrides. See <<override-variables>>.
+in the location expected for your OS and that the behavior of the module is
+appropriate for your environment. To change the default configurations, you need
+to specify variable settings. See <<specify-variable-settings>>.
 
 [float]
 [[enable-modules-cli]]
@@ -70,8 +70,6 @@ along with any modules that are enabled in the configuration file or `modules.d`
 directory. If there's a conflict, the configuration specified at the command
 line is used.
 
-//REVIEWERS: Is the above statement (about how Filebeat uses all module configs) true? I tested some combinations, but not all. Please verify.
-
 The following example shows how to enable and run the `nginx`,`mysql`, and
 `system` modules.
 
@@ -81,9 +79,9 @@ The following example shows how to enable and run the `nginx`,`mysql`, and
 ----
 
 The default module configurations assume that the logs you’re harvesting are
-in the location expected for your OS and that the default behavior of Filebeat
-is appropriate for your environment. To change the default settings, you need
-to specify variable overrides at the command line. See <<override-variables>>.
+in the location expected for your OS and that the behavior of the module is
+appropriate for your environment. To change the default configurations, you need
+to specify variable settings. See <<specify-variable-settings>>.
 
 [float]
 [[enable-modules-config-file]]
@@ -97,8 +95,8 @@ use the `modules` command to enable and disable configurations because the
 command requires the `modules.d` layout.
 
 To enable specific modules in the +{beatname_lc}.yml+ config file, you can add
-entries to the `filebeat.modules` list. Each entry in the list begins with a
-dash (-) and is followed by settings for that module.
+entries to the +{beatname_lc}.modules+ list. Each entry in the list begins with
+a dash (-) and is followed by settings for that module.
 
 The following example shows a configuration that runs the `nginx`,`mysql`, and
 `system` modules.
@@ -111,18 +109,18 @@ filebeat.modules:
 - module: system
 ----
 
-The configuration in the example assumes that the logs you’re harvesting are
-in the location expected for your OS and that the default behavior of Filebeat
-is appropriate for your environment. To change the default settings, you need
-to specify variable overrides. See <<override-variables>>.
+The default module configurations assume that the logs you’re harvesting are
+in the location expected for your OS and that the behavior of the module is
+appropriate for your environment. To change the default configurations, you need
+to specify variable settings. See <<specify-variable-settings>>.
 
-[[override-variables]]
-=== Override module settings
+[[specify-variable-settings]]
+=== Specify variable settings
 
-Each module and fileset has a set of variables that you can set to override
-the default config, including the paths where the module looks for log files.
-For example, the `var.paths` setting in the following example sets the path
-for `nginx` access log files:
+Each module and fileset has variables that you can set to change the default
+behavior of the module, including the paths where the module looks for log
+files. For example, the `var.paths` setting in the following example sets the
+path for `nginx` access log files:
 
 [source,yaml]
 ----
@@ -151,8 +149,8 @@ example shows how to set the paths to the access and error logs:
 ./filebeat --modules nginx -M "nginx.access.var.paths=[/var/log/nginx/access.log*]" -M "nginx.error.var.paths=[/var/log/nginx/error.log*]"
 ----
 
-For information about specific variables that you can override for each
-fileset, see the <<filebeat-modules,documentation for the modules>>.
+For information about specific variables that you can set for each fileset,
+see the <<filebeat-modules,documentation for the modules>>.
 
 [[advanced-settings]]
 === Advanced settings
