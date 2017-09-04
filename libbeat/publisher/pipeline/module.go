@@ -77,7 +77,7 @@ func Load(
 		return nil, err
 	}
 
-	logp.Info("Publisher name: %s", name)
+	logp.Info("Beat name: %s", name)
 	return p, err
 }
 
