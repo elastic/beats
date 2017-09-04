@@ -60,10 +60,14 @@ type pipelineProcessors struct {
 	// The pipeline its processor settings for
 	// constructing the clients complete processor
 	// pipeline on connect.
-	beatMetaProcessor  beat.Processor
-	eventMetaProcessor beat.Processor
-	processors         beat.Processor
-	disabled           bool // disabled is set if outputs have been disabled via CLI
+	fieldsProcessor beat.Processor
+	tagsProcessor   beat.Processor
+	fields          common.MapStr
+	tags            []string
+
+	processors beat.Processor
+
+	disabled bool // disabled is set if outputs have been disabled via CLI
 }
 
 // Settings is used to pass additional settings to a newly created pipeline instance.
@@ -132,40 +136,18 @@ func New(
 	out outputs.Group,
 	settings Settings,
 ) (*Pipeline, error) {
-	annotations := settings.Annotations
 	var err error
 
-	var beatMeta beat.Processor
-	if meta := annotations.Beat; meta != nil {
-		beatMeta = beatAnnotateProcessor(meta)
-	}
-
-	var eventMeta beat.Processor
-	if em := annotations.Event; len(em.Fields) > 0 || len(em.Tags) > 0 {
-		eventMeta = eventAnnotateProcessor(em)
-	}
-
-	var prog beat.Processor
-	if ps := settings.Processors; ps != nil && len(ps.List) > 0 {
-		tmp := &program{title: "global"}
-		for _, p := range ps.List {
-			tmp.add(p)
-		}
-		prog = tmp
-	}
-
 	log := defaultLogger
+	annotations := settings.Annotations
+	processors := settings.Processors
+	disabledOutput := settings.Disabled
 	p := &Pipeline{
 		logger:           log,
 		observer:         nilObserver,
 		waitCloseMode:    settings.WaitCloseMode,
 		waitCloseTimeout: settings.WaitClose,
-		processors: pipelineProcessors{
-			beatMetaProcessor:  beatMeta,
-			eventMetaProcessor: eventMeta,
-			processors:         prog,
-			disabled:           settings.Disabled,
-		},
+		processors:       makePipelineProcessors(annotations, processors, disabledOutput),
 	}
 	p.ackBuilder = &pipelineEmptyACK{p}
 	p.ackActive = atomic.MakeBool(true)
@@ -385,4 +367,38 @@ func (e *waitCloser) dec(n int) {
 
 func (e *waitCloser) wait() {
 	e.events.Wait()
+}
+
+func makePipelineProcessors(
+	annotations Annotations,
+	processors *processors.Processors,
+	disabled bool,
+) pipelineProcessors {
+	p := pipelineProcessors{}
+
+	fields := common.MapStr{}
+	if meta := annotations.Beat; meta != nil {
+		fields["beat"] = meta
+	}
+
+	fields = buildFields(fields, annotations.Event)
+	if len(fields) > 0 {
+		p.fieldsProcessor = pipelineEventFields(fields)
+		p.fields = fields
+	}
+
+	if t := annotations.Event.Tags; len(t) > 0 {
+		p.tags = t
+		p.tagsProcessor = makeAddTagsProcessor("globalTags", t)
+	}
+
+	if processors != nil && len(processors.List) > 0 {
+		tmp := &program{title: "global"}
+		for _, p := range processors.List {
+			tmp.add(p)
+		}
+		p.processors = tmp
+	}
+
+	return p
 }

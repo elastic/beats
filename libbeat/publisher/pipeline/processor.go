@@ -42,37 +42,57 @@ type processorFn struct {
 func (p *Pipeline) newProcessorPipeline(
 	config beat.ClientConfig,
 ) beat.Processor {
-	processors := &program{title: "processPipeline"}
+	var (
+		// pipeline processors
+		processors = &program{title: "processPipeline"}
 
-	global := p.processors
-	localProcessors := makeClientProcessors(config)
+		// client fields and metadata
+		clientMeta      = config.Meta
+		clientFields    = buildFields(config.Fields, config.EventMetadata)
+		clientTags      = config.EventMetadata.Tags
+		localProcessors = makeClientProcessors(config)
+
+		// pipeline global
+		global          = p.processors
+		fieldsProcessor = global.fieldsProcessor
+		tagsProcessor   = global.tagsProcessor
+	)
 
 	// setup 1: generalize/normalize output (P)
 	processors.add(generalizeProcessor)
 
 	// setup 2: add Meta from client config (C)
-	if m := config.Meta; len(m) > 0 {
+	if m := clientMeta; len(m) > 0 {
 		processors.add(clientEventMeta(m))
 	}
 
-	// setup 3: add Fields from client config (C)
-	if m := config.Fields; len(m) > 0 {
-		processors.add(clientEventFields(m))
+	if localProcessors == nil {
+		// merge 3 + 4 + 5 + 7:
+		//   Merge all field and  updates into one processor if no client
+		//   processors have been configured.
+		fields := clientFields.Clone()
+		fields.DeepUpdate(global.fields)
+		fieldsProcessor = makeAddFieldsProcessor("fields", fields)
+
+		if tags := append(clientTags, global.tags...); len(tags) > 0 {
+			tagsProcessor = makeAddTagsProcessor("tags", tags)
+		}
+	} else {
+		// setup 3 + 4: add Fields from client config (C), add fields + tags (C)
+		if f := clientFields; len(f) > 0 {
+			processors.add(makeAddFieldsProcessor("clientFields", f))
+		}
+		if t := clientTags; len(t) > 0 {
+			processors.add(makeAddTagsProcessor("clientTags", t))
+		}
+
+		// setup 5: client processors (C)
+		processors.add(localProcessors)
 	}
 
-	// setup 4: add fields + tags (C)
-	if em := config.EventMetadata; len(em.Fields) > 0 || len(em.Tags) > 0 {
-		processors.add(eventAnnotateProcessor(em))
-	}
-
-	// setup 5: client processors (C)
-	processors.add(localProcessors)
-
-	// setup 6: add beats metadata (P)
-	processors.add(global.beatMetaProcessor)
-
-	// setup 7: add event fields + tags (P)
-	processors.add(global.eventMetaProcessor)
+	// setup 6 + 7: add beats metadata (P), add event fields + tags (P)
+	processors.add(fieldsProcessor)
+	processors.add(tagsProcessor)
 
 	// setup 8: pipeline processors (P)
 	processors.add(global.processors)
@@ -203,8 +223,18 @@ func clientEventMeta(meta common.MapStr) *processorFn {
 	})
 }
 
-func clientEventFields(fields common.MapStr) *processorFn {
-	return newAnnotateProcessor("globalFields", func(event *beat.Event) {
+func pipelineEventFields(fields common.MapStr) *processorFn {
+	return makeAddFieldsProcessor("pipelineFields", fields)
+}
+
+func makeAddTagsProcessor(name string, tags []string) *processorFn {
+	return newAnnotateProcessor(name, func(event *beat.Event) {
+		common.AddTags(event.Fields, tags)
+	})
+}
+
+func makeAddFieldsProcessor(name string, fields common.MapStr) *processorFn {
+	return newAnnotateProcessor(name, func(event *beat.Event) {
 		event.Fields.DeepUpdate(fields.Clone())
 	})
 }
@@ -239,4 +269,27 @@ func makeClientProcessors(config beat.ClientConfig) processors.Processor {
 		title: "client",
 		list:  procs.All(),
 	}
+}
+
+func mergeFields(a, b common.MapStr) common.MapStr {
+	m := a.Clone()
+	m.DeepUpdate(b)
+	return m
+}
+
+func buildFields(fields common.MapStr, em common.EventMetadata) common.MapStr {
+	if fields == nil {
+		fields = common.MapStr{}
+	} else {
+		fields = fields.Clone()
+	}
+
+	if fs := em.Fields; len(fs) > 0 {
+		common.MergeFields(fields, fs.Clone(), em.FieldsUnderRoot)
+	}
+
+	if len(fields) == 0 {
+		return nil
+	}
+	return fields
 }
