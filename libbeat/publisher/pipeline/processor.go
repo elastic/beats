@@ -29,73 +29,60 @@ type processorFn struct {
 //
 // Pipeline (C=client, P=pipeline)
 //
-// 1. (P) extract EventMetadataKey fields + tags (to be removed in favor of 4)
-// 2. (P) generalize/normalize event
-// 3. (P) add beats metadata (name, hostname, version)
-// 4. (C) add Meta from client Config to event.Meta
-// 5. (C) add Fields from client config to event.Fields
-// 6. (P) add pipeline fields + tags
-// 7. (C) add client fields + tags
-// 8. (P/C) apply EventMetadataKey fields + tags (to be removed in favor of 4)
-// 9. (C) client processors list
-// 10. (P) pipeline processors list
-// 11. (P) (if publish/debug enabled) log event
-// 12. (P) (if output disabled) dropEvent
+//  1. (P) generalize/normalize event
+//  2. (C) add Meta from client Config to event.Meta
+//  3. (C) add Fields from client config to event.Fields
+//  4. (C) add client fields + tags
+//  5. (C) client processors list
+//  6. (P) add beats metadata
+//  7. (P) add pipeline fields + tags
+//  8. (P) pipeline processors list
+//  9. (P) (if publish/debug enabled) log event
+// 10. (P) (if output disabled) dropEvent
 func (p *Pipeline) newProcessorPipeline(
 	config beat.ClientConfig,
 ) beat.Processor {
 	processors := &program{title: "processPipeline"}
 
 	global := p.processors
+	localProcessors := makeClientProcessors(config)
 
-	// setup 1: extract EventMetadataKey fields + tags
-	processors.add(preEventUserAnnotateProcessor)
-
-	// setup 2 and 3: generalize/normalize output (P)
+	// setup 1: generalize/normalize output (P)
 	processors.add(generalizeProcessor)
-	processors.add(global.beatMetaProcessor)
 
-	// setup 4: add Meta from client config
+	// setup 2: add Meta from client config (C)
 	if m := config.Meta; len(m) > 0 {
 		processors.add(clientEventMeta(m))
 	}
 
-	// setup 5: add Fields from client config
+	// setup 3: add Fields from client config (C)
 	if m := config.Fields; len(m) > 0 {
 		processors.add(clientEventFields(m))
 	}
 
-	// setup 6: add event fields + tags (P)
-	processors.add(global.eventMetaProcessor)
-
-	// setup 7: add fields + tags (C)
+	// setup 4: add fields + tags (C)
 	if em := config.EventMetadata; len(em.Fields) > 0 || len(em.Tags) > 0 {
 		processors.add(eventAnnotateProcessor(em))
 	}
 
-	// setup 8: apply EventMetadata fields + tags
-	processors.add(eventUserAnnotateProcessor)
+	// setup 5: client processors (C)
+	processors.add(localProcessors)
 
-	// setup 9: client processors (C)
-	if procs := config.Processor; procs != nil {
-		if lst := procs.All(); len(lst) > 0 {
+	// setup 6: add beats metadata (P)
+	processors.add(global.beatMetaProcessor)
 
-			processors.add(&program{
-				title: "client",
-				list:  lst,
-			})
-		}
-	}
+	// setup 7: add event fields + tags (P)
+	processors.add(global.eventMetaProcessor)
 
-	// setup 10: pipeline processors (P)
+	// setup 8: pipeline processors (P)
 	processors.add(global.processors)
 
-	// setup 11: debug print final event (P)
+	// setup 9: debug print final event (P)
 	if logp.IsDebug("publish") {
 		processors.add(debugPrintProcessor())
 	}
 
-	// setup 12: drop all events if outputs are disabled
+	// setup 10: drop all events if outputs are disabled (P)
 	if global.disabled {
 		processors.add(dropDisabledProcessor)
 	}
@@ -222,51 +209,6 @@ func clientEventFields(fields common.MapStr) *processorFn {
 	})
 }
 
-// TODO: remove var-section. Keep for backwards compatibility with old publisher API.
-//       Remove after updating all beats to new publisher API.
-// Note: this functionality is used by filebeat/winlogbeat, so prospector/harvesters
-//       can apply fields to events after generating the event type.
-//       This functionality will be removed, in favor of harvesters publishing
-//       event to a beat.Client with properly setup processor
-var (
-	preEventUserAnnotateProcessor = newAnnotateProcessor("annotateEventUserPre", func(event *beat.Event) {
-		const key = common.EventMetadataKey
-		val, exists := event.Fields[key]
-		if !exists {
-			return
-		}
-
-		delete(event.Fields, key)
-
-		if _, ok := val.(common.EventMetadata); ok {
-			if event.Meta == nil {
-				event.Meta = common.MapStr{}
-			}
-			event.Meta[key] = val
-		}
-	})
-
-	eventUserAnnotateProcessor = newAnnotateProcessor("annotateEventUser", func(event *beat.Event) {
-		const key = common.EventMetadataKey
-
-		tmp, ok := event.Meta[key]
-		if !ok {
-			return
-		}
-
-		delete(event.Meta, key)
-		if len(event.Meta) == 0 {
-			event.Meta = nil
-		}
-
-		eventMeta := tmp.(common.EventMetadata)
-		common.AddTags(event.Fields, eventMeta.Tags)
-		if fields := eventMeta.Fields; len(fields) > 0 {
-			common.MergeFields(event.Fields, fields.Clone(), eventMeta.FieldsUnderRoot)
-		}
-	})
-)
-
 func debugPrintProcessor() *processorFn {
 	// ensure only one go-routine is using the encoder (in case
 	// beat.Client is shared between multiple go-routines by accident)
@@ -285,4 +227,16 @@ func debugPrintProcessor() *processorFn {
 		logp.Debug("publish", "Publish event: %s", b)
 		return event, nil
 	})
+}
+
+func makeClientProcessors(config beat.ClientConfig) processors.Processor {
+	procs := config.Processor
+	if procs == nil || len(procs.All()) == 0 {
+		return nil
+	}
+
+	return &program{
+		title: "client",
+		list:  procs.All(),
+	}
 }
