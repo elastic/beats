@@ -376,6 +376,15 @@ func makePipelineProcessors(
 ) pipelineProcessors {
 	p := pipelineProcessors{}
 
+	hasProcessors := processors != nil && len(processors.List) > 0
+	if hasProcessors {
+		tmp := &program{title: "global"}
+		for _, p := range processors.List {
+			tmp.add(p)
+		}
+		p.processors = tmp
+	}
+
 	fields := common.MapStr{}
 	if meta := annotations.Beat; meta != nil {
 		fields["beat"] = meta
@@ -383,21 +392,14 @@ func makePipelineProcessors(
 
 	fields = buildFields(fields, annotations.Event)
 	if len(fields) > 0 {
-		p.fieldsProcessor = pipelineEventFields(fields)
+		needsCopy := hasProcessors
+		p.fieldsProcessor = pipelineEventFields(fields, needsCopy)
 		p.fields = fields
 	}
 
 	if t := annotations.Event.Tags; len(t) > 0 {
 		p.tags = t
 		p.tagsProcessor = makeAddTagsProcessor("globalTags", t)
-	}
-
-	if processors != nil && len(processors.List) > 0 {
-		tmp := &program{title: "global"}
-		for _, p := range processors.List {
-			tmp.add(p)
-		}
-		p.processors = tmp
 	}
 
 	return p

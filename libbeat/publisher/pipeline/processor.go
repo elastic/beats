@@ -63,7 +63,8 @@ func (p *Pipeline) newProcessorPipeline(
 
 	// setup 2: add Meta from client config (C)
 	if m := clientMeta; len(m) > 0 {
-		processors.add(clientEventMeta(m))
+		needsCopy := localProcessors != nil || global.processors != nil
+		processors.add(clientEventMeta(m, needsCopy))
 	}
 
 	if localProcessors == nil {
@@ -72,7 +73,8 @@ func (p *Pipeline) newProcessorPipeline(
 		//   processors have been configured.
 		fields := clientFields.Clone()
 		fields.DeepUpdate(global.fields)
-		fieldsProcessor = makeAddFieldsProcessor("fields", fields)
+		needsCopy := global.processors != nil
+		fieldsProcessor = makeAddFieldsProcessor("fields", fields, needsCopy)
 
 		if tags := append(clientTags, global.tags...); len(tags) > 0 {
 			tagsProcessor = makeAddTagsProcessor("tags", tags)
@@ -80,7 +82,8 @@ func (p *Pipeline) newProcessorPipeline(
 	} else {
 		// setup 3 + 4: add Fields from client config (C), add fields + tags (C)
 		if f := clientFields; len(f) > 0 {
-			processors.add(makeAddFieldsProcessor("clientFields", f))
+			needsCopy := true
+			processors.add(makeAddFieldsProcessor("clientFields", f, needsCopy))
 		}
 		if t := clientTags; len(t) > 0 {
 			processors.add(makeAddTagsProcessor("clientTags", t))
@@ -212,19 +215,25 @@ func eventAnnotateProcessor(eventMeta common.EventMetadata) *processorFn {
 	})
 }
 
-func clientEventMeta(meta common.MapStr) *processorFn {
-	return newAnnotateProcessor("@metadata", func(event *beat.Event) {
-		if event.Meta == nil {
-			event.Meta = meta.Clone()
-		} else {
-			event.Meta = event.Meta.Clone()
-			event.Meta.DeepUpdate(meta.Clone())
-		}
-	})
+func clientEventMeta(meta common.MapStr, needsCopy bool) *processorFn {
+	fn := func(event *beat.Event) { addMeta(event, meta) }
+	if needsCopy {
+		fn = func(event *beat.Event) { addMeta(event, meta.Clone()) }
+	}
+	return newAnnotateProcessor("@metadata", fn)
 }
 
-func pipelineEventFields(fields common.MapStr) *processorFn {
-	return makeAddFieldsProcessor("pipelineFields", fields)
+func addMeta(event *beat.Event, meta common.MapStr) {
+	if event.Meta == nil {
+		event.Meta = meta
+	} else {
+		event.Meta.Clone()
+		event.Meta.DeepUpdate(meta)
+	}
+}
+
+func pipelineEventFields(fields common.MapStr, copy bool) *processorFn {
+	return makeAddFieldsProcessor("pipelineFields", fields, copy)
 }
 
 func makeAddTagsProcessor(name string, tags []string) *processorFn {
@@ -233,10 +242,13 @@ func makeAddTagsProcessor(name string, tags []string) *processorFn {
 	})
 }
 
-func makeAddFieldsProcessor(name string, fields common.MapStr) *processorFn {
-	return newAnnotateProcessor(name, func(event *beat.Event) {
-		event.Fields.DeepUpdate(fields.Clone())
-	})
+func makeAddFieldsProcessor(name string, fields common.MapStr, copy bool) *processorFn {
+	fn := func(event *beat.Event) { event.Fields.DeepUpdate(fields) }
+	if copy {
+		fn = func(event *beat.Event) { event.Fields.DeepUpdate(fields.Clone()) }
+	}
+
+	return newAnnotateProcessor(name, fn)
 }
 
 func debugPrintProcessor() *processorFn {
