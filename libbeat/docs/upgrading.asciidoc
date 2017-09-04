@@ -31,21 +31,20 @@ changes>> doc.
 // If you are planning an upgrade of the full stack (Elasticsearch, Kibama, or
 // Logstash, in addition to Beats), please read the stack upgrade guide.
 
-It is recommended to first fully upgrade Elasticsearch and Kibana to version
-6.0, then upgrade Beats. However, it is also possible to upgrade Beats before
-Elasticsearch and Kibana, and running Beats 6.0 against Elasticsearch/Kibana
-version 5.6 is supported.
+We recommend that you fully upgrade Elasticsearch and Kibana to version 6.0
+before upgrading Beats. If you are on a Beats 5.x version lower than 5.6, please
+follow the <<upgrading-to-5.6>> section *before* doing the Elasticsearch
+upgrade.
 
-If you upgrade Elasticsearch before Beats, it's important to apply the 5.6
-template before starting the Elasticsearch upgrade. So if you are on a 5.x
-version lower than 5.6, please follow the <<upgrading-to-5.6>>
-section *before* doing the Elasticsearch upgrade.
+If you're not ready to upgrade Elasticsearch and Kibana to 6.0, that's alright.
+Beats version 6.0 works with Elasticsearch and Kibana version 5.6, so you can
+upgrade Beats now and the rest of the stack later.
 
 [[upgrading-to-5.6]]
 ==== Upgrade to 5.6
 
 The upgrade procedure assumes that you have Beats version 5.6 installed. If you
-are on a previous 5.x version of the Beats, please upgrade to version 5.6 first.
+are on a previous 5.x version of Beats, please upgrade to version 5.6 first.
 The reason is that the Elasticsearch mapping template in 5.6 was modified to be
 compatible with Elasticsearch 6.0 (by removing the `_all` settings).
 
@@ -74,10 +73,10 @@ Packetbeat).
 
 Beats 6.0 comes with several backwards incompatible configuration changes.
 Please review the <<breaking-changes-6.0>> document. Where possible, we kept the
-old configuration options working but deprecated. However, that is not always
-possible, so if you use any of the settings mentions in the Breaking Changes
-section of the release notes, make sure to understand the alternatives that we
-provide.
+old configuration options working, but deprecated them.  However, deprecation
+was not always possible, so if you use any of the settings mentioned in the
+Breaking Changes section of the release notes, make sure you understand the
+alternatives that we provide.
 
 ===== modules.d configuration layout
 
@@ -86,14 +85,16 @@ layout for configuration, where each module is configured in its own
 configuration file.
 
 While the all-in-one configuration is still fully supported, we recommend moving
-to the new layout at upgrade time. This typically means starting of with the new
-default configuration and modify it with the custom settings that you had in
+to the new layout at upgrade time. This typically means starting off with the new
+default configuration and modifying it with the custom settings that you had in
 your old files.
+
+// TODO: link to the docs on modules.d
 
 ===== New command `test config` command
 
-Beats 6.0 introduce a new command to test the configuration file, via the `test`
-command. For example:
+Beats 6.0 introduces a new test command for testing the configuration file. For
+example:
 
 [source,shell]
 ------------------------------------------------------------------------------
@@ -106,24 +107,27 @@ The old `-configtest` flag is still available, but deprecated.
 
 The `<beatname>.full.yml` file, which contains all the non-deprecated
 configuration options is renamed to `<beatname>.reference.yml` starting with
-Beats 6.0. We recommend using this file as a reference only, not for using it as
-the configuration file in production.
+Beats 6.0. We recommend using this file as a reference only. It's not intended
+to be used in production.
 
 ==== Dashboard upgrades
 
 We recommend re-importing the Kibana dashboards after the Beats and Kibana
-upgrades are complete. Note the section on
-<<breaking-changes-import-dashboards>> from the Breaking Changes documentation.
+upgrades are complete. This way, you will take advantage of the new Beats
+dashboards created for the 6.0 release.
 
-Note that if you have done manual changes done to the Beats dashboards,
-reimporting them will overwrite your changes. So consider duplicating the
-dashboards that you modified under new IDs.
+See <<breaking-changes-import-dashboards>> in the Breaking Changes
+documentation.
+
+NOTE: If you've modified the Beats dashboards manually, reimporting them will
+overwrite your changes. Consider saving your dashboards under new IDs, so
+that the reimport doesn't overwrite them.
 
 ==== Heartbeat package names
 
-The DEB and RPM packages for Heartbeat are now named `heartbeat-elastic`, to
-avoid conflicts with a different `heartbeat` project. The `.deb` and `.rpm` file
-names are still called the same, but the name in the repositories is changed.
+The DEB and RPM packages for Heartbeat are now named `heartbeat-elastic` to
+avoid conflicts with a different `heartbeat` project.  The `.deb` and `.rpm`
+file names haven't changed, just the package name in the repositories.
 
 [[upgrade-mapping-template]]
 === Upgrade the Elasticsearch mapping template
@@ -136,10 +140,12 @@ versioned. For example, Metricbeat 6.0.0 creates indices like this:
 metricbeat-6.0.0-2017-08-31
 ------------------------------------------------------------------------------
 
-And the corresponding Elasticsearch template is named `metricbeat-6.0.0`. This
-means that each version starts a new index and it is guaranteed that the correct
-template is applied. This means that starting with the 6.0 version, you
-generally don't have to do anything to upgrade the mapping template.
+And the corresponding Elasticsearch template is named `metricbeat-6.0.0`.
+
+This means that each version of the Beat creates a new index, and it is
+guaranteed that the correct template for that version is applied.  With these
+changes in place, you generally don't have to do anything to upgrade the mapping
+template when you move to a new version.
 
 One exception is when upgrading from 5.x, in which case you should make sure to
 read the <<upgrading-to-5.6>> section.
