@@ -5,6 +5,7 @@ import (
 	"sync"
 	"time"
 
+	"github.com/joeshaw/multierror"
 	"github.com/pkg/errors"
 
 	"github.com/elastic/beats/libbeat/common"
@@ -95,13 +96,9 @@ func (rl *Reloader) Check(runnerFactory RunnerFactory) error {
 	}
 
 	// Load all config objects
-	configs := []*common.Config{}
-	for _, file := range files {
-		c, err := LoadList(file)
-		if err != nil {
-			return errors.Wrap(err, "loading config")
-		}
-		configs = append(configs, c...)
+	configs, err := rl.loadConfigs(files)
+	if err != nil {
+		return err
 	}
 
 	debugf("Number of module configs found: %v", len(configs))
@@ -163,16 +160,7 @@ func (rl *Reloader) Run(runnerFactory RunnerFactory) {
 			}
 
 			// Load all config objects
-			configs := []*common.Config{}
-			for _, file := range files {
-				c, err := LoadList(file)
-				if err != nil {
-					logp.Err("Error loading config: %s", err)
-					continue
-				}
-
-				configs = append(configs, c...)
-			}
+			configs, _ := rl.loadConfigs(files)
 
 			debugf("Number of module configs found: %v", len(configs))
 
@@ -226,6 +214,24 @@ func (rl *Reloader) Run(runnerFactory RunnerFactory) {
 			}
 		}
 	}
+}
+
+func (rl *Reloader) loadConfigs(files []string) ([]*common.Config, error) {
+	// Load all config objects
+	configs := []*common.Config{}
+	var errs multierror.Errors
+	for _, file := range files {
+		c, err := LoadList(file)
+		if err != nil {
+			errs = append(errs, err)
+			logp.Err("Error loading config: %s", err)
+			continue
+		}
+
+		configs = append(configs, c...)
+	}
+
+	return configs, errs.Err()
 }
 
 // Stop stops the reloader and waits for all modules to properly stop
