@@ -159,9 +159,11 @@ ifeval::[("{beatname_lc}"=="filebeat") or ("{beatname_lc}"=="metricbeat")]
 ==== `modules` command
 
 {modules-command-short-desc}. You can use this command to enable and disable
-specific modules. The changes you make with this command are persisted and
-used for subsequent runs of {beatname_uc}. To see which modules are enabled
-and disabled, run the `list` subcommand.
+specific module configurations defined in the `modules.d` directory. The
+changes you make with this command are persisted and used for subsequent
+runs of {beatname_uc}.
+
+To see which modules are enabled and disabled, run the `list` subcommand.
 
 *SYNOPSIS*
 
