@@ -140,3 +140,8 @@ notice: python-env
 python-env:
 	@test -d $(PYTHON_ENV) || virtualenv $(VIRTUALENV_PARAMS) $(PYTHON_ENV)
 	@$(PYTHON_ENV)/bin/pip install -q --upgrade pip autopep8 six
+
+# Tests if apm works with the current code
+.PHONY: python-env
+test-apm:
+	sh ./script/test_apm.sh
