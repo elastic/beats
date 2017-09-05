@@ -9,8 +9,9 @@ TEST_ENVIRONMENT=false
 # This is called by the beats packer before building starts
 .PHONY: before-build
 before-build:
-	@cat ${ES_BEATS}/auditbeat/_meta/common.yml \
+	@cat ${ES_BEATS}/auditbeat/_meta/common.p1.yml \
 	     <(go run scripts/generate_config.go -os windows -concat) \
+	     ${ES_BEATS}/auditbeat/_meta/common.p2.yml \
 	     ${ES_BEATS}/libbeat/_meta/config.yml > \
 	     ${PREFIX}/${BEAT_NAME}-win.yml
 	@cat ${ES_BEATS}/auditbeat/_meta/common.reference.yml \
@@ -18,8 +19,9 @@ before-build:
 	     ${ES_BEATS}/libbeat/_meta/config.reference.yml > \
 	     ${PREFIX}/${BEAT_NAME}-win.reference.yml
 
-	@cat ${ES_BEATS}/auditbeat/_meta/common.yml \
+	@cat ${ES_BEATS}/auditbeat/_meta/common.p1.yml \
 	     <(go run scripts/generate_config.go -os darwin -concat) \
+	     ${ES_BEATS}/auditbeat/_meta/common.p2.yml \
 	     ${ES_BEATS}/libbeat/_meta/config.yml > \
 	     ${PREFIX}/${BEAT_NAME}-darwin.yml
 	@cat ${ES_BEATS}/auditbeat/_meta/common.reference.yml \
@@ -27,8 +29,9 @@ before-build:
 	     ${ES_BEATS}/libbeat/_meta/config.reference.yml > \
 	     ${PREFIX}/${BEAT_NAME}-darwin.reference.yml
 
-	@cat ${ES_BEATS}/auditbeat/_meta/common.yml \
+	@cat ${ES_BEATS}/auditbeat/_meta/common.p1.yml \
 	     <(go run scripts/generate_config.go -os linux -concat) \
+	     ${ES_BEATS}/auditbeat/_meta/common.p2.yml \
 	     ${ES_BEATS}/libbeat/_meta/config.yml > \
 	     ${PREFIX}/${BEAT_NAME}-linux.yml
 	@cat ${ES_BEATS}/auditbeat/_meta/common.reference.yml \
