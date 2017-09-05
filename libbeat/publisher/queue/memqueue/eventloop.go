@@ -7,6 +7,10 @@ import (
 type eventLoop struct {
 	broker *Broker
 
+	buf          ringBuffer
+	minEvents    int
+	flushTimeout time.Duration
+
 	// active broker API channels
 	events    chan pushRequest
 	get       chan getRequest
@@ -24,15 +28,18 @@ type eventLoop struct {
 	forceFlush bool
 }
 
-func newEventLoop(b *Broker) *eventLoop {
+func newEventLoop(b *Broker, size int, minEvents int, flushTimeout time.Duration) *eventLoop {
 	l := &eventLoop{
-		broker:    b,
-		events:    b.events,
-		pubCancel: b.pubCancel,
-		acks:      b.acks,
+		broker:       b,
+		events:       b.events,
+		minEvents:    minEvents,
+		flushTimeout: flushTimeout,
+		pubCancel:    b.pubCancel,
+		acks:         b.acks,
 	}
+	l.buf.init(b.logger, size)
 
-	if to := b.idleTimeout; to > 0 {
+	if to := l.flushTimeout; to > 0 {
 		// create initialy 'stopped' timer -> reset will be used
 		// on timer object, if flush timer becomes active.
 		l.timer = time.NewTimer(to)
@@ -45,7 +52,11 @@ func newEventLoop(b *Broker) *eventLoop {
 }
 
 func (l *eventLoop) run() {
-	broker := l.broker
+	var (
+		broker = l.broker
+		buf    = &l.buf
+	)
+
 	for {
 		select {
 		case <-broker.done:
@@ -77,8 +88,8 @@ func (l *eventLoop) run() {
 		// update get and idle timer after state machine
 		l.get = broker.requests
 		if !l.forceFlush {
-			avail := broker.avail()
-			if avail == 0 || broker.totalAvail() < broker.minEvents {
+			avail := buf.Avail()
+			if avail == 0 || buf.TotalAvail() < l.minEvents {
 				l.get = nil
 
 				if avail > 0 {
@@ -93,12 +104,41 @@ func (l *eventLoop) handleInsert(req *pushRequest) {
 	// log := l.broker.logger
 	// log.Debugf("push event: %v\t%v\t%p\n", req.event, req.seq, req.state)
 
-	if avail, ok := l.broker.insert(req); ok && avail == 0 {
+	if avail, ok := l.insert(req); ok && avail == 0 {
 		// log.Debugf("buffer: all regions full")
 
 		// no more space to accept new events -> unset events queue for time being
 		l.events = nil
 	}
+}
+
+func (l *eventLoop) insert(req *pushRequest) (int, bool) {
+	var avail int
+	log := l.broker.logger
+
+	if req.state == nil {
+		_, avail = l.buf.insert(req.event, clientState{})
+	} else {
+		st := req.state
+		if st.cancelled {
+			log.Debugf("cancelled producer - ignore event: %v\t%v\t%p", req.event, req.seq, req.state)
+
+			// do not add waiting events if producer did send cancel signal
+
+			if cb := st.dropCB; cb != nil {
+				cb(req.event.Content)
+			}
+
+			return -1, false
+		}
+
+		_, avail = l.buf.insert(req.event, clientState{
+			seq:   req.seq,
+			state: st,
+		})
+	}
+
+	return avail, true
 }
 
 func (l *eventLoop) handleCancel(req *producerCancelRequest) {
@@ -112,7 +152,7 @@ func (l *eventLoop) handleCancel(req *producerCancelRequest) {
 
 	if st := req.state; st != nil {
 		st.cancelled = true
-		removed = broker.cancel(st)
+		removed = l.buf.cancel(st)
 	}
 
 	// signal cancel request being finished
@@ -123,28 +163,30 @@ func (l *eventLoop) handleCancel(req *producerCancelRequest) {
 	}
 
 	// re-enable pushRequest if buffer can take new events
-	if !broker.full() {
+	if !l.buf.Full() {
 		l.events = broker.events
 	}
 }
 
 func (l *eventLoop) handleConsumer(req *getRequest) {
 	// log := l.broker.logger
+	// log.Debugf("try reserve %v events", req.sz)
 
-	start, buf := l.broker.get(req.sz)
+	start, buf := l.buf.reserve(req.sz)
 	count := len(buf)
 	if count == 0 {
 		panic("empty batch returned")
 	}
 
 	// log.Debug("newACKChan: ", b.ackSeq, count)
-	ackCH := newACKChan(l.ackSeq, start, count)
+	ackCH := newACKChan(l.ackSeq, start, count, l.buf.buf.clients)
 	l.ackSeq++
 
-	req.resp <- getResponse{buf, ackCH}
+	req.resp <- getResponse{ackCH, buf}
 	l.pendingACKs.append(ackCH)
 	l.schedACKS = l.broker.scheduledACKs
 
+	l.forceFlush = false
 	l.stopFlushTimer()
 }
 
@@ -155,8 +197,7 @@ func (l *eventLoop) handleACK(count int) {
 	// Give broker/buffer a chance to clean up most recent ACKs
 	// After handling ACKs some buffer has been freed up
 	// -> always reenable producers
-	broker := l.broker
-	broker.cleanACKs(count)
+	l.buf.ack(count)
 	l.events = l.broker.events
 }
 
@@ -166,7 +207,6 @@ func (l *eventLoop) enableFlushEvents() {
 }
 
 func (l *eventLoop) stopFlushTimer() {
-	l.forceFlush = false
 	if l.idleC != nil {
 		l.idleC = nil
 		if !l.timer.Stop() {
@@ -177,7 +217,7 @@ func (l *eventLoop) stopFlushTimer() {
 
 func (l *eventLoop) startFlushTimer() {
 	if l.idleC == nil && l.timer != nil {
-		l.timer.Reset(l.broker.idleTimeout)
+		l.timer.Reset(l.flushTimeout)
 		l.idleC = l.timer.C
 	}
 }

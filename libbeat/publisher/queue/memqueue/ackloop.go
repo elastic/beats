@@ -1,5 +1,11 @@
 package memqueue
 
+import (
+	"fmt"
+	"math"
+	"time"
+)
+
 // ackLoop implements the brokers asynchronous ACK worker.
 // Multiple concurrent ACKs from consecutive published batches will be batched up by the
 // worker, to reduce the number of signals to return to the producer and the
@@ -7,7 +13,7 @@ package memqueue
 // Producer ACKs are run in the ackLoop go-routine.
 type ackLoop struct {
 	broker *Broker
-	sig    chan batchAckRequest
+	sig    chan batchAckMsg
 	lst    chanList
 
 	totalACK   uint64
@@ -76,6 +82,7 @@ func (l *ackLoop) handleBatchSig() int {
 	l.broker.logger.Debugf("ackloop: receive ack [%v: %v, %v]", acks.seq, acks.start, acks.count)
 	start := acks.start
 	count := acks.count
+	states := acks.states
 	l.batchesACKed++
 	releaseACKChan(acks)
 
@@ -97,8 +104,7 @@ func (l *ackLoop) handleBatchSig() int {
 	}
 
 	// report acks to waiting clients
-	states := l.broker.buf.buf.clients
-	l.broker.reportACK(states, start, count)
+	l.processACK(states, start, count)
 
 	// return final ACK to EventLoop, in order to clean up internal buffer
 	l.broker.logger.Debug("ackloop: return ack to broker loop:", count)
@@ -106,4 +112,71 @@ func (l *ackLoop) handleBatchSig() int {
 	l.totalACK += uint64(count)
 	l.broker.logger.Debug("ackloop:  done send ack")
 	return count
+}
+
+func (l *ackLoop) processACK(states []clientState, start, N int) {
+	log := l.broker.logger
+
+	{
+		start := time.Now()
+		log.Debug("handle ACKs: ", N)
+		defer func() {
+			log.Debug("handle ACK took: ", time.Since(start))
+		}()
+	}
+
+	if e := l.broker.eventer; e != nil {
+		e.OnACK(N)
+	}
+
+	// TODO: global boolean to check if clients will need an ACK
+	//       no need to report ACKs if no client is interested in ACKs
+
+	idx := start + N - 1
+	if idx >= len(states) {
+		idx -= len(states)
+	}
+
+	total := 0
+	for i := N - 1; i >= 0; i-- {
+		if idx < 0 {
+			idx = len(states) - 1
+		}
+
+		st := &states[idx]
+		log.Debugf("try ack index: (idx=%v, i=%v, seq=%v)\n", idx, i, st.seq)
+
+		idx--
+		if st.state == nil {
+			log.Debug("no state set")
+			continue
+		}
+
+		count := (st.seq - st.state.lastACK)
+		if count == 0 || count > math.MaxUint32/2 {
+			// seq number comparison did underflow. This happens only if st.seq has
+			// allready been acknowledged
+			// log.Debug("seq number already acked: ", st.seq)
+
+			st.state = nil
+			continue
+		}
+
+		log.Debugf("broker ACK events: count=%v, start-seq=%v, end-seq=%v\n",
+			count,
+			st.state.lastACK+1,
+			st.seq,
+		)
+
+		total += int(count)
+		if total > N {
+			panic(fmt.Sprintf("Too many events acked (expected=%v, total=%v)",
+				count, total,
+			))
+		}
+
+		st.state.cb(int(count))
+		st.state.lastACK = st.seq
+		st.state = nil
+	}
 }

@@ -1,13 +1,10 @@
 package memqueue
 
 import (
-	"fmt"
-	"math"
 	"sync"
 	"time"
 
 	"github.com/elastic/beats/libbeat/common"
-	"github.com/elastic/beats/libbeat/publisher"
 	"github.com/elastic/beats/libbeat/publisher/queue"
 )
 
@@ -16,9 +13,10 @@ type Broker struct {
 
 	logger logger
 
-	buf         brokerBuffer
-	minEvents   int
-	idleTimeout time.Duration
+	bufSize int
+	// buf         brokerBuffer
+	// minEvents   int
+	// idleTimeout time.Duration
 
 	// api channels
 	events    chan pushRequest
@@ -46,9 +44,10 @@ type Settings struct {
 
 type ackChan struct {
 	next         *ackChan
-	ch           chan batchAckRequest
+	ch           chan batchAckMsg
 	seq          uint
 	start, count int // number of events waiting for ACK
+	states       []clientState
 }
 
 type chanList struct {
@@ -119,11 +118,9 @@ func NewBroker(
 
 		eventer: settings.Eventer,
 	}
-	b.buf.init(logger, sz)
-	b.minEvents = minEvents
-	b.idleTimeout = flushTimeout
 
-	eventLoop := newEventLoop(b)
+	eventLoop := newEventLoop(b, sz, minEvents, flushTimeout)
+	b.bufSize = sz
 	ack := &ackLoop{broker: b}
 
 	b.wg.Add(2)
@@ -149,7 +146,7 @@ func (b *Broker) Close() error {
 
 func (b *Broker) BufferConfig() queue.BufferConfig {
 	return queue.BufferConfig{
-		Events: b.buf.Size(),
+		Events: b.bufSize,
 	}
 }
 
@@ -161,136 +158,21 @@ func (b *Broker) Consumer() queue.Consumer {
 	return newConsumer(b)
 }
 
-func (b *Broker) insert(req *pushRequest) (int, bool) {
-	var avail int
-	if req.state == nil {
-		_, avail = b.buf.insert(req.event, clientState{})
-	} else {
-		st := req.state
-		if st.cancelled {
-			b.logger.Debugf("cancelled producer - ignore event: %v\t%v\t%p", req.event, req.seq, req.state)
-
-			// do not add waiting events if producer did send cancel signal
-
-			if cb := st.dropCB; cb != nil {
-				cb(req.event.Content)
-			}
-
-			return -1, false
-		}
-
-		_, avail = b.buf.insert(req.event, clientState{
-			seq:   req.seq,
-			state: st,
-		})
-	}
-
-	return avail, true
-}
-
-func (b *Broker) get(max int) (startIndex int, events []publisher.Event) {
-	return b.buf.reserve(max)
-}
-
-func (b *Broker) cancel(st *produceState) int {
-	return b.buf.cancel(st)
-}
-
-func (b *Broker) full() bool {
-	return b.buf.Full()
-}
-
-func (b *Broker) avail() int {
-	return b.buf.Avail()
-}
-
-func (b *Broker) totalAvail() int {
-	return b.buf.TotalAvail()
-}
-
-func (b *Broker) cleanACKs(count int) {
-	b.buf.ack(count)
-}
-
-func (b *Broker) reportACK(states []clientState, start, N int) {
-	{
-		start := time.Now()
-		b.logger.Debug("handle ACKs: ", N)
-		defer func() {
-			b.logger.Debug("handle ACK took: ", time.Since(start))
-		}()
-	}
-
-	if e := b.eventer; e != nil {
-		e.OnACK(N)
-	}
-
-	// TODO: global boolean to check if clients will need an ACK
-	//       no need to report ACKs if no client is interested in ACKs
-
-	idx := start + N - 1
-	if idx >= len(states) {
-		idx -= len(states)
-	}
-
-	total := 0
-	for i := N - 1; i >= 0; i-- {
-		if idx < 0 {
-			idx = len(states) - 1
-		}
-
-		st := &states[idx]
-		b.logger.Debugf("try ack index: (idx=%v, i=%v, seq=%v)\n", idx, i, st.seq)
-
-		idx--
-		if st.state == nil {
-			b.logger.Debug("no state set")
-			continue
-		}
-
-		count := (st.seq - st.state.lastACK)
-		if count == 0 || count > math.MaxUint32/2 {
-			// seq number comparison did underflow. This happens only if st.seq has
-			// allready been acknowledged
-			// b.logger.Debug("seq number already acked: ", st.seq)
-
-			st.state = nil
-			continue
-		}
-
-		b.logger.Debugf("broker ACK events: count=%v, start-seq=%v, end-seq=%v\n",
-			count,
-			st.state.lastACK+1,
-			st.seq,
-		)
-
-		total += int(count)
-		if total > N {
-			panic(fmt.Sprintf("Too many events acked (expected=%v, total=%v)",
-				count, total,
-			))
-		}
-
-		st.state.cb(int(count))
-		st.state.lastACK = st.seq
-		st.state = nil
-	}
-}
-
 var ackChanPool = sync.Pool{
 	New: func() interface{} {
 		return &ackChan{
-			ch: make(chan batchAckRequest, 1),
+			ch: make(chan batchAckMsg, 1),
 		}
 	},
 }
 
-func newACKChan(seq uint, start, count int) *ackChan {
+func newACKChan(seq uint, start, count int, states []clientState) *ackChan {
 	ch := ackChanPool.Get().(*ackChan)
 	ch.next = nil
 	ch.seq = seq
 	ch.start = start
 	ch.count = count
+	ch.states = states
 	return ch
 }
 
@@ -342,7 +224,7 @@ func (l *chanList) front() *ackChan {
 	return l.head
 }
 
-func (l *chanList) channel() chan batchAckRequest {
+func (l *chanList) channel() chan batchAckMsg {
 	if l.head == nil {
 		return nil
 	}
