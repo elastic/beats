@@ -17,3 +17,15 @@ func GetApacheEnvHost() string {
 	}
 	return host
 }
+
+// GetApacheEnvPort returns the port of the apache server to use for testing.
+// It reads the value from the APACHE_PORT environment variable and returns
+// 80 if it is not set.
+func GetApacheEnvPort() string {
+	port := os.Getenv("APACHE_PORT")
+
+	if len(port) == 0 {
+		port = "80"
+	}
+	return port
+}
