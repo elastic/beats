@@ -84,11 +84,11 @@
       description: >
         Cluster status version
     - name: osd.full
-      type: bool
+      type: boolean
       description: >
         Is osd full
     - name: osd.nearfull
-      type: bool
+      type: boolean
       description: >
         Is osd near full
     - name: osd.num_osds

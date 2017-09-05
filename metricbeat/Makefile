@@ -55,7 +55,7 @@ configs: python-env
 .PHONY: imports
 imports: python-env
 	@mkdir -p include
-	@${PYTHON_ENV}/bin/python ${ES_BEATS}/metricbeat/scripts/generate_imports.py ${BEAT_PATH} > include/list.go
+	@${PYTHON_ENV}/bin/python ${ES_BEATS}/script/generate_imports.py ${BEAT_PATH}
 
 # This is called by the beats packer before building starts
 .PHONY: before-build

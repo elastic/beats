@@ -224,7 +224,7 @@ if __name__ == "__main__":
                         help="copyright owner")
     parser.add_argument("--csv", dest="csvfile",
                         help="Output to a csv file")
-    parser.add_argument("-e", "--excludes", default=["dev-tools"],
+    parser.add_argument("-e", "--excludes", default=["dev-tools", "build"],
                         help="List of top directories to exclude")
     parser.add_argument("-s", "--skip-notice", default=[],
                         help="List of NOTICE files to skip")

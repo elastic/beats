@@ -34,6 +34,8 @@ https://github.com/elastic/beats/compare/v6.0.0-beta2...master[Check the HEAD di
 - Register kubernetes `field_format` matcher and remove logger in `Encode` API {pull}4888[4888]
 - Add support for `initContainers` in `add_kubernetes_metadata` processor. {issue}4825[4825]
 - Fix the `/usr/bin/beatname` script to accept `-d "*"` as a parameter. {issue}5040[5040]
+- Combine `fields.yml` properties when they are defined in different sources. {issue}5075[5075]
+- Fix `fields.yml` lookup when using `export template` with a custom `path.config` param. {issue}5089[5089]
 
 *Auditbeat*
 
@@ -61,6 +63,7 @@ https://github.com/elastic/beats/compare/v6.0.0-beta2...master[Check the HEAD di
 - Move TCP UDP start up into `server.Start()` {pull}4903[4903]
 - Changed the hashbang used in the beat helper script from `/bin/bash` to `/usr/bin/env bash`. {pull}5051[5051]
 - Changed beat helper script to use `exec` when running the beat. {pull}5051[5051]
+- Fix reloader error message to only print on actual error {pull}5066[5066]
 
 *Auditbeat*
 
@@ -70,6 +73,7 @@ https://github.com/elastic/beats/compare/v6.0.0-beta2...master[Check the HEAD di
 - Add Kafka log module. {pull}4885[4885]
 - Add support for `/var/log/containers/` log path in `add_kubernetes_metadata` processor. {pull}4981[4981]
 - Don't start filebeat if external modules/prospectors config is wrong and reload is disabled {pull}5053[5053]
+- Remove error log from runnerfactory as error is returned by API. {pull}5085[5085]
 
 *Heartbeat*
 

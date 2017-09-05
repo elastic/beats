@@ -7,6 +7,8 @@ PROMETHEUS_FIELDS = metricbeat.COMMON_FIELDS + ["prometheus"]
 
 class Test(metricbeat.BaseTest):
 
+    COMPOSE_SERVICES = ['prometheus']
+
     @unittest.skipUnless(metricbeat.INTEGRATION_TESTS, "integration test")
     def test_stats(self):
         """

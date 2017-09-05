@@ -100,6 +100,16 @@ with a CLI flag:
 filebeat --modules=system
 ----
 
+==== Other settings changed or moved
+
+The `outputs.elasticsearch.template.*` settings have been moved under
+`setup.template.*`, but are otherwise unchanged.
+
+The `dashboards.*` settings have been moved under `setup.dashboards.*`.
+
+The Filebeat deprecated options	`force_close_files` and `close_older` are
+removed.
+
 [[breaking-changes-import-dashboards]]
 ==== Changes for importing the Kibana dashboards
 

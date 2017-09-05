@@ -28,7 +28,7 @@ func Start(cfg *common.Config, info beat.Info) {
 		mux.HandleFunc("/stats", statsHandler)
 
 		url := config.Host + ":" + strconv.Itoa(config.Port)
-		logp.Info("URL: %s", url)
+		logp.Info("Metrics endpoint listening on: %s", url)
 		endpoint := http.ListenAndServe(url, mux)
 		logp.Info("finished starting stats endpoint: %v", endpoint)
 	}()

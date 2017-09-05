@@ -7,11 +7,14 @@ import (
 
 	"github.com/stretchr/testify/assert"
 
+	"github.com/elastic/beats/libbeat/tests/compose"
 	mbtest "github.com/elastic/beats/metricbeat/mb/testing"
 	"github.com/elastic/beats/metricbeat/module/mongodb"
 )
 
 func TestFetch(t *testing.T) {
+	compose.EnsureUp(t, "mongodb")
+
 	f := mbtest.NewEventsFetcher(t, getConfig())
 	events, err := f.Fetch()
 	if !assert.NoError(t, err) {
@@ -56,6 +59,8 @@ func TestFetch(t *testing.T) {
 }
 
 func TestData(t *testing.T) {
+	compose.EnsureUp(t, "mongodb")
+
 	f := mbtest.NewEventsFetcher(t, getConfig())
 	err := mbtest.WriteEvents(f, t)
 	if err != nil {

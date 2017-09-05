@@ -6,10 +6,13 @@ import (
 	"os"
 	"testing"
 
+	"github.com/elastic/beats/libbeat/tests/compose"
 	mbtest "github.com/elastic/beats/metricbeat/mb/testing"
 )
 
 func TestData(t *testing.T) {
+	compose.EnsureUp(t, "phpfpm")
+
 	f := mbtest.NewEventFetcher(t, getConfig())
 	err := mbtest.WriteEvent(f, t)
 	if err != nil {
