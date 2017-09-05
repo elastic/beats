@@ -8,6 +8,7 @@
 # https://www.elastic.co/guide/en/beats/metricbeat/index.html
 
 #==========================  Modules configuration ============================
+
 metricbeat.config.modules:
   # Glob pattern for configuration loading
   path: ${path.config}/modules.d/*.yml
@@ -19,6 +20,7 @@ metricbeat.config.modules:
   #reload.period: 10s
 
 #==================== Elasticsearch template setting ==========================
+
 setup.template.settings:
   index.number_of_shards: 1
   index.codec: best_compression

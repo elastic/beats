@@ -50,8 +50,9 @@ fields: python-env
 # Collects all module configs
 .PHONY: configs
 configs: python-env
-	@cat ${ES_BEATS}/auditbeat/_meta/common.yml \
-	     <(go run scripts/generate_config.go -os linux -concat) > _meta/beat.yml
+	@cat ${ES_BEATS}/auditbeat/_meta/common.p1.yml \
+	     <(go run scripts/generate_config.go -os linux -concat) \
+		 ${ES_BEATS}/auditbeat/_meta/common.p2.yml > _meta/beat.yml
 	@cat ${ES_BEATS}/auditbeat/_meta/common.reference.yml \
 	     <(go run scripts/generate_config.go -os linux -ref -concat) > _meta/beat.reference.yml
 

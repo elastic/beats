@@ -29,6 +29,12 @@ auditbeat.modules:
   
 
 
+#==================== Elasticsearch template setting ==========================
+setup.template.settings:
+  index.number_of_shards: 3
+  #index.codec: best_compression
+  #_source.enabled: false
+
 #================================ General =====================================
 
 # The name of the shipper that publishes the network data. It can be used to group
