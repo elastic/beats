@@ -1,6 +1,12 @@
 [[configuration-filebeat-options]]
 == Set up prospectors
 
+TIP: <<filebeat-modules-overview,Filebeat modules>> provide the fastest getting
+started experience for common log formats. See <<filebeat-modules-quickstart>>
+to learn how to get started with modules. Also see
+<<configuration-filebeat-modules>> for information about enabling and
+configuring modules.
+
 Filebeat uses prospectors to locate and process files. To configure Filebeat,
 you specify a list of prospectors in the `filebeat.prospectors` section of the
 +{beatname_lc}.yml+ config file.
