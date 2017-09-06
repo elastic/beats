@@ -6,7 +6,7 @@
 # Default-Start:     2 3 4 5
 # Default-Stop:      0 1 6
 # Short-Description: {{.beat_description}}
-# Description:       {{.beat_name}} is a shipper part of the Elastic Beats
+# Description:       {{.beat_binary_name}} is a shipper part of the Elastic Beats
 #					 family. Please see: https://www.elastic.co/products/beats
 ### END INIT INFO
 
@@ -15,12 +15,12 @@
 # PATH should only include /usr/* if it runs after the mountnfs.sh script
 PATH=/sbin:/usr/sbin:/bin:/usr/bin
 DESC="{{.beat_description}}"
-NAME="{{.beat_name}}"
-DAEMON=/usr/share/{{.beat_name}}/bin/$NAME
-DAEMON_ARGS="-c /etc/{{.beat_name}}/{{.beat_name}}.yml -path.home /usr/share/{{.beat_name}} -path.config /etc/{{.beat_name}} -path.data /var/lib/{{.beat_name}} -path.logs /var/log/{{.beat_name}}"
+NAME="{{.beat_binary_name}}"
+DAEMON=/usr/share/{{.beat_binary_name}}/bin/$NAME
+DAEMON_ARGS="-c /etc/{{.beat_binary_name}}/{{.beat_binary_name}}.yml -path.home /usr/share/{{.beat_binary_name}} -path.config /etc/{{.beat_binary_name}} -path.data /var/lib/{{.beat_binary_name}} -path.logs /var/log/{{.beat_binary_name}}"
 TEST_ARGS="-e test config"
 PIDFILE=/var/run/{{.beat_pkg_name}}.pid
-WRAPPER="/usr/share/{{.beat_name}}/bin/{{.beat_name}}-god"
+WRAPPER="/usr/share/{{.beat_binary_name}}/bin/{{.beat_binary_name}}-god"
 BEAT_USER="root"
 WRAPPER_ARGS="-r / -n -p $PIDFILE"
 SCRIPTNAME=/etc/init.d/$NAME
