@@ -50,6 +50,7 @@ https://github.com/elastic/beats/compare/v6.0.0-beta2...master[Check the HEAD di
 - Fix wrong MySQL CRUD queries timelion visualization {pull}4857[4857]
 - Add new metrics to CPU metricsset {pull}4969[4969]
 - Fix a memory allocation issue where more memory was allocated than needed in the windows-perfmon metricset. {issue}5035[5035]
+- Don't start metricbeat if external modules config is wrong and reload is disabled {pull}5053[5053]
 
 *Packetbeat*
 
@@ -73,6 +74,7 @@ https://github.com/elastic/beats/compare/v6.0.0-beta2...master[Check the HEAD di
 - Add PostgreSQL module with slowlog support. {pull}4763[4763]
 - Add Kafka log module. {pull}4885[4885]
 - Add support for `/var/log/containers/` log path in `add_kubernetes_metadata` processor. {pull}4981[4981]
+- Don't start filebeat if external modules/prospectors config is wrong and reload is disabled {pull}5053[5053]
 - Remove error log from runnerfactory as error is returned by API. {pull}5085[5085]
 - Changed the number of shards in the default configuration to 3. {issue}5095[5095]
 
