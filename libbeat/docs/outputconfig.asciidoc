@@ -41,9 +41,6 @@ Example configuration:
 
 output.elasticsearch:
   hosts: ["http://localhost:9200"]
-  template.enabled: true
-  template.fields: "fields.yml"
-  template.overwrite: false
   index: "{beatname_lc}"
   ssl.certificate_authorities: ["/etc/pki/root/ca.pem"]
   ssl.certificate: "/etc/pki/client/cert.pem"
