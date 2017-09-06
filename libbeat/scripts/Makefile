@@ -265,12 +265,12 @@ update: python-env collect
 	@echo "Updating generated files for ${BEAT_NAME}"
 
 	@# Update config files.
-	@cat _meta/beat.yml ${ES_BEATS}/libbeat/_meta/config.yml | sed -e "s/beatname/${BEAT_NAME}/g" > ${BEAT_NAME}.yml
+		@cat _meta/beat.yml ${ES_BEATS}/libbeat/_meta/config.yml | sed -e "s/beatname/${BEAT_NAME}/g;s/index-prefix/${BEAT_INDEX_PREFIX}/g" > ${BEAT_NAME}.yml
 	@if [ -e _meta/beat.reference.yml ]; then \
-        cat _meta/beat.reference.yml ${ES_BEATS}/libbeat/_meta/config.reference.yml | sed -e "s/beatname/${BEAT_NAME}/g" > ${BEAT_NAME}.reference.yml ; \
+        cat _meta/beat.reference.yml ${ES_BEATS}/libbeat/_meta/config.reference.yml | sed -e "s/beatname/${BEAT_NAME}/g;s/index-prefix/${BEAT_INDEX_PREFIX}/g" > ${BEAT_NAME}.reference.yml ; \
     else \
-        cat _meta/beat.yml ${ES_BEATS}/libbeat/_meta/config.reference.yml | sed -e "s/beatname/${BEAT_NAME}/g" > ${BEAT_NAME}.reference.yml ; \
-    fi;
+        cat _meta/beat.yml ${ES_BEATS}/libbeat/_meta/config.reference.yml | sed -e "s/beatname/${BEAT_NAME}/g;s/index-prefix/${BEAT_INDEX_PREFIX}/g" > ${BEAT_NAME}.reference.yml ; \
+    fi;  fi;
 	@chmod 0640 ${BEAT_NAME}.yml ${BEAT_NAME}.reference.yml
 
 	@# Update libbeat fields.generated.yml
