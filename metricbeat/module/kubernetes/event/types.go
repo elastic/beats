@@ -4,8 +4,8 @@ import "time"
 
 type ObjectMeta struct {
 	Annotations       map[string]string `json:"annotations"`
-	CreationTimestamp string            `json:"creationTimestamp"`
-	DeletionTimestamp string            `json:"deletionTimestamp"`
+	CreationTimestamp *time.Time        `json:"creationTimestamp"`
+	DeletionTimestamp *time.Time        `json:"deletionTimestamp"`
 	GenerateName      string            `json:"generateName"`
 	Labels            map[string]string `json:"labels"`
 	Name              string            `json:"name"`
@@ -23,9 +23,9 @@ type ObjectMeta struct {
 }
 
 type Event struct {
-	APIVersion     string    `json:"apiVersion"`
-	Count          int64     `json:"count"`
-	FirstTimestamp time.Time `json:"firstTimestamp"`
+	APIVersion     string     `json:"apiVersion"`
+	Count          int64      `json:"count"`
+	FirstTimestamp *time.Time `json:"firstTimestamp"`
 	InvolvedObject struct {
 		APIVersion      string `json:"apiVersion"`
 		Kind            string `json:"kind"`
@@ -34,7 +34,7 @@ type Event struct {
 		UID             string `json:"uid"`
 	} `json:"involvedObject"`
 	Kind          string     `json:"kind"`
-	LastTimestamp time.Time  `json:"lastTimestamp"`
+	LastTimestamp *time.Time `json:"lastTimestamp"`
 	Message       string     `json:"message"`
 	Metadata      ObjectMeta `json:"metadata"`
 	Reason        string     `json:"reason"`
