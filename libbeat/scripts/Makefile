@@ -291,7 +291,7 @@ endif
 	@# Generate Kibana index pattern
 	@mkdir -p $(PWD)/_meta/kibana/5.x/index-pattern
 	@mkdir -p $(PWD)/_meta/kibana/default/index-pattern
-	@${PYTHON_ENV}/bin/python ${ES_BEATS}/libbeat/scripts/generate_index_pattern.py --index '${BEAT_INDEX_PREFIX}-*' --beat $(PWD) --version ${BEAT_VERSION}
+	@${PYTHON_ENV}/bin/python ${ES_BEATS}/libbeat/scripts/generate_index_pattern.py --index '${BEAT_INDEX_PREFIX}-*' --beat-name $(BEAT_NAME) --beat $(PWD) --version ${BEAT_VERSION}
 
 
 .PHONY: docs
