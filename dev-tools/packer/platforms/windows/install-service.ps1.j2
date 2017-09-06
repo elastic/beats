@@ -1,6 +1,6 @@
 # delete service if it already exists
-if (Get-Service {{.beat_name}} -ErrorAction SilentlyContinue) {
-  $service = Get-WmiObject -Class Win32_Service -Filter "name='{{.beat_name}}'"
+if (Get-Service {{.beat_binary_name}} -ErrorAction SilentlyContinue) {
+  $service = Get-WmiObject -Class Win32_Service -Filter "name='{{.beat_binary_name}}'"
   $service.StopService()
   Start-Sleep -s 1
   $service.delete()
@@ -9,6 +9,6 @@ if (Get-Service {{.beat_name}} -ErrorAction SilentlyContinue) {
 $workdir = Split-Path $MyInvocation.MyCommand.Path
 
 # create new service
-New-Service -name {{.beat_name}} `
-  -displayName {{.beat_name}} `
-  -binaryPathName "`"$workdir\\{{.beat_name}}.exe`" -c `"$workdir\\{{.beat_name}}.yml`" -path.home `"$workdir`" -path.data `"C:\\ProgramData\\{{.beat_name}}`" -path.logs `"C:\\ProgramData\\{{.beat_name}}\logs`""
+New-Service -name {{.beat_binary_name}} `
+  -displayName {{.beat_binary_name}} `
+  -binaryPathName "`"$workdir\\{{.beat_binary_name}}.exe`" -c `"$workdir\\{{.beat_binary_name}}.yml`" -path.home `"$workdir`" -path.data `"C:\\ProgramData\\{{.beat_binary_name}}`" -path.logs `"C:\\ProgramData\\{{.beat_binary_name}}\logs`""

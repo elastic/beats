@@ -31,29 +31,29 @@ FPM_ARGS=(
         --url {{.beat_url}}
         --rpm-init /tmp/{{.beat_pkg_name}}.init
         --after-install /tmp/systemd-daemon-reload.sh
-        --config-files /etc/{{.beat_name}}/{{.beat_name}}.yml
-        homedir/=/usr/share/{{.beat_name}}
-        beatname-${RUNID}.sh=/usr/bin/{{.beat_name}}
-        {{.beat_name}}-linux-{{.arch}}=/usr/share/{{.beat_name}}/bin/{{.beat_name}}
-        {{.beat_name}}-linux.yml=/etc/{{.beat_name}}/{{.beat_name}}.yml
-        {{.beat_name}}-linux.reference.yml=/etc/{{.beat_name}}/{{.beat_name}}.reference.yml
-        fields.yml=/etc/{{.beat_name}}/fields.yml
+        --config-files /etc/{{.beat_binary_name}}/{{.beat_binary_name}}.yml
+        homedir/=/usr/share/{{.beat_binary_name}}
+        beatname-${RUNID}.sh=/usr/bin/{{.beat_binary_name}}
+        {{.beat_binary_name}}-linux-{{.arch}}=/usr/share/{{.beat_binary_name}}/bin/{{.beat_binary_name}}
+        {{.beat_binary_name}}-linux.yml=/etc/{{.beat_binary_name}}/{{.beat_binary_name}}.yml
+        {{.beat_binary_name}}-linux.reference.yml=/etc/{{.beat_binary_name}}/{{.beat_binary_name}}.reference.yml
+        fields.yml=/etc/{{.beat_binary_name}}/fields.yml
         ${RUNID}.service=/lib/systemd/system/{{.beat_pkg_name}}.service
-        god-linux-{{.arch}}=/usr/share/{{.beat_name}}/bin/{{.beat_name}}-god
+        god-linux-{{.arch}}=/usr/share/{{.beat_binary_name}}/bin/{{.beat_binary_name}}-god
   )
 
 if [ -d modules.d-linux ]; then
-  FPM_ARGS+=(modules.d-linux/=/etc/{{.beat_name}}/modules.d/)
+  FPM_ARGS+=(modules.d-linux/=/etc/{{.beat_binary_name}}/modules.d/)
 fi
 
 fpm "${FPM_ARGS[@]}"
 
 # rename so that the filename respects semver rules
 mkdir -p upload
-mv {{.beat_pkg_name}}-${RPM_VERSION}-1.{{.rpm_arch}}.rpm upload/{{.beat_name}}-${VERSION}-{{.rpm_arch}}.rpm
-echo "Created upload/{{.beat_name}}-${VERSION}-{{.rpm_arch}}.rpm"
+mv {{.beat_pkg_name}}-${RPM_VERSION}-1.{{.rpm_arch}}.rpm upload/{{.beat_binary_name}}-${VERSION}-{{.rpm_arch}}.rpm
+echo "Created upload/{{.beat_binary_name}}-${VERSION}-{{.rpm_arch}}.rpm"
 
 # create sha1 file
 cd upload
-sha1sum {{.beat_name}}-${VERSION}-{{.rpm_arch}}.rpm | awk '{print $1;}' > {{.beat_name}}-${VERSION}-{{.rpm_arch}}.rpm.sha1
-echo "Created upload/{{.beat_name}}-${VERSION}-{{.rpm_arch}}.rpm.sha1"
+sha1sum {{.beat_binary_name}}-${VERSION}-{{.rpm_arch}}.rpm | awk '{print $1;}' > {{.beat_binary_name}}-${VERSION}-{{.rpm_arch}}.rpm.sha1
+echo "Created upload/{{.beat_binary_name}}-${VERSION}-{{.rpm_arch}}.rpm.sha1"

@@ -12,7 +12,7 @@ gotpl ${BASEDIR}/run.sh.j2 < ${BUILD_DIR}/settings-$runid.yml > ${BUILD_DIR}/run
 chmod +x ${BUILD_DIR}/run-$runid.sh
 
 docker run --rm -v ${BUILD_DIR}:/build \
-    -e BUILDID=$BUILDID -e SNAPSHOT=$SNAPSHOT -e RUNID=$runid -e BEAT_NAME=$BEAT_NAME \
+    -e BUILDID=$BUILDID -e SNAPSHOT=$SNAPSHOT -e RUNID=$runid -e BEAT_NAME=$BEAT_NAME -e BEAT_BINARY_NAME=$BEAT_BINARY_NAME \
     tudorg/fpm /build/run-$runid.sh
 
 rm ${BUILD_DIR}/settings-$runid.yml ${BUILD_DIR}/run-$runid.sh

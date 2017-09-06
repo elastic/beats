@@ -133,6 +133,6 @@ if __name__ == "__main__":
     output = open(beat_path + "/docs/fields.asciidoc", 'w')
 
     try:
-        fields_to_asciidoc(fields, output, beat_name.title())
+        fields_to_asciidoc(fields, output, beat_name)
     finally:
         output.close()

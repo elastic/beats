@@ -3,9 +3,9 @@
 # Script to run {{.beat_name}} in foreground with the same path settings that
 # the init script / systemd unit file would do.
 
-exec /usr/share/{{.beat_name}}/bin/{{.beat_name}} \
-  -path.home /usr/share/{{.beat_name}} \
-  -path.config /etc/{{.beat_name}} \
-  -path.data /var/lib/{{.beat_name}} \
-  -path.logs /var/log/{{.beat_name}} \
+exec /usr/share/{{.beat_binary_name}}/bin/{{.beat_binary_name}} \
+  -path.home /usr/share/{{.beat_binary_name}} \
+  -path.config /etc/{{.beat_binary_name}} \
+  -path.data /var/lib/{{.beat_binary_name}} \
+  -path.logs /var/log/{{.beat_binary_name}} \
   "$@"

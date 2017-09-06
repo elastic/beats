@@ -24,28 +24,28 @@ FPM_ARGS=(
         --url {{.beat_url}}
         --deb-init /tmp/{{.beat_pkg_name}}.init
         --deb-systemd ${RUNID}.service
-        --config-files /etc/{{.beat_name}}/{{.beat_name}}.yml
-        homedir/=/usr/share/{{.beat_name}}
-        beatname-${RUNID}.sh=/usr/bin/{{.beat_name}}
-        {{.beat_name}}-linux-{{.arch}}=/usr/share/{{.beat_name}}/bin/{{.beat_name}}
-        {{.beat_name}}-linux.yml=/etc/{{.beat_name}}/{{.beat_name}}.yml
-        {{.beat_name}}-linux.reference.yml=/etc/{{.beat_name}}/{{.beat_name}}.reference.yml
-        fields.yml=/etc/{{.beat_name}}/fields.yml
-        god-linux-{{.arch}}=/usr/share/{{.beat_name}}/bin/{{.beat_name}}-god
+        --config-files /etc/{{.beat_binary_name}}/{{.beat_binary_name}}.yml
+        homedir/=/usr/share/{{.beat_binary_name}}
+        beatname-${RUNID}.sh=/usr/bin/{{.beat_binary_name}}
+        {{.beat_binary_name}}-linux-{{.arch}}=/usr/share/{{.beat_binary_name}}/bin/{{.beat_binary_name}}
+        {{.beat_binary_name}}-linux.yml=/etc/{{.beat_binary_name}}/{{.beat_binary_name}}.yml
+        {{.beat_binary_name}}-linux.reference.yml=/etc/{{.beat_binary_name}}/{{.beat_binary_name}}.reference.yml
+        fields.yml=/etc/{{.beat_binary_name}}/fields.yml
+        god-linux-{{.arch}}=/usr/share/{{.beat_binary_name}}/bin/{{.beat_binary_name}}-god
   )
 
 if [ -d modules.d-linux ]; then
-  FPM_ARGS+=(modules.d-linux/=/etc/{{.beat_name}}/modules.d/)
+  FPM_ARGS+=(modules.d-linux/=/etc/{{.beat_binary_name}}/modules.d/)
 fi
 
 fpm "${FPM_ARGS[@]}"
 
 # move and rename to use the elastic conventions
 mkdir -p upload
-mv {{.beat_pkg_name}}_${VERSION}_{{.deb_arch}}.deb upload/{{.beat_name}}-${VERSION}-{{.deb_arch}}.deb
-echo "Created upload/{{.beat_name}}-${VERSION}-{{.deb_arch}}.deb"
+mv {{.beat_pkg_name}}_${VERSION}_{{.deb_arch}}.deb upload/{{.beat_binary_name}}-${VERSION}-{{.deb_arch}}.deb
+echo "Created upload/{{.beat_binary_name}}-${VERSION}-{{.deb_arch}}.deb"
 
 # create sha1 file
 cd upload
-sha1sum {{.beat_name}}-${VERSION}-{{.deb_arch}}.deb | awk '{print $1;}' > {{.beat_name}}-${VERSION}-{{.deb_arch}}.deb.sha1
-echo "Created upload/{{.beat_name}}-${VERSION}-{{.deb_arch}}.deb.sha1"
+sha1sum {{.beat_binary_name}}-${VERSION}-{{.deb_arch}}.deb | awk '{print $1;}' > {{.beat_binary_name}}-${VERSION}-{{.deb_arch}}.deb.sha1
+echo "Created upload/{{.beat_binary_name}}-${VERSION}-{{.deb_arch}}.deb.sha1"
