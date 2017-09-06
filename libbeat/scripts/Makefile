@@ -1,6 +1,7 @@
 ### VARIABLE SETUP ###
 ### Application using libbeat may override the following variables in their Makefile
-BEAT_NAME?=libbeat ## @packaging Name of the application
+BEAT_NAME?=libbeat## @packaging Name of the binary
+BEAT_TITLE?=${BEAT_NAME}## @packaging Title of the application
 BEAT_DESCRIPTION?=Sends events to Elasticsearch or Logstash ## @packaging Description of the application
 BEAT_PATH?=github.com/elastic/beats/${BEAT_NAME}
 BEAT_PACKAGE_NAME?=${BEAT_NAME}
@@ -285,7 +286,7 @@ endif
 
 	@# Update docs
 	@mkdir -p docs
-	@${PYTHON_ENV}/bin/python ${ES_BEATS}/libbeat/scripts/generate_fields_docs.py $(PWD) ${BEAT_NAME} ${ES_BEATS}
+	@${PYTHON_ENV}/bin/python ${ES_BEATS}/libbeat/scripts/generate_fields_docs.py $(PWD) ${BEAT_TITLE} ${ES_BEATS}
 
 	@# Generate Kibana index pattern
 	@mkdir -p $(PWD)/_meta/kibana/5.x/index-pattern
