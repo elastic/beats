@@ -9,7 +9,7 @@ This file is generated! See _meta/fields.yml and scripts/generate_field_docs.py
 [partintro]
 
 --
-This document describes the fields that are exported by Auditbeat. They are
+This document describes the fields that are exported by auditbeat. They are
 grouped in the following categories:
 
 * <<exported-fields-audit>>
