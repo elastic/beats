@@ -96,11 +96,10 @@ filebeat.registry_file: {{ beat.working_dir + '/' }}{{ registryFile|default("reg
 
 {% if reload or reload_path -%}
 filebeat.config.{{ reload_type|default("prospectors") }}:
-  enabled: true
   path: {{ reload_path }}
   {% if reload  -%}
   reload.period: 1s
-  reload.enabled: true
+  reload.enabled: {{ reload|default("false") }}
   {% endif -%}
 {% endif -%}
 
