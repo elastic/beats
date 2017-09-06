@@ -126,6 +126,10 @@ func (bt *Metricbeat) Run(b *beat.Beat) error {
 		moduleReloader := cfgfile.NewReloader(bt.config.ConfigModules)
 		factory := module.NewFactory(bt.config.MaxStartDelay, b.Publisher)
 
+		if err := moduleReloader.Check(factory); err != nil {
+			return err
+		}
+
 		go moduleReloader.Run(factory)
 		wg.Add(1)
 		go func() {
