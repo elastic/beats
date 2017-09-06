@@ -1,11 +1,5 @@
 package memqueue
 
-import (
-	"fmt"
-	"math"
-	"time"
-)
-
 // ackLoop implements the brokers asynchronous ACK worker.
 // Multiple concurrent ACKs from consecutive published batches will be batched up by the
 // worker, to reduce the number of signals to return to the producer and the
@@ -21,6 +15,14 @@ type ackLoop struct {
 
 	batchesSched uint64
 	batchesACKed uint64
+
+	processACK func(chanList, int)
+}
+
+func newACKLoop(b *Broker, processACK func(chanList, int)) *ackLoop {
+	l := &ackLoop{broker: b}
+	l.processACK = processACK
+	return l
 }
 
 func (l *ackLoop) run() {
@@ -78,33 +80,23 @@ func (l *ackLoop) run() {
 // handleBatchSig collects and handles a batch ACK/Cancel signal. handleBatchSig
 // is run by the ackLoop.
 func (l *ackLoop) handleBatchSig() int {
-	acks := l.lst.pop()
-	l.broker.logger.Debugf("ackloop: receive ack [%v: %v, %v]", acks.seq, acks.start, acks.count)
-	start := acks.start
-	count := acks.count
-	states := acks.states
-	l.batchesACKed++
-	releaseACKChan(acks)
+	lst := l.collectAcked()
 
-	done := false
-	// collect pending ACKs
-	for !l.lst.empty() && !done {
-		acks := l.lst.front()
-		select {
-		case <-acks.ch:
-			l.broker.logger.Debugf("ackloop: receive ack [%v: %v, %v]", acks.seq, acks.start, acks.count)
+	count := 0
+	for current := lst.front(); current != nil; current = current.next {
+		count += current.count
+	}
 
-			count += acks.count
-			l.batchesACKed++
-			releaseACKChan(l.lst.pop())
-
-		default:
-			done = true
-		}
+	if e := l.broker.eventer; e != nil {
+		e.OnACK(count)
 	}
 
 	// report acks to waiting clients
-	l.processACK(states, start, count)
+	l.processACK(lst, count)
+
+	for !lst.empty() {
+		releaseACKChan(lst.pop())
+	}
 
 	// return final ACK to EventLoop, in order to clean up internal buffer
 	l.broker.logger.Debug("ackloop: return ack to broker loop:", count)
@@ -114,69 +106,25 @@ func (l *ackLoop) handleBatchSig() int {
 	return count
 }
 
-func (l *ackLoop) processACK(states []clientState, start, N int) {
-	log := l.broker.logger
+func (l *ackLoop) collectAcked() chanList {
+	lst := chanList{}
 
-	{
-		start := time.Now()
-		log.Debug("handle ACKs: ", N)
-		defer func() {
-			log.Debug("handle ACK took: ", time.Since(start))
-		}()
+	acks := l.lst.pop()
+	lst.append(acks)
+
+	done := false
+	for !l.lst.empty() && !done {
+		acks := l.lst.front()
+		select {
+		case <-acks.ch:
+			l.broker.logger.Debugf("ackloop: receive ack [%v: %v, %v]", acks.seq, acks.start, acks.count)
+			l.batchesACKed++
+			lst.append(l.lst.pop())
+
+		default:
+			done = true
+		}
 	}
 
-	if e := l.broker.eventer; e != nil {
-		e.OnACK(N)
-	}
-
-	// TODO: global boolean to check if clients will need an ACK
-	//       no need to report ACKs if no client is interested in ACKs
-
-	idx := start + N - 1
-	if idx >= len(states) {
-		idx -= len(states)
-	}
-
-	total := 0
-	for i := N - 1; i >= 0; i-- {
-		if idx < 0 {
-			idx = len(states) - 1
-		}
-
-		st := &states[idx]
-		log.Debugf("try ack index: (idx=%v, i=%v, seq=%v)\n", idx, i, st.seq)
-
-		idx--
-		if st.state == nil {
-			log.Debug("no state set")
-			continue
-		}
-
-		count := (st.seq - st.state.lastACK)
-		if count == 0 || count > math.MaxUint32/2 {
-			// seq number comparison did underflow. This happens only if st.seq has
-			// allready been acknowledged
-			// log.Debug("seq number already acked: ", st.seq)
-
-			st.state = nil
-			continue
-		}
-
-		log.Debugf("broker ACK events: count=%v, start-seq=%v, end-seq=%v\n",
-			count,
-			st.state.lastACK+1,
-			st.seq,
-		)
-
-		total += int(count)
-		if total > N {
-			panic(fmt.Sprintf("Too many events acked (expected=%v, total=%v)",
-				count, total,
-			))
-		}
-
-		st.state.cb(int(count))
-		st.state.lastACK = st.seq
-		st.state = nil
-	}
+	return lst
 }

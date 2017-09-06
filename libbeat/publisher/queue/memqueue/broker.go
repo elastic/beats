@@ -119,9 +119,19 @@ func NewBroker(
 		eventer: settings.Eventer,
 	}
 
-	eventLoop := newEventLoop(b, sz, minEvents, flushTimeout)
+	var eventLoop interface {
+		run()
+		processACK(chanList, int)
+	}
+
+	if minEvents > 1 {
+		eventLoop = newBufferingEventLoop(b, sz, minEvents, flushTimeout)
+	} else {
+		eventLoop = newDirectEventLoop(b, sz)
+	}
+
 	b.bufSize = sz
-	ack := &ackLoop{broker: b}
+	ack := newACKLoop(b, eventLoop.processACK)
 
 	b.wg.Add(2)
 	go func() {
@@ -242,4 +252,13 @@ func (l *chanList) pop() *ackChan {
 
 	ch.next = nil
 	return ch
+}
+
+func (l *chanList) reverse() {
+	tmp := *l
+	*l = chanList{}
+
+	for !tmp.empty() {
+		l.prepend(tmp.pop())
+	}
 }
