@@ -1,7 +1,7 @@
 ### VARIABLE SETUP ###
 ### Application using libbeat may override the following variables in their Makefile
-BEAT_NAME?=libbeat ## @packaging Name of the application
-BEAT_BINARY_NAME?=$(BEAT_NAME) ## @packaging Name of the binary
+BEAT_NAME?=libbeat## @packaging Name of the application
+BEAT_BINARY_NAME?=$(BEAT_NAME)## @packaging Name of the binary
 BEAT_DESCRIPTION?=Sends events to Elasticsearch or Logstash ## @packaging Description of the application
 BEAT_PATH?=github.com/elastic/beats/${BEAT_BINARY_NAME}
 BEAT_PACKAGE_NAME?=${BEAT_BINARY_NAME}
