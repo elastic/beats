@@ -30,11 +30,9 @@ type directEventLoop struct {
 type bufferingEventLoop struct {
 	broker *Broker
 
-	buf                 *batchBuffer
-	flushedBuffers      *batchBuffer
-	flushTail           *batchBuffer
-	flushedbuffersCount int
-	eventCount          int
+	buf        *batchBuffer
+	flushList  flushList
+	eventCount int
 
 	minEvents    int
 	maxEvents    int
@@ -54,6 +52,12 @@ type bufferingEventLoop struct {
 	// buffer flush timer state
 	timer *time.Timer
 	idleC <-chan time.Time
+}
+
+type flushList struct {
+	head  *batchBuffer
+	tail  *batchBuffer
+	count int
 }
 
 func newDirectEventLoop(b *Broker, size int) *directEventLoop {
@@ -315,7 +319,9 @@ func (l *bufferingEventLoop) run() {
 		case <-l.idleC:
 			l.idleC = nil
 			l.timer.Stop()
-			l.flushBuffer()
+			if l.buf.length() > 0 {
+				l.flushBuffer()
+			}
 		}
 	}
 }
@@ -332,6 +338,7 @@ func (l *bufferingEventLoop) handleInsert(req *pushRequest) {
 			if L < l.minEvents {
 				l.startFlushTimer()
 			} else {
+				l.stopFlushTimer()
 				l.flushBuffer()
 				l.buf = newBatchBuffer(l.minEvents)
 			}
@@ -366,7 +373,7 @@ func (l *bufferingEventLoop) handleCancel(req *producerCancelRequest) {
 	removed := 0
 	if st := req.state; st != nil {
 		// remove from actively flushed buffers
-		for buf := l.flushedBuffers; buf != nil; buf = buf.next {
+		for buf := l.flushList.head; buf != nil; buf = buf.next {
 			removed += buf.cancel(st)
 		}
 		if !l.buf.flushed {
@@ -380,9 +387,20 @@ func (l *bufferingEventLoop) handleCancel(req *producerCancelRequest) {
 		req.resp <- producerCancelResponse{removed: removed}
 	}
 
-	// TODO: re-enable pushRequest if buffer can take new events
-	//       disable get request if buffer is too small
-	//       -> restart timer
+	// remove flushed but empty buffers:
+	tmpList := flushList{}
+	for l.flushList.head != nil {
+		b := l.flushList.head
+		l.flushList.head = b.next
+
+		if b.length() > 0 {
+			tmpList.add(b)
+		}
+	}
+	l.flushList = tmpList
+	if tmpList.empty() {
+		l.get = nil
+	}
 
 	l.eventCount -= removed
 	if l.eventCount < l.maxEvents {
@@ -391,17 +409,19 @@ func (l *bufferingEventLoop) handleCancel(req *producerCancelRequest) {
 }
 
 func (l *bufferingEventLoop) handleConsumer(req *getRequest) {
-	buf := l.flushedBuffers
+	buf := l.flushList.head
 	if buf == nil {
 		panic("get from non-flushed buffers")
 	}
 
 	count := buf.length()
-	complete := true
+	if count == 0 {
+		panic("empty buffer in flush list")
+	}
+
 	if sz := req.sz; sz > 0 {
 		if sz < count {
 			count = sz
-			complete = false
 		}
 	}
 
@@ -418,11 +438,10 @@ func (l *bufferingEventLoop) handleConsumer(req *getRequest) {
 	l.pendingACKs.append(ackChan)
 	l.schedACKS = l.broker.scheduledACKs
 
-	if complete {
+	buf.events = buf.events[count:]
+	buf.clients = buf.clients[count:]
+	if buf.length() == 0 {
 		l.advanceFlushList()
-	} else {
-		buf.events = buf.events[count:]
-		buf.clients = buf.clients[count:]
 	}
 }
 
@@ -450,32 +469,24 @@ func (l *bufferingEventLoop) stopFlushTimer() {
 }
 
 func (l *bufferingEventLoop) advanceFlushList() {
-	l.flushedbuffersCount--
-	if l.flushedbuffersCount > 0 {
-		l.flushedBuffers = l.flushedBuffers.next
-		return
-	}
+	l.flushList.pop()
+	if l.flushList.count == 0 {
+		l.get = nil
 
-	l.flushedBuffers = nil
-	l.flushTail = nil
-	if l.buf.flushed {
-		l.buf = newBatchBuffer(l.minEvents)
+		if l.buf.flushed {
+			l.buf = newBatchBuffer(l.minEvents)
+		}
 	}
-
-	l.get = nil
 }
 
 func (l *bufferingEventLoop) flushBuffer() {
 	l.buf.flushed = true
-	l.flushedbuffersCount++
-	if l.flushTail == nil {
-		l.flushedBuffers = l.buf
-		l.flushTail = l.buf
-	} else {
-		l.flushTail.next = l.buf
-		l.flushTail = l.buf
+
+	if l.buf.length() == 0 {
+		panic("flushing empty buffer")
 	}
 
+	l.flushList.add(l.buf)
 	l.get = l.broker.requests
 }
 
@@ -521,6 +532,32 @@ func (l *bufferingEventLoop) processACK(lst chanList, N int) {
 			st.state.lastACK = st.seq
 			st.state = nil
 		}
+	}
+}
+
+func (l *flushList) pop() {
+	l.count--
+	if l.count > 0 {
+		l.head = l.head.next
+	} else {
+		l.head = nil
+		l.tail = nil
+	}
+}
+
+func (l *flushList) empty() bool {
+	return l.head == nil
+}
+
+func (l *flushList) add(b *batchBuffer) {
+	l.count++
+	b.next = nil
+	if l.tail == nil {
+		l.head = b
+		l.tail = b
+	} else {
+		l.tail.next = b
+		l.tail = b
 	}
 }
 
