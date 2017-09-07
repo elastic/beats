@@ -2,7 +2,6 @@ package beater
 
 import (
 	"sync"
-	"time"
 
 	"github.com/joeshaw/multierror"
 	"github.com/pkg/errors"
@@ -10,7 +9,6 @@ import (
 	"github.com/elastic/beats/libbeat/beat"
 	"github.com/elastic/beats/libbeat/cfgfile"
 	"github.com/elastic/beats/libbeat/common"
-	"github.com/elastic/beats/libbeat/common/cfgwarn"
 	"github.com/elastic/beats/libbeat/logp"
 	"github.com/elastic/beats/metricbeat/mb"
 	"github.com/elastic/beats/metricbeat/mb/module"
@@ -21,14 +19,11 @@ import (
 
 // Metricbeat implements the Beater interface for metricbeat.
 type Metricbeat struct {
-	done    chan struct{}  // Channel used to initiate shutdown.
-	modules []staticModule // Active list of modules.
-	config  Config
-}
-
-type staticModule struct {
-	connector *module.Connector
-	module    *module.Wrapper
+	done     chan struct{}    // Channel used to initiate shutdown.
+	modules  []cfgfile.Runner // Active list of modules.
+	config   Config
+	reloader *cfgfile.Reloader
+	factory  *module.Factory
 }
 
 // New creates and returns a new Metricbeat instance.
@@ -41,59 +36,45 @@ func New(b *beat.Beat, rawConfig *common.Config) (beat.Beater, error) {
 		return nil, errors.Wrap(err, "error reading configuration file")
 	}
 
-	dynamicCfgEnabled := config.ConfigModules.Enabled()
-	if !dynamicCfgEnabled && len(config.Modules) == 0 {
-		return nil, mb.ErrEmptyConfig
-	}
-
+	factory := module.NewFactory(config.MaxStartDelay, b.Publisher)
 	var errs multierror.Errors
-	var modules []staticModule
+	var modules []cfgfile.Runner
+
+	// Init static modules
 	for _, moduleCfg := range config.Modules {
 		if !moduleCfg.Enabled() {
 			continue
 		}
 
-		failed := false
-
-		err := cfgwarn.CheckRemoved5xSettings(moduleCfg, "filters")
-		if err != nil {
+		if module, err := factory.Create(moduleCfg); err != nil {
 			errs = append(errs, err)
-			failed = true
+		} else {
+			modules = append(modules, module)
 		}
-
-		connector, err := module.NewConnector(b.Publisher, moduleCfg)
-		if err != nil {
-			errs = append(errs, err)
-			failed = true
-		}
-
-		module, err := module.NewWrapper(config.MaxStartDelay, moduleCfg, mb.Registry)
-		if err != nil {
-			errs = append(errs, err)
-			failed = true
-		}
-
-		if failed {
-			continue
-		}
-
-		modules = append(modules, staticModule{
-			connector: connector,
-			module:    module,
-		})
 	}
+
+	// Init config reloader
+	reloader, err := cfgfile.NewReloader(config.ConfigModules, factory)
+	if err != nil {
+		errs = append(errs, err)
+	}
+	modules = append(modules, reloader.Runners()...)
 
 	if err := errs.Err(); err != nil {
 		return nil, err
 	}
-	if len(modules) == 0 && !dynamicCfgEnabled {
-		return nil, mb.ErrAllModulesDisabled
-	}
 
+	if !reloader.ReloadEnabled() {
+		if len(modules) == 0 {
+			return nil, mb.ErrEmptyConfig
+		}
+	}
 	mb := &Metricbeat{
-		done:    make(chan struct{}),
-		modules: modules,
-		config:  config,
+		done:     make(chan struct{}),
+		modules:  modules,
+		config:   config,
+		factory:  factory,
+		reloader: reloader,
 	}
 	return mb, nil
 }
@@ -106,38 +87,25 @@ func New(b *beat.Beat, rawConfig *common.Config) (beat.Beater, error) {
 func (bt *Metricbeat) Run(b *beat.Beat) error {
 	var wg sync.WaitGroup
 
-	for _, m := range bt.modules {
-		client, err := m.connector.Connect()
-		if err != nil {
-			return err
-		}
-
-		r := module.NewRunner(client, m.module)
-		r.Start()
+	for _, module := range bt.modules {
+		runner := module
+		runner.Start()
 		wg.Add(1)
 		go func() {
 			defer wg.Done()
 			<-bt.done
-			r.Stop()
+			runner.Stop()
 		}()
 	}
 
-	if bt.config.ConfigModules.Enabled() {
-		moduleReloader := cfgfile.NewReloader(bt.config.ConfigModules)
-		factory := module.NewFactory(bt.config.MaxStartDelay, b.Publisher)
-
-		if err := moduleReloader.Check(factory); err != nil {
-			return err
-		}
-
-		go moduleReloader.Run(factory)
-		wg.Add(1)
-		go func() {
-			defer wg.Done()
-			<-bt.done
-			moduleReloader.Stop()
-		}()
-	}
+	// Run config reloader
+	go bt.reloader.Run()
+	wg.Add(1)
+	go func() {
+		defer wg.Done()
+		<-bt.done
+		bt.reloader.Stop()
+	}()
 
 	wg.Wait()
 	return nil
@@ -157,32 +125,7 @@ func (bt *Metricbeat) Stop() {
 func (bt *Metricbeat) Modules() ([]*module.Wrapper, error) {
 	var modules []*module.Wrapper
 	for _, m := range bt.modules {
-		modules = append(modules, m.module)
-	}
-
-	// Add dynamic modules
-	if bt.config.ConfigModules.Enabled() {
-		config := cfgfile.DefaultDynamicConfig
-		bt.config.ConfigModules.Unpack(&config)
-
-		modulesManager, err := cfgfile.NewGlobManager(config.Path, ".yml", ".disabled")
-		if err != nil {
-			return nil, errors.Wrap(err, "initialization error")
-		}
-
-		for _, file := range modulesManager.ListEnabled() {
-			confs, err := cfgfile.LoadList(file.Path)
-			if err != nil {
-				return nil, errors.Wrap(err, "error loading config files")
-			}
-			for _, conf := range confs {
-				m, err := module.NewWrapper(time.Duration(0), conf, mb.Registry)
-				if err != nil {
-					return nil, errors.Wrap(err, "module initialization error")
-				}
-				modules = append(modules, m)
-			}
-		}
+		modules = append(modules, m.(module.Runner).Module())
 	}
 
 	return modules, nil

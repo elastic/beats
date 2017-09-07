@@ -113,13 +113,8 @@ func ExampleRunner() {
 		return
 	}
 
-	client, err := connector.Connect()
-	if err != nil {
-		return
-	}
-
 	// Create the Runner facade.
-	runner := module.NewRunner(client, m)
+	runner := module.NewRunner(connector, m)
 
 	// Start the module and have it publish to a new publisher.Client.
 	runner.Start()

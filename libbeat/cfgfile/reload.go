@@ -6,7 +6,6 @@ import (
 	"time"
 
 	"github.com/joeshaw/multierror"
-	"github.com/pkg/errors"
 
 	"github.com/elastic/beats/libbeat/common"
 	"github.com/elastic/beats/libbeat/logp"
@@ -55,15 +54,22 @@ type Runner interface {
 
 // Reloader is used to register and reload modules
 type Reloader struct {
-	registry *Registry
-	config   DynamicConfig
-	path     string
-	done     chan struct{}
-	wg       sync.WaitGroup
+	registry      *Registry
+	config        DynamicConfig
+	runnerFactory RunnerFactory
+	path          string
+	done          chan struct{}
+	wg            sync.WaitGroup
+	watcher       *GlobWatcher
 }
 
 // NewReloader creates new Reloader instance for the given config
-func NewReloader(cfg *common.Config) *Reloader {
+func NewReloader(cfg *common.Config, runnerFactory RunnerFactory) (*Reloader, error) {
+	if !cfg.Enabled() {
+		// Return nil reloader if it's not enabled, it will do nothing and return no errors
+		return nil, nil
+	}
+
 	config := DefaultDynamicConfig
 	cfg.Unpack(&config)
 
@@ -72,53 +78,54 @@ func NewReloader(cfg *common.Config) *Reloader {
 		path = paths.Resolve(paths.Config, path)
 	}
 
-	return &Reloader{
-		registry: NewRegistry(),
-		config:   config,
-		path:     path,
-		done:     make(chan struct{}),
+	reloader := Reloader{
+		registry:      NewRegistry(),
+		config:        config,
+		runnerFactory: runnerFactory,
+		path:          path,
+		done:          make(chan struct{}),
+		watcher:       NewGlobWatcher(path),
 	}
+
+	// Scan for current configs and fill regisry
+	startRunners, _, _, err := reloader.scan(false)
+	for _, r := range startRunners {
+		reloader.registry.Add(r.ID(), r)
+	}
+
+	// Ignore errors if reload is enabled, they may be solved by the user later on
+	if err != nil && !config.Reload.Enabled {
+		return nil, err
+	}
+
+	return &reloader, nil
 }
 
-// Check configs are valid (only if reload is disabled)
-func (rl *Reloader) Check(runnerFactory RunnerFactory) error {
-	// If config reload is enabled we ignore errors (as they may be fixed afterwards)
-	if rl.config.Reload.Enabled {
+func (rl *Reloader) Runners() []Runner {
+	if rl == nil {
 		return nil
 	}
 
-	debugf("Checking module configs from: %s", rl.path)
-	gw := NewGlobWatcher(rl.path)
-
-	files, _, err := gw.Scan()
-	if err != nil {
-		return errors.Wrap(err, "fetching config files")
+	var runners []Runner
+	for _, runner := range rl.registry.List {
+		runners = append(runners, runner)
 	}
+	return runners
+}
 
-	// Load all config objects
-	configs, err := rl.loadConfigs(files)
-	if err != nil {
-		return err
+func (rl *Reloader) ReloadEnabled() bool {
+	if rl == nil {
+		return false
 	}
-
-	debugf("Number of module configs found: %v", len(configs))
-
-	// Initialize modules
-	for _, c := range configs {
-		// Only add configs to startList which are enabled
-		if !c.Enabled() {
-			continue
-		}
-		_, err := runnerFactory.Create(c)
-		if err != nil {
-			return err
-		}
-	}
-	return nil
+	return rl.config.Reload.Enabled
 }
 
 // Run runs the reloader
-func (rl *Reloader) Run(runnerFactory RunnerFactory) {
+func (rl *Reloader) Run() {
+	if rl == nil {
+		return
+	}
+
 	logp.Info("Config reloader started")
 
 	rl.wg.Add(1)
@@ -127,79 +134,26 @@ func (rl *Reloader) Run(runnerFactory RunnerFactory) {
 	// Stop all running modules when method finishes
 	defer rl.stopRunners(rl.registry.CopyList())
 
-	gw := NewGlobWatcher(rl.path)
+	// Start all runners in the registry
+	rl.startRunners(rl.registry.List)
 
-	// If reloading is disable, config files should be loaded immidiately
+	// If reloading is disabled we are done
 	if !rl.config.Reload.Enabled {
-		rl.config.Reload.Period = 0
+		<-rl.done
+		return
 	}
 
+	// Manage reloading:
+	var startList, stopList map[uint64]Runner
 	overwriteUpate := true
-
 	for {
 		select {
 		case <-rl.done:
 			logp.Info("Dynamic config reloader stopped")
 			return
+
 		case <-time.After(rl.config.Reload.Period):
-
-			debugf("Scan for new config files")
-			configReloads.Add(1)
-
-			files, updated, err := gw.Scan()
-			if err != nil {
-				// In most cases of error, updated == false, so will continue
-				// to next iteration below
-				logp.Err("Error fetching new config files: %v", err)
-			}
-
-			// no file changes
-			if !updated && !overwriteUpate {
-				overwriteUpate = false
-				continue
-			}
-
-			// Load all config objects
-			configs, _ := rl.loadConfigs(files)
-
-			debugf("Number of module configs found: %v", len(configs))
-
-			startList := map[uint64]Runner{}
-			stopList := rl.registry.CopyList()
-
-			for _, c := range configs {
-
-				// Only add configs to startList which are enabled
-				if !c.Enabled() {
-					continue
-				}
-
-				runner, err := runnerFactory.Create(c)
-				if err != nil {
-					// Make sure the next run also updates because some runners were not properly loaded
-					overwriteUpate = true
-
-					// In case prospector already is running, do not stop it
-					if runner != nil && rl.registry.Has(runner.ID()) {
-						debugf("Remove module from stoplist: %v", runner.ID())
-						delete(stopList, runner.ID())
-					} else {
-						logp.Err("Error creating module: %s", err)
-					}
-					continue
-				}
-
-				debugf("Remove module from stoplist: %v", runner.ID())
-				delete(stopList, runner.ID())
-
-				// As module already exist, it must be removed from the stop list and not started
-				if !rl.registry.Has(runner.ID()) {
-					debugf("Add module to startlist: %v", runner.ID())
-					startList[runner.ID()] = runner
-					continue
-				}
-			}
-
+			startList, stopList, overwriteUpate, _ = rl.scan(overwriteUpate)
 			rl.stopRunners(stopList)
 			rl.startRunners(startList)
 		}
@@ -214,6 +168,65 @@ func (rl *Reloader) Run(runnerFactory RunnerFactory) {
 			}
 		}
 	}
+}
+
+func (rl *Reloader) scan(overwriteUpdate bool) (map[uint64]Runner, map[uint64]Runner, bool, error) {
+	debugf("Scan for new config files")
+	configReloads.Add(1)
+
+	files, updated, err := rl.watcher.Scan()
+	if err != nil {
+		return nil, nil, false, err
+	}
+
+	// no file changes
+	if !updated && !overwriteUpdate {
+		return nil, nil, false, nil
+	}
+
+	// Load all config objects
+	configs, _ := rl.loadConfigs(files)
+
+	debugf("Number of module configs found: %v", len(configs))
+
+	startList := map[uint64]Runner{}
+	stopList := rl.registry.CopyList()
+	errs := multierror.Errors{}
+
+	for _, c := range configs {
+		// Only add configs to startList which are enabled
+		if !c.Enabled() {
+			continue
+		}
+
+		runner, err := rl.runnerFactory.Create(c)
+		if err != nil {
+			// Make sure the next run also updates because some runners were not properly loaded
+			overwriteUpdate = true
+			errs = append(errs, err)
+
+			// In case prospector already is running, do not stop it
+			if runner != nil && rl.registry.Has(runner.ID()) {
+				debugf("Remove module from stoplist: %v", runner.ID())
+				delete(stopList, runner.ID())
+			} else {
+				logp.Err("Error creating module: %s", err)
+			}
+			continue
+		}
+
+		debugf("Remove module from stoplist: %v", runner.ID())
+		delete(stopList, runner.ID())
+
+		// As module already exist, it must be removed from the stop list and not started
+		if !rl.registry.Has(runner.ID()) {
+			debugf("Add module to startlist: %v", runner.ID())
+			startList[runner.ID()] = runner
+			continue
+		}
+	}
+
+	return startList, stopList, overwriteUpdate, errs.Err()
 }
 
 func (rl *Reloader) loadConfigs(files []string) ([]*common.Config, error) {
@@ -236,6 +249,10 @@ func (rl *Reloader) loadConfigs(files []string) ([]*common.Config, error) {
 
 // Stop stops the reloader and waits for all modules to properly stop
 func (rl *Reloader) Stop() {
+	if rl == nil {
+		return
+	}
+
 	close(rl.done)
 	rl.wg.Wait()
 }

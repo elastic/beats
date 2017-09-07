@@ -15,11 +15,7 @@ var debugf = logp.MakeDebug("mb")
 
 var (
 	// ErrEmptyConfig indicates that modules configuration list is nil or empty.
-	ErrEmptyConfig = errors.New("one or more modules must be configured")
-
-	// ErrAllModulesDisabled indicates that all modules are disabled. At least
-	// one module must be enabled.
-	ErrAllModulesDisabled = errors.New("all modules are disabled")
+	ErrEmptyConfig = errors.New("one or more modules must be enabled")
 
 	// ErrModuleDisabled indicates a disabled module has been tried to instantiate.
 	ErrModuleDisabled = errors.New("disabled module")
