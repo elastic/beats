@@ -7,10 +7,10 @@ import (
 	"math"
 	"time"
 
+	"github.com/elastic/beats/libbeat/beat"
 	"github.com/elastic/beats/libbeat/common"
 	"github.com/elastic/beats/libbeat/logp"
 	"github.com/elastic/beats/libbeat/monitoring"
-	"github.com/elastic/beats/libbeat/publisher/beat"
 
 	"github.com/elastic/beats/packetbeat/protos"
 	"github.com/elastic/beats/packetbeat/protos/applayer"
@@ -320,7 +320,6 @@ func checkResponseComplete(msg *message) bool {
 }
 
 func newTransaction(requ, resp *message) *transaction {
-
 	if requ == nil && resp == nil {
 		return nil
 	}

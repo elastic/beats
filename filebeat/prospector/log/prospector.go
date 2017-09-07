@@ -12,6 +12,7 @@ import (
 	"github.com/elastic/beats/filebeat/channel"
 	"github.com/elastic/beats/filebeat/harvester"
 	"github.com/elastic/beats/filebeat/input/file"
+	"github.com/elastic/beats/filebeat/prospector"
 	"github.com/elastic/beats/filebeat/util"
 	"github.com/elastic/beats/libbeat/common"
 	"github.com/elastic/beats/libbeat/logp"
@@ -28,6 +29,13 @@ var (
 	harvesterSkipped = monitoring.NewInt(nil, "filebeat.harvester.skipped")
 )
 
+func init() {
+	err := prospector.Register("log", NewProspector)
+	if err != nil {
+		panic(err)
+	}
+}
+
 // Prospector contains the prospector and its config
 type Prospector struct {
 	cfg         *common.Config
@@ -42,10 +50,9 @@ type Prospector struct {
 // NewProspector instantiates a new Log
 func NewProspector(
 	cfg *common.Config,
-	states []file.State,
-	outlet channel.OutleterFactory,
-	done, beatDone chan struct{},
-) (*Prospector, error) {
+	outlet channel.Factory,
+	context prospector.Context,
+) (prospector.Prospectorer, error) {
 
 	// Note: underlying output.
 	//  The prospector and harvester do have different requirements
@@ -61,7 +68,7 @@ func NewProspector(
 	// stateOut will only be unblocked if the beat is shut down.
 	// otherwise it can block on a full publisher pipeline, so state updates
 	// can be forwarded correctly to the registrar.
-	stateOut := channel.CloseOnSignal(channel.SubOutlet(out), beatDone)
+	stateOut := channel.CloseOnSignal(channel.SubOutlet(out), context.BeatDone)
 
 	p := &Prospector{
 		config:      defaultConfig,
@@ -70,7 +77,7 @@ func NewProspector(
 		outlet:      out,
 		stateOutlet: stateOut,
 		states:      &file.States{},
-		done:        done,
+		done:        context.Done,
 	}
 
 	if err := cfg.Unpack(&p.config); err != nil {
@@ -92,7 +99,7 @@ func NewProspector(
 		return nil, fmt.Errorf("each prospector must have at least one path defined")
 	}
 
-	err = p.loadStates(states)
+	err = p.loadStates(context.States)
 	if err != nil {
 		return nil, err
 	}
@@ -182,7 +189,6 @@ func (p *Prospector) Run() {
 }
 
 func (p *Prospector) removeState(state file.State) {
-
 	// Only clean up files where state is Finished
 	if !state.Finished {
 		logp.Debug("prospector", "State for file not removed because harvester not finished: %s", state.Source)
@@ -194,13 +200,11 @@ func (p *Prospector) removeState(state file.State) {
 	if err != nil {
 		logp.Err("File cleanup state update error: %s", err)
 	}
-
 }
 
 // getFiles returns all files which have to be harvested
 // All globs are expanded and then directory and excluded files are removed
 func (p *Prospector) getFiles() map[string]os.FileInfo {
-
 	paths := map[string]os.FileInfo{}
 
 	for _, path := range p.config.Paths {
@@ -265,7 +269,6 @@ func (p *Prospector) getFiles() map[string]os.FileInfo {
 
 // matchesFile returns true in case the given filePath is part of this prospector, means matches its glob patterns
 func (p *Prospector) matchesFile(filePath string) bool {
-
 	// Path is cleaned to ensure we always compare clean paths
 	filePath = filepath.Clean(filePath)
 
@@ -295,7 +298,6 @@ type FileSortInfo struct {
 }
 
 func getSortInfos(paths map[string]os.FileInfo) []FileSortInfo {
-
 	sortInfos := make([]FileSortInfo, 0, len(paths))
 	for path, info := range paths {
 		sortInfo := FileSortInfo{info: info, path: path}
@@ -368,7 +370,6 @@ func getKeys(paths map[string]os.FileInfo) []string {
 
 // Scan starts a scanGlob for each provided path/glob
 func (p *Prospector) scan() {
-
 	var sortInfos []FileSortInfo
 	var files []string
 
@@ -439,7 +440,6 @@ func (p *Prospector) scan() {
 
 // harvestExistingFile continues harvesting a file with a known state if needed
 func (p *Prospector) harvestExistingFile(newState file.State, oldState file.State) {
-
 	logp.Debug("prospector", "Update existing file for harvesting: %s, offset: %v", newState.Source, oldState.Offset)
 
 	// No harvester is running for the file, start a new harvester
@@ -539,7 +539,6 @@ func (p *Prospector) isFileExcluded(file string) bool {
 
 // isIgnoreOlder checks if the given state reached ignore_older
 func (p *Prospector) isIgnoreOlder(state file.State) bool {
-
 	// ignore_older is disable
 	if p.config.IgnoreOlder == 0 {
 		return false
@@ -555,7 +554,6 @@ func (p *Prospector) isIgnoreOlder(state file.State) bool {
 
 // isCleanInactive checks if the given state false under clean_inactive
 func (p *Prospector) isCleanInactive(state file.State) bool {
-
 	// clean_inactive is disable
 	if p.config.CleanInactive <= 0 {
 		return false
@@ -571,7 +569,6 @@ func (p *Prospector) isCleanInactive(state file.State) bool {
 
 // createHarvester creates a new harvester instance from the given state
 func (p *Prospector) createHarvester(state file.State) (*Harvester, error) {
-
 	// Each wraps the outlet, for closing the outlet individualy
 	outlet := channel.SubOutlet(p.outlet)
 	h, err := NewHarvester(
@@ -590,7 +587,6 @@ func (p *Prospector) createHarvester(state file.State) (*Harvester, error) {
 // startHarvester starts a new harvester with the given offset
 // In case the HarvesterLimit is reached, an error is returned
 func (p *Prospector) startHarvester(state file.State, offset int64) error {
-
 	if p.config.HarvesterLimit > 0 && p.harvesters.Len() >= p.config.HarvesterLimit {
 		harvesterSkipped.Add(1)
 		return fmt.Errorf("Harvester limit reached")
@@ -651,7 +647,6 @@ func (p *Prospector) Wait() {
 
 // Stop stops all harvesters and then stops the prospector
 func (p *Prospector) Stop() {
-
 	// Stop all harvesters
 	// In case the beatDone channel is closed, this will not wait for completion
 	// Otherwise Stop will wait until output is complete

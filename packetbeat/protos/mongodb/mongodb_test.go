@@ -7,11 +7,12 @@ import (
 	"net"
 	"testing"
 
+	"github.com/stretchr/testify/assert"
+
+	"github.com/elastic/beats/libbeat/beat"
 	"github.com/elastic/beats/libbeat/common"
 	"github.com/elastic/beats/libbeat/logp"
-	"github.com/elastic/beats/libbeat/publisher/beat"
 	"github.com/elastic/beats/packetbeat/protos"
-	"github.com/stretchr/testify/assert"
 )
 
 type eventStore struct {
@@ -261,7 +262,6 @@ func TestReconstructQuery(t *testing.T) {
 
 // max_docs option should be respected
 func TestMaxDocs(t *testing.T) {
-
 	if testing.Verbose() {
 		logp.LogInit(logp.LOG_DEBUG, "", false, true, []string{"mongodb", "mongodbdetailed"})
 	}

@@ -7,7 +7,7 @@ import (
 	"strings"
 
 	"github.com/elastic/beats/libbeat/common"
-	"github.com/elastic/beats/libbeat/logp"
+	"github.com/elastic/beats/libbeat/common/cfgwarn"
 	"github.com/elastic/beats/metricbeat/helper"
 	"github.com/elastic/beats/metricbeat/mb"
 	"github.com/elastic/beats/metricbeat/mb/parse"
@@ -55,7 +55,7 @@ type MetricSet struct {
 // Part of new is also setting up the configuration by processing additional
 // configuration entries if needed.
 func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
-	logp.Beta("The http json metricset is in beta.")
+	cfgwarn.Beta("The http json metricset is in beta.")
 
 	config := struct {
 		Namespace       string `config:"namespace" validate:"required"`
@@ -93,7 +93,6 @@ func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
 // It returns the event which is then forward to the output. In case of an error, a
 // descriptive error must be returned.
 func (m *MetricSet) Fetch() (common.MapStr, error) {
-
 	response, err := m.http.FetchResponse()
 	if err != nil {
 		return nil, err
@@ -140,7 +139,6 @@ func (m *MetricSet) Fetch() (common.MapStr, error) {
 }
 
 func (m *MetricSet) getHeaders(header http.Header) map[string]string {
-
 	headers := make(map[string]string)
 	for k, v := range header {
 		value := ""

@@ -324,6 +324,19 @@ heartbeat.scheduler:
 #processors:
 #- add_docker_metadata: ~
 
+#============================= Elastic Cloud ==================================
+
+# These settings simplify using heartbeat with the Elastic Cloud (https://cloud.elastic.co/).
+
+# The cloud.id setting overwrites the `output.elasticsearch.hosts` and
+# `setup.kibana.host` options.
+# You can find the `cloud.id` in the Elastic Cloud web UI.
+#cloud.id:
+
+# The cloud.auth setting overwrites the `output.elasticsearch.username` and
+# `output.elasticsearch.password` settings. The format is `<user>:<pass>`.
+#cloud.auth:
+
 #================================ Outputs ======================================
 
 # Configure what outputs to use when sending the data collected by the beat.
@@ -358,6 +371,7 @@ output.elasticsearch:
 
   # Optional index name. The default is "heartbeat" plus date
   # and generates [heartbeat-]YYYY.MM.DD keys.
+  # In case you modify this pattern you must update setup.template.name and setup.template.pattern accordingly.
   #index: "heartbeat-%{[beat.version]}-%{+yyyy.MM.dd}"
 
   # Optional ingest node pipeline. By default no pipeline will be used.
@@ -384,11 +398,6 @@ output.elasticsearch:
 
   # Configure http request timeout before failing an request to Elasticsearch.
   #timeout: 90
-
-  # The number of seconds to wait for new events between two bulk API index requests.
-  # If `bulk_max_size` is reached before this interval expires, addition bulk index
-  # requests are made.
-  #flush_interval: 1s
 
   # Use SSL settings for HTTPS. Default is true.
   #ssl.enabled: true
@@ -450,6 +459,11 @@ output.elasticsearch:
   # Number of batches to be sent asynchronously to logstash while processing
   # new batches.
   #pipelining: 5
+
+  # If enabled only a subset of events in a batch of events is transfered per
+  # transaction.  The number of events to sent increases up to `bulk_max_size`
+  # if no error is encountered.
+  #slow_start: false
 
   # Optional index name. The default index name is set to name of the beat
   # in all lowercase.
@@ -588,9 +602,6 @@ output.elasticsearch:
   # If set to 0, no ACKs are returned by Kafka. Messages might be lost silently
   # on error.
   #required_acks: 1
-
-  # The number of seconds to wait for new events between two producer API calls.
-  #flush_interval: 1s
 
   # The configurable ClientID used for logging, debugging, and auditing
   # purposes.  The default is "beats".
@@ -826,16 +837,35 @@ output.elasticsearch:
 # Set to false to disable template loading.
 #setup.template.enabled: true
 
-# Template name. By default the template name is heartbeat.
-# The version of the beat will always be appended to the given name
-# so the final name is heartbeat-%{[beat.version]}.
-#setup.template.name: "heartbeat"
+# Template name. By default the template name is "heartbeat-%{[beat.version]}"
+# The template name and pattern has to be set in case the elasticsearch index pattern is modified.
+#setup.template.name: "heartbeat-%{[beat.version]}"
+
+# Template patttern. By default the template pattern is "-%{[beat.version]}-*" to apply to the default index settings.
+# The first part is the version of the beat and then -* is used to match all daily indicies.
+# The template name and pattern has to be set in case the elasticsearch index pattern is modified.
+#setup.template.pattern: "heartbeat-%{[beat.version]}-*"
 
 # Path to fields.yml file to generate the template
 #setup.template.fields: "${path.config}/fields.yml"
 
 # Overwrite existing template
 #setup.template.overwrite: false
+
+# Elasticsearch template settings
+setup.template.settings:
+
+  # A dictionary of settings to place into the settings.index dictionary
+  # of the Elasticsearch template. For more details, please check
+  # https://www.elastic.co/guide/en/elasticsearch/reference/current/mapping.html
+  #index:
+    #number_of_shards: 1
+    #codec: best_compression
+
+  # A dictionary of settings for the _source field. For more details, please check
+  # https://www.elastic.co/guide/en/elasticsearch/reference/current/mapping-source-field.html
+  #_source:
+    #enabled: false
 
 #============================== Kibana =====================================
 

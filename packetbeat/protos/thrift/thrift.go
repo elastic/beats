@@ -10,10 +10,10 @@ import (
 	"time"
 	"unicode/utf8"
 
+	"github.com/elastic/beats/libbeat/beat"
 	"github.com/elastic/beats/libbeat/common"
 	"github.com/elastic/beats/libbeat/logp"
 	"github.com/elastic/beats/libbeat/monitoring"
-	"github.com/elastic/beats/libbeat/publisher/beat"
 
 	"github.com/elastic/beats/packetbeat/procs"
 	"github.com/elastic/beats/packetbeat/protos"
@@ -584,7 +584,6 @@ func (thrift *thriftPlugin) readMap(data []byte) (value string, ok bool, complet
 }
 
 func (thrift *thriftPlugin) readStruct(data []byte) (value string, ok bool, complete bool, off int) {
-
 	var bytesRead int
 	offset := 0
 	fields := []thriftField{}
@@ -685,7 +684,6 @@ func (thrift *thriftPlugin) funcReadersByType(typ byte) (fn thriftFieldReader, e
 }
 
 func (thrift *thriftPlugin) readField(s *thriftStream) (ok bool, complete bool, field *thriftField) {
-
 	var off int
 
 	field = new(thriftField)
@@ -1004,7 +1002,6 @@ func (thrift *thriftPlugin) receivedRequest(msg *thriftMessage) {
 }
 
 func (thrift *thriftPlugin) receivedReply(msg *thriftMessage) {
-
 	// we need to search the request first.
 	tuple := msg.tcpTuple
 

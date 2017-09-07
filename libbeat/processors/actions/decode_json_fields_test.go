@@ -3,10 +3,11 @@ package actions
 import (
 	"testing"
 
+	"github.com/stretchr/testify/assert"
+
+	"github.com/elastic/beats/libbeat/beat"
 	"github.com/elastic/beats/libbeat/common"
 	"github.com/elastic/beats/libbeat/logp"
-	"github.com/elastic/beats/libbeat/publisher/beat"
-	"github.com/stretchr/testify/assert"
 )
 
 var fields = [1]string{"msg"}
@@ -43,7 +44,6 @@ func TestFieldNotString(t *testing.T) {
 	}
 
 	assert.Equal(t, expected.String(), actual.String())
-
 }
 
 func TestInvalidJSON(t *testing.T) {
@@ -59,7 +59,6 @@ func TestInvalidJSON(t *testing.T) {
 		"pipeline": "us1",
 	}
 	assert.Equal(t, expected.String(), actual.String())
-
 }
 
 func TestInvalidJSONMultiple(t *testing.T) {
@@ -75,7 +74,6 @@ func TestInvalidJSONMultiple(t *testing.T) {
 		"pipeline": "us1",
 	}
 	assert.Equal(t, expected.String(), actual.String())
-
 }
 
 func TestValidJSONDepthOne(t *testing.T) {
@@ -96,7 +94,6 @@ func TestValidJSONDepthOne(t *testing.T) {
 	}
 
 	assert.Equal(t, expected.String(), actual.String())
-
 }
 
 func TestValidJSONDepthTwo(t *testing.T) {
@@ -125,7 +122,6 @@ func TestValidJSONDepthTwo(t *testing.T) {
 	}
 
 	assert.Equal(t, expected.String(), actual.String())
-
 }
 
 func TestTargetOption(t *testing.T) {

@@ -6,9 +6,10 @@ import (
 	"crypto/tls"
 	"testing"
 
+	"github.com/stretchr/testify/assert"
+
 	"github.com/elastic/beats/libbeat/common"
 	"github.com/elastic/beats/libbeat/outputs/transport"
-	"github.com/stretchr/testify/assert"
 )
 
 // test TLS config loading

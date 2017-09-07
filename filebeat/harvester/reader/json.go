@@ -6,10 +6,10 @@ import (
 	"fmt"
 	"time"
 
+	"github.com/elastic/beats/libbeat/beat"
 	"github.com/elastic/beats/libbeat/common"
 	"github.com/elastic/beats/libbeat/common/jsontransform"
 	"github.com/elastic/beats/libbeat/logp"
-	"github.com/elastic/beats/libbeat/publisher/beat"
 )
 
 type JSON struct {
@@ -94,7 +94,6 @@ func createJSONError(message string) common.MapStr {
 // If MessageKey is defined, the Text value from the event always
 // takes precedence.
 func MergeJSONFields(data common.MapStr, jsonFields common.MapStr, text *string, config JSONConfig) {
-
 	// The message key might have been modified by multiline
 	if len(config.MessageKey) > 0 && text != nil {
 		jsonFields[config.MessageKey] = *text

@@ -4,16 +4,19 @@ import (
 	"crypto/md5"
 	"crypto/sha1"
 	"crypto/sha256"
+	"crypto/sha512"
 	"encoding/hex"
 	"fmt"
+	"hash"
 	"io"
 	"os"
 	"runtime"
 	"strconv"
 	"time"
 
-	"github.com/elastic/beats/libbeat/common"
 	"github.com/pkg/errors"
+
+	"github.com/elastic/beats/libbeat/common"
 )
 
 // Action is a description of the change that occurred.
@@ -46,15 +49,12 @@ var actionNames = map[Action]string{
 
 // Event describe the filesystem change and includes metadata about the file.
 type Event struct {
-	Timestamp  time.Time // Time of event.
-	Path       string    // The path associated with the event.
-	TargetPath string    // Target path for symlinks.
-	Action     string    // Action (like created, updated).
-	Info       *Metadata // File metadata (if the file exists).
-	Hashed     bool      // True if hashed.
-	MD5        string
-	SHA1       string
-	SHA256     string
+	Timestamp  time.Time         // Time of event.
+	Path       string            // The path associated with the event.
+	TargetPath string            // Target path for symlinks.
+	Action     string            // Action (like created, updated).
+	Info       *Metadata         // File metadata (if the file exists).
+	Hashes     map[string]string // File hashes.
 
 	errors []error
 }
@@ -80,7 +80,7 @@ func buildMapStr(e *Event) common.MapStr {
 		"@timestamp": e.Timestamp,
 		"path":       e.Path,
 		"action":     e.Action,
-		"hashed":     e.Hashed,
+		"hashed":     len(e.Hashes) > 0,
 	}
 
 	if e.TargetPath != "" {
@@ -117,33 +117,65 @@ func buildMapStr(e *Event) common.MapStr {
 		}
 	}
 
-	if e.Hashed {
-		m["md5"] = e.MD5
-		m["sha1"] = e.SHA1
-		m["sha256"] = e.SHA256
+	for name, hash := range e.Hashes {
+		m[name] = hash
 	}
 
 	return m
 }
 
-func hashFile(name string) (md5sum, sha1sum, sha256sum string, err error) {
+func hashFile(name string, hashType ...string) (map[string]string, error) {
+	if len(hashType) == 0 {
+		return nil, nil
+	}
+
+	var hashes []hash.Hash
+	for _, name := range hashType {
+		switch name {
+		case "md5":
+			hashes = append(hashes, md5.New())
+		case "sha1":
+			hashes = append(hashes, sha1.New())
+		case "sha224":
+			hashes = append(hashes, sha256.New224())
+		case "sha256":
+			hashes = append(hashes, sha256.New())
+		case "sha384":
+			hashes = append(hashes, sha512.New384())
+		case "sha512":
+			hashes = append(hashes, sha512.New())
+		case "sha512_224":
+			hashes = append(hashes, sha512.New512_224())
+		case "sha512_256":
+			hashes = append(hashes, sha512.New512_256())
+		default:
+			return nil, errors.Errorf("unknown hash type '%v'", name)
+		}
+	}
+
 	f, err := os.Open(name)
 	if err != nil {
-		return "", "", "", errors.Wrap(err, "failed to open file for hashing")
+		return nil, errors.Wrap(err, "failed to open file for hashing")
 	}
 	defer f.Close()
 
-	m5 := md5.New()
-	s1 := sha1.New()
-	s256 := sha256.New()
-
-	hashWriter := io.MultiWriter(m5, s1, s256)
+	hashWriter := multiWriter(hashes)
 	if _, err := io.Copy(hashWriter, f); err != nil {
-		return "", "", "", errors.Wrap(err, "failed to calculate file hashes")
+		return nil, errors.Wrap(err, "failed to calculate file hashes")
 	}
 
-	return hex.EncodeToString(m5.Sum(nil)),
-		hex.EncodeToString(s1.Sum(nil)),
-		hex.EncodeToString(s256.Sum(nil)),
-		nil
+	nameToHash := make(map[string]string, len(hashes))
+	for i, h := range hashes {
+		nameToHash[hashType[i]] = hex.EncodeToString(h.Sum(nil))
+	}
+
+	return nameToHash, nil
+}
+
+func multiWriter(hash []hash.Hash) io.Writer {
+	writers := make([]io.Writer, 0, len(hash))
+	for _, h := range hash {
+		writers = append(writers, h)
+	}
+	return io.MultiWriter(writers...)
 }

@@ -1,6 +1,7 @@
 package fileout
 
 import (
+	"github.com/elastic/beats/libbeat/beat"
 	"github.com/elastic/beats/libbeat/common"
 	"github.com/elastic/beats/libbeat/logp"
 	"github.com/elastic/beats/libbeat/outputs"
@@ -13,7 +14,7 @@ func init() {
 }
 
 type fileOutput struct {
-	beat    common.BeatInfo
+	beat    beat.Info
 	stats   *outputs.Stats
 	rotator logp.FileRotator
 	codec   codec.Codec
@@ -21,7 +22,7 @@ type fileOutput struct {
 
 // New instantiates a new file output instance.
 func makeFileout(
-	beat common.BeatInfo,
+	beat beat.Info,
 	stats *outputs.Stats,
 	cfg *common.Config,
 ) (outputs.Group, error) {
@@ -31,7 +32,6 @@ func makeFileout(
 	}
 
 	// disable bulk support in publisher pipeline
-	cfg.SetInt("flush_interval", -1, -1)
 	cfg.SetInt("bulk_max_size", -1, -1)
 
 	fo := &fileOutput{beat: beat, stats: stats}

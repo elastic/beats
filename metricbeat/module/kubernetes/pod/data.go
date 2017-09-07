@@ -45,5 +45,4 @@ func eventMapping(content []byte) ([]common.MapStr, error) {
 		events = append(events, podEvent)
 	}
 	return events, nil
-
 }

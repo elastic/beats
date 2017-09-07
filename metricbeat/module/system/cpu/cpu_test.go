@@ -17,12 +17,12 @@ func TestData(t *testing.T) {
 	}
 	time.Sleep(1 * time.Second)
 
-	event, err := f.Fetch()
+	fields, err := f.Fetch()
 	if err != nil {
 		t.Fatal(err)
 	}
 
-	event = mbtest.CreateFullEvent(f, event)
+	event := mbtest.CreateFullEvent(f, fields)
 	mbtest.WriteEventToDataJSON(t, event)
 }
 

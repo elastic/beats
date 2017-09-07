@@ -13,7 +13,6 @@ import (
 )
 
 func TestGetMappings(t *testing.T) {
-
 	files, err := filepath.Glob("./_meta/test/node.*.json")
 	assert.NoError(t, err)
 
@@ -35,7 +34,6 @@ func TestGetMappings(t *testing.T) {
 }
 
 func TestInvalid(t *testing.T) {
-
 	file := "./_meta/test/invalid.json"
 
 	content, err := ioutil.ReadFile(file)

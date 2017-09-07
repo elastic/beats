@@ -5,6 +5,7 @@ import (
 
 	"github.com/pkg/errors"
 
+	"github.com/elastic/beats/libbeat/common/cfgwarn"
 	"github.com/elastic/beats/libbeat/logp"
 	"github.com/elastic/beats/metricbeat/mb"
 	"github.com/elastic/beats/metricbeat/mb/parse"
@@ -25,15 +26,6 @@ func init() {
 	}
 }
 
-type Config struct {
-	Paths       map[string][]string `config:"file.paths"`
-	MaxFileSize int64               `config:"max_file_size"`
-}
-
-var defaultConfig = Config{
-	MaxFileSize: 1 << 30, // 1 Gibibyte
-}
-
 type EventReader interface {
 	Start(done <-chan struct{}) (<-chan Event, error)
 }
@@ -45,7 +37,7 @@ type MetricSet struct {
 }
 
 func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
-	logp.Experimental("The %v metricset is an experimental feature", metricsetName)
+	cfgwarn.Experimental("The %v metricset is an experimental feature", metricsetName)
 
 	config := defaultConfig
 	if err := base.Module().UnpackConfig(&config); err != nil {

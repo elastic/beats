@@ -1,4 +1,4 @@
-== kubernetes Module
+== Kubernetes module
 
 beta[]
 

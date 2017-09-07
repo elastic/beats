@@ -3,8 +3,9 @@ package cpu
 import (
 	"strings"
 
-	"github.com/elastic/beats/libbeat/logp"
 	"github.com/pkg/errors"
+
+	"github.com/elastic/beats/libbeat/common/cfgwarn"
 )
 
 // CPU metric types.
@@ -23,7 +24,7 @@ type Config struct {
 // Validate validates the cpu config.
 func (c Config) Validate() error {
 	if c.CPUTicks != nil {
-		logp.Deprecate("6.1", "cpu_ticks is deprecated. Add 'ticks' to the cpu.metrics list.")
+		cfgwarn.Deprecate("6.1", "cpu_ticks is deprecated. Add 'ticks' to the cpu.metrics list.")
 	}
 
 	if len(c.Metrics) == 0 {

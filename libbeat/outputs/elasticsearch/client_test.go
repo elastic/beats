@@ -12,13 +12,13 @@ import (
 
 	"github.com/stretchr/testify/assert"
 
+	"github.com/elastic/beats/libbeat/beat"
 	"github.com/elastic/beats/libbeat/common"
 	"github.com/elastic/beats/libbeat/common/fmtstr"
 	"github.com/elastic/beats/libbeat/logp"
 	"github.com/elastic/beats/libbeat/outputs/outest"
 	"github.com/elastic/beats/libbeat/outputs/outil"
 	"github.com/elastic/beats/libbeat/publisher"
-	"github.com/elastic/beats/libbeat/publisher/beat"
 )
 
 func readStatusItem(in []byte) (int, string, error) {
@@ -171,7 +171,6 @@ func TestCollectPipelinePublishFail(t *testing.T) {
 }
 
 func TestGetIndexStandard(t *testing.T) {
-
 	ts := time.Now().UTC()
 	extension := fmt.Sprintf("%d.%02d.%02d", ts.Year(), ts.Month(), ts.Day())
 	fields := common.MapStr{"field": 1}
@@ -186,7 +185,6 @@ func TestGetIndexStandard(t *testing.T) {
 }
 
 func TestGetIndexOverwrite(t *testing.T) {
-
 	time := time.Now().UTC()
 	extension := fmt.Sprintf("%d.%02d.%02d", time.Year(), time.Month(), time.Day())
 

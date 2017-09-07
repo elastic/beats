@@ -4,18 +4,18 @@ import (
 	"sync"
 
 	"github.com/elastic/beats/libbeat/publisher"
-	"github.com/elastic/beats/libbeat/publisher/broker"
+	"github.com/elastic/beats/libbeat/publisher/queue"
 )
 
 type Batch struct {
-	original broker.Batch
+	original queue.Batch
 	ctx      *batchContext
 	ttl      int
 	events   []publisher.Event
 }
 
 type batchContext struct {
-	observer *observer
+	observer outputObserver
 	retryer  *retryer
 }
 
@@ -25,7 +25,7 @@ var batchPool = sync.Pool{
 	},
 }
 
-func newBatch(ctx *batchContext, original broker.Batch, ttl int) *Batch {
+func newBatch(ctx *batchContext, original queue.Batch, ttl int) *Batch {
 	if original == nil {
 		panic("empty batch")
 	}

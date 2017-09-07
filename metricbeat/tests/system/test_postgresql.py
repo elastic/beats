@@ -6,6 +6,8 @@ from nose.plugins.attrib import attr
 
 class Test(metricbeat.BaseTest):
 
+    COMPOSE_SERVICES = ['postgresql']
+
     def common_checks(self, output):
         # Ensure no errors or warnings exist in the log.
         log = self.get_log()

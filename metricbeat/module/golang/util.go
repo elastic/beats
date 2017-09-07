@@ -24,5 +24,4 @@ func GetCmdStr(v interface{}) interface{} {
 		logp.Debug("golang", "unexpected cmdline, %v, %v", t, v)
 		return v
 	}
-
 }

@@ -238,7 +238,6 @@ func (pgsql *pgsqlPlugin) parseCommandComplete(s *pgsqlStream, length int) (bool
 }
 
 func (pgsql *pgsqlPlugin) parseReadyForQuery(s *pgsqlStream, length int) (bool, bool) {
-
 	// ReadyForQuery -> backend ready for a new query cycle
 	m := s.message
 	m.start = s.parseOffset
@@ -319,7 +318,6 @@ func (pgsql *pgsqlPlugin) parseExtResp(s *pgsqlStream, length int) (bool, bool) 
 }
 
 func (pgsql *pgsqlPlugin) parseSkipMessage(s *pgsqlStream, length int) (bool, bool) {
-
 	// TODO: add info from NoticeResponse in case there are warning messages for a query
 	// ignore command
 	s.parseOffset++ //type
@@ -639,7 +637,6 @@ func (pgsql *pgsqlPlugin) parseMessageExtendedQuery(s *pgsqlStream) (bool, bool)
 }
 
 func isSpecialPgsqlCommand(data []byte) (bool, int, int) {
-
 	if len(data) < 8 {
 		// 8 bytes required
 		return false, 0, 0

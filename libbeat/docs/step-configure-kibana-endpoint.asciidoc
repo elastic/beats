@@ -1,0 +1,17 @@
+. If you plan to use the sample Kibana dashboards provided with {beatname_uc},
+configure the Kibana endpoint:
++
+[source,yaml]
+----------------------------------------------------------------------
+setup.kibana:
+  host: "localhost:5601"
+----------------------------------------------------------------------
++
+--
+Where `host` is the hostname and port of the machine where Kibana is running,
+for example, `localhost:5601`.
+
+NOTE: If you specify a path after the port number, you need to include
+the scheme and port: `http://localhost:5601/path`.
+
+--

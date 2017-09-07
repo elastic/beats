@@ -16,21 +16,21 @@ following tips:
 --
 
 [[getting-help]]
-== Getting Help
+== Get help
 
 include::../../libbeat/docs/getting-help.asciidoc[]
 
 //sets block macro for debugging.asciidoc included in next section
 
 [[enable-packetbeat-debugging]]
-== Debugging
+== Debug
 
 include::../../libbeat/docs/debugging.asciidoc[]
 
 //sets block macro for recording-trace content included in next section
 
 [[recording-trace]]
-== Recording a Trace
+== Record a trace
 
 If you are having an issue, it's often useful to record a full network trace
 and send it to us. It will help us reproduce the issue, and we can also add it

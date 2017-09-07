@@ -4,29 +4,29 @@
       "attributes": {
         "description": "",
         "kibanaSavedObjectMeta": {
-          "searchSourceJSON": "{\"filter\":[]}"
+          "searchSourceJSON": "{\n  \"filter\": []\n}"
         },
-        "savedSearchId": "Web-transactions",
+        "savedSearchId": "71908f00-88ca-11e7-ad9c-db80de0bf8d3",
         "title": "Web transactions",
         "uiStateJSON": "{}",
         "version": 1,
-        "visState": "{\"title\":\"Web transactions\",\"type\":\"histogram\",\"params\":{\"shareYAxis\":true,\"addTooltip\":true,\"addLegend\":false,\"mode\":\"stacked\",\"defaultYExtents\":false,\"scale\":\"linear\",\"times\":[],\"addTimeMarker\":false,\"setYExtents\":false,\"yAxis\":{}},\"aggs\":[{\"id\":\"1\",\"type\":\"count\",\"schema\":\"metric\",\"params\":{}},{\"id\":\"2\",\"type\":\"date_histogram\",\"schema\":\"segment\",\"params\":{\"field\":\"@timestamp\",\"interval\":\"auto\",\"customInterval\":\"2h\",\"min_doc_count\":1,\"extended_bounds\":{}}}],\"listeners\":{}}"
+        "visState": "{\n  \"title\": \"Web transactions\",\n  \"type\": \"histogram\",\n  \"params\": {\n    \"shareYAxis\": true,\n    \"addTooltip\": true,\n    \"addLegend\": false,\n    \"mode\": \"stacked\",\n    \"defaultYExtents\": false,\n    \"scale\": \"linear\",\n    \"times\": [],\n    \"addTimeMarker\": false,\n    \"setYExtents\": false,\n    \"yAxis\": {}\n  },\n  \"aggs\": [\n    {\n      \"id\": \"1\",\n      \"type\": \"count\",\n      \"schema\": \"metric\",\n      \"params\": {}\n    },\n    {\n      \"id\": \"2\",\n      \"type\": \"date_histogram\",\n      \"schema\": \"segment\",\n      \"params\": {\n        \"field\": \"@timestamp\",\n        \"interval\": \"auto\",\n        \"customInterval\": \"2h\",\n        \"min_doc_count\": 1,\n        \"extended_bounds\": {}\n      }\n    }\n  ],\n  \"listeners\": {}\n}"
       },
       "id": "Web-transactions",
       "type": "visualization",
-      "version": 4
+      "version": 3
     },
     {
       "attributes": {
         "description": "",
         "kibanaSavedObjectMeta": {
-          "searchSourceJSON": "{\"filter\":[]}"
+          "searchSourceJSON": "{\n  \"filter\": []\n}"
         },
-        "savedSearchId": "DB-transactions",
+        "savedSearchId": "800e2a00-88cb-11e7-ad9c-db80de0bf8d3",
         "title": "DB transactions",
         "uiStateJSON": "{}",
         "version": 1,
-        "visState": "{\"title\":\"DB transactions\",\"type\":\"histogram\",\"params\":{\"shareYAxis\":true,\"addTooltip\":true,\"addLegend\":true,\"mode\":\"stacked\",\"defaultYExtents\":false,\"scale\":\"linear\",\"times\":[],\"addTimeMarker\":false,\"setYExtents\":false,\"yAxis\":{}},\"aggs\":[{\"id\":\"1\",\"type\":\"count\",\"schema\":\"metric\",\"params\":{}},{\"id\":\"2\",\"type\":\"date_histogram\",\"schema\":\"segment\",\"params\":{\"field\":\"@timestamp\",\"interval\":\"auto\",\"customInterval\":\"2h\",\"min_doc_count\":1,\"extended_bounds\":{}}},{\"id\":\"3\",\"type\":\"terms\",\"schema\":\"group\",\"params\":{\"field\":\"type\",\"size\":5,\"order\":\"desc\",\"orderBy\":\"1\"}}],\"listeners\":{}}"
+        "visState": "{\n  \"title\": \"DB transactions\",\n  \"type\": \"histogram\",\n  \"params\": {\n    \"shareYAxis\": true,\n    \"addTooltip\": true,\n    \"addLegend\": true,\n    \"mode\": \"stacked\",\n    \"defaultYExtents\": false,\n    \"scale\": \"linear\",\n    \"times\": [],\n    \"addTimeMarker\": false,\n    \"setYExtents\": false,\n    \"yAxis\": {}\n  },\n  \"aggs\": [\n    {\n      \"id\": \"1\",\n      \"type\": \"count\",\n      \"schema\": \"metric\",\n      \"params\": {}\n    },\n    {\n      \"id\": \"2\",\n      \"type\": \"date_histogram\",\n      \"schema\": \"segment\",\n      \"params\": {\n        \"field\": \"@timestamp\",\n        \"interval\": \"auto\",\n        \"customInterval\": \"2h\",\n        \"min_doc_count\": 1,\n        \"extended_bounds\": {}\n      }\n    },\n    {\n      \"id\": \"3\",\n      \"type\": \"terms\",\n      \"schema\": \"group\",\n      \"params\": {\n        \"field\": \"type\",\n        \"size\": 5,\n        \"order\": \"desc\",\n        \"orderBy\": \"1\"\n      }\n    }\n  ],\n  \"listeners\": {}\n}"
       },
       "id": "DB-transactions",
       "type": "visualization",
@@ -36,13 +36,13 @@
       "attributes": {
         "description": "",
         "kibanaSavedObjectMeta": {
-          "searchSourceJSON": "{\"filter\":[]}"
+          "searchSourceJSON": "{\n  \"filter\": []\n}"
         },
-        "savedSearchId": "Cache-transactions",
+        "savedSearchId": "3dd366e0-88cc-11e7-ad9c-db80de0bf8d3",
         "title": "Cache transactions",
         "uiStateJSON": "{}",
         "version": 1,
-        "visState": "{\"title\":\"Cache transactions\",\"type\":\"histogram\",\"params\":{\"shareYAxis\":true,\"addTooltip\":true,\"addLegend\":false,\"mode\":\"stacked\",\"defaultYExtents\":false,\"scale\":\"linear\",\"times\":[],\"addTimeMarker\":false,\"setYExtents\":false,\"yAxis\":{}},\"aggs\":[{\"id\":\"1\",\"type\":\"count\",\"schema\":\"metric\",\"params\":{}},{\"id\":\"2\",\"type\":\"date_histogram\",\"schema\":\"segment\",\"params\":{\"field\":\"@timestamp\",\"interval\":\"auto\",\"customInterval\":\"2h\",\"min_doc_count\":1,\"extended_bounds\":{}}}],\"listeners\":{}}"
+        "visState": "{\n  \"title\": \"Cache transactions\",\n  \"type\": \"histogram\",\n  \"params\": {\n    \"shareYAxis\": true,\n    \"addTooltip\": true,\n    \"addLegend\": false,\n    \"mode\": \"stacked\",\n    \"defaultYExtents\": false,\n    \"scale\": \"linear\",\n    \"times\": [],\n    \"addTimeMarker\": false,\n    \"setYExtents\": false,\n    \"yAxis\": {}\n  },\n  \"aggs\": [\n    {\n      \"id\": \"1\",\n      \"type\": \"count\",\n      \"schema\": \"metric\",\n      \"params\": {}\n    },\n    {\n      \"id\": \"2\",\n      \"type\": \"date_histogram\",\n      \"schema\": \"segment\",\n      \"params\": {\n        \"field\": \"@timestamp\",\n        \"interval\": \"auto\",\n        \"customInterval\": \"2h\",\n        \"min_doc_count\": 1,\n        \"extended_bounds\": {}\n      }\n    }\n  ],\n  \"listeners\": {}\n}"
       },
       "id": "Cache-transactions",
       "type": "visualization",
@@ -52,13 +52,13 @@
       "attributes": {
         "description": "",
         "kibanaSavedObjectMeta": {
-          "searchSourceJSON": "{\"filter\":[]}"
+          "searchSourceJSON": "{\n  \"filter\": []\n}"
         },
-        "savedSearchId": "RPC-transactions",
+        "savedSearchId": "d3089370-88cc-11e7-ad9c-db80de0bf8d3",
         "title": "RPC transactions",
         "uiStateJSON": "{}",
         "version": 1,
-        "visState": "{\"title\":\"RPC transactions\",\"type\":\"histogram\",\"params\":{\"shareYAxis\":true,\"addTooltip\":true,\"addLegend\":false,\"mode\":\"stacked\",\"defaultYExtents\":false,\"scale\":\"linear\",\"times\":[],\"addTimeMarker\":false,\"setYExtents\":false,\"yAxis\":{}},\"aggs\":[{\"id\":\"1\",\"type\":\"cardinality\",\"schema\":\"metric\",\"params\":{\"field\":\"type\"}},{\"id\":\"2\",\"type\":\"date_histogram\",\"schema\":\"segment\",\"params\":{\"field\":\"@timestamp\",\"interval\":\"auto\",\"customInterval\":\"2h\",\"min_doc_count\":1,\"extended_bounds\":{}}}],\"listeners\":{}}"
+        "visState": "{\n  \"title\": \"RPC transactions\",\n  \"type\": \"histogram\",\n  \"params\": {\n    \"shareYAxis\": true,\n    \"addTooltip\": true,\n    \"addLegend\": false,\n    \"mode\": \"stacked\",\n    \"defaultYExtents\": false,\n    \"scale\": \"linear\",\n    \"times\": [],\n    \"addTimeMarker\": false,\n    \"setYExtents\": false,\n    \"yAxis\": {}\n  },\n  \"aggs\": [\n    {\n      \"id\": \"1\",\n      \"type\": \"cardinality\",\n      \"schema\": \"metric\",\n      \"params\": {\n        \"field\": \"type\"\n      }\n    },\n    {\n      \"id\": \"2\",\n      \"type\": \"date_histogram\",\n      \"schema\": \"segment\",\n      \"params\": {\n        \"field\": \"@timestamp\",\n        \"interval\": \"auto\",\n        \"customInterval\": \"2h\",\n        \"min_doc_count\": 1,\n        \"extended_bounds\": {}\n      }\n    }\n  ],\n  \"listeners\": {}\n}"
       },
       "id": "RPC-transactions",
       "type": "visualization",
@@ -78,7 +78,7 @@
       },
       "id": "Response-times-percentiles",
       "type": "visualization",
-      "version": 2
+      "version": 1
     },
     {
       "attributes": {
@@ -94,7 +94,7 @@
       },
       "id": "Errors-count-over-time",
       "type": "visualization",
-      "version": 2
+      "version": 1
     },
     {
       "attributes": {
@@ -110,7 +110,7 @@
       },
       "id": "Errors-vs-successful-transactions",
       "type": "visualization",
-      "version": 2
+      "version": 1
     },
     {
       "attributes": {
@@ -126,7 +126,7 @@
       },
       "id": "Latency-histogram",
       "type": "visualization",
-      "version": 2
+      "version": 1
     },
     {
       "attributes": {
@@ -141,7 +141,7 @@
       },
       "id": "Client-locations",
       "type": "visualization",
-      "version": 2
+      "version": 1
     },
     {
       "attributes": {
@@ -157,22 +157,106 @@
       },
       "id": "Response-times-repartition",
       "type": "visualization",
-      "version": 2
+      "version": 1
     },
     {
       "attributes": {
         "description": "",
         "kibanaSavedObjectMeta": {
-          "searchSourceJSON": "{\"query\":{\"query_string\":{\"analyze_wildcard\":true,\"query\":\"*\"}},\"filter\":[]}"
+          "searchSourceJSON": "{\"query\":{\"query\":{\"query_string\":{\"analyze_wildcard\":true,\"query\":\"*\"}},\"language\":\"lucene\"},\"filter\":[]}"
         },
         "title": "Navigation",
         "uiStateJSON": "{}",
         "version": 1,
-        "visState": "{\"title\":\"Navigation\",\"type\":\"markdown\",\"params\":{\"markdown\":\"### Packetbeat:\\n\\n[Overview](#/dashboard/Packetbeat-Dashboard)\\n\\n[Flows](#/dashboard/Packetbeat-Flows)\\n\\n[Web transactions](#/dashboard/Packetbeat-HTTP)\\n\\n[MySQL performance](#/dashboard/Packetbeat-MySQL-performance)\\n\\n[PostgreSQL performance](#/dashboard/Packetbeat-PgSQL-performance)\\n\\n[MongoDB performance](#/dashboard/Packetbeat-MongoDB-performance)\\n\\n[Thrift-RPC performance](#/dashboard/Packetbeat-Thrift-performance)\\n\\n[NFS transactions](#/dashboard/Packetbeat-NFS)\\n\\n[Cassandra performance](#/dashboard/Packetbeat-Cassandra)\"},\"aggs\":[],\"listeners\":{}}"
+        "visState": "{\"title\":\"Navigation\",\"type\":\"markdown\",\"params\":{\"markdown\":\"### Packetbeat:\\n\\n[Overview](#/dashboard/Packetbeat-Dashboard)\\n\\n[Flows](#/dashboard/Packetbeat-Flows)\\n\\n[Web transactions](#/dashboard/Packetbeat-HTTP)\\n\\n[MySQL performance](#/dashboard/Packetbeat-MySQL-performance)\\n\\n[PostgreSQL performance](#/dashboard/Packetbeat-PgSQL-performance)\\n\\n[MongoDB performance](#/dashboard/Packetbeat-MongoDB-performance)\\n\\n[Thrift-RPC performance](#/dashboard/Packetbeat-Thrift-performance)\\n\\n[NFS transactions](#/dashboard/Packetbeat-NFS)\\n\\n[Cassandra performance](#/dashboard/Packetbeat-Cassandra)\",\"fontSize\":\"10\"},\"aggs\":[]}"
       },
       "id": "Navigation",
       "type": "visualization",
-      "version": 18
+      "version": 10
+    },
+    {
+      "attributes": {
+        "columns": [
+          "_source"
+        ],
+        "description": "",
+        "hits": 0,
+        "kibanaSavedObjectMeta": {
+          "searchSourceJSON": "{\"index\":\"packetbeat-*\",\"highlightAll\":true,\"version\":true,\"query\":{\"language\":\"lucene\",\"query\":\"*\"},\"filter\":[{\"meta\":{\"index\":\"packetbeat-*\",\"negate\":false,\"disabled\":false,\"alias\":null,\"type\":\"phrase\",\"key\":\"type\",\"value\":\"http\",\"params\":{\"query\":\"http\",\"type\":\"phrase\"}},\"query\":{\"match\":{\"type\":{\"query\":\"http\",\"type\":\"phrase\"}}},\"$state\":{\"store\":\"appState\"}}]}"
+        },
+        "sort": [
+          "@timestamp",
+          "desc"
+        ],
+        "title": "Web Transactions [Packetbeat]",
+        "version": 1
+      },
+      "id": "71908f00-88ca-11e7-ad9c-db80de0bf8d3",
+      "type": "search",
+      "version": 2
+    },
+    {
+      "attributes": {
+        "columns": [
+          "_source"
+        ],
+        "description": "",
+        "hits": 0,
+        "kibanaSavedObjectMeta": {
+          "searchSourceJSON": "{\"index\":\"packetbeat-*\",\"highlightAll\":true,\"version\":true,\"query\":{\"query\":\"\",\"language\":\"lucene\"},\"filter\":[{\"meta\":{\"index\":\"packetbeat-*\",\"type\":\"phrases\",\"key\":\"type\",\"value\":\"mysql, postgresql\",\"negate\":false,\"disabled\":false,\"alias\":null},\"query\":{\"bool\":{\"should\":[{\"match_phrase\":{\"type\":\"mysql\"}},{\"match_phrase\":{\"type\":\"postgresql\"}}],\"minimum_should_match\":1}},\"$state\":{\"store\":\"appState\"}}]}"
+        },
+        "sort": [
+          "@timestamp",
+          "desc"
+        ],
+        "title": "DB transactions",
+        "version": 1
+      },
+      "id": "800e2a00-88cb-11e7-ad9c-db80de0bf8d3",
+      "type": "search",
+      "version": 1
+    },
+    {
+      "attributes": {
+        "columns": [
+          "_source"
+        ],
+        "description": "",
+        "hits": 0,
+        "kibanaSavedObjectMeta": {
+          "searchSourceJSON": "{\"index\":\"packetbeat-*\",\"highlightAll\":true,\"version\":true,\"query\":{\"query\":\"\",\"language\":\"lucene\"},\"filter\":[{\"meta\":{\"index\":\"packetbeat-*\",\"type\":\"phrases\",\"key\":\"type\",\"value\":\"redis, memcache\",\"negate\":false,\"disabled\":false,\"alias\":null},\"query\":{\"bool\":{\"should\":[{\"match_phrase\":{\"type\":\"redis\"}},{\"match_phrase\":{\"type\":\"memcache\"}}],\"minimum_should_match\":1}},\"$state\":{\"store\":\"appState\"}}]}"
+        },
+        "sort": [
+          "@timestamp",
+          "desc"
+        ],
+        "title": "Cache Transactions [Packetbeat]",
+        "version": 1
+      },
+      "id": "3dd366e0-88cc-11e7-ad9c-db80de0bf8d3",
+      "type": "search",
+      "version": 1
+    },
+    {
+      "attributes": {
+        "columns": [
+          "_source"
+        ],
+        "description": "",
+        "hits": 0,
+        "kibanaSavedObjectMeta": {
+          "searchSourceJSON": "{\"index\":\"packetbeat-*\",\"highlightAll\":true,\"version\":true,\"query\":{\"query\":\"\",\"language\":\"lucene\"},\"filter\":[{\"meta\":{\"index\":\"packetbeat-*\",\"negate\":false,\"disabled\":false,\"alias\":null,\"type\":\"phrase\",\"key\":\"type\",\"value\":\"thrift\",\"params\":{\"query\":\"thrift\",\"type\":\"phrase\"}},\"query\":{\"match\":{\"type\":{\"query\":\"thrift\",\"type\":\"phrase\"}}},\"$state\":{\"store\":\"appState\"}}]}"
+        },
+        "sort": [
+          "@timestamp",
+          "desc"
+        ],
+        "title": "RPC transactions",
+        "version": 1
+      },
+      "id": "d3089370-88cc-11e7-ad9c-db80de0bf8d3",
+      "type": "search",
+      "version": 1
     },
     {
       "attributes": {
@@ -201,7 +285,7 @@
       },
       "id": "Packetbeat-Search",
       "type": "search",
-      "version": 8
+      "version": 1
     },
     {
       "attributes": {
@@ -230,18 +314,20 @@
       },
       "id": "Transactions-errors",
       "type": "search",
-      "version": 2
+      "version": 1
     },
     {
       "attributes": {
-        "description": "",
+        "description": "Packetbeat overview dashboard",
         "hits": 0,
         "kibanaSavedObjectMeta": {
-          "searchSourceJSON": "{\"filter\":[{\"query\":{\"query_string\":{\"analyze_wildcard\":true,\"query\":\"*\"}}}]}"
+          "searchSourceJSON": "{\"filter\":[],\"query\":{\"language\":\"lucene\",\"query\":{\"query_string\":{\"analyze_wildcard\":true,\"query\":\"*\",\"default_field\":\"*\"}}},\"highlightAll\":true,\"version\":true}"
         },
-        "panelsJSON": "[{\"col\":1,\"id\":\"Web-transactions\",\"row\":5,\"size_x\":3,\"size_y\":2,\"type\":\"visualization\"},{\"col\":4,\"id\":\"DB-transactions\",\"row\":5,\"size_x\":3,\"size_y\":2,\"type\":\"visualization\"},{\"col\":7,\"id\":\"Cache-transactions\",\"row\":5,\"size_x\":3,\"size_y\":2,\"type\":\"visualization\"},{\"col\":10,\"id\":\"RPC-transactions\",\"row\":5,\"size_x\":3,\"size_y\":2,\"type\":\"visualization\"},{\"col\":1,\"id\":\"Response-times-percentiles\",\"row\":10,\"size_x\":6,\"size_y\":3,\"type\":\"visualization\"},{\"col\":1,\"id\":\"Errors-count-over-time\",\"row\":13,\"size_x\":6,\"size_y\":3,\"type\":\"visualization\"},{\"col\":7,\"id\":\"Errors-vs-successful-transactions\",\"row\":10,\"size_x\":6,\"size_y\":3,\"type\":\"visualization\"},{\"col\":7,\"id\":\"Latency-histogram\",\"row\":13,\"size_x\":6,\"size_y\":3,\"type\":\"visualization\"},{\"col\":4,\"id\":\"Client-locations\",\"row\":1,\"size_x\":9,\"size_y\":4,\"type\":\"visualization\"},{\"col\":1,\"id\":\"Response-times-repartition\",\"row\":7,\"size_x\":12,\"size_y\":3,\"type\":\"visualization\"},{\"id\":\"Navigation\",\"type\":\"visualization\",\"size_x\":3,\"size_y\":4,\"col\":1,\"row\":1}]",
+        "optionsJSON": "{\"darkTheme\":false}",
+        "panelsJSON": "[{\"col\":1,\"id\":\"Web-transactions\",\"row\":5,\"size_x\":3,\"size_y\":2,\"type\":\"visualization\",\"panelIndex\":1},{\"col\":4,\"id\":\"DB-transactions\",\"row\":5,\"size_x\":3,\"size_y\":2,\"type\":\"visualization\",\"panelIndex\":2},{\"col\":7,\"id\":\"Cache-transactions\",\"row\":5,\"size_x\":3,\"size_y\":2,\"type\":\"visualization\",\"panelIndex\":3},{\"col\":10,\"id\":\"RPC-transactions\",\"row\":5,\"size_x\":3,\"size_y\":2,\"type\":\"visualization\",\"panelIndex\":4},{\"col\":1,\"id\":\"Response-times-percentiles\",\"row\":10,\"size_x\":6,\"size_y\":3,\"type\":\"visualization\",\"panelIndex\":5},{\"col\":1,\"id\":\"Errors-count-over-time\",\"row\":13,\"size_x\":6,\"size_y\":3,\"type\":\"visualization\",\"panelIndex\":6},{\"col\":7,\"id\":\"Errors-vs-successful-transactions\",\"row\":10,\"size_x\":6,\"size_y\":3,\"type\":\"visualization\",\"panelIndex\":7},{\"col\":7,\"id\":\"Latency-histogram\",\"row\":13,\"size_x\":6,\"size_y\":3,\"type\":\"visualization\",\"panelIndex\":8},{\"col\":4,\"id\":\"Client-locations\",\"row\":1,\"size_x\":9,\"size_y\":4,\"type\":\"visualization\",\"panelIndex\":9},{\"col\":1,\"id\":\"Response-times-repartition\",\"row\":7,\"size_x\":12,\"size_y\":3,\"type\":\"visualization\",\"panelIndex\":10},{\"id\":\"Navigation\",\"type\":\"visualization\",\"size_x\":3,\"size_y\":4,\"col\":1,\"row\":1,\"panelIndex\":11}]",
         "timeRestore": false,
-        "title": "Packetbeat Dashboard",
+        "title": "[Packetbeat] Overview",
+        "uiStateJSON": "{\"P-9\":{\"mapZoom\":2,\"mapBounds\":{\"bottom_right\":{\"lat\":-54.97761367069625,\"lon\":153.984375},\"top_left\":{\"lat\":54.97761367069628,\"lon\":-153.984375}},\"mapCollar\":{\"top_left\":{\"lat\":90,\"lon\":-180},\"bottom_right\":{\"lat\":-90,\"lon\":180},\"zoom\":2}}}",
         "version": 1
       },
       "id": "Packetbeat-Dashboard",
@@ -249,5 +335,5 @@
       "version": 2
     }
   ],
-  "version": "6.0.0-alpha3-SNAPSHOT"
+  "version": "6.0.0-beta1-SNAPSHOT"
 }

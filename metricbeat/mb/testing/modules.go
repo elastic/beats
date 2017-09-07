@@ -43,8 +43,6 @@ import (
 
 	"github.com/elastic/beats/libbeat/common"
 	"github.com/elastic/beats/metricbeat/mb"
-
-	"github.com/stretchr/testify/assert"
 )
 
 type TestModule struct {
@@ -74,28 +72,23 @@ func newMetricSet(t testing.TB, config interface{}) mb.MetricSet {
 	if err != nil {
 		t.Fatal(err)
 	}
-	m, err := mb.NewModules([]*common.Config{c}, mb.Registry)
+	m, metricsets, err := mb.NewModule(c, mb.Registry)
 	if err != nil {
 		t.Fatal(err)
 	}
-	if !assert.Len(t, m, 1) {
-		t.FailNow()
+	if m == nil {
+		t.Fatal("no module instantiated")
 	}
 
-	var metricSet mb.MetricSet
-	for _, v := range m {
-		if !assert.Len(t, v, 1) {
-			t.FailNow()
-		}
-
-		metricSet = v[0]
-		break
+	if len(metricsets) != 1 {
+		t.Fatal("invalid number of metricsets instantiated")
 	}
 
-	if !assert.NotNil(t, metricSet) {
-		t.FailNow()
+	metricset := metricsets[0]
+	if metricset == nil {
+		t.Fatal("metricset is nil")
 	}
-	return metricSet
+	return metricset
 }
 
 // NewEventFetcher instantiates a new EventFetcher using the given

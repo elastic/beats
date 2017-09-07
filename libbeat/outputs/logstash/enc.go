@@ -1,8 +1,8 @@
 package logstash
 
 import (
+	"github.com/elastic/beats/libbeat/beat"
 	"github.com/elastic/beats/libbeat/outputs/codec/json"
-	"github.com/elastic/beats/libbeat/publisher/beat"
 )
 
 func makeLogstashEventEncoder(index string) func(interface{}) ([]byte, error) {

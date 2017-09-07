@@ -5,10 +5,11 @@ import (
 	"strings"
 	"time"
 
+	"github.com/elastic/beats/libbeat/beat"
 	"github.com/elastic/beats/libbeat/common"
 	"github.com/elastic/beats/libbeat/logp"
 	"github.com/elastic/beats/libbeat/monitoring"
-	"github.com/elastic/beats/libbeat/publisher/beat"
+
 	"github.com/elastic/beats/packetbeat/protos"
 	"github.com/elastic/beats/packetbeat/protos/tcp"
 )
@@ -344,7 +345,6 @@ func (amqp *amqpPlugin) expireTransaction(trans *amqpTransaction) {
 //This method handles published messages from clients. Being an async
 //process, the method, header and body frames are regrouped in one transaction
 func (amqp *amqpPlugin) handlePublishing(client *amqpMessage) {
-
 	tuple := client.tcpTuple
 	trans := amqp.getTransaction(tuple.Hashable())
 
@@ -389,7 +389,6 @@ func (amqp *amqpPlugin) handlePublishing(client *amqpMessage) {
 //returned messages to clients. Being an async process, the method, header and
 //body frames are regrouped in one transaction
 func (amqp *amqpPlugin) handleDelivering(server *amqpMessage) {
-
 	tuple := server.tcpTuple
 	trans := amqp.getTransaction(tuple.Hashable())
 
@@ -434,7 +433,6 @@ func (amqp *amqpPlugin) handleDelivering(server *amqpMessage) {
 }
 
 func (amqp *amqpPlugin) publishTransaction(t *amqpTransaction) {
-
 	if amqp.results == nil {
 		return
 	}

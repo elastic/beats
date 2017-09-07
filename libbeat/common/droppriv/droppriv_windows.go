@@ -8,7 +8,6 @@ type RunOptions struct {
 }
 
 func DropPrivileges(config RunOptions) error {
-
 	if config.Uid == nil {
 		// not found, no dropping privileges but no err
 		return nil

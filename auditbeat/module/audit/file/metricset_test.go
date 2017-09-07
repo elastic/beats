@@ -5,6 +5,7 @@ import (
 	"os"
 	"path/filepath"
 	"runtime"
+	"syscall"
 	"testing"
 	"time"
 
@@ -13,6 +14,8 @@ import (
 
 	mbtest "github.com/elastic/beats/metricbeat/mb/testing"
 )
+
+const ERROR_SHARING_VIOLATION syscall.Errno = 32
 
 func TestData(t *testing.T) {
 	dir, err := ioutil.TempDir("", "audit-file")
@@ -44,9 +47,7 @@ func getConfig(path string) map[string]interface{} {
 	return map[string]interface{}{
 		"module":     "audit",
 		"metricsets": []string{"file"},
-		"file.paths": map[string][]string{
-			"binaries": {path},
-		},
+		"file.paths": []string{path},
 	}
 }
 
@@ -60,9 +61,7 @@ func TestEventReader(t *testing.T) {
 
 	// Create a new EventReader.
 	config := defaultConfig
-	config.Paths = map[string][]string{
-		"testdir": {dir},
-	}
+	config.Paths = []string{dir}
 	r, err := NewEventReader(config)
 	if err != nil {
 		t.Fatal(err)
@@ -78,7 +77,7 @@ func TestEventReader(t *testing.T) {
 	// Create a new file.
 	txt1 := filepath.Join(dir, "test1.txt")
 	var fileMode os.FileMode = 0640
-	t.Run("created", func(t *testing.T) {
+	mustRun(t, "created", func(t *testing.T) {
 		if err = ioutil.WriteFile(txt1, []byte("hello"), fileMode); err != nil {
 			t.Fatal(err)
 		}
@@ -93,10 +92,8 @@ func TestEventReader(t *testing.T) {
 
 	// Rename the file.
 	txt2 := filepath.Join(dir, "test2.txt")
-	t.Run("move", func(t *testing.T) {
-		if err = os.Rename(txt1, txt2); err != nil {
-			t.Fatal(err)
-		}
+	mustRun(t, "move", func(t *testing.T) {
+		rename(t, txt1, txt2)
 
 		received := readMax(t, 3, events)
 		if len(received) == 0 {
@@ -115,7 +112,7 @@ func TestEventReader(t *testing.T) {
 	})
 
 	// Chmod the file.
-	t.Run("attributes modified", func(t *testing.T) {
+	mustRun(t, "attributes modified", func(t *testing.T) {
 		if runtime.GOOS == "windows" {
 			t.Skip()
 		}
@@ -131,7 +128,7 @@ func TestEventReader(t *testing.T) {
 	})
 
 	// Append data to the file.
-	t.Run("updated", func(t *testing.T) {
+	mustRun(t, "updated", func(t *testing.T) {
 		f, err := os.OpenFile(txt2, os.O_RDWR|os.O_APPEND, fileMode)
 		if err != nil {
 			t.Fatal(err)
@@ -149,7 +146,7 @@ func TestEventReader(t *testing.T) {
 	})
 
 	// Change the GID of the file.
-	t.Run("chown", func(t *testing.T) {
+	mustRun(t, "chown", func(t *testing.T) {
 		if runtime.GOOS == "windows" {
 			t.Skip("skip chown on windows")
 		}
@@ -161,7 +158,7 @@ func TestEventReader(t *testing.T) {
 		assert.EqualValues(t, gid, event.Info.GID)
 	})
 
-	t.Run("deleted", func(t *testing.T) {
+	mustRun(t, "deleted", func(t *testing.T) {
 		if err = os.Remove(txt2); err != nil {
 			t.Fatal(err)
 		}
@@ -172,7 +169,7 @@ func TestEventReader(t *testing.T) {
 
 	// Create a sub-directory.
 	subDir := filepath.Join(dir, "subdir")
-	t.Run("dir created", func(t *testing.T) {
+	mustRun(t, "dir created", func(t *testing.T) {
 		if err = os.Mkdir(subDir, 0755); err != nil {
 			t.Fatal(err)
 		}
@@ -181,20 +178,10 @@ func TestEventReader(t *testing.T) {
 		assertSameFile(t, subDir, event.Path)
 	})
 
-	// Test that it does not monitor recursively.
-	subFile := filepath.Join(subDir, "foo.txt")
-	t.Run("non-recursive", func(t *testing.T) {
-		if err = ioutil.WriteFile(subFile, []byte("foo"), fileMode); err != nil {
-			t.Fatal(err)
-		}
-
-		assertNoEvent(t, events)
-	})
-
 	// Test moving a file into the monitored dir from outside.
 	var moveInOrig string
 	moveIn := filepath.Join(dir, "test3.txt")
-	t.Run("move in", func(t *testing.T) {
+	mustRun(t, "move in", func(t *testing.T) {
 		f, err := ioutil.TempFile("", "test3.txt")
 		if err != nil {
 			t.Fatal(err)
@@ -204,9 +191,7 @@ func TestEventReader(t *testing.T) {
 		f.Close()
 		moveInOrig = f.Name()
 
-		if err = os.Rename(moveInOrig, moveIn); err != nil {
-			t.Fatal(err)
-		}
+		rename(t, moveInOrig, moveIn)
 
 		event := readTimeout(t, events)
 		assert.Equal(t, Created.String(), event.Action)
@@ -214,10 +199,8 @@ func TestEventReader(t *testing.T) {
 	})
 
 	// Test moving a file out of the monitored dir.
-	t.Run("move out", func(t *testing.T) {
-		if err = os.Rename(moveIn, moveInOrig); err != nil {
-			t.Fatal(err)
-		}
+	mustRun(t, "move out", func(t *testing.T) {
+		rename(t, moveIn, moveInOrig)
 		defer os.Remove(moveInOrig)
 
 		event := readTimeout(t, events)
@@ -227,6 +210,16 @@ func TestEventReader(t *testing.T) {
 		} else {
 			assert.Equal(t, Moved.String(), event.Action)
 		}
+	})
+
+	// Test that it does not monitor recursively.
+	subFile := filepath.Join(subDir, "foo.txt")
+	mustRun(t, "non-recursive", func(t *testing.T) {
+		if err = ioutil.WriteFile(subFile, []byte("foo"), fileMode); err != nil {
+			t.Fatal(err)
+		}
+
+		assertNoEvent(t, events)
 	})
 }
 
@@ -322,4 +315,61 @@ func changeGID(t testing.TB, file string) int {
 	}
 
 	return gid
+}
+
+// mustRun runs a sub-test and stops the execution of the parent if the sub-test
+// fails.
+func mustRun(t *testing.T, name string, f func(t *testing.T)) {
+	if !t.Run(name, f) {
+		t.FailNow()
+	}
+}
+
+// rename renames a file or it fails the test. It retries the rename operation
+// multiple times before failing.
+//
+// https://support.microsoft.com/en-us/help/316609/prb-error-sharing-violation-error-message-when-the-createfile-function
+func rename(t *testing.T, oldPath, newPath string) {
+	const maxRetries = 100
+
+	for retries := 0; retries < maxRetries; retries++ {
+		err := os.Rename(oldPath, newPath)
+		if err == nil {
+			if retries > 0 {
+				t.Logf("rename needed %d retries", retries)
+			}
+			return
+		}
+
+		if linkErr, ok := err.(*os.LinkError); ok && linkErr.Err == ERROR_SHARING_VIOLATION {
+			time.Sleep(time.Millisecond)
+			continue
+		}
+
+		t.Fatal(err)
+	}
+}
+
+func BenchmarkHashFile(b *testing.B) {
+	f, err := ioutil.TempFile("", "hash")
+	if err != nil {
+		b.Fatal(err)
+	}
+	defer os.Remove(f.Name())
+
+	zeros := make([]byte, 100)
+	for i := 0; i < 1024*1024; i++ {
+		if _, err = f.Write(zeros); err != nil {
+			b.Fatal(err)
+		}
+	}
+	f.Close()
+	b.ResetTimer()
+
+	for i := 0; i < b.N; i++ {
+		_, err = hashFile(f.Name(), "sha256")
+		if err != nil {
+			b.Fatal(err)
+		}
+	}
 }

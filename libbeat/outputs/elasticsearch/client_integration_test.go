@@ -10,15 +10,14 @@ import (
 
 	"github.com/stretchr/testify/assert"
 
+	"github.com/elastic/beats/libbeat/beat"
 	"github.com/elastic/beats/libbeat/common"
 	"github.com/elastic/beats/libbeat/logp"
 	"github.com/elastic/beats/libbeat/outputs"
 	"github.com/elastic/beats/libbeat/outputs/outest"
-	"github.com/elastic/beats/libbeat/publisher/beat"
 )
 
 func TestClientConnect(t *testing.T) {
-
 	client := GetTestingElasticsearch(t)
 	err := client.Connect()
 	assert.NoError(t, err)
@@ -249,7 +248,7 @@ func connectTestEs(t *testing.T, cfg interface{}) (outputs.Client, *Client) {
 		t.Fatal(err)
 	}
 
-	output, err := makeES(common.BeatInfo{Beat: "libbeat"}, nil, config)
+	output, err := makeES(beat.Info{Beat: "libbeat"}, nil, config)
 	if err != nil {
 		t.Fatal(err)
 	}

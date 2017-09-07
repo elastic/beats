@@ -5,11 +5,12 @@ import (
 
 	"github.com/spf13/pflag"
 
-	// import modules
-	_ "github.com/elastic/beats/metricbeat/include"
-
 	cmd "github.com/elastic/beats/libbeat/cmd"
 	"github.com/elastic/beats/metricbeat/beater"
+	"github.com/elastic/beats/metricbeat/cmd/test"
+
+	// import modules
+	_ "github.com/elastic/beats/metricbeat/include"
 )
 
 // Name of this beat
@@ -24,4 +25,5 @@ func init() {
 
 	RootCmd = cmd.GenRootCmdWithRunFlags(Name, "", beater.New, runFlags)
 	RootCmd.AddCommand(cmd.GenModulesCmd(Name, "", buildModulesManager))
+	RootCmd.TestCmd.AddCommand(test.GenTestModulesCmd(Name, ""))
 }

@@ -1,7 +1,7 @@
 - key: windows
   title: "Windows"
   description: >
-    []beta
+    beta[]
     Module for Windows
   short_config: false
   fields:

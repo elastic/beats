@@ -57,7 +57,7 @@ func TestQuery(t *testing.T) {
 	}
 	defer q.Close()
 
-	err = q.AddCounter(processorTimeCounter, FloatFlormat)
+	err = q.AddCounter(processorTimeCounter, FloatFlormat, "")
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -145,7 +145,7 @@ func TestLongOutputFormat(t *testing.T) {
 	}
 	defer query.Close()
 
-	err = query.AddCounter(processorTimeCounter, LongFormat)
+	err = query.AddCounter(processorTimeCounter, LongFormat, "")
 	if err != nil && err != PDH_NO_MORE_DATA {
 		t.Fatal(err)
 	}
@@ -179,7 +179,7 @@ func TestFloatOutputFormat(t *testing.T) {
 	}
 	defer query.Close()
 
-	err = query.AddCounter(processorTimeCounter, FloatFlormat)
+	err = query.AddCounter(processorTimeCounter, FloatFlormat, "")
 	if err != nil && err != PDH_NO_MORE_DATA {
 		t.Fatal(err)
 	}
@@ -213,7 +213,7 @@ func TestRawValues(t *testing.T) {
 	}
 	defer query.Close()
 
-	err = query.AddCounter(processorTimeCounter, FloatFlormat)
+	err = query.AddCounter(processorTimeCounter, FloatFlormat, "")
 	if err != nil && err != PDH_NO_MORE_DATA {
 		t.Fatal(err)
 	}
@@ -221,13 +221,11 @@ func TestRawValues(t *testing.T) {
 	var values []float64
 
 	for i := 0; i < 2; i++ {
-
 		if err = query.Execute(); err != nil {
 			t.Fatal(err)
 		}
 
 		_, rawvalue1, err := PdhGetRawCounterValue(query.counters[processorTimeCounter].handle)
-
 		if err != nil {
 			t.Fatal(err)
 		}
@@ -239,19 +237,16 @@ func TestRawValues(t *testing.T) {
 		}
 
 		_, rawvalue2, err := PdhGetRawCounterValue(query.counters[processorTimeCounter].handle)
-
 		if err != nil {
 			t.Fatal(err)
 		}
 
 		value, err := PdhCalculateCounterFromRawValue(query.counters[processorTimeCounter].handle, PdhFmtDouble|PdhFmtNoCap100, rawvalue2, rawvalue1)
-
 		if err != nil {
 			t.Fatal(err)
 		}
 
 		values = append(values, *(*float64)(unsafe.Pointer(&value.LongValue)))
-
 	}
 
 	t.Log(values)
@@ -274,7 +269,6 @@ func TestWildcardQuery(t *testing.T) {
 	time.Sleep(time.Millisecond * 1000)
 
 	values, err = handle.Read()
-
 	if err != nil {
 		t.Fatal(err)
 	}

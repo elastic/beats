@@ -60,7 +60,9 @@ func TestGlobManager(t *testing.T) {
 	assert.Equal(t, len(manager.ListEnabled()), 1)
 	assert.Equal(t, len(manager.ListDisabled()), 2)
 
-	assert.Equal(t, manager.ListEnabled(), []string{"config1"})
+	enabled := manager.ListEnabled()
+	assert.Equal(t, enabled[0].Name, "config1")
+	assert.Equal(t, enabled[0].Enabled, true)
 
 	// Test enable
 	if err = manager.Enable("config3"); err != nil {
@@ -70,7 +72,9 @@ func TestGlobManager(t *testing.T) {
 	assert.Equal(t, len(manager.ListEnabled()), 2)
 	assert.Equal(t, len(manager.ListDisabled()), 1)
 
-	assert.Equal(t, manager.ListDisabled(), []string{"config2"})
+	disabled := manager.ListDisabled()
+	assert.Equal(t, disabled[0].Name, "config2")
+	assert.Equal(t, disabled[0].Enabled, false)
 
 	// Check correct files layout:
 	files, err := filepath.Glob(dir + "/*")

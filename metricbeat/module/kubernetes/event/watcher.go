@@ -88,7 +88,6 @@ func (w *Watcher) watchEvents() {
 
 		}
 	}
-
 }
 
 func (w *Watcher) Run() {
@@ -111,7 +110,6 @@ func (w *Watcher) getEventMeta(pod *corev1.Event) *Event {
 	}
 
 	return eve
-
 }
 
 func (w *Watcher) Stop() {

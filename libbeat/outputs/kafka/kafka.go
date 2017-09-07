@@ -10,6 +10,7 @@ import (
 	"github.com/Shopify/sarama"
 	gometrics "github.com/rcrowley/go-metrics"
 
+	"github.com/elastic/beats/libbeat/beat"
 	"github.com/elastic/beats/libbeat/common"
 	"github.com/elastic/beats/libbeat/logp"
 	"github.com/elastic/beats/libbeat/monitoring"
@@ -44,12 +45,21 @@ var (
 	errNoHosts    = errors.New("No hosts configured")
 )
 
+// TODO: remove me.
+// Compat version overwrite for missing versions in sarama
+// Public API is compatible between these versions.
+var (
+	v0_10_2_1 = sarama.V0_10_2_0
+	v0_11_0_0 = sarama.V0_10_2_0
+)
+
 var (
 	compressionModes = map[string]sarama.CompressionCodec{
 		"none":   sarama.CompressionNone,
 		"no":     sarama.CompressionNone,
 		"off":    sarama.CompressionNone,
 		"gzip":   sarama.CompressionGZIP,
+		"lz4":    sarama.CompressionLZ4,
 		"snappy": sarama.CompressionSnappy,
 	}
 
@@ -72,7 +82,14 @@ var (
 		"0.10.0":   sarama.V0_10_0_1,
 		"0.10.1.0": sarama.V0_10_1_0,
 		"0.10.1":   sarama.V0_10_1_0,
-		"0.10":     sarama.V0_10_1_0,
+		"0.10.2.0": sarama.V0_10_2_0,
+		"0.10.2.1": v0_10_2_1,
+		"0.10.2":   v0_10_2_1,
+		"0.10":     v0_10_2_1,
+
+		"0.11.0.0": v0_11_0_0,
+		"0.11.0":   v0_11_0_0,
+		"0.11":     v0_11_0_0,
 	}
 )
 
@@ -95,7 +112,7 @@ func kafkaMetricsRegistry() gometrics.Registry {
 }
 
 func makeKafka(
-	beat common.BeatInfo,
+	beat beat.Info,
 	stats *outputs.Stats,
 	cfg *common.Config,
 ) (outputs.Group, error) {

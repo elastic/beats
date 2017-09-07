@@ -1,6 +1,7 @@
 package template
 
 import (
+	"fmt"
 	"strings"
 
 	"github.com/elastic/beats/libbeat/common"
@@ -11,18 +12,21 @@ var (
 )
 
 type Field struct {
-	Name           string `config:"name"`
-	Type           string `config:"type"`
-	Description    string `config:"description"`
-	Format         string `config:"format"`
-	ScalingFactor  int    `config:"scaling_factor"`
-	Fields         Fields `config:"fields"`
-	MultiFields    Fields `config:"multi_fields"`
-	ObjectType     string `config:"object_type"`
-	Enabled        *bool  `config:"enabled"`
-	Analyzer       string `config:"analyzer"`
-	SearchAnalyzer string `config:"search_analyzer"`
-	Norms          bool   `config:"norms"`
+	Name           string      `config:"name"`
+	Type           string      `config:"type"`
+	Description    string      `config:"description"`
+	Format         string      `config:"format"`
+	ScalingFactor  int         `config:"scaling_factor"`
+	Fields         Fields      `config:"fields"`
+	MultiFields    Fields      `config:"multi_fields"`
+	ObjectType     string      `config:"object_type"`
+	Enabled        *bool       `config:"enabled"`
+	Analyzer       string      `config:"analyzer"`
+	SearchAnalyzer string      `config:"search_analyzer"`
+	Norms          bool        `config:"norms"`
+	Dynamic        dynamicType `config:"dynamic"`
+	Index          *bool       `config:"index"`
+	DocValues      *bool       `config:"doc_values"`
 
 	path      string
 	esVersion common.Version
@@ -33,7 +37,9 @@ type Field struct {
 // long, geo_point, date, short, byte, float, double, boolean
 func (f *Field) other() common.MapStr {
 	property := f.getDefaultProperties()
-	property["type"] = f.Type
+	if f.Type != "" {
+		property["type"] = f.Type
+	}
 
 	return property
 }
@@ -125,18 +131,23 @@ func (f *Field) text() common.MapStr {
 	}
 
 	if len(f.MultiFields) > 0 {
-		properties["fields"] = f.MultiFields.process("", f.esVersion)
+		fields := common.MapStr{}
+		f.MultiFields.process("", f.esVersion, fields)
+		properties["fields"] = fields
 	}
 
 	return properties
 }
 
 func (f *Field) array() common.MapStr {
-	return f.getDefaultProperties()
+	properties := f.getDefaultProperties()
+	if f.ObjectType != "" {
+		properties["type"] = f.ObjectType
+	}
+	return properties
 }
 
 func (f *Field) object() common.MapStr {
-
 	dynProperties := f.getDefaultProperties()
 
 	switch f.ObjectType {
@@ -158,11 +169,18 @@ func (f *Field) object() common.MapStr {
 
 	properties := f.getDefaultProperties()
 	properties["type"] = "object"
+	if f.Enabled != nil {
+		properties["enabled"] = *f.Enabled
+	}
+
+	if f.Dynamic.value != nil {
+		properties["dynamic"] = f.Dynamic.value
+	}
+
 	return properties
 }
 
 func (f *Field) addDynamicTemplate(properties common.MapStr, matchType string) {
-
 	path := ""
 	if len(f.path) > 0 {
 		path = f.path + "."
@@ -181,12 +199,16 @@ func (f *Field) addDynamicTemplate(properties common.MapStr, matchType string) {
 
 func (f *Field) getDefaultProperties() common.MapStr {
 	// Currently no defaults exist
-	property := common.MapStr{}
-	if f.Enabled != nil {
-		property["enabled"] = *f.Enabled
+	properties := common.MapStr{}
+
+	if f.Index != nil {
+		properties["index"] = *f.Index
 	}
 
-	return property
+	if f.DocValues != nil {
+		properties["doc_values"] = *f.DocValues
+	}
+	return properties
 }
 
 // Recursively generates the correct key based on the dots
@@ -197,4 +219,20 @@ func generateKey(key string) string {
 		key = keys[0] + ".properties." + generateKey(keys[1])
 	}
 	return key
+}
+
+type dynamicType struct{ value interface{} }
+
+func (d *dynamicType) Unpack(s string) error {
+	switch s {
+	case "true":
+		d.value = true
+	case "false":
+		d.value = false
+	case "strict":
+		d.value = s
+	default:
+		return fmt.Errorf("'%v' is invalid dynamic setting", s)
+	}
+	return nil
 }

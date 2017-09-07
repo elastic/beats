@@ -12,7 +12,6 @@ import (
 
 // main generates index templates for the beats
 func main() {
-
 	beatVersion := version.GetDefaultVersion()
 	index := flag.String("index", "", "Base index name. Normally {beat_name} (required)")
 	output := flag.String("output", "", "Required: Full path to the output file (required)")
@@ -41,7 +40,7 @@ func main() {
 		*version = "2.0.0"
 	}
 
-	tmpl, err := template.New(beatVersion, *version, *index, template.TemplateSettings{})
+	tmpl, err := template.New(beatVersion, *index, *version, template.TemplateConfig{})
 	if err != nil {
 		fmt.Fprintf(os.Stderr, "Error generating template: %+v", err)
 		os.Exit(1)

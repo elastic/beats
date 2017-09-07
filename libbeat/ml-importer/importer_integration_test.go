@@ -8,9 +8,10 @@ import (
 	"os"
 	"testing"
 
+	"github.com/stretchr/testify/assert"
+
 	"github.com/elastic/beats/libbeat/logp"
 	"github.com/elastic/beats/libbeat/outputs/elasticsearch"
-	"github.com/stretchr/testify/assert"
 )
 
 const sampleJob = `
@@ -48,7 +49,7 @@ const sampleDatafeed = `
       "filebeat-*"
     ],
     "types": [
-      "_default_",
+      "doc",
       "log"
     ],
     "query": {

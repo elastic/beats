@@ -33,75 +33,91 @@ For more information, see:
 * <<load-template-manually>> - required for Logstash output
 
 [[load-template-auto]]
-==== Configuring Template Loading
+==== Configure template loading
 
 By default, {beatname_uc} automatically loads the recommended template file, +fields.yml+,
 if Elasticsearch output is enabled. You can configure {beatname_lc} to load a different template
-by adjusting the `template.name` and `template.fields` options in +{beatname_lc}.yml+ file:
+by adjusting the `setup.template.name` and `setup.template.fields` options in
++{beatname_lc}.yml+ file:
 
 ["source","yaml",subs="attributes,callouts"]
 ----------------------------------------------------------------------
-output.elasticsearch:
-  hosts: ["localhost:9200"]
-  template.name: "{beatname_lc}"
-  template.fields: "fields.yml"
-  template.overwrite: false
+setup.template.name: "{beatname_lc}"
+setup.template.fields: "path/to/fields.yml"
+setup.template.overwrite: false
 ----------------------------------------------------------------------
 
 By default, if a template already exists in the index, it is not overwritten. To overwrite an existing
-template, set `template.overwrite: true` in the configuration file.
+template, set `setup.template.overwrite: true` in the configuration file.
 
-To disable automatic template loading, comment out the template part under the Elasticsearch output.
+To disable automatic template loading, set `setup.template.enabled: false`.
 
 The options for auto loading the template are not supported if you are using the
 Logstash output.
 
 [[load-template-manually]]
-==== Loading the Template Manually
+==== Load the template manually
 
-If you disable automatic template loading, you need to run the following command to load the template:
+If you disable automatic template loading, you can run the `setup` command to
+load the template manually.
 
 ifdef::allplatforms[]
 
-*deb or rpm:*
+*deb, rpm, and mac:*
 
-["source","sh",subs="attributes,callouts"]
-----------------------------------------------------------------------
-curl -H 'Content-Type: application/json' -XPUT 'http://localhost:9200/_template/{beatname_lc}' -d@/etc/{beatname_lc}/{beatname_lc}.template.json
-----------------------------------------------------------------------
+["source","sh",subs="attributes"]
+----
+./{beatname_lc} setup --template
+----
 
-*mac:*
+ifeval::["{requires-sudo}"=="yes"]
 
-["source","sh",subs="attributes,callouts"]
-----------------------------------------------------------------------
-cd {beatname_lc}-{version}-darwin-x86_64
-curl -H 'Content-Type: application/json' -XPUT 'http://localhost:9200/_template/{beatname_lc}' -d@{beatname_lc}.template.json
-----------------------------------------------------------------------
+If you changed ownership of the config file to root, you'll need preface this
+command with `sudo`.
+
+endif::[]
+
+ifeval::["{beatname_lc}"!="auditbeat"]
 
 *docker:*
 
-["source", "sh", subs="attributes"]
+["source","sh",subs="attributes"]
 ----------------------------------------------------------------------
-docker run --rm {dockerimage} curl -H 'Content-Type: application/json' -XPUT 'http://localhost:9200/_template/{beatname_lc}' -d@{beatname_lc}.template.json
+docker run {dockerimage} setup --template
 ----------------------------------------------------------------------
+
+endif::[]
 
 *win:*
 
 endif::allplatforms[]
 
+Open a PowerShell prompt as an Administrator (right-click the PowerShell icon
+and select *Run As Administrator*). If you are running Windows XP, you may need
+to download and install PowerShell.
+
+From the PowerShell prompt, change to the directory where you installed {beatname_uc},
+and run:
+
 ["source","sh",subs="attributes,callouts"]
 ----------------------------------------------------------------------
-PS C:\Program Files{backslash}{beatname_uc}> Invoke-WebRequest -Method Put -InFile {beatname_lc}.template.json -Uri  http://localhost:9200/_template/{beatname_lc}?pretty -ContentType application/json
+PS > {beatname_lc} setup --template
 ----------------------------------------------------------------------
 
-where `localhost:9200` is the IP and port where Elasticsearch is listening.
 
 NOTE: If you've already used {beatname_uc} to index data into Elasticsearch,
 the index may contain old documents. After you load the index template,
 you can delete the old documents from {beatname_lc}-* to force Kibana to look
 at the newest documents. Use this command:
 
-["source","sh",subs="attributes,callouts"]
+["source","sh",subs="attributes"]
 ----------------------------------------------------------------------
 curl -XDELETE 'http://localhost:9200/{beatname_lc}-*'
 ----------------------------------------------------------------------
+
+[[passing-credentials-template-loading]]
+==== Pass credentials
+
+:start-type: setup-index
+include::./shared-passing-credentials-setup.asciidoc[]
+

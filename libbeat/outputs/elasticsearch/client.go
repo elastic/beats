@@ -11,12 +11,12 @@ import (
 	"net/url"
 	"time"
 
+	"github.com/elastic/beats/libbeat/beat"
 	"github.com/elastic/beats/libbeat/logp"
 	"github.com/elastic/beats/libbeat/outputs"
 	"github.com/elastic/beats/libbeat/outputs/outil"
 	"github.com/elastic/beats/libbeat/outputs/transport"
 	"github.com/elastic/beats/libbeat/publisher"
-	"github.com/elastic/beats/libbeat/publisher/beat"
 	"github.com/elastic/beats/libbeat/testing"
 )
 
@@ -393,7 +393,6 @@ func getPipeline(event *beat.Event, pipelineSel *outil.Selector) (string, error)
 // Index is either defined in the config as part of the output
 // or can be overload by the event through setting index
 func getIndex(event *beat.Event, index outil.Selector) string {
-
 	if event.Meta != nil {
 		if str, exists := event.Meta["index"]; exists {
 			idx, ok := str.(string)
@@ -665,7 +664,8 @@ func (conn *Connection) Request(
 	params map[string]string,
 	body interface{},
 ) (int, []byte, error) {
-	url := makeURL(conn.URL, path, pipeline, params)
+
+	url := addToURL(conn.URL, path, pipeline, params)
 	debugf("%s %s %s %v", method, url, pipeline, body)
 
 	return conn.RequestURL(method, url, body)
@@ -720,16 +720,17 @@ func (conn *Connection) execHTTPRequest(req *http.Request) (int, []byte, error) 
 	defer closing(resp.Body)
 
 	status := resp.StatusCode
-	var retErr error
-	if status >= 300 {
-		retErr = fmt.Errorf("%v", resp.Status)
-	}
-
 	obj, err := ioutil.ReadAll(resp.Body)
 	if err != nil {
-		return status, nil, retErr
+		return status, nil, err
 	}
-	return status, obj, retErr
+
+	if status >= 300 {
+		// add the response body with the error returned by Elasticsearch
+		err = fmt.Errorf("%v: %s", resp.Status, obj)
+	}
+
+	return status, obj, err
 }
 
 func (conn *Connection) GetVersion() string {

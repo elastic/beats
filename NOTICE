@@ -5,7 +5,7 @@ This product includes software developed by The Apache Software
 Foundation (http://www.apache.org/).
 
 ==========================================================================
-Third party libraries used by the Beats project:
+Third party libraries used by the Elastic Beats project:
 ==========================================================================
 
 
@@ -314,8 +314,8 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 --------------------------------------------------------------------
 Dependency: github.com/elastic/go-libaudit
-Version: v0.0.4
-Revision: c1565774e89c92d72a7b412217d83de180188887
+Version: v0.0.5
+Revision: 3a005d3d0bbcee26d60e3ab2f1890699746f4da6
 License type (autodetected): Apache License 2.0
 ./vendor/github.com/elastic/go-libaudit/LICENSE:
 --------------------------------------------------------------------
@@ -3034,6 +3034,34 @@ DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY
 THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
 (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+--------------------------------------------------------------------
+Dependency: github.com/Shopify/sarama
+Version: v1.12/enh/offset-replica-id
+Revision: c292021939f5aba53b3ffc2cb09c7aadb32a42df
+License type (autodetected): MIT license
+./vendor/github.com/Shopify/sarama/LICENSE:
+--------------------------------------------------------------------
+Copyright (c) 2013 Evan Huus
+
+Permission is hereby granted, free of charge, to any person obtaining
+a copy of this software and associated documentation files (the
+"Software"), to deal in the Software without restriction, including
+without limitation the rights to use, copy, modify, merge, publish,
+distribute, sublicense, and/or sell copies of the Software, and to
+permit persons to whom the Software is furnished to do so, subject to
+the following conditions:
+
+The above copyright notice and this permission notice shall be
+included in all copies or substantial portions of the Software.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND,
+EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF
+MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND
+NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE
+LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION
+OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION
+WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
+
 --------------------------------------------------------------------
 Dependency: github.com/Sirupsen/logrus
 Revision: 5e5dc898656f695e2a086b8e12559febbfc01562

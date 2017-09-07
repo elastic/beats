@@ -3,6 +3,7 @@
 include::../../libbeat/docs/version.asciidoc[]
 
 :libbeat: http://www.elastic.co/guide/en/beats/libbeat/{doc-branch}
+:kibana-ref: https://www.elastic.co/guide/en/kibana/{doc-branch}
 :beatsdevguide: http://www.elastic.co/guide/en/beats/devguide/{doc-branch}
 :packetbeat: http://www.elastic.co/guide/en/beats/packetbeat/{doc-branch}
 :metricbeat: http://www.elastic.co/guide/en/beats/metricbeat/{doc-branch}
@@ -27,38 +28,15 @@ include::./getting-started.asciidoc[]
 
 include::./modules-getting-started.asciidoc[]
 
-include::./command-line.asciidoc[]
-
-include::../../libbeat/docs/shared-directory-layout.asciidoc[]
-
 include::../../libbeat/docs/repositories.asciidoc[]
 
-include::./running-on-docker.asciidoc[]
+include::./setting-up-running.asciidoc[]
 
 include::./upgrading.asciidoc[]
 
 include::./how-filebeat-works.asciidoc[]
 
 include::./configuring-howto.asciidoc[]
-
-include::./filebeat-filtering.asciidoc[]
-
-include::./multiline.asciidoc[]
-
-include::../../libbeat/docs/shared-config-ingest.asciidoc[]
-
-:standalone:
-include::../../libbeat/docs/shared-env-vars.asciidoc[]
-
-include::./multiple-prospectors.asciidoc[]
-
-include::./load-balancing.asciidoc[]
-
-:standalone:
-:allplatforms:
-include::../../libbeat/docs/yaml.asciidoc[]
-
-include::../../libbeat/docs/regexp.asciidoc[]
 
 include::./modules.asciidoc[]
 

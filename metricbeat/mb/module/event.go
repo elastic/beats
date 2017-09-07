@@ -3,9 +3,10 @@ package module
 import (
 	"time"
 
+	"github.com/elastic/beats/libbeat/beat"
 	"github.com/elastic/beats/libbeat/common"
 	"github.com/elastic/beats/libbeat/logp"
-	"github.com/elastic/beats/libbeat/processors"
+
 	"github.com/elastic/beats/metricbeat/mb"
 )
 
@@ -20,28 +21,19 @@ type EventBuilder struct {
 	FetchDuration time.Duration
 	Event         common.MapStr
 	fetchErr      error
-	filters       *processors.Processors
-	metadata      common.EventMetadata
 }
 
 // Build builds an event from MetricSet data and applies the Module-level
 // filters.
-func (b EventBuilder) Build() (common.MapStr, error) {
+func (b EventBuilder) Build() (beat.Event, error) {
 	// event may be nil when there was an error fetching.
-	event := b.Event
-	if event == nil {
-		event = common.MapStr{} // TODO (akroh): do we want to send an empty event field?
+	fields := b.Event
+	if fields == nil {
+		fields = common.MapStr{}
 	}
 
 	// Get and remove meta fields from the event created by the MetricSet.
-	timestamp := getTimestamp(event, common.Time(b.StartTime))
-
-	// Apply filters.
-	if b.filters != nil {
-		if event = b.filters.RunBC(event); event == nil {
-			return nil, nil
-		}
-	}
+	timestamp := time.Time(getTimestamp(fields, common.Time(b.StartTime)))
 
 	metricsetData := common.MapStr{
 		"module": b.ModuleName,
@@ -56,8 +48,8 @@ func (b EventBuilder) Build() (common.MapStr, error) {
 	}
 
 	namespace := b.MetricSetName
-	if n, ok := event["_namespace"]; ok {
-		delete(event, "_namespace")
+	if n, ok := fields["_namespace"]; ok {
+		delete(fields, "_namespace")
 		if ns, ok := n.(string); ok {
 			namespace = ns
 		}
@@ -67,13 +59,13 @@ func (b EventBuilder) Build() (common.MapStr, error) {
 
 	// Checks if additional meta information is provided by the MetricSet under the key ModuleData
 	// This is based on the convention that each MetricSet can provide module data under the key ModuleData
-	moduleData, moudleDataExists := event[mb.ModuleDataKey]
+	moduleData, moudleDataExists := fields[mb.ModuleDataKey]
 	if moudleDataExists {
-		delete(event, mb.ModuleDataKey)
+		delete(fields, mb.ModuleDataKey)
 	}
 
 	moduleEvent := common.MapStr{}
-	moduleEvent.Put(namespace, event)
+	moduleEvent.Put(namespace, fields)
 
 	// In case meta data exists, it is added on the module level
 	// This is mostly used for shared fields across multiple metricsets in one module
@@ -83,16 +75,18 @@ func (b EventBuilder) Build() (common.MapStr, error) {
 		}
 	}
 
-	event = common.MapStr{
-		"@timestamp":            timestamp,
-		common.EventMetadataKey: b.metadata,
-		b.ModuleName:            moduleEvent,
-		"metricset":             metricsetData,
+	event := beat.Event{
+		Timestamp: time.Time(timestamp),
+		Fields: common.MapStr{
+			// common.EventMetadataKey: b.metadata,
+			b.ModuleName: moduleEvent,
+			"metricset":  metricsetData,
+		},
 	}
 
 	// Adds error to event in case error happened
 	if b.fetchErr != nil {
-		event["error"] = common.MapStr{
+		event.Fields["error"] = common.MapStr{
 			"message": b.fetchErr.Error(),
 		}
 	}
@@ -127,7 +121,7 @@ func createEvent(
 	fetchErr error,
 	start time.Time,
 	elapsed time.Duration,
-) (common.MapStr, error) {
+) (beat.Event, error) {
 	return EventBuilder{
 		ModuleName:    msw.Module().Name(),
 		MetricSetName: msw.Name(),
@@ -136,7 +130,5 @@ func createEvent(
 		FetchDuration: elapsed,
 		Event:         event,
 		fetchErr:      fetchErr,
-		filters:       msw.module.filters,
-		metadata:      msw.module.Config().EventMetadata,
 	}.Build()
 }

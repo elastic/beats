@@ -8,6 +8,7 @@ import (
 	"github.com/pkg/errors"
 
 	"github.com/elastic/beats/libbeat/common"
+	"github.com/elastic/beats/libbeat/common/cfgwarn"
 	"github.com/elastic/beats/libbeat/logp"
 	"github.com/elastic/beats/libbeat/monitoring"
 	"github.com/elastic/beats/metricbeat/mb"
@@ -20,10 +21,6 @@ import (
 const (
 	metricsetName = "audit.kernel"
 	logPrefix     = "[" + metricsetName + "]"
-
-	reassemblerMaxInFlight = 5
-	reassemblerTimeout     = 2 * time.Second
-	streamBufferLen        = 64
 )
 
 var (
@@ -51,7 +48,7 @@ type MetricSet struct {
 
 // New constructs a new MetricSet.
 func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
-	logp.Experimental("The %v metricset is a beta feature", metricsetName)
+	cfgwarn.Experimental("The %v metricset is a beta feature", metricsetName)
 
 	config := defaultConfig
 	if err := base.Module().UnpackConfig(&config); err != nil {
@@ -184,8 +181,8 @@ func (ms *MetricSet) receiveEvents(done <-chan struct{}) (<-chan []*auparse.Audi
 		return nil, err
 	}
 
-	out := make(chan []*auparse.AuditMessage, streamBufferLen)
-	reassembler, err := libaudit.NewReassembler(reassemblerMaxInFlight, reassemblerTimeout, &stream{done, out})
+	out := make(chan []*auparse.AuditMessage, ms.config.StreamBufferQueueSize)
+	reassembler, err := libaudit.NewReassembler(int(ms.config.ReassemblerMaxInFlight), ms.config.ReassemblerTimeout, &stream{done, out})
 	if err != nil {
 		return nil, errors.Wrap(err, "failed to create Reassembler")
 	}
@@ -305,22 +302,24 @@ func buildMapStr(msgs []*auparse.AuditMessage, config Config) (common.MapStr, er
 	if len(event.Socket) > 0 {
 		m.Put("socket", event.Socket)
 	}
-	if config.RawMessage {
-		addMessages(msgs, m)
-	}
 	if config.Warnings && len(event.Warnings) > 0 {
 		warnings := make([]string, 0, len(event.Warnings))
 		for _, err := range event.Warnings {
 			warnings = append(warnings, err.Error())
 		}
 		m.Put("warnings", warnings)
+		addMessages(msgs, m)
+	}
+	if config.RawMessage {
+		addMessages(msgs, m)
 	}
 
 	return m, nil
 }
 
 func addMessages(msgs []*auparse.AuditMessage, m common.MapStr) {
-	if len(msgs) > 0 {
+	_, added := m["messages"]
+	if !added && len(msgs) > 0 {
 		rawMsgs := make([]string, 0, len(msgs))
 		for _, msg := range msgs {
 			rawMsgs = append(rawMsgs, "type="+msg.RecordType.String()+" msg="+msg.RawData)
@@ -347,5 +346,5 @@ func (s *stream) ReassemblyComplete(msgs []*auparse.AuditMessage) {
 }
 
 func (s *stream) EventsLost(count int) {
-	lostMetric.Add(int64(count))
+	lostMetric.Inc()
 }

@@ -43,24 +43,45 @@ func newLogsPathMatcher(cfg common.Config) (add_kubernetes_metadata.Matcher, err
 		logPath = logPath + "/"
 	}
 
+	logp.Debug("kubernetes", "logs_path matcher log path: %s", logPath)
+
 	return &LogPathMatcher{LogsPath: logPath}, nil
 }
 
-func (f *LogPathMatcher) MetadataIndex(event common.MapStr) string {
+// Docker container ID is a 64-character-long hexadecimal string
+const containerIdLen = 64
 
+func (f *LogPathMatcher) MetadataIndex(event common.MapStr) string {
 	if value, ok := event["source"]; ok {
 		source := value.(string)
-		logp.Debug("kubernetes", "Incoming source value: ", source)
-		cid := ""
-		if strings.Contains(source, f.LogsPath) {
-			//Docker container is 64 chars in length
-			cid = source[len(f.LogsPath) : len(f.LogsPath)+64]
-		}
-		logp.Debug("kubernetes", "Using container id: ", cid)
+		logp.Debug("kubernetes", "Incoming source value: %s", source)
 
-		if cid != "" {
+		if !strings.Contains(source, f.LogsPath) {
+			logp.Debug("kubernetes", "Error extracting container id - source value does not contain matcher's logs_path '%s'.", f.LogsPath)
+			return ""
+		}
+
+		sourceLen := len(source)
+		logsPathLen := len(f.LogsPath)
+
+		// In case of the Kubernetes log path "/var/log/containers/",
+		// the container ID will be located right before the ".log" extension.
+		if strings.HasPrefix(f.LogsPath, "/var/log/containers/") && strings.HasSuffix(source, ".log") && sourceLen >= containerIdLen+4 {
+			containerIdEnd := sourceLen - 4
+			cid := source[containerIdEnd-containerIdLen : containerIdEnd]
+			logp.Debug("kubernetes", "Using container id: %s", cid)
 			return cid
 		}
+
+		// In any other case, we assume the container ID will follow right after the log path.
+		// However we need to check the length to prevent "slice bound out of range" runtime errors.
+		if sourceLen >= logsPathLen+containerIdLen {
+			cid := source[logsPathLen : logsPathLen+containerIdLen]
+			logp.Debug("kubernetes", "Using container id: %s", cid)
+			return cid
+		}
+
+		logp.Debug("kubernetes", "Error extracting container id - source value contains matcher's logs_path, however it is too short to contain a Docker container ID.")
 	}
 
 	return ""

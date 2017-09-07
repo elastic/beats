@@ -6,9 +6,9 @@ import (
 	"fmt"
 	"time"
 
+	"github.com/elastic/beats/libbeat/beat"
 	"github.com/elastic/beats/libbeat/common"
 	"github.com/elastic/beats/libbeat/monitoring"
-	"github.com/elastic/beats/libbeat/publisher/beat"
 	"github.com/elastic/beats/packetbeat/protos/tcp"
 )
 
@@ -36,7 +36,6 @@ func (r *rpc) handleExpiredPacket(nfs *nfs) {
 
 // called when we process a RPC call
 func (r *rpc) handleCall(xid string, xdr *xdr, ts time.Time, tcptuple *common.TCPTuple, dir uint8) {
-
 	// eat rpc version number
 	xdr.getUInt()
 	rpcProg := xdr.getUInt()

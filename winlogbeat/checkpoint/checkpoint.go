@@ -12,8 +12,9 @@ import (
 	"sync"
 	"time"
 
-	"github.com/elastic/beats/libbeat/logp"
 	"gopkg.in/yaml.v2"
+
+	"github.com/elastic/beats/libbeat/logp"
 )
 
 // Checkpoint persists event log state information to disk.
@@ -156,11 +157,16 @@ func (c *Checkpoint) States() map[string]EventLogState {
 
 // Persist queues the given event log state information to be written to disk.
 func (c *Checkpoint) Persist(name string, recordNumber uint64, ts time.Time) {
-	c.save <- EventLogState{
+	c.PersistState(EventLogState{
 		Name:         name,
 		RecordNumber: recordNumber,
 		Timestamp:    ts,
-	}
+	})
+}
+
+// PersistState queues the given event log state to be written to disk.
+func (c *Checkpoint) PersistState(st EventLogState) {
+	c.save <- st
 }
 
 // persist writes the current state to disk if the in-memory state is dirty.

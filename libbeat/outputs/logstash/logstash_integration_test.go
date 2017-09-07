@@ -10,14 +10,15 @@ import (
 	"testing"
 	"time"
 
+	"github.com/stretchr/testify/assert"
+
+	"github.com/elastic/beats/libbeat/beat"
 	"github.com/elastic/beats/libbeat/common"
 	"github.com/elastic/beats/libbeat/common/fmtstr"
 	"github.com/elastic/beats/libbeat/outputs"
 	"github.com/elastic/beats/libbeat/outputs/elasticsearch"
 	"github.com/elastic/beats/libbeat/outputs/outest"
 	"github.com/elastic/beats/libbeat/outputs/outil"
-	"github.com/elastic/beats/libbeat/publisher/beat"
-	"github.com/stretchr/testify/assert"
 )
 
 const (
@@ -147,19 +148,17 @@ func newTestElasticsearchOutput(t *testing.T, test string) *testOutputer {
 	index := testElasticsearchIndex(test)
 	connection := esConnect(t, index)
 
-	flushInterval := 0
 	bulkSize := 0
 	config, _ := common.NewConfigFrom(map[string]interface{}{
 		"hosts":            []string{getElasticsearchHost()},
 		"index":            connection.index,
-		"flush_interval":   &flushInterval,
 		"bulk_max_size":    &bulkSize,
 		"username":         os.Getenv("ES_USER"),
 		"password":         os.Getenv("ES_PASS"),
 		"template.enabled": false,
 	})
 
-	grp, err := plugin(common.BeatInfo{Beat: "libbeat"}, nil, config)
+	grp, err := plugin(beat.Info{Beat: "libbeat"}, nil, config)
 	if err != nil {
 		t.Fatalf("init elasticsearch output plugin failed: %v", err)
 	}
@@ -295,7 +294,6 @@ func TestSendMultipleViaLogstashTLS(t *testing.T) {
 }
 
 func testSendMultipleViaLogstash(t *testing.T, name string, tls bool) {
-
 	ls := newTestLogstashOutput(t, name, tls)
 	defer ls.Cleanup()
 	for i := 0; i < 10; i++ {
@@ -403,7 +401,6 @@ func TestLogstashElasticOutputPluginCompatibleMessageTLS(t *testing.T) {
 }
 
 func testLogstashElasticOutputPluginCompatibleMessage(t *testing.T, name string, tls bool) {
-
 	timeout := 10 * time.Second
 
 	ls := newTestLogstashOutput(t, name, tls)

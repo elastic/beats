@@ -6,6 +6,7 @@ MAINTAINER Elastic Docker Team <docker@elastic.co>
 ARG ELASTIC_VERSION
 ARG DOWNLOAD_URL
 ARG ES_JAVA_OPTS
+ARG CACHE_BUST=1
 ARG XPACK
 
 ENV ELASTIC_CONTAINER true
@@ -19,7 +20,7 @@ RUN groupadd -g 1000 elasticsearch && adduser -u 1000 -g 1000 -d /usr/share/elas
 WORKDIR /usr/share/elasticsearch
 
 # Download/extract defined ES version. busybox tar can't strip leading dir.
-RUN wget ${DOWNLOAD_URL}/elasticsearch/elasticsearch-${ELASTIC_VERSION}.tar.gz && \
+RUN curl -L -o elasticsearch-${ELASTIC_VERSION}.tar.gz ${DOWNLOAD_URL}/elasticsearch/elasticsearch-${ELASTIC_VERSION}.tar.gz?c=${CACHE_BUST} && \
     EXPECTED_SHA=$(wget -O - ${DOWNLOAD_URL}/elasticsearch/elasticsearch-${ELASTIC_VERSION}.tar.gz.sha1) && \
     test $EXPECTED_SHA == $(sha1sum elasticsearch-${ELASTIC_VERSION}.tar.gz | awk '{print $1}') && \
     tar zxf elasticsearch-${ELASTIC_VERSION}.tar.gz && \
@@ -36,9 +37,12 @@ RUN set -ex && for esdirs in config data logs; do \
 USER elasticsearch
 
 # Install xpack
-RUN if [ ${XPACK} = "1" ]; then elasticsearch-plugin install --batch ${DOWNLOAD_URL}/packs/x-pack/x-pack-${ELASTIC_VERSION}.zip; fi
-RUN elasticsearch-plugin install --batch ${DOWNLOAD_URL}/elasticsearch-plugins/ingest-user-agent/ingest-user-agent-${ELASTIC_VERSION}.zip
-RUN elasticsearch-plugin install --batch ${DOWNLOAD_URL}/elasticsearch-plugins/ingest-geoip/ingest-geoip-${ELASTIC_VERSION}.zip
+RUN if [ ${XPACK} = "1" ]; then elasticsearch-plugin install --batch ${DOWNLOAD_URL}/packs/x-pack/x-pack-${ELASTIC_VERSION}.zip?c=${CACHE_BUST}; fi
+RUN elasticsearch-plugin install --batch ${DOWNLOAD_URL}/elasticsearch-plugins/ingest-user-agent/ingest-user-agent-${ELASTIC_VERSION}.zip?c=${CACHE_BUST}
+RUN elasticsearch-plugin install --batch ${DOWNLOAD_URL}/elasticsearch-plugins/ingest-geoip/ingest-geoip-${ELASTIC_VERSION}.zip?c=${CACHE_BUST}
+
+# Set bootstrap password (for when security is used)
+RUN if [ ${XPACK} = "1" ]; then elasticsearch-keystore create; echo "changeme" | elasticsearch-keystore add -x 'bootstrap.password'; fi
 
 COPY config/elasticsearch.yml config/
 COPY config/log4j2.properties config/

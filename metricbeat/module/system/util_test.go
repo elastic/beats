@@ -7,8 +7,9 @@ import (
 	"runtime"
 	"testing"
 
-	"github.com/elastic/gosigar"
 	"github.com/stretchr/testify/assert"
+
+	"github.com/elastic/gosigar"
 )
 
 func TestCPUMonitorSample(t *testing.T) {
@@ -51,6 +52,8 @@ func TestCPUCoresMonitorSample(t *testing.T) {
 		assert.True(t, normPct.System <= 100)
 		assert.True(t, normPct.Idle > 0)
 		assert.True(t, normPct.Idle <= 100)
+		assert.True(t, normPct.Total > 0)
+		assert.True(t, normPct.Total <= 100)
 
 		ticks := s.Ticks()
 		assert.True(t, ticks.User > 0)
@@ -109,10 +112,14 @@ func TestCPUMetricsPercentages(t *testing.T) {
 	pct := sample.NormalizedPercentages()
 	assert.EqualValues(t, .3, pct.User)
 	assert.EqualValues(t, .7, pct.System)
+	assert.EqualValues(t, .0, pct.Idle)
+	assert.EqualValues(t, 1., pct.Total)
 
 	pct = sample.Percentages()
 	assert.EqualValues(t, .3*float64(NumCPU), pct.User)
 	assert.EqualValues(t, .7*float64(NumCPU), pct.System)
+	assert.EqualValues(t, .0*float64(NumCPU), pct.Idle)
+	assert.EqualValues(t, 1.*float64(NumCPU), pct.Total)
 }
 
 func TestRound(t *testing.T) {

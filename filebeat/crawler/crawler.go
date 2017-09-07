@@ -11,21 +11,25 @@ import (
 	"github.com/elastic/beats/filebeat/registrar"
 	"github.com/elastic/beats/libbeat/cfgfile"
 	"github.com/elastic/beats/libbeat/common"
+	"github.com/elastic/beats/libbeat/common/cfgwarn"
 	"github.com/elastic/beats/libbeat/logp"
+
+	_ "github.com/elastic/beats/filebeat/include"
 )
 
 type Crawler struct {
-	prospectors       map[uint64]*prospector.Prospector
-	prospectorConfigs []*common.Config
-	out               channel.OutleterFactory
-	wg                sync.WaitGroup
-	reloader          *cfgfile.Reloader
-	once              bool
-	beatVersion       string
-	beatDone          chan struct{}
+	prospectors         map[uint64]*prospector.Prospector
+	prospectorConfigs   []*common.Config
+	out                 channel.Factory
+	wg                  sync.WaitGroup
+	modulesReloader     *cfgfile.Reloader
+	prospectorsReloader *cfgfile.Reloader
+	once                bool
+	beatVersion         string
+	beatDone            chan struct{}
 }
 
-func New(out channel.OutleterFactory, prospectorConfigs []*common.Config, beatVersion string, beatDone chan struct{}, once bool) (*Crawler, error) {
+func New(out channel.Factory, prospectorConfigs []*common.Config, beatVersion string, beatDone chan struct{}, once bool) (*Crawler, error) {
 	return &Crawler{
 		out:               out,
 		prospectors:       map[uint64]*prospector.Prospector{},
@@ -51,22 +55,30 @@ func (c *Crawler) Start(r *registrar.Registrar, configProspectors *common.Config
 	}
 
 	if configProspectors.Enabled() {
-		logp.Beta("Loading separate prospectors is enabled.")
+		cfgwarn.Beta("Loading separate prospectors is enabled.")
 
-		c.reloader = cfgfile.NewReloader(configProspectors)
-		factory := prospector.NewFactory(c.out, r, c.beatDone)
+		c.prospectorsReloader = cfgfile.NewReloader(configProspectors)
+		runnerFactory := prospector.NewRunnerFactory(c.out, r, c.beatDone)
+		if err := c.prospectorsReloader.Check(runnerFactory); err != nil {
+			return err
+		}
+
 		go func() {
-			c.reloader.Run(factory)
+			c.prospectorsReloader.Run(runnerFactory)
 		}()
 	}
 
 	if configModules.Enabled() {
-		logp.Beta("Loading separate modules is enabled.")
+		cfgwarn.Beta("Loading separate modules is enabled.")
 
-		c.reloader = cfgfile.NewReloader(configModules)
-		factory := fileset.NewFactory(c.out, r, c.beatVersion, pipelineLoaderFactory, c.beatDone)
+		c.modulesReloader = cfgfile.NewReloader(configModules)
+		modulesFactory := fileset.NewFactory(c.out, r, c.beatVersion, pipelineLoaderFactory, c.beatDone)
+		if err := c.modulesReloader.Check(modulesFactory); err != nil {
+			return err
+		}
+
 		go func() {
-			c.reloader.Run(factory)
+			c.modulesReloader.Run(modulesFactory)
 		}()
 	}
 
@@ -79,7 +91,7 @@ func (c *Crawler) startProspector(config *common.Config, states []file.State) er
 	if !config.Enabled() {
 		return nil
 	}
-	p, err := prospector.NewProspector(config, c.out, c.beatDone, states)
+	p, err := prospector.New(config, c.out, c.beatDone, states)
 	if err != nil {
 		return fmt.Errorf("Error in initing prospector: %s", err)
 	}
@@ -113,8 +125,12 @@ func (c *Crawler) Stop() {
 		asyncWaitStop(p.Stop)
 	}
 
-	if c.reloader != nil {
-		asyncWaitStop(c.reloader.Stop)
+	if c.prospectorsReloader != nil {
+		asyncWaitStop(c.prospectorsReloader.Stop)
+	}
+
+	if c.modulesReloader != nil {
+		asyncWaitStop(c.modulesReloader.Stop)
 	}
 
 	c.WaitForCompletion()

@@ -40,7 +40,6 @@ func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
 
 // Fetch methods implements the data gathering and data conversion to the right format
 func (m *MetricSet) Fetch() ([]common.MapStr, error) {
-
 	content, err := m.http.FetchContent()
 	if err != nil {
 		return nil, err

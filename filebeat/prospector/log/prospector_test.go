@@ -7,13 +7,13 @@ import (
 	"testing"
 	"time"
 
+	"github.com/stretchr/testify/assert"
+
 	"github.com/elastic/beats/filebeat/input/file"
 	"github.com/elastic/beats/libbeat/common/match"
-	"github.com/stretchr/testify/assert"
 )
 
 func TestProspectorFileExclude(t *testing.T) {
-
 	p := Prospector{
 		config: config{
 			ExcludeFiles: []match.Matcher{match.MustCompile(`\.gz$`)},
@@ -47,7 +47,6 @@ var cleanInactiveTests = []struct {
 }
 
 func TestIsCleanInactive(t *testing.T) {
-
 	for _, test := range cleanInactiveTests {
 
 		l := Prospector{

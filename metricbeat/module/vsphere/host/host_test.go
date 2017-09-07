@@ -55,7 +55,6 @@ func TestFetchEventContents(t *testing.T) {
 
 	memoryFree := memory["free"].(common.MapStr)
 	assert.EqualValues(t, uint64(2822230016), memoryFree["bytes"])
-
 }
 
 func TestData(t *testing.T) {

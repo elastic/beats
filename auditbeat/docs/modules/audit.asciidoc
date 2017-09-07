@@ -2,47 +2,21 @@
 This file is generated! See scripts/docs_collector.py
 ////
 
-[[metricbeat-module-audit]]
+[id="{beatname_lc}-module-audit"]
 == Audit Module
 
-The `audit` module reports security-relevant information based on data
-captured from the operating system (OS) or services running on the OS. While it
-doesn't provide additional security to your system, it does help make it
-possible to discover violations of security policies and track to the actions
-being performed.
-
-[float]
-=== Index Management
-
-The data produced by this metricset may contain sensitive information and may
-have different access and retention requirements than other data produced by
-Metricbeat. For these reasons you may wish to store the data in a separate
-index. Below is an example configuration demonstrating how to store the data
-from the `audit` module in its own index.
-
-[source,yaml]
-----
-metricbeat.modules:
-- module: audit
-  metricsets: ["kernel"]
-
-output.elasticsearch:
-  hosts: ["http://localhost:9200"]
-  indices:
-  - index: "metricbeat-%{[beat.version]}-audit-%{+yyyy.MM.dd}"
-    when.equals.metricset.module: "audit"
-----
-
-The default index template applied by Metricbeat will also apply to this index
-because the pattern in the template matches the `metricbeat-%{[beat.version]}`
-prefix.
+The `audit` module reports security-relevant information based on data captured
+from the operating system (OS) or services running on the OS. Although this
+feature doesn’t provide additional security to your system, it does make it
+easier for you to discover and track security policy violations.
 
 
 [float]
-=== Example Configuration
+=== Example configuration
 
-The Audit module supports the standard configuration options that are described
-in <<configuration-metricbeat>>. Here is an example configuration:
+The Audit module supports the common configuration options that are
+described under <<configuration-{beatname_lc},configuring {beatname_uc}>>. Here
+is an example configuration:
 
 [source,yaml]
 ----
@@ -58,13 +32,11 @@ auditbeat.modules:
 - module: audit
   metricsets: [file]
   file.paths:
-    binaries:
-    - /bin
-    - /usr/bin
-    - /sbin
-    - /usr/sbin
-    conf:
-    - /etc
+  - /bin
+  - /usr/bin
+  - /sbin
+  - /usr/sbin
+  - /etc
   
 ----
 
@@ -73,7 +45,11 @@ auditbeat.modules:
 
 The following metricsets are available:
 
-* <<metricbeat-metricset-audit-kernel,kernel>>
+* <<{beatname_lc}-metricset-audit-file,file>>
+
+* <<{beatname_lc}-metricset-audit-kernel,kernel>>
+
+include::audit/file.asciidoc[]
 
 include::audit/kernel.asciidoc[]
 

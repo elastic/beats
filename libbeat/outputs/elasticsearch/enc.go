@@ -10,9 +10,9 @@ import (
 	"github.com/urso/go-structform/gotype"
 	"github.com/urso/go-structform/json"
 
+	"github.com/elastic/beats/libbeat/beat"
 	"github.com/elastic/beats/libbeat/common"
 	"github.com/elastic/beats/libbeat/outputs/codec"
-	"github.com/elastic/beats/libbeat/publisher/beat"
 )
 
 type bodyEncoder interface {
@@ -66,7 +66,9 @@ func (b *jsonEncoder) resetState() {
 	var err error
 	visitor := json.NewVisitor(b.buf)
 	b.folder, err = gotype.NewIterator(visitor,
-		gotype.Folders(codec.TimestampEncoder, codec.BcTimestampEncoder))
+		gotype.Folders(
+			codec.MakeTimestampEncoder(),
+			codec.MakeBCTimestampEncoder()))
 	if err != nil {
 		panic(err)
 	}
@@ -136,7 +138,9 @@ func (g *gzipEncoder) resetState() {
 	var err error
 	visitor := json.NewVisitor(g.gzip)
 	g.folder, err = gotype.NewIterator(visitor,
-		gotype.Folders(codec.TimestampEncoder, codec.BcTimestampEncoder))
+		gotype.Folders(
+			codec.MakeTimestampEncoder(),
+			codec.MakeBCTimestampEncoder()))
 	if err != nil {
 		panic(err)
 	}

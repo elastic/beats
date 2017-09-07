@@ -9,7 +9,6 @@ import (
 )
 
 func TestFormatString(t *testing.T) {
-
 	tests := []struct {
 		title       string
 		pattern     string

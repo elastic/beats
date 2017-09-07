@@ -54,7 +54,7 @@ This file is generated! See scripts/docs_collector.py
             module_file += """
 
 [float]
-=== Example Configuration
+=== Example configuration
 
 The """ + title + """ module supports the standard configuration options that are described
 in <<configuration-metricbeat>>. Here is an example configuration:

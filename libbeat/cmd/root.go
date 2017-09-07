@@ -51,7 +51,7 @@ func GenRootCmdWithRunFlags(name, version string, beatCreator beat.Creator, runF
 	rootCmd.SetupCmd = genSetupCmd(name, version, beatCreator)
 	rootCmd.VersionCmd = genVersionCmd(name, version)
 	rootCmd.CompletionCmd = genCompletionCmd(name, version, rootCmd)
-	rootCmd.ExportCmd = genExportCmd(name, version, beatCreator)
+	rootCmd.ExportCmd = genExportCmd(name, version)
 	rootCmd.TestCmd = genTestCmd(name, version, beatCreator)
 
 	// Root command is an alias for run
@@ -68,6 +68,9 @@ func GenRootCmdWithRunFlags(name, version string, beatCreator beat.Creator, runF
 	rootCmd.PersistentFlags().AddGoFlag(flag.CommandLine.Lookup("path.logs"))
 	rootCmd.PersistentFlags().AddGoFlag(flag.CommandLine.Lookup("path.home"))
 	rootCmd.PersistentFlags().AddGoFlag(flag.CommandLine.Lookup("strict.perms"))
+	if f := flag.CommandLine.Lookup("plugin"); f != nil {
+		rootCmd.PersistentFlags().AddGoFlag(f)
+	}
 
 	// Inherit root flags from run command
 	// TODO deprecate when root command no longer executes run (7.0)

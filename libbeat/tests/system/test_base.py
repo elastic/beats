@@ -16,7 +16,7 @@ class Test(BaseTest):
         )
 
         proc = self.start_beat()
-        self.wait_until(lambda: self.log_contains("Setup Beat"))
+        self.wait_until(lambda: self.log_contains("mockbeat start running."))
         proc.check_kill_and_wait()
 
     def test_no_config(self):
@@ -82,6 +82,21 @@ class Test(BaseTest):
         assert exit_code == 0
         assert self.log_contains("Config OK") is True
 
+    def test_invalid_config_with_removed_settings(self):
+        """
+        Checks if libbeat fails to load if removed settings have been used:
+        """
+        self.render_config_template(console={"pretty": "false"})
+
+        exit_code = self.run_beat(extra_args=[
+            "-E", "queue_size=2048",
+            "-E", "bulk_queue_size=1",
+        ])
+
+        assert exit_code == 1
+        assert self.log_contains("setting 'queue_size' has been removed")
+        assert self.log_contains("setting 'bulk_queue_size' has been removed")
+
     def test_version_simple(self):
         """
         Tests -version prints a version and exits.
@@ -139,7 +154,6 @@ class Test(BaseTest):
             console={
                 "pretty": "false",
                 "bulk_max_size": 1,
-                "flush_interval": "1h"
             }
         )
 

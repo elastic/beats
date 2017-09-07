@@ -1,4 +1,5 @@
 BEAT_NAME=winlogbeat
+BEAT_TITLE=Winlogbeat
 BEAT_DESCRIPTION=Winlogbeat ships Windows event logs to Elasticsearch or Logstash.
 SYSTEM_TESTS=true
 TEST_ENVIRONMENT=false

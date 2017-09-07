@@ -4,7 +4,7 @@ import (
 	"strings"
 
 	"github.com/elastic/beats/libbeat/common"
-	"github.com/elastic/beats/libbeat/logp"
+	"github.com/elastic/beats/libbeat/common/cfgwarn"
 	"github.com/elastic/beats/metricbeat/helper"
 	"github.com/elastic/beats/metricbeat/mb"
 	"github.com/elastic/beats/metricbeat/mb/parse"
@@ -34,7 +34,7 @@ type MetricSet struct {
 }
 
 func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
-	logp.Beta("The prometheus stats metricset is beta")
+	cfgwarn.Beta("The prometheus stats metricset is beta")
 
 	return &MetricSet{
 		BaseMetricSet: base,
@@ -43,7 +43,6 @@ func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
 }
 
 func (m *MetricSet) Fetch() (common.MapStr, error) {
-
 	scanner, err := m.http.FetchScanner()
 	if err != nil {
 		return nil, err

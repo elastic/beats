@@ -7,10 +7,10 @@ import (
 	"strings"
 	"time"
 
+	"github.com/elastic/beats/libbeat/beat"
 	"github.com/elastic/beats/libbeat/common"
 	"github.com/elastic/beats/libbeat/logp"
 	"github.com/elastic/beats/libbeat/monitoring"
-	"github.com/elastic/beats/libbeat/publisher/beat"
 
 	"github.com/elastic/beats/packetbeat/procs"
 	"github.com/elastic/beats/packetbeat/protos"
@@ -151,7 +151,6 @@ func (http *httpPlugin) GetPorts() []int {
 // tcp stream. Decides if we can ignore the gap or it's a parser error
 // and we need to drop the stream.
 func (http *httpPlugin) messageGap(s *stream, nbytes int) (ok bool, complete bool) {
-
 	m := s.message
 	switch s.parseState {
 	case stateStart, stateHeaders:
@@ -523,7 +522,6 @@ func (http *httpPlugin) publishTransaction(event beat.Event) {
 }
 
 func (http *httpPlugin) collectHeaders(m *message) interface{} {
-
 	hdrs := map[string]interface{}{}
 
 	hdrs["content-length"] = m.contentLength
@@ -610,7 +608,6 @@ func (http *httpPlugin) cutMessageBody(m *message) []byte {
 
 	// add body
 	return append(cutMsg, http.extractBody(m)...)
-
 }
 
 func (http *httpPlugin) shouldIncludeInBody(contenttype []byte) bool {

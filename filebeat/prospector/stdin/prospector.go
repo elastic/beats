@@ -6,10 +6,18 @@ import (
 	"github.com/elastic/beats/filebeat/channel"
 	"github.com/elastic/beats/filebeat/harvester"
 	"github.com/elastic/beats/filebeat/input/file"
+	"github.com/elastic/beats/filebeat/prospector"
 	"github.com/elastic/beats/filebeat/prospector/log"
 	"github.com/elastic/beats/libbeat/common"
 	"github.com/elastic/beats/libbeat/logp"
 )
+
+func init() {
+	err := prospector.Register("stdin", NewProspector)
+	if err != nil {
+		panic(err)
+	}
+}
 
 // Prospector is a prospector for stdin
 type Prospector struct {
@@ -22,8 +30,7 @@ type Prospector struct {
 
 // NewStdin creates a new stdin prospector
 // This prospector contains one harvester which is reading from stdin
-func NewProspector(cfg *common.Config, outlet channel.OutleterFactory) (*Prospector, error) {
-
+func NewProspector(cfg *common.Config, outlet channel.Factory, context prospector.Context) (prospector.Prospectorer, error) {
 	out, err := outlet(cfg)
 	if err != nil {
 		return nil, err
@@ -46,7 +53,6 @@ func NewProspector(cfg *common.Config, outlet channel.OutleterFactory) (*Prospec
 
 // Run runs the prospector
 func (p *Prospector) Run() {
-
 	// Make sure stdin harvester is only started once
 	if !p.started {
 		err := p.harvester.Setup()

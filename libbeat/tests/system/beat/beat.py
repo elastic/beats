@@ -11,6 +11,9 @@ import time
 import yaml
 from datetime import datetime, timedelta
 
+from .compose import ComposeMixin
+
+
 BEAT_REQUIRED_FIELDS = ["@timestamp",
                         "beat.name", "beat.hostname", "beat.version"]
 
@@ -101,7 +104,7 @@ class Proc(object):
             pass
 
 
-class TestCase(unittest.TestCase):
+class TestCase(unittest.TestCase, ComposeMixin):
 
     @classmethod
     def setUpClass(self):
@@ -120,6 +123,13 @@ class TestCase(unittest.TestCase):
         # Create build path
         build_dir = self.beat_path + "/build"
         self.build_path = build_dir + "/system-tests/"
+
+        # Start the containers needed to run these tests
+        self.compose_up()
+
+    @classmethod
+    def tearDownClass(self):
+        self.compose_down()
 
     def run_beat(self,
                  cmd=None,
@@ -168,7 +178,7 @@ class TestCase(unittest.TestCase):
                 "-test.coverprofile",
                 os.path.join(self.working_dir, "coverage.cov"),
                 "-path.home", os.path.normpath(self.working_dir),
-                "-c", os.path.join(self.working_dir, config)
+                "-c", os.path.join(self.working_dir, config),
                 ]
 
         if logging_args:
@@ -261,6 +271,11 @@ class TestCase(unittest.TestCase):
         if os.path.exists(self.working_dir):
             shutil.rmtree(self.working_dir)
         os.makedirs(self.working_dir)
+
+        fields_yml = os.path.join(self.beat_path, "fields.yml")
+        # Only add it if it exists
+        if os.path.isfile(fields_yml):
+            shutil.copyfile(fields_yml, os.path.join(self.working_dir, "fields.yml"))
 
         try:
             # update the last_run link

@@ -1,9 +1,9 @@
 - key: ceph
-  title: "ceph"
+  title: "Ceph"
   description: >
     beta[]
 
-    ceph Module
+    Ceph module
   short_config: false
   fields:
     - name: ceph

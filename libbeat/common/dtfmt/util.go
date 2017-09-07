@@ -9,7 +9,7 @@ func appendUnpadded(bs []byte, i int) []byte {
 	return strconv.AppendInt(bs, int64(i), 10)
 }
 
-func appendPadded(bs []byte, i int, sz int) []byte {
+func appendPadded(bs []byte, i, sz int) []byte {
 	if i < 0 {
 		bs = append(bs, '-')
 		i = -i
@@ -39,5 +39,6 @@ func appendPadded(bs []byte, i int, sz int) []byte {
 	for ; sz > digits; sz-- {
 		bs = append(bs, '0')
 	}
+
 	return strconv.AppendInt(bs, int64(i), 10)
 }

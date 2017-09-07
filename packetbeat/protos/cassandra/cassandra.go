@@ -68,7 +68,6 @@ func (cassandra *cassandra) init(results protos.Reporter, config *cassandraConfi
 }
 
 func (cassandra *cassandra) setFromConfig(config *cassandraConfig) error {
-
 	// set module configuration
 	if err := cassandra.ports.Set(config.Ports); err != nil {
 		return err

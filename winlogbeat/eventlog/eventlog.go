@@ -7,8 +7,11 @@ import (
 	"strconv"
 	"syscall"
 
+	"github.com/elastic/beats/libbeat/beat"
 	"github.com/elastic/beats/libbeat/common"
 	"github.com/elastic/beats/libbeat/logp"
+
+	"github.com/elastic/beats/winlogbeat/checkpoint"
 	"github.com/elastic/beats/winlogbeat/sys"
 )
 
@@ -53,22 +56,19 @@ type EventLog interface {
 // Record represents a single event from the log.
 type Record struct {
 	sys.Event
-	common.EventMetadata        // Fields and tags to add to the event.
-	API                  string // The event log API type used to read the record.
-	XML                  string // XML representation of the event.
+	API string // The event log API type used to read the record.
+	XML string // XML representation of the event.
 }
 
 // ToMapStr returns a new MapStr containing the data from this Record.
-func (e Record) ToMapStr() common.MapStr {
+func (e Record) ToEvent() beat.Event {
 	m := common.MapStr{
-		"type":                  e.API,
-		common.EventMetadataKey: e.EventMetadata,
-		"@timestamp":            common.Time(e.TimeCreated.SystemTime),
-		"log_name":              e.Channel,
-		"source_name":           e.Provider.Name,
-		"computer_name":         e.Computer,
-		"record_number":         strconv.FormatUint(e.RecordID, 10),
-		"event_id":              e.EventIdentifier.ID,
+		"type":          e.API,
+		"log_name":      e.Channel,
+		"source_name":   e.Provider.Name,
+		"computer_name": e.Computer,
+		"record_number": strconv.FormatUint(e.RecordID, 10),
+		"event_id":      e.EventIdentifier.ID,
 	}
 
 	addOptional(m, "xml", e.XML)
@@ -109,7 +109,15 @@ func (e Record) ToMapStr() common.MapStr {
 	userData := addPairs(m, "user_data", e.UserData.Pairs)
 	addOptional(userData, "xml_name", e.UserData.Name.Local)
 
-	return m
+	return beat.Event{
+		Timestamp: e.TimeCreated.SystemTime,
+		Fields:    m,
+		Private: checkpoint.EventLogState{
+			Name:         e.API,
+			RecordNumber: e.RecordID,
+			Timestamp:    e.TimeCreated.SystemTime,
+		},
+	}
 }
 
 // addOptional adds a key and value to the given MapStr if the value is not the

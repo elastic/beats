@@ -72,7 +72,6 @@ func TestData(t *testing.T) {
 	if err := mbtest.WriteEvents(f, t); err != nil {
 		t.Fatal("write", err)
 	}
-
 }
 
 func getConfig(ts *simulator.Server) map[string]interface{} {

@@ -22,7 +22,6 @@ type manifest struct {
 }
 
 func makeURL(url, path string, params url.Values) string {
-
 	if len(params) == 0 {
 		return url + path
 	}
@@ -31,7 +30,6 @@ func makeURL(url, path string, params url.Values) string {
 }
 
 func ExtractIndexPattern(body []byte) ([]byte, error) {
-
 	var contents common.MapStr
 
 	err := json.Unmarshal(body, &contents)
@@ -62,11 +60,9 @@ func ExtractIndexPattern(body []byte) ([]byte, error) {
 	}
 
 	return newBody, nil
-
 }
 
 func Export(client *http.Client, conn string, dashboard string, out string) error {
-
 	params := url.Values{}
 
 	params.Add("dashboard", dashboard)
@@ -104,7 +100,6 @@ func Export(client *http.Client, conn string, dashboard string, out string) erro
 }
 
 func ReadManifest(file string) ([]map[string]string, error) {
-
 	cfg, err := common.LoadFile(file)
 	if err != nil {
 		return nil, fmt.Errorf("error reading manifest file: %v", err)
@@ -116,11 +111,9 @@ func ReadManifest(file string) ([]map[string]string, error) {
 		return nil, fmt.Errorf("error unpacking manifest: %v", err)
 	}
 	return manifest.Dashboards, nil
-
 }
 
 func main() {
-
 	kibanaURL := flag.String("kibana", "http://localhost:5601", "Kibana URL")
 	dashboard := flag.String("dashboard", "", "Dashboard ID")
 	fileOutput := flag.String("output", "output.json", "Output file")

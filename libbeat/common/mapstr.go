@@ -156,6 +156,39 @@ func (m MapStr) String() string {
 	return string(bytes)
 }
 
+// Flatten flattens the given MapStr and returns a flat MapStr.
+//
+// Example:
+//   "hello": MapStr{"world": "test" }
+//
+// This is converted to:
+//   "hello.world": "test"
+//
+// This can be useful for testing or logging.
+func (m MapStr) Flatten() MapStr {
+	return flatten("", m, MapStr{})
+}
+
+// flatten is a helper for Flatten. See docs for Flatten. For convenience the
+// out parameter is returned.
+func flatten(prefix string, in, out MapStr) MapStr {
+	for k, v := range in {
+		var fullKey string
+		if prefix == "" {
+			fullKey = k
+		} else {
+			fullKey = fmt.Sprintf("%s.%s", prefix, k)
+		}
+
+		if m, ok := tryToMapStr(v); ok {
+			flatten(fullKey, m, out)
+		} else {
+			out[fullKey] = v
+		}
+	}
+	return out
+}
+
 // MapStrUnion creates a new MapStr containing the union of the
 // key-value pairs of the two maps. If the same key is present in
 // both, the key-value pairs from dict2 overwrite the ones from dict1.

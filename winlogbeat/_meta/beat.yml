@@ -22,3 +22,10 @@ winlogbeat.event_logs:
     ignore_older: 72h
   - name: Security
   - name: System
+
+#==================== Elasticsearch template setting ==========================
+
+setup.template.settings:
+  index.number_of_shards: 3
+  #index.codec: best_compression
+  #_source.enabled: false

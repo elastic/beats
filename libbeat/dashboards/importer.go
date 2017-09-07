@@ -41,7 +41,6 @@ func NewImporter(version string, cfg *Config, loader Loader) (*Importer, error) 
 
 // Import imports the Kibana dashboards according to the configuration options.
 func (imp Importer) Import() error {
-
 	if imp.cfg.URL != "" || imp.cfg.File != "" {
 		err := imp.ImportArchive()
 		if err != nil {
@@ -273,11 +272,22 @@ func (imp Importer) ImportKibanaDir(dir string) error {
 		return fmt.Errorf("The directory %s does not contain the %s subdirectory."+
 			" There is nothing to import into Kibana.", dir, strings.Join(check, " or "))
 	}
+
+	importDashboards := false
 	for _, t := range types {
 		err = imp.ImportDir(t, dir)
 		if err != nil {
 			return fmt.Errorf("Failed to import %s: %v", t, err)
 		}
+
+		if t == "dashboard" {
+			importDashboards = true
+		}
+	}
+
+	if !importDashboards {
+		return fmt.Errorf("No dashboards to import. Please make sure the %s directory contains a dashboard directory.",
+			dir)
 	}
 	return nil
 }

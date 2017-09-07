@@ -2,6 +2,7 @@ package jmx
 
 import (
 	"github.com/elastic/beats/libbeat/common"
+	"github.com/elastic/beats/libbeat/common/cfgwarn"
 	"github.com/elastic/beats/libbeat/logp"
 	"github.com/elastic/beats/metricbeat/helper"
 	"github.com/elastic/beats/metricbeat/mb"
@@ -48,7 +49,7 @@ type MetricSet struct {
 
 // New create a new instance of the MetricSet
 func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
-	logp.Beta("The jolokia jmx metricset is beta")
+	cfgwarn.Beta("The jolokia jmx metricset is beta")
 
 	// Additional configuration options
 	config := struct {
@@ -80,7 +81,6 @@ func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
 		namespace:     config.Namespace,
 		http:          http,
 	}, nil
-
 }
 
 // Fetch methods implements the data gathering and data conversion to the right format

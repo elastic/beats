@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"sync"
 
+	"github.com/elastic/beats/libbeat/beat"
 	"github.com/elastic/beats/libbeat/common"
 	"github.com/elastic/beats/libbeat/logp"
 	"github.com/elastic/beats/libbeat/outputs"
@@ -47,7 +48,7 @@ func RegisterConnectCallback(callback connectCallback) {
 }
 
 func makeES(
-	beat common.BeatInfo,
+	beat beat.Info,
 	stats *outputs.Stats,
 	cfg *common.Config,
 ) (outputs.Group, error) {
@@ -156,15 +157,19 @@ func NewConnectedClient(cfg *common.Config) (*Client, error) {
 		return nil, err
 	}
 
+	errors := []string{}
+
 	for _, client := range clients {
 		err = client.Connect()
 		if err != nil {
 			logp.Err("Error connecting to Elasticsearch at %v: %v", client.Connection.URL, err)
+			err = fmt.Errorf("Error connection to Elasticsearch %v: %v", client.Connection.URL, err)
+			errors = append(errors, err.Error())
 			continue
 		}
 		return &client, nil
 	}
-	return nil, fmt.Errorf("Couldn't connect to any of the configured Elasticsearch hosts")
+	return nil, fmt.Errorf("Couldn't connect to any of the configured Elasticsearch hosts. Errors: %v", errors)
 }
 
 // NewElasticsearchClients returns a list of Elasticsearch clients based on the given
@@ -173,7 +178,6 @@ func NewConnectedClient(cfg *common.Config) (*Client, error) {
 // template) .If multiple hosts are defined in the configuration, a client is returned
 // for each of them.
 func NewElasticsearchClients(cfg *common.Config) ([]Client, error) {
-
 	hosts, err := outputs.ReadHostList(cfg)
 	if err != nil {
 		return nil, err

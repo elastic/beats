@@ -4,11 +4,12 @@ import (
 	"fmt"
 	"strings"
 
+	"github.com/elastic/beats/libbeat/beat"
 	"github.com/elastic/beats/libbeat/common"
+	"github.com/elastic/beats/libbeat/common/cfgwarn"
 	"github.com/elastic/beats/libbeat/logp"
 	"github.com/elastic/beats/libbeat/processors"
 	"github.com/elastic/beats/libbeat/processors/actions"
-	"github.com/elastic/beats/libbeat/publisher/beat"
 )
 
 func init() {
@@ -26,7 +27,7 @@ func newDockerMetadataProcessor(cfg *common.Config) (processors.Processor, error
 }
 
 func buildDockerMetadataProcessor(cfg *common.Config, watcherConstructor WatcherConstructor) (processors.Processor, error) {
-	logp.Beta("The add_docker_metadata processor is beta")
+	cfgwarn.Beta("The add_docker_metadata processor is beta")
 
 	config := defaultConfig()
 

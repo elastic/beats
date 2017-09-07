@@ -15,13 +15,13 @@ type GlobManager struct {
 	glob              string
 	enabledExtension  string
 	disabledExtension string
-	files             []*cfgfile
+	files             []*CfgFile
 }
 
-type cfgfile struct {
-	name    string
-	path    string
-	enabled bool
+type CfgFile struct {
+	Name    string
+	Path    string
+	Enabled bool
 }
 
 // NewGlobManager takes a glob and enabled/disabled extensions and returns a GlobManager object.
@@ -58,10 +58,10 @@ func (g *GlobManager) load() error {
 
 	for _, path := range files {
 		// Trim cfg file name
-		g.files = append(g.files, &cfgfile{
-			name:    strings.TrimSuffix(filepath.Base(path), g.enabledExtension),
-			enabled: true,
-			path:    path,
+		g.files = append(g.files, &CfgFile{
+			Name:    strings.TrimSuffix(filepath.Base(path), g.enabledExtension),
+			Enabled: true,
+			Path:    path,
 		})
 	}
 
@@ -74,10 +74,10 @@ func (g *GlobManager) load() error {
 
 	for _, path := range files {
 		// Trim cfg file name
-		g.files = append(g.files, &cfgfile{
-			name:    strings.TrimSuffix(filepath.Base(path), g.enabledExtension+g.disabledExtension),
-			enabled: false,
-			path:    path,
+		g.files = append(g.files, &CfgFile{
+			Name:    strings.TrimSuffix(filepath.Base(path), g.enabledExtension+g.disabledExtension),
+			Enabled: false,
+			Path:    path,
 		})
 	}
 
@@ -85,34 +85,34 @@ func (g *GlobManager) load() error {
 }
 
 // ListEnabled conf files
-func (g *GlobManager) ListEnabled() []string {
-	var names []string
+func (g *GlobManager) ListEnabled() []*CfgFile {
+	var enabled []*CfgFile
 	for _, file := range g.files {
-		if file.enabled {
-			names = append(names, file.name)
+		if file.Enabled {
+			enabled = append(enabled, file)
 		}
 	}
 
-	return names
+	return enabled
 }
 
 // ListDisabled conf files
-func (g *GlobManager) ListDisabled() []string {
-	var names []string
+func (g *GlobManager) ListDisabled() []*CfgFile {
+	var disabled []*CfgFile
 	for _, file := range g.files {
-		if !file.enabled {
-			names = append(names, file.name)
+		if !file.Enabled {
+			disabled = append(disabled, file)
 		}
 	}
 
-	return names
+	return disabled
 }
 
 // Enabled returns true if given conf file is enabled
 func (g *GlobManager) Enabled(name string) bool {
 	for _, file := range g.files {
-		if name == file.name {
-			return file.enabled
+		if name == file.Name {
+			return file.Enabled
 		}
 	}
 	return false
@@ -121,7 +121,7 @@ func (g *GlobManager) Enabled(name string) bool {
 // Exists return true if the given conf exists (enabled or disabled)
 func (g *GlobManager) Exists(name string) bool {
 	for _, file := range g.files {
-		if name == file.name {
+		if name == file.Name {
 			return true
 		}
 	}
@@ -131,14 +131,14 @@ func (g *GlobManager) Exists(name string) bool {
 // Enable given conf file, does nothing if it's enabled already
 func (g *GlobManager) Enable(name string) error {
 	for _, file := range g.files {
-		if name == file.name {
-			if !file.enabled {
-				newPath := strings.TrimSuffix(file.path, g.disabledExtension)
-				if err := os.Rename(file.path, newPath); err != nil {
+		if name == file.Name {
+			if !file.Enabled {
+				newPath := strings.TrimSuffix(file.Path, g.disabledExtension)
+				if err := os.Rename(file.Path, newPath); err != nil {
 					return errors.Wrap(err, "enable failed")
 				}
-				file.enabled = true
-				file.path = newPath
+				file.Enabled = true
+				file.Path = newPath
 			}
 			return nil
 		}
@@ -150,14 +150,14 @@ func (g *GlobManager) Enable(name string) error {
 // Disable given conf file, does nothing if it's disabled already
 func (g *GlobManager) Disable(name string) error {
 	for _, file := range g.files {
-		if name == file.name {
-			if file.enabled {
-				newPath := file.path + g.disabledExtension
-				if err := os.Rename(file.path, newPath); err != nil {
+		if name == file.Name {
+			if file.Enabled {
+				newPath := file.Path + g.disabledExtension
+				if err := os.Rename(file.Path, newPath); err != nil {
 					return errors.Wrap(err, "disable failed")
 				}
-				file.enabled = false
-				file.path = newPath
+				file.Enabled = false
+				file.Path = newPath
 			}
 			return nil
 		}

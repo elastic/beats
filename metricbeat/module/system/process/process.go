@@ -6,14 +6,14 @@ import (
 	"fmt"
 	"runtime"
 
+	"github.com/pkg/errors"
+
 	"github.com/elastic/beats/libbeat/common"
 	"github.com/elastic/beats/libbeat/logp"
 	"github.com/elastic/beats/metricbeat/mb"
 	"github.com/elastic/beats/metricbeat/mb/parse"
 	"github.com/elastic/beats/metricbeat/module/system"
-
 	"github.com/elastic/gosigar/cgroup"
-	"github.com/pkg/errors"
 )
 
 var debugf = logp.MakeDebug("system.process")

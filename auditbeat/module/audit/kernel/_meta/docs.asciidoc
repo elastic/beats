@@ -1,6 +1,4 @@
-=== Audit Kernel Metricset
-
-experimental[]
+=== Audit kernel metricset
 
 The `kernel` metricset receives audit events from the Linux Audit Framework that
 is a part of the Linux kernel.
@@ -8,9 +6,9 @@ is a part of the Linux kernel.
 This metricset is available only for Linux.
 
 [float]
-=== How it Works
+=== How it works
 
-This metricset establishes a subscription to the `kernel` to receive the events
+This metricset establishes a subscription to the kernel to receive the events
 as they occur. So unlike most other metricsets, the `period` configuration
 option is unused because it is not implemented using polling.
 
@@ -18,11 +16,11 @@ The Linux kernel only supports a single subscriber to the audit events so this
 metricset cannot be used simultaneously with a service like `auditd`. `auditd`
 should be disabled if this metricset is being used. If you wish to continue to
 use `auditd` instead of this metricset to receive audit messages from the kernel
-then consider using {filebeat}/filebeat-module-auditd.html[Filebeat] to collect the daemon's
-log files.
+then consider using {filebeat}/filebeat-module-auditd.html[Filebeat] to collect
+the daemon's log files.
 
 The Linux Audit Framework can send multiple messages for a single auditable
-event. For example, a `rename` syscall causes the kernel to sent eight separate
+event. For example, a `rename` syscall causes the kernel to send eight separate
 messages. Each message describes a different aspect of the activity that is
 occurring (the syscall itself, file paths, current working directory, process
 title). This metricset will combine all of the data from each of the messages
@@ -33,10 +31,10 @@ metricset will buffer the messages in order to combine related messages into a
 single event even if they arrive interleaved or out of order.
 
 [float]
-=== Configuration Options
+=== Configuration options
 
-This metricset has some configuration options for tuning its behavior. Below
-is example showing all configuration options with their default values.
+This metricset has some configuration options for tuning its behavior. The
+following example shows all configuration options with their default values.
 
 [source,yaml]
 ----
@@ -54,40 +52,42 @@ is example showing all configuration options with their default values.
 GIDs to their associated names. The default value is true.
 
 *`kernel.failure_mode`*:: This determines the kernel's behavior on critical
-failures such as errors sending events to Metricbeat, the backlog limit was
+failures such as errors sending events to {beatname_uc}, the backlog limit was
 exceeded, the kernel ran out of memory, or the rate limit was exceeded. The
 options are `silent`, `log`, or `panic`. `silent` basically makes the kernel
 ignore the errors, `log` makes the kernel write the audit messages using
 `printk` so they show up in system's syslog, and `panic` causes the kernel to
-panic to prevent use of the machine. Metricbeat's default is `silent`.
+panic to prevent use of the machine. {beatname_uc}'s default is `silent`.
 
 *`kernel.backlog_limit`*:: This controls the maximum number of audit messages
-that will be buffered by kernel.
+that will be buffered by the kernel.
 
 *`kernel.rate_limit`*:: This sets a rate limit on the number of messages/sec
-delivered by the kernel. The default is 0 which means to disable rate limiting.
+delivered by the kernel. The default is 0, which disables rate limiting.
 Changing this value to anything other than zero can cause messages to be lost.
 The preferred approach to reduce the messaging rate is be more selective in the
 audit ruleset.
 
-*`kernel.include_raw_message`*:: This boolean setting causes Metricbeat to
+*`kernel.include_raw_message`*:: This boolean setting causes {beatname_uc} to
 include each of the raw messages that contributed to the event in the document
 as a field called `messages`. The default value is false. This setting is
 primarily used for development and debugging purposes.
 
-*`kernel.include_warnings`*:: This boolean setting causes Metricbeat to include
-as warnings any issues that were encountered while parsing the raw messages.
-The default value is false. This setting is primarily used for development and
-debugging purposes.
+*`kernel.include_warnings`*:: This boolean setting causes {beatname_uc} to
+include as warnings any issues that were encountered while parsing the raw
+messages. The default value is false. When this setting is enabled the raw
+messages will be included in the event regardless of the
+`kernel.include_raw_message` config setting. This setting is primarily used for
+development and debugging purposes.
 
 *`kernel.audit_rules`*:: A string containing the audit rules that should be
 installed to the kernel. There should be one rule per line. Comments can be
 embedded in the string using `#` as a prefix. The format for rules is the same
-used by the Linux `auditctl` utility. Metricbeat supports adding file watches
+used by the Linux `auditctl` utility. {beatname_uc} supports adding file watches
 (`-w`) and syscall rules (`-a` or `-A`).
 
 [float]
-=== Audit Rules
+=== Audit rules
 
 The audit rules are where you configure the activities that are audited. These
 rules are configured as either syscalls or files that should be monitored. For
@@ -104,13 +104,13 @@ the most active rules first in order to speed up evaluation.
 You can assign keys to each rule for better identification of the rule that
 triggered an event and easier filtering later in Elasticsearch.
 
-Defining any audit rules in the config causes Metricbeat to purge all existing
-audit rules prior to adding the rules specified in the config. Therefore it is
-unnecessary and unsupported to include a `-D` (delete all) rule.
+Defining any audit rules in the config causes {beatname_uc} to purge all
+existing audit rules prior to adding the rules specified in the config.
+Therefore it is unnecessary and unsupported to include a `-D` (delete all) rule.
 
-[source,yaml]
+["source","sh",subs="attributes"]
 ----
-metricbeat.modules:
+{beatname_lc}.modules:
 - module: audit
   metricsets: ["kernel"]
   kernel.audit_rules: |

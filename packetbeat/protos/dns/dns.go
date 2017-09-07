@@ -15,10 +15,10 @@ import (
 	"strings"
 	"time"
 
+	"github.com/elastic/beats/libbeat/beat"
 	"github.com/elastic/beats/libbeat/common"
 	"github.com/elastic/beats/libbeat/logp"
 	"github.com/elastic/beats/libbeat/monitoring"
-	"github.com/elastic/beats/libbeat/publisher/beat"
 
 	"github.com/elastic/beats/packetbeat/protos"
 
@@ -492,7 +492,6 @@ func addDNSToMapStr(m common.MapStr, dns *mkdns.Msg, authority bool, additional 
 			m["additionals"] = rrsMapStrs
 		}
 	}
-
 }
 
 func optToMapStr(rrOPT *mkdns.OPT) common.MapStr {

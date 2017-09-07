@@ -82,12 +82,13 @@ type PodContainerStatus struct {
 }
 
 type PodStatus struct {
-	Conditions        []PodStatusCondition `json:"conditions"`
-	ContainerStatuses []PodContainerStatus `json:"containerStatuses"`
-	HostIP            string               `json:"hostIP"`
-	Phase             string               `json:"phase"`
-	PodIP             string               `json:"podIP"`
-	StartTime         string               `json:"startTime"`
+	Conditions            []PodStatusCondition `json:"conditions"`
+	ContainerStatuses     []PodContainerStatus `json:"containerStatuses"`
+	InitContainerStatuses []PodContainerStatus `json:"initContainerStatuses"`
+	HostIP                string               `json:"hostIP"`
+	Phase                 string               `json:"phase"`
+	PodIP                 string               `json:"podIP"`
+	StartTime             string               `json:"startTime"`
 }
 
 type Pod struct {

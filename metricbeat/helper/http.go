@@ -72,7 +72,6 @@ func NewHTTP(base mb.BaseMetricSet) *HTTP {
 // It's important that resp.Body has to be closed if this method is used. Before using this method
 // check if one of the other Fetch* methods could be used as they ensure that the Body is properly closed.
 func (h *HTTP) FetchResponse() (*http.Response, error) {
-
 	// Create a fresh reader every time
 	var reader io.Reader
 	if h.body != nil {
@@ -140,7 +139,6 @@ func (h *HTTP) FetchScanner() (*bufio.Scanner, error) {
 // FetchJSON makes an HTTP request to the configured url and returns the JSON content.
 // This only works if the JSON output needed is in map[string]interface format.
 func (h *HTTP) FetchJSON() (map[string]interface{}, error) {
-
 	body, err := h.FetchContent()
 	if err != nil {
 		return nil, err

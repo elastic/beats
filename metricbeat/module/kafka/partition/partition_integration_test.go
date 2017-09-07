@@ -11,10 +11,12 @@ import (
 	"time"
 
 	"github.com/Shopify/sarama"
+	"github.com/stretchr/testify/assert"
+
 	"github.com/elastic/beats/libbeat/common"
 	"github.com/elastic/beats/libbeat/logp"
+	"github.com/elastic/beats/libbeat/tests/compose"
 	mbtest "github.com/elastic/beats/metricbeat/mb/testing"
-	"github.com/stretchr/testify/assert"
 )
 
 const (
@@ -23,6 +25,8 @@ const (
 )
 
 func TestData(t *testing.T) {
+	compose.EnsureUp(t, "kafka")
+
 	generateKafkaData(t, "metricbeat-generate-data")
 
 	f := mbtest.NewEventsFetcher(t, getConfig(""))
@@ -33,6 +37,8 @@ func TestData(t *testing.T) {
 }
 
 func TestTopic(t *testing.T) {
+	compose.EnsureUp(t, "kafka")
+
 	if testing.Verbose() {
 		logp.LogInit(logp.LOG_DEBUG, "", false, true, []string{"kafka"})
 	}

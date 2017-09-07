@@ -10,7 +10,6 @@ import (
 )
 
 func TestEventMapping(t *testing.T) {
-
 	var HostSystemTest = mo.HostSystem{
 		Summary: types.HostListSummary{
 			Host: &types.ManagedObjectReference{Type: "HostSystem", Value: "ha-host"},

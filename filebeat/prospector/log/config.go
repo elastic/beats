@@ -5,10 +5,12 @@ import (
 	"time"
 
 	"github.com/dustin/go-humanize"
+
 	cfg "github.com/elastic/beats/filebeat/config"
 	"github.com/elastic/beats/filebeat/harvester"
 	"github.com/elastic/beats/filebeat/harvester/reader"
 	"github.com/elastic/beats/filebeat/input/file"
+	"github.com/elastic/beats/libbeat/common/cfgwarn"
 	"github.com/elastic/beats/libbeat/common/match"
 	"github.com/elastic/beats/libbeat/logp"
 )
@@ -115,7 +117,6 @@ var ValidScanSort = map[string]struct{}{
 }
 
 func (c *config) Validate() error {
-
 	// DEPRECATED 6.0.0: warning is already outputted on propsector level
 	if c.InputType != "" {
 		c.Type = c.InputType
@@ -151,7 +152,7 @@ func (c *config) Validate() error {
 	}
 
 	if c.ScanSort != "" {
-		logp.Experimental("scan_sort is used.")
+		cfgwarn.Experimental("scan_sort is used.")
 
 		// Check input type
 		if _, ok := ValidScanSort[c.ScanSort]; !ok {

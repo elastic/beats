@@ -1,4 +1,5 @@
 import os
+import shutil
 import metricbeat
 
 
@@ -109,5 +110,77 @@ class TestCommands(metricbeat.BaseTest):
         assert not os.path.exists(self.working_dir + "/modules.d/enabled2.yml")
         assert not os.path.exists(self.working_dir + "/modules.d/enabled3.yml")
 
+    def test_modules_test(self):
+        """
+        Test test modules command
+        """
+        self.write_system_yml()
+
+        exit_code = self.run_beat(
+            extra_args=["test", "modules"])
+
+        assert exit_code == 0
+        assert self.log_contains("cpu...OK")
+        assert self.log_contains("memory...OK")
+
+    def test_modules_test_error(self):
+        """
+        Test test modules command with an error result
+        """
+        self.write_system_yml()
+        self.write_nginx_yml()
+
+        exit_code = self.run_beat(
+            extra_args=["test", "modules"])
+
+        assert exit_code == 0
+        assert self.log_contains("ERROR error making http request")
+        assert self.log_contains("cpu...OK")
+        assert self.log_contains("memory...OK")
+
+    def test_modules_test_filter_no_result(self):
+        """
+        Test test modules command filter by module (no result)
+        """
+        self.write_system_yml()
+
+        exit_code = self.run_beat(
+            extra_args=["test", "modules", "apache"])
+
+        assert exit_code == 0
+        assert not self.log_contains("OK")
+
+    def test_modules_test_filter(self):
+        """
+        Test test modules command filter by metricset
+        """
+        self.write_system_yml()
+        self.write_nginx_yml()
+
+        exit_code = self.run_beat(
+            extra_args=["test", "modules", "system", "cpu"])
+
+        assert exit_code == 0
+        assert self.log_contains("cpu...OK")
+        assert not self.log_contains("memory...OK")
+
     def touch(self, path):
         open(path, 'a').close()
+
+    def write_system_yml(self):
+        with open(self.working_dir + "/modules.d/system.yml", "wb") as f:
+            f.write("""
+- module: system
+  period: 10s
+  metricsets:
+    - cpu
+    - memory""")
+
+    def write_nginx_yml(self):
+        with open(self.working_dir + "/modules.d/nginx.yml", "wb") as f:
+            f.write("""
+- module: nginx
+  period: 10s
+  hosts: ["errorhost:80"]
+  metricsets:
+    - stubstatus""")

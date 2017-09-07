@@ -11,14 +11,14 @@ import (
 	"testing"
 	"time"
 
+	"github.com/stretchr/testify/assert"
+
 	"github.com/elastic/beats/filebeat/harvester/encoding"
 	"github.com/elastic/beats/filebeat/harvester/reader"
 	"github.com/elastic/beats/libbeat/common"
-	"github.com/stretchr/testify/assert"
 )
 
 func TestReadLine(t *testing.T) {
-
 	absPath, err := filepath.Abs("../../tests/files/logs/")
 	// All files starting with tmp are ignored
 	logFile := absPath + "/tmp" + strconv.Itoa(rand.Int()) + ".log"

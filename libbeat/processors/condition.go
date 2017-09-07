@@ -7,10 +7,10 @@ import (
 	"strconv"
 	"strings"
 
+	"github.com/elastic/beats/libbeat/beat"
 	"github.com/elastic/beats/libbeat/common"
 	"github.com/elastic/beats/libbeat/common/match"
 	"github.com/elastic/beats/libbeat/logp"
-	"github.com/elastic/beats/libbeat/publisher/beat"
 )
 
 type RangeValue struct {
@@ -106,7 +106,6 @@ func NewConditionList(config []ConditionConfig) ([]Condition, error) {
 }
 
 func (c *Condition) setEquals(cfg *ConditionFields) error {
-
 	c.equals = map[string]EqualsValue{}
 
 	for field, value := range cfg.fields {
@@ -152,7 +151,6 @@ func compileMatches(
 }
 
 func (c *Condition) setRange(cfg *ConditionFields) error {
-
 	c.rangexp = map[string]RangeValue{}
 
 	updateRangeValue := func(key string, op string, value float64) error {
@@ -198,7 +196,6 @@ func (c *Condition) setRange(cfg *ConditionFields) error {
 }
 
 func (c *Condition) Check(event *beat.Event) bool {
-
 	if len(c.or) > 0 {
 		return c.checkOR(event)
 	}
@@ -267,7 +264,6 @@ func (c *Condition) checkEquals(event *beat.Event) bool {
 	}
 
 	return true
-
 }
 
 func (c *Condition) checkMatches(event *beat.Event) bool {
@@ -310,7 +306,6 @@ func (c *Condition) checkMatches(event *beat.Event) bool {
 }
 
 func (c *Condition) checkRange(event *beat.Event) bool {
-
 	checkValue := func(value float64, rangeValue RangeValue) bool {
 
 		if rangeValue.gte != nil {
@@ -375,7 +370,6 @@ func (c *Condition) checkRange(event *beat.Event) bool {
 }
 
 func (c Condition) String() string {
-
 	s := ""
 
 	if len(c.equals) > 0 {
@@ -407,7 +401,6 @@ func (c Condition) String() string {
 }
 
 func (r RangeValue) String() string {
-
 	s := ""
 	if r.gte != nil {
 		s = s + fmt.Sprintf(">= %v", *r.gte)
@@ -436,7 +429,6 @@ func (r RangeValue) String() string {
 }
 
 func (e EqualsValue) String() string {
-
 	if len(e.Str) > 0 {
 		return e.Str
 	}

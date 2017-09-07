@@ -119,7 +119,7 @@ output.elasticsearch.hosts: ["http://localhost:9200"]
 ------------------------------------------------------------------------------
 
 [[config-file-format-type]]
-=== Config file Data Types
+=== Config file data types
 
 Values of configuration settings are interpreted as required by beats.
 If a value can not be correctly interpreted as the required type - for example a
@@ -180,7 +180,7 @@ duration2: 6h
 duration_disabled: -1s
 ------------------------------------------------------------------------------
 
-==== Regular Expression
+==== Regular expression
 
 Regular expressions are special strings getting compiled into regular
 expressions at load time.
@@ -211,12 +211,12 @@ format-string-with-date: '%{[fieldname]}-%{+yyyy.MM.dd}'
 
 
 [[config-file-format-env-vars]]
-=== Environment Variables
+=== Environment variables
 
 include::shared-env-vars.asciidoc[]
 
 [[config-gile-format-refs]]
-=== Reference Variables
+=== Reference variables
 
 Beats settings can reference other settings splicing multiple optionally custom
 named settings into new values. References use the same syntax as
@@ -281,7 +281,7 @@ when using plain references.
 
 
 [[config-file-permissions]]
-=== Config File Ownership and Permissions
+=== Config file ownership and permissions
 
 NOTE: This section does not apply to Windows or other non-POSIX operating systems.
 
@@ -317,7 +317,7 @@ permissions use: 'chmod go-w /etc/{beatname}/{beatname}.yml')
 To correct this problem, use `chmod go-w /etc/{beatname}/{beatname}.yml` to
 remove write privileges from anyone other than the owner.
 
-==== Disabling Strict Permission Checks
+==== Disabling strict permission checks
 
 You can disable strict permission checks from the command line by using
 `-strict.perms=false`, but we strongly encourage you to leave the checks enabled.
@@ -372,7 +372,7 @@ output.console:
 
 
 [[config-file-format-tips]]
-=== YAML Tips and Gotchas
+=== YAML tips and gotchas
 
 :allplatforms:
 include::yaml.asciidoc[]

@@ -17,7 +17,6 @@ type MultilineConfig struct {
 }
 
 func (c *MultilineConfig) Validate() error {
-
 	if c.Match != "after" && c.Match != "before" {
 		return fmt.Errorf("unknown matcher type: %s", c.Match)
 	}

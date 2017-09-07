@@ -1,9 +1,9 @@
 - key: aerospike
-  title: "aerospike"
+  title: "Aerospike"
   description: >
-    []experimental
+    experimental[]
 
-    aerospike Module
+    Aerospike module
   fields:
     - name: aerospike
       type: group

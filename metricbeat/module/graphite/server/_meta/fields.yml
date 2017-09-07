@@ -1,0 +1,9 @@
+- name: server
+  type: group
+  description: >
+    server
+  fields:
+    - name: example
+      type: keyword
+      description: >
+        Example field

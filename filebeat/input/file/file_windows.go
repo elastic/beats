@@ -15,7 +15,6 @@ type StateOS struct {
 
 // GetOSState returns the platform specific StateOS
 func GetOSState(info os.FileInfo) StateOS {
-
 	// os.SameFile must be called to populate the id fields. Otherwise in case for example
 	// os.Stat(file) is used to get the fileInfo, the ids are empty.
 	// https://github.com/elastic/beats/filebeat/pull/53
@@ -50,7 +49,6 @@ func (fs StateOS) String() string {
 // ReadOpen opens a file for reading only
 // As Windows blocks deleting a file when its open, some special params are passed here.
 func ReadOpen(path string) (*os.File, error) {
-
 	// Set all write flags
 	// This indirectly calls syscall_windows::Open method https://github.com/golang/go/blob/7ebcf5eac7047b1eef2443eda1786672b5c70f51/src/syscall/syscall_windows.go#L251
 	// As FILE_SHARE_DELETE cannot be passed to Open, os.CreateFile must be implemented directly

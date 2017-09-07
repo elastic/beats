@@ -3,13 +3,13 @@ package pipeline
 import (
 	"errors"
 
-	"github.com/elastic/beats/libbeat/publisher/beat"
+	"github.com/elastic/beats/libbeat/beat"
 )
 
 type ackBuilder interface {
 	createPipelineACKer(canDrop bool, sema *sema) acker
 	createCountACKer(canDrop bool, sema *sema, fn func(int)) acker
-	createEventACKer(canDrop bool, sema *sema, fn func([]beat.Event)) acker
+	createEventACKer(canDrop bool, sema *sema, fn func([]interface{})) acker
 }
 
 type pipelineEmptyACK struct {
@@ -33,10 +33,10 @@ func (b *pipelineEmptyACK) createCountACKer(canDrop bool, sema *sema, fn func(in
 func (b *pipelineEmptyACK) createEventACKer(
 	canDrop bool,
 	sema *sema,
-	fn func([]beat.Event),
+	fn func([]interface{}),
 ) acker {
-	return buildClientEventACK(b.pipeline, canDrop, sema, func(guard *clientACKer) func([]beat.Event, int) {
-		return func(events []beat.Event, acked int) {
+	return buildClientEventACK(b.pipeline, canDrop, sema, func(guard *clientACKer) func([]interface{}, int) {
+		return func(events []interface{}, acked int) {
 			if guard.Active() {
 				fn(events)
 			}
@@ -67,13 +67,13 @@ func (b *pipelineCountACK) createCountACKer(canDrop bool, sema *sema, fn func(in
 func (b *pipelineCountACK) createEventACKer(
 	canDrop bool,
 	sema *sema,
-	fn func([]beat.Event),
+	fn func([]interface{}),
 ) acker {
-	return buildClientEventACK(b.pipeline, canDrop, sema, func(guard *clientACKer) func([]beat.Event, int) {
-		return func(events []beat.Event, acked int) {
-			b.cb(len(events), acked)
+	return buildClientEventACK(b.pipeline, canDrop, sema, func(guard *clientACKer) func([]interface{}, int) {
+		return func(data []interface{}, acked int) {
+			b.cb(len(data), acked)
 			if guard.Active() {
-				fn(events)
+				fn(data)
 			}
 		}
 	})
@@ -81,7 +81,7 @@ func (b *pipelineCountACK) createEventACKer(
 
 type pipelineEventsACK struct {
 	pipeline *Pipeline
-	cb       func([]beat.Event, int)
+	cb       func([]interface{}, int)
 }
 
 func (b *pipelineEventsACK) createPipelineACKer(canDrop bool, sema *sema) acker {
@@ -89,30 +89,30 @@ func (b *pipelineEventsACK) createPipelineACKer(canDrop bool, sema *sema) acker 
 }
 
 func (b *pipelineEventsACK) createCountACKer(canDrop bool, sema *sema, fn func(int)) acker {
-	return buildClientEventACK(b.pipeline, canDrop, sema, func(guard *clientACKer) func([]beat.Event, int) {
-		return func(events []beat.Event, acked int) {
-			b.cb(events, acked)
+	return buildClientEventACK(b.pipeline, canDrop, sema, func(guard *clientACKer) func([]interface{}, int) {
+		return func(data []interface{}, acked int) {
+			b.cb(data, acked)
 			if guard.Active() {
-				fn(len(events))
+				fn(len(data))
 			}
 		}
 	})
 }
 
-func (b *pipelineEventsACK) createEventACKer(canDrop bool, sema *sema, fn func([]beat.Event)) acker {
-	return buildClientEventACK(b.pipeline, canDrop, sema, func(guard *clientACKer) func([]beat.Event, int) {
-		return func(events []beat.Event, acked int) {
-			b.cb(events, acked)
+func (b *pipelineEventsACK) createEventACKer(canDrop bool, sema *sema, fn func([]interface{})) acker {
+	return buildClientEventACK(b.pipeline, canDrop, sema, func(guard *clientACKer) func([]interface{}, int) {
+		return func(data []interface{}, acked int) {
+			b.cb(data, acked)
 			if guard.Active() {
-				fn(events)
+				fn(data)
 			}
 		}
 	})
 }
 
 // pipelineEventCB internally handles active ACKs in the pipeline.
-// It receives ACK events from the broker and the individual clients.
-// Once the broker returns an ACK to the pipelineEventCB, the worker loop will collect
+// It receives ACK events from the queue and the individual clients.
+// Once the queue returns an ACK to the pipelineEventCB, the worker loop will collect
 // events from all clients having published events in the last batch of events
 // being ACKed.
 // the PipelineACKHandler will be notified, once all events being ACKed
@@ -124,15 +124,15 @@ type pipelineEventCB struct {
 
 	acks chan int
 
-	events        chan eventsMsg
-	droppedEvents chan eventsMsg
+	events        chan eventsDataMsg
+	droppedEvents chan eventsDataMsg
 
 	mode    pipelineACKMode
 	handler beat.PipelineACKHandler
 }
 
-type eventsMsg struct {
-	events       []beat.Event
+type eventsDataMsg struct {
+	data         []interface{}
 	total, acked int
 	sig          chan struct{}
 }
@@ -173,8 +173,8 @@ func newPipelineEventCB(handler beat.PipelineACKHandler) (*pipelineEventCB, erro
 		acks:          make(chan int),
 		mode:          mode,
 		handler:       handler,
-		events:        make(chan eventsMsg),
-		droppedEvents: make(chan eventsMsg),
+		events:        make(chan eventsDataMsg),
+		droppedEvents: make(chan eventsDataMsg),
 	}
 	go cb.worker()
 	return cb, nil
@@ -194,17 +194,17 @@ func (p *pipelineEventCB) close() {
 // Note: the call blocks, until the ACK handler has collected all active events
 //       from all clients. This ensure an ACK event being fully 'captured'
 //       by the pipeline, before receiving/processing another ACK event.
-//       In the meantime the broker has the chance of batching-up more ACK events,
+//       In the meantime the queue has the chance of batching-up more ACK events,
 //       such that only one ACK event is being reported to the pipeline handler
-func (p *pipelineEventCB) onEvents(events []beat.Event, acked int) {
-	p.pushMsg(eventsMsg{events: events, total: len(events), acked: acked})
+func (p *pipelineEventCB) onEvents(data []interface{}, acked int) {
+	p.pushMsg(eventsDataMsg{data: data, total: len(data), acked: acked})
 }
 
 func (p *pipelineEventCB) onCounts(total, acked int) {
-	p.pushMsg(eventsMsg{total: total, acked: acked})
+	p.pushMsg(eventsDataMsg{total: total, acked: acked})
 }
 
-func (p *pipelineEventCB) pushMsg(msg eventsMsg) {
+func (p *pipelineEventCB) pushMsg(msg eventsDataMsg) {
 	if msg.acked == 0 {
 		p.droppedEvents <- msg
 	} else {
@@ -215,7 +215,7 @@ func (p *pipelineEventCB) pushMsg(msg eventsMsg) {
 }
 
 // Starts a new ACKed event.
-func (p *pipelineEventCB) reportBrokerACK(acked int) {
+func (p *pipelineEventCB) reportQueueACK(acked int) {
 	p.acks <- acked
 }
 
@@ -235,7 +235,7 @@ func (p *pipelineEventCB) worker() {
 			// short circuite dropped events, but have client block until all events
 			// have been processed by pipeline ack handler
 		case msg := <-p.droppedEvents:
-			p.reportEvents(msg.events, msg.total)
+			p.reportEventsData(msg.data, msg.total)
 			if msg.sig != nil {
 				close(msg.sig)
 			}
@@ -249,13 +249,13 @@ func (p *pipelineEventCB) worker() {
 func (p *pipelineEventCB) collect(count int) (exit bool) {
 	var (
 		signalers []chan struct{}
-		events    []beat.Event
+		data      []interface{}
 		acked     int
 		total     int
 	)
 
 	for acked < count {
-		var msg eventsMsg
+		var msg eventsDataMsg
 		select {
 		case msg = <-p.events:
 		case msg = <-p.droppedEvents:
@@ -276,31 +276,31 @@ func (p *pipelineEventCB) collect(count int) (exit bool) {
 
 		switch p.mode {
 		case eventsACKMode:
-			events = append(events, msg.events...)
+			data = append(data, msg.data...)
 
 		case lastEventsACKMode:
-			if L := len(msg.events); L > 0 {
-				events = append(events, msg.events[L-1])
+			if L := len(msg.data); L > 0 {
+				data = append(data, msg.data[L-1])
 			}
 		}
 	}
 
-	// signal clients we processed all active ACKs, as reported by broker
+	// signal clients we processed all active ACKs, as reported by queue
 	for _, sig := range signalers {
 		close(sig)
 	}
-	p.reportEvents(events, total)
+	p.reportEventsData(data, total)
 	return
 }
 
-func (p *pipelineEventCB) reportEvents(events []beat.Event, total int) {
+func (p *pipelineEventCB) reportEventsData(data []interface{}, total int) {
 	// report ACK back to the beat
 	switch p.mode {
 	case countACKMode:
 		p.handler.ACKCount(total)
 	case eventsACKMode:
-		p.handler.ACKEvents(events)
+		p.handler.ACKEvents(data)
 	case lastEventsACKMode:
-		p.handler.ACKLastEvents(events)
+		p.handler.ACKLastEvents(data)
 	}
 }

@@ -3,14 +3,14 @@ package beater
 import (
 	"sync"
 
+	"github.com/elastic/beats/filebeat/input/file"
 	"github.com/elastic/beats/filebeat/registrar"
-	"github.com/elastic/beats/filebeat/util"
 	"github.com/elastic/beats/libbeat/monitoring"
 )
 
 type registrarLogger struct {
 	done chan struct{}
-	ch   chan<- []*util.Data
+	ch   chan<- []file.State
 }
 
 type finishedLogger struct {
@@ -32,7 +32,7 @@ func newRegistrarLogger(reg *registrar.Registrar) *registrarLogger {
 }
 
 func (l *registrarLogger) Close() { close(l.done) }
-func (l *registrarLogger) Published(events []*util.Data) bool {
+func (l *registrarLogger) Published(states []file.State) {
 	select {
 	case <-l.done:
 		// set ch to nil, so no more events will be send after channel close signal
@@ -40,9 +40,7 @@ func (l *registrarLogger) Published(events []*util.Data) bool {
 		// Note: nil channels will block, so only done channel will be actively
 		//       report 'closed'.
 		l.ch = nil
-		return false
-	case l.ch <- events:
-		return true
+	case l.ch <- states:
 	}
 }
 
@@ -50,11 +48,10 @@ func newFinishedLogger(wg *eventCounter) *finishedLogger {
 	return &finishedLogger{wg}
 }
 
-func (l *finishedLogger) Published(events []*util.Data) bool {
-	for range events {
+func (l *finishedLogger) Published(n int) bool {
+	for i := 0; i < n; i++ {
 		l.wg.Done()
 	}
-
 	return true
 }
 

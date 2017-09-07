@@ -16,6 +16,9 @@ type Driver interface {
 
 	// Fatal behaves like error but stops current goroutine on error
 	Fatal(field string, err error)
+
+	// Shows given result to the user
+	Result(data string)
 }
 
 // Testable is optionally implemented by clients that support self testing.

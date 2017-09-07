@@ -20,19 +20,20 @@ import (
 	"sync"
 	"time"
 
+	"github.com/satori/go.uuid"
+	"golang.org/x/text/transform"
+
+	"github.com/elastic/beats/libbeat/beat"
+	"github.com/elastic/beats/libbeat/common"
+	"github.com/elastic/beats/libbeat/logp"
+	"github.com/elastic/beats/libbeat/monitoring"
+
 	"github.com/elastic/beats/filebeat/channel"
 	"github.com/elastic/beats/filebeat/harvester"
 	"github.com/elastic/beats/filebeat/harvester/encoding"
 	"github.com/elastic/beats/filebeat/harvester/reader"
 	"github.com/elastic/beats/filebeat/input/file"
 	"github.com/elastic/beats/filebeat/util"
-	"github.com/elastic/beats/libbeat/common"
-	"github.com/elastic/beats/libbeat/logp"
-	"github.com/elastic/beats/libbeat/monitoring"
-	"github.com/elastic/beats/libbeat/publisher/beat"
-
-	"github.com/satori/go.uuid"
-	"golang.org/x/text/transform"
 )
 
 var (
@@ -118,7 +119,6 @@ func NewHarvester(
 
 // open does open the file given under h.Path and assigns the file handler to h.log
 func (h *Harvester) open() error {
-
 	switch h.config.Type {
 	case harvester.StdinType:
 		return h.openStdin()
@@ -150,12 +150,10 @@ func (h *Harvester) Setup() error {
 	}
 
 	return nil
-
 }
 
 // Run start the harvester and reads files line by line and sends events to the defined output
 func (h *Harvester) Run() error {
-
 	// This is to make sure a harvester is not started anymore if stop was already
 	// called before the harvester was started. The waitgroup is not incremented afterwards
 	// as otherwise it could happend that between checking for the close channel and incrementing
@@ -328,7 +326,6 @@ func (h *Harvester) sendEvent(data *util.Data) bool {
 // is started. As soon as the output becomes available again, the finished state is written
 // and processing can continue.
 func (h *Harvester) SendStateUpdate() {
-
 	if !h.source.HasState() {
 		return
 	}
@@ -360,7 +357,6 @@ func (h *Harvester) shouldExportLine(line string) bool {
 	}
 
 	return true
-
 }
 
 // openFile opens a file and checks for the encoding. In case the encoding cannot be detected
@@ -368,7 +364,6 @@ func (h *Harvester) shouldExportLine(line string) bool {
 // is returned and the harvester is closed. The file will be picked up again the next time
 // the file system is scanned
 func (h *Harvester) openFile() error {
-
 	f, err := file.ReadOpen(h.state.Source)
 	if err != nil {
 		return fmt.Errorf("Failed opening %s: %s", h.state.Source, err)
@@ -389,7 +384,6 @@ func (h *Harvester) openFile() error {
 }
 
 func (h *Harvester) validateFile(f *os.File) error {
-
 	info, err := f.Stat()
 	if err != nil {
 		return fmt.Errorf("Failed getting stats for file %s: %s", h.state.Source, err)
@@ -428,7 +422,6 @@ func (h *Harvester) validateFile(f *os.File) error {
 }
 
 func (h *Harvester) initFileOffset(file *os.File) (int64, error) {
-
 	// continue from last known offset
 	if h.state.Offset > 0 {
 		logp.Debug("harvester", "Set previous offset for file: %s. Offset: %d ", h.state.Source, h.state.Offset)
@@ -442,7 +435,6 @@ func (h *Harvester) initFileOffset(file *os.File) (int64, error) {
 
 // getState returns an updated copy of the harvester state
 func (h *Harvester) getState() file.State {
-
 	if !h.source.HasState() {
 		return file.State{}
 	}
@@ -455,7 +447,6 @@ func (h *Harvester) getState() file.State {
 }
 
 func (h *Harvester) cleanup() {
-
 	// Mark harvester as finished
 	h.state.Finished = true
 
@@ -496,7 +487,6 @@ func (h *Harvester) cleanup() {
 // log_file implements io.Reader interface and encode reader is an adapter for io.Reader to
 // reader.Reader also handling file encodings. All other readers implement reader.Reader
 func (h *Harvester) newLogFileReader() (reader.Reader, error) {
-
 	var r reader.Reader
 	var err error
 

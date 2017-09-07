@@ -4,11 +4,12 @@ import (
 	"bytes"
 	stdjson "encoding/json"
 
-	"github.com/elastic/beats/libbeat/common"
-	"github.com/elastic/beats/libbeat/outputs/codec"
-	"github.com/elastic/beats/libbeat/publisher/beat"
 	"github.com/urso/go-structform/gotype"
 	"github.com/urso/go-structform/json"
+
+	"github.com/elastic/beats/libbeat/beat"
+	"github.com/elastic/beats/libbeat/common"
+	"github.com/elastic/beats/libbeat/outputs/codec"
 )
 
 type Encoder struct {
@@ -51,7 +52,10 @@ func (e *Encoder) reset() {
 
 	// create new encoder with custom time.Time encoding
 	e.folder, err = gotype.NewIterator(visitor,
-		gotype.Folders(codec.TimestampEncoder, codec.BcTimestampEncoder),
+		gotype.Folders(
+			codec.MakeTimestampEncoder(),
+			codec.MakeBCTimestampEncoder(),
+		),
 	)
 	if err != nil {
 		panic(err)

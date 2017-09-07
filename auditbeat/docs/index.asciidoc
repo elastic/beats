@@ -3,6 +3,13 @@
 include::../../libbeat/docs/version.asciidoc[]
 
 :libbeat: http://www.elastic.co/guide/en/beats/libbeat/{doc-branch}
+:kibana-ref: https://www.elastic.co/guide/en/kibana/{doc-branch}
+:beatsdevguide: http://www.elastic.co/guide/en/beats/devguide/{doc-branch}
+:filebeat: http://www.elastic.co/guide/en/beats/filebeat/{doc-branch}
+:logstashdoc: https://www.elastic.co/guide/en/logstash/{doc-branch}
+:elasticsearch: https://www.elastic.co/guide/en/elasticsearch/reference/{doc-branch}
+:securitydoc: https://www.elastic.co/guide/en/x-pack/current
+:monitoringdoc: https://www.elastic.co/guide/en/x-pack/current
 :version: {stack-version}
 :beatname_lc: auditbeat
 :beatname_uc: Auditbeat
@@ -10,14 +17,24 @@ include::../../libbeat/docs/version.asciidoc[]
 :security: X-Pack Security
 :dockerimage: docker.elastic.co/beats/{beatname_lc}:{version}
 
+include::./overview.asciidoc[]
+
 include::../../libbeat/docs/contributing-to-beats.asciidoc[]
+
+include::./getting-started.asciidoc[]
 
 include::../../libbeat/docs/repositories.asciidoc[]
 
-:standalone:
-include::../../libbeat/docs/shared-env-vars.asciidoc[]
-:standalone:
-:allplatforms:
-include::../../libbeat/docs/yaml.asciidoc[]
+include::./setting-up-running.asciidoc[]
+
+include::./configuring-howto.asciidoc[]
+
+include::./modules.asciidoc[]
 
 include::./fields.asciidoc[]
+
+include::./securing-auditbeat.asciidoc[]
+
+include::./troubleshooting.asciidoc[]
+
+include::./faq.asciidoc[]

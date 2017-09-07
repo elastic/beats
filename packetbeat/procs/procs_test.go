@@ -19,7 +19,6 @@ type testProcFile struct {
 }
 
 func createFakeDirectoryStructure(prefix string, files []testProcFile) error {
-
 	var err error
 	for _, file := range files {
 		dir := filepath.Dir(file.path)
@@ -117,7 +116,6 @@ func TestFindPidsByCmdlineGrep(t *testing.T) {
 }
 
 func TestRefreshPids(t *testing.T) {
-
 	proc := []testProcFile{
 		{path: "/proc/1/cmdline", contents: "/sbin/init"},
 		{path: "/proc/1/cgroup", contents: ""},

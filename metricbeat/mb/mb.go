@@ -9,7 +9,6 @@ import (
 	"time"
 
 	"github.com/elastic/beats/libbeat/common"
-	"github.com/elastic/beats/libbeat/processors"
 )
 
 const (
@@ -206,24 +205,20 @@ func (b *BaseMetricSet) HostData() HostData {
 // the metricset fetches not only the predefined fields but add alls raw data under
 // the raw namespace to the event.
 type ModuleConfig struct {
-	Hosts      []string                `config:"hosts"`
-	Period     time.Duration           `config:"period"     validate:"positive"`
-	Timeout    time.Duration           `config:"timeout"    validate:"positive"`
-	Module     string                  `config:"module"     validate:"required"`
-	MetricSets []string                `config:"metricsets" validate:"required"`
-	Enabled    bool                    `config:"enabled"`
-	Filters    processors.PluginConfig `config:"filters"`
-	Raw        bool                    `config:"raw"`
-
-	common.EventMetadata `config:",inline"` // Fields and tags to add to events.
+	Hosts      []string      `config:"hosts"`
+	Period     time.Duration `config:"period"     validate:"positive"`
+	Timeout    time.Duration `config:"timeout"    validate:"positive"`
+	Module     string        `config:"module"     validate:"required"`
+	MetricSets []string      `config:"metricsets" validate:"required"`
+	Enabled    bool          `config:"enabled"`
+	Raw        bool          `config:"raw"`
 }
 
 func (c ModuleConfig) String() string {
 	return fmt.Sprintf(`{Module:"%v", MetricSets:%v, Enabled:%v, `+
-		`Hosts:[%v hosts], Period:"%v", Timeout:"%v", Raw:%v, Fields:%v, `+
-		`FieldsUnderRoot:%v, Tags:%v}`,
+		`Hosts:[%v hosts], Period:"%v", Timeout:"%v", Raw:%v}`,
 		c.Module, c.MetricSets, c.Enabled, len(c.Hosts), c.Period, c.Timeout,
-		c.Raw, c.Fields, c.FieldsUnderRoot, c.Tags)
+		c.Raw)
 }
 
 func (c ModuleConfig) GoString() string { return c.String() }

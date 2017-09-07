@@ -8,8 +8,9 @@ import (
 	"strconv"
 	"testing"
 
-	"github.com/elastic/beats/libbeat/outputs/elasticsearch"
 	"github.com/stretchr/testify/assert"
+
+	"github.com/elastic/beats/libbeat/outputs/elasticsearch"
 )
 
 func TestLoadPipeline(t *testing.T) {
@@ -67,8 +68,8 @@ func TestSetupNginx(t *testing.T) {
 	modulesPath, err := filepath.Abs("../module")
 	assert.NoError(t, err)
 
-	configs := []ModuleConfig{
-		{Module: "nginx"},
+	configs := []*ModuleConfig{
+		&ModuleConfig{Module: "nginx"},
 	}
 
 	reg, err := newModuleRegistry(modulesPath, configs, nil, "5.2.0")

@@ -90,7 +90,6 @@ func (proto TestProtocol) ConnectionTimeout() time.Duration {
 }
 
 func Test_configToPortsMap(t *testing.T) {
-
 	type configTest struct {
 		Input  map[protos.Protocol]protos.TCPPlugin
 		Output map[uint16]protos.Protocol
@@ -143,7 +142,6 @@ func Test_configToPortsMap(t *testing.T) {
 }
 
 func Test_configToPortsMap_negative(t *testing.T) {
-
 	type errTest struct {
 		Input map[protos.Protocol]protos.TCPPlugin
 		Err   string

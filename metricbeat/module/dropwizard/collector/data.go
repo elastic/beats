@@ -108,7 +108,6 @@ func splitTagsFromMetricName(metricName string) (string, common.MapStr) {
 
 // convertValue takes the input string and converts it to int of float
 func convertValue(value json.Number) interface{} {
-
 	if i, err := value.Int64(); err == nil {
 		return i
 	}

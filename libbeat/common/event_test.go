@@ -5,8 +5,9 @@ import (
 	"testing"
 	"time"
 
-	"github.com/elastic/beats/libbeat/logp"
 	"github.com/stretchr/testify/assert"
+
+	"github.com/elastic/beats/libbeat/logp"
 )
 
 func TestConvertNestedMapStr(t *testing.T) {
@@ -117,7 +118,6 @@ func TestConvertNestedMapStr(t *testing.T) {
 	for i, test := range tests {
 		assert.Equal(t, test.Output, ConvertToGenericEvent(test.Input), "Test case %d", i)
 	}
-
 }
 
 func TestConvertNestedStruct(t *testing.T) {
@@ -300,7 +300,6 @@ func TestMarshalUnmarshalArray(t *testing.T) {
 }
 
 func TestMarshalFloatValues(t *testing.T) {
-
 	assert := assert.New(t)
 
 	var f float64

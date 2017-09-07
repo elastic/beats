@@ -2,7 +2,7 @@
 This file is generated! See scripts/docs_collector.py
 ////
 
-  * <<metricbeat-module-audit,Audit>>
+  * <<{beatname_lc}-module-audit,Audit>>
 
 
 --

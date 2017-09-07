@@ -5,10 +5,10 @@ import (
 	"strings"
 	"time"
 
+	"github.com/elastic/beats/libbeat/beat"
 	"github.com/elastic/beats/libbeat/common"
 	"github.com/elastic/beats/libbeat/logp"
 	"github.com/elastic/beats/libbeat/monitoring"
-	"github.com/elastic/beats/libbeat/publisher/beat"
 
 	"github.com/elastic/beats/packetbeat/procs"
 	"github.com/elastic/beats/packetbeat/protos"
@@ -182,7 +182,6 @@ func (stream *pgsqlStream) prepareForNewMessage() {
 
 // Extract the method from a SQL query
 func getQueryMethod(q string) string {
-
 	index := strings.Index(q, " ")
 	var method string
 	if index > 0 {
@@ -355,7 +354,6 @@ var handlePgsql = func(pgsql *pgsqlPlugin, m *pgsqlMessage, tcptuple *common.TCP
 }
 
 func (pgsql *pgsqlPlugin) receivedPgsqlRequest(msg *pgsqlMessage) {
-
 	tuple := msg.tcpTuple
 
 	// parse the query, as it might contain a list of pgsql command
@@ -403,7 +401,6 @@ func (pgsql *pgsqlPlugin) receivedPgsqlRequest(msg *pgsqlMessage) {
 }
 
 func (pgsql *pgsqlPlugin) receivedPgsqlResponse(msg *pgsqlMessage) {
-
 	tuple := msg.tcpTuple
 	transList := pgsql.getTransaction(tuple.Hashable())
 	if transList == nil || len(transList) == 0 {
@@ -443,7 +440,6 @@ func (pgsql *pgsqlPlugin) receivedPgsqlResponse(msg *pgsqlMessage) {
 }
 
 func (pgsql *pgsqlPlugin) publishTransaction(t *pgsqlTransaction) {
-
 	if pgsql.results == nil {
 		return
 	}

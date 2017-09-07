@@ -8,7 +8,6 @@ import (
 	"sync"
 
 	"github.com/elastic/beats/filebeat/input/file"
-	"github.com/elastic/beats/filebeat/util"
 	helper "github.com/elastic/beats/libbeat/common/file"
 	"github.com/elastic/beats/libbeat/logp"
 	"github.com/elastic/beats/libbeat/monitoring"
@@ -16,7 +15,7 @@ import (
 )
 
 type Registrar struct {
-	Channel      chan []*util.Data
+	Channel      chan []file.State
 	out          successLogger
 	done         chan struct{}
 	registryFile string       // Path to the Registry File
@@ -25,7 +24,7 @@ type Registrar struct {
 }
 
 type successLogger interface {
-	Published(events []*util.Data) bool
+	Published(n int) bool
 }
 
 var (
@@ -36,12 +35,11 @@ var (
 )
 
 func New(registryFile string, out successLogger) (*Registrar, error) {
-
 	r := &Registrar{
 		registryFile: registryFile,
 		done:         make(chan struct{}),
 		states:       file.NewStates(),
-		Channel:      make(chan []*util.Data, 1),
+		Channel:      make(chan []file.State, 1),
 		out:          out,
 		wg:           sync.WaitGroup{},
 	}
@@ -52,7 +50,6 @@ func New(registryFile string, out successLogger) (*Registrar, error) {
 
 // Init sets up the Registrar and make sure the registry file is setup correctly
 func (r *Registrar) Init() error {
-
 	// The registry file is opened in the data path
 	r.registryFile = paths.Resolve(paths.Data, r.registryFile)
 
@@ -96,7 +93,6 @@ func (r *Registrar) GetStates() []file.State {
 // loadStates fetches the previous reading state from the configure RegistryFile file
 // The default file is `registry` in the data path.
 func (r *Registrar) loadStates() error {
-
 	f, err := os.Open(r.registryFile)
 	if err != nil {
 		return err
@@ -123,7 +119,6 @@ func (r *Registrar) loadStates() error {
 // resetStates sets all states to finished and disable TTL on restart
 // For all states covered by a prospector, TTL will be overwritten with the prospector value
 func resetStates(states []file.State) []file.State {
-
 	for key, state := range states {
 		state.Finished = true
 		// Set ttl to -2 to easily spot which states are not managed by a prospector
@@ -134,7 +129,6 @@ func resetStates(states []file.State) []file.State {
 }
 
 func (r *Registrar) Start() error {
-
 	// Load the previous log file locations now, for use in prospector
 	err := r.loadStates()
 	if err != nil {
@@ -160,15 +154,15 @@ func (r *Registrar) Run() {
 		case <-r.done:
 			logp.Info("Ending Registrar")
 			return
-		case events := <-r.Channel:
-			r.onEvents(events)
+		case states := <-r.Channel:
+			r.onEvents(states)
 		}
 	}
 }
 
 // onEvents processes events received from the publisher pipeline
-func (r *Registrar) onEvents(events []*util.Data) {
-	r.processEventStates(events)
+func (r *Registrar) onEvents(states []file.State) {
+	r.processEventStates(states)
 
 	beforeCount := r.states.Count()
 	cleanedStates := r.states.Cleanup()
@@ -183,21 +177,16 @@ func (r *Registrar) onEvents(events []*util.Data) {
 	}
 
 	if r.out != nil {
-		r.out.Published(events)
+		r.out.Published(len(states))
 	}
 }
 
 // processEventStates gets the states from the events and writes them to the registrar state
-func (r *Registrar) processEventStates(events []*util.Data) {
-	logp.Debug("registrar", "Processing %d events", len(events))
+func (r *Registrar) processEventStates(states []file.State) {
+	logp.Debug("registrar", "Processing %d events", len(states))
 
-	for _, data := range events {
-
-		// skip events without state
-		if !data.HasState() {
-			continue
-		}
-		r.states.Update(data.GetState())
+	for i := range states {
+		r.states.Update(states[i])
 		statesUpdate.Add(1)
 	}
 }

@@ -2,7 +2,7 @@
 This file is generated! See scripts/docs_collector.py
 ////
 
-[[metricbeat-metricset-audit-kernel]]
+[id="{beatname_lc}-metricset-audit-kernel"]
 include::../../../module/audit/kernel/_meta/docs.asciidoc[]
 
 

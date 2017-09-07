@@ -1,0 +1,67 @@
+=== Audit file metricset
+
+The `file` metricset sends events when a file is changed (created, updated, or
+deleted) on disk. The events contain file metadata and hashes.
+
+The metricset is implemented for Linux, macOS (Darwin), and Windows.
+
+[float]
+=== How it works
+
+This metricset uses features of the operating system to monitor file changes in
+realtime. When the metricset starts it creates a subscription with the OS to
+receive notifications of changes to the specified files or directories. Upon
+receiving notification of a change the metricset will read the file's metadata
+and the compute a hash of the file's contents.
+
+This metricset does not perform an initial scan of the given paths to generate
+events for the files as they existed at start time. It is strictly driven by
+change notifications from the OS.
+
+The operating system features that power this feature are as follows.
+
+* Linux - `inotify` is used, and therefore the kernel must have inotify support.
+Inotify was initially merged into the 2.6.13 Linux kernel.
+* macOS (Darwin) - `kqueue` is used. It requires one file descriptor for each
+file so please check the `ulimit` values used with {beatname_uc}. The FSEvents
+API was considered for the implementation, but FSEvents coalesces multiple
+notifications into a single event which is inconsistent with the metricset's
+behavior on other operating systems.
+* Windows - `ReadDirectoryChangesW` is used.
+
+The file metricset should not be used to monitor paths on network file systems.
+
+[float]
+=== Configuration options
+
+This metricset has some configuration options for tuning its behavior. The
+following example shows all configuration options with their default values for
+Linux.
+
+[source,yaml]
+----
+- module: audit
+  metricsets: [file]
+  file.paths:
+  - /bin
+  - /usr/bin
+  - /sbin
+  - /usr/sbin
+  - /etc
+  file.max_file_size: 100 MiB
+  file.hash_types: [sha1]
+----
+
+*`file.paths`*:: A list of paths (directories or files) to watch. The watches
+are non-recursive and globs are not supported. The specified paths should exist
+when the metricset is started.
+
+*`file.max_file_size`*:: The maximum size of a file in bytes for which
+{beatname_uc} will compute hashes. Files larger than this size will not be
+hashed. The default value is 100 MiB. For convenience units can be specified as
+a suffix to the value. The supported units are `b`, `kib`, `kb`, `mib`, `mb`,
+`gib`, `gb`, `tib`, `tb`, `pib`, `pb`, `eib`, and `eb`.
+
+*`file.hash_types`*:: A list of hash types to compute when the file changes.
+The supported hash types are md5, sha1, sha224, sha256, sha384, sha512,
+sha512_224, and sha512_256. The default value is sha1.

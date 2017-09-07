@@ -7,8 +7,9 @@ import (
 	"runtime"
 	"testing"
 
-	"github.com/elastic/gosigar"
 	"github.com/stretchr/testify/assert"
+
+	"github.com/elastic/gosigar"
 )
 
 func TestGetMemory(t *testing.T) {
@@ -25,7 +26,6 @@ func TestGetMemory(t *testing.T) {
 }
 
 func TestGetSwap(t *testing.T) {
-
 	if runtime.GOOS == "windows" {
 		return //no load data on windows
 	}
@@ -41,7 +41,6 @@ func TestGetSwap(t *testing.T) {
 }
 
 func TestMemPercentage(t *testing.T) {
-
 	m := MemStat{
 		Mem: gosigar.Mem{
 			Total: 7,
@@ -60,7 +59,6 @@ func TestMemPercentage(t *testing.T) {
 }
 
 func TestActualMemPercentage(t *testing.T) {
-
 	m := MemStat{
 		Mem: gosigar.Mem{
 			Total:      7,

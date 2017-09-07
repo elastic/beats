@@ -10,13 +10,14 @@ import (
 	"strings"
 	"time"
 
+	"github.com/pkg/errors"
+
 	"github.com/elastic/beats/libbeat/common"
 	"github.com/elastic/beats/libbeat/common/match"
 	"github.com/elastic/beats/libbeat/logp"
 	"github.com/elastic/beats/metricbeat/module/system"
 	"github.com/elastic/beats/metricbeat/module/system/memory"
 	sigar "github.com/elastic/gosigar"
-	"github.com/pkg/errors"
 )
 
 var NumCPU = runtime.NumCPU()
@@ -181,7 +182,6 @@ func getProcEnv(pid int, out common.MapStr, filter func(v string) bool) error {
 }
 
 func GetProcMemPercentage(proc *Process, totalPhyMem uint64) float64 {
-
 	// in unit tests, total_phymem is set to a value greater than zero
 	if totalPhyMem == 0 {
 		memStat, err := memory.GetMemory()
@@ -198,7 +198,6 @@ func GetProcMemPercentage(proc *Process, totalPhyMem uint64) float64 {
 }
 
 func Pids() ([]int, error) {
-
 	pids := sigar.ProcList{}
 	err := pids.Get()
 	if err != nil {
@@ -208,7 +207,6 @@ func Pids() ([]int, error) {
 }
 
 func getProcState(b byte) string {
-
 	switch b {
 	case 'S':
 		return "sleeping"
@@ -309,7 +307,6 @@ func GetProcCpuPercentage(s0, s1 *Process) (normalizedPct, pct float64) {
 }
 
 func (procStats *ProcStats) MatchProcess(name string) bool {
-
 	for _, reg := range procStats.procRegexps {
 		if reg.MatchString(name) {
 			return true
@@ -319,7 +316,6 @@ func (procStats *ProcStats) MatchProcess(name string) bool {
 }
 
 func (procStats *ProcStats) InitProcStats() error {
-
 	procStats.ProcsMap = make(ProcsMap)
 
 	if len(procStats.Procs) == 0 {
@@ -348,7 +344,6 @@ func (procStats *ProcStats) InitProcStats() error {
 }
 
 func (procStats *ProcStats) GetProcStats() ([]common.MapStr, error) {
-
 	if len(procStats.Procs) == 0 {
 		return nil, nil
 	}
@@ -405,7 +400,6 @@ func (procStats *ProcStats) GetProcStats() ([]common.MapStr, error) {
 }
 
 func (procStats *ProcStats) includeTopProcesses(processes []Process) []Process {
-
 	if !procStats.IncludeTop.Enabled ||
 		(procStats.IncludeTop.ByCPU == 0 && procStats.IncludeTop.ByMemory == 0) {
 

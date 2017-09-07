@@ -11,7 +11,6 @@ import (
 )
 
 func TestGetUrl(t *testing.T) {
-
 	// List of inputs / outputs that must match after fetching url
 	// Setting a path without a scheme is not allowed. Example: 192.168.1.1:9200/hello
 	inputOutput := map[string]string{
@@ -80,11 +79,9 @@ func TestGetUrl(t *testing.T) {
 		assert.Nil(t, err)
 		assert.Equal(t, output, urlNew)
 	}
-
 }
 
 func TestURLParamsEncode(t *testing.T) {
-
 	inputOutputWithParams := map[string]string{
 		"http://localhost": "http://localhost:5601?dashboard=first&dashboard=second",
 	}
@@ -99,5 +96,4 @@ func TestURLParamsEncode(t *testing.T) {
 		assert.Nil(t, err)
 		assert.Equal(t, output, urlWithParams)
 	}
-
 }

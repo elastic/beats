@@ -1,4 +1,4 @@
-== HTTP Module
+== HTTP module
 
 The HTTP module is a Metricbeat module used to call arbitrary HTTP endpoints for which a dedicated Metricbeat module is not available.
 

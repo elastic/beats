@@ -53,10 +53,10 @@ metricbeat.modules:
   processes: {{ m.processes }}
   {% endif -%}
 
-  {% if m.filters is defined -%}
-  filters:
-    {% for f in m.filters -%}
-    {% for k, v in f.items() -%}
+  {% if m.processors is defined -%}
+  processors:
+    {% for p in m.processors -%}
+    {% for k, v in p.items() -%}
     - {{ k }}.fields: [
       {%- for field in v -%}
       '{{ field }}' {%- if not loop.last %}, {% endif -%}
@@ -91,11 +91,11 @@ metricbeat.modules:
   {% endif -%}
 {%- endfor %}
 
-{% if reload -%}
+{% if reload or reload_path -%}
 metricbeat.config.modules:
   path: {{ reload_path|default("${path.config}/modules.d/*.yml") }}
   reload.period: 1s
-  reload.enabled: true
+  reload.enabled: {{ reload|default("false")}}
 {% endif -%}
 
 # Disable random start delay for metricsets.

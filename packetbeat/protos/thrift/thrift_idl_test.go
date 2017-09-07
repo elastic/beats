@@ -24,7 +24,6 @@ func thriftIdlForTesting(t *testing.T, content string) *thriftIdl {
 }
 
 func TestThriftIdl_thriftReadFiles(t *testing.T) {
-
 	if testing.Verbose() {
 		logp.LogInit(logp.LOG_DEBUG, "", false, true, []string{"thrift", "thriftdetailed"})
 	}

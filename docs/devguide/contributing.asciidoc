@@ -112,6 +112,8 @@ Running the testsuite has the following requirements:
 * Docker >= {docker}
 * Docker-compose >= {docker-compose}
 
+For more details check the <<testing>> guide.
+
 
 [float]
 [[documentation]]

@@ -8,10 +8,11 @@ import (
 	"testing"
 	"time"
 
+	"github.com/stretchr/testify/assert"
+
+	"github.com/elastic/beats/libbeat/beat"
 	"github.com/elastic/beats/libbeat/common"
 	"github.com/elastic/beats/libbeat/logp"
-	"github.com/elastic/beats/libbeat/publisher/beat"
-	"github.com/stretchr/testify/assert"
 
 	"github.com/elastic/beats/packetbeat/protos"
 )
@@ -123,7 +124,6 @@ func TestPgsqlParser_dataResponse(t *testing.T) {
 
 // Test parsing a pgsql response
 func TestPgsqlParser_response(t *testing.T) {
-
 	pgsql := pgsqlModForTests(nil)
 	data := []byte(
 		"54000000420003610000004009000100000413ffffffffffff0000620000004009000200000413ffffffffffff0000630000004009000300000413ffffffffffff0000" +
@@ -195,12 +195,10 @@ func TestPgsqlParser_incomplete_response(t *testing.T) {
 	if complete {
 		t.Error("Expecting an incomplete message")
 	}
-
 }
 
 // Test 3 responses in a row
 func TestPgsqlParser_threeResponses(t *testing.T) {
-
 	pgsql := pgsqlModForTests(nil)
 
 	data, err := hex.DecodeString(
@@ -232,7 +230,6 @@ func TestPgsqlParser_threeResponses(t *testing.T) {
 	if countHandlePgsql != 3 {
 		t.Error("handlePgsql not called three times")
 	}
-
 }
 
 // Test parsing an error response

@@ -55,7 +55,7 @@
     - name: hashed
       type: boolean
       description: >
-        Boolean indicating if the event includes a file hashes. If true the
+        Boolean indicating if the event includes file hashes. If true the
         md5, sha1, and sha256 fields will be present.
     - name: md5
       type: keyword

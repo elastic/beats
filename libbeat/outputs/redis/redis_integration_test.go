@@ -14,10 +14,10 @@ import (
 
 	"github.com/garyburd/redigo/redis"
 
+	"github.com/elastic/beats/libbeat/beat"
 	"github.com/elastic/beats/libbeat/common"
 	"github.com/elastic/beats/libbeat/outputs"
 	"github.com/elastic/beats/libbeat/outputs/outest"
-	"github.com/elastic/beats/libbeat/publisher/beat"
 
 	_ "github.com/elastic/beats/libbeat/outputs/codec/format"
 	_ "github.com/elastic/beats/libbeat/outputs/codec/json"
@@ -250,7 +250,6 @@ func getSRedisAddr() string {
 }
 
 func newRedisTestingOutput(t *testing.T, cfg map[string]interface{}) *client {
-
 	config, err := common.NewConfigFrom(cfg)
 	if err != nil {
 		t.Fatalf("Error reading config: %v", err)
@@ -261,7 +260,7 @@ func newRedisTestingOutput(t *testing.T, cfg map[string]interface{}) *client {
 		t.Fatalf("redis output module not registered")
 	}
 
-	out, err := plugin(common.BeatInfo{Beat: "libbeat"}, nil, config)
+	out, err := plugin(beat.Info{Beat: "libbeat"}, nil, config)
 	if err != nil {
 		t.Fatalf("Failed to initialize redis output: %v", err)
 	}

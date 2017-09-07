@@ -5,10 +5,10 @@ import (
 	"strings"
 	"time"
 
+	"github.com/elastic/beats/libbeat/beat"
 	"github.com/elastic/beats/libbeat/common"
 	"github.com/elastic/beats/libbeat/logp"
 	"github.com/elastic/beats/libbeat/monitoring"
-	"github.com/elastic/beats/libbeat/publisher/beat"
 	"github.com/elastic/beats/packetbeat/procs"
 	"github.com/elastic/beats/packetbeat/protos"
 	"github.com/elastic/beats/packetbeat/protos/tcp"
@@ -362,7 +362,6 @@ func reconstructQuery(t *transaction, full bool) (query string) {
 }
 
 func (mongodb *mongodbPlugin) publishTransaction(t *transaction) {
-
 	if mongodb.results == nil {
 		debugf("Try to publish transaction with null results")
 		return

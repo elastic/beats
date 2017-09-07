@@ -1,6 +1,8 @@
 package dtfmt
 
-import "time"
+import (
+	"time"
+)
 
 // ctx stores pre-computed time fields used by the formatter.
 type ctx struct {
@@ -56,6 +58,10 @@ func (c *ctxConfig) enableDate() {
 
 func (c *ctxConfig) enableClock() {
 	c.clock = true
+}
+
+func (c *ctxConfig) enableMillis() {
+	c.millis = true
 }
 
 func (c *ctxConfig) enableWeekday() {

@@ -17,7 +17,6 @@ type Version struct {
 // NewVersion expects a string in the format:
 // major.minor.bugfix(-meta)
 func NewVersion(version string) (*Version, error) {
-
 	v := Version{
 		version: version,
 	}

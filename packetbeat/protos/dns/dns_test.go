@@ -11,13 +11,14 @@ import (
 	"testing"
 	"time"
 
-	"github.com/elastic/beats/packetbeat/protos"
-
-	"github.com/elastic/beats/libbeat/common"
-	"github.com/elastic/beats/libbeat/logp"
-	"github.com/elastic/beats/libbeat/publisher/beat"
 	mkdns "github.com/miekg/dns"
 	"github.com/stretchr/testify/assert"
+
+	"github.com/elastic/beats/libbeat/beat"
+	"github.com/elastic/beats/libbeat/common"
+	"github.com/elastic/beats/libbeat/logp"
+
+	"github.com/elastic/beats/packetbeat/protos"
 )
 
 // Test Constants

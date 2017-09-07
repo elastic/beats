@@ -5,10 +5,11 @@ import (
 	"testing"
 	"time"
 
+	"github.com/stretchr/testify/assert"
+
+	"github.com/elastic/beats/libbeat/beat"
 	"github.com/elastic/beats/libbeat/common"
 	"github.com/elastic/beats/libbeat/logp"
-	"github.com/elastic/beats/libbeat/publisher/beat"
-	"github.com/stretchr/testify/assert"
 )
 
 type countFilter struct {
@@ -23,7 +24,6 @@ func (c *countFilter) Run(e *beat.Event) (*beat.Event, error) {
 func (c *countFilter) String() string { return "count" }
 
 func TestConditions(t *testing.T) {
-
 	if testing.Verbose() {
 		logp.LogInit(logp.LOG_DEBUG, "", false, true, []string{"*"})
 	}
@@ -74,7 +74,6 @@ func GetConditions(t *testing.T, configs []ConditionConfig) []Condition {
 }
 
 func TestEqualsCondition(t *testing.T) {
-
 	if testing.Verbose() {
 		logp.LogInit(logp.LOG_DEBUG, "", false, true, []string{"*"})
 	}
@@ -129,7 +128,6 @@ func TestEqualsCondition(t *testing.T) {
 }
 
 func TestContainsCondition(t *testing.T) {
-
 	if testing.Verbose() {
 		logp.LogInit(logp.LOG_DEBUG, "", false, true, []string{"*"})
 	}
@@ -187,7 +185,6 @@ func TestContainsCondition(t *testing.T) {
 }
 
 func TestRegexpCondition(t *testing.T) {
-
 	if testing.Verbose() {
 		logp.LogInit(logp.LOG_DEBUG, "", false, true, []string{"*"})
 	}
@@ -246,7 +243,6 @@ func TestRegexpCondition(t *testing.T) {
 }
 
 func TestRangeCondition(t *testing.T) {
-
 	if testing.Verbose() {
 		logp.LogInit(logp.LOG_DEBUG, "", false, true, []string{"*"})
 	}
@@ -395,7 +391,6 @@ func TestORCondition(t *testing.T) {
 	}
 
 	assert.True(t, conds[0].Check(event))
-
 }
 
 func TestANDCondition(t *testing.T) {
@@ -454,7 +449,6 @@ func TestANDCondition(t *testing.T) {
 	}
 
 	assert.True(t, conds[0].Check(event))
-
 }
 
 func TestNOTCondition(t *testing.T) {
@@ -506,7 +500,6 @@ func TestNOTCondition(t *testing.T) {
 	}
 
 	assert.False(t, conds[0].Check(event))
-
 }
 
 func TestCombinedCondition(t *testing.T) {
@@ -575,7 +568,6 @@ func TestCombinedCondition(t *testing.T) {
 	}
 
 	assert.True(t, conds[0].Check(event))
-
 }
 
 func TestWhenProcessor(t *testing.T) {

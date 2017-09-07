@@ -1,4 +1,5 @@
 BEAT_NAME?=packetbeat
+BEAT_TITLE?=Packetbeat
 BEAT_DESCRIPTION?=Packetbeat analyzes network traffic and sends the data to Elasticsearch.
 SYSTEM_TESTS?=true
 TEST_ENVIRONMENT=false
@@ -42,4 +43,4 @@ create-tcp-protocol: python-env
 imports: python-env
 	@mkdir -p include
 	@mkdir -p protos
-	@${PYTHON_ENV}/bin/python ${ES_BEATS}/packetbeat/scripts/generate_imports.py ${BEAT_PATH} > include/list.go
+	@${PYTHON_ENV}/bin/python ${ES_BEATS}/script/generate_imports.py ${BEAT_PATH}

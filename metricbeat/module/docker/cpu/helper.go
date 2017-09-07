@@ -47,7 +47,6 @@ func (c *CPUService) getCPUStatsList(rawStats []docker.Stat) []CPUStats {
 }
 
 func (c *CPUService) getCpuStats(myRawStat *docker.Stat) CPUStats {
-
 	return CPUStats{
 		Time:                        common.Time(myRawStat.Stats.Read),
 		Container:                   docker.NewContainer(&myRawStat.Container),

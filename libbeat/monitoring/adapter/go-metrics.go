@@ -5,9 +5,10 @@ import (
 	"reflect"
 	"sync"
 
+	metrics "github.com/rcrowley/go-metrics"
+
 	"github.com/elastic/beats/libbeat/logp"
 	"github.com/elastic/beats/libbeat/monitoring"
-	metrics "github.com/rcrowley/go-metrics"
 )
 
 // implement adapter for adding go-metrics based counters

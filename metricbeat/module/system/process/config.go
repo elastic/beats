@@ -1,6 +1,6 @@
 package process
 
-import "github.com/elastic/beats/libbeat/logp"
+import "github.com/elastic/beats/libbeat/common/cfgwarn"
 
 // includeTopConfig is the configuration for the "top N processes
 // filtering" feature
@@ -22,7 +22,7 @@ type Config struct {
 
 func (c Config) Validate() error {
 	if c.CPUTicks != nil {
-		logp.Deprecate("6.1", "cpu_ticks is deprecated. Use process.include_cpu_ticks instead")
+		cfgwarn.Deprecate("6.1", "cpu_ticks is deprecated. Use process.include_cpu_ticks instead")
 	}
 	return nil
 }

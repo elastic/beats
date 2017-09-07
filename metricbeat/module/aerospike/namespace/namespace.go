@@ -3,13 +3,14 @@ package namespace
 import (
 	"strings"
 
+	as "github.com/aerospike/aerospike-client-go"
+	"github.com/pkg/errors"
+
 	"github.com/elastic/beats/libbeat/common"
+	"github.com/elastic/beats/libbeat/common/cfgwarn"
 	"github.com/elastic/beats/libbeat/logp"
 	"github.com/elastic/beats/metricbeat/mb"
 	"github.com/elastic/beats/metricbeat/module/aerospike"
-	"github.com/pkg/errors"
-
-	as "github.com/aerospike/aerospike-client-go"
 )
 
 // init registers the MetricSet with the central registry.
@@ -33,10 +34,9 @@ type MetricSet struct {
 // Part of new is also setting up the configuration by processing additional
 // configuration entries if needed.
 func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
-
 	config := struct{}{}
 
-	logp.Experimental("The aerospike namespace metricset is experimental")
+	cfgwarn.Experimental("The aerospike namespace metricset is experimental")
 
 	if err := base.Module().UnpackConfig(&config); err != nil {
 		return nil, err

@@ -39,7 +39,6 @@ func (mo *ModuleOverrides) Get(module, fileset string) []*common.Config {
 }
 
 func getModulesCLIConfig() ([]string, *ModuleOverrides, error) {
-
 	modulesList := []string{}
 	if modulesFlag != nil {
 		modulesList = strings.Split(*modulesFlag, ",")

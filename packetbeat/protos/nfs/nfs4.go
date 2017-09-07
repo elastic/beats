@@ -123,7 +123,6 @@ var nfsOpnum4 = map[int]string{
 }
 
 func (nfs *nfs) eatData(op int, xdr *xdr) {
-
 	switch op {
 	case opGetattr:
 		xdr.getUIntVector()
@@ -180,7 +179,6 @@ func (nfs *nfs) eatData(op int, xdr *xdr) {
 //
 // GETATTR is the main operation.
 func (nfs *nfs) findV4MainOpcode(xdr *xdr) string {
-
 	// did we find a main operation opcode?
 	found := false
 

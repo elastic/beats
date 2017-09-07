@@ -6,10 +6,10 @@ import (
 	"strings"
 	"time"
 
+	"github.com/elastic/beats/libbeat/beat"
 	"github.com/elastic/beats/libbeat/common"
 	"github.com/elastic/beats/libbeat/logp"
 	"github.com/elastic/beats/libbeat/monitoring"
-	"github.com/elastic/beats/libbeat/publisher/beat"
 
 	"github.com/elastic/beats/packetbeat/procs"
 	"github.com/elastic/beats/packetbeat/protos"
@@ -196,7 +196,6 @@ func (stream *mysqlStream) prepareForNewMessage() {
 }
 
 func mysqlMessageParser(s *mysqlStream) (bool, bool) {
-
 	logp.Debug("mysqldetailed", "MySQL parser called. parseState = %s", s.parseState)
 
 	m := s.message
@@ -429,7 +428,6 @@ func mysqlMessageParser(s *mysqlStream) (bool, bool) {
 // tcp stream. Returns true if there is already enough data in the message
 // read so far that we can use it further in the stack.
 func (mysql *mysqlPlugin) messageGap(s *mysqlStream, nbytes int) (complete bool) {
-
 	m := s.message
 	switch s.parseState {
 	case mysqlStateStart, mysqlStateEatMessage:
@@ -674,7 +672,6 @@ func (mysql *mysqlPlugin) receivedMysqlResponse(msg *mysqlMessage) {
 }
 
 func (mysql *mysqlPlugin) parseMysqlResponse(data []byte) ([]string, [][]string) {
-
 	length, err := readLength(data, 0)
 	if err != nil {
 		logp.Warn("Invalid response: %v", err)
@@ -824,7 +821,6 @@ func (mysql *mysqlPlugin) parseMysqlResponse(data []byte) ([]string, [][]string)
 }
 
 func (mysql *mysqlPlugin) publishTransaction(t *mysqlTransaction) {
-
 	if mysql.results == nil {
 		return
 	}

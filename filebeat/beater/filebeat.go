@@ -8,10 +8,10 @@ import (
 
 	"github.com/elastic/beats/libbeat/beat"
 	"github.com/elastic/beats/libbeat/common"
+	"github.com/elastic/beats/libbeat/common/cfgwarn"
 	"github.com/elastic/beats/libbeat/logp"
 	"github.com/elastic/beats/libbeat/monitoring"
 	"github.com/elastic/beats/libbeat/outputs/elasticsearch"
-	pub "github.com/elastic/beats/libbeat/publisher/beat"
 
 	"github.com/elastic/beats/filebeat/channel"
 	cfg "github.com/elastic/beats/filebeat/config"
@@ -46,9 +46,17 @@ func New(b *beat.Beat, rawConfig *common.Config) (beat.Beater, error) {
 		return nil, fmt.Errorf("Error reading config file: %v", err)
 	}
 
+	err := cfgwarn.CheckRemoved5xSettings(rawConfig, "spool_size", "publish_async", "idle_timeout")
+	if err != nil {
+		return nil, err
+	}
+
 	moduleRegistry, err := fileset.NewModuleRegistry(config.Modules, b.Info.Version)
 	if err != nil {
 		return nil, err
+	}
+	if !moduleRegistry.Empty() {
+		logp.Info("Enabled modules/filesets: %s", moduleRegistry.InfoString())
 	}
 
 	moduleProspectors, err := moduleRegistry.GetProspectorConfigs()
@@ -74,10 +82,10 @@ func New(b *beat.Beat, rawConfig *common.Config) (beat.Beater, error) {
 	if !config.ConfigProspector.Enabled() && !config.ConfigModules.Enabled() && !haveEnabledProspectors {
 		if !b.InSetupCmd {
 			return nil, errors.New("No modules or prospectors enabled and configuration reloading disabled. What files do you want me to watch?")
-		} else {
-			// in the `setup` command, log this only as a warning
-			logp.Warn("Setup called, but no modules enabled.")
 		}
+
+		// in the `setup` command, log this only as a warning
+		logp.Warn("Setup called, but no modules enabled.")
 	}
 
 	if *once && config.ConfigProspector.Enabled() && config.ConfigModules.Enabled() {
@@ -168,7 +176,7 @@ func (fb *Filebeat) Run(b *beat.Beat) error {
 	// Make sure all events that were published in
 	registrarChannel := newRegistrarLogger(registrar)
 
-	err = b.Publisher.SetACKHandler(pub.PipelineACKHandler{
+	err = b.Publisher.SetACKHandler(beat.PipelineACKHandler{
 		ACKEvents: newEventACKer(registrarChannel).ackEvents,
 	})
 	if err != nil {

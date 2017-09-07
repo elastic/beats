@@ -84,7 +84,7 @@ func (p *PodWatcher) watchPods() {
 		if err != nil {
 			//watch pod failures should be logged and gracefully failed over as metadata retrieval
 			//should never stop.
-			logp.Err("kubernetes: Watching API eror %v", err)
+			logp.Err("kubernetes: Watching API error %v", err)
 			time.Sleep(time.Second)
 			continue
 		}
@@ -99,7 +99,6 @@ func (p *PodWatcher) watchPods() {
 			p.podQueue <- pod
 		}
 	}
-
 }
 
 func (p *PodWatcher) Run() bool {
@@ -172,7 +171,6 @@ func (p *PodWatcher) getPodMeta(pod *corev1.Pod) *Pod {
 	}
 
 	return po
-
 }
 
 func (p *PodWatcher) worker() {
@@ -189,7 +187,6 @@ func (p *PodWatcher) worker() {
 			}
 		}
 	}
-
 }
 
 func (p *PodWatcher) GetMetaData(arg string) common.MapStr {
