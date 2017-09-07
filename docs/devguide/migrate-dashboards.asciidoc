@@ -4,13 +4,13 @@ This section is useful for the community Beats to migrate the Kibana 5.x dashboa
 
 In the Kibana 5.x, the saved dashboards consist of multiple JSON files, one for each dashboard, search, visualization
 and index-pattern. To import a dashboard in Kibana, you need to load not only the JSON file containing the dashboard, but
-also all its dependencies (searches, visualizations).  
+also all its dependencies (searches, visualizations).
 
 Starting with Kibana 6.0, the dashboards are loaded by default via the Kibana API. In this case, the saved dashboard
-consist of a single JSON file that includes not only the dashboard content, but also all its dependencies. 
+consist of a single JSON file that includes not only the dashboard content, but also all its dependencies.
 
 As the format of the dashboards and index-pattern for Kibana 5.x is different than the ones for Kibana 6.x, they are placed in different
-directories. Depending on the Kibana version, the 5.x or 6.x dashboards are loaded. 
+directories. Depending on the Kibana version, the 5.x or 6.x dashboards are loaded.
 
 The Kibana 5.x dashboards are placed under the 5.x directory that contains the following directories:
 - search
@@ -27,8 +27,8 @@ NOTE:: Please make sure the 5.x and default directories are created before runni
 To migrate your Kibana 5.x dashboards to Kibana 6.0 and above, you can import the dashboards into Kibana 5.6 and then
 export them using Beats 6.0 version.
 
-1. Start Kibana 5.6
-2. Import Kibana 5.x dashboards using Beats 6.0 version. 
+* Start Kibana 5.6
+* Import Kibana 5.x dashboards using Beats 6.0 version.
 
 Before importing the dashboards, make sure you run `make update` in the Beat directory, that updates the `_meta/kibana` directory. It generates the index-pattern from
 the `fields.yml` file, and places it under the `5.x/index-pattern` and `default/index-pattern` directories. In case of Metricbeat, Filebeat and Auditbeat,
@@ -48,9 +48,9 @@ make update
 ./metricbeat setup -E setup.dashboards.directory=_meta/kibana
 -----------------
 
-3. Export the dashboards using Beats 6.0 version.
+* Export the dashboards using Beats 6.0 version.
 
-You can export the dashboards via the Kibana API by using the 
+You can export the dashboards via the Kibana API by using the
 https://github.com/elastic/beats/blob/master/dev-tools/cmd/dashboards/export_dashboards.go[export_dashboards.go]
 application.
 
@@ -62,7 +62,7 @@ cd beats/metricbeat
 go run ../dev-tools/cmd/dashboards/export_dashboards.go -dashboards Metricbeat-Rabbitmq -output
 module/rabbitmq/_meta/kibana/default/Metricbeat-Rabbitmq.json <1>
 -----------------
-<1> `Metricbeat-Rabbitmq` is the ID of the dashboard that you want to export. 
+<1> `Metricbeat-Rabbitmq` is the ID of the dashboard that you want to export.
 
 Note: You can get the dashboard ID from the URL of the dashboard in Kibana. Depending on the Kibana version the
 dashboard was created, the ID consists of a name or random characters that can be separated by `-`.
