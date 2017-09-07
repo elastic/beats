@@ -44,10 +44,6 @@
         type: date
         description: >
           Timestamp of creation of the given event
-      - name: deleted
-        type: date
-        description: >
-          Timestamp of deletion of the given event
     - name: name
       type: keyword
       description: >

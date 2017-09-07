@@ -51,6 +51,7 @@ https://github.com/elastic/beats/compare/v6.0.0-beta2...master[Check the HEAD di
 - Add new metrics to CPU metricsset {pull}4969[4969]
 - Fix a memory allocation issue where more memory was allocated than needed in the windows-perfmon metricset. {issue}5035[5035]
 - Don't start metricbeat if external modules config is wrong and reload is disabled {pull}5053[5053]
+- Fix kubernetes events module to be able to index time fields properly. {issue}5093[5093]
 
 *Packetbeat*
 
