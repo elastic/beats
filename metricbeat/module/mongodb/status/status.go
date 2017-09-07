@@ -30,7 +30,7 @@ func init() {
 // multiple fetch calls.
 type MetricSet struct {
 	mb.BaseMetricSet
-	mongoSession *mgo.Session
+	dialInfo *mgo.DialInfo
 }
 
 // New creates a new instance of the MetricSet
@@ -43,15 +43,9 @@ func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
 	}
 	dialInfo.Timeout = base.Module().Config().Timeout
 
-	// instantiate direct connections to Mongo host
-	mongoSession, err := mongodb.NewDirectSession(dialInfo)
-	if err != nil {
-		return nil, err
-	}
-
 	return &MetricSet{
 		BaseMetricSet: base,
-		mongoSession:  mongoSession,
+		dialInfo:      dialInfo,
 	}, nil
 }
 
@@ -59,8 +53,15 @@ func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
 // It returns the event which is then forward to the output. In case of an error, a
 // descriptive error must be returned.
 func (m *MetricSet) Fetch() (common.MapStr, error) {
+
+	// instantiate direct connections to each of the configured Mongo hosts
+	mongoSession, err := mongodb.NewDirectSession(m.dialInfo)
+	if err != nil {
+		return nil, err
+	}
+
 	result := map[string]interface{}{}
-	if err := m.mongoSession.DB("admin").Run(bson.D{{Name: "serverStatus", Value: 1}}, &result); err != nil {
+	if err := mongoSession.DB("admin").Run(bson.D{{Name: "serverStatus", Value: 1}}, &result); err != nil {
 		return nil, err
 	}
 
