@@ -1,4 +1,5 @@
 BEAT_NAME?=packetbeat
+BEAT_TITLE?=Packetbeat
 BEAT_DESCRIPTION?=Packetbeat analyzes network traffic and sends the data to Elasticsearch.
 SYSTEM_TESTS?=true
 TEST_ENVIRONMENT=false
