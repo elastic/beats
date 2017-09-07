@@ -64,10 +64,6 @@ https://github.com/elastic/beats/compare/v6.0.0-beta2...master[Check the HEAD di
 
 *Filebeat*
 
-- Add PostgreSQL module with slowlog support. {pull}4763[4763]
-- Add Kafka log module. {pull}4885[4885]
-- Add support for `/var/log/containers/` log path in `add_kubernetes_metadata` processor. {pull}4981[4981]
-- Remove error log from runnerfactory as error is returned by API. {pull}5085[5085]
 - Changed the number of shards in the default configuration to 3. {issue}5095[5095]
 
 *Heartbeat*
