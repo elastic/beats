@@ -175,7 +175,7 @@ func newKubernetesAnnotator(cfg *common.Config) (processors.Processor, error) {
 	logp.Debug("kubernetes", "Using host ", config.Host)
 	logp.Debug("kubernetes", "Initializing watcher")
 	if client != nil {
-		watcher := NewPodWatcher(client, &indexers, config.SyncPeriod, config.Host)
+		watcher := NewPodWatcher(client, &indexers, config.SyncPeriod, config.CleanupTimeout, config.Host)
 
 		if watcher.Run() {
 			return &kubernetesAnnotator{podWatcher: watcher, matchers: &matchers}, nil
