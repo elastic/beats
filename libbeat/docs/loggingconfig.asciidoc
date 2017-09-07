@@ -139,13 +139,12 @@ in the range of 2 to 1024 files.
 [float]
 ==== `logging.files.permissions`
 
-//REVIEWERS: Noticed that his is not in the beat.reference.yml file. Should it be? Or is the option old?
-
-The permission mask to apply when rotating log files. The default value is 0600. The
- `permissions` options must be a valid Unix-style file permissions mask expressed
+The permissions mask to apply when rotating log files. The default value is 0600. The
+ `permissions` option must be a valid Unix-style file permissions mask expressed
  in octal notation. In Go, numbers in octal notation must start with '0'.
 
 Examples:
+
 * 0644: give read and write access to the file owner, and read access to all others.
 * 0600: give read and write access to the file owner, and no access to all others.
 * 0664: give read and write access to the file owner and members of the group
