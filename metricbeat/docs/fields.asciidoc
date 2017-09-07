@@ -4518,14 +4518,6 @@ Timestamp of creation of the given event
 
 
 [float]
-=== kubernetes.event.metadata.timestamp.deleted
-
-type: date
-
-Timestamp of deletion of the given event
-
-
-[float]
 === kubernetes.event.metadata.name
 
 type: keyword
