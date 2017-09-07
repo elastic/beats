@@ -84,10 +84,8 @@ func (m *MetricSet) Run(reporter mb.PushReporter) {
 			return
 		case msg := <-m.watcher.eventQueue:
 			// Ignore events that are deleted
-			if msg.Metadata.DeletionTimestamp == "" {
-				if msg.Metadata.DeletionTimestamp == "" {
-					reporter.Event(generateMapStrFromEvent(msg))
-				}
+			if msg.Metadata.DeletionTimestamp == nil {
+				reporter.Event(generateMapStrFromEvent(msg))
 			}
 		}
 	}
@@ -97,7 +95,6 @@ func generateMapStrFromEvent(eve *Event) common.MapStr {
 	eventMeta := common.MapStr{
 		"timestamp": common.MapStr{
 			"created": eve.Metadata.CreationTimestamp,
-			"deleted": eve.Metadata.DeletionTimestamp,
 		},
 		"name":             eve.Metadata.Name,
 		"namespace":        eve.Metadata.Namespace,
@@ -125,11 +122,7 @@ func generateMapStrFromEvent(eve *Event) common.MapStr {
 		eventMeta["annotations"] = annotations
 	}
 
-	return common.MapStr{
-		"timestamp": common.MapStr{
-			"first_occurrence": eve.FirstTimestamp.UTC(),
-			"last_occurrence":  eve.LastTimestamp.UTC(),
-		},
+	output := common.MapStr{
 		"message": eve.Message,
 		"reason":  eve.Reason,
 		"type":    eve.Type,
@@ -143,4 +136,20 @@ func generateMapStrFromEvent(eve *Event) common.MapStr {
 		},
 		"metadata": eventMeta,
 	}
+
+	tsMap := make(common.MapStr)
+
+	if eve.FirstTimestamp != nil {
+		tsMap["first_occurrence"] = eve.FirstTimestamp.UTC()
+	}
+
+	if eve.LastTimestamp != nil {
+		tsMap["last_occurrence"] = eve.LastTimestamp.UTC()
+	}
+
+	if len(tsMap) != 0 {
+		output["timestamp"] = tsMap
+	}
+
+	return output
 }
