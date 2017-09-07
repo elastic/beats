@@ -562,6 +562,19 @@ processors:
           lookup_fields: ["metricset.host"]
 -------------------------------------------------------------------------------
 
+The `add_kubernetes_metadata` processor has the following configuration settings:
+
+`in_cluster`:: (Optional) Use in cluster settings for Kubernetes client, `true`
+by default.
+`host`:: (Optional) In case `in_cluster` is false, use this host to connect to
+Kubernetes API.
+`kube_config`:: (Optional) Use given config file as configuration for Kubernetes
+client.
+`default_indexers.enabled`:: (Optional) Enable/Disable default pod indexers, in
+case you want to specify your own.
+`default_matchers.enabled`:: (Optional) Enable/Disable default pod matchers, in
+case you want to specify your own.
+
 [[add-docker-metadata]]
 === Add Docker metadata
 
@@ -578,10 +591,10 @@ from Docker containers:
 processors:
 - add_docker_metadata:
     host: "unix:///var/run/docker.sock"
-    match_fields: ["system.process.cgroup.id"]
-    match_source: true
-    match_source_index: 4
-
+    #match_fields: ["system.process.cgroup.id"]
+    #match_source: true
+    #match_source_index: 4
+    #cleanup_timeout: 60
     # To connect to Docker over TLS you must specify a client and CA certificate.
     #ssl:
     #  certificate_authority: "/etc/pki/root/ca.pem"
@@ -600,3 +613,5 @@ It has the following settings:
 `match_source_index`:: (Optional) Index in the source path split by / to look
   for container id. It defaults to 4 to match
   `/var/lib/docker/containers/<container_id>/*.log`
+`cleanup_timeout`:: (Optional) Time of inactivity to consider we can clean and
+forget metadata for a container, 60s by default.
