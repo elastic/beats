@@ -1,4 +1,5 @@
 BEAT_NAME=auditbeat
+BEAT_TITLE=Auditbeat
 BEAT_DESCRIPTION=Audit the activities of users and processes on your system.
 SYSTEM_TESTS=false
 TEST_ENVIRONMENT=false
