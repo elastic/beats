@@ -65,6 +65,14 @@ func TestConfigValidateFailureMode(t *testing.T) {
 	t.Log(err)
 }
 
+func TestConfigValidateConnectionType(t *testing.T) {
+	config := defaultConfig
+	config.SocketType = "Satellite"
+	err := config.Validate()
+	assert.Error(t, err)
+	t.Log(err)
+}
+
 func parseConfig(t testing.TB, yaml string) (Config, error) {
 	c, err := common.NewConfigWithYAML([]byte(yaml), "")
 	if err != nil {
