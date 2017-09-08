@@ -2,7 +2,9 @@ package kernel
 
 import (
 	"os"
+	"strconv"
 	"strings"
+	"syscall"
 	"time"
 
 	"github.com/pkg/errors"
@@ -48,16 +50,17 @@ type MetricSet struct {
 
 // New constructs a new MetricSet.
 func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
-	cfgwarn.Experimental("The %v metricset is a beta feature", metricsetName)
+	cfgwarn.Beta("The %v metricset is a beta feature", metricsetName)
 
 	config := defaultConfig
 	if err := base.Module().UnpackConfig(&config); err != nil {
 		return nil, errors.Wrap(err, "failed to unpack the audit.kernel config")
 	}
 
-	debugf("%v the metricset is running as euid=%v", logPrefix, os.Geteuid())
+	_, _, kernel, _ := kernelVersion()
+	debugf("%v the metricset is running as euid=%v on kernel=%v", logPrefix, os.Geteuid(), kernel)
 
-	client, err := libaudit.NewAuditClient(nil)
+	client, err := newAuditClient(&config)
 	if err != nil {
 		return nil, errors.Wrap(err, "failed to create audit.kernel client")
 	}
@@ -69,6 +72,37 @@ func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
 		client:        client,
 		config:        config,
 	}, nil
+}
+
+func newAuditClient(c *Config) (*libaudit.AuditClient, error) {
+	hasMulticast := hasMulticastSupport()
+
+	switch c.SocketType {
+	// Attempt to determine the optimal socket_type.
+	case "":
+		// Use multicast only when no rules are present. Specifying rules
+		// implies you want control over the audit framework so you should be
+		// using unicast.
+		if rules, _ := c.rules(); len(rules) == 0 && hasMulticast {
+			c.SocketType = "multicast"
+			logp.Info("%v kernel.socket_type=multicast will be used.", logPrefix)
+		}
+	case "multicast":
+		if !hasMulticast {
+			logp.Warn("%v kernel.socket_type is set to multicast "+
+				"but based on the kernel version multicast audit subscriptions "+
+				"are not supported. unicast will be used instead.", logPrefix)
+			c.SocketType = "unicast"
+		}
+	}
+
+	switch c.SocketType {
+	case "multicast":
+		return libaudit.NewMulticastAuditClient(nil)
+	default:
+		c.SocketType = "unicast"
+		return libaudit.NewAuditClient(nil)
+	}
 }
 
 // Run initializes the audit client and receives audit messages from the
@@ -115,8 +149,14 @@ func (ms *MetricSet) addRules(reporter mb.PushReporter) error {
 		return nil
 	}
 
+	client, err := libaudit.NewAuditClient(nil)
+	if err != nil {
+		return errors.Wrap(err, "failed to create audit client for adding rules")
+	}
+	defer client.Close()
+
 	// Delete existing rules.
-	n, err := ms.client.DeleteRules()
+	n, err := client.DeleteRules()
 	if err != nil {
 		return errors.Wrap(err, "failed to delete existing rules")
 	}
@@ -125,7 +165,7 @@ func (ms *MetricSet) addRules(reporter mb.PushReporter) error {
 	// Add rules from config.
 	var failCount int
 	for _, rule := range rules {
-		if err = ms.client.AddRule(rule.data); err != nil {
+		if err = client.AddRule(rule.data); err != nil {
 			// Treat rule add errors as warnings and continue.
 			err = errors.Wrapf(err, "failed to add kernel rule '%v'", rule.flags)
 			reporter.Error(err)
@@ -139,6 +179,17 @@ func (ms *MetricSet) addRules(reporter mb.PushReporter) error {
 }
 
 func (ms *MetricSet) initClient() error {
+	if ms.config.SocketType == "multicast" {
+		// This request will fail with EPERM if this process does not have
+		// CAP_AUDIT_CONTROL, but we will ignore the response. The user will be
+		// required to ensure that auditing is enabled if the process is only
+		// given CAP_AUDIT_READ.
+		err := ms.client.SetEnabled(true, libaudit.NoWait)
+		return errors.Wrap(err, "failed to enable auditing in the kernel")
+	}
+
+	// Unicast client initialization (requires CAP_AUDIT_CONTROL and that the
+	// process be in initial PID namespace).
 	status, err := ms.client.GetStatus()
 	if err != nil {
 		return errors.Wrap(err, "failed to get audit status")
@@ -347,4 +398,55 @@ func (s *stream) ReassemblyComplete(msgs []*auparse.AuditMessage) {
 
 func (s *stream) EventsLost(count int) {
 	lostMetric.Inc()
+}
+
+func hasMulticastSupport() bool {
+	// Check the kernel version because 3.16+ should have multicast
+	// support.
+	major, minor, _, err := kernelVersion()
+	if err != nil {
+		// Assume not supported.
+		return false
+	}
+
+	switch {
+	case major > 3,
+		major == 3 && minor >= 16:
+		return true
+	}
+
+	return false
+}
+
+func kernelVersion() (major, minor int, full string, err error) {
+	var uname syscall.Utsname
+	if err := syscall.Uname(&uname); err != nil {
+		return 0, 0, "", err
+	}
+
+	data := make([]byte, len(uname.Release))
+	for i, v := range uname.Release {
+		if v == 0 {
+			break
+		}
+		data[i] = byte(v)
+	}
+
+	release := string(data)
+	parts := strings.SplitN(release, ".", 3)
+	if len(parts) < 2 {
+		return 0, 0, release, errors.Errorf("failed to parse uname release '%v'", release)
+	}
+
+	major, err = strconv.Atoi(parts[0])
+	if err != nil {
+		return 0, 0, release, errors.Wrapf(err, "failed to parse major version from '%v'", release)
+	}
+
+	minor, err = strconv.Atoi(parts[1])
+	if err != nil {
+		return 0, 0, release, errors.Wrapf(err, "failed to parse minor version from '%v'", release)
+	}
+
+	return major, minor, release, nil
 }

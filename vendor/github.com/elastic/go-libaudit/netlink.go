@@ -73,16 +73,16 @@ type NetlinkClient struct {
 // (this is useful for debugging).
 //
 // The returned NetlinkClient must be closed with Close() when finished.
-func NewNetlinkClient(proto int, readBuf []byte, resp io.Writer) (*NetlinkClient, error) {
+func NewNetlinkClient(proto int, groups uint32, readBuf []byte, resp io.Writer) (*NetlinkClient, error) {
 	s, err := syscall.Socket(syscall.AF_NETLINK, syscall.SOCK_RAW, proto)
 	if err != nil {
 		return nil, err
 	}
 
-	src := &syscall.SockaddrNetlink{Family: syscall.AF_NETLINK}
+	src := &syscall.SockaddrNetlink{Family: syscall.AF_NETLINK, Groups: groups}
 	if err = syscall.Bind(s, src); err != nil {
 		syscall.Close(s)
-		return nil, err
+		return nil, errors.Wrap(err, "bind failed")
 	}
 
 	pid, err := getPortID(s)
