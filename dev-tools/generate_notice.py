@@ -205,7 +205,7 @@ def detect_license_summary(content):
     return "Unknown"
 
 
-EXCLUDES = ["dev-tools"]
+EXCLUDES = ["dev-tools", "build"]
 
 if __name__ == "__main__":
 

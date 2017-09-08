@@ -12,16 +12,6 @@ class Test(metricbeat.BaseTest):
         """
         test container fields
         """
-
-        test_env = os.environ.get('DOCKER_COMPOSE_PROJECT_NAME')
-        processors = None
-        if test_env:
-            processors = [{
-                "drop_event": {
-                    "when.not": "contains.docker.container.name: " + test_env,
-                },
-            }]
-
         self.render_config_template(
             modules=[{
                 "name": "docker",
@@ -29,7 +19,6 @@ class Test(metricbeat.BaseTest):
                 "hosts": ["unix:///var/run/docker.sock"],
                 "period": "10s",
             }],
-            processors=processors,
         )
 
         proc = self.start_beat()
@@ -37,8 +26,6 @@ class Test(metricbeat.BaseTest):
         proc.check_kill_and_wait()
         self.assert_no_logged_warnings(["WARN Container stopped when recovering stats",
                                         "ERR An error occurred while getting docker stats"])
-
-        print(os.environ.get('TESTING_ENVIRONMENT'))
 
         output = self.read_output_json()
         evt = output[0]

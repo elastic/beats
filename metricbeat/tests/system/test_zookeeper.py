@@ -14,6 +14,8 @@ MNTR_FIELDS = ["version", "latency.avg", "latency.max",
 
 class ZooKeeperMntrTest(metricbeat.BaseTest):
 
+    COMPOSE_SERVICES = ['zookeeper']
+
     @unittest.skipUnless(metricbeat.INTEGRATION_TESTS, "integration test")
     @attr('integration')
     def test_output(self):

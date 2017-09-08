@@ -1,3 +1,5 @@
+// +build integration
+
 package node
 
 import (
@@ -5,10 +7,13 @@ import (
 	"os"
 	"testing"
 
+	"github.com/elastic/beats/libbeat/tests/compose"
 	mbtest "github.com/elastic/beats/metricbeat/mb/testing"
 )
 
 func TestData(t *testing.T) {
+	compose.EnsureUp(t, "rabbitmq")
+
 	f := mbtest.NewEventsFetcher(t, getConfig())
 	err := mbtest.WriteEvents(f, t)
 	if err != nil {

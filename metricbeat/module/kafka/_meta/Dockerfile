@@ -2,8 +2,7 @@
 # as otherwise builds are not identical over time.
 FROM spotify/kafka
 
-RUN apt-get update && apt-get install -y netcat
-HEALTHCHECK CMD nc -z localhost 9092
+HEALTHCHECK --interval=1s --retries=90 CMD /opt/kafka_*/bin/kafka-topics.sh --zookeeper localhost:2181 --list
 
 EXPOSE 2181 9092
 

@@ -7,6 +7,8 @@ PHPFPM_FIELDS = metricbeat.COMMON_FIELDS + ["php_fpm"]
 
 class Test(metricbeat.BaseTest):
 
+    COMPOSE_SERVICES = ['phpfpm']
+
     @unittest.skipUnless(metricbeat.INTEGRATION_TESTS, "integration test")
     def test_info(self):
         """

@@ -6,6 +6,8 @@ from nose.plugins.attrib import attr
 
 class Test(metricbeat.BaseTest):
 
+    COMPOSE_SERVICES = ['jolokia']
+
     @unittest.skipUnless(metricbeat.INTEGRATION_TESTS, "integration test")
     def test_jmx(self):
         """
