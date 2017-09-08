@@ -211,3 +211,35 @@ class Test(BaseTest):
         assert output[0]["message"] == "Hello 1"
         assert output[1]["message"] == "Hello 2"
         proc.check_kill_and_wait()
+
+    def test_wrong_module_no_reload(self):
+        """
+        Test beat errors when reload is disabled and some module config is wrong
+        """
+        self.render_config_template(
+            reload=False,
+            reload_path=self.working_dir + "/configs/*.yml",
+            prospectors=False,
+        )
+        os.mkdir(self.working_dir + "/configs/")
+
+        config_path = self.working_dir + "/configs/wrong_module.yml"
+        moduleConfig = """
+- module: test
+  test:
+    enabled: true
+    wrong_field: error
+    prospector:
+      scan_frequency: 1s
+"""
+        with open(config_path, 'w') as f:
+            f.write(moduleConfig)
+
+        exit_code = self.run_beat()
+
+        # Wait until offset for new line is updated
+        self.wait_until(
+            lambda: self.log_contains("No paths were defined for prospector accessing"),
+            max_timeout=10)
+
+        assert exit_code == 1

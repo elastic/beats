@@ -87,3 +87,32 @@ class Test(metricbeat.BaseTest):
         assert lines == self.output_lines()
 
         proc.check_kill_and_wait()
+
+    @unittest.skipUnless(re.match("(?i)win|linux|darwin|freebsd|openbsd", sys.platform), "os")
+    def test_wrong_module_no_reload(self):
+        """
+        Test beat errors when reload is disabled and some module config is wrong
+        """
+        self.render_config_template(
+            reload=False,
+            reload_path=self.working_dir + "/configs/*.yml",
+        )
+        os.mkdir(self.working_dir + "/configs/")
+
+        config_path = self.working_dir + "/configs/system.yml"
+        systemConfig = """
+- module: system
+  metricsets: ["wrong_metricset"]
+  period: 1s
+"""
+        with open(config_path, 'w') as f:
+            f.write(systemConfig)
+
+        exit_code = self.run_beat()
+
+        # Wait until offset for new line is updated
+        self.wait_until(
+            lambda: self.log_contains("metricset not found"),
+            max_timeout=10)
+
+        assert exit_code == 1
