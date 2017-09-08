@@ -74,7 +74,7 @@ func NewDirectSession(dialInfo *mgo.DialInfo) (*mgo.Session, error) {
 	nodeDialInfo.Direct = true
 	nodeDialInfo.FailFast = true
 
-	logp.Info("Connecting to MongoDB node at %v", nodeDialInfo.Addrs)
+	logp.Debug("mongodb", "Connecting to MongoDB node at %v", nodeDialInfo.Addrs)
 
 	session, err := mgo.DialWithInfo(&nodeDialInfo)
 	if err != nil {
