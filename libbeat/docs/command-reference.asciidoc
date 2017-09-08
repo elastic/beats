@@ -231,6 +231,12 @@ endif::[]
 {beatname_lc} run [FLAGS]
 -----
 
+Or:
+
+["source","sh",subs="attributes"]
+-----
+{beatname_lc} [FLAGS]
+-----
 
 *FLAGS*
 
@@ -354,9 +360,15 @@ endif::[]
 
 ["source","sh",subs="attributes"]
 -----
-{beatname_lc} run -e
+{beatname_lc} run -e --setup
 -----
 
+Or:
+
+["source","sh",subs="attributes"]
+-----
+{beatname_lc} -e --setup
+-----
 
 [[setup-command]]
 ==== `setup` command
@@ -368,6 +380,9 @@ endif::[]
 in Kibana.
 * The machine learning jobs contain the configuration information and metadata
 necessary to analyze data for anomalies.
+
+Use this command instead of `run --setup` when you want to set up the
+environment without actually running {beatname_uc} and ingesting data.
 
 *SYNOPSIS*
 
