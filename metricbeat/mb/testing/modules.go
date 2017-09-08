@@ -74,7 +74,7 @@ func newMetricSet(t testing.TB, config interface{}) mb.MetricSet {
 	}
 	m, metricsets, err := mb.NewModule(c, mb.Registry)
 	if err != nil {
-		t.Fatal(err)
+		t.Fatal("failed to create new MetricSet", err)
 	}
 	if m == nil {
 		t.Fatal("no module instantiated")
