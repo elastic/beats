@@ -60,10 +60,9 @@ type pipelineProcessors struct {
 	// The pipeline its processor settings for
 	// constructing the clients complete processor
 	// pipeline on connect.
-	fieldsProcessor beat.Processor
-	tagsProcessor   beat.Processor
-	fields          common.MapStr
-	tags            []string
+	beatsMeta common.MapStr
+	fields    common.MapStr
+	tags      []string
 
 	processors beat.Processor
 
@@ -387,19 +386,16 @@ func makePipelineProcessors(
 
 	fields := common.MapStr{}
 	if meta := annotations.Beat; meta != nil {
-		fields["beat"] = meta
+		p.beatsMeta = common.MapStr{"beat": meta}
 	}
 
 	fields = buildFields(fields, annotations.Event)
 	if len(fields) > 0 {
-		needsCopy := hasProcessors
-		p.fieldsProcessor = pipelineEventFields(fields, needsCopy)
 		p.fields = fields
 	}
 
 	if t := annotations.Event.Tags; len(t) > 0 {
 		p.tags = t
-		p.tagsProcessor = makeAddTagsProcessor("globalTags", t)
 	}
 
 	return p

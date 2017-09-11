@@ -32,10 +32,10 @@ type processorFn struct {
 //  1. (P) generalize/normalize event
 //  2. (C) add Meta from client Config to event.Meta
 //  3. (C) add Fields from client config to event.Fields
-//  4. (C) add client fields + tags
-//  5. (C) client processors list
-//  6. (P) add beats metadata
-//  7. (P) add pipeline fields + tags
+//  4. (P) add pipeline fields + tags
+//  5. (C) add client fields + tags
+//  6. (C) client processors list
+//  7. (P) add beats metadata
 //  8. (P) pipeline processors list
 //  9. (P) (if publish/debug enabled) log event
 // 10. (P) (if output disabled) dropEvent
@@ -48,56 +48,49 @@ func (p *Pipeline) newProcessorPipeline(
 
 		// client fields and metadata
 		clientMeta      = config.Meta
-		clientFields    = buildFields(config.Fields, config.EventMetadata)
-		clientTags      = config.EventMetadata.Tags
 		localProcessors = makeClientProcessors(config)
 
 		// pipeline global
-		global          = p.processors
-		fieldsProcessor = global.fieldsProcessor
-		tagsProcessor   = global.tagsProcessor
+		global = p.processors
 	)
+
+	needsCopy := localProcessors != nil || global.processors != nil
 
 	// setup 1: generalize/normalize output (P)
 	processors.add(generalizeProcessor)
 
 	// setup 2: add Meta from client config (C)
 	if m := clientMeta; len(m) > 0 {
-		needsCopy := localProcessors != nil || global.processors != nil
 		processors.add(clientEventMeta(m, needsCopy))
 	}
 
-	if localProcessors == nil {
-		// merge 3 + 4 + 5 + 7:
-		//   Merge all field and  updates into one processor if no client
-		//   processors have been configured.
-		fields := clientFields.Clone()
-		fields.DeepUpdate(global.fields)
-		needsCopy := global.processors != nil
-		fieldsProcessor = makeAddFieldsProcessor("fields", fields, needsCopy)
-
-		if tags := append(clientTags, global.tags...); len(tags) > 0 {
-			tagsProcessor = makeAddTagsProcessor("tags", tags)
-		}
-	} else {
-		// setup 3 + 4: add Fields from client config (C), add fields + tags (C)
-		if f := clientFields; len(f) > 0 {
-			needsCopy := true
-			processors.add(makeAddFieldsProcessor("clientFields", f, needsCopy))
-		}
-		if t := clientTags; len(t) > 0 {
-			processors.add(makeAddTagsProcessor("clientTags", t))
-		}
-
-		// setup 5: client processors (C)
-		processors.add(localProcessors)
+	// setup 4, 5: pipeline tags + client tags
+	var tags []string
+	tags = append(tags, global.tags...)
+	tags = append(tags, config.EventMetadata.Tags...)
+	if len(tags) > 0 {
+		processors.add(makeAddTagsProcessor("tags", tags))
 	}
 
-	// setup 6 + 7: add beats metadata (P), add event fields + tags (P)
-	processors.add(fieldsProcessor)
-	processors.add(tagsProcessor)
+	// setup 3, 4, 5: client config fields + pipeline fields + client fields
+	fields := config.Fields.Clone()
+	fields.DeepUpdate(global.fields)
+	if em := config.EventMetadata; len(em.Fields) > 0 {
+		common.MergeFields(fields, em.Fields.Clone(), em.FieldsUnderRoot)
+	}
+	if len(fields) > 0 {
+		processors.add(makeAddFieldsProcessor("fields", fields, needsCopy))
+	}
 
-	// setup 8: pipeline processors (P)
+	// setup 5: client processor list
+	processors.add(localProcessors)
+
+	// setup 6: add beats metadata
+	if meta := global.beatsMeta; len(meta) > 0 {
+		processors.add(makeAddFieldsProcessor("beatsMeta", meta, needsCopy))
+	}
+
+	// setup 7: pipeline processors list
 	processors.add(global.processors)
 
 	// setup 9: debug print final event (P)
@@ -281,12 +274,6 @@ func makeClientProcessors(config beat.ClientConfig) processors.Processor {
 		title: "client",
 		list:  procs.All(),
 	}
-}
-
-func mergeFields(a, b common.MapStr) common.MapStr {
-	m := a.Clone()
-	m.DeepUpdate(b)
-	return m
 }
 
 func buildFields(fields common.MapStr, em common.EventMetadata) common.MapStr {
