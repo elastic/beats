@@ -64,19 +64,26 @@ https://github.com/elastic/beats/compare/v6.0.0-beta2...master[Check the HEAD di
 
 *Auditbeat*
 
+- Changed the number of shards in the default configuration to 3. {issue}5095[5095]
+
 *Filebeat*
 
+- Changed the number of shards in the default configuration to 3. {issue}5095[5095]
 - Don't start filebeat if external modules/prospectors config is wrong and reload is disabled {pull}5053[5053]
 
 *Heartbeat*
+
+- Changed the number of shards in the default configuration to 1. {issue}5095[5095]
 
 *Metricbeat*
 
 *Packetbeat*
 
+- Changed the number of shards in the default configuration to 3. {issue}5095[5095]
+
 *Winlogbeat*
 
-*Auditbeat*
+- Changed the number of shards in the default configuration to 3. {issue}5095[5095]
 
 ==== Deprecated
 
