@@ -35,4 +35,6 @@ include::./metricbeat-devguide.asciidoc[]
 
 include::./modules-dev-guide.asciidoc[]
 
+include::./migrate-dashboards.asciidoc[]
+
 

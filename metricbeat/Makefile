@@ -2,6 +2,7 @@
 
 # Name can be overwritten, as Metricbeat is also a library
 BEAT_NAME?=metricbeat
+BEAT_TITLE?=Metricbeat
 BEAT_DESCRIPTION?=Metricbeat sends metrics to Elasticsearch.
 SYSTEM_TESTS?=true
 TEST_ENVIRONMENT?=true
