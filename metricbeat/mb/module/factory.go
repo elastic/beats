@@ -47,11 +47,6 @@ func (r *Factory) Create(c *common.Config) (cfgfile.Runner, error) {
 		return nil, err
 	}
 
-	client, err := connector.Connect()
-	if err != nil {
-		return nil, err
-	}
-
-	mr := NewRunner(client, w)
+	mr := NewRunner(connector, w)
 	return mr, nil
 }

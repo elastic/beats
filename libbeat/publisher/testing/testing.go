@@ -5,6 +5,10 @@ import (
 	"github.com/elastic/beats/libbeat/beat"
 )
 
+type TestPipeline struct {
+	client beat.Client
+}
+
 type TestPublisher struct {
 	client beat.Client
 }
@@ -13,6 +17,20 @@ type TestPublisher struct {
 type ChanClient struct {
 	done    chan struct{}
 	Channel chan beat.Event
+}
+
+func NewTestPipeline(c *ChanClient) *TestPipeline {
+	return &TestPipeline{client: c}
+}
+
+func (t *TestPipeline) Connect() (beat.Client, error) {
+	return t.client, nil
+}
+func (t *TestPipeline) ConnectWith(beat.ClientConfig) (beat.Client, error) {
+	return t.client, nil
+}
+func (t *TestPipeline) SetACKHandler(beat.PipelineACKHandler) error {
+	return nil
 }
 
 func PublisherWithClient(client beat.Client) beat.Pipeline {

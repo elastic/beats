@@ -5,7 +5,6 @@ package module_test
 import (
 	"testing"
 
-	"github.com/elastic/beats/libbeat/beat"
 	"github.com/elastic/beats/libbeat/common"
 	pubtest "github.com/elastic/beats/libbeat/publisher/testing"
 	"github.com/elastic/beats/metricbeat/mb"
@@ -15,7 +14,7 @@ import (
 )
 
 func TestRunner(t *testing.T) {
-	pubClient, factory := newPubClientFactory()
+	client := pubtest.NewChanClient(10)
 
 	config, err := common.NewConfigFrom(map[string]interface{}{
 		"module":     moduleName,
@@ -32,22 +31,19 @@ func TestRunner(t *testing.T) {
 	}
 
 	// Create the Runner facade.
-	runner := module.NewRunner(factory(), m)
+	connector, err := module.NewConnector(pubtest.NewTestPipeline(client), common.NewConfig())
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	runner := module.NewRunner(connector, m)
 
 	// Start the module and have it publish to a new publisher.Client.
 	runner.Start()
 
-	assert.NotNil(t, <-pubClient.Channel)
+	assert.NotNil(t, <-client.Channel)
 
 	// Stop the module. This blocks until all MetricSets in the Module have
 	// stopped and the publisher.Client is closed.
 	runner.Stop()
-}
-
-// newPubClientFactory returns a new ChanClient and a function that returns
-// the same Client when invoked. This simulates the return value of
-// Publisher.Connect.
-func newPubClientFactory() (*pubtest.ChanClient, func() beat.Client) {
-	client := pubtest.NewChanClient(10)
-	return client, func() beat.Client { return client }
 }
