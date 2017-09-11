@@ -6,5 +6,5 @@ services:
     build:
       args:
         DOWNLOAD_URL: https://snapshots.elastic.co/downloads
-        ELASTIC_VERSION: 6.0.0-beta1-SNAPSHOT
-        CACHE_BUST: 20170720
+        ELASTIC_VERSION: 7.0.0-alpha1-SNAPSHOT
+        CACHE_BUST: 20170911
