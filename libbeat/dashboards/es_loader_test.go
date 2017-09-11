@@ -24,7 +24,8 @@ func TestImporter(t *testing.T) {
 	}
 
 	client := elasticsearch.GetTestingElasticsearch(t)
-	if strings.HasPrefix(client.Connection.GetVersion(), "6.") {
+	if strings.HasPrefix(client.Connection.GetVersion(), "6.") ||
+		strings.HasPrefix(client.Connection.GetVersion(), "7.") {
 		t.Skip("Skipping tests for Elasticsearch 6.x releases")
 	}
 
@@ -60,7 +61,8 @@ func TestImporterEmptyBeat(t *testing.T) {
 	}
 
 	client := elasticsearch.GetTestingElasticsearch(t)
-	if strings.HasPrefix(client.Connection.GetVersion(), "6.") {
+	if strings.HasPrefix(client.Connection.GetVersion(), "6.") ||
+		strings.HasPrefix(client.Connection.GetVersion(), "7.") {
 		t.Skip("Skipping tests for Elasticsearch 6.x releases")
 	}
 
