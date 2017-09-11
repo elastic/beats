@@ -131,7 +131,9 @@ func (f *Field) text() common.MapStr {
 	}
 
 	if len(f.MultiFields) > 0 {
-		properties["fields"] = f.MultiFields.process("", f.esVersion)
+		fields := common.MapStr{}
+		f.MultiFields.process("", f.esVersion, fields)
+		properties["fields"] = fields
 	}
 
 	return properties

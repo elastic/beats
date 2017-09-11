@@ -1,4 +1,5 @@
 BEAT_NAME=heartbeat
+BEAT_TITLE=Heartbeat
 BEAT_PACKAGE_NAME=heartbeat-elastic
 BEAT_DESCRIPTION?=Ping remote services for availability and log results to Elasticsearch or send to Logstash.
 SYSTEM_TESTS=true

@@ -22,6 +22,7 @@ type Config struct {
 	RawMessage   bool   `config:"kernel.include_raw_message"` // Include the list of raw audit messages in the event.
 	Warnings     bool   `config:"kernel.include_warnings"`    // Include warnings in the event (for dev/debug purposes only).
 	RulesBlob    string `config:"kernel.audit_rules"`         // Audit rules. One rule per line.
+	SocketType   string `config:"kernel.socket_type"`         // Socket type to use with the kernel (unicast or multicast).
 
 	// Tuning options (advanced, use with care)
 	ReassemblerMaxInFlight uint32        `config:"kernel.reassembler.max_in_flight"`
@@ -35,7 +36,7 @@ type auditRule struct {
 }
 
 // Validate validates the rules specified in the config.
-func (c Config) Validate() error {
+func (c *Config) Validate() error {
 	var errs multierror.Errors
 	_, err := c.rules()
 	if err != nil {
@@ -45,6 +46,15 @@ func (c Config) Validate() error {
 	if err != nil {
 		errs = append(errs, err)
 	}
+
+	c.SocketType = strings.ToLower(c.SocketType)
+	switch c.SocketType {
+	case "", "unicast", "multicast":
+	default:
+		errs = append(errs, errors.Errorf("invalid kernel.socket_type "+
+			"'%v' (use unicast, multicast, or don't set a value)", c.SocketType))
+	}
+
 	return errs.Err()
 }
 

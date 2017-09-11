@@ -34,6 +34,9 @@ https://github.com/elastic/beats/compare/v6.0.0-beta2...master[Check the HEAD di
 - Register kubernetes `field_format` matcher and remove logger in `Encode` API {pull}4888[4888]
 - Add support for `initContainers` in `add_kubernetes_metadata` processor. {issue}4825[4825]
 - Fix the `/usr/bin/beatname` script to accept `-d "*"` as a parameter. {issue}5040[5040]
+- Combine `fields.yml` properties when they are defined in different sources. {issue}5075[5075]
+- Keep Docker & Kubernetes pod metadata after container dies while they are needed by processors. {pull}5084[5084]
+- Fix `fields.yml` lookup when using `export template` with a custom `path.config` param. {issue}5089[5089]
 
 *Auditbeat*
 
@@ -48,6 +51,9 @@ https://github.com/elastic/beats/compare/v6.0.0-beta2...master[Check the HEAD di
 - Fix wrong MySQL CRUD queries timelion visualization {pull}4857[4857]
 - Add new metrics to CPU metricsset {pull}4969[4969]
 - Fix a memory allocation issue where more memory was allocated than needed in the windows-perfmon metricset. {issue}5035[5035]
+- Don't start metricbeat if external modules config is wrong and reload is disabled {pull}5053[5053]
+- Fix kubernetes events module to be able to index time fields properly. {issue}5093[5093]
+- The MongoDB module now connects on each fetch, to avoid stopping the whole Metricbeat instance if MongoDB is not up when starting. {pull}5120[5120]
 
 *Packetbeat*
 
@@ -60,16 +66,25 @@ https://github.com/elastic/beats/compare/v6.0.0-beta2...master[Check the HEAD di
 - Move TCP UDP start up into `server.Start()` {pull}4903[4903]
 - Changed the hashbang used in the beat helper script from `/bin/bash` to `/usr/bin/env bash`. {pull}5051[5051]
 - Changed beat helper script to use `exec` when running the beat. {pull}5051[5051]
+- Fix reloader error message to only print on actual error {pull}5066[5066]
 
 *Auditbeat*
+
+- Changed the number of shards in the default configuration to 3. {issue}5095[5095]
 
 *Filebeat*
 
 - Add PostgreSQL module with slowlog support. {pull}4763[4763]
 - Add Kafka log module. {pull}4885[4885]
 - Add support for `/var/log/containers/` log path in `add_kubernetes_metadata` processor. {pull}4981[4981]
+- Don't start filebeat if external modules/prospectors config is wrong and reload is disabled {pull}5053[5053]
+- Remove error log from runnerfactory as error is returned by API. {pull}5085[5085]
+- Changed the number of shards in the default configuration to 3. {issue}5095[5095]
+- Remove error log from runnerfactory as error is returned by API. {pull}5085[5085]
 
 *Heartbeat*
+
+- Changed the number of shards in the default configuration to 1. {issue}5095[5095]
 
 *Metricbeat*
 
@@ -80,9 +95,11 @@ https://github.com/elastic/beats/compare/v6.0.0-beta2...master[Check the HEAD di
 
 *Packetbeat*
 
+- Changed the number of shards in the default configuration to 3. {issue}5095[5095]
+
 *Winlogbeat*
 
-*Auditbeat*
+- Changed the number of shards in the default configuration to 3. {issue}5095[5095]
 
 ==== Deprecated
 

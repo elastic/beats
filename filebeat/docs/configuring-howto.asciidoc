@@ -19,6 +19,7 @@ _Beats Platform Reference_ for more about the structure of the config file.
 
 The following topics describe how to configure Filebeat:
 
+* <<configuration-filebeat-modules>>
 * <<configuration-filebeat-options>>
 * <<multiline-examples>>
 * <<configuration-general-options>>
@@ -38,6 +39,8 @@ The following topics describe how to configure Filebeat:
 * <<regexp-support>>
 
 --
+
+include::./filebeat-modules-options.asciidoc[]
 
 include::./filebeat-options.asciidoc[]
 

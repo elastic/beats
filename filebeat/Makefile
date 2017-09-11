@@ -1,4 +1,5 @@
 BEAT_NAME?=filebeat
+BEAT_TITLE?=Filebeat
 BEAT_DESCRIPTION?=Filebeat sends log files to Logstash or directly to Elasticsearch.
 SYSTEM_TESTS?=true
 TEST_ENVIRONMENT?=true

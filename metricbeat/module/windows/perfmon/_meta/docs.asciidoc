@@ -22,13 +22,11 @@ For wildcard queries this setting has no effect.
   metricsets: ["perfmon"]
   period: 10s
   perfmon.counters:
-    - alias: "procesor.name.stats"
-      instance_label: "processor.name"
+    - instance_label: "processor.name"
       instance_name: "Total"
       measurement_label: "processor.time.total.pct"
       query: '\Processor Information(_Total)\% Processor Time'
-    - alias: "diskio.name.stats"
-      instance_label: "diskio.name"
+    - instance_label: "diskio.name"
       measurement_label: "diskio.write.bytes"
       query: '\PhysicalDisk(*)\Disk Writes/sec'
       format: "long"

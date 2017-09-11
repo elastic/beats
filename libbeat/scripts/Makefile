@@ -1,6 +1,7 @@
 ### VARIABLE SETUP ###
 ### Application using libbeat may override the following variables in their Makefile
-BEAT_NAME?=libbeat ## @packaging Name of the application
+BEAT_NAME?=libbeat## @packaging Name of the binary
+BEAT_TITLE?=${BEAT_NAME}## @packaging Title of the application
 BEAT_DESCRIPTION?=Sends events to Elasticsearch or Logstash ## @packaging Description of the application
 BEAT_PATH?=github.com/elastic/beats/${BEAT_NAME}
 BEAT_PACKAGE_NAME?=${BEAT_NAME}
@@ -27,19 +28,19 @@ SHELL=bash
 ES_HOST?="elasticsearch"
 PWD=$(shell pwd)
 BUILD_DIR?=$(shell pwd)/build
-COVERAGE_DIR=${BUILD_DIR}/coverage
-COVERAGE_TOOL=${BEAT_GOPATH}/bin/gotestcover
-COVERAGE_TOOL_REPO=github.com/elastic/beats/vendor/github.com/pierrre/gotestcover
-TESTIFY_TOOL_REPO=github.com/elastic/beats/vendor/github.com/stretchr/testify
-LIBCOMPOSE_TOOL_REPO=github.com/docker/libcompose
+COVERAGE_DIR?=${BUILD_DIR}/coverage
+COVERAGE_TOOL?=${BEAT_GOPATH}/bin/gotestcover
+COVERAGE_TOOL_REPO?=github.com/elastic/beats/vendor/github.com/pierrre/gotestcover
+TESTIFY_TOOL_REPO?=github.com/elastic/beats/vendor/github.com/stretchr/testify
+LIBCOMPOSE_TOOL_REPO?=github.com/docker/libcompose
 GOIMPORTS=goimports
-GOIMPORTS_REPO=golang.org/x/tools/cmd/goimports
+GOIMPORTS_REPO?=golang.org/x/tools/cmd/goimports
 GOIMPORTS_LOCAL_PREFIX?=github.com/elastic
 GOLINT=golint
-GOLINT_REPO=github.com/golang/lint/golint
-REVIEWDOG=reviewdog -conf ${ES_BEATS}/reviewdog.yml
+GOLINT_REPO?=github.com/golang/lint/golint
+REVIEWDOG?=reviewdog -conf ${ES_BEATS}/reviewdog.yml
 REVIEWDOG_OPTIONS?=-diff "git diff master"
-REVIEWDOG_REPO=github.com/haya14busa/reviewdog/cmd/reviewdog
+REVIEWDOG_REPO?=github.com/haya14busa/reviewdog/cmd/reviewdog
 PROCESSES?= 4
 TIMEOUT?= 90
 NOSETESTS_OPTIONS?=--process-timeout=$(TIMEOUT) --with-timer -v --with-xunit --xunit-file=${BUILD_DIR}/TEST-system.xml ## @testing the options to pass when calling nosetests
@@ -285,7 +286,7 @@ endif
 
 	@# Update docs
 	@mkdir -p docs
-	@${PYTHON_ENV}/bin/python ${ES_BEATS}/libbeat/scripts/generate_fields_docs.py $(PWD) ${BEAT_NAME} ${ES_BEATS}
+	@${PYTHON_ENV}/bin/python ${ES_BEATS}/libbeat/scripts/generate_fields_docs.py $(PWD) ${BEAT_TITLE} ${ES_BEATS}
 
 	@# Generate Kibana index pattern
 	@mkdir -p $(PWD)/_meta/kibana/5.x/index-pattern
@@ -355,8 +356,6 @@ env-logs:
 HOME_PREFIX?=/tmp/${BEAT_NAME}
 .PHONY: install-home
 install-home:
-	install -d -m 755 ${HOME_PREFIX}/scripts/
-	install -m 755 ${ES_BEATS}/libbeat/scripts/migrate_beat_config_1_x_to_5_0.py ${HOME_PREFIX}/scripts/
 	if [ -a ${NOTICE_FILE} ]; then \
 		install -m 644 ${NOTICE_FILE} ${HOME_PREFIX}/; \
 	fi

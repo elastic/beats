@@ -102,7 +102,7 @@ func (s ProtocolsStruct) Init(
 	}
 
 	for proto := range protocolSyms {
-		logp.Info("registered protocol plugin: %v", proto)
+		logp.Debug("protos", "registered protocol plugin: %v", proto)
 	}
 
 	for name, config := range configs {
