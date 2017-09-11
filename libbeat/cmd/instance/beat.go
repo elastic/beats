@@ -454,7 +454,7 @@ func (b *Beat) loadMeta() error {
 	}
 
 	metaPath := paths.Resolve(paths.Data, "meta.json")
-	logp.Info("Beat metadata path: %v", metaPath)
+	logp.Debug("beat", "Beat metadata path: %v", metaPath)
 
 	f, err := openRegular(metaPath)
 	if err != nil && !os.IsNotExist(err) {
