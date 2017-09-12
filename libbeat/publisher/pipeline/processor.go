@@ -95,7 +95,7 @@ func (p *Pipeline) newProcessorPipeline(
 
 	// setup 9: debug print final event (P)
 	if logp.IsDebug("publish") {
-		processors.add(debugPrintProcessor())
+		processors.add(debugPrintProcessor(p.beatInfo))
 	}
 
 	// setup 10: drop all events if outputs are disabled (P)
@@ -244,17 +244,17 @@ func makeAddFieldsProcessor(name string, fields common.MapStr, copy bool) *proce
 	return newAnnotateProcessor(name, fn)
 }
 
-func debugPrintProcessor() *processorFn {
+func debugPrintProcessor(info beat.Info) *processorFn {
 	// ensure only one go-routine is using the encoder (in case
 	// beat.Client is shared between multiple go-routines by accident)
 	var mux sync.Mutex
 
-	encoder := json.New(true)
+	encoder := json.New(true, info.Version)
 	return newProcessor("debugPrint", func(event *beat.Event) (*beat.Event, error) {
 		mux.Lock()
 		defer mux.Unlock()
 
-		b, err := encoder.Encode("<not set>", event)
+		b, err := encoder.Encode(info.Beat, event)
 		if err != nil {
 			return event, nil
 		}
