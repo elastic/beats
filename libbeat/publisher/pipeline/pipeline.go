@@ -33,6 +33,8 @@ import (
 // Processors in the pipeline are executed in the clients go-routine, before
 // entering the queue. No filtering/processing will occur on the output side.
 type Pipeline struct {
+	beatInfo beat.Info
+
 	logger *logp.Logger
 	queue  queue.Queue
 	output *outputController
@@ -130,6 +132,7 @@ type queueFactory func(queue.Eventer) (queue.Queue, error)
 // The new pipeline will take ownership of queue and outputs. On Close, the
 // queue and outputs will be closed.
 func New(
+	beat beat.Info,
 	metrics *monitoring.Registry,
 	queueFactory queueFactory,
 	out outputs.Group,
@@ -142,6 +145,7 @@ func New(
 	processors := settings.Processors
 	disabledOutput := settings.Disabled
 	p := &Pipeline{
+		beatInfo:         beat,
 		logger:           log,
 		waitCloseMode:    settings.WaitCloseMode,
 		waitCloseTimeout: settings.WaitClose,

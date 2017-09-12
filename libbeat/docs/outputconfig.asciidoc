@@ -325,18 +325,18 @@ use in Logstash for indexing and filtering:
     ...
     "@metadata": { <1>
       "beat": "{beatname_lc}", <2>
-      "type": "doc" <3>
+      "version": "{stack-version}" <3>
+      "type": "doc" <4>
     }
 }
 ------------------------------------------------------------------------------
-<1> {beatname_uc} uses the `@metadata` field to send metadata to Logstash. The
-contents of the `@metadata` field only exist in Logstash and are not part of any
-events sent from Logstash. See the
+<1> {beatname_uc} uses the `@metadata` field to send metadata to Logstash. See the
 {logstashdoc}/event-dependent-configuration.html#metadata[Logstash documentation]
 for more about the `@metadata` field.
 <2> The default is {beatname_lc}. To change this value, set the
 <<logstash-index,`index`>> option in the {beatname_uc} config file.
-<3> The value of `type` is currently hardcoded to `doc`. It was used by previous
+<3> The beats current version.
+<4> The value of `type` is currently hardcoded to `doc`. It was used by previous
 Logstash configs to set the type of the document in Elasticsearch.
 
 
@@ -362,14 +362,15 @@ input {
 output {
   elasticsearch {
     hosts => ["http://localhost:9200"]
-    index => "%{[@metadata][beat]}-%{+YYYY.MM.dd}" <1>
+    index => "%{[@metadata][beat]}-%{[@metadata][version]}-%{+YYYY.MM.dd}" <1>
   }
 }
 ------------------------------------------------------------------------------
 <1> `%{[@metadata][beat]}` sets the first part of the index name to the value
-of the `beat` metadata field, and `%{+YYYY.MM.dd}` sets the second part of the
+of the `beat` metadata field, `%{[@metadata][version]}` sets the second part to
+the beat's version, and `%{+YYYY.MM.dd}` sets the third part of the
 name to a date based on the Logstash `@timestamp` field. For example:
-+{beatname_lc}-2017.03.29+.
++{beatname_lc}-{stack-version}-2017.03.29+.
 
 Events indexed into Elasticsearch with the Logstash configuration shown here
 will be similar to events directly indexed by Beats into Elasticsearch.
