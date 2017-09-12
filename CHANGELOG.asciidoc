@@ -85,6 +85,8 @@ https://github.com/elastic/beats/compare/v6.0.0-beta2...master[Check the HEAD di
 
 - Changed the number of shards in the default configuration to 3. {issue}5095[5095]
 
+- Add support for receiving audit events using a multicast socket. [issue]4850[4850]
+
 ==== Deprecated
 
 *Affecting all Beats*
