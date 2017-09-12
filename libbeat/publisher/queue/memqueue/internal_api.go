@@ -27,10 +27,10 @@ type getRequest struct {
 }
 
 type getResponse struct {
-	buf []publisher.Event
 	ack *ackChan
+	buf []publisher.Event
 }
 
-type batchAckRequest struct{}
+type batchAckMsg struct{}
 
 type batchCancelRequest struct{ ack *ackChan }
