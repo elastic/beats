@@ -78,7 +78,6 @@ func (b EventBuilder) Build() (beat.Event, error) {
 	event := beat.Event{
 		Timestamp: time.Time(timestamp),
 		Fields: common.MapStr{
-			// common.EventMetadataKey: b.metadata,
 			b.ModuleName: moduleEvent,
 			"metricset":  metricsetData,
 		},

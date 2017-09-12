@@ -85,9 +85,6 @@ func CreateFullEvent(ms mb.MetricSet, metricSetData common.MapStr) beat.Event {
 		"hostname": "host.example.com",
 	}
 
-	// Delete meta data as not needed for the event output here.
-	delete(fullEvent.Fields, common.EventMetadataKey)
-
 	return fullEvent
 }
 
