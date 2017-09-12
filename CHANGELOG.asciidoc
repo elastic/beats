@@ -71,6 +71,7 @@ https://github.com/elastic/beats/compare/v6.0.0-beta2...master[Check the HEAD di
 
 - Changed the number of shards in the default configuration to 3. {issue}5095[5095]
 - Don't start filebeat if external modules/prospectors config is wrong and reload is disabled {pull}5053[5053]
+- Add `filebeat.registry_flush` setting, to delay the registry updates. {pull}5146[5146]
 
 *Heartbeat*
 
