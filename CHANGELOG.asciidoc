@@ -64,6 +64,8 @@ https://github.com/elastic/beats/compare/v6.0.0-beta2...master[Check the HEAD di
 
 *Affecting all Beats*
 
+- Add @metadata.version to events send to Logstash. {pull}5166[5166]
+
 *Auditbeat*
 
 - Changed the number of shards in the default configuration to 3. {issue}5095[5095]

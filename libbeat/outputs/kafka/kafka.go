@@ -143,7 +143,7 @@ func makeKafka(
 		return outputs.Fail(err)
 	}
 
-	codec, err := codec.CreateEncoder(config.Codec)
+	codec, err := codec.CreateEncoder(beat, config.Codec)
 	if err != nil {
 		return outputs.Fail(err)
 	}

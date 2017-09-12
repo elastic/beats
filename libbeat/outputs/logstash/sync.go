@@ -3,6 +3,7 @@ package logstash
 import (
 	"time"
 
+	"github.com/elastic/beats/libbeat/beat"
 	"github.com/elastic/beats/libbeat/logp"
 	"github.com/elastic/beats/libbeat/outputs"
 	"github.com/elastic/beats/libbeat/outputs/transport"
@@ -20,6 +21,7 @@ type syncClient struct {
 }
 
 func newSyncClient(
+	beat beat.Info,
 	conn *transport.Client,
 	stats *outputs.Stats,
 	config *Config,
@@ -38,7 +40,7 @@ func newSyncClient(
 	}
 
 	var err error
-	enc := makeLogstashEventEncoder(config.Index)
+	enc := makeLogstashEventEncoder(beat, config.Index)
 	c.client, err = v2.NewSyncClientWithConn(conn,
 		v2.JSONEncoder(enc),
 		v2.Timeout(config.Timeout),
