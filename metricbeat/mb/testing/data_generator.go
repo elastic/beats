@@ -102,7 +102,7 @@ func WriteEventToDataJSON(t testing.TB, fullEvent beat.Event) {
 	}
 
 	// use json output codec to encode event to json
-	output, err := json.New(true).Encode("noindex", &fullEvent)
+	output, err := json.New(true, "1.2.3").Encode("noindex", &fullEvent)
 	if err != nil {
 		t.Fatal(err)
 	}
