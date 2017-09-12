@@ -293,6 +293,9 @@ endif
 	@mkdir -p $(PWD)/_meta/kibana/default/index-pattern
 	@${PYTHON_ENV}/bin/python ${ES_BEATS}/libbeat/scripts/generate_index_pattern.py --index '${BEAT_NAME}-*' --beat $(PWD) --version ${BEAT_VERSION}
 
+	# Runs the post-update target if it exists. Will not return errors
+	@-$(MAKE) post-update
+
 
 .PHONY: docs
 docs:  ## @build Builds the documents for the beat
