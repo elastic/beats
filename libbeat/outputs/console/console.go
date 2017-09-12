@@ -48,12 +48,12 @@ func makeConsole(
 
 	var enc codec.Codec
 	if config.Codec.Namespace.IsSet() {
-		enc, err = codec.CreateEncoder(config.Codec)
+		enc, err = codec.CreateEncoder(beat, config.Codec)
 		if err != nil {
 			return outputs.Fail(err)
 		}
 	} else {
-		enc = json.New(config.Pretty)
+		enc = json.New(config.Pretty, beat.Version)
 	}
 
 	index := beat.Beat
