@@ -70,7 +70,8 @@ func ExampleWrapper() {
 	// {
 	//   "@metadata": {
 	//     "beat": "noindex",
-	//     "type": "doc"
+	//     "type": "doc",
+	//     "version": "1.2.3"
 	//   },
 	//   "@timestamp": "2016-05-10T23:27:58.485Z",
 	//   "fake": {
@@ -130,7 +131,7 @@ func ExampleRunner() {
 }
 
 func encodeEvent(event beat.Event) (string, error) {
-	output, err := json.New(false).Encode("noindex", &event)
+	output, err := json.New(false, "1.2.3").Encode("noindex", &event)
 	if err != nil {
 		return "", nil
 	}
