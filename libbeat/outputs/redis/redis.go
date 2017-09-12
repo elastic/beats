@@ -94,7 +94,7 @@ func makeRedis(
 
 	clients := make([]outputs.NetworkClient, len(hosts))
 	for i, host := range hosts {
-		enc, err := codec.CreateEncoder(config.Codec)
+		enc, err := codec.CreateEncoder(beat, config.Codec)
 		if err != nil {
 			return outputs.Fail(err)
 		}

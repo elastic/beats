@@ -114,6 +114,7 @@ func makeReporter(beat beat.Info, cfg *common.Config) (report.Reporter, error) {
 	monitoring := monitoring.Default.NewRegistry("xpack.monitoring")
 
 	pipeline, err := pipeline.New(
+		beat,
 		monitoring,
 		queueFactory, out, pipeline.Settings{
 			WaitClose:     0,

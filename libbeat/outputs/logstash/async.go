@@ -4,6 +4,7 @@ import (
 	"net"
 	"time"
 
+	"github.com/elastic/beats/libbeat/beat"
 	"github.com/elastic/beats/libbeat/common/atomic"
 	"github.com/elastic/beats/libbeat/logp"
 	"github.com/elastic/beats/libbeat/outputs"
@@ -32,6 +33,7 @@ type msgRef struct {
 }
 
 func newAsyncClient(
+	beat beat.Info,
 	conn *transport.Client,
 	stats *outputs.Stats,
 	config *Config,
@@ -49,7 +51,7 @@ func newAsyncClient(
 		logp.Warn(`The async Logstash client does not support the "ttl" option`)
 	}
 
-	enc := makeLogstashEventEncoder(config.Index)
+	enc := makeLogstashEventEncoder(beat, config.Index)
 
 	queueSize := config.Pipelining - 1
 	timeout := config.Timeout
