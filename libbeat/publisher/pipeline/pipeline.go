@@ -373,7 +373,9 @@ func makePipelineProcessors(
 	processors *processors.Processors,
 	disabled bool,
 ) pipelineProcessors {
-	p := pipelineProcessors{}
+	p := pipelineProcessors{
+		disabled: disabled,
+	}
 
 	hasProcessors := processors != nil && len(processors.List) > 0
 	if hasProcessors {
@@ -384,13 +386,13 @@ func makePipelineProcessors(
 		p.processors = tmp
 	}
 
-	fields := common.MapStr{}
 	if meta := annotations.Beat; meta != nil {
 		p.beatsMeta = common.MapStr{"beat": meta}
 	}
 
-	fields = buildFields(fields, annotations.Event)
-	if len(fields) > 0 {
+	if em := annotations.Event; len(em.Fields) > 0 {
+		fields := common.MapStr{}
+		common.MergeFields(fields, em.Fields.Clone(), em.FieldsUnderRoot)
 		p.fields = fields
 	}
 

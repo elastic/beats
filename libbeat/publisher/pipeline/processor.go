@@ -275,20 +275,3 @@ func makeClientProcessors(config beat.ClientConfig) processors.Processor {
 		list:  procs.All(),
 	}
 }
-
-func buildFields(fields common.MapStr, em common.EventMetadata) common.MapStr {
-	if fields == nil {
-		fields = common.MapStr{}
-	} else {
-		fields = fields.Clone()
-	}
-
-	if fs := em.Fields; len(fs) > 0 {
-		common.MergeFields(fields, fs.Clone(), em.FieldsUnderRoot)
-	}
-
-	if len(fields) == 0 {
-		return nil
-	}
-	return fields
-}
