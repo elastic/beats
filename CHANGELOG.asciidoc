@@ -38,6 +38,7 @@ https://github.com/elastic/beats/compare/v6.0.0-beta2...master[Check the HEAD di
 - Keep Docker & Kubernetes pod metadata after container dies while they are needed by processors. {pull}5084[5084]
 - Fix `fields.yml` lookup when using `export template` with a custom `path.config` param. {issue}5089[5089]
 - Remove runner creation from every reload check {pull}5141[5141]
+- Remove ID() from Runner interface {issue}5153[5153]
 
 *Auditbeat*
 
