@@ -21,6 +21,7 @@ const (
 type Config struct {
 	Prospectors      []*common.Config `config:"prospectors"`
 	RegistryFile     string           `config:"registry_file"`
+	RegistryFlush    time.Duration    `config:"registry_flush"`
 	ConfigDir        string           `config:"config_dir"`
 	ShutdownTimeout  time.Duration    `config:"shutdown_timeout"`
 	Modules          []*common.Config `config:"modules"`

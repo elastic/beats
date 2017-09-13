@@ -13,6 +13,7 @@ https://github.com/elastic/beats/compare/v6.0.0-beta2...master[Check the HEAD di
 ==== Breaking changes
 
 *Affecting all Beats*
+- Fix kubernetes matcher registry lookup. {pull}5159[5159]
 
 *Auditbeat*
 
@@ -37,6 +38,7 @@ https://github.com/elastic/beats/compare/v6.0.0-beta2...master[Check the HEAD di
 - Combine `fields.yml` properties when they are defined in different sources. {issue}5075[5075]
 - Keep Docker & Kubernetes pod metadata after container dies while they are needed by processors. {pull}5084[5084]
 - Fix `fields.yml` lookup when using `export template` with a custom `path.config` param. {issue}5089[5089]
+- Remove runner creation from every reload check {pull}5141[5141]
 
 *Auditbeat*
 
@@ -67,6 +69,8 @@ https://github.com/elastic/beats/compare/v6.0.0-beta2...master[Check the HEAD di
 - Changed the hashbang used in the beat helper script from `/bin/bash` to `/usr/bin/env bash`. {pull}5051[5051]
 - Changed beat helper script to use `exec` when running the beat. {pull}5051[5051]
 - Fix reloader error message to only print on actual error {pull}5066[5066]
+- Enable flush timeout by default. {pull}5150[5150]
+- Add @metadata.version to events send to Logstash. {pull}5166[5166]
 
 *Auditbeat*
 
@@ -81,6 +85,7 @@ https://github.com/elastic/beats/compare/v6.0.0-beta2...master[Check the HEAD di
 - Remove error log from runnerfactory as error is returned by API. {pull}5085[5085]
 - Changed the number of shards in the default configuration to 3. {issue}5095[5095]
 - Remove error log from runnerfactory as error is returned by API. {pull}5085[5085]
+- Add `filebeat.registry_flush` setting, to delay the registry updates. {pull}5146[5146]
 
 *Heartbeat*
 

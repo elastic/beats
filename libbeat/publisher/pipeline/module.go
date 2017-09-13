@@ -72,7 +72,7 @@ func Load(
 		return nil, err
 	}
 
-	p, err := New(reg, queueBuilder, out, settings)
+	p, err := New(beatInfo, reg, queueBuilder, out, settings)
 	if err != nil {
 		return nil, err
 	}

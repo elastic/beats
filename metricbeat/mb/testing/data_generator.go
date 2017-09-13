@@ -85,9 +85,6 @@ func CreateFullEvent(ms mb.MetricSet, metricSetData common.MapStr) beat.Event {
 		"hostname": "host.example.com",
 	}
 
-	// Delete meta data as not needed for the event output here.
-	delete(fullEvent.Fields, common.EventMetadataKey)
-
 	return fullEvent
 }
 
@@ -105,7 +102,7 @@ func WriteEventToDataJSON(t testing.TB, fullEvent beat.Event) {
 	}
 
 	// use json output codec to encode event to json
-	output, err := json.New(true).Encode("noindex", &fullEvent)
+	output, err := json.New(true, "1.2.3").Encode("noindex", &fullEvent)
 	if err != nil {
 		t.Fatal(err)
 	}

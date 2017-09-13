@@ -8,9 +8,9 @@ import (
 )
 
 func TestJsonCodec(t *testing.T) {
-	expectedValue := `{"@timestamp":"0001-01-01T00:00:00.000Z","@metadata":{"beat":"test","type":"doc"},"msg":"message"}`
+	expectedValue := `{"@timestamp":"0001-01-01T00:00:00.000Z","@metadata":{"beat":"test","type":"doc","version":"1.2.3"},"msg":"message"}`
 
-	codec := New(false)
+	codec := New(false, "1.2.3")
 	output, err := codec.Encode("test", &beat.Event{Fields: common.MapStr{"msg": "message"}})
 
 	if err != nil {
@@ -27,12 +27,13 @@ func TestJsonWriterPrettyPrint(t *testing.T) {
   "@timestamp": "0001-01-01T00:00:00.000Z",
   "@metadata": {
     "beat": "test",
-    "type": "doc"
+    "type": "doc",
+    "version": "1.2.3"
   },
   "msg": "message"
 }`
 
-	codec := New(true)
+	codec := New(true, "1.2.3")
 	output, err := codec.Encode("test", &beat.Event{Fields: common.MapStr{"msg": "message"}})
 
 	if err != nil {

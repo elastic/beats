@@ -21,7 +21,7 @@ func TestProduceConsumer(t *testing.T) {
 	minEvents := 32
 
 	rand.Seed(seed)
-	events := rand.Intn(maxEvents-minEvents) + maxEvents
+	events := rand.Intn(maxEvents-minEvents) + minEvents
 	batchSize := rand.Intn(events-8) + 4
 	bufferSize := rand.Intn(batchSize*2) + 4
 
@@ -34,22 +34,32 @@ func TestProduceConsumer(t *testing.T) {
 	t.Log("batchSize: ", batchSize)
 	t.Log("bufferSize: ", bufferSize)
 
-	factory := makeTestQueue(bufferSize)
+	testWith := func(factory queuetest.QueueFactory) func(t *testing.T) {
+		return func(t *testing.T) {
+			t.Run("single", func(t *testing.T) {
+				queuetest.TestSingleProducerConsumer(t, events, batchSize, factory)
+			})
+			t.Run("multi", func(t *testing.T) {
+				queuetest.TestMultiProducerConsumer(t, events, batchSize, factory)
+			})
+		}
+	}
 
-	t.Run("single", func(t *testing.T) {
-		queuetest.TestSingleProducerConsumer(t, events, batchSize, factory)
-	})
-	t.Run("multi", func(t *testing.T) {
-		queuetest.TestMultiProducerConsumer(t, events, batchSize, factory)
-	})
+	t.Run("direct", testWith(makeTestQueue(bufferSize, 0, 0)))
+	t.Run("flush", testWith(makeTestQueue(bufferSize, batchSize/2, 100*time.Millisecond)))
 }
 
 func TestProducerCancelRemovesEvents(t *testing.T) {
-	queuetest.TestProducerCancelRemovesEvents(t, makeTestQueue(1024))
+	queuetest.TestProducerCancelRemovesEvents(t, makeTestQueue(1024, 0, 0))
 }
 
-func makeTestQueue(sz int) queuetest.QueueFactory {
+func makeTestQueue(sz, minEvents int, flushTimeout time.Duration) queuetest.QueueFactory {
 	return func() queue.Queue {
-		return NewBroker(Settings{Events: sz, WaitOnClose: true})
+		return NewBroker(Settings{
+			Events:         sz,
+			FlushMinEvents: minEvents,
+			FlushTimeout:   flushTimeout,
+			WaitOnClose:    true,
+		})
 	}
 }
