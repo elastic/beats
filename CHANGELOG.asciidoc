@@ -64,6 +64,7 @@ https://github.com/elastic/beats/compare/v6.0.0-beta2...master[Check the HEAD di
 
 *Affecting all Beats*
 
+- Enable flush timeout by default. {pull}5150[5150]
 - Add @metadata.version to events send to Logstash. {pull}5166[5166]
 
 *Auditbeat*
