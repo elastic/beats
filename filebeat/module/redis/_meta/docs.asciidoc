@@ -8,8 +8,9 @@ This module has two filesets:
 * connects to Redis via the network and retrieves the slow logs
   by using the `SLOWLOG` command.
 
-For the `log` fileset, make sure the `logfile` option is set in the Redis configuration file. For
-the `slowlog` fileset, make sure the `slowlog-log-slower-than` is set.
+For the `log` fileset, make sure the `logfile` option, from the Redis configuration file, is set to `redis-server.log`.
+
+For the `slowlog` fileset, make sure the `slowlog-log-slower-than` option, from the Redis configuration file, is set to a lower value than the default one.
 
 [float]
 === Compatibility

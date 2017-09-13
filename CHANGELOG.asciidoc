@@ -42,6 +42,7 @@ https://github.com/elastic/beats/compare/v6.0.0-beta2...master[Check the HEAD di
 *Auditbeat*
 
 *Filebeat*
+- Fix default paths for redis 4.0.1 logs on macOS {pull}5173[5173] 
 
 *Heartbeat*
 
