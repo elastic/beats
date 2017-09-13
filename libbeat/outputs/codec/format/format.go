@@ -18,7 +18,7 @@ type Config struct {
 }
 
 func init() {
-	codec.RegisterType("format", func(cfg *common.Config) (codec.Codec, error) {
+	codec.RegisterType("format", func(_ beat.Info, cfg *common.Config) (codec.Codec, error) {
 		config := Config{}
 		if cfg == nil {
 			return nil, errors.New("empty format codec configuration")
