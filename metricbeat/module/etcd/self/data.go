@@ -12,7 +12,7 @@ type LeaderInfo struct {
 }
 
 type AppendRequest struct {
-	Count int64 `json:"recvAppendRequestCnt`
+	Count int64 `json:"recvAppendRequestCnt"`
 }
 
 type Recv struct {
