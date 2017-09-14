@@ -34,7 +34,7 @@ type Send struct {
 type Self struct {
 	ID         string `json:"id"`
 	LeaderInfo LeaderInfo
-	name       string `json:"name"`
+	Name       string `json:"name"`
 	Recv       Recv
 	Send       Send
 	StartTime  string `json:"startTime"`
@@ -51,7 +51,7 @@ func eventMapping(content []byte) common.MapStr {
 			"starttime": data.LeaderInfo.StartTime,
 			"uptime":    data.LeaderInfo.Uptime,
 		},
-		"name": data.name,
+		"name": data.Name,
 		"recv": common.MapStr{
 			"appendrequest": common.MapStr{
 				"count": data.Recv.Appendrequest.Count,
