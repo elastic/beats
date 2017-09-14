@@ -2,6 +2,7 @@ package self
 
 import (
 	"encoding/json"
+	
 	"github.com/elastic/beats/libbeat/common"
 )
 
