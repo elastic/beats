@@ -6,9 +6,10 @@ import (
 	"net/http/httptest"
 	"path/filepath"
 
+	"github.com/stretchr/testify/assert"
+
 	"github.com/elastic/beats/libbeat/common"
 	mbtest "github.com/elastic/beats/metricbeat/mb/testing"
-	"github.com/stretchr/testify/assert"
 
 	"testing"
 )
