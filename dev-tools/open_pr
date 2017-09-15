@@ -21,7 +21,10 @@ Open PR against the 6.0 branch, with the review and in progress labels:
 
 Open PR against the 6.0 branch, with the review and docs labels:
 
-./dev-tools/open_pr --remote tsg --lables=review,docs
+./dev-tools/open_pr --remote tsg --labels=review,docs
+
+The title and message of the PR are taken from the _last_ commit in the
+PR.
 """
 
 def main():
@@ -36,6 +39,8 @@ def main():
                         help="Remote branch to open PR against (e.g 5.0)")
     parser.add_argument("--wip", action="store_true",
                         help="Add the `in progress` label")
+    parser.add_argument("--labels",
+                        help="Extra labels to add (comma separated)")
     parser.add_argument("--yes", action="store_true",
                         help="Assume yes.")
     args = parser.parse_args()
@@ -44,6 +49,8 @@ def main():
     msg = check_output("git show -q HEAD --format='%b'", shell=True).strip()
 
     labels = ["review"]
+    if args.labels:
+        labels.extend(args.labels.split(","))
     if args.wip:
         lables += "in progress"
 
