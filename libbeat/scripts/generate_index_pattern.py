@@ -161,7 +161,7 @@ def get_index_pattern_name(index):
 
 def dump_index_pattern(args, version, output):
 
-    fileName = get_index_pattern_name(args.index)
+    fileName = get_index_pattern_name(args.beat_name)
     target_dir = os.path.join(args.beat, "_meta", "kibana", version, "index-pattern")
     target_file = os.path.join(target_dir, fileName + ".json")
 
@@ -187,6 +187,7 @@ if __name__ == "__main__":
     parser.add_argument("--version", help="Beat version")
     parser.add_argument("--index", help="The name of the index-pattern")
     parser.add_argument("--beat", help="Local Beat directory")
+    parser.add_argument("--beat-name", help="Name of the beat")
 
     args = parser.parse_args()
 

@@ -155,10 +155,10 @@ output.elasticsearch:
   # Number of workers per Elasticsearch host.
   #worker: 1
 
-  # Optional index name. The default is "beatname" plus date
-  # and generates [beatname-]YYYY.MM.DD keys.
+  # Optional index name. The default is "index-prefix" plus date
+  # and generates [index-prefix-]YYYY.MM.DD keys.
   # In case you modify this pattern you must update setup.template.name and setup.template.pattern accordingly.
-  #index: "beatname-%{[beat.version]}-%{+yyyy.MM.dd}"
+  #index: "index-prefix-%{[beat.version]}-%{+yyyy.MM.dd}"
 
   # Optional ingest node pipeline. By default no pipeline will be used.
   #pipeline: ""
@@ -253,7 +253,7 @@ output.elasticsearch:
 
   # Optional index name. The default index name is set to name of the beat
   # in all lowercase.
-  #index: 'beatname'
+  #index: 'index-prefix'
 
   # SOCKS5 proxy server URL
   #proxy_url: socks5://user:password@socks5-server:2233
@@ -620,14 +620,14 @@ output.elasticsearch:
 # Set to false to disable template loading.
 #setup.template.enabled: true
 
-# Template name. By default the template name is "beatname-%{[beat.version]}"
+# Template name. By default the template name is "index-prefix-%{[beat.version]}"
 # The template name and pattern has to be set in case the elasticsearch index pattern is modified.
-#setup.template.name: "beatname-%{[beat.version]}"
+#setup.template.name: "index-prefix-%{[beat.version]}"
 
 # Template patttern. By default the template pattern is "-%{[beat.version]}-*" to apply to the default index settings.
 # The first part is the version of the beat and then -* is used to match all daily indicies.
 # The template name and pattern has to be set in case the elasticsearch index pattern is modified.
-#setup.template.pattern: "beatname-%{[beat.version]}-*"
+#setup.template.pattern: "index-prefix-%{[beat.version]}-*"
 
 # Path to fields.yml file to generate the template
 #setup.template.fields: "${path.config}/fields.yml"
