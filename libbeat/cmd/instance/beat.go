@@ -114,9 +114,9 @@ func initRand() {
 // implementation. bt is the `Creator` callback for creating a new beater
 // instance.
 // XXX Move this as a *Beat method?
-func Run(name, version string, bt beat.Creator) error {
+func Run(name, idxPrefix, version string, bt beat.Creator) error {
 	return handleError(func() error {
-		b, err := NewBeat(name, version)
+		b, err := NewBeat(name, idxPrefix, version)
 		if err != nil {
 			return err
 		}
@@ -125,9 +125,12 @@ func Run(name, version string, bt beat.Creator) error {
 }
 
 // NewBeat creates a new beat instance
-func NewBeat(name, v string) (*Beat, error) {
+func NewBeat(name, indexPrefix, v string) (*Beat, error) {
 	if v == "" {
 		v = version.GetDefaultVersion()
+	}
+	if indexPrefix == "" {
+		indexPrefix = name
 	}
 
 	hostname, err := os.Hostname()
@@ -137,11 +140,12 @@ func NewBeat(name, v string) (*Beat, error) {
 
 	b := beat.Beat{
 		Info: beat.Info{
-			Beat:     name,
-			Version:  v,
-			Name:     hostname,
-			Hostname: hostname,
-			UUID:     uuid.NewV4(),
+			Beat:        name,
+			IndexPrefix: indexPrefix,
+			Version:     v,
+			Name:        hostname,
+			Hostname:    hostname,
+			UUID:        uuid.NewV4(),
 		},
 	}
 

@@ -16,7 +16,7 @@ func GenTestOutputCmd(name, beatVersion string) *cobra.Command {
 		Use:   "output",
 		Short: "Test " + name + " can connect to the output by using the current settings",
 		Run: func(cmd *cobra.Command, args []string) {
-			b, err := instance.NewBeat(name, beatVersion)
+			b, err := instance.NewBeat(name, "", beatVersion)
 			if err != nil {
 				fmt.Fprintf(os.Stderr, "Error initializing beat: %s\n", err)
 				os.Exit(1)

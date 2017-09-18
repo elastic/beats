@@ -703,7 +703,7 @@ output.elasticsearch:
   # if no error is encountered.
   #slow_start: false
 
-  # Optional index name. The default index name is set to name of the beat
+  # Optional index name. The default index name is set to packetbeat
   # in all lowercase.
   #index: 'packetbeat'
 
