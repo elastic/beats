@@ -8,7 +8,7 @@
 // Template, add newest changes here
 
 === Beats version HEAD
-https://github.com/elastic/beats/compare/v5.4.1...master[Check the HEAD diff]
+https://github.com/elastic/beats/compare/v5.6.1...master[Check the HEAD diff]
 
 ==== Breaking changes
 
@@ -81,6 +81,12 @@ https://github.com/elastic/beats/compare/v5.4.1...master[Check the HEAD diff]
 *Winlogbeat*
 
 ////////////////////////////////////////////////////////////
+
+[[release-notes-5.6.1]]
+=== Beats version 5.6.1
+https://github.com/elastic/beats/compare/v5.6.0...v5.6.1[View commits]
+
+No changes in this release.
 
 [[release-notes-5.6.0]]
 === Beats version 5.6.0
