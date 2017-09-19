@@ -25,7 +25,7 @@ echo "Index document: ${index}"
 
 dest_dir="$html_dir/${name}"
 mkdir -p "$dest_dir"
-params=""
+params="--chunk=1"
 if [ "$PREVIEW" = "1" ]; then
   params="--chunk=1 -open chunk=1 -open"
 fi
