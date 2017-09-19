@@ -73,8 +73,6 @@ services:
 
   kibana:
     build: ./module/kibana/_meta
-    depends_on:
-      - elasticsearch
 
   kubernetes:
     build: ./module/kubernetes/_meta
