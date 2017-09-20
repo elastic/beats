@@ -162,6 +162,10 @@ func (c *Client) RemoteAddr() net.Addr {
 	return nil
 }
 
+func (c *Client) Host() string  {
+	return c.host
+}
+
 func (c *Client) SetDeadline(t time.Time) error {
 	conn := c.getConn()
 	if conn == nil {
