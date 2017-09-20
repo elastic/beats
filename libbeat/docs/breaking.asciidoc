@@ -119,14 +119,14 @@ following command:
 
 ["source","sh",subs="attributes"]
 ----
-./scripts/import_dashboards -user elastic -pass changeme
+./scripts/import_dashboards -user elastic -pass {pwd}
 ----
 
 Can be replaced with:
 
 ["source","sh",subs="attributes"]
 ----
-./filebeat setup -E "output.elasticsearch.username=elastic" -E "output.elasticsearch.password=changeme"
+./filebeat setup -E "output.elasticsearch.username=elastic" -E "output.elasticsearch.password={pwd}"
 ----
 
 Note that the `-E` flags are only required if the Elasticsearch output is not
