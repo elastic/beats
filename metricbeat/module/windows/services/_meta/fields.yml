@@ -1,0 +1,9 @@
+- name: services
+  type: group
+  description: >
+    services
+  fields:
+    - name: example
+      type: keyword
+      description: >
+        Example field
