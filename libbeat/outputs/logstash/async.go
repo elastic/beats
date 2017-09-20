@@ -139,8 +139,8 @@ func (c *asyncClient) Publish(batch publisher.Batch) error {
 			n, err = c.publishWindowed(ref, events)
 		}
 
-		debugf("%v events out of %v events sent to logstash. Continue sending",
-			n, len(events))
+		debugf("%v events out of %v events sent to logstash host %s. Continue sending",
+			n, len(events), c.Host())
 
 		events = events[n:]
 		if err != nil {
@@ -159,8 +159,8 @@ func (c *asyncClient) publishWindowed(
 	batchSize := len(events)
 	windowSize := c.win.get()
 
-	debugf("Try to publish %v events to logstash with window size %v",
-		batchSize, windowSize)
+	debugf("Try to publish %v events to logstash host %s with window size %v",
+		batchSize, c.Host(), windowSize)
 
 	// prepare message payload
 	if batchSize > windowSize {
