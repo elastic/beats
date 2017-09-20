@@ -52,7 +52,6 @@ type RunnerFactory interface {
 type Runner interface {
 	Start()
 	Stop()
-	ID() uint64
 }
 
 // Reloader is used to register and reload modules
