@@ -162,7 +162,7 @@ func (c *Client) RemoteAddr() net.Addr {
 	return nil
 }
 
-func (c *Client) Host() string  {
+func (c *Client) Host() string {
 	return c.host
 }
 
