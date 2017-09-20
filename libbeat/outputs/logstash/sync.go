@@ -76,7 +76,7 @@ func (c *syncClient) Close() error {
 
 func (c *syncClient) reconnect() error {
 	if err := c.Client.Close(); err != nil {
-		logp.Err("error closing connection to logstash: %s, reconnecting...", err)
+		logp.Err("error closing connection to logstash host %s: %s, reconnecting...", c.Host(), err)
 	}
 	return c.Client.Connect()
 }
@@ -123,8 +123,8 @@ func (c *syncClient) Publish(batch publisher.Batch) error {
 		events = events[n:]
 		st.Acked(n)
 
-		debugf("%v events out of %v events sent to logstash. Continue sending",
-			n, len(events))
+		debugf("%v events out of %v events sent to logstash host %s. Continue sending",
+			n, len(events), c.Host())
 
 		if err != nil {
 			// return batch to pipeline before reporting/counting error
@@ -151,8 +151,8 @@ func (c *syncClient) Publish(batch publisher.Batch) error {
 func (c *syncClient) publishWindowed(events []publisher.Event) (int, error) {
 	batchSize := len(events)
 	windowSize := c.win.get()
-	debugf("Try to publish %v events to logstash with window size %v",
-		batchSize, windowSize)
+	debugf("Try to publish %v events to logstash host %s with window size %v",
+		batchSize, c.Host(), windowSize)
 
 	// prepare message payload
 	if batchSize > windowSize {
