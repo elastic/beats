@@ -25,7 +25,7 @@ type Prospector struct {
 	prospectorer Prospectorer
 	done         chan struct{}
 	wg           *sync.WaitGroup
-	id           uint64
+	ID           uint64
 	Once         bool
 	beatDone     chan struct{}
 }
@@ -52,7 +52,7 @@ func New(
 
 	var h map[string]interface{}
 	conf.Unpack(&h)
-	prospector.id, err = hashstructure.Hash(h, nil)
+	prospector.ID, err = hashstructure.Hash(h, nil)
 	if err != nil {
 		return nil, err
 	}
@@ -81,7 +81,7 @@ func New(
 // Start starts the prospector
 func (p *Prospector) Start() {
 	p.wg.Add(1)
-	logp.Info("Starting prospector of type: %v; id: %v ", p.config.Type, p.ID())
+	logp.Info("Starting prospector of type: %v; ID: %d ", p.config.Type, p.ID)
 
 	onceWg := sync.WaitGroup{}
 	if p.Once {
@@ -124,11 +124,6 @@ func (p *Prospector) Run() {
 	}
 }
 
-// ID returns prospector identifier
-func (p *Prospector) ID() uint64 {
-	return p.id
-}
-
 // Stop stops the prospector and with it all harvesters
 func (p *Prospector) Stop() {
 	// Stop scanning and wait for completion
@@ -137,7 +132,7 @@ func (p *Prospector) Stop() {
 }
 
 func (p *Prospector) stop() {
-	logp.Info("Stopping Prospector: %v", p.ID())
+	logp.Info("Stopping Prospector: %d", p.ID)
 
 	// In case of once, it will be waited until harvesters close itself
 	if p.Once {

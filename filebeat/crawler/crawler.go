@@ -92,11 +92,11 @@ func (c *Crawler) startProspector(config *common.Config, states []file.State) er
 	}
 	p.Once = c.once
 
-	if _, ok := c.prospectors[p.ID()]; ok {
-		return fmt.Errorf("Prospector with same ID already exists: %v", p.ID())
+	if _, ok := c.prospectors[p.ID]; ok {
+		return fmt.Errorf("Prospector with same ID already exists: %d", p.ID)
 	}
 
-	c.prospectors[p.ID()] = p
+	c.prospectors[p.ID] = p
 
 	p.Start()
 
