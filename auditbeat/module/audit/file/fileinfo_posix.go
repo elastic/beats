@@ -12,12 +12,10 @@ import (
 	"github.com/pkg/errors"
 )
 
-func Stat(path string) (*Metadata, error) {
-	info, err := os.Lstat(path)
-	if err != nil {
-		return nil, errors.Wrap(err, "failed to stat path")
-	}
-
+// NewMetadata returns a new Metadata object. If an error is returned it is
+// still possible for a non-nil Metadata object to be returned (possibly with
+// less data populated).
+func NewMetadata(path string, info os.FileInfo) (*Metadata, error) {
 	stat, ok := info.Sys().(*syscall.Stat_t)
 	if !ok {
 		return nil, errors.Errorf("unexpected fileinfo sys type %T for %v", info.Sys(), path)
@@ -27,18 +25,18 @@ func Stat(path string) (*Metadata, error) {
 		Inode: stat.Ino,
 		UID:   stat.Uid,
 		GID:   stat.Gid,
-		Mode:  info.Mode(),
-		Size:  info.Size(),
+		Mode:  info.Mode().Perm(),
+		Size:  uint64(info.Size()),
 	}
-	fileInfo.ATime, fileInfo.MTime, fileInfo.CTime = fileTimes(stat)
+	_, fileInfo.MTime, fileInfo.CTime = fileTimes(stat)
 
 	switch {
 	case info.IsDir():
-		fileInfo.Type = "dir"
+		fileInfo.Type = DirType
 	case info.Mode().IsRegular():
-		fileInfo.Type = "file"
+		fileInfo.Type = FileType
 	case info.Mode()&os.ModeSymlink > 0:
-		fileInfo.Type = "symlink"
+		fileInfo.Type = SymlinkType
 	}
 
 	// Lookup UID and GID

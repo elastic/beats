@@ -23,6 +23,11 @@ const (
 	// put the name under the same name as the package. This is for example
 	// the case in elasticsearch `node_stats` which puts the data under `node.stats`.
 	NamespaceKey string = "_namespace"
+
+	// RTTKey is used by a MetricSet to specify the round trip time (RTT), or
+	// total amount of time, taken to collect the information in the event. The
+	// data must be of type time.Duration otherwise the value is ignored.
+	RTTKey string = "_rtt"
 )
 
 // Module interfaces
