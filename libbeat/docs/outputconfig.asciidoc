@@ -1101,22 +1101,26 @@ output.console:
 [[configure-cloud-id]]
 === Configure the output for the Elastic Cloud
 
+++++
+<titleabbrev>Cloud</titleabbrev>
+++++
+
 {beatname_uc} comes with two settings that simplify the output configuration
 when used together with https://cloud.elastic.co/[Elastic Cloud]. When defined,
 these setting overwrite settings from other parts in the configuration.
 
 Example:
 
-[source,yaml]
+["source","yaml",subs="attributes"]
 ------------------------------------------------------------------------------
 cloud.id: "staging:dXMtZWFzdC0xLmF3cy5mb3VuZC5pbyRjZWM2ZjI2MWE3NGJmMjRjZTMzYmI4ODExYjg0Mjk0ZiRjNmMyY2E2ZDA0MjI0OWFmMGNjN2Q3YTllOTYyNTc0Mw=="
-cloud.auth: "elastic:changeme"
+cloud.auth: "elastic:{pwd}"
 ------------------------------------------------------------------------------
 
 These settings can be also specified at the command line, like this:
 
 
-["source","sh",subs="attributes,callouts"]
+["source","sh",subs="attributes"]
 ------------------------------------------------------------------------------
 {beatname_lc} -e -E cloud.id="<cloud-id>" -E cloud.auth="<cloud.auth>"
 ------------------------------------------------------------------------------
