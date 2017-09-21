@@ -24,6 +24,7 @@ class Test(metricbeat.BaseTest):
         self.render_config_template(
             reload=True,
             reload_path=self.working_dir + "/configs/*.yml",
+            flush_min_events=1,
         )
         proc = self.start_beat()
 
@@ -49,6 +50,7 @@ class Test(metricbeat.BaseTest):
         self.render_config_template(
             reload=True,
             reload_path=self.working_dir + "/configs/*.yml",
+            flush_min_events=1,
         )
         os.mkdir(self.working_dir + "/configs/")
 

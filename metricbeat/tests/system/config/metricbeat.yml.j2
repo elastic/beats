@@ -143,7 +143,7 @@ processors:
 
 queue.mem:
   events: 4096
-  flush.min_events: 8
+  flush.min_events: {{ flush_min_events|default(8) }}
   flush.timeout: 0.1s
 
 #================================ Outputs =====================================
