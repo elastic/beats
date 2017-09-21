@@ -223,7 +223,7 @@ if __name__ == "__main__":
     args = parser.parse_args()
 
     cwd = os.getcwd()
-    notice = os.path.join(cwd, "NOTICE")
+    notice = os.path.join(cwd, "NOTICE.txt")
     vendor_dirs = []
 
     for root, dirs, files in os.walk(args.vendor):
