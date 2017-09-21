@@ -296,13 +296,14 @@ output {
   elasticsearch {
     hosts => "localhost:9200"
     manage_template => false
-    index => "%{[@metadata][beat]}-%{+YYYY.MM.dd}" <1>
+    index => "%{[@metadata][beat]}-%{[@metadata][version]}-%{+YYYY.MM.dd}" <1>
     document_type => "%{[@metadata][type]}" <2>
   }
 }
 ------------------------------------------------------------------------------
 <1> `%{[@metadata][beat]}` sets the first part of the index name to the value
-of the `beat` metadata field, and `%{+YYYY.MM.dd}` sets the second part of the
+of the `beat` metadata field, `%{[@metadata][version]}` sets the second part of
+the name to the beat's version, and `%{+YYYY.MM.dd}` sets the third part of the
 name to a date based on the Logstash `@timestamp` field. For example:
 +{beatname_lc}-2017.03.29+.
 <2> `%{[@metadata][type]}` sets the document type based on the value of the `type`

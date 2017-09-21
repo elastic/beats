@@ -13,8 +13,8 @@ type config struct {
 
 var defaultConfig = config{
 	Events:         4 * 1024,
-	FlushMinEvents: 0,
-	FlushTimeout:   0,
+	FlushMinEvents: 2 * 1024,
+	FlushTimeout:   1 * time.Second,
 }
 
 func (c *config) Validate() error {

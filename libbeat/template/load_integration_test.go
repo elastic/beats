@@ -219,10 +219,11 @@ func TestOverwrite(t *testing.T) {
 	}
 
 	beatInfo := beat.Info{
-		Beat:    "testbeat",
-		Version: version.GetDefaultVersion(),
+		Beat:        "testbeat",
+		IndexPrefix: "testbeatidx",
+		Version:     version.GetDefaultVersion(),
 	}
-	templateName := "testbeat-" + version.GetDefaultVersion()
+	templateName := "testbeatidx-" + version.GetDefaultVersion()
 
 	absPath, err := filepath.Abs("../")
 	assert.NotNil(t, absPath)

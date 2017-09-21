@@ -10,12 +10,12 @@ import (
 	"github.com/elastic/beats/libbeat/cmd/instance"
 )
 
-func GenExportConfigCmd(name, beatVersion string) *cobra.Command {
+func GenExportConfigCmd(name, idxPrefix, beatVersion string) *cobra.Command {
 	return &cobra.Command{
 		Use:   "config",
 		Short: "Export current config to stdout",
 		Run: func(cmd *cobra.Command, args []string) {
-			b, err := instance.NewBeat(name, beatVersion)
+			b, err := instance.NewBeat(name, idxPrefix, beatVersion)
 			if err != nil {
 				fmt.Fprintf(os.Stderr, "Error initializing beat: %s\n", err)
 				os.Exit(1)

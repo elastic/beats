@@ -60,9 +60,9 @@ func makeLogstash(
 		}
 
 		if config.Pipelining > 0 {
-			client, err = newAsyncClient(conn, stats, config)
+			client, err = newAsyncClient(beat, conn, stats, config)
 		} else {
-			client, err = newSyncClient(conn, stats, config)
+			client, err = newSyncClient(beat, conn, stats, config)
 		}
 		if err != nil {
 			return outputs.Fail(err)

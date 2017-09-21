@@ -480,11 +480,11 @@ metricbeat.modules:
     # before providing a batch of events to the outputs.
     # A value of 0 (the default) ensures events are immediately available
     # to be sent to the outputs.
-    #flush.min_events: 0
+    #flush.min_events: 2048
 
     # Maximum duration after which events are available to the outputs,
     # if the number of events stored in the queue is < min_flush_events.
-    #flush.timeout: 0s
+    #flush.timeout: 1s
 
 # Sets the maximum number of CPUs that can be executing simultaneously. The
 # default is the number of logical CPUs available in the system.
@@ -695,7 +695,7 @@ output.elasticsearch:
   # if no error is encountered.
   #slow_start: false
 
-  # Optional index name. The default index name is set to name of the beat
+  # Optional index name. The default index name is set to metricbeat
   # in all lowercase.
   #index: 'metricbeat'
 
@@ -1191,6 +1191,10 @@ logging.files:
 
   # Number of rotated log files to keep. Oldest files will be deleted first.
   #keepfiles: 7
+
+  # The permissions mask to apply when rotating log files. The default value is 0600.
+  # Must be a valid Unix-style file permissions mask expressed in octal notation.
+  #permissions: 0600
 
 # Set to true to log messages in json format.
 #logging.json: false

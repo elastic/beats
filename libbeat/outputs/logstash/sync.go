@@ -3,6 +3,7 @@ package logstash
 import (
 	"time"
 
+	"github.com/elastic/beats/libbeat/beat"
 	"github.com/elastic/beats/libbeat/logp"
 	"github.com/elastic/beats/libbeat/outputs"
 	"github.com/elastic/beats/libbeat/outputs/transport"
@@ -20,6 +21,7 @@ type syncClient struct {
 }
 
 func newSyncClient(
+	beat beat.Info,
 	conn *transport.Client,
 	stats *outputs.Stats,
 	config *Config,
@@ -38,7 +40,7 @@ func newSyncClient(
 	}
 
 	var err error
-	enc := makeLogstashEventEncoder(config.Index)
+	enc := makeLogstashEventEncoder(beat, config.Index)
 	c.client, err = v2.NewSyncClientWithConn(conn,
 		v2.JSONEncoder(enc),
 		v2.Timeout(config.Timeout),
@@ -74,7 +76,7 @@ func (c *syncClient) Close() error {
 
 func (c *syncClient) reconnect() error {
 	if err := c.Client.Close(); err != nil {
-		logp.Err("error closing connection to logstash: %s, reconnecting...", err)
+		logp.Err("error closing connection to logstash host %s: %s, reconnecting...", c.Host(), err)
 	}
 	return c.Client.Connect()
 }
@@ -121,8 +123,8 @@ func (c *syncClient) Publish(batch publisher.Batch) error {
 		events = events[n:]
 		st.Acked(n)
 
-		debugf("%v events out of %v events sent to logstash. Continue sending",
-			n, len(events))
+		debugf("%v events out of %v events sent to logstash host %s. Continue sending",
+			n, len(events), c.Host())
 
 		if err != nil {
 			// return batch to pipeline before reporting/counting error
@@ -149,8 +151,8 @@ func (c *syncClient) Publish(batch publisher.Batch) error {
 func (c *syncClient) publishWindowed(events []publisher.Event) (int, error) {
 	batchSize := len(events)
 	windowSize := c.win.get()
-	debugf("Try to publish %v events to logstash with window size %v",
-		batchSize, windowSize)
+	debugf("Try to publish %v events to logstash host %s with window size %v",
+		batchSize, c.Host(), windowSize)
 
 	// prepare message payload
 	if batchSize > windowSize {

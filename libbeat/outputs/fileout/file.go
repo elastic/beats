@@ -35,14 +35,14 @@ func makeFileout(
 	cfg.SetInt("bulk_max_size", -1, -1)
 
 	fo := &fileOutput{beat: beat, stats: stats}
-	if err := fo.init(config); err != nil {
+	if err := fo.init(beat, config); err != nil {
 		return outputs.Fail(err)
 	}
 
 	return outputs.Success(-1, 0, fo)
 }
 
-func (out *fileOutput) init(config config) error {
+func (out *fileOutput) init(beat beat.Info, config config) error {
 	var err error
 
 	out.rotator.Path = config.Path
@@ -51,7 +51,7 @@ func (out *fileOutput) init(config config) error {
 		out.rotator.Name = out.beat.Beat
 	}
 
-	enc, err := codec.CreateEncoder(config.Codec)
+	enc, err := codec.CreateEncoder(beat, config.Codec)
 	if err != nil {
 		return err
 	}

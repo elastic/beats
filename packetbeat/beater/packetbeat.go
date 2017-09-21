@@ -183,6 +183,12 @@ func (pb *packetbeat) Run(b *beat.Beat) error {
 	}
 
 	defer pb.transPub.Stop()
+
+	timeout := pb.config.ShutdownTimeout
+	if timeout > 0 {
+		defer time.Sleep(timeout)
+	}
+
 	if pb.flows != nil {
 		pb.flows.Start()
 		defer pb.flows.Stop()
@@ -208,11 +214,6 @@ func (pb *packetbeat) Run(b *beat.Beat) error {
 	default:
 	case err := <-errC:
 		return err
-	}
-
-	timeout := pb.config.ShutdownTimeout
-	if timeout > 0 {
-		time.Sleep(timeout)
 	}
 
 	return nil

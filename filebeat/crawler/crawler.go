@@ -11,7 +11,6 @@ import (
 	"github.com/elastic/beats/filebeat/registrar"
 	"github.com/elastic/beats/libbeat/cfgfile"
 	"github.com/elastic/beats/libbeat/common"
-	"github.com/elastic/beats/libbeat/common/cfgwarn"
 	"github.com/elastic/beats/libbeat/logp"
 
 	_ "github.com/elastic/beats/filebeat/include"
@@ -55,8 +54,6 @@ func (c *Crawler) Start(r *registrar.Registrar, configProspectors *common.Config
 	}
 
 	if configProspectors.Enabled() {
-		cfgwarn.Beta("Loading separate prospectors is enabled.")
-
 		c.prospectorsReloader = cfgfile.NewReloader(configProspectors)
 		runnerFactory := prospector.NewRunnerFactory(c.out, r, c.beatDone)
 		if err := c.prospectorsReloader.Check(runnerFactory); err != nil {
@@ -69,8 +66,6 @@ func (c *Crawler) Start(r *registrar.Registrar, configProspectors *common.Config
 	}
 
 	if configModules.Enabled() {
-		cfgwarn.Beta("Loading separate modules is enabled.")
-
 		c.modulesReloader = cfgfile.NewReloader(configModules)
 		modulesFactory := fileset.NewFactory(c.out, r, c.beatVersion, pipelineLoaderFactory, c.beatDone)
 		if err := c.modulesReloader.Check(modulesFactory); err != nil {
@@ -97,11 +92,11 @@ func (c *Crawler) startProspector(config *common.Config, states []file.State) er
 	}
 	p.Once = c.once
 
-	if _, ok := c.prospectors[p.ID()]; ok {
-		return fmt.Errorf("Prospector with same ID already exists: %v", p.ID())
+	if _, ok := c.prospectors[p.ID]; ok {
+		return fmt.Errorf("Prospector with same ID already exists: %d", p.ID)
 	}
 
-	c.prospectors[p.ID()] = p
+	c.prospectors[p.ID] = p
 
 	p.Start()
 

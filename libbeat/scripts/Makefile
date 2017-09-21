@@ -5,6 +5,7 @@ BEAT_TITLE?=${BEAT_NAME}## @packaging Title of the application
 BEAT_DESCRIPTION?=Sends events to Elasticsearch or Logstash ## @packaging Description of the application
 BEAT_PATH?=github.com/elastic/beats/${BEAT_NAME}
 BEAT_PACKAGE_NAME?=${BEAT_NAME}
+BEAT_INDEX_PREFIX?=${BEAT_NAME}
 BEAT_URL?=https://www.elastic.co/products/beats/${BEAT_NAME} ## @packaging Link to the homepage of the application
 BEAT_DOC_URL?=https://www.elastic.co/guide/en/beats/${BEAT_NAME}/current/index.html ## @packaging Link to the user documentation of the application
 BEAT_LICENSE?=ASL 2.0 ## @packaging Software license of the application
@@ -13,7 +14,8 @@ BEAT_GOPATH=$(firstword $(subst :, ,${GOPATH}))
 ES_BEATS?=..## @community_beat Must be set to ./vendor/github.com/elastic/beats. It must always be a relative path.
 GOPACKAGES?=$(shell go list ${BEAT_PATH}/... | grep -v /vendor/)
 PACKER_TEMPLATES_DIR?=${ES_BEATS}/dev-tools/packer ## @Building Directory of templates that are used by "make package"
-NOTICE_FILE?=../NOTICE
+NOTICE_FILE?=../NOTICE.txt
+LICENSE_FILE?=../LICENSE.txt
 
 space:=$() #
 comma:=,
@@ -265,11 +267,11 @@ update: python-env collect
 	@echo "Updating generated files for ${BEAT_NAME}"
 
 	@# Update config files.
-	@cat _meta/beat.yml ${ES_BEATS}/libbeat/_meta/config.yml | sed -e "s/beatname/${BEAT_NAME}/g" > ${BEAT_NAME}.yml
+	@cat _meta/beat.yml ${ES_BEATS}/libbeat/_meta/config.yml | sed -e "s/beatname/${BEAT_NAME}/g;s/beat-index-prefix/${BEAT_INDEX_PREFIX}/g" > ${BEAT_NAME}.yml
 	@if [ -e _meta/beat.reference.yml ]; then \
-        cat _meta/beat.reference.yml ${ES_BEATS}/libbeat/_meta/config.reference.yml | sed -e "s/beatname/${BEAT_NAME}/g" > ${BEAT_NAME}.reference.yml ; \
+        cat _meta/beat.reference.yml ${ES_BEATS}/libbeat/_meta/config.reference.yml | sed -e "s/beatname/${BEAT_NAME}/g;s/beat-index-prefix/${BEAT_INDEX_PREFIX}/g" > ${BEAT_NAME}.reference.yml ; \
     else \
-        cat _meta/beat.yml ${ES_BEATS}/libbeat/_meta/config.reference.yml | sed -e "s/beatname/${BEAT_NAME}/g" > ${BEAT_NAME}.reference.yml ; \
+        cat _meta/beat.yml ${ES_BEATS}/libbeat/_meta/config.reference.yml | sed -e "s/beatname/${BEAT_NAME}/g;s/beat-index-prefix/${BEAT_INDEX_PREFIX}/g" > ${BEAT_NAME}.reference.yml ; \
     fi;
 	@chmod 0640 ${BEAT_NAME}.yml ${BEAT_NAME}.reference.yml
 
@@ -291,7 +293,10 @@ endif
 	@# Generate Kibana index pattern
 	@mkdir -p $(PWD)/_meta/kibana/5.x/index-pattern
 	@mkdir -p $(PWD)/_meta/kibana/default/index-pattern
-	@${PYTHON_ENV}/bin/python ${ES_BEATS}/libbeat/scripts/generate_index_pattern.py --index '${BEAT_NAME}-*' --beat $(PWD) --version ${BEAT_VERSION}
+	@${PYTHON_ENV}/bin/python ${ES_BEATS}/libbeat/scripts/generate_index_pattern.py --index '${BEAT_INDEX_PREFIX}-*' --beat-name ${BEAT_NAME} --beat $(PWD) --version ${BEAT_VERSION}
+
+	# Runs the post-update target if it exists. Will not return errors
+	@-$(MAKE) post-update
 
 
 .PHONY: docs
@@ -305,7 +310,7 @@ docs-preview:  ## @build Preview the documents for the beat in the browser
 
 .PHONY: index-template
 index-template: ## @build Generate index templates for the given $VERSION. This is for manual testing.
-	go run ${ES_BEATS}/dev-tools/cmd/index_template/index_template.go -index ${BEAT_NAME} -output ${BEAT_GOPATH}/src/${BEAT_PATH}/${BEAT_NAME}.template-es${VERSION}.json -file ${BEAT_GOPATH}/src/${BEAT_PATH}/fields.yml -es.version=${VERSION}
+	go run ${ES_BEATS}/dev-tools/cmd/index_template/index_template.go -index ${BEAT_INDEX_PREFIX} -output ${BEAT_GOPATH}/src/${BEAT_PATH}/${BEAT_NAME}.template-es${VERSION}.json -file ${BEAT_GOPATH}/src/${BEAT_PATH}/fields.yml -es.version=${VERSION}
 
 ### KIBANA FILES HANDLING ###
 ES_URL?=http://localhost:9200
@@ -358,6 +363,9 @@ HOME_PREFIX?=/tmp/${BEAT_NAME}
 install-home:
 	if [ -a ${NOTICE_FILE} ]; then \
 		install -m 644 ${NOTICE_FILE} ${HOME_PREFIX}/; \
+	fi
+	if [ -a ${LICENSE_FILE} ]; then \
+		install -m 644 ${LICENSE_FILE} ${HOME_PREFIX}/; \
 	fi
 	if [ -d _meta/module.generated ]; then \
 		install -d -m 755 ${HOME_PREFIX}/module; \
