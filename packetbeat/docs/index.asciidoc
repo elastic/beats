@@ -2,6 +2,8 @@
 
 include::../../libbeat/docs/version.asciidoc[]
 
+include::{asciidoc-dir}/../../shared/attributes.asciidoc[]
+
 :libbeat: http://www.elastic.co/guide/en/beats/libbeat/{doc-branch}
 :kibana-ref: https://www.elastic.co/guide/en/kibana/{doc-branch}
 :beatsdevguide: http://www.elastic.co/guide/en/beats/devguide/{doc-branch}
