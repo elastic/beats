@@ -103,7 +103,7 @@ crosscompile: $(GOFILES)
 
 .PHONY: check
 check: python-env ## @build Checks project and source code if everything is according to standard
-	@rm -rf ${GOPATH}/pkg/*/github.com/elastic/beats # TODO go 1.9 supports `-source` flag in go vet, remove this in favor of the flag
+	find ${GOPATH}
 	@go vet ${GOPACKAGES}
 	@go get $(GOIMPORTS_REPO)
 	@goimports -local ${GOIMPORTS_LOCAL_PREFIX} -l ${GOFILES_NOVENDOR} | (! grep .) || (echo "Code differs from goimports' style ^" && false)
