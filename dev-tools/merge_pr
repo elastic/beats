@@ -25,7 +25,7 @@ def main():
                                       "Continue? [y/n]: ") != "y":
             return 1
         check_call("git reset --hard", shell=True)
-        check_call("git clean -dfx", shell=True)
+        check_call("git clean -df", shell=True)
         check_call("git fetch", shell=True)
 
         check_call("git checkout {}".format(args.from_branch), shell=True)

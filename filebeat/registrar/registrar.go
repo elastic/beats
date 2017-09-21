@@ -6,6 +6,7 @@ import (
 	"os"
 	"path/filepath"
 	"sync"
+	"time"
 
 	"github.com/elastic/beats/filebeat/input/file"
 	helper "github.com/elastic/beats/libbeat/common/file"
@@ -18,9 +19,12 @@ type Registrar struct {
 	Channel      chan []file.State
 	out          successLogger
 	done         chan struct{}
-	registryFile string       // Path to the Registry File
-	states       *file.States // Map with all file paths inside and the corresponding state
+	registryFile string // Path to the Registry File
 	wg           sync.WaitGroup
+
+	states               *file.States // Map with all file paths inside and the corresponding state
+	flushTimeout         time.Duration
+	bufferedStateUpdates int
 }
 
 type successLogger interface {
@@ -34,12 +38,13 @@ var (
 	registryWrites = monitoring.NewInt(nil, "registrar.writes")
 )
 
-func New(registryFile string, out successLogger) (*Registrar, error) {
+func New(registryFile string, flushTimeout time.Duration, out successLogger) (*Registrar, error) {
 	r := &Registrar{
 		registryFile: registryFile,
 		done:         make(chan struct{}),
 		states:       file.NewStates(),
 		Channel:      make(chan []file.State, 1),
+		flushTimeout: flushTimeout,
 		out:          out,
 		wg:           sync.WaitGroup{},
 	}
@@ -149,13 +154,28 @@ func (r *Registrar) Run() {
 		r.wg.Done()
 	}()
 
+	var (
+		timer  *time.Timer
+		flushC <-chan time.Time
+	)
+
 	for {
 		select {
 		case <-r.done:
 			logp.Info("Ending Registrar")
 			return
+		case <-flushC:
+			flushC = nil
+			timer.Stop()
+			r.flushRegistry()
 		case states := <-r.Channel:
 			r.onEvents(states)
+			if r.flushTimeout <= 0 {
+				r.flushRegistry()
+			} else if flushC == nil {
+				timer = time.NewTimer(r.flushTimeout)
+				flushC = timer.C
+			}
 		}
 	}
 }
@@ -168,17 +188,11 @@ func (r *Registrar) onEvents(states []file.State) {
 	cleanedStates := r.states.Cleanup()
 	statesCleanup.Add(int64(cleanedStates))
 
+	r.bufferedStateUpdates += len(states)
+
 	logp.Debug("registrar",
 		"Registrar states cleaned up. Before: %d, After: %d",
 		beforeCount, beforeCount-cleanedStates)
-
-	if err := r.writeRegistry(); err != nil {
-		logp.Err("Writing of registry returned error: %v. Continuing...", err)
-	}
-
-	if r.out != nil {
-		r.out.Published(len(states))
-	}
 }
 
 // processEventStates gets the states from the events and writes them to the registrar state
@@ -196,6 +210,17 @@ func (r *Registrar) Stop() {
 	logp.Info("Stopping Registrar")
 	close(r.done)
 	r.wg.Wait()
+}
+
+func (r *Registrar) flushRegistry() {
+	if err := r.writeRegistry(); err != nil {
+		logp.Err("Writing of registry returned error: %v. Continuing...", err)
+	}
+
+	if r.out != nil {
+		r.out.Published(r.bufferedStateUpdates)
+	}
+	r.bufferedStateUpdates = 0
 }
 
 // writeRegistry writes the new json registry file to disk.

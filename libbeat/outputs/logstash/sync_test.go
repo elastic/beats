@@ -7,6 +7,7 @@ import (
 	"testing"
 	"time"
 
+	"github.com/elastic/beats/libbeat/beat"
 	"github.com/elastic/beats/libbeat/outputs"
 	"github.com/elastic/beats/libbeat/outputs/outest"
 	"github.com/elastic/beats/libbeat/outputs/transport"
@@ -48,7 +49,7 @@ func makeTestClient(conn *transport.Client) testClientDriver {
 	config := defaultConfig
 	config.Timeout = 1 * time.Second
 	config.TTL = 5 * time.Second
-	client, err := newSyncClient(conn, nil, &config)
+	client, err := newSyncClient(beat.Info{}, conn, nil, &config)
 	if err != nil {
 		panic(err)
 	}

@@ -14,9 +14,10 @@ import (
 )
 
 var Name = "{beat}"
+var IndexPrefix = "{beat}"
 
 func main() {
-	if err := instance.Run(Name, "", beater.New); err != nil {
+	if err := instance.Run(Name, IndexPrefix, "", beater.New); err != nil {
 		os.Exit(1)
 	}
 }

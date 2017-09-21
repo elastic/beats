@@ -43,7 +43,7 @@ func NewLoader(cfg *common.Config, client ESClient, beatInfo beat.Info) (*Loader
 // template is written to index
 func (l *Loader) Load() error {
 
-	tmpl, err := New(l.beatInfo.Version, l.beatInfo.Beat, l.client.GetVersion(), l.config)
+	tmpl, err := New(l.beatInfo.Version, l.beatInfo.IndexPrefix, l.client.GetVersion(), l.config)
 	if err != nil {
 		return fmt.Errorf("error creating template instance: %v", err)
 	}

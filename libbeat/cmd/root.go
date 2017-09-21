@@ -44,14 +44,18 @@ func GenRootCmd(name, version string, beatCreator beat.Creator) *BeatsRootCmd {
 // given (for backwards compatibility). runFlags parameter must the flagset used by
 // run command
 func GenRootCmdWithRunFlags(name, version string, beatCreator beat.Creator, runFlags *pflag.FlagSet) *BeatsRootCmd {
+	return GenRootCmdWithIndexPrefixWithRunFlags(name, name, version, beatCreator, runFlags)
+}
+
+func GenRootCmdWithIndexPrefixWithRunFlags(name, indexPrefix, version string, beatCreator beat.Creator, runFlags *pflag.FlagSet) *BeatsRootCmd {
 	rootCmd := &BeatsRootCmd{}
 	rootCmd.Use = name
 
-	rootCmd.RunCmd = genRunCmd(name, version, beatCreator, runFlags)
-	rootCmd.SetupCmd = genSetupCmd(name, version, beatCreator)
+	rootCmd.RunCmd = genRunCmd(name, indexPrefix, version, beatCreator, runFlags)
+	rootCmd.SetupCmd = genSetupCmd(name, indexPrefix, version, beatCreator)
 	rootCmd.VersionCmd = genVersionCmd(name, version)
 	rootCmd.CompletionCmd = genCompletionCmd(name, version, rootCmd)
-	rootCmd.ExportCmd = genExportCmd(name, version)
+	rootCmd.ExportCmd = genExportCmd(name, indexPrefix, version)
 	rootCmd.TestCmd = genTestCmd(name, version, beatCreator)
 
 	// Root command is an alias for run

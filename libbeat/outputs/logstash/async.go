@@ -4,6 +4,7 @@ import (
 	"net"
 	"time"
 
+	"github.com/elastic/beats/libbeat/beat"
 	"github.com/elastic/beats/libbeat/common/atomic"
 	"github.com/elastic/beats/libbeat/logp"
 	"github.com/elastic/beats/libbeat/outputs"
@@ -32,6 +33,7 @@ type msgRef struct {
 }
 
 func newAsyncClient(
+	beat beat.Info,
 	conn *transport.Client,
 	stats *outputs.Stats,
 	config *Config,
@@ -49,7 +51,7 @@ func newAsyncClient(
 		logp.Warn(`The async Logstash client does not support the "ttl" option`)
 	}
 
-	enc := makeLogstashEventEncoder(config.Index)
+	enc := makeLogstashEventEncoder(beat, config.Index)
 
 	queueSize := config.Pipelining - 1
 	timeout := config.Timeout
@@ -137,8 +139,8 @@ func (c *asyncClient) Publish(batch publisher.Batch) error {
 			n, err = c.publishWindowed(ref, events)
 		}
 
-		debugf("%v events out of %v events sent to logstash. Continue sending",
-			n, len(events))
+		debugf("%v events out of %v events sent to logstash host %s. Continue sending",
+			n, len(events), c.Host())
 
 		events = events[n:]
 		if err != nil {
@@ -157,8 +159,8 @@ func (c *asyncClient) publishWindowed(
 	batchSize := len(events)
 	windowSize := c.win.get()
 
-	debugf("Try to publish %v events to logstash with window size %v",
-		batchSize, windowSize)
+	debugf("Try to publish %v events to logstash host %s with window size %v",
+		batchSize, c.Host(), windowSize)
 
 	// prepare message payload
 	if batchSize > windowSize {

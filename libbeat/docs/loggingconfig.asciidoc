@@ -40,12 +40,12 @@ the logging output configuration from the command line. See
 You can specify the following options in the `logging` section of the +{beatname_lc}.yml+ config file:
 
 [float]
-==== `to_syslog`
+==== `logging.to_syslog`
 
 When true, writes all logging output to the syslog.
 
 [float]
-==== `to_files`
+==== `logging.to_files`
 
 When true, writes all logging output to files. The log files are automatically
 rotated when the log file size limit is reached.
@@ -56,7 +56,7 @@ there will be no log file in the directory specified for logs.
 
 [float]
 [[level]]
-==== `level`
+==== `logging.level`
 
 Minimum log level. One of `debug`, `info`, `warning`, `error`, or `critical`.
 The default log level is `info`.
@@ -79,7 +79,7 @@ that are published. Also logs any warnings, errors, or critical errors.
 
 [float]
 [[selectors]]
-==== `selectors`
+==== `logging.selectors`
 
 The list of debugging-only selector tags used by different Beats components. Use `*`
 to enable debug output for all components. For example add `publish` to display
@@ -88,7 +88,7 @@ selectors can be overwritten using the `-d` command line option (`-d` also sets
 the debug log level).
 
 [float]
-==== `metrics.enabled`
+==== `logging.metrics.enabled`
 
 If enabled, {beatname_uc} periodically logs its internal metrics that have
 changed in the last period. For each metric that changed, the delta from the
@@ -107,47 +107,53 @@ metrics and for this reason they are also not documented.
 
 
 [float]
-==== `metrics.period`
+==== `logging.metrics.period`
 
 The period after which to log the internal metrics. The default is 30s.
 
 [float]
-==== `files.path`
+==== `logging.files.path`
 
 The directory that log files are written to. The default is the logs path. See the
 <<directory-layout>> section for details.
 
 [float]
-==== `files.name`
+==== `logging.files.name`
 
 The name of the file that logs are written to. By default, the name of the Beat
 is used.
 
 [float]
-==== `files.rotateeverybytes`
+==== `logging.files.rotateeverybytes`
 
 The maximum size of a log file. If the limit is reached, a new log file is generated.
 The default size limit is 10485760 (10 MB).
 
 [float]
-==== `files.keepfiles`
+==== `logging.files.keepfiles`
 
 The number of most recent rotated log files to keep on disk. Older files are
 deleted during log rotation. The default value is 7. The `keepfiles` options has to be
 in the range of 2 to 1024 files.
 
 [float]
-==== `files.permissions`
+==== `logging.files.permissions`
 
-The permission mask to apply when rotating log files. The default value is 0600. The
- `permissions` options must be a valid Unix-style file permissions mask expressed
+The permissions mask to apply when rotating log files. The default value is 0600. The
+ `permissions` option must be a valid Unix-style file permissions mask expressed
  in octal notation. In Go, numbers in octal notation must start with '0'.
 
 Examples:
+
 * 0644: give read and write access to the file owner, and read access to all others.
 * 0600: give read and write access to the file owner, and no access to all others.
 * 0664: give read and write access to the file owner and members of the group
 associated with the file, as well as read access to all other users.
+
+[float]
+==== `logging.json`
+
+When true, logs messages in JSON format. The default is false.
 
 [float]
 === Logging format
