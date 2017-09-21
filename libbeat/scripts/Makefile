@@ -103,6 +103,7 @@ crosscompile: $(GOFILES)
 
 .PHONY: check
 check: python-env ## @build Checks project and source code if everything is according to standard
+	find ${GOPATH}
 	@go vet ${GOPACKAGES}
 	@go get $(GOIMPORTS_REPO)
 	@goimports -local ${GOIMPORTS_LOCAL_PREFIX} -l ${GOFILES_NOVENDOR} | (! grep .) || (echo "Code differs from goimports' style ^" && false)
