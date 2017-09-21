@@ -14,7 +14,8 @@ BEAT_GOPATH=$(firstword $(subst :, ,${GOPATH}))
 ES_BEATS?=..## @community_beat Must be set to ./vendor/github.com/elastic/beats. It must always be a relative path.
 GOPACKAGES?=$(shell go list ${BEAT_PATH}/... | grep -v /vendor/)
 PACKER_TEMPLATES_DIR?=${ES_BEATS}/dev-tools/packer ## @Building Directory of templates that are used by "make package"
-NOTICE_FILE?=../NOTICE
+NOTICE_FILE?=../NOTICE.txt
+LICENSE_FILE?=../LICENSE.txt
 
 space:=$() #
 comma:=,
@@ -362,6 +363,9 @@ HOME_PREFIX?=/tmp/${BEAT_NAME}
 install-home:
 	if [ -a ${NOTICE_FILE} ]; then \
 		install -m 644 ${NOTICE_FILE} ${HOME_PREFIX}/; \
+	fi
+	if [ -a ${LICENSE_FILE} ]; then \
+		install -m 644 ${LICENSE_FILE} ${HOME_PREFIX}/; \
 	fi
 	if [ -d _meta/module.generated ]; then \
 		install -d -m 755 ${HOME_PREFIX}/module; \
