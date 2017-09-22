@@ -26,7 +26,7 @@ func makeInfluxdb(
 	stats *outputs.Stats,
 	cfg *common.Config,
 ) (outputs.Group, error) {
-  var err error
+	var err error
 	config := defaultConfig
 	if err = cfg.Unpack(&config); err != nil {
 		return outputs.Fail(err)
@@ -39,8 +39,8 @@ func makeInfluxdb(
 	}
 
 
-  client := newClient(stats, config.Addr, config.Username, config.Password, 
-      config.Db, config.Measurement, config.TimePrecision, config.SendAsTags, config.SendAsTime)
+	client := newClient(stats, config.Addr, config.Username, config.Password, 
+	   config.Db, config.Measurement, config.TimePrecision, config.SendAsTags, config.SendAsTime)
 
 	return outputs.Success(config.BulkMaxSize, config.MaxRetries, client)
 }

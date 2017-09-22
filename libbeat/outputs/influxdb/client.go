@@ -11,17 +11,17 @@ import (
 )
 
 type client struct {
-	conn   influxdb.Client
-	stats    *outputs.Stats
- 	addr     string
+	conn  		influxdb.Client
+	stats  		*outputs.Stats
+ 	addr		string
  	username        string
 	password        string
-	db       string
+	db		string
 	measurement     string
 	timePrecision   string
- 	tagFields      []string
- 	tagFieldsHash  map[string]int
- 	timeField       string
+ 	tagFields	[]string
+ 	tagFieldsHash	map[string]int
+ 	timeField	string
 }
 
 
@@ -81,7 +81,7 @@ func (c *client) Connect() error {
 
 func (c *client) Close() error {
 	debugf("close connection")
-  return c.conn.Close()
+	return c.conn.Close()
 }
 
 func (c *client) Publish(batch publisher.Batch) error {
