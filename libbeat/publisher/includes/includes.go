@@ -8,6 +8,7 @@ import (
 	_ "github.com/elastic/beats/libbeat/outputs/kafka"
 	_ "github.com/elastic/beats/libbeat/outputs/logstash"
 	_ "github.com/elastic/beats/libbeat/outputs/redis"
+	_ "github.com/elastic/beats/libbeat/outputs/influxdb"
 
 	// load support output codec
 	_ "github.com/elastic/beats/libbeat/outputs/codec/format"
