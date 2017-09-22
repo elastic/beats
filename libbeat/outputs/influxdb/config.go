@@ -13,9 +13,9 @@ type influxdbConfig struct {
 	TLS         *outputs.TLSConfig    `config:"ssl"`
 	Db          string                `config:"db"`
 	Measurement string                `config:"measurement"`
-  TimePrecision string              `config:"time_precision"`
-  SendAsTags  []string              `config:"send_as_tags"` 
-  SendAsTime  string                `config:"send_as_time"` 
+ 	TimePrecision string              `config:"time_precision"`
+ 	SendAsTags  []string              `config:"send_as_tags"` 
+ 	SendAsTime  string                `config:"send_as_time"` 
 }
 
 var (
@@ -24,9 +24,9 @@ var (
 		MaxRetries:  3,
 		TLS:         nil,
 		Db:          "test_db",
-    Measurement: "test",
-    TimePrecision: "s",
-    BulkMaxSize: 2048,
+ 		Measurement: "test",
+ 		TimePrecision: "s",
+ 		BulkMaxSize: 2048,
 	}
 )
 

@@ -15,17 +15,6 @@ type influxdbOut struct {
 
 var debugf = logp.MakeDebug("influxdb")
 
-const (
-	defaultWaitRetry    = 1 * time.Second
-	defaultMaxWaitRetry = 60 * time.Second
-)
-
-
-type fieldRole int
-const (
-  fieldRoleTag = iota
-  fieldRoleTime = iota
-)
 
 func init() {
 	outputs.RegisterType("influxdb", makeInfluxdb)
