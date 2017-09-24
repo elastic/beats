@@ -158,7 +158,6 @@ metricbeat.modules:
 #-------------------------------- Etcd Module --------------------------------
 - module: etcd
   metricsets: ["leader", "self", "store"]
-  enabled: false
   period: 10s
   hosts: ["localhost:2379"]
 
