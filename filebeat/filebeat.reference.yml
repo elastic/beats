@@ -724,8 +724,8 @@ output.elasticsearch:
   # Not yet supported for async connections (i.e. with the "pipelining" option set)
   #ttl: 30s
 
-  # Optional load balance the events between the Logstash hosts
-  #loadbalance: true
+  # Optional load balance the events between the Logstash hosts. Default is false.
+  #loadbalance: false
 
   # Number of batches to be sent asynchronously to logstash while processing
   # new batches.
