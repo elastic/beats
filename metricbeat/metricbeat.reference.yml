@@ -569,8 +569,7 @@ metricbeat.modules:
 
 #================================ Outputs ======================================
 
-# Configure what outputs to use when sending the data collected by the beat.
-# Multiple outputs may be used.
+# Configure what output to use when sending the data collected by the beat.
 
 #-------------------------- Elasticsearch output -------------------------------
 output.elasticsearch:
