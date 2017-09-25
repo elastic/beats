@@ -14,10 +14,11 @@ REVIEWDOG_OPTIONS?=-diff "git diff master"
 REVIEWDOG_REPO=github.com/haya14busa/reviewdog/cmd/reviewdog
 
 # Runs complete testsuites (unit, system, integration) for all beats with coverage and race detection.
-# Also it builds the docs and the generators
+# Also it builds the generators
 .PHONY: testsuite
 testsuite:
 	@$(foreach var,$(PROJECTS),$(MAKE) -C $(var) testsuite || exit 1;)
+	$(MAKE) -C generator/ test
 
 stop-environments:
 	@$(foreach var,$(PROJECTS_ENV),$(MAKE) -C $(var) stop-environment || exit 0;)
