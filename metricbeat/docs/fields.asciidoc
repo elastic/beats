@@ -2743,6 +2743,40 @@ type: long
 
 
 
+[float]
+== fs.summary fields
+
+File system summary
+
+
+
+[float]
+=== `elasticsearch.node.stats.fs.summary.total.bytes`
+
+type: long
+
+format: bytes
+
+
+
+[float]
+=== `elasticsearch.node.stats.fs.summary.free.bytes`
+
+type: long
+
+format: bytes
+
+
+
+[float]
+=== `elasticsearch.node.stats.fs.summary.available.bytes`
+
+type: long
+
+format: bytes
+
+
+
 [[exported-fields-golang]]
 == Golang fields
 
