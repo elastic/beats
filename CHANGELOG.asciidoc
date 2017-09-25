@@ -40,6 +40,8 @@ https://github.com/elastic/beats/compare/v6.0.0-rc1...master[Check the HEAD diff
 
 *Metricbeat*
 
+- Fixed `cmd_set` and `cmd_get` being mixed in the Memcache module. {pull}5189[5189]
+
 *Packetbeat*
 
 *Winlogbeat*
