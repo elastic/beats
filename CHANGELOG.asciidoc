@@ -35,20 +35,11 @@ https://github.com/elastic/beats/compare/v6.0.0-rc1...master[Check the HEAD diff
 *Filebeat*
 
 *Filebeat*
-- Fix default paths for redis 4.0.1 logs on macOS {pull}5173[5173]
 
 *Heartbeat*
 
 *Metricbeat*
 
-- Support `npipe` protocol (Windows) in Docker module. {pull}4751[4751]
-- Added missing mongodb configuration file to the `modules.d` folder. {pull}4870[4870]
-- Fix wrong MySQL CRUD queries timelion visualization {pull}4857[4857]
-- Add new metrics to CPU metricsset {pull}4969[4969]
-- Fix a memory allocation issue where more memory was allocated than needed in the windows-perfmon metricset. {issue}5035[5035]
-- Don't start metricbeat if external modules config is wrong and reload is disabled {pull}5053[5053]
-- Fix kubernetes events module to be able to index time fields properly. {issue}5093[5093]
-- The MongoDB module now connects on each fetch, to avoid stopping the whole Metricbeat instance if MongoDB is not up when starting. {pull}5120[5120]
 - Fixed `cmd_set` and `cmd_get` being mixed in the Memcache module. {pull}5189[5189]
 
 *Packetbeat*
