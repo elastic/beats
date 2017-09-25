@@ -207,7 +207,8 @@ class TestCase(unittest.TestCase, ComposeMixin):
 
         kargs["beat"] = self
         output_str = template.render(**kargs)
-        with open(os.path.join(self.working_dir, output), "wb") as f:
+        filepath = os.path.join(self.working_dir, output)
+        with os.fdopen(os.open(filepath, os.O_WRONLY | os.O_CREAT, 0o600), "wb") as f:
             f.write(output_str.encode('utf8'))
 
     # Returns output as JSON object with flattened fields (. notation)
