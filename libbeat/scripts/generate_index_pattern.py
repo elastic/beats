@@ -71,6 +71,18 @@ def field_to_json(fields, desc, path, output,
     else:
         field["type"] = "string"
 
+    if "enable" in desc and not desc["enabled"]:
+        # Skip objects which are not enabled
+        return
+
+    if "index" in desc and not desc["index"]:
+        # If fields is not indexed, mark it in Kibana
+        field["indexed"] = False
+        field["analyzed"] = False
+        field["doc_values"] = False
+        field["searchable"] = False
+        field["aggregatable"] = False
+
     output["fields"].append(field)
 
     if "format" in desc or "pattern" in desc:
