@@ -21,8 +21,8 @@ var (
 			"misses": c.Int("get_misses"),
 		},
 		"cmd": s.Object{
-			"get": c.Int("cmd_set"),
-			"set": c.Int("cmd_get"),
+			"get": c.Int("cmd_get"),
+			"set": c.Int("cmd_set"),
 		},
 		"read": s.Object{
 			"bytes": c.Int("bytes_read"),
