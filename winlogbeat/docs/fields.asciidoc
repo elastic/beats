@@ -225,7 +225,7 @@ Image labels.
 
 
 [[exported-fields-eventlog]]
-== Event Log Record fields
+== Event log record fields
 
 Contains data from a Windows event log record.
 
