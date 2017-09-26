@@ -21,6 +21,7 @@ import (
 // Windows API calls
 //sys _OpenSCManager(machineName *uint16, databaseName *uint16, desiredAcces ServiceAccessRight) (handle ServiceDatabaseHandle, err error) = advapi32.OpenSCManagerW
 //sys _EnumServicesStatusEx(handle ServiceDatabaseHandle, infoLevel ServiceInfoLevel, serviceType ServiceType, serviceState ServiceEnumState, services *byte, bufSize uint32, bytesNeeded *uint32, servicesReturned *uint32, resumeHandle *uintptr, groupName *uintptr) (err error) [failretval==0] = advapi32.EnumServicesStatusExW
+//sys _CloseServiceHandle(handle ServiceDatabaseHandle) (err error) = advapi32.CloseServiceHandle
 
 var (
 	sizeOfEnumServiceStatusProcess = (int)(unsafe.Sizeof(EnumServiceStatusProcess{}))
@@ -58,13 +59,13 @@ type ServiceStatus struct {
 }
 
 type ServiceReader struct {
-	handle *ServiceDatabaseHandle
+	handle ServiceDatabaseHandle
 	state  ServiceEnumState
 }
 
 var InvalidServiceDatabaseHandleHandle = ^ServiceDatabaseHandle(0)
 
-func getServiceDatabaseHandle(machineName string, databaseName string, desiredAccess ServiceAccessRight) (*ServiceDatabaseHandle, error) {
+func getServiceDatabaseHandle(machineName string, databaseName string, desiredAccess ServiceAccessRight) (ServiceDatabaseHandle, error) {
 	var handle ServiceDatabaseHandle
 
 	var machineNamePtr *uint16
@@ -72,7 +73,7 @@ func getServiceDatabaseHandle(machineName string, databaseName string, desiredAc
 		var err error
 		machineNamePtr, err = syscall.UTF16PtrFromString(machineName)
 		if err != nil {
-			return nil, err
+			return InvalidServiceDatabaseHandleHandle, err
 		}
 	}
 
@@ -81,25 +82,25 @@ func getServiceDatabaseHandle(machineName string, databaseName string, desiredAc
 		var err error
 		databaseNamePtr, err = syscall.UTF16PtrFromString(databaseName)
 		if err != nil {
-			return nil, err
+			return InvalidServiceDatabaseHandleHandle, err
 		}
 	}
 
 	handle, err := _OpenSCManager(machineNamePtr, databaseNamePtr, desiredAccess)
 	if err != nil {
-		return nil, ServiceErrno(err.(syscall.Errno))
+		return InvalidServiceDatabaseHandleHandle, ServiceErrno(err.(syscall.Errno))
 	}
 
-	return &handle, nil
+	return handle, nil
 }
 
-func getServiceStates(handle *ServiceDatabaseHandle, state ServiceEnumState) ([]ServiceStatus, error) {
+func getServiceStates(handle ServiceDatabaseHandle, state ServiceEnumState) ([]ServiceStatus, error) {
 	var bufSize uint32
 	var bytesNeeded uint32
 	var servicesReturned uint32
 	var lastOffset uintptr
 
-	if err := _EnumServicesStatusEx(*handle, ScEnumProcessInfo, ServiceWin32, state, nil, bufSize, &bytesNeeded, &servicesReturned, nil, nil); err != nil {
+	if err := _EnumServicesStatusEx(handle, ScEnumProcessInfo, ServiceWin32, state, nil, bufSize, &bytesNeeded, &servicesReturned, nil, nil); err != nil {
 		if ServiceErrno(err.(syscall.Errno)) != SERVICE_ERROR_MORE_DATA {
 			return nil, ServiceErrno(err.(syscall.Errno))
 		}
@@ -109,7 +110,7 @@ func getServiceStates(handle *ServiceDatabaseHandle, state ServiceEnumState) ([]
 
 		// This loop should not repeat more then two times
 		for {
-			if err := _EnumServicesStatusEx(*handle, ScEnumProcessInfo, ServiceWin32, state, &servicesBuffer[0], bufSize, &bytesNeeded, &servicesReturned, nil, nil); err != nil {
+			if err := _EnumServicesStatusEx(handle, ScEnumProcessInfo, ServiceWin32, state, &servicesBuffer[0], bufSize, &bytesNeeded, &servicesReturned, nil, nil); err != nil {
 				if ServiceErrno(err.(syscall.Errno)) != SERVICE_ERROR_MORE_DATA {
 					return nil, ServiceErrno(err.(syscall.Errno))
 				}
@@ -159,6 +160,18 @@ func getServiceStates(handle *ServiceDatabaseHandle, state ServiceEnumState) ([]
 	return nil, nil
 }
 
+func (reader *ServiceReader) Close() error {
+	return CloseServiceHandle(reader.handle)
+}
+
+func CloseServiceHandle(handle ServiceDatabaseHandle) error {
+	if err := _CloseServiceHandle(handle); err != nil {
+		return ServiceErrno(err.(syscall.Errno))
+	}
+
+	return nil
+}
+
 func NewServiceReader(config ServiceConfig) (*ServiceReader, error) {
 
 	hndl, err := getServiceDatabaseHandle("", "", ScManagerEnumerateService|ScManagerConnect)
@@ -183,6 +196,7 @@ func NewServiceReader(config ServiceConfig) (*ServiceReader, error) {
 		state = ServiceInActive
 	default:
 		err := fmt.Errorf("state '%s' are not valid", configState)
+		r.Close()
 		return nil, errors.Wrap(err, "initialization failed")
 	}
 

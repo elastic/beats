@@ -41,6 +41,7 @@ var (
 
 	procOpenSCManagerW        = modadvapi32.NewProc("OpenSCManagerW")
 	procEnumServicesStatusExW = modadvapi32.NewProc("EnumServicesStatusExW")
+	procCloseServiceHandle    = modadvapi32.NewProc("CloseServiceHandle")
 )
 
 func _OpenSCManager(machineName *uint16, databaseName *uint16, desiredAcces ServiceAccessRight) (handle ServiceDatabaseHandle, err error) {
@@ -58,6 +59,18 @@ func _OpenSCManager(machineName *uint16, databaseName *uint16, desiredAcces Serv
 
 func _EnumServicesStatusEx(handle ServiceDatabaseHandle, infoLevel ServiceInfoLevel, serviceType ServiceType, serviceState ServiceEnumState, services *byte, bufSize uint32, bytesNeeded *uint32, servicesReturned *uint32, resumeHandle *uintptr, groupName *uintptr) (err error) {
 	r1, _, e1 := syscall.Syscall12(procEnumServicesStatusExW.Addr(), 10, uintptr(handle), uintptr(infoLevel), uintptr(serviceType), uintptr(serviceState), uintptr(unsafe.Pointer(services)), uintptr(bufSize), uintptr(unsafe.Pointer(bytesNeeded)), uintptr(unsafe.Pointer(servicesReturned)), uintptr(unsafe.Pointer(resumeHandle)), uintptr(unsafe.Pointer(groupName)), 0, 0)
+	if r1 == 0 {
+		if e1 != 0 {
+			err = errnoErr(e1)
+		} else {
+			err = syscall.EINVAL
+		}
+	}
+	return
+}
+
+func _CloseServiceHandle(handle ServiceDatabaseHandle) (err error) {
+	r1, _, e1 := syscall.Syscall(procCloseServiceHandle.Addr(), 1, uintptr(handle), 0, 0)
 	if r1 == 0 {
 		if e1 != 0 {
 			err = errnoErr(e1)
