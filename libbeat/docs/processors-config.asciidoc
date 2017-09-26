@@ -16,7 +16,7 @@
 include::../../libbeat/docs/processors.asciidoc[]
 
 To define a processor, you specify the processor name, an optional condition,
-and a set of parameters: 
+and a set of parameters:
 
 [source,yaml]
 ------
@@ -41,7 +41,7 @@ the event.
 * <when: condition> specifies an optional <<conditions,condition>>. If the
 condition is present, then the action is executed only if the condition is
 fulfilled. If no condition is passed, then the action is always executed.
-* <parameters> is the list of parameters to pass to the processor. 
+* <parameters> is the list of parameters to pass to the processor.
 
 See <<filtering-and-enhancing-data>> for specific {beatname_uc} examples.
 
@@ -51,7 +51,7 @@ See <<filtering-and-enhancing-data>> for specific {beatname_uc} examples.
 
 Each condition receives a field to compare. You can specify multiple fields
 under the same condition by using `AND` between the fields (for example,
-`field1 AND field2`). 
+`field1 AND field2`).
 
 For each field, you can specify a simple field name or a nested map, for
 example `dns.question.name`.
@@ -160,7 +160,7 @@ range:
 [[condition-or]]
 ==== OR
 
-The `or` operator receives a list of conditions. 
+The `or` operator receives a list of conditions.
 
 [source,yaml]
 -------
@@ -173,7 +173,7 @@ or:
 -------
 
 For example, to configure the condition
-`http.response.code = 304 OR http.response.code = 404`: 
+`http.response.code = 304 OR http.response.code = 404`:
 
 [source,yaml]
 ------
@@ -188,7 +188,7 @@ or:
 [[condition-and]]
 ==== AND
 
-The `and` operator receives a list of conditions. 
+The `and` operator receives a list of conditions.
 
 [source,yaml]
 -------
@@ -201,7 +201,7 @@ and:
 -------
 
 For example, to configure the condition
-`http.response.code = 200 AND status = OK`: 
+`http.response.code = 200 AND status = OK`:
 
 [source,yaml]
 ------
@@ -237,7 +237,7 @@ not:
 
 -------
 
-For example, to configure the condition `NOT status = OK`: 
+For example, to configure the condition `NOT status = OK`:
 
 [source,yaml]
 ------
@@ -351,9 +351,9 @@ replaces the strings with valid JSON objects.
 processors:
  - decode_json_fields:
      fields: ["field1", "field2", ...]
-     process_array: false 
+     process_array: false
      max_depth: 1
-     target:
+     target: ""
      overwrite_keys: false
 -----------------------------------------------------
 
@@ -366,7 +366,7 @@ arrays. The default is false.
 `target`:: (Optional) The field under which the decoded JSON will be written. By
 default the decoded JSON object replaces the string field from which it was
 read. To merge the decoded JSON fields into the root of the event, specify
-`target` with an empty string (`target:""`). Note that the `null` value (`target:`)
+`target` with an empty string (`target: ""`). Note that the `null` value (`target:`)
 is treated as if the field was not set at all.
 `overwrite_keys`:: (Optional) A boolean that specifies whether keys that already
 exist in the event are overwritten by keys from the decoded JSON object. The
@@ -377,7 +377,7 @@ default value is false.
 
 The `drop_event` processor drops the entire event if the associated condition
 is fulfilled. The condition is mandatory, because without one, all the events
-are dropped. 
+are dropped.
 
 [source,yaml]
 ------
@@ -395,7 +395,7 @@ See <<conditions>> for a list of supported conditions.
 The `drop_fields` processor specifies which fields to drop if a certain
 condition is fulfilled. The condition is optional. If it's missing, the
 specified fields are always dropped. The `@timestamp` and `type` fields cannot
-be dropped, even if they show up in the `drop_fields` list. 
+be dropped, even if they show up in the `drop_fields` list.
 
 [source,yaml]
 -----------------------------------------------------
