@@ -3,8 +3,9 @@ package common
 import (
 	"testing"
 
-	"github.com/elastic/go-ucfg/yaml"
 	"github.com/stretchr/testify/assert"
+
+	"github.com/elastic/go-ucfg/yaml"
 )
 
 func TestFieldsHasKey(t *testing.T) {

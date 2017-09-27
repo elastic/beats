@@ -12,30 +12,57 @@ import (
 //The purpose is to enable using different kinds of transformation, on top of the same data structure.
 //Current transformation:
 //  -Kibana Index Pattern
-//  -ElasticSearch Template: still uses its own Fields definition
+//  -ElasticSearch Template
+
+type Fields []Field
 
 type Field struct {
-	Name           string      `config:"name"`
-	Type           string      `config:"type"`
-	Description    string      `config:"description"`
-	Format         string      `config:"format"`
-	ScalingFactor  int         `config:"scaling_factor"`
-	Fields         Fields      `config:"fields"`
-	MultiFields    Fields      `config:"multi_fields"`
-	ObjectType     string      `config:"object_type"`
-	Enabled        *bool       `config:"enabled"`
-	Analyzer       string      `config:"analyzer"`
-	SearchAnalyzer string      `config:"search_analyzer"`
-	Norms          bool        `config:"norms"`
-	Dynamic        DynamicType `config:"dynamic"`
-	Index          *bool       `config:"index"`
-	DocValues      *bool       `config:"doc_values"`
+	Name            string      `config:"name"`
+	Type            string      `config:"type"`
+	Description     string      `config:"description"`
+	Format          string      `config:"format"`
+	Pattern         string      `config:"pattern"`
+	ScalingFactor   int         `config:"scaling_factor"`
+	Fields          Fields      `config:"fields"`
+	MultiFields     Fields      `config:"multi_fields"`
+	ObjectType      string      `config:"object_type"`
+	Enabled         *bool       `config:"enabled"`
+	Analyzer        string      `config:"analyzer"`
+	SearchAnalyzer  string      `config:"search_analyzer"`
+	Norms           bool        `config:"norms"`
+	Dynamic         DynamicType `config:"dynamic"`
+	Index           *bool       `config:"index"`
+	DocValues       *bool       `config:"doc_values"`
+	Scripted        *bool       `config:"scripted"`
+	Script          string      `config:"script"`
+	Lang            string      `config:"lang"`
+	Count           int         `config:"count"`
+	Searchable      *bool       `config:"searchable"`
+	Aggregatable    *bool       `config:"aggregatable"`
+	InputFormat     string      `config:"input_format"`
+	OutputFormat    string      `config:"output_format"`
+	OutputPrecision string      `config:"output_precision"`
+	LabelTemplate   string      `config:"label_template"`
+	UrlTemplate     string      `config:"url_template"`
 
 	Path string
 }
 
-type Fields []Field
+type DynamicType struct{ Value interface{} }
 
+func (d *DynamicType) Unpack(s string) error {
+	switch s {
+	case "true":
+		d.Value = true
+	case "false":
+		d.Value = false
+	case "strict":
+		d.Value = s
+	default:
+		return fmt.Errorf("'%v' is invalid dynamic setting", s)
+	}
+	return nil
+}
 func LoadFieldsYaml(path string) (Fields, error) {
 	keys := []Field{}
 
@@ -70,22 +97,6 @@ func GenerateKey(key string) string {
 		key = keys[0] + ".properties." + GenerateKey(keys[1])
 	}
 	return key
-}
-
-type DynamicType struct{ Value interface{} }
-
-func (d *DynamicType) Unpack(s string) error {
-	switch s {
-	case "true":
-		d.Value = true
-	case "false":
-		d.Value = false
-	case "strict":
-		d.Value = s
-	default:
-		return fmt.Errorf("'%v' is invalid dynamic setting", s)
-	}
-	return nil
 }
 
 func (f Fields) hasKey(keys []string) bool {
