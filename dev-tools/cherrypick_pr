@@ -38,7 +38,7 @@ PR.
 def main():
     """Main"""
     parser = argparse.ArgumentParser(
-        description="Creates a PR for merging two branches",
+        description="Creates a PR for cherry-picking commits",
         formatter_class=argparse.RawDescriptionHelpFormatter,
         epilog=usage)
     parser.add_argument("to_branch",

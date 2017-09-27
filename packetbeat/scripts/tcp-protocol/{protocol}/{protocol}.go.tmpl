@@ -8,7 +8,6 @@ import (
 
 	"github.com/elastic/beats/packetbeat/protos"
 	"github.com/elastic/beats/packetbeat/protos/tcp"
-	"github.com/elastic/beats/packetbeat/publish"
 )
 
 // {plugin_type} application level protocol analyzer plugin
@@ -45,7 +44,7 @@ func init() {
 // New create and initializes a new {protocol} protocol analyzer instance.
 func New(
 	testMode bool,
-	results publish.Transactions,
+	results protos.Reporter,
 	cfg *common.Config,
 ) (protos.Plugin, error) {
 	p := &{plugin_type}{}
@@ -62,7 +61,7 @@ func New(
 	return p, nil
 }
 
-func ({plugin_var} *{plugin_type}) init(results publish.Transactions, config *{protocol}Config) error {
+func ({plugin_var} *{plugin_type}) init(results protos.Reporter, config *{protocol}Config) error {
 	if err := {plugin_var}.setFromConfig(config); err != nil {
 		return err
 	}

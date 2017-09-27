@@ -65,11 +65,11 @@ winlogbeat.event_logs:
     # before providing a batch of events to the outputs.
     # A value of 0 (the default) ensures events are immediately available
     # to be sent to the outputs.
-    #flush.min_events: 0
+    #flush.min_events: 2048
 
     # Maximum duration after which events are available to the outputs,
     # if the number of events stored in the queue is < min_flush_events.
-    #flush.timeout: 0s
+    #flush.timeout: 1s
 
 # Sets the maximum number of CPUs that can be executing simultaneously. The
 # default is the number of logical CPUs available in the system.
@@ -139,10 +139,22 @@ winlogbeat.event_logs:
 #processors:
 #- add_docker_metadata: ~
 
+#============================= Elastic Cloud ==================================
+
+# These settings simplify using winlogbeat with the Elastic Cloud (https://cloud.elastic.co/).
+
+# The cloud.id setting overwrites the `output.elasticsearch.hosts` and
+# `setup.kibana.host` options.
+# You can find the `cloud.id` in the Elastic Cloud web UI.
+#cloud.id:
+
+# The cloud.auth setting overwrites the `output.elasticsearch.username` and
+# `output.elasticsearch.password` settings. The format is `<user>:<pass>`.
+#cloud.auth:
+
 #================================ Outputs ======================================
 
-# Configure what outputs to use when sending the data collected by the beat.
-# Multiple outputs may be used.
+# Configure what output to use when sending the data collected by the beat.
 
 #-------------------------- Elasticsearch output -------------------------------
 output.elasticsearch:
@@ -262,7 +274,12 @@ output.elasticsearch:
   # new batches.
   #pipelining: 5
 
-  # Optional index name. The default index name is set to name of the beat
+  # If enabled only a subset of events in a batch of events is transfered per
+  # transaction.  The number of events to sent increases up to `bulk_max_size`
+  # if no error is encountered.
+  #slow_start: false
+
+  # Optional index name. The default index name is set to winlogbeat
   # in all lowercase.
   #index: 'winlogbeat'
 
@@ -635,7 +652,7 @@ output.elasticsearch:
 # The template name and pattern has to be set in case the elasticsearch index pattern is modified.
 #setup.template.name: "winlogbeat-%{[beat.version]}"
 
-# Template patttern. By default the template patter is "-%{[beat.version]}-*" to apply to the default index settings.
+# Template patttern. By default the template pattern is "-%{[beat.version]}-*" to apply to the default index settings.
 # The first part is the version of the beat and then -* is used to match all daily indicies.
 # The template name and pattern has to be set in case the elasticsearch index pattern is modified.
 #setup.template.pattern: "winlogbeat-%{[beat.version]}-*"
@@ -758,6 +775,10 @@ logging.files:
 
   # Number of rotated log files to keep. Oldest files will be deleted first.
   #keepfiles: 7
+
+  # The permissions mask to apply when rotating log files. The default value is 0600.
+  # Must be a valid Unix-style file permissions mask expressed in octal notation.
+  #permissions: 0600
 
 # Set to true to log messages in json format.
 #logging.json: false

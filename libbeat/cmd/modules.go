@@ -42,7 +42,7 @@ func GenModulesCmd(name, version string, modulesFactory modulesManagerFactory) *
 
 // Instantiate a modules manager or die trying
 func getModules(name, version string, modulesFactory modulesManagerFactory) ModulesManager {
-	b, err := instance.NewBeat(name, version)
+	b, err := instance.NewBeat(name, "", version)
 	if err != nil {
 		fmt.Fprintf(os.Stderr, "Error initializing beat: %s\n", err)
 		os.Exit(1)

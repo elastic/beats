@@ -5,7 +5,12 @@ import (
 	"sync"
 	"time"
 
+	"github.com/joeshaw/multierror"
+	"github.com/mitchellh/hashstructure"
+	"github.com/pkg/errors"
+
 	"github.com/elastic/beats/libbeat/common"
+	"github.com/elastic/beats/libbeat/common/cfgwarn"
 	"github.com/elastic/beats/libbeat/logp"
 	"github.com/elastic/beats/libbeat/monitoring"
 	"github.com/elastic/beats/libbeat/paths"
@@ -47,13 +52,13 @@ type RunnerFactory interface {
 type Runner interface {
 	Start()
 	Stop()
-	ID() uint64
 }
 
 // Reloader is used to register and reload modules
 type Reloader struct {
 	registry *Registry
 	config   DynamicConfig
+	path     string
 	done     chan struct{}
 	wg       sync.WaitGroup
 }
@@ -63,11 +68,58 @@ func NewReloader(cfg *common.Config) *Reloader {
 	config := DefaultDynamicConfig
 	cfg.Unpack(&config)
 
+	path := config.Path
+	if !filepath.IsAbs(path) {
+		path = paths.Resolve(paths.Config, path)
+	}
+
+	if config.Reload.Enabled {
+		cfgwarn.Beta("Dynamic config reload is enabled.")
+	}
+
 	return &Reloader{
 		registry: NewRegistry(),
 		config:   config,
+		path:     path,
 		done:     make(chan struct{}),
 	}
+}
+
+// Check configs are valid (only if reload is disabled)
+func (rl *Reloader) Check(runnerFactory RunnerFactory) error {
+	// If config reload is enabled we ignore errors (as they may be fixed afterwards)
+	if rl.config.Reload.Enabled {
+		return nil
+	}
+
+	debugf("Checking module configs from: %s", rl.path)
+	gw := NewGlobWatcher(rl.path)
+
+	files, _, err := gw.Scan()
+	if err != nil {
+		return errors.Wrap(err, "fetching config files")
+	}
+
+	// Load all config objects
+	configs, err := rl.loadConfigs(files)
+	if err != nil {
+		return err
+	}
+
+	debugf("Number of module configs found: %v", len(configs))
+
+	// Initialize modules
+	for _, c := range configs {
+		// Only add configs to startList which are enabled
+		if !c.Enabled() {
+			continue
+		}
+		_, err := runnerFactory.Create(c)
+		if err != nil {
+			return err
+		}
+	}
+	return nil
 }
 
 // Run runs the reloader
@@ -80,19 +132,14 @@ func (rl *Reloader) Run(runnerFactory RunnerFactory) {
 	// Stop all running modules when method finishes
 	defer rl.stopRunners(rl.registry.CopyList())
 
-	path := rl.config.Path
-	if !filepath.IsAbs(path) {
-		path = paths.Resolve(paths.Config, path)
-	}
-
-	gw := NewGlobWatcher(path)
+	gw := NewGlobWatcher(rl.path)
 
 	// If reloading is disable, config files should be loaded immidiately
 	if !rl.config.Reload.Enabled {
 		rl.config.Reload.Period = 0
 	}
 
-	overwriteUpate := true
+	overwriteUpdate := true
 
 	for {
 		select {
@@ -112,22 +159,13 @@ func (rl *Reloader) Run(runnerFactory RunnerFactory) {
 			}
 
 			// no file changes
-			if !updated && !overwriteUpate {
-				overwriteUpate = false
+			if !updated && !overwriteUpdate {
+				overwriteUpdate = false
 				continue
 			}
 
 			// Load all config objects
-			configs := []*common.Config{}
-			for _, file := range files {
-				c, err := LoadList(file)
-				if err != nil {
-					logp.Err("Error loading config: %s", err)
-					continue
-				}
-
-				configs = append(configs, c...)
-			}
+			configs, _ := rl.loadConfigs(files)
 
 			debugf("Number of module configs found: %v", len(configs))
 
@@ -141,28 +179,34 @@ func (rl *Reloader) Run(runnerFactory RunnerFactory) {
 					continue
 				}
 
-				runner, err := runnerFactory.Create(c)
-				if err != nil {
-					// Make sure the next run also updates because some runners were not properly loaded
-					overwriteUpate = true
+				rawCfg := map[string]interface{}{}
+				err := c.Unpack(rawCfg)
 
-					// In case prospector already is running, do not stop it
-					if runner != nil && rl.registry.Has(runner.ID()) {
-						debugf("Remove module from stoplist: %v", runner.ID())
-						delete(stopList, runner.ID())
-					}
-					logp.Err("Error creating module: %s", err)
+				if err != nil {
+					logp.Err("Unable to unpack config file due to error: %v", err)
 					continue
 				}
 
-				debugf("Remove module from stoplist: %v", runner.ID())
-				delete(stopList, runner.ID())
+				hash, err := hashstructure.Hash(rawCfg, nil)
+				if err != nil {
+					// Make sure the next run also updates because some runners were not properly loaded
+					overwriteUpdate = true
+					debugf("Unable to generate hash for config file %v due to error: %v", c, err)
+					continue
+				}
+
+				debugf("Remove module from stoplist: %v", hash)
+				delete(stopList, hash)
 
 				// As module already exist, it must be removed from the stop list and not started
-				if !rl.registry.Has(runner.ID()) {
-					debugf("Add module to startlist: %v", runner.ID())
-					startList[runner.ID()] = runner
-					continue
+				if !rl.registry.Has(hash) {
+					debugf("Add module to startlist: %v", hash)
+					runner, err := runnerFactory.Create(c)
+					if err != nil {
+						logp.Err("Unable to create runner due to error: %v", err)
+						continue
+					}
+					startList[hash] = runner
 				}
 			}
 
@@ -180,6 +224,24 @@ func (rl *Reloader) Run(runnerFactory RunnerFactory) {
 			}
 		}
 	}
+}
+
+func (rl *Reloader) loadConfigs(files []string) ([]*common.Config, error) {
+	// Load all config objects
+	configs := []*common.Config{}
+	var errs multierror.Errors
+	for _, file := range files {
+		c, err := LoadList(file)
+		if err != nil {
+			errs = append(errs, err)
+			logp.Err("Error loading config: %s", err)
+			continue
+		}
+
+		configs = append(configs, c...)
+	}
+
+	return configs, errs.Err()
 }
 
 // Stop stops the reloader and waits for all modules to properly stop

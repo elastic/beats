@@ -34,7 +34,7 @@ func init() {
 	p.MustRegisterLoader(indexerKey, func(ifc interface{}) error {
 		i, ok := ifc.(indexerPlugin)
 		if !ok {
-			return errors.New("plugin does not match output plugin type")
+			return errors.New("plugin does not match indexer plugin type")
 		}
 
 		name := i.name
@@ -49,11 +49,11 @@ func init() {
 	p.MustRegisterLoader(matcherKey, func(ifc interface{}) error {
 		m, ok := ifc.(matcherPlugin)
 		if !ok {
-			return errors.New("plugin does not match output plugin type")
+			return errors.New("plugin does not match matcher plugin type")
 		}
 
 		name := m.name
-		if Indexing.indexers[name] != nil {
+		if Indexing.matchers[name] != nil {
 			return fmt.Errorf("matcher type %v already registered", name)
 		}
 

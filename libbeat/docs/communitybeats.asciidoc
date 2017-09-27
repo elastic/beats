@@ -25,7 +25,9 @@ https://github.com/verticle-io/apexbeat[apexbeat]:: Extracts configurable contex
 https://github.com/goomzee/burrowbeat[burrowbeat]:: Monitors Kafka consumer lag using Burrow.
 https://github.com/goomzee/cassandrabeat[cassandrabeat]:: Uses Cassandra's nodetool cfstats utility to monitor Cassandra database nodes and lag.
 https://github.com/hartfordfive/cloudflarebeat[cloudflarebeat]:: Indexes log entries from the Cloudflare Enterprise Log Share API.
+https://github.com/jarl-tornroos/cloudfrontbeat[cloudfrontbeat]:: Reads log events from Amazon Web Services https://aws.amazon.com/cloudfront/[CloudFront].
 https://github.com/aidan-/cloudtrailbeat[cloudtrailbeat]:: Reads events from Amazon Web Services' https://aws.amazon.com/cloudtrail/[CloudTrail].
+https://github.com/narmitech/cloudwatchmetricbeat[cloudwatchmetricbeat]::  A beat for Amazon Web Services' https://aws.amazon.com/cloudwatch/details/#other-aws-resource-monitoring[CloudWatch Metrics]. 
 https://github.com/e-travel/cloudwatchlogsbeat[cloudwatchlogsbeat]:: Reads log events from Amazon Web Services' https://aws.amazon.com/cloudwatch/details/#log-monitoring[CloudWatch Logs].
 https://github.com/raboof/connbeat[connbeat]:: Exposes metadata about TCP connections.
 https://github.com/Pravoru/consulbeat[consulbeat]:: Reads services health checks from consul and pushes them to Elastic.
@@ -38,7 +40,7 @@ Logstash or Elasticsearch.
 https://github.com/jarpy/factbeat[factbeat]:: Collects facts from https://puppetlabs.com/facter[Facter].
 https://github.com/FStelzer/flowbeat[flowbeat]:: Collects, parses, and indexes http://www.sflow.org/index.php[sflow] samples.
 https://github.com/GeneralElectric/GABeat[gabeat]:: Collects data from Google Analytics Realtime API.
-https://github.com/jlevesy/githubbeat[githubbeat]:: Easily monitor github repositories activity
+https://github.com/jlevesy/githubbeat[githubbeat]:: Easily monitors GitHub repository activity.
 https://github.com/hpcugent/gpfsbeat[gpfsbeat]:: Collects GPFS metric and quota information.
 https://github.com/YaSuenag/hsbeat[hsbeat]:: Reads all performance counters in Java HotSpot VM.
 https://github.com/christiangalsterer/httpbeat[httpbeat]:: Polls multiple HTTP(S) endpoints and sends the data to

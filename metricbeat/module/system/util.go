@@ -47,6 +47,7 @@ type CPUPercentages struct {
 	Nice    float64
 	SoftIRQ float64
 	Steal   float64
+	Total   float64
 }
 
 type CPUTicks struct {
@@ -98,6 +99,10 @@ func cpuPercentages(s0, s1 *sigar.Cpu, numCPU int) CPUPercentages {
 		return Round(pct * float64(numCPU))
 	}
 
+	calculateTotalPct := func() float64 {
+		return Round(float64(numCPU) - calculatePct(s0.Idle, s1.Idle))
+	}
+
 	return CPUPercentages{
 		User:    calculatePct(s0.User, s1.User),
 		System:  calculatePct(s0.Sys, s1.Sys),
@@ -107,6 +112,7 @@ func cpuPercentages(s0, s1 *sigar.Cpu, numCPU int) CPUPercentages {
 		Nice:    calculatePct(s0.Nice, s1.Nice),
 		SoftIRQ: calculatePct(s0.SoftIrq, s1.SoftIrq),
 		Steal:   calculatePct(s0.Stolen, s1.Stolen),
+		Total:   calculateTotalPct(),
 	}
 }
 

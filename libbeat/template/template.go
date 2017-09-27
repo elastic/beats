@@ -99,7 +99,10 @@ func (t *Template) Load(file string) (common.MapStr, error) {
 	}
 
 	// Start processing at the root
-	properties := fields.process("", t.esVersion)
+	properties := common.MapStr{}
+	if err := fields.process("", t.esVersion, properties); err != nil {
+		return nil, err
+	}
 	output := t.generate(properties, dynamicTemplates)
 
 	return output, nil

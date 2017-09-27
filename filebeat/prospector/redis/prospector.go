@@ -8,10 +8,18 @@ import (
 	"github.com/elastic/beats/filebeat/channel"
 	"github.com/elastic/beats/filebeat/harvester"
 	"github.com/elastic/beats/filebeat/input/file"
+	"github.com/elastic/beats/filebeat/prospector"
 	"github.com/elastic/beats/libbeat/common"
 	"github.com/elastic/beats/libbeat/common/cfgwarn"
 	"github.com/elastic/beats/libbeat/logp"
 )
+
+func init() {
+	err := prospector.Register("redis", NewProspector)
+	if err != nil {
+		panic(err)
+	}
+}
 
 // Prospector is a prospector for redis
 type Prospector struct {
@@ -23,7 +31,7 @@ type Prospector struct {
 }
 
 // NewProspector creates a new redis prospector
-func NewProspector(cfg *common.Config, outletFactory channel.OutleterFactory) (*Prospector, error) {
+func NewProspector(cfg *common.Config, outletFactory channel.Factory, context prospector.Context) (prospector.Prospectorer, error) {
 	cfgwarn.Experimental("Redis slowlog prospector is enabled.")
 
 	config := defaultConfig

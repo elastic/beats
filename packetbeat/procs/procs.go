@@ -173,7 +173,7 @@ func findPidsByCmdlineGrep(prefix string, process string) ([]int, error) {
 			continue
 		}
 
-		if strings.Index(string(cmdline), process) >= 0 {
+		if strings.Contains(string(cmdline), process) {
 			pids = append(pids, pid)
 		}
 	}

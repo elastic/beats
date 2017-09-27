@@ -1,132 +1,81 @@
-version: '2.1'
+version: '2'
 services:
   beat:
-    build: ${PWD}/.
+    build: .
     environment:
       - TEST_ENVIRONMENT=false
     working_dir: /go/src/github.com/elastic/beats/metricbeat
     volumes:
-      - ${PWD}/..:/go/src/github.com/elastic/beats/
-      # This is required for the docker module tests
+      - ./..:/go/src/github.com/elastic/beats/
+      # This is required to on-demand launching the rest on containers for tests & also docker module tests:
       - /var/run/docker.sock:/var/run/docker.sock
     command: make
-
-    # Wait for all services to be up and healthy.
-    depends_on:
-      - proxy_dep1
-      - proxy_dep2
-      - proxy_dep3
-
     env_file:
-      - ${PWD}/module/aerospike/_meta/env
-      - ${PWD}/module/apache/_meta/env
-      - ${PWD}/module/ceph/_meta/env
-      - ${PWD}/module/couchbase/_meta/env
-      - ${PWD}/module/dropwizard/_meta/env
-      - ${PWD}/module/elasticsearch/_meta/env
-      - ${PWD}/module/haproxy/_meta/env
-      - ${PWD}/module/http/_meta/env
-      - ${PWD}/module/jolokia/_meta/env
-      - ${PWD}/module/kafka/_meta/env
-      - ${PWD}/module/kibana/_meta/env
-      - ${PWD}/module/kubernetes/_meta/env
-      - ${PWD}/module/memcached/_meta/env
-      - ${PWD}/module/mongodb/_meta/env
-      - ${PWD}/module/mysql/_meta/env
-      - ${PWD}/module/nginx/_meta/env
-      - ${PWD}/module/php_fpm/_meta/env
-      - ${PWD}/module/postgresql/_meta/env
-      - ${PWD}/module/prometheus/_meta/env
-      - ${PWD}/module/rabbitmq/_meta/env
-      - ${PWD}/module/redis/_meta/env
-      - ${PWD}/module/zookeeper/_meta/env
-
-  # This is a proxy used to block beats until all services are healthy.
-  # See: https://github.com/docker/compose/issues/4369
-  proxy_dep1:
-    image: busybox
-    depends_on:
-      aerospike:      { condition: service_healthy }
-      apache:         { condition: service_healthy }
-      ceph:           { condition: service_healthy }
-      couchbase:      { condition: service_healthy }
-      dropwizard:     { condition: service_healthy }
-      elasticsearch:  { condition: service_healthy }
-      haproxy:        { condition: service_healthy }
-      http:           { condition: service_healthy }
-
-
-  proxy_dep2:
-    image: busybox
-    depends_on:
-      jolokia:        { condition: service_healthy }
-      kafka:          { condition: service_healthy }
-      kibana:         { condition: service_healthy }
-      kubernetes:     { condition: service_healthy }
-      kube-state:     { condition: service_started }
-      memcached:      { condition: service_healthy }
-      mongodb:        { condition: service_healthy }
-
-  proxy_dep3:
-    image: busybox
-    depends_on:
-      mysql:          { condition: service_healthy }
-      nginx:          { condition: service_healthy }
-      phpfpm:         { condition: service_healthy }
-      postgresql:     { condition: service_healthy }
-      prometheus:     { condition: service_healthy }
-      rabbitmq:       { condition: service_healthy }
-      redis:          { condition: service_healthy }
-      zookeeper:      { condition: service_healthy }
+      - ./module/aerospike/_meta/env
+      - ./module/apache/_meta/env
+      - ./module/ceph/_meta/env
+      - ./module/couchbase/_meta/env
+      - ./module/dropwizard/_meta/env
+      - ./module/elasticsearch/_meta/env
+      - ./module/haproxy/_meta/env
+      - ./module/http/_meta/env
+      - ./module/jolokia/_meta/env
+      - ./module/kafka/_meta/env
+      - ./module/kibana/_meta/env
+      - ./module/kubernetes/_meta/env
+      - ./module/memcached/_meta/env
+      - ./module/mongodb/_meta/env
+      - ./module/mysql/_meta/env
+      - ./module/nginx/_meta/env
+      - ./module/php_fpm/_meta/env
+      - ./module/postgresql/_meta/env
+      - ./module/prometheus/_meta/env
+      - ./module/rabbitmq/_meta/env
+      - ./module/redis/_meta/env
+      - ./module/zookeeper/_meta/env
 
   # Modules
   aerospike:
-    build: ${PWD}/module/aerospike/_meta
+    build: ./module/aerospike/_meta
 
   apache:
-    build: ${PWD}/module/apache/_meta
+    build: ./module/apache/_meta
 
   ceph:
-    build: ${PWD}/module/ceph/_meta
+    build: ./module/ceph/_meta
 
   couchbase:
-    build: ${PWD}/module/couchbase/_meta
+    build: ./module/couchbase/_meta
 
   dropwizard:
-    build: ${PWD}/module/dropwizard/_meta
+    build: ./module/dropwizard/_meta
 
   elasticsearch:
-    extends:
-      file: ${ES_BEATS}/testing/environments/${TESTING_ENVIRONMENT}.yml
-      service: elasticsearch
+    build: ./module/elasticsearch/_meta
     environment:
       - "ES_JAVA_OPTS=-Xms90m -Xmx90m"
+      - "network.host="
+      - "transport.host=127.0.0.1"
+      - "http.host=0.0.0.0"
+      - "xpack.security.enabled=false"
 
   haproxy:
-    build: ${PWD}/module/haproxy/_meta
+    build: ./module/haproxy/_meta
 
   http:
-    build: ${PWD}/module/http/_meta
+    build: ./module/http/_meta
 
   jolokia:
-    build: ${PWD}/module/jolokia/_meta
-    depends_on:
-      - proxy_dep1
+    build: ./module/jolokia/_meta
 
   kafka:
-    build: ${PWD}/module/kafka/_meta
-    depends_on:
-      - proxy_dep1
+    build: ./module/kafka/_meta
 
   kibana:
-    extends:
-      file: ${ES_BEATS}/testing/environments/${TESTING_ENVIRONMENT}.yml
-      service: kibana
-    depends_on:
-      - proxy_dep1
+    build: ./module/kibana/_meta
 
   kubernetes:
-    build: ${PWD}/module/kubernetes/_meta
+    build: ./module/kubernetes/_meta
     network_mode: host
     pid: host
     privileged: true
@@ -135,62 +84,40 @@ services:
       - /sys:/sys
       - /var/lib/docker:/var/lib/docker
       - /var/run:/var/run
-    depends_on:
-      - proxy_dep1
 
-  kube-state:
+  kubestate:
     build:
-      context: ${PWD}/module/kubernetes/_meta/
+      context: ./module/kubernetes/_meta/
       dockerfile: Dockerfile.kube-state
     depends_on:
-      - proxy_dep1
+      - kubernetes
 
   memcached:
-    build: ${PWD}/module/memcached/_meta
-    depends_on:
-      - proxy_dep1
+    build: ./module/memcached/_meta
 
   mongodb:
-    build: ${PWD}/module/mongodb/_meta
-    depends_on:
-      - proxy_dep1
+    build: ./module/mongodb/_meta
 
   mysql:
-    build: ${PWD}/module/mysql/_meta
-    depends_on:
-      - proxy_dep2
+    build: ./module/mysql/_meta
 
   nginx:
-    build: ${PWD}/module/nginx/_meta
-    depends_on:
-      - proxy_dep2
+    build: ./module/nginx/_meta
 
   phpfpm:
-    build: ${PWD}/module/php_fpm/_meta
-    depends_on:
-      - proxy_dep2
+    build: ./module/php_fpm/_meta
 
   postgresql:
-    build: ${PWD}/module/postgresql/_meta
-    depends_on:
-      - proxy_dep2
+    build: ./module/postgresql/_meta
 
   prometheus:
-    build: ${PWD}/module/prometheus/_meta
-    depends_on:
-      - proxy_dep2
+    build: ./module/prometheus/_meta
 
   rabbitmq:
-    build: ${PWD}/module/rabbitmq/_meta
-    depends_on:
-      - proxy_dep2
+    build: ./module/rabbitmq/_meta
 
   redis:
-    build: ${PWD}/module/redis/_meta
-    depends_on:
-      - proxy_dep2
+    build: ./module/redis/_meta
 
   zookeeper:
-    build: ${PWD}/module/zookeeper/_meta
-    depends_on:
-      - proxy_dep2
+    build: ./module/zookeeper/_meta

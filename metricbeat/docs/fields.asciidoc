@@ -858,6 +858,229 @@ Status of the round
 
 
 [float]
+== cluster_status fields
+
+cluster_status
+
+
+
+[float]
+=== `ceph.cluster_status.version`
+
+type: long
+
+Ceph Status version
+
+
+[float]
+=== `ceph.cluster_status.traffic.read_bytes`
+
+type: long
+
+format: bytes
+
+Cluster read throughput per second
+
+
+[float]
+=== `ceph.cluster_status.traffic.write_bytes`
+
+type: long
+
+format: bytes
+
+Cluster write throughput per second
+
+
+[float]
+=== `ceph.cluster_status.traffic.read_op_per_sec`
+
+type: long
+
+Cluster read iops per second
+
+
+[float]
+=== `ceph.cluster_status.traffic.write_op_per_sec`
+
+type: long
+
+Cluster write iops per second
+
+
+[float]
+=== `ceph.cluster_status.misplace.total`
+
+type: long
+
+Cluster misplace pg number
+
+
+[float]
+=== `ceph.cluster_status.misplace.objects`
+
+type: long
+
+Cluster misplace objects number
+
+
+[float]
+=== `ceph.cluster_status.misplace.ratio`
+
+type: scaled_float
+
+format: percent
+
+Cluster misplace ratio
+
+
+[float]
+=== `ceph.cluster_status.degraded.total`
+
+type: long
+
+Cluster degraded pg number
+
+
+[float]
+=== `ceph.cluster_status.degraded.objects`
+
+type: long
+
+Cluster degraded objects number
+
+
+[float]
+=== `ceph.cluster_status.degraded.ratio`
+
+type: scaled_float
+
+format: percent
+
+Cluster degraded ratio
+
+
+[float]
+=== `ceph.cluster_status.pg.data_bytes`
+
+type: long
+
+format: bytes
+
+Cluster pg data bytes
+
+
+[float]
+=== `ceph.cluster_status.pg.avail_bytes`
+
+type: long
+
+format: bytes
+
+Cluster available bytes
+
+
+[float]
+=== `ceph.cluster_status.pg.total_bytes`
+
+type: long
+
+format: bytes
+
+Cluster total bytes
+
+
+[float]
+=== `ceph.cluster_status.pg.used_bytes`
+
+type: long
+
+format: bytes
+
+Cluster used bytes
+
+
+[float]
+=== `ceph.cluster_status.pg_state.state_name`
+
+type: long
+
+Pg state description
+
+
+[float]
+=== `ceph.cluster_status.pg_state.count`
+
+type: long
+
+Shows how many pgs are in state of pg_state.state_name
+
+
+[float]
+=== `ceph.cluster_status.pg_state.version`
+
+type: long
+
+Cluster status version
+
+
+[float]
+=== `ceph.cluster_status.osd.full`
+
+type: boolean
+
+Is osd full
+
+
+[float]
+=== `ceph.cluster_status.osd.nearfull`
+
+type: boolean
+
+Is osd near full
+
+
+[float]
+=== `ceph.cluster_status.osd.num_osds`
+
+type: long
+
+Shows how many osds in the cluster
+
+
+[float]
+=== `ceph.cluster_status.osd.num_up_osds`
+
+type: long
+
+Shows how many osds are on the state of UP
+
+
+[float]
+=== `ceph.cluster_status.osd.num_in_osds`
+
+type: long
+
+Shows how many osds are on the state of IN
+
+
+[float]
+=== `ceph.cluster_status.osd.num_in_osds`
+
+type: long
+
+Shows how many osds are on the state of REMAPPED
+
+
+[float]
+=== `ceph.cluster_status.osd.epoch`
+
+type: long
+
+epoch number
+
+
+[float]
 == monitor_health fields
 
 monitor_health stats data
@@ -4551,14 +4774,6 @@ Metadata associated with the given event
 type: date
 
 Timestamp of creation of the given event
-
-
-[float]
-=== `kubernetes.event.metadata.timestamp.deleted`
-
-type: date
-
-Timestamp of deletion of the given event
 
 
 [float]
@@ -8691,6 +8906,16 @@ The percentage of CPU time spent in involuntary wait by the virtual CPU while th
 
 
 [float]
+=== `system.cpu.total.pct`
+
+type: scaled_float
+
+format: percent
+
+The percentage of CPU time spent in non-idle state.
+
+
+[float]
 === `system.cpu.user.norm.pct`
 
 type: scaled_float
@@ -8768,6 +8993,16 @@ type: scaled_float
 format: percent
 
 The percentage of CPU time spent in involuntary wait by the virtual CPU while the hypervisor was servicing another processor. Available only on Unix.
+
+
+[float]
+=== `system.cpu.total.norm.pct`
+
+type: scaled_float
+
+format: percent
+
+The percentage of CPU time spent in non-idle state.
 
 
 [float]

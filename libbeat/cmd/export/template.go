@@ -7,10 +7,11 @@ import (
 	"github.com/spf13/cobra"
 
 	"github.com/elastic/beats/libbeat/cmd/instance"
+	"github.com/elastic/beats/libbeat/paths"
 	"github.com/elastic/beats/libbeat/template"
 )
 
-func GenTemplateConfigCmd(name, beatVersion string) *cobra.Command {
+func GenTemplateConfigCmd(name, idxPrefix, beatVersion string) *cobra.Command {
 	genTemplateConfigCmd := &cobra.Command{
 		Use:   "template",
 		Short: "Export index template to stdout",
@@ -18,7 +19,7 @@ func GenTemplateConfigCmd(name, beatVersion string) *cobra.Command {
 			version, _ := cmd.Flags().GetString("es.version")
 			index, _ := cmd.Flags().GetString("index")
 
-			b, err := instance.NewBeat(name, beatVersion)
+			b, err := instance.NewBeat(name, idxPrefix, beatVersion)
 			if err != nil {
 				fmt.Fprintf(os.Stderr, "Error initializing beat: %s\n", err)
 				os.Exit(1)
@@ -44,7 +45,8 @@ func GenTemplateConfigCmd(name, beatVersion string) *cobra.Command {
 				os.Exit(1)
 			}
 
-			templateString, err := tmpl.Load(cfg.Fields)
+			fieldsPath := paths.Resolve(paths.Config, cfg.Fields)
+			templateString, err := tmpl.Load(fieldsPath)
 			if err != nil {
 				fmt.Fprintf(os.Stderr, "Error generating template: %+v", err)
 				os.Exit(1)
@@ -59,7 +61,7 @@ func GenTemplateConfigCmd(name, beatVersion string) *cobra.Command {
 	}
 
 	genTemplateConfigCmd.Flags().String("es.version", beatVersion, "Elasticsearch version")
-	genTemplateConfigCmd.Flags().String("index", name, "Base index name")
+	genTemplateConfigCmd.Flags().String("index", idxPrefix, "Base index name")
 
 	return genTemplateConfigCmd
 }

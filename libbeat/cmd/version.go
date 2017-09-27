@@ -16,7 +16,7 @@ func genVersionCmd(name, beatVersion string) *cobra.Command {
 		Use:   "version",
 		Short: "Show current version info",
 		Run: func(cmd *cobra.Command, args []string) {
-			beat, err := instance.NewBeat(name, beatVersion)
+			beat, err := instance.NewBeat(name, "", beatVersion)
 			if err != nil {
 				fmt.Fprintf(os.Stderr, "Error initializing beat: %s\n", err)
 				os.Exit(1)

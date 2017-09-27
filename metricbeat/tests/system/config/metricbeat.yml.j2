@@ -91,11 +91,11 @@ metricbeat.modules:
   {% endif -%}
 {%- endfor %}
 
-{% if reload -%}
+{% if reload or reload_path -%}
 metricbeat.config.modules:
   path: {{ reload_path|default("${path.config}/modules.d/*.yml") }}
   reload.period: 1s
-  reload.enabled: true
+  reload.enabled: {{ reload|default("false")}}
 {% endif -%}
 
 # Disable random start delay for metricsets.
@@ -138,6 +138,13 @@ processors:
 {%- endfor %}
 
 {%- endif %}
+
+#================================ Queue =====================================
+
+queue.mem:
+  events: 4096
+  flush.min_events: {{ flush_min_events|default(8) }}
+  flush.timeout: 0.1s
 
 #================================ Outputs =====================================
 

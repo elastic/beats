@@ -87,7 +87,10 @@ func (loader ElasticsearchLoader) ImportIndex(file string) error {
 		return err
 	}
 	var indexContent common.MapStr
-	json.Unmarshal(reader, &indexContent)
+	err = json.Unmarshal(reader, &indexContent)
+	if err != nil {
+		return fmt.Errorf("fail to unmarshal index content: %v", err)
+	}
 
 	indexName, ok := indexContent["title"].(string)
 	if !ok {
@@ -117,7 +120,11 @@ func (loader ElasticsearchLoader) importJSONFile(fileType string, file string) e
 		return fmt.Errorf("Failed to read %s. Error: %s", file, err)
 	}
 	var jsonContent map[string]interface{}
-	json.Unmarshal(reader, &jsonContent)
+	err = json.Unmarshal(reader, &jsonContent)
+	if err != nil {
+		return fmt.Errorf("fail to unmarshal json file: %v", err)
+	}
+
 	fileBase := strings.TrimSuffix(filepath.Base(file), filepath.Ext(file))
 
 	body, err := loader.client.LoadJSON(path+"/"+fileBase, jsonContent)
@@ -149,10 +156,16 @@ func (loader ElasticsearchLoader) importPanelsFromDashboard(file string) (err er
 	}
 
 	var jsonContent record
-	json.Unmarshal(reader, &jsonContent)
+	err = json.Unmarshal(reader, &jsonContent)
+	if err != nil {
+		return fmt.Errorf("fail to unmarshal json content: %v", err)
+	}
 
 	var widgets []panel
-	json.Unmarshal([]byte(jsonContent.PanelsJSON), &widgets)
+	err = json.Unmarshal([]byte(jsonContent.PanelsJSON), &widgets)
+	if err != nil {
+		return fmt.Errorf("fail to unmarshal panels content: %v", err)
+	}
 
 	for _, widget := range widgets {
 		if widget.Type == "visualization" {
@@ -175,7 +188,26 @@ func (loader ElasticsearchLoader) importPanelsFromDashboard(file string) (err er
 
 func (loader ElasticsearchLoader) importVisualization(file string) error {
 	loader.statusMsg("Import visualization %s", file)
-	if err := loader.importJSONFile("visualization", file); err != nil {
+	reader, err := ioutil.ReadFile(file)
+	if err != nil {
+		return err
+	}
+	var vizContent common.MapStr
+	err = json.Unmarshal(reader, &vizContent)
+	if err != nil {
+		return fmt.Errorf("fail to unmarshal vizualization content %s: %v", file, err)
+	}
+
+	if loader.config.Index != "" {
+		if savedObject, ok := vizContent["kibanaSavedObjectMeta"].(map[string]interface{}); ok {
+
+			vizContent["kibanaSavedObjectMeta"] = ReplaceIndexInSavedObject(loader.config.Index, savedObject)
+		}
+	}
+
+	vizName := strings.TrimSuffix(filepath.Base(file), filepath.Ext(file))
+	path := "/" + loader.config.KibanaIndex + "/visualization/" + vizName
+	if _, err := loader.client.LoadJSON(path, vizContent); err != nil {
 		return err
 	}
 
@@ -192,29 +224,16 @@ func (loader ElasticsearchLoader) importSearch(file string) error {
 	var searchContent common.MapStr
 	err = json.Unmarshal(reader, &searchContent)
 	if err != nil {
-		return fmt.Errorf("Failed to unmarshal search content %s: %v", searchName, err)
+		return fmt.Errorf("fail to unmarshal search content %s: %v", searchName, err)
 	}
 
 	if loader.config.Index != "" {
+
 		// change index pattern name
 		if savedObject, ok := searchContent["kibanaSavedObjectMeta"].(map[string]interface{}); ok {
-			if source, ok := savedObject["searchSourceJSON"].(string); ok {
-				var record common.MapStr
-				err = json.Unmarshal([]byte(source), &record)
-				if err != nil {
-					return fmt.Errorf("Failed to unmarshal searchSourceJSON from search %s: %v", searchName, err)
-				}
 
-				if _, ok := record["index"]; ok {
-					record["index"] = loader.config.Index
-				}
-				searchSourceJSON, err := json.Marshal(record)
-				if err != nil {
-					return fmt.Errorf("Failed to marshal searchSourceJSON: %v", err)
-				}
+			searchContent["kibanaSavedObjectMeta"] = ReplaceIndexInSavedObject(loader.config.Index, savedObject)
 
-				savedObject["searchSourceJSON"] = string(searchSourceJSON)
-			}
 		}
 	}
 
@@ -240,7 +259,11 @@ func (loader ElasticsearchLoader) importSearchFromVisualization(file string) err
 	}
 
 	var jsonContent record
-	json.Unmarshal(reader, &jsonContent)
+	err = json.Unmarshal(reader, &jsonContent)
+	if err != nil {
+		return fmt.Errorf("fail to unmarshal the search content: %v", err)
+	}
+
 	id := jsonContent.SavedSearchID
 	if len(id) == 0 {
 		// no search used

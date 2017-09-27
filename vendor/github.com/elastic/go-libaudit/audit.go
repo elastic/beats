@@ -43,6 +43,12 @@ const (
 	AuditSet
 )
 
+// Netlink groups.
+const (
+	NetlinkGroupNone    = iota // Group 0 not used
+	NetlinkGroupReadLog        // "best effort" read only socket
+)
+
 // WaitMode is a flag to control the behavior of methods that abstract
 // asynchronous communication for the caller.
 type WaitMode uint8
@@ -72,13 +78,27 @@ type AuditClient struct {
 	Netlink NetlinkSendReceiver
 }
 
+// NewMulticastAuditClient creates a new AuditClient that binds to the multicast
+// socket subscribes to the audit group. The process should have the
+// CAP_AUDIT_READ capability to use this. This audit client should not be used
+// for command and control. The resp parameter is optional. If provided resp
+// will receive a copy of all data read from the netlink socket. This is useful
+// for debugging purposes.
+func NewMulticastAuditClient(resp io.Writer) (*AuditClient, error) {
+	return newAuditClient(NetlinkGroupReadLog, resp)
+}
+
 // NewAuditClient creates a new AuditClient. The resp parameter is optional. If
 // provided resp will receive a copy of all data read from the netlink socket.
 // This is useful for debugging purposes.
 func NewAuditClient(resp io.Writer) (*AuditClient, error) {
+	return newAuditClient(NetlinkGroupNone, resp)
+}
+
+func newAuditClient(netlinkGroups uint32, resp io.Writer) (*AuditClient, error) {
 	buf := make([]byte, syscall.NLMSG_HDRLEN+AuditMessageMaxLength)
 
-	netlink, err := NewNetlinkClient(syscall.NETLINK_AUDIT, buf, resp)
+	netlink, err := NewNetlinkClient(syscall.NETLINK_AUDIT, netlinkGroups, buf, resp)
 	if err != nil {
 		return nil, err
 	}

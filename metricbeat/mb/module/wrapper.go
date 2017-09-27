@@ -12,8 +12,6 @@ import (
 	"github.com/elastic/beats/libbeat/monitoring"
 	"github.com/elastic/beats/libbeat/testing"
 	"github.com/elastic/beats/metricbeat/mb"
-
-	"github.com/mitchellh/hashstructure"
 )
 
 // Expvar metric names.
@@ -37,7 +35,6 @@ var (
 type Wrapper struct {
 	mb.Module
 	metricSets    []*metricSetWrapper // List of pointers to its associated MetricSets.
-	configHash    uint64
 	maxStartDelay time.Duration
 }
 
@@ -125,26 +122,6 @@ func (mw *Wrapper) Start(done <-chan struct{}) <-chan beat.Event {
 func (mw *Wrapper) String() string {
 	return fmt.Sprintf("Wrapper[name=%s, len(metricSetWrappers)=%d]",
 		mw.Name(), len(mw.metricSets))
-}
-
-// Hash returns the hash value of the module wrapper
-// This allows to check if two modules are the same / have the same config
-func (mw *Wrapper) Hash() uint64 {
-	// Check if hash was calculated previously
-	if mw.configHash > 0 {
-		return mw.configHash
-	}
-	var err error
-
-	// Config is unpacked into map[string]interface{} to also take metricset
-	// configs into account for the hash.
-	var c map[string]interface{}
-	mw.UnpackConfig(&c)
-	mw.configHash, err = hashstructure.Hash(c, nil)
-	if err != nil {
-		logp.Err("Error creating config hash for module %s: %s", mw.String(), err)
-	}
-	return mw.configHash
 }
 
 // MetricSets return the list of metricsets of the module

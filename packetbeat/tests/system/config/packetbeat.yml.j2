@@ -4,11 +4,15 @@
 # keyword to sniff on all connected interfaces.
 packetbeat.interfaces.device: {{ iface_device|default("any") }}
 
+{% if bpf_filter %}
+packetbeat.interfaces.bpf_filter: {{ bpf_filter }}
+{% endif %}
+
 {% if flows %}
 #================================== Flows =====================================
 # Set network flow timeout. Flow is killed if no packet is received before being
 # timed out.
-packetbeat.flows.timeout: 10s
+packetbeat.flows.timeout: 2s
 
 # Configure reporting period. If set to -1, only killed flows will be reported
 packetbeat.flows.period: -1s
@@ -168,7 +172,7 @@ tags: [
   {%- endif -%}
 ]
 
-packetbeat.shutdown_timeout: {{ shutdown_timeout|default(0) }}
+packetbeat.shutdown_timeout: {{ shutdown_timeout|default('400ms') }}
 
 {%- if processors %}
 
@@ -188,6 +192,13 @@ processors:
 {%- endfor %}
 
 {%- endif %}
+
+#================================ Queue =====================================
+
+queue.mem:
+  events: 4096
+  flush.min_events: 8
+  flush.timeout: 0.1s
 
 #================================ Outputs =====================================
 

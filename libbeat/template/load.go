@@ -43,7 +43,7 @@ func NewLoader(cfg *common.Config, client ESClient, beatInfo beat.Info) (*Loader
 // template is written to index
 func (l *Loader) Load() error {
 
-	tmpl, err := New(l.beatInfo.Version, l.beatInfo.Beat, l.client.GetVersion(), l.config)
+	tmpl, err := New(l.beatInfo.Version, l.beatInfo.IndexPrefix, l.client.GetVersion(), l.config)
 	if err != nil {
 		return fmt.Errorf("error creating template instance: %v", err)
 	}
@@ -80,7 +80,7 @@ func (l *Loader) Load() error {
 // template if it exists. If you wish to not overwrite an existing template
 // then use CheckTemplate prior to calling this method.
 func (l *Loader) LoadTemplate(templateName string, template map[string]interface{}) error {
-	logp.Info("load template: %s", templateName)
+	logp.Debug("template", "Try loading template with name: %s", templateName)
 	path := "/_template/" + templateName
 	body, err := l.client.LoadJSON(path, template)
 	if err != nil {
