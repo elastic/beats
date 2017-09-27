@@ -7852,6 +7852,153 @@ type: long
 Node uptime.
 
 
+[float]
+== queue fields
+
+queue
+
+
+
+[float]
+=== `rabbitmq.queue.name`
+
+type: keyword
+
+The name of the queue with non-ASCII characters escaped as in C.
+
+
+[float]
+=== `rabbitmq.queue.vhost`
+
+type: keyword
+
+Virtual host name with non-ASCII characters escaped as in C.
+
+
+[float]
+=== `rabbitmq.queue.durable`
+
+type: boolean
+
+Whether or not the queue survives server restarts.
+
+
+[float]
+=== `rabbitmq.queue.auto_delete`
+
+type: boolean
+
+Whether the queue will be deleted automatically when no longer used.
+
+
+[float]
+=== `rabbitmq.queue.exclusive`
+
+type: boolean
+
+Whether the queue is exclusive (i.e. has owner_pid).
+
+
+[float]
+=== `rabbitmq.queue.node`
+
+type: keyword
+
+Node name.
+
+
+[float]
+=== `rabbitmq.queue.state`
+
+type: keyword
+
+The state of the queue. Normally 'running', but may be "{syncing, MsgCount}" if the queue is synchronising. Queues which are located on cluster nodes that are currently down will be shown with a status of 'down'.
+
+
+[float]
+=== `rabbitmq.queue.arguments.max_priority`
+
+type: long
+
+Maximum number of priority levels for the queue to support.
+
+
+[float]
+=== `rabbitmq.queue.consumers.count`
+
+type: long
+
+Number of consumers.
+
+
+[float]
+=== `rabbitmq.queue.consumers.utilisation.pct`
+
+type: long
+
+format: percentage
+
+Fraction of the time (between 0.0 and 1.0) that the queue is able to immediately deliver messages to consumers. This can be less than 1.0 if consumers are limited by network congestion or prefetch count.
+
+
+[float]
+=== `rabbitmq.queue.messages.total.count`
+
+type: long
+
+Sum of ready and unacknowledged messages (queue depth).
+
+
+[float]
+=== `rabbitmq.queue.messages.ready.count`
+
+type: long
+
+Number of messages ready to be delivered to clients.
+
+
+[float]
+=== `rabbitmq.queue.messages.unacknowledged.count`
+
+type: long
+
+Number of messages delivered to clients but not yet acknowledged.
+
+
+[float]
+=== `rabbitmq.queue.messages.persistent.count`
+
+type: long
+
+Total number of persistent messages in the queue (will always be 0 for transient queues).
+
+
+[float]
+=== `rabbitmq.queue.memory.bytes`
+
+type: long
+
+format: bytes
+
+Bytes of memory consumed by the Erlang process associated with the queue, including stack, heap and internal structures.
+
+
+[float]
+=== `rabbitmq.queue.disk.reads.count`
+
+type: long
+
+Total number of times messages have been read from disk by this queue since it started.
+
+
+[float]
+=== `rabbitmq.queue.disk.writes.count`
+
+type: long
+
+Total number of times messages have been written to disk by this queue since it started.
+
+
 [[exported-fields-redis]]
 == Redis fields
 
