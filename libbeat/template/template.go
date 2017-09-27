@@ -7,7 +7,6 @@ import (
 	"github.com/elastic/beats/libbeat/beat"
 	"github.com/elastic/beats/libbeat/common"
 	"github.com/elastic/beats/libbeat/common/fmtstr"
-	"github.com/elastic/go-ucfg/yaml"
 )
 
 var (
@@ -93,14 +92,15 @@ func New(beatVersion string, beatName string, esVersion string, config TemplateC
 
 // Load the given input and generates the input based on it
 func (t *Template) Load(file string) (common.MapStr, error) {
-	fields, err := loadYaml(file)
+	fields, err := common.LoadFieldsYaml(file)
 	if err != nil {
 		return nil, err
 	}
 
 	// Start processing at the root
 	properties := common.MapStr{}
-	if err := fields.process("", t.esVersion, properties); err != nil {
+	processor := Processor{EsVersion: t.esVersion}
+	if err := processor.process(fields, "", properties); err != nil {
 		return nil, err
 	}
 	output := t.generate(properties, dynamicTemplates)
@@ -191,21 +191,4 @@ func (t *Template) generate(properties common.MapStr, dynamicTemplates []common.
 	}
 
 	return basicStructure
-}
-
-func loadYaml(path string) (Fields, error) {
-	keys := []Field{}
-
-	cfg, err := yaml.NewConfigWithFile(path)
-	if err != nil {
-		return nil, err
-	}
-	cfg.Unpack(&keys)
-
-	fields := Fields{}
-
-	for _, key := range keys {
-		fields = append(fields, key.Fields...)
-	}
-	return fields, nil
 }
