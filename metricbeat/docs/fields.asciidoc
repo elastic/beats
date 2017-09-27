@@ -11304,6 +11304,22 @@ beta[] Module for Windows
 
 
 
+
+[float]
+== services fields
+
+`services` contains the status for windows services.
+
+
+
+[float]
+=== `windows.services.status`
+
+type: keyword
+
+Which kind of service status to read. Possible values are `all`, `active` and `inactive`.
+
+
 [[exported-fields-zookeeper]]
 == ZooKeeper fields
 

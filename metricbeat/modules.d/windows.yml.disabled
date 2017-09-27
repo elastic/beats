@@ -1,3 +1,4 @@
 - module: windows
-  metricsets: ["services"]
+  metricsets: ["perfmon"]
   period: 10s
+  perfmon.counters:

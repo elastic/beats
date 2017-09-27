@@ -1,10 +1,10 @@
 - module: system
   period: 10s
   metricsets:
-    #- cpu
-    #- load
-    #- memory
-    #- network
+    - cpu
+    - load
+    - memory
+    - network
     - process
     - process_summary
     #- core
