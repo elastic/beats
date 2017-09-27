@@ -59,6 +59,7 @@ https://github.com/elastic/beats/compare/v6.0.0-beta2...master[Check the HEAD di
 - Fix kubernetes events module to be able to index time fields properly. {issue}5093[5093]
 - The MongoDB module now connects on each fetch, to avoid stopping the whole Metricbeat instance if MongoDB is not up when starting. {pull}5120[5120]
 - Fixed `cmd_set` and `cmd_get` being mixed in the Memcache module. {pull}5189[5189]
+- Change field type of http header from nested to object {pull}5258[5258]
 
 *Packetbeat*
 
