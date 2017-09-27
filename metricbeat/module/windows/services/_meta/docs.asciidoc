@@ -1,3 +1,18 @@
 === windows services MetricSet
 
-This is the services metricset of the module windows.
+The `services` metricset of the Windows module reads the status for Windows
+Services.
+
+[float]
+=== Configuration
+
+[source,yaml]
+----
+- module: windows
+  metricsets: ["services"]
+  period: 10s
+  services:
+    status: ["all"] | ["active"] | ["inactive"]
+----
+
+With `status`, you can specify which kind of service you want to read. The default value is `all`.

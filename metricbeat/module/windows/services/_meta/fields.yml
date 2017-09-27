@@ -1,9 +1,10 @@
 - name: services
   type: group
   description: >
-    services
+    `services` contains the status for windows services.
   fields:
-    - name: example
+    - name: status
       type: keyword
       description: >
-        Example field
+        Which kind of service status to read. Possible values are
+        `all`, `active` and `inactive`.
