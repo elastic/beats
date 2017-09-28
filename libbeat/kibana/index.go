@@ -37,7 +37,19 @@ func (i *Index) Create() error {
 	fields := TransformFields("@timestamp", i.IndexName, commonFields)
 
 	dumpToFile(i.targetDir5x, i.targetFilename, fields)
-	dumpToFile(i.targetDirDefault, i.targetFilename, fields)
+
+	out := common.MapStr{
+		"version": i.Version,
+		"objects": []common.MapStr{
+			common.MapStr{
+				"type":       "index-pattern",
+				"id":         i.IndexName,
+				"version":    1,
+				"attributes": fields,
+			},
+		},
+	}
+	dumpToFile(i.targetDirDefault, i.targetFilename, out)
 	return nil
 }
 

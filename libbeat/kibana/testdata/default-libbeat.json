@@ -1,0 +1,77 @@
+{
+  "objects": [
+    {
+      "attributes": {
+        "fieldFormatMap": {},
+        "fields": [
+          {
+            "aggregatable": true,
+            "analyzed": false,
+            "count": 0,
+            "index": true,
+            "name": "long",
+            "readFromDocValues": true,
+            "searchable": true,
+            "type": "number"
+          },
+          {
+            "aggregatable": false,
+            "analyzed": false,
+            "count": 0,
+            "index": true,
+            "name": "group_enabled.message",
+            "readFromDocValues": true,
+            "searchable": true,
+            "type": "string"
+          },
+          {
+            "aggregatable": true,
+            "analyzed": false,
+            "count": 0,
+            "index": true,
+            "name": "_id",
+            "readFromDocValues": true,
+            "searchable": true,
+            "type": "string"
+          },
+          {
+            "aggregatable": true,
+            "analyzed": false,
+            "count": 0,
+            "index": true,
+            "name": "_type",
+            "readFromDocValues": true,
+            "searchable": true,
+            "type": "string"
+          },
+          {
+            "aggregatable": true,
+            "analyzed": false,
+            "count": 0,
+            "index": true,
+            "name": "_index",
+            "readFromDocValues": true,
+            "searchable": true,
+            "type": "string"
+          },
+          {
+            "aggregatable": true,
+            "analyzed": false,
+            "count": 0,
+            "index": true,
+            "name": "_score",
+            "readFromDocValues": true,
+            "searchable": true,
+            "type": "number"
+          }
+        ],
+        "timeFieldName": "@timestamp",
+        "title": "libbeat-*"
+      },
+      "id": "libbeat-*",
+      "type": "index-pattern",
+      "version": 1
+    }
+  ],
+  "version": "7.0"
+}

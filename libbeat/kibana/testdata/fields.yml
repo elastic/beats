@@ -3,20 +3,16 @@
   description: >
     Contains all types for testing
   fields:
-
-    - name: object
-      type: object
-
-    - name: array
-      type: array
-
-    - name: keyword
-      type: keyword
-
-    - name: object_disabled
-      type: object
+    - name: long
+      type: long 
+    - name: group_disabled
+      type: group 
       enabled: false
-
-    - name: array_disabled
-      type: array
-      enabled: false
+      fields:
+        - name: message
+          type: text
+    - name: group_enabled
+      type: group 
+      fields:
+        - name: message
+          type: text
