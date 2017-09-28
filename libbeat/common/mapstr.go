@@ -3,6 +3,8 @@ package common
 import (
 	"encoding/json"
 	"fmt"
+	"reflect"
+	"strconv"
 	"strings"
 
 	"github.com/pkg/errors"
@@ -126,6 +128,177 @@ func (m MapStr) GetValue(key string) (interface{}, error) {
 	return walkMap(key, m, opGet)
 }
 
+func (m MapStr) GetValueNoErr(key string) interface{} {
+	o, err := m.GetValue(key)
+	if err != nil {
+		return nil
+	}
+	return o
+}
+
+func (m MapStr) GetStringValueWithDefault(key string, df string) string {
+	vi, err := m.GetValue(key)
+	if err != nil || vi == nil {
+		return df
+	}
+
+	v, ok := vi.(string)
+	if !ok {
+		return df
+	} else {
+		return v
+	}
+}
+
+func (m MapStr) GetStringValue(key string) string {
+	return m.GetStringValueWithDefault(key, "")
+}
+
+// Get value from path, and convert the value to int64
+// string and intX uintX will be converted
+// any failed will cause df return
+func (m MapStr) GetInt64ValueWithDefault(key string, df int64) int64 {
+	vi, err := m.GetValue(key)
+	if err != nil || vi == nil {
+		return df
+	}
+
+	switch i := vi.(type) {
+	case int, int8, int16, int32, int64:
+		return int64(reflect.ValueOf(i).Int())
+	case uint8, uint16, uint32, uint64:
+		return int64(reflect.ValueOf(i).Uint())
+	case float32, float64:
+		return int64(reflect.ValueOf(i).Float())
+	case string:
+		v, err := strconv.Atoi(i)
+		if err != nil {
+			return df
+		}
+		return int64(v)
+	default:
+		return df
+	}
+
+}
+
+// Get value from path, and convert the value to int64
+// string and intX uintX will be converted
+// any failed will cause 0 return
+func (m MapStr) GetInt64Value(key string) int64 {
+	return m.GetInt64ValueWithDefault(key, 0)
+}
+
+// Get value from path, and convert the value to float64
+// string and intX uintX will be converted
+// any failed will cause df return
+func (m MapStr) GetFloat64ValueWithDefault(key string, df float64) float64 {
+	vi, err := m.GetValue(key)
+	if err != nil || vi == nil {
+		return df
+	}
+
+	switch i := vi.(type) {
+	case int, int8, int16, int32, int64:
+		return reflect.ValueOf(i).Float()
+	case uint8, uint16, uint32, uint64:
+		return reflect.ValueOf(i).Float()
+	case float32, float64:
+		return reflect.ValueOf(i).Float()
+	case string:
+		v, err := strconv.ParseFloat(i, 64)
+		if err != nil {
+			return df
+		}
+		return float64(v)
+	default:
+		return df
+	}
+
+}
+
+// Get value from path, and convert the value to float64
+// string and intX uintX will be converted
+// any failed will cause 0 return
+func (m MapStr) GetFloat64Value(key string) float64 {
+	return m.GetFloat64ValueWithDefault(key, 0.0)
+}
+func (m MapStr) GetObject(key string) MapStr {
+	return m.GetObjectWithDefault(key, MapStr{})
+}
+
+func (m MapStr) GetObjectWithDefault(key string, df MapStr) MapStr {
+	vi, err := m.GetValue(key)
+	if err != nil || vi == nil {
+		return df
+	}
+	obj, err := toMapStr(vi)
+	if err != nil || obj == nil {
+		return df
+	}
+	return obj
+}
+
+func (m MapStr) GetObjectArray(key string) []MapStr {
+	vi, err := m.GetValue(key)
+	if err != nil || vi == nil {
+		return nil
+	}
+
+	switch array := vi.(type) {
+	case []interface{}:
+		rt := make([]MapStr, 0, len(array))
+		for _, item := range array {
+			mItem, err := toMapStr(item)
+			if err != nil {
+				continue
+			}
+
+			rt = append(rt, mItem)
+		}
+
+		return rt
+	case []MapStr:
+		rt := make([]MapStr, 0, len(array))
+		for _, item := range array {
+			mItem, err := toMapStr(item)
+			if err != nil {
+				continue
+			}
+
+			rt = append(rt, mItem)
+		}
+
+		return rt
+	}
+
+	return nil
+}
+
+func (m MapStr) GetStringArray(key string) []string {
+	vi, err := m.GetValue(key)
+	if err != nil || vi == nil {
+		return nil
+	}
+
+	sa := make([]string, 0)
+	switch array := vi.(type) {
+	case []string:
+		for _, f := range array {
+			sa = append(sa, f)
+		}
+	case []interface{}:
+		for _, f := range array {
+			sa = append(sa, fmt.Sprintf("%v", f))
+		}
+	default:
+		return nil
+	}
+
+	return sa
+
+}
+
 // Put associates the specified value with the specified key. If the map
 // previously contained a mapping for the key, the old value is replaced and
 // returned. The key can be expressed in dot-notation (e.g. x.y) to put a value
@@ -153,6 +326,24 @@ func (m MapStr) String() string {
 		return fmt.Sprintf("Not valid json: %v", err)
 	}
 	return string(bytes)
+}
+
+func MapStrUnmarshal(data []byte) (MapStr, error) {
+	var ms interface{}
+	err := json.Unmarshal(data, &ms)
+	if err != nil {
+		return nil, err
+	}
+
+	return toMapStr(ms)
+}
+
+func (m MapStr) MarshalBinary() (data []byte, err error) {
+	bytes, err := json.Marshal(m)
+	if err != nil {
+		return nil, errors.Wrap(err, "Not valid json")
+	}
+	return bytes, nil
 }
 
 // Flatten flattens the given MapStr and returns a flat MapStr.

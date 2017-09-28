@@ -473,6 +473,69 @@ func TestFlatten(t *testing.T) {
 	}
 }
 
+func TestGetStringValue(t *testing.T) {
+	m := MapStr{
+		"a": "b",
+		"b": "c",
+	}
+
+	assert.Equal(t, "b", m.GetStringValue("a"))
+	assert.Equal(t, "", m.GetStringValue("c"))
+}
+
+func TestGetInt64Value(t *testing.T) {
+	m := MapStr{
+		"int":       123456,
+		"float":     123456.0,
+		"short_int": 1,
+		"str_int":   "789",
+		"err_int":   "kkk",
+	}
+
+	assert.Equal(t, int64(123456), m.GetInt64Value("int"))
+	assert.Equal(t, int64(123456), m.GetInt64Value("float"))
+	assert.Equal(t, int64(1), m.GetInt64Value("short_int"))
+	assert.Equal(t, int64(789), m.GetInt64Value("str_int"))
+	assert.Equal(t, int64(0), m.GetInt64Value("err_int"))
+}
+
+func TestGetStringArray(t *testing.T) {
+	m := MapStr{
+		"a": []string{"b", "c"},
+	}
+	array := m.GetStringArray("a")
+	assert.Equal(t, 2, len(array))
+}
+
+func TestGetObjectArray(t *testing.T) {
+	str := fmt.Sprintf(`{
+		"a": [
+		{"i":"j"},
+		{"k":"n"}
+		]
+	}`)
+
+	m, err := MapStrUnmarshal([]byte(str))
+	assert.Nil(t, err)
+	array := m.GetObjectArray("a")
+	assert.Equal(t, 2, len(array))
+	assert.Equal(t, "j", array[0].GetStringValue("i"))
+
+	obj := MapStr{
+		"a": []MapStr{
+			MapStr{
+				"i": "j",
+			},
+			MapStr{
+				"k": "n",
+			},
+		},
+	}
+	array2 := obj.GetObjectArray("a")
+	assert.Equal(t, 2, len(array2))
+	assert.Equal(t, "j", array2[0].GetStringValue("i"))
+}
+
 func BenchmarkMapStrFlatten(b *testing.B) {
 	m := MapStr{
 		"test": 15,
