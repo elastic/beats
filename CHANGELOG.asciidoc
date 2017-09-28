@@ -40,8 +40,6 @@ https://github.com/elastic/beats/compare/v6.0.0-rc1...master[Check the HEAD diff
 
 *Metricbeat*
 
-- Fixed `cmd_set` and `cmd_get` being mixed in the Memcache module. {pull}5189[5189]
-
 *Packetbeat*
 
 *Winlogbeat*
@@ -102,6 +100,7 @@ https://github.com/elastic/beats/compare/v6.0.0-beta2...v6.0.0-rc1[View commits]
 - Don't start metricbeat if external modules config is wrong and reload is disabled {pull}5053[5053]
 - The MongoDB module now connects on each fetch, to avoid stopping the whole Metricbeat instance if MongoDB is not up when starting. {pull}5120[5120]
 - Fix kubernetes events module to be able to index time fields properly. {issue}5093[5093]
+- Fixed `cmd_set` and `cmd_get` being mixed in the Memcache module. {pull}5189[5189]
 
 
 ==== Added
