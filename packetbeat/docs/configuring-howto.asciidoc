@@ -34,7 +34,6 @@ The following topics describe how to configure Packetbeat:
 * <<configuration-dashboards>>
 * <<configuration-template>>
 * <<configuration-logging>>
-* <<configuration-run-options>>
 * <<using-environ-vars>>
 * <<yaml-tips>>
 
@@ -62,8 +61,6 @@ include::../../libbeat/docs/shared-kibana-config.asciidoc[]
 include::../../libbeat/docs/setup-config.asciidoc[]
 
 include::../../libbeat/docs/loggingconfig.asciidoc[]
-
-include::./runconfig.asciidoc[]
 
 :standalone:
 include::../../libbeat/docs/shared-env-vars.asciidoc[]
