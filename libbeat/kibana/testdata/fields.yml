@@ -1,0 +1,21 @@
+- key: test
+  title: Test fields.yml
+  description: >
+    Contains all types for testing
+  fields:
+    - name: long
+      type: long 
+    - name: group_disabled
+      type: group 
+      enabled: false
+      fields:
+        - name: message
+          type: text
+
+    - name: group_enabled
+      type: group 
+      fields:
+        - name: message
+          type: text
+          format: url
+          input_format: string
