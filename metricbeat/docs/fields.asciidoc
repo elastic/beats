@@ -4039,7 +4039,7 @@ HTTP request information
 [float]
 === `http.request.header`
 
-type: nested
+type: object
 
 The HTTP headers sent
 
@@ -4070,7 +4070,7 @@ HTTP response information
 [float]
 === `http.response.header`
 
-type: nested
+type: object
 
 The HTTP headers received
 
