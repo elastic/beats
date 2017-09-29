@@ -11,8 +11,11 @@
       fields:
         - name: message
           type: text
+
     - name: group_enabled
       type: group 
       fields:
         - name: message
           type: text
+          format: url
+          input_format: string

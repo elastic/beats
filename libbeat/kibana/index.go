@@ -34,9 +34,18 @@ func (i *Index) Create() error {
 	if err != nil {
 		return err
 	}
-	fields := TransformFields("@timestamp", i.IndexName, commonFields)
+	transformed := TransformFields("@timestamp", i.IndexName, commonFields)
 
-	dumpToFile(i.targetDir5x, i.targetFilename, fields)
+	fieldsBytes, errF := json.Marshal(transformed["fields"])
+	fieldFormatBytes, errFf := json.Marshal(transformed["fieldFormatMap"])
+
+	if errF != nil || errFf != nil {
+		return err
+	}
+	transformed["fields"] = string(fieldsBytes)
+	transformed["fieldFormatMap"] = string(fieldFormatBytes)
+
+	dumpToFile(i.targetDir5x, i.targetFilename, transformed)
 
 	out := common.MapStr{
 		"version": i.Version,
@@ -45,7 +54,7 @@ func (i *Index) Create() error {
 				"type":       "index-pattern",
 				"id":         i.IndexName,
 				"version":    1,
-				"attributes": fields,
+				"attributes": transformed,
 			},
 		},
 	}
