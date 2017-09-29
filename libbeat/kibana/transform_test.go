@@ -15,14 +15,6 @@ var (
 	ctMetaData = 4
 )
 
-func TestErrors(t *testing.T) {
-	commonFields := common.Fields{
-		common.Field{Name: "context", Path: "something"},
-		common.Field{Name: "context", Path: "something", Type: "keyword"},
-	}
-	assert.Panics(t, func() { TransformFields("", "", commonFields) })
-}
-
 func TestEmpty(t *testing.T) {
 	out := TransformFields("name", "title", common.Fields{})
 	expected := common.MapStr{

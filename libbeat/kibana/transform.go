@@ -1,18 +1,14 @@
 package kibana
 
 import (
-	"errors"
-	"fmt"
-
 	"github.com/elastic/beats/libbeat/common"
 )
 
 func TransformFields(timeFieldName string, title string, commonFields common.Fields) common.MapStr {
 	fields := []common.MapStr{}
 	fieldFormatMap := common.MapStr{}
-	keys := common.MapStr{}
 
-	transformFields(keys, commonFields, &fields, fieldFormatMap, "")
+	transformFields(commonFields, &fields, fieldFormatMap, "")
 
 	//add some meta fields
 	add(common.Field{Path: "_id", Type: "keyword"}, &fields, fieldFormatMap)
@@ -28,22 +24,16 @@ func TransformFields(timeFieldName string, title string, commonFields common.Fie
 	}
 }
 
-func transformFields(keys common.MapStr, commonFields common.Fields, fields *[]common.MapStr, fieldFormatMap common.MapStr, path string) {
+func transformFields(commonFields common.Fields, fields *[]common.MapStr, fieldFormatMap common.MapStr, path string) {
 	for _, f := range commonFields {
 		f.Path = f.Name
 		if path != "" {
 			f.Path = path + "." + f.Name
 		}
 
-		if keys[f.Path] != nil {
-			msg := fmt.Sprintf("ERROR: Field %s is duplicated. Please delete it and try again.", f.Path)
-			panic(errors.New(msg))
-		}
-		keys[f.Path] = true
-
 		if f.Type == "group" {
 			if f.Enabled == nil || *f.Enabled {
-				transformFields(keys, f.Fields, fields, fieldFormatMap, f.Path)
+				transformFields(f.Fields, fields, fieldFormatMap, f.Path)
 			}
 		} else {
 			add(f, fields, fieldFormatMap)
