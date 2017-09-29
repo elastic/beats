@@ -13,7 +13,7 @@
               HTTP request information
           fields:
             - name: header
-              type: nested
+              type: object
               description: >
                 The HTTP headers sent
             - name: method
@@ -30,7 +30,7 @@
               HTTP response information
           fields:
             - name: header
-              type: nested
+              type: object
               description: >
                 The HTTP headers received
             - name: status_code
