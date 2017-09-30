@@ -23,7 +23,7 @@ var (
 			"max_children_reached": c.Int("max children reached"),
 			"total": c.Int("total processes"),
 		},
-		"start_time": c.Str("start time"),
+		"start_time": c.Int("start time"),
 		"start_since": c.Int("start since"),
 	}
 )
