@@ -2798,6 +2798,93 @@ Total size of the store in bytes.
 
 
 [float]
+=== `elasticsearch.node.stats.indices.fielddata.memory.bytes`
+
+type: long
+
+Bytes of memory used by fielddata.
+
+
+[float]
+=== `elasticsearch.node.stats.indices.search.query.total`
+
+type: long
+
+Total count of query.
+
+
+[float]
+=== `elasticsearch.node.stats.indices.search.query.current`
+
+type: long
+
+Current count of query.
+
+
+[float]
+=== `elasticsearch.node.stats.indices.search.query.ms`
+
+type: long
+
+The taked millisecond of query.
+
+
+[float]
+=== `elasticsearch.node.stats.indices.indexing.index.total`
+
+type: long
+
+Total count of indexing index.
+
+
+[float]
+=== `elasticsearch.node.stats.indices.indexing.index.current`
+
+type: long
+
+Current count of indexing index.
+
+
+[float]
+=== `elasticsearch.node.stats.indices.indexing.index.ms`
+
+type: long
+
+The taked millisecond of indexing index.
+
+
+[float]
+== jvm.mem.heap fields
+
+JVM memory heap
+
+
+
+[float]
+=== `elasticsearch.node.stats.jvm.mem.heap.used.bytes`
+
+type: long
+
+JVM memory heap used bytes.
+
+
+[float]
+=== `elasticsearch.node.stats.jvm.mem.heap.max.bytes`
+
+type: long
+
+JVM memory heap max bytes.
+
+
+[float]
+=== `elasticsearch.node.stats.jvm.mem.heap.percent`
+
+type: long
+
+JVM memory heap used percent.         
+
+
+[float]
 == jvm.mem.pools fields
 
 JVM memory pool stats
@@ -2952,6 +3039,7 @@ Old collection gc.
 
 type: long
 
+Old collection count
 
 
 [float]
@@ -2959,6 +3047,7 @@ type: long
 
 type: long
 
+Old collection millisecond
 
 
 [float]
@@ -2973,6 +3062,7 @@ Young collection gc.
 
 type: long
 
+Young collection count
 
 
 [float]
@@ -2980,6 +3070,7 @@ type: long
 
 type: long
 
+Young collection millisecond
 
 
 [float]
@@ -2996,6 +3087,7 @@ type: long
 
 format: bytes
 
+The total disk space in bytes.
 
 
 [float]
@@ -3005,6 +3097,7 @@ type: long
 
 format: bytes
 
+The disk space free in bytes.
 
 
 [float]
@@ -3014,6 +3107,109 @@ type: long
 
 format: bytes
 
+The disk space available in bytes.
+
+
+[float]
+== threadpool fields
+
+Node threadpool stats
+
+
+
+[float]
+=== `elasticsearch.node.stats.threadpool.bulk.active`
+
+type: long
+
+The count of bulk threads.
+
+
+[float]
+=== `elasticsearch.node.stats.threadpool.bulk.queue`
+
+type: long
+
+The length of bulk queue.
+
+
+[float]
+=== `elasticsearch.node.stats.threadpool.bulk.rejected`
+
+type: long
+
+The count of rejected bulk.
+
+
+[float]
+=== `elasticsearch.node.stats.threadpool.index.active`
+
+type: long
+
+The count of index threads.
+
+
+[float]
+=== `elasticsearch.node.stats.threadpool.index.queue`
+
+type: long
+
+The length of index queue.
+
+
+[float]
+=== `elasticsearch.node.stats.threadpool.index.rejected`
+
+type: long
+
+The count of rejected index.
+
+
+[float]
+=== `elasticsearch.node.stats.threadpool.search.active`
+
+type: long
+
+The count of search threads.
+
+
+[float]
+=== `elasticsearch.node.stats.threadpool.search.queue`
+
+type: long
+
+The length of search queue.
+
+
+[float]
+=== `elasticsearch.node.stats.threadpool.search.rejected`
+
+type: long
+
+The count of rejected bulk.
+
+
+[float]
+== transport fields
+
+Node network transport stats
+
+
+
+[float]
+=== `elasticsearch.node.stats.transport.rx.bytes`
+
+type: long
+
+The bytes of network received.
+
+
+[float]
+=== `elasticsearch.node.stats.transport.tx.bytes`
+
+type: long
+
+The bytes of network sent.
 
 
 [[exported-fields-etcd]]
