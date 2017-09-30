@@ -2390,10 +2390,20 @@
                     },
                     "queued": {
                       "type": "long"
+                    },
+                    "listen_queue_len": {
+                      "type": "long"
+                    },
+                    "max_listen_queue": {
+                      "type": "long"
                     }
                   }
                 },
                 "name": {
+                  "ignore_above": 1024,
+                  "type": "keyword"
+                },
+                "process_manager": {
                   "ignore_above": 1024,
                   "type": "keyword"
                 },
@@ -2404,10 +2414,25 @@
                     },
                     "idle": {
                       "type": "long"
+                    },
+                    "max_active": {
+                      "type": "long"
+                    },
+                    "max_children_reached": {
+                      "type": "long"
+                    },
+                    "total": {
+                      "type": "long"
                     }
                   }
                 },
                 "slow_requests": {
+                  "type": "long"
+                },
+                "start_since": {
+                  "type": "long"
+                },
+                "start_time": {
                   "type": "long"
                 }
               }
