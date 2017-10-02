@@ -370,7 +370,7 @@ func (b *Beat) handleFlags() error {
 	flag.Parse()
 
 	if printVersion {
-		cfgwarn.Deprecate("6.0", "-version flag has been deprectad, use version subcommand")
+		cfgwarn.Deprecate("6.0", "-version flag has been deprecated, use version subcommand")
 		fmt.Printf("%s version %s (%s), libbeat %s\n",
 			b.Info.Beat, b.Info.Version, runtime.GOARCH, version.GetDefaultVersion())
 		return beat.GracefulExit
