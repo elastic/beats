@@ -34,12 +34,19 @@ type Field struct {
 	DocValues      *bool       `config:"doc_values"`
 
 	// Kibana specific
-	Pattern      string `config:"pattern"`
 	Analyzed     *bool  `config:"analyzed"`
 	Count        int    `config:"count"`
 	Searchable   *bool  `config:"searchable"`
 	Aggregatable *bool  `config:"aggregatable"`
-	InputFormat  string `config:"input_format"`
+	Script       string `config:"script"`
+	Lang         string `config:"lang"`
+
+	Pattern         string `config:"pattern"`
+	InputFormat     string `config:"input_format"`
+	OutputFormat    string `config:"output_format"`
+	OutputPrecision string `config:"output_precision"`
+	LabelTemplate   string `config:"label_template"`
+	UrlTemplate     string `config:"url_template"`
 
 	Path string
 }

@@ -1,0 +1,16 @@
+{
+  "objects": [
+    {
+      "attributes": {
+        "fieldFormatMap": "{\"group_enabled.message\":{\"id\":\"url\",\"params\":{\"inputFormat\":\"string\"}}}",
+        "fields": "[{\"aggregatable\":true,\"count\":0,\"indexed\":true,\"name\":\"long\",\"readFromDocValues\":true,\"scripted\":false,\"searchable\":true,\"type\":\"number\"},{\"aggregatable\":false,\"count\":0,\"indexed\":true,\"name\":\"group_enabled.message\",\"readFromDocValues\":true,\"scripted\":false,\"searchable\":true,\"type\":\"string\"},{\"aggregatable\":false,\"count\":0,\"indexed\":false,\"name\":\"notindexed\",\"readFromDocValues\":false,\"scripted\":false,\"searchable\":false,\"type\":\"string\"},{\"aggregatable\":false,\"count\":5,\"indexed\":false,\"lang\":\"painless\",\"name\":\"scripted\",\"readFromDocValues\":false,\"script\":\"doc[]\",\"scripted\":true,\"searchable\":false,\"type\":\"string\"},{\"aggregatable\":false,\"count\":0,\"indexed\":true,\"name\":\"multifield_field\",\"readFromDocValues\":true,\"scripted\":false,\"searchable\":true,\"type\":\"string\"},{\"aggregatable\":true,\"count\":0,\"indexed\":true,\"name\":\"multifield_field.keyword\",\"readFromDocValues\":true,\"scripted\":false,\"searchable\":true,\"type\":\"string\"},{\"aggregatable\":false,\"count\":0,\"indexed\":false,\"name\":\"_id\",\"readFromDocValues\":false,\"scripted\":false,\"searchable\":false,\"type\":\"string\"},{\"aggregatable\":false,\"count\":0,\"indexed\":false,\"name\":\"_type\",\"readFromDocValues\":false,\"scripted\":false,\"searchable\":false,\"type\":\"string\"},{\"aggregatable\":false,\"count\":0,\"indexed\":false,\"name\":\"_index\",\"readFromDocValues\":false,\"scripted\":false,\"searchable\":false,\"type\":\"string\"},{\"aggregatable\":false,\"count\":0,\"indexed\":false,\"name\":\"_score\",\"readFromDocValues\":false,\"scripted\":false,\"searchable\":false,\"type\":\"number\"}]",
+        "timeFieldName": "@timestamp",
+        "title": "beat-*"
+      },
+      "id": "beat-*",
+      "type": "index-pattern",
+      "version": 1
+    }
+  ],
+  "version": "7.0.0-alpha1"
+}
