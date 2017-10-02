@@ -5,6 +5,9 @@ set -euox pipefail
 : "${WORKSPACE:?Need to set WORKSPACE to a non-empty value.}"
 : "${beat:?Need to set beat to a non-empty value.}"
 
+# Cleanup complete workspace
+docker run --rm -v ${WORKSPACE}:/cleanup alpine /bin/sh -c "rm -rf /cleanup"
+
 if [ ! -d "$beat" ]; then
   echo "$beat does not exist"
   mkdir -p build
