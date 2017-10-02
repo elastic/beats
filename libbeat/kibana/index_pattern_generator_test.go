@@ -26,7 +26,7 @@ func TestNewGenerator(t *testing.T) {
 	assert.NoError(t, err)
 	assert.Equal(t, "7.0", generator.version)
 	assert.Equal(t, "beat-index", generator.indexName)
-	assert.Equal(t, beatDir+"/fields.yml", generator.fieldsYaml)
+	assert.Equal(t, filepath.Join(beatDir, "fields.yml"), generator.fieldsYaml)
 
 	// creates file dir and sets name
 	expectedDir := filepath.Join(beatDir, "_meta/kibana/default/index-pattern")
