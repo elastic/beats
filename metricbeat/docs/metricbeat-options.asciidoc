@@ -45,7 +45,6 @@ The following example shows a basic configuration for the Apache module:
   metricsets: ["status"]
   hosts: ["http://127.0.0.1/"]
   period: 10s
-  enabled: true
   fields:
     dc: west
   tags: ["tag"]
@@ -53,9 +52,6 @@ The following example shows a basic configuration for the Apache module:
   ....
 ----
 
-// REVIEWERS: We aren't very consistent about when to show enabled: true. I'm
-// assuming this option is available for all modules, but wondering if we should
-// show it in the config.
 
 See <<config-combos>> for additional configuration examples.
 
@@ -63,7 +59,6 @@ See <<config-combos>> for additional configuration examples.
 [[enable-modules-config-file]]
 === Enable module configs in the +{beatname_lc}.yml+ file
 
-// REVIEWERS: I think the following statement is true.
 
 When possible, you should use the config files in the `modules.d` directory.
 
@@ -88,14 +83,12 @@ metricbeat.modules:
 #---------------------------- Apache Status Module ---------------------------
 - module: apache
   metricsets: ["status"]
-  enabled: true
   period: 1s
   hosts: ["http://127.0.0.1/"]
 
 #---------------------------- MySQL Status Module ----------------------------
 - module: mysql
   metricsets: ["status"]
-  enabled: true
   period: 2s
   hosts: ["root@tcp(127.0.0.1:3306)/"]
 ------------------------------------------------------------------------------
@@ -112,12 +105,10 @@ metricbeat.modules:
   metricsets: ["info"]
   hosts: ["host1"]
   period: 1s
-  enabled: true
 - module: apache
   metricsets: ["info"]
   hosts: ["host1"]
   period: 30s
-  enabled: true
 ----
 
 [float]
@@ -131,9 +122,6 @@ For a module with multiple metricsets defined, it's possible to define the
 module twice and specify a different period to use for each metricset. For the
 following example, the `set1` metricset will be fetched every 10 seconds, while
 the `set2` metricset will be fetched every 2 minutes:
-
-// REVIEWERS: I'm assuming the following config is still supported if you are
-// using the modules.d layout. Is that correct?
 
 [source,yaml]
 ----
