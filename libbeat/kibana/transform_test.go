@@ -16,55 +16,52 @@ var (
 )
 
 func TestEmpty(t *testing.T) {
-	out := TransformFields("name", "title", common.Fields{})
+	trans := NewTransformer("name", "title", common.Fields{})
+	out := trans.TransformFields()
 	expected := common.MapStr{
 		"timeFieldName":  "name",
 		"title":          "title",
 		"fieldFormatMap": common.MapStr{},
 		"fields": []common.MapStr{
 			common.MapStr{
-				"name":         "_id",
-				"type":         "string",
-				"scripted":     false,
-				"aggregatable": false,
-				"analyzed":     false,
-				"count":        0,
-				"indexed":      false,
-				"doc_values":   false,
-				"searchable":   false,
+				"name":              "_id",
+				"type":              "string",
+				"scripted":          false,
+				"aggregatable":      false,
+				"count":             0,
+				"indexed":           false,
+				"readFromDocValues": false,
+				"searchable":        false,
 			},
 			common.MapStr{
-				"name":         "_type",
-				"type":         "string",
-				"scripted":     false,
-				"count":        0,
-				"aggregatable": true,
-				"analyzed":     false,
-				"indexed":      false,
-				"doc_values":   false,
-				"searchable":   true,
+				"name":              "_type",
+				"type":              "string",
+				"scripted":          false,
+				"count":             0,
+				"aggregatable":      false,
+				"indexed":           false,
+				"readFromDocValues": false,
+				"searchable":        false,
 			},
 			common.MapStr{
-				"name":         "_index",
-				"type":         "string",
-				"scripted":     false,
-				"count":        0,
-				"aggregatable": false,
-				"analyzed":     false,
-				"indexed":      false,
-				"doc_values":   false,
-				"searchable":   false,
+				"name":              "_index",
+				"type":              "string",
+				"scripted":          false,
+				"count":             0,
+				"aggregatable":      false,
+				"indexed":           false,
+				"readFromDocValues": false,
+				"searchable":        false,
 			},
 			common.MapStr{
-				"name":         "_score",
-				"type":         "number",
-				"scripted":     false,
-				"count":        0,
-				"aggregatable": false,
-				"analyzed":     false,
-				"indexed":      false,
-				"doc_values":   false,
-				"searchable":   false,
+				"name":              "_score",
+				"type":              "number",
+				"scripted":          false,
+				"count":             0,
+				"aggregatable":      false,
+				"indexed":           false,
+				"readFromDocValues": false,
+				"searchable":        false,
 			},
 		},
 	}
@@ -76,7 +73,8 @@ func TestErrors(t *testing.T) {
 		common.Field{Name: "context", Path: "something"},
 		common.Field{Name: "context", Path: "something", Type: "keyword"},
 	}
-	assert.Panics(t, func() { TransformFields("", "", commonFields) })
+	trans := NewTransformer("name", "title", commonFields)
+	assert.Panics(t, func() { trans.TransformFields() })
 }
 
 func TestTransformTypes(t *testing.T) {
@@ -94,13 +92,14 @@ func TestTransformTypes(t *testing.T) {
 		{commonField: common.Field{Type: "byte"}, expected: "number"},
 		{commonField: common.Field{Type: "keyword"}, expected: "string"},
 		{commonField: common.Field{Type: "text"}, expected: "string"},
-		{commonField: common.Field{Type: "string"}, expected: nil},
+		{commonField: common.Field{Type: "string"}, expected: ""},
 		{commonField: common.Field{Type: "date"}, expected: "date"},
 		{commonField: common.Field{Type: "geo_point"}, expected: "geo_point"},
-		{commonField: common.Field{Type: "invalid"}, expected: nil},
+		{commonField: common.Field{Type: "invalid"}, expected: ""},
 	}
 	for idx, test := range tests {
-		out := TransformFields("", "", common.Fields{test.commonField})["fields"].([]common.MapStr)[0]
+		trans := NewTransformer("name", "title", common.Fields{test.commonField})
+		out := trans.TransformFields()["fields"].([]common.MapStr)[0]
 		assert.Equal(t, test.expected, out["type"], fmt.Sprintf("Failed for idx %v", idx))
 	}
 }
@@ -142,7 +141,8 @@ func TestTransformGroup(t *testing.T) {
 		},
 	}
 	for idx, test := range tests {
-		out := TransformFields("", "", test.commonFields)["fields"].([]common.MapStr)
+		trans := NewTransformer("name", "title", test.commonFields)
+		out := trans.TransformFields()["fields"].([]common.MapStr)
 		assert.Equal(t, len(test.expected)+ctMetaData, len(out))
 		for i, e := range test.expected {
 			assert.Equal(t, e, out[i]["name"], fmt.Sprintf("Failed for idx %v", idx))
@@ -156,47 +156,59 @@ func TestTransformMisc(t *testing.T) {
 		expected    interface{}
 		attr        string
 	}{
+		// count
 		{commonField: common.Field{}, expected: 0, attr: "count"},
+		{commonField: common.Field{Count: 4}, expected: 4, attr: "count"},
 
-		// searchable always set to true except for meta fields
+		// searchable
 		{commonField: common.Field{}, expected: true, attr: "searchable"},
 		{commonField: common.Field{Searchable: &truthy}, expected: true, attr: "searchable"},
-		{commonField: common.Field{Searchable: &falsy}, expected: true, attr: "searchable"},
+		{commonField: common.Field{Searchable: &falsy}, expected: false, attr: "searchable"},
+		{commonField: common.Field{Index: &falsy}, expected: false, attr: "searchable"},
+		{commonField: common.Field{Searchable: &truthy, Index: &falsy}, expected: false, attr: "searchable"},
 
-		// aggregatable always set to true except for meta fields or type text
+		// aggregatable
 		{commonField: common.Field{}, expected: true, attr: "aggregatable"},
 		{commonField: common.Field{Aggregatable: &truthy}, expected: true, attr: "aggregatable"},
-		{commonField: common.Field{Aggregatable: &falsy}, expected: true, attr: "aggregatable"},
+		{commonField: common.Field{Aggregatable: &falsy}, expected: false, attr: "aggregatable"},
 		{commonField: common.Field{Type: "keyword"}, expected: true, attr: "aggregatable"},
+		{commonField: common.Field{Type: "string"}, expected: true, attr: "aggregatable"},
 		{commonField: common.Field{Aggregatable: &truthy, Type: "text"}, expected: false, attr: "aggregatable"},
 		{commonField: common.Field{Type: "text"}, expected: false, attr: "aggregatable"},
+		{commonField: common.Field{Index: &falsy}, expected: false, attr: "aggregatable"},
+		{commonField: common.Field{Aggregatable: &truthy, Index: &falsy}, expected: false, attr: "aggregatable"},
 
-		// analyzed always set to false except for meta fields
-		{commonField: common.Field{}, expected: false, attr: "analyzed"},
-		{commonField: common.Field{Analyzed: &truthy}, expected: false, attr: "analyzed"},
-		{commonField: common.Field{Analyzed: &falsy}, expected: false, attr: "analyzed"},
-
-		// indexed always set to true except for meta fields
+		// indexed
 		{commonField: common.Field{}, expected: true, attr: "indexed"},
 		{commonField: common.Field{Index: &truthy}, expected: true, attr: "indexed"},
-		{commonField: common.Field{Index: &falsy}, expected: true, attr: "indexed"},
+		{commonField: common.Field{Index: &falsy}, expected: false, attr: "indexed"},
 
-		// doc_values always set to true except for meta fields
-		{commonField: common.Field{}, expected: true, attr: "doc_values"},
-		{commonField: common.Field{DocValues: &truthy}, expected: true, attr: "doc_values"},
-		{commonField: common.Field{DocValues: &falsy}, expected: true, attr: "doc_values"},
+		// readFromDocValues
+		{commonField: common.Field{}, expected: true, attr: "readFromDocValues"},
+		{commonField: common.Field{DocValues: &truthy}, expected: true, attr: "readFromDocValues"},
+		{commonField: common.Field{DocValues: &falsy}, expected: false, attr: "readFromDocValues"},
+		{commonField: common.Field{Index: &falsy}, expected: false, attr: "readFromDocValues"},
+		{commonField: common.Field{DocValues: &truthy, Index: &falsy}, expected: false, attr: "readFromDocValues"},
 
-		// scripted always set to false
+		// scripted
 		{commonField: common.Field{}, expected: false, attr: "scripted"},
+		{commonField: common.Field{Script: "doc[]"}, expected: true, attr: "scripted"},
+
+		// language
+		{commonField: common.Field{}, expected: nil, attr: "lang"},
+		{commonField: common.Field{Lang: "lucene"}, expected: nil, attr: "lang"},
+		{commonField: common.Field{Lang: "lucene", Script: "doc[]"}, expected: "lucene", attr: "lang"},
+		{commonField: common.Field{Script: "doc[]"}, expected: "painless", attr: "lang"},
 	}
 	for idx, test := range tests {
-		out := TransformFields("", "", common.Fields{test.commonField})["fields"].([]common.MapStr)[0]
+		trans := NewTransformer("", "", common.Fields{test.commonField})
+		out := trans.TransformFields()["fields"].([]common.MapStr)[0]
 		msg := fmt.Sprintf("(%v): expected '%s' to be <%v> but was <%v>", idx, test.attr, test.expected, out[test.attr])
 		assert.Equal(t, test.expected, out[test.attr], msg)
 	}
 }
 
-func TestTransformFielFormatMap(t *testing.T) {
+func TestTransformFieldFormatMap(t *testing.T) {
 	tests := []struct {
 		commonField common.Field
 		expected    common.MapStr
@@ -214,11 +226,7 @@ func TestTransformFielFormatMap(t *testing.T) {
 				Name:    "c",
 				Pattern: "p",
 			},
-			expected: common.MapStr{
-				"c": common.MapStr{
-					"params": common.MapStr{"pattern": "p"},
-				},
-			},
+			expected: common.MapStr{},
 		},
 		{
 			commonField: common.Field{
@@ -259,7 +267,8 @@ func TestTransformFielFormatMap(t *testing.T) {
 				"c": common.MapStr{
 					"id": "url",
 					"params": common.MapStr{
-						"pattern": "[^-]",
+						"pattern":     "[^-]",
+						"inputFormat": "string",
 					},
 				},
 			},
@@ -271,9 +280,123 @@ func TestTransformFielFormatMap(t *testing.T) {
 			},
 			expected: common.MapStr{},
 		},
+		{
+			commonField: common.Field{
+				Name:            "c",
+				Format:          "url",
+				Pattern:         "[^-]",
+				InputFormat:     "string",
+				OutputFormat:    "float",
+				OutputPrecision: "3",
+				LabelTemplate:   "lblT",
+				UrlTemplate:     "urlT",
+			},
+			expected: common.MapStr{
+				"c": common.MapStr{
+					"id": "url",
+					"params": common.MapStr{
+						"pattern":         "[^-]",
+						"inputFormat":     "string",
+						"outputFormat":    "float",
+						"outputPrecision": "3",
+						"labelTemplate":   "lblT",
+						"urlTemplate":     "urlT",
+					},
+				},
+			},
+		},
 	}
 	for idx, test := range tests {
-		out := TransformFields("", "", common.Fields{test.commonField})["fieldFormatMap"]
+		trans := NewTransformer("", "", common.Fields{test.commonField})
+		out := trans.TransformFields()["fieldFormatMap"]
 		assert.Equal(t, test.expected, out, fmt.Sprintf("Failed for idx %v", idx))
+	}
+}
+
+func TestTransformMultiField(t *testing.T) {
+	f := common.Field{
+		Name: "context",
+		Type: "",
+		MultiFields: common.Fields{
+			common.Field{Name: "keyword", Type: "keyword"},
+			common.Field{Name: "text", Type: "text"},
+		},
+	}
+	trans := NewTransformer("", "", common.Fields{f})
+	out := trans.TransformFields()["fields"].([]common.MapStr)
+	assert.Equal(t, "context", out[0]["name"])
+	assert.Equal(t, "context.keyword", out[1]["name"])
+	assert.Equal(t, "context.text", out[2]["name"])
+	assert.Equal(t, "string", out[0]["type"])
+	assert.Equal(t, "string", out[1]["type"])
+	assert.Equal(t, "string", out[2]["type"])
+}
+
+func TestTransformGroupAndEnabled(t *testing.T) {
+	tests := []struct {
+		commonFields common.Fields
+		expected     []string
+	}{
+		{
+			commonFields: common.Fields{common.Field{Name: "context", Path: "something"}},
+			expected:     []string{"context"},
+		},
+		{
+			commonFields: common.Fields{
+				common.Field{
+					Name: "context",
+					Type: "group",
+					Fields: common.Fields{
+						common.Field{Name: "type", Type: ""},
+						common.Field{
+							Name: "metric",
+							Type: "group",
+							Fields: common.Fields{
+								common.Field{Name: "object"},
+							},
+						},
+					},
+				},
+			},
+			expected: []string{"context.type", "context.metric.object"},
+		},
+		{
+			commonFields: common.Fields{
+				common.Field{Name: "enabledField"},
+				common.Field{Name: "disabledField", Enabled: &falsy}, //enabled is ignored for Type!=group
+				common.Field{
+					Name:    "enabledGroup",
+					Type:    "group",
+					Enabled: &truthy,
+					Fields: common.Fields{
+						common.Field{Name: "type", Type: ""},
+					},
+				},
+				common.Field{
+					Name:    "context",
+					Type:    "group",
+					Enabled: &falsy,
+					Fields: common.Fields{
+						common.Field{Name: "type", Type: ""},
+						common.Field{
+							Name: "metric",
+							Type: "group",
+							Fields: common.Fields{
+								common.Field{Name: "object"},
+							},
+						},
+					},
+				},
+			},
+			expected: []string{"enabledField", "disabledField", "enabledGroup.type"},
+		},
+	}
+	for idx, test := range tests {
+		trans := NewTransformer("", "", test.commonFields)
+		out := trans.TransformFields()["fields"].([]common.MapStr)
+		assert.Equal(t, len(test.expected)+ctMetaData, len(out))
+		for i, e := range test.expected {
+			assert.Equal(t, e, out[i]["name"], fmt.Sprintf("Failed for idx %v", idx))
+		}
 	}
 }

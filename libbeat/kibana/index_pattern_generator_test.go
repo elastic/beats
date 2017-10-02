@@ -14,49 +14,32 @@ import (
 	"github.com/elastic/beats/libbeat/common"
 )
 
-func TestAllArgsSet(t *testing.T) {
+func TestNewGenerator(t *testing.T) {
 	beatDir := tmpPath()
 	defer teardown(beatDir)
 
-	tests := []struct {
-		Index Index
-	}{
-		{Index: Index{IndexName: "beat-index", BeatDir: beatDir, BeatName: "mybeat."}},
-		{Index: Index{Version: "6.0", BeatDir: beatDir, BeatName: "mybeat."}},
-		{Index: Index{Version: "6.0", IndexName: "beat-index", BeatName: "mybeat."}},
-		{Index: Index{Version: "6.0", IndexName: "beat-index", BeatDir: beatDir}},
-	}
-	for idx, test := range tests {
-		err := test.Index.init()
-		msg := fmt.Sprintf("(%v): Should have raised error", idx)
-		assert.Error(t, err, msg)
-	}
-}
-
-func TestInit(t *testing.T) {
-	beatDir := tmpPath()
-	defer teardown(beatDir)
 	// checks for fields.yml
-	idx := Index{Version: "7.0", IndexName: "beat-index", BeatDir: filepath.Join(beatDir, "notexistent"), BeatName: "mybeat."}
-	err := idx.init()
+	generator, err := NewGenerator("beat-index", "mybeat.", filepath.Join(beatDir, "notexistent"), "7.0")
 	assert.Error(t, err)
 
-	idx = Index{Version: "7.0", IndexName: "beat-index", BeatDir: beatDir, BeatName: "mybeat."}
-	err = idx.init()
+	generator, err = NewGenerator("beat-index", "mybeat.", beatDir, "7.0")
 	assert.NoError(t, err)
+	assert.Equal(t, "7.0", generator.version)
+	assert.Equal(t, "beat-index", generator.indexName)
+	assert.Equal(t, beatDir+"/fields.yml", generator.fieldsYaml)
 
 	// creates file dir and sets name
 	expectedDir := filepath.Join(beatDir, "_meta/kibana/default/index-pattern")
-	assert.Equal(t, expectedDir, idx.targetDirDefault)
-	_, err = os.Stat(idx.targetDirDefault)
+	assert.Equal(t, expectedDir, generator.targetDirDefault)
+	_, err = os.Stat(generator.targetDirDefault)
 	assert.NoError(t, err)
 
 	expectedDir = filepath.Join(beatDir, "_meta/kibana/5.x/index-pattern")
-	assert.Equal(t, expectedDir, idx.targetDir5x)
-	_, err = os.Stat(idx.targetDir5x)
+	assert.Equal(t, expectedDir, generator.targetDir5x)
+	_, err = os.Stat(generator.targetDir5x)
 	assert.NoError(t, err)
 
-	assert.Equal(t, "mybeat.json", idx.targetFilename)
+	assert.Equal(t, "mybeat.json", generator.targetFilename)
 }
 
 func TestCleanName(t *testing.T) {
@@ -75,16 +58,53 @@ func TestCleanName(t *testing.T) {
 	}
 }
 
-func TestDefault(t *testing.T) {
+func TestGenerateFieldsYaml(t *testing.T) {
 	beatDir := tmpPath()
 	defer teardown(beatDir)
+	generator, err := NewGenerator("metricbeat-*", "metric beat ?!", beatDir, "7.0.0-alpha1")
+	_, err = generator.Generate()
+	assert.NoError(t, err)
 
-	index := Index{Version: "7.0.0-alpha1", IndexName: "metricbeat-*", BeatDir: beatDir, BeatName: "metric beat !"}
-	index.Create()
+	generator.fieldsYaml = ""
+	_, err = generator.Generate()
+	assert.Error(t, err)
+}
+
+func TestDumpToFile5x(t *testing.T) {
+	beatDir := tmpPath()
+	defer teardown(beatDir)
+	generator, err := NewGenerator("metricbeat-*", "metric beat ?!", beatDir, "7.0.0-alpha1")
+	_, err = generator.Generate()
+	assert.NoError(t, err)
+
+	generator.targetDir5x = "./non-existing/something"
+	_, err = generator.Generate()
+	assert.Error(t, err)
+}
+
+func TestDumpToFileDefault(t *testing.T) {
+	beatDir := tmpPath()
+	defer teardown(beatDir)
+	generator, err := NewGenerator("metricbeat-*", "metric beat ?!", beatDir, "7.0.0-alpha1")
+	_, err = generator.Generate()
+	assert.NoError(t, err)
+
+	generator.targetDirDefault = "./non-existing/something"
+	_, err = generator.Generate()
+	assert.Error(t, err)
+}
+
+func TestGenerate(t *testing.T) {
+	beatDir := tmpPath()
+	defer teardown(beatDir)
+	generator, err := NewGenerator("beat-*", "be at ?!", beatDir, "7.0.0-alpha1")
+	pattern, err := generator.Generate()
+	assert.NoError(t, err)
+	assert.Equal(t, 2, len(pattern))
 
 	tests := []map[string]string{
-		{"existing": "metricbeat-5x-old.json", "created": "_meta/kibana/5.x/index-pattern/metricbeat.json"},
-		{"existing": "metricbeat-default-old.json", "created": "_meta/kibana/default/index-pattern/metricbeat.json"},
+		{"existing": "beat-5x.json", "created": "_meta/kibana/5.x/index-pattern/beat.json"},
+		{"existing": "beat-default.json", "created": "_meta/kibana/default/index-pattern/beat.json"},
 	}
 
 	for _, test := range tests {
@@ -127,7 +147,7 @@ func TestDefault(t *testing.T) {
 		assert.NoError(t, err)
 		err = json.Unmarshal([]byte(attrCreated["fields"].(string)), &fieldsCreated)
 		assert.NoError(t, err)
-		assert.Equal(t, len(ffmExisting), len(ffmCreated))
+		assert.Equal(t, len(fieldsExisting), len(fieldsCreated))
 		for _, e := range fieldsExisting {
 			idx := find(fieldsCreated, e["name"].(string))
 			assert.NotEqual(t, -1, idx)

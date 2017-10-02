@@ -7,104 +7,149 @@ import (
 	"github.com/elastic/beats/libbeat/common"
 )
 
-func TransformFields(timeFieldName string, title string, commonFields common.Fields) common.MapStr {
-	fields := []common.MapStr{}
-	fieldFormatMap := common.MapStr{}
-	keys := common.MapStr{}
+type Transformer struct {
+	fields                    common.Fields
+	transformedFields         []common.MapStr
+	transformedFieldFormatMap common.MapStr
+	timeFieldName             string
+	title                     string
+	keys                      common.MapStr
+}
 
-	transformFields(keys, commonFields, &fields, fieldFormatMap, "")
-
-	// add some meta fields
-	truthy := true
-	falsy := false
-	add(common.Field{Path: "_id", Type: "keyword", Index: &falsy, Analyzed: &falsy, DocValues: &falsy, Searchable: &falsy, Aggregatable: &falsy}, &fields, fieldFormatMap)
-	add(common.Field{Path: "_type", Type: "keyword", Index: &falsy, Analyzed: &falsy, DocValues: &falsy, Searchable: &truthy, Aggregatable: &truthy}, &fields, fieldFormatMap)
-	add(common.Field{Path: "_index", Type: "keyword", Index: &falsy, Analyzed: &falsy, DocValues: &falsy, Searchable: &falsy, Aggregatable: &falsy}, &fields, fieldFormatMap)
-	add(common.Field{Path: "_score", Type: "integer", Index: &falsy, Analyzed: &falsy, DocValues: &falsy, Searchable: &falsy, Aggregatable: &falsy}, &fields, fieldFormatMap)
-
-	return common.MapStr{
-		"timeFieldName":  timeFieldName,
-		"title":          title,
-		"fields":         fields,
-		"fieldFormatMap": fieldFormatMap,
+func NewTransformer(timeFieldName, title string, fields common.Fields) Transformer {
+	return Transformer{
+		fields:                    fields,
+		timeFieldName:             timeFieldName,
+		title:                     title,
+		transformedFields:         []common.MapStr{},
+		transformedFieldFormatMap: common.MapStr{},
+		keys: common.MapStr{},
 	}
 }
 
-func transformFields(keys common.MapStr, commonFields common.Fields, fields *[]common.MapStr, fieldFormatMap common.MapStr, path string) {
+func (t *Transformer) TransformFields() common.MapStr {
+	t.transformFields(t.fields, "")
+
+	// add some meta fields
+	falsy := false
+	t.add(common.Field{Path: "_id", Type: "keyword", Index: &falsy})
+	t.add(common.Field{Path: "_type", Type: "keyword", Index: &falsy})
+	t.add(common.Field{Path: "_index", Type: "keyword", Index: &falsy})
+	t.add(common.Field{Path: "_score", Type: "integer", Index: &falsy})
+
+	return common.MapStr{
+		"timeFieldName":  t.timeFieldName,
+		"title":          t.title,
+		"fields":         t.transformedFields,
+		"fieldFormatMap": t.transformedFieldFormatMap,
+	}
+}
+
+func (t *Transformer) transformFields(commonFields common.Fields, path string) {
 	for _, f := range commonFields {
 		f.Path = f.Name
 		if path != "" {
 			f.Path = path + "." + f.Name
 		}
 
-		if keys[f.Path] != nil {
+		if t.keys[f.Path] != nil {
 			msg := fmt.Sprintf("ERROR: Field <%s> is duplicated. Please update and try again.", f.Path)
 			panic(errors.New(msg))
 		}
 
 		if f.Type == "group" {
-			transformFields(keys, f.Fields, fields, fieldFormatMap, f.Path)
+			if f.Enabled == nil || *f.Enabled {
+				t.transformFields(f.Fields, f.Path)
+			}
 		} else {
-			// set default values (as done in python script)
-			keys[f.Path] = true
-
-			truthy := true
-			falsy := false
-			f.Index = &truthy
-			f.Analyzed = &falsy
-			f.DocValues = &truthy
-			f.Searchable = &truthy
-			f.Aggregatable = &truthy
-			add(f, fields, fieldFormatMap)
+			t.keys[f.Path] = true
+			t.add(f)
+			if f.MultiFields != nil {
+				path := f.Path
+				for _, mf := range f.MultiFields {
+					f.Type = mf.Type
+					f.Path = path + "." + mf.Name
+					t.add(f)
+				}
+			}
 		}
 	}
 }
 
-func add(f common.Field, fields *[]common.MapStr, fieldFormatMap common.MapStr) {
+func (t *Transformer) add(f common.Field) {
 	field, fieldFormat := transformField(f)
-	*fields = append(*fields, field)
+	t.transformedFields = append(t.transformedFields, field)
 	if fieldFormat != nil {
-		fieldFormatMap[field["name"].(string)] = fieldFormat
+		t.transformedFieldFormatMap[field["name"].(string)] = fieldFormat
 	}
 
 }
 
 func transformField(f common.Field) (common.MapStr, common.MapStr) {
 	field := common.MapStr{
-		"name":         f.Path,
-		"count":        0,
-		"scripted":     false,
-		"indexed":      getVal(f.Index, true),
-		"analyzed":     getVal(f.Analyzed, false),
-		"doc_values":   getVal(f.DocValues, true),
-		"searchable":   getVal(f.Searchable, true),
-		"aggregatable": getVal(f.Aggregatable, true),
+		"name":       f.Path,
+		"type":       typeMapping[f.Type],
+		"count":      f.Count,
+		"scripted":   false,
+		"indexed":    getVal(f.Index, true),
+		"searchable": getVal(f.Searchable, true),
 	}
 
-	if t, ok := typeMapping[f.Type]; ok == true {
-		field["type"] = t
+	setReadFromDocValues(field, f)
+	setAggregatable(field, f)
+
+	if f.Script != "" {
+		field["scripted"] = true
+		field["script"] = f.Script
+		field["indexed"] = false
+		if f.Lang == "" {
+			field["lang"] = "painless"
+		} else {
+			field["lang"] = f.Lang
+		}
 	}
 
-	if f.Type == "text" {
+	if field["indexed"] == false {
+		field["searchable"] = false
 		field["aggregatable"] = false
+		field["readFromDocValues"] = false
 	}
 
 	var format common.MapStr
-	if f.Format != "" || f.Pattern != "" {
-		format = common.MapStr{}
-
-		if f.Format != "" {
-			format["id"] = f.Format
-			if f.InputFormat != "" {
-				format["params"] = common.MapStr{"inputFormat": f.InputFormat}
-			}
-		}
-		if f.Pattern != "" {
-			format["params"] = common.MapStr{"pattern": f.Pattern}
-		}
+	if f.Format != "" {
+		format = common.MapStr{"id": f.Format}
 	}
+	addFormatParam(format, "pattern", f.Pattern)
+	addFormatParam(format, "inputFormat", f.InputFormat)
+	addFormatParam(format, "outputFormat", f.OutputFormat)
+	addFormatParam(format, "outputPrecision", f.OutputPrecision)
+	addFormatParam(format, "labelTemplate", f.LabelTemplate)
+	addFormatParam(format, "urlTemplate", f.UrlTemplate)
 
 	return field, format
+}
+
+func setReadFromDocValues(f common.MapStr, c common.Field) {
+	//https://www.elastic.co/guide/en/elasticsearch/reference/current/doc-values.html#doc-values
+	attr := "readFromDocValues"
+	if c.DocValues != nil {
+		f[attr] = *c.DocValues
+	} else if f["type"] == "string" && (c.Analyzer != "" || c.SearchAnalyzer != "") {
+		f[attr] = false
+	} else if f[attr] == nil {
+		f[attr] = true
+	}
+}
+
+func setAggregatable(f common.MapStr, c common.Field) {
+	attr := "aggregatable"
+	if c.Type == "text" {
+		f[attr] = false
+	} else if c.Aggregatable != nil {
+		f[attr] = *c.Aggregatable
+	} else if f[attr] == nil {
+		f[attr] = true
+	}
 }
 
 func getVal(valP *bool, def bool) bool {
@@ -112,6 +157,18 @@ func getVal(valP *bool, def bool) bool {
 		return *valP
 	}
 	return def
+}
+
+func addFormatParam(f common.MapStr, key string, val string) {
+	if val == "" {
+		return
+	}
+	if f == nil {
+		f = common.MapStr{"params": common.MapStr{}}
+	} else if f["params"] == nil {
+		f["params"] = common.MapStr{}
+	}
+	f["params"].(common.MapStr)[key] = val
 }
 
 var (

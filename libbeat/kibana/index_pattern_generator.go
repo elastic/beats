@@ -2,7 +2,6 @@ package kibana
 
 import (
 	"encoding/json"
-	"errors"
 	"io/ioutil"
 	"os"
 	"path/filepath"
@@ -11,43 +10,56 @@ import (
 	"github.com/elastic/beats/libbeat/common"
 )
 
-type Index struct {
-	Version   string
-	IndexName string
-	BeatDir   string
-	BeatName  string
-
+type IndexPatternGenerator struct {
+	indexName        string
+	version          string
 	fieldsYaml       string
 	targetDirDefault string
 	targetDir5x      string
 	targetFilename   string
 }
 
-// Create the Index-Pattern for Kibana for 5.x and default.
-func (i *Index) Create() ([]string, error) {
-	indices := []string{}
+// Create an instance of the Kibana Index Pattern Generator
+func NewGenerator(indexName, beatName, beatDir, version string) (IndexPatternGenerator, error) {
+	beatName = clean(beatName)
 
-	err := i.init()
-	if err != nil {
-		return nil, err
+	fieldsYaml := filepath.Join(beatDir, "fields.yml")
+	if _, err := os.Stat(fieldsYaml); err != nil {
+		return IndexPatternGenerator{}, err
 	}
+
+	return IndexPatternGenerator{
+		indexName:        indexName,
+		version:          version,
+		fieldsYaml:       fieldsYaml,
+		targetDirDefault: createTargetDir(beatDir, "default"),
+		targetDir5x:      createTargetDir(beatDir, "5.x"),
+		targetFilename:   beatName + ".json",
+	}, nil
+}
+
+// Create the Index-Pattern for Kibana for 5.x and default.
+func (i *IndexPatternGenerator) Generate() ([]string, error) {
+	var indices []string
 
 	commonFields, err := common.LoadFieldsYaml(i.fieldsYaml)
 	if err != nil {
 		return nil, err
 	}
-	transformed := TransformFields("@timestamp", i.IndexName, commonFields)
+	transformer := NewTransformer("@timestamp", i.indexName, commonFields)
+	transformed := transformer.TransformFields()
 
-	if fieldsBytes, err := json.Marshal(transformed["fields"]); err != nil {
+	fieldsBytes, err := json.Marshal(transformed["fields"])
+	if err != nil {
 		return nil, err
-	} else {
-		transformed["fields"] = string(fieldsBytes)
 	}
-	if fieldFormatBytes, err := json.Marshal(transformed["fieldFormatMap"]); err != nil {
+	transformed["fields"] = string(fieldsBytes)
+
+	fieldFormatBytes, err := json.Marshal(transformed["fieldFormatMap"])
+	if err != nil {
 		return nil, err
-	} else {
-		transformed["fieldFormatMap"] = string(fieldFormatBytes)
 	}
+	transformed["fieldFormatMap"] = string(fieldFormatBytes)
 
 	file5x := filepath.Join(i.targetDir5x, i.targetFilename)
 	err = dumpToFile(file5x, transformed)
@@ -57,11 +69,11 @@ func (i *Index) Create() ([]string, error) {
 	indices = append(indices, file5x)
 
 	out := common.MapStr{
-		"version": i.Version,
+		"version": i.version,
 		"objects": []common.MapStr{
 			common.MapStr{
 				"type":       "index-pattern",
-				"id":         i.IndexName,
+				"id":         i.indexName,
 				"version":    1,
 				"attributes": transformed,
 			},
@@ -75,24 +87,6 @@ func (i *Index) Create() ([]string, error) {
 	}
 	indices = append(indices, fileDefault)
 	return indices, nil
-}
-
-func (i *Index) init() error {
-	if i.Version == "" || i.IndexName == "" || i.BeatDir == "" || i.BeatName == "" {
-		return errors.New("RequiredParams: Version, IndexName, BeatDir and BeatName")
-	}
-	i.BeatName = clean(i.BeatName)
-
-	i.fieldsYaml = filepath.Join(i.BeatDir, "fields.yml")
-	if _, err := os.Stat(i.fieldsYaml); err != nil {
-		return err
-	}
-
-	i.targetDirDefault = createTargetDir(i.BeatDir, "default")
-	i.targetDir5x = createTargetDir(i.BeatDir, "5.x")
-	i.targetFilename = i.BeatName + ".json"
-
-	return nil
 }
 
 func clean(name string) string {
