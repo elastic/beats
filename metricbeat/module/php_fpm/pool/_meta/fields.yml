@@ -83,6 +83,7 @@
       description: >
         Number of seconds since FPM has started.
     - name: start_time
-      type: long
+      type: date
+      format: epoch_second
       description: >
         The date and time FPM has started.
