@@ -89,18 +89,44 @@ const (
 	ServiceStateAll ServiceEnumState = C.SERVICE_STATE_ALL
 )
 
-type ServiceAccessRight uint32
+type ServiceSCMAccessRight uint32
 
-// Service Access Rights
+// Access Rights for the Service Control Manager
 const (
 	// Includes STANDARD_RIGHTS_REQUIRED, in addition to all access rights in this table.
-	ScManagerAllAccess ServiceAccessRight = C.SC_MANAGER_ALL_ACCESS
+	ScManagerAllAccess ServiceSCMAccessRight = C.SC_MANAGER_ALL_ACCESS
 	// Required to connect to the service control manager.
-	ScManagerConnect ServiceAccessRight = C.SC_MANAGER_CONNECT
+	ScManagerConnect ServiceSCMAccessRight = C.SC_MANAGER_CONNECT
 	// Required to call the EnumServicesStatus or EnumServicesStatusEx function to list the services that are in the database.
-	ScManagerEnumerateService ServiceAccessRight = C.SC_MANAGER_ENUMERATE_SERVICE
+	ScManagerEnumerateService ServiceSCMAccessRight = C.SC_MANAGER_ENUMERATE_SERVICE
 	// Required to call the QueryServiceLockStatus function to retrieve the lock status information for the database.
-	ScManagerQueryLockStatus ServiceAccessRight = C.SC_MANAGER_QUERY_LOCK_STATUS
+	ScManagerQueryLockStatus ServiceSCMAccessRight = C.SC_MANAGER_QUERY_LOCK_STATUS
+)
+
+type ServiceAccessRight uint32
+
+// Access Rights for a Service
+const (
+	// Includes STANDARD_RIGHTS_REQUIRED in addition to all access rights in this table.
+	ServiceAllAccess ServiceAccessRight = C.SERVICE_ALL_ACCESS
+	// Required to call the ChangeServiceConfig or ChangeServiceConfig2 function to change the service configuration. Because this grants the caller the right to change the executable file that the system runs, it should be granted only to administrators.
+	ServcieChangeConfig ServiceAccessRight = C.SERVICE_CHANGE_CONFIG
+	// Required to call the EnumDependentServices function to enumerate all the services dependent on the service.
+	ServiceEnumerateDependents ServiceAccessRight = C.SERVICE_ENUMERATE_DEPENDENTS
+	// Required to call the ControlService function to ask the service to report its status immediately.
+	ServiceInterrogate ServiceAccessRight = C.SERVICE_INTERROGATE
+	// Required to call the ControlService function to pause or continue the service.
+	ServicePauseContinue ServiceAccessRight = C.SERVICE_PAUSE_CONTINUE
+	// Required to call the QueryServiceConfig and QueryServiceConfig2 functions to query the service configuration.
+	ServiceQueryConfig ServiceAccessRight = C.SERVICE_QUERY_CONFIG
+	// Required to call the QueryServiceStatus or QueryServiceStatusEx function to ask the service control manager about the status of the service.
+	ServiceQueryStatus ServiceAccessRight = C.SERVICE_QUERY_STATUS
+	// Required to call the StartService function to start the service.
+	ServiceStart ServiceAccessRight = C.SERVICE_START
+	// Required to call the ControlService function to stop the service.
+	ServiceStop ServiceAccessRight = C.SERVICE_STOP
+	// Required to call the ControlService function to specify a user-defined control code.
+	ServiceUserDefinedControl ServiceAccessRight = C.SERVICE_USER_DEFINED_CONTROL
 )
 
 type ServiceInfoLevel uint32

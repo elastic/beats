@@ -77,16 +77,40 @@ const (
 	ServiceStateAll ServiceEnumState = 0x3
 )
 
+type ServiceSCMAccessRight uint32
+
+const (
+	ScManagerAllAccess ServiceSCMAccessRight = 0xf003f
+
+	ScManagerConnect ServiceSCMAccessRight = 0x1
+
+	ScManagerEnumerateService ServiceSCMAccessRight = 0x4
+
+	ScManagerQueryLockStatus ServiceSCMAccessRight = 0x10
+)
+
 type ServiceAccessRight uint32
 
 const (
-	ScManagerAllAccess ServiceAccessRight = 0xf003f
+	ServiceAllAccess ServiceAccessRight = 0xf01ff
 
-	ScManagerConnect ServiceAccessRight = 0x1
+	ServcieChangeConfig ServiceAccessRight = 0x2
 
-	ScManagerEnumerateService ServiceAccessRight = 0x4
+	ServiceEnumerateDependents ServiceAccessRight = 0x8
 
-	ScManagerQueryLockStatus ServiceAccessRight = 0x10
+	ServiceInterrogate ServiceAccessRight = 0x80
+
+	ServicePauseContinue ServiceAccessRight = 0x40
+
+	ServiceQueryConfig ServiceAccessRight = 0x1
+
+	ServiceQueryStatus ServiceAccessRight = 0x4
+
+	ServiceStart ServiceAccessRight = 0x10
+
+	ServiceStop ServiceAccessRight = 0x20
+
+	ServiceUserDefinedControl ServiceAccessRight = 0x100
 )
 
 type ServiceInfoLevel uint32

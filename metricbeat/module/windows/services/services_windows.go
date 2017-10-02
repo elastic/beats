@@ -65,7 +65,7 @@ type ServiceReader struct {
 
 var InvalidServiceDatabaseHandleHandle = ^ServiceDatabaseHandle(0)
 
-func getServiceDatabaseHandle(machineName string, databaseName string, desiredAccess ServiceAccessRight) (ServiceDatabaseHandle, error) {
+func getServiceDatabaseHandle(machineName string, databaseName string, desiredAccess ServiceSCMAccessRight) (ServiceDatabaseHandle, error) {
 	var handle ServiceDatabaseHandle
 
 	var machineNamePtr *uint16
