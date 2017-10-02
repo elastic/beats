@@ -15,6 +15,15 @@ const (
 	SERVICE_ERROR_DATABASE_DOES_NOT_EXIST ServiceErrno = 0x429
 )
 
+type ServiceErrorControl uint32
+
+const (
+	SERVICE_ERROR_CRITICAL ServiceErrno = 0x3
+	SERVICE_ERROR_IGNORE   ServiceErrno = 0x0
+	SERVICE_ERROR_NORMAL   ServiceErrno = 0x1
+	SERVICE_ERROR_SEVERE   ServiceErrno = 0x2
+)
+
 var serviceErrors = map[ServiceErrno]struct{}{
 	SERVICE_ERROR_ACCESS_DENIED:           struct{}{},
 	SERVICE_ERROR_MORE_DATA:               struct{}{},
@@ -23,6 +32,10 @@ var serviceErrors = map[ServiceErrno]struct{}{
 	SERVICE_ERROR_INVALID_LEVEL:           struct{}{},
 	SERVICE_ERROR_SHUTDOWN_IN_PROGRESS:    struct{}{},
 	SERVICE_ERROR_DATABASE_DOES_NOT_EXIST: struct{}{},
+	SERVICE_ERROR_CRITICAL:                struct{}{},
+	SERVICE_ERROR_IGNORE:                  struct{}{},
+	SERVICE_ERROR_NORMAL:                  struct{}{},
+	SERVICE_ERROR_SEVERE:                  struct{}{},
 }
 
 type ServiceType uint32
@@ -38,7 +51,8 @@ const (
 
 	ServiceWin32OwnProcess ServiceType = 0x10
 
-	ServiceWin32Shareprocess ServiceType = 0x20
+	ServiceWin32Shareprocess  ServiceType = 0x20
+	ServiceInteractiveProcess ServiceType = 0x100
 )
 
 type ServiceState uint32
@@ -79,6 +93,20 @@ type ServiceInfoLevel uint32
 
 const (
 	ScEnumProcessInfo ServiceInfoLevel = 0x0
+)
+
+type ServcieStartType uint32
+
+const (
+	ServiceAuotStart ServcieStartType = 0x2
+
+	ServiceBootStart ServcieStartType = 0x0
+
+	ServiceDemandStart ServcieStartType = 0x3
+
+	ServiceDisabled ServcieStartType = 0x4
+
+	ServcieSystemStart ServcieStartType = 0x1
 )
 
 type ServiceStatusProcess struct {

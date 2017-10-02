@@ -21,6 +21,16 @@ const (
 	SERVICE_ERROR_DATABASE_DOES_NOT_EXIST ServiceErrno = C.ERROR_DATABASE_DOES_NOT_EXIST
 )
 
+type ServiceErrorControl uint32
+
+// Servcie Error Controls
+const (
+	SERVICE_ERROR_CRITICAL ServiceErrno = C.SERVICE_ERROR_CRITICAL
+	SERVICE_ERROR_IGNORE   ServiceErrno = C.SERVICE_ERROR_IGNORE
+	SERVICE_ERROR_NORMAL   ServiceErrno = C.SERVICE_ERROR_NORMAL
+	SERVICE_ERROR_SEVERE   ServiceErrno = C.SERVICE_ERROR_SEVERE
+)
+
 var serviceErrors = map[ServiceErrno]struct{}{
 	SERVICE_ERROR_ACCESS_DENIED:           struct{}{},
 	SERVICE_ERROR_MORE_DATA:               struct{}{},
@@ -29,6 +39,10 @@ var serviceErrors = map[ServiceErrno]struct{}{
 	SERVICE_ERROR_INVALID_LEVEL:           struct{}{},
 	SERVICE_ERROR_SHUTDOWN_IN_PROGRESS:    struct{}{},
 	SERVICE_ERROR_DATABASE_DOES_NOT_EXIST: struct{}{},
+	SERVICE_ERROR_CRITICAL:                struct{}{},
+	SERVICE_ERROR_IGNORE:                  struct{}{},
+	SERVICE_ERROR_NORMAL:                  struct{}{},
+	SERVICE_ERROR_SEVERE:                  struct{}{},
 }
 
 type ServiceType uint32
@@ -46,7 +60,8 @@ const (
 	// Services that run in their own processes.
 	ServiceWin32OwnProcess ServiceType = C.SERVICE_WIN32_OWN_PROCESS
 	// Services that share a process with one or more other services.
-	ServiceWin32Shareprocess ServiceType = C.SERVICE_WIN32_SHARE_PROCESS
+	ServiceWin32Shareprocess  ServiceType = C.SERVICE_WIN32_SHARE_PROCESS
+	ServiceInteractiveProcess ServiceType = C.SERVICE_INTERACTIVE_PROCESS
 )
 
 type ServiceState uint32
@@ -93,6 +108,22 @@ type ServiceInfoLevel uint32
 // Service Info Levels
 const (
 	ScEnumProcessInfo ServiceInfoLevel = C.SC_ENUM_PROCESS_INFO
+)
+
+type ServcieStartType uint32
+
+// Service Start Types
+const (
+	// A service started automatically by the service control manager during system startup.
+	ServiceAuotStart ServcieStartType = C.SERVICE_AUTO_START
+	// A device driver started by the system loader. This value is valid only for driver services.
+	ServiceBootStart ServcieStartType = C.SERVICE_BOOT_START
+	// A service started by the service control manager when a process calls the StartService function.
+	ServiceDemandStart ServcieStartType = C.SERVICE_DEMAND_START
+	// A service that cannot be started. Attempts to start the service result in the error code ERROR_SERVICE_DISABLED.
+	ServiceDisabled ServcieStartType = C.SERVICE_DISABLED
+	// A device driver started by the IoInitSystem function. This value is valid only for driver services.
+	ServcieSystemStart ServcieStartType = C.SERVICE_SYSTEM_START
 )
 
 // Contains process status information for a service.
