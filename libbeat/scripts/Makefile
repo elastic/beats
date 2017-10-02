@@ -293,7 +293,7 @@ endif
 	@# Generate Kibana index pattern
 	@mkdir -p $(PWD)/_meta/kibana/5.x/index-pattern
 	@mkdir -p $(PWD)/_meta/kibana/default/index-pattern
-	go run -v ${ES_BEATS}/libbeat/scripts/generate_index_pattern.go '${BEAT_INDEX_PREFIX}-*' ${BEAT_NAME} $(PWD) ${BEAT_VERSION}
+	@go run ${ES_BEATS}/dev-tools/cmd/kibana_index_pattern/kibana_index_pattern.go -index '${BEAT_INDEX_PREFIX}-*' -beat-name ${BEAT_NAME} -beat-dir $(PWD) -version ${BEAT_VERSION}
 
 	# Runs the post-update target if it exists. Will not return errors
 	@-$(MAKE) post-update

@@ -16,7 +16,8 @@ var (
 )
 
 func TestEmpty(t *testing.T) {
-	out := TransformFields("name", "title", common.Fields{})
+	trans := NewTransformer("name", "title", common.Fields{})
+	out := trans.TransformFields()
 	expected := common.MapStr{
 		"timeFieldName":  "name",
 		"title":          "title",
@@ -76,7 +77,8 @@ func TestErrors(t *testing.T) {
 		common.Field{Name: "context", Path: "something"},
 		common.Field{Name: "context", Path: "something", Type: "keyword"},
 	}
-	assert.Panics(t, func() { TransformFields("", "", commonFields) })
+	trans := NewTransformer("name", "title", commonFields)
+	assert.Panics(t, func() { trans.TransformFields() })
 }
 
 func TestTransformTypes(t *testing.T) {
@@ -100,7 +102,8 @@ func TestTransformTypes(t *testing.T) {
 		{commonField: common.Field{Type: "invalid"}, expected: nil},
 	}
 	for idx, test := range tests {
-		out := TransformFields("", "", common.Fields{test.commonField})["fields"].([]common.MapStr)[0]
+		trans := NewTransformer("name", "title", common.Fields{test.commonField})
+		out := trans.TransformFields()["fields"].([]common.MapStr)[0]
 		assert.Equal(t, test.expected, out["type"], fmt.Sprintf("Failed for idx %v", idx))
 	}
 }
@@ -142,7 +145,8 @@ func TestTransformGroup(t *testing.T) {
 		},
 	}
 	for idx, test := range tests {
-		out := TransformFields("", "", test.commonFields)["fields"].([]common.MapStr)
+		trans := NewTransformer("name", "title", test.commonFields)
+		out := trans.TransformFields()["fields"].([]common.MapStr)
 		assert.Equal(t, len(test.expected)+ctMetaData, len(out))
 		for i, e := range test.expected {
 			assert.Equal(t, e, out[i]["name"], fmt.Sprintf("Failed for idx %v", idx))
@@ -190,13 +194,14 @@ func TestTransformMisc(t *testing.T) {
 		{commonField: common.Field{}, expected: false, attr: "scripted"},
 	}
 	for idx, test := range tests {
-		out := TransformFields("", "", common.Fields{test.commonField})["fields"].([]common.MapStr)[0]
+		trans := NewTransformer("", "", common.Fields{test.commonField})
+		out := trans.TransformFields()["fields"].([]common.MapStr)[0]
 		msg := fmt.Sprintf("(%v): expected '%s' to be <%v> but was <%v>", idx, test.attr, test.expected, out[test.attr])
 		assert.Equal(t, test.expected, out[test.attr], msg)
 	}
 }
 
-func TestTransformFielFormatMap(t *testing.T) {
+func TestTransformFieldFormatMap(t *testing.T) {
 	tests := []struct {
 		commonField common.Field
 		expected    common.MapStr
@@ -273,7 +278,8 @@ func TestTransformFielFormatMap(t *testing.T) {
 		},
 	}
 	for idx, test := range tests {
-		out := TransformFields("", "", common.Fields{test.commonField})["fieldFormatMap"]
+		trans := NewTransformer("", "", common.Fields{test.commonField})
+		out := trans.TransformFields()["fieldFormatMap"]
 		assert.Equal(t, test.expected, out, fmt.Sprintf("Failed for idx %v", idx))
 	}
 }
