@@ -3915,7 +3915,7 @@ Number of data transfers aborted by the server. This value is included in haprox
 
 type: integer
 
-Number of backend servers that are active, meaning that they are healthy and can receive requests from the load balancer. 
+Number of backend servers that are active, meaning that they are healthy and can receive requests from the load balancer.
 
 
 [float]
@@ -7009,6 +7009,14 @@ The name of the pool.
 
 
 [float]
+=== `php_fpm.pool.process_manager`
+
+type: keyword
+
+Static, dynamic or ondemand.
+
+
+[float]
 == connections fields
 
 Connection state specific statistics.
@@ -7029,6 +7037,22 @@ The number of incoming requests that the PHP-FPM server has accepted; when a con
 type: long
 
 The current number of connections that have been initiated, but not yet accepted. If this value is non-zero it typically means that all the available server processes are currently busy, and there are no processes available to serve the next request. Raising `pm.max_children` (provided the server can handle it) should help keep this number low. This property follows from the fact that PHP-FPM listens via a socket (TCP or file based), and thus inherits some of the characteristics of sockets.
+
+
+[float]
+=== `php_fpm.pool.connections.max_listen_queue`
+
+type: long
+
+The maximum number of requests in the queue of pending connections since FPM has started.
+
+
+[float]
+=== `php_fpm.pool.connections.listen_queue_len`
+
+type: long
+
+The size of the socket queue of pending connections.
 
 
 [float]
@@ -7055,11 +7079,52 @@ The number of servers current processing a page - the minimum is `1` (so even on
 
 
 [float]
+=== `php_fpm.pool.processes.total`
+
+type: long
+
+The number of idle + active processes.
+
+
+[float]
+=== `php_fpm.pool.processes.max_active`
+
+type: long
+
+The maximum number of active processes since FPM has started.
+
+
+[float]
+=== `php_fpm.pool.processes.max_children_reached`
+
+type: long
+
+Number of times, the process limit has been reached, when pm tries to start more children (works only for pm 'dynamic' and 'ondemand').
+
+
+[float]
 === `php_fpm.pool.slow_requests`
 
 type: long
 
 The number of times a request execution time has exceeded `request_slowlog_timeout`.
+
+
+[float]
+=== `php_fpm.pool.start_since`
+
+type: long
+
+Number of seconds since FPM has started.
+
+
+[float]
+=== `php_fpm.pool.start_time`
+
+type: long
+
+The date and time FPM has started.
+
 
 
 [[exported-fields-postgresql]]
@@ -7713,7 +7778,7 @@ type: long
 
 format: bytes
 
-Point at which the memory alarm will go off. 
+Point at which the memory alarm will go off.
 
 
 [float]
@@ -7721,7 +7786,7 @@ Point at which the memory alarm will go off.
 
 type: long
 
-Memory used in bytes. 
+Memory used in bytes.
 
 
 [float]
@@ -7745,7 +7810,7 @@ Number of Mnesia transactions which have been performed that did not require wri
 
 type: long
 
-Number of messages which have been read from the message store. 
+Number of messages which have been read from the message store.
 
 
 [float]
@@ -7753,7 +7818,7 @@ Number of messages which have been read from the message store.
 
 type: long
 
-Number of messages which have been written to the message store. 
+Number of messages which have been written to the message store.
 
 
 [float]
@@ -7801,7 +7866,7 @@ Number of records written to the queue index journal.
 
 type: long
 
-Number of records read from the queue index. 
+Number of records read from the queue index.
 
 
 [float]
@@ -7809,7 +7874,7 @@ Number of records read from the queue index.
 
 type: long
 
-Number of records written to the queue index. 
+Number of records written to the queue index.
 
 
 [float]
@@ -7817,7 +7882,7 @@ Number of records written to the queue index.
 
 type: long
 
-Average number of Erlang processes waiting to run. 
+Average number of Erlang processes waiting to run.
 
 
 [float]
@@ -7825,7 +7890,7 @@ Average number of Erlang processes waiting to run.
 
 type: long
 
-File descriptors available for use as sockets. 
+File descriptors available for use as sockets.
 
 
 [float]
