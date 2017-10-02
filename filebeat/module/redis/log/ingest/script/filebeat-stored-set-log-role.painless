@@ -1,0 +1,9 @@
+if (ctx.redis.log.role == 'M') {
+    ctx.redis.log.role = 'master';
+} else if (ctx.redis.log.role == 'S') {
+    ctx.redis.log.role = 'slave';
+} else if (ctx.redis.log.role == 'C') {
+    ctx.redis.log.role = 'child';
+} else if (ctx.redis.log.role == 'X') {
+    ctx.redis.log.role = 'sentinel';
+}

@@ -330,6 +330,40 @@ func (fs *Fileset) getInputConfig() (*common.Config, error) {
 	return cfg, nil
 }
 
+// GetScriptsToStore returns a map of scripts under ingest/script folder of fileset
+// Keys of the returned map are the filename and the values are the source code of the script
+func (fs *Fileset) GetScriptsToStore() (map[string]string, error) {
+	// return none if no scripts are available for the fileset
+	scriptsPath := filepath.Join(fs.modulePath, fs.name, "ingest", "script")
+	if _, err := os.Stat(scriptsPath); os.IsNotExist(err) {
+		return nil, nil
+	}
+
+	scriptFiles, err := ioutil.ReadDir(scriptsPath)
+	if err != nil {
+		return nil, fmt.Errorf("Error opening script directory for fileset %s: %v", fs.name, err)
+	}
+
+	// return if the folder is empty
+	if len(scriptFiles) == 0 {
+		return nil, nil
+	}
+
+	// read all scripts into a map
+	scripts := make(map[string]string)
+	for _, scriptFile := range scriptFiles {
+		name := scriptFile.Name()
+		var source []byte
+		source, err = ioutil.ReadFile(filepath.Join(scriptsPath, name))
+		if err != nil {
+			return nil, fmt.Errorf("Error while reading script %s for fileset %s: %v", name, fs.name, err)
+		}
+		scripts[name] = string(source[:])
+	}
+
+	return scripts, nil
+}
+
 // getPipelineID returns the Ingest Node pipeline ID
 func (fs *Fileset) getPipelineID(beatVersion string) (string, error) {
 	path, err := applyTemplate(fs.vars, fs.manifest.IngestPipeline, false)

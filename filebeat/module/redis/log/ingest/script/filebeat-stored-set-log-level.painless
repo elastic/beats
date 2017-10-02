@@ -1,0 +1,9 @@
+if (ctx.redis.log.level == '.') {
+    ctx.redis.log.level = 'debug';
+} else if (ctx.redis.log.level == '-') {
+    ctx.redis.log.level = 'verbose';
+} else if (ctx.redis.log.level == '*') {
+    ctx.redis.log.level = 'notice';
+} else if (ctx.redis.log.level == '#') {
+    ctx.redis.log.level = 'warning';
+}

@@ -1,0 +1,69 @@
+String trimQuotes(def v) {
+    if (v.startsWith(\"'\") || v.startsWith('\"')) {
+        v = v.substring(1, v.length());
+    }
+    if (v.endsWith(\"'\") || v.endsWith('\"')) {
+        v = v.substring(0, v.length()-1);
+    }  
+    return v;
+}
+
+boolean isHexAscii(String v) {
+    def len = v.length();
+    if (len == 0 || len % 2 != 0) {
+        return false; 
+    }
+
+    for (int i = 0 ; i < len ; i++) {
+        if (Character.digit(v.charAt(i), 16) == -1) {
+            return false;
+        }
+    }
+
+    return true;
+}
+
+String convertHexToString(String hex) {
+    StringBuilder sb = new StringBuilder();
+
+    for (int i=0; i < hex.length() - 1; i+=2) {
+        String output = hex.substring(i, (i + 2));
+        int decimal = Integer.parseInt(output, 16);
+        sb.append((char)decimal);
+    }
+
+    return sb.toString();
+}
+
+def possibleHexKeys = ['exe', 'cmd'];
+
+def audit = ctx.auditd.get(\"log\");
+Iterator entries = audit.entrySet().iterator();
+while (entries.hasNext()) {
+    def e = entries.next();
+    def k = e.getKey();
+    def v = e.getValue(); 
+
+    // Remove entries whose value is ?
+    if (v == \"?\" || v == \"(null)\" || v == \"\") {
+        entries.remove();
+        continue;
+    }
+
+    // Convert hex values to ASCII.
+    if (possibleHexKeys.contains(k) && isHexAscii(v)) {
+        v = convertHexToString(v);
+        audit.put(k, v);
+    }
+
+    // Trim quotes.
+    if (v instanceof String) {
+        v = trimQuotes(v);
+        audit.put(k, v);
+    }
+
+    // Convert arch.
+    if (k == \"arch\" && v == \"c000003e\") {
+        audit.put(k, \"x86_64\");
+    }
+}

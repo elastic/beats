@@ -257,6 +257,74 @@ func (reg *ModuleRegistry) GetInputConfigs() ([]*common.Config, error) {
 	return result, nil
 }
 
+// PipelineLoader factory builds and returns a PipelineLoader
+type PipelineLoaderFactory func() (PipelineLoader, error)
+
+// PipelineLoader is a subset of the Elasticsearch client API capable of loading
+// the pipelines.
+type PipelineLoader interface {
+	LoadJSON(path string, json map[string]interface{}) ([]byte, error)
+	Request(method, path string, pipeline string, params map[string]string, body interface{}) (int, []byte, error)
+	GetVersion() string
+}
+
+// LoadPipelines loads the pipelines for each configured fileset.
+func (reg *ModuleRegistry) LoadPipelines(esClient PipelineLoader) error {
+	for module, filesets := range reg.registry {
+		for name, fileset := range filesets {
+			// check that all the required Ingest Node plugins are available
+			requiredProcessors := fileset.GetRequiredProcessors()
+			logp.Debug("modules", "Required processors: %s", requiredProcessors)
+			if len(requiredProcessors) > 0 {
+				err := checkAvailableProcessors(esClient, requiredProcessors)
+				if err != nil {
+					return fmt.Errorf("Error loading pipeline for fileset %s/%s: %v", module, name, err)
+				}
+			}
+
+			pipelineID, content, err := fileset.GetPipeline(esClient.GetVersion())
+			if err != nil {
+				return fmt.Errorf("Error getting pipeline for fileset %s/%s: %v", module, name, err)
+			}
+			err = loadPipeline(esClient, pipelineID, content)
+			if err != nil {
+				return fmt.Errorf("Error loading pipeline for fileset %s/%s: %v", module, name, err)
+			}
+		}
+	}
+	return nil
+}
+
+func loadScript(name, source string, esClient PipelineLoader) error {
+	parts := strings.Split(name, ".")
+	url := strings.Join([]string{"/_scripts/", parts[0]}, "")
+	payload := common.MapStr{
+		"script": common.MapStr{
+			"lang":   parts[1],
+			"source": source,
+		},
+	}
+
+	status, body, err := esClient.Request("POST", url, "", nil, payload)
+	if err != nil {
+		return fmt.Errorf("Error adding script: %v", err)
+	}
+	if status > 299 {
+		return fmt.Errorf("Error adding script. Status: %d. Response body: %s", status, body)
+	}
+	return nil
+}
+
+func loadScripts(esClient PipelineLoader, scripts map[string]string) error {
+	for name, source := range scripts {
+		err := loadScript(name, source, esClient)
+		if err != nil {
+			return err
+		}
+	}
+	return nil
+}
+
 // InfoString returns the enabled modules and filesets in a single string, ready to
 // be shown to the user
 func (reg *ModuleRegistry) InfoString() string {
