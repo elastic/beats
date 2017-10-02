@@ -21,6 +21,7 @@ import (
 // Windows API calls
 //sys _OpenSCManager(machineName *uint16, databaseName *uint16, desiredAcces ServiceAccessRight) (handle ServiceDatabaseHandle, err error) = advapi32.OpenSCManagerW
 //sys _EnumServicesStatusEx(handle ServiceDatabaseHandle, infoLevel ServiceInfoLevel, serviceType ServiceType, serviceState ServiceEnumState, services *byte, bufSize uint32, bytesNeeded *uint32, servicesReturned *uint32, resumeHandle *uintptr, groupName *uintptr) (err error) [failretval==0] = advapi32.EnumServicesStatusExW
+//sys _OpenService(handle ServiceDatabaseHandle, serviceName *uint16, desiredAccess ServiceAccessRight) (handle ServiceHandle, err error) = advapi32.OpenService
 //sys _CloseServiceHandle(handle ServiceDatabaseHandle) (err error) = advapi32.CloseServiceHandle
 
 var (
@@ -34,6 +35,8 @@ type enumServiceStatusProcess struct {
 }
 
 type ServiceDatabaseHandle uintptr
+
+type ServiceHandle uintptr
 
 var serviceStates = map[ServiceState]string{
 	ServiceContinuePending: "ServiceContinuePending",
