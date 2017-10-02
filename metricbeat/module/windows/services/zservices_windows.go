@@ -42,10 +42,11 @@ var (
 	procOpenSCManagerW        = modadvapi32.NewProc("OpenSCManagerW")
 	procEnumServicesStatusExW = modadvapi32.NewProc("EnumServicesStatusExW")
 	procOpenService           = modadvapi32.NewProc("OpenService")
+	procQueryServiceConfig    = modadvapi32.NewProc("QueryServiceConfig")
 	procCloseServiceHandle    = modadvapi32.NewProc("CloseServiceHandle")
 )
 
-func _OpenSCManager(machineName *uint16, databaseName *uint16, desiredAcces ServiceAccessRight) (handle ServiceDatabaseHandle, err error) {
+func _OpenSCManager(machineName *uint16, databaseName *uint16, desiredAcces ServiceSCMAccessRight) (handle ServiceDatabaseHandle, err error) {
 	r0, _, e1 := syscall.Syscall(procOpenSCManagerW.Addr(), 3, uintptr(unsafe.Pointer(machineName)), uintptr(unsafe.Pointer(databaseName)), uintptr(desiredAcces))
 	handle = ServiceDatabaseHandle(r0)
 	if handle == 0 {
@@ -70,10 +71,22 @@ func _EnumServicesStatusEx(handle ServiceDatabaseHandle, infoLevel ServiceInfoLe
 	return
 }
 
-func _OpenService(handle ServiceDatabaseHandle, serviceName *uint16, desiredAccess ServiceAccessRight) (handle ServiceHandle, err error) {
+func _OpenService(handle ServiceDatabaseHandle, serviceName *uint16, desiredAccess ServiceAccessRight) (serviceHandle ServiceHandle, err error) {
 	r0, _, e1 := syscall.Syscall(procOpenService.Addr(), 3, uintptr(handle), uintptr(unsafe.Pointer(serviceName)), uintptr(desiredAccess))
-	handle = ServiceHandle(r0)
-	if handle == 0 {
+	serviceHandle = ServiceHandle(r0)
+	if serviceHandle == 0 {
+		if e1 != 0 {
+			err = errnoErr(e1)
+		} else {
+			err = syscall.EINVAL
+		}
+	}
+	return
+}
+
+func _QueryServiceConfig(serviceHandle ServiceHandle, serviceConfig *QueryServiceConfig, bufSize uint32, bytesNeeded *byte) (err error) {
+	r1, _, e1 := syscall.Syscall6(procQueryServiceConfig.Addr(), 4, uintptr(serviceHandle), uintptr(unsafe.Pointer(serviceConfig)), uintptr(bufSize), uintptr(unsafe.Pointer(bytesNeeded)), 0, 0)
+	if r1 == 0 {
 		if e1 != 0 {
 			err = errnoErr(e1)
 		} else {

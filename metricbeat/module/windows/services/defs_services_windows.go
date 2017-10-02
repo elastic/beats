@@ -136,20 +136,20 @@ const (
 	ScEnumProcessInfo ServiceInfoLevel = C.SC_ENUM_PROCESS_INFO
 )
 
-type ServcieStartType uint32
+type ServiceStartType uint32
 
 // Service Start Types
 const (
 	// A service started automatically by the service control manager during system startup.
-	ServiceAuotStart ServcieStartType = C.SERVICE_AUTO_START
+	ServiceAuotStart ServiceStartType = C.SERVICE_AUTO_START
 	// A device driver started by the system loader. This value is valid only for driver services.
-	ServiceBootStart ServcieStartType = C.SERVICE_BOOT_START
+	ServiceBootStart ServiceStartType = C.SERVICE_BOOT_START
 	// A service started by the service control manager when a process calls the StartService function.
-	ServiceDemandStart ServcieStartType = C.SERVICE_DEMAND_START
+	ServiceDemandStart ServiceStartType = C.SERVICE_DEMAND_START
 	// A service that cannot be started. Attempts to start the service result in the error code ERROR_SERVICE_DISABLED.
-	ServiceDisabled ServcieStartType = C.SERVICE_DISABLED
+	ServiceDisabled ServiceStartType = C.SERVICE_DISABLED
 	// A device driver started by the IoInitSystem function. This value is valid only for driver services.
-	ServcieSystemStart ServcieStartType = C.SERVICE_SYSTEM_START
+	ServcieSystemStart ServiceStartType = C.SERVICE_SYSTEM_START
 )
 
 // Contains process status information for a service.

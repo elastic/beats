@@ -119,18 +119,18 @@ const (
 	ScEnumProcessInfo ServiceInfoLevel = 0x0
 )
 
-type ServcieStartType uint32
+type ServiceStartType uint32
 
 const (
-	ServiceAuotStart ServcieStartType = 0x2
+	ServiceAuotStart ServiceStartType = 0x2
 
-	ServiceBootStart ServcieStartType = 0x0
+	ServiceBootStart ServiceStartType = 0x0
 
-	ServiceDemandStart ServcieStartType = 0x3
+	ServiceDemandStart ServiceStartType = 0x3
 
-	ServiceDisabled ServcieStartType = 0x4
+	ServiceDisabled ServiceStartType = 0x4
 
-	ServcieSystemStart ServcieStartType = 0x1
+	ServcieSystemStart ServiceStartType = 0x1
 )
 
 type ServiceStatusProcess struct {
