@@ -41,8 +41,8 @@ var (
 
 	procOpenSCManagerW        = modadvapi32.NewProc("OpenSCManagerW")
 	procEnumServicesStatusExW = modadvapi32.NewProc("EnumServicesStatusExW")
-	procOpenService           = modadvapi32.NewProc("OpenService")
-	procQueryServiceConfig    = modadvapi32.NewProc("QueryServiceConfig")
+	procOpenServiceW          = modadvapi32.NewProc("OpenServiceW")
+	procQueryServiceConfigW   = modadvapi32.NewProc("QueryServiceConfigW")
 	procCloseServiceHandle    = modadvapi32.NewProc("CloseServiceHandle")
 )
 
@@ -72,7 +72,7 @@ func _EnumServicesStatusEx(handle ServiceDatabaseHandle, infoLevel ServiceInfoLe
 }
 
 func _OpenService(handle ServiceDatabaseHandle, serviceName *uint16, desiredAccess ServiceAccessRight) (serviceHandle ServiceHandle, err error) {
-	r0, _, e1 := syscall.Syscall(procOpenService.Addr(), 3, uintptr(handle), uintptr(unsafe.Pointer(serviceName)), uintptr(desiredAccess))
+	r0, _, e1 := syscall.Syscall(procOpenServiceW.Addr(), 3, uintptr(handle), uintptr(unsafe.Pointer(serviceName)), uintptr(desiredAccess))
 	serviceHandle = ServiceHandle(r0)
 	if serviceHandle == 0 {
 		if e1 != 0 {
@@ -84,8 +84,8 @@ func _OpenService(handle ServiceDatabaseHandle, serviceName *uint16, desiredAcce
 	return
 }
 
-func _QueryServiceConfig(serviceHandle ServiceHandle, serviceConfig *QueryServiceConfig, bufSize uint32, bytesNeeded *byte) (err error) {
-	r1, _, e1 := syscall.Syscall6(procQueryServiceConfig.Addr(), 4, uintptr(serviceHandle), uintptr(unsafe.Pointer(serviceConfig)), uintptr(bufSize), uintptr(unsafe.Pointer(bytesNeeded)), 0, 0)
+func _QueryServiceConfig(serviceHandle ServiceHandle, serviceConfig *QueryServiceConfig, bufSize uint32, bytesNeeded *uint32) (err error) {
+	r1, _, e1 := syscall.Syscall6(procQueryServiceConfigW.Addr(), 4, uintptr(serviceHandle), uintptr(unsafe.Pointer(serviceConfig)), uintptr(bufSize), uintptr(unsafe.Pointer(bytesNeeded)), 0, 0)
 	if r1 == 0 {
 		if e1 != 0 {
 			err = errnoErr(e1)
@@ -96,7 +96,7 @@ func _QueryServiceConfig(serviceHandle ServiceHandle, serviceConfig *QueryServic
 	return
 }
 
-func _CloseServiceHandle(handle ServiceDatabaseHandle) (err error) {
+func _CloseServiceHandle(handle uintptr) (err error) {
 	r1, _, e1 := syscall.Syscall(procCloseServiceHandle.Addr(), 1, uintptr(handle), 0, 0)
 	if r1 == 0 {
 		if e1 != 0 {
