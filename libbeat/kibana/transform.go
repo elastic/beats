@@ -7,46 +7,62 @@ import (
 	"github.com/elastic/beats/libbeat/common"
 )
 
-func TransformFields(timeFieldName string, title string, commonFields common.Fields) common.MapStr {
-	fields := []common.MapStr{}
-	fieldFormatMap := common.MapStr{}
-	keys := common.MapStr{}
+type Transformer struct {
+	fields                    common.Fields
+	transformedFields         []common.MapStr
+	transformedFieldFormatMap common.MapStr
+	timeFieldName             string
+	title                     string
+	keys                      common.MapStr
+}
 
-	transformFields(keys, commonFields, &fields, fieldFormatMap, "")
+func NewTransformer(timeFieldName, title string, fields common.Fields) *Transformer {
+	return &Transformer{
+		fields:                    fields,
+		timeFieldName:             timeFieldName,
+		title:                     title,
+		transformedFields:         []common.MapStr{},
+		transformedFieldFormatMap: common.MapStr{},
+		keys: common.MapStr{},
+	}
+}
+
+func (t *Transformer) TransformFields() common.MapStr {
+	t.transformFields(t.fields, "")
 
 	// add some meta fields
 	truthy := true
 	falsy := false
-	add(common.Field{Path: "_id", Type: "keyword", Index: &falsy, Analyzed: &falsy, DocValues: &falsy, Searchable: &falsy, Aggregatable: &falsy}, &fields, fieldFormatMap)
-	add(common.Field{Path: "_type", Type: "keyword", Index: &falsy, Analyzed: &falsy, DocValues: &falsy, Searchable: &truthy, Aggregatable: &truthy}, &fields, fieldFormatMap)
-	add(common.Field{Path: "_index", Type: "keyword", Index: &falsy, Analyzed: &falsy, DocValues: &falsy, Searchable: &falsy, Aggregatable: &falsy}, &fields, fieldFormatMap)
-	add(common.Field{Path: "_score", Type: "integer", Index: &falsy, Analyzed: &falsy, DocValues: &falsy, Searchable: &falsy, Aggregatable: &falsy}, &fields, fieldFormatMap)
+	t.add(common.Field{Path: "_id", Type: "keyword", Index: &falsy, Analyzed: &falsy, DocValues: &falsy, Searchable: &falsy, Aggregatable: &falsy})
+	t.add(common.Field{Path: "_type", Type: "keyword", Index: &falsy, Analyzed: &falsy, DocValues: &falsy, Searchable: &truthy, Aggregatable: &truthy})
+	t.add(common.Field{Path: "_index", Type: "keyword", Index: &falsy, Analyzed: &falsy, DocValues: &falsy, Searchable: &falsy, Aggregatable: &falsy})
+	t.add(common.Field{Path: "_score", Type: "integer", Index: &falsy, Analyzed: &falsy, DocValues: &falsy, Searchable: &falsy, Aggregatable: &falsy})
 
 	return common.MapStr{
-		"timeFieldName":  timeFieldName,
-		"title":          title,
-		"fields":         fields,
-		"fieldFormatMap": fieldFormatMap,
+		"timeFieldName":  t.timeFieldName,
+		"title":          t.title,
+		"fields":         t.transformedFields,
+		"fieldFormatMap": t.transformedFieldFormatMap,
 	}
 }
 
-func transformFields(keys common.MapStr, commonFields common.Fields, fields *[]common.MapStr, fieldFormatMap common.MapStr, path string) {
+func (t *Transformer) transformFields(commonFields common.Fields, path string) {
 	for _, f := range commonFields {
 		f.Path = f.Name
 		if path != "" {
 			f.Path = path + "." + f.Name
 		}
 
-		if keys[f.Path] != nil {
+		if t.keys[f.Path] != nil {
 			msg := fmt.Sprintf("ERROR: Field <%s> is duplicated. Please update and try again.", f.Path)
 			panic(errors.New(msg))
 		}
 
 		if f.Type == "group" {
-			transformFields(keys, f.Fields, fields, fieldFormatMap, f.Path)
+			t.transformFields(f.Fields, f.Path)
 		} else {
 			// set default values (as done in python script)
-			keys[f.Path] = true
+			t.keys[f.Path] = true
 
 			truthy := true
 			falsy := false
@@ -55,16 +71,16 @@ func transformFields(keys common.MapStr, commonFields common.Fields, fields *[]c
 			f.DocValues = &truthy
 			f.Searchable = &truthy
 			f.Aggregatable = &truthy
-			add(f, fields, fieldFormatMap)
+			t.add(f)
 		}
 	}
 }
 
-func add(f common.Field, fields *[]common.MapStr, fieldFormatMap common.MapStr) {
+func (t *Transformer) add(f common.Field) {
 	field, fieldFormat := transformField(f)
-	*fields = append(*fields, field)
+	t.transformedFields = append(t.transformedFields, field)
 	if fieldFormat != nil {
-		fieldFormatMap[field["name"].(string)] = fieldFormat
+		t.transformedFieldFormatMap[field["name"].(string)] = fieldFormat
 	}
 
 }
