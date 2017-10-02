@@ -74,6 +74,15 @@ func (t *Transformer) transformFields(commonFields common.Fields, path string) {
 			f.Searchable = &truthy
 			f.Aggregatable = &truthy
 			t.add(f)
+
+			if f.MultiFields != nil {
+				path := f.Path
+				for _, mf := range f.MultiFields {
+					f.Type = mf.Type
+					f.Path = path + "." + mf.Name
+					t.add(f)
+				}
+			}
 		}
 	}
 }
