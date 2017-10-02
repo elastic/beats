@@ -3915,7 +3915,7 @@ Number of data transfers aborted by the server. This value is included in haprox
 
 type: integer
 
-Number of backend servers that are active, meaning that they are healthy and can receive requests from the load balancer.
+Number of backend servers that are active, meaning that they are healthy and can receive requests from the load balancer. 
 
 
 [float]
@@ -7122,10 +7122,10 @@ Number of seconds since FPM has started.
 === `php_fpm.pool.start_time`
 
 type: date
+
 format: epoch_second
 
 The date and time FPM has started.
-
 
 
 [[exported-fields-postgresql]]
@@ -7779,7 +7779,7 @@ type: long
 
 format: bytes
 
-Point at which the memory alarm will go off.
+Point at which the memory alarm will go off. 
 
 
 [float]
@@ -7787,7 +7787,7 @@ Point at which the memory alarm will go off.
 
 type: long
 
-Memory used in bytes.
+Memory used in bytes. 
 
 
 [float]
@@ -7811,7 +7811,7 @@ Number of Mnesia transactions which have been performed that did not require wri
 
 type: long
 
-Number of messages which have been read from the message store.
+Number of messages which have been read from the message store. 
 
 
 [float]
@@ -7819,7 +7819,7 @@ Number of messages which have been read from the message store.
 
 type: long
 
-Number of messages which have been written to the message store.
+Number of messages which have been written to the message store. 
 
 
 [float]
@@ -7867,7 +7867,7 @@ Number of records written to the queue index journal.
 
 type: long
 
-Number of records read from the queue index.
+Number of records read from the queue index. 
 
 
 [float]
@@ -7875,7 +7875,7 @@ Number of records read from the queue index.
 
 type: long
 
-Number of records written to the queue index.
+Number of records written to the queue index. 
 
 
 [float]
@@ -7883,7 +7883,7 @@ Number of records written to the queue index.
 
 type: long
 
-Average number of Erlang processes waiting to run.
+Average number of Erlang processes waiting to run. 
 
 
 [float]
@@ -7891,7 +7891,7 @@ Average number of Erlang processes waiting to run.
 
 type: long
 
-File descriptors available for use as sockets.
+File descriptors available for use as sockets. 
 
 
 [float]
