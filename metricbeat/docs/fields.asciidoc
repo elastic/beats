@@ -7121,7 +7121,8 @@ Number of seconds since FPM has started.
 [float]
 === `php_fpm.pool.start_time`
 
-type: long
+type: date
+format: epoch_second
 
 The date and time FPM has started.
 
