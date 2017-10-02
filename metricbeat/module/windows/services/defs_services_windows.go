@@ -17,8 +17,11 @@ const (
 	SERVICE_ERROR_INVALID_PARAMETER       ServiceErrno = C.ERROR_INVALID_PARAMETER
 	SERVICE_ERROR_INVALID_HANDLE          ServiceErrno = C.ERROR_INVALID_HANDLE
 	SERVICE_ERROR_INVALID_LEVEL           ServiceErrno = C.ERROR_INVALID_LEVEL
+	SERVICE_ERROR_INVALID_NAME            ServiceErrno = C.ERROR_INVALID_NAME
 	SERVICE_ERROR_SHUTDOWN_IN_PROGRESS    ServiceErrno = C.ERROR_SHUTDOWN_IN_PROGRESS
 	SERVICE_ERROR_DATABASE_DOES_NOT_EXIST ServiceErrno = C.ERROR_DATABASE_DOES_NOT_EXIST
+	SERVICE_ERROR_INSUFFICIENT_BUFFER     ServiceErrno = C.ERROR_INSUFFICIENT_BUFFER
+	SERVICE_ERROR_SERVICE_DOES_NOT_EXIST  ServiceErrno = C.ERROR_SERVICE_DOES_NOT_EXIST
 )
 
 type ServiceErrorControl uint32
@@ -37,12 +40,15 @@ var serviceErrors = map[ServiceErrno]struct{}{
 	SERVICE_ERROR_INVALID_PARAMETER:       struct{}{},
 	SERVICE_ERROR_INVALID_HANDLE:          struct{}{},
 	SERVICE_ERROR_INVALID_LEVEL:           struct{}{},
+	SERVICE_ERROR_INVALID_NAME:            struct{}{},
 	SERVICE_ERROR_SHUTDOWN_IN_PROGRESS:    struct{}{},
 	SERVICE_ERROR_DATABASE_DOES_NOT_EXIST: struct{}{},
+	SERVICE_ERROR_INSUFFICIENT_BUFFER:     struct{}{},
 	SERVICE_ERROR_CRITICAL:                struct{}{},
 	SERVICE_ERROR_IGNORE:                  struct{}{},
 	SERVICE_ERROR_NORMAL:                  struct{}{},
 	SERVICE_ERROR_SEVERE:                  struct{}{},
+	SERVICE_ERROR_SERVICE_DOES_NOT_EXIST:  struct{}{},
 }
 
 type ServiceType uint32
@@ -141,7 +147,7 @@ type ServiceStartType uint32
 // Service Start Types
 const (
 	// A service started automatically by the service control manager during system startup.
-	ServiceAuotStart ServiceStartType = C.SERVICE_AUTO_START
+	ServiceAutoStart ServiceStartType = C.SERVICE_AUTO_START
 	// A device driver started by the system loader. This value is valid only for driver services.
 	ServiceBootStart ServiceStartType = C.SERVICE_BOOT_START
 	// A service started by the service control manager when a process calls the StartService function.
@@ -149,7 +155,7 @@ const (
 	// A service that cannot be started. Attempts to start the service result in the error code ERROR_SERVICE_DISABLED.
 	ServiceDisabled ServiceStartType = C.SERVICE_DISABLED
 	// A device driver started by the IoInitSystem function. This value is valid only for driver services.
-	ServcieSystemStart ServiceStartType = C.SERVICE_SYSTEM_START
+	ServiceSystemStart ServiceStartType = C.SERVICE_SYSTEM_START
 )
 
 // Contains process status information for a service.
@@ -157,3 +163,6 @@ type ServiceStatusProcess C.SERVICE_STATUS_PROCESS
 
 // Contains the name of a service in a service control manager database and information about the service.
 type EnumServiceStatusProcess C.ENUM_SERVICE_STATUS_PROCESS
+
+//Contains configuration information for an installed service.
+type QueryServiceConfig C.QUERY_SERVICE_CONFIG

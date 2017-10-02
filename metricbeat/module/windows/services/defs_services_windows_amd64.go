@@ -11,8 +11,11 @@ const (
 	SERVICE_ERROR_INVALID_PARAMETER       ServiceErrno = 0x57
 	SERVICE_ERROR_INVALID_HANDLE          ServiceErrno = 0x6
 	SERVICE_ERROR_INVALID_LEVEL           ServiceErrno = 0x7c
+	SERVICE_ERROR_INVALID_NAME            ServiceErrno = 0x7b
 	SERVICE_ERROR_SHUTDOWN_IN_PROGRESS    ServiceErrno = 0x45b
 	SERVICE_ERROR_DATABASE_DOES_NOT_EXIST ServiceErrno = 0x429
+	SERVICE_ERROR_INSUFFICIENT_BUFFER     ServiceErrno = 0x7a
+	SERVICE_ERROR_SERVICE_DOES_NOT_EXIST  ServiceErrno = 0x424
 )
 
 type ServiceErrorControl uint32
@@ -30,12 +33,15 @@ var serviceErrors = map[ServiceErrno]struct{}{
 	SERVICE_ERROR_INVALID_PARAMETER:       struct{}{},
 	SERVICE_ERROR_INVALID_HANDLE:          struct{}{},
 	SERVICE_ERROR_INVALID_LEVEL:           struct{}{},
+	SERVICE_ERROR_INVALID_NAME:            struct{}{},
 	SERVICE_ERROR_SHUTDOWN_IN_PROGRESS:    struct{}{},
 	SERVICE_ERROR_DATABASE_DOES_NOT_EXIST: struct{}{},
+	SERVICE_ERROR_INSUFFICIENT_BUFFER:     struct{}{},
 	SERVICE_ERROR_CRITICAL:                struct{}{},
 	SERVICE_ERROR_IGNORE:                  struct{}{},
 	SERVICE_ERROR_NORMAL:                  struct{}{},
 	SERVICE_ERROR_SEVERE:                  struct{}{},
+	SERVICE_ERROR_SERVICE_DOES_NOT_EXIST:  struct{}{},
 }
 
 type ServiceType uint32
@@ -122,7 +128,7 @@ const (
 type ServiceStartType uint32
 
 const (
-	ServiceAuotStart ServiceStartType = 0x2
+	ServiceAutoStart ServiceStartType = 0x2
 
 	ServiceBootStart ServiceStartType = 0x0
 
@@ -130,7 +136,7 @@ const (
 
 	ServiceDisabled ServiceStartType = 0x4
 
-	ServcieSystemStart ServiceStartType = 0x1
+	ServiceSystemStart ServiceStartType = 0x1
 )
 
 type ServiceStatusProcess struct {
@@ -150,4 +156,18 @@ type EnumServiceStatusProcess struct {
 	LpDisplayName        *int8
 	ServiceStatusProcess ServiceStatusProcess
 	Pad_cgo_0            [4]byte
+}
+
+type QueryServiceConfig struct {
+	DwServiceType      uint32
+	DwStartType        uint32
+	DwErrorControl     uint32
+	Pad_cgo_0          [4]byte
+	LpBinaryPathName   *int8
+	LpLoadOrderGroup   *int8
+	DwTagId            uint32
+	Pad_cgo_1          [4]byte
+	LpDependencies     *int8
+	LpServiceStartName *int8
+	LpDisplayName      *int8
 }

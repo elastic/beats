@@ -21,8 +21,8 @@ import (
 // Windows API calls
 //sys _OpenSCManager(machineName *uint16, databaseName *uint16, desiredAcces ServiceSCMAccessRight) (handle ServiceDatabaseHandle, err error) = advapi32.OpenSCManagerW
 //sys _EnumServicesStatusEx(handle ServiceDatabaseHandle, infoLevel ServiceInfoLevel, serviceType ServiceType, serviceState ServiceEnumState, services *byte, bufSize uint32, bytesNeeded *uint32, servicesReturned *uint32, resumeHandle *uintptr, groupName *uintptr) (err error) [failretval==0] = advapi32.EnumServicesStatusExW
-//sys _OpenService(handle ServiceDatabaseHandle, serviceName *uint16, desiredAccess ServiceAccessRight) (serviceHandle ServiceHandle, err error) = advapi32.OpenService
-//sys _QueryServiceConfig(serviceHandle ServiceHandle, serviceConfig *QueryServiceConfig, bufSize uint32, bytesNeeded *byte) (err error) [failretval==0] = advapi32.QueryServiceConfig
+//sys _OpenService(handle ServiceDatabaseHandle, serviceName *uint16, desiredAccess ServiceAccessRight) (serviceHandle ServiceHandle, err error) = advapi32.OpenServiceW
+//sys _QueryServiceConfig(serviceHandle ServiceHandle, serviceConfig *QueryServiceConfig, bufSize uint32, bytesNeeded *byte) (err error) [failretval==0] = advapi32.QueryServiceConfigW
 //sys _CloseServiceHandle(handle ServiceDatabaseHandle) (err error) = advapi32.CloseServiceHandle
 
 var (
@@ -33,20 +33,6 @@ type enumServiceStatusProcess struct {
 	LpServiceName        uintptr
 	LpDisplayName        uintptr
 	ServiceStatusProcess ServiceStatusProcess
-}
-
-type QueryServiceConfig struct {
-	DwServiceType      ServiceType
-	DwStartType        ServiceStartType
-	DwErrorControl     ServiceErrorControl
-	Pad_cgo_0          [4]byte
-	LpBinaryPathName   *int8
-	LpLoadOrderGroup   *int8
-	DwTagId            uint32
-	Pad_cgo_1          [4]byte
-	LpDependencies     *int8
-	LpServiceStartName *int8
-	LpDisplayName      *int8
 }
 
 type ServiceDatabaseHandle uintptr
