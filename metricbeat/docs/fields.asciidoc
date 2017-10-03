@@ -7043,6 +7043,14 @@ The name of the pool.
 
 
 [float]
+=== `php_fpm.pool.process_manager`
+
+type: keyword
+
+Static, dynamic or ondemand.
+
+
+[float]
 == connections fields
 
 Connection state specific statistics.
@@ -7063,6 +7071,22 @@ The number of incoming requests that the PHP-FPM server has accepted; when a con
 type: long
 
 The current number of connections that have been initiated, but not yet accepted. If this value is non-zero it typically means that all the available server processes are currently busy, and there are no processes available to serve the next request. Raising `pm.max_children` (provided the server can handle it) should help keep this number low. This property follows from the fact that PHP-FPM listens via a socket (TCP or file based), and thus inherits some of the characteristics of sockets.
+
+
+[float]
+=== `php_fpm.pool.connections.max_listen_queue`
+
+type: long
+
+The maximum number of requests in the queue of pending connections since FPM has started.
+
+
+[float]
+=== `php_fpm.pool.connections.listen_queue_len`
+
+type: long
+
+The size of the socket queue of pending connections.
 
 
 [float]
@@ -7089,11 +7113,53 @@ The number of servers current processing a page - the minimum is `1` (so even on
 
 
 [float]
+=== `php_fpm.pool.processes.total`
+
+type: long
+
+The number of idle + active processes.
+
+
+[float]
+=== `php_fpm.pool.processes.max_active`
+
+type: long
+
+The maximum number of active processes since FPM has started.
+
+
+[float]
+=== `php_fpm.pool.processes.max_children_reached`
+
+type: long
+
+Number of times, the process limit has been reached, when pm tries to start more children (works only for pm 'dynamic' and 'ondemand').
+
+
+[float]
 === `php_fpm.pool.slow_requests`
 
 type: long
 
 The number of times a request execution time has exceeded `request_slowlog_timeout`.
+
+
+[float]
+=== `php_fpm.pool.start_since`
+
+type: long
+
+Number of seconds since FPM has started.
+
+
+[float]
+=== `php_fpm.pool.start_time`
+
+type: date
+
+format: epoch_second
+
+The date and time FPM has started.
 
 
 [[exported-fields-postgresql]]
