@@ -59,7 +59,9 @@ func (t *Transformer) transformFields(commonFields common.Fields, path string) {
 		}
 
 		if f.Type == "group" {
-			t.transformFields(f.Fields, f.Path)
+			if f.Enabled == nil || *f.Enabled {
+				t.transformFields(f.Fields, f.Path)
+			}
 		} else {
 			// set default values (as done in python script)
 			t.keys[f.Path] = true

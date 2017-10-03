@@ -283,3 +283,71 @@ func TestTransformFieldFormatMap(t *testing.T) {
 		assert.Equal(t, test.expected, out, fmt.Sprintf("Failed for idx %v", idx))
 	}
 }
+func TestTransformGroupAndEnabled(t *testing.T) {
+	tests := []struct {
+		commonFields common.Fields
+		expected     []string
+	}{
+		{
+			commonFields: common.Fields{common.Field{Name: "context", Path: "something"}},
+			expected:     []string{"context"},
+		},
+		{
+			commonFields: common.Fields{
+				common.Field{
+					Name: "context",
+					Type: "group",
+					Fields: common.Fields{
+						common.Field{Name: "type", Type: ""},
+						common.Field{
+							Name: "metric",
+							Type: "group",
+							Fields: common.Fields{
+								common.Field{Name: "object"},
+							},
+						},
+					},
+				},
+			},
+			expected: []string{"context.type", "context.metric.object"},
+		},
+		{
+			commonFields: common.Fields{
+				common.Field{Name: "enabledField"},
+				common.Field{Name: "disabledField", Enabled: &falsy}, //enabled is ignored for Type!=group
+				common.Field{
+					Name:    "enabledGroup",
+					Type:    "group",
+					Enabled: &truthy,
+					Fields: common.Fields{
+						common.Field{Name: "type", Type: ""},
+					},
+				},
+				common.Field{
+					Name:    "context",
+					Type:    "group",
+					Enabled: &falsy,
+					Fields: common.Fields{
+						common.Field{Name: "type", Type: ""},
+						common.Field{
+							Name: "metric",
+							Type: "group",
+							Fields: common.Fields{
+								common.Field{Name: "object"},
+							},
+						},
+					},
+				},
+			},
+			expected: []string{"enabledField", "disabledField", "enabledGroup.type"},
+		},
+	}
+	for idx, test := range tests {
+		trans := NewTransformer("name", "title", test.commonFields)
+		out := trans.TransformFields()["fields"].([]common.MapStr)
+		assert.Equal(t, len(test.expected)+ctMetaData, len(out))
+		for i, e := range test.expected {
+			assert.Equal(t, e, out[i]["name"], fmt.Sprintf("Failed for idx %v", idx))
+		}
+	}
+}
