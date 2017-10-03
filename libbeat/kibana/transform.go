@@ -107,6 +107,13 @@ func transformField(f common.Field) (common.MapStr, common.MapStr) {
 		field["aggregatable"] = false
 	}
 
+	if f.Script != "" {
+		field["scripted"] = true
+		field["script"] = f.Script
+		field["lang"] = "painless"
+		field["doc_values"] = false
+	}
+
 	var format common.MapStr
 	if f.Format != "" || f.Pattern != "" {
 		format = common.MapStr{}
