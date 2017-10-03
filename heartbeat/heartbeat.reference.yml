@@ -452,15 +452,15 @@ output.elasticsearch:
   # Not yet supported for async connections (i.e. with the "pipelining" option set)
   #ttl: 30s
 
-  # Optional load balance the events between the Logstash hosts
-  #loadbalance: true
+  # Optional load balance the events between the Logstash hosts. Default is false.
+  #loadbalance: false
 
   # Number of batches to be sent asynchronously to logstash while processing
   # new batches.
   #pipelining: 5
 
-  # If enabled only a subset of events in a batch of events is transfered per
-  # transaction.  The number of events to sent increases up to `bulk_max_size`
+  # If enabled only a subset of events in a batch of events is transferred per
+  # transaction.  The number of events to be sent increases up to `bulk_max_size`
   # if no error is encountered.
   #slow_start: false
 
@@ -796,7 +796,7 @@ output.elasticsearch:
 
 #============================== Dashboards =====================================
 # These settings control loading the sample dashboards to the Kibana index. Loading
-# the dashboards is disabled by default and can be enabled either by setting the
+# the dashboards are disabled by default and can be enabled either by setting the
 # options here, or by using the `-setup` CLI flag or the `setup` command.
 #setup.dashboards.enabled: false
 
@@ -837,8 +837,8 @@ output.elasticsearch:
 # The template name and pattern has to be set in case the elasticsearch index pattern is modified.
 #setup.template.name: "heartbeat-%{[beat.version]}"
 
-# Template patttern. By default the template pattern is "-%{[beat.version]}-*" to apply to the default index settings.
-# The first part is the version of the beat and then -* is used to match all daily indicies.
+# Template pattern. By default the template pattern is "-%{[beat.version]}-*" to apply to the default index settings.
+# The first part is the version of the beat and then -* is used to match all daily indices.
 # The template name and pattern has to be set in case the elasticsearch index pattern is modified.
 #setup.template.pattern: "heartbeat-%{[beat.version]}-*"
 
@@ -875,7 +875,7 @@ setup.kibana:
   # IPv6 addresses should always be defined as: https://[2001:db8::1]:5601
   #host: "localhost:5601"
 
-  # Optional protocol and basic auth crendentials.
+  # Optional protocol and basic auth credentials.
   #protocol: "https"
   #username: "elastic"
   #password: "changeme"
@@ -943,7 +943,7 @@ setup.kibana:
 # The period after which to log the internal metrics. The default is 30s.
 #logging.metrics.period: 30s
 
-# Logging to rotating files files. Set logging.to_files to false to disable logging to
+# Logging to rotating files. Set logging.to_files to false to disable logging to
 # files.
 logging.to_files: true
 logging.files:
