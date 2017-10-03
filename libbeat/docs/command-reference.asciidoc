@@ -96,7 +96,7 @@ command exports the configuration that's defined in the specified file.
 [[template-subcommand]]
 *`template`*::
 Exports the index template to stdout. You can specify the `--es.version` and
-`--index` flags to futher define what gets exported.
+`--index` flags to further define what gets exported.
 
 *FLAGS*
 

@@ -1406,7 +1406,7 @@ The timezone of timestamp.
 
 type: long
 
-Processs id
+Process id
 
 
 [float]
@@ -1444,7 +1444,7 @@ Duration of a query.
 
 example: SELECT * FROM users;
 
-Query statment.
+Query statement.
 
 [float]
 === `postgresql.log.message`

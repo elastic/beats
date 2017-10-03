@@ -195,7 +195,7 @@ func (loader ElasticsearchLoader) importVisualization(file string) error {
 	var vizContent common.MapStr
 	err = json.Unmarshal(reader, &vizContent)
 	if err != nil {
-		return fmt.Errorf("fail to unmarshal vizualization content %s: %v", file, err)
+		return fmt.Errorf("fail to unmarshal visualization content %s: %v", file, err)
 	}
 
 	if loader.config.Index != "" {

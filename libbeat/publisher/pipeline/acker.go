@@ -61,7 +61,7 @@ func (a *countACK) ackEvents(n int) {
 // gapCountACK returns event ACKs to the producer, taking account for dropped events.
 // Events being dropped by processors will always be ACKed with the last batch ACKed
 // by the broker. This way clients waiting for ACKs can expect all processed
-// events being alwyas ACKed.
+// events being always ACKed.
 type gapCountACK struct {
 	pipeline *Pipeline
 
@@ -134,7 +134,7 @@ func (a *gapCountACK) ackLoop() {
 			}
 
 		case <-drop:
-			// TODO: accumulate mulitple drop events + flush count with timer
+			// TODO: accumulate multiple drop events + flush count with timer
 			a.fn(1, 0)
 		}
 	}
