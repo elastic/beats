@@ -97,16 +97,37 @@ func TestDumpToFileDefault(t *testing.T) {
 func TestGenerate(t *testing.T) {
 	beatDir := tmpPath()
 	defer teardown(beatDir)
-	generator, err := NewGenerator("metricbeat-*", "metric beat ?!", beatDir, "7.0.0-alpha1")
+	generator, err := NewGenerator("beat-*", "b eat ?!", beatDir, "7.0.0-alpha1")
 	pattern, err := generator.Generate()
 	assert.NoError(t, err)
 	assert.Equal(t, 2, len(pattern))
 
 	tests := []map[string]string{
-		{"existing": "metricbeat-5x-old.json", "created": "_meta/kibana/5.x/index-pattern/metricbeat.json"},
-		{"existing": "metricbeat-default-old.json", "created": "_meta/kibana/default/index-pattern/metricbeat.json"},
+		{"existing": "beat-5x.json", "created": "_meta/kibana/5.x/index-pattern/beat.json"},
+		{"existing": "beat-default.json", "created": "_meta/kibana/default/index-pattern/beat.json"},
 	}
+	testGenerate(t, beatDir, tests)
+}
 
+func TestGenerateExtensive(t *testing.T) {
+	beatDir, err := filepath.Abs("./testdata/extensive")
+	if err != nil {
+		panic(err)
+	}
+	defer teardown(beatDir)
+	generator, err := NewGenerator("metricbeat-*", "metric be at ?!", beatDir, "7.0.0-alpha1")
+	pattern, err := generator.Generate()
+	assert.NoError(t, err)
+	assert.Equal(t, 2, len(pattern))
+
+	tests := []map[string]string{
+		{"existing": "metricbeat-5x.json", "created": "_meta/kibana/5.x/index-pattern/metricbeat.json"},
+		{"existing": "metricbeat-default.json", "created": "_meta/kibana/default/index-pattern/metricbeat.json"},
+	}
+	testGenerate(t, beatDir, tests)
+}
+
+func testGenerate(t *testing.T, beatDir string, tests []map[string]string) {
 	for _, test := range tests {
 		// compare default
 		existing, err := readJson(filepath.Join(beatDir, test["existing"]))
@@ -147,7 +168,7 @@ func TestGenerate(t *testing.T) {
 		assert.NoError(t, err)
 		err = json.Unmarshal([]byte(attrCreated["fields"].(string)), &fieldsCreated)
 		assert.NoError(t, err)
-		assert.Equal(t, len(ffmExisting), len(ffmCreated))
+		assert.Equal(t, len(fieldsExisting), len(fieldsCreated))
 		for _, e := range fieldsExisting {
 			idx := find(fieldsCreated, e["name"].(string))
 			assert.NotEqual(t, -1, idx)
