@@ -283,6 +283,7 @@ func TestTransformFieldFormatMap(t *testing.T) {
 		assert.Equal(t, test.expected, out, fmt.Sprintf("Failed for idx %v", idx))
 	}
 }
+
 func TestTransformGroupAndEnabled(t *testing.T) {
 	tests := []struct {
 		commonFields common.Fields
@@ -350,4 +351,23 @@ func TestTransformGroupAndEnabled(t *testing.T) {
 			assert.Equal(t, e, out[i]["name"], fmt.Sprintf("Failed for idx %v", idx))
 		}
 	}
+}
+
+func TestTransformMultiField(t *testing.T) {
+	f := common.Field{
+		Name: "context",
+		Type: "",
+		MultiFields: common.Fields{
+			common.Field{Name: "keyword", Type: "keyword"},
+			common.Field{Name: "text", Type: "text"},
+		},
+	}
+	trans := NewTransformer("name", "title", common.Fields{f})
+	out := trans.TransformFields()["fields"].([]common.MapStr)
+	assert.Equal(t, "context", out[0]["name"])
+	assert.Equal(t, "context.keyword", out[1]["name"])
+	assert.Equal(t, "context.text", out[2]["name"])
+	assert.Equal(t, "string", out[0]["type"])
+	assert.Equal(t, "string", out[1]["type"])
+	assert.Equal(t, "string", out[2]["type"])
 }
