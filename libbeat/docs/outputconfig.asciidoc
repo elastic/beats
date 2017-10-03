@@ -445,7 +445,7 @@ output.logstash:
 
 ===== `pipelining`
 
-Configures number of batches to be send asynchronously to logstash while waiting
+Configures number of batches to be sent asynchronously to logstash while waiting
 for ACK from logstash. Output only becomes blocking once number of `pipelining`
 batches have been written. Pipelining is disabled if a values of 0 is
 configured. The default value is 0.
