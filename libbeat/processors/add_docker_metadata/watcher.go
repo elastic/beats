@@ -108,10 +108,11 @@ func NewWatcherWithClient(client Client, cleanupTimeout time.Duration) (*watcher
 func (w *watcher) Container(ID string) *Container {
 	w.RLock()
 	container := w.containers[ID]
+	_, ok := w.deleted[ID]
 	w.RUnlock()
 
 	// Update last access time if it's deleted
-	if _, ok := w.deleted[ID]; ok {
+	if ok {
 		w.Lock()
 		w.deleted[ID] = time.Now()
 		w.Unlock()
