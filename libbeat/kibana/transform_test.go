@@ -260,7 +260,8 @@ func TestTransformFieldFormatMap(t *testing.T) {
 				"c": common.MapStr{
 					"id": "url",
 					"params": common.MapStr{
-						"pattern": "[^-]",
+						"pattern":     "[^-]",
+						"inputFormat": "string",
 					},
 				},
 			},
@@ -271,6 +272,31 @@ func TestTransformFieldFormatMap(t *testing.T) {
 				InputFormat: "string",
 			},
 			expected: common.MapStr{},
+		},
+		{
+			commonField: common.Field{
+				Name:            "c",
+				Format:          "url",
+				Pattern:         "[^-]",
+				InputFormat:     "string",
+				OutputFormat:    "float",
+				OutputPrecision: "3",
+				LabelTemplate:   "lblT",
+				UrlTemplate:     "urlT",
+			},
+			expected: common.MapStr{
+				"c": common.MapStr{
+					"id": "url",
+					"params": common.MapStr{
+						"pattern":         "[^-]",
+						"inputFormat":     "string",
+						"outputFormat":    "float",
+						"outputPrecision": "3",
+						"labelTemplate":   "lblT",
+						"urlTemplate":     "urlT",
+					},
+				},
+			},
 		},
 	}
 	for idx, test := range tests {

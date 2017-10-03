@@ -113,13 +113,13 @@ func transformField(f common.Field) (common.MapStr, common.MapStr) {
 
 		if f.Format != "" {
 			format["id"] = f.Format
-			if f.InputFormat != "" {
-				format["params"] = common.MapStr{"inputFormat": f.InputFormat}
-			}
+			addFormatParam(&format, "inputFormat", f.InputFormat)
+			addFormatParam(&format, "outputFormat", f.OutputFormat)
+			addFormatParam(&format, "outputPrecision", f.OutputPrecision)
+			addFormatParam(&format, "labelTemplate", f.LabelTemplate)
+			addFormatParam(&format, "urlTemplate", f.UrlTemplate)
 		}
-		if f.Pattern != "" {
-			format["params"] = common.MapStr{"pattern": f.Pattern}
-		}
+		addFormatParam(&format, "pattern", f.Pattern)
 	}
 
 	return field, format
@@ -150,6 +150,16 @@ func getVal(valP *bool, def bool) bool {
 		return *valP
 	}
 	return def
+}
+
+func addFormatParam(f *common.MapStr, key string, val string) {
+	if val == "" {
+		return
+	}
+	if (*f)["params"] == nil {
+		(*f)["params"] = common.MapStr{}
+	}
+	(*f)["params"].(common.MapStr)[key] = val
 }
 
 var (
