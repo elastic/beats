@@ -569,7 +569,7 @@ func (p *Prospector) isCleanInactive(state file.State) bool {
 
 // createHarvester creates a new harvester instance from the given state
 func (p *Prospector) createHarvester(state file.State) (*Harvester, error) {
-	// Each wraps the outlet, for closing the outlet individualy
+	// Each wraps the outlet, for closing the outlet individually
 	outlet := channel.SubOutlet(p.outlet)
 	h, err := NewHarvester(
 		p.cfg,

@@ -33,14 +33,14 @@ type BeatsRootCmd struct {
 }
 
 // GenRootCmd returns the root command to use for your beat. It takes
-// beat name as paramter, and also run command, which will be called if no args are
+// beat name as parameter, and also run command, which will be called if no args are
 // given (for backwards compatibility)
 func GenRootCmd(name, version string, beatCreator beat.Creator) *BeatsRootCmd {
 	return GenRootCmdWithRunFlags(name, version, beatCreator, nil)
 }
 
 // GenRootCmdWithRunFlags returns the root command to use for your beat. It takes
-// beat name as paramter, and also run command, which will be called if no args are
+// beat name as parameter, and also run command, which will be called if no args are
 // given (for backwards compatibility). runFlags parameter must the flagset used by
 // run command
 func GenRootCmdWithRunFlags(name, version string, beatCreator beat.Creator, runFlags *pflag.FlagSet) *BeatsRootCmd {
@@ -61,7 +61,7 @@ func GenRootCmdWithIndexPrefixWithRunFlags(name, indexPrefix, version string, be
 	// Root command is an alias for run
 	rootCmd.Run = rootCmd.RunCmd.Run
 
-	// Persistent flags, common accross all subcommands
+	// Persistent flags, common across all subcommands
 	rootCmd.PersistentFlags().AddGoFlag(flag.CommandLine.Lookup("E"))
 	rootCmd.PersistentFlags().AddGoFlag(flag.CommandLine.Lookup("c"))
 	rootCmd.PersistentFlags().AddGoFlag(flag.CommandLine.Lookup("d"))

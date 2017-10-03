@@ -7,7 +7,7 @@
   - name: count
     type: long
     description: >
-      Count field records the number of times the particular event has occured
+      Count field records the number of times the particular event has occurred
     fields:
     - name: timestamp
       type: group
