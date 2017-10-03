@@ -59,7 +59,7 @@ func (c *consumer) Get(sz int) (queue.Batch, error) {
 		return nil, io.EOF
 	}
 
-	// if request has been send, we do have to wait for a reponse
+	// if request has been send, we do have to wait for a response
 	resp := <-c.resp
 
 	ack := resp.ack

@@ -533,7 +533,7 @@ spooler size.
 
 ===== `slow_start`
 
-If enabled only a subset of events in a batch of events is transfered per transaction.
+If enabled only a subset of events in a batch of events is transferred per transaction.
 The number of events to be sent increases up to `bulk_max_size` if no error is encountered.
 On error the number of events per transaction is reduced again.
 
@@ -1067,7 +1067,7 @@ setting does not affect how events are published.
 Setting `bulk_max_size` to 0 disables buffering in libbeat.
 
 [[configuration-output-codec]]
-=== Configure the ouput codec
+=== Configure the output codec
 
 ++++
 <titleabbrev>Output codec</titleabbrev>

@@ -32,7 +32,7 @@ func Register(name string, factory Factory) error {
 	}
 
 	registry[name] = factory
-	logp.Info("Succesfully registered prospector")
+	logp.Info("Successfully registered prospector")
 
 	return nil
 }

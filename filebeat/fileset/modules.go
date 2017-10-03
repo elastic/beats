@@ -443,7 +443,7 @@ func interpretError(initialErr error, body []byte) error {
 	return fmt.Errorf("couldn't load pipeline: %v. Response body: %s", initialErr, body)
 }
 
-// LoadML loads the machine-learning configurations into Elasticsearch, if Xpack is avaiable
+// LoadML loads the machine-learning configurations into Elasticsearch, if Xpack is available
 func (reg *ModuleRegistry) LoadML(esClient PipelineLoader) error {
 	haveXpack, err := mlimporter.HaveXpackML(esClient)
 	if err != nil {

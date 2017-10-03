@@ -72,7 +72,8 @@ check: python-env
 .PHONY: misspell
 misspell:
 	go get github.com/client9/misspell
-	$(FIND) -name '*' -exec misspell -w {} \;
+	# Ignore Kibana files (.json)
+	$(FIND) -not -path "*.json" -name '*' -exec misspell -w {} \;
 
 .PHONY: fmt
 fmt: python-env
