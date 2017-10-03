@@ -161,34 +161,30 @@ func TestTransformMisc(t *testing.T) {
 		attr        string
 	}{
 		{commonField: common.Field{}, expected: 0, attr: "count"},
+		{commonField: common.Field{Count: 4}, expected: 4, attr: "count"},
 
-		// searchable always set to true except for meta fields
+		// searchable
 		{commonField: common.Field{}, expected: true, attr: "searchable"},
 		{commonField: common.Field{Searchable: &truthy}, expected: true, attr: "searchable"},
-		{commonField: common.Field{Searchable: &falsy}, expected: true, attr: "searchable"},
+		{commonField: common.Field{Searchable: &falsy}, expected: false, attr: "searchable"},
 
-		// aggregatable always set to true except for meta fields or type text
+		// aggregatable
 		{commonField: common.Field{}, expected: true, attr: "aggregatable"},
 		{commonField: common.Field{Aggregatable: &truthy}, expected: true, attr: "aggregatable"},
-		{commonField: common.Field{Aggregatable: &falsy}, expected: true, attr: "aggregatable"},
+		{commonField: common.Field{Aggregatable: &falsy}, expected: false, attr: "aggregatable"},
 		{commonField: common.Field{Type: "keyword"}, expected: true, attr: "aggregatable"},
 		{commonField: common.Field{Aggregatable: &truthy, Type: "text"}, expected: false, attr: "aggregatable"},
 		{commonField: common.Field{Type: "text"}, expected: false, attr: "aggregatable"},
 
-		// analyzed always set to false except for meta fields
+		// analyzed
 		{commonField: common.Field{}, expected: false, attr: "analyzed"},
-		{commonField: common.Field{Analyzed: &truthy}, expected: false, attr: "analyzed"},
+		{commonField: common.Field{Analyzed: &truthy}, expected: true, attr: "analyzed"},
 		{commonField: common.Field{Analyzed: &falsy}, expected: false, attr: "analyzed"},
-
-		// indexed always set to true except for meta fields
-		{commonField: common.Field{}, expected: true, attr: "indexed"},
-		{commonField: common.Field{Index: &truthy}, expected: true, attr: "indexed"},
-		{commonField: common.Field{Index: &falsy}, expected: true, attr: "indexed"},
 
 		// doc_values always set to true except for meta fields
 		{commonField: common.Field{}, expected: true, attr: "doc_values"},
 		{commonField: common.Field{DocValues: &truthy}, expected: true, attr: "doc_values"},
-		{commonField: common.Field{DocValues: &falsy}, expected: true, attr: "doc_values"},
+		{commonField: common.Field{DocValues: &falsy}, expected: false, attr: "doc_values"},
 
 		// scripted always set to false
 		{commonField: common.Field{}, expected: false, attr: "scripted"},

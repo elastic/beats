@@ -63,16 +63,7 @@ func (t *Transformer) transformFields(commonFields common.Fields, path string) {
 				t.transformFields(f.Fields, f.Path)
 			}
 		} else {
-			// set default values (as done in python script)
 			t.keys[f.Path] = true
-
-			truthy := true
-			falsy := false
-			f.Index = &truthy
-			f.Analyzed = &falsy
-			f.DocValues = &truthy
-			f.Searchable = &truthy
-			f.Aggregatable = &truthy
 			t.add(f)
 
 			if f.MultiFields != nil {
@@ -99,7 +90,7 @@ func (t *Transformer) add(f common.Field) {
 func transformField(f common.Field) (common.MapStr, common.MapStr) {
 	field := common.MapStr{
 		"name":         f.Path,
-		"count":        0,
+		"count":        f.Count,
 		"scripted":     false,
 		"indexed":      getVal(f.Index, true),
 		"analyzed":     getVal(f.Analyzed, false),
@@ -132,6 +123,26 @@ func transformField(f common.Field) (common.MapStr, common.MapStr) {
 	}
 
 	return field, format
+}
+
+func setVal(f common.MapStr, attr string, p *bool, def bool) {
+	if p != nil {
+		f[attr] = *p
+	}
+	if f[attr] == nil {
+		f[attr] = def
+	}
+}
+
+func setAggregatable(f common.MapStr, c common.Field) {
+	attr := "aggregatable"
+	if c.Aggregatable != nil {
+		f[attr] = *c.Aggregatable
+	} else if c.Type == "text" {
+		f[attr] = false
+	} else if f[attr] == nil {
+		f[attr] = true
+	}
 }
 
 func getVal(valP *bool, def bool) bool {
