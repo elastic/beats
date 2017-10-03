@@ -185,9 +185,18 @@ func TestTransformMisc(t *testing.T) {
 		{commonField: common.Field{}, expected: true, attr: "doc_values"},
 		{commonField: common.Field{DocValues: &truthy}, expected: true, attr: "doc_values"},
 		{commonField: common.Field{DocValues: &falsy}, expected: false, attr: "doc_values"},
+		{commonField: common.Field{Script: "doc[]"}, expected: false, attr: "doc_values"},
+		{commonField: common.Field{DocValues: &truthy, Script: "doc[]"}, expected: false, attr: "doc_values"},
 
-		// scripted always set to false
+		// script, scripted
 		{commonField: common.Field{}, expected: false, attr: "scripted"},
+		{commonField: common.Field{}, expected: nil, attr: "script"},
+		{commonField: common.Field{Script: "doc[]"}, expected: true, attr: "scripted"},
+		{commonField: common.Field{Script: "doc[]"}, expected: "doc[]", attr: "script"},
+
+		// language
+		{commonField: common.Field{}, expected: nil, attr: "lang"},
+		{commonField: common.Field{Script: "doc[]"}, expected: "painless", attr: "lang"},
 	}
 	for idx, test := range tests {
 		trans := NewTransformer("", "", common.Fields{test.commonField})

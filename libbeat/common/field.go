@@ -34,10 +34,11 @@ type Field struct {
 	DocValues      *bool       `config:"doc_values"`
 
 	// Kibana specific
-	Analyzed     *bool `config:"analyzed"`
-	Count        int   `config:"count"`
-	Searchable   *bool `config:"searchable"`
-	Aggregatable *bool `config:"aggregatable"`
+	Analyzed     *bool  `config:"analyzed"`
+	Count        int    `config:"count"`
+	Searchable   *bool  `config:"searchable"`
+	Aggregatable *bool  `config:"aggregatable"`
+	Script       string `config:"script"`
 	// Kibana field format specific
 	Pattern         string `config:"pattern"`
 	InputFormat     string `config:"input_format"`
