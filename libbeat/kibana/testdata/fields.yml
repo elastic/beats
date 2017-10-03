@@ -5,6 +5,13 @@
     Contains common beat fields available in all event types.
   fields:
 
+    - name: group_disabled
+      type: group
+      enabled: false
+      fields:
+        - name: message
+          type: text
+
     - name: beat.name
       description: >
         The name of the Beat sending the log messages. If the Beat name is
