@@ -30,6 +30,8 @@ https://github.com/elastic/beats/compare/v6.0.0-rc1...master[Check the HEAD diff
 
 *Affecting all Beats*
 
+- Fix data race accessing watched containers. {issue}5147[5147]
+
 *Auditbeat*
 
 *Filebeat*
