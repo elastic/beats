@@ -207,6 +207,7 @@ func TestTransformMisc(t *testing.T) {
 }
 
 func TestTransformFieldFormatMap(t *testing.T) {
+	precision := 3
 	tests := []struct {
 		commonField common.Field
 		expected    common.MapStr
@@ -289,7 +290,7 @@ func TestTransformFieldFormatMap(t *testing.T) {
 				Pattern:         "[^-]",
 				InputFormat:     "string",
 				OutputFormat:    "float",
-				OutputPrecision: "3",
+				OutputPrecision: &precision,
 				LabelTemplate:   "lblT",
 				UrlTemplate:     "urlT",
 			},
@@ -300,7 +301,7 @@ func TestTransformFieldFormatMap(t *testing.T) {
 						"pattern":         "[^-]",
 						"inputFormat":     "string",
 						"outputFormat":    "float",
-						"outputPrecision": "3",
+						"outputPrecision": 3,
 						"labelTemplate":   "lblT",
 						"urlTemplate":     "urlT",
 					},
