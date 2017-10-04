@@ -11,7 +11,6 @@ import (
 
 	"github.com/elastic/beats/libbeat/beat"
 	"github.com/elastic/beats/libbeat/common"
-	"github.com/elastic/beats/libbeat/common/droppriv"
 	"github.com/elastic/beats/libbeat/logp"
 	"github.com/elastic/beats/libbeat/processors"
 	"github.com/elastic/beats/libbeat/service"
@@ -176,11 +175,6 @@ func (pb *packetbeat) Run(b *beat.Beat) error {
 			logp.Debug("main", "Streams and transactions should all be expired now.")
 		}
 	}()
-
-	// This needs to be after the sniffer Init but before the sniffer Run.
-	if err := droppriv.DropPrivileges(pb.config.RunOptions); err != nil {
-		return err
-	}
 
 	defer pb.transPub.Stop()
 	if pb.flows != nil {
