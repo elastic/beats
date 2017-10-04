@@ -43,7 +43,7 @@ type Field struct {
 	Pattern         string `config:"pattern"`
 	InputFormat     string `config:"input_format"`
 	OutputFormat    string `config:"output_format"`
-	OutputPrecision string `config:"output_precision"`
+	OutputPrecision *int   `config:"output_precision"`
 	LabelTemplate   string `config:"label_template"`
 	UrlTemplate     string `config:"url_template"`
 

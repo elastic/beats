@@ -172,7 +172,7 @@ func testGenerate(t *testing.T, beatDir string, tests []map[string]string) {
 		for _, e := range fieldsExisting {
 			idx := find(fieldsCreated, e["name"].(string))
 			assert.NotEqual(t, -1, idx)
-			assert.Equal(t, fieldsCreated[idx], e)
+			assert.Equal(t, e, fieldsCreated[idx])
 		}
 	}
 }
