@@ -26,7 +26,7 @@ supported right now.  By default no flush interval is configured. All events
 published to this queue will be directly consumed by the outputs.
 The output's `bulk_max_size` setting limits the number of events being processed at once.
 
-The memory queue is waiting for the output to acknowledge or drop an events. If
+The memory queue waits for the output to acknowledge or drop events. If
 the queue is full, no new events can be inserted into the memeory queue. Only
 after the signal from the output will the queue free up space for more events to be accepted.
 
