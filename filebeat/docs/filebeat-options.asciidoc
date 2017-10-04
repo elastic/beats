@@ -396,6 +396,9 @@ json.add_error_key: true
 json.message_key: log
 -------------------------------------------------------------------------------------
 
+You must specify at least one of the following settings to enable JSON parsing
+mode:
+
 *`keys_under_root`*:: By default, the decoded JSON is placed under a "json" key in the output document.
 If you enable this setting, the keys are copied top level in the output document. The default is false.
 
