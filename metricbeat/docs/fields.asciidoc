@@ -2469,24 +2469,6 @@ node
 
 
 [float]
-=== `elasticsearch.node.jvm.memory.heap_init.bytes`
-
-type: long
-
-format: bytes
-
-Heap init used by the JVM in bytes.
-
-
-[float]
-=== `elasticsearch.node.jvm.version`
-
-type: keyword
-
-JVM version.
-
-
-[float]
 === `elasticsearch.node.name`
 
 type: keyword
@@ -2500,6 +2482,69 @@ Node name.
 type: keyword
 
 Node version.
+
+
+[float]
+== jvm fields
+
+JVM Info.
+
+
+
+[float]
+=== `elasticsearch.node.jvm.version`
+
+type: keyword
+
+JVM version.
+
+
+[float]
+=== `elasticsearch.node.jvm.memory.heap.init.bytes`
+
+type: long
+
+format: bytes
+
+Heap init used by the JVM in bytes.
+
+
+[float]
+=== `elasticsearch.node.jvm.memory.heap.max.bytes`
+
+type: long
+
+format: bytes
+
+Heap max used by the JVM in bytes.
+
+
+[float]
+=== `elasticsearch.node.jvm.memory.nonheap.init.bytes`
+
+type: long
+
+format: bytes
+
+Non-Heap init used by the JVM in bytes.
+
+
+[float]
+=== `elasticsearch.node.jvm.memory.nonheap.max.bytes`
+
+type: long
+
+format: bytes
+
+Non-Heap max used by the JVM in bytes.
+
+
+[float]
+=== `elasticsearch.node.process.mlockall`
+
+type: bool
+
+If process locked in memory.
 
 
 [float]

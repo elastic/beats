@@ -22,6 +22,9 @@ https://github.com/elastic/beats/compare/v6.0.0-beta2...master[Check the HEAD di
 
 *Metricbeat*
 
+- Rename `heap_init` field to `heap.init`. {pull}5320[5320]
+
+
 *Packetbeat*
 
 - Remove not-working `runoptions.uid` and `runoptions.gid` options in Packetbeat. {pull}5261[5261]
