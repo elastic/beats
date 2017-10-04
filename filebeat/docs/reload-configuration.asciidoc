@@ -2,13 +2,12 @@
 == Load external configuration files
 
 Filebeat can load external configuration files for prospectors and modules,
-which allows you to separate your configuration in multiple smaller
-configuration files. To use this functionality, use the `path` option from the
-`filebeat.config.prospectors` (for prospector configs) or
-`filebeat.config.modules` (for module configs) settings.
+which allows you to separate your configuration into multiple smaller
+configuration files. See the <<load-prospector-config>> and the
+<<load-module-config>> sections for details.
 
 [float]
-[[reload-prospector-config]]
+[[load-prospector-config]]
 === Prospector config
 
 For prospector configurations, you specify `path` option in the
@@ -44,7 +43,7 @@ file paths defined. If more than one prospector harvests the same file at the
 same time, it can lead to unexpected behaviour.
 
 [float]
-[[reload-module-config]]
+[[load-module-config]]
 === Module config
 
 For module configurations, you specify the `path` option in the
