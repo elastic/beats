@@ -56,6 +56,15 @@ func (v *Version) IsMajor(major int) bool {
 	return major == v.Major
 }
 
+// Equal returns true if v is exactly the same as v1.
+// The meta part is not taken into account.
+func (v *Version) Equal(v1 *Version) bool {
+	if v.Major == v1.Major && v.Minor == v1.Minor && v.Bugfix == v1.Bugfix {
+		return true
+	}
+	return false
+}
+
 // LessThan returns true if v is strictly smaller than v1. When comparing, the major,
 // minor and bugfix numbers are compared in order. The meta part is not taken into account.
 func (v *Version) LessThan(v1 *Version) bool {

@@ -40,13 +40,63 @@ func NewGenerator(indexName, beatName, beatDir, version string) (*IndexPatternGe
 
 // Create the Index-Pattern for Kibana for 5.x and default.
 func (i *IndexPatternGenerator) Generate() ([]string, error) {
-	var indices []string
-
 	commonFields, err := common.LoadFieldsYaml(i.fieldsYaml)
 	if err != nil {
 		return nil, err
 	}
-	transformer := NewTransformer("@timestamp", i.indexName, commonFields)
+
+	index5xPath, err := i.generate5x(commonFields)
+	if err != nil {
+		return nil, err
+	}
+
+	index6xPath, err := i.generate6x(commonFields)
+	if err != nil {
+		return nil, err
+	}
+
+	return []string{index5xPath, index6xPath}, nil
+}
+
+func (i *IndexPatternGenerator) generate5x(fields common.Fields) (string, error) {
+	version, _ := common.NewVersion("5.0.0")
+	transformed, err := generate(i.indexName, version, fields)
+	if err != nil {
+		return "", err
+	}
+
+	file5x := filepath.Join(i.targetDir5x, i.targetFilename)
+	err = dumpToFile(file5x, transformed)
+	return file5x, err
+}
+
+func (i *IndexPatternGenerator) generate6x(fields common.Fields) (string, error) {
+	version, _ := common.NewVersion("6.0.0")
+	transformed, err := generate(i.indexName, version, fields)
+	if err != nil {
+		return "", err
+	}
+	out := common.MapStr{
+		"version": i.version,
+		"objects": []common.MapStr{
+			common.MapStr{
+				"type":       "index-pattern",
+				"id":         i.indexName,
+				"version":    1,
+				"attributes": transformed,
+			},
+		},
+	}
+	file6x := filepath.Join(i.targetDirDefault, i.targetFilename)
+	err = dumpToFile(file6x, out)
+	return file6x, err
+}
+
+func generate(indexName string, version *common.Version, f common.Fields) (common.MapStr, error) {
+	transformer, err := NewTransformer("@timestamp", indexName, version, f)
+	if err != nil {
+		return nil, err
+	}
 	transformed := transformer.TransformFields()
 
 	fieldsBytes, err := json.Marshal(transformed["fields"])
@@ -60,33 +110,7 @@ func (i *IndexPatternGenerator) Generate() ([]string, error) {
 		return nil, err
 	}
 	transformed["fieldFormatMap"] = string(fieldFormatBytes)
-
-	file5x := filepath.Join(i.targetDir5x, i.targetFilename)
-	err = dumpToFile(file5x, transformed)
-	if err != nil {
-		return nil, err
-	}
-	indices = append(indices, file5x)
-
-	out := common.MapStr{
-		"version": i.version,
-		"objects": []common.MapStr{
-			common.MapStr{
-				"type":       "index-pattern",
-				"id":         i.indexName,
-				"version":    1,
-				"attributes": transformed,
-			},
-		},
-	}
-
-	fileDefault := filepath.Join(i.targetDirDefault, i.targetFilename)
-	err = dumpToFile(fileDefault, out)
-	if err != nil {
-		return indices, err
-	}
-	indices = append(indices, fileDefault)
-	return indices, nil
+	return transformed, nil
 }
 
 func clean(name string) string {

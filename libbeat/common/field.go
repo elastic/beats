@@ -39,15 +39,20 @@ type Field struct {
 	Searchable   *bool  `config:"searchable"`
 	Aggregatable *bool  `config:"aggregatable"`
 	Script       string `config:"script"`
-	// Kibana field format specific
-	Pattern         string `config:"pattern"`
-	InputFormat     string `config:"input_format"`
-	OutputFormat    string `config:"output_format"`
-	OutputPrecision *int   `config:"output_precision"`
-	LabelTemplate   string `config:"label_template"`
-	UrlTemplate     string `config:"url_template"`
+	//Kibana params
+	Pattern         string              `config:"pattern"`
+	InputFormat     string              `config:"input_format"`
+	OutputFormat    string              `config:"output_format"`
+	OutputPrecision *int                `config:"output_precision"`
+	LabelTemplate   string              `config:"label_template"`
+	UrlTemplate     []VersionizedString `config:"url_template"`
 
 	Path string
+}
+
+type VersionizedString struct {
+	MinVersion string `config:"min_version"`
+	Value      string `config:"value"`
 }
 
 type DynamicType struct{ Value interface{} }

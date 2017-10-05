@@ -13,10 +13,11 @@ var (
 	truthy     = true
 	falsy      = false
 	ctMetaData = 4
+	version, _ = common.NewVersion("6.0.0")
 )
 
 func TestEmpty(t *testing.T) {
-	trans := NewTransformer("name", "title", common.Fields{})
+	trans, _ := NewTransformer("name", "title", version, common.Fields{})
 	out := trans.TransformFields()
 	expected := common.MapStr{
 		"timeFieldName":  "name",
@@ -72,12 +73,18 @@ func TestEmpty(t *testing.T) {
 	assert.Equal(t, expected, out)
 }
 
+func TestMissingVersion(t *testing.T) {
+	var c *common.Version
+	_, err := NewTransformer("name", "title", c, common.Fields{})
+	assert.Error(t, err)
+}
+
 func TestErrors(t *testing.T) {
 	commonFields := common.Fields{
 		common.Field{Name: "context", Path: "something"},
 		common.Field{Name: "context", Path: "something", Type: "keyword"},
 	}
-	trans := NewTransformer("name", "title", commonFields)
+	trans, _ := NewTransformer("name", "title", version, commonFields)
 	assert.Panics(t, func() { trans.TransformFields() })
 }
 
@@ -102,7 +109,7 @@ func TestTransformTypes(t *testing.T) {
 		{commonField: common.Field{Type: "invalid"}, expected: nil},
 	}
 	for idx, test := range tests {
-		trans := NewTransformer("name", "title", common.Fields{test.commonField})
+		trans, _ := NewTransformer("name", "title", version, common.Fields{test.commonField})
 		out := trans.TransformFields()["fields"].([]common.MapStr)[0]
 		assert.Equal(t, test.expected, out["type"], fmt.Sprintf("Failed for idx %v", idx))
 	}
@@ -145,7 +152,7 @@ func TestTransformGroup(t *testing.T) {
 		},
 	}
 	for idx, test := range tests {
-		trans := NewTransformer("name", "title", test.commonFields)
+		trans, _ := NewTransformer("name", "title", version, test.commonFields)
 		out := trans.TransformFields()["fields"].([]common.MapStr)
 		assert.Equal(t, len(test.expected)+ctMetaData, len(out))
 		for i, e := range test.expected {
@@ -199,7 +206,7 @@ func TestTransformMisc(t *testing.T) {
 		{commonField: common.Field{Script: "doc[]"}, expected: "painless", attr: "lang"},
 	}
 	for idx, test := range tests {
-		trans := NewTransformer("", "", common.Fields{test.commonField})
+		trans, _ := NewTransformer("", "", version, common.Fields{test.commonField})
 		out := trans.TransformFields()["fields"].([]common.MapStr)[0]
 		msg := fmt.Sprintf("(%v): expected '%s' to be <%v> but was <%v>", idx, test.attr, test.expected, out[test.attr])
 		assert.Equal(t, test.expected, out[test.attr], msg)
@@ -208,28 +215,27 @@ func TestTransformMisc(t *testing.T) {
 
 func TestTransformFieldFormatMap(t *testing.T) {
 	precision := 3
+	version620, _ := common.NewVersion("6.2.0")
+
 	tests := []struct {
 		commonField common.Field
+		version     *common.Version
 		expected    common.MapStr
 	}{
 		{
 			commonField: common.Field{Name: "c"},
 			expected:    common.MapStr{},
+			version:     version,
 		},
 		{
 			commonField: common.Field{Name: "c", Format: "url"},
 			expected:    common.MapStr{"c": common.MapStr{"id": "url"}},
+			version:     version,
 		},
 		{
-			commonField: common.Field{
-				Name:    "c",
-				Pattern: "p",
-			},
-			expected: common.MapStr{
-				"c": common.MapStr{
-					"params": common.MapStr{"pattern": "p"},
-				},
-			},
+			commonField: common.Field{Name: "c", Pattern: "p"},
+			expected:    common.MapStr{"c": common.MapStr{"params": common.MapStr{"pattern": "p"}}},
+			version:     version,
 		},
 		{
 			commonField: common.Field{
@@ -243,6 +249,7 @@ func TestTransformFieldFormatMap(t *testing.T) {
 					"params": common.MapStr{"pattern": "p"},
 				},
 			},
+			version: version,
 		},
 		{
 			commonField: common.Field{
@@ -258,6 +265,7 @@ func TestTransformFieldFormatMap(t *testing.T) {
 					},
 				},
 			},
+			version: version,
 		},
 		{
 			commonField: common.Field{
@@ -275,6 +283,7 @@ func TestTransformFieldFormatMap(t *testing.T) {
 					},
 				},
 			},
+			version: version,
 		},
 		{
 			commonField: common.Field{
@@ -282,8 +291,10 @@ func TestTransformFieldFormatMap(t *testing.T) {
 				InputFormat: "string",
 			},
 			expected: common.MapStr{},
+			version:  version,
 		},
 		{
+			version: version620,
 			commonField: common.Field{
 				Name:            "c",
 				Format:          "url",
@@ -292,7 +303,10 @@ func TestTransformFieldFormatMap(t *testing.T) {
 				OutputFormat:    "float",
 				OutputPrecision: &precision,
 				LabelTemplate:   "lblT",
-				UrlTemplate:     "urlT",
+				UrlTemplate: []common.VersionizedString{
+					{MinVersion: "5.0.0", Value: "5x.urlTemplate"},
+					{MinVersion: "6.0.0", Value: "6x.urlTemplate"},
+				},
 			},
 			expected: common.MapStr{
 				"c": common.MapStr{
@@ -303,14 +317,84 @@ func TestTransformFieldFormatMap(t *testing.T) {
 						"outputFormat":    "float",
 						"outputPrecision": 3,
 						"labelTemplate":   "lblT",
-						"urlTemplate":     "urlT",
+						"urlTemplate":     "6x.urlTemplate",
+					},
+				},
+			},
+		},
+		{
+			version: version620,
+			commonField: common.Field{
+				Name:   "c",
+				Format: "url",
+				UrlTemplate: []common.VersionizedString{
+					{MinVersion: "6.4.0", Value: "6x.urlTemplate"},
+				},
+			},
+			expected: common.MapStr{
+				"c": common.MapStr{"id": "url"},
+			},
+		},
+		{
+			version: version620,
+			commonField: common.Field{
+				Name:   "c",
+				Format: "url",
+				UrlTemplate: []common.VersionizedString{
+					{MinVersion: "4.7.2", Value: "4x.urlTemplate"},
+					{MinVersion: "6.5.1", Value: "6x.urlTemplate"},
+				},
+			},
+			expected: common.MapStr{
+				"c": common.MapStr{
+					"id": "url",
+					"params": common.MapStr{
+						"urlTemplate": "4x.urlTemplate",
+					},
+				},
+			},
+		},
+		{
+			version: version620,
+			commonField: common.Field{
+				Name:   "c",
+				Format: "url",
+				UrlTemplate: []common.VersionizedString{
+					{MinVersion: "6.2.0", Value: "6.2.0.urlTemplate"},
+					{MinVersion: "6.2.7", Value: "6.2.7.urlTemplate"},
+				},
+			},
+			expected: common.MapStr{
+				"c": common.MapStr{
+					"id": "url",
+					"params": common.MapStr{
+						"urlTemplate": "6.2.0.urlTemplate",
+					},
+				},
+			},
+		},
+		{
+			version: version620,
+			commonField: common.Field{
+				Name:   "c",
+				Format: "url",
+				UrlTemplate: []common.VersionizedString{
+					{MinVersion: "4.1.0", Value: "4x.urlTemplate"},
+					{MinVersion: "5.2.0", Value: "5x.urlTemplate"},
+				},
+			},
+			expected: common.MapStr{
+				"c": common.MapStr{
+					"id": "url",
+					"params": common.MapStr{
+						"urlTemplate": "5x.urlTemplate",
 					},
 				},
 			},
 		},
 	}
 	for idx, test := range tests {
-		trans := NewTransformer("", "", common.Fields{test.commonField})
+		trans, _ := NewTransformer("", "", test.version, common.Fields{test.commonField})
 		out := trans.TransformFields()["fieldFormatMap"]
 		assert.Equal(t, test.expected, out, fmt.Sprintf("Failed for idx %v", idx))
 	}
@@ -376,7 +460,7 @@ func TestTransformGroupAndEnabled(t *testing.T) {
 		},
 	}
 	for idx, test := range tests {
-		trans := NewTransformer("name", "title", test.commonFields)
+		trans, _ := NewTransformer("name", "title", version, test.commonFields)
 		out := trans.TransformFields()["fields"].([]common.MapStr)
 		assert.Equal(t, len(test.expected)+ctMetaData, len(out))
 		for i, e := range test.expected {
@@ -394,7 +478,7 @@ func TestTransformMultiField(t *testing.T) {
 			common.Field{Name: "text", Type: "text"},
 		},
 	}
-	trans := NewTransformer("name", "title", common.Fields{f})
+	trans, _ := NewTransformer("name", "title", version, common.Fields{f})
 	out := trans.TransformFields()["fields"].([]common.MapStr)
 	assert.Equal(t, "context", out[0]["name"])
 	assert.Equal(t, "context.keyword", out[1]["name"])

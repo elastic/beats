@@ -13,18 +13,23 @@ type Transformer struct {
 	transformedFieldFormatMap common.MapStr
 	timeFieldName             string
 	title                     string
+	version                   *common.Version
 	keys                      common.MapStr
 }
 
-func NewTransformer(timeFieldName, title string, fields common.Fields) *Transformer {
+func NewTransformer(timeFieldName, title string, version *common.Version, fields common.Fields) (*Transformer, error) {
+	if version == nil {
+		return nil, errors.New("Version must be given")
+	}
 	return &Transformer{
-		fields:                    fields,
 		timeFieldName:             timeFieldName,
 		title:                     title,
+		fields:                    fields,
+		version:                   version,
 		transformedFields:         []common.MapStr{},
 		transformedFieldFormatMap: common.MapStr{},
 		keys: common.MapStr{},
-	}
+	}, nil
 }
 
 func (t *Transformer) TransformFields() common.MapStr {
@@ -79,7 +84,7 @@ func (t *Transformer) transformFields(commonFields common.Fields, path string) {
 }
 
 func (t *Transformer) add(f common.Field) {
-	field, fieldFormat := transformField(f)
+	field, fieldFormat := transformField(t.version, f)
 	t.transformedFields = append(t.transformedFields, field)
 	if fieldFormat != nil {
 		t.transformedFieldFormatMap[field["name"].(string)] = fieldFormat
@@ -87,7 +92,7 @@ func (t *Transformer) add(f common.Field) {
 
 }
 
-func transformField(f common.Field) (common.MapStr, common.MapStr) {
+func transformField(version *common.Version, f common.Field) (common.MapStr, common.MapStr) {
 	field := common.MapStr{
 		"name":         f.Path,
 		"count":        f.Count,
@@ -120,36 +125,11 @@ func transformField(f common.Field) (common.MapStr, common.MapStr) {
 
 		if f.Format != "" {
 			format["id"] = f.Format
-			addStringFormatParam(&format, "inputFormat", f.InputFormat)
-			addStringFormatParam(&format, "outputFormat", f.OutputFormat)
-			addIntPFormatParam(&format, "outputPrecision", f.OutputPrecision)
-			addStringFormatParam(&format, "labelTemplate", f.LabelTemplate)
-			addStringFormatParam(&format, "urlTemplate", f.UrlTemplate)
 		}
-		addStringFormatParam(&format, "pattern", f.Pattern)
+		addParams(&format, version, f)
 	}
 
 	return field, format
-}
-
-func setVal(f common.MapStr, attr string, p *bool, def bool) {
-	if p != nil {
-		f[attr] = *p
-	}
-	if f[attr] == nil {
-		f[attr] = def
-	}
-}
-
-func setAggregatable(f common.MapStr, c common.Field) {
-	attr := "aggregatable"
-	if c.Aggregatable != nil {
-		f[attr] = *c.Aggregatable
-	} else if c.Type == "text" {
-		f[attr] = false
-	} else if f[attr] == nil {
-		f[attr] = true
-	}
 }
 
 func getVal(valP *bool, def bool) bool {
@@ -159,24 +139,60 @@ func getVal(valP *bool, def bool) bool {
 	return def
 }
 
-func addStringFormatParam(f *common.MapStr, key string, val string) {
-	if val == "" {
-		return
-	}
-	if (*f)["params"] == nil {
-		(*f)["params"] = common.MapStr{}
-	}
-	(*f)["params"].(common.MapStr)[key] = val
+func addParams(format *common.MapStr, version *common.Version, f common.Field) {
+	addFormatParam(format, "pattern", f.Pattern)
+	addFormatParam(format, "inputFormat", f.InputFormat)
+	addFormatParam(format, "outputFormat", f.OutputFormat)
+	addFormatParam(format, "outputPrecision", f.OutputPrecision)
+	addFormatParam(format, "labelTemplate", f.LabelTemplate)
+	addVersionedFormatParam(format, version, "urlTemplate", f.UrlTemplate)
 }
 
-func addIntPFormatParam(f *common.MapStr, key string, valP *int) {
-	if valP == nil {
+func addFormatParam(f *common.MapStr, key string, val interface{}) {
+	switch val.(type) {
+	case string:
+		if v := val.(string); v != "" {
+			createParam(f)
+			(*f)["params"].(common.MapStr)[key] = v
+		}
+	case *int:
+		if v := val.(*int); v != nil {
+			createParam(f)
+			(*f)["params"].(common.MapStr)[key] = *v
+		}
+	}
+}
+
+// takes the highest version where major version <= given version
+func addVersionedFormatParam(f *common.MapStr, version *common.Version, key string, val []common.VersionizedString) {
+	if len(val) == 0 {
 		return
 	}
+	paramVer, _ := common.NewVersion("0.0.0")
+	var paramVal string
+	for _, v := range val {
+		minVer, err := common.NewVersion(v.MinVersion)
+		if err != nil {
+			continue
+		}
+		if minVer.Equal(version) {
+			addFormatParam(f, key, v.Value)
+			return
+		}
+		if minVer.LessThan(version) && paramVer.LessThan(minVer) {
+			paramVer = minVer
+			paramVal = v.Value
+		}
+	}
+	if paramVal != "" {
+		addFormatParam(f, key, paramVal)
+	}
+}
+
+func createParam(f *common.MapStr) {
 	if (*f)["params"] == nil {
 		(*f)["params"] = common.MapStr{}
 	}
-	(*f)["params"].(common.MapStr)[key] = *valP
 }
 
 var (
