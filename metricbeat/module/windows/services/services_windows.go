@@ -22,11 +22,12 @@ import (
 //sys _OpenSCManager(machineName *uint16, databaseName *uint16, desiredAcces ServiceSCMAccessRight) (handle ServiceDatabaseHandle, err error) = advapi32.OpenSCManagerW
 //sys _EnumServicesStatusEx(handle ServiceDatabaseHandle, infoLevel ServiceInfoLevel, serviceType ServiceType, serviceState ServiceEnumState, services *byte, bufSize uint32, bytesNeeded *uint32, servicesReturned *uint32, resumeHandle *uintptr, groupName *uintptr) (err error) [failretval==0] = advapi32.EnumServicesStatusExW
 //sys _OpenService(handle ServiceDatabaseHandle, serviceName *uint16, desiredAccess ServiceAccessRight) (serviceHandle ServiceHandle, err error) = advapi32.OpenServiceW
-//sys _QueryServiceConfig(serviceHandle ServiceHandle, serviceConfig *QueryServiceConfig, bufSize uint32, bytesNeeded *uint32) (err error) [failretval==0] = advapi32.QueryServiceConfigW
+//sys _QueryServiceConfig(serviceHandle ServiceHandle, serviceConfig *byte, bufSize uint32, bytesNeeded *uint32) (err error) [failretval==0] = advapi32.QueryServiceConfigW
 //sys _CloseServiceHandle(handle uintptr) (err error) = advapi32.CloseServiceHandle
 
 var (
 	sizeOfEnumServiceStatusProcess = (int)(unsafe.Sizeof(EnumServiceStatusProcess{}))
+	sizeOfQueryServiceConfig       = (int)(unsafe.Sizeof(QueryServiceConfig{}))
 )
 
 type enumServiceStatusProcess struct {
@@ -80,8 +81,6 @@ var InvalidServiceDatabaseHandle = ^ServiceDatabaseHandle(0)
 var InvalidServiceHandle = ^ServiceHandle(0)
 
 func OpenSCManager(machineName string, databaseName string, desiredAccess ServiceSCMAccessRight) (ServiceDatabaseHandle, error) {
-	var handle ServiceDatabaseHandle
-
 	var machineNamePtr *uint16
 	if machineName != "" {
 		var err error
@@ -109,8 +108,6 @@ func OpenSCManager(machineName string, databaseName string, desiredAccess Servic
 }
 
 func OpenService(handle ServiceDatabaseHandle, serviceName string, desiredAccess ServiceAccessRight) (ServiceHandle, error) {
-	var serviceHandle ServiceHandle
-
 	var serviceNamePtr *uint16
 	if serviceName != "" {
 		var err error
@@ -133,14 +130,15 @@ func getServiceStates(handle ServiceDatabaseHandle, state ServiceEnumState) ([]S
 	var bytesNeeded uint32
 	var servicesReturned uint32
 	var lastOffset uintptr
+	var services []ServiceStatus
 
 	if err := _EnumServicesStatusEx(handle, ScEnumProcessInfo, ServiceWin32, state, nil, bufSize, &bytesNeeded, &servicesReturned, nil, nil); err != nil {
 		if ServiceErrno(err.(syscall.Errno)) != SERVICE_ERROR_MORE_DATA {
-			return nil, ServiceErrno(err.(syscall.Errno))
+			return services, ServiceErrno(err.(syscall.Errno))
 		}
 		bufSize += bytesNeeded
 		servicesBuffer := make([]byte, bytesNeeded)
-		lastOffset = uintptr(len(servicesBuffer))
+		lastOffset = uintptr(len(servicesBuffer)) - 1
 
 		// This loop should not repeat more then two times
 		for {
@@ -150,7 +148,7 @@ func getServiceStates(handle ServiceDatabaseHandle, state ServiceEnumState) ([]S
 				}
 				bufSize += bytesNeeded
 			} else {
-				services := make([]ServiceStatus, servicesReturned)
+
 				displayNameBuffer := new(bytes.Buffer)
 				serviceNameBuffer := new(bytes.Buffer)
 
@@ -163,18 +161,20 @@ func getServiceStates(handle ServiceDatabaseHandle, state ServiceEnumState) ([]S
 					displayNameBuffer.Reset()
 					serviceNameBuffer.Reset()
 
-					if err := sys.UTF16ToUTF8Bytes(servicesBuffer[displayNameOffset:serviceNameOffset], displayNameBuffer); err != nil {
+					if err = sys.UTF16ToUTF8Bytes(servicesBuffer[displayNameOffset:serviceNameOffset], displayNameBuffer); err != nil {
 						return nil, err
 					}
 
-					if err := sys.UTF16ToUTF8Bytes(servicesBuffer[serviceNameOffset:lastOffset], serviceNameBuffer); err != nil {
+					if err = sys.UTF16ToUTF8Bytes(servicesBuffer[serviceNameOffset:lastOffset], serviceNameBuffer); err != nil {
 						return nil, err
 					}
 
 					lastOffset = displayNameOffset
 
-					services[i].DisplayName = displayNameBuffer.String()
-					services[i].ServiceName = serviceNameBuffer.String()
+					service := ServiceStatus{}
+
+					service.DisplayName = displayNameBuffer.String()
+					service.ServiceName = serviceNameBuffer.String()
 
 					var state string
 
@@ -183,40 +183,51 @@ func getServiceStates(handle ServiceDatabaseHandle, state ServiceEnumState) ([]S
 					} else {
 						state = "Can not define State"
 					}
-					services[i].CurrentState = state
+					service.CurrentState = state
 
 					// Get detailed information
-					var serviceHandle ServiceHandle
 					var serviceBufSize uint32
 					var serviceBytesNeeded uint32
-					var serviceQueryConfig QueryServiceConfig
 
-					if serviceHandle, err = OpenService(handle, services[i].ServiceName, ServiceQueryConfig); err != nil {
+					serviceHandle, err := OpenService(handle, service.ServiceName, ServiceQueryConfig)
+					if err != nil {
 						return nil, err
 					}
 
-					if err = _QueryServiceConfig(serviceHandle, nil, serviceBufSize, &serviceBytesNeeded); err != nil {
+					if err := _QueryServiceConfig(serviceHandle, nil, serviceBufSize, &serviceBytesNeeded); err != nil {
 						if ServiceErrno(err.(syscall.Errno)) != SERVICE_ERROR_INSUFFICIENT_BUFFER {
+							if err := CloseServiceHandle(serviceHandle); err != nil {
+								return nil, err
+							}
 							return nil, err
 						}
 						serviceBufSize += serviceBytesNeeded
+						buffer := make([]byte, serviceBufSize)
 
 						for {
-							if err = _QueryServiceConfig(serviceHandle, &serviceQueryConfig, serviceBufSize, &serviceBytesNeeded); err != nil {
+							if err := _QueryServiceConfig(serviceHandle, &buffer[0], serviceBufSize, &serviceBytesNeeded); err != nil {
 								if ServiceErrno(err.(syscall.Errno)) != SERVICE_ERROR_INSUFFICIENT_BUFFER {
+									if err := CloseServiceHandle(serviceHandle); err != nil {
+										return nil, err
+									}
 									return nil, err
 								}
 								serviceBufSize += serviceBytesNeeded
 							} else {
-								services[i].StartType = serviceStartTypes[ServiceStartType(serviceQueryConfig.DwStartType)]
-								CloseServiceHandle(serviceHandle)
+								serviceQueryConfig := (*QueryServiceConfig)(unsafe.Pointer(&buffer[0]))
+								service.StartType = serviceStartTypes[ServiceStartType(serviceQueryConfig.DwStartType)]
+								if err := CloseServiceHandle(serviceHandle); err != nil {
+									return nil, err
+								}
 								break
 							}
 						}
 					}
+
+					services = append(services, service)
 				}
 
-				return services, nil
+				return nil, nil
 			}
 		}
 	}
@@ -292,6 +303,7 @@ func (reader *ServiceReader) Read() ([]common.MapStr, error) {
 			"display_name": service.DisplayName,
 			"service_name": service.ServiceName,
 			"state":        service.CurrentState,
+			"start_type":   service.StartType,
 		}
 
 		result = append(result, ev)

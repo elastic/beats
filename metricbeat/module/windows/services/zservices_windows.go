@@ -84,7 +84,7 @@ func _OpenService(handle ServiceDatabaseHandle, serviceName *uint16, desiredAcce
 	return
 }
 
-func _QueryServiceConfig(serviceHandle ServiceHandle, serviceConfig *QueryServiceConfig, bufSize uint32, bytesNeeded *uint32) (err error) {
+func _QueryServiceConfig(serviceHandle ServiceHandle, serviceConfig *byte, bufSize uint32, bytesNeeded *uint32) (err error) {
 	r1, _, e1 := syscall.Syscall6(procQueryServiceConfigW.Addr(), 4, uintptr(serviceHandle), uintptr(unsafe.Pointer(serviceConfig)), uintptr(bufSize), uintptr(unsafe.Pointer(bytesNeeded)), 0, 0)
 	if r1 == 0 {
 		if e1 != 0 {
