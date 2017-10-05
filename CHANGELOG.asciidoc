@@ -13,8 +13,6 @@ https://github.com/elastic/beats/compare/v6.0.0-beta2...master[Check the HEAD di
 ==== Breaking changes
 
 *Affecting all Beats*
-- Fix kubernetes matcher registry lookup. {pull}5159[5159]
-- Fix data race accessing watched containers. {issue}5147[5147]
 
 *Auditbeat*
 
@@ -33,35 +31,20 @@ https://github.com/elastic/beats/compare/v6.0.0-beta2...master[Check the HEAD di
 ==== Bugfixes
 
 *Affecting all Beats*
-- Fix go plugins not loaded when beat starts {pull}4799[4799]
-- Eliminate deprecated _default_ mapping in 6.x {pull}4864[4864]
-- Register kubernetes `field_format` matcher and remove logger in `Encode` API {pull}4888[4888]
-- Add support for `initContainers` in `add_kubernetes_metadata` processor. {issue}4825[4825]
-- Fix the `/usr/bin/beatname` script to accept `-d "*"` as a parameter. {issue}5040[5040]
-- Combine `fields.yml` properties when they are defined in different sources. {issue}5075[5075]
-- Keep Docker & Kubernetes pod metadata after container dies while they are needed by processors. {pull}5084[5084]
-- Fix `fields.yml` lookup when using `export template` with a custom `path.config` param. {issue}5089[5089]
-- Remove runner creation from every reload check {pull}5141[5141]
+
+- Fix data race accessing watched containers. {issue}5147[5147]
 - Remove ID() from Runner interface {issue}5153[5153]
 
 *Auditbeat*
 
 *Filebeat*
+
 - Fix default paths for redis 4.0.1 logs on macOS {pull}5173[5173]
 
 *Heartbeat*
 
 *Metricbeat*
 
-- Support `npipe` protocol (Windows) in Docker module. {pull}4751[4751]
-- Added missing mongodb configuration file to the `modules.d` folder. {pull}4870[4870]
-- Fix wrong MySQL CRUD queries timelion visualization {pull}4857[4857]
-- Add new metrics to CPU metricsset {pull}4969[4969]
-- Fix a memory allocation issue where more memory was allocated than needed in the windows-perfmon metricset. {issue}5035[5035]
-- Don't start metricbeat if external modules config is wrong and reload is disabled {pull}5053[5053]
-- Fix kubernetes events module to be able to index time fields properly. {issue}5093[5093]
-- The MongoDB module now connects on each fetch, to avoid stopping the whole Metricbeat instance if MongoDB is not up when starting. {pull}5120[5120]
-- Fixed `cmd_set` and `cmd_get` being mixed in the Memcache module. {pull}5189[5189]
 - Change field type of http header from nested to object {pull}5258[5258]
 
 *Packetbeat*
@@ -76,28 +59,18 @@ https://github.com/elastic/beats/compare/v6.0.0-beta2...master[Check the HEAD di
 - Changed the hashbang used in the beat helper script from `/bin/bash` to `/usr/bin/env bash`. {pull}5051[5051]
 - Changed beat helper script to use `exec` when running the beat. {pull}5051[5051]
 - Fix reloader error message to only print on actual error {pull}5066[5066]
-- Enable flush timeout by default. {pull}5150[5150]
-- Add @metadata.version to events send to Logstash. {pull}5166[5166]
-- Add Collectbeat to community beats. {pull}5327[5327]
 
 *Auditbeat*
-
-- Changed the number of shards in the default configuration to 3. {issue}5095[5095]
 
 *Filebeat*
 
 - Add PostgreSQL module with slowlog support. {pull}4763[4763]
 - Add Kafka log module. {pull}4885[4885]
 - Add support for `/var/log/containers/` log path in `add_kubernetes_metadata` processor. {pull}4981[4981]
-- Don't start filebeat if external modules/prospectors config is wrong and reload is disabled {pull}5053[5053]
 - Remove error log from runnerfactory as error is returned by API. {pull}5085[5085]
-- Changed the number of shards in the default configuration to 3. {issue}5095[5095]
 - Remove error log from runnerfactory as error is returned by API. {pull}5085[5085]
-- Add `filebeat.registry_flush` setting, to delay the registry updates. {pull}5146[5146]
 
 *Heartbeat*
-
-- Changed the number of shards in the default configuration to 1. {issue}5095[5095]
 
 *Metricbeat*
 
@@ -105,23 +78,16 @@ https://github.com/elastic/beats/compare/v6.0.0-beta2...master[Check the HEAD di
 - Add http server metricset to support push metrics via http. {pull}4770[4770]
 - Make config object public for graphite and http server {pull}4820[4820]
 - Add system uptime metricset. {issue}[4848[4848]
-- Add `filesystem.ignore_types` to system module for ignoring filesystem types. {issue}4685[4685]
 - Add experimental `queue` metricset to RabbitMQ module. {pull}4788[4788]
 - Add additional php-fpm pool status kpis for Metricbeat module {pull}5287[5287]
 
 *Packetbeat*
 
-- Changed the number of shards in the default configuration to 3. {issue}5095[5095]
-
 *Winlogbeat*
-
-- Changed the number of shards in the default configuration to 3. {issue}5095[5095]
 
 ==== Deprecated
 
 *Affecting all Beats*
-
-- Fix pod name indexer to use both namespace, pod name to frame index key {pull}4775[4775]
 
 *Filebeat*
 
@@ -139,6 +105,61 @@ https://github.com/elastic/beats/compare/v6.0.0-beta2...master[Check the HEAD di
 
 
 ////////////////////////////////////////////////////////////
+
+[[release-notes-6.0.0-rc1]]
+=== Beats version 6.0.0-rc1
+https://github.com/elastic/beats/compare/v6.0.0-beta2...v6.0.0-rc1[View commits]
+
+==== Bugfixes
+
+*Affecting all Beats*
+
+- Fix the `/usr/bin/beatname` script to accept `-d "*"` as a parameter. {issue}5040[5040]
+- Combine `fields.yml` properties when they are defined in different sources. {issue}5075[5075]
+- Keep Docker & Kubernetes pod metadata after container dies while they are needed by processors. {pull}5084[5084]
+- Fix `fields.yml` lookup when using `export template` with a custom `path.config` param. {issue}5089[5089]
+- Remove runner creation from every reload check {pull}5141[5141]
+- Fix add_kubernetes_metadata matcher registry lookup. {pull}5159[5159]
+
+*Metricbeat*
+
+- Fix a memory allocation issue where more memory was allocated than needed in the windows-perfmon metricset. {issue}5035[5035]
+- Don't start metricbeat if external modules config is wrong and reload is disabled {pull}5053[5053]
+- The MongoDB module now connects on each fetch, to avoid stopping the whole Metricbeat instance if MongoDB is not up when starting. {pull}5120[5120]
+- Fix kubernetes events module to be able to index time fields properly. {issue}5093[5093]
+- Fixed `cmd_set` and `cmd_get` being mixed in the Memcache module. {pull}5189[5189]
+
+
+==== Added
+
+*Affecting all Beats*
+
+- Enable flush timeout by default. {pull}5150[5150]
+- Add @metadata.version to events send to Logstash. {pull}5166[5166]
+
+*Auditbeat*
+
+- Changed the number of shards in the default configuration to 3. {issue}5095[5095]
+- Add support for receiving audit events using a multicast socket. {issue}4850[4850]
+
+*Filebeat*
+
+- Changed the number of shards in the default configuration to 3. {issue}5095[5095]
+- Don't start filebeat if external modules/prospectors config is wrong and reload is disabled {pull}5053[5053]
+- Add `filebeat.registry_flush` setting, to delay the registry updates. {pull}5146[5146]
+
+*Heartbeat*
+
+- Changed the number of shards in the default configuration to 1. {issue}5095[5095]
+
+*Packetbeat*
+
+- Changed the number of shards in the default configuration to 3. {issue}5095[5095]
+
+*Winlogbeat*
+
+- Changed the number of shards in the default configuration to 3. {issue}5095[5095]
+
 
 [[release-notes-6.0.0-beta2]]
 === Beats version 6.0.0-beta2
@@ -164,6 +185,7 @@ https://github.com/elastic/beats/compare/v6.0.0-beta1...v6.0.0-beta2[View commit
 - Fix go plugins not loaded when beat starts {pull}4799[4799]
 - Add support for `initContainers` in `add_kubernetes_metadata` processor. {issue}4825[4825]
 - Eliminate deprecated _default_ mapping in 6.x {pull}4864[4864]
+- Fix pod name indexer to use both namespace, pod name to frame index key {pull}4775[4775]
 
 *Heartbeat*
 
@@ -196,12 +218,6 @@ https://github.com/elastic/beats/compare/v6.0.0-beta1...v6.0.0-beta2[View commit
 
 - Add `filesystem.ignore_types` to system module for ignoring filesystem types. {issue}4685[4685]
 - Add support to exclude labels from kubernetes pod metadata. {pull}4757[4757]
-
-==== Deprecated
-
-*Affecting all Beats*
-
-- Fix pod name indexer to use both namespace, pod name to frame index key {pull}4775[4775]
 
 
 [[release-notes-6.0.0-beta1]]
@@ -530,6 +546,79 @@ https://github.com/elastic/beats/compare/v5.4.0...v6.0.0-alpha1[View commits]
 
 - Prospector reloading only works properly with new files. {pull}3546[3546]
 
+[[release-notes-5.6.2]]
+=== Beats version 5.6.2
+https://github.com/elastic/beats/compare/v5.6.1...v5.6.2[View commits]
+
+No changes in this release.
+
+[[release-notes-5.6.1]]
+=== Beats version 5.6.1
+https://github.com/elastic/beats/compare/v5.6.0...v5.6.1[View commits]
+
+No changes in this release.
+
+[[release-notes-5.6.0]]
+=== Beats version 5.6.0
+https://github.com/elastic/beats/compare/v5.5.3...v5.6.0[View commits]
+
+==== Breaking changes
+
+*Affecting all Beats*
+
+- The _all.norms setting in the Elasticsearch template is no longer disabled.
+  This increases the storage size with one byte per document, but allows for a
+  better upgrade experience to 6.0. {issue}4901[4901]
+
+
+==== Bugfixes
+
+*Filebeat*
+
+- Fix issue where the `fileset.module` could have the wrong value. {issue}4761[4761]
+
+*Packetbeat*
+
+- Update flow timestamp on each packet being received. {issue}4895[4895]
+
+*Metricbeat*
+
+- Fix a debug statement that said a module wrapper had stopped when it hadn't. {pull}4264[4264]
+- Use MemAvailable value from /proc/meminfo on Linux 3.14. {pull}4316[4316]
+- Fix panic when events were dropped by filters. {issue}4327[4327]
+
+==== Added
+
+*Affecting all Beats*
+
+- Add option to the import_dashboards script to load the dashboards via Kibana API. {pull}4682[4682]
+
+*Filebeat*
+
+- Add support for loading Xpack Machine Learning configurations from the modules, and added sample configurations for the Nginx module. {pull}4506[4506] {pull}4609[4609]
+-  Add ability to parse nginx logs exposing the X-Forwarded-For header instead of the remote address. {pull}4351[4351]
+
+*Metricbeat*
+
+- Add `filesystem.ignore_types` to system module for ignoring filesystem types. {issue}4685[4685]
+
+==== Deprecated
+
+*Affecting all Beats*
+
+- Loading more than one output is deprecated and will be removed in 6.0. {pull}4907[4907]
+
+[[release-notes-5.5.3]]
+=== Beats version 5.5.3
+https://github.com/elastic/beats/compare/v5.5.2...v5.5.3[View commits]
+
+No changes in this release.
+
+[[release-notes-5.5.2]]
+=== Beats version 5.5.2
+https://github.com/elastic/beats/compare/v5.5.1...v5.5.2[View commits]
+
+No changes in this release.
 [[release-notes-5.5.1]]
 === Beats version 5.5.1
 https://github.com/elastic/beats/compare/v5.5.0...v5.5.1[View commits]
