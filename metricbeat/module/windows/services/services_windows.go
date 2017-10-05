@@ -10,10 +10,11 @@ import (
 	"unsafe"
 
 	"github.com/elastic/beats/libbeat/common"
+	gosigar "github.com/elastic/gosigar/sys/windows"
 	"github.com/pkg/errors"
+	"golang.org/x/sys/windows"
 
 	"github.com/elastic/beats/winlogbeat/sys"
-	"golang.org/x/sys/windows"
 )
 
 // Windows API calls
@@ -22,8 +23,6 @@ import (
 //sys _OpenService(handle ServiceDatabaseHandle, serviceName *uint16, desiredAccess ServiceAccessRight) (serviceHandle ServiceHandle, err error) = advapi32.OpenServiceW
 //sys _QueryServiceConfig(serviceHandle ServiceHandle, serviceConfig *byte, bufSize uint32, bytesNeeded *uint32) (err error) [failretval==0] = advapi32.QueryServiceConfigW
 //sys _CloseServiceHandle(handle uintptr) (err error) = advapi32.CloseServiceHandle
-//sys _OpenProcess(desiredAccess ProcessAccessRight, inheritHandle bool, uint32 processId) (handle ProcessHandle, err error) [failtretval==0] = OpenProcess
-//sys _GetProcessTimes(handle ProcessHandle, creationTime *ServiceFileTime, exitTime *ServiceFileTime, kernelTime *ServiceFileTime, userTime *ServiceFileTime) (err error) [failretval==0] = GetProcessTimes
 
 var (
 	sizeOfEnumServiceStatusProcess = (int)(unsafe.Sizeof(EnumServiceStatusProcess{}))
@@ -223,6 +222,41 @@ func getServiceStates(handle ServiceDatabaseHandle, state ServiceEnumState) ([]S
 								}
 								break
 							}
+						}
+					}
+
+					//Get uptime for service
+					if ServiceState(serviceTemp.ServiceStatusProcess.DwCurrentState) != ServiceStopped {
+
+						var processCreationTime syscall.Filetime
+						var processExitTime syscall.Filetime
+						var processKernelTime syscall.Filetime
+						var processUserTime syscall.Filetime
+
+						// Enable SeDebugPrivilege to opne processes
+
+						var token syscall.Token
+
+						currentProcess, err := syscall.GetCurrentProcess()
+						if err != nil {
+							return nil, err
+						}
+
+						if err := syscall.OpenProcessToken(currentProcess, syscall.TOKEN_ADJUST_PRIVILEGES, &token); err != nil {
+							return nil, err
+						}
+
+						if err := gosigar.EnableTokenPrivileges(token, gosigar.SeDebugPrivilege); err != nil {
+							return nil, err
+						}
+
+						processHandle, err := syscall.OpenProcess(uint32(ProcessAllAccess), false, serviceTemp.ServiceStatusProcess.DwProcessId)
+						if err != nil {
+							return nil, err
+						}
+
+						if err := syscall.GetProcessTimes(processHandle, &processCreationTime, &processExitTime, &processKernelTime, &processUserTime); err != nil {
+							return nil, err
 						}
 					}
 
