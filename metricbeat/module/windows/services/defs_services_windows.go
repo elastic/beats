@@ -158,6 +158,25 @@ const (
 	ServiceSystemStart ServiceStartType = C.SERVICE_SYSTEM_START
 )
 
+type ProcessAccessRight uint32
+
+const (
+	ProcessAllAccess             ProcessAccessRight = C.PROCESS_ALL_ACCESS
+	ProcessCreateProcess         ProcessAccessRight = C.PROCESS_CREATE_PROCESS
+	ProcessCreateThread          ProcessAccessRight = C.PROCESS_CREATE_THREAD
+	ProcessDupHandle             ProcessAccessRight = C.PROCESS_DUP_HANDLE
+	ProcessQueryInformation      ProcessAccessRight = C.PROCESS_QUERY_INFORMATION
+	ProcessQueryLimitInformation ProcessAccessRight = C.PROCESS_QUERY_LIMITED_INFORMATION
+	ProcessSetInformation        ProcessAccessRight = C.PROCESS_SET_INFORMATION
+	ProcessSetQuota              ProcessAccessRight = C.PROCESS_SET_QUOTA
+	ProcessSuspendResume         ProcessAccessRight = C.PROCESS_SUSPEND_RESUME
+	ProcessTerminate             ProcessAccessRight = C.PROCESS_TERMINATE
+	ProcessVmOperation           ProcessAccessRight = C.PROCESS_VM_OPERATION
+	ProcessVmRead                ProcessAccessRight = C.PROCESS_VM_READ
+	ProcessVmWrite               ProcessAccessRight = C.PROCESS_VM_WRITE
+	ProcessSynchronize           ProcessAccessRight = C.SYNCHRONIZE
+)
+
 // Contains process status information for a service.
 type ServiceStatusProcess C.SERVICE_STATUS_PROCESS
 

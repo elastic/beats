@@ -139,6 +139,25 @@ const (
 	ServiceSystemStart ServiceStartType = 0x1
 )
 
+type ProcessAccessRight uint32
+
+const (
+	ProcessAllAccess             ProcessAccessRight = 0x1f0fff
+	ProcessCreateProcess         ProcessAccessRight = 0x80
+	ProcessCreateThread          ProcessAccessRight = 0x2
+	ProcessDupHandle             ProcessAccessRight = 0x40
+	ProcessQueryInformation      ProcessAccessRight = 0x400
+	ProcessQueryLimitInformation ProcessAccessRight = 0x1000
+	ProcessSetInformation        ProcessAccessRight = 0x200
+	ProcessSetQuota              ProcessAccessRight = 0x100
+	ProcessSuspendResume         ProcessAccessRight = 0x800
+	ProcessTerminate             ProcessAccessRight = 0x1
+	ProcessVmOperation           ProcessAccessRight = 0x8
+	ProcessVmRead                ProcessAccessRight = 0x10
+	ProcessVmWrite               ProcessAccessRight = 0x20
+	ProcessSynchronize           ProcessAccessRight = 0x100000
+)
+
 type ServiceStatusProcess struct {
 	DwServiceType             uint32
 	DwCurrentState            uint32

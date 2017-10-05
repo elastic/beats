@@ -225,7 +225,7 @@ func getServiceStates(handle ServiceDatabaseHandle, state ServiceEnumState) ([]S
 					services = append(services, service)
 				}
 
-				return nil, nil
+				return services, nil
 			}
 		}
 	}
