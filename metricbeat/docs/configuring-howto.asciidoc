@@ -34,6 +34,7 @@ The following topics describe how to configure Metricbeat:
 * <<using-environ-vars>>
 * <<yaml-tips>>
 * <<regexp-support>>
+* <<{beatname_lc}-reference-yml>>
 
 --
 
