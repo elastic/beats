@@ -572,7 +572,7 @@ func (b *Beat) registerTemplateLoading() error {
 			return err
 		}
 
-		if esCfg.Index != "" && (cfg.Name == "" || cfg.Pattern == "") {
+		if esCfg.Index != "" && (cfg.Name == "" || cfg.Pattern == "") && (b.Config.Template == nil || b.Config.Template.Enabled()) {
 			return fmt.Errorf("setup.template.name and setup.template.pattern have to be set if index name is modified.")
 		}
 
