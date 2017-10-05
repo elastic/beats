@@ -125,6 +125,8 @@ https://github.com/elastic/beats/compare/v6.0.0-beta2...master[Check the HEAD di
 
 *Filebeat*
 
+- The `filebeat.config_dir` option is deprecated. Use `filebeat.config.prospector` options instead. {pull}5321[5321]
+
 *Heartbeat*
 
 *Metricbeat*
