@@ -6,10 +6,6 @@ import (
 	"github.com/elastic/beats/metricbeat/mb"
 )
 
-type ServiceConfig struct {
-	State string `config:"state"`
-}
-
 // init registers the MetricSet with the central registry.
 // The New method will be called after the setup of the module and before starting to fetch data
 func init() {
@@ -33,15 +29,13 @@ type MetricSet struct {
 func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
 	logp.Warn("EXPERIMENTAL: The windows services metricset is experimental")
 
-	config := struct {
-		ServiceConfig ServiceConfig `config:"services"`
-	}{}
+	config := struct{}{}
 
 	if err := base.Module().UnpackConfig(&config); err != nil {
 		return nil, err
 	}
 
-	reader, err := NewServiceReader(config.ServiceConfig)
+	reader, err := NewServiceReader()
 
 	if err != nil {
 		return nil, err

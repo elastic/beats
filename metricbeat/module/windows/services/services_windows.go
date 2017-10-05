@@ -4,9 +4,7 @@ package services
 
 import (
 	"bytes"
-	"fmt"
 	"strconv"
-	"strings"
 	"syscall"
 	"unicode/utf16"
 	"unsafe"
@@ -255,7 +253,7 @@ func CloseServiceHandle(handle ServiceHandle) error {
 	return nil
 }
 
-func NewServiceReader(config ServiceConfig) (*ServiceReader, error) {
+func NewServiceReader() (*ServiceReader, error) {
 
 	hndl, err := OpenSCManager("", "", ScManagerEnumerateService|ScManagerConnect)
 
@@ -267,23 +265,23 @@ func NewServiceReader(config ServiceConfig) (*ServiceReader, error) {
 		handle: hndl,
 	}
 
-	var state ServiceEnumState
+	//var state ServiceEnumState
 
-	configState := strings.ToLower(config.State)
-	switch configState {
-	case "all", "":
-		state = ServiceStateAll
-	case "active":
-		state = ServiceActive
-	case "inactive":
-		state = ServiceInActive
-	default:
-		err := fmt.Errorf("state '%s' are not valid", configState)
-		r.Close()
-		return nil, errors.Wrap(err, "initialization failed")
-	}
+	// configState := strings.ToLower(config.State)
+	// switch configState {
+	// case "all", "":
+	// 	state = ServiceStateAll
+	// case "active":
+	// 	state = ServiceActive
+	// case "inactive":
+	// 	state = ServiceInActive
+	// default:
+	// 	err := fmt.Errorf("state '%s' are not valid", configState)
+	// 	r.Close()
+	// 	return nil, errors.Wrap(err, "initialization failed")
+	// }
 
-	r.state = state
+	r.state = ServiceStateAll
 
 	return r, nil
 }

@@ -11,8 +11,4 @@ Services.
 - module: windows
   metricsets: ["services"]
   period: 10s
-  services:
-    status: ["all"] | ["active"] | ["inactive"]
 ----
-
-With `status`, you can specify which kind of service you want to read. The default value is `all`.
