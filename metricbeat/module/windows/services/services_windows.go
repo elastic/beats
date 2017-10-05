@@ -22,6 +22,8 @@ import (
 //sys _OpenService(handle ServiceDatabaseHandle, serviceName *uint16, desiredAccess ServiceAccessRight) (serviceHandle ServiceHandle, err error) = advapi32.OpenServiceW
 //sys _QueryServiceConfig(serviceHandle ServiceHandle, serviceConfig *byte, bufSize uint32, bytesNeeded *uint32) (err error) [failretval==0] = advapi32.QueryServiceConfigW
 //sys _CloseServiceHandle(handle uintptr) (err error) = advapi32.CloseServiceHandle
+//sys _OpenProcess(desiredAccess ProcessAccessRight, inheritHandle bool, uint32 processId) (handle ProcessHandle, err error) [failtretval==0] = OpenProcess
+//sys _GetProcessTimes(handle ProcessHandle, creationTime *ServiceFileTime, exitTime *ServiceFileTime, kernelTime *ServiceFileTime, userTime *ServiceFileTime) (err error) [failretval==0] = GetProcessTimes
 
 var (
 	sizeOfEnumServiceStatusProcess = (int)(unsafe.Sizeof(EnumServiceStatusProcess{}))
@@ -37,6 +39,8 @@ type enumServiceStatusProcess struct {
 type ServiceDatabaseHandle uintptr
 
 type ServiceHandle uintptr
+
+type ProcessHandle uintptr
 
 var serviceStates = map[ServiceState]string{
 	ServiceContinuePending: "ServiceContinuePending",

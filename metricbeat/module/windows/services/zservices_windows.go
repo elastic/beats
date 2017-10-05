@@ -38,12 +38,15 @@ func errnoErr(e syscall.Errno) error {
 
 var (
 	modadvapi32 = windows.NewLazySystemDLL("advapi32.dll")
+	modkernel32 = windows.NewLazySystemDLL("kernel32.dll")
 
 	procOpenSCManagerW        = modadvapi32.NewProc("OpenSCManagerW")
 	procEnumServicesStatusExW = modadvapi32.NewProc("EnumServicesStatusExW")
 	procOpenServiceW          = modadvapi32.NewProc("OpenServiceW")
 	procQueryServiceConfigW   = modadvapi32.NewProc("QueryServiceConfigW")
 	procCloseServiceHandle    = modadvapi32.NewProc("CloseServiceHandle")
+	procOpenProcess           = modkernel32.NewProc("OpenProcess")
+	procGetProcessTimes       = modkernel32.NewProc("GetProcessTimes")
 )
 
 func _OpenSCManager(machineName *uint16, databaseName *uint16, desiredAcces ServiceSCMAccessRight) (handle ServiceDatabaseHandle, err error) {
@@ -98,6 +101,37 @@ func _QueryServiceConfig(serviceHandle ServiceHandle, serviceConfig *byte, bufSi
 
 func _CloseServiceHandle(handle uintptr) (err error) {
 	r1, _, e1 := syscall.Syscall(procCloseServiceHandle.Addr(), 1, uintptr(handle), 0, 0)
+	if r1 == 0 {
+		if e1 != 0 {
+			err = errnoErr(e1)
+		} else {
+			err = syscall.EINVAL
+		}
+	}
+	return
+}
+
+func _OpenProcess(desiredAccess ProcessAccessRight, inheritHandle bool, uint32 processId) (handle ProcessHandle, err error) {
+	var _p0 uint32
+	if inheritHandle {
+		_p0 = 1
+	} else {
+		_p0 = 0
+	}
+	r0, _, e1 := syscall.Syscall(procOpenProcess.Addr(), 3, uintptr(desiredAccess), uintptr(_p0), uintptr(uint32))
+	handle = ProcessHandle(r0)
+	if failtretval == 0 {
+		if e1 != 0 {
+			err = errnoErr(e1)
+		} else {
+			err = syscall.EINVAL
+		}
+	}
+	return
+}
+
+func _GetProcessTimes(handle ProcessHandle, creationTime *ServiceFileTime, exitTime *ServiceFileTime, kernelTime *ServiceFileTime, userTime *ServiceFileTime) (err error) {
+	r1, _, e1 := syscall.Syscall6(procGetProcessTimes.Addr(), 5, uintptr(handle), uintptr(unsafe.Pointer(creationTime)), uintptr(unsafe.Pointer(exitTime)), uintptr(unsafe.Pointer(kernelTime)), uintptr(unsafe.Pointer(userTime)), 0)
 	if r1 == 0 {
 		if e1 != 0 {
 			err = errnoErr(e1)

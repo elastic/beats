@@ -190,3 +190,8 @@ type QueryServiceConfig struct {
 	LpServiceStartName *int8
 	LpDisplayName      *int8
 }
+
+type ProcessFileTime struct {
+	DwLowDateTime  uint32
+	DwHighDateTime uint32
+}

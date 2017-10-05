@@ -185,3 +185,5 @@ type EnumServiceStatusProcess C.ENUM_SERVICE_STATUS_PROCESS
 
 //Contains configuration information for an installed service.
 type QueryServiceConfig C.QUERY_SERVICE_CONFIG
+
+type ProcessFileTime C.FILETIME
