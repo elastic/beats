@@ -9,6 +9,7 @@ import (
 
 	"github.com/elastic/beats/libbeat/cfgfile"
 	"github.com/elastic/beats/libbeat/common"
+	"github.com/elastic/beats/libbeat/common/cfgwarn"
 	"github.com/elastic/beats/libbeat/logp"
 	"github.com/elastic/beats/libbeat/paths"
 )
@@ -93,6 +94,8 @@ func (config *Config) FetchConfigs() error {
 	if configDir == "" {
 		return nil
 	}
+
+	cfgwarn.Deprecate("7.0.0", "config_dir is deprecated. Use `filebeat.config.prospectors` instead.")
 
 	// If configDir is relative, consider it relative to the config path
 	configDir = paths.Resolve(paths.Config, configDir)
