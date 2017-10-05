@@ -51,6 +51,13 @@ func TestProcessor(t *testing.T) {
 			},
 		},
 		{
+			output: p.integer(&common.Field{Type: "long", CopyTo: "hello.world"}),
+			expected: common.MapStr{
+				"type":    "long",
+				"copy_to": "hello.world",
+			},
+		},
+		{
 			output:   p.array(&common.Field{Type: "array"}),
 			expected: common.MapStr{},
 		},
