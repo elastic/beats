@@ -23,14 +23,17 @@ func init() {
 const LogPathMatcherName = "logs_path"
 
 type LogPathMatcher struct {
-	LogsPath string
+	LogsPath      string
+	UseDockerPath bool
 }
 
 func newLogsPathMatcher(cfg common.Config) (add_kubernetes_metadata.Matcher, error) {
 	config := struct {
-		LogsPath string `config:"logs_path"`
+		LogsPath      string `config:"logs_path"`
+		UseDockerPath bool   `config:"use_docker_path"`
 	}{
-		LogsPath: "/var/lib/docker/containers/",
+		LogsPath:      "/var/lib/docker/containers/",
+		UseDockerPath: true,
 	}
 
 	err := cfg.Unpack(&config)
@@ -45,7 +48,7 @@ func newLogsPathMatcher(cfg common.Config) (add_kubernetes_metadata.Matcher, err
 
 	logp.Debug("kubernetes", "logs_path matcher log path: %s", logPath)
 
-	return &LogPathMatcher{LogsPath: logPath}, nil
+	return &LogPathMatcher{LogsPath: logPath, UseDockerPath: config.UseDockerPath}, nil
 }
 
 // Docker container ID is a 64-character-long hexadecimal string
@@ -66,7 +69,7 @@ func (f *LogPathMatcher) MetadataIndex(event common.MapStr) string {
 
 		// In case of the Kubernetes log path "/var/log/containers/",
 		// the container ID will be located right before the ".log" extension.
-		if strings.HasPrefix(f.LogsPath, "/var/log/containers/") && strings.HasSuffix(source, ".log") && sourceLen >= containerIdLen+4 {
+		if f.UseDockerPath == false && strings.HasSuffix(source, ".log") && sourceLen >= containerIdLen+4 {
 			containerIdEnd := sourceLen - 4
 			cid := source[containerIdEnd-containerIdLen : containerIdEnd]
 			logp.Debug("kubernetes", "Using container id: %s", cid)

@@ -94,6 +94,7 @@ https://github.com/elastic/beats/compare/v6.0.0-beta2...master[Check the HEAD di
 - Changed the number of shards in the default configuration to 3. {issue}5095[5095]
 - Remove error log from runnerfactory as error is returned by API. {pull}5085[5085]
 - Add `filebeat.registry_flush` setting, to delay the registry updates. {pull}5146[5146]
+- Optimzie kubernetes logs_path matcher {pull}5223[5223]
 
 *Heartbeat*
 
