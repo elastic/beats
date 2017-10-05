@@ -29,6 +29,7 @@ https://github.com/jarl-tornroos/cloudfrontbeat[cloudfrontbeat]:: Reads log even
 https://github.com/aidan-/cloudtrailbeat[cloudtrailbeat]:: Reads events from Amazon Web Services' https://aws.amazon.com/cloudtrail/[CloudTrail].
 https://github.com/narmitech/cloudwatchmetricbeat[cloudwatchmetricbeat]::  A beat for Amazon Web Services' https://aws.amazon.com/cloudwatch/details/#other-aws-resource-monitoring[CloudWatch Metrics]. 
 https://github.com/e-travel/cloudwatchlogsbeat[cloudwatchlogsbeat]:: Reads log events from Amazon Web Services' https://aws.amazon.com/cloudwatch/details/#log-monitoring[CloudWatch Logs].
+https://github.com/eBay/collectbeat[collectbeat]:: Adds discovery on top of Filebeat and Metricbeat in environments like Kubernetes.
 https://github.com/raboof/connbeat[connbeat]:: Exposes metadata about TCP connections.
 https://github.com/Pravoru/consulbeat[consulbeat]:: Reads services health checks from consul and pushes them to Elastic.
 https://github.com/Ingensi/dockbeat[dockbeat]:: Reads Docker container
