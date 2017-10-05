@@ -11,6 +11,11 @@ This section summarizes the changes in each release.
 * <<release-notes-6.0.0-beta1>>
 * <<release-notes-6.0.0-alpha2>>
 * <<release-notes-6.0.0-alpha1>>
+* <<release-notes-5.6.2>>
+* <<release-notes-5.6.1>>
+* <<release-notes-5.6.0>>
+* <<release-notes-5.5.3>>
+* <<release-notes-5.5.2>>
 * <<release-notes-5.5.1>>
 * <<release-notes-5.5.0>>
 * <<release-notes-5.4.2>>
