@@ -55,14 +55,6 @@ type: keyword
 The target path for symlinks.
 
 [float]
-=== `audit.file.source`
-
-type: keyword
-
-The source of the event. The two options are `scan` and `fsnotify`. Events from `scan` were triggered while traversing the file system and checking for changes since the last time it was run. `fsnotify` events were triggered by a notification from the OS that something changed.
-
-
-[float]
 === `audit.file.action`
 
 type: keyword

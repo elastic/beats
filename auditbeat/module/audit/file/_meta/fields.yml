@@ -9,13 +9,6 @@
     - name: target_path
       type: keyword
       description: The target path for symlinks.
-    - name: source
-      type: keyword
-      description: >
-        The source of the event. The two options are `scan` and `fsnotify`.
-        Events from `scan` were triggered while traversing the file system and
-        checking for changes since the last time it was run. `fsnotify` events
-        were triggered by a notification from the OS that something changed.
     - name: action
       type: keyword
       example: attributes_modified

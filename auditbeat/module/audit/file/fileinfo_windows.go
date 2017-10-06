@@ -35,10 +35,10 @@ func NewMetadata(path string, info os.FileInfo) (*Metadata, error) {
 	}
 
 	switch {
-	case info.IsDir():
-		fileInfo.Type = DirType
 	case info.Mode().IsRegular():
 		fileInfo.Type = FileType
+	case info.IsDir():
+		fileInfo.Type = DirType
 	case info.Mode()&os.ModeSymlink > 0:
 		fileInfo.Type = SymlinkType
 	}

@@ -213,7 +213,6 @@ func buildMapStr(e *Event) common.MapStr {
 	m := common.MapStr{
 		"@timestamp": e.Timestamp,
 		"path":       e.Path,
-		"source":     e.Source.String(),
 		"hashed":     len(e.Hashes) > 0,
 		mb.RTTKey:    e.rtt,
 	}

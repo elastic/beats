@@ -116,10 +116,18 @@ func (s *scanner) walkDir(dir string) error {
 			s.throttle(event.Info.Size)
 		}
 
+		// Always traverse into the start dir.
+		if !info.IsDir() || dir == path {
+			return nil
+		}
+
 		// Only step into directories if recursion is enabled.
-		if dir != path && info.IsDir() && !s.config.Recursive {
+		// Skip symlinks to dirs.
+		m := info.Mode()
+		if !s.config.Recursive || m&os.ModeSymlink > 0 {
 			return filepath.SkipDir
 		}
+
 		return nil
 	})
 	if err == errDone {
