@@ -1033,6 +1033,12 @@
 			"revisionTime": "2017-04-03T16:00:31Z"
 		},
 		{
+			"checksumSHA1": "iNE2KX9BQzCptlQC2DdQEVmn4R4=",
+			"path": "golang.org/x/crypto/sha3",
+			"revision": "9419663f5a44be8b34ca85f08abc5fe1be11f8a3",
+			"revisionTime": "2017-09-30T17:45:11Z"
+		},
+		{
 			"checksumSHA1": "tK8eFmQ0JeKpR3P0TjiGobzlIh0=",
 			"path": "golang.org/x/net/bpf",
 			"revision": "e90d6d0afc4c315a0d87a568ae68577cc15149a0",

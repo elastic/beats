@@ -162,8 +162,76 @@ func (rcv *Hash) Sha512256Length() int {
 	return 0
 }
 
+func (rcv *Hash) Sha3224(j int) int8 {
+	o := flatbuffers.UOffsetT(rcv._tab.Offset(20))
+	if o != 0 {
+		a := rcv._tab.Vector(o)
+		return rcv._tab.GetInt8(a + flatbuffers.UOffsetT(j*1))
+	}
+	return 0
+}
+
+func (rcv *Hash) Sha3224Length() int {
+	o := flatbuffers.UOffsetT(rcv._tab.Offset(20))
+	if o != 0 {
+		return rcv._tab.VectorLen(o)
+	}
+	return 0
+}
+
+func (rcv *Hash) Sha3256(j int) int8 {
+	o := flatbuffers.UOffsetT(rcv._tab.Offset(22))
+	if o != 0 {
+		a := rcv._tab.Vector(o)
+		return rcv._tab.GetInt8(a + flatbuffers.UOffsetT(j*1))
+	}
+	return 0
+}
+
+func (rcv *Hash) Sha3256Length() int {
+	o := flatbuffers.UOffsetT(rcv._tab.Offset(22))
+	if o != 0 {
+		return rcv._tab.VectorLen(o)
+	}
+	return 0
+}
+
+func (rcv *Hash) Sha3384(j int) int8 {
+	o := flatbuffers.UOffsetT(rcv._tab.Offset(24))
+	if o != 0 {
+		a := rcv._tab.Vector(o)
+		return rcv._tab.GetInt8(a + flatbuffers.UOffsetT(j*1))
+	}
+	return 0
+}
+
+func (rcv *Hash) Sha3384Length() int {
+	o := flatbuffers.UOffsetT(rcv._tab.Offset(24))
+	if o != 0 {
+		return rcv._tab.VectorLen(o)
+	}
+	return 0
+}
+
+func (rcv *Hash) Sha3512(j int) int8 {
+	o := flatbuffers.UOffsetT(rcv._tab.Offset(26))
+	if o != 0 {
+		a := rcv._tab.Vector(o)
+		return rcv._tab.GetInt8(a + flatbuffers.UOffsetT(j*1))
+	}
+	return 0
+}
+
+func (rcv *Hash) Sha3512Length() int {
+	o := flatbuffers.UOffsetT(rcv._tab.Offset(26))
+	if o != 0 {
+		return rcv._tab.VectorLen(o)
+	}
+	return 0
+}
+
 func HashStart(builder *flatbuffers.Builder) {
-	builder.StartObject(8)
+	builder.StartObject(12)
 }
 func HashAddMd5(builder *flatbuffers.Builder, md5 flatbuffers.UOffsetT) {
 	builder.PrependUOffsetTSlot(0, flatbuffers.UOffsetT(md5), 0)
@@ -211,6 +279,30 @@ func HashAddSha512256(builder *flatbuffers.Builder, sha512256 flatbuffers.UOffse
 	builder.PrependUOffsetTSlot(7, flatbuffers.UOffsetT(sha512256), 0)
 }
 func HashStartSha512256Vector(builder *flatbuffers.Builder, numElems int) flatbuffers.UOffsetT {
+	return builder.StartVector(1, numElems, 1)
+}
+func HashAddSha3224(builder *flatbuffers.Builder, sha3224 flatbuffers.UOffsetT) {
+	builder.PrependUOffsetTSlot(8, flatbuffers.UOffsetT(sha3224), 0)
+}
+func HashStartSha3224Vector(builder *flatbuffers.Builder, numElems int) flatbuffers.UOffsetT {
+	return builder.StartVector(1, numElems, 1)
+}
+func HashAddSha3256(builder *flatbuffers.Builder, sha3256 flatbuffers.UOffsetT) {
+	builder.PrependUOffsetTSlot(9, flatbuffers.UOffsetT(sha3256), 0)
+}
+func HashStartSha3256Vector(builder *flatbuffers.Builder, numElems int) flatbuffers.UOffsetT {
+	return builder.StartVector(1, numElems, 1)
+}
+func HashAddSha3384(builder *flatbuffers.Builder, sha3384 flatbuffers.UOffsetT) {
+	builder.PrependUOffsetTSlot(10, flatbuffers.UOffsetT(sha3384), 0)
+}
+func HashStartSha3384Vector(builder *flatbuffers.Builder, numElems int) flatbuffers.UOffsetT {
+	return builder.StartVector(1, numElems, 1)
+}
+func HashAddSha3512(builder *flatbuffers.Builder, sha3512 flatbuffers.UOffsetT) {
+	builder.PrependUOffsetTSlot(11, flatbuffers.UOffsetT(sha3512), 0)
+}
+func HashStartSha3512Vector(builder *flatbuffers.Builder, numElems int) flatbuffers.UOffsetT {
 	return builder.StartVector(1, numElems, 1)
 }
 func HashEnd(builder *flatbuffers.Builder) flatbuffers.UOffsetT {
