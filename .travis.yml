@@ -14,6 +14,7 @@ env:
     - GOX_FLAGS="-arch amd64"
     - DOCKER_COMPOSE_VERSION=1.11.1
     - GO_VERSION="$(cat .go-version)"
+    - TRAVIS_ETCD_VERSION=v3.2.8
 
 jobs:
   include:
@@ -93,6 +94,26 @@ jobs:
     - os: linux
       env: TARGETS="-C generator/beat test"
       go: $GO_VERSION
+      stage: test
+
+    # Kubernetes
+    - os: linux
+      install: deploy/kubernetes/.travis/setup.sh
+      env:
+        - TARGETS="-C deploy/kubernetes test"
+        - TRAVIS_KUBE_VERSION=v1.6.11
+      stage: test
+    - os: linux
+      install: deploy/kubernetes/.travis/setup.sh
+      env:
+        - TARGETS="-C deploy/kubernetes test"
+        - TRAVIS_KUBE_VERSION=v1.7.7
+      stage: test
+    - os: linux
+      install: deploy/kubernetes/.travis/setup.sh
+      env:
+        - TARGETS="-C deploy/kubernetes test"
+        - TRAVIS_KUBE_VERSION=v1.8.0
       stage: test
 
 addons:
