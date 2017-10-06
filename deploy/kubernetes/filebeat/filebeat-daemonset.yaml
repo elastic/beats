@@ -17,7 +17,7 @@ spec:
       terminationGracePeriodSeconds: 30
       containers:
       - name: filebeat
-        image: docker.elastic.co/beats/filebeat:6.0.0-beta1
+        image: docker.elastic.co/beats/filebeat:%VERSION%
         args: [
           "-c", "/etc/filebeat.yml",
           "-e",
