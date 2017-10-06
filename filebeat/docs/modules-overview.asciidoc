@@ -30,7 +30,10 @@ and loads them to the respective Elastic stack components.
 NOTE: At the moment, Filebeat modules require using the Elasticsearch
 {elasticsearch}/ingest.html[Ingest Node]. In the future, Filebeat Modules will
 be able to also configure Logstash as a more powerful alternative to Ingest
-Node.
+Node. For now, if you want to use Logstash, you can follow the steps described
+in the section called
+{logstashdoc}/filebeat-modules.html[Working with Filebeat Modules] in the
+Logstash Reference.
 
 Filebeat modules require Elasticsearch 5.2 or later.
 
