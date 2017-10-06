@@ -33,6 +33,7 @@ https://github.com/elastic/beats/compare/v6.0.0-rc1...master[Check the HEAD diff
 *Affecting all Beats*
 
 - Fix data race accessing watched containers. {issue}5147[5147]
+- Do not require template if index change and template disabled {pull}5319[5319]
 
 *Auditbeat*
 
