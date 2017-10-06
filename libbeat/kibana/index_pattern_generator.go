@@ -11,16 +11,16 @@ import (
 )
 
 type IndexPatternGenerator struct {
-	indexName        string
-	version          string
-	fieldsYaml       string
-	targetDirDefault string
-	targetDir5x      string
-	targetFilename   string
+	indexName      string
+	beatVersion    string
+	fieldsYaml     string
+	version        common.Version
+	targetDir      string
+	targetFilename string
 }
 
 // Create an instance of the Kibana Index Pattern Generator
-func NewGenerator(indexName, beatName, beatDir, version string) (*IndexPatternGenerator, error) {
+func NewGenerator(indexName, beatName, beatDir, beatVersion string, version common.Version) (*IndexPatternGenerator, error) {
 	beatName = clean(beatName)
 
 	fieldsYaml := filepath.Join(beatDir, "fields.yml")
@@ -29,33 +29,35 @@ func NewGenerator(indexName, beatName, beatDir, version string) (*IndexPatternGe
 	}
 
 	return &IndexPatternGenerator{
-		indexName:        indexName,
-		version:          version,
-		fieldsYaml:       fieldsYaml,
-		targetDirDefault: createTargetDir(beatDir, "default"),
-		targetDir5x:      createTargetDir(beatDir, "5.x"),
-		targetFilename:   beatName + ".json",
+		indexName:      indexName,
+		fieldsYaml:     fieldsYaml,
+		beatVersion:    beatVersion,
+		version:        version,
+		targetDir:      createTargetDir(beatDir, version),
+		targetFilename: beatName + ".json",
 	}, nil
 }
 
 // Create the Index-Pattern for Kibana for 5.x and default.
-func (i *IndexPatternGenerator) Generate() ([]string, error) {
+func (i *IndexPatternGenerator) Generate() (string, error) {
 	commonFields, err := common.LoadFieldsYaml(i.fieldsYaml)
 	if err != nil {
-		return nil, err
+		return "", err
 	}
 
-	index5xPath, err := i.generate5x(commonFields)
+	var path string
+
+	if i.version.Major == 5 {
+		path, err = i.generate5x(commonFields)
+	} else {
+		path, err = i.generate6x(commonFields)
+	}
+
 	if err != nil {
-		return nil, err
+		return "", err
 	}
 
-	index6xPath, err := i.generate6x(commonFields)
-	if err != nil {
-		return nil, err
-	}
-
-	return []string{index5xPath, index6xPath}, nil
+	return path, nil
 }
 
 func (i *IndexPatternGenerator) generate5x(fields common.Fields) (string, error) {
@@ -65,7 +67,7 @@ func (i *IndexPatternGenerator) generate5x(fields common.Fields) (string, error)
 		return "", err
 	}
 
-	file5x := filepath.Join(i.targetDir5x, i.targetFilename)
+	file5x := filepath.Join(i.targetDir, i.targetFilename)
 	err = dumpToFile(file5x, transformed)
 	return file5x, err
 }
@@ -77,7 +79,7 @@ func (i *IndexPatternGenerator) generate6x(fields common.Fields) (string, error)
 		return "", err
 	}
 	out := common.MapStr{
-		"version": i.version,
+		"version": i.beatVersion,
 		"objects": []common.MapStr{
 			common.MapStr{
 				"type":       "index-pattern",
@@ -87,7 +89,7 @@ func (i *IndexPatternGenerator) generate6x(fields common.Fields) (string, error)
 			},
 		},
 	}
-	file6x := filepath.Join(i.targetDirDefault, i.targetFilename)
+	file6x := filepath.Join(i.targetDir, i.targetFilename)
 	err = dumpToFile(file6x, out)
 	return file6x, err
 }
@@ -133,10 +135,19 @@ func dumpToFile(f string, pattern common.MapStr) error {
 	return nil
 }
 
-func createTargetDir(baseDir string, version string) string {
-	targetDir := filepath.Join(baseDir, "_meta", "kibana", version, "index-pattern")
+func createTargetDir(baseDir string, version common.Version) string {
+	targetDir := filepath.Join(baseDir, "_meta", "kibana", getVersionPath(version), "index-pattern")
 	if _, err := os.Stat(targetDir); os.IsNotExist(err) {
 		os.MkdirAll(targetDir, 0777)
 	}
 	return targetDir
+}
+
+func getVersionPath(version common.Version) string {
+	versionPath := "default"
+	if version.Major == 5 {
+		versionPath = "5.x"
+	}
+	return versionPath
+
 }
