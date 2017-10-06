@@ -1,6 +1,7 @@
 package dashboards
 
 import (
+	"bytes"
 	"encoding/json"
 	"fmt"
 
@@ -102,4 +103,17 @@ func ReplaceIndexInDashboardObject(index string, content common.MapStr) common.M
 		content["objects"] = objects
 	}
 	return content
+}
+
+func ReplaceStringInDashboard(old, new string, content common.MapStr) (common.MapStr, error) {
+	marshaled, err := json.Marshal(content)
+	if err != nil {
+		return nil, fmt.Errorf("fail to marshal dashboard object: %v", content)
+	}
+
+	replaced := bytes.Replace(marshaled, []byte(old), []byte(new), -1)
+
+	var result common.MapStr
+	err = json.Unmarshal(replaced, &result)
+	return result, nil
 }
