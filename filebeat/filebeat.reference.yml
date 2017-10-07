@@ -215,6 +215,20 @@ filebeat.modules:
     # Optional, the password to use when connecting to Redis.
     #var.password:
 
+#------------------------------- Traefik Module ------------------------------
+#- module: traefik
+  # Access logs
+  #access:
+    #enabled: true
+
+    # Set custom paths for the log files. If left empty,
+    # Filebeat will choose the paths depending on your OS.
+    #var.paths:
+
+    # Prospector configuration (advanced). Any prospector configuration option
+    # can be added under this section.
+    #prospector:
+
 
 #=========================== Filebeat prospectors =============================
 
