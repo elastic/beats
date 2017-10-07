@@ -74,6 +74,11 @@ packetbeat.protocols:
   # the Redis protocol by commenting out the list of ports.
   ports: [6379]
 
+- type: smtp
+  # Configure the ports where to listen for SMTP traffic. You can disable
+  # the SMTP protocol by commenting out the list of ports.
+  ports: [25]
+
 - type: thrift
   # Configure the ports where to listen for Thrift-RPC traffic. You can disable
   # the Thrift-RPC protocol by commenting out the list of ports.

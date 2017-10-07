@@ -342,6 +342,28 @@ packetbeat.protocols:
   # large enough to allow for pipelining.
   #queue_max_messages: 20000
 
+- type: smtp
+  # SMTP port for traffic monitoring.
+  ports: [25]
+
+  # If this option is enabled, the SMTP requests are included in published
+  # events. The default is true.
+  #send_request: true
+
+  # If this option is enabled, the SMTP DATA request headers are included
+  # in published events. The default is false. Enable `send_request`
+  # before enabling this option.
+  #send_data_headers: true
+
+  # If this option is enabled, the raw message of SMTP DATA request
+  # body is included in published events. The default is false. Enable
+  # `send_request` before enabling this option.
+  #send_data_body: true
+
+  # If this option is enabled, the SMTP responses are included in
+  # published events. The default is true.
+  #send_response: true
+
 - type: thrift
   # Enable thrift monitoring. Default: true
   #enabled: true
@@ -1447,7 +1469,7 @@ setup.template.settings:
 #setup.ilm.enabled: auto
 
 # Set the prefix used in the index lifecycle write alias name. The default alias
-# name is 'packetbeat-%{[agent.version]}'. 
+# name is 'packetbeat-%{[agent.version]}'.
 #setup.ilm.rollover_alias: "packetbeat"
 
 # Set the rollover index pattern. The default is "%{now/d}-000001".

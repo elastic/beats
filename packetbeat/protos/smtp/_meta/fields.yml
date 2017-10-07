@@ -1,0 +1,42 @@
+- key: smtp
+  title: "SMTP"
+  description: SMTP event fields.
+  fields:
+    - name: smtp
+      type: group
+      description: Information about the SMTP request and response.
+      fields:
+        - name: request
+          description: SMTP request
+          type: group
+          fields:
+            - name: command
+              description: The SMTP command.
+              example: EHLO
+
+            - name: param
+              description: >
+                The SMTP command argument. It follows the SMTP command issued by the client (e.g. `localhost` in `HELO localhost`).
+
+            - name: headers
+              type: object
+              object_type: keyword
+              description: >
+                A map containing the captured message header fields from the client DATA request.
+
+            - name: body
+              type: text
+              description: The body (message) of the client DATA request.
+
+        - name: response
+          description: SMTP response
+          type: group
+          fields:
+            - name: code
+              description: The SMTP status code.
+              example: 250
+
+            - name: phrases
+              type: object
+              description: The SMTP status phrases.
+

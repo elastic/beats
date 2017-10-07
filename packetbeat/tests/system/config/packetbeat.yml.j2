@@ -138,6 +138,12 @@ packetbeat.protocols:
 {% if mongodb_max_docs is not none %}  max_docs: {{mongodb_max_docs}}{% endif %}
 {% if mongodb_max_doc_length is not none %}  max_doc_length: {{mongodb_max_doc_length}}{% endif %}
 
+- type: smtp
+  ports: [{{ smtp_ports|default([25])|join(", ") }}]
+{% if smtp_send_request %}  send_request: true{%endif %}
+{% if smtp_send_response %}  send_response: true{% endif %}
+{% if smtp_send_data_headers %}  send_data_headers: true{% endif %}
+{% if smtp_send_data_body %}  send_data_body: true{% endif %}
 
 {% if procs_enabled %}
 #=========================== Monitored processes ==============================

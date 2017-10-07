@@ -35,6 +35,7 @@ grouped in the following categories:
 * <<exported-fields-process>>
 * <<exported-fields-raw>>
 * <<exported-fields-redis>>
+* <<exported-fields-smtp>>
 * <<exported-fields-thrift>>
 * <<exported-fields-tls>>
 * <<exported-fields-trans_event>>
@@ -7427,6 +7428,73 @@ The return value of the Redis command in a human readable format.
 --
 If the Redis command has resulted in an error, this field contains the error message returned by the Redis server.
 
+--
+
+[[exported-fields-smtp]]
+== SMTP fields
+
+SMTP event fields.
+
+
+[float]
+== smtp fields
+
+Information about the SMTP request and response.
+
+
+[float]
+== request fields
+
+SMTP request
+
+
+[float]
+=== `smtp.request.command`
+
+example: EHLO
+
+The SMTP command.
+
+[float]
+=== `smtp.request.param`
+
+The SMTP command argument. It follows the SMTP command issued by the client (e.g. `localhost` in `HELO localhost`).
+
+
+[float]
+=== `smtp.request.headers`
+
+type: object
+
+A map containing the captured message header fields from the client DATA request.
+
+
+[float]
+=== `smtp.request.body`
+
+type: text
+
+The body (message) of the client DATA request.
+
+[float]
+== response fields
+
+SMTP response
+
+
+[float]
+=== `smtp.response.code`
+
+example: 250
+
+The SMTP status code.
+
+[float]
+=== `smtp.response.phrases`
+
+type: object
+
+The SMTP status phrases.
 
 --
 
