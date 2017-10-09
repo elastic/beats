@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"time"
 
+	"github.com/elastic/beats/libbeat/common"
 	"github.com/elastic/beats/libbeat/common/match"
 	"github.com/elastic/beats/libbeat/logp"
 )
@@ -248,6 +249,12 @@ func (mlr *Multiline) clear() {
 
 // finalize writes the existing content into the returned message and resets all reader variables.
 func (mlr *Multiline) finalize() Message {
+
+	mlr.message.AddFields(common.MapStr{
+		"multiline": common.MapStr{
+			"lines": mlr.numLines,
+		},
+	})
 	// Copy message from existing content
 	msg := mlr.message
 	mlr.clear()

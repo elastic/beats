@@ -41,3 +41,8 @@
     - name: fileset.name
       description: >
         The Filebeat fileset that generated this event.
+
+    - name: multiline.lines
+      type: long
+      description: >
+        This is set in case of a multiline event and contains the number of lines that the multiline event consists of.

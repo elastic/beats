@@ -959,6 +959,14 @@ The Filebeat module that generated this event.
 The Filebeat fileset that generated this event.
 
 
+[float]
+=== `multiline.lines`
+
+type: long
+
+This is set in case of a multiline event and contains the number of lines that the multiline event consists of.
+
+
 [[exported-fields-mysql]]
 == MySQL fields
 
