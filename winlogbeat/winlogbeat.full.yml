@@ -229,6 +229,10 @@ output.elasticsearch:
   # Configure curve types for ECDHE based cipher suites
   #ssl.curve_types: []
 
+  # Configure what types of renegotiation are supported. Valid options are
+  # never, once, and freely. Default is never.
+  #ssl.renegotiation: never
+
 
 #----------------------------- Logstash output ---------------------------------
 #output.logstash:
@@ -292,6 +296,10 @@ output.elasticsearch:
 
   # Configure curve types for ECDHE based cipher suites
   #ssl.curve_types: []
+
+  # Configure what types of renegotiation are supported. Valid options are
+  # never, once, and freely. Default is never.
+  #ssl.renegotiation: never
 
 #------------------------------- Kafka output ----------------------------------
 #output.kafka:
@@ -428,6 +436,10 @@ output.elasticsearch:
   # Configure curve types for ECDHE based cipher suites
   #ssl.curve_types: []
 
+  # Configure what types of renegotiation are supported. Valid options are
+  # never, once, and freely. Default is never.
+  #ssl.renegotiation: never
+
 #------------------------------- Redis output ----------------------------------
 #output.redis:
   # Boolean flag to enable or disable the output module.
@@ -524,6 +536,10 @@ output.elasticsearch:
 
   # Configure curve types for ECDHE based cipher suites
   #ssl.curve_types: []
+
+  # Configure what types of renegotiation are supported. Valid options are
+  # never, once, and freely. Default is never.
+  #ssl.renegotiation: never
 
 
 #------------------------------- File output -----------------------------------
