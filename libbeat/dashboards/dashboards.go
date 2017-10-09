@@ -10,7 +10,7 @@ import (
 	"github.com/elastic/beats/libbeat/logp"
 )
 
-func ImportDashboards(beatName, beatVersion, homePath string,
+func ImportDashboards(beatName, hostname, homePath string,
 	kibanaConfig *common.Config, esConfig *common.Config,
 	dashboardsConfig *common.Config, msgOutputter MessageOutputter) error {
 
@@ -62,7 +62,7 @@ func ImportDashboards(beatName, beatVersion, homePath string,
 		kibanaConfig.SetString("password", -1, esLoader.client.Password)
 	}
 
-	kibanaLoader, err := NewKibanaLoader(kibanaConfig, &dashConfig, msgOutputter)
+	kibanaLoader, err := NewKibanaLoader(kibanaConfig, &dashConfig, hostname, msgOutputter)
 	if err != nil {
 		return fmt.Errorf("fail to create the Kibana loader: %v", err)
 	}
