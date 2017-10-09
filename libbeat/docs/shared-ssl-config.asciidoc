@@ -157,3 +157,12 @@ The following elliptic curve types are available:
 * P-384
 * P-521
 
+[float]
+==== `renegotiation`
+
+This configures what types of TLS renegotiation are supported. The valid options
+are `never`, `once`, and `freely`. The default value is never.
+
+* `never` - Disables renegotiation.
+* `once` - Allows a remote server to request renegotiation once per connection.
+* `freely` - Allows a remote server to repeatedly request renegotiation.
