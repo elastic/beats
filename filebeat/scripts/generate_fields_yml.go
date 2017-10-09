@@ -52,13 +52,20 @@ type Field struct {
 
 type FieldYml struct {
 	Name        string      `yaml:"name"`
-	Description string      `yaml:"description"`
-	Example     string      `yaml:"example"`
+	Description string      `yaml:"description,omitempty"`
+	Example     string      `yaml:"example,omitempty"`
 	Type        string      `yaml:"type,omitempty"`
 	Fields      []*FieldYml `yaml:"fields,omitempty"`
 }
 
-func NewFieldYml(name, typeName string) *FieldYml {
+func NewFieldYml(name, typeName string, noDoc bool) *FieldYml {
+	if noDoc {
+		return &FieldYml{
+			Name: name,
+			Type: typeName,
+		}
+	}
+
 	return &FieldYml{
 		Name:        name,
 		Type:        typeName,
@@ -152,46 +159,46 @@ func getFieldByName(f []*FieldYml, name string) *FieldYml {
 	return nil
 }
 
-func insertLastField(f []*FieldYml, name, typeName string) []*FieldYml {
+func insertLastField(f []*FieldYml, name, typeName string, noDoc bool) []*FieldYml {
 	ff := getFieldByName(f, name)
 	if ff != nil {
 		return f
 	}
 
-	nf := NewFieldYml(name, types[typeName])
+	nf := NewFieldYml(name, types[typeName], noDoc)
 	return append(f, nf)
 }
 
-func insertGroup(out []*FieldYml, field Field, index, count int) []*FieldYml {
+func insertGroup(out []*FieldYml, field Field, index, count int, noDoc bool) []*FieldYml {
 	g := getFieldByName(out, field.Elements[index])
 	if g != nil {
-		g.Fields = generateField(g.Fields, field, index+1, count)
+		g.Fields = generateField(g.Fields, field, index+1, count, noDoc)
 		return out
 	} else {
 		groupFields := make([]*FieldYml, 0)
-		groupFields = generateField(groupFields, field, index+1, count)
-		group := NewFieldYml(field.Elements[index], "group")
+		groupFields = generateField(groupFields, field, index+1, count, noDoc)
+		group := NewFieldYml(field.Elements[index], "group", noDoc)
 		group.Fields = groupFields
 		return append(out, group)
 	}
 }
 
-func generateField(out []*FieldYml, field Field, index, count int) []*FieldYml {
+func generateField(out []*FieldYml, field Field, index, count int, noDoc bool) []*FieldYml {
 	if index+1 == count {
-		return insertLastField(out, field.Elements[index], field.Type)
+		return insertLastField(out, field.Elements[index], field.Type, noDoc)
 	}
-	return insertGroup(out, field, index, count)
+	return insertGroup(out, field, index, count, noDoc)
 }
 
-func generateFields(f []Field) []*FieldYml {
+func generateFields(f []Field, noDoc bool) []*FieldYml {
 	out := make([]*FieldYml, 0)
 	for _, ff := range f {
-		out = generateField(out, ff, 1, len(ff.Elements))
+		out = generateField(out, ff, 1, len(ff.Elements), noDoc)
 	}
 	return out
 }
 
-func (p *Pipeline) toFieldsYml() ([]byte, error) {
+func (p *Pipeline) toFieldsYml(noDoc bool) ([]byte, error) {
 	pt, err := getPatternsFromProcessors(p.Processors)
 	if err != nil {
 		return nil, err
@@ -202,7 +209,7 @@ func (p *Pipeline) toFieldsYml() ([]byte, error) {
 		return nil, err
 	}
 
-	f := generateFields(fs)
+	f := generateFields(fs, noDoc)
 	var d []byte
 	d, err = yaml.Marshal(&f)
 
@@ -221,6 +228,7 @@ func writeFieldsYml(module, fileset string, f []byte) error {
 func main() {
 	module := flag.String("module", "", "Name of the module to generate fields.yml for")
 	fileset := flag.String("fileset", "", "Name of the fileset to generate fields.yml for")
+	noDoc := flag.Bool("nodoc", false, "Generate description and example elements for fields.yml. Documentation is required, if the module is going to be submitted to elastic/beats.")
 	flag.Parse()
 
 	if *module == "" {
@@ -236,7 +244,7 @@ func main() {
 	}
 
 	var d []byte
-	d, err = p.toFieldsYml()
+	d, err = p.toFieldsYml(*noDoc)
 	if err != nil {
 		log.Fatalln("Error while creating fields struct: %v", err)
 	}
