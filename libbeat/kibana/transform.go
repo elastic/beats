@@ -175,11 +175,7 @@ func addVersionedFormatParam(f *common.MapStr, version *common.Version, key stri
 		if err != nil {
 			continue
 		}
-		if minVer.Equal(version) {
-			addFormatParam(f, key, v.Value)
-			return
-		}
-		if minVer.LessThan(version) && paramVer.LessThan(minVer) {
+		if minVer.LessThanOrEqual(true, version) && paramVer.LessThanOrEqual(true, minVer) {
 			paramVer = minVer
 			paramVal = v.Value
 		}

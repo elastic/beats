@@ -361,6 +361,7 @@ func TestTransformFieldFormatMap(t *testing.T) {
 				Format: "url",
 				UrlTemplate: []common.VersionizedString{
 					{MinVersion: "6.2.0", Value: "6.2.0.urlTemplate"},
+					{MinVersion: "6.2.0-alpha", Value: "6.2.0-alpha.urlTemplate"},
 					{MinVersion: "6.2.7", Value: "6.2.7.urlTemplate"},
 				},
 			},
@@ -380,14 +381,16 @@ func TestTransformFieldFormatMap(t *testing.T) {
 				Format: "url",
 				UrlTemplate: []common.VersionizedString{
 					{MinVersion: "4.1.0", Value: "4x.urlTemplate"},
-					{MinVersion: "5.2.0", Value: "5x.urlTemplate"},
+					{MinVersion: "5.2.0-rc2", Value: "5.2.0-rc2.urlTemplate"},
+					{MinVersion: "5.2.0-rc3", Value: "5.2.0-rc3.urlTemplate"},
+					{MinVersion: "5.2.0-rc1", Value: "5.2.0-rc1.urlTemplate"},
 				},
 			},
 			expected: common.MapStr{
 				"c": common.MapStr{
 					"id": "url",
 					"params": common.MapStr{
-						"urlTemplate": "5x.urlTemplate",
+						"urlTemplate": "5.2.0-rc3.urlTemplate",
 					},
 				},
 			},

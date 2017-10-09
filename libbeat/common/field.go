@@ -39,7 +39,7 @@ type Field struct {
 	Searchable   *bool  `config:"searchable"`
 	Aggregatable *bool  `config:"aggregatable"`
 	Script       string `config:"script"`
-	//Kibana params
+	// Kibana params
 	Pattern         string              `config:"pattern"`
 	InputFormat     string              `config:"input_format"`
 	OutputFormat    string              `config:"output_format"`
