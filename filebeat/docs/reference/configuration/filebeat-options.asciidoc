@@ -14,7 +14,6 @@ filebeat.prospectors:
 - input_type: log
   paths:
     - /var/log/apache/httpd-*.log
-  document_type: apache
 
 - input_type: log
   paths:
