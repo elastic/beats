@@ -46,6 +46,7 @@ https://github.com/elastic/beats/compare/v6.0.0-rc1...master[Check the HEAD diff
 *Metricbeat*
 
 - Use `beat.name` instead of `beat.hostname` in the Host Overview dashboard. {pull}5340[5340]
+- Fix the loading of 5.x dashboards. {issue}5277[5277]
 
 *Packetbeat*
 
