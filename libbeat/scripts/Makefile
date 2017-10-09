@@ -295,10 +295,6 @@ endif
 	@mkdir -p $(PWD)/_meta/kibana/default/index-pattern
 	@go run ${ES_BEATS}/dev-tools/cmd/kibana_index_pattern/kibana_index_pattern.go -index '${BEAT_INDEX_PREFIX}-*' -beat-name ${BEAT_NAME} -beat-dir $(PWD) -version ${BEAT_VERSION}
 
-	# Runs the post-update target if it exists. Will not return errors
-	@-$(MAKE) post-update
-
-
 .PHONY: docs
 docs:  ## @build Builds the documents for the beat
 	sh ${ES_BEATS}/script/build_docs.sh ${BEAT_NAME} ${BEAT_PATH}/docs ${BUILD_DIR}
