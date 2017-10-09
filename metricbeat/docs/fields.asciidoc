@@ -2743,6 +2743,7 @@ type: long
 type: long
 
 
+
 [float]
 == fs.summary fields
 
@@ -3047,8 +3048,6 @@ type: integer
 === `etcd.store.watchers`
 
 type: integer
-
-
 
 [[exported-fields-golang]]
 == Golang fields
