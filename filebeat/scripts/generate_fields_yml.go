@@ -141,13 +141,89 @@ func accumulatePatterns(grok interface{}) ([]string, error) {
 	return nil, fmt.Errorf("No patterns in pipeline")
 }
 
-func getPatternsFromProcessors(p []map[string]interface{}) ([]string, error) {
-	for _, e := range p {
-		if ee, ok := e["grok"]; ok {
-			return accumulatePatterns(ee)
+func accumulateRemoveFields(remove interface{}, out []string) []string {
+	for k, v := range remove.(map[string]interface{}) {
+		if k == "field" {
+			vs := v.(string)
+			return append(out, vs)
 		}
 	}
-	return nil, fmt.Errorf("No patterns in pipeline")
+	return out
+}
+
+func accumulateRenameFields(rename interface{}, out map[string]string) map[string]string {
+	var from, to string
+	for k, v := range rename.(map[string]interface{}) {
+		if k == "field" {
+			from = v.(string)
+		}
+		if k == "target_field" {
+			to = v.(string)
+		}
+	}
+	out[from] = to
+	return out
+}
+
+type Processors struct {
+	patterns []string
+	remove   []string
+	rename   map[string]string
+}
+
+func (p *Processors) processFields() ([]Field, error) {
+	f, err := getElementsFromPatterns(p.patterns)
+	if err != nil {
+		return nil, err
+	}
+
+	for i, ff := range f {
+		fs := strings.Join(ff.Elements, ".")
+		for _, rm := range p.remove {
+			if fs == rm {
+				f = append(f[:i], f[i+1:]...)
+			}
+		}
+		for k, mv := range p.rename {
+			if k == fs {
+				ff.Elements = strings.Split(mv, ".")
+			}
+		}
+		f[i] = ff
+	}
+	return f, nil
+}
+
+func getProcessors(p []map[string]interface{}) (*Processors, error) {
+	patterns := make([]string, 0)
+	rmFields := make([]string, 0)
+	mvFields := make(map[string]string)
+	var err error
+
+	for _, e := range p {
+		if ee, ok := e["grok"]; ok {
+			patterns, err = accumulatePatterns(ee)
+			if err != nil {
+				return nil, err
+			}
+		}
+		if rm, ok := e["remove"]; ok {
+			rmFields = accumulateRemoveFields(rm, rmFields)
+		}
+		if mv, ok := e["rename"]; ok {
+			mvFields = accumulateRenameFields(mv, mvFields)
+		}
+	}
+
+	if patterns == nil {
+		return nil, fmt.Errorf("No patterns in pipeline")
+	}
+
+	return &Processors{
+		patterns: patterns,
+		remove:   rmFields,
+		rename:   mvFields,
+	}, nil
 }
 
 func getFieldByName(f []*FieldYml, name string) *FieldYml {
@@ -199,12 +275,13 @@ func generateFields(f []Field, noDoc bool) []*FieldYml {
 }
 
 func (p *Pipeline) toFieldsYml(noDoc bool) ([]byte, error) {
-	pt, err := getPatternsFromProcessors(p.Processors)
+	pr, err := getProcessors(p.Processors)
 	if err != nil {
 		return nil, err
 	}
+
 	var fs []Field
-	fs, err = getElementsFromPatterns(pt)
+	fs, err = pr.processFields()
 	if err != nil {
 		return nil, err
 	}
