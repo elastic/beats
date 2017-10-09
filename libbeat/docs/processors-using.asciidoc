@@ -373,11 +373,11 @@ _Azure Virtual Machine_
 {
   "meta": {
     "cloud": {
-      "provider":      "az",
-  				"instance_id":   "04ab04c3-63de-4709-a9f9-9ab8c0411d5e",
-  				"instance_name": "test-az-vm",
-  				"machine_type":  "Standard_D3_v2",
-  				"region":        "eastus2"
+      "provider": "az",
+      "instance_id": "04ab04c3-63de-4709-a9f9-9ab8c0411d5e",
+      "instance_name": "test-az-vm",
+      "machine_type": "Standard_D3_v2",
+      "region": "eastus2"
     }
   }
 }
