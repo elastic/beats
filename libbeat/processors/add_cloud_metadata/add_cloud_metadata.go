@@ -260,6 +260,10 @@ func setupFetchers(c *common.Config) ([]*metadataFetcher, error) {
 	if err != nil {
 		return fetchers, err
 	}
+	azFetcher, err := newAzureVmMetadataFetcher(c)
+	if err != nil {
+		return fetchers, err
+	}
 
 	fetchers = []*metadataFetcher{
 		doFetcher,
@@ -267,6 +271,7 @@ func setupFetchers(c *common.Config) ([]*metadataFetcher, error) {
 		gceFetcher,
 		qcloudFetcher,
 		ecsFetcher,
+		azFetcher,
 	}
 	return fetchers, nil
 }
