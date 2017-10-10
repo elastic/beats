@@ -12,18 +12,9 @@ if [ ! -d "$beat" ]; then
   exit
 fi
 
-# Setup Go.
-export GOPATH=${WORKSPACE}
-export PATH=${GOPATH}/bin:${PATH}
-if [ -f ".go-version" ]; then
-  eval "$(gvm $(cat .go-version))"
-else
-  eval "$(gvm 1.7.5)"
-fi
+source ./dev-tools/common.bash
 
-# Workaround for Python virtualenv path being too long.
-TEMP_PYTHON_ENV=$(mktemp -d)
-export PYTHON_ENV="${TEMP_PYTHON_ENV}/python-env"
+jenkins_setup
 
 cleanup() {
   echo "Running cleanup..."
