@@ -2,7 +2,7 @@
 apiVersion: apps/v1beta1
 kind: Deployment
 metadata:
-  name: metricbeat-deployment
+  name: metricbeat
   namespace: kube-system
   labels:
     k8s-app: metricbeat
