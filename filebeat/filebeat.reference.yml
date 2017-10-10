@@ -181,7 +181,7 @@ filebeat.modules:
     #enabled: true
 
     # The Redis hosts to connect to.
-    #var.hosts: ["localhost:6378"]
+    #var.hosts: ["localhost:6379"]
 
     # Optional, the password to use when connecting to Redis.
     #var.password:
