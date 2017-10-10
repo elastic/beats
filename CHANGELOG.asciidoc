@@ -42,6 +42,8 @@ https://github.com/elastic/beats/compare/v5.6.3...5.6[Check the HEAD diff]
 
 *Affecting all Beats*
 
+- Add support for enabling TLS renegotiation. {issue}4386[4386]
+
 *Filebeat*
 
 *Heartbeat*

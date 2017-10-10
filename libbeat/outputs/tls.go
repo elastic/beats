@@ -35,6 +35,7 @@ type TLSConfig struct {
 	CAs              []string                      `config:"certificate_authorities"`
 	Certificate      CertificateConfig             `config:",inline"`
 	CurveTypes       []tlsCurveType                `config:"curve_types"`
+	Renegotiation    tlsRenegotiationSupport       `config:"renegotiation"`
 }
 
 type CertificateConfig struct {
@@ -46,6 +47,8 @@ type CertificateConfig struct {
 type tlsCipherSuite uint16
 
 type tlsCurveType tls.CurveID
+
+type tlsRenegotiationSupport tls.RenegotiationSupport
 
 var tlsCipherSuites = map[string]tlsCipherSuite{
 	"ECDHE-ECDSA-AES-128-CBC-SHA":    tlsCipherSuite(tls.TLS_ECDHE_ECDSA_WITH_AES_128_CBC_SHA),
@@ -71,6 +74,12 @@ var tlsCurveTypes = map[string]tlsCurveType{
 	"P-256": tlsCurveType(tls.CurveP256),
 	"P-384": tlsCurveType(tls.CurveP384),
 	"P-521": tlsCurveType(tls.CurveP521),
+}
+
+var tlsRenegotiationSupportTypes = map[string]tlsRenegotiationSupport{
+	"never":  tlsRenegotiationSupport(tls.RenegotiateNever),
+	"once":   tlsRenegotiationSupport(tls.RenegotiateOnceAsClient),
+	"freely": tlsRenegotiationSupport(tls.RenegotiateFreelyAsClient),
 }
 
 func (c *TLSConfig) Validate() error {
@@ -143,6 +152,7 @@ func LoadTLSConfig(config *TLSConfig) (*transport.TLSConfig, error) {
 		RootCAs:          cas,
 		CipherSuites:     cipherSuites,
 		CurvePreferences: curves,
+		Renegotiation:    tls.RenegotiationSupport(config.Renegotiation),
 	}, nil
 }
 
@@ -286,5 +296,15 @@ func (ct *tlsCurveType) Unpack(s string) error {
 	}
 
 	*ct = t
+	return nil
+}
+
+func (r *tlsRenegotiationSupport) Unpack(s string) error {
+	t, found := tlsRenegotiationSupportTypes[s]
+	if !found {
+		return fmt.Errorf("invalid tls renegotiation type '%v'", s)
+	}
+
+	*r = t
 	return nil
 }
