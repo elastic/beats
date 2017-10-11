@@ -32,7 +32,16 @@ func newTransformer(timeFieldName, title string, version *common.Version, fields
 	}, nil
 }
 
-func (t *transformer) transformFields() common.MapStr {
+func (t *transformer) transformFields() (transformed common.MapStr, err error) {
+	defer func() {
+		if r := recover(); r != nil {
+			var ok bool
+			if err, ok = r.(error); !ok {
+				err = fmt.Errorf("Unrecoverable Error %v", r)
+			}
+		}
+	}()
+
 	t.transform(t.fields, "")
 
 	// add some meta fields
@@ -43,12 +52,13 @@ func (t *transformer) transformFields() common.MapStr {
 	t.add(common.Field{Path: "_index", Type: "keyword", Index: &falsy, Analyzed: &falsy, DocValues: &falsy, Searchable: &falsy, Aggregatable: &falsy})
 	t.add(common.Field{Path: "_score", Type: "integer", Index: &falsy, Analyzed: &falsy, DocValues: &falsy, Searchable: &falsy, Aggregatable: &falsy})
 
-	return common.MapStr{
+	transformed = common.MapStr{
 		"timeFieldName":  t.timeFieldName,
 		"title":          t.title,
 		"fields":         t.transformedFields,
 		"fieldFormatMap": t.transformedFieldFormatMap,
 	}
+	return
 }
 
 func (t *transformer) transform(commonFields common.Fields, path string) {
@@ -173,7 +183,8 @@ func addVersionedFormatParam(f *common.MapStr, version *common.Version, key stri
 	for _, v := range val {
 		minVer, err := common.NewVersion(v.MinVersion)
 		if err != nil {
-			continue
+			msg := fmt.Sprintf("ERROR: Parameter Version <%s> for <%s> is invalid. Please update and try again.", v.MinVersion, key)
+			panic(errors.New(msg))
 		}
 		if minVer.LessThanOrEqual(true, version) && paramVer.LessThanOrEqual(true, minVer) {
 			paramVer = minVer

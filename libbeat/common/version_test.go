@@ -110,27 +110,6 @@ func TestLessThanOrEqual(t *testing.T) {
 			result:   true,
 		},
 		{
-			name:     "5.4.3 < 6.4.3",
-			version:  "5.4.3",
-			version1: "6.4.3",
-			meta:     false,
-			result:   true,
-		},
-		{
-			name:     "5.7.3 < 5.8.3",
-			version:  "5.7.3",
-			version1: "5.8.2",
-			meta:     false,
-			result:   true,
-		},
-		{
-			name:     "5.4.3 > 5.4.2",
-			version:  "5.4.3",
-			version1: "5.4.2",
-			meta:     false,
-			result:   false,
-		},
-		{
 			name:     "5.4.3 = 5.4.3",
 			version:  "5.4.3",
 			version1: "5.4.3",

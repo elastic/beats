@@ -97,7 +97,10 @@ func generate(indexName string, version *common.Version, f common.Fields) (commo
 	if err != nil {
 		return nil, err
 	}
-	transformed := transformer.transformFields()
+	transformed, err := transformer.transformFields()
+	if err != nil {
+		return nil, err
+	}
 
 	fieldsBytes, err := json.Marshal(transformed["fields"])
 	if err != nil {

@@ -17,8 +17,10 @@ var (
 )
 
 func TestEmpty(t *testing.T) {
-	trans, _ := newTransformer("name", "title", version, common.Fields{})
-	out := trans.transformFields()
+	trans, err := newTransformer("name", "title", version, common.Fields{})
+	assert.NoError(t, err)
+	out, err := trans.transformFields()
+	assert.NoError(t, err)
 	expected := common.MapStr{
 		"timeFieldName":  "name",
 		"title":          "title",
@@ -79,13 +81,31 @@ func TestMissingVersion(t *testing.T) {
 	assert.Error(t, err)
 }
 
-func TestErrors(t *testing.T) {
+func TestDuplicateField(t *testing.T) {
 	commonFields := common.Fields{
 		common.Field{Name: "context", Path: "something"},
 		common.Field{Name: "context", Path: "something", Type: "keyword"},
 	}
-	trans, _ := newTransformer("name", "title", version, commonFields)
-	assert.Panics(t, func() { trans.transformFields() })
+	trans, err := newTransformer("name", "title", version, commonFields)
+	assert.NoError(t, err)
+	_, err = trans.transformFields()
+	assert.Error(t, err)
+}
+
+func TestInvalidVersion(t *testing.T) {
+	commonFields := common.Fields{
+		common.Field{
+			Name:   "versionTest",
+			Format: "url",
+			UrlTemplate: []common.VersionizedString{
+				{MinVersion: "3", Value: ""},
+			},
+		},
+	}
+	trans, err := newTransformer("name", "title", version, commonFields)
+	assert.NoError(t, err)
+	_, err = trans.transformFields()
+	assert.Error(t, err)
 }
 
 func TestTransformTypes(t *testing.T) {
@@ -110,7 +130,9 @@ func TestTransformTypes(t *testing.T) {
 	}
 	for idx, test := range tests {
 		trans, _ := newTransformer("name", "title", version, common.Fields{test.commonField})
-		out := trans.transformFields()["fields"].([]common.MapStr)[0]
+		transformed, err := trans.transformFields()
+		assert.NoError(t, err)
+		out := transformed["fields"].([]common.MapStr)[0]
 		assert.Equal(t, test.expected, out["type"], fmt.Sprintf("Failed for idx %v", idx))
 	}
 }
@@ -153,7 +175,9 @@ func TestTransformGroup(t *testing.T) {
 	}
 	for idx, test := range tests {
 		trans, _ := newTransformer("name", "title", version, test.commonFields)
-		out := trans.transformFields()["fields"].([]common.MapStr)
+		transformed, err := trans.transformFields()
+		assert.NoError(t, err)
+		out := transformed["fields"].([]common.MapStr)
 		assert.Equal(t, len(test.expected)+ctMetaData, len(out))
 		for i, e := range test.expected {
 			assert.Equal(t, e, out[i]["name"], fmt.Sprintf("Failed for idx %v", idx))
@@ -207,13 +231,15 @@ func TestTransformMisc(t *testing.T) {
 	}
 	for idx, test := range tests {
 		trans, _ := newTransformer("", "", version, common.Fields{test.commonField})
-		out := trans.transformFields()["fields"].([]common.MapStr)[0]
+		transformed, err := trans.transformFields()
+		assert.NoError(t, err)
+		out := transformed["fields"].([]common.MapStr)[0]
 		msg := fmt.Sprintf("(%v): expected '%s' to be <%v> but was <%v>", idx, test.attr, test.expected, out[test.attr])
 		assert.Equal(t, test.expected, out[test.attr], msg)
 	}
 }
 
-func TesttransformFieldFormatMap(t *testing.T) {
+func TestTransformFieldFormatMap(t *testing.T) {
 	precision := 3
 	version620, _ := common.NewVersion("6.2.0")
 
@@ -398,7 +424,9 @@ func TesttransformFieldFormatMap(t *testing.T) {
 	}
 	for idx, test := range tests {
 		trans, _ := newTransformer("", "", test.version, common.Fields{test.commonField})
-		out := trans.transformFields()["fieldFormatMap"]
+		transformed, err := trans.transformFields()
+		assert.NoError(t, err)
+		out := transformed["fieldFormatMap"]
 		assert.Equal(t, test.expected, out, fmt.Sprintf("Failed for idx %v", idx))
 	}
 }
@@ -464,7 +492,9 @@ func TestTransformGroupAndEnabled(t *testing.T) {
 	}
 	for idx, test := range tests {
 		trans, _ := newTransformer("name", "title", version, test.commonFields)
-		out := trans.transformFields()["fields"].([]common.MapStr)
+		transformed, err := trans.transformFields()
+		assert.NoError(t, err)
+		out := transformed["fields"].([]common.MapStr)
 		assert.Equal(t, len(test.expected)+ctMetaData, len(out))
 		for i, e := range test.expected {
 			assert.Equal(t, e, out[i]["name"], fmt.Sprintf("Failed for idx %v", idx))
@@ -482,7 +512,9 @@ func TestTransformMultiField(t *testing.T) {
 		},
 	}
 	trans, _ := newTransformer("name", "title", version, common.Fields{f})
-	out := trans.transformFields()["fields"].([]common.MapStr)
+	transformed, err := trans.transformFields()
+	assert.NoError(t, err)
+	out := transformed["fields"].([]common.MapStr)
 	assert.Equal(t, "context", out[0]["name"])
 	assert.Equal(t, "context.keyword", out[1]["name"])
 	assert.Equal(t, "context.text", out[2]["name"])
