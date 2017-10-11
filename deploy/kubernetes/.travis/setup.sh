@@ -39,11 +39,11 @@ popd
 
 # Wait until kube is up and running
 TIMEOUT=0
-TIMEOUT_COUNT=40
-until $( curl --output /dev/null --silent http://localhost:8080 ) || [ $TIMEOUT -eq $TIMEOUT_COUNT ]; do
+TIMEOUT_COUNT=800
+until $(curl --output /dev/null --silent http://localhost:8080) || [ $TIMEOUT -eq $TIMEOUT_COUNT ]; do
   echo "Kube is not up yet"
   let TIMEOUT=TIMEOUT+1
-  sleep 20
+  sleep 1
 done
 
 if [ $TIMEOUT -eq $TIMEOUT_COUNT ]; then
