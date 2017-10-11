@@ -7,7 +7,7 @@ import (
 	"github.com/elastic/beats/libbeat/common"
 )
 
-type Transformer struct {
+type transformer struct {
 	fields                    common.Fields
 	transformedFields         []common.MapStr
 	transformedFieldFormatMap common.MapStr
@@ -17,11 +17,11 @@ type Transformer struct {
 	keys                      common.MapStr
 }
 
-func NewTransformer(timeFieldName, title string, version *common.Version, fields common.Fields) (*Transformer, error) {
+func newTransformer(timeFieldName, title string, version *common.Version, fields common.Fields) (*transformer, error) {
 	if version == nil {
 		return nil, errors.New("Version must be given")
 	}
-	return &Transformer{
+	return &transformer{
 		timeFieldName:             timeFieldName,
 		title:                     title,
 		fields:                    fields,
@@ -32,8 +32,8 @@ func NewTransformer(timeFieldName, title string, version *common.Version, fields
 	}, nil
 }
 
-func (t *Transformer) TransformFields() common.MapStr {
-	t.transformFields(t.fields, "")
+func (t *transformer) transformFields() common.MapStr {
+	t.transform(t.fields, "")
 
 	// add some meta fields
 	truthy := true
@@ -51,7 +51,7 @@ func (t *Transformer) TransformFields() common.MapStr {
 	}
 }
 
-func (t *Transformer) transformFields(commonFields common.Fields, path string) {
+func (t *transformer) transform(commonFields common.Fields, path string) {
 	for _, f := range commonFields {
 		f.Path = f.Name
 		if path != "" {
@@ -65,7 +65,7 @@ func (t *Transformer) transformFields(commonFields common.Fields, path string) {
 
 		if f.Type == "group" {
 			if f.Enabled == nil || *f.Enabled {
-				t.transformFields(f.Fields, f.Path)
+				t.transform(f.Fields, f.Path)
 			}
 		} else {
 			t.keys[f.Path] = true
@@ -83,7 +83,7 @@ func (t *Transformer) transformFields(commonFields common.Fields, path string) {
 	}
 }
 
-func (t *Transformer) add(f common.Field) {
+func (t *transformer) add(f common.Field) {
 	field, fieldFormat := transformField(t.version, f)
 	t.transformedFields = append(t.transformedFields, field)
 	if fieldFormat != nil {

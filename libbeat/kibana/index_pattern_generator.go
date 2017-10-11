@@ -93,11 +93,11 @@ func (i *IndexPatternGenerator) generate6x(fields common.Fields) (string, error)
 }
 
 func generate(indexName string, version *common.Version, f common.Fields) (common.MapStr, error) {
-	transformer, err := NewTransformer("@timestamp", indexName, version, f)
+	transformer, err := newTransformer("@timestamp", indexName, version, f)
 	if err != nil {
 		return nil, err
 	}
-	transformed := transformer.TransformFields()
+	transformed := transformer.transformFields()
 
 	fieldsBytes, err := json.Marshal(transformed["fields"])
 	if err != nil {
