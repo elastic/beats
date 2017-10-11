@@ -32,6 +32,7 @@ type Field struct {
 	Dynamic        DynamicType `config:"dynamic"`
 	Index          *bool       `config:"index"`
 	DocValues      *bool       `config:"doc_values"`
+	CopyTo         string      `config:"copy_to"`
 
 	// Kibana specific
 	Analyzed     *bool  `config:"analyzed"`
@@ -70,6 +71,7 @@ func (d *DynamicType) Unpack(s string) error {
 	}
 	return nil
 }
+
 func LoadFieldsYaml(path string) (Fields, error) {
 	keys := []Field{}
 
