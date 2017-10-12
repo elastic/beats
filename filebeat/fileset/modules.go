@@ -297,6 +297,14 @@ func (reg *ModuleRegistry) LoadPipelines(esClient PipelineLoader) error {
 
 func loadScript(name, source string, esClient PipelineLoader) error {
 	parts := strings.Split(name, ".")
+	if len(parts) != 2 {
+		return fmt.Errorf("Invalid number of filename parts: %d (instead of 2)", len(parts))
+	}
+
+	if parts[1] != "painless" {
+		return fmt.Errorf("Only painless scripts can be stored for pipelines")
+	}
+
 	url := strings.Join([]string{"/_scripts/", parts[0]}, "")
 	payload := common.MapStr{
 		"script": common.MapStr{
