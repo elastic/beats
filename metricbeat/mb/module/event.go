@@ -43,6 +43,13 @@ func (b EventBuilder) Build() (beat.Event, error) {
 	if b.Host != "" {
 		metricsetData["host"] = b.Host
 	}
+	// Add RTT.
+	if rtt, found := fields[mb.RTTKey]; found {
+		delete(fields, mb.RTTKey)
+		if rttDuration, ok := rtt.(time.Duration); ok {
+			b.FetchDuration = rttDuration
+		}
+	}
 	if b.FetchDuration != 0 {
 		metricsetData["rtt"] = b.FetchDuration.Nanoseconds() / int64(time.Microsecond)
 	}

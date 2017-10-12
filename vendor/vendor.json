@@ -109,6 +109,14 @@
 			"revisionTime": "2016-09-02T18:42:37Z"
 		},
 		{
+			"checksumSHA1": "R1Q34Pfnt197F/nCOO9kG8c+Z90=",
+			"path": "github.com/boltdb/bolt",
+			"revision": "2f1ce7a837dcb8da3ec595b1dac9d0632f0f99e8",
+			"revisionTime": "2017-07-17T17:11:48Z",
+			"version": "v1.3.1",
+			"versionExact": "v1.3.1"
+		},
+		{
 			"checksumSHA1": "5rPfda8jFccr3A6heL+JAmi9K9g=",
 			"path": "github.com/davecgh/go-spew/spew",
 			"revision": "5215b55f46b2b919f50a1df0eaa5886afe4e3b3d",
@@ -757,6 +765,12 @@
 			"revisionTime": "2017-02-15T23:32:05Z"
 		},
 		{
+			"checksumSHA1": "upYudcnxqDBx2/71UDwwxHn/KyY=",
+			"path": "github.com/google/flatbuffers/go",
+			"revision": "7a6b2bf521e95097a92ec848001531b2dcf0f3fa",
+			"revisionTime": "2017-09-25T18:44:58Z"
+		},
+		{
 			"checksumSHA1": "5DBIm/bJOKLR3CbQH6wIELQDLlQ=",
 			"path": "github.com/gorhill/cronexpr",
 			"revision": "d520615e531a6bf3fb69406b9eba718261285ec8",
@@ -773,6 +787,12 @@
 			"path": "github.com/joeshaw/multierror",
 			"revision": "69b34d4ec901851247ae7e77d33909caf9df99ed",
 			"revisionTime": "2014-01-24T17:37:10Z"
+		},
+		{
+			"checksumSHA1": "a8Ge6pE7oxux9ZMZVAlyEeGzCng=",
+			"path": "github.com/juju/ratelimit",
+			"revision": "5b9ff866471762aa2ab2dced63c9fb6f53921342",
+			"revisionTime": "2017-05-23T01:21:41Z"
 		},
 		{
 			"checksumSHA1": "+CqJGh7NIDMnHgScq9sl9tPrnVM=",

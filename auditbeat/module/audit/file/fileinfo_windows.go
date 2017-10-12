@@ -15,12 +15,10 @@ import (
 	"github.com/elastic/beats/filebeat/input/file"
 )
 
-func Stat(path string) (*Metadata, error) {
-	info, err := os.Lstat(path)
-	if err != nil {
-		return nil, errors.Wrap(err, "failed to stat path")
-	}
-
+// NewMetadata returns a new Metadata object. If an error is returned it is
+// still possible for a non-nil Metadata object to be returned (possibly with
+// less data populated).
+func NewMetadata(path string, info os.FileInfo) (*Metadata, error) {
 	attrs, ok := info.Sys().(*syscall.Win32FileAttributeData)
 	if !ok {
 		return nil, errors.Errorf("unexpected fileinfo sys type %T for %v", info.Sys(), path)
@@ -31,30 +29,31 @@ func Stat(path string) (*Metadata, error) {
 	fileInfo := &Metadata{
 		Inode: uint64(state.IdxHi<<32 + state.IdxLo),
 		Mode:  info.Mode(),
-		Size:  info.Size(),
-		ATime: time.Unix(0, attrs.LastAccessTime.Nanoseconds()).UTC(),
+		Size:  uint64(info.Size()),
 		MTime: time.Unix(0, attrs.LastWriteTime.Nanoseconds()).UTC(),
 		CTime: time.Unix(0, attrs.CreationTime.Nanoseconds()).UTC(),
 	}
 
 	switch {
-	case info.IsDir():
-		fileInfo.Type = "dir"
 	case info.Mode().IsRegular():
-		fileInfo.Type = "file"
+		fileInfo.Type = FileType
+	case info.IsDir():
+		fileInfo.Type = DirType
 	case info.Mode()&os.ModeSymlink > 0:
-		fileInfo.Type = "symlink"
+		fileInfo.Type = SymlinkType
 	}
 
 	// fileOwner only works on files or symlinks to file because os.Open only
 	// works on files. To open a dir we need to use CreateFile with the
 	// FILE_FLAG_BACKUP_SEMANTICS flag.
+	var err error
 	if !info.IsDir() {
 		fileInfo.SID, fileInfo.Owner, err = fileOwner(path)
 	}
 	return fileInfo, err
 }
 
+// fileOwner returns the SID and name (domain\user) of the file's owner.
 func fileOwner(path string) (sid, owner string, err error) {
 	f, err := os.Open(path)
 	if err != nil {
@@ -65,7 +64,7 @@ func fileOwner(path string) (sid, owner string, err error) {
 	var securityID *syscall.SID
 	var securityDescriptor *SecurityDescriptor
 
-	if err := GetSecurityInfo(syscall.Handle(f.Fd()), FileObject,
+	if err = GetSecurityInfo(syscall.Handle(f.Fd()), FileObject,
 		OwnerSecurityInformation, &securityID, nil, nil, nil, &securityDescriptor); err != nil {
 		return "", "", errors.Wrapf(err, "failed on GetSecurityInfo for %v", path)
 	}
