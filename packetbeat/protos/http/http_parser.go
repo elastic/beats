@@ -211,15 +211,15 @@ func parseResponseStatus(s []byte) (uint16, []byte, error) {
 	if p == -1 {
 		return 0, nil, errors.New("Not able to identify status code")
 	}
-
-	code, _ := parseInt(s[0:p])
-
-	p = bytes.LastIndexByte(s, ' ')
-	if p == -1 {
-		return uint16(code), nil, errors.New("Not able to identify status code")
+	statusCode, err := parseInt(s[0:p])
+	if err != nil {
+		return 0, nil, fmt.Errorf("Unable to parse status code from [%s]", s)
 	}
 	phrase := s[p+1:]
-	return uint16(code), phrase, nil
+	if len(phrase) == 0 {
+		return 0, nil, fmt.Errorf("Unable to parse status phrase from [%s]", s)
+	}
+	return uint16(statusCode), phrase, nil
 }
 
 func parseVersion(s []byte) (uint8, uint8, error) {
