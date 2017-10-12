@@ -38,5 +38,5 @@
     - name: custom_fields
       type: object
       object_type: keyword
-      descripton: >
+      description: >
         Custom fields      

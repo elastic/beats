@@ -134,7 +134,7 @@ func (rl *Reloader) Run(runnerFactory RunnerFactory) {
 
 	gw := NewGlobWatcher(rl.path)
 
-	// If reloading is disable, config files should be loaded immidiately
+	// If reloading is disable, config files should be loaded immediately
 	if !rl.config.Reload.Enabled {
 		rl.config.Reload.Period = 0
 	}

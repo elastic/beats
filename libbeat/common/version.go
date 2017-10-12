@@ -57,6 +57,35 @@ func (v *Version) IsMajor(major int) bool {
 }
 
 // LessThan returns true if v is strictly smaller than v1. When comparing, the major,
+// minor, bugfix and pre-release numbers are compared in order.
+func (v *Version) LessThanOrEqual(withMeta bool, v1 *Version) bool {
+	if withMeta && v.version == v1.version {
+		return true
+	}
+	if v.Major < v1.Major {
+		return true
+	}
+	if v.Major == v1.Major {
+		if v.Minor < v1.Minor {
+			return true
+		}
+		if v.Minor == v1.Minor {
+			if v.Bugfix < v1.Bugfix {
+				return true
+			}
+			if v.Bugfix == v1.Bugfix {
+				if withMeta {
+					return v.metaIsLessThanOrEqual(v1)
+				} else {
+					return true
+				}
+			}
+		}
+	}
+	return false
+}
+
+// LessThan returns true if v is strictly smaller than v1. When comparing, the major,
 // minor and bugfix numbers are compared in order. The meta part is not taken into account.
 func (v *Version) LessThan(v1 *Version) bool {
 	if v.Major < v1.Major {
@@ -75,4 +104,17 @@ func (v *Version) LessThan(v1 *Version) bool {
 
 func (v *Version) String() string {
 	return v.version
+}
+
+func (v *Version) metaIsLessThanOrEqual(v1 *Version) bool {
+	if v.Meta == "" && v1.Meta == "" {
+		return true
+	}
+	if v.Meta == "" {
+		return false
+	}
+	if v1.Meta == "" {
+		return true
+	}
+	return v.Meta <= v1.Meta
 }

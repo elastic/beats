@@ -156,7 +156,7 @@ func (h *Harvester) Setup() error {
 func (h *Harvester) Run() error {
 	// This is to make sure a harvester is not started anymore if stop was already
 	// called before the harvester was started. The waitgroup is not incremented afterwards
-	// as otherwise it could happend that between checking for the close channel and incrementing
+	// as otherwise it could happened that between checking for the close channel and incrementing
 	// the waitgroup, the harvester could be stopped.
 	h.stopWg.Add(1)
 	select {

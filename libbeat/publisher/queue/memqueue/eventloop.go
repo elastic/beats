@@ -242,7 +242,7 @@ func (l *directEventLoop) processACK(lst chanList, N int) {
 		count := (st.seq - st.state.lastACK)
 		if count == 0 || count > math.MaxUint32/2 {
 			// seq number comparison did underflow. This happens only if st.seq has
-			// allready been acknowledged
+			// already been acknowledged
 			// log.Debug("seq number already acked: ", st.seq)
 
 			st.state = nil
@@ -508,7 +508,7 @@ func (l *bufferingEventLoop) processACK(lst chanList, N int) {
 			count := st.seq - st.state.lastACK
 			if count == 0 || count > math.MaxUint32/2 {
 				// seq number comparison did underflow. This happens only if st.seq has
-				// allready been acknowledged
+				// already been acknowledged
 				// log.Debug("seq number already acked: ", st.seq)
 
 				st.state = nil

@@ -6,7 +6,7 @@ import (
 	"github.com/elastic/beats/libbeat/publisher/queue"
 )
 
-// outputController manages the pipelines output capabilites, like:
+// outputController manages the pipelines output capabilities, like:
 // - start
 // - stop
 // - reload

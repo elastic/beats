@@ -14,7 +14,8 @@
 == Configure the output
 
 You configure {beatname_uc} to write to a specific output by setting options
-in the `output` section of the +{beatname_lc}.yml+ config file.
+in the `output` section of the +{beatname_lc}.yml+ config file. Only a single
+output may be defined.
 
 The following topics describe how to configure each supported output:
 
@@ -280,10 +281,9 @@ However big batch sizes can also increase processing times, which might result i
 API errors, killed connections, timed-out publishing requests, and, ultimately, lower
 throughput.
 
-Setting `bulk_max_size` to values less than or equal to 0 disables buffering in libbeat. When buffering is disabled,
-Beats that publish single events (such as Packetbeat) send each event directly to
-Elasticsearch. Beats that publish data in batches (such as Filebeat) send events in batches based on the
-spooler size.
+Setting `bulk_max_size` to values less than or equal to 0 disables the
+splitting of batches. When splitting is disabled, the queue decides on the
+number of events to be contained in a batch.
 
 ===== `timeout`
 
@@ -444,7 +444,7 @@ output.logstash:
 
 ===== `pipelining`
 
-Configures number of batches to be send asynchronously to logstash while waiting
+Configures number of batches to be sent asynchronously to logstash while waiting
 for ACK from logstash. Output only becomes blocking once number of `pipelining`
 batches have been written. Pipelining is disabled if a values of 0 is
 configured. The default value is 0.
@@ -525,14 +525,14 @@ However big batch sizes can also increase processing times, which might result i
 API errors, killed connections, timed-out publishing requests, and, ultimately, lower
 throughput.
 
-Setting `bulk_max_size` to values less than or equal to 0 disables buffering in libbeat. When buffering is disabled,
-Beats that publish single events (such as Packetbeat) send each event directly to
-Elasticsearch. Beats that publish data in batches (such as Filebeat) send events in batches based on the
-spooler size.
+Setting `bulk_max_size` to values less than or equal to 0 disables the
+splitting of batches. When splitting is disabled, the queue decides on the
+number of events to be contained in a batch.
+
 
 ===== `slow_start`
 
-If enabled only a subset of events in a batch of events is transfered per transaction.
+If enabled only a subset of events in a batch of events is transferred per transaction.
 The number of events to be sent increases up to `bulk_max_size` if no error is encountered.
 On error the number of events per transaction is reduced again.
 
@@ -929,11 +929,9 @@ of sending events. However big batch sizes can also increase processing times,
 which might result in API errors, killed connections, timed-out publishing
 requests, and, ultimately, lower throughput.
 
-Setting `bulk_max_size` to values less than or equal to 0 disables buffering in
-libbeat. When buffering is disabled, Beats that publish single events (such as
-Packetbeat) send each event directly to Redis. Beats that publish
-data in batches (such as Filebeat) send events in batches based on the spooler
-size.
+Setting `bulk_max_size` to values less than or equal to 0 disables the
+splitting of batches. When splitting is disabled, the queue decides on the
+number of events to be contained in a batch.
 
 ===== `ssl`
 
@@ -1063,10 +1061,12 @@ The maximum number of events to buffer internally during publishing. The default
 Specifying a larger batch size may add some latency and buffering during publishing. However, for Console output, this
 setting does not affect how events are published.
 
-Setting `bulk_max_size` to 0 disables buffering in libbeat.
+Setting `bulk_max_size` to values less than or equal to 0 disables the
+splitting of batches. When splitting is disabled, the queue decides on the
+number of events to be contained in a batch.
 
 [[configuration-output-codec]]
-=== Configure the ouput codec
+=== Configure the output codec
 
 ++++
 <titleabbrev>Output codec</titleabbrev>
@@ -1101,22 +1101,26 @@ output.console:
 [[configure-cloud-id]]
 === Configure the output for the Elastic Cloud
 
+++++
+<titleabbrev>Cloud</titleabbrev>
+++++
+
 {beatname_uc} comes with two settings that simplify the output configuration
 when used together with https://cloud.elastic.co/[Elastic Cloud]. When defined,
 these setting overwrite settings from other parts in the configuration.
 
 Example:
 
-[source,yaml]
+["source","yaml",subs="attributes"]
 ------------------------------------------------------------------------------
 cloud.id: "staging:dXMtZWFzdC0xLmF3cy5mb3VuZC5pbyRjZWM2ZjI2MWE3NGJmMjRjZTMzYmI4ODExYjg0Mjk0ZiRjNmMyY2E2ZDA0MjI0OWFmMGNjN2Q3YTllOTYyNTc0Mw=="
-cloud.auth: "elastic:changeme"
+cloud.auth: "elastic:{pwd}"
 ------------------------------------------------------------------------------
 
 These settings can be also specified at the command line, like this:
 
 
-["source","sh",subs="attributes,callouts"]
+["source","sh",subs="attributes"]
 ------------------------------------------------------------------------------
 {beatname_lc} -e -E cloud.id="<cloud-id>" -E cloud.auth="<cloud.auth>"
 ------------------------------------------------------------------------------
