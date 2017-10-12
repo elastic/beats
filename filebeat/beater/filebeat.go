@@ -51,7 +51,7 @@ func New(b *beat.Beat, rawConfig *common.Config) (beat.Beater, error) {
 		return nil, err
 	}
 
-	moduleRegistry, err := fileset.NewModuleRegistry(config.Modules, b.Info.Version)
+	moduleRegistry, err := fileset.NewModuleRegistry(config.Modules, b.Info.Version, true)
 	if err != nil {
 		return nil, err
 	}
