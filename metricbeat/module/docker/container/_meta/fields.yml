@@ -15,6 +15,10 @@
       type: keyword
       description: >
         Container status.
+    - name: ip_addresses
+      type: keyword
+      description: >
+        Container IP addresses.
     - name: size
       type: group
       description: >

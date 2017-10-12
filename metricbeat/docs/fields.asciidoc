@@ -1909,6 +1909,14 @@ Container status.
 
 
 [float]
+=== `docker.container.ip_addresses`
+
+type: keyword
+
+Container IP addresses.
+
+
+[float]
 == size fields
 
 Container size metrics.
