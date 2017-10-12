@@ -120,7 +120,7 @@ const (
 
 	// DropIfFull drops an event to be send if the pipeline is currently full.
 	// This ensures a beats internals can continue processing if the pipeline has
-	// filled up. Usefull if an event stream must be processed to keep internal
+	// filled up. Useful if an event stream must be processed to keep internal
 	// state up-to-date.
 	DropIfFull
 )

@@ -85,6 +85,7 @@ func TestValuesSet(t *testing.T) {
     supported_protocols: [TLSv1.1, TLSv1.2]
     curve_types:
       - P-521
+    renegotiation: freely
   `)
 
 	if err != nil {
@@ -100,6 +101,9 @@ func TestValuesSet(t *testing.T) {
 		[]transport.TLSVersion{transport.TLSVersion11, transport.TLSVersion12},
 		cfg.Versions)
 	assert.Len(t, cfg.CurveTypes, 1)
+	assert.Equal(t,
+		tls.RenegotiateFreelyAsClient,
+		tls.RenegotiationSupport(cfg.Renegotiation))
 }
 
 func TestApplyEmptyConfig(t *testing.T) {
@@ -168,6 +172,10 @@ func TestCertificateFails(t *testing.T) {
 		{
 			"unknown curve type",
 			"curve_types: ['unknown curve type']",
+		},
+		{
+			"unknown renegotiation type",
+			"renegotiation: always",
 		},
 	}
 

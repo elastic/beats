@@ -12,7 +12,7 @@
     - name: thread_id
       type: long
       description: >
-          Processs id
+          Process id
     - name: user
       example: "admin"
       description:
@@ -33,7 +33,7 @@
     - name: query
       example: "SELECT * FROM users;"
       description:
-        Query statment.
+        Query statement.
     - name: message
       type: text
       description: >

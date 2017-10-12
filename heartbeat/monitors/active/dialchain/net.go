@@ -13,7 +13,7 @@ import (
 
 // TCPDialer creates a new NetDialer with constant event fields and default
 // connection timeout.
-// The fields parameter holds additonal constants to be added to the final event
+// The fields parameter holds additional constants to be added to the final event
 // structure.
 //
 // The dialer will update the active events with:
@@ -30,7 +30,7 @@ func TCPDialer(to time.Duration) NetDialer {
 
 // UDPDialer creates a new NetDialer with constant event fields and default
 // connection timeout.
-// The fields parameter holds additonal constants to be added to the final event
+// The fields parameter holds additional constants to be added to the final event
 // structure.
 //
 // The dialer will update the active events with:

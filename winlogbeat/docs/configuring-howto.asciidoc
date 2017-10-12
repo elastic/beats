@@ -19,6 +19,7 @@ The following topics describe how to configure Winlogbeat:
 
 * <<configuration-winlogbeat-options>>
 * <<configuration-general-options>>
+* <<configuring-internal-queue>>
 * <<configuring-output>>
 * <<configuration-ssl>>
 * <<filtering-and-enhancing-data>>
@@ -38,6 +39,8 @@ include::./winlogbeat-options.asciidoc[]
 include::./winlogbeat-general-options.asciidoc[]
 
 :win:
+include::../../libbeat/docs/queueconfig.asciidoc[]
+
 include::../../libbeat/docs/outputconfig.asciidoc[]
 
 include::../../libbeat/docs/shared-ssl-config.asciidoc[]

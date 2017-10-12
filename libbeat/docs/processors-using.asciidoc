@@ -260,6 +260,7 @@ The following cloud providers are supported:
 - Google Compute Engine (GCE)
 - https://www.qcloud.com/?lang=en[Tencent Cloud] (QCloud)
 - Alibaba Cloud (ECS)
+- Azure Virtual Machine
 
 The simple configuration below enables the processor.
 
@@ -365,6 +366,24 @@ ECS instance.
 }
 -------------------------------------------------------------------------------
 
+_Azure Virtual Machine_
+
+[source,json]
+-------------------------------------------------------------------------------
+{
+  "meta": {
+    "cloud": {
+      "provider": "az",
+      "instance_id": "04ab04c3-63de-4709-a9f9-9ab8c0411d5e",
+      "instance_name": "test-az-vm",
+      "machine_type": "Standard_D3_v2",
+      "region": "eastus2"
+    }
+  }
+}
+-------------------------------------------------------------------------------
+
+
 [[add-locale]]
 === Add the local time zone
 
@@ -410,7 +429,7 @@ processors:
      fields: ["field1", "field2", ...]
      process_array: false
      max_depth: 1
-     target:
+     target: ""
      overwrite_keys: false
 -----------------------------------------------------
 
@@ -423,7 +442,8 @@ arrays. The default is false.
 `target`:: (Optional) The field under which the decoded JSON will be written. By
 default the decoded JSON object replaces the string field from which it was
 read. To merge the decoded JSON fields into the root of the event, specify
-`target` with an empty value (`target:`).
+`target` with an empty string (`target: ""`). Note that the `null` value (`target:`)
+is treated as if the field was not set at all.
 `overwrite_keys`:: (Optional) A boolean that specifies whether keys that already
 exist in the event are overwritten by keys from the decoded JSON object. The
 default value is false.

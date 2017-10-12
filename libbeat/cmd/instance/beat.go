@@ -370,7 +370,7 @@ func (b *Beat) handleFlags() error {
 	flag.Parse()
 
 	if printVersion {
-		cfgwarn.Deprecate("6.0", "-version flag has been deprectad, use version subcommand")
+		cfgwarn.Deprecate("6.0", "-version flag has been deprecated, use version subcommand")
 		fmt.Printf("%s version %s (%s), libbeat %s\n",
 			b.Info.Beat, b.Info.Version, runtime.GOARCH, version.GetDefaultVersion())
 		return beat.GracefulExit
@@ -537,7 +537,7 @@ func (b *Beat) loadDashboards(force bool) error {
 		if b.Config.Output.Name() == "elasticsearch" {
 			esConfig = b.Config.Output.Config()
 		}
-		err := dashboards.ImportDashboards(b.Info.Beat, b.Info.Version, paths.Resolve(paths.Home, ""),
+		err := dashboards.ImportDashboards(b.Info.Beat, b.Info.Name, paths.Resolve(paths.Home, ""),
 			b.Config.Kibana, esConfig, b.Config.Dashboards, nil)
 		if err != nil {
 			return fmt.Errorf("Error importing Kibana dashboards: %v", err)
@@ -575,7 +575,7 @@ func (b *Beat) registerTemplateLoading() error {
 			return err
 		}
 
-		if esCfg.Index != "" && (cfg.Name == "" || cfg.Pattern == "") {
+		if esCfg.Index != "" && (cfg.Name == "" || cfg.Pattern == "") && (b.Config.Template == nil || b.Config.Template.Enabled()) {
 			return fmt.Errorf("setup.template.name and setup.template.pattern have to be set if index name is modified.")
 		}
 

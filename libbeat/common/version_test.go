@@ -45,6 +45,103 @@ func TestVersion(t *testing.T) {
 	}
 }
 
+func TestLessThanOrEqual(t *testing.T) {
+	tests := []struct {
+		name     string
+		version  string
+		version1 string
+		meta     bool
+		result   bool
+	}{
+		{
+			name:     "5.4.3 < 6.4.3",
+			version:  "5.4.3",
+			version1: "6.4.3",
+			meta:     true,
+			result:   true,
+		},
+		{
+			name:     "5.7.3 < 5.8.3",
+			version:  "5.7.3",
+			version1: "5.8.2",
+			meta:     true,
+			result:   true,
+		},
+		{
+			name:     "5.4.3 > 5.4.2",
+			version:  "5.4.3",
+			version1: "5.4.2",
+			meta:     true,
+			result:   false,
+		},
+		{
+			name:     "5.4.3 = 5.4.3",
+			version:  "5.4.3",
+			version1: "5.4.3",
+			meta:     true,
+			result:   true,
+		},
+		{
+			name:     "1.2.3 > 1.2.3-alpha1",
+			version:  "1.2.3",
+			version1: "1.2.3-alpha1",
+			meta:     true,
+			result:   false,
+		},
+		{
+			name:     "1.2.3.alpha < 1.2.3",
+			version:  "1.2.3-alpha",
+			version1: "1.2.3",
+			meta:     true,
+			result:   true,
+		},
+		{
+			name:     "1.2.3.alpha < 1.2.3.beta",
+			version:  "1.2.3-alpha",
+			version1: "1.2.3-beta",
+			meta:     true,
+			result:   true,
+		},
+		{
+			name:     "1.2.3.rc1 < 1.2.3.rc2",
+			version:  "1.2.3-rc1",
+			version1: "1.2.3-rc2",
+			meta:     true,
+			result:   true,
+		},
+		{
+			name:     "5.4.3 = 5.4.3",
+			version:  "5.4.3",
+			version1: "5.4.3",
+			meta:     false,
+			result:   true,
+		},
+		{
+			name:     "1.2.3 = 1.2.3-alpha1",
+			version:  "1.2.3",
+			version1: "1.2.3-alpha1",
+			meta:     false,
+			result:   true,
+		},
+		{
+			name:     "1.2.3.beta1 = 1.2.3-beta2",
+			version:  "1.2.3-beta1",
+			version1: "1.2.3-beta2",
+			meta:     false,
+			result:   true,
+		},
+	}
+
+	for _, test := range tests {
+		v, err := NewVersion(test.version)
+		assert.NoError(t, err)
+		v1, err := NewVersion(test.version1)
+		assert.NoError(t, err)
+
+		assert.Equal(t, test.result, v.LessThanOrEqual(test.meta, v1), test.name)
+	}
+}
+
 func TestVersionLessThan(t *testing.T) {
 	tests := []struct {
 		name     string

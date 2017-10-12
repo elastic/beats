@@ -26,6 +26,7 @@ grouped in the following categories:
 * <<exported-fields-postgresql>>
 * <<exported-fields-redis>>
 * <<exported-fields-system>>
+* <<exported-fields-traefik>>
 
 --
 [[exported-fields-apache2]]
@@ -1406,7 +1407,7 @@ The timezone of timestamp.
 
 type: long
 
-Processs id
+Process id
 
 
 [float]
@@ -1444,7 +1445,7 @@ Duration of a query.
 
 example: SELECT * FROM users;
 
-Query statment.
+Query statement.
 
 [float]
 === `postgresql.log.message`
@@ -1843,4 +1844,252 @@ The PID of the process that sent the syslog message.
 
 The message in the log line.
 
+
+[[exported-fields-traefik]]
+== Traefik fields
+
+Module for parsing the Traefik log files.
+
+
+
+[float]
+== traefik fields
+
+Fields from the Traefik log files.
+
+
+
+[float]
+== access fields
+
+Contains fields for the Traefik access logs.
+
+
+
+[float]
+=== `traefik.access.remote_ip`
+
+type: keyword
+
+Client IP address.
+
+
+[float]
+=== `traefik.access.user_name`
+
+type: keyword
+
+The user name used when basic authentication is used.
+
+
+[float]
+=== `traefik.access.method`
+
+type: keyword
+
+example: GET
+
+The request HTTP method.
+
+
+[float]
+=== `traefik.access.url`
+
+type: keyword
+
+The request HTTP URL.
+
+
+[float]
+=== `traefik.access.http_version`
+
+type: keyword
+
+The HTTP version.
+
+
+[float]
+=== `traefik.access.response_code`
+
+type: long
+
+The HTTP response code.
+
+
+[float]
+=== `traefik.access.body_sent.bytes`
+
+type: long
+
+format: bytes
+
+The number of bytes of the server response body.
+
+
+[float]
+=== `traefik.access.referrer`
+
+type: keyword
+
+The HTTP referrer.
+
+
+[float]
+=== `traefik.access.agent`
+
+type: text
+
+Contains the un-parsed user agent string. Only present if the user agent Elasticsearch plugin is not available or not used.
+
+
+[float]
+== user_agent fields
+
+Contains the parsed User agent field. Only present if the user agent Elasticsearch plugin is available and used.
+
+
+
+[float]
+=== `traefik.access.user_agent.device`
+
+type: keyword
+
+The name of the physical device.
+
+
+[float]
+=== `traefik.access.user_agent.major`
+
+type: long
+
+The major version of the user agent.
+
+
+[float]
+=== `traefik.access.user_agent.minor`
+
+type: long
+
+The minor version of the user agent.
+
+
+[float]
+=== `traefik.access.user_agent.patch`
+
+type: keyword
+
+The patch version of the user agent.
+
+
+[float]
+=== `traefik.access.user_agent.name`
+
+type: keyword
+
+example: Chrome
+
+The name of the user agent.
+
+
+[float]
+=== `traefik.access.user_agent.os`
+
+type: keyword
+
+The name of the operating system.
+
+
+[float]
+=== `traefik.access.user_agent.os_major`
+
+type: long
+
+The major version of the operating system.
+
+
+[float]
+=== `traefik.access.user_agent.os_minor`
+
+type: long
+
+The minor version of the operating system.
+
+
+[float]
+=== `traefik.access.user_agent.os_name`
+
+type: keyword
+
+The name of the operating system.
+
+
+[float]
+== geoip fields
+
+Contains GeoIP information gathered based on the remote_ip field. Only present if the GeoIP Elasticsearch plugin is available and used.
+
+
+
+[float]
+=== `traefik.access.geoip.continent_name`
+
+type: keyword
+
+The name of the continent.
+
+
+[float]
+=== `traefik.access.geoip.country_iso_code`
+
+type: keyword
+
+Country ISO code.
+
+
+[float]
+=== `traefik.access.geoip.location`
+
+type: geo_point
+
+The longitude and latitude.
+
+
+[float]
+=== `traefik.access.geoip.region_name`
+
+type: keyword
+
+The region name.
+
+
+[float]
+=== `traefik.access.geoip.city_name`
+
+type: keyword
+
+The city name.
+
+
+[float]
+=== `traefik.access.request_count`
+
+type: long
+
+The number of requests
+
+
+[float]
+=== `traefik.access.frontend_name`
+
+type: text
+
+The name of the frontend used
+
+
+[float]
+=== `traefik.access.backend_url`
+
+type: text
+
+The url of the backend where request is forwarded
 
