@@ -542,6 +542,51 @@ func TestHttpParser_301_response(t *testing.T) {
 	assert.Equal(t, 290, msg.contentLength)
 }
 
+func TestHttpParser_PhraseContainsSpaces(t *testing.T) {
+	if testing.Verbose() {
+		logp.LogInit(logp.LOG_DEBUG, "", false, true, []string{"http"})
+	}
+	response_404 := "HTTP/1.1 404 Not Found\r\n" +
+		"Server: Apache-Coyote/1.1\r\n" +
+		"Content-Type: text/html;charset=utf-8\r\n" +
+		"Content-Length: 18\r\n" +
+		"Date: Mon, 31 Jul 2017 11:31:53 GMT\r\n" +
+		"\r\n" +
+		"Http Response Body"
+
+	r, ok, complete := testParse(nil, response_404)
+	assert.True(t, ok)
+	assert.True(t, complete)
+	assert.Equal(t, 18, r.contentLength)
+	assert.Equal(t, "Not Found", string(r.statusPhrase))
+	assert.Equal(t, 404, int(r.statusCode))
+
+	response_500 := "HTTP/1.1 500 Internal Server Error\r\n" +
+		"Server: Apache-Coyote/1.1\r\n" +
+		"Content-Type: text/html;charset=utf-8\r\n" +
+		"Content-Length: 2\r\n" +
+		"Date: Mon, 30 Jul 2017 00:00:00 GMT\r\n" +
+		"\r\n" +
+		"xx"
+	r, ok, complete = testParse(nil, response_500)
+	assert.True(t, ok)
+	assert.True(t, complete)
+	assert.Equal(t, 2, r.contentLength)
+	assert.Equal(t, "Internal Server Error", string(r.statusPhrase))
+	assert.Equal(t, 500, int(r.statusCode))
+
+	broken := "HTTP/1.1 500 \r\n" +
+		"Server: Apache-Coyote/1.1\r\n" +
+		"Content-Type: text/html;charset=utf-8\r\n" +
+		"Content-Length: 2\r\n" +
+		"Date: Mon, 30 Jul 2017 00:00:00 GMT\r\n" +
+		"\r\n" +
+		"xx"
+	r, ok, complete = testParse(nil, broken)
+	assert.False(t, ok)
+	assert.False(t, complete)
+}
+
 func TestEatBodyChunked(t *testing.T) {
 	if testing.Verbose() {
 		logp.LogInit(logp.LOG_DEBUG, "", false, true, []string{"http", "httpdetailed"})
