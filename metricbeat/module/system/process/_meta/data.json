@@ -1,5 +1,5 @@
 {
-    "@timestamp": "2016-05-23T08:05:34.853Z",
+    "@timestamp": "2017-10-12T08:05:34.853Z",
     "beat": {
         "hostname": "host.example.com",
         "name": "host.example.com"
@@ -11,30 +11,30 @@
     },
     "system": {
         "process": {
-            "cmdline": "/var/folders/8x/rnyk6yxn6w97lddn3bs02gf00000gn/T/go-build935695167/github.com/elastic/beats/metricbeat/module/system/process/_test/process.test -test.v=true -data",
+            "cmdline": "/var/folders/k3/xlwbcsmj6dd7vjv2tg1d7c_40000gn/T/go-build217299100/github.com/elastic/beats/metricbeat/module/system/process/_test/process.test -data",
             "cpu": {
-                "start_time": "2017-06-23T19:57:04.691Z",
+                "start_time": "2017-10-12T10:41:40.406Z",
                 "total": {
                     "norm": {
-                        "pct": 0.0117
+                        "pct": 0.0226
                     },
-                    "pct": 0.0938
+                    "pct": 0.0902
                 }
             },
             "memory": {
                 "rss": {
-                    "bytes": 13565952,
-                    "pct": 0.0008
+                    "bytes": 11612160,
+                    "pct": 0.0007
                 },
                 "share": 0,
-                "size": 570052358144
+                "size": 569977466880
             },
             "name": "process.test",
-            "pgid": 61828,
-            "pid": 61938,
-            "ppid": 61828,
+            "pgid": 10585,
+            "pid": 10731,
+            "ppid": 10585,
             "state": "running",
-            "username": "akroh"
+            "username": "ruflin"
         }
     }
 }
