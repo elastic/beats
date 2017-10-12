@@ -471,36 +471,36 @@
 			"revisionTime": "2017-02-07T06:38:51Z"
 		},
 		{
-			"checksumSHA1": "SF7Qsaj7bCzUfZrVzmK564Rgmk4=",
+			"checksumSHA1": "XCXFL46ybPz+NgKH+Pm9hW87wNA=",
 			"path": "github.com/elastic/gosigar",
-			"revision": "5a9ad8e33837b4e4c776d129142fcd5ccf41f639",
-			"revisionTime": "2017-06-12T15:08:20Z",
-			"version": "v0.4.0",
-			"versionExact": "v0.4.0"
+			"revision": "306d51981789ccc65e5f1431d5c0d78d8c368f1b",
+			"revisionTime": "2017-10-12T15:04:52Z",
+			"version": "v0.5.0",
+			"versionExact": "v0.5.0"
 		},
 		{
 			"checksumSHA1": "jE0nhsyuGyQ7vWoyBRPEU63mQ4g=",
 			"path": "github.com/elastic/gosigar/cgroup",
-			"revision": "5a9ad8e33837b4e4c776d129142fcd5ccf41f639",
-			"revisionTime": "2017-06-12T15:08:20Z",
-			"version": "v0.4.0",
-			"versionExact": "v0.4.0"
+			"revision": "306d51981789ccc65e5f1431d5c0d78d8c368f1b",
+			"revisionTime": "2017-10-12T15:04:52Z",
+			"version": "v0.5.0",
+			"versionExact": "v0.5.0"
 		},
 		{
 			"checksumSHA1": "2VhOsaR4sv3S79HO6X+6dEphNKU=",
 			"path": "github.com/elastic/gosigar/sys/linux",
-			"revision": "5a9ad8e33837b4e4c776d129142fcd5ccf41f639",
-			"revisionTime": "2017-06-12T15:08:20Z",
-			"version": "v0.4.0",
-			"versionExact": "v0.4.0"
+			"revision": "306d51981789ccc65e5f1431d5c0d78d8c368f1b",
+			"revisionTime": "2017-10-12T15:04:52Z",
+			"version": "v0.5.0",
+			"versionExact": "v0.5.0"
 		},
 		{
 			"checksumSHA1": "qDsgp2kAeI9nhj565HUScaUyjU4=",
 			"path": "github.com/elastic/gosigar/sys/windows",
-			"revision": "5a9ad8e33837b4e4c776d129142fcd5ccf41f639",
-			"revisionTime": "2017-06-12T15:08:20Z",
-			"version": "v0.4.0",
-			"versionExact": "v0.4.0"
+			"revision": "306d51981789ccc65e5f1431d5c0d78d8c368f1b",
+			"revisionTime": "2017-10-12T15:04:52Z",
+			"version": "v0.5.0",
+			"versionExact": "v0.5.0"
 		},
 		{
 			"checksumSHA1": "P0CvGmmAM8uYPSE2ix4th/L9c/8=",
