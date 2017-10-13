@@ -18,25 +18,31 @@ func TestNewGenerator(t *testing.T) {
 	beatDir := tmpPath()
 	defer teardown(beatDir)
 
+	v, _ := common.NewVersion("7.0.0")
 	// checks for fields.yml
-	generator, err := NewGenerator("beat-index", "mybeat.", filepath.Join(beatDir, "notexistent"), "7.0")
+	generator, err := NewGenerator("beat-index", "mybeat.", filepath.Join(beatDir, "notexistent"), "7.0", *v)
 	assert.Error(t, err)
 
-	generator, err = NewGenerator("beat-index", "mybeat.", beatDir, "7.0")
+	generator, err = NewGenerator("beat-index", "mybeat.", beatDir, "7.0", *v)
 	assert.NoError(t, err)
-	assert.Equal(t, "7.0", generator.version)
+	assert.Equal(t, "7.0", generator.beatVersion)
 	assert.Equal(t, "beat-index", generator.indexName)
 	assert.Equal(t, filepath.Join(beatDir, "fields.yml"), generator.fieldsYaml)
 
 	// creates file dir and sets name
 	expectedDir := filepath.Join(beatDir, "_meta/kibana/default/index-pattern")
-	assert.Equal(t, expectedDir, generator.targetDirDefault)
-	_, err = os.Stat(generator.targetDirDefault)
+	assert.Equal(t, expectedDir, generator.targetDir)
+	_, err = os.Stat(generator.targetDir)
+	assert.NoError(t, err)
+
+	v, _ = common.NewVersion("5.0.0")
+	// checks for fields.yml
+	generator, err = NewGenerator("beat-index", "mybeat.", beatDir, "7.0", *v)
 	assert.NoError(t, err)
 
 	expectedDir = filepath.Join(beatDir, "_meta/kibana/5.x/index-pattern")
-	assert.Equal(t, expectedDir, generator.targetDir5x)
-	_, err = os.Stat(generator.targetDir5x)
+	assert.Equal(t, expectedDir, generator.targetDir)
+	_, err = os.Stat(generator.targetDir)
 	assert.NoError(t, err)
 
 	assert.Equal(t, "mybeat.json", generator.targetFilename)
@@ -61,7 +67,10 @@ func TestCleanName(t *testing.T) {
 func TestGenerateFieldsYaml(t *testing.T) {
 	beatDir := tmpPath()
 	defer teardown(beatDir)
-	generator, err := NewGenerator("metricbeat-*", "metric beat ?!", beatDir, "7.0.0-alpha1")
+
+	v, _ := common.NewVersion("6.0.0")
+	generator, err := NewGenerator("metricbeat-*", "metric beat ?!", beatDir, "7.0.0-alpha1", *v)
+
 	_, err = generator.Generate()
 	assert.NoError(t, err)
 
@@ -73,11 +82,13 @@ func TestGenerateFieldsYaml(t *testing.T) {
 func TestDumpToFile5x(t *testing.T) {
 	beatDir := tmpPath()
 	defer teardown(beatDir)
-	generator, err := NewGenerator("metricbeat-*", "metric beat ?!", beatDir, "7.0.0-alpha1")
+	v, _ := common.NewVersion("5.0.0")
+	generator, err := NewGenerator("metricbeat-*", "metric beat ?!", beatDir, "7.0.0-alpha1", *v)
+
 	_, err = generator.Generate()
 	assert.NoError(t, err)
 
-	generator.targetDir5x = "./non-existing/something"
+	generator.targetDir = "./non-existing/something"
 	_, err = generator.Generate()
 	assert.Error(t, err)
 }
@@ -85,11 +96,14 @@ func TestDumpToFile5x(t *testing.T) {
 func TestDumpToFileDefault(t *testing.T) {
 	beatDir := tmpPath()
 	defer teardown(beatDir)
-	generator, err := NewGenerator("metricbeat-*", "metric beat ?!", beatDir, "7.0.0-alpha1")
+
+	v, _ := common.NewVersion("7.0.0")
+	generator, err := NewGenerator("metricbeat-*", "metric beat ?!", beatDir, "7.0.0-alpha1", *v)
+
 	_, err = generator.Generate()
 	assert.NoError(t, err)
 
-	generator.targetDirDefault = "./non-existing/something"
+	generator.targetDir = "./non-existing/something"
 	_, err = generator.Generate()
 	assert.Error(t, err)
 }
@@ -97,10 +111,17 @@ func TestDumpToFileDefault(t *testing.T) {
 func TestGenerate(t *testing.T) {
 	beatDir := tmpPath()
 	defer teardown(beatDir)
-	generator, err := NewGenerator("beat-*", "b eat ?!", beatDir, "7.0.0-alpha1")
-	pattern, err := generator.Generate()
-	assert.NoError(t, err)
-	assert.Equal(t, 2, len(pattern))
+
+	version5, _ := common.NewVersion("5.0.0")
+	version6, _ := common.NewVersion("6.0.0")
+	versions := []*common.Version{version5, version6}
+	for _, version := range versions {
+		generator, err := NewGenerator("beat-*", "b eat ?!", beatDir, "7.0.0-alpha1", *version)
+		assert.NoError(t, err)
+
+		_, err = generator.Generate()
+		assert.NoError(t, err)
+	}
 
 	tests := []map[string]string{
 		{"existing": "beat-5x.json", "created": "_meta/kibana/5.x/index-pattern/beat.json"},
@@ -115,10 +136,17 @@ func TestGenerateExtensive(t *testing.T) {
 		panic(err)
 	}
 	defer teardown(beatDir)
-	generator, err := NewGenerator("metricbeat-*", "metric be at ?!", beatDir, "7.0.0-alpha1")
-	pattern, err := generator.Generate()
-	assert.NoError(t, err)
-	assert.Equal(t, 2, len(pattern))
+
+	version5, _ := common.NewVersion("5.0.0")
+	version6, _ := common.NewVersion("6.0.0")
+	versions := []*common.Version{version5, version6}
+	for _, version := range versions {
+		generator, err := NewGenerator("metricbeat-*", "metric be at ?!", beatDir, "7.0.0-alpha1", *version)
+		assert.NoError(t, err)
+
+		_, err = generator.Generate()
+		assert.NoError(t, err)
+	}
 
 	tests := []map[string]string{
 		{"existing": "metricbeat-5x.json", "created": "_meta/kibana/5.x/index-pattern/metricbeat.json"},
