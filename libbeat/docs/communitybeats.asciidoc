@@ -54,6 +54,7 @@ https://github.com/mheese/journalbeat[journalbeat]:: Used for log shipping from 
 https://github.com/justsocialapps/kafkabeat[kafkabeat]:: Reads data from Kafka topics.
 https://github.com/eskibars/lmsensorsbeat[lmsensorsbeat]:: Collects data from lm-sensors (such as CPU temperatures, fan speeds, and voltages from i2c and smbus).
 https://github.com/consulthys/logstashbeat[logstashbeat]:: Collects data from Logstash monitoring API (v5 onwards) and indexes them in Elasticsearch.
+https://github.com/PPACI/krakenbeat[krakenbeat]:: Collect information on each transaction on the Kraken crypto platform.
 https://github.com/yedamao/mcqbeat[mcqbeat]:: Reads the status of queues from memcacheq.
 https://github.com/scottcrespo/mongobeat[mongobeat]:: Monitors MongoDB instances and can be configured to send multiple document types to Elasticsearch.
 https://github.com/nathan-K-/mqttbeat[mqttbeat]:: Add messages from mqtt topics to Elasticsearch.
