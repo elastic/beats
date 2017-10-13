@@ -187,6 +187,34 @@ type: keyword
 SHA384 hash of the file.
 
 [float]
+=== `audit.file.sha3_224`
+
+type: keyword
+
+SHA3_224 hash of the file.
+
+[float]
+=== `audit.file.sha3_256`
+
+type: keyword
+
+SHA3_256 hash of the file.
+
+[float]
+=== `audit.file.sha3_384`
+
+type: keyword
+
+SHA3_384 hash of the file.
+
+[float]
+=== `audit.file.sha3_512`
+
+type: keyword
+
+SHA3_512 hash of the file.
+
+[float]
 === `audit.file.sha512`
 
 type: keyword

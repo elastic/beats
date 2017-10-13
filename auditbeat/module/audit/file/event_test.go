@@ -141,6 +141,10 @@ func TestHashFile(t *testing.T) {
 			SHA512:     mustDecodeHex("f5408390735bf3ef0bb8aaf66eff4f8ca716093d2fec50996b479b3527e5112e3ea3b403e9e62c72155ac1e08a49b476f43ab621e1a5fc2bbb0559d8258a614d"),
 			SHA512_224: mustDecodeHex("fde054253f43a95559f1b6eeb8e2edba4124957b43b85d7fcb4d20d5"),
 			SHA512_256: mustDecodeHex("3380f6a625aac19cbdddc598ab07aea195bae000f8d4c8cd6bb8870ac25df15d"),
+			SHA3_224:   mustDecodeHex("62e3515dae95bbd0e105bee840b7dc3b47f6d6bc772c259dbc0da31a"),
+			SHA3_256:   mustDecodeHex("3cb5385a2987ca45888d7877fbcf92b4854f7155ae19c96cecc7ea1300c6f5a4"),
+			SHA3_384:   mustDecodeHex("f19539818b4f29fa0ee599db4113fd81b77cd1119682e6d799a052849d2e40ef0dad84bc947ba2dee742d9731f1b9e9b"),
+			SHA3_512:   mustDecodeHex("f0a2c0f9090c1fd6dedf211192e36a6668d2b3c7f57a35419acb1c4fc7dfffc267bbcd90f5f38676caddcab652f6aacd1ed4e0ad0a8e1e4b98f890b62b6c7c5c"),
 		}
 
 		f, err := ioutil.TempFile("", "input.txt")
@@ -163,7 +167,11 @@ func TestHashFile(t *testing.T) {
 				t.Errorf("%v not found", hashType)
 			} else {
 				delete(hashes, hashType)
-				assert.Equal(t, expectedHashes[hashType], hash, "%v hash incorrect", hashType)
+				expected, ok := expectedHashes[hashType]
+				if !ok {
+					t.Fatalf("hash type not found in expected hashes: %v", hashType)
+				}
+				assert.Equal(t, expected, hash, "%v hash incorrect", hashType)
 			}
 		}
 

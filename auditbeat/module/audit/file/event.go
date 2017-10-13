@@ -19,6 +19,8 @@ import (
 
 	"github.com/pkg/errors"
 
+	"golang.org/x/crypto/sha3"
+
 	"github.com/elastic/beats/libbeat/common"
 	"github.com/elastic/beats/metricbeat/mb"
 )
@@ -346,6 +348,14 @@ func hashFile(name string, hashType ...HashType) (map[HashType][]byte, error) {
 			hashes = append(hashes, sha256.New())
 		case SHA384:
 			hashes = append(hashes, sha512.New384())
+		case SHA3_224:
+			hashes = append(hashes, sha3.New224())
+		case SHA3_256:
+			hashes = append(hashes, sha3.New256())
+		case SHA3_384:
+			hashes = append(hashes, sha3.New384())
+		case SHA3_512:
+			hashes = append(hashes, sha3.New512())
 		case SHA512:
 			hashes = append(hashes, sha512.New())
 		case SHA512_224:
