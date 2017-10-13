@@ -1,12 +1,8 @@
 {
-    "@timestamp": "2016-05-23T08:05:34.853Z",
+    "@timestamp": "2017-10-12T08:05:34.853Z",
     "beat": {
         "hostname": "host.example.com",
         "name": "host.example.com"
-    },
-    "@metadata": {
-        "beat": "noindex",
-        "type": "doc"
     },
     "metricset": {
         "module": "system",
@@ -15,18 +11,18 @@
     },
     "system": {
         "filesystem": {
-            "available": 105569656832,
+            "available": 60083531776,
             "device_name": "/dev/disk1",
-            "type": "hfs",
-            "files": 4294967279
-            "free": 105831800832,
-            "free_files": 4292793781,
+            "files": 4294967279,
+            "free": 60345675776,
+            "free_files": 4291998784,
             "mount_point": "/",
             "total": 249779191808,
+            "type": "hfs",
             "used": {
-                "bytes": 143947390976,
-                "pct": 0.5763
-            },
+                "bytes": 189433516032,
+                "pct": 0.7584
+            }
         }
     }
 }
