@@ -35,6 +35,7 @@ https://github.com/elastic/beats/compare/v6.0.0-beta2...master[Check the HEAD di
 - Fix data race accessing watched containers. {issue}5147[5147]
 - Remove ID() from Runner interface {issue}5153[5153]
 - Do not require template if index change and template disabled {pull}5319[5319]
+- Determine log level for kafka output {pull}5383[5383]
 
 *Auditbeat*
 
