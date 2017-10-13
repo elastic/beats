@@ -2188,7 +2188,7 @@ https://github.com/elastic/beats/compare/1.0.0-beta3...1.0.0-beta4[Check
 - Add tls configuration support to elasticsearch and logstash outputers #139
 - All external dependencies were updated to the latest version. Update to Golang 1.5.1 #162
 - Guarantee ES index is based in UTC time zone #164
-- Cache: optional per element timeout #144
+- Cache: optional per element timeout #144
 - Make it possible to set hosts in different ways. #135
 - Expose more TLS config options #124
 - Use the Beat name in the default configuration file path #99
