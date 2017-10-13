@@ -47,20 +47,16 @@ func (i *IndexPatternGenerator) Generate() (string, error) {
 
 	var path string
 
-	if i.version.Major == 5 {
-		path, err = i.generate5x(commonFields)
+	if i.version.Major >= 6 {
+		path, err = i.genereteMinVersion6(commonFields)
 	} else {
-		path, err = i.generate6x(commonFields)
+		path, err = i.genereteMinVersion5(commonFields)
 	}
 
-	if err != nil {
-		return "", err
-	}
-
-	return path, nil
+	return path, err
 }
 
-func (i *IndexPatternGenerator) generate5x(fields common.Fields) (string, error) {
+func (i *IndexPatternGenerator) genereteMinVersion5(fields common.Fields) (string, error) {
 	version, _ := common.NewVersion("5.0.0")
 	transformed, err := generate(i.indexName, version, fields)
 	if err != nil {
@@ -72,7 +68,7 @@ func (i *IndexPatternGenerator) generate5x(fields common.Fields) (string, error)
 	return file5x, err
 }
 
-func (i *IndexPatternGenerator) generate6x(fields common.Fields) (string, error) {
+func (i *IndexPatternGenerator) genereteMinVersion6(fields common.Fields) (string, error) {
 	version, _ := common.NewVersion("6.0.0")
 	transformed, err := generate(i.indexName, version, fields)
 	if err != nil {
