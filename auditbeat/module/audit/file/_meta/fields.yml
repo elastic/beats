@@ -69,6 +69,18 @@
     - name: sha384
       type: keyword
       description: SHA384 hash of the file.
+    - name: sha3_224
+      type: keyword
+      description: SHA3_224 hash of the file.
+    - name: sha3_256
+      type: keyword
+      description: SHA3_256 hash of the file.
+    - name: sha3_384
+      type: keyword
+      description: SHA3_384 hash of the file.
+    - name: sha3_512
+      type: keyword
+      description: SHA3_512 hash of the file.
     - name: sha512
       type: keyword
       description: SHA512 hash of the file.

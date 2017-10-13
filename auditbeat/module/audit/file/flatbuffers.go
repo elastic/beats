@@ -66,6 +66,14 @@ func fbWriteHash(b *flatbuffers.Builder, hashes map[HashType][]byte) flatbuffers
 			schema.HashAddSha256(b, offset)
 		case SHA384:
 			schema.HashAddSha384(b, offset)
+		case SHA3_224:
+			schema.HashAddSha3224(b, offset)
+		case SHA3_256:
+			schema.HashAddSha3256(b, offset)
+		case SHA3_384:
+			schema.HashAddSha3384(b, offset)
+		case SHA3_512:
+			schema.HashAddSha3512(b, offset)
 		case SHA512:
 			schema.HashAddSha512(b, offset)
 		case SHA512_224:
@@ -258,6 +266,18 @@ func fbDecodeHash(e *schema.Event) map[HashType][]byte {
 		case SHA384:
 			length = hash.Sha384Length()
 			producer = hash.Sha384
+		case SHA3_224:
+			length = hash.Sha3224Length()
+			producer = hash.Sha3224
+		case SHA3_256:
+			length = hash.Sha3256Length()
+			producer = hash.Sha3256
+		case SHA3_384:
+			length = hash.Sha3384Length()
+			producer = hash.Sha3384
+		case SHA3_512:
+			length = hash.Sha3512Length()
+			producer = hash.Sha3512
 		case SHA512:
 			length = hash.Sha512Length()
 			producer = hash.Sha512

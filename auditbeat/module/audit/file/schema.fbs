@@ -46,6 +46,12 @@ table Hash {
   sha512:[byte];
   sha512_224:[byte];
   sha512_256:[byte];
+
+  // SHA-3
+  sha3_224:[byte];
+  sha3_256:[byte];
+  sha3_384:[byte];
+  sha3_512:[byte];
 }
 
 table Event {
