@@ -80,7 +80,12 @@ func ImportDashboardsViaKibana(kibanaLoader *KibanaLoader) error {
 		return fmt.Errorf("Kibana API is not available in Kibana version %s", kibanaLoader.version)
 	}
 
-	importer, err := NewImporter("default", kibanaLoader.config, kibanaLoader)
+	version, err := common.NewVersion(kibanaLoader.version)
+	if err != nil {
+		return fmt.Errorf("Invalid Kibana version: %s", kibanaLoader.version)
+	}
+
+	importer, err := NewImporter(*version, kibanaLoader.config, kibanaLoader)
 	if err != nil {
 		return fmt.Errorf("fail to create a Kibana importer for loading the dashboards: %v", err)
 	}
@@ -98,7 +103,9 @@ func ImportDashboardsViaElasticsearch(esLoader *ElasticsearchLoader) error {
 		return fmt.Errorf("fail to create the kibana index: %v", err)
 	}
 
-	importer, err := NewImporter("5.x", esLoader.config, esLoader)
+	version, _ := common.NewVersion("5.0.0")
+
+	importer, err := NewImporter(*version, esLoader.config, esLoader)
 	if err != nil {
 		return fmt.Errorf("fail to create an Elasticsearch importer for loading the dashboards: %v", err)
 	}
