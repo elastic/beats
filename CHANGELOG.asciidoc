@@ -75,6 +75,8 @@ https://github.com/elastic/beats/compare/v6.0.0-beta2...master[Check the HEAD di
 
 *Auditbeat*
 
+- Add support for SHA3 hash algorithms to the file integrity module. {issue}5345[5345]
+
 *Filebeat*
 
 - Add PostgreSQL module with slowlog support. {pull}4763[4763]
