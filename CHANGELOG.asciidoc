@@ -22,6 +22,9 @@ https://github.com/elastic/beats/compare/v6.0.0-beta2...master[Check the HEAD di
 
 *Metricbeat*
 
+- Rename `heap_init` field to `heap.init`. {pull}5320[5320]
+
+
 *Packetbeat*
 
 - Remove not-working `runoptions.uid` and `runoptions.gid` options in Packetbeat. {pull}5261[5261]
@@ -35,6 +38,7 @@ https://github.com/elastic/beats/compare/v6.0.0-beta2...master[Check the HEAD di
 - Fix data race accessing watched containers. {issue}5147[5147]
 - Remove ID() from Runner interface {issue}5153[5153]
 - Do not require template if index change and template disabled {pull}5319[5319]
+- Correctly send configured `Host` header to the remote server. {issue}4842[4842]
 - Determine log level for kafka output {pull}5383[5383]
 
 *Auditbeat*
@@ -50,8 +54,11 @@ https://github.com/elastic/beats/compare/v6.0.0-beta2...master[Check the HEAD di
 - Change field type of http header from nested to object {pull}5258[5258]
 - Use `beat.name` instead of `beat.hostname` in the Host Overview dashboard. {pull}5340[5340]
 - Fix the loading of 5.x dashboards. {issue}5277[5277]
+- Fix the fetching of process information when some data is missing under MacOS X. {issue}5337[5337]
 
 *Packetbeat*
+
+- Fix http status phrase parsing not allow spaces. {pull}5312[5312]
 
 *Winlogbeat*
 
@@ -65,6 +72,7 @@ https://github.com/elastic/beats/compare/v6.0.0-beta2...master[Check the HEAD di
 - Fix reloader error message to only print on actual error {pull}5066[5066]
 - Add support for enabling TLS renegotiation. {issue}4386[4386]
 - Add Azure VM support for add_cloud_metadata processor {pull}5355[5355]
+- Add `output.file.permission` config option. {pull}4638[4638]
 
 *Auditbeat*
 
@@ -2178,7 +2186,7 @@ https://github.com/elastic/beats/compare/1.0.0-beta3...1.0.0-beta4[Check
 - Add tls configuration support to elasticsearch and logstash outputers #139
 - All external dependencies were updated to the latest version. Update to Golang 1.5.1 #162
 - Guarantee ES index is based in UTC time zone #164
-- Cache: optional per element timeout #144
+- Cache: optional per element timeout #144
 - Make it possible to set hosts in different ways. #135
 - Expose more TLS config options #124
 - Use the Beat name in the default configuration file path #99
