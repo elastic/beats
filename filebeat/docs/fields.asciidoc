@@ -17,6 +17,7 @@ grouped in the following categories:
 * <<exported-fields-beat>>
 * <<exported-fields-cloud>>
 * <<exported-fields-docker-processor>>
+* <<exported-fields-elasticsearch>>
 * <<exported-fields-icinga>>
 * <<exported-fields-kafka>>
 * <<exported-fields-kubernetes-processor>>
@@ -643,6 +644,577 @@ Container name.
 type: object
 
 Image labels.
+
+
+[[exported-fields-elasticsearch]]
+== Elasticsearch fields
+
+Module for parsing Elasticsearch log files.
+
+
+
+[float]
+== elasticsearch fields
+
+Fields from the Elasticsearch log files.
+
+
+
+[float]
+=== `elasticsearch.log_level`
+
+type: keyword
+
+The log level for this event.
+
+
+[float]
+== log fields
+
+Contains fields from the Elasticsearch standard logs.
+
+
+
+[float]
+=== `elasticsearch.log.component`
+
+The component within Elasticsearch that generated this event.
+
+
+[float]
+=== `elasticsearch.log.reason`
+
+Extra reason or details for a particular event.
+
+
+[float]
+=== `elasticsearch.log.exception`
+
+type: text
+
+An exception trace for this event.
+
+
+[float]
+=== `elasticsearch.log.allocation_info`
+
+type: text
+
+Detailed cluster allocation information.
+
+
+[float]
+== cluster fields
+
+Contains fields related to an Elasticsearch cluster.
+
+
+
+[float]
+=== `elasticsearch.log.cluster.discovery_type`
+
+The discovery method this cluster is using.
+
+
+[float]
+=== `elasticsearch.log.cluster.license_id`
+
+The license ID for this cluster.
+
+
+[float]
+=== `elasticsearch.log.cluster.license_type`
+
+The type of license used on this cluster (i.e., trial, platinum, etc.)
+
+
+[float]
+=== `elasticsearch.log.cluster.license_status`
+
+The license status (i.e., validity).
+
+
+[float]
+=== `elasticsearch.log.cluster.action`
+
+A cluster-level action.
+
+
+[float]
+=== `elasticsearch.log.cluster.action_details`
+
+type: text
+
+A cluster-level action details.
+
+
+[float]
+== state fields
+
+Contains fields related to the cluster state.
+
+
+
+[float]
+=== `elasticsearch.log.cluster.state.version`
+
+type: long
+
+The cluster state version.
+
+
+[float]
+=== `elasticsearch.log.cluster.state.uuid`
+
+A cluster state UUID.
+
+
+[float]
+=== `elasticsearch.log.cluster.state.diff`
+
+A diff size of the cluster state version.
+
+
+[float]
+== health fields
+
+Contains fields related to the cluster health.
+
+
+
+[float]
+=== `elasticsearch.log.cluster.health.old_value`
+
+The previous health of the cluster.
+
+
+[float]
+=== `elasticsearch.log.cluster.health.new_value`
+
+The new health of the cluster.
+
+
+[float]
+== setting fields
+
+Contains fields related to cluster settings.
+
+
+
+[float]
+=== `elasticsearch.log.cluster.setting.action`
+
+The action being applied to this cluster setting.
+
+
+[float]
+=== `elasticsearch.log.cluster.setting.name`
+
+The cluster setting name.
+
+
+[float]
+=== `elasticsearch.log.cluster.setting.old_value`
+
+The previous value of the setting.
+
+
+[float]
+=== `elasticsearch.log.cluster.setting.new_value`
+
+The new value of the setting.
+
+
+[float]
+== node fields
+
+Contains fields related to an Elasticsearch node.
+
+
+
+[float]
+=== `elasticsearch.log.node.name`
+
+The node name.
+
+
+[float]
+=== `elasticsearch.log.node.uuid`
+
+The unique node UUID.
+
+
+[float]
+=== `elasticsearch.log.node.version`
+
+The Elasticsearch version running on this node.
+
+
+[float]
+=== `elasticsearch.log.node.pid`
+
+The process ID of the Elasticsearch process running on this node.
+
+
+[float]
+=== `elasticsearch.log.node.build`
+
+The Elasticsearch build ID.
+
+
+[float]
+=== `elasticsearch.log.node.os`
+
+The OS version details of this node.
+
+
+[float]
+=== `elasticsearch.log.node.jvm`
+
+The JVM details of this node.
+
+
+[float]
+=== `elasticsearch.log.node.heap_size`
+
+The heap size assigned to Elasticsearch on this node.
+
+
+[float]
+=== `elasticsearch.log.node.status`
+
+What last state the node was in (i.e., starting/started/stopping/stopped).
+
+
+[float]
+=== `elasticsearch.log.node.modules`
+
+A list of Elasticsearch modules installed on this node.
+
+
+[float]
+=== `elasticsearch.log.node.plugins`
+
+A list of Elasticsearch plugins installed on this node.
+
+
+[float]
+=== `elasticsearch.log.node.publish_addr`
+
+The IP address, hostname or interface on which the node is publishing itself.
+
+
+[float]
+=== `elasticsearch.log.node.publish_port`
+
+type: short
+
+The port on which the node is publishing itself.
+
+
+[float]
+=== `elasticsearch.log.node.bound_addr`
+
+The IP address, hostname or interface on which the node is binding itself.
+
+
+[float]
+=== `elasticsearch.log.node.bound_port`
+
+type: short
+
+The port on which the node is binding itself.
+
+
+[float]
+=== `elasticsearch.log.node.data_paths`
+
+A list of data paths used by this node.
+
+
+[float]
+=== `elasticsearch.log.node.data_paths_usable_space`
+
+The usable space this node could use across all data paths configured.
+
+
+[float]
+=== `elasticsearch.log.node.data_paths_total_space`
+
+The total space available across all data paths configured.
+
+
+[float]
+=== `elasticsearch.log.node.data_paths_spins`
+
+type: boolean
+
+Whether the data paths on this node are detected as spinning disks.
+
+
+[float]
+=== `elasticsearch.log.node.data_paths_types`
+
+The list of filesystem types used by the data paths on this node.
+
+
+[float]
+=== `elasticsearch.log.node.data_paths_watermark`
+
+The low/high watermark for a data path.
+
+
+[float]
+== index fields
+
+Contains fields related to a particular index.
+
+
+
+[float]
+=== `elasticsearch.log.index.name`
+
+An index name.
+
+
+[float]
+=== `elasticsearch.log.index.uuid`
+
+The unique index UUID.
+
+
+[float]
+=== `elasticsearch.log.index.shard`
+
+type: short
+
+The shard ID or number.
+
+
+[float]
+== setting fields
+
+Contains fields related to index settings.
+
+
+
+[float]
+=== `elasticsearch.log.index.setting.action`
+
+The action being applied to this index setting.
+
+
+[float]
+=== `elasticsearch.log.index.setting.name`
+
+The name of this index setting.
+
+
+[float]
+=== `elasticsearch.log.index.setting.value`
+
+The value of the setting.
+
+
+[float]
+=== `elasticsearch.log.index.templates`
+
+A list of templates applied to this index.
+
+
+[float]
+=== `elasticsearch.log.index.mappings`
+
+A list of mappings applied to this index.
+
+
+[float]
+=== `elasticsearch.log.index.primary_shards`
+
+type: short
+
+Number of primary shards for this index.
+
+
+[float]
+=== `elasticsearch.log.index.replica_shards`
+
+type: short
+
+Number of replica shards for this index.
+
+
+[float]
+=== `elasticsearch.log.index.action_details`
+
+type: text
+
+Extra action information. NEEDS FURTHER GROKKING.
+
+
+[float]
+== request fields
+
+Contains fields related to a particular request.
+
+
+
+[float]
+=== `elasticsearch.log.request.type`
+
+The type of request.
+
+
+[float]
+=== `elasticsearch.log.request.id`
+
+The ID of the request.
+
+
+[float]
+=== `elasticsearch.log.request.phase`
+
+At what stage this request was logged.
+
+
+[float]
+== document fields
+
+Contains fields related to a particular document.
+
+
+
+[float]
+=== `elasticsearch.log.document.type`
+
+The type of document.
+
+
+[float]
+=== `elasticsearch.log.document.id`
+
+The document ID.
+
+
+[float]
+=== `elasticsearch.log.document.source`
+
+The original document source JSON.
+
+
+[float]
+=== `elasticsearch.log.bulk_action`
+
+type: text
+
+A complete bulk request.
+
+
+[float]
+== circuit_breaker fields
+
+Contains fields related to circuit breakers.
+
+
+
+[float]
+=== `elasticsearch.log.circuit_breaker.name`
+
+Name of the circuit breaker.
+
+
+[float]
+=== `elasticsearch.log.circuit_breaker.type`
+
+The type of circuit breaker.
+
+
+[float]
+=== `elasticsearch.log.circuit_breaker.limit`
+
+The value of the circuit breaker.
+
+
+[float]
+=== `elasticsearch.log.circuit_breaker.overhead`
+
+How much this circuit breaker value was breached.
+
+
+[float]
+== xpack fields
+
+Contains fields related to X-Pack features
+
+
+
+[float]
+== security fields
+
+Contains fields related to X-Pack security.
+
+
+
+[float]
+=== `elasticsearch.log.xpack.security.role`
+
+The role in use.
+
+
+[float]
+=== `elasticsearch.log.xpack.security.role_file`
+
+The role file from which the role was sourced.
+
+
+[float]
+== watch fields
+
+Contains fields related to X-Pack alerting.
+
+
+
+[float]
+=== `elasticsearch.log.xpack.watch.stage`
+
+The execution stage of the watch.
+
+
+[float]
+=== `elasticsearch.log.xpack.watch.id`
+
+The watch ID.
+
+
+[float]
+== monitoring fields
+
+Contains fields related to X-Pack monitoring.
+
+
+
+[float]
+=== `elasticsearch.log.xpack.monitoring.collector`
+
+The name of the collector (i.e., metrics) being gathered.
+
+
+[float]
+=== `elasticsearch.log.snapshot`
+
+The name/ID of a snapshot.
+
+
+[float]
+=== `elasticsearch.log.nodes`
+
+NEEDS FURTHER GROKKING.
+
+
+[float]
+=== `elasticsearch.log.action`
+
+NEEDS BETTER CLASSIFICATION.
 
 
 [[exported-fields-icinga]]

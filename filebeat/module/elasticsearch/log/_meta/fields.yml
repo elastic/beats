@@ -1,0 +1,297 @@
+- name: log
+  type: group
+  description: >
+    Contains fields from the Elasticsearch standard logs.
+  fields:
+    - name: component
+      description: >
+        The component within Elasticsearch that generated this event.
+    - name: reason
+      description: >
+        Extra reason or details for a particular event.
+    - name: exception
+      type: text
+      description: >
+        An exception trace for this event.
+    - name: allocation_info
+      type: text
+      description: >
+        Detailed cluster allocation information.
+    - name: cluster
+      type: group
+      description: >
+        Contains fields related to an Elasticsearch cluster.
+      fields:
+        - name: discovery_type
+          description: >
+            The discovery method this cluster is using.
+        - name: license_id
+          description: >
+            The license ID for this cluster.
+        - name: license_type
+          description: >
+            The type of license used on this cluster (i.e., trial, platinum, etc.)
+        - name: license_status
+          description: >
+            The license status (i.e., validity).
+        - name: action
+          description: >
+            A cluster-level action.
+        - name: action_details
+          type: text
+          description: >
+            A cluster-level action details.
+        - name: state
+          type: group
+          description: >
+            Contains fields related to the cluster state.
+          fields:
+            - name: version
+              type: long
+              description: >
+                The cluster state version.
+            - name: uuid
+              description: >
+                A cluster state UUID.
+            - name: diff
+              description: >
+                A diff size of the cluster state version.
+        - name: health
+          type: group
+          description: >
+            Contains fields related to the cluster health.
+          fields:
+            - name: old_value
+              description: >
+                The previous health of the cluster.
+            - name: new_value
+              description: >
+                The new health of the cluster.
+        - name: setting
+          type: group
+          description: >
+            Contains fields related to cluster settings.
+          fields:
+            - name: action
+              description: >
+                The action being applied to this cluster setting.
+            - name: name
+              description: >
+                The cluster setting name.
+            - name: old_value
+              description: >
+                The previous value of the setting.
+            - name: new_value
+              description: >
+                The new value of the setting.
+    - name: node
+      type: group
+      description: >
+        Contains fields related to an Elasticsearch node.
+      fields:
+        - name: name
+          description: >
+            The node name.
+        - name: uuid
+          description: >
+            The unique node UUID.
+        - name: version
+          description: >
+            The Elasticsearch version running on this node.
+        - name: pid
+          description: >
+            The process ID of the Elasticsearch process running on this node.
+        - name: build
+          description: >
+            The Elasticsearch build ID.
+        - name: os
+          description: >
+            The OS version details of this node.
+        - name: jvm
+          description: >
+            The JVM details of this node.
+        - name: heap_size
+          description: >
+            The heap size assigned to Elasticsearch on this node.
+        - name: status
+          description: >
+            What last state the node was in (i.e., starting/started/stopping/stopped).
+        - name: modules
+          description: >
+            A list of Elasticsearch modules installed on this node.
+        - name: plugins
+          description: >
+            A list of Elasticsearch plugins installed on this node.
+        - name: publish_addr
+          description: >
+            The IP address, hostname or interface on which the node is publishing itself.
+        - name: publish_port
+          type: short
+          description: >
+            The port on which the node is publishing itself.
+        - name: bound_addr
+          description: >
+            The IP address, hostname or interface on which the node is binding itself.
+        - name: bound_port
+          type: short
+          description: >
+            The port on which the node is binding itself.
+        - name: data_paths
+          description: >
+            A list of data paths used by this node.
+        - name: data_paths_usable_space
+          description: >
+            The usable space this node could use across all data paths configured.
+        - name: data_paths_total_space
+          description: >
+            The total space available across all data paths configured.
+        - name: data_paths_spins
+          type: boolean
+          description: >
+            Whether the data paths on this node are detected as spinning disks.
+        - name: data_paths_types
+          description: >
+            The list of filesystem types used by the data paths on this node.
+        - name: data_paths_watermark
+          description: >
+            The low/high watermark for a data path.
+    - name: index
+      type: group
+      description: >
+        Contains fields related to a particular index.
+      fields:
+        - name: name
+          description: >
+            An index name.
+        - name: uuid
+          description: >
+            The unique index UUID.
+        - name: shard
+          type: short
+          description: >
+            The shard ID or number.
+        - name: setting
+          type: group
+          description: >
+            Contains fields related to index settings.
+          fields:
+            - name: action
+              description: >
+                The action being applied to this index setting.
+            - name: name
+              description: >
+                The name of this index setting.
+            - name: value
+              description: >
+                The value of the setting.
+        - name: templates
+          description: >
+            A list of templates applied to this index.
+        - name: mappings
+          description: >
+            A list of mappings applied to this index.
+        - name: primary_shards
+          type: short
+          description: >
+            Number of primary shards for this index.
+        - name: replica_shards
+          type: short
+          description: >
+            Number of replica shards for this index.
+        - name: action_details
+          type: text
+          description: >
+            Extra action information. NEEDS FURTHER GROKKING.
+    - name: request
+      type: group
+      description: >
+        Contains fields related to a particular request.
+      fields:
+        - name: type
+          description: >
+            The type of request.
+        - name: id
+          description: >
+            The ID of the request.
+        - name: phase
+          description: >
+            At what stage this request was logged.
+    - name: document
+      type: group
+      description: >
+        Contains fields related to a particular document.
+      fields:
+        - name: type
+          description: >
+            The type of document.
+        - name: id
+          description: >
+            The document ID.
+        - name: source
+          description: >
+            The original document source JSON.
+    - name: bulk_action
+      type: text
+      description: >
+        A complete bulk request.
+    - name: circuit_breaker
+      type: group
+      description: >
+        Contains fields related to circuit breakers.
+      fields:
+        - name: name
+          description: >
+            Name of the circuit breaker.
+        - name: type
+          description: >
+            The type of circuit breaker.
+        - name: limit
+          description: >
+            The value of the circuit breaker.
+        - name: overhead
+          description: >
+            How much this circuit breaker value was breached.
+    - name: xpack
+      type: group
+      description: >
+        Contains fields related to X-Pack features
+      fields:
+        - name: security
+          type: group
+          description: >
+            Contains fields related to X-Pack security.
+          fields:
+            - name: role
+              description: >
+                The role in use.
+            - name: role_file
+              description: >
+                The role file from which the role was sourced.
+        - name: watch
+          type: group
+          description: >
+            Contains fields related to X-Pack alerting.
+          fields:
+            - name: stage
+              description: >
+                The execution stage of the watch.
+            - name: id
+              description: >
+                The watch ID.
+        - name: monitoring
+          type: group
+          description: >
+            Contains fields related to X-Pack monitoring.
+          fields:
+            - name: collector
+              description: >
+                The name of the collector (i.e., metrics) being gathered.
+    - name: snapshot
+      description: >
+        The name/ID of a snapshot.
+    - name: nodes
+      description: >
+        NEEDS FURTHER GROKKING.
+    - name: action
+      description: >
+        NEEDS BETTER CLASSIFICATION.

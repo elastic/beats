@@ -1,0 +1,15 @@
+- key: elasticsearch
+  title: "Elasticsearch"
+  description: >
+    Module for parsing Elasticsearch log files.
+  short_config: true
+  fields:
+    - name: elasticsearch
+      type: group
+      description: >
+        Fields from the Elasticsearch log files.
+      fields:
+        - name: log_level
+          type: keyword
+          description: >
+            The log level for this event.
