@@ -130,6 +130,29 @@ class Test(BaseTest):
         assert output["source"] == "hello"
         assert output["message"] == "test source"
 
+    def test_json_add_tags(self):
+        self.render_config_template(
+            path=os.path.abspath(self.working_dir) + "/log/*",
+            json=dict(
+                keys_under_root=True,
+            ),
+            agent_tags=["tag3", "tag4"]
+        )
+        os.mkdir(self.working_dir + "/log/")
+        self.copy_files(["logs/json_tag.log"],
+                        source_dir="../files",
+                        target_dir="log")
+
+        proc = self.start_beat()
+        self.wait_until(
+            lambda: self.output_has(lines=1),
+            max_timeout=10)
+
+        proc.check_kill_and_wait()
+
+        output = self.read_output()[0]
+        assert sorted(output["tags"]) == ["tag1", "tag2", "tag3", "tag4"]
+
     def test_config_no_msg_key_filtering(self):
         """
         Should raise an error if line filtering and JSON are defined,
