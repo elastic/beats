@@ -1,2 +1,2 @@
-ETCD_HOST=etcd
+ETCD_HOST=localhost
 ETCD_PORT=2379

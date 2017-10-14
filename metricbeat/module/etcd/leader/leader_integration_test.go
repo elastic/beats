@@ -15,8 +15,8 @@ import (
 func TestData(t *testing.T) {
 	compose.EnsureUp(t, "etcd")
 
-	f := mbtest.NewEventsFetcher(t, getConfig())
-	err := mbtest.WriteEvents(f, t)
+	f := mbtest.NewEventFetcher(t, getConfig())
+	err := mbtest.WriteEvent(f, t)
 	if err != nil {
 		t.Fatal("write", err)
 	}
@@ -25,7 +25,7 @@ func TestData(t *testing.T) {
 func TestFetch(t *testing.T) {
 	compose.EnsureUp(t, "etcd")
 
-	f := mbtest.NewEventsFetcher(t, getConfig())
+	f := mbtest.NewEventFetcher(t, getConfig())
 	event, err := f.Fetch()
 	if !assert.NoError(t, err) {
 		t.FailNow()
