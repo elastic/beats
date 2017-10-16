@@ -26,9 +26,9 @@ var schema = s.Schema{
 	},
 	"backend_start":     c.Time(time.RFC3339Nano, "backend_start"),
 	"transaction_start": c.Time(time.RFC3339Nano, "xact_start", s.Optional),
-	"query_start":       c.Time(time.RFC3339Nano, "query_start"),
-	"state_change":      c.Time(time.RFC3339Nano, "state_change"),
-	"waiting":           c.Bool("waiting"),
+	"query_start":       c.Time(time.RFC3339Nano, "query_start", s.Optional),
+	"state_change":      c.Time(time.RFC3339Nano, "state_change", s.Optional),
+	"waiting":           c.Bool("waiting", s.Optional),
 	"state":             c.Str("state"),
 	"query":             c.Str("query"),
 }
