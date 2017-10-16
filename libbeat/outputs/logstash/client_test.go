@@ -44,9 +44,21 @@ type testDriverCommand struct {
 	data []outputs.Data
 }
 
-func newLumberjackTestClient(conn *transport.Client) *client {
-	c, err := newLumberjackClient(conn, 3,
-		testMaxWindowSize, 100*time.Millisecond, "test")
+func newLumberjackTestClient(conn *transport.Client, settings map[string]interface{}) *client {
+	config, err := common.NewConfigFrom(settings)
+	if err != nil {
+		panic(err)
+	}
+
+	lsCfg := defaultConfig
+	lsCfg.Index = "test"
+	lsCfg.BulkMaxSize = testMaxWindowSize
+	lsCfg.Timeout = 100 * time.Millisecond
+	if err := config.Unpack(&lsCfg); err != nil {
+		panic(err)
+	}
+
+	c, err := newLumberjackClient(conn, &lsCfg)
 	if err != nil {
 		panic(err)
 	}

@@ -137,16 +137,12 @@ func makeClientFactory(
 	cfg *logstashConfig,
 	tcfg *transport.Config,
 ) modeutil.ClientFactory {
-	compressLvl := cfg.CompressionLevel
-	maxBulkSz := cfg.BulkMaxSize
-	to := cfg.Timeout
-
 	return func(host string) (mode.ProtocolClient, error) {
 		t, err := transport.NewClient(tcfg, "tcp", host, cfg.Port)
 		if err != nil {
 			return nil, err
 		}
-		return newLumberjackClient(t, compressLvl, maxBulkSz, to, cfg.Index)
+		return newLumberjackClient(t, cfg)
 	}
 }
 
@@ -154,17 +150,12 @@ func makeAsyncClientFactory(
 	cfg *logstashConfig,
 	tcfg *transport.Config,
 ) modeutil.AsyncClientFactory {
-	compressLvl := cfg.CompressionLevel
-	maxBulkSz := cfg.BulkMaxSize
-	queueSize := cfg.Pipelining - 1
-	to := cfg.Timeout
-
 	return func(host string) (mode.AsyncProtocolClient, error) {
 		t, err := transport.NewClient(tcfg, "tcp", host, cfg.Port)
 		if err != nil {
 			return nil, err
 		}
-		return newAsyncLumberjackClient(t, queueSize, compressLvl, maxBulkSz, to, cfg.Index)
+		return newAsyncLumberjackClient(t, cfg)
 	}
 }
 

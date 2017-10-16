@@ -25,27 +25,29 @@ type clientServer struct {
 }
 
 func TestClientSendZero(t *testing.T) {
-	testSendZero(t, makeTestClient)
+	testSendZero(t, makeTestClient(nil))
 }
 
 func TestClientSimpleEvent(t *testing.T) {
-	testSimpleEvent(t, makeTestClient)
+	testSimpleEvent(t, makeTestClient(nil))
 }
 
 func TestClientStructuredEvent(t *testing.T) {
-	testStructuredEvent(t, makeTestClient)
+	testStructuredEvent(t, makeTestClient(nil))
 }
 
 func TestClientMultiFailMaxTimeouts(t *testing.T) {
-	testMultiFailMaxTimeouts(t, makeTestClient)
+	testMultiFailMaxTimeouts(t, makeTestClient(nil))
 }
 
 func newClientServerTCP(t *testing.T, to time.Duration) *clientServer {
 	return &clientServer{transptest.NewMockServerTCP(t, to, "", nil)}
 }
 
-func makeTestClient(conn *transport.Client) testClientDriver {
-	return newClientTestDriver(newLumberjackTestClient(conn))
+func makeTestClient(settings map[string]interface{}) func(*transport.Client) testClientDriver {
+	return func(conn *transport.Client) testClientDriver {
+		return newClientTestDriver(newLumberjackTestClient(conn, settings))
+	}
 }
 
 func newClientTestDriver(client mode.ProtocolClient) *testSyncDriver {

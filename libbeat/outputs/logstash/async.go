@@ -14,7 +14,7 @@ import (
 type asyncClient struct {
 	*transport.Client
 	client *v2.AsyncClient
-	win    window
+	win    *window
 
 	connect func() error
 }
@@ -30,17 +30,22 @@ type msgRef struct {
 
 func newAsyncLumberjackClient(
 	conn *transport.Client,
-	queueSize int,
-	compressLevel int,
-	maxWindowSize int,
-	timeout time.Duration,
-	beat string,
+	config *logstashConfig,
 ) (*asyncClient, error) {
-	c := &asyncClient{}
-	c.Client = conn
-	c.win.init(defaultStartMaxWindowSize, maxWindowSize)
+	c := &asyncClient{
+		Client: conn,
+	}
 
-	enc, err := makeLogstashEventEncoder(beat)
+	if config.SlowStart {
+		maxWindowSize := config.BulkMaxSize
+		c.win = newWindower(defaultStartMaxWindowSize, maxWindowSize)
+	}
+
+	queueSize := config.Pipelining - 1
+	timeout := config.Timeout
+	compressLevel := config.CompressionLevel
+
+	enc, err := makeLogstashEventEncoder(config.Index)
 	if err != nil {
 		return nil, err
 	}
@@ -102,14 +107,24 @@ func (c *asyncClient) AsyncPublishEvents(
 		count:     1,
 		batch:     data,
 		batchSize: len(data),
-		win:       &c.win,
+		win:       c.win,
 		cb:        cb,
 		err:       nil,
 	}
 	defer ref.dec()
 
 	for len(data) > 0 {
-		n, err := c.publishWindowed(ref, data)
+		var (
+			n   int
+			err error
+		)
+
+		if c.win == nil {
+			n = len(data)
+			err = c.sendEvents(ref, data)
+		} else {
+			n, err = c.publishWindowed(ref, data)
+		}
 
 		debug("%v events out of %v events sent to logstash. Continue sending",
 			n, len(data))
@@ -166,15 +181,21 @@ func (r *msgRef) callback(seq uint32, err error) {
 func (r *msgRef) done(n uint32) {
 	ackedEvents.Add(int64(n))
 	r.batch = r.batch[n:]
-	r.win.tryGrowWindow(r.batchSize)
+	if r.win != nil {
+		r.win.tryGrowWindow(r.batchSize)
+	}
 	r.dec()
 }
 
 func (r *msgRef) fail(n uint32, err error) {
 	ackedEvents.Add(int64(n))
-	r.err = err
+	if r.err == nil {
+		r.err = err
+	}
 	r.batch = r.batch[n:]
-	r.win.shrinkWindow()
+	if r.win != nil {
+		r.win.shrinkWindow()
+	}
 	r.dec()
 }
 
@@ -189,7 +210,8 @@ func (r *msgRef) dec() {
 		eventsNotAcked.Add(int64(len(r.batch)))
 		logp.Err("Failed to publish events caused by: %v", err)
 		r.cb(r.batch, err)
-	} else {
-		r.cb(nil, nil)
+		return
 	}
+
+	r.cb(nil, nil)
 }

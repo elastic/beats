@@ -3,10 +3,12 @@
 package logstash
 
 import (
+	"fmt"
 	"sync"
 	"testing"
 	"time"
 
+	"github.com/elastic/beats/libbeat/common"
 	"github.com/elastic/beats/libbeat/outputs"
 	"github.com/elastic/beats/libbeat/outputs/mode"
 	"github.com/elastic/beats/libbeat/outputs/transport"
@@ -19,29 +21,67 @@ type testAsyncDriver struct {
 	wg      sync.WaitGroup
 }
 
-func TestAsyncSendZero(t *testing.T) {
-	testSendZero(t, makeAsyncTestClient)
+func TestAsync(t *testing.T) {
+	tests := []struct {
+		name   string
+		runner func(*testing.T, clientFactory)
+	}{
+		{"sendZero", testSendZero},
+		{"simpleEvent", testSimpleEvent},
+		{"structuredEvent", testStructuredEvent},
+		{"multiFailMaxTimeouts", testMultiFailMaxTimeouts},
+	}
+
+	settings := []map[string]interface{}{
+		nil,
+		map[string]interface{}{
+			"slow_start": false,
+		},
+		map[string]interface{}{
+			"slow_start": true,
+		},
+		map[string]interface{}{
+			"slow_start":    true,
+			"pipelining":    5,
+			"bulk_max_size": 8,
+		},
+	}
+
+	for _, test := range tests {
+		t.Run(test.name, func(t *testing.T) {
+			for _, s := range settings {
+				s := s
+				t.Run(fmt.Sprintf("%v", s), func(t *testing.T) {
+					test.runner(t, makeAsyncTestClient(s))
+				})
+			}
+		})
+	}
 }
 
-func TestAsyncSimpleEvent(t *testing.T) {
-	testSimpleEvent(t, makeAsyncTestClient)
+func makeAsyncTestClient(settings map[string]interface{}) func(*transport.Client) testClientDriver {
+	return func(conn *transport.Client) testClientDriver {
+		return newAsyncTestDriver(newAsyncTestClient(conn, settings))
+	}
 }
 
-func TestAsyncStructuredEvent(t *testing.T) {
-	testStructuredEvent(t, makeAsyncTestClient)
-}
+func newAsyncTestClient(conn *transport.Client, settings map[string]interface{}) *asyncClient {
+	config, err := common.NewConfigFrom(settings)
+	if err != nil {
+		panic(err)
+	}
 
-func TestAsyncMultiFailMaxTimeouts(t *testing.T) {
-	testMultiFailMaxTimeouts(t, makeAsyncTestClient)
-}
+	lsCfg := defaultConfig
+	lsCfg.Index = "testbeat"
+	lsCfg.BulkMaxSize = testMaxWindowSize
+	lsCfg.Timeout = 100 * time.Millisecond
+	lsCfg.Pipelining = 2
+	lsCfg.SlowStart = true
+	if err := config.Unpack(&lsCfg); err != nil {
+		panic(err)
+	}
 
-func makeAsyncTestClient(conn *transport.Client) testClientDriver {
-	return newAsyncTestDriver(newAsyncTestClient(conn))
-}
-
-func newAsyncTestClient(conn *transport.Client) *asyncClient {
-	c, err := newAsyncLumberjackClient(conn,
-		1, 3, testMaxWindowSize, 100*time.Millisecond, "testbeat")
+	c, err := newAsyncLumberjackClient(conn, &lsCfg)
 	if err != nil {
 		panic(err)
 	}

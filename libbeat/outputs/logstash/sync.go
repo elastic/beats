@@ -18,29 +18,31 @@ const (
 type client struct {
 	*transport.Client
 	client *v2.SyncClient
-	win    window
+	win    *window
 }
 
 func newLumberjackClient(
 	conn *transport.Client,
-	compressLevel int,
-	maxWindowSize int,
-	timeout time.Duration,
-	beat string,
+	config *logstashConfig,
 ) (*client, error) {
-	c := &client{}
-	c.Client = conn
-	c.win.init(defaultStartMaxWindowSize, maxWindowSize)
+	c := &client{
+		Client: conn,
+	}
 
-	enc, err := makeLogstashEventEncoder(beat)
+	if config.SlowStart {
+		maxWindowSize := config.BulkMaxSize
+		c.win = newWindower(defaultStartMaxWindowSize, maxWindowSize)
+	}
+
+	enc, err := makeLogstashEventEncoder(config.Index)
 	if err != nil {
 		return nil, err
 	}
 
 	cl, err := v2.NewSyncClientWithConn(conn,
 		v2.JSONEncoder(enc),
-		v2.Timeout(timeout),
-		v2.CompressionLevel(compressLevel))
+		v2.Timeout(config.Timeout),
+		v2.CompressionLevel(config.CompressionLevel))
 	if err != nil {
 		return nil, err
 	}
@@ -71,15 +73,30 @@ func (c *client) PublishEvents(
 ) ([]outputs.Data, error) {
 	publishEventsCallCount.Add(1)
 	totalNumberOfEvents := len(data)
+
+	if len(data) == 0 {
+		return nil, nil
+	}
+
 	for len(data) > 0 {
-		n, err := c.publishWindowed(data)
+		var (
+			n   int
+			err error
+		)
+		if c.win == nil {
+			n, err = c.sendEvents(data)
+		} else {
+			n, err = c.publishWindowed(data)
+		}
 
 		debug("%v events out of %v events sent to logstash. Continue sending",
 			n, len(data))
 
 		data = data[n:]
 		if err != nil {
-			c.win.shrinkWindow()
+			if c.win != nil {
+				c.win.shrinkWindow()
+			}
 			_ = c.Close()
 
 			logp.Err("Failed to publish events caused by: %v", err)
