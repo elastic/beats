@@ -3,7 +3,7 @@ This file is generated! See scripts/docs_collector.py
 ////
 
 [[filebeat-module-elasticsearch]]
-== Apache2 module
+== Elasticsearch module
 
 This is a Filebeat module that can ingest Elasticsearch server logs. It allows you to visualise these logs in Kibana.
 
