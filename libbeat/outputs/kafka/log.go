@@ -2,6 +2,7 @@ package kafka
 
 import (
 	"github.com/Shopify/sarama"
+
 	"github.com/elastic/beats/libbeat/logp"
 )
 
