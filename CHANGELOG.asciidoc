@@ -97,6 +97,7 @@ https://github.com/elastic/beats/compare/v6.0.0-beta2...master[Check the HEAD di
 - Add experimental `queue` metricset to RabbitMQ module. {pull}4788[4788]
 - Add additional php-fpm pool status kpis for Metricbeat module {pull}5287[5287]
 - Auto-select a hostname (based on the host on which the Beat is running) in the Host Overview dashboard. {pull}5340[5340]
+- Add etcd module. {issue}4970[4970]
 
 *Packetbeat*
 
