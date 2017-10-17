@@ -155,6 +155,13 @@ metricbeat.modules:
   period: 10s
   hosts: ["localhost:9200"]
 
+#-------------------------------- Etcd Module --------------------------------
+- module: etcd
+  metricsets: ["leader", "self", "store"]
+  period: 10s
+  hosts: ["localhost:2379"]
+
+
 #------------------------------- Golang Module -------------------------------
 - module: golang
   metricsets: ["expvar","heap"]
