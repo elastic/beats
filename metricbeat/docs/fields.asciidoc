@@ -2543,7 +2543,7 @@ Non-Heap max used by the JVM in bytes.
 [float]
 === `elasticsearch.node.process.mlockall`
 
-type: bool
+type: boolean
 
 If process locked in memory.
 
