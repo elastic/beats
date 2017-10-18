@@ -97,7 +97,7 @@ docs:
 	@sh libbeat/scripts/build_docs.sh $(PROJECTS)
 
 .PHONY: package
-package: update beats-dashboards
+package: update beats-dashboards kubernetes-manifests
 	@$(foreach var,$(BEATS),SNAPSHOT=$(SNAPSHOT) $(MAKE) -C $(var) package || exit 1;)
 
 	@echo "Start building the dashboards package"
@@ -105,10 +105,16 @@ package: update beats-dashboards
 	@BUILD_DIR=$(CURDIR)/build SNAPSHOT=$(SNAPSHOT) $(MAKE) -C dev-tools/packer package-dashboards $(CURDIR)/build/upload/build_id.txt
 	@mv build/upload build/dashboards-upload
 
+	@echo "Start building kubernetes manifests"
+	@mkdir -p build/upload/
+	@BUILD_DIR=${BUILD_DIR} SNAPSHOT=$(SNAPSHOT) $(MAKE) -C dev-tools/packer package-kubernetes ${BUILD_DIR}/upload/build_id.txt
+	@mv build/upload build/kubernetes-upload
+
 	@# Copy build files over to top build directory
 	@mkdir -p build/upload/
 	@$(foreach var,$(BEATS),cp -r $(var)/build/upload/ build/upload/$(var)  || exit 1;)
 	@cp -r build/dashboards-upload build/upload/dashboards
+	@cp -r build/kubernetes-upload build/upload/kubernetes
 	@# Run tests on the generated packages.
 	@go test ./dev-tools/package_test.go -files "$(CURDIR)/build/upload/*/*"
 
@@ -139,3 +145,10 @@ notice: python-env
 python-env:
 	@test -d $(PYTHON_ENV) || virtualenv $(VIRTUALENV_PARAMS) $(PYTHON_ENV)
 	@$(PYTHON_ENV)/bin/pip install -q --upgrade pip autopep8 six
+
+# Build kubernetes manifests
+.PHONY: kubernetes-manifests
+kubernetes-manifests:
+	@mkdir -p build/kubernetes
+	$(MAKE) -C deploy/kubernetes all
+	cp deploy/kubernetes/*.yaml build/kubernetes
