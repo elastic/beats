@@ -935,6 +935,16 @@ The content of the line read from the log file.
 
 
 [float]
+=== `stream`
+
+type: keyword
+
+required: False
+
+Log stream when reading container logs, can be 'stdout' or 'stderr'
+
+
+[float]
 === `prospector.type`
 
 required: True

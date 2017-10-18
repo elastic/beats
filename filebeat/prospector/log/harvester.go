@@ -126,6 +126,8 @@ func (h *Harvester) open() error {
 		return h.openStdin()
 	case harvester.LogType:
 		return h.openFile()
+	case harvester.DockerType:
+		return h.openFile()
 	default:
 		return fmt.Errorf("Invalid harvester type: %+v", h.config)
 	}
@@ -513,6 +515,11 @@ func (h *Harvester) newLogFileReader() (reader.Reader, error) {
 	r, err = reader.NewEncode(h.log, h.encoding, h.config.BufferSize)
 	if err != nil {
 		return nil, err
+	}
+
+	if h.config.DockerJSON {
+		// Docker json-file format, add custom parsing to the pipeline
+		r = reader.NewDockerJSON(r)
 	}
 
 	if h.config.JSON != nil {
