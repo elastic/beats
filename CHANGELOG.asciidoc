@@ -22,6 +22,9 @@ https://github.com/elastic/beats/compare/v6.0.0-beta2...master[Check the HEAD di
 
 *Metricbeat*
 
+- Rename `heap_init` field to `heap.init`. {pull}5320[5320]
+
+
 *Packetbeat*
 
 - Remove not-working `runoptions.uid` and `runoptions.gid` options in Packetbeat. {pull}5261[5261]
@@ -35,12 +38,14 @@ https://github.com/elastic/beats/compare/v6.0.0-beta2...master[Check the HEAD di
 - Fix data race accessing watched containers. {issue}5147[5147]
 - Remove ID() from Runner interface {issue}5153[5153]
 - Do not require template if index change and template disabled {pull}5319[5319]
+- Correctly send configured `Host` header to the remote server. {issue}4842[4842]
 
 *Auditbeat*
 
 *Filebeat*
 
 - Fix default paths for redis 4.0.1 logs on macOS {pull}5173[5173]
+- Fix Filebeat not starting if command line and modules configs are used together. {issue}5376[5376]
 
 *Heartbeat*
 
@@ -49,8 +54,11 @@ https://github.com/elastic/beats/compare/v6.0.0-beta2...master[Check the HEAD di
 - Change field type of http header from nested to object {pull}5258[5258]
 - Use `beat.name` instead of `beat.hostname` in the Host Overview dashboard. {pull}5340[5340]
 - Fix the loading of 5.x dashboards. {issue}5277[5277]
+- Fix the fetching of process information when some data is missing under MacOS X. {issue}5337[5337]
 
 *Packetbeat*
+
+- Fix http status phrase parsing not allow spaces. {pull}5312[5312]
 
 *Winlogbeat*
 
@@ -63,8 +71,12 @@ https://github.com/elastic/beats/compare/v6.0.0-beta2...master[Check the HEAD di
 - Changed beat helper script to use `exec` when running the beat. {pull}5051[5051]
 - Fix reloader error message to only print on actual error {pull}5066[5066]
 - Add support for enabling TLS renegotiation. {issue}4386[4386]
+- Add Azure VM support for add_cloud_metadata processor {pull}5355[5355]
+- Add `output.file.permission` config option. {pull}4638[4638]
 
 *Auditbeat*
+
+- Add support for SHA3 hash algorithms to the file integrity module. {issue}5345[5345]
 
 *Filebeat*
 
@@ -87,6 +99,7 @@ https://github.com/elastic/beats/compare/v6.0.0-beta2...master[Check the HEAD di
 - Add additional php-fpm pool status kpis for Metricbeat module {pull}5287[5287]
 - Auto-select a hostname (based on the host on which the Beat is running) in the Host Overview dashboard. {pull}5340[5340]
 - Add Kubernetes manifests to deploy Metricbeat. {pull}5349[5349]
+- Add etcd module. {issue}4970[4970]
 
 *Packetbeat*
 
@@ -154,6 +167,7 @@ https://github.com/elastic/beats/compare/v6.0.0-beta2...v6.0.0-rc1[View commits]
 - Changed the number of shards in the default configuration to 3. {issue}5095[5095]
 - Don't start filebeat if external modules/prospectors config is wrong and reload is disabled {pull}5053[5053]
 - Add `filebeat.registry_flush` setting, to delay the registry updates. {pull}5146[5146]
+- Add traefik module {pull}5372[5372]
 
 *Heartbeat*
 

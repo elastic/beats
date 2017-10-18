@@ -1,0 +1,2 @@
+192.168.33.1 - - [02/Oct/2017:20:22:07 +0000] "GET /ui/favicons/favicon-16x16.png HTTP/1.1" 304 0 "http://example.com/login" "Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/61.0.3163.100 Safari/537.36" 262 "Host-host-1" "http://172.19.0.3:5601" 2ms
+85.181.35.98 - - [02/Oct/2017:20:22:08 +0000] "GET /ui/favicons/favicon.ico HTTP/1.1" 304 0 "http://example.com/login" "Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/61.0.3163.100 Safari/537.36" 271 "Host-host1 "http://172.19.0.3:5601" 3ms

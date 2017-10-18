@@ -11,6 +11,8 @@ import (
 	"path"
 	"path/filepath"
 	"strings"
+
+	"github.com/elastic/beats/libbeat/common"
 )
 
 // MessageOutputter is a function type for injecting status logging
@@ -19,7 +21,7 @@ type MessageOutputter func(msg string, a ...interface{})
 
 type Importer struct {
 	cfg     *Config
-	version string
+	version common.Version
 
 	loader Loader
 }
@@ -31,7 +33,7 @@ type Loader interface {
 	Close() error
 }
 
-func NewImporter(version string, cfg *Config, loader Loader) (*Importer, error) {
+func NewImporter(version common.Version, cfg *Config, loader Loader) (*Importer, error) {
 	return &Importer{
 		cfg:     cfg,
 		version: version,
@@ -245,7 +247,12 @@ func (imp Importer) downloadFile(url string, target string) (string, error) {
 func (imp Importer) ImportKibanaDir(dir string) error {
 	var err error
 
-	dir = path.Join(dir, imp.version)
+	versionPath := "default"
+	if imp.version.Major == 5 {
+		versionPath = "5x"
+	}
+
+	dir = path.Join(dir, versionPath)
 
 	imp.loader.statusMsg("Importing directory %v", dir)
 

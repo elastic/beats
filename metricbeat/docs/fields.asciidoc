@@ -23,6 +23,7 @@ grouped in the following categories:
 * <<exported-fields-docker>>
 * <<exported-fields-dropwizard>>
 * <<exported-fields-elasticsearch>>
+* <<exported-fields-etcd>>
 * <<exported-fields-golang>>
 * <<exported-fields-graphite>>
 * <<exported-fields-haproxy>>
@@ -2469,24 +2470,6 @@ node
 
 
 [float]
-=== `elasticsearch.node.jvm.memory.heap_init.bytes`
-
-type: long
-
-format: bytes
-
-Heap init used by the JVM in bytes.
-
-
-[float]
-=== `elasticsearch.node.jvm.version`
-
-type: keyword
-
-JVM version.
-
-
-[float]
 === `elasticsearch.node.name`
 
 type: keyword
@@ -2500,6 +2483,69 @@ Node name.
 type: keyword
 
 Node version.
+
+
+[float]
+== jvm fields
+
+JVM Info.
+
+
+
+[float]
+=== `elasticsearch.node.jvm.version`
+
+type: keyword
+
+JVM version.
+
+
+[float]
+=== `elasticsearch.node.jvm.memory.heap.init.bytes`
+
+type: long
+
+format: bytes
+
+Heap init used by the JVM in bytes.
+
+
+[float]
+=== `elasticsearch.node.jvm.memory.heap.max.bytes`
+
+type: long
+
+format: bytes
+
+Heap max used by the JVM in bytes.
+
+
+[float]
+=== `elasticsearch.node.jvm.memory.nonheap.init.bytes`
+
+type: long
+
+format: bytes
+
+Non-Heap init used by the JVM in bytes.
+
+
+[float]
+=== `elasticsearch.node.jvm.memory.nonheap.max.bytes`
+
+type: long
+
+format: bytes
+
+Non-Heap max used by the JVM in bytes.
+
+
+[float]
+=== `elasticsearch.node.process.mlockall`
+
+type: bool
+
+If process locked in memory.
 
 
 [float]
@@ -2776,6 +2822,277 @@ type: long
 format: bytes
 
 
+
+[[exported-fields-etcd]]
+== Etcd fields
+
+[]experimental
+etcd Module
+
+
+
+[float]
+== etcd fields
+
+`etcd` contains statistics that were read from Etcd
+
+
+
+[float]
+== leader fields
+
+Contains etcd leader statistics.
+
+
+
+[float]
+== followers.counts fields
+
+The number of failed and successful Raft RPC requests.
+
+
+
+[float]
+=== `etcd.leader.followers.counts.followers.counts.success`
+
+type: integer
+
+[float]
+=== `etcd.leader.followers.counts.followers.counts.fail`
+
+type: integer
+
+[float]
+== followers.latency fields
+
+latency to each peer in the cluster
+
+
+
+[float]
+=== `etcd.leader.followers.latency.followers.latency.average`
+
+type: scaled_float
+
+[float]
+=== `etcd.leader.followers.latency.followers.latency.current`
+
+type: scaled_float
+
+[float]
+=== `etcd.leader.followers.latency.followers.latency.maximum`
+
+type: scaled_float
+
+[float]
+=== `etcd.leader.followers.latency.followers.latency.minimum`
+
+type: integer
+
+[float]
+=== `etcd.leader.followers.latency.follower.latency.standardDeviation`
+
+type: scaled_float
+
+[float]
+=== `etcd.leader.leader`
+
+type: keyword
+
+[float]
+== self fields
+
+Contains etcd self statistics.
+
+
+
+[float]
+=== `etcd.self.id`
+
+type: keyword
+
+the unique identifier for the member
+
+
+[float]
+=== `etcd.self.leaderinfo.leader`
+
+type: keyword
+
+id of the current leader member
+
+
+[float]
+=== `etcd.self.leaderinfo.starttime`
+
+type: keyword
+
+[float]
+=== `etcd.self.leaderinfo.uptime`
+
+type: keyword
+
+id of the current leader member
+
+
+[float]
+=== `etcd.self.name`
+
+type: keyword
+
+this member's name
+
+
+[float]
+=== `etcd.self.recv.appendrequest.count`
+
+type: integer
+
+number of append requests this node has processed
+
+
+[float]
+=== `etcd.self.recv.bandwithrate`
+
+type: scaled_float
+
+number of bytes per second this node is receiving (follower only)
+
+
+[float]
+=== `etcd.self.recv.pkgrate`
+
+type: scaled_float
+
+number of requests per second this node is receiving (follower only)
+
+
+[float]
+=== `etcd.self.send.appendrequest.count`
+
+type: integer
+
+number of requests that this node has sent
+
+
+[float]
+=== `etcd.self.send.bandwithrate`
+
+type: scaled_float
+
+number of bytes per second this node is sending (leader only). This value is undefined on single member clusters.
+
+
+[float]
+=== `etcd.self.send.pkgrate`
+
+type: scaled_float
+
+number of requests per second this node is sending (leader only). This value is undefined on single member clusters.
+
+
+[float]
+=== `etcd.self.starttime`
+
+type: keyword
+
+the time when this node was started
+
+
+[float]
+=== `etcd.self.state`
+
+type: keyword
+
+either leader or follower
+
+
+[float]
+== store fields
+
+The store statistics include information about the operations that this node has handled.
+
+
+
+[float]
+=== `etcd.store.gets.success`
+
+type: integer
+
+[float]
+=== `etcd.store.gets.fail`
+
+type: integer
+
+[float]
+=== `etcd.store.sets.success`
+
+type: integer
+
+[float]
+=== `etcd.store.sets.fail`
+
+type: integer
+
+[float]
+=== `etcd.store.delete.success`
+
+type: integer
+
+[float]
+=== `etcd.store.delete.fail`
+
+type: integer
+
+[float]
+=== `etcd.store.update.success`
+
+type: integer
+
+[float]
+=== `etcd.store.update.fail`
+
+type: integer
+
+[float]
+=== `etcd.store.create.success`
+
+type: integer
+
+[float]
+=== `etcd.store.create.fail`
+
+type: integer
+
+[float]
+=== `etcd.store.compareandswap.success`
+
+type: integer
+
+[float]
+=== `etcd.store.compareandswap.fail`
+
+type: integer
+
+[float]
+=== `etcd.store.compareanddelete.success`
+
+type: integer
+
+[float]
+=== `etcd.store.compareanddelete.fail`
+
+type: integer
+
+[float]
+=== `etcd.store.expire.count`
+
+type: integer
+
+[float]
+=== `etcd.store.watchers`
+
+type: integer
 
 [[exported-fields-golang]]
 == Golang fields

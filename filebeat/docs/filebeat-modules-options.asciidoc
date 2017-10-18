@@ -87,12 +87,14 @@ to specify variable settings. See <<specify-variable-settings>>.
 [[enable-modules-config-file]]
 === Enable module configs in the +{beatname_lc}.yml+ file
 
-Enabling <<filebeat-modules,modules>> directly in the config file is a practical
-approach if you have upgraded from a previous version of {beatname_uc} and don't
-want to move your module configs to the `modules.d` directory. You can continue
-to configure modules in the +{beatname_lc}.yml+ file, but you won't be able to
-use the `modules` command to enable and disable configurations because the
-command requires the `modules.d` layout.
+When possible, you should use the config files in the `modules.d` directory.
+
+However, enabling <<filebeat-modules,modules>> directly in the config file is a
+practical approach if you have upgraded from a previous version of {beatname_uc}
+and don't want to move your module configs to the `modules.d` directory. You can
+continue to configure modules in the +{beatname_lc}.yml+ file, but you won't be
+able to use the `modules` command to enable and disable configurations because
+the command requires the `modules.d` layout.
 
 To enable specific modules in the +{beatname_lc}.yml+ config file, you can add
 entries to the +{beatname_lc}.modules+ list. Each entry in the list begins with

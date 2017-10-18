@@ -7,28 +7,42 @@ import (
 	"github.com/elastic/beats/libbeat/common"
 )
 
-type Transformer struct {
+type transformer struct {
 	fields                    common.Fields
 	transformedFields         []common.MapStr
 	transformedFieldFormatMap common.MapStr
 	timeFieldName             string
 	title                     string
+	version                   *common.Version
 	keys                      common.MapStr
 }
 
-func NewTransformer(timeFieldName, title string, fields common.Fields) *Transformer {
-	return &Transformer{
-		fields:                    fields,
+func newTransformer(timeFieldName, title string, version *common.Version, fields common.Fields) (*transformer, error) {
+	if version == nil {
+		return nil, errors.New("Version must be given")
+	}
+	return &transformer{
 		timeFieldName:             timeFieldName,
 		title:                     title,
+		fields:                    fields,
+		version:                   version,
 		transformedFields:         []common.MapStr{},
 		transformedFieldFormatMap: common.MapStr{},
 		keys: common.MapStr{},
-	}
+	}, nil
 }
 
-func (t *Transformer) TransformFields() common.MapStr {
-	t.transformFields(t.fields, "")
+func (t *transformer) transformFields() (transformed common.MapStr, err error) {
+	defer func() {
+		if r := recover(); r != nil {
+			var ok bool
+			if err, ok = r.(error); !ok {
+				err = fmt.Errorf("Unrecoverable Error %v", r)
+			}
+		}
+	}()
+
+	t.transform(t.fields, "")
 
 	// add some meta fields
 	truthy := true
@@ -38,15 +52,16 @@ func (t *Transformer) TransformFields() common.MapStr {
 	t.add(common.Field{Path: "_index", Type: "keyword", Index: &falsy, Analyzed: &falsy, DocValues: &falsy, Searchable: &falsy, Aggregatable: &falsy})
 	t.add(common.Field{Path: "_score", Type: "integer", Index: &falsy, Analyzed: &falsy, DocValues: &falsy, Searchable: &falsy, Aggregatable: &falsy})
 
-	return common.MapStr{
+	transformed = common.MapStr{
 		"timeFieldName":  t.timeFieldName,
 		"title":          t.title,
 		"fields":         t.transformedFields,
 		"fieldFormatMap": t.transformedFieldFormatMap,
 	}
+	return
 }
 
-func (t *Transformer) transformFields(commonFields common.Fields, path string) {
+func (t *transformer) transform(commonFields common.Fields, path string) {
 	for _, f := range commonFields {
 		f.Path = f.Name
 		if path != "" {
@@ -60,7 +75,7 @@ func (t *Transformer) transformFields(commonFields common.Fields, path string) {
 
 		if f.Type == "group" {
 			if f.Enabled == nil || *f.Enabled {
-				t.transformFields(f.Fields, f.Path)
+				t.transform(f.Fields, f.Path)
 			}
 		} else {
 			t.keys[f.Path] = true
@@ -78,8 +93,8 @@ func (t *Transformer) transformFields(commonFields common.Fields, path string) {
 	}
 }
 
-func (t *Transformer) add(f common.Field) {
-	field, fieldFormat := transformField(f)
+func (t *transformer) add(f common.Field) {
+	field, fieldFormat := transformField(t.version, f)
 	t.transformedFields = append(t.transformedFields, field)
 	if fieldFormat != nil {
 		t.transformedFieldFormatMap[field["name"].(string)] = fieldFormat
@@ -87,7 +102,7 @@ func (t *Transformer) add(f common.Field) {
 
 }
 
-func transformField(f common.Field) (common.MapStr, common.MapStr) {
+func transformField(version *common.Version, f common.Field) (common.MapStr, common.MapStr) {
 	field := common.MapStr{
 		"name":         f.Path,
 		"count":        f.Count,
@@ -120,36 +135,11 @@ func transformField(f common.Field) (common.MapStr, common.MapStr) {
 
 		if f.Format != "" {
 			format["id"] = f.Format
-			addStringFormatParam(&format, "inputFormat", f.InputFormat)
-			addStringFormatParam(&format, "outputFormat", f.OutputFormat)
-			addIntPFormatParam(&format, "outputPrecision", f.OutputPrecision)
-			addStringFormatParam(&format, "labelTemplate", f.LabelTemplate)
-			addStringFormatParam(&format, "urlTemplate", f.UrlTemplate)
 		}
-		addStringFormatParam(&format, "pattern", f.Pattern)
+		addParams(&format, version, f)
 	}
 
 	return field, format
-}
-
-func setVal(f common.MapStr, attr string, p *bool, def bool) {
-	if p != nil {
-		f[attr] = *p
-	}
-	if f[attr] == nil {
-		f[attr] = def
-	}
-}
-
-func setAggregatable(f common.MapStr, c common.Field) {
-	attr := "aggregatable"
-	if c.Aggregatable != nil {
-		f[attr] = *c.Aggregatable
-	} else if c.Type == "text" {
-		f[attr] = false
-	} else if f[attr] == nil {
-		f[attr] = true
-	}
 }
 
 func getVal(valP *bool, def bool) bool {
@@ -159,24 +149,57 @@ func getVal(valP *bool, def bool) bool {
 	return def
 }
 
-func addStringFormatParam(f *common.MapStr, key string, val string) {
-	if val == "" {
-		return
-	}
-	if (*f)["params"] == nil {
-		(*f)["params"] = common.MapStr{}
-	}
-	(*f)["params"].(common.MapStr)[key] = val
+func addParams(format *common.MapStr, version *common.Version, f common.Field) {
+	addFormatParam(format, "pattern", f.Pattern)
+	addFormatParam(format, "inputFormat", f.InputFormat)
+	addFormatParam(format, "outputFormat", f.OutputFormat)
+	addFormatParam(format, "outputPrecision", f.OutputPrecision)
+	addFormatParam(format, "labelTemplate", f.LabelTemplate)
+	addVersionedFormatParam(format, version, "urlTemplate", f.UrlTemplate)
 }
 
-func addIntPFormatParam(f *common.MapStr, key string, valP *int) {
-	if valP == nil {
+func addFormatParam(f *common.MapStr, key string, val interface{}) {
+	switch val.(type) {
+	case string:
+		if v := val.(string); v != "" {
+			createParam(f)
+			(*f)["params"].(common.MapStr)[key] = v
+		}
+	case *int:
+		if v := val.(*int); v != nil {
+			createParam(f)
+			(*f)["params"].(common.MapStr)[key] = *v
+		}
+	}
+}
+
+// takes the highest version where major version <= given version
+func addVersionedFormatParam(f *common.MapStr, version *common.Version, key string, val []common.VersionizedString) {
+	if len(val) == 0 {
 		return
 	}
+	paramVer, _ := common.NewVersion("0.0.0")
+	var paramVal string
+	for _, v := range val {
+		minVer, err := common.NewVersion(v.MinVersion)
+		if err != nil {
+			msg := fmt.Sprintf("ERROR: Parameter Version <%s> for <%s> is invalid. Please update and try again.", v.MinVersion, key)
+			panic(errors.New(msg))
+		}
+		if minVer.LessThanOrEqual(true, version) && paramVer.LessThanOrEqual(true, minVer) {
+			paramVer = minVer
+			paramVal = v.Value
+		}
+	}
+	if paramVal != "" {
+		addFormatParam(f, key, paramVal)
+	}
+}
+
+func createParam(f *common.MapStr) {
 	if (*f)["params"] == nil {
 		(*f)["params"] = common.MapStr{}
 	}
-	(*f)["params"].(common.MapStr)[key] = *valP
 }
 
 var (

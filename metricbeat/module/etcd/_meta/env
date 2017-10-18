@@ -1,0 +1,2 @@
+ETCD_HOST=etcd
+ETCD_PORT=2379

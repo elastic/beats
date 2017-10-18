@@ -255,5 +255,9 @@ func getDefaultProperties(f *common.Field) common.MapStr {
 	if f.DocValues != nil {
 		properties["doc_values"] = *f.DocValues
 	}
+
+	if f.CopyTo != "" {
+		properties["copy_to"] = f.CopyTo
+	}
 	return properties
 }

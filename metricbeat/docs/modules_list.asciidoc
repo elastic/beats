@@ -9,6 +9,7 @@ This file is generated! See scripts/docs_collector.py
   * <<metricbeat-module-docker,Docker>>
   * <<metricbeat-module-dropwizard,Dropwizard>>
   * <<metricbeat-module-elasticsearch,Elasticsearch>>
+  * <<metricbeat-module-etcd,Etcd>>
   * <<metricbeat-module-golang,Golang>>
   * <<metricbeat-module-graphite,graphite>>
   * <<metricbeat-module-haproxy,HAProxy>>
@@ -41,6 +42,7 @@ include::modules/couchbase.asciidoc[]
 include::modules/docker.asciidoc[]
 include::modules/dropwizard.asciidoc[]
 include::modules/elasticsearch.asciidoc[]
+include::modules/etcd.asciidoc[]
 include::modules/golang.asciidoc[]
 include::modules/graphite.asciidoc[]
 include::modules/haproxy.asciidoc[]
