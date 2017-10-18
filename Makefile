@@ -16,7 +16,7 @@ REVIEWDOG_REPO=github.com/haya14busa/reviewdog/cmd/reviewdog
 # Runs complete testsuites (unit, system, integration) for all beats with coverage and race detection.
 # Also it builds the docs and the generators
 
-.PHONY: setup-commit-hook 
+.PHONY: setup-commit-hook
 setup-commit-hook:
 	@cp script/pre_commit.sh .git/hooks/pre-commit
 	@chmod 751 .git/hooks/pre-commit
@@ -105,7 +105,7 @@ docs:
 	sh ./script/build_docs.sh dev-guide github.com/elastic/beats/docs/devguide ${BUILD_DIR}
 
 .PHONY: package
-package: update beats-dashboards
+package: update beats-dashboards kubernetes-manifests
 	@$(foreach var,$(BEATS),SNAPSHOT=$(SNAPSHOT) $(MAKE) -C $(var) package || exit 1;)
 
 	@echo "Start building the dashboards package"
@@ -113,10 +113,16 @@ package: update beats-dashboards
 	@BUILD_DIR=${BUILD_DIR} SNAPSHOT=$(SNAPSHOT) $(MAKE) -C dev-tools/packer package-dashboards ${BUILD_DIR}/upload/build_id.txt
 	@mv build/upload build/dashboards-upload
 
+	@echo "Start building kubernetes manifests"
+	@mkdir -p build/upload/
+	@BUILD_DIR=${BUILD_DIR} SNAPSHOT=$(SNAPSHOT) $(MAKE) -C dev-tools/packer package-kubernetes ${BUILD_DIR}/upload/build_id.txt
+	@mv build/upload build/kubernetes-upload
+
 	@# Copy build files over to top build directory
 	@mkdir -p build/upload/
 	@$(foreach var,$(BEATS),cp -r $(var)/build/upload/ build/upload/$(var)  || exit 1;)
 	@cp -r build/dashboards-upload build/upload/dashboards
+	@cp -r build/kubernetes-upload build/upload/kubernetes
 	@# Run tests on the generated packages.
 	@go test ./dev-tools/package_test.go -files "${BUILD_DIR}/upload/*/*"
 
@@ -149,6 +155,13 @@ python-env:
 	@$(PYTHON_ENV)/bin/pip install -q --upgrade pip autopep8 six
 
 # Tests if apm works with the current code
-.PHONY: python-env
+.PHONY: test-apm
 test-apm:
 	sh ./script/test_apm.sh
+
+# Build kubernetes manifests
+.PHONY: kubernetes-manifests
+kubernetes-manifests:
+	@mkdir -p build/kubernetes
+	$(MAKE) -C deploy/kubernetes all
+	cp deploy/kubernetes/*.yaml build/kubernetes
