@@ -141,7 +141,7 @@ func (smtp *smtpPlugin) Parse(
 	st := conn.streams[dir]
 	if st == nil {
 		st = &stream{}
-		st.parser.init(&smtp.parserConfig, func(msg *message) error {
+		st.parser.init(&smtp.parserConfig, &smtp.pub, func(msg *message) error {
 			return conn.trans.onMessage(tcptuple.IPPort(), dir, msg)
 		})
 		conn.streams[dir] = st

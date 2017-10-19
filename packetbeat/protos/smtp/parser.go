@@ -17,9 +17,9 @@ import (
 type parser struct {
 	buf     streambuf.Buffer
 	config  *parserConfig
+	pub     *transPub
 	message *message
 	state   parseState
-	payload []byte
 
 	onMessage func(m *message) error
 }
@@ -42,6 +42,7 @@ type message struct {
 	statusCode    int
 	statusPhrases []common.NetString
 
+	raw []byte
 	// list element use by 'transactions' for correlation
 	next *message
 }
@@ -61,11 +62,13 @@ var (
 
 func (p *parser) init(
 	cfg *parserConfig,
+	pub *transPub,
 	onMessage func(*message) error,
 ) {
 	*p = parser{
 		buf:       streambuf.Buffer{},
 		config:    cfg,
+		pub:       pub,
 		onMessage: onMessage,
 	}
 }
@@ -140,9 +143,16 @@ func (*parser) isResponseComplete(byts []byte) bool {
 }
 
 func (p *parser) parsePayload() error {
+	if !p.pub.sendDataHeaders && !p.pub.sendDataBody {
+		return nil
+	}
+
 	m := p.message
 
-	payload, err := mail.ReadMessage(bytes.NewReader(p.payload))
+	// ".\r\n" is not part of the payload
+	parseTo := len(m.raw) - len(constEOD)
+
+	payload, err := mail.ReadMessage(bytes.NewReader(m.raw[:parseTo]))
 	if err != nil {
 		return err
 	}
@@ -195,12 +205,18 @@ func (p *parser) parse() (*message, error) {
 					m.param = common.NetString(words[1])
 				}
 			}
+			if p.pub.sendRequest {
+				m.raw = append(m.raw, byts...)
+			}
 		} else {
 			// Response
 			m.statusCode = code
 			if nbytes > constMinRespSize+1 {
 				m.statusPhrases = append(m.statusPhrases,
 					byts[constPhraseOffset:nbytes-constCRLFSize])
+			}
+			if p.pub.sendResponse {
+				m.raw = append(m.raw, byts...)
 			}
 		}
 
@@ -219,10 +235,11 @@ func (p *parser) parse() (*message, error) {
 				}
 			}
 
-		case stateData:
-			// Request only state
+		case stateData: // request only state
+			if (p.pub.sendDataHeaders || p.pub.sendDataBody) && !p.pub.sendRequest {
+				m.raw = append(m.raw, byts...)
+			}
 			if bytes.Compare(byts, constEOD) != 0 {
-				p.payload = append(p.payload, byts...)
 				continue
 			} else {
 				// We want to provide a request section since the

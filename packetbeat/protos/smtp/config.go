@@ -15,8 +15,8 @@ var (
 	defaultConfig = smtpConfig{
 		ProtocolCommon: config.ProtocolCommon{
 			TransactionTimeout: protos.DefaultTransactionExpiration,
-			SendRequest:        true,
-			SendResponse:       true,
+			SendRequest:        false,
+			SendResponse:       false,
 		},
 	}
 )

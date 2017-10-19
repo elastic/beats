@@ -38,6 +38,10 @@ func (pub *transPub) createEvent(requ, resp *message) beat.Event {
 		"bytes_out": resp.Size,
 	}
 
+	if pub.sendResponse {
+		fields["response"] = common.NetString(resp.raw)
+	}
+
 	details := common.MapStr{}
 
 	// Some transactions can have no request
@@ -63,23 +67,25 @@ func (pub *transPub) createEvent(requ, resp *message) beat.Event {
 		fields["dst"] = dst
 		fields["bytes_in"] = requ.Size
 
+		if pub.sendRequest {
+			fields["request"] = common.NetString(requ.raw)
+		}
+
 		requNotes = requ.Notes
 		ts = requ.Ts
 
-		if pub.sendRequest {
-			details["request"] = common.MapStr{}
-			dr := details["request"].(common.MapStr)
+		details["request"] = common.MapStr{}
+		dr := details["request"].(common.MapStr)
 
-			dr["command"] = requ.command
-			if len(requ.param) > 0 {
-				dr["param"] = requ.param
-			}
-			if pub.sendDataHeaders && len(requ.headers) > 0 {
-				dr["headers"] = requ.headers
-			}
-			if pub.sendDataBody && len(requ.body) > 0 {
-				dr["body"] = requ.body
-			}
+		dr["command"] = requ.command
+		if len(requ.param) > 0 {
+			dr["param"] = requ.param
+		}
+		if pub.sendDataHeaders && len(requ.headers) > 0 {
+			dr["headers"] = requ.headers
+		}
+		if pub.sendDataBody && len(requ.body) > 0 {
+			dr["body"] = requ.body
 		}
 	}
 
@@ -88,13 +94,11 @@ func (pub *transPub) createEvent(requ, resp *message) beat.Event {
 		fields["notes"] = append(requNotes, resp.Notes...)
 	}
 
-	if pub.sendResponse {
-		details["response"] = common.MapStr{}
-		dr := details["response"].(common.MapStr)
-		dr["code"] = resp.statusCode
-		if len(resp.statusPhrases) > 0 {
-			dr["phrases"] = resp.statusPhrases
-		}
+	details["response"] = common.MapStr{}
+	dr := details["response"].(common.MapStr)
+	dr["code"] = resp.statusCode
+	if len(resp.statusPhrases) > 0 {
+		dr["phrases"] = resp.statusPhrases
 	}
 
 	if len(details) > 0 {

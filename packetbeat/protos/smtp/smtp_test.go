@@ -16,6 +16,7 @@ func TestSmtpParser_startResponse(t *testing.T) {
 
 	p := parser{
 		message: new(message),
+		pub:     &transPub{true, true, true, true, nil},
 	}
 
 	p.buf.Write([]byte("220 mx.google.com ESMTP l5si801447pli.743 - gsmtp\r\n"))
@@ -34,6 +35,7 @@ func TestSmtpParser_startIncompleteResponse(t *testing.T) {
 
 	p := parser{
 		message: new(message),
+		pub:     &transPub{false, true, true, true, nil},
 	}
 
 	p.buf.Write([]byte("220 mx.google.com ESMTP l5si801447pli.743 - gsmtp"))
@@ -56,6 +58,7 @@ func TestSmtpParser_MultilineResponse(t *testing.T) {
 
 	p := parser{
 		message: new(message),
+		pub:     &transPub{true, false, true, true, nil},
 	}
 
 	data := "220-localhost ESMTP Exim 4.89 Sun, 15 Aug 2012 08:41:55 -0700\r\n" +
@@ -79,6 +82,7 @@ func TestSmtpParser_MultilineIncompleteResponse(t *testing.T) {
 
 	p := parser{
 		message: new(message),
+		pub:     &transPub{true, true, false, true, nil},
 	}
 
 	data := "250-mx.google.com at your service, [8.8.8.8]\r\n" +
@@ -112,6 +116,7 @@ func TestSmtpParser_CommandRequest(t *testing.T) {
 
 	p := parser{
 		message: new(message),
+		pub:     &transPub{true, true, true, false, nil},
 	}
 
 	p.buf.Write([]byte("EHLO localhost\r\n"))
@@ -131,6 +136,7 @@ func TestSmtpParser_IncompleteCommandRequest(t *testing.T) {
 
 	p := parser{
 		message: new(message),
+		pub:     &transPub{false, false, true, true, nil},
 	}
 
 	p.buf.Write([]byte("EHLO localhost"))
@@ -155,6 +161,7 @@ func TestSmtpParser_DataTransaction(t *testing.T) {
 	// Client
 	pc := parser{
 		message: new(message),
+		pub:     &transPub{true, false, false, true, nil},
 	}
 
 	pc.buf.Write([]byte("DATA\r\n"))
@@ -166,6 +173,7 @@ func TestSmtpParser_DataTransaction(t *testing.T) {
 	// Server
 	ps := parser{
 		message: new(message),
+		pub:     &transPub{true, true, false, false, nil},
 	}
 
 	ps.buf.Write([]byte("354 Enter message, ending with \".\" on a line by itself\r\n"))
