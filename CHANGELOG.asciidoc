@@ -103,6 +103,8 @@ https://github.com/elastic/beats/compare/v6.0.0-beta2...master[Check the HEAD di
 
 *Packetbeat*
 
+- Add SMTP protocol support to Packetbeat. {pull}{5408}[5408]
+
 *Winlogbeat*
 
 ==== Deprecated

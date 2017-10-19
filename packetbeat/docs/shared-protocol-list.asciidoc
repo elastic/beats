@@ -12,6 +12,7 @@
  - Mysql
  - PostgreSQL
  - Redis
+ - SMTP
  - Thrift-RPC
  - MongoDB
  - Memcache
