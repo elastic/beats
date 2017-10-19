@@ -15,9 +15,9 @@ class Test(BaseTest):
             # Disable DNS (the pcap contains a DNS query)
             dns_ports=[],
             smtp_ports=['25'],
-            smtp_send_request=True,
-            smtp_send_response=True,
-            smtp_send_data_headers=True,
+            smtp_send_request=False,
+            smtp_send_response=False,
+            smtp_send_data_headers=False,
             smtp_send_data_body=True,
         )
 
@@ -41,7 +41,7 @@ class Test(BaseTest):
         self.render_config_template(
             smtp_ports=['25'],
             smtp_send_request=True,
-            smtp_send_response=True,
+            smtp_send_response=False,
             smtp_send_data_headers=True,
             smtp_send_data_body=True,
         )
@@ -66,7 +66,7 @@ class Test(BaseTest):
             smtp_ports=['25'],
             smtp_send_request=True,
             smtp_send_response=True,
-            smtp_send_data_headers=True,
+            smtp_send_data_headers=False,
             smtp_send_data_body=True,
         )
 
@@ -88,10 +88,10 @@ class Test(BaseTest):
         """
         self.render_config_template(
             smtp_ports=['25'],
-            smtp_send_request=True,
-            smtp_send_response=True,
-            smtp_send_data_headers=True,
-            smtp_send_data_body=True,
+            smtp_send_request=False,
+            smtp_send_response=False,
+            smtp_send_data_headers=False,
+            smtp_send_data_body=False,
         )
 
         self.run_packetbeat(pcap="smtp_tcp_gap_in_response.pcap",
