@@ -441,6 +441,9 @@ packetbeat.protocols:
 - type: redis
   ports: [6379]
 
+- type: smtp
+  ports: [25]
+
 - type: pgsql
   ports: [5432]
 
@@ -903,6 +906,40 @@ NOTE: Quiet messages in UDP binary protocol get responses only if there is an er
 The memcache protocol analyzer will wait for the number of milliseconds specified by
 `udptransactiontimeout` before publishing quiet messages. Non-quiet messages or
 quiet requests with an error response are published immediately.
+
+[[packetbeat-smtp-options]]
+=== Capture SMTP traffic
+
+++++
+<titleabbrev>SMTP</titleabbrev>
+++++
+
+The `smtp` section of the +{beatname_lc}.yml+ config file specifies configuration options for the SMTP
+protocol. Here is a sample configuration:
+
+[source,yaml]
+------------------------------------------------------------------------------
+packetbeat.protocols:
+- type: smtp
+  ports: [25]
+  send_data_headers: true
+  send_data_body: true
+------------------------------------------------------------------------------
+
+==== Configuration options
+
+Also see <<common-protocol-options>>.
+
+===== `send_data_headers`
+
+If set to true, Packetbeat parses the SMTP DATA payload headers and includes them
+in published events.  Those headers are key-value pairs that specify information
+such as the subject of the message or the message recipient. The default is false.
+
+===== `send_data_body`
+
+If set to true, Packetbeat includes the raw SMTP DATA payload body (contents of the message)
+in published events. The default is false
 
 [[packetbeat-mysql-options]]
 === Capture MySQL traffic

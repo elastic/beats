@@ -219,6 +219,9 @@ packetbeat.protocols:
 - type: redis
   ports: [6379]
 
+- type: smtp
+  ports: [25]
+
 - type: thrift
   ports: [9090]
 

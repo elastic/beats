@@ -58,7 +58,6 @@ class Test(BaseTest):
         assert "Content-Type" in d
         assert d["Content-Type"].startswith("multipart/mixed")
 
-
     def test_smtp_tcp_gap_in_request(self):
         """
         Should generate no new transactions in case of TCP gap in request

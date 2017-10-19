@@ -337,23 +337,21 @@ packetbeat.protocols:
   # SMTP port for traffic monitoring.
   ports: [25]
 
-  # If this option is enabled, the SMTP requests are included in published
-  # events. The default is true.
-  #send_request: true
+  # If this option is enabled, the SMTP DATA request (payload) headers are
+  # included in published events. The default is false.
+  #send_data_headers: false
 
-  # If this option is enabled, the SMTP DATA request headers are included
-  # in published events. The default is false. Enable `send_request`
-  # before enabling this option.
-  #send_data_headers: true
+  # If this option is enabled, the raw message of SMTP DATA request (payload)
+  # body is included in published events. The default is false.
+  #send_data_body: false
 
-  # If this option is enabled, the raw message of SMTP DATA request
-  # body is included in published events. The default is false. Enable
-  # `send_request` before enabling this option.
-  #send_data_body: true
+  # If this option is enabled, the raw message of the request (`request` field)
+  # is sent to Elasticsearch. The default is false.
+  #send_request: false
 
-  # If this option is enabled, the SMTP responses are included in
-  # published events. The default is true.
-  #send_response: true
+  # If this option is enabled, the raw message of the response (`response`
+  # field) is sent to Elasticsearch. The default is false.
+  #send_response: false
 
   # Max size for per-session message queue. This places a limit on the memory
   # that can be used to buffer requests and responses for correlation.
