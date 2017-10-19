@@ -94,7 +94,7 @@ func TestMultilineAfterNegateOKFlushPattern(t *testing.T) {
 		},
 		3,
 		"EventStart\nEventId: 1\nEventEnd\n",
-		"OtherThingInBetween\n", // this should be a seperate event..
+		"OtherThingInBetween\n", // this should be a separate event..
 		"EventStart\nEventId: 2\nEventEnd\n",
 	)
 }

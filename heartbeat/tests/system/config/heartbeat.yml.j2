@@ -56,6 +56,15 @@ fields:
   {% endfor -%}
 {% endif %}
 
+#================================ Queue =====================================
+
+queue.mem:
+  events: 4096
+  flush.min_events: 8
+  flush.timeout: 0.1s
+
+#================================ Outputs =====================================
+
 output.file:
   path: {{ output_file_path|default(beat.working_dir + "/output") }}
   filename: "{{ output_file_filename|default("heartbeat") }}"

@@ -18,6 +18,7 @@ import (
 	"github.com/elastic/beats/libbeat/api"
 	"github.com/elastic/beats/libbeat/beat"
 	"github.com/elastic/beats/libbeat/cfgfile"
+	"github.com/elastic/beats/libbeat/cloudid"
 	"github.com/elastic/beats/libbeat/common"
 	"github.com/elastic/beats/libbeat/common/cfgwarn"
 	"github.com/elastic/beats/libbeat/common/file"
@@ -113,9 +114,9 @@ func initRand() {
 // implementation. bt is the `Creator` callback for creating a new beater
 // instance.
 // XXX Move this as a *Beat method?
-func Run(name, version string, bt beat.Creator) error {
+func Run(name, idxPrefix, version string, bt beat.Creator) error {
 	return handleError(func() error {
-		b, err := NewBeat(name, version)
+		b, err := NewBeat(name, idxPrefix, version)
 		if err != nil {
 			return err
 		}
@@ -124,9 +125,12 @@ func Run(name, version string, bt beat.Creator) error {
 }
 
 // NewBeat creates a new beat instance
-func NewBeat(name, v string) (*Beat, error) {
+func NewBeat(name, indexPrefix, v string) (*Beat, error) {
 	if v == "" {
 		v = version.GetDefaultVersion()
+	}
+	if indexPrefix == "" {
+		indexPrefix = name
 	}
 
 	hostname, err := os.Hostname()
@@ -136,11 +140,12 @@ func NewBeat(name, v string) (*Beat, error) {
 
 	b := beat.Beat{
 		Info: beat.Info{
-			Beat:     name,
-			Version:  v,
-			Name:     hostname,
-			Hostname: hostname,
-			UUID:     uuid.NewV4(),
+			Beat:        name,
+			IndexPrefix: indexPrefix,
+			Version:     v,
+			Name:        hostname,
+			Hostname:    hostname,
+			UUID:        uuid.NewV4(),
 		},
 	}
 
@@ -365,7 +370,7 @@ func (b *Beat) handleFlags() error {
 	flag.Parse()
 
 	if printVersion {
-		cfgwarn.Deprecate("6.0", "-version flag has been deprectad, use version subcommand")
+		cfgwarn.Deprecate("6.0", "-version flag has been deprecated, use version subcommand")
 		fmt.Printf("%s version %s (%s), libbeat %s\n",
 			b.Info.Beat, b.Info.Version, runtime.GOARCH, version.GetDefaultVersion())
 		return beat.GracefulExit
@@ -387,6 +392,11 @@ func (b *Beat) configure() error {
 	cfg, err := cfgfile.Load("")
 	if err != nil {
 		return fmt.Errorf("error loading config file: %v", err)
+	}
+
+	err = cloudid.OverwriteSettings(cfg)
+	if err != nil {
+		return err
 	}
 
 	b.RawConfig = cfg
@@ -444,7 +454,7 @@ func (b *Beat) loadMeta() error {
 	}
 
 	metaPath := paths.Resolve(paths.Data, "meta.json")
-	logp.Info("Beat metadata path: %v", metaPath)
+	logp.Debug("beat", "Beat metadata path: %v", metaPath)
 
 	f, err := openRegular(metaPath)
 	if err != nil && !os.IsNotExist(err) {
@@ -527,7 +537,7 @@ func (b *Beat) loadDashboards(force bool) error {
 		if b.Config.Output.Name() == "elasticsearch" {
 			esConfig = b.Config.Output.Config()
 		}
-		err := dashboards.ImportDashboards(b.Info.Beat, b.Info.Version, paths.Resolve(paths.Home, ""),
+		err := dashboards.ImportDashboards(b.Info.Beat, b.Info.Name, paths.Resolve(paths.Home, ""),
 			b.Config.Kibana, esConfig, b.Config.Dashboards, nil)
 		if err != nil {
 			return fmt.Errorf("Error importing Kibana dashboards: %v", err)
@@ -542,9 +552,11 @@ func (b *Beat) loadDashboards(force bool) error {
 // the elasticsearch output. It is important the the registration happens before
 // the publisher is created.
 func (b *Beat) registerTemplateLoading() error {
+
+	var cfg template.TemplateConfig
+
 	// Check if outputting to file is enabled, and output to file if it is
-	if b.Config.Template != nil && b.Config.Template.Enabled() {
-		var cfg template.TemplateConfig
+	if b.Config.Template.Enabled() {
 		err := b.Config.Template.Unpack(&cfg)
 		if err != nil {
 			return fmt.Errorf("unpacking template config fails: %v", err)
@@ -553,7 +565,22 @@ func (b *Beat) registerTemplateLoading() error {
 
 	// Loads template by default if esOutput is enabled
 	if b.Config.Output.Name() == "elasticsearch" {
+
+		// Get ES Index name for comparison
+		esCfg := struct {
+			Index string `config:"index"`
+		}{}
+		err := b.Config.Output.Config().Unpack(&esCfg)
+		if err != nil {
+			return err
+		}
+
+		if esCfg.Index != "" && (cfg.Name == "" || cfg.Pattern == "") && (b.Config.Template == nil || b.Config.Template.Enabled()) {
+			return fmt.Errorf("setup.template.name and setup.template.pattern have to be set if index name is modified.")
+		}
+
 		if b.Config.Template == nil || (b.Config.Template != nil && b.Config.Template.Enabled()) {
+
 			// load template through callback to make sure it is also loaded
 			// on reconnecting
 			callback, err := b.templateLoadingCallback()

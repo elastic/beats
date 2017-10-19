@@ -4,6 +4,8 @@
 package system
 
 import (
+	"bytes"
+	"io/ioutil"
 	"runtime"
 	"testing"
 
@@ -52,6 +54,8 @@ func TestCPUCoresMonitorSample(t *testing.T) {
 		assert.True(t, normPct.System <= 100)
 		assert.True(t, normPct.Idle > 0)
 		assert.True(t, normPct.Idle <= 100)
+		assert.True(t, normPct.Total > 0)
+		assert.True(t, normPct.Total <= 100)
 
 		ticks := s.Ticks()
 		assert.True(t, ticks.User > 0)
@@ -110,10 +114,14 @@ func TestCPUMetricsPercentages(t *testing.T) {
 	pct := sample.NormalizedPercentages()
 	assert.EqualValues(t, .3, pct.User)
 	assert.EqualValues(t, .7, pct.System)
+	assert.EqualValues(t, .0, pct.Idle)
+	assert.EqualValues(t, 1., pct.Total)
 
 	pct = sample.Percentages()
 	assert.EqualValues(t, .3*float64(NumCPU), pct.User)
 	assert.EqualValues(t, .7*float64(NumCPU), pct.System)
+	assert.EqualValues(t, .0*float64(NumCPU), pct.Idle)
+	assert.EqualValues(t, 1.*float64(NumCPU), pct.Total)
 }
 
 func TestRound(t *testing.T) {
@@ -124,4 +132,18 @@ func TestRound(t *testing.T) {
 	assert.EqualValues(t, 1234.5, Round(1234.5))
 	assert.EqualValues(t, 1234.5, Round(1234.50004))
 	assert.EqualValues(t, 1234.5001, Round(1234.50005))
+}
+
+// Checks that the Host Overview dashboard contains the CHANGEME_HOSTNAME variable
+// that the dashboard loader code magically changes to the hostname on which the Beat
+// is running.
+func TestHostDashboardHasChangeableHost(t *testing.T) {
+	dashPath := "_meta/kibana/default/dashboard/Metricbeat-host-overview.json"
+	contents, err := ioutil.ReadFile(dashPath)
+	if err != nil {
+		t.Fatalf("Error reading file %s: %v", dashPath, err)
+	}
+	if !bytes.Contains(contents, []byte("CHANGEME_HOSTNAME")) {
+		t.Errorf("Dashboard '%s' doesn't contain string 'CHANGEME_HOSTNAME'. See elastic/beats#5340", dashPath)
+	}
 }

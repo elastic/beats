@@ -1,8 +1,10 @@
 package {protocol}
 
 import (
+	"github.com/elastic/beats/libbeat/beat"
 	"github.com/elastic/beats/libbeat/common"
-	"github.com/elastic/beats/packetbeat/publish"
+
+	"github.com/elastic/beats/packetbeat/protos"
 )
 
 // Transaction Publisher.
@@ -10,7 +12,7 @@ type transPub struct {
 	sendRequest        bool
 	sendResponse       bool
 
-	results publish.Transactions
+	results protos.Reporter
 }
 
 func (pub *transPub) onTransaction(requ, resp *message) error {
@@ -18,12 +20,11 @@ func (pub *transPub) onTransaction(requ, resp *message) error {
 		return nil
 	}
 
-	event := pub.createEvent(requ, resp)
-	pub.results.PublishTransaction(event)
+	pub.results(pub.createEvent(requ, resp))
 	return nil
 }
 
-func (pub *transPub) createEvent(requ, resp *message) common.MapStr {
+func (pub *transPub) createEvent(requ, resp *message) beat.Event {
 	status := common.OK_STATUS
 
 	// resp_time in milliseconds
@@ -40,8 +41,7 @@ func (pub *transPub) createEvent(requ, resp *message) common.MapStr {
 		Proc: string(requ.CmdlineTuple.Dst),
 	}
 
-	event := common.MapStr{
-		"@timestamp":   common.Time(requ.Ts),
+	fields := common.MapStr{
 		"type":         "{protocol}",
 		"status":       status,
 		"responsetime": responseTime,
@@ -53,15 +53,18 @@ func (pub *transPub) createEvent(requ, resp *message) common.MapStr {
 
 	// add processing notes/errors to event
 	if len(requ.Notes)+len(resp.Notes) > 0 {
-		event["notes"] = append(requ.Notes, resp.Notes...)
+		fields["notes"] = append(requ.Notes, resp.Notes...)
 	}
 
 	if pub.sendRequest {
-		// event["request"] =
+		// fields["request"] =
 	}
 	if pub.sendResponse {
-		// event["response"] =
+		// fields["response"] =
 	}
 
-	return event
+	return beat.Event{
+		Timestamp: requ.Ts,
+		Fields: fields,
+	}
 }

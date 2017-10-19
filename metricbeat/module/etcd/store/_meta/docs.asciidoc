@@ -1,0 +1,3 @@
+=== etcd store MetricSet
+
+This is the store metricset of the module etcd.

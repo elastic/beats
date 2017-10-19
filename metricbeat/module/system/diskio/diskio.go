@@ -65,17 +65,33 @@ func (m *MetricSet) Fetch() ([]common.MapStr, error) {
 		extraMetrics, err := m.statistics.CalIOStatistics(counters)
 		if err == nil {
 			event["iostat"] = common.MapStr{
-				"read_request_merged_per_sec":  extraMetrics.ReadRequestMergeCountPerSec,
-				"write_request_merged_per_sec": extraMetrics.WriteRequestMergeCountPerSec,
-				"read_request_per_sec":         extraMetrics.ReadRequestCountPerSec,
-				"write_request_per_sec":        extraMetrics.WriteRequestCountPerSec,
-				"read_byte_per_sec":            extraMetrics.ReadBytesPerSec,
-				"write_byte_per_sec":           extraMetrics.WriteBytesPerSec,
-				"avg_request_size":             extraMetrics.AvgRequestSize,
-				"avg_queue_size":               extraMetrics.AvgQueueSize,
-				"await":                        extraMetrics.AvgAwaitTime,
-				"service_time":                 extraMetrics.AvgServiceTime,
-				"busy":                         extraMetrics.BusyPct,
+				"read": common.MapStr{
+					"request": common.MapStr{
+						"merges_per_sec": extraMetrics.ReadRequestMergeCountPerSec,
+						"per_sec":        extraMetrics.ReadRequestCountPerSec,
+					},
+					"per_sec": common.MapStr{
+						"bytes": extraMetrics.ReadBytesPerSec,
+					},
+				},
+				"write": common.MapStr{
+					"request": common.MapStr{
+						"merges_per_sec": extraMetrics.WriteRequestMergeCountPerSec,
+						"per_sec":        extraMetrics.WriteRequestCountPerSec,
+					},
+					"per_sec": common.MapStr{
+						"bytes": extraMetrics.WriteBytesPerSec,
+					},
+				},
+				"queue": common.MapStr{
+					"avg_size": extraMetrics.AvgQueueSize,
+				},
+				"request": common.MapStr{
+					"avg_size": extraMetrics.AvgRequestSize,
+				},
+				"await":        extraMetrics.AvgAwaitTime,
+				"service_time": extraMetrics.AvgServiceTime,
+				"busy":         extraMetrics.BusyPct,
 			}
 		}
 

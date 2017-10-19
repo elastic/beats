@@ -8,6 +8,8 @@ MONGODB_FIELDS = metricbeat.COMMON_FIELDS + ["mongodb"]
 
 class Test(metricbeat.BaseTest):
 
+    COMPOSE_SERVICES = ['mongodb']
+
     @unittest.skipUnless(metricbeat.INTEGRATION_TESTS, "integration test")
     @attr('integration')
     def test_status(self):

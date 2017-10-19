@@ -9,11 +9,14 @@
 			"revisionTime": "2017-05-24T00:36:31Z"
 		},
 		{
-			"checksumSHA1": "WfQhuFTJ3zYmzVjeghW+9e76Yq0=",
+			"checksumSHA1": "GCpYz281OE/XkAQK23BLr+nK6O0=",
 			"origin": "github.com/urso/sarama",
 			"path": "github.com/Shopify/sarama",
-			"revision": "f0996189c86dc27338468f2a9b10077c6d572b34",
-			"revisionTime": "2016-11-23T00:27:23Z"
+			"revision": "c292021939f5aba53b3ffc2cb09c7aadb32a42df",
+			"revisionTime": "2016-11-23T00:27:23Z",
+			"tree": true,
+			"version": "v1.12/enh/offset-replica-id",
+			"versionExact": "v1.12/enh/offset-replica-id"
 		},
 		{
 			"checksumSHA1": "DYv6Q1+VfnUVxMwvk5IshAClLvw=",
@@ -104,6 +107,14 @@
 			"path": "github.com/armon/go-socks5",
 			"revision": "e75332964ef517daa070d7c38a9466a0d687e0a5",
 			"revisionTime": "2016-09-02T18:42:37Z"
+		},
+		{
+			"checksumSHA1": "R1Q34Pfnt197F/nCOO9kG8c+Z90=",
+			"path": "github.com/boltdb/bolt",
+			"revision": "2f1ce7a837dcb8da3ec595b1dac9d0632f0f99e8",
+			"revisionTime": "2017-07-17T17:11:48Z",
+			"version": "v1.3.1",
+			"versionExact": "v1.3.1"
 		},
 		{
 			"checksumSHA1": "5rPfda8jFccr3A6heL+JAmi9K9g=",
@@ -356,44 +367,44 @@
 			"revisionTime": "2016-08-05T00:47:13Z"
 		},
 		{
-			"checksumSHA1": "Pd9e8K98V1LGGScIG/u4Z36l0P0=",
+			"checksumSHA1": "/JppfHtRGQSFjB9FlY2jpHhmlhk=",
 			"path": "github.com/elastic/go-libaudit",
-			"revision": "3a005d3d0bbcee26d60e3ab2f1890699746f4da6",
-			"revisionTime": "2017-07-24T13:10:22Z",
-			"version": "v0.0.5",
-			"versionExact": "v0.0.5"
+			"revision": "df0d4981f3fce65ffd3d7411dfec3e03231b491c",
+			"revisionTime": "2017-09-07T20:19:58Z",
+			"version": "v0.0.6",
+			"versionExact": "v0.0.6"
 		},
 		{
-			"checksumSHA1": "Ca2OhodWbbke1v+cctf9y/HdwZM=",
+			"checksumSHA1": "n8bRlhOdmfREBoCgStzHWGWiwSY=",
 			"path": "github.com/elastic/go-libaudit/aucoalesce",
-			"revision": "3a005d3d0bbcee26d60e3ab2f1890699746f4da6",
-			"revisionTime": "2017-07-24T13:10:22Z",
-			"version": "v0.0.5",
-			"versionExact": "v0.0.5"
+			"revision": "df0d4981f3fce65ffd3d7411dfec3e03231b491c",
+			"revisionTime": "2017-09-07T20:19:58Z",
+			"version": "v0.0.6",
+			"versionExact": "v0.0.6"
 		},
 		{
-			"checksumSHA1": "N+9Ssj7RWKl2Sk1DqVmZ2Z3f8Ts=",
+			"checksumSHA1": "eUIiDm0pSFKNKjWme5s3PtWEoSU=",
 			"path": "github.com/elastic/go-libaudit/auparse",
-			"revision": "3a005d3d0bbcee26d60e3ab2f1890699746f4da6",
-			"revisionTime": "2017-07-24T13:10:22Z",
-			"version": "v0.0.5",
-			"versionExact": "v0.0.5"
+			"revision": "df0d4981f3fce65ffd3d7411dfec3e03231b491c",
+			"revisionTime": "2017-09-07T20:19:58Z",
+			"version": "v0.0.6",
+			"versionExact": "v0.0.6"
 		},
 		{
 			"checksumSHA1": "H0rnscnKHbkjmXc4whC3gtIPR0c=",
 			"path": "github.com/elastic/go-libaudit/rule",
-			"revision": "3a005d3d0bbcee26d60e3ab2f1890699746f4da6",
-			"revisionTime": "2017-07-24T13:10:22Z",
-			"version": "v0.0.5",
-			"versionExact": "v0.0.5"
+			"revision": "df0d4981f3fce65ffd3d7411dfec3e03231b491c",
+			"revisionTime": "2017-09-07T20:19:58Z",
+			"version": "v0.0.6",
+			"versionExact": "v0.0.6"
 		},
 		{
 			"checksumSHA1": "36UaYid29Kyhrsa5D8N6BoM8dVw=",
 			"path": "github.com/elastic/go-libaudit/rule/flags",
-			"revision": "3a005d3d0bbcee26d60e3ab2f1890699746f4da6",
-			"revisionTime": "2017-07-24T13:10:22Z",
-			"version": "v0.0.5",
-			"versionExact": "v0.0.5"
+			"revision": "df0d4981f3fce65ffd3d7411dfec3e03231b491c",
+			"revisionTime": "2017-09-07T20:19:58Z",
+			"version": "v0.0.6",
+			"versionExact": "v0.0.6"
 		},
 		{
 			"checksumSHA1": "3jizmlZPCyo6FAZY8Trk9jA8NH4=",
@@ -468,36 +479,36 @@
 			"revisionTime": "2017-02-07T06:38:51Z"
 		},
 		{
-			"checksumSHA1": "SF7Qsaj7bCzUfZrVzmK564Rgmk4=",
+			"checksumSHA1": "XCXFL46ybPz+NgKH+Pm9hW87wNA=",
 			"path": "github.com/elastic/gosigar",
-			"revision": "5a9ad8e33837b4e4c776d129142fcd5ccf41f639",
-			"revisionTime": "2017-06-12T15:08:20Z",
-			"version": "v0.4.0",
-			"versionExact": "v0.4.0"
+			"revision": "306d51981789ccc65e5f1431d5c0d78d8c368f1b",
+			"revisionTime": "2017-10-12T15:04:52Z",
+			"version": "v0.5.0",
+			"versionExact": "v0.5.0"
 		},
 		{
 			"checksumSHA1": "jE0nhsyuGyQ7vWoyBRPEU63mQ4g=",
 			"path": "github.com/elastic/gosigar/cgroup",
-			"revision": "5a9ad8e33837b4e4c776d129142fcd5ccf41f639",
-			"revisionTime": "2017-06-12T15:08:20Z",
-			"version": "v0.4.0",
-			"versionExact": "v0.4.0"
+			"revision": "306d51981789ccc65e5f1431d5c0d78d8c368f1b",
+			"revisionTime": "2017-10-12T15:04:52Z",
+			"version": "v0.5.0",
+			"versionExact": "v0.5.0"
 		},
 		{
 			"checksumSHA1": "2VhOsaR4sv3S79HO6X+6dEphNKU=",
 			"path": "github.com/elastic/gosigar/sys/linux",
-			"revision": "5a9ad8e33837b4e4c776d129142fcd5ccf41f639",
-			"revisionTime": "2017-06-12T15:08:20Z",
-			"version": "v0.4.0",
-			"versionExact": "v0.4.0"
+			"revision": "306d51981789ccc65e5f1431d5c0d78d8c368f1b",
+			"revisionTime": "2017-10-12T15:04:52Z",
+			"version": "v0.5.0",
+			"versionExact": "v0.5.0"
 		},
 		{
 			"checksumSHA1": "qDsgp2kAeI9nhj565HUScaUyjU4=",
 			"path": "github.com/elastic/gosigar/sys/windows",
-			"revision": "5a9ad8e33837b4e4c776d129142fcd5ccf41f639",
-			"revisionTime": "2017-06-12T15:08:20Z",
-			"version": "v0.4.0",
-			"versionExact": "v0.4.0"
+			"revision": "306d51981789ccc65e5f1431d5c0d78d8c368f1b",
+			"revisionTime": "2017-10-12T15:04:52Z",
+			"version": "v0.5.0",
+			"versionExact": "v0.5.0"
 		},
 		{
 			"checksumSHA1": "P0CvGmmAM8uYPSE2ix4th/L9c/8=",
@@ -754,6 +765,12 @@
 			"revisionTime": "2017-02-15T23:32:05Z"
 		},
 		{
+			"checksumSHA1": "upYudcnxqDBx2/71UDwwxHn/KyY=",
+			"path": "github.com/google/flatbuffers/go",
+			"revision": "7a6b2bf521e95097a92ec848001531b2dcf0f3fa",
+			"revisionTime": "2017-09-25T18:44:58Z"
+		},
+		{
 			"checksumSHA1": "5DBIm/bJOKLR3CbQH6wIELQDLlQ=",
 			"path": "github.com/gorhill/cronexpr",
 			"revision": "d520615e531a6bf3fb69406b9eba718261285ec8",
@@ -770,6 +787,12 @@
 			"path": "github.com/joeshaw/multierror",
 			"revision": "69b34d4ec901851247ae7e77d33909caf9df99ed",
 			"revisionTime": "2014-01-24T17:37:10Z"
+		},
+		{
+			"checksumSHA1": "a8Ge6pE7oxux9ZMZVAlyEeGzCng=",
+			"path": "github.com/juju/ratelimit",
+			"revision": "5b9ff866471762aa2ab2dced63c9fb6f53921342",
+			"revisionTime": "2017-05-23T01:21:41Z"
 		},
 		{
 			"checksumSHA1": "+CqJGh7NIDMnHgScq9sl9tPrnVM=",
@@ -1008,6 +1031,12 @@
 			"path": "github.com/yuin/gopher-lua/pm",
 			"revision": "b402f3114ec730d8bddb074a6c137309f561aa78",
 			"revisionTime": "2017-04-03T16:00:31Z"
+		},
+		{
+			"checksumSHA1": "iNE2KX9BQzCptlQC2DdQEVmn4R4=",
+			"path": "golang.org/x/crypto/sha3",
+			"revision": "9419663f5a44be8b34ca85f08abc5fe1be11f8a3",
+			"revisionTime": "2017-09-30T17:45:11Z"
 		},
 		{
 			"checksumSHA1": "tK8eFmQ0JeKpR3P0TjiGobzlIh0=",

@@ -1,7 +1,7 @@
 package dashboards
 
 import (
-	"bytes"
+	"encoding/json"
 	"fmt"
 	"io/ioutil"
 	"net/url"
@@ -17,10 +17,11 @@ type KibanaLoader struct {
 	client       *kibana.Client
 	config       *Config
 	version      string
+	hostname     string
 	msgOutputter MessageOutputter
 }
 
-func NewKibanaLoader(cfg *common.Config, dashboardsConfig *Config, msgOutputter MessageOutputter) (*KibanaLoader, error) {
+func NewKibanaLoader(cfg *common.Config, dashboardsConfig *Config, hostname string, msgOutputter MessageOutputter) (*KibanaLoader, error) {
 
 	if cfg == nil || !cfg.Enabled() {
 		return nil, fmt.Errorf("Kibana is not configured or enabled")
@@ -35,6 +36,7 @@ func NewKibanaLoader(cfg *common.Config, dashboardsConfig *Config, msgOutputter 
 		client:       client,
 		config:       dashboardsConfig,
 		version:      client.GetVersion(),
+		hostname:     hostname,
 		msgOutputter: msgOutputter,
 	}
 
@@ -48,12 +50,20 @@ func (loader KibanaLoader) ImportIndex(file string) error {
 	params.Set("force", "true") //overwrite the existing dashboards
 
 	// read json file
-	content, err := ioutil.ReadFile(file)
+	reader, err := ioutil.ReadFile(file)
 	if err != nil {
-		return fmt.Errorf("fail to read index-pattern: %v", err)
+		return fmt.Errorf("fail to read index-pattern from file %s: %v", file, err)
 	}
 
-	return loader.client.ImportJSON(importAPI, params, bytes.NewBuffer(content))
+	var indexContent common.MapStr
+	err = json.Unmarshal(reader, &indexContent)
+	if err != nil {
+		return fmt.Errorf("fail to unmarshal the index content from file %s: %v", file, err)
+	}
+
+	indexContent = ReplaceIndexInIndexPattern(loader.config.Index, indexContent)
+
+	return loader.client.ImportJSON(importAPI, params, indexContent)
 }
 
 func (loader KibanaLoader) ImportDashboard(file string) error {
@@ -62,12 +72,24 @@ func (loader KibanaLoader) ImportDashboard(file string) error {
 	params.Add("exclude", "index-pattern") //don't import the index pattern from the dashboards
 
 	// read json file
-	content, err := ioutil.ReadFile(file)
+	reader, err := ioutil.ReadFile(file)
 	if err != nil {
-		return fmt.Errorf("fail to read index-pattern: %v", err)
+		return fmt.Errorf("fail to read dashboard from file %s: %v", file, err)
+	}
+	var content common.MapStr
+	err = json.Unmarshal(reader, &content)
+	if err != nil {
+		return fmt.Errorf("fail to unmarshal the dashboard content from file %s: %v", file, err)
 	}
 
-	return loader.client.ImportJSON(importAPI, params, bytes.NewBuffer(content))
+	content = ReplaceIndexInDashboardObject(loader.config.Index, content)
+
+	content, err = ReplaceStringInDashboard("CHANGEME_HOSTNAME", loader.hostname, content)
+	if err != nil {
+		return fmt.Errorf("fail to replace the hostname in dashboard %s: %v", file, err)
+	}
+
+	return loader.client.ImportJSON(importAPI, params, content)
 }
 
 func (loader KibanaLoader) Close() error {

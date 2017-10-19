@@ -57,7 +57,7 @@ func makeES(
 	}
 
 	if !cfg.HasField("index") {
-		pattern := fmt.Sprintf("%v-%v-%%{+yyyy.MM.dd}", beat.Beat, beat.Version)
+		pattern := fmt.Sprintf("%v-%v-%%{+yyyy.MM.dd}", beat.IndexPrefix, beat.Version)
 		cfg.SetString("index", -1, pattern)
 	}
 

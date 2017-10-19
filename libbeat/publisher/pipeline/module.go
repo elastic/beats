@@ -72,12 +72,12 @@ func Load(
 		return nil, err
 	}
 
-	p, err := New(reg, queueBuilder, out, settings)
+	p, err := New(beatInfo, reg, queueBuilder, out, settings)
 	if err != nil {
 		return nil, err
 	}
 
-	logp.Info("Publisher name: %s", name)
+	logp.Info("Beat name: %s", name)
 	return p, err
 }
 

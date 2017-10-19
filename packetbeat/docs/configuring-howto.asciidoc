@@ -24,6 +24,7 @@ The following topics describe how to configure Packetbeat:
 * <<configuration-protocols>>
 * <<configuration-processes>>
 * <<configuration-general-options>>
+* <<configuring-internal-queue>>
 * <<configuring-output>>
 * <<configuration-ssl>>
 * <<filtering-and-enhancing-data>>
@@ -34,7 +35,6 @@ The following topics describe how to configure Packetbeat:
 * <<configuration-dashboards>>
 * <<configuration-template>>
 * <<configuration-logging>>
-* <<configuration-run-options>>
 * <<using-environ-vars>>
 * <<yaml-tips>>
 
@@ -45,6 +45,8 @@ include::./packetbeat-options.asciidoc[]
 include::./packetbeat-general-options.asciidoc[]
 
 :allplatforms:
+include::../../libbeat/docs/queueconfig.asciidoc[]
+
 include::../../libbeat/docs/outputconfig.asciidoc[]
 
 include::../../libbeat/docs/shared-ssl-config.asciidoc[]
@@ -62,8 +64,6 @@ include::../../libbeat/docs/shared-kibana-config.asciidoc[]
 include::../../libbeat/docs/setup-config.asciidoc[]
 
 include::../../libbeat/docs/loggingconfig.asciidoc[]
-
-include::./runconfig.asciidoc[]
 
 :standalone:
 include::../../libbeat/docs/shared-env-vars.asciidoc[]

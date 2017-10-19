@@ -96,7 +96,7 @@ command exports the configuration that's defined in the specified file.
 [[template-subcommand]]
 *`template`*::
 Exports the index template to stdout. You can specify the `--es.version` and
-`--index` flags to futher define what gets exported.
+`--index` flags to further define what gets exported.
 
 *FLAGS*
 
@@ -159,9 +159,11 @@ ifeval::[("{beatname_lc}"=="filebeat") or ("{beatname_lc}"=="metricbeat")]
 ==== `modules` command
 
 {modules-command-short-desc}. You can use this command to enable and disable
-specific modules. The changes you make with this command are persisted and
-used for subsequent runs of {beatname_uc}. To see which modules are enabled
-and disabled, run the `list` subcommand.
+specific module configurations defined in the `modules.d` directory. The
+changes you make with this command are persisted and used for subsequent
+runs of {beatname_uc}.
+
+To see which modules are enabled and disabled, run the `list` subcommand.
 
 *SYNOPSIS*
 
@@ -229,6 +231,12 @@ endif::[]
 {beatname_lc} run [FLAGS]
 -----
 
+Or:
+
+["source","sh",subs="attributes"]
+-----
+{beatname_lc} [FLAGS]
+-----
 
 *FLAGS*
 
@@ -352,9 +360,15 @@ endif::[]
 
 ["source","sh",subs="attributes"]
 -----
-{beatname_lc} run -e
+{beatname_lc} run -e --setup
 -----
 
+Or:
+
+["source","sh",subs="attributes"]
+-----
+{beatname_lc} -e --setup
+-----
 
 [[setup-command]]
 ==== `setup` command
@@ -366,6 +380,9 @@ endif::[]
 in Kibana.
 * The machine learning jobs contain the configuration information and metadata
 necessary to analyze data for anomalies.
+
+Use this command instead of `run --setup` when you want to set up the
+environment without actually running {beatname_uc} and ingesting data.
 
 *SYNOPSIS*
 

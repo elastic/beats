@@ -4,6 +4,8 @@ import (
 	"fmt"
 	"net"
 
+	"github.com/pkg/errors"
+
 	"github.com/elastic/beats/libbeat/common"
 	"github.com/elastic/beats/libbeat/logp"
 	"github.com/elastic/beats/metricbeat/helper/server"
@@ -11,6 +13,7 @@ import (
 )
 
 type UdpServer struct {
+	udpaddr           *net.UDPAddr
 	listener          *net.UDPConn
 	receiveBufferSize int
 	done              chan struct{}
@@ -43,25 +46,28 @@ func NewUdpServer(base mb.BaseMetricSet) (server.Server, error) {
 		return nil, err
 	}
 
-	listener, err := net.ListenUDP("udp", addr)
-	if err != nil {
-		return nil, err
-	}
-
-	logp.Info("Started listening for UDP on: %s:%d", config.Host, config.Port)
 	return &UdpServer{
-		listener:          listener,
+		udpaddr:           addr,
 		receiveBufferSize: config.ReceiveBufferSize,
 		done:              make(chan struct{}),
 		eventQueue:        make(chan server.Event),
 	}, nil
 }
 
-func (g *UdpServer) Start() {
-	go g.WatchMetrics()
+func (g *UdpServer) Start() error {
+	listener, err := net.ListenUDP("udp", g.udpaddr)
+	if err != nil {
+		return errors.Wrap(err, "failed to start UDP server")
+	}
+
+	logp.Info("Started listening for UDP on: %s", g.udpaddr.String())
+	g.listener = listener
+
+	go g.watchMetrics()
+	return nil
 }
 
-func (g *UdpServer) WatchMetrics() {
+func (g *UdpServer) watchMetrics() {
 	buffer := make([]byte, g.receiveBufferSize)
 	for {
 		select {

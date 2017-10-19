@@ -12,6 +12,7 @@ import (
 	"github.com/elastic/beats/filebeat/channel"
 	"github.com/elastic/beats/filebeat/harvester"
 	"github.com/elastic/beats/filebeat/input/file"
+	"github.com/elastic/beats/filebeat/prospector"
 	"github.com/elastic/beats/filebeat/util"
 	"github.com/elastic/beats/libbeat/common"
 	"github.com/elastic/beats/libbeat/logp"
@@ -28,6 +29,13 @@ var (
 	harvesterSkipped = monitoring.NewInt(nil, "filebeat.harvester.skipped")
 )
 
+func init() {
+	err := prospector.Register("log", NewProspector)
+	if err != nil {
+		panic(err)
+	}
+}
+
 // Prospector contains the prospector and its config
 type Prospector struct {
 	cfg         *common.Config
@@ -42,10 +50,9 @@ type Prospector struct {
 // NewProspector instantiates a new Log
 func NewProspector(
 	cfg *common.Config,
-	states []file.State,
-	outlet channel.OutleterFactory,
-	done, beatDone chan struct{},
-) (*Prospector, error) {
+	outlet channel.Factory,
+	context prospector.Context,
+) (prospector.Prospectorer, error) {
 
 	// Note: underlying output.
 	//  The prospector and harvester do have different requirements
@@ -61,7 +68,7 @@ func NewProspector(
 	// stateOut will only be unblocked if the beat is shut down.
 	// otherwise it can block on a full publisher pipeline, so state updates
 	// can be forwarded correctly to the registrar.
-	stateOut := channel.CloseOnSignal(channel.SubOutlet(out), beatDone)
+	stateOut := channel.CloseOnSignal(channel.SubOutlet(out), context.BeatDone)
 
 	p := &Prospector{
 		config:      defaultConfig,
@@ -70,7 +77,7 @@ func NewProspector(
 		outlet:      out,
 		stateOutlet: stateOut,
 		states:      &file.States{},
-		done:        done,
+		done:        context.Done,
 	}
 
 	if err := cfg.Unpack(&p.config); err != nil {
@@ -92,7 +99,7 @@ func NewProspector(
 		return nil, fmt.Errorf("each prospector must have at least one path defined")
 	}
 
-	err = p.loadStates(states)
+	err = p.loadStates(context.States)
 	if err != nil {
 		return nil, err
 	}
@@ -442,7 +449,7 @@ func (p *Prospector) harvestExistingFile(newState file.State, oldState file.Stat
 		// Resume harvesting of an old file we've stopped harvesting from
 		// This could also be an issue with force_close_older that a new harvester is started after each scan but not needed?
 		// One problem with comparing modTime is that it is in seconds, and scans can happen more then once a second
-		logp.Debug("prospector", "Resuming harvesting of file: %s, offset: %v", newState.Source, oldState.Offset)
+		logp.Debug("prospector", "Resuming harvesting of file: %s, offset: %d, new size: %d", newState.Source, oldState.Offset, newState.Fileinfo.Size())
 		err := p.startHarvester(newState, oldState.Offset)
 		if err != nil {
 			logp.Err("Harvester could not be started on existing file: %s, Err: %s", newState.Source, err)
@@ -452,7 +459,7 @@ func (p *Prospector) harvestExistingFile(newState file.State, oldState file.Stat
 
 	// File size was reduced -> truncated file
 	if oldState.Finished && newState.Fileinfo.Size() < oldState.Offset {
-		logp.Debug("prospector", "Old file was truncated. Starting from the beginning: %s", newState.Source)
+		logp.Debug("prospector", "Old file was truncated. Starting from the beginning: %s, offset: %d, new size: %d ", newState.Source, newState.Fileinfo.Size())
 		err := p.startHarvester(newState, 0)
 		if err != nil {
 			logp.Err("Harvester could not be started on truncated file: %s, Err: %s", newState.Source, err)
@@ -562,7 +569,7 @@ func (p *Prospector) isCleanInactive(state file.State) bool {
 
 // createHarvester creates a new harvester instance from the given state
 func (p *Prospector) createHarvester(state file.State) (*Harvester, error) {
-	// Each wraps the outlet, for closing the outlet individualy
+	// Each wraps the outlet, for closing the outlet individually
 	outlet := channel.SubOutlet(p.outlet)
 	h, err := NewHarvester(
 		p.cfg,

@@ -470,6 +470,9 @@ class Test(BaseTest):
             f.write("hello world 2\n")
             f.flush()
 
+        # Sleep 1 second to make sure the file is persisted on disk and timestamp is in the past
+        time.sleep(1)
+
         filebeat = self.start_beat()
         self.wait_until(
             lambda: self.log_contains(

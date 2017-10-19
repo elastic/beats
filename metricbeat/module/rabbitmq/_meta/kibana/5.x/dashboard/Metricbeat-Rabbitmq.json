@@ -1,0 +1,13 @@
+{
+  "hits": 0, 
+  "timeRestore": false, 
+  "version": 1, 
+  "title": "Metricbeat-Rabbitmq", 
+  "uiStateJSON": "{}", 
+  "panelsJSON": "[{\"col\":1,\"id\":\"RabbitMQ-Memory-Usage\",\"panelIndex\":8,\"row\":1,\"size_x\":6,\"size_y\":3,\"type\":\"visualization\"},{\"col\":8,\"id\":\"Rabbitmq-Number-of-Nodes\",\"panelIndex\":2,\"row\":1,\"size_x\":3,\"size_y\":3,\"type\":\"visualization\"},{\"col\":1,\"id\":\"RabbitMQ-Erlang-Process-Usage\",\"panelIndex\":10,\"row\":4,\"size_x\":6,\"size_y\":3,\"type\":\"visualization\"},{\"col\":7,\"id\":\"RabbitMQ-Queue-Index-Operations\",\"panelIndex\":9,\"row\":4,\"size_x\":6,\"size_y\":3,\"type\":\"visualization\"}]", 
+  "optionsJSON": "{\"darkTheme\":false}", 
+  "kibanaSavedObjectMeta": {
+    "searchSourceJSON": "{\"filter\":[{\"query\":{\"query_string\":{\"analyze_wildcard\":true,\"query\":\"*\"}}}]}"
+  }, 
+  "description": ""
+}

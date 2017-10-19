@@ -115,13 +115,13 @@ if __name__ == "__main__":
     parser = argparse.ArgumentParser(
         description="Generates the documentation for a Beat.")
     parser.add_argument("path", help="Path to the beat folder")
-    parser.add_argument("beatname", help="The beat name")
+    parser.add_argument("beattitle", help="The beat title")
     parser.add_argument("es_beats", help="The path to the general beats folder")
 
     args = parser.parse_args()
 
     beat_path = args.path
-    beat_name = args.beatname
+    beat_title = args.beattitle
     es_beats = args.es_beats
 
     fields_yml = beat_path + "/fields.yml"
@@ -133,6 +133,6 @@ if __name__ == "__main__":
     output = open(beat_path + "/docs/fields.asciidoc", 'w')
 
     try:
-        fields_to_asciidoc(fields, output, beat_name.title())
+        fields_to_asciidoc(fields, output, beat_title)
     finally:
         output.close()

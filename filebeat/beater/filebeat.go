@@ -51,7 +51,7 @@ func New(b *beat.Beat, rawConfig *common.Config) (beat.Beater, error) {
 		return nil, err
 	}
 
-	moduleRegistry, err := fileset.NewModuleRegistry(config.Modules, b.Info.Version)
+	moduleRegistry, err := fileset.NewModuleRegistry(config.Modules, b.Info.Version, true)
 	if err != nil {
 		return nil, err
 	}
@@ -167,7 +167,7 @@ func (fb *Filebeat) Run(b *beat.Beat) error {
 	finishedLogger := newFinishedLogger(wgEvents)
 
 	// Setup registrar to persist state
-	registrar, err := registrar.New(config.RegistryFile, finishedLogger)
+	registrar, err := registrar.New(config.RegistryFile, config.RegistryFlush, finishedLogger)
 	if err != nil {
 		logp.Err("Could not init registrar: %v", err)
 		return err

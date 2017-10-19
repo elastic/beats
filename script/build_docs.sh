@@ -17,16 +17,19 @@ else
     echo "$docs_dir already exists. Not cloning."
 fi
 
-
-index="${GOPATH%%:*}/src/${path}/index.asciidoc"
-
-if [ -f "$index" ]; then
+index_list="$(find ${GOPATH%%:*}/src/$path -name 'index.asciidoc')"
+for index in $index_list
+do
   echo "Building docs for ${name}..."
-  dest_dir="$html_dir/${name}"
+  echo "Index document: ${index}"
+  index_path=$(basename $(dirname $index))
+  echo "Index path: $index_path"
+
+  dest_dir="$html_dir/${name}/${index_path}"
   mkdir -p "$dest_dir"
-  params=""
+  params="--chunk=1"
   if [ "$PREVIEW" = "1" ]; then
     params="--chunk=1 -open chunk=1 -open"
   fi
   $docs_dir/build_docs.pl $params --doc "$index" -out "$dest_dir"
-fi
+done

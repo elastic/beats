@@ -6,6 +6,7 @@ import (
 	"testing"
 
 	"github.com/elastic/beats/libbeat/common"
+	"github.com/elastic/beats/libbeat/tests/compose"
 	mbtest "github.com/elastic/beats/metricbeat/mb/testing"
 	"github.com/elastic/beats/metricbeat/module/mysql"
 
@@ -13,6 +14,8 @@ import (
 )
 
 func TestFetch(t *testing.T) {
+	compose.EnsureUp(t, "mysql")
+
 	f := mbtest.NewEventFetcher(t, getConfig(false))
 	event, err := f.Fetch()
 	if !assert.NoError(t, err) {
@@ -35,6 +38,8 @@ func TestFetch(t *testing.T) {
 }
 
 func TestFetchRaw(t *testing.T) {
+	compose.EnsureUp(t, "mysql")
+
 	f := mbtest.NewEventFetcher(t, getConfig(true))
 	event, err := f.Fetch()
 	if !assert.NoError(t, err) {

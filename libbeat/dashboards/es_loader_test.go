@@ -8,6 +8,7 @@ import (
 
 	"github.com/stretchr/testify/assert"
 
+	"github.com/elastic/beats/libbeat/common"
 	"github.com/elastic/beats/libbeat/logp"
 	"github.com/elastic/beats/libbeat/outputs/elasticsearch"
 )
@@ -24,7 +25,8 @@ func TestImporter(t *testing.T) {
 	}
 
 	client := elasticsearch.GetTestingElasticsearch(t)
-	if strings.HasPrefix(client.Connection.GetVersion(), "6.") {
+	if strings.HasPrefix(client.Connection.GetVersion(), "6.") ||
+		strings.HasPrefix(client.Connection.GetVersion(), "7.") {
 		t.Skip("Skipping tests for Elasticsearch 6.x releases")
 	}
 
@@ -37,8 +39,9 @@ func TestImporter(t *testing.T) {
 
 	assert.NoError(t, err)
 
-	imp, err := NewImporter("5.x", &dashboardsConfig, loader)
+	version, _ := common.NewVersion("5.0.0")
 
+	imp, err := NewImporter(*version, &dashboardsConfig, loader)
 	assert.NoError(t, err)
 
 	err = imp.Import()
@@ -60,7 +63,8 @@ func TestImporterEmptyBeat(t *testing.T) {
 	}
 
 	client := elasticsearch.GetTestingElasticsearch(t)
-	if strings.HasPrefix(client.Connection.GetVersion(), "6.") {
+	if strings.HasPrefix(client.Connection.GetVersion(), "6.") ||
+		strings.HasPrefix(client.Connection.GetVersion(), "7.") {
 		t.Skip("Skipping tests for Elasticsearch 6.x releases")
 	}
 
@@ -69,8 +73,9 @@ func TestImporterEmptyBeat(t *testing.T) {
 		config: &dashboardsConfig,
 	}
 
-	imp, err := NewImporter("5.x", &dashboardsConfig, loader)
+	version, _ := common.NewVersion("5.0.0")
 
+	imp, err := NewImporter(*version, &dashboardsConfig, loader)
 	assert.NoError(t, err)
 
 	err = imp.Import()

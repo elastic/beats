@@ -34,7 +34,7 @@ type staticModule struct {
 // New creates and returns a new Metricbeat instance.
 func New(b *beat.Beat, rawConfig *common.Config) (beat.Beater, error) {
 	// List all registered modules and metricsets.
-	logp.Info("%s", mb.Registry.String())
+	logp.Debug("modules", "%s", mb.Registry.String())
 
 	config := defaultConfig
 	if err := rawConfig.Unpack(&config); err != nil {
@@ -125,6 +125,10 @@ func (bt *Metricbeat) Run(b *beat.Beat) error {
 	if bt.config.ConfigModules.Enabled() {
 		moduleReloader := cfgfile.NewReloader(bt.config.ConfigModules)
 		factory := module.NewFactory(bt.config.MaxStartDelay, b.Publisher)
+
+		if err := moduleReloader.Check(factory); err != nil {
+			return err
+		}
 
 		go moduleReloader.Run(factory)
 		wg.Add(1)

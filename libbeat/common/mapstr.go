@@ -11,9 +11,8 @@ import (
 // Event metadata constants. These keys are used within libbeat to identify
 // metadata stored in an event.
 const (
-	EventMetadataKey = "_event_metadata"
-	FieldsKey        = "fields"
-	TagsKey          = "tags"
+	FieldsKey = "fields"
+	TagsKey   = "tags"
 )
 
 var (

@@ -33,6 +33,8 @@ import (
 // Processors in the pipeline are executed in the clients go-routine, before
 // entering the queue. No filtering/processing will occur on the output side.
 type Pipeline struct {
+	beatInfo beat.Info
+
 	logger *logp.Logger
 	queue  queue.Queue
 	output *outputController
@@ -60,10 +62,13 @@ type pipelineProcessors struct {
 	// The pipeline its processor settings for
 	// constructing the clients complete processor
 	// pipeline on connect.
-	beatMetaProcessor  beat.Processor
-	eventMetaProcessor beat.Processor
-	processors         beat.Processor
-	disabled           bool // disabled is set if outputs have been disabled via CLI
+	beatsMeta common.MapStr
+	fields    common.MapStr
+	tags      []string
+
+	processors beat.Processor
+
+	disabled bool // disabled is set if outputs have been disabled via CLI
 }
 
 // Settings is used to pass additional settings to a newly created pipeline instance.
@@ -111,7 +116,7 @@ type pipelineEventer struct {
 	mutex      sync.Mutex
 	modifyable bool
 
-	observer  *observer
+	observer  queueObserver
 	waitClose *waitCloser
 	cb        *pipelineEventCB
 }
@@ -127,49 +132,33 @@ type queueFactory func(queue.Eventer) (queue.Queue, error)
 // The new pipeline will take ownership of queue and outputs. On Close, the
 // queue and outputs will be closed.
 func New(
+	beat beat.Info,
 	metrics *monitoring.Registry,
 	queueFactory queueFactory,
 	out outputs.Group,
 	settings Settings,
 ) (*Pipeline, error) {
-	annotations := settings.Annotations
 	var err error
 
-	var beatMeta beat.Processor
-	if meta := annotations.Beat; meta != nil {
-		beatMeta = beatAnnotateProcessor(meta)
-	}
-
-	var eventMeta beat.Processor
-	if em := annotations.Event; len(em.Fields) > 0 || len(em.Tags) > 0 {
-		eventMeta = eventAnnotateProcessor(em)
-	}
-
-	var prog beat.Processor
-	if ps := settings.Processors; ps != nil && len(ps.List) > 0 {
-		tmp := &program{title: "global"}
-		for _, p := range ps.List {
-			tmp.add(p)
-		}
-		prog = tmp
-	}
-
 	log := defaultLogger
+	annotations := settings.Annotations
+	processors := settings.Processors
+	disabledOutput := settings.Disabled
 	p := &Pipeline{
+		beatInfo:         beat,
 		logger:           log,
+		observer:         nilObserver,
 		waitCloseMode:    settings.WaitCloseMode,
 		waitCloseTimeout: settings.WaitClose,
-		processors: pipelineProcessors{
-			beatMetaProcessor:  beatMeta,
-			eventMetaProcessor: eventMeta,
-			processors:         prog,
-			disabled:           settings.Disabled,
-		},
+		processors:       makePipelineProcessors(annotations, processors, disabledOutput),
 	}
 	p.ackBuilder = &pipelineEmptyACK{p}
 	p.ackActive = atomic.MakeBool(true)
 
-	p.eventer.observer = &p.observer
+	if metrics != nil {
+		p.observer = newMetricsObserver(metrics)
+	}
+	p.eventer.observer = p.observer
 	p.eventer.modifyable = true
 
 	if settings.WaitCloseMode == WaitOnPipelineClose && settings.WaitClose > 0 {
@@ -185,9 +174,7 @@ func New(
 	}
 	p.eventSema = newSema(p.queue.BufferConfig().Events)
 
-	p.observer.init(metrics)
-
-	p.output = newOutputController(log, &p.observer, p.queue)
+	p.output = newOutputController(log, p.observer, p.queue)
 	p.output.Set(out)
 
 	return p, nil
@@ -283,8 +270,9 @@ func (p *Pipeline) Connect() (beat.Client, error) {
 // the appropriate fields in the passed ClientConfig.
 func (p *Pipeline) ConnectWith(cfg beat.ClientConfig) (beat.Client, error) {
 	var (
-		canDrop    bool
-		eventFlags publisher.EventFlags
+		canDrop      bool
+		dropOnCancel bool
+		eventFlags   publisher.EventFlags
 	)
 
 	err := validateClientConfig(&cfg)
@@ -299,6 +287,7 @@ func (p *Pipeline) ConnectWith(cfg beat.ClientConfig) (beat.Client, error) {
 	switch cfg.PublishMode {
 	case beat.GuaranteedSend:
 		eventFlags = publisher.GuaranteedSend
+		dropOnCancel = true
 	case beat.DropIfFull:
 		canDrop = true
 	}
@@ -319,9 +308,9 @@ func (p *Pipeline) ConnectWith(cfg beat.ClientConfig) (beat.Client, error) {
 
 	acker := p.makeACKer(processors != nil, &cfg, waitClose)
 	producerCfg := queue.ProducerConfig{
-		// only cancel events from queue if acker is configured
-		// and no pipeline-wide ACK handler is registered
-		DropOnCancel: acker != nil && p.eventer.cb == nil,
+		// Cancel events from queue if acker is configured
+		// and no pipeline-wide ACK handler is registered.
+		DropOnCancel: dropOnCancel && acker != nil && p.eventer.cb == nil,
 	}
 
 	if reportEvents || cfg.Events != nil {
@@ -381,4 +370,39 @@ func (e *waitCloser) dec(n int) {
 
 func (e *waitCloser) wait() {
 	e.events.Wait()
+}
+
+func makePipelineProcessors(
+	annotations Annotations,
+	processors *processors.Processors,
+	disabled bool,
+) pipelineProcessors {
+	p := pipelineProcessors{
+		disabled: disabled,
+	}
+
+	hasProcessors := processors != nil && len(processors.List) > 0
+	if hasProcessors {
+		tmp := &program{title: "global"}
+		for _, p := range processors.List {
+			tmp.add(p)
+		}
+		p.processors = tmp
+	}
+
+	if meta := annotations.Beat; meta != nil {
+		p.beatsMeta = common.MapStr{"beat": meta}
+	}
+
+	if em := annotations.Event; len(em.Fields) > 0 {
+		fields := common.MapStr{}
+		common.MergeFields(fields, em.Fields.Clone(), em.FieldsUnderRoot)
+		p.fields = fields
+	}
+
+	if t := annotations.Event.Tags; len(t) > 0 {
+		p.tags = t
+	}
+
+	return p
 }

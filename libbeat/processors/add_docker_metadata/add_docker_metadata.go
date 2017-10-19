@@ -79,7 +79,8 @@ func (d *addDockerMetadata) Run(event *beat.Event) (*beat.Event, error) {
 		if event.Fields["source"] != nil {
 			event, err = d.sourceProcessor.Run(event)
 			if err != nil {
-				return nil, err
+				logp.Debug("docker", "Error while extracting container ID from source path: %v", err)
+				return event, nil
 			}
 		}
 	}

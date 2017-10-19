@@ -58,6 +58,8 @@ func (t *flowMetaTable) get(id *FlowID, counter *counterReg) Flow {
 }
 
 func (t *flowTable) get(id *FlowID, counter *counterReg) Flow {
+	ts := time.Now()
+
 	t.mutex.Lock()
 	defer t.mutex.Unlock()
 
@@ -66,13 +68,14 @@ func (t *flowTable) get(id *FlowID, counter *counterReg) Flow {
 	if bf == nil || !bf.isAlive() {
 		debugf("create new flow")
 
-		bf = newBiFlow(id.rawFlowID.clone(), time.Now(), id.dir)
+		bf = newBiFlow(id.rawFlowID.clone(), ts, id.dir)
 		t.table[string(bf.id.flowID)] = bf
 		t.flows.append(bf)
 	} else if bf.dir != id.dir {
 		dir = flowDirReversed
 	}
 
+	bf.ts = ts
 	stats := bf.stats[dir]
 	if stats == nil {
 		stats = newFlowStats(counter)

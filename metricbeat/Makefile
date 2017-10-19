@@ -2,6 +2,7 @@
 
 # Name can be overwritten, as Metricbeat is also a library
 BEAT_NAME?=metricbeat
+BEAT_TITLE?=Metricbeat
 BEAT_DESCRIPTION?=Metricbeat sends metrics to Elasticsearch.
 SYSTEM_TESTS?=true
 TEST_ENVIRONMENT?=true
@@ -26,7 +27,7 @@ kibana:
 
 # Collects all module and metricset fields
 .PHONY: fields
-fields:
+fields: python-env
 	@mkdir -p _meta
 	@cp ${ES_BEATS}/metricbeat/_meta/fields.common.yml _meta/fields.generated.yml
 	@${PYTHON_ENV}/bin/python ${ES_BEATS}/metricbeat/scripts/fields_collector.py >> _meta/fields.generated.yml
@@ -55,7 +56,7 @@ configs: python-env
 .PHONY: imports
 imports: python-env
 	@mkdir -p include
-	@${PYTHON_ENV}/bin/python ${ES_BEATS}/metricbeat/scripts/generate_imports.py ${BEAT_PATH} > include/list.go
+	@${PYTHON_ENV}/bin/python ${ES_BEATS}/script/generate_imports.py ${BEAT_PATH}
 
 # This is called by the beats packer before building starts
 .PHONY: before-build

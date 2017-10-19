@@ -1,11 +1,10 @@
 {
-    "@timestamp": "2016-05-23T08:05:34.853Z",
+    "@timestamp": "2017-10-12T08:05:34.853Z",
     "beat": {
         "hostname": "host.example.com",
         "name": "host.example.com"
     },
     "metricset": {
-        "host": "localhost",
         "module": "system",
         "name": "network",
         "rtt": 115
@@ -13,19 +12,18 @@
     "system": {
         "network": {
             "in": {
-                "bytes": 0,
+                "bytes": 34293500,
                 "dropped": 0,
                 "errors": 0,
-                "packets": 0
+                "packets": 303805
             },
-            "name": "sit0",
+            "name": "lo0",
             "out": {
-                "bytes": 0,
+                "bytes": 34293500,
                 "dropped": 0,
                 "errors": 0,
-                "packets": 0
+                "packets": 303805
             }
         }
-    },
-    "type": "metricsets"
+    }
 }

@@ -33,7 +33,7 @@ FPM_ARGS=(
         --after-install /tmp/systemd-daemon-reload.sh
         --config-files /etc/{{.beat_name}}/{{.beat_name}}.yml
         homedir/=/usr/share/{{.beat_name}}
-        beatname-${RUNID}.sh=/usr/bin/{{.beat_name}}.sh
+        beatname-${RUNID}.sh=/usr/bin/{{.beat_name}}
         {{.beat_name}}-linux-{{.arch}}=/usr/share/{{.beat_name}}/bin/{{.beat_name}}
         {{.beat_name}}-linux.yml=/etc/{{.beat_name}}/{{.beat_name}}.yml
         {{.beat_name}}-linux.reference.yml=/etc/{{.beat_name}}/{{.beat_name}}.reference.yml

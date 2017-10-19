@@ -271,15 +271,19 @@ func NewContainerIndexer(_ common.Config, genMeta GenMeta) (Indexer, error) {
 
 func (c *ContainerIndexer) GetMetadata(pod *Pod) []MetadataIndex {
 	commonMeta := c.genMeta.GenerateMetaData(pod)
-	containers := c.GetIndexes(pod)
 	var metadata []MetadataIndex
-	for i := 0; i < len(containers); i++ {
+	for _, status := range append(pod.Status.ContainerStatuses, pod.Status.InitContainerStatuses...) {
+		cID := containerID(status)
+		if cID == "" {
+			continue
+		}
+
 		containerMeta := commonMeta.Clone()
 		containerMeta["container"] = common.MapStr{
-			"name": pod.Status.ContainerStatuses[i].Name,
+			"name": status.Name,
 		}
 		metadata = append(metadata, MetadataIndex{
-			Index: containers[i],
+			Index: cID,
 			Data:  containerMeta,
 		})
 	}
@@ -289,16 +293,25 @@ func (c *ContainerIndexer) GetMetadata(pod *Pod) []MetadataIndex {
 
 func (c *ContainerIndexer) GetIndexes(pod *Pod) []string {
 	var containers []string
-	for _, status := range pod.Status.ContainerStatuses {
-		cID := status.ContainerID
-		if cID != "" {
-			parts := strings.Split(cID, "//")
-			if len(parts) == 2 {
-				containers = append(containers, parts[1])
-			}
+	for _, status := range append(pod.Status.ContainerStatuses, pod.Status.InitContainerStatuses...) {
+		cID := containerID(status)
+		if cID == "" {
+			continue
 		}
+		containers = append(containers, cID)
 	}
 	return containers
+}
+
+func containerID(status PodContainerStatus) string {
+	cID := status.ContainerID
+	if cID != "" {
+		parts := strings.Split(cID, "//")
+		if len(parts) == 2 {
+			return parts[1]
+		}
+	}
+	return ""
 }
 
 type FieldMatcher struct {

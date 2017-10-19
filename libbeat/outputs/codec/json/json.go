@@ -9,14 +9,15 @@ import (
 
 	"github.com/elastic/beats/libbeat/beat"
 	"github.com/elastic/beats/libbeat/common"
-	"github.com/elastic/beats/libbeat/logp"
 	"github.com/elastic/beats/libbeat/outputs/codec"
 )
 
+// Encoder for serializing a beat.Event to json.
 type Encoder struct {
-	buf    bytes.Buffer
-	folder *gotype.Iterator
-	pretty bool
+	buf     bytes.Buffer
+	folder  *gotype.Iterator
+	pretty  bool
+	version string
 }
 
 type config struct {
@@ -28,7 +29,7 @@ var defaultConfig = config{
 }
 
 func init() {
-	codec.RegisterType("json", func(cfg *common.Config) (codec.Codec, error) {
+	codec.RegisterType("json", func(info beat.Info, cfg *common.Config) (codec.Codec, error) {
 		config := defaultConfig
 		if cfg != nil {
 			if err := cfg.Unpack(&config); err != nil {
@@ -36,14 +37,13 @@ func init() {
 			}
 		}
 
-		return New(config.Pretty), nil
+		return New(config.Pretty, info.Version), nil
 	})
 }
 
-func New(pretty bool) *Encoder {
-	logp.Info("load json codec")
-
-	e := &Encoder{pretty: pretty}
+// New creates a new json Encoder.
+func New(pretty bool, version string) *Encoder {
+	e := &Encoder{pretty: pretty, version: version}
 	e.reset()
 	return e
 }
@@ -65,9 +65,11 @@ func (e *Encoder) reset() {
 	}
 }
 
+// Encode serializies a beat event to JSON. It adds additional metadata in the
+// `@metadata` namespace.
 func (e *Encoder) Encode(index string, event *beat.Event) ([]byte, error) {
 	e.buf.Reset()
-	err := e.folder.Fold(makeEvent(index, event))
+	err := e.folder.Fold(makeEvent(index, e.version, event))
 	if err != nil {
 		e.reset()
 		return nil, err

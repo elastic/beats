@@ -43,6 +43,13 @@ func (b EventBuilder) Build() (beat.Event, error) {
 	if b.Host != "" {
 		metricsetData["host"] = b.Host
 	}
+	// Add RTT.
+	if rtt, found := fields[mb.RTTKey]; found {
+		delete(fields, mb.RTTKey)
+		if rttDuration, ok := rtt.(time.Duration); ok {
+			b.FetchDuration = rttDuration
+		}
+	}
 	if b.FetchDuration != 0 {
 		metricsetData["rtt"] = b.FetchDuration.Nanoseconds() / int64(time.Microsecond)
 	}
@@ -78,7 +85,6 @@ func (b EventBuilder) Build() (beat.Event, error) {
 	event := beat.Event{
 		Timestamp: time.Time(timestamp),
 		Fields: common.MapStr{
-			// common.EventMetadataKey: b.metadata,
 			b.ModuleName: moduleEvent,
 			"metricset":  metricsetData,
 		},

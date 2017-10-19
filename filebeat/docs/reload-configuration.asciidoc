@@ -1,35 +1,25 @@
 [[filebeat-configuration-reloading]]
-== Reload the configuration dynamically
+== Load external configuration files
 
-beta[]
+Filebeat can load external configuration files for prospectors and modules,
+which allows you to separate your configuration into multiple smaller
+configuration files. See the <<load-prospector-config>> and the
+<<load-module-config>> sections for details.
 
-You can configure Filebeat to dynamically reload prospector configuration files
-when there are changes. To do this, you specify a path
-(https://golang.org/pkg/path/filepath/#Glob[Glob]) to watch for prospector
-configuration changes. When the files found by the Glob change, new prospectors
-are started/stopped according to changes in the configuration files.
+[float]
+[[load-prospector-config]]
+=== Prospector config
 
-This feature is especially useful in container environments where one container
-is used to tail logs for services running in other containers on the same host.
-
-To enable dynamic config reloading, you specify the `path` and `reload` options
-in the `filebeat.config.prospectors` section of the main `filebeat.yml` config
-file. For example:
+For prospector configurations, you specify `path` option in the
+`filebeat.config.prospectors` section of the +{beatname_lc}.yml+ file. For
+example:
 
 [source,yaml]
 ------------------------------------------------------------------------------
 filebeat.config.prospectors:
+  enabled: true
   path: configs/*.yml
-  reload.enabled: true
-  reload.period: 10s
 ------------------------------------------------------------------------------
-
-`path`:: A Glob that defines the files to check for changes.
-`reload.enabled`:: When set to `true`, enables dynamic config reload.
-`reload.period`:: Specifies how often the files are checked for changes. Do not
-set the `period` to less than 1s because the modification time of files is often
-stored in seconds. Setting the `period` to less than 1s will result in
-unnecessary overhead.
 
 Each file found by the Glob must contain a list of one or more prospector
 definitions. For example:
@@ -47,6 +37,75 @@ definitions. For example:
   scan_frequency: 5s
 ------------------------------------------------------------------------------
 
+
 WARNING: It is critical that two running prospectors DO NOT have overlapping
 file paths defined. If more than one prospector harvests the same file at the
 same time, it can lead to unexpected behaviour.
+
+[float]
+[[load-module-config]]
+=== Module config
+
+For module configurations, you specify the `path` option in the
+`filebeat.config.modules` section of the +{beatname_lc}.yml+ file. For example:
+
+[source,yaml]
+------------------------------------------------------------------------------
+filebeat.config.modules:
+  enabled: true
+  path: prospectors.d/*.yml <1>
+------------------------------------------------------------------------------
+
+<1> If you change the path setting to look for config changes in a different
+directory, you will not be able to use the <<modules-command,`modules`>> command
+to enable and disable module configurations.
+
+Each file found by the Glob must contain a list of one or more module
+definitions. For example:
+
+[source,yaml]
+------------------------------------------------------------------------------
+- module: apache2
+  access:
+    enabled: true
+    var.paths: [/var/log/apache2/access.log*]
+  error:
+    enabled: true
+    var.paths: [/var/log/apache2/error.log*]
+------------------------------------------------------------------------------
+
+=== Live reloading
+
+beta[]
+
+You can configure Filebeat to dynamically reload configuration files when there
+are changes. This feature is available for prospector and module configuration
+files only.
+
+To configure this feature, you specify a path
+(https://golang.org/pkg/path/filepath/#Glob[Glob]) to watch for configuration
+changes. When the files found by the Glob change, new prospectors and/or
+modules are started and stopped according to changes in the configuration files.
+
+This feature is especially useful in container environments where one container
+is used to tail logs for services running in other containers on the same host.
+
+To enable dynamic config reloading, you specify the `path` and `reload` options
+under `filebeat.config.prospectors` or `filebeat.config.modules` sections. For
+example:
+
+[source,yaml]
+------------------------------------------------------------------------------
+filebeat.config.prospectors:
+  enabled: true
+  path: configs/*.yml
+  reload.enabled: true
+  reload.period: 10s
+------------------------------------------------------------------------------
+
+`path`:: A Glob that defines the files to check for changes.
+`reload.enabled`:: When set to `true`, enables dynamic config reload.
+`reload.period`:: Specifies how often the files are checked for changes. Do not
+set the `period` to less than 1s because the modification time of files is often
+stored in seconds. Setting the `period` to less than 1s will result in
+unnecessary overhead.

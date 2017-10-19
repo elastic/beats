@@ -39,6 +39,11 @@ package-dashboards:
 	echo Creating the Dashboards package
 	BUILDID=$(BUILDID) SNAPSHOT=$(SNAPSHOT) $(packer_absdir)/platforms/dashboards/build.sh
 
+.PHONY: package-kubernetes
+package-kubernetes:
+	echo Creating the kubernetes manifests package
+	BUILDID=$(BUILDID) SNAPSHOT=$(SNAPSHOT) $(packer_absdir)/platforms/kubernetes/build.sh
+
 .PHONY: deps
 deps:
 	go get -u github.com/tsg/gotpl

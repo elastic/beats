@@ -23,6 +23,7 @@ grouped in the following categories:
 * <<exported-fields-docker>>
 * <<exported-fields-dropwizard>>
 * <<exported-fields-elasticsearch>>
+* <<exported-fields-etcd>>
 * <<exported-fields-golang>>
 * <<exported-fields-graphite>>
 * <<exported-fields-haproxy>>
@@ -1027,7 +1028,11 @@ Cluster status version
 [float]
 === `ceph.cluster_status.osd.full`
 
+<<<<<<< HEAD
 type: bool
+=======
+type: boolean
+>>>>>>> upstream/master
 
 Is osd full
 
@@ -1035,7 +1040,11 @@ Is osd full
 [float]
 === `ceph.cluster_status.osd.nearfull`
 
+<<<<<<< HEAD
 type: bool
+=======
+type: boolean
+>>>>>>> upstream/master
 
 Is osd near full
 
@@ -1065,7 +1074,7 @@ Shows how many osds are on the state of IN
 
 
 [float]
-=== `ceph.cluster_status.osd.num_in_osds`
+=== `ceph.cluster_status.osd.num_remapped_pgs`
 
 type: long
 
@@ -2469,24 +2478,6 @@ node
 
 
 [float]
-=== `elasticsearch.node.jvm.memory.heap_init.bytes`
-
-type: long
-
-format: bytes
-
-Heap init used by the JVM in bytes.
-
-
-[float]
-=== `elasticsearch.node.jvm.version`
-
-type: keyword
-
-JVM version.
-
-
-[float]
 === `elasticsearch.node.name`
 
 type: keyword
@@ -2500,6 +2491,69 @@ Node name.
 type: keyword
 
 Node version.
+
+
+[float]
+== jvm fields
+
+JVM Info.
+
+
+
+[float]
+=== `elasticsearch.node.jvm.version`
+
+type: keyword
+
+JVM version.
+
+
+[float]
+=== `elasticsearch.node.jvm.memory.heap.init.bytes`
+
+type: long
+
+format: bytes
+
+Heap init used by the JVM in bytes.
+
+
+[float]
+=== `elasticsearch.node.jvm.memory.heap.max.bytes`
+
+type: long
+
+format: bytes
+
+Heap max used by the JVM in bytes.
+
+
+[float]
+=== `elasticsearch.node.jvm.memory.nonheap.init.bytes`
+
+type: long
+
+format: bytes
+
+Non-Heap init used by the JVM in bytes.
+
+
+[float]
+=== `elasticsearch.node.jvm.memory.nonheap.max.bytes`
+
+type: long
+
+format: bytes
+
+Non-Heap max used by the JVM in bytes.
+
+
+[float]
+=== `elasticsearch.node.process.mlockall`
+
+type: boolean
+
+If process locked in memory.
 
 
 [float]
@@ -2742,6 +2796,311 @@ type: long
 type: long
 
 
+
+[float]
+== fs.summary fields
+
+File system summary
+
+
+
+[float]
+=== `elasticsearch.node.stats.fs.summary.total.bytes`
+
+type: long
+
+format: bytes
+
+
+
+[float]
+=== `elasticsearch.node.stats.fs.summary.free.bytes`
+
+type: long
+
+format: bytes
+
+
+
+[float]
+=== `elasticsearch.node.stats.fs.summary.available.bytes`
+
+type: long
+
+format: bytes
+
+
+
+[[exported-fields-etcd]]
+== Etcd fields
+
+[]experimental
+etcd Module
+
+
+
+[float]
+== etcd fields
+
+`etcd` contains statistics that were read from Etcd
+
+
+
+[float]
+== leader fields
+
+Contains etcd leader statistics.
+
+
+
+[float]
+== followers.counts fields
+
+The number of failed and successful Raft RPC requests.
+
+
+
+[float]
+=== `etcd.leader.followers.counts.followers.counts.success`
+
+type: integer
+
+[float]
+=== `etcd.leader.followers.counts.followers.counts.fail`
+
+type: integer
+
+[float]
+== followers.latency fields
+
+latency to each peer in the cluster
+
+
+
+[float]
+=== `etcd.leader.followers.latency.followers.latency.average`
+
+type: scaled_float
+
+[float]
+=== `etcd.leader.followers.latency.followers.latency.current`
+
+type: scaled_float
+
+[float]
+=== `etcd.leader.followers.latency.followers.latency.maximum`
+
+type: scaled_float
+
+[float]
+=== `etcd.leader.followers.latency.followers.latency.minimum`
+
+type: integer
+
+[float]
+=== `etcd.leader.followers.latency.follower.latency.standardDeviation`
+
+type: scaled_float
+
+[float]
+=== `etcd.leader.leader`
+
+type: keyword
+
+[float]
+== self fields
+
+Contains etcd self statistics.
+
+
+
+[float]
+=== `etcd.self.id`
+
+type: keyword
+
+the unique identifier for the member
+
+
+[float]
+=== `etcd.self.leaderinfo.leader`
+
+type: keyword
+
+id of the current leader member
+
+
+[float]
+=== `etcd.self.leaderinfo.starttime`
+
+type: keyword
+
+[float]
+=== `etcd.self.leaderinfo.uptime`
+
+type: keyword
+
+id of the current leader member
+
+
+[float]
+=== `etcd.self.name`
+
+type: keyword
+
+this member's name
+
+
+[float]
+=== `etcd.self.recv.appendrequest.count`
+
+type: integer
+
+number of append requests this node has processed
+
+
+[float]
+=== `etcd.self.recv.bandwithrate`
+
+type: scaled_float
+
+number of bytes per second this node is receiving (follower only)
+
+
+[float]
+=== `etcd.self.recv.pkgrate`
+
+type: scaled_float
+
+number of requests per second this node is receiving (follower only)
+
+
+[float]
+=== `etcd.self.send.appendrequest.count`
+
+type: integer
+
+number of requests that this node has sent
+
+
+[float]
+=== `etcd.self.send.bandwithrate`
+
+type: scaled_float
+
+number of bytes per second this node is sending (leader only). This value is undefined on single member clusters.
+
+
+[float]
+=== `etcd.self.send.pkgrate`
+
+type: scaled_float
+
+number of requests per second this node is sending (leader only). This value is undefined on single member clusters.
+
+
+[float]
+=== `etcd.self.starttime`
+
+type: keyword
+
+the time when this node was started
+
+
+[float]
+=== `etcd.self.state`
+
+type: keyword
+
+either leader or follower
+
+
+[float]
+== store fields
+
+The store statistics include information about the operations that this node has handled.
+
+
+
+[float]
+=== `etcd.store.gets.success`
+
+type: integer
+
+[float]
+=== `etcd.store.gets.fail`
+
+type: integer
+
+[float]
+=== `etcd.store.sets.success`
+
+type: integer
+
+[float]
+=== `etcd.store.sets.fail`
+
+type: integer
+
+[float]
+=== `etcd.store.delete.success`
+
+type: integer
+
+[float]
+=== `etcd.store.delete.fail`
+
+type: integer
+
+[float]
+=== `etcd.store.update.success`
+
+type: integer
+
+[float]
+=== `etcd.store.update.fail`
+
+type: integer
+
+[float]
+=== `etcd.store.create.success`
+
+type: integer
+
+[float]
+=== `etcd.store.create.fail`
+
+type: integer
+
+[float]
+=== `etcd.store.compareandswap.success`
+
+type: integer
+
+[float]
+=== `etcd.store.compareandswap.fail`
+
+type: integer
+
+[float]
+=== `etcd.store.compareanddelete.success`
+
+type: integer
+
+[float]
+=== `etcd.store.compareanddelete.fail`
+
+type: integer
+
+[float]
+=== `etcd.store.expire.count`
+
+type: integer
+
+[float]
+=== `etcd.store.watchers`
+
+type: integer
 
 [[exported-fields-golang]]
 == Golang fields
@@ -4039,7 +4398,7 @@ HTTP request information
 [float]
 === `http.request.header`
 
-type: nested
+type: object
 
 The HTTP headers sent
 
@@ -4070,7 +4429,7 @@ HTTP response information
 [float]
 === `http.response.header`
 
-type: nested
+type: object
 
 The HTTP headers received
 
@@ -4733,7 +5092,7 @@ The Kubernetes events metricset collects events that are generated by objects ru
 
 type: long
 
-Count field records the number of times the particular event has occured
+Count field records the number of times the particular event has occurred
 
 
 [float]
@@ -4774,14 +5133,6 @@ Metadata associated with the given event
 type: date
 
 Timestamp of creation of the given event
-
-
-[float]
-=== `kubernetes.event.metadata.timestamp.deleted`
-
-type: date
-
-Timestamp of deletion of the given event
 
 
 [float]
@@ -7017,6 +7368,14 @@ The name of the pool.
 
 
 [float]
+=== `php_fpm.pool.process_manager`
+
+type: keyword
+
+Static, dynamic or ondemand.
+
+
+[float]
 == connections fields
 
 Connection state specific statistics.
@@ -7037,6 +7396,22 @@ The number of incoming requests that the PHP-FPM server has accepted; when a con
 type: long
 
 The current number of connections that have been initiated, but not yet accepted. If this value is non-zero it typically means that all the available server processes are currently busy, and there are no processes available to serve the next request. Raising `pm.max_children` (provided the server can handle it) should help keep this number low. This property follows from the fact that PHP-FPM listens via a socket (TCP or file based), and thus inherits some of the characteristics of sockets.
+
+
+[float]
+=== `php_fpm.pool.connections.max_listen_queue`
+
+type: long
+
+The maximum number of requests in the queue of pending connections since FPM has started.
+
+
+[float]
+=== `php_fpm.pool.connections.listen_queue_len`
+
+type: long
+
+The size of the socket queue of pending connections.
 
 
 [float]
@@ -7063,11 +7438,53 @@ The number of servers current processing a page - the minimum is `1` (so even on
 
 
 [float]
+=== `php_fpm.pool.processes.total`
+
+type: long
+
+The number of idle + active processes.
+
+
+[float]
+=== `php_fpm.pool.processes.max_active`
+
+type: long
+
+The maximum number of active processes since FPM has started.
+
+
+[float]
+=== `php_fpm.pool.processes.max_children_reached`
+
+type: long
+
+Number of times, the process limit has been reached, when pm tries to start more children (works only for pm 'dynamic' and 'ondemand').
+
+
+[float]
 === `php_fpm.pool.slow_requests`
 
 type: long
 
 The number of times a request execution time has exceeded `request_slowlog_timeout`.
+
+
+[float]
+=== `php_fpm.pool.start_since`
+
+type: long
+
+Number of seconds since FPM has started.
+
+
+[float]
+=== `php_fpm.pool.start_time`
+
+type: date
+
+format: epoch_second
+
+The date and time FPM has started.
 
 
 [[exported-fields-postgresql]]
@@ -7858,6 +8275,153 @@ Node type.
 type: long
 
 Node uptime.
+
+
+[float]
+== queue fields
+
+queue
+
+
+
+[float]
+=== `rabbitmq.queue.name`
+
+type: keyword
+
+The name of the queue with non-ASCII characters escaped as in C.
+
+
+[float]
+=== `rabbitmq.queue.vhost`
+
+type: keyword
+
+Virtual host name with non-ASCII characters escaped as in C.
+
+
+[float]
+=== `rabbitmq.queue.durable`
+
+type: boolean
+
+Whether or not the queue survives server restarts.
+
+
+[float]
+=== `rabbitmq.queue.auto_delete`
+
+type: boolean
+
+Whether the queue will be deleted automatically when no longer used.
+
+
+[float]
+=== `rabbitmq.queue.exclusive`
+
+type: boolean
+
+Whether the queue is exclusive (i.e. has owner_pid).
+
+
+[float]
+=== `rabbitmq.queue.node`
+
+type: keyword
+
+Node name.
+
+
+[float]
+=== `rabbitmq.queue.state`
+
+type: keyword
+
+The state of the queue. Normally 'running', but may be "{syncing, MsgCount}" if the queue is synchronising. Queues which are located on cluster nodes that are currently down will be shown with a status of 'down'.
+
+
+[float]
+=== `rabbitmq.queue.arguments.max_priority`
+
+type: long
+
+Maximum number of priority levels for the queue to support.
+
+
+[float]
+=== `rabbitmq.queue.consumers.count`
+
+type: long
+
+Number of consumers.
+
+
+[float]
+=== `rabbitmq.queue.consumers.utilisation.pct`
+
+type: long
+
+format: percentage
+
+Fraction of the time (between 0.0 and 1.0) that the queue is able to immediately deliver messages to consumers. This can be less than 1.0 if consumers are limited by network congestion or prefetch count.
+
+
+[float]
+=== `rabbitmq.queue.messages.total.count`
+
+type: long
+
+Sum of ready and unacknowledged messages (queue depth).
+
+
+[float]
+=== `rabbitmq.queue.messages.ready.count`
+
+type: long
+
+Number of messages ready to be delivered to clients.
+
+
+[float]
+=== `rabbitmq.queue.messages.unacknowledged.count`
+
+type: long
+
+Number of messages delivered to clients but not yet acknowledged.
+
+
+[float]
+=== `rabbitmq.queue.messages.persistent.count`
+
+type: long
+
+Total number of persistent messages in the queue (will always be 0 for transient queues).
+
+
+[float]
+=== `rabbitmq.queue.memory.bytes`
+
+type: long
+
+format: bytes
+
+Bytes of memory consumed by the Erlang process associated with the queue, including stack, heap and internal structures.
+
+
+[float]
+=== `rabbitmq.queue.disk.reads.count`
+
+type: long
+
+Total number of times messages have been read from disk by this queue since it started.
+
+
+[float]
+=== `rabbitmq.queue.disk.writes.count`
+
+type: long
+
+Total number of times messages have been written to disk by this queue since it started.
 
 
 [[exported-fields-redis]]
@@ -8767,6 +9331,16 @@ The percentage of CPU time spent in involuntary wait by the virtual CPU while th
 
 
 [float]
+=== `system.cpu.total.pct`
+
+type: scaled_float
+
+format: percent
+
+The percentage of CPU time spent in non-idle state.
+
+
+[float]
 === `system.cpu.user.norm.pct`
 
 type: scaled_float
@@ -8844,6 +9418,16 @@ type: scaled_float
 format: percent
 
 The percentage of CPU time spent in involuntary wait by the virtual CPU while the hypervisor was servicing another processor. Available only on Unix.
+
+
+[float]
+=== `system.cpu.total.norm.pct`
+
+type: scaled_float
+
+format: percent
+
+The percentage of CPU time spent in non-idle state.
 
 
 [float]
@@ -8996,7 +9580,7 @@ The total number of of milliseconds spent doing I/Os.
 
 
 [float]
-=== `system.diskio.iostat.read_request_merged_per_sec`
+=== `system.diskio.iostat.read.request.merges_per_sec`
 
 type: float
 
@@ -9004,7 +9588,7 @@ The number of read requests merged per second that were queued to the device.
 
 
 [float]
-=== `system.diskio.iostat.write_request_merged_per_sec`
+=== `system.diskio.iostat.write.request.merges_per_sec`
 
 type: float
 
@@ -9012,7 +9596,7 @@ The number of write requests merged per second that were queued to the device.
 
 
 [float]
-=== `system.diskio.iostat.read_request_per_sec`
+=== `system.diskio.iostat.read.request.per_sec`
 
 type: float
 
@@ -9020,7 +9604,7 @@ The number of read requests that were issued to the device per second
 
 
 [float]
-=== `system.diskio.iostat.write_request_per_sec`
+=== `system.diskio.iostat.write.request.per_sec`
 
 type: float
 
@@ -9028,23 +9612,27 @@ The number of write requests that were issued to the device per second
 
 
 [float]
-=== `system.diskio.iostat.read_byte_per_sec`
+=== `system.diskio.iostat.read.per_sec.bytes`
 
 type: float
+
+format: bytes
 
 The number of Bytes read from the device per second.
 
 
 [float]
-=== `system.diskio.iostat.write_byte_per_sec`
+=== `system.diskio.iostat.write.per_sec.bytes`
 
 type: float
+
+format: bytes
 
 The number of Bytes write from the device per second.
 
 
 [float]
-=== `system.diskio.iostat.avg_request_size`
+=== `system.diskio.iostat.request.avg_size`
 
 type: float
 
@@ -9052,7 +9640,7 @@ The average size (in sectors) of the requests that were issued to the device.
 
 
 [float]
-=== `system.diskio.iostat.avg_queue_size`
+=== `system.diskio.iostat.queue.avg_size`
 
 type: float
 
@@ -10708,6 +11296,9 @@ Free Memory of Guest in bytes
 === `vsphere.virtualmachine.custom_fields`
 
 type: object
+
+Custom fields      
+
 
 [[exported-fields-windows]]
 == Windows fields

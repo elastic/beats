@@ -17,18 +17,20 @@ type event struct {
 
 // Meta defines common event metadata to be stored in '@metadata'
 type meta struct {
-	Beat   string                 `struct:"beat"`
-	Type   string                 `struct:"type"`
-	Fields map[string]interface{} `struct:",inline"`
+	Beat    string                 `struct:"beat"`
+	Type    string                 `struct:"type"`
+	Version string                 `struct:"version"`
+	Fields  map[string]interface{} `struct:",inline"`
 }
 
-func makeEvent(index string, in *beat.Event) event {
+func makeEvent(index, version string, in *beat.Event) event {
 	return event{
 		Timestamp: in.Timestamp,
 		Meta: meta{
-			Beat:   index,
-			Type:   "doc",
-			Fields: in.Meta,
+			Beat:    index,
+			Version: version,
+			Type:    "doc",
+			Fields:  in.Meta,
 		},
 		Fields: in.Fields,
 	}

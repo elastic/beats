@@ -17,6 +17,7 @@ import (
 type PodWatcher struct {
 	kubeClient          *k8s.Client
 	syncPeriod          time.Duration
+	cleanupTimeout      time.Duration
 	podQueue            chan *corev1.Pod
 	nodeFilter          k8s.Option
 	lastResourceVersion string
@@ -27,21 +28,21 @@ type PodWatcher struct {
 }
 
 type annotationCache struct {
-	sync.Mutex
+	sync.RWMutex
 	annotations map[string]common.MapStr
-	pods        map[string]*Pod // pod uid -> Pod
+	pods        map[string]*Pod      // pod uid -> Pod
+	deleted     map[string]time.Time // deleted annotations key -> last access time
 }
-
-type NodeOption struct{}
 
 // NewPodWatcher initializes the watcher client to provide a local state of
 // pods from the cluster (filtered to the given host)
-func NewPodWatcher(kubeClient *k8s.Client, indexers *Indexers, syncPeriod time.Duration, host string) *PodWatcher {
+func NewPodWatcher(kubeClient *k8s.Client, indexers *Indexers, syncPeriod, cleanupTimeout time.Duration, host string) *PodWatcher {
 	ctx, cancel := context.WithCancel(context.Background())
 	return &PodWatcher{
 		kubeClient:          kubeClient,
 		indexers:            indexers,
 		syncPeriod:          syncPeriod,
+		cleanupTimeout:      cleanupTimeout,
 		podQueue:            make(chan *corev1.Pod, 10),
 		nodeFilter:          k8s.QueryParam("fieldSelector", "spec.nodeName="+host),
 		lastResourceVersion: "0",
@@ -50,6 +51,7 @@ func NewPodWatcher(kubeClient *k8s.Client, indexers *Indexers, syncPeriod time.D
 		annotationCache: annotationCache{
 			annotations: make(map[string]common.MapStr),
 			pods:        make(map[string]*Pod),
+			deleted:     make(map[string]time.Time),
 		},
 	}
 }
@@ -84,7 +86,7 @@ func (p *PodWatcher) watchPods() {
 		if err != nil {
 			//watch pod failures should be logged and gracefully failed over as metadata retrieval
 			//should never stop.
-			logp.Err("kubernetes: Watching API eror %v", err)
+			logp.Err("kubernetes: Watching API error %v", err)
 			time.Sleep(time.Second)
 			continue
 		}
@@ -102,8 +104,9 @@ func (p *PodWatcher) watchPods() {
 }
 
 func (p *PodWatcher) Run() bool {
-	// Start pod processing worker:
+	// Start pod processing & annotations cleanup workers
 	go p.worker()
+	go p.cleanupWorker()
 
 	// Make sure that events don't flow into the annotator before informer is fully set up
 	// Sync initial state:
@@ -133,6 +136,9 @@ func (p *PodWatcher) onPodAdd(pod *Pod) {
 
 	for _, m := range metadata {
 		p.annotationCache.annotations[m.Index] = m.Data
+
+		// un-delete if it's flagged (in case of update or recreation)
+		delete(p.annotationCache.deleted, m.Index)
 	}
 }
 
@@ -151,8 +157,10 @@ func (p *PodWatcher) onPodDelete(pod *Pod) {
 
 	delete(p.annotationCache.pods, pod.Metadata.UID)
 
+	// Flag all annotations as deleted (they will be still available for a while)
+	now := time.Now()
 	for _, index := range p.indexers.GetIndexes(pod) {
-		delete(p.annotationCache.annotations, index)
+		p.annotationCache.deleted[index] = now
 	}
 }
 
@@ -189,18 +197,65 @@ func (p *PodWatcher) worker() {
 	}
 }
 
+// Check annotations flagged as deleted for their last access time, fully delete
+// the ones older than p.cleanupTimeout
+func (p *PodWatcher) cleanupWorker() {
+	for {
+		// Wait a full period
+		time.Sleep(p.cleanupTimeout)
+
+		select {
+		case <-p.ctx.Done():
+			return
+		default:
+			// Check entries for timeout
+			var toDelete []string
+			timeout := time.Now().Add(-p.cleanupTimeout)
+			p.annotationCache.RLock()
+			for key, lastSeen := range p.annotationCache.deleted {
+				if lastSeen.Before(timeout) {
+					toDelete = append(toDelete, key)
+				}
+			}
+			p.annotationCache.RUnlock()
+
+			// Delete timed out entries:
+			p.annotationCache.Lock()
+			for _, key := range toDelete {
+				delete(p.annotationCache.deleted, key)
+				delete(p.annotationCache.annotations, key)
+			}
+			p.annotationCache.Unlock()
+		}
+	}
+}
+
 func (p *PodWatcher) GetMetaData(arg string) common.MapStr {
-	p.annotationCache.Lock()
-	defer p.annotationCache.Unlock()
-	if meta, ok := p.annotationCache.annotations[arg]; ok {
+	p.annotationCache.RLock()
+	meta, ok := p.annotationCache.annotations[arg]
+	var deleted bool
+	if ok {
+		_, deleted = p.annotationCache.deleted[arg]
+	}
+	p.annotationCache.RUnlock()
+
+	// Update deleted last access
+	if deleted {
+		p.annotationCache.Lock()
+		p.annotationCache.deleted[arg] = time.Now()
+		p.annotationCache.Unlock()
+	}
+
+	if ok {
 		return meta
 	}
+
 	return nil
 }
 
 func (p *PodWatcher) GetPod(uid string) *Pod {
-	p.annotationCache.Lock()
-	defer p.annotationCache.Unlock()
+	p.annotationCache.RLock()
+	defer p.annotationCache.RUnlock()
 	return p.annotationCache.pods[uid]
 }
 

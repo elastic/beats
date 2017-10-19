@@ -58,7 +58,7 @@ func makeReporter(beat beat.Info, cfg *common.Config) (report.Reporter, error) {
 		return nil, err
 	}
 
-	// check endpoint availablity on startup only every 30 seconds
+	// check endpoint availability on startup only every 30 seconds
 	checkRetry := 30 * time.Second
 	windowSize := config.BulkMaxSize - 1
 	if windowSize <= 0 {
@@ -114,6 +114,7 @@ func makeReporter(beat beat.Info, cfg *common.Config) (report.Reporter, error) {
 	monitoring := monitoring.Default.NewRegistry("xpack.monitoring")
 
 	pipeline, err := pipeline.New(
+		beat,
 		monitoring,
 		queueFactory, out, pipeline.Settings{
 			WaitClose:     0,

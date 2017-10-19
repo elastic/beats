@@ -6,9 +6,9 @@ import (
 	"os"
 	"path/filepath"
 	"sync"
+	"time"
 
 	"github.com/elastic/beats/filebeat/input/file"
-	"github.com/elastic/beats/filebeat/util"
 	helper "github.com/elastic/beats/libbeat/common/file"
 	"github.com/elastic/beats/libbeat/logp"
 	"github.com/elastic/beats/libbeat/monitoring"
@@ -16,16 +16,19 @@ import (
 )
 
 type Registrar struct {
-	Channel      chan []*util.Data
+	Channel      chan []file.State
 	out          successLogger
 	done         chan struct{}
-	registryFile string       // Path to the Registry File
-	states       *file.States // Map with all file paths inside and the corresponding state
+	registryFile string // Path to the Registry File
 	wg           sync.WaitGroup
+
+	states               *file.States // Map with all file paths inside and the corresponding state
+	flushTimeout         time.Duration
+	bufferedStateUpdates int
 }
 
 type successLogger interface {
-	Published(events []*util.Data) bool
+	Published(n int) bool
 }
 
 var (
@@ -35,12 +38,13 @@ var (
 	registryWrites = monitoring.NewInt(nil, "registrar.writes")
 )
 
-func New(registryFile string, out successLogger) (*Registrar, error) {
+func New(registryFile string, flushTimeout time.Duration, out successLogger) (*Registrar, error) {
 	r := &Registrar{
 		registryFile: registryFile,
 		done:         make(chan struct{}),
 		states:       file.NewStates(),
-		Channel:      make(chan []*util.Data, 1),
+		Channel:      make(chan []file.State, 1),
+		flushTimeout: flushTimeout,
 		out:          out,
 		wg:           sync.WaitGroup{},
 	}
@@ -150,49 +154,53 @@ func (r *Registrar) Run() {
 		r.wg.Done()
 	}()
 
+	var (
+		timer  *time.Timer
+		flushC <-chan time.Time
+	)
+
 	for {
 		select {
 		case <-r.done:
 			logp.Info("Ending Registrar")
 			return
-		case events := <-r.Channel:
-			r.onEvents(events)
+		case <-flushC:
+			flushC = nil
+			timer.Stop()
+			r.flushRegistry()
+		case states := <-r.Channel:
+			r.onEvents(states)
+			if r.flushTimeout <= 0 {
+				r.flushRegistry()
+			} else if flushC == nil {
+				timer = time.NewTimer(r.flushTimeout)
+				flushC = timer.C
+			}
 		}
 	}
 }
 
 // onEvents processes events received from the publisher pipeline
-func (r *Registrar) onEvents(events []*util.Data) {
-	r.processEventStates(events)
+func (r *Registrar) onEvents(states []file.State) {
+	r.processEventStates(states)
 
 	beforeCount := r.states.Count()
 	cleanedStates := r.states.Cleanup()
 	statesCleanup.Add(int64(cleanedStates))
 
+	r.bufferedStateUpdates += len(states)
+
 	logp.Debug("registrar",
 		"Registrar states cleaned up. Before: %d, After: %d",
 		beforeCount, beforeCount-cleanedStates)
-
-	if err := r.writeRegistry(); err != nil {
-		logp.Err("Writing of registry returned error: %v. Continuing...", err)
-	}
-
-	if r.out != nil {
-		r.out.Published(events)
-	}
 }
 
 // processEventStates gets the states from the events and writes them to the registrar state
-func (r *Registrar) processEventStates(events []*util.Data) {
-	logp.Debug("registrar", "Processing %d events", len(events))
+func (r *Registrar) processEventStates(states []file.State) {
+	logp.Debug("registrar", "Processing %d events", len(states))
 
-	for _, data := range events {
-
-		// skip events without state
-		if !data.HasState() {
-			continue
-		}
-		r.states.Update(data.GetState())
+	for i := range states {
+		r.states.Update(states[i])
 		statesUpdate.Add(1)
 	}
 }
@@ -202,6 +210,17 @@ func (r *Registrar) Stop() {
 	logp.Info("Stopping Registrar")
 	close(r.done)
 	r.wg.Wait()
+}
+
+func (r *Registrar) flushRegistry() {
+	if err := r.writeRegistry(); err != nil {
+		logp.Err("Writing of registry returned error: %v. Continuing...", err)
+	}
+
+	if r.out != nil {
+		r.out.Published(r.bufferedStateUpdates)
+	}
+	r.bufferedStateUpdates = 0
 }
 
 // writeRegistry writes the new json registry file to disk.

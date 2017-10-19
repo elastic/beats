@@ -1,6 +1,12 @@
 [[configuration-filebeat-options]]
 == Set up prospectors
 
+TIP: <<filebeat-modules-overview,Filebeat modules>> provide the fastest getting
+started experience for common log formats. See <<filebeat-modules-quickstart>>
+to learn how to get started with modules. Also see
+<<configuration-filebeat-modules>> for information about enabling and
+configuring modules.
+
 Filebeat uses prospectors to locate and process files. To configure Filebeat,
 you specify a list of prospectors in the `filebeat.prospectors` section of the
 +{beatname_lc}.yml+ config file.
@@ -32,9 +38,10 @@ filebeat.prospectors:
 
 One of the following input types:
 
-    * log: Reads every line of the log file (default)
-    * stdin: Reads the standard in
-    * redis: Reads slow log entries from redis (experimental)
+    * log: Reads every line of the log file (default).
+    * stdin: Reads the standard in.
+    * redis: Reads slow log entries from redis (experimental).
+    * udp: Reads events over UDP. Also see <<max-message-size>>.
 
 The value that you specify here is used as the `type` for each event published to Logstash and Elasticsearch.
 
@@ -491,4 +498,10 @@ by assigning a higher limit of harvesters.
 ==== `enabled`
 
 The `enabled` option can be used with each prospector to define if a prospector is enabled or not. By default, enabled is set to true.
+
+[float]
+[[max-message-size]]
+==== `max_message_size`
+
+When used with `type: udp`, specifies the maximum size of the message received over UDP. The default is 10240.
 

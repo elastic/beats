@@ -52,6 +52,11 @@ metricbeat.modules:
   cpu.metrics:  ["percentages"]  # The other available options are normalized_percentages and ticks.
   core.metrics: ["percentages"]  # The other available option is ticks.
 
+  # A list of filesystem types to ignore. The filesystem metricset will not
+  # collect data from filesystems matching any of the specified types, and
+  # fsstats will not include data from these filesystems in its summary stats.
+  #filesystem.ignore_types: []
+
   # These options allow you to filter out all processes that are not
   # in the top N by CPU or memory, in order to reduce the number of documents created.
   # If both the `by_cpu` and `by_memory` options are used, the union of the two sets
@@ -149,6 +154,13 @@ metricbeat.modules:
   metricsets: ["node", "node_stats"]
   period: 10s
   hosts: ["localhost:9200"]
+
+#-------------------------------- Etcd Module --------------------------------
+- module: etcd
+  metricsets: ["leader", "self", "store"]
+  period: 10s
+  hosts: ["localhost:2379"]
+
 
 #------------------------------- Golang Module -------------------------------
 - module: golang
@@ -373,7 +385,7 @@ metricbeat.modules:
 
 #------------------------------ RabbitMQ Module ------------------------------
 - module: rabbitmq
-  metricsets: ["node"]
+  metricsets: ["node", "queue"]
   period: 10s
   hosts: ["localhost:15672"]
 
@@ -475,11 +487,11 @@ metricbeat.modules:
     # before providing a batch of events to the outputs.
     # A value of 0 (the default) ensures events are immediately available
     # to be sent to the outputs.
-    #flush.min_events: 0
+    #flush.min_events: 2048
 
     # Maximum duration after which events are available to the outputs,
     # if the number of events stored in the queue is < min_flush_events.
-    #flush.timeout: 0s
+    #flush.timeout: 1s
 
 # Sets the maximum number of CPUs that can be executing simultaneously. The
 # default is the number of logical CPUs available in the system.
@@ -549,10 +561,22 @@ metricbeat.modules:
 #processors:
 #- add_docker_metadata: ~
 
+#============================= Elastic Cloud ==================================
+
+# These settings simplify using metricbeat with the Elastic Cloud (https://cloud.elastic.co/).
+
+# The cloud.id setting overwrites the `output.elasticsearch.hosts` and
+# `setup.kibana.host` options.
+# You can find the `cloud.id` in the Elastic Cloud web UI.
+#cloud.id:
+
+# The cloud.auth setting overwrites the `output.elasticsearch.username` and
+# `output.elasticsearch.password` settings. The format is `<user>:<pass>`.
+#cloud.auth:
+
 #================================ Outputs ======================================
 
-# Configure what outputs to use when sending the data collected by the beat.
-# Multiple outputs may be used.
+# Configure what output to use when sending the data collected by the beat.
 
 #-------------------------- Elasticsearch output -------------------------------
 output.elasticsearch:
@@ -583,6 +607,7 @@ output.elasticsearch:
 
   # Optional index name. The default is "metricbeat" plus date
   # and generates [metricbeat-]YYYY.MM.DD keys.
+  # In case you modify this pattern you must update setup.template.name and setup.template.pattern accordingly.
   #index: "metricbeat-%{[beat.version]}-%{+yyyy.MM.dd}"
 
   # Optional ingest node pipeline. By default no pipeline will be used.
@@ -642,6 +667,10 @@ output.elasticsearch:
   # Configure curve types for ECDHE based cipher suites
   #ssl.curve_types: []
 
+  # Configure what types of renegotiation are supported. Valid options are
+  # never, once, and freely. Default is never.
+  #ssl.renegotiation: never
+
 
 #----------------------------- Logstash output ---------------------------------
 #output.logstash:
@@ -664,14 +693,19 @@ output.elasticsearch:
   # Not yet supported for async connections (i.e. with the "pipelining" option set)
   #ttl: 30s
 
-  # Optional load balance the events between the Logstash hosts
-  #loadbalance: true
+  # Optional load balance the events between the Logstash hosts. Default is false.
+  #loadbalance: false
 
   # Number of batches to be sent asynchronously to logstash while processing
   # new batches.
   #pipelining: 5
 
-  # Optional index name. The default index name is set to name of the beat
+  # If enabled only a subset of events in a batch of events is transferred per
+  # transaction.  The number of events to be sent increases up to `bulk_max_size`
+  # if no error is encountered.
+  #slow_start: false
+
+  # Optional index name. The default index name is set to metricbeat
   # in all lowercase.
   #index: 'metricbeat'
 
@@ -712,6 +746,10 @@ output.elasticsearch:
 
   # Configure curve types for ECDHE based cipher suites
   #ssl.curve_types: []
+
+  # Configure what types of renegotiation are supported. Valid options are
+  # never, once, and freely. Default is never.
+  #ssl.renegotiation: never
 
 #------------------------------- Kafka output ----------------------------------
 #output.kafka:
@@ -845,6 +883,10 @@ output.elasticsearch:
   # Configure curve types for ECDHE based cipher suites
   #ssl.curve_types: []
 
+  # Configure what types of renegotiation are supported. Valid options are
+  # never, once, and freely. Default is never.
+  #ssl.renegotiation: never
+
 #------------------------------- Redis output ----------------------------------
 #output.redis:
   # Boolean flag to enable or disable the output module.
@@ -942,6 +984,9 @@ output.elasticsearch:
   # Configure curve types for ECDHE based cipher suites
   #ssl.curve_types: []
 
+  # Configure what types of renegotiation are supported. Valid options are
+  # never, once, and freely. Default is never.
+  #ssl.renegotiation: never
 
 #------------------------------- File output -----------------------------------
 #output.file:
@@ -965,6 +1010,9 @@ output.elasticsearch:
   # the oldest file is deleted and the rest are shifted from last to first. The
   # default is 7 files.
   #number_of_files: 7
+
+  # Permissions to use for file creation. The default is 0600.
+  #permissions: 0600
 
 
 #----------------------------- Console output ---------------------------------
@@ -1003,7 +1051,7 @@ output.elasticsearch:
 
 #============================== Dashboards =====================================
 # These settings control loading the sample dashboards to the Kibana index. Loading
-# the dashboards is disabled by default and can be enabled either by setting the
+# the dashboards are disabled by default and can be enabled either by setting the
 # options here, or by using the `-setup` CLI flag or the `setup` command.
 #setup.dashboards.enabled: false
 
@@ -1040,10 +1088,14 @@ output.elasticsearch:
 # Set to false to disable template loading.
 #setup.template.enabled: true
 
-# Template name. By default the template name is metricbeat.
-# The version of the beat will always be appended to the given name
-# so the final name is metricbeat-%{[beat.version]}.
-#setup.template.name: "metricbeat"
+# Template name. By default the template name is "metricbeat-%{[beat.version]}"
+# The template name and pattern has to be set in case the elasticsearch index pattern is modified.
+#setup.template.name: "metricbeat-%{[beat.version]}"
+
+# Template pattern. By default the template pattern is "-%{[beat.version]}-*" to apply to the default index settings.
+# The first part is the version of the beat and then -* is used to match all daily indices.
+# The template name and pattern has to be set in case the elasticsearch index pattern is modified.
+#setup.template.pattern: "metricbeat-%{[beat.version]}-*"
 
 # Path to fields.yml file to generate the template
 #setup.template.fields: "${path.config}/fields.yml"
@@ -1078,7 +1130,7 @@ setup.kibana:
   # IPv6 addresses should always be defined as: https://[2001:db8::1]:5601
   #host: "localhost:5601"
 
-  # Optional protocol and basic auth crendentials.
+  # Optional protocol and basic auth credentials.
   #protocol: "https"
   #username: "elastic"
   #password: "changeme"
@@ -1146,7 +1198,7 @@ setup.kibana:
 # The period after which to log the internal metrics. The default is 30s.
 #logging.metrics.period: 30s
 
-# Logging to rotating files files. Set logging.to_files to false to disable logging to
+# Logging to rotating files. Set logging.to_files to false to disable logging to
 # files.
 logging.to_files: true
 logging.files:
@@ -1163,6 +1215,10 @@ logging.files:
 
   # Number of rotated log files to keep. Oldest files will be deleted first.
   #keepfiles: 7
+
+  # The permissions mask to apply when rotating log files. The default value is 0600.
+  # Must be a valid Unix-style file permissions mask expressed in octal notation.
+  #permissions: 0600
 
 # Set to true to log messages in json format.
 #logging.json: false

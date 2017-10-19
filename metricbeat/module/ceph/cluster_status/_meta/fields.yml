@@ -84,11 +84,11 @@
       description: >
         Cluster status version
     - name: osd.full
-      type: bool
+      type: boolean
       description: >
         Is osd full
     - name: osd.nearfull
-      type: bool
+      type: boolean
       description: >
         Is osd near full
     - name: osd.num_osds
@@ -103,7 +103,7 @@
       type: long
       description: >
         Shows how many osds are on the state of IN
-    - name: osd.num_in_osds
+    - name: osd.num_remapped_pgs
       type: long
       description: >
         Shows how many osds are on the state of REMAPPED

@@ -19,10 +19,12 @@ _Beats Platform Reference_ for more about the structure of the config file.
 
 The following topics describe how to configure Filebeat:
 
+* <<configuration-filebeat-modules>>
 * <<configuration-filebeat-options>>
 * <<multiline-examples>>
 * <<configuration-general-options>>
 * <<filebeat-configuration-reloading>>
+* <<configuring-internal-queue>>
 * <<configuring-output>>
 * <<configuration-ssl>>
 * <<filtering-and-enhancing-data>>
@@ -39,6 +41,8 @@ The following topics describe how to configure Filebeat:
 
 --
 
+include::./filebeat-modules-options.asciidoc[]
+
 include::./filebeat-options.asciidoc[]
 
 include::./multiple-prospectors.asciidoc[]
@@ -50,6 +54,8 @@ include::./filebeat-general-options.asciidoc[]
 include::./reload-configuration.asciidoc[]
 
 :allplatforms:
+include::../../libbeat/docs/queueconfig.asciidoc[]
+
 include::../../libbeat/docs/outputconfig.asciidoc[]
 
 include::../../libbeat/docs/shared-ssl-config.asciidoc[]

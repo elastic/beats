@@ -46,7 +46,8 @@ class Test(BaseTest):
             template_name="filebeat_modules",
             output=cfgfile,
             index_name=self.index_name,
-            elasticsearch_url=self.elasticsearch_url)
+            elasticsearch_url=self.elasticsearch_url
+        )
 
         for module in modules:
             path = os.path.join(self.modules_path, module)
@@ -161,6 +162,8 @@ class Test(BaseTest):
                 pipeline="estest",
                 index=index_name),
             pipeline="test",
+            setup_template_name=index_name,
+            setup_template_pattern=index_name + "*",
         )
 
         os.mkdir(self.working_dir + "/log/")

@@ -96,11 +96,10 @@ filebeat.registry_file: {{ beat.working_dir + '/' }}{{ registryFile|default("reg
 
 {% if reload or reload_path -%}
 filebeat.config.{{ reload_type|default("prospectors") }}:
-  enabled: true
   path: {{ reload_path }}
   {% if reload  -%}
   reload.period: 1s
-  reload.enabled: true
+  reload.enabled: {{ reload|default("false") }}
   {% endif -%}
 {% endif -%}
 
@@ -133,6 +132,11 @@ geoip:
   ]
 {%- endif %}
 
+{% if setup_template_name is not none %}
+setup.template.name: setup_template_name
+setup.template.pattern: setup_template_pattern
+{%- endif %}
+
 {%- if processors %}
 
 #================================ Filters =====================================
@@ -151,6 +155,13 @@ processors:
 {%- endfor %}
 
 {%- endif %}
+
+#================================ Queue =====================================
+
+queue.mem:
+  events: 4096
+  flush.min_events: 8
+  flush.timeout: 0.1s
 
 #================================ Outputs =====================================
 

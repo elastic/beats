@@ -20,6 +20,8 @@ CLIENTS_FIELDS = ["blocked", "biggest_input_buf",
 
 class Test(metricbeat.BaseTest):
 
+    COMPOSE_SERVICES = ['redis']
+
     @unittest.skipUnless(metricbeat.INTEGRATION_TESTS, "integration test")
     @attr('integration')
     def test_info(self):
