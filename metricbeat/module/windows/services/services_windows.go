@@ -9,7 +9,7 @@ import (
 	"unicode/utf16"
 	"unsafe"
 
-	gosigar "github.com/elastic/gosigar/sys/windows"
+	gosigar "github.com/elastic/gosigar"
 	"github.com/pkg/errors"
 	"golang.org/x/sys/windows"
 
@@ -71,6 +71,7 @@ type ServiceStatus struct {
 	ServiceName  string
 	CurrentState string
 	StartType    string
+	Uptime       uint64
 }
 
 type ServiceReader struct {
@@ -139,7 +140,7 @@ func getServiceStates(handle ServiceDatabaseHandle, state ServiceEnumState) ([]S
 		}
 		bufSize += bytesNeeded
 		servicesBuffer := make([]byte, bytesNeeded)
-		lastOffset = uintptr(len(servicesBuffer)) - 1
+		lastOffset = uintptr(len(servicesBuffer))
 
 		// This loop should not repeat more then two times
 		for {
@@ -193,9 +194,11 @@ func getServiceStates(handle ServiceDatabaseHandle, state ServiceEnumState) ([]S
 
 					//Get uptime for service
 					if ServiceState(serviceTemp.ServiceStatusProcess.DwCurrentState) != ServiceStopped {
-						if err := getServiceUptime(serviceTemp.ServiceStatusProcess.DwProcessId); err != nil {
+						processTime, err := getServiceUptime(serviceTemp.ServiceStatusProcess.DwProcessId)
+						if err != nil {
 							return nil, err
 						}
+						service.Uptime = processTime.Total
 					}
 
 					services = append(services, service)
@@ -250,39 +253,15 @@ func getDetailedServiceInfo(handle ServiceDatabaseHandle, serviceName string, ac
 	return nil
 }
 
-func getServiceUptime(processId uint32) error {
-	var processCreationTime syscall.Filetime
-	var processExitTime syscall.Filetime
-	var processKernelTime syscall.Filetime
-	var processUserTime syscall.Filetime
+func getServiceUptime(processId uint32) (gosigar.ProcTime, error) {
+	var processCreationTime gosigar.ProcTime
 
-	// Enable SeDebugPrivilege to opne processes
-
-	var token syscall.Token
-
-	currentProcess, err := syscall.GetCurrentProcess()
+	err := processCreationTime.Get(int(processId))
 	if err != nil {
-		return err
+		return processCreationTime, err
 	}
 
-	if err := syscall.OpenProcessToken(currentProcess, syscall.TOKEN_ADJUST_PRIVILEGES, &token); err != nil {
-		return err
-	}
-
-	if err := gosigar.EnableTokenPrivileges(token, gosigar.SeDebugPrivilege); err != nil {
-		return err
-	}
-
-	processHandle, err := syscall.OpenProcess(uint32(ProcessAllAccess), false, processId)
-	if err != nil {
-		return err
-	}
-
-	if err := syscall.GetProcessTimes(processHandle, &processCreationTime, &processExitTime, &processKernelTime, &processUserTime); err != nil {
-		return err
-	}
-
-	return nil
+	return processCreationTime, nil
 }
 
 func (reader *ServiceReader) Close() error {
