@@ -9,11 +9,11 @@ import (
 	"unicode/utf16"
 	"unsafe"
 
-	"github.com/elastic/beats/libbeat/common"
 	gosigar "github.com/elastic/gosigar/sys/windows"
 	"github.com/pkg/errors"
 	"golang.org/x/sys/windows"
 
+	"github.com/elastic/beats/libbeat/common"
 	"github.com/elastic/beats/winlogbeat/sys"
 )
 
@@ -25,8 +25,8 @@ import (
 //sys _CloseServiceHandle(handle uintptr) (err error) = advapi32.CloseServiceHandle
 
 var (
-	sizeOfEnumServiceStatusProcess = (int)(unsafe.Sizeof(EnumServiceStatusProcess{}))
-	sizeOfQueryServiceConfig       = (int)(unsafe.Sizeof(QueryServiceConfig{}))
+	sizeofEnumServiceStatusProcess = (int)(unsafe.Sizeof(EnumServiceStatusProcess{}))
+	sizeofQueryServiceConfig       = (int)(unsafe.Sizeof(QueryServiceConfig{}))
 )
 
 type enumServiceStatusProcess struct {
@@ -154,7 +154,7 @@ func getServiceStates(handle ServiceDatabaseHandle, state ServiceEnumState) ([]S
 				serviceNameBuffer := new(bytes.Buffer)
 
 				for i := 0; i < int(servicesReturned); i++ {
-					serviceTemp := (*EnumServiceStatusProcess)(unsafe.Pointer(&servicesBuffer[i*sizeOfEnumServiceStatusProcess]))
+					serviceTemp := (*EnumServiceStatusProcess)(unsafe.Pointer(&servicesBuffer[i*sizeofEnumServiceStatusProcess]))
 
 					serviceNameOffset := uintptr(unsafe.Pointer(serviceTemp.LpServiceName)) - (uintptr)(unsafe.Pointer(&servicesBuffer[0]))
 					displayNameOffset := uintptr(unsafe.Pointer(serviceTemp.LpDisplayName)) - (uintptr)(unsafe.Pointer(&servicesBuffer[0]))

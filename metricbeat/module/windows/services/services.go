@@ -29,14 +29,7 @@ type MetricSet struct {
 func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
 	logp.Warn("EXPERIMENTAL: The windows services metricset is experimental")
 
-	config := struct{}{}
-
-	if err := base.Module().UnpackConfig(&config); err != nil {
-		return nil, err
-	}
-
 	reader, err := NewServiceReader()
-
 	if err != nil {
 		return nil, err
 	}
@@ -51,7 +44,6 @@ func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
 // It returns the event which is then forward to the output. In case of an error, a
 // descriptive error must be returned.
 func (m *MetricSet) Fetch() ([]common.MapStr, error) {
-
 	services, err := m.reader.Read()
 	if err != nil {
 		return nil, err
