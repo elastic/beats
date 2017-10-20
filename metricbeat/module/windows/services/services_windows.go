@@ -187,75 +187,13 @@ func getServiceStates(handle ServiceDatabaseHandle, state ServiceEnumState) ([]S
 					service.CurrentState = state
 
 					// Get detailed information
-					var serviceBufSize uint32
-					var serviceBytesNeeded uint32
-
-					serviceHandle, err := OpenService(handle, service.ServiceName, ServiceQueryConfig)
-					if err != nil {
+					if err := getDetailedServiceInfo(handle, service.ServiceName, ServiceQueryConfig, &service); err != nil {
 						return nil, err
-					}
-
-					if err := _QueryServiceConfig(serviceHandle, nil, serviceBufSize, &serviceBytesNeeded); err != nil {
-						if ServiceErrno(err.(syscall.Errno)) != SERVICE_ERROR_INSUFFICIENT_BUFFER {
-							if err := CloseServiceHandle(serviceHandle); err != nil {
-								return nil, err
-							}
-							return nil, err
-						}
-						serviceBufSize += serviceBytesNeeded
-						buffer := make([]byte, serviceBufSize)
-
-						for {
-							if err := _QueryServiceConfig(serviceHandle, &buffer[0], serviceBufSize, &serviceBytesNeeded); err != nil {
-								if ServiceErrno(err.(syscall.Errno)) != SERVICE_ERROR_INSUFFICIENT_BUFFER {
-									if err := CloseServiceHandle(serviceHandle); err != nil {
-										return nil, err
-									}
-									return nil, err
-								}
-								serviceBufSize += serviceBytesNeeded
-							} else {
-								serviceQueryConfig := (*QueryServiceConfig)(unsafe.Pointer(&buffer[0]))
-								service.StartType = serviceStartTypes[ServiceStartType(serviceQueryConfig.DwStartType)]
-								if err := CloseServiceHandle(serviceHandle); err != nil {
-									return nil, err
-								}
-								break
-							}
-						}
 					}
 
 					//Get uptime for service
 					if ServiceState(serviceTemp.ServiceStatusProcess.DwCurrentState) != ServiceStopped {
-
-						var processCreationTime syscall.Filetime
-						var processExitTime syscall.Filetime
-						var processKernelTime syscall.Filetime
-						var processUserTime syscall.Filetime
-
-						// Enable SeDebugPrivilege to opne processes
-
-						var token syscall.Token
-
-						currentProcess, err := syscall.GetCurrentProcess()
-						if err != nil {
-							return nil, err
-						}
-
-						if err := syscall.OpenProcessToken(currentProcess, syscall.TOKEN_ADJUST_PRIVILEGES, &token); err != nil {
-							return nil, err
-						}
-
-						if err := gosigar.EnableTokenPrivileges(token, gosigar.SeDebugPrivilege); err != nil {
-							return nil, err
-						}
-
-						processHandle, err := syscall.OpenProcess(uint32(ProcessAllAccess), false, serviceTemp.ServiceStatusProcess.DwProcessId)
-						if err != nil {
-							return nil, err
-						}
-
-						if err := syscall.GetProcessTimes(processHandle, &processCreationTime, &processExitTime, &processKernelTime, &processUserTime); err != nil {
+						if err := getServiceUptime(serviceTemp.ServiceStatusProcess.DwProcessId); err != nil {
 							return nil, err
 						}
 					}
@@ -269,6 +207,82 @@ func getServiceStates(handle ServiceDatabaseHandle, state ServiceEnumState) ([]S
 	}
 
 	return nil, nil
+}
+
+func getDetailedServiceInfo(handle ServiceDatabaseHandle, serviceName string, accessRight ServiceAccessRight, service *ServiceStatus) error {
+	var serviceBufSize uint32
+	var serviceBytesNeeded uint32
+
+	serviceHandle, err := OpenService(handle, service.ServiceName, ServiceQueryConfig)
+	if err != nil {
+		return err
+	}
+
+	if err := _QueryServiceConfig(serviceHandle, nil, serviceBufSize, &serviceBytesNeeded); err != nil {
+		if ServiceErrno(err.(syscall.Errno)) != SERVICE_ERROR_INSUFFICIENT_BUFFER {
+			if err := CloseServiceHandle(serviceHandle); err != nil {
+				return err
+			}
+			return err
+		}
+		serviceBufSize += serviceBytesNeeded
+		buffer := make([]byte, serviceBufSize)
+
+		for {
+			if err := _QueryServiceConfig(serviceHandle, &buffer[0], serviceBufSize, &serviceBytesNeeded); err != nil {
+				if ServiceErrno(err.(syscall.Errno)) != SERVICE_ERROR_INSUFFICIENT_BUFFER {
+					if err := CloseServiceHandle(serviceHandle); err != nil {
+						return err
+					}
+					return err
+				}
+				serviceBufSize += serviceBytesNeeded
+			} else {
+				serviceQueryConfig := (*QueryServiceConfig)(unsafe.Pointer(&buffer[0]))
+				service.StartType = serviceStartTypes[ServiceStartType(serviceQueryConfig.DwStartType)]
+				if err := CloseServiceHandle(serviceHandle); err != nil {
+					return err
+				}
+				break
+			}
+		}
+	}
+	return nil
+}
+
+func getServiceUptime(processId uint32) error {
+	var processCreationTime syscall.Filetime
+	var processExitTime syscall.Filetime
+	var processKernelTime syscall.Filetime
+	var processUserTime syscall.Filetime
+
+	// Enable SeDebugPrivilege to opne processes
+
+	var token syscall.Token
+
+	currentProcess, err := syscall.GetCurrentProcess()
+	if err != nil {
+		return err
+	}
+
+	if err := syscall.OpenProcessToken(currentProcess, syscall.TOKEN_ADJUST_PRIVILEGES, &token); err != nil {
+		return err
+	}
+
+	if err := gosigar.EnableTokenPrivileges(token, gosigar.SeDebugPrivilege); err != nil {
+		return err
+	}
+
+	processHandle, err := syscall.OpenProcess(uint32(ProcessAllAccess), false, processId)
+	if err != nil {
+		return err
+	}
+
+	if err := syscall.GetProcessTimes(processHandle, &processCreationTime, &processExitTime, &processKernelTime, &processUserTime); err != nil {
+		return err
+	}
+
+	return nil
 }
 
 func (reader *ServiceReader) Close() error {
