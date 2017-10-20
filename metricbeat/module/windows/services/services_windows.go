@@ -6,6 +6,7 @@ import (
 	"bytes"
 	"strconv"
 	"syscall"
+	"time"
 	"unicode/utf16"
 	"unsafe"
 
@@ -14,6 +15,7 @@ import (
 	"golang.org/x/sys/windows"
 
 	"github.com/elastic/beats/libbeat/common"
+	"github.com/elastic/beats/libbeat/logp"
 	"github.com/elastic/beats/winlogbeat/sys"
 )
 
@@ -196,9 +198,11 @@ func getServiceStates(handle ServiceDatabaseHandle, state ServiceEnumState) ([]S
 					if ServiceState(serviceTemp.ServiceStatusProcess.DwCurrentState) != ServiceStopped {
 						processTime, err := getServiceUptime(serviceTemp.ServiceStatusProcess.DwProcessId)
 						if err != nil {
-							return nil, err
+							logp.Warn("Uptime for service %v is not available", service.ServiceName)
+						} else {
+							tm := time.Now().UnixNano()
+							service.Uptime = uint64((tm / int64(time.Millisecond)) - int64(processTime.StartTime))
 						}
-						service.Uptime = processTime.Total
 					}
 
 					services = append(services, service)
@@ -333,6 +337,7 @@ func (reader *ServiceReader) Read() ([]common.MapStr, error) {
 			"service_name": service.ServiceName,
 			"state":        service.CurrentState,
 			"start_type":   service.StartType,
+			"uptime":       service.Uptime,
 		}
 
 		result = append(result, ev)
