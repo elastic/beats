@@ -56,6 +56,7 @@ type ClientSettings struct {
 	Timeout            time.Duration
 	CompressionLevel   int
 	Stats              *outputs.Stats
+	Aws                *AwsData
 }
 
 type connectCallback func(client *Client) error
@@ -72,6 +73,7 @@ type Connection struct {
 
 	encoder bodyEncoder
 	version string
+	Aws     *AwsData
 }
 
 var (
@@ -168,6 +170,7 @@ func NewClient(
 				Timeout: s.Timeout,
 			},
 			encoder: encoder,
+			Aws:     s.Aws,
 		},
 		tlsConfig: s.TLS,
 		index:     s.Index,
@@ -219,6 +222,7 @@ func (client *Client) Clone() *Client {
 			Headers:          client.Headers,
 			Timeout:          client.http.Timeout,
 			CompressionLevel: client.compressionLevel,
+			Aws:              client.Aws,
 		},
 		nil, // XXX: do not pass connection callback?
 	)
@@ -719,6 +723,10 @@ func (conn *Connection) execHTTPRequest(req *http.Request) (int, []byte, error) 
 	// We use the normalized key header to retrieve the user configured value and assign it to the host.
 	if host := req.Header.Get("Host"); host != "" {
 		req.Host = host
+	}
+
+	if conn.Aws != nil {
+		conn.performAwsSignature(req)
 	}
 
 	resp, err := conn.http.Do(req)
