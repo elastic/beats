@@ -5,6 +5,7 @@ package logstash
 
 import (
 	"expvar"
+	"fmt"
 	"time"
 
 	"github.com/elastic/go-lumber/log"
@@ -142,7 +143,7 @@ func makeClientFactory(
 		if err != nil {
 			return nil, err
 		}
-		return newLumberjackClient(t, cfg)
+		return newLumberjackClient(t, fmt.Sprintf("%v:%v", host, cfg.Port), cfg)
 	}
 }
 
@@ -155,7 +156,7 @@ func makeAsyncClientFactory(
 		if err != nil {
 			return nil, err
 		}
-		return newAsyncLumberjackClient(t, cfg)
+		return newAsyncLumberjackClient(t, fmt.Sprintf("%v:%v", host, cfg.Port), cfg)
 	}
 }
 

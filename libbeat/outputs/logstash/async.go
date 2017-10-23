@@ -14,12 +14,14 @@ import (
 type asyncClient struct {
 	*transport.Client
 	client *v2.AsyncClient
+	host   string
 	win    *window
 
 	connect func() error
 }
 
 type msgRef struct {
+	client    *asyncClient
 	count     int32
 	batch     []outputs.Data
 	err       error
@@ -30,10 +32,12 @@ type msgRef struct {
 
 func newAsyncLumberjackClient(
 	conn *transport.Client,
+	addr string,
 	config *logstashConfig,
 ) (*asyncClient, error) {
 	c := &asyncClient{
 		Client: conn,
+		host:   addr,
 	}
 
 	if config.SlowStart {
@@ -65,12 +69,12 @@ func newAsyncLumberjackClient(
 }
 
 func (c *asyncClient) Connect(timeout time.Duration) error {
-	logp.Debug("logstash", "connect")
+	logp.Debug("logstash", "connect to logstash host %v", c.host)
 	return c.connect()
 }
 
 func (c *asyncClient) Close() error {
-	logp.Debug("logstash", "close connection")
+	logp.Debug("logstash", "close connection to logstash host %v", c.host)
 	if c.client != nil {
 		err := c.client.Close()
 		c.client = nil
@@ -104,6 +108,7 @@ func (c *asyncClient) AsyncPublishEvents(
 	}
 
 	ref := &msgRef{
+		client:    c,
 		count:     1,
 		batch:     data,
 		batchSize: len(data),
@@ -126,8 +131,8 @@ func (c *asyncClient) AsyncPublishEvents(
 			n, err = c.publishWindowed(ref, data)
 		}
 
-		debug("%v events out of %v events sent to logstash. Continue sending",
-			n, len(data))
+		debug("%v events out of %v events sent to logstash host %s. Continue sending",
+			n, len(data), c.host)
 
 		data = data[n:]
 		if err != nil {
@@ -145,8 +150,8 @@ func (c *asyncClient) publishWindowed(
 ) (int, error) {
 	batchSize := len(data)
 	windowSize := c.win.get()
-	debug("Try to publish %v events to logstash with window size %v",
-		batchSize, windowSize)
+	debug("Try to publish %v events to logstash host %v with window size %v",
+		batchSize, c.host, windowSize)
 
 	// prepare message payload
 	if batchSize > windowSize {
@@ -208,7 +213,7 @@ func (r *msgRef) dec() {
 	err := r.err
 	if err != nil {
 		eventsNotAcked.Add(int64(len(r.batch)))
-		logp.Err("Failed to publish events caused by: %v", err)
+		logp.Err("Failed to publish events (host: %v) caused by: %v", r.client.host, err)
 		r.cb(r.batch, err)
 		return
 	}

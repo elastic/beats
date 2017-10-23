@@ -32,7 +32,7 @@ type testClientDriver interface {
 	Returns() []testClientReturn
 }
 
-type clientFactory func(*transport.Client) testClientDriver
+type clientFactory func(*transport.Client, string) testClientDriver
 
 type testClientReturn struct {
 	n   int
@@ -44,7 +44,7 @@ type testDriverCommand struct {
 	data []outputs.Data
 }
 
-func newLumberjackTestClient(conn *transport.Client, settings map[string]interface{}) *client {
+func newLumberjackTestClient(conn *transport.Client, host string, settings map[string]interface{}) *client {
 	config, err := common.NewConfigFrom(settings)
 	if err != nil {
 		panic(err)
@@ -58,7 +58,7 @@ func newLumberjackTestClient(conn *transport.Client, settings map[string]interfa
 		panic(err)
 	}
 
-	c, err := newLumberjackClient(conn, &lsCfg)
+	c, err := newLumberjackClient(conn, host, &lsCfg)
 	if err != nil {
 		panic(err)
 	}
@@ -78,7 +78,7 @@ func testSendZero(t *testing.T, factory clientFactory) {
 		t.Fatalf("Failed to connect server and client: %v", err)
 	}
 
-	client := factory(transp)
+	client := factory(transp, server.Addr())
 	defer sock.Close()
 	defer transp.Close()
 
@@ -104,7 +104,7 @@ func testSimpleEvent(t *testing.T, factory clientFactory) {
 	if err != nil {
 		t.Fatalf("Failed to connect: %v", err)
 	}
-	client := factory(transp)
+	client := factory(transp, mock.Addr())
 	defer transp.Close()
 	defer client.Stop()
 
@@ -133,7 +133,7 @@ func testStructuredEvent(t *testing.T, factory clientFactory) {
 	if err != nil {
 		t.Fatalf("Failed to connect: %v", err)
 	}
-	client := factory(transp)
+	client := factory(transp, mock.Addr())
 	defer transp.Close()
 	defer client.Stop()
 
@@ -183,7 +183,7 @@ func testMultiFailMaxTimeouts(t *testing.T, factory clientFactory) {
 	if err != nil {
 		t.Fatalf("Failed to connect: %v", err)
 	}
-	client := factory(transp)
+	client := factory(transp, mock.Addr())
 	defer transp.Close()
 	defer client.Stop()
 

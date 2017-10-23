@@ -44,9 +44,9 @@ func newClientServerTCP(t *testing.T, to time.Duration) *clientServer {
 	return &clientServer{transptest.NewMockServerTCP(t, to, "", nil)}
 }
 
-func makeTestClient(settings map[string]interface{}) func(*transport.Client) testClientDriver {
-	return func(conn *transport.Client) testClientDriver {
-		return newClientTestDriver(newLumberjackTestClient(conn, settings))
+func makeTestClient(settings map[string]interface{}) func(*transport.Client, string) testClientDriver {
+	return func(conn *transport.Client, host string) testClientDriver {
+		return newClientTestDriver(newLumberjackTestClient(conn, host, settings))
 	}
 }
 

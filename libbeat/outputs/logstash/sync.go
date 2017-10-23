@@ -18,15 +18,18 @@ const (
 type client struct {
 	*transport.Client
 	client *v2.SyncClient
+	host   string
 	win    *window
 }
 
 func newLumberjackClient(
 	conn *transport.Client,
+	addr string,
 	config *logstashConfig,
 ) (*client, error) {
 	c := &client{
 		Client: conn,
+		host:   addr,
 	}
 
 	if config.SlowStart {
@@ -52,12 +55,12 @@ func newLumberjackClient(
 }
 
 func (c *client) Connect(timeout time.Duration) error {
-	logp.Debug("logstash", "connect")
+	logp.Debug("logstash", "connect to logstash host %v", c.host)
 	return c.Client.Connect()
 }
 
 func (c *client) Close() error {
-	logp.Debug("logstash", "close connection")
+	logp.Debug("logstash", "close connection to logstash host %v", c.host)
 	return c.Client.Close()
 }
 
@@ -89,8 +92,8 @@ func (c *client) PublishEvents(
 			n, err = c.publishWindowed(data)
 		}
 
-		debug("%v events out of %v events sent to logstash. Continue sending",
-			n, len(data))
+		debug("%v events out of %v events sent to logstash host %v. Continue sending",
+			n, len(data), c.host)
 
 		data = data[n:]
 		if err != nil {
@@ -99,7 +102,7 @@ func (c *client) PublishEvents(
 			}
 			_ = c.Close()
 
-			logp.Err("Failed to publish events caused by: %v", err)
+			logp.Err("Failed to publish events (host: %v), caused by: %v", c.host, err)
 
 			eventsNotAcked.Add(int64(len(data)))
 			ackedEvents.Add(int64(totalNumberOfEvents - len(data)))
@@ -120,8 +123,8 @@ func (c *client) publishWindowed(data []outputs.Data) (int, error) {
 
 	batchSize := len(data)
 	windowSize := c.win.get()
-	debug("Try to publish %v events to logstash with window size %v",
-		batchSize, windowSize)
+	debug("Try to publish %v events to logstash host %s with window size %v",
+		batchSize, c.host, windowSize)
 
 	// prepare message payload
 	if batchSize > windowSize {

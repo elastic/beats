@@ -59,13 +59,13 @@ func TestAsync(t *testing.T) {
 	}
 }
 
-func makeAsyncTestClient(settings map[string]interface{}) func(*transport.Client) testClientDriver {
-	return func(conn *transport.Client) testClientDriver {
-		return newAsyncTestDriver(newAsyncTestClient(conn, settings))
+func makeAsyncTestClient(settings map[string]interface{}) func(*transport.Client, string) testClientDriver {
+	return func(conn *transport.Client, host string) testClientDriver {
+		return newAsyncTestDriver(newAsyncTestClient(conn, host, settings))
 	}
 }
 
-func newAsyncTestClient(conn *transport.Client, settings map[string]interface{}) *asyncClient {
+func newAsyncTestClient(conn *transport.Client, host string, settings map[string]interface{}) *asyncClient {
 	config, err := common.NewConfigFrom(settings)
 	if err != nil {
 		panic(err)
@@ -81,7 +81,7 @@ func newAsyncTestClient(conn *transport.Client, settings map[string]interface{})
 		panic(err)
 	}
 
-	c, err := newAsyncLumberjackClient(conn, &lsCfg)
+	c, err := newAsyncLumberjackClient(conn, host, &lsCfg)
 	if err != nil {
 		panic(err)
 	}
