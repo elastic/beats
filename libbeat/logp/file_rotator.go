@@ -18,6 +18,7 @@ type FileRotator struct {
 	Name             string
 	RotateEveryBytes *uint64
 	KeepFiles        *int
+	Permissions      *uint32
 
 	current     *os.File
 	currentSize uint64
@@ -44,7 +45,7 @@ func (rotator *FileRotator) CreateDirectory() error {
 
 func (rotator *FileRotator) CheckIfConfigSane() error {
 	if len(rotator.Name) == 0 {
-		return fmt.Errorf("File logging requires a name for the file names")
+		return fmt.Errorf("file logging requires a name for the file names")
 	}
 	if rotator.KeepFiles == nil {
 		rotator.KeepFiles = new(int)
@@ -56,7 +57,11 @@ func (rotator *FileRotator) CheckIfConfigSane() error {
 	}
 
 	if *rotator.KeepFiles < 2 || *rotator.KeepFiles >= RotatorMaxFiles {
-		return fmt.Errorf("The number of files to keep should be between 2 and %d", RotatorMaxFiles-1)
+		return fmt.Errorf("the number of files to keep should be between 2 and %d", RotatorMaxFiles-1)
+	}
+
+	if rotator.Permissions != nil && (*rotator.Permissions > uint32(os.ModePerm)) {
+		return fmt.Errorf("the permissions mask %d is invalid", *rotator.Permissions)
 	}
 	return nil
 }
@@ -148,7 +153,7 @@ func (rotator *FileRotator) Rotate() error {
 
 		if rotator.FileExists(fileNo + 1) {
 			// next file exists, something is strange
-			return fmt.Errorf("File %s exists, when rotating would overwrite it", rotator.FilePath(fileNo+1))
+			return fmt.Errorf("file %s exists, when rotating would overwrite it", rotator.FilePath(fileNo+1))
 		}
 
 		err := os.Rename(path, rotator.FilePath(fileNo+1))
@@ -159,7 +164,7 @@ func (rotator *FileRotator) Rotate() error {
 
 	// create the new file
 	path := rotator.FilePath(0)
-	current, err := os.OpenFile(path, os.O_RDWR|os.O_CREATE|os.O_TRUNC, 0600)
+	current, err := os.OpenFile(path, os.O_RDWR|os.O_CREATE|os.O_TRUNC, os.FileMode(rotator.getPermissions()))
 	if err != nil {
 		return err
 	}
@@ -171,4 +176,11 @@ func (rotator *FileRotator) Rotate() error {
 	os.Remove(path)
 
 	return nil
+}
+
+func (rotator *FileRotator) getPermissions() uint32 {
+	if rotator.Permissions == nil {
+		return 0600
+	}
+	return *rotator.Permissions
 }
