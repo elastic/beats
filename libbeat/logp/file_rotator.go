@@ -6,6 +6,7 @@ import (
 	"path/filepath"
 	"strconv"
 	"strings"
+	"sync"
 )
 
 const RotatorMaxFiles = 1024
@@ -20,6 +21,7 @@ type FileRotator struct {
 
 	current     *os.File
 	currentSize uint64
+	currentLock sync.RWMutex
 }
 
 func (rotator *FileRotator) CreateDirectory() error {
@@ -68,16 +70,26 @@ func (rotator *FileRotator) WriteLine(line []byte) error {
 	}
 
 	line = append(line, '\n')
+
+	rotator.currentLock.RLock()
 	_, err := rotator.current.Write(line)
+	rotator.currentLock.RUnlock()
+
 	if err != nil {
 		return err
 	}
+
+	rotator.currentLock.Lock()
 	rotator.currentSize += uint64(len(line))
+	rotator.currentLock.Unlock()
 
 	return nil
 }
 
 func (rotator *FileRotator) shouldRotate() bool {
+	rotator.currentLock.RLock()
+	defer rotator.currentLock.RUnlock()
+
 	if rotator.current == nil {
 		return true
 	}
@@ -107,6 +119,8 @@ func (rotator *FileRotator) FileExists(fileNo int) bool {
 }
 
 func (rotator *FileRotator) Rotate() error {
+	rotator.currentLock.Lock()
+	defer rotator.currentLock.Unlock()
 
 	if rotator.current != nil {
 		if err := rotator.current.Close(); err != nil {
