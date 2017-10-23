@@ -21,7 +21,7 @@ WORKDIR /usr/share/elasticsearch
 
 # Download/extract defined ES version. busybox tar can't strip leading dir.
 RUN curl -L -o elasticsearch-${ELASTIC_VERSION}.tar.gz ${DOWNLOAD_URL}/elasticsearch/elasticsearch-${ELASTIC_VERSION}.tar.gz?c=${CACHE_BUST} && \
-    EXPECTED_SHA=$(wget -O - ${DOWNLOAD_URL}/elasticsearch/elasticsearch-${ELASTIC_VERSION}.tar.gz.sha512) && \
+    EXPECTED_SHA=$(wget -O - ${DOWNLOAD_URL}/elasticsearch/elasticsearch-${ELASTIC_VERSION}.tar.gz.sha512 | awk '{print $1}') && \
     test $EXPECTED_SHA == $(sha512sum elasticsearch-${ELASTIC_VERSION}.tar.gz | awk '{print $1}') && \
     tar zxf elasticsearch-${ELASTIC_VERSION}.tar.gz && \
     chown -R elasticsearch:elasticsearch elasticsearch-${ELASTIC_VERSION} && \
