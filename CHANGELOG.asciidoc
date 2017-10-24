@@ -14,6 +14,8 @@ https://github.com/elastic/beats/compare/v6.0.0-beta2...master[Check the HEAD di
 
 *Affecting all Beats*
 
+- Determine log level for kafka output. {pull}5397[5397]
+
 *Auditbeat*
 
 *Filebeat*
