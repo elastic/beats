@@ -4,6 +4,7 @@ import (
 	"syscall"
 
 	"github.com/elastic/beats/libbeat/logp"
+	"github.com/elastic/gosigar"
 	"github.com/elastic/gosigar/sys/windows"
 	"github.com/pkg/errors"
 )
@@ -80,4 +81,16 @@ func CheckAndEnableSeDebugPrivilege() error {
 
 	logp.Info("SeDebugPrivilege is now enabled. %v", seDebug)
 	return nil
+}
+
+// GetServiceUptime returns the uptime for process
+func GetServiceUptime(processID uint32) (gosigar.ProcTime, error) {
+	var processCreationTime gosigar.ProcTime
+
+	err := processCreationTime.Get(int(processID))
+	if err != nil {
+		return processCreationTime, err
+	}
+
+	return processCreationTime, nil
 }

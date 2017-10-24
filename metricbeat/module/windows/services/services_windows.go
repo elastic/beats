@@ -10,7 +10,6 @@ import (
 	"unicode/utf16"
 	"unsafe"
 
-	gosigar "github.com/elastic/gosigar"
 	"github.com/pkg/errors"
 	"golang.org/x/sys/windows"
 
@@ -189,7 +188,7 @@ func getServiceStates(handle ServiceDatabaseHandle, state ServiceEnumState) ([]S
 
 					//Get uptime for service
 					if ServiceState(serviceTemp.ServiceStatusProcess.DwCurrentState) != ServiceStopped {
-						processTime, err := getServiceUptime(serviceTemp.ServiceStatusProcess.DwProcessId)
+						processTime, err := helper.GetServiceUptime(serviceTemp.ServiceStatusProcess.DwProcessId)
 						if err != nil {
 							logp.Warn("Uptime for service %v is not available", service.ServiceName)
 						} else {
@@ -248,17 +247,6 @@ func getDetailedServiceInfo(handle ServiceDatabaseHandle, serviceName string, ac
 		}
 	}
 	return nil
-}
-
-func getServiceUptime(processId uint32) (gosigar.ProcTime, error) {
-	var processCreationTime gosigar.ProcTime
-
-	err := processCreationTime.Get(int(processId))
-	if err != nil {
-		return processCreationTime, err
-	}
-
-	return processCreationTime, nil
 }
 
 func (reader *ServiceReader) Close() error {
