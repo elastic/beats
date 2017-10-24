@@ -3,8 +3,34 @@
   description: >
     `services` contains the status for windows services.
   fields:
-    - name: status
+    - name: uptime
+      type: group
+      description: >
+        `uptime` contains the service uptime metric.
+      fields:
+      - name: ms
+        type: long
+        format: duration
+        input_format: milliseconds
+        description: >
+          The service uptime in milliseconds.
+
+    - name: service_name
       type: keyword
       description: >
-        Which kind of service status to read. Possible values are
-        `all`, `active` and `inactive`.
+        The service name.
+
+    - name: display_name
+      type: keyword
+      description: >
+        The display name of the service.
+
+    - name: start_type
+      type: keyword
+      description: >
+        The start type of the service.
+
+    - name: state
+      type: keyword
+      description: >
+        The actual state of the service.
