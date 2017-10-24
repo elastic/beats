@@ -31,6 +31,7 @@ grouped in the following categories:
 * <<exported-fields-raw>>
 * <<exported-fields-redis>>
 * <<exported-fields-thrift>>
+* <<exported-fields-tls>>
 * <<exported-fields-trans_event>>
 * <<exported-fields-trans_measurements>>
 
@@ -2734,6 +2735,32 @@ The value returned by the Thrift-RPC call. This is encoded in a human readable f
 === `thrift.exceptions`
 
 If the call resulted in exceptions, this field contains the exceptions in a human readable format.
+
+
+[[exported-fields-tls]]
+== TLS fields
+
+TLS-specific event fields.
+
+
+
+
+[float]
+=== `tls.negotiated cypher`
+
+The cypher selected after initial handshake
+
+
+[float]
+=== `tls.compression_method`
+
+The compression method
+
+
+[float]
+=== `tls.error`
+
+If the Redis command has resulted in an error, this field contains the error message returned by the Redis server.
 
 
 [[exported-fields-trans_event]]

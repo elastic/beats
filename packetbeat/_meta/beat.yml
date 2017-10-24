@@ -93,6 +93,11 @@ packetbeat.protocols:
   # the NFS protocol by commenting out the list of ports.
   ports: [2049]
 
+- type: tls
+  # Configure the ports where to listen for TLS traffic. You can disable
+  # the TLS protocol by commenting out the list of ports.
+  ports: [443]
+
 #==================== Elasticsearch template setting ==========================
 
 setup.template.settings:

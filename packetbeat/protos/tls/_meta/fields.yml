@@ -1,0 +1,20 @@
+- key: tls
+  title: "TLS"
+  description: >
+    TLS-specific event fields.
+  fields:
+    - name: tls
+      type: group
+      fields:
+        - name: negotiated cypher
+          description: >
+            The cypher selected after initial handshake
+
+        - name: compression_method
+          description: >
+            The compression method
+        - name: error
+          description: >
+            If the Redis command has resulted in an error, this field contains the
+            error message returned by the Redis server.
+
