@@ -146,54 +146,12 @@ func getServiceStates(handle ServiceDatabaseHandle, state ServiceEnumState) ([]S
 				bufSize += bytesNeeded
 			} else {
 
-				displayNameBuffer := new(bytes.Buffer)
-				serviceNameBuffer := new(bytes.Buffer)
-
 				for i := 0; i < int(servicesReturned); i++ {
 					serviceTemp := (*EnumServiceStatusProcess)(unsafe.Pointer(&servicesBuffer[i*sizeofEnumServiceStatusProcess]))
 
-					serviceNameOffset := uintptr(unsafe.Pointer(serviceTemp.LpServiceName)) - (uintptr)(unsafe.Pointer(&servicesBuffer[0]))
-					displayNameOffset := uintptr(unsafe.Pointer(serviceTemp.LpDisplayName)) - (uintptr)(unsafe.Pointer(&servicesBuffer[0]))
-
-					displayNameBuffer.Reset()
-					serviceNameBuffer.Reset()
-
-					if err = sys.UTF16ToUTF8Bytes(servicesBuffer[displayNameOffset:serviceNameOffset], displayNameBuffer); err != nil {
+					service, err := getServiceInformation(serviceTemp, servicesBuffer, lastOffset, handle)
+					if err != nil {
 						return nil, err
-					}
-
-					if err = sys.UTF16ToUTF8Bytes(servicesBuffer[serviceNameOffset:lastOffset], serviceNameBuffer); err != nil {
-						return nil, err
-					}
-
-					lastOffset = displayNameOffset
-
-					service := ServiceStatus{}
-
-					service.DisplayName = displayNameBuffer.String()
-					service.ServiceName = serviceNameBuffer.String()
-
-					var state string
-
-					if stat, ok := serviceStates[ServiceState(serviceTemp.ServiceStatusProcess.DwCurrentState)]; ok {
-						state = stat
-					} else {
-						state = "Can not define State"
-					}
-					service.CurrentState = state
-
-					// Get detailed information
-					if err := getDetailedServiceInfo(handle, service.ServiceName, ServiceQueryConfig, &service); err != nil {
-						return nil, err
-					}
-
-					//Get uptime for service
-					if ServiceState(serviceTemp.ServiceStatusProcess.DwCurrentState) != ServiceStopped {
-						processUpTime, err := getServiceUptime(serviceTemp.ServiceStatusProcess.DwProcessId)
-						if err != nil {
-							logp.Warn("Uptime for service %v is not available", service.ServiceName)
-						}
-						service.Uptime = processUpTime
 					}
 
 					services = append(services, service)
@@ -205,6 +163,57 @@ func getServiceStates(handle ServiceDatabaseHandle, state ServiceEnumState) ([]S
 	}
 
 	return nil, nil
+}
+
+func getServiceInformation(rawService *EnumServiceStatusProcess, servicesBuffer []byte, lastOffset uintptr, handle ServiceDatabaseHandle) (ServiceStatus, error) {
+	service := ServiceStatus{}
+
+	displayNameBuffer := new(bytes.Buffer)
+	serviceNameBuffer := new(bytes.Buffer)
+
+	serviceNameOffset := uintptr(unsafe.Pointer(rawService.LpServiceName)) - (uintptr)(unsafe.Pointer(&servicesBuffer[0]))
+	displayNameOffset := uintptr(unsafe.Pointer(rawService.LpDisplayName)) - (uintptr)(unsafe.Pointer(&servicesBuffer[0]))
+
+	displayNameBuffer.Reset()
+	serviceNameBuffer.Reset()
+
+	if err := sys.UTF16ToUTF8Bytes(servicesBuffer[displayNameOffset:serviceNameOffset], displayNameBuffer); err != nil {
+		return service, err
+	}
+
+	if err := sys.UTF16ToUTF8Bytes(servicesBuffer[serviceNameOffset:lastOffset], serviceNameBuffer); err != nil {
+		return service, err
+	}
+
+	lastOffset = displayNameOffset
+
+	service.DisplayName = displayNameBuffer.String()
+	service.ServiceName = serviceNameBuffer.String()
+
+	var state string
+
+	if stat, ok := serviceStates[ServiceState(rawService.ServiceStatusProcess.DwCurrentState)]; ok {
+		state = stat
+	} else {
+		state = "Can not define State"
+	}
+	service.CurrentState = state
+
+	// Get detailed information
+	if err := getDetailedServiceInfo(handle, service.ServiceName, ServiceQueryConfig, &service); err != nil {
+		return service, err
+	}
+
+	//Get uptime for service
+	if ServiceState(rawService.ServiceStatusProcess.DwCurrentState) != ServiceStopped {
+		processUpTime, err := getServiceUptime(rawService.ServiceStatusProcess.DwProcessId)
+		if err != nil {
+			logp.Warn("Uptime for service %v is not available", service.ServiceName)
+		}
+		service.Uptime = processUpTime
+	}
+
+	return service, nil
 }
 
 // getServiceUptime returns the uptime for process
