@@ -15,6 +15,7 @@ import (
 
 	"github.com/elastic/beats/libbeat/common"
 	"github.com/elastic/beats/libbeat/logp"
+	"github.com/elastic/beats/metricbeat/helper"
 	"github.com/elastic/beats/winlogbeat/sys"
 )
 

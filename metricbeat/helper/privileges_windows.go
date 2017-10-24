@@ -2,6 +2,7 @@ package helper
 
 import (
 	"syscall"
+	"time"
 
 	"github.com/elastic/beats/libbeat/logp"
 	"github.com/elastic/gosigar"
@@ -84,13 +85,13 @@ func CheckAndEnableSeDebugPrivilege() error {
 }
 
 // GetServiceUptime returns the uptime for process
-func GetServiceUptime(processID uint32) (gosigar.ProcTime, error) {
+func GetServiceUptime(processID uint32) (time.Duration, error) {
 	var processCreationTime gosigar.ProcTime
 
 	err := processCreationTime.Get(int(processID))
 	if err != nil {
-		return processCreationTime, err
+		return time.Duration(processCreationTime.StartTime), err
 	}
 
-	return processCreationTime, nil
+	return time.Duration(processCreationTime.StartTime), nil
 }
