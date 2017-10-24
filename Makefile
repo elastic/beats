@@ -50,6 +50,7 @@ coverage-report:
 .PHONY: update
 update: notice
 	@$(foreach var,$(PROJECTS),$(MAKE) -C $(var) update || exit 1;)
+	@$(MAKE) -C deploy/kubernetes all
 
 .PHONY: clean
 clean:
