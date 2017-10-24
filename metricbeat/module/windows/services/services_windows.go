@@ -15,8 +15,8 @@ import (
 
 	"github.com/elastic/beats/libbeat/common"
 	"github.com/elastic/beats/libbeat/logp"
-	"github.com/elastic/beats/metricbeat/helper"
 	"github.com/elastic/beats/winlogbeat/sys"
+	"github.com/elastic/gosigar"
 )
 
 // Windows API calls
@@ -66,7 +66,7 @@ type ServiceStatus struct {
 	ServiceName  string
 	CurrentState string
 	StartType    string
-	Uptime       uint64
+	Uptime       time.Duration
 }
 
 type ServiceReader struct {
@@ -189,13 +189,11 @@ func getServiceStates(handle ServiceDatabaseHandle, state ServiceEnumState) ([]S
 
 					//Get uptime for service
 					if ServiceState(serviceTemp.ServiceStatusProcess.DwCurrentState) != ServiceStopped {
-						processTime, err := helper.GetServiceUptime(serviceTemp.ServiceStatusProcess.DwProcessId)
+						processUpTime, err := getServiceUptime(serviceTemp.ServiceStatusProcess.DwProcessId)
 						if err != nil {
 							logp.Warn("Uptime for service %v is not available", service.ServiceName)
-						} else {
-							tm := time.Now().UnixNano()
-							service.Uptime = uint64((tm / int64(time.Millisecond)) - int64(processTime.StartTime))
 						}
+						service.Uptime = processUpTime
 					}
 
 					services = append(services, service)
@@ -207,6 +205,21 @@ func getServiceStates(handle ServiceDatabaseHandle, state ServiceEnumState) ([]S
 	}
 
 	return nil, nil
+}
+
+// getServiceUptime returns the uptime for process
+func getServiceUptime(processID uint32) (time.Duration, error) {
+	var processCreationTime gosigar.ProcTime
+
+	err := processCreationTime.Get(int(processID))
+	if err != nil {
+		return time.Duration(processCreationTime.StartTime), err
+	}
+
+	tm := time.Now().UnixNano()
+	uptime := time.Duration((tm / int64(time.Millisecond)) - int64(processCreationTime.StartTime))
+
+	return uptime, nil
 }
 
 func getDetailedServiceInfo(handle ServiceDatabaseHandle, serviceName string, accessRight ServiceAccessRight, service *ServiceStatus) error {
