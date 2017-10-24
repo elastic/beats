@@ -29,7 +29,7 @@ To get the manifests just run:
 
 ["source", "sh", subs="attributes"]
 ------------------------------------------------
-curl -L -O https://artifacts.elastic.co/downloads/beats/kubernetes/filebeat-kubernetes-{version}.yaml
+curl -L -O https://raw.githubusercontent.com/elastic/beats/{doc-branch}/deploy/kubernetes/filebeat-kubernetes.yaml
 ------------------------------------------------
 
 [float]
@@ -58,7 +58,7 @@ To deploy Filebeat to Kubernetes just run:
 
 ["source", "sh", subs="attributes"]
 ------------------------------------------------
-kubectl deploy -f kubernetes/filebeat-kubernetes-{version}.yaml
+kubectl deploy -f kubernetes/filebeat-kubernetes.yaml
 ------------------------------------------------
 
 Then you should be able to check the status by running:
