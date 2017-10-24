@@ -7,11 +7,13 @@
   },
   "windows": {
     "services": {
+      "uptime": {
+        "ms": 0
+      },
+      "display_name": "AllJoyn-Routerdienst",
       "service_name": "AJRouter",
       "state": "ServiceStopped",
-      "start_type": "ServiceDemandStart",
-      "uptime": 0,
-      "display_name": "AllJoyn-Routerdienst"
+      "start_type": "ServiceDemandStart"
     }
   },
   "metricset": {
