@@ -28,14 +28,7 @@ import (
 
 var (
 	sizeofEnumServiceStatusProcess = (int)(unsafe.Sizeof(EnumServiceStatusProcess{}))
-	sizeofQueryServiceConfig       = (int)(unsafe.Sizeof(QueryServiceConfig{}))
 )
-
-type enumServiceStatusProcess struct {
-	LpServiceName        uintptr
-	LpDisplayName        uintptr
-	ServiceStatusProcess ServiceStatusProcess
-}
 
 type ServiceDatabaseHandle uintptr
 
