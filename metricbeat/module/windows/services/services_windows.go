@@ -292,7 +292,6 @@ func CloseServiceHandle(handle ServiceHandle) error {
 }
 
 func NewServiceReader() (*ServiceReader, error) {
-
 	hndl, err := OpenSCManager("", "", ScManagerEnumerateService|ScManagerConnect)
 
 	if err != nil {
@@ -325,7 +324,6 @@ func NewServiceReader() (*ServiceReader, error) {
 }
 
 func (reader *ServiceReader) Read() ([]common.MapStr, error) {
-
 	services, err := getServiceStates(reader.handle, reader.state)
 
 	if err != nil {
