@@ -270,8 +270,17 @@ func (h *Harvester) Run() error {
 				jsonFields = f.(common.MapStr)
 			}
 
+			data.Event = beat.Event{
+				Timestamp: message.Ts,
+			}
+
 			if h.config.JSON != nil && len(jsonFields) > 0 {
-				reader.MergeJSONFields(fields, jsonFields, &text, *h.config.JSON)
+				ts := reader.MergeJSONFields(fields, jsonFields, &text, *h.config.JSON)
+				if !ts.IsZero() {
+					// there was a `@timestamp` key in the event, so overwrite
+					// the resulting timestamp
+					data.Event.Timestamp = ts
+				}
 			} else if &text != nil {
 				if fields == nil {
 					fields = common.MapStr{}
@@ -279,10 +288,7 @@ func (h *Harvester) Run() error {
 				fields["message"] = text
 			}
 
-			data.Event = beat.Event{
-				Timestamp: message.Ts,
-				Fields:    fields,
-			}
+			data.Event.Fields = fields
 		}
 
 		// Always send event to update state, also if lines was skipped
