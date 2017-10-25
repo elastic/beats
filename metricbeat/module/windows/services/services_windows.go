@@ -210,7 +210,7 @@ func getServiceInformation(rawService *EnumServiceStatusProcess, servicesBuffer 
 		if err != nil {
 			logp.Warn("Uptime for service %v is not available", service.ServiceName)
 		}
-		service.Uptime = processUpTime
+		service.Uptime = processUpTime / time.Millisecond
 	}
 
 	return service, nil
@@ -225,7 +225,7 @@ func getServiceUptime(processID uint32) (time.Duration, error) {
 		return time.Duration(processCreationTime.StartTime), err
 	}
 
-	uptime := time.Since(time.Unix(0, int64(processCreationTime.StartTime)*int64(time.Millisecond))) / time.Millisecond
+	uptime := time.Since(time.Unix(0, int64(processCreationTime.StartTime)*int64(time.Millisecond)))
 
 	return uptime, nil
 }
