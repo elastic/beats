@@ -12,6 +12,7 @@ type logstashConfig struct {
 	Port             int                   `config:"port"`
 	LoadBalance      bool                  `config:"loadbalance"`
 	BulkMaxSize      int                   `config:"bulk_max_size"`
+	SlowStart        bool                  `config:"slow_start"`
 	Timeout          time.Duration         `config:"timeout"`
 	Pipelining       int                   `config:"pipelining"        validate:"min=0"`
 	CompressionLevel int                   `config:"compression_level" validate:"min=0, max=9"`
@@ -25,6 +26,7 @@ var (
 		Port:             10200,
 		LoadBalance:      false,
 		BulkMaxSize:      2048,
+		SlowStart:        false,
 		CompressionLevel: 3,
 		Timeout:          30 * time.Second,
 		MaxRetries:       3,

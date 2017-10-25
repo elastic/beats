@@ -14,12 +14,14 @@ import (
 type asyncClient struct {
 	*transport.Client
 	client *v2.AsyncClient
-	win    window
+	host   string
+	win    *window
 
 	connect func() error
 }
 
 type msgRef struct {
+	client    *asyncClient
 	count     int32
 	batch     []outputs.Data
 	err       error
@@ -30,17 +32,24 @@ type msgRef struct {
 
 func newAsyncLumberjackClient(
 	conn *transport.Client,
-	queueSize int,
-	compressLevel int,
-	maxWindowSize int,
-	timeout time.Duration,
-	beat string,
+	addr string,
+	config *logstashConfig,
 ) (*asyncClient, error) {
-	c := &asyncClient{}
-	c.Client = conn
-	c.win.init(defaultStartMaxWindowSize, maxWindowSize)
+	c := &asyncClient{
+		Client: conn,
+		host:   addr,
+	}
 
-	enc, err := makeLogstashEventEncoder(beat)
+	if config.SlowStart {
+		maxWindowSize := config.BulkMaxSize
+		c.win = newWindower(defaultStartMaxWindowSize, maxWindowSize)
+	}
+
+	queueSize := config.Pipelining - 1
+	timeout := config.Timeout
+	compressLevel := config.CompressionLevel
+
+	enc, err := makeLogstashEventEncoder(config.Index)
 	if err != nil {
 		return nil, err
 	}
@@ -60,12 +69,12 @@ func newAsyncLumberjackClient(
 }
 
 func (c *asyncClient) Connect(timeout time.Duration) error {
-	logp.Debug("logstash", "connect")
+	logp.Debug("logstash", "connect to logstash host %v", c.host)
 	return c.connect()
 }
 
 func (c *asyncClient) Close() error {
-	logp.Debug("logstash", "close connection")
+	logp.Debug("logstash", "close connection to logstash host %v", c.host)
 	if c.client != nil {
 		err := c.client.Close()
 		c.client = nil
@@ -99,20 +108,31 @@ func (c *asyncClient) AsyncPublishEvents(
 	}
 
 	ref := &msgRef{
+		client:    c,
 		count:     1,
 		batch:     data,
 		batchSize: len(data),
-		win:       &c.win,
+		win:       c.win,
 		cb:        cb,
 		err:       nil,
 	}
 	defer ref.dec()
 
 	for len(data) > 0 {
-		n, err := c.publishWindowed(ref, data)
+		var (
+			n   int
+			err error
+		)
 
-		debug("%v events out of %v events sent to logstash. Continue sending",
-			n, len(data))
+		if c.win == nil {
+			n = len(data)
+			err = c.sendEvents(ref, data)
+		} else {
+			n, err = c.publishWindowed(ref, data)
+		}
+
+		debug("%v events out of %v events sent to logstash host %s. Continue sending",
+			n, len(data), c.host)
 
 		data = data[n:]
 		if err != nil {
@@ -130,8 +150,8 @@ func (c *asyncClient) publishWindowed(
 ) (int, error) {
 	batchSize := len(data)
 	windowSize := c.win.get()
-	debug("Try to publish %v events to logstash with window size %v",
-		batchSize, windowSize)
+	debug("Try to publish %v events to logstash host %v with window size %v",
+		batchSize, c.host, windowSize)
 
 	// prepare message payload
 	if batchSize > windowSize {
@@ -166,15 +186,21 @@ func (r *msgRef) callback(seq uint32, err error) {
 func (r *msgRef) done(n uint32) {
 	ackedEvents.Add(int64(n))
 	r.batch = r.batch[n:]
-	r.win.tryGrowWindow(r.batchSize)
+	if r.win != nil {
+		r.win.tryGrowWindow(r.batchSize)
+	}
 	r.dec()
 }
 
 func (r *msgRef) fail(n uint32, err error) {
 	ackedEvents.Add(int64(n))
-	r.err = err
+	if r.err == nil {
+		r.err = err
+	}
 	r.batch = r.batch[n:]
-	r.win.shrinkWindow()
+	if r.win != nil {
+		r.win.shrinkWindow()
+	}
 	r.dec()
 }
 
@@ -187,9 +213,10 @@ func (r *msgRef) dec() {
 	err := r.err
 	if err != nil {
 		eventsNotAcked.Add(int64(len(r.batch)))
-		logp.Err("Failed to publish events caused by: %v", err)
+		logp.Err("Failed to publish events (host: %v) caused by: %v", r.client.host, err)
 		r.cb(r.batch, err)
-	} else {
-		r.cb(nil, nil)
+		return
 	}
+
+	r.cb(nil, nil)
 }

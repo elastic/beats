@@ -11,6 +11,12 @@ type window struct {
 	maxWindowSize   int
 }
 
+func newWindower(start, max int) *window {
+	w := &window{}
+	w.init(start, max)
+	return w
+}
+
 func (w *window) init(start, max int) {
 	*w = window{
 		windowSize:    int32(start),
