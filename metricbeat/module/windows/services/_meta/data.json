@@ -5,11 +5,12 @@
     "type": "doc",
     "version": "1.2.3"
   },
+  "beat": {
+    "name": "host.example.com",
+    "hostname": "host.example.com"
+  },
   "windows": {
     "services": {
-      "uptime": {
-        "ms": 0
-      },
       "display_name": "AllJoyn-Routerdienst",
       "service_name": "AJRouter",
       "state": "ServiceStopped",
@@ -20,9 +21,5 @@
     "module": "windows",
     "name": "services",
     "rtt": 115
-  },
-  "beat": {
-    "name": "host.example.com",
-    "hostname": "host.example.com"
   }
 }
