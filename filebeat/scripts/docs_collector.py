@@ -48,7 +48,7 @@ This file is generated! See scripts/docs_collector.py
 [float]
 === Fields
 
-For a description of each field in the metricset, see the
+For a description of each field in the module, see the
 <<exported-fields-""" + module + """,exported fields>> section.
 
 """

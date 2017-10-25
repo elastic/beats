@@ -5,7 +5,7 @@ defaults)
 
 * Makes sure each multiline log event gets sent as a single event
 
-* Parses and processes the log lines, shaping the data into a structure suitable
+* Uses ingest node to parse and process the log lines, shaping the data into a structure suitable
 for visualizing in Kibana
 
 * Deploys dashboards for visualizing the log data

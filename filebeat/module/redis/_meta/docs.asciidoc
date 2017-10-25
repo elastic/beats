@@ -68,9 +68,6 @@ To specify the same settings at the command line, you use:
 -----
 
 
-// REVIEWERS: Please confirm that the slowlog examples are correct. Couldn't
-// test the slowlog examples 
-
 The command in the example assumes that you have already enabled the +{modulename}+ module. 
 
 //set the fileset name used in the included example

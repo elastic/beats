@@ -73,9 +73,6 @@ To specify the same settings at the command line, you use:
 -----
 
 
-// REVIEWERS: Please confirm that the slowlog examples are correct. Couldn't
-// test the slowlog examples 
-
 The command in the example assumes that you have already enabled the +{modulename}+ module. 
 
 //set the fileset name used in the included example
@@ -106,6 +103,6 @@ The password to use to connect to Redis, in case Redis authentication is enabled
 [float]
 === Fields
 
-For a description of each field in the metricset, see the
+For a description of each field in the module, see the
 <<exported-fields-redis,exported fields>> section.
 

@@ -78,6 +78,6 @@ include::../include/var-paths.asciidoc[]
 [float]
 === Fields
 
-For a description of each field in the metricset, see the
+For a description of each field in the module, see the
 <<exported-fields-apache2,exported fields>> section.
 
