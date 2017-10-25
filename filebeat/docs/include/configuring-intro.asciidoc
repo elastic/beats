@@ -1,0 +1,7 @@
+[float]
+[id="configuring-{modulename}-module"]
+=== Configure the module
+
+You can further refine the behavior of the +{modulename}+ module by specifying
+<<{modulename}-settings,variable settings>> in the
++modules.d/{modulename}.yml+ file, or overriding settings at the command line.
