@@ -24,11 +24,11 @@
       type: keyword
       description: >
         The start type of the service.
-        The possible values are `ServiceAutoStart`, `ServiceBootStart`, `ServiceDemandStart`, `ServiceDisabled` and `ServiceSystemStart`.
+        The possible values are `ServiceAutoStart`, `ServiceBootStart`, `ServiceDemandStart`, `ServiceDisabled`, and `ServiceSystemStart`.
 
     - name: state
       type: keyword
       description: >
         The actual state of the service.
-        The possible values are `ServiceContinuePending`, `ServicePausePending`, `ServicePaused`, `ServiceRuning`,	`ServiceStartPending`,
-        `ServiceStopPending` and `ServiceStopped`.
+        The possible values are `ServiceContinuePending`, `ServicePausePending`, `ServicePaused`, `ServiceRuning`, `ServiceStartPending`,
+        `ServiceStopPending`, and `ServiceStopped`.
