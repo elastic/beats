@@ -5,9 +5,10 @@ import (
 
 	"github.com/spf13/pflag"
 
-	"github.com/elastic/beats/filebeat/beater"
-
 	cmd "github.com/elastic/beats/libbeat/cmd"
+
+	"github.com/elastic/beats/filebeat/beater"
+	"github.com/elastic/beats/filebeat/cmd/multiline"
 )
 
 // Name of this beat
@@ -24,6 +25,7 @@ func init() {
 	RootCmd = cmd.GenRootCmdWithRunFlags(Name, "", beater.New, runFlags)
 	RootCmd.PersistentFlags().AddGoFlag(flag.CommandLine.Lookup("M"))
 	RootCmd.TestCmd.Flags().AddGoFlag(flag.CommandLine.Lookup("modules"))
+	RootCmd.TestCmd.AddCommand(multiline.Command)
 	RootCmd.SetupCmd.Flags().AddGoFlag(flag.CommandLine.Lookup("modules"))
 	RootCmd.AddCommand(cmd.GenModulesCmd(Name, "", buildModulesManager))
 }
