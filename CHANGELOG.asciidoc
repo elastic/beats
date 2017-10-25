@@ -34,6 +34,7 @@ https://github.com/elastic/beats/compare/v6.0.0-rc1...master[Check the HEAD diff
 
 - Fix data race accessing watched containers. {issue}5147[5147]
 - Do not require template if index change and template disabled {pull}5319[5319]
+- Fix missing ACK in redis output. {issue}5404[5404]
 
 *Auditbeat*
 
