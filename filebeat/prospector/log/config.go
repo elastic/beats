@@ -2,6 +2,7 @@ package log
 
 import (
 	"fmt"
+	"path/filepath"
 	"time"
 
 	"github.com/dustin/go-humanize"
@@ -33,6 +34,7 @@ var (
 		TailFiles:      false,
 		ScanSort:       "",
 		ScanOrder:      "asc",
+		RecursiveGlob:  true,
 
 		// Harvester
 		BufferSize: 16 * humanize.KiByte,
@@ -168,14 +170,15 @@ func (c *config) Validate() error {
 	return nil
 }
 
-func (c *config) resolvePaths() error {
-	var paths []string
+// resolveRecursiveGlobs expands `**` from the globs in multiple patterns
+func (c *config) resolveRecursiveGlobs() error {
 	if !c.RecursiveGlob {
 		logp.Debug("prospector", "recursive glob disabled")
-		paths = c.Paths
-	} else {
-		logp.Debug("prospector", "recursive glob enabled")
+		return nil
 	}
+
+	logp.Debug("prospector", "recursive glob enabled")
+	var paths []string
 	for _, path := range c.Paths {
 		patterns, err := file.GlobPatterns(path, recursiveGlobDepth)
 		if err != nil {
@@ -185,6 +188,20 @@ func (c *config) resolvePaths() error {
 			logp.Debug("prospector", "%q expanded to %#v", path, patterns)
 		}
 		paths = append(paths, patterns...)
+	}
+	c.Paths = paths
+	return nil
+}
+
+// makeGlobsAbsolute calls `filepath.Abs` on all the globs from config
+func (c *config) makeGlobsAbsolute() error {
+	var paths []string
+	for _, path := range c.Paths {
+		pathAbs, err := filepath.Abs(path)
+		if err != nil {
+			return fmt.Errorf("Error getting absolute path for %s: %v", path, err)
+		}
+		paths = append(paths, pathAbs)
 	}
 	c.Paths = paths
 	return nil

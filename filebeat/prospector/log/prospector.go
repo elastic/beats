@@ -85,9 +85,11 @@ func NewProspector(
 	if err := cfg.Unpack(&p.config); err != nil {
 		return nil, err
 	}
-	if err := p.config.resolvePaths(); err != nil {
-		logp.Err("Failed to resolve paths in config: %+v", err)
-		return nil, err
+	if err := p.config.resolveRecursiveGlobs(); err != nil {
+		return nil, fmt.Errorf("Failed to resolve recursive globs in config: %+v", err)
+	}
+	if err := p.config.makeGlobsAbsolute(); err != nil {
+		return nil, fmt.Errorf("Failed to make globs absolute: %+v", err)
 	}
 
 	// Create empty harvester to check if configs are fine
@@ -115,7 +117,7 @@ func NewProspector(
 // It goes through all states coming from the registry. Only the states which match the glob patterns of
 // the prospector will be loaded and updated. All other states will not be touched.
 func (p *Prospector) loadStates(states []file.State) error {
-	logp.Debug("prospector", "exclude_files: %s", p.config.ExcludeFiles)
+	logp.Debug("prospector", "exclude_files: %s. Number of stats: %d", p.config.ExcludeFiles, len(states))
 
 	for _, state := range states {
 		// Check if state source belongs to this prospector. If yes, update the state.
