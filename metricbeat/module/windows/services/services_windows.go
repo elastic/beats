@@ -302,22 +302,6 @@ func NewServiceReader() (*ServiceReader, error) {
 		handle: hndl,
 	}
 
-	//var state ServiceEnumState
-
-	// configState := strings.ToLower(config.State)
-	// switch configState {
-	// case "all", "":
-	// 	state = ServiceStateAll
-	// case "active":
-	// 	state = ServiceActive
-	// case "inactive":
-	// 	state = ServiceInActive
-	// default:
-	// 	err := fmt.Errorf("state '%s' are not valid", configState)
-	// 	r.Close()
-	// 	return nil, errors.Wrap(err, "initialization failed")
-	// }
-
 	r.state = ServiceStateAll
 
 	return r, nil
