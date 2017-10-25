@@ -11313,11 +11313,52 @@ beta[] Module for Windows
 
 
 [float]
-=== `windows.services.status`
+== uptime fields
+
+`uptime` contains the service uptime metric.
+
+
+
+[float]
+=== `windows.services.uptime.ms`
+
+type: long
+
+format: duration
+
+The service uptime in milliseconds.
+
+
+[float]
+=== `windows.services.service_name`
 
 type: keyword
 
-Which kind of service status to read. Possible values are `all`, `active` and `inactive`.
+The service name.
+
+
+[float]
+=== `windows.services.display_name`
+
+type: keyword
+
+The display name of the service.
+
+
+[float]
+=== `windows.services.start_type`
+
+type: keyword
+
+The start type of the service.
+
+
+[float]
+=== `windows.services.state`
+
+type: keyword
+
+The actual state of the service.
 
 
 [[exported-fields-zookeeper]]
