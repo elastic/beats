@@ -225,8 +225,7 @@ func getServiceUptime(processID uint32) (time.Duration, error) {
 		return time.Duration(processCreationTime.StartTime), err
 	}
 
-	tm := time.Now().UnixNano()
-	uptime := time.Duration((tm / int64(time.Millisecond)) - int64(processCreationTime.StartTime))
+	uptime := time.Since(time.Unix(0, int64(processCreationTime.StartTime)*int64(time.Millisecond))) / time.Millisecond
 
 	return uptime, nil
 }
