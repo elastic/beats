@@ -10,13 +10,13 @@ import (
 	"unicode/utf16"
 	"unsafe"
 
+	"github.com/elastic/gosigar"
 	"github.com/pkg/errors"
 	"golang.org/x/sys/windows"
 
 	"github.com/elastic/beats/libbeat/common"
 	"github.com/elastic/beats/libbeat/logp"
 	"github.com/elastic/beats/winlogbeat/sys"
-	"github.com/elastic/gosigar"
 )
 
 // Windows API calls
