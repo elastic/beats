@@ -390,7 +390,7 @@ func TestAddTag(t *testing.T) {
 				"tags": []string{"json"},
 			},
 		},
-		// Existing tags, appends
+		// Existing tags is a []string, appends
 		{
 			Event: MapStr{
 				"tags": []string{"json"},
@@ -400,7 +400,17 @@ func TestAddTag(t *testing.T) {
 				"tags": []string{"json", "docker"},
 			},
 		},
-		// Existing tags is not a []string
+		// Existing tags is a []interface{}, appends
+		{
+			Event: MapStr{
+				"tags": []interface{}{"json"},
+			},
+			Tags: []string{"docker"},
+			Output: MapStr{
+				"tags": []interface{}{"json", "docker"},
+			},
+		},
+		// Existing tags is not a []string or []interface{}
 		{
 			Event: MapStr{
 				"tags": "not a slice",
