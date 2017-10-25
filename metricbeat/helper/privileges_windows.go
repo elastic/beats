@@ -43,10 +43,11 @@ func enableSeDebugPrivilege() error {
 	return nil
 }
 
-func CheckAndEnableSeDebugPrivilege() {
+func CheckAndEnableSeDebugPrivilege() (err error) {
 	once.Do(func() {
-		checkAndEnableSeDebugPrivilege()
+		err = checkAndEnableSeDebugPrivilege()
 	})
+	return err
 }
 
 // CheckAndEnableSeDebugPrivilege checks if the process's token has the
