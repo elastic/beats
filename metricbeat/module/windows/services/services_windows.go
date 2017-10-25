@@ -325,7 +325,7 @@ func (reader *ServiceReader) Read() ([]common.MapStr, error) {
 		}
 
 		if service.Uptime > 0 {
-			ev.Put("uptime", map[string]interface{}{"ms": service.Uptime})
+			ev.Put("uptime.ms", service.Uptime)
 		}
 
 		result = append(result, ev)
