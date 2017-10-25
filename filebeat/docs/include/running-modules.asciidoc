@@ -1,0 +1,77 @@
+[float]
+[id="running-{modulename}-modules"]
+=== Set up and run the module
+
+IMPORTANT: If you’ve secured Elasticsearch and Kibana, you need to configure the
+`username` and `password` options in the Elasticsearch output before setting up
+and running the module. See
+<<elasticsearch-output,Configure the Elasticsearch output>>.
+
+Before doing these steps, verify that Elasticsearch and Kibana are running and
+that Elasticsearch is ready to receive data from {beatname_uc}.
+
+To set up and run the module:
+
+. Enable the module:
++
+["source","sh",subs="attributes"]
+----------------------------------------------------------------------
+./{beatname_lc} modules enable {modulename}
+----------------------------------------------------------------------
++
+The <<modules-command,`modules enable`>> command enables the +{modulename}+
+config defined in the `modules.d` directory. See
+<<configuration-{beatname_lc}-modules>> for other ways to enable modules.
++
+To see a list of enabled and disabled modules, run:
++
+["source","sh",subs="attributes"]
+-----
+./{beatname_lc} modules list
+-----
+
+
+. Set up the initial environment:
++
+["source","sh",subs="attributes"]
+----------------------------------------------------------------------
+./{beatname_lc} setup -e
+----------------------------------------------------------------------
++
+The <<setup-command,`setup`>> command loads the recommended index template for
+writing to Elasticsearch and deploys the sample dashboards for visualizing the
+data in Kibana. This is a one-time setup step. 
++
+The `-e` flag is optional and sends output to standard error instead of syslog.
+
+. Run {beatname_uc}:
++
+["source","sh",subs="attributes"]
+-----
+./{beatname_lc} -e
+-----
++
+If the module is configured correctly, you'll see
+`INFO Harvester started` messages for each file specified in the config.
++
+If your logs aren't in the default location, see
+<<configuring-{modulename}-module>>, then run {beatname_uc} after you've
+configured the module.
++
+NOTE: Depending on how you've installed Filebeat, you might see errors
+related to file ownership or permissions when you try to run Filebeat modules.
+See {libbeat}/config-file-permissions.html[Config File Ownership and Permissions]
+in the _Beats Platform Reference_ if you encounter errors related to file
+ownership or permissions. 
+
+. Explore your data in Kibana:
+.. Open your browser and navigate to the *Dashboard* overview in Kibana:
+http://localhost:5601/app/kibana#/dashboards[http://localhost:5601/app/kibana#/dashboards].
+Replace `localhost` with the name of the Kibana host.
+.. If security is enabled, log in with the Kibana username and password that you
+used when you set up security.
+.. Enter *{modulename}* in the search box, then open a dashboard and explore
+the visualizations for your parsed logs.
++
+TIP: If you don’t see data in Kibana, try changing the date range to a larger
+range. By default, Kibana shows the last 15 minutes.
