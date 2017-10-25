@@ -110,7 +110,7 @@ check: python-env ## @build Checks project and source code if everything is acco
 
 .PHONY: fmt
 fmt: python-env ## @build Runs `goimports -l -w` and `autopep8`on the project's source code, modifying any files that do not match its style.
-	@goimports -local ${GOIMPORTS_LOCAL_PREFIX} -l -w ${GOFILES_NOVENDOR}
+	@goimports -l -w ${GOFILES_NOVENDOR}
 	@${FIND} -name *.py -exec ${PYTHON_ENV}/bin/autopep8 --in-place --max-line-length 120  {} \;
 
 .PHONY: lint
