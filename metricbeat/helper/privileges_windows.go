@@ -1,12 +1,15 @@
 package helper
 
 import (
+	"sync"
 	"syscall"
 
 	"github.com/elastic/beats/libbeat/logp"
 	"github.com/elastic/gosigar/sys/windows"
 	"github.com/pkg/errors"
 )
+
+var once sync.Once
 
 // errMissingSeDebugPrivilege indicates that the SeDebugPrivilege is not
 // present in the process's token. This is distinct from disabled. The token
@@ -39,9 +42,15 @@ func enableSeDebugPrivilege() error {
 	return nil
 }
 
+func CheckAndEnableSeDebugPrivilege() {
+	once.Do(func() {
+		checkAndEnableSeDebugPrivilege()
+	})
+}
+
 // CheckAndEnableSeDebugPrivilege checks if the process's token has the
 // SeDebugPrivilege and enables it if it is disabled.
-func CheckAndEnableSeDebugPrivilege() error {
+func checkAndEnableSeDebugPrivilege() error {
 	info, err := windows.GetDebugInfo()
 	if err != nil {
 		return errors.Wrap(err, "GetDebugInfo failed")
