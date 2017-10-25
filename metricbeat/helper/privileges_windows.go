@@ -43,14 +43,15 @@ func enableSeDebugPrivilege() error {
 	return nil
 }
 
-func CheckAndEnableSeDebugPrivilege() (err error) {
+func CheckAndEnableSeDebugPrivilege() error {
+	var err error
 	once.Do(func() {
 		err = checkAndEnableSeDebugPrivilege()
 	})
 	return err
 }
 
-// CheckAndEnableSeDebugPrivilege checks if the process's token has the
+// checkAndEnableSeDebugPrivilege checks if the process's token has the
 // SeDebugPrivilege and enables it if it is disabled.
 func checkAndEnableSeDebugPrivilege() error {
 	info, err := windows.GetDebugInfo()
