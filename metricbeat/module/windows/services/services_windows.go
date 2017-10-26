@@ -135,7 +135,7 @@ func getServiceStates(handle ServiceDatabaseHandle, state ServiceEnumState) ([]S
 		}
 		bufSize += bytesNeeded
 		servicesBuffer := make([]byte, bytesNeeded)
-		lastOffset = uintptr(len(servicesBuffer))
+		lastOffset = uintptr(len(servicesBuffer)) - 1
 
 		// This loop should not repeat more then two times
 		for {
@@ -184,8 +184,6 @@ func getServiceInformation(rawService *EnumServiceStatusProcess, servicesBuffer 
 	if err := sys.UTF16ToUTF8Bytes(servicesBuffer[serviceNameOffset:lastOffset], serviceNameBuffer); err != nil {
 		return service, err
 	}
-
-	lastOffset = displayNameOffset
 
 	service.DisplayName = displayNameBuffer.String()
 	service.ServiceName = serviceNameBuffer.String()
@@ -241,9 +239,7 @@ func getDetailedServiceInfo(handle ServiceDatabaseHandle, serviceName string, ac
 
 	if err := _QueryServiceConfig(serviceHandle, nil, serviceBufSize, &serviceBytesNeeded); err != nil {
 		if ServiceErrno(err.(syscall.Errno)) != SERVICE_ERROR_INSUFFICIENT_BUFFER {
-			if err := CloseServiceHandle(serviceHandle); err != nil {
-				return err
-			}
+			err := CloseServiceHandle(serviceHandle)
 			return err
 		}
 		serviceBufSize += serviceBytesNeeded
@@ -252,9 +248,7 @@ func getDetailedServiceInfo(handle ServiceDatabaseHandle, serviceName string, ac
 		for {
 			if err := _QueryServiceConfig(serviceHandle, &buffer[0], serviceBufSize, &serviceBytesNeeded); err != nil {
 				if ServiceErrno(err.(syscall.Errno)) != SERVICE_ERROR_INSUFFICIENT_BUFFER {
-					if err := CloseServiceHandle(serviceHandle); err != nil {
-						return err
-					}
+					err := CloseServiceHandle(serviceHandle)
 					return err
 				}
 				serviceBufSize += serviceBytesNeeded
@@ -325,7 +319,9 @@ func (reader *ServiceReader) Read() ([]common.MapStr, error) {
 		}
 
 		if service.Uptime > 0 {
-			ev.Put("uptime.ms", service.Uptime)
+			if _, err = ev.Put("uptime.ms", service.Uptime); err != nil {
+				return nil, err
+			}
 		}
 
 		result = append(result, ev)
