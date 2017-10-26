@@ -19,11 +19,12 @@ func eventsMapping(containersList []dc.APIContainers) []common.MapStr {
 
 func eventMapping(cont *dc.APIContainers) common.MapStr {
 	event := common.MapStr{
-		"created": common.Time(time.Unix(cont.Created, 0)),
-		"id":      cont.ID,
-		"name":    docker.ExtractContainerName(cont.Names),
-		"command": cont.Command,
-		"image":   cont.Image,
+		"created":      common.Time(time.Unix(cont.Created, 0)),
+		"id":           cont.ID,
+		"name":         docker.ExtractContainerName(cont.Names),
+		"command":      cont.Command,
+		"image":        cont.Image,
+		"ip_addresses": extractIPAddresses(cont.Networks),
 		"size": common.MapStr{
 			"root_fs": cont.SizeRootFs,
 			"rw":      cont.SizeRw,
@@ -38,4 +39,12 @@ func eventMapping(cont *dc.APIContainers) common.MapStr {
 	}
 
 	return event
+}
+
+func extractIPAddresses(networks dc.NetworkList) []string {
+	ipAddresses := make([]string, 0, len(networks.Networks))
+	for _, network := range networks.Networks {
+		ipAddresses = append(ipAddresses, network.IPAddress)
+	}
+	return ipAddresses
 }

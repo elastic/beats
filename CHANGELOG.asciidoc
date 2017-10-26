@@ -103,6 +103,7 @@ https://github.com/elastic/beats/compare/v6.0.0-beta2...master[Check the HEAD di
 - Auto-select a hostname (based on the host on which the Beat is running) in the Host Overview dashboard. {pull}5340[5340]
 - Add Kubernetes manifests to deploy Metricbeat. {pull}5349[5349]
 - Add etcd module. {issue}4970[4970]
+- Add ip address of docker containers to event. {pull}5379[5379]
 
 *Packetbeat*
 
