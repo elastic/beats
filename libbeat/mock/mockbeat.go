@@ -14,8 +14,7 @@ var Version = "9.9.9"
 var Name = "mockbeat"
 
 type Mockbeat struct {
-	done   chan struct{}
-	client beat.Client
+	done chan struct{}
 }
 
 // Creates beater
@@ -28,15 +27,13 @@ func New(b *beat.Beat, _ *common.Config) (beat.Beater, error) {
 /// *** Beater interface methods ***///
 
 func (mb *Mockbeat) Run(b *beat.Beat) error {
-	var err error
-
-	mb.client, err = b.Publisher.Connect()
+	client, err := b.Publisher.Connect()
 	if err != nil {
 		return err
 	}
 
 	// Wait until mockbeat is done
-	mb.client.Publish(beat.Event{
+	go client.Publish(beat.Event{
 		Timestamp: time.Now(),
 		Fields: common.MapStr{
 			"type":    "mock",
@@ -50,6 +47,5 @@ func (mb *Mockbeat) Run(b *beat.Beat) error {
 func (mb *Mockbeat) Stop() {
 	logp.Info("Mockbeat Stop")
 
-	mb.client.Close()
 	close(mb.done)
 }

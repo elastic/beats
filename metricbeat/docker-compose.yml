@@ -17,6 +17,7 @@ services:
       - ./module/couchbase/_meta/env
       - ./module/dropwizard/_meta/env
       - ./module/elasticsearch/_meta/env
+      - ./module/etcd/_meta/env
       - ./module/haproxy/_meta/env
       - ./module/http/_meta/env
       - ./module/jolokia/_meta/env
@@ -58,6 +59,9 @@ services:
       - "transport.host=127.0.0.1"
       - "http.host=0.0.0.0"
       - "xpack.security.enabled=false"
+
+  etcd:
+    build: ./module/etcd/_meta
 
   haproxy:
     build: ./module/haproxy/_meta

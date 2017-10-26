@@ -9,16 +9,32 @@
             "name": "elasticsearch"
         },
         "node": {
-            "jvm": {
-                "memory": {
-                    "heap_init": {
-                        "bytes": 536870912
+            "name": "8zgOwJ24TMamDDH9amWINQ",
+            "version": "6.0.0-alpha1",
+            "jvm":{
+                "version":"1.8.0_60",
+                "memory":{
+                    "heap":{
+                        "init":{
+                            "bytes":268435456
+                        },
+                        "max":{
+                            "bytes":1038876672
+                        }
+                    },
+                    "nonheap":{
+                        "init":{
+                            "bytes":2555904
+                        },
+                        "max":{
+                            "bytes":0
+                        }
                     }
                 },
-                "version": "1.8.0_121"
-            },
-            "name": "8zgOwJ24TMamDDH9amWINQ",
-            "version": "6.0.0-alpha1"
+                "process":{
+                    "mlockall":true
+                }
+            }
         }
     },
     "metricset": {

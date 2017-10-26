@@ -50,10 +50,19 @@
   - /etc
   {{ end -}}
   {{ if .reference }}
-  # Limit on the size of files that will be hashed. Default is 100 MiB.
+  # Scan over the configured file paths at startup and send events for new or
+  # modified files since the last time Auditbeat was running.
+  file.scan_at_start: true
+
+  # Average scan rate. This throttles the amount of CPU and I/O that Auditbeat
+  # consumes at startup while scanning. Default is "50 MiB".
+  file.scan_rate_per_sec: 50 MiB
+
+  # Limit on the size of files that will be hashed. Default is "100 MiB".
   file.max_file_size: 100 MiB
 
   # Hash types to compute when the file changes. Supported types are md5, sha1,
-  # sha224, sha256, sha384, sha512, sha512_224, and sha512_256. Default is sha1.
+  # sha224, sha256, sha384, sha512, sha512_224, sha512_256, sha3_224, sha3_256,
+  # sha3_384 and sha3_512. Default is sha1.
   file.hash_types: [sha1]
   {{- end }}

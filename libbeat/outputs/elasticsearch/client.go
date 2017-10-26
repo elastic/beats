@@ -713,6 +713,14 @@ func (conn *Connection) execHTTPRequest(req *http.Request) (int, []byte, error) 
 		req.Header.Add(name, value)
 	}
 
+	// The stlib will override the value in the header based on the configured `Host`
+	// on the request which default to the current machine.
+	//
+	// We use the normalized key header to retrieve the user configured value and assign it to the host.
+	if host := req.Header.Get("Host"); host != "" {
+		req.Host = host
+	}
+
 	resp, err := conn.http.Do(req)
 	if err != nil {
 		return 0, nil, err

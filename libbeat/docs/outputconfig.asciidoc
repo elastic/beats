@@ -976,6 +976,7 @@ output.file:
   filename: {beatname_lc}
   #rotate_every_kb: 10000
   #number_of_files: 7
+  #permissions: 0600
 ------------------------------------------------------------------------------
 
 ==== Configuration options
@@ -1010,6 +1011,10 @@ rotated. The default value is 10240 KB.
 The maximum number of files to save under <<path,`path`>>. When this number of files is reached, the
 oldest file is deleted, and the rest of the files are shifted from last to first. The default
 is 7 files.
+
+===== `permissions`
+
+Permissions to use for file creation. The default is 0600.
 
 ===== `codec`
 

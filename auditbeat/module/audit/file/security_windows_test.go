@@ -22,7 +22,7 @@ func TestGetSecurityInfo(t *testing.T) {
 	// Get the file owner.
 	var securityID *syscall.SID
 	var securityDescriptor *SecurityDescriptor
-	if err := GetSecurityInfo(syscall.Handle(file.Fd()), FileObject,
+	if err = GetSecurityInfo(syscall.Handle(file.Fd()), FileObject,
 		OwnerSecurityInformation, &securityID, nil, nil, nil, &securityDescriptor); err != nil {
 		t.Fatal(err)
 	}

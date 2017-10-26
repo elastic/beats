@@ -1,5 +1,5 @@
 {
-    "@timestamp": "2016-05-23T08:05:34.853Z",
+    "@timestamp": "2017-10-12T08:05:34.853Z",
     "beat": {
         "hostname": "host.example.com",
         "name": "host.example.com"
@@ -12,27 +12,26 @@
     "system": {
         "memory": {
             "actual": {
-                "free": 5786603520,
+                "free": 6629445632,
                 "used": {
-                    "bytes": 2575933440,
-                    "pct": 0.308
+                    "bytes": 10550423552,
+                    "pct": 0.6141
                 }
             },
-            "free": 286552064,
+            "free": 447393792,
             "swap": {
-                "free": 4197806080,
-                "total": 4199542784,
+                "free": 917504000,
+                "total": 1073741824,
                 "used": {
-                    "bytes": 1736704,
-                    "pct": 0.0004
+                    "bytes": 156237824,
+                    "pct": 0.1455
                 }
             },
-            "total": 8362536960,
+            "total": 17179869184,
             "used": {
-                "bytes": 8075984896,
-                "pct": 0.9657
+                "bytes": 16732475392,
+                "pct": 0.974
             }
         }
-    },
-    "type": "metricsets"
+    }
 }
