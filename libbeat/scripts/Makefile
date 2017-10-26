@@ -107,6 +107,7 @@ check: python-env ## @build Checks project and source code if everything is acco
 	@go get $(GOIMPORTS_REPO)
 	@goimports -local ${GOIMPORTS_LOCAL_PREFIX} -l ${GOFILES_NOVENDOR} | (! grep .) || (echo "Code differs from goimports' style ^" && false)
 	@${FIND} -name *.py -exec autopep8 -d --max-line-length 120  {} \; | (! grep . -q) || (echo "Code differs from autopep8's style" && false)
+	@${FIND} -wholename "*tests/system/test_*.py" -perm "+111" -exec false {} + || (echo "Python test files shouldn't be executable, otherwise nose doesn't find them" && false)
 
 .PHONY: fmt
 fmt: python-env ## @build Runs `goimports -l -w` and `autopep8`on the project's source code, modifying any files that do not match its style.

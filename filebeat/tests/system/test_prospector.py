@@ -714,8 +714,3 @@ class Test(BaseTest):
             name="output contains 'entry2'")
 
         filebeat.check_kill_and_wait()
-
-
-if __name__ == '__main__':
-    import unittest
-    unittest.main()
