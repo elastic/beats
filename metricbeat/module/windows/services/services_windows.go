@@ -10,9 +10,10 @@ import (
 	"unicode/utf16"
 	"unsafe"
 
-	"github.com/elastic/gosigar"
 	"github.com/pkg/errors"
 	"golang.org/x/sys/windows"
+
+	"github.com/elastic/gosigar"
 
 	"github.com/elastic/beats/libbeat/common"
 	"github.com/elastic/beats/libbeat/logp"

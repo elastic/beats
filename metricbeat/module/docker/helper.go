@@ -3,8 +3,9 @@ package docker
 import (
 	"strings"
 
-	"github.com/elastic/beats/libbeat/common"
 	"github.com/fsouza/go-dockerclient"
+
+	"github.com/elastic/beats/libbeat/common"
 )
 
 type Container struct {
