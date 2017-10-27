@@ -67,7 +67,7 @@ const (
 	ServiceContinuePending ServiceState = 0x5
 	ServicePausePending    ServiceState = 0x6
 	ServicePaused          ServiceState = 0x7
-	ServiceRuning          ServiceState = 0x4
+	ServiceRunning         ServiceState = 0x4
 	ServiceStartPending    ServiceState = 0x2
 	ServiceStopPending     ServiceState = 0x3
 	ServiceStopped         ServiceState = 0x1

@@ -13,11 +13,10 @@ import (
 	"github.com/pkg/errors"
 	"golang.org/x/sys/windows"
 
-	"github.com/elastic/gosigar"
-
 	"github.com/elastic/beats/libbeat/common"
 	"github.com/elastic/beats/libbeat/logp"
 	"github.com/elastic/beats/winlogbeat/sys"
+	"github.com/elastic/gosigar"
 )
 
 // Windows API calls
@@ -41,7 +40,7 @@ var serviceStates = map[ServiceState]string{
 	ServiceContinuePending: "ServiceContinuePending",
 	ServicePausePending:    "ServicePausePending",
 	ServicePaused:          "ServicePaused",
-	ServiceRuning:          "ServiceRuning",
+	ServiceRunning:         "ServiceRunning",
 	ServiceStartPending:    "ServiceStartPending",
 	ServiceStopPending:     "ServiceStopPending",
 	ServiceStopped:         "ServiceStopped",
@@ -124,70 +123,68 @@ func OpenService(handle ServiceDatabaseHandle, serviceName string, desiredAccess
 }
 
 func getServiceStates(handle ServiceDatabaseHandle, state ServiceEnumState) ([]ServiceStatus, error) {
-	var bufSize uint32
-	var bytesNeeded uint32
 	var servicesReturned uint32
-	var lastOffset uintptr
-	var services []ServiceStatus
+	var servicesBuffer []byte
 
-	if err := _EnumServicesStatusEx(handle, ScEnumProcessInfo, ServiceWin32, state, nil, bufSize, &bytesNeeded, &servicesReturned, nil, nil); err != nil {
-		if ServiceErrno(err.(syscall.Errno)) != SERVICE_ERROR_MORE_DATA {
-			return services, ServiceErrno(err.(syscall.Errno))
+	for {
+		var bytesNeeded uint32
+		var buf *byte
+		if len(servicesBuffer) > 0 {
+			buf = &servicesBuffer[0]
 		}
-		bufSize += bytesNeeded
-		servicesBuffer := make([]byte, bytesNeeded)
-		lastOffset = uintptr(len(servicesBuffer)) - 1
 
-		// This loop should not repeat more then two times
-		for {
-			if err := _EnumServicesStatusEx(handle, ScEnumProcessInfo, ServiceWin32, state, &servicesBuffer[0], bufSize, &bytesNeeded, &servicesReturned, nil, nil); err != nil {
-				if ServiceErrno(err.(syscall.Errno)) != SERVICE_ERROR_MORE_DATA {
-					return nil, ServiceErrno(err.(syscall.Errno))
-				}
-				bufSize += bytesNeeded
-			} else {
-
-				for i := 0; i < int(servicesReturned); i++ {
-					serviceTemp := (*EnumServiceStatusProcess)(unsafe.Pointer(&servicesBuffer[i*sizeofEnumServiceStatusProcess]))
-
-					service, err := getServiceInformation(serviceTemp, servicesBuffer, lastOffset, handle)
-					if err != nil {
-						return nil, err
-					}
-
-					services = append(services, service)
-				}
-
-				return services, nil
+		if err := _EnumServicesStatusEx(handle, ScEnumProcessInfo, ServiceWin32, state, buf, uint32(len(servicesBuffer)), &bytesNeeded, &servicesReturned, nil, nil); err != nil {
+			if ServiceErrno(err.(syscall.Errno)) == SERVICE_ERROR_MORE_DATA {
+				// Increase buffer size and retry.
+				servicesBuffer = make([]byte, len(servicesBuffer)+int(bytesNeeded))
+				continue
 			}
+			return nil, ServiceErrno(err.(syscall.Errno))
 		}
+
+		break
 	}
 
-	return nil, nil
+	// Windows appears to tack on a single byte null terminator to the UTF-16
+	// strings, but we are expecting either no null terminator or \u0000 (an
+	// even number of bytes).
+	if len(servicesBuffer)%2 != 0 && servicesBuffer[len(servicesBuffer)-1] == 0 {
+		servicesBuffer = servicesBuffer[:len(servicesBuffer)-1]
+	}
+
+	var services []ServiceStatus
+	for i := 0; i < int(servicesReturned); i++ {
+		serviceTemp := (*EnumServiceStatusProcess)(unsafe.Pointer(&servicesBuffer[i*sizeofEnumServiceStatusProcess]))
+
+		service, err := getServiceInformation(serviceTemp, servicesBuffer, handle)
+		if err != nil {
+			return nil, err
+		}
+
+		services = append(services, service)
+	}
+
+	return services, nil
 }
 
-func getServiceInformation(rawService *EnumServiceStatusProcess, servicesBuffer []byte, lastOffset uintptr, handle ServiceDatabaseHandle) (ServiceStatus, error) {
-	service := ServiceStatus{}
+func getServiceInformation(rawService *EnumServiceStatusProcess, servicesBuffer []byte, handle ServiceDatabaseHandle) (ServiceStatus, error) {
+	var service ServiceStatus
 
-	displayNameBuffer := new(bytes.Buffer)
-	serviceNameBuffer := new(bytes.Buffer)
-
+	// Read null-terminated UTF16 strings from the buffer.
 	serviceNameOffset := uintptr(unsafe.Pointer(rawService.LpServiceName)) - (uintptr)(unsafe.Pointer(&servicesBuffer[0]))
 	displayNameOffset := uintptr(unsafe.Pointer(rawService.LpDisplayName)) - (uintptr)(unsafe.Pointer(&servicesBuffer[0]))
 
-	displayNameBuffer.Reset()
-	serviceNameBuffer.Reset()
-
-	if err := sys.UTF16ToUTF8Bytes(servicesBuffer[displayNameOffset:serviceNameOffset], displayNameBuffer); err != nil {
+	strBuf := new(bytes.Buffer)
+	if err := sys.UTF16ToUTF8Bytes(servicesBuffer[displayNameOffset:], strBuf); err != nil {
 		return service, err
 	}
+	service.DisplayName = strBuf.String()
 
-	if err := sys.UTF16ToUTF8Bytes(servicesBuffer[serviceNameOffset:lastOffset], serviceNameBuffer); err != nil {
+	strBuf.Reset()
+	if err := sys.UTF16ToUTF8Bytes(servicesBuffer[serviceNameOffset:], strBuf); err != nil {
 		return service, err
 	}
-
-	service.DisplayName = displayNameBuffer.String()
-	service.ServiceName = serviceNameBuffer.String()
+	service.ServiceName = strBuf.String()
 
 	var state string
 
