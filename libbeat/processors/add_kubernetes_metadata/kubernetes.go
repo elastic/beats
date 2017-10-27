@@ -59,7 +59,7 @@ func newKubernetesAnnotator(cfg *common.Config) (processors.Processor, error) {
 	//Load default indexer configs
 	if config.DefaultIndexers.Enabled == true {
 		Indexing.RLock()
-		for key, cfg := range Indexing.defaultIndexerConfigs {
+		for key, cfg := range Indexing.GetDefaultIndexerConfigs() {
 			config.Indexers = append(config.Indexers, map[string]common.Config{key: cfg})
 		}
 		Indexing.RUnlock()
@@ -68,65 +68,18 @@ func newKubernetesAnnotator(cfg *common.Config) (processors.Processor, error) {
 	//Load default matcher configs
 	if config.DefaultMatchers.Enabled == true {
 		Indexing.RLock()
-		for key, cfg := range Indexing.defaultMatcherConfigs {
+		for key, cfg := range Indexing.GetDefaultMatcherConfigs() {
 			config.Matchers = append(config.Matchers, map[string]common.Config{key: cfg})
 		}
 		Indexing.RUnlock()
 	}
 
-	metaGen := &GenDefaultMeta{
-		labels:        config.IncludeLabels,
-		annotations:   config.IncludeAnnotations,
-		labelsExclude: config.ExcludeLabels,
-	}
+	metaGen := NewGenDefaultMeta(config.IncludeAnnotations, config.IncludeLabels, config.ExcludeLabels)
+	indexers := NewIndexers(config.Indexers, metaGen)
 
-	indexers := Indexers{
-		indexers: []Indexer{},
-	}
+	matchers := NewMatchers(config.Matchers)
 
-	//Create all configured indexers
-	for _, pluginConfigs := range config.Indexers {
-		for name, pluginConfig := range pluginConfigs {
-			indexFunc := Indexing.GetIndexer(name)
-			if indexFunc == nil {
-				logp.Warn("Unable to find indexing plugin %s", name)
-				continue
-			}
-
-			indexer, err := indexFunc(pluginConfig, metaGen)
-			if err != nil {
-				logp.Warn("Unable to initialize indexing plugin %s due to error %v", name, err)
-			}
-
-			indexers.indexers = append(indexers.indexers, indexer)
-
-		}
-	}
-
-	matchers := Matchers{
-		matchers: []Matcher{},
-	}
-
-	//Create all configured matchers
-	for _, pluginConfigs := range config.Matchers {
-		for name, pluginConfig := range pluginConfigs {
-			matchFunc := Indexing.GetMatcher(name)
-			if matchFunc == nil {
-				logp.Warn("Unable to find matcher plugin %s", name)
-				continue
-			}
-
-			matcher, err := matchFunc(pluginConfig)
-			if err != nil {
-				logp.Warn("Unable to initialize matcher plugin %s due to error %v", name, err)
-			}
-
-			matchers.matchers = append(matchers.matchers, matcher)
-
-		}
-	}
-
-	if len(matchers.matchers) == 0 {
+	if matchers.Empty() {
 		return nil, fmt.Errorf("Can not initialize kubernetes plugin with zero matcher plugins")
 	}
 
@@ -175,10 +128,10 @@ func newKubernetesAnnotator(cfg *common.Config) (processors.Processor, error) {
 	logp.Debug("kubernetes", "Using host ", config.Host)
 	logp.Debug("kubernetes", "Initializing watcher")
 	if client != nil {
-		watcher := NewPodWatcher(client, &indexers, config.SyncPeriod, config.CleanupTimeout, config.Host)
+		watcher := NewPodWatcher(client, indexers, config.SyncPeriod, config.CleanupTimeout, config.Host)
 
 		if watcher.Run() {
-			return &kubernetesAnnotator{podWatcher: watcher, matchers: &matchers}, nil
+			return &kubernetesAnnotator{podWatcher: watcher, matchers: matchers}, nil
 		}
 
 		return nil, fatalError
