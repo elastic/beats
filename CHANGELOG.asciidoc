@@ -50,20 +50,13 @@ https://github.com/elastic/beats/compare/v6.0.0-rc2...master[Check the HEAD diff
 
 *Filebeat*
 
-- Add PostgreSQL module with slowlog support. {pull}4763[4763]
-- Add Kafka log module. {pull}4885[4885]
-- Add support for `/var/log/containers/` log path in `add_kubernetes_metadata` processor. {pull}4981[4981]
-- Remove error log from runnerfactory as error is returned by API. {pull}5085[5085]
-- Remove error log from runnerfactory as error is returned by API. {pull}5085[5085]
 - Add Kubernetes manifests to deploy Filebeat. {pull}5349[5349]
 
 *Heartbeat*
 
 *Metricbeat*
 
-- Auto-select a hostname (based on the host on which the Beat is running) in the Host Overview dashboard. {pull}5340[5340]
 - Add Kubernetes manifests to deploy Metricbeat. {pull}5349[5349]
-- Add etcd module. {issue}4970[4970]
 
 *Packetbeat*
 
