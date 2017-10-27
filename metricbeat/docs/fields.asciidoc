@@ -11313,20 +11313,13 @@ beta[] Module for Windows
 
 
 [float]
-== uptime fields
-
-`uptime` contains the service uptime metric.
-
-
-
-[float]
 === `windows.services.uptime.ms`
 
 type: long
 
 format: duration
 
-The service uptime in milliseconds.
+`uptime` contains the service uptime metric.
 
 
 [float]
@@ -11350,7 +11343,7 @@ The display name of the service.
 
 type: keyword
 
-The start type of the service.
+The start type of the service. The possible values are `ServiceAutoStart`, `ServiceBootStart`, `ServiceDemandStart`, `ServiceDisabled`, and `ServiceSystemStart`.
 
 
 [float]
@@ -11358,7 +11351,7 @@ The start type of the service.
 
 type: keyword
 
-The actual state of the service.
+The actual state of the service. The possible values are `ServiceContinuePending`, `ServicePausePending`, `ServicePaused`, `ServiceRuning`, `ServiceStartPending`, `ServiceStopPending`, and `ServiceStopped`.
 
 
 [[exported-fields-zookeeper]]
