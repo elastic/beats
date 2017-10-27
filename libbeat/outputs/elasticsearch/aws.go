@@ -4,7 +4,6 @@ import (
 	"net/http"
 	"github.com/aws/aws-sdk-go/aws"
 	"github.com/aws/aws-sdk-go/aws/defaults"
-	"github.com/aws/aws-sdk-go/aws/client/metadata"
 	"github.com/aws/aws-sdk-go/aws/signer/v4"
 	"io/ioutil"
 	"bytes"
@@ -15,8 +14,8 @@ import (
 )
 
 type AwsData struct {
-	Config     aws.Config
-	ClientInfo metadata.ClientInfo
+	Config aws.Config
+	Signer v4.Signer
 }
 
 // Calculate signature for request and append headers
@@ -24,12 +23,6 @@ func (conn *Connection) performAwsSignature(req *http.Request) {
 
 	if conn.Aws == nil {
 		return
-	}
-
-	signer := v4.Signer{
-		Credentials: conn.Aws.Config.Credentials,
-		Logger:      aws.NewDefaultLogger(), // TODO remove debug logging
-		Debug:       aws.LogDebugWithSigning,
 	}
 
 	var reader io.ReadSeeker
@@ -54,7 +47,7 @@ func (conn *Connection) performAwsSignature(req *http.Request) {
 	if colon >= 0 {
 		req.Host = req.Host[:colon]
 	}
-	_, err := signer.Sign(req, reader, "es", *conn.Aws.Config.Region, time.Now())
+	_, err := conn.Aws.Signer.Sign(req, reader, "es", *conn.Aws.Config.Region, time.Now())
 	if err != nil {
 		logp.Err("Error performing AWS signature: %s", err)
 	}
@@ -74,8 +67,14 @@ func (c *elasticsearchConfig) Aws() *AwsData {
 			region = "us-east-1"
 		}
 
+		config := aws.NewConfig().WithCredentials(credentials).WithRegion(region)
 		return &AwsData{
-			Config: *aws.NewConfig().WithCredentials(credentials).WithRegion(region),
+			Config: *config,
+			Signer: v4.Signer{
+				Credentials: config.Credentials,
+				Logger:      aws.NewDefaultLogger(), // TODO remove debug logging
+				Debug:       aws.LogDebugWithSigning,
+			},
 		}
 	}
 
