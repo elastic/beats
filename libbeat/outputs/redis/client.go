@@ -128,7 +128,10 @@ func (c *client) Publish(batch publisher.Batch) error {
 	if rest != nil {
 		c.stats.Failed(len(rest))
 		batch.RetryEvents(rest)
+		return err
 	}
+
+	batch.ACK()
 	return err
 }
 
