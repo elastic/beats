@@ -18,6 +18,8 @@ include::{asciidoc-dir}/../../shared/attributes.asciidoc[]
 :security: X-Pack Security
 :monitoringdoc: https://www.elastic.co/guide/en/x-pack/current
 :dockerimage: docker.elastic.co/beats/{beatname_lc}:{version}
+:dockergithub: https://github.com/elastic/beats-docker/tree/{doc-branch}
+
 
 include::./overview.asciidoc[]
 
