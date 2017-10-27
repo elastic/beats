@@ -8,7 +8,7 @@
 // Template, add newest changes here
 
 === Beats version HEAD
-https://github.com/elastic/beats/compare/v6.0.0-rc1...master[Check the HEAD diff]
+https://github.com/elastic/beats/compare/v6.0.0-rc2...master[Check the HEAD diff]
 
 ==== Breaking changes
 
@@ -24,33 +24,19 @@ https://github.com/elastic/beats/compare/v6.0.0-rc1...master[Check the HEAD diff
 
 *Packetbeat*
 
-- Remove not-working `runoptions.uid` and `runoptions.gid` options in Packetbeat. {pull}5261[5261]
-
 *Winlogbeat*
 
 ==== Bugfixes
 
 *Affecting all Beats*
 
-- Fix data race accessing watched containers. {issue}5147[5147]
-- Do not require template if index change and template disabled {pull}5319[5319]
-- Fix missing ACK in redis output. {issue}5404[5404]
-
 *Auditbeat*
 
 *Filebeat*
-- Fix default paths for redis 4.0.1 logs on macOS {pull}5173[5173] 
-
-*Filebeat*
-- Fix default paths for redis 4.0.1 logs on macOS {pull}5173[5173]
-- Fix Filebeat not starting if command line and modules configs are used together. {issue}5376[5376]
 
 *Heartbeat*
 
 *Metricbeat*
-
-- Use `beat.name` instead of `beat.hostname` in the Host Overview dashboard. {pull}5340[5340]
-- Fix the loading of 5.x dashboards. {issue}5277[5277]
 
 *Packetbeat*
 
@@ -68,8 +54,6 @@ https://github.com/elastic/beats/compare/v6.0.0-rc1...master[Check the HEAD diff
 
 *Metricbeat*
 
-- Auto-select a hostname (based on the host on which the Beat is running) in the Host Overview dashboard. {pull}5340[5340]
-
 *Packetbeat*
 
 *Winlogbeat*
@@ -79,8 +63,6 @@ https://github.com/elastic/beats/compare/v6.0.0-rc1...master[Check the HEAD diff
 *Affecting all Beats*
 
 *Filebeat*
-
-- The `filebeat.config_dir` option is deprecated. Use `filebeat.config.prospector` options instead. {pull}5321[5321]
 
 *Heartbeat*
 
@@ -94,6 +76,47 @@ https://github.com/elastic/beats/compare/v6.0.0-rc1...master[Check the HEAD diff
 
 
 ////////////////////////////////////////////////////////////
+
+[[release-notes-6.0.0-rc2]]
+=== Beats version 6.0.0-rc2
+https://github.com/elastic/beats/compare/v6.0.0-rc1...v6.0.0-rc2[View commits]
+
+==== Breaking changes
+
+*Packetbeat*
+
+- Remove not-working `runoptions.uid` and `runoptions.gid` options in Packetbeat. {pull}5261[5261]
+
+==== Bugfixes
+
+*Affecting all Beats*
+
+- Fix data race accessing watched containers. {issue}5147[5147]
+- Do not require template if index change and template disabled {pull}5319[5319]
+- Fix missing ACK in redis output. {issue}5404[5404]
+
+*Filebeat*
+
+- Fix default paths for redis 4.0.1 logs on macOS {pull}5173[5173]
+- Fix Filebeat not starting if command line and modules configs are used together. {issue}5376[5376]
+- Fix double `@timestamp` field when JSON decoding was used. {pull}5436[5436]
+
+*Metricbeat*
+
+- Use `beat.name` instead of `beat.hostname` in the Host Overview dashboard. {pull}5340[5340]
+- Fix the loading of 5.x dashboards. {issue}5277[5277]
+
+==== Added
+
+*Metricbeat*
+
+- Auto-select a hostname (based on the host on which the Beat is running) in the Host Overview dashboard. {pull}5340[5340]
+
+==== Deprecated
+
+*Filebeat*
+
+- The `filebeat.config_dir` option is deprecated. Use `filebeat.config.prospector` options instead. {pull}5321[5321]
 
 [[release-notes-6.0.0-rc1]]
 === Beats version 6.0.0-rc1
