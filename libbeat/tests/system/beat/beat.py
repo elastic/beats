@@ -227,7 +227,8 @@ class TestCase(unittest.TestCase, ComposeMixin):
                     break
 
                 try:
-                    jsons.append(self.flatten_object(json.loads(line, object_pairs_hook=self.json_raise_on_duplicates), []))
+                    jsons.append(self.flatten_object(json.loads(
+                        line, object_pairs_hook=self.json_raise_on_duplicates), []))
                 except:
                     print("Fail to load the json {}".format(line))
                     raise
@@ -260,9 +261,9 @@ class TestCase(unittest.TestCase, ComposeMixin):
         d = {}
         for k, v in ordered_pairs:
             if k in d:
-               raise ValueError("duplicate key: %r" % (k,))
+                raise ValueError("duplicate key: %r" % (k,))
             else:
-               d[k] = v
+                d[k] = v
         return d
 
     def copy_files(self, files, source_dir="files/"):
