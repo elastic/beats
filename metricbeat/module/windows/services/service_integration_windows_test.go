@@ -21,3 +21,17 @@ func TestData(t *testing.T) {
 		t.Fatal("write", err)
 	}
 }
+
+func TestReadService(t *testing.T) {
+	reader, err := NewServiceReader()
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	services, err := reader.Read()
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	t.Log(services)
+}
