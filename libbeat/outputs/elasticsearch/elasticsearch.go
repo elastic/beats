@@ -136,6 +136,7 @@ func makeES(
 			Timeout:          config.Timeout,
 			CompressionLevel: config.CompressionLevel,
 			Stats:            stats,
+			Aws:              config.Aws(),
 		}, &connectCallbackRegistry)
 		if err != nil {
 			return outputs.Fail(err)

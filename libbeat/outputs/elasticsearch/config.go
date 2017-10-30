@@ -21,6 +21,12 @@ type elasticsearchConfig struct {
 	MaxRetries       int                `config:"max_retries"`
 	Timeout          time.Duration      `config:"timeout"`
 	Backoff          Backoff            `config:"backoff"`
+	AwsConfig        AwsConfig          `config:"aws"`
+}
+
+type AwsConfig struct {
+	Enabled bool   `config:"enabled"`
+	Region  string `config:"region"`
 }
 
 type Backoff struct {
@@ -48,6 +54,10 @@ var (
 		Backoff: Backoff{
 			Init: 1 * time.Second,
 			Max:  60 * time.Second,
+		},
+		AwsConfig: AwsConfig{
+			Enabled: false,
+			Region:  "",
 		},
 	}
 )
