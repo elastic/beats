@@ -1,0 +1,14 @@
+#!/bin/bash
+
+# this is executed in the docker fpm image
+set -e
+cd /build
+
+mkdir -p upload
+cp -r /build/kubernetes/*.yaml upload/
+
+cd upload
+for FILE in $(ls *.yaml); do
+  sha1sum $FILE | awk '{print $1;}' > $FILE.sha1
+  echo "Created upload/$FILE.sha1"
+done

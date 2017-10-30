@@ -50,9 +50,13 @@ https://github.com/elastic/beats/compare/v6.0.0-rc2...master[Check the HEAD diff
 
 *Filebeat*
 
+- Add Kubernetes manifests to deploy Filebeat. {pull}5349[5349]
+
 *Heartbeat*
 
 *Metricbeat*
+
+- Add Kubernetes manifests to deploy Metricbeat. {pull}5349[5349]
 
 *Packetbeat*
 
