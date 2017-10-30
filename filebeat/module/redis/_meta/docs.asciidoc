@@ -37,8 +37,9 @@ include::../include/running-modules.asciidoc[]
 [float]
 === Example dashboard
 
-This module comes with a sample dashboard.
+This module comes with a sample dashboard. For example:
 
+[role="screenshot"]
 image::./images/kibana-redis.png[]
 
 include::../include/configuring-intro.asciidoc[]
