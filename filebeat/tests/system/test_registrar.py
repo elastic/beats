@@ -1384,8 +1384,3 @@ class Test(BaseTest):
                 "inode": stat.st_ino,
                 "device": stat.st_dev,
             }, file_state_os)
-
-
-if __name__ == '__main__':
-    import unittest
-    unittest.main()
