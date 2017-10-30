@@ -40,6 +40,9 @@ https://github.com/elastic/beats/compare/v6.0.0-rc2...master[Check the HEAD diff
 
 *Packetbeat*
 
+- Fix http status phrase parsing not allow spaces. {pull}5312[5312]
+- Fix missing length check in the PostgreSQL module. {pull}5457[5457]
+
 *Winlogbeat*
 
 ==== Added
