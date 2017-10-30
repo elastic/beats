@@ -379,6 +379,9 @@ func pgsqlFieldsParser(s *pgsqlStream, buf []byte) error {
 		off += 4
 
 		// read format (int16)
+		if len(buf) < off+2 {
+			return errFieldBufferShort
+		}
 		format := common.BytesNtohs(buf[off : off+2])
 		off += 2
 		fieldsFormat = append(fieldsFormat, byte(format))
