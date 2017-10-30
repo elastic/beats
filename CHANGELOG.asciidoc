@@ -60,14 +60,6 @@ https://github.com/elastic/beats/compare/v6.0.0-rc1...master[Check the HEAD diff
 
 *Affecting all Beats*
 
-- Move TCP UDP start up into `server.Start()` {pull}4903[4903]
-- Changed the hashbang used in the beat helper script from `/bin/bash` to `/usr/bin/env bash`. {pull}5051[5051]
-- Changed beat helper script to use `exec` when running the beat. {pull}5051[5051]
-- Fix reloader error message to only print on actual error {pull}5066[5066]
-- Enable flush timeout by default. {pull}5150[5150]
-- Add @metadata.version to events send to Logstash. {pull}5166[5166]
-- Add Collectbeat to community beats. {pull}5327[5327]
-
 *Auditbeat*
 
 *Filebeat*
