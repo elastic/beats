@@ -42,6 +42,7 @@ https://github.com/elastic/beats/compare/v6.0.0-beta2...master[Check the HEAD di
 - Do not require template if index change and template disabled {pull}5319[5319]
 - Correctly send configured `Host` header to the remote server. {issue}4842[4842]
 - Fix missing ACK in redis output. {issue}5404[5404]
+- Change add_kubernetes_metadata to attempt detection of namespace. {pull}5482[5482]
 
 *Auditbeat*
 
