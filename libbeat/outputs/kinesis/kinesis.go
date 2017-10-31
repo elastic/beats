@@ -80,6 +80,7 @@ func (k *Kinesis) Publish(batch publisher.Batch) error {
 			logp.Warn("Failed to serialize the event: %v", err)
 		}
 	}
+	fmt.Printf("wrote %d records", len(request.Records))
 	response, err := k.stream.PutRecords(&request)
 	if err != nil {
 		logp.Critical("Failed to write to Kinesis stream: %v", err)
