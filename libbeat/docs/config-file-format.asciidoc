@@ -58,6 +58,7 @@ The following topics provide more detail to help you understand and work with co
 * <<config-file-format-type>>
 * <<config-file-format-env-vars>>
 * <<config-gile-format-refs>>
+* <<config-file-permissions>>
 * <<config-file-format-cli>>
 * <<config-file-format-tips>>
 

@@ -19,8 +19,6 @@ After installing the Elastic Stack, read the following topics to learn how to in
 * <<filebeat-starting>>
 * <<view-kibana-dashboards>>
 * <<filebeat-modules-quickstart>>
-* <<command-line-options>>
-* <<directory-layout>>
 * <<setup-repositories>>
 
 [[filebeat-installation]]
