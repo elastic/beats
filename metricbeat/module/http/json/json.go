@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	"io/ioutil"
 	"net/http"
+	"strconv"
 	"strings"
 
 	"github.com/elastic/beats/libbeat/common"
@@ -124,10 +125,12 @@ func (m *MetricSet) Fetch() (common.MapStr, error) {
 	}
 
 	if m.responseEnabled {
+		statusPhrase := strings.TrimPrefix(response.Status, strconv.Itoa(response.StatusCode)+" ")
 		event[mb.ModuleDataKey] = common.MapStr{
 			"response": common.MapStr{
-				"status_code": response.StatusCode,
-				"headers":     m.getHeaders(response.Header),
+				"status_code":   response.StatusCode,
+				"status_phrase": statusPhrase,
+				"headers":       m.getHeaders(response.Header),
 			},
 		}
 	}

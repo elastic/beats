@@ -37,6 +37,10 @@
               type: keyword
               description: >
                 The HTTP status code
+            - name: status_phrase
+              type: keyword
+              description: >
+                The HTTP status phrase
             - name: body
               type: keyword
               description: >
