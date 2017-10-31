@@ -21,8 +21,7 @@ After installing the Elastic Stack, read the following topics to learn how to in
 * <<load-kibana-dashboards>>
 * <<metricbeat-starting>>
 * <<view-kibana-dashboards>>
-* <<command-line-options>>
-* <<directory-layout>>
+* <<setup-repositories>>
 
 [[metricbeat-installation]]
 === Step 1: Install Metricbeat
