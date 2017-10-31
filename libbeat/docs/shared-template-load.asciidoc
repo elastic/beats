@@ -105,15 +105,23 @@ PS > {beatname_lc} setup --template
 ----------------------------------------------------------------------
 
 
-NOTE: If you've already used {beatname_uc} to index data into Elasticsearch,
+[NOTE]
+=====
+If you've already used {beatname_uc} to index data into Elasticsearch,
 the index may contain old documents. After you load the index template,
-you can delete the old documents from {beatname_lc}-* to force Kibana to look
+you can delete the old documents from +{beatname_lc}-*+ to force Kibana to look
 at the newest documents. Use this command:
 
 ["source","sh",subs="attributes"]
 ----------------------------------------------------------------------
 curl -XDELETE 'http://localhost:9200/{beatname_lc}-*'
 ----------------------------------------------------------------------
+
+This command will delete all indexes that match the pattern +{beatname_lc}-*+.
+Before running this command, make sure you want to delete all indexes that
+match the pattern.
+
+=====
 
 [[passing-credentials-template-loading]]
 ==== Pass credentials

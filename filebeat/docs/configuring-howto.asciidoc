@@ -26,6 +26,7 @@ The following topics describe how to configure Filebeat:
 * <<filebeat-configuration-reloading>>
 * <<configuring-internal-queue>>
 * <<configuring-output>>
+* <<load-balancing>>
 * <<configuration-ssl>>
 * <<filtering-and-enhancing-data>>
 * <<configuring-ingest-node>>
@@ -35,9 +36,9 @@ The following topics describe how to configure Filebeat:
 * <<configuration-template>>
 * <<configuration-logging>>
 * <<using-environ-vars>>
-* <<load-balancing>>
 * <<yaml-tips>>
 * <<regexp-support>>
+* <<{beatname_lc}-reference-yml>>
 
 --
 
@@ -58,9 +59,9 @@ include::../../libbeat/docs/queueconfig.asciidoc[]
 
 include::../../libbeat/docs/outputconfig.asciidoc[]
 
-include::../../libbeat/docs/shared-ssl-config.asciidoc[]
-
 include::./load-balancing.asciidoc[]
+
+include::../../libbeat/docs/shared-ssl-config.asciidoc[]
 
 include::./filebeat-filtering.asciidoc[]
 
