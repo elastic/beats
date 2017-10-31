@@ -5,6 +5,8 @@ import (
 
 	uuid "github.com/satori/go.uuid"
 
+	"fmt"
+
 	"github.com/elastic/beats/libbeat/logp"
 )
 
@@ -59,14 +61,14 @@ func (r *Registry) WaitForCompletion() {
 }
 
 // Start starts the given harvester and add its to the registry
-func (r *Registry) Start(h Harvester) {
+func (r *Registry) Start(h Harvester) error {
 	// Make sure stop is not called during starting a harvester
 	r.Lock()
 	defer r.Unlock()
 
 	// Make sure no new harvesters are started after stop was called
 	if !r.active() {
-		return
+		return fmt.Errorf("registry already stopped")
 	}
 
 	r.wg.Add(1)
@@ -82,6 +84,7 @@ func (r *Registry) Start(h Harvester) {
 			logp.Err("Error running prospector: %v", err)
 		}
 	}()
+	return nil
 }
 
 // Len returns the current number of harvesters in the registry

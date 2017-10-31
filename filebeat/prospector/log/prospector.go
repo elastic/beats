@@ -612,9 +612,7 @@ func (p *Prospector) startHarvester(state file.State, offset int64) error {
 	// This is synchronous state update as part of the scan
 	h.SendStateUpdate()
 
-	p.harvesters.Start(h)
-
-	return nil
+	return p.harvesters.Start(h)
 }
 
 // updateState updates the prospector state and forwards the event to the spooler

@@ -60,7 +60,9 @@ func (p *Prospector) Run() {
 			logp.Err("Error setting up stdin harvester: %s", err)
 			return
 		}
-		p.registry.Start(p.harvester)
+		if err = p.registry.Start(p.harvester); err != nil {
+			logp.Err("Error starting the harvester: %s", err)
+		}
 		p.started = true
 	}
 }
