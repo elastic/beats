@@ -4118,6 +4118,14 @@ The HTTP status code
 
 
 [float]
+=== `http.response.status_phrase`
+
+type: keyword
+
+The HTTP status phrase
+
+
+[float]
 === `http.response.body`
 
 type: keyword
