@@ -1,11 +1,10 @@
 package harvester
 
 import (
+	"fmt"
 	"sync"
 
 	uuid "github.com/satori/go.uuid"
-
-	"fmt"
 
 	"github.com/elastic/beats/libbeat/logp"
 )
