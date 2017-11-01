@@ -5,7 +5,6 @@ import (
 	"errors"
 	"io/ioutil"
 	"net/mail"
-	"strconv"
 	"strings"
 	"time"
 
@@ -19,6 +18,7 @@ type parser struct {
 	config  *parserConfig
 	pub     *transPub
 	message *message
+	conn    *connection
 	state   parseState
 
 	onMessage func(m *message) error
@@ -39,7 +39,7 @@ type message struct {
 	body    common.NetString
 
 	// Response
-	statusCode    int
+	statusCode    uint
 	statusPhrases []common.NetString
 
 	raw []byte
@@ -49,10 +49,12 @@ type message struct {
 
 // Error code if stream exceeds max allowed size on append.
 var (
-	constCRLF = []byte("\r\n")
-	constEOD  = []byte(".\r\n")
+	constCRLF    = []byte("\r\n")
+	constEOD     = []byte(".\r\n")
+	constEODSize = 3
 	// Responses are at least len("XXX\r\n") in size
 	constMinRespSize  = 5
+	constRespCodeSize = 3
 	constPhraseOffset = 4
 	constStatusSize   = 3
 	constCRLFSize     = 2
@@ -85,33 +87,27 @@ func (p *parser) append(data []byte) error {
 	return nil
 }
 
-func (p *parser) feed(ts time.Time, data []byte) error {
-	if err := p.append(data); err != nil {
-		return err
+func (p *parser) process(ts time.Time) error {
+	if p.message == nil {
+		// allocate new message object to be used by parser with current timestamp
+		p.message = p.newMessage(ts)
 	}
 
-	for p.buf.Total() > 0 {
-		if p.message == nil {
-			// allocate new message object to be used by parser with current timestamp
-			p.message = p.newMessage(ts)
-		}
+	msg, err := p.parse()
+	if err != nil {
+		return err
+	}
+	if msg == nil {
+		return nil // wait for more data
+	}
 
-		msg, err := p.parse()
-		if err != nil {
-			return err
-		}
-		if msg == nil {
-			break // wait for more data
-		}
+	// remove processed bytes from buffer
+	p.buf.Reset()
+	p.message = nil
 
-		// reset buffer and message -> handle next message in buffer
-		p.buf.Reset()
-		p.message = nil
-
-		// call message handler callback
-		if err := p.onMessage(msg); err != nil {
-			return err
-		}
+	// call message handler callback
+	if err := p.onMessage(msg); err != nil {
+		return err
 	}
 
 	return nil
@@ -125,21 +121,44 @@ func (p *parser) newMessage(ts time.Time) *message {
 	}
 }
 
-// SMTP server's reply message is separated from the 3-digit status
-// code with either a space or a hyphen. The latter indicates that
-// more lines are to follow.
-func (*parser) isResponseComplete(byts []byte) bool {
-	switch byts[constStatusSize] {
-	case ' ':
+// SMTP server's reply message (if any) is separated from the
+// 3-digit status code with either a space or a hyphen. The latter
+// indicates that more lines are to follow.
+func (*parser) isResponseComplete(raw []byte) bool {
+	switch raw[constStatusSize] {
+	case ' ', '\r':
 		return true
 	case '-':
 		return false
 	default:
-		debugf("Failed to understand SMTP status code: %s",
-			string(byts[:len(byts)-constCRLFSize]))
+		debugf("Failed to parse SMTP status code: %s",
+			string(raw[:len(raw)-constCRLFSize]))
 	}
 
 	return true
+}
+
+func isResponseCode(raw []byte) bool {
+	tail := constRespCodeSize
+
+	for i := 0; i < tail; i++ {
+		if raw[i] < '0' || raw[0] > '9' {
+			return false
+		}
+	}
+	if raw[tail] != ' ' && raw[tail] != '-' && raw[tail] != '\r' {
+		return false
+	}
+
+	return true
+}
+
+func btoi(raw []byte) uint {
+	var res uint
+	for _, b := range raw {
+		res = res*10 + uint(b-'0')
+	}
+	return res
 }
 
 func (p *parser) parsePayload() error {
@@ -179,44 +198,40 @@ func (p *parser) parse() (*message, error) {
 
 	for {
 		var err error
-		var code int
 
-		byts, err := p.buf.CollectUntil(constCRLF)
+		raw, err := p.buf.CollectUntil(constCRLF)
 		if err != nil {
 			// Get more data
 			return nil, nil
 		}
 
-		nbytes := len(byts)
-		str := string(byts[:nbytes-constCRLFSize])
-		words := []string{}
+		nbytes := len(raw)
+		var words [][]byte
+		isCode := nbytes >= constMinRespSize &&
+			isResponseCode(raw[:constMinRespSize])
 
-		if nbytes >= constMinRespSize {
-			code, err = strconv.Atoi(str[:constStatusSize])
-		}
-
-		if nbytes < constMinRespSize || err != nil || p.state == stateData {
+		if nbytes < constMinRespSize || !isCode || p.state == stateData {
 			// Request
 			m.IsRequest = true
 			if p.state != stateData {
-				words = strings.SplitN(str, " ", 2)
-				m.command = common.NetString(strings.ToUpper(words[0]))
+				words = bytes.SplitN(raw[:nbytes-constCRLFSize], []byte(" "), 2)
+				m.command = common.NetString(strings.ToUpper(string(words[0])))
 				if len(words) == 2 {
 					m.param = common.NetString(words[1])
 				}
 			}
 			if p.pub.sendRequest {
-				m.raw = append(m.raw, byts...)
+				m.raw = append(m.raw, raw...)
 			}
 		} else {
 			// Response
-			m.statusCode = code
+			m.statusCode = btoi(raw[:3])
 			if nbytes > constMinRespSize+1 {
 				m.statusPhrases = append(m.statusPhrases,
-					byts[constPhraseOffset:nbytes-constCRLFSize])
+					raw[constPhraseOffset:nbytes-constCRLFSize])
 			}
 			if p.pub.sendResponse {
-				m.raw = append(m.raw, byts...)
+				m.raw = append(m.raw, raw...)
 			}
 		}
 
@@ -226,20 +241,20 @@ func (p *parser) parse() (*message, error) {
 
 		case stateCommand:
 			if m.IsRequest {
-				if words[0] == "DATA" {
+				if bytes.Compare(words[0], []byte("DATA")) == 0 {
 					p.state = stateData
 				}
 			} else {
-				if !p.isResponseComplete(byts) {
+				if !p.isResponseComplete(raw) {
 					continue
 				}
 			}
 
 		case stateData: // request only state
 			if (p.pub.sendDataHeaders || p.pub.sendDataBody) && !p.pub.sendRequest {
-				m.raw = append(m.raw, byts...)
+				m.raw = append(m.raw, raw...)
 			}
-			if bytes.Compare(byts, constEOD) != 0 {
+			if bytes.Compare(raw, constEOD) != 0 {
 				continue
 			} else {
 				// We want to provide a request section since the
