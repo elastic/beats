@@ -14,6 +14,8 @@ https://github.com/elastic/beats/compare/v6.0.0-beta2...master[Check the HEAD di
 
 *Affecting all Beats*
 
+- Determine log level for kafka output. {pull}5397[5397]
+
 *Auditbeat*
 
 *Filebeat*
@@ -39,6 +41,7 @@ https://github.com/elastic/beats/compare/v6.0.0-beta2...master[Check the HEAD di
 - Remove ID() from Runner interface {issue}5153[5153]
 - Do not require template if index change and template disabled {pull}5319[5319]
 - Correctly send configured `Host` header to the remote server. {issue}4842[4842]
+- Fix missing ACK in redis output. {issue}5404[5404]
 
 *Auditbeat*
 
@@ -46,6 +49,7 @@ https://github.com/elastic/beats/compare/v6.0.0-beta2...master[Check the HEAD di
 
 - Fix default paths for redis 4.0.1 logs on macOS {pull}5173[5173]
 - Fix Filebeat not starting if command line and modules configs are used together. {issue}5376[5376]
+- Add support for adding string tags {pull}5395{5395}
 
 *Heartbeat*
 
@@ -55,10 +59,12 @@ https://github.com/elastic/beats/compare/v6.0.0-beta2...master[Check the HEAD di
 - Use `beat.name` instead of `beat.hostname` in the Host Overview dashboard. {pull}5340[5340]
 - Fix the loading of 5.x dashboards. {issue}5277[5277]
 - Fix the fetching of process information when some data is missing under MacOS X. {issue}5337[5337]
+- Change `MySQL active connections` visualization title to `MySQL total connections`. {issue}4812[4812]
 
 *Packetbeat*
 
 - Fix http status phrase parsing not allow spaces. {pull}5312[5312]
+- Fix missing length check in the PostgreSQL module. {pull}5457[5457]
 
 *Winlogbeat*
 
@@ -73,6 +79,7 @@ https://github.com/elastic/beats/compare/v6.0.0-beta2...master[Check the HEAD di
 - Add support for enabling TLS renegotiation. {issue}4386[4386]
 - Add Azure VM support for add_cloud_metadata processor {pull}5355[5355]
 - Add `output.file.permission` config option. {pull}4638[4638]
+- Refactor add_kubernetes_metadata to support autodiscovery {pull}5434[5434]
 
 *Auditbeat*
 
@@ -100,6 +107,7 @@ https://github.com/elastic/beats/compare/v6.0.0-beta2...master[Check the HEAD di
 - Auto-select a hostname (based on the host on which the Beat is running) in the Host Overview dashboard. {pull}5340[5340]
 - Add Kubernetes manifests to deploy Metricbeat. {pull}5349[5349]
 - Add etcd module. {issue}4970[4970]
+- Add ip address of docker containers to event. {pull}5379[5379]
 
 *Packetbeat*
 

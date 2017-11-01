@@ -176,11 +176,12 @@ func TestAddJSONFields(t *testing.T) {
 	now := time.Now().UTC()
 
 	tests := []struct {
-		Name          string
-		Data          common.MapStr
-		Text          *string
-		JSONConfig    JSONConfig
-		ExpectedItems common.MapStr
+		Name              string
+		Data              common.MapStr
+		Text              *string
+		JSONConfig        JSONConfig
+		ExpectedItems     common.MapStr
+		ExpectedTimestamp time.Time
 	}{
 		{
 			// by default, don't overwrite keys
@@ -192,6 +193,7 @@ func TestAddJSONFields(t *testing.T) {
 				"type": "test_type",
 				"text": "hello",
 			},
+			ExpectedTimestamp: time.Time{},
 		},
 		{
 			// overwrite keys if asked
@@ -203,6 +205,7 @@ func TestAddJSONFields(t *testing.T) {
 				"type": "test",
 				"text": "hello",
 			},
+			ExpectedTimestamp: time.Time{},
 		},
 		{
 			// without keys_under_root, put everything in a json key
@@ -213,6 +216,7 @@ func TestAddJSONFields(t *testing.T) {
 			ExpectedItems: common.MapStr{
 				"json": common.MapStr{"type": "test", "text": "hello"},
 			},
+			ExpectedTimestamp: time.Time{},
 		},
 		{
 			// when MessageKey is defined, the Text overwrites the value of that key
@@ -224,6 +228,7 @@ func TestAddJSONFields(t *testing.T) {
 				"json": common.MapStr{"type": "test", "text": "hello"},
 				"type": "test_type",
 			},
+			ExpectedTimestamp: time.Time{},
 		},
 		{
 			// when @timestamp is in JSON and overwrite_keys is true, parse it
@@ -233,9 +238,9 @@ func TestAddJSONFields(t *testing.T) {
 			Text:       &text,
 			JSONConfig: JSONConfig{KeysUnderRoot: true, OverwriteKeys: true},
 			ExpectedItems: common.MapStr{
-				"@timestamp": common.MustParseTime("2016-04-05T18:47:18.444Z"),
-				"type":       "test",
+				"type": "test",
 			},
+			ExpectedTimestamp: time.Time(common.MustParseTime("2016-04-05T18:47:18.444Z")),
 		},
 		{
 			// when the parsing on @timestamp fails, leave the existing value and add an error key
@@ -245,10 +250,10 @@ func TestAddJSONFields(t *testing.T) {
 			Text:       &text,
 			JSONConfig: JSONConfig{KeysUnderRoot: true, OverwriteKeys: true},
 			ExpectedItems: common.MapStr{
-				"@timestamp": common.Time(now),
-				"type":       "test",
-				"error":      common.MapStr{"type": "json", "message": "@timestamp not overwritten (parse error on 2016-04-05T18:47:18.44XX4Z)"},
+				"type":  "test",
+				"error": common.MapStr{"type": "json", "message": "@timestamp not overwritten (parse error on 2016-04-05T18:47:18.44XX4Z)"},
 			},
+			ExpectedTimestamp: time.Time{},
 		},
 		{
 			// when the @timestamp has the wrong type, leave the existing value and add an error key
@@ -258,10 +263,10 @@ func TestAddJSONFields(t *testing.T) {
 			Text:       &text,
 			JSONConfig: JSONConfig{KeysUnderRoot: true, OverwriteKeys: true},
 			ExpectedItems: common.MapStr{
-				"@timestamp": common.Time(now),
-				"type":       "test",
-				"error":      common.MapStr{"type": "json", "message": "@timestamp not overwritten (not string)"},
+				"type":  "test",
+				"error": common.MapStr{"type": "json", "message": "@timestamp not overwritten (not string)"},
 			},
+			ExpectedTimestamp: time.Time{},
 		},
 		{
 			// if overwrite_keys is true, but the `type` key in json is not a string, ignore it
@@ -273,6 +278,7 @@ func TestAddJSONFields(t *testing.T) {
 				"type":  "test_type",
 				"error": common.MapStr{"type": "json", "message": "type not overwritten (not string)"},
 			},
+			ExpectedTimestamp: time.Time{},
 		},
 		{
 			// if overwrite_keys is true, but the `type` key in json is empty, ignore it
@@ -284,6 +290,7 @@ func TestAddJSONFields(t *testing.T) {
 				"type":  "test_type",
 				"error": common.MapStr{"type": "json", "message": "type not overwritten (invalid value [])"},
 			},
+			ExpectedTimestamp: time.Time{},
 		},
 		{
 			// if overwrite_keys is true, but the `type` key in json starts with _, ignore it
@@ -295,6 +302,7 @@ func TestAddJSONFields(t *testing.T) {
 				"type":  "test_type",
 				"error": common.MapStr{"type": "json", "message": "type not overwritten (invalid value [_type])"},
 			},
+			ExpectedTimestamp: time.Time{},
 		},
 	}
 
@@ -305,12 +313,13 @@ func TestAddJSONFields(t *testing.T) {
 				jsonFields = fields.(common.MapStr)
 			}
 
-			MergeJSONFields(test.Data, jsonFields, test.Text, test.JSONConfig)
+			ts := MergeJSONFields(test.Data, jsonFields, test.Text, test.JSONConfig)
 
 			t.Log("Executing test:", test)
 			for k, v := range test.ExpectedItems {
 				assert.Equal(t, v, test.Data[k])
 			}
+			assert.Equal(t, test.ExpectedTimestamp, ts)
 		})
 	}
 }

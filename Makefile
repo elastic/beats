@@ -50,6 +50,7 @@ coverage-report:
 .PHONY: update
 update: notice
 	@$(foreach var,$(PROJECTS),$(MAKE) -C $(var) update || exit 1;)
+	@$(MAKE) -C deploy/kubernetes all
 
 .PHONY: clean
 clean:
@@ -105,7 +106,7 @@ docs:
 	sh ./script/build_docs.sh dev-guide github.com/elastic/beats/docs/devguide ${BUILD_DIR}
 
 .PHONY: package
-package: update beats-dashboards kubernetes-manifests
+package: update beats-dashboards
 	@$(foreach var,$(BEATS),SNAPSHOT=$(SNAPSHOT) $(MAKE) -C $(var) package || exit 1;)
 
 	@echo "Start building the dashboards package"
@@ -113,16 +114,10 @@ package: update beats-dashboards kubernetes-manifests
 	@BUILD_DIR=${BUILD_DIR} SNAPSHOT=$(SNAPSHOT) $(MAKE) -C dev-tools/packer package-dashboards ${BUILD_DIR}/upload/build_id.txt
 	@mv build/upload build/dashboards-upload
 
-	@echo "Start building kubernetes manifests"
-	@mkdir -p build/upload/
-	@BUILD_DIR=${BUILD_DIR} SNAPSHOT=$(SNAPSHOT) $(MAKE) -C dev-tools/packer package-kubernetes ${BUILD_DIR}/upload/build_id.txt
-	@mv build/upload build/kubernetes-upload
-
 	@# Copy build files over to top build directory
 	@mkdir -p build/upload/
 	@$(foreach var,$(BEATS),cp -r $(var)/build/upload/ build/upload/$(var)  || exit 1;)
 	@cp -r build/dashboards-upload build/upload/dashboards
-	@cp -r build/kubernetes-upload build/upload/kubernetes
 	@# Run tests on the generated packages.
 	@go test ./dev-tools/package_test.go -files "${BUILD_DIR}/upload/*/*"
 
@@ -158,10 +153,3 @@ python-env:
 .PHONY: test-apm
 test-apm:
 	sh ./script/test_apm.sh
-
-# Build kubernetes manifests
-.PHONY: kubernetes-manifests
-kubernetes-manifests:
-	@mkdir -p build/kubernetes
-	$(MAKE) -C deploy/kubernetes all
-	cp deploy/kubernetes/*.yaml build/kubernetes
