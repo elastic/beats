@@ -11,7 +11,7 @@
       "name": "osd.0",
       "type": "osd",
       "primary_affinity": 1,
-      "exists": 1,
+      "exists": true,
       "id": 0,
       "type_id": 0,
       "crush_weight": 0.048691,

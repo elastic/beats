@@ -74,11 +74,15 @@ func eventsMapping(content []byte) ([]common.MapStr, error) {
 			//osd node
 			nodeInfo["crush_weight"] = node.CrushWeight
 			nodeInfo["depth"] = node.Depth
-			nodeInfo["exists"] = node.Exist
 			nodeInfo["primary_affinity"] = node.PrimaryAffinity
 			nodeInfo["reweight"] = node.Reweight
 			nodeInfo["status"] = node.Status
 			nodeInfo["device_class"] = node.DeviceClass
+			if node.Exist > 0 {
+				nodeInfo["exists"] = true
+			} else {
+				nodeInfo["exists"] = false
+			}
 		}
 		nodeInfo["id"] = node.Id
 		nodeInfo["name"] = node.Name

@@ -1210,7 +1210,7 @@ osd or bucket node id
 [float]
 === `ceph.osd_tree.name`
 
-type: string
+type: text
 
 osd or bucket node name
 
@@ -1218,7 +1218,7 @@ osd or bucket node name
 [float]
 === `ceph.osd_tree.type`
 
-type: string
+type: keyword
 
 osd or bucket node type, illegal type include osd, host, root etc.
 
@@ -1258,7 +1258,7 @@ node depth
 [float]
 === `ceph.osd_tree.exists`
 
-type: long
+type: boolean
 
 is node still exist or not(1-yes, 0-no)
 
@@ -1290,7 +1290,7 @@ status of osd, it should be up or down
 [float]
 === `ceph.osd_tree.device_class`
 
-type: string
+type: keyword
 
 the device class of osd, like hdd, ssd etc.
 

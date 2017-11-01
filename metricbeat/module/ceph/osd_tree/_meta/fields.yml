@@ -8,11 +8,11 @@
       description: >
         osd or bucket node id
     - name: name
-      type: string
+      type: text
       description: >
         osd or bucket node name
     - name: type
-      type: string
+      type: keyword
       description: >
         osd or bucket node type, illegal type include osd, host, root etc.
     - name: type_id
@@ -32,7 +32,7 @@
       description: >
         node depth
     - name: exists
-      type: long
+      type: boolean
       description: >
         is node still exist or not(1-yes, 0-no)
     - name: primary_affinity
@@ -48,7 +48,7 @@
       description: >
         status of osd, it should be up or down
     - name: device_class
-      type: string
+      type: keyword
       description: >
         the device class of osd, like hdd, ssd etc.
     - name: father
