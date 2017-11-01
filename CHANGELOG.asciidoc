@@ -50,6 +50,7 @@ https://github.com/elastic/beats/compare/v6.0.0-beta2...master[Check the HEAD di
 - Fix default paths for redis 4.0.1 logs on macOS {pull}5173[5173]
 - Fix Filebeat not starting if command line and modules configs are used together. {issue}5376[5376]
 - Add support for adding string tags {pull}5395{5395}
+- Fix race condition when limiting the number of harvesters running in parallel {issue}5458[5458]
 
 *Heartbeat*
 
