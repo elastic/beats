@@ -11,48 +11,47 @@
       type: string
       description: >
         osd or bucket node name
-	- name: type
+    - name: type
       type: string
       description: >
         osd or bucket node type, illegal type include osd, host, root etc.
-	- name: type_id
+    - name: type_id
       type: long
       description: >
         osd or bucket node typeID
-	- name: children
+    - name: children
       type: string
       description: >
         bucket children list, seperate by comma.
-	- name: crush_weight
+    - name: crush_weight
       type: float
       description: >
         osd node crush weight
-	- name: depth
+    - name: depth
       type: long
       description: >
         node depth
-	- name: exists
+    - name: exists
       type: long
       description: >
         is node still exist or not(1-yes, 0-no)
-	- name: primary_affinity
+    - name: primary_affinity
       type: float
       description: >
         the weight of reading data from primary osd
-	- name: reweight
+    - name: reweight
       type: long
       description: >
         the reweight of osd
-	- name: status
+    - name: status
       type: string
       description: >
         status of osd, it should be up or down
-	- name: device_class
+    - name: device_class
       type: string
       description: >
         the device class of osd, like hdd, ssd etc.
-	- name: father
+    - name: father
       type: string
       description: >
         the parent node of this osd or bucket node
-	
