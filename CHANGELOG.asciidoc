@@ -40,6 +40,8 @@ https://github.com/elastic/beats/compare/v6.0.0-rc2...master[Check the HEAD diff
 
 *Packetbeat*
 
+- Fix missing length check in the PostgreSQL module. {pull}5457[5457]
+
 *Winlogbeat*
 
 ==== Added
