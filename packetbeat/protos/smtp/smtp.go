@@ -22,9 +22,7 @@ type smtpPlugin struct {
 type connection struct {
 	streams [2]*stream
 	trans   transactions
-
-	// Packet loss affects SMTP session parsing
-	isPacketLoss bool
+	syncer  syncer
 }
 
 // Uni-directioal tcp stream state for parsing messages.
@@ -35,7 +33,8 @@ type stream struct {
 type parseState uint8
 
 const (
-	stateCommand parseState = iota
+	stateUnsynced parseState = iota
+	stateCommand
 	// Request only state
 	stateData
 )
@@ -128,29 +127,30 @@ func (smtp *smtpPlugin) Parse(
 ) protos.ProtocolData {
 	defer logp.Recover("Parse SMTP exception")
 
-	conn := smtp.ensureConnection(private)
+	var err error
+	errMsg := "Error in direction %d: %s"
 
-	// There's no way to recover synchronization from packet loss
-	// during SMTP session. However packetbeat doesn't let us simply
-	// drop the session. The best we can do is suppress any message
-	// generation for the rest of the session.
-	if conn.isPacketLoss {
-		return conn
-	}
+	conn := smtp.ensureConnection(private)
+	conn.ensureStream(dir, smtp, tcptuple)
 
 	st := conn.streams[dir]
-	if st == nil {
-		st = &stream{}
-		st.parser.init(&smtp.parserConfig, &smtp.pub, func(msg *message) error {
-			return conn.trans.onMessage(tcptuple.IPPort(), dir, msg)
-		})
-		conn.streams[dir] = st
-	}
 
-	if err := st.parser.feed(pkt.Ts, pkt.Payload); err != nil {
-		debugf("Error in direction %d: %s", dir, err)
+	if err = st.parser.append(pkt.Payload); err != nil {
+		debugf(errMsg, dir, err)
 		return nil
 	}
+
+	if conn.syncer.done {
+		err = st.parser.process(pkt.Ts)
+	} else {
+		err = conn.syncer.process(pkt.Ts, dir)
+	}
+
+	if err != nil {
+		debugf(errMsg, dir, err)
+		return nil
+	}
+
 	return conn
 }
 
@@ -173,14 +173,15 @@ func (smtp *smtpPlugin) GapInStream(tcptuple *common.TCPTuple, dir uint8,
 	conn := getConnection(private)
 	if conn != nil {
 		debugf("Loss of synchronization due to gap in TCP stream")
-		// Let parser handle the error
-		conn.isPacketLoss = true
 	}
 
-	return private, false
+	// Drop state and let the parsers re-sync
+	return nil, true
 }
 
-func (smtp *smtpPlugin) ensureConnection(private protos.ProtocolData) *connection {
+func (smtp *smtpPlugin) ensureConnection(
+	private protos.ProtocolData,
+) *connection {
 	conn := getConnection(private)
 	if conn == nil {
 		conn = &connection{}
@@ -192,6 +193,26 @@ func (smtp *smtpPlugin) ensureConnection(private protos.ProtocolData) *connectio
 func (conn *connection) dropStreams() {
 	conn.streams[0] = nil
 	conn.streams[1] = nil
+}
+
+func (conn *connection) ensureStream(
+	dir uint8,
+	smtp *smtpPlugin,
+	tcptuple *common.TCPTuple,
+) {
+	st := conn.streams[dir]
+	if st == nil {
+		st = &stream{}
+		st.parser.init(
+			&smtp.parserConfig,
+			&smtp.pub,
+			func(msg *message) error {
+				return conn.trans.onMessage(tcptuple.IPPort(), dir, msg)
+			},
+		)
+		conn.streams[dir] = st
+		conn.syncer.parsers[dir] = &st.parser
+	}
 }
 
 func getConnection(private protos.ProtocolData) *connection {

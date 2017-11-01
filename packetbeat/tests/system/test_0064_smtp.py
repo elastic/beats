@@ -33,10 +33,12 @@ class Test(BaseTest):
         assert all(["smtp.response.code" in o for o in objs])
         assert all([o["smtp.response.code"] < 400 for o in objs])
         assert objs[3]["smtp.request.command"].startswith("Z3V")
+        assert objs[3]["smtp.response.code"] == 334
+        assert objs[3]["smtp.response.phrases"][0] == "UGFzc3dvcmQ6"
 
     def test_smtp_data_attachment(self):
         """
-        Should correctly handle RFC 5322 data payloads
+        Should parse RFC 5322 data payloads
         """
         self.render_config_template(
             smtp_ports=['25'],
@@ -60,7 +62,8 @@ class Test(BaseTest):
 
     def test_smtp_tcp_gap_in_request(self):
         """
-        Should generate no new transactions in case of TCP gap in request
+        Should generate no new transactions if there's not enough data to
+        resync after TCP gap in request
         """
         self.render_config_template(
             smtp_ports=['25'],
@@ -70,7 +73,7 @@ class Test(BaseTest):
             smtp_send_data_body=True,
         )
 
-        self.run_packetbeat(pcap="smtp_tcp_gap_in_request.pcap",
+        self.run_packetbeat(pcap="smtp_tcp_gap_in_data_request.pcap",
                             debug_selectors=["smtp"])
         objs = self.read_output()
 
@@ -79,12 +82,15 @@ class Test(BaseTest):
         assert all([o["status"] == "OK" for o in objs])
         assert all(["smtp.response.code" in o for o in objs])
 
-        # "Enter message" is the last one (before packet loss)
+        # "DATA" is the last request (before packet loss)
+        assert objs[-1]["smtp.request.command"] == "DATA"
+        # "Enter message" is the last response (before packet loss)
         assert objs[-1]["smtp.response.code"] == 354
 
     def test_smtp_tcp_gap_in_response(self):
         """
-        Should generate no new transactions in case of TCP gap in response
+        Should recover if there's enough data to resync after TCP gap
+        in response
         """
         self.render_config_template(
             smtp_ports=['25'],
@@ -98,10 +104,42 @@ class Test(BaseTest):
                             debug_selectors=["smtp"])
         objs = self.read_output()
 
-        assert len(objs) == 3
+        assert len(objs) == 5
         assert all([o["type"] == "smtp" for o in objs])
         assert all([o["status"] == "OK" for o in objs])
         assert all(["smtp.response.code" in o for o in objs])
 
-        # "MAIL" is the last request command (before packet loss)
-        assert objs[-1]["smtp.request.command"] == "MAIL"
+        # "QUIT" is the last request command (after recovery from packet loss)
+        assert objs[-1]["smtp.request.command"] == "QUIT"
+        # 221 is the last response code (after recovery from packet loss)
+        assert objs[-1]["smtp.response.code"] == 221
+
+    def test_smtp_tcp_gap_no_220_prompt(self):
+        """
+        Should handle lack of a 220 prompt in the beginning of a session
+        """
+        self.render_config_template(
+            smtp_ports=['25'],
+            smtp_send_request=False,
+            smtp_send_response=False,
+            smtp_send_data_headers=False,
+            smtp_send_data_body=False,
+        )
+
+        self.run_packetbeat(pcap="smtp_tcp_gap_no_220_prompt.pcap",
+                            debug_selectors=["smtp"])
+        objs = self.read_output()
+
+        assert len(objs) == 6
+        assert all([o["type"] == "smtp" for o in objs])
+        assert all([o["status"] == "OK" for o in objs])
+        assert all(["smtp.response.code" in o for o in objs])
+
+        # "EHLO" command is the first request
+        assert objs[0]["smtp.request.command"] == "EHLO"
+        # 250 code is the first response
+        assert objs[0]["smtp.response.code"] == 250
+        # "QUIT" command is the last request
+        assert objs[-1]["smtp.request.command"] == "QUIT"
+        # 221 code is the last response
+        assert objs[-1]["smtp.response.code"] == 221
