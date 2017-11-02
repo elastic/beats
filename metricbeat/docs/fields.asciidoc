@@ -11312,6 +11312,56 @@ beta[] Module for Windows
 
 
 
+
+[float]
+== service fields
+
+`service` contains the status for windows services.
+
+
+
+[float]
+=== `windows.service.uptime.ms`
+
+type: long
+
+format: duration
+
+`uptime` contains the service uptime metric.
+
+
+[float]
+=== `windows.service.name`
+
+type: keyword
+
+The service name.
+
+
+[float]
+=== `windows.service.display_name`
+
+type: keyword
+
+The display name of the service.
+
+
+[float]
+=== `windows.service.start_type`
+
+type: keyword
+
+The start type of the service. The possible values are `ServiceAutoStart`, `ServiceBootStart`, `ServiceDemandStart`, `ServiceDisabled`, and `ServiceSystemStart`.
+
+
+[float]
+=== `windows.service.state`
+
+type: keyword
+
+The actual state of the service. The possible values are `ServiceContinuePending`, `ServicePausePending`, `ServicePaused`, `ServiceRunning`, `ServiceStartPending`, `ServiceStopPending`, and `ServiceStopped`.
+
+
 [[exported-fields-zookeeper]]
 == ZooKeeper fields
 
