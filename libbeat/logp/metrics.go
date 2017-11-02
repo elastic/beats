@@ -49,7 +49,7 @@ func LogTotalExpvars(cfg *Logging) {
 	zero := monitoring.MakeFlatSnapshot()
 	metrics := formatMetrics(snapshotDelta(zero, snapshotMetrics()))
 	Info("Total non-zero values: %s", metrics)
-	Info("Uptime: %s", time.Now().Sub(startTime))
+	Info("Uptime: %s", time.Since(startTime))
 }
 
 func snapshotMetrics() monitoring.FlatSnapshot {

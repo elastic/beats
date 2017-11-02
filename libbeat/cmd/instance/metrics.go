@@ -7,23 +7,14 @@ import (
 	"github.com/elastic/beats/libbeat/monitoring"
 )
 
-type memstatsVar struct{}
-
-type fixedstatsVar struct{}
-
-var (
-	metrics = monitoring.Default.NewRegistry("beat")
-)
-
 func init() {
-	var ms memstatsVar
-	metrics.Add("memstats", ms, monitoring.Reported)
+	metrics := monitoring.Default.NewRegistry("beat")
 
-	var fs fixedstatsVar
-	metrics.Add("info", fs, monitoring.Reported)
+	monitoring.NewFunc(metrics, "memstats", reportMemStats, monitoring.Report)
+	monitoring.NewFunc(metrics, "info", reportInfo, monitoring.Report)
 }
 
-func (memstatsVar) Visit(m monitoring.Mode, V monitoring.Visitor) {
+func reportMemStats(m monitoring.Mode, V monitoring.Visitor) {
 	var stats runtime.MemStats
 	runtime.ReadMemStats(&stats)
 
@@ -37,11 +28,10 @@ func (memstatsVar) Visit(m monitoring.Mode, V monitoring.Visitor) {
 	}
 }
 
-func (fixedstatsVar) Visit(m monitoring.Mode, V monitoring.Visitor) {
-	uptime := int64(time.Now().Sub(startTime).Seconds())
-
+func reportInfo(_ monitoring.Mode, V monitoring.Visitor) {
 	V.OnRegistryStart()
 	defer V.OnRegistryFinished()
 
-	monitoring.ReportInt(V, "uptime", uptime)
+	uptime := int64(time.Since(startTime).Seconds()) * 1000
+	monitoring.ReportInt(V, "uptime.ms", uptime)
 }
