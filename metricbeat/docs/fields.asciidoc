@@ -11351,7 +11351,7 @@ The start type of the service. The possible values are `ServiceAutoStart`, `Serv
 
 type: keyword
 
-The actual state of the service. The possible values are `ServiceContinuePending`, `ServicePausePending`, `ServicePaused`, `ServiceRuning`, `ServiceStartPending`, `ServiceStopPending`, and `ServiceStopped`.
+The actual state of the service. The possible values are `ServiceContinuePending`, `ServicePausePending`, `ServicePaused`, `ServiceRunning`, `ServiceStartPending`, `ServiceStopPending`, and `ServiceStopped`.
 
 
 [[exported-fields-zookeeper]]
