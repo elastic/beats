@@ -311,7 +311,7 @@ func (reader *ServiceReader) Read() ([]common.MapStr, error) {
 	for _, service := range services {
 		ev := common.MapStr{
 			"display_name": service.DisplayName,
-			"service_name": service.ServiceName,
+			"name":         service.ServiceName,
 			"state":        service.CurrentState,
 			"start_type":   service.StartType,
 		}
