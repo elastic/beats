@@ -1,5 +1,5 @@
 // Created by cgo -godefs - DO NOT EDIT
-// cgo.exe -godefs defs_services_windows.go
+// cgo.exe -godefs defs_service_windows.go
 
 package service
 
