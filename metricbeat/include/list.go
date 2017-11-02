@@ -17,6 +17,7 @@ import (
 	_ "github.com/elastic/beats/metricbeat/module/ceph/cluster_health"
 	_ "github.com/elastic/beats/metricbeat/module/ceph/cluster_status"
 	_ "github.com/elastic/beats/metricbeat/module/ceph/monitor_health"
+	_ "github.com/elastic/beats/metricbeat/module/ceph/osd_tree"
 	_ "github.com/elastic/beats/metricbeat/module/ceph/pool_disk"
 	_ "github.com/elastic/beats/metricbeat/module/couchbase"
 	_ "github.com/elastic/beats/metricbeat/module/couchbase/bucket"
