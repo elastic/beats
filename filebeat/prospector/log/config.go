@@ -193,13 +193,13 @@ func (c *config) resolveRecursiveGlobs() error {
 	return nil
 }
 
-// makeGlobsAbsolute calls `filepath.Abs` on all the globs from config
-func (c *config) makeGlobsAbsolute() error {
+// normalizeGlobPatterns calls `filepath.Abs` on all the globs from config
+func (c *config) normalizeGlobPatterns() error {
 	var paths []string
 	for _, path := range c.Paths {
 		pathAbs, err := filepath.Abs(path)
 		if err != nil {
-			return fmt.Errorf("Error getting absolute path for %s: %v", path, err)
+			return fmt.Errorf("Failed to get the absolute path for %s: %v", path, err)
 		}
 		paths = append(paths, pathAbs)
 	}

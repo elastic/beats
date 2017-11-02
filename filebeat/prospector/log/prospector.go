@@ -86,10 +86,10 @@ func NewProspector(
 		return nil, err
 	}
 	if err := p.config.resolveRecursiveGlobs(); err != nil {
-		return nil, fmt.Errorf("Failed to resolve recursive globs in config: %+v", err)
+		return nil, fmt.Errorf("Failed to resolve recursive globs in config: %v", err)
 	}
-	if err := p.config.makeGlobsAbsolute(); err != nil {
-		return nil, fmt.Errorf("Failed to make globs absolute: %+v", err)
+	if err := p.config.normalizeGlobPatterns(); err != nil {
+		return nil, fmt.Errorf("Failed to normalize globs patterns: %v", err)
 	}
 
 	// Create empty harvester to check if configs are fine
