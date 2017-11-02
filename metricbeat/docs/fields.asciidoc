@@ -11323,7 +11323,7 @@ format: duration
 
 
 [float]
-=== `windows.service.service_name`
+=== `windows.service.name`
 
 type: keyword
 

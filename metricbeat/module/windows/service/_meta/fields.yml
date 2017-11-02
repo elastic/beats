@@ -10,7 +10,7 @@
       description: >
         `uptime` contains the service uptime metric.
 
-    - name: service_name
+    - name: name
       type: keyword
       description: >
         The service name.
