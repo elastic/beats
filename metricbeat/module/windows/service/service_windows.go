@@ -1,6 +1,6 @@
 // +build windows
 
-package services
+package service
 
 import (
 	"bytes"

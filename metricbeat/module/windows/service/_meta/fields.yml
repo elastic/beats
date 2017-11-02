@@ -1,7 +1,7 @@
-- name: services
+- name: service
   type: group
   description: >
-    `services` contains the status for windows services.
+    `service` contains the status for windows services.
   fields:
     - name: uptime.ms
       type: long

@@ -1,6 +1,6 @@
 // +build windows
 
-package services
+package service
 
 import (
 	"github.com/elastic/beats/libbeat/common"
@@ -11,7 +11,7 @@ import (
 // init registers the MetricSet with the central registry.
 // The New method will be called after the setup of the module and before starting to fetch data
 func init() {
-	if err := mb.Registry.AddMetricSet("windows", "services", New); err != nil {
+	if err := mb.Registry.AddMetricSet("windows", "service", New); err != nil {
 		panic(err)
 	}
 }
@@ -29,7 +29,7 @@ type MetricSet struct {
 // Part of new is also setting up the configuration by processing additional
 // configuration entries if needed.
 func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
-	logp.Warn("EXPERIMENTAL: The windows services metricset is experimental")
+	logp.Warn("EXPERIMENTAL: The windows service metricset is experimental")
 
 	reader, err := NewServiceReader()
 	if err != nil {

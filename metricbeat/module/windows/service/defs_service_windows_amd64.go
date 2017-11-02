@@ -1,7 +1,7 @@
 // Created by cgo -godefs - DO NOT EDIT
 // cgo.exe -godefs defs_services_windows.go
 
-package services
+package service
 
 type ServiceErrno uintptr
 
@@ -174,15 +174,18 @@ type EnumServiceStatusProcess struct {
 	LpServiceName        *int8
 	LpDisplayName        *int8
 	ServiceStatusProcess ServiceStatusProcess
+	Pad_cgo_0            [4]byte
 }
 
 type QueryServiceConfig struct {
 	DwServiceType      uint32
 	DwStartType        uint32
 	DwErrorControl     uint32
+	Pad_cgo_0          [4]byte
 	LpBinaryPathName   *int8
 	LpLoadOrderGroup   *int8
 	DwTagId            uint32
+	Pad_cgo_1          [4]byte
 	LpDependencies     *int8
 	LpServiceStartName *int8
 	LpDisplayName      *int8

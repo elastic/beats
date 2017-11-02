@@ -1,6 +1,6 @@
 // +build integration windows
 
-package services
+package service
 
 import (
 	"testing"
@@ -11,7 +11,7 @@ import (
 func TestData(t *testing.T) {
 	config := map[string]interface{}{
 		"module":     "windows",
-		"metricsets": []string{"services"},
+		"metricsets": []string{"service"},
 	}
 
 	f := mbtest.NewEventsFetcher(t, config)

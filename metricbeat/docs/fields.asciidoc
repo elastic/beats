@@ -11306,14 +11306,14 @@ beta[] Module for Windows
 
 
 [float]
-== services fields
+== service fields
 
-`services` contains the status for windows services.
+`service` contains the status for windows services.
 
 
 
 [float]
-=== `windows.services.uptime.ms`
+=== `windows.service.uptime.ms`
 
 type: long
 
@@ -11323,7 +11323,7 @@ format: duration
 
 
 [float]
-=== `windows.services.service_name`
+=== `windows.service.service_name`
 
 type: keyword
 
@@ -11331,7 +11331,7 @@ The service name.
 
 
 [float]
-=== `windows.services.display_name`
+=== `windows.service.display_name`
 
 type: keyword
 
@@ -11339,7 +11339,7 @@ The display name of the service.
 
 
 [float]
-=== `windows.services.start_type`
+=== `windows.service.start_type`
 
 type: keyword
 
@@ -11347,7 +11347,7 @@ The start type of the service. The possible values are `ServiceAutoStart`, `Serv
 
 
 [float]
-=== `windows.services.state`
+=== `windows.service.state`
 
 type: keyword
 

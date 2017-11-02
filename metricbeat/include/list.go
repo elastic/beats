@@ -114,7 +114,7 @@ import (
 	_ "github.com/elastic/beats/metricbeat/module/vsphere/virtualmachine"
 	_ "github.com/elastic/beats/metricbeat/module/windows"
 	_ "github.com/elastic/beats/metricbeat/module/windows/perfmon"
-	_ "github.com/elastic/beats/metricbeat/module/windows/services"
+	_ "github.com/elastic/beats/metricbeat/module/windows/service"
 	_ "github.com/elastic/beats/metricbeat/module/zookeeper"
 	_ "github.com/elastic/beats/metricbeat/module/zookeeper/mntr"
 )

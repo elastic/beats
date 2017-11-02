@@ -1,6 +1,6 @@
 // +build ignore
 
-package services
+package service
 
 /*
 #include <windows.h>
