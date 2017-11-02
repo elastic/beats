@@ -77,7 +77,7 @@ const (
 	ServiceContinuePending ServiceState = C.SERVICE_CONTINUE_PENDING
 	ServicePausePending    ServiceState = C.SERVICE_PAUSE_PENDING
 	ServicePaused          ServiceState = C.SERVICE_PAUSED
-	ServiceRuning          ServiceState = C.SERVICE_RUNNING
+	ServiceRunning         ServiceState = C.SERVICE_RUNNING
 	ServiceStartPending    ServiceState = C.SERVICE_START_PENDING
 	ServiceStopPending     ServiceState = C.SERVICE_STOP_PENDING
 	ServiceStopped         ServiceState = C.SERVICE_STOPPED
