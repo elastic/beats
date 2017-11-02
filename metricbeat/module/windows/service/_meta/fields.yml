@@ -30,5 +30,5 @@
       type: keyword
       description: >
         The actual state of the service.
-        The possible values are `ServiceContinuePending`, `ServicePausePending`, `ServicePaused`, `ServiceRuning`, `ServiceStartPending`,
+        The possible values are `ServiceContinuePending`, `ServicePausePending`, `ServicePaused`, `ServiceRunning`, `ServiceStartPending`,
         `ServiceStopPending`, and `ServiceStopped`.
