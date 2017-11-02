@@ -44,7 +44,7 @@ func init() {
 func newKubernetesAnnotator(cfg *common.Config) (processors.Processor, error) {
 	cfgwarn.Beta("The kubernetes processor is beta")
 
-	config := defaultKuberentesAnnotatorConfig()
+	config := defaultKubernetesAnnotatorConfig()
 
 	err := cfg.Unpack(&config)
 	if err != nil {
@@ -87,7 +87,7 @@ func newKubernetesAnnotator(cfg *common.Config) (processors.Processor, error) {
 	if config.InCluster == true {
 		client, err = k8s.NewInClusterClient()
 		if err != nil {
-			return nil, fmt.Errorf("Unable to get in cluster configuration")
+			return nil, fmt.Errorf("Unable to get in cluster configuration: %v", err)
 		}
 	} else {
 		data, err := ioutil.ReadFile(config.KubeConfig)
@@ -109,11 +109,11 @@ func newKubernetesAnnotator(cfg *common.Config) (processors.Processor, error) {
 	ctx := context.Background()
 	if config.Host == "" {
 		podName := os.Getenv("HOSTNAME")
-		logp.Info("Using pod name %s and namespace %s", podName, config.Namespace)
+		logp.Info("Using pod name %s and namespace %s", podName, client.Namespace)
 		if podName == "localhost" {
 			config.Host = "localhost"
 		} else {
-			pod, error := client.CoreV1().GetPod(ctx, podName, config.Namespace)
+			pod, error := client.CoreV1().GetPod(ctx, podName, client.Namespace)
 			if error != nil {
 				logp.Err("Querying for pod failed with error: ", error.Error())
 				logp.Info("Unable to find pod, setting host to localhost")
