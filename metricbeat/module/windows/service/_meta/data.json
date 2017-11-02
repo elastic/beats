@@ -1,25 +1,20 @@
 {
-  "@timestamp": "2016-05-23T08:05:34.853Z",
-  "@metadata": {
-    "beat": "noindex",
-    "type": "doc",
-    "version": "1.2.3"
-  },
-  "beat": {
-    "name": "host.example.com",
-    "hostname": "host.example.com"
-  },
-  "windows": {
-    "services": {
-      "display_name": "AllJoyn-Routerdienst",
-      "service_name": "AJRouter",
-      "state": "ServiceStopped",
-      "start_type": "ServiceDemandStart"
+    "@timestamp": "2017-10-12T08:05:34.853Z",
+    "beat": {
+        "hostname": "host.example.com",
+        "name": "host.example.com"
+    },
+    "metricset": {
+        "module": "windows",
+        "name": "service",
+        "rtt": 115
+    },
+    "windows": {
+        "service": {
+            "display_name": "AllJoyn-Routerdienst",
+            "name": "AJRouter",
+            "start_type": "ServiceDemandStart",
+            "state": "ServiceStopped"
+        }
     }
-  },
-  "metricset": {
-    "module": "windows",
-    "name": "services",
-    "rtt": 115
-  }
 }
