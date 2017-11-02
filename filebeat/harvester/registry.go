@@ -1,7 +1,7 @@
 package harvester
 
 import (
-	"fmt"
+	"errors"
 	"sync"
 
 	uuid "github.com/satori/go.uuid"
@@ -67,7 +67,7 @@ func (r *Registry) Start(h Harvester) error {
 
 	// Make sure no new harvesters are started after stop was called
 	if !r.active() {
-		return fmt.Errorf("registry already stopped")
+		return errors.New("registry already stopped")
 	}
 
 	r.wg.Add(1)

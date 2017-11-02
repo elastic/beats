@@ -583,7 +583,6 @@ class Test(BaseTest):
         # Make sure there is only one entry, means it didn't follow the symlink
         assert len(data) == 1
 
-    #@unittest.skip("Flaky due to race. Opened https://github.com/elastic/beats/issues/5458")
     def test_harvester_limit(self):
         """
         Test if harvester_limit applies
