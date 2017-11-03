@@ -16,6 +16,8 @@ Filebeat provides a few different ways to enable modules. You can:
 * <<enable-modules-cli>>
 * <<enable-modules-config-file>>
 
+include::../../libbeat/docs/shared-note-file-permissions.asciidoc[]
+
 When you enable modules, you can also
 <<specify-variable-settings,specify variable settings>> to change the default
 behavior of the modules, and you can specify
