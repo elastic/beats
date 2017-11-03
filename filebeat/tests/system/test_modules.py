@@ -208,7 +208,7 @@ class Test(BaseTest):
                      "integration test not available on 2.x")
     def test_setup_machine_learning_nginx(self):
         """
-        Tests that setup works and loads nginx dashboards.
+        Tests that setup works and loads machine learning jobs using --modules flag.
         """
         self.init()
         # generate a minimal configuration
@@ -238,3 +238,87 @@ class Test(BaseTest):
 
         datafeeds = self.es.transport.perform_request("GET", "/_xpack/ml/datafeeds/")
         assert "filebeat-nginx-access-response_code" in (df["job_id"] for df in datafeeds["datafeeds"])
+
+    @unittest.skipIf(not INTEGRATION_TESTS or
+                     os.getenv("TESTING_ENVIRONMENT") == "2x",
+                     "integration test not available on 2.x")
+    def test_setup_machine_learning_nginx_enable(self):
+        """
+        Tests that setup works and loads machine learning jobs for enabled modules.
+        """
+        self.init()
+        # generate a minimal configuration
+        cfgfile = os.path.join(self.working_dir, "filebeat.yml")
+        self.render_config_template(
+            template_name="filebeat_modules",
+            output=cfgfile,
+            index_name=self.index_name,
+            elasticsearch_url=self.elasticsearch_url)
+
+        # Enable nginx
+        os.mkdir(os.path.join(self.working_dir, "modules.d"))
+        with open(os.path.join(self.working_dir, "modules.d/nginx.yml"), "wb") as nginx:
+            nginx.write("- module: nginx")
+
+        cmd = [
+            self.filebeat, "-systemTest",
+            "-e", "-d", "*",
+            "-c", cfgfile,
+            "setup", "--machine-learning"]
+
+        output = open(os.path.join(self.working_dir, "output.log"), "ab")
+        output.write(" ".join(cmd) + "\n")
+        subprocess.Popen(cmd,
+                         stdin=None,
+                         stdout=output,
+                         stderr=output,
+                         bufsize=0).wait()
+
+        jobs = self.es.transport.perform_request("GET", "/_xpack/ml/anomaly_detectors/")
+        assert "filebeat-nginx-access-response_code" in (job["job_id"] for job in jobs["jobs"])
+
+        datafeeds = self.es.transport.perform_request("GET", "/_xpack/ml/datafeeds/")
+        assert "filebeat-nginx-access-response_code" in (df["job_id"] for df in datafeeds["datafeeds"])
+
+    @unittest.skipIf(not INTEGRATION_TESTS or
+                     os.getenv("TESTING_ENVIRONMENT") == "2x",
+                     "integration test not available on 2.x")
+    def test_setup_flag_machine_learning_nginx_enable(self):
+        """
+        Tests that setup works and loads machine learning jobs for enabled modules using --setup flag.
+        """
+        self.init()
+        # generate a minimal configuration
+        cfgfile = os.path.join(self.working_dir, "filebeat.yml")
+        self.render_config_template(
+            template_name="filebeat_modules",
+            output=cfgfile,
+            index_name=self.index_name,
+            elasticsearch_url=self.elasticsearch_url)
+
+        # Enable nginx
+        os.mkdir(os.path.join(self.working_dir, "modules.d"))
+        with open(os.path.join(self.working_dir, "modules.d/nginx.yml"), "wb") as nginx:
+            nginx.write("- module: nginx")
+
+        cmd = [
+            self.filebeat, "-systemTest",
+            "-e", "-d", "*",
+            "-c", cfgfile,
+            "--setup"]
+
+        output = open(os.path.join(self.working_dir, "output.log"), "ab")
+        output.write(" ".join(cmd) + "\n")
+        beat = subprocess.Popen(cmd,
+                                stdin=None,
+                                stdout=output,
+                                stderr=output,
+                                bufsize=0)
+
+        jobs = self.es.transport.perform_request("GET", "/_xpack/ml/anomaly_detectors/")
+        assert "filebeat-nginx-access-response_code" in (job["job_id"] for job in jobs["jobs"])
+
+        datafeeds = self.es.transport.perform_request("GET", "/_xpack/ml/datafeeds/")
+        assert "filebeat-nginx-access-response_code" in (df["job_id"] for df in datafeeds["datafeeds"])
+
+        beat.kill()

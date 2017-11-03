@@ -1,5 +1,8 @@
 filebeat.registry_file: {{ beat.working_dir + '/' }}{{ registryFile|default("registry")}}
 
+filebeat.config.modules:
+  path: {{ beat.working_dir + '/modules.d/*.yml' }}
+
 output.elasticsearch.hosts: ["{{ elasticsearch_url }}"]
 output.elasticsearch.index: {{ index_name }}
 
