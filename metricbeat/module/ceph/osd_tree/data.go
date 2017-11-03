@@ -10,10 +10,10 @@ import (
 )
 
 type Node struct {
-	Id       int64   `json:"id"`
+	ID       int64   `json:"id"`
 	Name     string  `json:"name"`
 	Type     string  `json:"type"`
-	TypeId   int64   `json:"type_id"`
+	TypeID   int64   `json:"type_id"`
 	Children []int64 `json:"children"`
 
 	CrushWeight     float64 `json:"crush_weight"`
@@ -49,15 +49,15 @@ func eventsMapping(content []byte) ([]common.MapStr, error) {
 	childrenMap := make(map[string]string)
 
 	for _, node := range nodeList {
-		if node.Id >= 0 {
+		if node.ID >= 0 {
 			//it's osd node
 			continue
 		}
 		childrenList := []string{}
 		for _, child := range node.Children {
-			childIdStr := strconv.FormatInt(child, 10)
-			childrenList = append(childrenList, childIdStr)
-			fatherMap[childIdStr] = node.Name
+			childIDStr := strconv.FormatInt(child, 10)
+			childrenList = append(childrenList, childIDStr)
+			fatherMap[childIDStr] = node.Name
 		}
 		//generate bucket node's children list
 		childrenMap[node.Name] = strings.Join(childrenList, ",")
@@ -67,7 +67,7 @@ func eventsMapping(content []byte) ([]common.MapStr, error) {
 	events := []common.MapStr{}
 	for _, node := range nodeList {
 		nodeInfo := common.MapStr{}
-		if node.Id < 0 {
+		if node.ID < 0 {
 			//bucket node
 			nodeInfo["children"] = childrenMap[node.Name]
 		} else {
@@ -84,12 +84,12 @@ func eventsMapping(content []byte) ([]common.MapStr, error) {
 				nodeInfo["exists"] = false
 			}
 		}
-		nodeInfo["id"] = node.Id
+		nodeInfo["id"] = node.ID
 		nodeInfo["name"] = node.Name
 		nodeInfo["type"] = node.Type
-		nodeInfo["type_id"] = node.TypeId
+		nodeInfo["type_id"] = node.TypeID
 
-		idStr := strconv.FormatInt(node.Id, 10)
+		idStr := strconv.FormatInt(node.ID, 10)
 		nodeInfo["father"] = fatherMap[idStr]
 
 		events = append(events, nodeInfo)
