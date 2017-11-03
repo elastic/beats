@@ -44,7 +44,7 @@
       description: >
         the reweight of osd
     - name: status
-      type: string
+      type: keyword 
       description: >
         status of osd, it should be up or down
     - name: device_class
@@ -52,6 +52,6 @@
       description: >
         the device class of osd, like hdd, ssd etc.
     - name: father
-      type: string
+      type: keyword 
       description: >
         the parent node of this osd or bucket node

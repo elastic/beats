@@ -1282,7 +1282,7 @@ the reweight of osd
 [float]
 === `ceph.osd_tree.status`
 
-type: string
+type: keyword
 
 status of osd, it should be up or down
 
@@ -1298,7 +1298,7 @@ the device class of osd, like hdd, ssd etc.
 [float]
 === `ceph.osd_tree.father`
 
-type: string
+type: keyword
 
 the parent node of this osd or bucket node
 
