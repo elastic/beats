@@ -20,7 +20,7 @@
       description: >
         osd or bucket node typeID
     - name: children
-      type: string
+      type: text 
       description: >
         bucket children list, seperate by comma.
     - name: crush_weight

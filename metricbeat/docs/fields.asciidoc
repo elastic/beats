@@ -1234,7 +1234,7 @@ osd or bucket node typeID
 [float]
 === `ceph.osd_tree.children`
 
-type: string
+type: text
 
 bucket children list, seperate by comma.
 
