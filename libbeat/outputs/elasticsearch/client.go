@@ -84,7 +84,7 @@ var (
 	errExpectedItemObject    = errors.New("expected item response object")
 	errExpectedStatusCode    = errors.New("expected item status code")
 	errUnexpectedEmptyObject = errors.New("empty object")
-	errExcpectedObjectEnd    = errors.New("expected end of object")
+	errExpectedObjectEnd     = errors.New("expected end of object")
 	errTempBulkFailure       = errors.New("temporary bulk send failure")
 )
 
@@ -505,7 +505,7 @@ func itemStatus(reader *jsonReader) (int, []byte, error) {
 		return 0, nil, err
 	}
 	if kind != dictEnd {
-		err = errExcpectedObjectEnd
+		err = errExpectedObjectEnd
 		logp.Err("Failed to parse bulk response item: %s", err)
 		return 0, nil, err
 	}
