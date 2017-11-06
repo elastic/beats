@@ -37,6 +37,7 @@ var extensionMap = map[uint16]extension{
 	11:     {"ec_points_formats", parseEcPoints},
 	12:     {"srp", parseSrp},
 	13:     {"signature_algorithms", parseSignatureSchemes},
+	16:     {"application_layer_protocol_negotiation", parseALPN},
 	35:     {"session_ticket", parseTicket},
 	0xff01: {"renegotiation_info", ignoreContent},
 }
@@ -201,7 +202,7 @@ func parseSignatureSchemes(buffer bufferView) interface{} {
 		return notParsedExtension
 	}
 	groups := ""
-	for pos := 0; buffer.read16Net(pos+2, &value); pos += 2 {
+	for pos := 2; buffer.read16Net(pos, &value); pos += 2 {
 		groups = stringAppend(groups, signatureScheme(value).String())
 	}
 	return groups
@@ -212,4 +213,22 @@ func parseTicket(buffer bufferView) interface{} {
 		return fmt.Sprintf("(%d bytes)", buffer.length())
 	}
 	return emptyExtension
+}
+
+func parseALPN(buffer bufferView) interface{} {
+	var length uint16
+	if !buffer.read16Net(0, &length) || int(length)+2 != buffer.length() {
+		return notParsedExtension
+	}
+	var strlen uint8
+	var proto string
+	protos := ""
+	for pos := 2; buffer.read8(pos, &strlen); {
+		if !buffer.readString(pos+1, int(strlen), &proto) {
+			return notParsedExtension
+		}
+		protos = stringAppend(protos, proto)
+		pos += 1 + int(strlen)
+	}
+	return protos
 }
