@@ -488,7 +488,7 @@ func (version tlsVersion) String() string {
 }
 
 func certToMap(cert *x509.Certificate) common.MapStr {
-	return common.MapStr{
+	certMap := common.MapStr{
 		"signature_algorithm":  cert.SignatureAlgorithm.String(),
 		"public_key_algorithm": toString(cert.PublicKeyAlgorithm),
 		"version":              cert.Version,
@@ -498,6 +498,15 @@ func certToMap(cert *x509.Certificate) common.MapStr {
 		"not_before":           cert.NotBefore,
 		"not_after":            cert.NotAfter,
 	}
+	san := make([]string, 0, len(cert.DNSNames)+len(cert.IPAddresses)+len(cert.EmailAddresses))
+	san = append(append(san, cert.DNSNames...), cert.EmailAddresses...)
+	for _, ip := range cert.IPAddresses {
+		san = append(san, ip.String())
+	}
+	if len(san) > 0 {
+		certMap["alternative_names"] = san
+	}
+	return certMap
 }
 
 func toMap(name *pkix.Name) common.MapStr {

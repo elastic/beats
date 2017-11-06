@@ -149,6 +149,10 @@
                   type: keyword
                   description: Name or host name identified by the certificate.
 
+            - name: alternative_names
+              type: array
+              description: Subject Alternative Names for this certificate.
+
             - name: issuer
               type: group
               description: Entity that issued and signed this certificate.
@@ -231,6 +235,9 @@
                   type: keyword
                   description: Name or host name identified by the certificate.
 
+            - name: alternative_names
+              type: array
+              description: Subject Alternative Names for this certificate.
 
             - name: issuer
               type: group

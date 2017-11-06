@@ -318,6 +318,18 @@ func TestCertificates(t *testing.T) {
 		}
 		assert.Equal(t, expectedValue, value)
 	}
+	san, err := certMap.GetValue("alternative_names")
+	assert.Nil(t, err)
+	assert.Equal(t, []string{
+		"www.example.org",
+		"example.com",
+		"example.edu",
+		"example.net",
+		"example.org",
+		"www.example.com",
+		"www.example.edu",
+		"www.example.net",
+	}, san)
 }
 
 func TestBadCertMessage(t *testing.T) {
