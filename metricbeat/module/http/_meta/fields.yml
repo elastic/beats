@@ -33,10 +33,10 @@
               type: object
               description: >
                 The HTTP headers received
-            - name: status_code
+            - name: code
               type: keyword
-              description: >
-                The HTTP status code
+              description: The HTTP status code.
+              example: 404
             - name: body
               type: keyword
               description: >
