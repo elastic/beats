@@ -15,7 +15,7 @@
       type: group
       description: >
         JVM Info.
-      fields:  
+      fields:
         - name: version
           type: keyword
           description: >
@@ -41,6 +41,6 @@
           description: >
             Non-Heap max used by the JVM in bytes.
     - name: process.mlockall
-      type: bool
+      type: boolean
       description: >
         If process locked in memory.

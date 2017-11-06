@@ -93,7 +93,7 @@ func createJSONError(message string) common.MapStr {
 // respecting the KeysUnderRoot and OverwriteKeys configuration options.
 // If MessageKey is defined, the Text value from the event always
 // takes precedence.
-func MergeJSONFields(data common.MapStr, jsonFields common.MapStr, text *string, config JSONConfig) {
+func MergeJSONFields(data common.MapStr, jsonFields common.MapStr, text *string, config JSONConfig) time.Time {
 	// The message key might have been modified by multiline
 	if len(config.MessageKey) > 0 && text != nil {
 		jsonFields[config.MessageKey] = *text
@@ -111,6 +111,7 @@ func MergeJSONFields(data common.MapStr, jsonFields common.MapStr, text *string,
 			case common.Time:
 				ts = time.Time(ts)
 			}
+			delete(data, "@timestamp")
 		}
 		event := &beat.Event{
 			Timestamp: ts,
@@ -118,9 +119,7 @@ func MergeJSONFields(data common.MapStr, jsonFields common.MapStr, text *string,
 		}
 		jsontransform.WriteJSONKeys(event, jsonFields, config.OverwriteKeys)
 
-		// if timestamp has been set -> add to data
-		if !event.Timestamp.IsZero() {
-			data["@timestamp"] = common.Time(event.Timestamp)
-		}
+		return event.Timestamp
 	}
+	return time.Time{}
 }

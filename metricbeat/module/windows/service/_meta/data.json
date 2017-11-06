@@ -1,0 +1,20 @@
+{
+    "@timestamp": "2017-10-12T08:05:34.853Z",
+    "beat": {
+        "hostname": "host.example.com",
+        "name": "host.example.com"
+    },
+    "metricset": {
+        "module": "windows",
+        "name": "service",
+        "rtt": 115
+    },
+    "windows": {
+        "service": {
+            "display_name": "AllJoyn-Routerdienst",
+            "name": "AJRouter",
+            "start_type": "ServiceDemandStart",
+            "state": "ServiceStopped"
+        }
+    }
+}

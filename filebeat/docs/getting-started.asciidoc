@@ -19,8 +19,6 @@ After installing the Elastic Stack, read the following topics to learn how to in
 * <<filebeat-starting>>
 * <<view-kibana-dashboards>>
 * <<filebeat-modules-quickstart>>
-* <<command-line-options>>
-* <<directory-layout>>
 * <<setup-repositories>>
 
 [[filebeat-installation]]
@@ -311,4 +309,5 @@ by the dashboards.
 
 Here is an example of the Filebeat system dashboard:
 
+[role="screenshot"]
 image:./images/kibana-system.png[]

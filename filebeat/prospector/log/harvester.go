@@ -75,6 +75,8 @@ type Harvester struct {
 	// event/state publishing
 	forwarder    *harvester.Forwarder
 	publishState func(*util.Data) bool
+
+	onTerminate func()
 }
 
 // NewHarvester creates a new harvester
@@ -154,6 +156,10 @@ func (h *Harvester) Setup() error {
 
 // Run start the harvester and reads files line by line and sends events to the defined output
 func (h *Harvester) Run() error {
+	// Allow for some cleanup on termination
+	if h.onTerminate != nil {
+		defer h.onTerminate()
+	}
 	// This is to make sure a harvester is not started anymore if stop was already
 	// called before the harvester was started. The waitgroup is not incremented afterwards
 	// as otherwise it could happened that between checking for the close channel and incrementing
@@ -270,8 +276,17 @@ func (h *Harvester) Run() error {
 				jsonFields = f.(common.MapStr)
 			}
 
+			data.Event = beat.Event{
+				Timestamp: message.Ts,
+			}
+
 			if h.config.JSON != nil && len(jsonFields) > 0 {
-				reader.MergeJSONFields(fields, jsonFields, &text, *h.config.JSON)
+				ts := reader.MergeJSONFields(fields, jsonFields, &text, *h.config.JSON)
+				if !ts.IsZero() {
+					// there was a `@timestamp` key in the event, so overwrite
+					// the resulting timestamp
+					data.Event.Timestamp = ts
+				}
 			} else if &text != nil {
 				if fields == nil {
 					fields = common.MapStr{}
@@ -279,10 +294,7 @@ func (h *Harvester) Run() error {
 				fields["message"] = text
 			}
 
-			data.Event = beat.Event{
-				Timestamp: message.Ts,
-				Fields:    fields,
-			}
+			data.Event.Fields = fields
 		}
 
 		// Always send event to update state, also if lines was skipped
