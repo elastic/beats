@@ -683,8 +683,7 @@ class Test(BaseTest):
         """
         self.render_config_template(
             path=os.path.abspath(self.working_dir) + "/log/**",
-            scan_frequency="1s",
-            recursive_glob=True,
+            scan_frequency="1s"
         )
 
         testfile_dir = os.path.join(self.working_dir, "log", "some", "other", "subdir")
@@ -714,4 +713,24 @@ class Test(BaseTest):
             max_timeout=10,
             name="output contains 'entry2'")
 
+        filebeat.check_kill_and_wait()
+
+    def test_disable_recursive_glob(self):
+        """
+        Check that the recursive glob can be disabled from the config.
+        """
+        self.render_config_template(
+            path=os.path.abspath(self.working_dir) + "/log/**",
+            scan_frequency="1s",
+            disable_recursive_glob=True,
+        )
+
+        testfile_dir = os.path.join(self.working_dir, "log", "some", "other", "subdir")
+        os.makedirs(testfile_dir)
+        testfile_path = os.path.join(testfile_dir, "input")
+        filebeat = self.start_beat()
+        self.wait_until(
+            lambda: self.log_contains(
+                "recursive glob disabled"),
+            max_timeout=10)
         filebeat.check_kill_and_wait()
