@@ -34,6 +34,8 @@ https://github.com/elastic/beats/compare/v6.0.0-rc2...master[Check the HEAD diff
 
 *Filebeat*
 
+- Fix machine learning jobs setup for dynamic modules. {pull}5509[5509]
+
 *Heartbeat*
 
 *Metricbeat*
