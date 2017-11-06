@@ -1,0 +1,19 @@
+{
+  "sort": [
+    "timestamp", 
+    "desc"
+  ], 
+  "hits": 0, 
+  "description": "", 
+  "title": "Event Explorer [Elasticsearch]", 
+  "version": 1, 
+  "kibanaSavedObjectMeta": {
+    "searchSourceJSON": "{\"index\":\"filebeat-*\",\"highlightAll\":true,\"version\":true,\"filter\":[{\"meta\":{\"negate\":false,\"index\":\"filebeat-*\",\"key\":\"fileset.module\",\"value\":\"elasticsearch\",\"disabled\":false,\"alias\":null,\"type\":\"phrase\"},\"query\":{\"match\":{\"fileset.module\":{\"query\":\"elasticsearch\",\"type\":\"phrase\"}}},\"$state\":{\"store\":\"appState\"}},{\"meta\":{\"negate\":false,\"index\":\"filebeat-*\",\"key\":\"fileset.name\",\"value\":\"log\",\"disabled\":false,\"alias\":null,\"type\":\"phrase\"},\"query\":{\"match\":{\"fileset.name\":{\"query\":\"log\",\"type\":\"phrase\"}}},\"$state\":{\"store\":\"appState\"}}],\"query\":{\"query_string\":{\"query\":\"*\",\"analyze_wildcard\":true}}}"
+  }, 
+  "columns": [
+    "elasticsearch.log.component", 
+    "elasticsearch.log_level", 
+    "elasticsearch.log.node.name", 
+    "message"
+  ]
+}
