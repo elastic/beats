@@ -59,7 +59,9 @@ func (l *ackLoop) run() {
 
 		case <-l.sig:
 			acked += l.handleBatchSig()
-			acks = l.broker.acks
+			if acked > 0 {
+				acks = l.broker.acks
+			}
 		}
 
 		// log.Debug("ackloop INFO")
@@ -81,6 +83,9 @@ func (l *ackLoop) run() {
 // is run by the ackLoop.
 func (l *ackLoop) handleBatchSig() int {
 	lst := l.collectAcked()
+	if lst.empty() {
+		return 0
+	}
 
 	count := 0
 	for current := lst.front(); current != nil; current = current.next {
@@ -108,9 +113,6 @@ func (l *ackLoop) handleBatchSig() int {
 
 func (l *ackLoop) collectAcked() chanList {
 	lst := chanList{}
-
-	acks := l.lst.pop()
-	lst.append(acks)
 
 	done := false
 	for !l.lst.empty() && !done {
