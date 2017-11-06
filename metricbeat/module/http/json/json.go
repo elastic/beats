@@ -128,9 +128,9 @@ func (m *MetricSet) Fetch() (common.MapStr, error) {
 		phrase := strings.TrimPrefix(response.Status, strconv.Itoa(response.StatusCode)+" ")
 		event[mb.ModuleDataKey] = common.MapStr{
 			"response": common.MapStr{
-				"status_code": response.StatusCode,
-				"phrase":      phrase,
-				"headers":     m.getHeaders(response.Header),
+				"code":    response.StatusCode,
+				"phrase":  phrase,
+				"headers": m.getHeaders(response.Header),
 			},
 		}
 	}
