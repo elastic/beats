@@ -18,8 +18,13 @@ This section includes additional information on how to set up and run
 
 * <<command-line-options>>
 
-//MAINTAINERS: If you add a new file to this section, make sure you update the bulletedl ist ^^ too.
+* <<running-on-docker>>
+
+
+//MAINTAINERS: If you add a new file to this section, make sure you update the bulleted list ^^ too.
 
 include::../../libbeat/docs/shared-directory-layout.asciidoc[]
 
 include::../../libbeat/docs/command-reference.asciidoc[]
+
+include::./running-on-docker.asciidoc[]
