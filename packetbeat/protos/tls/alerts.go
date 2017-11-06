@@ -51,7 +51,7 @@ var alertNames = map[alertCode]string{
 }
 
 var (
-	ReadError = errors.New("Buffer read error")
+	errRead = errors.New("Buffer read error")
 )
 
 func (severity alertSeverity) String() string {
@@ -90,7 +90,7 @@ func (parser *parser) parseAlert(buf *bufferView) error {
 
 	var severity, code uint8
 	if !buf.read8(0, &severity) || !buf.read8(1, &code) {
-		return ReadError
+		return errRead
 	}
 	if severity < 1 || severity > 2 {
 		logp.Warn("invalid severity in alert: %v", severity)

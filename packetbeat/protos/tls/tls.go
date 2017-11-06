@@ -266,9 +266,9 @@ func (plugin *tlsPlugin) createEvent(conn *tlsConnectionData) beat.Event {
 	// It is a bit tricky to detect the mechanism used for a resumed session. If the client offered a ticket, then
 	// ticket is assumed as the method used for resumption even when a session ID is also used (as RFC-5077 requires).
 	// It is not possible to tell whether the server accepted the ticket or the session ID.
-	sessionIdMatch := len(clientHello.sessionID) != 0 && clientHello.sessionID == serverHello.sessionID
+	sessionIDMatch := len(clientHello.sessionID) != 0 && clientHello.sessionID == serverHello.sessionID
 	ticketOffered := len(clientHello.ticket.value) != 0 && serverHello.ticket.present
-	resumed := !client.parser.keyExchanged && !server.parser.keyExchanged && (sessionIdMatch || ticketOffered)
+	resumed := !client.parser.keyExchanged && !server.parser.keyExchanged && (sessionIDMatch || ticketOffered)
 
 	tls["resumed"] = resumed
 	if resumed {

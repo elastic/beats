@@ -16,7 +16,7 @@ type extension struct {
 
 var (
 	// returned when the extension should go into the unparsed section
-	notParsedExtension interface{} = nil
+	notParsedExtension interface{}
 
 	// Returned when the extension should have its own entry without a value
 	emptyExtension = ""

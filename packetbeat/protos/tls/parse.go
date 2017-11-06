@@ -462,7 +462,7 @@ func parseCertificates(buffer bufferView) []*x509.Certificate {
 		return nil
 	}
 
-	certs := make([]*x509.Certificate, 0)
+	var certs []*x509.Certificate
 
 	for pos, limit := 3, int(totalLen)+3; pos+3 <= limit; {
 		var certLen uint32
