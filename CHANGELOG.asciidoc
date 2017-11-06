@@ -8,7 +8,7 @@
 // Template, add newest changes here
 
 === Beats version HEAD
-https://github.com/elastic/beats/compare/v5.6.3...5.6[Check the HEAD diff]
+https://github.com/elastic/beats/compare/v5.6.4...5.6[Check the HEAD diff]
 
 ==== Breaking changes
 
@@ -28,8 +28,6 @@ https://github.com/elastic/beats/compare/v5.6.3...5.6[Check the HEAD diff]
 
 *Affecting all Beats*
 
-- Fix race condition in internal logging rotator. {pull}4519[4519]
-
 *Filebeat*
 
 *Heartbeat*
@@ -38,16 +36,11 @@ https://github.com/elastic/beats/compare/v5.6.3...5.6[Check the HEAD diff]
 
 *Packetbeat*
 
-- Fix missing length check in the PostgreSQL module. {pull}5457[5457]
-
 *Winlogbeat*
 
 ==== Added
 
 *Affecting all Beats*
-
-- Add support for enabling TLS renegotiation. {issue}4386[4386]
-- Add setting to enable/disable the slow start in logstash output. {pull}5400[5400]
 
 *Filebeat*
 
@@ -88,6 +81,27 @@ https://github.com/elastic/beats/compare/v5.6.3...5.6[Check the HEAD diff]
 *Winlogbeat*
 
 ////////////////////////////////////////////////////////////
+
+[[release-notes-5.6.4]]
+=== Beats version 5.6.4
+https://github.com/elastic/beats/compare/v5.6.3...v5.6.4[View commits]
+
+==== Bugfixes
+
+*Affecting all Beats*
+
+- Fix race condition in internal logging rotator. {pull}4519[4519]
+
+*Packetbeat*
+
+- Fix missing length check in the PostgreSQL module. {pull}5457[5457]
+
+==== Added
+
+*Affecting all Beats*
+
+- Add support for enabling TLS renegotiation. {issue}4386[4386]
+- Add setting to enable/disable the slow start in logstash output. {pull}5400[5400]
 
 [[release-notes-5.6.3]]
 === Beats version 5.6.3
