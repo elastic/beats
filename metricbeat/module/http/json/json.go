@@ -126,7 +126,7 @@ func (m *MetricSet) Fetch() (common.MapStr, error) {
 	if m.responseEnabled {
 		event[mb.ModuleDataKey] = common.MapStr{
 			"response": common.MapStr{
-				"status_code": response.StatusCode,
+				"code": response.StatusCode,
 				"headers":     m.getHeaders(response.Header),
 			},
 		}
