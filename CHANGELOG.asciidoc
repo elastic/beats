@@ -29,6 +29,7 @@ https://github.com/elastic/beats/compare/v6.0.0-rc2...master[Check the HEAD diff
 ==== Bugfixes
 
 *Affecting all Beats*
+- Process out of order ACKs in correct order. {pull}5526[5526]
 
 *Auditbeat*
 
