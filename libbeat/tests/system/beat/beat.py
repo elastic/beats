@@ -542,3 +542,12 @@ class TestCase(unittest.TestCase, ComposeMixin):
             host=os.getenv("ES_HOST", "localhost"),
             port=os.getenv("ES_PORT", "9200"),
         )
+
+    def get_kibana_url(self):
+        """
+        Returns kibana host URL
+        """
+        return "http://{host}:{port}".format(
+            host=os.getenv("KIBANA_HOST", "localhost"),
+            port=os.getenv("KIBANA_PORT", "5601"),
+        )
