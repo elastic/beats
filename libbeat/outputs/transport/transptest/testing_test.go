@@ -52,7 +52,7 @@ func TestTransportReconnectsOnConnect(t *testing.T) {
 
 	certName := "ca_test"
 	timeout := 2 * time.Second
-	GenCertsForIPIfMIssing(t, net.IP{127, 0, 0, 1}, certName)
+	GenCertForTestingPurpose(t, "127.0.0.1", certName, "")
 
 	testServer(t, &config, func(t *testing.T, makeServer MockServerFactory, proxy *transport.ProxyConfig) {
 		server := makeServer(t, timeout, certName, proxy)
@@ -89,7 +89,7 @@ func TestTransportFailConnectUnknownAddress(t *testing.T) {
 	defer l.Close()
 
 	certName := "ca_test"
-	GenCertsForIPIfMIssing(t, net.IP{127, 0, 0, 1}, certName)
+	GenCertForTestingPurpose(t, "127.0.0.1", certName, "")
 
 	invalidAddr := "invalid.dns.fqdn-unknown.invalid:100"
 
@@ -123,7 +123,7 @@ func TestTransportClosedOnWriteReadError(t *testing.T) {
 
 	certName := "ca_test"
 	timeout := 2 * time.Second
-	GenCertsForIPIfMIssing(t, net.IP{127, 0, 0, 1}, certName)
+	GenCertForTestingPurpose(t, "127.0.0.1", certName, "")
 
 	testServer(t, &config, func(t *testing.T, makeServer MockServerFactory, proxy *transport.ProxyConfig) {
 		server := makeServer(t, timeout, certName, proxy)

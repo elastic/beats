@@ -2,7 +2,6 @@ package logstash
 
 import (
 	"fmt"
-	"net"
 	"os"
 	"testing"
 	"time"
@@ -41,10 +40,10 @@ func TestLogstashTLS(t *testing.T) {
 	enableLogging([]string{"*"})
 
 	certName := "ca_test"
-	ip := net.IP{127, 0, 0, 1}
+	ip := "127.0.0.1"
 
 	timeout := 2 * time.Second
-	transptest.GenCertsForIPIfMIssing(t, ip, certName)
+	transptest.GenCertForTestingPurpose(t, ip, certName, "")
 	server := transptest.NewMockServerTLS(t, timeout, certName, nil)
 
 	// create lumberjack output client
@@ -59,10 +58,10 @@ func TestLogstashTLS(t *testing.T) {
 
 func TestLogstashInvalidTLSInsecure(t *testing.T) {
 	certName := "ca_invalid_test"
-	ip := net.IP{1, 2, 3, 4}
+	ip := "1.2.3.4"
 
 	timeout := 2 * time.Second
-	transptest.GenCertsForIPIfMIssing(t, ip, certName)
+	transptest.GenCertForTestingPurpose(t, ip, certName, "")
 	server := transptest.NewMockServerTLS(t, timeout, certName, nil)
 
 	config := map[string]interface{}{
