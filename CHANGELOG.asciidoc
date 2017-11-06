@@ -43,6 +43,7 @@ https://github.com/elastic/beats/compare/v6.0.0-rc2...master[Check the HEAD diff
 *Packetbeat*
 
 - Fix missing length check in the PostgreSQL module. {pull}5457[5457]
+- Fix panic in ACK handler if event is dropped on blocked queue {issue}5524[5524]
 
 *Winlogbeat*
 
