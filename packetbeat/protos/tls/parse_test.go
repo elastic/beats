@@ -5,6 +5,7 @@ package tls
 import (
 	"encoding/hex"
 	"fmt"
+	"strconv"
 	"testing"
 	"time"
 
@@ -312,6 +313,8 @@ func TestCertificates(t *testing.T) {
 		assert.Nil(t, err, key)
 		if t, ok := value.(time.Time); ok {
 			value = t.String()
+		} else if n, ok := value.(int); ok {
+			value = strconv.Itoa(n)
 		}
 		assert.Equal(t, expectedValue, value)
 	}

@@ -491,7 +491,7 @@ func certToMap(cert *x509.Certificate) common.MapStr {
 	return common.MapStr{
 		"signature_algorithm":  cert.SignatureAlgorithm.String(),
 		"public_key_algorithm": toString(cert.PublicKeyAlgorithm),
-		"version":              fmt.Sprintf("%x", cert.Version),
+		"version":              cert.Version,
 		"serial_number":        cert.SerialNumber.Text(16),
 		"issuer":               toMap(&cert.Issuer),
 		"subject":              toMap(&cert.Subject),
@@ -512,7 +512,7 @@ func toMap(name *pkix.Name) common.MapStr {
 		{"locality", name.Locality},
 		{"province", name.Province},
 		{"postal_code", name.PostalCode},
-		{"serial_number", name.StreetAddress},
+		{"serial_number", name.SerialNumber},
 		{"common_name", name.CommonName},
 		{"street_address", name.StreetAddress},
 	}

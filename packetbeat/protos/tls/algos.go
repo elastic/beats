@@ -467,9 +467,11 @@ func (code pointsGroup) String() string {
 func (code compressionMethod) String() string {
 	switch code {
 	case 0:
-		return "null"
+		return "NULL"
 	case 1:
 		return "DEFLATE"
+	case 64:
+		return "LZS"
 	default:
 		return fmt.Sprintf("(unknown:0x%02x)", uint8(code))
 	}
