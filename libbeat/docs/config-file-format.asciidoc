@@ -289,8 +289,8 @@ NOTE: This section does not apply to Windows or other non-POSIX operating system
 On systems with POSIX file permissions, all Beats configuration files are
 subject to ownership and file permission checks. The purpose of these checks is
 to prevent unauthorized users from providing or modifying configurations that
-are run by the Beat. The owner of the configuration file must be either `root`
-or the user who is executing the Beat process. The permissions on the file must
+are run by the Beat. The owner of the configuration files must be either `root`
+or the user who is executing the Beat process. The permissions on each file must
 disallow writes by anyone other than the owner.
 
 When installed via an RPM or DEB package, the config file at
@@ -317,6 +317,9 @@ permissions use: 'chmod go-w /etc/{beatname}/{beatname}.yml')
 
 To correct this problem, use `chmod go-w /etc/{beatname}/{beatname}.yml` to
 remove write privileges from anyone other than the owner.
+
+Other config files, such as the files in the `modules.d` directory, are subject
+to the same ownership and file permission checks. 
 
 ==== Disabling strict permission checks
 
