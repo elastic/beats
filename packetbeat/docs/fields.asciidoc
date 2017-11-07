@@ -2817,6 +2817,29 @@ The hello extensions provided by the client.
 
 
 [float]
+=== `tls.client_hello.extensions.server_name_indication`
+
+type: string
+
+Comma-separated list of server names
+
+[float]
+=== `tls.client_hello.extensions.application_layer_protocol_negotiation`
+
+type: string
+
+Comma-separated list of protocols
+
+[float]
+=== `tls.client_hello.extensions.session_ticket`
+
+type: string
+
+Length of the session ticket, if provided, or empty
+
+
+
+[float]
 === `tls.server_hello.version`
 
 type: keyword
@@ -2852,6 +2875,21 @@ The compression method selected by the server from the list provided in the clie
 == extensions fields
 
 The hello extensions provided by the server.
+
+
+[float]
+=== `tls.server_hello.extensions.application_layer_protocol_negotiation`
+
+type: string
+
+Negotiated application layer protocol
+
+[float]
+=== `tls.server_hello.extensions.session_ticket`
+
+type: string
+
+Empty
 
 [float]
 == client_certificate fields
