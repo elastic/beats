@@ -1,20 +1,19 @@
-// +build darwin freebsd linux openbsd windows
-
 package memory
 
 import (
 	"github.com/elastic/beats/libbeat/common"
-	"github.com/elastic/beats/metricbeat/module/system"
 	sigar "github.com/elastic/gosigar"
 )
 
+// MemStat includes the memory usage statistics and ratios of usage and total memory usage
 type MemStat struct {
 	sigar.Mem
 	UsedPercent       float64 `json:"used_p"`
 	ActualUsedPercent float64 `json:"actual_used_p"`
 }
 
-func GetMemory() (*MemStat, error) {
+// Get returns the memory stats of the host
+func Get() (*MemStat, error) {
 	mem := sigar.Mem{}
 	err := mem.Get()
 	if err != nil {
@@ -24,23 +23,26 @@ func GetMemory() (*MemStat, error) {
 	return &MemStat{Mem: mem}, nil
 }
 
+// AddMemPercentage calculates the ratio of used and total size of memory
 func AddMemPercentage(m *MemStat) {
 	if m.Mem.Total == 0 {
 		return
 	}
 
 	perc := float64(m.Mem.Used) / float64(m.Mem.Total)
-	m.UsedPercent = system.Round(perc)
+	m.UsedPercent = common.Round(perc, common.DefaultDecimalPlacesCount)
 
 	actualPerc := float64(m.Mem.ActualUsed) / float64(m.Mem.Total)
-	m.ActualUsedPercent = system.Round(actualPerc)
+	m.ActualUsedPercent = common.Round(actualPerc, common.DefaultDecimalPlacesCount)
 }
 
+// SwapStat includes the current swap usage and the ratio of used and total swap size
 type SwapStat struct {
 	sigar.Swap
 	UsedPercent float64 `json:"used_p"`
 }
 
+// GetSwap returns the swap usage of the host
 func GetSwap() (*SwapStat, error) {
 	swap := sigar.Swap{}
 	err := swap.Get()
@@ -51,6 +53,7 @@ func GetSwap() (*SwapStat, error) {
 	return &SwapStat{Swap: swap}, nil
 }
 
+// GetMemoryEvent returns the event created from memory statistics
 func GetMemoryEvent(memStat *MemStat) common.MapStr {
 	return common.MapStr{
 		"total":         memStat.Total,
@@ -63,6 +66,7 @@ func GetMemoryEvent(memStat *MemStat) common.MapStr {
 	}
 }
 
+// GetSwapEvent returns the event created from swap usage
 func GetSwapEvent(swapStat *SwapStat) common.MapStr {
 	return common.MapStr{
 		"total":  swapStat.Total,
@@ -72,11 +76,12 @@ func GetSwapEvent(swapStat *SwapStat) common.MapStr {
 	}
 }
 
+// AddSwapPercentage calculates the ratio of used and total swap size
 func AddSwapPercentage(s *SwapStat) {
 	if s.Swap.Total == 0 {
 		return
 	}
 
 	perc := float64(s.Swap.Used) / float64(s.Swap.Total)
-	s.UsedPercent = system.Round(perc)
+	s.UsedPercent = common.Round(perc, common.DefaultDecimalPlacesCount)
 }
