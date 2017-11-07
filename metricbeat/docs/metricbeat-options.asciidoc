@@ -6,6 +6,8 @@ Metricbeat provides a couple different ways to enable modules and metricsets:
 * <<enable-modules-d-configs>>
 * <<enable-modules-config-file>>
 
+include::../../libbeat/docs/shared-note-file-permissions.asciidoc[]
+
 [float]
 [[enable-modules-d-configs]]
 === Enable module configs in the `modules.d` directory
