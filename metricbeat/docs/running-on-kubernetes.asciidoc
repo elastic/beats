@@ -65,7 +65,7 @@ To deploy Metricbeat to Kubernetes just run:
 
 ["source", "sh", subs="attributes"]
 ------------------------------------------------
-kubectl deploy -f metricbeat-kubernetes.yaml
+kubectl create -f metricbeat-kubernetes.yaml
 ------------------------------------------------
 
 Then you should be able to check the status by running:
