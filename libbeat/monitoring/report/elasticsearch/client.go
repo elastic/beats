@@ -84,13 +84,11 @@ func (c *publishClient) Publish(batch publisher.Batch) error {
 	events := batch.Events()
 	bulk := make([]interface{}, 0, 2*len(events))
 	for _, event := range events {
-		mEvent := report.Event{
-			Timestamp: event.Content.Timestamp,
-			Fields:    event.Content.Fields,
-		}
 		bulk = append(bulk,
-			actMonitoringBeats, mEvent,
-		)
+			actMonitoringBeats, report.Event{
+				Timestamp: event.Content.Timestamp,
+				Fields:    event.Content.Fields,
+			})
 	}
 
 	_, err := c.es.BulkWith("_xpack", "monitoring", c.params, nil, bulk)
