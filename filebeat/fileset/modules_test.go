@@ -346,7 +346,7 @@ func TestMissingModuleFolder(t *testing.T) {
 		load(t, map[string]interface{}{"module": "nginx"}),
 	}
 
-	reg, err := NewModuleRegistry(configs, "5.2.0")
+	reg, err := NewModuleRegistry(configs, "5.2.0", true)
 	assert.NoError(t, err)
 	assert.NotNil(t, reg)
 

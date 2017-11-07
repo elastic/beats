@@ -20,8 +20,7 @@ After installing the Elastic Stack, read the following topics to learn how to in
 * <<load-kibana-dashboards>>
 * <<packetbeat-starting>>
 * <<view-kibana-dashboards>>
-* <<command-line-options>>
-* <<directory-layout>>
+* <<setup-repositories>>
 
 [[packetbeat-installation]]
 === Step 1: Install Packetbeat

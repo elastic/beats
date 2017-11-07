@@ -22,6 +22,7 @@ The following topics describe how to configure Metricbeat:
 * <<configuration-metricbeat>>
 * <<configuration-general-options>>
 * <<metricbeat-configuration-reloading>>
+* <<configuring-internal-queue>>
 * <<configuring-output>>
 * <<configuration-ssl>>
 * <<filtering-and-enhancing-data>>
@@ -34,6 +35,7 @@ The following topics describe how to configure Metricbeat:
 * <<using-environ-vars>>
 * <<yaml-tips>>
 * <<regexp-support>>
+* <<{beatname_lc}-reference-yml>>
 
 --
 
@@ -44,6 +46,8 @@ include::./metricbeat-general-options.asciidoc[]
 include::./reload-configuration.asciidoc[]
 
 :allplatforms:
+include::../../libbeat/docs/queueconfig.asciidoc[]
+
 include::../../libbeat/docs/outputconfig.asciidoc[]
 
 include::../../libbeat/docs/shared-ssl-config.asciidoc[]

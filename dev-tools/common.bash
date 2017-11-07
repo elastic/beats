@@ -78,3 +78,17 @@ setup_go_path() {
 
   debug "GOPATH=${GOPATH}"
 }
+
+jenkins_setup() {
+  : "${HOME:?Need to set HOME to a non-empty value.}"
+  : "${WORKSPACE:?Need to set WORKSPACE to a non-empty value.}"
+
+  # Setup Go.
+  export GOPATH=${WORKSPACE}
+  export PATH=${GOPATH}/bin:${PATH}
+  eval "$(gvm $(cat .go-version))"
+
+  # Workaround for Python virtualenv path being too long.
+  export TEMP_PYTHON_ENV=$(mktemp -d)
+  export PYTHON_ENV="${TEMP_PYTHON_ENV}/python-env"
+}

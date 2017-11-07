@@ -283,8 +283,12 @@ func TestClientWithHeaders(t *testing.T) {
 	// start a mock HTTP server
 	ts := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		assert.Equal(t, "testing value", r.Header.Get("X-Test"))
-		requestCount++
+		// from the documentation: https://golang.org/pkg/net/http/
+		// For incoming requests, the Host header is promoted to the
+		// Request.Host field and removed from the Header map.
+		assert.Equal(t, "myhost.local", r.Host)
 		fmt.Fprintln(w, "Hello, client")
+		requestCount++
 	}))
 	defer ts.Close()
 
@@ -292,6 +296,7 @@ func TestClientWithHeaders(t *testing.T) {
 		URL:   ts.URL,
 		Index: outil.MakeSelector(outil.ConstSelectorExpr("test")),
 		Headers: map[string]string{
+			"host":   "myhost.local",
 			"X-Test": "testing value",
 		},
 	}, nil)

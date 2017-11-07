@@ -16,7 +16,7 @@ REVIEWDOG_REPO=github.com/haya14busa/reviewdog/cmd/reviewdog
 # Runs complete testsuites (unit, system, integration) for all beats with coverage and race detection.
 # Also it builds the docs and the generators
 
-.PHONY: setup-commit-hook 
+.PHONY: setup-commit-hook
 setup-commit-hook:
 	@cp script/pre_commit.sh .git/hooks/pre-commit
 	@chmod 751 .git/hooks/pre-commit
@@ -50,6 +50,7 @@ coverage-report:
 .PHONY: update
 update: notice
 	@$(foreach var,$(PROJECTS),$(MAKE) -C $(var) update || exit 1;)
+	@$(MAKE) -C deploy/kubernetes all
 
 .PHONY: clean
 clean:
@@ -149,6 +150,6 @@ python-env:
 	@$(PYTHON_ENV)/bin/pip install -q --upgrade pip autopep8 six
 
 # Tests if apm works with the current code
-.PHONY: python-env
+.PHONY: test-apm
 test-apm:
 	sh ./script/test_apm.sh

@@ -1,0 +1,86 @@
+[[running-on-kubernetes]]
+=== Running Metricbeat on Kubernetes
+
+Metricbeat <<running-on-docker,Docker images>> can be used on Kubernetes to
+retrieve cluster metrics.
+
+ifeval::["{release-state}"=="unreleased"]
+
+However, version {stack-version} of {beatname_uc} has not yet been
+released, so no Docker image is currently available for this version.
+
+endif::[]
+
+
+[float]
+==== Kubernetes deploy manifests
+
+Metricbeat is deployed in two different ways at the same time:
+
+By deploying Metricbeat as a https://kubernetes.io/docs/concepts/workloads/controllers/daemonset/[DaemonSet]
+we ensure we get a running instance on each node of the cluster. It will be used
+to retrieve most metrics from the host, like system metrics, Docker stats and
+metrics from all the services running on top of Kubernetes.
+
+A single Metricbeat instance is also created using a https://kubernetes.io/docs/concepts/workloads/controllers/Deployment/[Deployment].
+It will retrieve metrics that are unique for the whole cluster, like
+Kubernetes events or https://github.com/kubernetes/kube-state-metrics[kube-state-metrics].
+
+Everything is deployed under `kube-system` namespace, you can change that by
+updating the YAML file.
+
+To get the manifests just run:
+
+["source", "sh", subs="attributes"]
+------------------------------------------------
+curl -L -O https://raw.githubusercontent.com/elastic/beats/{doc-branch}/deploy/kubernetes/metricbeat-kubernetes.yaml
+------------------------------------------------
+
+[float]
+==== Settings
+
+Some parameters are exposed in the manifest to configure logs destination, by
+default they will use an existing Elasticsearch deploy if it's present, but you
+may want to change that behavior, so just edit the YAML file and modify them:
+
+["source", "yaml", subs="attributes"]
+------------------------------------------------
+- name: ELASTICSEARCH_HOST
+  value: elasticsearch
+- name: ELASTICSEARCH_PORT
+  value: "9200"
+- name: ELASTICSEARCH_USERNAME
+  value: elastic
+- name: ELASTICSEARCH_PASSWORD
+  value: changeme
+------------------------------------------------
+
+[float]
+==== Deploy
+
+Metricbeat gets some metrics from https://github.com/kubernetes/kube-state-metrics#usage[kube-state-metrics],
+you will need to deploy it if it's not already running.
+
+To deploy Metricbeat to Kubernetes just run:
+
+["source", "sh", subs="attributes"]
+------------------------------------------------
+kubectl create -f metricbeat-kubernetes.yaml
+------------------------------------------------
+
+Then you should be able to check the status by running:
+
+["source", "sh", subs="attributes"]
+------------------------------------------------
+$ kubectl --namespace=kube-system  get ds/metricbeat
+
+NAME       DESIRED   CURRENT   READY     UP-TO-DATE   AVAILABLE   NODE-SELECTOR   AGE
+metricbeat   32        32        0         32           0           <none>          1m
+
+$ kubectl --namespace=kube-system  get deploy/metricbeat
+
+NAME                    DESIRED   CURRENT   UP-TO-DATE   AVAILABLE   AGE
+metricbeat                1         1         1            1           1m
+------------------------------------------------
+
+Metrics should start flowing to Elasticsearch.

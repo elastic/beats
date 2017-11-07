@@ -1,0 +1,12 @@
+dashboards:
+- id: filebeat-traefik-overview
+  file: Filebeat-traefik-overview.json
+
+- id: filebeat-traefik-logs
+  file: Filebeat-traefik-logs.json
+
+- id: ML-Traefik-Access-Remote-IP-Count-Explorer
+  file: ml-traefik-access-remote-ip-count-explorer.json
+
+- id: ML-Traefik-Remote-IP-URL-Explorer
+  file: ml-traefik-remote-ip-url-explorer.json
