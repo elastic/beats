@@ -82,11 +82,14 @@ type beatConfig struct {
 var (
 	printVersion bool
 	setup        bool
+	startTime    time.Time
 )
 
 var debugf = logp.MakeDebug("beat")
 
 func init() {
+	startTime = time.Now()
+
 	initRand()
 
 	flag.BoolVar(&printVersion, "version", false, "Print the version and exit")
@@ -421,7 +424,7 @@ func (b *Beat) configure() error {
 		return fmt.Errorf("error setting default paths: %v", err)
 	}
 
-	err = logp.Init(b.Info.Beat, &b.Config.Logging)
+	err = logp.Init(b.Info.Beat, startTime, &b.Config.Logging)
 	if err != nil {
 		return fmt.Errorf("error initializing logging: %v", err)
 	}
