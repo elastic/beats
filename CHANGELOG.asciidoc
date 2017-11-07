@@ -28,7 +28,6 @@ https://github.com/elastic/beats/compare/v5.6.4...5.6[Check the HEAD diff]
 
 *Affecting all Beats*
 
-- Fix race condition in internal logging rotator. {pull}4519[4519]
 - Fix duplicate batches of events in retry queue. {pull}5520[5520]
 
 *Filebeat*
