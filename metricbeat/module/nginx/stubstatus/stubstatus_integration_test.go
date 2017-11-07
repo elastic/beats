@@ -5,6 +5,7 @@ package stubstatus
 import (
 	"testing"
 
+	"github.com/elastic/beats/libbeat/tests/compose"
 	mbtest "github.com/elastic/beats/metricbeat/mb/testing"
 	"github.com/elastic/beats/metricbeat/module/nginx"
 
@@ -12,6 +13,8 @@ import (
 )
 
 func TestFetch(t *testing.T) {
+	compose.EnsureUp(t, "nginx")
+
 	f := mbtest.NewEventFetcher(t, getConfig())
 	event, err := f.Fetch()
 	if !assert.NoError(t, err) {

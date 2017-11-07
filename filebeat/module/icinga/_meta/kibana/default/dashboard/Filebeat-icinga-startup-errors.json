@@ -1,0 +1,62 @@
+{
+  "objects": [
+    {
+      "attributes": {
+        "description": "",
+        "kibanaSavedObjectMeta": {
+          "searchSourceJSON": "{\n  \"filter\": []\n}"
+        },
+        "savedSearchId": "710043e0-2417-11e7-a83b-d5f4cebac9ff",
+        "title": "Startup Errors [Filebeat Icinga]",
+        "uiStateJSON": "{\n  \"vis\": {\n    \"colors\": {\n      \"Count\": \"#BF1B00\"\n    }\n  }\n}",
+        "version": 1,
+        "visState": "{\n  \"title\": \"Icinga Startup Errors\",\n  \"type\": \"histogram\",\n  \"params\": {\n    \"addTooltip\": true,\n    \"addLegend\": true,\n    \"legendPosition\": \"right\",\n    \"scale\": \"linear\",\n    \"mode\": \"stacked\",\n    \"times\": [],\n    \"addTimeMarker\": false,\n    \"defaultYExtents\": false,\n    \"setYExtents\": false\n  },\n  \"aggs\": [\n    {\n      \"id\": \"1\",\n      \"enabled\": true,\n      \"type\": \"count\",\n      \"schema\": \"metric\",\n      \"params\": {}\n    },\n    {\n      \"id\": \"2\",\n      \"enabled\": true,\n      \"type\": \"date_histogram\",\n      \"schema\": \"segment\",\n      \"params\": {\n        \"field\": \"@timestamp\",\n        \"interval\": \"auto\",\n        \"customInterval\": \"2h\",\n        \"min_doc_count\": 1,\n        \"extended_bounds\": {}\n      }\n    }\n  ],\n  \"listeners\": {}\n}"
+      },
+      "id": "a59b5e00-2417-11e7-a83b-d5f4cebac9ff",
+      "type": "visualization",
+      "version": 2
+    },
+    {
+      "attributes": {
+        "columns": [
+          "icinga.startup.facility",
+          "icinga.startup.severity",
+          "icinga.startup.message"
+        ],
+        "description": "",
+        "hits": 0,
+        "kibanaSavedObjectMeta": {
+          "searchSourceJSON": "{\"index\":\"filebeat-*\",\"highlightAll\":true,\"query\":{\"query\":{\"query_string\":{\"query\":\"icinga.startup.severity:critical\",\"analyze_wildcard\":true,\"default_field\":\"*\"}},\"language\":\"lucene\"},\"filter\":[],\"version\":true}"
+        },
+        "sort": [
+          "@timestamp",
+          "desc"
+        ],
+        "title": "Startup Errors [Filebeat Icinga]",
+        "version": 1
+      },
+      "id": "710043e0-2417-11e7-a83b-d5f4cebac9ff",
+      "type": "search",
+      "version": 2
+    },
+    {
+      "attributes": {
+        "description": "Filebeat Icinga module dashboard for startup errors",
+        "hits": 0,
+        "kibanaSavedObjectMeta": {
+          "searchSourceJSON": "{\"filter\":[],\"query\":{\"language\":\"lucene\",\"query\":{\"query_string\":{\"analyze_wildcard\":true,\"default_field\":\"*\",\"query\":\"*\"}}},\"highlightAll\":true,\"version\":true}"
+        },
+        "optionsJSON": "{\"darkTheme\":false}",
+        "panelsJSON": "[{\"col\":1,\"id\":\"a59b5e00-2417-11e7-a83b-d5f4cebac9ff\",\"panelIndex\":1,\"row\":1,\"size_x\":12,\"size_y\":2,\"type\":\"visualization\"},{\"col\":1,\"columns\":[\"icinga.startup.facility\",\"icinga.startup.severity\",\"icinga.startup.message\"],\"id\":\"710043e0-2417-11e7-a83b-d5f4cebac9ff\",\"panelIndex\":2,\"row\":3,\"size_x\":12,\"size_y\":13,\"sort\":[\"@timestamp\",\"desc\"],\"type\":\"search\"}]",
+        "timeRestore": false,
+        "title": "[Filebeat Icinga] Startup Errors",
+        "uiStateJSON": "{}",
+        "version": 1
+      },
+      "id": "b9163ea0-2417-11e7-a83b-d5f4cebac9ff",
+      "type": "dashboard",
+      "version": 2
+    }
+  ],
+  "version": "6.0.0-beta1-SNAPSHOT"
+}

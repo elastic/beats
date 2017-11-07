@@ -1,0 +1,436 @@
+- key: common
+  title: Common
+  description: >
+      These fields contain data about the environment in which the
+      transaction or flow was captured.
+  fields:
+    - name: server
+      description: >
+        The name of the server that served the transaction.
+
+    - name: client_server
+      description: >
+        The name of the server that initiated the transaction.
+
+    - name: service
+      description: >
+        The name of the logical service that served the transaction.
+
+    - name: client_service
+      description: >
+        The name of the logical service that initiated the transaction.
+
+    - name: ip
+      description: >
+        The IP address of the server that served the transaction.
+      format: dotted notation.
+
+    - name: client_ip
+      description: >
+        The IP address of the server that initiated the transaction.
+      format: dotted notation.
+
+    - name: real_ip
+      description: >
+        If the server initiating the transaction is a proxy, this field
+        contains the original client IP address.
+        For HTTP, for example, the IP address extracted from a configurable
+        HTTP header, by default `X-Forwarded-For`.
+
+        Unless this field is disabled, it always has a value, and it matches
+        the `client_ip` for non proxy clients.
+      format: Dotted notation.
+
+    - name: client_geoip
+      description: The GeoIP information of the client.
+      type: group
+      fields:
+        - name: location
+          type: geo_point
+          example: {lat: 51, lon: 9}
+          description: >
+            The GeoIP location of the `client_ip` address. This field is available
+            only if you define a
+            https://www.elastic.co/guide/en/elasticsearch/plugins/master/using-ingest-geoip.html[GeoIP Processor] as a pipeline in the
+            https://www.elastic.co/guide/en/elasticsearch/plugins/master/ingest-geoip.html[Ingest GeoIP processor plugin] or using Logstash.
+
+    - name: client_port
+      description: >
+        The layer 4 port of the process that initiated the transaction.
+      format: dotted notation.
+
+    - name: transport
+      description: >
+        The transport protocol used for the transaction. If not specified, then
+        tcp is assumed.
+      example: udp
+
+    - name: type
+      description: >
+        The type of the transaction (for example, HTTP, MySQL, Redis, or RUM) or "flow" in case of flows.
+      required: true
+
+    - name: port
+      description: >
+        The layer 4 port of the process that served the transaction.
+      format: dotted notation.
+
+    - name: proc
+      description: >
+        The name of the process that served the transaction.
+
+    - name: client_proc
+      description: >
+        The name of the process that initiated the transaction.
+
+    - name: release
+      description: >
+        The software release of the service serving the transaction.
+        This can be the commit id or a semantic version.
+
+- key: flows_event
+  title: "Flow Event"
+  description: >
+    These fields contain data about the flow itself.
+  fields:
+    - name: "start_time"
+      type: date
+      required: true
+      format: YYYY-MM-DDTHH:MM:SS.milliZ
+      example: 2015-01-24T14:06:05.071Z
+      description: >
+        The time, the first packet for the flow has been seen.
+
+    - name: "last_time"
+      type: date
+      required: true
+      format: YYYY-MM-DDTHH:MM:SS.milliZ
+      example: 2015-01-24T14:06:05.071Z
+      description: >
+        The time, the most recent processed packet for the flow has been seen.
+
+    - name: final
+      description: >
+        Indicates if event is last event in flow. If final is false, the event
+        reports an intermediate flow state only.
+
+    - name: flow_id
+      description: >
+        Internal flow id based on connection meta data and address.
+
+    - name: vlan
+      description: >
+        Innermost VLAN address used in network packets.
+
+    - name: outer_vlan
+      description: >
+        Second innermost VLAN address used in network packets.
+
+
+    - name: source
+      type: group
+      description: >
+        Properties of the source host
+      fields:
+        - name: mac
+          description: >
+            Source MAC address as indicated by first packet seen for the current flow.
+
+        - name: ip
+          description: >
+            Innermost IPv4 source address as indicated by first packet seen for the
+            current flow.
+
+        - name: ip_location
+          type: geo_point
+          example: "40.715, -74.011"
+          description: >
+            The GeoIP location of the `ip_source` IP address. The field is a string
+            containing the latitude and longitude separated by a comma.
+
+        - name: outer_ip
+          description: >
+            Second innermost IPv4 source address as indicated by first packet seen
+            for the current flow.
+
+        - name: outer_ip_location
+          type: geo_point
+          example: "40.715, -74.011"
+          description: >
+            The GeoIP location of the `outer_ip_source` IP address. The field is a
+            string containing the latitude and longitude separated by a comma.
+
+        - name: ipv6
+          description: >
+            Innermost IPv6 source address as indicated by first packet seen for the
+            current flow.
+
+        - name: ipv6_location
+          type: geo_point
+          example: "60.715, -76.011"
+          description: >
+            The GeoIP location of the `ipv6_source` IP address. The field is a string
+            containing the latitude and longitude separated by a comma.
+
+        - name: outer_ipv6
+          description: >
+            Second innermost IPv6 source address as indicated by first packet seen
+            for the current flow.
+
+        - name: outer_ipv6_location
+          type: geo_point
+          example: "60.715, -76.011"
+          description: >
+            The GeoIP location of the `outer_ipv6_source` IP address. The field is a
+            string containing the latitude and longitude separated by a comma.
+
+        - name: port
+          description: >
+            Source port number as indicated by first packet seen for the current flow.
+
+        - name: stats
+          type: group
+          description: >
+            Object with source to destination flow measurements.
+          fields:
+            - name: net_packets_total
+              type: long
+              description: >
+                Total number of packets
+
+            - name: net_bytes_total
+              type: long
+              description: >
+                Total number of bytes
+
+
+
+    - name: dest
+      type: group
+      description: >
+        Properties of the destination host
+      fields:
+        - name: mac
+          description: >
+            Destination MAC address as indicated by first packet seen for the current flow.
+
+        - name: ip
+          description: >
+            Innermost IPv4 destination address as indicated by first packet seen for the
+            current flow.
+
+        - name: ip_location
+          type: geo_point
+          example: "40.715, -74.011"
+          description: >
+            The GeoIP location of the `ip_dest` IP address. The field is a string
+            containing the latitude and longitude separated by a comma.
+
+        - name: outer_ip
+          description: >
+            Second innermost IPv4 destination address as indicated by first packet
+            seen for the current flow.
+
+        - name: outer_ip_location
+          type: geo_point
+          example: "40.715, -74.011"
+          description: >
+            The GeoIP location of the `outer_ip_dest` IP address. The field is a
+            string containing the latitude and longitude separated by a comma.
+
+        - name: ipv6
+          description: >
+            Innermost IPv6 destination address as indicated by first packet seen for the
+            current flow.
+
+        - name: ipv6_location
+          type: geo_point
+          example: "60.715, -76.011"
+          description: >
+            The GeoIP location of the `ipv6_dest` IP address. The field is a string
+            containing the latitude and longitude separated by a comma.
+
+        - name: outer_ipv6
+          description: >
+            Second innermost IPv6 destination address as indicated by first packet
+            seen for the current flow.
+
+        - name: outer_ipv6_location
+          type: geo_point
+          example: "60.715, -76.011"
+          description: >
+            The GeoIP location of the `outer_ipv6_dest` IP address. The field is a
+            string containing the latitude and longitude separated by a comma.
+
+        - name: port
+          description: >
+            Destination port number as indicated by first packet seen for the current flow.
+
+        - name: stats
+          type: group
+          description: >
+            Object with destination to source flow measurements.
+          fields:
+            - name: net_packets_total
+              type: long
+              description: >
+                Total number of packets
+
+            - name: net_bytes_total
+              type: long
+              description: >
+                Total number of bytes
+    - name: icmp_id
+      description: >
+        ICMP id used in ICMP based flow.
+
+    - name: connection_id
+      description: >
+        optional TCP connection id
+
+- key: trans_event
+  title: "Transaction Event"
+  description: >
+    These fields contain data about the transaction itself.
+  fields:
+
+    - name: direction
+      required: true
+      description: >
+        Indicates whether the transaction is inbound (emitted by server)
+        or outbound (emitted by the client). Values can be in or out. No defaults.
+      possible_values:
+        - in
+        - out
+
+    - name: status
+      description: >
+        The high level status of the transaction. The way to compute this
+        value depends on the protocol, but the result has a meaning
+        independent of the protocol.
+      required: true
+      possible_values:
+        - OK
+        - Error
+        - Server Error
+        - Client Error
+
+    - name: method
+      description: >
+        The command/verb/method of the transaction. For HTTP, this is the
+        method name (GET, POST, PUT, and so on), for SQL this is the verb (SELECT,
+        UPDATE, DELETE, and so on).
+
+    - name: resource
+      description: >
+        The logical resource that this transaction refers to. For HTTP, this is
+        the URL path up to the last slash (/). For example, if the URL is `/users/1`,
+        the resource is `/users`. For databases, the resource is typically the
+        table name. The field is not filled for all transaction types.
+
+    - name: path
+      required: true
+      description: >
+        The path the transaction refers to. For HTTP, this is the URL.
+        For SQL databases, this is the table name. For key-value stores, this
+        is the key.
+
+    - name: query
+      type: keyword
+      description: >
+        The query in a human readable format. For HTTP, it will typically be
+        something like `GET /users/_search?name=test`. For MySQL, it is
+        something like `SELECT id from users where name=test`.
+
+    - name: params
+      type: text
+      description: >
+        The request parameters. For HTTP, these are the POST or GET parameters.
+        For Thrift-RPC, these are the parameters from the request.
+
+    - name: notes
+      description: >
+        Messages from Packetbeat itself. This field usually contains error messages for
+        interpreting the raw data. This information can be helpful for troubleshooting.
+
+- key: raw
+  title: Raw
+  description: These fields contain the raw transaction data.
+  fields:
+    - name: request
+      type: text
+      description: >
+        For text protocols, this is the request as seen on the wire
+        (application layer only). For binary protocols this is our
+        representation of the request.
+
+    - name: response
+      type: text
+      description: >
+        For text protocols, this is the response as seen on the wire
+        (application layer only). For binary protocols this is our
+        representation of the request.
+
+- key: trans_measurements
+  title: "Measurements (Transactions)"
+  description: >
+    These fields contain measurements related to the transaction.
+  fields:
+    - name: responsetime
+      description: >
+        The wall clock time it took to complete the transaction.
+        The precision is in milliseconds.
+      type: long
+
+    - name: cpu_time
+      description: The CPU time it took to complete the transaction.
+      type: long
+
+    - name: bytes_in
+      description: >
+        The number of bytes of the request. Note that this size is
+        the application layer message length, without the length of the IP or
+        TCP headers.
+      type: long
+      format: bytes
+
+    - name: bytes_out
+      description: >
+        The number of bytes of the response. Note that this size is
+        the application layer message length, without the length of the IP or
+        TCP headers.
+      type: long
+      format: bytes
+
+    - name: dnstime
+      type: long
+      description: >
+        The time it takes to query the name server for a given request.
+        This is typically used for RUM (real-user-monitoring) but can
+        also have values for server-to-server communication when DNS
+        is used for service discovery.
+        The precision is in microseconds.
+
+    - name: connecttime
+      type: long
+      description: >
+        The time it takes for the TCP connection to be established for
+        the given transaction.
+        The precision is in microseconds.
+
+    - name: loadtime
+      type: long
+      description: >
+        The time it takes for the content to be loaded. This is typically
+        used for RUM (real-user-monitoring) but it can make sense in other
+        cases as well.
+        The precision is in microseconds.
+
+    - name: domloadtime
+      type: long
+      description: >
+        In RUM (real-user-monitoring), the total time it takes for the
+        DOM to be loaded. In terms of the W3 Navigation Timing API, this is
+        the difference between `domContentLoadedEnd` and
+        `domContentLoadedStart`.
+

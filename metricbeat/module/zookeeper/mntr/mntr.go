@@ -29,13 +29,14 @@ package mntr
 import (
 	"github.com/elastic/beats/libbeat/common"
 	"github.com/elastic/beats/metricbeat/mb"
+	"github.com/elastic/beats/metricbeat/mb/parse"
 	"github.com/elastic/beats/metricbeat/module/zookeeper"
 
 	"github.com/pkg/errors"
 )
 
 func init() {
-	if err := mb.Registry.AddMetricSet("zookeeper", "mntr", New); err != nil {
+	if err := mb.Registry.AddMetricSet("zookeeper", "mntr", New, parse.PassThruHostParser); err != nil {
 		panic(err)
 	}
 }

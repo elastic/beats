@@ -1,0 +1,9 @@
+dashboards:
+- id: Metricbeat-system-overview
+  file: Metricbeat-system-overview.json
+
+- id: 79ffd6e0-faa0-11e6-947f-177f697178b8
+  file: Metricbeat-host-overview.json
+
+- id: CPU-slash-Memory-per-container
+  file: Metricbeat-containers-overview.json

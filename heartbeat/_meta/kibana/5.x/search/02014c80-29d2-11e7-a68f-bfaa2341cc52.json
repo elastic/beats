@@ -1,0 +1,24 @@
+{
+  "sort": [
+    "@timestamp", 
+    "desc"
+  ], 
+  "hits": 0, 
+  "description": "", 
+  "title": "Heartbeat HTTP pings", 
+  "version": 1, 
+  "kibanaSavedObjectMeta": {
+    "searchSourceJSON": "{\n  \"index\": \"heartbeat-*\",\n  \"highlightAll\": true,\n  \"query\": {\n    \"query_string\": {\n      \"analyze_wildcard\": true,\n      \"query\": \"*\"\n    }\n  },\n  \"filter\": [\n    {\n      \"$state\": {\n        \"store\": \"appState\"\n      },\n      \"meta\": {\n        \"alias\": null,\n        \"disabled\": false,\n        \"index\": \"heartbeat-*\",\n        \"key\": \"monitor.type\",\n        \"negate\": false,\n        \"value\": \"http\"\n      },\n      \"query\": {\n        \"match\": {\n          \"monitor.type\": {\n            \"query\": \"http\",\n            \"type\": \"phrase\"\n          }\n        }\n      }\n    }\n  ]\n}"
+  }, 
+  "columns": [
+    "monitor.id", 
+    "http.url", 
+    "monitor.status", 
+    "http.response.status", 
+    "monitor.duration.us", 
+    "tcp.rtt.connect.us", 
+    "tls.rtt.handshake.us", 
+    "resolve.rtt.us", 
+    "http.rtt.content.us"
+  ]
+}

@@ -1,0 +1,3 @@
+=== Kubernetes state_deployment metricset
+
+This is the `state_deployment` metricset of the Kubernetes module.

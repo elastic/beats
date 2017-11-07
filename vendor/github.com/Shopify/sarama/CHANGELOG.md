@@ -1,5 +1,159 @@
 # Changelog
 
+#### Version 1.12.0 (2017-05-08)
+
+New Features:
+ - Added support for the `ApiVersions` request and response pair, and Kafka
+   version 0.10.2 ([#867](https://github.com/Shopify/sarama/pull/867)). Note
+   that you still need to specify the Kafka version in the Sarama configuration
+   for the time being.
+ - Added a `Brokers` method to the Client which returns the complete set of
+   active brokers ([#813](https://github.com/Shopify/sarama/pull/813)).
+ - Added an `InSyncReplicas` method to the Client which returns the set of all
+   in-sync broker IDs for the given partition, now that the Kafka versions for
+   which this was misleading are no longer in our supported set
+   ([#872](https://github.com/Shopify/sarama/pull/872)).
+ - Added a `NewCustomHashPartitioner` method which allows constructing a hash
+   partitioner with a custom hash method in case the default (FNV-1a) is not
+   suitable
+   ([#837](https://github.com/Shopify/sarama/pull/837),
+    [#841](https://github.com/Shopify/sarama/pull/841)).
+
+Improvements:
+ - Recognize more Kafka error codes
+   ([#859](https://github.com/Shopify/sarama/pull/859)).
+
+Bug Fixes:
+ - Fix an issue where decoding a malformed FetchRequest would not return the
+   correct error ([#818](https://github.com/Shopify/sarama/pull/818)).
+ - Respect ordering of group protocols in JoinGroupRequests. This fix is
+   transparent if you're using the `AddGroupProtocol` or
+   `AddGroupProtocolMetadata` helpers; otherwise you will need to switch from
+   the `GroupProtocols` field (now deprecated) to use `OrderedGroupProtocols`
+   ([#812](https://github.com/Shopify/sarama/issues/812)).
+ - Fix an alignment-related issue with atomics on 32-bit architectures
+   ([#859](https://github.com/Shopify/sarama/pull/859)).
+
+#### Version 1.11.0 (2016-12-20)
+
+_Important:_ As of Sarama 1.11 it is necessary to set the config value of
+`Producer.Return.Successes` to true in order to use the SyncProducer. Previous
+versions would silently override this value when instantiating a SyncProducer
+which led to unexpected values and data races.
+
+New Features:
+ - Metrics! Thanks to Sébastien Launay for all his work on this feature
+   ([#701](https://github.com/Shopify/sarama/pull/701),
+    [#746](https://github.com/Shopify/sarama/pull/746),
+    [#766](https://github.com/Shopify/sarama/pull/766)).
+ - Add support for LZ4 compression
+   ([#786](https://github.com/Shopify/sarama/pull/786)).
+ - Add support for ListOffsetRequest v1 and Kafka 0.10.1
+   ([#775](https://github.com/Shopify/sarama/pull/775)).
+ - Added a `HighWaterMarks` method to the Consumer which aggregates the
+   `HighWaterMarkOffset` values of its child topic/partitions
+   ([#769](https://github.com/Shopify/sarama/pull/769)).
+
+Bug Fixes:
+ - Fixed producing when using timestamps, compression and Kafka 0.10
+   ([#759](https://github.com/Shopify/sarama/pull/759)).
+ - Added missing decoder methods to DescribeGroups response
+   ([#756](https://github.com/Shopify/sarama/pull/756)).
+ - Fix producer shutdown when `Return.Errors` is disabled
+   ([#787](https://github.com/Shopify/sarama/pull/787)).
+ - Don't mutate configuration in SyncProducer
+   ([#790](https://github.com/Shopify/sarama/pull/790)).
+ - Fix crash on SASL initialization failure
+   ([#795](https://github.com/Shopify/sarama/pull/795)).
+
+#### Version 1.10.1 (2016-08-30)
+
+Bug Fixes:
+ - Fix the documentation for `HashPartitioner` which was incorrect
+   ([#717](https://github.com/Shopify/sarama/pull/717)).
+ - Permit client creation even when it is limited by ACLs
+   ([#722](https://github.com/Shopify/sarama/pull/722)).
+ - Several fixes to the consumer timer optimization code, regressions introduced
+   in v1.10.0. Go's timers are finicky
+   ([#730](https://github.com/Shopify/sarama/pull/730),
+    [#733](https://github.com/Shopify/sarama/pull/733),
+    [#734](https://github.com/Shopify/sarama/pull/734)).
+ - Handle consuming compressed relative offsets with Kafka 0.10
+   ([#735](https://github.com/Shopify/sarama/pull/735)).
+
+#### Version 1.10.0 (2016-08-02)
+
+_Important:_ As of Sarama 1.10 it is necessary to tell Sarama the version of
+Kafka you are running against (via the `config.Version` value) in order to use
+features that may not be compatible with old Kafka versions. If you don't
+specify this value it will default to 0.8.2 (the minimum supported), and trying
+to use more recent features (like the offset manager) will fail with an error.
+
+_Also:_ The offset-manager's behaviour has been changed to match the upstream
+java consumer (see [#705](https://github.com/Shopify/sarama/pull/705) and
+[#713](https://github.com/Shopify/sarama/pull/713)). If you use the
+offset-manager, please ensure that you are committing one *greater* than the
+last consumed message offset or else you may end up consuming duplicate
+messages.
+
+New Features:
+ - Support for Kafka 0.10
+   ([#672](https://github.com/Shopify/sarama/pull/672),
+    [#678](https://github.com/Shopify/sarama/pull/678),
+    [#681](https://github.com/Shopify/sarama/pull/681), and others).
+ - Support for configuring the target Kafka version
+   ([#676](https://github.com/Shopify/sarama/pull/676)).
+ - Batch producing support in the SyncProducer
+   ([#677](https://github.com/Shopify/sarama/pull/677)).
+ - Extend producer mock to allow setting expectations on message contents
+   ([#667](https://github.com/Shopify/sarama/pull/667)).
+
+Improvements:
+ - Support `nil` compressed messages for deleting in compacted topics
+   ([#634](https://github.com/Shopify/sarama/pull/634)).
+ - Pre-allocate decoding errors, greatly reducing heap usage and GC time against
+   misbehaving brokers ([#690](https://github.com/Shopify/sarama/pull/690)).
+ - Re-use consumer expiry timers, removing one allocation per consumed message
+   ([#707](https://github.com/Shopify/sarama/pull/707)).
+
+Bug Fixes:
+ - Actually default the client ID to "sarama" like we say we do
+   ([#664](https://github.com/Shopify/sarama/pull/664)).
+ - Fix a rare issue where `Client.Leader` could return the wrong error
+   ([#685](https://github.com/Shopify/sarama/pull/685)).
+ - Fix a possible tight loop in the consumer
+   ([#693](https://github.com/Shopify/sarama/pull/693)).
+ - Match upstream's offset-tracking behaviour
+   ([#705](https://github.com/Shopify/sarama/pull/705)).
+ - Report UnknownTopicOrPartition errors from the offset manager
+   ([#706](https://github.com/Shopify/sarama/pull/706)).
+ - Fix possible negative partition value from the HashPartitioner
+   ([#709](https://github.com/Shopify/sarama/pull/709)).
+
+#### Version 1.9.0 (2016-05-16)
+
+New Features:
+ - Add support for custom offset manager retention durations
+   ([#602](https://github.com/Shopify/sarama/pull/602)).
+ - Publish low-level mocks to enable testing of third-party producer/consumer
+   implementations ([#570](https://github.com/Shopify/sarama/pull/570)).
+ - Declare support for Golang 1.6
+   ([#611](https://github.com/Shopify/sarama/pull/611)).
+ - Support for SASL plain-text auth
+   ([#648](https://github.com/Shopify/sarama/pull/648)).
+
+Improvements:
+ - Simplified broker locking scheme slightly
+   ([#604](https://github.com/Shopify/sarama/pull/604)).
+ - Documentation cleanup
+   ([#605](https://github.com/Shopify/sarama/pull/605),
+    [#621](https://github.com/Shopify/sarama/pull/621),
+    [#654](https://github.com/Shopify/sarama/pull/654)).
+
+Bug Fixes:
+ - Fix race condition shutting down the OffsetManager
+   ([#658](https://github.com/Shopify/sarama/pull/658)).
+
 #### Version 1.8.0 (2016-02-01)
 
 New Features:

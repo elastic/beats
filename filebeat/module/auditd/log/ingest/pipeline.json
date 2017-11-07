@@ -1,0 +1,101 @@
+{
+    "description": "Pipeline for parsing Linux auditd logs",
+    "processors": [
+        {
+            "grok": {
+                "field": "message",
+                "pattern_definitions": {
+                    "AUDIT_TYPE": "^type=%{NOTSPACE:auditd.log.record_type}",
+                    "AUDIT_PREFIX": "%{AUDIT_TYPE} msg=audit\\(%{NUMBER:auditd.log.epoch}:%{NUMBER:auditd.log.sequence}\\):(%{DATA})?",
+                    "AUDIT_KEY_VALUES": "%{WORD}=%{GREEDYDATA}"
+                },
+                "patterns": [
+                    "%{AUDIT_PREFIX} %{AUDIT_KEY_VALUES:auditd.log.kv} old auid=%{NUMBER:auditd.log.old_auid} new auid=%{NUMBER:auditd.log.new_auid} old ses=%{NUMBER:auditd.log.old_ses} new ses=%{NUMBER:auditd.log.new_ses}",
+                    "%{AUDIT_PREFIX} %{AUDIT_KEY_VALUES:auditd.log.kv} msg=['\"](%{DATA:auditd.log.msg}\\s+)?%{AUDIT_KEY_VALUES:auditd.log.sub_kv}['\"]",
+                    "%{AUDIT_PREFIX} %{AUDIT_KEY_VALUES:auditd.log.kv}",
+                    "%{AUDIT_PREFIX}",
+                    "%{AUDIT_TYPE} %{AUDIT_KEY_VALUES:auditd.log.kv}"
+                ]
+            }
+        },
+        {
+            "kv": {
+                "field": "auditd.log.kv",
+                "field_split": "\\s+",
+                "value_split": "=",
+                "target_field": "auditd.log"
+            }
+        },
+        {
+            "kv": {
+                "field": "auditd.log.sub_kv",
+                "field_split": "\\s+",
+                "value_split": "=",
+                "target_field": "auditd.log",
+                "ignore_missing": true
+            }
+        },
+        {
+            "remove": {
+                "field": "auditd.log.kv",
+                "ignore_failure": true
+            }
+        },
+        {
+            "remove": {
+                "field": "auditd.log.sub_kv",
+                "ignore_failure": true
+            }
+        },
+        {
+            "remove": {
+                "field": "message",
+                "ignore_failure": true
+            }
+        },
+        {
+            "date": {
+                "field": "auditd.log.epoch",
+                "target_field": "@timestamp",
+                "formats": [
+                    "UNIX"
+                ],
+                "ignore_failure": true
+            }
+        },
+        {
+            "remove": {
+                "field": "auditd.log.epoch",
+                "ignore_failure": true
+            }
+        },
+        {
+            "convert": {
+                "field" : "auditd.log.sequence",
+                "type": "integer",
+                "ignore_missing": true
+            }
+        },
+        {
+            "script": {
+                "lang": "painless",
+                "inline": "    String trimQuotes(def v) {\n        if (v.startsWith(\"'\") || v.startsWith('\"')) {\n          v = v.substring(1, v.length());\n        }\n        if (v.endsWith(\"'\") || v.endsWith('\"')) {\n          v = v.substring(0, v.length()-1);\n        }  \n        return v;\n    }\n    \n    boolean isHexAscii(String v) {\n      def len = v.length();\n      if (len == 0 || len % 2 != 0) {\n        return false; \n      }\n  \n      for (int i = 0 ; i < len ; i++) {\n        if (Character.digit(v.charAt(i), 16) == -1) {\n          return false;\n        }\n      }\n\n      return true;\n    }\n    \n    String convertHexToString(String hex) {\n\t    StringBuilder sb = new StringBuilder();\n\n      for (int i=0; i < hex.length() - 1; i+=2) {\n          String output = hex.substring(i, (i + 2));\n          int decimal = Integer.parseInt(output, 16);\n          sb.append((char)decimal);\n      }\n\n      return sb.toString();\n    }\n    \n    def possibleHexKeys = ['exe', 'cmd'];\n    \n    def audit = ctx.auditd.get(\"log\");\n    Iterator entries = audit.entrySet().iterator();\n    while (entries.hasNext()) {\n      def e = entries.next();\n      def k = e.getKey();\n      def v = e.getValue(); \n\n      // Remove entries whose value is ?\n      if (v == \"?\" || v == \"(null)\" || v == \"\") {\n        entries.remove();\n        continue;\n      }\n      \n      // Convert hex values to ASCII.\n      if (possibleHexKeys.contains(k) && isHexAscii(v)) {\n        v = convertHexToString(v);\n        audit.put(k, v);\n      }\n      \n      // Trim quotes.\n      if (v instanceof String) {\n        v = trimQuotes(v);\n        audit.put(k, v);\n      }\n      \n      // Convert arch.\n      if (k == \"arch\" && v == \"c000003e\") {\n        audit.put(k, \"x86_64\");\n      }\n    }"
+            }
+        },
+        {
+            "geoip": {
+                "field": "auditd.log.addr",
+                "target_field": "auditd.log.geoip",
+                "ignore_failure": true
+            }
+        }
+    ],
+    "on_failure": [
+        {
+            "set": {
+                "field": "error.message",
+                "value": "{{ _ingest.on_failure_message }}"
+            }
+        }
+    ]
+}

@@ -1,0 +1,42 @@
+- name: slowlog
+  type: group
+  description: >
+    Contains fields from the MySQL slow logs.
+  fields:
+    - name: user
+      description: >
+        The MySQL user that created the query.
+    - name: host
+      description: >
+        The host from where the user that created the query logged in.
+    - name: ip
+      description: >
+        The IP address from where the user that created the query logged in.
+    - name: query_time.sec
+      type: float
+      description: >
+        The total time the query took, in seconds, as a floating point number.
+    - name: lock_time.sec
+      type: float
+      description: >
+        The amount of time the query waited for the lock to be available. The
+        value is in seconds, as a floating point number.
+    - name: rows_sent
+      type: long
+      description: >
+        The number of rows returned by the query.
+    - name: rows_examined
+      type: long
+      description: >
+        The number of rows scanned by the query.
+    - name: timestamp
+      type: long
+      description: >
+        The unix timestamp taken from the `SET timestamp` query.
+    - name: query
+      description: >
+        The slow query.
+    - name: id
+      type: long
+      description: >
+        The connection ID for the query.

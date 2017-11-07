@@ -1,0 +1,12 @@
+- key: zookeeper
+  title: "ZooKeeper"
+  description: >
+    ZooKeeper metrics collected by the four-letter monitoring commands.
+  short_config: false
+  fields:
+    - name: zookeeper
+      type: group
+      description: >
+        `zookeeper` contains the metrics reported by ZooKeeper
+        commands.
+      fields:

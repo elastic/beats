@@ -1,0 +1,11 @@
+{
+  "visState": "{\"title\":\"MySQL slowest queries\",\"type\":\"table\",\"params\":{\"perPage\":10,\"showPartialRows\":false,\"showMeticsAtAllLevels\":false,\"sort\":{\"columnIndex\":null,\"direction\":null},\"showTotal\":false,\"totalFunc\":\"sum\"},\"aggs\":[{\"id\":\"1\",\"enabled\":true,\"type\":\"max\",\"schema\":\"metric\",\"params\":{\"field\":\"mysql.slowlog.query_time.sec\",\"customLabel\":\"Query time\"}},{\"id\":\"2\",\"enabled\":true,\"type\":\"terms\",\"schema\":\"bucket\",\"params\":{\"field\":\"mysql.slowlog.query\",\"size\":5,\"order\":\"desc\",\"orderBy\":\"1\",\"customLabel\":\"Query\"}},{\"id\":\"3\",\"enabled\":true,\"type\":\"terms\",\"schema\":\"bucket\",\"params\":{\"field\":\"mysql.slowlog.user\",\"size\":5,\"order\":\"desc\",\"orderBy\":\"1\",\"customLabel\":\"User\"}}],\"listeners\":{}}", 
+  "description": "", 
+  "title": "MySQL slowest queries", 
+  "uiStateJSON": "{\"vis\":{\"params\":{\"sort\":{\"columnIndex\":null,\"direction\":null}}}}", 
+  "version": 1, 
+  "savedSearchId": "Filebeat-MySQL-Slow-log", 
+  "kibanaSavedObjectMeta": {
+    "searchSourceJSON": "{\"filter\":[]}"
+  }
+}

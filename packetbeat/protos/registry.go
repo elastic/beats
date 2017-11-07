@@ -3,15 +3,18 @@ package protos
 import (
 	"time"
 
+	"github.com/elastic/beats/libbeat/beat"
 	"github.com/elastic/beats/libbeat/common"
-	"github.com/elastic/beats/packetbeat/publish"
 )
 
 type ProtocolPlugin func(
 	testMode bool,
-	results publish.Transactions,
+	results Reporter,
 	cfg *common.Config,
 ) (Plugin, error)
+
+// Reporter is used by plugin instances to report new transaction events.
+type Reporter func(beat.Event)
 
 // Functions to be exported by a protocol plugin
 type Plugin interface {
@@ -19,20 +22,20 @@ type Plugin interface {
 	GetPorts() []int
 }
 
-type TcpPlugin interface {
+type TCPPlugin interface {
 	Plugin
 
 	// Called when TCP payload data is available for parsing.
-	Parse(pkt *Packet, tcptuple *common.TcpTuple,
+	Parse(pkt *Packet, tcptuple *common.TCPTuple,
 		dir uint8, private ProtocolData) ProtocolData
 
 	// Called when the FIN flag is seen in the TCP stream.
-	ReceivedFin(tcptuple *common.TcpTuple, dir uint8,
+	ReceivedFin(tcptuple *common.TCPTuple, dir uint8,
 		private ProtocolData) ProtocolData
 
 	// Called when a packets are missing from the tcp
 	// stream.
-	GapInStream(tcptuple *common.TcpTuple, dir uint8, nbytes int,
+	GapInStream(tcptuple *common.TCPTuple, dir uint8, nbytes int,
 		private ProtocolData) (priv ProtocolData, drop bool)
 
 	// ConnectionTimeout returns the per stream connection timeout.
@@ -40,11 +43,11 @@ type TcpPlugin interface {
 	ConnectionTimeout() time.Duration
 }
 
-type UdpPlugin interface {
+type UDPPlugin interface {
 	Plugin
 
-	// ParseUdp is invoked when UDP payload data is available for parsing.
-	ParseUdp(pkt *Packet)
+	// ParseUDP is invoked when UDP payload data is available for parsing.
+	ParseUDP(pkt *Packet)
 }
 
 // Protocol identifier.

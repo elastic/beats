@@ -1,0 +1,19 @@
+{
+  "sort": [
+    "@timestamp", 
+    "desc"
+  ], 
+  "hits": 0, 
+  "description": "", 
+  "title": "Filebeat Redis slowlog", 
+  "version": 1, 
+  "kibanaSavedObjectMeta": {
+    "searchSourceJSON": "{\"index\":\"filebeat-*\",\"highlightAll\":true,\"version\":true,\"query\":{\"query_string\":{\"query\":\"_exists_:redis.slowlog\",\"analyze_wildcard\":true}},\"filter\":[]}"
+  }, 
+  "columns": [
+    "beat.name", 
+    "message", 
+    "redis.slowlog.duration.us", 
+    "redis.slowlog.key"
+  ]
+}

@@ -1,0 +1,11 @@
+- key: apache
+  title: "Apache"
+  description: >
+    Apache HTTPD server metricsets collected from the Apache web server.
+  short_config: false
+  fields:
+    - name: apache
+      type: group
+      description: >
+        `apache` contains the metrics that were scraped from Apache.
+      fields:

@@ -1,0 +1,3 @@
+=== PostgreSQL activity metricset
+
+This is the `activity` metricset of the PostgreSQL module.

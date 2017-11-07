@@ -1,0 +1,31 @@
+localhost
+ServerVersion: Apache/2.4.25 (Ubuntu)
+ServerMPM: event
+Server Built: 2017-02-10T16:53:43
+CurrentTime: Monday, 27-Mar-2017 15:39:28 UTC
+RestartTime: Monday, 27-Mar-2017 15:38:33 UTC
+ParentServerConfigGeneration: 1
+ParentServerMPMGeneration: 0
+ServerUptimeSeconds: 55
+ServerUptime: 55 seconds
+Load1: 0.69
+Load5: 0.61
+Load15: 0.58
+Total Accesses: 18
+Total kBytes: 23
+CPUUser: 0
+CPUSystem: .01
+CPUChildrenUser: 0
+CPUChildrenSystem: 0
+CPULoad: .0181818
+Uptime: 55
+ReqPerSec: .327273
+BytesPerSec: 428.218
+BytesPerReq: 1308.44
+BusyWorkers: 1
+IdleWorkers: 49
+ConnsTotal: 0
+ConnsAsyncWriting: 0
+ConnsAsyncKeepAlive: 0
+ConnsAsyncClosing: 0
+Scoreboard: _W________________________________________________....................................................................................................

@@ -1,0 +1,8 @@
+= Filebeat modules developer guide
+
+This guide describes the process of creating a new Filebeat module.
+
+== Overview
+
+A Filebeat module is typically named after the service that creates the logs it
+is collecting and parsing.

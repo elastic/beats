@@ -4,68 +4,101 @@ import (
 	"fmt"
 	"sync"
 
-	"github.com/elastic/beats/filebeat/input"
+	"github.com/elastic/beats/filebeat/channel"
+	"github.com/elastic/beats/filebeat/fileset"
+	"github.com/elastic/beats/filebeat/input/file"
+	"github.com/elastic/beats/filebeat/prospector"
+	"github.com/elastic/beats/filebeat/registrar"
+	"github.com/elastic/beats/libbeat/cfgfile"
 	"github.com/elastic/beats/libbeat/common"
 	"github.com/elastic/beats/libbeat/logp"
+
+	_ "github.com/elastic/beats/filebeat/include"
 )
 
-/*
- The hierarchy for the crawler objects is explained as following
-
- Crawler: Filebeat has one crawler. The crawler is the single point of control
- 	and stores the state. The state is written through the registrar
- Prospector: For every FileConfig the crawler starts a prospector
- Harvester: For every file found inside the FileConfig, the Prospector starts a Harvester
- 		The harvester send their events to the spooler
- 		The spooler sends the event to the publisher
- 		The publisher writes the state down with the registrar
-*/
-
 type Crawler struct {
-	// Registrar object to persist the state
-	Registrar   *Registrar
-	prospectors []*Prospector
-	wg          sync.WaitGroup
+	prospectors         map[uint64]*prospector.Prospector
+	prospectorConfigs   []*common.Config
+	out                 channel.Factory
+	wg                  sync.WaitGroup
+	modulesReloader     *cfgfile.Reloader
+	prospectorsReloader *cfgfile.Reloader
+	once                bool
+	beatVersion         string
+	beatDone            chan struct{}
 }
 
-func (c *Crawler) Start(prospectorConfigs []*common.Config, eventChan chan *input.FileEvent) error {
+func New(out channel.Factory, prospectorConfigs []*common.Config, beatVersion string, beatDone chan struct{}, once bool) (*Crawler, error) {
+	return &Crawler{
+		out:               out,
+		prospectors:       map[uint64]*prospector.Prospector{},
+		prospectorConfigs: prospectorConfigs,
+		once:              once,
+		beatVersion:       beatVersion,
+		beatDone:          beatDone,
+	}, nil
+}
 
-	if len(prospectorConfigs) == 0 {
-		return fmt.Errorf("No prospectors defined. You must have at least one prospector defined in the config file.")
-	}
+// Start starts the crawler with all prospectors
+func (c *Crawler) Start(r *registrar.Registrar, configProspectors *common.Config,
+	configModules *common.Config, pipelineLoaderFactory fileset.PipelineLoaderFactory) error {
 
-	logp.Info("Loading Prospectors: %v", len(prospectorConfigs))
-
-	// Get existing states
-	states := *c.Registrar.state
+	logp.Info("Loading Prospectors: %v", len(c.prospectorConfigs))
 
 	// Prospect the globs/paths given on the command line and launch harvesters
-	for _, prospectorConfig := range prospectorConfigs {
-
-		prospector, err := NewProspector(prospectorConfig, states, eventChan)
+	for _, prospectorConfig := range c.prospectorConfigs {
+		err := c.startProspector(prospectorConfig, r.GetStates())
 		if err != nil {
-			return fmt.Errorf("Error in initing prospector: %s", err)
+			return err
 		}
-		c.prospectors = append(c.prospectors, prospector)
 	}
 
-	logp.Info("Loading Prospectors completed. Number of prospectors: %v", len(c.prospectors))
+	if configProspectors.Enabled() {
+		c.prospectorsReloader = cfgfile.NewReloader(configProspectors)
+		runnerFactory := prospector.NewRunnerFactory(c.out, r, c.beatDone)
+		if err := c.prospectorsReloader.Check(runnerFactory); err != nil {
+			return err
+		}
 
-	c.wg = sync.WaitGroup{}
-	for i, p := range c.prospectors {
-		c.wg.Add(1)
-
-		go func(id int, prospector *Prospector) {
-			defer func() {
-				c.wg.Done()
-				logp.Debug("crawler", "Prospector %v stopped", id)
-			}()
-			logp.Debug("crawler", "Starting prospector %v", id)
-			prospector.Run()
-		}(i, p)
+		go func() {
+			c.prospectorsReloader.Run(runnerFactory)
+		}()
 	}
 
-	logp.Info("All prospectors are initialised and running with %d states to persist", c.Registrar.state.Count())
+	if configModules.Enabled() {
+		c.modulesReloader = cfgfile.NewReloader(configModules)
+		modulesFactory := fileset.NewFactory(c.out, r, c.beatVersion, pipelineLoaderFactory, c.beatDone)
+		if err := c.modulesReloader.Check(modulesFactory); err != nil {
+			return err
+		}
+
+		go func() {
+			c.modulesReloader.Run(modulesFactory)
+		}()
+	}
+
+	logp.Info("Loading and starting Prospectors completed. Enabled prospectors: %v", len(c.prospectors))
+
+	return nil
+}
+
+func (c *Crawler) startProspector(config *common.Config, states []file.State) error {
+	if !config.Enabled() {
+		return nil
+	}
+	p, err := prospector.New(config, c.out, c.beatDone, states)
+	if err != nil {
+		return fmt.Errorf("Error in initing prospector: %s", err)
+	}
+	p.Once = c.once
+
+	if _, ok := c.prospectors[p.ID]; ok {
+		return fmt.Errorf("Prospector with same ID already exists: %d", p.ID)
+	}
+
+	c.prospectors[p.ID] = p
+
+	p.Start()
 
 	return nil
 }
@@ -73,12 +106,33 @@ func (c *Crawler) Start(prospectorConfigs []*common.Config, eventChan chan *inpu
 func (c *Crawler) Stop() {
 	logp.Info("Stopping Crawler")
 
-	logp.Info("Stopping %v prospectors", len(c.prospectors))
-	for _, prospector := range c.prospectors {
-		// Stop prospectors in parallel
+	asyncWaitStop := func(stop func()) {
 		c.wg.Add(1)
-		go prospector.Stop(&c.wg)
+		go func() {
+			defer c.wg.Done()
+			stop()
+		}()
 	}
-	c.wg.Wait()
+
+	logp.Info("Stopping %v prospectors", len(c.prospectors))
+	for _, p := range c.prospectors {
+		// Stop prospectors in parallel
+		asyncWaitStop(p.Stop)
+	}
+
+	if c.prospectorsReloader != nil {
+		asyncWaitStop(c.prospectorsReloader.Stop)
+	}
+
+	if c.modulesReloader != nil {
+		asyncWaitStop(c.modulesReloader.Stop)
+	}
+
+	c.WaitForCompletion()
+
 	logp.Info("Crawler stopped")
+}
+
+func (c *Crawler) WaitForCompletion() {
+	c.wg.Wait()
 }

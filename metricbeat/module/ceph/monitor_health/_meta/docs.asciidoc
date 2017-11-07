@@ -1,0 +1,3 @@
+=== Ceph monitor_health metricset
+
+This is the `monitor_health` metricset of the Ceph module.

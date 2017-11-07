@@ -1,0 +1,12 @@
+package: github.com/elastic/beats/metricbeat/module/docker
+import:
+- package: github.com/fsouza/go-dockerclient
+  version: e085edda407c05214cc6e71e4881de47667e77ec
+- package: github.com/docker/docker
+  version: 8bc7e193464b5b59a2019a4a429a48526f71bc40
+- package: github.com/docker/go-units
+  version: e30f1e79f3cd72542f2026ceec18d3bd67ab859c
+- package: github.com/hashicorp/go-cleanhttp
+  version: ad28ea4487f05916463e2423a55166280e8254b5
+- package: github.com/Microsoft/go-winio
+  version: v0.3.7

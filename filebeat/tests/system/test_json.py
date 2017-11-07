@@ -1,5 +1,6 @@
 from filebeat import BaseTest
 import os
+import six
 
 """
 Tests for the JSON decoding functionality.
@@ -7,6 +8,7 @@ Tests for the JSON decoding functionality.
 
 
 class Test(BaseTest):
+
     def test_docker_logs(self):
         """
         Should be able to interpret docker logs.
@@ -128,6 +130,29 @@ class Test(BaseTest):
         assert output["source"] == "hello"
         assert output["message"] == "test source"
 
+    def test_json_add_tags(self):
+        self.render_config_template(
+            path=os.path.abspath(self.working_dir) + "/log/*",
+            json=dict(
+                keys_under_root=True,
+            ),
+            agent_tags=["tag3", "tag4"]
+        )
+        os.mkdir(self.working_dir + "/log/")
+        self.copy_files(["logs/json_tag.log"],
+                        source_dir="../files",
+                        target_dir="log")
+
+        proc = self.start_beat()
+        self.wait_until(
+            lambda: self.output_has(lines=1),
+            max_timeout=10)
+
+        proc.check_kill_and_wait()
+
+        output = self.read_output()[0]
+        assert sorted(output["tags"]) == ["tag1", "tag2", "tag3", "tag4"]
+
     def test_config_no_msg_key_filtering(self):
         """
         Should raise an error if line filtering and JSON are defined,
@@ -179,7 +204,7 @@ class Test(BaseTest):
                 message_key="msg",
                 keys_under_root=True,
                 overwrite_keys=True
-                ),
+            ),
         )
         os.mkdir(self.working_dir + "/log/")
         self.copy_files(["logs/json_timestamp.log"],
@@ -188,22 +213,27 @@ class Test(BaseTest):
 
         proc = self.start_beat()
         self.wait_until(
-            lambda: self.output_has(lines=3),
+            lambda: self.output_has(lines=5),
             max_timeout=10)
         proc.check_kill_and_wait()
 
         output = self.read_output()
-        assert len(output) == 3
-        assert all(isinstance(o["@timestamp"], basestring) for o in output)
-        assert all(isinstance(o["type"], basestring) for o in output)
+        assert len(output) == 5
+        assert all(isinstance(o["@timestamp"], six.string_types) for o in output)
         assert output[0]["@timestamp"] == "2016-04-05T18:47:18.444Z"
 
         assert output[1]["@timestamp"] != "invalid"
-        assert output[1]["json_error"] == \
+        assert output[1]["error.message"] == \
             "@timestamp not overwritten (parse error on invalid)"
 
-        assert output[2]["json_error"] == \
+        assert output[2]["error.message"] == \
             "@timestamp not overwritten (not string)"
+
+        assert "error" not in output[3]
+        assert output[3]["@timestamp"] == "2016-04-05T18:47:18.444Z", output[3]["@timestamp"]
+
+        assert "error" not in output[4]
+        assert output[4]["@timestamp"] == "2016-04-05T18:47:18.000Z", output[4]["@timestamp"]
 
     def test_type_in_message(self):
         """
@@ -216,7 +246,7 @@ class Test(BaseTest):
                 message_key="msg",
                 keys_under_root=True,
                 overwrite_keys=True
-                ),
+            ),
         )
         os.mkdir(self.working_dir + "/log/")
         self.copy_files(["logs/json_type.log"],
@@ -231,16 +261,15 @@ class Test(BaseTest):
 
         output = self.read_output()
         assert len(output) == 3
-        assert all(isinstance(o["@timestamp"], basestring) for o in output)
-        assert all(isinstance(o["type"], basestring) for o in output)
+        assert all(isinstance(o["@timestamp"], six.string_types) for o in output)
         assert output[0]["type"] == "test"
 
-        assert output[1]["type"] == "log"
-        assert output[1]["json_error"] == \
+        assert "type" not in output[1]
+        assert output[1]["error.message"] == \
             "type not overwritten (not string)"
 
-        assert output[2]["type"] == "log"
-        assert output[2]["json_error"] == \
+        assert "type" not in output[2]
+        assert output[2]["error.message"] == \
             "type not overwritten (not string)"
 
     def test_with_generic_filtering(self):
@@ -255,11 +284,13 @@ class Test(BaseTest):
                 message_key="message",
                 keys_under_root=True,
                 overwrite_keys=True,
-                add_error_key=True,
-                ),
-            drop_fields={
-                "fields": ["headers.request-id"],
-            },
+                add_error_key=True
+            ),
+            processors=[{
+                "drop_fields": {
+                    "fields": ["headers.request-id"],
+                },
+            }]
         )
 
         os.mkdir(self.working_dir + "/log/")
@@ -274,14 +305,16 @@ class Test(BaseTest):
         proc.check_kill_and_wait()
 
         output = self.read_output(
-            required_fields=["@timestamp", "type"],
+            required_fields=["@timestamp"],
         )
         assert len(output) == 1
         o = output[0]
 
         assert "headers.content-type" in o
         assert "headers.request-id" not in o
-        assert o["res"] is None
+
+        # We drop null values during the generic event conversion.
+        assert "res" not in o
 
     def test_with_generic_filtering_remove_headers(self):
         """
@@ -295,11 +328,13 @@ class Test(BaseTest):
                 message_key="message",
                 keys_under_root=True,
                 overwrite_keys=True,
-                add_error_key=True,
-                ),
-            drop_fields={
-                "fields": ["headers", "res"],
-            },
+                add_error_key=True
+            ),
+            processors=[{
+                "drop_fields": {
+                    "fields": ["headers", "res"],
+                },
+            }]
         )
 
         os.mkdir(self.working_dir + "/log/")
@@ -314,7 +349,7 @@ class Test(BaseTest):
         proc.check_kill_and_wait()
 
         output = self.read_output(
-            required_fields=["@timestamp", "type"],
+            required_fields=["@timestamp"],
         )
         assert len(output) == 1
         o = output[0]
@@ -324,3 +359,34 @@ class Test(BaseTest):
         assert "res" not in o
         assert o["method"] == "GET"
         assert o["message"] == "Sent response: "
+
+    def test_integer_condition(self):
+        """
+        It should work to drop JSON event based on an integer
+        value by using a simple `equal` condition. See #2038.
+        """
+        self.render_config_template(
+            path=os.path.abspath(self.working_dir) + "/log/*",
+            json=dict(
+                keys_under_root=True,
+            ),
+            processors=[{
+                "drop_event": {
+                    "when": "equals.status: 200",
+                },
+            }]
+        )
+        os.mkdir(self.working_dir + "/log/")
+        self.copy_files(["logs/json_int.log"],
+                        source_dir="../files",
+                        target_dir="log")
+
+        proc = self.start_beat()
+        self.wait_until(
+            lambda: self.output_has(lines=1),
+            max_timeout=10)
+        proc.check_kill_and_wait()
+
+        output = self.read_output()
+        assert len(output) == 1
+        assert output[0]["status"] == 404

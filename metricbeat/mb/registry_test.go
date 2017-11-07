@@ -119,14 +119,58 @@ func TestModuleFactoryUnknownModule(t *testing.T) {
 }
 
 func TestMetricSetFactory(t *testing.T) {
+	t.Run("without HostParser", func(t *testing.T) {
+		registry := NewRegister()
+		err := registry.AddMetricSet(moduleName, metricSetName, fakeMetricSetFactory)
+		if err != nil {
+			t.Fatal(err)
+		}
+
+		ms, hp, err := registry.metricSetFactory(moduleName, metricSetName)
+		if err != nil {
+			t.Fatal(err)
+		}
+		assert.NotNil(t, ms)
+		assert.Nil(t, hp)
+	})
+
+	t.Run("with HostParser", func(t *testing.T) {
+		registry := NewRegister()
+		hostParser := func(Module, string) (HostData, error) { return HostData{}, nil }
+		err := registry.AddMetricSet(moduleName, metricSetName, fakeMetricSetFactory, hostParser)
+		if err != nil {
+			t.Fatal(err)
+		}
+
+		ms, hp, err := registry.metricSetFactory(moduleName, metricSetName)
+		if err != nil {
+			t.Fatal(err)
+		}
+		assert.NotNil(t, ms)
+		assert.NotNil(t, hp) // Can't compare functions in Go so just check for non-nil.
+	})
+}
+
+func TestMetricSetQuery(t *testing.T) {
 	registry := NewRegister()
 	err := registry.AddMetricSet(moduleName, metricSetName, fakeMetricSetFactory)
 	if err != nil {
 		t.Fatal(err)
 	}
 
-	ms, err := registry.metricSetFactory(moduleName, metricSetName)
-	if assert.NoError(t, err) {
-		assert.NotNil(t, ms)
-	}
+	metricsets := registry.MetricSets(moduleName)
+	assert.Equal(t, len(metricsets), 1)
+	assert.Equal(t, metricsets[0], metricSetName)
+
+	metricsets = registry.MetricSets("foo")
+	assert.Equal(t, len(metricsets), 0)
+}
+
+func TestModuleQuery(t *testing.T) {
+	registry := NewRegister()
+	registry.modules[moduleName] = fakeModuleFactory
+
+	modules := registry.Modules()
+	assert.Equal(t, len(modules), 1)
+	assert.Equal(t, modules[0], moduleName)
 }

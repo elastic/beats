@@ -1,0 +1,221 @@
+{
+  "objects": [
+    {
+      "attributes": {
+        "description": "",
+        "kibanaSavedObjectMeta": {
+          "searchSourceJSON": "{\"query\":{\"query\":{\"query_string\":{\"analyze_wildcard\":true,\"query\":\"*\"}},\"language\":\"lucene\"},\"filter\":[]}"
+        },
+        "title": "Navigation",
+        "uiStateJSON": "{}",
+        "version": 1,
+        "visState": "{\"title\":\"Navigation\",\"type\":\"markdown\",\"params\":{\"markdown\":\"### Packetbeat:\\n\\n[Overview](#/dashboard/Packetbeat-Dashboard)\\n\\n[Flows](#/dashboard/Packetbeat-Flows)\\n\\n[Web transactions](#/dashboard/Packetbeat-HTTP)\\n\\n[MySQL performance](#/dashboard/Packetbeat-MySQL-performance)\\n\\n[PostgreSQL performance](#/dashboard/Packetbeat-PgSQL-performance)\\n\\n[MongoDB performance](#/dashboard/Packetbeat-MongoDB-performance)\\n\\n[Thrift-RPC performance](#/dashboard/Packetbeat-Thrift-performance)\\n\\n[NFS transactions](#/dashboard/Packetbeat-NFS)\\n\\n[Cassandra performance](#/dashboard/Packetbeat-Cassandra)\",\"fontSize\":\"10\"},\"aggs\":[]}"
+      },
+      "id": "Navigation",
+      "type": "visualization",
+      "version": 10
+    },
+    {
+      "attributes": {
+        "description": "",
+        "kibanaSavedObjectMeta": {
+          "searchSourceJSON": "{\n  \"filter\": []\n}"
+        },
+        "savedSearchId": "651fd6d0-88d0-11e7-ad9c-db80de0bf8d3",
+        "title": "MongoDB errors",
+        "uiStateJSON": "{}",
+        "version": 1,
+        "visState": "{\n  \"title\": \"MongoDB errors\",\n  \"type\": \"line\",\n  \"params\": {\n    \"addLegend\": true,\n    \"addTimeMarker\": false,\n    \"addTooltip\": true,\n    \"defaultYExtents\": false,\n    \"drawLinesBetweenPoints\": true,\n    \"interpolate\": \"linear\",\n    \"radiusRatio\": 9,\n    \"scale\": \"linear\",\n    \"setYExtents\": false,\n    \"shareYAxis\": true,\n    \"showCircles\": true,\n    \"smoothLines\": false,\n    \"spyPerPage\": 10,\n    \"times\": [],\n    \"yAxis\": {}\n  },\n  \"aggs\": [\n    {\n      \"id\": \"1\",\n      \"type\": \"count\",\n      \"schema\": \"metric\",\n      \"params\": {}\n    },\n    {\n      \"id\": \"2\",\n      \"type\": \"date_histogram\",\n      \"schema\": \"segment\",\n      \"params\": {\n        \"field\": \"@timestamp\",\n        \"interval\": \"auto\",\n        \"customInterval\": \"2h\",\n        \"min_doc_count\": 1,\n        \"extended_bounds\": {}\n      }\n    },\n    {\n      \"id\": \"3\",\n      \"type\": \"terms\",\n      \"schema\": \"split\",\n      \"params\": {\n        \"field\": \"resource\",\n        \"size\": 3,\n        \"order\": \"desc\",\n        \"orderBy\": \"1\",\n        \"row\": true\n      }\n    },\n    {\n      \"id\": \"4\",\n      \"type\": \"terms\",\n      \"schema\": \"group\",\n      \"params\": {\n        \"field\": \"method\",\n        \"size\": 5,\n        \"order\": \"desc\",\n        \"orderBy\": \"1\"\n      }\n    }\n  ],\n  \"listeners\": {}\n}"
+      },
+      "id": "MongoDB-errors",
+      "type": "visualization",
+      "version": 2
+    },
+    {
+      "attributes": {
+        "description": "",
+        "kibanaSavedObjectMeta": {
+          "searchSourceJSON": "{\"filter\":[]}"
+        },
+        "savedSearchId": "MongoDB-transactions",
+        "title": "MongoDB commands",
+        "uiStateJSON": "{}",
+        "version": 1,
+        "visState": "{\"title\":\"MongoDB commands\",\"type\":\"area\",\"params\":{\"shareYAxis\":true,\"addTooltip\":true,\"addLegend\":true,\"smoothLines\":true,\"scale\":\"linear\",\"interpolate\":\"linear\",\"mode\":\"silhouette\",\"times\":[],\"addTimeMarker\":false,\"defaultYExtents\":false,\"setYExtents\":false,\"yAxis\":{}},\"aggs\":[{\"id\":\"1\",\"type\":\"count\",\"schema\":\"metric\",\"params\":{}},{\"id\":\"2\",\"type\":\"date_histogram\",\"schema\":\"segment\",\"params\":{\"field\":\"@timestamp\",\"interval\":\"auto\",\"customInterval\":\"2h\",\"min_doc_count\":1,\"extended_bounds\":{}}},{\"id\":\"3\",\"type\":\"terms\",\"schema\":\"group\",\"params\":{\"field\":\"method\",\"size\":5,\"order\":\"desc\",\"orderBy\":\"1\"}}],\"listeners\":{}}"
+      },
+      "id": "MongoDB-commands",
+      "type": "visualization",
+      "version": 1
+    },
+    {
+      "attributes": {
+        "description": "",
+        "kibanaSavedObjectMeta": {
+          "searchSourceJSON": "{\n  \"filter\": []\n}"
+        },
+        "savedSearchId": "651fd6d0-88d0-11e7-ad9c-db80de0bf8d3",
+        "title": "MongoDB errors per collection",
+        "uiStateJSON": "{}",
+        "version": 1,
+        "visState": "{\n  \"title\": \"MongoDB errors per collection\",\n  \"type\": \"line\",\n  \"params\": {\n    \"addLegend\": true,\n    \"addTimeMarker\": false,\n    \"addTooltip\": true,\n    \"defaultYExtents\": false,\n    \"drawLinesBetweenPoints\": true,\n    \"interpolate\": \"linear\",\n    \"radiusRatio\": 9,\n    \"scale\": \"linear\",\n    \"setYExtents\": false,\n    \"shareYAxis\": true,\n    \"showCircles\": true,\n    \"smoothLines\": false,\n    \"spyPerPage\": 10,\n    \"times\": [],\n    \"yAxis\": {}\n  },\n  \"aggs\": [\n    {\n      \"id\": \"1\",\n      \"type\": \"count\",\n      \"schema\": \"metric\",\n      \"params\": {}\n    },\n    {\n      \"id\": \"2\",\n      \"type\": \"date_histogram\",\n      \"schema\": \"segment\",\n      \"params\": {\n        \"field\": \"@timestamp\",\n        \"interval\": \"auto\",\n        \"customInterval\": \"2h\",\n        \"min_doc_count\": 1,\n        \"extended_bounds\": {}\n      }\n    },\n    {\n      \"id\": \"3\",\n      \"type\": \"terms\",\n      \"schema\": \"group\",\n      \"params\": {\n        \"field\": \"resource\",\n        \"size\": 5,\n        \"order\": \"desc\",\n        \"orderBy\": \"1\"\n      }\n    }\n  ],\n  \"listeners\": {}\n}"
+      },
+      "id": "MongoDB-errors-per-collection",
+      "type": "visualization",
+      "version": 2
+    },
+    {
+      "attributes": {
+        "description": "",
+        "kibanaSavedObjectMeta": {
+          "searchSourceJSON": "{\"filter\":[]}"
+        },
+        "savedSearchId": "MongoDB-transactions",
+        "title": "MongoDB in/out throughput",
+        "version": 1,
+        "visState": "{\"type\":\"line\",\"params\":{\"shareYAxis\":true,\"addTooltip\":true,\"addLegend\":true,\"showCircles\":true,\"smoothLines\":false,\"interpolate\":\"linear\",\"scale\":\"linear\",\"drawLinesBetweenPoints\":true,\"radiusRatio\":9,\"times\":[],\"addTimeMarker\":false,\"defaultYExtents\":false,\"setYExtents\":false,\"yAxis\":{}},\"aggs\":[{\"id\":\"1\",\"type\":\"sum\",\"schema\":\"metric\",\"params\":{\"field\":\"bytes_in\"}},{\"id\":\"2\",\"type\":\"date_histogram\",\"schema\":\"segment\",\"params\":{\"field\":\"@timestamp\",\"interval\":\"auto\",\"customInterval\":\"2h\",\"min_doc_count\":1,\"extended_bounds\":{}}},{\"id\":\"4\",\"type\":\"sum\",\"schema\":\"metric\",\"params\":{\"field\":\"bytes_out\"}}],\"listeners\":{}}"
+      },
+      "id": "MongoDB-in-slash-out-throughput",
+      "type": "visualization",
+      "version": 1
+    },
+    {
+      "attributes": {
+        "description": "",
+        "kibanaSavedObjectMeta": {
+          "searchSourceJSON": "{\"filter\":[]}"
+        },
+        "savedSearchId": "MongoDB-transactions",
+        "title": "MongoDB response times by collection",
+        "uiStateJSON": "{}",
+        "version": 1,
+        "visState": "{\"title\":\"MongoDB response times by collection\",\"type\":\"line\",\"params\":{\"shareYAxis\":true,\"addTooltip\":true,\"addLegend\":true,\"showCircles\":true,\"smoothLines\":false,\"interpolate\":\"linear\",\"scale\":\"linear\",\"drawLinesBetweenPoints\":false,\"radiusRatio\":\"9\",\"times\":[],\"addTimeMarker\":false,\"defaultYExtents\":false,\"setYExtents\":false,\"yAxis\":{}},\"aggs\":[{\"id\":\"1\",\"type\":\"percentiles\",\"schema\":\"metric\",\"params\":{\"field\":\"responsetime\",\"percents\":[99]}},{\"id\":\"2\",\"type\":\"date_histogram\",\"schema\":\"segment\",\"params\":{\"field\":\"@timestamp\",\"interval\":\"auto\",\"customInterval\":\"2h\",\"min_doc_count\":1,\"extended_bounds\":{}}},{\"id\":\"3\",\"type\":\"terms\",\"schema\":\"group\",\"params\":{\"field\":\"resource\",\"size\":5,\"order\":\"desc\",\"orderBy\":\"1.99\"}},{\"id\":\"4\",\"type\":\"count\",\"schema\":\"radius\",\"params\":{}}],\"listeners\":{}}"
+      },
+      "id": "MongoDB-response-times-by-collection",
+      "type": "visualization",
+      "version": 1
+    },
+    {
+      "attributes": {
+        "description": "",
+        "kibanaSavedObjectMeta": {
+          "searchSourceJSON": "{\"filter\":[]}"
+        },
+        "savedSearchId": "MongoDB-transactions",
+        "title": "Top slowest MongoDB queries",
+        "version": 1,
+        "visState": "{\"type\":\"table\",\"params\":{\"perPage\":10,\"showPartialRows\":false,\"showMeticsAtAllLevels\":false},\"aggs\":[{\"id\":\"1\",\"type\":\"percentiles\",\"schema\":\"metric\",\"params\":{\"field\":\"responsetime\",\"percents\":[99]}},{\"id\":\"2\",\"type\":\"terms\",\"schema\":\"bucket\",\"params\":{\"field\":\"query\",\"size\":10,\"order\":\"desc\",\"orderBy\":\"1.99\"}}],\"listeners\":{}}"
+      },
+      "id": "Top-slowest-MongoDB-queries",
+      "type": "visualization",
+      "version": 1
+    },
+    {
+      "attributes": {
+        "description": "",
+        "kibanaSavedObjectMeta": {
+          "searchSourceJSON": "{\"filter\":[]}"
+        },
+        "savedSearchId": "MongoDB-transactions-with-write-concern-0",
+        "title": "Number of MongoDB transactions with writeConcern w=0",
+        "uiStateJSON": "{}",
+        "version": 1,
+        "visState": "{\"title\":\"Number of MongoDB transactions with writeConcern w=0\",\"type\":\"line\",\"params\":{\"shareYAxis\":true,\"addTooltip\":true,\"addLegend\":true,\"showCircles\":true,\"smoothLines\":false,\"interpolate\":\"linear\",\"scale\":\"linear\",\"drawLinesBetweenPoints\":true,\"radiusRatio\":9,\"times\":[],\"addTimeMarker\":false,\"defaultYExtents\":false,\"setYExtents\":false,\"yAxis\":{}},\"aggs\":[{\"id\":\"1\",\"type\":\"count\",\"schema\":\"metric\",\"params\":{}},{\"id\":\"2\",\"type\":\"date_histogram\",\"schema\":\"segment\",\"params\":{\"field\":\"@timestamp\",\"interval\":\"auto\",\"customInterval\":\"2h\",\"min_doc_count\":1,\"extended_bounds\":{}}},{\"id\":\"3\",\"type\":\"count\",\"schema\":\"radius\",\"params\":{}}],\"listeners\":{}}"
+      },
+      "id": "Number-of-MongoDB-transactions-with-writeConcern-w-equal-0",
+      "type": "visualization",
+      "version": 1
+    },
+    {
+      "attributes": {
+        "columns": [
+          "_source"
+        ],
+        "description": "",
+        "hits": 0,
+        "kibanaSavedObjectMeta": {
+          "searchSourceJSON": "{\"index\":\"packetbeat-*\",\"highlightAll\":true,\"version\":true,\"query\":{\"query\":\"*\",\"language\":\"lucene\"},\"filter\":[{\"meta\":{\"index\":\"packetbeat-*\",\"negate\":false,\"disabled\":false,\"alias\":null,\"type\":\"phrase\",\"key\":\"type\",\"value\":\"mongodb\",\"params\":{\"query\":\"mongodb\",\"type\":\"phrase\"}},\"query\":{\"match\":{\"type\":{\"query\":\"mongodb\",\"type\":\"phrase\"}}},\"$state\":{\"store\":\"appState\"}},{\"meta\":{\"index\":\"packetbeat-*\",\"negate\":true,\"disabled\":false,\"alias\":null,\"type\":\"phrase\",\"key\":\"status\",\"value\":\"OK\",\"params\":{\"query\":\"OK\",\"type\":\"phrase\"}},\"query\":{\"match\":{\"status\":{\"query\":\"OK\",\"type\":\"phrase\"}}},\"$state\":{\"store\":\"appState\"}}]}"
+        },
+        "sort": [
+          "@timestamp",
+          "desc"
+        ],
+        "title": "MongoDB errors [Packetbeat]",
+        "version": 1
+      },
+      "id": "651fd6d0-88d0-11e7-ad9c-db80de0bf8d3",
+      "type": "search",
+      "version": 1
+    },
+    {
+      "attributes": {
+        "columns": [
+          "method",
+          "type",
+          "path",
+          "responsetime",
+          "status",
+          "query"
+        ],
+        "description": "",
+        "hits": 0,
+        "kibanaSavedObjectMeta": {
+          "searchSourceJSON": "{\"index\":\"packetbeat-*\",\"highlight\":{\"pre_tags\":[\"@kibana-highlighted-field@\"],\"post_tags\":[\"@/kibana-highlighted-field@\"],\"fields\":{\"*\":{}},\"fragment_size\":2147483647},\"filter\":[{\"meta\":{\"disabled\":false,\"index\":\"packetbeat-*\",\"key\":\"type\",\"negate\":false,\"value\":\"mongodb\"},\"query\":{\"match\":{\"type\":{\"query\":\"mongodb\",\"type\":\"phrase\"}}}}],\"query\":{\"query_string\":{\"query\":\"*\",\"analyze_wildcard\":true}}}"
+        },
+        "sort": [
+          "@timestamp",
+          "desc"
+        ],
+        "title": "MongoDB transactions",
+        "version": 1
+      },
+      "id": "MongoDB-transactions",
+      "type": "search",
+      "version": 1
+    },
+    {
+      "attributes": {
+        "columns": [
+          "method",
+          "type",
+          "path",
+          "responsetime",
+          "status",
+          "query"
+        ],
+        "description": "",
+        "hits": 0,
+        "kibanaSavedObjectMeta": {
+          "searchSourceJSON": "{\"index\":\"packetbeat-*\",\"highlight\":{\"pre_tags\":[\"@kibana-highlighted-field@\"],\"post_tags\":[\"@/kibana-highlighted-field@\"],\"fields\":{\"*\":{}},\"fragment_size\":2147483647},\"filter\":[{\"meta\":{\"disabled\":false,\"index\":\"packetbeat-*\",\"key\":\"type\",\"negate\":false,\"value\":\"mongodb\"},\"query\":{\"match\":{\"type\":{\"query\":\"mongodb\",\"type\":\"phrase\"}}}}],\"query\":{\"query_string\":{\"analyze_wildcard\":true,\"query\":\"request: \\\"writeConcern w 0\\\"\"}}}"
+        },
+        "sort": [
+          "@timestamp",
+          "desc"
+        ],
+        "title": "MongoDB transactions with write concern 0",
+        "version": 1
+      },
+      "id": "MongoDB-transactions-with-write-concern-0",
+      "type": "search",
+      "version": 1
+    },
+    {
+      "attributes": {
+        "description": "",
+        "hits": 0,
+        "kibanaSavedObjectMeta": {
+          "searchSourceJSON": "{\"filter\":[],\"query\":{\"language\":\"lucene\",\"query\":{\"query_string\":{\"analyze_wildcard\":true,\"default_field\":\"*\",\"query\":\"*\"}}},\"highlightAll\":true,\"version\":true}"
+        },
+        "optionsJSON": "{\"darkTheme\":false}",
+        "panelsJSON": "[{\"col\":1,\"id\":\"Navigation\",\"panelIndex\":1,\"row\":1,\"size_x\":3,\"size_y\":4,\"type\":\"visualization\"},{\"col\":4,\"id\":\"MongoDB-errors\",\"panelIndex\":2,\"row\":1,\"size_x\":5,\"size_y\":4,\"type\":\"visualization\"},{\"col\":9,\"id\":\"MongoDB-commands\",\"panelIndex\":3,\"row\":1,\"size_x\":4,\"size_y\":4,\"type\":\"visualization\"},{\"col\":1,\"id\":\"MongoDB-errors-per-collection\",\"panelIndex\":4,\"row\":5,\"size_x\":4,\"size_y\":3,\"type\":\"visualization\"},{\"col\":5,\"id\":\"MongoDB-in-slash-out-throughput\",\"panelIndex\":5,\"row\":5,\"size_x\":4,\"size_y\":3,\"type\":\"visualization\"},{\"col\":1,\"id\":\"MongoDB-response-times-by-collection\",\"panelIndex\":6,\"row\":8,\"size_x\":8,\"size_y\":5,\"type\":\"visualization\"},{\"col\":9,\"id\":\"Top-slowest-MongoDB-queries\",\"panelIndex\":7,\"row\":8,\"size_x\":4,\"size_y\":5,\"type\":\"visualization\"},{\"col\":9,\"id\":\"Number-of-MongoDB-transactions-with-writeConcern-w-equal-0\",\"panelIndex\":8,\"row\":5,\"size_x\":4,\"size_y\":3,\"type\":\"visualization\"}]",
+        "timeRestore": false,
+        "title": "[Packetbeat] MongoDB",
+        "uiStateJSON": "{\"P-7\":{\"vis\":{\"params\":{\"sort\":{\"columnIndex\":null,\"direction\":null}}}}}",
+        "version": 1
+      },
+      "id": "Packetbeat-MongoDB-performance",
+      "type": "dashboard",
+      "version": 2
+    }
+  ],
+  "version": "6.0.0-beta1-SNAPSHOT"
+}

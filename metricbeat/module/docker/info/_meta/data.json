@@ -1,0 +1,26 @@
+{
+    "@timestamp": "2016-05-23T08:05:34.853Z",
+    "beat": {
+        "hostname": "host.example.com",
+        "name": "host.example.com"
+    },
+    "docker": {
+        "info": {
+            "containers": {
+                "paused": 0,
+                "running": 11,
+                "stopped": 1,
+                "total": 12
+            },
+            "id": "CRDS:UHQ6:W3IR:GROZ:IUG3:VS2E:4QJJ:FJWG:PRQ4:R25R:VNNP:NE62",
+            "images": 119
+        }
+    },
+    "metricset": {
+        "host": "/var/run/docker.sock",
+        "module": "docker",
+        "name": "info",
+        "rtt": 115
+    },
+    "type": "metricsets"
+}

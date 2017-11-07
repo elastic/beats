@@ -1,38 +1,36 @@
-FROM debian:jessie
+# Copy of https://github.com/elastic/kibana-docker/blob/master/build/kibana/Dockerfile
+FROM docker.elastic.co/kibana/kibana-ubuntu-base:latest
+MAINTAINER Elastic Docker Team <docker@elastic.co>
 
-# add our user and group first to make sure their IDs get assigned consistently
-RUN groupadd -r kibana && useradd -r -m -g kibana kibana
+ARG DOWNLOAD_URL
+ARG ELASTIC_VERSION
+ARG CACHE_BUST=1
+ARG XPACK
 
-RUN apt-get update && apt-get install -y ca-certificates curl --no-install-recommends && rm -rf /var/lib/apt/lists/*
+RUN apt-get update && apt-get install -y jq && apt-get clean
 
-# grab gosu for easy step-down from root
-RUN gpg --keyserver ha.pool.sks-keyservers.net --recv-keys B42F6819007F00F88E364FD4036A9C25BF357DD4
-RUN arch="$(dpkg --print-architecture)" \
-	&& set -x \
-	&& curl -o /usr/local/bin/gosu -SL "https://github.com/tianon/gosu/releases/download/1.3/gosu-$arch" \
-	&& curl -o /usr/local/bin/gosu.asc -SL "https://github.com/tianon/gosu/releases/download/1.3/gosu-$arch.asc" \
-	&& gpg --verify /usr/local/bin/gosu.asc \
-	&& rm /usr/local/bin/gosu.asc \
-	&& chmod +x /usr/local/bin/gosu
-
-RUN set -x \
-
-	&& curl -fSL "https://download.elastic.co/kibana/staging/5.0.0-aa9a450/kibana/kibana-5.0.0-alpha3-linux-x64.tar.gz" -o kibana.tar.gz \
-	&& mkdir -p /opt/kibana \
-	&& tar -xz --strip-components=1 -C /opt/kibana -f kibana.tar.gz \
-	&& chown -R kibana:kibana /opt/kibana \
-	&& rm kibana.tar.gz
-
-ENV PATH /opt/kibana/bin:$PATH
-
-COPY ./docker-entrypoint.sh /
-
-# There is no compatible Sense plugin for Kibana 5.0-alpha1.
-RUN gosu kibana kibana-plugin install timelion
-
+HEALTHCHECK --retries=6 CMD curl -f http://localhost:5601/api/status | jq '. | .status.overall.state' | grep -q green
 EXPOSE 5601
-ENTRYPOINT ["/docker-entrypoint.sh"]
-CMD ["kibana"]
 
+WORKDIR /usr/share/kibana
+RUN curl -Ls ${DOWNLOAD_URL}/kibana/kibana-${ELASTIC_VERSION}-linux-x86_64.tar.gz?c=${CACHE_BUST} | tar --strip-components=1 -zxf - && \
+    ln -s /usr/share/kibana /opt/kibana
 
+# Install XPACK
+RUN if [ ${XPACK} = "1" ]; then bin/kibana-plugin install ${DOWNLOAD_URL}/kibana-plugins/x-pack/x-pack-${ELASTIC_VERSION}.zip?c=${CACHE_BUST}; fi
 
+# Set some Kibana configuration defaults.
+ADD config/kibana.yml /usr/share/kibana/config/
+
+# Add the launcher/wrapper script. It knows how to interpret environment
+# variables and translate them to Kibana CLI options.
+ADD bin/kibana-docker /usr/local/bin/
+
+# Add a self-signed SSL certificate for use in examples.
+#ADD ssl/kibana.example.org.* /usr/share/kibana/config/
+
+RUN usermod --home /usr/share/kibana kibana
+USER kibana
+ENV BABEL_CACHE_PATH /usr/share/kibana/optimize/.babelcache.json
+ENV PATH=/usr/share/kibana/bin:$PATH
+CMD /usr/local/bin/kibana-docker

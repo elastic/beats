@@ -1,35 +1,29 @@
 package harvester
 
-import (
-	"regexp"
-	"time"
+import "github.com/elastic/beats/libbeat/common/match"
 
-	"github.com/elastic/beats/filebeat/harvester/processor"
-	"github.com/elastic/beats/libbeat/common"
+// Contains available prospector types
+const (
+	LogType   = "log"
+	StdinType = "stdin"
+	RedisType = "redis"
+	UdpType   = "udp"
 )
 
-// readLine reads a full line into buffer and returns it.
-// In case of partial lines, readLine does return and error and en empty string
-// This could potentialy be improved / replaced by https://github.com/elastic/beats/libbeat/tree/master/common/streambuf
-func readLine(reader processor.LineProcessor) (time.Time, string, int, common.MapStr, error) {
-	l, err := reader.Next()
-
-	// Full line read to be returned
-	if l.Bytes != 0 && err == nil {
-		return l.Ts, string(l.Content), l.Bytes, l.Fields, err
-	}
-
-	return time.Time{}, "", 0, nil, err
+// ValidType of valid input types
+var ValidType = map[string]struct{}{
+	StdinType: {},
+	LogType:   {},
+	RedisType: {},
+	UdpType:   {},
 }
 
-// MatchAnyRegexps checks if the text matches any of the regular expressions
-func MatchAnyRegexps(regexps []*regexp.Regexp, text string) bool {
-
-	for _, rexp := range regexps {
-		if rexp.MatchString(text) {
+// MatchAny checks if the text matches any of the regular expressions
+func MatchAny(matchers []match.Matcher, text string) bool {
+	for _, m := range matchers {
+		if m.MatchString(text) {
 			return true
 		}
 	}
-
 	return false
 }

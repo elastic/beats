@@ -3,41 +3,62 @@
 [![GoReportCard](http://goreportcard.com/badge/elastic/beats)](http://goreportcard.com/report/elastic/beats)
 [![codecov.io](https://codecov.io/github/elastic/beats/coverage.svg?branch=master)](https://codecov.io/github/elastic/beats?branch=master)
 
-# Beats - Lightweight shippers for Elasticsearch & Logstash
+# Beats - The Lightweight Shippers of the Elastic Stack
 
-The [Beats](https://www.elastic.co/products/beats) are lightweight processes,
-written in Go, that you install on your servers to capture all sorts of
-operational data like logs, operating system metrics or network packet data,
-and to send it to Elasticsearch, either directly or via Logstash, so it can be
-visualized with Kibana.
+The [Beats](https://www.elastic.co/products/beats) are lightweight data
+shippers, written in Go, that you install on your servers to capture all sorts
+of operational data (think of logs, metrics, or network packet data). The Beats
+send the operational data to Elasticsearch, either directly or via Logstash, so
+it can be visualized with Kibana.
 
-This repository contains libbeat and all the officially supported Beats, in the
-following folders:
+By "lightweight", we mean that Beats have a small installation footprint, use
+limited system resources, and have no runtime dependencies.
 
-Folder  | Description
+This repository contains
+[libbeat](https://github.com/elastic/beats/tree/master/libbeat), our Go
+framework for creating Beats, and all the officially supported Beats:
+
+Beat  | Description
 --- | ---
-[libbeat](https://github.com/elastic/beats/tree/master/libbeat) | The Go framework for creating new Beats
-[Topbeat](https://github.com/elastic/beats/tree/master/topbeat) | Like 'top' but inserting the data into Elasticsearch
-[Packetbeat](https://github.com/elastic/beats/tree/master/packetbeat) | Tap into your wire data
-[Filebeat](https://github.com/elastic/beats/tree/master/filebeat) | Lightweight log forwarder to Logstash & Elasticsearch
-[Winlogbeat](https://github.com/elastic/beats/tree/master/winlogbeat) | Sends Windows Event logs
+[Filebeat](https://github.com/elastic/beats/tree/master/filebeat) | Tails and ships log files
+[Heartbeat](https://github.com/elastic/beats/tree/master/heartbeat) | Ping remote services for availability
+[Metricbeat](https://github.com/elastic/beats/tree/master/metricbeat) | Fetches sets of metrics from the operating system and services
+[Packetbeat](https://github.com/elastic/beats/tree/master/packetbeat) | Monitors the network and applications by sniffing packets
+[Winlogbeat](https://github.com/elastic/beats/tree/master/winlogbeat) | Fetches and ships Windows Event logs
 
 In addition to the above Beats, which are officially supported by
-[Elastic](elastic.co), the
+[Elastic](https://elastic.co), the
 community has created a set of other Beats that make use of libbeat but live
 outside of this Github repository. We maintain a list of community Beats
 [here](https://www.elastic.co/guide/en/beats/libbeat/master/community-beats.html).
 
-## Documentation and Getting Help
+## Documentation and Getting Started
 
-You can find the documentation on the [elastic.co
-site](https://www.elastic.co/guide/en/beats/libbeat/current/index.html). If you
-need help, you can open a topic on our [discuss
-forums](https://discuss.elastic.co/c/beats).
+You can find the documentation and getting started guides for each of the Beats
+on the [elastic.co site](https://www.elastic.co/guide/):
+
+* [Beats platform](https://www.elastic.co/guide/en/beats/libbeat/current/index.html)
+* [Filebeat](https://www.elastic.co/guide/en/beats/filebeat/current/index.html)
+* [Heartbeat](https://www.elastic.co/guide/en/beats/heartbeat/current/index.html)
+* [Metricbeat](https://www.elastic.co/guide/en/beats/metricbeat/current/index.html)
+* [Packetbeat](https://www.elastic.co/guide/en/beats/packetbeat/current/index.html)
+* [Winlogbeat](https://www.elastic.co/guide/en/beats/winlogbeat/current/index.html)
+
+
+## Getting Help
+
+If you need help or hit an issue, please start by opening a topic on our
+[discuss forums](https://discuss.elastic.co/c/beats). Please note that we
+reserve GitHub tickets for confirmed bugs and enhancement requests.
+
+## Downloads
+
+You can download pre-compiled Beats binaries, as well as packages for the
+supported platforms, from [this page](https://www.elastic.co/downloads/beats).
 
 ## Contributing
 
-We'd love working with you! You can help making the Beats better in many ways:
+We'd love working with you! You can help make the Beats better in many ways:
 report issues, help us reproduce issues, fix bugs, add functionality, or even
 create your own Beat.
 

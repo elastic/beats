@@ -1,0 +1,10 @@
+{
+  "visState": "{\"title\":\"Navigation\",\"type\":\"markdown\",\"params\":{\"markdown\":\"### Packetbeat:\\n\\n[Overview](#/dashboard/Packetbeat-Dashboard)\\n\\n[Flows](#/dashboard/Packetbeat-Flows)\\n\\n[Web transactions](#/dashboard/Packetbeat-HTTP)\\n\\n[MySQL performance](#/dashboard/Packetbeat-MySQL-performance)\\n\\n[PostgreSQL performance](#/dashboard/Packetbeat-PgSQL-performance)\\n\\n[MongoDB performance](#/dashboard/Packetbeat-MongoDB-performance)\\n\\n[Thrift-RPC performance](#/dashboard/Packetbeat-Thrift-performance)\\n\\n[NFS transactions](#/dashboard/Packetbeat-NFS)\\n\\n[Cassandra performance](#/dashboard/Packetbeat-Cassandra)\"},\"aggs\":[],\"listeners\":{}}", 
+  "description": "", 
+  "title": "Navigation", 
+  "uiStateJSON": "{}", 
+  "version": 1, 
+  "kibanaSavedObjectMeta": {
+    "searchSourceJSON": "{\"query\":{\"query_string\":{\"analyze_wildcard\":true,\"query\":\"*\"}},\"filter\":[]}"
+  }
+}

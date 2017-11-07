@@ -1,4 +1,0 @@
-beat_name: {{cookiecutter.beat}}
-beat_url: 'https://{{cookiecutter.beat_path}}'
-beat_repo: '{{cookiecutter.beat_path}}'
-beat_description: Sends {{cookiecutter.beat}} metrics to Logstash or directly to Elasticsearch.

@@ -7,20 +7,9 @@ This section contains detailed information about the metric collecting modules
 contained in {beatname_uc}. Each module contains one or multiple metricsets. More details
 about each module can be found under the links below.
 
-  * <<metricbeat-module-apache,Apache>>
-  * <<metricbeat-module-mysql,MySQL>>
-  * <<metricbeat-module-nginx,Nginx>>
-  * <<metricbeat-module-redis,Redis>>
-  * <<metricbeat-module-system,System>>
-  * <<metricbeat-module-zookeeper,Zookeeper>>
+//pass macro block used here to remove Edit links from modules documentation because it is generated
+pass::[<?edit_url?>]
+include::modules_list.asciidoc[]
 
---
-
-include::modules/apache.asciidoc[]
-include::modules/mysql.asciidoc[]
-include::modules/nginx.asciidoc[]
-include::modules/redis.asciidoc[]
-include::modules/system.asciidoc[]
-include::modules/zookeeper.asciidoc[]
 
 

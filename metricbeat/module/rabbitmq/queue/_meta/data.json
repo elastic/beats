@@ -1,0 +1,61 @@
+{
+    "@timestamp": "2017-08-21T21:06:47.437Z",
+    "@metadata": {
+      "beat": "metricbeat",
+      "type": "doc"
+    },
+    "rabbitmq": {
+      "queue": {
+        "disk": {
+          "writes": {
+            "count": 0
+          },
+          "reads": {
+            "count": 0
+          }
+        },
+        "consumers": {
+          "count": 5,
+          "utilisation": {}
+        },
+        "auto_delete": false,
+        "memory": {
+          "bytes": 144392
+        },
+        "state": "running",
+        "messages": {
+          "total": {
+            "count": 0
+          },
+          "ready": {
+            "count": 0
+          },
+          "unacknowledged": {
+            "count": 0
+          },
+          "persistent": {
+            "count": 0
+          }
+        },
+        "durable": true,
+        "vhost": "/",
+        "arguments": {
+          "max_priority": 9
+        },
+        "exclusive": false,
+        "node": "rabbit@localhost",
+        "name": "myfancyqueue"
+      }
+    },
+    "metricset": {
+      "module": "rabbitmq",
+      "name": "queue",
+      "host": "localhost:15672",
+      "rtt": 6730
+    },
+    "beat": {
+      "version": "7.0.0-alpha1",
+      "name": "name",
+      "hostname": "hostname"
+    }
+  }

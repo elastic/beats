@@ -1,0 +1,8 @@
+/usr/local/Cellar/mysql/5.7.10/bin/mysqld, Version: 5.7.10 (Homebrew). started with:
+Tcp port: 3306  Unix socket: /tmp/mysql.sock
+Time                 Id Command    Argument
+# Time: 2016-12-12T11:54:16.601172Z
+# User@Host: root[root] @ localhost []  Id:     2
+# Query_time: 11.004467  Lock_time: 0.000000 Rows_sent: 1  Rows_examined: 0
+SET timestamp=1481543656;
+select sleep(11);

@@ -16,12 +16,12 @@ my_logger.setLevel(logging.DEBUG)
 if not os.path.exists("logs"):
     os.mkdir("logs")
 
-maxSize = 0.1 * 1000 * 1000 # 1MB
+maxSize = 0.1 * 1000 * 1000  # 1MB
 rotatedFiles = 50
 logsPerSecond = 10000
 
 handler = logging.handlers.RotatingFileHandler(
-              LOG_FILENAME, maxBytes=maxSize, backupCount=rotatedFiles)
+    LOG_FILENAME, maxBytes=maxSize, backupCount=rotatedFiles)
 my_logger.addHandler(handler)
 
 count = 1
@@ -35,4 +35,4 @@ while True:
     log_message = timestamp + " " + str(count) + " " + str(uuid.uuid4()) + " " + randomString
     my_logger.debug(log_message)
     count = count + 1
-    time.sleep (sleepTime)
+    time.sleep(sleepTime)

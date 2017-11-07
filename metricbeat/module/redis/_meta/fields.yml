@@ -1,0 +1,10 @@
+- key: redis
+  title: "Redis"
+  description: >
+    Redis metrics collected from Redis.
+  fields:
+    - name: redis
+      type: group
+      description: >
+        `redis` contains the information and statistics from Redis.
+      fields:

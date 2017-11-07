@@ -1,0 +1,161 @@
+- name: status
+  type: group
+  description: >
+    `status` contains the metrics that were obtained by the status SQL query.
+  fields:
+    - name: aborted
+      type: group
+      description: >
+        Aborted status fields.
+      fields:
+        - name: clients
+          type: long
+          description: >
+            The number of connections that were aborted because the client died without closing the connection properly.
+
+        - name: connects
+          type: long
+          description: >
+            The number of failed attempts to connect to the MySQL server.
+
+    - name: binlog
+      type: group
+      description: >
+      fields:
+        - name: cache.disk_use
+          type: long
+          description: >
+
+        - name: cache.use
+          type: long
+          description: >
+
+    - name: bytes
+      type: group
+      description: >
+        Bytes stats.
+      fields:
+        - name: received
+          format: bytes
+          type: long
+          description: >
+            The number of bytes received from all clients.
+
+        - name: sent
+          type: long
+          format: bytes
+          description: >
+            The number of bytes sent to all clients.
+
+    - name: threads
+      type: group
+      description: >
+        Threads stats.
+      fields:
+        - name: cached
+          type: long
+          description: >
+            The number of cached threads.
+
+        - name: created
+          type: long
+          description: >
+            The number of created threads.
+
+        - name: connected
+          type: long
+          description: >
+            The number of connected threads.
+
+        - name: running
+          type: long
+          description: >
+            The number of running threads.
+
+    - name: connections
+      type: long
+      description: >
+
+    - name: created
+      type: group
+      description: >
+      fields:
+        - name: tmp.disk_tables
+          type: long
+          description: >
+
+        - name: tmp.files
+          type: long
+          description: >
+
+        - name: tmp.tables
+          type: long
+          description: >
+
+    - name: delayed
+      type: group
+      description: >
+      fields:
+        - name: errors
+          type: long
+          description: >
+
+        - name: insert_threads
+          type: long
+          description: >
+
+        - name: writes
+          type: long
+          description: >
+
+    - name: flush_commands
+      type: long
+      description: >
+
+    - name: max_used_connections
+      type: long
+      description: >
+
+    - name: open
+      type: group
+      description: >
+      fields:
+        - name: files
+          type: long
+          description: >
+
+        - name: streams
+          type: long
+          description: >
+
+        - name: tables
+          type: long
+          description: >
+
+    - name: opened_tables
+      type: long
+      description: >
+
+    - name: command
+      type: group
+      description: >
+      fields:
+        - name: delete
+          type: long
+          description: >
+            The number of DELETE queries since startup.
+
+        - name: insert
+          type: long
+          description: >
+            The number of INSERT queries since startup.
+
+        - name: select
+          type: long
+          description: >
+            The number of SELECT queries since startup.
+
+        - name: update
+          type: long
+          description: >
+            The number of UPDATE queries since startup.

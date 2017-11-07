@@ -162,7 +162,7 @@ func Dial(network, address string, options ...DialOption) (Conn, error) {
 	return c, nil
 }
 
-var pathDBRegexp = regexp.MustCompile(`/(\d+)\z`)
+var pathDBRegexp = regexp.MustCompile(`/(\d*)\z`)
 
 // DialURL connects to a Redis server at the given URL using the Redis
 // URI scheme. URLs should follow the draft IANA specification for the
@@ -199,9 +199,12 @@ func DialURL(rawurl string, options ...DialOption) (Conn, error) {
 
 	match := pathDBRegexp.FindStringSubmatch(u.Path)
 	if len(match) == 2 {
-		db, err := strconv.Atoi(match[1])
-		if err != nil {
-			return nil, fmt.Errorf("invalid database: %s", u.Path[1:])
+		db := 0
+		if len(match[1]) > 0 {
+			db, err = strconv.Atoi(match[1])
+			if err != nil {
+				return nil, fmt.Errorf("invalid database: %s", u.Path[1:])
+			}
 		}
 		if db != 0 {
 			options = append(options, DialDatabase(db))

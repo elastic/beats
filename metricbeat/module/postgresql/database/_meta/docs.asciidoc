@@ -1,0 +1,3 @@
+=== PostgreSQL database metricset
+
+This is the `database` metricset of the PostgreSQL module.

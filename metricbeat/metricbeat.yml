@@ -1,49 +1,30 @@
 ###################### Metricbeat Configuration Example #######################
 
 # This file is an example configuration file highlighting only the most common
-# options. The metricbeat.full.yml file from the same directory contains all the
+# options. The metricbeat.reference.yml file from the same directory contains all the
 # supported options with more comments. You can use it as a reference.
 #
 # You can find the full configuration reference here:
 # https://www.elastic.co/guide/en/beats/metricbeat/index.html
 
 #==========================  Modules configuration ============================
-metricbeat.modules:
 
-#---------------------------- System Status Module ---------------------------
-- module: system
-  metricsets:
-    # CPU stats
-    - cpu
+metricbeat.config.modules:
+  # Glob pattern for configuration loading
+  path: ${path.config}/modules.d/*.yml
 
-    # Per CPU core stats
-    #- core
+  # Set to true to enable config reloading
+  reload.enabled: false
 
-    # IO stats
-    #- diskio
+  # Period on which files under path should be checked for changes
+  #reload.period: 10s
 
-    # Per filesystem stats
-    - filesystem
+#==================== Elasticsearch template setting ==========================
 
-    # File system summary stats
-    #- fsstat
-
-    # Memory stats
-    - memory
-
-    # Network stats
-    - network
-
-    # Per process stats
-    - process
-  enabled: true
-  period: 10s
-  processes: ['.*']
-
-  # if true, exports the CPU usage in ticks, together with the percentage values
-  cpu_ticks: false
-
-
+setup.template.settings:
+  index.number_of_shards: 1
+  index.codec: best_compression
+  #_source.enabled: false
 
 #================================ General =====================================
 
@@ -60,42 +41,80 @@ metricbeat.modules:
 #fields:
 #  env: staging
 
+
+#============================== Dashboards =====================================
+# These settings control loading the sample dashboards to the Kibana index. Loading
+# the dashboards is disabled by default and can be enabled either by setting the
+# options here, or by using the `-setup` CLI flag or the `setup` command.
+#setup.dashboards.enabled: false
+
+# The URL from where to download the dashboards archive. By default this URL
+# has a value which is computed based on the Beat name and version. For released
+# versions, this URL points to the dashboard archive on the artifacts.elastic.co
+# website.
+#setup.dashboards.url:
+
+#============================== Kibana =====================================
+
+# Starting with Beats version 6.0.0, the dashboards are loaded via the Kibana API.
+# This requires a Kibana endpoint configuration.
+setup.kibana:
+
+  # Kibana Host
+  # Scheme and port can be left out and will be set to the default (http and 5601)
+  # In case you specify and additional path, the scheme is required: http://localhost:5601/path
+  # IPv6 addresses should always be defined as: https://[2001:db8::1]:5601
+  #host: "localhost:5601"
+
+#============================= Elastic Cloud ==================================
+
+# These settings simplify using metricbeat with the Elastic Cloud (https://cloud.elastic.co/).
+
+# The cloud.id setting overwrites the `output.elasticsearch.hosts` and
+# `setup.kibana.host` options.
+# You can find the `cloud.id` in the Elastic Cloud web UI.
+#cloud.id:
+
+# The cloud.auth setting overwrites the `output.elasticsearch.username` and
+# `output.elasticsearch.password` settings. The format is `<user>:<pass>`.
+#cloud.auth:
+
 #================================ Outputs =====================================
 
-# Configure what outputs to use when sending the data collected by the beat.
-# Multiple outputs may be used.
+# Configure what output to use when sending the data collected by the beat.
 
 #-------------------------- Elasticsearch output ------------------------------
 output.elasticsearch:
   # Array of hosts to connect to.
   hosts: ["localhost:9200"]
 
-  # Template name. By default the template name is metricbeat.
-  template.name: "metricbeat"
-
-  # Path to template file
-  template.path: "metricbeat.template.json"
-
-  # Overwrite existing template
-  template.overwrite: false
+  # Optional protocol and basic auth credentials.
+  #protocol: "https"
+  #username: "elastic"
+  #password: "changeme"
 
 #----------------------------- Logstash output --------------------------------
 #output.logstash:
   # The Logstash hosts
   #hosts: ["localhost:5044"]
 
-  # Optional TLS. By default is off.
+  # Optional SSL. By default is off.
   # List of root certificates for HTTPS server verifications
-  #tls.certificate_authorities: ["/etc/pki/root/ca.pem"]
+  #ssl.certificate_authorities: ["/etc/pki/root/ca.pem"]
 
-  # Certificate for TLS client authentication
-  #tls.certificate: "/etc/pki/client/cert.pem"
+  # Certificate for SSL client authentication
+  #ssl.certificate: "/etc/pki/client/cert.pem"
 
   # Client Certificate Key
-  #tls.certificate_key: "/etc/pki/client/cert.key"
+  #ssl.key: "/etc/pki/client/cert.key"
 
 #================================ Logging =====================================
 
-# Sets log level. The default log level is error.
+# Sets log level. The default log level is info.
 # Available log levels are: critical, error, warning, info, debug
 #logging.level: debug
+
+# At debug level, you can selectively enable logging only for some components.
+# To enable all selectors use ["*"]. Examples of other selectors are "beat",
+# "publish", "service".
+#logging.selectors: ["*"]

@@ -10,24 +10,24 @@
 //////////////////////////////////////////////////////////////////////////
 
 [[configuring-ingest-node]]
-=== Configuring {beatname_uc} to Use Ingest Node
+== Parse logs by using ingest node
 
 When you use Elasticsearch for output, you can configure {beatname_uc} to use
-https://www.elastic.co/guide/en/elasticsearch/reference/master/ingest.html[ingest node] to pre-process documents
+{elasticsearch}/ingest.html[ingest node] to pre-process documents
 before the actual indexing takes place in Elasticsearch. Ingest node is a convenient processing option when you
 want to do some extra processing on your data, but you do not require the full power of Logstash. For
 example, you can create an ingest node pipeline in Elasticsearch that consists of one processor
-that removes a field in a document followed by another processor that renames a field. 
+that removes a field in a document followed by another processor that renames a field.
 
 After defining the pipeline in Elasticsearch, you simply configure your Beat to use the pipeline. To configure
-{beatname_uc}, you specify the pipeline ID in the `parameters` option under `elasticsearch` in the 
+{beatname_uc}, you specify the pipeline ID in the `parameters` option under `elasticsearch` in the
 +{beatname_lc}.yml+ file:
 
 [source,yaml]
 ------------------------------------------------------------------------------
 output.elasticsearch:
   hosts: ["localhost:9200"]
-  parameters: {pipeline: my_pipeline_id}
+  pipeline: my_pipeline_id
 ------------------------------------------------------------------------------
 
 For example, let's say that you've defined the following pipeline in a file named `pipeline.json`:
@@ -50,7 +50,7 @@ To add the pipeline in Elasticsearch, you would run:
 
 [source,shell]
 ------------------------------------------------------------------------------
-curl -XPUT 'http://192.168.99.100:9200/_ingest/pipeline/test-pipeline' -d@pipeline.json
+curl -H 'Content-Type: application/json' -XPUT 'http://localhost:9200/_ingest/pipeline/test-pipeline' -d@pipeline.json
 ------------------------------------------------------------------------------
 
 Then in the +{beatname_lc}.yml+ file, you would specify:
@@ -59,7 +59,7 @@ Then in the +{beatname_lc}.yml+ file, you would specify:
 ------------------------------------------------------------------------------
 output.elasticsearch:
   hosts: ["localhost:9200"]
-  parameters: {pipeline: "test-pipeline"}
+  pipeline: "test-pipeline"
 ------------------------------------------------------------------------------
 
 When you run {beatname_uc}, the value of `beat.name` is converted to lowercase before indexing.

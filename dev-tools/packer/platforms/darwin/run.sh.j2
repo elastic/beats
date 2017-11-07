@@ -10,18 +10,18 @@ if [ "$SNAPSHOT" = "yes" ]; then
     VERSION="${VERSION}-SNAPSHOT"
 fi
 
-mkdir /{{.beat_name}}-${VERSION}-darwin-x64
-cp -a homedirs/{{.beat_name}}/. /{{.beat_name}}-${VERSION}-darwin-x64/
-cp {{.beat_name}}-darwin-amd64 /{{.beat_name}}-${VERSION}-darwin-x64/{{.beat_name}}
-cp {{.beat_name}}-darwin.yml /{{.beat_name}}-${VERSION}-darwin-x64/{{.beat_name}}.yml
-cp {{.beat_name}}-darwin.full.yml /{{.beat_name}}-${VERSION}-darwin-x64/{{.beat_name}}.full.yml
-cp {{.beat_name}}.template.json /{{.beat_name}}-${VERSION}-darwin-x64/
-cp {{.beat_name}}.template-es2x.json /{{.beat_name}}-${VERSION}-darwin-x64/
+mkdir /{{.beat_name}}-${VERSION}-darwin-x86_64
+cp -a homedir/. /{{.beat_name}}-${VERSION}-darwin-x86_64/
+cp {{.beat_name}}-darwin-amd64 /{{.beat_name}}-${VERSION}-darwin-x86_64/{{.beat_name}}
+cp {{.beat_name}}-darwin.yml /{{.beat_name}}-${VERSION}-darwin-x86_64/{{.beat_name}}.yml
+cp {{.beat_name}}-darwin.reference.yml /{{.beat_name}}-${VERSION}-darwin-x86_64/{{.beat_name}}.reference.yml
+cp fields.yml /{{.beat_name}}-${VERSION}-darwin-x86_64/
+cp -a modules.d-darwin/ /{{.beat_name}}-${VERSION}-darwin-x86_64/modules.d || true
 
-mkdir -p upload/{{.beat_name}}
-tar czvf upload/{{.beat_name}}/{{.beat_name}}-${VERSION}-darwin-x64.tar.gz /{{.beat_name}}-${VERSION}-darwin-x64
-echo "Created upload/{{.beat_name}}/{{.beat_name}}-${VERSION}-darwin-x64.tar.gz"
+mkdir -p upload
+tar czvf upload/{{.beat_name}}-${VERSION}-darwin-x86_64.tar.gz /{{.beat_name}}-${VERSION}-darwin-x86_64
+echo "Created upload/{{.beat_name}}-${VERSION}-darwin-x86_64.tar.gz"
 
-cd upload/{{.beat_name}}
-sha1sum {{.beat_name}}-${VERSION}-darwin-x64.tar.gz > {{.beat_name}}-${VERSION}-darwin-x64.tar.gz.sha1.txt
-echo "Created upload/{{.beat_name}}/{{.beat_name}}-${VERSION}-darwin-x64.tar.gz.sha1.txt"
+cd upload
+sha1sum {{.beat_name}}-${VERSION}-darwin-x86_64.tar.gz | awk '{print $1;}' > {{.beat_name}}-${VERSION}-darwin-x86_64.tar.gz.sha1
+echo "Created upload/{{.beat_name}}-${VERSION}-darwin-x86_64.tar.gz.sha1"

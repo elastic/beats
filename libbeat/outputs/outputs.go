@@ -1,116 +1,38 @@
+// Package outputs defines common types and interfaces to be implemented by
+// output plugins.
+
 package outputs
 
 import (
-	"github.com/elastic/beats/libbeat/common"
-	"github.com/elastic/beats/libbeat/common/op"
-	"github.com/elastic/beats/libbeat/logp"
+	"github.com/elastic/beats/libbeat/publisher"
 )
 
-type Options struct {
-	Guaranteed bool
-}
-
-type Outputer interface {
-	// Publish event
-	PublishEvent(sig op.Signaler, opts Options, event common.MapStr) error
-
+// Client provides the minimal interface an output must implement to be usable
+// with the publisher pipeline.
+type Client interface {
 	Close() error
+
+	// Publish sends events to the clients sink. A client must synchronously or
+	// asynchronously ACK the given batch, once all events have been processed.
+	// Using Retry/Cancelled a client can return a batch of unprocessed events to
+	// the publisher pipeline. The publisher pipeline (if configured by the output
+	// factory) will take care of retrying/dropping events.
+	Publish(publisher.Batch) error
 }
 
-type TopologyOutputer interface {
-	// Register the agent name and its IPs to the topology map
-	PublishIPs(name string, localAddrs []string) error
-
-	// Get the agent name with a specific IP from the topology map
-	GetNameByIP(ip string) string
+// NetworkClient defines the required client capabilities for network based
+// outputs, that must be reconnectable.
+type NetworkClient interface {
+	Client
+	Connectable
 }
 
-// BulkOutputer adds BulkPublish to publish batches of events without looping.
-// Outputers still might loop on events or use more efficient bulk-apis if present.
-type BulkOutputer interface {
-	Outputer
-	BulkPublish(sig op.Signaler, opts Options, event []common.MapStr) error
-}
-
-// Create and initialize the output plugin
-type OutputBuilder func(config *common.Config, topologyExpire int) (Outputer, error)
-
-// Functions to be exported by a output plugin
-type OutputInterface interface {
-	Outputer
-	TopologyOutputer
-}
-
-type OutputPlugin struct {
-	Name   string
-	Config *common.Config
-	Output Outputer
-}
-
-type bulkOutputAdapter struct {
-	Outputer
-}
-
-var enabledOutputPlugins = make(map[string]OutputBuilder)
-
-func RegisterOutputPlugin(name string, builder OutputBuilder) {
-	enabledOutputPlugins[name] = builder
-}
-
-func FindOutputPlugin(name string) OutputBuilder {
-	return enabledOutputPlugins[name]
-}
-
-func InitOutputs(
-	beatName string,
-	configs map[string]*common.Config,
-	topologyExpire int,
-) ([]OutputPlugin, error) {
-	var plugins []OutputPlugin = nil
-	for name, plugin := range enabledOutputPlugins {
-		config, exists := configs[name]
-		if !exists {
-			continue
-		}
-
-		if !config.HasField("index") {
-			config.SetString("index", -1, beatName)
-		}
-
-		output, err := plugin(config, topologyExpire)
-		if err != nil {
-			logp.Err("failed to initialize %s plugin as output: %s", name, err)
-			return nil, err
-		}
-
-		plugin := OutputPlugin{Name: name, Config: config, Output: output}
-		plugins = append(plugins, plugin)
-		logp.Info("Activated %s as output plugin.", name)
-	}
-	return plugins, nil
-}
-
-// CastBulkOutputer casts out into a BulkOutputer if out implements
-// the BulkOutputer interface. If out does not implement the interface an outputer
-// wrapper implementing the BulkOutputer interface is returned.
-func CastBulkOutputer(out Outputer) BulkOutputer {
-	if bo, ok := out.(BulkOutputer); ok {
-		return bo
-	}
-	return &bulkOutputAdapter{out}
-}
-
-func (b *bulkOutputAdapter) BulkPublish(
-	signal op.Signaler,
-	opts Options,
-	events []common.MapStr,
-) error {
-	signal = op.SplitSignaler(signal, len(events))
-	for _, evt := range events {
-		err := b.PublishEvent(signal, opts, evt)
-		if err != nil {
-			return err
-		}
-	}
-	return nil
+// Connectable is optionally implemented by clients that might be able to close
+// and reconnect dynamically.
+type Connectable interface {
+	// Connect establishes a connection to the clients sink.
+	// The connection attempt shall report an error if no connection could been
+	// established within the given time interval. A timeout value of 0 == wait
+	// forever.
+	Connect() error
 }

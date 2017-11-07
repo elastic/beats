@@ -1,0 +1,6 @@
+type: redis
+hosts:
+{{ range $i, $host := .hosts }}
+ - {{$host}}
+{{ end }}
+password: {{ .password }}

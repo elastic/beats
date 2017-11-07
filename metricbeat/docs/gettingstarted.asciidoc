@@ -1,5 +1,5 @@
 [[metricbeat-getting-started]]
-== Getting Started With Metricbeat
+== Getting started with Metricbeat
 
 Metricbeat helps you monitor your servers and the services they host by
 collecting metrics from the operating system and services.
@@ -11,15 +11,20 @@ related products:
  * Kibana for the UI.
  * Logstash (optional) for inserting data into Elasticsearch.
 
-See {libbeat}/getting-started.html[Getting Started with Beats and the Elastic
-Stack] for more information.
+See {libbeat}/getting-started.html[Getting Started with Beats and the Elastic Stack] for more information.
 
-After you have installed these products, you can start
-<<metricbeat-installation>>.
+After installing the Elastic Stack, read the following topics to learn how to install, configure, and run Metricbeat:
 
+* <<metricbeat-installation>>
+* <<metricbeat-configuration>>
+* <<metricbeat-template>>
+* <<load-kibana-dashboards>>
+* <<metricbeat-starting>>
+* <<view-kibana-dashboards>>
+* <<setup-repositories>>
 
 [[metricbeat-installation]]
-=== Step 1: Installing Metricbeat
+=== Step 1: Install Metricbeat
 
 You should install Metricbeat as close as possible to the service you want to
 monitor. For example, if you have four servers with MySQL running, it's
@@ -29,49 +34,93 @@ traffic or prevent Metricbeat from collecting metrics when there are network
 problems. Metrics from multiple Metricbeat instances will be combined on the
 Elasticsearch server.
 
-To download and install Metricbeat, use the commands that work with your system
-(<<deb, deb>> for Debian/Ubuntu, <<rpm, rpm>> for Redhat/Centos/Fedora, <<mac,
-mac>> for OS X, and <<win, win>> for Windows).
-
-[NOTE]
-==================================================
-If you use Apt or Yum, you can
-{libbeat}/setup-repositories.html[install Metricbeat from our repositories] to
-update to the newest version more easily.
-
-See our https://www.elastic.co/downloads/beats/metricbeat[download page] for
-other installation options, such as 32-bit images.
-==================================================
+include::../../libbeat/docs/shared-download-and-install.asciidoc[]
 
 [[deb]]
 *deb:*
 
+ifeval::["{release-state}"=="unreleased"]
+
+Version {stack-version} of {beatname_uc} has not yet been released.
+
+endif::[]
+
+ifeval::["{release-state}"!="unreleased"]
+
 ["source","sh",subs="attributes,callouts"]
 ------------------------------------------------
-curl -L -O https://download.elastic.co/beats/metricbeat/metricbeat-{version}-amd64.deb
+curl -L -O https://artifacts.elastic.co/downloads/beats/metricbeat/metricbeat-{version}-amd64.deb
 sudo dpkg -i metricbeat-{version}-amd64.deb
 ------------------------------------------------
+
+endif::[]
 
 [[rpm]]
 *rpm:*
 
+ifeval::["{release-state}"=="unreleased"]
+
+Version {stack-version} of {beatname_uc} has not yet been released.
+
+endif::[]
+
+ifeval::["{release-state}"!="unreleased"]
+
 ["source","sh",subs="attributes,callouts"]
 ------------------------------------------------
-curl -L -O https://download.elastic.co/beats/metricbeat/metricbeat-{version}-x86_64.rpm
+curl -L -O https://artifacts.elastic.co/downloads/beats/metricbeat/metricbeat-{version}-x86_64.rpm
 sudo rpm -vi metricbeat-{version}-x86_64.rpm
 ------------------------------------------------
+
+endif::[]
 
 [[mac]]
 *mac:*
 
+ifeval::["{release-state}"=="unreleased"]
+
+Version {stack-version} of {beatname_uc} has not yet been released.
+
+endif::[]
+
+ifeval::["{release-state}"!="unreleased"]
+
 ["source","sh",subs="attributes,callouts"]
 ------------------------------------------------
-curl -L -O https://download.elastic.co/beats/metricbeat/metricbeat-{version}-darwin-x64.tar.gz
-tar xzvf metricbeat-{version}-darwin-x64.tar.gz
+curl -L -O https://artifacts.elastic.co/downloads/beats/metricbeat/metricbeat-{version}-darwin-x86_64.tar.gz
+tar xzvf metricbeat-{version}-darwin-x86_64.tar.gz
 ------------------------------------------------
+
+endif::[]
+
+[[docker]]
+*docker:*
+
+ifeval::["{release-state}"=="unreleased"]
+
+Version {stack-version} of {beatname_uc} has not yet been released.
+
+endif::[]
+
+ifeval::["{release-state}"!="unreleased"]
+
+["source", "shell", subs="attributes"]
+------------------------------------------------
+docker pull {dockerimage}
+------------------------------------------------
+
+endif::[]
 
 [[win]]
 *win:*
+
+ifeval::["{release-state}"=="unreleased"]
+
+Version {stack-version} of {beatname_uc} has not yet been released.
+
+endif::[]
+
+ifeval::["{release-state}"!="unreleased"]
 
 . Download the Metricbeat Windows zip file from the
 https://www.elastic.co/downloads/beats/metricbeat[downloads page].
@@ -84,7 +133,8 @@ https://www.elastic.co/downloads/beats/metricbeat[downloads page].
 and select *Run As Administrator*). If you are running Windows XP, you may need
 to download and install PowerShell.
 
-. Run the following commands to install Metricbeat as a Windows service:
+. From the PowerShell prompt, run the following commands to install Metricbeat
+as a Windows service:
 +
 [source,shell]
 ----------------------------------------------------------------------
@@ -97,85 +147,148 @@ execution policy for the current session to allow the script to run. For
 example: `PowerShell.exe -ExecutionPolicy UnRestricted -File
 .\install-service-metricbeat.ps1`.
 
+endif::[]
+
 Before starting Metricbeat, you should look at the configuration options in the
 configuration file, for example `C:\Program Files\Metricbeat\metricbeat.yml`.
 For more information about these options, see
-<<metricbeat-configuration-options>>.
+<<configuring-howto-metricbeat>>.
 
 [[metricbeat-configuration]]
-=== Step 2: Configuring Metricbeat
+=== Step 2: Configure Metricbeat
 
-To configure Metricbeat, you edit the configuration file. For rpm and deb,
-you'll find the configuration file at `/etc/metricbeat/metricbeat.yml`. For mac
-and win, look in the archive that you just extracted.
+include::../../libbeat/docs/shared-configuring.asciidoc[]
 
-Here is a sample of the `metricbeat.yml` file. Metricbeat uses modules to
-collect metrics, and each module must be individually configured. The example
-below shows how to configure the Apache HTTPD module.
+Metricbeat uses <<metricbeat-modules,modules>> to collect metrics. You configure
+each module individually. The following example shows the default configuration
+in the `metricbeat.yml` file. The system status module is enabled by default to
+collect metrics about your server, such as CPU usage, memory usage, network IO
+metrics, and process statistics:
 
 [source, shell]
 -------------------------------------
 metricbeat.modules:
-- module: apache
+- module: system
+  metricsets:
+    - cpu
+    - filesystem
+    - memory
+    - network
+    - process
   enabled: true
-  metricsets: ['status']
-  hosts: ['http://127.0.0.1/']
+  period: 10s
+  processes: ['.*']
+  cpu_ticks: false
+-------------------------------------
+
+The following example shows how to configure two modules: the system module
+and the Apache HTTPD module:
+
+[source, shell]
+-------------------------------------
+metricbeat.modules:
+- module: system
+  metricsets:
+    - cpu
+    - filesystem
+    - memory
+    - network
+    - process
+  enabled: true
+  period: 10s
+  processes: ['.*']
+  cpu_ticks: false
+- module: apache
+  metricsets: ["status"]
+  enabled: true
   period: 1s
+  hosts: ["http://127.0.0.1"]
 -------------------------------------
 
 To configure Metricbeat:
 
-////
-TODO: Migrate the documentation ruflin has written to here.
-////
+. Define the Metricbeat modules that you want to enable. For each module, specify
+the metricsets that you want to collect. See <<configuring-howto-metricbeat>> for
+more details about configuring modules.
++
+If you accept the default configuration without specifying additional modules,
+Metricbeat will collect system metrics only.
 
-. Define the metricbeat modules that you want enabled.
-
-. If you are sending output to Elasticsearch, set the IP address and port where
-Metricbeat can find the Elasticsearch installation:
+. If you are sending output directly to Elasticsearch (and not using Logstash),
+set the IP address and port where Metricbeat can find the Elasticsearch installation:
 +
 [source,yaml]
 ----------------------------------------------------------------------
-# Configure what outputs to use when sending the data collected by the beat.
-# Multiple outputs may be used.
-
 output.elasticsearch:
-  # Array of hosts to connect to.
   hosts: ["192.168.1.42:9200"]
 ----------------------------------------------------------------------
 +
-If you are sending output to Logstash, see <<config-metricbeat-logstash>>
-instead.
+If you are sending output to Logstash, make sure you
+<<logstash-output,Configure the Logstash output>> instead.
+
+include::../../libbeat/docs/step-configure-kibana-endpoint.asciidoc[]
+
+include::../../libbeat/docs/step-configure-credentials.asciidoc[]
+
+include::../../libbeat/docs/step-test-config.asciidoc[]
+
+include::../../libbeat/docs/step-look-at-config.asciidoc[]
 
 [[metricbeat-template]]
-=== Step 3: Loading the Index Template in Elasticsearch
+=== Step 3: Load the index template in Elasticsearch
 
 :allplatforms:
 include::../../libbeat/docs/shared-template-load.asciidoc[]
 
-=== Step 4: Starting Metricbeat
+[[load-kibana-dashboards]]
+=== Step 4: Set up the Kibana dashboards
 
-Run Metricbeat by issuing the following command:
+:allplatforms:
+include::../../libbeat/docs/dashboards.asciidoc[]
+
+[[metricbeat-starting]]
+=== Step 5: Start Metricbeat
+
+Run Metricbeat by issuing the appropriate command for your platform.
+
+NOTE: If you use an init.d script to start Metricbeat on deb or rpm, you can't
+specify command line flags (see <<command-line-options>>). To specify flags,
+start Metricbeat in the foreground.
 
 *deb:*
 
-[source,shell]
+["source","sh",subs="attributes"]
 ----------------------------------------------------------------------
-sudo /etc/init.d/metricbeat start
+sudo service {beatname_lc} start
 ----------------------------------------------------------------------
+
 *rpm:*
 
-[source,shell]
+["source","sh",subs="attributes"]
 ----------------------------------------------------------------------
-sudo /etc/init.d/metricbeat start
+sudo service {beatname_lc} start
+----------------------------------------------------------------------
+
+*docker:*
+
+["source", "shell", subs="attributes"]
+----------------------------------------------------------------------
+docker run {dockerimage}
 ----------------------------------------------------------------------
 
 *mac:*
 
 [source,shell]
 ----------------------------------------------------------------------
+sudo chown root metricbeat.yml <1>
+sudo chown root modules.d/system.yml <1>
 sudo ./metricbeat -e -c metricbeat.yml -d "publish"
 ----------------------------------------------------------------------
+<1> You'll be running Metricbeat as root, so you need to change ownership of the
+configuration file and any configurations enabled in the `modules.d` directory,
+or run Metricbeat with `-strict.perms=false` specified. See
+{libbeat}/config-file-permissions.html[Config File Ownership and Permissions]
+in the _Beats Platform Reference_.
 
 *win:*
 
@@ -189,7 +302,13 @@ By default the log files are stored in `C:\ProgramData\metricbeat\Logs`.
 NOTE: On Windows, statistics about system load and swap usage are currently
 not captured.
 
-==== Testing the Metricbeat Installation
+[id="{beatname_lc}-passing-credentials"]
+==== Pass credentials
+
+:start-type: start
+include::../../libbeat/docs/shared-passing-credentials-setup.asciidoc[]
+
+==== Test the Metricbeat installation
 
 To verify that your server's statistics are present in Elasticsearch, issue
 the following command:
@@ -205,4 +324,16 @@ Elasticsearch instance.
 On Windows, if you don't have cURL installed, simply point your browser to the
 URL.
 
-Enjoy!
+[[view-kibana-dashboards]]
+=== Step 6: View the sample Kibana dashboards
+
+To make it easier for you to start monitoring your servers in Kibana,
+we have created example {beatname_uc} dashboards. You loaded the dashboards
+earlier when you ran the `setup` command.
+
+include::../../libbeat/docs/opendashboards.asciidoc[]
+
+The dashboards are provided as examples. We recommend that you
+{kibana-ref}/dashboard.html[customize] them to meet your needs.
+
+image:./images/metricbeat_system_dashboard.png[Metricbeat Dashboard]

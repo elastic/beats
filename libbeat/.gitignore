@@ -25,3 +25,6 @@ _testmain.go
 .idea
 .jenkins
 
+/libbeat.yml
+/libbeat.reference.yml
+/docs/fields.asciidoc

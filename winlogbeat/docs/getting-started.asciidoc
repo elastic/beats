@@ -11,11 +11,18 @@ related products:
 See {libbeat}/getting-started.html[Getting Started with Beats and the Elastic
 Stack] for more information.
 
-After you have installed these products, you can start
-<<winlogbeat-installation>>.
+After installing the Elastic Stack, read the following topics to learn how to install, configure, and run Winlogbeat:
+
+* <<winlogbeat-installation>>
+* <<winlogbeat-configuration>>
+* <<config-winlogbeat-logstash>>
+* <<winlogbeat-template>>
+* <<load-kibana-dashboards>>
+* <<winlogbeat-starting>>
+* <<view-kibana-dashboards>>
 
 [[winlogbeat-installation]]
-=== Step 1: Installing Winlogbeat
+=== Step 1: Install Winlogbeat
 
 . Download the Winlogbeat zip file from the
 https://www.elastic.co/downloads/beats/winlogbeat[downloads page].
@@ -24,7 +31,7 @@ https://www.elastic.co/downloads/beats/winlogbeat[downloads page].
 . Open a PowerShell prompt as an Administrator (right-click on the PowerShell
 icon and select Run As Administrator). If you are running Windows XP, you may
 need to download and install PowerShell.
-. Run the following commands to install the service.
+. From the PowerShell prompt, run the following commands to install the service.
 
 ["source","sh",subs="attributes,callouts"]
 ------------------------------------------------
@@ -49,13 +56,18 @@ execution policy for the current session to allow the script to run. For example
 
 Before starting Winlogbeat, you should look at the configuration options in the
 configuration file, for example `C:\Program Files\Winlogbeat\winlogbeat.yml`.
-For more information about these options, see <<winlogbeat-configuration-details>>.
+There’s also a full example configuration file called `winlogbeat.reference.yml` that
+shows all non-deprecated options. For more information about these options, see
+<<configuring-howto-winlogbeat>>.
 
 [[winlogbeat-configuration]]
-=== Step 2: Configuring Winlogbeat
+=== Step 2: Configure Winlogbeat
 
-To configure Winlogbeat, you edit the `winlogbeat.yml` configuration file. Here
-is a sample of the `winlogbeat.yml` file:
+To configure Winlogbeat, you edit the `winlogbeat.yml` configuration file. See the
+{libbeat}/config-file-format.html[Config File Format] section of the
+_Beats Platform Reference_ for more about the structure of the config file.
+
+Here is a sample of the `winlogbeat.yml` file:
 
 [source,yaml]
 --------------------------------------------------------------------------------
@@ -91,8 +103,9 @@ To obtain a list of available event logs, run `Get-EventLog *` in PowerShell.
 For more information about this command, see the configuration details for
 <<configuration-winlogbeat-options-event_logs-name,event_logs.name>>.
 
-. If you are sending output to Elasticsearch, set the IP address and port where
-Winlogbeat can find the Elasticsearch installation:
+. If you are sending output directly to Elasticsearch (and not using Logstash),
+set the IP address and port where Winlogbeat can find the Elasticsearch
+installation:
 +
 [source,yaml]
 ----------------------------------------------------------------------
@@ -101,26 +114,39 @@ output.elasticsearch:
     - localhost:9200
 ----------------------------------------------------------------------
 +
-If you are sending output to Logstash, see <<config-winlogbeat-logstash>> instead.
+If you are sending output to Logstash, make sure you
+<<config-winlogbeat-logstash,Configure the Logstash output>> instead.
+
+include::../../libbeat/docs/step-configure-kibana-endpoint.asciidoc[]
+
+include::../../libbeat/docs/step-configure-credentials.asciidoc[]
 
 . After you save your configuration file, test it with the following command.
 +
 [source,shell]
 ----------------------------------------------------------------------
-PS C:\Program Files\Winlogbeat> .\winlogbeat.exe -c .\winlogbeat.yml -configtest -e
+PS C:\Program Files\Winlogbeat> .\winlogbeat.exe test config -c .\winlogbeat.yml -e
 ----------------------------------------------------------------------
 
 [[config-winlogbeat-logstash]]
-=== Step 3: Configuring Winlogbeat to Use Logstash
+=== Step 3: Configure Winlogbeat to use Logstash
 
+:win:
 include::../../libbeat/docs/shared-logstash-config.asciidoc[]
 
 [[winlogbeat-template]]
-=== Step 4: Loading the Index Template in Elasticsearch
+=== Step 4: Load the index template in Elasticsearch
 
 include::../../libbeat/docs/shared-template-load.asciidoc[]
 
-=== Step 5: Starting Winlogbeat
+[[load-kibana-dashboards]]
+=== Step 5: Set up the Kibana dashboards
+
+:win:
+include::../../libbeat/docs/dashboards.asciidoc[]
+
+[[winlogbeat-starting]]
+=== Step 6: Start Winlogbeat
 
 Start the Winlogbeat service with the following command:
 
@@ -141,7 +167,14 @@ this command:
 PS C:\Program Files\Winlogbeat> services.msc
 ----------------------------------------------------------------------
 
-==== Stopping Winlogbeat
+[id="{beatname_lc}-passing-credentials"]
+==== Pass credentials
+
+:start-type: start
+include::../../libbeat/docs/shared-passing-credentials-setup.asciidoc[]
+
+
+==== Stop Winlogbeat
 
 Stop the Winlogbeat service with the following command:
 
@@ -150,16 +183,16 @@ Stop the Winlogbeat service with the following command:
 PS C:\Program Files\Winlogbeat> Stop-Service winlogbeat
 ----------------------------------------------------------------------
 
-=== Step 6: Loading Sample Kibana Dashboards
+[[view-kibana-dashboards]]
+=== Step 7: View the sample Kibana dashboards
 
-To make it easier for you to start monitoring your servers in Kibana,
-we have created a sample Winlogbeat dashboard. This dashboard is provided as
-an example. We recommend that you
-http://www.elastic.co/guide/en/kibana/current/dashboard.html[customize] it
-to meet your needs.
+To make it easier for you to start monitoring your servers in Kibana, we have
+created example {beatname_uc} dashboards. You loaded the dashboards earlier
+when you ran the `setup` command.
 
-For more information, see
-{libbeat}/load-kibana-dashboards.html[Loading the Beats Dashboards].
+include::../../libbeat/docs/opendashboards.asciidoc[]
+
+The dashboards are provided as examples. We recommend that you
+{kibana-ref}/dashboard.html[customize] them to meet your needs.
 
 image:./images/winlogbeat-dashboard.png[Winlogbeat statistics]
-

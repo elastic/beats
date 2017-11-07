@@ -11,7 +11,6 @@ package main
 
 import (
 	"bufio"
-	"bytes"
 	"flag"
 	"fmt"
 	"io"
@@ -24,9 +23,9 @@ import (
 	"strconv"
 	"strings"
 
-	"golang.org/x/text/cldr"
 	"golang.org/x/text/internal/gen"
 	"golang.org/x/text/internal/tag"
+	"golang.org/x/text/unicode/cldr"
 )
 
 var (
@@ -93,11 +92,6 @@ altRegionIDs holds a list of regionIDs the positions of which match those
 of the 3-letter ISO codes in altRegionISO3.`,
 	`
 variantNumSpecialized is the number of specialized variants in variants.`,
-	`
-currency holds an alphabetically sorted list of canonical 3-letter currency identifiers.
-Each identifier is followed by a byte of which the 6 most significant bits
-indicated the rounding and the least 2 significant bits indicate the
-number of decimal positions.`,
 	`
 suppressScript is an index from langID to the dominant script for that language,
 if it exists.  If a script is given, it should be suppressed from the language tag.`,
@@ -324,7 +318,6 @@ type builder struct {
 	script      stringSet // 4-letter ISO codes
 	region      stringSet // 2-letter ISO or 3-digit UN M49 codes
 	variant     stringSet // 4-8-alphanumeric variant code.
-	currency    stringSet // 3-letter ISO currency codes
 
 	// Region codes that are groups with their corresponding group IDs.
 	groups map[int]index
@@ -339,7 +332,6 @@ func newBuilder(w *gen.CodeWriter) *builder {
 	r := gen.OpenCLDRCoreZip()
 	defer r.Close()
 	d := &cldr.Decoder{}
-	d.SetDirFilter("supplemental")
 	data, err := d.DecodeZip(r)
 	failOnError(err)
 	b := builder{
@@ -617,6 +609,39 @@ func (b *builder) parseIndices() {
 		}
 		ss.add(k)
 	}
+	// Include any language for which there is data.
+	for _, lang := range b.data.Locales() {
+		if x := b.data.RawLDML(lang); false ||
+			x.LocaleDisplayNames != nil ||
+			x.Characters != nil ||
+			x.Delimiters != nil ||
+			x.Measurement != nil ||
+			x.Dates != nil ||
+			x.Numbers != nil ||
+			x.Units != nil ||
+			x.ListPatterns != nil ||
+			x.Collations != nil ||
+			x.Segmentations != nil ||
+			x.Rbnf != nil ||
+			x.Annotations != nil ||
+			x.Metadata != nil {
+
+			from := strings.Split(lang, "_")
+			if lang := from[0]; lang != "root" {
+				b.lang.add(lang)
+			}
+		}
+	}
+	// Include locales for plural rules, which uses a different structure.
+	for _, plurals := range b.data.Supplemental().Plurals {
+		for _, rules := range plurals.PluralRules {
+			for _, lang := range strings.Split(rules.Locales, " ") {
+				if lang = strings.Split(lang, "_")[0]; lang != "root" {
+					b.lang.add(lang)
+				}
+			}
+		}
+	}
 	// Include languages in likely subtags.
 	for _, m := range b.supp.LikelySubtags.LikelySubtag {
 		from := strings.Split(m.From, "_")
@@ -634,12 +659,6 @@ func (b *builder) parseIndices() {
 			b.region.add(reg.Type)
 		}
 	}
-	// currency codes
-	for _, reg := range b.supp.CurrencyData.Region {
-		for _, cur := range reg.Currency {
-			b.currency.add(cur.Iso4217)
-		}
-	}
 
 	for _, s := range b.lang.s {
 		if len(s) == 3 {
@@ -649,13 +668,11 @@ func (b *builder) parseIndices() {
 	b.writeConst("numLanguages", len(b.lang.slice())+len(b.langNoIndex.slice()))
 	b.writeConst("numScripts", len(b.script.slice()))
 	b.writeConst("numRegions", len(b.region.slice()))
-	b.writeConst("numCurrencies", len(b.currency.slice()))
 
 	// Add dummy codes at the start of each list to represent "unspecified".
 	b.lang.add("---")
 	b.script.add("----")
 	b.region.add("---")
-	b.currency.add("---")
 
 	// common locales
 	b.locale.parse(meta.DefaultContent.Locales)
@@ -1178,35 +1195,6 @@ func (b *builder) writeVariant() {
 func (b *builder) writeLanguageInfo() {
 }
 
-func (b *builder) writeCurrencies() {
-	b.writeConsts(b.currency.index, "XTS", "XXX")
-
-	digits := map[string]uint64{}
-	rounding := map[string]uint64{}
-	for _, info := range b.supp.CurrencyData.Fractions[0].Info {
-		var err error
-		digits[info.Iso4217], err = strconv.ParseUint(info.Digits, 10, curDigitBits)
-		failOnError(err)
-		rounding[info.Iso4217], err = strconv.ParseUint(info.Rounding, 10, curRoundBits)
-		failOnError(err)
-	}
-	for i, cur := range b.currency.slice() {
-		d := uint64(2) // default number of decimal positions
-		if dd, ok := digits[cur]; ok {
-			d = dd
-		}
-		var r uint64
-		if r = rounding[cur]; r == 0 {
-			r = 1 // default rounding increment in units 10^{-digits)
-		}
-		b.currency.s[i] += mkCurrencyInfo(int(r), int(d))
-	}
-	b.writeConst("currency", tag.Index(b.currency.join()))
-	// Hack alert: gofmt indents a trailing comment after an indented string.
-	// Ensure that the next thing written is not a comment.
-	// writeLikelyData serves this purpose as it starts with an uncommented type.
-}
-
 // writeLikelyData writes tables that are used both for finding parent relations and for
 // language matching.  Each entry contains additional bits to indicate the status of the
 // data to know when it cannot be used for parent relations.
@@ -1467,16 +1455,15 @@ func (b *builder) writeMatchData() {
 				oneway: m.Oneway == "true",
 			})
 		} else {
-			// TODO: Handle the es_MX -> es_419 mapping. This does not seem to
-			// make much sense for our purposes, though.
+			// TODO: Handle other mappings.
 			a := []string{"*;*", "*_*;*_*", "es_MX;es_419"}
 			s := strings.Join([]string{desired, supported}, ";")
 			if i := sort.SearchStrings(a, s); i == len(a) || a[i] != s {
-				log.Fatalf("%q not handled", s)
+				log.Printf("%q not handled", s)
 			}
 		}
 	}
-	sort.Sort(sortByConf(matchLang))
+	sort.Stable(sortByConf(matchLang))
 	// collapse percentage into confidence classes
 	for i, m := range matchLang {
 		matchLang[i].conf = toConf(m.conf)
@@ -1620,29 +1607,10 @@ func (b *builder) writeParents() {
 	b.writeSliceAddSize("parents", n*2, parents)
 }
 
-const version = `
-// Version is the version of CLDR used to generate the data in this package.
-const Version = %q
-`
-
-func rewriteCommon() {
-	// Generate common.go
-	src, err := ioutil.ReadFile("gen_common.go")
-	failOnError(err)
-	const toDelete = "// +build ignore\n\npackage main\n\n"
-	i := bytes.Index(src, []byte(toDelete))
-	if i < 0 {
-		log.Fatalf("could not find %q in gen_common.go", toDelete)
-	}
-	w := &bytes.Buffer{}
-	w.Write(src[i+len(toDelete):])
-	gen.WriteGoFile("common.go", "language", w.Bytes())
-}
-
 func main() {
 	gen.Init()
 
-	rewriteCommon()
+	gen.Repackage("gen_common.go", "common.go", "language")
 
 	w := gen.NewCodeWriter()
 	defer w.WriteGoFile("tables.go", "language")
@@ -1650,7 +1618,7 @@ func main() {
 	fmt.Fprintln(w, `import "golang.org/x/text/internal/tag"`)
 
 	b := newBuilder(w)
-	fmt.Fprintf(w, version, cldr.Version)
+	gen.WriteCLDRVersion(w)
 
 	b.parseIndices()
 	b.writeType(fromTo{})
@@ -1659,7 +1627,6 @@ func main() {
 	b.writeRegion()
 	b.writeVariant()
 	// TODO: b.writeLocale()
-	b.writeCurrencies()
 	b.computeRegionGroups()
 	b.writeLikelyData()
 	b.writeMatchData()

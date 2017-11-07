@@ -1,0 +1,11 @@
+{
+  "visState": "{\n  \"title\": \"Docker containers\",\n  \"type\": \"table\",\n  \"params\": {\n    \"perPage\": 8,\n    \"showMeticsAtAllLevels\": false,\n    \"showPartialRows\": false,\n    \"showTotal\": true,\n    \"sort\": {\n      \"columnIndex\": null,\n      \"direction\": null\n    },\n    \"totalFunc\": \"sum\"\n  },\n  \"aggs\": [\n    {\n      \"id\": \"2\",\n      \"enabled\": true,\n      \"type\": \"terms\",\n      \"schema\": \"bucket\",\n      \"params\": {\n        \"field\": \"docker.container.name\",\n        \"size\": 5,\n        \"order\": \"desc\",\n        \"orderBy\": \"1\",\n        \"customLabel\": \"Name\"\n      }\n    },\n    {\n      \"id\": \"3\",\n      \"enabled\": true,\n      \"type\": \"max\",\n      \"schema\": \"metric\",\n      \"params\": {\n        \"field\": \"docker.cpu.total.pct\",\n        \"customLabel\": \"CPU usage (%)\"\n      }\n    },\n    {\n      \"id\": \"4\",\n      \"enabled\": true,\n      \"type\": \"max\",\n      \"schema\": \"metric\",\n      \"params\": {\n        \"field\": \"docker.diskio.total\",\n        \"customLabel\": \"DiskIO\"\n      }\n    },\n    {\n      \"id\": \"5\",\n      \"enabled\": true,\n      \"type\": \"max\",\n      \"schema\": \"metric\",\n      \"params\": {\n        \"field\": \"docker.memory.usage.pct\",\n        \"customLabel\": \"Mem (%)\"\n      }\n    },\n    {\n      \"id\": \"6\",\n      \"enabled\": true,\n      \"type\": \"max\",\n      \"schema\": \"metric\",\n      \"params\": {\n        \"field\": \"docker.memory.rss.total\",\n        \"customLabel\": \"Mem RSS\"\n      }\n    },\n    {\n      \"id\": \"1\",\n      \"enabled\": true,\n      \"type\": \"cardinality\",\n      \"schema\": \"metric\",\n      \"params\": {\n        \"field\": \"docker.container.id\",\n        \"customLabel\": \"Number of Containers\"\n      }\n    }\n  ],\n  \"listeners\": {}\n}", 
+  "description": "", 
+  "title": "Docker containers", 
+  "uiStateJSON": "{\n  \"vis\": {\n    \"params\": {\n      \"sort\": {\n        \"columnIndex\": 1,\n        \"direction\": \"asc\"\n      }\n    }\n  }\n}", 
+  "version": 1, 
+  "savedSearchId": "Metricbeat-Docker", 
+  "kibanaSavedObjectMeta": {
+    "searchSourceJSON": "{\n  \"filter\": []\n}"
+  }
+}

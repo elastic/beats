@@ -1,7 +1,7 @@
 #################### Packetbeat Configuration Example #########################
 
 # This file is an example configuration file highlighting only the most common
-# options. The packetbeat.full.yml file from the same directory contains all the
+# options. The packetbeat.reference.yml file from the same directory contains all the
 # supported options with more comments. You can use it as a reference.
 #
 # You can find the full configuration reference here:
@@ -9,33 +9,38 @@
 
 #============================== Network device ================================
 
-# Select the network interface to sniff the data. You can use the "any"
-# keyword to sniff on all connected interfaces.
+# Select the network interface to sniff the data. On Linux, you can use the
+# "any" keyword to sniff on all connected interfaces.
 packetbeat.interfaces.device: any
 
 #================================== Flows =====================================
 
-# Comment out all options to disable flows reporting.
+# Set `enabled: false` or comment out all options to disable flows reporting.
+packetbeat.flows:
+  # Set network flow timeout. Flow is killed if no packet is received before being
+  # timed out.
+  timeout: 30s
 
-# Set network flow timeout. Flow is killed if no packet is received before being
-# timed out.
-packetbeat.flows.timeout: 30s
-
-# Configure reporting period. If set to -1, only killed flows will be reported
-packetbeat.flows.period: 10s
+  # Configure reporting period. If set to -1, only killed flows will be reported
+  period: 10s
 
 #========================== Transaction protocols =============================
 
-packetbeat.protocols.icmp:
+packetbeat.protocols:
+- type: icmp
   # Enable ICMPv4 and ICMPv6 monitoring. Default: false
   enabled: true
 
-packetbeat.protocols.amqp:
+- type: amqp
   # Configure the ports where to listen for AMQP traffic. You can disable
   # the AMQP protocol by commenting out the list of ports.
   ports: [5672]
 
-packetbeat.protocols.dns:
+- type: cassandra
+  #Cassandra port for traffic monitoring.
+  ports: [9042]
+
+- type: dns
   # Configure the ports where to listen for DNS traffic. You can disable
   # the DNS protocol by commenting out the list of ports.
   ports: [53]
@@ -48,45 +53,52 @@ packetbeat.protocols.dns:
   # (additional resource records) is added to messages.
   include_additionals: true
 
-packetbeat.protocols.http:
+- type: http
   # Configure the ports where to listen for HTTP traffic. You can disable
   # the HTTP protocol by commenting out the list of ports.
   ports: [80, 8080, 8000, 5000, 8002]
 
-packetbeat.protocols.memcache:
+- type: memcache
   # Configure the ports where to listen for memcache traffic. You can disable
   # the Memcache protocol by commenting out the list of ports.
   ports: [11211]
 
-packetbeat.protocols.mysql:
+- type: mysql
   # Configure the ports where to listen for MySQL traffic. You can disable
   # the MySQL protocol by commenting out the list of ports.
   ports: [3306]
 
-packetbeat.protocols.pgsql:
+- type: pgsql
   # Configure the ports where to listen for Pgsql traffic. You can disable
   # the Pgsql protocol by commenting out the list of ports.
   ports: [5432]
 
-packetbeat.protocols.redis:
+- type: redis
   # Configure the ports where to listen for Redis traffic. You can disable
   # the Redis protocol by commenting out the list of ports.
   ports: [6379]
 
-packetbeat.protocols.thrift:
+- type: thrift
   # Configure the ports where to listen for Thrift-RPC traffic. You can disable
   # the Thrift-RPC protocol by commenting out the list of ports.
   ports: [9090]
 
-packetbeat.protocols.mongodb:
+- type: mongodb
   # Configure the ports where to listen for MongoDB traffic. You can disable
   # the MongoDB protocol by commenting out the list of ports.
   ports: [27017]
 
-packetbeat.protocols.nfs:
+- type: nfs
   # Configure the ports where to listen for NFS traffic. You can disable
   # the NFS protocol by commenting out the list of ports.
   ports: [2049]
+
+#==================== Elasticsearch template setting ==========================
+
+setup.template.settings:
+  index.number_of_shards: 3
+  #index.codec: best_compression
+  #_source.enabled: false
 
 #================================ General =====================================
 
@@ -103,42 +115,80 @@ packetbeat.protocols.nfs:
 #fields:
 #  env: staging
 
+
+#============================== Dashboards =====================================
+# These settings control loading the sample dashboards to the Kibana index. Loading
+# the dashboards is disabled by default and can be enabled either by setting the
+# options here, or by using the `-setup` CLI flag or the `setup` command.
+#setup.dashboards.enabled: false
+
+# The URL from where to download the dashboards archive. By default this URL
+# has a value which is computed based on the Beat name and version. For released
+# versions, this URL points to the dashboard archive on the artifacts.elastic.co
+# website.
+#setup.dashboards.url:
+
+#============================== Kibana =====================================
+
+# Starting with Beats version 6.0.0, the dashboards are loaded via the Kibana API.
+# This requires a Kibana endpoint configuration.
+setup.kibana:
+
+  # Kibana Host
+  # Scheme and port can be left out and will be set to the default (http and 5601)
+  # In case you specify and additional path, the scheme is required: http://localhost:5601/path
+  # IPv6 addresses should always be defined as: https://[2001:db8::1]:5601
+  #host: "localhost:5601"
+
+#============================= Elastic Cloud ==================================
+
+# These settings simplify using packetbeat with the Elastic Cloud (https://cloud.elastic.co/).
+
+# The cloud.id setting overwrites the `output.elasticsearch.hosts` and
+# `setup.kibana.host` options.
+# You can find the `cloud.id` in the Elastic Cloud web UI.
+#cloud.id:
+
+# The cloud.auth setting overwrites the `output.elasticsearch.username` and
+# `output.elasticsearch.password` settings. The format is `<user>:<pass>`.
+#cloud.auth:
+
 #================================ Outputs =====================================
 
-# Configure what outputs to use when sending the data collected by the beat.
-# Multiple outputs may be used.
+# Configure what output to use when sending the data collected by the beat.
 
 #-------------------------- Elasticsearch output ------------------------------
 output.elasticsearch:
   # Array of hosts to connect to.
   hosts: ["localhost:9200"]
 
-  # Template name. By default the template name is packetbeat.
-  template.name: "packetbeat"
-
-  # Path to template file
-  template.path: "packetbeat.template.json"
-
-  # Overwrite existing template
-  template.overwrite: false
+  # Optional protocol and basic auth credentials.
+  #protocol: "https"
+  #username: "elastic"
+  #password: "changeme"
 
 #----------------------------- Logstash output --------------------------------
 #output.logstash:
   # The Logstash hosts
   #hosts: ["localhost:5044"]
 
-  # Optional TLS. By default is off.
+  # Optional SSL. By default is off.
   # List of root certificates for HTTPS server verifications
-  #tls.certificate_authorities: ["/etc/pki/root/ca.pem"]
+  #ssl.certificate_authorities: ["/etc/pki/root/ca.pem"]
 
-  # Certificate for TLS client authentication
-  #tls.certificate: "/etc/pki/client/cert.pem"
+  # Certificate for SSL client authentication
+  #ssl.certificate: "/etc/pki/client/cert.pem"
 
   # Client Certificate Key
-  #tls.certificate_key: "/etc/pki/client/cert.key"
+  #ssl.key: "/etc/pki/client/cert.key"
 
 #================================ Logging =====================================
 
-# Sets log level. The default log level is error.
+# Sets log level. The default log level is info.
 # Available log levels are: critical, error, warning, info, debug
 #logging.level: debug
+
+# At debug level, you can selectively enable logging only for some components.
+# To enable all selectors use ["*"]. Examples of other selectors are "beat",
+# "publish", "service".
+#logging.selectors: ["*"]

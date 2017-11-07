@@ -1,0 +1,3 @@
+=== MongoDB status metricset
+
+This is the `status` metricset of the MongoDB module.

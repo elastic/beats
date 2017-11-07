@@ -1,0 +1,64 @@
+{
+  "description": "Pipeline for parsing Nginx access logs. Requires the geoip and user_agent plugins.",
+  "processors": [{
+    "grok": {
+      "field": "message",
+      "patterns":[
+        "\"?%{IP_LIST:nginx.access.remote_ip_list} - %{DATA:nginx.access.user_name} \\[%{HTTPDATE:nginx.access.time}\\] \"%{WORD:nginx.access.method} %{DATA:nginx.access.url} HTTP/%{NUMBER:nginx.access.http_version}\" %{NUMBER:nginx.access.response_code} %{NUMBER:nginx.access.body_sent.bytes} \"%{DATA:nginx.access.referrer}\" \"%{DATA:nginx.access.agent}\""
+        ],
+      "pattern_definitions": {
+        "IP_LIST": "%{IP}(\"?,?\\s*%{IP})*"
+      },
+      "ignore_missing": true
+    }
+  }, {
+    "split": {
+      "field": "nginx.access.remote_ip_list",
+      "separator": "\"?,?\\s+"
+    }
+  }, {
+    "script": {
+      "lang": "painless",
+      "inline": "boolean isPrivate(def ip) { try { StringTokenizer tok = new StringTokenizer(ip, '.'); int firstByte = Integer.parseInt(tok.nextToken());       int secondByte = Integer.parseInt(tok.nextToken());       if (firstByte == 10) {         return true;       }       if (firstByte == 192 && secondByte == 168) {         return true;       }       if (firstByte == 172 && secondByte >= 16 && secondByte <= 31) {         return true;       }       if (firstByte == 127) {         return true;       }       return false;     } catch (Exception e) {       return false;     }   }   def found = false;   for (def item : ctx.nginx.access.remote_ip_list) {     if (!isPrivate(item)) {       ctx.nginx.access.remote_ip = item;       found = true;       break;     }   }   if (!found) {     ctx.nginx.access.remote_ip = ctx.nginx.access.remote_ip_list[0];   }"
+      }
+  }, {
+    "remove":{
+      "field": "message"
+    }
+  }, {
+    "rename": {
+      "field": "@timestamp",
+      "target_field": "read_timestamp"
+    }
+  }, {
+    "date": {
+      "field": "nginx.access.time",
+      "target_field": "@timestamp",
+      "formats": ["dd/MMM/YYYY:H:m:s Z"]
+    }
+  }, {
+    "remove": {
+      "field": "nginx.access.time"
+    }
+  }, {
+    "user_agent": {
+      "field": "nginx.access.agent",
+      "target_field": "nginx.access.user_agent"
+    }
+  }, {
+    "remove": {
+      "field": "nginx.access.agent"
+    }
+  }, {
+    "geoip": {
+      "field": "nginx.access.remote_ip",
+      "target_field": "nginx.access.geoip"
+    }
+  }],
+  "on_failure" : [{
+    "set" : {
+      "field" : "error.message",
+      "value" : "{{ _ingest.on_failure_message }}"
+    }
+  }]
+}

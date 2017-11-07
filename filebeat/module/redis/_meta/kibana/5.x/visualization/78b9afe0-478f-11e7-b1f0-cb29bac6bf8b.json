@@ -1,0 +1,10 @@
+{
+  "visState": "{\"title\":\"Redis log levels and roles\",\"type\":\"pie\",\"params\":{\"addLegend\":true,\"addTooltip\":true,\"isDonut\":false,\"legendPosition\":\"bottom\"},\"aggs\":[{\"id\":\"1\",\"enabled\":true,\"type\":\"count\",\"schema\":\"metric\",\"params\":{}},{\"id\":\"3\",\"enabled\":true,\"type\":\"terms\",\"schema\":\"segment\",\"params\":{\"field\":\"redis.log.role\",\"size\":5,\"order\":\"desc\",\"orderBy\":\"1\"}},{\"id\":\"2\",\"enabled\":true,\"type\":\"terms\",\"schema\":\"segment\",\"params\":{\"field\":\"redis.log.level\",\"size\":5,\"order\":\"desc\",\"orderBy\":\"1\",\"customLabel\":\"Log level\"}}],\"listeners\":{}}", 
+  "description": "", 
+  "title": "Redis log levels and roles", 
+  "uiStateJSON": "{}", 
+  "version": 1, 
+  "kibanaSavedObjectMeta": {
+    "searchSourceJSON": "{\"filter\":[],\"index\":\"filebeat-*\",\"highlightAll\":true,\"version\":true,\"query\":{\"query_string\":{\"query\":\"_exists_:redis.log\",\"analyze_wildcard\":true}}}"
+  }
+}

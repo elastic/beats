@@ -1,0 +1,2 @@
+type=MAC_IPSEC_EVENT msg=audit(1485893834.891:18877201): op=SPD-delete auid=4294967295 ses=4294967295 res=1 src=192.168.2.0 src_prefixlen=24 dst=192.168.0.0 dst_prefixlen=16
+type=SYSCALL msg=audit(1485893834.891:18877199): arch=c000003e syscall=44 success=yes exit=184 a0=9 a1=7f564b2672a0 a2=b8 a3=0 items=0 ppid=1240 pid=1281 auid=4294967295 uid=0 gid=0 euid=0 suid=0 fsuid=0 egid=0 sgid=0 fsgid=0 tty=(none) ses=4294967295 comm="charon" exe=2F7573722F6C6962657865632F7374726F6E677377616E2F636861726F6E202864656C6574656429 key=(null)

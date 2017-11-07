@@ -4,16 +4,25 @@
 [partintro]
 --
 If you have issues installing or running Filebeat, read the
-following tips.
+following tips:
+
+* <<getting-help>>
+* <<enable-filebeat-debugging>>
+* <<faq>>
+
+//sets block macro for getting-help.asciidoc included in next section
 
 --
 
-== Getting Help
+[[getting-help]]
+== Get help
 
 include::../../libbeat/docs/getting-help.asciidoc[]
 
+//sets block macro for debugging.asciidoc included in next section
+
 [[enable-filebeat-debugging]]
-== Debugging
+== Debug
 
 include::../../libbeat/docs/debugging.asciidoc[]
 

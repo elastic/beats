@@ -14,6 +14,7 @@ type ConsumerMessage struct {
 	Topic      string
 	Partition  int32
 	Offset     int64
+	Timestamp  time.Time // only set if kafka is version 0.10+
 }
 
 // ConsumerError is what is provided to the user when an error occurs.
@@ -41,9 +42,10 @@ func (ce ConsumerErrors) Error() string {
 // on a consumer to avoid leaks, it will not be garbage-collected automatically when it passes out of
 // scope.
 //
-// Sarama's Consumer type does not currently support automatic consumer group rebalancing and offset tracking,
-// however the https://github.com/wvanbergen/kafka library builds on Sarama to add this support. We plan
-// to properly integrate this functionality at a later date.
+// Sarama's Consumer type does not currently support automatic consumer-group rebalancing and offset tracking.
+// For Zookeeper-based tracking (Kafka 0.8.2 and earlier), the https://github.com/wvanbergen/kafka library
+// builds on Sarama to add this support. For Kafka-based tracking (Kafka 0.9 and later), the
+// https://github.com/bsm/sarama-cluster library builds on Sarama to add this support.
 type Consumer interface {
 
 	// Topics returns the set of available topics as retrieved from the cluster
@@ -60,6 +62,10 @@ type Consumer interface {
 	// on the given topic/partition. Offset can be a literal offset, or OffsetNewest
 	// or OffsetOldest
 	ConsumePartition(topic string, partition int32, offset int64) (PartitionConsumer, error)
+
+	// HighWaterMarks returns the current high water marks for each topic and partition.
+	// Consistency between partitions is not guaranteed since high water marks are updated separately.
+	HighWaterMarks() map[string]map[int32]int64
 
 	// Close shuts down the consumer. It must be called after all child
 	// PartitionConsumers have already been closed.
@@ -161,6 +167,22 @@ func (c *consumer) ConsumePartition(topic string, partition int32, offset int64)
 	return child, nil
 }
 
+func (c *consumer) HighWaterMarks() map[string]map[int32]int64 {
+	c.lock.Lock()
+	defer c.lock.Unlock()
+
+	hwms := make(map[string]map[int32]int64)
+	for topic, p := range c.children {
+		hwm := make(map[int32]int64, len(p))
+		for partition, pc := range p {
+			hwm[partition] = pc.HighWaterMarkOffset()
+		}
+		hwms[topic] = hwm
+	}
+
+	return hwms
+}
+
 func (c *consumer) addChild(child *partitionConsumer) error {
 	c.lock.Lock()
 	defer c.lock.Unlock()
@@ -254,7 +276,7 @@ type PartitionConsumer interface {
 	// the broker.
 	Messages() <-chan *ConsumerMessage
 
-	// Errors returns a read channel of errors that occured during consuming, if
+	// Errors returns a read channel of errors that occurred during consuming, if
 	// enabled. By default, errors are logged and not returned over this channel.
 	// If you want to implement any custom error handling, set your config's
 	// Consumer.Return.Errors setting to true, and read from this channel.
@@ -267,10 +289,11 @@ type PartitionConsumer interface {
 }
 
 type partitionConsumer struct {
-	consumer  *consumer
-	conf      *Config
-	topic     string
-	partition int32
+	highWaterMarkOffset int64 // must be at the top of the struct because https://golang.org/pkg/sync/atomic/#pkg-note-BUG
+	consumer            *consumer
+	conf                *Config
+	topic               string
+	partition           int32
 
 	broker   *brokerConsumer
 	messages chan *ConsumerMessage
@@ -280,9 +303,8 @@ type partitionConsumer struct {
 	trigger, dying chan none
 	responseResult error
 
-	fetchSize           int32
-	offset              int64
-	highWaterMarkOffset int64
+	fetchSize int32
+	offset    int64
 }
 
 var errTimedOut = errors.New("timed out feeding messages to the user") // not user-facing
@@ -302,7 +324,7 @@ func (child *partitionConsumer) sendError(err error) {
 }
 
 func (child *partitionConsumer) dispatcher() {
-	for _ = range child.trigger {
+	for range child.trigger {
 		select {
 		case <-child.dying:
 			close(child.trigger)
@@ -389,7 +411,7 @@ func (child *partitionConsumer) Close() error {
 	child.AsyncClose()
 
 	go withRecover(func() {
-		for _ = range child.messages {
+		for range child.messages {
 			// drain
 		}
 	})
@@ -411,15 +433,25 @@ func (child *partitionConsumer) HighWaterMarkOffset() int64 {
 
 func (child *partitionConsumer) responseFeeder() {
 	var msgs []*ConsumerMessage
+	expiryTimer := time.NewTimer(child.conf.Consumer.MaxProcessingTime)
+	expireTimedOut := false
 
 feederLoop:
 	for response := range child.feeder {
 		msgs, child.responseResult = child.parseResponse(response)
 
 		for i, msg := range msgs {
+			if !expiryTimer.Stop() && !expireTimedOut {
+				// expiryTimer was expired; clear out the waiting msg
+				<-expiryTimer.C
+			}
+			expiryTimer.Reset(child.conf.Consumer.MaxProcessingTime)
+			expireTimedOut = false
+
 			select {
 			case child.messages <- msg:
-			case <-time.After(child.conf.Consumer.MaxProcessingTime):
+			case <-expiryTimer.C:
+				expireTimedOut = true
 				child.responseResult = errTimedOut
 				child.broker.acks.Done()
 				for _, msg = range msgs[i:] {
@@ -476,20 +508,26 @@ func (child *partitionConsumer) parseResponse(response *FetchResponse) ([]*Consu
 	for _, msgBlock := range block.MsgSet.Messages {
 
 		for _, msg := range msgBlock.Messages() {
-			if prelude && msg.Offset < child.offset {
+			offset := msg.Offset
+			if msg.Msg.Version >= 1 {
+				baseOffset := msgBlock.Offset - msgBlock.Messages()[len(msgBlock.Messages())-1].Offset
+				offset += baseOffset
+			}
+			if prelude && offset < child.offset {
 				continue
 			}
 			prelude = false
 
-			if msg.Offset >= child.offset {
+			if offset >= child.offset {
 				messages = append(messages, &ConsumerMessage{
 					Topic:     child.topic,
 					Partition: child.partition,
 					Key:       msg.Msg.Key,
 					Value:     msg.Msg.Value,
-					Offset:    msg.Offset,
+					Offset:    offset,
+					Timestamp: msg.Msg.Timestamp,
 				})
-				child.offset = msg.Offset + 1
+				child.offset = offset + 1
 			} else {
 				incomplete = true
 			}
@@ -537,7 +575,7 @@ func (bc *brokerConsumer) subscriptionManager() {
 	var buffer []*partitionConsumer
 
 	// The subscriptionManager constantly accepts new subscriptions on `input` (even when the main subscriptionConsumer
-	//  goroutine is in the middle of a network request) and batches it up. The main worker goroutine picks
+	// goroutine is in the middle of a network request) and batches it up. The main worker goroutine picks
 	// up a batch of new subscriptions between every network request by reading from `newSubscriptions`, so we give
 	// it nil if no new subscriptions are available. We also write to `wait` only when new subscriptions is available,
 	// so the main goroutine can block waiting for work if it has none.
@@ -642,7 +680,7 @@ func (bc *brokerConsumer) handleResponses() {
 			Logger.Printf("consumer/%s/%d shutting down because %s\n", child.topic, child.partition, result)
 			close(child.trigger)
 			delete(bc.subscriptions, child)
-		case ErrUnknownTopicOrPartition, ErrNotLeaderForPartition, ErrLeaderNotAvailable:
+		case ErrUnknownTopicOrPartition, ErrNotLeaderForPartition, ErrLeaderNotAvailable, ErrReplicaNotAvailable:
 			// not an error, but does need redispatching
 			Logger.Printf("consumer/broker/%d abandoned subscription to %s/%d because %s\n",
 				bc.broker.ID(), child.topic, child.partition, result)
@@ -668,8 +706,12 @@ func (bc *brokerConsumer) abort(err error) {
 		child.trigger <- none{}
 	}
 
-	for newSubscription := range bc.newSubscriptions {
-		for _, child := range newSubscription {
+	for newSubscriptions := range bc.newSubscriptions {
+		if len(newSubscriptions) == 0 {
+			<-bc.wait
+			continue
+		}
+		for _, child := range newSubscriptions {
 			child.sendError(err)
 			child.trigger <- none{}
 		}
@@ -680,6 +722,9 @@ func (bc *brokerConsumer) fetchNewMessages() (*FetchResponse, error) {
 	request := &FetchRequest{
 		MinBytes:    bc.consumer.conf.Consumer.Fetch.Min,
 		MaxWaitTime: int32(bc.consumer.conf.Consumer.MaxWaitTime / time.Millisecond),
+	}
+	if bc.consumer.conf.Version.IsAtLeast(V0_10_0_0) {
+		request.Version = 2
 	}
 
 	for child := range bc.subscriptions {

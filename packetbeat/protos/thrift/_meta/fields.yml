@@ -1,0 +1,28 @@
+- key: thrift
+  title: "Thrift-RPC"
+  description: >
+    Thrift-RPC specific event fields.
+  fields:
+    - name: thrift
+      type: group
+      fields:
+        - name: params
+          description: >
+            The RPC method call parameters in a human readable format. If the IDL
+            files are available, the parameters use names whenever possible.
+            Otherwise, the IDs from the message are used.
+
+        - name: service
+          description: >
+            The name of the Thrift-RPC service as defined in the IDL files.
+
+        - name: return_value
+          description: >
+            The value returned by the Thrift-RPC call. This is encoded in a human
+            readable format.
+
+        - name: exceptions
+          description: >
+            If the call resulted in exceptions, this field contains the exceptions in a human
+            readable format.
+

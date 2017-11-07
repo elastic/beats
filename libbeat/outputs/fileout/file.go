@@ -1,48 +1,68 @@
 package fileout
 
 import (
-	"encoding/json"
-
+	"github.com/elastic/beats/libbeat/beat"
 	"github.com/elastic/beats/libbeat/common"
-	"github.com/elastic/beats/libbeat/common/op"
 	"github.com/elastic/beats/libbeat/logp"
 	"github.com/elastic/beats/libbeat/outputs"
+	"github.com/elastic/beats/libbeat/outputs/codec"
+	"github.com/elastic/beats/libbeat/publisher"
 )
 
 func init() {
-	outputs.RegisterOutputPlugin("file", New)
+	outputs.RegisterType("file", makeFileout)
 }
 
 type fileOutput struct {
+	beat    beat.Info
+	stats   *outputs.Stats
 	rotator logp.FileRotator
+	codec   codec.Codec
 }
 
 // New instantiates a new file output instance.
-func New(cfg *common.Config, _ int) (outputs.Outputer, error) {
+func makeFileout(
+	beat beat.Info,
+	stats *outputs.Stats,
+	cfg *common.Config,
+) (outputs.Group, error) {
 	config := defaultConfig
 	if err := cfg.Unpack(&config); err != nil {
-		return nil, err
+		return outputs.Fail(err)
 	}
 
 	// disable bulk support in publisher pipeline
-	cfg.SetInt("flush_interval", -1, -1)
 	cfg.SetInt("bulk_max_size", -1, -1)
 
-	output := &fileOutput{}
-	if err := output.init(config); err != nil {
-		return nil, err
+	fo := &fileOutput{beat: beat, stats: stats}
+	if err := fo.init(beat, config); err != nil {
+		return outputs.Fail(err)
 	}
-	return output, nil
+
+	return outputs.Success(-1, 0, fo)
 }
 
-func (out *fileOutput) init(config config) error {
+func (out *fileOutput) init(beat beat.Info, config config) error {
+	var err error
+
 	out.rotator.Path = config.Path
 	out.rotator.Name = config.Filename
 	if out.rotator.Name == "" {
-		out.rotator.Name = config.Index
+		out.rotator.Name = out.beat.Beat
 	}
+
+	enc, err := codec.CreateEncoder(beat, config.Codec)
+	if err != nil {
+		return err
+	}
+
+	out.codec = enc
+
 	logp.Info("File output path set to: %v", out.rotator.Path)
 	logp.Info("File output base filename set to: %v", out.rotator.Name)
+
+	logp.Info("File output permissions set to: %#o", config.Permissions)
+	out.rotator.Permissions = &config.Permissions
 
 	rotateeverybytes := uint64(config.RotateEveryKb) * 1024
 	logp.Info("Rotate every bytes set to: %v", rotateeverybytes)
@@ -52,7 +72,7 @@ func (out *fileOutput) init(config config) error {
 	logp.Info("Number of files set to: %v", keepfiles)
 	out.rotator.KeepFiles = &keepfiles
 
-	err := out.rotator.CreateDirectory()
+	err = out.rotator.CreateDirectory()
 	if err != nil {
 		return err
 	}
@@ -70,28 +90,50 @@ func (out *fileOutput) Close() error {
 	return nil
 }
 
-func (out *fileOutput) PublishEvent(
-	sig op.Signaler,
-	opts outputs.Options,
-	event common.MapStr,
+func (out *fileOutput) Publish(
+	batch publisher.Batch,
 ) error {
-	jsonEvent, err := json.Marshal(event)
-	if err != nil {
-		// mark as success so event is not sent again.
-		op.SigCompleted(sig)
+	defer batch.ACK()
 
-		logp.Err("Fail to json encode event(%v): %#v", err, event)
-		return err
-	}
+	st := out.stats
+	events := batch.Events()
+	st.NewBatch(len(events))
 
-	err = out.rotator.WriteLine(jsonEvent)
-	if err != nil {
-		if opts.Guaranteed {
-			logp.Critical("Unable to write events to file: %s", err)
-		} else {
-			logp.Err("Error when writing line to file: %s", err)
+	dropped := 0
+	for i := range events {
+		event := &events[i]
+
+		serializedEvent, err := out.codec.Encode(out.beat.Beat, &event.Content)
+		if err != nil {
+			if event.Guaranteed() {
+				logp.Critical("Failed to serialize the event: %v", err)
+			} else {
+				logp.Warn("Failed to serialize the event: %v", err)
+			}
+
+			dropped++
+			continue
 		}
+
+		err = out.rotator.WriteLine(serializedEvent)
+		if err != nil {
+			st.WriteError()
+
+			if event.Guaranteed() {
+				logp.Critical("Writing event to file failed with: %v", err)
+			} else {
+				logp.Warn("Writing event to file failed with: %v", err)
+			}
+
+			dropped++
+			continue
+		}
+
+		st.WriteBytes(len(serializedEvent) + 1)
 	}
-	op.Sig(sig, err)
-	return err
+
+	st.Dropped(dropped)
+	st.Acked(len(events) - dropped)
+
+	return nil
 }

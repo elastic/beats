@@ -1,0 +1,38 @@
+- key: icmp
+  title: "ICMP"
+  description: >
+    ICMP specific event fields.
+  fields:
+    - name: icmp
+      type: group
+      fields:
+        - name: version
+          description: The version of the ICMP protocol.
+          possible_values:
+            - 4
+            - 6
+
+        - name: request.message
+          type: keyword
+          description: A human readable form of the request.
+
+        - name: request.type
+          type: long
+          description: The request type.
+
+        - name: request.code
+          type: long
+          description: The request code.
+
+        - name: response.message
+          type: keyword
+          description: A human readable form of the response.
+
+        - name: response.type
+          type: long
+          description: The response type.
+
+        - name: response.code
+          type: long
+          description: The response code.
+

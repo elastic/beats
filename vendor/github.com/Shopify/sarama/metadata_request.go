@@ -4,14 +4,14 @@ type MetadataRequest struct {
 	Topics []string
 }
 
-func (mr *MetadataRequest) encode(pe packetEncoder) error {
-	err := pe.putArrayLength(len(mr.Topics))
+func (r *MetadataRequest) encode(pe packetEncoder) error {
+	err := pe.putArrayLength(len(r.Topics))
 	if err != nil {
 		return err
 	}
 
-	for i := range mr.Topics {
-		err = pe.putString(mr.Topics[i])
+	for i := range r.Topics {
+		err = pe.putString(r.Topics[i])
 		if err != nil {
 			return err
 		}
@@ -19,7 +19,7 @@ func (mr *MetadataRequest) encode(pe packetEncoder) error {
 	return nil
 }
 
-func (mr *MetadataRequest) decode(pd packetDecoder) error {
+func (r *MetadataRequest) decode(pd packetDecoder, version int16) error {
 	topicCount, err := pd.getArrayLength()
 	if err != nil {
 		return err
@@ -28,21 +28,25 @@ func (mr *MetadataRequest) decode(pd packetDecoder) error {
 		return nil
 	}
 
-	mr.Topics = make([]string, topicCount)
-	for i := range mr.Topics {
+	r.Topics = make([]string, topicCount)
+	for i := range r.Topics {
 		topic, err := pd.getString()
 		if err != nil {
 			return err
 		}
-		mr.Topics[i] = topic
+		r.Topics[i] = topic
 	}
 	return nil
 }
 
-func (mr *MetadataRequest) key() int16 {
+func (r *MetadataRequest) key() int16 {
 	return 3
 }
 
-func (mr *MetadataRequest) version() int16 {
+func (r *MetadataRequest) version() int16 {
 	return 0
+}
+
+func (r *MetadataRequest) requiredVersion() KafkaVersion {
+	return minVersion
 }

@@ -3,6 +3,7 @@ package paths
 import (
 	"os"
 	"path/filepath"
+	"runtime"
 	"testing"
 
 	"github.com/stretchr/testify/assert"
@@ -10,200 +11,149 @@ import (
 
 func TestHomePath(t *testing.T) {
 	type io struct {
-		CLIHome    *string // cli flag home setting
-		CfgHome    string  // config file home setting
-		Path       string  // requested path
-		Result     string  // expected result
-		ResultData string  // expected data path
+		Home       string // cli flag home setting
+		Path       string // requested path
+		ResultHome string // expected home path
+		ResultData string // expected data path
 	}
 
 	binDir, err := filepath.Abs(filepath.Dir(os.Args[0]))
-	assert.NoError(t, err)
-	tmp := "/tmp/"
+	if err != nil {
+		t.Fatal(err)
+	}
 
 	tests := []io{
 		{
-			CLIHome:    nil,
-			CfgHome:    "",
+			Home:       binDir,
 			Path:       "test",
-			Result:     filepath.Join(binDir, "test"),
+			ResultHome: filepath.Join(binDir, "test"),
 			ResultData: filepath.Join(binDir, "data", "test"),
 		},
 		{
-			CLIHome:    &tmp,
-			CfgHome:    "",
+			Home:       rootDir("/tmp"),
 			Path:       "test",
-			Result:     "/tmp/test",
-			ResultData: "/tmp/data/test",
+			ResultHome: rootDir("/tmp/test"),
+			ResultData: rootDir("/tmp/data/test"),
 		},
 		{
-			CLIHome:    &tmp,
-			CfgHome:    "/root/",
-			Path:       "test",
-			Result:     "/tmp/test",
-			ResultData: "/tmp/data/test",
-		},
-		{
-			CLIHome:    nil,
-			CfgHome:    "/root/",
-			Path:       "test",
-			Result:     "/root/test",
-			ResultData: "/root/data/test",
-		},
-		{
-			CLIHome:    nil,
-			CfgHome:    "/root/",
-			Path:       "/home/test",
-			Result:     "/home/test",
-			ResultData: "/home/test",
+			Home:       rootDir("/home"),
+			Path:       rootDir("/abc/test"),
+			ResultHome: rootDir("/abc/test"),
+			ResultData: rootDir("/abc/test"),
 		},
 	}
 
 	for _, test := range tests {
-		t.Log("Executing test", test)
-		homePath = test.CLIHome
-		cfg := Path{Home: test.CfgHome}
-		assert.NoError(t, Paths.initPaths(&cfg))
+		cfg := Path{Home: test.Home}
+		if err := Paths.initPaths(&cfg); err != nil {
+			t.Errorf("error on %+v: %v", test, err)
+			continue
+		}
 
-		assert.Equal(t, test.Result, Resolve(Home, test.Path))
+		assert.Equal(t, test.ResultHome, Resolve(Home, test.Path), "failed on %+v", test)
 
 		// config path same as home path
-		assert.Equal(t, test.Result, Resolve(Config, test.Path))
+		assert.Equal(t, test.ResultHome, Resolve(Config, test.Path), "failed on %+v", test)
 
 		// data path under home path
-		assert.Equal(t, test.ResultData, Resolve(Data, test.Path))
+		assert.Equal(t, test.ResultData, Resolve(Data, test.Path), "failed on %+v", test)
 	}
-
 }
 
 func TestDataPath(t *testing.T) {
 	type io struct {
-		CLIHome    *string // cli flag home setting
-		CfgHome    string  // config file home setting
-		CLIData    *string // cli flag for data setting
-		CfgData    string  // config file data setting
-		Path       string  // requested path
-		ResultData string  // expected data path
+		Home       string // cli flag home setting
+		Data       string // cli flag for data setting
+		Path       string // requested path
+		ResultData string // expected data path
 	}
 
 	binDir, err := filepath.Abs(filepath.Dir(os.Args[0]))
-	assert.NoError(t, err)
-	tmp := "/tmp/"
-	root := "/root/"
+	if err != nil {
+		t.Fatal(err)
+	}
 
 	tests := []io{
 		{
-			CLIHome:    nil,
-			CfgHome:    "",
-			CLIData:    nil,
-			CfgData:    "",
+			Home:       binDir,
+			Data:       "",
 			Path:       "test",
 			ResultData: filepath.Join(binDir, "data", "test"),
 		},
 		{
-			CLIHome:    nil,
-			CfgHome:    "/tmp/",
-			CLIData:    nil,
-			CfgData:    "/root/",
+			Home:       rootDir("/tmp"),
+			Data:       rootDir("/root"),
 			Path:       "test",
-			ResultData: "/root/test",
+			ResultData: rootDir("/root/test"),
 		},
 		{
-			CLIHome:    &tmp,
-			CfgHome:    "",
-			CLIData:    nil,
-			CfgData:    "/root/",
-			Path:       "test",
-			ResultData: "/root/test",
-		},
-		{
-			CLIHome:    &tmp,
-			CfgHome:    "",
-			CLIData:    &root,
-			CfgData:    "/root/data",
-			Path:       "test",
-			ResultData: "/root/test",
+			Home:       rootDir("/tmp"),
+			Data:       rootDir("root"),
+			Path:       rootDir("/var/data"),
+			ResultData: rootDir("/var/data"),
 		},
 	}
 
 	for _, test := range tests {
-		t.Log("Executing test", test)
-		homePath = test.CLIHome
-		dataPath = test.CLIData
-		cfg := Path{Home: test.CfgHome, Data: test.CfgData}
-		assert.NoError(t, Paths.initPaths(&cfg))
+		cfg := Path{Home: test.Home, Data: test.Data}
+		if err := Paths.initPaths(&cfg); err != nil {
+			t.Errorf("error on %+v: %v", test, err)
+			continue
+		}
 
-		assert.Equal(t, test.ResultData, Resolve(Data, test.Path))
+		assert.Equal(t, test.ResultData, Resolve(Data, test.Path), "failed on %+v", test)
 	}
-
 }
 
 func TestLogsPath(t *testing.T) {
 	type io struct {
-		CLIHome    *string // cli flag home setting
-		CfgHome    string  // config file home setting
-		CLILogs    *string // cli flag for data setting
-		CfgLogs    string  // config file data setting
-		Path       string  // requested path
-		ResultLogs string  // expected logs path
+		Home       string // cli flag home setting
+		Logs       string // cli flag for data setting
+		Path       string // requested path
+		ResultLogs string // expected logs path
 	}
 
 	binDir, err := filepath.Abs(filepath.Dir(os.Args[0]))
-	assert.NoError(t, err)
-	tmp := "/tmp/"
-	root := "/root/"
+	if err != nil {
+		t.Fatal(err)
+	}
 
 	tests := []io{
 		{
-			CLIHome:    nil,
-			CfgHome:    "",
-			CLILogs:    nil,
-			CfgLogs:    "",
-			Path:       "",
-			ResultLogs: filepath.Join(binDir, "logs"),
-		},
-		{
-			CLIHome:    nil,
-			CfgHome:    "",
-			CLILogs:    nil,
-			CfgLogs:    "",
+			Home:       binDir,
+			Logs:       "",
 			Path:       "test",
 			ResultLogs: filepath.Join(binDir, "logs", "test"),
 		},
 		{
-			CLIHome:    nil,
-			CfgHome:    "/tmp/",
-			CLILogs:    nil,
-			CfgLogs:    "/root/logs",
-			Path:       "",
-			ResultLogs: "/root/logs",
+			Home:       rootDir("/tmp"),
+			Logs:       rootDir("/var"),
+			Path:       "log",
+			ResultLogs: rootDir("/var/log"),
 		},
 		{
-			CLIHome:    &tmp,
-			CfgHome:    "",
-			CLILogs:    nil,
-			CfgLogs:    "/root/logs",
-			Path:       "",
-			ResultLogs: "/root/logs",
-		},
-		{
-			CLIHome:    &tmp,
-			CfgHome:    "",
-			CLILogs:    &root,
-			CfgLogs:    "/root/logs",
-			Path:       "",
-			ResultLogs: "/root",
+			Home:       rootDir("tmp"),
+			Logs:       rootDir("root"),
+			Path:       rootDir("/var/log"),
+			ResultLogs: rootDir("/var/log"),
 		},
 	}
 
 	for _, test := range tests {
-		t.Log("Executing test", test)
-		homePath = test.CLIHome
-		logsPath = test.CLILogs
-		cfg := Path{Home: test.CfgHome, Logs: test.CfgLogs}
-		assert.NoError(t, Paths.initPaths(&cfg))
+		cfg := Path{Home: test.Home, Logs: test.Logs}
+		if err := Paths.initPaths(&cfg); err != nil {
+			t.Errorf("error on %+v: %v", test, err)
+			continue
+		}
 
 		assert.Equal(t, test.ResultLogs, Resolve(Logs, test.Path))
 	}
+}
 
+// rootDir builds an OS specific absolute root directory.
+func rootDir(path string) string {
+	if runtime.GOOS == "windows" {
+		return filepath.Join(`c:\`, path)
+	}
+	return filepath.Join("/", path)
 }

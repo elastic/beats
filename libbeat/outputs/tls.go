@@ -1,12 +1,18 @@
 package outputs
 
 import (
+	"bytes"
 	"crypto/tls"
 	"crypto/x509"
+	"encoding/pem"
 	"errors"
+	"fmt"
 	"io/ioutil"
 
+	"github.com/joeshaw/multierror"
+
 	"github.com/elastic/beats/libbeat/logp"
+	"github.com/elastic/beats/libbeat/outputs/transport"
 )
 
 var (
@@ -19,32 +25,67 @@ var (
 
 	// ErrKeyNoCertificate indicate a configuration error with missing certificate file
 	ErrKeyNoCertificate = errors.New("certificate file not configured")
-
-	// ErrInvalidTLSVersion indicates an unknown tls version string given.
-	ErrInvalidTLSVersion = errors.New("invalid TLS version string")
-
-	// ErrUnknownCipherSuite indicates an unknown tls cipher suite being used
-	ErrUnknownCipherSuite = errors.New("unknown cypher suite")
-
-	// ErrUnknownCurveID indicates an unknown curve id has been configured
-	ErrUnknownCurveID = errors.New("unknown curve id")
 )
 
 // TLSConfig defines config file options for TLS clients.
 type TLSConfig struct {
-	Certificate    string   `config:"certificate"`
-	CertificateKey string   `config:"certificate_key"`
-	CAs            []string `config:"certificate_authorities"`
-	Insecure       bool     `config:"insecure"`
-	CipherSuites   []string `config:"cipher_suites"`
-	MinVersion     string   `config:"min_version"`
-	MaxVersion     string   `config:"max_version"`
-	CurveTypes     []string `config:"curve_types"`
+	Enabled          *bool                         `config:"enabled"`
+	VerificationMode transport.TLSVerificationMode `config:"verification_mode"` // one of 'none', 'full'
+	Versions         []transport.TLSVersion        `config:"supported_protocols"`
+	CipherSuites     []tlsCipherSuite              `config:"cipher_suites"`
+	CAs              []string                      `config:"certificate_authorities"`
+	Certificate      CertificateConfig             `config:",inline"`
+	CurveTypes       []tlsCurveType                `config:"curve_types"`
+	Renegotiation    tlsRenegotiationSupport       `config:"renegotiation"`
+}
+
+type CertificateConfig struct {
+	Certificate string `config:"certificate"`
+	Key         string `config:"key"`
+	Passphrase  string `config:"key_passphrase"`
+}
+
+type tlsCipherSuite uint16
+
+type tlsCurveType tls.CurveID
+
+type tlsRenegotiationSupport tls.RenegotiationSupport
+
+var tlsCipherSuites = map[string]tlsCipherSuite{
+	"ECDHE-ECDSA-AES-128-CBC-SHA":    tlsCipherSuite(tls.TLS_ECDHE_ECDSA_WITH_AES_128_CBC_SHA),
+	"ECDHE-ECDSA-AES-128-GCM-SHA256": tlsCipherSuite(tls.TLS_ECDHE_ECDSA_WITH_AES_128_GCM_SHA256),
+	"ECDHE-ECDSA-AES-256-CBC-SHA":    tlsCipherSuite(tls.TLS_ECDHE_ECDSA_WITH_AES_256_CBC_SHA),
+	"ECDHE-ECDSA-AES-256-GCM-SHA384": tlsCipherSuite(tls.TLS_ECDHE_ECDSA_WITH_AES_256_GCM_SHA384),
+	"ECDHE-ECDSA-RC4-128-SHA":        tlsCipherSuite(tls.TLS_ECDHE_ECDSA_WITH_RC4_128_SHA),
+	"ECDHE-RSA-3DES-CBC3-SHA":        tlsCipherSuite(tls.TLS_ECDHE_RSA_WITH_3DES_EDE_CBC_SHA),
+	"ECDHE-RSA-AES-128-CBC-SHA":      tlsCipherSuite(tls.TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA),
+	"ECDHE-RSA-AES-128-GCM-SHA256":   tlsCipherSuite(tls.TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256),
+	"ECDHE-RSA-AES-256-CBC-SHA":      tlsCipherSuite(tls.TLS_ECDHE_RSA_WITH_AES_256_CBC_SHA),
+	"ECDHE-RSA-AES-256-GCM-SHA384":   tlsCipherSuite(tls.TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384),
+	"ECDHE-RSA-RC4-128-SHA":          tlsCipherSuite(tls.TLS_ECDHE_RSA_WITH_RC4_128_SHA),
+	"RSA-3DES-CBC3-SHA":              tlsCipherSuite(tls.TLS_RSA_WITH_3DES_EDE_CBC_SHA),
+	"RSA-AES-128-CBC-SHA":            tlsCipherSuite(tls.TLS_RSA_WITH_AES_128_CBC_SHA),
+	"RSA-AES-128-GCM-SHA256":         tlsCipherSuite(tls.TLS_RSA_WITH_AES_128_GCM_SHA256),
+	"RSA-AES-256-CBC-SHA":            tlsCipherSuite(tls.TLS_RSA_WITH_AES_256_CBC_SHA),
+	"RSA-AES-256-GCM-SHA384":         tlsCipherSuite(tls.TLS_RSA_WITH_AES_256_GCM_SHA384),
+	"RSA-RC4-128-SHA":                tlsCipherSuite(tls.TLS_RSA_WITH_RC4_128_SHA),
+}
+
+var tlsCurveTypes = map[string]tlsCurveType{
+	"P-256": tlsCurveType(tls.CurveP256),
+	"P-384": tlsCurveType(tls.CurveP384),
+	"P-521": tlsCurveType(tls.CurveP521),
+}
+
+var tlsRenegotiationSupportTypes = map[string]tlsRenegotiationSupport{
+	"never":  tlsRenegotiationSupport(tls.RenegotiateNever),
+	"once":   tlsRenegotiationSupport(tls.RenegotiateOnceAsClient),
+	"freely": tlsRenegotiationSupport(tls.RenegotiateFreelyAsClient),
 }
 
 func (c *TLSConfig) Validate() error {
-	hasCertificate := c.Certificate != ""
-	hasKey := c.CertificateKey != ""
+	hasCertificate := c.Certificate.Certificate != ""
+	hasKey := c.Certificate.Key != ""
 
 	switch {
 	case hasCertificate && !hasKey:
@@ -53,167 +94,218 @@ func (c *TLSConfig) Validate() error {
 		return ErrKeyNoCertificate
 	}
 
-	if _, err := parseTLSVersion(c.MinVersion); err != nil {
-		return err
-	}
-	if _, err := parseTLSVersion(c.MaxVersion); err != nil {
-		return err
-	}
-
-	if _, err := parseTLSCipherSuites(c.CipherSuites); err != nil {
-		return err
-	}
-
-	if _, err := parseCurveTypes(c.CurveTypes); err != nil {
-		return err
-	}
-
 	return nil
+}
+
+func (c *TLSConfig) IsEnabled() bool {
+	return c != nil && (c.Enabled == nil || *c.Enabled)
 }
 
 // LoadTLSConfig will load a certificate from config with all TLS based keys
 // defined. If Certificate and CertificateKey are configured, client authentication
 // will be configured. If no CAs are configured, the host CA will be used by go
 // built-in TLS support.
-func LoadTLSConfig(config *TLSConfig) (*tls.Config, error) {
-	if config == nil {
+func LoadTLSConfig(config *TLSConfig) (*transport.TLSConfig, error) {
+	if !config.IsEnabled() {
 		return nil, nil
 	}
 
+	fail := multierror.Errors{}
+	logFail := func(es ...error) {
+		for _, e := range es {
+			if e != nil {
+				fail = append(fail, e)
+			}
+		}
+	}
+
+	var cipherSuites []uint16
+	for _, suite := range config.CipherSuites {
+		cipherSuites = append(cipherSuites, uint16(suite))
+	}
+
+	var curves []tls.CurveID
+	for _, id := range config.CurveTypes {
+		curves = append(curves, tls.CurveID(id))
+	}
+
+	cert, err := LoadCertificate(&config.Certificate)
+	logFail(err)
+
+	cas, errs := LoadCertificateAuthorities(config.CAs)
+	logFail(errs...)
+
+	// fail, if any error occurred when loading certificate files
+	if err = fail.Err(); err != nil {
+		return nil, err
+	}
+
+	var certs []tls.Certificate
+	if cert != nil {
+		certs = []tls.Certificate{*cert}
+	}
+
+	// return config if no error occurred
+	return &transport.TLSConfig{
+		Versions:         config.Versions,
+		Verification:     config.VerificationMode,
+		Certificates:     certs,
+		RootCAs:          cas,
+		CipherSuites:     cipherSuites,
+		CurvePreferences: curves,
+		Renegotiation:    tls.RenegotiationSupport(config.Renegotiation),
+	}, nil
+}
+
+func LoadCertificate(config *CertificateConfig) (*tls.Certificate, error) {
 	certificate := config.Certificate
-	key := config.CertificateKey
-	rootCAs := config.CAs
+	key := config.Key
+
 	hasCertificate := certificate != ""
 	hasKey := key != ""
 
-	var certs []tls.Certificate
 	switch {
 	case hasCertificate && !hasKey:
 		return nil, ErrCertificateNoKey
 	case !hasCertificate && hasKey:
 		return nil, ErrKeyNoCertificate
-	case hasCertificate && hasKey:
-		cert, err := tls.LoadX509KeyPair(certificate, key)
+	case !hasCertificate && !hasKey:
+		return nil, nil
+	}
+
+	certPEM, err := ReadPEMFile(certificate, config.Passphrase)
+	if err != nil {
+		logp.Critical("Failed reading certificate file %v: %v", certificate, err)
+		return nil, fmt.Errorf("%v %v", err, certificate)
+	}
+
+	keyPEM, err := ReadPEMFile(key, config.Passphrase)
+	if err != nil {
+		logp.Critical("Failed reading key file %v: %v", key, err)
+		return nil, fmt.Errorf("%v %v", err, key)
+	}
+
+	cert, err := tls.X509KeyPair(certPEM, keyPEM)
+	if err != nil {
+		logp.Critical("Failed loading client certificate", err)
+		return nil, err
+	}
+
+	return &cert, nil
+}
+
+func ReadPEMFile(path, passphrase string) ([]byte, error) {
+	pass := []byte(passphrase)
+	var blocks []*pem.Block
+
+	content, err := ioutil.ReadFile(path)
+	if err != nil {
+		return nil, err
+	}
+
+	for len(content) > 0 {
+		var block *pem.Block
+
+		block, content = pem.Decode(content)
+		if block == nil {
+			if len(blocks) == 0 {
+				return nil, errors.New("no pem file")
+			}
+			break
+		}
+
+		if x509.IsEncryptedPEMBlock(block) {
+			var buffer []byte
+			var err error
+			if len(pass) == 0 {
+				err = errors.New("No passphrase available")
+			} else {
+				// Note, decrypting pem might succeed even with wrong password, but
+				// only noise will be stored in buffer in this case.
+				buffer, err = x509.DecryptPEMBlock(block, pass)
+			}
+
+			if err != nil {
+				logp.Err("Dropping encrypted pem '%v' block read from %v. %v",
+					block.Type, path, err)
+				continue
+			}
+
+			// DEK-Info contains encryption info. Remove header to mark block as
+			// unencrypted.
+			delete(block.Headers, "DEK-Info")
+			block.Bytes = buffer
+		}
+		blocks = append(blocks, block)
+	}
+
+	if len(blocks) == 0 {
+		return nil, errors.New("no PEM blocks")
+	}
+
+	// re-encode available, decrypted blocks
+	buffer := bytes.NewBuffer(nil)
+	for _, block := range blocks {
+		err := pem.Encode(buffer, block)
 		if err != nil {
-			logp.Critical("Failed loading client certificate", err)
 			return nil, err
 		}
-		certs = []tls.Certificate{cert}
+	}
+	return buffer.Bytes(), nil
+}
+
+func LoadCertificateAuthorities(CAs []string) (*x509.CertPool, []error) {
+	errors := []error{}
+
+	if len(CAs) == 0 {
+		return nil, nil
 	}
 
-	var roots *x509.CertPool
-	if len(rootCAs) > 0 {
-		roots = x509.NewCertPool()
-		for _, caFile := range rootCAs {
-			pemData, err := ioutil.ReadFile(caFile)
-			if err != nil {
-				logp.Critical("Failed reading CA certificate: %s", err)
-				return nil, err
-			}
+	roots := x509.NewCertPool()
+	for _, path := range CAs {
+		pemData, err := ioutil.ReadFile(path)
+		if err != nil {
+			logp.Critical("Failed reading CA certificate: %v", err)
+			errors = append(errors, fmt.Errorf("%v reading %v", err, path))
+			continue
+		}
 
-			if ok := roots.AppendCertsFromPEM(pemData); !ok {
-				return nil, ErrNotACertificate
-			}
+		if ok := roots.AppendCertsFromPEM(pemData); !ok {
+			logp.Critical("Failed reading CA certificate: %v", err)
+			errors = append(errors, fmt.Errorf("%v adding %v", ErrNotACertificate, path))
+			continue
 		}
 	}
 
-	minVersion, err := parseTLSVersion(config.MinVersion)
-	if err != nil {
-		return nil, err
-	}
-	if minVersion == 0 {
-		// require minimum TLS-1.0 if not configured
-		minVersion = tls.VersionTLS10
-	}
-
-	maxVersion, err := parseTLSVersion(config.MaxVersion)
-	if err != nil {
-		return nil, err
-	}
-
-	cipherSuites, err := parseTLSCipherSuites(config.CipherSuites)
-	if err != nil {
-		return nil, err
-	}
-
-	curveIDs, err := parseCurveTypes(config.CurveTypes)
-	if err != nil {
-		return nil, err
-	}
-
-	tlsConfig := tls.Config{
-		MinVersion:         minVersion,
-		MaxVersion:         maxVersion,
-		Certificates:       certs,
-		RootCAs:            roots,
-		InsecureSkipVerify: config.Insecure,
-		CipherSuites:       cipherSuites,
-		CurvePreferences:   curveIDs,
-	}
-	return &tlsConfig, nil
+	return roots, errors
 }
 
-func parseTLSVersion(s string) (uint16, error) {
-	versions := map[string]uint16{
-		"":        0,
-		"SSL-3.0": tls.VersionSSL30,
-		"1.0":     tls.VersionTLS10,
-		"1.1":     tls.VersionTLS11,
-		"1.2":     tls.VersionTLS12,
+func (cs *tlsCipherSuite) Unpack(s string) error {
+	suite, found := tlsCipherSuites[s]
+	if !found {
+		return fmt.Errorf("invalid tls cipher suite '%v'", s)
 	}
 
-	id, ok := versions[s]
-	if !ok {
-		return 0, ErrInvalidTLSVersion
-	}
-	return id, nil
+	*cs = suite
+	return nil
 }
 
-func parseTLSCipherSuites(names []string) ([]uint16, error) {
-	suites := map[string]uint16{
-		"RSA-RC4-128-SHA":                tls.TLS_RSA_WITH_RC4_128_SHA,
-		"RSA-3DES-CBC3-SHA":              tls.TLS_RSA_WITH_3DES_EDE_CBC_SHA,
-		"RSA-AES-128-CBC-SHA":            tls.TLS_RSA_WITH_AES_128_CBC_SHA,
-		"RSA-AES-256-CBC-SHA":            tls.TLS_RSA_WITH_AES_256_CBC_SHA,
-		"ECDHE-ECDSA-RC4-128-SHA":        tls.TLS_ECDHE_ECDSA_WITH_RC4_128_SHA,
-		"ECDHE-ECDSA-AES-128-CBC-SHA":    tls.TLS_ECDHE_ECDSA_WITH_AES_128_CBC_SHA,
-		"ECDHE-ECDSA-AES-256-CBC-SHA":    tls.TLS_ECDHE_ECDSA_WITH_AES_256_CBC_SHA,
-		"ECDHE-RSA-RC4-128-SHA":          tls.TLS_ECDHE_RSA_WITH_RC4_128_SHA,
-		"ECDHE-RSA-3DES-CBC3-SHA":        tls.TLS_ECDHE_RSA_WITH_3DES_EDE_CBC_SHA,
-		"ECDHE-RSA-AES-128-CBC-SHA":      tls.TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA,
-		"ECDHE-RSA-AES-256-CBC-SHA":      tls.TLS_ECDHE_RSA_WITH_AES_256_CBC_SHA,
-		"ECDHE-RSA-AES-128-GCM-SHA256":   tls.TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256,
-		"ECDHE-ECDSA-AES-128-GCM-SHA256": tls.TLS_ECDHE_ECDSA_WITH_AES_128_GCM_SHA256,
-		"ECDHE-RSA-AES-256-GCM-SHA384":   tls.TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384,
-		"ECDHE-ECDSA-AES-256-GCM-SHA384": tls.TLS_ECDHE_ECDSA_WITH_AES_256_GCM_SHA384,
+func (ct *tlsCurveType) Unpack(s string) error {
+	t, found := tlsCurveTypes[s]
+	if !found {
+		return fmt.Errorf("invalid tls curve type '%v'", s)
 	}
 
-	var list []uint16
-	for _, name := range names {
-		id, ok := suites[name]
-		if !ok {
-			return nil, ErrUnknownCipherSuite
-		}
-
-		list = append(list, id)
-	}
-	return list, nil
+	*ct = t
+	return nil
 }
 
-func parseCurveTypes(names []string) ([]tls.CurveID, error) {
-	curveIDs := map[string]tls.CurveID{
-		"P-256": tls.CurveP256,
-		"P-384": tls.CurveP384,
-		"P-521": tls.CurveP521,
+func (r *tlsRenegotiationSupport) Unpack(s string) error {
+	t, found := tlsRenegotiationSupportTypes[s]
+	if !found {
+		return fmt.Errorf("invalid tls renegotiation type '%v'", s)
 	}
 
-	var list []tls.CurveID
-	for _, name := range names {
-		id, ok := curveIDs[name]
-		if !ok {
-			return nil, ErrUnknownCurveID
-		}
-		list = append(list, id)
-	}
-	return list, nil
+	*r = t
+	return nil
 }

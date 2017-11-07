@@ -1,0 +1,42 @@
+{
+    "@timestamp": "2016-05-23T08:05:34.853Z",
+    "beat": {
+        "hostname": "host.example.com",
+        "name": "host.example.com"
+    },
+    "docker": {
+        "container": {
+            "id": "1306772b6ca9a24207a2bc268d4cc3137b951886ca4df478cfe2ba3943636c54",
+            "labels": {
+                "com_docker_compose_container-number": "2",
+                "com_docker_compose_oneoff": "True",
+                "com_docker_compose_project": "environments",
+                "com_docker_compose_service": "beat",
+                "com_docker_compose_version": "1.8.0"
+            },
+            "name": "environments_beat_run_2"
+        },
+        "network": {
+            "in": {
+                "bytes": 0,
+                "dropped": 0,
+                "errors": 0,
+                "packets": 0
+            },
+            "interface": "eth0",
+            "out": {
+                "bytes": 0,
+                "dropped": 0,
+                "errors": 0,
+                "packets": 0
+            }
+        }
+    },
+    "metricset": {
+        "host": "/var/run/docker.sock",
+        "module": "docker",
+        "name": "network",
+        "rtt": 115
+    },
+    "type": "metricsets"
+}

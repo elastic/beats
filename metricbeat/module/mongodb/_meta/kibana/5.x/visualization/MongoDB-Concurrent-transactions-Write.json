@@ -1,0 +1,11 @@
+{
+  "visState": "{\"aggs\":[{\"enabled\":true,\"id\":\"1\",\"params\":{\"customLabel\":\"Write Available\",\"field\":\"mongodb.status.wired_tiger.concurrent_transactions.write.available\"},\"schema\":\"metric\",\"type\":\"avg\"},{\"enabled\":true,\"id\":\"2\",\"params\":{\"customInterval\":\"2h\",\"extended_bounds\":{},\"field\":\"@timestamp\",\"interval\":\"auto\",\"min_doc_count\":1},\"schema\":\"segment\",\"type\":\"date_histogram\"},{\"enabled\":true,\"id\":\"3\",\"params\":{\"customLabel\":\"Write Used\",\"field\":\"mongodb.status.wired_tiger.concurrent_transactions.write.out\"},\"schema\":\"metric\",\"type\":\"avg\"}],\"listeners\":{},\"params\":{\"addLegend\":true,\"addTimeMarker\":false,\"addTooltip\":true,\"defaultYExtents\":false,\"interpolate\":\"linear\",\"legendPosition\":\"bottom\",\"mode\":\"stacked\",\"scale\":\"linear\",\"setYExtents\":false,\"shareYAxis\":true,\"smoothLines\":false,\"times\":[],\"yAxis\":{}},\"title\":\"MongoDB Concurrent transactions Write\",\"type\":\"area\"}", 
+  "description": "", 
+  "title": "MongoDB Concurrent transactions Write", 
+  "uiStateJSON": "{\"vis\":{\"colors\":{\"Write Available\":\"#629E51\",\"Write Used\":\"#BF1B00\"}}}", 
+  "version": 1, 
+  "savedSearchId": "MongoDB-search", 
+  "kibanaSavedObjectMeta": {
+    "searchSourceJSON": "{\"filter\":[]}"
+  }
+}

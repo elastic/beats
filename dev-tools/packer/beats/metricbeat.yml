@@ -1,4 +1,0 @@
-beat_name: metricbeat
-beat_url: 'https://github.com/elastic/beats/metricbeat'
-beat_repo: 'github.com/elastic/beat/metricbeat'
-beat_description: Sends metrics to Elasticsearch.

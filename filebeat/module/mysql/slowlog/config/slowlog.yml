@@ -1,0 +1,11 @@
+type: log
+paths:
+{{ range $i, $path := .paths }}
+ - {{$path}}
+{{ end }}
+exclude_files: ['.gz$']
+multiline:
+  pattern: '^# User@Host: '
+  negate: true
+  match: after
+exclude_lines: ['^[\/\w\.]+, Version: .* started with:.*']   # Exclude the header

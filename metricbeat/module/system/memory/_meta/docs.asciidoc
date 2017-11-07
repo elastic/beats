@@ -1,0 +1,16 @@
+=== System memory metricset
+
+The System `memory` metricset provides memory statistics.
+
+This metricset is available on:
+
+- FreeBSD
+- Linux
+- macOS
+- OpenBSD
+- Windows
+
+[float]
+=== Configuration
+
+There are no configuration options for this metricset.

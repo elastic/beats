@@ -1,0 +1,27 @@
+//Added conditional coding to support Beats that don't offer all of these install options
+
+ifeval::["{beatname_lc}"!="auditbeat"]
+
+To download and install {beatname_uc}, use the commands that work with your system
+(<<deb, deb>> for Debian/Ubuntu, <<rpm, rpm>> for Redhat/Centos/Fedora, <<mac,
+mac>> for OS X, <<docker, docker>> for any Docker platform, and <<win, win>> for
+Windows).
+
+endif::[]
+
+ifeval::["{beatname_lc}"=="auditbeat"]
+
+To download and install {beatname_uc}, use the commands that work with your system
+(<<deb, deb>> for Debian/Ubuntu, <<rpm, rpm>> for Redhat/Centos/Fedora, <<mac,
+mac>> for OS X, and <<win, win>> for Windows).
+
+endif::[]
+
+[NOTE]
+==================================================
+If you use Apt or Yum, you can <<setup-repositories,install {beatname_uc} from our
+repositories>> to update to the newest version more easily.
+
+See our https://www.elastic.co/downloads/beats/{beatname_lc}[download page] for
+other installation options, such as 32-bit images.
+==================================================

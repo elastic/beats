@@ -1,16 +1,19 @@
 [[faq]]
-== Frequently Asked Questions
+== Frequently asked questions
 
 This section contains frequently asked questions about Winlogbeat. Also check
 out the https://discuss.elastic.co/c/beats/winlogbeat[Winlogbeat discussion
 forum].
 
+[float]
 [[dashboard-fields-incorrect]]
-=== Why is the dashboard in Kibana breaking up my data fields incorrectly?
+=== Dashboard in Kibana is breaking up data fields incorrectly?
 
 The index template might not be loaded correctly. See <<winlogbeat-template>>.
 
-=== Why are there bogus computer_name fields reported in some events?
+[float]
+[[bogus-computer-name-fields]]
+=== Bogus computer_name fields are reported in some events?
 
 Prior to the hostname configuration stage, during OS installation any event log
 records generated may have a randomly assigned hostname.

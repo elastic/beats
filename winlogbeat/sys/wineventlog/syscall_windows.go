@@ -13,6 +13,7 @@ const (
 	ERROR_INSUFFICIENT_BUFFER             syscall.Errno = 122
 	ERROR_NO_MORE_ITEMS                   syscall.Errno = 259
 	ERROR_NONE_MAPPED                     syscall.Errno = 1332
+	RPC_S_INVALID_BOUND                   syscall.Errno = 1734
 	ERROR_INVALID_OPERATION               syscall.Errno = 4317
 	ERROR_EVT_MESSAGE_NOT_FOUND           syscall.Errno = 15027
 	ERROR_EVT_MESSAGE_ID_NOT_FOUND        syscall.Errno = 15028
@@ -191,6 +192,35 @@ func (e EvtSystemPropertyID) String() string {
 		return "Unknown"
 	}
 	return s
+}
+
+// EventLevel identifies the six levels of events that can be logged
+type EventLevel uint16
+
+// EventLevel values.
+const (
+	// Do not reorder.
+	EVENTLOG_LOGALWAYS_LEVEL EventLevel = iota
+	EVENTLOG_CRITICAL_LEVEL
+	EVENTLOG_ERROR_LEVEL
+	EVENTLOG_WARNING_LEVEL
+	EVENTLOG_INFORMATION_LEVEL
+	EVENTLOG_VERBOSE_LEVEL
+)
+
+// Mapping of event levels to their string representations.
+var EventLevelToString = map[EventLevel]string{
+	EVENTLOG_LOGALWAYS_LEVEL:   "Information",
+	EVENTLOG_INFORMATION_LEVEL: "Information",
+	EVENTLOG_CRITICAL_LEVEL:    "Critical",
+	EVENTLOG_ERROR_LEVEL:       "Error",
+	EVENTLOG_WARNING_LEVEL:     "Warning",
+	EVENTLOG_VERBOSE_LEVEL:     "Verbose",
+}
+
+// String returns string representation of EventLevel.
+func (et EventLevel) String() string {
+	return EventLevelToString[et]
 }
 
 // Add -trace to enable debug prints around syscalls.

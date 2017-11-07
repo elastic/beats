@@ -1,0 +1,13 @@
+{
+  "hits": 0, 
+  "timeRestore": false, 
+  "description": "", 
+  "title": "Filebeat Auth - Sudo commands", 
+  "uiStateJSON": "{\"P-3\":{\"vis\":{\"params\":{\"sort\":{\"columnIndex\":null,\"direction\":null}}}}}", 
+  "panelsJSON": "[{\"col\":1,\"id\":\"5c7af030-fa2a-11e6-bbd3-29c986c96e5a\",\"panelIndex\":1,\"row\":5,\"size_x\":12,\"size_y\":4,\"type\":\"visualization\"},{\"col\":1,\"id\":\"51164310-fa2b-11e6-bbd3-29c986c96e5a\",\"panelIndex\":2,\"row\":9,\"size_x\":12,\"size_y\":3,\"type\":\"visualization\"},{\"col\":1,\"id\":\"dc589770-fa2b-11e6-bbd3-29c986c96e5a\",\"panelIndex\":3,\"row\":1,\"size_x\":12,\"size_y\":4,\"type\":\"visualization\"}]", 
+  "optionsJSON": "{\"darkTheme\":false}", 
+  "version": 1, 
+  "kibanaSavedObjectMeta": {
+    "searchSourceJSON": "{\"filter\":[{\"query\":{\"query_string\":{\"analyze_wildcard\":true,\"query\":\"*\"}}}]}"
+  }
+}

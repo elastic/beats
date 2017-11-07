@@ -7,22 +7,103 @@
 
 // Package language implements BCP 47 language tags and related functionality.
 //
-// The Tag type, which is used to represent language tags, is agnostic to the
+// The Tag type, which is used to represent languages, is agnostic to the
 // meaning of its subtags. Tags are not fully canonicalized to preserve
 // information that may be valuable in certain contexts. As a consequence, two
-// different tags may represent identical languages in certain contexts.
+// different tags may represent identical languages.
 //
-// To determine equivalence between tags, a user should typically use a Matcher
-// that is aware of the intricacies of equivalence within the given context.
-// The default Matcher implementation provided in this package takes into
-// account things such as deprecated subtags, legacy tags, and mutual
-// intelligibility between scripts and languages.
+// Initializing language- or locale-specific components usually consists of
+// two steps. The first step is to select a display language based on the
+// preferred languages of the user and the languages supported by an application.
+// The second step is to create the language-specific services based on
+// this selection. Each is discussed in more details below.
 //
-// See http://tools.ietf.org/html/bcp47 for more details.
+// Matching preferred against supported languages
 //
-// NOTE: This package is still under development. Parts of it are not yet
-// implemented, and the API is subject to change.
+// An application may support various languages. This list is typically limited
+// by the languages for which there exists translations of the user interface.
+// Similarly, a user may provide a list of preferred languages which is limited
+// by the languages understood by this user.
+// An application should use a Matcher to find the best supported language based
+// on the user's preferred list.
+// Matchers are aware of the intricacies of equivalence between languages.
+// The default Matcher implementation takes into account things such as
+// deprecated subtags, legacy tags, and mutual intelligibility between scripts
+// and languages.
+//
+// A Matcher for English, Australian English, Danish, and standard Mandarin can
+// be defined as follows:
+//
+//		var matcher = language.NewMatcher([]language.Tag{
+//			language.English,   // The first language is used as fallback.
+// 			language.MustParse("en-AU"),
+//			language.Danish,
+//			language.Chinese,
+//		})
+//
+// The following code selects the best match for someone speaking Spanish and
+// Norwegian:
+//
+// 		preferred := []language.Tag{ language.Spanish, language.Norwegian }
+//		tag, _, _ := matcher.Match(preferred...)
+//
+// In this case, the best match is Danish, as Danish is sufficiently a match to
+// Norwegian to not have to fall back to the default.
+// See ParseAcceptLanguage on how to handle the Accept-Language HTTP header.
+//
+// Selecting language-specific services
+//
+// One should always use the Tag returned by the Matcher to create an instance
+// of any of the language-specific services provided by the text repository.
+// This prevents the mixing of languages, such as having a different language for
+// messages and display names, as well as improper casing or sorting order for
+// the selected language.
+// Using the returned Tag also allows user-defined settings, such as collation
+// order or numbering system to be transparently passed as options.
+//
+// If you have language-specific data in your application, however, it will in
+// most cases suffice to use the index returned by the matcher to identify
+// the user language.
+// The following loop provides an alternative in case this is not sufficient:
+//
+// 		supported := map[language.Tag]data{
+//			language.English:            enData,
+// 			language.MustParse("en-AU"): enAUData,
+//			language.Danish:             daData,
+//			language.Chinese:            zhData,
+// 		}
+//		tag, _, _ := matcher.Match(preferred...)
+//		for ; tag != language.Und; tag = tag.Parent() {
+//			if v, ok := supported[tag]; ok {
+//				return v
+//			}
+//		}
+// 		return enData // should not reach here
+//
+// Repeatedly taking the Parent of the tag returned by Match will eventually
+// match one of the tags used to initialize the Matcher.
+//
+// Canonicalization
+//
+// By default, only legacy and deprecated tags are converted into their
+// canonical equivalent. All other information is preserved. This approach makes
+// the confidence scores more accurate and allows matchers to distinguish
+// between variants that are otherwise lost.
+//
+// As a consequence, two tags that should be treated as identical according to
+// BCP 47 or CLDR, like "en-Latn" and "en", will be represented differently. The
+// Matchers will handle such distinctions, though, and are aware of the
+// equivalence relations. The CanonType type can be used to alter the
+// canonicalization form.
+//
+// References
+//
+// BCP 47 - Tags for Identifying Languages
+// http://tools.ietf.org/html/bcp47
 package language // import "golang.org/x/text/language"
+
+// TODO: Remove above NOTE after:
+// - verifying that tables are dropped correctly (most notably matcher tables).
 
 import (
 	"errors"
@@ -266,11 +347,11 @@ func (t *Tag) remakeString() {
 	var buf [max99thPercentileSize]byte // avoid extra memory allocation in most cases.
 	b := buf[:t.genCoreBytes(buf[:])]
 	if extra != "" {
-		diff := uint8(len(b)) - t.pVariant
+		diff := len(b) - int(t.pVariant)
 		b = append(b, '-')
 		b = append(b, extra...)
-		t.pVariant += diff
-		t.pExt += uint16(diff)
+		t.pVariant = uint8(int(t.pVariant) + diff)
+		t.pExt = uint16(int(t.pExt) + diff)
 	} else {
 		t.pVariant = uint8(len(b))
 		t.pExt = uint16(len(b))
@@ -691,26 +772,33 @@ func (t Tag) findTypeForKey(key string) (start, end int, hasExt bool) {
 
 // CompactIndex returns an index, where 0 <= index < NumCompactTags, for tags
 // for which data exists in the text repository. The index will change over time
-// and should not be stored in persistent storage. Extensions other than 'x' are
-// not considered for determining the index. It will return 0, false if no
+// and should not be stored in persistent storage. Extensions, except for the
+// 'va' type of the 'u' extension, are ignored. It will return 0, false if no
 // compact tag exists, where 0 is the index for the root language (Und).
 func CompactIndex(t Tag) (index int, ok bool) {
 	// TODO: perhaps give more frequent tags a lower index.
 	// TODO: we could make the indexes stable. This will excluded some
 	//       possibilities for optimization, so don't do this quite yet.
+	b, s, r := t.Raw()
 	if len(t.str) > 0 {
-		// We have variants or extensions.
-		if x, ok := t.Extension('x'); ok || uint16(t.pVariant) != t.pExt {
-			// Strip all but variants and the x extension.
-			if uint16(t.pVariant) != t.pExt {
-				b, s, r := t.Raw()
-				if ok {
-					t, _ = Raw.Compose(b, s, r, t.Variants(), x)
-				} else {
-					t, _ = Raw.Compose(b, s, r, t.Variants())
-				}
+		if strings.HasPrefix(t.str, "x-") {
+			// We have no entries for user-defined tags.
+			return 0, false
+		}
+		if uint16(t.pVariant) != t.pExt {
+			// There are no tags with variants and an u-va type.
+			if t.TypeForKey("va") != "" {
+				return 0, false
 			}
-			// We have variants or an x extension.
+			t, _ = Raw.Compose(b, s, r, t.Variants())
+		} else if _, ok := t.Extension('u'); ok {
+			// Strip all but the 'va' entry.
+			variant := t.TypeForKey("va")
+			t, _ = Raw.Compose(b, s, r)
+			t, _ = t.SetTypeForKey("va", variant)
+		}
+		if len(t.str) > 0 {
+			// We have some variants.
 			for i, s := range specialTags {
 				if s == t {
 					return i + 1, true
@@ -718,10 +806,14 @@ func CompactIndex(t Tag) (index int, ok bool) {
 			}
 			return 0, false
 		}
-		// We only have non-x extensions, which we ignore, and no variants.
 	}
-	b, s, r := t.Raw()
-	x, ok := coreTags[coreKey{base: b, script: s, region: r}]
+	// No variants specified: just compare core components.
+	// The key has the form lllssrrr, where l, s, and r are nibbles for
+	// respectively the langID, scriptID, and regionID.
+	key := uint32(b.langID) << (8 + 12)
+	key |= uint32(s.scriptID) << 12
+	key |= uint32(r.regionID)
+	x, ok := coreTags[key]
 	return int(x), ok
 }
 
@@ -880,21 +972,4 @@ func ParseVariant(s string) (Variant, error) {
 // String returns the string representation of the variant.
 func (v Variant) String() string {
 	return v.variant
-}
-
-// Currency is deprecated. Use package golang.org/x/text/currency.
-type Currency struct {
-	currencyID
-}
-
-// ParseCurrency parses a 3-letter ISO 4217 code.
-// It returns a ValueError if s is a well-formed but unknown currency identifier
-// or another error if another error occurred.
-func ParseCurrency(s string) (Currency, error) {
-	if len(s) != 3 {
-		return Currency{}, errSyntax
-	}
-	var buf [3]byte
-	c, err := getCurrencyID(currency, buf[:copy(buf[:], s)])
-	return Currency{c}, err
 }

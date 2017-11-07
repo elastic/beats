@@ -1,0 +1,13 @@
+{
+  "hits": 0, 
+  "timeRestore": false, 
+  "description": "", 
+  "title": "Packetbeat Flows", 
+  "uiStateJSON": "{\"P-5\":{\"vis\":{\"params\":{\"sort\":{\"columnIndex\":null,\"direction\":null}}}}}", 
+  "panelsJSON": "[{\"col\":1,\"id\":\"Navigation\",\"panelIndex\":2,\"row\":1,\"size_x\":3,\"size_y\":4,\"type\":\"visualization\"},{\"col\":4,\"id\":\"Connections-over-time\",\"panelIndex\":3,\"row\":1,\"size_x\":9,\"size_y\":5,\"type\":\"visualization\"},{\"col\":1,\"id\":\"Top-hosts-creating-traffic\",\"panelIndex\":1,\"row\":6,\"size_x\":6,\"size_y\":7,\"type\":\"visualization\"},{\"col\":7,\"id\":\"Top-hosts-receiving-traffic\",\"panelIndex\":4,\"row\":6,\"size_x\":6,\"size_y\":7,\"type\":\"visualization\"},{\"id\":\"Network-traffic-between-your-hosts\",\"type\":\"visualization\",\"panelIndex\":5,\"size_x\":12,\"size_y\":7,\"col\":1,\"row\":13}]", 
+  "optionsJSON": "{\"darkTheme\":false}", 
+  "version": 1, 
+  "kibanaSavedObjectMeta": {
+    "searchSourceJSON": "{\"filter\":[{\"query\":{\"query_string\":{\"analyze_wildcard\":true,\"query\":\"*\"}}}]}"
+  }
+}

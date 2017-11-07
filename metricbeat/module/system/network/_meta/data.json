@@ -1,0 +1,29 @@
+{
+    "@timestamp": "2017-10-12T08:05:34.853Z",
+    "beat": {
+        "hostname": "host.example.com",
+        "name": "host.example.com"
+    },
+    "metricset": {
+        "module": "system",
+        "name": "network",
+        "rtt": 115
+    },
+    "system": {
+        "network": {
+            "in": {
+                "bytes": 34293500,
+                "dropped": 0,
+                "errors": 0,
+                "packets": 303805
+            },
+            "name": "lo0",
+            "out": {
+                "bytes": 34293500,
+                "dropped": 0,
+                "errors": 0,
+                "packets": 303805
+            }
+        }
+    }
+}

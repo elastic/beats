@@ -5,9 +5,13 @@ import (
 	"fmt"
 	"reflect"
 	"strconv"
+	"syscall"
 
+	"github.com/elastic/beats/libbeat/beat"
 	"github.com/elastic/beats/libbeat/common"
 	"github.com/elastic/beats/libbeat/logp"
+
+	"github.com/elastic/beats/winlogbeat/checkpoint"
 	"github.com/elastic/beats/winlogbeat/sys"
 )
 
@@ -23,9 +27,14 @@ var (
 	detailf = logp.MakeDebug(detailSelector)
 )
 
-// dropReasons contains counters for the number of dropped events for each
-// reason.
-var dropReasons = expvar.NewMap("dropReasons")
+var (
+	// dropReasons contains counters for the number of dropped events for each
+	// reason.
+	dropReasons = expvar.NewMap("drop_reasons")
+
+	// readErrors contains counters for the read error types that occur.
+	readErrors = expvar.NewMap("read_errors")
+)
 
 // EventLog is an interface to a Windows Event Log.
 type EventLog interface {
@@ -47,22 +56,19 @@ type EventLog interface {
 // Record represents a single event from the log.
 type Record struct {
 	sys.Event
-	common.EventMetadata        // Fields and tags to add to the event.
-	API                  string // The event log API type used to read the record.
-	XML                  string // XML representation of the event.
+	API string // The event log API type used to read the record.
+	XML string // XML representation of the event.
 }
 
 // ToMapStr returns a new MapStr containing the data from this Record.
-func (e Record) ToMapStr() common.MapStr {
+func (e Record) ToEvent() beat.Event {
 	m := common.MapStr{
-		"type":                  e.API,
-		common.EventMetadataKey: e.EventMetadata,
-		"@timestamp":            common.Time(e.TimeCreated.SystemTime),
-		"log_name":              e.Channel,
-		"source_name":           e.Provider.Name,
-		"computer_name":         e.Computer,
-		"record_number":         strconv.FormatUint(e.RecordID, 10),
-		"event_id":              e.EventIdentifier.ID,
+		"type":          e.API,
+		"log_name":      e.Channel,
+		"source_name":   e.Provider.Name,
+		"computer_name": e.Computer,
+		"record_number": strconv.FormatUint(e.RecordID, 10),
+		"event_id":      e.EventIdentifier.ID,
 	}
 
 	addOptional(m, "xml", e.XML)
@@ -103,7 +109,15 @@ func (e Record) ToMapStr() common.MapStr {
 	userData := addPairs(m, "user_data", e.UserData.Pairs)
 	addOptional(userData, "xml_name", e.UserData.Name.Local)
 
-	return m
+	return beat.Event{
+		Timestamp: e.TimeCreated.SystemTime,
+		Fields:    m,
+		Private: checkpoint.EventLogState{
+			Name:         e.API,
+			RecordNumber: e.RecordID,
+			Timestamp:    e.TimeCreated.SystemTime,
+		},
+	}
 }
 
 // addOptional adds a key and value to the given MapStr if the value is not the
@@ -176,4 +190,18 @@ func isZero(i interface{}) bool {
 		return v.IsNil()
 	}
 	return false
+}
+
+// incrementMetric increments a value in the specified expvar.Map. The key
+// should be a windows syscall.Errno or a string. Any other types will be
+// reported under the "other" key.
+func incrementMetric(v *expvar.Map, key interface{}) {
+	switch t := key.(type) {
+	default:
+		v.Add("other", 1)
+	case string:
+		v.Add(t, 1)
+	case syscall.Errno:
+		v.Add(strconv.Itoa(int(t)), 1)
+	}
 }

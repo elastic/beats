@@ -1,0 +1,209 @@
+- key: amqp
+  title: "AMQP"
+  description: AMQP specific event fields.
+  fields:
+    - name: amqp
+      type: group
+      fields:
+        - name: reply-code
+          type: long
+          description: >
+            AMQP reply code to an error, similar to http reply-code
+          example: 404
+
+        - name: reply-text
+          type: keyword
+          description: >
+            Text explaining the error.
+
+        - name: class-id
+          type: long
+          description: >
+            Failing method class.
+
+        - name: method-id
+          type: long
+          description: >
+            Failing method ID.
+
+        - name: exchange
+          type: keyword
+          description: >
+            Name of the exchange.
+
+        - name: exchange-type
+          type: keyword
+          description: >
+            Exchange type.
+          example: fanout
+
+        - name: passive
+          type: boolean
+          description: >
+            If set, do not create exchange/queue.
+
+        - name: durable
+          type: boolean
+          description: >
+            If set, request a durable exchange/queue.
+
+        - name: exclusive
+          type: boolean
+          description: >
+            If set, request an exclusive queue.
+
+        - name: auto-delete
+          type: boolean
+          description: >
+            If set, auto-delete queue when unused.
+
+        - name: no-wait
+          type: boolean
+          description: >
+            If set, the server will not respond to the method.
+
+        - name: consumer-tag
+          description: >
+            Identifier for the consumer, valid within the current channel.
+
+        - name: delivery-tag
+          type: long
+          description: >
+            The server-assigned and channel-specific delivery tag.
+
+        - name: message-count
+          type: long
+          description: >
+            The number of messages in the queue, which will be zero for
+            newly-declared queues.
+
+        - name: consumer-count
+          type: long
+          description: >
+            The number of consumers of a queue.
+
+        - name: routing-key
+          type: keyword
+          description: >
+            Message routing key.
+
+        - name: no-ack
+          type: boolean
+          description: >
+            If set, the server does not expect acknowledgements for messages.
+
+        - name: no-local
+          type: boolean
+          description: >
+            If set, the server will not send messages to the connection that
+            published them.
+
+        - name: if-unused
+          type: boolean
+          description: >
+            Delete only if unused.
+
+        - name: if-empty
+          type: boolean
+          description: >
+            Delete only if empty.
+
+        - name: queue
+          type: keyword
+          description: >
+            The queue name identifies the queue within the vhost.
+
+        - name: redelivered
+          type: boolean
+          description: >
+            Indicates that the message has been previously delivered to this
+            or another client.
+
+        - name: multiple
+          type: boolean
+          description: >
+            Acknowledge multiple messages.
+
+        - name: arguments
+          type: object
+          description: >
+            Optional additional arguments passed to some methods. Can be of
+            various types.
+
+        - name: mandatory
+          type: boolean
+          description: >
+            Indicates mandatory routing.
+
+        - name: immediate
+          type: boolean
+          description: >
+            Request immediate delivery.
+
+        - name: content-type
+          type: keyword
+          description: >
+            MIME content type.
+          example: text/plain
+
+        - name: content-encoding
+          type: keyword
+          description: >
+            MIME content encoding.
+
+        - name: headers
+          type: object
+          object_type: keyword
+          description: >
+            Message header field table.
+
+        - name: delivery-mode
+          type: keyword
+          description: >
+            Non-persistent (1) or persistent (2).
+
+        - name: priority
+          type: long
+          description: >
+            Message priority, 0 to 9.
+
+        - name: correlation-id
+          type: keyword
+          description: >
+            Application correlation identifier.
+
+        - name: reply-to
+          type: keyword
+          description: >
+            Address to reply to.
+
+        - name: expiration
+          type: keyword
+          description: >
+            Message expiration specification.
+
+        - name: message-id
+          type: keyword
+          description: >
+            Application message identifier.
+
+        - name: timestamp
+          type: keyword
+          description: >
+            Message timestamp.
+
+        - name: type
+          type: keyword
+          description: >
+            Message type name.
+
+        - name: user-id
+          type: keyword
+          description: >
+            Creating user id.
+
+        - name: app-id
+          type: keyword
+          description: >
+            Creating application id.
+

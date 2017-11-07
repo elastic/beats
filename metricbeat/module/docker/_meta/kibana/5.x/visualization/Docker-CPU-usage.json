@@ -1,0 +1,10 @@
+{
+  "visState": "{\n  \"title\": \"Docker CPU usage\",\n  \"type\": \"area\",\n  \"params\": {\n    \"addLegend\": true,\n    \"addTimeMarker\": false,\n    \"addTooltip\": true,\n    \"defaultYExtents\": false,\n    \"interpolate\": \"linear\",\n    \"legendPosition\": \"top\",\n    \"mode\": \"stacked\",\n    \"scale\": \"linear\",\n    \"setYExtents\": false,\n    \"shareYAxis\": true,\n    \"smoothLines\": true,\n    \"times\": [],\n    \"yAxis\": {}\n  },\n  \"aggs\": [\n    {\n      \"id\": \"1\",\n      \"enabled\": true,\n      \"type\": \"percentiles\",\n      \"schema\": \"metric\",\n      \"params\": {\n        \"field\": \"docker.cpu.total.pct\",\n        \"percents\": [\n          75\n        ],\n        \"customLabel\": \"Total CPU time\"\n      }\n    },\n    {\n      \"id\": \"2\",\n      \"enabled\": true,\n      \"type\": \"date_histogram\",\n      \"schema\": \"segment\",\n      \"params\": {\n        \"field\": \"@timestamp\",\n        \"interval\": \"auto\",\n        \"customInterval\": \"2h\",\n        \"min_doc_count\": 1,\n        \"extended_bounds\": {}\n      }\n    },\n    {\n      \"id\": \"3\",\n      \"enabled\": true,\n      \"type\": \"terms\",\n      \"schema\": \"group\",\n      \"params\": {\n        \"field\": \"docker.container.name\",\n        \"size\": 5,\n        \"order\": \"desc\",\n        \"orderBy\": \"1.75\",\n        \"customLabel\": \"Container name\"\n      }\n    }\n  ],\n  \"listeners\": {}\n}", 
+  "description": "", 
+  "title": "Docker CPU usage", 
+  "uiStateJSON": "{}", 
+  "version": 1, 
+  "kibanaSavedObjectMeta": {
+    "searchSourceJSON": "{\n  \"filter\": [],\n  \"index\": \"metricbeat-*\",\n  \"highlight\": {\n    \"pre_tags\": [\n      \"@kibana-highlighted-field@\"\n    ],\n    \"post_tags\": [\n      \"@/kibana-highlighted-field@\"\n    ],\n    \"fields\": {\n      \"*\": {}\n    },\n    \"require_field_match\": false,\n    \"fragment_size\": 2147483647\n  },\n  \"query\": {\n    \"query_string\": {\n      \"query\": \"metricset.module:docker AND metricset.name:cpu\",\n      \"analyze_wildcard\": true\n    }\n  }\n}"
+  }
+}

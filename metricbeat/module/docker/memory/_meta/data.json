@@ -1,0 +1,42 @@
+{
+    "@timestamp": "2016-05-23T08:05:34.853Z",
+    "beat": {
+        "hostname": "host.example.com",
+        "name": "host.example.com"
+    },
+    "docker": {
+        "container": {
+            "id": "1306772b6ca9a24207a2bc268d4cc3137b951886ca4df478cfe2ba3943636c54",
+            "labels": {
+                "com_docker_compose_container-number": "2",
+                "com_docker_compose_oneoff": "True",
+                "com_docker_compose_project": "environments",
+                "com_docker_compose_service": "beat",
+                "com_docker_compose_version": "1.8.0"
+            },
+            "name": "environments_beat_run_2"
+        },
+        "memory": {
+            "fail": {
+                "count": 0
+            },
+            "limit": 4139544576,
+            "rss": {
+                "pct": 0.10530747622030197,
+                "total": 435924992
+            },
+            "usage": {
+                "max": 465604608,
+                "pct": 0.11162827975789383,
+                "total": 462090240
+            }
+        }
+    },
+    "metricset": {
+        "host": "/var/run/docker.sock",
+        "module": "docker",
+        "name": "memory",
+        "rtt": 115
+    },
+    "type": "metricsets"
+}

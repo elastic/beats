@@ -17,24 +17,23 @@ import (
 // scope.
 type AsyncProducer interface {
 
-	// AsyncClose triggers a shutdown of the producer, flushing any messages it may
-	// have buffered. The shutdown has completed when both the Errors and Successes
-	// channels have been closed. When calling AsyncClose, you *must* continue to
-	// read from those channels in order to drain the results of any messages in
-	// flight.
+	// AsyncClose triggers a shutdown of the producer. The shutdown has completed
+	// when both the Errors and Successes channels have been closed. When calling
+	// AsyncClose, you *must* continue to read from those channels in order to
+	// drain the results of any messages in flight.
 	AsyncClose()
 
-	// Close shuts down the producer and flushes any messages it may have buffered.
-	// You must call this function before a producer object passes out of scope, as
-	// it may otherwise leak memory. You must call this before calling Close on the
-	// underlying client.
+	// Close shuts down the producer and waits for any buffered messages to be
+	// flushed. You must call this function before a producer object passes out of
+	// scope, as it may otherwise leak memory. You must call this before calling
+	// Close on the underlying client.
 	Close() error
 
 	// Input is the input channel for the user to write messages to that they
 	// wish to send.
 	Input() chan<- *ProducerMessage
 
-	// Successes is the success output channel back to the user when AckSuccesses is
+	// Successes is the success output channel back to the user when Return.Successes is
 	// enabled. If Return.Successes is true, you MUST read from this channel or the
 	// Producer will deadlock. It is suggested that you send and read messages
 	// together in a single select statement.
@@ -135,6 +134,11 @@ type ProducerMessage struct {
 	// Partition is the partition that the message was sent to. This is only
 	// guaranteed to be defined if the message was successfully delivered.
 	Partition int32
+	// Timestamp is the timestamp assigned to the message by the broker. This
+	// is only guaranteed to be defined if the message was successfully
+	// delivered, RequiredAcks is not NoResponse, and the Kafka broker is at
+	// least version 0.10.0.
+	Timestamp time.Time
 
 	retries int
 	flags   flagSet
@@ -195,7 +199,7 @@ func (p *asyncProducer) Close() error {
 
 	if p.conf.Producer.Return.Successes {
 		go withRecover(func() {
-			for _ = range p.successes {
+			for range p.successes {
 			}
 		})
 	}
@@ -205,6 +209,8 @@ func (p *asyncProducer) Close() error {
 		for event := range p.errors {
 			errors = append(errors, event)
 		}
+	} else {
+		<-p.errors
 	}
 
 	if len(errors) > 0 {
@@ -722,6 +728,11 @@ func (bp *brokerProducer) handleSuccess(sent *produceSet, response *ProduceRespo
 		switch block.Err {
 		// Success
 		case ErrNoError:
+			if bp.parent.conf.Version.IsAtLeast(V0_10_0_0) && !block.Timestamp.IsZero() {
+				for _, msg := range msgs {
+					msg.Timestamp = block.Timestamp
+				}
+			}
 			for i, msg := range msgs {
 				msg.Offset = block.Offset + int64(i)
 			}

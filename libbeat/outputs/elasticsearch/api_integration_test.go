@@ -3,22 +3,26 @@
 package elasticsearch
 
 import (
+	"encoding/json"
 	"fmt"
+	"net/http"
 	"os"
+	"strings"
 	"testing"
+
+	"github.com/stretchr/testify/assert"
 
 	"github.com/elastic/beats/libbeat/logp"
 )
 
 func TestIndex(t *testing.T) {
-
 	if testing.Verbose() {
 		logp.LogInit(logp.LOG_DEBUG, "", false, true, []string{"elasticsearch"})
 	}
 
-	client := GetTestingElasticsearch()
+	index := fmt.Sprintf("beats-test-index-%d", os.Getpid())
 
-	index := fmt.Sprintf("packetbeat-unittest-%d", os.Getpid())
+	client := GetTestingElasticsearch(t)
 
 	body := map[string]interface{}{
 		"user":      "test",
@@ -32,8 +36,8 @@ func TestIndex(t *testing.T) {
 	if err != nil {
 		t.Fatalf("Index() returns error: %s", err)
 	}
-	if !resp.Created {
-		t.Errorf("Index() fails: %s", resp)
+	if !resp.Created && resp.Result != "created" {
+		t.Fatalf("Index() fails: %s", resp)
 	}
 
 	params = map[string]string{
@@ -51,4 +55,71 @@ func TestIndex(t *testing.T) {
 	if err != nil {
 		t.Errorf("Delete() returns error: %s", err)
 	}
+}
+
+func TestIngest(t *testing.T) {
+	type obj map[string]interface{}
+
+	if testing.Verbose() {
+		logp.LogInit(logp.LOG_DEBUG, "", false, true, []string{"elasticsearch"})
+	}
+
+	index := fmt.Sprintf("beats-test-ingest-%d", os.Getpid())
+	pipeline := fmt.Sprintf("beats-test-pipeline-%d", os.Getpid())
+
+	pipelineBody := obj{
+		"description": "Test pipeline",
+		"processors": []obj{
+			{
+				"lowercase": obj{
+					"field": "testfield",
+				},
+			},
+		},
+	}
+
+	client := GetTestingElasticsearch(t)
+	if strings.HasPrefix(client.Connection.version, "2.") {
+		t.Skip("Skipping tests as pipeline not available in 2.x releases")
+	}
+
+	status, _, err := client.DeletePipeline(pipeline, nil)
+	if err != nil && status != http.StatusNotFound {
+		t.Fatal(err)
+	}
+
+	_, resp, err := client.CreatePipeline(pipeline, nil, pipelineBody)
+	if err != nil {
+		t.Fatal(err)
+	}
+	if !resp.Acknowledged {
+		t.Fatalf("Test pipeline %v not created", pipeline)
+	}
+
+	params := map[string]string{"refresh": "true"}
+	_, resp, err = client.Ingest(index, "test", pipeline, "1", params, obj{
+		"testfield": "TEST",
+	})
+	if err != nil {
+		t.Fatalf("Ingest() returns error: %s", err)
+	}
+	if !resp.Created && resp.Result != "created" {
+		t.Errorf("Ingest() fails: %s", resp)
+	}
+
+	// get _source field from indexed document
+	_, docBody, err := client.apiCall("GET", index, "test", "1/_source", "", nil, nil)
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	doc := struct {
+		Field string `json:"testfield"`
+	}{}
+	err = json.Unmarshal(docBody, &doc)
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	assert.Equal(t, "test", doc.Field)
 }

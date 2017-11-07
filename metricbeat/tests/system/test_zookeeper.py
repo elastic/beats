@@ -1,5 +1,6 @@
 import os
 import metricbeat
+import unittest
 from nose.plugins.attrib import attr
 
 ZK_FIELDS = metricbeat.COMMON_FIELDS + ["zookeeper"]
@@ -10,7 +11,12 @@ MNTR_FIELDS = ["version", "latency.avg", "latency.max",
                "watch_count", "ephemerals_count",
                "approximate_data_size", "num_alive_connections"]
 
+
 class ZooKeeperMntrTest(metricbeat.BaseTest):
+
+    COMPOSE_SERVICES = ['zookeeper']
+
+    @unittest.skipUnless(metricbeat.INTEGRATION_TESTS, "integration test")
     @attr('integration')
     def test_output(self):
         """
@@ -25,10 +31,7 @@ class ZooKeeperMntrTest(metricbeat.BaseTest):
         proc = self.start_beat()
         self.wait_until(lambda: self.output_lines() > 0)
         proc.check_kill_and_wait()
-
-        # Ensure no errors or warnings exist in the log.
-        log = self.get_log()
-        self.assertNotRegexpMatches(log, "ERR|WARN")
+        self.assert_no_logged_warnings()
 
         output = self.read_output_json()
         self.assertEqual(len(output), 1)
@@ -47,9 +50,6 @@ class ZooKeeperMntrTest(metricbeat.BaseTest):
 
         self.assert_fields_are_documented(evt)
 
-
     def get_hosts(self):
         return [os.getenv('ZOOKEEPER_HOST', 'localhost') + ':' +
                 os.getenv('ZOOKEEPER_PORT', '2181')]
-
-

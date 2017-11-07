@@ -1,0 +1,11 @@
+{
+  "description": "",
+  "uiStateJSON": "{}",
+  "kibanaSavedObjectMeta": {
+    "searchSourceJSON": "{\"filter\":[]}"
+  },
+  "savedSearchId": "Apache-HTTPD",
+  "visState": "{\"title\":\"Apache HTTPD - Total accesses and kbytes\",\"type\":\"metric\",\"params\":{\"handleNoResults\":true,\"fontSize\":60},\"aggs\":[{\"id\":\"1\",\"type\":\"max\",\"schema\":\"metric\",\"params\":{\"field\":\"apache.status.total_kbytes\",\"customLabel\":\"Total kbytes\"}},{\"id\":\"2\",\"type\":\"max\",\"schema\":\"metric\",\"params\":{\"field\":\"apache.status.total_accesses\",\"customLabel\":\"Total accesses\"}}],\"listeners\":{}}",
+  "title": "Apache HTTPD - Total accesses and kbytes",
+  "version": 1
+}

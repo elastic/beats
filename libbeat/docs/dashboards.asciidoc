@@ -1,95 +1,80 @@
-[[load-kibana-dashboards]]
-=== Loading the Beats Dashboards
+//////////////////////////////////////////////////////////////////////////
+//// This content is shared by all Elastic Beats. Make sure you keep the
+//// descriptions here generic enough to work for all Beats that include
+//// this file. When using cross references, make sure that the cross
+//// references resolve correctly for any files that include this one.
+//// Use the appropriate variables defined in the index.asciidoc file to
+//// resolve Beat names: beatname_uc and beatname_lc.
+//// Use the following include to pull this content into a doc file:
+//// include::../../libbeat/docs/dashboards.asciidoc[]
+//////////////////////////////////////////////////////////////////////////
 
-Kibana has a large set of visualization types that you can combine to create
-the perfect dashboards for your needs. But this flexibility can be a bit
-overwhelming at the beginning, so we have created some sample dashboards to get you
-started and to demonstrate what is possible based on the Beats data.
 
-NOTE: The Beats dashboards require Kibana 4 or later.
+{beatname_uc} comes packaged with example Kibana dashboards, visualizations,
+and searches for visualizing {beatname_uc} data in Kibana. Before you can use
+the dashboards, you need to create the index  pattern, +{beatname_lc}-*+, and
+load the dashboards into Kibana. To do this, you can either run the `setup`
+command (as described here) or
+<<configuration-dashboards,configure dashboard loading>> in the
++{beatname_lc}.yml+ config file.
 
-Each Beat comes packaged with a script that you can use to import the example dashboards,
-visualizations, and searches for that Beat. The script also creates index patterns, such as 
-`packetbeat-*` for Packetbeat, `metricbeat-*` for Metricbeat, and so on. 
+NOTE: Starting with Beats 6.0.0, the dashboards are loaded via the Kibana API.
+This requires a Kibana endpoint configuration. You should have configured the
+endpoint earlier when you
+<<{beatname_lc}-configuration,configured {beatname_uc}>>. If you didn't,
+configure it now.
 
-Use the following commands to run the script:
+Make sure Kibana is running before you perform this step.
+
+To set up the Kibana dashboards for {beatname_uc}:
+
+ifdef::allplatforms[]
 
 *deb, rpm, and mac:*
 
-From the directory where you installed the Beat, change to the `kibana` directory and run the `import_dashboards.sh` script. For example:
+From the directory where you installed {beatname_uc}, run:
 
 ["source","sh",subs="attributes,callouts"]
 ----------------------------------------------------------------------
-cd kibana/ 
-./import_dashboards.sh
+./{beatname_lc} setup --dashboards
 ----------------------------------------------------------------------
 
-On deb and rpm, the `kibana` folder is located under the home path, which is `/usr/share/beat_name/` unless you change it.
+ifeval::["{requires-sudo}"=="yes"]
 
-By default, the script assumes that you are running Elasticsearch on `127.0.0.1:9200`. Use the `-url` option
-to specify a different location. For example: `./import_dashboards.sh -url http://192.168.33.60:9200`. To specify a Kibana index pattern or pass in user credentials, see <<dashboard-load-options>>.
+If you changed ownership of the config file to root, you'll need preface this
+command with `sudo`.
+
+endif::[]
+
+ifeval::["{beatname_lc}"!="auditbeat"]
+
+*docker:*
+
+["source","sh",subs="attributes"]
+----------------------------------------------------------------------
+docker run {dockerimage} setup --dashboards
+----------------------------------------------------------------------
+
+endif::[]
 
 *win:*
 
-. Open a PowerShell prompt as an Administrator (right-click the PowerShell icon
+endif::allplatforms[]
+
+Open a PowerShell prompt as an Administrator (right-click the PowerShell icon
 and select *Run As Administrator*). If you are running Windows XP, you may need
-to download and install PowerShell. 
+to download and install PowerShell.
 
-. From the directory where you installed the Beat, run the following commands to load the dashboards:
-+
+From the PowerShell prompt, change to the directory where you installed {beatname_uc},
+and run:
+
 ["source","sh",subs="attributes,callouts"]
 ----------------------------------------------------------------------
-PS > cd kibana
-PS > .\import_dashboards.ps1
-----------------------------------------------------------------------
-+
-By default, the script assumes that you are running Elasticsearch on `127.0.0.1:9200`. Use the `-url` option
-to specify a different location. For example: `.\import_dashboards.ps1 -url http://192.168.33.60:9200`. To specify a Kibana index pattern or pass in user credentials, see <<dashboard-load-options>>.
-+
-NOTE: If script execution is disabled on your system, you need to set the execution policy for the current session to allow the script to run. For example: `PowerShell.exe -ExecutionPolicy UnRestricted -File .\import_dashboards.ps1 -url http://192.168.33.60:9200`.
-
-[[dashboard-load-options]]
-=== Other Dashboard Load Options
-When you load the Beats dashboards, you can also specify:
-
-* The Kibana index pattern where you want to load the dashboards in Elasticsearch. For example:
-+
-["source","sh",subs="attributes,callouts"]
-----------------------------------------------------------------------
-./import_dashboards.sh -url http://test.com:9200 -index .kibana_env
+PS > {beatname_lc} setup --dashboards
 ----------------------------------------------------------------------
 
-* The username and password to use for authentication. There are a few ways to pass in the username and password. For example:
-+
-["source","sh",subs="attributes,callouts"]
-----------------------------------------------------------------------
-./import_dashboards.sh -url https://xyz.found.io -u user:password <1>
+[[passing-credentials-dashboard-loading]]
+==== Pass credentials
 
-./import_dashboards.sh -url https://xyz.found.io -u admin:$(cat ~/pass-file) <2> 
-
-./import_dashboards.sh -url https://user:password@xyz.found.io <3>
-----------------------------------------------------------------------
-+
-<1> Specify the username and password separated by a colon.
-<2> Use a file to avoid polluting the bash history with the password.
-<3> Put the username and password in the URL.
-
-These options are also available when you run `.\import_dashboards.ps1` on Windows.
-
-[[view-kibana-dashboards]]
-=== Opening the Beats Dashboards in Kibana
-
-After <<load-kibana-dashboards,loading the Beats dashboards>>,
-launch the Kibana web interface by pointing your browser
-to port 5601. For example, http://127.0.0.1:5601[http://127.0.0.1:5601].
-
-If Kibana shows a `No default index pattern` warning, you must select or create
-an index pattern to continue. To resolve the issue, select one of the
-predefined index patterns and set it as the default.
-
-image:./images/kibana-created-indexes.png[Kibana configured indexes]
-
-To open the loaded dashboards, go to the *Dashboard* page and click *Open*.
-Select the dashboard that you want to open. 
-
-image:./images/kibana-navigation-vis.png[Navigation widget in Kibana]
+:start-type: setup-dashboards
+include::./shared-passing-credentials-setup.asciidoc[]

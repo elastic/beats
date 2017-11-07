@@ -1,8 +1,10 @@
 package common
 
 import (
+	"encoding/binary"
 	"encoding/json"
 	"errors"
+	"hash"
 	"time"
 )
 
@@ -30,10 +32,19 @@ func (t *Time) UnmarshalJSON(data []byte) (err error) {
 	return
 }
 
+func (t Time) Hash32(h hash.Hash32) error {
+	err := binary.Write(h, binary.LittleEndian, time.Time(t).UnixNano())
+	return err
+}
+
 // ParseTime parses a time in the TsLayout format.
 func ParseTime(timespec string) (Time, error) {
 	t, err := time.Parse(TsLayout, timespec)
 	return Time(t), err
+}
+
+func (t Time) String() string {
+	return time.Time(t).Format(TsLayout)
 }
 
 // MustParseTime is a convenience equivalent of the ParseTime function
@@ -43,5 +54,6 @@ func MustParseTime(timespec string) Time {
 	if err != nil {
 		panic(err)
 	}
+
 	return ts
 }

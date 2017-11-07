@@ -2,7 +2,7 @@ import json
 import os
 import sys
 
-sys.path.append('../../../libbeat/tests/system')
+sys.path.append(os.path.join(os.path.dirname(__file__), '../../../libbeat/tests/system'))
 
 from beat.beat import TestCase
 
@@ -12,12 +12,14 @@ class BaseTest(TestCase):
     @classmethod
     def setUpClass(self):
         self.beat_name = "filebeat"
+        self.beat_path = os.path.abspath(os.path.join(os.path.dirname(__file__), "../../"))
+
         super(BaseTest, self).setUpClass()
 
     def get_registry(self):
         # Returns content of the registry file
         dotFilebeat = self.working_dir + '/registry'
-        assert os.path.isfile(dotFilebeat) is True
+        self.wait_until(cond=lambda: os.path.isfile(dotFilebeat))
 
         with open(dotFilebeat) as file:
             return json.load(file)
@@ -39,8 +41,19 @@ class BaseTest(TestCase):
                 if tmp_entry == None:
                     tmp_entry = entry
                 else:
-                    if tmp_entry["last_seen"] < entry["last_seen"]:
+                    if tmp_entry["timestamp"] < entry["timestamp"]:
                         tmp_entry = entry
 
         return tmp_entry
 
+    def assert_fields_are_documented(self, evt):
+        """
+        Assert that all keys present in evt are documented in fields.yml.
+        This reads from the global fields.yml, means `make collect` has to be run before the check.
+        """
+        expected_fields, dict_fields = self.load_fields()
+        flat = self.flatten_object(evt, dict_fields)
+
+        for key in flat.keys():
+            if key not in expected_fields:
+                raise Exception("Key '{}' found in event is not documented!".format(key))

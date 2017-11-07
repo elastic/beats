@@ -5,6 +5,11 @@ import (
 	"math"
 )
 
+var errInvalidArrayLength = PacketDecodingError{"invalid array length"}
+var errInvalidByteSliceLength = PacketDecodingError{"invalid byteslice length"}
+var errInvalidStringLength = PacketDecodingError{"invalid string length"}
+var errInvalidSubsetSize = PacketDecodingError{"invalid subset size"}
+
 type realDecoder struct {
 	raw   []byte
 	off   int
@@ -64,7 +69,7 @@ func (rd *realDecoder) getArrayLength() (int, error) {
 		rd.off = len(rd.raw)
 		return -1, ErrInsufficientData
 	} else if tmp > 2*math.MaxUint16 {
-		return -1, PacketDecodingError{"invalid array length"}
+		return -1, errInvalidArrayLength
 	}
 	return tmp, nil
 }
@@ -82,7 +87,7 @@ func (rd *realDecoder) getBytes() ([]byte, error) {
 
 	switch {
 	case n < -1:
-		return nil, PacketDecodingError{"invalid byteslice length"}
+		return nil, errInvalidByteSliceLength
 	case n == -1:
 		return nil, nil
 	case n == 0:
@@ -108,7 +113,7 @@ func (rd *realDecoder) getString() (string, error) {
 
 	switch {
 	case n < -1:
-		return "", PacketDecodingError{"invalid string length"}
+		return "", errInvalidStringLength
 	case n == -1:
 		return "", nil
 	case n == 0:
@@ -141,7 +146,7 @@ func (rd *realDecoder) getInt32Array() ([]int32, error) {
 	}
 
 	if n < 0 {
-		return nil, PacketDecodingError{"invalid array length"}
+		return nil, errInvalidArrayLength
 	}
 
 	ret := make([]int32, n)
@@ -170,7 +175,7 @@ func (rd *realDecoder) getInt64Array() ([]int64, error) {
 	}
 
 	if n < 0 {
-		return nil, PacketDecodingError{"invalid array length"}
+		return nil, errInvalidArrayLength
 	}
 
 	ret := make([]int64, n)
@@ -194,16 +199,17 @@ func (rd *realDecoder) getStringArray() ([]string, error) {
 	}
 
 	if n < 0 {
-		return nil, PacketDecodingError{"invalid array length"}
+		return nil, errInvalidArrayLength
 	}
 
 	ret := make([]string, n)
 	for i := range ret {
-		if str, err := rd.getString(); err != nil {
+		str, err := rd.getString()
+		if err != nil {
 			return nil, err
-		} else {
-			ret[i] = str
 		}
+
+		ret[i] = str
 	}
 	return ret, nil
 }
@@ -216,7 +222,7 @@ func (rd *realDecoder) remaining() int {
 
 func (rd *realDecoder) getSubset(length int) (packetDecoder, error) {
 	if length < 0 {
-		return nil, PacketDecodingError{"invalid subset size"}
+		return nil, errInvalidSubsetSize
 	} else if length > rd.remaining() {
 		rd.off = len(rd.raw)
 		return nil, ErrInsufficientData

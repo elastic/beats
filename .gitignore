@@ -1,14 +1,21 @@
 # Directories
 /.vagrant
 /.idea
+/.vscode
 /build
 /*/data
+/*/logs
+/*/fields.yml
+/*/*.template*.json
 
 # Files
 .DS_Store
-/glide.lock
 /beats.iml
 *.dev.yml
+*.generated.yml
+coverage.out
+.python-version
+beat.db
 
 # Editor swap files
 *.swp

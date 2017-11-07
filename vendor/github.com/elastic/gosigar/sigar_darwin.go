@@ -21,6 +21,7 @@ import (
 	"fmt"
 	"io"
 	"os/user"
+	"runtime"
 	"strconv"
 	"syscall"
 	"time"
@@ -162,6 +163,10 @@ func (self *CpuList) Get() error {
 	}
 
 	return nil
+}
+
+func (self *FDUsage) Get() error {
+	return ErrNotImplemented{runtime.GOOS}
 }
 
 func (self *FileSystemList) Get() error {
@@ -321,12 +326,28 @@ func (self *ProcArgs) Get(pid int) error {
 	return err
 }
 
+func (self *ProcEnv) Get(pid int) error {
+	if self.Vars == nil {
+		self.Vars = map[string]string{}
+	}
+
+	env := func(k, v string) {
+		self.Vars[k] = v
+	}
+
+	return kern_procargs(pid, nil, nil, env)
+}
+
 func (self *ProcExe) Get(pid int) error {
 	exe := func(arg string) {
 		self.Name = arg
 	}
 
 	return kern_procargs(pid, exe, nil, nil)
+}
+
+func (self *ProcFDUsage) Get(pid int) error {
+	return ErrNotImplemented{runtime.GOOS}
 }
 
 // wrapper around sysctl KERN_PROCARGS2
@@ -352,13 +373,19 @@ func kern_procargs(pid int,
 	binary.Read(bbuf, binary.LittleEndian, &argc)
 
 	path, err := bbuf.ReadBytes(0)
+	if err != nil {
+		return fmt.Errorf("Error reading the argv[0]: %v", err)
+	}
 	if exe != nil {
 		exe(string(chop(path)))
 	}
 
 	// skip trailing \0's
 	for {
-		c, _ := bbuf.ReadByte()
+		c, err := bbuf.ReadByte()
+		if err != nil {
+			return fmt.Errorf("Error skipping nils: %v", err)
+		}
 		if c != 0 {
 			bbuf.UnreadByte()
 			break // start of argv[0]
@@ -369,6 +396,9 @@ func kern_procargs(pid int,
 		arg, err := bbuf.ReadBytes(0)
 		if err == io.EOF {
 			break
+		}
+		if err != nil {
+			return fmt.Errorf("Error reading args: %v", err)
 		}
 		if argv != nil {
 			argv(string(chop(arg)))
@@ -386,7 +416,15 @@ func kern_procargs(pid int,
 		if err == io.EOF || line[0] == 0 {
 			break
 		}
+		if err != nil {
+			return fmt.Errorf("Error reading args: %v", err)
+		}
 		pair := bytes.SplitN(chop(line), delim, 2)
+
+		if len(pair) != 2 {
+			return fmt.Errorf("Error reading process information for PID: %d", pid)
+		}
+
 		env(string(pair[0]), string(pair[1]))
 	}
 

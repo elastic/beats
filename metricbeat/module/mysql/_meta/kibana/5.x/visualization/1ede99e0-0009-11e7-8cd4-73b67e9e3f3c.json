@@ -1,0 +1,10 @@
+{
+  "visState": "{\"title\":\"MySQL threads created\",\"type\":\"timelion\",\"params\":{\"expression\":\".es(*, metric='avg:mysql.status.threads.created').derivative().label(\\\"Threads created\\\")\",\"interval\":\"1m\"},\"aggs\":[],\"listeners\":{}}", 
+  "description": "", 
+  "title": "MySQL threads created", 
+  "uiStateJSON": "{}", 
+  "version": 1, 
+  "kibanaSavedObjectMeta": {
+    "searchSourceJSON": "{\"query\":{\"query_string\":{\"analyze_wildcard\":true,\"query\":\"*\"}},\"filter\":[]}"
+  }
+}

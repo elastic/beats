@@ -14,8 +14,8 @@ import (
 type memcacheMagic uint8
 
 const (
-	MemcacheMagicRequest  = 0x80
-	MemcacheMagicResponse = 0x81
+	memcacheMagicRequest  = 0x80
+	memcacheMagicResponse = 0x81
 )
 
 const memcacheHeaderSize = 24
@@ -48,86 +48,86 @@ func init() {
 	// define all memcache opcode commands:
 	binaryUnknownCommand = defBinaryCommand(
 		nil,
-		MemcacheUnknownType,
-		MemcacheCmdUNKNOWN,
+		memcacheUnknownType,
+		memcacheCmdUNKNOWN,
 		requestArgs(),
 		responseArgs(),
 		nil)
 
 	defBinaryCommand(
 		opcodes(opcodeGet, opcodeGetK, opcodeGetKQ, opcodeGetQ),
-		MemcacheLoadMsg,
-		MemcacheCmdGet,
+		memcacheLoadMsg,
+		memcacheCmdGet,
 		requestArgs(),
 		responseArgs(extraFlags),
 		nil)
 
 	defBinaryEmptyCommand(
 		opcodes(opcodeDelete, opcodeDeleteQ),
-		MemcacheDeleteMsg, MemcacheCmdDelete)
+		memcacheDeleteMsg, memcacheCmdDelete)
 
 	defBinaryCommand(
 		opcodes(opcodeFlush, opcodeFlushQ),
-		MemcacheDeleteMsg,
-		MemcacheCmdDelete,
+		memcacheDeleteMsg,
+		memcacheCmdDelete,
 		requestArgs(extraExpTime),
 		responseArgs(), nil)
 
-	defBinaryStoreCommand(opcodes(opcodeSet, opcodeSetQ), MemcacheCmdSet)
-	defBinaryStoreCommand(opcodes(opcodeAdd, opcodeAddQ), MemcacheCmdAdd)
+	defBinaryStoreCommand(opcodes(opcodeSet, opcodeSetQ), memcacheCmdSet)
+	defBinaryStoreCommand(opcodes(opcodeAdd, opcodeAddQ), memcacheCmdAdd)
 	defBinaryStoreCommand(
 		opcodes(opcodeReplace, opcodeReplaceQ),
-		MemcacheCmdReplace)
+		memcacheCmdReplace)
 	defBinaryEmptyCommand(
 		opcodes(opcodeAppend, opcodeAppendQ),
-		MemcacheStoreMsg, MemcacheCmdAppend)
+		memcacheStoreMsg, memcacheCmdAppend)
 	defBinaryEmptyCommand(
 		opcodes(opcodePrepend, opcodePrependQ),
-		MemcacheStoreMsg, MemcacheCmdPrepend)
+		memcacheStoreMsg, memcacheCmdPrepend)
 
-	defBinaryEmptyCommand(opcodes(opcodeNoOp), MemcacheInfoMsg, MemcacheCmdNoOp)
+	defBinaryEmptyCommand(opcodes(opcodeNoOp), memcacheInfoMsg, memcacheCmdNoOp)
 
 	defBinaryCounterCommand(
 		opcodes(opcodeIncrement, opcodeIncrementQ),
-		MemcacheCmdIncr)
+		memcacheCmdIncr)
 	defBinaryCounterCommand(
 		opcodes(opcodeDecrement, opcodeDecrementQ),
-		MemcacheCmdDecr)
+		memcacheCmdDecr)
 
 	defBinaryEmptyCommand(
 		opcodes(opcodeQuit, opcodeQuitQ),
-		MemcacheInfoMsg,
-		MemcacheCmdQuit)
+		memcacheInfoMsg,
+		memcacheCmdQuit)
 
 	defBinaryCommand(
 		opcodes(opcodeVersion),
-		MemcacheInfoMsg,
-		MemcacheCmdVersion,
+		memcacheInfoMsg,
+		memcacheCmdVersion,
 		requestArgs(), responseArgs(),
 		parseVersionNumber)
 
 	defBinaryCommand(
 		opcodes(opcodeTouch),
-		MemcacheStoreMsg, MemcacheCmdTouch,
+		memcacheStoreMsg, memcacheCmdTouch,
 		requestArgs(extraExpTime),
 		responseArgs(), nil)
 
 	defBinaryCommand(
 		opcodes(opcodeVerbosity),
-		MemcacheInfoMsg,
-		MemcacheCmdVerbosity,
+		memcacheInfoMsg,
+		memcacheCmdVerbosity,
 		requestArgs(extraVerbosity),
 		responseArgs(),
 		nil)
 
-	defBinarySaslCommand(opcodeSaslListMechs, MemcacheCmdSaslList)
-	defBinarySaslCommand(opcodeSaslAuth, MemcacheCmdSaslAuth)
-	defBinarySaslCommand(opcodeSaslStep, MemcacheCmdSaslStep)
+	defBinarySaslCommand(opcodeSaslListMechs, memcacheCmdSaslList)
+	defBinarySaslCommand(opcodeSaslAuth, memcacheCmdSaslAuth)
+	defBinarySaslCommand(opcodeSaslStep, memcacheCmdSaslStep)
 
 	defBinaryCommand(
 		opcodes(opcodeStat),
-		MemcacheStatsMsg,
-		MemcacheCmdStats,
+		memcacheStatsMsg,
+		memcacheCmdStats,
 		requestArgs(),
 		responseArgs(binStatsValue),
 		parseStatResponse)
@@ -200,11 +200,11 @@ func defBinaryEmptyCommand(
 }
 
 func defBinarySaslCommand(opcode memcacheOpcode, code commandCode) {
-	defBinaryEmptyCommand(opcodes(opcode), MemcacheAuthMsg, code)
+	defBinaryEmptyCommand(opcodes(opcode), memcacheAuthMsg, code)
 }
 
 func defBinaryStoreCommand(opcodes []memcacheOpcode, code commandCode) {
-	defBinaryCommand(opcodes, MemcacheStoreMsg, code,
+	defBinaryCommand(opcodes, memcacheStoreMsg, code,
 		requestArgs(extraFlags, extraExpTime),
 		responseArgs(), nil)
 }
@@ -212,7 +212,7 @@ func defBinaryStoreCommand(opcodes []memcacheOpcode, code commandCode) {
 func defBinaryCounterCommand(opcodes []memcacheOpcode, code commandCode) {
 	defBinaryCommand(
 		opcodes,
-		MemcacheCounterMsg,
+		memcacheCounterMsg,
 		code,
 		requestArgs(extraDelta, extraInitial, extraExpTime),
 		responseArgs(),
@@ -231,12 +231,12 @@ func parseBinaryCommand(parser *parser, buf *streambuf.Buffer) parseResult {
 	msg.isBinary = true
 	magic, _ := buf.ReadNetUint8At(0)
 	switch magic {
-	case MemcacheMagicRequest:
+	case memcacheMagicRequest:
 		msg.IsRequest = true
-	case MemcacheMagicResponse:
+	case memcacheMagicResponse:
 		msg.IsRequest = false
 	default:
-		return parser.failing(ErrInvalidMemcacheMagic)
+		return parser.failing(errInvalidMemcacheMagic)
 	}
 
 	opcode, _ := buf.ReadNetUint8At(1)
@@ -302,7 +302,7 @@ func makeParseBinary(
 
 		valueLen := int(totalLen) - (int(extraLen) + int(keyLen))
 		if valueLen < 0 {
-			return parser.failing(ErrLen)
+			return parser.failing(errLen)
 		}
 
 		if valueParser != nil && valueLen > 0 {
@@ -370,7 +370,7 @@ func parseDataBinary(parser *parser, buf *streambuf.Buffer) parseResult {
 
 	debug("found data message")
 	if msg.bytesLost > 0 {
-		msg.count_values++
+		msg.countValues++
 	} else {
 		parser.appendMessageData(data)
 	}
@@ -422,7 +422,7 @@ func parseStatResponse(parser *parser, buf *streambuf.Buffer) parseResult {
 	bytes, _ := buf.Collect(int(msg.bytes))
 
 	if len(msg.keys) == 0 {
-		return parser.failing(ErrExpectedKeys)
+		return parser.failing(errExpectedKeys)
 	}
 
 	msg.stats = append(msg.stats, memcacheStat{
@@ -453,8 +453,8 @@ func makeSerializeBinary(
 		if msg.isCas {
 			serializeCas(msg, event)
 		}
-		if msg.count_values > 0 {
-			event["count_values"] = msg.count_values
+		if msg.countValues > 0 {
+			event["count_values"] = msg.countValues
 			if len(msg.values) > 0 {
 				event["values"] = msg.values
 			}
@@ -468,16 +468,16 @@ func makeSerializeBinary(
 			event["quiet"] = msg.isQuiet
 			event["vbucket"] = msg.vbucket
 			return serializeArgs(msg, event, requestArgs)
-		} else {
-			status := memcacheStatusCode(msg.status)
-			event["status"] = status.String()
-			event["status_code"] = status
-
-			if typ == MemcacheCounterMsg {
-				event["value"] = msg.value
-			}
-			return serializeArgs(msg, event, responseArgs)
 		}
+
+		status := memcacheStatusCode(msg.status)
+		event["status"] = status.String()
+		event["status_code"] = status
+
+		if typ == memcacheCounterMsg {
+			event["value"] = msg.value
+		}
+		return serializeArgs(msg, event, responseArgs)
 	}
 }
 

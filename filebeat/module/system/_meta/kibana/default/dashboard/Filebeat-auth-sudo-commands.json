@@ -1,0 +1,109 @@
+{
+  "objects": [
+    {
+      "attributes": {
+        "description": "",
+        "kibanaSavedObjectMeta": {
+          "searchSourceJSON": "{\n  \"filter\": []\n}"
+        },
+        "savedSearchId": "b6f321e0-fa25-11e6-bbd3-29c986c96e5a",
+        "title": "Sudo commands by user [Filebeat System]",
+        "uiStateJSON": "{}",
+        "version": 1,
+        "visState": "{\n  \"title\": \"Sudo commands by user\",\n  \"type\": \"histogram\",\n  \"params\": {\n    \"addTooltip\": true,\n    \"addLegend\": true,\n    \"legendPosition\": \"right\",\n    \"scale\": \"linear\",\n    \"mode\": \"stacked\",\n    \"times\": [],\n    \"addTimeMarker\": false,\n    \"defaultYExtents\": false,\n    \"setYExtents\": false\n  },\n  \"aggs\": [\n    {\n      \"id\": \"1\",\n      \"enabled\": true,\n      \"type\": \"count\",\n      \"schema\": \"metric\",\n      \"params\": {}\n    },\n    {\n      \"id\": \"2\",\n      \"enabled\": true,\n      \"type\": \"date_histogram\",\n      \"schema\": \"segment\",\n      \"params\": {\n        \"field\": \"@timestamp\",\n        \"interval\": \"auto\",\n        \"customInterval\": \"2h\",\n        \"min_doc_count\": 1,\n        \"extended_bounds\": {}\n      }\n    },\n    {\n      \"id\": \"3\",\n      \"enabled\": true,\n      \"type\": \"terms\",\n      \"schema\": \"group\",\n      \"params\": {\n        \"field\": \"system.auth.user\",\n        \"size\": 5,\n        \"order\": \"desc\",\n        \"orderBy\": \"1\"\n      }\n    }\n  ],\n  \"listeners\": {}\n}"
+      },
+      "id": "5c7af030-fa2a-11e6-bbd3-29c986c96e5a",
+      "type": "visualization",
+      "version": 2
+    },
+    {
+      "attributes": {
+        "description": "",
+        "kibanaSavedObjectMeta": {
+          "searchSourceJSON": "{\n  \"filter\": [],\n  \"index\": \"filebeat-*\",\n  \"highlightAll\": true,\n  \"query\": {\n    \"query_string\": {\n      \"query\": \"_exists_:system.auth.sudo.error\",\n      \"analyze_wildcard\": true\n    }\n  }\n}"
+        },
+        "title": "Sudo errors [Filebeat System]",
+        "uiStateJSON": "{}",
+        "version": 1,
+        "visState": "{\n  \"title\": \"Sudo errors\",\n  \"type\": \"histogram\",\n  \"params\": {\n    \"addTooltip\": true,\n    \"addLegend\": true,\n    \"legendPosition\": \"right\",\n    \"scale\": \"linear\",\n    \"mode\": \"stacked\",\n    \"times\": [],\n    \"addTimeMarker\": false,\n    \"defaultYExtents\": false,\n    \"setYExtents\": false\n  },\n  \"aggs\": [\n    {\n      \"id\": \"1\",\n      \"enabled\": true,\n      \"type\": \"count\",\n      \"schema\": \"metric\",\n      \"params\": {}\n    },\n    {\n      \"id\": \"2\",\n      \"enabled\": true,\n      \"type\": \"date_histogram\",\n      \"schema\": \"segment\",\n      \"params\": {\n        \"field\": \"@timestamp\",\n        \"interval\": \"auto\",\n        \"customInterval\": \"2h\",\n        \"min_doc_count\": 1,\n        \"extended_bounds\": {}\n      }\n    },\n    {\n      \"id\": \"3\",\n      \"enabled\": true,\n      \"type\": \"terms\",\n      \"schema\": \"group\",\n      \"params\": {\n        \"field\": \"system.auth.sudo.error\",\n        \"size\": 5,\n        \"order\": \"desc\",\n        \"orderBy\": \"1\"\n      }\n    }\n  ],\n  \"listeners\": {}\n}"
+      },
+      "id": "51164310-fa2b-11e6-bbd3-29c986c96e5a",
+      "type": "visualization",
+      "version": 2
+    },
+    {
+      "attributes": {
+        "description": "",
+        "kibanaSavedObjectMeta": {
+          "searchSourceJSON": "{\n  \"filter\": []\n}"
+        },
+        "savedSearchId": "b6f321e0-fa25-11e6-bbd3-29c986c96e5a",
+        "title": "Top sudo commands [Filebeat System]",
+        "uiStateJSON": "{\n  \"vis\": {\n    \"params\": {\n      \"sort\": {\n        \"columnIndex\": null,\n        \"direction\": null\n      }\n    }\n  }\n}",
+        "version": 1,
+        "visState": "{\n  \"title\": \"Top sudo commands\",\n  \"type\": \"table\",\n  \"params\": {\n    \"perPage\": 10,\n    \"showPartialRows\": false,\n    \"showMeticsAtAllLevels\": false,\n    \"sort\": {\n      \"columnIndex\": null,\n      \"direction\": null\n    },\n    \"showTotal\": false,\n    \"totalFunc\": \"sum\"\n  },\n  \"aggs\": [\n    {\n      \"id\": \"1\",\n      \"enabled\": true,\n      \"type\": \"count\",\n      \"schema\": \"metric\",\n      \"params\": {}\n    },\n    {\n      \"id\": \"2\",\n      \"enabled\": true,\n      \"type\": \"terms\",\n      \"schema\": \"bucket\",\n      \"params\": {\n        \"field\": \"system.auth.sudo.command\",\n        \"size\": 5,\n        \"order\": \"desc\",\n        \"orderBy\": \"1\"\n      }\n    },\n    {\n      \"id\": \"3\",\n      \"enabled\": true,\n      \"type\": \"terms\",\n      \"schema\": \"bucket\",\n      \"params\": {\n        \"field\": \"system.auth.user\",\n        \"size\": 5,\n        \"order\": \"desc\",\n        \"orderBy\": \"1\"\n      }\n    }\n  ],\n  \"listeners\": {}\n}"
+      },
+      "id": "dc589770-fa2b-11e6-bbd3-29c986c96e5a",
+      "type": "visualization",
+      "version": 2
+    },
+    {
+      "attributes": {
+        "description": "",
+        "kibanaSavedObjectMeta": {
+          "searchSourceJSON": "{}"
+        },
+        "title": "Dashboards [Filebeat System]",
+        "uiStateJSON": "{}",
+        "version": 1,
+        "visState": "{\"title\":\"Dashboards [Filebeat System]\",\"type\":\"markdown\",\"params\":{\"fontSize\":12,\"markdown\":\"[Syslog](#/dashboard/Filebeat-syslog-dashboard) | [Sudo commands](#/dashboard/277876d0-fa2c-11e6-bbd3-29c986c96e5a) | [SSH logins](#/dashboard/5517a150-f9ce-11e6-8115-a7c18106d86a) | [New users and groups](#/dashboard/0d3f2380-fa78-11e6-ae9b-81e5311e8cab)\"},\"aggs\":[]}"
+      },
+      "id": "327417e0-8462-11e7-bab8-bd2f0fb42c54",
+      "type": "visualization",
+      "version": 1
+    },
+    {
+      "attributes": {
+        "columns": [
+          "system.auth.user",
+          "system.auth.sudo.user",
+          "system.auth.sudo.pwd",
+          "system.auth.sudo.command"
+        ],
+        "description": "",
+        "hits": 0,
+        "kibanaSavedObjectMeta": {
+          "searchSourceJSON": "{\n  \"index\": \"filebeat-*\",\n  \"highlightAll\": true,\n  \"query\": {\n    \"query_string\": {\n      \"query\": \"_exists_:system.auth.sudo\",\n      \"analyze_wildcard\": true\n    }\n  },\n  \"filter\": []\n}"
+        },
+        "sort": [
+          "@timestamp",
+          "desc"
+        ],
+        "title": "Sudo commands [Filebeat System]",
+        "version": 1
+      },
+      "id": "b6f321e0-fa25-11e6-bbd3-29c986c96e5a",
+      "type": "search",
+      "version": 2
+    },
+    {
+      "attributes": {
+        "description": "Sudo commands dashboard from the Filebeat System module",
+        "hits": 0,
+        "kibanaSavedObjectMeta": {
+          "searchSourceJSON": "{\"filter\":[],\"query\":{\"query\":{\"query_string\":{\"analyze_wildcard\":true,\"query\":\"*\",\"default_field\":\"*\"}},\"language\":\"lucene\"},\"highlightAll\":true,\"version\":true}"
+        },
+        "optionsJSON": "{\"darkTheme\":false}",
+        "panelsJSON": "[{\"col\":1,\"id\":\"5c7af030-fa2a-11e6-bbd3-29c986c96e5a\",\"panelIndex\":1,\"row\":6,\"size_x\":12,\"size_y\":4,\"type\":\"visualization\"},{\"col\":1,\"id\":\"51164310-fa2b-11e6-bbd3-29c986c96e5a\",\"panelIndex\":2,\"row\":10,\"size_x\":12,\"size_y\":3,\"type\":\"visualization\"},{\"col\":1,\"id\":\"dc589770-fa2b-11e6-bbd3-29c986c96e5a\",\"panelIndex\":3,\"row\":2,\"size_x\":12,\"size_y\":4,\"type\":\"visualization\"},{\"size_x\":12,\"size_y\":1,\"panelIndex\":4,\"type\":\"visualization\",\"id\":\"327417e0-8462-11e7-bab8-bd2f0fb42c54\",\"col\":1,\"row\":1}]",
+        "timeRestore": false,
+        "title": "[Filebeat System] Sudo commands",
+        "uiStateJSON": "{\"P-3\":{\"vis\":{\"params\":{\"sort\":{\"columnIndex\":null,\"direction\":null}}}}}",
+        "version": 1
+      },
+      "id": "277876d0-fa2c-11e6-bbd3-29c986c96e5a",
+      "type": "dashboard",
+      "version": 6
+    }
+  ],
+  "version": "6.0.0-beta1-SNAPSHOT"
+}

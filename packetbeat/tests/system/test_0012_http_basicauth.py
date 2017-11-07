@@ -5,6 +5,7 @@ import re
 Tests for removing base64-encoded authentication information
 """
 
+
 class Test(BaseTest):
 
     def test_http_auth_headers(self):
@@ -21,9 +22,8 @@ class Test(BaseTest):
 
         assert len(objs) >= 1
         assert all([o["type"] == "http" for o in objs])
-        assert all([o["http.request_headers"]["authorization"] == "*"
-                   is not None for o in objs])
-
+        assert all([o["http.request.headers"]["authorization"] == "*"
+                    is not None for o in objs])
 
     def test_http_auth_raw(self):
         self.render_config_template(

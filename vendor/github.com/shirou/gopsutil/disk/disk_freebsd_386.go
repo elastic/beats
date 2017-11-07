@@ -39,6 +39,10 @@ const (
 	MNT_SUSPEND = 4
 )
 
+const (
+	sizeOfDevstat = 0xf0
+)
+
 type (
 	_C_short       int16
 	_C_int         int32
@@ -95,7 +99,7 @@ type Devstat struct {
 	Flags         uint32
 	Device_type   uint32
 	Priority      uint32
-	ID            *byte
+	Id            *byte
 	Sequence1     uint32
 }
 type Bintime struct {

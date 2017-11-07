@@ -1,3 +1,0 @@
-=== System Memory MetricSet
-
-The System Memory MetricSet provides memory statistics.

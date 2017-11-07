@@ -1,3 +1,0 @@
-=== System Fsstat MetricSet
-
-The System FsStats MetricSet provides overall Filesystem statistics.

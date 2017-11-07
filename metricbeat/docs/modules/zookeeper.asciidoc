@@ -3,35 +3,36 @@ This file is generated! See scripts/docs_collector.py
 ////
 
 [[metricbeat-module-zookeeper]]
-== Zookeeper Module
+== ZooKeeper module
 
+The ZooKeeper module fetches statistics from the ZooKeeper service.
 
+[float]
 === Compatibility
 
-The zookeeper MetricSets were tested with zookeeper 3.4.8 and are expected to work with all version
+The ZooKeeper metricsets were tested with ZooKeeper 3.4.8 and are expected to work with all version
 >= 3.4.0. Versions prior to 3.4 do not support the `mntr` command.
 
 
 [float]
-=== Example Configuration
+=== Example configuration
 
-The Zookeeper Status module supports the standard configuration options which can be found
-here <<configuration-metricbeat,here>>. Below is an example of a configuration option:
+The ZooKeeper module supports the standard configuration options that are described
+in <<configuration-metricbeat>>. Here is an example configuration:
 
 [source,yaml]
 ----
 metricbeat.modules:
-#- module: zookeeper
-  #metricsets: ["mntr"]
-  #enabled: true
-  #period: 10s
-  #hosts: ["localhost:2181"]
+- module: zookeeper
+  metricsets: ["mntr"]
+  period: 10s
+  hosts: ["localhost:2181"]
 ----
 
 [float]
-=== MetricSets
+=== Metricsets
 
-The following MetricSets are available:
+The following metricsets are available:
 
 * <<metricbeat-metricset-zookeeper-mntr,mntr>>
 

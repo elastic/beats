@@ -1,0 +1,10 @@
+{
+  "visState": "{\"title\":\"Golang: Heap\",\"type\":\"timelion\",\"params\":{\"expression\":\".es(index=\\\"metricbeat*\\\",metric=\\\"avg:golang.heap.allocations.total\\\").label(\\\"Heap Total\\\").derivative().movingaverage(30),.es(index=\\\"metricbeat*\\\",metric=\\\"avg:golang.heap.allocations.active\\\").label(\\\"Heap Inuse\\\").movingaverage(30),.es(index=\\\"metricbeat*\\\",metric=\\\"avg:golang.heap.allocations.allocated\\\").label(\\\"Heap Allocated\\\").movingaverage(30),.es(index=\\\"metricbeat*\\\",metric=\\\"avg:golang.heap.allocations.idle\\\").label(\\\"Heap Idle\\\").movingaverage(30)\",\"interval\":\"10s\"},\"aggs\":[],\"listeners\":{}}", 
+  "description": "", 
+  "title": "Golang: Heap", 
+  "uiStateJSON": "{}", 
+  "version": 1, 
+  "kibanaSavedObjectMeta": {
+    "searchSourceJSON": "{\"query\":{\"query_string\":{\"query\":\"*\",\"analyze_wildcard\":true}},\"filter\":[]}"
+  }
+}

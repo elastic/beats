@@ -85,6 +85,7 @@ const (
 	ErrMessageSizeTooLarge             KError = 10
 	ErrStaleControllerEpochCode        KError = 11
 	ErrOffsetMetadataTooLarge          KError = 12
+	ErrNetworkException                KError = 13
 	ErrOffsetsLoadInProgress           KError = 14
 	ErrConsumerCoordinatorNotAvailable KError = 15
 	ErrNotCoordinatorForConsumer       KError = 16
@@ -103,11 +104,24 @@ const (
 	ErrTopicAuthorizationFailed        KError = 29
 	ErrGroupAuthorizationFailed        KError = 30
 	ErrClusterAuthorizationFailed      KError = 31
+	ErrInvalidTimestamp                KError = 32
+	ErrUnsupportedSASLMechanism        KError = 33
+	ErrIllegalSASLState                KError = 34
+	ErrUnsupportedVersion              KError = 35
+	ErrTopicAlreadyExists              KError = 36
+	ErrInvalidPartitions               KError = 37
+	ErrInvalidReplicationFactor        KError = 38
+	ErrInvalidReplicaAssignment        KError = 39
+	ErrInvalidConfig                   KError = 40
+	ErrNotController                   KError = 41
+	ErrInvalidRequest                  KError = 42
+	ErrUnsupportedForMessageFormat     KError = 43
+	ErrPolicyViolation                 KError = 44
 )
 
 func (err KError) Error() string {
 	// Error messages stolen/adapted from
-	// https://cwiki.apache.org/confluence/display/KAFKA/A+Guide+To+The+Kafka+Protocol
+	// https://kafka.apache.org/protocol#protocol_error_codes
 	switch err {
 	case ErrNoError:
 		return "kafka server: Not an error, why are you printing me?"
@@ -130,13 +144,15 @@ func (err KError) Error() string {
 	case ErrBrokerNotAvailable:
 		return "kafka server: Broker not available. Not a client facing error, we should never receive this!!!"
 	case ErrReplicaNotAvailable:
-		return "kafka server: Replica infomation not available, one or more brokers are down."
+		return "kafka server: Replica information not available, one or more brokers are down."
 	case ErrMessageSizeTooLarge:
 		return "kafka server: Message was too large, server rejected it to avoid allocation error."
 	case ErrStaleControllerEpochCode:
 		return "kafka server: StaleControllerEpochCode (internal error code for broker-to-broker communication)."
 	case ErrOffsetMetadataTooLarge:
 		return "kafka server: Specified a string larger than the configured maximum for offset metadata."
+	case ErrNetworkException:
+		return "kafka server: The server disconnected before a response was received."
 	case ErrOffsetsLoadInProgress:
 		return "kafka server: The broker is still loading offsets after a leader change for that offset's topic partition."
 	case ErrConsumerCoordinatorNotAvailable:
@@ -173,6 +189,32 @@ func (err KError) Error() string {
 		return "kafka server: The client is not authorized to access this group."
 	case ErrClusterAuthorizationFailed:
 		return "kafka server: The client is not authorized to send this request type."
+	case ErrInvalidTimestamp:
+		return "kafka server: The timestamp of the message is out of acceptable range."
+	case ErrUnsupportedSASLMechanism:
+		return "kafka server: The broker does not support the requested SASL mechanism."
+	case ErrIllegalSASLState:
+		return "kafka server: Request is not valid given the current SASL state."
+	case ErrUnsupportedVersion:
+		return "kafka server: The version of API is not supported."
+	case ErrTopicAlreadyExists:
+		return "kafka server: Topic with this name already exists."
+	case ErrInvalidPartitions:
+		return "kafka server: Number of partitions is invalid."
+	case ErrInvalidReplicationFactor:
+		return "kafka server: Replication-factor is invalid."
+	case ErrInvalidReplicaAssignment:
+		return "kafka server: Replica assignment is invalid."
+	case ErrInvalidConfig:
+		return "kafka server: Configuration is invalid."
+	case ErrNotController:
+		return "kafka server: This is not the correct controller for this cluster."
+	case ErrInvalidRequest:
+		return "kafka server: This most likely occurs because of a request being malformed by the client library or the message was sent to an incompatible broker. See the broker logs for more details."
+	case ErrUnsupportedForMessageFormat:
+		return "kafka server: The requested operation is not supported by the message format version."
+	case ErrPolicyViolation:
+		return "kafka server: Request parameters do not satisfy the configured policy."
 	}
 
 	return fmt.Sprintf("Unknown error, how did this happen? Error code = %d", err)

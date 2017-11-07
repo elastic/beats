@@ -1,0 +1,37 @@
+- key: cloud
+  title: Cloud provider metadata
+  description: >
+    Metadata from cloud providers added by the add_cloud_metadata processor.
+  fields:
+
+    - name: meta.cloud.provider
+      example: ec2
+      description: >
+        Name of the cloud provider. Possible values are ec2, gce, or digitalocean.
+
+    - name: meta.cloud.instance_id
+      description: >
+        Instance ID of the host machine.
+
+    - name: meta.cloud.instance_name
+      description: >
+        Instance name of the host machine.
+
+    - name: meta.cloud.machine_type
+      example: t2.medium
+      description: >
+        Machine type of the host machine.
+
+    - name: meta.cloud.availability_zone
+      example: us-east-1c
+      description: >
+        Availability zone in which this host is running.
+
+    - name: meta.cloud.project_id
+      example: project-x
+      description: >
+        Name of the project in Google Cloud.
+
+    - name: meta.cloud.region
+      description: >
+        Region in which this host is running.

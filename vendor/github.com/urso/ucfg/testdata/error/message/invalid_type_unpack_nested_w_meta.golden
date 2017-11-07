@@ -1,1 +1,0 @@
-(assert) string key required when unpacking into 'map[int]interface {}' accessing 'nested' (source:'test.source')

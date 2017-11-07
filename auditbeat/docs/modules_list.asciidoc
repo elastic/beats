@@ -1,0 +1,10 @@
+////
+This file is generated! See scripts/docs_collector.py
+////
+
+  * <<{beatname_lc}-module-audit,Audit>>
+
+
+--
+
+include::modules/audit.asciidoc[]

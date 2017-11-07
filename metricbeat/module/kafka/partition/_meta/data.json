@@ -1,0 +1,35 @@
+{
+    "@timestamp": "2016-05-23T08:05:34.853Z",
+    "beat": {
+        "hostname": "host.example.com",
+        "name": "host.example.com"
+    },
+    "kafka": {
+        "partition": {
+            "broker": {
+                "address": "kafka:9092",
+                "id": 0
+            },
+            "offset": {
+                "newest": 11,
+                "oldest": 0
+            },
+            "partition": {
+                "id": 0,
+                "insync_replica": true,
+                "leader": 0,
+                "replica": 0
+            },
+            "topic": {
+                "name": "test-metricbeat-70692474374989458"
+            }
+        }
+    },
+    "metricset": {
+        "host": "kafka:9092",
+        "module": "kafka",
+        "name": "partition",
+        "rtt": 115
+    },
+    "type": "metricsets"
+}

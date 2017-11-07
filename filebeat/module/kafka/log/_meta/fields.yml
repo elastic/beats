@@ -1,0 +1,41 @@
+- name: log
+  type: group
+  description: >
+    Kafka log lines.
+  fields:
+    - name: timestamp
+      description: >
+        The timestamp from the log line.
+    - name: level
+      example: "WARN"
+      description: >
+        The log level.
+    - name: message
+      type: text
+      description: >
+        The logged message.
+    - name: component
+      type: keyword
+      description: >
+        Component the log is coming from.
+    - name: class
+      type: text
+      description: >
+        Java class the log is coming from.
+    - name: trace
+      type: group
+      description: >
+          Trace in the log line.
+      fields:
+        - name: class
+          type: keyword
+          description: >
+            Java class the trace is coming from.
+        - name: message
+          type: text
+          description: >
+              Message part of the trace.
+        - name: full
+          type: text
+          description: >
+              The full trace in the log line.

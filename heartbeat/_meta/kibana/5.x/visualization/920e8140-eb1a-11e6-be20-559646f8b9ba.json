@@ -1,0 +1,11 @@
+{
+  "visState": "{\n  \"title\": \"HTTP monitors status\",\n  \"type\": \"pie\",\n  \"params\": {\n    \"addTooltip\": true,\n    \"addLegend\": true,\n    \"legendPosition\": \"bottom\",\n    \"isDonut\": false\n  },\n  \"aggs\": [\n    {\n      \"id\": \"1\",\n      \"enabled\": true,\n      \"type\": \"cardinality\",\n      \"schema\": \"metric\",\n      \"params\": {\n        \"field\": \"monitor.id\"\n      }\n    },\n    {\n      \"id\": \"3\",\n      \"enabled\": true,\n      \"type\": \"filters\",\n      \"schema\": \"segment\",\n      \"params\": {\n        \"filters\": [\n          {\n            \"input\": {\n              \"query\": {\n                \"query_string\": {\n                  \"query\": \"monitor.status: up\",\n                  \"analyze_wildcard\": true\n                }\n              }\n            },\n            \"label\": \"\"\n          },\n          {\n            \"input\": {\n              \"query\": {\n                \"query_string\": {\n                  \"query\": \"monitor.status: down\",\n                  \"analyze_wildcard\": true\n                }\n              }\n            }\n          }\n        ]\n      }\n    },\n    {\n      \"id\": \"2\",\n      \"enabled\": true,\n      \"type\": \"terms\",\n      \"schema\": \"segment\",\n      \"params\": {\n        \"field\": \"http.response.status\",\n        \"size\": 5,\n        \"order\": \"desc\",\n        \"orderBy\": \"1\"\n      }\n    }\n  ],\n  \"listeners\": {}\n}", 
+  "description": "", 
+  "title": "HTTP monitors status", 
+  "uiStateJSON": "{\n  \"vis\": {\n    \"colors\": {\n      \"200\": \"#B7DBAB\",\n      \"monitor.status: up\": \"#629E51\",\n      \"monitor.status: down\": \"#E24D42\"\n    },\n    \"legendOpen\": true\n  }\n}", 
+  "version": 1, 
+  "savedSearchId": "02014c80-29d2-11e7-a68f-bfaa2341cc52", 
+  "kibanaSavedObjectMeta": {
+    "searchSourceJSON": "{\n  \"filter\": []\n}"
+  }
+}

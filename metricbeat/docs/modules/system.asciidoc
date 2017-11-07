@@ -3,95 +3,64 @@ This file is generated! See scripts/docs_collector.py
 ////
 
 [[metricbeat-module-system]]
-== System Module
+== System module
 
-The system modules allows to monitor your servers. As the system modules always applies to the local
-server the `hosts` config option is not needed.
-
-[float]
-== Additional Config options
-
-The system module offers two additional config options.
-
+The System module allows you to monitor your servers. Because the System module
+always applies to the local server, the `hosts` config option is not needed.
 
 [float]
-=== processes
+=== Dashboard
 
-The config option `processes: ['.*']` can be used if the `process` MetricSet is enabled. It allows to define a list
-of regexp expressions to filter the processes which are reported. By default all processes are reported.
-For more complex filtering, the filters configuration option should be used. An example config can look as following:
+The System module comes with a predefined dashboard. For example:
+
+image::./images/metricbeat_system_dashboard.png[]
+
+
+[float]
+=== Example configuration
+
+The System module supports the standard configuration options that are described
+in <<configuration-metricbeat>>. Here is an example configuration:
 
 [source,yaml]
 ----
 metricbeat.modules:
 - module: system
-  metricsets: ["process"]
-  processes: ['.*']
-----
-
-
-[float]
-=== cpu_ticks
-
-For config option `cpu_ticks: false` can be used if the `cpu` or `core` MetricSet is enabled. If the config option
-`cpu_ticks` is enabled, not only cpu precentages stats will be reported but also the cpu ticks. An example config can
-be found below:
-
-[source,yaml]
-----
-metricbeat.modules:
-- module: system
-  metricsets: ["cpu", "core"]
-  cpu_ticks: true
-----
-
-
-[float]
-=== Example Configuration
-
-The System Status module supports the standard configuration options which can be found
-here <<configuration-metricbeat,here>>. Below is an example of a configuration option:
-
-[source,yaml]
-----
-metricbeat.modules:
-- module: system
-  metricsets:
-    # CPU stats
-    - cpu
-
-    # Per CPU core stats
-    #- core
-
-    # IO stats
-    #- diskio
-
-    # Per filesystem stats
-    - filesystem
-
-    # File system summary stats
-    #- fsstat
-
-    # Memory stats
-    - memory
-
-    # Network stats
-    - network
-
-    # Per process stats
-    - process
-  enabled: true
   period: 10s
+  metricsets:
+    - cpu
+    - load
+    - memory
+    - network
+    - process
+    - process_summary
+    #- core
+    #- diskio
+    #- socket
   processes: ['.*']
+  process.include_top_n:
+    by_cpu: 5      # include top 5 processes by CPU
+    by_memory: 5   # include top 5 processes by memory
 
-  # if true, exports the CPU usage in ticks, together with the percentage values
-  cpu_ticks: false
+- module: system
+  period: 1m
+  metricsets:
+    - filesystem
+    - fsstat
+  processors:
+  - drop_event.when.regexp:
+      system.filesystem.mount_point: '^/(sys|cgroup|proc|dev|etc|host|lib)($|/)'
+
+- module: system
+  period: 15m
+  metricsets:
+    - uptime
 ----
 
 [float]
-=== MetricSets
+=== Metricsets
 
-The following MetricSets are available:
+The following metricsets are available:
 
 * <<metricbeat-metricset-system-core,core>>
 
@@ -103,11 +72,19 @@ The following MetricSets are available:
 
 * <<metricbeat-metricset-system-fsstat,fsstat>>
 
+* <<metricbeat-metricset-system-load,load>>
+
 * <<metricbeat-metricset-system-memory,memory>>
 
 * <<metricbeat-metricset-system-network,network>>
 
 * <<metricbeat-metricset-system-process,process>>
+
+* <<metricbeat-metricset-system-process_summary,process_summary>>
+
+* <<metricbeat-metricset-system-socket,socket>>
+
+* <<metricbeat-metricset-system-uptime,uptime>>
 
 include::system/core.asciidoc[]
 
@@ -119,9 +96,17 @@ include::system/filesystem.asciidoc[]
 
 include::system/fsstat.asciidoc[]
 
+include::system/load.asciidoc[]
+
 include::system/memory.asciidoc[]
 
 include::system/network.asciidoc[]
 
 include::system/process.asciidoc[]
+
+include::system/process_summary.asciidoc[]
+
+include::system/socket.asciidoc[]
+
+include::system/uptime.asciidoc[]
 

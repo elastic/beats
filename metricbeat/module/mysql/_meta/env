@@ -1,0 +1,3 @@
+MYSQL_DSN=root:test@tcp(mysql:3306)/
+MYSQL_HOST=mysql
+MYSQL_PORT=3306

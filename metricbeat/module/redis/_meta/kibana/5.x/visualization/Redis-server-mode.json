@@ -1,0 +1,11 @@
+{
+  "visState": "{\"title\":\"Redis server mode\",\"type\":\"pie\",\"params\":{\"shareYAxis\":true,\"addTooltip\":true,\"addLegend\":true,\"legendPosition\":\"right\",\"isDonut\":false},\"aggs\":[{\"id\":\"1\",\"enabled\":true,\"type\":\"cardinality\",\"schema\":\"metric\",\"params\":{\"field\":\"metricset.host\",\"customLabel\":\"Hosts\"}},{\"id\":\"2\",\"enabled\":true,\"type\":\"terms\",\"schema\":\"segment\",\"params\":{\"field\":\"redis.info.server.mode\",\"size\":5,\"order\":\"desc\",\"orderBy\":\"1\",\"customLabel\":\"Server mode\"}}],\"listeners\":{}}", 
+  "description": "", 
+  "title": "Redis server mode", 
+  "uiStateJSON": "{}", 
+  "version": 1, 
+  "savedSearchId": "Metricbeat-Redis", 
+  "kibanaSavedObjectMeta": {
+    "searchSourceJSON": "{\"filter\":[]}"
+  }
+}

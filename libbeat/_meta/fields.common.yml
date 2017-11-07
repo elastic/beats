@@ -1,0 +1,61 @@
+
+- key: beat
+  title: Beat
+  description: >
+    Contains common beat fields available in all event types.
+  fields:
+
+    - name: beat.name
+      description: >
+        The name of the Beat sending the log messages. If the Beat name is
+        set in the configuration file, then that value is used. If it is not
+        set, the hostname is used. To set the Beat name, use the `name`
+        option in the configuration file.
+    - name: beat.hostname
+      description: >
+        The hostname as returned by the operating system on which the Beat is
+        running.
+    - name: beat.timezone
+      description: >
+        The timezone as returned by the operating system on which the Beat is
+        running.
+    - name: beat.version
+      description: >
+        The version of the beat that generated this event.
+
+    - name: "@timestamp"
+      type: date
+      required: true
+      format: date
+      example: August 26th 2016, 12:35:53.332
+      description: >
+        The timestamp when the event log record was generated.
+
+    - name: tags
+      description: >
+        Arbitrary tags that can be set per Beat and per transaction
+        type.
+
+    - name: fields
+      type: object
+      object_type: keyword
+      description: >
+        Contains user configurable fields.
+
+    - name: error
+      type: group
+      description: >
+        Error fields containing additional info in case of errors.
+      fields:
+        - name: message
+          type: text
+          description: >
+            Error message.
+        - name: code
+          type: long
+          description: >
+            Error code.
+        - name: type
+          type: keyword
+          description: >
+            Error type.

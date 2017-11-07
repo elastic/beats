@@ -42,15 +42,15 @@ var argMultiKeys = argDef{
 		msg := parser.message
 		rest := buf.Bytes()
 		buf.Advance(len(rest))
-		raw_keys := bytes.FieldsFunc(rest, func(b rune) bool {
+		rawKeys := bytes.FieldsFunc(rest, func(b rune) bool {
 			return b == ' '
 		})
-		if len(raw_keys) == 0 {
-			return ErrExpectedKeys
+		if len(rawKeys) == 0 {
+			return errExpectedKeys
 		}
-		msg.keys = make([]memcacheString, len(raw_keys))
-		for i, raw_key := range raw_keys {
-			msg.keys[i] = memcacheString{raw_key}
+		msg.keys = make([]memcacheString, len(rawKeys))
+		for i, rawKey := range rawKeys {
+			msg.keys[i] = memcacheString{rawKey}
 		}
 		return nil
 	},
@@ -124,111 +124,111 @@ var argErrorMessage = argDef{
 
 var requestCommands = []textCommandType{
 	// retrieval request types
-	loadCommand("get", MemcacheCmdGet),
-	loadCommand("gets", MemcacheCmdGets),
+	loadCommand("get", memcacheCmdGet),
+	loadCommand("gets", memcacheCmdGets),
 
 	// store request types
-	storeCommand("set", MemcacheCmdSet),
-	storeCommand("add", MemcacheCmdAdd),
-	storeCommand("replace", MemcacheCmdReplace),
-	storeCommand("append", MemcacheCmdAppend),
-	storeCommand("prepend", MemcacheCmdPrepend),
-	casStoreCommand("cas", MemcacheCmdCas),
+	storeCommand("set", memcacheCmdSet),
+	storeCommand("add", memcacheCmdAdd),
+	storeCommand("replace", memcacheCmdReplace),
+	storeCommand("append", memcacheCmdAppend),
+	storeCommand("prepend", memcacheCmdPrepend),
+	casStoreCommand("cas", memcacheCmdCas),
 
 	// counter commands
-	counterCommand("incr", MemcacheCmdIncr),
-	counterCommand("decr", MemcacheCmdDecr),
+	counterCommand("incr", memcacheCmdIncr),
+	counterCommand("decr", memcacheCmdDecr),
 
 	// touch
-	defTextMessage("touch", MemcacheStoreMsg, MemcacheCmdTouch,
+	defTextMessage("touch", memcacheStoreMsg, memcacheCmdTouch,
 		argKey, argExpTime, argOptional(argNoReply)),
 
 	// delete command
-	deleteCommand("delete", MemcacheCmdDelete, argKey, argOptional(argNoReply)),
-	deleteCommand("flush_all", MemcacheCmdFlushAll, argOptional(argExpTime)),
+	deleteCommand("delete", memcacheCmdDelete, argKey, argOptional(argNoReply)),
+	deleteCommand("flush_all", memcacheCmdFlushAll, argOptional(argExpTime)),
 
 	// slabs command
-	defSubCommand("slabs", MemcacheSlabCtrlMsg, MemcacheCmdUNKNOWN, slabsCommands),
+	defSubCommand("slabs", memcacheSlabCtrlMsg, memcacheCmdUNKNOWN, slabsCommands),
 
 	// lru_crawler command
-	defSubCommand("lru_crawler", MemcacheLruCrawlerMsg, MemcacheCmdUNKNOWN,
+	defSubCommand("lru_crawler", memcacheLruCrawlerMsg, memcacheCmdUNKNOWN,
 		lruCrawlerCommands),
 
 	// stats command (pretty diverse, just store raw argument list in string)
-	defTextMessage("stats", MemcacheStatsMsg, MemcacheCmdStats, argsRaw),
+	defTextMessage("stats", memcacheStatsMsg, memcacheCmdStats, argsRaw),
 
 	// others
-	infoCommand("verbosity", MemcacheCmdVerbosity, argVerbosity),
-	infoCommand("version", MemcacheCmdVersion),
-	infoCommand("quit", MemcacheCmdQuit, argOptional(argNoReply)),
+	infoCommand("verbosity", memcacheCmdVerbosity, argVerbosity),
+	infoCommand("version", memcacheCmdVersion),
+	infoCommand("quit", memcacheCmdQuit, argOptional(argNoReply)),
 }
 
 var slabsCommands = []textCommandType{
-	defTextMessage("reassign", MemcacheSlabCtrlMsg, MemcacheCmdSlabsReassign,
+	defTextMessage("reassign", memcacheSlabCtrlMsg, memcacheCmdSlabsReassign,
 		argSourceClass, argDestClass),
-	defTextMessage("automove", MemcacheSlabCtrlMsg, MemcacheCmdSlabsAutomove,
+	defTextMessage("automove", memcacheSlabCtrlMsg, memcacheCmdSlabsAutomove,
 		argAutomove),
 }
 
 var lruCrawlerCommands = []textCommandType{
-	defTextMessage("enable", MemcacheLruCrawlerMsg, MemcacheCmdLruEnable),
-	defTextMessage("disable", MemcacheLruCrawlerMsg, MemcacheCmdLruDisable),
-	defTextMessage("sleep", MemcacheLruCrawlerMsg, MemcacheCmdLruSleep, argSleepUs),
-	defTextMessage("tocrawl", MemcacheLruCrawlerMsg, MemcacheCmdLruToCrawl, argValue),
-	defTextMessage("crawl", MemcacheLruCrawlerMsg, MemcacheCmdLruToCrawl, argsRaw),
+	defTextMessage("enable", memcacheLruCrawlerMsg, memcacheCmdLruEnable),
+	defTextMessage("disable", memcacheLruCrawlerMsg, memcacheCmdLruDisable),
+	defTextMessage("sleep", memcacheLruCrawlerMsg, memcacheCmdLruSleep, argSleepUs),
+	defTextMessage("tocrawl", memcacheLruCrawlerMsg, memcacheCmdLruToCrawl, argValue),
+	defTextMessage("crawl", memcacheLruCrawlerMsg, memcacheCmdLruToCrawl, argsRaw),
 }
 
 var responseCommands = []textCommandType{
 	// retrieval response types
-	defTextDataResponse("VALUE", MemcacheLoadMsg, MemcacheResValue,
+	defTextDataResponse("VALUE", memcacheLoadMsg, memcacheResValue,
 		argKey, argFlags, argBytes, argOptional(argCasUnique)),
 
-	defTextMessage("END", MemcacheLoadMsg, MemcacheResEnd),
+	defTextMessage("END", memcacheLoadMsg, memcacheResEnd),
 
 	// store response types
-	successResp("STORED", MemcacheResStored),
-	failResp("NOT_STORED", MemcacheResNotStored),
-	successResp("EXISTS", MemcacheResExists),
-	failResp("NOT_FOUND", MemcacheResNotFound),
+	successResp("STORED", memcacheResStored),
+	failResp("NOT_STORED", memcacheResNotStored),
+	successResp("EXISTS", memcacheResExists),
+	failResp("NOT_FOUND", memcacheResNotFound),
 
 	// touch response types
-	successResp("TOUCHED", MemcacheResTouched),
+	successResp("TOUCHED", memcacheResTouched),
 
 	// delete response types
-	successResp("DELETED", MemcacheResDeleted),
+	successResp("DELETED", memcacheResDeleted),
 
-	successResp("OK", MemcacheResOK),
+	successResp("OK", memcacheResOK),
 
 	// response error types
-	failResp("ERROR", MemcacheErrError),
-	failMsgResp("CLIENT_ERROR", MemcacheErrClientError),
-	failMsgResp("SERVER_ERROR", MemcacheErrServerError),
-	failMsgResp("BUSY", MemcacheErrBusy),
-	failMsgResp("BADCLASS", MemcacheErrBadClass),
-	failMsgResp("NOSPARE", MemcacheErrNoSpare),
-	failMsgResp("NOTFULL", MemcacheErrNotFull),
-	failMsgResp("UNSAFE", MemcacheErrUnsafe),
-	failMsgResp("SAME", MemcacheErrSame),
+	failResp("ERROR", memcacheErrError),
+	failMsgResp("CLIENT_ERROR", memcacheErrClientError),
+	failMsgResp("SERVER_ERROR", memcacheErrServerError),
+	failMsgResp("BUSY", memcacheErrBusy),
+	failMsgResp("BADCLASS", memcacheErrBadClass),
+	failMsgResp("NOSPARE", memcacheErrNoSpare),
+	failMsgResp("NOTFULL", memcacheErrNotFull),
+	failMsgResp("UNSAFE", memcacheErrUnsafe),
+	failMsgResp("SAME", memcacheErrSame),
 
 	// stats
-	defTextMessage("STAT", MemcacheStatsMsg, MemcacheResStat, argStat),
+	defTextMessage("STAT", memcacheStatsMsg, memcacheResStat, argStat),
 
 	// The version response type. Version string is storedin raw_args.
-	defTextMessage("VERSION", MemcacheInfoMsg, MemcacheResVersion),
+	defTextMessage("VERSION", memcacheInfoMsg, memcacheResVersion),
 }
 
 // non-standard message types
 var counterResponse = makeTextCommand(
 	"",
-	MemcacheCounterMsg,
-	MemcacheResCounterOp,
+	memcacheCounterMsg,
+	memcacheResCounterOp,
 	parseCounterResponse,
 	serializeCounterResponse)
 
 var unknownCommand = makeTextCommand(
 	"UNKNOWN",
-	MemcacheUnknownType,
-	MemcacheCmdUNKNOWN,
+	memcacheUnknownType,
+	memcacheCmdUNKNOWN,
 	parseUnknown,
 	serializeUnknown)
 
@@ -262,10 +262,10 @@ func defTextMessage(
 }
 
 func makeDefTextDataMessage(
-	is_request bool,
+	isRequest bool,
 ) func(string, commandTypeCode, commandCode, ...argDef) textCommandType {
 	serialize := serializeDataResponse
-	if is_request {
+	if isRequest {
 		serialize = serializeDataRequest
 	}
 	return func(
@@ -284,30 +284,30 @@ var defTextDataRequest = makeDefTextDataMessage(true)
 var defTextDataResponse = makeDefTextDataMessage(false)
 
 func loadCommand(name string, code commandCode) textCommandType {
-	return defTextMessage(name, MemcacheLoadMsg, code, argMultiKeys)
+	return defTextMessage(name, memcacheLoadMsg, code, argMultiKeys)
 }
 
 func storeCommand(name string, code commandCode) textCommandType {
-	return defTextDataRequest(name, MemcacheStoreMsg, code,
+	return defTextDataRequest(name, memcacheStoreMsg, code,
 		argKey, argFlags, argExpTime, argBytes, argOptional(argNoReply),
 	)
 }
 
 func deleteCommand(name string, code commandCode, args ...argDef) textCommandType {
-	return defTextMessage(name, MemcacheDeleteMsg, code, args...)
+	return defTextMessage(name, memcacheDeleteMsg, code, args...)
 }
 
 func casStoreCommand(name string, code commandCode) textCommandType {
-	return defTextDataRequest(name, MemcacheStoreMsg, code,
+	return defTextDataRequest(name, memcacheStoreMsg, code,
 		argKey, argFlags, argExpTime, argBytes, argCasUnique, argOptional(argNoReply))
 }
 
 func infoCommand(name string, code commandCode, args ...argDef) textCommandType {
-	return defTextMessage(name, MemcacheInfoMsg, code, args...)
+	return defTextMessage(name, memcacheInfoMsg, code, args...)
 }
 
 func counterCommand(name string, code commandCode) textCommandType {
-	return defTextMessage(name, MemcacheCounterMsg, code,
+	return defTextMessage(name, memcacheCounterMsg, code,
 		argKey, argDelta, argOptional(argNoReply))
 }
 
@@ -322,11 +322,11 @@ func defSubCommand(
 }
 
 func successResp(name string, code commandCode) textCommandType {
-	return defTextMessage(name, MemcacheSuccessResp, code)
+	return defTextMessage(name, memcacheSuccessResp, code)
 }
 
 func failResp(name string, code commandCode, args ...argDef) textCommandType {
-	return defTextMessage(name, MemcacheFailResp, code, args...)
+	return defTextMessage(name, memcacheFailResp, code, args...)
 }
 
 func failMsgResp(name string, code commandCode) textCommandType {
@@ -369,7 +369,7 @@ func makeSubMessageParser(commands []textCommandType) parserStateFn {
 			if parser.config.parseUnkown {
 				cmd = &unknownCommand
 			} else {
-				return parser.failing(ErrParserUnknownCommand)
+				return parser.failing(errParserUnknownCommand)
 			}
 		}
 
@@ -456,7 +456,7 @@ func doParseTextCommand(parser *parser, buf *streambuf.Buffer) parseResult {
 		if parser.config.parseUnkown {
 			cmd = &unknownCommand
 		} else {
-			return parser.failing(ErrParserUnknownCommand)
+			return parser.failing(errParserUnknownCommand)
 		}
 	}
 
@@ -478,7 +478,7 @@ func parseUnknown(parser *parser, buf *streambuf.Buffer) parseResult {
 func parseCounterResponse(parser *parser, buf *streambuf.Buffer) parseResult {
 	msg := parser.message
 	tmp := streambuf.NewFixed(msg.rawCommand)
-	msg.value, _ = tmp.AsciiUint(false)
+	msg.value, _ = tmp.UintASCII(false)
 	if tmp.Failed() {
 		err := tmp.Err()
 		debug("counter response invalid: %v", err)
@@ -504,7 +504,7 @@ func parseData(parser *parser, buf *streambuf.Buffer) parseResult {
 
 	debug("found message data")
 	if msg.bytesLost > 0 {
-		msg.count_values++
+		msg.countValues++
 	} else {
 		parser.appendMessageData(data)
 	}
@@ -526,8 +526,7 @@ func parseStatLine(parser *parser, hdr, buf *streambuf.Buffer) error {
 	return nil
 }
 
-func parseTextArgs(parser *parser, args []argDef) error {
-	var err error = nil
+func parseTextArgs(parser *parser, args []argDef) (err error) {
 	buf := streambuf.NewFixed(parser.message.rawArgs)
 	for _, arg := range args {
 		debug("args rest: %s", buf.Bytes())
@@ -536,21 +535,21 @@ func parseTextArgs(parser *parser, args []argDef) error {
 			break
 		}
 	}
-	return err
+	return
 }
 
 func splitCommandAndArgs(line []byte) ([]byte, []byte, error) {
-	command_line := streambuf.NewFixed(line)
-	command, err := parseStringArg(command_line)
+	commandLine := streambuf.NewFixed(line)
+	command, err := parseStringArg(commandLine)
 	if err != nil {
 		return nil, nil, err
 	}
 	var args []byte
-	if command_line.Len() > 0 {
-		command_line.Advance(1)
-		args = command_line.Bytes()
+	if commandLine.Len() > 0 {
+		commandLine.Advance(1)
+		args = commandLine.Bytes()
 	}
-	return command, args, command_line.Err()
+	return command, args, commandLine.Err()
 }
 
 func parseStringArg(buf *streambuf.Buffer) ([]byte, error) {
@@ -579,7 +578,7 @@ func parseNoReplyArg(buf *streambuf.Buffer) (bool, error) {
 	var noreplyArg = []byte("noreply")
 	noreply := bytes.HasPrefix(buf.Bytes(), noreplyArg)
 	if !noreply {
-		return false, ErrExpectedNoReply
+		return false, errExpectedNoReply
 	}
 	return true, nil
 }
@@ -588,17 +587,17 @@ func parseNextArg(buf *streambuf.Buffer) error {
 	err := buf.IgnoreSymbol(' ')
 	if err == streambuf.ErrUnexpectedEOB || err == streambuf.ErrNoMoreBytes {
 		buf.SetError(nil)
-		return ErrNoMoreArgument
+		return errNoMoreArgument
 	}
 	if buf.Len() == 0 {
-		return ErrNoMoreArgument
+		return errNoMoreArgument
 	}
 	return nil
 }
 
 func textArgError(err error) error {
 	if err == streambuf.ErrUnexpectedEOB {
-		return ErrNoMoreArgument
+		return errNoMoreArgument
 	}
 	return err
 }
@@ -610,7 +609,7 @@ func withUintArg(
 ) error {
 	msg := parser.message
 	parseNextArg(buf)
-	value, err := buf.AsciiUint(false)
+	value, err := buf.UintASCII(false)
 	if err == nil {
 		fn(msg, uint32(value))
 	}
@@ -623,7 +622,7 @@ func withUint64Arg(
 	fn func(msg *message, v uint64),
 ) error {
 	parseNextArg(buf)
-	value, err := buf.AsciiUint(false)
+	value, err := buf.UintASCII(false)
 	if err == nil {
 		fn(parser.message, value)
 	}
@@ -648,7 +647,7 @@ func withInt64Arg(
 	fn func(msg *message, v int64),
 ) error {
 	parseNextArg(buf)
-	value, err := buf.AsciiInt(false)
+	value, err := buf.IntASCII(false)
 	if err == nil {
 		fn(parser.message, value)
 	}
@@ -684,12 +683,12 @@ func serializeDataRequest(
 	args ...argDef,
 ) eventFn {
 	command := code.String()
-	event_type := typ.String()
+	eventType := typ.String()
 	return func(msg *message, event common.MapStr) error {
 		event["command"] = command
-		event["type"] = event_type
-		event["count_values"] = msg.count_values
-		if msg.count_values != 0 && msg.data.IsSet() {
+		event["type"] = eventType
+		event["count_values"] = msg.countValues
+		if msg.countValues != 0 && msg.data.IsSet() {
 			event["values"] = msg.data
 		}
 		return serializeArgs(msg, event, args)
@@ -702,12 +701,12 @@ func serializeDataResponse(
 	args ...argDef,
 ) eventFn {
 	response := code.String()
-	event_type := typ.String()
+	eventType := typ.String()
 	return func(msg *message, event common.MapStr) error {
 		event["command"] = response
-		event["type"] = event_type
-		event["count_values"] = msg.count_values
-		if msg.count_values != 0 && len(msg.values) > 0 {
+		event["type"] = eventType
+		event["count_values"] = msg.countValues
+		if msg.countValues != 0 && len(msg.values) > 0 {
 			event["values"] = msg.values
 		}
 		return serializeArgs(msg, event, args)
@@ -716,14 +715,14 @@ func serializeDataResponse(
 
 func serializeUnknown(msg *message, event common.MapStr) error {
 	event["line"] = msg.commandLine
-	event["command"] = MemcacheCmdUNKNOWN.String()
-	event["type"] = MemcacheUnknownType.String()
+	event["command"] = memcacheCmdUNKNOWN.String()
+	event["type"] = memcacheUnknownType.String()
 	return nil
 }
 
 func serializeCounterResponse(msg *message, event common.MapStr) error {
-	event["command"] = MemcacheResCounterOp.String()
-	event["type"] = MemcacheCounterMsg.String()
+	event["command"] = memcacheResCounterOp.String()
+	event["type"] = memcacheCounterMsg.String()
 	event["value"] = msg.value
 	return nil
 }

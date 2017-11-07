@@ -1,0 +1,30 @@
+################### Heartbeat Configuration Example #########################
+
+# This file is an example configuration file highlighting only some common options.
+# The heartbeat.reference.yml file in the same directory contains all the supported options
+# with detailed comments. You can use it for reference.
+#
+# You can find the full configuration reference here:
+# https://www.elastic.co/guide/en/beats/heartbeat/index.html
+
+############################# Heartbeat ######################################
+
+# Configure monitors
+heartbeat.monitors:
+- type: http
+
+  # List or urls to query
+  urls: ["http://localhost:9200"]
+
+  # Configure task schedule
+  schedule: '@every 10s'
+
+  # Total test connection and data exchange timeout
+  #timeout: 16s
+
+#==================== Elasticsearch template setting ==========================
+
+setup.template.settings:
+  index.number_of_shards: 1
+  index.codec: best_compression
+  #_source.enabled: false

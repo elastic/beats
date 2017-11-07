@@ -16,7 +16,7 @@ import (
 
 var debugf = logp.MakeDebug("decoder")
 
-type DecoderStruct struct {
+type Decoder struct {
 	decoders         map[gopacket.LayerType]gopacket.DecodingLayer
 	linkLayerDecoder gopacket.DecodingLayer
 	linkLayerType    gopacket.LayerType
@@ -54,16 +54,16 @@ const (
 	netBytesTotalCounter   = "net_bytes_total"
 )
 
-// Creates and returns a new DecoderStruct.
-func NewDecoder(
+// New creates and initializes a new packet decoder.
+func New(
 	f *flows.Flows,
 	datalink layers.LinkType,
 	icmp4 icmp.ICMPv4Processor,
 	icmp6 icmp.ICMPv6Processor,
 	tcp tcp.Processor,
 	udp udp.Processor,
-) (*DecoderStruct, error) {
-	d := DecoderStruct{
+) (*Decoder, error) {
+	d := Decoder{
 		flows:     f,
 		decoders:  make(map[gopacket.LayerType]gopacket.DecodingLayer),
 		icmp4Proc: icmp4, icmp6Proc: icmp6, tcpProc: tcp, udpProc: udp}
@@ -114,23 +114,23 @@ func NewDecoder(
 	return &d, nil
 }
 
-func (d *DecoderStruct) SetTruncated() {
+func (d *Decoder) SetTruncated() {
 	d.truncated = true
 }
 
-func (d *DecoderStruct) AddLayer(layer gopacket.DecodingLayer) {
+func (d *Decoder) AddLayer(layer gopacket.DecodingLayer) {
 	for _, typ := range layer.CanDecode().LayerTypes() {
 		d.decoders[typ] = layer
 	}
 }
 
-func (d *DecoderStruct) AddLayers(layers []gopacket.DecodingLayer) {
+func (d *Decoder) AddLayers(layers []gopacket.DecodingLayer) {
 	for _, layer := range layers {
 		d.AddLayer(layer)
 	}
 }
 
-func (d *DecoderStruct) OnPacket(data []byte, ci *gopacket.CaptureInfo) {
+func (d *Decoder) OnPacket(data []byte, ci *gopacket.CaptureInfo) {
 	defer logp.Recover("packet decoding failed")
 
 	d.truncated = false
@@ -146,7 +146,7 @@ func (d *DecoderStruct) OnPacket(data []byte, ci *gopacket.CaptureInfo) {
 	if d.flowID != nil {
 		d.flowID.Reset(d.flowIDBufferBacking[:0])
 
-		// supress flow stats snapshots while processing packet
+		// suppress flow stats snapshots while processing packet
 		d.flows.Lock()
 		defer d.flows.Unlock()
 	}
@@ -193,7 +193,7 @@ func (d *DecoderStruct) OnPacket(data []byte, ci *gopacket.CaptureInfo) {
 	}
 }
 
-func (d *DecoderStruct) process(
+func (d *Decoder) process(
 	packet *protos.Packet,
 	layerType gopacket.LayerType,
 ) (bool, error) {
@@ -221,9 +221,9 @@ func (d *DecoderStruct) process(
 			d.flowID.AddIPv4(ip4.SrcIP, ip4.DstIP)
 		}
 
-		packet.Tuple.Src_ip = ip4.SrcIP
-		packet.Tuple.Dst_ip = ip4.DstIP
-		packet.Tuple.Ip_length = 4
+		packet.Tuple.SrcIP = ip4.SrcIP
+		packet.Tuple.DstIP = ip4.DstIP
+		packet.Tuple.IPLength = 4
 
 	case layers.LayerTypeIPv6:
 		debugf("IPv6 packet")
@@ -234,9 +234,9 @@ func (d *DecoderStruct) process(
 			d.flowID.AddIPv6(ip6.SrcIP, ip6.DstIP)
 		}
 
-		packet.Tuple.Src_ip = ip6.SrcIP
-		packet.Tuple.Dst_ip = ip6.DstIP
-		packet.Tuple.Ip_length = 16
+		packet.Tuple.SrcIP = ip6.SrcIP
+		packet.Tuple.DstIP = ip6.DstIP
+		packet.Tuple.IPLength = 16
 
 	case layers.LayerTypeICMPv4:
 		debugf("ICMPv4 packet")
@@ -262,7 +262,7 @@ func (d *DecoderStruct) process(
 	return false, nil
 }
 
-func (d *DecoderStruct) onICMPv4(packet *protos.Packet) {
+func (d *Decoder) onICMPv4(packet *protos.Packet) {
 	if d.icmp4Proc != nil {
 		packet.Payload = d.icmp4.Payload
 		packet.Tuple.ComputeHashebles()
@@ -270,7 +270,7 @@ func (d *DecoderStruct) onICMPv4(packet *protos.Packet) {
 	}
 }
 
-func (d *DecoderStruct) onICMPv6(packet *protos.Packet) {
+func (d *Decoder) onICMPv6(packet *protos.Packet) {
 	if d.icmp6Proc != nil {
 		packet.Payload = d.icmp6.Payload
 		packet.Tuple.ComputeHashebles()
@@ -278,7 +278,7 @@ func (d *DecoderStruct) onICMPv6(packet *protos.Packet) {
 	}
 }
 
-func (d *DecoderStruct) onUDP(packet *protos.Packet) {
+func (d *Decoder) onUDP(packet *protos.Packet) {
 	src := uint16(d.udp.SrcPort)
 	dst := uint16(d.udp.DstPort)
 
@@ -287,15 +287,15 @@ func (d *DecoderStruct) onUDP(packet *protos.Packet) {
 		d.flowID.AddUDP(src, dst)
 	}
 
-	packet.Tuple.Src_port = src
-	packet.Tuple.Dst_port = dst
+	packet.Tuple.SrcPort = src
+	packet.Tuple.DstPort = dst
 	packet.Payload = d.udp.Payload
 	packet.Tuple.ComputeHashebles()
 
 	d.udpProc.Process(id, packet)
 }
 
-func (d *DecoderStruct) onTCP(packet *protos.Packet) {
+func (d *Decoder) onTCP(packet *protos.Packet) {
 	src := uint16(d.tcp.SrcPort)
 	dst := uint16(d.tcp.DstPort)
 
@@ -304,8 +304,8 @@ func (d *DecoderStruct) onTCP(packet *protos.Packet) {
 		id.AddTCP(src, dst)
 	}
 
-	packet.Tuple.Src_port = src
-	packet.Tuple.Dst_port = dst
+	packet.Tuple.SrcPort = src
+	packet.Tuple.DstPort = dst
 	packet.Payload = d.tcp.Payload
 
 	if id == nil && len(packet.Payload) == 0 && !d.tcp.FIN {

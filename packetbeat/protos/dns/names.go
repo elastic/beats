@@ -1,6 +1,7 @@
+package dns
+
 // This file contains the name mapping data used to convert various DNS IDs to
 // their string values.
-package dns
 
 import (
 	"encoding/hex"

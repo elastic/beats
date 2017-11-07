@@ -13,7 +13,7 @@ type ConsumerMetadataResponse struct {
 	CoordinatorPort int32  // deprecated: use Coordinator.Addr()
 }
 
-func (r *ConsumerMetadataResponse) decode(pd packetDecoder) (err error) {
+func (r *ConsumerMetadataResponse) decode(pd packetDecoder, version int16) (err error) {
 	tmp, err := pd.getInt16()
 	if err != nil {
 		return err
@@ -70,4 +70,16 @@ func (r *ConsumerMetadataResponse) encode(pe packetEncoder) error {
 	}
 	pe.putInt32(r.CoordinatorPort)
 	return nil
+}
+
+func (r *ConsumerMetadataResponse) key() int16 {
+	return 10
+}
+
+func (r *ConsumerMetadataResponse) version() int16 {
+	return 0
+}
+
+func (r *ConsumerMetadataResponse) requiredVersion() KafkaVersion {
+	return V0_8_2_0
 }

@@ -6,8 +6,9 @@ import (
 	"path/filepath"
 	"testing"
 
-	"github.com/elastic/beats/libbeat/cfgfile"
 	"github.com/stretchr/testify/assert"
+
+	"github.com/elastic/beats/libbeat/cfgfile"
 )
 
 func TestReadConfig2(t *testing.T) {
@@ -22,8 +23,6 @@ func TestReadConfig2(t *testing.T) {
 	// Reads second config file
 	err = cfgfile.Read(config, absPath+"/config2.yml")
 	assert.Nil(t, err)
-
-	assert.Equal(t, uint64(0), config.Filebeat.SpoolSize)
 }
 
 func TestGetConfigFiles_File(t *testing.T) {
@@ -94,5 +93,5 @@ func TestMergeConfigFiles(t *testing.T) {
 	config := &Config{}
 	mergeConfigFiles(files, config)
 
-	assert.Equal(t, 4, len(config.Filebeat.Prospectors))
+	assert.Equal(t, 4, len(config.Prospectors))
 }

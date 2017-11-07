@@ -2,10 +2,8 @@ package elasticsearch
 
 import (
 	"bytes"
-	"crypto/tls"
 	"encoding/json"
 	"errors"
-	"expvar"
 	"fmt"
 	"io"
 	"io/ioutil"
@@ -13,45 +11,68 @@ import (
 	"net/url"
 	"time"
 
-	humanize "github.com/dustin/go-humanize"
-
-	"github.com/elastic/beats/libbeat/common"
+	"github.com/elastic/beats/libbeat/beat"
 	"github.com/elastic/beats/libbeat/logp"
-	"github.com/elastic/beats/libbeat/outputs/mode"
+	"github.com/elastic/beats/libbeat/outputs"
+	"github.com/elastic/beats/libbeat/outputs/outil"
 	"github.com/elastic/beats/libbeat/outputs/transport"
+	"github.com/elastic/beats/libbeat/publisher"
+	"github.com/elastic/beats/libbeat/testing"
 )
 
+// Client is an elasticsearch client.
 type Client struct {
 	Connection
-	index  string
-	params map[string]string
+	tlsConfig *transport.TLSConfig
 
+	index    outil.Selector
+	pipeline *outil.Selector
+	params   map[string]string
+	timeout  time.Duration
+
+	// buffered bulk requests
+	bulkRequ *bulkRequest
+
+	// buffered json response reader
 	json jsonReader
+
+	// additional configs
+	compressionLevel int
+	proxyURL         *url.URL
+
+	stats *outputs.Stats
+}
+
+// ClientSettings contains the settings for a client.
+type ClientSettings struct {
+	URL                string
+	Proxy              *url.URL
+	TLS                *transport.TLSConfig
+	Username, Password string
+	Parameters         map[string]string
+	Headers            map[string]string
+	Index              outil.Selector
+	Pipeline           *outil.Selector
+	Timeout            time.Duration
+	CompressionLevel   int
+	Stats              *outputs.Stats
 }
 
 type connectCallback func(client *Client) error
 
+// Connection manages the connection for a given client.
 type Connection struct {
 	URL      string
 	Username string
 	Password string
+	Headers  map[string]string
 
 	http              *http.Client
-	connected         bool
 	onConnectCallback func() error
+
+	encoder bodyEncoder
+	version string
 }
-
-// Metrics that can retrieved through the expvar web interface.
-var (
-	ackedEvents            = expvar.NewInt("libbeatEsPublishedAndAckedEvents")
-	eventsNotAcked         = expvar.NewInt("libbeatEsPublishedButNotAckedEvents")
-	publishEventsCallCount = expvar.NewInt("libbeatEsPublishEventsCallCount")
-
-	statReadBytes   = expvar.NewInt("libbeatEsPublishReadBytes")
-	statWriteBytes  = expvar.NewInt("libbeatEsPublishWriteBytes")
-	statReadErrors  = expvar.NewInt("libbeatEsPublishReadErrors")
-	statWriteErrors = expvar.NewInt("libbeatEsPublishWriteErrors")
-)
 
 var (
 	nameItems  = []byte("items")
@@ -64,185 +85,327 @@ var (
 	errExpectedStatusCode    = errors.New("expected item status code")
 	errUnexpectedEmptyObject = errors.New("empty object")
 	errExcpectedObjectEnd    = errors.New("expected end of object")
+	errTempBulkFailure       = errors.New("temporary bulk send failure")
 )
 
+const (
+	eventType = "doc"
+)
+
+// NewClient instantiates a new client.
 func NewClient(
-	esURL, index string, proxyURL *url.URL, tls *tls.Config,
-	username, password string,
-	params map[string]string,
-	timeout time.Duration,
-	onConnectCallback connectCallback,
-) *Client {
+	s ClientSettings,
+	onConnect *callbacksRegistry,
+) (*Client, error) {
 	proxy := http.ProxyFromEnvironment
-	if proxyURL != nil {
-		proxy = http.ProxyURL(proxyURL)
+	if s.Proxy != nil {
+		proxy = http.ProxyURL(s.Proxy)
 	}
 
-	logp.Info("Elasticsearch url: %s", esURL)
+	pipeline := s.Pipeline
+	if pipeline != nil && pipeline.IsEmpty() {
+		pipeline = nil
+	}
 
-	dialer := transport.NetDialer(timeout)
-	dialer = transport.StatsDialer(dialer, &transport.IOStats{
-		Read:        statReadBytes,
-		Write:       statWriteBytes,
-		ReadErrors:  statReadErrors,
-		WriteErrors: statWriteErrors,
-	})
+	u, err := url.Parse(s.URL)
+	if err != nil {
+		return nil, fmt.Errorf("failed to parse elasticsearch URL: %v", err)
+	}
+	if u.User != nil {
+		s.Username = u.User.Username()
+		s.Password, _ = u.User.Password()
+		u.User = nil
+
+		// Re-write URL without credentials.
+		s.URL = u.String()
+	}
+
+	logp.Info("Elasticsearch url: %s", s.URL)
+
+	// TODO: add socks5 proxy support
+	var dialer, tlsDialer transport.Dialer
+
+	dialer = transport.NetDialer(s.Timeout)
+	tlsDialer, err = transport.TLSDialer(dialer, s.TLS, s.Timeout)
+	if err != nil {
+		return nil, err
+	}
+
+	if st := s.Stats; st != nil {
+		dialer = transport.StatsDialer(dialer, st)
+		tlsDialer = transport.StatsDialer(tlsDialer, st)
+	}
+
+	params := s.Parameters
+	bulkRequ, err := newBulkRequest(s.URL, "", "", params, nil)
+	if err != nil {
+		return nil, err
+	}
+
+	var encoder bodyEncoder
+	compression := s.CompressionLevel
+	if compression == 0 {
+		encoder = newJSONEncoder(nil)
+	} else {
+		encoder, err = newGzipEncoder(compression, nil)
+		if err != nil {
+			return nil, err
+		}
+	}
 
 	client := &Client{
 		Connection: Connection{
-			URL:      esURL,
-			Username: username,
-			Password: password,
+			URL:      s.URL,
+			Username: s.Username,
+			Password: s.Password,
+			Headers:  s.Headers,
 			http: &http.Client{
 				Transport: &http.Transport{
-					Dial:            dialer.Dial,
-					TLSClientConfig: tls,
-					Proxy:           proxy,
+					Dial:    dialer.Dial,
+					DialTLS: tlsDialer.Dial,
+					Proxy:   proxy,
 				},
-				Timeout: timeout,
+				Timeout: s.Timeout,
 			},
+			encoder: encoder,
 		},
-		index:  index,
-		params: params,
+		tlsConfig: s.TLS,
+		index:     s.Index,
+		pipeline:  pipeline,
+		params:    params,
+		timeout:   s.Timeout,
+
+		bulkRequ: bulkRequ,
+
+		compressionLevel: compression,
+		proxyURL:         s.Proxy,
 	}
 
 	client.Connection.onConnectCallback = func() error {
-		if onConnectCallback != nil {
-			return onConnectCallback(client)
+		if onConnect != nil {
+			onConnect.mutex.Lock()
+			defer onConnect.mutex.Unlock()
+
+			for _, callback := range onConnect.callbacks {
+				err := callback(client)
+				if err != nil {
+					return err
+				}
+			}
 		}
 		return nil
 	}
-	return client
+
+	return client, nil
 }
 
+// Clone clones a client.
 func (client *Client) Clone() *Client {
-	newClient := &Client{
-		Connection: Connection{
-			URL:      client.URL,
-			Username: client.Username,
-			Password: client.Password,
-			http: &http.Client{
-				Transport: client.http.Transport,
-			},
-			connected: false,
+	// when cloning the connection callback and params are not copied. A
+	// client's close is for example generated for topology-map support. With params
+	// most likely containing the ingest node pipeline and default callback trying to
+	// create install a template, we don't want these to be included in the clone.
+
+	c, _ := NewClient(
+		ClientSettings{
+			URL:              client.URL,
+			Index:            client.index,
+			Pipeline:         client.pipeline,
+			Proxy:            client.proxyURL,
+			TLS:              client.tlsConfig,
+			Username:         client.Username,
+			Password:         client.Password,
+			Parameters:       nil, // XXX: do not pass params?
+			Headers:          client.Headers,
+			Timeout:          client.http.Timeout,
+			CompressionLevel: client.compressionLevel,
 		},
-		index: client.index,
+		nil, // XXX: do not pass connection callback?
+	)
+	return c
+}
+
+func (client *Client) Publish(batch publisher.Batch) error {
+	events := batch.Events()
+	rest, err := client.publishEvents(events)
+	if len(rest) == 0 {
+		batch.ACK()
+	} else {
+		batch.RetryEvents(rest)
 	}
-	return newClient
+	return err
 }
 
 // PublishEvents sends all events to elasticsearch. On error a slice with all
 // events not published or confirmed to be processed by elasticsearch will be
 // returned. The input slice backing memory will be reused by return the value.
-func (client *Client) PublishEvents(
-	events []common.MapStr,
-) ([]common.MapStr, error) {
-
+func (client *Client) publishEvents(
+	data []publisher.Event,
+) ([]publisher.Event, error) {
 	begin := time.Now()
-	publishEventsCallCount.Add(1)
+	st := client.stats
 
-	if !client.connected {
-		return events, ErrNotConnected
+	if st != nil {
+		st.NewBatch(len(data))
 	}
 
-	// new request to store all events into
-	request, err := client.startBulkRequest("", "", client.params)
-	if err != nil {
-		logp.Err("Failed to perform any bulk index operations: %s", err)
-		return events, err
-	}
-
-	// encode events into bulk request buffer, dropping failed elements from
-	// events slice
-	events = bulkEncodePublishRequest(request, client.index, events)
-	if len(events) == 0 {
+	if len(data) == 0 {
 		return nil, nil
 	}
 
-	// send bulk request
-	bufferSize := request.buf.Len()
-	_, res, err := request.Flush()
-	if err != nil {
-		logp.Err("Failed to perform any bulk index operations: %s", err)
-		return events, err
+	body := client.encoder
+	body.Reset()
+
+	// encode events into bulk request buffer, dropping failed elements from
+	// events slice
+
+	origCount := len(data)
+	data = bulkEncodePublishRequest(body, client.index, client.pipeline, data)
+	newCount := len(data)
+	if st != nil && origCount > newCount {
+		st.Dropped(origCount - newCount)
+	}
+	if newCount == 0 {
+		return nil, nil
 	}
 
-	logp.Debug("elasticsearch", "PublishEvents: %d metrics have been packed into a buffer of %s and published to elasticsearch in %v.",
-		len(events),
-		humanize.Bytes(uint64(bufferSize)),
+	requ := client.bulkRequ
+	requ.Reset(body)
+	status, result, sendErr := client.sendBulkRequest(requ)
+	if sendErr != nil {
+		logp.Err("Failed to perform any bulk index operations: %s", sendErr)
+		return data, sendErr
+	}
+
+	debugf("PublishEvents: %d events have been  published to elasticsearch in %v.",
+		len(data),
 		time.Now().Sub(begin))
 
 	// check response for transient errors
-	client.json.init(res.raw)
-	failed_events := bulkCollectPublishFails(&client.json, events)
-	ackedEvents.Add(int64(len(events) - len(failed_events)))
-	eventsNotAcked.Add(int64(len(failed_events)))
-	if len(failed_events) > 0 {
-		return failed_events, mode.ErrTempBulkFailure
+	var failedEvents []publisher.Event
+	if status != 200 {
+		failedEvents = data
+	} else {
+		client.json.init(result.raw)
+		failedEvents = bulkCollectPublishFails(&client.json, data)
 	}
 
+	failed := len(failedEvents)
+	if st := client.stats; st != nil {
+		acked := len(data) - failed
+
+		st.Acked(acked)
+		st.Failed(failed)
+	}
+
+	if failed > 0 {
+		if sendErr == nil {
+			sendErr = errTempBulkFailure
+		}
+		return failedEvents, sendErr
+	}
 	return nil, nil
 }
 
 // fillBulkRequest encodes all bulk requests and returns slice of events
 // successfully added to bulk request.
 func bulkEncodePublishRequest(
-	requ *bulkRequest,
-	index string,
-	events []common.MapStr,
-) []common.MapStr {
-	okEvents := events[:0]
-	for _, event := range events {
-		meta := eventBulkMeta(index, event)
-		err := requ.Send(meta, event)
-		if err != nil {
+	body bulkWriter,
+	index outil.Selector,
+	pipeline *outil.Selector,
+	data []publisher.Event,
+) []publisher.Event {
+	okEvents := data[:0]
+	for i := range data {
+		event := &data[i].Content
+		meta := createEventBulkMeta(index, pipeline, event)
+		if err := body.Add(meta, event); err != nil {
 			logp.Err("Failed to encode event: %s", err)
 			continue
 		}
-
-		okEvents = append(okEvents, event)
+		okEvents = append(okEvents, data[i])
 	}
 	return okEvents
 }
 
-func eventBulkMeta(index string, event common.MapStr) bulkMeta {
+func createEventBulkMeta(
+	index outil.Selector,
+	pipelineSel *outil.Selector,
+	event *beat.Event,
+) interface{} {
+	pipeline, err := getPipeline(event, pipelineSel)
+	if err != nil {
+		logp.Err("Failed to select pipeline: %v", err)
+	}
 
-	index = getIndex(event, index)
-	meta := bulkMeta{
+	if pipeline == "" {
+		type bulkMetaIndex struct {
+			Index   string `json:"_index" struct:"_index"`
+			DocType string `json:"_type" struct:"_type"`
+		}
+		type bulkMeta struct {
+			Index bulkMetaIndex `json:"index"`
+		}
+
+		return bulkMeta{
+			Index: bulkMetaIndex{
+				Index:   getIndex(event, index),
+				DocType: eventType,
+			},
+		}
+	}
+
+	type bulkMetaIndex struct {
+		Index    string `json:"_index" struct:"_index"`
+		DocType  string `json:"_type" struct:"_type"`
+		Pipeline string `json:"pipeline" struct:"pipeline"`
+	}
+	type bulkMeta struct {
+		Index bulkMetaIndex `json:"index" struct:"index"`
+	}
+
+	return bulkMeta{
 		Index: bulkMetaIndex{
-			Index:   index,
-			DocType: event["type"].(string),
+			Index:    getIndex(event, index),
+			Pipeline: pipeline,
+			DocType:  eventType,
 		},
 	}
-	return meta
+}
+
+func getPipeline(event *beat.Event, pipelineSel *outil.Selector) (string, error) {
+	if event.Meta != nil {
+		if pipeline, exists := event.Meta["pipeline"]; exists {
+			if p, ok := pipeline.(string); ok {
+				return p, nil
+			}
+			return "", errors.New("pipeline metadata is no string")
+		}
+	}
+
+	if pipelineSel != nil {
+		return pipelineSel.Select(event)
+	}
+	return "", nil
 }
 
 // getIndex returns the full index name
 // Index is either defined in the config as part of the output
 // or can be overload by the event through setting index
-func getIndex(event common.MapStr, index string) string {
-
-	ts := time.Time(event["@timestamp"].(common.Time)).UTC()
-
-	// Check for dynamic index
-	if _, ok := event["beat"]; ok {
-		beatMeta, ok := event["beat"].(common.MapStr)
-		if ok {
-			// Check if index is set dynamically
-			if dynamicIndex, ok := beatMeta["index"]; ok {
-				dynamicIndexValue, ok := dynamicIndex.(string)
-				if ok {
-					index = dynamicIndexValue
-				}
+func getIndex(event *beat.Event, index outil.Selector) string {
+	if event.Meta != nil {
+		if str, exists := event.Meta["index"]; exists {
+			idx, ok := str.(string)
+			if ok {
+				ts := event.Timestamp.UTC()
+				return fmt.Sprintf("%s-%d.%02d.%02d",
+					idx, ts.Year(), ts.Month(), ts.Day())
 			}
 		}
 	}
 
-	// Append timestamp to index
-	index = fmt.Sprintf("%s-%d.%02d.%02d", index,
-		ts.Year(), ts.Month(), ts.Day())
-
-	return index
+	str, _ := index.Select(event)
+	return str
 }
 
 // bulkCollectPublishFails checks per item errors returning all events
@@ -251,8 +414,8 @@ func getIndex(event common.MapStr, index string) string {
 // the event will be dropped.
 func bulkCollectPublishFails(
 	reader *jsonReader,
-	events []common.MapStr,
-) []common.MapStr {
+	data []publisher.Event,
+) []publisher.Event {
 	if err := reader.expectDict(); err != nil {
 		logp.Err("Failed to parse bulk respose: expected JSON object")
 		return nil
@@ -285,8 +448,8 @@ func bulkCollectPublishFails(
 		return nil
 	}
 
-	count := len(events)
-	failed := events[:0]
+	count := len(data)
+	failed := data[:0]
 	for i := 0; i < count; i++ {
 		status, msg, err := itemStatus(reader)
 		if err != nil {
@@ -303,8 +466,8 @@ func bulkCollectPublishFails(
 			continue
 		}
 
-		logp.Info("Bulk item insert failed (i=%v, status=%v): %s", i, status, msg)
-		failed = append(failed, events[i])
+		debugf("Bulk item insert failed (i=%v, status=%v): %s", i, status, msg)
+		failed = append(failed, data[i])
 	}
 
 	return failed
@@ -330,6 +493,10 @@ func itemStatus(reader *jsonReader) (int, []byte, error) {
 
 	// parse actual item response code and error message
 	status, msg, err := itemStatusInner(reader)
+	if err != nil {
+		logp.Err("Failed to parse bulk response item: %s", err)
+		return 0, nil, err
+	}
 
 	// close dictionary. Expect outer dictionary to have only one element
 	kind, _, err = reader.step()
@@ -366,7 +533,7 @@ func itemStatusInner(reader *jsonReader) (int, []byte, error) {
 		case bytes.Equal(name, nameStatus): // name == "status"
 			status, err = reader.nextInt()
 			if err != nil {
-				logp.Err("Failed to parse bulk reponse item: %s", err)
+				logp.Err("Failed to parse bulk response item: %s", err)
 				return 0, nil, err
 			}
 
@@ -377,7 +544,10 @@ func itemStatusInner(reader *jsonReader) (int, []byte, error) {
 			}
 
 		default: // ignore unknown fields
-			reader.ignoreNext()
+			_, err = reader.ignoreNext()
+			if err != nil {
+				return 0, nil, err
+			}
 		}
 	}
 
@@ -387,77 +557,62 @@ func itemStatusInner(reader *jsonReader) (int, []byte, error) {
 	return status, msg, nil
 }
 
-func (client *Client) PublishEvent(event common.MapStr) error {
-	if !client.connected {
-		return ErrNotConnected
+// LoadJSON creates a PUT request based on a JSON document.
+func (client *Client) LoadJSON(path string, json map[string]interface{}) ([]byte, error) {
+	status, body, err := client.Request("PUT", path, "", nil, json)
+	if err != nil {
+		return body, fmt.Errorf("couldn't load json. Error: %s", err)
+	}
+	if status > 300 {
+		return body, fmt.Errorf("couldn't load json. Status: %v", status)
 	}
 
-	index := getIndex(event, client.index)
-	logp.Debug("output_elasticsearch", "Publish event: %s", event)
+	return body, nil
+}
 
-	// insert the events one by one
-	status, _, err := client.Index(
-		index, event["type"].(string), "", client.params, event)
-	if err != nil {
-		logp.Warn("Fail to insert a single event: %s", err)
-		if err == ErrJSONEncodeFailed {
-			// don't retry unencodable values
-			return nil
+// GetVersion returns the elasticsearch version the client is connected to
+func (client *Client) GetVersion() string {
+	return client.Connection.version
+}
+
+func (client *Client) Test(d testing.Driver) {
+	d.Run("elasticsearch: "+client.URL, func(d testing.Driver) {
+		u, err := url.Parse(client.URL)
+		d.Fatal("parse url", err)
+
+		address := u.Hostname()
+		if u.Port() != "" {
+			address += ":" + u.Port()
 		}
-	}
-	switch {
-	case status == 0: // event was not send yet
-		return nil
-	case status >= 500 || status == 429: // server error, retry
-		return err
-	case status >= 300 && status < 500:
-		// won't be able to index event in Elasticsearch => don't retry
-		return nil
-	}
+		d.Run("connection", func(d testing.Driver) {
+			netDialer := transport.TestNetDialer(d, client.timeout)
+			_, err = netDialer.Dial("tcp", address)
+			d.Fatal("dial up", err)
+		})
 
-	return nil
+		if u.Scheme != "https" {
+			d.Warn("TLS", "secure connection disabled")
+		} else {
+			d.Run("TLS", func(d testing.Driver) {
+				netDialer := transport.NetDialer(client.timeout)
+				tlsDialer, err := transport.TestTLSDialer(d, netDialer, client.tlsConfig, client.timeout)
+				_, err = tlsDialer.Dial("tcp", address)
+				d.Fatal("dial up", err)
+			})
+		}
+
+		err = client.Connect()
+		d.Fatal("talk to server", err)
+		d.Info("version", client.version)
+	})
 }
 
-// LoadTemplate loads a template into Elasticsearch overwriting the existing
-// template if it exists. If you wish to not overwrite an existing template
-// then use CheckTemplate prior to calling this method.
-func (client *Client) LoadTemplate(templateName string, reader *bytes.Reader) error {
-
-	status, _, err := client.execRequest("PUT", client.URL+"/_template/"+templateName, reader)
-
-	if err != nil {
-		return fmt.Errorf("Template could not be loaded. Error: %s", err)
-	}
-	if status != 200 {
-		return fmt.Errorf("Template could not be loaded. Status: %v", status)
-	}
-
-	logp.Info("Elasticsearch template with name '%s' loaded", templateName)
-
-	return nil
-}
-
-// CheckTemplate checks if a given template already exist. It returns true if
-// and only if Elasticsearch returns with HTTP status code 200.
-func (client *Client) CheckTemplate(templateName string) bool {
-
-	status, _, _ := client.request("HEAD", "/_template/"+templateName, nil, nil)
-
-	if status != 200 {
-		return false
-	}
-
-	return true
-}
-
-func (conn *Connection) Connect(timeout time.Duration) error {
+// Connect connects the client.
+func (conn *Connection) Connect() error {
 	var err error
-	conn.connected, err = conn.Ping(timeout)
+	conn.version, err = conn.Ping()
 	if err != nil {
 		return err
-	}
-	if !conn.connected {
-		return ErrNotConnected
 	}
 
 	err = conn.onConnectCallback()
@@ -467,48 +622,70 @@ func (conn *Connection) Connect(timeout time.Duration) error {
 	return nil
 }
 
-func (conn *Connection) Ping(timeout time.Duration) (bool, error) {
-	debug("ES Ping(url=%v, timeout=%v)", conn.URL, timeout)
+// Ping sends a GET request to the Elasticsearch.
+func (conn *Connection) Ping() (string, error) {
+	debugf("ES Ping(url=%v)", conn.URL)
 
-	conn.http.Timeout = timeout
-	status, _, err := conn.execRequest("HEAD", conn.URL, nil)
+	status, body, err := conn.execRequest("GET", conn.URL, nil)
 	if err != nil {
-		debug("Ping request failed with: %v", err)
-		return false, err
+		debugf("Ping request failed with: %v", err)
+		return "", err
 	}
 
-	debug("Ping status code: %v", status)
-	return status < 300, nil
-}
+	if status >= 300 {
+		return "", fmt.Errorf("Non 2xx response code: %d", status)
+	}
 
-func (conn *Connection) IsConnected() bool {
-	return conn.connected
-}
-
-func (conn *Connection) Close() error {
-	conn.connected = false
-	return nil
-}
-
-func (conn *Connection) request(
-	method, path string,
-	params map[string]string,
-	body interface{},
-) (int, []byte, error) {
-	url := makeURL(conn.URL, path, params)
-	logp.Debug("elasticsearch", "%s %s %v", method, url, body)
-
-	var obj []byte
-	if body != nil {
-		var err error
-		obj, err = json.Marshal(body)
-		if err != nil {
-			logp.Warn("Failed to json encode body (%v): %#v", err, body)
-			return 0, nil, ErrJSONEncodeFailed
+	var response struct {
+		Version struct {
+			Number string
 		}
 	}
 
-	return conn.execRequest(method, url, bytes.NewReader(obj))
+	err = json.Unmarshal(body, &response)
+	if err != nil {
+		return "", fmt.Errorf("Failed to parse JSON response: %v", err)
+	}
+
+	debugf("Ping status code: %v", status)
+	logp.Info("Connected to Elasticsearch version %s", response.Version.Number)
+	return response.Version.Number, nil
+}
+
+// Close closes a connection.
+func (conn *Connection) Close() error {
+	return nil
+}
+
+// Request sends a request via the connection.
+func (conn *Connection) Request(
+	method, path string,
+	pipeline string,
+	params map[string]string,
+	body interface{},
+) (int, []byte, error) {
+
+	url := addToURL(conn.URL, path, pipeline, params)
+	debugf("%s %s %s %v", method, url, pipeline, body)
+
+	return conn.RequestURL(method, url, body)
+}
+
+// RequestURL sends a request with the connection object to an alternative url
+func (conn *Connection) RequestURL(
+	method, url string,
+	body interface{},
+) (int, []byte, error) {
+
+	if body == nil {
+		return conn.execRequest(method, url, nil)
+	}
+
+	if err := conn.encoder.Marshal(body); err != nil {
+		logp.Warn("Failed to json encode body (%v): %#v", err, body)
+		return 0, nil, ErrJSONEncodeFailed
+	}
+	return conn.execRequest(method, url, conn.encoder.Reader())
 }
 
 func (conn *Connection) execRequest(
@@ -520,31 +697,52 @@ func (conn *Connection) execRequest(
 		logp.Warn("Failed to create request", err)
 		return 0, nil, err
 	}
+	if body != nil {
+		conn.encoder.AddHeader(&req.Header)
+	}
+	return conn.execHTTPRequest(req)
+}
 
+func (conn *Connection) execHTTPRequest(req *http.Request) (int, []byte, error) {
 	req.Header.Add("Accept", "application/json")
 	if conn.Username != "" || conn.Password != "" {
 		req.SetBasicAuth(conn.Username, conn.Password)
 	}
 
+	for name, value := range conn.Headers {
+		req.Header.Add(name, value)
+	}
+
+	// The stlib will override the value in the header based on the configured `Host`
+	// on the request which default to the current machine.
+	//
+	// We use the normalized key header to retrieve the user configured value and assign it to the host.
+	if host := req.Header.Get("Host"); host != "" {
+		req.Host = host
+	}
+
 	resp, err := conn.http.Do(req)
 	if err != nil {
-		conn.connected = false
 		return 0, nil, err
 	}
 	defer closing(resp.Body)
 
 	status := resp.StatusCode
-	if status >= 300 {
-		conn.connected = false
-		return status, nil, fmt.Errorf("%v", resp.Status)
-	}
-
 	obj, err := ioutil.ReadAll(resp.Body)
 	if err != nil {
-		conn.connected = false
 		return status, nil, err
 	}
-	return status, obj, nil
+
+	if status >= 300 {
+		// add the response body with the error returned by Elasticsearch
+		err = fmt.Errorf("%v: %s", resp.Status, obj)
+	}
+
+	return status, obj, err
+}
+
+func (conn *Connection) GetVersion() string {
+	return conn.version
 }
 
 func closing(c io.Closer) {

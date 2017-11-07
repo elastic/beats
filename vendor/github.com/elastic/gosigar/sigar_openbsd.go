@@ -19,6 +19,7 @@ import "C"
 //import "github.com/davecgh/go-spew/spew"
 
 import (
+	"runtime"
 	"syscall"
 	"time"
 	"unsafe"
@@ -187,6 +188,10 @@ func (self *FileSystemUsage) Get(path string) error {
 	return nil
 }
 
+func (self *FDUsage) Get() error {
+	return ErrNotImplemented{runtime.GOOS}
+}
+
 func (self *LoadAverage) Get() error {
 	avg := []C.double{0, 0, 0}
 
@@ -336,7 +341,7 @@ func (self *CpuList) Get() error {
 	load := [C.CPUSTATES]C.long{C.CP_USER, C.CP_NICE, C.CP_SYS, C.CP_INTR, C.CP_IDLE}
 
 	self.List = make([]Cpu, ncpu)
-	for curcpu, _ := range self.List {
+	for curcpu := range self.List {
 		sysctlCptime(ncpu, curcpu, &load)
 		fillCpu(&self.List[curcpu], load)
 	}
@@ -350,6 +355,10 @@ func (self *ProcList) Get() error {
 
 func (self *ProcArgs) Get(pid int) error {
 	return nil
+}
+
+func (self *ProcEnv) Get(pid int) error {
+	return ErrNotImplemented{runtime.GOOS}
 }
 
 func (self *ProcState) Get(pid int) error {
@@ -366,6 +375,10 @@ func (self *ProcTime) Get(pid int) error {
 
 func (self *ProcExe) Get(pid int) error {
 	return nil
+}
+
+func (self *ProcFDUsage) Get(pid int) error {
+	return ErrNotImplemented{runtime.GOOS}
 }
 
 func fillCpu(cpu *Cpu, load [C.CPUSTATES]C.long) {

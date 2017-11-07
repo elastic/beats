@@ -1,45 +1,65 @@
 package logstash
 
 import (
-	"sync/atomic"
+	"net"
 	"time"
 
-	"github.com/elastic/beats/libbeat/common"
+	"github.com/elastic/beats/libbeat/beat"
+	"github.com/elastic/beats/libbeat/common/atomic"
 	"github.com/elastic/beats/libbeat/logp"
+	"github.com/elastic/beats/libbeat/outputs"
 	"github.com/elastic/beats/libbeat/outputs/transport"
-	"github.com/urso/go-lumber/client/v2"
+	"github.com/elastic/beats/libbeat/publisher"
+	"github.com/elastic/go-lumber/client/v2"
 )
 
 type asyncClient struct {
 	*transport.Client
+	stats  *outputs.Stats
 	client *v2.AsyncClient
-	win    window
+	win    *window
 
 	connect func() error
 }
 
 type msgRef struct {
-	count     int32
-	batch     []common.MapStr
+	client    *asyncClient
+	count     atomic.Uint32
+	batch     publisher.Batch
+	slice     []publisher.Event
 	err       error
-	cb        func([]common.MapStr, error)
 	win       *window
 	batchSize int
 }
 
-func newAsyncLumberjackClient(
+func newAsyncClient(
+	beat beat.Info,
 	conn *transport.Client,
-	queueSize int,
-	compressLevel int,
-	maxWindowSize int,
-	timeout time.Duration,
-	beat string,
+	stats *outputs.Stats,
+	config *Config,
 ) (*asyncClient, error) {
-	c := &asyncClient{}
-	c.Client = conn
-	c.win.init(defaultStartMaxWindowSize, maxWindowSize)
+	c := &asyncClient{
+		Client: conn,
+		stats:  stats,
+	}
 
-	enc, err := makeLogstashEventEncoder(beat)
+	if config.SlowStart {
+		c.win = newWindower(defaultStartMaxWindowSize, config.BulkMaxSize)
+	}
+
+	if config.TTL != 0 {
+		logp.Warn(`The async Logstash client does not support the "ttl" option`)
+	}
+
+	enc := makeLogstashEventEncoder(beat, config.Index)
+
+	queueSize := config.Pipelining - 1
+	timeout := config.Timeout
+	compressLvl := config.CompressionLevel
+	clientFactory := makeClientFactory(queueSize, timeout, enc, compressLvl)
+
+	var err error
+	c.client, err = clientFactory(c.Client)
 	if err != nil {
 		return nil, err
 	}
@@ -47,18 +67,30 @@ func newAsyncLumberjackClient(
 	c.connect = func() error {
 		err := c.Client.Connect()
 		if err == nil {
-			c.client, err = v2.NewAsyncClientWithConn(c.Client,
-				queueSize,
-				v2.JSONEncoder(enc),
-				v2.Timeout(timeout),
-				v2.CompressionLevel(compressLevel))
+			c.client, err = clientFactory(c.Client)
 		}
 		return err
 	}
+
 	return c, nil
 }
 
-func (c *asyncClient) Connect(timeout time.Duration) error {
+func makeClientFactory(
+	queueSize int,
+	timeout time.Duration,
+	enc func(interface{}) ([]byte, error),
+	compressLvl int,
+) func(net.Conn) (*v2.AsyncClient, error) {
+	return func(conn net.Conn) (*v2.AsyncClient, error) {
+		return v2.NewAsyncClientWithConn(conn, queueSize,
+			v2.JSONEncoder(enc),
+			v2.Timeout(timeout),
+			v2.CompressionLevel(compressLvl),
+		)
+	}
+}
+
+func (c *asyncClient) Connect() error {
 	logp.Debug("logstash", "connect")
 	return c.connect()
 }
@@ -73,64 +105,62 @@ func (c *asyncClient) Close() error {
 	return c.Client.Close()
 }
 
-func (c *asyncClient) AsyncPublishEvent(
-	cb func(error),
-	event common.MapStr,
-) error {
-	data := []interface{}{event}
-	return c.client.Send(func(seq uint32, err error) { cb(err) }, data)
-}
-
-func (c *asyncClient) AsyncPublishEvents(
-	cb func([]common.MapStr, error),
-	events []common.MapStr,
-) error {
-	publishEventsCallCount.Add(1)
+func (c *asyncClient) Publish(batch publisher.Batch) error {
+	st := c.stats
+	events := batch.Events()
+	st.NewBatch(len(events))
 
 	if len(events) == 0 {
-		debug("send nil")
-		cb(nil, nil)
+		batch.ACK()
 		return nil
 	}
 
 	ref := &msgRef{
-		count:     1,
-		batch:     events,
+		client:    c,
+		count:     atomic.MakeUint32(1),
+		batch:     batch,
+		slice:     events,
 		batchSize: len(events),
-		win:       &c.win,
-		cb:        cb,
+		win:       c.win,
 		err:       nil,
 	}
+	defer ref.dec()
 
 	for len(events) > 0 {
-		n, err := c.publishWindowed(ref, events)
+		var (
+			n   int
+			err error
+		)
 
-		debug("%v events out of %v events sent to logstash. Continue sending",
-			n, len(events))
+		if c.win == nil {
+			n = len(events)
+			err = c.sendEvents(ref, events)
+		} else {
+			n, err = c.publishWindowed(ref, events)
+		}
+
+		debugf("%v events out of %v events sent to logstash host %s. Continue sending",
+			n, len(events), c.Host())
 
 		events = events[n:]
 		if err != nil {
-			c.win.shrinkWindow()
 			_ = c.Close()
-
-			logp.Err("Failed to publish events caused by: %v", err)
-			eventsNotAcked.Add(int64(len(events)))
 			return err
 		}
 	}
-	ref.dec()
 
 	return nil
 }
 
 func (c *asyncClient) publishWindowed(
 	ref *msgRef,
-	events []common.MapStr,
+	events []publisher.Event,
 ) (int, error) {
 	batchSize := len(events)
 	windowSize := c.win.get()
-	debug("Try to publish %v events to logstash with window size %v",
-		batchSize, windowSize)
+
+	debugf("Try to publish %v events to logstash host %s with window size %v",
+		batchSize, c.Host(), windowSize)
 
 	// prepare message payload
 	if batchSize > windowSize {
@@ -145,12 +175,12 @@ func (c *asyncClient) publishWindowed(
 	return len(events), nil
 }
 
-func (c *asyncClient) sendEvents(ref *msgRef, events []common.MapStr) error {
+func (c *asyncClient) sendEvents(ref *msgRef, events []publisher.Event) error {
 	window := make([]interface{}, len(events))
-	for i, event := range events {
-		window[i] = event
+	for i := range events {
+		window[i] = &events[i].Content
 	}
-	atomic.AddInt32(&ref.count, 1)
+	ref.count.Inc()
 	return c.client.Send(ref.callback, window)
 }
 
@@ -163,31 +193,44 @@ func (r *msgRef) callback(seq uint32, err error) {
 }
 
 func (r *msgRef) done(n uint32) {
-	ackedEvents.Add(int64(n))
-	r.batch = r.batch[n:]
+	r.client.stats.Acked(int(n))
+	r.slice = r.slice[n:]
+	if r.win != nil {
+		r.win.tryGrowWindow(r.batchSize)
+	}
 	r.dec()
 }
 
 func (r *msgRef) fail(n uint32, err error) {
-	ackedEvents.Add(int64(n))
-	r.err = err
-	r.batch = r.batch[n:]
+	if r.err == nil {
+		r.err = err
+	}
+	r.slice = r.slice[n:]
+	if r.win != nil {
+		r.win.shrinkWindow()
+	}
+
+	r.client.stats.Acked(int(n))
+
 	r.dec()
 }
 
 func (r *msgRef) dec() {
-	i := atomic.AddInt32(&r.count, -1)
+	i := r.count.Dec()
 	if i > 0 {
 		return
 	}
 
-	err := r.err
-	if err != nil {
-		eventsNotAcked.Add(int64(len(r.batch)))
-		r.win.shrinkWindow()
-		r.cb(r.batch, err)
-	} else {
-		r.win.tryGrowWindow(r.batchSize)
-		r.cb(nil, nil)
+	if L := len(r.slice); L > 0 {
+		r.client.stats.Failed(L)
 	}
+
+	err := r.err
+	if err == nil {
+		r.batch.ACK()
+		return
+	}
+
+	r.batch.RetryEvents(r.slice)
+	logp.Err("Failed to publish events caused by: %v", err)
 }

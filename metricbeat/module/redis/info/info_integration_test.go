@@ -6,6 +6,7 @@ import (
 	"testing"
 
 	"github.com/elastic/beats/libbeat/common"
+	"github.com/elastic/beats/libbeat/tests/compose"
 	mbtest "github.com/elastic/beats/metricbeat/mb/testing"
 	"github.com/elastic/beats/metricbeat/module/redis"
 
@@ -13,7 +14,15 @@ import (
 	"github.com/stretchr/testify/assert"
 )
 
+const (
+	password = "foobared"
+)
+
+var redisHost = redis.GetRedisEnvHost() + ":" + redis.GetRedisEnvPort()
+
 func TestFetch(t *testing.T) {
+	compose.EnsureUp(t, "redis")
+
 	f := mbtest.NewEventFetcher(t, getConfig(""))
 	event, err := f.Fetch()
 	if err != nil {
@@ -29,6 +38,8 @@ func TestFetch(t *testing.T) {
 }
 
 func TestData(t *testing.T) {
+	compose.EnsureUp(t, "redis")
+
 	f := mbtest.NewEventFetcher(t, getConfig(""))
 
 	err := mbtest.WriteEvent(f, t)
@@ -37,16 +48,17 @@ func TestData(t *testing.T) {
 	}
 }
 
-// +build integration
-const (
-	password = "foobared"
-)
-
-var redisHost = redis.GetRedisEnvHost() + ":" + redis.GetRedisEnvPort()
-
 func TestPasswords(t *testing.T) {
+	compose.EnsureUp(t, "redis")
+
 	// Add password and ensure it gets reset
-	defer resetPassword(redisHost, password, "")
+	defer func() {
+		err := resetPassword(redisHost, password)
+		if err != nil {
+			t.Fatal("resetting password", err)
+		}
+	}()
+
 	err := addPassword(redisHost, password)
 	if err != nil {
 		t.Fatal("adding password", err)
@@ -85,7 +97,7 @@ func addPassword(host, pass string) error {
 }
 
 // resetPassword changes the password to the redis DB.
-func resetPassword(host, currentPass, newPass string) error {
+func resetPassword(host, currentPass string) error {
 	c, err := rd.Dial("tcp", host)
 	if err != nil {
 		return err
@@ -97,7 +109,7 @@ func resetPassword(host, currentPass, newPass string) error {
 		return err
 	}
 
-	_, err = c.Do("CONFIG", "SET", "requirepass", newPass)
+	_, err = c.Do("CONFIG", "SET", "requirepass", "")
 	return err
 }
 

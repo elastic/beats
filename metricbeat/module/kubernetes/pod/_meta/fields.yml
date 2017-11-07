@@ -1,0 +1,36 @@
+- name: pod
+  type: group
+  description: >
+    kubernetes pod metrics
+  fields:
+    - name: start_time
+      type: date
+      description: >
+        Start time
+    - name: network
+      type: group
+      fields:
+        - name: rx
+          type: group
+          fields:
+            - name: bytes
+              type: long
+              format: bytes
+              description: >
+                Received bytes
+            - name: errors
+              type: long
+              description: >
+                Rx errors
+        - name: tx
+          type: group
+          fields:
+            - name: bytes
+              type: long
+              format: bytes
+              description: >
+                Transmitted bytes
+            - name: errors
+              type: long
+              description: >
+                Tx errors

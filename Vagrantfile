@@ -9,7 +9,7 @@
 # This box is used as a Windows development and testing environment for Beats.
 #
 # Usage and Features:
-#   - Two users exist: Administartor and Vagrant. Both have the password: vagrant
+#   - Two users exist: Administrator and Vagrant. Both have the password: vagrant
 #   - Use 'vagrant ssh' to open a Windows command prompt.
 #   - Use 'vagrant rdp' to open a Windows Remote Deskop session. Mac users must
 #     install the Microsoft Remote Desktop Client from the App Store.
@@ -55,12 +55,21 @@ cd ~/go/src/github.com/elastic
 if [ -d "/vagrant" ]; then ln -s /vagrant beats; fi
 SCRIPT
 
+# Linux GVM
+$linuxGvmProvision = <<SCRIPT
+mkdir -p ~/bin
+curl -sL -o ~/bin/gvm https://github.com/andrewkroh/gvm/releases/download/v0.0.1/gvm-linux-amd64
+chmod +x ~/bin/gvm
+echo 'export PATH=~/bin:$PATH' >> ~/.bash_profile
+echo 'eval "$(gvm 1.8.3)"' >> ~/.bash_profile
+SCRIPT
+
 Vagrant.configure(2) do |config|
 
   # Windows Server 2012 R2
   config.vm.define "win2012", primary: true do |win2012|
 
-    win2012.vm.box = "https://s3.amazonaws.com/beats-files/vagrant/beats-win2012-r2-virtualbox-2016-01-20_0057.box"
+    win2012.vm.box = "https://s3.amazonaws.com/beats-files/vagrant/beats-win2012-r2-virtualbox-2016-10-28_1224.box"
     win2012.vm.guest = :windows
 
     # Communicator for windows boxes
@@ -76,7 +85,7 @@ Vagrant.configure(2) do |config|
 
   # Solaris 11.2
   config.vm.define "solaris", primary: true do |solaris|
-    solaris.vm.box = "https://s3.amazonaws.com/beats-files/vagrant/beats-solaris-11.2-virtualbox-2016-01-23_0522.box"
+    solaris.vm.box = "https://s3.amazonaws.com/beats-files/vagrant/beats-solaris-11.2-virtualbox-2016-11-02_1603.box"
     solaris.vm.network :forwarded_port, guest: 22,   host: 2223,  id: "ssh", auto_correct: true
 
     solaris.vm.provision "shell", inline: $unixProvision, privileged: false
@@ -84,7 +93,7 @@ Vagrant.configure(2) do |config|
 
   # FreeBSD 11.0
   config.vm.define "freebsd", primary: true do |freebsd|
-    freebsd.vm.box = "https://s3.amazonaws.com/beats-files/vagrant/beats-freebsd-11.0-virtualbox-2016-01-23_1919.box"
+    freebsd.vm.box = "https://s3.amazonaws.com/beats-files/vagrant/beats-freebsd-11.0-virtualbox-2016-11-02_1638.box"
     freebsd.vm.network :forwarded_port, guest: 22,   host: 2224,  id: "ssh", auto_correct: true
 
     # Must use NFS to sync a folder on FreeBSD and this requires a host-only network.
@@ -92,12 +101,13 @@ Vagrant.configure(2) do |config|
     config.vm.synced_folder ".", "/vagrant", id: "vagrant-root", :nfs => true, disabled: true
     #config.vm.network "private_network", ip: "192.168.135.18"
 
+    freebsd.vm.hostname = "beats-tester"
     freebsd.vm.provision "shell", inline: $unixProvision, privileged: false
   end
 
-  # OpenBSD 5.9-current
+  # OpenBSD 5.9-stable
   config.vm.define "openbsd", primary: true do |openbsd|
-    openbsd.vm.box = "https://s3.amazonaws.com/beats-files/vagrant/beats-openbsd-5.9-current-virtualbox-2016-04-22_0422.box"
+    openbsd.vm.box = "https://s3.amazonaws.com/beats-files/vagrant/beats-openbsd-5.9-current-virtualbox-2016-11-02_2007.box"
     openbsd.vm.network :forwarded_port, guest: 22,   host: 2225,  id: "ssh", auto_correct: true
 
     config.vm.synced_folder ".", "/vagrant", type: "rsync", disabled: true
@@ -107,6 +117,18 @@ Vagrant.configure(2) do |config|
     end
 
     openbsd.vm.provision "shell", inline: $unixProvision, privileged: false
+  end
+
+  # CentOS 7
+  config.vm.define "centos7", primary: true do |centos7|
+    #centos7.vm.box = "http://cloud.centos.org/centos/7/vagrant/x86_64/images/CentOS-7-x86_64-Vagrant-1706_02.VirtualBox.box"
+    centos7.vm.box = "ubuntu/precise64"
+    centos7.vm.network :forwarded_port, guest: 22,   host: 2226,  id: "ssh", auto_correct: true
+
+    centos7.vm.provision "shell", inline: $unixProvision, privileged: false
+    centos7.vm.provision "shell", inline: $linuxGvmProvision, privileged: false
+
+    centos7.vm.synced_folder ".", "/vagrant", type: "virtualbox"
   end
 
 end

@@ -1,0 +1,62 @@
+- name: consumergroup
+  type: group
+  description: >
+    consumergroup
+  fields:
+    - name: broker
+      type: group
+      description: >
+        Broker Consumer Group Information have been read from (Broker handling
+        the consumer group).
+      fields:
+        - name: id
+          type: long
+          description: >
+            Broker id
+
+        - name: address
+          type: keyword
+          description: >
+            Broker address
+
+    - name: id
+      type: keyword
+      description: Consumer Group ID
+
+    - name: topic
+      type: keyword
+      description: Topic name
+
+    - name: partition
+      type: long
+      description: Partition ID
+
+    - name: offset
+      type: long
+      description: consumer offset into partition being read
+
+    - name: meta
+      type: text
+      description: custom consumer meta data string
+
+    - name: error.code
+      type: long
+      description: >
+        kafka consumer/partition error code.
+
+    - name: client
+      type: group
+      description: >
+        Assigned client reading events from partition
+      fields:
+        - name: id
+          type: keyword
+          description: Client ID (kafka setting client.id)
+
+        - name: host
+          type: keyword
+          description: Client host
+
+        - name: member_id
+          type: keyword
+          description: internal consumer group member ID

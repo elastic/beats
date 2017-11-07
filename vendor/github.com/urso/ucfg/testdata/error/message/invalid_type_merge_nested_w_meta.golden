@@ -1,1 +1,0 @@
-(assert) string key required when merging into 'map[int]interface {}' accessing 'nested' (source:'test.source')

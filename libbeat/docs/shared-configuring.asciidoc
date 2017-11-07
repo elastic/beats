@@ -1,0 +1,26 @@
+//Added conditional coding to support Beats that don't offer all of these install options
+
+ifeval::["{beatname_lc}"!="auditbeat"]
+
+To configure {beatname_uc}, you edit the configuration file. For rpm and deb,
+you'll find the configuration file at +/etc/{beatname_lc}/{beatname_lc}.yml+. Under
+Docker, it's located at +/usr/share/{beatname_lc}/{beatname_lc}.yml+. For mac and win,
+look in the archive that you just extracted. There’s also a full example
+configuration file called +{beatname_lc}.reference.yml+ that shows all non-deprecated
+options.
+
+endif::[]
+
+ifeval::["{beatname_lc}"=="auditbeat"]
+
+To configure {beatname_uc}, you edit the configuration file. For rpm and deb,
+you'll find the configuration file at +/etc/{beatname_lc}/{beatname_lc}.yml+.
+For mac and win, look in the archive that you just extracted. There’s also a
+full example configuration file called +{beatname_lc}.reference.yml+ that shows
+all non-deprecated options.
+
+endif::[]
+
+See the
+{libbeat}/config-file-format.html[Config File Format] section of the
+_Beats Platform Reference_ for more about the structure of the config file.

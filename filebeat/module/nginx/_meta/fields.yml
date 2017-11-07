@@ -1,0 +1,11 @@
+- key: nginx
+  title: "Nginx"
+  description: >
+    Module for parsing the Nginx log files.
+  short_config: true
+  fields:
+    - name: nginx
+      type: group
+      description: >
+        Fields from the Nginx log files.
+      fields:

@@ -1,0 +1,41 @@
+module_version: "1.0"
+
+var:
+  - name: paths
+    default:
+      - /var/log/nginx/access.log*
+    os.darwin:
+      - /usr/local/var/log/nginx/access.log*
+    os.windows:
+      - c:/programdata/nginx/logs/*access.log*
+
+ingest_pipeline: ingest/default.json
+prospector: config/nginx-access.yml
+
+machine_learning:
+- name: response_code
+  job: machine_learning/response_code.json
+  datafeed: machine_learning/datafeed_response_code.json
+  min_version: 5.5.0
+- name: low_request_rate
+  job: machine_learning/low_request_rate.json
+  datafeed: machine_learning/datafeed_low_request_rate.json
+  min_version: 5.5.0
+- name: remote_ip_url_count
+  job: machine_learning/remote_ip_url_count.json
+  datafeed: machine_learning/datafeed_remote_ip_url_count.json
+  min_version: 5.5.0
+- name: remote_ip_request_rate
+  job: machine_learning/remote_ip_request_rate.json
+  datafeed: machine_learning/datafeed_remote_ip_request_rate.json
+  min_version: 5.5.0
+- name: visitor_rate
+  job: machine_learning/visitor_rate.json
+  datafeed: machine_learning/datafeed_visitor_rate.json
+  min_version: 5.5.0
+
+requires.processors:
+- name: user_agent
+  plugin: ingest-user-agent
+- name: geoip
+  plugin: ingest-geoip

@@ -129,7 +129,7 @@ func Partitions(all bool) ([]PartitionStat, error) {
 	return ret, nil
 }
 
-func IOCounters() (map[string]IOCountersStat, error) {
+func IOCounters(names ...string) (map[string]IOCountersStat, error) {
 	ret := make(map[string]IOCountersStat, 0)
 	var dst []Win32_PerfFormattedData
 
@@ -141,6 +141,11 @@ func IOCounters() (map[string]IOCountersStat, error) {
 		if len(d.Name) > 3 { // not get _Total or Harddrive
 			continue
 		}
+
+		if len(names) > 0 && !common.StringsHas(names, d.Name) {
+			continue
+		}
+
 		ret[d.Name] = IOCountersStat{
 			Name:       d.Name,
 			ReadCount:  uint64(d.AvgDiskReadQueueLength),

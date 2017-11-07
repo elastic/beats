@@ -1,0 +1,363 @@
+[[new-dashboards]]
+== Creating New Kibana Dashboards for a Beat or a Beat module
+
+++++
+<titleabbrev>Creating New Kibana Dashboards</titleabbrev>
+++++
+
+
+When contributing to Beats development, you may want to add new dashboards or
+customize the existing ones. To get started, you can
+<<import-dashboards,import the Kibana dashboards>> that come with the official
+Beats and use them as a starting point for your own dashboards. When you're done
+making changes to the dashboards in Kibana, you can use the `export_dashboards`
+script to <<export-dashboards,export the dashboards>>, along with all
+dependencies, to a local directory.
+
+To make sure the dashboards are compatible with the latest version of Kibana and Elasticsearch, we
+recommend that you use the virtual environment under
+https://github.com/elastic/beats/tree/master/testing/environments[beats/testing/environments] to import, create, and
+export the Kibana dashboards.
+
+The following topics provide more detail about importing and working with Beats dashboards:
+
+* <<import-dashboards>>
+* <<build-dashboards>>
+* <<generate-index-pattern>>
+* <<export-dashboards>>
+* <<archive-dashboards>>
+* <<share-beat-dashboards>>
+
+[[import-dashboards]]
+=== Importing Existing Beat Dashboards
+
+The official Beats come with Kibana dashboards, and starting with 6.0.0, they
+are part of every Beat package. You can use the Beat executable to import all
+the dashboards and the index pattern for a Beat, including the dependencies
+such as visualizations and searches.
+
+You can use the Beat executable to import all the dashboards and the index pattern for a Beat, including the dependencies such as visualizations and searches.
+
+To import the dashboards, run the `setup` command.
+
+
+[source,shell]
+-------------------------
+./metricbeat setup
+-------------------------
+
+The `setup` phase loads:
+
+- Index mapping template in Elasticsearch
+- Kibana dashboards
+- Machine Learning jobs (if available)
+
+For more details about the `setup` command, run the following:
+
+[source,shell]
+-------------------------
+./metricbeat help setup   
+                                                                                                                                                             
+This command does initial setup of the environment:
+
+ * Index mapping template in Elasticsearch to ensure fields are mapped.
+ * Kibana dashboards (where available).
+ * ML jobs (where available).
+
+Usage:
+  filebeat setup [flags]
+
+Flags:
+      --dashboards         Setup dashboards only
+  -h, --help               help for setup
+      --machine-learning   Setup machine learning job configurations only
+      --modules string     List of enabled modules (comma separated)
+      --template           Setup index template only
+---------------------------
+
+The flags are useful when you don't want to load everything. For example, to
+import only the dashboards, use the `--dashboards` flag:
+
+[source,shell]
+---------------------
+./metricbeat setup --dashboards
+-------------------------------
+
+Starting with Beats 6.0.0, the dashboards are no longer loaded directly into Elasticsearch. Instead, they are imported directly into Kibana.
+Thus, if your Kibana instance is not listening on localhost, or you enabled
+X-Pack for Kibana, you need to either configure the Kibana endpoint in
+the config for the Beat, or pass the Kibana host and credentials as
+arguments to the `setup` command. For example:
+
+[source,shell]
+-------------------------
+./metricbeat setup -E setup.kibana.host=192.168.3.206:5601 -E setup.kibana.username=elastic -E setup.kibana.password=secret
+--------------------------
+
+By default, the `setup` command imports the dashboards from the `kibana`
+directory, which is available in the Beat package.
+
+NOTE: The format of the saved dashboards is not compatible between Kibana 5.x and 6.x. Thus, the Kibana 5.x dashboards are available in
+the `5.x` directory, and the Kibana 6.0 dashboards, and older are in the `default` directory.
+
+In case you are using customized dashboards, you can import them:
+
+- from a local directory:
++
+[source,shell]
+----------------------------------------------------------------------
+./metricbeat setup -E setup.dashboards.directory=kibana
+----------------------------------------------------------------------
+
+- from a local zip archive:
++
+[source,shell]
+----------------------------------------------------------------------
+./metricbeat setup -E setup.dashboards.file=metricbeat-dashboards-6.0.zip
+----------------------------------------------------------------------
+
+- from a zip archive available online:
++
+[source,shell]
+----------------------------------------------------------------------
+./metricbeat setup -E setup.dashboards.url=path/to/url
+----------------------------------------------------------------------
++
+
+See <<import-dashboard-options>> for a description of the `setup.dashboards` configuration options.
+
+
+[[import-dashboards-for-development]]
+==== Import Dashboards for Development
+
+You can make use of the Makefile from the Beat GitHub repository to import the
+dashboards. If Elasticsearch is running on localhost, then you can run the following command from the Beat repository:
+
+[source,shell]
+--------------------------------
+make import-dashboards
+--------------------------------
+
+If Elasticsearch is running on a different host, then you can use the `ES_URL` variable:
+
+[source,shell]
+-------------------------------
+ES_URL="http://192.168.3.206:9200" make import-dashboards
+-------------------------------
+
+[[import-dashboard-options]]
+==== Kibana dashboards configuration
+
+The configuration file (`*.reference.yml`) of each Beat contains the `setup.dashboards` section for configuring from where to get the Kibana dashboards, as well as the name of the index pattern.
+Each of these configuration options can be overwritten with the command line options by using `-E` flag.
+
+
+*`setup.dashboards.directory=<local_dir>`*::
+Local directory that contains the saved dashboards and their dependencies.
+The default value is the `kibana` directory available in the Beat package.
+
+*`setup.dashboards.file=<local_archive>`*::
+Local zip archive with the dashboards. The archive can contain Kibana dashboards for a single Beat or for multiple Beats. The dashboards of each Beat are placed under a separate directory with the name of the Beat.
+
+*`setup.dashboards.url=<zip_url>`*::
+Zip archive with the dashboards, available online. The archive can contain Kibana dashboards for a single Beat or for
+multiple Beats. The dashboards for each Beat are placed under a separate directory with the name of the Beat.
+
+*`setup.dashboards.index <elasticsearch_index>`*::
+You should only use this option if you want to change the index pattern name that's used by default. For example, if the
+default is `metricbeat-*`, you can change it to `custombeat-*`.
+
+
+[[build-dashboards]]
+=== Building Your Own Beat Dashboards
+
+NOTE: If you want to modify a dashboard that comes with a Beat, it's better to modify a copy of the dashboard because the Beat overwrites the dashboards during the setup phase in order to have the latest version. For duplicating a dashboard, just use the `Clone` button from the top of the page. 
+
+
+Before building your own dashboards or customizing the existing ones, you need to load:
+
+* the Beat index pattern, which specifies how Kibana should display the Beat fields
+* the Beat dashboards that you want to customize  
+
+For the Elastic Beats, the index pattern is available in the Beat package under
+`kibana/*/index-pattern`. The index-pattern is automatically generated from the `fields.yml` file, available in the Beat package. For more details
+check the <<generate-index-pattern,generate index pattern>> section.
+
+After creating your own dashboards in Kibana, you can <<export-dashboards,export the Kibana dashboards>> to a local
+directory, and then <<archive-dashboards,archive the dashboards>> in order to be able to share the dashboards with the community.
+
+[[generate-index-pattern]]
+=== Generating the Beat Index Pattern
+
+The index-pattern defines the format of each field, and it's used by Kibana to know how to display the field.
+If you change the fields exported by the Beat, you need to generate a new index pattern for your Beat. Otherwise, you can just use the index pattern available under the `kibana/*/index-pattern` directory.
+
+The Beat index pattern is generated from the `fields.yml`, which contains all
+the fields exported by the Beat. For each field, besides the `type`, you can configure the
+`format` field. The format informs Kibana about how to display a certain field. A good example is `percentage` or `bytes`
+to display fields as `50%` or `5MB`.
+
+To generate the index pattern from the `fields.yml`, you need to run the following command in the Beat repository:
+
+[source,shell]
+---------------
+make update
+---------------
+
+[[export-dashboards]]
+=== Exporting New and Modified Beat Dashboards
+
+To export all the dashboards for any Elastic Beat or any community Beat, including any new or modified dashboards and all dependencies such as
+visualizations, searches, you can use the Golang script `export_dashboards.go` from
+https://github.com/elastic/beats/tree/master/dev-tools/cmd/dashboards[dev-tools] for exporting Kibana 6.0 dashboards or later, and the Python script `export_5x_dashboards.py` 
+for exporting Kibana 5.x dashboards. See the dev-tools
+https://github.com/elastic/beats/tree/master/dev-tools/README.md[readme] for more info.
+
+/////////////////////
+NOT YET IMPLEMENTED
+NOTE: You can make use of the Makefile from the Beat GitHub repository to export all the Kibana dashboards for a Beat
+from your Elasticsearch. If Elasticsearch is running on localhost, then you just need to run the following command from the Beat repository:
+
+[source,shell]
+-----------------------------
+make export-dashboards
+-----------------------------
+
+If Elasticsearch is running on a different host, then you can use the `ES_URL` variable:
+
+[source,shell]
+----------------------------
+ES_URL="http://192.168.3.206:9200" make export-dashboards
+----------------------------
+
+/////////////////////
+
+==== Exporting Kibana 6.0 dashboards and newer
+
+The `dev-tools/cmd/export_dashboards.go` script helps you export your customized Kibana 6.0 dashboards and newer. You might need to export a single dashboard or all the dashboards available for a module or Beat. 
+
+
+===== Export a single Kibana dashboard
+
+You can export a single dashboard by passing the dashboard ID in the `-dashboard` flag.
+
+NOTE: The dashboard ID is available in the dashboard URL. For example, in case the dashboard URL is
+`app/kibana#/dashboard/7fea2930-478e-11e7-b1f0-cb29bac6bf8b?_g=()&_a=(description:'Overview%2...`, the dashboard ID is `7fea2930-478e-11e7-b1f0-cb29bac6bf8b`.
+
+[source,shell]
+---------------
+cd filebeat/module/redis/_meta/kibana/default/dashboard
+go run ../../../../../../../dev-tools/cmd/dashboards/export_dashboards.go -dashboard 7fea2930-478e-11e7-b1f0-cb29bac6bf8b -output Filebeat-redis.json
+---------------
+
+This generates the `Filebeat-redis.json` file that contains the dashboard for the Redis module of Filebeat, including the dependencies (visualizations and searches). 
+
+===== Export all module/Beat dashboards
+ 
+Each module should contain a `module.yml` file with a list of all the dashboards available for the module. For the Beats that don't have support for modules (e.g. Packetbeat), 
+there is a `dashboards.yml` file that defines all the Packetbeat dashboards. 
+
+Below, it's an example of the `module.yml` file for the system module in Metricbeat:
+
+[source,shell]
+---------------
+dashboards:
+- id: Metricbeat-system-overview
+  file: Metricbeat-system-overview.json
+
+- id: 79ffd6e0-faa0-11e6-947f-177f697178b8
+  file: Metricbeat-host-overview.json
+
+- id: CPU-slash-Memory-per-container
+  file: Metricbeat-containers-overview.json
+---------------
+
+
+Each dashboard is defined by an `id` and the name of json `file` where the dashboard is saved locally. 
+
+By passing the yml file to the `export_dashboards.go` script, you can export all the dashboards defined:
+
+[source,shell]
+-------------------
+go run dev-tools/cmd/dashboards/export_dashboards.go -yml filebeat/module/system/module.yml
+-------------------
+
+
+
+==== Exporting Kibana 5.x dashboards
+
+To export only some Kibana dashboards for an Elastic Beat or community Beat, you can simply pass a regular expression to
+the `export_dashboards.py` script to match the selected Kibana dashboards.
+
+Before running the `export_dashboards.py` script for the first time, you
+need to create an environment that contains all the required Python packages.
+
+[source,shell]
+-------------------------
+make python-env
+-------------------------
+
+For example, to export all Kibana dashboards that start with the **Packetbeat** name:
+
+[source,shell]
+----------------------------------------------------------------------
+python ../dev-tools/cmd/dashboards/export_dashboards.py --regex Packetbeat*
+----------------------------------------------------------------------
+
+To see all the available options, read the descriptions below or run:
+
+[source,shell]
+----------------------------------------------------------------------
+python ../dev-tools/cmd/dashboards/export_dashboards.py -h
+----------------------------------------------------------------------
+
+*`--url <elasticsearch_url>`*::
+The Elasticsearch URL. The default value is http://localhost:9200.
+
+*`--regex <regular_expression>`*::
+Regular expression to match all the Kibana dashboards to be exported. This argument is required.
+
+*`--kibana <kibana_index>`*::
+The Elasticsearch index pattern where Kibana saves its configuration. The default value is `.kibana`.
+
+*`--dir <output_dir>`*::
+The output directory where the dashboards and all dependencies will be saved. The default value is `output`.
+
+The output directory has the following structure:
+
+[source,shell]
+--------------
+output/
+    index-pattern/
+    dashboard/
+    visualization/
+    search/
+--------------
+
+[[archive-dashboards]]
+=== Archiving Your Beat Dashboards
+
+The Kibana dashboards for the Elastic Beats are saved under the `kibana` directory. To create a zip archive with the
+dashboards, including visualizations and searches and the index pattern, you can run the following command in the Beat
+repository:
+
+[source,shell]
+--------------
+make package-dashboards
+--------------
+
+The Makefile is part of libbeat, which means that community Beats contributors can use the commands shown here to
+archive dashboards. The dashboards must be available under the `kibana` directory.
+
+Another option would be to create a repository only with the dashboards, and use the GitHub release functionality to
+create a zip archive.
+
+Share the Kibana dashboards archive with the community, so other users can use your cool Kibana visualizations!
+
+
+
+[[share-beat-dashboards]]
+=== Sharing Your Beat Dashboards
+
+When you're done with your own Beat dashboards, how about letting everyone know? You can create a topic on the https://discuss.elastic.co/c/beats[Beats
+forum], and provide the link to the zip archive together with a short description.

@@ -3,6 +3,7 @@
 package disk
 
 import (
+	"path"
 	"syscall"
 	"unsafe"
 
@@ -74,14 +75,16 @@ func Partitions(all bool) ([]PartitionStat, error) {
 			Fstype:     common.IntToString(stat.Fstypename[:]),
 			Opts:       opts,
 		}
+		if all == false {
+			if !path.IsAbs(d.Device) || !common.PathExists(d.Device) {
+				continue
+			}
+		}
+
 		ret = append(ret, d)
 	}
 
 	return ret, nil
-}
-
-func IOCounters() (map[string]IOCountersStat, error) {
-	return nil, common.ErrNotImplementedError
 }
 
 func Getfsstat(buf []Statfs_t, flags int) (n int, err error) {

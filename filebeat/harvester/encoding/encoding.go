@@ -46,10 +46,7 @@ var Plain = enc(encoding.Nop)
 // converted to '\uFFFD'.
 //
 // See: http://encoding.spec.whatwg.org/#replacement
-var utf8Encoding = enc(mixedEncoding{
-	decoder: encoding.Replacement.NewEncoder,
-	encoder: encoding.Replacement.NewEncoder,
-})
+var utf8Encoding = enc(mixed{})
 
 // FindEncoding searches for an EncodingFactoryby name.
 func FindEncoding(name string) (EncodingFactory, bool) {

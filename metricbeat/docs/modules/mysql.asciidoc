@@ -3,51 +3,72 @@ This file is generated! See scripts/docs_collector.py
 ////
 
 [[metricbeat-module-mysql]]
-== MySQL Module
+== MySQL module
 
-This modules periodically fetches metrics from https://www.mysql.com/[MySQL]
+This module periodically fetches metrics from https://www.mysql.com/[MySQL]
 servers.
 
 [float]
-=== Configuration Options
+=== Module-specific configuration notes
 
-A basic configuration for the mysql module can be found below. The host must be passed as a MySQL Data Source Name (DSN). The format of the
-DSN is as following:
+When configuring the `hosts` option, you must use a MySQL Data Source Name (DSN)
+of the following format:
 
 ----
 [username[:password]@][protocol[(address)]]/
 ----
 
+You can also separately specify the username and password using the respective
+configuration options. Usernames and passwords specified in the DSN take
+precedence over those specified in the `username` and `password` config options.
+
+----
+- module: mysql
+  metricsets: ["status"]
+  hosts: ["tcp(127.0.0.1:3306)/"]
+  username: root
+  password: secret
+----
+
 [float]
 === Compatibility
 
-The mysql MetricSets were tested with mysql 5.7.10 and are expected to work with all version
->= 5.7.0.
+The mysql MetricSets were tested with mysql 5.7.12 and are expected to work with
+all versions >= 5.7.0.
 
 
 [float]
-=== Example Configuration
+=== Example configuration
 
-The MySQL Status module supports the standard configuration options which can be found
-here <<configuration-metricbeat,here>>. Below is an example of a configuration option:
+The MySQL module supports the standard configuration options that are described
+in <<configuration-metricbeat>>. Here is an example configuration:
 
 [source,yaml]
 ----
 metricbeat.modules:
 - module: mysql
   metricsets: ["status"]
-  enabled: true
   period: 10s
 
-  # Host DSN should be defined as "tcp(127.0.0.1:3306)/"
-  # The username and password can either be set in the DSN or for all hosts in username and password config option
-  hosts: ["root@tcp(127.0.0.1:3306)/"]
+  # Host DSN should be defined as "user:pass@tcp(127.0.0.1:3306)/"
+  # The username and password can either be set in the DSN or using the username
+  # and password config options. Those specified in the DSN take precedence.
+  hosts: ["root:secret@tcp(127.0.0.1:3306)/"]
+
+  # Username of hosts. Empty by default.
+  #username: root
+
+  # Password of hosts. Empty by default.
+  #password: secret
+
+  # By setting raw to true, all raw fields from the status metricset will be added to the event.
+  #raw: false
 ----
 
 [float]
-=== MetricSets
+=== Metricsets
 
-The following MetricSets are available:
+The following metricsets are available:
 
 * <<metricbeat-metricset-mysql-status,status>>
 

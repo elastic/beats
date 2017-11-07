@@ -1,0 +1,13 @@
+- key: ceph
+  title: "Ceph"
+  description: >
+    beta[]
+
+    Ceph module
+  short_config: false
+  fields:
+    - name: ceph
+      type: group
+      description: >
+        `ceph` contains the metrics that were scraped from CEPH.
+      fields:

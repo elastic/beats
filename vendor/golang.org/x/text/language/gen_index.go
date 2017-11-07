@@ -18,9 +18,9 @@ import (
 	"sort"
 	"strings"
 
-	"golang.org/x/text/cldr"
 	"golang.org/x/text/internal/gen"
 	"golang.org/x/text/language"
+	"golang.org/x/text/unicode/cldr"
 )
 
 var (
@@ -64,26 +64,41 @@ func main() {
 
 	m := map[language.Tag]bool{}
 	for _, lang := range data.Locales() {
-		if x := data.RawLDML(lang); false ||
-			x.LocaleDisplayNames != nil ||
-			x.Characters != nil ||
-			x.Delimiters != nil ||
-			x.Measurement != nil ||
-			x.Dates != nil ||
-			x.Numbers != nil ||
-			x.Units != nil ||
-			x.ListPatterns != nil ||
-			x.Collations != nil ||
-			x.Segmentations != nil ||
-			x.Rbnf != nil ||
-			x.Annotations != nil ||
-			x.Metadata != nil {
+		// We include all locales unconditionally to be consistent with en_US.
+		// We want en_US, even though it has no data associated with it.
 
-			// TODO: support POSIX natively, albeit non-standard.
-			tag := language.Make(strings.Replace(lang, "_POSIX", "-u-va-posix", 1))
-			m[tag] = true
+		// TODO: put any of the languages for which no data exists at the end
+		// of the index. This allows all components based on ICU to use that
+		// as the cutoff point.
+		// if x := data.RawLDML(lang); false ||
+		// 	x.LocaleDisplayNames != nil ||
+		// 	x.Characters != nil ||
+		// 	x.Delimiters != nil ||
+		// 	x.Measurement != nil ||
+		// 	x.Dates != nil ||
+		// 	x.Numbers != nil ||
+		// 	x.Units != nil ||
+		// 	x.ListPatterns != nil ||
+		// 	x.Collations != nil ||
+		// 	x.Segmentations != nil ||
+		// 	x.Rbnf != nil ||
+		// 	x.Annotations != nil ||
+		// 	x.Metadata != nil {
+
+		// TODO: support POSIX natively, albeit non-standard.
+		tag := language.Make(strings.Replace(lang, "_POSIX", "-u-va-posix", 1))
+		m[tag] = true
+		// }
+	}
+	// Include locales for plural rules, which uses a different structure.
+	for _, plurals := range data.Supplemental().Plurals {
+		for _, rules := range plurals.PluralRules {
+			for _, lang := range strings.Split(rules.Locales, " ") {
+				m[language.Make(lang)] = true
+			}
 		}
 	}
+
 	var core, special []language.Tag
 
 	for t := range m {
@@ -105,22 +120,16 @@ func main() {
 	sort.Sort(byAlpha(special))
 	w.WriteVar("specialTags", special)
 
-	type coreKey struct {
-		base   language.Base
-		script language.Script
-		region language.Region
-	}
-	w.WriteType(coreKey{})
-
 	// TODO: order by frequency?
 	sort.Sort(byAlpha(core))
 
 	// Size computations are just an estimate.
-	w.Size += int(reflect.TypeOf(map[coreKey]uint16{}).Size())
-	w.Size += len(core) * int(reflect.TypeOf(coreKey{}).Size()+2) // 2 is for uint16
+	w.Size += int(reflect.TypeOf(map[uint32]uint16{}).Size())
+	w.Size += len(core) * 6 // size of uint32 and uint16
 
-	fmt.Fprintln(w, "var coreTags = map[coreKey]uint16{")
-	fmt.Fprintln(w, "coreKey{}: 0, // und")
+	fmt.Fprintln(w)
+	fmt.Fprintln(w, "var coreTags = map[uint32]uint16{")
+	fmt.Fprintln(w, "0x0: 0, // und")
 	i := len(special) + 1 // Und and special tags already written.
 	for _, t := range core {
 		if t == language.Und {
@@ -128,12 +137,22 @@ func main() {
 		}
 		fmt.Fprint(w.Hash, t, i)
 		b, s, r := t.Raw()
-		key := fmt.Sprintf("%#v", coreKey{b, s, r})
-		key = strings.Replace(key[len("main."):], "language.", "", -1)
-		fmt.Fprintf(w, "%s: %d, // %s\n", key, i, t)
+		fmt.Fprintf(w, "0x%s%s%s: %d, // %s\n",
+			getIndex(b, 3), // 3 is enough as it is guaranteed to be a compact number
+			getIndex(s, 2),
+			getIndex(r, 3),
+			i, t)
 		i++
 	}
 	fmt.Fprintln(w, "}")
+}
+
+// getIndex prints the subtag type and extracts its index of size nibble.
+// If the index is less than n nibbles, the result is prefixed with 0s.
+func getIndex(x interface{}, n int) string {
+	s := fmt.Sprintf("%#v", x) // s is of form Type{typeID: 0x00}
+	s = s[strings.Index(s, "0x")+2 : len(s)-1]
+	return strings.Repeat("0", n-len(s)) + s
 }
 
 type byAlpha []language.Tag

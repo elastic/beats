@@ -1,0 +1,39 @@
+{
+  "description": "Pipeline for parsing MySQL slow logs.",
+  "processors": [{
+    "grok": {
+      "field": "message",
+      "patterns":[
+        "^# User@Host: %{USER:mysql.slowlog.user}(\\[[^\\]]+\\])? @ %{HOSTNAME:mysql.slowlog.host} \\[(%{IP:mysql.slowlog.ip})?\\](\\s*Id:\\s* %{NUMBER:mysql.slowlog.id})?\n# Query_time: %{NUMBER:mysql.slowlog.query_time.sec}\\s* Lock_time: %{NUMBER:mysql.slowlog.lock_time.sec}\\s* Rows_sent: %{NUMBER:mysql.slowlog.rows_sent}\\s* Rows_examined: %{NUMBER:mysql.slowlog.rows_examined}\n(SET timestamp=%{NUMBER:mysql.slowlog.timestamp};\n)?%{GREEDYMULTILINE:mysql.slowlog.query}"
+        ],
+      "pattern_definitions" : {
+        "GREEDYMULTILINE" : "(.|\n)*"
+      },
+      "ignore_missing": true
+    }
+  }, {
+    "remove":{
+      "field": "message"
+    }
+  }, {
+    "date": {
+      "field": "mysql.slowlog.timestamp",
+      "target_field": "@timestamp",
+      "formats": ["UNIX"],
+      "ignore_failure": true
+    }
+  }, {
+    "gsub": {
+      "field": "mysql.slowlog.query",
+       "pattern": "\n# Time: [0-9]+ [0-9][0-9]:[0-9][0-9]:[0-9][0-9](\\.[0-9]+)?$",
+       "replacement": "",
+       "ignore_failure": true
+    }
+  }],
+  "on_failure" : [{
+    "set" : {
+      "field" : "error.message",
+      "value" : "{{ _ingest.on_failure_message }}"
+    }
+  }]
+}

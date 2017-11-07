@@ -1,0 +1,5 @@
+- module: php_fpm
+  metricsets: ["pool"]
+  period: 10s
+  status_path: "/status"
+  hosts: ["localhost:8080"]

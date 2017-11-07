@@ -1,0 +1,34 @@
+////
+This file is generated! See scripts/docs_collector.py
+////
+
+[[metricbeat-module-kibana]]
+== Kibana module
+
+The Kibana module only tracks the high-level metrics. To monitor more Kibana metrics, use our {monitoringdoc}/xpack-monitoring.html[X-Pack monitoring] which is available under a free basic license.
+
+
+[float]
+=== Example configuration
+
+The Kibana module supports the standard configuration options that are described
+in <<configuration-metricbeat>>. Here is an example configuration:
+
+[source,yaml]
+----
+metricbeat.modules:
+- module: kibana
+  metricsets: ["status"]
+  period: 10s
+  hosts: ["localhost:5601"]
+----
+
+[float]
+=== Metricsets
+
+The following metricsets are available:
+
+* <<metricbeat-metricset-kibana-status,status>>
+
+include::kibana/status.asciidoc[]
+

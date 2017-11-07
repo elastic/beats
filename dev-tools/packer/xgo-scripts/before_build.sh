@@ -2,46 +2,59 @@
 
 set -e
 
-BEATS_PATH=/go/src/${1}
-# BEATNAME is in the $PACK variable
-BEATNAME=$PACK
-
-if [ $BEATNAME = "packetbeat" ]; then
+if [ $BEAT_NAME = "packetbeat" ]; then
 	patch -p1 < /gopacket_pcap.patch
 fi
 
-if [ $BEATS_PATH = "/go/src/github.com/elastic/beats" ]; then
-    BEAT_PATH=$BEATS_PATH/$BEATNAME
-else
-    BEAT_PATH=$BEATS_PATH
-fi
+cd $GOPATH/src/$BEAT_PATH
 
-cd $BEAT_PATH
+# Files must be copied before before-build calls to allow modifications on the config files
 
 PREFIX=/build
 
-# Add data to the home directory
-mkdir -p $PREFIX/homedirs/$BEATNAME
-make install-home HOME_PREFIX=$PREFIX/homedirs/$BEATNAME
-if [ -n "BUILDID" ]; then
-    echo "$BUILDID" > $PREFIX/homedirs/$BEATNAME/.build_hash.txt
-fi
-
-# Copy template
-cp $BEATNAME.template.json $PREFIX/$BEATNAME.template.json
-cp $BEATNAME.template-es2x.json $PREFIX/$BEATNAME.template-es2x.json
+# Copy fields.yml
+cp fields.yml $PREFIX/fields.yml
 
 # linux
-cp $BEATNAME.yml $PREFIX/$BEATNAME-linux.yml
-cp $BEATNAME.full.yml $PREFIX/$BEATNAME-linux.full.yml
+cp $BEAT_NAME.yml $PREFIX/$BEAT_NAME-linux.yml
+chmod 0600 $PREFIX/$BEAT_NAME-linux.yml
+cp $BEAT_NAME.reference.yml $PREFIX/$BEAT_NAME-linux.reference.yml
+rm -rf $PREFIX/modules.d-linux
+cp -r modules.d/ $PREFIX/modules.d-linux || true
+[ -d "$PREFIX/modules.d-linux" ] && chmod 0755 $PREFIX/modules.d-linux
 
 # darwin
-cp $BEATNAME.yml $PREFIX/$BEATNAME-darwin.yml
-cp $BEATNAME.full.yml $PREFIX/$BEATNAME-darwin.full.yml
+cp $BEAT_NAME.yml $PREFIX/$BEAT_NAME-darwin.yml
+chmod 0600 $PREFIX/$BEAT_NAME-darwin.yml
+cp $BEAT_NAME.reference.yml $PREFIX/$BEAT_NAME-darwin.reference.yml
+rm -rf $PREFIX/modules.d-darwin
+cp -r modules.d/ $PREFIX/modules.d-darwin || true
+[ -d "$PREFIX/modules.d-darwin" ] && chmod 0755 $PREFIX/modules.d-darwin
 
 # win
-cp $BEATNAME.yml $PREFIX/$BEATNAME-win.yml
-cp $BEATNAME.full.yml $PREFIX/$BEATNAME-win.full.yml
+cp $BEAT_NAME.yml $PREFIX/$BEAT_NAME-win.yml
+chmod 0600 $PREFIX/$BEAT_NAME-win.yml
+cp $BEAT_NAME.reference.yml $PREFIX/$BEAT_NAME-win.reference.yml
+rm -rf $PREFIX/modules.d-win
+cp -r modules.d/ $PREFIX/modules.d-win || true
+[ -d "$PREFIX/modules.d-win" ] && chmod 0755 $PREFIX/modules.d-win
 
-# Contains beat specific adjustments. As it is platform specific knowledge, it should be in packer not the beats itself
+# Runs beat specific tasks which should be done before building
 PREFIX=$PREFIX make before-build
+
+# Add data to the home directory
+mkdir -p $PREFIX/homedir
+make install-home HOME_PREFIX=$PREFIX/homedir
+
+if [ -n "BUILDID" ]; then
+    echo "$BUILDID" > $PREFIX/homedir/.build_hash.txt
+fi
+
+# Append doc versions to package.yml
+cat ${ES_BEATS}/libbeat/docs/version.asciidoc >> ${PREFIX}/package.yml
+
+# Make variable naming of doc-branch compatible with gotpl. Generate and copy README.md into homedir
+sed -i -e 's/:doc-branch/doc_branch/g' ${PREFIX}/package.yml
+
+# Create README file
+/go/bin/gotpl /templates/readme.md.j2 < ${PREFIX}/package.yml > ${PREFIX}/homedir/README.md

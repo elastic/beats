@@ -6,8 +6,9 @@ import (
 	"github.com/elastic/beats/libbeat/common"
 	"github.com/elastic/beats/libbeat/logp"
 	"github.com/elastic/beats/metricbeat/mb"
-
+	"github.com/elastic/beats/metricbeat/mb/parse"
 	"github.com/elastic/beats/metricbeat/module/redis"
+
 	rd "github.com/garyburd/redigo/redis"
 )
 
@@ -16,7 +17,7 @@ var (
 )
 
 func init() {
-	if err := mb.Registry.AddMetricSet("redis", "keyspace", New); err != nil {
+	if err := mb.Registry.AddMetricSet("redis", "keyspace", New, parse.PassThruHostParser); err != nil {
 		panic(err)
 	}
 }

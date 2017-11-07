@@ -1,0 +1,46 @@
+{
+    "@timestamp": "2016-05-23T08:05:34.853Z",
+    "beat": {
+        "hostname": "host.example.com",
+        "name": "host.example.com"
+    },
+    "memcached": {
+        "stats": {
+            "cmd": {
+                "get": 0,
+                "set": 0
+            },
+            "connections": {
+                "current": 10,
+                "total": 11
+            },
+            "evictions": 0,
+            "get": {
+                "hits": 0,
+                "misses": 0
+            },
+            "items": {
+                "current": 0,
+                "total": 0
+            },
+            "pid": 1,
+            "read": {
+                "bytes": 6
+            },
+            "threads": 4,
+            "uptime": {
+                "sec": 7
+            },
+            "written": {
+                "bytes": 0
+            }
+        }
+    },
+    "metricset": {
+        "host": "127.0.0.1:11211",
+        "module": "memcached",
+        "name": "stats",
+        "rtt": 115
+    },
+    "type": "metricsets"
+}

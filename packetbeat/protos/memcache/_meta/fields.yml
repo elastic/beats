@@ -1,0 +1,244 @@
+- key: memcache
+  title: "Memcache"
+  description: Memcached-specific event fields
+  fields:
+    - name: memcache
+      type: group
+      fields:
+        - name: protocol_type
+          type: keyword
+          description: >
+            The memcache protocol implementation. The value can be "binary"
+            for binary-based, "text" for text-based, or "unknown" for an unknown
+            memcache protocol type.
+
+        - name: request.line
+          type: keyword
+          description: >
+            The raw command line for unknown commands ONLY.
+
+        - name: request.command
+          type: keyword
+          description: >
+            The memcache command being requested in the memcache text protocol.
+            For example "set" or "get".
+            The binary protocol opcodes are translated into memcache text protocol
+            commands.
+
+        - name: response.command
+          type: keyword
+          description: >
+            Either the text based protocol response message type
+            or the name of the originating request if binary protocol is used.
+
+        - name: request.type
+          type: keyword
+          description: >
+            The memcache command classification. This value can be "UNKNOWN", "Load",
+            "Store", "Delete", "Counter", "Info", "SlabCtrl", "LRUCrawler",
+            "Stats", "Success", "Fail", or "Auth".
+
+        - name: response.type
+          type: keyword
+          description: >
+            The memcache command classification. This value can be "UNKNOWN", "Load",
+            "Store", "Delete", "Counter", "Info", "SlabCtrl", "LRUCrawler",
+            "Stats", "Success", "Fail", or "Auth".
+            The text based protocol will employ any of these, whereas the
+            binary based protocol will mirror the request commands only (see
+            `memcache.response.status` for binary protocol).
+
+        - name: response.error_msg
+          type: keyword
+          description: >
+            The optional error message in the memcache response (text based protocol only).
+
+        - name: request.opcode
+          type: keyword
+          description: >
+            The binary protocol message opcode name.
+
+        - name: response.opcode
+          type: keyword
+          description: >
+            The binary protocol message opcode name.
+
+        - name: request.opcode_value
+          type: long
+          description: >
+            The binary protocol message opcode value.
+
+        - name: response.opcode_value
+          type: long
+          description: >
+            The binary protocol message opcode value.
+
+        - name: request.opaque
+          type: long
+          description: >
+            The binary protocol opaque header value used for correlating request
+            with response messages.
+
+        - name: response.opaque
+          type: long
+          description: >
+            The binary protocol opaque header value used for correlating request
+            with response messages.
+
+        - name: request.vbucket
+          type: long
+          description: >
+            The vbucket index sent in the binary message.
+
+        - name: response.status
+          type: keyword
+          description: >
+            The textual representation of the response error code
+            (binary protocol only).
+
+        - name: response.status_code
+          type: long
+          description: >
+            The status code value returned in the response (binary protocol only).
+
+        - name: request.keys
+          type: array
+          description: >
+            The list of keys sent in the store or load commands.
+
+        - name: response.keys
+          type: array
+          description: >
+            The list of keys returned for the load command (if present).
+
+        - name: request.count_values
+          type: long
+          description: >
+            The number of values found in the memcache request message.
+            If the command does not send any data, this field is missing.
+
+        - name: response.count_values
+          type: long
+          description: >
+            The number of values found in the memcache response message.
+            If the command does not send any data, this field is missing.
+
+        - name: request.values
+          type: array
+          description: >
+            The list of base64 encoded values sent with the request (if present).
+
+        - name: response.values
+          type: array
+          description: >
+            The list of base64 encoded values sent with the response (if present).
+
+        - name: request.bytes
+          type: long
+          format: bytes
+          description: >
+            The byte count of the values being transferred.
+
+        - name: response.bytes
+          type: long
+          format: bytes
+          description: >
+            The byte count of the values being transferred.
+
+        - name: request.delta
+          type: long
+          description: >
+            The counter increment/decrement delta value.
+
+        - name: request.initial
+          type: long
+          description: >
+            The counter increment/decrement initial value parameter (binary protocol only).
+
+        - name: request.verbosity
+          type: long
+          description: >
+            The value of the memcache "verbosity" command.
+
+        - name: request.raw_args
+          type: keyword
+          description: >
+            The text protocol raw arguments for the "stats ..." and "lru crawl ..." commands.
+
+        - name: request.source_class
+          type: long
+          description: >
+            The source class id in 'slab reassign' command.
+
+        - name: request.dest_class
+          type: long
+          description: >
+            The destination class id in 'slab reassign' command.
+
+        - name: request.automove
+          type: keyword
+          description: >
+              The automove mode in the 'slab automove' command expressed as a string.
+              This value can be "standby"(=0), "slow"(=1), "aggressive"(=2), or the raw value if
+              the value is unknown.
+
+        - name: request.flags
+          type: long
+          description: >
+            The memcache command flags sent in the request (if present).
+
+        - name: response.flags
+          type: long
+          description: >
+            The memcache message flags sent in the response (if present).
+
+        - name: request.exptime
+          type: long
+          description: >
+            The data expiry time in seconds sent with the memcache command (if present).
+            If the value is <30 days, the expiry time is relative to "now", or else it
+            is an absolute Unix time in seconds (32-bit).
+
+        - name: request.sleep_us
+          type: long
+          description: >
+            The sleep setting in microseconds for the 'lru_crawler sleep' command.
+
+        - name: response.value
+          type: long
+          description: >
+            The counter value returned by a counter operation.
+
+        - name: request.noreply
+          type: boolean
+          description: >
+            Set to true if noreply was set in the request.
+            The `memcache.response` field will be missing.
+
+        - name: request.quiet
+          type: boolean
+          description: >
+            Set to true if the binary protocol message is to be treated as a quiet message.
+
+        - name: request.cas_unique
+          type: long
+          description: >
+            The CAS (compare-and-swap) identifier if present.
+
+        - name: response.cas_unique
+          type: long
+          description: >
+            The CAS (compare-and-swap) identifier to be used with CAS-based updates
+            (if present).
+
+        - name: response.stats
+          type: array
+          description: >
+            The list of statistic values returned. Each entry is a dictionary with the
+            fields "name" and "value".
+
+        - name: response.version
+          type: keyword
+          description: >
+            The returned memcache version string.
+

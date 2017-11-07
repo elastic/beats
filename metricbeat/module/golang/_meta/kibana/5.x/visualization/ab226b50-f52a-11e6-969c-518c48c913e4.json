@@ -1,0 +1,10 @@
+{
+  "visState": "{\"title\":\"Golang: GC durations\",\"type\":\"timelion\",\"params\":{\"expression\":\".es(index=\\\"metricbeat*\\\",metric=\\\"max:golang.heap.gc.pause.sum.ns\\\").bars().label(\\\"sum of GC Pause durations(ns)\\\").yaxis(label=\\\"Durations(ns)\\\"),.es(index=\\\"metricbeat*\\\",metric=\\\"max:golang.heap.gc.total_pause.ns\\\").derivative().movingaverage(30).label(\\\"Total GC Pause(ns) Rate\\\"),.es(index=\\\"metricbeat*\\\",metric=\\\"max:golang.heap.gc.pause.max.ns\\\").label(\\\"Max GC Pause(ns)\\\").movingaverage(30),.es(index=\\\"metricbeat*\\\",metric=\\\"avg:golang.heap.gc.pause.avg.ns\\\").label(\\\"Avg GC Pause(ns)\\\").movingaverage(30),.es(index=\\\"metricbeat*\\\",metric=\\\"max:golang.heap.gc.pause.count\\\").condition(lt,1, null).label(\\\"GC Pause count\\\").points().yaxis(2,label=\\\"Count\\\")\",\"interval\":\"10s\"},\"aggs\":[],\"listeners\":{}}", 
+  "description": "", 
+  "title": "Golang: GC durations", 
+  "uiStateJSON": "{}", 
+  "version": 1, 
+  "kibanaSavedObjectMeta": {
+    "searchSourceJSON": "{\"query\":{\"query_string\":{\"query\":\"*\",\"analyze_wildcard\":true}},\"filter\":[]}"
+  }
+}

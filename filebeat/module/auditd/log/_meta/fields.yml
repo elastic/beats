@@ -1,0 +1,79 @@
+- name: log
+  type: group
+  description: >
+    Fields from the Linux audit log. Not all fields are documented here because
+    they are dynamic and vary by audit event type.
+  fields:
+    - name: record_type
+      description: >
+        The audit event type.
+    - name: old_auid
+      description: >
+        For login events this is the old audit ID used for the user prior to
+        this login.
+    - name: new_auid
+      description: >
+        For login events this is the new audit ID. The audit ID can be used to
+        trace future events to the user even if their identity changes (like
+        becoming root).
+    - name: old_ses
+      description: >
+        For login events this is the old session ID used for the user prior to
+        this login.
+    - name: new_ses
+      description: >
+        For login events this is the new session ID. It can be used to tie a
+        user to future events by session ID.
+    - name: sequence
+      type: long
+      description: >
+        The audit event sequence number.
+    - name: acct
+      description: >
+        The user account name associated with the event.
+    - name: pid
+      description: >
+        The ID of the process.
+    - name: ppid
+      description: >
+        The ID of the process.
+    - name: items
+      description: >
+        The number of items in an event.
+    - name: item
+      description: >
+        The item field indicates which item out of the total number of items.
+        This number is zero-based; a value of 0 means it is the first item.
+    - name: a0
+      description: >
+        The first argument to the system call.
+    - name: res
+      description: >
+        The result of the system call (success or failure).
+    - name: geoip
+      type: group
+      description: >
+        Contains GeoIP information gathered based on the `auditd.log.addr`
+        field. Only present if the GeoIP Elasticsearch plugin is available and
+        used.
+      fields:
+        - name: continent_name
+          type: keyword
+          description: >
+            The name of the continent.
+        - name: city_name
+          type: keyword
+          description: >
+            The name of the city.
+        - name: region_name
+          type: keyword
+          description: >
+            The name of the region.
+        - name: country_iso_code
+          type: keyword
+          description: >
+            Country ISO code.
+        - name: location
+          type: geo_point
+          description: >
+            The longitude and latitude.

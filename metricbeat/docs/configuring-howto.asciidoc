@@ -1,80 +1,79 @@
 [[configuring-howto-metricbeat]]
-== Configuring {beatname_uc}
+= Configuring {beatname_uc}
 
-After following the <<metricbeat-configuration,configuration steps>> in the
-Getting Started, you might want to fine tune the behavior of {beatname_uc}.
+[partintro]
+--
+Before modifying configuration settings, make sure you've completed the
+<<metricbeat-configuration,configuration steps>> in the Getting Started.
 This section describes some common use cases for changing configuration options.
 
-For a complete description of all {beatname_uc} configuration options, see
-<<metricbeat-configuration-options>>.
+To configure {beatname_uc}, you edit the configuration file. For rpm and deb,
+you’ll find the configuration file at +/etc/{beatname_lc}/{beatname_lc}.yml+.
+There's also a full example configuration file at
++/etc/{beatname_lc}/{beatname_lc}.reference.yml+ that shows all non-deprecated
+options. For mac and win, look in the archive that you extracted.
+
+The {beatname_uc} configuration file uses http://yaml.org/[YAML] for its syntax.
+See the {libbeat}/config-file-format.html[Config File Format] section of the
+_Beats Platform Reference_ for more about the structure of the config file.
+
+The following topics describe how to configure Metricbeat:
+
+* <<configuration-metricbeat>>
+* <<configuration-general-options>>
+* <<metricbeat-configuration-reloading>>
+* <<configuring-internal-queue>>
+* <<configuring-output>>
+* <<configuration-ssl>>
+* <<filtering-and-enhancing-data>>
+* <<configuring-ingest-node>>
+* <<configuration-path>>
+* <<setup-kibana-endpoint>>
+* <<configuration-dashboards>>
+* <<configuration-template>>
+* <<configuration-logging>>
+* <<using-environ-vars>>
+* <<yaml-tips>>
+* <<regexp-support>>
+* <<{beatname_lc}-reference-yml>>
+
+--
+
+include::./metricbeat-options.asciidoc[]
+
+include::./metricbeat-general-options.asciidoc[]
+
+include::./reload-configuration.asciidoc[]
+
+:allplatforms:
+include::../../libbeat/docs/queueconfig.asciidoc[]
+
+include::../../libbeat/docs/outputconfig.asciidoc[]
+
+include::../../libbeat/docs/shared-ssl-config.asciidoc[]
+
+include::./metricbeat-filtering.asciidoc[]
+
+include::../../libbeat/docs/shared-config-ingest.asciidoc[]
+
+include::../../libbeat/docs/shared-path-config.asciidoc[]
+
+include::../../libbeat/docs/shared-kibana-config.asciidoc[]
+
+include::../../libbeat/docs/setup-config.asciidoc[]
+
+include::../../libbeat/docs/loggingconfig.asciidoc[]
+
+:standalone:
+include::../../libbeat/docs/shared-env-vars.asciidoc[]
+
+:standalone:
+:allplatforms:
+include::../../libbeat/docs/yaml.asciidoc[]
+
+include::../../libbeat/docs/regexp.asciidoc[]
+
+include::../../libbeat/docs/reference-yml.asciidoc[]
 
 
-[float]
-== Basic Configuration
 
-A Metricbeat configuration contains a list of modules. Each module contains the following config options:
-
-* module: Name of the module to run
-* metricsets: List of metricsets of the module which should be executed
-* hosts: List of hosts that the metricsets should connected to. For some modules, such as the system module, this is not required. For the details how to define the hosts string for each module, please check the documentation of the module.
-* period: How often in seconds the metricsets are executed. If a system is not reachable it will return an error for each period.
-* enabled: Modules are enabled (set to `enabled: true`) by default. To disable a module, specify `enabled: false`.
-* fields: Fields is optional. Here you can define additional fields which should be sent with the metricset event
-* tags: Tags is optional. Here you can define additional tags which should be sent with the metricset event
-* filters: With filters you can reduce the amount of data is sent. For details on the available filter options check (link to filters).
-
-[source,yaml]
-----
-metricbeat:
-  modules:
-    - module: apache
-      metricsets: ["status"]
-      hosts: ["http://127.0.0.1/"]
-      period: 10s
-      enabled: true
-      selectors: []
-      fields:
-        dc: west
-      tags: ["tag"]
-      filters:
-        ....
-----
-
-[float]
-== Configuration Combinations
-
-This configuration allows you to create different combinations of module, metricsets, period, hosts, and selectors. In the following example, the same hosts is crawled for the `stats` information every second as this is critical data, and the full list of metricsets is only fetched every 30 seconds as it is less critical.
-
-[source,yaml]
-----
-metricbeat:
-  modules:
-    - module: redis
-      metricsets: ["info"]
-      hosts: ["host1"]
-      period: 1s
-      enabled: true
-      selectors: ["stats"]
-    - module: apache
-      metricsets: ["info"]
-      hosts: ["host1"]
-      period: 30s
-      enabled: true
-      selectors: []
-----
-
-For a module with multiple metricsets its also possible to run define the module twice and run it in once case with both metricsets and in the second case only with one metricset with a different period:
-
-[source,yaml]
-----
-metricbeat:
-  modules:
-    - module: example
-      metricsets: ["set1"]
-      hosts: ["host1"]
-      period: 10s
-    - module: example
-      metricsets: ["set2"]
-      hosts: ["host1"]
-      period: 2m
-----

@@ -1,0 +1,138 @@
+[[beats-contributing]]
+== Contributing to Beats
+
+If you have a bugfix or new feature that you would like to contribute, please
+start by opening a topic on the https://discuss.elastic.co/c/beats[forums].
+It may be that somebody is already working on it, or that there are particular
+issues that you should know about before implementing the change.
+
+We enjoy working with contributors to get their code accepted. There are many
+approaches to fixing a problem and it is important to find the best approach
+before writing too much code.
+
+The process for contributing to any of the Elastic repositories is similar.
+
+[float]
+[[contribution-steps]]
+=== Contribution Steps
+
+. Please make sure you have signed our https://www.elastic.co/contributor-agreement/[Contributor License Agreement]. We are not asking you to assign
+copyright to us, but to give us the right to distribute your code without
+restriction. We ask this of all contributors in order to assure our users of the
+origin and continuing existence of the code. You only need to sign the CLA once.
+
+. Send a pull request! Push your changes to your fork of the repository and https://help.github.com/articles/using-pull-requests[submit a pull request]. In
+the pull request, describe what your changes do and mention any bugs/issues
+related to the pull request.
+
+[float]
+[[adding-new-beat]]
+=== Adding a New Beat
+
+If you want to create a new Beat, please read <<new-beat>>. You don't need to
+submit the code to this repository. Most new Beats start in their own repository
+and just make use of the libbeat packages. After you have a working Beat that
+you'd like to share with others, open a PR to add it to our list of
+https://github.com/elastic/beats/blob/master/libbeat/docs/communitybeats.asciidoc[community
+Beats].
+
+[float]
+[[setting-up-dev-environment]]
+=== Setting Up Your Dev Environment
+
+The Beats are Go programs, so install the latest version of
+http://golang.org/[golang] if you don't have it already. The current Go version
+used for development is Golang {go-version}.
+
+The location where you clone is important. Please clone under the source
+directory of your `GOPATH`. If you don't have `GOPATH` already set, you can
+simply set it to the `go` directory in your home (`export GOPATH=$HOME/go`).
+
+[source,shell]
+--------------------------------------------------------------------------------
+mkdir -p ${GOPATH}/src/github.com/elastic
+cd ${GOPATH}/src/github.com/elastic
+git clone https://github.com/elastic/beats.git
+--------------------------------------------------------------------------------
+
+NOTE: If you have multiple go paths, use `${GOPATH%%:*}` instead of `${GOPATH}`.
+
+Then you can compile a particular Beat by using the Makefile. For example, for
+Packetbeat:
+
+[source,shell]
+--------------------------------------------------------------------------------
+cd beats/packetbeat
+make
+--------------------------------------------------------------------------------
+
+Some of the Beats might have extra development requirements, in which case
+you'll find a CONTRIBUTING.md file in the Beat directory.
+
+We use an http://editorconfig.org/[EditorConfig] file in the beats repository
+to standardise how different editors handle whitespace, line endings, and other
+coding styles in our files. Most popular editors have a
+http://editorconfig.org/#download[plugin] for EditorConfig and we strongly
+recommend that you install it.
+
+[float]
+[[update-scripts]]
+=== Update scripts
+
+The Beats use a variety of scripts based on Python to generate configuration files
+and documentation. The command used for this is:
+
+[source,shell]
+--------------------------------------------------------------------------------
+make update
+--------------------------------------------------------------------------------
+
+This command has the following dependencies:
+
+* Python >= {python}
+* https://virtualenv.pypa.io/en/latest/[virtualenv] for Python
+
+Virtualenv can be installed with the command `easy_install virtualenv` or `pip install virtualenv`.
+More details can be found https://virtualenv.pypa.io/en/latest/installation.html[here].
+
+[float]
+[[running-testsuite]]
+=== Testing
+
+You can run the whole testsuite with the following command:
+
+[source,shell]
+--------------------------------------------------------------------------------
+make testsuite
+--------------------------------------------------------------------------------
+
+Running the testsuite has the following requirements:
+
+* Python >= {python}
+* Docker >= {docker}
+* Docker-compose >= {docker-compose}
+
+For more details check the <<testing>> guide.
+
+
+[float]
+[[documentation]]
+=== Documentation
+
+The documentation for each Beat is located under `{beatname}/docs` and is based
+on asciidoc. After changing the docs, you should verify that the docs are still
+building to avoid breaking the automated docs build. To build the docs run
+`make docs`. If you want to preview the docs for a specific Beat, run
+`make docs-preview` inside the folder for the Beat. This will automatically open
+your browser with the docs for preview.
+
+[float]
+[[dependencies]]
+=== Dependencies
+
+To manage the `vendor/` folder we use
+https://github.com/kardianos/govendor[govendor]. Please see
+the govendor documentation on how to add or update vendored dependencies.
+
+In most cases `govendor fetch your/dependency@version +out` will get the job done.
+

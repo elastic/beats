@@ -1,0 +1,18 @@
+{
+  "sort": [
+    "@timestamp", 
+    "desc"
+  ], 
+  "hits": 0, 
+  "description": "", 
+  "title": "Icinga Debug Log", 
+  "version": 1, 
+  "kibanaSavedObjectMeta": {
+    "searchSourceJSON": "{\"index\":\"filebeat-*\",\"highlightAll\":true,\"query\":{\"query_string\":{\"query\":\"source:*icinga2\\\\/debug.log\",\"analyze_wildcard\":true}},\"filter\":[]}"
+  }, 
+  "columns": [
+    "icinga.debug.facility", 
+    "icinga.debug.severity", 
+    "icinga.debug.message"
+  ]
+}

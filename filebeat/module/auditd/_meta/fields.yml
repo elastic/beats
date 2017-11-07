@@ -1,0 +1,11 @@
+- key: auditd
+  title: "Auditd"
+  description: >
+    Module for parsing auditd logs.
+  short_config: true
+  fields:
+    - name: auditd
+      type: group
+      description: >
+        Fields from the auditd logs.
+      fields:

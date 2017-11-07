@@ -1,0 +1,79 @@
+{
+    "@timestamp": "2017-10-12T08:05:34.853Z",
+    "beat": {
+        "hostname": "host.example.com",
+        "name": "host.example.com"
+    },
+    "metricset": {
+        "module": "system",
+        "name": "cpu",
+        "rtt": 115
+    },
+    "system": {
+        "cpu": {
+            "cores": 4,
+            "idle": {
+                "norm": {
+                    "pct": 0.0948
+                },
+                "pct": 0.3791,
+                "ticks": 6154450
+            },
+            "iowait": {
+                "norm": {
+                    "pct": 0
+                },
+                "pct": 0,
+                "ticks": 0
+            },
+            "irq": {
+                "norm": {
+                    "pct": 0
+                },
+                "pct": 0,
+                "ticks": 0
+            },
+            "nice": {
+                "norm": {
+                    "pct": 0
+                },
+                "pct": 0,
+                "ticks": 0
+            },
+            "softirq": {
+                "norm": {
+                    "pct": 0
+                },
+                "pct": 0,
+                "ticks": 0
+            },
+            "steal": {
+                "norm": {
+                    "pct": 0
+                },
+                "pct": 0,
+                "ticks": 0
+            },
+            "system": {
+                "norm": {
+                    "pct": 0.2818
+                },
+                "pct": 1.1272,
+                "ticks": 1100833
+            },
+            "total": {
+                "norm": {
+                    "pct": 0.9052
+                },
+                "pct": 3.6209
+            },
+            "user": {
+                "norm": {
+                    "pct": 0.6234
+                },
+                "pct": 2.4938,
+                "ticks": 1193819
+            }
+        }
+    }
+}

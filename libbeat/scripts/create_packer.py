@@ -3,15 +3,16 @@ import argparse
 
 # Adds dev-tools/packer directory with the necessary files to a beat
 
+
 def generate_packer(es_beats, abs_path, beat, beat_path, version):
 
     # create dev-tools/packer
     packer_path = abs_path + "/dev-tools/packer"
 
-    print packer_path
+    print(packer_path)
 
     if os.path.isdir(packer_path):
-        print "Dev tools already exists. Stopping..."
+        print("Dev tools already exists. Stopping...")
         return
 
     # create all directories needed
@@ -23,17 +24,15 @@ def generate_packer(es_beats, abs_path, beat, beat_path, version):
     with open(packer_path + "/version.yml", "w") as f:
         f.write(content)
 
-
     content = load_file(templates + "/Makefile", beat, beat_path, version)
     with open(packer_path + "/Makefile", "w") as f:
         f.write(content)
-
 
     content = load_file(templates + "/config.yml", beat, beat_path, version)
     with open(packer_path + "/beats/" + beat + ".yml", "w") as f:
         f.write(content)
 
-    print "Packer directories created"
+    print("Packer directories created")
 
 
 def load_file(file, beat, beat_path, version):
@@ -42,6 +41,7 @@ def load_file(file, beat, beat_path, version):
         content = f.read()
 
     return content.replace("{beat}", beat).replace("{beat_path}", beat_path).replace("{version}", version)
+
 
 if __name__ == "__main__":
 
@@ -54,16 +54,16 @@ if __name__ == "__main__":
     args = parser.parse_args()
 
     # Fetches GOPATH and current execution directory. It is expected to run this script from the Makefile.
-    gopath = os.environ['GOPATH']
+    gopath = os.environ['GOPATH'].split(os.pathsep)[0]
     # Normalise go path
     gopath = os.path.abspath(gopath)
     abs_path = os.path.abspath("./")
 
     # Removes the gopath + /src/ from the directory name to fetch the path
-    beat_path = abs_path[len(gopath)+5:]
+    beat_path = abs_path[len(gopath) + 5:]
 
-    print beat_path
-    print abs_path
+    print(beat_path)
+    print(abs_path)
 
     es_beats = os.path.abspath(args.es_beats)
     generate_packer(es_beats, abs_path, args.beat, beat_path, args.version)

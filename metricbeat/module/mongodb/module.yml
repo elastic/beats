@@ -1,0 +1,3 @@
+dashboards:
+    - id: Metricbeat-MongoDB
+      file: Metricbeat-mongodb-overview.json

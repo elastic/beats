@@ -13,42 +13,42 @@ import (
 
 // Http Message
 type message struct {
-	Ts               time.Time
+	ts               time.Time
 	hasContentLength bool
 	headerOffset     int
-	bodyOffset       int
 	version          version
 	connection       common.NetString
 	chunkedLength    int
 	chunkedBody      []byte
 
-	IsRequest    bool
-	TCPTuple     common.TcpTuple
-	CmdlineTuple *common.CmdlineTuple
-	Direction    uint8
+	isRequest    bool
+	tcpTuple     common.TCPTuple
+	cmdlineTuple *common.CmdlineTuple
+	direction    uint8
 
 	//Request Info
-	RequestURI   common.NetString
-	Method       common.NetString
-	StatusCode   uint16
-	StatusPhrase common.NetString
-	RealIP       common.NetString
+	requestURI   common.NetString
+	method       common.NetString
+	statusCode   uint16
+	statusPhrase common.NetString
+	realIP       common.NetString
 
 	// Http Headers
-	ContentLength    int
-	ContentType      common.NetString
-	TransferEncoding common.NetString
-	Headers          map[string]common.NetString
-	Size             uint64
+	contentLength    int
+	contentType      common.NetString
+	transferEncoding common.NetString
+	headers          map[string]common.NetString
+	size             uint64
 
 	//Raw Data
-	Raw []byte
+	raw []byte
 
-	Notes []string
+	notes []string
 
-	//Timing
-	start int
-	end   int
+	//Offsets
+	start      int
+	end        int
+	bodyOffset int
 
 	next *message
 }
@@ -63,10 +63,10 @@ type parser struct {
 }
 
 type parserConfig struct {
-	RealIPHeader     string
-	SendHeaders      bool
-	SendAllHeaders   bool
-	HeadersWhitelist map[string]bool
+	realIPHeader     string
+	sendHeaders      bool
+	sendAllHeaders   bool
+	headersWhitelist map[string]bool
 }
 
 var (
@@ -87,8 +87,17 @@ func newParser(config *parserConfig) *parser {
 	return &parser{config: config}
 }
 
-func (parser *parser) parse(s *stream) (bool, bool) {
+func (parser *parser) parse(s *stream, extraMsgSize int) (bool, bool) {
 	m := s.message
+
+	if extraMsgSize > 0 {
+		// A packet of extraMsgSize size was seen, but we don't have
+		// its actual bytes. This is only usable in the `stateBody` state.
+		if s.parseState != stateBody {
+			return false, false
+		}
+		return parser.eatBody(s, m, extraMsgSize)
+	}
 
 	for s.parseOffset < len(s.data) {
 		switch s.parseState {
@@ -138,16 +147,16 @@ func (*parser) parseHTTPLine(s *stream, m *message) (cont, ok, complete bool) {
 	}
 	if bytes.Equal(fline[0:5], []byte("HTTP/")) {
 		//RESPONSE
-		m.IsRequest = false
+		m.isRequest = false
 		version = fline[5:8]
-		m.StatusCode, m.StatusPhrase, err = parseResponseStatus(fline[9:])
+		m.statusCode, m.statusPhrase, err = parseResponseStatus(fline[9:])
 		if err != nil {
 			logp.Warn("Failed to understand HTTP response status: %s", fline[9:])
 			return false, false, false
 		}
 
 		if isDebug {
-			debugf("HTTP status_code=%d, status_phrase=%s", m.StatusCode, m.StatusPhrase)
+			debugf("HTTP status_code=%d, status_phrase=%s", m.statusCode, m.statusPhrase)
 		}
 	} else {
 		// REQUEST
@@ -159,11 +168,11 @@ func (*parser) parseHTTPLine(s *stream, m *message) (cont, ok, complete bool) {
 			return false, false, false
 		}
 
-		m.Method = common.NetString(slices[0])
-		m.RequestURI = common.NetString(slices[1])
+		m.method = common.NetString(slices[0])
+		m.requestURI = common.NetString(slices[1])
 
 		if bytes.Equal(slices[2][:5], []byte("HTTP/")) {
-			m.IsRequest = true
+			m.isRequest = true
 			version = slices[2][5:]
 		} else {
 			if isDebug {
@@ -202,15 +211,15 @@ func parseResponseStatus(s []byte) (uint16, []byte, error) {
 	if p == -1 {
 		return 0, nil, errors.New("Not able to identify status code")
 	}
-
-	code, _ := parseInt(s[0:p])
-
-	p = bytes.LastIndexByte(s, ' ')
-	if p == -1 {
-		return uint16(code), nil, errors.New("Not able to identify status code")
+	statusCode, err := parseInt(s[0:p])
+	if err != nil {
+		return 0, nil, fmt.Errorf("Unable to parse status code from [%s]", s)
 	}
 	phrase := s[p+1:]
-	return uint16(code), phrase, nil
+	if len(phrase) == 0 {
+		return 0, nil, fmt.Errorf("Unable to parse status phrase from [%s]", s)
+	}
+	return uint16(statusCode), phrase, nil
 }
 
 func parseVersion(s []byte) (uint8, uint8, error) {
@@ -233,18 +242,18 @@ func (parser *parser) parseHeaders(s *stream, m *message) (cont, ok, complete bo
 		s.parseOffset += 2
 		m.bodyOffset = s.parseOffset
 
-		if !m.IsRequest && ((100 <= m.StatusCode && m.StatusCode < 200) || m.StatusCode == 204 || m.StatusCode == 304) {
+		if !m.isRequest && ((100 <= m.statusCode && m.statusCode < 200) || m.statusCode == 204 || m.statusCode == 304) {
 			//response with a 1xx, 204 , or 304 status  code is always terminated
 			// by the first empty line after the  header fields
 			if isDebug {
-				debugf("Terminate response, status code %d", m.StatusCode)
+				debugf("Terminate response, status code %d", m.statusCode)
 			}
 			m.end = s.parseOffset
-			m.Size = uint64(m.end - m.start)
+			m.size = uint64(m.end - m.start)
 			return false, true, true
 		}
 
-		if bytes.Equal(m.TransferEncoding, transferEncodingChunked) {
+		if bytes.Equal(m.transferEncoding, transferEncodingChunked) {
 			// support for HTTP/1.1 Chunked transfer
 			// Transfer-Encoding overrides the Content-Length
 			if isDebug {
@@ -254,13 +263,13 @@ func (parser *parser) parseHeaders(s *stream, m *message) (cont, ok, complete bo
 			return true, true, true
 		}
 
-		if m.ContentLength == 0 && (m.IsRequest || m.hasContentLength) {
+		if m.contentLength == 0 && (m.isRequest || m.hasContentLength) {
 			if isDebug {
 				debugf("Empty content length, ignore body")
 			}
 			// Ignore body for request that contains a message body but not a Content-Length
 			m.end = s.parseOffset
-			m.Size = uint64(m.end - m.start)
+			m.size = uint64(m.end - m.start)
 			return false, true, true
 		}
 
@@ -282,8 +291,8 @@ func (parser *parser) parseHeaders(s *stream, m *message) (cont, ok, complete bo
 }
 
 func (parser *parser) parseHeader(m *message, data []byte) (bool, bool, int) {
-	if m.Headers == nil {
-		m.Headers = make(map[string]common.NetString)
+	if m.headers == nil {
+		m.headers = make(map[string]common.NetString)
 	}
 	i := bytes.Index(data, []byte(":"))
 	if i == -1 {
@@ -320,37 +329,37 @@ func (parser *parser) parseHeader(m *message, data []byte) (bool, bool, int) {
 			// Headers we need for parsing. Make sure we always
 			// capture their value
 			if bytes.Equal(headerName, nameContentLength) {
-				m.ContentLength, _ = parseInt(headerVal)
+				m.contentLength, _ = parseInt(headerVal)
 				m.hasContentLength = true
 			} else if bytes.Equal(headerName, nameContentType) {
-				m.ContentType = headerVal
+				m.contentType = headerVal
 			} else if bytes.Equal(headerName, nameTransferEncoding) {
-				m.TransferEncoding = common.NetString(headerVal)
+				m.transferEncoding = common.NetString(headerVal)
 			} else if bytes.Equal(headerName, nameConnection) {
 				m.connection = headerVal
 			}
-			if len(config.RealIPHeader) > 0 && bytes.Equal(headerName, []byte(config.RealIPHeader)) {
+			if len(config.realIPHeader) > 0 && bytes.Equal(headerName, []byte(config.realIPHeader)) {
 				if ips := bytes.SplitN(headerVal, []byte{','}, 2); len(ips) > 0 {
-					m.RealIP = trim(ips[0])
+					m.realIP = trim(ips[0])
 				}
 			}
 
-			if config.SendHeaders {
-				if !config.SendAllHeaders {
-					_, exists := config.HeadersWhitelist[string(headerName)]
+			if config.sendHeaders {
+				if !config.sendAllHeaders {
+					_, exists := config.headersWhitelist[string(headerName)]
 					if !exists {
 						return true, true, p + 2
 					}
 				}
-				if val, ok := m.Headers[string(headerName)]; ok {
+				if val, ok := m.headers[string(headerName)]; ok {
 					composed := make([]byte, len(val)+len(headerVal)+2)
 					off := copy(composed, val)
 					off = copy(composed[off:], []byte(", "))
 					copy(composed[off:], headerVal)
 
-					m.Headers[string(headerName)] = composed
+					m.headers[string(headerName)] = composed
 				} else {
-					m.Headers[string(headerName)] = headerVal
+					m.headers[string(headerName)] = headerVal
 				}
 			}
 
@@ -363,27 +372,57 @@ func (parser *parser) parseHeader(m *message, data []byte) (bool, bool, int) {
 
 func (*parser) parseBody(s *stream, m *message) (ok, complete bool) {
 	if isDebug {
-		debugf("eat body: %d", s.parseOffset)
+		debugf("parseBody body: %d", s.parseOffset)
 	}
 	if !m.hasContentLength && (bytes.Equal(m.connection, constClose) ||
 		(isVersion(m.version, 1, 0) && !bytes.Equal(m.connection, constKeepAlive))) {
 
 		// HTTP/1.0 no content length. Add until the end of the connection
 		if isDebug {
-			debugf("close connection, %d", len(s.data)-s.parseOffset)
+			debugf("http conn close, received %d", len(s.data)-s.parseOffset)
 		}
 		s.bodyReceived += (len(s.data) - s.parseOffset)
-		m.ContentLength += (len(s.data) - s.parseOffset)
+		m.contentLength += (len(s.data) - s.parseOffset)
 		s.parseOffset = len(s.data)
 		return true, false
-	} else if len(s.data[s.parseOffset:]) >= m.ContentLength-s.bodyReceived {
-		s.parseOffset += (m.ContentLength - s.bodyReceived)
+	} else if len(s.data[s.parseOffset:]) >= m.contentLength-s.bodyReceived {
+		s.parseOffset += (m.contentLength - s.bodyReceived)
 		m.end = s.parseOffset
-		m.Size = uint64(m.end - m.start)
+		m.size = uint64(m.end - m.start)
 		return true, true
 	} else {
 		s.bodyReceived += (len(s.data) - s.parseOffset)
 		s.parseOffset = len(s.data)
+		if isDebug {
+			debugf("bodyReceived: %d", s.bodyReceived)
+		}
+		return true, false
+	}
+}
+
+// eatBody acts as if size bytes were received, without having access to
+// those bytes.
+func (*parser) eatBody(s *stream, m *message, size int) (ok, complete bool) {
+	if isDebug {
+		debugf("eatBody body: %d", s.parseOffset)
+	}
+	if !m.hasContentLength && (bytes.Equal(m.connection, constClose) ||
+		(isVersion(m.version, 1, 0) && !bytes.Equal(m.connection, constKeepAlive))) {
+
+		// HTTP/1.0 no content length. Add until the end of the connection
+		if isDebug {
+			debugf("http conn close, received %d", size)
+		}
+		s.bodyReceived += size
+		m.contentLength += size
+		return true, false
+	} else if size >= m.contentLength-s.bodyReceived {
+		s.bodyReceived += (m.contentLength - s.bodyReceived)
+		m.end = s.parseOffset
+		m.size = uint64(m.bodyOffset-m.start) + uint64(m.contentLength)
+		return true, true
+	} else {
+		s.bodyReceived += size
 		if isDebug {
 			debugf("bodyReceived: %d", s.bodyReceived)
 		}
@@ -417,7 +456,7 @@ func (*parser) parseBodyChunkedStart(s *stream, m *message) (cont, ok, complete 
 		s.parseOffset += 2 // skip final CRLF
 
 		m.end = s.parseOffset
-		m.Size = uint64(m.end - m.start)
+		m.size = uint64(m.end - m.start)
 		return false, true, true
 	}
 	s.bodyReceived = 0
@@ -427,12 +466,11 @@ func (*parser) parseBodyChunkedStart(s *stream, m *message) (cont, ok, complete 
 }
 
 func (*parser) parseBodyChunked(s *stream, m *message) (cont, ok, complete bool) {
-
 	if len(s.data[s.parseOffset:]) >= m.chunkedLength-s.bodyReceived+2 /*\r\n*/ {
 		// Received more data than expected
 		m.chunkedBody = append(m.chunkedBody, s.data[s.parseOffset:s.parseOffset+m.chunkedLength-s.bodyReceived]...)
 		s.parseOffset += (m.chunkedLength - s.bodyReceived + 2 /*\r\n*/)
-		m.ContentLength += m.chunkedLength
+		m.contentLength += m.chunkedLength
 		s.parseState = stateBodyChunkedStart
 		return true, true, false
 	}
@@ -461,7 +499,7 @@ func (*parser) parseBodyChunkedWaitFinalCRLF(s *stream, m *message) (ok, complet
 
 	s.parseOffset += 2 // skip final CRLF
 	m.end = s.parseOffset
-	m.Size = uint64(m.end - m.start)
+	m.size = uint64(m.end - m.start)
 	return true, true
 }
 
@@ -494,7 +532,7 @@ func trimRight(buf []byte) []byte {
 
 func parseInt(line []byte) (int, error) {
 	buf := streambuf.NewFixed(line)
-	i, err := buf.AsciiInt(false)
+	i, err := buf.IntASCII(false)
 	return int(i), err
 	// TODO: is it an error if 'buf.Len() != 0 {}' ?
 }

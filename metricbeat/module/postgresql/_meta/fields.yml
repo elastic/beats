@@ -1,0 +1,11 @@
+- key: postgresql
+  title: "PostgreSQL"
+  description: >
+    Metrics collected from PostgreSQL servers.
+  short_config: false
+  fields:
+    - name: postgresql
+      type: group
+      description: >
+        PostgreSQL metrics.
+      fields:

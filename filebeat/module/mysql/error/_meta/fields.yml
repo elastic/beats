@@ -1,0 +1,21 @@
+- name: error
+  type: group
+  description: >
+    Contains fields from the MySQL error logs.
+  fields:
+    - name: timestamp
+      description: >
+        The timestamp from the log line.
+    - name: thread_id
+      type: long
+      description: >
+        As of MySQL 5.7.2, this is the thread id. For MySQL versions prior to 5.7.2, this
+        field contains the process id.
+    - name: level
+      example: "Warning"
+      description:
+        The log level.
+    - name: message
+      type: text
+      description: >
+        The logged message.

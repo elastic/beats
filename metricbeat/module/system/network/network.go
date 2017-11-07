@@ -8,6 +8,7 @@ import (
 	"github.com/elastic/beats/libbeat/common"
 	"github.com/elastic/beats/libbeat/logp"
 	"github.com/elastic/beats/metricbeat/mb"
+	"github.com/elastic/beats/metricbeat/mb/parse"
 
 	"github.com/pkg/errors"
 	"github.com/shirou/gopsutil/net"
@@ -16,7 +17,7 @@ import (
 var debugf = logp.MakeDebug("system-network")
 
 func init() {
-	if err := mb.Registry.AddMetricSet("system", "network", New); err != nil {
+	if err := mb.Registry.AddMetricSet("system", "network", New, parse.EmptyHostParser); err != nil {
 		panic(err)
 	}
 }
@@ -53,7 +54,7 @@ func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
 	}, nil
 }
 
-// Fetch fetches disk IO metrics from the OS.
+// Fetch fetches network IO metrics from the OS.
 func (m *MetricSet) Fetch() ([]common.MapStr, error) {
 	stats, err := net.IOCounters(true)
 	if err != nil {

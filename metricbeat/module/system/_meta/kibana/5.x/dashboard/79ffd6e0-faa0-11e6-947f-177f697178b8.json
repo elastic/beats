@@ -1,0 +1,20 @@
+{
+  "hits": 0, 
+  "timeFrom": "now-15m", 
+  "timeRestore": true, 
+  "description": "", 
+  "title": "Metricbeat host overview", 
+  "uiStateJSON": "{\"P-18\":{\"vis\":{\"params\":{\"sort\":{\"columnIndex\":null,\"direction\":null}}}}}", 
+  "panelsJSON": "[{\"col\":1,\"id\":\"6b7b9a40-faa1-11e6-86b1-cd7735ff7e23\",\"panelIndex\":1,\"row\":13,\"size_x\":6,\"size_y\":3,\"type\":\"visualization\"},{\"col\":7,\"id\":\"4d546850-1b15-11e7-b09e-037021c4f8df\",\"panelIndex\":2,\"row\":4,\"size_x\":6,\"size_y\":3,\"type\":\"visualization\"},{\"col\":7,\"id\":\"089b85d0-1b16-11e7-b09e-037021c4f8df\",\"panelIndex\":3,\"row\":10,\"size_x\":6,\"size_y\":3,\"type\":\"visualization\"},{\"col\":1,\"id\":\"bfa5e400-1b16-11e7-b09e-037021c4f8df\",\"panelIndex\":4,\"row\":10,\"size_x\":6,\"size_y\":3,\"type\":\"visualization\"},{\"col\":7,\"id\":\"e0f001c0-1b18-11e7-b09e-037021c4f8df\",\"panelIndex\":5,\"row\":16,\"size_x\":6,\"size_y\":3,\"type\":\"visualization\"},{\"col\":1,\"id\":\"2e224660-1b19-11e7-b09e-037021c4f8df\",\"panelIndex\":6,\"row\":16,\"size_x\":6,\"size_y\":3,\"type\":\"visualization\"},{\"col\":1,\"id\":\"ab2d1e90-1b1a-11e7-b09e-037021c4f8df\",\"panelIndex\":7,\"row\":7,\"size_x\":6,\"size_y\":3,\"type\":\"visualization\"},{\"col\":7,\"id\":\"4e4bb1e0-1b1b-11e7-b09e-037021c4f8df\",\"panelIndex\":8,\"row\":7,\"size_x\":6,\"size_y\":3,\"type\":\"visualization\"},{\"col\":7,\"id\":\"26732e20-1b91-11e7-bec4-a5e9ec5cab8b\",\"panelIndex\":9,\"row\":2,\"size_x\":2,\"size_y\":2,\"type\":\"visualization\"},{\"col\":5,\"id\":\"83e12df0-1b91-11e7-bec4-a5e9ec5cab8b\",\"panelIndex\":10,\"row\":2,\"size_x\":2,\"size_y\":2,\"type\":\"visualization\"},{\"col\":9,\"id\":\"d3166e80-1b91-11e7-bec4-a5e9ec5cab8b\",\"panelIndex\":11,\"row\":2,\"size_x\":2,\"size_y\":2,\"type\":\"visualization\"},{\"col\":1,\"id\":\"522ee670-1b92-11e7-bec4-a5e9ec5cab8b\",\"panelIndex\":12,\"row\":2,\"size_x\":2,\"size_y\":2,\"type\":\"visualization\"},{\"col\":3,\"id\":\"1aae9140-1b93-11e7-8ada-3df93aab833e\",\"panelIndex\":13,\"row\":2,\"size_x\":2,\"size_y\":2,\"type\":\"visualization\"},{\"col\":11,\"id\":\"34f97ee0-1b96-11e7-8ada-3df93aab833e\",\"panelIndex\":14,\"row\":2,\"size_x\":2,\"size_y\":2,\"type\":\"visualization\"},{\"col\":10,\"id\":\"aa984970-1e0b-11e7-852e-cdcfcfdffddd\",\"panelIndex\":15,\"row\":1,\"size_x\":3,\"size_y\":1,\"type\":\"visualization\"},{\"col\":1,\"id\":\"System-Navigation\",\"panelIndex\":16,\"row\":1,\"size_x\":9,\"size_y\":1,\"type\":\"visualization\"},{\"col\":7,\"id\":\"In-vs-Out-Network-Bytes\",\"panelIndex\":17,\"row\":13,\"size_x\":6,\"size_y\":3,\"type\":\"visualization\"},{\"col\":1,\"id\":\"217025e0-2a69-11e7-99f0-399f2a11b723\",\"panelIndex\":18,\"row\":4,\"size_x\":6,\"size_y\":3,\"type\":\"visualization\"}]", 
+  "timeTo": "now", 
+  "optionsJSON": "{\"darkTheme\":false}", 
+  "version": 1, 
+  "refreshInterval": {
+    "pause": false, 
+    "display": "Off", 
+    "value": 0
+  }, 
+  "kibanaSavedObjectMeta": {
+    "searchSourceJSON": "{\"filter\":[{\"query\":{\"query_string\":{\"analyze_wildcard\":true,\"query\":\"*\"}}}],\"highlightAll\":true,\"version\":true}"
+  }
+}

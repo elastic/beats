@@ -2,8 +2,15 @@ package sarama
 
 import (
 	"crypto/tls"
+	"regexp"
 	"time"
+
+	"github.com/rcrowley/go-metrics"
 )
+
+const defaultClientID = "sarama"
+
+var validID = regexp.MustCompile(`\A[A-Za-z0-9._-]+\z`)
 
 // Config is used to pass multiple configuration options to Sarama's constructors.
 type Config struct {
@@ -28,6 +35,21 @@ type Config struct {
 			// The TLS configuration to use for secure connections if
 			// enabled (defaults to nil).
 			Config *tls.Config
+		}
+
+		// SASL based authentication with broker. While there are multiple SASL authentication methods
+		// the current implementation is limited to plaintext (SASL/PLAIN) authentication
+		SASL struct {
+			// Whether or not to use SASL authentication when connecting to the broker
+			// (defaults to false).
+			Enable bool
+			// Whether or not to send the Kafka SASL handshake first if enabled
+			// (defaults to true). You should only set this to false if you're using
+			// a non-Kafka SASL proxy.
+			Handshake bool
+			//username and password for SASL/PLAIN authentication
+			User     string
+			Password string
 		}
 
 		// KeepAlive specifies the keep-alive period for an active network connection.
@@ -121,6 +143,13 @@ type Config struct {
 
 	// Consumer is the namespace for configuration related to consuming messages,
 	// used by the Consumer.
+	//
+	// Note that Sarama's Consumer type does not currently support automatic
+	// consumer-group rebalancing and offset tracking.  For Zookeeper-based
+	// tracking (Kafka 0.8.2 and earlier), the https://github.com/wvanbergen/kafka
+	// library builds on Sarama to add this support. For Kafka-based tracking
+	// (Kafka 0.9 and later), the https://github.com/bsm/sarama-cluster library
+	// builds on Sarama to add this support.
 	Consumer struct {
 		Retry struct {
 			// How long to wait after a failing to read from a partition before
@@ -168,7 +197,7 @@ type Config struct {
 		// Return specifies what channels will be populated. If they are set to true,
 		// you must read from them to prevent deadlock.
 		Return struct {
-			// If enabled, any errors that occured while consuming are returned on
+			// If enabled, any errors that occurred while consuming are returned on
 			// the Errors channel (default disabled).
 			Errors bool
 		}
@@ -183,6 +212,14 @@ type Config struct {
 			// The initial offset to use if no offset was previously committed.
 			// Should be OffsetNewest or OffsetOldest. Defaults to OffsetNewest.
 			Initial int64
+
+			// The retention duration for committed offsets. If zero, disabled
+			// (in which case the `offsets.retention.minutes` option on the
+			// broker will be used).  Kafka only supports precision up to
+			// milliseconds; nanoseconds will be truncated. Requires Kafka
+			// broker version 0.9.0 or later.
+			// (default is 0: disabled).
+			Retention time.Duration
 		}
 	}
 
@@ -195,6 +232,19 @@ type Config struct {
 	// in the background while user code is working, greatly improving throughput.
 	// Defaults to 256.
 	ChannelBufferSize int
+	// The version of Kafka that Sarama will assume it is running against.
+	// Defaults to the oldest supported stable version. Since Kafka provides
+	// backwards-compatibility, setting it to a version older than you have
+	// will not break anything, although it may prevent you from using the
+	// latest features. Setting it to a version greater than you are actually
+	// running may lead to random breakage.
+	Version KafkaVersion
+	// The registry to define metrics into.
+	// Defaults to a local registry.
+	// If you want to disable metrics gathering, set "metrics.UseNilMetrics" to "true"
+	// prior to starting Sarama.
+	// See Examples on how to use the metrics registry
+	MetricRegistry metrics.Registry
 }
 
 // NewConfig returns a new configuration instance with sane defaults.
@@ -205,6 +255,7 @@ func NewConfig() *Config {
 	c.Net.DialTimeout = 30 * time.Second
 	c.Net.ReadTimeout = 30 * time.Second
 	c.Net.WriteTimeout = 30 * time.Second
+	c.Net.SASL.Handshake = true
 
 	c.Metadata.Retry.Max = 3
 	c.Metadata.Retry.Backoff = 250 * time.Millisecond
@@ -227,7 +278,10 @@ func NewConfig() *Config {
 	c.Consumer.Offsets.CommitInterval = 1 * time.Second
 	c.Consumer.Offsets.Initial = OffsetNewest
 
+	c.ClientID = defaultClientID
 	c.ChannelBufferSize = 256
+	c.Version = minVersion
+	c.MetricRegistry = metrics.NewRegistry()
 
 	return c
 }
@@ -239,14 +293,25 @@ func (c *Config) Validate() error {
 	if c.Net.TLS.Enable == false && c.Net.TLS.Config != nil {
 		Logger.Println("Net.TLS is disabled but a non-nil configuration was provided.")
 	}
+	if c.Net.SASL.Enable == false {
+		if c.Net.SASL.User != "" {
+			Logger.Println("Net.SASL is disabled but a non-empty username was provided.")
+		}
+		if c.Net.SASL.Password != "" {
+			Logger.Println("Net.SASL is disabled but a non-empty password was provided.")
+		}
+	}
 	if c.Producer.RequiredAcks > 1 {
 		Logger.Println("Producer.RequiredAcks > 1 is deprecated and will raise an exception with kafka >= 0.8.2.0.")
 	}
 	if c.Producer.MaxMessageBytes >= int(MaxRequestSize) {
-		Logger.Println("Producer.MaxMessageBytes is larger than MaxRequestSize; it will be ignored.")
+		Logger.Println("Producer.MaxMessageBytes must be smaller than MaxRequestSize; it will be ignored.")
 	}
 	if c.Producer.Flush.Bytes >= int(MaxRequestSize) {
-		Logger.Println("Producer.Flush.Bytes is larger than MaxRequestSize; it will be ignored.")
+		Logger.Println("Producer.Flush.Bytes must be smaller than MaxRequestSize; it will be ignored.")
+	}
+	if (c.Producer.Flush.Bytes > 0 || c.Producer.Flush.Messages > 0) && c.Producer.Flush.Frequency == 0 {
+		Logger.Println("Producer.Flush: Bytes or Messages are set, but Frequency is not; messages may not get flushed.")
 	}
 	if c.Producer.Timeout%time.Millisecond != 0 {
 		Logger.Println("Producer.Timeout only supports millisecond resolution; nanoseconds will be truncated.")
@@ -257,7 +322,10 @@ func (c *Config) Validate() error {
 	if c.Consumer.MaxWaitTime%time.Millisecond != 0 {
 		Logger.Println("Consumer.MaxWaitTime only supports millisecond precision; nanoseconds will be truncated.")
 	}
-	if c.ClientID == "sarama" {
+	if c.Consumer.Offsets.Retention%time.Millisecond != 0 {
+		Logger.Println("Consumer.Offsets.Retention only supports millisecond precision; nanoseconds will be truncated.")
+	}
+	if c.ClientID == defaultClientID {
 		Logger.Println("ClientID is the default of 'sarama', you should consider setting it to something application-specific.")
 	}
 
@@ -273,6 +341,10 @@ func (c *Config) Validate() error {
 		return ConfigurationError("Net.WriteTimeout must be > 0")
 	case c.Net.KeepAlive < 0:
 		return ConfigurationError("Net.KeepAlive must be >= 0")
+	case c.Net.SASL.Enable == true && c.Net.SASL.User == "":
+		return ConfigurationError("Net.SASL.User must not be empty when SASL is enabled")
+	case c.Net.SASL.Enable == true && c.Net.SASL.Password == "":
+		return ConfigurationError("Net.SASL.Password must not be empty when SASL is enabled")
 	}
 
 	// validate the Metadata values
@@ -311,6 +383,10 @@ func (c *Config) Validate() error {
 		return ConfigurationError("Producer.Retry.Backoff must be >= 0")
 	}
 
+	if c.Producer.Compression == CompressionLZ4 && !c.Version.IsAtLeast(V0_10_0_0) {
+		return ConfigurationError("lz4 compression requires Version >= V0_10_0_0")
+	}
+
 	// validate the Consumer values
 	switch {
 	case c.Consumer.Fetch.Min <= 0:
@@ -336,6 +412,8 @@ func (c *Config) Validate() error {
 	switch {
 	case c.ChannelBufferSize < 0:
 		return ConfigurationError("ChannelBufferSize must be >= 0")
+	case !validID.MatchString(c.ClientID):
+		return ConfigurationError("ClientID is invalid")
 	}
 
 	return nil

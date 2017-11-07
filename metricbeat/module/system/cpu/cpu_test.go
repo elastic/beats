@@ -1,8 +1,9 @@
+// +build darwin freebsd linux openbsd windows
+
 package cpu
 
 import (
 	"testing"
-
 	"time"
 
 	mbtest "github.com/elastic/beats/metricbeat/mb/testing"
@@ -10,21 +11,25 @@ import (
 
 func TestData(t *testing.T) {
 	f := mbtest.NewEventFetcher(t, getConfig())
-
-	// Do a first fetch to have precentages
-	f.Fetch()
+	_, err := f.Fetch()
+	if err != nil {
+		t.Fatal(err)
+	}
 	time.Sleep(1 * time.Second)
 
-	err := mbtest.WriteEvent(f, t)
+	fields, err := f.Fetch()
 	if err != nil {
-		t.Fatal("write", err)
+		t.Fatal(err)
 	}
+
+	event := mbtest.CreateFullEvent(f, fields)
+	mbtest.WriteEventToDataJSON(t, event)
 }
 
 func getConfig() map[string]interface{} {
 	return map[string]interface{}{
-		"module":     "system",
-		"metricsets": []string{"cpu"},
-		"cpu_ticks":  true,
+		"module":      "system",
+		"metricsets":  []string{"cpu"},
+		"cpu.metrics": []string{"percentages", "normalized_percentages", "ticks"},
 	}
 }

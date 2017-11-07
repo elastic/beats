@@ -1,0 +1,9 @@
+- module: jolokia
+  metricsets: ["jmx"]
+  period: 10s
+  hosts: ["localhost"]
+  namespace: "metrics"
+  path: "/jolokia/?ignoreErrors=true&canonicalNaming=false"
+  jmx.mapping:
+  jmx.application:
+  jmx.instance:

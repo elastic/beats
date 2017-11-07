@@ -30,21 +30,24 @@ RUN \
     --no-install-recommends
 
 # Configure the container for OSX cross compilation
-ENV OSX_SDK_PATH https://github.com/trevd/android_platform_build2/raw/master/osxsdks10.6.tar.gz
-ENV OSX_SDK      MacOSX10.6.sdk
+ENV OSX_SDK     MacOSX10.11.sdk
+ENV OSX_NDK_X86 /usr/local/osx-ndk-x86
 
 RUN \
+  OSX_SDK_PATH=https://github.com/phracker/MacOSX-SDKs/releases/download/MacOSX10.11.sdk/MacOSX10.11.sdk.tar.xz && \
+  $FETCH $OSX_SDK_PATH f3430e3d923644e66c0c13f7a48754e7b6aa2e3f       && \
+  \
   git clone https://github.com/tpoechtrager/osxcross.git && \
+  mv `basename $OSX_SDK_PATH` /osxcross/tarballs/        && \
   \
-  $FETCH $OSX_SDK_PATH f526b4ae9806e8d31e3b094e3f004f8f160a3fad
+  sed -i -e 's|-march=native||g' /osxcross/build_clang.sh /osxcross/wrapper/build.sh && \
+  UNATTENDED=yes OSX_VERSION_MIN=10.6 /osxcross/build.sh                             && \
+  mv /osxcross/target $OSX_NDK_X86                                                   && \
+  \
+  rm -rf /osxcross
 
-RUN \
-  tar -xzf `basename $OSX_SDK_PATH` --strip-components 1 SDKs/$OSX_SDK && \
-  tar -cjf /osxcross/tarballs/$OSX_SDK.tar.bz2 $OSX_SDK && \
-  rm -rf `basename $OSX_SDK_PATH` $OSX_SDK && \
-  \
-  UNATTENDED=yes /osxcross/build.sh
-ENV PATH /osxcross/target/bin:$PATH
+ADD patch.tar.xz $OSX_NDK_X86/SDK/$OSX_SDK/usr/include/c++
+ENV PATH $OSX_NDK_X86/bin:$PATH
 
 
 # Inject the Go package downloader and tool-chain bootstrapper

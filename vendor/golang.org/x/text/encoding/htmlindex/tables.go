@@ -34,8 +34,8 @@ const (
 	windows1257
 	windows1258
 	macintoshCyrillic
+	gbk
 	gb18030
-	hzgb2312
 	big5
 	eucjp
 	iso2022jp
@@ -78,8 +78,8 @@ var canonical = [numEncodings]string{
 	"windows-1257",
 	"windows-1258",
 	"x-mac-cyrillic",
+	"gbk",
 	"gb18030",
-	"hz-gb-2312",
 	"big5",
 	"euc-jp",
 	"iso-2022-jp",
@@ -199,6 +199,7 @@ var nameMap = map[string]htmlEncoding{
 	"koi8":                koi8r,
 	"koi8-r":              koi8r,
 	"koi8_r":              koi8r,
+	"koi8-ru":             koi8u,
 	"koi8-u":              koi8u,
 	"csmacintosh":         macintosh,
 	"mac":                 macintosh,
@@ -262,17 +263,16 @@ var nameMap = map[string]htmlEncoding{
 	"x-cp1258":            windows1258,
 	"x-mac-cyrillic":      macintoshCyrillic,
 	"x-mac-ukrainian":     macintoshCyrillic,
-	"chinese":             gb18030,
-	"csgb2312":            gb18030,
-	"csiso58gb231280":     gb18030,
+	"chinese":             gbk,
+	"csgb2312":            gbk,
+	"csiso58gb231280":     gbk,
+	"gb2312":              gbk,
+	"gb_2312":             gbk,
+	"gb_2312-80":          gbk,
+	"gbk":                 gbk,
+	"iso-ir-58":           gbk,
+	"x-gbk":               gbk,
 	"gb18030":             gb18030,
-	"gb2312":              gb18030,
-	"gb_2312":             gb18030,
-	"gb_2312-80":          gb18030,
-	"gbk":                 gb18030,
-	"iso-ir-58":           gb18030,
-	"x-gbk":               gb18030,
-	"hz-gb-2312":          hzgb2312,
 	"big5":                big5,
 	"big5-hkscs":          big5,
 	"cn-big5":             big5,
@@ -284,6 +284,7 @@ var nameMap = map[string]htmlEncoding{
 	"csiso2022jp":         iso2022jp,
 	"iso-2022-jp":         iso2022jp,
 	"csshiftjis":          shiftJIS,
+	"ms932":               shiftJIS,
 	"ms_kanji":            shiftJIS,
 	"shift-jis":           shiftJIS,
 	"shift_jis":           shiftJIS,
@@ -301,6 +302,7 @@ var nameMap = map[string]htmlEncoding{
 	"ksc_5601":            euckr,
 	"windows-949":         euckr,
 	"csiso2022kr":         replacement,
+	"hz-gb-2312":          replacement,
 	"iso-2022-cn":         replacement,
 	"iso-2022-cn-ext":     replacement,
 	"iso-2022-kr":         replacement,

@@ -1,0 +1,34 @@
+- name: service
+  type: group
+  description: >
+    `service` contains the status for windows services.
+  fields:
+    - name: uptime.ms
+      type: long
+      format: duration
+      input_format: milliseconds
+      description: >
+        `uptime` contains the service uptime metric.
+
+    - name: name
+      type: keyword
+      description: >
+        The service name.
+
+    - name: display_name
+      type: keyword
+      description: >
+        The display name of the service.
+
+    - name: start_type
+      type: keyword
+      description: >
+        The start type of the service.
+        The possible values are `ServiceAutoStart`, `ServiceBootStart`, `ServiceDemandStart`, `ServiceDisabled`, and `ServiceSystemStart`.
+
+    - name: state
+      type: keyword
+      description: >
+        The actual state of the service.
+        The possible values are `ServiceContinuePending`, `ServicePausePending`, `ServicePaused`, `ServiceRunning`, `ServiceStartPending`,
+        `ServiceStopPending`, and `ServiceStopped`.

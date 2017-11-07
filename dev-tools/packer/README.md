@@ -71,13 +71,13 @@ For example, here are the artifacts created for Filebeat:
 
 ```
 filebeat-5.0.0-amd64.deb
-filebeat-5.0.0-darwin-x64.tar.gz
+filebeat-5.0.0-darwin-x86_64.tar.gz
 filebeat-5.0.0-i386.deb
 filebeat-5.0.0-i686.rpm
-filebeat-5.0.0-linux-x64.tar.gz
 filebeat-5.0.0-linux-x86.tar.gz
-filebeat-5.0.0-windows-x64.zip
+filebeat-5.0.0-linux-x86_64.tar.gz
 filebeat-5.0.0-windows-x86.zip
+filebeat-5.0.0-windows-x86_64.zip
 filebeat-5.0.0-x86_64.rpm
 ```
 
@@ -85,12 +85,12 @@ And the SNAPSHOT versions:
 
 ```
 filebeat-5.0.0-SNAPSHOT-amd64.deb
+filebeat-5.0.0-SNAPSHOT-darwin-x86_64.tar.gz
 filebeat-5.0.0-SNAPSHOT-i386.deb
 filebeat-5.0.0-SNAPSHOT-i686.rpm
-filebeat-5.0.0-SNAPSHOT-x86_64.rpm
-filebeat-5.0.0-SNAPSHOT-darwin-x64.tar.gz
-filebeat-5.0.0-SNAPSHOT-linux-x64.tar.gz
 filebeat-5.0.0-SNAPSHOT-linux-x86.tar.gz
-filebeat-5.0.0-SNAPSHOT-windows-x64.zip
+filebeat-5.0.0-SNAPSHOT-linux-x86_64.tar.gz
 filebeat-5.0.0-SNAPSHOT-windows-x86.zip
+filebeat-5.0.0-SNAPSHOT-windows-x86_64.zip
+filebeat-5.0.0-SNAPSHOT-x86_64.rpm
 ```

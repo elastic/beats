@@ -3,7 +3,7 @@ This file is generated! See scripts/docs_collector.py
 ////
 
 [[metricbeat-module-apache]]
-== Apache Module
+== Apache module
 
 This module periodically fetches metrics from https://httpd.apache.org/[Apache
 HTTPD] servers.
@@ -11,22 +11,29 @@ HTTPD] servers.
 [float]
 === Compatibility
 
-The apache MetricSets were tested with apache 2.4.20 and are expected to work with all version
+The Apache metricsets were tested with Apache 2.4.20 and are expected to work with all versions
 >= 2.2.31 and >= 2.4.16.
 
 
 [float]
-=== Example Configuration
+=== Dashboard
 
-The Apache module supports the standard configuration options which can be found
-here <<configuration-metricbeat,here>>. Below is an example of a configuration option:
+The Apache module comes with a predefined dashboard. For example:
+
+image::./images/apache_httpd_server_status.png[]
+
+
+[float]
+=== Example configuration
+
+The Apache module supports the standard configuration options that are described
+in <<configuration-metricbeat>>. Here is an example configuration:
 
 [source,yaml]
 ----
 metricbeat.modules:
 - module: apache
   metricsets: ["status"]
-  enabled: true
   period: 10s
 
   # Apache hosts
@@ -34,9 +41,9 @@ metricbeat.modules:
 ----
 
 [float]
-=== MetricSets
+=== Metricsets
 
-The following MetricSets are available:
+The following metricsets are available:
 
 * <<metricbeat-metricset-apache-status,status>>
 

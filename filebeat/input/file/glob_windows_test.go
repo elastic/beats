@@ -1,0 +1,92 @@
+// +build windows
+
+package file
+
+var globTests = []globTest{
+	{
+		"*",
+		[]string{
+			"foo",
+		},
+	},
+	{
+		"foo\\*",
+		[]string{
+			"foo\\bar",
+		},
+	},
+	{
+		"foo/*",
+		[]string{
+			"foo\\bar",
+		},
+	},
+	{
+		"*\\*",
+		[]string{
+			"foo\\bar",
+		},
+	},
+	{
+		"**",
+		[]string{
+			"",
+			"foo",
+			"foo\\bar",
+			"foo\\bar\\baz",
+			"foo\\bar\\baz\\qux",
+		},
+	},
+	{
+		"foo**",
+		[]string{
+			"foo",
+		},
+	},
+	{
+		"foo\\**",
+		[]string{
+			"foo",
+			"foo\\bar",
+			"foo\\bar\\baz",
+			"foo\\bar\\baz\\qux",
+			"foo\\bar\\baz\\qux\\quux",
+		},
+	},
+	{
+		"foo\\**\\baz",
+		[]string{
+			"foo\\bar\\baz",
+		},
+	},
+	{
+		"foo/**\\baz",
+		[]string{
+			"foo\\bar\\baz",
+		},
+	},
+	{
+		"foo\\**\\bazz",
+		[]string{},
+	},
+	{
+		"foo\\**\\bar",
+		[]string{
+			"foo\\bar",
+		},
+	},
+	{
+		"foo\\\\bar",
+		[]string{
+			"foo\\bar",
+		},
+	},
+}
+
+var globPatternsTests = []globPatternsTest{
+	{
+		"C:\\foo\\**\\bar",
+		[]string{"C:\\foo\\bar", "C:\\foo\\*\\bar", "C:\\foo\\*\\*\\bar"},
+		false,
+	},
+}

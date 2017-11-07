@@ -1,0 +1,37 @@
+{
+  "description": "Pipeline for parsing the Nginx error logs",
+  "processors": [{
+    "grok": {
+      "field": "message",
+      "patterns": [
+        "%{DATA:nginx.error.time} \\[%{DATA:nginx.error.level}\\] %{NUMBER:nginx.error.pid}#%{NUMBER:nginx.error.tid}: (\\*%{NUMBER:nginx.error.connection_id} )?%{GREEDYDATA:nginx.error.message}"
+      ],
+      "ignore_missing": true
+    }
+  },{
+    "remove":{
+      "field": "message"
+    }
+  }, {
+    "rename": {
+      "field": "@timestamp",
+      "target_field": "read_timestamp"
+    }
+  }, {
+    "date": {
+      "field": "nginx.error.time",
+      "target_field": "@timestamp",
+      "formats": ["YYYY/MM/dd H:m:s"]
+    }
+  }, {
+    "remove": {
+      "field": "nginx.error.time"
+    }
+  }],
+  "on_failure" : [{
+    "set" : {
+      "field" : "error.message",
+      "value" : "{{ _ingest.on_failure_message }}"
+    }
+  }]
+}

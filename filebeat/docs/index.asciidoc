@@ -1,50 +1,55 @@
 = Filebeat Reference
-:libbeat: http://www.elastic.co/guide/en/beats/libbeat/master
-:packetbeat: http://www.elastic.co/guide/en/beats/packetbeat/master
-:topbeat: http://www.elastic.co/guide/en/beats/topbeat/master
-:metricbeat: http://www.elastic.co/guide/en/beats/metricbeat/master
-:filebeat: http://www.elastic.co/guide/en/beats/filebeat/master
-:winlogbeat: http://www.elastic.co/guide/en/beats/winlogbeat/master
-:elasticsearch: https://www.elastic.co/guide/en/elasticsearch/reference/master/
-:version: 5.0.0-alpha3
+
+include::../../libbeat/docs/version.asciidoc[]
+
+include::{asciidoc-dir}/../../shared/attributes.asciidoc[]
+
+:libbeat: http://www.elastic.co/guide/en/beats/libbeat/{doc-branch}
+:kibana-ref: https://www.elastic.co/guide/en/kibana/{doc-branch}
+:beatsdevguide: http://www.elastic.co/guide/en/beats/devguide/{doc-branch}
+:packetbeat: http://www.elastic.co/guide/en/beats/packetbeat/{doc-branch}
+:metricbeat: http://www.elastic.co/guide/en/beats/metricbeat/{doc-branch}
+:filebeat: http://www.elastic.co/guide/en/beats/filebeat/{doc-branch}
+:winlogbeat: http://www.elastic.co/guide/en/beats/winlogbeat/{doc-branch}
+:logstashdoc: https://www.elastic.co/guide/en/logstash/{doc-branch}
+:elasticsearch: https://www.elastic.co/guide/en/elasticsearch/reference/{doc-branch}
+:elasticsearch-plugins: https://www.elastic.co/guide/en/elasticsearch/plugins/{doc-branch}
+:securitydoc: https://www.elastic.co/guide/en/x-pack/current
+:version: {stack-version}
 :beatname_lc: filebeat
 :beatname_uc: Filebeat
+:beatname_pkg: {beatname_lc}
 :security: X-Pack Security
+:dockerimage: docker.elastic.co/beats/{beatname_lc}:{version}
+:dockergithub: https://github.com/elastic/beats-docker/tree/{doc-branch}
+
 
 include::./overview.asciidoc[]
 
+include::../../libbeat/docs/contributing-to-beats.asciidoc[]
+
 include::./getting-started.asciidoc[]
 
-include::./command-line.asciidoc[]
+include::./modules-getting-started.asciidoc[]
 
-include::../../libbeat/docs/shared-directory-layout.asciidoc[]
+include::../../libbeat/docs/repositories.asciidoc[]
+
+include::./setting-up-running.asciidoc[]
+
+include::./upgrading.asciidoc[]
+
+include::./how-filebeat-works.asciidoc[]
 
 include::./configuring-howto.asciidoc[]
 
-include::./filebeat-filtering.asciidoc[]
+include::./modules.asciidoc[]
 
-include::./multiline.asciidoc[]
-
-include::../../libbeat/docs/shared-config-ingest.asciidoc[]
-
-include::../../libbeat/docs/shared-env-vars.asciidoc[]
-
-include::./multiple-prospectors.asciidoc[]
+include::./fields.asciidoc[]
 
 include::./securing-filebeat.asciidoc[]
-
-include::../../libbeat/docs/https.asciidoc[]
-
-include::../../libbeat/docs/shared-tls-logstash-config.asciidoc[]
 
 include::./troubleshooting.asciidoc[]
 
 include::./faq.asciidoc[]
 
 include::./migration.asciidoc[]
-
-include::./reference.asciidoc[]
-
-include::./fields.asciidoc[]
-
-include::../../libbeat/docs/regexp.asciidoc[]

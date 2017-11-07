@@ -85,9 +85,9 @@ func TestXML(t *testing.T) {
 				User:            SID{Identifier: "S-1-5-21-3541430928-2051711210-1391384369-1001"},
 				EventData: EventData{
 					Pairs: []KeyValue{
-						KeyValue{"param1", "winlogbeat"},
-						KeyValue{"param2", "running"},
-						KeyValue{"Binary", "770069006E006C006F00670062006500610074002F0034000000"},
+						{"param1", "winlogbeat"},
+						{"param2", "running"},
+						{"Binary", "770069006E006C006F00670062006500610074002F0034000000"},
 					},
 				},
 				UserData: UserData{
@@ -96,8 +96,8 @@ func TestXML(t *testing.T) {
 						Space: "Event_NS",
 					},
 					Pairs: []KeyValue{
-						KeyValue{"ServerName", `\\VAGRANT-2012-R2`},
-						KeyValue{"UserName", "vagrant"},
+						{"ServerName", `\\VAGRANT-2012-R2`},
+						{"UserName", "vagrant"},
 					},
 				},
 				Message:                 "Creating WSMan shell on server with ResourceUri: %1",
@@ -126,7 +126,7 @@ func TestXML(t *testing.T) {
 						Space: "http://manifests.microsoft.com/win/2006/windows/WMI",
 					},
 					Pairs: []KeyValue{
-						KeyValue{"Id", "{00000000-0000-0000-0000-000000000000}"},
+						{"Id", "{00000000-0000-0000-0000-000000000000}"},
 					},
 				},
 			},

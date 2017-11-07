@@ -1,0 +1,3 @@
+dashboards:
+- id: dfbb49f0-0a0f-11e7-8a62-2d05eaaac5cb
+  file: Filebeat-auditd.json

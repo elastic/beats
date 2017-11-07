@@ -1,0 +1,29 @@
+- name: error
+  type: group
+  description: >
+    Fields from the Apache error logs.
+  fields:
+    - name: level
+      type: keyword
+      description: >
+        The severity level of the message.
+    - name: client
+      type: keyword
+      description: >
+        The IP address of the client that generated the error.
+    - name: message
+      type: text
+      description: >
+        The logged message.
+    - name: pid
+      type: long
+      description: >
+        The process ID.
+    - name: tid
+      type: long
+      description: >
+        The thread ID.
+    - name: module
+      type: keyword
+      description: >
+        The module producing the logged message.

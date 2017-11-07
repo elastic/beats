@@ -1,0 +1,84 @@
+[[configuration-general-options]]
+== Specify general settings
+
+You can specify settings in the +{beatname_lc}.yml+ config file to control the
+general behavior of {beatname_uc}. This includes:
+
+* <<configuration-global-options,Global options>> that control things like
+publisher behavior and the location of some files.
+
+* <<configuration-general,General options>> that are supported by all Elastic
+Beats.
+
+[float]
+[[configuration-global-options]]
+=== Global Filebeat configuration options
+
+These options are in the `filebeat` namespace.
+
+[float]
+==== `registry_file`
+
+The name of the registry file. If a relative path is used, it is considered relative to the
+data path. See the <<directory-layout>> section for details. The default is `${path.data}/registry`.
+
+[source,yaml]
+-------------------------------------------------------------------------------------
+filebeat.registry_file: registry
+-------------------------------------------------------------------------------------
+
+It is not possible to use a symlink as registry file.
+
+NOTE: The registry file is only updated when new events are flushed and not on a predefined period.
+That means in case there are some states where the TTL expired, these are only removed when new event are processed.
+
+
+[float]
+==== `config_dir`
+
+The full path to the directory that contains additional prospector configuration files.
+Each configuration file must end with `.yml`. Each config file must also specify the full Filebeat
+config hierarchy even though only the prospector part of the file is processed. All global
+options, such as `registry_file`, are ignored.
+
+The `config_dir` option MUST point to a directory other than the directory where the main Filebeat config file resides.
+
+If the specified path is not absolute, it is considered relative to the configuration path. See the
+<<directory-layout>> section for details.
+
+[source,yaml]
+-------------------------------------------------------------------------------------
+filebeat.config_dir: path/to/configs
+-------------------------------------------------------------------------------------
+
+[float]
+[[shutdown-timeout]]
+==== `shutdown_timeout`
+
+How long Filebeat waits on shutdown for the publisher to finish sending events
+before Filebeat shuts down.
+
+By default, this option is disabled, and Filebeat does not wait for the
+publisher to finish sending events before shutting down. This means that any
+events sent to the output, but not acknowledged before Filebeat shuts down,
+are sent again when you restart Filebeat. For more details about how this
+works, see <<at-least-once-delivery>>.
+
+You can configure the `shutdown_timeout` option to specify the maximum amount
+of time that Filebeat waits for the publisher to finish sending events before
+shutting down. If all events are acknowledged before `shutdown_timeout` is
+reached, Filebeat will shut down.
+
+There is no recommended setting for this option because determining the correct
+value for `shutdown_timeout` depends heavily on the environment in which
+Filebeat is running and the current state of the output.
+
+Example configuration:
+
+[source,yaml]
+-------------------------------------------------------------------------------------
+filebeat.shutdown_timeout: 5s
+-------------------------------------------------------------------------------------
+
+include::../../libbeat/docs/generalconfig.asciidoc[]
+

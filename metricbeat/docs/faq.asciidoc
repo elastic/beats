@@ -1,7 +1,25 @@
 [[faq]]
-== Frequently Asked Questions
+== Frequently asked questions
 
 This section contains frequently asked questions about Metricbeat. Also check out the
 https://discuss.elastic.co/c/beats/metricbeat[Metricbeat discussion forum].
+
+[float]
+[[freebsd-no-such-file]]
+=== Fix for `open /compat/linux/proc: no such file or directory` error on FreeBSD?
+
+The system metricsets rely a Linux comparability layer to retrieve metrics on
+FreeBSD. You need to mount the Linux procfs filesystem using the following
+commands. You may want to add these filesystems to your `/etc/fstab` so they are
+mounted automatically.
+
+[source,sh]
+----
+sudo mount -t procfs proc /proc
+sudo mkdir -p /compat/linux/proc
+sudo mount -t linprocfs /dev/null /compat/linux/proc
+----
+
+include::../../libbeat/docs/faq-limit-bandwidth.asciidoc[]
 
 include::../../libbeat/docs/shared-faq.asciidoc[]

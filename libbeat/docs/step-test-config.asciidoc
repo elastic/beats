@@ -1,0 +1,23 @@
+ifeval::["{requires-sudo}"!="yes"]
+
+TIP: To test your configuration file, change to the directory where the
+{beatname_uc} binary is installed, and run {beatname_uc} in the foreground with
+the following options specified: +./{beatname_lc} test config -e+. Make sure your
+config files are in the path expected by {beatname_uc} (see <<directory-layout>>),
+or use the `-c` flag to specify the path to the config file.
+
+endif::[]
+
+ifeval::["{requires-sudo}"=="yes"]
+
+TIP: To test your configuration file, change to the directory where the
+{beatname_uc} binary is installed, and run {beatname_uc} in the foreground with
+the following options specified: +sudo ./{beatname_lc} test config -e+. Make sure
+your config files are in the path expected by {beatname_uc} (see
+<<directory-layout>>), or use the `-c` flag to specify the path to the config
+file. Depending on your OS, you might run into file ownership issues when you
+run this test. See
+{libbeat}/config-file-permissions.html[Config File Ownership and Permissions]
+in the _Beats Platform Reference_ for more information.
+
+endif::[]

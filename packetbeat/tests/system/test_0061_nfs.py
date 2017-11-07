@@ -6,6 +6,7 @@ Tests for the NFS
 
 
 class Test(BaseTest):
+
     def test_V3(self):
         """
         Should correctly parse NFS v3 packet
@@ -56,3 +57,19 @@ class Test(BaseTest):
 
         assert o["nfs.opcode"] == "READDIR"
         assert o["nfs.status"] == "NFS_OK"
+
+    def test_first_class_op(self):
+        """
+        Should cerrectly detect first-class opration in a middle of
+        compound call
+        """
+        self.render_config_template(
+            nfs_ports=[2049],
+        )
+        self.run_packetbeat(pcap="nfs4_close.pcap")
+
+        objs = self.read_output()
+        assert len(objs) == 1
+        o = objs[0]
+
+        assert o["nfs.opcode"] == "CLOSE"

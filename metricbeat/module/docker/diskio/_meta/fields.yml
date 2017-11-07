@@ -1,0 +1,17 @@
+- name: diskio
+  type: group
+  description: >
+    Disk I/O metrics.
+  fields:
+    - name: reads
+      type: scaled_float
+      description: >
+        Number of reads.
+    - name: writes
+      type: scaled_float
+      description: >
+        Number of writes.
+    - name: total
+      type: scaled_float
+      description: >
+        Number of reads and writes combined.

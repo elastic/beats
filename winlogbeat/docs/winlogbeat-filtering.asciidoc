@@ -1,15 +1,16 @@
-[[filtering-data]]
-=== Filtering the Exported Data
+[[filtering-and-enhancing-data]]
+== Filter and Enhance the exported data
 
-include::../../libbeat/docs/filtering.asciidoc[]
+include::../../libbeat/docs/processors.asciidoc[]
 
 For example, the following filter configuration drops a few fields that are rarely used (`provider_guid`, `process_id`, `thread_id`, and `version`) and one nested field, `event_data.ErrorSourceTable`:
 
 [source, yaml]
 -----------------------------------------------------
-filters:
+processors:
   - drop_fields:
       fields: [provider_guid, process_id, thread_id, version, event_data.ErrorSourceTable]
 -----------------------------------------------------
 
-See <<configuration-filter,filter configuration options>> for more information.
+include::../../libbeat/docs/processors-using.asciidoc[]
+

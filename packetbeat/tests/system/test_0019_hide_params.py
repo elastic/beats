@@ -1,5 +1,7 @@
 from packetbeat import BaseTest
 
+import six
+
 """
 Tests for checking the hide_keywords options.
 """
@@ -22,10 +24,10 @@ class Test(BaseTest):
         assert len(objs) == 1
         o = objs[0]
         assert o["type"] == "http"
-        assert o["params"] == "pass=xxxxx&user=monica"
+        assert o["http.request.params"] == "pass=xxxxx&user=monica"
         assert o["path"] == "/login"
         for _, val in o.items():
-            if isinstance(val, basestring):
+            if isinstance(val, six.string_types):
                 assert "secret" not in val
 
     def test_http_hide_get(self):
@@ -43,10 +45,10 @@ class Test(BaseTest):
         assert len(objs) == 1
         o = objs[0]
         assert o["type"] == "http"
-        assert o["params"] == "pass=xxxxx&user=monica"
+        assert o["http.request.params"] == "pass=xxxxx&user=monica"
         assert o["path"] == "/login"
         for _, val in o.items():
-            if isinstance(val, basestring):
+            if isinstance(val, six.string_types):
                 assert "secret" not in val
 
     def test_http_hide_post_default(self):
@@ -61,5 +63,5 @@ class Test(BaseTest):
         assert len(objs) == 1
         o = objs[0]
         assert o["type"] == "http"
-        assert o["params"] == "pass=secret&user=monica"
+        assert o["http.request.params"] == "pass=secret&user=monica"
         assert o["path"] == "/login"

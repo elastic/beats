@@ -5,7 +5,7 @@ REM Batch script to build and test on Windows. You can use this in conjunction
 REM with the Vagrant machine.
 REM
 
-go get github.com/pierrre/gotestcover
+go install github.com/elastic/beats/vendor/github.com/pierrre/gotestcover
 if %errorlevel% neq 0 exit /b %errorlevel%
 
 echo Building

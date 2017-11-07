@@ -1,18 +1,32 @@
 [[beats-reference]]
 = Beats Platform Reference
-:packetbeat: http://www.elastic.co/guide/en/beats/packetbeat/master
-:metricbeat: http://www.elastic.co/guide/en/beats/metricbeat/master
-:filebeat: http://www.elastic.co/guide/en/beats/filebeat/master
-:winlogbeat: http://www.elastic.co/guide/en/beats/winlogbeat/master
+
+include::./version.asciidoc[]
+
+include::{asciidoc-dir}/../../shared/attributes.asciidoc[]
+
+:packetbeat: http://www.elastic.co/guide/en/beats/packetbeat/{doc-branch}
+:metricbeat: http://www.elastic.co/guide/en/beats/metricbeat/{doc-branch}
+:filebeat: http://www.elastic.co/guide/en/beats/filebeat/{doc-branch}
+:winlogbeat: http://www.elastic.co/guide/en/beats/winlogbeat/{doc-branch}
+:heartbeat: http://www.elastic.co/guide/en/beats/heartbeat/{doc-branch}
+:beatsdevguide: http://www.elastic.co/guide/en/beats/devguide/{doc-branch}
+:securitydoc: https://www.elastic.co/guide/en/x-pack/5.2
+:logstashdoc: https://www.elastic.co/guide/en/logstash/{doc-branch}
+:elasticsearch: https://www.elastic.co/guide/en/elasticsearch/reference/{doc-branch}
+:beatname_lc: beatname
+:beatname_uc: a Beat
 :security: X-Pack Security
-:ES-version: 5.0.0-alpha3
-:LS-version: 5.0.0-alpha3
-:Kibana-version: 5.0.0-alpha3
-:Dashboards-version: 5.0.0-alpha3
+:ES-version: {stack-version}
+:LS-version: {stack-version}
+:Kibana-version: {stack-version}
+:dashboards: https://artifacts.elastic.co/downloads/beats/beats-dashboards/beats-dashboards-{stack-version}.zip
 
 include::./overview.asciidoc[]
 
 include::./communitybeats.asciidoc[]
+
+include::../../libbeat/docs/contributing-to-beats.asciidoc[]
 
 include::./gettingstarted.asciidoc[]
 
@@ -20,16 +34,10 @@ include::./installing-beats.asciidoc[]
 
 include::./repositories.asciidoc[]
 
-include::./visualizing-data.asciidoc[]
+include::./breaking.asciidoc[]
 
-include::./dashboards.asciidoc[]
+include::./upgrading.asciidoc[]
 
-pass::[<?page_header <b>PLEASE NOTE:</b><br/>We are working on updating this section. Some content might be out of date. While you're waiting for updates, you might want to try out the Beat generator at https://github.com/elastic/beat-generator.?>]
-
-include::./newbeat.asciidoc[]
-
-pass::[<?page_header ?>]
-
-include::./newdashboards.asciidoc[]
+include::./config-file-format.asciidoc[]
 
 include::./release.asciidoc[]

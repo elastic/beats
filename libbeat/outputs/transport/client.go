@@ -1,17 +1,19 @@
 package transport
 
 import (
-	"crypto/tls"
 	"fmt"
 	"net"
 	"sync"
 	"time"
+
+	"github.com/elastic/beats/libbeat/testing"
 )
 
 type Client struct {
 	dialer  Dialer
 	network string
 	host    string
+	config  *Config
 
 	conn  net.Conn
 	mutex sync.Mutex
@@ -19,9 +21,9 @@ type Client struct {
 
 type Config struct {
 	Proxy   *ProxyConfig
-	TLS     *tls.Config
+	TLS     *TLSConfig
 	Timeout time.Duration
-	Stats   *IOStats
+	Stats   IOStatser
 }
 
 func MakeDialer(c *Config) (Dialer, error) {
@@ -34,7 +36,10 @@ func MakeDialer(c *Config) (Dialer, error) {
 	if c.Stats != nil {
 		dialer = StatsDialer(dialer, c.Stats)
 	}
-	dialer = TLSDialer(c.TLS, c.Timeout, dialer)
+
+	if c.TLS != nil {
+		return TLSDialer(dialer, c.TLS, c.Timeout)
+	}
 	return dialer, nil
 }
 
@@ -57,10 +62,10 @@ func NewClient(c *Config, network, host string, defaultPort int) (*Client, error
 		return nil, err
 	}
 
-	return NewClientWithDialer(dialer, network, host, defaultPort)
+	return NewClientWithDialer(dialer, c, network, host, defaultPort)
 }
 
-func NewClientWithDialer(d Dialer, network, host string, defaultPort int) (*Client, error) {
+func NewClientWithDialer(d Dialer, c *Config, network, host string, defaultPort int) (*Client, error) {
 	// check address being parseable
 	host = fullAddress(host, defaultPort)
 	_, _, err := net.SplitHostPort(host)
@@ -72,6 +77,7 @@ func NewClientWithDialer(d Dialer, network, host string, defaultPort int) (*Clie
 		dialer:  d,
 		network: network,
 		host:    host,
+		config:  c,
 	}
 	return client, nil
 }
@@ -126,7 +132,6 @@ func (c *Client) Read(b []byte) (int, error) {
 		return 0, ErrNotConnected
 	}
 
-	debugf("try read: %v", len(b))
 	n, err := conn.Read(b)
 	return n, c.handleError(err)
 }
@@ -147,7 +152,6 @@ func (c *Client) LocalAddr() net.Addr {
 		return c.conn.LocalAddr()
 	}
 	return nil
-
 }
 
 func (c *Client) RemoteAddr() net.Addr {
@@ -156,6 +160,10 @@ func (c *Client) RemoteAddr() net.Addr {
 		return c.conn.LocalAddr()
 	}
 	return nil
+}
+
+func (c *Client) Host() string {
+	return c.host
 }
 
 func (c *Client) SetDeadline(t time.Time) error {
@@ -197,4 +205,28 @@ func (c *Client) handleError(err error) error {
 		}
 	}
 	return err
+}
+
+func (c *Client) Test(d testing.Driver) {
+	d.Run("logstash: "+c.host, func(d testing.Driver) {
+		d.Run("connection", func(d testing.Driver) {
+			netDialer := TestNetDialer(d, c.config.Timeout)
+			_, err := netDialer.Dial("tcp", c.host)
+			d.Fatal("dial up", err)
+		})
+
+		if c.config.TLS == nil {
+			d.Warn("TLS", "secure connection disabled")
+		} else {
+			d.Run("TLS", func(d testing.Driver) {
+				netDialer := NetDialer(c.config.Timeout)
+				tlsDialer, err := TestTLSDialer(d, netDialer, c.config.TLS, c.config.Timeout)
+				_, err = tlsDialer.Dial("tcp", c.host)
+				d.Fatal("dial up", err)
+			})
+		}
+
+		err := c.Connect()
+		d.Fatal("talk to server", err)
+	})
 }

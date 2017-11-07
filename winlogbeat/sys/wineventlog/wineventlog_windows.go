@@ -10,8 +10,9 @@ import (
 	"runtime"
 	"syscall"
 
-	"github.com/elastic/beats/winlogbeat/sys"
 	"golang.org/x/sys/windows"
+
+	"github.com/elastic/beats/winlogbeat/sys"
 )
 
 // Errors
@@ -125,6 +126,10 @@ func Subscribe(
 // handles available to return. Close must be called on each returned EvtHandle
 // when finished with the handle.
 func EventHandles(subscription EvtHandle, maxHandles int) ([]EvtHandle, error) {
+	if maxHandles < 1 {
+		return nil, fmt.Errorf("maxHandles must be greater than 0")
+	}
+
 	eventHandles := make([]EvtHandle, maxHandles)
 	var numRead uint32
 
@@ -152,10 +157,11 @@ func RenderEvent(
 	lang uint32,
 	renderBuf []byte,
 	pubHandleProvider func(string) sys.MessageFiles,
-) (string, error) {
+	out io.Writer,
+) error {
 	providerName, err := evtRenderProviderName(renderBuf, eventHandle)
 	if err != nil {
-		return "", err
+		return err
 	}
 
 	var publisherHandle uintptr
@@ -169,43 +175,45 @@ func RenderEvent(
 	}
 
 	// Only a single string is returned when rendering XML.
-	xml, err := FormatEventString(EvtFormatMessageXml,
-		eventHandle, providerName, EvtHandle(publisherHandle), lang, renderBuf)
+	err = FormatEventString(EvtFormatMessageXml,
+		eventHandle, providerName, EvtHandle(publisherHandle), lang, renderBuf, out)
 
 	// Recover by rendering the XML without the RenderingInfo (message string).
 	if err != nil {
 		// Do not try to recover from InsufficientBufferErrors because these
 		// can be retried with a larger buffer.
 		if _, ok := err.(sys.InsufficientBufferError); ok {
-			return "", err
+			return err
 		}
 
-		// Ignore the error and return the original error with the response.
-		xml, _ = RenderEventNoMessage(eventHandle, renderBuf)
+		err = RenderEventXML(eventHandle, renderBuf, out)
 	}
 
-	return xml, err
+	return err
 }
 
-// RenderEventNoMessage render the events as XML but without the RenderingInfo (message).
-func RenderEventNoMessage(eventHandle EvtHandle, renderBuf []byte) (string, error) {
+// RenderEventXML renders the event as XML. If the event is already rendered, as
+// in a forwarded event whose content type is "RenderedText", then the XML will
+// include the RenderingInfo (message). If the event is not rendered then the
+// XML will not include the message, and in this case RenderEvent should be
+// used.
+func RenderEventXML(eventHandle EvtHandle, renderBuf []byte, out io.Writer) error {
 	var bufferUsed, propertyCount uint32
 	err := _EvtRender(0, eventHandle, EvtRenderEventXml, uint32(len(renderBuf)),
 		&renderBuf[0], &bufferUsed, &propertyCount)
 	if err == ERROR_INSUFFICIENT_BUFFER {
-		return "", sys.InsufficientBufferError{err, int(bufferUsed)}
+		return sys.InsufficientBufferError{err, int(bufferUsed)}
 	}
 	if err != nil {
-		return "", err
+		return err
 	}
 
 	if int(bufferUsed) > len(renderBuf) {
-		return "", fmt.Errorf("Windows EvtRender reported that wrote %d bytes "+
+		return fmt.Errorf("Windows EvtRender reported that wrote %d bytes "+
 			"to the buffer, but the buffer can only hold %d bytes",
 			bufferUsed, len(renderBuf))
 	}
-	xml, _, err := sys.UTF16BytesToString(renderBuf[:bufferUsed])
-	return xml, err
+	return sys.UTF16ToUTF8Bytes(renderBuf[:bufferUsed], out)
 }
 
 // CreateBookmark creates a new handle to a bookmark. Close must be called on
@@ -292,24 +300,25 @@ func FormatEventString(
 	publisherHandle EvtHandle,
 	lang uint32,
 	buffer []byte,
-) (string, error) {
+	out io.Writer,
+) error {
 	// Open a publisher handle if one was not provided.
 	ph := publisherHandle
 	if ph == 0 {
 		ph, err := OpenPublisherMetadata(0, publisher, 0)
 		if err != nil {
-			return "", err
+			return err
 		}
 		defer _EvtClose(ph)
 	}
 
-	// Create a buffer if one was not provider.
+	// Create a buffer if one was not provided.
 	var bufferUsed uint32
 	if buffer == nil {
 		err := _EvtFormatMessage(ph, eventHandle, 0, 0, 0, messageFlag,
 			0, nil, &bufferUsed)
 		if err != nil && err != ERROR_INSUFFICIENT_BUFFER {
-			return "", err
+			return err
 		}
 
 		bufferUsed *= 2
@@ -321,16 +330,15 @@ func FormatEventString(
 		uint32(len(buffer)/2), &buffer[0], &bufferUsed)
 	bufferUsed *= 2
 	if err == ERROR_INSUFFICIENT_BUFFER {
-		return "", sys.InsufficientBufferError{err, int(bufferUsed)}
+		return sys.InsufficientBufferError{err, int(bufferUsed)}
 	}
 	if err != nil {
-		return "", err
+		return err
 	}
 
 	// This assumes there is only a single string value to read. This will
 	// not work to read keys (when messageFlag == EvtFormatMessageKeyword).
-	value, _, err := sys.UTF16BytesToString(buffer[0:bufferUsed])
-	return value, err
+	return sys.UTF16ToUTF8Bytes(buffer[:bufferUsed], out)
 }
 
 // offset reads a pointer value from the reader then calculates an offset from
@@ -393,8 +401,7 @@ func readString(buffer []byte, reader io.Reader) (string, error) {
 func evtRenderProviderName(renderBuf []byte, eventHandle EvtHandle) (string, error) {
 	var bufferUsed, propertyCount uint32
 	err := _EvtRender(providerNameContext, eventHandle, EvtRenderEventValues,
-		uint32(len(renderBuf)), &renderBuf[0], &bufferUsed,
-		&propertyCount)
+		uint32(len(renderBuf)), &renderBuf[0], &bufferUsed, &propertyCount)
 	if err == ERROR_INSUFFICIENT_BUFFER {
 		return "", sys.InsufficientBufferError{err, int(bufferUsed)}
 	}

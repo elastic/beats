@@ -1,4 +1,0 @@
-beat_name: {beat}
-beat_url: 'https://{beat_path}'
-beat_repo: '{beat_path}'
-beat_description: Sends {beat} metrics to Logstash or directly to Elasticsearch.

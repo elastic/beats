@@ -10,7 +10,6 @@ import (
 	"github.com/elastic/beats/libbeat/common"
 	"github.com/elastic/beats/libbeat/logp"
 	"github.com/elastic/beats/packetbeat/protos"
-	"github.com/elastic/beats/packetbeat/publish"
 
 	// import plugins for testing
 	_ "github.com/elastic/beats/packetbeat/protos/http"
@@ -33,18 +32,18 @@ var (
 )
 
 type TestProtocols struct {
-	udp map[protos.Protocol]protos.UdpPlugin
+	udp map[protos.Protocol]protos.UDPPlugin
 }
 
-func (p TestProtocols) BpfFilter(with_vlans bool, with_icmp bool) string {
+func (p TestProtocols) BpfFilter(withVlans bool, withICMP bool) string {
 	return "mock bpf filter"
 }
 
-func (p TestProtocols) GetTcp(proto protos.Protocol) protos.TcpPlugin {
+func (p TestProtocols) GetTCP(proto protos.Protocol) protos.TCPPlugin {
 	return nil
 }
 
-func (p TestProtocols) GetUdp(proto protos.Protocol) protos.UdpPlugin {
+func (p TestProtocols) GetUDP(proto protos.Protocol) protos.UDPPlugin {
 	return p.udp[proto]
 }
 
@@ -52,11 +51,11 @@ func (p TestProtocols) GetAll() map[protos.Protocol]protos.Plugin {
 	return nil
 }
 
-func (p TestProtocols) GetAllTcp() map[protos.Protocol]protos.TcpPlugin {
+func (p TestProtocols) GetAllTCP() map[protos.Protocol]protos.TCPPlugin {
 	return nil
 }
 
-func (p TestProtocols) GetAllUdp() map[protos.Protocol]protos.UdpPlugin {
+func (p TestProtocols) GetAllUDP() map[protos.Protocol]protos.UDPPlugin {
 	return p.udp
 }
 
@@ -69,7 +68,7 @@ type TestProtocol struct {
 	pkt   *protos.Packet // UDP packet that the plugin was called to process.
 }
 
-func (proto *TestProtocol) Init(test_mode bool, results publish.Transactions) error {
+func (proto *TestProtocol) Init(testMode bool, results protos.Reporter) error {
 	return nil
 }
 
@@ -77,13 +76,13 @@ func (proto *TestProtocol) GetPorts() []int {
 	return proto.Ports
 }
 
-func (proto *TestProtocol) ParseUdp(pkt *protos.Packet) {
+func (proto *TestProtocol) ParseUDP(pkt *protos.Packet) {
 	proto.pkt = pkt
 }
 
 type TestStruct struct {
 	protocols *TestProtocols
-	udp       *Udp
+	udp       *UDP
 	plugin    *TestProtocol
 }
 
@@ -94,11 +93,11 @@ func testSetup(t *testing.T) *TestStruct {
 	}
 
 	protocols := &TestProtocols{}
-	protocols.udp = make(map[protos.Protocol]protos.UdpPlugin)
+	protocols.udp = make(map[protos.Protocol]protos.UDPPlugin)
 	plugin := &TestProtocol{Ports: []int{PORT}}
 	protocols.udp[PROTO] = plugin
 
-	udp, err := NewUdp(protocols)
+	udp, err := NewUDP(protocols)
 	if err != nil {
 		t.Error("Error creating UDP handler: ", err)
 	}
@@ -108,15 +107,15 @@ func testSetup(t *testing.T) *TestStruct {
 
 func Test_buildPortsMap(t *testing.T) {
 	type configTest struct {
-		Input  map[protos.Protocol]protos.UdpPlugin
+		Input  map[protos.Protocol]protos.UDPPlugin
 		Output map[uint16]protos.Protocol
 	}
 
 	// The protocols named here are not necessarily UDP. They are just used
 	// for testing purposes.
-	config_tests := []configTest{
+	configTests := []configTest{
 		{
-			Input: map[protos.Protocol]protos.UdpPlugin{
+			Input: map[protos.Protocol]protos.UDPPlugin{
 				httpProtocol: &TestProtocol{Ports: []int{80, 8080}},
 			},
 			Output: map[uint16]protos.Protocol{
@@ -125,7 +124,7 @@ func Test_buildPortsMap(t *testing.T) {
 			},
 		},
 		{
-			Input: map[protos.Protocol]protos.UdpPlugin{
+			Input: map[protos.Protocol]protos.UDPPlugin{
 				httpProtocol:  &TestProtocol{Ports: []int{80, 8080}},
 				mysqlProtocol: &TestProtocol{Ports: []int{3306}},
 				redisProtocol: &TestProtocol{Ports: []int{6379, 6380}},
@@ -141,7 +140,7 @@ func Test_buildPortsMap(t *testing.T) {
 
 		// should ignore duplicate ports in the same protocol
 		{
-			Input: map[protos.Protocol]protos.UdpPlugin{
+			Input: map[protos.Protocol]protos.UDPPlugin{
 				httpProtocol:  &TestProtocol{Ports: []int{80, 8080, 8080}},
 				mysqlProtocol: &TestProtocol{Ports: []int{3306}},
 			},
@@ -153,7 +152,7 @@ func Test_buildPortsMap(t *testing.T) {
 		},
 	}
 
-	for _, test := range config_tests {
+	for _, test := range configTests {
 		output, err := buildPortsMap(test.Input)
 		assert.Nil(t, err)
 		assert.Equal(t, test.Output, output)
@@ -164,7 +163,7 @@ func Test_buildPortsMap(t *testing.T) {
 // for the same port number.
 func Test_buildPortsMap_portOverlapError(t *testing.T) {
 	type errTest struct {
-		Input map[protos.Protocol]protos.UdpPlugin
+		Input map[protos.Protocol]protos.UDPPlugin
 		Err   string
 	}
 
@@ -173,7 +172,7 @@ func Test_buildPortsMap_portOverlapError(t *testing.T) {
 	tests := []errTest{
 		{
 			// Should raise error on duplicate port
-			Input: map[protos.Protocol]protos.UdpPlugin{
+			Input: map[protos.Protocol]protos.UDPPlugin{
 				httpProtocol:  &TestProtocol{Ports: []int{80, 8080}},
 				mysqlProtocol: &TestProtocol{Ports: []int{3306}},
 				redisProtocol: &TestProtocol{Ports: []int{6379, 6380, 3306}},
@@ -193,7 +192,7 @@ func Test_buildPortsMap_portOverlapError(t *testing.T) {
 // packet's source port.
 func Test_decideProtocol_bySrcPort(t *testing.T) {
 	test := testSetup(t)
-	tuple := common.NewIpPortTuple(4,
+	tuple := common.NewIPPortTuple(4,
 		net.ParseIP("192.168.0.1"), PORT,
 		net.ParseIP("10.0.0.1"), 34898)
 	assert.Equal(t, PROTO, test.udp.decideProtocol(&tuple))
@@ -203,7 +202,7 @@ func Test_decideProtocol_bySrcPort(t *testing.T) {
 // packet's destination port.
 func Test_decideProtocol_byDstPort(t *testing.T) {
 	test := testSetup(t)
-	tuple := common.NewIpPortTuple(4,
+	tuple := common.NewIPPortTuple(4,
 		net.ParseIP("10.0.0.1"), 34898,
 		net.ParseIP("192.168.0.1"), PORT)
 	assert.Equal(t, PROTO, test.udp.decideProtocol(&tuple))
@@ -213,7 +212,7 @@ func Test_decideProtocol_byDstPort(t *testing.T) {
 // which it does not have a plugin.
 func TestProcess_unknownProtocol(t *testing.T) {
 	test := testSetup(t)
-	tuple := common.NewIpPortTuple(4,
+	tuple := common.NewIPPortTuple(4,
 		net.ParseIP("10.0.0.1"), 34898,
 		net.ParseIP("192.168.0.1"), PORT+1)
 	assert.Equal(t, protos.UnknownProtocol, test.udp.decideProtocol(&tuple))
@@ -222,7 +221,7 @@ func TestProcess_unknownProtocol(t *testing.T) {
 // Verify that Process ignores empty packets.
 func TestProcess_emptyPayload(t *testing.T) {
 	test := testSetup(t)
-	tuple := common.NewIpPortTuple(4,
+	tuple := common.NewIPPortTuple(4,
 		net.ParseIP("192.168.0.1"), PORT,
 		net.ParseIP("10.0.0.1"), 34898)
 	emptyPkt := &protos.Packet{Ts: time.Now(), Tuple: tuple, Payload: []byte{}}
@@ -234,7 +233,7 @@ func TestProcess_emptyPayload(t *testing.T) {
 // ProcessUdp on it.
 func TestProcess_nonEmptyPayload(t *testing.T) {
 	test := testSetup(t)
-	tuple := common.NewIpPortTuple(4,
+	tuple := common.NewIPPortTuple(4,
 		net.ParseIP("192.168.0.1"), PORT,
 		net.ParseIP("10.0.0.1"), 34898)
 	payload := []byte{1}

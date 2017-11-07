@@ -1,0 +1,13 @@
+{
+  "hits": 0, 
+  "timeRestore": false, 
+  "description": "", 
+  "title": "Metricbeat-processes", 
+  "uiStateJSON": "{\"P-1\":{\"vis\":{\"params\":{\"sort\":{\"columnIndex\":null,\"direction\":null}}}},\"P-4\":{\"vis\":{\"params\":{\"sort\":{\"columnIndex\":null,\"direction\":null}}}}}", 
+  "panelsJSON": "[{\"col\":1,\"id\":\"System-Navigation\",\"panelIndex\":5,\"row\":1,\"size_x\":12,\"size_y\":1,\"type\":\"visualization\"},{\"col\":1,\"id\":\"Number-of-processes\",\"panelIndex\":7,\"row\":2,\"size_x\":3,\"size_y\":3,\"type\":\"visualization\"},{\"col\":1,\"id\":\"CPU-usage-per-process\",\"panelIndex\":2,\"row\":5,\"size_x\":6,\"size_y\":8,\"type\":\"visualization\"},{\"col\":7,\"id\":\"Memory-usage-per-process\",\"panelIndex\":3,\"row\":5,\"size_x\":6,\"size_y\":8,\"type\":\"visualization\"},{\"col\":1,\"id\":\"Top-processes-by-memory-usage\",\"panelIndex\":1,\"row\":13,\"size_x\":6,\"size_y\":6,\"type\":\"visualization\"},{\"col\":7,\"id\":\"Top-processes-by-CPU-usage\",\"panelIndex\":4,\"row\":13,\"size_x\":6,\"size_y\":6,\"type\":\"visualization\"},{\"col\":4,\"id\":\"Number-of-processes-over-time\",\"panelIndex\":10,\"row\":2,\"size_x\":9,\"size_y\":3,\"type\":\"visualization\"}]", 
+  "optionsJSON": "{\"darkTheme\":false}", 
+  "version": 1, 
+  "kibanaSavedObjectMeta": {
+    "searchSourceJSON": "{\"filter\":[{\"query\":{\"query_string\":{\"analyze_wildcard\":true,\"query\":\"*\"}}}],\"highlightAll\":true,\"version\":true}"
+  }
+}

@@ -1,0 +1,11 @@
+{
+  "description": "",
+  "uiStateJSON": "{}",
+  "kibanaSavedObjectMeta": {
+    "searchSourceJSON": "{\"filter\":[]}"
+  },
+  "savedSearchId": "Apache-HTTPD",
+  "visState": "{\"title\":\"Apache HTTPD - Load1/5/15\",\"type\":\"line\",\"params\":{\"shareYAxis\":true,\"addTooltip\":true,\"addLegend\":true,\"showCircles\":true,\"smoothLines\":false,\"interpolate\":\"linear\",\"scale\":\"linear\",\"drawLinesBetweenPoints\":true,\"radiusRatio\":9,\"times\":[],\"addTimeMarker\":false,\"defaultYExtents\":false,\"setYExtents\":false,\"yAxis\":{}},\"aggs\":[{\"id\":\"1\",\"type\":\"avg\",\"schema\":\"metric\",\"params\":{\"field\":\"apache.status.load.5\",\"customLabel\":\"Load 5\"}},{\"id\":\"2\",\"type\":\"date_histogram\",\"schema\":\"segment\",\"params\":{\"field\":\"@timestamp\",\"interval\":\"auto\",\"customInterval\":\"2h\",\"min_doc_count\":1,\"extended_bounds\":{}}},{\"id\":\"3\",\"type\":\"avg\",\"schema\":\"metric\",\"params\":{\"field\":\"apache.status.load.1\",\"customLabel\":\"Load 1\"}},{\"id\":\"4\",\"type\":\"avg\",\"schema\":\"metric\",\"params\":{\"field\":\"apache.status.load.15\",\"customLabel\":\"Load 15\"}},{\"id\":\"5\",\"type\":\"terms\",\"schema\":\"split\",\"params\":{\"field\":\"apache.status.hostname\",\"size\":5,\"order\":\"desc\",\"orderBy\":\"1\",\"customLabel\":\"Hostname\",\"row\":true}}],\"listeners\":{}}",
+  "title": "Apache HTTPD - Load1/5/15",
+  "version": 1
+}

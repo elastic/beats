@@ -1,0 +1,50 @@
+{
+  "description": "Pipeline for parsing MySQL error logs. It currently uses message1 and message2 to workaround bug https://github.com/elastic/elasticsearch/issues/22117",
+  "processors": [{
+    "grok": {
+        "field": "message",
+        "patterns": [
+          "%{LOCALDATETIME:mysql.error.timestamp} (\\[%{DATA:mysql.error.level}\\] )?%{GREEDYDATA:mysql.error.message}",
+          "%{DATA:mysql.error.timestamp} %{NUMBER:mysql.error.thread_id} \\[%{DATA:mysql.error.level}\\] %{GREEDYDATA:mysql.error.message1}",
+          "%{GREEDYDATA:mysql.error.message2}"
+        ],
+        "ignore_missing": true,
+        "pattern_definitions": {
+          "LOCALDATETIME": "[0-9]+ %{TIME}",
+          "GREEDYDATA1": ".*"
+        }
+      }
+    }, {
+      "remove": {
+        "field": "message"
+      }
+    }, {
+      "rename": {
+        "field": "mysql.error.message1",
+        "target_field": "mysql.error.message",
+        "ignore_failure": true
+      }
+    }, {
+      "rename": {
+        "field": "mysql.error.message2",
+        "target_field": "mysql.error.message",
+        "ignore_failure": true
+      }
+    }, {
+      "date": {
+        "field": "mysql.error.timestamp",
+        "target_field": "@timestamp",
+        "formats": [
+          "ISO8601",
+          "YYMMdd H:m:s"
+        ],
+        "ignore_failure": true
+      }
+    }],
+  "on_failure" : [{
+    "set" : {
+      "field" : "error.message",
+      "value" : "{{ _ingest.on_failure_message }}"
+    }
+  }]
+}

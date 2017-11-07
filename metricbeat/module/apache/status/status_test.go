@@ -3,10 +3,12 @@
 package status
 
 import (
+	"bufio"
 	"net"
 	"net/http"
 	"net/http/httptest"
-	"net/url"
+	"os"
+	"path/filepath"
 	"sync"
 	"testing"
 	"time"
@@ -95,7 +97,7 @@ func TestFetchEventContents(t *testing.T) {
 	assert.Equal(t, 6750.8, cpu["system"])
 	assert.Equal(t, 14076.6, cpu["user"])
 
-	assert.Equal(t, server.URL, event["hostname"])
+	assert.Equal(t, server.URL[7:], event["hostname"])
 
 	load := event["load"].(common.MapStr)
 	assert.Equal(t, .02, load["1"])
@@ -152,8 +154,8 @@ func TestFetchTimeout(t *testing.T) {
 		assert.Contains(t, err.Error(), "request canceled (Client.Timeout exceeded")
 	}
 
-	// Elapsed should be ~50ms.
-	assert.True(t, elapsed < 100*time.Millisecond, "elapsed time: %s", elapsed.String())
+	// Elapsed should be ~50ms, sometimes it can be up to 1s
+	assert.True(t, elapsed < 5*time.Second, "elapsed time: %s", elapsed.String())
 }
 
 // TestMultipleFetches verifies that the server connection is reused when HTTP
@@ -197,14 +199,14 @@ func TestMultipleFetches(t *testing.T) {
 	connLock.Unlock()
 }
 
-func TestHostParse(t *testing.T) {
+func TestHostParser(t *testing.T) {
 	var tests = []struct {
 		host string
 		url  string
 		err  string
 	}{
-		{"", "", "error parsing apache host: empty host"},
-		{":80", "", "error parsing apache host: parse :80: missing protocol scheme"},
+		{"", "", "empty host"},
+		{":80", "", "empty host"},
 		{"localhost", "http://localhost/server-status?auto=", ""},
 		{"localhost/ServerStatus", "http://localhost/ServerStatus?auto=", ""},
 		{"127.0.0.1", "http://127.0.0.1/server-status?auto=", ""},
@@ -214,21 +216,26 @@ func TestHostParse(t *testing.T) {
 	}
 
 	for _, test := range tests {
-		u, err := getURL("", "", defaultPath, test.host)
+		hostData, err := hostParser(mbtest.NewTestModule(t, map[string]interface{}{}), test.host)
 		if err != nil && test.err != "" {
-			assert.Equal(t, test.err, err.Error())
+			assert.Contains(t, err.Error(), test.err)
 		} else if assert.NoError(t, err, "unexpected error") {
-			assert.Equal(t, test.url, u.String())
+			assert.Equal(t, test.url, hostData.URI)
 		}
 	}
 }
 
-func TestRedactPassword(t *testing.T) {
-	rawURL := "https://admin:secret@127.0.0.1"
-	u, err := url.Parse(rawURL)
-	if assert.NoError(t, err) {
-		assert.Equal(t, "https://admin@127.0.0.1", redactPassword(*u))
-		// redactPassword shall not modify the URL.
-		assert.Equal(t, rawURL, u.String())
+// Test event mapping for different apache status outputs
+func TestStatusOutputs(t *testing.T) {
+	files, err := filepath.Glob("./_meta/test/status_*")
+	assert.NoError(t, err)
+
+	for _, filename := range files {
+		f, err := os.Open(filename)
+		assert.NoError(t, err, "cannot open test file "+filename)
+		scanner := bufio.NewScanner(f)
+
+		_, errors := eventMapping(scanner, "localhost")
+		assert.False(t, errors.HasRequiredErrors(), "error mapping "+filename)
 	}
 }

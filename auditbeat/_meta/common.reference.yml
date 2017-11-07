@@ -1,0 +1,31 @@
+########################## Auditbeat Configuration #############################
+
+# This is a reference configuration file documenting all non-deprecated options
+# in comments. For a shorter configuration example that contains only the most
+# common options, please see auditbeat.yml in the same directory.
+#
+# You can find the full configuration reference here:
+# https://www.elastic.co/guide/en/beats/auditbeat/index.html
+
+#============================  Config Reloading ================================
+
+# Config reloading allows to dynamically load modules. Each file which is
+# monitored must contain one or multiple modules as a list.
+auditbeat.config.modules:
+
+  # Glob pattern for configuration reloading
+  path: ${path.config}/conf.d/*.yml
+
+  # Period on which files under path should be checked for changes
+  reload.period: 10s
+
+  # Set to true to enable config reloading
+  reload.enabled: false
+
+# Maximum amount of time to randomly delay the start of a metricset. Use 0 to
+# disable startup delay.
+auditbeat.max_start_delay: 10s
+
+#==========================  Modules configuration =============================
+auditbeat.modules:
+

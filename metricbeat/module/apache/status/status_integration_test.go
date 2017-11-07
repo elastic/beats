@@ -5,6 +5,7 @@ package status
 import (
 	"testing"
 
+	"github.com/elastic/beats/libbeat/tests/compose"
 	mbtest "github.com/elastic/beats/metricbeat/mb/testing"
 	"github.com/elastic/beats/metricbeat/module/apache"
 
@@ -12,6 +13,8 @@ import (
 )
 
 func TestFetch(t *testing.T) {
+	compose.EnsureUp(t, "apache")
+
 	f := mbtest.NewEventFetcher(t, getConfig())
 	event, err := f.Fetch()
 	if !assert.NoError(t, err) {
@@ -21,10 +24,14 @@ func TestFetch(t *testing.T) {
 	t.Logf("%s/%s event: %+v", f.Module().Name(), f.Name(), event)
 
 	// Check number of fields.
-	assert.Equal(t, 12, len(event))
+	if len(event) < 11 {
+		t.Fatal("Too few top-level elements in the event")
+	}
 }
 
 func TestData(t *testing.T) {
+	compose.EnsureUp(t, "apache")
+
 	f := mbtest.NewEventFetcher(t, getConfig())
 
 	err := mbtest.WriteEvent(f, t)

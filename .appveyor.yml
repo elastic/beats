@@ -6,42 +6,45 @@ os: Windows Server 2012 R2
 
 # Environment variables
 environment:
-  GOROOT: c:\go1.6.2
   GOPATH: c:\gopath
-  PYWIN_DL: https://downloads.sourceforge.net/project/pywin32/pywin32/Build%20219/pywin32-219.win32-py2.7.exe
+  GVM_DL: https://github.com/andrewkroh/gvm/releases/download/v0.0.1/gvm-windows-amd64.exe
+  PYWIN_DL: https://beats-files.s3.amazonaws.com/deps/pywin32-220.win32-py2.7.exe
   matrix:
+  - PROJ: github.com\elastic\beats\metricbeat
+    BEAT: metricbeat
   - PROJ: github.com\elastic\beats\filebeat
     BEAT: filebeat
-  - PROJ: github.com\elastic\beats\topbeat
-    BEAT: topbeat
   - PROJ: github.com\elastic\beats\winlogbeat
     BEAT: winlogbeat
 
 # Custom clone folder (variables are not expanded here).
 clone_folder: c:\gopath\src\github.com\elastic\beats
 
-# Cache mingw install until appveyor.yml is modified.
+# Cache files until appveyor.yml is modified.
 cache:
 - C:\ProgramData\chocolatey\bin -> .appveyor.yml
 - C:\ProgramData\chocolatey\lib -> .appveyor.yml
-- C:\go1.6.2 -> .appveyor.yml
+- C:\Users\appveyor\.gvm -> .go-version
+- C:\Windows\System32\gvm.exe -> .appveyor.yml
 - C:\tools\mingw64 -> .appveyor.yml
 - C:\pywin_inst.exe -> .appveyor.yml
 
 # Scripts that run after cloning repository
 install:
-  - ps: c:\gopath\src\github.com\elastic\beats\libbeat\scripts\install-go.ps1 -version 1.6.2
-  - set PATH=%GOROOT%\bin;%PATH%
-  # AppVeyor installed mingw is 32-bit only.
+  - ps: >-
+      if(!(Test-Path "C:\Windows\System32\gvm.exe")) {
+        wget "$env:GVM_DL" -Outfile C:\Windows\System32\gvm.exe
+      }
+  - ps: gvm --format=powershell $(Get-Content .go-version) | Invoke-Expression
+  # AppVeyor installed mingw is 32-bit only so install 64-bit version.
   - ps: >-
       if(!(Test-Path "C:\tools\mingw64\bin\gcc.exe")) {
         cinst mingw > mingw-install.txt
         Push-AppveyorArtifact mingw-install.txt
       }
-  - set PATH=C:\tools\mingw64\bin;%GOROOT%\bin;%PATH%
+  - set PATH=C:\tools\mingw64\bin;%PATH%
   - set PATH=%GOPATH%\bin;%PATH%
-  - go get github.com/pierrre/gotestcover
-  - set GO15VENDOREXPERIMENT=1
+  - go install github.com/elastic/beats/vendor/github.com/pierrre/gotestcover
   - go version
   - go env
   # Download the PyWin32 installer if it is not cached.
@@ -52,7 +55,7 @@ install:
   - set PYTHONPATH=C:\Python27
   - set PATH=%PYTHONPATH%;%PYTHONPATH%\Scripts;%PATH%
   - python --version
-  - pip install jinja2 nose nose-timer PyYAML
+  - pip install six jinja2 nose nose-timer PyYAML redis elasticsearch
   - easy_install C:/pywin_inst.exe
 
 # To run your custom scripts instead of automatic MSBuild
@@ -73,6 +76,11 @@ test_script:
   # System tests
   - ps: Add-AppveyorTest "System tests" -Outcome Running
   - go test -race -c -cover -covermode=atomic -coverpkg ./...
+  - ps: |
+      if ($env:BEAT -eq "metricbeat") {
+        cp .\_meta\fields.common.yml .\_meta\fields.generated.yml
+        python .\scripts\fields_collector.py | out-file -append -encoding UTF8 -filepath .\_meta\fields.generated.yml
+      }
   - ps: cd tests/system
   - nosetests --with-timer
   - ps: Update-AppveyorTest "System tests" -Outcome Passed

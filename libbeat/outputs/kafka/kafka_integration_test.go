@@ -3,18 +3,27 @@
 package kafka
 
 import (
+	"encoding/json"
 	"fmt"
 	"math/rand"
 	"os"
 	"strconv"
+	"sync"
 	"testing"
 	"time"
 
 	"github.com/Shopify/sarama"
-	"github.com/elastic/beats/libbeat/common"
-	"github.com/elastic/beats/libbeat/logp"
-	"github.com/elastic/beats/libbeat/outputs"
+
 	"github.com/stretchr/testify/assert"
+
+	"github.com/elastic/beats/libbeat/beat"
+	"github.com/elastic/beats/libbeat/common"
+	"github.com/elastic/beats/libbeat/common/fmtstr"
+	"github.com/elastic/beats/libbeat/logp"
+	"github.com/elastic/beats/libbeat/outputs/outest"
+
+	_ "github.com/elastic/beats/libbeat/outputs/codec/format"
+	_ "github.com/elastic/beats/libbeat/outputs/codec/json"
 )
 
 const (
@@ -22,7 +31,231 @@ const (
 	kafkaDefaultPort = "9092"
 )
 
-var testOptions = outputs.Options{}
+type eventInfo struct {
+	events []beat.Event
+}
+
+func TestKafkaPublish(t *testing.T) {
+	if testing.Verbose() {
+		logp.LogInit(logp.LOG_DEBUG, "", false, true, []string{"kafka"})
+	}
+
+	id := strconv.Itoa(rand.New(rand.NewSource(int64(time.Now().Nanosecond()))).Int())
+	testTopic := fmt.Sprintf("test-libbeat-%s", id)
+	logType := fmt.Sprintf("log-type-%s", id)
+
+	tests := []struct {
+		title  string
+		config map[string]interface{}
+		topic  string
+		events []eventInfo
+	}{
+		{
+			"publish single event to test topic",
+			nil,
+			testTopic,
+			single(common.MapStr{
+				"host":    "test-host",
+				"message": id,
+			}),
+		},
+		{
+			"publish single event with topic from type",
+			map[string]interface{}{
+				"topic": "%{[type]}",
+			},
+			logType,
+			single(common.MapStr{
+				"host":    "test-host",
+				"type":    logType,
+				"message": id,
+			}),
+		},
+		{
+			"publish single event with formating to test topic",
+			map[string]interface{}{
+				"codec.format.string": "%{[message]}",
+			},
+			testTopic,
+			single(common.MapStr{
+				"host":    "test-host",
+				"message": id,
+			}),
+		},
+		{
+			"batch publish to test topic",
+			nil,
+			testTopic,
+			randMulti(5, 100, common.MapStr{
+				"host": "test-host",
+			}),
+		},
+		{
+			"batch publish to test topic from type",
+			map[string]interface{}{
+				"topic": "%{[type]}",
+			},
+			logType,
+			randMulti(5, 100, common.MapStr{
+				"host": "test-host",
+				"type": logType,
+			}),
+		},
+		{
+			"batch publish with random partitioner",
+			map[string]interface{}{
+				"partition.random": map[string]interface{}{
+					"group_events": 1,
+				},
+			},
+			testTopic,
+			randMulti(1, 10, common.MapStr{
+				"host": "test-host",
+				"type": "log",
+			}),
+		},
+		{
+			"batch publish with round robin partitioner",
+			map[string]interface{}{
+				"partition.round_robin": map[string]interface{}{
+					"group_events": 1,
+				},
+			},
+			testTopic,
+			randMulti(1, 10, common.MapStr{
+				"host": "test-host",
+				"type": "log",
+			}),
+		},
+		{
+			"batch publish with hash partitioner without key (fallback to random)",
+			map[string]interface{}{
+				"partition.hash": map[string]interface{}{},
+			},
+			testTopic,
+			randMulti(1, 10, common.MapStr{
+				"host": "test-host",
+				"type": "log",
+			}),
+		},
+		{
+			// warning: this test uses random keys. In case keys are reused, test might fail.
+			"batch publish with hash partitioner with key",
+			map[string]interface{}{
+				"key":            "%{[message]}",
+				"partition.hash": map[string]interface{}{},
+			},
+			testTopic,
+			randMulti(1, 10, common.MapStr{
+				"host": "test-host",
+				"type": "log",
+			}),
+		},
+		{
+			// warning: this test uses random keys. In case keys are reused, test might fail.
+			"batch publish with fields hash partitioner",
+			map[string]interface{}{
+				"partition.hash.hash": []string{
+					"@timestamp",
+					"type",
+					"message",
+				},
+			},
+			testTopic,
+			randMulti(1, 10, common.MapStr{
+				"host": "test-host",
+				"type": "log",
+			}),
+		},
+	}
+
+	defaultConfig := map[string]interface{}{
+		"hosts":   []string{getTestKafkaHost()},
+		"topic":   testTopic,
+		"timeout": "1s",
+	}
+
+	for i, test := range tests {
+		test := test
+		name := fmt.Sprintf("run test(%v): %v", i, test.title)
+
+		cfg := makeConfig(t, defaultConfig)
+		if test.config != nil {
+			cfg.Merge(makeConfig(t, test.config))
+		}
+
+		t.Run(name, func(t *testing.T) {
+			grp, err := makeKafka(beat.Info{Beat: "libbeat"}, nil, cfg)
+			if err != nil {
+				t.Fatal(err)
+			}
+
+			output := grp.Clients[0].(*client)
+			if err := output.Connect(); err != nil {
+				t.Fatal(err)
+			}
+			defer output.Close()
+
+			// publish test events
+			var wg sync.WaitGroup
+			for i := range test.events {
+				batch := outest.NewBatch(test.events[i].events...)
+				batch.OnSignal = func(_ outest.BatchSignal) {
+					wg.Done()
+				}
+
+				wg.Add(1)
+				output.Publish(batch)
+			}
+
+			// wait for all published batches to be ACKed
+			wg.Wait()
+
+			expected := flatten(test.events)
+
+			// check we can find all event in topic
+			timeout := 20 * time.Second
+			stored := testReadFromKafkaTopic(t, test.topic, len(expected), timeout)
+
+			// validate messages
+			if len(expected) != len(stored) {
+				assert.Equal(t, len(stored), len(expected))
+				return
+			}
+
+			validate := validateJSON
+			if fmt, exists := test.config["codec.format.string"]; exists {
+				validate = makeValidateFmtStr(fmt.(string))
+			}
+
+			for i, d := range expected {
+				validate(t, stored[i].Value, d)
+			}
+		})
+	}
+}
+
+func validateJSON(t *testing.T, value []byte, event beat.Event) {
+	var decoded map[string]interface{}
+	err := json.Unmarshal(value, &decoded)
+	if err != nil {
+		t.Errorf("can not json decode event value: %v", value)
+		return
+	}
+	assert.Equal(t, decoded["type"], event.Fields["type"])
+	assert.Equal(t, decoded["message"], event.Fields["message"])
+}
+
+func makeValidateFmtStr(fmt string) func(*testing.T, []byte, beat.Event) {
+	fmtString := fmtstr.MustCompileEvent(fmt)
+	return func(t *testing.T, value []byte, event beat.Event) {
+		expectedMessage, err := fmtString.Run(&event)
+		if err != nil {
+			t.Fatal(err)
+		}
+		assert.Equal(t, string(expectedMessage), string(value))
+	}
+}
 
 func strDefault(a, defaults string) string {
 	if len(a) == 0 {
@@ -42,39 +275,12 @@ func getTestKafkaHost() string {
 	)
 }
 
-func newTestKafkaClient(t *testing.T, topic string) *client {
-
-	hosts := []string{getTestKafkaHost()}
-	t.Logf("host: %v", hosts)
-
-	client, err := newKafkaClient(hosts, topic, false, nil)
+func makeConfig(t *testing.T, in map[string]interface{}) *common.Config {
+	cfg, err := common.NewConfigFrom(in)
 	if err != nil {
 		t.Fatal(err)
 	}
-
-	return client
-}
-
-func newTestKafkaOutput(t *testing.T, topic string, useType bool) outputs.Outputer {
-
-	config := map[string]interface{}{
-		"hosts":    []string{getTestKafkaHost()},
-		"timeout":  "1s",
-		"topic":    topic,
-		"use_type": useType,
-	}
-
-	cfg, err := common.NewConfigFrom(config)
-	if err != nil {
-		t.Fatal(err)
-	}
-
-	output, err := New(cfg, 0)
-	if err != nil {
-		t.Fatal(err)
-	}
-
-	return output
+	return cfg
 }
 
 func newTestConsumer(t *testing.T) sarama.Consumer {
@@ -86,16 +292,23 @@ func newTestConsumer(t *testing.T) sarama.Consumer {
 	return consumer
 }
 
+var testTopicOffsets = map[string]int64{}
+
 func testReadFromKafkaTopic(
 	t *testing.T, topic string, nMessages int,
-	timeout time.Duration) []*sarama.ConsumerMessage {
-
+	timeout time.Duration,
+) []*sarama.ConsumerMessage {
 	consumer := newTestConsumer(t)
 	defer func() {
 		consumer.Close()
 	}()
 
-	partitionConsumer, err := consumer.ConsumePartition(topic, 0, sarama.OffsetOldest)
+	offset, found := testTopicOffsets[topic]
+	if !found {
+		offset = sarama.OffsetOldest
+	}
+
+	partitionConsumer, err := consumer.ConsumePartition(topic, 0, offset)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -109,6 +322,7 @@ func testReadFromKafkaTopic(
 		select {
 		case msg := <-partitionConsumer.Messages():
 			messages = append(messages, msg)
+			testTopicOffsets[topic] = msg.Offset + 1
 		case <-timer:
 			break
 		}
@@ -117,62 +331,38 @@ func testReadFromKafkaTopic(
 	return messages
 }
 
-func TestOneMessageToKafka(t *testing.T) {
-	if testing.Short() {
-		t.Skip("Skipping in short mode. Requires Kafka")
+func flatten(infos []eventInfo) []beat.Event {
+	var out []beat.Event
+	for _, info := range infos {
+		out = append(out, info.events...)
 	}
-	if testing.Verbose() {
-		logp.LogInit(logp.LOG_DEBUG, "", false, true, []string{"kafka"})
-	}
+	return out
+}
 
-	id := strconv.Itoa(rand.New(rand.NewSource(int64(time.Now().Nanosecond()))).Int())
-	topic := fmt.Sprintf("test-libbeat-%s", id)
-
-	kafka := newTestKafkaOutput(t, topic, false)
-	event := common.MapStr{
-		"@timestamp": common.Time(time.Now()),
-		"host":       "test-host",
-		"type":       "log",
-		"message":    id,
-	}
-	if err := kafka.PublishEvent(nil, testOptions, event); err != nil {
-		t.Fatal(err)
-	}
-
-	messages := testReadFromKafkaTopic(t, topic, 1, 5*time.Second)
-	if assert.Len(t, messages, 1) {
-		msg := messages[0]
-		logp.Debug("kafka", "%s: %s", msg.Key, msg.Value)
-		assert.Contains(t, string(msg.Value), id)
+func single(fields common.MapStr) []eventInfo {
+	return []eventInfo{
+		{
+			events: []beat.Event{
+				{Timestamp: time.Now(), Fields: fields},
+			},
+		},
 	}
 }
 
-func TestUseType(t *testing.T) {
-	if testing.Short() {
-		t.Skip("Skipping in short mode. Requires Kafka")
-	}
-	if testing.Verbose() {
-		logp.LogInit(logp.LOG_DEBUG, "", false, true, []string{"kafka"})
-	}
+func randMulti(batches, n int, event common.MapStr) []eventInfo {
+	var out []eventInfo
+	for i := 0; i < batches; i++ {
+		var data []beat.Event
+		for j := 0; j < n; j++ {
+			tmp := common.MapStr{}
+			for k, v := range event {
+				tmp[k] = v
+			}
+			tmp["message"] = randString(100)
+			data = append(data, beat.Event{Timestamp: time.Now(), Fields: tmp})
+		}
 
-	id := strconv.Itoa(rand.New(rand.NewSource(int64(time.Now().Nanosecond()))).Int())
-	logType := fmt.Sprintf("log-type-%s", id)
-
-	kafka := newTestKafkaOutput(t, "", true)
-	event := common.MapStr{
-		"@timestamp": common.Time(time.Now()),
-		"host":       "test-host",
-		"type":       logType,
-		"message":    id,
+		out = append(out, eventInfo{data})
 	}
-	if err := kafka.PublishEvent(nil, testOptions, event); err != nil {
-		t.Fatal(err)
-	}
-
-	messages := testReadFromKafkaTopic(t, logType, 1, 5*time.Second)
-	if assert.Len(t, messages, 1) {
-		msg := messages[0]
-		logp.Debug("kafka", "%s: %s", msg.Key, msg.Value)
-		assert.Contains(t, string(msg.Value), id)
-	}
+	return out
 }

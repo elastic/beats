@@ -1,8 +1,0 @@
-package: {{cookiecutter.beat_path}}/{{cookiecutter.beat}}
-import:
-- package: github.com/elastic/beats
-  subpackages:
-  - libbeat/beat
-  - metricbeat/beater
-  - metricbeat/helper
-  - metricbeat/include

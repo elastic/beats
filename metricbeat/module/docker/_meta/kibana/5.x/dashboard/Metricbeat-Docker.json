@@ -1,0 +1,13 @@
+{
+  "hits": 0, 
+  "timeRestore": false, 
+  "description": "", 
+  "title": "Metricbeat Docker", 
+  "uiStateJSON": "{\"P-1\":{\"vis\":{\"params\":{\"sort\":{\"columnIndex\":1,\"direction\":\"asc\"}}}},\"P-3\":{\"vis\":{\"legendOpen\":true}},\"P-5\":{\"vis\":{\"legendOpen\":true}},\"P-7\":{\"vis\":{\"legendOpen\":true}}}", 
+  "panelsJSON": "[{\"col\":1,\"id\":\"Docker-containers\",\"panelIndex\":1,\"row\":1,\"size_x\":7,\"size_y\":5,\"type\":\"visualization\"},{\"col\":8,\"id\":\"Docker-Number-of-Containers\",\"panelIndex\":2,\"row\":1,\"size_x\":5,\"size_y\":2,\"type\":\"visualization\"},{\"col\":8,\"id\":\"Docker-containers-per-host\",\"panelIndex\":3,\"row\":3,\"size_x\":2,\"size_y\":3,\"type\":\"visualization\"},{\"col\":10,\"id\":\"Docker-images-and-names\",\"panelIndex\":7,\"row\":3,\"size_x\":3,\"size_y\":3,\"type\":\"visualization\"},{\"col\":1,\"id\":\"Docker-CPU-usage\",\"panelIndex\":4,\"row\":6,\"size_x\":6,\"size_y\":3,\"type\":\"visualization\"},{\"col\":7,\"id\":\"Docker-memory-usage\",\"panelIndex\":5,\"row\":6,\"size_x\":6,\"size_y\":3,\"type\":\"visualization\"},{\"col\":1,\"id\":\"Docker-Network-IO\",\"panelIndex\":6,\"row\":9,\"size_x\":12,\"size_y\":3,\"type\":\"visualization\"}]", 
+  "optionsJSON": "{\"darkTheme\":false}", 
+  "version": 1, 
+  "kibanaSavedObjectMeta": {
+    "searchSourceJSON": "{\"filter\":[{\"query\":{\"query_string\":{\"analyze_wildcard\":true,\"query\":\"*\"}}}]}"
+  }
+}

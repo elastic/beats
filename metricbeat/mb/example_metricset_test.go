@@ -1,51 +1,50 @@
 package mb_test
 
 import (
+	"fmt"
+
 	"github.com/elastic/beats/libbeat/common"
 	"github.com/elastic/beats/metricbeat/mb"
+	"github.com/elastic/beats/metricbeat/mb/parse"
 )
+
+var hostParser = parse.URLHostParserBuilder{
+	DefaultScheme: "http",
+}.Build()
 
 func init() {
 	// Register the MetricSetFactory function for the "status" MetricSet.
-	if err := mb.Registry.AddMetricSet("someapp", "status", NewMetricSet); err != nil {
+	if err := mb.Registry.AddMetricSet("someapp", "status", NewMetricSet, hostParser); err != nil {
 		panic(err)
 	}
 }
 
 type MetricSet struct {
 	mb.BaseMetricSet
-	username string
-	password string
 }
 
 func NewMetricSet(base mb.BaseMetricSet) (mb.MetricSet, error) {
-	// Unpack additional configuration options.
-	config := struct {
-		Username string `config:"username"`
-		Password string `config:"password"`
-	}{
-		Username: "",
-		Password: "",
-	}
-	if err := base.Module().UnpackConfig(&config); err != nil {
-		return nil, err
-	}
-
-	return &MetricSet{
-		BaseMetricSet: base,
-		username:      config.Username,
-		password:      config.Password,
-	}, nil
+	fmt.Println("someapp-status url=", base.HostData().SanitizedURI)
+	return &MetricSet{BaseMetricSet: base}, nil
 }
 
-func (ms *MetricSet) Fetch() (common.MapStr, error) {
-	// Fetch data from host and return the data.
-	return common.MapStr{
-		"someParam":  "value",
-		"otherParam": 42,
-	}, nil
+// Fetch will be called periodically by the framework.
+func (ms *MetricSet) Fetch(report mb.Reporter) {
+	// Fetch data from the host at ms.HostData().URI and return the data.
+	data, err := common.MapStr{
+		"some_metric":          18.0,
+		"answer_to_everything": 42,
+	}, error(nil)
+	if err != nil {
+		// Report an error if it occurs.
+		report.Error(err)
+		return
+	}
+
+	// Otherwise report the collected data.
+	report.Event(data)
 }
 
-// ExampleMetricSetFactory demonstrates how to register a MetricSetFactory
-// and unpack additional configuration data.
-func ExampleMetricSetFactory() {}
+// ExampleReportingMetricSet demonstrates how to register a MetricSetFactory
+// and implement a ReportingMetricSet.
+func ExampleReportingMetricSet() {}

@@ -1,0 +1,27 @@
+//////////////////////////////////////////////////////////////////////////
+//// This content is shared by all Elastic Beats. Make sure you keep the
+//// descriptions here generic enough to work for all Beats that include
+//// this file. When using cross references, make sure that the cross
+//// references resolve correctly for any files that include this one.
+//// Use the appropriate variables defined in the index.asciidoc file to
+//// resolve Beat names: beatname_uc and beatname_lc.
+//// Use the following include to pull this content into a doc file:
+//// include::../../libbeat/docs/processors.asciidoc[]
+//////////////////////////////////////////////////////////////////////////
+
+You can <<defining-processors,define processors>> in your configuration to
+process events before they are sent to the configured output. The libbeat
+library provides processors for:
+
+* reducing the number of exported fields
+* enhancing events with additional metadata
+* performing additional processing and decoding
+
+Each processor receives an event, applies a defined action to the event, and
+returns the event. If you define a list of processors, they are executed in the
+order they are defined in the {beatname_uc} configuration file.
+
+[source,yaml]
+-------
+event -> processor 1 -> event1 -> processor 2 -> event2 ...
+-------

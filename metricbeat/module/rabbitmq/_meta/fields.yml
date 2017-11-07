@@ -1,0 +1,11 @@
+- key: rabbitmq
+  title: "RabbitMQ"
+  description: >
+    experimental[]
+
+    RabbitMQ module
+  fields:
+    - name: rabbitmq
+      type: group
+      description: >
+      fields:

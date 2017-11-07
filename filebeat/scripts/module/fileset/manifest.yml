@@ -1,0 +1,13 @@
+module_version: 1.0
+
+var:
+  - name: paths
+    default:
+      - /example/test.log*
+    os.darwin:
+      - /usr/local/example/test.log*
+    os.windows:
+      - c:/programdata/example/logs/test.log*
+
+ingest_pipeline: ingest/pipeline.json
+prospector: config/{fileset}.yml

@@ -1,0 +1,59 @@
+{
+    "@timestamp": "2017-10-12T08:05:34.853Z",
+    "beat": {
+        "hostname": "host.example.com",
+        "name": "host.example.com"
+    },
+    "metricset": {
+        "module": "system",
+        "name": "diskio",
+        "rtt": 115
+    },
+    "system": {
+        "diskio": {
+            "io": {
+                "time": 338930
+            },
+            "iostat": {
+                "await": 0,
+                "busy": 0,
+                "queue": {
+                    "avg_size": 0
+                },
+                "read": {
+                    "per_sec": {
+                        "bytes": 0
+                    },
+                    "request": {
+                        "merges_per_sec": 0,
+                        "per_sec": 0
+                    }
+                },
+                "request": {
+                    "avg_size": 0
+                },
+                "service_time": 0,
+                "write": {
+                    "per_sec": {
+                        "bytes": 0
+                    },
+                    "request": {
+                        "merges_per_sec": 0,
+                        "per_sec": 0
+                    }
+                }
+            },
+            "name": "sda",
+            "read": {
+                "bytes": 2540010496,
+                "count": 128537,
+                "time": 166380
+            },
+            "write": {
+                "bytes": 110828974080,
+                "count": 374728,
+                "time": 2139780
+            }
+        }
+    }
+}
