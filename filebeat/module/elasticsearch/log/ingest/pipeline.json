@@ -44,7 +44,7 @@
           "NODES_LIST": "(pending|current) nodes: [\\{\\[]%{GREEDYDATA:elasticsearch.log.nodes}[\\}\\]]",
           "NODES_MSG": "(failed to (execute|connect))",
           "SHARD_MSG": "(received shard failed)",
-          "CLUSTER_ACTION": "(added|removed|cluster state update task|detected_master|master_left)",
+          "CLUSTER_ACTION": "(added|removed|cluster state update task|detected_master|master_left|new_master)",
           "ALLOC_MSG": "(rerouting shards|(low|high) disk watermark|explaining the allocation for)",
           "NODE_UPDOWN": "(starting|started|initializing|initialized|stopping|stopped|closed|closing)"
         },
@@ -58,14 +58,16 @@
           "using discovery type \\[%{USER:elasticsearch.log.cluster.discovery_type}\\]",
           "license \\[%{DATA:elasticsearch.log.cluster.license_id}\\] mode \\[%{WORD:elasticsearch.log.cluster.license_type}\\] - %{WORD:elasticsearch.log.cluster.license_status}",
           "publish_address \\{%{DATA:elasticsearch.log.node.publish_addr}:%{INT:elasticsearch.log.node.publish_port}\\}, bound_addresses \\{%{DATA:elasticsearch.log.node.bound_addr}:%{INT:elasticsearch.log.node.bound_port}\\}",
-          "using \\[%{POSINT}\\] data paths, mounts \\[%{DATA:elasticsearch.log.node.data_paths}\\], net usable_space \\[%{DATA:elasticsearch.log.node.data_paths_usable_space}\\], net total_space \\[%{DATA:elasticsearch.log.node.data_paths_total_space}\\], spins\\? \\[%{DATA:elasticsearch.log.node.data_paths_spins}\\], types \\[%{DATA:elasticsearch.log.node.data_paths.types}\\]",
+          "using \\[%{POSINT}\\] data paths, mounts \\[%{DATA:meta.data_paths}\\], net usable_space \\[%{DATA:elasticsearch.node.disk_usable_space}\\], net total_space \\[%{DATA:elasticsearch.node.disk_total_space}\\],",
           "Using REST wrapper from plugin %{GREEDYDATA}",
+          "recovered \\[%{POSINT}\\] indices into cluster_state",
           "Cluster health status changed from \\[%{WORD:elasticsearch.log.cluster.health.old_value}\\] to \\[%{WORD:elasticsearch.log.cluster.health.new_value}\\] \\(reason: \\[%{DATA:elasticsearch.log.reason}\\]\\)\\.",
           "%{ALLOC_MSG:message}: \\[%{DATA:elasticsearch.log.reason}\\]",
-          "%{ALLOC_MSG:message} \\[%{DATA:elasticsearch.log.data_paths_watermark}\\] exceeded on \\[%{DATA:elasticsearch.log.node.uuid}\\]\\[%{DATA:elasticsearch.log.node.name}\\]\\[%{PATH:elasticsearch.log.data_paths}\\] free: %{DATA}\\[%{DATA}\\] %{GREEDYDATA:elasticsearch.log.reason}",
+          "%{ALLOC_MSG:message} \\[%{DATA:elasticsearch.log.node.data_path.watermark}\\] exceeded on \\[%{DATA:elasticsearch.log.node.uuid}\\]\\[%{DATA:elasticsearch.log.node.name}\\]\\[%{PATH:elasticsearch.log.node.data_path.location}\\] free: %{DATA:elasticsearch.log.node.data_path.free_space}\\[%{DATA:elasticsearch.log.node.data_path.free_space_pc}\\], %{GREEDYDATA:elasticsearch.log.reason}",
           "%{ALLOC_MSG:message} \\[%{GREEDYDATA:elasticsearch.log.allocation_info}\\](\\n%{GREEDYMULTILINE:elasticsearch.log.exception})?",
           "Updated breaker settings (for in-flight requests|field data): \\[%{WORD:elasticsearch.log.circuit_breaker.name},type=%{WORD:elasticsearch.log.circuit_breaker.type},limit=%{DATA:elasticsearch.log.circuit_breaker.limit},overhead=%{DATA:elasticsearch.log.circuit_breaker.overhead}\\]",
           "%{WORD:elasticsearch.log.cluster.setting.action} (\\[)?%{USERNAME:elasticsearch.log.cluster.setting.name}(\\])? from \\[%{DATA:elasticsearch.log.cluster.setting.old_value}\\] to \\[%{DATA:elasticsearch.log.cluster.setting.new_value}\\]",
+          "\\[%{INDEX_ID}\\] can not be imported as a dangling index, as index with same name already exists in cluster metadata",
           "%{INDEX_ID} %{SHARD_MSG:message} for shard id \\[\\[%{USER:elasticsearch.log.index.name}\\]\\[%{INT:elasticsearch.log.index.shard}\\]\\], allocation id \\[%{DATA:elasticsearch.log.index.shard_allocation_id}\\], primary term \\[%{INT}\\], message %{GREEDYDATA:elasticsearch.log.reason}",
           "%{WORD:elasticsearch.log.index.setting.action} %{USERNAME:elasticsearch.log.index.setting.name} to \\[%{DATA:elasticsearch.log.index.setting.value}\\] for indices \\[%{DATA:elasticsearch.log.index.name}\\]",
           "%{INDEX_ID} %{INDEX_ACTION:message}, cause \\[%{DATA:elasticsearch.log.reason}\\], templates \\[%{DATA:elasticsearch.log.index.templates}\\], shards \\[%{POSINT:elasticsearch.log.index.primary_shards}\\]\\/\\[%{INT:elasticsearch.log.index.replica_shards}\\], mappings \\[%{DATA:elasticsearch.log.index.mappings}\\]",
@@ -73,7 +75,7 @@
           "%{INDEX_ID} %{INDEX_ACTION:message}( \\[%{DATA:elasticsearch.log.index.action_details}\\])?",
           "%{INDEX_ID} %{MAPPING_ACTION:message}( \\[%{DATA:elasticsearch.log.index.mappings}\\])?",
           "%{MAPPING_ACTION:message} \\[\\[%{INDEX_ID}\\]\\], type \\[%{USER:elasticsearch.log.index.mappings}\\](\\n%{GREEDYMULTILINE:elasticsearch.log.exception})?",
-          "%{CLUSTER_ACTION:message} \\{%{DATA:elasticsearch.log.nodes}\\,}, reason: %{GREEDYDATA:elasticsearch.log.cluster.action_details}",
+          "%{CLUSTER_ACTION:message} (\\{)?%{DATA:elasticsearch.log.nodes}(\\,\\})?, reason: %{GREEDYDATA:elasticsearch.log.cluster.action_details}",
           "%{CLUSTER_ACTION:message} \\[%{DATA:elasticsearch.log.cluster.action}([\\(\\[]%{DATA:cluster.action_details}[\\)\\]])?\\] took \\[%{DATA}\\] above the warn threshold of %{GREEDYDATA}",
           "%{CLUSTER_ACTION:message} \\[%{DATA:elasticsearch.log.nodes}\\], reason \\[%{DATA:elasticsearch.log.reason}\\]",
           "%{CLUSTER_ACTION:message} %{GREEDYDATA}",
@@ -105,22 +107,32 @@
       }
     },
     {
+      "grok": {
+        "field": "meta.data_paths",
+        "patterns": [
+          "\\[%{PATH:elasticsearch.log.node.data_path.location} \\(%{WORD:elasticsearch.log.node.data_path.fstype}\\)\\]"
+        ],
+        "ignore_missing" : true
+      }
+    },
+    {
       "split": {
-        "field": "index.templates",
+        "field": "elasticsearch.index.templates",
         "separator": ",\\s",
         "ignore_missing": true
       }
     },
     {
       "split": {
-        "field": "index.mappings",
+        "field": "elasticsearch.index.mappings",
         "separator": ",\\s",
         "ignore_missing": true
       }
     },
     {
       "remove": {
-        "field": "timestamp"
+        "field": ["timestamp","meta.data_paths"],
+        "ignore_failure" : true
       }
     }
   ]

@@ -136,25 +136,29 @@
           type: short
           description: >
             The port on which the node is binding itself.
-        - name: data_paths
-          description: >
-            A list of data paths used by this node.
-        - name: data_paths_usable_space
+        - name: disk_usable_space
           description: >
             The usable space this node could use across all data paths configured.
-        - name: data_paths_total_space
+        - name: disk_total_space
           description: >
             The total space available across all data paths configured.
-        - name: data_paths_spins
-          type: boolean
+        - name: data_path
+          type: group
           description: >
-            Whether the data paths on this node are detected as spinning disks.
-        - name: data_paths_types
-          description: >
-            The list of filesystem types used by the data paths on this node.
-        - name: data_paths_watermark
-          description: >
-            The low/high watermark for a data path.
+            Information about a particular data path
+          fields:
+            - name: location
+              description: >
+                The on-disk location.
+            - name: watermark
+              description: >
+                The watermark value, either absolute size or percentage.
+            - name: free_space
+              description: >
+                The amount of free space in this location (absolute value).
+            - name: free_space_pc
+              description: >
+                The amount of free space in this location (percentage).
     - name: index
       type: group
       description: >

@@ -927,41 +927,46 @@ The port on which the node is binding itself.
 
 
 [float]
-=== `elasticsearch.log.node.data_paths`
-
-A list of data paths used by this node.
-
-
-[float]
-=== `elasticsearch.log.node.data_paths_usable_space`
+=== `elasticsearch.log.node.disk_usable_space`
 
 The usable space this node could use across all data paths configured.
 
 
 [float]
-=== `elasticsearch.log.node.data_paths_total_space`
+=== `elasticsearch.log.node.disk_total_space`
 
 The total space available across all data paths configured.
 
 
 [float]
-=== `elasticsearch.log.node.data_paths_spins`
+== data_path fields
 
-type: boolean
+Information about a particular data path
 
-Whether the data paths on this node are detected as spinning disks.
-
-
-[float]
-=== `elasticsearch.log.node.data_paths_types`
-
-The list of filesystem types used by the data paths on this node.
 
 
 [float]
-=== `elasticsearch.log.node.data_paths_watermark`
+=== `elasticsearch.log.node.data_path.location`
 
-The low/high watermark for a data path.
+The on-disk location.
+
+
+[float]
+=== `elasticsearch.log.node.data_path.watermark`
+
+The watermark value, either absolute size or percentage.
+
+
+[float]
+=== `elasticsearch.log.node.data_path.free_space`
+
+The amount of free space in this location (absolute value).
+
+
+[float]
+=== `elasticsearch.log.node.data_path.free_space_pc`
+
+The amount of free space in this location (percentage).
 
 
 [float]
