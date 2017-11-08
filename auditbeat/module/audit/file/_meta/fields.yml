@@ -13,8 +13,9 @@
       type: keyword
       example: attributes_modified
       description: >
-        Action describes the change to the file. The possible values are:
-        attributes_modified, created, deleted, updated, and moved.
+        Action describes the change that triggered the event. The possible
+        values are: attributes_modified, created, deleted, updated, moved, and
+        config_change.
     - name: type
       type: keyword
       description: The file type (file, dir, or symlink).
@@ -42,29 +43,50 @@
       description: The mode of the file in octal representation.
     - name: size
       type: long
-      description: The file size in bytes.
-    - name: atime
-      type: date
-      description: The last access time of the file.
+      description: The file size in bytes (field is only added when `type` is `file`).
     - name: mtime
       type: date
-      description: The last modified time of the file.
+      description: The last modified time of the file (time when content was modified).
     - name: ctime
       type: date
-      description: The creation time of the file.
+      description: The last change time of the file (time when metadata was changed).
     - name: hashed
       type: boolean
       description: >
-        Boolean indicating if the event includes file hashes. If true the
-        md5, sha1, and sha256 fields will be present.
+        Boolean indicating if the event includes any file hashes.
     - name: md5
       type: keyword
       description: MD5 hash of the file.
     - name: sha1
       type: keyword
       description: SHA1 hash of the file.
+    - name: sha224
+      type: keyword
+      description: SHA224 hash of the file.
     - name: sha256
       type: keyword
       description: SHA256 hash of the file.
-
-
+    - name: sha384
+      type: keyword
+      description: SHA384 hash of the file.
+    - name: sha3_224
+      type: keyword
+      description: SHA3_224 hash of the file.
+    - name: sha3_256
+      type: keyword
+      description: SHA3_256 hash of the file.
+    - name: sha3_384
+      type: keyword
+      description: SHA3_384 hash of the file.
+    - name: sha3_512
+      type: keyword
+      description: SHA3_512 hash of the file.
+    - name: sha512
+      type: keyword
+      description: SHA512 hash of the file.
+    - name: sha512_224
+      type: keyword
+      description: SHA512/224 hash of the file.
+    - name: sha512_256
+      type: keyword
+      description: SHA512/256 hash of the file.

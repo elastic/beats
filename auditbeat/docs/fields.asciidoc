@@ -61,7 +61,7 @@ type: keyword
 
 example: attributes_modified
 
-Action describes the change to the file. The possible values are: attributes_modified, created, deleted, updated, and moved.
+Action describes the change that triggered the event. The possible values are: attributes_modified, created, deleted, updated, moved, and config_change.
 
 
 [float]
@@ -127,35 +127,28 @@ The mode of the file in octal representation.
 
 type: long
 
-The file size in bytes.
-
-[float]
-=== `audit.file.atime`
-
-type: date
-
-The last access time of the file.
+The file size in bytes (field is only added when `type` is `file`).
 
 [float]
 === `audit.file.mtime`
 
 type: date
 
-The last modified time of the file.
+The last modified time of the file (time when content was modified).
 
 [float]
 === `audit.file.ctime`
 
 type: date
 
-The creation time of the file.
+The last change time of the file (time when metadata was changed).
 
 [float]
 === `audit.file.hashed`
 
 type: boolean
 
-Boolean indicating if the event includes file hashes. If true the md5, sha1, and sha256 fields will be present.
+Boolean indicating if the event includes any file hashes.
 
 
 [float]
@@ -173,11 +166,74 @@ type: keyword
 SHA1 hash of the file.
 
 [float]
+=== `audit.file.sha224`
+
+type: keyword
+
+SHA224 hash of the file.
+
+[float]
 === `audit.file.sha256`
 
 type: keyword
 
 SHA256 hash of the file.
+
+[float]
+=== `audit.file.sha384`
+
+type: keyword
+
+SHA384 hash of the file.
+
+[float]
+=== `audit.file.sha3_224`
+
+type: keyword
+
+SHA3_224 hash of the file.
+
+[float]
+=== `audit.file.sha3_256`
+
+type: keyword
+
+SHA3_256 hash of the file.
+
+[float]
+=== `audit.file.sha3_384`
+
+type: keyword
+
+SHA3_384 hash of the file.
+
+[float]
+=== `audit.file.sha3_512`
+
+type: keyword
+
+SHA3_512 hash of the file.
+
+[float]
+=== `audit.file.sha512`
+
+type: keyword
+
+SHA512 hash of the file.
+
+[float]
+=== `audit.file.sha512_224`
+
+type: keyword
+
+SHA512/224 hash of the file.
+
+[float]
+=== `audit.file.sha512_256`
+
+type: keyword
+
+SHA512/256 hash of the file.
 
 [float]
 == kernel fields

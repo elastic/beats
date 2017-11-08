@@ -22,6 +22,7 @@ The following topics describe how to configure {beatname_uc}:
 * <<configuration-{beatname_lc}>>
 * <<configuration-general-options>>
 * <<{beatname_lc}-configuration-reloading>>
+* <<configuring-internal-queue>>
 * <<configuring-output>>
 * <<configuration-ssl>>
 * <<filtering-and-enhancing-data>>
@@ -33,6 +34,7 @@ The following topics describe how to configure {beatname_uc}:
 * <<configuration-logging>>
 * <<using-environ-vars>>
 * <<yaml-tips>>
+* <<{beatname_lc}-reference-yml>>
 
 After changing configuration settings, you need to restart {beatname_uc} to
 pick up the changes.
@@ -46,6 +48,8 @@ include::./auditbeat-general-options.asciidoc[]
 include::./reload-configuration.asciidoc[]
 
 :allplatforms:
+include::../../libbeat/docs/queueconfig.asciidoc[]
+
 include::../../libbeat/docs/outputconfig.asciidoc[]
 
 include::../../libbeat/docs/shared-ssl-config.asciidoc[]

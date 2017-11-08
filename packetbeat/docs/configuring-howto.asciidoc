@@ -24,6 +24,7 @@ The following topics describe how to configure Packetbeat:
 * <<configuration-protocols>>
 * <<configuration-processes>>
 * <<configuration-general-options>>
+* <<configuring-internal-queue>>
 * <<configuring-output>>
 * <<configuration-ssl>>
 * <<filtering-and-enhancing-data>>
@@ -36,6 +37,7 @@ The following topics describe how to configure Packetbeat:
 * <<configuration-logging>>
 * <<using-environ-vars>>
 * <<yaml-tips>>
+* <<{beatname_lc}-reference-yml>>
 
 --
 
@@ -44,6 +46,8 @@ include::./packetbeat-options.asciidoc[]
 include::./packetbeat-general-options.asciidoc[]
 
 :allplatforms:
+include::../../libbeat/docs/queueconfig.asciidoc[]
+
 include::../../libbeat/docs/outputconfig.asciidoc[]
 
 include::../../libbeat/docs/shared-ssl-config.asciidoc[]

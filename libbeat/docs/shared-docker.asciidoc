@@ -22,7 +22,7 @@ endif::[]
 
 The base image is https://hub.docker.com/_/centos/[centos:7] and the source
 code can be found on
-https://github.com/elastic/beats-docker/tree/{doc-branch}[GitHub].
+{dockergithub}[GitHub].
 
 [float]
 ==== Configure {beatname_uc} on Docker

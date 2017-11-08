@@ -36,6 +36,10 @@ import (
 	_ "github.com/elastic/beats/metricbeat/module/elasticsearch"
 	_ "github.com/elastic/beats/metricbeat/module/elasticsearch/node"
 	_ "github.com/elastic/beats/metricbeat/module/elasticsearch/node_stats"
+	_ "github.com/elastic/beats/metricbeat/module/etcd"
+	_ "github.com/elastic/beats/metricbeat/module/etcd/leader"
+	_ "github.com/elastic/beats/metricbeat/module/etcd/self"
+	_ "github.com/elastic/beats/metricbeat/module/etcd/store"
 	_ "github.com/elastic/beats/metricbeat/module/golang"
 	_ "github.com/elastic/beats/metricbeat/module/golang/expvar"
 	_ "github.com/elastic/beats/metricbeat/module/golang/heap"
@@ -110,6 +114,7 @@ import (
 	_ "github.com/elastic/beats/metricbeat/module/vsphere/virtualmachine"
 	_ "github.com/elastic/beats/metricbeat/module/windows"
 	_ "github.com/elastic/beats/metricbeat/module/windows/perfmon"
+	_ "github.com/elastic/beats/metricbeat/module/windows/service"
 	_ "github.com/elastic/beats/metricbeat/module/zookeeper"
 	_ "github.com/elastic/beats/metricbeat/module/zookeeper/mntr"
 )

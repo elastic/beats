@@ -1,6 +1,7 @@
 package testing
 
 import (
+	"encoding/json"
 	"flag"
 	"fmt"
 	"io/ioutil"
@@ -10,7 +11,6 @@ import (
 
 	"github.com/elastic/beats/libbeat/beat"
 	"github.com/elastic/beats/libbeat/common"
-	"github.com/elastic/beats/libbeat/outputs/codec/json"
 	"github.com/elastic/beats/metricbeat/mb"
 	"github.com/elastic/beats/metricbeat/mb/module"
 )
@@ -62,7 +62,7 @@ func WriteEvents(f mb.EventsFetcher, t testing.TB) error {
 // This simulates the output of Metricbeat as if it were
 // 2016-05-23T08:05:34.853Z and the hostname is host.example.com.
 func CreateFullEvent(ms mb.MetricSet, metricSetData common.MapStr) beat.Event {
-	startTime, err := time.Parse(time.RFC3339Nano, "2016-05-23T08:05:34.853Z")
+	startTime, err := time.Parse(time.RFC3339Nano, "2017-10-12T08:05:34.853Z")
 	if err != nil {
 		panic(err)
 	}
@@ -101,8 +101,10 @@ func WriteEventToDataJSON(t testing.TB, fullEvent beat.Event) {
 		t.Fatal(err)
 	}
 
-	// use json output codec to encode event to json
-	output, err := json.New(true, "1.2.3").Encode("noindex", &fullEvent)
+	fields := fullEvent.Fields
+	fields["@timestamp"] = fullEvent.Timestamp
+
+	output, err := json.MarshalIndent(&fullEvent.Fields, "", "    ")
 	if err != nil {
 		t.Fatal(err)
 	}

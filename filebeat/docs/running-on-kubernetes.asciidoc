@@ -1,0 +1,75 @@
+[[running-on-kubernetes]]
+=== Running Filebeat on Kubernetes
+
+Filebeat <<running-on-docker,Docker images>> can be used on Kubernetes to
+retrieve and ship container logs.
+
+ifeval::["{release-state}"=="unreleased"]
+
+However, version {stack-version} of {beatname_uc} has not yet been
+released, so no Docker image is currently available for this version.
+
+endif::[]
+
+
+[float]
+==== Kubernetes deploy manifests
+
+By deploying Filebeat as a https://kubernetes.io/docs/concepts/workloads/controllers/daemonset/[DaemonSet]
+we ensure we get a running instance on each node of the cluster.
+
+Docker logs host folder (`/var/lib/docker/containers`) is mounted on the Filebeat
+container. Filebeat will start a prospector for these files and start harvesting
+them as they appear.
+
+Everything is deployed under `kube-system` namespace, you can change that by
+updating the YAML file.
+
+To get the manifests just run:
+
+["source", "sh", subs="attributes"]
+------------------------------------------------
+curl -L -O https://raw.githubusercontent.com/elastic/beats/{doc-branch}/deploy/kubernetes/filebeat-kubernetes.yaml
+------------------------------------------------
+
+[float]
+==== Settings
+
+Some parameters are exposed in the manifest to configure logs destination, by
+default they will use an existing Elasticsearch deploy if it's present, but you
+may want to change that behavior, so just edit the YAML file and modify them:
+
+["source", "yaml", subs="attributes"]
+------------------------------------------------
+- name: ELASTICSEARCH_HOST
+  value: elasticsearch
+- name: ELASTICSEARCH_PORT
+  value: "9200"
+- name: ELASTICSEARCH_USERNAME
+  value: elastic
+- name: ELASTICSEARCH_PASSWORD
+  value: changeme
+------------------------------------------------
+
+[float]
+==== Deploy
+
+To deploy Filebeat to Kubernetes just run:
+
+["source", "sh", subs="attributes"]
+------------------------------------------------
+kubectl create -f filebeat-kubernetes.yaml
+------------------------------------------------
+
+Then you should be able to check the status by running:
+
+["source", "sh", subs="attributes"]
+------------------------------------------------
+$ kubectl --namespace=kube-system get ds/filebeat
+
+NAME       DESIRED   CURRENT   READY     UP-TO-DATE   AVAILABLE   NODE-SELECTOR   AGE
+filebeat   32        32        0         32           0           <none>          1m
+------------------------------------------------
+
+Logs should start flowing to Elasticsearch, all annotated with <<add-kubernetes-metadata>>
+processor.

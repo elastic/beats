@@ -42,8 +42,6 @@ var (
 )
 
 func init() {
-	startTime = time.Now()
-
 	// Adds logging specific flags: -v, -e and -d.
 	verbose = flag.Bool("v", false, "Log at INFO level")
 	toStderr = flag.Bool("e", false, "Log to stderr and disable syslog/file output")
@@ -78,7 +76,7 @@ func HandleFlags(name string) error {
 // flags to initialize the Logging systems. After calling this function,
 // standard output is always enabled. You can make it respect the command
 // line flag with a later SetStderr call.
-func Init(name string, config *Logging) error {
+func Init(name string, start time.Time, config *Logging) error {
 	// reset settings from HandleFlags
 	_log = logger{
 		JSON: config.JSON,
@@ -126,6 +124,8 @@ func Init(name string, config *Logging) error {
 		toSyslog = false
 		toFiles = false
 	}
+
+	startTime = start
 
 	LogInit(Priority(logLevel), "", toSyslog, true, debugSelectors)
 	if len(debugSelectors) > 0 {

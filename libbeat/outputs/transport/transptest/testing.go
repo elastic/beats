@@ -174,14 +174,9 @@ func connectTLS(timeout time.Duration, certName string) TransportFactory {
 	}
 }
 
-// genCertsIfMIssing generates a testing certificate for ip 127.0.0.1 for
-// testing if certificate or key is missing. Generated is used for CA,
-// client-auth and server-auth. Use only for testing.
-func GenCertsForIPIfMIssing(
-	t *testing.T,
-	ip net.IP,
-	name string,
-) error {
+// GenCertForTestingPurpose generates a testing certificate.
+// Generated is used for CA, client-auth and server-auth. Use only for testing.
+func GenCertForTestingPurpose(t *testing.T, host, name, keyPassword string) error {
 	capem := name + ".pem"
 	cakey := name + ".key"
 
@@ -217,7 +212,6 @@ func GenCertsForIPIfMIssing(
 			SerialNumber:       "23",
 			CommonName:         "*",
 		},
-		IPAddresses: []net.IP{ip},
 
 		SignatureAlgorithm:    x509.SHA512WithRSA,
 		PublicKeyAlgorithm:    x509.ECDSA,
@@ -233,12 +227,43 @@ func GenCertsForIPIfMIssing(
 			x509.KeyUsageDigitalSignature |
 			x509.KeyUsageCertSign,
 	}
+	//Could be ip or dns format
+	ip := net.ParseIP(host)
+	if ip != nil {
+		caTemplate.IPAddresses = []net.IP{ip}
+	} else {
+		caTemplate.DNSNames = []string{host}
+	}
 
-	// generate keys
-	priv, err := rsa.GenerateKey(rand.Reader, 4096)
+	pemBlock, err := genPrivatePem(4096, keyPassword)
 	if err != nil {
 		t.Fatalf("failed to generate ca private key: %v", err)
 	}
+
+	// write key file
+	var keyOut *os.File
+	keyOut, err = os.OpenFile(cakey, os.O_WRONLY|os.O_CREATE|os.O_TRUNC, 0600)
+	if err != nil {
+		t.Fatalf("failed to open key file for writing: %v", err)
+	}
+	pem.Encode(keyOut, pemBlock)
+	keyOut.Close()
+
+	//Decrypt pem block to add it later to the certificate
+	if x509.IsEncryptedPEMBlock(pemBlock) {
+		pemBlock.Bytes, err = x509.DecryptPEMBlock(pemBlock, []byte(keyPassword))
+		if err != nil {
+			t.Fatalf("failed to decrypt private key: %v", err)
+		}
+	}
+
+	var priv *rsa.PrivateKey
+	priv, err = x509.ParsePKCS1PrivateKey(pemBlock.Bytes)
+	if err != nil {
+		t.Fatalf("failed to parse pemBlock to private key: %v", err)
+		return err
+	}
+
 	pub := &priv.PublicKey
 
 	// generate certificate
@@ -251,16 +276,6 @@ func GenCertsForIPIfMIssing(
 		t.Fatalf("failed to generate ca certificate: %v", err)
 	}
 
-	// write key file
-	keyOut, err := os.OpenFile(cakey, os.O_WRONLY|os.O_CREATE|os.O_TRUNC, 0600)
-	if err != nil {
-		t.Fatalf("failed to open key file for writing: %v", err)
-	}
-	pem.Encode(keyOut, &pem.Block{
-		Type:  "RSA PRIVATE KEY",
-		Bytes: x509.MarshalPKCS1PrivateKey(priv)})
-	keyOut.Close()
-
 	// write certificate
 	certOut, err := os.Create(capem)
 	if err != nil {
@@ -270,4 +285,27 @@ func GenCertsForIPIfMIssing(
 	certOut.Close()
 
 	return nil
+}
+
+func genPrivatePem(bits int, password string) (*pem.Block, error) {
+	//Generate private key
+	key, err := rsa.GenerateKey(rand.Reader, bits)
+	if err != nil {
+		return nil, err
+	}
+
+	block := &pem.Block{
+		Type:  "RSA PRIVATE KEY",
+		Bytes: x509.MarshalPKCS1PrivateKey(key),
+	}
+
+	//Encrypt pem block from the given password
+	if len(password) > 0 {
+		block, err = x509.EncryptPEMBlock(rand.Reader, block.Type, block.Bytes, []byte(password), x509.PEMCipherAES256)
+		if err != nil {
+			return nil, err
+		}
+	}
+
+	return block, nil
 }

@@ -39,6 +39,10 @@ type TLSConfig struct {
 	// Types of elliptic curves that will be used in an ECDHE handshake. If empty,
 	// the implementation will choose a default.
 	CurvePreferences []tls.CurveID
+
+	// Renegotiation controls what types of renegotiation are supported.
+	// The default, never, is correct for the vast majority of applications.
+	Renegotiation tls.RenegotiationSupport
 }
 
 type TLSVersion uint16

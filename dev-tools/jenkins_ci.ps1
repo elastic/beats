@@ -15,11 +15,7 @@ function Exec
 # Setup Go.
 $env:GOPATH = $env:WORKSPACE
 $env:PATH = "$env:GOPATH\bin;C:\tools\mingw64\bin;$env:PATH"
-if (Test-Path -PathType leaf .go-version) {
-    & gvm --format=powershell $(Get-Content .go-version) | Invoke-Expression
-} else {
-    & gvm --format=powershell 1.7.5 | Invoke-Expression
-}
+& gvm --format=powershell $(Get-Content .go-version) | Invoke-Expression
 
 if (Test-Path "$env:beat") {
     cd "$env:beat"
