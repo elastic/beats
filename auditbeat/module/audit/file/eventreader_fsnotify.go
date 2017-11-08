@@ -33,10 +33,10 @@ func (r *reader) Start(done <-chan struct{}) (<-chan Event, error) {
 	for _, p := range r.config.Paths {
 		if err := r.watcher.Add(p); err != nil {
 			if err == syscall.EMFILE {
-				logp.Warn("%v Failed to watch %v: %v (check the max number of "+
-					"open files allowed with 'ulimit -a')", logPrefix, p, err)
+				logp.Warn("Failed to watch %v: %v (check the max number of "+
+					"open files allowed with 'ulimit -a')", p, err)
 			} else {
-				logp.Warn("%v Failed to watch %v: %v", logPrefix, p, err)
+				logp.Warn("Failed to watch %v: %v", p, err)
 			}
 		}
 	}

@@ -13,7 +13,6 @@ import (
 
 const (
 	metricsetName = "audit.file"
-	logPrefix     = "[" + metricsetName + "]"
 )
 
 var (
@@ -49,8 +48,7 @@ func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
 		return nil, errors.Wrap(err, "failed to initialize audit file event reader")
 	}
 
-	debugf("%v Initialized the audit file event reader. Running as euid=%v",
-		logPrefix, os.Geteuid())
+	debugf("Initialized the audit file event reader. Running as euid=%v", os.Geteuid())
 
 	return &MetricSet{BaseMetricSet: base, config: config, reader: r}, nil
 }
@@ -60,7 +58,7 @@ func (ms *MetricSet) Run(reporter mb.PushReporter) {
 	if err != nil {
 		err = errors.Wrap(err, "failed to start event reader")
 		reporter.Error(err)
-		logp.Err("%v %v", logPrefix, err)
+		logp.Err("%v", err)
 		return
 	}
 
@@ -72,8 +70,8 @@ func (ms *MetricSet) Run(reporter mb.PushReporter) {
 			reporter.Event(buildMapStr(&event))
 
 			if len(event.errors) > 0 {
-				debugf("%v Errors on %v event for %v: %v",
-					logPrefix, event.Action, event.Path, event.errors)
+				debugf("Errors on %v event for %v: %v",
+					event.Action, event.Path, event.errors)
 			}
 		}
 	}
