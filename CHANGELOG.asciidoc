@@ -120,6 +120,7 @@ https://github.com/elastic/beats/compare/v6.0.0-beta2...master[Check the HEAD di
 - Add etcd module. {issue}4970[4970]
 - Add ip address of docker containers to event. {pull}5379[5379]
 - Add ceph osd tree infomation to metricbeat {pull}5498[5498]
+- Add basic Logstash module. {pull}5540[5540]
 
 *Packetbeat*
 
