@@ -4443,6 +4443,16 @@ The HTTP status code
 
 
 [float]
+=== `http.response.phrase`
+
+type: keyword
+
+example: Not found
+
+The HTTP status phrase
+
+
+[float]
 === `http.response.body`
 
 type: keyword
