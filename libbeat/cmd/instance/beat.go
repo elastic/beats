@@ -364,12 +364,6 @@ func (b *Beat) Setup(bt beat.Creator, template, dashboards, machineLearning bool
 // handleFlags parses the command line flags. It handles the '-version' flag
 // and invokes the HandleFlags callback if implemented by the Beat.
 func (b *Beat) handleFlags() error {
-	// Due to a dependence upon the beat name, the default config file path
-	// must be updated prior to CLI flag handling.
-	err := cfgfile.ChangeDefaultCfgfileFlag(b.Info.Beat)
-	if err != nil {
-		return fmt.Errorf("failed to set default config file path: %v", err)
-	}
 	flag.Parse()
 
 	if printVersion {
