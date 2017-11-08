@@ -22,6 +22,7 @@ import (
 
 const (
 	metricsetName = "audit.kernel"
+	logPrefix     = "[" + metricsetName + "]"
 )
 
 var (
@@ -84,13 +85,13 @@ func newAuditClient(c *Config) (*libaudit.AuditClient, error) {
 		// using unicast.
 		if rules, _ := c.rules(); len(rules) == 0 && hasMulticast {
 			c.SocketType = "multicast"
-			logp.Info("kernel.socket_type=multicast will be used.")
+			logp.Info("%v kernel.socket_type=multicast will be used.", logPrefix)
 		}
 	case "multicast":
 		if !hasMulticast {
-			logp.Warn("kernel.socket_type is set to multicast " +
-				"but based on the kernel version multicast audit subscriptions " +
-				"are not supported. unicast will be used instead.")
+			logp.Warn("%v kernel.socket_type is set to multicast "+
+				"but based on the kernel version multicast audit subscriptions "+
+				"are not supported. unicast will be used instead.", logPrefix)
 			c.SocketType = "unicast"
 		}
 	}
@@ -111,14 +112,14 @@ func (ms *MetricSet) Run(reporter mb.PushReporter) {
 
 	if err := ms.addRules(reporter); err != nil {
 		reporter.Error(err)
-		logp.Err("%v", err)
+		logp.Err("%v %v", logPrefix, err)
 		return
 	}
 
 	out, err := ms.receiveEvents(reporter.Done())
 	if err != nil {
 		reporter.Error(err)
-		logp.Err("%v", err)
+		logp.Err("%v %v", logPrefix, err)
 		return
 	}
 
@@ -144,7 +145,7 @@ func (ms *MetricSet) addRules(reporter mb.PushReporter) error {
 	}
 
 	if len(rules) == 0 {
-		logp.Info("No audit kernel.rules were specified.")
+		logp.Info("%v No audit kernel.rules were specified.", logPrefix)
 		return nil
 	}
 
@@ -159,7 +160,7 @@ func (ms *MetricSet) addRules(reporter mb.PushReporter) error {
 	if err != nil {
 		return errors.Wrap(err, "failed to delete existing rules")
 	}
-	logp.Info("Deleted %v pre-existing audit rules.", n)
+	logp.Info("%v Deleted %v pre-existing audit rules.", logPrefix, n)
 
 	// Add rules from config.
 	var failCount int
@@ -168,11 +169,12 @@ func (ms *MetricSet) addRules(reporter mb.PushReporter) error {
 			// Treat rule add errors as warnings and continue.
 			err = errors.Wrapf(err, "failed to add kernel rule '%v'", rule.flags)
 			reporter.Error(err)
-			logp.Warn("%v", err)
+			logp.Warn("%v %v", logPrefix, err)
 			failCount++
 		}
 	}
-	logp.Info("Successfully added %d of %d kernel audit rules.", len(rules)-failCount, len(rules))
+	logp.Info("%v Successfully added %d of %d kernel audit rules.",
+		logPrefix, len(rules)-failCount, len(rules))
 	return nil
 }
 

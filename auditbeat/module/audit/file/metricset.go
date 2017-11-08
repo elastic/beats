@@ -17,6 +17,7 @@ import (
 
 const (
 	metricsetName = "audit.file"
+	logPrefix     = "[" + metricsetName + "]"
 	bucketName    = metricsetName + ".v1"
 )
 
@@ -132,7 +133,7 @@ func (ms *MetricSet) init(reporter mb.PushReporter) bool {
 	if err != nil {
 		err = errors.Wrap(err, "failed to open persistent datastore")
 		reporter.Error(err)
-		logp.Err("%v", err)
+		logp.Err("%v %v", logPrefix, err)
 		return false
 	}
 	ms.bucket = bucket.(datastore.BoltBucket)
@@ -141,7 +142,7 @@ func (ms *MetricSet) init(reporter mb.PushReporter) bool {
 	if err != nil {
 		err = errors.Wrap(err, "failed to start fsnotify event producer")
 		reporter.Error(err)
-		logp.Err("%v", err)
+		logp.Err("%v %v", logPrefix, err)
 		return false
 	}
 
@@ -151,7 +152,7 @@ func (ms *MetricSet) init(reporter mb.PushReporter) bool {
 		if err != nil {
 			err = errors.Wrap(err, "failed to start file scanner")
 			reporter.Error(err)
-			logp.Err("%v", err)
+			logp.Err("%v %v", logPrefix, err)
 			return false
 		}
 	}
@@ -176,11 +177,11 @@ func (ms *MetricSet) reportEvent(reporter mb.PushReporter, event *Event) bool {
 	// Persist event locally.
 	if event.Action == Deleted {
 		if err := ms.bucket.Delete(event.Path); err != nil {
-			logp.Err("%v", err)
+			logp.Err("%v %v", logPrefix, err)
 		}
 	} else if event.Info != nil {
 		if err := store(ms.bucket, event); err != nil {
-			logp.Err("%v", err)
+			logp.Err("%v %v", logPrefix, err)
 		}
 	}
 	return true
@@ -190,7 +191,7 @@ func (ms *MetricSet) hasFileChangedSinceLastEvent(event *Event) bool {
 	// Load event from DB.
 	lastEvent, err := load(ms.bucket, event.Path)
 	if err != nil {
-		logp.Warn("%v", err)
+		logp.Warn("%v %v", logPrefix, err)
 		return true
 	}
 
@@ -210,7 +211,7 @@ func (ms *MetricSet) purgeDeleted(reporter mb.PushReporter) {
 	for _, prefix := range ms.config.Paths {
 		deleted, err := purgeOlder(ms.bucket, ms.scanStart, prefix)
 		if err != nil {
-			logp.Err("%v", err)
+			logp.Err("%v %v", logPrefix, err)
 			continue
 		}
 
