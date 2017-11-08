@@ -4118,9 +4118,11 @@ The HTTP status code
 
 
 [float]
-=== `http.response.status_phrase`
+=== `http.response.phrase`
 
 type: keyword
+
+example: Not found
 
 The HTTP status phrase
 
