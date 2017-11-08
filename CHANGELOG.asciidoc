@@ -85,6 +85,7 @@ https://github.com/elastic/beats/compare/v6.0.0-beta2...master[Check the HEAD di
 - Add Azure VM support for add_cloud_metadata processor {pull}5355[5355]
 - Add `output.file.permission` config option. {pull}4638[4638]
 - Refactor add_kubernetes_metadata to support autodiscovery {pull}5434[5434]
+- Improve custom flag handling and CLI flags usage message. {pull}5543[5543]
 
 *Auditbeat*
 
