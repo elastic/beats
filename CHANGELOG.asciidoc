@@ -43,6 +43,7 @@ https://github.com/elastic/beats/compare/v6.0.0-beta2...master[Check the HEAD di
 - Correctly send configured `Host` header to the remote server. {issue}4842[4842]
 - Fix missing ACK in redis output. {issue}5404[5404]
 - Change add_kubernetes_metadata to attempt detection of namespace. {pull}5482[5482]
+- Avoid double slash when join url and path {pull}5517[5517]
 
 *Auditbeat*
 
