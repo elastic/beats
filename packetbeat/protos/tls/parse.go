@@ -6,6 +6,7 @@ import (
 	"encoding/hex"
 	"fmt"
 	"strings"
+	"time"
 
 	"github.com/elastic/beats/libbeat/common"
 	"github.com/elastic/beats/libbeat/common/streambuf"
@@ -165,7 +166,7 @@ func (header *recordHeader) isValid() bool {
 func (hello helloMessage) toMap() common.MapStr {
 	m := common.MapStr{
 		"version":   fmt.Sprintf("%d.%d", hello.version.major, hello.version.minor),
-		"timestamp": hello.timestamp,
+		"timestamp": time.Unix(int64(hello.timestamp), 0).UTC(),
 	}
 	if len(hello.sessionID) != 0 {
 		m["session_id"] = hello.sessionID

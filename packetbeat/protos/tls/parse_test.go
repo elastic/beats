@@ -220,7 +220,7 @@ func TestParserHello(t *testing.T) {
 
 	helloMap := parser.hello.toMap()
 	assert.Equal(t, "3.3", mapGet(t, helloMap, "version").(string))
-	assert.Equal(t, uint32(0x12345678), mapGet(t, helloMap, "timestamp").(uint32))
+	assert.Equal(t, time.Unix(0x12345678, 0).UTC(), mapGet(t, helloMap, "timestamp").(time.Time))
 	assert.Equal(t, "TLS_ECDHE_ECDSA_WITH_AES_256_CBC_SHA", mapGet(t, helloMap, "selected_cipher"))
 	assert.Equal(t, "DEFLATE", mapGet(t, helloMap, "selected_compression_method"))
 	assert.Equal(t, "abcdef", parser.hello.sessionID)
@@ -241,7 +241,7 @@ func TestParserHello(t *testing.T) {
 
 	helloMap = parser.hello.toMap()
 	assert.Equal(t, "3.3", mapGet(t, helloMap, "version").(string))
-	assert.Equal(t, uint32(0x12345678), mapGet(t, helloMap, "timestamp").(uint32))
+	assert.Equal(t, time.Unix(0x12345678, 0).UTC(), mapGet(t, helloMap, "timestamp").(time.Time))
 	assert.Equal(t, "TLS_ECDHE_ECDSA_WITH_AES_256_CBC_SHA", mapGet(t, helloMap, "selected_cipher"))
 	assert.Equal(t, "DEFLATE", mapGet(t, helloMap, "selected_compression_method"))
 	assert.Equal(t, "abcdef", parser.hello.sessionID)

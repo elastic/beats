@@ -2789,9 +2789,9 @@ The version of the TLS protocol by which the client wishes to communicate during
 [float]
 === `tls.client_hello.timestamp`
 
-type: long
+type: date
 
-The current time and date in standard UNIX 32-bit format according to the client's internal clock.
+The current time and date according to the client's internal clock.
 
 
 [float]
@@ -2850,9 +2850,9 @@ The version of the TLS protocol that is used for this session. It is the highest
 [float]
 === `tls.server_hello.timestamp`
 
-type: long
+type: date
 
-The current time and date in standard UNIX 32-bit format according to the server's internal clock.
+The current time and date according to the server's internal clock.
 
 
 [float]

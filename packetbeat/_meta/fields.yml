@@ -1789,10 +1789,9 @@
                 communicate during this session.
 
             - name: timestamp
-              type: long
+              type: date
               description: >
-                The current time and date in standard UNIX 32-bit format
-                according to the client's internal clock.
+                The current time and date according to the client's internal clock.
 
             - name: supported_ciphers
               type: array
@@ -1834,10 +1833,9 @@
                 the version requested in the client hello.
 
             - name: timestamp
-              type: long
+              type: date
               description: >
-                The current time and date in standard UNIX 32-bit format
-                according to the server's internal clock.
+                The current time and date according to the server's internal clock.
 
             - name: selected_cipher
               type: keyword
