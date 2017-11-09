@@ -72,6 +72,7 @@ https://github.com/elastic/beats/compare/v6.0.0-beta2...master[Check the HEAD di
 - Fix http status phrase parsing not allow spaces. {pull}5312[5312]
 - Fix missing length check in the PostgreSQL module. {pull}5457[5457]
 - Fix panic in ACK handler if event is dropped on blocked queue {issue}5524[5524]
+- Fix http parse to allow to parse get request with space in the URI. {pull}5495[5495]
 
 *Winlogbeat*
 

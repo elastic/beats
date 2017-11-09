@@ -5,6 +5,7 @@ import (
 	"errors"
 	"fmt"
 	"time"
+	"unicode"
 
 	"github.com/elastic/beats/libbeat/common"
 	"github.com/elastic/beats/libbeat/common/streambuf"
@@ -74,8 +75,9 @@ var (
 
 	constCRLF = []byte("\r\n")
 
-	constClose     = []byte("close")
-	constKeepAlive = []byte("keep-alive")
+	constClose       = []byte("close")
+	constKeepAlive   = []byte("keep-alive")
+	constHTTPVersion = []byte("HTTP/")
 
 	nameContentLength    = []byte("content-length")
 	nameContentType      = []byte("content-type")
@@ -145,7 +147,7 @@ func (*parser) parseHTTPLine(s *stream, m *message) (cont, ok, complete bool) {
 		}
 		return false, false, false
 	}
-	if bytes.Equal(fline[0:5], []byte("HTTP/")) {
+	if bytes.Equal(fline[0:5], constHTTPVersion) {
 		//RESPONSE
 		m.isRequest = false
 		version = fline[5:8]
@@ -160,20 +162,23 @@ func (*parser) parseHTTPLine(s *stream, m *message) (cont, ok, complete bool) {
 		}
 	} else {
 		// REQUEST
-		slices := bytes.Fields(fline)
-		if len(slices) != 3 {
+		afterMethodIdx := bytes.IndexFunc(fline, unicode.IsSpace)
+		afterRequestURIIdx := bytes.LastIndexFunc(fline, unicode.IsSpace)
+
+		// Make sure we have the VERB + URI + HTTP_VERSION
+		if afterMethodIdx == -1 || afterRequestURIIdx == -1 || afterMethodIdx == afterRequestURIIdx {
 			if isDebug {
 				debugf("Couldn't understand HTTP request: %s", fline)
 			}
 			return false, false, false
 		}
 
-		m.method = common.NetString(slices[0])
-		m.requestURI = common.NetString(slices[1])
+		m.method = common.NetString(fline[:afterMethodIdx])
+		m.requestURI = common.NetString(fline[afterMethodIdx+1 : afterRequestURIIdx])
 
-		if bytes.Equal(slices[2][:5], []byte("HTTP/")) {
+		if bytes.Equal(fline[afterRequestURIIdx+1:afterRequestURIIdx+len(constHTTPVersion)+1], constHTTPVersion) {
 			m.isRequest = true
-			version = slices[2][5:]
+			version = fline[afterRequestURIIdx+len(constHTTPVersion)+1:]
 		} else {
 			if isDebug {
 				debugf("Couldn't understand HTTP version: %s", fline)
