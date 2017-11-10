@@ -2819,16 +2819,17 @@ The hello extensions provided by the client.
 [float]
 === `tls.client_hello.extensions.server_name_indication`
 
-type: string
+type: array
 
-Comma-separated list of server names
+List of hostnames
 
 [float]
 === `tls.client_hello.extensions.application_layer_protocol_negotiation`
 
-type: string
+type: array
 
-Comma-separated list of protocols
+List of application-layer protocols the client is willing to use.
+
 
 [float]
 === `tls.client_hello.extensions.session_ticket`

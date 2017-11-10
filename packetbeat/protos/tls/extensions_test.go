@@ -19,7 +19,7 @@ func TestSni(t *testing.T) {
 		15)
 	r := parseSni(*buf)
 	assert.NotNil(t, r)
-	assert.Equal(t, "elastic.co", r.(string))
+	assert.Equal(t, []string{"elastic.co"}, r.([]string))
 
 	// 3 elements
 
@@ -36,7 +36,7 @@ func TestSni(t *testing.T) {
 		41)
 	r = parseSni(*buf)
 	assert.NotNil(t, r)
-	assert.Equal(t, "elastic.co,example.net,localhost", r.(string))
+	assert.Equal(t, []string{"elastic.co", "example.net", "localhost"}, r.([]string))
 
 	// Unknown entry type
 
@@ -53,7 +53,7 @@ func TestSni(t *testing.T) {
 		41)
 	r = parseSni(*buf)
 	assert.NotNil(t, r)
-	assert.Equal(t, "elastic.co,localhost", r.(string))
+	assert.Equal(t, []string{"elastic.co", "localhost"}, r.([]string))
 
 	// Truncated
 
@@ -70,7 +70,7 @@ func TestSni(t *testing.T) {
 		41)
 	r = parseSni(*buf)
 	assert.NotNil(t, r)
-	assert.Equal(t, "elastic.co,example.net,localhost", r.(string))
+	assert.Equal(t, []string{"elastic.co", "example.net", "localhost"}, r.([]string))
 
 	// Out of bounds
 
@@ -87,7 +87,7 @@ func TestSni(t *testing.T) {
 		41)
 	r = parseSni(*buf)
 	assert.NotNil(t, r)
-	assert.Equal(t, "elastic.co,example.net", r.(string))
+	assert.Equal(t, []string{"elastic.co", "example.net"}, r.([]string))
 
 	// Out of bounds
 
@@ -104,7 +104,7 @@ func TestSni(t *testing.T) {
 		41)
 	r = parseSni(*buf)
 	assert.NotNil(t, r)
-	assert.Equal(t, "elastic.co,example.net", r.(string))
+	assert.Equal(t, []string{"elastic.co", "example.net"}, r.([]string))
 }
 
 func TestParseMaxFragmentLength(t *testing.T) {
@@ -123,15 +123,15 @@ func TestParseMaxFragmentLength(t *testing.T) {
 
 func TestParseCertType(t *testing.T) {
 	r := parseCertType(*mkBuf(t, "00", 1))
-	assert.Equal(t, "X.509", r.(string))
+	assert.Equal(t, []string{"X.509"}, r.([]string))
 	r = parseCertType(*mkBuf(t, "01", 1))
-	assert.Equal(t, "OpenPGP", r.(string))
+	assert.Equal(t, []string{"OpenPGP"}, r.([]string))
 	r = parseCertType(*mkBuf(t, "02", 1))
-	assert.Equal(t, "RawPubKey", r.(string))
+	assert.Equal(t, []string{"RawPubKey"}, r.([]string))
 	r = parseCertType(*mkBuf(t, "3c", 1))
-	assert.Equal(t, "(unknown:60)", r.(string))
+	assert.Equal(t, []string{"(unknown:60)"}, r.([]string))
 	r = parseCertType(*mkBuf(t, "03020100", 4))
-	assert.Equal(t, "RawPubKey,OpenPGP,X.509", r.(string))
+	assert.Equal(t, []string{"RawPubKey", "OpenPGP", "X.509"}, r.([]string))
 }
 
 func TestParseSrp(t *testing.T) {

@@ -60,12 +60,13 @@
               description: The hello extensions provided by the client.
               fields:
                 - name: server_name_indication
-                  type: string
-                  description: Comma-separated list of server names
+                  type: array
+                  description: List of hostnames
 
                 - name: application_layer_protocol_negotiation
-                  type: string
-                  description: Comma-separated list of protocols
+                  type: array
+                  description: >
+                    List of application-layer protocols the client is willing to use.
 
                 - name: session_ticket
                   type: string
@@ -104,7 +105,7 @@
               description: The hello extensions provided by the server.
               fields:
                 - name: application_layer_protocol_negotiation
-                  type: string
+                  type: array
                   description: Negotiated application layer protocol
 
                 - name: session_ticket

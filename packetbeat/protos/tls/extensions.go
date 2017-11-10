@@ -42,13 +42,6 @@ var extensionMap = map[uint16]extension{
 	0xff01: {"renegotiation_info", ignoreContent},
 }
 
-func stringAppend(src, part string) string {
-	if len(src) != 0 {
-		return src + "," + part
-	}
-	return part
-}
-
 func parseExtensions(buffer bufferView) common.MapStr {
 	var extensionsLength uint16
 	if !buffer.read16Net(0, &extensionsLength) || extensionsLength == 0 {
@@ -59,7 +52,7 @@ func parseExtensions(buffer bufferView) common.MapStr {
 	limit := 2 + int(extensionsLength)
 	result := common.MapStr{}
 
-	var unknown string
+	var unknown []string
 	for base := 2; base < limit; {
 		var code, length uint16
 		if !buffer.read16Net(base, &code) || !buffer.read16Net(base+2, &length) {
@@ -71,7 +64,7 @@ func parseExtensions(buffer bufferView) common.MapStr {
 		if content != notParsedExtension {
 			result[label] = content
 		} else {
-			unknown = stringAppend(unknown, label)
+			unknown = append(unknown, label)
 		}
 		base += 4 + int(length)
 	}
@@ -93,7 +86,7 @@ func parseSni(buffer bufferView) interface{} {
 	if !buffer.read16Net(0, &listLength) {
 		return notParsedExtension
 	}
-	hosts := ""
+	var hosts []string
 	for pos, limit := 2, 2+int(listLength); pos+3 <= limit; {
 		var nameType uint8
 		var nameLen uint16
@@ -104,7 +97,7 @@ func parseSni(buffer bufferView) interface{} {
 			break
 		}
 		if nameType == 0 {
-			hosts = stringAppend(hosts, host)
+			hosts = append(hosts, host)
 		}
 		pos += 3 + int(nameLen)
 	}
@@ -135,7 +128,8 @@ func expectEmpty(buffer bufferView) interface{} {
 
 func parseCertType(buffer bufferView) interface{} {
 	var value uint8
-	pos, types, limit := 0, "", buffer.length()
+	var types []string
+	pos, limit := 0, buffer.length()
 	if limit > 1 {
 		buffer.read8(0, &value)
 		pos = 1
@@ -155,7 +149,7 @@ func parseCertType(buffer bufferView) interface{} {
 		default:
 			label = fmt.Sprintf("(unknown:%d)", value)
 		}
-		types = stringAppend(types, label)
+		types = append(types, label)
 	}
 	return types
 }
@@ -165,9 +159,9 @@ func parseSupportedGroups(buffer bufferView) interface{} {
 	if !buffer.read16Net(0, &value) || int(value)+2 != buffer.length() {
 		return notParsedExtension
 	}
-	groups := ""
+	var groups []string
 	for pos := 0; buffer.read16Net(pos+2, &value); pos += 2 {
-		groups = stringAppend(groups, pointsGroup(value).String())
+		groups = append(groups, pointsGroup(value).String())
 	}
 	return groups
 }
@@ -177,9 +171,9 @@ func parseEcPoints(buffer bufferView) interface{} {
 	if !buffer.read8(0, &length) || int(length)+1 != buffer.length() {
 		return notParsedExtension
 	}
-	formats := ""
+	var formats []string
 	for pos := 0; pos < int(length) && buffer.read8(1+pos, &value); pos++ {
-		formats = stringAppend(formats, ecPointsFormat(value).String())
+		formats = append(formats, ecPointsFormat(value).String())
 	}
 	return formats
 }
@@ -201,9 +195,9 @@ func parseSignatureSchemes(buffer bufferView) interface{} {
 	if !buffer.read16Net(0, &value) || int(value)+2 != buffer.length() {
 		return notParsedExtension
 	}
-	groups := ""
+	var groups []string
 	for pos := 2; buffer.read16Net(pos, &value); pos += 2 {
-		groups = stringAppend(groups, signatureScheme(value).String())
+		groups = append(groups, signatureScheme(value).String())
 	}
 	return groups
 }
@@ -222,12 +216,12 @@ func parseALPN(buffer bufferView) interface{} {
 	}
 	var strlen uint8
 	var proto string
-	protos := ""
+	var protos []string
 	for pos := 2; buffer.read8(pos, &strlen); {
 		if !buffer.readString(pos+1, int(strlen), &proto) {
 			return notParsedExtension
 		}
-		protos = stringAppend(protos, proto)
+		protos = append(protos, proto)
 		pos += 1 + int(strlen)
 	}
 	return protos
