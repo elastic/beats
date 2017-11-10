@@ -1,0 +1,35 @@
+{
+  "@timestamp": "2017-11-01T07:26:34.876Z",
+  "@metadata": {
+    "beat": "metricbeat",
+    "type": "doc",
+    "version": "7.0.0-alpha1"
+  },
+  "ceph": {
+    "osd_tree": {
+      "status": "up",
+      "name": "osd.0",
+      "type": "osd",
+      "primary_affinity": 1,
+      "exists": true,
+      "id": 0,
+      "type_id": 0,
+      "crush_weight": 0.048691,
+      "device_class": "hdd",
+      "reweight": 1,
+      "father": "ceph-mon1",
+      "depth": 2
+    }
+  },
+  "metricset": {
+    "rtt": 1331122,
+    "module": "ceph",
+    "name": "osd_tree",
+    "host": "192.168.56.131:5000"
+  },
+  "beat": {
+    "hostname": "centos7gui",
+    "version": "7.0.0-alpha1",
+    "name": "centos7gui"
+  }
+}

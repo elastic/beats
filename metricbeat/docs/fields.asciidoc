@@ -1193,6 +1193,117 @@ Last updated
 
 
 [float]
+== osd_tree fields
+
+ceph osd tree info
+
+
+
+[float]
+=== `ceph.osd_tree.id`
+
+type: long
+
+osd or bucket node id
+
+
+[float]
+=== `ceph.osd_tree.name`
+
+type: text
+
+osd or bucket node name
+
+
+[float]
+=== `ceph.osd_tree.type`
+
+type: keyword
+
+osd or bucket node type, illegal type include osd, host, root etc.
+
+
+[float]
+=== `ceph.osd_tree.type_id`
+
+type: long
+
+osd or bucket node typeID
+
+
+[float]
+=== `ceph.osd_tree.children`
+
+type: text
+
+bucket children list, seperate by comma.
+
+
+[float]
+=== `ceph.osd_tree.crush_weight`
+
+type: float
+
+osd node crush weight
+
+
+[float]
+=== `ceph.osd_tree.depth`
+
+type: long
+
+node depth
+
+
+[float]
+=== `ceph.osd_tree.exists`
+
+type: boolean
+
+is node still exist or not(1-yes, 0-no)
+
+
+[float]
+=== `ceph.osd_tree.primary_affinity`
+
+type: float
+
+the weight of reading data from primary osd
+
+
+[float]
+=== `ceph.osd_tree.reweight`
+
+type: long
+
+the reweight of osd
+
+
+[float]
+=== `ceph.osd_tree.status`
+
+type: keyword
+
+status of osd, it should be up or down
+
+
+[float]
+=== `ceph.osd_tree.device_class`
+
+type: keyword
+
+the device class of osd, like hdd, ssd etc.
+
+
+[float]
+=== `ceph.osd_tree.father`
+
+type: keyword
+
+the parent node of this osd or bucket node
+
+
+[float]
 == pool_disk fields
 
 pool_disk
