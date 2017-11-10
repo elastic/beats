@@ -391,6 +391,7 @@ func (hello *helloMessage) parseExtensions(buffer bufferView) {
 		if value, ok := ticket.(string); ok {
 			hello.ticket.present = true
 			hello.ticket.value = value
+		} else {
 			logp.Err("tls ticket data type error")
 		}
 	}
