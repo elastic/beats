@@ -1819,9 +1819,10 @@
                     List of application-layer protocols the client is willing to use.
 
                 - name: session_ticket
-                  type: string
+                  type: keyword
                   description: >
-                    Length of the session ticket, if provided, or empty
+                    Length of the session ticket, if provided, or an empty string
+                    to advertise support for tickets.
 
         - name: server_hello
           type: group
@@ -1859,8 +1860,11 @@
                   description: Negotiated application layer protocol
 
                 - name: session_ticket
-                  type: string
-                  description: Empty
+                  type: keyword
+                  description: >
+                    Used to announce that a session ticket will be provided
+                    by the server. Always an empty string.
+
 
         - name: client_certificate
           type: group

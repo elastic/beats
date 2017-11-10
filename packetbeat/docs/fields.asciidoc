@@ -2834,9 +2834,9 @@ List of application-layer protocols the client is willing to use.
 [float]
 === `tls.client_hello.extensions.session_ticket`
 
-type: string
+type: keyword
 
-Length of the session ticket, if provided, or empty
+Length of the session ticket, if provided, or an empty string to advertise support for tickets.
 
 
 
@@ -2881,16 +2881,17 @@ The hello extensions provided by the server.
 [float]
 === `tls.server_hello.extensions.application_layer_protocol_negotiation`
 
-type: string
+type: array
 
 Negotiated application layer protocol
 
 [float]
 === `tls.server_hello.extensions.session_ticket`
 
-type: string
+type: keyword
 
-Empty
+Used to announce that a session ticket will be provided by the server. Always an empty string.
+
 
 [float]
 == client_certificate fields
