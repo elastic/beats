@@ -127,8 +127,7 @@
 
             - name: serial_number
               type: keyword
-              description: >
-                The certificate's serial number, in hexadecimal.
+              description: The certificate's serial number.
 
             - name: not_before
               type: date
@@ -213,8 +212,7 @@
 
             - name: serial_number
               type: keyword
-              description: >
-                The certificate's serial number, in hexadecimal.
+              description: The certificate's serial number.
 
             - name: not_before
               type: date

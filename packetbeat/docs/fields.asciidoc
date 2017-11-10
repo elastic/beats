@@ -2911,8 +2911,7 @@ X509 format version.
 
 type: keyword
 
-The certificate's serial number, in hexadecimal.
-
+The certificate's serial number.
 
 [float]
 === `tls.client_certificate.not_before`
@@ -3051,8 +3050,7 @@ X509 format version.
 
 type: keyword
 
-The certificate's serial number, in hexadecimal.
-
+The certificate's serial number.
 
 [float]
 === `tls.server_certificate.not_before`

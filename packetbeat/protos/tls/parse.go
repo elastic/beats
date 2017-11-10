@@ -493,7 +493,7 @@ func certToMap(cert *x509.Certificate) common.MapStr {
 		"signature_algorithm":  cert.SignatureAlgorithm.String(),
 		"public_key_algorithm": toString(cert.PublicKeyAlgorithm),
 		"version":              cert.Version,
-		"serial_number":        cert.SerialNumber.Text(16),
+		"serial_number":        cert.SerialNumber.Text(10),
 		"issuer":               toMap(&cert.Issuer),
 		"subject":              toMap(&cert.Subject),
 		"not_before":           cert.NotBefore,
