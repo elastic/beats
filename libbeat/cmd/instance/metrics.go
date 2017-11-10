@@ -33,6 +33,6 @@ func reportInfo(_ monitoring.Mode, V monitoring.Visitor) {
 	defer V.OnRegistryFinished()
 
 	delta := time.Since(startTime)
-	uptime := int64(delta.Seconds())*1000 + int64(delta.Nanoseconds()/1000000)
+	uptime := int64(delta / time.Millisecond)
 	monitoring.ReportInt(V, "uptime.ms", uptime)
 }
