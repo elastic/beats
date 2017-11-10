@@ -717,35 +717,47 @@ The discovery method this cluster is using.
 
 
 [float]
-=== `elasticsearch.log.cluster.license_id`
+== license fields
 
-The license ID for this cluster.
+Contains fields related to a cluster license.
+
 
 
 [float]
-=== `elasticsearch.log.cluster.license_type`
+=== `elasticsearch.log.cluster.license.uid`
+
+The license UID for this cluster.
+
+
+[float]
+=== `elasticsearch.log.cluster.license.type`
 
 The type of license used on this cluster (i.e., trial, platinum, etc.)
 
 
 [float]
-=== `elasticsearch.log.cluster.license_status`
+=== `elasticsearch.log.cluster.license.status`
 
 The license status (i.e., validity).
 
 
 [float]
-=== `elasticsearch.log.cluster.action`
+== action fields
 
 A cluster-level action.
 
 
+
 [float]
-=== `elasticsearch.log.cluster.action_details`
+=== `elasticsearch.log.cluster.action.name`
 
-type: text
+The name of the cluster-level action.
 
-A cluster-level action details.
+
+[float]
+=== `elasticsearch.log.cluster.action.duration`
+
+Time take to execute the cluster-level action.
 
 
 [float]
@@ -778,20 +790,20 @@ A diff size of the cluster state version.
 [float]
 == health fields
 
-Contains fields related to the cluster health.
+Cluster health status.
 
 
 
 [float]
 === `elasticsearch.log.cluster.health.old_value`
 
-The previous health of the cluster.
+The previous cluster health.
 
 
 [float]
 === `elasticsearch.log.cluster.health.new_value`
 
-The new health of the cluster.
+The current cluster health.
 
 
 [float]
@@ -799,12 +811,6 @@ The new health of the cluster.
 
 Contains fields related to cluster settings.
 
-
-
-[float]
-=== `elasticsearch.log.cluster.setting.action`
-
-The action being applied to this cluster setting.
 
 
 [float]
@@ -869,9 +875,15 @@ The OS version details of this node.
 
 
 [float]
-=== `elasticsearch.log.node.jvm`
+=== `elasticsearch.log.node.jvm_details`
 
 The JVM details of this node.
+
+
+[float]
+=== `elasticsearch.log.node.jvm_arguments`
+
+The arguments passed to the JVM. This is the combination of any default arguments in addition to arguments set by the user.
 
 
 [float]
@@ -1022,6 +1034,37 @@ The value of the setting.
 
 
 [float]
+== field fields
+
+Contains fields related to a particular field and actions on that field.
+
+
+
+[float]
+=== `elasticsearch.log.index.field.name`
+
+The name of the field.
+
+
+[float]
+=== `elasticsearch.log.index.field.value`
+
+The value of the field.
+
+
+[float]
+=== `elasticsearch.log.index.field.action`
+
+The action undertaken on the field.
+
+
+[float]
+=== `elasticsearch.log.index.field.action_duration`
+
+The duration taken to perform the action on the field.
+
+
+[float]
 === `elasticsearch.log.index.templates`
 
 A list of templates applied to this index.
@@ -1156,7 +1199,7 @@ Contains fields related to X-Pack features
 [float]
 == security fields
 
-Contains fields related to X-Pack security.
+Contains fields related to X-Pack Security.
 
 
 
@@ -1167,15 +1210,69 @@ The role in use.
 
 
 [float]
-=== `elasticsearch.log.xpack.security.role_file`
+=== `elasticsearch.log.xpack.security.roles_file`
 
-The role file from which the role was sourced.
+File containing roles for file-based realm.
+
+
+[float]
+=== `elasticsearch.log.xpack.security.role_mappings_file`
+
+File containing role mappings for directory server based realms.
+
+
+[float]
+=== `elasticsearch.log.xpack.security.user`
+
+The username used to authenticate.
+
+
+[float]
+=== `elasticsearch.log.xpack.security.users_file`
+
+File containing users for file-based realm.
+
+
+[float]
+=== `elasticsearch.log.xpack.security.key_file`
+
+The system key file.
+
+
+[float]
+=== `elasticsearch.log.xpack.security.realm`
+
+The name of a realm.
+
+
+[float]
+=== `elasticsearch.log.xpack.security.certificate_file`
+
+File containing a PEM encoded certificate.
+
+
+[float]
+=== `elasticsearch.log.xpack.security.certificate_subjectdn`
+
+Subject DN of certificate.
+
+
+[float]
+=== `elasticsearch.log.xpack.security.certificate_serial`
+
+Serial of certificate.
+
+
+[float]
+=== `elasticsearch.log.xpack.security.certificate_common_names`
+
+Common names specified in certificate.
 
 
 [float]
 == watch fields
 
-Contains fields related to X-Pack alerting.
+Contains fields related to X-Pack Alerting.
 
 
 
@@ -1194,7 +1291,7 @@ The watch ID.
 [float]
 == monitoring fields
 
-Contains fields related to X-Pack monitoring.
+Contains fields related to X-Pack Monitoring.
 
 
 
@@ -1205,21 +1302,48 @@ The name of the collector (i.e., metrics) being gathered.
 
 
 [float]
+== ml fields
+
+Contains fields related to X-Pack Machine Learning.
+
+
+
+[float]
+=== `elasticsearch.log.xpack.ml.datafeed`
+
+The ML datafeed name.
+
+
+[float]
+=== `elasticsearch.log.xpack.ml.job_id`
+
+The ML job ID.
+
+
+[float]
+=== `elasticsearch.log.xpack.ml.process`
+
+The process responsible for this message.
+
+
+[float]
+=== `elasticsearch.log.xpack.ml.process_id`
+
+type: long
+
+The process ID.
+
+
+[float]
+=== `elasticsearch.log.xpack.ml.code`
+
+The source code file and line number responsible for this message.
+
+
+[float]
 === `elasticsearch.log.snapshot`
 
 The name/ID of a snapshot.
-
-
-[float]
-=== `elasticsearch.log.nodes`
-
-NEEDS FURTHER GROKKING.
-
-
-[float]
-=== `elasticsearch.log.action`
-
-NEEDS BETTER CLASSIFICATION.
 
 
 [[exported-fields-icinga]]

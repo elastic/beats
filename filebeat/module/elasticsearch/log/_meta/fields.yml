@@ -25,22 +25,31 @@
         - name: discovery_type
           description: >
             The discovery method this cluster is using.
-        - name: license_id
+        - name: license
+          type: group
           description: >
-            The license ID for this cluster.
-        - name: license_type
-          description: >
-            The type of license used on this cluster (i.e., trial, platinum, etc.)
-        - name: license_status
-          description: >
-            The license status (i.e., validity).
+            Contains fields related to a cluster license.
+          fields:
+            - name: uid
+              description: >
+                The license UID for this cluster.
+            - name: type
+              description: >
+                The type of license used on this cluster (i.e., trial, platinum, etc.)
+            - name: status
+              description: >
+                The license status (i.e., validity).
         - name: action
+          type: group
           description: >
             A cluster-level action.
-        - name: action_details
-          type: text
-          description: >
-            A cluster-level action details.
+          fields:
+            - name: name
+              description: >
+                The name of the cluster-level action.
+            - name: duration
+              description: >
+                Time take to execute the cluster-level action.
         - name: state
           type: group
           description: >
@@ -59,22 +68,19 @@
         - name: health
           type: group
           description: >
-            Contains fields related to the cluster health.
+            Cluster health status.
           fields:
             - name: old_value
               description: >
-                The previous health of the cluster.
+                The previous cluster health.
             - name: new_value
               description: >
-                The new health of the cluster.
+                The current cluster health.
         - name: setting
           type: group
           description: >
             Contains fields related to cluster settings.
           fields:
-            - name: action
-              description: >
-                The action being applied to this cluster setting.
             - name: name
               description: >
                 The cluster setting name.
@@ -107,9 +113,13 @@
         - name: os
           description: >
             The OS version details of this node.
-        - name: jvm
+        - name: jvm_details
           description: >
             The JVM details of this node.
+        - name: jvm_arguments
+          description: >
+            The arguments passed to the JVM. This is the combination of any default arguments
+            in addition to arguments set by the user.
         - name: heap_size
           description: >
             The heap size assigned to Elasticsearch on this node.
@@ -188,6 +198,23 @@
             - name: value
               description: >
                 The value of the setting.
+        - name: field
+          type: group
+          description: >
+            Contains fields related to a particular field and actions on that field.
+          fields:
+            - name: name
+              description: >
+                The name of the field.
+            - name: value
+              description: >
+                The value of the field.
+            - name: action
+              description: >
+                The action undertaken on the field.
+            - name: action_duration
+              description: >
+                The duration taken to perform the action on the field.
         - name: templates
           description: >
             A list of templates applied to this index.
@@ -263,18 +290,45 @@
         - name: security
           type: group
           description: >
-            Contains fields related to X-Pack security.
+            Contains fields related to X-Pack Security.
           fields:
             - name: role
               description: >
                 The role in use.
-            - name: role_file
+            - name: roles_file
               description: >
-                The role file from which the role was sourced.
+                File containing roles for file-based realm.
+            - name: role_mappings_file
+              description: >
+                File containing role mappings for directory server based realms.
+            - name: user
+              description: >
+                The username used to authenticate.
+            - name: users_file
+              description: >
+                File containing users for file-based realm.
+            - name: key_file
+              description: >
+                The system key file.
+            - name: realm
+              description: >
+                The name of a realm.
+            - name: certificate_file
+              description: >
+                File containing a PEM encoded certificate.
+            - name: certificate_subjectdn
+              description: >
+                Subject DN of certificate.
+            - name: certificate_serial
+              description: >
+                Serial of certificate.
+            - name: certificate_common_names
+              description: >
+                Common names specified in certificate.
         - name: watch
           type: group
           description: >
-            Contains fields related to X-Pack alerting.
+            Contains fields related to X-Pack Alerting.
           fields:
             - name: stage
               description: >
@@ -285,17 +339,32 @@
         - name: monitoring
           type: group
           description: >
-            Contains fields related to X-Pack monitoring.
+            Contains fields related to X-Pack Monitoring.
           fields:
             - name: collector
               description: >
                 The name of the collector (i.e., metrics) being gathered.
+        - name: ml
+          type: group
+          description: >
+            Contains fields related to X-Pack Machine Learning.
+          fields:
+            - name: datafeed
+              description: >
+                The ML datafeed name.
+            - name: job_id
+              description: >
+                The ML job ID.
+            - name: process
+              description: >
+                The process responsible for this message.
+            - name: process_id
+              type: long
+              description: >
+                The process ID.
+            - name: code
+              description: >
+                The source code file and line number responsible for this message.
     - name: snapshot
       description: >
         The name/ID of a snapshot.
-    - name: nodes
-      description: >
-        NEEDS FURTHER GROKKING.
-    - name: action
-      description: >
-        NEEDS BETTER CLASSIFICATION.
