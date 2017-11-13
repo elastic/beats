@@ -4546,9 +4546,11 @@ The HTTP headers received
 
 
 [float]
-=== `http.response.status_code`
+=== `http.response.code`
 
 type: keyword
+
+example: 404
 
 The HTTP status code
 
