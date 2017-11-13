@@ -37,6 +37,7 @@ func TestData(t *testing.T) {
 }
 
 func TestTopic(t *testing.T) {
+	t.Skipf("Skip test as currently too flaky")
 	compose.EnsureUp(t, "kafka")
 
 	if testing.Verbose() {
