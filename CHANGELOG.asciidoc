@@ -79,6 +79,8 @@ https://github.com/elastic/beats/compare/v6.0.0...master[Check the HEAD diff]
 
 ////////////////////////////////////////////////////////////
 
+include::libbeat/docs/release-notes/6.0.0.asciidoc[]
+
 [[release-notes-6.0.0-ga]]
 === Beats version 6.0.0-GA
 https://github.com/elastic/beats/compare/v6.0.0-rc2...v6.0.0[View commits]
@@ -429,7 +431,6 @@ https://github.com/elastic/beats/compare/v6.0.0-alpha1...v6.0.0-alpha2[View comm
 - Fix type of field `haproxy.stat.check.health.last`. {issue}4407[4407]
 
 *Packetbeat*
-- Enable memcache filtering only if a port is specified in the config file. {issue}4335[4335]
 - Enable memcache filtering only if a port is specified in the config file. {issue}4335[4335]
 
 ==== Added
