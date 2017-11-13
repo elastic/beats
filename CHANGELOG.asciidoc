@@ -34,6 +34,8 @@ https://github.com/elastic/beats/compare/v5.6.4...5.6[Check the HEAD diff]
 
 *Metricbeat*
 
+- Clarify meaning of percentages reported by system core metricset. {pull}5565[5565]
+
 *Packetbeat*
 
 *Winlogbeat*
