@@ -82,11 +82,14 @@ type beatConfig struct {
 var (
 	printVersion bool
 	setup        bool
+	startTime    time.Time
 )
 
 var debugf = logp.MakeDebug("beat")
 
 func init() {
+	startTime = time.Now()
+
 	initRand()
 
 	flag.BoolVar(&printVersion, "version", false, "Print the version and exit")
@@ -361,12 +364,6 @@ func (b *Beat) Setup(bt beat.Creator, template, dashboards, machineLearning bool
 // handleFlags parses the command line flags. It handles the '-version' flag
 // and invokes the HandleFlags callback if implemented by the Beat.
 func (b *Beat) handleFlags() error {
-	// Due to a dependence upon the beat name, the default config file path
-	// must be updated prior to CLI flag handling.
-	err := cfgfile.ChangeDefaultCfgfileFlag(b.Info.Beat)
-	if err != nil {
-		return fmt.Errorf("failed to set default config file path: %v", err)
-	}
 	flag.Parse()
 
 	if printVersion {
@@ -421,7 +418,7 @@ func (b *Beat) configure() error {
 		return fmt.Errorf("error setting default paths: %v", err)
 	}
 
-	err = logp.Init(b.Info.Beat, &b.Config.Logging)
+	err = logp.Init(b.Info.Beat, startTime, &b.Config.Logging)
 	if err != nil {
 		return fmt.Errorf("error initializing logging: %v", err)
 	}

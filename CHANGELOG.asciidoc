@@ -25,6 +25,7 @@ https://github.com/elastic/beats/compare/v6.0.0-beta2...master[Check the HEAD di
 *Metricbeat*
 
 - Rename `heap_init` field to `heap.init`. {pull}5320[5320]
+- Rename `http.response.status_code` field to `http.response.code`. {pull}5521[5521]
 
 
 *Packetbeat*
@@ -43,6 +44,7 @@ https://github.com/elastic/beats/compare/v6.0.0-beta2...master[Check the HEAD di
 - Correctly send configured `Host` header to the remote server. {issue}4842[4842]
 - Fix missing ACK in redis output. {issue}5404[5404]
 - Change add_kubernetes_metadata to attempt detection of namespace. {pull}5482[5482]
+- Avoid double slash when join url and path {pull}5517[5517]
 
 *Auditbeat*
 
@@ -70,6 +72,8 @@ https://github.com/elastic/beats/compare/v6.0.0-beta2...master[Check the HEAD di
 
 - Fix http status phrase parsing not allow spaces. {pull}5312[5312]
 - Fix missing length check in the PostgreSQL module. {pull}5457[5457]
+- Fix panic in ACK handler if event is dropped on blocked queue {issue}5524[5524]
+- Fix http parse to allow to parse get request with space in the URI. {pull}5495[5495]
 
 *Winlogbeat*
 
@@ -85,6 +89,7 @@ https://github.com/elastic/beats/compare/v6.0.0-beta2...master[Check the HEAD di
 - Add Azure VM support for add_cloud_metadata processor {pull}5355[5355]
 - Add `output.file.permission` config option. {pull}4638[4638]
 - Refactor add_kubernetes_metadata to support autodiscovery {pull}5434[5434]
+- Improve custom flag handling and CLI flags usage message. {pull}5543[5543]
 
 *Auditbeat*
 
@@ -114,6 +119,7 @@ https://github.com/elastic/beats/compare/v6.0.0-beta2...master[Check the HEAD di
 - Add Kubernetes manifests to deploy Metricbeat. {pull}5349[5349]
 - Add etcd module. {issue}4970[4970]
 - Add ip address of docker containers to event. {pull}5379[5379]
+- Add ceph osd tree infomation to metricbeat {pull}5498[5498]
 
 *Packetbeat*
 
