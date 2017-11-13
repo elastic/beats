@@ -36,6 +36,8 @@ https://github.com/elastic/beats/compare/v6.0.0...master[Check the HEAD diff]
 
 *Heartbeat*
 
+- Fix the "HTTP up status" visualization. {pull}5564[5564]
+
 *Metricbeat*
 
 *Packetbeat*
