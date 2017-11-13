@@ -150,6 +150,7 @@ sudo yum install {beatname_lc}
 ["source","sh",subs="attributes"]
 --------------------------------------------------
 sudo chkconfig --add {beatname_lc}
+sudo chkconfig {beatname_lc} on
 --------------------------------------------------
 
 endif::[]
