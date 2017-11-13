@@ -79,7 +79,7 @@ func (s *syncer) process(ts time.Time, dir uint8) error {
 		}
 
 		s.nbytesSeen[dir] += nbytes
-		if jsize == 0 {
+		if jsize == 0 || jsize == 1 && s.journal[jend].dir == dir {
 			s.firstMessageLines++
 		}
 	}
@@ -103,11 +103,6 @@ func (s *syncer) process(ts time.Time, dir uint8) error {
 				break
 			}
 		}
-		if s.parsers[dir1].state == stateUnsynced {
-			// First message of this stream is a response, syncer got
-			// done before getting to it, so it wasn't logged
-			s.parsers[dir1].state = stateCommand
-		}
 
 		// First line of the capture can be mangled. Since SMTP
 		// sessions start with a (prompt) response, a non-response
@@ -117,7 +112,7 @@ func (s *syncer) process(ts time.Time, dir uint8) error {
 		raw, _ := p.buf.CollectUntil(constCRLF)
 		isCode := len(raw) >= constMinRespSize &&
 			isResponseCode(raw[:constMinRespSize])
-		if isCode && len(s.journal) > 1 && s.journal[1].dir == s.requDir {
+		if isCode && s.journal[0].dir != s.requDir {
 			// All good
 			p.buf.Restore(bufBeforeStart)
 		} else {

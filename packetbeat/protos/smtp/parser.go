@@ -89,6 +89,11 @@ func (p *parser) append(data []byte) error {
 // If yield is set, parsing is driven by the syncer,
 // process will return after parsing a message.
 func (p *parser) process(ts time.Time, yield bool) error {
+	if p.state == stateUnsynced {
+		// First message of this stream is a response, syncer just got
+		// done before getting to it
+		p.state = stateCommand
+	}
 
 	for p.buf.Total() > 0 {
 		if p.message == nil {
