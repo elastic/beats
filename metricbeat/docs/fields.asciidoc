@@ -9775,7 +9775,7 @@ The average queue length of the requests that were issued to the device.
 
 type: float
 
-The average queue length of the requests that were issued to the device.
+The average time spent for requests issued to the device to be served.
 
 
 [float]
