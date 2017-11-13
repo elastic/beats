@@ -60,6 +60,8 @@ https://github.com/elastic/beats/compare/v6.0.0-beta2...master[Check the HEAD di
 
 *Heartbeat*
 
+- Fix the "HTTP up status" visualization. {pull}5564[5564]
+
 *Metricbeat*
 
 - Change field type of http header from nested to object {pull}5258[5258]

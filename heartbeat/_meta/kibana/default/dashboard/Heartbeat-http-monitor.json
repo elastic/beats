@@ -52,17 +52,17 @@
       "attributes": {
         "description": "",
         "kibanaSavedObjectMeta": {
-          "searchSourceJSON": "{\n  \"filter\": []\n}"
+          "searchSourceJSON": "{\"filter\":[],\"query\":{\"query\":\"\",\"language\":\"lucene\"}}"
         },
         "savedSearchId": "02014c80-29d2-11e7-a68f-bfaa2341cc52",
         "title": "HTTP up status",
-        "uiStateJSON": "{\n  \"vis\": {\n    \"colors\": {\n      \"monitor.status: up\": \"#629E51\",\n      \"monitor.status: down\": \"#E24D42\"\n    }\n  }\n}",
+        "uiStateJSON": "{\"vis\":{\"colors\":{\"monitor.status: up\":\"#629E51\",\"monitor.status: down\":\"#E24D42\"}}}",
         "version": 1,
-        "visState": "{\n  \"title\": \"HTTP up status\",\n  \"type\": \"area\",\n  \"params\": {\n    \"addTooltip\": true,\n    \"addLegend\": true,\n    \"legendPosition\": \"right\",\n    \"scale\": \"linear\",\n    \"interpolate\": \"linear\",\n    \"mode\": \"percentage\",\n    \"times\": [],\n    \"addTimeMarker\": false,\n    \"defaultYExtents\": false,\n    \"setYExtents\": true,\n    \"yAxis\": {\n      \"max\": 100,\n      \"min\": 0\n    }\n  },\n  \"aggs\": [\n    {\n      \"id\": \"1\",\n      \"enabled\": true,\n      \"type\": \"count\",\n      \"schema\": \"metric\",\n      \"params\": {}\n    },\n    {\n      \"id\": \"2\",\n      \"enabled\": true,\n      \"type\": \"date_histogram\",\n      \"schema\": \"segment\",\n      \"params\": {\n        \"field\": \"@timestamp\",\n        \"interval\": \"auto\",\n        \"customInterval\": \"2h\",\n        \"min_doc_count\": 1,\n        \"extended_bounds\": {}\n      }\n    },\n    {\n      \"id\": \"3\",\n      \"enabled\": true,\n      \"type\": \"filters\",\n      \"schema\": \"group\",\n      \"params\": {\n        \"filters\": [\n          {\n            \"input\": {\n              \"query\": {\n                \"query_string\": {\n                  \"query\": \"monitor.status: down\",\n                  \"analyze_wildcard\": true\n                }\n              }\n            },\n            \"label\": \"\"\n          },\n          {\n            \"input\": {\n              \"query\": {\n                \"query_string\": {\n                  \"query\": \"monitor.status: up\",\n                  \"analyze_wildcard\": true\n                }\n              }\n            }\n          }\n        ]\n      }\n    }\n  ],\n  \"listeners\": {}\n}"
+        "visState": "{\"title\":\"HTTP up status\",\"type\":\"area\",\"params\":{\"addTooltip\":true,\"addLegend\":true,\"legendPosition\":\"right\",\"scale\":\"linear\",\"interpolate\":\"linear\",\"mode\":\"percentage\",\"times\":[],\"addTimeMarker\":false,\"defaultYExtents\":false,\"setYExtents\":true,\"yAxis\":{\"max\":100,\"min\":0},\"type\":\"area\",\"grid\":{\"categoryLines\":false,\"style\":{\"color\":\"#eee\"}},\"categoryAxes\":[{\"id\":\"CategoryAxis-1\",\"type\":\"category\",\"position\":\"bottom\",\"show\":true,\"style\":{},\"scale\":{\"type\":\"linear\"},\"labels\":{\"show\":true,\"truncate\":100},\"title\":{}}],\"valueAxes\":[{\"id\":\"ValueAxis-1\",\"name\":\"LeftAxis-1\",\"type\":\"value\",\"position\":\"left\",\"show\":true,\"style\":{},\"scale\":{\"type\":\"linear\",\"mode\":\"percentage\",\"setYExtents\":true,\"defaultYExtents\":false,\"min\":0,\"max\":100},\"labels\":{\"show\":true,\"rotate\":0,\"filter\":false,\"truncate\":100},\"title\":{\"text\":\"Percentage of Count\"}}],\"seriesParams\":[{\"show\":\"true\",\"type\":\"area\",\"mode\":\"stacked\",\"data\":{\"label\":\"Percentage of Count\",\"id\":\"1\"},\"interpolate\":\"linear\",\"valueAxis\":\"ValueAxis-1\"}]},\"aggs\":[{\"id\":\"1\",\"enabled\":true,\"type\":\"count\",\"schema\":\"metric\",\"params\":{}},{\"id\":\"2\",\"enabled\":true,\"type\":\"date_histogram\",\"schema\":\"segment\",\"params\":{\"field\":\"@timestamp\",\"interval\":\"auto\",\"customInterval\":\"2h\",\"min_doc_count\":1,\"extended_bounds\":{}}},{\"id\":\"3\",\"enabled\":true,\"type\":\"filters\",\"schema\":\"group\",\"params\":{\"filters\":[{\"input\":{\"query\":\"monitor.status: down\"},\"label\":\"\"},{\"input\":{\"query\":\"monitor.status: up\"}}]}}]}"
       },
       "id": "091c3a90-eb1e-11e6-be20-559646f8b9ba",
       "type": "visualization",
-      "version": 1
+      "version": 2
     },
     {
       "attributes": {
@@ -107,7 +107,7 @@
       },
       "id": "02014c80-29d2-11e7-a68f-bfaa2341cc52",
       "type": "search",
-      "version": 5
+      "version": 1
     },
     {
       "attributes": {
@@ -128,5 +128,5 @@
       "version": 1
     }
   ],
-  "version": "6.0.0-alpha3-SNAPSHOT"
+  "version": "6.0.0-SNAPSHOT"
 }
