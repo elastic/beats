@@ -141,7 +141,7 @@ func (smtp *smtpPlugin) Parse(
 	}
 
 	if conn.syncer.done {
-		err = st.parser.process(pkt.Ts)
+		err = st.parser.process(pkt.Ts, false)
 	} else {
 		err = conn.syncer.process(pkt.Ts, dir)
 	}

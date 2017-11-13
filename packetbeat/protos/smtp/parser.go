@@ -18,7 +18,6 @@ type parser struct {
 	config  *parserConfig
 	pub     *transPub
 	message *message
-	conn    *connection
 	state   parseState
 
 	onMessage func(m *message) error
@@ -49,9 +48,8 @@ type message struct {
 
 // Error code if stream exceeds max allowed size on append.
 var (
-	constCRLF    = []byte("\r\n")
-	constEOD     = []byte(".\r\n")
-	constEODSize = 3
+	constCRLF = []byte("\r\n")
+	constEOD  = []byte(".\r\n")
 	// Responses are at least len("XXX\r\n") in size
 	constMinRespSize  = 5
 	constRespCodeSize = 3
@@ -87,27 +85,37 @@ func (p *parser) append(data []byte) error {
 	return nil
 }
 
-func (p *parser) process(ts time.Time) error {
-	if p.message == nil {
-		// allocate new message object to be used by parser with current timestamp
-		p.message = p.newMessage(ts)
-	}
+// process parses message(s) from the stream.
+// If yield is set, parsing is driven by the syncer,
+// process will return after parsing a message.
+func (p *parser) process(ts time.Time, yield bool) error {
 
-	msg, err := p.parse()
-	if err != nil {
-		return err
-	}
-	if msg == nil {
-		return nil // wait for more data
-	}
+	for p.buf.Total() > 0 {
+		if p.message == nil {
+			// allocate new message object to be used by parser with current timestamp
+			p.message = p.newMessage(ts)
+		}
 
-	// remove processed bytes from buffer
-	p.buf.Reset()
-	p.message = nil
+		msg, err := p.parse()
+		if err != nil {
+			return err
+		}
+		if msg == nil {
+			return nil // wait for more data
+		}
 
-	// call message handler callback
-	if err := p.onMessage(msg); err != nil {
-		return err
+		// remove processed bytes from buffer
+		p.buf.Reset()
+		p.message = nil
+
+		// call message handler callback
+		if err := p.onMessage(msg); err != nil {
+			return err
+		}
+
+		if yield {
+			break
+		}
 	}
 
 	return nil
