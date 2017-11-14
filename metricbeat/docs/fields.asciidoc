@@ -33,6 +33,7 @@ grouped in the following categories:
 * <<exported-fields-kibana>>
 * <<exported-fields-kubernetes-processor>>
 * <<exported-fields-kubernetes>>
+* <<exported-fields-logstash>>
 * <<exported-fields-memcached>>
 * <<exported-fields-mongodb>>
 * <<exported-fields-mysql>>
@@ -6145,6 +6146,66 @@ Free inodes
 type: long
 
 Total inodes
+
+
+[[exported-fields-logstash]]
+== Logstash fields
+
+experimental[]
+Logstash module
+
+
+
+[float]
+== logstash fields
+
+
+
+
+[float]
+== node fields
+
+node
+
+
+
+[float]
+=== `logstash.node.host`
+
+type: keyword
+
+Host name
+
+
+[float]
+=== `logstash.node.version`
+
+type: keyword
+
+Logstash Version
+
+
+[float]
+== jvm fields
+
+JVM Info
+
+
+
+[float]
+=== `logstash.node.jvm.version`
+
+type: keyword
+
+Version
+
+
+[float]
+=== `logstash.node.jvm.pid`
+
+type: long
+
+Pid
 
 
 [[exported-fields-memcached]]

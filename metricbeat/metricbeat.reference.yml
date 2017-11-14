@@ -287,6 +287,14 @@ metricbeat.modules:
   metricsets:
     - event
 
+#------------------------------ Logstash Module ------------------------------
+- module: logstash
+  metricsets: ["node"]
+  enabled: false
+  period: 10s
+  hosts: ["localhost"]
+
+
 #------------------------------ Memcached Module -----------------------------
 - module: memcached
   metricsets: ["stats"]
