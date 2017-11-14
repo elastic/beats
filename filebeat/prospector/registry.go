@@ -10,9 +10,10 @@ import (
 )
 
 type Context struct {
-	States   []file.State
-	Done     chan struct{}
-	BeatDone chan struct{}
+	States        []file.State
+	Done          chan struct{}
+	BeatDone      chan struct{}
+	DynamicFields *common.MapStrPointer
 }
 
 type Factory func(config *common.Config, outletFactory channel.Factory, context Context) (Prospectorer, error)
