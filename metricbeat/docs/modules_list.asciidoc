@@ -18,6 +18,7 @@ This file is generated! See scripts/docs_collector.py
   * <<metricbeat-module-kafka,Kafka>>
   * <<metricbeat-module-kibana,Kibana>>
   * <<metricbeat-module-kubernetes,Kubernetes>>
+  * <<metricbeat-module-logstash,Logstash>>
   * <<metricbeat-module-memcached,Memcached>>
   * <<metricbeat-module-mongodb,MongoDB>>
   * <<metricbeat-module-mysql,MySQL>>
@@ -51,6 +52,7 @@ include::modules/jolokia.asciidoc[]
 include::modules/kafka.asciidoc[]
 include::modules/kibana.asciidoc[]
 include::modules/kubernetes.asciidoc[]
+include::modules/logstash.asciidoc[]
 include::modules/memcached.asciidoc[]
 include::modules/mongodb.asciidoc[]
 include::modules/mysql.asciidoc[]
