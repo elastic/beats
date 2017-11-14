@@ -44,6 +44,9 @@ import (
 	_ "github.com/elastic/beats/libbeat/processors/add_kubernetes_metadata"
 	_ "github.com/elastic/beats/libbeat/processors/add_locale"
 
+	// Register autodiscover providers
+	_ "github.com/elastic/beats/libbeat/autodiscover/providers/docker"
+
 	// Register default monitoring reporting
 	_ "github.com/elastic/beats/libbeat/monitoring/report/elasticsearch"
 )
