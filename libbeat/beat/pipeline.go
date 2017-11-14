@@ -34,6 +34,9 @@ type ClientConfig struct {
 	// Fields provides additional 'global' fields to be added to every event
 	Fields common.MapStr
 
+	// DynamicFields provides additional fields to be added to every event, supporting live updates
+	DynamicFields *common.MapStrPointer
+
 	// Processors passes additional processor to the client, to be executed before
 	// the pipeline processors.
 	Processor ProcessorList

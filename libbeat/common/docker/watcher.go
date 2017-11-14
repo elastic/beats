@@ -1,4 +1,4 @@
-package add_docker_metadata
+package docker
 
 import (
 	"fmt"
@@ -13,6 +13,7 @@ import (
 	"github.com/docker/go-connections/tlsconfig"
 	"golang.org/x/net/context"
 
+	"github.com/elastic/beats/libbeat/common/bus"
 	"github.com/elastic/beats/libbeat/logp"
 )
 
@@ -32,6 +33,19 @@ type Watcher interface {
 
 	// Containers returns the list of known containers
 	Containers() map[string]*Container
+
+	// ListenStart returns a bus listener to receive container started events, with a `container` key holding it
+	ListenStart() bus.Listener
+
+	// ListenStop returns a bus listener to receive container stopped events, with a `container` key holding it
+	ListenStop() bus.Listener
+}
+
+// TLSConfig for docker socket connection
+type TLSConfig struct {
+	CA          string `config:"certificate_authority"`
+	Certificate string `config:"certificate"`
+	Key         string `config:"key"`
 }
 
 type watcher struct {
@@ -44,14 +58,17 @@ type watcher struct {
 	cleanupTimeout     time.Duration
 	lastValidTimestamp int64
 	stopped            sync.WaitGroup
+	bus                bus.Bus
 }
 
 // Container info retrieved by the watcher
 type Container struct {
-	ID     string
-	Name   string
-	Image  string
-	Labels map[string]string
+	ID          string
+	Name        string
+	Image       string
+	Labels      map[string]string
+	IPAddresses []string
+	Ports       []types.Port
 }
 
 // Client for docker interface
@@ -101,6 +118,7 @@ func NewWatcherWithClient(client Client, cleanupTimeout time.Duration) (*watcher
 		containers:     make(map[string]*Container),
 		deleted:        make(map[string]time.Time),
 		cleanupTimeout: cleanupTimeout,
+		bus:            bus.New("docker"),
 	}, nil
 }
 
@@ -140,19 +158,24 @@ func (w *watcher) Start() error {
 
 	w.Lock()
 	defer w.Unlock()
-	containers, err := w.client.ContainerList(w.ctx, types.ContainerListOptions{})
+	containers, err := w.listContainers(types.ContainerListOptions{})
 	if err != nil {
 		return err
 	}
 
 	for _, c := range containers {
-		w.containers[c.ID] = &Container{
-			ID:     c.ID,
-			Name:   c.Names[0][1:], // Strip '/' from container names
-			Image:  c.Image,
-			Labels: c.Labels,
-		}
+		w.containers[c.ID] = c
 	}
+
+	// Emit all start events (avoid blocking if the bus get's blocked)
+	go func() {
+		for _, c := range containers {
+			w.bus.Publish(bus.Event{
+				"start":     true,
+				"container": c,
+			})
+		}
+	}()
 
 	w.stopped.Add(2)
 	go w.watch()
@@ -166,12 +189,12 @@ func (w *watcher) Stop() {
 }
 
 func (w *watcher) watch() {
-	filters := filters.NewArgs()
-	filters.Add("type", "container")
+	filter := filters.NewArgs()
+	filter.Add("type", "container")
 
 	options := types.EventsOptions{
 		Since:   fmt.Sprintf("%d", w.lastValidTimestamp),
-		Filters: filters,
+		Filters: filter,
 	}
 
 	for {
@@ -186,26 +209,40 @@ func (w *watcher) watch() {
 
 				// Add / update
 				if event.Action == "start" || event.Action == "update" {
-					name := event.Actor.Attributes["name"]
-					image := event.Actor.Attributes["image"]
-					delete(event.Actor.Attributes, "name")
-					delete(event.Actor.Attributes, "image")
+					filter := filters.NewArgs()
+					filter.Add("id", event.Actor.ID)
+
+					containers, err := w.listContainers(types.ContainerListOptions{
+						Filters: filter,
+					})
+					if err != nil || len(containers) != 1 {
+						logp.Err("Error getting container info: %v", err)
+						continue
+					}
+					container := containers[0]
 
 					w.Lock()
-					w.containers[event.Actor.ID] = &Container{
-						ID:     event.Actor.ID,
-						Name:   name,
-						Image:  image,
-						Labels: event.Actor.Attributes,
-					}
-
+					w.containers[event.Actor.ID] = container
 					// un-delete if it's flagged (in case of update or recreation)
 					delete(w.deleted, event.Actor.ID)
 					w.Unlock()
+
+					w.bus.Publish(bus.Event{
+						"start":     true,
+						"container": container,
+					})
 				}
 
 				// Delete
-				if event.Action == "die" || event.Action == "kill" {
+				if event.Action == "die" {
+					container := w.Container(event.Actor.ID)
+					if container != nil {
+						w.bus.Publish(bus.Event{
+							"stop":      true,
+							"container": container,
+						})
+					}
+
 					w.Lock()
 					w.deleted[event.Actor.ID] = time.Now()
 					w.Unlock()
@@ -224,6 +261,31 @@ func (w *watcher) watch() {
 			}
 		}
 	}
+}
+
+func (w *watcher) listContainers(options types.ContainerListOptions) ([]*Container, error) {
+	containers, err := w.client.ContainerList(w.ctx, options)
+	if err != nil {
+		return nil, err
+	}
+
+	var result []*Container
+	for _, c := range containers {
+		var ipaddresses []string
+		for _, net := range c.NetworkSettings.Networks {
+			ipaddresses = append(ipaddresses, net.IPAddress)
+		}
+		result = append(result, &Container{
+			ID:          c.ID,
+			Name:        c.Names[0][1:], // Strip '/' from container names
+			Image:       c.Image,
+			Labels:      c.Labels,
+			Ports:       c.Ports,
+			IPAddresses: ipaddresses,
+		})
+	}
+
+	return result, nil
 }
 
 // Clean up deleted containers after they are not used anymore
@@ -250,6 +312,16 @@ func (w *watcher) cleanupWorker() {
 			w.RUnlock()
 
 			// Delete timed out entries:
+			for _, key := range toDelete {
+				container := w.Container(key)
+				if container != nil {
+					w.bus.Publish(bus.Event{
+						"delete":    true,
+						"container": container,
+					})
+				}
+			}
+
 			w.Lock()
 			for _, key := range toDelete {
 				delete(w.deleted, key)
@@ -258,4 +330,14 @@ func (w *watcher) cleanupWorker() {
 			w.Unlock()
 		}
 	}
+}
+
+// ListenStart returns a bus listener to receive container started events, with a `container` key holding it
+func (w *watcher) ListenStart() bus.Listener {
+	return w.bus.Subscribe("start")
+}
+
+// ListenStop returns a bus listener to receive container stopped events, with a `container` key holding it
+func (w *watcher) ListenStop() bus.Listener {
+	return w.bus.Subscribe("stop")
 }
