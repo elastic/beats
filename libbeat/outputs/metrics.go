@@ -26,8 +26,8 @@ type Stats struct {
 	readErrors *monitoring.Uint // total number of errors while waiting for response on output
 }
 
-func MakeStats(reg *monitoring.Registry) Stats {
-	return Stats{
+func NewStats(reg *monitoring.Registry) *Stats {
+	return &Stats{
 		batches: monitoring.NewUint(reg, "events.batches"),
 		events:  monitoring.NewUint(reg, "events.total"),
 		acked:   monitoring.NewUint(reg, "events.acked"),
@@ -77,7 +77,7 @@ func (s *Stats) Cancelled(n int) {
 	}
 }
 
-func (s *Stats) WriteError() {
+func (s *Stats) WriteError(err error) {
 	if s != nil {
 		s.writeErrors.Inc()
 	}
@@ -89,7 +89,7 @@ func (s *Stats) WriteBytes(n int) {
 	}
 }
 
-func (s *Stats) ReadError() {
+func (s *Stats) ReadError(err error) {
 	if s != nil {
 		s.readErrors.Inc()
 	}
