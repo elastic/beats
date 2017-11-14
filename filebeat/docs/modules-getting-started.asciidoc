@@ -61,13 +61,12 @@ the sample dashboards for visualizing the data in Kibana. For example:
 ./filebeat setup -e
 ----------------------------------------------------------------------
 +
-The value that you pass with the `--modules` flag is a comma-separated list of
-modules that you want to set up. The `-e` flag is optional and sends output
-to standard error instead of syslog.
+The `-e` flag is optional and sends output to standard error instead of syslog.
 
-. Start Filebeat and use the `--modules` flag to specify the list of modules
-you want to run. The following example starts Filebeat with the `system` module
-enabled (it's assumed that you've already loaded the sample dashboards):
+. Start Filebeat and use the `--modules` flag to specify a comma-separated list
+of modules you want to run. The following example starts Filebeat with the
+`system` module enabled (it's assumed that you've already loaded the sample
+dashboards):
 +
 [source,shell]
 ----------------------------------------------------------------------
