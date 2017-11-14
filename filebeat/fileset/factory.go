@@ -110,6 +110,3 @@ func (p *prospectorsRunner) Stop() {
 		prospector.Stop()
 	}
 }
-func (p *prospectorsRunner) ID() uint64 {
-	return p.id
-}
