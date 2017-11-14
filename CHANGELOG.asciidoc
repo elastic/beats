@@ -94,6 +94,7 @@ https://github.com/elastic/beats/compare/v6.0.0-beta2...master[Check the HEAD di
 - Refactor add_kubernetes_metadata to support autodiscovery {pull}5434[5434]
 - Improve custom flag handling and CLI flags usage message. {pull}5543[5543]
 - Update to Golang 1.9.2
+- Add number_of_routing_shards config set to 30 {pull}5570[5570]
 
 *Auditbeat*
 
