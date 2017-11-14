@@ -28,6 +28,8 @@ https://github.com/elastic/beats/compare/v5.6.4...5.6[Check the HEAD diff]
 
 *Affecting all Beats*
 
+- Fix duplicate batches of events in retry queue. {pull}5520[5520]
+
 *Filebeat*
 
 *Heartbeat*
