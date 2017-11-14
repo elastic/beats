@@ -108,6 +108,7 @@ https://github.com/elastic/beats/compare/v6.0.0-beta2...master[Check the HEAD di
 - Remove error log from runnerfactory as error is returned by API. {pull}5085[5085]
 - Add Kubernetes manifests to deploy Filebeat. {pull}5349[5349]
 - Add experimental Docker `json-file` prospector . {pull}5402[5402]
+- Add experimental Docker autodiscover functionality. {pull}5245[5245]
 
 *Heartbeat*
 
