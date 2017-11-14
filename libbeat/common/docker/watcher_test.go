@@ -1,4 +1,4 @@
-package add_docker_metadata
+package docker
 
 import (
 	"testing"
@@ -12,7 +12,7 @@ import (
 
 type MockClient struct {
 	// containers to return on ContainerList call
-	containers []types.Container
+	containers [][]types.Container
 	// event list to send on Events call
 	events []interface{}
 
@@ -20,7 +20,9 @@ type MockClient struct {
 }
 
 func (m *MockClient) ContainerList(ctx context.Context, options types.ContainerListOptions) ([]types.Container, error) {
-	return m.containers, nil
+	res := m.containers[0]
+	m.containers = m.containers[1:]
+	return res, nil
 }
 
 func (m *MockClient) Events(ctx context.Context, options types.EventsOptions) (<-chan events.Message, <-chan error) {
@@ -44,18 +46,22 @@ func (m *MockClient) Events(ctx context.Context, options types.EventsOptions) (<
 
 func TestWatcherInitialization(t *testing.T) {
 	watcher := runWatcher(t, true,
-		[]types.Container{
-			types.Container{
-				ID:     "0332dbd79e20",
-				Names:  []string{"/containername", "othername"},
-				Image:  "busybox",
-				Labels: map[string]string{"foo": "bar"},
-			},
-			types.Container{
-				ID:     "6ac6ee8df5d4",
-				Names:  []string{"/other"},
-				Image:  "nginx",
-				Labels: map[string]string{},
+		[][]types.Container{
+			[]types.Container{
+				types.Container{
+					ID:              "0332dbd79e20",
+					Names:           []string{"/containername", "othername"},
+					Image:           "busybox",
+					Labels:          map[string]string{"foo": "bar"},
+					NetworkSettings: &types.SummaryNetworkSettings{},
+				},
+				types.Container{
+					ID:              "6ac6ee8df5d4",
+					Names:           []string{"/other"},
+					Image:           "nginx",
+					Labels:          map[string]string{},
+					NetworkSettings: &types.SummaryNetworkSettings{},
+				},
 			},
 		},
 		nil)
@@ -78,12 +84,24 @@ func TestWatcherInitialization(t *testing.T) {
 
 func TestWatcherAddEvents(t *testing.T) {
 	watcher := runWatcher(t, true,
-		[]types.Container{
-			types.Container{
-				ID:     "0332dbd79e20",
-				Names:  []string{"/containername", "othername"},
-				Image:  "busybox",
-				Labels: map[string]string{"foo": "bar"},
+		[][]types.Container{
+			[]types.Container{
+				types.Container{
+					ID:              "0332dbd79e20",
+					Names:           []string{"/containername", "othername"},
+					Image:           "busybox",
+					Labels:          map[string]string{"foo": "bar"},
+					NetworkSettings: &types.SummaryNetworkSettings{},
+				},
+			},
+			[]types.Container{
+				types.Container{
+					ID:              "6ac6ee8df5d4",
+					Names:           []string{"/other"},
+					Image:           "nginx",
+					Labels:          map[string]string{"label": "value"},
+					NetworkSettings: &types.SummaryNetworkSettings{},
+				},
 			},
 		},
 		[]interface{}{
@@ -119,12 +137,24 @@ func TestWatcherAddEvents(t *testing.T) {
 
 func TestWatcherUpdateEvent(t *testing.T) {
 	watcher := runWatcher(t, true,
-		[]types.Container{
-			types.Container{
-				ID:     "0332dbd79e20",
-				Names:  []string{"/containername", "othername"},
-				Image:  "busybox",
-				Labels: map[string]string{"label": "foo"},
+		[][]types.Container{
+			[]types.Container{
+				types.Container{
+					ID:              "0332dbd79e20",
+					Names:           []string{"/containername", "othername"},
+					Image:           "busybox",
+					Labels:          map[string]string{"label": "foo"},
+					NetworkSettings: &types.SummaryNetworkSettings{},
+				},
+			},
+			[]types.Container{
+				types.Container{
+					ID:              "0332dbd79e20",
+					Names:           []string{"/containername", "othername"},
+					Image:           "busybox",
+					Labels:          map[string]string{"label": "bar"},
+					NetworkSettings: &types.SummaryNetworkSettings{},
+				},
 			},
 		},
 		[]interface{}{
@@ -153,19 +183,22 @@ func TestWatcherUpdateEvent(t *testing.T) {
 	assert.Equal(t, len(watcher.deleted), 0)
 }
 
-func TestWatcherKill(t *testing.T) {
+func TestWatcherDie(t *testing.T) {
 	watcher := runWatcher(t, false,
-		[]types.Container{
-			types.Container{
-				ID:     "0332dbd79e20",
-				Names:  []string{"/containername", "othername"},
-				Image:  "busybox",
-				Labels: map[string]string{"label": "foo"},
+		[][]types.Container{
+			[]types.Container{
+				types.Container{
+					ID:              "0332dbd79e20",
+					Names:           []string{"/containername", "othername"},
+					Image:           "busybox",
+					Labels:          map[string]string{"label": "foo"},
+					NetworkSettings: &types.SummaryNetworkSettings{},
+				},
 			},
 		},
 		[]interface{}{
 			events.Message{
-				Action: "kill",
+				Action: "die",
 				Actor: events.Actor{
 					ID: "0332dbd79e20",
 				},
@@ -185,7 +218,7 @@ func TestWatcherKill(t *testing.T) {
 	assert.Equal(t, len(watcher.Containers()), 0)
 }
 
-func runWatcher(t *testing.T, kill bool, containers []types.Container, events []interface{}) *watcher {
+func runWatcher(t *testing.T, kill bool, containers [][]types.Container, events []interface{}) *watcher {
 	client := &MockClient{
 		containers: containers,
 		events:     events,
