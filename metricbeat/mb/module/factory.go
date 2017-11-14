@@ -27,14 +27,14 @@ func NewFactory(maxStartDelay time.Duration, p beat.Pipeline) *Factory {
 	}
 }
 
-func (r *Factory) Create(c *common.Config) (cfgfile.Runner, error) {
+func (r *Factory) Create(c *common.Config, meta *common.MapStrPointer) (cfgfile.Runner, error) {
 	var errs multierror.Errors
 
 	err := cfgwarn.CheckRemoved5xSettings(c, "filters")
 	if err != nil {
 		errs = append(errs, err)
 	}
-	connector, err := NewConnector(r.pipeline, c)
+	connector, err := NewConnector(r.pipeline, c, meta)
 	if err != nil {
 		errs = append(errs, err)
 	}

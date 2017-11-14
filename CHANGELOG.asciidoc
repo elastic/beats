@@ -127,6 +127,7 @@ https://github.com/elastic/beats/compare/v6.0.0-beta2...master[Check the HEAD di
 - Add ceph osd tree infomation to metricbeat {pull}5498[5498]
 - Add basic Logstash module. {pull}5540[5540]
 - Add dashboard for Windows service metricset. {pull}5603[5603]
+- Add experimental Docker autodiscover functionality. {pull}5245[5245]
 
 *Packetbeat*
 
