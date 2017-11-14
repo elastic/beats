@@ -1,8 +1,6 @@
 [[filebeat-modules-overview]]
 == Modules overview
 
-beta[]
-
 Filebeat modules simplify the collection, parsing, and visualization of common
 log formats.
 
