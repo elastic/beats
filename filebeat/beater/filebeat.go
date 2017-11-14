@@ -7,6 +7,7 @@ import (
 	"github.com/joeshaw/multierror"
 	"github.com/pkg/errors"
 
+	"github.com/elastic/beats/libbeat/autodiscover"
 	"github.com/elastic/beats/libbeat/beat"
 	"github.com/elastic/beats/libbeat/cfgfile"
 	"github.com/elastic/beats/libbeat/common"
@@ -81,7 +82,7 @@ func New(b *beat.Beat, rawConfig *common.Config) (beat.Beater, error) {
 		}
 	}
 
-	if !config.ConfigProspector.Enabled() && !config.ConfigModules.Enabled() && !haveEnabledProspectors {
+	if !config.ConfigProspector.Enabled() && !config.ConfigModules.Enabled() && !haveEnabledProspectors && config.Autodiscover == nil {
 		if !b.InSetupCmd {
 			return nil, errors.New("No modules or prospectors enabled and configuration reloading disabled. What files do you want me to watch?")
 		}
@@ -276,14 +277,25 @@ func (fb *Filebeat) Run(b *beat.Beat) error {
 		waitFinished.Add(runOnce)
 	}
 
+	var adiscover *autodiscover.Autodiscover
+	if fb.config.Autodiscover != nil {
+		adapter := NewAutodiscoverAdapter(crawler.ProspectorsFactory, crawler.ModulesFactory)
+		adiscover, err = autodiscover.NewAutodiscover("filebeat", adapter, config.Autodiscover)
+		if err != nil {
+			return err
+		}
+	}
+	adiscover.Start()
+
 	// Add done channel to wait for shutdown signal
 	waitFinished.AddChan(fb.done)
 	waitFinished.Wait()
 
-	// Stop crawler -> stop prospectors -> stop harvesters
+	// Stop autodiscover -> Stop crawler -> stop prospectors -> stop harvesters
 	// Note: waiting for crawlers to stop here in order to install wgEvents.Wait
 	//       after all events have been enqueued for publishing. Otherwise wgEvents.Wait
 	//       or publisher might panic due to concurrent updates.
+	adiscover.Stop()
 	crawler.Stop()
 
 	timeout := fb.config.ShutdownTimeout

@@ -62,7 +62,7 @@ func NewProspector(
 	//  The outlet generated here is the underlying outlet, only closed
 	//  once all workers have been shut down.
 	//  For state updates and events, separate sub-outlets will be used.
-	out, err := outlet(cfg)
+	out, err := outlet(cfg, context.DynamicFields)
 	if err != nil {
 		return nil, err
 	}
