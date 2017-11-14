@@ -24,6 +24,7 @@ import (
 	"github.com/elastic/beats/libbeat/common/file"
 	"github.com/elastic/beats/libbeat/dashboards"
 	"github.com/elastic/beats/libbeat/logp"
+	"github.com/elastic/beats/libbeat/monitoring"
 	"github.com/elastic/beats/libbeat/monitoring/report"
 	"github.com/elastic/beats/libbeat/outputs/elasticsearch"
 	"github.com/elastic/beats/libbeat/paths"
@@ -203,8 +204,13 @@ func (b *Beat) createBeater(bt beat.Creator) (beat.Beater, error) {
 		return nil, err
 	}
 
+	reg := monitoring.Default.GetRegistry("libbeat")
+	if reg == nil {
+		reg = monitoring.Default.NewRegistry("libbeat")
+	}
+
 	debugf("Initializing output plugins")
-	pipeline, err := pipeline.Load(b.Info, b.Config.Pipeline, b.Config.Output)
+	pipeline, err := pipeline.Load(b.Info, reg, b.Config.Pipeline, b.Config.Output)
 	if err != nil {
 		return nil, fmt.Errorf("error initializing publisher: %v", err)
 	}
