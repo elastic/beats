@@ -37,6 +37,7 @@ The following topics describe how to configure Packetbeat:
 * <<configuration-logging>>
 * <<using-environ-vars>>
 * <<yaml-tips>>
+* <<{beatname_lc}-reference-yml>>
 
 --
 
