@@ -7,6 +7,8 @@ RUN set -x && \
          netcat python-pip virtualenv && \
     apt-get clean
 
+RUN pip install --upgrade setuptools
+
 # Setup work environment
 ENV METRICBEAT_PATH /go/src/github.com/elastic/beats/metricbeat
 
