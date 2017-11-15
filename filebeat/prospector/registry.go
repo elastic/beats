@@ -39,7 +39,7 @@ func Register(name string, factory Factory) error {
 
 func GetFactory(name string) (Factory, error) {
 	if _, exists := registry[name]; !exists {
-		return nil, fmt.Errorf("Error retrieving factory for prospector '%v'", name)
+		return nil, fmt.Errorf("Error creating prospector. No such prospector type exist: '%v'", name)
 	}
 	return registry[name], nil
 }

@@ -138,11 +138,6 @@ func (c *config) Validate() error {
 	}
 
 	// Harvester
-	// Check input type
-	if _, ok := harvester.ValidType[c.Type]; !ok {
-		return fmt.Errorf("Invalid input type: %v", c.Type)
-	}
-
 	if c.JSON != nil && len(c.JSON.MessageKey) == 0 &&
 		c.Multiline != nil {
 		return fmt.Errorf("When using the JSON decoder and multiline together, you need to specify a message_key value")
