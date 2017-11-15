@@ -16,6 +16,10 @@ type emptyObserver struct{}
 
 var nilObserver = (*emptyObserver)(nil)
 
+func NewNilObserver() Observer {
+	return nilObserver
+}
+
 func (*emptyObserver) NewBatch(int)     {}
 func (*emptyObserver) Acked(int)        {}
 func (*emptyObserver) Failed(int)       {}

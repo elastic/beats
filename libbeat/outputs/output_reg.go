@@ -49,7 +49,7 @@ func Load(info beat.Info, stats Observer, name string, config *common.Config) (G
 	}
 
 	if stats == nil {
-		stats = nilObserver
+		stats = NewNilObserver()
 	}
 	return factory(info, stats, config)
 }
