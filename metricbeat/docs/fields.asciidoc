@@ -2946,7 +2946,7 @@ format: bytes
 [[exported-fields-etcd]]
 == Etcd fields
 
-[]experimental
+experimental[]
 etcd Module
 
 
@@ -3486,7 +3486,7 @@ Bytes in non-idle span.
 [[exported-fields-graphite]]
 == graphite fields
 
-[]experimental
+experimental[]
 graphite Module
 
 
