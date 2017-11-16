@@ -41,17 +41,16 @@ func TestPipeline(t *testing.T) {
 
 	// TODO: if verbose, enable logging
 
-	onErr := func(err error) {
-		t.Error(err)
-	}
-
-	t.Parallel()
 	configTest(t, "gen", genConfigs, func(t *testing.T, gen string) {
 		configTest(t, "pipeline", pipelineConfigs, func(t *testing.T, pipeline string) {
 			configTest(t, "out", outConfigs, func(t *testing.T, out string) {
 				config, err := common.LoadFiles(gen, pipeline, out)
 				if err != nil {
 					t.Fatal(err)
+				}
+
+				onErr := func(err error) {
+					t.Error(err)
 				}
 
 				if err := RunTests(info, duration, config, onErr); err != nil {
