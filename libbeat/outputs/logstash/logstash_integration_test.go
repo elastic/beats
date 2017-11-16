@@ -158,7 +158,7 @@ func newTestElasticsearchOutput(t *testing.T, test string) *testOutputer {
 		"template.enabled": false,
 	})
 
-	grp, err := plugin(beat.Info{Beat: "libbeat"}, nil, config)
+	grp, err := plugin(beat.Info{Beat: "libbeat"}, outputs.NewNilObserver(), config)
 	if err != nil {
 		t.Fatalf("init elasticsearch output plugin failed: %v", err)
 	}

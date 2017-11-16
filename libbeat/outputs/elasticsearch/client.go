@@ -40,7 +40,7 @@ type Client struct {
 	compressionLevel int
 	proxyURL         *url.URL
 
-	stats *outputs.Stats
+	observer outputs.Observer
 }
 
 // ClientSettings contains the settings for a client.
@@ -55,7 +55,7 @@ type ClientSettings struct {
 	Pipeline           *outil.Selector
 	Timeout            time.Duration
 	CompressionLevel   int
-	Stats              *outputs.Stats
+	Observer           outputs.Observer
 }
 
 type connectCallback func(client *Client) error
@@ -131,7 +131,7 @@ func NewClient(
 		return nil, err
 	}
 
-	if st := s.Stats; st != nil {
+	if st := s.Observer; st != nil {
 		dialer = transport.StatsDialer(dialer, st)
 		tlsDialer = transport.StatsDialer(tlsDialer, st)
 	}
@@ -243,7 +243,7 @@ func (client *Client) publishEvents(
 	data []publisher.Event,
 ) ([]publisher.Event, error) {
 	begin := time.Now()
-	st := client.stats
+	st := client.observer
 
 	if st != nil {
 		st.NewBatch(len(data))
@@ -291,7 +291,7 @@ func (client *Client) publishEvents(
 	}
 
 	failed := len(failedEvents)
-	if st := client.stats; st != nil {
+	if st := client.observer; st != nil {
 		acked := len(data) - failed
 
 		st.Acked(acked)

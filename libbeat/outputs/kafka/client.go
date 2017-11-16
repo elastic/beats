@@ -16,13 +16,13 @@ import (
 )
 
 type client struct {
-	stats  *outputs.Stats
-	hosts  []string
-	topic  outil.Selector
-	key    *fmtstr.EventFormatString
-	index  string
-	codec  codec.Codec
-	config sarama.Config
+	observer outputs.Observer
+	hosts    []string
+	topic    outil.Selector
+	key      *fmtstr.EventFormatString
+	index    string
+	codec    codec.Codec
+	config   sarama.Config
 
 	producer sarama.AsyncProducer
 
@@ -40,7 +40,7 @@ type msgRef struct {
 }
 
 func newKafkaClient(
-	stats *outputs.Stats,
+	observer outputs.Observer,
 	hosts []string,
 	index string,
 	key *fmtstr.EventFormatString,
@@ -49,13 +49,13 @@ func newKafkaClient(
 	cfg *sarama.Config,
 ) (*client, error) {
 	c := &client{
-		stats:  stats,
-		hosts:  hosts,
-		topic:  topic,
-		key:    key,
-		index:  index,
-		codec:  writer,
-		config: *cfg,
+		observer: observer,
+		hosts:    hosts,
+		topic:    topic,
+		key:      key,
+		index:    index,
+		codec:    writer,
+		config:   *cfg,
 	}
 	return c, nil
 }
@@ -90,7 +90,7 @@ func (c *client) Close() error {
 
 func (c *client) Publish(batch publisher.Batch) error {
 	events := batch.Events()
-	c.stats.NewBatch(len(events))
+	c.observer.NewBatch(len(events))
 
 	ref := &msgRef{
 		client: c,
@@ -107,7 +107,7 @@ func (c *client) Publish(batch publisher.Batch) error {
 		if err != nil {
 			logp.Err("Dropping event: %v", err)
 			ref.done()
-			c.stats.Dropped(1)
+			c.observer.Dropped(1)
 			continue
 		}
 
@@ -218,7 +218,7 @@ func (r *msgRef) dec() {
 	}
 
 	debugf("finished kafka batch")
-	stats := r.client.stats
+	stats := r.client.observer
 
 	err := r.err
 	if err != nil {
