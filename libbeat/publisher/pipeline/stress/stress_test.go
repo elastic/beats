@@ -1,3 +1,5 @@
+// +build stresstest
+
 package stress
 
 import (
