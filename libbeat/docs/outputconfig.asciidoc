@@ -223,7 +223,11 @@ output.elasticsearch:
   pipeline: my_pipeline_id
 ------------------------------------------------------------------------------
 
+ifeval::["{beatname_lc}"!="metricbeat"]
+
 For more information, see <<configuring-ingest-node>>.
+
+endif::[]
 
 ===== `pipelines`
 
