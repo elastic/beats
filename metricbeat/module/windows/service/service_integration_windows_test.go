@@ -33,5 +33,7 @@ func TestReadService(t *testing.T) {
 		t.Fatal(err)
 	}
 
-	t.Log(services)
+	for _, s := range services {
+		t.Log(s)
+	}
 }
