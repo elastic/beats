@@ -15,11 +15,12 @@ RUN mkdir -p ${KAFKA_LOGS_DIR} && mkdir -p ${KAFKA_HOME} && curl -s -o $INSTALL_
     tar xzf ${INSTALL_DIR}/kafka.tgz -C ${KAFKA_HOME} --strip-components 1
 
 ADD run.sh /run.sh
+ADD healthcheck.sh /healthcheck.sh
 
 EXPOSE 9092
 EXPOSE 2181
 
 # Healtcheck creates an empty topic foo. As soon as a topic is created, it assumes broke is available
-HEALTHCHECK --interval=1s --retries=90 CMD ${KAFKA_HOME}/bin/kafka-topics.sh --zookeeper=127.0.0.1:2181 --create --partitions 1 --topic "foo" --replication-factor 1
+HEALTHCHECK --interval=1s --retries=90 CMD /healthcheck.sh
 
 ENTRYPOINT ["/run.sh"]
