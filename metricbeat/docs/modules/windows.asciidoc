@@ -5,6 +5,8 @@ This file is generated! See scripts/docs_collector.py
 [[metricbeat-module-windows]]
 == Windows module
 
+beta[]
+
 This is the Windows module.
 
 
