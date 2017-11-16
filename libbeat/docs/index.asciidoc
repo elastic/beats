@@ -21,6 +21,7 @@ include::{asciidoc-dir}/../../shared/attributes.asciidoc[]
 :LS-version: {stack-version}
 :Kibana-version: {stack-version}
 :dashboards: https://artifacts.elastic.co/downloads/beats/beats-dashboards/beats-dashboards-{stack-version}.zip
+:beatname_pkg: {beatname_lc}
 
 include::./overview.asciidoc[]
 
