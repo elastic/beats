@@ -83,6 +83,9 @@ type config struct {
 	MaxBytes     int                     `config:"max_bytes" validate:"min=0,nonzero"`
 	Multiline    *reader.MultilineConfig `config:"multiline"`
 	JSON         *reader.JSONConfig      `config:"json"`
+
+	// Hidden on purpose, used by the docker prospector:
+	DockerJSON bool `config:"docker-json"`
 }
 
 type LogConfig struct {
