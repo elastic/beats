@@ -27,6 +27,7 @@ import (
 //sys _EnumServicesStatusEx(handle ServiceDatabaseHandle, infoLevel ServiceInfoLevel, serviceType ServiceType, serviceState ServiceEnumState, services *byte, bufSize uint32, bytesNeeded *uint32, servicesReturned *uint32, resumeHandle *uintptr, groupName *uintptr) (err error) [failretval==0] = advapi32.EnumServicesStatusExW
 //sys _OpenService(handle ServiceDatabaseHandle, serviceName *uint16, desiredAccess ServiceAccessRight) (serviceHandle ServiceHandle, err error) = advapi32.OpenServiceW
 //sys _QueryServiceConfig(serviceHandle ServiceHandle, serviceConfig *byte, bufSize uint32, bytesNeeded *uint32) (err error) [failretval==0] = advapi32.QueryServiceConfigW
+//sys _QueryServiceConfig2(serviceHandle ServiceHandle, infoLevel ServiceConfigInformation, configBuffer *byte, bufSize uint32, bytesNeeded *uint32) (err error) [failretval==0] = advapi32.QueryServiceConfig2W
 //sys _CloseServiceHandle(handle uintptr) (err error) = advapi32.CloseServiceHandle
 
 var (
@@ -38,6 +39,16 @@ type ServiceDatabaseHandle uintptr
 type ServiceHandle uintptr
 
 type ProcessHandle uintptr
+
+type serviceDelayedAutoStartInfo struct {
+	delayedAutoStart bool
+}
+
+type serviceTriggerInfo struct {
+	cTriggers uint32
+	pTriggers uintptr
+	pReserved uintptr
+}
 
 var serviceStates = map[ServiceState]string{
 	ServiceContinuePending: "Continuing",
@@ -135,6 +146,34 @@ func OpenService(handle ServiceDatabaseHandle, serviceName string, desiredAccess
 	return serviceHandle, nil
 }
 
+func QueryServiceConfig2(serviceHandle ServiceHandle, infoLevel ServiceConfigInformation) ([]byte, error) {
+	var serviceBufSize uint32
+	var serviceBytesNeeded uint32
+
+	if err := _QueryServiceConfig2(serviceHandle, infoLevel, nil, serviceBufSize, &serviceBytesNeeded); err != nil {
+		if ServiceErrno(err.(syscall.Errno)) != SERVICE_ERROR_INSUFFICIENT_BUFFER {
+			err := CloseServiceHandle(serviceHandle)
+			return nil, err
+		}
+		serviceBufSize += serviceBytesNeeded
+		buffer := make([]byte, serviceBufSize)
+
+		for {
+			if err := _QueryServiceConfig2(serviceHandle, infoLevel, &buffer[0], serviceBufSize, &serviceBytesNeeded); err != nil {
+				if ServiceErrno(err.(syscall.Errno)) != SERVICE_ERROR_INSUFFICIENT_BUFFER {
+					err := CloseServiceHandle(serviceHandle)
+					return nil, err
+				}
+				serviceBufSize += serviceBytesNeeded
+			} else {
+				return buffer, nil
+			}
+		}
+	}
+
+	return nil, nil
+}
+
 func getServiceStates(handle ServiceDatabaseHandle, state ServiceEnumState) ([]ServiceStatus, error) {
 	var servicesReturned uint32
 	var servicesBuffer []byte
@@ -216,8 +255,22 @@ func getServiceInformation(rawService *EnumServiceStatusProcess, servicesBuffer 
 		service.ExitCode = rawService.ServiceStatusProcess.DwServiceSpecificExitCode
 	}
 
+	serviceHandle, err := OpenService(handle, service.ServiceName, ServiceQueryConfig)
+	if err != nil {
+		return service, err
+	}
+
 	// Get detailed information
-	if err := getDetailedServiceInfo(handle, service.ServiceName, ServiceQueryConfig, &service); err != nil {
+	if err := getAdditionalServiceInfo(serviceHandle, &service); err != nil {
+		return service, err
+	}
+
+	// Get optional information
+	if err := getOptionalServiceInfo(serviceHandle, &service); err != nil {
+		return service, err
+	}
+
+	if err := CloseServiceHandle(serviceHandle); err != nil {
 		return service, err
 	}
 
@@ -247,14 +300,9 @@ func getServiceUptime(processID uint32) (time.Duration, error) {
 	return uptime, nil
 }
 
-func getDetailedServiceInfo(handle ServiceDatabaseHandle, serviceName string, accessRight ServiceAccessRight, service *ServiceStatus) error {
+func getAdditionalServiceInfo(serviceHandle ServiceHandle, service *ServiceStatus) error {
 	var serviceBufSize uint32
 	var serviceBytesNeeded uint32
-
-	serviceHandle, err := OpenService(handle, service.ServiceName, ServiceQueryConfig)
-	if err != nil {
-		return err
-	}
 
 	if err := _QueryServiceConfig(serviceHandle, nil, serviceBufSize, &serviceBytesNeeded); err != nil {
 		if ServiceErrno(err.(syscall.Errno)) != SERVICE_ERROR_INSUFFICIENT_BUFFER {
@@ -274,13 +322,50 @@ func getDetailedServiceInfo(handle ServiceDatabaseHandle, serviceName string, ac
 			} else {
 				serviceQueryConfig := (*QueryServiceConfig)(unsafe.Pointer(&buffer[0]))
 				service.StartType = serviceStartTypes[ServiceStartType(serviceQueryConfig.DwStartType)]
-				if err := CloseServiceHandle(serviceHandle); err != nil {
-					return err
-				}
 				break
 			}
 		}
 	}
+	return nil
+}
+
+func getOptionalServiceInfo(serviceHandle ServiceHandle, service *ServiceStatus) error {
+	// Get information if the service is started delayed or triggered. Only valid for automatic or manual services. So filter them first.
+	if service.StartType == "Automatic" || service.StartType == "Manual" {
+		var delayedInfo *serviceDelayedAutoStartInfo
+		if service.StartType == "Automatic" {
+			delayedInfoBuffer, err := QueryServiceConfig2(serviceHandle, ServiceConfigDelayedAutoStartInfo)
+			if err != nil {
+				return err
+			}
+
+			delayedInfo = (*serviceDelayedAutoStartInfo)(unsafe.Pointer(&delayedInfoBuffer[0]))
+		}
+
+		// Get information if the service is triggered.
+		triggeredInfoBuffer, err := QueryServiceConfig2(serviceHandle, ServiceConfigTriggerInfo)
+		if err != nil {
+			return err
+		}
+
+		triggeredInfo := (*serviceTriggerInfo)(unsafe.Pointer(&triggeredInfoBuffer[0]))
+
+		if service.StartType == "Automatic" {
+			if triggeredInfo.cTriggers > 0 && delayedInfo.delayedAutoStart {
+				service.StartType = "Automatic (Delayed, Triggered)"
+			} else if triggeredInfo.cTriggers > 0 {
+				service.StartType = "Automatic (Triggered)"
+			} else if delayedInfo.delayedAutoStart {
+				service.StartType = "Automatic (Delayed)"
+			}
+			return nil
+		}
+
+		if service.StartType == "Manual" && triggeredInfo.cTriggers > 0 {
+			service.StartType = "Manual (Triggered)"
+		}
+	}
+
 	return nil
 }
 
