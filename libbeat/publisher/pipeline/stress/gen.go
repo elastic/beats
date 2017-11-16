@@ -25,7 +25,7 @@ var defaultGenerateConfig = generateConfig{
 	ACK:       false,
 	MaxEvents: 0,
 	WaitClose: 0,
-	Watchdog:  200 * time.Millisecond,
+	Watchdog:  1 * time.Second,
 }
 
 var publishModes = map[string]beat.PublishMode{
