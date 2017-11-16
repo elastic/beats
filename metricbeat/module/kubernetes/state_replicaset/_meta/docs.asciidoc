@@ -1,3 +1,5 @@
 === Kubernetes state_replicaset metricset
 
+beta[]
+
 This is the `state_replicaset` metricset of the Kubernetes module.
