@@ -2,8 +2,6 @@
 
 == Redis module
 
-experimental[]
-
 The +{modulename}+ module parses logs and slowlogs created by
 https://redis.io/[Redis].
 
