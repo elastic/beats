@@ -18,6 +18,8 @@ https://github.com/elastic/beats/compare/v6.0.0-beta2...master[Check the HEAD di
 
 *Auditbeat*
 
+- Changed `audit.file.path` to be a multi-field so that path is searchable. {pull}nnnn[nnnn]
+
 *Filebeat*
 
 *Heartbeat*

@@ -62,6 +62,10 @@ def document_field(output, field, path):
         if not field["enable"]:
             output.write("{}\n\n".format("Object is not enabled."))
 
+    if "multi_fields" in field:
+        for subfield in field["multi_fields"]:
+            document_field(output, subfield, path + "." + subfield["name"])
+
 
 def fields_to_asciidoc(input, output, beat):
 
