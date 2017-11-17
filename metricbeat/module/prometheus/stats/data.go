@@ -2,8 +2,8 @@ package stats
 
 import (
 	"github.com/elastic/beats/libbeat/common"
-	s "github.com/elastic/beats/metricbeat/schema"
-	c "github.com/elastic/beats/metricbeat/schema/mapstrstr"
+	s "github.com/elastic/beats/libbeat/common/schema"
+	c "github.com/elastic/beats/libbeat/common/schema/mapstrstr"
 )
 
 var (
@@ -22,5 +22,6 @@ var (
 )
 
 func eventMapping(entries map[string]interface{}) (common.MapStr, error) {
-	return schema.Apply(entries), nil
+	data, _ := schema.Apply(entries)
+	return data, nil
 }

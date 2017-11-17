@@ -1,9 +1,0 @@
-#!/usr/bin/make -f
-%:
-	dh $@
-
-override_dh_auto_test:
-	go test -short
-
-override_dh_installinit:
-	dh_installinit --no-start

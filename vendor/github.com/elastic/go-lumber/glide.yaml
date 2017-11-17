@@ -1,5 +1,0 @@
-package: github.com/elastic/go-lumber
-import:
-- package: github.com/klauspost/compress
-  subpackages:
-  - zlib

@@ -5,98 +5,152 @@ services:
 
 language: go
 
-go:
-  - 1.7.1
-
 # Make sure project can also be built on travis for clones of the repo
 go_import_path: github.com/elastic/beats
 
-os:
-  - linux
-  - osx
-
 env:
-  matrix:
-    - TARGETS="check"
-    - TARGETS="-C filebeat testsuite"
-    - TARGETS="-C heartbeat testsuite"
-    - TARGETS="-C libbeat testsuite"
-    - TARGETS="-C metricbeat testsuite"
-    - TARGETS="-C packetbeat testsuite"
-    - TARGETS="-C libbeat crosscompile"
-    - TARGETS="-C metricbeat crosscompile"
-    - TARGETS="-C winlogbeat crosscompile"
-    - TARGETS="-C libbeat/dashboards"
-    - TARGETS="-C generate/metricbeat/metricset test"
-    - TARGETS="-C generate/beat test"
   global:
     # Cross-compile for amd64 only to speed up testing.
     - GOX_FLAGS="-arch amd64"
-    - DOCKER_COMPOSE_VERSION: 1.8.1
+    - DOCKER_COMPOSE_VERSION=1.11.1
+    - GO_VERSION="$(cat .go-version)"
+    - TRAVIS_ETCD_VERSION=v3.2.8
 
-matrix:
-  exclude:
-    - os: osx
+jobs:
+  include:
+    # General checks
+    - os: linux
       env: TARGETS="check"
+      go: $GO_VERSION
+      stage: check
+
+    # Filebeat
+    - os: linux
+      env: TARGETS="-C filebeat testsuite"
+      go: $GO_VERSION
+      stage: test
     - os: osx
-      env: TARGETS="-C filebeat crosscompile"
+      env: TARGETS="TEST_ENVIRONMENT=0 -C filebeat testsuite"
+      go: $GO_VERSION
+      stage: test
+
+    # Heartbeat
+    - os: linux
+      env: TARGETS="-C heartbeat testsuite"
+      go: $GO_VERSION
+      stage: test
     - os: osx
-      env: TARGETS="-C libbeat crosscompile"
-    - os: osx
-      env: TARGETS="-C metricbeat crosscompile"
-    - os: osx
-      env: TARGETS="-C winlogbeat crosscompile"
-    - os: osx
+      env: TARGETS="TEST_ENVIRONMENT=0 -C heartbeat testsuite"
+      go: $GO_VERSION
+      stage: test
+
+    # Auditbeat
+    - os: linux
+      env: TARGETS="-C auditbeat testsuite"
+      go: $GO_VERSION
+      stage: test
+
+    # Libbeat
+    - os: linux
       env: TARGETS="-C libbeat testsuite"
-    - os: osx
-      env: TARGETS="-C hearbeat testsuite"
-    - os: osx
+      go: $GO_VERSION
+      stage: test
+    - os: linux
+      env: TARGETS="-C libbeat crosscompile"
+      go: $GO_VERSION
+      stage: test
+
+    # Metricbeat
+    - os: linux
       env: TARGETS="-C metricbeat testsuite"
+      go: $GO_VERSION
+      stage: test
     - os: osx
-      env: TARGETS="-C libbeat/dashboards"
-    - os: osx
-      env: TARGETS="-C generate/metricbeat/metricset test"
-    - os: osx
-      env: TARGETS="-C generate/beat test"
-  fast_finish: true
-  allow_failures:
-    - env: TARGETS="-C libbeat crosscompile"
-    - env: TARGETS="-C filebeat crosscompile"
+      env: TARGETS="TEST_ENVIRONMENT=0 -C metricbeat testsuite"
+      go: $GO_VERSION
+      stage: test
+    - os: linux
+      env: TARGETS="-C metricbeat crosscompile"
+      go: $GO_VERSION
+      stage: test
+
+    # Packetbeat
+    - os: linux
+      env: TARGETS="-C packetbeat testsuite"
+      go: $GO_VERSION
+      stage: test
+
+    # Winlogbeat
+    - os: linux
+      env: TARGETS="-C winlogbeat crosscompile"
+      go: $GO_VERSION
+      stage: test
+
+    # Generators
+    - os: linux
+      env: TARGETS="-C generator/metricbeat test"
+      go: $GO_VERSION
+      stage: test
+    - os: linux
+      env: TARGETS="-C generator/beat test"
+      go: $GO_VERSION
+      stage: test
+
+    # Kubernetes
+    - os: linux
+      install: deploy/kubernetes/.travis/setup.sh
+      env:
+        - TARGETS="-C deploy/kubernetes test"
+        - TRAVIS_KUBE_VERSION=v1.6.11
+      stage: test
+    - os: linux
+      install: deploy/kubernetes/.travis/setup.sh
+      env:
+        - TARGETS="-C deploy/kubernetes test"
+        - TRAVIS_KUBE_VERSION=v1.7.7
+      stage: test
+    - os: linux
+      install: deploy/kubernetes/.travis/setup.sh
+      env:
+        - TARGETS="-C deploy/kubernetes test"
+        - TRAVIS_KUBE_VERSION=v1.8.0
+      stage: test
 
 addons:
   apt:
     packages:
       - python-virtualenv
       - libpcap-dev
-      - geoip-database
 
 before_install:
-  # Update to most recent docker version
-  - if [[ "$TRAVIS_OS_NAME" == "linux" ]]; then
-      sudo apt-get update;
-      sudo apt-cache search docker;
-      sudo apt-get -o Dpkg::Options::="--force-confnew" install -y docker-engine;
-    fi
+  - python --version
+  - umask 022
+  - chmod -R go-w $GOPATH/src/github.com/elastic/beats
   # Docker-compose installation
   - sudo rm /usr/local/bin/docker-compose || true
   - curl -L https://github.com/docker/compose/releases/download/${DOCKER_COMPOSE_VERSION}/docker-compose-`uname -s`-`uname -m` > docker-compose
   - chmod +x docker-compose
   - sudo mv docker-compose /usr/local/bin
 
-install:
-  - true
+# Skips installations step
+install: true
 
 script:
   - make $TARGETS
 
 notifications:
   slack:
+    on_success: change
+    on_failure: always
+    on_pull_requests: false
     rooms:
       secure: "e25J5puEA31dOooTI4T+K+zrTs8XeWIGq2cgmiPt9u/g7eqWeQj1UJnVsr8GOu1RPDyuJZJHXqfrvuOYJTdHzXbwjD0JTbwwVVZMkkZW2SWZHG46HCXPiucjWXEr3hXJKBJDDpIx6VxrN7r17dejv1biQ8QuEFZfiB1H8kbH/ho="
 
 after_success:
   # Copy full.cov to coverage.txt because codecov.io requires this file
+  - test -f auditbeat/build/coverage/full.cov && bash <(curl -s https://codecov.io/bash) -f auditbeat/build/coverage/full.cov
   - test -f filebeat/build/coverage/full.cov && bash <(curl -s https://codecov.io/bash) -f filebeat/build/coverage/full.cov
-  - test -f packetbeat/build/coverage/full.cov && bash <(curl -s https://codecov.io/bash) -f packetbeat/build/coverage/full.cov
+  - test -f heartbeat/build/coverage/full.cov && bash <(curl -s https://codecov.io/bash) -f heartbeat/build/coverage/full.cov
   - test -f libbeat/build/coverage/full.cov && bash <(curl -s https://codecov.io/bash) -f libbeat/build/coverage/full.cov
   - test -f metricbeat/build/coverage/full.cov && bash <(curl -s https://codecov.io/bash) -f metricbeat/build/coverage/full.cov
+  - test -f packetbeat/build/coverage/full.cov && bash <(curl -s https://codecov.io/bash) -f packetbeat/build/coverage/full.cov

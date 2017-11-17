@@ -19,7 +19,6 @@ type testProcFile struct {
 }
 
 func createFakeDirectoryStructure(prefix string, files []testProcFile) error {
-
 	var err error
 	for _, file := range files {
 		dir := filepath.Dir(file.path)
@@ -94,7 +93,7 @@ func TestFindPidsByCmdlineGrep(t *testing.T) {
 	}
 
 	// Create fake proc file system
-	pathPrefix, err := ioutil.TempDir("/tmp", "")
+	pathPrefix, err := ioutil.TempDir("", "find-pids")
 	if err != nil {
 		t.Error("TempDir failed:", err)
 		return
@@ -117,7 +116,6 @@ func TestFindPidsByCmdlineGrep(t *testing.T) {
 }
 
 func TestRefreshPids(t *testing.T) {
-
 	proc := []testProcFile{
 		{path: "/proc/1/cmdline", contents: "/sbin/init"},
 		{path: "/proc/1/cgroup", contents: ""},
@@ -129,7 +127,7 @@ func TestRefreshPids(t *testing.T) {
 	}
 
 	// Create fake proc file system
-	pathPrefix, err := ioutil.TempDir("/tmp", "")
+	pathPrefix, err := ioutil.TempDir("", "refresh-pids")
 	if err != nil {
 		t.Error("TempDir failed:", err)
 		return
@@ -187,7 +185,7 @@ func TestFindSocketsOfPid(t *testing.T) {
 	}
 
 	// Create fake proc file system
-	pathPrefix, err := ioutil.TempDir("/tmp", "")
+	pathPrefix, err := ioutil.TempDir("", "find-sockets")
 	if err != nil {
 		t.Error("TempDir failed:", err)
 		return
@@ -209,11 +207,7 @@ func TestFindSocketsOfPid(t *testing.T) {
 }
 
 func TestParse_Proc_Net_Tcp(t *testing.T) {
-	file, err := os.Open("../tests/files/proc_net_tcp.txt")
-	if err != nil {
-		t.Fatalf("Opening ../tests/files/proc_net_tcp.txt: %s", err)
-	}
-	socketInfo, err := parseProcNetTCP(file, false)
+	socketInfo, err := socketsFromProc("../tests/files/proc_net_tcp.txt", false)
 	if err != nil {
 		t.Fatalf("Parse_Proc_Net_Tcp: %s", err)
 	}
@@ -229,11 +223,7 @@ func TestParse_Proc_Net_Tcp(t *testing.T) {
 }
 
 func TestParse_Proc_Net_Tcp6(t *testing.T) {
-	file, err := os.Open("../tests/files/proc_net_tcp6.txt")
-	if err != nil {
-		t.Fatalf("Opening ../tests/files/proc_net_tcp6.txt: %s", err)
-	}
-	socketInfo, err := parseProcNetTCP(file, true)
+	socketInfo, err := socketsFromProc("../tests/files/proc_net_tcp6.txt", true)
 	if err != nil {
 		t.Fatalf("Parse_Proc_Net_Tcp: %s", err)
 	}
@@ -243,8 +233,10 @@ func TestParse_Proc_Net_Tcp6(t *testing.T) {
 	if socketInfo[5].srcIP.String() != "::" {
 		t.Error("Failed to parse source IP address ::, got instead", socketInfo[5].srcIP.String())
 	}
-	// TODO add an example of a 'real' IPv6 address
 	if socketInfo[5].srcPort != 59497 {
 		t.Error("Failed to parse source port 59497, got instead", socketInfo[5].srcPort)
+	}
+	if socketInfo[4].srcIP.String() != "2001:db8::123:ffff:89ab:cdef" {
+		t.Error("Failed to parse source IP address 2001:db8::123:ffff:89ab:cdef, got instead", socketInfo[4].srcIP.String())
 	}
 }

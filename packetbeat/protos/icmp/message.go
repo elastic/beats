@@ -4,8 +4,9 @@ import (
 	"encoding/binary"
 	"time"
 
-	"github.com/elastic/beats/libbeat/logp"
 	"github.com/tsg/gopacket/layers"
+
+	"github.com/elastic/beats/libbeat/logp"
 )
 
 // TODO: more types (that are not provided as constants in gopacket)

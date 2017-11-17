@@ -4,7 +4,7 @@ This file is generated! See _meta/fields.yml and scripts/generate_field_docs.py
 ////
 
 [[exported-fields]]
-= Exported Fields
+= Exported fields
 
 [partintro]
 
@@ -15,35 +15,49 @@ grouped in the following categories:
 * <<exported-fields-beat>>
 * <<exported-fields-cloud>>
 * <<exported-fields-common>>
+* <<exported-fields-docker-processor>>
+* <<exported-fields-http>>
+* <<exported-fields-icmp>>
+* <<exported-fields-kubernetes-processor>>
+* <<exported-fields-resolve>>
+* <<exported-fields-socks5>>
+* <<exported-fields-tcp>>
+* <<exported-fields-tls>>
 
 --
 [[exported-fields-beat]]
-== Beat Fields
+== Beat fields
 
 Contains common beat fields available in all event types.
 
 
 
 [float]
-=== beat.name
+=== `beat.name`
 
 The name of the Beat sending the log messages. If the Beat name is set in the configuration file, then that value is used. If it is not set, the hostname is used. To set the Beat name, use the `name` option in the configuration file.
 
 
 [float]
-=== beat.hostname
+=== `beat.hostname`
 
 The hostname as returned by the operating system on which the Beat is running.
 
 
 [float]
-=== beat.version
+=== `beat.timezone`
+
+The timezone as returned by the operating system on which the Beat is running.
+
+
+[float]
+=== `beat.version`
 
 The version of the beat that generated this event.
 
 
 [float]
-=== @timestamp
+=== `@timestamp`
 
 type: date
 
@@ -57,28 +71,59 @@ The timestamp when the event log record was generated.
 
 
 [float]
-=== tags
+=== `tags`
 
 Arbitrary tags that can be set per Beat and per transaction type.
 
 
 [float]
-=== fields
+=== `fields`
 
-type: dict
+type: object
 
 Contains user configurable fields.
 
 
+[float]
+== error fields
+
+Error fields containing additional info in case of errors.
+
+
+
+[float]
+=== `error.message`
+
+type: text
+
+Error message.
+
+
+[float]
+=== `error.code`
+
+type: long
+
+Error code.
+
+
+[float]
+=== `error.type`
+
+type: keyword
+
+Error type.
+
+
 [[exported-fields-cloud]]
-== Cloud Provider Metadata Fields
+== Cloud provider metadata fields
 
 Metadata from cloud providers added by the add_cloud_metadata processor.
 
 
 
 [float]
-=== meta.cloud.provider
+=== `meta.cloud.provider`
 
 example: ec2
 
@@ -86,13 +131,19 @@ Name of the cloud provider. Possible values are ec2, gce, or digitalocean.
 
 
 [float]
-=== meta.cloud.instance_id
+=== `meta.cloud.instance_id`
 
 Instance ID of the host machine.
 
 
 [float]
-=== meta.cloud.machine_type
+=== `meta.cloud.instance_name`
+
+Instance name of the host machine.
+
+
+[float]
+=== `meta.cloud.machine_type`
 
 example: t2.medium
 
@@ -100,7 +151,7 @@ Machine type of the host machine.
 
 
 [float]
-=== meta.cloud.availability_zone
+=== `meta.cloud.availability_zone`
 
 example: us-east-1c
 
@@ -108,7 +159,7 @@ Availability zone in which this host is running.
 
 
 [float]
-=== meta.cloud.project_id
+=== `meta.cloud.project_id`
 
 example: project-x
 
@@ -116,45 +167,71 @@ Name of the project in Google Cloud.
 
 
 [float]
-=== meta.cloud.region
+=== `meta.cloud.region`
 
 Region in which this host is running.
 
 
 [[exported-fields-common]]
-== Common monitoring fields Fields
+== Common heartbeat monitor fields
 
 None
 
 
 [float]
-=== type
+== monitor fields
+
+Common monitor fields.
+
+
+
+[float]
+=== `monitor.type`
 
 type: keyword
-
-required: True
 
 The monitor type.
 
 
 [float]
-=== monitor
+=== `monitor.name`
 
 type: keyword
 
-Monitor job name.
+The monitors configured name
 
 
 [float]
-=== scheme
+=== `monitor.id`
 
 type: keyword
 
-Address url scheme. For example `tcp`, `ssl`, `http`, and `https`.
+The monitors full job ID as used by heartbeat.
 
 
 [float]
-=== host
+== duration fields
+
+total monitoring test duration
+
+
+[float]
+=== `monitor.duration.us`
+
+type: long
+
+Duration in microseconds
+
+[float]
+=== `monitor.scheme`
+
+type: keyword
+
+Address url scheme. For example `tcp`, `tls`, `http`, and `https`.
+
+
+[float]
+=== `monitor.host`
 
 type: keyword
 
@@ -162,15 +239,79 @@ Hostname of service being monitored. Can be missing, if service is monitored by 
 
 
 [float]
-=== port
+=== `monitor.ip`
 
-type: integer
+type: ip
 
-Service port number.
+IP of service being monitored. If service is monitored by hostname, the `ip` field contains the resolved ip address for the current host.
 
 
 [float]
-=== url
+=== `monitor.status`
+
+type: keyword
+
+required: True
+
+Indicator if monitor could validate the service to be available.
+
+
+[[exported-fields-docker-processor]]
+== Docker fields
+
+beta[]
+Docker stats collected from Docker.
+
+
+
+
+[float]
+=== `docker.container.id`
+
+type: keyword
+
+Unique container id.
+
+
+[float]
+=== `docker.container.image`
+
+type: keyword
+
+Name of the image the container was built on.
+
+
+[float]
+=== `docker.container.name`
+
+type: keyword
+
+Container name.
+
+
+[float]
+=== `docker.container.labels`
+
+type: object
+
+Image labels.
+
+
+[[exported-fields-http]]
+== HTTP monitor fields
+
+None
+
+
+[float]
+== http fields
+
+HTTP related fields.
+
+
+
+[float]
+=== `http.url`
 
 type: text
 
@@ -178,131 +319,14 @@ Service url used by monitor.
 
 
 [float]
-=== ip
-
-type: keyword
-
-IP of service being monitored. If service is monitored by hostname, the `ip` field contains the resolved ip address for the current host.
-
-
-[float]
-== duration Fields
-
-total monitoring test duration
-
-
-[float]
-=== duration.us
-
-type: long
-
-Duration in microseconds
-
-[float]
-== resolve_rtt Fields
-
-Duration required to resolve an IP from hostname.
-
-
-[float]
-=== resolve_rtt.us
-
-type: long
-
-Duration in microseconds
-
-[float]
-== icmp_rtt Fields
-
-ICMP Echo Request and Reply round trip time
-
-
-[float]
-=== icmp_rtt.us
-
-type: long
-
-Duration in microseconds
-
-[float]
-== tcp_connect_rtt Fields
-
-Duration required to establish a TCP connection based on already available IP address.
-
-
-
-[float]
-=== tcp_connect_rtt.us
-
-type: long
-
-Duration in microseconds
-
-[float]
-== socks5_connect_rtt Fields
-
-Time required to establish a connection via SOCKS5 to endpoint based on available connection to SOCKS5 proxy.
-
-
-
-[float]
-=== socks5_connect_rtt.us
-
-type: long
-
-Duration in microseconds
-
-[float]
-== tls_handshake_rtt Fields
-
-Time required to finish TLS handshake based on already available network connection.
-
-
-
-[float]
-=== tls_handshake_rtt.us
-
-type: long
-
-Duration in microseconds
-
-[float]
-== http_rtt Fields
-
-Time required between sending the HTTP request and first by from HTTP response being read. Duration based on already available network connection.
-
-
-
-[float]
-=== http_rtt.us
-
-type: long
-
-Duration in microseconds
-
-[float]
-== validate_rtt Fields
-
-Time required for validating the connection if connection checks are configured.
-
-
-
-[float]
-=== validate_rtt.us
-
-type: long
-
-Duration in microseconds
-
-[float]
-== response Fields
+== response fields
 
 Service response parameters.
 
 
 
 [float]
-=== response.status
+=== `http.response.status`
 
 type: integer
 
@@ -310,35 +334,350 @@ Response status code.
 
 
 [float]
-=== up
+== rtt fields
 
-type: boolean
-
-required: True
-
-Boolean indicator if monitor could validate the service to be available.
-
-
-[float]
-== error Fields
-
-Reason monitor flagging a service as down.
+HTTP layer round trip times.
 
 
 
 [float]
-=== error.type
+== validate fields
+
+Duration between first byte of HTTP request being written and
+response being processed by validator. Duration based on already
+available network connection.
+
+Note: if validator is not reading body or only a prefix, this
+      number does not fully represent the total time needed
+      to read the body.
+
+
+
+[float]
+=== `http.rtt.validate.us`
+
+type: long
+
+Duration in microseconds
+
+[float]
+== validate_body fields
+
+Duration of validator required to read and validate the response
+body.
+
+Note: if validator is not reading body or only a prefix, this
+      number does not fully represent the total time needed
+      to read the body.
+
+
+
+[float]
+=== `http.rtt.validate_body.us`
+
+type: long
+
+Duration in microseconds
+
+[float]
+== write_request fields
+
+Duration of sending the complete HTTP request. Duration based on already available network connection.
+
+
+[float]
+=== `http.rtt.write_request.us`
+
+type: long
+
+Duration in microseconds
+
+[float]
+== response_header fields
+
+Time required between sending the start of sending the HTTP request and first by from HTTP response being read. Duration based on already available network connection.
+
+
+[float]
+=== `http.rtt.response_header.us`
+
+type: long
+
+Duration in microseconds
+
+[float]
+== total fields
+
+Duration required to process the HTTP transaction. Starts with
+the initial TCP connection attempt. Ends with after validator
+did check the response.
+
+Note: if validator is not reading body or only a prefix, this
+      number does not fully represent the total time needed.
+
+
+
+[float]
+=== `http.rtt.total.us`
+
+type: long
+
+Duration in microseconds
+
+[[exported-fields-icmp]]
+== ICMP fields
+
+None
+
+
+[float]
+== icmp fields
+
+IP ping fields.
+
+
+
+[float]
+=== `icmp.requests`
+
+type: integer
+
+Number if ICMP EchoRequests send.
+
+
+[float]
+== rtt fields
+
+ICMP Echo Request and Reply round trip time
+
+
+[float]
+=== `icmp.rtt.us`
+
+type: long
+
+Duration in microseconds
+
+[[exported-fields-kubernetes-processor]]
+== Kubernetes fields
+
+beta[]
+Kubernetes metadata added by the kubernetes processor
+
+
+
+
+[float]
+=== `kubernetes.pod.name`
 
 type: keyword
 
-Failure type. For example `io` or `validate`.
+Kubernetes pod name
 
 
 [float]
-=== error.message
+=== `kubernetes.namespace`
 
-type: text
+type: keyword
 
-Failure description.
+Kubernetes namespace
 
+
+[float]
+=== `kubernetes.labels`
+
+type: object
+
+Kubernetes labels map
+
+
+[float]
+=== `kubernetes.annotations`
+
+type: object
+
+Kubernetes annotations map
+
+
+[float]
+=== `kubernetes.container.name`
+
+type: keyword
+
+Kubernetes container name
+
+
+[float]
+=== `kubernetes.container.image`
+
+type: keyword
+
+Kubernetes container image
+
+
+[[exported-fields-resolve]]
+== Host lookup fields
+
+None
+
+
+[float]
+== resolve fields
+
+Host lookup fields.
+
+
+
+[float]
+=== `resolve.host`
+
+type: keyword
+
+Hostname of service being monitored.
+
+
+[float]
+=== `resolve.ip`
+
+type: ip
+
+IP address found for the given host.
+
+
+[float]
+== rtt fields
+
+Duration required to resolve an IP from hostname.
+
+
+[float]
+=== `resolve.rtt.us`
+
+type: long
+
+Duration in microseconds
+
+[[exported-fields-socks5]]
+== SOCKS5 proxy fields
+
+None
+
+
+[float]
+== socks5 fields
+
+SOCKS5 proxy related fields:
+
+
+
+[float]
+== rtt fields
+
+TLS layer round trip times.
+
+
+
+[float]
+== connect fields
+
+Time required to establish a connection via SOCKS5 to endpoint based on available connection to SOCKS5 proxy.
+
+
+
+[float]
+=== `socks5.rtt.connect.us`
+
+type: long
+
+Duration in microseconds
+
+[[exported-fields-tcp]]
+== TCP layer fields
+
+None
+
+
+[float]
+== tcp fields
+
+TCP network layer related fields.
+
+
+
+[float]
+=== `tcp.port`
+
+type: integer
+
+Service port number.
+
+
+[float]
+== rtt fields
+
+TCP layer round trip times.
+
+
+
+[float]
+== connect fields
+
+Duration required to establish a TCP connection based on already available IP address.
+
+
+
+[float]
+=== `tcp.rtt.connect.us`
+
+type: long
+
+Duration in microseconds
+
+[float]
+== validate fields
+
+Duration of validation step based on existing TCP connection.
+
+
+
+[float]
+=== `tcp.rtt.validate.us`
+
+type: long
+
+Duration in microseconds
+
+[[exported-fields-tls]]
+== TLS encryption layer fields
+
+None
+
+
+[float]
+== tls fields
+
+TLS layer related fields.
+
+
+
+[float]
+== rtt fields
+
+TLS layer round trip times.
+
+
+
+[float]
+== handshake fields
+
+Time required to finish TLS handshake based on already available network connection.
+
+
+
+[float]
+=== `tls.rtt.handshake.us`
+
+type: long
+
+Duration in microseconds
 

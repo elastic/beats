@@ -10,17 +10,11 @@ package main
 import (
 	"os"
 
-	"github.com/elastic/beats/metricbeat/beater"
-	_ "github.com/elastic/beats/metricbeat/include"
-
-	"github.com/elastic/beats/libbeat/beat"
+	"github.com/elastic/beats/metricbeat/cmd"
 )
 
-// Name of this Beat.
-var Name = "metricbeat"
-
 func main() {
-	if err := beat.Run(Name, "", beater.New); err != nil {
+	if err := cmd.RootCmd.Execute(); err != nil {
 		os.Exit(1)
 	}
 }

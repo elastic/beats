@@ -1,0 +1,2450 @@
+
+////
+This file is generated! See _meta/fields.yml and scripts/generate_field_docs.py
+////
+
+[[exported-fields]]
+= Exported fields
+
+[partintro]
+
+--
+This document describes the fields that are exported by Auditbeat. They are
+grouped in the following categories:
+
+* <<exported-fields-audit>>
+* <<exported-fields-beat>>
+* <<exported-fields-cloud>>
+* <<exported-fields-common>>
+* <<exported-fields-docker-processor>>
+* <<exported-fields-kubernetes-processor>>
+
+--
+[[exported-fields-audit]]
+== Audit fields
+
+The `audit` module reports security-relevant information based on data captured from the operating system (OS) or services running on the OS.
+
+
+
+[float]
+== audit fields
+
+
+
+
+[float]
+== file fields
+
+The file metricset generates events when a file changes on disk.
+
+
+
+[float]
+=== `audit.file.path`
+
+type: keyword
+
+The path to the file.
+
+[float]
+=== `audit.file.target_path`
+
+type: keyword
+
+The target path for symlinks.
+
+[float]
+=== `audit.file.action`
+
+type: keyword
+
+example: attributes_modified
+
+Action describes the change that triggered the event. The possible values are: attributes_modified, created, deleted, updated, moved, and config_change.
+
+
+[float]
+=== `audit.file.type`
+
+type: keyword
+
+The file type (file, dir, or symlink).
+
+[float]
+=== `audit.file.inode`
+
+type: keyword
+
+The inode representing the file in the filesystem.
+
+[float]
+=== `audit.file.uid`
+
+type: keyword
+
+The user ID (UID) of the file owner.
+
+[float]
+=== `audit.file.owner`
+
+type: keyword
+
+The file owner's username.
+
+[float]
+=== `audit.file.gid`
+
+type: keyword
+
+The primary group ID (GID) of the file.
+
+[float]
+=== `audit.file.group`
+
+type: keyword
+
+The primary group name of the file.
+
+[float]
+=== `audit.file.sid`
+
+type: keyword
+
+The security identifier (SID) of the file owner (Windows only).
+
+[float]
+=== `audit.file.mode`
+
+type: keyword
+
+example: 416
+
+The mode of the file in octal representation.
+
+[float]
+=== `audit.file.size`
+
+type: long
+
+The file size in bytes (field is only added when `type` is `file`).
+
+[float]
+=== `audit.file.mtime`
+
+type: date
+
+The last modified time of the file (time when content was modified).
+
+[float]
+=== `audit.file.ctime`
+
+type: date
+
+The last change time of the file (time when metadata was changed).
+
+[float]
+=== `audit.file.hashed`
+
+type: boolean
+
+Boolean indicating if the event includes any file hashes.
+
+
+[float]
+=== `audit.file.md5`
+
+type: keyword
+
+MD5 hash of the file.
+
+[float]
+=== `audit.file.sha1`
+
+type: keyword
+
+SHA1 hash of the file.
+
+[float]
+=== `audit.file.sha224`
+
+type: keyword
+
+SHA224 hash of the file.
+
+[float]
+=== `audit.file.sha256`
+
+type: keyword
+
+SHA256 hash of the file.
+
+[float]
+=== `audit.file.sha384`
+
+type: keyword
+
+SHA384 hash of the file.
+
+[float]
+=== `audit.file.sha3_224`
+
+type: keyword
+
+SHA3_224 hash of the file.
+
+[float]
+=== `audit.file.sha3_256`
+
+type: keyword
+
+SHA3_256 hash of the file.
+
+[float]
+=== `audit.file.sha3_384`
+
+type: keyword
+
+SHA3_384 hash of the file.
+
+[float]
+=== `audit.file.sha3_512`
+
+type: keyword
+
+SHA3_512 hash of the file.
+
+[float]
+=== `audit.file.sha512`
+
+type: keyword
+
+SHA512 hash of the file.
+
+[float]
+=== `audit.file.sha512_224`
+
+type: keyword
+
+SHA512/224 hash of the file.
+
+[float]
+=== `audit.file.sha512_256`
+
+type: keyword
+
+SHA512/256 hash of the file.
+
+[float]
+== kernel fields
+
+The kernel metricset distributes audit events received from the Linux Audit Framework that is a part of the Linux kernel.
+
+
+
+[float]
+=== `audit.kernel.action`
+
+type: keyword
+
+example: logged-in
+
+A description of the action taken by the user.
+
+[float]
+== actor fields
+
+The actor is the user that triggered the audit event.
+
+
+[float]
+== attrs fields
+
+Attributes of the actor.
+
+
+[float]
+=== `audit.kernel.actor.attrs.auid`
+
+type: keyword
+
+login user ID
+
+[float]
+=== `audit.kernel.actor.attrs.uid`
+
+type: keyword
+
+user ID
+
+[float]
+=== `audit.kernel.actor.attrs.euid`
+
+type: keyword
+
+effective user ID
+
+[float]
+=== `audit.kernel.actor.attrs.fsuid`
+
+type: keyword
+
+file system user ID
+
+[float]
+=== `audit.kernel.actor.attrs.suid`
+
+type: keyword
+
+sent user ID
+
+[float]
+=== `audit.kernel.actor.attrs.gid`
+
+type: keyword
+
+group ID
+
+[float]
+=== `audit.kernel.actor.attrs.egid`
+
+type: keyword
+
+effective group ID
+
+[float]
+=== `audit.kernel.actor.attrs.sgid`
+
+type: keyword
+
+set group ID
+
+[float]
+=== `audit.kernel.actor.attrs.fsgid`
+
+type: keyword
+
+file system group ID
+
+[float]
+=== `audit.kernel.actor.primary`
+
+type: keyword
+
+The primary identity of the actor. This is the actor's original login ID. It will not change even if the user changes to another account.
+
+
+[float]
+=== `audit.kernel.actor.secondary`
+
+type: keyword
+
+The secondary identity of the actor. This is typically the same as the primary, except for when the user has used `su`.
+
+[float]
+== selinux fields
+
+The SELinux identity of the actor.
+
+
+[float]
+=== `audit.kernel.actor.selinux.user`
+
+type: keyword
+
+account submitted for authentication
+
+[float]
+=== `audit.kernel.actor.selinux.role`
+
+type: keyword
+
+user's SELinux role
+
+[float]
+=== `audit.kernel.actor.selinux.domain`
+
+type: keyword
+
+The actor's SELinux domain or type.
+
+[float]
+=== `audit.kernel.actor.selinux.level`
+
+type: keyword
+
+example: s0
+
+The actor's SELinux level.
+
+[float]
+=== `audit.kernel.actor.selinux.category`
+
+type: keyword
+
+The actor's SELinux category or compartments.
+
+[float]
+=== `audit.kernel.category`
+
+type: keyword
+
+example: audit-rule
+
+The event's category is a value derived from the `record_type`.
+
+
+[float]
+=== `audit.kernel.sequence`
+
+type: long
+
+The sequence number of the event as assigned by the kernel. Sequence numbers are stored as a uint32 in the kernel and can rollover.
+
+
+[float]
+=== `audit.kernel.session`
+
+type: keyword
+
+The session ID assigned to a login. All events related to a login session will have the same value.
+
+
+[float]
+== paths fields
+
+List of paths associated with the event.
+
+
+[float]
+=== `audit.kernel.paths.inode`
+
+type: keyword
+
+inode number
+
+[float]
+=== `audit.kernel.paths.dev`
+
+type: keyword
+
+device name as found in /dev
+
+[float]
+=== `audit.kernel.paths.obj_user`
+
+type: keyword
+
+
+
+[float]
+=== `audit.kernel.paths.obj_role`
+
+type: keyword
+
+
+
+[float]
+=== `audit.kernel.paths.obj_domain`
+
+type: keyword
+
+
+
+[float]
+=== `audit.kernel.paths.obj_level`
+
+type: keyword
+
+
+
+[float]
+=== `audit.kernel.paths.objtype`
+
+type: keyword
+
+
+
+[float]
+=== `audit.kernel.paths.ouid`
+
+type: keyword
+
+file owner user ID
+
+[float]
+=== `audit.kernel.paths.rdev`
+
+type: keyword
+
+the device identifier (special files only)
+
+[float]
+=== `audit.kernel.paths.nametype`
+
+type: keyword
+
+kind of file operation being referenced
+
+[float]
+=== `audit.kernel.paths.ogid`
+
+type: keyword
+
+file owner group ID
+
+[float]
+=== `audit.kernel.paths.item`
+
+type: keyword
+
+which item is being recorded
+
+[float]
+=== `audit.kernel.paths.mode`
+
+type: keyword
+
+mode flags on a file
+
+[float]
+=== `audit.kernel.paths.name`
+
+type: keyword
+
+file name in avcs
+
+[float]
+=== `audit.kernel.record_type`
+
+type: keyword
+
+The audit record's type.
+
+[float]
+== socket fields
+
+Socket data from sockaddr messages.
+
+
+[float]
+=== `audit.kernel.socket.port`
+
+type: keyword
+
+The port number.
+
+[float]
+=== `audit.kernel.socket.saddr`
+
+type: keyword
+
+The raw socket address structure.
+
+[float]
+=== `audit.kernel.socket.addr`
+
+type: keyword
+
+The remote address.
+
+[float]
+=== `audit.kernel.socket.family`
+
+type: keyword
+
+example: unix
+
+The socket family (unix, ipv4, ipv6, netlink).
+
+[float]
+=== `audit.kernel.socket.path`
+
+type: keyword
+
+This is the path associated with a unix socket.
+
+[float]
+== thing fields
+
+This is the thing or object being acted upon in the event.
+
+
+
+[float]
+=== `audit.kernel.thing.what`
+
+type: keyword
+
+A description of the what the "thing" is (e.g. file, socket, user-session).
+
+
+[float]
+=== `audit.kernel.thing.primary`
+
+type: keyword
+
+
+
+[float]
+=== `audit.kernel.thing.secondary`
+
+type: keyword
+
+
+
+[float]
+== selinux fields
+
+The SELinux identity of the object.
+
+
+[float]
+=== `audit.kernel.thing.selinux.user`
+
+type: keyword
+
+The owner of the object.
+
+[float]
+=== `audit.kernel.thing.selinux.role`
+
+type: keyword
+
+The object's SELinux role.
+
+[float]
+=== `audit.kernel.thing.selinux.domain`
+
+type: keyword
+
+The object's SELinux domain or type.
+
+[float]
+=== `audit.kernel.thing.selinux.level`
+
+type: keyword
+
+example: s0
+
+The object's SELinux level.
+
+[float]
+=== `audit.kernel.how`
+
+type: keyword
+
+This describes how the action was performed. Usually this is the exe or command that was being executed that triggered the event.
+
+
+[float]
+=== `audit.kernel.key`
+
+type: keyword
+
+The key assigned to the audit rule that triggered the event.
+
+[float]
+=== `audit.kernel.result`
+
+type: keyword
+
+example: success or fail
+
+The result of the audited operation (success/fail).
+
+[float]
+== data fields
+
+The data from the audit messages.
+
+
+[float]
+=== `audit.kernel.data.action`
+
+type: keyword
+
+netfilter packet disposition
+
+[float]
+=== `audit.kernel.data.minor`
+
+type: keyword
+
+device minor number
+
+[float]
+=== `audit.kernel.data.acct`
+
+type: keyword
+
+a user's account name
+
+[float]
+=== `audit.kernel.data.addr`
+
+type: keyword
+
+the remote address that the user is connecting from
+
+[float]
+=== `audit.kernel.data.cipher`
+
+type: keyword
+
+name of crypto cipher selected
+
+[float]
+=== `audit.kernel.data.id`
+
+type: keyword
+
+during account changes
+
+[float]
+=== `audit.kernel.data.entries`
+
+type: keyword
+
+number of entries in the netfilter table
+
+[float]
+=== `audit.kernel.data.kind`
+
+type: keyword
+
+server or client in crypto operation
+
+[float]
+=== `audit.kernel.data.ksize`
+
+type: keyword
+
+key size for crypto operation
+
+[float]
+=== `audit.kernel.data.spid`
+
+type: keyword
+
+sent process ID
+
+[float]
+=== `audit.kernel.data.arch`
+
+type: keyword
+
+the elf architecture flags
+
+[float]
+=== `audit.kernel.data.argc`
+
+type: keyword
+
+the number of arguments to an execve syscall
+
+[float]
+=== `audit.kernel.data.major`
+
+type: keyword
+
+device major number
+
+[float]
+=== `audit.kernel.data.unit`
+
+type: keyword
+
+systemd unit
+
+[float]
+=== `audit.kernel.data.table`
+
+type: keyword
+
+netfilter table name
+
+[float]
+=== `audit.kernel.data.terminal`
+
+type: keyword
+
+terminal name the user is running programs on
+
+[float]
+=== `audit.kernel.data.comm`
+
+type: keyword
+
+command line program name
+
+[float]
+=== `audit.kernel.data.exe`
+
+type: keyword
+
+executable name
+
+[float]
+=== `audit.kernel.data.grantors`
+
+type: keyword
+
+pam modules approving the action
+
+[float]
+=== `audit.kernel.data.pid`
+
+type: keyword
+
+process ID
+
+[float]
+=== `audit.kernel.data.direction`
+
+type: keyword
+
+direction of crypto operation
+
+[float]
+=== `audit.kernel.data.op`
+
+type: keyword
+
+the operation being performed that is audited
+
+[float]
+=== `audit.kernel.data.tty`
+
+type: keyword
+
+tty udevice the user is running programs on
+
+[float]
+=== `audit.kernel.data.proctitle`
+
+type: keyword
+
+process title and command line parameters
+
+[float]
+=== `audit.kernel.data.syscall`
+
+type: keyword
+
+syscall number in effect when the event occurred
+
+[float]
+=== `audit.kernel.data.data`
+
+type: keyword
+
+TTY text
+
+[float]
+=== `audit.kernel.data.family`
+
+type: keyword
+
+netfilter protocol
+
+[float]
+=== `audit.kernel.data.mac`
+
+type: keyword
+
+crypto MAC algorithm selected
+
+[float]
+=== `audit.kernel.data.pfs`
+
+type: keyword
+
+perfect forward secrecy method
+
+[float]
+=== `audit.kernel.data.items`
+
+type: keyword
+
+the number of path records in the event
+
+[float]
+=== `audit.kernel.data.a0`
+
+type: keyword
+
+
+
+[float]
+=== `audit.kernel.data.a1`
+
+type: keyword
+
+
+
+[float]
+=== `audit.kernel.data.a2`
+
+type: keyword
+
+
+
+[float]
+=== `audit.kernel.data.a3`
+
+type: keyword
+
+
+
+[float]
+=== `audit.kernel.data.cwd`
+
+type: keyword
+
+the current working directory
+
+[float]
+=== `audit.kernel.data.hostname`
+
+type: keyword
+
+the hostname that the user is connecting from
+
+[float]
+=== `audit.kernel.data.lport`
+
+type: keyword
+
+local network port
+
+[float]
+=== `audit.kernel.data.ppid`
+
+type: keyword
+
+parent process ID
+
+[float]
+=== `audit.kernel.data.rport`
+
+type: keyword
+
+remote port number
+
+[float]
+=== `audit.kernel.data.cmdline`
+
+type: keyword
+
+The full command line from the execve message.
+
+[float]
+=== `audit.kernel.data.exit`
+
+type: keyword
+
+syscall exit code
+
+[float]
+=== `audit.kernel.data.fp`
+
+type: keyword
+
+crypto key finger print
+
+[float]
+=== `audit.kernel.data.laddr`
+
+type: keyword
+
+local network address
+
+[float]
+=== `audit.kernel.data.sport`
+
+type: keyword
+
+local port number
+
+[float]
+=== `audit.kernel.data.capability`
+
+type: keyword
+
+posix capabilities
+
+[float]
+=== `audit.kernel.data.nargs`
+
+type: keyword
+
+the number of arguments to a socket call
+
+[float]
+=== `audit.kernel.data.new-enabled`
+
+type: keyword
+
+new TTY audit enabled setting
+
+[float]
+=== `audit.kernel.data.audit_backlog_limit`
+
+type: keyword
+
+audit system's backlog queue size
+
+[float]
+=== `audit.kernel.data.dir`
+
+type: keyword
+
+directory name
+
+[float]
+=== `audit.kernel.data.cap_pe`
+
+type: keyword
+
+process effective capability map
+
+[float]
+=== `audit.kernel.data.model`
+
+type: keyword
+
+security model being used for virt
+
+[float]
+=== `audit.kernel.data.new_pp`
+
+type: keyword
+
+new process permitted capability map
+
+[float]
+=== `audit.kernel.data.old-enabled`
+
+type: keyword
+
+present TTY audit enabled setting
+
+[float]
+=== `audit.kernel.data.oauid`
+
+type: keyword
+
+object's login user ID
+
+[float]
+=== `audit.kernel.data.old`
+
+type: keyword
+
+old value
+
+[float]
+=== `audit.kernel.data.banners`
+
+type: keyword
+
+banners used on printed page
+
+[float]
+=== `audit.kernel.data.feature`
+
+type: keyword
+
+kernel feature being changed
+
+[float]
+=== `audit.kernel.data.vm-ctx`
+
+type: keyword
+
+the vm's context string
+
+[float]
+=== `audit.kernel.data.opid`
+
+type: keyword
+
+object's process ID
+
+[float]
+=== `audit.kernel.data.seperms`
+
+type: keyword
+
+SELinux permissions being used
+
+[float]
+=== `audit.kernel.data.seresult`
+
+type: keyword
+
+SELinux AVC decision granted/denied
+
+[float]
+=== `audit.kernel.data.new-rng`
+
+type: keyword
+
+device name of rng being added from a vm
+
+[float]
+=== `audit.kernel.data.old-net`
+
+type: keyword
+
+present MAC address assigned to vm
+
+[float]
+=== `audit.kernel.data.sigev_signo`
+
+type: keyword
+
+signal number
+
+[float]
+=== `audit.kernel.data.ino`
+
+type: keyword
+
+inode number
+
+[float]
+=== `audit.kernel.data.old_enforcing`
+
+type: keyword
+
+old MAC enforcement status
+
+[float]
+=== `audit.kernel.data.old-vcpu`
+
+type: keyword
+
+present number of CPU cores
+
+[float]
+=== `audit.kernel.data.range`
+
+type: keyword
+
+user's SE Linux range
+
+[float]
+=== `audit.kernel.data.res`
+
+type: keyword
+
+result of the audited operation(success/fail)
+
+[float]
+=== `audit.kernel.data.added`
+
+type: keyword
+
+number of new files detected
+
+[float]
+=== `audit.kernel.data.fam`
+
+type: keyword
+
+socket address family
+
+[float]
+=== `audit.kernel.data.nlnk-pid`
+
+type: keyword
+
+pid of netlink packet sender
+
+[float]
+=== `audit.kernel.data.subj`
+
+type: keyword
+
+lspp subject's context string
+
+[float]
+=== `audit.kernel.data.a[0-3]`
+
+type: keyword
+
+the arguments to a syscall
+
+[float]
+=== `audit.kernel.data.cgroup`
+
+type: keyword
+
+path to cgroup in sysfs
+
+[float]
+=== `audit.kernel.data.kernel`
+
+type: keyword
+
+kernel's version number
+
+[float]
+=== `audit.kernel.data.ocomm`
+
+type: keyword
+
+object's command line name
+
+[float]
+=== `audit.kernel.data.new-net`
+
+type: keyword
+
+MAC address being assigned to vm
+
+[float]
+=== `audit.kernel.data.permissive`
+
+type: keyword
+
+SELinux is in permissive mode
+
+[float]
+=== `audit.kernel.data.class`
+
+type: keyword
+
+resource class assigned to vm
+
+[float]
+=== `audit.kernel.data.compat`
+
+type: keyword
+
+is_compat_task result
+
+[float]
+=== `audit.kernel.data.fi`
+
+type: keyword
+
+file assigned inherited capability map
+
+[float]
+=== `audit.kernel.data.changed`
+
+type: keyword
+
+number of changed files
+
+[float]
+=== `audit.kernel.data.msg`
+
+type: keyword
+
+the payload of the audit record
+
+[float]
+=== `audit.kernel.data.dport`
+
+type: keyword
+
+remote port number
+
+[float]
+=== `audit.kernel.data.new-seuser`
+
+type: keyword
+
+new SELinux user
+
+[float]
+=== `audit.kernel.data.invalid_context`
+
+type: keyword
+
+SELinux context
+
+[float]
+=== `audit.kernel.data.dmac`
+
+type: keyword
+
+remote MAC address
+
+[float]
+=== `audit.kernel.data.ipx-net`
+
+type: keyword
+
+IPX network number
+
+[float]
+=== `audit.kernel.data.iuid`
+
+type: keyword
+
+ipc object's user ID
+
+[float]
+=== `audit.kernel.data.macproto`
+
+type: keyword
+
+ethernet packet type ID field
+
+[float]
+=== `audit.kernel.data.obj`
+
+type: keyword
+
+lspp object context string
+
+[float]
+=== `audit.kernel.data.a[[:digit:]+]\[.*\]`
+
+type: keyword
+
+the arguments to the execve syscall
+
+[float]
+=== `audit.kernel.data.ipid`
+
+type: keyword
+
+IP datagram fragment identifier
+
+[float]
+=== `audit.kernel.data.new-fs`
+
+type: keyword
+
+file system being added to vm
+
+[float]
+=== `audit.kernel.data.vm-pid`
+
+type: keyword
+
+vm's process ID
+
+[float]
+=== `audit.kernel.data.cap_pi`
+
+type: keyword
+
+process inherited capability map
+
+[float]
+=== `audit.kernel.data.old-auid`
+
+type: keyword
+
+previous auid value
+
+[float]
+=== `audit.kernel.data.oses`
+
+type: keyword
+
+object's session ID
+
+[float]
+=== `audit.kernel.data.fd`
+
+type: keyword
+
+file descriptor number
+
+[float]
+=== `audit.kernel.data.igid`
+
+type: keyword
+
+ipc object's group ID
+
+[float]
+=== `audit.kernel.data.new-disk`
+
+type: keyword
+
+disk being added to vm
+
+[float]
+=== `audit.kernel.data.parent`
+
+type: keyword
+
+the inode number of the parent file
+
+[float]
+=== `audit.kernel.data.len`
+
+type: keyword
+
+length
+
+[float]
+=== `audit.kernel.data.oflag`
+
+type: keyword
+
+open syscall flags
+
+[float]
+=== `audit.kernel.data.uuid`
+
+type: keyword
+
+a UUID
+
+[float]
+=== `audit.kernel.data.code`
+
+type: keyword
+
+seccomp action code
+
+[float]
+=== `audit.kernel.data.nlnk-grp`
+
+type: keyword
+
+netlink group number
+
+[float]
+=== `audit.kernel.data.cap_fp`
+
+type: keyword
+
+file permitted capability map
+
+[float]
+=== `audit.kernel.data.new-mem`
+
+type: keyword
+
+new amount of memory in KB
+
+[float]
+=== `audit.kernel.data.seperm`
+
+type: keyword
+
+SELinux permission being decided on
+
+[float]
+=== `audit.kernel.data.enforcing`
+
+type: keyword
+
+new MAC enforcement status
+
+[float]
+=== `audit.kernel.data.new-chardev`
+
+type: keyword
+
+new character device being assigned to vm
+
+[float]
+=== `audit.kernel.data.old-rng`
+
+type: keyword
+
+device name of rng being removed from a vm
+
+[float]
+=== `audit.kernel.data.outif`
+
+type: keyword
+
+out interface number
+
+[float]
+=== `audit.kernel.data.cmd`
+
+type: keyword
+
+command being executed
+
+[float]
+=== `audit.kernel.data.hook`
+
+type: keyword
+
+netfilter hook that packet came from
+
+[float]
+=== `audit.kernel.data.new-level`
+
+type: keyword
+
+new run level
+
+[float]
+=== `audit.kernel.data.sauid`
+
+type: keyword
+
+sent login user ID
+
+[float]
+=== `audit.kernel.data.sig`
+
+type: keyword
+
+signal number
+
+[float]
+=== `audit.kernel.data.audit_backlog_wait_time`
+
+type: keyword
+
+audit system's backlog wait time
+
+[float]
+=== `audit.kernel.data.printer`
+
+type: keyword
+
+printer name
+
+[float]
+=== `audit.kernel.data.old-mem`
+
+type: keyword
+
+present amount of memory in KB
+
+[float]
+=== `audit.kernel.data.perm`
+
+type: keyword
+
+the file permission being used
+
+[float]
+=== `audit.kernel.data.old_pi`
+
+type: keyword
+
+old process inherited capability map
+
+[float]
+=== `audit.kernel.data.state`
+
+type: keyword
+
+audit daemon configuration resulting state
+
+[float]
+=== `audit.kernel.data.format`
+
+type: keyword
+
+audit log's format
+
+[float]
+=== `audit.kernel.data.new_gid`
+
+type: keyword
+
+new group ID being assigned
+
+[float]
+=== `audit.kernel.data.tcontext`
+
+type: keyword
+
+the target's or object's context string
+
+[float]
+=== `audit.kernel.data.maj`
+
+type: keyword
+
+device major number
+
+[float]
+=== `audit.kernel.data.watch`
+
+type: keyword
+
+file name in a watch record
+
+[float]
+=== `audit.kernel.data.device`
+
+type: keyword
+
+device name
+
+[float]
+=== `audit.kernel.data.grp`
+
+type: keyword
+
+group name
+
+[float]
+=== `audit.kernel.data.bool`
+
+type: keyword
+
+name of SELinux boolean
+
+[float]
+=== `audit.kernel.data.icmp_type`
+
+type: keyword
+
+type of icmp message
+
+[float]
+=== `audit.kernel.data.new_lock`
+
+type: keyword
+
+new value of feature lock
+
+[float]
+=== `audit.kernel.data.old_prom`
+
+type: keyword
+
+network promiscuity flag
+
+[float]
+=== `audit.kernel.data.acl`
+
+type: keyword
+
+access mode of resource assigned to vm
+
+[float]
+=== `audit.kernel.data.ip`
+
+type: keyword
+
+network address of a printer
+
+[float]
+=== `audit.kernel.data.new_pi`
+
+type: keyword
+
+new process inherited capability map
+
+[float]
+=== `audit.kernel.data.default-context`
+
+type: keyword
+
+default MAC context
+
+[float]
+=== `audit.kernel.data.inode_gid`
+
+type: keyword
+
+group ID of the inode's owner
+
+[float]
+=== `audit.kernel.data.new-log_passwd`
+
+type: keyword
+
+new value for TTY password logging
+
+[float]
+=== `audit.kernel.data.new_pe`
+
+type: keyword
+
+new process effective capability map
+
+[float]
+=== `audit.kernel.data.selected-context`
+
+type: keyword
+
+new MAC context assigned to session
+
+[float]
+=== `audit.kernel.data.cap_fver`
+
+type: keyword
+
+file system capabilities version number
+
+[float]
+=== `audit.kernel.data.file`
+
+type: keyword
+
+file name
+
+[float]
+=== `audit.kernel.data.net`
+
+type: keyword
+
+network MAC address
+
+[float]
+=== `audit.kernel.data.virt`
+
+type: keyword
+
+kind of virtualization being referenced
+
+[float]
+=== `audit.kernel.data.cap_pp`
+
+type: keyword
+
+process permitted capability map
+
+[float]
+=== `audit.kernel.data.old-range`
+
+type: keyword
+
+present SELinux range
+
+[float]
+=== `audit.kernel.data.resrc`
+
+type: keyword
+
+resource being assigned
+
+[float]
+=== `audit.kernel.data.new-range`
+
+type: keyword
+
+new SELinux range
+
+[float]
+=== `audit.kernel.data.obj_gid`
+
+type: keyword
+
+group ID of object
+
+[float]
+=== `audit.kernel.data.proto`
+
+type: keyword
+
+network protocol
+
+[float]
+=== `audit.kernel.data.old-disk`
+
+type: keyword
+
+disk being removed from vm
+
+[float]
+=== `audit.kernel.data.audit_failure`
+
+type: keyword
+
+audit system's failure mode
+
+[float]
+=== `audit.kernel.data.inif`
+
+type: keyword
+
+in interface number
+
+[float]
+=== `audit.kernel.data.vm`
+
+type: keyword
+
+virtual machine name
+
+[float]
+=== `audit.kernel.data.flags`
+
+type: keyword
+
+mmap syscall flags
+
+[float]
+=== `audit.kernel.data.nlnk-fam`
+
+type: keyword
+
+netlink protocol number
+
+[float]
+=== `audit.kernel.data.old-fs`
+
+type: keyword
+
+file system being removed from vm
+
+[float]
+=== `audit.kernel.data.old-ses`
+
+type: keyword
+
+previous ses value
+
+[float]
+=== `audit.kernel.data.seqno`
+
+type: keyword
+
+sequence number
+
+[float]
+=== `audit.kernel.data.fver`
+
+type: keyword
+
+file system capabilities version number
+
+[float]
+=== `audit.kernel.data.qbytes`
+
+type: keyword
+
+ipc objects quantity of bytes
+
+[float]
+=== `audit.kernel.data.seuser`
+
+type: keyword
+
+user's SE Linux user acct
+
+[float]
+=== `audit.kernel.data.cap_fe`
+
+type: keyword
+
+file assigned effective capability map
+
+[float]
+=== `audit.kernel.data.new-vcpu`
+
+type: keyword
+
+new number of CPU cores
+
+[float]
+=== `audit.kernel.data.old-level`
+
+type: keyword
+
+old run level
+
+[float]
+=== `audit.kernel.data.old_pp`
+
+type: keyword
+
+old process permitted capability map
+
+[float]
+=== `audit.kernel.data.daddr`
+
+type: keyword
+
+remote IP address
+
+[float]
+=== `audit.kernel.data.old-role`
+
+type: keyword
+
+present SELinux role
+
+[float]
+=== `audit.kernel.data.ioctlcmd`
+
+type: keyword
+
+The request argument to the ioctl syscall
+
+[float]
+=== `audit.kernel.data.smac`
+
+type: keyword
+
+local MAC address
+
+[float]
+=== `audit.kernel.data.apparmor`
+
+type: keyword
+
+apparmor event information
+
+[float]
+=== `audit.kernel.data.fe`
+
+type: keyword
+
+file assigned effective capability map
+
+[float]
+=== `audit.kernel.data.perm_mask`
+
+type: keyword
+
+file permission mask that triggered a watch event
+
+[float]
+=== `audit.kernel.data.ses`
+
+type: keyword
+
+login session ID
+
+[float]
+=== `audit.kernel.data.cap_fi`
+
+type: keyword
+
+file inherited capability map
+
+[float]
+=== `audit.kernel.data.obj_uid`
+
+type: keyword
+
+user ID of object
+
+[float]
+=== `audit.kernel.data.reason`
+
+type: keyword
+
+text string denoting a reason for the action
+
+[float]
+=== `audit.kernel.data.list`
+
+type: keyword
+
+the audit system's filter list number
+
+[float]
+=== `audit.kernel.data.old_lock`
+
+type: keyword
+
+present value of feature lock
+
+[float]
+=== `audit.kernel.data.bus`
+
+type: keyword
+
+name of subsystem bus a vm resource belongs to
+
+[float]
+=== `audit.kernel.data.old_pe`
+
+type: keyword
+
+old process effective capability map
+
+[float]
+=== `audit.kernel.data.new-role`
+
+type: keyword
+
+new SELinux role
+
+[float]
+=== `audit.kernel.data.prom`
+
+type: keyword
+
+network promiscuity flag
+
+[float]
+=== `audit.kernel.data.uri`
+
+type: keyword
+
+URI pointing to a printer
+
+[float]
+=== `audit.kernel.data.audit_enabled`
+
+type: keyword
+
+audit systems's enable/disable status
+
+[float]
+=== `audit.kernel.data.old-log_passwd`
+
+type: keyword
+
+present value for TTY password logging
+
+[float]
+=== `audit.kernel.data.old-seuser`
+
+type: keyword
+
+present SELinux user
+
+[float]
+=== `audit.kernel.data.per`
+
+type: keyword
+
+linux personality
+
+[float]
+=== `audit.kernel.data.scontext`
+
+type: keyword
+
+the subject's context string
+
+[float]
+=== `audit.kernel.data.tclass`
+
+type: keyword
+
+target's object classification
+
+[float]
+=== `audit.kernel.data.ver`
+
+type: keyword
+
+audit daemon's version number
+
+[float]
+=== `audit.kernel.data.new`
+
+type: keyword
+
+value being set in feature
+
+[float]
+=== `audit.kernel.data.val`
+
+type: keyword
+
+generic value associated with the operation
+
+[float]
+=== `audit.kernel.data.img-ctx`
+
+type: keyword
+
+the vm's disk image context string
+
+[float]
+=== `audit.kernel.data.old-chardev`
+
+type: keyword
+
+present character device assigned to vm
+
+[float]
+=== `audit.kernel.data.old_val`
+
+type: keyword
+
+current value of SELinux boolean
+
+[float]
+=== `audit.kernel.data.success`
+
+type: keyword
+
+whether the syscall was successful or not
+
+[float]
+=== `audit.kernel.data.inode_uid`
+
+type: keyword
+
+user ID of the inode's owner
+
+[float]
+=== `audit.kernel.data.removed`
+
+type: keyword
+
+number of deleted files
+
+[float]
+=== `audit.kernel.messages`
+
+type: text
+
+An ordered list of the raw messages received from the kernel that were used to construct this document. This field is present if an error occurred processing the data or if `kernel.include_raw_message` is set in the config.
+
+
+[float]
+=== `audit.kernel.warnings`
+
+type: keyword
+
+The warnings generated by the Beat during the construction of the event. These are disabled by default and are used for development and debug purposes only.
+
+
+[float]
+== geoip fields
+
+Contains GeoIP information gathered based on the `os_events.audit.addr` field. Only present if the GeoIP Elasticsearch plugin is available and used.
+
+
+
+[float]
+=== `audit.kernel.geoip.continent_name`
+
+type: keyword
+
+The name of the continent.
+
+
+[float]
+=== `audit.kernel.geoip.city_name`
+
+type: keyword
+
+The name of the city.
+
+
+[float]
+=== `audit.kernel.geoip.region_name`
+
+type: keyword
+
+The name of the region.
+
+
+[float]
+=== `audit.kernel.geoip.country_iso_code`
+
+type: keyword
+
+Country ISO code.
+
+
+[float]
+=== `audit.kernel.geoip.location`
+
+type: geo_point
+
+The longitude and latitude.
+
+
+[[exported-fields-beat]]
+== Beat fields
+
+Contains common beat fields available in all event types.
+
+
+
+[float]
+=== `beat.name`
+
+The name of the Beat sending the log messages. If the Beat name is set in the configuration file, then that value is used. If it is not set, the hostname is used. To set the Beat name, use the `name` option in the configuration file.
+
+
+[float]
+=== `beat.hostname`
+
+The hostname as returned by the operating system on which the Beat is running.
+
+
+[float]
+=== `beat.timezone`
+
+The timezone as returned by the operating system on which the Beat is running.
+
+
+[float]
+=== `beat.version`
+
+The version of the beat that generated this event.
+
+
+[float]
+=== `@timestamp`
+
+type: date
+
+example: August 26th 2016, 12:35:53.332
+
+format: date
+
+required: True
+
+The timestamp when the event log record was generated.
+
+
+[float]
+=== `tags`
+
+Arbitrary tags that can be set per Beat and per transaction type.
+
+
+[float]
+=== `fields`
+
+type: object
+
+Contains user configurable fields.
+
+
+[float]
+== error fields
+
+Error fields containing additional info in case of errors.
+
+
+
+[float]
+=== `error.message`
+
+type: text
+
+Error message.
+
+
+[float]
+=== `error.code`
+
+type: long
+
+Error code.
+
+
+[float]
+=== `error.type`
+
+type: keyword
+
+Error type.
+
+
+[[exported-fields-cloud]]
+== Cloud provider metadata fields
+
+Metadata from cloud providers added by the add_cloud_metadata processor.
+
+
+
+[float]
+=== `meta.cloud.provider`
+
+example: ec2
+
+Name of the cloud provider. Possible values are ec2, gce, or digitalocean.
+
+
+[float]
+=== `meta.cloud.instance_id`
+
+Instance ID of the host machine.
+
+
+[float]
+=== `meta.cloud.instance_name`
+
+Instance name of the host machine.
+
+
+[float]
+=== `meta.cloud.machine_type`
+
+example: t2.medium
+
+Machine type of the host machine.
+
+
+[float]
+=== `meta.cloud.availability_zone`
+
+example: us-east-1c
+
+Availability zone in which this host is running.
+
+
+[float]
+=== `meta.cloud.project_id`
+
+example: project-x
+
+Name of the project in Google Cloud.
+
+
+[float]
+=== `meta.cloud.region`
+
+Region in which this host is running.
+
+
+[[exported-fields-common]]
+== Common fields
+
+Contains common fields available in all event types.
+
+
+
+[float]
+=== `metricset.module`
+
+The name of the module that generated the event.
+
+
+[float]
+=== `metricset.name`
+
+The name of the metricset that generated the event.
+
+
+[float]
+=== `metricset.host`
+
+Hostname of the machine from which the metricset was collected. This field may not be present when the data was collected locally.
+
+
+[float]
+=== `metricset.rtt`
+
+type: long
+
+required: True
+
+Event round trip time in microseconds.
+
+
+[float]
+=== `metricset.namespace`
+
+type: keyword
+
+Namespace of dynamic metricsets.
+
+
+[float]
+=== `type`
+
+example: metricsets
+
+required: True
+
+The document type. Always set to "metricsets".
+
+
+[[exported-fields-docker-processor]]
+== Docker fields
+
+beta[]
+Docker stats collected from Docker.
+
+
+
+
+[float]
+=== `docker.container.id`
+
+type: keyword
+
+Unique container id.
+
+
+[float]
+=== `docker.container.image`
+
+type: keyword
+
+Name of the image the container was built on.
+
+
+[float]
+=== `docker.container.name`
+
+type: keyword
+
+Container name.
+
+
+[float]
+=== `docker.container.labels`
+
+type: object
+
+Image labels.
+
+
+[[exported-fields-kubernetes-processor]]
+== Kubernetes fields
+
+beta[]
+Kubernetes metadata added by the kubernetes processor
+
+
+
+
+[float]
+=== `kubernetes.pod.name`
+
+type: keyword
+
+Kubernetes pod name
+
+
+[float]
+=== `kubernetes.namespace`
+
+type: keyword
+
+Kubernetes namespace
+
+
+[float]
+=== `kubernetes.labels`
+
+type: object
+
+Kubernetes labels map
+
+
+[float]
+=== `kubernetes.annotations`
+
+type: object
+
+Kubernetes annotations map
+
+
+[float]
+=== `kubernetes.container.name`
+
+type: keyword
+
+Kubernetes container name
+
+
+[float]
+=== `kubernetes.container.image`
+
+type: keyword
+
+Kubernetes container image
+
+

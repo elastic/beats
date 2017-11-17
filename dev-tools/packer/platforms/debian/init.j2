@@ -1,6 +1,6 @@
 #!/bin/sh
 ### BEGIN INIT INFO
-# Provides:          {{.beat_name}}
+# Provides:          {{.beat_pkg_name}}
 # Required-Start:    $local_fs $network $syslog
 # Required-Stop:     $local_fs $network $syslog
 # Default-Start:     2 3 4 5
@@ -18,9 +18,10 @@ DESC="{{.beat_description}}"
 NAME="{{.beat_name}}"
 DAEMON=/usr/share/{{.beat_name}}/bin/$NAME
 DAEMON_ARGS="-c /etc/{{.beat_name}}/{{.beat_name}}.yml -path.home /usr/share/{{.beat_name}} -path.config /etc/{{.beat_name}} -path.data /var/lib/{{.beat_name}} -path.logs /var/log/{{.beat_name}}"
-TEST_ARGS="-e -configtest"
-PIDFILE=/var/run/{{.beat_name}}.pid
+TEST_ARGS="-e test config"
+PIDFILE=/var/run/{{.beat_pkg_name}}.pid
 WRAPPER="/usr/share/{{.beat_name}}/bin/{{.beat_name}}-god"
+BEAT_USER="root"
 WRAPPER_ARGS="-r / -n -p $PIDFILE"
 SCRIPTNAME=/etc/init.d/$NAME
 
@@ -28,7 +29,15 @@ SCRIPTNAME=/etc/init.d/$NAME
 [ -x "$DAEMON" ] || exit 0
 
 # Read configuration variable file if it is present
-[ -r /etc/default/$NAME ] && . /etc/default/$NAME
+[ -r /etc/default/{{.beat_pkg_name}} ] && . /etc/default/{{.beat_pkg_name}}
+
+[ "$BEAT_USER" != "root" ] && WRAPPER_ARGS="$WRAPPER_ARGS -u $BEAT_USER"
+USER_WRAPPER="su"
+USER_WRAPPER_ARGS="$BEAT_USER -c"
+
+if command -v runuser >/dev/null 2>&1; then
+    USER_WRAPPER="runuser"
+fi
 
 # Load the VERBOSE setting and other rcS variables
 . /lib/init/vars.sh
@@ -44,7 +53,7 @@ SCRIPTNAME=/etc/init.d/$NAME
 #
 do_test()
 {
-        $DAEMON $DAEMON_ARGS $TEST_ARGS
+        $USER_WRAPPER $USER_WRAPPER_ARGS "$DAEMON $DAEMON_ARGS $TEST_ARGS"
 }
 
 #

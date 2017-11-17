@@ -1,0 +1,2 @@
+CEPH_HOST=ceph
+CEPH_PORT=5000

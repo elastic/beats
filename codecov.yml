@@ -1,1 +1,33 @@
+# Enable coverage report message for diff on commit
+# Docs can be found here: https://docs.codecov.io/v4.3.0/docs/commit-status
+coverage:
+  status:
+    project:
+      default:
+        target: auto
+        # Overall coverage should never drop more then 0.5%
+        threshold: 0.5
+        base: auto
+        branches: null
+        if_no_uploads: error
+        if_not_found: success
+        if_ci_failed: error
+        only_pulls: false
+        flags: null
+        paths: null
+    patch:
+      default:
+        target: auto
+        # Allows PRs without tests, overall stats count
+        threshold: 100
+        base: auto
+        branches: null
+        if_no_uploads: error
+        if_not_found: success
+        if_ci_failed: error
+        only_pulls: false
+        flags: null
+        paths: null
+
+# Disable comments on Pull Requests
 comment: false

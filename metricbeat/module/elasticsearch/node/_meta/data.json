@@ -1,0 +1,46 @@
+{
+    "@timestamp": "2016-05-23T08:05:34.853Z",
+    "beat": {
+        "hostname": "host.example.com",
+        "name": "host.example.com"
+    },
+    "elasticsearch": {
+        "cluster": {
+            "name": "elasticsearch"
+        },
+        "node": {
+            "name": "8zgOwJ24TMamDDH9amWINQ",
+            "version": "6.0.0-alpha1",
+            "jvm":{
+                "version":"1.8.0_60",
+                "memory":{
+                    "heap":{
+                        "init":{
+                            "bytes":268435456
+                        },
+                        "max":{
+                            "bytes":1038876672
+                        }
+                    },
+                    "nonheap":{
+                        "init":{
+                            "bytes":2555904
+                        },
+                        "max":{
+                            "bytes":0
+                        }
+                    }
+                },
+                "process":{
+                    "mlockall":true
+                }
+            }
+        }
+    },
+    "metricset": {
+        "host": "127.0.0.1:9200",
+        "module": "elasticsearch",
+        "name": "node",
+        "rtt": 115
+    }
+}

@@ -1,0 +1,201 @@
+{
+  "cluster_name" : "elasticsearch",
+  "nodes" : {
+    "r5sVf89AQxOh6k96c_s74g" : {
+      "name" : "Laura Dean",
+      "transport_address" : "127.0.0.1:9300",
+      "host" : "127.0.0.1",
+      "ip" : "127.0.0.1",
+      "version" : "2.4.3",
+      "build" : "d38a34e",
+      "http_address" : "127.0.0.1:9200",
+      "settings" : {
+        "name" : "Laura Dean",
+        "client" : {
+          "type" : "node"
+        },
+        "cluster" : {
+          "name" : "elasticsearch"
+        },
+        "path" : {
+          "logs" : "/Users/ruflin/Downloads/elasticsearch-2.4.3/logs",
+          "home" : "/Users/ruflin/Downloads/elasticsearch-2.4.3"
+        },
+        "config" : {
+          "ignore_system_properties" : "true"
+        }
+      },
+      "os" : {
+        "refresh_interval_in_millis" : 1000,
+        "name" : "Mac OS X",
+        "arch" : "x86_64",
+        "version" : "10.12.4",
+        "available_processors" : 4,
+        "allocated_processors" : 4
+      },
+      "process" : {
+        "refresh_interval_in_millis" : 1000,
+        "id" : 12185,
+        "mlockall" : false
+      },
+      "jvm" : {
+        "pid" : 12185,
+        "version" : "1.8.0_60",
+        "vm_name" : "Java HotSpot(TM) 64-Bit Server VM",
+        "vm_version" : "25.60-b23",
+        "vm_vendor" : "Oracle Corporation",
+        "start_time_in_millis" : 1491556546451,
+        "mem" : {
+          "heap_init_in_bytes" : 268435456,
+          "heap_max_in_bytes" : 1038876672,
+          "non_heap_init_in_bytes" : 2555904,
+          "non_heap_max_in_bytes" : 0,
+          "direct_max_in_bytes" : 1038876672
+        },
+        "gc_collectors" : [ "ParNew", "ConcurrentMarkSweep" ],
+        "memory_pools" : [ "Code Cache", "Metaspace", "Compressed Class Space", "Par Eden Space", "Par Survivor Space", "CMS Old Gen" ],
+        "using_compressed_ordinary_object_pointers" : "true"
+      },
+      "thread_pool" : {
+        "force_merge" : {
+          "type" : "fixed",
+          "min" : 1,
+          "max" : 1,
+          "queue_size" : -1
+        },
+        "percolate" : {
+          "type" : "fixed",
+          "min" : 4,
+          "max" : 4,
+          "queue_size" : 1000
+        },
+        "fetch_shard_started" : {
+          "type" : "scaling",
+          "min" : 1,
+          "max" : 8,
+          "keep_alive" : "5m",
+          "queue_size" : -1
+        },
+        "listener" : {
+          "type" : "fixed",
+          "min" : 2,
+          "max" : 2,
+          "queue_size" : -1
+        },
+        "index" : {
+          "type" : "fixed",
+          "min" : 4,
+          "max" : 4,
+          "queue_size" : 200
+        },
+        "refresh" : {
+          "type" : "scaling",
+          "min" : 1,
+          "max" : 2,
+          "keep_alive" : "5m",
+          "queue_size" : -1
+        },
+        "suggest" : {
+          "type" : "fixed",
+          "min" : 4,
+          "max" : 4,
+          "queue_size" : 1000
+        },
+        "generic" : {
+          "type" : "cached",
+          "keep_alive" : "30s",
+          "queue_size" : -1
+        },
+        "warmer" : {
+          "type" : "scaling",
+          "min" : 1,
+          "max" : 2,
+          "keep_alive" : "5m",
+          "queue_size" : -1
+        },
+        "search" : {
+          "type" : "fixed",
+          "min" : 7,
+          "max" : 7,
+          "queue_size" : 1000
+        },
+        "flush" : {
+          "type" : "scaling",
+          "min" : 1,
+          "max" : 2,
+          "keep_alive" : "5m",
+          "queue_size" : -1
+        },
+        "fetch_shard_store" : {
+          "type" : "scaling",
+          "min" : 1,
+          "max" : 8,
+          "keep_alive" : "5m",
+          "queue_size" : -1
+        },
+        "management" : {
+          "type" : "scaling",
+          "min" : 1,
+          "max" : 5,
+          "keep_alive" : "5m",
+          "queue_size" : -1
+        },
+        "get" : {
+          "type" : "fixed",
+          "min" : 4,
+          "max" : 4,
+          "queue_size" : 1000
+        },
+        "bulk" : {
+          "type" : "fixed",
+          "min" : 4,
+          "max" : 4,
+          "queue_size" : 50
+        },
+        "snapshot" : {
+          "type" : "scaling",
+          "min" : 1,
+          "max" : 2,
+          "keep_alive" : "5m",
+          "queue_size" : -1
+        }
+      },
+      "transport" : {
+        "bound_address" : [ "[fe80::1]:9300", "[::1]:9300", "127.0.0.1:9300" ],
+        "publish_address" : "127.0.0.1:9300",
+        "profiles" : { }
+      },
+      "http" : {
+        "bound_address" : [ "[fe80::1]:9200", "[::1]:9200", "127.0.0.1:9200" ],
+        "publish_address" : "127.0.0.1:9200",
+        "max_content_length_in_bytes" : 104857600
+      },
+      "plugins" : [ ],
+      "modules" : [ {
+        "name" : "lang-expression",
+        "version" : "2.4.3",
+        "description" : "Lucene expressions integration for Elasticsearch",
+        "jvm" : true,
+        "classname" : "org.elasticsearch.script.expression.ExpressionPlugin",
+        "isolated" : true,
+        "site" : false
+      }, {
+        "name" : "lang-groovy",
+        "version" : "2.4.3",
+        "description" : "Groovy scripting integration for Elasticsearch",
+        "jvm" : true,
+        "classname" : "org.elasticsearch.script.groovy.GroovyPlugin",
+        "isolated" : true,
+        "site" : false
+      }, {
+        "name" : "reindex",
+        "version" : "2.4.3",
+        "description" : "_reindex and _update_by_query APIs",
+        "jvm" : true,
+        "classname" : "org.elasticsearch.index.reindex.ReindexPlugin",
+        "isolated" : true,
+        "site" : false
+      } ]
+    }
+  }
+}

@@ -26,6 +26,12 @@
                 "received": 992,
                 "sent": 40657
             },
+            "command": {
+              "delete": 0,
+              "insert": 0,
+              "select": 9,
+              "update": 0
+            },
             "connections": 11,
             "created": {
                 "tmp": {

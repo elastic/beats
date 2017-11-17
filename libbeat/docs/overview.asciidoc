@@ -1,5 +1,9 @@
 == Overview
 
+++++
+<titleabbrev>Beats overview</titleabbrev>
+++++
+
 The _Beats_ are open source data shippers that you install as _agents_ on
 your servers to send different types of operational data to
 https://www.elastic.co/products/elasticsearch[Elasticsearch]. Beats can

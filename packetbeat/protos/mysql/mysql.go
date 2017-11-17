@@ -2,18 +2,18 @@ package mysql
 
 import (
 	"errors"
-	"expvar"
 	"fmt"
 	"strings"
 	"time"
 
+	"github.com/elastic/beats/libbeat/beat"
 	"github.com/elastic/beats/libbeat/common"
 	"github.com/elastic/beats/libbeat/logp"
+	"github.com/elastic/beats/libbeat/monitoring"
 
 	"github.com/elastic/beats/packetbeat/procs"
 	"github.com/elastic/beats/packetbeat/protos"
 	"github.com/elastic/beats/packetbeat/protos/tcp"
-	"github.com/elastic/beats/packetbeat/publish"
 )
 
 // Packet types
@@ -24,8 +24,8 @@ const (
 const maxPayloadSize = 100 * 1024
 
 var (
-	unmatchedRequests  = expvar.NewInt("mysql.unmatched_requests")
-	unmatchedResponses = expvar.NewInt("mysql.unmatched_responses")
+	unmatchedRequests  = monitoring.NewInt(nil, "mysql.unmatched_requests")
+	unmatchedResponses = monitoring.NewInt(nil, "mysql.unmatched_responses")
 )
 
 type mysqlMessage struct {
@@ -123,7 +123,7 @@ type mysqlPlugin struct {
 	transactions       *common.Cache
 	transactionTimeout time.Duration
 
-	results publish.Transactions
+	results protos.Reporter
 
 	// function pointer for mocking
 	handleMysql func(mysql *mysqlPlugin, m *mysqlMessage, tcp *common.TCPTuple,
@@ -136,7 +136,7 @@ func init() {
 
 func New(
 	testMode bool,
-	results publish.Transactions,
+	results protos.Reporter,
 	cfg *common.Config,
 ) (protos.Plugin, error) {
 	p := &mysqlPlugin{}
@@ -153,7 +153,7 @@ func New(
 	return p, nil
 }
 
-func (mysql *mysqlPlugin) init(results publish.Transactions, config *mysqlConfig) error {
+func (mysql *mysqlPlugin) init(results protos.Reporter, config *mysqlConfig) error {
 	mysql.setFromConfig(config)
 
 	mysql.transactions = common.NewCache(
@@ -196,7 +196,6 @@ func (stream *mysqlStream) prepareForNewMessage() {
 }
 
 func mysqlMessageParser(s *mysqlStream) (bool, bool) {
-
 	logp.Debug("mysqldetailed", "MySQL parser called. parseState = %s", s.parseState)
 
 	m := s.message
@@ -429,7 +428,6 @@ func mysqlMessageParser(s *mysqlStream) (bool, bool) {
 // tcp stream. Returns true if there is already enough data in the message
 // read so far that we can use it further in the stack.
 func (mysql *mysqlPlugin) messageGap(s *mysqlStream, nbytes int) (complete bool) {
-
 	m := s.message
 	switch s.parseState {
 	case mysqlStateStart, mysqlStateEatMessage:
@@ -674,7 +672,6 @@ func (mysql *mysqlPlugin) receivedMysqlResponse(msg *mysqlMessage) {
 }
 
 func (mysql *mysqlPlugin) parseMysqlResponse(data []byte) ([]string, [][]string) {
-
 	length, err := readLength(data, 0)
 	if err != nil {
 		logp.Warn("Invalid response: %v", err)
@@ -824,45 +821,46 @@ func (mysql *mysqlPlugin) parseMysqlResponse(data []byte) ([]string, [][]string)
 }
 
 func (mysql *mysqlPlugin) publishTransaction(t *mysqlTransaction) {
-
 	if mysql.results == nil {
 		return
 	}
 
 	logp.Debug("mysql", "mysql.results exists")
 
-	event := common.MapStr{}
-	event["type"] = "mysql"
+	fields := common.MapStr{}
+	fields["type"] = "mysql"
 
 	if t.mysql["iserror"].(bool) {
-		event["status"] = common.ERROR_STATUS
+		fields["status"] = common.ERROR_STATUS
 	} else {
-		event["status"] = common.OK_STATUS
+		fields["status"] = common.OK_STATUS
 	}
 
-	event["responsetime"] = t.responseTime
+	fields["responsetime"] = t.responseTime
 	if mysql.sendRequest {
-		event["request"] = t.requestRaw
+		fields["request"] = t.requestRaw
 	}
 	if mysql.sendResponse {
-		event["response"] = t.responseRaw
+		fields["response"] = t.responseRaw
 	}
-	event["method"] = t.method
-	event["query"] = t.query
-	event["mysql"] = t.mysql
-	event["path"] = t.path
-	event["bytes_out"] = t.bytesOut
-	event["bytes_in"] = t.bytesIn
+	fields["method"] = t.method
+	fields["query"] = t.query
+	fields["mysql"] = t.mysql
+	fields["path"] = t.path
+	fields["bytes_out"] = t.bytesOut
+	fields["bytes_in"] = t.bytesIn
 
 	if len(t.notes) > 0 {
-		event["notes"] = t.notes
+		fields["notes"] = t.notes
 	}
 
-	event["@timestamp"] = common.Time(t.ts)
-	event["src"] = &t.src
-	event["dst"] = &t.dst
+	fields["src"] = &t.src
+	fields["dst"] = &t.dst
 
-	mysql.results.PublishTransaction(event)
+	mysql.results(beat.Event{
+		Timestamp: t.ts,
+		Fields:    fields,
+	})
 }
 
 func readLstring(data []byte, offset int) ([]byte, int, bool, error) {

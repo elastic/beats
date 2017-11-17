@@ -2,7 +2,6 @@ package cluster
 
 import (
 	"encoding/json"
-	"io"
 
 	"github.com/elastic/beats/libbeat/common"
 	"github.com/elastic/beats/libbeat/logp"
@@ -41,10 +40,9 @@ type Data struct {
 	MaxBucketCount       int64         `json:"maxBucketCount"`
 }
 
-func eventMapping(body io.Reader) common.MapStr {
-
+func eventMapping(content []byte) common.MapStr {
 	var d Data
-	err := json.NewDecoder(body).Decode(&d)
+	err := json.Unmarshal(content, &d)
 	if err != nil {
 		logp.Err("Error: ", err)
 	}

@@ -341,7 +341,7 @@ func (self *CpuList) Get() error {
 	load := [C.CPUSTATES]C.long{C.CP_USER, C.CP_NICE, C.CP_SYS, C.CP_INTR, C.CP_IDLE}
 
 	self.List = make([]Cpu, ncpu)
-	for curcpu, _ := range self.List {
+	for curcpu := range self.List {
 		sysctlCptime(ncpu, curcpu, &load)
 		fillCpu(&self.List[curcpu], load)
 	}
@@ -355,6 +355,10 @@ func (self *ProcList) Get() error {
 
 func (self *ProcArgs) Get(pid int) error {
 	return nil
+}
+
+func (self *ProcEnv) Get(pid int) error {
+	return ErrNotImplemented{runtime.GOOS}
 }
 
 func (self *ProcState) Get(pid int) error {

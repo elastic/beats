@@ -21,10 +21,9 @@ def collect():
             continue
 
         # Load module yaml
-        with file(module_fields) as f:
+        with open(module_fields) as f:
             tmp = f.read()
             fields_yml += tmp
-
 
         # Iterate over all metricsets
         for metricset in sorted(os.listdir(base_dir + "/" + module)):
@@ -36,7 +35,7 @@ def collect():
                 continue
 
             # Load metricset yaml
-            with file(metricset_fields) as f:
+            with open(metricset_fields) as f:
                 # Add 4 spaces for indentation in front of each line
                 for line in f:
                     if len(line.strip()) > 0:
@@ -48,10 +47,8 @@ def collect():
             fields_yml += "\n"
 
     # output string so it can be concatenated
-    print fields_yml
+    print(fields_yml)
+
 
 if __name__ == "__main__":
     collect()
-
-
-

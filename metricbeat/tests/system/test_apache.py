@@ -17,6 +17,9 @@ CPU_FIELDS = ["load", "user", "system", "children_user",
 
 
 class ApacheStatusTest(metricbeat.BaseTest):
+
+    COMPOSE_SERVICES = ['apache']
+
     @unittest.skipUnless(metricbeat.INTEGRATION_TESTS, "integration test")
     @attr('integration')
     def test_output(self):
@@ -36,17 +39,14 @@ class ApacheStatusTest(metricbeat.BaseTest):
         # Waits until CPULoad is part of the status
         while found == False:
             res = urllib2.urlopen(hosts[0] + "/server-status?auto").read()
-            if "CPULoad"  in res:
+            if "CPULoad" in res:
                 found = True
             time.sleep(0.5)
 
         proc = self.start_beat()
         self.wait_until(lambda: self.output_lines() > 0)
         proc.check_kill_and_wait()
-
-        # Ensure no errors or warnings exist in the log.
-        log = self.get_log()
-        self.assertNotRegexpMatches(log, "ERR|WARN")
+        self.assert_no_logged_warnings()
 
         output = self.read_output_json()
         self.assertEqual(len(output), 1)
@@ -61,7 +61,6 @@ class ApacheStatusTest(metricbeat.BaseTest):
 
         # Verify all fields present are documented.
         self.assert_fields_are_documented(evt)
-
 
     def get_hosts(self):
         return ['http://' + os.getenv('APACHE_HOST', 'localhost') + ':' +

@@ -152,13 +152,13 @@ func (r *jsonReader) popState() {
 }
 
 func (r *jsonReader) expectDict() error {
-	entity, _, err := r.step()
+	e, _, err := r.step()
 
 	if err != nil {
 		return err
 	}
 
-	if entity != dictStart {
+	if e != dictStart {
 		return r.SetError(errExpectedObject)
 	}
 
@@ -166,12 +166,12 @@ func (r *jsonReader) expectDict() error {
 }
 
 func (r *jsonReader) expectArray() error {
-	entity, _, err := r.step()
+	e, _, err := r.step()
 	if err != nil {
 		return err
 	}
 
-	if entity != arrStart {
+	if e != arrStart {
 		return r.SetError(errExpectedArray)
 	}
 
@@ -179,25 +179,25 @@ func (r *jsonReader) expectArray() error {
 }
 
 func (r *jsonReader) nextFieldName() (entity, []byte, error) {
-	entity, raw, err := r.step()
+	e, raw, err := r.step()
 	if err != nil {
-		return entity, raw, err
+		return e, raw, err
 	}
 
-	if entity != mapKeyEntity && entity != dictEnd {
-		return entity, nil, r.SetError(errExpectedFieldName)
+	if e != mapKeyEntity && e != dictEnd {
+		return e, nil, r.SetError(errExpectedFieldName)
 	}
 
-	return entity, raw, err
+	return e, raw, err
 }
 
 func (r *jsonReader) nextInt() (int, error) {
-	entity, raw, err := r.step()
+	e, raw, err := r.step()
 	if err != nil {
 		return 0, err
 	}
 
-	if entity != intEntity {
+	if e != intEntity {
 		return 0, errExpectedInteger
 	}
 
@@ -213,12 +213,12 @@ func (r *jsonReader) ignoreNext() (raw []byte, err error) {
 	snapshot := r.Snapshot()
 	before := r.Len()
 
-	entity, _, err := r.step()
+	e, _, err := r.step()
 	if err != nil {
 		return nil, err
 	}
 
-	switch entity {
+	switch e {
 	case arrStart:
 		err = ignoreKind(r, arrEnd)
 	case dictStart:
@@ -238,12 +238,12 @@ func (r *jsonReader) ignoreNext() (raw []byte, err error) {
 
 func ignoreKind(r *jsonReader, kind entity) error {
 	for {
-		entity, _, err := r.step()
+		e, _, err := r.step()
 		if err != nil {
 			return err
 		}
 
-		switch entity {
+		switch e {
 		case kind:
 			return nil
 		case arrStart:
@@ -441,9 +441,9 @@ func stepSymbol(r *jsonReader, e entity, symb []byte, fail error) (entity, []byt
 }
 
 func (r *jsonReader) stepMapKey() (entity, []byte, error) {
-	entity, key, err := r.stepString()
+	e, key, err := r.stepString()
 	if err != nil {
-		return entity, key, err
+		return e, key, err
 	}
 
 	r.skipWS()

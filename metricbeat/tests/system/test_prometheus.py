@@ -1,11 +1,14 @@
 import os
 import metricbeat
 import unittest
-from nose.plugins.attrib import attr
 
 PROMETHEUS_FIELDS = metricbeat.COMMON_FIELDS + ["prometheus"]
 
+
 class Test(metricbeat.BaseTest):
+
+    COMPOSE_SERVICES = ['prometheus']
+
     @unittest.skipUnless(metricbeat.INTEGRATION_TESTS, "integration test")
     def test_stats(self):
         """
@@ -20,10 +23,7 @@ class Test(metricbeat.BaseTest):
         proc = self.start_beat()
         self.wait_until(lambda: self.output_lines() > 0)
         proc.check_kill_and_wait()
-
-        # Ensure no errors or warnings exist in the log.
-        log = self.get_log()
-        self.assertNotRegexpMatches(log.replace("WARN EXPERIMENTAL", ""), "ERR|WARN")
+        self.assert_no_logged_warnings()
 
         output = self.read_output_json()
         self.assertEqual(len(output), 1)

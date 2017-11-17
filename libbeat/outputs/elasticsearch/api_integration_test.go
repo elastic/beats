@@ -5,12 +5,14 @@ package elasticsearch
 import (
 	"encoding/json"
 	"fmt"
+	"net/http"
 	"os"
 	"strings"
 	"testing"
 
-	"github.com/elastic/beats/libbeat/logp"
 	"github.com/stretchr/testify/assert"
+
+	"github.com/elastic/beats/libbeat/logp"
 )
 
 func TestIndex(t *testing.T) {
@@ -20,7 +22,7 @@ func TestIndex(t *testing.T) {
 
 	index := fmt.Sprintf("beats-test-index-%d", os.Getpid())
 
-	client := GetTestingElasticsearch()
+	client := GetTestingElasticsearch(t)
 
 	body := map[string]interface{}{
 		"user":      "test",
@@ -34,8 +36,8 @@ func TestIndex(t *testing.T) {
 	if err != nil {
 		t.Fatalf("Index() returns error: %s", err)
 	}
-	if !resp.Created {
-		t.Errorf("Index() fails: %s", resp)
+	if !resp.Created && resp.Result != "created" {
+		t.Fatalf("Index() fails: %s", resp)
 	}
 
 	params = map[string]string{
@@ -76,12 +78,15 @@ func TestIngest(t *testing.T) {
 		},
 	}
 
-	client := GetTestingElasticsearch()
+	client := GetTestingElasticsearch(t)
 	if strings.HasPrefix(client.Connection.version, "2.") {
 		t.Skip("Skipping tests as pipeline not available in 2.x releases")
 	}
 
-	_, _, err := client.DeletePipeline(pipeline, nil)
+	status, _, err := client.DeletePipeline(pipeline, nil)
+	if err != nil && status != http.StatusNotFound {
+		t.Fatal(err)
+	}
 
 	_, resp, err := client.CreatePipeline(pipeline, nil, pipelineBody)
 	if err != nil {
@@ -98,7 +103,7 @@ func TestIngest(t *testing.T) {
 	if err != nil {
 		t.Fatalf("Ingest() returns error: %s", err)
 	}
-	if !resp.Created {
+	if !resp.Created && resp.Result != "created" {
 		t.Errorf("Ingest() fails: %s", resp)
 	}
 

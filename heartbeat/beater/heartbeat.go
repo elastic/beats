@@ -7,7 +7,6 @@ import (
 	"github.com/elastic/beats/libbeat/beat"
 	"github.com/elastic/beats/libbeat/common"
 	"github.com/elastic/beats/libbeat/logp"
-	"github.com/elastic/beats/libbeat/publisher"
 
 	"github.com/elastic/beats/heartbeat/config"
 	"github.com/elastic/beats/heartbeat/monitors"
@@ -17,12 +16,13 @@ import (
 type Heartbeat struct {
 	done chan struct{}
 
-	client    publisher.Client
 	scheduler *scheduler.Scheduler
-	manager   *MonitorManager
+	manager   *monitorManager
 }
 
 func New(b *beat.Beat, cfg *common.Config) (beat.Beater, error) {
+	logp.Warn("Beta: Heartbeat is beta software")
+
 	config := config.DefaultConfig
 	if err := cfg.Unpack(&config); err != nil {
 		return nil, fmt.Errorf("Error reading config file: %v", err)
@@ -38,16 +38,14 @@ func New(b *beat.Beat, cfg *common.Config) (beat.Beater, error) {
 		return nil, err
 	}
 
-	client := b.Publisher.Connect()
 	sched := scheduler.NewWithLocation(limit, location)
-	manager, err := newMonitorManager(client, sched, monitors.Registry, config.Monitors)
+	manager, err := newMonitorManager(b.Publisher, sched, monitors.Registry, config.Monitors)
 	if err != nil {
 		return nil, err
 	}
 
 	bt := &Heartbeat{
 		done:      make(chan struct{}),
-		client:    client,
 		scheduler: sched,
 		manager:   manager,
 	}
@@ -64,11 +62,12 @@ func (bt *Heartbeat) Run(b *beat.Beat) error {
 
 	<-bt.done
 
+	bt.manager.Stop()
+
 	logp.Info("Shutting down.")
 	return nil
 }
 
 func (bt *Heartbeat) Stop() {
-	bt.client.Close()
 	close(bt.done)
 }

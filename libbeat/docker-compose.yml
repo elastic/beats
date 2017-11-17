@@ -1,11 +1,9 @@
-version: '2'
+version: '2.1'
 services:
   beat:
     build: ${PWD}/.
-    links:
-      - redis
-      - sredis
-      - kafka
+    depends_on:
+      - proxy_dep
     environment:
       - REDIS_HOST=redis
       - REDIS_PORT=6379
@@ -20,29 +18,57 @@ services:
       - SHIELD=false
       - KAFKA_HOST=kafka
       - KAFKA_PORT=9092
+      - KIBANA_HOST=kibana
+      - KIBANA_PORT=5601
     env_file:
       - ${PWD}/build/test.env
     volumes:
       - ${PWD}/..:/go/src/github.com/elastic/beats/
+      # Used for docker integration tests:
+      - /var/run/docker.sock:/var/run/docker.sock
     working_dir: /go/src/github.com/elastic/beats/libbeat
     command: make
-    entrypoint: /go/src/github.com/elastic/beats/libbeat/scripts/docker-entrypoint.sh
 
-  # This host name is fixed because of the certificate
+  # This is a proxy used to block beats until all services are healthy.
+  # See: https://github.com/docker/compose/issues/4369
+  proxy_dep:
+    image: busybox
+    depends_on:
+      elasticsearch: { condition: service_healthy }
+      logstash:      { condition: service_healthy }
+      kafka:         { condition: service_healthy }
+      redis:         { condition: service_healthy }
+      sredis:        { condition: service_healthy }
+      kafka:         { condition: service_healthy }
+      kibana:        { condition: service_healthy }
+
+  elasticsearch:
+    extends:
+      file: ../testing/environments/${TESTING_ENVIRONMENT}.yml
+      service: elasticsearch
+
+  # This host name is static because of the certificate.
   logstash:
+    extends:
+      file: ../testing/environments/${TESTING_ENVIRONMENT}.yml
+      service: logstash
     env_file:
       - ${PWD}/build/test.env
+    depends_on:
+      elasticsearch:
+        condition: service_healthy
 
   redis:
-    image: redis:3.2.4-alpine
+    build: ${PWD}/../testing/environments/docker/redis
 
-  # This host name is fixed because of the certificate
+  # This host name is static because of the certificate.
   sredis: # stunnel proxy for redis
     build: ${PWD}/../testing/environments/docker/sredis
     expose:
       - 6380
-    links:
-      - redis
+    depends_on:
+      redis:
+        condition: service_healthy
     environment:
       - REDIS_HOST=redis
       - REDIS_PORT=6379
@@ -50,13 +76,14 @@ services:
       - ${PWD}/build/test.env
 
   kafka:
-    image: spotify/kafka
+    build: ${PWD}/../testing/environments/docker/kafka
     expose:
       - 9092
       - 2181
     environment:
       - ADVERTISED_HOST=kafka
 
-  # Overloading kibana with a simple image as it is not needed here
   kibana:
-    image: alpine:latest
+    extends:
+      file: ${ES_BEATS}/testing/environments/${TESTING_ENVIRONMENT}.yml
+      service: kibana

@@ -1,12 +1,12 @@
 package tcp
 
 import (
-	"expvar"
 	"fmt"
 	"time"
 
 	"github.com/elastic/beats/libbeat/common"
 	"github.com/elastic/beats/libbeat/logp"
+	"github.com/elastic/beats/libbeat/monitoring"
 
 	"github.com/elastic/beats/packetbeat/flows"
 	"github.com/elastic/beats/packetbeat/protos"
@@ -33,7 +33,7 @@ type Processor interface {
 }
 
 var (
-	droppedBecauseOfGaps = expvar.NewInt("tcp.dropped_because_of_gaps")
+	droppedBecauseOfGaps = monitoring.NewInt(nil, "tcp.dropped_because_of_gaps")
 )
 
 type seqCompare int

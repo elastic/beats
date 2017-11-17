@@ -17,9 +17,6 @@ type connConfig struct {
 	Topics   []string           `config:"topics"`
 }
 
-type metaConfig struct {
-}
-
 var defaultConfig = connConfig{
 	Retries:  3,
 	Backoff:  250 * time.Millisecond,

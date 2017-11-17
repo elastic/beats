@@ -1,0 +1,52 @@
+{
+    "description": "Pipeline for parsing Traefik access logs. Requires the geoip and user_agent plugins.",
+    "processors": [{
+        "grok": {
+            "field": "message",
+            "patterns":[
+                "%{IPORHOST:traefik.access.remote_ip} - %{DATA:traefik.access.user_name} \\[%{HTTPDATE:traefik.access.time}\\] \"%{WORD:traefik.access.method} %{DATA:traefik.access.url} HTTP/%{NUMBER:traefik.access.http_version}\" %{NUMBER:traefik.access.response_code} (?:%{NUMBER:traefik.access.body_sent.bytes}|-)( \"%{DATA:traefik.access.referrer}\")?( \"%{DATA:traefik.access.agent}\")?(?:%{NUMBER:traefik.access.request_count}|-)?( \"%{DATA:traefik.access.frontend_name}\")?( \"%{DATA:traefik.access.backend_url}\")?"
+            ],
+            "ignore_missing": true
+        }
+    },{
+        "remove":{
+            "field": "message"
+        }
+    }, {
+        "rename": {
+            "field": "@timestamp",
+            "target_field": "read_timestamp"
+        }
+    }, {
+        "date": {
+            "field": "traefik.access.time",
+            "target_field": "@timestamp",
+            "formats": ["dd/MMM/YYYY:H:m:s Z"]
+        }
+    }, {
+        "remove": {
+            "field": "traefik.access.time"
+        }
+    }, {
+        "user_agent": {
+            "field": "traefik.access.agent",
+            "target_field": "traefik.access.user_agent",
+            "ignore_failure": true
+        }
+    }, {
+        "remove": {
+            "field": "traefik.access.agent"
+        }
+    }, {
+        "geoip": {
+            "field": "traefik.access.remote_ip",
+            "target_field": "traefik.access.geoip"
+        }
+    }],
+    "on_failure" : [{
+        "set" : {
+            "field" : "error.message",
+            "value" : "{{ _ingest.on_failure_message }}"
+        }
+    }]
+}

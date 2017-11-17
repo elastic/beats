@@ -1,0 +1,87 @@
+{
+  "objects": [
+    {
+      "attributes": {
+        "description": "",
+        "kibanaSavedObjectMeta": {
+          "searchSourceJSON": "{\"filter\":[],\"query\":{\"language\":\"lucene\"}}"
+        },
+        "savedSearchId": "PostgreSQL Query Durations",
+        "title": "Query count and cumulated duration [Filebeat PostgreSQL]",
+        "uiStateJSON": "{\"vis\":{\"colors\":{\"Sum of query duration\":\"#6ED0E0\",\"Number of queries\":\"#0A437C\"},\"legendOpen\":true}}",
+        "version": 1,
+        "visState": "{\"title\":\"Query count and cumulated duration [Filebeat PostgreSQL]\",\"type\":\"histogram\",\"params\":{\"type\":\"histogram\",\"grid\":{\"categoryLines\":false,\"style\":{\"color\":\"#eee\"}},\"categoryAxes\":[{\"id\":\"CategoryAxis-1\",\"type\":\"category\",\"position\":\"bottom\",\"show\":true,\"style\":{},\"scale\":{\"type\":\"linear\"},\"labels\":{\"show\":true,\"truncate\":100},\"title\":{\"text\":\"@timestamp per 3 hours\"}}],\"valueAxes\":[{\"id\":\"ValueAxis-1\",\"name\":\"LeftAxis-1\",\"type\":\"value\",\"position\":\"left\",\"show\":true,\"style\":{},\"scale\":{\"type\":\"linear\",\"mode\":\"normal\"},\"labels\":{\"show\":true,\"rotate\":0,\"filter\":false,\"truncate\":100},\"title\":{\"text\":\"\"}}],\"seriesParams\":[{\"show\":true,\"mode\":\"normal\",\"type\":\"histogram\",\"drawLinesBetweenPoints\":true,\"showCircles\":true,\"interpolate\":\"linear\",\"lineWidth\":2,\"data\":{\"id\":\"4\",\"label\":\"Number of queries\"},\"valueAxis\":\"ValueAxis-1\"},{\"show\":true,\"mode\":\"normal\",\"type\":\"histogram\",\"drawLinesBetweenPoints\":true,\"showCircles\":true,\"interpolate\":\"linear\",\"lineWidth\":2,\"data\":{\"id\":\"2\",\"label\":\"Sum of query duration\"},\"valueAxis\":\"ValueAxis-1\"}],\"addTooltip\":true,\"addLegend\":true,\"legendPosition\":\"right\",\"times\":[],\"addTimeMarker\":false},\"aggs\":[{\"id\":\"3\",\"enabled\":true,\"type\":\"date_histogram\",\"schema\":\"segment\",\"params\":{\"field\":\"@timestamp\",\"interval\":\"auto\",\"customInterval\":\"2h\",\"min_doc_count\":1,\"extended_bounds\":{}}},{\"id\":\"4\",\"enabled\":true,\"type\":\"count\",\"schema\":\"metric\",\"params\":{\"customLabel\":\"Number of queries\"}},{\"id\":\"2\",\"enabled\":true,\"type\":\"sum\",\"schema\":\"metric\",\"params\":{\"field\":\"postgresql.log.duration\",\"customLabel\":\"Sum of query duration\"}}]}"
+      },
+      "id": "PostgreSQL Query Count and Duration",
+      "type": "visualization",
+      "version": 1
+    },
+    {
+      "attributes": {
+        "columns": [
+          "postgresql.log.user",
+          "postgresql.log.database",
+          "postgresql.log.duration",
+          "postgresql.log.query"
+        ],
+        "description": "",
+        "hits": 0,
+        "kibanaSavedObjectMeta": {
+          "searchSourceJSON": "{\"index\":\"filebeat-*\",\"highlightAll\":true,\"version\":true,\"query\":{\"query\":\"postgresql.log.duration:\u003e30\",\"language\":\"lucene\"},\"filter\":[]}"
+        },
+        "sort": [
+          "@timestamp",
+          "desc"
+        ],
+        "title": "Slow Queries [Filebeat PostgreSQL]",
+        "version": 1
+      },
+      "id": "Slow PostgreSQL Queries",
+      "type": "search",
+      "version": 1
+    },
+    {
+      "attributes": {
+        "columns": [
+          "postgresql.log.user",
+          "postgresql.log.database",
+          "postgresql.log.duration",
+          "postgresql.log.query"
+        ],
+        "description": "",
+        "hits": 0,
+        "kibanaSavedObjectMeta": {
+          "searchSourceJSON": "{\"index\":\"filebeat-*\",\"highlightAll\":true,\"version\":true,\"query\":{\"query\":\"postgresql.log.duration:*\",\"language\":\"lucene\"},\"filter\":[]}"
+        },
+        "sort": [
+          "@timestamp",
+          "desc"
+        ],
+        "title": "Query Durations [Filebeat PostgreSQL]",
+        "version": 1
+      },
+      "id": "PostgreSQL Query Durations",
+      "type": "search",
+      "version": 1
+    },
+    {
+      "attributes": {
+        "description": "Dashboard for analyzing the query durations of the Filebeat PostgreSQL module",
+        "hits": 0,
+        "kibanaSavedObjectMeta": {
+          "searchSourceJSON": "{\"query\":{\"language\":\"lucene\",\"query\":\"postgresql.log.query:*\"},\"filter\":[],\"highlightAll\":true,\"version\":true}"
+        },
+        "optionsJSON": "{\"darkTheme\":false}",
+        "panelsJSON": "[{\"col\":1,\"id\":\"PostgreSQL Query Count and Duration\",\"panelIndex\":1,\"row\":1,\"size_x\":6,\"size_y\":3,\"type\":\"visualization\"},{\"col\":7,\"columns\":[\"postgresql.log.user\",\"postgresql.log.database\",\"postgresql.log.duration\",\"postgresql.log.query\"],\"id\":\"Slow PostgreSQL Queries\",\"panelIndex\":2,\"row\":1,\"size_x\":6,\"size_y\":3,\"sort\":[\"@timestamp\",\"desc\"],\"type\":\"search\"},{\"col\":1,\"columns\":[\"postgresql.log.user\",\"postgresql.log.database\",\"postgresql.log.duration\",\"postgresql.log.query\"],\"id\":\"PostgreSQL Query Durations\",\"panelIndex\":3,\"row\":4,\"size_x\":12,\"size_y\":5,\"sort\":[\"@timestamp\",\"desc\"],\"type\":\"search\"}]",
+        "timeRestore": false,
+        "title": "[Filebeat PostgreSQL] Query Duration Overview",
+        "uiStateJSON": "{}",
+        "version": 1
+      },
+      "id": "e4c5f230-87f3-11e7-ad9c-db80de0bf8d3",
+      "type": "dashboard",
+      "version": 1
+    }
+  ],
+  "version": "6.0.0-beta1-SNAPSHOT"
+}

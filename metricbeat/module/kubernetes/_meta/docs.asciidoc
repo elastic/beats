@@ -1,0 +1,10 @@
+== Kubernetes module
+
+beta[]
+
+This module fetches metrics from Kubernetes https://kubernetes.io/docs/admin/kubelet/[kubelet]
+agent and https://github.com/kubernetes/kube-state-metrics[kube-state-metrics] service.
+
+All metricsets with the `state_` prefix require `hosts` field pointing to kube-stat-metrics
+service within the cluster, while the rest should be pointed to kubelet service. Check the
+example configuration on how to do it.

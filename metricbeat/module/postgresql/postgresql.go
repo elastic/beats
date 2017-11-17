@@ -10,11 +10,12 @@ import (
 	"strconv"
 	"strings"
 
+	"github.com/lib/pq"
+	"github.com/pkg/errors"
+
 	"github.com/elastic/beats/libbeat/logp"
 	"github.com/elastic/beats/metricbeat/mb"
 	"github.com/elastic/beats/metricbeat/mb/parse"
-	"github.com/lib/pq"
-	"github.com/pkg/errors"
 )
 
 func init() {

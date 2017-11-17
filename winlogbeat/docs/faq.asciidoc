@@ -1,5 +1,5 @@
 [[faq]]
-== Frequently Asked Questions
+== Frequently asked questions
 
 This section contains frequently asked questions about Winlogbeat. Also check
 out the https://discuss.elastic.co/c/beats/winlogbeat[Winlogbeat discussion

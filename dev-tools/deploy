@@ -10,7 +10,7 @@ def main():
                         help="Don't append -SNAPSHOT to the version.")
     args = parser.parse_args()
 
-    dir = os.path.dirname(os.path.realpath(__file__))
+    dir = os.path.dirname(__file__)
     os.chdir(dir + "/../")
     print("Getting dependencies")
     check_call("make clean", shell=True)

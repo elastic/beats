@@ -1,0 +1,32 @@
+# Defines if ports should be exported.
+# This is useful for testing locally with a full elastic stack setup.
+# All services can be reached through localhost like localhost:5601 for Kibana
+# This is not used for CI as otherwise ports conflicts could happen.
+version: '2.1'
+services:
+  kibana:
+    ports:
+      - "127.0.0.1:5601:5601"
+
+  elasticsearch:
+    ports:
+      - "127.0.0.1:9200:9200"
+
+  logstash:
+    ports:
+      - "127.0.0.1:5044:5044"
+      - "127.0.0.1:5055:5055"
+    depends_on:
+      elasticsearch:
+        condition: service_healthy
+
+  # Makes sure containers keep running for manual testing
+  beat:
+    build: .
+    depends_on:
+      elasticsearch:
+        condition: service_healthy
+      kibana:
+        condition: service_healthy
+      logstash:
+        condition: service_healthy

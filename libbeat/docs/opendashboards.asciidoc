@@ -1,0 +1,25 @@
+//////////////////////////////////////////////////////////////////////////
+//// This content is shared by all Elastic Beats. Make sure you keep the
+//// descriptions here generic enough to work for all Beats that include
+//// this file. When using cross references, make sure that the cross
+//// references resolve correctly for any files that include this one.
+//// Use the appropriate variables defined in the index.asciidoc file to
+//// resolve Beat names: beatname_uc and beatname_lc.
+//// Use the following include to pull this content into a doc file:
+//// include::../../libbeat/docs/opendashboards.asciidoc[]
+//////////////////////////////////////////////////////////////////////////
+
+To open the dashboards, launch the Kibana web interface by pointing your browser
+to port 5601. For example, http://127.0.0.1:5601[http://127.0.0.1:5601].
+
+On the *Discover* page, make sure that the predefined +{beatname_lc}-*+ index
+pattern is selected to see {beatname_uc} data.
+
+[role="screenshot"]
+image:./images/kibana-created-indexes.png[Discover tab with index selected]
+
+Go to the *Dashboard* page and select the dashboard that you want to open.
+
+[role="screenshot"]
+image:./images/kibana-navigation-vis.png[Navigation widget in Kibana]
+

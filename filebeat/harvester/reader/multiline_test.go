@@ -6,13 +6,14 @@ import (
 	"bytes"
 	"errors"
 	"os"
-	"regexp"
 	"strings"
 	"testing"
 	"time"
 
-	"github.com/elastic/beats/filebeat/harvester/encoding"
 	"github.com/stretchr/testify/assert"
+
+	"github.com/elastic/beats/filebeat/harvester/encoding"
+	"github.com/elastic/beats/libbeat/common/match"
 )
 
 type bufferSource struct{ buf *bytes.Buffer }
@@ -24,9 +25,10 @@ func (p bufferSource) Stat() (os.FileInfo, error) { return nil, errors.New("unkn
 func (p bufferSource) Continuable() bool          { return false }
 
 func TestMultilineAfterOK(t *testing.T) {
+	pattern := match.MustCompile(`^[ \t] +`) // next line is indented by spaces
 	testMultilineOK(t,
 		MultilineConfig{
-			Pattern: regexp.MustCompile(`^[ \t] +`), // next line is indented by spaces
+			Pattern: &pattern,
 			Match:   "after",
 		},
 		2,
@@ -36,9 +38,11 @@ func TestMultilineAfterOK(t *testing.T) {
 }
 
 func TestMultilineBeforeOK(t *testing.T) {
+	pattern := match.MustCompile(`\\$`) // previous line ends with \
+
 	testMultilineOK(t,
 		MultilineConfig{
-			Pattern: regexp.MustCompile(`\\$`), // previous line ends with \
+			Pattern: &pattern,
 			Match:   "before",
 		},
 		2,
@@ -48,9 +52,11 @@ func TestMultilineBeforeOK(t *testing.T) {
 }
 
 func TestMultilineAfterNegateOK(t *testing.T) {
+	pattern := match.MustCompile(`^-`) // first line starts with '-' at beginning of line
+
 	testMultilineOK(t,
 		MultilineConfig{
-			Pattern: regexp.MustCompile(`^-`), // first line starts with '-' at beginning of line
+			Pattern: &pattern,
 			Negate:  true,
 			Match:   "after",
 		},
@@ -61,9 +67,11 @@ func TestMultilineAfterNegateOK(t *testing.T) {
 }
 
 func TestMultilineBeforeNegateOK(t *testing.T) {
+	pattern := match.MustCompile(`;$`) // last line ends with ';'
+
 	testMultilineOK(t,
 		MultilineConfig{
-			Pattern: regexp.MustCompile(`;$`), // last line ends with ';'
+			Pattern: &pattern,
 			Negate:  true,
 			Match:   "before",
 		},
@@ -73,10 +81,47 @@ func TestMultilineBeforeNegateOK(t *testing.T) {
 	)
 }
 
-func TestMultilineBeforeNegateOKWithEmptyLine(t *testing.T) {
+func TestMultilineAfterNegateOKFlushPattern(t *testing.T) {
+	flushMatcher := match.MustCompile(`EventEnd`)
+	pattern := match.MustCompile(`EventStart`)
+
 	testMultilineOK(t,
 		MultilineConfig{
-			Pattern: regexp.MustCompile(`;$`), // last line ends with ';'
+			Pattern:      &pattern,
+			Negate:       true,
+			Match:        "after",
+			FlushPattern: &flushMatcher,
+		},
+		3,
+		"EventStart\nEventId: 1\nEventEnd\n",
+		"OtherThingInBetween\n", // this should be a separate event..
+		"EventStart\nEventId: 2\nEventEnd\n",
+	)
+}
+
+func TestMultilineAfterNegateOKFlushPatternWhereTheFirstLinesDosentMatchTheStartPattern(t *testing.T) {
+	flushMatcher := match.MustCompile(`EventEnd`)
+	pattern := match.MustCompile(`EventStart`)
+
+	testMultilineOK(t,
+		MultilineConfig{
+			Pattern:      &pattern,
+			Negate:       true,
+			Match:        "after",
+			FlushPattern: &flushMatcher,
+		},
+		3, //first two non-matching lines, will be merged to one event
+		"StartLineThatDosentMatchTheEvent\nOtherThingInBetween\n",
+		"EventStart\nEventId: 2\nEventEnd\n",
+		"EventStart\nEventId: 3\nEventEnd\n",
+	)
+}
+
+func TestMultilineBeforeNegateOKWithEmptyLine(t *testing.T) {
+	pattern := match.MustCompile(`;$`) // last line ends with ';'
+	testMultilineOK(t,
+		MultilineConfig{
+			Pattern: &pattern,
 			Negate:  true,
 			Match:   "before",
 		},
@@ -96,6 +141,7 @@ func testMultilineOK(t *testing.T, cfg MultilineConfig, events int, expected ...
 		if err != nil {
 			break
 		}
+
 		messages = append(messages, message)
 	}
 

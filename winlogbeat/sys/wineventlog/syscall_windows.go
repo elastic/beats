@@ -194,6 +194,35 @@ func (e EvtSystemPropertyID) String() string {
 	return s
 }
 
+// EventLevel identifies the six levels of events that can be logged
+type EventLevel uint16
+
+// EventLevel values.
+const (
+	// Do not reorder.
+	EVENTLOG_LOGALWAYS_LEVEL EventLevel = iota
+	EVENTLOG_CRITICAL_LEVEL
+	EVENTLOG_ERROR_LEVEL
+	EVENTLOG_WARNING_LEVEL
+	EVENTLOG_INFORMATION_LEVEL
+	EVENTLOG_VERBOSE_LEVEL
+)
+
+// Mapping of event levels to their string representations.
+var EventLevelToString = map[EventLevel]string{
+	EVENTLOG_LOGALWAYS_LEVEL:   "Information",
+	EVENTLOG_INFORMATION_LEVEL: "Information",
+	EVENTLOG_CRITICAL_LEVEL:    "Critical",
+	EVENTLOG_ERROR_LEVEL:       "Error",
+	EVENTLOG_WARNING_LEVEL:     "Warning",
+	EVENTLOG_VERBOSE_LEVEL:     "Verbose",
+}
+
+// String returns string representation of EventLevel.
+func (et EventLevel) String() string {
+	return EventLevelToString[et]
+}
+
 // Add -trace to enable debug prints around syscalls.
 //go:generate go run $GOROOT/src/syscall/mksyscall_windows.go -output zsyscall_windows.go syscall_windows.go
 

@@ -1,3 +1,14 @@
+//////////////////////////////////////////////////////////////////////////
+//// This content is shared by all Elastic Beats. Make sure you keep the
+//// descriptions here generic enough to work for all Beats that include
+//// this file. When using cross references, make sure that the cross
+//// references resolve correctly for any files that include this one.
+//// Use the appropriate variables defined in the index.asciidoc file to
+//// resolve Beat names: beatname_uc and beatname_lc.
+//// Use the following include to pull this content into a doc file:
+//// include::../../libbeat/docs/setup-repositories.asciidoc[]
+//////////////////////////////////////////////////////////////////////////
+
 [[setup-repositories]]
 === Repositories for APT and YUM
 
@@ -13,6 +24,14 @@ to sign all our packages. It is available from https://pgp.mit.edu.
 
 [float]
 ==== APT
+
+ifeval::["{release-state}"=="unreleased"]
+
+Version {stack-version} of Beats has not yet been released.
+
+endif::[]
+
+ifeval::["{release-state}"!="unreleased"]
 
 To add the Beats repository for APT:
 
@@ -30,11 +49,11 @@ wget -qO - https://artifacts.elastic.co/GPG-KEY-elasticsearch | sudo apt-key add
 sudo apt-get install apt-transport-https
 --------------------------------------------------
 
-. Save the repository definition to  +/etc/apt/sources.list.d/elastic-5.x.list+:
+. Save the repository definition to  +/etc/apt/sources.list.d/elastic-6.x-prerelease.list+:
 +
 ["source","sh",subs="attributes,callouts"]
 --------------------------------------------------
-echo "deb https://artifacts.elastic.co/packages/5.x/apt stable main" | sudo tee -a /etc/apt/sources.list.d/elastic-5.x.list
+echo "deb https://artifacts.elastic.co/packages/6.x-prerelease/apt stable main" | sudo tee -a /etc/apt/sources.list.d/elastic-6.x-prerelease.list
 --------------------------------------------------
 +
 [WARNING]
@@ -52,22 +71,32 @@ Simply delete the `deb-src` entry from the `/etc/apt/sources.list` file, and the
 ==================================================
 
 . Run `apt-get update`, and the repository is ready for use. For example, you can
-install Filebeat by running:
+install {beatname_uc} by running:
 +
-[source,sh]
+["source","sh",subs="attributes"]
 --------------------------------------------------
-sudo apt-get update && sudo apt-get install filebeat
+sudo apt-get update && sudo apt-get install {beatname_pkg}
 --------------------------------------------------
 
-. To configure the beat to start automatically during boot, run:
+. To configure the Beat to start automatically during boot, run:
 +
-[source,sh]
+["source","sh",subs="attributes"]
 --------------------------------------------------
-sudo update-rc.d filebeat defaults 95 10
+sudo update-rc.d {beatname_pkg} defaults 95 10
 --------------------------------------------------
+
+endif::[]
 
 [float]
 ==== YUM
+
+ifeval::["{release-state}"=="unreleased"]
+
+Version {stack-version} of Beats has not yet been released.
+
+endif::[]
+
+ifeval::["{release-state}"!="unreleased"]
 
 To add the Beats repository for YUM:
 
@@ -83,9 +112,9 @@ your `/etc/yum.repos.d/` directory and add the following lines:
 +
 ["source","sh",subs="attributes,callouts"]
 --------------------------------------------------
-[elastic-5.x]
-name=Elastic repository for 5.x packages
-baseurl=https://artifacts.elastic.co/packages/5.x/yum
+[elastic-6.x-prerelease]
+name=Elastic repository for 6.x prerelease packages
+baseurl=https://artifacts.elastic.co/packages/6.x-prerelease/yum
 gpgcheck=1
 gpgkey=https://artifacts.elastic.co/GPG-KEY-elasticsearch
 enabled=1
@@ -93,17 +122,20 @@ autorefresh=1
 type=rpm-md
 --------------------------------------------------
 +
-Your repository is ready to use. For example, you can install Filebeat by
+Your repository is ready to use. For example, you can install {beatname_uc} by
 running:
 +
-[source,sh]
+["source","sh",subs="attributes"]
 --------------------------------------------------
-sudo yum install filebeat
+sudo yum install {beatname_pkg}
 --------------------------------------------------
 
-. To configure the beat to start automatically during boot, run:
+. To configure the Beat to start automatically during boot, run:
 +
-[source,sh]
+["source","sh",subs="attributes"]
 --------------------------------------------------
-sudo chkconfig --add filebeat
+sudo chkconfig --add {beatname_pkg}
 --------------------------------------------------
+
+endif::[]
+

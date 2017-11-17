@@ -2,9 +2,9 @@ package info
 
 import (
 	"github.com/elastic/beats/libbeat/common"
+	s "github.com/elastic/beats/libbeat/common/schema"
+	c "github.com/elastic/beats/libbeat/common/schema/mapstrstr"
 	"github.com/elastic/beats/metricbeat/module/haproxy"
-	s "github.com/elastic/beats/metricbeat/schema"
-	c "github.com/elastic/beats/metricbeat/schema/mapstrstr"
 
 	"reflect"
 	"strconv"
@@ -144,5 +144,6 @@ func eventMapping(info *haproxy.Info) (common.MapStr, error) {
 
 	}
 
-	return schema.Apply(source), nil
+	data, _ := schema.Apply(source)
+	return data, nil
 }

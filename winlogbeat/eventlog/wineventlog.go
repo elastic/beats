@@ -8,13 +8,14 @@ import (
 	"syscall"
 	"time"
 
+	"github.com/joeshaw/multierror"
+	"github.com/pkg/errors"
+	"golang.org/x/sys/windows"
+
 	"github.com/elastic/beats/libbeat/common"
 	"github.com/elastic/beats/libbeat/logp"
 	"github.com/elastic/beats/winlogbeat/sys"
 	win "github.com/elastic/beats/winlogbeat/sys/wineventlog"
-	"github.com/joeshaw/multierror"
-	"github.com/pkg/errors"
-	"golang.org/x/sys/windows"
 )
 
 const (
@@ -31,11 +32,10 @@ var winEventLogConfigKeys = append(commonConfigKeys, "batch_read_size",
 
 type winEventLogConfig struct {
 	ConfigCommon  `config:",inline"`
-	BatchReadSize int                    `config:"batch_read_size"` // Maximum number of events that Read will return.
-	IncludeXML    bool                   `config:"include_xml"`
-	Forwarded     *bool                  `config:"forwarded"`
-	SimpleQuery   query                  `config:",inline"`
-	Raw           map[string]interface{} `config:",inline"`
+	BatchReadSize int   `config:"batch_read_size"` // Maximum number of events that Read will return.
+	IncludeXML    bool  `config:"include_xml"`
+	Forwarded     *bool `config:"forwarded"`
+	SimpleQuery   query `config:",inline"`
 }
 
 // defaultWinEventLogConfig is the default configuration for new wineventlog readers.
@@ -81,8 +81,7 @@ type winEventLog struct {
 	outputBuf *sys.ByteBuffer                                // Buffer for receiving XML
 	cache     *messageFilesCache                             // Cached mapping of source name to event message file handles.
 
-	logPrefix     string               // String to prefix on log messages.
-	eventMetadata common.EventMetadata // Field and tags to add to each event.
+	logPrefix string // String to prefix on log messages.
 }
 
 // Name returns the name of the event log (i.e. Application, Security, etc.).
@@ -216,14 +215,18 @@ func (l *winEventLog) buildRecordFromXML(x []byte, recoveredErr error) (Record, 
 		e.RenderErr = recoveredErr.Error()
 	}
 
+	if e.Level == "" {
+		// Fallback on LevelRaw if the Level is not set in the RenderingInfo.
+		e.Level = win.EventLevel(e.LevelRaw).String()
+	}
+
 	if logp.IsDebug(detailSelector) {
 		detailf("%s XML=%s Event=%+v", l.logPrefix, string(x), e)
 	}
 
 	r := Record{
-		API:           winEventLogAPIName,
-		EventMetadata: l.eventMetadata,
-		Event:         e,
+		API:   winEventLogAPIName,
+		Event: e,
 	}
 
 	if l.config.IncludeXML {
@@ -235,7 +238,7 @@ func (l *winEventLog) buildRecordFromXML(x []byte, recoveredErr error) (Record, 
 
 // newWinEventLog creates and returns a new EventLog for reading event logs
 // using the Windows Event Log.
-func newWinEventLog(options map[string]interface{}) (EventLog, error) {
+func newWinEventLog(options *common.Config) (EventLog, error) {
 	c := defaultWinEventLogConfig
 	if err := readConfig(options, &c, winEventLogConfigKeys); err != nil {
 		return nil, err
@@ -269,15 +272,14 @@ func newWinEventLog(options map[string]interface{}) (EventLog, error) {
 	}
 
 	l := &winEventLog{
-		config:        c,
-		query:         query,
-		channelName:   c.Name,
-		maxRead:       c.BatchReadSize,
-		renderBuf:     make([]byte, renderBufferSize),
-		outputBuf:     sys.NewByteBuffer(renderBufferSize),
-		cache:         newMessageFilesCache(c.Name, eventMetadataHandle, freeHandle),
-		logPrefix:     fmt.Sprintf("WinEventLog[%s]", c.Name),
-		eventMetadata: c.EventMetadata,
+		config:      c,
+		query:       query,
+		channelName: c.Name,
+		maxRead:     c.BatchReadSize,
+		renderBuf:   make([]byte, renderBufferSize),
+		outputBuf:   sys.NewByteBuffer(renderBufferSize),
+		cache:       newMessageFilesCache(c.Name, eventMetadataHandle, freeHandle),
+		logPrefix:   fmt.Sprintf("WinEventLog[%s]", c.Name),
 	}
 
 	// Forwarded events should be rendered using RenderEventXML. It is more

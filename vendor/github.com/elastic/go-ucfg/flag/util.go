@@ -35,7 +35,7 @@ func (v *FlagValue) String() string {
 	if v.collector == nil {
 		return ""
 	}
-	
+
 	return toString(v.Config(), v.collector.GetOptions(), v.onError)
 }
 

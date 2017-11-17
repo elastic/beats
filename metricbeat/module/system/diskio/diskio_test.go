@@ -1,12 +1,10 @@
 // +build !integration
-// +build freebsd linux windows
+// +build darwin,cgo freebsd linux windows
 
 package diskio
 
 import (
 	"testing"
-
-	"time"
 
 	mbtest "github.com/elastic/beats/metricbeat/mb/testing"
 )
@@ -14,12 +12,7 @@ import (
 func TestData(t *testing.T) {
 	f := mbtest.NewEventsFetcher(t, getConfig())
 
-	// Do a first fetch to have percentages
-	f.Fetch()
-	time.Sleep(1 * time.Second)
-
-	err := mbtest.WriteEvents(f, t)
-	if err != nil {
+	if err := mbtest.WriteEvents(f, t); err != nil {
 		t.Fatal("write", err)
 	}
 }

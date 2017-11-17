@@ -1,4 +1,4 @@
-== {module} Module
+== {module} module
 
-This is the {module} Module.
+This is the {module} module.
 

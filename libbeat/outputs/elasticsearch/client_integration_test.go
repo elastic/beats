@@ -8,197 +8,19 @@ import (
 	"testing"
 	"time"
 
-	"path/filepath"
+	"github.com/stretchr/testify/assert"
 
+	"github.com/elastic/beats/libbeat/beat"
 	"github.com/elastic/beats/libbeat/common"
 	"github.com/elastic/beats/libbeat/logp"
 	"github.com/elastic/beats/libbeat/outputs"
-	"github.com/stretchr/testify/assert"
+	"github.com/elastic/beats/libbeat/outputs/outest"
 )
 
 func TestClientConnect(t *testing.T) {
-
-	client := GetTestingElasticsearch()
-	err := client.Connect(5 * time.Second)
+	client := GetTestingElasticsearch(t)
+	err := client.Connect()
 	assert.NoError(t, err)
-}
-
-func TestCheckTemplate(t *testing.T) {
-
-	client := GetTestingElasticsearch()
-	err := client.Connect(5 * time.Second)
-	assert.Nil(t, err)
-
-	// Check for non existent template
-	assert.False(t, client.CheckTemplate("libbeat-notexists"))
-}
-
-func TestLoadTemplate(t *testing.T) {
-
-	// Setup ES
-	client := GetTestingElasticsearch()
-	err := client.Connect(5 * time.Second)
-	assert.Nil(t, err)
-
-	// Load template
-	absPath, err := filepath.Abs("../../tests/files/")
-	assert.NotNil(t, absPath)
-	assert.Nil(t, err)
-
-	templatePath := absPath + "/template.json"
-	if strings.HasPrefix(client.Connection.version, "2.") {
-		templatePath = absPath + "/template-es2x.json"
-	}
-	content, err := readTemplate(templatePath)
-	assert.Nil(t, err)
-
-	templateName := "testbeat"
-
-	// Load template
-	err = client.LoadTemplate(templateName, content)
-	assert.Nil(t, err)
-
-	// Make sure template was loaded
-	assert.True(t, client.CheckTemplate(templateName))
-
-	// Delete template again to clean up
-	client.request("DELETE", "/_template/"+templateName, "", nil, nil)
-
-	// Make sure it was removed
-	assert.False(t, client.CheckTemplate(templateName))
-
-}
-
-func TestLoadInvalidTemplate(t *testing.T) {
-
-	// Invalid Template
-	template := map[string]interface{}{
-		"json": "invalid",
-	}
-
-	// Setup ES
-	client := GetTestingElasticsearch()
-	err := client.Connect(5 * time.Second)
-	assert.Nil(t, err)
-
-	templateName := "invalidtemplate"
-
-	// Try to load invalid template
-	err = client.LoadTemplate(templateName, template)
-	assert.Error(t, err)
-
-	// Make sure template was not loaded
-	assert.False(t, client.CheckTemplate(templateName))
-}
-
-// Tests loading the templates for each beat
-func TestLoadBeatsTemplate(t *testing.T) {
-
-	beats := []string{
-		"filebeat",
-		"packetbeat",
-		"metricbeat",
-		"winlogbeat",
-	}
-
-	for _, beat := range beats {
-		// Load template
-		absPath, err := filepath.Abs("../../../" + beat)
-		assert.NotNil(t, absPath)
-		assert.Nil(t, err)
-
-		// Setup ES
-		client := GetTestingElasticsearch()
-
-		templatePath := absPath + "/" + beat + ".template.json"
-
-		if strings.HasPrefix(client.Connection.version, "2.") {
-			templatePath = absPath + "/" + beat + ".template-es2x.json"
-		}
-
-		content, err := readTemplate(templatePath)
-		assert.Nil(t, err)
-
-		err = client.Connect(5 * time.Second)
-		assert.Nil(t, err)
-
-		templateName := beat
-
-		// Load template
-		err = client.LoadTemplate(templateName, content)
-		assert.Nil(t, err)
-
-		// Make sure template was loaded
-		assert.True(t, client.CheckTemplate(templateName))
-
-		// Delete template again to clean up
-		client.request("DELETE", "/_template/"+templateName, "", nil, nil)
-
-		// Make sure it was removed
-		assert.False(t, client.CheckTemplate(templateName))
-	}
-}
-
-// TestOutputLoadTemplate checks that the template is inserted before
-// the first event is published.
-func TestOutputLoadTemplate(t *testing.T) {
-
-	client := GetTestingElasticsearch()
-	err := client.Connect(5 * time.Second)
-	if err != nil {
-		t.Fatal(err)
-	}
-
-	// delete template if it exists
-	client.request("DELETE", "/_template/libbeat", "", nil, nil)
-
-	// Make sure template is not yet there
-	assert.False(t, client.CheckTemplate("libbeat"))
-
-	templatePath := "../../../packetbeat/packetbeat.template.json"
-
-	if strings.HasPrefix(client.Connection.version, "2.") {
-		templatePath = "../../../packetbeat/packetbeat.template-es2x.json"
-	}
-
-	tPath, err := filepath.Abs(templatePath)
-	if err != nil {
-		t.Fatal(err)
-	}
-	config := map[string]interface{}{
-		"hosts": GetEsHost(),
-		"template": map[string]interface{}{
-			"name":                "libbeat",
-			"path":                tPath,
-			"versions.2x.enabled": false,
-		},
-	}
-
-	cfg, err := common.NewConfigFrom(config)
-	if err != nil {
-		t.Fatal(err)
-	}
-
-	output, err := New("libbeat", cfg, 0)
-	if err != nil {
-		t.Fatal(err)
-	}
-	event := outputs.Data{Event: common.MapStr{
-		"@timestamp": common.Time(time.Now()),
-		"host":       "test-host",
-		"type":       "libbeat",
-		"message":    "Test message from libbeat",
-	}}
-
-	err = output.PublishEvent(nil, outputs.Options{Guaranteed: true}, event)
-	if err != nil {
-		t.Fatal(err)
-	}
-
-	// Guaranteed publish, so the template should be there
-
-	assert.True(t, client.CheckTemplate("libbeat"))
-
 }
 
 func TestClientPublishEvent(t *testing.T) {
@@ -210,12 +32,15 @@ func TestClientPublishEvent(t *testing.T) {
 	// drop old index preparing test
 	client.Delete(index, "", "", nil)
 
-	event := outputs.Data{Event: common.MapStr{
-		"@timestamp": common.Time(time.Now()),
-		"type":       "libbeat",
-		"message":    "Test message from libbeat",
-	}}
-	err := output.PublishEvent(nil, outputs.Options{Guaranteed: true}, event)
+	batch := outest.NewBatch(beat.Event{
+		Timestamp: time.Now(),
+		Fields: common.MapStr{
+			"type":    "libbeat",
+			"message": "Test message from libbeat",
+		},
+	})
+
+	err := output.Publish(batch)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -254,9 +79,8 @@ func TestClientPublishEventWithPipeline(t *testing.T) {
 		t.Skip("Skipping tests as pipeline not available in 2.x releases")
 	}
 
-	publish := func(event common.MapStr) {
-		opts := outputs.Options{Guaranteed: true}
-		err := output.PublishEvent(nil, opts, outputs.Data{Event: event})
+	publish := func(event beat.Event) {
+		err := output.Publish(outest.NewBatch(event))
 		if err != nil {
 			t.Fatal(err)
 		}
@@ -293,19 +117,21 @@ func TestClientPublishEventWithPipeline(t *testing.T) {
 		t.Fatalf("Test pipeline %v not created", pipeline)
 	}
 
-	publish(common.MapStr{
-		"@timestamp": common.Time(time.Now()),
-		"type":       "libbeat",
-		"message":    "Test message 1",
-		"pipeline":   pipeline,
-		"testfield":  0,
-	})
-	publish(common.MapStr{
-		"@timestamp": common.Time(time.Now()),
-		"type":       "libbeat",
-		"message":    "Test message 2",
-		"testfield":  0,
-	})
+	publish(beat.Event{
+		Timestamp: time.Now(),
+		Fields: common.MapStr{
+			"type":      "libbeat",
+			"message":   "Test message 1",
+			"pipeline":  pipeline,
+			"testfield": 0,
+		}})
+	publish(beat.Event{
+		Timestamp: time.Now(),
+		Fields: common.MapStr{
+			"type":      "libbeat",
+			"message":   "Test message 2",
+			"testfield": 0,
+		}})
 
 	_, _, err = client.Refresh(index)
 	if err != nil {
@@ -336,9 +162,8 @@ func TestClientBulkPublishEventsWithPipeline(t *testing.T) {
 		t.Skip("Skipping tests as pipeline not available in 2.x releases")
 	}
 
-	publish := func(events ...outputs.Data) {
-		opts := outputs.Options{Guaranteed: true}
-		err := output.BulkPublish(nil, opts, events)
+	publish := func(events ...beat.Event) {
+		err := output.Publish(outest.NewBatch(events...))
 		if err != nil {
 			t.Fatal(err)
 		}
@@ -376,19 +201,21 @@ func TestClientBulkPublishEventsWithPipeline(t *testing.T) {
 	}
 
 	publish(
-		outputs.Data{Event: common.MapStr{
-			"@timestamp": common.Time(time.Now()),
-			"type":       "libbeat",
-			"message":    "Test message 1",
-			"pipeline":   pipeline,
-			"testfield":  0,
-		}},
-		outputs.Data{Event: common.MapStr{
-			"@timestamp": common.Time(time.Now()),
-			"type":       "libbeat",
-			"message":    "Test message 2",
-			"testfield":  0,
-		}},
+		beat.Event{
+			Timestamp: time.Now(),
+			Fields: common.MapStr{
+				"type":      "libbeat",
+				"message":   "Test message 1",
+				"pipeline":  pipeline,
+				"testfield": 0,
+			}},
+		beat.Event{
+			Timestamp: time.Now(),
+			Fields: common.MapStr{
+				"type":      "libbeat",
+				"message":   "Test message 2",
+				"testfield": 0,
+			}},
 	)
 
 	_, _, err = client.Refresh(index)
@@ -400,7 +227,7 @@ func TestClientBulkPublishEventsWithPipeline(t *testing.T) {
 	assert.Equal(t, 1, getCount("testfield:0")) // no pipeline
 }
 
-func connectTestEs(t *testing.T, cfg interface{}) (outputs.BulkOutputer, *Client) {
+func connectTestEs(t *testing.T, cfg interface{}) (outputs.Client, *Client) {
 	config, err := common.NewConfigFrom(map[string]interface{}{
 		"hosts":            GetEsHost(),
 		"username":         os.Getenv("ES_USER"),
@@ -421,15 +248,19 @@ func connectTestEs(t *testing.T, cfg interface{}) (outputs.BulkOutputer, *Client
 		t.Fatal(err)
 	}
 
-	output, err := New("libbeat", config, 0)
+	output, err := makeES(beat.Info{Beat: "libbeat"}, outputs.NewNilObserver(), config)
 	if err != nil {
 		t.Fatal(err)
 	}
 
-	es := output.(*elasticsearchOutput)
-	client := es.randomClient()
-	// Load version number
-	client.Connect(3 * time.Second)
+	type clientWrap interface {
+		outputs.NetworkClient
+		Client() outputs.NetworkClient
+	}
+	client := randomClient(output).(clientWrap).Client().(*Client)
 
-	return es, client
+	// Load version number
+	client.Connect()
+
+	return client, client
 }

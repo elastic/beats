@@ -1,5 +1,5 @@
-=== couchbase cluster MetricSet
+=== Couchbase cluster metricset
 
 The Couchbase `cluster` metricset collects data from Couchbase pools Rest API
 `http://couchbasehost:8091/pools/default` and creates an event
-with cluster metrics
+containing cluster metrics.

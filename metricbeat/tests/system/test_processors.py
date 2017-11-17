@@ -3,6 +3,7 @@ import sys
 import metricbeat
 import unittest
 
+
 @unittest.skipUnless(re.match("(?i)win|linux|darwin|freebsd", sys.platform), "os")
 class TestProcessors(metricbeat.BaseTest):
 
@@ -15,7 +16,7 @@ class TestProcessors(metricbeat.BaseTest):
                 "period": "1s"
             }],
             processors=[{
-                "drop_fields":{
+                "drop_fields": {
                     "when": "range.system.cpu.system.pct.lt: 0.1",
                     "fields": ["system.cpu.load"],
                 },
@@ -34,15 +35,14 @@ class TestProcessors(metricbeat.BaseTest):
         print(evt.keys())
         self.assertItemsEqual(self.de_dot([
             'beat', '@timestamp', 'system', 'metricset.module',
-            'metricset.rtt', 'type', 'metricset.name'
+            'metricset.rtt', 'metricset.name'
         ]), evt.keys())
         cpu = evt["system"]["cpu"]
         print(cpu.keys())
         self.assertItemsEqual(self.de_dot([
             "system", "cores", "user", "softirq", "iowait",
-            "idle", "irq", "steal", "nice"
+            "idle", "irq", "steal", "nice", "total"
         ]), cpu.keys())
-
 
     def test_dropfields_with_condition(self):
         """
@@ -55,7 +55,7 @@ class TestProcessors(metricbeat.BaseTest):
                 "period": "1s"
             }],
             processors=[{
-                "drop_fields":{
+                "drop_fields": {
                     "fields": ["system.process.memory"],
                     "when": "range.system.process.cpu.total.pct.lt: 0.5",
                 },
@@ -69,7 +69,7 @@ class TestProcessors(metricbeat.BaseTest):
         metricbeat.kill_and_wait()
 
         output = self.read_output(
-            required_fields=["@timestamp", "type"],
+            required_fields=["@timestamp"],
         )
 
         for event in output:
@@ -89,7 +89,7 @@ class TestProcessors(metricbeat.BaseTest):
                 "period": "1s"
             }],
             processors=[{
-                "drop_event":{
+                "drop_event": {
                     "when": "range.system.process.cpu.total.pct.lt: 0.001",
                 },
             }]
@@ -102,11 +102,10 @@ class TestProcessors(metricbeat.BaseTest):
         metricbeat.kill_and_wait()
 
         output = self.read_output(
-            required_fields=["@timestamp", "type"],
+            required_fields=["@timestamp"],
         )
         for event in output:
             assert float(event["system.process.cpu.total.pct"]) >= 0.001
-
 
     def test_dropevent_with_complex_condition(self):
         """
@@ -119,7 +118,7 @@ class TestProcessors(metricbeat.BaseTest):
                 "period": "1s"
             }],
             processors=[{
-                "drop_event":{
+                "drop_event": {
                     "when.not": "contains.system.process.cmdline: metricbeat.test",
                 },
             }]
@@ -132,10 +131,9 @@ class TestProcessors(metricbeat.BaseTest):
         metricbeat.kill_and_wait()
 
         output = self.read_output(
-            required_fields=["@timestamp", "type"],
+            required_fields=["@timestamp"],
         )
         assert len(output) >= 1
-
 
     def test_include_fields(self):
         """
@@ -148,7 +146,7 @@ class TestProcessors(metricbeat.BaseTest):
                 "period": "1s"
             }],
             processors=[{
-                "include_fields":{"fields": ["system.process.cpu", "system.process.memory"]},
+                "include_fields": {"fields": ["system.process.cpu", "system.process.memory"]},
             }]
         )
         metricbeat = self.start_beat()
@@ -159,7 +157,7 @@ class TestProcessors(metricbeat.BaseTest):
         metricbeat.kill_and_wait()
 
         output = self.read_output(
-            required_fields=["@timestamp", "type"],
+            required_fields=["@timestamp"],
         )[0]
         print(output)
 
@@ -190,7 +188,7 @@ class TestProcessors(metricbeat.BaseTest):
                 "period": "1s"
             }],
             processors=[{
-                "include_fields":{"fields": ["system.process"]},
+                "include_fields": {"fields": ["system.process"]},
             }, {
                 "drop_fields": {"fields": ["system.process.memory"]},
             }]
@@ -203,7 +201,7 @@ class TestProcessors(metricbeat.BaseTest):
         metricbeat.kill_and_wait()
 
         output = self.read_output(
-            required_fields=["@timestamp", "type"],
+            required_fields=["@timestamp"],
         )[0]
 
         for key in [
@@ -232,7 +230,7 @@ class TestProcessors(metricbeat.BaseTest):
                 "period": "1s"
             }],
             processors=[{
-                "include_fields":{
+                "include_fields": {
                     "fields": ["system.process.memory.size", "proc.memory.rss.pct"],
                 },
             }, {
@@ -248,7 +246,7 @@ class TestProcessors(metricbeat.BaseTest):
         metricbeat.kill_and_wait()
 
         output = self.read_output(
-            required_fields=["@timestamp", "type"],
+            required_fields=["@timestamp"],
         )[0]
 
         for key in [

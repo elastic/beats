@@ -35,7 +35,7 @@ Lists and dictionaries are used in beats to build structured configurations.
 ------------------------------------------------------------------------------
 filebeat:
   prospectors:
-    - input_type: log
+    - type: log
       paths:
         - /var/log/*.log
       multiline:
@@ -58,6 +58,7 @@ The following topics provide more detail to help you understand and work with co
 * <<config-file-format-type>>
 * <<config-file-format-env-vars>>
 * <<config-gile-format-refs>>
+* <<config-file-permissions>>
 * <<config-file-format-cli>>
 * <<config-file-format-tips>>
 
@@ -92,11 +93,11 @@ For example this filebeat setting:
 
 filebeat:
   prospectors:
-    - input_type: log
+    - type: log
 
 ------------------------------------------------------------------------------
 
-Gets collapsed into `filebeat.prospectors.0.input_type: log`.
+Gets collapsed into `filebeat.prospectors.0.type: log`.
 
 Alternatively to using indentation, setting names can be used in collapsed form too.
 
@@ -109,8 +110,8 @@ Simple filebeat example with partially collapsed setting names and use of compac
 ------------------------------------------------------------------------------
 
 filebeat.prospectors:
-- input_type: log
-  paths: ["/var/log/*.log"] 
+- type: log
+  paths: ["/var/log/*.log"]
   multiline.pattern: '^['
   multiline.match: after
 
@@ -119,7 +120,7 @@ output.elasticsearch.hosts: ["http://localhost:9200"]
 ------------------------------------------------------------------------------
 
 [[config-file-format-type]]
-=== Config file Data Types
+=== Config file data types
 
 Values of configuration settings are interpreted as required by beats.
 If a value can not be correctly interpreted as the required type - for example a
@@ -180,7 +181,7 @@ duration2: 6h
 duration_disabled: -1s
 ------------------------------------------------------------------------------
 
-==== Regular Expression
+==== Regular expression
 
 Regular expressions are special strings getting compiled into regular
 expressions at load time.
@@ -199,8 +200,8 @@ field references `[fieldname]`. Optional default values can be specified in case
 field name is missing from the event.
 
 You can also format time stored in the
-`@timestamp` field using the `+FORMAT` syntax where FORMAT is a valid (time
-format)[https://godoc.org/github.com/elastic/beats/libbeat/common/dtfmt].
+`@timestamp` field using the `+FORMAT` syntax where FORMAT is a valid https://godoc.org/github.com/elastic/beats/libbeat/common/dtfmt[time
+format].
 
 ["source","yaml",subs="attributes"]
 ------------------------------------------------------------------------------
@@ -211,49 +212,12 @@ format-string-with-date: '%{[fieldname]}-%{+yyyy.MM.dd}'
 
 
 [[config-file-format-env-vars]]
-=== Environment Variables
+=== Environment variables
 
-Beats support use of environment variables in config files to set values that
-need to be configurable during deployment. Environment variable expansion is
-introduced using `${VAR}`, where `VAR` is the name of the environment variable.
-
-Note: Only values can be set using environment variables. Environment variables
-usage in namespace and setting names are not supported.
-
-Variable references are replaced when settings are read by beats. The
-replacement is case-sensitive and occurs after the YAML file itself has been
-parsed. References to undefined variables will lead to errors when dereferenced
-and no default value is specified. To specify a default value, use:
-
-`${VAR:default_value}`
-
-Where `default_value` is the value to use if the environment variable is
-undefined.
-
-If you need to use a literal `${` in your configuration file then you can write
-`$${` to escape the expansion. The `$` symbol can be used to escape other
-characters in the default_value like using `$}` in order to generate a `}`
-character without closing the variable expansion.
-
-After changing the value of an environment variable, the beat needs to be
-restarted to pick up the new value.
-
-[float]
-==== Examples
-
-Here are some examples of configurations that use environment variables
-and what each configuration looks like after replacement:
-
-[options="header"]
-|==================================
-|Config source	       |Environment setting   |Config after replacement
-|`name: ${NAME}`       |`export NAME=elastic` |`name: elastic`
-|`name: ${NAME:beats}` |no setting            |`name: beats`
-|`name: ${NAME:beats}` |`export NAME=elastic` |`name: elastic`
-|==================================
+include::shared-env-vars.asciidoc[]
 
 [[config-gile-format-refs]]
-=== Reference Variables
+=== Reference variables
 
 Beats settings can reference other settings splicing multiple optionally custom
 named settings into new values. References use the same syntax as
@@ -317,6 +281,51 @@ shared:
 when using plain references.
 
 
+[[config-file-permissions]]
+=== Config file ownership and permissions
+
+NOTE: This section does not apply to Windows or other non-POSIX operating systems.
+
+On systems with POSIX file permissions, all Beats configuration files are
+subject to ownership and file permission checks. The purpose of these checks is
+to prevent unauthorized users from providing or modifying configurations that
+are run by the Beat. The owner of the configuration files must be either `root`
+or the user who is executing the Beat process. The permissions on each file must
+disallow writes by anyone other than the owner.
+
+When installed via an RPM or DEB package, the config file at
+`/etc/{beatname}/{beatname}.yml` will have the proper owner and permissions. The
+file is owned by `root` and has file permissions of `0644` (`-rw-r--r--`).
+
+You may encounter the following errors if your config file fails these checks:
+
+["source","sh"]
+--------------------------------------------------------------------------------
+Exiting: error loading config file: config file ("{beatname}.yml") must be
+owned by the beat user (uid=501) or root
+--------------------------------------------------------------------------------
+
+To correct this problem you can use either `chown root {beatname}.yml` or
+`chown 501 {beatname}.yml` to change the owner of the configuration file.
+
+["source","sh"]
+--------------------------------------------------------------------------------
+Exiting: error loading config file: config file ("{beatname}.yml") can only be
+writable by the owner but the permissions are "-rw-rw-r--" (to fix the
+permissions use: 'chmod go-w /etc/{beatname}/{beatname}.yml')
+--------------------------------------------------------------------------------
+
+To correct this problem, use `chmod go-w /etc/{beatname}/{beatname}.yml` to
+remove write privileges from anyone other than the owner.
+
+Other config files, such as the files in the `modules.d` directory, are subject
+to the same ownership and file permission checks. 
+
+==== Disabling strict permission checks
+
+You can disable strict permission checks from the command line by using
+`-strict.perms=false`, but we strongly encourage you to leave the checks enabled.
+
 [[config-file-format-cli]]
 === Command line arguments
 
@@ -328,49 +337,46 @@ use this, for example, for setting defaults in a base configuration file, and
 overwrite settings via local configuration files.
 
 In addition to overwriting settings using multiple configuration files,
-individual settings can be overwritten using `-E <setting>=<value>`.
+individual settings can be overwritten using `-E <setting>=<value>`. The
+`<value>` can be either a single value or a complex object, such as a list or
+dictionary.
+
+For example, given the following configuration:
+
+["source","yaml"]
+--------------------------------------------------------------------------------
+output.elasticsearch:
+  hosts: ["http://localhost:9200"]
+  username: username
+  password: password
+--------------------------------------------------------------------------------
+
+You can disable the Elasticsearch output and write all events to the console by
+setting:
+
+["source","sh"]
+--------------------------------------------------------------------------------
+-E output='{elasticsearch.enabled: false, console.pretty: true}'
+--------------------------------------------------------------------------------
+
+Any complex objects that you specify at the command line are merged with the
+original configuration, and the following configuration is passed to the Beat:
+
+["source","yaml"]
+--------------------------------------------------------------------------------
+output.elasticsearch:
+  enabled: false
+  hosts: ["http://localhost:9200"]
+  username: username
+  password: password
+
+output.console:
+  pretty: true
+--------------------------------------------------------------------------------
+
 
 [[config-file-format-tips]]
-=== YAML Tips and Gotchas
+=== YAML tips and gotchas
 
-When you edit the configuration file, there are a few things that you should know.
-
-[float]
-==== Use Spaces for Indentation
-
-Indentation is meaningful in YAML. Make sure that you use spaces, rather than
-tab characters, to indent sections.
-
-In the default configuration files and in all the examples in the documentation,
-we use 2 spaces per indentation level. We recommend you do the same.
-
-[float]
-==== Look at the Default Config File for Structure
-
-The best way to understand where to define a configuration option is by looking
-at the provided sample configuration files. The configuration files contain most
-of the default configurations that are available per beat. To change a setting,
-simply uncomment the line and change the values.
-
-[float]
-==== Test Your Config File
-
-You can test your configuration file to verify that the structure is valid.
-Simply change to the directory where the binary is installed, and run
-your Beat in the foreground with the `-configtest` flag specified. For example:
-
-["source","yaml",subs="attributes,callouts"]
-----------------------------------------------------------------------
-filebeat -c filebeat.yml -configtest
-----------------------------------------------------------------------
-
-You'll see a message if an error in the configuration file is found.
-
-[float]
-==== Wrap Regular Expressions in Single Quotation Marks
-
-If you need to specify a regular expression in a YAML file, it's a good idea to
-wrap the regular expression in single quotation marks to work around YAML's
-tricky rules for string escaping.
-
-For more information about YAML, see http://yaml.org/.
+:allplatforms:
+include::yaml.asciidoc[]

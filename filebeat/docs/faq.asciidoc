@@ -1,5 +1,5 @@
 [[faq]]
-== Frequently Asked Questions
+== Frequently asked questions
 
 This section contains frequently asked questions about Filebeat. Also check out the
 https://discuss.elastic.co/c/beats/filebeat[Filebeat discussion forum].
@@ -33,7 +33,7 @@ it's publishing events successfully:
 
 [float]
 [[open-file-handlers]]
-== Too many open file handlers?
+=== Too many open file handlers?
 
 Filebeat keeps the file handler open in case it reaches the end of a file so that it can read new log lines in near real time. If Filebeat is harvesting a large number of files, the number of open files can become an issue. In most environments, the number of files that are actively updated is low. The `close_inactive` configuration option should be set accordingly to close files that are no longer active.
 

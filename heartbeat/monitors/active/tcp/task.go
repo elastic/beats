@@ -31,19 +31,25 @@ func newTCPMonitorHostJob(
 		return nil, err
 	}
 
-	return monitors.MakeSimpleJob(jobName, typ, func() (common.MapStr, error) {
-		event := common.MapStr{
-			"scheme": scheme,
-			"port":   port,
+	settings := monitors.MakeJobSetting(jobName).WithFields(common.MapStr{
+		"monitor": common.MapStr{
 			"host":   host,
-		}
-		dialer, err := taskDialer.BuildWithMeasures(event)
+			"scheme": scheme,
+		},
+		"tcp": common.MapStr{
+			"port": port,
+		},
+	})
+
+	return monitors.MakeSimpleJob(settings, func() (common.MapStr, error) {
+		event := common.MapStr{}
+		dialer, err := taskDialer.Build(event)
 		if err != nil {
 			return event, err
 		}
 
 		results, err := pingHost(dialer, pingAddr, timeout, validator)
-		event.Update(results)
+		event.DeepUpdate(results)
 		return event, err
 	}), nil
 }
@@ -64,14 +70,16 @@ func newTCPMonitorIPsJob(
 		return nil, err
 	}
 
-	pingFactory := createPingFactory(dialerFactory, addr, timeout, validator)
-	if ip := net.ParseIP(addr.Host); ip != nil {
-		debugf("Make TCP by IP job: %v:%v", ip, addr.Ports)
-		return monitors.MakeByIPJob(jobName, typ, ip, pingFactory)
-	}
+	settings := monitors.MakeHostJobSettings(jobName, addr.Host, config.Mode)
+	settings = settings.WithFields(common.MapStr{
+		"monitor": common.MapStr{
+			"scheme": addr.Scheme,
+		},
+	})
 
-	debugf("Make TCP by Host job: %v:%v (mode=%#v)", addr.Host, addr.Ports, config.Mode)
-	return monitors.MakeByHostJob(jobName, typ, addr.Host, config.Mode, pingFactory)
+	debugf("Make TCP job: %v:%v", addr.Host, addr.Ports)
+	pingFactory := createPingFactory(dialerFactory, addr, timeout, validator)
+	return monitors.MakeByHostJob(settings, pingFactory)
 }
 
 func createPingFactory(
@@ -80,21 +88,25 @@ func createPingFactory(
 	timeout time.Duration,
 	validator ConnCheck,
 ) func(*net.IPAddr) monitors.TaskRunner {
-	fields := common.MapStr{"scheme": addr.Scheme}
-
-	return monitors.MakePingAllIPPortFactory(fields, addr.Ports,
+	return monitors.MakePingAllIPPortFactory(addr.Ports,
 		func(ip *net.IPAddr, port uint16) (common.MapStr, error) {
-			host := net.JoinHostPort(ip.String(), strconv.Itoa(int(port)))
+			ipStr := ip.String()
+			host := net.JoinHostPort(ipStr, strconv.Itoa(int(port)))
 			pingAddr := net.JoinHostPort(addr.Host, strconv.Itoa(int(port)))
 
-			event := common.MapStr{}
-			dialer, err := makeDialerChain(host).BuildWithMeasures(event)
+			event := common.MapStr{
+				"tcp": common.MapStr{
+					"port": port,
+				},
+			}
+
+			dialer, err := makeDialerChain(host).Build(event)
 			if err != nil {
 				return event, err
 			}
 
 			results, err := pingHost(dialer, pingAddr, timeout, validator)
-			event.Update(results)
+			event.DeepUpdate(results)
 			return event, err
 		})
 }
@@ -133,7 +145,11 @@ func pingHost(
 
 	end := time.Now()
 	event := common.MapStr{
-		"validate_rtt": look.RTT(end.Sub(validateStart)),
+		"tcp": common.MapStr{
+			"rtt": common.MapStr{
+				"validate": look.RTT(end.Sub(validateStart)),
+			},
+		},
 	}
 	if err != nil {
 		event["error"] = reason.FailValidate(err)
@@ -169,13 +185,20 @@ func buildDialerChain(
 	config *Config,
 ) (*dialchain.DialerChain, error) {
 	d := &dialchain.DialerChain{
-		Net: dialchain.TCPDialer("tcp_connect_rtt", config.Timeout),
+		Net: dialchain.TCPDialer(config.Timeout),
 	}
-	if config.Socks5.URL != "" {
-		d.AddLayer(dialchain.SOCKS5Layer("socks5_connect_rtt", &config.Socks5))
+
+	withProxy := config.Socks5.URL != ""
+	if withProxy {
+		d.AddLayer(dialchain.SOCKS5Layer(&config.Socks5))
 	}
+
+	// insert empty placeholder, so address can be replaced in dialer chain
+	// by replacing this placeholder dialer
+	d.AddLayer(dialchain.IDLayer())
+
 	if isTLSAddr(scheme) {
-		d.AddLayer(dialchain.TLSLayer("tls_handshake_rtt", tls, config.Timeout))
+		d.AddLayer(dialchain.TLSLayer(tls, config.Timeout))
 	}
 
 	if err := d.TestBuild(); err != nil {
@@ -195,16 +218,15 @@ func buildHostDialerChainFactory(
 	}
 
 	withProxy := config.Socks5.URL != ""
-	return func(addr string) *dialchain.DialerChain {
-		if withProxy {
-			d := template.Clone()
-			d.Layers[0] = dialchain.ConstAddrLayer(addr, d.Layers[0])
-			return d
-		}
+	addrIndex := 0
+	if withProxy {
+		addrIndex = 1
+	}
 
-		return &dialchain.DialerChain{
-			Net:    dialchain.ConstAddrDialer("tcp_connect_rtt", addr, config.Timeout),
-			Layers: template.Layers,
-		}
+	return func(addr string) *dialchain.DialerChain {
+		// replace IDLayer placeholder in template with ConstAddrLayer
+		d := template.Clone()
+		d.Layers[addrIndex] = dialchain.ConstAddrLayer(addr)
+		return d
 	}, nil
 }

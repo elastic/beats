@@ -19,6 +19,9 @@ CLIENTS_FIELDS = ["blocked", "biggest_input_buf",
 
 
 class Test(metricbeat.BaseTest):
+
+    COMPOSE_SERVICES = ['redis']
+
     @unittest.skipUnless(metricbeat.INTEGRATION_TESTS, "integration test")
     @attr('integration')
     def test_info(self):
@@ -34,10 +37,7 @@ class Test(metricbeat.BaseTest):
         proc = self.start_beat()
         self.wait_until(lambda: self.output_lines() > 0)
         proc.check_kill_and_wait()
-
-        # Ensure no errors or warnings exist in the log.
-        log = self.get_log()
-        self.assertNotRegexpMatches(log, "ERR|WARN")
+        self.assert_no_logged_warnings()
 
         output = self.read_output_json()
         self.assertEqual(len(output), 1)
@@ -70,10 +70,7 @@ class Test(metricbeat.BaseTest):
         proc = self.start_beat()
         self.wait_until(lambda: self.output_lines() > 0)
         proc.check_kill_and_wait()
-
-        # Ensure no errors or warnings exist in the log.
-        log = self.get_log()
-        self.assertNotRegexpMatches(log, "ERR|WARN")
+        self.assert_no_logged_warnings()
 
         output = self.read_output_json()
         self.assertEqual(len(output), 1)
@@ -86,27 +83,26 @@ class Test(metricbeat.BaseTest):
 
     @unittest.skipUnless(metricbeat.INTEGRATION_TESTS, "integration test")
     @attr('integration')
-    def test_filters(self):
+    def test_module_processors(self):
         """
-        Test filters for Redis info event.
+        Test local processors for Redis info event.
         """
         fields = ["clients", "cpu"]
+        eventFields = ['beat', 'metricset']
+        eventFields += ['redis.info.' + f for f in fields]
         self.render_config_template(modules=[{
             "name": "redis",
             "metricsets": ["info"],
             "hosts": self.get_hosts(),
             "period": "5s",
-            "filters": [{
-                "include_fields": fields,
+            "processors": [{
+                "include_fields": eventFields,
             }],
         }])
         proc = self.start_beat()
         self.wait_until(lambda: self.output_lines() > 0)
         proc.check_kill_and_wait()
-
-        # Ensure no errors or warnings exist in the log.
-        log = self.get_log()
-        self.assertNotRegexpMatches(log, "ERR|WARN")
+        self.assert_no_logged_warnings()
 
         output = self.read_output_json()
         self.assertEqual(len(output), 1)
@@ -114,7 +110,7 @@ class Test(metricbeat.BaseTest):
 
         self.assertItemsEqual(self.de_dot(REDIS_FIELDS), evt.keys())
         redis_info = evt["redis"]["info"]
-        print redis_info
+        print(redis_info)
         self.assertItemsEqual(fields, redis_info.keys())
         self.assertItemsEqual(self.de_dot(CLIENTS_FIELDS), redis_info["clients"].keys())
         self.assertItemsEqual(self.de_dot(CPU_FIELDS), redis_info["cpu"].keys())
@@ -122,4 +118,3 @@ class Test(metricbeat.BaseTest):
     def get_hosts(self):
         return [os.getenv('REDIS_HOST', 'localhost') + ':' +
                 os.getenv('REDIS_PORT', '6379')]
-

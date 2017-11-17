@@ -1,0 +1,305 @@
+[[heartbeat-getting-started]]
+== Getting Started With Heartbeat
+
+To get started with your own Heartbeat setup, install and configure these
+related products:
+
+ * Elasticsearch for storage and indexing the data.
+ * Kibana for the UI.
+ * Logstash (optional) for inserting data into Elasticsearch.
+
+See {libbeat}/getting-started.html[Getting Started with Beats and the Elastic Stack]
+for more information.
+
+After installing the Elastic Stack, read the following topics to learn how to
+install, configure, and run Heartbeat:
+
+* <<heartbeat-installation>>
+* <<heartbeat-configuration>>
+* <<heartbeat-template>>
+* <<load-kibana-dashboards>>
+* <<heartbeat-starting>>
+* <<view-kibana-dashboards>>
+* <<setup-repositories>>
+
+
+[[heartbeat-installation]]
+=== Step 1: Install Heartbeat
+
+Unlike most Beats, which you install on edge nodes, you typically install
+Heartbeat as part of monitoring service that runs on a separate machine
+and possibly even outside of the network where the services that you want to
+monitor are running.
+
+//TODO: Add a separate topic that explores deployment scenarios in more detail (like installing on a sub-network where there's a firewall etc.
+
+include::../../libbeat/docs/shared-download-and-install.asciidoc[]
+
+[[deb]]
+*deb:*
+
+ifeval::["{release-state}"=="unreleased"]
+
+Version {version} of {beatname_uc} has not yet been released.
+
+endif::[]
+
+ifeval::["{release-state}"!="unreleased"]
+
+["source","sh",subs="attributes"]
+----------------------------------------------------------------------
+curl -L -O {downloads}/heartbeat/heartbeat-{version}-amd64.deb
+sudo dpkg -i heartbeat-{version}-amd64.deb
+----------------------------------------------------------------------
+
+endif::[]
+
+[[rpm]]
+*rpm:*
+
+ifeval::["{release-state}"=="unreleased"]
+
+Version {version} of {beatname_uc} has not yet been released.
+
+endif::[]
+
+ifeval::["{release-state}"!="unreleased"]
+
+["source","sh",subs="attributes"]
+----------------------------------------------------------------------
+curl -L -O {downloads}/heartbeat/heartbeat-{version}-x86_64.rpm
+sudo rpm -vi heartbeat-{version}-x86_64.rpm
+----------------------------------------------------------------------
+
+endif::[]
+
+[[mac]]
+*mac:*
+
+ifeval::["{release-state}"=="unreleased"]
+
+Version {version} of {beatname_uc} has not yet been released.
+
+endif::[]
+
+ifeval::["{release-state}"!="unreleased"]
+
+["source","sh",subs="attributes"]
+------------------------------------------------
+curl -L -O {downloads}/heartbeat/heartbeat-{version}-darwin-x86_64.tar.gz
+tar xzvf heartbeat-{version}-darwin-x86_64.tar.gz
+------------------------------------------------
+
+endif::[]
+
+
+[[docker]]
+*docker:*
+
+ifeval::["{release-state}"=="unreleased"]
+
+Version {stack-version} of {beatname_uc} has not yet been released.
+
+endif::[]
+
+ifeval::["{release-state}"!="unreleased"]
+
+["source", "shell", subs="attributes"]
+------------------------------------------------
+docker pull {dockerimage}
+------------------------------------------------
+
+endif::[]
+
+[[win]]
+*win:*
+
+ifeval::["{release-state}"=="unreleased"]
+
+Version {version} of {beatname_uc} has not yet been released.
+
+endif::[]
+
+ifeval::["{release-state}"!="unreleased"]
+
+. Download the Heartbeat Windows zip file from the
+https://www.elastic.co/downloads/beats/heartbeat[downloads page].
+
+. Extract the contents of the zip file into `C:\Program Files`.
+
+. Rename the +heartbeat-<version>-windows+ directory to +Heartbeat+.
+
+. Open a PowerShell prompt as an Administrator (right-click the PowerShell icon
+and select *Run As Administrator*). If you are running Windows XP, you may need
+to download and install PowerShell.
+
+. From the PowerShell prompt, run the following commands to install Heartbeat as
+a Windows service:
++
+["source","sh",subs="attributes"]
+----------------------------------------------------------------------
+PS > cd 'C:\Program Files\Heartbeat'
+PS C:\Program Files\Heartbeat> .\install-service-heartbeat.ps1
+----------------------------------------------------------------------
+
+NOTE: If script execution is disabled on your system, you need to set the
+execution policy for the current session to allow the script to run. For
+example:
++PowerShell.exe -ExecutionPolicy UnRestricted -File .\install-service-heartbeat.ps1+.
+
+endif::[]
+
+Before starting Heartbeat, you should look at the configuration options in
+the configuration file, for example +C:\Program Files\Heartbeat\heartbeat.yml+
+or +/etc/heartbeat/heartbeat.yml+. For more information about these
+options, see <<configuring-howto-heartbeat>>.
+
+[[heartbeat-configuration]]
+=== Step 2: Configure Heartbeat
+
+include::../../libbeat/docs/shared-configuring.asciidoc[]
+
+Heartbeat provides monitors to check the status of hosts at set intervals.
+You configure each monitor individually. Heartbeat currently provides monitors
+for ICMP, TCP, and HTTP (see <<heartbeat-overview>> for more about these
+monitors). Here is an example that configures Heartbeat to use an `icmp`
+monitor:
+
+[source,yaml]
+----------------------------------------------------------------------
+heartbeat.monitors:
+- type: icmp
+  schedule: '*/5 * * * * * *'
+  hosts: ["myhost"]
+output.elasticsearch:
+  hosts: ["myEShost:9200"]
+----------------------------------------------------------------------
+
+To configure Heartbeat:
+
+. Specify the list of monitors that you want to enable. Each item in the list
+begins with a dash (-). The following example configures Heartbeat to use two
+monitors, an `icmp` monitor and a `tcp` monitor:
++
+[source,yaml]
+----------------------------------------------------------------------
+heartbeat.monitors:
+- type: icmp
+  schedule: '*/5 * * * * * *' <1>
+  hosts: ["myhost"]
+- type: tcp
+  schedule: '@every 5s' <2>
+  hosts: ["myhost:12345"]
+  mode: any <3>
+----------------------------------------------------------------------
+<1> The `icmp` monitor is scheduled to run exactly every 5 seconds (10:00:00,
+10:00:05, and so on). The `schedule` option uses a cron-like syntax based on
+https://github.com/gorhill/cronexpr#implementation[this `cronexpr` implementation].
+<2> The `tcp` monitor is set to run every 5 seconds from the time when Heartbeat
+was started. Heartbeat adds the `@every` keyword to the syntax provided by the
+`cronexpr` package.
+<3> The `mode` specifies whether to ping one IP (`any`) or all resolvable IPs
+(`all`).
++
+See <<configuring-howto-heartbeat>> for a full description of each
+configuration option.
+
+. If you are sending output directly to Elasticsearch (and not using Logstash),
+set the IP address and port where Heartbeat can find the Elasticsearch
+installation:
++
+[source,yaml]
+----------------------------------------------------------------------
+output.elasticsearch:
+  hosts: ["192.168.1.42:9200"]
+----------------------------------------------------------------------
++
+If you are sending output to Logstash, make sure you
+<<logstash-output,Configure the Logstash output>> instead.
+
+include::../../libbeat/docs/step-configure-kibana-endpoint.asciidoc[]
+
+include::../../libbeat/docs/step-configure-credentials.asciidoc[]
+
+include::../../libbeat/docs/step-test-config.asciidoc[]
+
+include::../../libbeat/docs/step-look-at-config.asciidoc[]
+
+[[heartbeat-template]]
+=== Step 3: Load the index template in Elasticsearch
+
+:allplatforms:
+include::../../libbeat/docs/shared-template-load.asciidoc[]
+
+[[load-kibana-dashboards]]
+=== Step 4: Set up the Kibana dashboards
+
+:allplatforms:
+include::../../libbeat/docs/dashboards.asciidoc[]
+
+[[heartbeat-starting]]
+=== Step 5: Start Heartbeat
+
+Start Heartbeat by issuing the appropriate command for your platform.
+
+NOTE: If you use an init.d script to start Heartbeat on deb or rpm, you can't
+specify command line flags (see <<command-line-options>>). To specify flags,
+start Heartbeat in the foreground.
+
+*deb:*
+
+["source","sh",subs="attributes"]
+----------------------------------------------------------------------
+sudo service {beatname_lc}-elastic start
+----------------------------------------------------------------------
+
+*rpm:*
+
+["source","sh",subs="attributes"]
+----------------------------------------------------------------------
+sudo service {beatname_lc}-elastic start
+----------------------------------------------------------------------
+
+*mac:*
+
+["source","sh",subs="attributes"]
+----------------------------------------------------------------------
+sudo chown root heartbeat.yml <1>
+sudo ./heartbeat -e -c heartbeat.yml -d "publish"
+----------------------------------------------------------------------
+<1> You'll be running Heartbeat as root, so you need to change ownership of the
+configuration file, or run Heartbeat with `-strict.perms=false` specified. See
+{libbeat}/config-file-permissions.html[Config File Ownership and Permissions]
+in the _Beats Platform Reference_.
+
+*win:*
+
+["source","sh",subs="attributes"]
+----------------------------------------------------------------------
+PS C:\Program Files\Heartbeat> Start-Service heartbeat
+----------------------------------------------------------------------
+
+By default, Windows log files are stored in +C:\ProgramData\heartbeat\Logs+.
+
+Heartbeat is now ready to check the status of your services and send
+events to your defined output.
+
+[id="{beatname_lc}-passing-credentials"]
+==== Pass credentials
+
+:start-type: start
+include::../../libbeat/docs/shared-passing-credentials-setup.asciidoc[]
+
+[[view-kibana-dashboards]]
+=== Step 6: View the sample Kibana dashboards
+
+To make it easier for you to visualize the status of your services, we have
+created example {beatname_uc} dashboards. You loaded the dashboards earlier when
+you ran the `setup` command.
+
+include::../../libbeat/docs/opendashboards.asciidoc[]
+
+The dashboards are provided as examples. We recommend that you
+{kibana-ref}/dashboard.html[customize] them to meet your needs.
+
+image:./images/heartbeat-statistics.png[Heartbeat statistics]

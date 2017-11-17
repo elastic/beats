@@ -1,0 +1,45 @@
+{
+    "@timestamp": "2016-05-23T08:05:34.853Z",
+    "beat": {
+        "hostname": "host.example.com",
+        "name": "host.example.com"
+    },
+    "metricset": {
+        "host": "http://127.0.0.1:38179/sdk",
+        "module": "vsphere",
+        "name": "virtualmachine",
+        "rtt": 115
+    },
+    "type": "metricsets",
+    "vsphere": {
+        "virtualmachine": {
+            "cpu": {
+                "used": {
+                    "mhz": 0
+                }
+            },
+            "datacenter": "ha-datacenter",
+            "memory": {
+                "free": {
+                    "guest": {
+                        "bytes": 33554432
+                    }
+                },
+                "total": {
+                    "guest": {
+                        "bytes": 33554432
+                    }
+                },
+                "used": {
+                    "guest": {
+                        "bytes": 0
+                    },
+                    "host": {
+                        "bytes": 0
+                    }
+                }
+            },
+            "name": "ha-host_VM1"
+        }
+    }
+}

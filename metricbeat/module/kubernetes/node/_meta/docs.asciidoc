@@ -1,0 +1,5 @@
+=== Kubernetes node metricset
+
+beta[]
+
+This is the `node` metricset of the Kubernetes module.

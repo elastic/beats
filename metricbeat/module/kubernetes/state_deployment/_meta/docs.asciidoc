@@ -1,0 +1,5 @@
+=== Kubernetes state_deployment metricset
+
+beta[]
+
+This is the `state_deployment` metricset of the Kubernetes module.

@@ -1,78 +1,70 @@
-################### Beat Configuration #########################
+heartbeat.monitors:
+{% for monitor in monitors -%}
+- type: {{ monitor.type }}
+  {%- if monitor.hosts is defined %}
+  hosts:
+    {%- for host in monitor.hosts %}
+    - '{{ host }}'
+    {% endfor -%}
+  {% endif -%}
 
+  {%- if monitor.urls is defined %}
+  urls:
+    {%- for url in monitor.urls %}
+    - '{{ url }}'
+    {% endfor %}
+  {% endif -%}
 
+  {%- if monitor.schedule is defined %}
+  schedule: '{{ monitor.schedule }}'
+  {%- else -%}
+  schedule: '@every 1s'
+  {% endif -%}
 
-############################# Output ##########################################
+  {%- if monitor.tags is defined %}
+  tags:
+    {% for tag in monitor.tags -%}
+    - '{{ tag }}'
+    {% endfor %}
+  {% endif -%}
 
-# Configure what outputs to use when sending the data collected by the beat.
-# You can enable one or multiple outputs by setting enabled option to true.
-output:
+  {%- if monitor.fields is defined %}
+  {% if monitor.fields_under_root %}fields_under_root: true{% endif %}
+  fields:
+    {% for k, v in monitor.fields.items() -%}
+    {{ k }}: {{ v }}
+    {% endfor %}
+  {% endif %}
+{% endfor -%}
 
-  ### File as output
-  file:
-    # Enabling file output
-    enabled: true
+{%- if shipper_name %}
+name: {{ shipper_name }}
+{% endif %}
 
-    # Path to the directory where to save the generated files. The option is mandatory.
-    path: {{ output_file_path|default(beat.working_dir + "/output") }}
+{%- if tags %}
+tags:
+  {% for tag in tags -%}
+  - {{ tag }}
+  {% endfor -%}
+{% endif %}
 
+{%- if fields %}
+{% if fields_under_root %}fields_under_root: true{% endif %}
+fields:
+  {% for k, v in fields.items() -%}
+  {{ k }}: {{ v }}
+  {% endfor -%}
+{% endif %}
 
-    # Name of the generated files. The default is `heartbeat` and it generates
-    # files: `heartbeat`, `heartbeat.1`, `heartbeat.2`, etc.
-    filename: "{{ output_file_filename|default("heartbeat") }}"
+#================================ Queue =====================================
 
-    # Maximum size in kilobytes of each file. When this size is reached, the files are
-    # rotated. The default value is 10 MB.
-    #rotate_every_kb: 10000
+queue.mem:
+  events: 4096
+  flush.min_events: 8
+  flush.timeout: 0.1s
 
-    # Maximum number of files under path. When this number of files is reached, the
-    # oldest file is deleted and the rest are shifted from last to first. The default
-    # is 7 files.
-    #number_of_files: 7
+#================================ Outputs =====================================
 
-
-
-############################# Beat #########################################
-
-# The name of the shipper that publishes the network data. It can be used to group
-# all the transactions sent by a single shipper in the web interface.
-# If this options is not defined, the hostname is used.
-#name:
-
-# The tags of the shipper are included in their own field with each
-# transaction published. Tags make it easy to group servers by different
-# logical properties.
-#tags: ["service-X", "web-tier"]
-
-
-
-############################# Logging #########################################
-
-#logging:
-  # Send all logging output to syslog. On Windows default is false, otherwise
-  # default is true.
-  #to_syslog: true
-
-  # Write all logging output to files. Beats automatically rotate files if configurable
-  # limit is reached.
-  #to_files: false
-
-  # Enable debug output for selected components.
-  #selectors: []
-
-  # Set log level
-  #level: error
-
-  #files:
-    # The directory where the log files will written to.
-    #path: /var/log/heartbeat
-
-    # The name of the files where the logs are written to.
-    #name: heartbeat
-
-    # Configure log file size limit. If limit is reached, log file will be
-    # automatically rotated
-    #rotateeverybytes: 10485760 # = 10MB
-
-    # Number of rotated log files to keep. Oldest files will be deleted first.
-    #keepfiles: 7
+output.file:
+  path: {{ output_file_path|default(beat.working_dir + "/output") }}
+  filename: "{{ output_file_filename|default("heartbeat") }}"

@@ -1,15 +1,22 @@
 package harvester
 
-import "regexp"
+import "github.com/elastic/beats/libbeat/common/match"
 
-// MatchAnyRegexps checks if the text matches any of the regular expressions
-func MatchAnyRegexps(regexps []*regexp.Regexp, text string) bool {
+// Contains available prospector types
+const (
+	LogType    = "log"
+	StdinType  = "stdin"
+	RedisType  = "redis"
+	UdpType    = "udp"
+	DockerType = "docker"
+)
 
-	for _, rexp := range regexps {
-		if rexp.MatchString(text) {
+// MatchAny checks if the text matches any of the regular expressions
+func MatchAny(matchers []match.Matcher, text string) bool {
+	for _, m := range matchers {
+		if m.MatchString(text) {
 			return true
 		}
 	}
-
 	return false
 }

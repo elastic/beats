@@ -55,7 +55,7 @@ func (io *BLkioService) getBlkioStats(myRawStat *docker.Stat) BlkioStats {
 	if exist {
 		myBlkioStats.reads = io.getReadPs(&oldBlkioStats, &newBlkioStats)
 		myBlkioStats.writes = io.getWritePs(&oldBlkioStats, &newBlkioStats)
-		myBlkioStats.totals = io.getReadPs(&oldBlkioStats, &newBlkioStats)
+		myBlkioStats.totals = io.getTotalPs(&oldBlkioStats, &newBlkioStats)
 	} else {
 		io.BlkioSTatsPerContainer = make(map[string]BlkioRaw)
 	}

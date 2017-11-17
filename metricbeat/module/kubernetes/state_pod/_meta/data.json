@@ -1,0 +1,31 @@
+{
+  "@timestamp": "2017-05-10T16:46:17.825Z",
+  "beat": {
+    "hostname": "X1",
+    "name": "X1",
+    "version": "6.0.0-alpha1"
+  },
+  "kubernetes": {
+    "namespace": "kube-system",
+    "node": {
+      "name": "minikube"
+    },
+    "pod": {
+      "host_ip": "192.168.99.100",
+      "ip": "172.17.0.3",
+      "name": "tiller-deploy-3067024529-1gp80",
+      "status": {
+        "phase": "running",
+        "ready": "true",
+        "scheduled": "true"
+      }
+    }
+  },
+  "metricset": {
+    "host": "192.168.99.100:18080",
+    "module": "kubernetes",
+    "name": "state_pod",
+    "namespace": "pod",
+    "rtt": 3911
+  }
+}

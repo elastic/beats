@@ -5,6 +5,7 @@ winlogbeat
 _obj
 _test
 coverage
+_meta/kibana/*/index-pattern
 
 # Architecture specific extensions/prefixes
 *.[568vq]

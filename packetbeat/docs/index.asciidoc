@@ -1,52 +1,43 @@
 = Packetbeat Reference
 
-include::./version.asciidoc[]
+include::../../libbeat/docs/version.asciidoc[]
+
+include::{asciidoc-dir}/../../shared/attributes.asciidoc[]
 
 :libbeat: http://www.elastic.co/guide/en/beats/libbeat/{doc-branch}
+:kibana-ref: https://www.elastic.co/guide/en/kibana/{doc-branch}
+:beatsdevguide: http://www.elastic.co/guide/en/beats/devguide/{doc-branch}
 :packetbeat: http://www.elastic.co/guide/en/beats/packetbeat/{doc-branch}
 :metricbeat: http://www.elastic.co/guide/en/beats/metricbeat/{doc-branch}
 :filebeat: http://www.elastic.co/guide/en/beats/filebeat/{doc-branch}
 :winlogbeat: http://www.elastic.co/guide/en/beats/winlogbeat/{doc-branch}
-:elasticsearch: https://www.elastic.co/guide/en/elasticsearch/reference/{doc-branch}
 :logstashdoc: https://www.elastic.co/guide/en/logstash/{doc-branch}
-:securitydoc: https://www.elastic.co/guide/en/x-pack/5.0
+:elasticsearch: https://www.elastic.co/guide/en/elasticsearch/reference/{doc-branch}
+:securitydoc: https://www.elastic.co/guide/en/x-pack/current
 :kibanadoc: https://www.elastic.co/guide/en/kibana/{doc-branch}
 :plugindoc: https://www.elastic.co/guide/en/elasticsearch/plugins/{doc-branch}
 :version: {stack-version}
 :beatname_lc: packetbeat
 :beatname_uc: Packetbeat
+:beatname_pkg: {beatname_lc}
 :security: X-Pack Security
+:dockerimage: docker.elastic.co/beats/{beatname_lc}:{version}
+:dockergithub: https://github.com/elastic/beats-docker/tree/{doc-branch}
+
 
 include::./overview.asciidoc[]
 
+include::../../libbeat/docs/contributing-to-beats.asciidoc[]
+
 include::./gettingstarted.asciidoc[]
 
-include::./command-line.asciidoc[]
+include::../../libbeat/docs/repositories.asciidoc[]
 
-include::../../libbeat/docs/shared-directory-layout.asciidoc[]
+include::./setting-up-running.asciidoc[]
 
 include::./upgrading.asciidoc[]
 
 include::./configuring-howto.asciidoc[]
-
-include::./packetbeat-filtering.asciidoc[]
-
-include::../../libbeat/docs/shared-config-ingest.asciidoc[]
-
-include::./packetbeat-geoip.asciidoc[]
-
-include::./configuring-logstash.asciidoc[]
-
-include::../../libbeat/docs/shared-env-vars.asciidoc[]
-
-include::./capturing.asciidoc[]
-
-include::./thrift.asciidoc[]
-
-include::./maintaining-topology.asciidoc[]
-
-:allplatforms:
-include::../../libbeat/docs/yaml.asciidoc[]
 
 include::./fields.asciidoc[]
 
@@ -59,10 +50,3 @@ include::./filtering.asciidoc[]
 include::./troubleshooting.asciidoc[]
 
 include::./faq.asciidoc[]
-
-pass::[<?page_header We are working on updating this section. Some content might be out of date. While you're waiting for updates, you might want to try out the TCP protocol generator at https://github.com/elastic/beats/tree/master/generate/packetbeat/tcp-protocol. ?>]
-
-include::./new_protocol.asciidoc[]
-
-pass::[<?page_header ?>]
-

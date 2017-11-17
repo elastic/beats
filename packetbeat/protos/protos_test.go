@@ -7,7 +7,6 @@ import (
 	"time"
 
 	"github.com/elastic/beats/libbeat/common"
-	"github.com/elastic/beats/packetbeat/publish"
 
 	"github.com/stretchr/testify/assert"
 )
@@ -18,7 +17,7 @@ type TestProtocol struct {
 
 type TCPProtocol TestProtocol
 
-func (proto *TCPProtocol) Init(testMode bool, results publish.Transactions) error {
+func (proto *TCPProtocol) Init(testMode bool, results Reporter) error {
 	return nil
 }
 
@@ -45,7 +44,7 @@ func (proto *TCPProtocol) ConnectionTimeout() time.Duration { return 0 }
 
 type UDPProtocol TestProtocol
 
-func (proto *UDPProtocol) Init(testMode bool, results publish.Transactions) error {
+func (proto *UDPProtocol) Init(testMode bool, results Reporter) error {
 	return nil
 }
 
@@ -59,7 +58,7 @@ func (proto *UDPProtocol) ParseUDP(pkt *Packet) {
 
 type TCPUDPProtocol TestProtocol
 
-func (proto *TCPUDPProtocol) Init(testMode bool, results publish.Transactions) error {
+func (proto *TCPUDPProtocol) Init(testMode bool, results Reporter) error {
 	return nil
 }
 
@@ -95,7 +94,7 @@ func TestProtocolNames(t *testing.T) {
 
 func newProtocols() Protocols {
 	p := ProtocolsStruct{}
-	p.all = make(map[Protocol]Plugin)
+	p.all = make(map[Protocol]protocolInstance)
 	p.tcp = make(map[Protocol]TCPPlugin)
 	p.udp = make(map[Protocol]UDPPlugin)
 
@@ -103,15 +102,15 @@ func newProtocols() Protocols {
 	udp := &UDPProtocol{Ports: []int{5060}}
 	tcpUDP := &TCPUDPProtocol{Ports: []int{53}}
 
-	p.register(1, tcp)
-	p.register(2, udp)
-	p.register(3, tcpUDP)
+	p.register(1, nil, tcp)
+	p.register(2, nil, udp)
+	p.register(3, nil, tcpUDP)
 	return p
 }
 
 func TestBpfFilterWithoutVlanOnlyIcmp(t *testing.T) {
 	p := ProtocolsStruct{}
-	p.all = make(map[Protocol]Plugin)
+	p.all = make(map[Protocol]protocolInstance)
 	p.tcp = make(map[Protocol]TCPPlugin)
 	p.udp = make(map[Protocol]UDPPlugin)
 
@@ -143,14 +142,6 @@ func TestBpfFilterWithVlanWithIcmp(t *testing.T) {
 	filter := p.BpfFilter(true, true)
 	assert.Equal(t, "tcp port 80 or udp port 5060 or port 53 or icmp or icmp6 or "+
 		"(vlan and (tcp port 80 or udp port 5060 or port 53 or icmp or icmp6))", filter)
-}
-
-func TestGetAll(t *testing.T) {
-	p := newProtocols()
-	all := p.GetAll()
-	assert.NotNil(t, all[1])
-	assert.NotNil(t, all[2])
-	assert.NotNil(t, all[3])
 }
 
 func TestGetAllTCP(t *testing.T) {

@@ -5,8 +5,6 @@ import (
 	"os"
 	"reflect"
 	"syscall"
-
-	"github.com/elastic/beats/libbeat/logp"
 )
 
 type StateOS struct {
@@ -17,7 +15,6 @@ type StateOS struct {
 
 // GetOSState returns the platform specific StateOS
 func GetOSState(info os.FileInfo) StateOS {
-
 	// os.SameFile must be called to populate the id fields. Otherwise in case for example
 	// os.Stat(file) is used to get the fileInfo, the ids are empty.
 	// https://github.com/elastic/beats/filebeat/pull/53
@@ -45,35 +42,13 @@ func (fs StateOS) IsSame(state StateOS) bool {
 	return fs.IdxHi == state.IdxHi && fs.IdxLo == state.IdxLo && fs.Vol == state.Vol
 }
 
-// SafeFileRotate safely rotates an existing file under path and replaces it with the tempfile
-func SafeFileRotate(path, tempfile string) error {
-	old := path + ".old"
-	var e error
-
-	// In Windows, one cannot rename a file if the destination already exists, at least
-	// not with using the os.Rename function that Golang offers.
-	// This tries to move the existing file into an old file first and only do the
-	// move after that.
-	if e = os.Remove(old); e != nil {
-		logp.Debug("filecompare", "delete old: %v", e)
-		// ignore error in case old doesn't exit yet
-	}
-	if e = os.Rename(path, old); e != nil {
-		logp.Debug("filecompare", "rotate to old: %v", e)
-		// ignore error in case path doesn't exist
-	}
-
-	if e = os.Rename(tempfile, path); e != nil {
-		logp.Err("rotate: %v", e)
-		return e
-	}
-	return nil
+func (fs StateOS) String() string {
+	return fmt.Sprintf("%d-%d-%d", fs.IdxHi, fs.IdxLo, fs.Vol)
 }
 
 // ReadOpen opens a file for reading only
 // As Windows blocks deleting a file when its open, some special params are passed here.
 func ReadOpen(path string) (*os.File, error) {
-
 	// Set all write flags
 	// This indirectly calls syscall_windows::Open method https://github.com/golang/go/blob/7ebcf5eac7047b1eef2443eda1786672b5c70f51/src/syscall/syscall_windows.go#L251
 	// As FILE_SHARE_DELETE cannot be passed to Open, os.CreateFile must be implemented directly

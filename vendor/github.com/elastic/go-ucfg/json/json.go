@@ -8,7 +8,7 @@ import (
 )
 
 func NewConfig(in []byte, opts ...ucfg.Option) (*ucfg.Config, error) {
-	var m map[string]interface{}
+	var m interface{}
 	if err := json.Unmarshal(in, &m); err != nil {
 		return nil, err
 	}

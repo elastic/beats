@@ -7,9 +7,10 @@ import (
 	"fmt"
 	"time"
 
+	"github.com/elastic/beats/libbeat/beat"
 	"github.com/elastic/beats/libbeat/common"
 	"github.com/elastic/beats/libbeat/logp"
-	"github.com/elastic/beats/libbeat/publisher"
+	"github.com/elastic/beats/libbeat/processors"
 
 	"github.com/elastic/beats/heartbeat/monitors"
 	"github.com/elastic/beats/heartbeat/scheduler"
@@ -17,14 +18,13 @@ import (
 	"github.com/elastic/beats/heartbeat/watcher"
 )
 
-type MonitorManager struct {
-	monitors   []Monitor
-	jobControl JobControl
-	client     publisher.Client
+type monitorManager struct {
+	monitors   []monitor
+	jobControl jobControl
 }
 
-type Monitor struct {
-	manager *MonitorManager
+type monitor struct {
+	manager *monitorManager
 	watcher watcher.Watch
 
 	name       string
@@ -32,29 +32,44 @@ type Monitor struct {
 	factory    monitors.Factory
 	config     *common.Config
 
-	active map[string]MonitorTask
+	active map[string]monitorTask
+
+	pipeline beat.Pipeline
 }
 
-type MonitorTask struct {
-	job      monitors.Job
-	schedule scheduler.Schedule
-	cancel   JobCanceller
+type monitorTask struct {
+	job    monitors.Job
+	cancel jobCanceller
+
+	config monitorTaskConfig
 }
 
-type JobControl interface {
+type monitorTaskConfig struct {
+	Name     string             `config:"name"`
+	Type     string             `config:"type"`
+	Schedule *schedule.Schedule `config:"schedule" validate:"required"`
+
+	// Fields and tags to add to monitor.
+	EventMetadata common.EventMetadata    `config:",inline"`
+	Processors    processors.PluginConfig `config:"processors"`
+}
+
+type jobControl interface {
 	Add(sched scheduler.Schedule, name string, f scheduler.TaskFunc) func() error
 }
 
-type JobCanceller func() error
+type jobCanceller func() error
 
 var defaultFilePollInterval = 5 * time.Second
 
+const defaultEventType = "monitor"
+
 func newMonitorManager(
-	client publisher.Client,
-	jobControl JobControl,
+	pipeline beat.Pipeline,
+	jobControl jobControl,
 	registry *monitors.Registrar,
 	configs []*common.Config,
-) (*MonitorManager, error) {
+) (*monitorManager, error) {
 	type watchConfig struct {
 		Path string        `config:"watch.poll_file.path"`
 		Poll time.Duration `config:"watch.poll_file.interval" validate:"min=1"`
@@ -63,8 +78,7 @@ func newMonitorManager(
 		Poll: defaultFilePollInterval,
 	}
 
-	m := &MonitorManager{
-		client:     client,
+	m := &monitorManager{
 		jobControl: jobControl,
 	}
 
@@ -100,12 +114,13 @@ func newMonitorManager(
 			return nil, fmt.Errorf("Found non-runnable monitor %v", plugin.Type)
 		}
 
-		m.monitors = append(m.monitors, Monitor{
-			manager: m,
-			name:    info.Name,
-			factory: factory,
-			config:  config,
-			active:  map[string]MonitorTask{},
+		m.monitors = append(m.monitors, monitor{
+			manager:  m,
+			name:     info.Name,
+			factory:  factory,
+			config:   config,
+			active:   map[string]monitorTask{},
+			pipeline: pipeline,
 		})
 	}
 
@@ -141,8 +156,14 @@ func newMonitorManager(
 	return m, nil
 }
 
-func (m *Monitor) Update(configs []*common.Config) error {
-	all := map[string]MonitorTask{}
+func (m *monitorManager) Stop() {
+	for _, m := range m.monitors {
+		m.Close()
+	}
+}
+
+func (m *monitor) Update(configs []*common.Config) error {
+	all := map[string]monitorTask{}
 	for i, upd := range configs {
 		config, err := common.MergeConfigs(m.config, upd)
 		if err != nil {
@@ -150,9 +171,7 @@ func (m *Monitor) Update(configs []*common.Config) error {
 			return err
 		}
 
-		shared := struct {
-			Schedule *schedule.Schedule `config:"schedule" validate:"required"`
-		}{}
+		shared := monitorTaskConfig{}
 		if err := config.Unpack(&shared); err != nil {
 			logp.Err("Failed parsing job schedule: ", err)
 			return err
@@ -165,9 +184,9 @@ func (m *Monitor) Update(configs []*common.Config) error {
 		}
 
 		for _, job := range jobs {
-			all[job.Name()] = MonitorTask{
-				job:      job,
-				schedule: shared.Schedule,
+			all[job.Name()] = monitorTask{
+				job:    job,
+				config: shared,
 			}
 		}
 	}
@@ -176,19 +195,46 @@ func (m *Monitor) Update(configs []*common.Config) error {
 	for _, job := range m.active {
 		job.cancel()
 	}
-	m.active = map[string]MonitorTask{}
+	m.active = map[string]monitorTask{}
 
 	// start new and reconfigured tasks
-	for name, t := range all {
-		job := createJob(m.manager.client, name, t.job)
-		t.cancel = m.manager.jobControl.Add(t.schedule, name, job)
-		m.active[name] = t
+	for id, t := range all {
+		processors, err := processors.New(t.config.Processors)
+		if err != nil {
+			logp.Critical("Fail to load monitor processors: %v", err)
+			continue
+		}
+
+		// create connection per monitorTask
+		client, err := m.pipeline.ConnectWith(beat.ClientConfig{
+			EventMetadata: t.config.EventMetadata,
+			Processor:     processors,
+		})
+		if err != nil {
+			logp.Critical("Fail to connect job '%v' to publisher pipeline: %v", id, err)
+			continue
+		}
+
+		job := t.createJob(client)
+		jobCancel := m.manager.jobControl.Add(t.config.Schedule, id, job)
+		t.cancel = func() error {
+			client.Close()
+			return jobCancel()
+		}
+
+		m.active[id] = t
 	}
 
 	return nil
 }
 
-func createWatchUpdater(monitor *Monitor) func(content []byte) {
+func (m *monitor) Close() {
+	for _, mt := range m.active {
+		mt.cancel()
+	}
+}
+
+func createWatchUpdater(monitor *monitor) func(content []byte) {
 	return func(content []byte) {
 		defer logp.Recover("Failed applying monitor watch")
 
@@ -221,28 +267,35 @@ func createWatchUpdater(monitor *Monitor) func(content []byte) {
 	}
 }
 
-func createJob(
-	client publisher.Client,
-	name string,
-	r monitors.Job,
-) scheduler.TaskFunc {
-	return createJobTask(client, name, r)
+func (m *monitorTask) createJob(client beat.Client) scheduler.TaskFunc {
+	name := m.config.Name
+	if name == "" {
+		name = m.config.Type
+	}
+
+	meta := common.MapStr{
+		"monitor": common.MapStr{
+			"name": name,
+			"type": m.config.Type,
+		},
+	}
+	return m.prepareSchedulerJob(client, meta, m.job.Run)
 }
 
-func createJobTask(
-	client publisher.Client,
-	name string,
-	r monitors.TaskRunner,
-) scheduler.TaskFunc {
+func (m *monitorTask) prepareSchedulerJob(client beat.Client, meta common.MapStr, run monitors.JobRunner) scheduler.TaskFunc {
 	return func() []scheduler.TaskFunc {
-		event, next, err := r.Run()
+		event, next, err := run()
 		if err != nil {
 			logp.Err("Job %v failed with: ", err)
 		}
 
-		if event != nil {
-			event["monitor"] = name
-			client.PublishEvent(event)
+		if event.Fields != nil {
+			event.Fields.DeepUpdate(meta)
+			if _, exists := event.Fields["type"]; !exists {
+				event.Fields["type"] = defaultEventType
+			}
+
+			client.Publish(event)
 		}
 
 		if len(next) == 0 {
@@ -251,7 +304,7 @@ func createJobTask(
 
 		cont := make([]scheduler.TaskFunc, len(next))
 		for i, n := range next {
-			cont[i] = createJobTask(client, name, n)
+			cont[i] = m.prepareSchedulerJob(client, meta, n)
 		}
 		return cont
 	}

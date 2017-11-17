@@ -3,8 +3,8 @@ package database
 import (
 	"time"
 
-	s "github.com/elastic/beats/metricbeat/schema"
-	c "github.com/elastic/beats/metricbeat/schema/mapstrstr"
+	s "github.com/elastic/beats/libbeat/common/schema"
+	c "github.com/elastic/beats/libbeat/common/schema/mapstrstr"
 )
 
 // Based on https://www.postgresql.org/docs/9.2/static/monitoring-stats.html#PG-STAT-DATABASE-VIEW
@@ -39,5 +39,3 @@ var schema = s.Schema{
 	"deadlocks":   c.Int("deadlocks"),
 	"stats_reset": c.Time(time.RFC3339Nano, "stats_reset", s.Optional),
 }
-
-var eventMapping = schema.Apply

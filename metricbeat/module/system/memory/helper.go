@@ -15,7 +15,6 @@ type MemStat struct {
 }
 
 func GetMemory() (*MemStat, error) {
-
 	mem := sigar.Mem{}
 	err := mem.Get()
 	if err != nil {
@@ -26,16 +25,15 @@ func GetMemory() (*MemStat, error) {
 }
 
 func AddMemPercentage(m *MemStat) {
-
 	if m.Mem.Total == 0 {
 		return
 	}
 
 	perc := float64(m.Mem.Used) / float64(m.Mem.Total)
-	m.UsedPercent = system.Round(perc, .5, 4)
+	m.UsedPercent = system.Round(perc)
 
 	actualPerc := float64(m.Mem.ActualUsed) / float64(m.Mem.Total)
-	m.ActualUsedPercent = system.Round(actualPerc, .5, 4)
+	m.ActualUsedPercent = system.Round(actualPerc)
 }
 
 type SwapStat struct {
@@ -44,7 +42,6 @@ type SwapStat struct {
 }
 
 func GetSwap() (*SwapStat, error) {
-
 	swap := sigar.Swap{}
 	err := swap.Get()
 	if err != nil {
@@ -52,7 +49,6 @@ func GetSwap() (*SwapStat, error) {
 	}
 
 	return &SwapStat{Swap: swap}, nil
-
 }
 
 func GetMemoryEvent(memStat *MemStat) common.MapStr {
@@ -82,5 +78,5 @@ func AddSwapPercentage(s *SwapStat) {
 	}
 
 	perc := float64(s.Swap.Used) / float64(s.Swap.Total)
-	s.UsedPercent = system.Round(perc, .5, 4)
+	s.UsedPercent = system.Round(perc)
 }

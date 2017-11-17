@@ -1,0 +1,13 @@
+{
+  "hits": 0, 
+  "timeRestore": false, 
+  "description": "", 
+  "title": "Heartbeat HTTP monitoring", 
+  "uiStateJSON": "{\"P-3\":{\"vis\":{\"params\":{\"sort\":{\"columnIndex\":null,\"direction\":null}}}},\"P-5\":{\"vis\":{\"defaultColors\":{\"0 - 2\":\"rgb(247,251,255)\",\"2 - 3\":\"rgb(227,238,249)\",\"3 - 4\":\"rgb(208,225,242)\",\"4 - 5\":\"rgb(182,212,233)\",\"5 - 6\":\"rgb(148,196,223)\",\"6 - 8\":\"rgb(107,174,214)\",\"8 - 9\":\"rgb(74,152,201)\",\"9 - 10\":\"rgb(46,126,188)\",\"10 - 11\":\"rgb(23,100,171)\",\"11 - 12\":\"rgb(8,74,145)\"}}}}", 
+  "panelsJSON": "[{\"col\":1,\"id\":\"c65ef340-eb19-11e6-be20-559646f8b9ba\",\"panelIndex\":1,\"row\":7,\"size_x\":12,\"size_y\":4,\"type\":\"visualization\"},{\"col\":9,\"id\":\"920e8140-eb1a-11e6-be20-559646f8b9ba\",\"panelIndex\":2,\"row\":1,\"size_x\":4,\"size_y\":4,\"type\":\"visualization\"},{\"col\":1,\"id\":\"1738dbc0-eb1d-11e6-be20-559646f8b9ba\",\"panelIndex\":3,\"row\":1,\"size_x\":8,\"size_y\":4,\"type\":\"visualization\"},{\"col\":1,\"id\":\"091c3a90-eb1e-11e6-be20-559646f8b9ba\",\"panelIndex\":4,\"row\":5,\"size_x\":12,\"size_y\":2,\"type\":\"visualization\"},{\"col\":1,\"id\":\"0f4c0560-eb20-11e6-9f11-159ff202874a\",\"panelIndex\":5,\"row\":11,\"size_x\":12,\"size_y\":5,\"type\":\"visualization\"}]", 
+  "optionsJSON": "{\"darkTheme\":false}", 
+  "version": 1, 
+  "kibanaSavedObjectMeta": {
+    "searchSourceJSON": "{\"filter\":[{\"query\":{\"query_string\":{\"analyze_wildcard\":true,\"query\":\"*\"}}}]}"
+  }
+}

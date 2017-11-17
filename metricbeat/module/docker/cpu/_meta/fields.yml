@@ -35,6 +35,6 @@
         Total CPU usage.
     # TODO: how to document cpu list?
     #- name: core
-    #  type: list
+    #  type: array
     #  description: >
     #    Dictionary with list of cpu and usage inside.

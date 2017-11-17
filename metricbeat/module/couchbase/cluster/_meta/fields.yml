@@ -1,62 +1,60 @@
 - name: cluster
   type: group
   description: >
-    experimental[]
-
-    Couchbase Cluster metrics
+    Couchbase cluster metrics.
   fields:
     - name: hdd.free.bytes
       format: bytes
       type: long
       description: >
-        Free harddrive space in the cluster (bytes)
+        Free hard drive space in the cluster (bytes).
     - name: hdd.quota.total.bytes
       format: bytes
       type: long
       description: >
-        Harddrive quota total for the cluster (bytes)
+        Hard drive quota total for the cluster (bytes).
     - name: hdd.total.bytes
       format: bytes
       type: long
       description: >
-        Total harddrive space available to cluster (bytes)
+        Total hard drive space available to the cluster (bytes).
     - name: hdd.used.value.bytes
       format: bytes
       type: long
       description: >
-        Harddrive space used by the cluster (bytes)
+        Hard drive space used by the cluster (bytes).
     - name: hdd.used.by_data.bytes
       format: bytes
       type: long
       description: >
-        Harddrive use by the data in the cluster(bytes)
+        Hard drive space used by the data in the cluster (bytes).
     - name: max_bucket_count
       type: long
       description: >
-        Setting of Max Bucket Count
+        Max bucket count setting.
     - name: quota.index_memory.mb
       type: long
       description: >
-        Setting of Memory quota for the Index service (Mbyte)
+        Memory quota setting for the Index service (Mbyte).
     - name: quota.memory.mb
       type: long
       description: >
-        Setting of Memory quota for the cluster (Mbyte)
+        Memory quota setting for the cluster (Mbyte).
     - name: ram.quota.total.value.bytes
       format: bytes
       type: long
       description: >
-        Ram quota total for the cluster (bytes)
+        RAM quota total for the cluster (bytes).
     - name: ram.quota.total.per_node.bytes
       format: bytes
       type: long
       description: >
-        Ram quota used by the current node in the cluster (bytes)
+        RAM quota used by the current node in the cluster (bytes).
     - name: ram.quota.used.value.bytes
       format: bytes
       type: long
       description: >
-        Ram quota used by the cluster (bytes)
+        RAM quota used by the cluster (bytes).
     - name: ram.quota.used.per_node.bytes
       format: bytes
       type: long
@@ -66,14 +64,14 @@
       format: bytes
       type: long
       description: >
-        Total ram available to cluster (bytes)
+        Total RAM available to cluster (bytes).
     - name: ram.used.value.bytes
       format: bytes
       type: long
       description: >
-        Ram used by the cluster (bytes)
+        RAM used by the cluster (bytes).
     - name: ram.used.by_data.bytes
       format: bytes
       type: long
       description: >
-        Ram used by the data in the cluster (bytes)
+        RAM used by the data in the cluster (bytes).

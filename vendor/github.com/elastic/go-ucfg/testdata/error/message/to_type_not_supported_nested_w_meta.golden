@@ -1,1 +1,0 @@
-(assert) value of type 'int' not convertible into unsupported go type 'struct {}' accessing 'nested' (source:'test.source')

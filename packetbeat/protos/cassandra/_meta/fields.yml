@@ -175,8 +175,8 @@
                           description: The paging_state is a bytes value that should be used in QUERY/EXECUTE to continue paging and retrieve the remainder of the result for this query.
 
             - name: supported
-              type: dict
-              dict-type: keyword
+              type: object
+              object_type: keyword
               description:  Indicates which startup options are supported by the server. This message comes as a response to an OPTIONS message.
 
             - name: authentication

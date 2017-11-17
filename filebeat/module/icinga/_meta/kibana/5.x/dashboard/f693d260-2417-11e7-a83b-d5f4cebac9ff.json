@@ -1,0 +1,13 @@
+{
+  "hits": 0, 
+  "timeRestore": false, 
+  "description": "", 
+  "title": "Icinga Main Log", 
+  "uiStateJSON": "{}", 
+  "panelsJSON": "[{\"col\":7,\"id\":\"d8e5dc40-2417-11e7-a83b-d5f4cebac9ff\",\"panelIndex\":1,\"row\":1,\"size_x\":6,\"size_y\":3,\"type\":\"visualization\"},{\"col\":1,\"columns\":[\"icinga.main.facility\",\"icinga.main.severity\",\"icinga.main.message\"],\"id\":\"ffaf5a30-2413-11e7-a0d9-39604d45ca7f\",\"panelIndex\":2,\"row\":4,\"size_x\":12,\"size_y\":25,\"sort\":[\"@timestamp\",\"desc\"],\"type\":\"search\"},{\"size_x\":6,\"size_y\":3,\"panelIndex\":3,\"type\":\"visualization\",\"id\":\"2cf77780-2418-11e7-a83b-d5f4cebac9ff\",\"col\":1,\"row\":1}]", 
+  "optionsJSON": "{\"darkTheme\":false}", 
+  "version": 1, 
+  "kibanaSavedObjectMeta": {
+    "searchSourceJSON": "{\"filter\":[{\"query\":{\"query_string\":{\"analyze_wildcard\":true,\"query\":\"*\"}}}]}"
+  }
+}

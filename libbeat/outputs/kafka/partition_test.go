@@ -9,9 +9,11 @@ import (
 	"time"
 
 	"github.com/Shopify/sarama"
-	"github.com/elastic/beats/libbeat/common"
-	"github.com/elastic/beats/libbeat/outputs"
 	"github.com/stretchr/testify/assert"
+
+	"github.com/elastic/beats/libbeat/beat"
+	"github.com/elastic/beats/libbeat/common"
+	"github.com/elastic/beats/libbeat/publisher"
 )
 
 type partTestScenario func(*testing.T, bool, sarama.Partitioner) error
@@ -210,7 +212,6 @@ func partTestSimple(N int, makeKey bool) partTestScenario {
 
 			event := common.MapStr{
 				"@timestamp": common.Time(ts),
-				"type":       "test",
 				"message":    randString(20),
 			}
 
@@ -220,7 +221,7 @@ func partTestSimple(N int, makeKey bool) partTestScenario {
 			}
 
 			msg := &message{partition: -1}
-			msg.data = outputs.Data{event, nil}
+			msg.data = publisher.Event{Content: beat.Event{Fields: event}}
 			msg.topic = "test"
 			if makeKey {
 				msg.key = randASCIIBytes(10)
@@ -263,7 +264,6 @@ func partTestHashInvariant(N int) partTestScenario {
 
 			event := common.MapStr{
 				"@timestamp": common.Time(ts),
-				"type":       "test",
 				"message":    randString(20),
 			}
 
@@ -273,7 +273,7 @@ func partTestHashInvariant(N int) partTestScenario {
 			}
 
 			msg := &message{partition: -1}
-			msg.data = outputs.Data{event, nil}
+			msg.data = publisher.Event{Content: beat.Event{Fields: event}}
 			msg.topic = "test"
 			msg.key = randASCIIBytes(10)
 			msg.value = jsonEvent

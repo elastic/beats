@@ -1,22 +1,22 @@
 - name: info
   type: group
   description: >
-    General infomration collected on HAProxy process
+    General information about HAProxy processes.
   fields:
     - name: processes
       type: long
       description: >
-        Number of processes
+        Number of processes.
 
     - name: process_num
       type: long
       description: >
-        Process number
+        Process number.
 
     - name: pid
       type: long
       description: >
-        Process ID
+        Process ID.
 
     - name: run_queue
       type: long
@@ -29,18 +29,18 @@
     - name: uptime.sec
       type: long
       description: >
-        Current uptime in seconds
+        Current uptime in seconds.
 
     - name: memory.max.bytes
       type: long
       format: bytes
       description: >
-        Max number of memory usage in bytes (The 'Memmax_MB' value converted to bytes)
+        Maximum amount of memory usage in bytes (the 'Memmax_MB' value converted to bytes).
 
     - name: ulimit_n
       type: long
       description: >
-        Max number of open files for process
+        Maximum number of open files for the process.
 
     - name: compress
       type: group
@@ -89,32 +89,32 @@
         - name: current
           type: long
           description: >
-            Current Connections
+            Current connections.
 
         - name: total
           type: long
           description: >
-            Total Connections
+            Total connections.
 
         - name: ssl.current
           type: long
           description: >
-            Current ssl Connections
+            Current SSL connections.
 
         - name: ssl.total
           type: long
           description: >
-            Current Connections
+            Total SSL connections.
 
         - name: ssl.max
           type: long
           description: >
-            Current Connections
+            Maximum SSL connections.
 
         - name: max
           type: long
           description: >
-            Max connections
+            Maximum connections.
 
         - name: hard_max
           type: long

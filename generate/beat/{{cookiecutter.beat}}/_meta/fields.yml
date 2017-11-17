@@ -1,9 +1,0 @@
-- key: {{ cookiecutter.beat }}
-  title: {{ cookiecutter.beat }}
-  description:
-  fields:
-    - name: counter
-      type: long
-      required: true
-      description: >
-        PLEASE UPDATE DOCUMENTATION

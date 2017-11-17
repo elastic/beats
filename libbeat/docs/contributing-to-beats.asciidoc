@@ -1,0 +1,23 @@
+//////////////////////////////////////////////////////////////////////////
+//// This content is shared by all Elastic Beats. Make sure you keep the
+//// descriptions here generic enough to work for all Beats that include
+//// this file. When using cross references, make sure that the cross
+//// references resolve correctly for any files that include this one.
+//// Use the appropriate variables defined in the index.asciidoc file to
+//// resolve Beat names: beatname_uc and beatname_lc.
+//// Use the following include to pull this content into a doc file:
+//// include::../../libbeat/docs/contributing-to-beats.asciidoc[]
+//////////////////////////////////////////////////////////////////////////
+
+[[contributing-to-beats]]
+== Contributing to Beats
+
+The Beats are open source and we love to receive contributions from our
+community — you!
+
+There are many ways to contribute, from writing tutorials or blog posts,
+improving the documentation, submitting bug reports and feature requests, or
+writing code that implements a whole new protocol, module, or Beat.
+
+The {beatsdevguide}/index.html[Beats Developer Guide] is your one-stop shop for
+everything related to developing code for the Beats project. 

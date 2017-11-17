@@ -1,13 +1,11 @@
 package stats
 
 import (
-	"bufio"
-	"fmt"
-	"net/http"
 	"strings"
 
 	"github.com/elastic/beats/libbeat/common"
-	"github.com/elastic/beats/libbeat/logp"
+	"github.com/elastic/beats/libbeat/common/cfgwarn"
+	"github.com/elastic/beats/metricbeat/helper"
 	"github.com/elastic/beats/metricbeat/mb"
 	"github.com/elastic/beats/metricbeat/mb/parse"
 )
@@ -18,8 +16,6 @@ const (
 )
 
 var (
-	debugf = logp.MakeDebug("prometheus-stats")
-
 	hostParser = parse.URLHostParserBuilder{
 		DefaultScheme: defaultScheme,
 		DefaultPath:   defaultPath,
@@ -34,35 +30,23 @@ func init() {
 
 type MetricSet struct {
 	mb.BaseMetricSet
-	client *http.Client
+	http *helper.HTTP
 }
 
 func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
-	logp.Warn("EXPERIMENTAL: The prometheus stats metricset is experimental")
+	cfgwarn.Beta("The prometheus stats metricset is beta")
 
 	return &MetricSet{
 		BaseMetricSet: base,
-		client:        &http.Client{Timeout: base.Module().Config().Timeout},
+		http:          helper.NewHTTP(base),
 	}, nil
 }
 
 func (m *MetricSet) Fetch() (common.MapStr, error) {
-
-	req, err := http.NewRequest("GET", m.HostData().SanitizedURI, nil)
-	if m.HostData().User != "" || m.HostData().Password != "" {
-		req.SetBasicAuth(m.HostData().User, m.HostData().Password)
-	}
-	resp, err := m.client.Do(req)
+	scanner, err := m.http.FetchScanner()
 	if err != nil {
-		return nil, fmt.Errorf("error making http request: %v", err)
+		return nil, err
 	}
-	defer resp.Body.Close()
-
-	if resp.StatusCode != 200 {
-		return nil, fmt.Errorf("HTTP error %d: %s", resp.StatusCode, resp.Status)
-	}
-
-	scanner := bufio.NewScanner(resp.Body)
 
 	entries := map[string]interface{}{}
 
@@ -74,7 +58,10 @@ func (m *MetricSet) Fetch() (common.MapStr, error) {
 		if line[0] == '#' || strings.Contains(line, "quantile=") {
 			continue
 		}
-		split := strings.Split(line, " ")
+
+		splitPos := strings.LastIndex(line, " ")
+		split := []string{line[:splitPos], line[splitPos+1:]}
+
 		entries[split[0]] = split[1]
 	}
 

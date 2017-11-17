@@ -38,8 +38,13 @@ func (decode *decoder) getCSVRow() ([]string, error) {
 	return decode.csvDecoder.Read()
 }
 
+type CSVReader interface {
+	Read() ([]string, error)
+	ReadAll() ([][]string, error)
+}
+
 type csvDecoder struct {
-	*csv.Reader
+	CSVReader
 }
 
 func (c csvDecoder) getCSVRows() ([][]string, error) {
@@ -116,9 +121,15 @@ func readTo(decoder Decoder, out interface{}) error {
 
 	csvHeadersLabels := make(map[int]*fieldInfo, len(outInnerStructInfo.Fields)) // Used to store the correspondance header <-> position in CSV
 
+	headerCount := map[string]int{}
 	for i, csvColumnHeader := range headers {
-		if fieldInfo := getCSVFieldPosition(csvColumnHeader, outInnerStructInfo); fieldInfo != nil {
+		curHeaderCount := headerCount[csvColumnHeader]
+		if fieldInfo := getCSVFieldPosition(csvColumnHeader, outInnerStructInfo, curHeaderCount); fieldInfo != nil {
 			csvHeadersLabels[i] = fieldInfo
+			if ShouldAlignDuplicateHeadersWithStructFieldOrder {
+				curHeaderCount++
+				headerCount[csvColumnHeader] = curHeaderCount
+			}
 		}
 	}
 
@@ -170,9 +181,15 @@ func readEach(decoder SimpleDecoder, c interface{}) error {
 		return errors.New("no csv struct tags found")
 	}
 	csvHeadersLabels := make(map[int]*fieldInfo, len(outInnerStructInfo.Fields)) // Used to store the correspondance header <-> position in CSV
+	headerCount := map[string]int{}
 	for i, csvColumnHeader := range headers {
-		if fieldInfo := getCSVFieldPosition(csvColumnHeader, outInnerStructInfo); fieldInfo != nil {
+		curHeaderCount := headerCount[csvColumnHeader]
+		if fieldInfo := getCSVFieldPosition(csvColumnHeader, outInnerStructInfo, curHeaderCount); fieldInfo != nil {
 			csvHeadersLabels[i] = fieldInfo
+			if ShouldAlignDuplicateHeadersWithStructFieldOrder {
+				curHeaderCount++
+				headerCount[csvColumnHeader] = curHeaderCount
+			}
 		}
 	}
 	if err := maybeMissingStructFields(outInnerStructInfo.Fields, headers); err != nil {
@@ -249,10 +266,15 @@ func ensureOutCapacity(out *reflect.Value, csvLen int) error {
 	return nil
 }
 
-func getCSVFieldPosition(key string, structInfo *structInfo) *fieldInfo {
+func getCSVFieldPosition(key string, structInfo *structInfo, curHeaderCount int) *fieldInfo {
+	matchedFieldCount := 0
 	for _, field := range structInfo.Fields {
 		if field.matchesKey(key) {
-			return &field
+			if matchedFieldCount >= curHeaderCount {
+				return &field
+			} else {
+				matchedFieldCount++
+			}
 		}
 	}
 	return nil

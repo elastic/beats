@@ -54,7 +54,7 @@ class Test(BaseTest):
 
         output = self.read_output()
         doc = output[0]
-        print doc
+        print(doc)
         assert doc["hello"] == "world"
         assert doc["type"] == "log2"
         assert doc["timestamp"] == 2

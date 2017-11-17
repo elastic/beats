@@ -32,7 +32,7 @@
           description: >
             Leader id (broker).
         - name: isr
-          type: list
+          type: array
           description: >
             List of isr ids.
         - name: replica

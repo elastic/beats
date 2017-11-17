@@ -1,0 +1,12 @@
+- key: etcd
+  title: "Etcd"
+  description: >
+    experimental[]
+
+    etcd Module
+  fields:
+    - name: etcd
+      type: group
+      description: >
+        `etcd` contains statistics that were read from Etcd
+      fields:

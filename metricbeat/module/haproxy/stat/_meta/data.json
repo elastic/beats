@@ -1,5 +1,9 @@
 {
     "@timestamp": "2016-05-23T08:05:34.853Z",
+    "beat": {
+        "hostname": "host.example.com",
+        "name": "host.example.com"
+    },
     "haproxy": {
         "stat": {
             "check": {
@@ -63,7 +67,7 @@
         }
     },
     "metricset": {
-        "host": "localhost",
+        "host": "haproxy:14567",
         "module": "haproxy",
         "name": "stat",
         "rtt": 115

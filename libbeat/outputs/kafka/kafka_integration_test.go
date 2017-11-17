@@ -8,15 +8,23 @@ import (
 	"math/rand"
 	"os"
 	"strconv"
+	"sync"
 	"testing"
 	"time"
 
 	"github.com/Shopify/sarama"
+
+	"github.com/stretchr/testify/assert"
+
+	"github.com/elastic/beats/libbeat/beat"
 	"github.com/elastic/beats/libbeat/common"
+	"github.com/elastic/beats/libbeat/common/fmtstr"
 	"github.com/elastic/beats/libbeat/logp"
 	"github.com/elastic/beats/libbeat/outputs"
-	"github.com/elastic/beats/libbeat/outputs/mode/modetest"
-	"github.com/stretchr/testify/assert"
+	"github.com/elastic/beats/libbeat/outputs/outest"
+
+	_ "github.com/elastic/beats/libbeat/outputs/codec/format"
+	_ "github.com/elastic/beats/libbeat/outputs/codec/json"
 )
 
 const (
@@ -24,9 +32,11 @@ const (
 	kafkaDefaultPort = "9092"
 )
 
-func TestKafkaPublish(t *testing.T) {
-	single := modetest.SingleEvent
+type eventInfo struct {
+	events []beat.Event
+}
 
+func TestKafkaPublish(t *testing.T) {
 	if testing.Verbose() {
 		logp.LogInit(logp.LOG_DEBUG, "", false, true, []string{"kafka"})
 	}
@@ -39,17 +49,15 @@ func TestKafkaPublish(t *testing.T) {
 		title  string
 		config map[string]interface{}
 		topic  string
-		events []modetest.EventInfo
+		events []eventInfo
 	}{
 		{
 			"publish single event to test topic",
 			nil,
 			testTopic,
 			single(common.MapStr{
-				"@timestamp": common.Time(time.Now()),
-				"host":       "test-host",
-				"type":       "log",
-				"message":    id,
+				"host":    "test-host",
+				"message": id,
 			}),
 		},
 		{
@@ -59,10 +67,20 @@ func TestKafkaPublish(t *testing.T) {
 			},
 			logType,
 			single(common.MapStr{
-				"@timestamp": common.Time(time.Now()),
-				"host":       "test-host",
-				"type":       logType,
-				"message":    id,
+				"host":    "test-host",
+				"type":    logType,
+				"message": id,
+			}),
+		},
+		{
+			"publish single event with formating to test topic",
+			map[string]interface{}{
+				"codec.format.string": "%{[message]}",
+			},
+			testTopic,
+			single(common.MapStr{
+				"host":    "test-host",
+				"message": id,
 			}),
 		},
 		{
@@ -70,9 +88,7 @@ func TestKafkaPublish(t *testing.T) {
 			nil,
 			testTopic,
 			randMulti(5, 100, common.MapStr{
-				"@timestamp": common.Time(time.Now()),
-				"host":       "test-host",
-				"type":       "log",
+				"host": "test-host",
 			}),
 		},
 		{
@@ -82,9 +98,8 @@ func TestKafkaPublish(t *testing.T) {
 			},
 			logType,
 			randMulti(5, 100, common.MapStr{
-				"@timestamp": common.Time(time.Now()),
-				"host":       "test-host",
-				"type":       logType,
+				"host": "test-host",
+				"type": logType,
 			}),
 		},
 		{
@@ -96,9 +111,8 @@ func TestKafkaPublish(t *testing.T) {
 			},
 			testTopic,
 			randMulti(1, 10, common.MapStr{
-				"@timestamp": common.Time(time.Now()),
-				"host":       "test-host",
-				"type":       "log",
+				"host": "test-host",
+				"type": "log",
 			}),
 		},
 		{
@@ -110,9 +124,8 @@ func TestKafkaPublish(t *testing.T) {
 			},
 			testTopic,
 			randMulti(1, 10, common.MapStr{
-				"@timestamp": common.Time(time.Now()),
-				"host":       "test-host",
-				"type":       "log",
+				"host": "test-host",
+				"type": "log",
 			}),
 		},
 		{
@@ -122,9 +135,8 @@ func TestKafkaPublish(t *testing.T) {
 			},
 			testTopic,
 			randMulti(1, 10, common.MapStr{
-				"@timestamp": common.Time(time.Now()),
-				"host":       "test-host",
-				"type":       "log",
+				"host": "test-host",
+				"type": "log",
 			}),
 		},
 		{
@@ -136,9 +148,8 @@ func TestKafkaPublish(t *testing.T) {
 			},
 			testTopic,
 			randMulti(1, 10, common.MapStr{
-				"@timestamp": common.Time(time.Now()),
-				"host":       "test-host",
-				"type":       "log",
+				"host": "test-host",
+				"type": "log",
 			}),
 		},
 		{
@@ -153,9 +164,8 @@ func TestKafkaPublish(t *testing.T) {
 			},
 			testTopic,
 			randMulti(1, 10, common.MapStr{
-				"@timestamp": common.Time(time.Now()),
-				"host":       "test-host",
-				"type":       "log",
+				"host": "test-host",
+				"type": "log",
 			}),
 		},
 	}
@@ -167,27 +177,42 @@ func TestKafkaPublish(t *testing.T) {
 	}
 
 	for i, test := range tests {
-		t.Logf("run test(%v): %v", i, test.title)
+		test := test
+		name := fmt.Sprintf("run test(%v): %v", i, test.title)
 
 		cfg := makeConfig(t, defaultConfig)
 		if test.config != nil {
 			cfg.Merge(makeConfig(t, test.config))
 		}
 
-		// create output within function scope to guarantee
-		// output is properly closed between single tests
-		func() {
-			tmp, err := New("libbeat", cfg, 0)
+		t.Run(name, func(t *testing.T) {
+			grp, err := makeKafka(beat.Info{Beat: "libbeat"}, outputs.NewNilObserver(), cfg)
 			if err != nil {
 				t.Fatal(err)
 			}
 
-			output := tmp.(*kafka)
+			output := grp.Clients[0].(*client)
+			if err := output.Connect(); err != nil {
+				t.Fatal(err)
+			}
 			defer output.Close()
 
 			// publish test events
-			_, tmpExpected := modetest.PublishAllWith(t, output, test.events)
-			expected := modetest.FlattenEvents(tmpExpected)
+			var wg sync.WaitGroup
+			for i := range test.events {
+				batch := outest.NewBatch(test.events[i].events...)
+				batch.OnSignal = func(_ outest.BatchSignal) {
+					wg.Done()
+				}
+
+				wg.Add(1)
+				output.Publish(batch)
+			}
+
+			// wait for all published batches to be ACKed
+			wg.Wait()
+
+			expected := flatten(test.events)
 
 			// check we can find all event in topic
 			timeout := 20 * time.Second
@@ -199,19 +224,37 @@ func TestKafkaPublish(t *testing.T) {
 				return
 			}
 
-			for i, d := range expected {
-				var decoded map[string]interface{}
-				err := json.Unmarshal(stored[i].Value, &decoded)
-				if err != nil {
-					t.Errorf("can not json decode event value: %v", stored[i].Value)
-					return
-				}
-				event := d.Event
-
-				assert.Equal(t, decoded["type"], event["type"])
-				assert.Equal(t, decoded["message"], event["message"])
+			validate := validateJSON
+			if fmt, exists := test.config["codec.format.string"]; exists {
+				validate = makeValidateFmtStr(fmt.(string))
 			}
-		}()
+
+			for i, d := range expected {
+				validate(t, stored[i].Value, d)
+			}
+		})
+	}
+}
+
+func validateJSON(t *testing.T, value []byte, event beat.Event) {
+	var decoded map[string]interface{}
+	err := json.Unmarshal(value, &decoded)
+	if err != nil {
+		t.Errorf("can not json decode event value: %v", value)
+		return
+	}
+	assert.Equal(t, decoded["type"], event.Fields["type"])
+	assert.Equal(t, decoded["message"], event.Fields["message"])
+}
+
+func makeValidateFmtStr(fmt string) func(*testing.T, []byte, beat.Event) {
+	fmtString := fmtstr.MustCompileEvent(fmt)
+	return func(t *testing.T, value []byte, event beat.Event) {
+		expectedMessage, err := fmtString.Run(&event)
+		if err != nil {
+			t.Fatal(err)
+		}
+		assert.Equal(t, string(expectedMessage), string(value))
 	}
 }
 
@@ -256,7 +299,6 @@ func testReadFromKafkaTopic(
 	t *testing.T, topic string, nMessages int,
 	timeout time.Duration,
 ) []*sarama.ConsumerMessage {
-
 	consumer := newTestConsumer(t)
 	defer func() {
 		consumer.Close()
@@ -290,20 +332,38 @@ func testReadFromKafkaTopic(
 	return messages
 }
 
-func randMulti(batches, n int, event common.MapStr) []modetest.EventInfo {
-	var out []modetest.EventInfo
+func flatten(infos []eventInfo) []beat.Event {
+	var out []beat.Event
+	for _, info := range infos {
+		out = append(out, info.events...)
+	}
+	return out
+}
+
+func single(fields common.MapStr) []eventInfo {
+	return []eventInfo{
+		{
+			events: []beat.Event{
+				{Timestamp: time.Now(), Fields: fields},
+			},
+		},
+	}
+}
+
+func randMulti(batches, n int, event common.MapStr) []eventInfo {
+	var out []eventInfo
 	for i := 0; i < batches; i++ {
-		var data []outputs.Data
+		var data []beat.Event
 		for j := 0; j < n; j++ {
 			tmp := common.MapStr{}
 			for k, v := range event {
 				tmp[k] = v
 			}
 			tmp["message"] = randString(100)
-			data = append(data, outputs.Data{Event: tmp})
+			data = append(data, beat.Event{Timestamp: time.Now(), Fields: tmp})
 		}
 
-		out = append(out, modetest.EventInfo{Single: false, Data: data})
+		out = append(out, eventInfo{data})
 	}
 	return out
 }

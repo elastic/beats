@@ -1,9 +1,9 @@
 - key: prometheus
   title: "Prometheus"
   description: >
-    prometheus Module
-
-    experimental[]
+    beta[]
+    
+    Stats collected from Prometheus.
   short_config: false
   fields:
     - name: prometheus

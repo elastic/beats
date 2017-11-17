@@ -3,6 +3,7 @@ package icmp
 import (
 	"bytes"
 	"encoding/binary"
+	"errors"
 	"fmt"
 	"math/rand"
 	"net"
@@ -12,6 +13,8 @@ import (
 	"golang.org/x/net/icmp"
 	"golang.org/x/net/ipv4"
 	"golang.org/x/net/ipv6"
+
+	"github.com/elastic/beats/libbeat/logp"
 )
 
 type icmpLoop struct {
@@ -66,16 +69,12 @@ var (
 )
 
 func newICMPLoop() (*icmpLoop, error) {
-	conn4, err := icmp.ListenPacket("ip4:icmp", "")
-	if err != nil {
-		return nil, err
-	}
-
-	conn6, err := icmp.ListenPacket("ip6:ipv6-icmp", "")
-	if err != nil {
-		conn4.Close()
-		return nil, err
-	}
+	// Log errors at info level, as the loop is setup globally when ICMP module is loaded
+	// first (not yet configured).
+	// With multiple configurations using the icmp loop, we have to postpose
+	// IPv4/IPv6 checking
+	conn4 := createListener("IPv4", "ip4:icmp")
+	conn6 := createListener("IPv6", "ip6:ipv6-icmp")
 
 	l := &icmpLoop{
 		conn4:    conn4,
@@ -83,10 +82,38 @@ func newICMPLoop() (*icmpLoop, error) {
 		recv:     make(chan packet, 16),
 		requests: map[requestID]*requestContext{},
 	}
-	go l.runICMPRecv(conn4, protocolICMP)
-	go l.runICMPRecv(conn6, protocolIPv6ICMP)
+
+	if conn4 != nil {
+		go l.runICMPRecv(conn4, protocolICMP)
+	}
+	if conn6 != nil {
+		go l.runICMPRecv(conn6, protocolIPv6ICMP)
+	}
 
 	return l, nil
+}
+
+func (l *icmpLoop) checkNetworkMode(mode string) error {
+	ip4, ip6 := false, false
+	switch mode {
+	case "ip4":
+		ip4 = true
+	case "ip6":
+		ip6 = true
+	case "ip":
+		ip4, ip6 = true, true
+	default:
+		return fmt.Errorf("'%v' is not supported", mode)
+	}
+
+	if ip4 && l.conn4 == nil {
+		return errors.New("failed to initiate IPv4 support")
+	}
+	if ip6 && l.conn6 == nil {
+		return errors.New("failed to initiate IPv6 support")
+	}
+
+	return nil
 }
 
 func (l *icmpLoop) runICMPRecv(conn *icmp.PacketConn, proto int) {
@@ -99,7 +126,7 @@ func (l *icmpLoop) runICMPRecv(conn *icmp.PacketConn, proto int) {
 				if neterr.Timeout() {
 					continue
 				} else {
-					// TODO: report error and quit loop
+					// TODO: report error and quit loop?
 					return
 				}
 			}
@@ -226,7 +253,7 @@ func (l *icmpLoop) ping(
 	}
 
 	if !success {
-		return 0, 0, timeoutError{}
+		return 0, requests, timeoutError{}
 	}
 	return rtt, requests, nil
 }
@@ -291,6 +318,19 @@ func (l *icmpLoop) sendEchoRequest(addr *net.IPAddr) (*requestContext, error) {
 
 	ctx.ts = ts
 	return ctx, nil
+}
+
+func createListener(name, network string) *icmp.PacketConn {
+	conn, err := icmp.ListenPacket(network, "")
+
+	// XXX: need to check for conn == nil, as 'err != nil' seems always to be
+	//      true, even if error value itself is `nil`. Checking for conn suppresses
+	//      missleading log message.
+	if conn == nil && err != nil {
+		logp.Info("%v ICMP not supported: %v", name, err)
+		return nil
+	}
+	return conn
 }
 
 // timeoutError implements net.Error interface

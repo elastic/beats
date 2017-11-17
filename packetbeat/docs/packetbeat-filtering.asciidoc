@@ -1,5 +1,5 @@
 [[filtering-and-enhancing-data]]
-== Filtering and Enhancing the Exported Data
+== Filter and enhance the exported data
 
 include::../../libbeat/docs/processors.asciidoc[]
 
@@ -65,4 +65,4 @@ processors:
      fields: ["request", "response"]
 ------------
 
-See <<configuration-processors>> for more information.
+include::../../libbeat/docs/processors-using.asciidoc[]

@@ -1,19 +1,19 @@
 - name: core
   type: group
   description: >
-    `system-core` contains local CPU core stats.
+    `system-core` contains CPU metrics for a single core of a multi-core system.
   fields:
     - name: id
       type: long
       description: >
         CPU Core number.
 
+    # Percentages
     - name: user.pct
       type: scaled_float
       format: percent
       description: >
-        The percentage of CPU time spent in user space. On multi-core systems, you can have percentages that are greater than 100%.
-        For example, if 3 cores are at 60% use, then the `cpu.user_p` will be 180%.
+        The percentage of CPU time spent in user space.
 
     - name: user.ticks
       type: long
@@ -100,4 +100,3 @@
         The amount of CPU time spent in involuntary wait by the virtual CPU while the hypervisor
         was servicing another processor.
         Available only on Unix.
-

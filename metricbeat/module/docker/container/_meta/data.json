@@ -18,6 +18,9 @@
                 "com_docker_compose_version": "1.9.0-rc4"
             },
             "name": "environments_beat_run_1",
+            "ip_addresses": [
+              "10.0.0.1"
+            ],
             "size": {
                 "root_fs": 0,
                 "rw": 0

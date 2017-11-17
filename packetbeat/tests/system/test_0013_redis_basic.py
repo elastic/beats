@@ -1,5 +1,7 @@
 from packetbeat import BaseTest
 
+import six
+
 
 class Test(BaseTest):
     """
@@ -39,9 +41,9 @@ class Test(BaseTest):
         # the rest should be successful
         assert all([o["status"] == "OK" for o in objs[3:]])
         assert all(["redis.return_value" in o for o in objs[3:]])
-        assert all([isinstance(o["method"], basestring) for o in objs[3:]])
-        assert all([isinstance(o["resource"], basestring) for o in objs[3:]])
-        assert all([isinstance(o["query"], basestring) for o in objs[3:]])
+        assert all([isinstance(o["method"], six.string_types) for o in objs[3:]])
+        assert all([isinstance(o["resource"], six.string_types) for o in objs[3:]])
+        assert all([isinstance(o["query"], six.string_types) for o in objs[3:]])
 
         assert all(["bytes_in" in o for o in objs])
         assert all(["bytes_out" in o for o in objs])

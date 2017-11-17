@@ -1,4 +1,6 @@
-== prometheus Module
+== Prometheus module
 
-This is the prometheus Module.
+beta[]
 
+This module periodically fetches metrics from
+https://prometheus.io/docs/[Prometheus].

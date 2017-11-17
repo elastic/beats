@@ -41,9 +41,9 @@ import (
 )
 
 type Client struct { // Our example struct, you can use "-" to ignore a field
-	Id      string `csv:"id"`
-	Name    string `csv:"name"`
-	Age     string `csv:"age"`
+	Id      string `csv:"client_id"`
+	Name    string `csv:"client_name"`
+	Age     string `csv:"client_age"`
 	NotUsed string `csv:"-"`
 }
 

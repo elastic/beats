@@ -1,97 +1,131 @@
 version: '2'
 services:
   beat:
-    build: ${PWD}/.
-    links:
-      - apache
-      - couchbase
-      - mongodb
-      - haproxy
-      - kafka
-      - mysql
-      - nginx
-      - postgresql
-      - prometheus
-      - redis
-      - zookeeper
+    build: .
     environment:
-      - APACHE_HOST=apache
-      - APACHE_PORT=80
-      - COUCHBASE_HOST=couchbase
-      - COUCHBASE_PORT=8091
-      - COUCHBASE_DSN=http://Administrator:password@couchbase:8091
-      - HAPROXY_HOST=haproxy
-      - HAPROXY_PORT=14567
-      - KAFKA_HOST=kafka
-      - KAFKA_PORT=9092
-      - NGINX_HOST=nginx
-      - NGINX_PORT=80
-      - REDIS_HOST=redis
-      - REDIS_PORT=6379
-      - MONGODB_HOST=mongodb
-      - MONGODB_PORT=27017
-      - MYSQL_DSN=root:test@tcp(mysql:3306)/
-      - MYSQL_HOST=mysql
-      - MYSQL_PORT=3306
-      - POSTGRESQL_DSN=postgres://postgresql:5432?sslmode=disable
-      - POSTGRESQL_HOST=postgresql
-      - POSTGRESQL_PORT=5432
-      - POSTGRESQL_USERNAME=postgres
-      - PROMETHEUS_HOST=prometheus
-      - PROMETHEUS_PORT=9090
-      - ZOOKEEPER_HOST=zookeeper
-      - ZOOKEEPER_PORT=2181
       - TEST_ENVIRONMENT=false
     working_dir: /go/src/github.com/elastic/beats/metricbeat
     volumes:
-      - ${PWD}/..:/go/src/github.com/elastic/beats/
+      - ./..:/go/src/github.com/elastic/beats/
+      # This is required to on-demand launching the rest on containers for tests & also docker module tests:
       - /var/run/docker.sock:/var/run/docker.sock
     command: make
-    entrypoint: /go/src/github.com/elastic/beats/metricbeat/docker-entrypoint.sh
-
-  # Overloading kibana with a simple image as it is not needed here
-  kibana:
-    image: alpine:latest
+    env_file:
+      - ./module/aerospike/_meta/env
+      - ./module/apache/_meta/env
+      - ./module/ceph/_meta/env
+      - ./module/couchbase/_meta/env
+      - ./module/dropwizard/_meta/env
+      - ./module/elasticsearch/_meta/env
+      - ./module/etcd/_meta/env
+      - ./module/haproxy/_meta/env
+      - ./module/http/_meta/env
+      - ./module/jolokia/_meta/env
+      - ./module/kafka/_meta/env
+      - ./module/kibana/_meta/env
+      - ./module/kubernetes/_meta/env
+      - ./module/logstash/_meta/env
+      - ./module/memcached/_meta/env
+      - ./module/mongodb/_meta/env
+      - ./module/mysql/_meta/env
+      - ./module/nginx/_meta/env
+      - ./module/php_fpm/_meta/env
+      - ./module/postgresql/_meta/env
+      - ./module/prometheus/_meta/env
+      - ./module/rabbitmq/_meta/env
+      - ./module/redis/_meta/env
+      - ./module/zookeeper/_meta/env
 
   # Modules
+  aerospike:
+    build: ./module/aerospike/_meta
+
   apache:
-    build: ${PWD}/module/apache/_meta
+    build: ./module/apache/_meta
+
+  ceph:
+    build: ./module/ceph/_meta
 
   couchbase:
-    build: ${PWD}/module/couchbase/_meta
+    build: ./module/couchbase/_meta
 
-  kafka:
-    image: spotify/kafka
-    expose:
-      - 9092
-      - 2181
+  dropwizard:
+    build: ./module/dropwizard/_meta
+
+  elasticsearch:
+    build: ./module/elasticsearch/_meta
     environment:
-      - ADVERTISED_HOST=kafka
+      - "ES_JAVA_OPTS=-Xms90m -Xmx90m"
+      - "network.host="
+      - "transport.host=127.0.0.1"
+      - "http.host=0.0.0.0"
+      - "xpack.security.enabled=false"
 
-  mongodb:
-    image: mongo:3.4
-
-  mysql:
-    image: mysql:5.7.12
-    environment:
-      - MYSQL_ROOT_PASSWORD=test
-
-  nginx:
-    build: ${PWD}/module/nginx/_meta
+  etcd:
+    build: ./module/etcd/_meta
 
   haproxy:
-    build: ${PWD}/module/haproxy/_meta
+    build: ./module/haproxy/_meta
+
+  http:
+    build: ./module/http/_meta
+
+  jolokia:
+    build: ./module/jolokia/_meta
+
+  kafka:
+    build: ./module/kafka/_meta
+
+  kibana:
+    build: ./module/kibana/_meta
+
+  kubernetes:
+    build: ./module/kubernetes/_meta
+    network_mode: host
+    pid: host
+    privileged: true
+    volumes:
+      - /:/rootfs:ro
+      - /sys:/sys
+      - /var/lib/docker:/var/lib/docker
+      - /var/run:/var/run
+
+  kubestate:
+    build:
+      context: ./module/kubernetes/_meta/
+      dockerfile: Dockerfile.kube-state
+    depends_on:
+      - kubernetes
+
+  logstash:
+    build: ./module/logstash/_meta
+
+  memcached:
+    build: ./module/memcached/_meta
+
+  mongodb:
+    build: ./module/mongodb/_meta
+
+  mysql:
+    build: ./module/mysql/_meta
+
+  nginx:
+    build: ./module/nginx/_meta
+
+  phpfpm:
+    build: ./module/php_fpm/_meta
 
   postgresql:
-    image: postgres:9.5.3
+    build: ./module/postgresql/_meta
 
   prometheus:
-    image: prom/prometheus
-    expose:
-      - 9090
+    build: ./module/prometheus/_meta
+
+  rabbitmq:
+    build: ./module/rabbitmq/_meta
 
   redis:
-    image: redis:3.2.4-alpine
+    build: ./module/redis/_meta
 
   zookeeper:
-    image: jplock/zookeeper:3.4.8
+    build: ./module/zookeeper/_meta

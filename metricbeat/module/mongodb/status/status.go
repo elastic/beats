@@ -6,7 +6,6 @@ import (
 	"github.com/elastic/beats/metricbeat/mb"
 	"github.com/elastic/beats/metricbeat/module/mongodb"
 
-	"github.com/pkg/errors"
 	"gopkg.in/mgo.v2"
 	"gopkg.in/mgo.v2/bson"
 )
@@ -25,11 +24,18 @@ func init() {
 	}
 }
 
+// MetricSet type defines all fields of the MetricSet
+// As a minimum it must inherit the mb.BaseMetricSet fields, but can be extended with
+// additional entries. These variables can be used to persist data or configuration between
+// multiple fetch calls.
 type MetricSet struct {
 	mb.BaseMetricSet
 	dialInfo *mgo.DialInfo
 }
 
+// New creates a new instance of the MetricSet
+// Part of new is also setting up the configuration by processing additional
+// configuration entries if needed.
 func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
 	dialInfo, err := mgo.ParseURL(base.HostData().URI)
 	if err != nil {
@@ -43,18 +49,22 @@ func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
 	}, nil
 }
 
+// Fetch methods implements the data gathering and data conversion to the right format
+// It returns the event which is then forward to the output. In case of an error, a
+// descriptive error must be returned.
 func (m *MetricSet) Fetch() (common.MapStr, error) {
-	session, err := mgo.DialWithInfo(m.dialInfo)
+
+	// instantiate direct connections to each of the configured Mongo hosts
+	mongoSession, err := mongodb.NewDirectSession(m.dialInfo)
 	if err != nil {
 		return nil, err
 	}
-	defer session.Close()
 
-	session.SetMode(mgo.Monotonic, true)
 	result := map[string]interface{}{}
-	if err := session.DB("admin").Run(bson.D{{"serverStatus", 1}}, &result); err != nil {
-		return nil, errors.Wrap(err, "mongodb fetch failed")
+	if err := mongoSession.DB("admin").Run(bson.D{{Name: "serverStatus", Value: 1}}, &result); err != nil {
+		return nil, err
 	}
 
-	return eventMapping(result), nil
+	data, _ := schema.Apply(result)
+	return data, nil
 }

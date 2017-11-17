@@ -15,29 +15,30 @@ After installing the Elastic Stack, read the following topics to learn how to in
 * <<filebeat-configuration>>
 * <<config-filebeat-logstash>>
 * <<filebeat-template>>
+* <<load-kibana-dashboards>>
 * <<filebeat-starting>>
-* <<filebeat-index-pattern>>
-* <<filebeat-command-line>>
-* <<directory-layout>>
-
+* <<view-kibana-dashboards>>
+* <<filebeat-modules-quickstart>>
+* <<setup-repositories>>
 
 [[filebeat-installation]]
-=== Step 1: Installing Filebeat
+=== Step 1: Install Filebeat
 
-To download and install Filebeat, use the commands that work with your system
-(<<deb, deb>> for Debian/Ubuntu, <<rpm, rpm>> for Redhat/Centos/Fedora, <<mac,
-mac>> for OS X, and <<win, win>> for Windows).
+Before running Filebeat, you need to install and configure the Elastic stack. See
+{libbeat}/getting-started.html[Getting Started with Beats and the Elastic Stack].
 
-[NOTE]
-==================================================
-If you use Apt or Yum, you can {libbeat}/setup-repositories.html[install Filebeat from our repositories] to update to the newest version more easily.
-
-See our https://www.elastic.co/downloads/beats/filebeat[download page] for other installation options, such as 32-bit images.
-
-==================================================
+include::../../libbeat/docs/shared-download-and-install.asciidoc[]
 
 [[deb]]
 *deb:*
+
+ifeval::["{release-state}"=="unreleased"]
+
+Version {version} of {beatname_uc} has not yet been released.
+
+endif::[]
+
+ifeval::["{release-state}"!="unreleased"]
 
 ["source","sh",subs="attributes,callouts"]
 ------------------------------------------------
@@ -45,8 +46,18 @@ curl -L -O https://artifacts.elastic.co/downloads/beats/filebeat/filebeat-{versi
 sudo dpkg -i filebeat-{version}-amd64.deb
 ------------------------------------------------
 
+endif::[]
+
 [[rpm]]
 *rpm:*
+
+ifeval::["{release-state}"=="unreleased"]
+
+Version {version} of {beatname_uc} has not yet been released.
+
+endif::[]
+
+ifeval::["{release-state}"!="unreleased"]
 
 ["source","sh",subs="attributes,callouts"]
 ------------------------------------------------
@@ -54,8 +65,18 @@ curl -L -O https://artifacts.elastic.co/downloads/beats/filebeat/filebeat-{versi
 sudo rpm -vi filebeat-{version}-x86_64.rpm
 ------------------------------------------------
 
+endif::[]
+
 [[mac]]
 *mac:*
+
+ifeval::["{release-state}"=="unreleased"]
+
+Version {version} of {beatname_uc} has not yet been released.
+
+endif::[]
+
+ifeval::["{release-state}"!="unreleased"]
 
 ["source","sh",subs="attributes,callouts"]
 ------------------------------------------------
@@ -63,8 +84,36 @@ curl -L -O https://artifacts.elastic.co/downloads/beats/filebeat/filebeat-{versi
 tar xzvf filebeat-{version}-darwin-x86_64.tar.gz
 ------------------------------------------------
 
+endif::[]
+
+[[docker]]
+*docker:*
+
+ifeval::["{release-state}"=="unreleased"]
+
+Version {stack-version} of {beatname_uc} has not yet been released.
+
+endif::[]
+
+ifeval::["{release-state}"!="unreleased"]
+
+["source", "shell", subs="attributes"]
+------------------------------------------------
+docker pull {dockerimage}
+------------------------------------------------
+
+endif::[]
+
 [[win]]
 *win:*
+
+ifeval::["{release-state}"=="unreleased"]
+
+Version {version} of {beatname_uc} has not yet been released.
+
+endif::[]
+
+ifeval::["{release-state}"!="unreleased"]
 
 . Download the Filebeat Windows zip file from the
 https://www.elastic.co/downloads/beats/filebeat[downloads page].
@@ -75,7 +124,8 @@ https://www.elastic.co/downloads/beats/filebeat[downloads page].
 
 . Open a PowerShell prompt as an Administrator (right-click the PowerShell icon and select *Run As Administrator*). If you are running Windows XP, you may need to download and install PowerShell.
 
-. Run the following commands to install Filebeat as a Windows service:
+. From the PowerShell prompt, run the following commands to install Filebeat as a
+Windows service:
 +
 [source,shell]
 ----------------------------------------------------------------------
@@ -85,16 +135,19 @@ PS C:\Program Files\Filebeat> .\install-service-filebeat.ps1
 
 NOTE: If script execution is disabled on your system, you need to set the execution policy for the current session to allow the script to run. For example: `PowerShell.exe -ExecutionPolicy UnRestricted -File .\install-service-filebeat.ps1`.
 
-Before starting Filebeat, you should look at the configuration options in the configuration
-file, for example `C:\Program Files\Filebeat\filebeat.yml` or `/etc/filebeat/filebeat.yml`. For more information about these options,
-see <<filebeat-configuration-details>>.
+endif::[]
 
 [[filebeat-configuration]]
-=== Step 2: Configuring Filebeat
+=== Step 2: Configure Filebeat
 
-To configure Filebeat, you edit the configuration file. For rpm and deb, you'll
-find the configuration file at `/etc/filebeat/filebeat.yml`. For mac and win, look in
-the archive that you just extracted.
+TIP: <<filebeat-modules-overview,Filebeat modules>> provide the fastest getting
+started experience for common log formats. See <<filebeat-modules-quickstart>>
+to learn how to get started with modules. If you use Filebeat modules to get
+started, you can skip the content in this section, including the remaining
+getting started steps, and go directly to the <<filebeat-modules-quickstart>>
+page.
+
+include::../../libbeat/docs/shared-configuring.asciidoc[]
 
 Here is a sample of the `filebeat` section of the `filebeat.yml` file. Filebeat uses predefined
 default values for most configuration options.
@@ -102,7 +155,8 @@ default values for most configuration options.
 [source,yaml]
 -------------------------------------------------------------------------------------
 filebeat.prospectors:
-- input_type: log
+- type: log
+  enabled: true
   paths:
     - /var/log/*.log
     #- c:\programdata\elasticsearch\logs\*
@@ -117,7 +171,8 @@ For the most basic Filebeat configuration, you can define a single prospector wi
 [source,yaml]
 -------------------------------------------------------------------------------------
 filebeat.prospectors:
-- input_type: log
+- type: log
+  enabled: true
   paths:
     - /var/log/*.log
 -------------------------------------------------------------------------------------
@@ -131,7 +186,8 @@ To fetch all files from a predefined level of subdirectories, the following patt
 fetch log files from the `/var/log` folder itself. Currently it is not possible to recursively
 fetch all files in all subdirectories of a directory.
 
-. If you are sending output to Elasticsearch, set the IP address and port where Filebeat can find the Elasticsearch installation:
+. If you are sending output directly to Elasticsearch (and not using Logstash),
+set the IP address and port where Filebeat can find the Elasticsearch installation:
 +
 [source,yaml]
 ----------------------------------------------------------------------
@@ -139,53 +195,77 @@ output.elasticsearch:
   hosts: ["192.168.1.42:9200"]
 ----------------------------------------------------------------------
 +
-If you are sending output to Logstash, see <<config-filebeat-logstash>> instead.
+If you are sending output to Logstash, make sure you
+configure the Logstash output in <<config-filebeat-logstash>>.
 
-TIP: To test your configuration file, change to the directory where the Filebeat
-binary is installed, and run Filebeat in the foreground with the following
-options specified: +./filebeat -configtest -e+. Make sure your config files are
-in the path expected by Filebeat (see <<directory-layout>>). If you
-installed from DEB or RPM packages, run +./filebeat.sh -configtest -e+.
+include::../../libbeat/docs/step-configure-kibana-endpoint.asciidoc[]
 
-See <<filebeat-configuration-details>> for more details about each configuration option.
+include::../../libbeat/docs/step-configure-credentials.asciidoc[]
+
+include::../../libbeat/docs/step-test-config.asciidoc[]
+
+include::../../libbeat/docs/step-look-at-config.asciidoc[]
 
 [[config-filebeat-logstash]]
-=== Step 3: Configuring Filebeat to Use Logstash
+=== Step 3: Configure Filebeat to use Logstash
 
 :allplatforms:
 include::../../libbeat/docs/shared-logstash-config.asciidoc[]
 
 [[filebeat-template]]
-=== Step 4: Loading the Index Template in Elasticsearch
+=== Step 4: Load the index template in Elasticsearch
 
 :allplatforms:
 include::../../libbeat/docs/shared-template-load.asciidoc[]
 
+[[load-kibana-dashboards]]
+=== Step 5: Set up the Kibana dashboards
+
+:allplatforms:
+include::../../libbeat/docs/dashboards.asciidoc[]
+
 [[filebeat-starting]]
-=== Step 5: Starting Filebeat
+=== Step 6: Start Filebeat
 
 Start Filebeat by issuing the appropriate command for your platform.
 
+NOTE: If you use an init.d script to start Filebeat on deb or rpm, you can't
+specify command line flags (see <<command-line-options>>). To specify flags,
+start Filebeat in the foreground.
+
 *deb:*
 
-[source,shell]
+["source","sh",subs="attributes"]
 ----------------------------------------------------------------------
-sudo /etc/init.d/filebeat start
+sudo service {beatname_lc} start
 ----------------------------------------------------------------------
 
 *rpm:*
 
-[source,shell]
+["source","sh",subs="attributes"]
 ----------------------------------------------------------------------
-sudo /etc/init.d/filebeat start
+sudo service {beatname_lc} start
+----------------------------------------------------------------------
+
+*docker:*
+
+["source", "shell", subs="attributes"]
+----------------------------------------------------------------------
+docker run {dockerimage}
 ----------------------------------------------------------------------
 
 *mac:*
 
 [source,shell]
 ----------------------------------------------------------------------
+sudo chown root filebeat.yml <1>
 sudo ./filebeat -e -c filebeat.yml -d "publish"
 ----------------------------------------------------------------------
+<1> You'll be running Filebeat as root, so you need to change ownership
+of the configuration file, or run Filebeat with `--strict.perms=false`
+specified. See
+{libbeat}/config-file-permissions.html[Config File Ownership and Permissions]
+in the _Beats Platform Reference_.
 
 *win:*
 
@@ -194,23 +274,40 @@ sudo ./filebeat -e -c filebeat.yml -d "publish"
 PS C:\Program Files\Filebeat> Start-Service filebeat
 ----------------------------------------------------------------------
 
+
 By default, Windows log files are stored in `C:\ProgramData\filebeat\Logs`.
 
 Filebeat is now ready to send log files to your defined output.
 
-[[filebeat-index-pattern]]
-=== Step 6: Loading the Kibana Index Pattern
+[id="{beatname_lc}-passing-credentials"]
+==== Pass credentials
 
-We don't offer prebuilt dashboards for visualizing Filebeat data. However, to make it easier for you to explore Filebeat
-data in Kibana, we've created a Filebeat index pattern: `filebeat-*`. To load this pattern, you can use the script
-that's provided for importing dashboards.
+:start-type: start
+include::../../libbeat/docs/shared-passing-credentials-setup.asciidoc[]
 
-For more information about running the script, see
-{libbeat}/import-dashboards.html[Importing Existing Beat Dashboards] in the _Beats Platform Reference_.
+[[view-kibana-dashboards]]
+=== Step 7: View the sample Kibana dashboards
 
-After you've created the index pattern, you can select the `filebeat-*` index pattern in Kibana to explore
-Filebeat data.
+To make it easier for you to explore Filebeat data in Kibana, we've created
+example {beatname_uc} dashboards. You loaded the dashboards earlier when you
+ran the `setup` command.
 
-image:./images/filebeat-discover-tab.png[]
+include::../../libbeat/docs/opendashboards.asciidoc[]
 
-TIP: If you don't see `filebeat-*` in the list of available index patterns, try refreshing the page in your browser.
+These dashboards are designed to work out-of-the box when you use
+<<filebeat-modules-overview,Filebeat modules>>. However, you can also use them
+as examples and {kibana-ref}/dashboard.html[customize] them to meet your needs
+even if you aren't using Filebeat modules.
+
+To populate the example dashboards with data, you need to either
+<<configuring-ingest-node,define ingest node pipelines>> or use Logstash to
+parse the data into the fields expected by the dashboards. If you are using
+Logstash, see the
+{logstashdoc}/logstash-config-for-filebeat-modules.html[configuration examples]
+in the Logstash documentation for help parsing the log formats supported
+by the dashboards.
+
+Here is an example of the Filebeat system dashboard:
+
+[role="screenshot"]
+image:./images/kibana-system.png[]

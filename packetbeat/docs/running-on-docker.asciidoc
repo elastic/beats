@@ -1,0 +1,31 @@
+include::../../libbeat/docs/shared-docker.asciidoc[]
+
+[float]
+==== Required network capabilities
+
+Under Docker, Packetbeat runs as a non-root user, but requires some privileged
+network capabilities to operate correctly. Ensure that the +NET_ADMIN+
+capability is available to the container.
+
+["source","sh",subs="attributes"]
+----
+docker run --cap-add=NET_ADMIN {dockerimage}
+----
+
+[float]
+==== Capture traffic from the host system
+
+By default, Docker networking will connect the Packetbeat container to an
+isolated virtual network, with a limited view of network traffic. You may wish
+to connect the container directly to the host network in order to see traffic
+destined for, and originating from, the host system. With +docker run+, this can
+be achieved by specifying +--network=host+.
+
+["source","sh",subs="attributes"]
+----
+docker run --cap-add=NET_ADMIN --network=host {dockerimage}
+----
+
+NOTE: On Windows and MacOS, specifying +--network=host+ will bind the
+container's network interface to the virtual interface of Docker's embedded
+Linux virtual machine, not to the physical interface of the host system.

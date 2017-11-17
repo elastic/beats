@@ -1,4 +1,5 @@
 import re
+import six
 import sys
 import unittest
 import metricbeat
@@ -6,23 +7,32 @@ import getpass
 import os
 
 SYSTEM_CPU_FIELDS = ["cores", "idle.pct", "iowait.pct", "irq.pct", "nice.pct",
-                     "softirq.pct", "steal.pct", "system.pct", "user.pct"]
+                     "softirq.pct", "steal.pct", "system.pct", "user.pct", "total.pct"]
 
 SYSTEM_CPU_FIELDS_ALL = ["cores", "idle.pct", "idle.ticks", "iowait.pct", "iowait.ticks", "irq.pct", "irq.ticks", "nice.pct", "nice.ticks",
-                     "softirq.pct", "softirq.ticks", "steal.pct", "steal.ticks", "system.pct", "system.ticks", "user.pct", "user.ticks"]
+                         "softirq.pct", "softirq.ticks", "steal.pct", "steal.ticks", "system.pct", "system.ticks", "user.pct", "user.ticks",
+                         "idle.norm.pct", "iowait.norm.pct", "irq.norm.pct", "nice.norm.pct", "softirq.norm.pct",
+                         "steal.norm.pct", "system.norm.pct", "user.norm.pct", "total.norm.pct"]
 
-SYSTEM_LOAD_FIELDS = ["1", "5", "15", "norm.1", "norm.5", "norm.15"]
+SYSTEM_LOAD_FIELDS = ["cores", "1", "5", "15", "norm.1", "norm.5", "norm.15"]
 
 SYSTEM_CORE_FIELDS = ["id", "idle.pct", "iowait.pct", "irq.pct", "nice.pct",
-               "softirq.pct", "steal.pct", "system.pct", "user.pct"]
+                      "softirq.pct", "steal.pct", "system.pct", "user.pct"]
 
 SYSTEM_CORE_FIELDS_ALL = SYSTEM_CORE_FIELDS + ["idle.ticks", "iowait.ticks", "irq.ticks", "nice.ticks",
-               "softirq.ticks", "steal.ticks", "system.ticks", "user.ticks"]
+                                               "softirq.ticks", "steal.ticks", "system.ticks", "user.ticks",
+                                               "idle.norm.pct", "iowait.norm.pct", "irq.norm.pct", "nice.norm.pct",
+                                               "softirq.norm.pct", "steal.norm.pct", "system.norm.pct", "user.norm.pct"]
 
 SYSTEM_DISKIO_FIELDS = ["name", "read.count", "write.count", "read.bytes",
-                      "write.bytes", "read.time", "write.time", "io.time"]
+                        "write.bytes", "read.time", "write.time", "io.time"]
 
-SYSTEM_FILESYSTEM_FIELDS = ["available", "device_name", "files", "free",
+SYSTEM_DISKIO_FIELDS_LINUX = ["name", "read.count", "write.count", "read.bytes",
+                              "write.bytes", "read.time", "write.time", "io.time",
+                              "iostat.read.request.merges_per_sec", "iostat.write.request.merges_per_sec", "iostat.read.request.per_sec", "iostat.write.request.per_sec", "iostat.read.per_sec.bytes", "iostat.write.per_sec.bytes"
+                              "iostat.request.avg_size", "iostat.queue.avg_size", "iostat.await", "iostat.service_time", "iostat.busy"]
+
+SYSTEM_FILESYSTEM_FIELDS = ["available", "device_name", "type", "files", "free",
                             "free_files", "mount_point", "total", "used.bytes",
                             "used.pct"]
 
@@ -37,11 +47,13 @@ SYSTEM_NETWORK_FIELDS = ["name", "out.bytes", "in.bytes", "out.packets",
 # cmdline is also part of the system process fields, but it may not be present
 # for some kernel level processes. fd is also part of the system process, but
 # is not available on all OSes and requires root to read for all processes.
+# cgroup is only available on linux.
 SYSTEM_PROCESS_FIELDS = ["cpu", "memory", "name", "pid", "ppid", "pgid",
-                         "state", "username"]
+                         "state", "username", "cgroup", "cwd"]
 
 
-class SystemTest(metricbeat.BaseTest):
+class Test(metricbeat.BaseTest):
+
     @unittest.skipUnless(re.match("(?i)win|linux|darwin|freebsd|openbsd", sys.platform), "os")
     def test_cpu(self):
         """
@@ -55,10 +67,7 @@ class SystemTest(metricbeat.BaseTest):
         proc = self.start_beat()
         self.wait_until(lambda: self.output_lines() > 0)
         proc.check_kill_and_wait()
-
-        # Ensure no errors or warnings exist in the log.
-        log = self.get_log()
-        self.assertNotRegexpMatches(log, "ERR|WARN")
+        self.assert_no_logged_warnings()
 
         output = self.read_output_json()
         self.assertEqual(len(output), 1)
@@ -78,16 +87,13 @@ class SystemTest(metricbeat.BaseTest):
             "metricsets": ["cpu"],
             "period": "5s",
             "extras": {
-                "cpu_ticks": True,
+                "cpu.metrics": ["percentages", "ticks"],
             },
         }])
         proc = self.start_beat()
         self.wait_until(lambda: self.output_lines() > 0)
         proc.check_kill_and_wait()
-
-        # Ensure no errors or warnings exist in the log.
-        log = self.get_log()
-        self.assertNotRegexpMatches(log, "ERR|WARN")
+        self.assert_no_logged_warnings()
 
         output = self.read_output_json()
         self.assertGreater(len(output), 0)
@@ -110,10 +116,7 @@ class SystemTest(metricbeat.BaseTest):
         proc = self.start_beat()
         self.wait_until(lambda: self.output_lines() > 0)
         proc.check_kill_and_wait()
-
-        # Ensure no errors or warnings exist in the log.
-        log = self.get_log()
-        self.assertNotRegexpMatches(log, "ERR|WARN")
+        self.assert_no_logged_warnings()
 
         output = self.read_output_json()
         self.assertGreater(len(output), 0)
@@ -133,16 +136,13 @@ class SystemTest(metricbeat.BaseTest):
             "metricsets": ["core"],
             "period": "5s",
             "extras": {
-                "cpu_ticks": True,
+                "core.metrics": ["percentages", "ticks"],
             },
         }])
         proc = self.start_beat()
         self.wait_until(lambda: self.output_lines() > 0)
         proc.check_kill_and_wait()
-
-        # Ensure no errors or warnings exist in the log.
-        log = self.get_log()
-        self.assertNotRegexpMatches(log, "ERR|WARN")
+        self.assert_no_logged_warnings()
 
         output = self.read_output_json()
         self.assertGreater(len(output), 0)
@@ -165,10 +165,7 @@ class SystemTest(metricbeat.BaseTest):
         proc = self.start_beat()
         self.wait_until(lambda: self.output_lines() > 0)
         proc.check_kill_and_wait()
-
-        # Ensure no errors or warnings exist in the log.
-        log = self.get_log()
-        self.assertNotRegexpMatches(log, "ERR|WARN")
+        self.assert_no_logged_warnings()
 
         output = self.read_output_json()
         self.assertEqual(len(output), 1)
@@ -178,7 +175,7 @@ class SystemTest(metricbeat.BaseTest):
         cpu = evt["system"]["load"]
         self.assertItemsEqual(self.de_dot(SYSTEM_LOAD_FIELDS), cpu.keys())
 
-    @unittest.skipUnless(re.match("(?i)win|linux|freebsd", sys.platform), "os")
+    @unittest.skipUnless(re.match("(?i)win|freebsd", sys.platform), "os")
     def test_diskio(self):
         """
         Test system/diskio output.
@@ -191,10 +188,7 @@ class SystemTest(metricbeat.BaseTest):
         proc = self.start_beat()
         self.wait_until(lambda: self.output_lines() > 0)
         proc.check_kill_and_wait()
-
-        # Ensure no errors or warnings exist in the log.
-        log = self.get_log()
-        self.assertNotRegexpMatches(log, "ERR|WARN")
+        self.assert_no_logged_warnings()
 
         output = self.read_output_json()
         self.assertGreater(len(output), 0)
@@ -203,6 +197,29 @@ class SystemTest(metricbeat.BaseTest):
             self.assert_fields_are_documented(evt)
             diskio = evt["system"]["diskio"]
             self.assertItemsEqual(self.de_dot(SYSTEM_DISKIO_FIELDS), diskio.keys())
+
+    @unittest.skipUnless(re.match("(?i)linux", sys.platform), "os")
+    def test_diskio_linux(self):
+        """
+        Test system/diskio output on linux.
+        """
+        self.render_config_template(modules=[{
+            "name": "system",
+            "metricsets": ["diskio"],
+            "period": "5s"
+        }])
+        proc = self.start_beat()
+        self.wait_until(lambda: self.output_lines() > 0)
+        proc.check_kill_and_wait()
+        self.assert_no_logged_warnings()
+
+        output = self.read_output_json()
+        self.assertGreater(len(output), 0)
+
+        for evt in output:
+            self.assert_fields_are_documented(evt)
+            diskio = evt["system"]["diskio"]
+            self.assertItemsEqual(self.de_dot(SYSTEM_DISKIO_FIELDS_LINUX), diskio.keys())
 
     @unittest.skipUnless(re.match("(?i)win|linux|darwin|freebsd|openbsd", sys.platform), "os")
     def test_filesystem(self):
@@ -217,10 +234,7 @@ class SystemTest(metricbeat.BaseTest):
         proc = self.start_beat()
         self.wait_until(lambda: self.output_lines() > 0)
         proc.check_kill_and_wait()
-
-        # Ensure no errors or warnings exist in the log.
-        log = self.get_log()
-        self.assertNotRegexpMatches(log, "ERR|WARN")
+        self.assert_no_logged_warnings()
 
         output = self.read_output_json()
         self.assertGreater(len(output), 0)
@@ -243,10 +257,7 @@ class SystemTest(metricbeat.BaseTest):
         proc = self.start_beat()
         self.wait_until(lambda: self.output_lines() > 0)
         proc.check_kill_and_wait()
-
-        # Ensure no errors or warnings exist in the log.
-        log = self.get_log()
-        self.assertNotRegexpMatches(log, "ERR|WARN")
+        self.assert_no_logged_warnings()
 
         output = self.read_output_json()
         self.assertEqual(len(output), 1)
@@ -269,10 +280,7 @@ class SystemTest(metricbeat.BaseTest):
         proc = self.start_beat()
         self.wait_until(lambda: self.output_lines() > 0)
         proc.check_kill_and_wait()
-
-        # Ensure no errors or warnings exist in the log.
-        log = self.get_log()
-        self.assertNotRegexpMatches(log, "ERR|WARN")
+        self.assert_no_logged_warnings()
 
         output = self.read_output_json()
         self.assertEqual(len(output), 1)
@@ -306,10 +314,7 @@ class SystemTest(metricbeat.BaseTest):
         proc = self.start_beat()
         self.wait_until(lambda: self.output_lines() > 0)
         proc.check_kill_and_wait()
-
-        # Ensure no errors or warnings exist in the log.
-        log = self.get_log()
-        self.assertNotRegexpMatches(log, "ERR|WARN")
+        self.assert_no_logged_warnings()
 
         output = self.read_output_json()
         self.assertGreater(len(output), 0)
@@ -320,43 +325,96 @@ class SystemTest(metricbeat.BaseTest):
             self.assertItemsEqual(self.de_dot(SYSTEM_NETWORK_FIELDS), network.keys())
 
     @unittest.skipUnless(re.match("(?i)win|linux|darwin|freebsd", sys.platform), "os")
-    def test_process(self):
+    def test_process_summary(self):
         """
-        Test system/process output.
+        Test system/process_summary output.
         """
         self.render_config_template(modules=[{
             "name": "system",
-            "metricsets": ["process"],
-            "period": "5s"
+            "metricsets": ["process_summary"],
+            "period": "5s",
         }])
         proc = self.start_beat()
         self.wait_until(lambda: self.output_lines() > 0)
         proc.check_kill_and_wait()
+        self.assert_no_logged_warnings()
 
-        # Ensure no errors or warnings exist in the log.
-        log = self.get_log()
-        self.assertNotRegexpMatches(log, "ERR|WARN")
+        output = self.read_output_json()
+        self.assertGreater(len(output), 0)
+
+        for evt in output:
+            self.assert_fields_are_documented(evt)
+
+            summary = evt["system"]["process"]["summary"]
+            assert isinstance(summary["total"], int)
+            assert isinstance(summary["sleeping"], int)
+            assert isinstance(summary["running"], int)
+            assert isinstance(summary["idle"], int)
+            assert isinstance(summary["stopped"], int)
+            assert isinstance(summary["zombie"], int)
+            assert isinstance(summary["unknown"], int)
+
+            assert summary["total"] == summary["sleeping"] + summary["running"] + \
+                summary["idle"] + summary["stopped"] + summary["zombie"] + summary["unknown"]
+
+    @unittest.skipUnless(re.match("(?i)win|linux|darwin|freebsd", sys.platform), "os")
+    def test_process(self):
+        """
+        Test system/process output.
+        """
+        if not sys.platform.startswith("linux") and "cgroup" in SYSTEM_PROCESS_FIELDS:
+            SYSTEM_PROCESS_FIELDS.remove("cgroup")
+
+        if not sys.platform.startswith("linux") and "cwd" in SYSTEM_PROCESS_FIELDS:
+            SYSTEM_PROCESS_FIELDS.remove("cwd")
+
+        self.render_config_template(modules=[{
+            "name": "system",
+            "metricsets": ["process"],
+            "period": "5s",
+            "extras": {
+                "process.env.whitelist": ["PATH"]
+            }
+        }])
+        proc = self.start_beat()
+        self.wait_until(lambda: self.output_lines() > 0)
+        proc.check_kill_and_wait()
+        self.assert_no_logged_warnings()
 
         output = self.read_output_json()
         self.assertGreater(len(output), 0)
 
         found_cmdline = False
+        found_env = False
         found_fd = False
         for evt in output:
-            self.assert_fields_are_documented(evt)
             process = evt["system"]["process"]
+
+            # Remove 'env' prior to checking documented fields because its keys are dynamic.
+            env = process.pop("env", None)
+            if env is not None:
+                found_env = True
+
+            self.assert_fields_are_documented(evt)
+
+            # Remove optional keys.
             cmdline = process.pop("cmdline", None)
             if cmdline is not None:
                 found_cmdline = True
             fd = process.pop("fd", None)
             if fd is not None:
                 found_fd = True
+
             self.assertItemsEqual(SYSTEM_PROCESS_FIELDS, process.keys())
 
         self.assertTrue(found_cmdline, "cmdline not found in any process events")
 
         if sys.platform.startswith("linux") or sys.platform.startswith("freebsd"):
             self.assertTrue(found_fd, "fd not found in any process events")
+
+        if sys.platform.startswith("linux") or sys.platform.startswith("freebsd")\
+                or sys.platform.startswith("darwin"):
+            self.assertTrue(found_env, "env not found in any process events")
 
     @unittest.skipUnless(re.match("(?i)win|linux|darwin|freebsd", sys.platform), "os")
     def test_process_metricbeat(self):
@@ -379,11 +437,11 @@ class SystemTest(metricbeat.BaseTest):
 
         assert re.match("(?i)metricbeat.test(.exe)?", output["system.process.name"])
         assert re.match("(?i).*metricbeat.test(.exe)? -systemTest", output["system.process.cmdline"])
-        assert isinstance(output["system.process.state"], basestring)
-        assert isinstance(output["system.process.cpu.start_time"], basestring)
+        assert isinstance(output["system.process.state"], six.string_types)
+        assert isinstance(output["system.process.cpu.start_time"], six.string_types)
         self.check_username(output["system.process.username"])
 
-    def check_username(self, observed, expected = None):
+    def check_username(self, observed, expected=None):
         if expected == None:
             expected = getpass.getuser()
 

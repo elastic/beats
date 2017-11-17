@@ -3,35 +3,36 @@ SNAPSHOT?=yes
 
 BEATS_BUILDER_IMAGE?=tudorg/beats-builder
 BEATS_BUILDER_DEB6_IMAGE?=tudorg/beats-builder-deb6
+BEATS_GOPATH=$(firstword $(subst :, ,${GOPATH}))
 
 makefile_abspath:=$(abspath $(lastword $(MAKEFILE_LIST)))
 packer_absdir=$(shell dirname ${makefile_abspath})
-beat_abspath=${GOPATH}/src/${BEAT_DIR}
+beat_abspath=${BEATS_GOPATH}/src/${BEAT_PATH}
 
 
 %/deb: ${BUILD_DIR}/god-linux-386 ${BUILD_DIR}/god-linux-amd64 fpm-image
 	echo Creating DEB packages for $(@D)
-	ARCH=386 BEAT=$(@D) BUILD_DIR=${BUILD_DIR} BEAT_DIR=$(beat_abspath) BUILDID=$(BUILDID) SNAPSHOT=$(SNAPSHOT) $(packer_absdir)/platforms/debian/build.sh
-	ARCH=amd64 BEAT=$(@D) BUILD_DIR=${BUILD_DIR} BEAT_DIR=$(beat_abspath) BUILDID=$(BUILDID) SNAPSHOT=$(SNAPSHOT) $(packer_absdir)/platforms/debian/build.sh
+	ARCH=386 BEAT=$(@D) BUILD_DIR=${BUILD_DIR} BEAT_PATH=$(beat_abspath) BUILDID=$(BUILDID) SNAPSHOT=$(SNAPSHOT) $(packer_absdir)/platforms/debian/build.sh
+	ARCH=amd64 BEAT=$(@D) BUILD_DIR=${BUILD_DIR} BEAT_PATH=$(beat_abspath) BUILDID=$(BUILDID) SNAPSHOT=$(SNAPSHOT) $(packer_absdir)/platforms/debian/build.sh
 
 %/rpm: ${BUILD_DIR}/god-linux-386 ${BUILD_DIR}/god-linux-amd64 fpm-image
 	echo Creating RPM packages for $(@D)
-	ARCH=386 BEAT=$(@D) BUILD_DIR=${BUILD_DIR} BEAT_DIR=$(beat_abspath) BUILDID=$(BUILDID) SNAPSHOT=$(SNAPSHOT) $(packer_absdir)/platforms/centos/build.sh
-	ARCH=amd64 BEAT=$(@D) BUILD_DIR=${BUILD_DIR} BEAT_DIR=$(beat_abspath) BUILDID=$(BUILDID) SNAPSHOT=$(SNAPSHOT) $(packer_absdir)/platforms/centos/build.sh
+	ARCH=386 BEAT=$(@D) BUILD_DIR=${BUILD_DIR} BEAT_PATH=$(beat_abspath) BUILDID=$(BUILDID) SNAPSHOT=$(SNAPSHOT) $(packer_absdir)/platforms/centos/build.sh
+	ARCH=amd64 BEAT=$(@D) BUILD_DIR=${BUILD_DIR} BEAT_PATH=$(beat_abspath) BUILDID=$(BUILDID) SNAPSHOT=$(SNAPSHOT) $(packer_absdir)/platforms/centos/build.sh
 
 %/darwin:
 	echo Creating Darwin packages for $(@D)
-	ARCH=amd64 BEAT=$(@D) BUILD_DIR=${BUILD_DIR} BEAT_DIR=$(beat_abspath) BUILDID=$(BUILDID) SNAPSHOT=$(SNAPSHOT) $(packer_absdir)/platforms/darwin/build.sh
+	ARCH=amd64 BEAT=$(@D) BUILD_DIR=${BUILD_DIR} BEAT_PATH=$(beat_abspath) BUILDID=$(BUILDID) SNAPSHOT=$(SNAPSHOT) $(packer_absdir)/platforms/darwin/build.sh
 
 %/win:
 	echo Creating Darwin packages for $(@D)
-	ARCH=386 BEAT=$(@D) BUILD_DIR=${BUILD_DIR} BEAT_DIR=$(beat_abspath) BUILDID=$(BUILDID) SNAPSHOT=$(SNAPSHOT) $(packer_absdir)/platforms/windows/build.sh
-	ARCH=amd64 BEAT=$(@D) BUILD_DIR=${BUILD_DIR} BEAT_DIR=$(beat_abspath) BUILDID=$(BUILDID) SNAPSHOT=$(SNAPSHOT) $(packer_absdir)/platforms/windows/build.sh
+	ARCH=386 BEAT=$(@D) BUILD_DIR=${BUILD_DIR} BEAT_PATH=$(beat_abspath) BUILDID=$(BUILDID) SNAPSHOT=$(SNAPSHOT) $(packer_absdir)/platforms/windows/build.sh
+	ARCH=amd64 BEAT=$(@D) BUILD_DIR=${BUILD_DIR} BEAT_PATH=$(beat_abspath) BUILDID=$(BUILDID) SNAPSHOT=$(SNAPSHOT) $(packer_absdir)/platforms/windows/build.sh
 
 %/bin:
 	echo Creating Linux packages for $(@D)
-	ARCH=386 BEAT=$(@D) BUILD_DIR=${BUILD_DIR} BEAT_DIR=$(beat_abspath) BUILDID=$(BUILDID) SNAPSHOT=$(SNAPSHOT) $(packer_absdir)/platforms/binary/build.sh
-	ARCH=amd64 BEAT=$(@D) BUILD_DIR=${BUILD_DIR} BEAT_DIR=$(beat_abspath) BUILDID=$(BUILDID) SNAPSHOT=$(SNAPSHOT) $(packer_absdir)/platforms/binary/build.sh
+	ARCH=386 BEAT=$(@D) BUILD_DIR=${BUILD_DIR} BEAT_PATH=$(beat_abspath) BUILDID=$(BUILDID) SNAPSHOT=$(SNAPSHOT) $(packer_absdir)/platforms/binary/build.sh
+	ARCH=amd64 BEAT=$(@D) BUILD_DIR=${BUILD_DIR} BEAT_PATH=$(beat_abspath) BUILDID=$(BUILDID) SNAPSHOT=$(SNAPSHOT) $(packer_absdir)/platforms/binary/build.sh
 
 .PHONY: package-dashboards
 package-dashboards:

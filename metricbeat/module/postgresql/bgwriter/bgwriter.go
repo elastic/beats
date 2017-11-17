@@ -4,10 +4,11 @@ import (
 	"database/sql"
 	"fmt"
 
+	"github.com/pkg/errors"
+
 	"github.com/elastic/beats/libbeat/common"
 	"github.com/elastic/beats/metricbeat/mb"
 	"github.com/elastic/beats/metricbeat/module/postgresql"
-	"github.com/pkg/errors"
 
 	// Register postgresql database/sql driver
 	_ "github.com/lib/pq"
@@ -47,5 +48,6 @@ func (m *MetricSet) Fetch() (common.MapStr, error) {
 		return nil, fmt.Errorf("No results from the pg_stat_bgwriter query")
 	}
 
-	return schema.Apply(results[0]), nil
+	data, _ := schema.Apply(results[0])
+	return data, nil
 }

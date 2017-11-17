@@ -3,10 +3,11 @@ package database
 import (
 	"database/sql"
 
+	"github.com/pkg/errors"
+
 	"github.com/elastic/beats/libbeat/common"
 	"github.com/elastic/beats/metricbeat/mb"
 	"github.com/elastic/beats/metricbeat/module/postgresql"
-	"github.com/pkg/errors"
 
 	// Register postgresql database/sql driver
 	_ "github.com/lib/pq"
@@ -45,7 +46,8 @@ func (m *MetricSet) Fetch() ([]common.MapStr, error) {
 
 	events := []common.MapStr{}
 	for _, result := range results {
-		events = append(events, eventMapping(result))
+		data, _ := schema.Apply(result)
+		events = append(events, data)
 	}
 
 	return events, nil

@@ -83,7 +83,7 @@
           example: amazon.co.uk.
 
         - name: answers
-          type: dict
+          type: object
           description: >
             An array containing a dictionary about each answer section returned by
             the server.
@@ -119,7 +119,7 @@
             on the type and class of the resource record.
 
         - name: authorities
-          type: dict
+          type: object
           description: >
             An array containing a dictionary for each authority section from the
             answer.
@@ -144,7 +144,7 @@
           example: IN
 
         - name: additionals
-          type: dict
+          type: object
           description: >
             An array containing a dictionary for each additional section from the
             answer.

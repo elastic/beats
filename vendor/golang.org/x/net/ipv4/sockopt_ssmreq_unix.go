@@ -23,7 +23,7 @@ func setsockoptGroupReq(fd, name int, ifi *net.Interface, grp net.IP) error {
 	}
 	gr.setGroup(grp)
 	var p unsafe.Pointer
-	var l sysSockoptLen
+	var l uint32
 	if freebsd32o64 {
 		var d [sysSizeofGroupReq + 4]byte
 		s := (*[sysSizeofGroupReq]byte)(unsafe.Pointer(&gr))
@@ -45,7 +45,7 @@ func setsockoptGroupSourceReq(fd, name int, ifi *net.Interface, grp, src net.IP)
 	}
 	gsr.setSourceGroup(grp, src)
 	var p unsafe.Pointer
-	var l sysSockoptLen
+	var l uint32
 	if freebsd32o64 {
 		var d [sysSizeofGroupSourceReq + 4]byte
 		s := (*[sysSizeofGroupSourceReq]byte)(unsafe.Pointer(&gsr))

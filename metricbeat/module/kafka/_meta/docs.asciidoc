@@ -1,4 +1,6 @@
-== kafka Module
+== Kafka module
 
-This is the kafka Module.
+beta[]
+
+This is the Kafka module.
 

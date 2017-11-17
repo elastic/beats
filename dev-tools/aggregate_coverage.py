@@ -8,6 +8,7 @@ import sys
 import argparse
 import fnmatch
 
+
 def main(arguments):
 
     parser = argparse.ArgumentParser(description=__doc__,
@@ -34,9 +35,9 @@ def main(arguments):
                     if not line.startswith('mode:') and "vendor" not in line:
                         (position, stmt, count) = line.split(" ")
                         stmt = int(stmt)
-                        count = int (count)
+                        count = int(count)
                         prev_count = 0
-                        if lines.has_key(position):
+                        if position in lines:
                             (_, prev_stmt, prev_count) = lines[position]
                             assert prev_stmt == stmt
                         lines[position] = (position, stmt, prev_count + count)

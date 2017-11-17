@@ -6,20 +6,24 @@ import (
 	"path/filepath"
 	"strconv"
 	"strings"
+	"sync"
 )
 
 const RotatorMaxFiles = 1024
 const DefaultKeepFiles = 7
 const DefaultRotateEveryBytes = 10 * 1024 * 1024
+const DefaultPermissions = 0600
 
 type FileRotator struct {
 	Path             string
 	Name             string
 	RotateEveryBytes *uint64
 	KeepFiles        *int
+	Permissions      *uint32
 
 	current     *os.File
 	currentSize uint64
+	currentLock sync.RWMutex
 }
 
 func (rotator *FileRotator) CreateDirectory() error {
@@ -31,7 +35,7 @@ func (rotator *FileRotator) CreateDirectory() error {
 	}
 
 	if os.IsNotExist(err) {
-		err = os.MkdirAll(rotator.Path, 0755)
+		err = os.MkdirAll(rotator.Path, 0750)
 		if err != nil {
 			return err
 		}
@@ -42,7 +46,7 @@ func (rotator *FileRotator) CreateDirectory() error {
 
 func (rotator *FileRotator) CheckIfConfigSane() error {
 	if len(rotator.Name) == 0 {
-		return fmt.Errorf("File logging requires a name for the file names")
+		return fmt.Errorf("file logging requires a name for the file names")
 	}
 	if rotator.KeepFiles == nil {
 		rotator.KeepFiles = new(int)
@@ -53,8 +57,17 @@ func (rotator *FileRotator) CheckIfConfigSane() error {
 		*rotator.RotateEveryBytes = DefaultRotateEveryBytes
 	}
 
+	if rotator.Permissions == nil {
+		rotator.Permissions = new(uint32)
+		*rotator.Permissions = DefaultPermissions
+	}
+
 	if *rotator.KeepFiles < 2 || *rotator.KeepFiles >= RotatorMaxFiles {
-		return fmt.Errorf("The number of files to keep should be between 2 and %d", RotatorMaxFiles-1)
+		return fmt.Errorf("the number of files to keep should be between 2 and %d", RotatorMaxFiles-1)
+	}
+
+	if rotator.Permissions != nil && (*rotator.Permissions > uint32(os.ModePerm)) {
+		return fmt.Errorf("the permissions mask %d is invalid", *rotator.Permissions)
 	}
 	return nil
 }
@@ -68,16 +81,26 @@ func (rotator *FileRotator) WriteLine(line []byte) error {
 	}
 
 	line = append(line, '\n')
+
+	rotator.currentLock.RLock()
 	_, err := rotator.current.Write(line)
+	rotator.currentLock.RUnlock()
+
 	if err != nil {
 		return err
 	}
+
+	rotator.currentLock.Lock()
 	rotator.currentSize += uint64(len(line))
+	rotator.currentLock.Unlock()
 
 	return nil
 }
 
 func (rotator *FileRotator) shouldRotate() bool {
+	rotator.currentLock.RLock()
+	defer rotator.currentLock.RUnlock()
+
 	if rotator.current == nil {
 		return true
 	}
@@ -107,6 +130,8 @@ func (rotator *FileRotator) FileExists(fileNo int) bool {
 }
 
 func (rotator *FileRotator) Rotate() error {
+	rotator.currentLock.Lock()
+	defer rotator.currentLock.Unlock()
 
 	if rotator.current != nil {
 		if err := rotator.current.Close(); err != nil {
@@ -134,7 +159,7 @@ func (rotator *FileRotator) Rotate() error {
 
 		if rotator.FileExists(fileNo + 1) {
 			// next file exists, something is strange
-			return fmt.Errorf("File %s exists, when rotating would overwrite it", rotator.FilePath(fileNo+1))
+			return fmt.Errorf("file %s exists, when rotating would overwrite it", rotator.FilePath(fileNo+1))
 		}
 
 		err := os.Rename(path, rotator.FilePath(fileNo+1))
@@ -145,7 +170,7 @@ func (rotator *FileRotator) Rotate() error {
 
 	// create the new file
 	path := rotator.FilePath(0)
-	current, err := os.Create(path)
+	current, err := os.OpenFile(path, os.O_RDWR|os.O_CREATE|os.O_TRUNC, os.FileMode(*rotator.Permissions))
 	if err != nil {
 		return err
 	}

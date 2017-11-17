@@ -3,10 +3,9 @@
 package file
 
 import (
+	"fmt"
 	"os"
 	"syscall"
-
-	"github.com/elastic/beats/libbeat/logp"
 )
 
 type StateOS struct {
@@ -16,7 +15,6 @@ type StateOS struct {
 
 // GetOSState returns the FileStateOS for non windows systems
 func GetOSState(info os.FileInfo) StateOS {
-
 	stat := info.Sys().(*syscall.Stat_t)
 
 	// Convert inode and dev to uint64 to be cross platform compatible
@@ -33,13 +31,8 @@ func (fs StateOS) IsSame(state StateOS) bool {
 	return fs.Inode == state.Inode && fs.Device == state.Device
 }
 
-// SafeFileRotate safely rotates an existing file under path and replaces it with the tempfile
-func SafeFileRotate(path, tempfile string) error {
-	if e := os.Rename(tempfile, path); e != nil {
-		logp.Err("Rotate error: %s", e)
-		return e
-	}
-	return nil
+func (fs StateOS) String() string {
+	return fmt.Sprintf("%d-%d", fs.Inode, fs.Device)
 }
 
 // ReadOpen opens a file for reading only

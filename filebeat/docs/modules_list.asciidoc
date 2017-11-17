@@ -1,0 +1,30 @@
+////
+This file is generated! See scripts/docs_collector.py
+////
+
+  * <<filebeat-modules-overview>>
+  * <<filebeat-module-apache2>>
+  * <<filebeat-module-auditd>>
+  * <<filebeat-module-icinga>>
+  * <<filebeat-module-kafka>>
+  * <<filebeat-module-mysql>>
+  * <<filebeat-module-nginx>>
+  * <<filebeat-module-postgresql>>
+  * <<filebeat-module-redis>>
+  * <<filebeat-module-system>>
+  * <<filebeat-module-traefik>>
+
+
+--
+
+include::modules-overview.asciidoc[]
+include::modules/apache2.asciidoc[]
+include::modules/auditd.asciidoc[]
+include::modules/icinga.asciidoc[]
+include::modules/kafka.asciidoc[]
+include::modules/mysql.asciidoc[]
+include::modules/nginx.asciidoc[]
+include::modules/postgresql.asciidoc[]
+include::modules/redis.asciidoc[]
+include::modules/system.asciidoc[]
+include::modules/traefik.asciidoc[]

@@ -1,0 +1,44 @@
+{
+  "@timestamp": "2017-05-10T16:42:27.816Z",
+  "beat": {
+    "hostname": "X1",
+    "name": "X1",
+    "version": "6.0.0-alpha1"
+  },
+  "kubernetes": {
+    "container": {
+      "cpu": {
+        "request": {
+          "nanocores": 200000000
+        }
+      },
+      "id": "docker://39f3267ad1b0c46025e664bfe0b70f3f18a9f172aad00463c8e87e0e93bbf628",
+      "image": "jenkinsci/jenkins:2.46.1",
+      "memory": {
+        "request": {
+          "bytes": 268435456
+        }
+      },
+      "name": "wise-lynx-jenkins",
+      "status": {
+        "phase": "running",
+        "ready": true,
+        "restarts": 4
+      }
+    },
+    "namespace": "jenkins",
+    "node": {
+      "name": "minikube"
+    },
+    "pod": {
+      "name": "wise-lynx-jenkins-1616735317-svn6k"
+    }
+  },
+  "metricset": {
+    "host": "192.168.99.100:18080",
+    "module": "kubernetes",
+    "name": "state_container",
+    "namespace": "container",
+    "rtt": 6219
+  }
+}

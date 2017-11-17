@@ -3,50 +3,10 @@ This file is generated! See scripts/docs_collector.py
 ////
 
 [[metricbeat-module-system]]
-== System Module
+== System module
 
-The System module allows you to monitor your servers. Because the System module always applies to the local
-server, the `hosts` config option is not needed.
-
-[float]
-=== Module-Specific Configuration Notes
-
-The System module has these additional config options:
-
-*`processes`*:: When the `process` metricset is enabled, you can use the `processes` option to define a list of
-regexp expressions to filter the processes that are reported. For more complex filtering, you should use the
-<<configuration-processors, processors>> configuration option.
-+
-The following example config returns metrics for all processes:
-+
-[source,yaml]
-----
-metricbeat.modules:
-- module: system
-  metricsets: ["process"]
-  processes: ['.*']
-----
-*`cgroups`*:: When the `process` metricset is enabled, you can use the boolean
-`cgroups` option to enable the experimental cgroup metrics on Linux.
-+
-The following example config enables cgroups metrics on Linux.
-+
-[source,yaml]
-----
-metricbeat.modules:
-- module: system
-  metricsets: ["process"]
-  cgroups: true
-----
-*`cpu_ticks`*:: When the `cpu` or `core` metricset is enabled, you can specify `cpu_ticks: true` to report CPU ticks in addition to CPU percentages stats. For example:
-+
-[source,yaml]
-----
-metricbeat.modules:
-- module: system
-  metricsets: ["cpu", "core"]
-  cpu_ticks: true
-----
+The System module allows you to monitor your servers. Because the System module
+always applies to the local server, the `hosts` config option is not needed.
 
 [float]
 === Dashboard
@@ -57,7 +17,7 @@ image::./images/metricbeat_system_dashboard.png[]
 
 
 [float]
-=== Example Configuration
+=== Example configuration
 
 The System module supports the standard configuration options that are described
 in <<configuration-metricbeat>>. Here is an example configuration:
@@ -66,36 +26,35 @@ in <<configuration-metricbeat>>. Here is an example configuration:
 ----
 metricbeat.modules:
 - module: system
-  metricsets:
-    # CPU stats
-    - cpu
-
-    # System Load stats
-    - load
-
-    # Per CPU core stats
-    #- core
-
-    # IO stats
-    #- diskio
-
-    # Per filesystem stats
-    - filesystem
-
-    # File system summary stats
-    - fsstat
-
-    # Memory stats
-    - memory
-
-    # Network stats
-    - network
-
-    # Per process stats
-    - process
-  enabled: true
   period: 10s
+  metricsets:
+    - cpu
+    - load
+    - memory
+    - network
+    - process
+    - process_summary
+    #- core
+    #- diskio
+    #- socket
   processes: ['.*']
+  process.include_top_n:
+    by_cpu: 5      # include top 5 processes by CPU
+    by_memory: 5   # include top 5 processes by memory
+
+- module: system
+  period: 1m
+  metricsets:
+    - filesystem
+    - fsstat
+  processors:
+  - drop_event.when.regexp:
+      system.filesystem.mount_point: '^/(sys|cgroup|proc|dev|etc|host|lib)($|/)'
+
+- module: system
+  period: 15m
+  metricsets:
+    - uptime
 ----
 
 [float]
@@ -121,6 +80,12 @@ The following metricsets are available:
 
 * <<metricbeat-metricset-system-process,process>>
 
+* <<metricbeat-metricset-system-process_summary,process_summary>>
+
+* <<metricbeat-metricset-system-socket,socket>>
+
+* <<metricbeat-metricset-system-uptime,uptime>>
+
 include::system/core.asciidoc[]
 
 include::system/cpu.asciidoc[]
@@ -138,4 +103,10 @@ include::system/memory.asciidoc[]
 include::system/network.asciidoc[]
 
 include::system/process.asciidoc[]
+
+include::system/process_summary.asciidoc[]
+
+include::system/socket.asciidoc[]
+
+include::system/uptime.asciidoc[]
 

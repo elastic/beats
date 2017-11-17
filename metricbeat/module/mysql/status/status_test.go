@@ -67,13 +67,17 @@ func TestConfigValidation(t *testing.T) {
 			t.Fatal(err)
 		}
 
-		_, err = mb.NewModules([]*common.Config{c}, mb.Registry)
+		_, _, err = mb.NewModule(c, mb.Registry)
 		if err != nil && test.err == "" {
 			t.Errorf("unexpected error in testcase %d: %v", i, err)
 			continue
 		}
-		if test.err != "" && assert.Error(t, err, "expected '%v' in testcase %d", test.err, i) {
-			assert.Contains(t, err.Error(), test.err, "testcase %d", i)
+		if test.err != "" {
+			if err != nil {
+				assert.Contains(t, err.Error(), test.err, "testcase %d", i)
+			} else {
+				t.Errorf("expected error '%v' in testcase %d", test.err, i)
+			}
 			continue
 		}
 	}

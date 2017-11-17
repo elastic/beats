@@ -37,12 +37,12 @@ that Metricbeat does it and with the same validations.
 package testing
 
 import (
+	"sync"
 	"testing"
+	"time"
 
 	"github.com/elastic/beats/libbeat/common"
 	"github.com/elastic/beats/metricbeat/mb"
-
-	"github.com/stretchr/testify/assert"
 )
 
 type TestModule struct {
@@ -72,28 +72,23 @@ func newMetricSet(t testing.TB, config interface{}) mb.MetricSet {
 	if err != nil {
 		t.Fatal(err)
 	}
-	m, err := mb.NewModules([]*common.Config{c}, mb.Registry)
+	m, metricsets, err := mb.NewModule(c, mb.Registry)
 	if err != nil {
-		t.Fatal(err)
+		t.Fatal("failed to create new MetricSet", err)
 	}
-	if !assert.Len(t, m, 1) {
-		t.FailNow()
-	}
-
-	var metricSet mb.MetricSet
-	for _, v := range m {
-		if !assert.Len(t, v, 1) {
-			t.FailNow()
-		}
-
-		metricSet = v[0]
-		break
+	if m == nil {
+		t.Fatal("no module instantiated")
 	}
 
-	if !assert.NotNil(t, metricSet) {
-		t.FailNow()
+	if len(metricsets) != 1 {
+		t.Fatal("invalid number of metricsets instantiated")
 	}
-	return metricSet
+
+	metricset := metricsets[0]
+	if metricset == nil {
+		t.Fatal("metricset is nil")
+	}
+	return metricset
 }
 
 // NewEventFetcher instantiates a new EventFetcher using the given
@@ -122,4 +117,88 @@ func NewEventsFetcher(t testing.TB, config interface{}) mb.EventsFetcher {
 	}
 
 	return fetcher
+}
+
+func NewReportingMetricSet(t testing.TB, config interface{}) mb.ReportingMetricSet {
+	metricSet := newMetricSet(t, config)
+
+	reportingMetricSet, ok := metricSet.(mb.ReportingMetricSet)
+	if !ok {
+		t.Fatal("MetricSet does not implement ReportingMetricSet")
+	}
+
+	return reportingMetricSet
+}
+
+// ReportingFetch runs the given reporting metricset and returns all of the
+// events and errors that occur during that period.
+func ReportingFetch(metricSet mb.ReportingMetricSet) ([]common.MapStr, []error) {
+	r := &capturingReporter{}
+	metricSet.Fetch(r)
+	return r.events, r.errs
+}
+
+// NewPushMetricSet instantiates a new PushMetricSet using the given
+// configuration. The ModuleFactory and MetricSetFactory are obtained from the
+// global Registry.
+func NewPushMetricSet(t testing.TB, config interface{}) mb.PushMetricSet {
+	metricSet := newMetricSet(t, config)
+
+	pushMetricSet, ok := metricSet.(mb.PushMetricSet)
+	if !ok {
+		t.Fatal("MetricSet does not implement PushMetricSet")
+	}
+
+	return pushMetricSet
+}
+
+type capturingReporter struct {
+	events []common.MapStr
+	errs   []error
+	done   chan struct{}
+}
+
+func (r *capturingReporter) Event(event common.MapStr) bool {
+	r.events = append(r.events, event)
+	return true
+}
+
+func (r *capturingReporter) ErrorWith(err error, meta common.MapStr) bool {
+	r.events = append(r.events, meta)
+	r.errs = append(r.errs, err)
+	return true
+}
+
+func (r *capturingReporter) Error(err error) bool {
+	r.errs = append(r.errs, err)
+	return true
+}
+
+func (r *capturingReporter) Done() <-chan struct{} {
+	return r.done
+}
+
+// RunPushMetricSet run the given push metricset for the specific amount of time
+// and returns all of the events and errors that occur during that period.
+func RunPushMetricSet(duration time.Duration, metricSet mb.PushMetricSet) ([]common.MapStr, []error) {
+	r := &capturingReporter{done: make(chan struct{})}
+
+	// Run the metricset.
+	var wg sync.WaitGroup
+	wg.Add(1)
+	go func() {
+		defer wg.Done()
+		metricSet.Run(r)
+	}()
+
+	// Let it run for some period, then stop it by closing the done channel.
+	time.AfterFunc(duration, func() {
+		close(r.done)
+	})
+
+	// Wait for the PushMetricSet to completely stop.
+	wg.Wait()
+
+	// Return all events and errors that were collected.
+	return r.events, r.errs
 }

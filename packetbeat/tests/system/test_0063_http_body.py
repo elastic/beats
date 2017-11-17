@@ -77,7 +77,7 @@ class Test(BaseTest):
 
         assert len(objs) == 1
         o = objs[0]
-        print o
+        print(o)
 
         assert o["type"] == "http"
 
@@ -107,7 +107,7 @@ class Test(BaseTest):
 
         assert len(objs) == 1
         o = objs[0]
-        print len(o["http.response.body"])
+        print(len(o["http.response.body"]))
 
         # response body should be included but trimmed
         assert len(o["http.response.body"]) < 2000

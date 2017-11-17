@@ -41,14 +41,6 @@
         the `client_ip` for non proxy clients.
       format: Dotted notation.
 
-    - name: client_location
-      type: geo_point
-      example: 40.715, -74.011
-      description: >
-        DEPRECATED. Please use `client_geoip` instead.
-        The GeoIP location of the `real_ip` IP address or of the `client_ip` address if the `real_ip` is
-        disabled. The field is a string containing the latitude and longitude separated by a comma.
-
     - name: client_geoip
       description: The GeoIP information of the client.
       type: group

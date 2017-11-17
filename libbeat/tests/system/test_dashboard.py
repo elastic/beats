@@ -1,14 +1,13 @@
 from base import BaseTest
-from nose.plugins.attrib import attr
-
 import os
+import os.path
 import subprocess
+from nose.plugins.attrib import attr
 import unittest
-import re
-from nose.plugins.skip import Skip, SkipTest
 
 
 INTEGRATION_TESTS = os.environ.get('INTEGRATION_TESTS', False)
+
 
 class Test(BaseTest):
 
@@ -16,21 +15,26 @@ class Test(BaseTest):
     @attr('integration')
     def test_load_dashboard(self):
         """
-        Test loading dashboards for all beats
+        Test loading dashboards
         """
-        beats = ["metricbeat", "packetbeat", "filebeat", "winlogbeat"]
+        self.render_config_template()
+        beat = self.start_beat(
+            logging_args=["-e", "-d", "*"],
+            extra_args=["setup",
+                        "--dashboards",
+                        "-E", "setup.dashboards.file=" +
+                        os.path.join("../../dashboards/testdata", "testbeat-dashboards.zip"),
+                        "-E", "setup.dashboards.beat=testbeat",
+                        "-E", "setup.kibana.protocol=http",
+                        "-E", "setup.kibana.host=" + self.get_kibana_host(),
+                        "-E", "setup.kibana.port=" + self.get_kibana_port(),
+                        "-E", "output.elasticsearch.hosts=['" + self.get_host() + "']",
+                        "-E", "output.file.enabled=false"]
+        )
 
-        for beat in beats:
-            command = "go run ../../dashboards/import_dashboards.go -es http://"+ self.get_elasticsearch_host() + " -dir ../../../"+ beat + "/etc/kibana"
+        beat.check_wait(exit_code=0)
 
-            if os.name == "nt":
-                command = "go run ..\..\dashboards\import_dashboards.go -es http:\\"+self.get_elasticsearch_host() + " -dir ..\..\..\\" + beat + "\etc\kibana"
-
-            print command
-            p = subprocess.Popen(command, shell=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
-            content, err = p.communicate()
-
-            assert p.returncode == 0
+        assert self.log_contains("Kibana dashboards successfully loaded") is True
 
     @unittest.skipUnless(INTEGRATION_TESTS, "integration test")
     @attr('integration')
@@ -39,39 +43,37 @@ class Test(BaseTest):
         Test export dashboards and remove unsupported characters
         """
 
-        raise SkipTest
-        # This test is currently skipped as it does not work.
-        # The test fails as soon as there are dashboards loaded which can happen if
-        # test_load_dashboard was run previously. Also this test should pass exactly
-        # when dashboards exist, means it should first load some "wrong" dashboards
-        # In addition, this test should not write to the beats directory but to a
-        # temporary directory and check the files there.
+        self.test_load_dashboard()
 
-        beats = ["metricbeat", "packetbeat", "filebeat", "winlogbeat"]
+        command = "./../../../dev-tools/cmd/dashboards/export_dashboards -kibana http://" + \
+            self.get_kibana_host() + ":" + self.get_kibana_port()
 
-        for beat in beats:
-            if os.name == "nt":
-                path = "..\..\..\\"+ beat + "\etc\kibana"
-            else:
-                path = "../../../"+ beat + "/etc/kibana"
+        if os.name == "nt":
+            command = "..\..\..\dev-tools\cmd\dashboards\export_dashboards -kibana http://" + \
+                self.get_kibana_host() + ":" + self.get_kibana_port()
 
-            command = "python ../../../dev-tools/export_dashboards.py --url http://"+ self.get_elasticsearch_host() + " --dir " + path + " --regex " + beat + "-*"
+        command = command + " -dashboard Metricbeat-system-overview"
 
-            if os.name == "nt":
-                command = "python ..\..\..\dev-tools/export_dashboards.py --url http://"+ self.get_elasticsearch_host() + " --dir " + path + " --regex " + beat + "-*"
+        print(command)
 
-            print command
+        p = subprocess.Popen(command, shell=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+        content, err = p.communicate()
 
-            p = subprocess.Popen(command, shell=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
-            content, err = p.communicate()
+        assert p.returncode == 0
 
-            assert p.returncode == 0
+        assert os.path.isfile("output.json") is True
 
-            files = os.listdir(path)
+        with open('output.json') as f:
+            content = f.read()
+            assert "Metricbeat-system-overview" in content
 
-            for f in files:
-                self.assertIsNone(re.search('[:\>\<"/\\\|\?\*]', f))
+        os.remove("output.json")
 
-
-    def get_elasticsearch_host(self):
+    def get_host(self):
         return os.getenv('ES_HOST', 'localhost') + ':' + os.getenv('ES_PORT', '9200')
+
+    def get_kibana_host(self):
+        return os.getenv('KIBANA_HOST', 'localhost')
+
+    def get_kibana_port(self):
+        return os.getenv('KIBANA_PORT', '5601')

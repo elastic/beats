@@ -6,6 +6,8 @@ import (
 	"log"
 	"net"
 	"os"
+
+	"golang.org/x/net/context"
 )
 
 const (
@@ -45,7 +47,7 @@ type Config struct {
 	Logger *log.Logger
 
 	// Optional function for dialing out
-	Dial func(network, addr string) (net.Conn, error)
+	Dial func(ctx context.Context, network, addr string) (net.Conn, error)
 }
 
 // Server is reponsible for accepting connections and handling

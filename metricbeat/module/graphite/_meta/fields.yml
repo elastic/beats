@@ -1,0 +1,11 @@
+- key: graphite
+  title: "graphite"
+  description: >
+    experimental[]
+
+    graphite Module
+  fields:
+    - name: graphite
+      type: group
+      description: >
+      fields:

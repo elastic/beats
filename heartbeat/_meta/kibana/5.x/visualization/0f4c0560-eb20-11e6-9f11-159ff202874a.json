@@ -1,0 +1,11 @@
+{
+  "visState": "{\n  \"title\": \"HTTP duration heatmap\",\n  \"type\": \"heatmap\",\n  \"params\": {\n    \"addTooltip\": true,\n    \"addLegend\": true,\n    \"enableHover\": false,\n    \"legendPosition\": \"right\",\n    \"times\": [],\n    \"colorsNumber\": 10,\n    \"colorSchema\": \"Blues\",\n    \"setColorRange\": false,\n    \"colorsRange\": [],\n    \"invertColors\": false,\n    \"percentageMode\": false,\n    \"valueAxes\": [\n      {\n        \"show\": false,\n        \"id\": \"ValueAxis-1\",\n        \"type\": \"value\",\n        \"scale\": {\n          \"type\": \"linear\",\n          \"defaultYExtents\": false\n        },\n        \"labels\": {\n          \"show\": false,\n          \"rotate\": 0,\n          \"color\": \"#555\"\n        }\n      }\n    ]\n  },\n  \"aggs\": [\n    {\n      \"id\": \"1\",\n      \"enabled\": true,\n      \"type\": \"count\",\n      \"schema\": \"metric\",\n      \"params\": {}\n    },\n    {\n      \"id\": \"2\",\n      \"enabled\": true,\n      \"type\": \"date_histogram\",\n      \"schema\": \"segment\",\n      \"params\": {\n        \"field\": \"@timestamp\",\n        \"interval\": \"auto\",\n        \"customInterval\": \"2h\",\n        \"min_doc_count\": 1,\n        \"extended_bounds\": {}\n      }\n    },\n    {\n      \"id\": \"3\",\n      \"enabled\": true,\n      \"type\": \"histogram\",\n      \"schema\": \"group\",\n      \"params\": {\n        \"field\": \"monitor.duration.us\",\n        \"interval\": 50000,\n        \"extended_bounds\": {}\n      }\n    }\n  ],\n  \"listeners\": {}\n}", 
+  "description": "", 
+  "title": "HTTP duration heatmap", 
+  "uiStateJSON": "{\n  \"vis\": {\n    \"defaultColors\": {\n      \"0 - 2\": \"rgb(247,251,255)\",\n      \"2 - 3\": \"rgb(227,238,249)\",\n      \"3 - 4\": \"rgb(208,225,242)\",\n      \"4 - 5\": \"rgb(182,212,233)\",\n      \"5 - 6\": \"rgb(148,196,223)\",\n      \"6 - 8\": \"rgb(107,174,214)\",\n      \"8 - 9\": \"rgb(74,152,201)\",\n      \"9 - 10\": \"rgb(46,126,188)\",\n      \"10 - 11\": \"rgb(23,100,171)\",\n      \"11 - 12\": \"rgb(8,74,145)\"\n    }\n  }\n}", 
+  "version": 1, 
+  "savedSearchId": "02014c80-29d2-11e7-a68f-bfaa2341cc52", 
+  "kibanaSavedObjectMeta": {
+    "searchSourceJSON": "{\n  \"filter\": []\n}"
+  }
+}

@@ -1,0 +1,30 @@
+[[troubleshooting]]
+= Troubleshooting
+
+[partintro]
+--
+If you have issues installing or running Heartbeat, read the
+following tips:
+
+* <<getting-help>>
+* <<enable-heartbeat-debugging>>
+* <<faq>>
+
+//sets block macro for getting-help.asciidoc included in next section
+
+--
+
+[[getting-help]]
+== Get help
+
+include::../../libbeat/docs/getting-help.asciidoc[]
+
+//sets block macro for debugging.asciidoc included in next section
+
+[[enable-heartbeat-debugging]]
+== Debug
+
+include::../../libbeat/docs/debugging.asciidoc[]
+
+
+

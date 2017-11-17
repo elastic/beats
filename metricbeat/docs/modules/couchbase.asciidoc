@@ -3,28 +3,27 @@ This file is generated! See scripts/docs_collector.py
 ////
 
 [[metricbeat-module-couchbase]]
-== couchbase Module
+== Couchbase module
 
-experimental[]
+beta[]
 
-This is the couchbase Module.
-
+This module periodically fetches metrics from https://www.couchbase.com/[Couchbase]
+servers.
 
 
 [float]
-=== Example Configuration
+=== Example configuration
 
-The couchbase module supports the standard configuration options that are described
+The Couchbase module supports the standard configuration options that are described
 in <<configuration-metricbeat>>. Here is an example configuration:
 
 [source,yaml]
 ----
 metricbeat.modules:
-#- module: couchbase
-  #metricsets: ["cluster", "node", "bucket"]
-  #enabled: true
-  #period: 10s
-  #hosts: ["localhost:8091"]
+- module: couchbase
+  metricsets: ["bucket", "cluster", "node"]
+  period: 10s
+  hosts: ["localhost:8091"]
 ----
 
 [float]

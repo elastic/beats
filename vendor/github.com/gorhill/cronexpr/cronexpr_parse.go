@@ -446,6 +446,9 @@ func genericFieldParse(s string, desc fieldDescriptor) ([]*cronDirective, error)
 			directive.first = desc.min
 			directive.last = desc.max
 			directive.step = atoi(snormal[pairs[2]:pairs[3]])
+			if directive.step < 1 || directive.step > desc.max {
+				return nil, fmt.Errorf("invalid interval %s", snormal)
+			}
 			directives = append(directives, &directive)
 			continue
 		}
@@ -456,6 +459,9 @@ func genericFieldParse(s string, desc fieldDescriptor) ([]*cronDirective, error)
 			directive.first = desc.atoi(snormal[pairs[2]:pairs[3]])
 			directive.last = desc.max
 			directive.step = atoi(snormal[pairs[4]:pairs[5]])
+			if directive.step < 1 || directive.step > desc.max {
+				return nil, fmt.Errorf("invalid interval %s", snormal)
+			}
 			directives = append(directives, &directive)
 			continue
 		}
@@ -466,6 +472,9 @@ func genericFieldParse(s string, desc fieldDescriptor) ([]*cronDirective, error)
 			directive.first = desc.atoi(snormal[pairs[2]:pairs[3]])
 			directive.last = desc.atoi(snormal[pairs[4]:pairs[5]])
 			directive.step = atoi(snormal[pairs[6]:pairs[7]])
+			if directive.step < 1 || directive.step > desc.max {
+				return nil, fmt.Errorf("invalid interval %s", snormal)
+			}
 			directives = append(directives, &directive)
 			continue
 		}

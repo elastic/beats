@@ -190,7 +190,6 @@ func (c *Client) run(cmd string) (*bytes.Buffer, error) {
 
 // GetStat returns the result from the 'show stat' command
 func (c *Client) GetStat() ([]*Stat, error) {
-
 	runResult, err := c.run("show stat")
 	if err != nil {
 		return nil, err
@@ -206,12 +205,10 @@ func (c *Client) GetStat() ([]*Stat, error) {
 	}
 
 	return statRes, nil
-
 }
 
 // GetInfo returns the result from the 'show stat' command
 func (c *Client) GetInfo() (*Info, error) {
-
 	res, err := c.run("show info")
 	if err != nil {
 		return nil, err
@@ -245,5 +242,4 @@ func (c *Client) GetInfo() (*Info, error) {
 	}
 
 	return nil, err
-
 }

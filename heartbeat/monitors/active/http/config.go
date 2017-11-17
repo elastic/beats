@@ -32,20 +32,27 @@ type Config struct {
 }
 
 type checkConfig struct {
-	// HTTP request configuration
-	Method      string            `config:"request.method"`      // http request method
-	SendHeaders map[string]string `config:"request.headers"`     // http request headers
-	SendBody    string            `config:"request.body"`        // send body payload
-	Compression compressionConfig `config:"request.compression"` // optionally compress payload
+	Request  requestParameters  `config:"request"`
+	Response responseParameters `config:"response"`
+}
 
-	// expected HTTP response configuration
-	Status      uint16            `config:"response.status" verify:"min=0, max=699"`
-	RecvHeaders map[string]string `config:"response.headers"`
-	RecvBody    string            `config:"response.body"`
+type requestParameters struct {
+	// HTTP request configuration
+	Method      string            `config:"method"`      // http request method
+	SendHeaders map[string]string `config:"headers"`     // http request headers
+	SendBody    string            `config:"body"`        // send body payload
+	Compression compressionConfig `config:"compression"` // optionally compress payload
 
 	// TODO:
 	//  - add support for cookies
 	//  - select HTTP version. golang lib will either use 1.1 or 2.0 if HTTPS is used, otherwise HTTP 1.1 . => implement/use specific http.RoundTripper implementation to change wire protocol/version being used
+}
+
+type responseParameters struct {
+	// expected HTTP response configuration
+	Status      uint16            `config:"status" verify:"min=0, max=699"`
+	RecvHeaders map[string]string `config:"headers"`
+	RecvBody    string            `config:"body"`
 }
 
 type compressionConfig struct {
@@ -58,13 +65,25 @@ var defaultConfig = Config{
 	Timeout:      16 * time.Second,
 	MaxRedirects: 10,
 	Mode:         monitors.DefaultIPSettings,
+	Check: checkConfig{
+		Request: requestParameters{
+			Method:      "GET",
+			SendHeaders: nil,
+			SendBody:    "",
+		},
+		Response: responseParameters{
+			Status:      0,
+			RecvHeaders: nil,
+			RecvBody:    "",
+		},
+	},
 }
 
-func (c *checkConfig) Validate() error {
-	switch strings.ToUpper(c.Method) {
+func (r *requestParameters) Validate() error {
+	switch strings.ToUpper(r.Method) {
 	case "HEAD", "GET", "POST":
 	default:
-		return fmt.Errorf("HTTP method '%v' not supported", c.Method)
+		return fmt.Errorf("HTTP method '%v' not supported", r.Method)
 	}
 
 	return nil

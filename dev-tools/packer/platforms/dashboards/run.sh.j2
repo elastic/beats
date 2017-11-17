@@ -10,14 +10,14 @@ if [ "$SNAPSHOT" = "yes" ]; then
     VERSION="${VERSION}-SNAPSHOT"
 fi
 
-mkdir /${BEATNAME:-beats}-dashboards-${VERSION}
-cp -a dashboards/. /${BEATNAME:-beats}-dashboards-${VERSION}/
-echo "$BUILDID" > /${BEATNAME:-beats}-dashboards-${VERSION}/.build_hash.txt
+mkdir /${BEAT_NAME:-beats}-dashboards-${VERSION}
+cp -a dashboards/. /${BEAT_NAME:-beats}-dashboards-${VERSION}/
+echo "$BUILDID" > /${BEAT_NAME:-beats}-dashboards-${VERSION}/.build_hash.txt
 
 mkdir -p upload
-zip -r upload/${BEATNAME:-beats}-dashboards-${VERSION}.zip /${BEATNAME:-beats}-dashboards-${VERSION}
-echo "Created upload/${BEATNAME:-beats}-dashboards-${VERSION}.zip"
+zip -r upload/${BEAT_NAME:-beats}-dashboards-${VERSION}.zip /${BEAT_NAME:-beats}-dashboards-${VERSION}
+echo "Created upload/${BEAT_NAME:-beats}-dashboards-${VERSION}.zip"
 
 cd upload
-sha1sum ${BEATNAME:-beats}-dashboards-${VERSION}.zip | awk '{print $1;}' > ${BEATNAME:-beats}-dashboards-${VERSION}.zip.sha1
-echo "Created upload/${BEATNAME:-beats}-dashboards-${VERSION}.zip.sha1"
+sha1sum ${BEAT_NAME:-beats}-dashboards-${VERSION}.zip | awk '{print $1;}' > ${BEAT_NAME:-beats}-dashboards-${VERSION}.zip.sha1
+echo "Created upload/${BEAT_NAME:-beats}-dashboards-${VERSION}.zip.sha1"

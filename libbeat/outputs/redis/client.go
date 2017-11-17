@@ -1,7 +1,6 @@
 package redis
 
 import (
-	"encoding/json"
 	"errors"
 	"regexp"
 	"strconv"
@@ -9,11 +8,14 @@ import (
 
 	"github.com/garyburd/redigo/redis"
 
+	"github.com/elastic/beats/libbeat/beat"
 	"github.com/elastic/beats/libbeat/common"
 	"github.com/elastic/beats/libbeat/logp"
 	"github.com/elastic/beats/libbeat/outputs"
+	"github.com/elastic/beats/libbeat/outputs/codec"
 	"github.com/elastic/beats/libbeat/outputs/outil"
 	"github.com/elastic/beats/libbeat/outputs/transport"
+	"github.com/elastic/beats/libbeat/publisher"
 )
 
 var (
@@ -22,16 +24,20 @@ var (
 
 type publishFn func(
 	keys outil.Selector,
-	data []outputs.Data,
-) ([]outputs.Data, error)
+	data []publisher.Event,
+) ([]publisher.Event, error)
 
 type client struct {
 	*transport.Client
+	observer outputs.Observer
+	index    string
 	dataType redisDataType
 	db       int
 	key      outil.Selector
 	password string
 	publish  publishFn
+	codec    codec.Codec
+	timeout  time.Duration
 }
 
 type redisDataType uint16
@@ -41,23 +47,35 @@ const (
 	redisChannelType
 )
 
-func newClient(tc *transport.Client, pass string, db int, key outil.Selector, dt redisDataType) *client {
+func newClient(
+	tc *transport.Client,
+	observer outputs.Observer,
+	timeout time.Duration,
+	pass string,
+	db int, key outil.Selector, dt redisDataType,
+	index string, codec codec.Codec,
+) *client {
 	return &client{
 		Client:   tc,
+		observer: observer,
+		timeout:  timeout,
 		password: pass,
+		index:    index,
 		db:       db,
 		dataType: dt,
 		key:      key,
+		codec:    codec,
 	}
 }
 
-func (c *client) Connect(to time.Duration) error {
+func (c *client) Connect() error {
 	debugf("connect")
 	err := c.Client.Connect()
 	if err != nil {
 		return err
 	}
 
+	to := c.timeout
 	conn := redis.NewConn(c.Client, to, to)
 	defer func() {
 		if err != nil {
@@ -66,7 +84,7 @@ func (c *client) Connect(to time.Duration) error {
 	}()
 
 	if err = initRedisConn(conn, c.password, c.db); err == nil {
-		c.publish, err = makePublish(conn, c.key, c.dataType)
+		c.publish, err = c.makePublish(conn)
 	}
 	return err
 }
@@ -96,30 +114,40 @@ func (c *client) Close() error {
 	return c.Client.Close()
 }
 
-func (c *client) PublishEvent(data outputs.Data) error {
-	_, err := c.PublishEvents([]outputs.Data{data})
+func (c *client) Publish(batch publisher.Batch) error {
+	if c == nil {
+		panic("no client")
+	}
+	if batch == nil {
+		panic("no batch")
+	}
+
+	events := batch.Events()
+	c.observer.NewBatch(len(events))
+	rest, err := c.publish(c.key, events)
+	if rest != nil {
+		c.observer.Failed(len(rest))
+		batch.RetryEvents(rest)
+		return err
+	}
+
+	batch.ACK()
 	return err
 }
 
-func (c *client) PublishEvents(data []outputs.Data) ([]outputs.Data, error) {
-	return c.publish(c.key, data)
-}
-
-func makePublish(
+func (c *client) makePublish(
 	conn redis.Conn,
-	key outil.Selector,
-	dt redisDataType,
 ) (publishFn, error) {
-	if dt == redisChannelType {
-		return makePublishPUBLISH(conn)
+	if c.dataType == redisChannelType {
+		return c.makePublishPUBLISH(conn)
 	}
-	return makePublishRPUSH(conn, key)
+	return c.makePublishRPUSH(conn)
 }
 
-func makePublishRPUSH(conn redis.Conn, key outil.Selector) (publishFn, error) {
-	if !key.IsConst() {
+func (c *client) makePublishRPUSH(conn redis.Conn) (publishFn, error) {
+	if !c.key.IsConst() {
 		// TODO: more clever bulk handling batching events with same key
-		return publishEventsPipeline(conn, "RPUSH"), nil
+		return c.publishEventsPipeline(conn, "RPUSH"), nil
 	}
 
 	var major, minor int
@@ -158,23 +186,24 @@ func makePublishRPUSH(conn redis.Conn, key outil.Selector) (publishFn, error) {
 	// See: http://redis.io/commands/rpush
 	multiValue := major > 2 || (major == 2 && minor >= 4)
 	if multiValue {
-		return publishEventsBulk(conn, key, "RPUSH"), nil
+		return c.publishEventsBulk(conn, "RPUSH"), nil
 	}
-	return publishEventsPipeline(conn, "RPUSH"), nil
+	return c.publishEventsPipeline(conn, "RPUSH"), nil
 }
 
-func makePublishPUBLISH(conn redis.Conn) (publishFn, error) {
-	return publishEventsPipeline(conn, "PUBLISH"), nil
+func (c *client) makePublishPUBLISH(conn redis.Conn) (publishFn, error) {
+	return c.publishEventsPipeline(conn, "PUBLISH"), nil
 }
 
-func publishEventsBulk(conn redis.Conn, key outil.Selector, command string) publishFn {
+func (c *client) publishEventsBulk(conn redis.Conn, command string) publishFn {
 	// XXX: requires key.IsConst() == true
-	dest, _ := key.Select(common.MapStr{})
-	return func(_ outil.Selector, data []outputs.Data) ([]outputs.Data, error) {
+	dest, _ := c.key.Select(&beat.Event{Fields: common.MapStr{}})
+	return func(_ outil.Selector, data []publisher.Event) ([]publisher.Event, error) {
 		args := make([]interface{}, 1, len(data)+1)
 		args[0] = dest
 
-		data, args = serializeEvents(args, 1, data)
+		okEvents, args := serializeEvents(args, 1, data, c.index, c.codec)
+		c.observer.Dropped(len(data) - len(okEvents))
 		if (len(args) - 1) == 0 {
 			return nil, nil
 		}
@@ -183,27 +212,32 @@ func publishEventsBulk(conn redis.Conn, key outil.Selector, command string) publ
 		_, err := conn.Do(command, args...)
 		if err != nil {
 			logp.Err("Failed to %v to redis list with %v", command, err)
-			return data, err
+			return okEvents, err
+
 		}
 
+		c.observer.Acked(len(okEvents))
 		return nil, nil
 	}
 }
 
-func publishEventsPipeline(conn redis.Conn, command string) publishFn {
-	return func(key outil.Selector, data []outputs.Data) ([]outputs.Data, error) {
-		var okEvents []outputs.Data
+func (c *client) publishEventsPipeline(conn redis.Conn, command string) publishFn {
+	return func(key outil.Selector, data []publisher.Event) ([]publisher.Event, error) {
+		var okEvents []publisher.Event
 		serialized := make([]interface{}, 0, len(data))
-		okEvents, serialized = serializeEvents(serialized, 0, data)
+		okEvents, serialized = serializeEvents(serialized, 0, data, c.index, c.codec)
+		c.observer.Dropped(len(data) - len(okEvents))
 		if len(serialized) == 0 {
 			return nil, nil
 		}
 
 		data = okEvents[:0]
+		dropped := 0
 		for i, serializedEvent := range serialized {
-			eventKey, err := key.Select(okEvents[i].Event)
+			eventKey, err := key.Select(&okEvents[i].Content)
 			if err != nil {
 				logp.Err("Failed to set redis key: %v", err)
+				dropped++
 				continue
 			}
 
@@ -213,6 +247,7 @@ func publishEventsPipeline(conn redis.Conn, command string) publishFn {
 				return okEvents, err
 			}
 		}
+		c.observer.Dropped(dropped)
 
 		if err := conn.Flush(); err != nil {
 			return data, err
@@ -237,6 +272,8 @@ func publishEventsPipeline(conn redis.Conn, command string) publishFn {
 				}
 			}
 		}
+
+		c.observer.Acked(len(okEvents) - len(failed))
 		return failed, lastErr
 	}
 }
@@ -244,16 +281,22 @@ func publishEventsPipeline(conn redis.Conn, command string) publishFn {
 func serializeEvents(
 	to []interface{},
 	i int,
-	data []outputs.Data,
-) ([]outputs.Data, []interface{}) {
+	data []publisher.Event,
+	index string,
+	codec codec.Codec,
+) ([]publisher.Event, []interface{}) {
+
 	succeeded := data
 	for _, d := range data {
-		jsonEvent, err := json.Marshal(d.Event)
+		serializedEvent, err := codec.Encode(index, &d.Content)
 		if err != nil {
-			logp.Err("Failed to convert the event to JSON (%v): %#v", err, d.Event)
+			logp.Err("Encoding event failed with error: %v", err)
 			goto failLoop
 		}
-		to = append(to, jsonEvent)
+
+		buf := make([]byte, len(serializedEvent))
+		copy(buf, serializedEvent)
+		to = append(to, buf)
 		i++
 	}
 	return succeeded, to
@@ -262,13 +305,16 @@ failLoop:
 	succeeded = data[:i]
 	rest := data[i+1:]
 	for _, d := range rest {
-		jsonEvent, err := json.Marshal(d.Event)
+		serializedEvent, err := codec.Encode(index, &d.Content)
 		if err != nil {
-			logp.Err("Failed to convert the event to JSON (%v): %#v", err, d.Event)
+			logp.Err("Encoding event failed with error: %v", err)
 			i++
 			continue
 		}
-		to = append(to, jsonEvent)
+
+		buf := make([]byte, len(serializedEvent))
+		copy(buf, serializedEvent)
+		to = append(to, buf)
 		i++
 	}
 

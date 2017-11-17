@@ -6,6 +6,7 @@ import (
 	"strings"
 	"testing"
 
+	"github.com/elastic/beats/libbeat/tests/compose"
 	mbtest "github.com/elastic/beats/metricbeat/mb/testing"
 	"github.com/elastic/beats/metricbeat/module/redis"
 
@@ -16,6 +17,7 @@ import (
 var host = redis.GetRedisEnvHost() + ":" + redis.GetRedisEnvPort()
 
 func TestFetch(t *testing.T) {
+	compose.EnsureUp(t, "redis")
 
 	addEntry(t)
 
@@ -40,6 +42,8 @@ func TestFetch(t *testing.T) {
 }
 
 func TestData(t *testing.T) {
+	compose.EnsureUp(t, "redis")
+
 	addEntry(t)
 
 	f := mbtest.NewEventsFetcher(t, getConfig())

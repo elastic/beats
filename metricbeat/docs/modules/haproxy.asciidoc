@@ -3,15 +3,17 @@ This file is generated! See scripts/docs_collector.py
 ////
 
 [[metricbeat-module-haproxy]]
-== HAProxy Module
+== HAProxy module
 
-This is the haproxy Module.  To enable stats collection from HAProxy, you must enable the stats socket via TCP.
-For example, placing the following statement under the `global` or `default` section of the haproxy config:
+This module collects stats from http://www.haproxy.org/[HAProxy]. To configure
+HAProxy to collect stats, you must enable the stats socket via TCP. For example,
+to enable stats reporting via any local IP on port 14567, place this statement
+under the `global` or `default` section of the haproxy config:
 
 `stats socket 127.0.0.1:14567`
 
-will enable stats reporting via any local IP on port 14567.  Please note that you should probably use an internal private IP
-or secure this with a firewall rule so that only designated hosts can access this data.
+NOTE: You should use an internal private IP, or secure this with a firewall
+rule, so that only designated hosts can access this data.
 
 [float]
 === Compatibility
@@ -20,9 +22,9 @@ The HAProxy metricsets were tested with HAProxy 1.6 and are expected to work wit
 
 
 [float]
-=== Example Configuration
+=== Example configuration
 
-The haproxy module supports the standard configuration options that are described
+The HAProxy module supports the standard configuration options that are described
 in <<configuration-metricbeat>>. Here is an example configuration:
 
 [source,yaml]
@@ -30,7 +32,6 @@ in <<configuration-metricbeat>>. Here is an example configuration:
 metricbeat.modules:
 - module: haproxy
   metricsets: ["info", "stat"]
-  enabled: true
   period: 10s
   hosts: ["tcp://127.0.0.1:14567"]
 ----

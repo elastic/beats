@@ -1,46 +1,40 @@
 {
-    "@timestamp": "2016-05-23T08:05:34.853Z",
+    "@timestamp": "2017-10-12T08:05:34.853Z",
     "beat": {
         "hostname": "host.example.com",
         "name": "host.example.com"
     },
     "metricset": {
-        "host": "localhost",
         "module": "system",
         "name": "process",
         "rtt": 115
     },
     "system": {
         "process": {
-            "cmdline": "go test -tags=integration github.com/elastic/beats/metricbeat/module/... -data",
+            "cmdline": "/var/folders/k3/xlwbcsmj6dd7vjv2tg1d7c_40000gn/T/go-build217299100/github.com/elastic/beats/metricbeat/module/system/process/_test/process.test -data",
             "cpu": {
-                "start_time": "2016-09-06T07:33:04.000Z",
+                "start_time": "2017-10-12T10:41:40.406Z",
                 "total": {
-                    "pct": 0
+                    "norm": {
+                        "pct": 0.0226
+                    },
+                    "pct": 0.0902
                 }
-            },
-            "fd": {
-                "limit": {
-                    "hard": 1048576,
-                    "soft": 1048576
-                },
-                "open": 4
             },
             "memory": {
                 "rss": {
-                    "bytes": 13770752,
-                    "pct": 0.0016
+                    "bytes": 11612160,
+                    "pct": 0.0007
                 },
-                "share": 6594560,
-                "size": 232972288
+                "share": 0,
+                "size": 569977466880
             },
-            "name": "go",
-            "pgid": 1,
-            "pid": 1,
-            "ppid": 0,
-            "state": "sleeping",
-            "username": "root"
+            "name": "process.test",
+            "pgid": 10585,
+            "pid": 10731,
+            "ppid": 10585,
+            "state": "running",
+            "username": "ruflin"
         }
-    },
-    "type": "metricsets"
+    }
 }

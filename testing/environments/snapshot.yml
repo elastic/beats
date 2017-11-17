@@ -1,34 +1,39 @@
-# This should test the environment with the latest snapshots
-# This is based on base.yml
-version: '2'
+# This should start the environment with the latest snapshots.
+
+version: '2.1'
 services:
   elasticsearch:
+    extends:
+      file: ./args.yml
+      service: args
     build:
       context: ./docker/elasticsearch
       dockerfile: Dockerfile-snapshot
       args:
-        ELASTIC_VERSION: 6.0.0-alpha1-SNAPSHOT
-        ES_DOWNLOAD_URL: https://snapshots.elastic.co/downloads/elasticsearch
-        #XPACK: http://snapshots.elastic.co/downloads/packs/x-pack/x-pack-6.0.0-alpha1-SNAPSHOT.zip
+        XPACK: 1
     environment:
       - "ES_JAVA_OPTS=-Xms512m -Xmx512m"
       - "network.host="
       - "transport.host=127.0.0.1"
       - "http.host=0.0.0.0"
+      - "xpack.security.enabled=false"
 
   logstash:
+    extends:
+      file: ./args.yml
+      service: args
     build:
       context: ./docker/logstash
       dockerfile: Dockerfile
-      args:
-        LS_VERSION: 6.0.0-alpha1-SNAPSHOT
-        LS_DOWNLOAD_URL: https://snapshots.elastic.co/downloads/logstash
-
+    environment:
+      - ES_HOST=elasticsearch
 
   kibana:
+    extends:
+      file: ./args.yml
+      service: args
     build:
       context: ./docker/kibana
       dockerfile: Dockerfile-snapshot
-      args: [ ]
-        #KIBANA_DOWNLOAD_URL: https://snapshots.elastic.co/downloads/kibana/kibana-6.0.0-alpha1-SNAPSHOT-linux-x86_64.tar.gz
-        #X_PACK_URL: http://snapshots.elastic.co/downloads/kibana-plugins/x-pack/x-pack-6.0.0-alpha1-SNAPSHOT.zip
+      args:
+        XPACK: 1

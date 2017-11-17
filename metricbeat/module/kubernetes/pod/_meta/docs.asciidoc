@@ -1,0 +1,5 @@
+=== Kubernetes pod metricset
+
+beta[]
+
+This is the `pod` metricset of the Kubernetes module.

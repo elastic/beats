@@ -31,8 +31,6 @@ type MetricSet struct {
 
 // New creates a haproxy info MetricSet.
 func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
-	logp.Warn("EXPERIMENTAL: The %v %v metricset is experimental", base.Module().Name(), base.Name())
-
 	return &MetricSet{BaseMetricSet: base}, nil
 }
 

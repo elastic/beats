@@ -30,13 +30,12 @@ RUN \
     --no-install-recommends
 
 # Configure the container for OSX cross compilation
-# Configure the container for OSX cross compilation
 ENV OSX_SDK     MacOSX10.11.sdk
 ENV OSX_NDK_X86 /usr/local/osx-ndk-x86
 
 RUN \
-  OSX_SDK_PATH=https://s3.dockerproject.org/darwin/v2/$OSX_SDK.tar.xz && \
-  $FETCH $OSX_SDK_PATH dd228a335194e3392f1904ce49aff1b1da26ca62       && \
+  OSX_SDK_PATH=https://github.com/phracker/MacOSX-SDKs/releases/download/MacOSX10.11.sdk/MacOSX10.11.sdk.tar.xz && \
+  $FETCH $OSX_SDK_PATH f3430e3d923644e66c0c13f7a48754e7b6aa2e3f       && \
   \
   git clone https://github.com/tpoechtrager/osxcross.git && \
   mv `basename $OSX_SDK_PATH` /osxcross/tarballs/        && \

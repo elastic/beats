@@ -14,11 +14,19 @@ import (
 	"github.com/elastic/beats/libbeat/outputs/transport"
 )
 
+const (
+	gzipEncoding   = "gzip"
+	urlSchemaHTTP  = "http"
+	urlSchemaHTTPS = "https"
+)
+
+// SimpleTransport contains the dialer and read/write callbacks
 type SimpleTransport struct {
 	Dialer             transport.Dialer
 	DisableCompression bool
 
 	OnStartWrite func()
+	OnEndWrite   func()
 	OnStartRead  func()
 }
 
@@ -32,7 +40,7 @@ func (t *SimpleTransport) checkRequest(req *http.Request) error {
 	}
 
 	scheme := req.URL.Scheme
-	isHTTP := scheme == "http" || scheme == "https"
+	isHTTP := scheme == urlSchemaHTTP || scheme == urlSchemaHTTPS
 	if !isHTTP {
 		return fmt.Errorf("http: unsupported scheme %v", scheme)
 	}
@@ -43,6 +51,7 @@ func (t *SimpleTransport) checkRequest(req *http.Request) error {
 	return nil
 }
 
+// RoundTrip sets up goroutines to write the request and read the responses
 func (t *SimpleTransport) RoundTrip(req *http.Request) (*http.Response, error) {
 	type readReturn struct {
 		resp *http.Response
@@ -68,7 +77,7 @@ func (t *SimpleTransport) RoundTrip(req *http.Request) (*http.Response, error) {
 		req.Method != "HEAD" {
 
 		requestedGzip = true
-		req.Header.Add("Accept-Encoding", "gzip")
+		req.Header.Add("Accept-Encoding", gzipEncoding)
 		defer req.Header.Del("Accept-Encoding")
 	}
 
@@ -117,6 +126,7 @@ func (t *SimpleTransport) writeRequest(conn net.Conn, req *http.Request) error {
 	if err == nil {
 		err = writer.Flush()
 	}
+	t.sigEndWrite()
 	return err
 }
 
@@ -130,9 +140,10 @@ func (t *SimpleTransport) readResponse(
 	if err != nil {
 		return nil, err
 	}
+
 	t.sigStartRead()
 
-	if requestedGzip && resp.Header.Get("Content-Encoding") == "gzip" {
+	if requestedGzip && resp.Header.Get("Content-Encoding") == gzipEncoding {
 		resp.Header.Del("Content-Encoding")
 		resp.Header.Del("Content-Length")
 		resp.ContentLength = -1
@@ -152,14 +163,12 @@ func (t *SimpleTransport) readResponse(
 	return resp, nil
 }
 
-func (t *SimpleTransport) sigStartRead() {
-	if f := t.OnStartRead; f != nil {
-		f()
-	}
-}
+func (t *SimpleTransport) sigStartRead()  { call(t.OnStartRead) }
+func (t *SimpleTransport) sigStartWrite() { call(t.OnStartWrite) }
+func (t *SimpleTransport) sigEndWrite()   { call(t.OnEndWrite) }
 
-func (t *SimpleTransport) sigStartWrite() {
-	if f := t.OnStartWrite; f != nil {
+func call(f func()) {
+	if f != nil {
 		f()
 	}
 }

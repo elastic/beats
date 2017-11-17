@@ -3,26 +3,27 @@ This file is generated! See scripts/docs_collector.py
 ////
 
 [[metricbeat-module-kafka]]
-== kafka Module
+== Kafka module
 
-This is the kafka Module.
+beta[]
+
+This is the Kafka module.
 
 
 
 [float]
-=== Example Configuration
+=== Example configuration
 
-The kafka module supports the standard configuration options that are described
+The Kafka module supports the standard configuration options that are described
 in <<configuration-metricbeat>>. Here is an example configuration:
 
 [source,yaml]
 ----
 metricbeat.modules:
-#- module: kafka
-  #metricsets: ["partition"]
-  #enabled: true
-  #period: 10s
-  #hosts: ["localhost:9092"]
+- module: kafka
+  metricsets: ["partition"]
+  period: 10s
+  hosts: ["localhost:9092"]
 
   #client_id: metricbeat
   #retries: 3
@@ -51,7 +52,11 @@ metricbeat.modules:
 
 The following metricsets are available:
 
+* <<metricbeat-metricset-kafka-consumergroup,consumergroup>>
+
 * <<metricbeat-metricset-kafka-partition,partition>>
+
+include::kafka/consumergroup.asciidoc[]
 
 include::kafka/partition.asciidoc[]
 

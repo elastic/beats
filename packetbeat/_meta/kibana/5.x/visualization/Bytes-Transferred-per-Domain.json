@@ -1,0 +1,11 @@
+{
+  "visState": "{\"title\":\"Bytes Transferred per Domain\",\"type\":\"histogram\",\"params\":{\"shareYAxis\":true,\"addTooltip\":true,\"addLegend\":true,\"scale\":\"linear\",\"mode\":\"grouped\",\"times\":[],\"addTimeMarker\":false,\"defaultYExtents\":true,\"setYExtents\":false,\"yAxis\":{},\"legendPosition\":\"right\"},\"aggs\":[{\"id\":\"1\",\"enabled\":true,\"type\":\"sum\",\"schema\":\"metric\",\"params\":{\"field\":\"bytes_out\",\"customLabel\":\"Bytes Out\"}},{\"id\":\"2\",\"enabled\":true,\"type\":\"terms\",\"schema\":\"segment\",\"params\":{\"field\":\"dns.question.etld_plus_one\",\"size\":20,\"order\":\"desc\",\"orderBy\":\"1\",\"customLabel\":\"Domains\"}},{\"id\":\"3\",\"enabled\":true,\"type\":\"sum\",\"schema\":\"metric\",\"params\":{\"field\":\"bytes_in\",\"customLabel\":\"Bytes In\"}}],\"listeners\":{}}", 
+  "description": "", 
+  "title": "Bytes Transferred per Domain", 
+  "uiStateJSON": "{\"vis\":{\"colors\":{\"Unique count of dns.question.name\":\"#E0752D\",\"Count\":\"#1F78C1\",\"Bytes Out\":\"#629E51\",\"Bytes In\":\"#F2C96D\"}}}", 
+  "version": 1, 
+  "savedSearchId": "DNS", 
+  "kibanaSavedObjectMeta": {
+    "searchSourceJSON": "{\"filter\":[]}"
+  }
+}

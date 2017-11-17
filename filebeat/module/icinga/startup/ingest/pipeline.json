@@ -1,0 +1,26 @@
+{
+  "description": "Pipeline for parsing icinga startup logs",
+  "processors": [{
+    "grok": {
+      "field": "message",
+      "patterns":[
+        "%{WORD:icinga.startup.severity}/%{WORD:icinga.startup.facility}: %{GREEDYMULTILINE:icinga.startup.message}"
+      ],
+      "ignore_missing": true,
+      "pattern_definitions": {
+        "GREEDYMULTILINE": "(.|\n)*"
+      }
+    }
+  },
+  {
+    "remove": {
+      "field": "message"
+    }
+  }],
+  "on_failure" : [{
+    "set" : {
+      "field" : "error.message",
+      "value" : "{{ _ingest.on_failure_message }}"
+    }
+  }]
+}

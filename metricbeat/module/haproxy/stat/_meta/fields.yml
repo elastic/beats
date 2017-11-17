@@ -1,75 +1,75 @@
 - name: stat
   type: group
   description: >
-    Stats collected from HAProxy process
+    Stats collected from HAProxy processes.
   fields:
 
     - name: status
       type: keyword
       description: >
-        status (UP/DOWN/NOLB/MAINT/MAINT(via)...)
+        Status (UP, DOWN, NOLB, MAINT, or MAINT(via)...).
 
     - name: weight
       type: long
       description: >
-        total weight (backend), server weight (server)
+        Total weight (for backends), or server weight (for servers).
 
     - name: downtime
       type: long
       description: >
-        total downtime (in seconds). The value for the backend
-        is the downtime for the whole backend, not the sum of the server downtime.
+        Total downtime (in seconds). For backends, this value is the downtime
+        for the whole backend, not the sum of the downtime for the servers.
 
     - name: component_type
       type: integer
       description: >
-        (0=frontend, 1=backend, 2=server, 3=socket/listener)
+        Component type (0=frontend, 1=backend, 2=server, or 3=socket/listener).
 
     - name: process_id
       type: integer
       description: >
-        process id (0 for first instance, 1 for second, ...)
+        Process ID (0 for first instance, 1 for second, and so on).
 
     - name: service_name
       type: keyword
       description: >
-        service name (FRONTEND for frontend, BACKEND for backend, any name for server/listener)
+        Service name (FRONTEND for frontend, BACKEND for backend, or any name for server/listener).
 
     - name: in.bytes
       type: long
       format: bytes
       description: >
-        bytes in
+        Bytes in.
 
     - name: out.bytes
       type: long
       format: bytes
       description: >
-        bytes out
+        Bytes out.
 
     - name: last_change
       type: integer
       description: >
-        number of seconds since the last UP<->DOWN transition
+        Number of seconds since the last UP->DOWN or DOWN->UP transition.
 
     - name: throttle.pct
       type: scaled_float
       format: percentage
       description: >
-        current throttle percentage for the server, when
-        slowstart is active, or no value if not in slowstart.
+        Current throttle percentage for the server when slowstart
+        is active, or no value if slowstart is inactive.
 
     - name: selected.total
       type: long
       description: >
-        total number of times a server was selected, either for new
-        sessions, or when re-dispatching. The server counter is the number
-        of times that server was selected.
+        Total number of times a server was selected, either for new
+        sessions, or when re-dispatching. For servers, this field reports the
+        the number of times the server was selected.
 
     - name: tracked.id
       type: long
       description: >
-        id of proxy/server if tracking is enabled.
+        ID of the proxy/server if tracking is enabled.
 
     - name: connection
       type: group
@@ -78,17 +78,17 @@
         - name: total
           type: long
           description: >
-            cumulative number of connections
+            Cumulative number of connections.
 
         - name: retried
           type: long
           description: >
-            number of times a connection to a server was retried.
+            Number of times a connection to a server was retried.
 
         - name: time.avg
           type: long
           description: >
-            the average connect time in ms over the 1024 last requests
+            Average connect time in ms over the last 1024 requests.
 
     - name: request
       type: group
@@ -97,25 +97,28 @@
         - name: denied
           type: long
           description: >
-            requests denied because of security concerns.
-              * For tcp this is because of a matched tcp-request content rule.
-              * For http this is because of a matched http-request or tarpit rule.
+            Requests denied because of security concerns.
+            
+              * For TCP this is because of a matched tcp-request content rule.
+              * For HTTP this is because of a matched http-request or tarpit rule.
 
         - name: queued.current
           type: long
           description: >
-            current queued requests. For the backend this reports the number queued without a server assigned
+            Current queued requests. For backends, this field reports the number
+            of requests queued without a server assigned.
 
         - name: queued.max
           type: long
           description: >
-            max value of queued.current
+            Maximum value of queued.current.
 
         - name: errors
           type: long
           description: >
-            request errors. Some of the possible causes are:
-              * early termination from the client, before the request has been sent.
+            Request errors. Some of the possible causes are:
+            
+              * early termination from the client, before the request has been sent
               * read error from the client
               * client timeout
               * client closed connection
@@ -125,16 +128,16 @@
         - name: redispatched
           type: long
           description: >
-            number of times a request was redispatched to another
-            server. The server value counts the number of times that server was
+            Number of times a request was redispatched to another server. For
+            servers, this field reports the number of times the server was
             switched away from.
 
         - name: connection.errors
           type: long
           description: >
-            number of requests that encountered an error trying to
-            connect to a backend server. The backend stat is the sum of the stat
-            for all servers of that backend, plus any connection errors not
+            Number of requests that encountered an error trying to
+            connect to a server. For backends, this field reports the sum of
+            the stat for all backend servers, plus any connection errors not
             associated with a particular server (such as the backend having no
             active servers).
 
@@ -145,16 +148,16 @@
             - name: value
               type: long
               description: >
-                HTTP requests per second over last elapsed second
+                Number of HTTP requests per second over the last elapsed second.
             - name: max
               type: long
               description: >
-                max number of HTTP requests per second observed
+                Maximum number of HTTP requests per second.
 
         - name: total
           type: long
           description: >
-            total number of HTTP requests received
+            Total number of HTTP requests received.
 
 
     - name: response
@@ -164,22 +167,24 @@
         - name: errors
           type: long
           description: >
-            response errors. srv_abrt will be counted here also.
+            Number of response errors. This value includes the number of data
+            transfers aborted by the server (haproxy.stat.server.aborted). 
             Some other errors are:
-            * write error on the client socket (won't be counted for the server stat)
-            * failure applying filters to the respons
+
+            * write errors on the client socket (won't be counted for the server stat)
+            * failure applying filters to the response
 
 
         - name: time.avg
           type: long
           description: >
-            the average response time in ms over the 1024 last requests (0 for TCP)
+            Average response time in ms over the last 1024 requests (0 for TCP).
 
         - name: denied
           type: integer
           description: >
-            responses denied because of security concerns.
-              * For http this is because of a matched http-request rule, or "option checkcache".
+            Responses denied because of security concerns. For HTTP this is
+            because of a matched http-request rule, or "option checkcache".
 
         - name: http
           type: group
@@ -189,32 +194,32 @@
             - name: 1xx
               type: long
               description: >
-                http responses with 1xx code
+                HTTP responses with 1xx code.
 
             - name: 2xx
               type: long
               description: >
-                http responses with 2xx code
+                HTTP responses with 2xx code.
 
             - name: 3xx
               type: long
               description: >
-                http responses with 3xx code
+                HTTP responses with 3xx code.
 
             - name: 4xx
               type: long
               description: >
-                http responses with 4xx code
+                HTTP responses with 4xx code.
 
             - name: 5xx
               type: long
               description: >
-                http responses with 5xx code
+                HTTP responses with 5xx code.
 
             - name: other
               type: long
               description: >
-                http responses with other codes (protocol error)
+                HTTP responses with other codes (protocol error).
 
 
     - name: session
@@ -224,17 +229,17 @@
         - name: current
           type: long
           description: >
-            current sessions
+            Number of current sessions.
 
         - name: max
           type: long
           description: >
-            max sessions
+            Maximum number of sessions.
 
         - name: limit
           type: long
           description: >
-            configured session limit
+            Configured session limit.
 
         - name: rate
           type: group
@@ -242,17 +247,17 @@
             - name: value
               type: integer
               description: >
-                number of sessions per second over last elapsed second
+                Number of sessions per second over the last elapsed second.
 
             - name: limit
               type: integer
               description: >
-                configured limit on new sessions per second
+                Configured limit on new sessions per second.
 
             - name: max
               type: integer
               description: >
-                max number of new sessions per second
+                Maximum number of new sessions per second.
 
 
     - name: check
@@ -263,7 +268,8 @@
         - name: status
           type: keyword
           description: >
-            status of last health check, one of:
+            Status of the last health check. One of:
+            
               UNK     -> unknown
               INI     -> initializing
               SOCKERR -> socket error
@@ -284,20 +290,22 @@
         - name: code
           type: long
           description: >
-            layer5-7 code, if available
+            Layer 5-7 code, if available.
 
         - name: duration
           type: long
           description: >
-            time in ms took to finish last health check
+            Time in ms that it took to finish the last health check.
 
         - name: health.last
-          type: long
+          type: keyword
           description: >
+            The result of the last health check.
 
         - name: health.fail
           type: long
           description: >
+            Number of failed checks.
 
         - name: agent.last
           type: integer
@@ -306,20 +314,19 @@
         - name: failed
           type: long
           description: >
-            number of failed checks. (Only counts checks failed when
-            the server is up.)
+            Number of checks that failed while the server was up.
 
         - name: down
           type: long
           description: >
-            number of UP->DOWN transitions. The backend counter counts
-            transitions to the whole backend being down, rather than the sum of the
-            counters for each server.
+            Number of UP->DOWN transitions. For backends, this value is the
+            number of transitions to the whole backend being down, rather than
+            the sum of the transitions for each server.
 
     - name: client.aborted
       type: integer
       description: >
-        number of data transfers aborted by the client
+        Number of data transfers aborted by the client.
 
 
     - name: server
@@ -330,22 +337,24 @@
         - name: id
           type: integer
           description: >
-            server id (unique inside a proxy)
+            Server ID (unique inside a proxy).
 
         - name: aborted
           type: integer
           description: >
-            number of data transfers aborted by the server (inc. in eresp)
+            Number of data transfers aborted by the server. This value is
+            included in haproxy.stat.response.errors.
 
         - name: active
           type: integer
           description: >
-            number of active servers (backend), server is active (server)
+            Number of backend servers that are active, meaning that they are
+            healthy and can receive requests from the load balancer. 
 
         - name: backup
           type: integer
           description: >
-            number of backup servers (backend), server is backup (server)
+            Number of backend servers that are backup servers.
 
 
     - name: compressor
@@ -357,25 +366,25 @@
           type: long
           format: bytes
           description: >
-            number of HTTP response bytes fed to the compressor
+            Number of HTTP response bytes fed to the compressor.
 
         - name: out.bytes
           type: integer
           format: bytes
           description: >
-            number of HTTP response bytes emitted by the compressor
+            Number of HTTP response bytes emitted by the compressor.
 
         - name: bypassed.bytes
           type: long
           format: bytes
           description: >
-            number of bytes that bypassed the HTTP compressor (CPU/BW limit)
+            Number of bytes that bypassed the HTTP compressor (CPU/BW limit).
 
         - name: response.bytes
           type: long
           format: bytes
           description: >
-            number of HTTP responses that were compressed
+            Number of HTTP responses that were compressed.
 
     - name: proxy
       type: group
@@ -385,12 +394,12 @@
         - name: id
           type: integer
           description: >
-            unique proxy id
+            Unique proxy ID.
 
         - name: name
           type: keyword
           description: >
-            proxy name
+            Proxy name.
 
 
     - name: queue
@@ -401,13 +410,13 @@
         - name: limit
           type: integer
           description: >
-            configured maxqueue for the server, or nothing in the
-            value is 0 (default, meaning no limit)
+            Configured queue limit (maxqueue) for the server, or nothing if the
+            value of maxqueue is 0 (meaning no limit).
 
         - name: time.avg
           type: integer
           description: >
-            the average queue time in ms over the 1024 last requests
+            The average queue time in ms over the last 1024 requests.
 
 
 

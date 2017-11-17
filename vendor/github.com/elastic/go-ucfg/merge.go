@@ -5,6 +5,8 @@ import (
 	"reflect"
 	"regexp"
 	"time"
+	"unicode"
+	"unicode/utf8"
 )
 
 // Merge a map, a slice, a struct or another Config object into c.
@@ -40,6 +42,9 @@ import (
 //  // struct, a slice, an array, a map or of type *Config)
 //  Field map[string]interface{} `config:",inline"`
 //
+//  // field is ignored by Merge
+//  Field string `config:",ignore"`
+//
 //
 // Returns an error if merging fails to normalize and validate the from value.
 // If duplicate setting names are detected in the input, merging fails as well.
@@ -48,6 +53,11 @@ import (
 // well. Passing cyclic structures to Merge will result in an infinite recursive
 // loop.
 func (c *Config) Merge(from interface{}, options ...Option) error {
+	// from is empty in case of empty config file
+	if from == nil {
+		return nil
+	}
+
 	opts := makeOptions(options)
 	other, err := normalize(opts, from)
 
@@ -71,27 +81,13 @@ func mergeConfigDict(opts *options, to, from *Config) Error {
 			field:  k,
 		}
 
-		old, ok := to.fields.get(k)
-		if !ok {
-			to.fields.set(k, v.cpy(ctx))
-			continue
-		}
-
-		subOld, err := old.toConfig(opts)
+		old, _ := to.fields.get(k)
+		merged, err := mergeValues(opts, old, v)
 		if err != nil {
-			to.fields.set(k, v.cpy(ctx))
-			continue
-		}
-
-		subFrom, err := v.toConfig(opts)
-		if err != nil {
-			to.fields.set(k, v.cpy(ctx))
-			continue
-		}
-
-		if err := mergeConfig(opts, subOld, subFrom); err != nil {
 			return err
 		}
+
+		to.fields.set(k, merged.cpy(ctx))
 	}
 	return nil
 }
@@ -109,23 +105,13 @@ func mergeConfigArr(opts *options, to, from *Config) Error {
 			field:  fmt.Sprintf("%v", i),
 		}
 
-		v := from.fields.array()[i]
-
 		old := to.fields.array()[i]
-		subOld, err := old.toConfig(opts)
+		v := from.fields.array()[i]
+		merged, err := mergeValues(opts, old, v)
 		if err != nil {
-			to.fields.setAt(i, cfgSub{to}, v.cpy(ctx))
-			continue
-		}
-
-		subFrom, err := v.toConfig(opts)
-		if err != nil {
-			to.fields.setAt(i, cfgSub{to}, v.cpy(ctx))
-		}
-
-		if err := mergeConfig(opts, subOld, subFrom); err != nil {
 			return err
 		}
+		to.fields.setAt(i, cfgSub{to}, merged.cpy(ctx))
 	}
 
 	end := len(from.fields.array())
@@ -144,6 +130,30 @@ func mergeConfigArr(opts *options, to, from *Config) Error {
 	}
 
 	return nil
+}
+
+func mergeValues(opts *options, old, v value) (value, Error) {
+	if old == nil {
+		return v, nil
+	}
+
+	// check if new and old value evaluate to sub-configurations. If one is no
+	// sub-configuration, use new value only.
+	subOld, err := old.toConfig(opts)
+	if err != nil {
+		return v, nil
+	}
+	subV, err := v.toConfig(opts)
+	if err != nil {
+		return v, nil
+	}
+
+	// merge new and old evaluated sub-configurations and return subOld for
+	// reassigning to old key in case of subOld being generated dynamically
+	if err := mergeConfig(opts, subOld, subV); err != nil {
+		return nil, err
+	}
+	return cfgSub{subOld}, nil
 }
 
 // convert from into normalized *Config checking for errors
@@ -179,7 +189,7 @@ func normalize(opts *options, from interface{}) (*Config, Error) {
 
 	}
 
-	return nil, raiseInvalidTopLevelType(from)
+	return nil, raiseInvalidTopLevelType(from, opts.meta)
 }
 
 func normalizeMap(opts *options, from reflect.Value) (*Config, Error) {
@@ -227,7 +237,16 @@ func normalizeStructInto(cfg *Config, opts *options, from reflect.Value) Error {
 	for i := 0; i < numField; i++ {
 		var err Error
 		stField := v.Type().Field(i)
+
+		// ignore non exported fields
+		if rune, _ := utf8.DecodeRuneInString(stField.Name); !unicode.IsUpper(rune) {
+			continue
+		}
+
 		name, tagOpts := parseTags(stField.Tag.Get(opts.tag))
+		if tagOpts.ignore {
+			continue
+		}
 
 		if tagOpts.squash {
 			vField := chaseValue(v.Field(i))

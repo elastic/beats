@@ -1,3 +1,4 @@
-=== prometheus stats MetricSet
+=== Prometheus stats metricset
 
-This is the stats metricset of the module prometheus.
+The Prometheus `stats` metricset collects statistics about the Prometheus
+server.

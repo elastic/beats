@@ -1,13 +1,11 @@
-- input_type: log
-  paths:
-  {%- for path in paths %}
-   - {{path}}
-  {%- endfor %}
-  exclude_files: [".gz$"]
-  multiline:
-    pattern: "^# User@Host: "
-    negate: true
-    match: after
-  fields:
-    source_type: mysql-slowlog
-    pipeline_id: {{beat.pipeline_id}}
+type: log
+paths:
+{{ range $i, $path := .paths }}
+ - {{$path}}
+{{ end }}
+exclude_files: ['.gz$']
+multiline:
+  pattern: '^# User@Host: '
+  negate: true
+  match: after
+exclude_lines: ['^[\/\w\.]+, Version: .* started with:.*']   # Exclude the header

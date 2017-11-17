@@ -2,6 +2,7 @@ import yaml
 import os
 import argparse
 
+
 def document_fields(output, section, sections, path):
     if "anchor" in section:
         output.write("[[exported-fields-{}]]\n".format(section["anchor"]))
@@ -14,7 +15,7 @@ def document_fields(output, section, sections, path):
         output.write("[float]\n")
 
     if "description" in section:
-        output.write("== {} Fields\n\n".format(section["name"]))
+        output.write("== {} fields\n\n".format(section["name"]))
         output.write("{}\n\n".format(section["description"]))
 
     if "fields" not in section or not section["fields"]:
@@ -39,7 +40,7 @@ def document_field(output, field, path):
     if "path" not in field:
         field["path"] = path
 
-    output.write("[float]\n=== {}\n\n".format(field["path"]))
+    output.write("[float]\n=== `{}`\n\n".format(field["path"]))
 
     if "type" in field:
         output.write("type: {}\n\n".format(field["type"]))
@@ -53,6 +54,14 @@ def document_field(output, field, path):
     if "description" in field:
         output.write("{}\n\n".format(field["description"]))
 
+    if "index" in field:
+        if not field["index"]:
+            output.write("{}\n\n".format("Field is not indexed."))
+
+    if "enable" in field:
+        if not field["enable"]:
+            output.write("{}\n\n".format("Object is not enabled."))
+
 
 def fields_to_asciidoc(input, output, beat):
 
@@ -64,7 +73,7 @@ This file is generated! See _meta/fields.yml and scripts/generate_field_docs.py
 ////
 
 [[exported-fields]]
-= Exported Fields
+= Exported fields
 
 [partintro]
 
@@ -73,7 +82,6 @@ This document describes the fields that are exported by {beat}. They are
 grouped in the following categories:
 
 """.format(**dict))
-
 
     docs = yaml.load(input)
 
@@ -84,51 +92,47 @@ grouped in the following categories:
 
     # Create sections from available fields
     sections = {}
-    for v in docs["fields"]:
+    for v in docs:
         sections[v["key"]] = v["title"]
 
-    for key in sorted(sections):
-        output.write("* <<exported-fields-{}>>\n".format(key))
+    for section in sorted(docs, key=lambda field: field["key"]):
+        if "anchor" not in section:
+            section["anchor"] = section["key"]
+
+        output.write("* <<exported-fields-{}>>\n".format(section["anchor"]))
     output.write("\n--\n")
 
     # Sort alphabetically by key
-    for section in sorted(docs["fields"], key=lambda field: field["key"]):
+    for section in sorted(docs, key=lambda field: field["key"]):
         section["name"] = section["title"]
-        section["anchor"] = section["key"]
+        if "anchor" not in section:
+            section["anchor"] = section["key"]
         document_fields(output, section, sections, "")
 
-if __name__ == "__main__":
 
+if __name__ == "__main__":
 
     parser = argparse.ArgumentParser(
         description="Generates the documentation for a Beat.")
     parser.add_argument("path", help="Path to the beat folder")
-    parser.add_argument("beatname", help="The beat name")
+    parser.add_argument("beattitle", help="The beat title")
     parser.add_argument("es_beats", help="The path to the general beats folder")
 
     args = parser.parse_args()
 
     beat_path = args.path
-    beat_name = args.beatname
+    beat_title = args.beattitle
     es_beats = args.es_beats
 
-    fields_yml = beat_path + "/_meta/fields.generated.yml"
-
-    # Not all beats have a fields.generated.yml. Fall back to fields.yml
-    if not os.path.isfile(fields_yml):
-        fields_yml = beat_path + "/_meta/fields.yml"
+    fields_yml = beat_path + "/fields.yml"
 
     # Read fields.yml
     with open(fields_yml) as f:
         fields = f.read()
 
-    # Prepends beat fields from libbeat
-    with open(es_beats + "/libbeat/_meta/fields.generated.yml") as f:
-        fields = f.read() + fields
-
     output = open(beat_path + "/docs/fields.asciidoc", 'w')
 
     try:
-        fields_to_asciidoc(fields, output, beat_name.title())
+        fields_to_asciidoc(fields, output, beat_title)
     finally:
         output.close()

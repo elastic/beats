@@ -6,17 +6,17 @@ import (
 	"fmt"
 	"runtime"
 
+	"github.com/pkg/errors"
+
 	"github.com/elastic/beats/libbeat/common"
 	"github.com/elastic/beats/libbeat/logp"
 	"github.com/elastic/beats/metricbeat/mb"
 	"github.com/elastic/beats/metricbeat/mb/parse"
 	"github.com/elastic/beats/metricbeat/module/system"
-
 	"github.com/elastic/gosigar/cgroup"
-	"github.com/pkg/errors"
 )
 
-var debugf = logp.MakeDebug("system-process")
+var debugf = logp.MakeDebug("system.process")
 
 func init() {
 	if err := mb.Registry.AddMetricSet("system", "process", New, parse.EmptyHostParser); err != nil {
@@ -27,20 +27,14 @@ func init() {
 // MetricSet that fetches process metrics.
 type MetricSet struct {
 	mb.BaseMetricSet
-	stats  *ProcStats
-	cgroup *cgroup.Reader
+	stats        *ProcStats
+	cgroup       *cgroup.Reader
+	cacheCmdLine bool
 }
 
 // New creates and returns a new MetricSet.
 func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
-	config := struct {
-		Procs   []string `config:"processes"` // collect all processes by default
-		Cgroups bool     `config:"cgroups"`
-	}{
-		Procs:   []string{".*"},
-		Cgroups: false,
-	}
-
+	config := defaultConfig
 	if err := base.Module().UnpackConfig(&config); err != nil {
 		return nil, err
 	}
@@ -48,7 +42,11 @@ func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
 	m := &MetricSet{
 		BaseMetricSet: base,
 		stats: &ProcStats{
-			Procs: config.Procs,
+			Procs:        config.Procs,
+			EnvWhitelist: config.EnvWhitelist,
+			CpuTicks:     config.IncludeCPUTicks || (config.CPUTicks != nil && *config.CPUTicks),
+			CacheCmdLine: config.CacheCmdLine,
+			IncludeTop:   config.IncludeTop,
 		},
 	}
 	err := m.stats.InitProcStats()
@@ -62,11 +60,15 @@ func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
 			return nil, fmt.Errorf("unexpected module type")
 		}
 
-		if config.Cgroups {
-			logp.Warn("EXPERIMENTAL: Cgroup is enabled for the system.process MetricSet.")
+		if config.Cgroups == nil || *config.Cgroups {
+			debugf("process cgroup data collection is enabled, using hostfs='%v'", systemModule.HostFS)
 			m.cgroup, err = cgroup.NewReader(systemModule.HostFS, true)
 			if err != nil {
-				return nil, errors.Wrap(err, "error initializing cgroup reader")
+				if err == cgroup.ErrCgroupsMissing {
+					logp.Warn("cgroup data collection will be disabled: %v", err)
+				} else {
+					return nil, errors.Wrap(err, "error initializing cgroup reader")
+				}
 			}
 		}
 	}

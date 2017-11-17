@@ -1,0 +1,20 @@
+- name: syslog
+  type: group
+  description: >
+    Contains fields from the syslog system logs.
+  fields:
+    - name: timestamp
+      description: >
+        The timestamp as read from the syslog message.
+    - name: hostname
+      description: >
+        The hostname as read from the syslog message.
+    - name: program
+      description: >
+        The process name as read from the syslog message.
+    - name: pid
+      description: >
+        The PID of the process that sent the syslog message.
+    - name: message
+      description: >
+        The message in the log line.

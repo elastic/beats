@@ -9,10 +9,10 @@ import (
 	"path/filepath"
 	"testing"
 
-	mbtest "github.com/elastic/beats/metricbeat/mb/testing"
+	"github.com/stretchr/testify/assert"
 
 	"github.com/elastic/beats/libbeat/common"
-	"github.com/stretchr/testify/assert"
+	mbtest "github.com/elastic/beats/metricbeat/mb/testing"
 )
 
 func TestFetchEventContents(t *testing.T) {
@@ -21,7 +21,7 @@ func TestFetchEventContents(t *testing.T) {
 	response, err := ioutil.ReadFile(absPath + "/sample_response.json")
 	server := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		w.WriteHeader(200)
-		w.Header().Set("Content-Type", "appication/json;")
+		w.Header().Set("Content-Type", "application/json;")
 		w.Write([]byte(response))
 	}))
 	defer server.Close()

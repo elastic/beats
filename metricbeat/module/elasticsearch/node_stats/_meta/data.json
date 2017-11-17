@@ -1,0 +1,118 @@
+{
+    "@timestamp": "2016-05-23T08:05:34.853Z",
+    "elasticsearch": {
+        "node": {
+            "stats": {
+                "jvm": {
+                    "mem": {
+                        "pools": {
+                            "young": {
+                                "used": {
+                                    "bytes": 125648960
+                                },
+                                "max": {
+                                    "bytes": 139591680
+                                },
+                                "peak": {
+                                    "bytes": 139591680
+                                },
+                                "peak_max": {
+                                    "bytes": 139591680
+                                }
+                            },
+                            "survivor": {
+                                "peak_max": {
+                                    "bytes": 17432576
+                                },
+                                "used": {
+                                    "bytes": 12279056
+                                },
+                                "max": {
+                                    "bytes": 17432576
+                                },
+                                "peak": {
+                                    "bytes": 17432568
+                                }
+                            },
+                            "old": {
+                                "used": {
+                                    "bytes": 176528696
+                                },
+                                "max": {
+                                    "bytes": 362414080
+                                },
+                                "peak": {
+                                    "bytes": 176528696
+                                },
+                                "peak_max": {
+                                    "bytes": 362414080
+                                }
+                            }
+                        }
+                    },
+                    "gc": {
+                        "collectors": {
+                            "old": {
+                                "collection": {
+                                    "count": 3,
+                                    "ms": 693
+                                }
+                            },
+                            "young": {
+                                "collection": {
+                                    "ms": 10691,
+                                    "count": 209
+                                }
+                            }
+                        }
+                    }
+                },
+                "indices": {
+                    "docs": {
+                        "deleted": 42,
+                        "count": 3093
+                    },
+                    "store": {
+                        "size": {
+                            "bytes": 2062479
+                        }
+                    },
+                    "segments": {
+                        "count": 17,
+                        "memory": {
+                            "bytes": 179535
+                        }
+                    }
+                },
+                "fs": {
+                    "summary": {
+                        "total": {
+                            "bytes": 67371577344
+                        },
+                        "free": {
+                            "bytes": 56422297600
+                        },
+                        "available": {
+                            "bytes": 52969598976
+                        }
+                    }
+                }
+            },
+            "name": "2jwM3tNWSr6tFlL8fLKtSg"
+        },
+        "cluster": {
+            "name": "elasticsearch"
+        }
+    },
+    "metricset": {
+        "rtt": 115,
+        "namespace": "node.stats",
+        "module": "elasticsearch",
+        "name": "node_stats",
+        "host": "127.0.0.1:9200"
+    },
+    "beat": {
+        "hostname": "host.example.com",
+        "name": "host.example.com"
+    }
+}

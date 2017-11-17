@@ -2,8 +2,8 @@ package status
 
 import (
 	"github.com/elastic/beats/libbeat/common"
-	s "github.com/elastic/beats/metricbeat/schema"
-	c "github.com/elastic/beats/metricbeat/schema/mapstrstr"
+	s "github.com/elastic/beats/libbeat/common/schema"
+	c "github.com/elastic/beats/libbeat/common/schema/mapstrstr"
 )
 
 var (
@@ -49,6 +49,12 @@ var (
 			"tables":  c.Int("Open_tables"),
 		},
 		"opened_tables": c.Int("Opened_tables"),
+		"command": s.Object{
+			"delete": c.Int("Com_delete"),
+			"insert": c.Int("Com_insert"),
+			"select": c.Int("Com_select"),
+			"update": c.Int("Com_update"),
+		},
 	}
 )
 
@@ -59,7 +65,8 @@ func eventMapping(status map[string]string) common.MapStr {
 	for key, val := range status {
 		source[key] = val
 	}
-	return schema.Apply(source)
+	data, _ := schema.Apply(source)
+	return data
 }
 
 func rawEventMapping(status map[string]string) common.MapStr {

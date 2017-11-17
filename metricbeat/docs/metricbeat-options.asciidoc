@@ -1,0 +1,202 @@
+[[configuration-metricbeat]]
+== Specify which modules to run
+
+Metricbeat provides a couple different ways to enable modules and metricsets:
+
+* <<enable-modules-d-configs>>
+* <<enable-modules-config-file>>
+
+include::../../libbeat/docs/shared-note-file-permissions.asciidoc[]
+
+[float]
+[[enable-modules-d-configs]]
+=== Enable module configs in the `modules.d` directory
+
+The `modules.d` directory contains default configurations for all the modules
+available in Metricbeat. You can enable or disable specific module
+configurations  under `modules.d` by running the <<modules-command,`modules
+enable` or `modules disable`>> commands.
+
+For example, to enable the `apache` and `mysql` configs in the `modules.d`
+directory, you use:
+
+[source,shell]
+----
+./metricbeat modules enable apache mysql
+----
+
+Then when you run Metricbeat, it loads the corresponding module configurations
+specified in the `modules.d` directory (for example, `modules.d/apache.yml` and
+`modules.d/mysql.yml`).
+
+To see a list of enabled and disabled modules, run:
+
+[source,shell]
+----
+./metricbeat modules list
+----
+
+You can change the default module configurations by modifying the `.yml` files
+in the `modules.d` directory. 
+
+The following example shows a basic configuration for the Apache module:
+
+[source,yaml]
+----
+- module: apache
+  metricsets: ["status"]
+  hosts: ["http://127.0.0.1/"]
+  period: 10s
+  fields:
+    dc: west
+  tags: ["tag"]
+  processors:
+  ....
+----
+
+
+See <<config-combos>> for additional configuration examples.
+
+[float]
+[[enable-modules-config-file]]
+=== Enable module configs in the +{beatname_lc}.yml+ file
+
+
+When possible, you should use the config files in the `modules.d` directory.
+
+However, enabling modules directly in the config file is a practical approach if
+you have upgraded from a previous version of {beatname_uc} and don't want to
+move your module configs to the `modules.d` directory. You can continue to
+configure modules in the +{beatname_lc}.yml+ file, but you won't be able to use
+the `modules` command to enable and disable configurations because the command
+requires the `modules.d` layout.
+
+To enable specific modules and metricsets in the +{beatname_lc}.yml+ config
+file, you can add entries to the +{beatname_lc}.modules+ list. Each entry in the
+list begins with a dash (-) and is followed by settings for that module. 
+
+The following example shows a configuration where the apache and mysql modules
+are enabled:
+
+[source,yaml]
+------------------------------------------------------------------------------
+metricbeat.modules:
+
+#---------------------------- Apache Status Module ---------------------------
+- module: apache
+  metricsets: ["status"]
+  period: 1s
+  hosts: ["http://127.0.0.1/"]
+
+#---------------------------- MySQL Status Module ----------------------------
+- module: mysql
+  metricsets: ["status"]
+  period: 2s
+  hosts: ["root@tcp(127.0.0.1:3306)/"]
+------------------------------------------------------------------------------
+
+In the following example, the Redis host is crawled for `stats` information
+every second because this is critical data, but the full list of Apache
+metricsets is only fetched every 30 seconds because the metrics are less
+critical.
+
+[source,yaml]
+----
+metricbeat.modules:
+- module: redis
+  metricsets: ["info"]
+  hosts: ["host1"]
+  period: 1s
+- module: apache
+  metricsets: ["info"]
+  hosts: ["host1"]
+  period: 30s
+----
+
+[float]
+[[config-combos]]
+== Configuration combinations
+
+You can specify a module configuration that uses different combinations of
+metricsets, periods, and hosts. 
+
+For a module with multiple metricsets defined, it's possible to define the
+module twice and specify a different period to use for each metricset. For the
+following example, the `set1` metricset will be fetched every 10 seconds, while
+the `set2` metricset will be fetched every 2 minutes:
+
+[source,yaml]
+----
+- module: example
+  metricsets: ["set1"]
+  hosts: ["host1"]
+  period: 10s
+- module: example
+  metricsets: ["set2"]
+  hosts: ["host1"]
+  period: 2m
+----
+
+
+[float]
+=== Standard config options
+
+You can specify the following options for any Metricbeat module. Some modules
+require additional configuration settings. See the <<metricbeat-modules>>
+section for more information.
+
+[float]
+==== `module`
+
+The name of the module to run. For documentation about each module, see the
+<<metricbeat-modules>> section.
+
+[float]
+==== `metricsets`
+
+A list of metricsets to execute. Make sure that you only list metricsets that
+are available in the module. It is not possible to reference metricsets from
+other modules. For a list of available metricsets, see the documentation for the
+module.
+
+[float]
+==== `enabled`
+
+A Boolean value that specifies whether the module is enabled. If you use the
+default config file, `metricbeat.yml`, the System module is enabled (set to
+`enabled: true`) by default. If the `enabled` option is missing from the
+configuration block, the module is enabled by default.
+
+[float]
+[[metricset-period]]
+==== `period`
+
+How often the metricsets are executed. If a system is not reachable, Metricbeat
+returns an error for each period. This setting is required.
+
+[float]
+==== `hosts`
+
+A list of hosts to fetch information from. For some metricsets, such as the
+System module, this setting is optional.
+
+[float]
+==== `fields`
+
+A dictionary of fields that will be sent with the metricset event. This setting
+is optional.
+
+[float]
+==== `tags`
+
+A list of tags that will be sent with the metricset event. This setting is
+optional.
+
+[float]
+==== `processors`
+
+A list of processors to apply to the data generated by the metricset.
+
+See <<filtering-and-enhancing-data>> for information about specifying
+processors in your config.
+

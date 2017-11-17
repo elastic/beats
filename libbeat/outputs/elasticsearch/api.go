@@ -3,9 +3,10 @@ package elasticsearch
 import (
 	"encoding/json"
 
-	"github.com/elastic/beats/libbeat/logp"
+	"github.com/pkg/errors"
 )
 
+// QueryResult contains the result of a query.
 type QueryResult struct {
 	Ok           bool            `json:"ok"`
 	Index        string          `json:"_index"`
@@ -13,13 +14,15 @@ type QueryResult struct {
 	ID           string          `json:"_id"`
 	Source       json.RawMessage `json:"_source"`
 	Version      int             `json:"_version"`
-	Found        bool            `json:"found"`
 	Exists       bool            `json:"exists"`
-	Created      bool            `json:"created"`
+	Found        bool            `json:"found"`   // Only used prior to ES 6. You must also check for Result == "found".
+	Created      bool            `json:"created"` // Only used prior to ES 6. You must also check for Result == "created".
+	Result       string          `json:"result"`  // Only used in ES 6+.
 	Acknowledged bool            `json:"acknowledged"`
 	Matches      []string        `json:"matches"`
 }
 
+// SearchResults contains the results of a search.
 type SearchResults struct {
 	Took   int                        `json:"took"`
 	Shards json.RawMessage            `json:"_shards"`
@@ -27,28 +30,21 @@ type SearchResults struct {
 	Aggs   map[string]json.RawMessage `json:"aggregations"`
 }
 
+// Hits contains the hits.
 type Hits struct {
 	Total int
 	Hits  []json.RawMessage `json:"hits"`
 }
 
+// CountResults contains the count of results.
 type CountResults struct {
 	Count  int             `json:"count"`
 	Shards json.RawMessage `json:"_shards"`
 }
 
-func (r QueryResult) String() string {
-	out, err := json.Marshal(r)
-	if err != nil {
-		logp.Warn("failed to marshal QueryResult (%v): %#v", err, r)
-		return "ERROR"
-	}
-	return string(out)
-}
-
 func withQueryResult(status int, resp []byte, err error) (int, *QueryResult, error) {
 	if err != nil {
-		return status, nil, err
+		return status, nil, errors.Wrapf(err, "Elasticsearch response: %s", resp)
 	}
 	result, err := readQueryResult(resp)
 	return status, result, err
@@ -109,6 +105,7 @@ func (es *Connection) Index(
 	return withQueryResult(es.apiCall(method, index, docType, id, "", params, body))
 }
 
+// Ingest pushes a pipeline of updates.
 func (es *Connection) Ingest(
 	index, docType, pipeline, id string,
 	params map[string]string,
@@ -133,6 +130,14 @@ func (es *Connection) Refresh(index string) (int, *QueryResult, error) {
 //
 func (es *Connection) CreateIndex(index string, body interface{}) (int, *QueryResult, error) {
 	return withQueryResult(es.apiCall("PUT", index, "", "", "", nil, body))
+}
+
+// IndexExists checks if an index exists.
+// Implements: https://www.elastic.co/guide/en/elasticsearch/reference/current/indices-exists.html
+//
+func (es *Connection) IndexExists(index string) (int, error) {
+	status, _, err := es.apiCall("HEAD", index, "", "", "", nil, nil)
+	return status, err
 }
 
 // Delete deletes a typed JSON document from a specific index based on its id.
@@ -160,7 +165,7 @@ func (es *Connection) DeletePipeline(
 	return withQueryResult(es.apiCall("DELETE", "_ingest", "pipeline", id, "", params, nil))
 }
 
-// A search request can be executed purely using a URI by providing request parameters.
+// SearchURI executes a search request using a URI by providing request parameters.
 // Implements: http://www.elastic.co/guide/en/elasticsearch/reference/current/search-uri-request.html
 func (es *Connection) SearchURI(index string, docType string, params map[string]string) (int, *SearchResults, error) {
 	status, resp, err := es.apiCall("GET", index, docType, "_search", "", params, nil)
@@ -171,6 +176,7 @@ func (es *Connection) SearchURI(index string, docType string, params map[string]
 	return status, result, err
 }
 
+// CountSearchURI counts the results for a search request.
 func (es *Connection) CountSearchURI(
 	index string, docType string,
 	params map[string]string,
@@ -192,5 +198,5 @@ func (es *Connection) apiCall(
 	if err != nil {
 		return 0, nil, err
 	}
-	return es.request(method, path, pipeline, params, body)
+	return es.Request(method, path, pipeline, params, body)
 }

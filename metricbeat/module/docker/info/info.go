@@ -2,7 +2,7 @@ package info
 
 import (
 	"github.com/elastic/beats/libbeat/common"
-	"github.com/elastic/beats/libbeat/logp"
+	"github.com/elastic/beats/libbeat/common/cfgwarn"
 	"github.com/elastic/beats/metricbeat/mb"
 	"github.com/elastic/beats/metricbeat/module/docker"
 
@@ -22,7 +22,7 @@ type MetricSet struct {
 
 // New create a new instance of the docker info MetricSet.
 func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
-	logp.Warn("EXPERIMENTAL: The docker info metricset is experimental")
+	cfgwarn.Beta("The docker info metricset is beta")
 
 	config := docker.Config{}
 	if err := base.Module().UnpackConfig(&config); err != nil {

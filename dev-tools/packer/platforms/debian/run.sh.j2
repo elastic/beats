@@ -4,12 +4,9 @@
 set -e
 cd /build
 
-# the init scripts needs to have the right name
-cp ${RUNID}.init /tmp/{{.beat_name}}.init
-
-# create script to reload systemd config
-echo "#!/bin/bash" > /tmp/systemd-daemon-reload.sh
-echo "systemctl daemon-reload 2> /dev/null || true" >> /tmp/systemd-daemon-reload.sh
+# the init script and systemd unit file need to have the right name
+cp ${RUNID}.init /tmp/{{.beat_pkg_name}}.init
+cp ${RUNID}.service /tmp/{{.beat_pkg_name}}.service
 
 # add SNAPSHOT if it was requested
 VERSION="{{.version}}"
@@ -18,30 +15,35 @@ if [ "$SNAPSHOT" = "yes" ]; then
 fi
 
 # create deb
-fpm --force -s dir -t deb \
-        -n {{.beat_name}} -v ${VERSION} \
-        --vendor "{{.beat_vendor}}"  \
-        --license "{{.beat_license}}"  \
-        --architecture {{.deb_arch}} \
-        --description "{{.beat_description}}" \
-        --url {{.beat_url}} \
-        --deb-init /tmp/{{.beat_name}}.init \
-        --after-install /tmp/systemd-daemon-reload.sh \
-        --config-files /etc/{{.beat_name}}/{{.beat_name}}.yml \
-        homedir/=/usr/share/{{.beat_name}} \
-        beatname-${RUNID}.sh=/usr/bin/{{.beat_name}}.sh \
-        {{.beat_name}}-linux-{{.arch}}=/usr/share/{{.beat_name}}/bin/{{.beat_name}} \
-        {{.beat_name}}-linux.yml=/etc/{{.beat_name}}/{{.beat_name}}.yml \
-        {{.beat_name}}-linux.full.yml=/etc/{{.beat_name}}/{{.beat_name}}.full.yml \
-        {{.beat_name}}.template.json=/etc/{{.beat_name}}/{{.beat_name}}.template.json \
-        {{.beat_name}}.template-es2x.json=/etc/{{.beat_name}}/{{.beat_name}}.template-es2x.json \
-        ${RUNID}.service=/lib/systemd/system/{{.beat_name}}.service \
-        god-linux-{{.arch}}=/usr/share/{{.beat_name}}/bin/{{.beat_name}}-god \
-        import_dashboards-linux-{{.arch}}=/usr/share/{{.beat_name}}/scripts/import_dashboards
+FPM_ARGS=(
+        --force -s dir -t deb
+        -n {{.beat_pkg_name}} -v ${VERSION}
+        --vendor "{{.beat_vendor}}"
+        --license "{{.beat_license}}"
+        --architecture {{.deb_arch}}
+        --description "{{.beat_description}}"
+        --url {{.beat_url}}
+        --deb-init /tmp/{{.beat_pkg_name}}.init
+        --deb-systemd /tmp/{{.beat_pkg_name}}.service
+        --config-files /etc/{{.beat_name}}/{{.beat_name}}.yml
+        homedir/=/usr/share/{{.beat_name}}
+        beatname-${RUNID}.sh=/usr/bin/{{.beat_name}}
+        {{.beat_name}}-linux-{{.arch}}=/usr/share/{{.beat_name}}/bin/{{.beat_name}}
+        {{.beat_name}}-linux.yml=/etc/{{.beat_name}}/{{.beat_name}}.yml
+        {{.beat_name}}-linux.reference.yml=/etc/{{.beat_name}}/{{.beat_name}}.reference.yml
+        fields.yml=/etc/{{.beat_name}}/fields.yml
+        god-linux-{{.arch}}=/usr/share/{{.beat_name}}/bin/{{.beat_name}}-god
+  )
+
+if [ -d modules.d-linux ]; then
+  FPM_ARGS+=(modules.d-linux/=/etc/{{.beat_name}}/modules.d/)
+fi
+
+fpm "${FPM_ARGS[@]}"
 
 # move and rename to use the elastic conventions
 mkdir -p upload
-mv {{.beat_name}}_${VERSION}_{{.deb_arch}}.deb upload/{{.beat_name}}-${VERSION}-{{.deb_arch}}.deb
+mv {{.beat_pkg_name}}_${VERSION}_{{.deb_arch}}.deb upload/{{.beat_name}}-${VERSION}-{{.deb_arch}}.deb
 echo "Created upload/{{.beat_name}}-${VERSION}-{{.deb_arch}}.deb"
 
 # create sha1 file

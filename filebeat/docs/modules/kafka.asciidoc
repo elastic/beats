@@ -1,0 +1,37 @@
+////
+This file is generated! See scripts/docs_collector.py
+////
+
+[[filebeat-module-kafka]]
+== Kafka module
+
+This module collects and parses the logs created by https://kafka.apache.org/[Kafka].
+
+[float]
+=== Compatibility
+
+The Kafka module was tested with logs from versions 2.11.
+
+[float]
+=== Dashboard
+
+This module comes with a sample dashboard to see Kafka logs and stacktraces.
+
+image::./images/filebeat-kafka-logs-overview.png[]
+
+[float]
+=== Logs fileset settings
+
+[float]
+==== var.paths
+
+An array of paths where to look for the log files. If left empty, Filebeat
+will choose the paths depending on your operating systems.
+
+
+[float]
+=== Fields
+
+For a description of each field in the module, see the
+<<exported-fields-kafka,exported fields>> section.
+

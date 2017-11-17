@@ -2,7 +2,6 @@ package bucket
 
 import (
 	"encoding/json"
-	"io"
 
 	"github.com/elastic/beats/libbeat/common"
 	"github.com/elastic/beats/libbeat/logp"
@@ -30,10 +29,9 @@ type Buckets []struct {
 	BasicStats BucketBasicStats `json:"basicStats"`
 }
 
-func eventsMapping(body io.Reader) []common.MapStr {
-
+func eventsMapping(content []byte) []common.MapStr {
 	var d Buckets
-	err := json.NewDecoder(body).Decode(&d)
+	err := json.Unmarshal(content, &d)
 	if err != nil {
 		logp.Err("Error: ", err)
 	}

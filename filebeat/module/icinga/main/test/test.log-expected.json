@@ -1,0 +1,116 @@
+[
+    {
+        "_index": "filebeat-2017.04.04",
+        "_type": "log",
+        "_id": "AVs4ouOJ2BrA1a1-e_FX",
+        "_score": null,
+        "_source": {
+            "@timestamp": "2017-04-04T09:16:34.000Z",
+            "offset": 518,
+            "beat": {
+                "hostname": "blerims-mbp.int.netways.de",
+                "name": "blerims-mbp.int.netways.de",
+                "version": "5.3.0"
+            },
+            "prospector": {
+                "type": "log"
+            },
+            "icinga": {
+                "main": {
+                    "severity": "warning",
+                    "message": "Notification command for object 'demo!load' (PID: 19401, arguments: '/etc/icinga2/scripts/mail-service-notification.sh') terminated with exit code 127, output: /etc/icinga2/scripts/mail-service-notification.sh: 20: /etc/icinga2/scripts/mail-service-notification.sh: mail: not found\n/usr/bin/printf: write error: Broken pipe\n",
+                    "facility": "PluginNotificationTask"
+                }
+            },
+            "source": "/usr/local/icinga2/var/log/icinga2/icinga2.log",
+            "fileset": {
+                "module": "icinga",
+                "name": "main"
+            }
+        },
+        "fields": {
+            "@timestamp": [
+                1491297394000
+            ]
+        },
+        "sort": [
+            1491297394000
+        ]
+    },
+    {
+        "_index": "filebeat-2017.04.04",
+        "_type": "log",
+        "_id": "AVs4ouOJ2BrA1a1-e_FW",
+        "_score": null,
+        "_source": {
+            "@timestamp": "2017-04-04T09:16:34.000Z",
+            "offset": 133,
+            "beat": {
+                "hostname": "blerims-mbp.int.netways.de",
+                "name": "blerims-mbp.int.netways.de",
+                "version": "5.3.0"
+            },
+            "prospector": {
+                "type": "log"
+            },
+            "icinga": {
+                "main": {
+                    "severity": "information",
+                    "message": "Sending 'Recovery' notification 'demo!load!mail-icingaadmin for user 'on-call'",
+                    "facility": "Notification"
+                }
+            },
+            "source": "/usr/local/icinga2/var/log/icinga2/icinga2.log",
+            "fileset": {
+                "module": "icinga",
+                "name": "main"
+            }
+        },
+        "fields": {
+            "@timestamp": [
+                1491297394000
+            ]
+        },
+        "sort": [
+            1491297394000
+        ]
+    },
+    {
+        "_index": "filebeat-2017.04.04",
+        "_type": "log",
+        "_id": "AVs4ovY82BrA1a1-e_FY",
+        "_score": null,
+        "_source": {
+            "@timestamp": "2017-04-04T09:16:48.000Z",
+            "offset": 654,
+            "beat": {
+                "hostname": "blerims-mbp.int.netways.de",
+                "name": "blerims-mbp.int.netways.de",
+                "version": "5.3.0"
+            },
+            "prospector": {
+                "type": "log"
+            },
+            "icinga": {
+                "main": {
+                    "severity": "information",
+                    "message": "Query queue items: 0, query rate: 5.38333/s (323/min 1610/5min 4778/15min);",
+                    "facility": "IdoMysqlConnection"
+                }
+            },
+            "source": "/usr/local/icinga2/var/log/icinga2/icinga2.log",
+            "fileset": {
+                "module": "icinga",
+                "name": "main"
+            }
+        },
+        "fields": {
+            "@timestamp": [
+                1491297408000
+            ]
+        },
+        "sort": [
+            1491297408000
+        ]
+    }
+]

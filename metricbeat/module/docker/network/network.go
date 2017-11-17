@@ -2,7 +2,7 @@ package network
 
 import (
 	"github.com/elastic/beats/libbeat/common"
-	"github.com/elastic/beats/libbeat/logp"
+	"github.com/elastic/beats/libbeat/common/cfgwarn"
 	"github.com/elastic/beats/metricbeat/mb"
 	"github.com/elastic/beats/metricbeat/module/docker"
 
@@ -23,7 +23,7 @@ type MetricSet struct {
 
 // New creates a new instance of the docker network MetricSet.
 func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
-	logp.Warn("EXPERIMENTAL: The docker network metricset is experimental")
+	cfgwarn.Beta("The docker network metricset is beta")
 
 	config := docker.Config{}
 	if err := base.Module().UnpackConfig(&config); err != nil {
@@ -46,7 +46,7 @@ func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
 
 // Fetch methods creates a list of network events for each container.
 func (m *MetricSet) Fetch() ([]common.MapStr, error) {
-	stats, err := docker.FetchStats(m.dockerClient)
+	stats, err := docker.FetchStats(m.dockerClient, m.Module().Config().Timeout)
 	if err != nil {
 		return nil, err
 	}

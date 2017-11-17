@@ -1,4 +1,4 @@
-FROM tudorg/xgo-1.7.1
+FROM tudorg/xgo-1.9.2
 
 MAINTAINER Tudor Golubenco <tudor@elastic.co>
 
@@ -23,6 +23,9 @@ RUN \
 	./fetch.sh $WPDPACK_URL f5c80885bd48f07f41833d0f65bf85da1ef1727a && \
 	unzip `basename $WPDPACK_URL` -d /libpcap/win && \
 	rm `basename $WPDPACK_URL`
+
+# Load gotpl
+RUN go get github.com/tsg/gotpl
 
 # Add patch for gopacket.
 ADD gopacket_pcap.patch /gopacket_pcap.patch

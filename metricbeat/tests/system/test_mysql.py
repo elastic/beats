@@ -6,10 +6,12 @@ from nose.plugins.attrib import attr
 MYSQL_FIELDS = metricbeat.COMMON_FIELDS + ["mysql"]
 
 MYSQL_STATUS_FIELDS = ["clients", "cluster", "cpu", "keyspace", "memory",
-                     "persistence", "replication", "server", "stats"]
+                       "persistence", "replication", "server", "stats"]
 
 
 class Test(metricbeat.BaseTest):
+
+    COMPOSE_SERVICES = ['mysql']
 
     @unittest.skipUnless(metricbeat.INTEGRATION_TESTS, "integration test")
     @attr('integration')
@@ -26,10 +28,7 @@ class Test(metricbeat.BaseTest):
         proc = self.start_beat()
         self.wait_until(lambda: self.output_lines() > 0)
         proc.check_kill_and_wait()
-
-        # Ensure no errors or warnings exist in the log.
-        log = self.get_log()
-        self.assertNotRegexpMatches(log, "ERR|WARN")
+        self.assert_no_logged_warnings()
 
         output = self.read_output_json()
         self.assertEqual(len(output), 1)
@@ -42,4 +41,3 @@ class Test(metricbeat.BaseTest):
 
     def get_hosts(self):
         return [os.getenv('MYSQL_DSN', 'root:test@tcp(localhost:3306)/')]
-

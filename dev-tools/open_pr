@@ -1,0 +1,102 @@
+#!/usr/bin/env python
+"""Open a PR from the current branch"""
+
+import sys
+import argparse
+import requests
+import re
+from subprocess import check_call, check_output
+from os.path import expanduser
+
+usage = """
+Example usage:
+
+Open PR against master, with the review label:
+
+./dev-tools/open_pr --remote tsg
+
+Open PR against the 6.0 branch, with the review and in progress labels:
+
+./dev-tools/open_pr --remote tsg --branch 6.0 --wip
+
+Open PR against the 6.0 branch, with the review and docs labels:
+
+./dev-tools/open_pr --remote tsg --labels=review,docs
+
+The title and message of the PR are taken from the _last_ commit in the
+PR.
+"""
+
+def main():
+    parser = argparse.ArgumentParser(
+        description="Creates a PR against a given branch",
+        formatter_class=argparse.RawDescriptionHelpFormatter,
+        epilog=usage)
+
+    parser.add_argument("--remote", default="origin",
+                        help="Your git remote to push the branch to.")
+    parser.add_argument("--branch", default="master",
+                        help="Remote branch to open PR against (e.g 5.0)")
+    parser.add_argument("--wip", action="store_true",
+                        help="Add the `in progress` label")
+    parser.add_argument("--labels",
+                        help="Extra labels to add (comma separated)")
+    parser.add_argument("--yes", action="store_true",
+                        help="Assume yes.")
+    args = parser.parse_args()
+    local_branch = check_output("git rev-parse --abbrev-ref HEAD", shell=True).strip()
+    title = check_output("git show -q HEAD --format='%s'", shell=True).strip()
+    msg = check_output("git show -q HEAD --format='%b'", shell=True).strip()
+
+    labels = ["review"]
+    if args.labels:
+        labels.extend(args.labels.split(","))
+    if args.wip:
+        lables += "in progress"
+
+    print("Branch: {}".format(args.branch))
+    print("Remote: {}".format(args.remote))
+    print("Local branch: {}".format(local_branch))
+    print("Title: {}".format(title))
+    print("Message: {}".format(msg))
+    print("Labels: {}".format(labels))
+
+    if not args.yes and raw_input("Continue? [Y/n]: ") not in ["y", "Y", ""]:
+        return 1
+
+    # push branch
+    check_call("git push --set-upstream {} {}"
+               .format(args.remote, local_branch), shell=True)
+
+
+    # open PR
+    token = open(expanduser("~/.elastic/github.token"), "r").read().strip()
+    base = "https://api.github.com/repos/elastic/beats"
+    session = requests.Session()
+    session.headers.update({"Authorization": "token " + token})
+
+    remote_url = check_output("git remote get-url {}".format(args.remote),
+                              shell=True)
+    remote_user = re.search("github.com:(.+)/beats", remote_url).group(1)
+
+    request = session.post(base + "/pulls", json=dict(
+        title=title,
+        head=remote_user + ":" + local_branch,
+        base=args.branch,
+        body=msg
+    ))
+    if request.status_code > 299:
+        print("Creating PR failed: {}".format(request.json()))
+        sys.exit(1)
+    new_pr = request.json()
+
+    # add labels
+    session.post(
+        base + "/issues/{}/labels".format(new_pr["number"]), json=labels)
+
+    print("\nDone. PR created: {}".format(new_pr["html_url"]))
+    print("Please go and review it for the message and labels.")
+
+
+if __name__ == "__main__":
+    sys.exit(main())

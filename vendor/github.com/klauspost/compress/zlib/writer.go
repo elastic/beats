@@ -21,6 +21,7 @@ const (
 	BestCompression     = flate.BestCompression
 	DefaultCompression  = flate.DefaultCompression
 	ConstantCompression = flate.ConstantCompression
+	HuffmanOnly         = flate.HuffmanOnly
 )
 
 // A Writer takes data written to it and writes the compressed
@@ -49,9 +50,9 @@ func NewWriter(w io.Writer) *Writer {
 // NewWriterLevel is like NewWriter but specifies the compression level instead
 // of assuming DefaultCompression.
 //
-// The compression level can be DefaultCompression, NoCompression, or any
-// integer value between BestSpeed and BestCompression inclusive. The error
-// returned will be nil if the level is valid.
+// The compression level can be DefaultCompression, NoCompression, HuffmanOnly
+// or any integer value between BestSpeed and BestCompression inclusive.
+// The error returned will be nil if the level is valid.
 func NewWriterLevel(w io.Writer, level int) (*Writer, error) {
 	return NewWriterLevelDict(w, level, nil)
 }
@@ -62,7 +63,7 @@ func NewWriterLevel(w io.Writer, level int) (*Writer, error) {
 // The dictionary may be nil. If not, its contents should not be modified until
 // the Writer is closed.
 func NewWriterLevelDict(w io.Writer, level int, dict []byte) (*Writer, error) {
-	if level < ConstantCompression || level > BestCompression {
+	if level < HuffmanOnly || level > BestCompression {
 		return nil, fmt.Errorf("zlib: invalid compression level: %d", level)
 	}
 	return &Writer{

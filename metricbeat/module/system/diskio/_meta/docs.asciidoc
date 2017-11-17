@@ -1,10 +1,16 @@
-=== System Diskio Metricset
+=== System diskio metricset
 
-The System `diskio` metricset provides disk IO metrics collected from the operating
-system. One event is created for each disk mounted on the system.
+The System `diskio` metricset provides disk IO metrics collected from the
+operating system. One event is created for each disk mounted on the system.
 
 This metricset is available on:
 
 - Linux
+- macOS (requires 10.10+)
 - Windows
 - FreeBSD (amd64)
+
+[float]
+=== Configuration
+
+There are no configuration options for this metricset.

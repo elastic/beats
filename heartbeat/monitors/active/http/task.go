@@ -47,19 +47,22 @@ func newHTTPMonitorHostJob(
 	}
 
 	timeout := config.Timeout
-	fields := common.MapStr{
-		"scheme": request.URL.Scheme,
-		"host":   hostname,
-		"port":   port,
-		"url":    request.URL.String(),
-	}
 
-	return monitors.MakeSimpleJob(jobName, typ, func() (common.MapStr, error) {
-		event, err := execPing(client, request, body, timeout, validator)
-		if event == nil {
-			event = common.MapStr{}
-		}
-		event.Update(fields)
+	settings := monitors.MakeJobSetting(jobName).WithFields(common.MapStr{
+		"monitor": common.MapStr{
+			"scheme": request.URL.Scheme,
+			"host":   hostname,
+		},
+		"http": common.MapStr{
+			"url": request.URL.String(),
+		},
+		"tcp": common.MapStr{
+			"port": port,
+		},
+	})
+
+	return monitors.MakeSimpleJob(settings, func() (common.MapStr, error) {
+		_, _, event, err := execPing(client, request, body, timeout, validator)
 		return event, err
 	}), nil
 }
@@ -85,11 +88,21 @@ func newHTTPMonitorIPsJob(
 		return nil, err
 	}
 
+	settings := monitors.MakeHostJobSettings(jobName, hostname, config.Mode)
+	settings = settings.WithFields(common.MapStr{
+		"monitor": common.MapStr{
+			"scheme": req.URL.Scheme,
+		},
+		"http": common.MapStr{
+			"url": req.URL.String(),
+		},
+		"tcp": common.MapStr{
+			"port": port,
+		},
+	})
+
 	pingFactory := createPingFactory(config, hostname, port, tls, req, body, validator)
-	if ip := net.ParseIP(hostname); ip != nil {
-		return monitors.MakeByIPJob(jobName, typ, ip, pingFactory)
-	}
-	return monitors.MakeByHostJob(jobName, typ, hostname, config.Mode, pingFactory)
+	return monitors.MakeByHostJob(settings, pingFactory)
 }
 
 func createPingFactory(
@@ -101,59 +114,67 @@ func createPingFactory(
 	body []byte,
 	validator RespCheck,
 ) func(*net.IPAddr) monitors.TaskRunner {
-	fields := common.MapStr{
-		"scheme": request.URL.Scheme,
-		"port":   port,
-		"url":    request.URL.String(),
-	}
-
 	timeout := config.Timeout
 	isTLS := request.URL.Scheme == "https"
 	checkRedirect := makeCheckRedirect(config.MaxRedirects)
 
-	return monitors.MakePingIPFactory(fields, func(ip *net.IPAddr) (common.MapStr, error) {
+	return monitors.MakePingIPFactory(func(ip *net.IPAddr) (common.MapStr, error) {
+		event := common.MapStr{}
 		addr := net.JoinHostPort(ip.String(), strconv.Itoa(int(port)))
 		d := &dialchain.DialerChain{
-			Net: dialchain.ConstAddrDialer("tcp_connect_rtt", addr, timeout),
-		}
-		if isTLS {
-			d.AddLayer(dialchain.TLSLayer("tls_handshake_rtt", tls, timeout))
+			Net: dialchain.MakeConstAddrDialer(addr, dialchain.TCPDialer(timeout)),
 		}
 
-		measures := common.MapStr{}
-		dialer, err := d.BuildWithMeasures(measures)
+		// TODO: add socks5 proxy?
+
+		if isTLS {
+			d.AddLayer(dialchain.TLSLayer(tls, timeout))
+		}
+
+		dialer, err := d.Build(event)
 		if err != nil {
 			return nil, err
 		}
 
-		var httpStart, httpEnd time.Time
+		var (
+			writeStart, readStart, writeEnd time.Time
+		)
 
 		client := &http.Client{
 			CheckRedirect: checkRedirect,
 			Timeout:       timeout,
 			Transport: &SimpleTransport{
 				Dialer:       dialer,
-				OnStartWrite: func() { httpStart = time.Now() },
-				OnStartRead:  func() { httpEnd = time.Now() },
+				OnStartWrite: func() { writeStart = time.Now() },
+				OnEndWrite:   func() { writeEnd = time.Now() },
+				OnStartRead:  func() { readStart = time.Now() },
 			},
 		}
 
-		event, err := execPing(client, request, body, timeout, validator)
-		if event == nil {
-			event = measures
-		} else {
-			event.Update(measures)
+		_, end, result, err := execPing(client, request, body, timeout, validator)
+		event.DeepUpdate(result)
+
+		if !readStart.IsZero() {
+			event.DeepUpdate(common.MapStr{
+				"http": common.MapStr{
+					"rtt": common.MapStr{
+						"write_request":   look.RTT(writeEnd.Sub(writeStart)),
+						"response_header": look.RTT(readStart.Sub(writeStart)),
+					},
+				},
+			})
+		}
+		if !writeStart.IsZero() {
+			event.Put("http.rtt.validate", look.RTT(end.Sub(writeStart)))
+			event.Put("http.rtt.content", look.RTT(end.Sub(readStart)))
 		}
 
-		if !httpEnd.IsZero() {
-			event["http_rtt"] = look.RTT(httpEnd.Sub(httpStart))
-		}
 		return event, err
 	})
 }
 
 func buildRequest(addr string, config *Config, enc contentEncoder) (*http.Request, error) {
-	method := strings.ToUpper(config.Check.Method)
+	method := strings.ToUpper(config.Check.Request.Method)
 	request, err := http.NewRequest(method, addr, nil)
 	if err != nil {
 		return nil, err
@@ -163,7 +184,7 @@ func buildRequest(addr string, config *Config, enc contentEncoder) (*http.Reques
 	if config.Username != "" {
 		request.SetBasicAuth(config.Username, config.Password)
 	}
-	for k, v := range config.Check.SendHeaders {
+	for k, v := range config.Check.Request.SendHeaders {
 		request.Header.Add(k, v)
 	}
 
@@ -180,7 +201,7 @@ func execPing(
 	body []byte,
 	timeout time.Duration,
 	validator func(*http.Response) error,
-) (common.MapStr, reason.Reason) {
+) (time.Time, time.Time, common.MapStr, reason.Reason) {
 	ctx, cancel := context.WithTimeout(context.Background(), timeout)
 	defer cancel()
 
@@ -194,35 +215,48 @@ func execPing(
 	resp, err := client.Do(req)
 	end := time.Now()
 	if err != nil {
-		return nil, reason.IOFailed(err)
+		return start, end, nil, reason.IOFailed(err)
 	}
 	defer resp.Body.Close()
 
-	if err := validator(resp); err != nil {
-		return nil, reason.ValidateFailed(err)
-	}
+	err = validator(resp)
+	end = time.Now()
 
 	rtt := end.Sub(start)
-	event := common.MapStr{
+	event := common.MapStr{"http": common.MapStr{
 		"response": common.MapStr{
 			"status": resp.StatusCode,
 		},
-		"rtt": look.RTT(rtt),
+		"rtt": common.MapStr{
+			"total": look.RTT(rtt),
+		},
+	}}
+
+	if err != nil {
+		return start, end, event, reason.ValidateFailed(err)
 	}
-	return event, nil
+	return start, end, event, nil
 }
 
 func splitHostnamePort(requ *http.Request) (string, uint16, error) {
-	host, port, err := net.SplitHostPort(requ.URL.Host)
+	host := requ.URL.Host
+	// Try to add a default port if needed
+	if strings.LastIndex(host, ":") == -1 {
+		switch requ.URL.Scheme {
+		case urlSchemaHTTP:
+			host += ":80"
+		case urlSchemaHTTPS:
+			host += ":443"
+		}
+	}
+	host, port, err := net.SplitHostPort(host)
 	if err != nil {
 		return "", 0, err
 	}
-
 	p, err := strconv.ParseUint(port, 10, 16)
 	if err != nil {
 		return "", 0, fmt.Errorf("'%v' is no valid port number in '%v'", port, requ.URL.Host)
 	}
-
 	return host, uint16(p), nil
 }
 

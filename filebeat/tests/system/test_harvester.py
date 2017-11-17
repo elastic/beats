@@ -20,6 +20,7 @@ class Test(BaseTest):
         self.render_config_template(
             path=os.path.abspath(self.working_dir) + "/log/test.log",
             close_renamed="true",
+            clean_removed="false",
             scan_frequency="0.1s"
         )
         os.mkdir(self.working_dir + "/log/")
@@ -57,14 +58,20 @@ class Test(BaseTest):
         self.wait_until(
             lambda: self.output_has(lines=iterations1 + 1), max_timeout=10)
 
-        filebeat.check_kill_and_wait()
-
-        data = self.get_registry()
+        # Wait until registry file is created
+        self.wait_until(
+            lambda: self.log_contains_count("Registry file updated") > 1)
 
         # Make sure new file was picked up. As it has the same file name,
         # one entry for the new and one for the old should exist
-        assert len(data) == 2
+        self.wait_until(
+            lambda: len(self.get_registry()) == 2, max_timeout=10)
 
+        filebeat.check_kill_and_wait()
+
+        # Check registry has 2 entries after shutdown
+        data = self.get_registry()
+        assert len(data) == 2
 
     def test_close_removed(self):
         """
@@ -115,7 +122,6 @@ class Test(BaseTest):
         # Make sure the state for the file was persisted
         assert len(data) == 1
 
-
     def test_close_eof(self):
         """
         Checks that a file is closed if eof is reached
@@ -143,7 +149,6 @@ class Test(BaseTest):
         self.wait_until(
             lambda: self.output_has(lines=iterations1), max_timeout=10)
 
-
         # Wait until error shows up on windows
         self.wait_until(
             lambda: self.log_contains(
@@ -156,7 +161,6 @@ class Test(BaseTest):
 
         # Make sure the state for the file was persisted
         assert len(data) == 1
-
 
     def test_empty_line(self):
         """
@@ -206,7 +210,6 @@ class Test(BaseTest):
 
         # Make sure the state for the file was persisted
         assert len(data) == 1
-
 
     def test_empty_lines_only(self):
         """
@@ -264,6 +267,11 @@ class Test(BaseTest):
 
         with open(logfile, 'w') as f:
             f.write(message + "\n")
+
+        # wait for at least one event being written
+        self.wait_until(
+            lambda: self.output_has(lines=1),
+            max_timeout=10)
 
         # Wait until state is written
         self.wait_until(
@@ -325,7 +333,6 @@ class Test(BaseTest):
             max_timeout=15)
 
         filebeat.check_kill_and_wait()
-
 
     def test_truncated_file_closed(self):
         """
@@ -443,7 +450,6 @@ class Test(BaseTest):
         filebeat.check_kill_and_wait()
 
     def test_boms(self):
-
         """
         Test bom log files if bom is removed properly
         """
@@ -525,7 +531,6 @@ class Test(BaseTest):
 
         filebeat.check_kill_and_wait()
 
-
     def test_symlinks_enabled(self):
         """
         Test if symlinks are harvested
@@ -558,7 +563,6 @@ class Test(BaseTest):
 
         filebeat.check_kill_and_wait()
 
-
     def test_symlink_rotated(self):
         """
         Test what happens if symlink removed and points to a new file
@@ -566,6 +570,8 @@ class Test(BaseTest):
         self.render_config_template(
             path=os.path.abspath(self.working_dir) + "/log/symlink.log",
             symlinks="true",
+            close_removed="false",
+            clean_removed="false",
         )
 
         os.mkdir(self.working_dir + "/log/")
@@ -620,8 +626,7 @@ class Test(BaseTest):
 
         # Check if two different files are in registry
         data = self.get_registry()
-        assert len(data) == 2
-
+        assert len(data) == 2, "expected to see 2 entries, got '%s'" % data
 
     def test_symlink_removed(self):
         """
@@ -630,7 +635,8 @@ class Test(BaseTest):
         self.render_config_template(
             path=os.path.abspath(self.working_dir) + "/log/symlink.log",
             symlinks="true",
-            clean_removed="false"
+            clean_removed="false",
+            close_removed="false",
         )
 
         os.mkdir(self.working_dir + "/log/")
@@ -770,14 +776,13 @@ class Test(BaseTest):
         data = self.get_registry()
         assert len(data) == 1
 
-
     def test_decode_error(self):
         """
         Tests that in case of a decoding error it is handled gracefully
         """
         self.render_config_template(
             path=os.path.abspath(self.working_dir) + "/log/*",
-            encoding="GBK", # Set invalid encoding for entry below which is actually uft-8
+            encoding="GBK",  # Set invalid encoding for entry below which is actually uft-8
         )
 
         os.mkdir(self.working_dir + "/log/")
@@ -810,7 +815,3 @@ class Test(BaseTest):
 
         output = self.read_output_json()
         assert output[2]["message"] == "hello world2"
-
-
-
-

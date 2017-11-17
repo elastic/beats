@@ -1,5 +1,5 @@
 {
-    "@timestamp": "2016-05-23T08:05:34.853Z",
+    "@timestamp": "2017-10-12T08:05:34.853Z",
     "beat": {
         "hostname": "host.example.com",
         "name": "host.example.com"
@@ -11,18 +11,18 @@
     },
     "system": {
         "filesystem": {
-            "available": 38688276480,
-            "device_name": "none",
-            "files": 3940352,
-            "free": 41930997760,
-            "free_files": 3276976,
+            "available": 60083531776,
+            "device_name": "/dev/disk1",
+            "files": 4294967279,
+            "free": 60345675776,
+            "free_files": 4291998784,
             "mount_point": "/",
-            "total": 63371726848,
+            "total": 249779191808,
+            "type": "hfs",
             "used": {
-                "bytes": 21440729088,
-                "pct": 0.3383
+                "bytes": 189433516032,
+                "pct": 0.7584
             }
         }
-    },
-    "type": "metricsets"
+    }
 }

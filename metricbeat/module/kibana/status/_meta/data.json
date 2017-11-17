@@ -1,0 +1,35 @@
+{
+    "@timestamp": "2016-05-23T08:05:34.853Z",
+    "beat": {
+        "hostname": "host.example.com",
+        "name": "host.example.com"
+    },
+    "kibana": {
+        "status": {
+            "metrics": {
+                "concurrent_connections": 0,
+                "requests": {
+                    "disconnects": 0,
+                    "total": 0
+                }
+            },
+            "name": "kibana",
+            "status": {
+                "overall": {
+                    "state": "red"
+                }
+            },
+            "uuid": "c94305f7-ad4e-4e0c-8aba-5c3e869dce59",
+            "version": {
+                "number": "6.0.0-alpha1"
+            }
+        }
+    },
+    "metricset": {
+        "host": "kibana:5601",
+        "module": "kibana",
+        "name": "status",
+        "rtt": 115
+    },
+    "type": "metricsets"
+}

@@ -9,7 +9,7 @@
 # This box is used as a Windows development and testing environment for Beats.
 #
 # Usage and Features:
-#   - Two users exist: Administartor and Vagrant. Both have the password: vagrant
+#   - Two users exist: Administrator and Vagrant. Both have the password: vagrant
 #   - Use 'vagrant ssh' to open a Windows command prompt.
 #   - Use 'vagrant rdp' to open a Windows Remote Deskop session. Mac users must
 #     install the Microsoft Remote Desktop Client from the App Store.
@@ -55,6 +55,15 @@ cd ~/go/src/github.com/elastic
 if [ -d "/vagrant" ]; then ln -s /vagrant beats; fi
 SCRIPT
 
+# Linux GVM
+$linuxGvmProvision = <<SCRIPT
+mkdir -p ~/bin
+curl -sL -o ~/bin/gvm https://github.com/andrewkroh/gvm/releases/download/v0.0.1/gvm-linux-amd64
+chmod +x ~/bin/gvm
+echo 'export PATH=~/bin:$PATH' >> ~/.bash_profile
+echo 'eval "$(gvm 1.9.2)"' >> ~/.bash_profile
+SCRIPT
+
 Vagrant.configure(2) do |config|
 
   # Windows Server 2012 R2
@@ -92,6 +101,7 @@ Vagrant.configure(2) do |config|
     config.vm.synced_folder ".", "/vagrant", id: "vagrant-root", :nfs => true, disabled: true
     #config.vm.network "private_network", ip: "192.168.135.18"
 
+    freebsd.vm.hostname = "beats-tester"
     freebsd.vm.provision "shell", inline: $unixProvision, privileged: false
   end
 
@@ -107,6 +117,18 @@ Vagrant.configure(2) do |config|
     end
 
     openbsd.vm.provision "shell", inline: $unixProvision, privileged: false
+  end
+
+  # CentOS 7
+  config.vm.define "centos7", primary: true do |centos7|
+    #centos7.vm.box = "http://cloud.centos.org/centos/7/vagrant/x86_64/images/CentOS-7-x86_64-Vagrant-1706_02.VirtualBox.box"
+    centos7.vm.box = "ubuntu/precise64"
+    centos7.vm.network :forwarded_port, guest: 22,   host: 2226,  id: "ssh", auto_correct: true
+
+    centos7.vm.provision "shell", inline: $unixProvision, privileged: false
+    centos7.vm.provision "shell", inline: $linuxGvmProvision, privileged: false
+
+    centos7.vm.synced_folder ".", "/vagrant", type: "virtualbox"
   end
 
 end

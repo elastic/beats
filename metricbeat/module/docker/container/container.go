@@ -4,7 +4,7 @@ import (
 	dc "github.com/fsouza/go-dockerclient"
 
 	"github.com/elastic/beats/libbeat/common"
-	"github.com/elastic/beats/libbeat/logp"
+	"github.com/elastic/beats/libbeat/common/cfgwarn"
 	"github.com/elastic/beats/metricbeat/mb"
 	"github.com/elastic/beats/metricbeat/module/docker"
 )
@@ -22,7 +22,7 @@ type MetricSet struct {
 
 // New creates a new instance of the docker container MetricSet.
 func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
-	logp.Warn("EXPERIMENTAL: The docker container metricset is experimental")
+	cfgwarn.Beta("The docker container metricset is beta")
 
 	config := docker.Config{}
 	if err := base.Module().UnpackConfig(&config); err != nil {

@@ -1,0 +1,6 @@
+== Jolokia module
+
+beta[]
+
+This is the Jolokia module.
+

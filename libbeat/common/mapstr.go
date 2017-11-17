@@ -11,9 +11,8 @@ import (
 // Event metadata constants. These keys are used within libbeat to identify
 // metadata stored in an event.
 const (
-	EventMetadataKey = "_event_metadata"
-	FieldsKey        = "fields"
-	TagsKey          = "tags"
+	FieldsKey = "fields"
+	TagsKey   = "tags"
 )
 
 var (
@@ -42,6 +41,40 @@ func (m MapStr) Update(d MapStr) {
 	}
 }
 
+// DeepUpdate recursively copies the key-value pairs from d to this map.
+// If the key is present and a map as well, the sub-map will be updated recursively
+// via DeepUpdate.
+func (m MapStr) DeepUpdate(d MapStr) {
+	for k, v := range d {
+		switch val := v.(type) {
+		case map[string]interface{}:
+			m[k] = deepUpdateValue(m[k], MapStr(val))
+		case MapStr:
+			m[k] = deepUpdateValue(m[k], val)
+		default:
+			m[k] = v
+		}
+	}
+}
+
+func deepUpdateValue(old interface{}, val MapStr) interface{} {
+	if old == nil {
+		return val
+	}
+
+	switch sub := old.(type) {
+	case MapStr:
+		sub.DeepUpdate(val)
+		return sub
+	case map[string]interface{}:
+		tmp := MapStr(sub)
+		tmp.DeepUpdate(val)
+		return tmp
+	default:
+		return val
+	}
+}
+
 // Delete deletes the given key from the map.
 func (m MapStr) Delete(key string) error {
 	_, err := walkMap(key, m, opDelete)
@@ -67,12 +100,10 @@ func (m MapStr) Clone() MapStr {
 	result := MapStr{}
 
 	for k, v := range m {
-		innerMap, err := toMapStr(v)
-		if err == nil {
-			result[k] = innerMap.Clone()
-		} else {
-			result[k] = v
+		if innerMap, ok := tryToMapStr(v); ok {
+			v = innerMap.Clone()
 		}
+		result[k] = v
 	}
 
 	return result
@@ -122,6 +153,39 @@ func (m MapStr) String() string {
 		return fmt.Sprintf("Not valid json: %v", err)
 	}
 	return string(bytes)
+}
+
+// Flatten flattens the given MapStr and returns a flat MapStr.
+//
+// Example:
+//   "hello": MapStr{"world": "test" }
+//
+// This is converted to:
+//   "hello.world": "test"
+//
+// This can be useful for testing or logging.
+func (m MapStr) Flatten() MapStr {
+	return flatten("", m, MapStr{})
+}
+
+// flatten is a helper for Flatten. See docs for Flatten. For convenience the
+// out parameter is returned.
+func flatten(prefix string, in, out MapStr) MapStr {
+	for k, v := range in {
+		var fullKey string
+		if prefix == "" {
+			fullKey = k
+		} else {
+			fullKey = fmt.Sprintf("%s.%s", prefix, k)
+		}
+
+		if m, ok := tryToMapStr(v); ok {
+			flatten(fullKey, m, out)
+		} else {
+			out[fullKey] = v
+		}
+	}
+	return out
 }
 
 // MapStrUnion creates a new MapStr containing the union of the
@@ -183,19 +247,23 @@ func AddTags(ms MapStr, tags []string) error {
 	if ms == nil || len(tags) == 0 {
 		return nil
 	}
-
-	tagsIfc, ok := ms[TagsKey]
-	if !ok {
+	eventTags, exists := ms[TagsKey]
+	if !exists {
 		ms[TagsKey] = tags
 		return nil
 	}
 
-	existingTags, ok := tagsIfc.([]string)
-	if !ok {
-		return errors.Errorf("expected string array by type is %T", tagsIfc)
+	switch arr := eventTags.(type) {
+	case []string:
+		ms[TagsKey] = append(arr, tags...)
+	case []interface{}:
+		for _, tag := range tags {
+			arr = append(arr, tag)
+		}
+		ms[TagsKey] = arr
+	default:
+		return errors.Errorf("expected string array by type is %T", eventTags)
 	}
-
-	ms[TagsKey] = append(existingTags, tags...)
 	return nil
 }
 
@@ -203,14 +271,21 @@ func AddTags(ms MapStr, tags []string) error {
 // a MapStr or a map[string]interface{}. If it's any other type or nil then
 // an error is returned.
 func toMapStr(v interface{}) (MapStr, error) {
-	switch v.(type) {
-	case MapStr:
-		return v.(MapStr), nil
-	case map[string]interface{}:
-		m := v.(map[string]interface{})
-		return MapStr(m), nil
-	default:
+	m, ok := tryToMapStr(v)
+	if !ok {
 		return nil, errors.Errorf("expected map but type is %T", v)
+	}
+	return m, nil
+}
+
+func tryToMapStr(v interface{}) (MapStr, bool) {
+	switch m := v.(type) {
+	case MapStr:
+		return m, true
+	case map[string]interface{}:
+		return MapStr(m), true
+	default:
+		return nil, false
 	}
 }
 

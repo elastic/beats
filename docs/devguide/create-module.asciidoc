@@ -1,0 +1,101 @@
+[[creating-metricbeat-module]]
+=== Creating a Metricbeat Module
+
+Metricbeat modules are used to group multiple metricsets together and to implement shared functionality
+of the metricsets. In most cases, no implementation of the module is needed and the default module
+implementation is automatically picked.
+
+It's important to complete the configuration and documentation files for a module. When you create a new
+metricset by running `make create-metricset`, default versions of these files are generated in the `_meta` directory.
+
+[float]
+==== Module Files
+
+* `config.yml` and `config.reference.yml`
+* `docs.asciidoc`
+* `fields.yml`
+
+After updating any of these files, make sure you run `make update` in your beat directory so all generated
+files are updated.
+
+
+[float]
+===== config.yml and config.reference.yml
+
+The `config.yml` file contains the basic configuration options and looks like this:
+
+[source,yaml]
+----
+include::../../metricbeat/scripts/module/config.yml[]
+----
+
+It contains the module name, your metricset, and the default period. If you have multiple
+metricsets in your module, make sure that you extend the metricset array:
+
+[source,yaml]
+----
+  metricsets: ["{metricset1}", "{metricset2}"]
+----
+
+The `full.config.yml` file is optional and by default has the same content as the `config.yml`. It is used
+to add and document more advanced configuration options that should not be part of the minimal
+config file shipped by default.
+
+[float]
+===== docs.asciidoc
+
+The `dosc.asciidoc` file contains the documentation about your module. During generation of the
+documentation, the default config file will be appended to the docs. Use this file to describe your
+module in more detail and to document specific configuration options.
+
+[source,asciidoc]
+----
+include::../../metricbeat/scripts/module/docs.asciidoc[]
+----
+
+[float]
+===== fields.yml
+
+The `fields.yml` file contains the top level structure for the fields in your metricset. It's used in combination with
+the `fields.yml` file in each metricset to generate the template and documentation for the fields.
+
+The default file looks like this:
+
+[source,yaml]
+----
+include::../../metricbeat/scripts/module/fields.yml[]
+----
+
+Make sure that you update at least the description of the module.
+
+
+[float]
+==== Testing
+
+It's a common pattern to use a `testing.go` file in the module package to share some testing functionality among
+the metricsets. This file does not have `_test.go` in the name because otherwise it would not be compiled for sub packages.
+
+To see an example of the `testing.go` file, look at the https://github.com/elastic/beats/tree/master/metricbeat/module/mysql[mysql module].
+
+[float]
+===== Run Environment tests for one module
+
+All the environments are setup with docker. `make integration-tests-environment` and `make system-tests-environment` can be used to run tests for all modules. In case you are developing a module it is convenient to run the tests only for one module and directly run it on your machine.
+
+First you need to start the environment for your module to test and expose the port to your local machien. For this you can run the following command inside the metricbeat directory:
+
+[source,bash]
+----
+MODULE=apache PORT=80 make run-module
+----
+
+Note: The apache module with port 80 is taken here as an example. You must put the name and port for your own module here.
+
+This will start the environment and you must wait until the service is completely started. After that you can run the test which require an environment:
+
+[source,bash]
+----
+MODULE=apache make test-module
+----
+
+This will run the integration and system tests connecting to the environment in your docker container.

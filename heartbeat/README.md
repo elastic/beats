@@ -5,7 +5,7 @@ Welcome to Heartbeat.
 This is a new EXPERIMENTAL beat for testing service availability using PING based on ICMP, TCP or higher level protocols.
 
 Ensure that this folder is at the following location:
-`${GOPATH}/github.com/elastic/beats`
+`${GOPATH}/src/github.com/elastic/beats`
 
 ## Getting Started with Heartbeat
 
@@ -35,8 +35,7 @@ To run Heartbeat with debugging output enabled, run:
 ### Update
 
 Each beat has a template for the mapping in elasticsearch and a documentation for the fields
-which is automatically generated based on `etc/fields.yml`.
-To generate etc/heartbeat.template.json and etc/heartbeat.asciidoc
+which is automatically generated based on `fields.yml`.
 
 ```
 make update

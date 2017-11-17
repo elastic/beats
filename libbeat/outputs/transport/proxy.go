@@ -4,8 +4,9 @@ import (
 	"net"
 	"net/url"
 
-	"github.com/elastic/beats/libbeat/logp"
 	"golang.org/x/net/proxy"
+
+	"github.com/elastic/beats/libbeat/logp"
 )
 
 // ProxyConfig holds the configuration information required to proxy
@@ -76,6 +77,6 @@ func ProxyDialer(config *ProxyConfig, forward Dialer) (Dialer, error) {
 		if err != nil {
 			return nil, err
 		}
-		return dialWith(dialer, network, host, addresses, port)
+		return DialWith(dialer, network, host, addresses, port)
 	}), nil
 }

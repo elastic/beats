@@ -1,7 +1,7 @@
 ###################### Winlogbeat Configuration Example ##########################
 
 # This file is an example configuration file highlighting only the most common
-# options. The winlogbeat.full.yml file from the same directory contains all the
+# options. The winlogbeat.reference.yml file from the same directory contains all the
 # supported options with more comments. You can use it as a reference.
 #
 # You can find the full configuration reference here:
@@ -22,3 +22,10 @@ winlogbeat.event_logs:
     ignore_older: 72h
   - name: Security
   - name: System
+
+#==================== Elasticsearch template setting ==========================
+
+setup.template.settings:
+  index.number_of_shards: 3
+  #index.codec: best_compression
+  #_source.enabled: false

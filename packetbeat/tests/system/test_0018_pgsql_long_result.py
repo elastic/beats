@@ -27,7 +27,7 @@ class Test(BaseTest):
         assert len(lines) == 11    # 10 plus header
 
         for line in lines[4:]:
-            print line, len(line)
+            print(line, len(line))
             assert len(line) == 237
 
     def test_max_row_length(self):
@@ -51,7 +51,7 @@ class Test(BaseTest):
         assert len(lines) == 11    # 10 plus header
 
         for line in lines[4:]:
-            print line, len(line)
+            print(line, len(line))
             assert len(line) == 83   # 79 plus two separators and two quotes
 
     def test_max_rows(self):

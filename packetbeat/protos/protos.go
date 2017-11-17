@@ -7,9 +7,10 @@ import (
 	"strings"
 	"time"
 
+	"github.com/elastic/beats/libbeat/beat"
 	"github.com/elastic/beats/libbeat/common"
+	"github.com/elastic/beats/libbeat/common/cfgwarn"
 	"github.com/elastic/beats/libbeat/logp"
-	"github.com/elastic/beats/packetbeat/publish"
 )
 
 const (
@@ -60,67 +61,117 @@ type Protocols interface {
 	BpfFilter(withVlans bool, withICMP bool) string
 	GetTCP(proto Protocol) TCPPlugin
 	GetUDP(proto Protocol) UDPPlugin
-	GetAll() map[Protocol]Plugin
+
 	GetAllTCP() map[Protocol]TCPPlugin
 	GetAllUDP() map[Protocol]UDPPlugin
+
 	// Register(proto Protocol, plugin ProtocolPlugin)
 }
 
 // list of protocol plugins
 type ProtocolsStruct struct {
-	all map[Protocol]Plugin
+	all map[Protocol]protocolInstance
 	tcp map[Protocol]TCPPlugin
 	udp map[Protocol]UDPPlugin
 }
 
 // Singleton of Protocols type.
 var Protos = ProtocolsStruct{
-	all: map[Protocol]Plugin{},
+	all: map[Protocol]protocolInstance{},
 	tcp: map[Protocol]TCPPlugin{},
 	udp: map[Protocol]UDPPlugin{},
 }
 
+type protocolInstance struct {
+	client beat.Client
+	plugin Plugin
+}
+
+type reporterFactory interface {
+	CreateReporter(*common.Config) (func(beat.Event), error)
+}
+
 func (s ProtocolsStruct) Init(
 	testMode bool,
-	results publish.Transactions,
+	pub reporterFactory,
 	configs map[string]*common.Config,
+	listConfigs []*common.Config,
 ) error {
+	if len(configs) > 0 {
+		cfgwarn.Deprecate("7.0.0", "dictionary style protocols configuration has been deprecated. Please use list-style protocols configuration.")
+	}
+
 	for proto := range protocolSyms {
-		logp.Info("registered protocol plugin: %v", proto)
+		logp.Debug("protos", "registered protocol plugin: %v", proto)
 	}
 
 	for name, config := range configs {
-		// XXX: icmp is special, ignore here :/
-		if name == "icmp" {
-			continue
+		if err := s.configureProtocol(testMode, pub, name, config); err != nil {
+			return err
 		}
+	}
 
-		proto, exists := protocolSyms[name]
-		if !exists {
-			logp.Err("Unknown protocol plugin: %v", name)
-			continue
-		}
-
-		plugin, exists := protocolPlugins[proto]
-		if !exists {
-			logp.Err("Protocol plugin '%v' not registered (%v).", name, proto.String())
-			continue
-		}
-
-		if !config.Enabled() {
-			logp.Info("Protocol plugin '%v' disabled by config", name)
-			continue
-		}
-
-		inst, err := plugin(testMode, results, config)
-		if err != nil {
-			logp.Err("Failed to register protocol plugin: %v", err)
+	for _, config := range listConfigs {
+		module := struct {
+			Name string `config:"type" validate:"required"`
+		}{}
+		if err := config.Unpack(&module); err != nil {
 			return err
 		}
 
-		s.register(proto, inst)
+		if err := s.configureProtocol(testMode, pub, module.Name, config); err != nil {
+			return err
+		}
 	}
 
+	return nil
+}
+
+func (s ProtocolsStruct) configureProtocol(
+	testMode bool,
+	pub reporterFactory,
+	name string,
+	config *common.Config,
+) error {
+	// XXX: icmp is special, ignore here :/
+	if name == "icmp" {
+		return nil
+	}
+
+	proto, exists := protocolSyms[name]
+	if !exists {
+		logp.Err("Unknown protocol plugin: %v", name)
+		return nil
+	}
+
+	plugin, exists := protocolPlugins[proto]
+	if !exists {
+		logp.Err("Protocol plugin '%v' not registered (%v).", name, proto.String())
+		return nil
+	}
+
+	if !config.Enabled() {
+		logp.Info("Protocol plugin '%v' disabled by config", name)
+		return nil
+	}
+
+	var client beat.Client
+	results := func(beat.Event) {}
+	if !testMode {
+		var err error
+		results, err = pub.CreateReporter(config)
+		if err != nil {
+			return err
+		}
+	}
+
+	inst, err := plugin(testMode, results, config)
+	if err != nil {
+		logp.Err("Failed to register protocol plugin: %v", err)
+		return err
+	}
+
+	s.register(proto, client, inst)
 	return nil
 }
 
@@ -140,10 +191,6 @@ func (s ProtocolsStruct) GetUDP(proto Protocol) UDPPlugin {
 	}
 
 	return plugin
-}
-
-func (s ProtocolsStruct) GetAll() map[Protocol]Plugin {
-	return s.all
 }
 
 func (s ProtocolsStruct) GetAllTCP() map[Protocol]TCPPlugin {
@@ -169,7 +216,7 @@ func (s ProtocolsStruct) BpfFilter(withVlans bool, withICMP bool) string {
 	var expressions []string
 	for _, key := range protos {
 		proto := Protocol(key)
-		plugin := s.all[proto]
+		plugin := s.all[proto].plugin
 		for _, port := range plugin.GetPorts() {
 			hasTCP := false
 			hasUDP := false
@@ -205,12 +252,15 @@ func (s ProtocolsStruct) BpfFilter(withVlans bool, withICMP bool) string {
 	return filter
 }
 
-func (s ProtocolsStruct) register(proto Protocol, plugin Plugin) {
+func (s ProtocolsStruct) register(proto Protocol, client beat.Client, plugin Plugin) {
 	if _, exists := s.all[proto]; exists {
 		logp.Warn("Protocol (%s) plugin will overwritten by another plugin", proto.String())
 	}
 
-	s.all[proto] = plugin
+	s.all[proto] = protocolInstance{
+		client: client,
+		plugin: plugin,
+	}
 
 	success := false
 	if tcp, ok := plugin.(TCPPlugin); ok {

@@ -1,0 +1,6 @@
+== Dropwizard module
+
+beta[]
+
+This is the http://dropwizard.io[Dropwizard] module.
+
