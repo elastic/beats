@@ -79,8 +79,9 @@ published events in the Filebeat logs.
 ==== Filebeat prospector type and document type changes
 
 The `document_type` setting, from the prospector configuration, was removed
-because the `_type` concept is being removed from Elasticsearch. Instead of the
-`document_type` setting, you can use a custom field.
+because the `_type` concept is being
+{elasticsearch}/removal-of-types.html[removed from Elasticsearch]. Instead of
+the `document_type` setting, you can use a custom field.
 
 This has led also to the rename of the `input_type` configuration setting to
 `type`. This change is backwards compatible because the old setting still

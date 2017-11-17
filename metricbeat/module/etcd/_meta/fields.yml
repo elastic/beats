@@ -1,7 +1,7 @@
 - key: etcd
   title: "Etcd"
   description: >
-    []experimental
+    experimental[]
 
     etcd Module
   fields:

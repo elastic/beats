@@ -37,6 +37,7 @@ func TestData(t *testing.T) {
 }
 
 func TestTopic(t *testing.T) {
+
 	compose.EnsureUp(t, "kafka")
 
 	if testing.Verbose() {
@@ -107,6 +108,11 @@ func generateKafkaData(t *testing.T, topic string) {
 
 	config := sarama.NewConfig()
 	config.Producer.Return.Successes = true
+	// Retry for 10 seconds
+	config.Producer.Retry.Max = 20
+	config.Producer.Retry.Backoff = 500 * time.Millisecond
+	config.Metadata.Retry.Max = 20
+	config.Metadata.Retry.Backoff = 500 * time.Millisecond
 	client, err := sarama.NewClient([]string{getTestKafkaHost()}, config)
 	if err != nil {
 		t.Errorf("%s", err)

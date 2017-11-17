@@ -23,6 +23,9 @@ data:
     processors:
       - add_cloud_metadata:
 
+    cloud.id: ${ELASTIC_CLOUD_ID}
+    cloud.auth: ${ELASTIC_CLOUD_AUTH}
+
     output.elasticsearch:
       hosts: ['${ELASTICSEARCH_HOST:elasticsearch}:${ELASTICSEARCH_PORT:9200}']
       username: ${ELASTICSEARCH_USERNAME}
@@ -81,6 +84,10 @@ spec:
           value: elastic
         - name: ELASTICSEARCH_PASSWORD
           value: changeme
+        - name: ELASTIC_CLOUD_ID
+          value:
+        - name: ELASTIC_CLOUD_AUTH
+          value:
         - name: POD_NAMESPACE
           valueFrom:
             fieldRef:

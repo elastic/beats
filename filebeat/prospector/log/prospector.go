@@ -15,6 +15,7 @@ import (
 	"github.com/elastic/beats/filebeat/prospector"
 	"github.com/elastic/beats/filebeat/util"
 	"github.com/elastic/beats/libbeat/common"
+	"github.com/elastic/beats/libbeat/common/atomic"
 	"github.com/elastic/beats/libbeat/logp"
 	"github.com/elastic/beats/libbeat/monitoring"
 )
@@ -38,13 +39,14 @@ func init() {
 
 // Prospector contains the prospector and its config
 type Prospector struct {
-	cfg         *common.Config
-	config      config
-	states      *file.States
-	harvesters  *harvester.Registry
-	outlet      channel.Outleter
-	stateOutlet channel.Outleter
-	done        chan struct{}
+	cfg           *common.Config
+	config        config
+	states        *file.States
+	harvesters    *harvester.Registry
+	outlet        channel.Outleter
+	stateOutlet   channel.Outleter
+	done          chan struct{}
+	numHarvesters atomic.Uint64
 }
 
 // NewProspector instantiates a new Log
@@ -60,7 +62,7 @@ func NewProspector(
 	//  The outlet generated here is the underlying outlet, only closed
 	//  once all workers have been shut down.
 	//  For state updates and events, separate sub-outlets will be used.
-	out, err := outlet(cfg)
+	out, err := outlet(cfg, context.DynamicFields)
 	if err != nil {
 		return nil, err
 	}
@@ -83,14 +85,16 @@ func NewProspector(
 	if err := cfg.Unpack(&p.config); err != nil {
 		return nil, err
 	}
-	if err := p.config.resolvePaths(); err != nil {
-		logp.Err("Failed to resolve paths in config: %+v", err)
-		return nil, err
+	if err := p.config.resolveRecursiveGlobs(); err != nil {
+		return nil, fmt.Errorf("Failed to resolve recursive globs in config: %v", err)
+	}
+	if err := p.config.normalizeGlobPatterns(); err != nil {
+		return nil, fmt.Errorf("Failed to normalize globs patterns: %v", err)
 	}
 
 	// Create empty harvester to check if configs are fine
 	// TODO: Do config validation instead
-	_, err = p.createHarvester(file.State{})
+	_, err = p.createHarvester(file.State{}, nil)
 	if err != nil {
 		return nil, err
 	}
@@ -113,7 +117,7 @@ func NewProspector(
 // It goes through all states coming from the registry. Only the states which match the glob patterns of
 // the prospector will be loaded and updated. All other states will not be touched.
 func (p *Prospector) loadStates(states []file.State) error {
-	logp.Debug("prospector", "exclude_files: %s", p.config.ExcludeFiles)
+	logp.Debug("prospector", "exclude_files: %s. Number of stats: %d", p.config.ExcludeFiles, len(states))
 
 	for _, state := range states {
 		// Check if state source belongs to this prospector. If yes, update the state.
@@ -568,7 +572,7 @@ func (p *Prospector) isCleanInactive(state file.State) bool {
 }
 
 // createHarvester creates a new harvester instance from the given state
-func (p *Prospector) createHarvester(state file.State) (*Harvester, error) {
+func (p *Prospector) createHarvester(state file.State, onTerminate func()) (*Harvester, error) {
 	// Each wraps the outlet, for closing the outlet individually
 	outlet := channel.SubOutlet(p.outlet)
 	h, err := NewHarvester(
@@ -580,30 +584,32 @@ func (p *Prospector) createHarvester(state file.State) (*Harvester, error) {
 		},
 		outlet,
 	)
-
+	h.onTerminate = onTerminate
 	return h, err
 }
 
 // startHarvester starts a new harvester with the given offset
 // In case the HarvesterLimit is reached, an error is returned
 func (p *Prospector) startHarvester(state file.State, offset int64) error {
-	if p.config.HarvesterLimit > 0 && p.harvesters.Len() >= p.config.HarvesterLimit {
+	if p.numHarvesters.Inc() > p.config.HarvesterLimit && p.config.HarvesterLimit > 0 {
+		p.numHarvesters.Dec()
 		harvesterSkipped.Add(1)
 		return fmt.Errorf("Harvester limit reached")
 	}
-
 	// Set state to "not" finished to indicate that a harvester is running
 	state.Finished = false
 	state.Offset = offset
 
 	// Create harvester with state
-	h, err := p.createHarvester(state)
+	h, err := p.createHarvester(state, func() { p.numHarvesters.Dec() })
 	if err != nil {
+		p.numHarvesters.Dec()
 		return err
 	}
 
 	err = h.Setup()
 	if err != nil {
+		p.numHarvesters.Dec()
 		return fmt.Errorf("Error setting up harvester: %s", err)
 	}
 
@@ -612,9 +618,10 @@ func (p *Prospector) startHarvester(state file.State, offset int64) error {
 	// This is synchronous state update as part of the scan
 	h.SendStateUpdate()
 
-	p.harvesters.Start(h)
-
-	return nil
+	if err = p.harvesters.Start(h); err != nil {
+		p.numHarvesters.Dec()
+	}
+	return err
 }
 
 // updateState updates the prospector state and forwards the event to the spooler

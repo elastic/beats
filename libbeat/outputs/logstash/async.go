@@ -15,9 +15,9 @@ import (
 
 type asyncClient struct {
 	*transport.Client
-	stats  *outputs.Stats
-	client *v2.AsyncClient
-	win    *window
+	observer outputs.Observer
+	client   *v2.AsyncClient
+	win      *window
 
 	connect func() error
 }
@@ -35,12 +35,12 @@ type msgRef struct {
 func newAsyncClient(
 	beat beat.Info,
 	conn *transport.Client,
-	stats *outputs.Stats,
+	observer outputs.Observer,
 	config *Config,
 ) (*asyncClient, error) {
 	c := &asyncClient{
-		Client: conn,
-		stats:  stats,
+		Client:   conn,
+		observer: observer,
 	}
 
 	if config.SlowStart {
@@ -106,7 +106,7 @@ func (c *asyncClient) Close() error {
 }
 
 func (c *asyncClient) Publish(batch publisher.Batch) error {
-	st := c.stats
+	st := c.observer
 	events := batch.Events()
 	st.NewBatch(len(events))
 
@@ -193,7 +193,7 @@ func (r *msgRef) callback(seq uint32, err error) {
 }
 
 func (r *msgRef) done(n uint32) {
-	r.client.stats.Acked(int(n))
+	r.client.observer.Acked(int(n))
 	r.slice = r.slice[n:]
 	if r.win != nil {
 		r.win.tryGrowWindow(r.batchSize)
@@ -210,7 +210,7 @@ func (r *msgRef) fail(n uint32, err error) {
 		r.win.shrinkWindow()
 	}
 
-	r.client.stats.Acked(int(n))
+	r.client.observer.Acked(int(n))
 
 	r.dec()
 }
@@ -222,7 +222,7 @@ func (r *msgRef) dec() {
 	}
 
 	if L := len(r.slice); L > 0 {
-		r.client.stats.Failed(L)
+		r.client.observer.Failed(L)
 	}
 
 	err := r.err

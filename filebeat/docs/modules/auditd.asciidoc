@@ -29,6 +29,7 @@ This module comes with a sample dashboard showing an overview of the audit log
 data. You can build more specific dashboards that are tailored to the audit
 rules that you use on your systems.
 
+[role="screenshot"]
 image::./images/kibana-audit-auditd.png[]
 
 include::../include/configuring-intro.asciidoc[]

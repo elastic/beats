@@ -7,6 +7,8 @@ import (
 
 	"github.com/elastic/beats/libbeat/beat"
 	"github.com/elastic/beats/libbeat/common"
+	"github.com/elastic/beats/libbeat/common/bus"
+	"github.com/elastic/beats/libbeat/common/docker"
 )
 
 func TestInitialization(t *testing.T) {
@@ -65,8 +67,8 @@ func TestMatchContainer(t *testing.T) {
 	assert.NoError(t, err)
 
 	p, err := buildDockerMetadataProcessor(testConfig, MockWatcherFactory(
-		map[string]*Container{
-			"container_id": &Container{
+		map[string]*docker.Container{
+			"container_id": &docker.Container{
 				ID:    "container_id",
 				Image: "image",
 				Name:  "name",
@@ -106,8 +108,8 @@ func TestMatchSource(t *testing.T) {
 	assert.NoError(t, err)
 
 	p, err := buildDockerMetadataProcessor(testConfig, MockWatcherFactory(
-		map[string]*Container{
-			"FABADA": &Container{
+		map[string]*docker.Container{
+			"FABADA": &docker.Container{
 				ID:    "FABADA",
 				Image: "image",
 				Name:  "name",
@@ -149,8 +151,8 @@ func TestDisableSource(t *testing.T) {
 	assert.NoError(t, err)
 
 	p, err := buildDockerMetadataProcessor(testConfig, MockWatcherFactory(
-		map[string]*Container{
-			"FABADA": &Container{
+		map[string]*docker.Container{
+			"FABADA": &docker.Container{
 				ID:    "FABADA",
 				Image: "image",
 				Name:  "name",
@@ -174,17 +176,17 @@ func TestDisableSource(t *testing.T) {
 
 // Mock container watcher
 
-func MockWatcherFactory(containers map[string]*Container) WatcherConstructor {
+func MockWatcherFactory(containers map[string]*docker.Container) docker.WatcherConstructor {
 	if containers == nil {
-		containers = make(map[string]*Container)
+		containers = make(map[string]*docker.Container)
 	}
-	return func(host string, tls *TLSConfig) (Watcher, error) {
+	return func(host string, tls *docker.TLSConfig) (docker.Watcher, error) {
 		return &mockWatcher{containers: containers}, nil
 	}
 }
 
 type mockWatcher struct {
-	containers map[string]*Container
+	containers map[string]*docker.Container
 }
 
 func (m *mockWatcher) Start() error {
@@ -193,10 +195,18 @@ func (m *mockWatcher) Start() error {
 
 func (m *mockWatcher) Stop() {}
 
-func (m *mockWatcher) Container(ID string) *Container {
+func (m *mockWatcher) Container(ID string) *docker.Container {
 	return m.containers[ID]
 }
 
-func (m *mockWatcher) Containers() map[string]*Container {
+func (m *mockWatcher) Containers() map[string]*docker.Container {
 	return m.containers
+}
+
+func (m *mockWatcher) ListenStart() bus.Listener {
+	return nil
+}
+
+func (m *mockWatcher) ListenStop() bus.Listener {
+	return nil
 }

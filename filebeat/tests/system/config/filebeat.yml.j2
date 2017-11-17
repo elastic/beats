@@ -10,7 +10,7 @@ filebeat.prospectors:
   # Paths that should be crawled and fetched
   {% if path %}paths:
     - {{ path }}{% endif %}
-  {% if recursive_glob %}recursive_glob.enabled: true
+  {% if disable_recursive_glob %}recursive_glob.enabled: false
   {% endif %}
   # Type of the files. Annotated in every documented
   scan_frequency: {{scan_frequency | default("0.1s") }}
@@ -102,6 +102,22 @@ filebeat.config.{{ reload_type|default("prospectors") }}:
   reload.enabled: {{ reload|default("false") }}
   {% endif -%}
 {% endif -%}
+
+#============================== Autodiscover ==================================
+
+{% if autodiscover %}
+filebeat.autodiscover:
+  providers:
+  {%- for provider, settings in autodiscover.items() %}
+  - type: {{provider}}
+    {%- if settings %}
+    {%- for k, v in settings.items() %}
+    {{k}}:
+      {{v | default([])}}
+    {%- endfor %}
+    {%- endif %}
+  {%- endfor %}
+{% endif %}
 
 #================================ General =====================================
 

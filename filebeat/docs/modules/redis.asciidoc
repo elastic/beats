@@ -7,8 +7,6 @@ This file is generated! See scripts/docs_collector.py
 
 == Redis module
 
-experimental[]
-
 The +{modulename}+ module parses logs and slowlogs created by
 https://redis.io/[Redis].
 
@@ -42,8 +40,9 @@ include::../include/running-modules.asciidoc[]
 [float]
 === Example dashboard
 
-This module comes with a sample dashboard.
+This module comes with a sample dashboard. For example:
 
+[role="screenshot"]
 image::./images/kibana-redis.png[]
 
 include::../include/configuring-intro.asciidoc[]
