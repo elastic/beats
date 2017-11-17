@@ -2,6 +2,7 @@ import os
 import metricbeat
 import unittest
 from nose.plugins.attrib import attr
+from nose.plugins.skip import SkipTest
 
 
 class Test(metricbeat.BaseTest):
@@ -13,6 +14,7 @@ class Test(metricbeat.BaseTest):
         """
         kafka partition metricset test
         """
+
         self.create_topic()
 
         self.render_config_template(modules=[{
@@ -33,8 +35,11 @@ class Test(metricbeat.BaseTest):
         self.assert_fields_are_documented(evt)
 
     def create_topic(self):
+
         from kafka import KafkaProducer
-        producer = KafkaProducer(bootstrap_servers=self.get_hosts()[0])
+
+        producer = KafkaProducer(bootstrap_servers=self.get_hosts()[
+            0], retries=20, retry_backoff_ms=500, api_version=("0.10"))
         producer.send('foobar', b'some_message_bytes')
 
     def get_hosts(self):

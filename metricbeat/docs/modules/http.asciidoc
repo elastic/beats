@@ -5,6 +5,8 @@ This file is generated! See scripts/docs_collector.py
 [[metricbeat-module-http]]
 == HTTP module
 
+beta[]
+
 The HTTP module is a Metricbeat module used to call arbitrary HTTP endpoints for which a dedicated Metricbeat module is not available.
 
 Multiple endpoints can be configured which are polled in a regular interval and the result is shipped to the configured output channel. It is recommended to install a Metricbeat instance on each host from which data should be fetched.

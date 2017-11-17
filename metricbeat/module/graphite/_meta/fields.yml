@@ -1,7 +1,7 @@
 - key: graphite
   title: "graphite"
   description: >
-    []experimental
+    experimental[]
 
     graphite Module
   fields:

@@ -25,3 +25,21 @@ metricbeat.config.modules:
 # Maximum amount of time to randomly delay the start of a metricset. Use 0 to
 # disable startup delay.
 metricbeat.max_start_delay: 10s
+
+#============================== Autodiscover ===================================
+
+# Autodiscover allows you to detect changes in the system and spawn new modules
+# as they happen.
+
+#metricbeat.autodiscover:
+  # List of enabled autodiscover providers
+#  providers:
+#    - type: docker
+#      templates:
+#        - condition:
+#            equals.docker.container.image: etcd
+#          config:
+#            - module: etcd
+#              metricsets: ["leader", "self", "store"]
+#              period: 10s
+#              hosts: ["${host}:2379"]

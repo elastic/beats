@@ -23,10 +23,11 @@ This module is not available for Windows.
 include::../include/running-modules.asciidoc[]
 
 [float]
-=== Example dashboard
+=== Example dashboards
 
-This module comes with a sample dashboard showing syslog data.
+This module comes with sample dashboards. For example:
 
+[role="screenshot"]
 image::./images/kibana-system.png[]
 
 include::../include/configuring-intro.asciidoc[]

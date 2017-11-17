@@ -200,6 +200,10 @@ func (l *chanList) prepend(ch *ackChan) {
 }
 
 func (l *chanList) concat(other *chanList) {
+	if other.head == nil {
+		return
+	}
+
 	if l.head == nil {
 		*l = *other
 		return

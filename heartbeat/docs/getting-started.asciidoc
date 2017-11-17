@@ -20,8 +20,7 @@ install, configure, and run Heartbeat:
 * <<load-kibana-dashboards>>
 * <<heartbeat-starting>>
 * <<view-kibana-dashboards>>
-* <<command-line-options>>
-* <<directory-layout>>
+* <<setup-repositories>>
 
 
 [[heartbeat-installation]]

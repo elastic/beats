@@ -20,7 +20,10 @@ include::../include/running-modules.asciidoc[]
 [float]
 === Example dashboard
 
-//TO DO: Add sample dashboards
+This module comes with sample dashboards. For example:
+
+[role="screenshot"]
+image::./images/kibana-icinga-main.png[]
 
 include::../include/configuring-intro.asciidoc[]
 

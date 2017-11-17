@@ -24,6 +24,8 @@ services:
       - ${PWD}/build/test.env
     volumes:
       - ${PWD}/..:/go/src/github.com/elastic/beats/
+      # Used for docker integration tests:
+      - /var/run/docker.sock:/var/run/docker.sock
     working_dir: /go/src/github.com/elastic/beats/libbeat
     command: make
 

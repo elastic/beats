@@ -42,7 +42,7 @@ func NewFactory(outlet channel.Factory, registrar *registrar.Registrar, beatVers
 }
 
 // Create creates a module based on a config
-func (f *Factory) Create(c *common.Config) (cfgfile.Runner, error) {
+func (f *Factory) Create(c *common.Config, meta *common.MapStrPointer) (cfgfile.Runner, error) {
 	// Start a registry of one module:
 	m, err := NewModuleRegistry([]*common.Config{c}, f.beatVersion, false)
 	if err != nil {
@@ -64,7 +64,7 @@ func (f *Factory) Create(c *common.Config) (cfgfile.Runner, error) {
 
 	prospectors := make([]*prospector.Prospector, len(pConfigs))
 	for i, pConfig := range pConfigs {
-		prospectors[i], err = prospector.New(pConfig, f.outlet, f.beatDone, f.registrar.GetStates())
+		prospectors[i], err = prospector.New(pConfig, f.outlet, f.beatDone, f.registrar.GetStates(), meta)
 		if err != nil {
 			logp.Err("Error creating prospector: %s", err)
 			return nil, err
@@ -110,6 +110,7 @@ func (p *prospectorsRunner) Stop() {
 		prospector.Stop()
 	}
 }
-func (p *prospectorsRunner) ID() uint64 {
-	return p.id
+
+func (p *prospectorsRunner) String() string {
+	return p.moduleRegistry.InfoString()
 }

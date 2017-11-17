@@ -26,6 +26,24 @@ metricbeat.config.modules:
 # disable startup delay.
 metricbeat.max_start_delay: 10s
 
+#============================== Autodiscover ===================================
+
+# Autodiscover allows you to detect changes in the system and spawn new modules
+# as they happen.
+
+#metricbeat.autodiscover:
+  # List of enabled autodiscover providers
+#  providers:
+#    - type: docker
+#      templates:
+#        - condition:
+#            equals.docker.container.image: etcd
+#          config:
+#            - module: etcd
+#              metricsets: ["leader", "self", "store"]
+#              period: 10s
+#              hosts: ["${host}:2379"]
+
 #==========================  Modules configuration ============================
 metricbeat.modules:
 
@@ -119,7 +137,7 @@ metricbeat.modules:
 
 #-------------------------------- Ceph Module --------------------------------
 - module: ceph
-  metricsets: ["cluster_disk", "cluster_health", "monitor_health", "pool_disk"]
+  metricsets: ["cluster_disk", "cluster_health", "monitor_health", "pool_disk", "osd_tree"]
   period: 10s
   hosts: ["localhost:5000"]
 
@@ -287,6 +305,14 @@ metricbeat.modules:
   metricsets:
     - event
 
+#------------------------------ Logstash Module ------------------------------
+- module: logstash
+  metricsets: ["node"]
+  enabled: false
+  period: 10s
+  hosts: ["localhost"]
+
+
 #------------------------------ Memcached Module -----------------------------
 - module: memcached
   metricsets: ["stats"]
@@ -441,6 +467,10 @@ metricbeat.modules:
   metricsets: ["perfmon"]
   period: 10s
   perfmon.counters:
+
+- module: windows
+  metricsets: ["service"]
+  period: 60s
 
 #------------------------------ ZooKeeper Module -----------------------------
 - module: zookeeper

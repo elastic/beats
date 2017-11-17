@@ -20,8 +20,7 @@ install, configure, and run {beatname_uc}:
 * <<load-kibana-dashboards>>
 * <<{beatname_lc}-starting>>
 * <<view-kibana-dashboards>>
-* <<command-line-options>>
-* <<directory-layout>>
+* <<setup-repositories>>
 
 [id="{beatname_lc}-installation"]
 === Step 1: Install {beatname_uc}
