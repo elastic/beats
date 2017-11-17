@@ -13,14 +13,8 @@ type consumer struct {
 	broker *Broker
 	resp   chan getResponse
 
-	stats consumerStats
-
 	done   chan struct{}
 	closed atomic.Bool
-}
-
-type consumerStats struct {
-	totalGet, totalACK uint64
 }
 
 type batch struct {
@@ -61,13 +55,6 @@ func (c *consumer) Get(sz int) (queue.Batch, error) {
 
 	// if request has been send, we do have to wait for a response
 	resp := <-c.resp
-
-	ack := resp.ack
-	c.stats.totalGet += uint64(ack.count)
-
-	// log.Debugf("create batch: seq=%v, start=%v, len=%v", ack.seq, ack.start, len(resp.buf))
-	// log.Debug("consumer: total events get = ", c.stats.totalGet)
-
 	return &batch{
 		consumer: c,
 		events:   resp.buf,
@@ -93,10 +80,6 @@ func (b *batch) Events() []publisher.Event {
 }
 
 func (b *batch) ACK() {
-	c := b.consumer
-	// broker := c.broker
-	// log := broker.logger
-
 	if b.state != batchActive {
 		switch b.state {
 		case batchACK:
@@ -106,9 +89,6 @@ func (b *batch) ACK() {
 		}
 	}
 
-	c.stats.totalACK += uint64(b.ack.count)
-	// log.Debug("consumer: total events ack = ", c.stats.totalACK)
-	// log.Debugf("ack batch: seq=%v, len=%v", b.ack.seq, len(b.events))
 	b.report()
 }
 

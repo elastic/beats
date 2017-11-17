@@ -63,13 +63,15 @@ paths. You can specify one path per line. Each line begins with a dash (-).
 
 [float]
 [[recursive_glob]]
-==== `recursive_glob`
+==== `recursive_glob.enabled`
 
-*`enabled`*:: Enable expanding `**` into recursive glob patterns. With this feature enabled,
-the rightmost `**` in each path is expanded into a fixed
-number of glob patterns. For example: `/foo/**` expands to `/foo`, `/foo/*`,
-`/foo/*/*`, and so on. The feature is disabled by default, and if enabled it expands a single `**`
-into a 8-level deep `*` pattern.
+Enable expanding `**` into recursive glob patterns. With this feature enabled,
+the rightmost `**` in each path is expanded into a fixed number of glob
+patterns. For example: `/foo/**` expands to `/foo`, `/foo/*`, `/foo/*/*`, and so
+on. If enabled it expands a single `**` into a 8-level deep `*` pattern.
+
+This feature is enabled by default, set to `recursive_glob.enabled` to false to
+disable it.
 
 [float]
 ==== `encoding`
@@ -395,6 +397,9 @@ json.keys_under_root: true
 json.add_error_key: true
 json.message_key: log
 -------------------------------------------------------------------------------------
+
+You must specify at least one of the following settings to enable JSON parsing
+mode:
 
 *`keys_under_root`*:: By default, the decoded JSON is placed under a "json" key in the output document.
 If you enable this setting, the keys are copied top level in the output document. The default is false.

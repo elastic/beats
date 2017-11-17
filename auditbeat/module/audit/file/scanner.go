@@ -29,15 +29,18 @@ type scanner struct {
 	done   <-chan struct{}
 	eventC chan Event
 
-	logPrefix string // Unique ID to correlate log messages to a single instance.
+	logID     string // Unique ID to correlate log messages to a single instance.
+	logPrefix string
 	config    Config
 }
 
 // NewFileSystemScanner creates a new EventProducer instance that scans the
 // configured file paths.
 func NewFileSystemScanner(c Config) (EventProducer, error) {
+	logID := fmt.Sprintf("[scanner-%v]", atomic.AddUint32(&scannerID, 1))
 	return &scanner{
-		logPrefix: fmt.Sprintf("%v [scanner-%v]", logPrefix, atomic.AddUint32(&scannerID, 1)),
+		logID:     logID,
+		logPrefix: fmt.Sprintf("%v %v", logPrefix, logID),
 		config:    c,
 		eventC:    make(chan Event, 1),
 	}, nil
@@ -52,7 +55,7 @@ func (s *scanner) Start(done <-chan struct{}) (<-chan Event, error) {
 
 	if s.config.ScanRateBytesPerSec > 0 {
 		debugf("%v creating token bucket with rate %v/sec and capacity %v",
-			s.logPrefix, s.config.ScanRatePerSec,
+			s.logID, s.config.ScanRatePerSec,
 			humanize.Bytes(s.config.MaxFileSizeBytes))
 
 		s.tokenBucket = ratelimit.NewBucketWithRate(
@@ -69,8 +72,8 @@ func (s *scanner) Start(done <-chan struct{}) (<-chan Event, error) {
 func (s *scanner) scan() {
 	if logp.IsDebug(metricsetName) {
 		debugf("%v File system scanner is starting for paths [%v].",
-			s.logPrefix, strings.Join(s.config.Paths, ", "))
-		defer debugf("%v File system scanner is stopping.", s.logPrefix)
+			s.logID, strings.Join(s.config.Paths, ", "))
+		defer debugf("%v File system scanner is stopping.", s.logID)
 	}
 	defer close(s.eventC)
 	startTime := time.Now()

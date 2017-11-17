@@ -4,9 +4,12 @@ import (
 	"flag"
 	"fmt"
 
+	"github.com/joeshaw/multierror"
 	"github.com/pkg/errors"
 
+	"github.com/elastic/beats/libbeat/autodiscover"
 	"github.com/elastic/beats/libbeat/beat"
+	"github.com/elastic/beats/libbeat/cfgfile"
 	"github.com/elastic/beats/libbeat/common"
 	"github.com/elastic/beats/libbeat/common/cfgwarn"
 	"github.com/elastic/beats/libbeat/logp"
@@ -79,7 +82,7 @@ func New(b *beat.Beat, rawConfig *common.Config) (beat.Beater, error) {
 		}
 	}
 
-	if !config.ConfigProspector.Enabled() && !config.ConfigModules.Enabled() && !haveEnabledProspectors {
+	if !config.ConfigProspector.Enabled() && !config.ConfigModules.Enabled() && !haveEnabledProspectors && config.Autodiscover == nil {
 		if !b.InSetupCmd {
 			return nil, errors.New("No modules or prospectors enabled and configuration reloading disabled. What files do you want me to watch?")
 		}
@@ -99,10 +102,8 @@ func New(b *beat.Beat, rawConfig *common.Config) (beat.Beater, error) {
 	}
 
 	// register `setup` callback for ML jobs
-	if !moduleRegistry.Empty() {
-		b.SetupMLCallback = func(b *beat.Beat) error {
-			return fb.loadModulesML(b)
-		}
+	b.SetupMLCallback = func(b *beat.Beat) error {
+		return fb.loadModulesML(b)
 	}
 	return fb, nil
 }
@@ -127,6 +128,7 @@ func (fb *Filebeat) loadModulesPipelines(b *beat.Beat) error {
 
 func (fb *Filebeat) loadModulesML(b *beat.Beat) error {
 	logp.Debug("machine-learning", "Setting up ML jobs for modules")
+	var errs multierror.Errors
 
 	if b.Config.Output.Name() != "elasticsearch" {
 		logp.Warn("Filebeat is unable to load the Xpack Machine Learning configurations for the" +
@@ -139,8 +141,39 @@ func (fb *Filebeat) loadModulesML(b *beat.Beat) error {
 	if err != nil {
 		return errors.Errorf("Error creating Elasticsearch client: %v", err)
 	}
+	if err := fb.moduleRegistry.LoadML(esClient); err != nil {
+		errs = append(errs, err)
+	}
 
-	return fb.moduleRegistry.LoadML(esClient)
+	// Add dynamic modules.d
+	if fb.config.ConfigModules.Enabled() {
+		config := cfgfile.DefaultDynamicConfig
+		fb.config.ConfigModules.Unpack(&config)
+
+		modulesManager, err := cfgfile.NewGlobManager(config.Path, ".yml", ".disabled")
+		if err != nil {
+			return errors.Wrap(err, "initialization error")
+		}
+
+		for _, file := range modulesManager.ListEnabled() {
+			confs, err := cfgfile.LoadList(file.Path)
+			if err != nil {
+				errs = append(errs, errors.Wrap(err, "error loading config file"))
+				continue
+			}
+			set, err := fileset.NewModuleRegistry(confs, "", false)
+			if err != nil {
+				errs = append(errs, err)
+				continue
+			}
+
+			if err := set.LoadML(esClient); err != nil {
+				errs = append(errs, err)
+			}
+		}
+	}
+
+	return errs.Err()
 }
 
 // Run allows the beater to be run as a beat.
@@ -244,14 +277,25 @@ func (fb *Filebeat) Run(b *beat.Beat) error {
 		waitFinished.Add(runOnce)
 	}
 
+	var adiscover *autodiscover.Autodiscover
+	if fb.config.Autodiscover != nil {
+		adapter := NewAutodiscoverAdapter(crawler.ProspectorsFactory, crawler.ModulesFactory)
+		adiscover, err = autodiscover.NewAutodiscover("filebeat", adapter, config.Autodiscover)
+		if err != nil {
+			return err
+		}
+	}
+	adiscover.Start()
+
 	// Add done channel to wait for shutdown signal
 	waitFinished.AddChan(fb.done)
 	waitFinished.Wait()
 
-	// Stop crawler -> stop prospectors -> stop harvesters
+	// Stop autodiscover -> Stop crawler -> stop prospectors -> stop harvesters
 	// Note: waiting for crawlers to stop here in order to install wgEvents.Wait
 	//       after all events have been enqueued for publishing. Otherwise wgEvents.Wait
 	//       or publisher might panic due to concurrent updates.
+	adiscover.Stop()
 	crawler.Stop()
 
 	timeout := fb.config.ShutdownTimeout

@@ -248,7 +248,7 @@ func connectTestEs(t *testing.T, cfg interface{}) (outputs.Client, *Client) {
 		t.Fatal(err)
 	}
 
-	output, err := makeES(beat.Info{Beat: "libbeat"}, nil, config)
+	output, err := makeES(beat.Info{Beat: "libbeat"}, outputs.NewNilObserver(), config)
 	if err != nil {
 		t.Fatal(err)
 	}

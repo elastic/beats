@@ -83,8 +83,7 @@ func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
 		}
 	}
 
-	debugf("%v Initialized the audit file event reader. Running as euid=%v",
-		logPrefix, os.Geteuid())
+	debugf("Initialized the audit file event reader. Running as euid=%v", os.Geteuid())
 
 	return ms, nil
 }
@@ -163,8 +162,8 @@ func (ms *MetricSet) init(reporter mb.PushReporter) bool {
 
 func (ms *MetricSet) reportEvent(reporter mb.PushReporter, event *Event) bool {
 	if len(event.errors) > 0 && logp.IsDebug(metricsetName) {
-		debugf("%v Errors on %v event for %v: %v",
-			logPrefix, event.Action, event.Path, event.errors)
+		debugf("Errors on %v event for %v: %v",
+			event.Action, event.Path, event.errors)
 	}
 
 	changed := ms.hasFileChangedSinceLastEvent(event)
@@ -202,8 +201,8 @@ func (ms *MetricSet) hasFileChangedSinceLastEvent(event *Event) bool {
 	}
 
 	if changed && logp.IsDebug(metricsetName) {
-		debugf("%v file at %v has changed since last seen: old=%v, new=%v",
-			logPrefix, event.Path, lastEvent, event)
+		debugf("file at %v has changed since last seen: old=%v, new=%v",
+			event.Path, lastEvent, event)
 	}
 	return changed
 }
@@ -264,7 +263,7 @@ func purgeOlder(b datastore.BoltBucket, t time.Time, prefix string) ([]*Event, e
 		return nil
 	})
 
-	debugf("%v Purged %v of %v entries in %v for %v", logPrefix, len(deleted),
+	debugf("Purged %v of %v entries in %v for %v", len(deleted),
 		totalKeys, time.Since(startTime), prefix)
 	return deleted, err
 }

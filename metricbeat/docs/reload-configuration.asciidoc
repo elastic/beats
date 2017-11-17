@@ -4,15 +4,22 @@
 Metricbeat can load external configuration files for modules, which allows you
 to separate your configuration into multiple smaller configuration files. To use
 this, you specify the `path` option under `metricbeat.config.modules` in the
-main `metricbeat.yml` configuration file. For example:
+main `metricbeat.yml` configuration file. By default, Metricbeat loads the
+module configurations enabled in the <<enable-modules-d-configs,`modules.d`>>
+directory. For example:
 
 [source,yaml]
 ------------------------------------------------------------------------------
 metricbeat.config.modules:
-  path: configs/*.yml
+  path: ${path.config}/modules.d/*.yml
 ------------------------------------------------------------------------------
 
+
 `path`:: A Glob that defines the files to check for changes.
++
+This setting must point to the `modules.d` directory if you want to use the
+<<modules-command,`modules`>> command to enable and disable module
+configurations.
 
 Each file found by the Glob must contain a list of one or more module
 definitions. For example:
@@ -30,9 +37,10 @@ definitions. For example:
   period: 10s
 ------------------------------------------------------------------------------
 
-=== Live reloading
 
-beta[]
+include::../../libbeat/docs/shared-note-file-permissions.asciidoc[]
+
+=== Live reloading
 
 You can configure Metricbeat to dynamically reload configuration files when
 there are changes. To do this, you specify a path
@@ -47,21 +55,29 @@ the Metricbeat configuration frequently to specify which modules are needed and
 which hosts must be monitored.
 
 To enable dynamic config reloading, you specify the `path` and `reload` options
-under `metricbeat.config.modules` in the main `metricbeat.yml` config file.
-For example:
+under `metricbeat.config.modules` in the main `metricbeat.yml` config file. For
+example:
 
 [source,yaml]
 ------------------------------------------------------------------------------
 metricbeat.config.modules:
-  path: configs/*.yml
+  path: ${path.config}/modules.d/*.yml
   reload.enabled: true
   reload.period: 10s
 ------------------------------------------------------------------------------
 
+
 `path`:: A Glob that defines the files to check for changes.
++
+This setting must point to the `modules.d` directory if you want to use the
+<<modules-command,`modules`>> command to enable and disable module
+configurations.
+
 `reload.enabled`:: When set to `true`, enables dynamic config reload.
+
 `reload.period`:: Specifies how often the files are checked for changes. Do not
 set the `period` to less than 1s because the modification time of files is often
 stored in seconds. Setting the `period` to less than 1s will result in
 unnecessary overhead.
 
+include::../../libbeat/docs/shared-note-file-permissions.asciidoc[]

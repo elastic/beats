@@ -41,7 +41,7 @@ func NewProspector(cfg *common.Config, outletFactory channel.Factory, context pr
 		return nil, err
 	}
 
-	outlet, err := outletFactory(cfg)
+	outlet, err := outletFactory(cfg, context.DynamicFields)
 	if err != nil {
 		return nil, err
 	}
@@ -79,7 +79,9 @@ func (p *Prospector) Run() {
 		h := NewHarvester(pool.Get())
 		h.forwarder = forwarder
 
-		p.registry.Start(h)
+		if err := p.registry.Start(h); err != nil {
+			logp.Err("Harvester start failed: %s", err)
+		}
 	}
 }
 

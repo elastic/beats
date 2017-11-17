@@ -610,7 +610,7 @@ packetbeat.protocols:
   ports: [80, 8080, 8000, 5000, 8002]
   hide_keywords: ["pass", "password", "passwd"]
   send_headers: ["User-Agent", "Cookie", "Set-Cookie"]
-  split_coookie: true
+  split_cookie: true
   real_ip_header: "X-Forwarded-For"
 ------------------------------------------------------------------------------
 

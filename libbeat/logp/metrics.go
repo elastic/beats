@@ -49,11 +49,28 @@ func LogTotalExpvars(cfg *Logging) {
 	zero := monitoring.MakeFlatSnapshot()
 	metrics := formatMetrics(snapshotDelta(zero, snapshotMetrics()))
 	Info("Total non-zero values: %s", metrics)
-	Info("Uptime: %s", time.Now().Sub(startTime))
+	Info("Uptime: %s", time.Since(startTime))
 }
 
 func snapshotMetrics() monitoring.FlatSnapshot {
 	return monitoring.CollectFlatSnapshot(monitoring.Default, monitoring.Full, true)
+}
+
+// List of metrics that are gauges, so that we know for which to
+// _not_ subtract the previous value in the output.
+// TODO: Replace this with a proper solution that uses the metric
+// type from where it is defined. See:
+// https://github.com/elastic/beats/issues/5433
+var gauges = map[string]bool{
+	"libbeat.pipeline.events.active": true,
+	"libbeat.pipeline.clients":       true,
+	"libbeat.config.module.running":  true,
+	"registrar.states.current":       true,
+	"filebeat.harvester.running":     true,
+	"filebeat.harvester.open_files":  true,
+	"beat.memstats.memory_total":     true,
+	"beat.memstats.memory_alloc":     true,
+	"beat.memstats.gc_next":          true,
 }
 
 func snapshotDelta(prev, cur monitoring.FlatSnapshot) map[string]interface{} {
@@ -72,8 +89,12 @@ func snapshotDelta(prev, cur monitoring.FlatSnapshot) map[string]interface{} {
 	}
 
 	for k, i := range cur.Ints {
-		if p := prev.Ints[k]; p != i {
-			out[k] = i - p
+		if _, found := gauges[k]; found {
+			out[k] = i
+		} else {
+			if p := prev.Ints[k]; p != i {
+				out[k] = i - p
+			}
 		}
 	}
 

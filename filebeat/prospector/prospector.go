@@ -1,6 +1,7 @@
 package prospector
 
 import (
+	"fmt"
 	"sync"
 	"time"
 
@@ -36,6 +37,7 @@ func New(
 	outlet channel.Factory,
 	beatDone chan struct{},
 	states []file.State,
+	dynFields *common.MapStrPointer,
 ) (*Prospector, error) {
 	prospector := &Prospector{
 		config:   defaultConfig,
@@ -64,9 +66,10 @@ func New(
 	}
 
 	context := Context{
-		States:   states,
-		Done:     prospector.done,
-		BeatDone: prospector.beatDone,
+		States:        states,
+		Done:          prospector.done,
+		BeatDone:      prospector.beatDone,
+		DynamicFields: dynFields,
 	}
 	var prospectorer Prospectorer
 	prospectorer, err = f(conf, outlet, context)
@@ -140,4 +143,8 @@ func (p *Prospector) stop() {
 	} else {
 		p.prospectorer.Stop()
 	}
+}
+
+func (p *Prospector) String() string {
+	return fmt.Sprintf("prospector [type=%s, ID=%d]", p.config.Type, p.ID)
 }

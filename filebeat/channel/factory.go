@@ -67,7 +67,7 @@ func NewOutletFactory(
 // Prospectors and all harvesters use the same pipeline client instance.
 // This guarantees ordering between events as required by the registrar for
 // file.State updates
-func (f *OutletFactory) Create(cfg *common.Config) (Outleter, error) {
+func (f *OutletFactory) Create(cfg *common.Config, dynFields *common.MapStrPointer) (Outleter, error) {
 	config := prospectorOutletConfig{}
 	if err := cfg.Unpack(&config); err != nil {
 		return nil, err
@@ -104,6 +104,7 @@ func (f *OutletFactory) Create(cfg *common.Config) (Outleter, error) {
 	client, err := f.pipeline.ConnectWith(beat.ClientConfig{
 		PublishMode:   beat.GuaranteedSend,
 		EventMetadata: config.EventMetadata,
+		DynamicFields: dynFields,
 		Meta:          meta,
 		Fields:        fields,
 		Processor:     processors,
