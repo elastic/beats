@@ -2,6 +2,7 @@ package log
 
 import (
 	"fmt"
+	"path/filepath"
 	"time"
 
 	"github.com/dustin/go-humanize"
@@ -33,6 +34,7 @@ var (
 		TailFiles:      false,
 		ScanSort:       "",
 		ScanOrder:      "asc",
+		RecursiveGlob:  true,
 
 		// Harvester
 		BufferSize: 16 * humanize.KiByte,
@@ -81,6 +83,9 @@ type config struct {
 	MaxBytes     int                     `config:"max_bytes" validate:"min=0,nonzero"`
 	Multiline    *reader.MultilineConfig `config:"multiline"`
 	JSON         *reader.JSONConfig      `config:"json"`
+
+	// Hidden on purpose, used by the docker prospector:
+	DockerJSON bool `config:"docker-json"`
 }
 
 type LogConfig struct {
@@ -136,11 +141,6 @@ func (c *config) Validate() error {
 	}
 
 	// Harvester
-	// Check input type
-	if _, ok := harvester.ValidType[c.Type]; !ok {
-		return fmt.Errorf("Invalid input type: %v", c.Type)
-	}
-
 	if c.JSON != nil && len(c.JSON.MessageKey) == 0 &&
 		c.Multiline != nil {
 		return fmt.Errorf("When using the JSON decoder and multiline together, you need to specify a message_key value")
@@ -168,14 +168,15 @@ func (c *config) Validate() error {
 	return nil
 }
 
-func (c *config) resolvePaths() error {
-	var paths []string
+// resolveRecursiveGlobs expands `**` from the globs in multiple patterns
+func (c *config) resolveRecursiveGlobs() error {
 	if !c.RecursiveGlob {
 		logp.Debug("prospector", "recursive glob disabled")
-		paths = c.Paths
-	} else {
-		logp.Debug("prospector", "recursive glob enabled")
+		return nil
 	}
+
+	logp.Debug("prospector", "recursive glob enabled")
+	var paths []string
 	for _, path := range c.Paths {
 		patterns, err := file.GlobPatterns(path, recursiveGlobDepth)
 		if err != nil {
@@ -185,6 +186,20 @@ func (c *config) resolvePaths() error {
 			logp.Debug("prospector", "%q expanded to %#v", path, patterns)
 		}
 		paths = append(paths, patterns...)
+	}
+	c.Paths = paths
+	return nil
+}
+
+// normalizeGlobPatterns calls `filepath.Abs` on all the globs from config
+func (c *config) normalizeGlobPatterns() error {
+	var paths []string
+	for _, path := range c.Paths {
+		pathAbs, err := filepath.Abs(path)
+		if err != nil {
+			return fmt.Errorf("Failed to get the absolute path for %s: %v", path, err)
+		}
+		paths = append(paths, pathAbs)
 	}
 	c.Paths = paths
 	return nil

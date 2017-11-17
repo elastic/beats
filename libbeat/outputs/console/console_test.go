@@ -13,6 +13,7 @@ import (
 	"github.com/elastic/beats/libbeat/beat"
 	"github.com/elastic/beats/libbeat/common"
 	"github.com/elastic/beats/libbeat/common/fmtstr"
+	"github.com/elastic/beats/libbeat/outputs"
 	"github.com/elastic/beats/libbeat/outputs/codec"
 	"github.com/elastic/beats/libbeat/outputs/codec/format"
 	"github.com/elastic/beats/libbeat/outputs/codec/json"
@@ -104,7 +105,7 @@ func TestConsoleOutput(t *testing.T) {
 
 func run(codec codec.Codec, batches ...publisher.Batch) (string, error) {
 	return withStdout(func() {
-		c, _ := newConsole("test", nil, codec)
+		c, _ := newConsole("test", outputs.NewNilObserver(), codec)
 		for _, b := range batches {
 			c.Publish(b)
 		}

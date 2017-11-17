@@ -1,0 +1,13 @@
+- key: logstash
+  title: "Logstash"
+  description: >
+    experimental[]
+
+    Logstash module
+  fields:
+    - name: logstash
+      type: group
+      description: >
+      fields:
+
+

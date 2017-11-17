@@ -75,6 +75,8 @@ type Harvester struct {
 	// event/state publishing
 	forwarder    *harvester.Forwarder
 	publishState func(*util.Data) bool
+
+	onTerminate func()
 }
 
 // NewHarvester creates a new harvester
@@ -124,6 +126,8 @@ func (h *Harvester) open() error {
 		return h.openStdin()
 	case harvester.LogType:
 		return h.openFile()
+	case harvester.DockerType:
+		return h.openFile()
 	default:
 		return fmt.Errorf("Invalid harvester type: %+v", h.config)
 	}
@@ -154,6 +158,10 @@ func (h *Harvester) Setup() error {
 
 // Run start the harvester and reads files line by line and sends events to the defined output
 func (h *Harvester) Run() error {
+	// Allow for some cleanup on termination
+	if h.onTerminate != nil {
+		defer h.onTerminate()
+	}
 	// This is to make sure a harvester is not started anymore if stop was already
 	// called before the harvester was started. The waitgroup is not incremented afterwards
 	// as otherwise it could happened that between checking for the close channel and incrementing
@@ -507,6 +515,11 @@ func (h *Harvester) newLogFileReader() (reader.Reader, error) {
 	r, err = reader.NewEncode(h.log, h.encoding, h.config.BufferSize)
 	if err != nil {
 		return nil, err
+	}
+
+	if h.config.DockerJSON {
+		// Docker json-file format, add custom parsing to the pipeline
+		r = reader.NewDockerJSON(r)
 	}
 
 	if h.config.JSON != nil {

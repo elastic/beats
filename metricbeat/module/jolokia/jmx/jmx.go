@@ -11,7 +11,6 @@ import (
 
 var (
 	metricsetName = "jolokia.jmx"
-	logPrefix     = "[" + metricsetName + "]"
 	debugf        = logp.MakeDebug(metricsetName)
 )
 
@@ -71,8 +70,8 @@ func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
 	http.SetBody(body)
 
 	if logp.IsDebug(metricsetName) {
-		debugf("%v The body for POST requests to jolokia host %v is: %v",
-			logPrefix, base.HostData().Host, string(body))
+		debugf("The body for POST requests to jolokia host %v is: %v",
+			base.HostData().Host, string(body))
 	}
 
 	return &MetricSet{
@@ -91,8 +90,8 @@ func (m *MetricSet) Fetch() (common.MapStr, error) {
 	}
 
 	if logp.IsDebug(metricsetName) {
-		debugf("%v The response body from jolokia host %v is: %v",
-			logPrefix, m.HostData().Host, string(body))
+		debugf("The response body from jolokia host %v is: %v",
+			m.HostData().Host, string(body))
 	}
 
 	event, err := eventMapping(body, m.mapping)

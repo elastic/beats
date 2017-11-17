@@ -1,7 +1,9 @@
 ALL=filebeat metricbeat
 BEAT_VERSION=$(shell head -n 1 ../../libbeat/docs/version.asciidoc | cut -c 17- )
 
-all: ${ALL:=-kubernetes.yaml}
+.PHONY: all $(ALL)
+
+all: $(ALL)
 
 test: all
 	for FILE in $(shell ls *-kubernetes.yaml); do \
@@ -12,10 +14,10 @@ test: all
 clean:
 	@for f in $(ALL); do rm -f "$$f-kubernetes.yaml"; done
 
-%-kubernetes.yaml: %/*.yaml
-	@echo "Generating $*-kubernetes.yaml"
-	@rm -f $*-kubernetes.yaml
-	@for f in $(shell ls $*/*.yaml); do \
-		sed "s/%VERSION%/${BEAT_VERSION}/g" $$f >> $*-kubernetes.yaml; \
-		echo --- >> $*-kubernetes.yaml; \
+$(ALL):
+	@echo "Generating $@-kubernetes.yaml"
+	@rm -f $@-kubernetes.yaml
+	@for f in $(shell ls $@/*.yaml); do \
+		sed "s/%VERSION%/${BEAT_VERSION}/g" $$f >> $@-kubernetes.yaml; \
+		echo --- >> $@-kubernetes.yaml; \
 	done

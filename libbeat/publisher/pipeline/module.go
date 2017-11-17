@@ -29,6 +29,7 @@ func init() {
 // configured queue and outputs.
 func Load(
 	beatInfo beat.Info,
+	reg *monitoring.Registry,
 	config Config,
 	outcfg common.ConfigNamespace,
 ) (*Pipeline, error) {
@@ -39,11 +40,6 @@ func Load(
 	processors, err := processors.New(config.Processors)
 	if err != nil {
 		return nil, fmt.Errorf("error initializing processors: %v", err)
-	}
-
-	reg := monitoring.Default.GetRegistry("libbeat")
-	if reg == nil {
-		reg = monitoring.Default.NewRegistry("libbeat")
 	}
 
 	name := beatInfo.Name
@@ -97,15 +93,24 @@ func loadOutput(
 	}
 
 	// TODO: add support to unload/reassign outStats on output reloading
-	outReg := reg.NewRegistry("output")
-	outStats := outputs.MakeStats(outReg)
 
-	out, err := outputs.Load(beatInfo, &outStats, outcfg.Name(), outcfg.Config())
+	var (
+		outReg   *monitoring.Registry
+		outStats outputs.Observer
+	)
+	if reg != nil {
+		outReg = reg.NewRegistry("output")
+		outStats = outputs.NewStats(outReg)
+	}
+
+	out, err := outputs.Load(beatInfo, outStats, outcfg.Name(), outcfg.Config())
 	if err != nil {
 		return outputs.Fail(err)
 	}
 
-	monitoring.NewString(outReg, "type").Set(outcfg.Name())
+	if outReg != nil {
+		monitoring.NewString(outReg, "type").Set(outcfg.Name())
+	}
 
 	return out, nil
 }

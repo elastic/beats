@@ -1,3 +1,5 @@
 === Kubernetes event metricset
 
+experimental[]
+
 This is the `event` metricset of the Kubernetes module.

@@ -20,8 +20,6 @@ After installing the Elastic Stack, read the following topics to learn how to in
 * <<load-kibana-dashboards>>
 * <<winlogbeat-starting>>
 * <<view-kibana-dashboards>>
-* <<command-line-options>>
-* <<directory-layout>>
 
 [[winlogbeat-installation]]
 === Step 1: Install Winlogbeat

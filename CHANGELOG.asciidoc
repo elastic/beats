@@ -25,6 +25,7 @@ https://github.com/elastic/beats/compare/v6.0.0-beta2...master[Check the HEAD di
 *Metricbeat*
 
 - Rename `heap_init` field to `heap.init`. {pull}5320[5320]
+- Rename `http.response.status_code` field to `http.response.code`. {pull}5521[5521]
 
 
 *Packetbeat*
@@ -41,6 +42,10 @@ https://github.com/elastic/beats/compare/v6.0.0-beta2...master[Check the HEAD di
 - Remove ID() from Runner interface {issue}5153[5153]
 - Do not require template if index change and template disabled {pull}5319[5319]
 - Correctly send configured `Host` header to the remote server. {issue}4842[4842]
+- Fix missing ACK in redis output. {issue}5404[5404]
+- Change add_kubernetes_metadata to attempt detection of namespace. {pull}5482[5482]
+- Avoid double slash when join url and path {pull}5517[5517]
+- Fix console color output for Windows. {issue}5611[5611]
 
 *Auditbeat*
 
@@ -49,8 +54,14 @@ https://github.com/elastic/beats/compare/v6.0.0-beta2...master[Check the HEAD di
 - Fix default paths for redis 4.0.1 logs on macOS {pull}5173[5173]
 - Fix Filebeat not starting if command line and modules configs are used together. {issue}5376[5376]
 - Add support for adding string tags {pull}5395{5395}
+- Fix race condition when limiting the number of harvesters running in parallel {issue}5458[5458]
+- Fix relative paths in the prospector definitions. {pull}5443[5433]
+- Fix `recursive_globe.enabled` option. {pull}5443[5443]
+- Fix machine learning jobs setup for dynamic modules. {pull}5509[5509]
 
 *Heartbeat*
+
+- Fix the "HTTP up status" visualization. {pull}5564[5564]
 
 *Metricbeat*
 
@@ -58,10 +69,14 @@ https://github.com/elastic/beats/compare/v6.0.0-beta2...master[Check the HEAD di
 - Use `beat.name` instead of `beat.hostname` in the Host Overview dashboard. {pull}5340[5340]
 - Fix the loading of 5.x dashboards. {issue}5277[5277]
 - Fix the fetching of process information when some data is missing under MacOS X. {issue}5337[5337]
+- Change `MySQL active connections` visualization title to `MySQL total connections`. {issue}4812[4812]
 
 *Packetbeat*
 
 - Fix http status phrase parsing not allow spaces. {pull}5312[5312]
+- Fix missing length check in the PostgreSQL module. {pull}5457[5457]
+- Fix panic in ACK handler if event is dropped on blocked queue {issue}5524[5524]
+- Fix http parse to allow to parse get request with space in the URI. {pull}5495[5495]
 
 *Winlogbeat*
 
@@ -76,10 +91,14 @@ https://github.com/elastic/beats/compare/v6.0.0-beta2...master[Check the HEAD di
 - Add support for enabling TLS renegotiation. {issue}4386[4386]
 - Add Azure VM support for add_cloud_metadata processor {pull}5355[5355]
 - Add `output.file.permission` config option. {pull}4638[4638]
+- Refactor add_kubernetes_metadata to support autodiscovery {pull}5434[5434]
+- Improve custom flag handling and CLI flags usage message. {pull}5543[5543]
+- Update to Golang 1.9.2
 
 *Auditbeat*
 
 - Add support for SHA3 hash algorithms to the file integrity module. {issue}5345[5345]
+- Add dashboards for Linux audit framework events (overview, executions, sockets). {pull}5516[5516]
 
 *Filebeat*
 
@@ -89,6 +108,8 @@ https://github.com/elastic/beats/compare/v6.0.0-beta2...master[Check the HEAD di
 - Remove error log from runnerfactory as error is returned by API. {pull}5085[5085]
 - Remove error log from runnerfactory as error is returned by API. {pull}5085[5085]
 - Add Kubernetes manifests to deploy Filebeat. {pull}5349[5349]
+- Add experimental Docker `json-file` prospector . {pull}5402[5402]
+- Add experimental Docker autodiscover functionality. {pull}5245[5245]
 
 *Heartbeat*
 
@@ -104,6 +125,10 @@ https://github.com/elastic/beats/compare/v6.0.0-beta2...master[Check the HEAD di
 - Add Kubernetes manifests to deploy Metricbeat. {pull}5349[5349]
 - Add etcd module. {issue}4970[4970]
 - Add ip address of docker containers to event. {pull}5379[5379]
+- Add ceph osd tree infomation to metricbeat {pull}5498[5498]
+- Add basic Logstash module. {pull}5540[5540]
+- Add dashboard for Windows service metricset. {pull}5603[5603]
+- Add experimental Docker autodiscover functionality. {pull}5245[5245]
 
 *Packetbeat*
 

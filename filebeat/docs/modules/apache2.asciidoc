@@ -30,12 +30,15 @@ include::../include/running-modules.asciidoc[]
 [float]
 === Example dashboard
 
+This module comes with a sample dashboard. For example:
+
+[role="screenshot"]
 image::./images/kibana-apache2.png[]
 
 include::../include/configuring-intro.asciidoc[]
 
 The following example shows how to set paths in the +modules.d/{modulename}.yml+
-file to override the default paths for Apache2 access and error logs: 
+file to override the default paths for Apache2 access and error logs:
 
 ["source","yaml",subs="attributes"]
 -----
@@ -57,7 +60,7 @@ To specify the same settings at the command line, you use:
 -----
 
 
-The command in the example assumes that you have already enabled the +{modulename}+ module. 
+The command in the example assumes that you have already enabled the +{modulename}+ module.
 
 //set the fileset name used in the included example
 :fileset_ex: access
