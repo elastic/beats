@@ -1,2 +1,1 @@
 kafka-python
-datetime
