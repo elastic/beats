@@ -1,8 +1,6 @@
 [[filebeat-modules-quickstart]]
 === Quick start for common log formats
 
-beta[]
-
 Filebeat provides a set of pre-built modules that you can use to rapidly
 implement and deploy a log monitoring solution, complete with sample dashboards
 and data visualizations, in about 5 minutes. These modules support common log
