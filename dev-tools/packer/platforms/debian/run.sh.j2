@@ -4,9 +4,8 @@
 set -e
 cd /build
 
-# the init script and systemd unit file need to have the right name
+# the init scripts needs to have the right name
 cp ${RUNID}.init /tmp/{{.beat_pkg_name}}.init
-cp ${RUNID}.service /tmp/{{.beat_pkg_name}}.service
 
 # add SNAPSHOT if it was requested
 VERSION="{{.version}}"
@@ -24,7 +23,7 @@ FPM_ARGS=(
         --description "{{.beat_description}}"
         --url {{.beat_url}}
         --deb-init /tmp/{{.beat_pkg_name}}.init
-        --deb-systemd /tmp/{{.beat_pkg_name}}.service
+        --deb-systemd ${RUNID}.service
         --config-files /etc/{{.beat_name}}/{{.beat_name}}.yml
         homedir/=/usr/share/{{.beat_name}}
         beatname-${RUNID}.sh=/usr/bin/{{.beat_name}}
