@@ -10,12 +10,12 @@ import (
 	"runtime"
 	"strings"
 
+	ucfg "github.com/elastic/go-ucfg"
+	"github.com/elastic/go-ucfg/yaml"
+
 	"github.com/elastic/beats/libbeat/common/file"
 	"github.com/elastic/beats/libbeat/logp"
-	ucfg "github.com/elastic/go-ucfg"
 	"github.com/elastic/go-ucfg/cfgutil"
-	cfgflag "github.com/elastic/go-ucfg/flag"
-	"github.com/elastic/go-ucfg/yaml"
 )
 
 var flagStrictPerms = flag.Bool("strict.perms", true, "Strict permission checking on config files")
@@ -37,12 +37,6 @@ type Config ucfg.Config
 type ConfigNamespace struct {
 	name   string
 	config *Config
-}
-
-type flagOverwrite struct {
-	config *ucfg.Config
-	path   string
-	value  string
 }
 
 var configOpts = []ucfg.Option{
@@ -100,62 +94,6 @@ func NewConfigWithYAML(in []byte, source string) (*Config, error) {
 	)
 	c, err := yaml.NewConfig(in, opts...)
 	return fromConfig(c), err
-}
-
-func NewFlagConfig(
-	set *flag.FlagSet,
-	def *Config,
-	name string,
-	usage string,
-) *Config {
-	opts := append(
-		[]ucfg.Option{
-			ucfg.MetaData(ucfg.Meta{Source: "command line flag"}),
-		},
-		configOpts...,
-	)
-
-	var to *ucfg.Config
-	if def != nil {
-		to = def.access()
-	}
-
-	config := cfgflag.ConfigVar(set, to, name, usage, opts...)
-	return fromConfig(config)
-}
-
-func NewFlagOverwrite(
-	set *flag.FlagSet,
-	config *Config,
-	name, path, def, usage string,
-) *string {
-	if config == nil {
-		panic("Missing configuration")
-	}
-	if path == "" {
-		panic("empty path")
-	}
-
-	if def != "" {
-		err := config.SetString(path, -1, def)
-		if err != nil {
-			panic(err)
-		}
-	}
-
-	f := &flagOverwrite{
-		config: config.access(),
-		path:   path,
-		value:  def,
-	}
-
-	if set == nil {
-		flag.Var(f, name, usage)
-	} else {
-		set.Var(f, name, usage)
-	}
-
-	return &f.value
 }
 
 func LoadFile(path string) (*Config, error) {
@@ -302,30 +240,6 @@ func (c *Config) access() *ucfg.Config {
 
 func (c *Config) GetFields() []string {
 	return c.access().GetFields()
-}
-
-func (f *flagOverwrite) String() string {
-	return f.value
-}
-
-func (f *flagOverwrite) Set(v string) error {
-	opts := append(
-		[]ucfg.Option{
-			ucfg.MetaData(ucfg.Meta{Source: "command line flag"}),
-		},
-		configOpts...,
-	)
-
-	err := f.config.SetString(f.path, -1, v, opts...)
-	if err != nil {
-		return err
-	}
-	f.value = v
-	return nil
-}
-
-func (f *flagOverwrite) Get() interface{} {
-	return f.value
 }
 
 // Unpack unpacks a configuration with at most one sub object. An sub object is

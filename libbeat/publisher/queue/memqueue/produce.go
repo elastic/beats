@@ -21,6 +21,7 @@ type ackProducer struct {
 }
 
 type openState struct {
+	log    logger
 	isOpen atomic.Bool
 	done   chan struct{}
 	events chan pushRequest
@@ -37,6 +38,7 @@ type ackHandler func(count int)
 
 func newProducer(b *Broker, cb ackHandler, dropCB func(beat.Event), dropOnCancel bool) queue.Producer {
 	openState := openState{
+		log:    b.logger,
 		isOpen: atomic.MakeBool(true),
 		done:   make(chan struct{}),
 		events: b.events,
@@ -69,11 +71,18 @@ func (p *forgetfullProducer) Cancel() int {
 }
 
 func (p *ackProducer) Publish(event publisher.Event) bool {
-	return p.openState.publish(p.makeRequest(event))
+	return p.updSeq(p.openState.publish(p.makeRequest(event)))
 }
 
 func (p *ackProducer) TryPublish(event publisher.Event) bool {
-	return p.openState.tryPublish(p.makeRequest(event))
+	return p.updSeq(p.openState.tryPublish(p.makeRequest(event)))
+}
+
+func (p *ackProducer) updSeq(ok bool) bool {
+	if ok {
+		p.seq++
+	}
+	return ok
 }
 
 func (p *ackProducer) makeRequest(event publisher.Event) pushRequest {
@@ -82,7 +91,6 @@ func (p *ackProducer) makeRequest(event publisher.Event) pushRequest {
 		seq:   p.seq,
 		state: &p.state,
 	}
-	p.seq++
 	return req
 }
 
@@ -126,6 +134,7 @@ func (st *openState) tryPublish(req pushRequest) bool {
 		st.events = nil
 		return false
 	default:
+		st.log.Debugf("Dropping event, queue is blocked (seq=%v) ", req.seq)
 		return false
 	}
 }

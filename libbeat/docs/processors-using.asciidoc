@@ -515,6 +515,8 @@ the required fields, `@timestamp` and `type`, are exported.
 [[add-kubernetes-metadata]]
 === Add Kubernetes metadata
 
+beta[]
+
 The `add_kubernetes_metadata` processor annotates each event with relevant
 metadata based on which Kubernetes pod the event originated from. Each event is
 annotated with:
@@ -597,6 +599,8 @@ case you want to specify your own.
 
 [[add-docker-metadata]]
 === Add Docker metadata
+
+beta[]
 
 The `add_docker_metadata` processor annotates each event with relevant metadata
 from Docker containers:

@@ -24,6 +24,7 @@ services:
       - ./module/kafka/_meta/env
       - ./module/kibana/_meta/env
       - ./module/kubernetes/_meta/env
+      - ./module/logstash/_meta/env
       - ./module/memcached/_meta/env
       - ./module/mongodb/_meta/env
       - ./module/mysql/_meta/env
@@ -95,6 +96,9 @@ services:
       dockerfile: Dockerfile.kube-state
     depends_on:
       - kubernetes
+
+  logstash:
+    build: ./module/logstash/_meta
 
   memcached:
     build: ./module/memcached/_meta

@@ -25,7 +25,7 @@ type Prospector struct {
 func NewProspector(cfg *common.Config, outlet channel.Factory, context prospector.Context) (prospector.Prospectorer, error) {
 	cfgwarn.Experimental("UDP prospector type is used")
 
-	out, err := outlet(cfg)
+	out, err := outlet(cfg, context.DynamicFields)
 	if err != nil {
 		return nil, err
 	}

@@ -1,0 +1,26 @@
+- name: node
+  type: group
+  description: >
+    node
+  fields:
+    - name: host
+      type: keyword
+      description: >
+        Host name
+    - name: version
+      type: keyword
+      description: >
+        Logstash Version
+    - name: jvm
+      type: group
+      description: >
+        JVM Info
+      fields:
+        - name: version
+          type: keyword
+          description: >
+            Version
+        - name: pid
+          type: long
+          description: >
+            Pid

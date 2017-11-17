@@ -7,6 +7,7 @@ import (
 	"path/filepath"
 	"time"
 
+	"github.com/elastic/beats/libbeat/autodiscover"
 	"github.com/elastic/beats/libbeat/cfgfile"
 	"github.com/elastic/beats/libbeat/common"
 	"github.com/elastic/beats/libbeat/common/cfgwarn"
@@ -20,14 +21,15 @@ const (
 )
 
 type Config struct {
-	Prospectors      []*common.Config `config:"prospectors"`
-	RegistryFile     string           `config:"registry_file"`
-	RegistryFlush    time.Duration    `config:"registry_flush"`
-	ConfigDir        string           `config:"config_dir"`
-	ShutdownTimeout  time.Duration    `config:"shutdown_timeout"`
-	Modules          []*common.Config `config:"modules"`
-	ConfigProspector *common.Config   `config:"config.prospectors"`
-	ConfigModules    *common.Config   `config:"config.modules"`
+	Prospectors      []*common.Config     `config:"prospectors"`
+	RegistryFile     string               `config:"registry_file"`
+	RegistryFlush    time.Duration        `config:"registry_flush"`
+	ConfigDir        string               `config:"config_dir"`
+	ShutdownTimeout  time.Duration        `config:"shutdown_timeout"`
+	Modules          []*common.Config     `config:"modules"`
+	ConfigProspector *common.Config       `config:"config.prospectors"`
+	ConfigModules    *common.Config       `config:"config.modules"`
+	Autodiscover     *autodiscover.Config `config:"autodiscover"`
 }
 
 var (

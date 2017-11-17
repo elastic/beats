@@ -23,6 +23,12 @@
       description: >
         The content of the line read from the log file.
 
+    - name: stream
+      type: keyword
+      required: false
+      description: >
+        Log stream when reading container logs, can be 'stdout' or 'stderr'
+
     - name: prospector.type
       required: true
       description: >

@@ -36,6 +36,7 @@ The following topics describe how to configure Heartbeat:
 * <<using-environ-vars>>
 * <<yaml-tips>>
 * <<regexp-support>>
+* <<{beatname_lc}-reference-yml>>
 
 --
 

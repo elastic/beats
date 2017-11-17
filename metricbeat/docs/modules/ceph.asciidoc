@@ -21,7 +21,7 @@ in <<configuration-metricbeat>>. Here is an example configuration:
 ----
 metricbeat.modules:
 - module: ceph
-  metricsets: ["cluster_disk", "cluster_health", "monitor_health", "pool_disk"]
+  metricsets: ["cluster_disk", "cluster_health", "monitor_health", "pool_disk", "osd_tree"]
   period: 10s
   hosts: ["localhost:5000"]
 ----
@@ -39,6 +39,8 @@ The following metricsets are available:
 
 * <<metricbeat-metricset-ceph-monitor_health,monitor_health>>
 
+* <<metricbeat-metricset-ceph-osd_tree,osd_tree>>
+
 * <<metricbeat-metricset-ceph-pool_disk,pool_disk>>
 
 include::ceph/cluster_disk.asciidoc[]
@@ -48,6 +50,8 @@ include::ceph/cluster_health.asciidoc[]
 include::ceph/cluster_status.asciidoc[]
 
 include::ceph/monitor_health.asciidoc[]
+
+include::ceph/osd_tree.asciidoc[]
 
 include::ceph/pool_disk.asciidoc[]
 

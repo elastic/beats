@@ -57,7 +57,7 @@ func (r *reader) consumeEvents() {
 			if event.Name == "" {
 				continue
 			}
-			debugf("%v Received fsnotify event: path=%v action=%v", logPrefix,
+			debugf("Received fsnotify event: path=%v action=%v",
 				event.Name, event.Op.String())
 
 			start := time.Now()
