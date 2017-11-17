@@ -20,6 +20,7 @@ func testEvent() *Event {
 		Source:    SourceScan,
 		Action:    ConfigChange,
 		Info: &Metadata{
+			Type:  FileType,
 			Inode: 123,
 			UID:   500,
 			GID:   500,
