@@ -2,6 +2,7 @@
   type: group
   description: >
     expvar
+  release: experimental
   fields:
     - name: cmdline
       type: keyword

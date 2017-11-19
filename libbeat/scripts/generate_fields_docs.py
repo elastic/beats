@@ -24,6 +24,10 @@ def document_fields(output, section, sections, path):
     output.write("\n")
     for field in section["fields"]:
 
+        # Skip entries which do not define a name
+        if "name" not in field:
+            continue
+
         if path == "":
             newpath = field["name"]
         else:

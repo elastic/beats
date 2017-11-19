@@ -3,6 +3,10 @@ This file is generated! See scripts/docs_collector.py
 ////
 
 [[metricbeat-metricset-vsphere-datastore]]
+=== vSphere datastore metricset
+
+beta[]
+
 include::../../../module/vsphere/datastore/_meta/docs.asciidoc[]
 
 

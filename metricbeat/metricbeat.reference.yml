@@ -190,7 +190,7 @@ metricbeat.modules:
     namespace: "example"
     path: "/debug/vars"
 
-#------------------------------ graphite Module ------------------------------
+#------------------------------ Graphite Module ------------------------------
 - module: graphite
   metricsets: ["server"]
   enabled: true

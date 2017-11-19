@@ -3,9 +3,11 @@ This file is generated! See scripts/docs_collector.py
 ////
 
 [[metricbeat-module-logstash]]
-== logstash module
+== Logstash module
 
-This is the logstash module.
+experimental[]
+
+This is the Logstash module.
 
 
 

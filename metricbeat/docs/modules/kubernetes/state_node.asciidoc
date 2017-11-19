@@ -3,6 +3,10 @@ This file is generated! See scripts/docs_collector.py
 ////
 
 [[metricbeat-metricset-kubernetes-state_node]]
+=== Kubernetes state_node metricset
+
+beta[]
+
 include::../../../module/kubernetes/state_node/_meta/docs.asciidoc[]
 
 

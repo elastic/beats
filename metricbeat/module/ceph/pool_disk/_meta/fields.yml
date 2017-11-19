@@ -2,6 +2,7 @@
   type: group
   description: >
     pool_disk
+  release: beta
   fields:
     - name: id
       type: long

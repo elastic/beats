@@ -3,6 +3,7 @@
   description: >
     Golang module
   short_config: false
+  release: experimental
   fields:
     - name: golang
       type: group

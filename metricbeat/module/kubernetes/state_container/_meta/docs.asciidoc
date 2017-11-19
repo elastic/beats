@@ -1,5 +1,1 @@
-=== Kubernetes state_container metricset
-
-beta[]
-
 This is the `state_container` metricset of the Kubernetes module.

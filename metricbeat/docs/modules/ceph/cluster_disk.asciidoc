@@ -3,6 +3,10 @@ This file is generated! See scripts/docs_collector.py
 ////
 
 [[metricbeat-metricset-ceph-cluster_disk]]
+=== Ceph cluster_disk metricset
+
+beta[]
+
 include::../../../module/ceph/cluster_disk/_meta/docs.asciidoc[]
 
 
