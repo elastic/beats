@@ -40,6 +40,21 @@ type ServiceHandle uintptr
 
 type ProcessHandle uintptr
 
+type ServiceConfigInformation uint32
+
+const (
+	ServiceConfigDelayedAutoStartInfo   ServiceConfigInformation = 3
+	ServiceConfigDescription            ServiceConfigInformation = 1
+	ServiceConfigFailureActions         ServiceConfigInformation = 2
+	ServiceConfigFailureActionsFlag     ServiceConfigInformation = 4
+	ServiceConfigPreferredNode          ServiceConfigInformation = 9
+	ServiceConfigPreshutdownInfo        ServiceConfigInformation = 7
+	ServiceConfigRequiredPrivilegesInfo ServiceConfigInformation = 6
+	ServiceConfigServiceSidInfo         ServiceConfigInformation = 5
+	ServiceConfigTriggerInfo            ServiceConfigInformation = 8
+	ServiceConfigLaunchProtected        ServiceConfigInformation = 12
+)
+
 type serviceDelayedAutoStartInfo struct {
 	delayedAutoStart bool
 }
