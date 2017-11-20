@@ -75,12 +75,34 @@ var serviceStates = map[ServiceState]string{
 	ServiceStopped:         "Stopped",
 }
 
-var serviceStartTypes = map[ServiceStartType]string{
-	ServiceAutoStart:   "Automatic",
-	ServiceBootStart:   "Boot",
-	ServiceDemandStart: "Manual",
-	ServiceDisabled:    "Disabled",
-	ServiceSystemStart: "System",
+type serviceStartType int
+
+const (
+	Boot = iota
+	System
+	Automatic
+	Manual
+	Disabled
+	AutomaticDelayed
+	AutomaticTriggered
+	AutomaticDelayedTriggered
+	ManualTriggered
+)
+
+var serviceStartTypes = [...]string{
+	"Boot",
+	"System",
+	"Automatic",
+	"Manual",
+	"Disabled",
+	"Automatic (Delayed)",
+	"Automatic (Triggered)",
+	"Automatic (Delayed, Triggered)",
+	"Manual (Triggered)",
+}
+
+func (startType ServiceStartType) String() string {
+	return serviceStartTypes[startType]
 }
 
 func (state ServiceState) String() string {
@@ -100,7 +122,7 @@ type ServiceStatus struct {
 	DisplayName  string
 	ServiceName  string
 	CurrentState string
-	StartType    string
+	StartType    ServiceStartType
 	PID          uint32 // ID of the associated process.
 	Uptime       time.Duration
 	ExitCode     uint32 // Exit code for stopped services.
@@ -336,7 +358,7 @@ func getAdditionalServiceInfo(serviceHandle ServiceHandle, service *ServiceStatu
 				serviceBufSize += serviceBytesNeeded
 			} else {
 				serviceQueryConfig := (*QueryServiceConfig)(unsafe.Pointer(&buffer[0]))
-				service.StartType = serviceStartTypes[ServiceStartType(serviceQueryConfig.DwStartType)]
+				service.StartType = ServiceStartType(serviceQueryConfig.DwStartType)
 				break
 			}
 		}
@@ -346,9 +368,9 @@ func getAdditionalServiceInfo(serviceHandle ServiceHandle, service *ServiceStatu
 
 func getOptionalServiceInfo(serviceHandle ServiceHandle, service *ServiceStatus) error {
 	// Get information if the service is started delayed or triggered. Only valid for automatic or manual services. So filter them first.
-	if service.StartType == "Automatic" || service.StartType == "Manual" {
+	if service.StartType == Automatic || service.StartType == Manual {
 		var delayedInfo *serviceDelayedAutoStartInfo
-		if service.StartType == "Automatic" {
+		if service.StartType == Automatic {
 			delayedInfoBuffer, err := QueryServiceConfig2(serviceHandle, ServiceConfigDelayedAutoStartInfo)
 			if err != nil {
 				return err
@@ -365,19 +387,19 @@ func getOptionalServiceInfo(serviceHandle ServiceHandle, service *ServiceStatus)
 
 		triggeredInfo := (*serviceTriggerInfo)(unsafe.Pointer(&triggeredInfoBuffer[0]))
 
-		if service.StartType == "Automatic" {
+		if service.StartType == Automatic {
 			if triggeredInfo.cTriggers > 0 && delayedInfo.delayedAutoStart {
-				service.StartType = "Automatic (Delayed, Triggered)"
+				service.StartType = AutomaticDelayedTriggered
 			} else if triggeredInfo.cTriggers > 0 {
-				service.StartType = "Automatic (Triggered)"
+				service.StartType = AutomaticTriggered
 			} else if delayedInfo.delayedAutoStart {
-				service.StartType = "Automatic (Delayed)"
+				service.StartType = AutomaticDelayed
 			}
 			return nil
 		}
 
-		if service.StartType == "Manual" && triggeredInfo.cTriggers > 0 {
-			service.StartType = "Manual (Triggered)"
+		if service.StartType == Manual && triggeredInfo.cTriggers > 0 {
+			service.StartType = ManualTriggered
 		}
 	}
 
@@ -439,7 +461,7 @@ func (reader *ServiceReader) Read() ([]common.MapStr, error) {
 			"display_name": service.DisplayName,
 			"name":         service.ServiceName,
 			"state":        service.CurrentState,
-			"start_type":   service.StartType,
+			"start_type":   service.StartType.String(),
 		}
 
 		if service.CurrentState == "Stopped" {
