@@ -3,6 +3,10 @@ This file is generated! See scripts/docs_collector.py
 ////
 
 [[metricbeat-metricset-kubernetes-event]]
+=== Kubernetes event metricset
+
+experimental[]
+
 include::../../../module/kubernetes/event/_meta/docs.asciidoc[]
 
 

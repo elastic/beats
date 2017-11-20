@@ -3,6 +3,10 @@ This file is generated! See scripts/docs_collector.py
 ////
 
 [[metricbeat-metricset-prometheus-collector]]
+=== Prometheus collector metricset
+
+beta[]
+
 include::../../../module/prometheus/collector/_meta/docs.asciidoc[]
 
 

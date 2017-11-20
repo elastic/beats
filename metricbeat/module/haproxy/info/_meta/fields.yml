@@ -2,6 +2,7 @@
   type: group
   description: >
     General information about HAProxy processes.
+  release: ga
   fields:
     - name: processes
       type: long

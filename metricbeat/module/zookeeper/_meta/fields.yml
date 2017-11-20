@@ -3,6 +3,7 @@
   description: >
     ZooKeeper metrics collected by the four-letter monitoring commands.
   short_config: false
+  release: ga
   fields:
     - name: zookeeper
       type: group

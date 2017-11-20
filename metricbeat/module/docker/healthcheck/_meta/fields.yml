@@ -2,6 +2,7 @@
   type: group
   description: >
     Docker container metrics.
+  release: beta
   fields:
     - name: failingstreak
       type: integer

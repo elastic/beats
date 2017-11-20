@@ -1,7 +1,3 @@
-== Kubernetes module
-
-beta[]
-
 This module fetches metrics from Kubernetes https://kubernetes.io/docs/admin/kubelet/[kubelet]
 agent and https://github.com/kubernetes/kube-state-metrics[kube-state-metrics] service.
 

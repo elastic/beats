@@ -1,5 +1,1 @@
-=== Kubernetes system metricset
-
-beta[]
-
 This is the `system` metricset of the Kubernetes module.

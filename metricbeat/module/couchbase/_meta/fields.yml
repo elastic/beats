@@ -1,10 +1,9 @@
 - key: couchbase
   title: "Couchbase"
   description: >
-    beta[]
-
     Metrics collected from Couchbase servers.
   short_config: false
+  release: beta
   fields:
     - name: couchbase
       type: group

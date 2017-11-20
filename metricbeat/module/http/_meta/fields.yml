@@ -2,6 +2,7 @@
   title: "HTTP"
   description: >
     HTTP module
+  release: beta
   fields:
     - name: http
       type: group

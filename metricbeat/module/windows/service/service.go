@@ -4,7 +4,7 @@ package service
 
 import (
 	"github.com/elastic/beats/libbeat/common"
-	"github.com/elastic/beats/libbeat/logp"
+	"github.com/elastic/beats/libbeat/common/cfgwarn"
 	"github.com/elastic/beats/metricbeat/mb"
 )
 
@@ -29,7 +29,7 @@ type MetricSet struct {
 // Part of new is also setting up the configuration by processing additional
 // configuration entries if needed.
 func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
-	logp.Warn("EXPERIMENTAL: The windows service metricset is experimental")
+	cfgwarn.Beta("The windows service metricset is beta")
 
 	reader, err := NewServiceReader()
 	if err != nil {

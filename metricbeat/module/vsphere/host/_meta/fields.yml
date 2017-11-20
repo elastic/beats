@@ -2,6 +2,7 @@
   type: group
   description: >
     host
+  release: beta
   fields:
     - name: datacenter
       type: keyword

@@ -2,9 +2,8 @@
   title: "Kafka"
   description: >
     Kafka module
-
-    beta[]
   short_config: false
+  release: beta
   fields:
     - name: kafka
       type: group

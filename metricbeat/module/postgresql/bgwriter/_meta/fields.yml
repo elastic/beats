@@ -3,6 +3,7 @@
   description: >
     Statistics about the background writer process's activity. Collected using the
     pg_stat_bgwriter query.
+  release: ga
   fields:
     - name: checkpoints.scheduled
       type: long

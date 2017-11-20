@@ -2,4 +2,5 @@
   type: group
   description: >
     server
+  release: experimental
   fields:
