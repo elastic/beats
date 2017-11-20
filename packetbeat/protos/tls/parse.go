@@ -4,6 +4,7 @@ import (
 	"crypto/x509"
 	"crypto/x509/pkix"
 	"encoding/hex"
+	"encoding/pem"
 	"fmt"
 	"strings"
 	"time"
@@ -345,8 +346,6 @@ func (parser *parser) parseHandshake(handshakeType handshakeType, buffer bufferV
 	return true
 }
 
-// "{\"dst\":{\"IP\":\"192.168.0.2\",\"Port\":27017,\"Name\":\"\",\"Cmdline\":\"\",\"Proc\":\"\"},\"src\":{\"IP\":\"192.168.0.1\",\"Port\":6512,\"Name\":\"\",\"Cmdline\":\"\",\"Proc\":\"\"},\"status\":\"Error\",\"tls\":{\"client_certificate_requested\":false,\"client_hello\":{\"ciphers\":[\"(unknown:0x3a3a)\",\"TLS_ECDHE_ECDSA_WITH_AES_128_GCM_SHA256\",\"TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256\",\"TLS_ECDHE_ECDSA_WITH_AES_256_GCM_SHA384\",\"TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384\",\"TLS_ECDHE_ECDSA_WITH_CHACHA20_POLY1305_SHA256\",\"TLS_ECDHE_RSA_WITH_CHACHA20_POLY1305_SHA256\",\"TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA\",\"TLS_ECDHE_RSA_WITH_AES_256_CBC_SHA\",\"TLS_RSA_WITH_AES_128_GCM_SHA256\",\"TLS_RSA_WITH_AES_256_GCM_SHA384\",\"TLS_RSA_WITH_AES_128_CBC_SHA\",\"TLS_RSA_WITH_AES_256_CBC_SHA\",\"TLS_RSA_WITH_3DES_EDE_CBC_SHA\"],\"compression_methods\":[\"null\"],\"extensions\":{\"_unparsed_\":\"56026,renegotiation_info,23,status_request,18,16,30032,43690\",\"ec_points_formats\":\"uncompressed\",\"server_name_indication\":\"example.org\",\"session_ticket\":\"\",\"signature_algorithms\":\"ecdsa_secp256r1_sha256,rsa_pss_sha256,rsa_pkcs1_sha256,ecdsa_secp384r1_sha384,rsa_pss_sha384,rsa_pkcs1_sha384,rsa_pss_sha512,rsa_pkcs1_sha512,rsa_pkcs1_sha1\",\"supported_groups\":\"(unknown:0x6a6a),x25519,secp256r1,secp384r1\"},\"timestamp\":862445486,\"version\":\"3.3\"},\"handshake_completed\":false,\"resumed\":false},\"type\":\"tls\"}" (expected)
-// "{\"dst\":{\"IP\":\"192.168.0.2\",\"Port\":27017,\"Name\":\"\",\"Cmdline\":\"\",\"Proc\":\"\"},\"src\":{\"IP\":\"192.168.0.1\",\"Port\":6512,\"Name\":\"\",\"Cmdline\":\"\",\"Proc\":\"\"},\"status\":\"Error\",\"tls\":{\"client_certificate_requested\":false,\"client_hello\":{\"ciphers\":[\"(unknown:0x3a3a)\",\"TLS_ECDHE_ECDSA_WITH_AES_128_GCM_SHA256\",\"TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256\",\"TLS_ECDHE_ECDSA_WITH_AES_256_GCM_SHA384\",\"TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384\",\"TLS_ECDHE_ECDSA_WITH_CHACHA20_POLY1305_SHA256\",\"TLS_ECDHE_RSA_WITH_CHACHA20_POLY1305_SHA256\",\"TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA\",\"TLS_ECDHE_RSA_WITH_AES_256_CBC_SHA\",\"TLS_RSA_WITH_AES_128_GCM_SHA256\",\"TLS_RSA_WITH_AES_256_GCM_SHA384\",\"TLS_RSA_WITH_AES_128_CBC_SHA\",\"TLS_RSA_WITH_AES_256_CBC_SHA\",\"TLS_RSA_WITH_3DES_EDE_CBC_SHA\"],\"compression_method\":\"null\",\"extensions\":{\"_unparsed_\":\"56026,renegotiation_info,23,status_request,18,16,30032,43690\",\"ec_points_formats\":\"uncompressed\",\"server_name_indication\":\"example.org\",\"session_ticket\":\"\",\"signature_algorithms\":\"ecdsa_secp256r1_sha256,rsa_pss_sha256,rsa_pkcs1_sha256,ecdsa_secp384r1_sha384,rsa_pss_sha384,rsa_pkcs1_sha384,rsa_pss_sha512,rsa_pkcs1_sha512,rsa_pkcs1_sha1\",\"supported_groups\":\"(unknown:0x6a6a),x25519,secp256r1,secp384r1\"},\"timestamp\":862445486,\"version\":\"3.3\"},\"handshake_completed\":false,\"resumed\":false},\"type\":\"tls\"}" (actual)
 func parseHelloRequest(buffer bufferView) bool {
 	if buffer.length() != 0 {
 		logp.Warn("non-empty hello request")
@@ -489,7 +488,7 @@ func (version tlsVersion) String() string {
 	return fmt.Sprintf("%d.%d", version.major, version.minor)
 }
 
-func certToMap(cert *x509.Certificate) common.MapStr {
+func certToMap(cert *x509.Certificate, includeRaw bool) common.MapStr {
 	certMap := common.MapStr{
 		"signature_algorithm":  cert.SignatureAlgorithm.String(),
 		"public_key_algorithm": toString(cert.PublicKeyAlgorithm),
@@ -507,6 +506,13 @@ func certToMap(cert *x509.Certificate) common.MapStr {
 	}
 	if len(san) > 0 {
 		certMap["alternative_names"] = san
+	}
+	if includeRaw {
+		block := pem.Block{
+			Type:  "CERTIFICATE",
+			Bytes: cert.Raw,
+		}
+		certMap["raw"] = string(pem.EncodeToMemory(&block))
 	}
 	return certMap
 }

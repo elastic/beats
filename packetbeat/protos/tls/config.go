@@ -6,8 +6,9 @@ import (
 )
 
 type tlsConfig struct {
-	config.ProtocolCommon `config:",inline"`
-	SendCertificates      bool `config:"send_certificates"`
+	config.ProtocolCommon  `config:",inline"`
+	SendCertificates       bool `config:"send_certificates"`
+	IncludeRawCertificates bool `config:"include_raw_certificates"`
 }
 
 var (
@@ -15,6 +16,7 @@ var (
 		ProtocolCommon: config.ProtocolCommon{
 			TransactionTimeout: protos.DefaultTransactionExpiration,
 		},
-		SendCertificates: true,
+		SendCertificates:       true,
+		IncludeRawCertificates: false,
 	}
 )

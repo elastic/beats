@@ -4,8 +4,10 @@ package tls
 
 import (
 	"encoding/hex"
+	"encoding/pem"
 	"fmt"
 	"strconv"
+	"strings"
 	"testing"
 	"time"
 
@@ -306,7 +308,7 @@ func TestCertificates(t *testing.T) {
 		"subject.organizational_unit": "Technology",
 		"subject.province":            "California",
 	}
-	certMap := certToMap(c[0])
+	certMap := certToMap(c[0], false)
 
 	for key, expectedValue := range expected {
 		value, err := certMap.GetValue(key)
@@ -319,7 +321,7 @@ func TestCertificates(t *testing.T) {
 		assert.Equal(t, expectedValue, value)
 	}
 	san, err := certMap.GetValue("alternative_names")
-	assert.Nil(t, err)
+	assert.NoError(t, err)
 	assert.Equal(t, []string{
 		"www.example.org",
 		"example.com",
@@ -330,6 +332,21 @@ func TestCertificates(t *testing.T) {
 		"www.example.edu",
 		"www.example.net",
 	}, san)
+
+	// test raw certificates in PEM format
+	for idx, cc := range c {
+		logStr := fmt.Sprintf("certificate %d", idx)
+		certMap = certToMap(cc, true)
+		obj, err := certMap.GetValue("raw")
+		assert.NoError(t, err, logStr)
+		cert := obj.(string)
+		assert.True(t, strings.HasPrefix(cert, "-----BEGIN CERTIFICATE-----\n"), logStr)
+		assert.True(t, strings.HasSuffix(cert, "-----END CERTIFICATE-----\n"), logStr)
+		block, rest := pem.Decode([]byte(cert))
+		assert.Equal(t, block.Type, "CERTIFICATE", logStr)
+		assert.Equal(t, block.Bytes, cc.Raw, logStr)
+		assert.Empty(t, rest, logStr)
+	}
 }
 
 func TestBadCertMessage(t *testing.T) {

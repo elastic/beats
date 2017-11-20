@@ -31,10 +31,11 @@ type tlsConnectionData struct {
 // TLS protocol plugin
 type tlsPlugin struct {
 	// config
-	ports              []int
-	sendCertificates   bool
-	transactionTimeout time.Duration
-	results            protos.Reporter
+	ports                  []int
+	sendCertificates       bool
+	includeRawCertificates bool
+	transactionTimeout     time.Duration
+	results                protos.Reporter
 }
 
 var (
@@ -81,6 +82,7 @@ func (plugin *tlsPlugin) init(results protos.Reporter, config *tlsConfig) error 
 func (plugin *tlsPlugin) setFromConfig(config *tlsConfig) {
 	plugin.ports = config.Ports
 	plugin.sendCertificates = config.SendCertificates
+	plugin.includeRawCertificates = config.IncludeRawCertificates
 	plugin.transactionTimeout = config.TransactionTimeout
 }
 
@@ -247,14 +249,14 @@ func (plugin *tlsPlugin) createEvent(conn *tlsConnectionData) beat.Event {
 		serverHello = server.parser.hello
 		tls["server_hello"] = serverHello.toMap()
 	}
-	if cert, chain := getCerts(client.parser.certificates); cert != nil {
+	if cert, chain := getCerts(client.parser.certificates, plugin.includeRawCertificates); cert != nil {
 		tls["client_certificate"] = cert
 		if chain != nil {
 			tls["client_certificate_chain"] = chain
 		}
 	}
 	if plugin.sendCertificates {
-		if cert, chain := getCerts(server.parser.certificates); cert != nil {
+		if cert, chain := getCerts(server.parser.certificates, plugin.includeRawCertificates); cert != nil {
 			tls["server_certificate"] = cert
 			if chain != nil {
 				tls["server_certificate_chain"] = chain
@@ -322,17 +324,17 @@ func (plugin *tlsPlugin) createEvent(conn *tlsConnectionData) beat.Event {
 	}
 }
 
-func getCerts(certs []*x509.Certificate) (common.MapStr, []common.MapStr) {
+func getCerts(certs []*x509.Certificate, includeRaw bool) (common.MapStr, []common.MapStr) {
 	if len(certs) == 0 {
 		return nil, nil
 	}
-	cert := certToMap(certs[0])
+	cert := certToMap(certs[0], includeRaw)
 	if len(certs) == 1 {
 		return cert, nil
 	}
 	chain := make([]common.MapStr, len(certs)-1)
 	for idx := 1; idx < len(certs); idx++ {
-		chain[idx-1] = certToMap(certs[idx])
+		chain[idx-1] = certToMap(certs[idx], includeRaw)
 	}
 	return cert, chain
 }
