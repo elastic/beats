@@ -17,6 +17,7 @@ import (
 	"text/template"
 
 	"github.com/elastic/beats/libbeat/common"
+	"github.com/elastic/beats/libbeat/logp"
 	mlimporter "github.com/elastic/beats/libbeat/ml-importer"
 )
 
@@ -155,6 +156,46 @@ func (fs *Fileset) evaluateVars() (map[string]interface{}, error) {
 	return vars, nil
 }
 
+// turnOffElasticsearchVars re-evaluates the variables that have `min_elasticsearch_version`
+// set.
+func (fs *Fileset) turnOffElasticsearchVars(vars map[string]interface{}, esVersion string) (map[string]interface{}, error) {
+
+	retVars := map[string]interface{}{}
+	for key, val := range vars {
+		retVars[key] = val
+	}
+
+	haveVersion, err := common.NewVersion(esVersion)
+	if err != nil {
+		return vars, fmt.Errorf("Error parsing version %s: %v", esVersion, err)
+	}
+
+	for _, vals := range fs.manifest.Vars {
+		var exists bool
+		name, exists := vals["name"].(string)
+		if !exists {
+			return nil, fmt.Errorf("Variable doesn't have a string 'name' key")
+		}
+
+		minESVersion, exists := vals["min_elasticsearch_version"].(map[string]interface{})
+		if exists {
+			minVersion, err := common.NewVersion(minESVersion["version"].(string))
+			if err != nil {
+				return vars, fmt.Errorf("Error parsing version %s: %v", minESVersion["version"].(string), err)
+			}
+
+			logp.Debug("fileset", "Comparing ES version %s with %s", haveVersion, minVersion)
+
+			if haveVersion.LessThan(minVersion) {
+				retVars[name] = minESVersion["value"]
+				logp.Info("Setting var %s to %v because Elasticsearch version is %s", name, minESVersion["value"], haveVersion)
+			}
+		}
+	}
+
+	return retVars, nil
+}
+
 // resolveVariable considers the value as a template so it can refer to built-in variables
 // as well as other variables defined before them.
 func resolveVariable(vars map[string]interface{}, value interface{}) (interface{}, error) {
@@ -283,7 +324,8 @@ func (fs *Fileset) getPipelineID(beatVersion string) (string, error) {
 	return formatPipelineID(fs.mcfg.Module, fs.name, path, beatVersion), nil
 }
 
-func (fs *Fileset) GetPipeline() (pipelineID string, content map[string]interface{}, err error) {
+func (fs *Fileset) GetPipeline(esVersion string) (pipelineID string, content map[string]interface{}, err error) {
+
 	path, err := applyTemplate(fs.vars, fs.manifest.IngestPipeline, false)
 	if err != nil {
 		return "", nil, fmt.Errorf("Error expanding vars on the ingest pipeline path: %v", err)
@@ -294,7 +336,12 @@ func (fs *Fileset) GetPipeline() (pipelineID string, content map[string]interfac
 		return "", nil, fmt.Errorf("Error reading pipeline file %s: %v", path, err)
 	}
 
-	jsonString, err := applyTemplate(fs.vars, string(strContents), true)
+	vars, err := fs.turnOffElasticsearchVars(fs.vars, esVersion)
+	if err != nil {
+		return "", nil, err
+	}
+
+	jsonString, err := applyTemplate(vars, string(strContents), true)
 	if err != nil {
 		return "", nil, fmt.Errorf("Error interpreting the template of the ingest pipeline: %v", err)
 	}
