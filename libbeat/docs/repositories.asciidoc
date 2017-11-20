@@ -49,11 +49,11 @@ wget -qO - https://artifacts.elastic.co/GPG-KEY-elasticsearch | sudo apt-key add
 sudo apt-get install apt-transport-https
 --------------------------------------------------
 
-. Save the repository definition to  +/etc/apt/sources.list.d/elastic-6.x-prerelease.list+:
+. Save the repository definition to  +/etc/apt/sources.list.d/elastic-6.x.list+:
 +
 ["source","sh",subs="attributes,callouts"]
 --------------------------------------------------
-echo "deb https://artifacts.elastic.co/packages/6.x-prerelease/apt stable main" | sudo tee -a /etc/apt/sources.list.d/elastic-6.x-prerelease.list
+echo "deb https://artifacts.elastic.co/packages/6.x/apt stable main" | sudo tee -a /etc/apt/sources.list.d/elastic-6.x.list
 --------------------------------------------------
 +
 [WARNING]
@@ -112,9 +112,9 @@ your `/etc/yum.repos.d/` directory and add the following lines:
 +
 ["source","sh",subs="attributes,callouts"]
 --------------------------------------------------
-[elastic-6.x-prerelease]
-name=Elastic repository for 6.x prerelease packages
-baseurl=https://artifacts.elastic.co/packages/6.x-prerelease/yum
+[elastic-6.x]
+name=Elastic repository for 6.x packages
+baseurl=https://artifacts.elastic.co/packages/6.x/yum
 gpgcheck=1
 gpgkey=https://artifacts.elastic.co/GPG-KEY-elasticsearch
 enabled=1
