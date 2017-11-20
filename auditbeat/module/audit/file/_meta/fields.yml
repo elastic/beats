@@ -4,11 +4,19 @@
       The file metricset generates events when a file changes on disk.
     fields:
     - name: path
-      type: keyword
+      type: text
       description: The path to the file.
+      multi_fields:
+      - name: raw
+        type: keyword
+        description: >
+          The path to the file. This is an non-analyzed field that is useful
+          for aggregations.
+
     - name: target_path
       type: keyword
       description: The target path for symlinks.
+
     - name: action
       type: keyword
       example: attributes_modified
@@ -16,77 +24,101 @@
         Action describes the change that triggered the event. The possible
         values are: attributes_modified, created, deleted, updated, moved, and
         config_change.
+
     - name: type
       type: keyword
       description: The file type (file, dir, or symlink).
+
     - name: inode
       type: keyword
       description: The inode representing the file in the filesystem.
+
     - name: uid
       type: keyword
       description: The user ID (UID) of the file owner.
+
     - name: owner
       type: keyword
       description: The file owner's username.
+
     - name: gid
       type: keyword
       description: The primary group ID (GID) of the file.
+
     - name: group
       type: keyword
       description: The primary group name of the file.
+
     - name: sid
       type: keyword
       description: The security identifier (SID) of the file owner (Windows only).
+
     - name: mode
       type: keyword
       example: 0640
       description: The mode of the file in octal representation.
+
     - name: size
       type: long
       description: The file size in bytes (field is only added when `type` is `file`).
+
     - name: mtime
       type: date
       description: The last modified time of the file (time when content was modified).
+
     - name: ctime
       type: date
       description: The last change time of the file (time when metadata was changed).
+
     - name: hashed
       type: boolean
       description: >
         Boolean indicating if the event includes any file hashes.
+
     - name: md5
       type: keyword
       description: MD5 hash of the file.
+
     - name: sha1
       type: keyword
       description: SHA1 hash of the file.
+
     - name: sha224
       type: keyword
       description: SHA224 hash of the file.
+
     - name: sha256
       type: keyword
       description: SHA256 hash of the file.
+
     - name: sha384
       type: keyword
       description: SHA384 hash of the file.
+
     - name: sha3_224
       type: keyword
       description: SHA3_224 hash of the file.
+
     - name: sha3_256
       type: keyword
       description: SHA3_256 hash of the file.
+
     - name: sha3_384
       type: keyword
       description: SHA3_384 hash of the file.
+
     - name: sha3_512
       type: keyword
       description: SHA3_512 hash of the file.
+
     - name: sha512
       type: keyword
       description: SHA512 hash of the file.
+
     - name: sha512_224
       type: keyword
       description: SHA512/224 hash of the file.
+
     - name: sha512_256
       type: keyword
       description: SHA512/256 hash of the file.
