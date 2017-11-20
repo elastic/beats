@@ -50,6 +50,7 @@ if [ "$SOURCE" != "" ]; then
 else
         mkdir -p $GOPATH/src/${GIT_REPO}
         cd $GOPATH/src/${GIT_REPO}
+	cd ..
         echo "Fetching main git repository ${GIT_REPO} in folder $GOPATH/src/${GIT_REPO}"
         git clone https://${GIT_REPO}.git
 fi
