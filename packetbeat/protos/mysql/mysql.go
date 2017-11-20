@@ -924,7 +924,7 @@ func (mysql *mysqlPlugin) parseMysqlExecuteStatement(data []byte, stmtdata *mysq
 				paramString = append(paramString, string(data[paramOffset:paramOffset+paramLen16]))
 				paramOffset += paramLen16
 			case 0xfd: /* 64k - 16M chars */
-				paramLen24 := int(data[paramOffset]) | int(data[paramOffset+1])<<8 | int(data[paramOffset+2]<<16)
+				paramLen24 := int(data[paramOffset]) | int(data[paramOffset+1])<<8 | int(data[paramOffset+2])<<16
 				paramOffset += 3
 				paramString = append(paramString, string(data[paramOffset:paramOffset+paramLen24]))
 				paramOffset += paramLen24
