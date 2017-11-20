@@ -97,7 +97,7 @@ This file is generated! See scripts/docs_collector.py
 .2+|   |<<metricbeat-metricset-redis-info,info>>   
 |<<metricbeat-metricset-redis-keyspace,keyspace>>   
 |<<metricbeat-module-system,System>>     |    
-.12+|   |<<metricbeat-metricset-system-core,core>>   
+.13+|   |<<metricbeat-metricset-system-core,core>>   
 |<<metricbeat-metricset-system-cpu,cpu>>   
 |<<metricbeat-metricset-system-diskio,diskio>>   
 |<<metricbeat-metricset-system-filesystem,filesystem>>   
@@ -107,6 +107,7 @@ This file is generated! See scripts/docs_collector.py
 |<<metricbeat-metricset-system-network,network>>   
 |<<metricbeat-metricset-system-process,process>>   
 |<<metricbeat-metricset-system-process_summary,process_summary>>   
+|<<metricbeat-metricset-system-raid,raid>> experimental[]  
 |<<metricbeat-metricset-system-socket,socket>> beta[]  
 |<<metricbeat-metricset-system-uptime,uptime>>   
 |<<metricbeat-module-vsphere,vSphere>>  beta[]   |    
