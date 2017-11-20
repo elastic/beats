@@ -799,11 +799,11 @@ func (mysql *mysqlPlugin) parseMysqlExecuteStatement(data []byte, stmtdata *mysq
 	// mysql hdr
 	offset += 4
 	// cmd type
-	offset += 1
+	offset ++
 	// stmt id
 	offset += 4
 	// flags
-	offset += 1
+	offset ++
 	// iterations
 	offset += 4
 	// null-bitmap
@@ -812,18 +812,18 @@ func (mysql *mysqlPlugin) parseMysqlExecuteStatement(data []byte, stmtdata *mysq
 	}
 	// stmt bound
 	stmtBound := data[offset]
-	offset += 1
+	offset ++
 	paramOffset := offset
 	if stmtBound == 1 {
 		paramOffset += nparam * 2
 		// First call or rebound (1)
 		for stmtPos := 0; stmtPos < nparam; stmtPos++ {
 			paramType = uint8(data[offset])
-			offset += 1
+			offset ++
 			nparamType = append(nparamType, paramType)
 			logp.Debug("mysqldetailed", "type = %d", paramType)
 			paramUnsigned = uint8(data[offset])
-			offset += 1
+			offset ++
 			if paramUnsigned != 0 {
 				logp.Debug("mysql", "Illegal param unsigned")
 				return []string{}
@@ -847,7 +847,7 @@ func (mysql *mysqlPlugin) parseMysqlExecuteStatement(data []byte, stmtdata *mysq
 		switch paramType {
 		// FIELD_TYPE_TINY
 		case 0x01:
-			paramOffset += 1
+			paramOffset ++
 			valueString := strconv.Itoa(int(data[paramOffset]))
 			paramString = append(paramString, valueString)
 		// FIELD_TYPE_SHORT
@@ -885,7 +885,7 @@ func (mysql *mysqlPlugin) parseMysqlExecuteStatement(data []byte, stmtdata *mysq
 		case 0x07, 0x0c, 0x0a:
 			var year, month, day, hour, minute, second string
 			paramLen := int(data[paramOffset])
-			paramOffset += 1
+			paramOffset ++
 			if paramLen >= 2 {
 				year = strconv.Itoa((int(data[paramOffset]) | int(data[paramOffset+1])<<8))
 			}
@@ -908,7 +908,7 @@ func (mysql *mysqlPlugin) parseMysqlExecuteStatement(data []byte, stmtdata *mysq
 		// FIELD_TYPE_TIME
 		case 0x0b:
 			paramLen := int(data[paramOffset])
-			paramOffset += 1
+			paramOffset ++
 			paramString = append(paramString, "TYPE_TIME")
 			paramOffset += paramLen
 		// FIELD_TYPE_VAR_STRING
@@ -916,7 +916,7 @@ func (mysql *mysqlPlugin) parseMysqlExecuteStatement(data []byte, stmtdata *mysq
 		// FIELD_TYPE_STRING
 		case 0xf6, 0xfc, 0xfd, 0xfe:
 			paramLen := int(data[paramOffset])
-			paramOffset += 1
+			paramOffset ++
 			switch paramLen {
 			case 0xfc: /* 252 - 64k chars */
 				paramLen16 := int(data[paramOffset]) | int(data[paramOffset+1])<<8
