@@ -297,6 +297,13 @@ func getServiceInformation(rawService *EnumServiceStatusProcess, servicesBuffer 
 		return service, err
 	}
 
+	defer func() (ServiceStatus, error) {
+		if err := CloseServiceHandle(serviceHandle); err != nil {
+			return service, err
+		}
+		return service, nil
+	}()
+
 	// Get detailed information
 	if err := getAdditionalServiceInfo(serviceHandle, &service); err != nil {
 		return service, err
@@ -304,10 +311,6 @@ func getServiceInformation(rawService *EnumServiceStatusProcess, servicesBuffer 
 
 	// Get optional information
 	if err := getOptionalServiceInfo(serviceHandle, &service); err != nil {
-		return service, err
-	}
-
-	if err := CloseServiceHandle(serviceHandle); err != nil {
 		return service, err
 	}
 
