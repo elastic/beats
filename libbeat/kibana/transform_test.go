@@ -242,6 +242,8 @@ func TestTransformMisc(t *testing.T) {
 func TestTransformFieldFormatMap(t *testing.T) {
 	precision := 3
 	version620, _ := common.NewVersion("6.2.0")
+	truthy := true
+	falsy := false
 
 	tests := []struct {
 		commonField common.Field
@@ -295,17 +297,19 @@ func TestTransformFieldFormatMap(t *testing.T) {
 		},
 		{
 			commonField: common.Field{
-				Name:        "c",
-				Format:      "url",
-				Pattern:     "[^-]",
-				InputFormat: "string",
+				Name:                 "c",
+				Format:               "url",
+				Pattern:              "[^-]",
+				InputFormat:          "string",
+				OpenLinkInCurrentTab: &falsy,
 			},
 			expected: common.MapStr{
 				"c": common.MapStr{
 					"id": "url",
 					"params": common.MapStr{
-						"pattern":     "[^-]",
-						"inputFormat": "string",
+						"pattern":              "[^-]",
+						"inputFormat":          "string",
+						"openLinkInCurrentTab": false,
 					},
 				},
 			},
@@ -322,13 +326,14 @@ func TestTransformFieldFormatMap(t *testing.T) {
 		{
 			version: version620,
 			commonField: common.Field{
-				Name:            "c",
-				Format:          "url",
-				Pattern:         "[^-]",
-				InputFormat:     "string",
-				OutputFormat:    "float",
-				OutputPrecision: &precision,
-				LabelTemplate:   "lblT",
+				Name:                 "c",
+				Format:               "url",
+				Pattern:              "[^-]",
+				OpenLinkInCurrentTab: &truthy,
+				InputFormat:          "string",
+				OutputFormat:         "float",
+				OutputPrecision:      &precision,
+				LabelTemplate:        "lblT",
 				UrlTemplate: []common.VersionizedString{
 					{MinVersion: "5.0.0", Value: "5x.urlTemplate"},
 					{MinVersion: "6.0.0", Value: "6x.urlTemplate"},
@@ -338,12 +343,13 @@ func TestTransformFieldFormatMap(t *testing.T) {
 				"c": common.MapStr{
 					"id": "url",
 					"params": common.MapStr{
-						"pattern":         "[^-]",
-						"inputFormat":     "string",
-						"outputFormat":    "float",
-						"outputPrecision": 3,
-						"labelTemplate":   "lblT",
-						"urlTemplate":     "6x.urlTemplate",
+						"pattern":              "[^-]",
+						"inputFormat":          "string",
+						"outputFormat":         "float",
+						"outputPrecision":      3,
+						"labelTemplate":        "lblT",
+						"urlTemplate":          "6x.urlTemplate",
+						"openLinkInCurrentTab": true,
 					},
 				},
 			},
