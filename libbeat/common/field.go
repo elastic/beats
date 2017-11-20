@@ -41,12 +41,13 @@ type Field struct {
 	Aggregatable *bool  `config:"aggregatable"`
 	Script       string `config:"script"`
 	// Kibana params
-	Pattern         string              `config:"pattern"`
-	InputFormat     string              `config:"input_format"`
-	OutputFormat    string              `config:"output_format"`
-	OutputPrecision *int                `config:"output_precision"`
-	LabelTemplate   string              `config:"label_template"`
-	UrlTemplate     []VersionizedString `config:"url_template"`
+	Pattern              string              `config:"pattern"`
+	InputFormat          string              `config:"input_format"`
+	OutputFormat         string              `config:"output_format"`
+	OutputPrecision      *int                `config:"output_precision"`
+	LabelTemplate        string              `config:"label_template"`
+	UrlTemplate          []VersionizedString `config:"url_template"`
+	OpenLinkInCurrentTab *bool               `config:"open_link_in_current_tab"`
 
 	Path string
 }
