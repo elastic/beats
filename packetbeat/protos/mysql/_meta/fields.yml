@@ -45,3 +45,7 @@
           description: >
             The error info message returned by MySQL.
 
+	- name: param
+          description: >
+            If the execute statement command is successful, this field contains the statement 
+            parameters.
