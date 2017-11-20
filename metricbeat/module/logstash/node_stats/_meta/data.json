@@ -5,19 +5,18 @@
         "name": "host.example.com"
     },
     "logstash": {
-        "node": {
-            "host": "4318d3c307b3",
-            "jvm": {
-                "pid": 1,
-                "version": "1.8.0_151"
-            },
-            "version": "6.0.0-rc2"
+        "node_stats": {
+            "events": {
+                "filtered": 0,
+                "in": 0,
+                "out": 0
+            }
         }
     },
     "metricset": {
         "host": "127.0.0.1:9600",
         "module": "logstash",
-        "name": "node",
+        "name": "node_stats",
         "rtt": 115
     }
 }

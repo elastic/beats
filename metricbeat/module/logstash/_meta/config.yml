@@ -1,5 +1,5 @@
 - module: logstash
-  metricsets: ["node"]
+  metricsets: ["node", "node_stats"]
   enabled: false
   period: 10s
   hosts: ["localhost"]

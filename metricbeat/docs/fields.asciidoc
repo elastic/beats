@@ -6196,6 +6196,44 @@ type: long
 Pid
 
 
+[float]
+== node_stats fields
+
+node_stats metrics.
+
+
+
+[float]
+== events fields
+
+Events stats
+
+
+
+[float]
+=== `logstash.node_stats.events.in`
+
+type: long
+
+Incoming events counter.
+
+
+[float]
+=== `logstash.node_stats.events.out`
+
+type: long
+
+Outgoing events counter.
+
+
+[float]
+=== `logstash.node_stats.events.filtered`
+
+type: long
+
+Filtered events counter.
+
+
 [[exported-fields-memcached]]
 == Memcached fields
 
