@@ -8,6 +8,8 @@ var:
     os.darwin:
       - /var/log/system.log*
     os.windows: []
+  - name: convert_timezone
+    default: false
 
 ingest_pipeline: ingest/pipeline.json
 prospector: config/syslog.yml

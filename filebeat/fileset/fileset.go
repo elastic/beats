@@ -160,13 +160,13 @@ func (fs *Fileset) evaluateVars() (map[string]interface{}, error) {
 func resolveVariable(vars map[string]interface{}, value interface{}) (interface{}, error) {
 	switch v := value.(type) {
 	case string:
-		return applyTemplate(vars, v)
+		return applyTemplate(vars, v, false)
 	case []interface{}:
 		transformed := []interface{}{}
 		for _, val := range v {
 			s, ok := val.(string)
 			if ok {
-				transf, err := applyTemplate(vars, s)
+				transf, err := applyTemplate(vars, s, false)
 				if err != nil {
 					return nil, fmt.Errorf("array: %v", err)
 				}
@@ -180,9 +180,15 @@ func resolveVariable(vars map[string]interface{}, value interface{}) (interface{
 	return value, nil
 }
 
-// applyTemplate applies a Golang text/template
-func applyTemplate(vars map[string]interface{}, templateString string) (string, error) {
-	tpl, err := template.New("text").Parse(templateString)
+// applyTemplate applies a Golang text/template. If specialDelims is set to true,
+// the delimiters are set to `{%` and `%}` instead of `{{` and `}}`. These are easier to use
+// in pipeline definitions.
+func applyTemplate(vars map[string]interface{}, templateString string, specialDelims bool) (string, error) {
+	tpl := template.New("text")
+	if specialDelims {
+		tpl = tpl.Delims("{%", "%}")
+	}
+	tpl, err := tpl.Parse(templateString)
 	if err != nil {
 		return "", fmt.Errorf("Error parsing template %s: %v", templateString, err)
 	}
@@ -215,7 +221,7 @@ func (fs *Fileset) getBuiltinVars() (map[string]interface{}, error) {
 }
 
 func (fs *Fileset) getProspectorConfig() (*common.Config, error) {
-	path, err := applyTemplate(fs.vars, fs.manifest.Prospector)
+	path, err := applyTemplate(fs.vars, fs.manifest.Prospector, false)
 	if err != nil {
 		return nil, fmt.Errorf("Error expanding vars on the prospector path: %v", err)
 	}
@@ -224,7 +230,7 @@ func (fs *Fileset) getProspectorConfig() (*common.Config, error) {
 		return nil, fmt.Errorf("Error reading prospector file %s: %v", path, err)
 	}
 
-	yaml, err := applyTemplate(fs.vars, string(contents))
+	yaml, err := applyTemplate(fs.vars, string(contents), false)
 	if err != nil {
 		return nil, fmt.Errorf("Error interpreting the template of the prospector: %v", err)
 	}
@@ -269,7 +275,7 @@ func (fs *Fileset) getProspectorConfig() (*common.Config, error) {
 
 // getPipelineID returns the Ingest Node pipeline ID
 func (fs *Fileset) getPipelineID(beatVersion string) (string, error) {
-	path, err := applyTemplate(fs.vars, fs.manifest.IngestPipeline)
+	path, err := applyTemplate(fs.vars, fs.manifest.IngestPipeline, false)
 	if err != nil {
 		return "", fmt.Errorf("Error expanding vars on the ingest pipeline path: %v", err)
 	}
@@ -278,18 +284,22 @@ func (fs *Fileset) getPipelineID(beatVersion string) (string, error) {
 }
 
 func (fs *Fileset) GetPipeline() (pipelineID string, content map[string]interface{}, err error) {
-	path, err := applyTemplate(fs.vars, fs.manifest.IngestPipeline)
+	path, err := applyTemplate(fs.vars, fs.manifest.IngestPipeline, false)
 	if err != nil {
 		return "", nil, fmt.Errorf("Error expanding vars on the ingest pipeline path: %v", err)
 	}
 
-	f, err := os.Open(filepath.Join(fs.modulePath, fs.name, path))
+	strContents, err := ioutil.ReadFile(filepath.Join(fs.modulePath, fs.name, path))
 	if err != nil {
 		return "", nil, fmt.Errorf("Error reading pipeline file %s: %v", path, err)
 	}
 
-	dec := json.NewDecoder(f)
-	err = dec.Decode(&content)
+	jsonString, err := applyTemplate(fs.vars, string(strContents), true)
+	if err != nil {
+		return "", nil, fmt.Errorf("Error interpreting the template of the ingest pipeline: %v", err)
+	}
+
+	err = json.Unmarshal([]byte(jsonString), &content)
 	if err != nil {
 		return "", nil, fmt.Errorf("Error JSON decoding the pipeline file: %s: %v", path, err)
 	}
