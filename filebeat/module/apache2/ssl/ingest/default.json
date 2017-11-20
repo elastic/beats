@@ -1,0 +1,42 @@
+{
+  "description": "Pipeline for parsing Apache2 SSL access logs. Requires the geoip and user_agent plugins.",
+  "processors": [{
+    "grok": {
+      "field": "message",
+      "patterns":[
+        "\\[%{HTTPDATE:apache2.access.time}\\] %{IPORHOST:apache2.access.remote_ip} %{DATA:apache2.access.ssl_protocol} %{DATA:apache2.access.ssl_cipher} \"%{WORD:apache2.access.method} %{DATA:apache2.access.url} HTTP/%{NUMBER:apache2.access.http_version}\" (?:%{NUMBER:apache2.access.body_sent.bytes}|-)"
+        ],
+      "ignore_missing": true
+    }
+  },{
+    "remove":{
+      "field": "message"
+    }
+  }, {
+    "rename": {
+      "field": "@timestamp",
+      "target_field": "read_timestamp"
+    }
+  }, {
+    "date": {
+      "field": "apache2.access.time",
+      "target_field": "@timestamp",
+      "formats": ["dd/MMM/YYYY:H:m:s Z"]
+    }
+  }, {
+    "remove": {
+      "field": "apache2.access.time"
+    }
+  }, {
+    "geoip": {
+      "field": "apache2.access.remote_ip",
+      "target_field": "apache2.access.geoip"
+    }
+  }],
+  "on_failure" : [{
+    "set" : {
+      "field" : "error.message",
+      "value" : "{{ _ingest.on_failure_message }}"
+    }
+  }]
+}
