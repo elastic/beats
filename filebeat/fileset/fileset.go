@@ -52,6 +52,11 @@ func New(
 	}, nil
 }
 
+// String returns the module and the name of the fileset.
+func (fs *Fileset) String() string {
+	return fs.mcfg.Module + "/" + fs.name
+}
+
 // Read reads the manifest file and evaluates the variables.
 func (fs *Fileset) Read(beatVersion string) error {
 	var err error
@@ -188,7 +193,7 @@ func (fs *Fileset) turnOffElasticsearchVars(vars map[string]interface{}, esVersi
 
 			if haveVersion.LessThan(minVersion) {
 				retVars[name] = minESVersion["value"]
-				logp.Info("Setting var %s to %v because Elasticsearch version is %s", name, minESVersion["value"], haveVersion)
+				logp.Info("Setting var %s (%s) to %v because Elasticsearch version is %s", name, fs, minESVersion["value"], haveVersion)
 			}
 		}
 	}
@@ -324,6 +329,7 @@ func (fs *Fileset) getPipelineID(beatVersion string) (string, error) {
 	return formatPipelineID(fs.mcfg.Module, fs.name, path, beatVersion), nil
 }
 
+// GetPipeline returns the JSON content of the Ingest Node pipeline that parses the logs.
 func (fs *Fileset) GetPipeline(esVersion string) (pipelineID string, content map[string]interface{}, err error) {
 
 	path, err := applyTemplate(fs.vars, fs.manifest.IngestPipeline, false)
