@@ -111,6 +111,7 @@ https://github.com/elastic/beats/compare/v6.0.0-beta2...master[Check the HEAD di
 - Add Kubernetes manifests to deploy Filebeat. {pull}5349[5349]
 - Add experimental Docker `json-file` prospector . {pull}5402[5402]
 - Add experimental Docker autodiscover functionality. {pull}5245[5245]
+- Add option to convert the timestamps to UTC in the system module. {pull}5647[5647]
 
 *Heartbeat*
 
