@@ -4,7 +4,7 @@ BEAT_URL=https://${BEAT_PATH}
 SYSTEM_TESTS=false
 TEST_ENVIRONMENT=false
 ES_BEATS?=./vendor/github.com/elastic/beats
-GOPACKAGES=$(shell govendor list +local)
+GOPACKAGES=$(shell govendor list -no-status +local)
 PREFIX?=.
 NOTICE_FILE=NOTICE
 
