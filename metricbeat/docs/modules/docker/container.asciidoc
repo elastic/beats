@@ -3,6 +3,10 @@ This file is generated! See scripts/docs_collector.py
 ////
 
 [[metricbeat-metricset-docker-container]]
+=== Docker container metricset
+
+beta[]
+
 include::../../../module/docker/container/_meta/docs.asciidoc[]
 
 

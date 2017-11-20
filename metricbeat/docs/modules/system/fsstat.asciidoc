@@ -3,6 +3,8 @@ This file is generated! See scripts/docs_collector.py
 ////
 
 [[metricbeat-metricset-system-fsstat]]
+=== System fsstat metricset
+
 include::../../../module/system/fsstat/_meta/docs.asciidoc[]
 
 

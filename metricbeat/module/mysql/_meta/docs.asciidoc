@@ -1,5 +1,3 @@
-== MySQL module
-
 This module periodically fetches metrics from https://www.mysql.com/[MySQL]
 servers.
 

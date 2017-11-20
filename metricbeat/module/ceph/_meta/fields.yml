@@ -1,10 +1,9 @@
 - key: ceph
   title: "Ceph"
   description: >
-    beta[]
-
     Ceph module
   short_config: false
+  release: beta
   fields:
     - name: ceph
       type: group

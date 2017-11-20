@@ -2,6 +2,7 @@
   type: group
   description: >
     kubernetes replica set metrics
+  release: beta
   fields:
     - name: name
       type: keyword

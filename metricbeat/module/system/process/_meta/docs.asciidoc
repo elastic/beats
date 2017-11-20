@@ -1,5 +1,3 @@
-=== System process metricset
-
 The System `process` metricset provides process statistics. One document is
 provided for each process.
 

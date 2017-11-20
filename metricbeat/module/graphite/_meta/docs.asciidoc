@@ -1,6 +1,2 @@
-== graphite Module
-
-experimental[]
-
 This is the graphite Module.
 

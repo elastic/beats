@@ -1,5 +1,3 @@
-== PostgreSQL Module
-
 This module periodically fetches metrics from
 https://www.postgresql.org/[PostgreSQL] servers.
 

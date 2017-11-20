@@ -1,5 +1,1 @@
-=== Ceph cluster_disk metricset
-
-experimental[]
-
 This is the `cluster_disk` metricset of the Ceph module.

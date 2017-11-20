@@ -3,6 +3,10 @@ This file is generated! See scripts/docs_collector.py
 ////
 
 [[metricbeat-metricset-couchbase-bucket]]
+=== Couchbase bucket metricset
+
+beta[]
+
 include::../../../module/couchbase/bucket/_meta/docs.asciidoc[]
 
 

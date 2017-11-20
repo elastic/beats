@@ -2,6 +2,7 @@
   type: group
   description: >
     `info` contains the information and statistics returned by the `INFO` command.
+  release: ga
   fields:
     - name: clients
       type: group

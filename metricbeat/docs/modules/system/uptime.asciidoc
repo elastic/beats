@@ -3,6 +3,8 @@ This file is generated! See scripts/docs_collector.py
 ////
 
 [[metricbeat-metricset-system-uptime]]
+=== System uptime metricset
+
 include::../../../module/system/uptime/_meta/docs.asciidoc[]
 
 

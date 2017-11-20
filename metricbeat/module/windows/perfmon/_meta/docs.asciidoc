@@ -1,5 +1,3 @@
-=== Windows perfmon metricset
-
 The `perfmon` metricset of the Windows module reads Windows
 performance counters.
 

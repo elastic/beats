@@ -3,6 +3,8 @@ This file is generated! See scripts/docs_collector.py
 ////
 
 [[metricbeat-metricset-nginx-stubstatus]]
+=== Nginx stubstatus metricset
+
 include::../../../module/nginx/stubstatus/_meta/docs.asciidoc[]
 
 

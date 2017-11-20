@@ -3,6 +3,10 @@ This file is generated! See scripts/docs_collector.py
 ////
 
 [[metricbeat-metricset-aerospike-namespace]]
+=== Aerospike namespace metricset
+
+beta[]
+
 include::../../../module/aerospike/namespace/_meta/docs.asciidoc[]
 
 

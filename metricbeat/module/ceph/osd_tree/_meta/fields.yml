@@ -2,6 +2,7 @@
   type: group
   description: >
     ceph osd tree info
+  release: beta
   fields:
     - name: id
       type: long
@@ -20,7 +21,7 @@
       description: >
         osd or bucket node typeID
     - name: children
-      type: text 
+      type: text
       description: >
         bucket children list, seperate by comma.
     - name: crush_weight
@@ -44,7 +45,7 @@
       description: >
         the reweight of osd
     - name: status
-      type: keyword 
+      type: keyword
       description: >
         status of osd, it should be up or down
     - name: device_class
@@ -52,6 +53,6 @@
       description: >
         the device class of osd, like hdd, ssd etc.
     - name: father
-      type: keyword 
+      type: keyword
       description: >
         the parent node of this osd or bucket node

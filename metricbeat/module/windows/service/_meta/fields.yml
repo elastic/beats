@@ -2,6 +2,7 @@
   type: group
   description: >
     `service` contains the status for Windows services.
+  release: beta
   fields:
     - name: id
       type: keyword

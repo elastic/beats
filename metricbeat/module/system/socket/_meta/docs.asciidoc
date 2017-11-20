@@ -1,7 +1,3 @@
-=== System socket metricset
-
-beta[]
-
 This metricset is available on Linux only and requires kernel 2.6.14 or newer.
 
 The system `socket` metricset reports an event for each new TCP socket that it

@@ -1,4 +1,2 @@
-== logstash module
-
-This is the logstash module.
+This is the Logstash module.
 

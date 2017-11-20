@@ -33,7 +33,7 @@ type MetricSet struct {
 // Part of new is also setting up the configuration by processing additional
 // configuration entries if needed.
 func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
-	cfgwarn.Experimental("The graphite server metricset is experimental")
+	cfgwarn.Beta("The graphite server metricset is beta")
 
 	config := DefaultGraphiteCollectorConfig()
 	if err := base.Module().UnpackConfig(&config); err != nil {

@@ -2,6 +2,7 @@
   type: group
   description: >
     `system-core` contains CPU metrics for a single core of a multi-core system.
+  release: ga
   fields:
     - name: id
       type: long

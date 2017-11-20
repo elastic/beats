@@ -1,5 +1,1 @@
-=== Kubernetes volume metricset
-
-beta[]
-
 This is the `volume` metricset of the Kubernetes module.
