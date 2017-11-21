@@ -34,7 +34,7 @@
       }
     }, {
       "geoip" : {
-        "field" : "clienthost"
+        "field" : "iis.access.remote_ip"
       }
     }
   ],
