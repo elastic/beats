@@ -7,3 +7,7 @@ exclude_files: [".gz$"]
 multiline:
   pattern: "^\\s"
   match: after
+{{ if .convert_timezone }}
+processors:
+- add_locale: ~
+{{ end }}
