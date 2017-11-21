@@ -106,7 +106,6 @@ func (a *Autodiscover) startWorker() {
 
 		meta := getMeta(event)
 		for _, config := range configs {
-
 			rawCfg := map[string]interface{}{}
 			err := config.Unpack(rawCfg)
 

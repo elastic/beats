@@ -243,4 +243,7 @@ func TestAutodiscoverHash(t *testing.T) {
 	assert.Equal(t, runners[0].meta.Get()["foo"], "bar")
 	assert.True(t, runners[0].started)
 	assert.False(t, runners[0].stopped)
+	assert.Equal(t, runners[1].meta.Get()["foo"], "bar")
+	assert.True(t, runners[1].started)
+	assert.False(t, runners[1].stopped)
 }
