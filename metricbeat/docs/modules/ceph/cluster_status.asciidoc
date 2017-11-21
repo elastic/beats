@@ -3,6 +3,10 @@ This file is generated! See scripts/docs_collector.py
 ////
 
 [[metricbeat-metricset-ceph-cluster_status]]
+=== Ceph cluster_status metricset
+
+beta[]
+
 include::../../../module/ceph/cluster_status/_meta/docs.asciidoc[]
 
 

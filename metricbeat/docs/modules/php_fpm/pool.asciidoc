@@ -3,6 +3,10 @@ This file is generated! See scripts/docs_collector.py
 ////
 
 [[metricbeat-metricset-php_fpm-pool]]
+=== PHP_FPM pool metricset
+
+beta[]
+
 include::../../../module/php_fpm/pool/_meta/docs.asciidoc[]
 
 

@@ -1,5 +1,1 @@
-=== Kubernetes state_node metricset
-
-beta[]
-
 This is the `state_node` metricset of the Kubernetes module.

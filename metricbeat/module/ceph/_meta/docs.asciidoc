@@ -1,6 +1,2 @@
-== Ceph module
-
-beta[]
-
 The Ceph module collects metrics by submitting HTTP GET requests to
 the http://docs.ceph.com/docs/master/man/8/ceph-rest-api/[ceph-rest-api].

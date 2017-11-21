@@ -8,6 +8,13 @@ var:
     os.darwin:
       - /var/log/system.log*
     os.windows: []
+  - name: convert_timezone
+    default: false
+    # if ES < 6.1.0, this flag switches to false automatically when evaluating the
+    # pipeline
+    min_elasticsearch_version:
+      version: 6.1.0
+      value: false
 
 ingest_pipeline: ingest/pipeline.json
 prospector: config/syslog.yml

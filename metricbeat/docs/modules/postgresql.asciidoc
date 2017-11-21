@@ -3,7 +3,7 @@ This file is generated! See scripts/docs_collector.py
 ////
 
 [[metricbeat-module-postgresql]]
-== PostgreSQL Module
+== PostgreSQL module
 
 This module periodically fetches metrics from
 https://www.postgresql.org/[PostgreSQL] servers.

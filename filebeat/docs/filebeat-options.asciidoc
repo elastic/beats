@@ -291,11 +291,11 @@ WARNING: Only use this option if you understand that data loss is a potential si
 
 When this option is enabled, Filebeat gives every harvester a predefined lifetime. Regardless of where the reader is in the file, reading will stop after the `close_timeout` period has elapsed. This option can be useful for older log files when you want to spend only a predefined amount of time on the files.  While `close_timeout` will close the file after the predefined timeout, if the file is still being updated, the prospector will start a new harvester again per the defined `scan_frequency`. And the close_timeout for this harvester will start again with the countdown for the timeout.
 
+This option is particularly useful in case the output is blocked, which makes Filebeat keep open file handlers even for files that were deleted from the disk. Setting `close_timeout` to `5m` ensures that the files are periodically closed so they can be freed up by the operating system.
+
 If you set `close_timeout` to equal `ignore_older`, the file will not be picked up if it's modified while the harvester is closed. This combination of settings normally leads to data loss, and the complete file is not sent.
 
 When you use `close_timeout` for logs that contain multiline events, the harvester might stop in the middle of a multiline event, which means that only parts of the event will be sent. If the harvester is started again and the file still exists, only the second part of the event will be sent.
-
-The `close_timeout` setting won't apply if your output is stalled and no further events can be sent. At least one event must be sent after `close_timeout` elapses so the harvester can be closed after sending the event.
 
 This option is set to 0 by default which means it is disabled.
 

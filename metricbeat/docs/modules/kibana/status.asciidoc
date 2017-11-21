@@ -3,6 +3,10 @@ This file is generated! See scripts/docs_collector.py
 ////
 
 [[metricbeat-metricset-kibana-status]]
+=== Kibana status metricset
+
+beta[]
+
 include::../../../module/kibana/status/_meta/docs.asciidoc[]
 
 

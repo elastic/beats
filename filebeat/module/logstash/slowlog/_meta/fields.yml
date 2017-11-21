@@ -1,0 +1,54 @@
+- name: slowlog
+  type: group
+  description: >
+    slowlog
+  fields:
+    - name: message
+      type: text
+      description: >
+        Contains the un-parsed log message
+    - name: level
+      type: keyword
+      description: >
+        The log level of the message, this correspond to Log4j levels.
+    - name: module
+      type: keyword
+      description: >
+        The module or class where the event originate.
+    - name: thread
+      type: text
+      description: >
+        Information about the running thread where the log originate.
+    - name: event
+      type: text
+      description: >
+        Raw dump of the original event
+    - name: plugin_name
+      type: keyword
+      description: >
+        Name of the plugin
+    - name: plugin_type
+      type: keyword
+      description: >
+        Type of the plugin: Inputs, Filters, Outputs or Codecs.
+    - name: took_in_millis
+      type: long
+      description: >
+        Execution time for the plugin in milliseconds.
+    - name: took_in_nanos
+      type: long
+      description: >
+        Execution time for the plugin in nanoseconds.
+    - name: plugin_params
+      type: text
+      description: >
+        String value of the plugin configuration
+    - name: plugin_params_object
+      type: object
+      description: >
+        key -> value of the configuration used by the plugin.
+
+
+
+
+

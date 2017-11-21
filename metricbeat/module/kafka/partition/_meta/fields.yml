@@ -2,6 +2,7 @@
   type: group
   description: >
     partition
+  release: beta
   fields:
     - name: offset
       type: group

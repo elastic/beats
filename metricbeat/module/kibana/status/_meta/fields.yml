@@ -2,6 +2,7 @@
   type: group
   description: >
     Status fields
+  release: beta
   fields:
     - name: name
       type: keyword

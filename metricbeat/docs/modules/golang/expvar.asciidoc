@@ -3,6 +3,10 @@ This file is generated! See scripts/docs_collector.py
 ////
 
 [[metricbeat-metricset-golang-expvar]]
+=== Golang expvar metricset
+
+experimental[]
+
 include::../../../module/golang/expvar/_meta/docs.asciidoc[]
 
 

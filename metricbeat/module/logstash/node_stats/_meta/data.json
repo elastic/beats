@@ -1,0 +1,22 @@
+{
+    "@timestamp": "2017-10-12T08:05:34.853Z",
+    "beat": {
+        "hostname": "host.example.com",
+        "name": "host.example.com"
+    },
+    "logstash": {
+        "node_stats": {
+            "events": {
+                "filtered": 0,
+                "in": 0,
+                "out": 0
+            }
+        }
+    },
+    "metricset": {
+        "host": "127.0.0.1:9600",
+        "module": "logstash",
+        "name": "node_stats",
+        "rtt": 115
+    }
+}

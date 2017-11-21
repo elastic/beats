@@ -3,6 +3,8 @@ This file is generated! See scripts/docs_collector.py
 ////
 
 [[metricbeat-metricset-apache-status]]
+=== Apache status metricset
+
 include::../../../module/apache/status/_meta/docs.asciidoc[]
 
 

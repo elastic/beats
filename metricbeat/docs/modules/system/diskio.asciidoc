@@ -3,6 +3,8 @@ This file is generated! See scripts/docs_collector.py
 ////
 
 [[metricbeat-metricset-system-diskio]]
+=== System diskio metricset
+
 include::../../../module/system/diskio/_meta/docs.asciidoc[]
 
 

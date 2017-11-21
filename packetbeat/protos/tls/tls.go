@@ -31,10 +31,11 @@ type tlsConnectionData struct {
 // TLS protocol plugin
 type tlsPlugin struct {
 	// config
-	ports              []int
-	sendCertificates   bool
-	transactionTimeout time.Duration
-	results            protos.Reporter
+	ports                  []int
+	sendCertificates       bool
+	includeRawCertificates bool
+	transactionTimeout     time.Duration
+	results                protos.Reporter
 }
 
 var (
@@ -81,6 +82,7 @@ func (plugin *tlsPlugin) init(results protos.Reporter, config *tlsConfig) error 
 func (plugin *tlsPlugin) setFromConfig(config *tlsConfig) {
 	plugin.ports = config.Ports
 	plugin.sendCertificates = config.SendCertificates
+	plugin.includeRawCertificates = config.IncludeRawCertificates
 	plugin.transactionTimeout = config.TransactionTimeout
 }
 
@@ -131,7 +133,7 @@ func (plugin *tlsPlugin) doParse(
 
 	// Ignore further traffic after the handshake is completed (encrypted connection)
 	// TODO: request/response analysis
-	if conn.handshakeCompleted > 1 {
+	if 0 != conn.handshakeCompleted&(1<<dir) {
 		return conn
 	}
 
@@ -167,8 +169,8 @@ func (plugin *tlsPlugin) doParse(
 			}
 
 		case resultEncrypted:
-			conn.handshakeCompleted++
-			if conn.handshakeCompleted > 1 {
+			conn.handshakeCompleted |= 1 << dir
+			if conn.handshakeCompleted == 3 {
 				plugin.sendEvent(conn)
 			}
 		}
@@ -247,14 +249,14 @@ func (plugin *tlsPlugin) createEvent(conn *tlsConnectionData) beat.Event {
 		serverHello = server.parser.hello
 		tls["server_hello"] = serverHello.toMap()
 	}
-	if cert, chain := getCerts(client.parser.certificates); cert != nil {
+	if cert, chain := getCerts(client.parser.certificates, plugin.includeRawCertificates); cert != nil {
 		tls["client_certificate"] = cert
 		if chain != nil {
 			tls["client_certificate_chain"] = chain
 		}
 	}
 	if plugin.sendCertificates {
-		if cert, chain := getCerts(server.parser.certificates); cert != nil {
+		if cert, chain := getCerts(server.parser.certificates, plugin.includeRawCertificates); cert != nil {
 			tls["server_certificate"] = cert
 			if chain != nil {
 				tls["server_certificate_chain"] = chain
@@ -293,12 +295,17 @@ func (plugin *tlsPlugin) createEvent(conn *tlsConnectionData) beat.Event {
 	src := &common.Endpoint{}
 	dst := &common.Endpoint{}
 
-	if client.tcptuple != nil {
-		src.IP = client.tcptuple.SrcIP.String()
-		src.Port = client.tcptuple.SrcPort
-		dst.IP = client.tcptuple.DstIP.String()
-		dst.Port = client.tcptuple.DstPort
+	tcptuple := client.tcptuple
+	if tcptuple == nil {
+		tcptuple = server.tcptuple
 	}
+	if tcptuple != nil {
+		src.IP = tcptuple.SrcIP.String()
+		src.Port = tcptuple.SrcPort
+		dst.IP = tcptuple.DstIP.String()
+		dst.Port = tcptuple.DstPort
+	}
+
 	if client.cmdlineTuple != nil {
 		src.Proc = string(client.cmdlineTuple.Src)
 		dst.Proc = string(client.cmdlineTuple.Dst)
@@ -314,6 +321,12 @@ func (plugin *tlsPlugin) createEvent(conn *tlsConnectionData) beat.Event {
 		"src":    src,
 		"dst":    dst,
 	}
+	// set "server" to SNI, if provided
+	if value, ok := clientHello.extensions["server_name_indication"]; ok {
+		if list, ok := value.([]string); ok && len(list) > 0 {
+			fields["server"] = list[0]
+		}
+	}
 
 	timestamp := time.Now()
 	return beat.Event{
@@ -322,17 +335,17 @@ func (plugin *tlsPlugin) createEvent(conn *tlsConnectionData) beat.Event {
 	}
 }
 
-func getCerts(certs []*x509.Certificate) (common.MapStr, []common.MapStr) {
+func getCerts(certs []*x509.Certificate, includeRaw bool) (common.MapStr, []common.MapStr) {
 	if len(certs) == 0 {
 		return nil, nil
 	}
-	cert := certToMap(certs[0])
+	cert := certToMap(certs[0], includeRaw)
 	if len(certs) == 1 {
 		return cert, nil
 	}
 	chain := make([]common.MapStr, len(certs)-1)
 	for idx := 1; idx < len(certs); idx++ {
-		chain[idx-1] = certToMap(certs[idx])
+		chain[idx-1] = certToMap(certs[idx], includeRaw)
 	}
 	return cert, chain
 }

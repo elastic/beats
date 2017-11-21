@@ -1,5 +1,3 @@
-== HAProxy module
-
 This module collects stats from http://www.haproxy.org/[HAProxy]. To configure
 HAProxy to collect stats, you must enable the stats socket via TCP. For example,
 to enable stats reporting via any local IP on port 14567, place this statement
