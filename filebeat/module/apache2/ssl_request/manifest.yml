@@ -10,9 +10,10 @@ var:
       - "C:/tools/Apache/httpd-2.*/Apache24/logs/ssl_request.log*"
       - "C:/Program Files/Apache Software Foundation/Apache2.*/logs/ssl_request.log*"
 
-ingest_pipeline: ingest/default.json
-prospector: config/ssl.yml
+ingest_pipeline: ingest/pipeline.json
+prospector: config/ssl_request.yml
 
 requires.processors:
 - name: geoip
   plugin: ingest-geoip
+
