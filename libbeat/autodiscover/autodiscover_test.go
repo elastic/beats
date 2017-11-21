@@ -110,6 +110,7 @@ func TestNilAutodiscover(t *testing.T) {
 func TestAutodiscover(t *testing.T) {
 	// Register mock autodiscover provider
 	busChan := make(chan bus.Bus, 1)
+	ProviderRegistry = NewRegistry()
 	ProviderRegistry.AddProvider("mock", func(b bus.Bus, c *common.Config) (Provider, error) {
 		// intercept bus to mock events
 		busChan <- b
@@ -185,4 +186,61 @@ func TestAutodiscover(t *testing.T) {
 	assert.Equal(t, runners[0].meta.Get()["foo"], "baz")
 	assert.True(t, runners[0].started)
 	assert.True(t, runners[0].stopped)
+}
+
+func TestAutodiscoverHash(t *testing.T) {
+	// Register mock autodiscover provider
+	busChan := make(chan bus.Bus, 1)
+
+	ProviderRegistry = NewRegistry()
+	ProviderRegistry.AddProvider("mock", func(b bus.Bus, c *common.Config) (Provider, error) {
+		// intercept bus to mock events
+		busChan <- b
+
+		return &mockProvider{}, nil
+	})
+
+	// Create a mock adapter
+	runnerConfig1, _ := common.NewConfigFrom(map[string]string{
+		"runner": "1",
+	})
+	runnerConfig2, _ := common.NewConfigFrom(map[string]string{
+		"runner": "2",
+	})
+	adapter := mockAdapter{
+		configs: []*common.Config{runnerConfig1, runnerConfig2},
+	}
+
+	// and settings:
+	providerConfig, _ := common.NewConfigFrom(map[string]string{
+		"type": "mock",
+	})
+	config := Config{
+		Providers: []*common.Config{providerConfig},
+	}
+
+	// Create autodiscover manager
+	autodiscover, err := NewAutodiscover("test", &adapter, &config)
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	// Start it
+	autodiscover.Start()
+	defer autodiscover.Stop()
+	eventBus := <-busChan
+
+	// Test start event
+	eventBus.Publish(bus.Event{
+		"start": true,
+		"meta": common.MapStr{
+			"foo": "bar",
+		},
+	})
+	time.Sleep(10 * time.Millisecond)
+	runners := adapter.Runners()
+	assert.Equal(t, len(runners), 2)
+	assert.Equal(t, runners[0].meta.Get()["foo"], "bar")
+	assert.True(t, runners[0].started)
+	assert.False(t, runners[0].stopped)
 }
