@@ -164,7 +164,6 @@ func (fs *Fileset) evaluateVars() (map[string]interface{}, error) {
 // turnOffElasticsearchVars re-evaluates the variables that have `min_elasticsearch_version`
 // set.
 func (fs *Fileset) turnOffElasticsearchVars(vars map[string]interface{}, esVersion string) (map[string]interface{}, error) {
-
 	retVars := map[string]interface{}{}
 	for key, val := range vars {
 		retVars[key] = val
@@ -176,20 +175,20 @@ func (fs *Fileset) turnOffElasticsearchVars(vars map[string]interface{}, esVersi
 	}
 
 	for _, vals := range fs.manifest.Vars {
-		var exists bool
-		name, exists := vals["name"].(string)
-		if !exists {
+		var ok bool
+		name, ok := vals["name"].(string)
+		if !ok {
 			return nil, fmt.Errorf("Variable doesn't have a string 'name' key")
 		}
 
-		minESVersion, exists := vals["min_elasticsearch_version"].(map[string]interface{})
-		if exists {
+		minESVersion, ok := vals["min_elasticsearch_version"].(map[string]interface{})
+		if ok {
 			minVersion, err := common.NewVersion(minESVersion["version"].(string))
 			if err != nil {
 				return vars, fmt.Errorf("Error parsing version %s: %v", minESVersion["version"].(string), err)
 			}
 
-			logp.Debug("fileset", "Comparing ES version %s with %s", haveVersion, minVersion)
+			logp.Debug("fileset", "Comparing ES version %s with requirement of %s", haveVersion, minVersion)
 
 			if haveVersion.LessThan(minVersion) {
 				retVars[name] = minESVersion["value"]
@@ -331,7 +330,6 @@ func (fs *Fileset) getPipelineID(beatVersion string) (string, error) {
 
 // GetPipeline returns the JSON content of the Ingest Node pipeline that parses the logs.
 func (fs *Fileset) GetPipeline(esVersion string) (pipelineID string, content map[string]interface{}, err error) {
-
 	path, err := applyTemplate(fs.vars, fs.manifest.IngestPipeline, false)
 	if err != nil {
 		return "", nil, fmt.Errorf("Error expanding vars on the ingest pipeline path: %v", err)
