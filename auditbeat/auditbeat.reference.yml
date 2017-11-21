@@ -722,6 +722,9 @@ output.elasticsearch:
 # dashboards and index pattern. Example: testbeat-*
 #setup.dashboards.index:
 
+# Force loading of dashboards using the Kibana API without querying Elasticsearch for the version
+#always_kibana: false
+
 #============================== Template =====================================
 
 # A template is used to set the mapping in Elasticsearch
