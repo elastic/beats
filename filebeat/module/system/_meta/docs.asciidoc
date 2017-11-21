@@ -63,3 +63,7 @@ include::../include/config-option-intro.asciidoc[]
 
 include::../include/var-paths.asciidoc[]
 
+[float]
+==== `auth` fileset settings
+
+include::../include/var-paths.asciidoc[]
