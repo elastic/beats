@@ -22,13 +22,13 @@
       }
     }, {
       "user_agent": {
-        "field": "apache2.access.agent",
-        "target_field": "apache2.access.user_agent",
+        "field": "iis.access.agent",
+        "target_field": "iis.access.user_agent",
         "ignore_failure": true
       }
     }, {
       "remove": {
-        "field": "apache2.access.agent",
+        "field": "iis.access.agent",
         "ignore_failure": true
       }
     }, {

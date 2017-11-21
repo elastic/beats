@@ -42,7 +42,6 @@ Apache2 Module
 Apache2 fields.
 
 
-
 [float]
 == access fields
 
@@ -205,6 +204,124 @@ The minor version of the operating system.
 type: keyword
 
 The name of the operating system.
+
+
+[float]
+== geoip fields
+
+Contains GeoIP information gathered based on the remote_ip field. Only present if the GeoIP Elasticsearch plugin is available and used.
+
+
+
+[float]
+=== `apache2.access.geoip.continent_name`
+
+type: keyword
+
+The name of the continent.
+
+
+[float]
+=== `apache2.access.geoip.country_iso_code`
+
+type: keyword
+
+Country ISO code.
+
+
+[float]
+=== `apache2.access.geoip.location`
+
+type: geo_point
+
+The longitude and latitude.
+
+
+[float]
+=== `apache2.access.geoip.region_name`
+
+type: keyword
+
+The region name.
+
+
+[float]
+=== `apache2.access.geoip.city_name`
+
+type: keyword
+
+The city name.
+
+
+[float]
+== access fields
+
+Contains fields for the Apache2 HTTPD access logs.
+
+
+
+[float]
+=== `apache2.access.remote_ip`
+
+type: keyword
+
+Client IP address.
+
+
+[float]
+=== `apache2.access.method`
+
+type: keyword
+
+example: GET
+
+The request HTTP method.
+
+
+[float]
+=== `apache2.access.url`
+
+type: keyword
+
+The request HTTP URL.
+
+
+[float]
+=== `apache2.access.http_version`
+
+type: keyword
+
+The HTTP version.
+
+
+[float]
+=== `apache2.access.ssl_cipher`
+
+type: keyword
+
+example: ECDHE-RSA-AES256-GCM-SHA384
+
+The SSL cipher used.
+
+
+[float]
+=== `apache2.access.ssl_protocol`
+
+type: keyword
+
+example: TLS1.2
+
+The SSL protocol used.
+
+
+[float]
+=== `apache2.access.body_sent.bytes`
+
+type: long
+
+format: bytes
+
+The number of bytes of the server response body.
 
 
 [float]
