@@ -27,10 +27,10 @@ after successfully connecting to Elasticsearch. If the template already exists,
 it's not overwritten unless you configure {beatname_uc} to do so.
 
 You can disable automatic template loading, or load your own template, by
-configuring template loading optons in the {beatname_uc} configuration file. 
+configuring template loading optons in the {beatname_uc} configuration file.
 
 NOTE: A connection to Elasticsearch is required to load the index template. If
-the output is Logstash, you must load the template manually. 
+the output is Logstash, you must load the template manually.
 
 For more information, see:
 
@@ -53,9 +53,10 @@ setup.template.fields: "path/to/fields.yml"
 setup.template.overwrite: false
 ----------------------------------------------------------------------
 
-By default, if a template already exists in the index, it is not overwritten. To
-overwrite an existing template, set `setup.template.overwrite: true` in the
-configuration file.
+
+If a template already exists in the index, it is not overwritten. To overwrite
+an existing template, set `setup.template.overwrite: true` in the configuration
+file.
 
 To disable automatic template loading, set `setup.template.enabled: false`. If
 you disable automatic template loading, you need to load the template manually.
@@ -71,16 +72,17 @@ is enabled.
 To load the template manually, run the <<setup-command,`setup`>> command. A
 connection to Elasticsearch is required. If Logstash output is enabled, you need
 to temporarily disable the Logstash output and enable Elasticsearch by using the
-`-E` option. 
+`-E` option.
 
 The examples here assume that Logstash output is enabled. You can omit the `-E`
 flags if Elasticsearch output is already enabled.
 
 If you are connecting to a secured Elasticsearch cluster, also see
-<<passing-credentials-template-loading>>.
+<<passing-credentials-template-loading>>. If the host running {beatname_uc} does
+not have direct connectivity to Elasticsearch, see
+<<load-template-manually-alternate>>.
 
-If the host running {beatname_uc} does not have direct connectivity to
-Elasticsearch, see <<load-template-manually-alternate>>.
+To load the template:
 
 ifdef::allplatforms[]
 
@@ -90,6 +92,7 @@ ifdef::allplatforms[]
 ----
 ./{beatname_lc} setup --template -E output.logstash.enabled=false -E 'output.elasticsearch.hosts=["localhost:9200"]'
 ----
+
 
 ifeval::["{requires-sudo}"=="yes"]
 
@@ -106,6 +109,7 @@ ifeval::["{beatname_lc}"!="auditbeat"]
 ----------------------------------------------------------------------
 docker run {dockerimage} setup --template -E output.logstash.enabled=false -E 'output.elasticsearch.hosts=["localhost:9200"]'
 ----------------------------------------------------------------------
+
 
 endif::[]
 
@@ -125,24 +129,33 @@ and run:
 PS > {beatname_lc} setup --template -E output.logstash.enabled=false -E 'output.elasticsearch.hosts=["localhost:9200"]'
 ----------------------------------------------------------------------
 
-[NOTE]
-=====
+
+[[force-kibana-new]]
+===== Force Kibana to look at newest documents
+
 If you've already used {beatname_uc} to index data into Elasticsearch,
 the index may contain old documents. After you load the index template,
 you can delete the old documents from +{beatname_lc}-*+ to force Kibana to look
 at the newest documents. Use this command:
+
+*deb, rpm, and mac:*
 
 ["source","sh",subs="attributes"]
 ----------------------------------------------------------------------
 curl -XDELETE 'http://localhost:9200/{beatname_lc}-*'
 ----------------------------------------------------------------------
 
-This command will delete all indexes that match the pattern +{beatname_lc}-*+.
-Before running this command, make sure you want to delete all indexes that
-match the pattern.
+*win:*
 
-=====
+["source","sh",subs="attributes"]
+----------------------------------------------------------------------
+PS > Invoke-RestMethod -Method Delete "http://localhost:9200/{beatname_lc}-*"
+----------------------------------------------------------------------
 
+
+This command deletes all indexes that match the pattern +{beatname_lc}-*+.
+Before running this command, make sure you want to delete all indexes that match
+the pattern.
 
 [[load-template-manually-alternate]]
 ==== Load the template manually (alternate method)
@@ -151,28 +164,40 @@ If the host running {beatname_uc} does not have direct connectivity to
 Elasticsearch, you can export the index template to a file and then install the
 template manually.
 
+. Export the index template:
++
 ifdef::allplatforms[]
-
 *deb, rpm, and mac:*
-
++
 ["source","sh",subs="attributes"]
 ----
 ./{beatname_lc} export template > {beatname_lc}.template.json
-curl -XPUT -H 'Content-Type: application/json' http://elasticsearch:9200/_template/{beatname_lc}-{stack-version} -d@{beatname_lc}.template.json
 ----
-
++
 *win*:
-
++
 endif::allplatforms[]
-
 ["source","sh",subs="attributes"]
 ----
-# Write the template to disk.
 PS> .{backslash}{beatname_lc}.exe export template --es.version {stack-version} | Out-File -Encoding UTF8 {beatname_lc}.template.json
+----
 
-# Install it to ES.
+. Install the template:
++
+*deb, rpm, and mac:*
++
+["source","sh",subs="attributes"]
+----
+curl -XPUT -H 'Content-Type: application/json' http://elasticsearch:9200/_template/{beatname_lc}-{stack-version} -d@{beatname_lc}.template.json
+----
++
+*win*:
++
+["source","sh",subs="attributes"]
+----
 PS > Invoke-RestMethod -Method Put -ContentType "application/json" -InFile {beatname_lc}.template.json -Uri http://elasticsearch:9200/_template/{beatname_lc}-{stack-version}
 ----
+
 
 [[passing-credentials-template-loading]]
 ==== Pass credentials
