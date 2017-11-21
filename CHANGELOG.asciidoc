@@ -37,6 +37,10 @@ https://github.com/elastic/beats/compare/v5.6.4...5.6[Check the HEAD diff]
 *Metricbeat*
 
 - Clarify meaning of percentages reported by system core metricset. {pull}5565[5565]
+- Change field type of http header from nested to object {pull}5258[5258]
+- Fix the fetching of process information when some data is missing under MacOS X. {issue}5337[5337]
+- Change `MySQL active connections` visualization title to `MySQL total connections`. {issue}4812[4812]
+- Fix map overwrite in docker diskio module. {issue}5582[5582]
 
 *Packetbeat*
 
