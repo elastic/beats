@@ -1,0 +1,42 @@
+{
+    "description": "Pipeline for parsing logstash logs in the plain format",
+    "on_failure": [
+        {
+            "set": {
+                "field": "error.message",
+                "value": "{{ _ingest.on_failure_message }}"
+            }
+        }
+    ],
+    "processors": [
+        {
+            "grok": {
+                "field": "message",
+                "pattern_definitions": {
+                    "LOGSTASH_CLASS_MODULE": "[\\w\\.]+\\s*",
+                    "LOGSTASH_LOGLEVEL": "INFO|ERROR|DEBUG|FATAL|WARN|TRACE"
+                },
+                "patterns": [
+                    "\\[%{TIMESTAMP_ISO8601:logstash.log.timestamp}\\]\\[%{LOGSTASH_LOGLEVEL:logstash.log.level}\\s?\\]\\[%{LOGSTASH_CLASS_MODULE:logstash.log.module}\\] %{GREEDYDATA:logstash.log.message}"
+                ]
+            }
+        },
+        {
+            "remove": {
+                "field": "message"
+            }
+        },
+        {
+            "rename": {
+                "field": "@timestamp",
+                "target_field": "read_timestamp"
+            }
+        },
+        {
+            "rename": {
+                "field": "logstash.log.timestamp",
+                "target_field": "@timestamp"
+            }
+        }
+    ]
+}
