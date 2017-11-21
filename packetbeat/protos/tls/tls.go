@@ -321,6 +321,12 @@ func (plugin *tlsPlugin) createEvent(conn *tlsConnectionData) beat.Event {
 		"src":    src,
 		"dst":    dst,
 	}
+	// set "server" to SNI, if provided
+	if value, ok := clientHello.extensions["server_name_indication"]; ok {
+		if list, ok := value.([]string); ok && len(list) > 0 {
+			fields["server"] = list[0]
+		}
+	}
 
 	timestamp := time.Now()
 	return beat.Event{
