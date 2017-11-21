@@ -45,7 +45,7 @@ func TestDeltaMultipleContainers(t *testing.T) {
 	apiContainer2.Stats.BlkioStats.IOServicedRecursive = append(apiContainer2.Stats.BlkioStats.IOServicedRecursive, metrics)
 	dockerStats := []docker.Stat{apiContainer1, apiContainer2}
 	stats := blkioService.getBlkioStatsList(dockerStats)
-	totals := make([]float64, 2, 2)
+	totals := make([]float64, 2)
 	for _, stat := range stats {
 		totals[0] = stat.totals
 	}
