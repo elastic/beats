@@ -99,7 +99,7 @@ func TestDeltaOneContainer(t *testing.T) {
 	apiContainer.Stats.BlkioStats.IOServicedRecursive = append(apiContainer.Stats.BlkioStats.IOServicedRecursive, metrics)
 	dockerStats := []docker.Stat{apiContainer}
 	stats := blkioService.getBlkioStatsList(dockerStats)
-	totals := make([]float64, 2, 2)
+	totals := make([]float64, 2)
 	for _, stat := range stats {
 		totals[0] = stat.totals
 	}
