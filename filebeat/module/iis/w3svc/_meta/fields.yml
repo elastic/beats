@@ -7,6 +7,14 @@
       type: keyword
       description: >
         Client IP address.
+    - name: site
+      type: keyword
+      description: >
+        Site IP address.
+    - name: port
+      type: long
+      description: >
+        The requested HTTP port.
     - name: user_name
       type: keyword
       description: >
@@ -20,19 +28,26 @@
       type: keyword
       description: >
         The request HTTP URL.
-    - name: http_version
-      type: keyword
-      description: >
-        The HTTP version.
     - name: response_code
       type: long
       description: >
         The HTTP response code.
-    - name: body_sent.bytes
+    - name: subresponse_code
       type: long
-      format: bytes
       description: >
-        The number of bytes of the server response body.
+        The HTTP subresponse code.
+    - name: scstatus
+      type: long
+      description: >
+        The HTTP Protocol Status code.
+    - name: response_time
+      type: long
+      description: >
+        The response time.
+    - name: querystring
+      type: text
+      description: >
+        Contains the un-parsed query string.
     - name: referrer
       type: keyword
       description: >
