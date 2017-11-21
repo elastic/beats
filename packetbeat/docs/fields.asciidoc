@@ -2944,6 +2944,20 @@ The algorithm used for the certificate's signature.
 
 
 [float]
+=== `tls.client_certificate.alternative_names`
+
+type: array
+
+Subject Alternative Names for this certificate.
+
+[float]
+=== `tls.client_certificate.raw`
+
+type: keyword
+
+The raw certificate in PEM format.
+
+[float]
 == subject fields
 
 Subject represented by this certificate.
@@ -2983,13 +2997,6 @@ Province or region within country.
 type: keyword
 
 Name or host name identified by the certificate.
-
-[float]
-=== `tls.client_certificate.alternative_names`
-
-type: array
-
-Subject Alternative Names for this certificate.
 
 [float]
 == issuer fields
@@ -3083,6 +3090,20 @@ The algorithm used for the certificate's signature.
 
 
 [float]
+=== `tls.server_certificate.alternative_names`
+
+type: array
+
+Subject Alternative Names for this certificate.
+
+[float]
+=== `tls.server_certificate.raw`
+
+type: keyword
+
+The raw certificate in PEM format.
+
+[float]
 == subject fields
 
 Subject represented by this certificate.
@@ -3122,13 +3143,6 @@ Province or region within country.
 type: keyword
 
 Name or host name identified by the certificate.
-
-[float]
-=== `tls.server_certificate.alternative_names`
-
-type: array
-
-Subject Alternative Names for this certificate.
 
 [float]
 == issuer fields
@@ -3177,6 +3191,13 @@ Name or host name identified by the certificate.
 type: array
 
 Chain of trust for the server certificate.
+
+[float]
+=== `tls.client_certificate_chain`
+
+type: array
+
+Chain of trust for the client certificate.
 
 [[exported-fields-trans_event]]
 == Transaction Event fields
