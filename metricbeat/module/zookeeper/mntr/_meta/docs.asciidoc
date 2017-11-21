@@ -1,3 +1,1 @@
-=== ZooKeeper mntr metricset
-
 The ZooKeeper `mntr` metricset collects ZooKeeper monitoring statistics.

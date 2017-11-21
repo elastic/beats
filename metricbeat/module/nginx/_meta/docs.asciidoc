@@ -1,5 +1,3 @@
-== Nginx module
-
 This module periodically fetches metrics from https://nginx.org/[Nginx] servers.
 
 

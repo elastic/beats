@@ -3,12 +3,14 @@
 package schema
 
 const (
-	TypeFile    = 0
-	TypeDir     = 1
-	TypeSymlink = 2
+	TypeUnknown = 0
+	TypeFile    = 1
+	TypeDir     = 2
+	TypeSymlink = 3
 )
 
 var EnumNamesType = map[int]string{
+	TypeUnknown: "Unknown",
 	TypeFile:    "File",
 	TypeDir:     "Dir",
 	TypeSymlink: "Symlink",

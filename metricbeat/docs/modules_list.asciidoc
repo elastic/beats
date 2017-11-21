@@ -11,7 +11,7 @@ This file is generated! See scripts/docs_collector.py
   * <<metricbeat-module-elasticsearch,Elasticsearch>>
   * <<metricbeat-module-etcd,Etcd>>
   * <<metricbeat-module-golang,Golang>>
-  * <<metricbeat-module-graphite,graphite>>
+  * <<metricbeat-module-graphite,Graphite>>
   * <<metricbeat-module-haproxy,HAProxy>>
   * <<metricbeat-module-http,HTTP>>
   * <<metricbeat-module-jolokia,Jolokia>>

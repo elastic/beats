@@ -16,6 +16,7 @@ enum Source : ubyte {
 }
 
 enum Type : ubyte {
+  Unknown,
   File,
   Dir,
   Symlink,
@@ -30,7 +31,7 @@ table Metadata {
   size:ulong;
   mtime_ns:long;
   ctime_ns:long;
-  type:Type;
+  type:Type = 1;
 }
 
 table Hash {

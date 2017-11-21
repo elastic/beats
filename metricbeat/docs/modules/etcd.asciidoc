@@ -3,7 +3,9 @@ This file is generated! See scripts/docs_collector.py
 ////
 
 [[metricbeat-module-etcd]]
-== Etcd Module
+== Etcd module
+
+beta[]
 
 This is the Etcd Module. The Etcd module uses https://coreos.com/etcd/docs/latest/v2/api.html [Etcd v2 API] to collect metrics.
 

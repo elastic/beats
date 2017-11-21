@@ -32,7 +32,7 @@ type MetricSet struct {
 }
 
 func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
-	cfgwarn.Experimental("The ceph cluster_disk metricset is experimental")
+	cfgwarn.Beta("The ceph cluster_disk metricset is beta")
 
 	http := helper.NewHTTP(base)
 	http.SetHeader("Accept", "application/json")

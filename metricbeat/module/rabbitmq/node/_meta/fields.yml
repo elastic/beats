@@ -2,6 +2,7 @@
   type: group
   description: >
     node
+  release: beta
   fields:
     - name: disk.free.bytes
       type: long
@@ -21,7 +22,7 @@
       type: long
       description: >
         Used file descriptors.
-    - name: gc.num.count  
+    - name: gc.num.count
       type: long
       description: >
         Number of GC operations.
@@ -87,12 +88,12 @@
     - name: mem.limit.bytes
       type: long
       description: >
-        Point at which the memory alarm will go off. 
+        Point at which the memory alarm will go off.
       format: bytes
     - name: mem.used.bytes
       type: long
       description: >
-        Memory used in bytes. 
+        Memory used in bytes.
     - name: mnesia.disk.tx.count
       type: long
       description: >
@@ -101,14 +102,14 @@
       type: long
       description: >
         Number of Mnesia transactions which have been performed that did not require writes to disk.
-    - name: msg.store_read.count 
+    - name: msg.store_read.count
       type: long
       description: >
-        Number of messages which have been read from the message store. 
+        Number of messages which have been read from the message store.
     - name: msg.store_write.count
       type: long
       description: >
-        Number of messages which have been written to the message store. 
+        Number of messages which have been written to the message store.
     - name: name
       type: keyword
       description: >
@@ -125,26 +126,26 @@
       type: long
       description: >
         Number of cores detected and usable by Erlang.
-    - name: queue.index.journal_write.count 
+    - name: queue.index.journal_write.count
       type: long
       description: >
         Number of records written to the queue index journal.
     - name: queue.index.read.count
       type: long
       description: >
-        Number of records read from the queue index. 
-    - name: queue.index.write.count 
+        Number of records read from the queue index.
+    - name: queue.index.write.count
       type: long
       description: >
-        Number of records written to the queue index. 
-    - name: run.queue 
+        Number of records written to the queue index.
+    - name: run.queue
       type: long
       description: >
-        Average number of Erlang processes waiting to run. 
+        Average number of Erlang processes waiting to run.
     - name: socket.total
       type: long
       description: >
-        File descriptors available for use as sockets. 
+        File descriptors available for use as sockets.
     - name: socket.used
       type: long
       description: >

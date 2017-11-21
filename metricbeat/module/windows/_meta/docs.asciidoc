@@ -1,5 +1,1 @@
-== Windows module
-
-beta[]
-
 This is the Windows module.

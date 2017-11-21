@@ -3,6 +3,8 @@ This file is generated! See scripts/docs_collector.py
 ////
 
 [[metricbeat-metricset-system-memory]]
+=== System memory metricset
+
 include::../../../module/system/memory/_meta/docs.asciidoc[]
 
 

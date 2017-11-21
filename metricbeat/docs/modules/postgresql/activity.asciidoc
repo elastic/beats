@@ -3,6 +3,8 @@ This file is generated! See scripts/docs_collector.py
 ////
 
 [[metricbeat-metricset-postgresql-activity]]
+=== PostgreSQL activity metricset
+
 include::../../../module/postgresql/activity/_meta/docs.asciidoc[]
 
 

@@ -2,6 +2,7 @@
   type: group
   description: >
     Contains etcd leader statistics.
+  release: beta
   fields:
     - name: followers.counts
       type: group
@@ -13,7 +14,7 @@
         - name: followers.counts.fail
           type: integer
 
-        
+
     - name: followers.latency
       type: group
       description: >

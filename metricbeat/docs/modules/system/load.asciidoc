@@ -3,6 +3,8 @@ This file is generated! See scripts/docs_collector.py
 ////
 
 [[metricbeat-metricset-system-load]]
+=== System load metricset
+
 include::../../../module/system/load/_meta/docs.asciidoc[]
 
 

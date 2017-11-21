@@ -1,5 +1,3 @@
-=== System load metricset
-
 The System `load` metricset provides load statistics.
 
 This metricset is available on:

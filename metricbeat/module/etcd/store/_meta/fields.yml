@@ -2,6 +2,7 @@
   type: group
   description: >
     The store statistics include information about the operations that this node has handled.
+  release: beta
   fields:
     - name: gets.success
       type: integer
@@ -12,9 +13,9 @@
       type: integer
     - name: sets.fail
       type: integer
-        
+
     - name: delete.success
-      type: integer 
+      type: integer
     - name: delete.fail
       type: integer
 
@@ -38,9 +39,9 @@
     - name: compareanddelete.fail
       type: integer
 
-       
+
     - name: expire.count
       type: integer
-    
+
     - name: watchers
       type: integer

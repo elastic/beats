@@ -104,6 +104,8 @@ func fbWriteMetadata(b *flatbuffers.Builder, m *Metadata) flatbuffers.UOffsetT {
 	}
 	schema.MetadataAddMode(b, uint32(m.Mode))
 	switch m.Type {
+	case UnknownType:
+		schema.MetadataAddType(b, schema.TypeUnknown)
 	case FileType:
 		schema.MetadataAddType(b, schema.TypeFile)
 
@@ -234,6 +236,8 @@ func fbDecodeMetadata(e *schema.Event) *Metadata {
 		rtn.Type = DirType
 	case schema.TypeSymlink:
 		rtn.Type = SymlinkType
+	default:
+		rtn.Type = UnknownType
 	}
 
 	return rtn

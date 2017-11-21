@@ -1,10 +1,9 @@
 - key: kibana
   title: "Kibana"
   description: >
-    experimental[]
-
     Kibana module
   short_config: false
+  release: beta
   fields:
     - name: kibana
       type: group

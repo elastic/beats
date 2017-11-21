@@ -2,6 +2,7 @@
   type: group
   description: >
     CPU load averages.
+  release: ga
   fields:
     - name: "1"
       type: scaled_float
