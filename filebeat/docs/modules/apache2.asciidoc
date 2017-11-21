@@ -73,6 +73,11 @@ include::../include/config-option-intro.asciidoc[]
 include::../include/var-paths.asciidoc[]
 
 [float]
+==== `ssl_request` log fileset settings
+
+include::../include/var-paths.asciidoc[]
+
+[float]
 ==== `error` log fileset settings
 
 include::../include/var-paths.asciidoc[]
