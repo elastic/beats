@@ -125,7 +125,8 @@ disk utilisation or even out of disk situations.
 
 To mitigate this issue, you can set the <<close-timeout>> setting to `5m`. This
 will ensure every file handler is closed once every 5 minutes, regardless of
-whether it reached EOF or not.
+whether it reached EOF or not. Note that this option can lead to data loss if the
+file is deleted before Filebeat reaches the end of the file.
 
 
 include::../../libbeat/docs/faq-limit-bandwidth.asciidoc[]
