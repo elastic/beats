@@ -59,6 +59,7 @@ https://github.com/elastic/beats/compare/v6.0.0-beta2...master[Check the HEAD di
 - Change field type of http header from nested to object {pull}5258[5258]
 - Fix the fetching of process information when some data is missing under MacOS X. {issue}5337[5337]
 - Change `MySQL active connections` visualization title to `MySQL total connections`. {issue}4812[4812]
+- Fix map overwrite in docker diskio module. {issue}5582[5582]
 
 *Packetbeat*
 
