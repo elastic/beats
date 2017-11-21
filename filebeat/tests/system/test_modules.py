@@ -80,7 +80,8 @@ class Test(BaseTest):
                                        "size": len(expected)})
             objects = [o["_source"] for o in res["hits"]["hits"]]
 
-        assert len(expected) == res['hits']['total'], "expected {} but got {}".format(len(expected), res['hits']['total'])
+        assert len(expected) == res['hits']['total'], "expected {} but got {}".format(
+            len(expected), res['hits']['total'])
 
         for ev in expected:
             found = False
