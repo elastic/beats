@@ -1116,7 +1116,7 @@ func (mysql *mysqlPlugin) publishTransaction(t *mysqlTransaction) {
 	}
 	fields["method"] = t.method
 	fields["query"] = t.query
-	fields["param"] = t.param
+	fields["params"] = t.param
 	fields["mysql"] = t.mysql
 	fields["path"] = t.path
 	fields["bytes_out"] = t.bytesOut
