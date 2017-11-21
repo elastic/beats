@@ -20,6 +20,14 @@ var defaultConfig = config{
 	Generate: defaultGenerateConfig,
 }
 
+// RunTests executes the pipeline stress tests. The test stops after the test
+// duration has passed, or runs infinitely if duration is <= 0.  The
+// configuration passed must contain the generator settings, the queue setting
+// and the test output settings, used to drive the test. If `errors` is not
+// nil, internal errors are reported to this callback. A watchdog checking for
+// progress is only started if the `errors` callback is set.
+// RunTests returns and error if test setup failed, but without `errors` some
+// internal errors might not visible.
 func RunTests(
 	info beat.Info,
 	duration time.Duration,
