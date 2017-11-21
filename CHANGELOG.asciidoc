@@ -14,6 +14,8 @@ https://github.com/elastic/beats/compare/v6.0.0-beta2...master[Check the HEAD di
 
 *Affecting all Beats*
 
+- Support dashboard loading without Elasticseach {pull}5653[5653]
+
 *Auditbeat*
 
 - Changed `audit.file.path` to be a multi-field so that path is searchable. {pull}5625[5625]
