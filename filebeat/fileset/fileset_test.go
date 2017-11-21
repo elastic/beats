@@ -3,12 +3,15 @@
 package fileset
 
 import (
+	"encoding/json"
 	"fmt"
 	"path/filepath"
 	"runtime"
 	"testing"
 
 	"github.com/stretchr/testify/assert"
+
+	"github.com/elastic/beats/libbeat/logp"
 )
 
 func getModuleForTesting(t *testing.T, module, fileset string) *Fileset {
@@ -193,9 +196,50 @@ func TestGetPipelineNginx(t *testing.T) {
 	fs := getModuleForTesting(t, "nginx", "access")
 	assert.NoError(t, fs.Read("5.2.0"))
 
-	pipelineID, content, err := fs.GetPipeline()
+	pipelineID, content, err := fs.GetPipeline("5.2.0")
 	assert.NoError(t, err)
 	assert.Equal(t, "filebeat-5.2.0-nginx-access-default", pipelineID)
 	assert.Contains(t, content, "description")
 	assert.Contains(t, content, "processors")
+}
+
+func TestGetPipelineConvertTS(t *testing.T) {
+	if testing.Verbose() {
+		logp.LogInit(logp.LOG_DEBUG, "", false, true, []string{"fileset", "modules"})
+	}
+
+	// load system/syslog
+	modulesPath, err := filepath.Abs("../module")
+	assert.NoError(t, err)
+	fs, err := New(modulesPath, "syslog", &ModuleConfig{Module: "system"}, &FilesetConfig{
+		Var: map[string]interface{}{
+			"convert_timezone": true,
+		},
+	})
+	assert.NoError(t, err)
+	assert.NoError(t, fs.Read("6.1.0"))
+
+	// ES 6.0.0 should not have beat.timezone referenced
+	pipelineID, content, err := fs.GetPipeline("6.0.0")
+	assert.NoError(t, err)
+	assert.Equal(t, "filebeat-6.1.0-system-syslog-pipeline", pipelineID)
+	marshaled, err := json.Marshal(content)
+	assert.NoError(t, err)
+	assert.NotContains(t, string(marshaled), "beat.timezone")
+
+	// ES 6.1.0 should have beat.timezone referenced
+	pipelineID, content, err = fs.GetPipeline("6.1.0")
+	assert.NoError(t, err)
+	assert.Equal(t, "filebeat-6.1.0-system-syslog-pipeline", pipelineID)
+	marshaled, err = json.Marshal(content)
+	assert.NoError(t, err)
+	assert.Contains(t, string(marshaled), "beat.timezone")
+
+	// ES 6.2.0 should have beat.timezone referenced
+	pipelineID, content, err = fs.GetPipeline("6.2.0")
+	assert.NoError(t, err)
+	assert.Equal(t, "filebeat-6.1.0-system-syslog-pipeline", pipelineID)
+	marshaled, err = json.Marshal(content)
+	assert.NoError(t, err)
+	assert.Contains(t, string(marshaled), "beat.timezone")
 }
