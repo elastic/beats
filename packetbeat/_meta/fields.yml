@@ -1788,11 +1788,6 @@
                 The version of the TLS protocol by which the client wishes to
                 communicate during this session.
 
-            - name: timestamp
-              type: date
-              description: >
-                The current time and date according to the client's internal clock.
-
             - name: supported_ciphers
               type: array
               description: >
@@ -1833,11 +1828,6 @@
                 The version of the TLS protocol that is used for this session.
                 It is the highest version supported by the server not exceeding
                 the version requested in the client hello.
-
-            - name: timestamp
-              type: date
-              description: >
-                The current time and date according to the server's internal clock.
 
             - name: selected_cipher
               type: keyword
