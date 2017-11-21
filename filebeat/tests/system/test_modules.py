@@ -80,7 +80,8 @@ class Test(BaseTest):
                                        "size": len(expected)})
             objects = [o["_source"] for o in res["hits"]["hits"]]
 
-        assert len(expected) == res['hits']['total'], "expected {} but got {}".format(len(expected), len(objects))
+        assert len(expected) == res['hits']['total'], "expected {} but got {}".format(
+            len(expected), res['hits']['total'])
 
         for ev in expected:
             found = False
@@ -137,7 +138,7 @@ class Test(BaseTest):
 
             assert "error" not in obj, "not error expected but got: {}".format(obj)
 
-            if module != "auditd" and fileset != "log":
+            if (module != "auditd" and fileset != "log"):
                 # There are dynamic fields in audit logs that are not documented.
                 self.assert_fields_are_documented(obj)
 

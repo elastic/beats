@@ -1,0 +1,98 @@
+////
+This file is generated! See scripts/docs_collector.py
+////
+
+[[filebeat-module-logstash]]
+:modulename: logstash
+== logstash module
+
+The +{modulename}+ module parse logstash regular logs and the slow log, it will support the plain text format
+and the JSON format (--log.format json). The default is the plain text format.
+
+include::../include/what-happens.asciidoc[]
+
+The +{modulename}+ module has two filesets:
+
+* The `log` fileset collects and parses the logs that logstash writes to disk.
+* The `slowlog` fileset parses the logstash slowlog.
+
+
+For the `slowlog` fileset, make sure to configure logstash slowlog option
+link:https://www.elastic.co/guide/en/logstash/current/logging.html#_slowlog
+
+[float]
+=== Compatibility
+
+The Logstash `log` fileset was tested with logs from Logstash 5.6 and 6.0.
+
+The Logstash `slowlog` fileset was tested with logs from Logstash 5.6 and 6.0
+
+include::../include/running-modules.asciidoc[]
+
+[float]
+===  This module comes with a two sample dashboard
+
+[role="screenshot"]
+image::./images/kibana-logstash-log.png[]
+
+image::./images/kibana-logstash-slowlog.png[]
+
+include::../include/configuring-intro.asciidoc[]
+
+The following example shows how to set paths in the +modules.d/{modulename}.yml+
+file to override the default paths for Logstash logs and set the format to json
+
+["source","yaml",subs="attributes"]
+-----
+- module: logstash
+  log:
+    enabled: true
+    var.paths: ["/path/to/log/logstash.log*"]
+    format: json
+  slowlog:
+    enabled: true
+    var.paths: ["/path/to/log/logstash-slowlog.log*"]
+    format: json
+-----
+
+To specify the same settings at the command line, you use:
+
+["source","sh",subs="attributes"]
+-----
+./{beatname_lc} -M "logstash.log.var.paths=[/path/to/log/logstash/logstash-server.log*]" -M "logstash.slowlog.var.paths=[/path/to/log/logstash/logstash-slowlog.log*]"
+-----
+
+
+The command in the example assumes that you have already enabled the +{modulename}+ module.
+
+//set the fileset name used in the included example
+:fileset_ex: log
+
+include::../include/config-option-intro.asciidoc[]
+
+
+[float]
+==== `log` fileset settings
+
+include::../include/var-paths.asciidoc[]
+
+*`var.format`*::
+
+The configured Logstash log format, possible values are: `json` or `plain`, by default it will use the `plain` format.
+
+[float]
+==== `slowlog` fileset settings
+
+include::../include/var-paths.asciidoc[]
+
+*`var.format`*::
+
+The configured Logstash log format, possible values are: `json` or `plain`, by default it will use the `plain` format.
+
+
+[float]
+=== Fields
+
+For a description of each field in the module, see the
+<<exported-fields-logstash,exported fields>> section.
+
