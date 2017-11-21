@@ -93,7 +93,7 @@ spec:
       hostNetwork: true
       containers:
       - name: metricbeat
-        image: docker.elastic.co/beats/metricbeat:6.1.0
+        image: docker.elastic.co/beats/metricbeat:6.2.0
         args: [
           "-c", "/etc/metricbeat.yml",
           "-e",
@@ -202,7 +202,7 @@ spec:
     spec:
       containers:
       - name: metricbeat
-        image: docker.elastic.co/beats/metricbeat:6.1.0
+        image: docker.elastic.co/beats/metricbeat:6.2.0
         args: [
           "-c", "/etc/metricbeat.yml",
           "-e",
