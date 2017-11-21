@@ -12,6 +12,7 @@
       "rename" : {
         "field": "@timestamp",
         "target_field": "read_timestamp"
+      }
     }, {
       "date" : {
         "field" : "iis.access.time",
