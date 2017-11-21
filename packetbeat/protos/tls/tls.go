@@ -133,7 +133,7 @@ func (plugin *tlsPlugin) doParse(
 
 	// Ignore further traffic after the handshake is completed (encrypted connection)
 	// TODO: request/response analysis
-	if conn.handshakeCompleted > 1 {
+	if 0 != conn.handshakeCompleted&(1<<dir) {
 		return conn
 	}
 
@@ -169,8 +169,8 @@ func (plugin *tlsPlugin) doParse(
 			}
 
 		case resultEncrypted:
-			conn.handshakeCompleted++
-			if conn.handshakeCompleted > 1 {
+			conn.handshakeCompleted |= 1 << dir
+			if conn.handshakeCompleted == 3 {
 				plugin.sendEvent(conn)
 			}
 		}
@@ -295,12 +295,17 @@ func (plugin *tlsPlugin) createEvent(conn *tlsConnectionData) beat.Event {
 	src := &common.Endpoint{}
 	dst := &common.Endpoint{}
 
-	if client.tcptuple != nil {
-		src.IP = client.tcptuple.SrcIP.String()
-		src.Port = client.tcptuple.SrcPort
-		dst.IP = client.tcptuple.DstIP.String()
-		dst.Port = client.tcptuple.DstPort
+	tcptuple := client.tcptuple
+	if tcptuple == nil {
+		tcptuple = server.tcptuple
 	}
+	if tcptuple != nil {
+		src.IP = tcptuple.SrcIP.String()
+		src.Port = tcptuple.SrcPort
+		dst.IP = tcptuple.DstIP.String()
+		dst.Port = tcptuple.DstPort
+	}
+
 	if client.cmdlineTuple != nil {
 		src.Proc = string(client.cmdlineTuple.Src)
 		dst.Proc = string(client.cmdlineTuple.Dst)
