@@ -44,4 +44,3 @@
         - name: error_message
           description: >
             The error info message returned by MySQL.
-
