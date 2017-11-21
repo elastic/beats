@@ -2,6 +2,7 @@
   type: group
   description: >
     kubernetes container metrics
+  release: beta
   fields:
     - name: id
       type: keyword

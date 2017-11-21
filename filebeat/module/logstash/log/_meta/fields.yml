@@ -1,0 +1,27 @@
+- name: log
+  title: "Logstash"
+  type: group
+  description: >
+    Fields from the Logstash logs.
+  fields:
+    - name: message
+      type: text
+      description: >
+        Contains the un-parsed log message
+    - name: level
+      type: keyword
+      description: >
+        The log level of the message, this correspond to Log4j levels.
+    - name: module
+      type: keyword
+      description: >
+        The module or class where the event originate.
+    - name: thread
+      type: text
+      description: >
+        Information about the running thread where the log originate.
+    - name: log_event
+      type: object
+      description: >
+        key and value debugging information.
+

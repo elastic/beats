@@ -33,7 +33,7 @@ type MetricSet struct {
 }
 
 func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
-	cfgwarn.Experimental("The vsphere virtualmachine metricset is experimental")
+	cfgwarn.Beta("The vsphere virtualmachine metricset is beta")
 
 	config := struct {
 		Username        string `config:"username"`

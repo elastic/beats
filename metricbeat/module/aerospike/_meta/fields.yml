@@ -1,9 +1,8 @@
 - key: aerospike
   title: "Aerospike"
   description: >
-    experimental[]
-
     Aerospike module
+  release: beta
   fields:
     - name: aerospike
       type: group

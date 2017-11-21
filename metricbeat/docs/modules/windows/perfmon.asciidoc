@@ -3,6 +3,10 @@ This file is generated! See scripts/docs_collector.py
 ////
 
 [[metricbeat-metricset-windows-perfmon]]
+=== Windows perfmon metricset
+
+beta[]
+
 include::../../../module/windows/perfmon/_meta/docs.asciidoc[]
 
 

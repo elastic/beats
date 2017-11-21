@@ -3,6 +3,10 @@ This file is generated! See scripts/docs_collector.py
 ////
 
 [[metricbeat-metricset-mongodb-dbstats]]
+=== MongoDB dbstats metricset
+
+beta[]
+
 include::../../../module/mongodb/dbstats/_meta/docs.asciidoc[]
 
 

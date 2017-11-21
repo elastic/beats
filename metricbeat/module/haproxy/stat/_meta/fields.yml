@@ -2,6 +2,7 @@
   type: group
   description: >
     Stats collected from HAProxy processes.
+  release: ga
   fields:
 
     - name: status
@@ -98,7 +99,7 @@
           type: long
           description: >
             Requests denied because of security concerns.
-            
+
               * For TCP this is because of a matched tcp-request content rule.
               * For HTTP this is because of a matched http-request or tarpit rule.
 
@@ -117,7 +118,7 @@
           type: long
           description: >
             Request errors. Some of the possible causes are:
-            
+
               * early termination from the client, before the request has been sent
               * read error from the client
               * client timeout
@@ -168,7 +169,7 @@
           type: long
           description: >
             Number of response errors. This value includes the number of data
-            transfers aborted by the server (haproxy.stat.server.aborted). 
+            transfers aborted by the server (haproxy.stat.server.aborted).
             Some other errors are:
 
             * write errors on the client socket (won't be counted for the server stat)
@@ -269,7 +270,7 @@
           type: keyword
           description: >
             Status of the last health check. One of:
-            
+
               UNK     -> unknown
               INI     -> initializing
               SOCKERR -> socket error
@@ -349,7 +350,7 @@
           type: integer
           description: >
             Number of backend servers that are active, meaning that they are
-            healthy and can receive requests from the load balancer. 
+            healthy and can receive requests from the load balancer.
 
         - name: backup
           type: integer

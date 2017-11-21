@@ -2,6 +2,7 @@
   type: group
   description: >
     `filesystem` contains local filesystem stats.
+  release: ga
   fields:
     - name: available
       type: long

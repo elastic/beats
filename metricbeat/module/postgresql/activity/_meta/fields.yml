@@ -4,6 +4,7 @@
     One document per server process, showing information related to the current
     activity of that process, such as state and current query. Collected by
     querying pg_stat_activity.
+  release: ga
   fields:
     - name: database.oid
       type: long

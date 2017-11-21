@@ -14,7 +14,7 @@
       },
       "id": "faf882f0-c242-11e7-8692-232bd1143e8a",
       "type": "visualization",
-      "version": 4
+      "version": 1
     },
     {
       "attributes": {
@@ -30,7 +30,7 @@
       },
       "id": "ea483730-c246-11e7-8692-232bd1143e8a",
       "type": "visualization",
-      "version": 3
+      "version": 1
     },
     {
       "attributes": {
@@ -76,7 +76,7 @@
       },
       "id": "a8e20450-c256-11e7-8692-232bd1143e8a",
       "type": "visualization",
-      "version": 3
+      "version": 1
     },
     {
       "attributes": {
@@ -129,7 +129,7 @@
       },
       "id": "5438b030-c246-11e7-8692-232bd1143e8a",
       "type": "search",
-      "version": 2
+      "version": 1
     },
     {
       "attributes": {
@@ -173,8 +173,8 @@
       },
       "id": "693a5f40-c243-11e7-8692-232bd1143e8a",
       "type": "dashboard",
-      "version": 6
+      "version": 1
     }
   ],
-  "version": "6.0.0-rc2"
+  "version": "6.0.0"
 }

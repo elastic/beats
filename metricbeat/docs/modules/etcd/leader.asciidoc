@@ -3,6 +3,10 @@ This file is generated! See scripts/docs_collector.py
 ////
 
 [[metricbeat-metricset-etcd-leader]]
+=== Etcd leader metricset
+
+beta[]
+
 include::../../../module/etcd/leader/_meta/docs.asciidoc[]
 
 

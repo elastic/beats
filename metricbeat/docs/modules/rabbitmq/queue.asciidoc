@@ -3,6 +3,10 @@ This file is generated! See scripts/docs_collector.py
 ////
 
 [[metricbeat-metricset-rabbitmq-queue]]
+=== RabbitMQ queue metricset
+
+beta[]
+
 include::../../../module/rabbitmq/queue/_meta/docs.asciidoc[]
 
 

@@ -13,7 +13,7 @@
       },
       "id": "97680df0-c1c0-11e7-8995-936807a28b16",
       "type": "visualization",
-      "version": 3
+      "version": 1
     },
     {
       "attributes": {
@@ -42,7 +42,7 @@
       },
       "id": "0f10c430-c1c3-11e7-8995-936807a28b16",
       "type": "search",
-      "version": 3
+      "version": 1
     },
     {
       "attributes": {
@@ -75,8 +75,8 @@
       },
       "id": "c0ac2c00-c1c0-11e7-8995-936807a28b16",
       "type": "dashboard",
-      "version": 7
+      "version": 1
     }
   ],
-  "version": "6.0.0-rc2"
+  "version": "6.0.0"
 }

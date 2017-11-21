@@ -3,6 +3,7 @@
   description: >
     `mntr` contains the metrics reported by the four-letter `mntr`
     command.
+  release: ga
   fields:
     - name: hostname
       type: keyword

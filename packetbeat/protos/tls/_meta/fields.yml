@@ -38,11 +38,6 @@
                 The version of the TLS protocol by which the client wishes to
                 communicate during this session.
 
-            - name: timestamp
-              type: date
-              description: >
-                The current time and date according to the client's internal clock.
-
             - name: supported_ciphers
               type: array
               description: >
@@ -83,11 +78,6 @@
                 The version of the TLS protocol that is used for this session.
                 It is the highest version supported by the server not exceeding
                 the version requested in the client hello.
-
-            - name: timestamp
-              type: date
-              description: >
-                The current time and date according to the server's internal clock.
 
             - name: selected_cipher
               type: keyword
@@ -148,6 +138,14 @@
               description: >
                 The algorithm used for the certificate's signature.
 
+            - name: alternative_names
+              type: array
+              description: Subject Alternative Names for this certificate.
+
+            - name: raw
+              type: keyword
+              description: The raw certificate in PEM format.
+
             - name: subject
               type: group
               description: Subject represented by this certificate.
@@ -171,10 +169,6 @@
                 - name: common_name
                   type: keyword
                   description: Name or host name identified by the certificate.
-
-            - name: alternative_names
-              type: array
-              description: Subject Alternative Names for this certificate.
 
             - name: issuer
               type: group
@@ -233,6 +227,14 @@
               description: >
                 The algorithm used for the certificate's signature.
 
+            - name: alternative_names
+              type: array
+              description: Subject Alternative Names for this certificate.
+
+            - name: raw
+              type: keyword
+              description: The raw certificate in PEM format.
+
             - name: subject
               type: group
               description: Subject represented by this certificate.
@@ -256,10 +258,6 @@
                 - name: common_name
                   type: keyword
                   description: Name or host name identified by the certificate.
-
-            - name: alternative_names
-              type: array
-              description: Subject Alternative Names for this certificate.
 
             - name: issuer
               type: group
@@ -285,7 +283,10 @@
                   type: keyword
                   description: Name or host name identified by the certificate.
 
-
         - name: server_certificate_chain
           type: array
           description: Chain of trust for the server certificate.
+
+        - name: client_certificate_chain
+          type: array
+          description: Chain of trust for the client certificate.

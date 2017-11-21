@@ -2,6 +2,7 @@
   type: group
   description: >
     kubernetes pod metrics
+  release: beta
   fields:
     - name: start_time
       type: date
