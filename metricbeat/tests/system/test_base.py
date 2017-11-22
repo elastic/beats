@@ -2,6 +2,7 @@ import re
 import sys
 import unittest
 from metricbeat import BaseTest
+import time
 
 
 class Test(BaseTest):
@@ -25,3 +26,28 @@ class Test(BaseTest):
         assert self.log_contains("Setup Beat: metricbeat")
         assert self.log_contains("metricbeat start running")
         assert self.log_contains("metricbeat stopped")
+
+    #COMPOSE_SERVICES = ['elasticsearch']
+#
+    #@unittest.skipUnless(metricbeat.INTEGRATION_TESTS, "integration test")
+    def test_template(self):
+        """
+        Test that the template can be loaded with `setup --template`
+        """
+        self.render_config_template(
+            elasticsearch={"hosts": "localhost:9200"},
+        )
+        proc = self.start_beat(extra_args=["setup", "--template"])
+
+        time.sleep(5)
+
+        # Wait until template is loaded
+        proc.check_kill_and_wait()
+        self.assert_no_logged_warnings()
+
+        output = self.read_output_json()
+        self.assertTrue(len(output) >= 1)
+        evt = output[0]
+        print(evt)
+
+        self.assert_fields_are_documented(evt)
