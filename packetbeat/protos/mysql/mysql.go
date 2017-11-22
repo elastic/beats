@@ -872,7 +872,7 @@ func (mysql *mysqlPlugin) parseMysqlExecuteStatement(data []byte, stmtdata *mysq
 			paramOffset++
 		// FIELD_TYPE_SHORT
 		case 0x02:
-			if dataLen < paramOffset + 2 {
+			if dataLen < paramOffset+2 {
 				logp.Debug("mysql", "Data too small")
 				return []string{}
 			}
@@ -881,7 +881,7 @@ func (mysql *mysqlPlugin) parseMysqlExecuteStatement(data []byte, stmtdata *mysq
 			paramOffset += 2
 		// FIELD_TYPE_LONG
 		case 0x03:
-			if dataLen < paramOffset + 4 {
+			if dataLen < paramOffset+4 {
 				logp.Debug("mysql", "Data too small")
 				return []string{}
 			}
@@ -901,7 +901,7 @@ func (mysql *mysqlPlugin) parseMysqlExecuteStatement(data []byte, stmtdata *mysq
 			paramString = append(paramString, "TYPE_NULL")
 		//  FIELD_TYPE_LONGLONG
 		case 0x08:
-			if dataLen < paramOffset + 8 {
+			if dataLen < paramOffset+8 {
 				logp.Debug("mysql", "Data too small")
 				return []string{}
 			}
@@ -917,7 +917,7 @@ func (mysql *mysqlPlugin) parseMysqlExecuteStatement(data []byte, stmtdata *mysq
 		case 0x07, 0x0c, 0x0a:
 			var year, month, day, hour, minute, second string
 			paramLen := int(data[paramOffset])
-			if dataLen < paramOffset + paramLen + 1 {
+			if dataLen < paramOffset+paramLen+1 {
 				logp.Debug("mysql", "Data too small")
 				return []string{}
 			}
@@ -944,7 +944,7 @@ func (mysql *mysqlPlugin) parseMysqlExecuteStatement(data []byte, stmtdata *mysq
 		// FIELD_TYPE_TIME
 		case 0x0b:
 			paramLen := int(data[paramOffset])
-			if dataLen < paramOffset + paramLen + 1 {
+			if dataLen < paramOffset+paramLen+1 {
 				logp.Debug("mysql", "Data too small")
 				return []string{}
 			}
@@ -960,7 +960,7 @@ func (mysql *mysqlPlugin) parseMysqlExecuteStatement(data []byte, stmtdata *mysq
 			switch paramLen {
 			case 0xfc: /* 252 - 64k chars */
 				paramLen16 := int(data[paramOffset]) | int(data[paramOffset+1])<<8
-				if dataLen < paramOffset + paramLen16 + 2 {
+				if dataLen < paramOffset+paramLen16+2 {
 					logp.Debug("mysql", "Data too small")
 					return []string{}
 				}
@@ -969,7 +969,7 @@ func (mysql *mysqlPlugin) parseMysqlExecuteStatement(data []byte, stmtdata *mysq
 				paramOffset += paramLen16
 			case 0xfd: /* 64k - 16M chars */
 				paramLen24 := int(data[paramOffset]) | int(data[paramOffset+1])<<8 | int(data[paramOffset+2])<<16
-				if dataLen < paramOffset + paramLen24 + 3 {
+				if dataLen < paramOffset+paramLen24+3 {
 					logp.Debug("mysql", "Data too small")
 					return []string{}
 				}
@@ -977,7 +977,7 @@ func (mysql *mysqlPlugin) parseMysqlExecuteStatement(data []byte, stmtdata *mysq
 				paramString = append(paramString, string(data[paramOffset:paramOffset+paramLen24]))
 				paramOffset += paramLen24
 			default: /* < 252 chars     */
-				if dataLen < paramOffset + paramLen {
+				if dataLen < paramOffset+paramLen {
 					logp.Debug("mysql", "Data too small")
 					return []string{}
 				}
