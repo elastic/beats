@@ -138,19 +138,19 @@ func TestProcessor(t *testing.T) {
 			},
 		},
 		{
-			output: p.object(&common.Field{Dynamic: common.DynamicType{false}}),
+			output: p.object(&common.Field{Dynamic: common.DynamicType{Value:false}}),
 			expected: common.MapStr{
 				"dynamic": false, "type": "object",
 			},
 		},
 		{
-			output: p.object(&common.Field{Dynamic: common.DynamicType{true}}),
+			output: p.object(&common.Field{Dynamic: common.DynamicType{Value:true}}),
 			expected: common.MapStr{
 				"dynamic": true, "type": "object",
 			},
 		},
 		{
-			output: p.object(&common.Field{Dynamic: common.DynamicType{"strict"}}),
+			output: p.object(&common.Field{Dynamic: common.DynamicType{Value:"strict"}}),
 			expected: common.MapStr{
 				"dynamic": "strict", "type": "object",
 			},
