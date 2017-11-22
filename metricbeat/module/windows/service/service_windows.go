@@ -184,29 +184,28 @@ func OpenService(handle ServiceDatabaseHandle, serviceName string, desiredAccess
 }
 
 func QueryServiceConfig2(serviceHandle ServiceHandle, infoLevel ServiceConfigInformation) ([]byte, error) {
-	var serviceBufSize uint32
-	var serviceBytesNeeded uint32
+	var buffer []byte
 
-	if err := _QueryServiceConfig2(serviceHandle, infoLevel, nil, serviceBufSize, &serviceBytesNeeded); err != nil {
-		if ServiceErrno(err.(syscall.Errno)) != SERVICE_ERROR_INSUFFICIENT_BUFFER {
-			return nil, ServiceErrno(err.(syscall.Errno))
+	for {
+		var bytesNeeded uint32
+		var bufPtr *byte
+		if len(buffer) > 0 {
+			bufPtr = &buffer[0]
 		}
-		serviceBufSize += serviceBytesNeeded
-		buffer := make([]byte, serviceBufSize)
 
-		for {
-			if err := _QueryServiceConfig2(serviceHandle, infoLevel, &buffer[0], serviceBufSize, &serviceBytesNeeded); err != nil {
-				if ServiceErrno(err.(syscall.Errno)) != SERVICE_ERROR_INSUFFICIENT_BUFFER {
-					return nil, ServiceErrno(err.(syscall.Errno))
-				}
-				serviceBufSize += serviceBytesNeeded
-			} else {
-				return buffer, nil
+		if err := _QueryServiceConfig2(serviceHandle, infoLevel, bufPtr, uint32(len(buffer)), &bytesNeeded); err != nil {
+			if ServiceErrno(err.(syscall.Errno)) == SERVICE_ERROR_INSUFFICIENT_BUFFER {
+				// Increase buffer size and retry.
+				buffer = make([]byte, len(buffer)+int(bytesNeeded))
+				continue
 			}
+			return nil, err
 		}
+
+		break
 	}
 
-	return nil, nil
+	return buffer, nil
 }
 
 func getServiceStates(handle ServiceDatabaseHandle, state ServiceEnumState) ([]ServiceStatus, error) {
@@ -345,29 +344,28 @@ func getServiceUptime(processID uint32) (time.Duration, error) {
 }
 
 func getAdditionalServiceInfo(serviceHandle ServiceHandle, service *ServiceStatus) error {
-	var serviceBufSize uint32
-	var serviceBytesNeeded uint32
+	var buffer []byte
 
-	if err := _QueryServiceConfig(serviceHandle, nil, serviceBufSize, &serviceBytesNeeded); err != nil {
-		if ServiceErrno(err.(syscall.Errno)) != SERVICE_ERROR_INSUFFICIENT_BUFFER {
+	for {
+		var bytesNeeded uint32
+		var bufPtr *byte
+		if len(buffer) > 0 {
+			bufPtr = &buffer[0]
+		}
+
+		if err := _QueryServiceConfig(serviceHandle, bufPtr, uint32(len(buffer)), &bytesNeeded); err != nil {
+			if ServiceErrno(err.(syscall.Errno)) == SERVICE_ERROR_INSUFFICIENT_BUFFER {
+				// Increase buffer size and retry.
+				buffer = make([]byte, len(buffer)+int(bytesNeeded))
+				continue
+			}
 			return ServiceErrno(err.(syscall.Errno))
 		}
-		serviceBufSize += serviceBytesNeeded
-		buffer := make([]byte, serviceBufSize)
-
-		for {
-			if err := _QueryServiceConfig(serviceHandle, &buffer[0], serviceBufSize, &serviceBytesNeeded); err != nil {
-				if ServiceErrno(err.(syscall.Errno)) != SERVICE_ERROR_INSUFFICIENT_BUFFER {
-					return ServiceErrno(err.(syscall.Errno))
-				}
-				serviceBufSize += serviceBytesNeeded
-			} else {
-				serviceQueryConfig := (*QueryServiceConfig)(unsafe.Pointer(&buffer[0]))
-				service.StartType = ServiceStartType(serviceQueryConfig.DwStartType)
-				break
-			}
-		}
+		serviceQueryConfig := (*QueryServiceConfig)(unsafe.Pointer(&buffer[0]))
+		service.StartType = ServiceStartType(serviceQueryConfig.DwStartType)
+		break
 	}
+
 	return nil
 }
 
