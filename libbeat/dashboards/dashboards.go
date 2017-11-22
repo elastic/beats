@@ -10,10 +10,19 @@ import (
 	"github.com/elastic/beats/libbeat/common"
 )
 
+type importMethod uint8
+
+// check import route
+const (
+	importNone importMethod = iota
+	importViaKibana
+	importViaES
+)
+
 // ImportDashboards tries to import the kibana dashboards.
 // If the Elastic Stack is at version 6.0+, the dashboards should be installed
 // via the kibana dashboard loader plugin. For older versions of the Elastic Stack
-// we write the dashboards right into the .kibana index.
+// we write the dashboards directly into the .kibana index.
 func ImportDashboards(
 	beatName, hostname, homePath string,
 	kibanaConfig, esConfig, dashboardsConfig *common.Config,
@@ -53,19 +62,10 @@ func ImportDashboards(
 		}
 	}
 
-	// check import route
-	const (
-		importNone = iota
-		importViaKibana
-		importViaES
-	)
+	var esLoader *ElasticsearchLoader
 
-	var (
-		importVia = importNone
-		esLoader  *ElasticsearchLoader
-		useKibana = importViaKibana
-	)
-
+	importVia := importNone
+	useKibana := importViaKibana
 	if !kibanaConfig.Enabled() {
 		useKibana = importNone
 	}
