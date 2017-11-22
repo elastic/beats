@@ -26,6 +26,7 @@ class Test(BaseTest):
         assert self.log_contains("auditbeat start running")
         assert self.log_contains("auditbeat stopped")
 
+    @unittest.skipUnless(INTEGRATION_TESTS, "integration test")
     def test_template(self):
         """
         Test that the template can be loaded with `setup --template`
