@@ -289,3 +289,53 @@ func TestPropertiesCombine(t *testing.T) {
 	assert.Equal(t, v1, common.MapStr{"type": "text", "norms": false})
 	assert.Equal(t, v2, common.MapStr{"type": "text", "norms": false})
 }
+
+func TestProcessNoName(t *testing.T) {
+	// Test common fields are combined even if they come from different objects
+	fields := common.Fields{
+		common.Field{
+			Fields: common.Fields{
+				common.Field{
+					Name: "one",
+					Type: "text",
+				},
+			},
+		},
+		common.Field{
+			Name: "test",
+			Type: "group",
+			Fields: common.Fields{
+				common.Field{
+					Name: "two",
+					Type: "text",
+				},
+			},
+		},
+	}
+
+	output := common.MapStr{}
+	version, err := common.NewVersion("6.0.0")
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	p := Processor{EsVersion: *version}
+	err = p.process(fields, "", output)
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	// Make sure fields without a name are skipped during template generation
+	expectedOutput := common.MapStr{
+		"test": common.MapStr{
+			"properties": common.MapStr{
+				"two": common.MapStr{
+					"norms": false,
+					"type":  "text",
+				},
+			},
+		},
+	}
+
+	assert.Equal(t, expectedOutput, output)
+}
