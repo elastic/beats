@@ -43,6 +43,7 @@ Apache2 Module
 Apache2 fields.
 
 
+
 [float]
 == access fields
 
@@ -211,7 +212,6 @@ The name of the operating system.
 == geoip fields
 
 Contains GeoIP information gathered based on the remote_ip field. Only present if the GeoIP Elasticsearch plugin is available and used.
-
 
 
 [float]
