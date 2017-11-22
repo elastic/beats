@@ -1,0 +1,46 @@
+{
+  "description": "Pipeline for parsing iis w3svc logs",
+  "processors" : [
+    {
+      "grok" : {
+        "field" : "message",
+        "patterns" : [
+          "%{TIMESTAMP_ISO8601:iis.access.time} %{IPORHOST:iis.access.site} %{WORD:iis.access.method} %{URIPATH:iis.access.url} %{NOTSPACE:iis.access.querystring} %{NUMBER:iis.access.port} %{NOTSPACE:iis.access.user_name} %{IPORHOST:iis.access.remote_ip} %{NOTSPACE:iis.access.agent} ?%{NOTSPACE:iis.access.referrer}? %{NUMBER:iis.access.response_code} %{NUMBER:iis.access.subresponse_code} %{NUMBER:iis.access.scstatus} %{NUMBER:iis.access.response_time}"
+        ]
+      }
+    }, {
+      "rename" : {
+        "field": "@timestamp",
+        "target_field": "read_timestamp"
+    }, {
+      "date" : {
+        "field" : "iis.access.time",
+        "target_field": "@timestamp",
+        "formats" : [
+          "yyyy-MM-dd HH:mm:ss"
+        ]
+      }
+    }, {
+      "user_agent": {
+        "field": "iis.access.agent",
+        "target_field": "iis.access.user_agent",
+        "ignore_failure": true
+      }
+    }, {
+      "remove": {
+        "field": "iis.access.agent",
+        "ignore_failure": true
+      }
+    }, {
+      "geoip" : {
+        "field" : "clienthost"
+      }
+    }
+  ],
+  "on_failure" : [{
+    "set" : {
+      "field" : "error.message",
+      "value" : "{{ _ingest.on_failure_message }}"
+    }
+  }]
+}
