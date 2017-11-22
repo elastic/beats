@@ -41,9 +41,6 @@ file to override the default paths for Apache2 access and error logs:
   access:
     enabled: true
     var.paths: ["/path/to/log/apache2/access.log*"]
-  ssl:
-    enabled: true
-    var.paths: ["/path/to/log/apache2/ssl_requests.log*"]
   error:
     enabled: true
     var.paths: ["/path/to/log/apache2/error.log*"]
@@ -67,11 +64,6 @@ include::../include/config-option-intro.asciidoc[]
 
 [float]
 ==== `access` log fileset settings
-
-include::../include/var-paths.asciidoc[]
-
-[float]
-==== `ssl` log fileset settings
 
 include::../include/var-paths.asciidoc[]
 
