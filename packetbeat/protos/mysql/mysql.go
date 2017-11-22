@@ -790,7 +790,11 @@ func (mysql *mysqlPlugin) receivedMysqlResponse(msg *mysqlMessage) {
 }
 
 func (mysql *mysqlPlugin) parseMysqlExecuteStatement(data []byte, stmtdata *mysqlStmtData) []string {
-
+	dataLen := len(data)
+	if dataLen < 14 {
+		logp.Debug("mysql", "Data too small")
+		return []string{}
+	}
 	var paramType, paramUnsigned uint8
 	nparamType := []uint8{}
 	paramString := []string{}
@@ -811,11 +815,19 @@ func (mysql *mysqlPlugin) parseMysqlExecuteStatement(data []byte, stmtdata *mysq
 		offset += (nparam + 7) / 8
 	}
 	// stmt bound
+	if dataLen < offset {
+		logp.Debug("mysql", "Data too small")
+		return []string{}
+	}
 	stmtBound := data[offset]
 	offset++
 	paramOffset := offset
 	if stmtBound == 1 {
 		paramOffset += nparam * 2
+		if dataLen < paramOffset {
+			logp.Debug("mysql", "Data too small to contain parameters")
+			return []string{}
+		}
 		// First call or rebound (1)
 		for stmtPos := 0; stmtPos < nparam; stmtPos++ {
 			paramType = uint8(data[offset])
@@ -847,16 +859,24 @@ func (mysql *mysqlPlugin) parseMysqlExecuteStatement(data []byte, stmtdata *mysq
 		switch paramType {
 		// FIELD_TYPE_TINY
 		case 0x01:
-			paramOffset++
 			valueString := strconv.Itoa(int(data[paramOffset]))
 			paramString = append(paramString, valueString)
+			paramOffset++
 		// FIELD_TYPE_SHORT
 		case 0x02:
+			if dataLen < paramOffset + 2 {
+				logp.Debug("mysql", "Data too small")
+				return []string{}
+			}
 			valueString := strconv.Itoa(int(data[paramOffset]) | int(data[paramOffset+1])<<8)
 			paramString = append(paramString, valueString)
 			paramOffset += 2
 		// FIELD_TYPE_LONG
 		case 0x03:
+			if dataLen < paramOffset + 4 {
+				logp.Debug("mysql", "Data too small")
+				return []string{}
+			}
 			valueString := strconv.Itoa(int(data[paramOffset]) | int(data[paramOffset+1])<<8 | int(data[paramOffset+2])<<16 | int(data[paramOffset+3])<<24)
 			paramString = append(paramString, valueString)
 			paramOffset += 4
@@ -873,6 +893,10 @@ func (mysql *mysqlPlugin) parseMysqlExecuteStatement(data []byte, stmtdata *mysq
 			paramString = append(paramString, "TYPE_NULL")
 		//  FIELD_TYPE_LONGLONG
 		case 0x08:
+			if dataLen < paramOffset + 8 {
+				logp.Debug("mysql", "Data too small")
+				return []string{}
+			}
 			valueString := strconv.FormatInt(int64(data[paramOffset])|int64(data[paramOffset+1])<<8|
 				int64(data[paramOffset+2])<<16|int64(data[paramOffset+3])<<24|
 				int64(data[paramOffset+4])<<32|int64(data[paramOffset+5])<<40|
@@ -885,6 +909,10 @@ func (mysql *mysqlPlugin) parseMysqlExecuteStatement(data []byte, stmtdata *mysq
 		case 0x07, 0x0c, 0x0a:
 			var year, month, day, hour, minute, second string
 			paramLen := int(data[paramOffset])
+			if dataLen < paramOffset + paramLen + 1 {
+				logp.Debug("mysql", "Data too small")
+				return []string{}
+			}
 			paramOffset++
 			if paramLen >= 2 {
 				year = strconv.Itoa((int(data[paramOffset]) | int(data[paramOffset+1])<<8))
@@ -908,6 +936,10 @@ func (mysql *mysqlPlugin) parseMysqlExecuteStatement(data []byte, stmtdata *mysq
 		// FIELD_TYPE_TIME
 		case 0x0b:
 			paramLen := int(data[paramOffset])
+			if dataLen < paramOffset + paramLen + 1 {
+				logp.Debug("mysql", "Data too small")
+				return []string{}
+			}
 			paramOffset++
 			paramString = append(paramString, "TYPE_TIME")
 			paramOffset += paramLen
@@ -920,15 +952,27 @@ func (mysql *mysqlPlugin) parseMysqlExecuteStatement(data []byte, stmtdata *mysq
 			switch paramLen {
 			case 0xfc: /* 252 - 64k chars */
 				paramLen16 := int(data[paramOffset]) | int(data[paramOffset+1])<<8
+				if dataLen < paramOffset + paramLen16 + 2 {
+					logp.Debug("mysql", "Data too small")
+					return []string{}
+				}
 				paramOffset += 2
 				paramString = append(paramString, string(data[paramOffset:paramOffset+paramLen16]))
 				paramOffset += paramLen16
 			case 0xfd: /* 64k - 16M chars */
 				paramLen24 := int(data[paramOffset]) | int(data[paramOffset+1])<<8 | int(data[paramOffset+2])<<16
+				if dataLen < paramOffset + paramLen24 + 3 {
+					logp.Debug("mysql", "Data too small")
+					return []string{}
+				}
 				paramOffset += 3
 				paramString = append(paramString, string(data[paramOffset:paramOffset+paramLen24]))
 				paramOffset += paramLen24
 			default: /* < 252 chars     */
+				if dataLen < paramOffset + paramLen {
+					logp.Debug("mysql", "Data too small")
+					return []string{}
+				}
 				paramString = append(paramString, string(data[paramOffset:paramOffset+paramLen]))
 				//logp.Debug("mysql", "Field_type_var_string : %s", string(data[paramOffset:paramOffset+paramLen]))
 				paramOffset += paramLen
