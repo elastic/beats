@@ -189,8 +189,7 @@ func QueryServiceConfig2(serviceHandle ServiceHandle, infoLevel ServiceConfigInf
 
 	if err := _QueryServiceConfig2(serviceHandle, infoLevel, nil, serviceBufSize, &serviceBytesNeeded); err != nil {
 		if ServiceErrno(err.(syscall.Errno)) != SERVICE_ERROR_INSUFFICIENT_BUFFER {
-			err := CloseServiceHandle(serviceHandle)
-			return nil, err
+			return nil, ServiceErrno(err.(syscall.Errno))
 		}
 		serviceBufSize += serviceBytesNeeded
 		buffer := make([]byte, serviceBufSize)
@@ -198,8 +197,7 @@ func QueryServiceConfig2(serviceHandle ServiceHandle, infoLevel ServiceConfigInf
 		for {
 			if err := _QueryServiceConfig2(serviceHandle, infoLevel, &buffer[0], serviceBufSize, &serviceBytesNeeded); err != nil {
 				if ServiceErrno(err.(syscall.Errno)) != SERVICE_ERROR_INSUFFICIENT_BUFFER {
-					err := CloseServiceHandle(serviceHandle)
-					return nil, err
+					return nil, ServiceErrno(err.(syscall.Errno))
 				}
 				serviceBufSize += serviceBytesNeeded
 			} else {
@@ -306,11 +304,17 @@ func getServiceInformation(rawService *EnumServiceStatusProcess, servicesBuffer 
 
 	// Get detailed information
 	if err := getAdditionalServiceInfo(serviceHandle, &service); err != nil {
+		if err := CloseServiceHandle(serviceHandle); err != nil {
+			return service, err
+		}
 		return service, err
 	}
 
 	// Get optional information
 	if err := getOptionalServiceInfo(serviceHandle, &service); err != nil {
+		if err := CloseServiceHandle(serviceHandle); err != nil {
+			return service, err
+		}
 		return service, err
 	}
 
@@ -346,8 +350,7 @@ func getAdditionalServiceInfo(serviceHandle ServiceHandle, service *ServiceStatu
 
 	if err := _QueryServiceConfig(serviceHandle, nil, serviceBufSize, &serviceBytesNeeded); err != nil {
 		if ServiceErrno(err.(syscall.Errno)) != SERVICE_ERROR_INSUFFICIENT_BUFFER {
-			err := CloseServiceHandle(serviceHandle)
-			return err
+			return ServiceErrno(err.(syscall.Errno))
 		}
 		serviceBufSize += serviceBytesNeeded
 		buffer := make([]byte, serviceBufSize)
@@ -355,8 +358,7 @@ func getAdditionalServiceInfo(serviceHandle ServiceHandle, service *ServiceStatu
 		for {
 			if err := _QueryServiceConfig(serviceHandle, &buffer[0], serviceBufSize, &serviceBytesNeeded); err != nil {
 				if ServiceErrno(err.(syscall.Errno)) != SERVICE_ERROR_INSUFFICIENT_BUFFER {
-					err := CloseServiceHandle(serviceHandle)
-					return err
+					return ServiceErrno(err.(syscall.Errno))
 				}
 				serviceBufSize += serviceBytesNeeded
 			} else {
