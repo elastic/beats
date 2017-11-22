@@ -1,8 +1,12 @@
-- name: access
+- name: ssl_access
   type: group
   description: >
     Contains fields for the Apache2 HTTPD ssl access logs.
   fields:
+    - name: remote_ip
+      type: keyword
+      description: >
+        Client IP address.
     - name: ssl_protocol
       type: keyword
       description: >
@@ -11,4 +15,49 @@
       type: keyword
       description: >
         The SSL cipher used during the connection.
+    - name: url
+      type: keyword
+      description: >
+        The request HTTP URL.
+    - name: method
+      type: keyword
+      example: GET
+      description: >
+        The request HTTP method.
+    - name: http_version
+      type: keyword
+      description: >
+        The HTTP version.
+    - name: body_sent.bytes
+      type: long
+      format: bytes
+      description: >
+        The number of bytes of the server response body.
+    - name: geoip
+      type: group
+      description: >
+        Contains GeoIP information gathered based on the remote_ip field.
+        Only present if the GeoIP Elasticsearch plugin is available and
+        used.
+      fields:
+        - name: continent_name
+          type: keyword
+          description: >
+            The name of the continent.
+        - name: country_iso_code
+          type: keyword
+          description: >
+            Country ISO code.
+        - name: location
+          type: geo_point
+          description: >
+            The longitude and latitude.
+        - name: region_name
+          type: keyword
+          description: >
+            The region name.
+        - name: city_name
+          type: keyword
+          description: >
+            The city name.
 
