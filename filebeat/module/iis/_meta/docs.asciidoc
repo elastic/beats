@@ -1,3 +1,0 @@
-== iis module
-
-This is the iis module.
