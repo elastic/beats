@@ -658,7 +658,7 @@ output.elasticsearch:
 #setup.dashboards.index:
 
 # Force loading of dashboards using the Kibana API without querying Elasticsearch for the version
-#always_kibana: false
+#setup.dashboards.always_kibana: false
 
 #============================== Template =====================================
 
