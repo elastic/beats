@@ -2,6 +2,7 @@
   type: group
   description: >
     `status` contains the metrics that were obtained by the status SQL query.
+  release: ga
   fields:
     - name: aborted
       type: group

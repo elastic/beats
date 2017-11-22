@@ -21,6 +21,9 @@ filebeat.modules:
     # Filebeat will choose the paths depending on your OS.
     #var.paths:
 
+    # Convert the timestamp to UTC. Requires Elasticsearch >= 6.1.
+    #convert_timezone: false
+
     # Prospector configuration (advanced). Any prospector configuration option
     # can be added under this section.
     #prospector:
@@ -32,6 +35,9 @@ filebeat.modules:
     # Set custom paths for the log files. If left empty,
     # Filebeat will choose the paths depending on your OS.
     #var.paths:
+
+    # Convert the timestamp to UTC. Requires Elasticsearch >= 6.1.
+    #convert_timezone: false
 
     # Prospector configuration (advanced). Any prospector configuration option
     # can be added under this section.
@@ -140,6 +146,23 @@ filebeat.modules:
     # Filebeat will choose the paths depending on your OS.
     #var.paths:
 
+
+#------------------------------ logstash Module ------------------------------
+#- module: logstash
+  # logs
+  #log:
+    #enabled: true
+
+    # Set custom paths for the log files. If left empty,
+    # Filebeat will choose the paths depending on your OS.
+    # var.paths:
+
+  # Slow logs
+  #slowlog:
+   #enabled: true
+    # Set custom paths for the log files. If left empty,
+    # Filebeat will choose the paths depending on your OS.
+    #var.paths:
 
 #-------------------------------- MySQL Module -------------------------------
 #- module: mysql
@@ -1155,6 +1178,9 @@ output.elasticsearch:
 # The Elasticsearch index name. This overwrites the index name defined in the
 # dashboards and index pattern. Example: testbeat-*
 #setup.dashboards.index:
+
+# Force loading of dashboards using the Kibana API without querying Elasticsearch for the version
+#always_kibana: false
 
 #============================== Template =====================================
 

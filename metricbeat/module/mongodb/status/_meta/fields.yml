@@ -2,6 +2,7 @@
   type: group
   description: >
     MongoDB server status metrics.
+  release: beta
   fields:
     - name: version
       type: keyword

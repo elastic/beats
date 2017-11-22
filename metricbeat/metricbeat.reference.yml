@@ -190,7 +190,7 @@ metricbeat.modules:
     namespace: "example"
     path: "/debug/vars"
 
-#------------------------------ graphite Module ------------------------------
+#------------------------------ Graphite Module ------------------------------
 - module: graphite
   metricsets: ["server"]
   enabled: true
@@ -307,7 +307,7 @@ metricbeat.modules:
 
 #------------------------------ Logstash Module ------------------------------
 - module: logstash
-  metricsets: ["node"]
+  metricsets: ["node", "node_stats"]
   enabled: false
   period: 10s
   hosts: ["localhost"]
@@ -1108,6 +1108,9 @@ output.elasticsearch:
 # The Elasticsearch index name. This overwrites the index name defined in the
 # dashboards and index pattern. Example: testbeat-*
 #setup.dashboards.index:
+
+# Force loading of dashboards using the Kibana API without querying Elasticsearch for the version
+#always_kibana: false
 
 #============================== Template =====================================
 

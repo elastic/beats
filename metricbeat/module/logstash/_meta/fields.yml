@@ -1,9 +1,8 @@
 - key: logstash
   title: "Logstash"
   description: >
-    experimental[]
-
     Logstash module
+  release: experimental
   fields:
     - name: logstash
       type: group

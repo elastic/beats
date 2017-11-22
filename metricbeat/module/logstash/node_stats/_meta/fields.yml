@@ -1,0 +1,23 @@
+- name: node_stats
+  type: group
+  description: >
+    node_stats metrics.
+  release: experimental
+  fields:
+    - name: events
+      type: group
+      description: >
+        Events stats
+      fields:
+        - name: in
+          type: long
+          description: >
+            Incoming events counter.
+        - name: out
+          type: long
+          description: >
+            Outgoing events counter.
+        - name: filtered
+          type: long
+          description: >
+            Filtered events counter.

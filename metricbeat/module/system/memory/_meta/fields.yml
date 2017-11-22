@@ -2,6 +2,7 @@
   type: group
   description: >
     `memory` contains local memory stats.
+  release: ga
   fields:
     - name: total
       type: long
@@ -40,7 +41,7 @@
           description: >
             Actual used memory in bytes. It represents the difference between the total and the available memory. The
             available memory depends on the OS. For more details, please check `system.actual.free`.
- 
+
         - name: free
           type: long
           format: bytes

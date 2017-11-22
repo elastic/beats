@@ -1,0 +1,1 @@
+[2017-10-23T14:20:12,046][INFO ][logstash.modules.scaffold] Initializing module {:module_name=>"fb_apache", :directory=>"/usr/share/logstash/modules/fb_apache/configuration"}

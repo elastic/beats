@@ -6,7 +6,7 @@
     },
     "logstash": {
         "node": {
-            "host": "9b61b9bdb06a",
+            "host": "4318d3c307b3",
             "jvm": {
                 "pid": 1,
                 "version": "1.8.0_151"

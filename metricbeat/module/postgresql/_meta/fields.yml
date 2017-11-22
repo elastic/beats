@@ -3,6 +3,7 @@
   description: >
     Metrics collected from PostgreSQL servers.
   short_config: false
+  release: ga
   fields:
     - name: postgresql
       type: group

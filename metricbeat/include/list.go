@@ -74,6 +74,7 @@ import (
 	_ "github.com/elastic/beats/metricbeat/module/kubernetes/volume"
 	_ "github.com/elastic/beats/metricbeat/module/logstash"
 	_ "github.com/elastic/beats/metricbeat/module/logstash/node"
+	_ "github.com/elastic/beats/metricbeat/module/logstash/node_stats"
 	_ "github.com/elastic/beats/metricbeat/module/memcached"
 	_ "github.com/elastic/beats/metricbeat/module/memcached/stats"
 	_ "github.com/elastic/beats/metricbeat/module/mongodb"

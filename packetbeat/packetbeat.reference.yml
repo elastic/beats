@@ -433,6 +433,10 @@ packetbeat.protocols:
   # certificate chains are sent to Elasticsearch. The default is true.
   #send_certificates: true
 
+  # If this option is enabled, the raw certificates will be stored
+  # in PEM format under the `raw` key. The default is false.
+  #include_raw_certificates: false
+
 #=========================== Monitored processes ==============================
 
 # Configure the processes to be monitored and how to find them. If a process is
@@ -1091,6 +1095,9 @@ output.elasticsearch:
 # The Elasticsearch index name. This overwrites the index name defined in the
 # dashboards and index pattern. Example: testbeat-*
 #setup.dashboards.index:
+
+# Force loading of dashboards using the Kibana API without querying Elasticsearch for the version
+#always_kibana: false
 
 #============================== Template =====================================
 

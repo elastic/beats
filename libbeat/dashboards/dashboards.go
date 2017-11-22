@@ -29,6 +29,14 @@ func ImportDashboards(beatName, hostname, homePath string,
 		return err
 	}
 
+	if kibanaConfig == nil {
+		kibanaConfig = common.NewConfig()
+	}
+
+	if esConfig == nil && dashConfig.AlwaysKibana {
+		return setupAndImportDashboardsViaKibana(hostname, kibanaConfig, &dashConfig, msgOutputter)
+	}
+
 	esLoader, err := NewElasticsearchLoader(esConfig, &dashConfig, msgOutputter)
 	if err != nil {
 		return fmt.Errorf("fail to create the Elasticsearch loader: %v", err)
@@ -48,10 +56,6 @@ func ImportDashboards(beatName, hostname, homePath string,
 
 	logp.Info("For Elasticsearch version >= 6.0.0, the Kibana dashboards need to be imported via the Kibana API.")
 
-	if kibanaConfig == nil {
-		kibanaConfig = common.NewConfig()
-	}
-
 	// In Cloud, the Kibana URL is different than the Elasticsearch URL,
 	// but the credentials are the same.
 	// So, by default, use same credentials for connecting to Kibana as to Elasticsearch
@@ -62,7 +66,13 @@ func ImportDashboards(beatName, hostname, homePath string,
 		kibanaConfig.SetString("password", -1, esLoader.client.Password)
 	}
 
-	kibanaLoader, err := NewKibanaLoader(kibanaConfig, &dashConfig, hostname, msgOutputter)
+	return setupAndImportDashboardsViaKibana(hostname, kibanaConfig, &dashConfig, msgOutputter)
+}
+
+func setupAndImportDashboardsViaKibana(hostname string, kibanaConfig *common.Config,
+	dashboardsConfig *Config, msgOutputter MessageOutputter) error {
+
+	kibanaLoader, err := NewKibanaLoader(kibanaConfig, dashboardsConfig, hostname, msgOutputter)
 	if err != nil {
 		return fmt.Errorf("fail to create the Kibana loader: %v", err)
 	}

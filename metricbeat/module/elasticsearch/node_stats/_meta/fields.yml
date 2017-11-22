@@ -2,6 +2,7 @@
   type: group
   description: >
     node_stats
+  release: beta
   fields:
     - name: indices
       type: group

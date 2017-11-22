@@ -3,6 +3,7 @@
   type: group
   description: >
     Summary metrics for the processes running on the host.
+  release: ga
   fields:
     - name: total
       type: long

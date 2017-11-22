@@ -1,5 +1,1 @@
-=== Ceph monitor_health metricset
-
-beta[]
-
 This is the `monitor_health` metricset of the Ceph module.

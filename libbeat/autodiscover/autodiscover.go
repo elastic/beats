@@ -106,7 +106,10 @@ func (a *Autodiscover) startWorker() {
 
 		meta := getMeta(event)
 		for _, config := range configs {
-			hash, err := hashstructure.Hash(config, nil)
+			rawCfg := map[string]interface{}{}
+			err := config.Unpack(rawCfg)
+
+			hash, err := hashstructure.Hash(rawCfg, nil)
 			if err != nil {
 				logp.Debug(debugK, "Could not hash config %v: %v", config, err)
 				continue
@@ -154,7 +157,10 @@ func (a *Autodiscover) stopWorker() {
 		logp.Debug(debugK, "Got a stop event: %v, generated configs: %+v", event, configs)
 
 		for _, config := range configs {
-			hash, err := hashstructure.Hash(config, nil)
+			rawCfg := map[string]interface{}{}
+			err := config.Unpack(rawCfg)
+
+			hash, err := hashstructure.Hash(rawCfg, nil)
 			if err != nil {
 				logp.Debug(debugK, "Could not hash config %v: %v", config, err)
 				continue

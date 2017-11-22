@@ -3,6 +3,7 @@
   description: >
     MySQL server status metrics collected from MySQL.
   short_config: false
+  release: ga
   fields:
     - name: mysql
       type: group
