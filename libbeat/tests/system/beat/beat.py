@@ -155,7 +155,7 @@ class TestCase(unittest.TestCase, ComposeMixin):
                    cmd=None,
                    config=None,
                    output=None,
-                   logging_args=["-e", "-v", "-d", "*"],
+                   logging_args=["-e", "-v", "-d", "\"*\""],
                    extra_args=[]):
         """
         Starts beat and returns the process handle. The
