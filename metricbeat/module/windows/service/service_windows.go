@@ -292,26 +292,15 @@ func getServiceInformation(rawService *EnumServiceStatusProcess, servicesBuffer 
 		return service, err
 	}
 
-	defer func() (ServiceStatus, error) {
-		if err := CloseServiceHandle(serviceHandle); err != nil {
-			return service, err
-		}
-		return service, nil
-	}()
+	defer CloseServiceHandle(serviceHandle)
 
 	// Get detailed information
 	if err := getAdditionalServiceInfo(serviceHandle, &service); err != nil {
-		if err := CloseServiceHandle(serviceHandle); err != nil {
-			return service, err
-		}
 		return service, err
 	}
 
 	// Get optional information
 	if err := getOptionalServiceInfo(serviceHandle, &service); err != nil {
-		if err := CloseServiceHandle(serviceHandle); err != nil {
-			return service, err
-		}
 		return service, err
 	}
 
