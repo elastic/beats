@@ -181,7 +181,7 @@ func (e *Event) String() string {
 	return string(data)
 }
 
-func buildMapStr(e *Event, existsBefore, existsNow bool) common.MapStr {
+func buildMapStr(e *Event, existedBefore bool) common.MapStr {
 	m := common.MapStr{
 		"@timestamp": e.Timestamp,
 		"path":       e.Path,
@@ -190,7 +190,7 @@ func buildMapStr(e *Event, existsBefore, existsNow bool) common.MapStr {
 	}
 
 	if e.Action > 0 {
-		m["action"] = e.Action.InOrder(existsBefore, existsNow).StringArray()
+		m["action"] = e.Action.InOrder(existedBefore, e.Info != nil).StringArray()
 	}
 
 	if e.TargetPath != "" {

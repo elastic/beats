@@ -1,12 +1,15 @@
 package file
 
-import "strings"
+import (
+	"math/bits"
+	"strings"
+)
 
 // Action is a description of the changes described by an event.
 type Action uint8
 
-// actionArray is just syntactic sugar to invoke methods on []Action receiver
-type actionArray []Action
+// ActionArray is just syntactic sugar to invoke methods on []Action receiver
+type ActionArray []Action
 
 // List of possible Actions.
 const (
@@ -36,7 +39,7 @@ type actionOrderKey struct {
 
 // Given the previous and current state of the file, and an action mask
 // returns a meaningful ordering for the actions in the mask
-var actionOrderMap = map[actionOrderKey]actionArray{
+var actionOrderMap = map[actionOrderKey]ActionArray{
 	{false, false, Created | Deleted}:                  {Created, Deleted},
 	{true, true, Created | Deleted}:                    {Deleted, Created},
 	{false, false, Moved | Created}:                    {Created, Moved},
@@ -60,8 +63,7 @@ var actionOrderMap = map[actionOrderKey]actionArray{
 }
 
 func (action Action) isMultiple() bool {
-	// checks if there is more than one bit set
-	return action != 0 && (action&(action-1)) != 0
+	return bits.OnesCount8(uint8(action)) > 1
 }
 
 func (action Action) String() string {
@@ -81,14 +83,14 @@ func (action Action) String() string {
 	return strings.Join(list, "|")
 }
 
-func resolveActionOrder(action Action, existsBefore, existsNow bool) actionArray {
+func resolveActionOrder(action Action, existedBefore, existsNow bool) ActionArray {
 	if action == None {
 		return nil
 	}
 	if !action.isMultiple() {
 		return []Action{action}
 	}
-	key := actionOrderKey{existsBefore, existsNow, action}
+	key := actionOrderKey{existedBefore, existsNow, action}
 	if result, ok := actionOrderMap[key]; ok {
 		return result
 	}
@@ -98,7 +100,7 @@ func resolveActionOrder(action Action, existsBefore, existsNow bool) actionArray
 	return action.InAnyOrder()
 }
 
-func (action Action) InOrder(existsBefore, existsNow bool) actionArray {
+func (action Action) InOrder(existedBefore, existsNow bool) ActionArray {
 	hasConfigChange := 0 != action&ConfigChange
 	hasUpdate := 0 != action&Updated
 	hasAttrMod := 0 != action&AttributesModified
@@ -107,7 +109,7 @@ func (action Action) InOrder(existsBefore, existsNow bool) actionArray {
 		action |= Updated
 	}
 
-	result := resolveActionOrder(action, existsBefore, existsNow)
+	result := resolveActionOrder(action, existedBefore, existsNow)
 
 	if hasConfigChange {
 		result = append(result, ConfigChange)
@@ -130,7 +132,7 @@ func (action Action) InOrder(existsBefore, existsNow bool) actionArray {
 	return result
 }
 
-func (action Action) InAnyOrder() actionArray {
+func (action Action) InAnyOrder() ActionArray {
 	if !action.isMultiple() {
 		return []Action{action}
 	}
@@ -143,7 +145,7 @@ func (action Action) InAnyOrder() actionArray {
 	return result
 }
 
-func (actions actionArray) StringArray() []string {
+func (actions ActionArray) StringArray() []string {
 	result := make([]string, len(actions))
 	for index, value := range actions {
 		result[index] = value.String()

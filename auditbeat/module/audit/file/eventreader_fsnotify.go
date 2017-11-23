@@ -20,7 +20,6 @@ type reader struct {
 
 // NewEventReader creates a new EventProducer backed by fsnotify.
 func NewEventReader(c Config) (EventProducer, error) {
-
 	if c.Recursive {
 		return nil, errors.New("recursive file auditing not supported in this platform (see file.recursive)")
 	}

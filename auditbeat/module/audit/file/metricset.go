@@ -169,7 +169,7 @@ func (ms *MetricSet) reportEvent(reporter mb.PushReporter, event *Event) bool {
 	changed, lastEvent := ms.hasFileChangedSinceLastEvent(event)
 	if changed {
 		// Publish event if it changed.
-		if ok := reporter.Event(buildMapStr(event, lastEvent != nil, event.Info != nil)); !ok {
+		if ok := reporter.Event(buildMapStr(event, lastEvent != nil)); !ok {
 			return false
 		}
 	}
@@ -217,7 +217,7 @@ func (ms *MetricSet) purgeDeleted(reporter mb.PushReporter) {
 
 		for _, e := range deleted {
 			// Don't persist!
-			if !reporter.Event(buildMapStr(e, true, false)) {
+			if !reporter.Event(buildMapStr(e, true)) {
 				return
 			}
 		}

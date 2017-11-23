@@ -226,7 +226,7 @@ func readTimeout(t testing.TB, events <-chan Event) Event {
 		if !ok {
 			t.Fatal("failed reading from event channel")
 		}
-		t.Logf("%+v", buildMapStr(&e, false, false).StringToPrint())
+		t.Logf("%+v", buildMapStr(&e, false).StringToPrint())
 		return e
 	}
 
@@ -248,7 +248,7 @@ func readMax(t testing.TB, max int, events <-chan Event) []Event {
 			if !ok {
 				t.Fatal("failed reading from event channel")
 			}
-			t.Logf("%+v", buildMapStr(&e, false, false).StringToPrint())
+			t.Logf("%+v", buildMapStr(&e, false).StringToPrint())
 			received = append(received, e)
 			if len(received) >= max {
 				return received
