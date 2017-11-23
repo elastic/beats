@@ -161,8 +161,8 @@ the pattern.
 ==== Load the template manually (alternate method)
 
 If the host running {beatname_uc} does not have direct connectivity to
-Elasticsearch, you can export the index template to a file and then install the
-template manually.
+Elasticsearch, you can export the index template to a file, move it to a
+machine that does have connectivity, and then install the template manually.
 
 . Export the index template:
 +
@@ -188,14 +188,14 @@ PS> .{backslash}{beatname_lc}.exe export template --es.version {stack-version} |
 +
 ["source","sh",subs="attributes"]
 ----
-curl -XPUT -H 'Content-Type: application/json' http://elasticsearch:9200/_template/{beatname_lc}-{stack-version} -d@{beatname_lc}.template.json
+curl -XPUT -H 'Content-Type: application/json' http://localhost:9200/_template/{beatname_lc}-{stack-version} -d@{beatname_lc}.template.json
 ----
 +
 *win*:
 +
 ["source","sh",subs="attributes"]
 ----
-PS > Invoke-RestMethod -Method Put -ContentType "application/json" -InFile {beatname_lc}.template.json -Uri http://elasticsearch:9200/_template/{beatname_lc}-{stack-version}
+PS > Invoke-RestMethod -Method Put -ContentType "application/json" -InFile {beatname_lc}.template.json -Uri http://localhost:9200/_template/{beatname_lc}-{stack-version}
 ----
 
 
