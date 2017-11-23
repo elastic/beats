@@ -22,7 +22,7 @@ type reader struct {
 func NewEventReader(c Config) (EventProducer, error) {
 
 	if c.Recursive {
-		return errors.New("recursive file auditing not supported in this platform (see file.recursive)")
+		return nil, errors.New("recursive file auditing not supported in this platform (see file.recursive)")
 	}
 	watcher, err := fsnotify.NewWatcher()
 	if err != nil {
