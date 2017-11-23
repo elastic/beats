@@ -15,17 +15,17 @@
       type: keyword
       description: >
         osd node type, illegal type include hdd, ssd etc.
-    - name: total_byte
+    - name: total.byte
       type: long
       format: bytes
       description: >
         osd disk total volume
-    - name: used_byte
+    - name: used.byte
       type: long
       format: bytes
       description: >
         osd disk usage volume
-    - name: avail_byte
+    - name: available.bytes
       type: long
       format: bytes
       description: >
@@ -34,7 +34,8 @@
       type: long
       description: >
         shows how many pg located on this osd
-    - name: used_pct
-      type: float
+    - name: used.pct
+      type: scaled_float
+      format: percent
       description: >
         osd disk usage percentage

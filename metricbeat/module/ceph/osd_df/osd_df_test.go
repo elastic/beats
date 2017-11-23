@@ -41,22 +41,22 @@ func TestFetchEventContents(t *testing.T) {
 	//check osd0 df info
 	nodeInfo := events[0]
 	assert.EqualValues(t, 0, nodeInfo["pg_num"])
-	assert.EqualValues(t, 52325356, nodeInfo["total_byte"])
-	assert.EqualValues(t, 1079496, nodeInfo["used_byte"])
-	assert.EqualValues(t, 51245860, nodeInfo["avail_byte"])
+	assert.EqualValues(t, 52325356, nodeInfo["total.byte"])
+	assert.EqualValues(t, 1079496, nodeInfo["used.byte"])
+	assert.EqualValues(t, 51245860, nodeInfo["available.byte"])
 	assert.EqualValues(t, "hdd", nodeInfo["device_class"])
-	assert.EqualValues(t, 0.020630456866839092, nodeInfo["used_pct"])
+	assert.EqualValues(t, 0.020630456866839092, nodeInfo["used.pct"])
 	assert.EqualValues(t, 0, nodeInfo["id"])
 	assert.EqualValues(t, "osd.0", nodeInfo["name"])
 
 	//check osd1 df info
 	nodeInfo = events[1]
 	assert.EqualValues(t, 0, nodeInfo["pg_num"])
-	assert.EqualValues(t, 52325356, nodeInfo["total_byte"])
-	assert.EqualValues(t, 1079496, nodeInfo["used_byte"])
-	assert.EqualValues(t, 51245860, nodeInfo["avail_byte"])
+	assert.EqualValues(t, 52325356, nodeInfo["total.byte"])
+	assert.EqualValues(t, 1079496, nodeInfo["used.byte"])
+	assert.EqualValues(t, 51245860, nodeInfo["available.byte"])
 	assert.EqualValues(t, "hdd", nodeInfo["device_class"])
-	assert.EqualValues(t, 0.020630456866839092, nodeInfo["used_pct"])
+	assert.EqualValues(t, 0.020630456866839092, nodeInfo["used.pct"])
 	assert.EqualValues(t, 1, nodeInfo["id"])
 	assert.EqualValues(t, "osd.1", nodeInfo["name"])
 

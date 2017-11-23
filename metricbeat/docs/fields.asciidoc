@@ -1224,7 +1224,7 @@ osd node type, illegal type include hdd, ssd etc.
 
 
 [float]
-=== `ceph.osd_df.total_byte`
+=== `ceph.osd_df.total.byte`
 
 type: long
 
@@ -1234,7 +1234,7 @@ osd disk total volume
 
 
 [float]
-=== `ceph.osd_df.used_byte`
+=== `ceph.osd_df.used.byte`
 
 type: long
 
@@ -1244,7 +1244,7 @@ osd disk usage volume
 
 
 [float]
-=== `ceph.osd_df.avail_byte`
+=== `ceph.osd_df.available.bytes`
 
 type: long
 
@@ -1262,9 +1262,11 @@ shows how many pg located on this osd
 
 
 [float]
-=== `ceph.osd_df.used_pct`
+=== `ceph.osd_df.used.pct`
 
-type: float
+type: scaled_float
+
+format: percent
 
 osd disk usage percentage
 

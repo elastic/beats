@@ -39,19 +39,20 @@ func eventsMapping(content []byte) ([]common.MapStr, error) {
 	//osd node list
 	events := []common.MapStr{}
 	for _, node := range nodeList {
-		nodeInfo := common.MapStr{}
-		nodeInfo["id"] = node.ID
-		nodeInfo["name"] = node.Name
-		nodeInfo["total_byte"] = node.Total
-		nodeInfo["used_byte"] = node.Used
-		nodeInfo["avail_byte"] = node.Available
-		nodeInfo["device_class"] = node.DeviceClass
-		nodeInfo["pg_num"] = node.PgNum
+		nodeInfo := common.MapStr{
+			"id":             node.ID,
+			"name":           node.Name,
+			"total.byte":     node.Total,
+			"used.byte":      node.Used,
+			"available.byte": node.Available,
+			"device_class":   node.DeviceClass,
+			"pg_num":         node.PgNum,
+		}
 
 		if 0 != node.Total {
 			var usedPct float64
 			usedPct = float64(node.Used) / float64(node.Total)
-			nodeInfo["used_pct"] = usedPct
+			nodeInfo["used.pct"] = usedPct
 		}
 
 		events = append(events, nodeInfo)
