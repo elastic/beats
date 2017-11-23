@@ -4,7 +4,6 @@ package file
 
 import (
 	"flag"
-	"fmt"
 	"os"
 	"path/filepath"
 	"strings"
@@ -23,10 +22,10 @@ func init() {
 }
 
 type fsreader struct {
-	stream        *fsevents.EventStream
-	config        Config
-	eventC        chan Event
-	watchedInodes map[uint64]bool
+	stream      *fsevents.EventStream
+	config      Config
+	eventC      chan Event
+	watchedDirs []os.FileInfo
 }
 
 var flagToAction = map[fsevents.EventFlags]Action{
@@ -96,22 +95,21 @@ func NewEventReader(c Config) (EventProducer, error) {
 		stream.Flags |= fsevents.IgnoreSelf
 	}
 
-	inodes := make(map[uint64]bool)
+	var dirs []os.FileInfo
 	if !c.Recursive {
 		for _, path := range c.Paths {
-			if inode, err := getInode(path); err == nil {
-				debugf("using path:%s inode:%v", path, inode)
-				inodes[inode] = true
+			if info, err := getFileInfo(path); err == nil {
+				dirs = append(dirs, info)
 			} else {
-				logp.Warn("%v failed to get inode for '%s': %v", logPrefix, path, err)
+				logp.Warn("%v failed to get file info for '%s': %v", logPrefix, path, err)
 			}
 		}
 	}
 	return &fsreader{
-		stream:        stream,
-		config:        c,
-		eventC:        make(chan Event, 1),
-		watchedInodes: inodes,
+		stream:      stream,
+		config:      c,
+		eventC:      make(chan Event, 1),
+		watchedDirs: dirs,
 	}, nil
 }
 
@@ -170,24 +168,13 @@ func flagsToString(flags fsevents.EventFlags) string {
 	return strings.Join(list, "|")
 }
 
-func getInode(path string) (uint64, error) {
+func getFileInfo(path string) (os.FileInfo, error) {
+	resolved, err := filepath.EvalSymlinks(path)
+	if err == nil {
+		path = resolved
+	}
 	info, err := os.Lstat(path)
-	if err != nil {
-		return 0, errors.Wrap(err, fmt.Sprintf("failed to stat"))
-	}
-	meta, err := NewMetadata(path, info)
-	// meta can return us some data even on an error condition
-	if meta == nil {
-		return 0, errors.Wrap(err, fmt.Sprintf("failed to get metadata"))
-	}
-	if meta.Type == SymlinkType {
-		resolved, err := filepath.EvalSymlinks(path)
-		if err != nil {
-			return 0, errors.Wrap(err, fmt.Sprintf("failed to follow symlinks"))
-		}
-		return getInode(resolved)
-	}
-	return meta.Inode, nil
+	return info, errors.Wrap(err, "failed to stat")
 }
 
 func (r *fsreader) isWatched(path string) bool {
@@ -195,11 +182,15 @@ func (r *fsreader) isWatched(path string) bool {
 		return true
 	}
 	dir := filepath.Dir(path)
-	inode, err := getInode(dir)
+	info, err := getFileInfo(dir)
 	if err != nil {
-		logp.Warn("%v failed to get inode for event '%s': %v", logPrefix, dir, err)
+		logp.Warn("%v failed to get event file info for '%s': %v", logPrefix, dir, err)
 		return false
 	}
-	_, found := r.watchedInodes[inode]
-	return found
+	for _, dir := range r.watchedDirs {
+		if os.SameFile(info, dir) {
+			return true
+		}
+	}
+	return false
 }
