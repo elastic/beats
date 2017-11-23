@@ -1167,8 +1167,9 @@ output.elasticsearch:
 # dashboards and index pattern. Example: testbeat-*
 #setup.dashboards.index:
 
-# Force loading of dashboards using the Kibana API without querying Elasticsearch for the version
-#always_kibana: false
+# Always use the Kibana API for loading the dashboards instead of autodetecting
+# how to install the dashboards by first querying Elasticsearch.
+#setup.dashboards.always_kibana: false
 
 #============================== Template =====================================
 

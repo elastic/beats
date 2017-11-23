@@ -537,13 +537,13 @@ func (b *Beat) loadDashboards(force bool) error {
 		}
 	}
 
-	if b.Config.Dashboards != nil && b.Config.Dashboards.Enabled() {
+	if b.Config.Dashboards.Enabled() {
 		var esConfig *common.Config
 
 		if b.Config.Output.Name() == "elasticsearch" {
 			esConfig = b.Config.Output.Config()
 		}
-		err := dashboards.ImportDashboards(b.Info.Beat, b.Info.Name, paths.Resolve(paths.Home, ""),
+		err := dashboards.ImportDashboards(b.Info.Beat, b.Info.Hostname, paths.Resolve(paths.Home, ""),
 			b.Config.Kibana, esConfig, b.Config.Dashboards, nil)
 		if err != nil {
 			return fmt.Errorf("Error importing Kibana dashboards: %v", err)
