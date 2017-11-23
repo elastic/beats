@@ -14,6 +14,7 @@ import (
 type Win32Service struct {
 	Name      string
 	ProcessId uint32
+	State     string
 }
 
 func TestData(t *testing.T) {
@@ -59,6 +60,7 @@ func TestReadService(t *testing.T) {
 				if s["pid"] != nil {
 					assert.Equal(t, w.ProcessId, s["pid"])
 				}
+				assert.Equal(t, w.State, s["state"])
 				found = true
 				break
 			}
