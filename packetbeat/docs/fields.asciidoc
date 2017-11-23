@@ -3183,6 +3183,14 @@ type: array
 
 Chain of trust for the client certificate.
 
+[float]
+=== `tls.alert_types`
+
+type: keyword
+
+An array containing the TLS alert type for every alert received.
+
+
 [[exported-fields-trans_event]]
 == Transaction Event fields
 

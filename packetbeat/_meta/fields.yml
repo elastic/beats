@@ -1855,7 +1855,6 @@
                     Used to announce that a session ticket will be provided
                     by the server. Always an empty string.
 
-
         - name: client_certificate
           type: group
           description: Certificate provided by the client for authentication.
@@ -2040,3 +2039,8 @@
         - name: client_certificate_chain
           type: array
           description: Chain of trust for the client certificate.
+
+        - name: alert_types
+          type: keyword
+          description: >
+            An array containing the TLS alert type for every alert received.

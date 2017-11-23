@@ -281,15 +281,20 @@ func (plugin *tlsPlugin) createEvent(conn *tlsConnectionData) beat.Event {
 		}
 	}
 
-	alerts := make([]common.MapStr, 0, len(client.parser.alerts)+len(server.parser.alerts))
+	numAlerts := len(client.parser.alerts) + len(server.parser.alerts)
+	alerts := make([]common.MapStr, 0, numAlerts)
+	alertTypes := make([]string, 0, numAlerts)
 	for _, alert := range client.parser.alerts {
 		alerts = append(alerts, alert.toMap("client"))
+		alertTypes = append(alertTypes, alert.code.String())
 	}
 	for _, alert := range server.parser.alerts {
 		alerts = append(alerts, alert.toMap("server"))
+		alertTypes = append(alertTypes, alert.code.String())
 	}
-	if len(alerts) != 0 {
+	if numAlerts != 0 {
 		tls["alerts"] = alerts
+		tls["alert_types"] = alertTypes
 	}
 
 	src := &common.Endpoint{}
