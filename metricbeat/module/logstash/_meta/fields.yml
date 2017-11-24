@@ -1,0 +1,12 @@
+- key: logstash
+  title: "Logstash"
+  description: >
+    Logstash module
+  release: experimental
+  fields:
+    - name: logstash
+      type: group
+      description: >
+      fields:
+
+

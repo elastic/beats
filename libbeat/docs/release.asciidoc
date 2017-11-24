@@ -4,8 +4,13 @@
 == Release notes
 
 --
-This section summarizes the changes in each release.
+This section summarizes the changes in each release. Also read
+<<breaking-changes>> for more detail about changes that affect
+upgrade.
 
+* <<release-notes-6.0.0>>
+* <<release-notes-6.0.0-ga>>
+* <<release-notes-6.0.0-rc2>>
 * <<release-notes-6.0.0-rc1>>
 * <<release-notes-6.0.0-beta2>>
 * <<release-notes-6.0.0-beta1>>

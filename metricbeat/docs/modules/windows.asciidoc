@@ -5,6 +5,8 @@ This file is generated! See scripts/docs_collector.py
 [[metricbeat-module-windows]]
 == Windows module
 
+beta[]
+
 This is the Windows module.
 
 
@@ -21,6 +23,10 @@ metricbeat.modules:
   metricsets: ["perfmon"]
   period: 10s
   perfmon.counters:
+
+- module: windows
+  metricsets: ["service"]
+  period: 60s
 ----
 
 [float]

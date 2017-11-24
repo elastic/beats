@@ -4,6 +4,8 @@ package service
 
 import (
 	"bytes"
+	"crypto/sha256"
+	"encoding/base64"
 	"strconv"
 	"syscall"
 	"time"
@@ -12,6 +14,7 @@ import (
 
 	"github.com/pkg/errors"
 	"golang.org/x/sys/windows"
+	"golang.org/x/sys/windows/registry"
 
 	"github.com/elastic/beats/libbeat/common"
 	"github.com/elastic/beats/libbeat/logp"
@@ -37,21 +40,21 @@ type ServiceHandle uintptr
 type ProcessHandle uintptr
 
 var serviceStates = map[ServiceState]string{
-	ServiceContinuePending: "ServiceContinuePending",
-	ServicePausePending:    "ServicePausePending",
-	ServicePaused:          "ServicePaused",
-	ServiceRunning:         "ServiceRunning",
-	ServiceStartPending:    "ServiceStartPending",
-	ServiceStopPending:     "ServiceStopPending",
-	ServiceStopped:         "ServiceStopped",
+	ServiceContinuePending: "Continuing",
+	ServicePausePending:    "Pausing",
+	ServicePaused:          "Paused",
+	ServiceRunning:         "Running",
+	ServiceStartPending:    "Starting",
+	ServiceStopPending:     "Stopping",
+	ServiceStopped:         "Stopped",
 }
 
 var serviceStartTypes = map[ServiceStartType]string{
-	ServiceAutoStart:   "ServiceAutoStart",
-	ServiceBootStart:   "ServiceBootStart",
-	ServiceDemandStart: "ServiceDemandStart",
-	ServiceDisabled:    "ServiceDisabled",
-	ServiceSystemStart: "ServiceSystemStart",
+	ServiceAutoStart:   "Automatic",
+	ServiceBootStart:   "Boot",
+	ServiceDemandStart: "Manual",
+	ServiceDisabled:    "Disabled",
+	ServiceSystemStart: "System",
 }
 
 func (state ServiceState) String() string {
@@ -61,17 +64,27 @@ func (state ServiceState) String() string {
 	return ""
 }
 
+// errorNames is mapping of errno values to names.
+// https://msdn.microsoft.com/en-us/library/windows/desktop/ms681383(v=vs.85).aspx
+var errorNames = map[uint32]string{
+	1077: "ERROR_SERVICE_NEVER_STARTED",
+}
+
 type ServiceStatus struct {
 	DisplayName  string
 	ServiceName  string
 	CurrentState string
 	StartType    string
+	PID          uint32 // ID of the associated process.
 	Uptime       time.Duration
+	ExitCode     uint32 // Exit code for stopped services.
 }
 
 type ServiceReader struct {
 	handle ServiceDatabaseHandle
 	state  ServiceEnumState
+	guid   string            // Host's MachineGuid value (a unique ID for the host).
+	ids    map[string]string // Cache of service IDs.
 }
 
 var InvalidServiceDatabaseHandle = ^ServiceDatabaseHandle(0)
@@ -168,7 +181,9 @@ func getServiceStates(handle ServiceDatabaseHandle, state ServiceEnumState) ([]S
 }
 
 func getServiceInformation(rawService *EnumServiceStatusProcess, servicesBuffer []byte, handle ServiceDatabaseHandle) (ServiceStatus, error) {
-	var service ServiceStatus
+	service := ServiceStatus{
+		PID: rawService.ServiceStatusProcess.DwProcessId,
+	}
 
 	// Read null-terminated UTF16 strings from the buffer.
 	serviceNameOffset := uintptr(unsafe.Pointer(rawService.LpServiceName)) - (uintptr)(unsafe.Pointer(&servicesBuffer[0]))
@@ -194,6 +209,12 @@ func getServiceInformation(rawService *EnumServiceStatusProcess, servicesBuffer 
 		state = "Can not define State"
 	}
 	service.CurrentState = state
+
+	// Exit code.
+	service.ExitCode = rawService.ServiceStatusProcess.DwWin32ExitCode
+	if service.ExitCode == uint32(windows.ERROR_SERVICE_SPECIFIC_ERROR) {
+		service.ExitCode = rawService.ServiceStatusProcess.DwServiceSpecificExitCode
+	}
 
 	// Get detailed information
 	if err := getDetailedServiceInfo(handle, service.ServiceName, ServiceQueryConfig, &service); err != nil {
@@ -285,23 +306,27 @@ func CloseServiceHandle(handle ServiceHandle) error {
 
 func NewServiceReader() (*ServiceReader, error) {
 	hndl, err := OpenSCManager("", "", ScManagerEnumerateService|ScManagerConnect)
-
 	if err != nil {
 		return nil, errors.Wrap(err, "initialization failed")
 	}
 
-	r := &ServiceReader{
-		handle: hndl,
+	guid, err := getMachineGUID()
+	if err != nil {
+		return nil, err
 	}
 
-	r.state = ServiceStateAll
+	r := &ServiceReader{
+		handle: hndl,
+		state:  ServiceStateAll,
+		guid:   guid,
+		ids:    map[string]string{},
+	}
 
 	return r, nil
 }
 
 func (reader *ServiceReader) Read() ([]common.MapStr, error) {
 	services, err := getServiceStates(reader.handle, reader.state)
-
 	if err != nil {
 		return nil, err
 	}
@@ -310,10 +335,19 @@ func (reader *ServiceReader) Read() ([]common.MapStr, error) {
 
 	for _, service := range services {
 		ev := common.MapStr{
+			"id":           reader.getServiceID(service.ServiceName),
 			"display_name": service.DisplayName,
 			"name":         service.ServiceName,
 			"state":        service.CurrentState,
 			"start_type":   service.StartType,
+		}
+
+		if service.CurrentState == "Stopped" {
+			ev.Put("exit_code", getErrorCode(service.ExitCode))
+		}
+
+		if service.PID > 0 {
+			ev.Put("pid", service.PID)
 		}
 
 		if service.Uptime > 0 {
@@ -326,6 +360,25 @@ func (reader *ServiceReader) Read() ([]common.MapStr, error) {
 	}
 
 	return result, nil
+}
+
+// getServiceID returns a unique ID for the service that is derived from the
+// machine's GUID and the service's name.
+func (reader *ServiceReader) getServiceID(name string) string {
+	// hash returns a base64 encoded sha256 hash that is truncated to 10 chars.
+	hash := func(v string) string {
+		sum := sha256.Sum256([]byte(v))
+		base64Hash := base64.RawURLEncoding.EncodeToString(sum[:])
+		return base64Hash[:10]
+	}
+
+	id, found := reader.ids[name]
+	if !found {
+		id = hash(reader.guid + name)
+		reader.ids[name] = id
+	}
+
+	return id
 }
 
 func (e ServiceErrno) Error() string {
@@ -347,4 +400,32 @@ func (e ServiceErrno) Error() string {
 	for ; n > 0 && (b[n-1] == '\n' || b[n-1] == '\r'); n-- {
 	}
 	return string(utf16.Decode(b[:n]))
+}
+
+// getMachineGUID returns the machine's GUID value which is unique to a Windows
+// installation.
+func getMachineGUID() (string, error) {
+	const key = registry.LOCAL_MACHINE
+	const path = `SOFTWARE\Microsoft\Cryptography`
+	const name = "MachineGuid"
+
+	k, err := registry.OpenKey(key, path, registry.READ)
+	if err != nil {
+		return "", errors.Wrapf(err, `failed to open HKLM\%v`, path)
+	}
+
+	guid, _, err := k.GetStringValue(name)
+	if err != nil {
+		return "", errors.Wrapf(err, `failed to get value of HKLM\%v\%v`, path, name)
+	}
+
+	return guid, nil
+}
+
+func getErrorCode(errno uint32) string {
+	name, found := errorNames[errno]
+	if found {
+		return name
+	}
+	return strconv.Itoa(int(errno))
 }

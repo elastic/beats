@@ -2,6 +2,7 @@
   title: "HTTP"
   description: >
     HTTP module
+  release: beta
   fields:
     - name: http
       type: group
@@ -33,10 +34,16 @@
               type: object
               description: >
                 The HTTP headers received
-            - name: status_code
+            - name: code
               type: keyword
               description: >
                 The HTTP status code
+              example: 404
+            - name: phrase
+              type: keyword
+              example: Not found
+              description: >
+                The HTTP status phrase
             - name: body
               type: keyword
               description: >

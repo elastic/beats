@@ -3,7 +3,7 @@
 version: '2.1'
 services:
   elasticsearch:
-    image: docker.elastic.co/elasticsearch/elasticsearch:6.0.0-rc1
+    image: docker.elastic.co/elasticsearch/elasticsearch:6.0.0
     healthcheck:
       test: ["CMD", "curl", "-f", "http://localhost:9200"]
     environment:
@@ -18,13 +18,13 @@ services:
       context: docker/logstash
       dockerfile: Dockerfile
       args:
-        ELASTIC_VERSION: 6.0.0-rc1
+        ELASTIC_VERSION: 6.0.0
         DOWNLOAD_URL: https://artifacts.elastic.co/downloads
     environment:
       - ES_HOST=elasticsearch
 
   kibana:
-    image: docker.elastic.co/kibana/kibana:6.0.0-rc1
+    image: docker.elastic.co/kibana/kibana:6.0.0
     healthcheck:
       test: ["CMD", "curl", "-f", "http://localhost:5601"]
       retries: 6

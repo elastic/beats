@@ -91,7 +91,8 @@ func (t Type) String() string {
 
 // Enum of possible file.Types.
 const (
-	FileType Type = iota
+	UnknownType Type = iota // Typically seen in deleted notifications where the object is gone.
+	FileType
 	DirType
 	SymlinkType
 )
@@ -237,7 +238,7 @@ func buildMapStr(e *Event) common.MapStr {
 			m["size"] = info.Size
 		}
 
-		if info.Type != 0 {
+		if info.Type != UnknownType {
 			m["type"] = info.Type.String()
 		}
 

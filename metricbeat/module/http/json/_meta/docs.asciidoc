@@ -1,5 +1,3 @@
-=== HTTP json metricset
-
 This is the `json` metricset of the HTTP module.
 
 [float]
@@ -124,7 +122,7 @@ Example:
         "Server": "Google Frontend",
         "X-Cloud-Trace-Context": "3f532d170112fc5b2a0b94fcbd6493b3"
       },
-      "status_code": 200
+      "code": 200
     }
   },
   "metricset": {

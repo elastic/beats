@@ -2,6 +2,7 @@
   type: group
   description: >
     Stats about the Prometheus server.
+  release: beta
   fields:
     - name: notifications
       type: group

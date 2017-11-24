@@ -1,3 +1,1 @@
-=== Docker memory metricset
-
 The Docker `memory` metricset collects memory metrics.

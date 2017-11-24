@@ -11,13 +11,14 @@ This file is generated! See scripts/docs_collector.py
   * <<metricbeat-module-elasticsearch,Elasticsearch>>
   * <<metricbeat-module-etcd,Etcd>>
   * <<metricbeat-module-golang,Golang>>
-  * <<metricbeat-module-graphite,graphite>>
+  * <<metricbeat-module-graphite,Graphite>>
   * <<metricbeat-module-haproxy,HAProxy>>
   * <<metricbeat-module-http,HTTP>>
   * <<metricbeat-module-jolokia,Jolokia>>
   * <<metricbeat-module-kafka,Kafka>>
   * <<metricbeat-module-kibana,Kibana>>
   * <<metricbeat-module-kubernetes,Kubernetes>>
+  * <<metricbeat-module-logstash,Logstash>>
   * <<metricbeat-module-memcached,Memcached>>
   * <<metricbeat-module-mongodb,MongoDB>>
   * <<metricbeat-module-mysql,MySQL>>
@@ -51,6 +52,7 @@ include::modules/jolokia.asciidoc[]
 include::modules/kafka.asciidoc[]
 include::modules/kibana.asciidoc[]
 include::modules/kubernetes.asciidoc[]
+include::modules/logstash.asciidoc[]
 include::modules/memcached.asciidoc[]
 include::modules/mongodb.asciidoc[]
 include::modules/mysql.asciidoc[]

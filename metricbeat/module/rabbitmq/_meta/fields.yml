@@ -1,9 +1,8 @@
 - key: rabbitmq
   title: "RabbitMQ"
   description: >
-    experimental[]
-
     RabbitMQ module
+  release: beta
   fields:
     - name: rabbitmq
       type: group

@@ -5,6 +5,8 @@ This file is generated! See scripts/docs_collector.py
 [[metricbeat-module-aerospike]]
 == Aerospike module
 
+beta[]
+
 The Aerospike module uses the http://www.aerospike.com/docs/reference/info[Info command] to collect metrics.
 
 [float]

@@ -5,6 +5,8 @@ This file is generated! See scripts/docs_collector.py
 [[metricbeat-module-mongodb]]
 == MongoDB module
 
+beta[]
+
 This module periodically fetches metrics from https://www.mongodb.com[MongoDB]
 servers.
 

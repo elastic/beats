@@ -2,6 +2,7 @@
   type: group
   description: >
     kubernetes node metrics
+  release: beta
   fields:
     - name: name
       type: keyword

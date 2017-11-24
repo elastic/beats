@@ -1,6 +1,7 @@
 package module
 
 import (
+	"fmt"
 	"sync"
 
 	"github.com/elastic/beats/libbeat/beat"
@@ -56,4 +57,8 @@ func (mr *runner) Stop() {
 		mr.client.Close()
 		mr.wg.Wait()
 	})
+}
+
+func (mr *runner) String() string {
+	return fmt.Sprintf("%s [metricsets=%d]", mr.mod.Name(), len(mr.mod.metricSets))
 }

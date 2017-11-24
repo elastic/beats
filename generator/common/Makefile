@@ -13,14 +13,14 @@ test: prepare-test
 	export GOPATH=${PWD}/build ; \
 	export PATH=${PATH}:${PWD}/build/bin; \
 	cd ${BEAT_PATH} ; \
-	make copy-vendor ; \
-	${PREPARE_COMMAND}  \
-	make check ; \
-	make update ; \
-	make ; \
+	make copy-vendor || exit 1  ; \
+	${PREPARE_COMMAND} \
+	make check || exit 1 ; \
+	make update || exit 1 ; \
+	make || exit 1 ; \
 	make unit
 
-prepare-test: python-env
+prepare-test:: python-env
 	# Makes sure to use current version of beats for testing
 	mkdir -p ${BUILD_DIR}/src/github.com/elastic/beats/
 	rsync -a --exclude=build ${PWD}/../../* ${BUILD_DIR}/src/github.com/elastic/beats/

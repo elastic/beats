@@ -6,6 +6,8 @@ which allows you to separate your configuration into multiple smaller
 configuration files. See the <<load-prospector-config>> and the
 <<load-module-config>> sections for details.
 
+include::../../libbeat/docs/shared-note-file-permissions.asciidoc[]
+
 [float]
 [[load-prospector-config]]
 === Prospector config
@@ -40,25 +42,28 @@ definitions. For example:
 
 WARNING: It is critical that two running prospectors DO NOT have overlapping
 file paths defined. If more than one prospector harvests the same file at the
-same time, it can lead to unexpected behaviour.
+same time, it can lead to unexpected behavior.
 
 [float]
 [[load-module-config]]
 === Module config
 
 For module configurations, you specify the `path` option in the
-`filebeat.config.modules` section of the +{beatname_lc}.yml+ file. For example:
+`filebeat.config.modules` section of the +{beatname_lc}.yml+ file. By default,
+Filebeat loads the module configurations enabled in the
+<<enable-modules-d-configs,`modules.d`>> directory. For example:
 
 [source,yaml]
 ------------------------------------------------------------------------------
 filebeat.config.modules:
   enabled: true
-  path: prospectors.d/*.yml <1>
+  path: ${path.config}/modules.d/*.yml
 ------------------------------------------------------------------------------
 
-<1> If you change the path setting to look for config changes in a different
-directory, you will not be able to use the <<modules-command,`modules`>> command
-to enable and disable module configurations.
+
+The `path` setting must point to the `modules.d` directory if you want to use
+the <<modules-command,`modules`>> command to enable and disable module
+configurations.
 
 Each file found by the Glob must contain a list of one or more module
 definitions. For example:
@@ -74,9 +79,8 @@ definitions. For example:
     var.paths: [/var/log/apache2/error.log*]
 ------------------------------------------------------------------------------
 
-=== Live reloading
 
-beta[]
+=== Live reloading
 
 You can configure Filebeat to dynamically reload configuration files when there
 are changes. This feature is available for prospector and module configuration
@@ -109,3 +113,5 @@ filebeat.config.prospectors:
 set the `period` to less than 1s because the modification time of files is often
 stored in seconds. Setting the `period` to less than 1s will result in
 unnecessary overhead.
+
+include::../../libbeat/docs/shared-note-file-permissions.asciidoc[]

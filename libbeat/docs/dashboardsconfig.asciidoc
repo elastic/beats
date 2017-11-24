@@ -12,8 +12,6 @@
 [[configuration-dashboards]]
 == Load the Kibana dashboards
 
-beta[]
-
 {beatname_uc} comes packaged with example Kibana dashboards, visualizations,
 and searches for visualizing {beatname_uc} data in Kibana.
 
@@ -93,3 +91,9 @@ is `".kibana"`
 
 The Elasticsearch index name. This setting overwrites the index name defined
 in the dashboards and index pattern. Example: `"testbeat-*"`
+
+[float]
+==== `setup.dashboards.always_kibana`
+
+Force loading of dashboards using the Kibana API without querying Elasticsearch for the version
+The default is `false`.

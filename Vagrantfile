@@ -61,7 +61,7 @@ mkdir -p ~/bin
 curl -sL -o ~/bin/gvm https://github.com/andrewkroh/gvm/releases/download/v0.0.1/gvm-linux-amd64
 chmod +x ~/bin/gvm
 echo 'export PATH=~/bin:$PATH' >> ~/.bash_profile
-echo 'eval "$(gvm 1.8.3)"' >> ~/.bash_profile
+echo 'eval "$(gvm 1.9.2)"' >> ~/.bash_profile
 SCRIPT
 
 Vagrant.configure(2) do |config|

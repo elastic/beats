@@ -2,6 +2,7 @@
   type: group
   description: >
     `disk` contains disk IO metrics collected from the operating system.
+  release: ga
   fields:
     - name: name
       type: keyword
@@ -100,7 +101,7 @@
     - name: iostat.await
       type: float
       description: >
-          The average queue length of the requests that were issued to the device.
+          The average time spent for requests issued to the device to be served.
 
     - name: iostat.service_time
       type: float

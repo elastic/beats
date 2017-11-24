@@ -58,7 +58,7 @@ To deploy Filebeat to Kubernetes just run:
 
 ["source", "sh", subs="attributes"]
 ------------------------------------------------
-kubectl deploy -f filebeat-kubernetes.yaml
+kubectl create -f filebeat-kubernetes.yaml
 ------------------------------------------------
 
 Then you should be able to check the status by running:

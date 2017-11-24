@@ -3,6 +3,8 @@ This file is generated! See scripts/docs_collector.py
 ////
 
 [[metricbeat-metricset-mysql-status]]
+=== MySQL status metricset
+
 include::../../../module/mysql/status/_meta/docs.asciidoc[]
 
 

@@ -13,6 +13,8 @@ services:
     working_dir: /go/src/github.com/elastic/beats/filebeat
     volumes:
       - ${PWD}/..:/go/src/github.com/elastic/beats/
+      # We launch docker containers to test docker autodiscover:
+      - /var/run/docker.sock:/var/run/docker.sock
     command: make
 
   # This is a proxy used to block beats until all services are healthy.

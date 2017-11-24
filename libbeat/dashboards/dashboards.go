@@ -1,68 +1,121 @@
 package dashboards
 
 import (
+	"errors"
 	"fmt"
 	"path/filepath"
 	"strconv"
 	"strings"
 
 	"github.com/elastic/beats/libbeat/common"
-	"github.com/elastic/beats/libbeat/logp"
 )
 
-func ImportDashboards(beatName, hostname, homePath string,
-	kibanaConfig *common.Config, esConfig *common.Config,
-	dashboardsConfig *common.Config, msgOutputter MessageOutputter) error {
+type importMethod uint8
 
+// check import route
+const (
+	importNone importMethod = iota
+	importViaKibana
+	importViaES
+)
+
+// ImportDashboards tries to import the kibana dashboards.
+// If the Elastic Stack is at version 6.0+, the dashboards should be installed
+// via the kibana dashboard loader plugin. For older versions of the Elastic Stack
+// we write the dashboards directly into the .kibana index.
+func ImportDashboards(
+	beatName, hostname, homePath string,
+	kibanaConfig, esConfig, dashboardsConfig *common.Config,
+	msgOutputter MessageOutputter,
+) error {
 	if dashboardsConfig == nil || !dashboardsConfig.Enabled() {
 		return nil
 	}
 
+	// unpack dashboard config
 	dashConfig := defaultConfig
 	dashConfig.Beat = beatName
-	if dashConfig.Dir == "" {
-		dashConfig.Dir = filepath.Join(homePath, defaultDirectory)
-	}
-
+	dashConfig.Dir = filepath.Join(homePath, defaultDirectory)
 	err := dashboardsConfig.Unpack(&dashConfig)
 	if err != nil {
 		return err
 	}
 
-	esLoader, err := NewElasticsearchLoader(esConfig, &dashConfig, msgOutputter)
-	if err != nil {
-		return fmt.Errorf("fail to create the Elasticsearch loader: %v", err)
-	}
-	defer esLoader.Close()
-
-	esLoader.statusMsg("Elasticsearch URL %v", esLoader.client.Connection.URL)
-
-	majorVersion, _, err := getMajorAndMinorVersion(esLoader.version)
-	if err != nil {
-		return fmt.Errorf("wrong Elasticsearch version: %v", err)
-	}
-
-	if majorVersion < 6 {
-		return ImportDashboardsViaElasticsearch(esLoader)
-	}
-
-	logp.Info("For Elasticsearch version >= 6.0.0, the Kibana dashboards need to be imported via the Kibana API.")
-
+	// init kibana config object
 	if kibanaConfig == nil {
 		kibanaConfig = common.NewConfig()
 	}
 
-	// In Cloud, the Kibana URL is different than the Elasticsearch URL,
-	// but the credentials are the same.
-	// So, by default, use same credentials for connecting to Kibana as to Elasticsearch
-	if !kibanaConfig.HasField("username") && len(esLoader.client.Username) > 0 {
-		kibanaConfig.SetString("username", -1, esLoader.client.Username)
+	if !kibanaConfig.HasField("host") {
+		// fallback to the beats hostname (localhost) if host is not configured
+		kibanaConfig.SetString("host", -1, hostname)
 	}
-	if !kibanaConfig.HasField("password") && len(esLoader.client.Password) > 0 {
-		kibanaConfig.SetString("password", -1, esLoader.client.Password)
+	if esConfig.Enabled() {
+		username, _ := esConfig.String("username", -1)
+		password, _ := esConfig.String("password", -1)
+
+		if !kibanaConfig.HasField("username") && username != "" {
+			kibanaConfig.SetString("username", -1, username)
+		}
+		if !kibanaConfig.HasField("password") && password != "" {
+			kibanaConfig.SetString("password", -1, password)
+		}
 	}
 
-	kibanaLoader, err := NewKibanaLoader(kibanaConfig, &dashConfig, hostname, msgOutputter)
+	var esLoader *ElasticsearchLoader
+
+	importVia := importNone
+	useKibana := importViaKibana
+	if !kibanaConfig.Enabled() {
+		useKibana = importNone
+	}
+
+	requiresKibana := dashConfig.AlwaysKibana || !esConfig.Enabled()
+	if requiresKibana {
+		importVia = useKibana
+	} else {
+		// Check import route via elasticsearch version. If Elasticsearch major
+		// version is >6, we assume Kibana also being at versions >6.0. In this
+		// case dashboards will be imported using the new kibana dashboard loader
+		// plugin.
+		// XXX(urso): Why do we test the Elasticsearch version? If kibana is
+		//            configured, why not test the kibana version and plugin
+		//            availability first?
+		esLoader, err = NewElasticsearchLoader(esConfig, &dashConfig, msgOutputter)
+		if err != nil {
+			return fmt.Errorf("fail to create the Elasticsearch loader: %v", err)
+		}
+		defer esLoader.Close()
+
+		esLoader.statusMsg("Elasticsearch URL %v", esLoader.client.Connection.URL)
+
+		majorVersion, _, err := getMajorAndMinorVersion(esLoader.version)
+		if err != nil {
+			return fmt.Errorf("wrong Elasticsearch version: %v", err)
+		}
+
+		if majorVersion < 6 {
+			importVia = importViaES
+		} else {
+			importVia = useKibana
+		}
+	}
+
+	// Try to import dashboards.
+	switch importVia {
+	case importViaES:
+		return ImportDashboardsViaElasticsearch(esLoader)
+	case importViaKibana:
+		return setupAndImportDashboardsViaKibana(hostname, kibanaConfig, &dashConfig, msgOutputter)
+	default:
+		return errors.New("Elasticsearch or Kibana configuration missing for loading dashboards.")
+	}
+}
+
+func setupAndImportDashboardsViaKibana(hostname string, kibanaConfig *common.Config,
+	dashboardsConfig *Config, msgOutputter MessageOutputter) error {
+
+	kibanaLoader, err := NewKibanaLoader(kibanaConfig, dashboardsConfig, hostname, msgOutputter)
 	if err != nil {
 		return fmt.Errorf("fail to create the Kibana loader: %v", err)
 	}

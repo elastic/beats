@@ -75,12 +75,44 @@ If you used the `file` or `console` outputs for debugging purposes, in addition
 to the main output, we recommend using the `-d "publish"` option which logs the
 published events in the Filebeat logs.
 
+[[breaking-changes-ls-index]]
+==== Logstash index setting now requires version
+
+If you use the Logstash output to send data from Beats to Logstash, you need to
+update the `index` setting in your Logstash configuration to include the Beat
+version:
+
+[source,json]
+----
+output {
+  elasticsearch {
+    hosts => "localhost:9200"
+    manage_template => false
+    index => "%{[@metadata][beat]}-%{[@metadata][version]}-%{+YYYY.MM.dd}"
+  }
+}
+----
+
+
+Prior to 6.0, the recommended setting was:
+
+[source,yaml]
+----
+    index => "%{[@metadata][beat]}-%{+YYYY.MM.dd}" 
+----
+
+    
+The index templates that ship with 6.0 are applied to new indexes that match the
+pattern `[beat]-[version]-*`. You must update your Logstash config, or the
+templates will not be applied. 
+
 [[breaking-changes-types]]
 ==== Filebeat prospector type and document type changes
 
 The `document_type` setting, from the prospector configuration, was removed
-because the `_type` concept is being removed from Elasticsearch. Instead of the
-`document_type` setting, you can use a custom field.
+because the `_type` concept is being
+{elasticsearch}/removal-of-types.html[removed from Elasticsearch]. Instead of
+the `document_type` setting, you can use a custom field.
 
 This has led also to the rename of the `input_type` configuration setting to
 `type`. This change is backwards compatible because the old setting still

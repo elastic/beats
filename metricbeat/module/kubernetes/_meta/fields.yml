@@ -1,9 +1,8 @@
 - key: kubernetes
   title: "Kubernetes"
   description: >
-    beta[]
-
     Kubernetes metrics
+  release: beta
   short_config: false
   fields:
     - name: kubernetes

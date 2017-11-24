@@ -3,6 +3,7 @@
   description: >
     HAProxy Module
   short_config: false
+  release: ga
   fields:
     - name: haproxy
       type: group

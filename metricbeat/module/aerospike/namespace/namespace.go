@@ -36,7 +36,7 @@ type MetricSet struct {
 func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
 	config := struct{}{}
 
-	cfgwarn.Experimental("The aerospike namespace metricset is experimental")
+	cfgwarn.Beta("The aerospike namespace metricset is beta")
 
 	if err := base.Module().UnpackConfig(&config); err != nil {
 		return nil, err

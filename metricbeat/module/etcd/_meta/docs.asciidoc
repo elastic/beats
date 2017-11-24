@@ -1,5 +1,3 @@
-== Etcd Module
-
 This is the Etcd Module. The Etcd module uses https://coreos.com/etcd/docs/latest/v2/api.html [Etcd v2 API] to collect metrics.
 
 

@@ -3,6 +3,10 @@ This file is generated! See scripts/docs_collector.py
 ////
 
 [[metricbeat-metricset-elasticsearch-node_stats]]
+=== Elasticsearch node_stats metricset
+
+beta[]
+
 include::../../../module/elasticsearch/node_stats/_meta/docs.asciidoc[]
 
 

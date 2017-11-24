@@ -2,6 +2,7 @@ package cmd
 
 import (
 	"flag"
+	"fmt"
 	"os"
 	"strings"
 
@@ -9,6 +10,7 @@ import (
 	"github.com/spf13/pflag"
 
 	"github.com/elastic/beats/libbeat/beat"
+	"github.com/elastic/beats/libbeat/cfgfile"
 )
 
 func init() {
@@ -50,6 +52,14 @@ func GenRootCmdWithRunFlags(name, version string, beatCreator beat.Creator, runF
 func GenRootCmdWithIndexPrefixWithRunFlags(name, indexPrefix, version string, beatCreator beat.Creator, runFlags *pflag.FlagSet) *BeatsRootCmd {
 	rootCmd := &BeatsRootCmd{}
 	rootCmd.Use = name
+
+	// Due to a dependence upon the beat name, the default config file path
+	err := cfgfile.ChangeDefaultCfgfileFlag(name)
+	if err != nil {
+		panic(fmt.Errorf("failed to set default config file path: %v", err))
+	}
+
+	// must be updated prior to CLI flag handling.
 
 	rootCmd.RunCmd = genRunCmd(name, indexPrefix, version, beatCreator, runFlags)
 	rootCmd.SetupCmd = genSetupCmd(name, indexPrefix, version, beatCreator)

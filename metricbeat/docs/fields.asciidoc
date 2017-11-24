@@ -33,6 +33,7 @@ grouped in the following categories:
 * <<exported-fields-kibana>>
 * <<exported-fields-kubernetes-processor>>
 * <<exported-fields-kubernetes>>
+* <<exported-fields-logstash>>
 * <<exported-fields-memcached>>
 * <<exported-fields-mongodb>>
 * <<exported-fields-mysql>>
@@ -51,7 +52,6 @@ grouped in the following categories:
 [[exported-fields-aerospike]]
 == Aerospike fields
 
-experimental[]
 Aerospike module
 
 
@@ -770,7 +770,6 @@ Error type.
 [[exported-fields-ceph]]
 == Ceph fields
 
-beta[]
 Ceph module
 
 
@@ -1193,6 +1192,117 @@ Last updated
 
 
 [float]
+== osd_tree fields
+
+ceph osd tree info
+
+
+
+[float]
+=== `ceph.osd_tree.id`
+
+type: long
+
+osd or bucket node id
+
+
+[float]
+=== `ceph.osd_tree.name`
+
+type: text
+
+osd or bucket node name
+
+
+[float]
+=== `ceph.osd_tree.type`
+
+type: keyword
+
+osd or bucket node type, illegal type include osd, host, root etc.
+
+
+[float]
+=== `ceph.osd_tree.type_id`
+
+type: long
+
+osd or bucket node typeID
+
+
+[float]
+=== `ceph.osd_tree.children`
+
+type: text
+
+bucket children list, seperate by comma.
+
+
+[float]
+=== `ceph.osd_tree.crush_weight`
+
+type: float
+
+osd node crush weight
+
+
+[float]
+=== `ceph.osd_tree.depth`
+
+type: long
+
+node depth
+
+
+[float]
+=== `ceph.osd_tree.exists`
+
+type: boolean
+
+is node still exist or not(1-yes, 0-no)
+
+
+[float]
+=== `ceph.osd_tree.primary_affinity`
+
+type: float
+
+the weight of reading data from primary osd
+
+
+[float]
+=== `ceph.osd_tree.reweight`
+
+type: long
+
+the reweight of osd
+
+
+[float]
+=== `ceph.osd_tree.status`
+
+type: keyword
+
+status of osd, it should be up or down
+
+
+[float]
+=== `ceph.osd_tree.device_class`
+
+type: keyword
+
+the device class of osd, like hdd, ssd etc.
+
+
+[float]
+=== `ceph.osd_tree.father`
+
+type: keyword
+
+the parent node of this osd or bucket node
+
+
+[float]
 == pool_disk fields
 
 pool_disk
@@ -1364,7 +1474,6 @@ The document type. Always set to "metricsets".
 [[exported-fields-couchbase]]
 == Couchbase fields
 
-beta[]
 Metrics collected from Couchbase servers.
 
 
@@ -1865,7 +1974,6 @@ Image labels.
 [[exported-fields-docker]]
 == Docker fields
 
-beta[]
 Docker stats collected from Docker.
 
 
@@ -2189,7 +2297,6 @@ Image tags.
 [float]
 == info fields
 
-beta[]
 Info metrics based on https://docs.docker.com/engine/reference/api/docker_remote_api_v1.24/#/display-system-wide-information.
 
 
@@ -2438,7 +2545,6 @@ Total number of outgoing packets.
 [[exported-fields-dropwizard]]
 == Dropwizard fields
 
-beta[]
 Stats collected from Dropwizard.
 
 
@@ -2448,10 +2554,10 @@ Stats collected from Dropwizard.
 
 
 
+
 [[exported-fields-elasticsearch]]
 == Elasticsearch fields
 
-experimental[]
 Elasticsearch module
 
 
@@ -2834,7 +2940,6 @@ format: bytes
 [[exported-fields-etcd]]
 == Etcd fields
 
-[]experimental
 etcd Module
 
 
@@ -3372,9 +3477,8 @@ Bytes in non-idle span.
 
 
 [[exported-fields-graphite]]
-== graphite fields
+== Graphite fields
 
-[]experimental
 graphite Module
 
 
@@ -4029,7 +4133,7 @@ Total number of HTTP requests received.
 
 type: long
 
-Number of response errors. This value includes the number of data transfers aborted by the server (haproxy.stat.server.aborted).  Some other errors are:
+Number of response errors. This value includes the number of data transfers aborted by the server (haproxy.stat.server.aborted). Some other errors are:
 * write errors on the client socket (won't be counted for the server stat) * failure applying filters to the response
 
 
@@ -4274,7 +4378,7 @@ Number of data transfers aborted by the server. This value is included in haprox
 
 type: integer
 
-Number of backend servers that are active, meaning that they are healthy and can receive requests from the load balancer. 
+Number of backend servers that are active, meaning that they are healthy and can receive requests from the load balancer.
 
 
 [float]
@@ -4435,11 +4539,23 @@ The HTTP headers received
 
 
 [float]
-=== `http.response.status_code`
+=== `http.response.code`
 
 type: keyword
 
+example: 404
+
 The HTTP status code
+
+
+[float]
+=== `http.response.phrase`
+
+type: keyword
+
+example: Not found
+
+The HTTP status phrase
 
 
 [float]
@@ -4465,7 +4581,6 @@ server
 [[exported-fields-jolokia]]
 == Jolokia fields
 
-beta[]
 Jolokia module
 
 
@@ -4476,11 +4591,11 @@ Jolokia module
 jolokia contains metrics exposed via jolokia agent
 
 
+
 [[exported-fields-kafka]]
 == Kafka fields
 
 Kafka module
-beta[]
 
 
 
@@ -4711,7 +4826,6 @@ Broker address
 [[exported-fields-kibana]]
 == Kibana fields
 
-experimental[]
 Kibana module
 
 
@@ -4859,7 +4973,6 @@ Kubernetes container image
 [[exported-fields-kubernetes]]
 == Kubernetes fields
 
-beta[]
 Kubernetes metrics
 
 
@@ -6024,10 +6137,106 @@ type: long
 Total inodes
 
 
+[[exported-fields-logstash]]
+== Logstash fields
+
+Logstash module
+
+
+
+[float]
+== logstash fields
+
+
+
+
+[float]
+== node fields
+
+node
+
+
+
+[float]
+=== `logstash.node.host`
+
+type: keyword
+
+Host name
+
+
+[float]
+=== `logstash.node.version`
+
+type: keyword
+
+Logstash Version
+
+
+[float]
+== jvm fields
+
+JVM Info
+
+
+
+[float]
+=== `logstash.node.jvm.version`
+
+type: keyword
+
+Version
+
+
+[float]
+=== `logstash.node.jvm.pid`
+
+type: long
+
+Pid
+
+
+[float]
+== node_stats fields
+
+node_stats metrics.
+
+
+
+[float]
+== events fields
+
+Events stats
+
+
+
+[float]
+=== `logstash.node_stats.events.in`
+
+type: long
+
+Incoming events counter.
+
+
+[float]
+=== `logstash.node_stats.events.out`
+
+type: long
+
+Outgoing events counter.
+
+
+[float]
+=== `logstash.node_stats.events.filtered`
+
+type: long
+
+Filtered events counter.
+
+
 [[exported-fields-memcached]]
 == Memcached fields
 
-beta[]
 Memcached module
 
 
@@ -7891,7 +8100,6 @@ Time at which these statistics were last reset.
 [[exported-fields-prometheus]]
 == Prometheus fields
 
-beta[]
 Stats collected from Prometheus.
 
 
@@ -7951,7 +8159,6 @@ Number of memory chunks that are not yet persisted to disk.
 [[exported-fields-rabbitmq]]
 == RabbitMQ fields
 
-experimental[]
 RabbitMQ module
 
 
@@ -8138,7 +8345,7 @@ type: long
 
 format: bytes
 
-Point at which the memory alarm will go off. 
+Point at which the memory alarm will go off.
 
 
 [float]
@@ -8146,7 +8353,7 @@ Point at which the memory alarm will go off.
 
 type: long
 
-Memory used in bytes. 
+Memory used in bytes.
 
 
 [float]
@@ -8170,7 +8377,7 @@ Number of Mnesia transactions which have been performed that did not require wri
 
 type: long
 
-Number of messages which have been read from the message store. 
+Number of messages which have been read from the message store.
 
 
 [float]
@@ -8178,7 +8385,7 @@ Number of messages which have been read from the message store.
 
 type: long
 
-Number of messages which have been written to the message store. 
+Number of messages which have been written to the message store.
 
 
 [float]
@@ -8226,7 +8433,7 @@ Number of records written to the queue index journal.
 
 type: long
 
-Number of records read from the queue index. 
+Number of records read from the queue index.
 
 
 [float]
@@ -8234,7 +8441,7 @@ Number of records read from the queue index.
 
 type: long
 
-Number of records written to the queue index. 
+Number of records written to the queue index.
 
 
 [float]
@@ -8242,7 +8449,7 @@ Number of records written to the queue index.
 
 type: long
 
-Average number of Erlang processes waiting to run. 
+Average number of Erlang processes waiting to run.
 
 
 [float]
@@ -8250,7 +8457,7 @@ Average number of Erlang processes waiting to run.
 
 type: long
 
-File descriptors available for use as sockets. 
+File descriptors available for use as sockets.
 
 
 [float]
@@ -9652,7 +9859,7 @@ The average queue length of the requests that were issued to the device.
 
 type: float
 
-The average queue length of the requests that were issued to the device.
+The average time spent for requests issued to the device to be served.
 
 
 [float]
@@ -11297,7 +11504,7 @@ Free Memory of Guest in bytes
 
 type: object
 
-Custom fields      
+Custom fields
 
 
 [[exported-fields-windows]]
@@ -11316,24 +11523,26 @@ beta[] Module for Windows
 [float]
 == service fields
 
-`service` contains the status for windows services.
+`service` contains the status for Windows services.
 
 
 
 [float]
-=== `windows.service.uptime.ms`
+=== `windows.service.id`
 
-type: long
+type: keyword
 
-format: duration
+example: hW3NJFc1Ap
 
-`uptime` contains the service uptime metric.
+A unique ID for the service. It is a hash of the machine's GUID and the service name.
 
 
 [float]
 === `windows.service.name`
 
 type: keyword
+
+example: Wecsvc
 
 The service name.
 
@@ -11343,6 +11552,8 @@ The service name.
 
 type: keyword
 
+example: Windows Event Collector
+
 The display name of the service.
 
 
@@ -11351,7 +11562,7 @@ The display name of the service.
 
 type: keyword
 
-The start type of the service. The possible values are `ServiceAutoStart`, `ServiceBootStart`, `ServiceDemandStart`, `ServiceDisabled`, and `ServiceSystemStart`.
+The startup type of the service. The possible values are `Automatic`, `Boot`, `Disabled`, `Manual`, and `System`.
 
 
 [float]
@@ -11359,7 +11570,35 @@ The start type of the service. The possible values are `ServiceAutoStart`, `Serv
 
 type: keyword
 
-The actual state of the service. The possible values are `ServiceContinuePending`, `ServicePausePending`, `ServicePaused`, `ServiceRunning`, `ServiceStartPending`, `ServiceStopPending`, and `ServiceStopped`.
+The actual state of the service. The possible values are `Continuing`, `Pausing`, `Paused`, `Running`, `Starting`, `Stopping`, and `Stopped`.
+
+
+[float]
+=== `windows.service.exit_code`
+
+type: keyword
+
+For `Stopped` services this is the error code that service reports when starting to stopping. This will be the generic Windows service error code unless the service provides a service-specific error code.
+
+
+[float]
+=== `windows.service.pid`
+
+type: long
+
+example: 1092
+
+For `Running` services this is the associated process PID.
+
+
+[float]
+=== `windows.service.uptime.ms`
+
+type: long
+
+format: duration
+
+The service's uptime specified in milliseconds.
 
 
 [[exported-fields-zookeeper]]
