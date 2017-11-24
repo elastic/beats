@@ -12,9 +12,10 @@ import (
 )
 
 type Win32Service struct {
-	Name      string
-	ProcessId uint32
-	State     string
+	Name        string
+	ProcessId   uint32
+	DisplayName string
+	State       string
 }
 
 func TestData(t *testing.T) {
@@ -61,6 +62,11 @@ func TestReadService(t *testing.T) {
 					assert.Equal(t, w.ProcessId, s["pid"])
 				}
 				assert.Equal(t, w.State, s["state"])
+
+				// For some services DisplayName and Name are the same. It seems to be a bug from the wmi query.
+				if w.DisplayName != w.Name {
+					assert.Equal(t, w.DisplayName, s["display_name"])
+				}
 				found = true
 				break
 			}
