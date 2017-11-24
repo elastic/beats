@@ -1,6 +1,7 @@
 package mysql
 
 import (
+	"encoding/binary"
 	"errors"
 	"fmt"
 	"strconv"
@@ -317,7 +318,7 @@ func mysqlMessageParser(s *mysqlStream) (bool, bool) {
 			if m.isRequest {
 				// get the statement id
 				if m.typ == mysqlCmdStmtExecute || m.typ == mysqlCmdStmtClose {
-					m.statementID = int(s.data[m.start+5]) | int(s.data[m.start+6])<<8 | int(s.data[m.start+7])<<16 | int(s.data[m.start+8])<<24
+					m.statementID = int(binary.LittleEndian.Uint32(s.data[m.start+5:]))
 				} else {
 					m.query = string(s.data[m.start+5 : m.end])
 				}
@@ -361,10 +362,9 @@ func mysqlMessageParser(s *mysqlStream) (bool, bool) {
 			// PREPARE_OK packet for Prepared Statement
 			// a trick for classify special OK packet
 			if m.isOK && m.packetLength == 12 {
-				idPtr := s.data[m.start+5 : m.start+13]
-				m.statementID = int(idPtr[0]) | int(idPtr[1])<<8 | int(idPtr[2])<<16 | int(idPtr[3])<<24
-				m.numberOfFields = int(idPtr[4]) | int(idPtr[5])<<8
-				m.numberOfParameter = int(idPtr[6]) | int(idPtr[7])<<8
+				m.statementID = int(binary.LittleEndian.Uint32(s.data[m.start+5:]))
+				m.numberOfFields = int(binary.LittleEndian.Uint16(s.data[m.start+9:]))
+				m.numberOfParameter = int(binary.LittleEndian.Uint16(s.data[m.start+11:]))
 				if m.numberOfFields > 0 {
 					s.parseState = mysqlStateEatFields
 				} else {
@@ -868,7 +868,7 @@ func (mysql *mysqlPlugin) parseMysqlExecuteStatement(data []byte, stmtdata *mysq
 				logp.Debug("mysql", "Data too small")
 				return []string{}
 			}
-			valueString := strconv.Itoa(int(data[paramOffset]) | int(data[paramOffset+1])<<8)
+			valueString := strconv.Itoa(int(binary.LittleEndian.Uint16(data[paramOffset:])))
 			paramString = append(paramString, valueString)
 			paramOffset += 2
 		// FIELD_TYPE_LONG
@@ -877,7 +877,7 @@ func (mysql *mysqlPlugin) parseMysqlExecuteStatement(data []byte, stmtdata *mysq
 				logp.Debug("mysql", "Data too small")
 				return []string{}
 			}
-			valueString := strconv.Itoa(int(data[paramOffset]) | int(data[paramOffset+1])<<8 | int(data[paramOffset+2])<<16 | int(data[paramOffset+3])<<24)
+			valueString := strconv.Itoa(int(binary.LittleEndian.Uint32(data[paramOffset:])))
 			paramString = append(paramString, valueString)
 			paramOffset += 4
 		//FIELD_TYPE_FLOAT
@@ -915,7 +915,7 @@ func (mysql *mysqlPlugin) parseMysqlExecuteStatement(data []byte, stmtdata *mysq
 			}
 			paramOffset++
 			if paramLen >= 2 {
-				year = strconv.Itoa((int(data[paramOffset]) | int(data[paramOffset+1])<<8))
+				year = strconv.Itoa(int(binary.LittleEndian.Uint16(data[paramOffset:])))
 			}
 			if paramLen >= 4 {
 				month = strconv.Itoa(int(data[paramOffset+2]))
