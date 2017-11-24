@@ -122,6 +122,8 @@ https://github.com/elastic/beats/compare/v6.0.0-beta2...master[Check the HEAD di
 
 *Packetbeat*
 
+- Configure good defaults for `add_kubernetes_metadata`. {pull}5707[5707]
+
 *Winlogbeat*
 
 ==== Deprecated

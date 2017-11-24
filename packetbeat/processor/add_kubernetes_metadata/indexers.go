@@ -12,12 +12,11 @@ func init() {
 	//Add IP Port Indexer as a default indexer
 	kubernetes.Indexing.AddDefaultIndexerConfig(kubernetes.IPPortIndexerName, *cfg)
 
-	config := map[string]interface{}{
-		"lookup_fields": []string{"metricset.host"},
-	}
-	fieldCfg, err := common.NewConfigFrom(config)
+	formatCfg, err := common.NewConfigFrom(map[string]interface{}{
+		"format": "%{[ip]}:%{[port]}",
+	})
 	if err == nil {
 		//Add field matcher with field to lookup as metricset.host
-		kubernetes.Indexing.AddDefaultMatcherConfig(kubernetes.FieldMatcherName, *fieldCfg)
+		kubernetes.Indexing.AddDefaultMatcherConfig(kubernetes.FieldFormatMatcherName, *formatCfg)
 	}
 }
