@@ -226,12 +226,12 @@ func resolveVariable(vars map[string]interface{}, value interface{}) (interface{
 }
 
 // applyTemplate applies a Golang text/template. If specialDelims is set to true,
-// the delimiters are set to `{%` and `%}` instead of `{{` and `}}`. These are easier to use
+// the delimiters are set to `{<` and `>}` instead of `{{` and `}}`. These are easier to use
 // in pipeline definitions.
 func applyTemplate(vars map[string]interface{}, templateString string, specialDelims bool) (string, error) {
 	tpl := template.New("text")
 	if specialDelims {
-		tpl = tpl.Delims("{%", "%}")
+		tpl = tpl.Delims("{<", ">}")
 	}
 	tpl, err := tpl.Parse(templateString)
 	if err != nil {
