@@ -13,8 +13,6 @@ import (
 )
 
 func TestFetch(t *testing.T) {
-	t.Skipf("Test is currently skipped as `node_stats` test is flaky.")
-
 	compose.EnsureUpWithTimeout(t, 120, "logstash")
 
 	f := mbtest.NewEventFetcher(t, logstash.GetConfig("node_stats"))
