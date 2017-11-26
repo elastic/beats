@@ -214,7 +214,7 @@ type ModuleConfig struct {
 	Period     time.Duration `config:"period"     validate:"positive"`
 	Timeout    time.Duration `config:"timeout"    validate:"positive"`
 	Module     string        `config:"module"     validate:"required"`
-	MetricSets []string      `config:"metricsets" validate:"required"`
+	MetricSets []string      `config:"metricsets"`
 	Enabled    bool          `config:"enabled"`
 	Raw        bool          `config:"raw"`
 }
