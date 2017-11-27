@@ -308,7 +308,7 @@ func getServiceInformation(rawService *EnumServiceStatusProcess, servicesBuffer 
 	if ServiceState(rawService.ServiceStatusProcess.DwCurrentState) != ServiceStopped {
 		processUpTime, err := getServiceUptime(rawService.ServiceStatusProcess.DwProcessId)
 		if err != nil {
-			logp.Warn("Uptime for service %v is not available because of insufficient rights", service.ServiceName)
+			logp.Warn("Uptime for service %v is not available", service.ServiceName)
 		}
 		service.Uptime = processUpTime / time.Millisecond
 	}
