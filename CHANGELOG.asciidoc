@@ -40,6 +40,8 @@ https://github.com/elastic/beats/compare/v6.0.0...master[Check the HEAD diff]
 
 *Metricbeat*
 
+- Fix map overwrite in docker diskio module. {issue}5582[5582]
+
 *Packetbeat*
 
 *Winlogbeat*
