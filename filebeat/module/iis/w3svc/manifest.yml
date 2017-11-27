@@ -4,6 +4,8 @@ var:
   - name: paths
     default:
       - C:/inetpub/logs/LogFiles/*/*
+    os.darwin: [""]
+    os.linux: [""]
     os.windows:
       - C:/inetpub/logs/LogFiles/*/*
 
