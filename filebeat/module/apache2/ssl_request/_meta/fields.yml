@@ -1,4 +1,4 @@
-- name: ssl_access
+- name: ssl_request
   type: group
   description: >
     Contains fields for the Apache2 HTTPD ssl access logs.
