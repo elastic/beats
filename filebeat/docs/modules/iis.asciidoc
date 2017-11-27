@@ -5,7 +5,9 @@ This file is generated! See scripts/docs_collector.py
 [[filebeat-module-iis]]
 == iis module
 
-This is the iis module.
+This is the iis module for Filebeat for use with Internet Information Services (IIS) for Windows OS.
+
+Note: Running IIS on anything other than Windows is not supported.
 
 
 [float]
