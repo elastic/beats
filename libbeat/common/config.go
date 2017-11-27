@@ -10,12 +10,11 @@ import (
 	"runtime"
 	"strings"
 
-	ucfg "github.com/elastic/go-ucfg"
-	"github.com/elastic/go-ucfg/yaml"
-
 	"github.com/elastic/beats/libbeat/common/file"
 	"github.com/elastic/beats/libbeat/logp"
+	ucfg "github.com/elastic/go-ucfg"
 	"github.com/elastic/go-ucfg/cfgutil"
+	"github.com/elastic/go-ucfg/yaml"
 )
 
 var flagStrictPerms = flag.Bool("strict.perms", true, "Strict permission checking on config files")
@@ -63,7 +62,7 @@ var debugBlacklist = MakeStringSet(
 )
 
 // make hasSelector and configDebugf available for unit testing
-var hasSelector = logp.HasSelector
+var hasSelector = func(string) bool { return false }
 var configDebugf = logp.Debug
 
 func NewConfig() *Config {

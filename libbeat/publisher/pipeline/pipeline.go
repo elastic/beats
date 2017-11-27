@@ -35,7 +35,7 @@ import (
 type Pipeline struct {
 	beatInfo beat.Info
 
-	logger *logp.Logger
+	logger *logp.SimpleLogger
 	queue  queue.Queue
 	output *outputController
 
@@ -140,7 +140,7 @@ func New(
 ) (*Pipeline, error) {
 	var err error
 
-	log := defaultLogger
+	log := logp.NewSimpleLogger("publish")
 	annotations := settings.Annotations
 	processors := settings.Processors
 	disabledOutput := settings.Disabled
@@ -253,7 +253,7 @@ func (p *Pipeline) Close() error {
 	// shutdown queue
 	err := p.queue.Close()
 	if err != nil {
-		log.Err("pipeline queue shutdown error: ", err)
+		p.logger.Error("pipeline queue shutdown error", logp.Error(err))
 	}
 
 	p.observer.cleanup()

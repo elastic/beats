@@ -48,6 +48,7 @@ type MetricSet struct {
 	config  Config
 	reader  EventProducer
 	scanner EventProducer
+	log     *logp.Logger
 
 	// Runtime params that are initialized on Run().
 	bucket       datastore.BoltBucket
@@ -74,6 +75,7 @@ func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
 		BaseMetricSet: base,
 		config:        config,
 		reader:        r,
+		log:           logp.NewLogger(metricsetName),
 	}
 
 	if config.ScanAtStart {
@@ -83,7 +85,7 @@ func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
 		}
 	}
 
-	debugf("Initialized the audit file event reader. Running as euid=%v", os.Geteuid())
+	ms.log.Debug("Initialized the audit file event reader.", logp.Int("euid", os.Geteuid()))
 
 	return ms, nil
 }
@@ -203,6 +205,11 @@ func (ms *MetricSet) hasFileChangedSinceLastEvent(event *Event) bool {
 	if changed && logp.IsDebug(metricsetName) {
 		debugf("file at %v has changed since last seen: old=%v, new=%v",
 			event.Path, lastEvent, event)
+		ms.log.Debug("File has changed since last seen",
+			logp.String("file.path", event.Path),
+			logp.Stringer("old_event", lastEvent),
+			logp.Stringer("new_event", event),
+		)
 	}
 	return changed
 }

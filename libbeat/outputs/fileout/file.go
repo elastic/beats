@@ -1,8 +1,12 @@
 package fileout
 
 import (
+	"os"
+	"path/filepath"
+
 	"github.com/elastic/beats/libbeat/beat"
 	"github.com/elastic/beats/libbeat/common"
+	"github.com/elastic/beats/libbeat/common/file"
 	"github.com/elastic/beats/libbeat/logp"
 	"github.com/elastic/beats/libbeat/outputs"
 	"github.com/elastic/beats/libbeat/outputs/codec"
@@ -16,11 +20,12 @@ func init() {
 type fileOutput struct {
 	beat     beat.Info
 	observer outputs.Observer
-	rotator  logp.FileRotator
+	rotator  *file.FileRotator
 	codec    codec.Codec
+	logger   *logp.Logger
 }
 
-// New instantiates a new file output instance.
+// NewLogger instantiates a new file output instance.
 func makeFileout(
 	beat beat.Info,
 	observer outputs.Observer,
@@ -34,7 +39,11 @@ func makeFileout(
 	// disable bulk support in publisher pipeline
 	cfg.SetInt("bulk_max_size", -1, -1)
 
-	fo := &fileOutput{beat: beat, observer: observer}
+	fo := &fileOutput{
+		beat:     beat,
+		observer: observer,
+		logger:   logp.NewLogger("output.file"),
+	}
 	if err := fo.init(beat, config); err != nil {
 		return outputs.Fail(err)
 	}
@@ -42,52 +51,43 @@ func makeFileout(
 	return outputs.Success(-1, 0, fo)
 }
 
-func (out *fileOutput) init(beat beat.Info, config config) error {
+func (out *fileOutput) init(beat beat.Info, c config) error {
+	var path string
+	if c.Filename != "" {
+		path = filepath.Join(c.Path, c.Filename)
+	} else {
+		path = filepath.Join(c.Path, out.beat.Beat+".json")
+	}
+
 	var err error
-
-	out.rotator.Path = config.Path
-	out.rotator.Name = config.Filename
-	if out.rotator.Name == "" {
-		out.rotator.Name = out.beat.Beat
-	}
-
-	enc, err := codec.CreateEncoder(beat, config.Codec)
+	out.rotator, err = file.NewFileRotator(
+		path,
+		file.MaxSizeBytes(c.RotateEveryKb*1024),
+		file.MaxBackups(c.NumberOfFiles),
+		file.Permissions(os.FileMode(c.Permissions)),
+	)
 	if err != nil {
 		return err
 	}
 
-	out.codec = enc
-
-	logp.Info("File output path set to: %v", out.rotator.Path)
-	logp.Info("File output base filename set to: %v", out.rotator.Name)
-
-	logp.Info("File output permissions set to: %#o", config.Permissions)
-	out.rotator.Permissions = &config.Permissions
-
-	rotateeverybytes := uint64(config.RotateEveryKb) * 1024
-	logp.Info("Rotate every bytes set to: %v", rotateeverybytes)
-	out.rotator.RotateEveryBytes = &rotateeverybytes
-
-	keepfiles := config.NumberOfFiles
-	logp.Info("Number of files set to: %v", keepfiles)
-	out.rotator.KeepFiles = &keepfiles
-
-	err = out.rotator.CreateDirectory()
+	out.codec, err = codec.CreateEncoder(beat, c.Codec)
 	if err != nil {
 		return err
 	}
 
-	err = out.rotator.CheckIfConfigSane()
-	if err != nil {
-		return err
-	}
+	out.logger.Info("Initialized file output",
+		logp.String("path", path),
+		logp.Uint("max_size_bytes", c.RotateEveryKb*1024),
+		logp.Uint("max_backups", c.NumberOfFiles),
+		logp.Stringer("permissions", os.FileMode(c.Permissions)),
+	)
 
 	return nil
 }
 
 // Implement Outputer
 func (out *fileOutput) Close() error {
-	return nil
+	return out.rotator.Close()
 }
 
 func (out *fileOutput) Publish(
@@ -106,23 +106,22 @@ func (out *fileOutput) Publish(
 		serializedEvent, err := out.codec.Encode(out.beat.Beat, &event.Content)
 		if err != nil {
 			if event.Guaranteed() {
-				logp.Critical("Failed to serialize the event: %v", err)
+				out.logger.Error("Failed to serialize the event", logp.Error(err))
 			} else {
-				logp.Warn("Failed to serialize the event: %v", err)
+				out.logger.Warn("Failed to serialize the event", logp.Error(err))
 			}
 
 			dropped++
 			continue
 		}
 
-		err = out.rotator.WriteLine(serializedEvent)
-		if err != nil {
+		if _, err = out.rotator.Write(append(serializedEvent, '\n')); err != nil {
 			st.WriteError(err)
 
 			if event.Guaranteed() {
-				logp.Critical("Writing event to file failed with: %v", err)
+				out.logger.Error("Writing event to file failed", logp.Error(err))
 			} else {
-				logp.Warn("Writing event to file failed with: %v", err)
+				out.logger.Warn("Writing event to file failed", logp.Error(err))
 			}
 
 			dropped++

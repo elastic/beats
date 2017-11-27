@@ -1,6 +1,6 @@
 // +build !integration
 
-package logp
+package monitoring
 
 import (
 	"expvar"
