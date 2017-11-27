@@ -8,7 +8,7 @@
     #var.paths:
 
   # SSL Request Logs
-  ssl:
+  ssl_request:
     enabled: true
 
     # Set custom paths for the log files. If left empty,
