@@ -4,6 +4,7 @@
     beta[]
     Module for Windows
   short_config: false
+  release: beta
   fields:
     - name: windows
       type: group

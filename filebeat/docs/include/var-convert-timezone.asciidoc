@@ -1,0 +1,8 @@
+*`var.convert_timezone`*::
+
+If this option is enabled, Filebeat reads the local timezone and uses it at log
+parsing time to convert the timestamp to UTC. The local timezone is also added
+in each event in a dedicated field (`beat.timezone`). The conversion is only
+possible in Elasticsearch >= 6.1. If the Elasticsearch version is less than 6.1,
+the `beat.timezone` field is added, but the conversion to UTC is not made.  The
+default is `false`.

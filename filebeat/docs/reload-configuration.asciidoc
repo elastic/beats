@@ -82,8 +82,6 @@ definitions. For example:
 
 === Live reloading
 
-beta[]
-
 You can configure Filebeat to dynamically reload configuration files when there
 are changes. This feature is available for prospector and module configuration
 files only.

@@ -2787,14 +2787,6 @@ The version of the TLS protocol by which the client wishes to communicate during
 
 
 [float]
-=== `tls.client_hello.timestamp`
-
-type: date
-
-The current time and date according to the client's internal clock.
-
-
-[float]
 === `tls.client_hello.supported_ciphers`
 
 type: array
@@ -2846,14 +2838,6 @@ Length of the session ticket, if provided, or an empty string to advertise suppo
 type: keyword
 
 The version of the TLS protocol that is used for this session. It is the highest version supported by the server not exceeding the version requested in the client hello.
-
-
-[float]
-=== `tls.server_hello.timestamp`
-
-type: date
-
-The current time and date according to the server's internal clock.
 
 
 [float]
@@ -2944,6 +2928,20 @@ The algorithm used for the certificate's signature.
 
 
 [float]
+=== `tls.client_certificate.alternative_names`
+
+type: array
+
+Subject Alternative Names for this certificate.
+
+[float]
+=== `tls.client_certificate.raw`
+
+type: keyword
+
+The raw certificate in PEM format.
+
+[float]
 == subject fields
 
 Subject represented by this certificate.
@@ -2983,13 +2981,6 @@ Province or region within country.
 type: keyword
 
 Name or host name identified by the certificate.
-
-[float]
-=== `tls.client_certificate.alternative_names`
-
-type: array
-
-Subject Alternative Names for this certificate.
 
 [float]
 == issuer fields
@@ -3083,6 +3074,20 @@ The algorithm used for the certificate's signature.
 
 
 [float]
+=== `tls.server_certificate.alternative_names`
+
+type: array
+
+Subject Alternative Names for this certificate.
+
+[float]
+=== `tls.server_certificate.raw`
+
+type: keyword
+
+The raw certificate in PEM format.
+
+[float]
 == subject fields
 
 Subject represented by this certificate.
@@ -3122,13 +3127,6 @@ Province or region within country.
 type: keyword
 
 Name or host name identified by the certificate.
-
-[float]
-=== `tls.server_certificate.alternative_names`
-
-type: array
-
-Subject Alternative Names for this certificate.
 
 [float]
 == issuer fields
@@ -3177,6 +3175,13 @@ Name or host name identified by the certificate.
 type: array
 
 Chain of trust for the server certificate.
+
+[float]
+=== `tls.client_certificate_chain`
+
+type: array
+
+Chain of trust for the client certificate.
 
 [[exported-fields-trans_event]]
 == Transaction Event fields

@@ -2,6 +2,7 @@
   type: group
   description: >
     `cpu` contains local CPU stats.
+  release: ga
   fields:
     - name: cores
       type: long

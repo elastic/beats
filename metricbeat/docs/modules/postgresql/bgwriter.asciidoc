@@ -3,6 +3,8 @@ This file is generated! See scripts/docs_collector.py
 ////
 
 [[metricbeat-metricset-postgresql-bgwriter]]
+=== PostgreSQL bgwriter metricset
+
 include::../../../module/postgresql/bgwriter/_meta/docs.asciidoc[]
 
 

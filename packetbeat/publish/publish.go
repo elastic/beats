@@ -170,22 +170,24 @@ func (p *transProcessor) normalizeTransAddr(event common.MapStr) bool {
 			event["direction"] = "out"
 		}
 
-		srcServer = p.GetServerName(src.IP)
 		event["client_ip"] = src.IP
 		event["client_port"] = src.Port
 		event["client_proc"] = src.Proc
-		event["client_server"] = srcServer
+		if _, exists := event["client_server"]; !exists {
+			event["client_server"] = p.GetServerName(src.IP)
+		}
 		delete(event, "src")
 	}
 
 	dst, ok := event["dst"].(*common.Endpoint)
 	debugf("has dst: %v", ok)
 	if ok {
-		dstServer = p.GetServerName(dst.IP)
 		event["ip"] = dst.IP
 		event["port"] = dst.Port
 		event["proc"] = dst.Proc
-		event["server"] = dstServer
+		if _, exists := event["server"]; !exists {
+			event["server"] = p.GetServerName(dst.IP)
+		}
 		delete(event, "dst")
 
 		//check if it's incoming transaction (as server)

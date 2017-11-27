@@ -6,7 +6,7 @@ import (
 )
 
 // Factory is used to create a new Outlet instance
-type Factory func(*common.Config) (Outleter, error)
+type Factory func(*common.Config, *common.MapStrPointer) (Outleter, error)
 
 // Outleter is the outlet for a prospector
 type Outleter interface {

@@ -20,6 +20,10 @@ var (
 func (p *Processor) process(fields common.Fields, path string, output common.MapStr) error {
 	for _, field := range fields {
 
+		if field.Name == "" {
+			continue
+		}
+
 		field.Path = path
 		var mapping common.MapStr
 
@@ -69,7 +73,6 @@ func (p *Processor) process(fields common.Fields, path string, output common.Map
 				return err
 			}
 			mapping["properties"] = properties
-
 		default:
 			mapping = p.other(&field)
 		}

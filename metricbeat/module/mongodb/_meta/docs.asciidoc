@@ -1,5 +1,3 @@
-== MongoDB module
-
 This module periodically fetches metrics from https://www.mongodb.com[MongoDB]
 servers.
 

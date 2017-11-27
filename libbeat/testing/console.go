@@ -4,9 +4,11 @@ import (
 	"fmt"
 	"io"
 	"os"
+	"runtime"
 	"strings"
 
 	"github.com/fatih/color"
+	"github.com/mattn/go-colorable"
 )
 
 // ConsoleDriver outputs test result to the given stdout/stderr descriptors
@@ -26,6 +28,11 @@ func NewConsoleDriver(stdout io.Writer) *ConsoleDriver {
 // NewConsoleDriverWithKiller initializes and returns a new console driver with output file
 // Killer function will be called on fatal errors
 func NewConsoleDriverWithKiller(stdout io.Writer, killer func()) *ConsoleDriver {
+	// On Windows we must wrap file outputs with a Colorable to achieve the right
+	// escape sequences.
+	if f, ok := stdout.(*os.File); ok && runtime.GOOS == "windows" {
+		stdout = colorable.NewColorable(f)
+	}
 	return &ConsoleDriver{
 		Stdout:   stdout,
 		level:    0,

@@ -46,7 +46,7 @@ type Reload struct {
 }
 
 type RunnerFactory interface {
-	Create(*common.Config) (Runner, error)
+	Create(config *common.Config, meta *common.MapStrPointer) (Runner, error)
 }
 
 type Runner interface {
@@ -114,7 +114,7 @@ func (rl *Reloader) Check(runnerFactory RunnerFactory) error {
 		if !c.Enabled() {
 			continue
 		}
-		_, err := runnerFactory.Create(c)
+		_, err := runnerFactory.Create(c, nil)
 		if err != nil {
 			return err
 		}
@@ -201,7 +201,7 @@ func (rl *Reloader) Run(runnerFactory RunnerFactory) {
 				// As module already exist, it must be removed from the stop list and not started
 				if !rl.registry.Has(hash) {
 					debugf("Add module to startlist: %v", hash)
-					runner, err := runnerFactory.Create(c)
+					runner, err := runnerFactory.Create(c, nil)
 					if err != nil {
 						logp.Err("Unable to create runner due to error: %v", err)
 						continue

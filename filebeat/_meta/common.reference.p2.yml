@@ -238,6 +238,23 @@ filebeat.prospectors:
   # Maximum size of the message received over UDP
   #max_message_size: 10240
 
+#========================== Filebeat autodiscover ==============================
+
+# Autodiscover allows you to detect changes in the system and spawn new modules
+# or prospectors as they happen.
+
+#filebeat.autodiscover:
+  # List of enabled autodiscover providers
+#  providers:
+#    - type: docker
+#      templates:
+#        - condition:
+#            equals.docker.container.image: busybox
+#          config:
+#            - type: log
+#              paths:
+#                - /var/lib/docker/containers/${data.docker.container.id}/*.log
+
 #========================= Filebeat global options ============================
 
 # Name of the registry file. If a relative path is used, it is considered relative to the

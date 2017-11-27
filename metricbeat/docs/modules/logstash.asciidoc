@@ -3,9 +3,11 @@ This file is generated! See scripts/docs_collector.py
 ////
 
 [[metricbeat-module-logstash]]
-== logstash module
+== Logstash module
 
-This is the logstash module.
+experimental[]
+
+This is the Logstash module.
 
 
 
@@ -19,7 +21,7 @@ in <<configuration-metricbeat>>. Here is an example configuration:
 ----
 metricbeat.modules:
 - module: logstash
-  metricsets: ["node"]
+  metricsets: ["node", "node_stats"]
   enabled: false
   period: 10s
   hosts: ["localhost"]
@@ -33,5 +35,9 @@ The following metricsets are available:
 
 * <<metricbeat-metricset-logstash-node,node>>
 
+* <<metricbeat-metricset-logstash-node_stats,node_stats>>
+
 include::logstash/node.asciidoc[]
+
+include::logstash/node_stats.asciidoc[]
 

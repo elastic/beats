@@ -43,9 +43,17 @@ The file metricset generates events when a file changes on disk.
 [float]
 === `audit.file.path`
 
-type: keyword
+type: text
 
 The path to the file.
+
+[float]
+=== `audit.file.path.raw`
+
+type: keyword
+
+The path to the file. This is an non-analyzed field that is useful for aggregations.
+
 
 [float]
 === `audit.file.target_path`

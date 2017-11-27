@@ -42,6 +42,27 @@ type metricSetFactoryInfo struct {
 	name       string
 	factory    MetricSetFactory
 	hostParser HostParser
+	isDefault  bool
+}
+
+// MetricSetOption sets an option for a MetricSetFactory that is being
+// registered.
+type MetricSetOption func(info *metricSetFactoryInfo)
+
+// WithHostParser specifies the HostParser that should be used with the
+// MetricSet.
+func WithHostParser(p HostParser) MetricSetOption {
+	return func(i *metricSetFactoryInfo) {
+		i.hostParser = p
+	}
+}
+
+// DefaultMetricSet specifies that the MetricSetFactory will be the default
+// when no MetricSet names are specified in the configuration.
+func DefaultMetricSet() MetricSetOption {
+	return func(i *metricSetFactoryInfo) {
+		i.isDefault = true
+	}
 }
 
 // Register contains the factory functions for creating new Modules and new
@@ -94,7 +115,28 @@ func (r *Register) AddModule(name string, factory ModuleFactory) error {
 // HostParser function for parsing the 'host' configuration data. An error is
 // returned if any parameter is empty or nil or if a factory has already been
 // registered under the name.
+//
+// Use MustAddMetricSet for new code.
 func (r *Register) AddMetricSet(module string, name string, factory MetricSetFactory, hostParser ...HostParser) error {
+	var opts []MetricSetOption
+	if len(hostParser) > 0 {
+		opts = append(opts, WithHostParser(hostParser[0]))
+	}
+	return r.addMetricSet(module, name, factory, opts...)
+}
+
+// MustAddMetricSet registers a new MetricSetFactory. It panics if any parameter
+// is empty or nil OR if a factory has already been registered under this name.
+func (r *Register) MustAddMetricSet(module, name string, factory MetricSetFactory, options ...MetricSetOption) {
+	if err := r.addMetricSet(module, name, factory, options...); err != nil {
+		panic(err)
+	}
+}
+
+// addMetricSet registers a new MetricSetFactory. An error is returned if any
+// parameter is empty or nil or if a factory has already been registered under
+// the name.
+func (r *Register) addMetricSet(module, name string, factory MetricSetFactory, options ...MetricSetOption) error {
 	r.lock.Lock()
 	defer r.lock.Unlock()
 
@@ -119,11 +161,13 @@ func (r *Register) AddMetricSet(module string, name string, factory MetricSetFac
 		return fmt.Errorf("metricset '%s/%s' cannot be registered with a nil factory", module, name)
 	}
 
-	var hp HostParser
-	if len(hostParser) > 0 {
-		hp = hostParser[0]
+	// Set the options.
+	msInfo := metricSetFactoryInfo{name: name, factory: factory}
+	for _, opt := range options {
+		opt(&msInfo)
 	}
-	r.metricSets[module][name] = metricSetFactoryInfo{name: name, factory: factory, hostParser: hp}
+
+	r.metricSets[module][name] = msInfo
 	logp.Info("MetricSet registered: %s/%s", module, name)
 	return nil
 }
@@ -146,12 +190,12 @@ func (r *Register) metricSetFactory(module, name string) (MetricSetFactory, Host
 	module = strings.ToLower(module)
 	name = strings.ToLower(name)
 
-	modules, exists := r.metricSets[module]
+	metricSets, exists := r.metricSets[module]
 	if !exists {
 		return nil, nil, fmt.Errorf("metricset '%s/%s' is not registered, module not found", module, name)
 	}
 
-	info, exists := modules[name]
+	info, exists := metricSets[name]
 	if !exists {
 		return nil, nil, fmt.Errorf("metricset '%s/%s' is not registered, metricset not found", module, name)
 	}
@@ -159,7 +203,34 @@ func (r *Register) metricSetFactory(module, name string) (MetricSetFactory, Host
 	return info.factory, info.hostParser, nil
 }
 
-//Modules returns the list of module names that are registered
+// defaultMetricSets returns the names of the default MetricSets for a module.
+// An error is returned if no default MetricSet is declared or the module does
+// not exist.
+func (r *Register) defaultMetricSets(module string) ([]string, error) {
+	r.lock.RLock()
+	defer r.lock.RUnlock()
+
+	module = strings.ToLower(module)
+
+	metricSets, exists := r.metricSets[module]
+	if !exists {
+		return nil, fmt.Errorf("module '%s' not found", module)
+	}
+
+	var defaults []string
+	for _, info := range metricSets {
+		if info.isDefault {
+			defaults = append(defaults, info.name)
+		}
+	}
+
+	if len(defaults) == 0 {
+		return nil, fmt.Errorf("no default metricset exists for module '%s'", module)
+	}
+	return defaults, nil
+}
+
+// Modules returns the list of module names that are registered
 func (r *Register) Modules() []string {
 	r.lock.RLock()
 	defer r.lock.RUnlock()
@@ -172,14 +243,14 @@ func (r *Register) Modules() []string {
 	return modules
 }
 
-//MetricSets returns the list of metricsets registered for a given module
+// MetricSets returns the list of MetricSets registered for a given module
 func (r *Register) MetricSets(module string) []string {
 	r.lock.RLock()
 	defer r.lock.RUnlock()
 
 	var metricsets []string
 
-	sets, ok := r.metricSets[module]
+	sets, ok := r.metricSets[strings.ToLower(module)]
 	if ok {
 		metricsets = make([]string, 0, len(sets))
 		for name := range sets {

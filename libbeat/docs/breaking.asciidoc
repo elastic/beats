@@ -75,6 +75,37 @@ If you used the `file` or `console` outputs for debugging purposes, in addition
 to the main output, we recommend using the `-d "publish"` option which logs the
 published events in the Filebeat logs.
 
+[[breaking-changes-ls-index]]
+==== Logstash index setting now requires version
+
+If you use the Logstash output to send data from Beats to Logstash, you need to
+update the `index` setting in your Logstash configuration to include the Beat
+version:
+
+[source,json]
+----
+output {
+  elasticsearch {
+    hosts => "localhost:9200"
+    manage_template => false
+    index => "%{[@metadata][beat]}-%{[@metadata][version]}-%{+YYYY.MM.dd}"
+  }
+}
+----
+
+
+Prior to 6.0, the recommended setting was:
+
+[source,yaml]
+----
+    index => "%{[@metadata][beat]}-%{+YYYY.MM.dd}" 
+----
+
+    
+The index templates that ship with 6.0 are applied to new indexes that match the
+pattern `[beat]-[version]-*`. You must update your Logstash config, or the
+templates will not be applied. 
+
 [[breaking-changes-types]]
 ==== Filebeat prospector type and document type changes
 

@@ -14,9 +14,9 @@ var hostParser = parse.URLHostParserBuilder{
 
 func init() {
 	// Register the MetricSetFactory function for the "status" MetricSet.
-	if err := mb.Registry.AddMetricSet("someapp", "status", NewMetricSet, hostParser); err != nil {
-		panic(err)
-	}
+	mb.Registry.MustAddMetricSet("someapp", "status", NewMetricSet,
+		mb.WithHostParser(hostParser),
+	)
 }
 
 type MetricSet struct {

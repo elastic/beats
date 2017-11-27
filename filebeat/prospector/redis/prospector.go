@@ -41,7 +41,7 @@ func NewProspector(cfg *common.Config, outletFactory channel.Factory, context pr
 		return nil, err
 	}
 
-	outlet, err := outletFactory(cfg)
+	outlet, err := outletFactory(cfg, context.DynamicFields)
 	if err != nil {
 		return nil, err
 	}

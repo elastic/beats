@@ -1,7 +1,3 @@
-== Docker module
-
-beta[]
-
 This module fetches metrics from https://www.docker.com/[Docker] containers.
 
 The Docker module is currently not tested on Windows.

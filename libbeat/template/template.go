@@ -11,8 +11,9 @@ import (
 
 var (
 	// Defaults used in the template
-	defaultDateDetection    = false
-	defaultTotalFieldsLimit = 10000
+	defaultDateDetection         = false
+	defaultTotalFieldsLimit      = 10000
+	defaultNumberOfRoutingShards = 30
 
 	// Array to store dynamicTemplate parts in
 	dynamicTemplates []common.MapStr
@@ -147,6 +148,13 @@ func (t *Template) generate(properties common.MapStr, dynamicTemplates []common.
 			},
 		},
 	}
+
+	// number_of_routing shards is only supported for ES version >= 6.1
+	version61, _ := common.NewVersion("6.1.0")
+	if !t.esVersion.LessThan(version61) {
+		indexSettings.Put("number_of_routing_shards", defaultNumberOfRoutingShards)
+	}
+
 	indexSettings.DeepUpdate(t.settings.Index)
 
 	var mappingName string

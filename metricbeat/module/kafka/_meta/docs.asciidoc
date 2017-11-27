@@ -1,6 +1,2 @@
-== Kafka module
-
-beta[]
-
 This is the Kafka module.
 
