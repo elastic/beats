@@ -61,6 +61,7 @@ func (m *MetricSet) Fetch() ([]common.MapStr, error) {
 	if err != nil {
 		return nil, err
 	}
+	defer mongoSession.Close()
 
 	// Get the list of databases names, which we'll use to call db.stats() on each
 	dbNames, err := mongoSession.DatabaseNames()
