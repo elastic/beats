@@ -258,6 +258,13 @@ The city name.
 
 [float]
 == error fields
+Fields from the Apache error logs.
+
+
+
+[float]
+=== `apache2.error.level`
+=======
 
 Fields from the Apache error logs.
 
@@ -292,6 +299,36 @@ The logged message.
 
 type: long
 
+The severity level of the message.
+
+
+[float]
+=== `apache2.error.client`
+
+type: keyword
+
+The IP address of the client that generated the error.
+
+
+[float]
+=== `apache2.error.message`
+
+type: text
+
+The logged message.
+
+
+[float]
+=== `apache2.error.pid`
+
+type: long
+
+The process ID.
+
+
+[float]
+=== `apache2.error.tid`
+=======
 The process ID.
 
 
@@ -312,9 +349,93 @@ The module producing the logged message.
 
 
 [float]
+== ssl_request fields
+
+Contains fields for the Apache2 HTTPD ssl access logs.
+
+
+
+[float]
+=== `apache2.ssl_request.remote_ip`
+
+type: keyword
+
+Client IP address.
+
+
+[float]
+=== `apache2.ssl_request.ssl_protocol`
+
+type: keyword
+
+The SSL protocol used during the connection.
+
+
+[float]
+=== `apache2.ssl_request.ssl_cipher`
+
+type: keyword
+
+The SSL cipher used during the connection.
+
+
+[float]
+=== `apache2.ssl_request.url`
+
+type: keyword
+
+The request HTTP URL.
+
+
+[float]
+=== `apache2.ssl_request.method`
+
+type: long
+
+The thread ID.
+
+
+[float]
+=== `apache2.error.module`
+
+type: keyword
+
+The module producing the logged message.
+
+
+[float]
 == access fields
 
 Contains fields for the Apache2 HTTPD ssl access logs.
+=======
+example: GET
+
+The request HTTP method.
+
+
+[float]
+=== `apache2.ssl_request.http_version`
+
+type: keyword
+
+The HTTP version.
+
+
+[float]
+=== `apache2.ssl_request.body_sent.bytes`
+
+type: long
+
+format: bytes
+
+The number of bytes of the server response body.
+
+
+[float]
+== geoip fields
+
+Contains GeoIP information gathered based on the remote_ip field. Only present if the GeoIP Elasticsearch plugin is available and used.
+>>>>>>> replaced ssl with ssl_request
 
 
 
@@ -332,6 +453,45 @@ The SSL protocol used during the connection.
 type: keyword
 
 The SSL cipher used during the connection.
+=======
+=== `apache2.ssl_request.geoip.continent_name`
+
+type: keyword
+
+The name of the continent.
+
+
+[float]
+=== `apache2.ssl_request.geoip.country_iso_code`
+
+type: keyword
+
+Country ISO code.
+
+
+[float]
+=== `apache2.ssl_request.geoip.location`
+
+type: geo_point
+
+The longitude and latitude.
+
+
+[float]
+=== `apache2.ssl_request.geoip.region_name`
+
+type: keyword
+
+The region name.
+
+
+[float]
+=== `apache2.ssl_request.geoip.city_name`
+
+type: keyword
+
+The city name.
+>>>>>>> replaced ssl with ssl_request
 
 
 [[exported-fields-auditd]]
