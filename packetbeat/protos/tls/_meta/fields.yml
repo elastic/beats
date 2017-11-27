@@ -55,11 +55,11 @@
               description: The hello extensions provided by the client.
               fields:
                 - name: server_name_indication
-                  type: array
+                  type: keyword
                   description: List of hostnames
 
                 - name: application_layer_protocol_negotiation
-                  type: array
+                  type: keyword
                   description: >
                     List of application-layer protocols the client is willing to use.
 
