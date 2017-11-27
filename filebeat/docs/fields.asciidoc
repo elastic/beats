@@ -311,14 +311,14 @@ The module producing the logged message.
 
 
 [float]
-== ssl_request fields
+== access fields
 
 Contains fields for the Apache2 HTTPD ssl access logs.
 
 
 
 [float]
-=== `apache2.ssl_request.remote_ip`
+=== `apache2.access.remote_ip`
 
 type: keyword
 
@@ -326,7 +326,7 @@ Client IP address.
 
 
 [float]
-=== `apache2.ssl_request.ssl_protocol`
+=== `apache2.access.ssl_protocol`
 
 type: keyword
 
@@ -334,7 +334,7 @@ The SSL protocol used during the connection.
 
 
 [float]
-=== `apache2.ssl_request.ssl_cipher`
+=== `apache2.access.ssl_cipher`
 
 type: keyword
 
@@ -342,7 +342,7 @@ The SSL cipher used during the connection.
 
 
 [float]
-=== `apache2.ssl_request.url`
+=== `apache2.access.url`
 
 type: keyword
 
@@ -350,7 +350,7 @@ The request HTTP URL.
 
 
 [float]
-=== `apache2.ssl_request.method`
+=== `apache2.access.method`
 
 type: keyword
 
@@ -360,7 +360,7 @@ The request HTTP method.
 
 
 [float]
-=== `apache2.ssl_request.http_version`
+=== `apache2.access.http_version`
 
 type: keyword
 
@@ -368,7 +368,7 @@ The HTTP version.
 
 
 [float]
-=== `apache2.ssl_request.body_sent.bytes`
+=== `apache2.access.body_sent.bytes`
 
 type: long
 
@@ -385,7 +385,7 @@ Contains GeoIP information gathered based on the remote_ip field. Only present i
 
 
 [float]
-=== `apache2.ssl_request.geoip.continent_name`
+=== `apache2.access.geoip.continent_name`
 
 type: keyword
 
@@ -393,7 +393,7 @@ The name of the continent.
 
 
 [float]
-=== `apache2.ssl_request.geoip.country_iso_code`
+=== `apache2.access.geoip.country_iso_code`
 
 type: keyword
 
@@ -401,7 +401,7 @@ Country ISO code.
 
 
 [float]
-=== `apache2.ssl_request.geoip.location`
+=== `apache2.access.geoip.location`
 
 type: geo_point
 
@@ -409,7 +409,7 @@ The longitude and latitude.
 
 
 [float]
-=== `apache2.ssl_request.geoip.region_name`
+=== `apache2.access.geoip.region_name`
 
 type: keyword
 
@@ -417,7 +417,7 @@ The region name.
 
 
 [float]
-=== `apache2.ssl_request.geoip.city_name`
+=== `apache2.access.geoip.city_name`
 
 type: keyword
 
