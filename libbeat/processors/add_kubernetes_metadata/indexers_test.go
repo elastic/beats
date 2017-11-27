@@ -268,8 +268,16 @@ func TestIpPortIndexer(t *testing.T) {
 
 	indexers := ipIndexer.GetMetadata(&pod)
 	indices := ipIndexer.GetIndexes(&pod)
-	assert.Equal(t, len(indexers), 0)
-	assert.Equal(t, len(indices), 0)
+
+	assert.Equal(t, 1, len(indexers))
+	assert.Equal(t, 1, len(indices))
+	assert.Equal(t, ip, indices[0])
+	assert.Equal(t, ip, indexers[0].Index)
+
+	// Meta doesn't have container info
+	_, err = indexers[0].Data.GetValue("kubernetes.container.name")
+	assert.NotNil(t, err)
+
 	expected := common.MapStr{
 		"pod": common.MapStr{
 			"name": "testpod",
@@ -291,15 +299,18 @@ func TestIpPortIndexer(t *testing.T) {
 			},
 		},
 	}
-	expected["container"] = common.MapStr{"name": container}
 
 	indexers = ipIndexer.GetMetadata(&pod)
-	assert.Equal(t, len(indexers), 1)
-	assert.Equal(t, indexers[0].Index, fmt.Sprintf("%s:%d", ip, port))
+	assert.Equal(t, 2, len(indexers))
+	assert.Equal(t, ip, indexers[0].Index)
+	assert.Equal(t, fmt.Sprintf("%s:%d", ip, port), indexers[1].Index)
 
 	indices = ipIndexer.GetIndexes(&pod)
-	assert.Equal(t, len(indices), 1)
-	assert.Equal(t, indices[0], fmt.Sprintf("%s:%d", ip, port))
+	assert.Equal(t, 2, len(indices))
+	assert.Equal(t, ip, indices[0])
+	assert.Equal(t, fmt.Sprintf("%s:%d", ip, port), indices[1])
 
 	assert.Equal(t, expected.String(), indexers[0].Data.String())
+	expected["container"] = common.MapStr{"name": container}
+	assert.Equal(t, expected.String(), indexers[1].Data.String())
 }
