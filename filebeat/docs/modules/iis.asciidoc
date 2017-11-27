@@ -1,0 +1,16 @@
+////
+This file is generated! See scripts/docs_collector.py
+////
+
+[[filebeat-module-iis]]
+== iis module
+
+This is the iis module.
+
+
+[float]
+=== Fields
+
+For a description of each field in the module, see the
+<<exported-fields-iis,exported fields>> section.
+
