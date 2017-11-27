@@ -18,6 +18,7 @@ grouped in the following categories:
 * <<exported-fields-cloud>>
 * <<exported-fields-docker-processor>>
 * <<exported-fields-icinga>>
+* <<exported-fields-iis>>
 * <<exported-fields-kafka>>
 * <<exported-fields-kubernetes-processor>>
 * <<exported-fields-log>>
@@ -750,6 +751,230 @@ Possible values are "debug", "notice", "information", "warning" or "critical".
 type: text
 
 The logged message.
+
+
+[[exported-fields-iis]]
+== iis fields
+
+iis Module
+
+
+
+[float]
+== iis fields
+
+
+
+
+[float]
+== access fields
+
+Contains fields for the Apache2 HTTPD access logs.
+
+
+
+[float]
+=== `iis.access.remote_ip`
+
+type: keyword
+
+Client IP address.
+
+
+[float]
+=== `iis.access.user_name`
+
+type: keyword
+
+The user name used when basic authentication is used.
+
+
+[float]
+=== `iis.access.method`
+
+type: keyword
+
+example: GET
+
+The request HTTP method.
+
+
+[float]
+=== `iis.access.url`
+
+type: keyword
+
+The request HTTP URL.
+
+
+[float]
+=== `iis.access.http_version`
+
+type: keyword
+
+The HTTP version.
+
+
+[float]
+=== `iis.access.response_code`
+
+type: long
+
+The HTTP response code.
+
+
+[float]
+=== `iis.access.body_sent.bytes`
+
+type: long
+
+format: bytes
+
+The number of bytes of the server response body.
+
+
+[float]
+=== `iis.access.referrer`
+
+type: keyword
+
+The HTTP referrer.
+
+
+[float]
+=== `iis.access.agent`
+
+type: text
+
+Contains the un-parsed user agent string. Only present if the user agent Elasticsearch plugin is not available or not used.
+
+
+[float]
+== user_agent fields
+
+Contains the parsed User agent field. Only present if the user agent Elasticsearch plugin is available and used.
+
+
+
+[float]
+=== `iis.access.user_agent.device`
+
+type: keyword
+
+The name of the physical device.
+
+
+[float]
+=== `iis.access.user_agent.major`
+
+type: long
+
+The major version of the user agent.
+
+
+[float]
+=== `iis.access.user_agent.minor`
+
+type: long
+
+The minor version of the user agent.
+
+
+[float]
+=== `iis.access.user_agent.patch`
+
+type: keyword
+
+The patch version of the user agent.
+
+
+[float]
+=== `iis.access.user_agent.name`
+
+type: keyword
+
+example: Chrome
+
+The name of the user agent.
+
+
+[float]
+=== `iis.access.user_agent.os`
+
+type: keyword
+
+The name of the operating system.
+
+
+[float]
+=== `iis.access.user_agent.os_major`
+
+type: long
+
+The major version of the operating system.
+
+
+[float]
+=== `iis.access.user_agent.os_minor`
+
+type: long
+
+The minor version of the operating system.
+
+
+[float]
+=== `iis.access.user_agent.os_name`
+
+type: keyword
+
+The name of the operating system.
+
+
+[float]
+== geoip fields
+
+Contains GeoIP information gathered based on the remote_ip field. Only present if the GeoIP Elasticsearch plugin is available and used.
+
+
+
+[float]
+=== `iis.access.geoip.continent_name`
+
+type: keyword
+
+The name of the continent.
+
+
+[float]
+=== `iis.access.geoip.country_iso_code`
+
+type: keyword
+
+Country ISO code.
+
+
+[float]
+=== `iis.access.geoip.location`
+
+type: geo_point
+
+The longitude and latitude.
+
+
+[float]
+=== `iis.access.geoip.region_name`
+
+type: keyword
+
+The region name.
+
+
+[float]
+=== `iis.access.geoip.city_name`
+
+type: keyword
+
+The city name.
 
 
 [[exported-fields-kafka]]

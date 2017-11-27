@@ -120,6 +120,16 @@ filebeat.modules:
     # can be added under this section.
     #prospector:
 
+#--------------------------------- iis Module --------------------------------
+- module: iis
+  # Win IIS logs
+  w3svc:
+    enabled: true
+
+    # Set custom paths for the log files. If left empty,
+    # Filebeat will choose the paths depending on your OS.
+    #var.paths:
+
 #-------------------------------- Kafka Module -------------------------------
 - module: kafka
   # All logs
