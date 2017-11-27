@@ -81,10 +81,11 @@ type ServiceStatus struct {
 }
 
 type ServiceReader struct {
-	handle ServiceDatabaseHandle
-	state  ServiceEnumState
-	guid   string            // Host's MachineGuid value (a unique ID for the host).
-	ids    map[string]string // Cache of service IDs.
+	handle            ServiceDatabaseHandle
+	state             ServiceEnumState
+	guid              string            // Host's MachineGuid value (a unique ID for the host).
+	ids               map[string]string // Cache of service IDs.
+	protectedServices map[string]struct{}
 }
 
 var InvalidServiceDatabaseHandle = ^ServiceDatabaseHandle(0)
@@ -135,7 +136,7 @@ func OpenService(handle ServiceDatabaseHandle, serviceName string, desiredAccess
 	return serviceHandle, nil
 }
 
-func getServiceStates(handle ServiceDatabaseHandle, state ServiceEnumState) ([]ServiceStatus, error) {
+func getServiceStates(handle ServiceDatabaseHandle, state ServiceEnumState, protectedServices map[string]struct{}) ([]ServiceStatus, error) {
 	var servicesReturned uint32
 	var servicesBuffer []byte
 
@@ -169,7 +170,7 @@ func getServiceStates(handle ServiceDatabaseHandle, state ServiceEnumState) ([]S
 	for i := 0; i < int(servicesReturned); i++ {
 		serviceTemp := (*EnumServiceStatusProcess)(unsafe.Pointer(&servicesBuffer[i*sizeofEnumServiceStatusProcess]))
 
-		service, err := getServiceInformation(serviceTemp, servicesBuffer, handle)
+		service, err := getServiceInformation(serviceTemp, servicesBuffer, handle, protectedServices)
 		if err != nil {
 			return nil, err
 		}
@@ -180,7 +181,7 @@ func getServiceStates(handle ServiceDatabaseHandle, state ServiceEnumState) ([]S
 	return services, nil
 }
 
-func getServiceInformation(rawService *EnumServiceStatusProcess, servicesBuffer []byte, handle ServiceDatabaseHandle) (ServiceStatus, error) {
+func getServiceInformation(rawService *EnumServiceStatusProcess, servicesBuffer []byte, handle ServiceDatabaseHandle, protectedServices map[string]struct{}) (ServiceStatus, error) {
 	service := ServiceStatus{
 		PID: rawService.ServiceStatusProcess.DwProcessId,
 	}
@@ -225,7 +226,12 @@ func getServiceInformation(rawService *EnumServiceStatusProcess, servicesBuffer 
 	if ServiceState(rawService.ServiceStatusProcess.DwCurrentState) != ServiceStopped {
 		processUpTime, err := getServiceUptime(rawService.ServiceStatusProcess.DwProcessId)
 		if err != nil {
-			logp.Warn("Uptime for service %v is not available", service.ServiceName)
+			if _, ok := protectedServices[service.ServiceName]; errors.Cause(err) == syscall.ERROR_ACCESS_DENIED && !ok {
+				protectedServices[service.ServiceName] = struct{}{}
+				logp.Warn("Uptime for service %v is not available", service.ServiceName)
+			} else {
+				return service, err
+			}
 		}
 		service.Uptime = processUpTime / time.Millisecond
 	}
@@ -316,17 +322,18 @@ func NewServiceReader() (*ServiceReader, error) {
 	}
 
 	r := &ServiceReader{
-		handle: hndl,
-		state:  ServiceStateAll,
-		guid:   guid,
-		ids:    map[string]string{},
+		handle:            hndl,
+		state:             ServiceStateAll,
+		guid:              guid,
+		ids:               map[string]string{},
+		protectedServices: map[string]struct{}{},
 	}
 
 	return r, nil
 }
 
 func (reader *ServiceReader) Read() ([]common.MapStr, error) {
-	services, err := getServiceStates(reader.handle, reader.state)
+	services, err := getServiceStates(reader.handle, reader.state, reader.protectedServices)
 	if err != nil {
 		return nil, err
 	}
