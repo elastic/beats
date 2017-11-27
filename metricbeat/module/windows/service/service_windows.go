@@ -228,7 +228,7 @@ func getServiceInformation(rawService *EnumServiceStatusProcess, servicesBuffer 
 		if err != nil {
 			if _, ok := protectedServices[service.ServiceName]; errors.Cause(err) == syscall.ERROR_ACCESS_DENIED && !ok {
 				protectedServices[service.ServiceName] = struct{}{}
-				logp.Warn("Uptime for service %v is not available", service.ServiceName)
+				logp.Warn("Uptime for service %v is not available because of insufficient rights", service.ServiceName)
 			} else {
 				return service, err
 			}
