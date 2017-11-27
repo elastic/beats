@@ -30,6 +30,8 @@ https://github.com/elastic/beats/compare/v6.0.0...master[Check the HEAD diff]
 
 *Affecting all Beats*
 
+- Fix documentation links in README.md files. {pull}5710[5710]
+
 *Auditbeat*
 
 *Filebeat*
