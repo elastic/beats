@@ -43,6 +43,7 @@ var (
 	procEnumServicesStatusExW = modadvapi32.NewProc("EnumServicesStatusExW")
 	procOpenServiceW          = modadvapi32.NewProc("OpenServiceW")
 	procQueryServiceConfigW   = modadvapi32.NewProc("QueryServiceConfigW")
+	procQueryServiceConfig2W  = modadvapi32.NewProc("QueryServiceConfig2W")
 	procCloseServiceHandle    = modadvapi32.NewProc("CloseServiceHandle")
 )
 
@@ -86,6 +87,18 @@ func _OpenService(handle ServiceDatabaseHandle, serviceName *uint16, desiredAcce
 
 func _QueryServiceConfig(serviceHandle ServiceHandle, serviceConfig *byte, bufSize uint32, bytesNeeded *uint32) (err error) {
 	r1, _, e1 := syscall.Syscall6(procQueryServiceConfigW.Addr(), 4, uintptr(serviceHandle), uintptr(unsafe.Pointer(serviceConfig)), uintptr(bufSize), uintptr(unsafe.Pointer(bytesNeeded)), 0, 0)
+	if r1 == 0 {
+		if e1 != 0 {
+			err = errnoErr(e1)
+		} else {
+			err = syscall.EINVAL
+		}
+	}
+	return
+}
+
+func _QueryServiceConfig2(serviceHandle ServiceHandle, infoLevel ServiceConfigInformation, configBuffer *byte, bufSize uint32, bytesNeeded *uint32) (err error) {
+	r1, _, e1 := syscall.Syscall6(procQueryServiceConfig2W.Addr(), 5, uintptr(serviceHandle), uintptr(infoLevel), uintptr(unsafe.Pointer(configBuffer)), uintptr(bufSize), uintptr(unsafe.Pointer(bytesNeeded)), 0)
 	if r1 == 0 {
 		if e1 != 0 {
 			err = errnoErr(e1)
