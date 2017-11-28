@@ -19,3 +19,5 @@ dashboards:
   file: Packetbeat-cassandra.json
 - id: DNS-Unique-Domains
   file: Packetbeat-dns-tunneling.json
+- id: TLS-Sessions
+  file: Packetbeat-tls.json
