@@ -5,6 +5,7 @@ import (
 	"time"
 
 	"github.com/elastic/beats/libbeat/common"
+	"github.com/elastic/beats/libbeat/logp"
 	"github.com/elastic/beats/libbeat/publisher/queue"
 )
 
@@ -100,7 +101,7 @@ func NewBroker(
 		minEvents = sz
 	}
 
-	logger := defaultLogger
+	logger := logp.NewSimpleLogger("memqueue")
 	b := &Broker{
 		done:   make(chan struct{}),
 		logger: logger,

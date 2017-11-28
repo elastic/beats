@@ -71,7 +71,7 @@ type beatConfig struct {
 	// beat internal components configurations
 	HTTP    *common.Config `config:"http"`
 	Path    paths.Path     `config:"path"`
-	Logging logp.Logging   `config:"logging"`
+	Logging logp.Config    `config:"logging"`
 
 	// output/publishing related configurations
 	Pipeline   pipeline.Config `config:",inline"`
@@ -87,6 +87,10 @@ var (
 	printVersion bool
 	setup        bool
 	startTime    time.Time
+
+	verbose           bool
+	toStderr          bool
+	debugSelectorsStr string
 )
 
 var debugf = logp.MakeDebug("beat")
@@ -98,6 +102,9 @@ func init() {
 
 	flag.BoolVar(&printVersion, "version", false, "Print the version and exit")
 	flag.BoolVar(&setup, "setup", false, "Load the sample Kibana dashboards")
+	flag.BoolVar(&verbose, "v", false, "Log at INFO level")
+	flag.BoolVar(&toStderr, "e", false, "Log to stderr and disable syslog/file output")
+	flag.StringVar(&debugSelectorsStr, "d", "", "Enable certain debug selectors")
 }
 
 // initRand initializes the runtime random number generator seed using
@@ -156,7 +163,10 @@ func NewBeat(name, indexPrefix, v string) (*Beat, error) {
 		},
 	}
 
-	return &Beat{Beat: b}, nil
+	rtn := &Beat{Beat: b}
+	rtn.Config.Logging = logp.DefaultConfig
+	rtn.Config.Logging.Files.Name = name
+	return rtn, nil
 }
 
 // init does initialization of things common to all actions (read confs, flags)
@@ -232,6 +242,8 @@ func (b *Beat) createBeater(bt beat.Creator) (beat.Beater, error) {
 }
 
 func (b *Beat) launch(bt beat.Creator) error {
+	defer logp.Sync()
+
 	err := b.Init()
 	if err != nil {
 		return err
@@ -273,9 +285,15 @@ func (b *Beat) launch(bt beat.Creator) error {
 		}
 	}
 
+	// TODO: Use config.
+	metricsLogger, err := monitoring.StartNewPeriodLogger(30 * time.Second)
+	if err != nil {
+		return err
+	}
+	defer metricsLogger.Stop()
+
 	logp.Info("%s start running.", b.Info.Beat)
 	defer logp.Info("%s stopped.", b.Info.Beat)
-	defer logp.LogTotalExpvars(&b.Config.Logging)
 
 	if b.Config.HTTP.Enabled() {
 		api.Start(b.Config.HTTP, b.Info)
@@ -382,11 +400,21 @@ func (b *Beat) handleFlags() error {
 		return beat.GracefulExit
 	}
 
-	if err := logp.HandleFlags(b.Info.Beat); err != nil {
-		return err
+	return cfgfile.HandleFlags()
+}
+
+func (b *Beat) configureLogging() error {
+	if toStderr {
+		b.Config.Logging.ToStderr = true
+	}
+	if verbose && strings.ToLower(b.Config.Logging.Level) != "debug" {
+		b.Config.Logging.Level = "info"
+	}
+	if debugSelectorsStr != "" {
+		b.Config.Logging.Selectors = strings.Split(debugSelectorsStr, ",")
 	}
 
-	return cfgfile.HandleFlags()
+	return logp.CustomSetup(b.Config.Logging)
 }
 
 // config reads the configuration file from disk, parses the common options
@@ -427,8 +455,7 @@ func (b *Beat) configure() error {
 		return fmt.Errorf("error setting default paths: %v", err)
 	}
 
-	err = logp.Init(b.Info.Beat, startTime, &b.Config.Logging)
-	if err != nil {
+	if err = b.configureLogging(); err != nil {
 		return fmt.Errorf("error initializing logging: %v", err)
 	}
 

@@ -13,7 +13,7 @@ import (
 // will the consumer be paused, until some batches have been processed by some
 // outputs.
 type retryer struct {
-	logger   *logp.Logger
+	logger   *logp.SimpleLogger
 	observer outputObserver
 
 	done chan struct{}
@@ -53,7 +53,7 @@ const (
 )
 
 func newRetryer(
-	log *logp.Logger,
+	log *logp.SimpleLogger,
 	observer outputObserver,
 	out workQueue,
 	c *eventConsumer,

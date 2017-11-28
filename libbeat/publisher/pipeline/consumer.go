@@ -11,7 +11,7 @@ import (
 // from the retryer in case of too many events failing to be send or if retryer
 // is receiving cancelled batches from outputs to be closed on output reloading.
 type eventConsumer struct {
-	logger *logp.Logger
+	logger *logp.SimpleLogger
 	done   chan struct{}
 
 	ctx *batchContext
@@ -41,7 +41,7 @@ const (
 )
 
 func newEventConsumer(
-	log *logp.Logger,
+	log *logp.SimpleLogger,
 	queue queue.Queue,
 	ctx *batchContext,
 ) *eventConsumer {

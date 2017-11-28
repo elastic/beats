@@ -11,7 +11,7 @@ import (
 // - stop
 // - reload
 type outputController struct {
-	logger   *logp.Logger
+	logger   *logp.SimpleLogger
 	observer outputObserver
 
 	queue queue.Queue
@@ -39,7 +39,7 @@ type outputWorker interface {
 }
 
 func newOutputController(
-	log *logp.Logger,
+	log *logp.SimpleLogger,
 	observer outputObserver,
 	b queue.Queue,
 ) *outputController {
