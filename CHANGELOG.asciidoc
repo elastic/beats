@@ -68,6 +68,7 @@ https://github.com/elastic/beats/compare/v6.0.0-beta2...master[Check the HEAD di
 - Fix error `datastore '*' not found` in Vsphere module. {issue}4879[4879]
 - Fix error `NotAuthenticated` in Vsphere module. {issue}4673[4673]
 - Fix connection leak in mongodb module. {issue}5688[5688]
+- Fix the include top N processes feature for cases where there are fewer processes than N. {pull}5729[5729]
 
 *Packetbeat*
 
