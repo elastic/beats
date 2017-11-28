@@ -24,7 +24,9 @@ endpoint earlier when you
 <<{beatname_lc}-configuration,configured {beatname_uc}>>. If you didn't,
 configure it now.
 
-Make sure Kibana is running before you perform this step.
+Make sure Kibana is running before you perform this step. If you are accessing a
+secured Kibana instance, make sure you've configured credentials as described in
+<<{beatname_lc}-configuration>>.
 
 To set up the Kibana dashboards for {beatname_uc}:
 
@@ -72,9 +74,3 @@ and run:
 ----------------------------------------------------------------------
 PS > {beatname_lc} setup --dashboards
 ----------------------------------------------------------------------
-
-[[passing-credentials-dashboard-loading]]
-==== Pass credentials
-
-:start-type: setup-dashboards
-include::./shared-passing-credentials-setup.asciidoc[]
