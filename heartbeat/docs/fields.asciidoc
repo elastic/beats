@@ -212,7 +212,7 @@ The monitors full job ID as used by heartbeat.
 [float]
 == duration fields
 
-total monitoring test duration
+Total monitoring test duration
 
 
 [float]
@@ -395,7 +395,7 @@ Duration in microseconds
 [float]
 == response_header fields
 
-Time required between sending the start of sending the HTTP request and first by from HTTP response being read. Duration based on already available network connection.
+Time required between sending the start of sending the HTTP request and first byte from HTTP response being read. Duration based on already available network connection.
 
 
 [float]
