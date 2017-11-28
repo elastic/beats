@@ -126,7 +126,7 @@ func TestDiffEvents(t *testing.T) {
 
 		action, changed := diffEvents(testEvent(), e)
 		assert.True(t, changed)
-		assert.EqualValues(t, Updated, action)
+		assert.EqualValues(t, Updated|AttributesModified, action)
 	})
 }
 
