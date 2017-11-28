@@ -4,10 +4,6 @@
     datastore
   release: beta
   fields:
-    - name: datacenter
-      type: keyword
-      description: >
-        Datacenter name
     - name: name
       type: keyword
       description: >
