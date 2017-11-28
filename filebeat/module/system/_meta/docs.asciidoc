@@ -13,6 +13,10 @@ include::../include/what-happens.asciidoc[]
 This module was tested with logs from OSes like Ubuntu 12.04, Centos 7, and
 macOS Sierra.
 
+This module requires the
+{elasticsearch-plugins}/ingest-user-agent.html[ingest-user-agent] and
+{elasticsearch-plugins}/ingest-geoip.html[ingest-geoip] Elasticsearch plugins.
+
 This module is not available for Windows.
 
 include::../include/running-modules.asciidoc[]
@@ -63,3 +67,7 @@ include::../include/config-option-intro.asciidoc[]
 
 include::../include/var-paths.asciidoc[]
 
+[float]
+==== `auth` fileset settings
+
+include::../include/var-paths.asciidoc[]
