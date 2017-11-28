@@ -156,24 +156,32 @@ func (smtp *smtpPlugin) Parse(
 
 // ReceivedFin handles TCP-FIN packet.
 func (smtp *smtpPlugin) ReceivedFin(
-	tcptuple *common.TCPTuple, dir uint8,
+	tcptuple *common.TCPTuple,
+	dir uint8,
 	private protos.ProtocolData,
 ) protos.ProtocolData {
+	debugf("Received FIN")
+
+	publishPendingMailTransaction(private,
+		"Unexpected connection termination")
+
 	return private
 }
 
 // GapInStream handles lost packets in tcp-stream.
-func (smtp *smtpPlugin) GapInStream(tcptuple *common.TCPTuple, dir uint8,
+func (smtp *smtpPlugin) GapInStream(
+	tcptuple *common.TCPTuple,
+	dir uint8,
 	nbytes int,
 	private protos.ProtocolData,
 ) (priv protos.ProtocolData, drop bool) {
 
 	defer logp.Recover("GapInStream(smtp) exception")
 
-	conn := getConnection(private)
-	if conn != nil {
-		debugf("Loss of synchronization due to gap in TCP stream")
-	}
+	debugf("Gap in TCP stream")
+
+	publishPendingMailTransaction(private,
+		"Packet loss while capturing the transaction")
 
 	// Drop state and let the parsers re-sync
 	return nil, true
@@ -230,4 +238,17 @@ func getConnection(private protos.ProtocolData) *connection {
 		return nil
 	}
 	return priv
+}
+
+func publishPendingMailTransaction(private protos.ProtocolData, note string) {
+	conn := getConnection(private)
+	if conn != nil {
+		trans := &conn.trans
+		if trans.current != nil {
+			if t, ok := trans.current.(*transMail); ok {
+				t.Notes = append(t.Notes, note)
+				trans.onTransaction(t, trans.sessionID)
+			}
+		}
+	}
 }

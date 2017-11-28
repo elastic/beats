@@ -3,9 +3,6 @@ package smtp
 import (
 	"bytes"
 	"errors"
-	"io/ioutil"
-	"net/mail"
-	"strings"
 	"time"
 
 	"github.com/elastic/beats/libbeat/common"
@@ -33,30 +30,34 @@ type message struct {
 	// Request
 	command common.NetString
 	param   common.NetString
-	// Request data payload
-	headers map[string]common.NetString
-	body    common.NetString
 
 	// Response
 	statusCode    uint
 	statusPhrases []common.NetString
 
-	raw []byte
+	raw streambuf.Buffer
+
 	// list element use by 'transactions' for correlation
 	next *message
 }
 
-// Error code if stream exceeds max allowed size on append.
-var (
-	constCRLF = []byte("\r\n")
-	constEOD  = []byte(".\r\n")
+const (
 	// Responses are at least len("XXX\r\n") in size
 	constMinRespSize  = 5
 	constRespCodeSize = 3
 	constPhraseOffset = 4
 	constStatusSize   = 3
 	constCRLFSize     = 2
+)
 
+var (
+	constCRLF = []byte("\r\n")
+	constEOD  = []byte(".\r\n")
+	constMAIL = []byte("MAIL")
+	constRCPT = []byte("RCPT")
+	constDATA = []byte("DATA")
+
+	// Error code if stream exceeds max allowed size on append.
 	ErrStreamTooLarge = errors.New("Stream data too large")
 )
 
@@ -174,35 +175,13 @@ func btoi(raw []byte) uint {
 	return res
 }
 
-func (p *parser) parsePayload() error {
-	if !p.pub.sendDataHeaders && !p.pub.sendDataBody {
-		return nil
+// Extract path (email address) from a MAIL/RCPT request param
+func getPath(param []byte) []byte {
+	l := bytes.IndexByte(param, byte('<'))
+	r := bytes.IndexByte(param, byte('>'))
+	if r > l {
+		return param[l+1 : r]
 	}
-
-	m := p.message
-
-	// ".\r\n" is not part of the payload
-	parseTo := len(m.raw) - len(constEOD)
-
-	payload, err := mail.ReadMessage(bytes.NewReader(m.raw[:parseTo]))
-	if err != nil {
-		return err
-	}
-
-	if m.headers == nil {
-		m.headers = make(map[string]common.NetString)
-	}
-
-	for k := range payload.Header {
-		m.headers[k] = common.NetString(payload.Header.Get(k))
-	}
-
-	if body, err := ioutil.ReadAll(payload.Body); err != nil {
-		return err
-	} else {
-		m.body = common.NetString(body)
-	}
-
 	return nil
 }
 
@@ -228,13 +207,15 @@ func (p *parser) parse() (*message, error) {
 			m.IsRequest = true
 			if p.state != stateData {
 				words = bytes.SplitN(raw[:nbytes-constCRLFSize], []byte(" "), 2)
-				m.command = common.NetString(strings.ToUpper(string(words[0])))
+				m.command = bytes.ToUpper(words[0])
 				if len(words) == 2 {
-					m.param = common.NetString(words[1])
+					m.param = words[1]
 				}
-			}
-			if p.pub.sendRequest {
-				m.raw = append(m.raw, raw...)
+				if p.pub.sendRequest {
+					if err = m.raw.Append(raw); err != nil {
+						return nil, err
+					}
+				}
 			}
 		} else {
 			// Response
@@ -244,7 +225,9 @@ func (p *parser) parse() (*message, error) {
 					raw[constPhraseOffset:nbytes-constCRLFSize])
 			}
 			if p.pub.sendResponse {
-				m.raw = append(m.raw, raw...)
+				if err = m.raw.Append(raw); err != nil {
+					return nil, err
+				}
 			}
 		}
 
@@ -254,7 +237,7 @@ func (p *parser) parse() (*message, error) {
 
 		case stateCommand:
 			if m.IsRequest {
-				if bytes.Compare(words[0], []byte("DATA")) == 0 {
+				if bytes.Equal(words[0], constDATA) {
 					p.state = stateData
 				}
 			} else {
@@ -264,19 +247,15 @@ func (p *parser) parse() (*message, error) {
 			}
 
 		case stateData: // request only state
-			if (p.pub.sendDataHeaders || p.pub.sendDataBody) && !p.pub.sendRequest {
-				m.raw = append(m.raw, raw...)
-			}
-			if bytes.Compare(raw, constEOD) != 0 {
+			if !bytes.Equal(raw, constEOD) {
+				if p.pub.sendDataHeaders || p.pub.sendDataBody {
+					if err = m.raw.Append(raw); err != nil {
+						return nil, err
+					}
+				}
 				continue
 			} else {
-				// We want to provide a request section since the
-				// server reply is going to be a response (as opposed
-				// to just a prompt). So we use a pseudo command.
-				m.command = common.NetString("EOD")
-				if err := p.parsePayload(); err != nil {
-					return nil, err
-				}
+				m.command = constEOD
 			}
 
 			p.state = stateCommand
