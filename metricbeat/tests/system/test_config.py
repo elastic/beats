@@ -84,4 +84,4 @@ class ConfigTest(metricbeat.BaseTest):
                                  " has been removed")
 
     def get_host(self):
-        return 'http://' + os.getenv('ELASTICSEARCH_HOST', 'localhost') + ':' + os.getenv('ELASTICSEARCH_PORT', '9200')
+        return 'http://' + os.getenv('ES_HOST', 'localhost') + ':' + os.getenv('ES_PORT', '9200')

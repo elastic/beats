@@ -170,9 +170,7 @@ queue.mem:
 output:
   {% if elasticsearch -%}
   elasticsearch:
-    {% for k, v in elasticsearch.items() -%}
-    {{ k }}: {{ v }}
-    {% endfor -%}
+    hosts: ["{{ elasticsearch.host }}"]
   {%- endif %}
 
   # File as output

@@ -9,6 +9,8 @@ from beat.beat import INTEGRATION_TESTS
 
 class Test(BaseTest):
 
+    COMPOSE_SERVICES = ['elasticsearch']
+
     @unittest.skipUnless(re.match("(?i)win|linux|darwin|freebsd|openbsd", sys.platform), "os")
     def test_start_stop(self):
         """
