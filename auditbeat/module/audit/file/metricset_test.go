@@ -90,10 +90,10 @@ func TestDetectDeletedFiles(t *testing.T) {
 	}
 	event := events[0]
 	assert.Equal(t, dir, event["path"])
-	assert.Equal(t, "created", event["action"])
+	assert.Equal(t, []string{"created"}, event["action"])
 	event = events[1]
 	assert.Equal(t, e.Path, event["path"])
-	assert.Equal(t, "deleted", event["action"])
+	assert.Equal(t, []string{"deleted"}, event["action"])
 }
 
 func setup(t testing.TB) func() {

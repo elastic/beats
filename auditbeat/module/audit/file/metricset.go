@@ -166,20 +166,20 @@ func (ms *MetricSet) reportEvent(reporter mb.PushReporter, event *Event) bool {
 			event.Action, event.Path, event.errors)
 	}
 
-	changed := ms.hasFileChangedSinceLastEvent(event)
+	changed, lastEvent := ms.hasFileChangedSinceLastEvent(event)
 	if changed {
 		// Publish event if it changed.
-		if ok := reporter.Event(buildMapStr(event)); !ok {
+		if ok := reporter.Event(buildMapStr(event, lastEvent != nil)); !ok {
 			return false
 		}
 	}
 
 	// Persist event locally.
-	if event.Action == Deleted {
+	if event.Info == nil {
 		if err := ms.bucket.Delete(event.Path); err != nil {
 			logp.Err("%v %v", logPrefix, err)
 		}
-	} else if event.Info != nil {
+	} else {
 		if err := store(ms.bucket, event); err != nil {
 			logp.Err("%v %v", logPrefix, err)
 		}
@@ -187,12 +187,12 @@ func (ms *MetricSet) reportEvent(reporter mb.PushReporter, event *Event) bool {
 	return true
 }
 
-func (ms *MetricSet) hasFileChangedSinceLastEvent(event *Event) bool {
+func (ms *MetricSet) hasFileChangedSinceLastEvent(event *Event) (changed bool, lastEvent *Event) {
 	// Load event from DB.
 	lastEvent, err := load(ms.bucket, event.Path)
 	if err != nil {
 		logp.Warn("%v %v", logPrefix, err)
-		return true
+		return true, lastEvent
 	}
 
 	action, changed := diffEvents(lastEvent, event)
@@ -204,7 +204,7 @@ func (ms *MetricSet) hasFileChangedSinceLastEvent(event *Event) bool {
 		debugf("file at %v has changed since last seen: old=%v, new=%v",
 			event.Path, lastEvent, event)
 	}
-	return changed
+	return changed, lastEvent
 }
 
 func (ms *MetricSet) purgeDeleted(reporter mb.PushReporter) {
@@ -217,7 +217,7 @@ func (ms *MetricSet) purgeDeleted(reporter mb.PushReporter) {
 
 		for _, e := range deleted {
 			// Don't persist!
-			if !reporter.Event(buildMapStr(e)) {
+			if !reporter.Event(buildMapStr(e, true)) {
 				return
 			}
 		}

@@ -1,7 +1,6 @@
 namespace schema;
 
-enum Action : ubyte {
-  None,
+enum Action : ubyte (bit_flags) {
   AttributesModified,
   Created,
   Deleted,
