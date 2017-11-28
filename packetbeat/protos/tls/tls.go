@@ -242,6 +242,11 @@ func (plugin *tlsPlugin) createEvent(conn *tlsConnectionData) beat.Event {
 	if client.parser.hello != nil {
 		clientHello = client.parser.hello
 		tls["client_hello"] = clientHello.toMap()
+		hash, str := getJa3Fingerprint(clientHello)
+		tls["ja3_fingerprint"] = common.MapStr{
+			"hash": hash,
+			"str":  str,
+		}
 	} else {
 		clientHello = emptyHello
 	}
@@ -327,7 +332,7 @@ func (plugin *tlsPlugin) createEvent(conn *tlsConnectionData) beat.Event {
 		"dst":    dst,
 	}
 	// set "server" to SNI, if provided
-	if value, ok := clientHello.extensions["server_name_indication"]; ok {
+	if value, ok := clientHello.extensions.Parsed["server_name_indication"]; ok {
 		if list, ok := value.([]string); ok && len(list) > 0 {
 			fields["server"] = list[0]
 		}
