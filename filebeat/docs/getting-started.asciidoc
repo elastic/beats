@@ -227,7 +227,9 @@ include::../../libbeat/docs/dashboards.asciidoc[]
 [[filebeat-starting]]
 === Step 6: Start Filebeat
 
-Start Filebeat by issuing the appropriate command for your platform.
+Start Filebeat by issuing the appropriate command for your platform. If you
+are accessing a secured Elasticsearch cluster, make sure you've configured
+credentials as described in <<{beatname_lc}-configuration>>.
 
 NOTE: If you use an init.d script to start Filebeat on deb or rpm, you can't
 specify command line flags (see <<command-line-options>>). To specify flags,
@@ -278,12 +280,6 @@ PS C:\Program Files\Filebeat> Start-Service filebeat
 By default, Windows log files are stored in `C:\ProgramData\filebeat\Logs`.
 
 Filebeat is now ready to send log files to your defined output.
-
-[id="{beatname_lc}-passing-credentials"]
-==== Pass credentials
-
-:start-type: start
-include::../../libbeat/docs/shared-passing-credentials-setup.asciidoc[]
 
 [[view-kibana-dashboards]]
 === Step 7: View the sample Kibana dashboards
