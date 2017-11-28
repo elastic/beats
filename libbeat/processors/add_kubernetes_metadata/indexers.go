@@ -12,6 +12,7 @@ import (
 const (
 	ContainerIndexerName = "container"
 	PodNameIndexerName   = "pod_name"
+	IPPortIndexerName    = "ip_port"
 )
 
 // Indexer take known pods and generate all the metadata we need to enrich
@@ -247,4 +248,82 @@ func containerID(status PodContainerStatus) string {
 		}
 	}
 	return ""
+}
+
+// IPPortIndexer indexes pods based on all their host:port combinations
+type IPPortIndexer struct {
+	genMeta GenMeta
+}
+
+// NewIPPortIndexer creates and returns a new indexer for pod IP & ports
+func NewIPPortIndexer(_ common.Config, genMeta GenMeta) (Indexer, error) {
+	return &IPPortIndexer{genMeta: genMeta}, nil
+}
+
+// GetMetadata returns metadata for the given pod, if it matches the index
+func (h *IPPortIndexer) GetMetadata(pod *Pod) []MetadataIndex {
+	commonMeta := h.genMeta.GenerateMetaData(pod)
+	hostPorts := h.GetIndexes(pod)
+	var metadata []MetadataIndex
+
+	if pod.Status.PodIP == "" {
+		return metadata
+	}
+	for i := 0; i < len(hostPorts); i++ {
+		dobreak := false
+		containerMeta := commonMeta.Clone()
+		for _, container := range pod.Spec.Containers {
+			ports := container.Ports
+
+			for _, port := range ports {
+				if port.ContainerPort == int64(0) {
+					continue
+				}
+				if strings.Index(hostPorts[i], fmt.Sprintf("%s:%d", pod.Status.PodIP, port.ContainerPort)) != -1 {
+					containerMeta["container"] = common.MapStr{
+						"name": container.Name,
+					}
+					dobreak = true
+					break
+				}
+			}
+
+			if dobreak {
+				break
+			}
+
+		}
+
+		metadata = append(metadata, MetadataIndex{
+			Index: hostPorts[i],
+			Data:  containerMeta,
+		})
+	}
+
+	return metadata
+}
+
+// GetIndexes returns the indexes for the given Pod
+func (h *IPPortIndexer) GetIndexes(pod *Pod) []string {
+	var hostPorts []string
+
+	ip := pod.Status.PodIP
+	if ip == "" {
+		return hostPorts
+	}
+	for _, container := range pod.Spec.Containers {
+		ports := container.Ports
+
+		for _, port := range ports {
+			if port.ContainerPort != int64(0) {
+				hostPorts = append(hostPorts, fmt.Sprintf("%s:%d", ip, port.ContainerPort))
+			} else {
+				hostPorts = append(hostPorts, ip)
+			}
+
+		}
+
+	}
+
+	return hostPorts
 }
