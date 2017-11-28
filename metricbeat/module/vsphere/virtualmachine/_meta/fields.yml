@@ -41,3 +41,7 @@
       object_type: keyword
       description: >
         Custom fields
+    - name: network_names
+      type: keyword
+      description: >
+        Network names

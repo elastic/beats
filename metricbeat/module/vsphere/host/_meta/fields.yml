@@ -35,3 +35,7 @@
       description: >
         Free Memory in bytes
       format: bytes
+    - name: network_names
+      type: keyword
+      description: >
+        Network names
