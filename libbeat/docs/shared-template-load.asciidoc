@@ -77,10 +77,11 @@ to temporarily disable the Logstash output and enable Elasticsearch by using the
 The examples here assume that Logstash output is enabled. You can omit the `-E`
 flags if Elasticsearch output is already enabled.
 
-If you are connecting to a secured Elasticsearch cluster, also see
-<<passing-credentials-template-loading>>. If the host running {beatname_uc} does
-not have direct connectivity to Elasticsearch, see
-<<load-template-manually-alternate>>.
+If you are connecting to a secured Elasticsearch cluster, make sure you've
+configured credentials as described in <<{beatname_lc}-configuration>>.
+
+If the host running {beatname_uc} does not have direct connectivity to
+Elasticsearch, see <<load-template-manually-alternate>>.
 
 To load the template:
 
@@ -197,11 +198,3 @@ curl -XPUT -H 'Content-Type: application/json' http://localhost:9200/_template/{
 ----
 PS > Invoke-RestMethod -Method Put -ContentType "application/json" -InFile {beatname_lc}.template.json -Uri http://localhost:9200/_template/{beatname_lc}-{stack-version}
 ----
-
-
-[[passing-credentials-template-loading]]
-==== Pass credentials
-
-:start-type: setup-index
-include::./shared-passing-credentials-setup.asciidoc[]
-
