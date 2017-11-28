@@ -18,7 +18,7 @@
                     "mhz": 0
                 }
             },
-            "datacenter": "ha-datacenter",
+            "host": "ha-host",
             "memory": {
                 "free": {
                     "guest": {

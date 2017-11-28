@@ -18341,9 +18341,9 @@ func init() {
 type GuestPosixFileAttributes struct {
 	GuestFileAttributes
 
-	OwnerId     int32 `xml:"ownerId,omitempty"`
-	GroupId     int32 `xml:"groupId,omitempty"`
-	Permissions int64 `xml:"permissions,omitempty"`
+	OwnerId     *int32 `xml:"ownerId"`
+	GroupId     *int32 `xml:"groupId"`
+	Permissions int64  `xml:"permissions,omitempty"`
 }
 
 func init() {
@@ -28546,7 +28546,7 @@ func init() {
 type MethodActionArgument struct {
 	DynamicData
 
-	Value AnyType `xml:"value,omitempty,typeattr"`
+	Value AnyType `xml:"value,typeattr"`
 }
 
 func init() {
@@ -31074,7 +31074,7 @@ type OptionValue struct {
 	DynamicData
 
 	Key   string  `xml:"key"`
-	Value AnyType `xml:"value,omitempty,typeattr"`
+	Value AnyType `xml:"value,typeattr"`
 }
 
 func init() {
@@ -53154,8 +53154,8 @@ type WaitForUpdatesResponse struct {
 type WaitOptions struct {
 	DynamicData
 
-	MaxWaitSeconds   int32 `xml:"maxWaitSeconds,omitempty"`
-	MaxObjectUpdates int32 `xml:"maxObjectUpdates,omitempty"`
+	MaxWaitSeconds   *int32 `xml:"maxWaitSeconds"`
+	MaxObjectUpdates int32  `xml:"maxObjectUpdates,omitempty"`
 }
 
 func init() {

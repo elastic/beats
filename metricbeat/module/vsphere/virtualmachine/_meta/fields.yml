@@ -4,10 +4,10 @@
     virtualmachine
   release: beta
   fields:
-    - name: datacenter
+    - name: host
       type: keyword
       description: >
-        Datacenter name
+        Host name
     - name: name
       type: keyword
       description: >
