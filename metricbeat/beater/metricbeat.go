@@ -16,7 +16,7 @@ import (
 	"github.com/elastic/beats/metricbeat/mb"
 	"github.com/elastic/beats/metricbeat/mb/module"
 
-	// Add metricbeat specific processors
+	// Add metricbeat default processors
 	_ "github.com/elastic/beats/metricbeat/processor/add_kubernetes_metadata"
 )
 

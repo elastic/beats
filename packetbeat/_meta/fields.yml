@@ -1805,11 +1805,11 @@
               description: The hello extensions provided by the client.
               fields:
                 - name: server_name_indication
-                  type: array
+                  type: keyword
                   description: List of hostnames
 
                 - name: application_layer_protocol_negotiation
-                  type: array
+                  type: keyword
                   description: >
                     List of application-layer protocols the client is willing to use.
 
@@ -1854,7 +1854,6 @@
                   description: >
                     Used to announce that a session ticket will be provided
                     by the server. Always an empty string.
-
 
         - name: client_certificate
           type: group
@@ -2040,3 +2039,8 @@
         - name: client_certificate_chain
           type: array
           description: Chain of trust for the client certificate.
+
+        - name: alert_types
+          type: keyword
+          description: >
+            An array containing the TLS alert type for every alert received.

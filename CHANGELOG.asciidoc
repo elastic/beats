@@ -28,6 +28,7 @@ https://github.com/elastic/beats/compare/v6.0.0-beta2...master[Check the HEAD di
 
 - Rename `heap_init` field to `heap.init`. {pull}5320[5320]
 - Rename `http.response.status_code` field to `http.response.code`. {pull}5521[5521]
+- Rename `golang.heap.system.optained` field to `golang.heap.system.obtained`. {issue}5703[5703]
 
 *Packetbeat*
 
@@ -68,6 +69,7 @@ https://github.com/elastic/beats/compare/v6.0.0-beta2...master[Check the HEAD di
 - Fix wrong MySQL CRUD queries timelion visualization {pull}4857[4857]
 - Fix error `datastore '*' not found` in Vsphere module. {issue}4879[4879]
 - Fix error `NotAuthenticated` in Vsphere module. {issue}4673[4673]
+- Fix connection leak in mongodb module. {issue}5688[5688]
 
 *Packetbeat*
 
@@ -92,6 +94,7 @@ https://github.com/elastic/beats/compare/v6.0.0-beta2...master[Check the HEAD di
 - Update to Golang 1.9.2
 - Add number_of_routing_shards config set to 30 {pull}5570[5570]
 - Set log level for kafka output. {pull}5397[5397]
+- Moved `ip_port` indexer for `add_kubernetes_metadata` to all beats. {pull}5707[5707]
 
 *Auditbeat*
 
@@ -127,6 +130,8 @@ https://github.com/elastic/beats/compare/v6.0.0-beta2...master[Check the HEAD di
 - Add experimental Docker autodiscover functionality. {pull}5245[5245]
 
 *Packetbeat*
+
+- Configure good defaults for `add_kubernetes_metadata`. {pull}5707[5707]
 
 *Winlogbeat*
 

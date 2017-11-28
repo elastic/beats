@@ -66,12 +66,16 @@ setup.kibana.path: /kibana
 [float]
 ==== `setup.kibana.username`
 
-The basic authentication username for connecting to Kibana.
+The basic authentication username for connecting to Kibana. If you don't
+specify a value for this setting, {beatname_uc} uses the `username` specified
+for the Elasticsearch output.
 
 [float]
 ==== `setup.kibana.password`
 
-The basic authentication password for connecting to Elasticsearch.
+The basic authentication password for connecting to Kibana. If you don't
+specify a value for this setting, {beatname_uc} uses the `password` specified
+for the Elasticsearch output.
 
 [float]
 [[kibana-path-option]]

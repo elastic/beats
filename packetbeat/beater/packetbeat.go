@@ -25,6 +25,9 @@ import (
 	"github.com/elastic/beats/packetbeat/protos/udp"
 	"github.com/elastic/beats/packetbeat/publish"
 	"github.com/elastic/beats/packetbeat/sniffer"
+
+	// Add packetbeat default processors
+	_ "github.com/elastic/beats/packetbeat/processor/add_kubernetes_metadata"
 )
 
 // Beater object. Contains all objects needed to run the beat

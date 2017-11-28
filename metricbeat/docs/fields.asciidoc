@@ -3376,7 +3376,7 @@ Total bytes obtained from system (sum of XxxSys below).
 
 
 [float]
-=== `golang.heap.system.optained`
+=== `golang.heap.system.obtained`
 
 type: long
 
