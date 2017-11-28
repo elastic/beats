@@ -112,7 +112,7 @@ type helloMessage struct {
 		cipherSuite cipherSuite
 		compression compressionMethod
 	}
-	extensions common.MapStr
+	extensions Extensions
 }
 
 func readRecordHeader(buf *streambuf.Buffer) (*recordHeader, error) {
@@ -188,8 +188,8 @@ func (hello helloMessage) toMap() common.MapStr {
 		m["selected_compression_method"] = hello.selected.compression.String()
 	}
 
-	if hello.extensions != nil {
-		m["extensions"] = hello.extensions
+	if hello.extensions.Parsed != nil {
+		m["extensions"] = hello.extensions.Parsed
 	}
 	return m
 }
@@ -383,8 +383,8 @@ func parseCommonHello(buffer bufferView, dest *helloMessage) (int, bool) {
 }
 
 func (hello *helloMessage) parseExtensions(buffer bufferView) {
-	hello.extensions = parseExtensions(buffer)
-	if ticket, err := hello.extensions.GetValue("session_ticket"); err == nil {
+	hello.extensions = ParseExtensions(buffer)
+	if ticket, err := hello.extensions.Parsed.GetValue("session_ticket"); err == nil {
 		if value, ok := ticket.(string); ok {
 			hello.ticket.present = true
 			hello.ticket.value = value
@@ -413,7 +413,9 @@ func parseClientHello(buffer bufferView) *helloMessage {
 			logp.Warn("failed parsing client hello cipher suite")
 			return nil
 		}
-		result.supported.cipherSuites = append(result.supported.cipherSuites, cipherSuite(cipher))
+		if !isGreaseValue(cipher) {
+			result.supported.cipherSuites = append(result.supported.cipherSuites, cipherSuite(cipher))
+		}
 	}
 
 	pos += 2 + int(cipherSuitesLength)
