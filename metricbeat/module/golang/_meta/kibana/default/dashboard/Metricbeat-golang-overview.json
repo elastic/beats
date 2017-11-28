@@ -54,7 +54,7 @@
         "title": "System  [Metricbeat Golang]",
         "uiStateJSON": "{}",
         "version": 1,
-        "visState": "{\"title\":\"System  [Metricbeat Golang]\",\"type\":\"timelion\",\"params\":{\"expression\":\".es(index=\\\"metricbeat*\\\",metric=\\\"avg:golang.heap.system.total\\\").label(\\\"System Total\\\"),.es(index=\\\"metricbeat*\\\",metric=\\\"avg:golang.heap.system.optained\\\").label(\\\"System Obtained\\\"),.es(index=\\\"metricbeat*\\\",metric=\\\"avg:golang.heap.system.stack\\\").label(\\\"System Stack\\\"),.es(index=\\\"metricbeat*\\\",metric=\\\"avg:golang.heap.system.released\\\").label(\\\"System Released\\\")\",\"interval\":\"10s\"},\"aggs\":[]}"
+        "visState": "{\"title\":\"System  [Metricbeat Golang]\",\"type\":\"timelion\",\"params\":{\"expression\":\".es(index=\\\"metricbeat*\\\",metric=\\\"avg:golang.heap.system.total\\\").label(\\\"System Total\\\"),.es(index=\\\"metricbeat*\\\",metric=\\\"avg:golang.heap.system.obtained\\\").label(\\\"System Obtained\\\"),.es(index=\\\"metricbeat*\\\",metric=\\\"avg:golang.heap.system.stack\\\").label(\\\"System Stack\\\"),.es(index=\\\"metricbeat*\\\",metric=\\\"avg:golang.heap.system.released\\\").label(\\\"System Released\\\")\",\"interval\":\"10s\"},\"aggs\":[]}"
       },
       "id": "9a9a8bf0-f52a-11e6-969c-518c48c913e4",
       "type": "visualization",

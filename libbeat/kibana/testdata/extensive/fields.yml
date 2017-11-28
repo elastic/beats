@@ -1683,7 +1683,7 @@
                   format: bytes
                   description: >
                     Total bytes obtained from system (sum of XxxSys below).
-                - name: optained
+                - name: obtained
                   type: long
                   format: bytes
                   description: >
