@@ -123,8 +123,8 @@ your `/etc/yum.repos.d/` directory and add the following lines:
 ifeval::["{release-state}"=="prerelease"]
 ["source","sh",subs="attributes"]
 --------------------------------------------------
-[elastic-6.x]
-name=Elastic repository for 6.x packages
+[elastic-6.x-prerelease]
+name=Elastic repository for 6.x prerelease packages
 baseurl=https://artifacts.elastic.co/packages/6.x/yum
 gpgcheck=1
 gpgkey=https://artifacts.elastic.co/GPG-KEY-elasticsearch
