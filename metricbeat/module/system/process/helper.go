@@ -408,17 +408,27 @@ func (procStats *ProcStats) includeTopProcesses(processes []Process) []Process {
 
 	var result []Process
 	if procStats.IncludeTop.ByCPU > 0 {
+		numProcs := procStats.IncludeTop.ByCPU
+		if len(processes) < procStats.IncludeTop.ByCPU {
+			numProcs = len(processes)
+		}
+
 		sort.Slice(processes, func(i, j int) bool {
 			return processes[i].cpuTotalPct > processes[j].cpuTotalPct
 		})
-		result = append(result, processes[:procStats.IncludeTop.ByCPU]...)
+		result = append(result, processes[:numProcs]...)
 	}
 
 	if procStats.IncludeTop.ByMemory > 0 {
+		numProcs := procStats.IncludeTop.ByMemory
+		if len(processes) < procStats.IncludeTop.ByMemory {
+			numProcs = len(processes)
+		}
+
 		sort.Slice(processes, func(i, j int) bool {
 			return processes[i].Mem.Resident > processes[j].Mem.Resident
 		})
-		for _, proc := range processes[:procStats.IncludeTop.ByMemory] {
+		for _, proc := range processes[:numProcs] {
 			if !isProcessInSlice(result, &proc) {
 				result = append(result, proc)
 			}
