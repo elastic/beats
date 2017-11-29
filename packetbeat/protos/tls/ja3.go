@@ -31,7 +31,7 @@ func getJa3Fingerprint(hello *helloMessage) (hash string, ja3str string) {
 	}
 
 	data[3] = extractJa3Array(hello.extensions.Raw[ExtensionSupportedGroups], 2)
-	data[4] = extractJa3Array(hello.extensions.Raw[ExtensionElipticCurvePointsFormats], 1)
+	data[4] = extractJa3Array(hello.extensions.Raw[ExtensionEllipticCurvePointsFormats], 1)
 
 	// build the string
 	parts := make([]string, len(data))
