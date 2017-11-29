@@ -269,7 +269,14 @@ func (h *IPPortIndexer) GetMetadata(pod *Pod) []MetadataIndex {
 	if pod.Status.PodIP == "" {
 		return metadata
 	}
-	for i := 0; i < len(hostPorts); i++ {
+
+	// Add pod IP
+	metadata = append(metadata, MetadataIndex{
+		Index: pod.Status.PodIP,
+		Data:  commonMeta,
+	})
+
+	for i := 1; i < len(hostPorts); i++ {
 		dobreak := false
 		containerMeta := commonMeta.Clone()
 		for _, container := range pod.Spec.Containers {
@@ -291,7 +298,6 @@ func (h *IPPortIndexer) GetMetadata(pod *Pod) []MetadataIndex {
 			if dobreak {
 				break
 			}
-
 		}
 
 		metadata = append(metadata, MetadataIndex{
@@ -311,18 +317,18 @@ func (h *IPPortIndexer) GetIndexes(pod *Pod) []string {
 	if ip == "" {
 		return hostPorts
 	}
+
+	// Add pod IP
+	hostPorts = append(hostPorts, ip)
+
 	for _, container := range pod.Spec.Containers {
 		ports := container.Ports
 
 		for _, port := range ports {
 			if port.ContainerPort != int64(0) {
 				hostPorts = append(hostPorts, fmt.Sprintf("%s:%d", ip, port.ContainerPort))
-			} else {
-				hostPorts = append(hostPorts, ip)
 			}
-
 		}
-
 	}
 
 	return hostPorts
