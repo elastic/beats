@@ -217,7 +217,7 @@ func TestWatcherDie(t *testing.T) {
 	}
 
 	// Now it should get removed
-	time.Sleep(150 * time.Millisecond)
+	time.Sleep(200 * time.Millisecond)
 	assert.Equal(t, 0, len(watcher.Containers()))
 }
 
@@ -232,7 +232,7 @@ func runWatcher(t *testing.T, kill bool, containers [][]types.Container, events 
 		done:       make(chan interface{}),
 	}
 
-	watcher, err := NewWatcherWithClient(client, 100*time.Millisecond)
+	watcher, err := NewWatcherWithClient(client, 150*time.Millisecond)
 	if err != nil {
 		t.Fatal(err)
 	}
