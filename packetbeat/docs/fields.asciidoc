@@ -3191,6 +3191,23 @@ type: keyword
 An array containing the TLS alert type for every alert received.
 
 
+
+[float]
+=== `tls.ja3_fingerprint.hash`
+
+type: keyword
+
+The JA3 fingerprint hash for the client side.
+
+
+[float]
+=== `tls.ja3_fingerprint.str`
+
+type: keyword
+
+The JA3 string used to calculate the hash.
+
+
 [[exported-fields-trans_event]]
 == Transaction Event fields
 
