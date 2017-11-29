@@ -237,16 +237,18 @@ func (plugin *tlsPlugin) createEvent(conn *tlsConnectionData) beat.Event {
 		"handshake_completed": conn.handshakeCompleted > 1,
 	}
 
+	fingerprints := common.MapStr{}
 	emptyHello := &helloMessage{}
 	var clientHello, serverHello *helloMessage
 	if client.parser.hello != nil {
 		clientHello = client.parser.hello
 		tls["client_hello"] = clientHello.toMap()
 		hash, str := getJa3Fingerprint(clientHello)
-		tls["ja3_fingerprint"] = common.MapStr{
+		ja3 := common.MapStr{
 			"hash": hash,
 			"str":  str,
 		}
+		fingerprints["ja3"] = ja3
 	} else {
 		clientHello = emptyHello
 	}
@@ -324,6 +326,9 @@ func (plugin *tlsPlugin) createEvent(conn *tlsConnectionData) beat.Event {
 		dst.Proc = string(server.cmdlineTuple.Src)
 	}
 
+	if len(fingerprints) > 0 {
+		tls["fingerprints"] = fingerprints
+	}
 	fields := common.MapStr{
 		"type":   "tls",
 		"status": status,

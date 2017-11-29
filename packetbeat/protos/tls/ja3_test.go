@@ -63,10 +63,10 @@ func TestJa3(t *testing.T) {
 		tls.ReceivedFin(tcpTuple, 0, private)
 		assert.Len(t, results.events, 1)
 		event := results.events[0]
-		actual, err := event.Fields.GetValue("tls.ja3_fingerprint.str")
+		actual, err := event.Fields.GetValue("tls.fingerprints.ja3.str")
 		assert.NoError(t, err)
 		assert.Equal(t, test.Str, actual)
-		actual, err = event.Fields.GetValue("tls.ja3_fingerprint.hash")
+		actual, err = event.Fields.GetValue("tls.fingerprints.ja3.hash")
 		assert.NoError(t, err)
 		assert.Equal(t, test.Fingerprint, actual)
 	}
