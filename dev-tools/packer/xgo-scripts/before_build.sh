@@ -55,7 +55,7 @@ cat ${ES_BEATS}/libbeat/docs/version.asciidoc >> ${PREFIX}/package.yml
 
 # Make variable naming of doc-branch compatible with gotpl. Generate and copy README.md into homedir
 # Add " to the version as gotpl interprets 6.0 as 6
-sed -i -e 's/:doc-branch: \([0-9]*.[0-9]*\)/doc_branch: "\1" /g' ${PREFIX}/package.yml
+sed -i -e 's/:doc-branch: \(.*\)/doc_branch: "\1" /g' ${PREFIX}/package.yml
 
 # Create README file
 /go/bin/gotpl /templates/readme.md.j2 < ${PREFIX}/package.yml > ${PREFIX}/homedir/README.md
