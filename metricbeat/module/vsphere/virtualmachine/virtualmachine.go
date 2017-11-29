@@ -2,17 +2,20 @@ package virtualmachine
 
 import (
 	"context"
+	"fmt"
 	"net/url"
 	"strings"
 	"sync"
 
 	"github.com/elastic/beats/libbeat/common"
 	"github.com/elastic/beats/libbeat/common/cfgwarn"
+	"github.com/elastic/beats/libbeat/logp"
 	"github.com/elastic/beats/metricbeat/mb"
 
 	"github.com/pkg/errors"
 	"github.com/vmware/govmomi"
 	"github.com/vmware/govmomi/object"
+	"github.com/vmware/govmomi/property"
 	"github.com/vmware/govmomi/view"
 	"github.com/vmware/govmomi/vim25"
 	"github.com/vmware/govmomi/vim25/mo"
@@ -112,7 +115,7 @@ func (m *MetricSet) Fetch() ([]common.MapStr, error) {
 
 		wg.Add(1)
 
-		go func(vm mo.VirtualMachine) {
+		go func(vm mo.VirtualMachine, c *vim25.Client) {
 
 			defer wg.Done()
 
@@ -157,10 +160,21 @@ func (m *MetricSet) Fetch() ([]common.MapStr, error) {
 				}
 			}
 
+			if vm.Summary.Vm != nil {
+				networkNames, err := getNetworkNames(c, vm.Summary.Vm.Reference())
+				if err != nil {
+					logp.Debug("vsphere", err.Error())
+				} else {
+					if len(networkNames) > 0 {
+						event["network_names"] = networkNames
+					}
+				}
+			}
+
 			mutex.Lock()
 			events = append(events, event)
 			mutex.Unlock()
-		}(vm)
+		}(vm, c)
 	}
 
 	wg.Wait()
@@ -181,6 +195,38 @@ func getCustomFields(customFields []types.BaseCustomFieldValue, customFieldsMap 
 	}
 
 	return outputFields
+}
+
+func getNetworkNames(c *vim25.Client, ref types.ManagedObjectReference) ([]string, error) {
+	ctx, cancel := context.WithCancel(context.Background())
+	defer cancel()
+
+	outputNetworkNames := []string{}
+
+	pc := property.DefaultCollector(c)
+
+	var vm mo.VirtualMachine
+	err := pc.RetrieveOne(ctx, ref, []string{"network"}, &vm)
+	if err != nil {
+		return nil, fmt.Errorf("error retrieving virtual machine information: %v", err)
+	}
+
+	if len(vm.Network) == 0 {
+		return nil, errors.Wrap(err, "no networks found")
+	}
+
+	var nets []mo.Network
+	err = pc.Retrieve(ctx, vm.Network, []string{"name"}, &nets)
+	if err != nil {
+		return nil, fmt.Errorf("error retrieving network from virtual machine: %v", err)
+	}
+
+	for _, net := range nets {
+		name := strings.Replace(net.Name, ".", "_", -1)
+		outputNetworkNames = append(outputNetworkNames, name)
+	}
+
+	return outputNetworkNames, nil
 }
 
 func setCustomFieldsMap(ctx context.Context, client *vim25.Client) (map[int32]string, error) {
