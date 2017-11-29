@@ -24,6 +24,7 @@ import (
 	"github.com/elastic/beats/libbeat/common/file"
 	"github.com/elastic/beats/libbeat/dashboards"
 	"github.com/elastic/beats/libbeat/logp"
+	"github.com/elastic/beats/libbeat/monitoring"
 	"github.com/elastic/beats/libbeat/monitoring/report"
 	"github.com/elastic/beats/libbeat/outputs/elasticsearch"
 	"github.com/elastic/beats/libbeat/paths"
@@ -42,6 +43,9 @@ import (
 	_ "github.com/elastic/beats/libbeat/processors/add_docker_metadata"
 	_ "github.com/elastic/beats/libbeat/processors/add_kubernetes_metadata"
 	_ "github.com/elastic/beats/libbeat/processors/add_locale"
+
+	// Register autodiscover providers
+	_ "github.com/elastic/beats/libbeat/autodiscover/providers/docker"
 
 	// Register default monitoring reporting
 	_ "github.com/elastic/beats/libbeat/monitoring/report/elasticsearch"
@@ -203,8 +207,13 @@ func (b *Beat) createBeater(bt beat.Creator) (beat.Beater, error) {
 		return nil, err
 	}
 
+	reg := monitoring.Default.GetRegistry("libbeat")
+	if reg == nil {
+		reg = monitoring.Default.NewRegistry("libbeat")
+	}
+
 	debugf("Initializing output plugins")
-	pipeline, err := pipeline.Load(b.Info, b.Config.Pipeline, b.Config.Output)
+	pipeline, err := pipeline.Load(b.Info, reg, b.Config.Pipeline, b.Config.Output)
 	if err != nil {
 		return nil, fmt.Errorf("error initializing publisher: %v", err)
 	}
@@ -528,13 +537,13 @@ func (b *Beat) loadDashboards(force bool) error {
 		}
 	}
 
-	if b.Config.Dashboards != nil && b.Config.Dashboards.Enabled() {
+	if b.Config.Dashboards.Enabled() {
 		var esConfig *common.Config
 
 		if b.Config.Output.Name() == "elasticsearch" {
 			esConfig = b.Config.Output.Config()
 		}
-		err := dashboards.ImportDashboards(b.Info.Beat, b.Info.Name, paths.Resolve(paths.Home, ""),
+		err := dashboards.ImportDashboards(b.Info.Beat, b.Info.Hostname, paths.Resolve(paths.Home, ""),
 			b.Config.Kibana, esConfig, b.Config.Dashboards, nil)
 		if err != nil {
 			return fmt.Errorf("Error importing Kibana dashboards: %v", err)

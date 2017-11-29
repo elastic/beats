@@ -26,6 +26,24 @@ metricbeat.config.modules:
 # disable startup delay.
 metricbeat.max_start_delay: 10s
 
+#============================== Autodiscover ===================================
+
+# Autodiscover allows you to detect changes in the system and spawn new modules
+# as they happen.
+
+#metricbeat.autodiscover:
+  # List of enabled autodiscover providers
+#  providers:
+#    - type: docker
+#      templates:
+#        - condition:
+#            equals.docker.container.image: etcd
+#          config:
+#            - module: etcd
+#              metricsets: ["leader", "self", "store"]
+#              period: 10s
+#              hosts: ["${host}:2379"]
+
 #==========================  Modules configuration ============================
 metricbeat.modules:
 
@@ -172,7 +190,7 @@ metricbeat.modules:
     namespace: "example"
     path: "/debug/vars"
 
-#------------------------------ graphite Module ------------------------------
+#------------------------------ Graphite Module ------------------------------
 - module: graphite
   metricsets: ["server"]
   enabled: true
@@ -286,6 +304,14 @@ metricbeat.modules:
   enabled: false
   metricsets:
     - event
+
+#------------------------------ Logstash Module ------------------------------
+- module: logstash
+  metricsets: ["node", "node_stats"]
+  enabled: false
+  period: 10s
+  hosts: ["localhost"]
+
 
 #------------------------------ Memcached Module -----------------------------
 - module: memcached
@@ -435,12 +461,17 @@ metricbeat.modules:
   insecure: false
   # Get custom fields when using virtualmachine metric set. Default false.
   # get_custom_fields: false
+  
 
 #------------------------------- Windows Module ------------------------------
 - module: windows
   metricsets: ["perfmon"]
   period: 10s
   perfmon.counters:
+
+- module: windows
+  metricsets: ["service"]
+  period: 60s
 
 #------------------------------ ZooKeeper Module -----------------------------
 - module: zookeeper
@@ -1079,6 +1110,10 @@ output.elasticsearch:
 # dashboards and index pattern. Example: testbeat-*
 #setup.dashboards.index:
 
+# Always use the Kibana API for loading the dashboards instead of autodetecting
+# how to install the dashboards by first querying Elasticsearch.
+#setup.dashboards.always_kibana: false
+
 #============================== Template =====================================
 
 # A template is used to set the mapping in Elasticsearch
@@ -1112,6 +1147,7 @@ setup.template.settings:
   #index:
     #number_of_shards: 1
     #codec: best_compression
+    #number_of_routing_shards: 30
 
   # A dictionary of settings for the _source field. For more details, please check
   # https://www.elastic.co/guide/en/elasticsearch/reference/current/mapping-source-field.html

@@ -2,11 +2,8 @@
   type: group
   description: >
     datastore
+  release: beta
   fields:
-    - name: datacenter
-      type: keyword
-      description: >
-        Datacenter name
     - name: name
       type: keyword
       description: >
@@ -16,7 +13,7 @@
       description: >
         Filesystem type
     - name: capacity.total.bytes
-      type: long      
+      type: long
       description: >
         Total bytes of the datastore
       format: bytes

@@ -1,5 +1,3 @@
-=== Jolokia jmx metricset
-
 This is the `jmx` metricset of the Jolokia module.
 
 [float]

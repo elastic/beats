@@ -126,7 +126,7 @@ To consolidate these lines into a single event in Filebeat, use the following mu
 
 [source,yaml]
 -------------------------------------------------------------------------------------
-multiline.pattern: '^[[:space:]]+|^Caused by:'
+multiline.pattern: '^[[:space:]]+(at|\.{3})\b|^Caused by:'
 multiline.negate: false
 multiline.match: after
 -------------------------------------------------------------------------------------

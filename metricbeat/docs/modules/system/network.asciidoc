@@ -3,6 +3,8 @@ This file is generated! See scripts/docs_collector.py
 ////
 
 [[metricbeat-metricset-system-network]]
+=== System network metricset
+
 include::../../../module/system/network/_meta/docs.asciidoc[]
 
 

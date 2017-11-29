@@ -123,7 +123,7 @@ func (rcv *Metadata) Type() byte {
 	if o != 0 {
 		return rcv._tab.GetByte(o + rcv._tab.Pos)
 	}
-	return 0
+	return 1
 }
 
 func (rcv *Metadata) MutateType(n byte) bool {
@@ -158,7 +158,7 @@ func MetadataAddCtimeNs(builder *flatbuffers.Builder, ctimeNs int64) {
 	builder.PrependInt64Slot(7, ctimeNs, 0)
 }
 func MetadataAddType(builder *flatbuffers.Builder, type_ byte) {
-	builder.PrependByteSlot(8, type_, 0)
+	builder.PrependByteSlot(8, type_, 1)
 }
 func MetadataEnd(builder *flatbuffers.Builder) flatbuffers.UOffsetT {
 	return builder.EndObject()

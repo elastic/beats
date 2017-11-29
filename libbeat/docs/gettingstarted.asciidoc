@@ -307,7 +307,13 @@ the name to the beat's version, and `%{+YYYY.MM.dd}` sets the third part of the
 name to a date based on the Logstash `@timestamp` field. For example:
 +{beatname_lc}-2017.03.29+.
 <2> `%{[@metadata][type]}` sets the document type based on the value of the `type`
-metadata field.
+metadata field. For Beats, this value resolves to `doc`. 
+
+NOTE: Starting with Logstash 6.0, the `document_type` option is deprecated due to the
+https://www.elastic.co/guide/en/elasticsearch/reference/6.0/removal-of-types.html[removal of types in Logstash 6.0].
+It will be removed in the next major version of Logstash. If you are running
+Logstash 6.0 or later, you do not need to set `document_type` in your
+configuration because Logstash sets the type to `doc` by default.
 
 When you run Logstash with this configuration, it indexes events into
 Elasticsearch in the same way that the Beat would, but you get access to other

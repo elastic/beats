@@ -3,6 +3,8 @@ This file is generated! See scripts/docs_collector.py
 ////
 
 [[metricbeat-metricset-system-core]]
+=== System core metricset
+
 include::../../../module/system/core/_meta/docs.asciidoc[]
 
 

@@ -23,6 +23,13 @@ func TestEventReader(t *testing.T) {
 	if err != nil {
 		t.Fatal(err)
 	}
+	// under macOS, temp dir has a symlink in the path (/var -> /private/var)
+	// and the path returned in events has the symlink resolved
+	if runtime.GOOS == "darwin" {
+		if dirAlt, err := filepath.EvalSymlinks(dir); err == nil {
+			dir = dirAlt
+		}
+	}
 	defer os.RemoveAll(dir)
 
 	// Create a new EventProducer.
@@ -49,7 +56,7 @@ func TestEventReader(t *testing.T) {
 		}
 
 		event := readTimeout(t, events)
-		assert.EqualValues(t, Created, event.Action)
+		assert.EqualValues(t, Created, event.Action&Created)
 		assertSameFile(t, txt1, event.Path)
 		if runtime.GOOS != "windows" {
 			assert.EqualValues(t, fileMode, event.Info.Mode)
@@ -65,14 +72,29 @@ func TestEventReader(t *testing.T) {
 		if len(received) == 0 {
 			t.Fatal("no events received")
 		}
-		for _, e := range received {
-			switch e.Action {
-			case Moved, Updated:
-				assert.Equal(t, txt1, e.Path)
-			case Created:
-				assertSameFile(t, txt2, e.Path)
-			default:
-				t.Errorf("unexpected event: %+v", e)
+		if runtime.GOOS == "darwin" {
+			for _, e := range received {
+				switch {
+				// Destination file only gets the Moved flag
+				case e.Action == Moved:
+					assertSameFile(t, txt2, e.Path)
+				// Source file is moved and updated
+				case 0 != e.Action&Moved, 0 != e.Action&Updated:
+					assertSameFile(t, txt1, e.Path)
+				default:
+					t.Errorf("unexpected event: %+v", e)
+				}
+			}
+		} else {
+			for _, e := range received {
+				switch {
+				case 0 != e.Action&Moved, 0 != e.Action&Updated:
+					assert.Equal(t, txt1, e.Path)
+				case 0 != e.Action&Created:
+					assertSameFile(t, txt2, e.Path)
+				default:
+					t.Errorf("unexpected event: %+v", e)
+				}
 			}
 		}
 	})
@@ -89,7 +111,7 @@ func TestEventReader(t *testing.T) {
 
 		event := readTimeout(t, events)
 		assertSameFile(t, txt2, event.Path)
-		assert.EqualValues(t, AttributesModified, event.Action)
+		assert.EqualValues(t, AttributesModified, AttributesModified&event.Action)
 		assert.EqualValues(t, 0644, event.Info.Mode)
 	})
 
@@ -105,7 +127,7 @@ func TestEventReader(t *testing.T) {
 
 		event := readTimeout(t, events)
 		assertSameFile(t, txt2, event.Path)
-		assert.EqualValues(t, Updated, event.Action)
+		assert.EqualValues(t, Updated, Updated&event.Action)
 		if runtime.GOOS != "windows" {
 			assert.EqualValues(t, 0644, event.Info.Mode)
 		}
@@ -120,7 +142,7 @@ func TestEventReader(t *testing.T) {
 		gid := changeGID(t, txt2)
 		event := readTimeout(t, events)
 		assertSameFile(t, txt2, event.Path)
-		assert.EqualValues(t, AttributesModified, event.Action)
+		assert.EqualValues(t, AttributesModified, AttributesModified&event.Action)
 		assert.EqualValues(t, gid, event.Info.GID)
 	})
 
@@ -130,7 +152,7 @@ func TestEventReader(t *testing.T) {
 		}
 
 		event := readTimeout(t, events)
-		assert.EqualValues(t, Deleted, event.Action)
+		assert.EqualValues(t, Deleted, Deleted&event.Action)
 	})
 
 	// Create a sub-directory.
@@ -160,7 +182,12 @@ func TestEventReader(t *testing.T) {
 		rename(t, moveInOrig, moveIn)
 
 		event := readTimeout(t, events)
-		assert.EqualValues(t, Created, event.Action)
+
+		if runtime.GOOS == "darwin" {
+			assert.EqualValues(t, Moved, event.Action)
+		} else {
+			assert.EqualValues(t, Created, event.Action)
+		}
 		assertSameFile(t, moveIn, event.Path)
 	})
 
@@ -174,7 +201,7 @@ func TestEventReader(t *testing.T) {
 		if runtime.GOOS == "windows" {
 			assert.EqualValues(t, Deleted, event.Action)
 		} else {
-			assert.EqualValues(t, Moved, event.Action)
+			assert.EqualValues(t, Moved, Moved&event.Action)
 		}
 	})
 
@@ -199,7 +226,7 @@ func readTimeout(t testing.TB, events <-chan Event) Event {
 		if !ok {
 			t.Fatal("failed reading from event channel")
 		}
-		t.Logf("%+v", buildMapStr(&e).StringToPrint())
+		t.Logf("%+v", buildMapStr(&e, false).StringToPrint())
 		return e
 	}
 
@@ -221,7 +248,7 @@ func readMax(t testing.TB, max int, events <-chan Event) []Event {
 			if !ok {
 				t.Fatal("failed reading from event channel")
 			}
-			t.Logf("%+v", buildMapStr(&e).StringToPrint())
+			t.Logf("%+v", buildMapStr(&e, false).StringToPrint())
 			received = append(received, e)
 			if len(received) >= max {
 				return received

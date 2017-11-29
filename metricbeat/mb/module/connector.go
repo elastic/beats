@@ -9,9 +9,10 @@ import (
 // Connector configures ann establishes a beat.Client for publishing events
 // to the publisher pipeline.
 type Connector struct {
-	pipeline   beat.Pipeline
-	processors *processors.Processors
-	eventMeta  common.EventMetadata
+	pipeline      beat.Pipeline
+	processors    *processors.Processors
+	eventMeta     common.EventMetadata
+	dynamicFields *common.MapStrPointer
 }
 
 type connectorConfig struct {
@@ -19,7 +20,7 @@ type connectorConfig struct {
 	common.EventMetadata `config:",inline"`      // Fields and tags to add to events.
 }
 
-func NewConnector(pipeline beat.Pipeline, c *common.Config) (*Connector, error) {
+func NewConnector(pipeline beat.Pipeline, c *common.Config, dynFields *common.MapStrPointer) (*Connector, error) {
 	config := connectorConfig{}
 	if err := c.Unpack(&config); err != nil {
 		return nil, err
@@ -31,9 +32,10 @@ func NewConnector(pipeline beat.Pipeline, c *common.Config) (*Connector, error) 
 	}
 
 	return &Connector{
-		pipeline:   pipeline,
-		processors: processors,
-		eventMeta:  config.EventMetadata,
+		pipeline:      pipeline,
+		processors:    processors,
+		eventMeta:     config.EventMetadata,
+		dynamicFields: dynFields,
 	}, nil
 }
 
@@ -41,5 +43,6 @@ func (c *Connector) Connect() (beat.Client, error) {
 	return c.pipeline.ConnectWith(beat.ClientConfig{
 		EventMetadata: c.eventMeta,
 		Processor:     c.processors,
+		DynamicFields: c.dynamicFields,
 	})
 }

@@ -3,6 +3,8 @@ This file is generated! See scripts/docs_collector.py
 ////
 
 [[metricbeat-metricset-system-process_summary]]
+=== System process_summary metricset
+
 include::../../../module/system/process_summary/_meta/docs.asciidoc[]
 
 

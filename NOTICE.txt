@@ -1134,7 +1134,7 @@ Apache License 2.0
 
 --------------------------------------------------------------------
 Dependency: github.com/google/uuid
-Revision: 6a5e28554805e78ea6141142aba763936c4761c0
+Revision: 281f560d28af7174109514e936f94c2ab2cb2823
 License type (autodetected): BSD 3-clause license
 ./metricbeat/module/vsphere/vendor/github.com/google/uuid/LICENSE:
 --------------------------------------------------------------------
@@ -3501,7 +3501,7 @@ Apache License 2.0
 
 --------------------------------------------------------------------
 Dependency: github.com/vmware/govmomi
-Revision: 9bfdc5ce62c0585b48b154cc460f8664dcd124c3
+Revision: 2cad15190b417804d82edb4981e7b3e62907c4ee
 License type (autodetected): Apache License 2.0
 ./metricbeat/module/vsphere/vendor/github.com/vmware/govmomi/LICENSE.txt:
 --------------------------------------------------------------------
@@ -3510,7 +3510,7 @@ Apache License 2.0
 
 --------------------------------------------------------------------
 Dependency: github.com/vmware/govmomi/vim25/xml
-Revision: 5072cda664c79ada30834d171d2ed1f76317d3b2
+Revision: 2cad15190b417804d82edb4981e7b3e62907c4ee
 License type (autodetected): BSD 3-clause license
 ./metricbeat/module/vsphere/vendor/github.com/vmware/govmomi/vim25/xml/LICENSE:
 --------------------------------------------------------------------
@@ -3543,15 +3543,6 @@ THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 --------------------------------------------------------------------
-Dependency: github.com/vmware/vic
-Revision: a2b2afb419d70009cd4d0b58f37b1a095c58b526
-License type (autodetected): Apache License 2.0
-./metricbeat/module/vsphere/vendor/github.com/vmware/vic/LICENSE:
---------------------------------------------------------------------
-Apache License 2.0
-
-
---------------------------------------------------------------------
 Dependency: github.com/yuin/gopher-lua
 Revision: b402f3114ec730d8bddb074a6c137309f561aa78
 License type (autodetected): MIT license
@@ -3581,7 +3572,7 @@ SOFTWARE.
 
 --------------------------------------------------------------------
 Dependency: golang.org/x/crypto
-Revision: 9419663f5a44be8b34ca85f08abc5fe1be11f8a3
+Revision: e8f229864d71a49e5fdc4a9a134c5f85c4c33d64
 License type (autodetected): BSD 3-clause license
 ./vendor/golang.org/x/crypto/LICENSE:
 --------------------------------------------------------------------
@@ -3649,7 +3640,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 --------------------------------------------------------------------
 Dependency: golang.org/x/sys
-Revision: a55a76086885b80f79961eacb876ebd8caf3868d
+Revision: b76f9891dc1d975623261def70f9b89661f5baab
 License type (autodetected): BSD 3-clause license
 ./vendor/golang.org/x/sys/LICENSE:
 --------------------------------------------------------------------

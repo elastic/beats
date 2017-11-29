@@ -20,9 +20,9 @@ func TestFBEncodeDecode(t *testing.T) {
 		t.Fatal("decode returned nil")
 	}
 
-	assert.EqualValues(t, *e.Info, *out.Info)
+	assert.Equal(t, *e.Info, *out.Info)
 	e.Info, out.Info = nil, nil
-	assert.EqualValues(t, e, out)
+	assert.Equal(t, e, out)
 }
 
 func BenchmarkFBEncodeEvent(b *testing.B) {

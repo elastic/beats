@@ -24,7 +24,6 @@
                     "mhz": 67
                 }
             },
-            "datacenter": "ha-datacenter",
             "memory": {
                 "free": {
                     "bytes": 2822230016

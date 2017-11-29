@@ -4,11 +4,11 @@ import (
 	"fmt"
 	"strings"
 
-	"github.com/elastic/beats/libbeat/common"
-	"github.com/elastic/beats/libbeat/logp"
-
 	"github.com/joeshaw/multierror"
 	"github.com/pkg/errors"
+
+	"github.com/elastic/beats/libbeat/common"
+	"github.com/elastic/beats/libbeat/logp"
 )
 
 var debugf = logp.MakeDebug("mb")
@@ -115,7 +115,12 @@ func initMetricSets(r *Register, m Module) ([]MetricSet, error) {
 		metricsets []MetricSet
 	)
 
-	for _, bm := range newBaseMetricSets(m) {
+	bms, err := newBaseMetricSets(r, m)
+	if err != nil {
+		return nil, err
+	}
+
+	for _, bm := range bms {
 		f, hostParser, err := r.metricSetFactory(bm.Module().Name(), bm.Name())
 		if err != nil {
 			errs = append(errs, err)
@@ -152,15 +157,25 @@ func initMetricSets(r *Register, m Module) ([]MetricSet, error) {
 }
 
 // newBaseMetricSets creates a new BaseMetricSet for all MetricSets defined
-// in the modules' config.
-func newBaseMetricSets(m Module) []BaseMetricSet {
+// in the module's config. An error is returned if no MetricSets are specified
+// in the module's config and no default MetricSet is defined.
+func newBaseMetricSets(r *Register, m Module) ([]BaseMetricSet, error) {
 	hosts := []string{""}
 	if l := m.Config().Hosts; len(l) > 0 {
 		hosts = l
 	}
 
+	metricSetNames := m.Config().MetricSets
+	if len(metricSetNames) == 0 {
+		var err error
+		metricSetNames, err = r.defaultMetricSets(m.Name())
+		if err != nil {
+			return nil, errors.Errorf("no metricsets configured for module '%s'", m.Name())
+		}
+	}
+
 	var metricsets []BaseMetricSet
-	for _, name := range m.Config().MetricSets {
+	for _, name := range metricSetNames {
 		name = strings.ToLower(name)
 		for _, host := range hosts {
 			metricsets = append(metricsets, BaseMetricSet{
@@ -170,7 +185,7 @@ func newBaseMetricSets(m Module) []BaseMetricSet {
 			})
 		}
 	}
-	return metricsets
+	return metricsets, nil
 }
 
 // mustHaveModule returns an error if the given MetricSet's Module() method

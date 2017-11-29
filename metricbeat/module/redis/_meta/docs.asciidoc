@@ -1,5 +1,3 @@
-== Redis module
-
 This module periodically fetches metrics from http://redis.io/[Redis] servers.
 
 [float]

@@ -1,6 +1,2 @@
-== Couchbase module
-
-beta[]
-
 This module periodically fetches metrics from https://www.couchbase.com/[Couchbase]
 servers.

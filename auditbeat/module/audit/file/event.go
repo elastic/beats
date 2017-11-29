@@ -25,37 +25,6 @@ import (
 	"github.com/elastic/beats/metricbeat/mb"
 )
 
-// Action is a description of the change that occurred.
-type Action uint8
-
-func (a Action) String() string {
-	if name, found := actionNames[a]; found {
-		return name
-	}
-	return "unknown"
-}
-
-// List of possible Actions.
-const (
-	None = iota << 1
-	AttributesModified
-	Created
-	Deleted
-	Updated
-	Moved
-	ConfigChange
-)
-
-var actionNames = map[Action]string{
-	None:               "none",
-	AttributesModified: "attributes_modified",
-	Created:            "created",
-	Deleted:            "deleted",
-	Updated:            "updated",
-	Moved:              "moved",
-	ConfigChange:       "config_change",
-}
-
 // Source identifies the source of an event (i.e. what triggered it).
 type Source uint8
 
@@ -91,7 +60,8 @@ func (t Type) String() string {
 
 // Enum of possible file.Types.
 const (
-	FileType Type = iota
+	UnknownType Type = iota // Typically seen in deleted notifications where the object is gone.
+	FileType
 	DirType
 	SymlinkType
 )
@@ -197,11 +167,11 @@ func NewEvent(
 	maxFileSize uint64,
 	hashTypes []HashType,
 ) Event {
-	if action == Deleted {
-		return NewEventFromFileInfo(path, nil, nil, action, source, maxFileSize, hashTypes)
-	}
-
 	info, err := os.Lstat(path)
+	if err != nil && os.IsNotExist(err) {
+		// deleted file is signaled by info == nil
+		err = nil
+	}
 	err = errors.Wrap(err, "failed to lstat")
 	return NewEventFromFileInfo(path, info, err, action, source, maxFileSize, hashTypes)
 }
@@ -211,7 +181,7 @@ func (e *Event) String() string {
 	return string(data)
 }
 
-func buildMapStr(e *Event) common.MapStr {
+func buildMapStr(e *Event, existedBefore bool) common.MapStr {
 	m := common.MapStr{
 		"@timestamp": e.Timestamp,
 		"path":       e.Path,
@@ -220,7 +190,7 @@ func buildMapStr(e *Event) common.MapStr {
 	}
 
 	if e.Action > 0 {
-		m["action"] = e.Action.String()
+		m["action"] = e.Action.InOrder(existedBefore, e.Info != nil).StringArray()
 	}
 
 	if e.TargetPath != "" {
@@ -237,7 +207,7 @@ func buildMapStr(e *Event) common.MapStr {
 			m["size"] = info.Size
 		}
 
-		if info.Type != 0 {
+		if info.Type != UnknownType {
 			m["type"] = info.Type.String()
 		}
 
@@ -286,9 +256,12 @@ func diffEvents(old, new *Event) (Action, bool) {
 		return Moved, true
 	}
 
+	result := None
+
 	// Test if new.Hashes is a subset of old.Hashes.
 	hasAllHashes := true
 	for hashType, newValue := range new.Hashes {
+
 		oldValue, found := old.Hashes[hashType]
 		if !found {
 			hasAllHashes = false
@@ -297,14 +270,15 @@ func diffEvents(old, new *Event) (Action, bool) {
 
 		// The Updated action takes precedence over a new hash type being configured.
 		if !bytes.Equal(oldValue, newValue) {
-			return Updated, true
+			result |= Updated
+			break
 		}
 	}
 
 	if old.TargetPath != new.TargetPath ||
 		(old.Info == nil && new.Info != nil) ||
 		(old.Info != nil && new.Info == nil) {
-		return AttributesModified, true
+		result |= AttributesModified
 	}
 
 	// Test if metadata has changed.
@@ -312,22 +286,21 @@ func diffEvents(old, new *Event) (Action, bool) {
 		// The owner and group names are ignored (they aren't persisted).
 		if o.Inode != n.Inode || o.UID != n.UID || o.GID != n.GID || o.SID != n.SID ||
 			o.Mode != n.Mode || o.Type != n.Type {
-			return AttributesModified, true
+			result |= AttributesModified
 		}
 
 		// For files consider mtime and size.
 		if n.Type == FileType && (!o.MTime.Equal(n.MTime) || o.Size != n.Size) {
-			return AttributesModified, true
+			result |= AttributesModified
 		}
 	}
 
 	// The old event didn't have all the requested hash types.
 	if !hasAllHashes {
-		return ConfigChange, true
+		result |= ConfigChange
 	}
 
-	// No change.
-	return None, false
+	return result, result != None
 }
 
 func hashFile(name string, hashType ...HashType) (map[HashType][]byte, error) {

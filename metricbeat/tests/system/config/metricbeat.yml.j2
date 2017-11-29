@@ -139,6 +139,22 @@ processors:
 
 {%- endif %}
 
+#============================== Autodiscover ==================================
+
+{% if autodiscover %}
+metricbeat.autodiscover:
+  providers:
+  {%- for provider, settings in autodiscover.items() %}
+  - type: {{provider}}
+    {%- if settings %}
+    {%- for k, v in settings.items() %}
+    {{k}}:
+      {{v | default([])}}
+    {%- endfor %}
+    {%- endif %}
+  {%- endfor %}
+{% endif %}
+
 #================================ Queue =====================================
 
 queue.mem:
@@ -151,12 +167,25 @@ queue.mem:
 # Configure what outputs to use when sending the data collected by the beat.
 # Multiple outputs may be used.
 
-#------------------------------- File output ----------------------------------
-output.file:
-  path: {{ output_file_path|default(beat.working_dir + "/output") }}
-  filename: "{{ output_file_filename|default("metricbeat") }}"
-  rotate_every_kb: 1000
-  #number_of_files: 7
+output:
+  {% if elasticsearch -%}
+  elasticsearch:
+    hosts: ["{{ elasticsearch.host }}"]
+  {%- endif %}
+
+  # File as output
+  # Options
+  # path: where to save the files
+  # filename: name of the files
+  # rotate_every_kb: maximum size of the files in path
+  # number of files: maximum number of files in path
+  {% if not (console or elasticsearch) -%}
+  file:
+    path: {{ output_file_path|default(beat.working_dir + "/output") }}
+    filename: "{{ output_file_filename|default("metricbeat") }}"
+    rotate_every_kb: 1000
+    #number_of_files: 7
+  {%- endif %}
 
 {% if path_data %}
 #================================ Paths =====================================

@@ -20,6 +20,7 @@ func testEvent() *Event {
 		Source:    SourceScan,
 		Action:    ConfigChange,
 		Info: &Metadata{
+			Type:  FileType,
 			Inode: 123,
 			UID:   500,
 			GID:   500,
@@ -125,7 +126,7 @@ func TestDiffEvents(t *testing.T) {
 
 		action, changed := diffEvents(testEvent(), e)
 		assert.True(t, changed)
-		assert.EqualValues(t, Updated, action)
+		assert.EqualValues(t, Updated|AttributesModified, action)
 	})
 }
 

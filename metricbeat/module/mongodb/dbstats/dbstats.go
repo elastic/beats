@@ -35,7 +35,7 @@ type MetricSet struct {
 // Part of new is also setting up the configuration by processing additional
 // configuration entries if needed.
 func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
-	cfgwarn.Experimental("The %v %v metricset is experimental", base.Module().Name(), base.Name())
+	cfgwarn.Beta("The %v %v metricset is Beta", base.Module().Name(), base.Name())
 
 	dialInfo, err := mgo.ParseURL(base.HostData().URI)
 	if err != nil {
@@ -61,6 +61,7 @@ func (m *MetricSet) Fetch() ([]common.MapStr, error) {
 	if err != nil {
 		return nil, err
 	}
+	defer mongoSession.Close()
 
 	// Get the list of databases names, which we'll use to call db.stats() on each
 	dbNames, err := mongoSession.DatabaseNames()

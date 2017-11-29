@@ -155,6 +155,7 @@ func addParams(format *common.MapStr, version *common.Version, f common.Field) {
 	addFormatParam(format, "outputFormat", f.OutputFormat)
 	addFormatParam(format, "outputPrecision", f.OutputPrecision)
 	addFormatParam(format, "labelTemplate", f.LabelTemplate)
+	addFormatParam(format, "openLinkInCurrentTab", f.OpenLinkInCurrentTab)
 	addVersionedFormatParam(format, version, "urlTemplate", f.UrlTemplate)
 }
 
@@ -167,6 +168,11 @@ func addFormatParam(f *common.MapStr, key string, val interface{}) {
 		}
 	case *int:
 		if v := val.(*int); v != nil {
+			createParam(f)
+			(*f)["params"].(common.MapStr)[key] = *v
+		}
+	case *bool:
+		if v := val.(*bool); v != nil {
 			createParam(f)
 			(*f)["params"].(common.MapStr)[key] = *v
 		}

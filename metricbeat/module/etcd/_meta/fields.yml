@@ -1,9 +1,8 @@
 - key: etcd
   title: "Etcd"
   description: >
-    []experimental
-
     etcd Module
+  release: beta
   fields:
     - name: etcd
       type: group

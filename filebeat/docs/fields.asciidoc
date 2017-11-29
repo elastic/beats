@@ -21,6 +21,7 @@ grouped in the following categories:
 * <<exported-fields-kafka>>
 * <<exported-fields-kubernetes-processor>>
 * <<exported-fields-log>>
+* <<exported-fields-logstash>>
 * <<exported-fields-mysql>>
 * <<exported-fields-nginx>>
 * <<exported-fields-postgresql>>
@@ -935,6 +936,16 @@ The content of the line read from the log file.
 
 
 [float]
+=== `stream`
+
+type: keyword
+
+required: False
+
+Log stream when reading container logs, can be 'stdout' or 'stderr'
+
+
+[float]
 === `prospector.type`
 
 required: True
@@ -958,6 +969,161 @@ The Filebeat module that generated this event.
 === `fileset.name`
 
 The Filebeat fileset that generated this event.
+
+
+[[exported-fields-logstash]]
+== logstash fields
+
+logstash Module
+
+
+
+[float]
+== logstash fields
+
+
+
+
+[float]
+== log fields
+
+Fields from the Logstash logs.
+
+
+
+[float]
+=== `logstash.log.message`
+
+type: text
+
+Contains the un-parsed log message
+
+
+[float]
+=== `logstash.log.level`
+
+type: keyword
+
+The log level of the message, this correspond to Log4j levels.
+
+
+[float]
+=== `logstash.log.module`
+
+type: keyword
+
+The module or class where the event originate.
+
+
+[float]
+=== `logstash.log.thread`
+
+type: text
+
+Information about the running thread where the log originate.
+
+
+[float]
+=== `logstash.log.log_event`
+
+type: object
+
+key and value debugging information.
+
+
+[float]
+== slowlog fields
+
+slowlog
+
+
+
+[float]
+=== `logstash.slowlog.message`
+
+type: text
+
+Contains the un-parsed log message
+
+
+[float]
+=== `logstash.slowlog.level`
+
+type: keyword
+
+The log level of the message, this correspond to Log4j levels.
+
+
+[float]
+=== `logstash.slowlog.module`
+
+type: keyword
+
+The module or class where the event originate.
+
+
+[float]
+=== `logstash.slowlog.thread`
+
+type: text
+
+Information about the running thread where the log originate.
+
+
+[float]
+=== `logstash.slowlog.event`
+
+type: text
+
+Raw dump of the original event
+
+
+[float]
+=== `logstash.slowlog.plugin_name`
+
+type: keyword
+
+Name of the plugin
+
+
+[float]
+=== `logstash.slowlog.plugin_type`
+
+type: keyword
+
+Type of the plugin: Inputs, Filters, Outputs or Codecs.
+
+
+[float]
+=== `logstash.slowlog.took_in_millis`
+
+type: long
+
+Execution time for the plugin in milliseconds.
+
+
+[float]
+=== `logstash.slowlog.took_in_nanos`
+
+type: long
+
+Execution time for the plugin in nanoseconds.
+
+
+[float]
+=== `logstash.slowlog.plugin_params`
+
+type: text
+
+String value of the plugin configuration
+
+
+[float]
+=== `logstash.slowlog.plugin_params_object`
+
+type: object
+
+key -> value of the configuration used by the plugin.
 
 
 [[exported-fields-mysql]]

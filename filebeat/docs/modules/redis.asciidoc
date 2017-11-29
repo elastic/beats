@@ -7,8 +7,6 @@ This file is generated! See scripts/docs_collector.py
 
 == Redis module
 
-experimental[]
-
 The +{modulename}+ module parses logs and slowlogs created by
 https://redis.io/[Redis].
 

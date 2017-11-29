@@ -21,6 +21,8 @@ type Crawler struct {
 	prospectorConfigs   []*common.Config
 	out                 channel.Factory
 	wg                  sync.WaitGroup
+	ProspectorsFactory  cfgfile.RunnerFactory
+	ModulesFactory      cfgfile.RunnerFactory
 	modulesReloader     *cfgfile.Reloader
 	prospectorsReloader *cfgfile.Reloader
 	once                bool
@@ -53,27 +55,27 @@ func (c *Crawler) Start(r *registrar.Registrar, configProspectors *common.Config
 		}
 	}
 
+	c.ProspectorsFactory = prospector.NewRunnerFactory(c.out, r, c.beatDone)
 	if configProspectors.Enabled() {
 		c.prospectorsReloader = cfgfile.NewReloader(configProspectors)
-		runnerFactory := prospector.NewRunnerFactory(c.out, r, c.beatDone)
-		if err := c.prospectorsReloader.Check(runnerFactory); err != nil {
+		if err := c.prospectorsReloader.Check(c.ProspectorsFactory); err != nil {
 			return err
 		}
 
 		go func() {
-			c.prospectorsReloader.Run(runnerFactory)
+			c.prospectorsReloader.Run(c.ProspectorsFactory)
 		}()
 	}
 
+	c.ModulesFactory = fileset.NewFactory(c.out, r, c.beatVersion, pipelineLoaderFactory, c.beatDone)
 	if configModules.Enabled() {
 		c.modulesReloader = cfgfile.NewReloader(configModules)
-		modulesFactory := fileset.NewFactory(c.out, r, c.beatVersion, pipelineLoaderFactory, c.beatDone)
-		if err := c.modulesReloader.Check(modulesFactory); err != nil {
+		if err := c.modulesReloader.Check(c.ModulesFactory); err != nil {
 			return err
 		}
 
 		go func() {
-			c.modulesReloader.Run(modulesFactory)
+			c.modulesReloader.Run(c.ModulesFactory)
 		}()
 	}
 
@@ -86,7 +88,7 @@ func (c *Crawler) startProspector(config *common.Config, states []file.State) er
 	if !config.Enabled() {
 		return nil
 	}
-	p, err := prospector.New(config, c.out, c.beatDone, states)
+	p, err := prospector.New(config, c.out, c.beatDone, states, nil)
 	if err != nil {
 		return fmt.Errorf("Error in initing prospector: %s", err)
 	}

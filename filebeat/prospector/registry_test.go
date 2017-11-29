@@ -52,6 +52,6 @@ func TestGetNonExistentFactory(t *testing.T) {
 	f, err := GetFactory("noSuchFactory")
 	assert.Nil(t, f)
 	if assert.Error(t, err) {
-		assert.Equal(t, "Error retrieving factory for prospector 'noSuchFactory'", err.Error())
+		assert.Equal(t, "Error creating prospector. No such prospector type exist: 'noSuchFactory'", err.Error())
 	}
 }

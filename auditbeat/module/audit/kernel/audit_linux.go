@@ -58,7 +58,7 @@ func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
 	}
 
 	_, _, kernel, _ := kernelVersion()
-	debugf("%v the metricset is running as euid=%v on kernel=%v", logPrefix, os.Geteuid(), kernel)
+	debugf("the metricset is running as euid=%v on kernel=%v", os.Geteuid(), kernel)
 
 	client, err := newAuditClient(&config)
 	if err != nil {
@@ -194,7 +194,7 @@ func (ms *MetricSet) initClient() error {
 	if err != nil {
 		return errors.Wrap(err, "failed to get audit status")
 	}
-	debugf("%v audit status from kernel at start: status=%+v", logPrefix, status)
+	debugf("audit status from kernel at start: status=%+v", status)
 
 	if fm, _ := ms.config.failureMode(); status.Failure != fm {
 		if err = ms.client.SetFailure(libaudit.FailureMode(fm), libaudit.NoWait); err != nil {
@@ -254,8 +254,8 @@ func (ms *MetricSet) receiveEvents(done <-chan struct{}) (<-chan []*auparse.Audi
 			}
 
 			if err := reassembler.Push(raw.Type, raw.Data); err != nil {
-				debugf("%v dropping message record_type=%v message='%v': ",
-					logPrefix, raw.Type, string(raw.Data), err)
+				debugf("dropping message record_type=%v message='%v': ",
+					raw.Type, string(raw.Data), err)
 				continue
 			}
 		}

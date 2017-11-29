@@ -49,7 +49,7 @@ func makeTestClient(conn *transport.Client) testClientDriver {
 	config := defaultConfig
 	config.Timeout = 1 * time.Second
 	config.TTL = 5 * time.Second
-	client, err := newSyncClient(beat.Info{}, conn, nil, &config)
+	client, err := newSyncClient(beat.Info{}, conn, outputs.NewNilObserver(), &config)
 	if err != nil {
 		panic(err)
 	}

@@ -83,8 +83,7 @@ func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
 		}
 	}
 
-	debugf("%v Initialized the audit file event reader. Running as euid=%v",
-		logPrefix, os.Geteuid())
+	debugf("Initialized the audit file event reader. Running as euid=%v", os.Geteuid())
 
 	return ms, nil
 }
@@ -163,24 +162,24 @@ func (ms *MetricSet) init(reporter mb.PushReporter) bool {
 
 func (ms *MetricSet) reportEvent(reporter mb.PushReporter, event *Event) bool {
 	if len(event.errors) > 0 && logp.IsDebug(metricsetName) {
-		debugf("%v Errors on %v event for %v: %v",
-			logPrefix, event.Action, event.Path, event.errors)
+		debugf("Errors on %v event for %v: %v",
+			event.Action, event.Path, event.errors)
 	}
 
-	changed := ms.hasFileChangedSinceLastEvent(event)
+	changed, lastEvent := ms.hasFileChangedSinceLastEvent(event)
 	if changed {
 		// Publish event if it changed.
-		if ok := reporter.Event(buildMapStr(event)); !ok {
+		if ok := reporter.Event(buildMapStr(event, lastEvent != nil)); !ok {
 			return false
 		}
 	}
 
 	// Persist event locally.
-	if event.Action == Deleted {
+	if event.Info == nil {
 		if err := ms.bucket.Delete(event.Path); err != nil {
 			logp.Err("%v %v", logPrefix, err)
 		}
-	} else if event.Info != nil {
+	} else {
 		if err := store(ms.bucket, event); err != nil {
 			logp.Err("%v %v", logPrefix, err)
 		}
@@ -188,12 +187,12 @@ func (ms *MetricSet) reportEvent(reporter mb.PushReporter, event *Event) bool {
 	return true
 }
 
-func (ms *MetricSet) hasFileChangedSinceLastEvent(event *Event) bool {
+func (ms *MetricSet) hasFileChangedSinceLastEvent(event *Event) (changed bool, lastEvent *Event) {
 	// Load event from DB.
 	lastEvent, err := load(ms.bucket, event.Path)
 	if err != nil {
 		logp.Warn("%v %v", logPrefix, err)
-		return true
+		return true, lastEvent
 	}
 
 	action, changed := diffEvents(lastEvent, event)
@@ -202,10 +201,10 @@ func (ms *MetricSet) hasFileChangedSinceLastEvent(event *Event) bool {
 	}
 
 	if changed && logp.IsDebug(metricsetName) {
-		debugf("%v file at %v has changed since last seen: old=%v, new=%v",
-			logPrefix, event.Path, lastEvent, event)
+		debugf("file at %v has changed since last seen: old=%v, new=%v",
+			event.Path, lastEvent, event)
 	}
-	return changed
+	return changed, lastEvent
 }
 
 func (ms *MetricSet) purgeDeleted(reporter mb.PushReporter) {
@@ -218,7 +217,7 @@ func (ms *MetricSet) purgeDeleted(reporter mb.PushReporter) {
 
 		for _, e := range deleted {
 			// Don't persist!
-			if !reporter.Event(buildMapStr(e)) {
+			if !reporter.Event(buildMapStr(e, true)) {
 				return
 			}
 		}
@@ -264,7 +263,7 @@ func purgeOlder(b datastore.BoltBucket, t time.Time, prefix string) ([]*Event, e
 		return nil
 	})
 
-	debugf("%v Purged %v of %v entries in %v for %v", logPrefix, len(deleted),
+	debugf("Purged %v of %v entries in %v for %v", len(deleted),
 		totalKeys, time.Since(startTime), prefix)
 	return deleted, err
 }

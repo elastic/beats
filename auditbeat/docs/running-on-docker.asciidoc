@@ -1,0 +1,15 @@
+include::../../libbeat/docs/shared-docker.asciidoc[]
+
+[float]
+==== Special requirements
+
+Under Docker, {beatname_uc} runs as a non-root user, but requires some privileged
+capabilities to operate correctly. Ensure that the +AUDIT_CONTROL+ and +AUDIT_READ+
+capabilities are available to the container.
+
+It is also essential to run {beatname_uc} in the host PID namespace.
+
+["source","sh",subs="attributes"]
+----
+docker run --cap-add=AUDIT_CONTROL,AUDIT_READ --pid=host {dockerimage}
+----

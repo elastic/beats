@@ -14,6 +14,15 @@ import (
 // Requires the Google flatbuffer compiler.
 //go:generate flatc --go schema.fbs
 
+var actionMap = map[Action]byte{
+	AttributesModified: schema.ActionAttributesModified,
+	Created:            schema.ActionCreated,
+	Deleted:            schema.ActionDeleted,
+	Updated:            schema.ActionUpdated,
+	Moved:              schema.ActionMoved,
+	ConfigChange:       schema.ActionConfigChanged,
+}
+
 var bufferPool sync.Pool
 
 func init() {
@@ -104,6 +113,8 @@ func fbWriteMetadata(b *flatbuffers.Builder, m *Metadata) flatbuffers.UOffsetT {
 	}
 	schema.MetadataAddMode(b, uint32(m.Mode))
 	switch m.Type {
+	case UnknownType:
+		schema.MetadataAddType(b, schema.TypeUnknown)
 	case FileType:
 		schema.MetadataAddType(b, schema.TypeFile)
 
@@ -146,20 +157,13 @@ func fbWriteEvent(b *flatbuffers.Builder, e *Event) flatbuffers.UOffsetT {
 		schema.EventAddTargetPath(b, targetPathOffset)
 	}
 
-	switch e.Action {
-	case AttributesModified:
-		schema.EventAddAction(b, schema.ActionAttributesModified)
-	case Created:
-		schema.EventAddAction(b, schema.ActionCreated)
-	case Deleted:
-		schema.EventAddAction(b, schema.ActionDeleted)
-	case Updated:
-		schema.EventAddAction(b, schema.ActionUpdated)
-	case Moved:
-		schema.EventAddAction(b, schema.ActionMoved)
-	case ConfigChange:
-		schema.EventAddAction(b, schema.ActionConfigChanged)
+	var action byte
+	for k, v := range actionMap {
+		if 0 != e.Action&k {
+			action |= v
+		}
 	}
+	schema.EventAddAction(b, action)
 
 	if metadataOffset > 0 {
 		schema.EventAddInfo(b, metadataOffset)
@@ -189,19 +193,11 @@ func fbDecodeEvent(path string, buf []byte) *Event {
 		rtn.Source = SourceFSNotify
 	}
 
-	switch e.Action() {
-	case schema.ActionAttributesModified:
-		rtn.Action = AttributesModified
-	case schema.ActionCreated:
-		rtn.Action = Created
-	case schema.ActionDeleted:
-		rtn.Action = Deleted
-	case schema.ActionUpdated:
-		rtn.Action = Updated
-	case schema.ActionMoved:
-		rtn.Action = Moved
-	case schema.ActionConfigChanged:
-		rtn.Action = ConfigChange
+	action := e.Action()
+	for k, v := range actionMap {
+		if 0 != action&v {
+			rtn.Action |= k
+		}
 	}
 
 	rtn.Info = fbDecodeMetadata(e)
@@ -234,6 +230,8 @@ func fbDecodeMetadata(e *schema.Event) *Metadata {
 		rtn.Type = DirType
 	case schema.TypeSymlink:
 		rtn.Type = SymlinkType
+	default:
+		rtn.Type = UnknownType
 	}
 
 	return rtn

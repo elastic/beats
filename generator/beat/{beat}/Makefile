@@ -5,7 +5,7 @@ BEAT_URL=https://${BEAT_PATH}
 SYSTEM_TESTS=false
 TEST_ENVIRONMENT=false
 ES_BEATS?=./vendor/github.com/elastic/beats
-GOPACKAGES=$(shell govendor list +local)
+GOPACKAGES=$(shell govendor list -no-status +local)
 PREFIX?=.
 NOTICE_FILE=NOTICE
 
@@ -15,7 +15,7 @@ NOTICE_FILE=NOTICE
 # Initial beat setup
 .PHONY: setup
 setup: copy-vendor
-	make update
+	$(MAKE) update
 
 # Copy beats into vendor directory
 .PHONY: copy-vendor

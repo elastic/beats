@@ -1,8 +1,9 @@
-// +build linux freebsd openbsd netbsd windows darwin
+// +build linux freebsd openbsd netbsd windows
 
 package file
 
 import (
+	"errors"
 	"syscall"
 	"time"
 
@@ -19,6 +20,9 @@ type reader struct {
 
 // NewEventReader creates a new EventProducer backed by fsnotify.
 func NewEventReader(c Config) (EventProducer, error) {
+	if c.Recursive {
+		return nil, errors.New("recursive file auditing not supported in this platform (see file.recursive)")
+	}
 	watcher, err := fsnotify.NewWatcher()
 	if err != nil {
 		return nil, err
@@ -44,6 +48,7 @@ func (r *reader) Start(done <-chan struct{}) (<-chan Event, error) {
 	}
 
 	go r.consumeEvents()
+	logp.Info("%v started fsnotify watcher", logPrefix)
 	return r.eventC, nil
 }
 
@@ -57,7 +62,7 @@ func (r *reader) consumeEvents() {
 			if event.Name == "" {
 				continue
 			}
-			debugf("%v Received fsnotify event: path=%v action=%v", logPrefix,
+			debugf("Received fsnotify event: path=%v action=%v",
 				event.Name, event.Op.String())
 
 			start := time.Now()

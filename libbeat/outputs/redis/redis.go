@@ -30,7 +30,7 @@ func init() {
 
 func makeRedis(
 	beat beat.Info,
-	stats *outputs.Stats,
+	observer outputs.Observer,
 	cfg *common.Config,
 ) (outputs.Group, error) {
 	config := defaultConfig
@@ -89,7 +89,7 @@ func makeRedis(
 		Timeout: config.Timeout,
 		Proxy:   &config.Proxy,
 		TLS:     tls,
-		Stats:   stats,
+		Stats:   observer,
 	}
 
 	clients := make([]outputs.NetworkClient, len(hosts))
@@ -104,7 +104,7 @@ func makeRedis(
 			return outputs.Fail(err)
 		}
 
-		clients[i] = newClient(conn, stats, config.Timeout,
+		clients[i] = newClient(conn, observer, config.Timeout,
 			config.Password, config.Db, key, dataType, config.Index, enc)
 	}
 

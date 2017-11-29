@@ -32,7 +32,7 @@ type MetricSet struct {
 }
 
 func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
-	cfgwarn.Experimental("The etcd self metricset is experimental")
+	cfgwarn.Beta("The etcd self metricset is beta")
 	config := struct{}{}
 
 	if err := base.Module().UnpackConfig(&config); err != nil {

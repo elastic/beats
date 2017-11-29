@@ -49,12 +49,22 @@ wget -qO - https://artifacts.elastic.co/GPG-KEY-elasticsearch | sudo apt-key add
 sudo apt-get install apt-transport-https
 --------------------------------------------------
 
+ifeval::["{release-state}"=="prerelease"]
 . Save the repository definition to  +/etc/apt/sources.list.d/elastic-6.x-prerelease.list+:
 +
-["source","sh",subs="attributes,callouts"]
+["source","sh",subs="attributes"]
 --------------------------------------------------
 echo "deb https://artifacts.elastic.co/packages/6.x-prerelease/apt stable main" | sudo tee -a /etc/apt/sources.list.d/elastic-6.x-prerelease.list
 --------------------------------------------------
+endif::[]
+ifeval::["{release-state}"=="released"]
+. Save the repository definition to  +/etc/apt/sources.list.d/elastic-6.x.list+:
++
+["source","sh",subs="attributes"]
+--------------------------------------------------
+echo "deb https://artifacts.elastic.co/packages/6.x/apt stable main" | sudo tee -a /etc/apt/sources.list.d/elastic-6.x.list
+--------------------------------------------------
+endif::[]
 +
 [WARNING]
 ==================================================
@@ -110,7 +120,8 @@ sudo rpm --import https://packages.elastic.co/GPG-KEY-elasticsearch
 . Create a file with a `.repo` extension (for example, `elastic.repo`) in
 your `/etc/yum.repos.d/` directory and add the following lines:
 +
-["source","sh",subs="attributes,callouts"]
+ifeval::["{release-state}"=="prerelease"]
+["source","sh",subs="attributes"]
 --------------------------------------------------
 [elastic-6.x-prerelease]
 name=Elastic repository for 6.x prerelease packages
@@ -121,6 +132,20 @@ enabled=1
 autorefresh=1
 type=rpm-md
 --------------------------------------------------
+endif::[]
+ifeval::["{release-state}"=="released"]
+["source","sh",subs="attributes"]
+--------------------------------------------------
+[elastic-6.x]
+name=Elastic repository for 6.x packages
+baseurl=https://artifacts.elastic.co/packages/6.x/yum
+gpgcheck=1
+gpgkey=https://artifacts.elastic.co/GPG-KEY-elasticsearch
+enabled=1
+autorefresh=1
+type=rpm-md
+--------------------------------------------------
+endif::[]
 +
 Your repository is ready to use. For example, you can install {beatname_uc} by
 running:

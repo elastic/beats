@@ -416,7 +416,7 @@ func (http *httpPlugin) correlate(conn *httpConnectionData) {
 	// drop responses with missing requests
 	if conn.requests.empty() {
 		for !conn.responses.empty() {
-			debugf("Response from unknown transaction. Ingoring.")
+			debugf("Response from unknown transaction. Ignoring.")
 			unmatchedResponses.Add(1)
 			conn.responses.pop()
 		}

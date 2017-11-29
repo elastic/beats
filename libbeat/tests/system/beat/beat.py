@@ -457,6 +457,10 @@ class TestCase(unittest.TestCase, ComposeMixin):
 
             for field in doc_list:
 
+                # Skip fields without name entry
+                if "name" not in field:
+                    continue
+
                 # Chain together names
                 if name != "":
                     newName = name + "." + field["name"]

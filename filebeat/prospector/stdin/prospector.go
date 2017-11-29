@@ -31,7 +31,7 @@ type Prospector struct {
 // NewStdin creates a new stdin prospector
 // This prospector contains one harvester which is reading from stdin
 func NewProspector(cfg *common.Config, outlet channel.Factory, context prospector.Context) (prospector.Prospectorer, error) {
-	out, err := outlet(cfg)
+	out, err := outlet(cfg, context.DynamicFields)
 	if err != nil {
 		return nil, err
 	}
