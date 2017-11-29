@@ -272,6 +272,31 @@ func TestIncludeTopProcesses(t *testing.T) {
 			Cfg:          includeTopConfig{Enabled: true},
 			ExpectedPids: []int{1, 2, 3, 4, 5, 6, 7, 8, 9, 10},
 		},
+		{
+			Name:         "top 12 by cpu (out of 10)",
+			Cfg:          includeTopConfig{Enabled: true, ByCPU: 12},
+			ExpectedPids: []int{1, 2, 3, 4, 5, 6, 7, 8, 9, 10},
+		},
+		{
+			Name:         "top 12 by cpu and top 14 memory (out of 10)",
+			Cfg:          includeTopConfig{Enabled: true, ByCPU: 12, ByMemory: 14},
+			ExpectedPids: []int{1, 2, 3, 4, 5, 6, 7, 8, 9, 10},
+		},
+		{
+			Name:         "top 14 by cpu and top 12 memory (out of 10)",
+			Cfg:          includeTopConfig{Enabled: true, ByCPU: 14, ByMemory: 12},
+			ExpectedPids: []int{1, 2, 3, 4, 5, 6, 7, 8, 9, 10},
+		},
+		{
+			Name:         "top 1 by cpu and top 3 memory",
+			Cfg:          includeTopConfig{Enabled: true, ByCPU: 1, ByMemory: 3},
+			ExpectedPids: []int{5, 7, 8},
+		},
+		{
+			Name:         "top 3 by cpu and top 1 memory",
+			Cfg:          includeTopConfig{Enabled: true, ByCPU: 3, ByMemory: 1},
+			ExpectedPids: []int{7, 8, 10},
+		},
 	}
 
 	for _, test := range tests {
