@@ -952,10 +952,10 @@
 			"versionExact": "v2.17.04"
 		},
 		{
-			"checksumSHA1": "B4668jhwnUwJ+QOdMCw5qINbTq8=",
+			"checksumSHA1": "e7mAb9jMke2ASQGZepFgOmfBFzM=",
 			"path": "github.com/spf13/cobra",
-			"revision": "e606913c4ee45fec232e67e70105fb6c866b95d9",
-			"revisionTime": "2017-05-28T10:56:30Z"
+			"revision": "1be1d2841c773c01bee8289f55f7463b6e2c2539",
+			"revisionTime": "2017-11-23T00:13:03Z"
 		},
 		{
 			"checksumSHA1": "STxYqRb4gnlSr3mRpT+Igfdz/kM=",
