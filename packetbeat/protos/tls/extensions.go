@@ -8,14 +8,14 @@ import (
 	"github.com/elastic/beats/libbeat/logp"
 )
 
-// ExtensionId is the 16-bit identifier for an extension
-type ExtensionId uint16
+// ExtensionID is the 16-bit identifier for an extension
+type ExtensionID uint16
 
 // Extensions stores the data from parsed extensions
 type Extensions struct {
 	Parsed  common.MapStr
-	Raw     map[ExtensionId][]byte
-	InOrder []ExtensionId
+	Raw     map[ExtensionID][]byte
+	InOrder []ExtensionID
 }
 
 type extensionParser func(reader bufferView) interface{}
@@ -27,7 +27,7 @@ type extension struct {
 
 const (
 	// ExtensionSupportedGroups identifies the supported group extension
-	ExtensionSupportedGroups ExtensionId = 10
+	ExtensionSupportedGroups ExtensionID = 10
 	// ExtensionEllipticCurvePointsFormats identifies the points formats extension
 	ExtensionEllipticCurvePointsFormats = 11
 )
@@ -64,7 +64,7 @@ func ParseExtensions(buffer bufferView) Extensions {
 	limit := 2 + int(extensionsLength)
 	result := Extensions{
 		Parsed: common.MapStr{},
-		Raw:    make(map[ExtensionId][]byte),
+		Raw:    make(map[ExtensionID][]byte),
 	}
 
 	var unknown []string
@@ -83,7 +83,7 @@ func ParseExtensions(buffer bufferView) Extensions {
 			continue
 		}
 
-		result.InOrder = append(result.InOrder, ExtensionId(code))
+		result.InOrder = append(result.InOrder, ExtensionID(code))
 		label, parsed, saveRaw := parseExtension(code, extBuffer)
 		if parsed != nil {
 			result.Parsed[label] = parsed
@@ -91,7 +91,7 @@ func ParseExtensions(buffer bufferView) Extensions {
 			unknown = append(unknown, label)
 		}
 		if saveRaw {
-			result.Raw[ExtensionId(code)] = extBuffer.readBytes(0, extBuffer.length())
+			result.Raw[ExtensionID(code)] = extBuffer.readBytes(0, extBuffer.length())
 		}
 	}
 	if len(unknown) != 0 {
