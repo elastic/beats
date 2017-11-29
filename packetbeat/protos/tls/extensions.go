@@ -8,8 +8,10 @@ import (
 	"github.com/elastic/beats/libbeat/logp"
 )
 
+// ExtensionId is the 16-bit identifier for an extension
 type ExtensionId uint16
 
+// Extensions stores the data from parsed extensions
 type Extensions struct {
 	Parsed  common.MapStr
 	Raw     map[ExtensionId][]byte
@@ -24,8 +26,10 @@ type extension struct {
 }
 
 const (
-	ExtensionSupportedGroups           ExtensionId = 10
-	ExtensionElipticCurvePointsFormats             = 11
+	// ExtensionSupportedGroups identifies the supported group extension
+	ExtensionSupportedGroups ExtensionId = 10
+	// ExtensionEllipticCurvePointsFormats identifies the points formats extension
+	ExtensionEllipticCurvePointsFormats = 11
 )
 
 var extensionMap = map[uint16]extension{
@@ -48,6 +52,7 @@ var extensionMap = map[uint16]extension{
 	0xff01: {"renegotiation_info", ignoreContent, false},
 }
 
+// ParseExtensions returns an Extensions object parsed from the supplied buffer
 func ParseExtensions(buffer bufferView) Extensions {
 
 	var extensionsLength uint16
