@@ -13,7 +13,7 @@
       },
       "id": "Navigation",
       "type": "visualization",
-      "updated_at": "2017-11-27T19:11:15.569Z",
+      "updated_at": "2017-11-29T00:29:13.363Z",
       "version": 10
     },
     {
@@ -30,7 +30,7 @@
       },
       "id": "059fe5e0-d2dd-11e7-9914-4982455b3063",
       "type": "visualization",
-      "updated_at": "2017-11-27T19:11:15.569Z",
+      "updated_at": "2017-11-29T00:29:13.363Z",
       "version": 1
     },
     {
@@ -46,7 +46,7 @@
       },
       "id": "c14377a0-d353-11e7-9914-4982455b3063",
       "type": "visualization",
-      "updated_at": "2017-11-27T19:11:15.569Z",
+      "updated_at": "2017-11-29T00:29:13.363Z",
       "version": 1
     },
     {
@@ -62,7 +62,7 @@
       },
       "id": "061de380-d361-11e7-9914-4982455b3063",
       "type": "visualization",
-      "updated_at": "2017-11-27T19:11:15.569Z",
+      "updated_at": "2017-11-29T00:29:13.363Z",
       "version": 1
     },
     {
@@ -79,8 +79,8 @@
       },
       "id": "a28d09d0-d361-11e7-9914-4982455b3063",
       "type": "visualization",
-      "updated_at": "2017-11-27T19:18:33.495Z",
-      "version": 2
+      "updated_at": "2017-11-29T00:29:13.363Z",
+      "version": 1
     },
     {
       "attributes": {
@@ -96,7 +96,7 @@
       },
       "id": "0af0b790-d37d-11e7-9914-4982455b3063",
       "type": "visualization",
-      "updated_at": "2017-11-27T19:11:15.569Z",
+      "updated_at": "2017-11-29T00:29:13.363Z",
       "version": 1
     },
     {
@@ -113,7 +113,7 @@
       },
       "id": "ae6e33c0-d37d-11e7-9914-4982455b3063",
       "type": "visualization",
-      "updated_at": "2017-11-27T19:11:15.569Z",
+      "updated_at": "2017-11-29T00:29:13.363Z",
       "version": 1
     },
     {
@@ -130,7 +130,7 @@
       },
       "id": "2c467370-d392-11e7-8fa0-232aa9259081",
       "type": "visualization",
-      "updated_at": "2017-11-27T19:11:15.569Z",
+      "updated_at": "2017-11-29T00:29:13.363Z",
       "version": 1
     },
     {
@@ -147,7 +147,7 @@
       },
       "id": "0958a910-d396-11e7-8fa0-232aa9259081",
       "type": "visualization",
-      "updated_at": "2017-11-27T19:11:15.569Z",
+      "updated_at": "2017-11-29T00:29:13.363Z",
       "version": 1
     },
     {
@@ -164,7 +164,7 @@
       },
       "id": "86743f90-d396-11e7-8fa0-232aa9259081",
       "type": "visualization",
-      "updated_at": "2017-11-27T19:11:15.569Z",
+      "updated_at": "2017-11-29T00:29:13.363Z",
       "version": 1
     },
     {
@@ -181,7 +181,24 @@
       },
       "id": "463d2bf0-d3a8-11e7-9081-ab2af08e9961",
       "type": "visualization",
-      "updated_at": "2017-11-27T19:22:14.447Z",
+      "updated_at": "2017-11-29T00:29:13.363Z",
+      "version": 1
+    },
+    {
+      "attributes": {
+        "description": "",
+        "kibanaSavedObjectMeta": {
+          "searchSourceJSON": "{\"filter\":[],\"query\":{\"query\":\"\",\"language\":\"lucene\"}}"
+        },
+        "savedSearchId": "6b1b1360-d49d-11e7-996f-bd7c1ca4591b",
+        "title": "TLS Fingerprint",
+        "uiStateJSON": "{\"vis\":{\"params\":{\"sort\":{\"columnIndex\":null,\"direction\":null}}}}",
+        "version": 1,
+        "visState": "{\"title\":\"TLS Fingerprint\",\"type\":\"table\",\"params\":{\"perPage\":10,\"showPartialRows\":false,\"showMeticsAtAllLevels\":false,\"sort\":{\"columnIndex\":null,\"direction\":null},\"showTotal\":false,\"totalFunc\":\"sum\"},\"aggs\":[{\"id\":\"1\",\"enabled\":true,\"type\":\"count\",\"schema\":\"metric\",\"params\":{}},{\"id\":\"2\",\"enabled\":true,\"type\":\"terms\",\"schema\":\"bucket\",\"params\":{\"field\":\"tls.fingerprints.ja3.hash\",\"size\":5,\"order\":\"desc\",\"orderBy\":\"1\",\"customLabel\":\"JA3 Fingerprint\"}}]}"
+      },
+      "id": "ad2a8b50-d49d-11e7-996f-bd7c1ca4591b",
+      "type": "visualization",
+      "updated_at": "2017-11-29T00:38:53.829Z",
       "version": 1
     },
     {
@@ -203,7 +220,7 @@
       },
       "id": "ffc3c0b0-d2d7-11e7-9914-4982455b3063",
       "type": "search",
-      "updated_at": "2017-11-27T19:11:15.569Z",
+      "updated_at": "2017-11-29T00:29:13.363Z",
       "version": 1
     },
     {
@@ -225,7 +242,7 @@
       },
       "id": "94908e80-d2d8-11e7-9914-4982455b3063",
       "type": "search",
-      "updated_at": "2017-11-27T19:11:15.569Z",
+      "updated_at": "2017-11-29T00:29:13.363Z",
       "version": 1
     },
     {
@@ -247,7 +264,7 @@
       },
       "id": "bf3d23b0-d37c-11e7-9914-4982455b3063",
       "type": "search",
-      "updated_at": "2017-11-27T19:11:15.569Z",
+      "updated_at": "2017-11-29T00:29:13.363Z",
       "version": 1
     },
     {
@@ -269,7 +286,29 @@
       },
       "id": "8f0ff590-d37d-11e7-9914-4982455b3063",
       "type": "search",
-      "updated_at": "2017-11-27T19:11:15.569Z",
+      "updated_at": "2017-11-29T00:29:13.363Z",
+      "version": 1
+    },
+    {
+      "attributes": {
+        "columns": [
+          "_source"
+        ],
+        "description": "",
+        "hits": 0,
+        "kibanaSavedObjectMeta": {
+          "searchSourceJSON": "{\"index\":\"packetbeat-*\",\"highlightAll\":true,\"version\":true,\"query\":{\"query\":\"\",\"language\":\"lucene\"},\"filter\":[{\"meta\":{\"index\":\"packetbeat-*\",\"negate\":false,\"disabled\":false,\"alias\":null,\"type\":\"exists\",\"key\":\"tls.fingerprints.ja3.hash\",\"value\":\"exists\"},\"exists\":{\"field\":\"tls.fingerprints.ja3.hash\"},\"$state\":{\"store\":\"appState\"}}]}"
+        },
+        "sort": [
+          "@timestamp",
+          "desc"
+        ],
+        "title": "TLS Fingerprint",
+        "version": 1
+      },
+      "id": "6b1b1360-d49d-11e7-996f-bd7c1ca4591b",
+      "type": "search",
+      "updated_at": "2017-11-29T00:37:02.998Z",
       "version": 1
     },
     {
@@ -280,15 +319,15 @@
           "searchSourceJSON": "{\"filter\":[],\"query\":{\"language\":\"lucene\",\"query\":{\"query_string\":{\"analyze_wildcard\":true,\"default_field\":\"*\",\"query\":\"*\"}}},\"highlightAll\":true,\"version\":true}"
         },
         "optionsJSON": "{\"darkTheme\":false,\"useMargins\":false}",
-        "panelsJSON": "[{\"panelIndex\":\"4\",\"gridData\":{\"x\":0,\"y\":0,\"w\":3,\"h\":4,\"i\":\"4\"},\"id\":\"Navigation\",\"type\":\"visualization\",\"version\":\"7.0.0-alpha1-SNAPSHOT\"},{\"panelIndex\":\"8\",\"gridData\":{\"x\":3,\"y\":0,\"w\":9,\"h\":4,\"i\":\"8\"},\"id\":\"059fe5e0-d2dd-11e7-9914-4982455b3063\",\"type\":\"visualization\",\"version\":\"7.0.0-alpha1-SNAPSHOT\"},{\"panelIndex\":\"9\",\"gridData\":{\"x\":3,\"y\":7,\"w\":3,\"h\":3,\"i\":\"9\"},\"id\":\"c14377a0-d353-11e7-9914-4982455b3063\",\"type\":\"visualization\",\"version\":\"7.0.0-alpha1-SNAPSHOT\"},{\"panelIndex\":\"10\",\"gridData\":{\"x\":0,\"y\":4,\"w\":2,\"h\":3,\"i\":\"10\"},\"id\":\"061de380-d361-11e7-9914-4982455b3063\",\"type\":\"visualization\",\"version\":\"7.0.0-alpha1-SNAPSHOT\"},{\"panelIndex\":\"11\",\"gridData\":{\"x\":2,\"y\":4,\"w\":10,\"h\":3,\"i\":\"11\"},\"id\":\"a28d09d0-d361-11e7-9914-4982455b3063\",\"type\":\"visualization\",\"version\":\"7.0.0-alpha1-SNAPSHOT\"},{\"panelIndex\":\"12\",\"gridData\":{\"x\":6,\"y\":7,\"w\":3,\"h\":3,\"i\":\"12\"},\"id\":\"0af0b790-d37d-11e7-9914-4982455b3063\",\"type\":\"visualization\",\"version\":\"7.0.0-alpha1-SNAPSHOT\"},{\"panelIndex\":\"13\",\"gridData\":{\"x\":9,\"y\":7,\"w\":3,\"h\":3,\"i\":\"13\"},\"id\":\"ae6e33c0-d37d-11e7-9914-4982455b3063\",\"type\":\"visualization\",\"version\":\"7.0.0-alpha1-SNAPSHOT\"},{\"panelIndex\":\"14\",\"gridData\":{\"x\":0,\"y\":7,\"w\":3,\"h\":3,\"i\":\"14\"},\"id\":\"2c467370-d392-11e7-8fa0-232aa9259081\",\"type\":\"visualization\",\"version\":\"7.0.0-alpha1-SNAPSHOT\"},{\"panelIndex\":\"15\",\"gridData\":{\"x\":0,\"y\":10,\"w\":6,\"h\":3,\"i\":\"15\"},\"id\":\"0958a910-d396-11e7-8fa0-232aa9259081\",\"type\":\"visualization\",\"version\":\"7.0.0-alpha1-SNAPSHOT\"},{\"panelIndex\":\"16\",\"gridData\":{\"x\":0,\"y\":13,\"w\":6,\"h\":3,\"i\":\"16\"},\"id\":\"86743f90-d396-11e7-8fa0-232aa9259081\",\"type\":\"visualization\",\"version\":\"7.0.0-alpha1-SNAPSHOT\"},{\"panelIndex\":\"17\",\"gridData\":{\"x\":6,\"y\":10,\"w\":6,\"h\":3,\"i\":\"17\"},\"version\":\"7.0.0-alpha1-SNAPSHOT\",\"type\":\"visualization\",\"id\":\"463d2bf0-d3a8-11e7-9081-ab2af08e9961\"}]",
+        "panelsJSON": "[{\"gridData\":{\"h\":4,\"i\":\"4\",\"w\":3,\"x\":0,\"y\":0},\"id\":\"Navigation\",\"panelIndex\":\"4\",\"type\":\"visualization\",\"version\":\"7.0.0-alpha1-SNAPSHOT\"},{\"gridData\":{\"h\":4,\"i\":\"8\",\"w\":9,\"x\":3,\"y\":0},\"id\":\"059fe5e0-d2dd-11e7-9914-4982455b3063\",\"panelIndex\":\"8\",\"type\":\"visualization\",\"version\":\"7.0.0-alpha1-SNAPSHOT\"},{\"gridData\":{\"h\":3,\"i\":\"9\",\"w\":3,\"x\":3,\"y\":7},\"id\":\"c14377a0-d353-11e7-9914-4982455b3063\",\"panelIndex\":\"9\",\"type\":\"visualization\",\"version\":\"7.0.0-alpha1-SNAPSHOT\"},{\"gridData\":{\"h\":3,\"i\":\"10\",\"w\":2,\"x\":0,\"y\":4},\"id\":\"061de380-d361-11e7-9914-4982455b3063\",\"panelIndex\":\"10\",\"type\":\"visualization\",\"version\":\"7.0.0-alpha1-SNAPSHOT\"},{\"gridData\":{\"h\":3,\"i\":\"11\",\"w\":10,\"x\":2,\"y\":4},\"id\":\"a28d09d0-d361-11e7-9914-4982455b3063\",\"panelIndex\":\"11\",\"type\":\"visualization\",\"version\":\"7.0.0-alpha1-SNAPSHOT\"},{\"gridData\":{\"h\":3,\"i\":\"12\",\"w\":3,\"x\":6,\"y\":7},\"id\":\"0af0b790-d37d-11e7-9914-4982455b3063\",\"panelIndex\":\"12\",\"type\":\"visualization\",\"version\":\"7.0.0-alpha1-SNAPSHOT\"},{\"gridData\":{\"h\":3,\"i\":\"13\",\"w\":3,\"x\":9,\"y\":7},\"id\":\"ae6e33c0-d37d-11e7-9914-4982455b3063\",\"panelIndex\":\"13\",\"type\":\"visualization\",\"version\":\"7.0.0-alpha1-SNAPSHOT\"},{\"gridData\":{\"h\":3,\"i\":\"14\",\"w\":3,\"x\":0,\"y\":7},\"id\":\"2c467370-d392-11e7-8fa0-232aa9259081\",\"panelIndex\":\"14\",\"type\":\"visualization\",\"version\":\"7.0.0-alpha1-SNAPSHOT\"},{\"gridData\":{\"h\":3,\"i\":\"15\",\"w\":6,\"x\":0,\"y\":10},\"id\":\"0958a910-d396-11e7-8fa0-232aa9259081\",\"panelIndex\":\"15\",\"type\":\"visualization\",\"version\":\"7.0.0-alpha1-SNAPSHOT\"},{\"gridData\":{\"h\":3,\"i\":\"16\",\"w\":6,\"x\":0,\"y\":13},\"id\":\"86743f90-d396-11e7-8fa0-232aa9259081\",\"panelIndex\":\"16\",\"type\":\"visualization\",\"version\":\"7.0.0-alpha1-SNAPSHOT\"},{\"gridData\":{\"h\":3,\"i\":\"17\",\"w\":6,\"x\":6,\"y\":10},\"id\":\"463d2bf0-d3a8-11e7-9081-ab2af08e9961\",\"panelIndex\":\"17\",\"type\":\"visualization\",\"version\":\"7.0.0-alpha1-SNAPSHOT\"},{\"gridData\":{\"w\":6,\"h\":3,\"x\":6,\"y\":13,\"i\":\"18\"},\"version\":\"7.0.0-alpha1-SNAPSHOT\",\"panelIndex\":\"18\",\"type\":\"visualization\",\"id\":\"ad2a8b50-d49d-11e7-996f-bd7c1ca4591b\"}]",
         "timeRestore": false,
         "title": "[Packetbeat] TLS Sessions",
-        "uiStateJSON": "{\"P-15\":{\"vis\":{\"params\":{\"sort\":{\"columnIndex\":null,\"direction\":null}}}},\"P-16\":{\"vis\":{\"params\":{\"sort\":{\"columnIndex\":null,\"direction\":null}}}},\"P-5\":{\"vis\":{\"defaultColors\":{\"0 - 100\":\"rgb(0,104,55)\"}}},\"P-7\":{\"vis\":{\"params\":{\"sort\":{\"columnIndex\":null,\"direction\":null}}}},\"P-17\":{\"vis\":{\"params\":{\"sort\":{\"columnIndex\":null,\"direction\":null}}}}}",
+        "uiStateJSON": "{\"P-15\":{\"vis\":{\"params\":{\"sort\":{\"columnIndex\":null,\"direction\":null}}}},\"P-16\":{\"vis\":{\"params\":{\"sort\":{\"columnIndex\":null,\"direction\":null}}}},\"P-17\":{\"vis\":{\"params\":{\"sort\":{\"columnIndex\":null,\"direction\":null}}}},\"P-5\":{\"vis\":{\"defaultColors\":{\"0 - 100\":\"rgb(0,104,55)\"}}},\"P-7\":{\"vis\":{\"params\":{\"sort\":{\"columnIndex\":null,\"direction\":null}}}},\"P-18\":{\"vis\":{\"params\":{\"sort\":{\"columnIndex\":null,\"direction\":null}}}}}",
         "version": 1
       },
-      "id": "cf931a40-d353-11e7-9914-4982455b3063",
+      "id": "tls-sessions",
       "type": "dashboard",
-      "updated_at": "2017-11-27T19:23:18.875Z",
+      "updated_at": "2017-11-29T00:39:28.426Z",
       "version": 2
     }
   ],
