@@ -2,15 +2,23 @@ package host
 
 import (
 	"context"
+	"fmt"
 	"net/url"
+	"strings"
+
+	"github.com/pkg/errors"
 
 	"github.com/elastic/beats/libbeat/common"
 	"github.com/elastic/beats/libbeat/common/cfgwarn"
+	"github.com/elastic/beats/libbeat/logp"
 	"github.com/elastic/beats/metricbeat/mb"
 
 	"github.com/vmware/govmomi"
+	"github.com/vmware/govmomi/property"
 	"github.com/vmware/govmomi/view"
+	"github.com/vmware/govmomi/vim25"
 	"github.com/vmware/govmomi/vim25/mo"
+	"github.com/vmware/govmomi/vim25/types"
 )
 
 func init() {
@@ -116,8 +124,55 @@ func (m *MetricSet) Fetch() ([]common.MapStr, error) {
 			},
 		}
 
+		if hs.Summary.Host != nil {
+			networkNames, err := getNetworkNames(ctx, c, hs.Summary.Host.Reference())
+			if err != nil {
+				logp.Debug("vsphere", err.Error())
+			} else {
+				if len(networkNames) > 0 {
+					event["network_names"] = networkNames
+				}
+			}
+		}
+
 		events = append(events, event)
 	}
 
 	return events, nil
+}
+
+func getNetworkNames(ctx context.Context, c *vim25.Client, ref types.ManagedObjectReference) ([]string, error) {
+	outputNetworkNames := []string{}
+
+	pc := property.DefaultCollector(c)
+
+	var hs mo.HostSystem
+	err := pc.RetrieveOne(ctx, ref, []string{"network"}, &hs)
+	if err != nil {
+		return nil, fmt.Errorf("error retrieving host information: %v", err)
+	}
+
+	if len(hs.Network) == 0 {
+		return nil, errors.Wrap(err, "no networks found")
+	}
+
+	networksRefs := []types.ManagedObjectReference{}
+	for _, obj := range hs.Network {
+		if obj.Type == "Network" {
+			networksRefs = append(networksRefs, obj)
+		}
+	}
+
+	var nets []mo.Network
+	err = pc.Retrieve(ctx, networksRefs, []string{"name"}, &nets)
+	if err != nil {
+		return nil, fmt.Errorf("error retrieving network from host: %v", err)
+	}
+
+	for _, net := range nets {
+		name := strings.Replace(net.Name, ".", "_", -1)
+		outputNetworkNames = append(outputNetworkNames, name)
+	}
+
+	return outputNetworkNames, nil
 }

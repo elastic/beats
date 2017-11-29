@@ -11413,6 +11413,14 @@ Free Memory in bytes
 
 
 [float]
+=== `vsphere.host.network_names`
+
+type: keyword
+
+Network names
+
+
+[float]
 == virtualmachine fields
 
 virtualmachine
@@ -11489,6 +11497,14 @@ Free Memory of Guest in bytes
 type: object
 
 Custom fields
+
+
+[float]
+=== `vsphere.virtualmachine.network_names`
+
+type: keyword
+
+Network names
 
 
 [[exported-fields-windows]]
