@@ -194,7 +194,7 @@
         "title": "TLS Fingerprint",
         "uiStateJSON": "{\"vis\":{\"params\":{\"sort\":{\"columnIndex\":null,\"direction\":null}}}}",
         "version": 1,
-        "visState": "{\"title\":\"TLS Fingerprint\",\"type\":\"table\",\"params\":{\"perPage\":10,\"showPartialRows\":false,\"showMeticsAtAllLevels\":false,\"sort\":{\"columnIndex\":null,\"direction\":null},\"showTotal\":false,\"totalFunc\":\"sum\"},\"aggs\":[{\"id\":\"1\",\"enabled\":true,\"type\":\"count\",\"schema\":\"metric\",\"params\":{}},{\"id\":\"2\",\"enabled\":true,\"type\":\"terms\",\"schema\":\"bucket\",\"params\":{\"field\":\"tls.ja3_fingerprint.hash\",\"size\":5,\"order\":\"desc\",\"orderBy\":\"1\",\"customLabel\":\"JA3 Fingerprint\"}}]}"
+        "visState": "{\"title\":\"TLS Fingerprint\",\"type\":\"table\",\"params\":{\"perPage\":10,\"showPartialRows\":false,\"showMeticsAtAllLevels\":false,\"sort\":{\"columnIndex\":null,\"direction\":null},\"showTotal\":false,\"totalFunc\":\"sum\"},\"aggs\":[{\"id\":\"1\",\"enabled\":true,\"type\":\"count\",\"schema\":\"metric\",\"params\":{}},{\"id\":\"2\",\"enabled\":true,\"type\":\"terms\",\"schema\":\"bucket\",\"params\":{\"field\":\"tls.fingerprints.ja3.hash\",\"size\":5,\"order\":\"desc\",\"orderBy\":\"1\",\"customLabel\":\"JA3 Fingerprint\"}}]}"
       },
       "id": "ad2a8b50-d49d-11e7-996f-bd7c1ca4591b",
       "type": "visualization",
@@ -297,7 +297,7 @@
         "description": "",
         "hits": 0,
         "kibanaSavedObjectMeta": {
-          "searchSourceJSON": "{\"index\":\"packetbeat-*\",\"highlightAll\":true,\"version\":true,\"query\":{\"query\":\"\",\"language\":\"lucene\"},\"filter\":[{\"meta\":{\"index\":\"packetbeat-*\",\"negate\":false,\"disabled\":false,\"alias\":null,\"type\":\"exists\",\"key\":\"tls.ja3_fingerprint.hash\",\"value\":\"exists\"},\"exists\":{\"field\":\"tls.ja3_fingerprint.hash\"},\"$state\":{\"store\":\"appState\"}}]}"
+          "searchSourceJSON": "{\"index\":\"packetbeat-*\",\"highlightAll\":true,\"version\":true,\"query\":{\"query\":\"\",\"language\":\"lucene\"},\"filter\":[{\"meta\":{\"index\":\"packetbeat-*\",\"negate\":false,\"disabled\":false,\"alias\":null,\"type\":\"exists\",\"key\":\"tls.fingerprints.ja3.hash\",\"value\":\"exists\"},\"exists\":{\"field\":\"tls.fingerprints.ja3.hash\"},\"$state\":{\"store\":\"appState\"}}]}"
         },
         "sort": [
           "@timestamp",
