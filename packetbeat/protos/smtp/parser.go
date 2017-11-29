@@ -16,6 +16,7 @@ type parser struct {
 	pub     *transPub
 	message *message
 	state   parseState
+	conn    *connection
 
 	onMessage func(m *message) error
 }
@@ -64,12 +65,14 @@ var (
 func (p *parser) init(
 	cfg *parserConfig,
 	pub *transPub,
+	conn *connection,
 	onMessage func(*message) error,
 ) {
 	*p = parser{
 		buf:       streambuf.Buffer{},
 		config:    cfg,
 		pub:       pub,
+		conn:      conn,
 		onMessage: onMessage,
 	}
 }
@@ -89,7 +92,7 @@ func (p *parser) append(data []byte) error {
 // process parses message(s) from the stream.
 // If yield is set, parsing is driven by the syncer,
 // process will return after parsing a message.
-func (p *parser) process(ts time.Time, yield bool) error {
+func (p *parser) process(ts time.Time, dir uint8, yield bool) error {
 	if p.state == stateUnsynced {
 		// First message of this stream is a response, syncer just got
 		// done before getting to it
@@ -99,7 +102,7 @@ func (p *parser) process(ts time.Time, yield bool) error {
 	for p.buf.Total() > 0 {
 		if p.message == nil {
 			// allocate new message object to be used by parser with current timestamp
-			p.message = p.newMessage(ts)
+			p.message = p.newMessage(ts, dir)
 		}
 
 		msg, err := p.parse()
@@ -127,10 +130,11 @@ func (p *parser) process(ts time.Time, yield bool) error {
 	return nil
 }
 
-func (p *parser) newMessage(ts time.Time) *message {
+func (p *parser) newMessage(ts time.Time, dir uint8) *message {
 	return &message{
 		Message: applayer.Message{
-			Ts: ts,
+			Ts:        ts,
+			Direction: applayer.NetDirection(dir),
 		},
 	}
 }
@@ -183,6 +187,24 @@ func getPath(param []byte) []byte {
 		return param[l+1 : r]
 	}
 	return nil
+}
+
+// Make sure client's stateData is not invalidated by server's
+// response
+func (p *parser) verifyStateData() {
+	m := p.message
+
+	// Only on error response
+	if m.statusCode < 400 {
+		return
+	}
+
+	st := p.conn.streams[m.Direction^1]
+
+	if st != nil && st.parser.state == stateData {
+		debugf("Resetting request parser to stateCommand")
+		st.parser.state = stateCommand
+	}
 }
 
 func (p *parser) parse() (*message, error) {
@@ -244,6 +266,7 @@ func (p *parser) parse() (*message, error) {
 				if !p.isResponseComplete(raw) {
 					continue
 				}
+				p.verifyStateData()
 			}
 
 		case stateData: // request only state

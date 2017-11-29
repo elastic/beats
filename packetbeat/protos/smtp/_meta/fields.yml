@@ -4,39 +4,58 @@
   fields:
     - name: smtp
       type: group
-      description: Information about the SMTP request and response.
+      description: Information about the SMTP transaction.
       fields:
+        - name: type
+          type: text
+          description: The SMTP transaction type (`PROMPT`, `COMMAND` or `MAIL`).
+
+        - name: session_id
+          type: text
+          description: SMTP session UUID.
+
         - name: request
-          description: SMTP request
           type: group
+          description: SMTP request (only `COMMAND` transactions).
           fields:
             - name: command
-              description: The SMTP command.
+              description: SMTP command
+              type: text
               example: EHLO
 
             - name: param
               description: >
-                The SMTP command argument. It follows the SMTP command issued by the client (e.g. `localhost` in `HELO localhost`).
-
-            - name: headers
-              type: object
-              object_type: keyword
-              description: >
-                A map containing the captured message header fields from the client DATA request.
-
-            - name: body
-              type: text
-              description: The body (message) of the client DATA request.
+                The SMTP command argument. Follows the SMTP command (e.g. `localhost` in `HELO localhost`).
 
         - name: response
-          description: SMTP response
+          description: SMTP response (only `COMMAND` and `PROMPT` transactions)
           type: group
           fields:
             - name: code
               description: The SMTP status code.
               example: 250
-
             - name: phrases
               type: object
-              description: The SMTP status phrases.
+              description: The SMTP status phrases (one per each line of the response)
+
+        - name: envelope_sender
+          type: text
+          description: >
+            Sender ("reverse path") provided during the mail transaction using the `MAIL` command (only `MAIL` transactions).
+
+        - name: envelope_recipients
+          type: object
+          description: >
+            Recipients ("forward paths") provided during the mail transaction using `RCPT` commands (only `MAIL` transactions).
+
+        - name: headers
+          type: object
+          object_type: keyword
+          description: >
+            A map containing the captured message header fields from the client `DATA` request (only `MAIL` transactions).
+
+        - name: body
+          type: text
+          description: >
+            The body (message) of the client DATA request (only `MAIL` transactions).
 

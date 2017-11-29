@@ -141,7 +141,7 @@ func (smtp *smtpPlugin) Parse(
 	}
 
 	if conn.syncer.done {
-		err = st.parser.process(pkt.Ts, false)
+		err = st.parser.process(pkt.Ts, dir, false)
 	} else {
 		err = conn.syncer.process(pkt.Ts, dir)
 	}
@@ -214,6 +214,7 @@ func (conn *connection) ensureStream(
 		st.parser.init(
 			&smtp.parserConfig,
 			&smtp.pub,
+			conn,
 			func(msg *message) error {
 				return conn.trans.onMessage(tcptuple.IPPort(), dir, msg)
 			},
