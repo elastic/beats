@@ -2044,3 +2044,23 @@
           type: keyword
           description: >
             An array containing the TLS alert type for every alert received.
+
+        - name: fingerprints
+          type: group
+          description: Fingerprints for this TLS session.
+          fields:
+
+            - name: ja3
+              type: group
+              description: JA3 TLS client fingerprint
+              fields:
+
+                - name: hash
+                  type: keyword
+                  description: >
+                    The JA3 fingerprint hash for the client side.
+
+                - name: str
+                  type: keyword
+                  description: >
+                    The JA3 string used to calculate the hash.
