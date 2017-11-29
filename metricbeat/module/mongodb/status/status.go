@@ -63,6 +63,7 @@ func (m *MetricSet) Fetch() (common.MapStr, error) {
 	if err != nil {
 		return nil, err
 	}
+	defer mongoSession.Close()
 
 	result := map[string]interface{}{}
 	if err := mongoSession.DB("admin").Run(bson.D{{Name: "serverStatus", Value: 1}}, &result); err != nil {
