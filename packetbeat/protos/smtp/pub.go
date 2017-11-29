@@ -100,10 +100,10 @@ func (pub *transPub) createEvent(
 	case *transMail:
 		d["type"] = "MAIL"
 		if t.reversePath != nil {
-			drequ["envelope_sender"] = t.reversePath
+			d["envelope_sender"] = t.reversePath
 		}
 		if t.forwardPaths != nil {
-			drequ["envelope_recipients"] = t.forwardPaths
+			d["envelope_recipients"] = t.forwardPaths
 		}
 		if bytes.Equal(t.requ.command, constEOD) {
 			headers, body, err := pub.parsePayload(t)
@@ -113,10 +113,10 @@ func (pub *transPub) createEvent(
 				debugf(msg)
 			} else {
 				if pub.sendDataHeaders {
-					drequ["headers"] = headers
+					d["headers"] = headers
 				}
 				if pub.sendDataBody {
-					drequ["body"] = body
+					d["body"] = body
 				}
 			}
 		}

@@ -99,6 +99,7 @@ func (trans *transactions) correlate() error {
 				if err != nil {
 					return err
 				}
+				trans.current = nil
 			} else {
 				logp.Warn(
 					"Ignoring response from unknown transaction: %d %s",

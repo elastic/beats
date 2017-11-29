@@ -135,7 +135,7 @@ func (s *syncer) process(ts time.Time, dir uint8) error {
 		// Call main parsers in the order the accumulated messages
 		// came in
 		for _, je := range s.journal {
-			err := s.parsers[je.dir].process(je.ts, true)
+			err := s.parsers[je.dir].process(je.ts, je.dir, true)
 			if err != nil {
 				return err
 			}

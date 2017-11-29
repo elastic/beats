@@ -47,6 +47,10 @@ const (
 	quit     = "QUIT\r\n"
 	quitResp = "221 localhost closing connection\r\n"
 
+	rcptErr     = "RCPT TO:<foo>\r\n"
+	rcptErrResp = "501 <foo>: recipient address must contain a domain\r\n"
+	dataErrResp = "503 valid RCPT command must precede DATA\r\n"
+
 	promptSplit1 = "220 localhost ESMTP Exim 4.89 S"
 	promptSplit2 = "un, 12 Nov 2017 22:22:42 -0800\r\n"
 
@@ -206,6 +210,20 @@ func TestIntegration(t *testing.T) {
 		})
 	})
 
+	t.Run("data command error", func(t *testing.T) {
+		testIntegration(t, script{
+			{none, prompt},
+			{ehlo, ehloResp},
+			{mailf, mailResp},
+			{rcptErr, rcptErrResp},
+			{data, dataErrResp},
+			{rcpt, rcptResp},
+			{data, dataResp},
+			{mime, mimeResp},
+			{quit, quitResp},
+		})
+	})
+
 	t.Run("multiple recipients", func(t *testing.T) {
 		testIntegrationMultiple(t, script{
 			{none, prompt},
@@ -220,7 +238,7 @@ func TestIntegration(t *testing.T) {
 	})
 
 	t.Run("late start data command", func(t *testing.T) {
-		testIntegrationGap(t, script{
+		testIntegrationSeq(t, script{
 			{data, dataResp},
 			{mime, mimeResp},
 			{quit, quitResp},
@@ -228,14 +246,14 @@ func TestIntegration(t *testing.T) {
 	})
 
 	t.Run("late start data payload", func(t *testing.T) {
-		testIntegrationGap(t, script{
+		testIntegrationSeq(t, script{
 			{mime, mimeResp},
 			{quit, quitResp},
 		}, []string{"MAIL", "COMMAND"})
 	})
 
 	t.Run("gap before data payload", func(t *testing.T) {
-		testIntegrationGap(t, script{
+		testIntegrationSeq(t, script{
 			{none, prompt},
 			{ehlo, ehloResp},
 			{ehlo, none},
@@ -247,7 +265,7 @@ func TestIntegration(t *testing.T) {
 	})
 
 	t.Run("gap between data payloads", func(t *testing.T) {
-		testIntegrationGap(t, script{
+		testIntegrationSeq(t, script{
 			{none, prompt},
 			{ehlo, ehloResp},
 			{mailf, mailResp},
@@ -261,7 +279,7 @@ func TestIntegration(t *testing.T) {
 	})
 
 	t.Run("gap during mail transaction", func(t *testing.T) {
-		testIntegrationGap(t, script{
+		testIntegrationSeq(t, script{
 			{none, prompt},
 			{ehlo, ehloResp},
 			{mailf, mailResp},
@@ -274,7 +292,7 @@ func TestIntegration(t *testing.T) {
 	})
 
 	t.Run("fin during mail transaction", func(t *testing.T) {
-		testIntegrationGap(t, script{
+		testIntegrationSeq(t, script{
 			{none, prompt},
 			{ehlo, ehloResp},
 			{mailf, mailResp},
@@ -282,7 +300,6 @@ func TestIntegration(t *testing.T) {
 			{none, none},
 		}, []string{"PROMPT", "COMMAND", "MAIL"})
 	})
-
 }
 
 func testIntegration(t *testing.T, s script) {
@@ -315,11 +332,9 @@ func testIntegration(t *testing.T, s script) {
 
 	ff = ee[2].Fields["smtp"].(common.MapStr)
 	assert.Equal(t, "MAIL", ff["type"])
-	requ = ff["request"].(common.MapStr)
-	assert.NotEmpty(t, requ["body"])
-	assert.Equal(t, 4, len(requ["headers"].(map[string]common.NetString)))
-	assert.NotEmpty(t, requ["envelope_sender"])
-	assert.Equal(t, 1, len(requ["envelope_recipients"].([]common.NetString)))
+	assert.NotEmpty(t, ff["body"])
+	assert.Equal(t, 4, len(ff["headers"].(map[string]common.NetString)))
+	assert.NotEmpty(t, ff["envelope_sender"])
 
 	ff = ee[3].Fields["smtp"].(common.MapStr)
 	assert.Equal(t, "COMMAND", ff["type"])
@@ -342,11 +357,10 @@ func testIntegrationMultiple(t *testing.T, s script) {
 
 	ff := ee[2].Fields["smtp"].(common.MapStr)
 	assert.Equal(t, "MAIL", ff["type"])
-	requ := ff["request"].(common.MapStr)
-	assert.Equal(t, 2, len(requ["envelope_recipients"].([]common.NetString)))
+	assert.Equal(t, 2, len(ff["envelope_recipients"].([]common.NetString)))
 }
 
-func testIntegrationGap(t *testing.T, s script, transSeq []string) {
+func testIntegrationSeq(t *testing.T, s script, transSeq []string) {
 	var store eventStore
 	integrationPlayScript(s, &store)
 
@@ -501,7 +515,7 @@ func parserPlayScript(s script, store *messageStore) {
 		parserForParserTests(store)}
 
 	for _, t := range s {
-		dir := 0
+		dir := uint8(0)
 		for _, s := range []string{t.requ, t.resp} {
 			if s != "" {
 				p := pp[dir]
@@ -509,7 +523,7 @@ func parserPlayScript(s script, store *messageStore) {
 				if err != nil {
 					panic(err)
 				}
-				err = p.process(time.Now(), false)
+				err = p.process(time.Now(), dir, false)
 				if err != nil {
 					panic(err)
 				}
