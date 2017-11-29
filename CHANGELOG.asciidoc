@@ -95,6 +95,7 @@ https://github.com/elastic/beats/compare/v6.0.0-beta2...master[Check the HEAD di
 - Add number_of_routing_shards config set to 30 {pull}5570[5570]
 - Set log level for kafka output. {pull}5397[5397]
 - Moved `ip_port` indexer for `add_kubernetes_metadata` to all beats. {pull}5707[5707]
+- `ip_port` indexer now index both IP and IP:port pairs. {pull}5721[5721]
 
 *Auditbeat*
 
