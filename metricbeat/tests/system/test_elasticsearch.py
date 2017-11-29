@@ -54,5 +54,5 @@ class Test(metricbeat.BaseTest):
         self.assert_fields_are_documented(evt)
 
     def get_hosts(self):
-        return [os.getenv('ELASTICSEARCH_HOST', 'localhost') + ':' +
-                os.getenv('ELASTICSEARCH_PORT', '9200')]
+        return [os.getenv('ES_HOST', 'localhost') + ':' +
+                os.getenv('ES_PORT', '9200')]
