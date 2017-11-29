@@ -8,6 +8,8 @@ import (
 	"github.com/docker/docker/api/types/events"
 	"github.com/stretchr/testify/assert"
 	"golang.org/x/net/context"
+
+	"github.com/elastic/beats/libbeat/logp"
 )
 
 type MockClient struct {
@@ -219,6 +221,10 @@ func TestWatcherDie(t *testing.T) {
 }
 
 func runWatcher(t *testing.T, kill bool, containers [][]types.Container, events []interface{}) *watcher {
+	if testing.Verbose() {
+		logp.LogInit(logp.LOG_DEBUG, "", false, true, []string{"*"})
+	}
+
 	client := &MockClient{
 		containers: containers,
 		events:     events,
