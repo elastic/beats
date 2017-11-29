@@ -63,6 +63,7 @@ https://github.com/elastic/beats/compare/v6.0.0-beta2...master[Check the HEAD di
 - Change `MySQL active connections` visualization title to `MySQL total connections`. {issue}4812[4812]
 - Fix map overwrite in docker diskio module. {issue}5582[5582]
 - Fix connection leak in mongodb module. {issue}5688[5688]
+- Fix the include top N processes feature for cases where there are fewer processes than N. {pull}5729[5729]
 
 *Packetbeat*
 
