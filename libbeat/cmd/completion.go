@@ -26,6 +26,7 @@ func genCompletionCmd(name, version string, rootCmd *BeatsRootCmd) *cobra.Comman
 				rootCmd.GenZshCompletion(os.Stdout)
 			default:
 				fmt.Printf("Unknown shell %s, only bash is available\n", args[0])
+				os.Exit(1)
 			}
 		},
 	}
