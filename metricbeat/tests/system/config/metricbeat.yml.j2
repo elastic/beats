@@ -162,6 +162,10 @@ queue.mem:
   flush.min_events: {{ flush_min_events|default(8) }}
   flush.timeout: 0.1s
 
+{% if kibana -%}
+setup.kibana.host: "{{ kibana.host }}"
+{%- endif %}
+
 #================================ Outputs =====================================
 
 # Configure what outputs to use when sending the data collected by the beat.
