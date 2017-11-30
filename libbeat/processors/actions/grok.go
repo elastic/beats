@@ -18,14 +18,14 @@ func init() {
 	processors.RegisterPlugin("grok",
 		configChecked(newGrok,
 			requireFields("field", "patterns"),
-			allowedFields("field", "patterns", "additional_patern_definitions", "when")))
+			allowedFields("field", "patterns", "additional_pattern_definitions", "when")))
 }
 
 func newGrok(c common.Config) (processors.Processor, error) {
 	type config struct {
-		Field                        string   `config:"field"`
-		Patterns                     []string `config:"patterns"`
-		AdditionalPatternDefinitions []string `config:"additional_pattern_definitions"`
+		Field                        string            `config:"field"`
+		Patterns                     []string          `config:"patterns"`
+		AdditionalPatternDefinitions map[string]string `config:"additional_pattern_definitions"`
 	}
 
 	var myconfig config
@@ -37,10 +37,11 @@ func newGrok(c common.Config) (processors.Processor, error) {
 
 	regexps := make([]*regexp.Regexp, len(myconfig.Patterns))
 	errInRegexps := false
+
 	for i, pattern := range myconfig.Patterns {
-		expandedPattern, err := grokExpandPattern(pattern, []string{})
+		expandedPattern, err := grokExpandPattern(pattern, []string{}, myconfig.AdditionalPatternDefinitions)
 		if err != nil {
-			logp.Warn("Error compiling regular expression: `%s'", pattern)
+			logp.Warn("Error compiling regular expression: `%s', %s", pattern, err)
 			errInRegexps = true
 		}
 		var patternStart string
@@ -103,7 +104,7 @@ func (g grok) String() string {
 
 var grokRegexp = regexp.MustCompile(`%\{(\w+)(?::(\w+))?\}`)
 
-func grokExpandPattern(pattern string, knownGrokNames []string) (string, error) {
+func grokExpandPattern(pattern string, knownGrokNames []string, customPatterns map[string]string) (string, error) {
 	matches := grokRegexp.FindAllStringSubmatchIndex(pattern, -1)
 	var result []byte
 	if matches == nil {
@@ -113,7 +114,7 @@ func grokExpandPattern(pattern string, knownGrokNames []string) (string, error) 
 	var errList []error
 	for _, match := range matches {
 		patternName := pattern[match[2]:match[3]]
-		patternExpand, err := grokSearchPattern(patternName, knownGrokNames)
+		patternExpand, err := grokSearchPattern(patternName, knownGrokNames, customPatterns)
 		if err != nil {
 			errList = append(errList, err)
 			continue
@@ -141,7 +142,7 @@ func grokExpandPattern(pattern string, knownGrokNames []string) (string, error) 
 	return string(result), nil
 }
 
-func grokSearchPattern(patternName string, knownGrokNames []string) (string, error) {
+func grokSearchPattern(patternName string, knownGrokNames []string, customPatterns map[string]string) (string, error) {
 	recursion := false
 	for _, usedName := range knownGrokNames {
 		if usedName == patternName {
@@ -151,13 +152,17 @@ func grokSearchPattern(patternName string, knownGrokNames []string) (string, err
 	if recursion {
 		return "", fmt.Errorf("detected recursion in grok name '%s'", patternName)
 	}
+
 	patterns := getGrokBuiltinPattern()
-	regexpVal, ok := patterns[patternName]
+	regexpVal, ok := customPatterns[patternName]
+	if !ok {
+		regexpVal, ok = patterns[patternName]
+	}
 	if !ok {
 		return "", fmt.Errorf("unknown grok name '%s'", patternName)
 	}
 	knownGrokNames2 := append(knownGrokNames, patternName)
-	return grokExpandPattern(regexpVal, knownGrokNames2)
+	return grokExpandPattern(regexpVal, knownGrokNames2, customPatterns)
 }
 
 func namedMatch(pattern string, name string) string {

@@ -93,7 +93,7 @@ func TestGrokPatterns(t *testing.T) {
 		},
 	}
 	for pattern, testMatches := range testsExpressions {
-		expandedPattern, err := grokExpandPattern(pattern, []string{})
+		expandedPattern, err := grokExpandPattern(pattern, []string{}, map[string]string{})
 		if err != nil {
 			logp.Err("Error expanding Grok expression")
 			t.Error(err)
@@ -159,6 +159,59 @@ func TestGrokWindowsFirewallLog1(t *testing.T) {
 
 	assert.Equal(t, expected.String(), actual.String())
 
+}
+
+func TestGrokLinuxFirewall(t *testing.T) {
+	input := common.MapStr{
+		"msg": "2017-10-12T20:03:28.64642+01:00 fumunchu kernel: [ 4587.744455] iptables rejected input" +
+			" IN=eth0 OUT= MAC=5b:1d:87:11:a2:c3:9a:90:12:3a:4d:3f:54:64 " +
+			"SRC=5.188.10.182 DST=192.168.32.1 LEN=60 TOS=0x00 PREC=0x00 TTL=47 ID=3322 DF PROTO=TCP SPT=78965" +
+			" DPT=22 WINDOW=29200 RES=0x00 SYN URGP=0",
+	}
+	var testGrokLinuxFirewallLog, _ = common.NewConfigFrom(map[string]interface{}{
+		"field": "msg",
+		"patterns": []string{`%{TIMESTAMP_ISO8601:timestamp} %{WORD:host} %{WORD:subsystem}\s+\[\s*\d+.\d+\]\+iptables rejected input ` +
+			`IN=(?:%{INTERFACE:in_interface}|-) ` +
+			`OUT=(?:%{INTERFACE:out_interface}|-) MAC=%{MAC:dest_mac}:%{MAC:src_mac}:\d{2}:\d{2} ` +
+			`SRC=%{IP:src_ip} DST=%{IP:src_ip} LEN=%{NUMBER:len} TOS=%{NUMBER:tos} PREC=%{BASE16NUM:prec} ` +
+			`TTL=%{NUMBER:ttl} ID=%{NUMBER:id} %{WORD:flags} PROTO=%{WORD:proto} ` +
+			`SPT=%{NUMBER:source_port} DPT=%{NUMBER:dest_port} WINDOW=%{NUMBER:window} ` +
+			`RES=%{BASE16NUM:res} %{WORD:syn} URGP=%{NUMBER:urg}`,
+			`%{TIMESTAMP_ISO8601:timestamp} %{WORD:host} %{WORD:subsystem}\s+\[\s*\d+.\d+\]\+iptables rejected input `,
+		},
+		"additional_pattern_definitions": map[string]string{
+			"RSYSLOG_TIMESTAMP": `\d+-\d+-\d+T\d+:\d+:\d+.\d+(?:\+\d+:\d+)?`,
+			"INTERFACE":         `\w+\d+`,
+			"MAC":               `\d{2}:\d{2}:\d{2}:\d{2}:\d{2}:\d{2}`,
+		},
+		//"patterns": []string{`%{IP:client_ip}`},
+	})
+
+	actual := getGrokActualValue(t, testGrokLinuxFirewallLog, input)
+	expected := common.MapStr{
+		"timestamp":    "2017-10-12T20:03:28.64642+01:00",
+		"host":         "fumanchu",
+		"subsystem":    "kernel",
+		"in_interface": "eth0",
+		"dest_mac":     "5b:1d:87:11:a2:c3",
+		"src_mac":      "9a:90:12:3a:4d:3f",
+		"src_ip":       "5.188.10.182",
+		"dst_ip":       "192.168.32.1",
+		"len":          "60",
+		"tos":          "0x00",
+		"prec":         "0x00",
+		"ttl":          "47",
+		"id":           "3322",
+		"flags":        "DF",
+		"proto":        "TCP",
+		"dest_port":    "22",
+		"source_port":  "78965",
+		"window":       "29200",
+		"res":          "0x00",
+		"syn":          "syn",
+		"urg":          "0",
+	}
+	assert.Equal(t, expected.String(), actual.String())
 }
 
 func getGrokActualValue(t *testing.T, config *common.Config, input common.MapStr) common.MapStr {

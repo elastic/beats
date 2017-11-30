@@ -5,7 +5,8 @@ import "sync"
 func getGrokBuiltinPatternOnce() map[string]string {
 
 	// TODO: remove lookbehind expressions like (?<! and
-	// (?!  zero-width negative lookahead
+	// (?!  zero-width negative lookahead and
+	// (?>
 	return map[string]string{
 
 		"USERNAME":       `[a-zA-Z0-9._-]+`,
@@ -14,10 +15,10 @@ func getGrokBuiltinPatternOnce() map[string]string {
 		"EMAILADDRESS":   `%{EMAILLOCALPART}@%{HOSTNAME}`,
 		"HTTPDUSER":      `%{EMAILADDRESS}|%{USER}`,
 		"INT":            `(?:[+-]?(?:[0-9]+))`,
-		"BASE10NUM":      `(?<![0-9.+-])(?>[+-]?(?:(?:[0-9]+(?:\.[0-9]+)?)|(?:\.[0-9]+)))`,
+		"BASE10NUM":      `(?:[+-]?(?:(?:[0-9]+(?:\.[0-9]+)?)|(?:\.[0-9]+)))`,
 		"NUMBER":         `(?:%{BASE10NUM})`,
-		"BASE16NUM":      `(?<![0-9A-Fa-f])(?:[+-]?(?:0x)?(?:[0-9A-Fa-f]+))`,
-		"BASE16FLOAT":    `\b(?<![0-9A-Fa-f.])(?:[+-]?(?:0x)?(?:(?:[0-9A-Fa-f]+(?:\.[0-9A-Fa-f]*)?)|(?:\.[0-9A-Fa-f]+)))\b`,
+		"BASE16NUM":      `(?:[+-]?(?:0x)?(?:[0-9A-Fa-f]+))`,
+		"BASE16FLOAT":    `\b(?:[+-]?(?:0x)?(?:(?:[0-9A-Fa-f]+(?:\.[0-9A-Fa-f]*)?)|(?:\.[0-9A-Fa-f]+)))\b`,
 
 		"POSINT":       `\b(?:[1-9][0-9]*)\b`,
 		"NONNEGINT":    `\b(?:[0-9]+)\b`,
@@ -26,7 +27,7 @@ func getGrokBuiltinPatternOnce() map[string]string {
 		"SPACE":        `\s*`,
 		"DATA":         `.*?`,
 		"GREEDYDATA":   `.*`,
-		"QUOTEDSTRING": `(?>(?<!\\)(?>"(?>\\.|[^\\"]+)+"|""|(?>'(?>\\.|[^\\']+)+')|''|(?>` + "`" + `(?>\\.|[^\\` + "`" + `]+)+` + "`" + `)|` + "``" + `))`,
+		"QUOTEDSTRING": `(?>(?>"(?>\\.|[^\\"]+)+"|""|(?>'(?>\\.|[^\\']+)+')|''|(?>` + "`" + `(?>\\.|[^\\` + "`" + `]+)+` + "`" + `)|` + "``" + `))`,
 		"UUID":         `[A-Fa-f0-9]{8}-(?:[A-Fa-f0-9]{4}-){3}[A-Fa-f0-9]{12}`,
 
 		// Networking
