@@ -1,6 +1,6 @@
 {
 	"comment": "",
-	"ignore": "test github.com/elastic/beats/metricbeat/module github.com/elastic/beats/dev-tools",
+	"ignore": "test",
 	"package": [
 		{
 			"checksumSHA1": "AzjRkOQtVBTwIw4RJLTygFhJs3s=",
@@ -491,24 +491,24 @@
 			"path": "github.com/elastic/gosigar/cgroup",
 			"revision": "306d51981789ccc65e5f1431d5c0d78d8c368f1b",
 			"revisionTime": "2017-10-12T15:04:52Z",
-			"version": "v0.5.0",
-			"versionExact": "v0.5.0"
+			"version": "v0.6.0",
+			"versionExact": "v0.6.0"
 		},
 		{
 			"checksumSHA1": "2VhOsaR4sv3S79HO6X+6dEphNKU=",
 			"path": "github.com/elastic/gosigar/sys/linux",
 			"revision": "306d51981789ccc65e5f1431d5c0d78d8c368f1b",
 			"revisionTime": "2017-10-12T15:04:52Z",
-			"version": "v0.5.0",
-			"versionExact": "v0.5.0"
+			"version": "v0.6.0",
+			"versionExact": "v0.6.0"
 		},
 		{
 			"checksumSHA1": "qDsgp2kAeI9nhj565HUScaUyjU4=",
 			"path": "github.com/elastic/gosigar/sys/windows",
 			"revision": "306d51981789ccc65e5f1431d5c0d78d8c368f1b",
 			"revisionTime": "2017-10-12T15:04:52Z",
-			"version": "v0.5.0",
-			"versionExact": "v0.5.0"
+			"version": "v0.6.0",
+			"versionExact": "v0.6.0"
 		},
 		{
 			"checksumSHA1": "P0CvGmmAM8uYPSE2ix4th/L9c/8=",
