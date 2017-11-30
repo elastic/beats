@@ -16,17 +16,9 @@ source ./dev-tools/common.bash
 
 jenkins_setup
 
-cleanup() {
-  echo "Running cleanup..."
-  rm -rf $TEMP_PYTHON_ENV
-  make stop-environment || true
-  make fix-permissions || true
-  echo "Killing all running containers..."
-  docker ps -q | xargs -r docker kill || true
-  echo "Cleaning stopped docker containers and dangling images/networks/volumes..."
-  docker system prune -f || true
-  echo "Cleanup complete."
-}
+# Cleanup before starting build in case some previous build was canceled and did not fully clean up
+cleanup
+
 trap cleanup EXIT
 
 rm -rf ${GOPATH}/pkg

@@ -92,3 +92,15 @@ jenkins_setup() {
   export TEMP_PYTHON_ENV=$(mktemp -d)
   export PYTHON_ENV="${TEMP_PYTHON_ENV}/python-env"
 }
+
+cleanup() {
+  echo "Running cleanup..."
+  rm -rf $TEMP_PYTHON_ENV
+  make stop-environment || true
+  make fix-permissions || true
+  echo "Killing all running containers..."
+  docker ps -q | xargs -r docker kill || true
+  echo "Cleaning stopped docker containers and dangling images/networks/volumes..."
+  docker system prune -f || true
+  echo "Cleanup complete."
+}
