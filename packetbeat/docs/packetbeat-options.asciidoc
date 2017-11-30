@@ -437,6 +437,8 @@ packetbeat.protocols:
 - type: thrift
   ports: [9090]
 
+- type: tls
+  ports: [443]
 
 ------------------------------------------------------------------------------
 
@@ -1089,6 +1091,48 @@ at the end of the document.
 
 Note that limiting documents in this way means that they are no longer correctly
 formatted JSON objects.
+
+[[configuration-tls]]
+=== Capture TLS traffic
+
+++++
+<titleabbrev>TLS</titleabbrev>
+++++
+
+The following settings are specific to the TLS protocol. Here is a sample
+configuration for the `tls` section of the +{beatname_lc}.yml+ config file:
+
+[source,yaml]
+------------------------------------------------------------------------------
+packetbeat.protocols:
+- type: tls
+  send_certificates: true
+  include_raw_certificates: true
+------------------------------------------------------------------------------
+
+==== Configuration options
+
+The `send_certificates` and `include_raw_certificates` settings are useful
+for limiting the amount of data Packetbeat indexes in its certificate fields.
+
+Also see <<common-protocol-options>>.
+
+===== `send_certificates`
+
+If the certificates presented by the client and server must be included in the
+event. The server's certificate is indexed in the `server_certificate` field and
+its certification chain in the `server_certificate_chain`. For the client,
+`client_certificate` and `client_certificate_chain` are used.
+
+The default is `true`.
+
+===== `include_raw_certificates`
+
+In addition to a fields representation of each certificate, include also the
+raw certificate encoded in PEM format, as a `raw` field under each certificate.
+
+Default is `false`. This setting requires that the `send_certificates` option
+is set to `true`, otherwise its ignored.
 
 [[configuration-processes]]
 == Specify which processes to monitor
