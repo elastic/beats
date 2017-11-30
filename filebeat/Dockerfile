@@ -8,7 +8,8 @@ RUN set -x && \
     apt-get clean
 
 RUN pip install --upgrade setuptools
-RUN pip install PyYAML datetime
+RUN pip install PyYAML
+RUN pip install datetime
 
 # Setup work environment
 ENV FILEBEAT_PATH /go/src/github.com/elastic/beats/filebeat
