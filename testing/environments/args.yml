@@ -7,4 +7,4 @@ services:
       args:
         DOWNLOAD_URL: https://snapshots.elastic.co/downloads
         ELASTIC_VERSION: 6.0.1-SNAPSHOT
-        CACHE_BUST: 20171201
+        CACHE_BUST: 20171212
