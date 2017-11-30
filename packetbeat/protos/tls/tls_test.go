@@ -150,6 +150,9 @@ func TestClientHello(t *testing.T) {
 
 	assert.Len(t, results.events, 1)
 	event := results.events[0]
+	// Remove responsetime (but fail if not present) so that the test
+	// does not depend on execution speed
+	assert.NoError(t, event.Fields.Delete("responsetime"))
 	b, err := json.Marshal(event.Fields)
 	assert.Nil(t, err)
 	assert.Equal(t, expectedClientHello, string(b))
@@ -218,6 +221,9 @@ func TestFragmentedHandshake(t *testing.T) {
 
 	assert.Len(t, results.events, 1)
 	event := results.events[0]
+	// Remove responsetime (but fail if not present) so that the test
+	// does not depend on execution speed
+	assert.NoError(t, event.Delete("responsetime"))
 	b, err := json.Marshal(event.Fields)
 	assert.Nil(t, err)
 	assert.Equal(t, expectedClientHello, string(b))

@@ -26,6 +26,7 @@ type tlsConnectionData struct {
 
 	handshakeCompleted int8
 	eventSent          bool
+	startTime, endTime time.Time
 }
 
 // TLS protocol plugin
@@ -103,6 +104,9 @@ func (plugin *tlsPlugin) Parse(
 	defer logp.Recover("ParseTLS exception")
 
 	conn := ensureTLSConnection(private)
+	if private == nil {
+		conn.startTime = pkt.Ts
+	}
 	conn = plugin.doParse(conn, pkt, tcptuple, dir)
 	if conn == nil {
 		return nil
@@ -171,6 +175,7 @@ func (plugin *tlsPlugin) doParse(
 		case resultEncrypted:
 			conn.handshakeCompleted |= 1 << dir
 			if conn.handshakeCompleted == 3 {
+				conn.endTime = pkt.Ts
 				plugin.sendEvent(conn)
 			}
 		}
@@ -341,6 +346,12 @@ func (plugin *tlsPlugin) createEvent(conn *tlsConnectionData) beat.Event {
 		if list, ok := value.([]string); ok && len(list) > 0 {
 			fields["server"] = list[0]
 		}
+	}
+
+	// set "responsetime" if handshake completed
+	responseTime := int32(conn.endTime.Sub(conn.startTime) / time.Millisecond)
+	if responseTime >= 0 {
+		fields["responsetime"] = responseTime
 	}
 
 	timestamp := time.Now()
