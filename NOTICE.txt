@@ -3327,7 +3327,7 @@ THE SOFTWARE.
 
 --------------------------------------------------------------------
 Dependency: github.com/spf13/cobra
-Revision: e606913c4ee45fec232e67e70105fb6c866b95d9
+Revision: 1be1d2841c773c01bee8289f55f7463b6e2c2539
 License type (autodetected): Apache-2.0
 ./vendor/github.com/spf13/cobra/LICENSE.txt:
 --------------------------------------------------------------------
