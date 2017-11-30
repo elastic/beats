@@ -19,7 +19,7 @@ type kibanaConfig struct {
 var (
 	defaultKibanaConfig = kibanaConfig{
 		Protocol: "http",
-		Host:     "",
+		Host:     "localhost:5601",
 		Path:     "",
 		Username: "",
 		Password: "",
