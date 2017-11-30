@@ -4,3 +4,4 @@ paths:
  - {{$path}}
 {{ end }}
 exclude_files: [".gz$"]
+exclude_lines: ["^#"]
