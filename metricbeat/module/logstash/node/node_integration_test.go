@@ -4,6 +4,7 @@ package node
 
 import (
 	"testing"
+	"time"
 
 	"github.com/elastic/beats/libbeat/tests/compose"
 	mbtest "github.com/elastic/beats/metricbeat/mb/testing"
@@ -16,6 +17,7 @@ func TestFetch(t *testing.T) {
 
 	compose.EnsureUpWithTimeout(t, 120, "logstash")
 
+	time.Sleep(1 * time.Second)
 	f := mbtest.NewEventFetcher(t, logstash.GetConfig("node"))
 	event, err := f.Fetch()
 	if !assert.NoError(t, err) {
