@@ -1113,26 +1113,28 @@ packetbeat.protocols:
 ==== Configuration options
 
 The `send_certificates` and `include_raw_certificates` settings are useful
-for limiting the amount of data Packetbeat indexes in its certificate fields.
+for limiting the amount of data Packetbeat indexes, as multiple certificates
+are usually exchanged in a single transaction, and those can take a considerable
+amount of storage.
 
 Also see <<common-protocol-options>>.
 
 ===== `send_certificates`
 
-If the certificates presented by the client and server must be included in the
-event. The server's certificate is indexed in the `server_certificate` field and
-its certification chain in the `server_certificate_chain`. For the client,
-`client_certificate` and `client_certificate_chain` are used.
+This setting causes the certificates presented by the client and server to be
+included in the event. The server's certificate is indexed in the
+`server_certificate` field and its certification chain in the
+`server_certificate_chain` field. For the client, the
+`client_certificate` and `client_certificate_chain` fields are used.
 
-The default is `true`.
+The default is true.
 
 ===== `include_raw_certificates`
 
-In addition to a fields representation of each certificate, include also the
-raw certificate encoded in PEM format, as a `raw` field under each certificate.
+When `send_certificates` is true, you can set `include_raw_certificates` to
+include the raw certificate encoded in PEM format as a `raw` field.
 
-Default is `false`. This setting requires that the `send_certificates` option
-is set to `true`, otherwise its ignored.
+If `send_certificates` is false, this setting is ignored. The default is false.
 
 [[configuration-processes]]
 == Specify which processes to monitor
