@@ -349,7 +349,7 @@ func (plugin *tlsPlugin) createEvent(conn *tlsConnectionData) beat.Event {
 	}
 
 	// set "responsetime" if handshake completed
-	responseTime := int32(conn.endTime.Sub(conn.startTime).Nanoseconds() / 1e6)
+	responseTime := int32(conn.endTime.Sub(conn.startTime) / time.Millisecond)
 	if responseTime >= 0 {
 		fields["responsetime"] = responseTime
 	}
