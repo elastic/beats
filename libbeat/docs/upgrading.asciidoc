@@ -7,6 +7,11 @@ This section gives general recommendations for upgrading the Beats:
 * <<upgrading-5-to-6>>
 * <<upgrade-mapping-template>>
 
+If you're upgrading other products in the stack, also read the
+{stack-ref}/index.html[Elastic Stack Installation and Upgrade Guide]. Want an
+upgrade list that's tailored to your stack? Try out our
+{upgrade_guide}[Interactive Upgrade Guide].
+
 [[upgrading-minor-versions]]
 === Upgrade between minor versions
 
