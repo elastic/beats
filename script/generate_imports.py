@@ -25,8 +25,8 @@ def generate_and_write_to_file(outfile, go_beat_path):
     imported_lines = "\n".join(imported_beat_lines)
     package = basename(dirname(outfile))
     list_go = import_template.format(package=package,
-            comment=comment,
-            imports=imported_lines)
+                                     comment=comment,
+                                     imports=imported_lines)
     with open(outfile, "w") as output:
         output.write(list_go)
 
