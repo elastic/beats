@@ -1192,6 +1192,85 @@ Last updated
 
 
 [float]
+== osd_df fields
+
+ceph osd disk usage information
+
+
+
+[float]
+=== `ceph.osd_df.id`
+
+type: long
+
+osd node id
+
+
+[float]
+=== `ceph.osd_df.name`
+
+type: text
+
+osd node name
+
+
+[float]
+=== `ceph.osd_df.device_class`
+
+type: keyword
+
+osd node type, illegal type include hdd, ssd etc.
+
+
+[float]
+=== `ceph.osd_df.total.byte`
+
+type: long
+
+format: bytes
+
+osd disk total volume
+
+
+[float]
+=== `ceph.osd_df.used.byte`
+
+type: long
+
+format: bytes
+
+osd disk usage volume
+
+
+[float]
+=== `ceph.osd_df.available.bytes`
+
+type: long
+
+format: bytes
+
+osd disk available volume
+
+
+[float]
+=== `ceph.osd_df.pg_num`
+
+type: long
+
+shows how many pg located on this osd
+
+
+[float]
+=== `ceph.osd_df.used.pct`
+
+type: scaled_float
+
+format: percent
+
+osd disk usage percentage
+
+
+[float]
 == osd_tree fields
 
 ceph osd tree info
