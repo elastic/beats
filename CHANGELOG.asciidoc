@@ -31,6 +31,7 @@ https://github.com/elastic/beats/compare/v6.0.0...master[Check the HEAD diff]
 *Affecting all Beats*
 
 - Fix documentation links in README.md files. {pull}5710[5710]
+- Fix `add_docker_metadata` dropping some containers. {pull}5787[5787]
 
 *Auditbeat*
 
