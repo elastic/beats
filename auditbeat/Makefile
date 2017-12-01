@@ -3,6 +3,7 @@ BEAT_TITLE=Auditbeat
 BEAT_DESCRIPTION=Audit the activities of users and processes on your system.
 SYSTEM_TESTS=false
 TEST_ENVIRONMENT=false
+GOX_OS?=linux darwin windows ## @Building List of all OS to be supported by "make crosscompile".
 
 # Path to the libbeat Makefile
 -include ../libbeat/scripts/Makefile
