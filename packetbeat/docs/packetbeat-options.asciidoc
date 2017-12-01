@@ -1119,10 +1119,6 @@ An example of indexed event:
 
 [source,json]
 ------------------------------------------------------------------------------
-{
-  "@timestamp": "2017-11-30T23:25:50.330Z",
-  "type": "tls",
-  "client_port": 63530,
   "tls": {
     "handshake_completed": true,
     "server_certificate": {
@@ -1186,44 +1182,19 @@ An example of indexed event:
         "signature_algorithms": [
           "rsa_pkcs1_sha256",
           "rsa_pkcs1_sha1",
-          "rsa_pkcs1_sha384",
-          "rsa_pkcs1_sha512",
-          "ecdsa_secp256r1_sha256",
-          "ecdsa_sha1",
-          "ecdsa_secp384r1_sha384",
-          "ecdsa_secp521r1_sha512"
+          [...]
         ],
         "application_layer_protocol_negotiation": [
           "h2",
           "h2-16",
-          "h2-15",
-          "h2-14",
-          "spdy/3.1",
-          "spdy/3",
-          "http/1.1"
+          [...]
         ],
       },
       "version": "3.3",
       "supported_ciphers": [
         "TLS_EMPTY_RENEGOTIATION_INFO_SCSV",
         "TLS_ECDHE_ECDSA_WITH_AES_256_GCM_SHA384",
-        "TLS_ECDHE_ECDSA_WITH_AES_128_GCM_SHA256",
-        "TLS_ECDHE_ECDSA_WITH_AES_256_CBC_SHA384",
-        "TLS_ECDHE_ECDSA_WITH_AES_128_CBC_SHA256",
-        "TLS_ECDHE_ECDSA_WITH_AES_256_CBC_SHA",
-        "TLS_ECDHE_ECDSA_WITH_AES_128_CBC_SHA",
-        "TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384",
-        "TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256",
-        "TLS_ECDHE_RSA_WITH_AES_256_CBC_SHA384",
-        "TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA256",
-        "TLS_ECDHE_RSA_WITH_AES_256_CBC_SHA",
-        "TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA",
-        "TLS_RSA_WITH_AES_256_GCM_SHA384",
-        "TLS_RSA_WITH_AES_128_GCM_SHA256",
-        "TLS_RSA_WITH_AES_256_CBC_SHA256",
-        "TLS_RSA_WITH_AES_128_CBC_SHA256",
-        "TLS_RSA_WITH_AES_256_CBC_SHA",
-        "TLS_RSA_WITH_AES_128_CBC_SHA"
+        [...]
       ],
       "supported_compression_methods": [
         "NULL"
@@ -1241,20 +1212,10 @@ An example of indexed event:
         ],
       },
       "version": "3.3",
-      "session_id": "d0e6d6ecd08fc555c9dbd2efede8860d623a76393f58e19c555f32bbdf76ed99",
       "selected_cipher": "TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256",
       "selected_compression_method": "NULL"
     },
-    "client_certificate_requested": false,
-  },
-  "status": "OK",
-  "ip": "151.101.62.217",
-  "direction": "out",
-  "client_ip": "192.168.1.36",
-  "port": 443,
-  "server": "www.elastic.co",
-  "client_server": ""
-}
+  }
 ------------------------------------------------------------------------------
 
 The `client_hello` contains the algorithms and extensions supported by the
