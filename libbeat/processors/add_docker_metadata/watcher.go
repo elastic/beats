@@ -205,7 +205,7 @@ func (w *watcher) watch() {
 				}
 
 				// Delete
-				if event.Action == "die" || event.Action == "kill" {
+				if event.Action == "die" {
 					w.Lock()
 					w.deleted[event.Actor.ID] = time.Now()
 					w.Unlock()

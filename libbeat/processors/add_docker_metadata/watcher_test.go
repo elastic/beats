@@ -154,7 +154,8 @@ func TestWatcherUpdateEvent(t *testing.T) {
 }
 
 func TestWatcherKill(t *testing.T) {
-	watcher := runWatcher(t, false,
+	// Assert kill is ignored
+	watcher := runWatcher(t, true,
 		[]types.Container{
 			types.Container{
 				ID:     "0332dbd79e20",
@@ -173,6 +174,29 @@ func TestWatcherKill(t *testing.T) {
 		},
 	)
 
+	assert.Equal(t, len(watcher.deleted), 0)
+}
+
+func TestWatcherDie(t *testing.T) {
+	watcher := runWatcher(t, false,
+		[]types.Container{
+			types.Container{
+				ID:     "0332dbd79e20",
+				Names:  []string{"/containername", "othername"},
+				Image:  "busybox",
+				Labels: map[string]string{"label": "foo"},
+			},
+		},
+		[]interface{}{
+			events.Message{
+				Action: "die",
+				Actor: events.Actor{
+					ID: "0332dbd79e20",
+				},
+			},
+		},
+	)
+
 	// Check it doesn't get removed while we request meta for the container
 	for i := 0; i < 18; i++ {
 		watcher.Container("0332dbd79e20")
@@ -181,7 +205,7 @@ func TestWatcherKill(t *testing.T) {
 	}
 
 	// Now it should get removed
-	time.Sleep(150 * time.Millisecond)
+	time.Sleep(300 * time.Millisecond)
 	assert.Equal(t, len(watcher.Containers()), 0)
 }
 
@@ -192,7 +216,7 @@ func runWatcher(t *testing.T, kill bool, containers []types.Container, events []
 		done:       make(chan interface{}),
 	}
 
-	watcher, err := NewWatcherWithClient(client, 100*time.Millisecond)
+	watcher, err := NewWatcherWithClient(client, 150*time.Millisecond)
 	if err != nil {
 		t.Fatal(err)
 	}
