@@ -8,16 +8,16 @@ from os import listdir
 
 
 blacklist = [
-        "monitors/active/dialchain"
+    "monitors/active/dialchain"
 ]
 
 
 def get_importable_lines(go_beat_path, import_line):
     def format(package, name):
         return import_line.format(
-                beat_path=go_beat_path,
-                module=package,
-                name=name)
+            beat_path=go_beat_path,
+            module=package,
+            name=name)
 
     def imports(mode):
         package = "monitors/{}".format(mode)
