@@ -11,7 +11,7 @@ include::{asciidoc-dir}/../../shared/attributes.asciidoc[]
 :winlogbeat: http://www.elastic.co/guide/en/beats/winlogbeat/{doc-branch}
 :heartbeat: http://www.elastic.co/guide/en/beats/heartbeat/{doc-branch}
 :beatsdevguide: http://www.elastic.co/guide/en/beats/devguide/{doc-branch}
-:securitydoc: https://www.elastic.co/guide/en/x-pack/5.2
+:securitydoc: https://www.elastic.co/guide/en/x-pack/{doc-branch}
 :logstashdoc: https://www.elastic.co/guide/en/logstash/{doc-branch}
 :elasticsearch: https://www.elastic.co/guide/en/elasticsearch/reference/{doc-branch}
 :stack-ref: http://www.elastic.co/guide/en/elastic-stack/{doc-branch}

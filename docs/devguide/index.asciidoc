@@ -9,7 +9,7 @@ include::../../libbeat/docs/version.asciidoc[]
 :filebeat: http://www.elastic.co/guide/en/beats/filebeat/{doc-branch}
 :winlogbeat: http://www.elastic.co/guide/en/beats/winlogbeat/{doc-branch}
 :heartbeat: http://www.elastic.co/guide/en/beats/heartbeat/{doc-branch}
-:securitydoc: https://www.elastic.co/guide/en/x-pack/5.2
+:securitydoc: https://www.elastic.co/guide/en/x-pack/{doc-branch}
 :logstashdoc: https://www.elastic.co/guide/en/logstash/{doc-branch}
 :beatname_lc: beatname
 :beatname_uc: a Beat
