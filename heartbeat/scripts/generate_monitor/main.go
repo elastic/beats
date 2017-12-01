@@ -8,6 +8,7 @@ import (
 	"os"
 	"path/filepath"
 	"reflect"
+	"strings"
 	"text/template"
 )
 
@@ -33,7 +34,13 @@ func main() {
 	}
 
 	env := map[string]interface{}{
+		// variables
 		"monitor": noDot(monitor),
+
+		// functions
+		"upper": strings.ToUpper,
+		"lower": strings.ToLower,
+		"title": strings.Title,
 	}
 	if err := generate(generatorHome, filepath.Join(path, monitor), env); err != nil {
 		fatal(err)
