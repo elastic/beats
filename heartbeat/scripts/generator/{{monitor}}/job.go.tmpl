@@ -1,0 +1,70 @@
+package {{monitor}}
+
+import (
+	"net"
+	"time"
+
+	"github.com/elastic/beats/libbeat/common"
+	"github.com/elastic/beats/libbeat/outputs/transport"
+
+	"github.com/elastic/beats/heartbeat/look"
+	"github.com/elastic/beats/heartbeat/reason"
+)
+
+func pingHost(
+	dialer transport.Dialer,
+	host string,
+	timeout time.Duration,
+	validator *validator,
+) (common.MapStr, reason.Reason) {
+	start := time.Now()
+	deadline := start.Add(timeout)
+
+	// IMPLEMENT_ME: dial endpoint. Sample code uses plain TCP (optional TLS)
+	//               connection, handling all communication in the validator.
+	//               Libraries for other services might require the dialer or connection
+	//               object, which is then passed to the validator.
+
+	// connect to endpoint
+	conn, err := dialer.Dial("tcp", host)
+	if err != nil {
+		debugf("dial failed with: %v", err)
+		return nil, reason.IOFailed(err)
+	}
+	defer conn.Close()
+
+	// no additional validation step => ping success
+	if validator == nil {
+		return common.MapStr{}, nil
+	}
+
+	// set validation deadline
+	if err := conn.SetDeadline(deadline); err != nil {
+		debugf("setting connection deadline failed with: %v", err)
+		return nil, reason.IOFailed(err)
+	}
+
+	// validate endpoint status
+	validateStart := time.Now()
+	err = validator.Check(conn)
+	if _, ok := err.(net.Error); ok {
+		// IMPLEMENT_ME: handle protocol specific IO/communication error types
+
+		return nil, reason.IOFailed(err)
+	}
+
+	// create validation event
+	end := time.Now()
+	event := common.MapStr{
+		namespace: common.MapStr{
+			"rtt": common.MapStr{
+				"validate": look.RTT(end.Sub(validateStart)),
+			},
+		},
+	}
+	if err != nil {
+		event["error"] = reason.FailValidate(err)
+	}
+
+	return event, nil
+}
