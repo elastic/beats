@@ -1,6 +1,7 @@
 import os
 import metricbeat
 import unittest
+import time
 
 
 class Test(metricbeat.BaseTest):
@@ -20,6 +21,7 @@ class Test(metricbeat.BaseTest):
             "hosts": self.get_hosts(),
             "period": "1s",
         }])
+        time.sleep(1)
         proc = self.start_beat()
         self.wait_until(lambda: self.output_lines() > 0, max_timeout=20)
         proc.check_kill_and_wait()
@@ -33,7 +35,7 @@ class Test(metricbeat.BaseTest):
         self.assert_fields_are_documented(evt)
 
     @unittest.skipUnless(metricbeat.INTEGRATION_TESTS, "integration test")
-    def test_node(self):
+    def test_node_stats(self):
         """
         logstash node_stats metricset test
         """
