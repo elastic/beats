@@ -73,6 +73,7 @@ https://github.com/elastic/beats/compare/v6.0.0-beta2...master[Check the HEAD di
 - Fix the include top N processes feature for cases where there are fewer processes than N. {pull}5729[5729]
 - Fix `ProcState` on Linux and FreeBSD when process names contain parentheses. {pull}5775[5775]
 - Fix incorrect `Mem.Used` calculation under linux. {pull}5775[5775]
+- Fix mongodb session consistency mode to allow command execution on secondary nodes. {issue}4689[4689]
 
 *Packetbeat*
 
