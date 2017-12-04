@@ -9,8 +9,9 @@ import (
 	"strings"
 	"time"
 
-	"github.com/fsnotify/fsevents"
 	"github.com/pkg/errors"
+
+	"github.com/elastic/fsevents"
 
 	"github.com/elastic/beats/libbeat/logp"
 )
