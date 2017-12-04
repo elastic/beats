@@ -120,12 +120,12 @@ func (c *syncClient) Publish(batch publisher.Batch) error {
 		} else {
 			n, err = c.publishWindowed(events)
 		}
-		events = events[n:]
-		st.Acked(n)
 
 		debugf("%v events out of %v events sent to logstash host %s. Continue sending",
 			n, len(events), c.Host())
 
+		events = events[n:]
+		st.Acked(n)
 		if err != nil {
 			// return batch to pipeline before reporting/counting error
 			batch.RetryEvents(events)
