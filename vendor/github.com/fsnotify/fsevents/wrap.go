@@ -35,7 +35,7 @@ import (
 )
 
 // eventIDSinceNow is a sentinel to begin watching events "since now".
-const eventIDSinceNow = uint64(C.kFSEventStreamEventIdSinceNow + (1 << 64))
+const eventIDSinceNow = uint64(C.kFSEventStreamEventIdSinceNow)
 
 // LatestEventID returns the most recently generated event ID, system-wide.
 func LatestEventID() uint64 {
