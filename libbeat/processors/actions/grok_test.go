@@ -3,6 +3,8 @@ package actions
 import (
 	"testing"
 
+	"github.com/elastic/beats/libbeat/beat"
+
 	"regexp"
 
 	"github.com/elastic/beats/libbeat/common"
@@ -220,13 +222,13 @@ func getGrokActualValue(t *testing.T, config *common.Config, input common.MapStr
 		logp.LogInit(logp.LOG_DEBUG, "", false, true, []string{"*"})
 	}
 
-	p, err := newGrok(*config)
+	p, err := newGrok(config)
 	if err != nil {
 		logp.Err("Error initializing Grok ")
 		t.Fatal(err)
 	}
 
-	actual, err := p.Run(input)
+	actual, err := p.Run(&beat.Event{Fields: input})
 
-	return actual
+	return actual.Fields
 }

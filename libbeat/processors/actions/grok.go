@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"regexp"
 
+	"github.com/elastic/beats/libbeat/beat"
 	"github.com/elastic/beats/libbeat/common"
 	"github.com/elastic/beats/libbeat/logp"
 	"github.com/elastic/beats/libbeat/processors"
@@ -21,7 +22,7 @@ func init() {
 			allowedFields("field", "patterns", "additional_pattern_definitions", "when")))
 }
 
-func newGrok(c common.Config) (processors.Processor, error) {
+func newGrok(c *common.Config) (processors.Processor, error) {
 	type config struct {
 		Field                        string            `config:"field"`
 		Patterns                     []string          `config:"patterns"`
@@ -63,7 +64,7 @@ func newGrok(c common.Config) (processors.Processor, error) {
 	return grok{Field: myconfig.Field, Patterns: regexps}, nil
 }
 
-func (g grok) Run(event common.MapStr) (common.MapStr, error) {
+func (g grok) Run(event *beat.Event) (*beat.Event, error) {
 
 	fieldi, err := event.GetValue(g.Field)
 	if err == nil {
@@ -76,7 +77,7 @@ func (g grok) Run(event common.MapStr) (common.MapStr, error) {
 					for i, subexp := range subexps {
 						if len(subexp) > 0 {
 							if matches[2*i] >= 0 {
-								event[subexp] = field[matches[2*i]:matches[2*i+1]]
+								event.PutValue(subexp, field[matches[2*i]:matches[2*i+1]])
 							}
 						}
 					}
