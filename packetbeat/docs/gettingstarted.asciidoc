@@ -224,6 +224,9 @@ packetbeat.protocols:
 - type: cassandra
   ports: [9042]
 
+- type: tls
+  ports: [443]
+
 ----------------------------------------------------------------------
 +
 . If you are sending output directly to Elasticsearch (and not using Logstash),
