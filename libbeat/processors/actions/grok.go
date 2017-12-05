@@ -69,12 +69,14 @@ func (g grok) Run(event common.MapStr) (common.MapStr, error) {
 		field, ok := fieldi.(string)
 		if ok {
 			for _, regexp := range g.Patterns {
-				matches := regexp.FindStringSubmatch(field)
+				matches := regexp.FindStringSubmatchIndex(field)
 				if matches != nil {
 					subexps := regexp.SubexpNames()
 					for i, subexp := range subexps {
 						if len(subexp) > 0 {
-							event[subexp] = matches[i]
+							if matches[2*i] >= 0 {
+								event[subexp] = field[matches[2*i]:matches[2*i+1]]
+							}
 						}
 					}
 					break
