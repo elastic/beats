@@ -73,7 +73,7 @@ func newProcessorPipeline(
 
 	// setup 3, 4, 5: client config fields + pipeline fields + client fields + dyn metadata
 	fields := config.Fields.Clone()
-	fields.DeepUpdate(global.fields)
+	fields.DeepUpdate(global.fields.Clone())
 	if em := config.EventMetadata; len(em.Fields) > 0 {
 		common.MergeFields(fields, em.Fields.Clone(), em.FieldsUnderRoot)
 	}
