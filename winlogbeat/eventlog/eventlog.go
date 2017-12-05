@@ -113,7 +113,7 @@ func (e Record) ToEvent() beat.Event {
 		Timestamp: e.TimeCreated.SystemTime,
 		Fields:    m,
 		Private: checkpoint.EventLogState{
-			Name:         e.API,
+			Name:         e.Channel,
 			RecordNumber: e.RecordID,
 			Timestamp:    e.TimeCreated.SystemTime,
 		},
