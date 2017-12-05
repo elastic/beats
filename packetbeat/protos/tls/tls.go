@@ -260,6 +260,8 @@ func (plugin *tlsPlugin) createEvent(conn *tlsConnectionData) beat.Event {
 	if server.parser.hello != nil {
 		serverHello = server.parser.hello
 		tls["server_hello"] = serverHello.toMap()
+	} else {
+		serverHello = emptyHello
 	}
 	if cert, chain := getCerts(client.parser.certificates, plugin.includeRawCertificates); cert != nil {
 		tls["client_certificate"] = cert
