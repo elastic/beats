@@ -10,7 +10,7 @@ func getGrokBuiltinPatternOnce() map[string]string {
 
 		"USERNAME":       `[a-zA-Z0-9._-]+`,
 		"USER":           `%{USERNAME}`,
-		"EMAILLOCALPART": `[a-zA-Z][a-zA-Z0-9_.+-=:]+`,
+		"EMAILLOCALPART": `[a-zA-Z0-9_][a-zA-Z0-9_.+-=:]+`,
 		"EMAILADDRESS":   `%{EMAILLOCALPART}@%{HOSTNAME}`,
 		"HTTPDUSER":      `%{EMAILADDRESS}|%{USER}`,
 		"INT":            `(?:[+-]?(?:[0-9]+))`,

@@ -3,6 +3,8 @@ package actions
 import (
 	"testing"
 
+	"regexp"
+
 	"github.com/elastic/beats/libbeat/common"
 	"github.com/elastic/beats/libbeat/logp"
 	"github.com/stretchr/testify/assert"
@@ -68,6 +70,58 @@ func TestGrokIp(t *testing.T) {
 	}
 
 	assert.Equal(t, expected.String(), actual.String())
+}
+
+func TestGrokPatterns(t *testing.T) {
+	type matchCase struct {
+		matchedString string
+		matches       map[string]string
+	}
+
+	testsExpressions := map[string][]matchCase{
+		",%{EMAILADDRESS:email},": []matchCase{
+			matchCase{",ramon_garcia@myaddress.org,", map[string]string{"email": "ramon_garcia@myaddress.org"}},
+			matchCase{",0200@amazon.com,", map[string]string{"email": "0200@amazon.com"}}},
+		":%{HTTPDUSER:user}:": []matchCase{
+			matchCase{":frobenius:", map[string]string{"user": "frobenius"}},
+			matchCase{":frobenius@somedomain.org:", map[string]string{"user": "frobenius@somedomain.org"}},
+		},
+		":%{INT:val}:": []matchCase{
+			matchCase{":132:", map[string]string{"val": "132"}},
+			matchCase{":-2:", map[string]string{"val": "-2"}},
+			matchCase{":+23:", map[string]string{"val": "+23"}},
+		},
+	}
+	for pattern, testMatches := range testsExpressions {
+		expandedPattern, err := grokExpandPattern(pattern, []string{})
+		if err != nil {
+			logp.Err("Error expanding Grok expression")
+			t.Error(err)
+		}
+		reg, err := regexp.Compile(expandedPattern)
+		if err != nil {
+			logp.Err("Error expanding compiling expression")
+			t.Error(err)
+		}
+		for _, matchCase := range testMatches {
+			matches := reg.FindStringSubmatchIndex(matchCase.matchedString)
+			if len(matches) == 0 {
+				t.Error("Expected match but did not match", pattern, matchCase.matchedString)
+				continue
+			}
+			subexps := reg.SubexpNames()
+			matchMap := make(map[string]string)
+
+			for i, subexp := range subexps {
+				if len(subexp) > 0 {
+					if matches[2*i] >= 0 {
+						matchMap[subexp] = matchCase.matchedString[matches[2*i]:matches[2*i+1]]
+					}
+				}
+			}
+			assert.Equal(t, matchCase.matches, matchMap)
+		}
+	}
 }
 
 // tcpflags tcpsyn tcpack tcpwin icmptype icmpcode info path
