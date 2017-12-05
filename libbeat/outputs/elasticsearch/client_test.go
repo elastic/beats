@@ -178,7 +178,7 @@ func TestGetIndexStandard(t *testing.T) {
 	indexSel := outil.MakeSelector(outil.FmtSelectorExpr(fmtstr, ""))
 
 	event := &beat.Event{Timestamp: ts, Fields: fields}
-	index := getIndex(event, indexSel)
+	index, _ := getIndex(event, indexSel)
 	assert.Equal(t, index, "beatname-"+extension)
 }
 
@@ -204,7 +204,7 @@ func TestGetIndexOverwrite(t *testing.T) {
 			"index": "dynamicindex",
 		},
 		Fields: fields}
-	index := getIndex(event, indexSel)
+	index, _ := getIndex(event, indexSel)
 	expected := "dynamicindex-" + extension
 	assert.Equal(t, expected, index)
 }

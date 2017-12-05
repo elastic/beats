@@ -74,6 +74,21 @@ type Connection struct {
 	version string
 }
 
+type bulkIndexAction struct {
+	Index bulkEventMeta `json:"index" struct:"index"`
+}
+
+type bulkCreateAction struct {
+	Create bulkEventMeta `json:"create" struct:"create"`
+}
+
+type bulkEventMeta struct {
+	Index    string      `json:"_index" struct:"_index"`
+	DocType  string      `json:"_type" struct:"_type"`
+	Pipeline string      `json:"pipeline,omitempty" struct:"pipeline,omitempty"`
+	ID       interface{} `json:"_id,omitempty" struct:"_id,omitempty"`
+}
+
 var (
 	nameItems  = []byte("items")
 	nameStatus = []byte("status")
@@ -318,7 +333,11 @@ func bulkEncodePublishRequest(
 	okEvents := data[:0]
 	for i := range data {
 		event := &data[i].Content
-		meta := createEventBulkMeta(index, pipeline, event)
+		meta, err := createEventBulkMeta(index, pipeline, event)
+		if err != nil {
+			logp.Err("Failed to encode event meta dat: %s", err)
+			continue
+		}
 		if err := body.Add(meta, event); err != nil {
 			logp.Err("Failed to encode event: %s", err)
 			continue
@@ -329,48 +348,38 @@ func bulkEncodePublishRequest(
 }
 
 func createEventBulkMeta(
-	index outil.Selector,
+	indexSel outil.Selector,
 	pipelineSel *outil.Selector,
 	event *beat.Event,
-) interface{} {
+) (interface{}, error) {
 	pipeline, err := getPipeline(event, pipelineSel)
 	if err != nil {
-		logp.Err("Failed to select pipeline: %v", err)
+		err := fmt.Errorf("failed to select pipeline: %v", err)
+		return nil, err
 	}
 
-	if pipeline == "" {
-		type bulkMetaIndex struct {
-			Index   string `json:"_index" struct:"_index"`
-			DocType string `json:"_type" struct:"_type"`
-		}
-		type bulkMeta struct {
-			Index bulkMetaIndex `json:"index"`
-		}
-
-		return bulkMeta{
-			Index: bulkMetaIndex{
-				Index:   getIndex(event, index),
-				DocType: eventType,
-			},
-		}
+	index, err := getIndex(event, indexSel)
+	if err != nil {
+		err := fmt.Errorf("failed to select event index: %v", err)
+		return nil, err
 	}
 
-	type bulkMetaIndex struct {
-		Index    string `json:"_index" struct:"_index"`
-		DocType  string `json:"_type" struct:"_type"`
-		Pipeline string `json:"pipeline" struct:"pipeline"`
-	}
-	type bulkMeta struct {
-		Index bulkMetaIndex `json:"index" struct:"index"`
+	var id interface{}
+	if m := event.Meta; m != nil {
+		id = m["id"]
 	}
 
-	return bulkMeta{
-		Index: bulkMetaIndex{
-			Index:    getIndex(event, index),
-			Pipeline: pipeline,
-			DocType:  eventType,
-		},
+	meta := bulkEventMeta{
+		Index:    index,
+		DocType:  eventType,
+		Pipeline: pipeline,
+		ID:       id,
 	}
+
+	if id != nil {
+		return bulkCreateAction{meta}, nil
+	}
+	return bulkIndexAction{meta}, nil
 }
 
 func getPipeline(event *beat.Event, pipelineSel *outil.Selector) (string, error) {
@@ -392,20 +401,19 @@ func getPipeline(event *beat.Event, pipelineSel *outil.Selector) (string, error)
 // getIndex returns the full index name
 // Index is either defined in the config as part of the output
 // or can be overload by the event through setting index
-func getIndex(event *beat.Event, index outil.Selector) string {
+func getIndex(event *beat.Event, index outil.Selector) (string, error) {
 	if event.Meta != nil {
 		if str, exists := event.Meta["index"]; exists {
 			idx, ok := str.(string)
 			if ok {
 				ts := event.Timestamp.UTC()
 				return fmt.Sprintf("%s-%d.%02d.%02d",
-					idx, ts.Year(), ts.Month(), ts.Day())
+					idx, ts.Year(), ts.Month(), ts.Day()), nil
 			}
 		}
 	}
 
-	str, _ := index.Select(event)
-	return str
+	return index.Select(event)
 }
 
 // bulkCollectPublishFails checks per item errors returning all events
