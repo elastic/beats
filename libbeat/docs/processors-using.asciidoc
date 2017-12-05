@@ -40,6 +40,7 @@ The supported processors are:
  * <<add-cloud-metadata,`add_cloud_metadata`>>
  * <<add-locale,`add_locale`>>
  * <<decode-json-fields,`decode_json_fields`>>
+ * <<grok, `grok`>>
  * <<drop-event,`drop_event`>>
  * <<drop-fields,`drop_fields`>>
  * <<include-fields,`include_fields`>>
@@ -447,6 +448,72 @@ is treated as if the field was not set at all.
 `overwrite_keys`:: (Optional) A boolean that specifies whether keys that already
 exist in the event are overwritten by keys from the decoded JSON object. The
 default value is false.
+
+[[grok]]
+=== Grok
+The `grok` processor extract fields from a string field using a provided regular expression. It is similar to the grok processor in elasticsearch
+and logstash (Go regular expressions are used instead of Ruby or Java, so there are minor differences). The Grok expression can extract fields using
+the syntax %{regular_expression_name:extracted_field_name}. For instance, in order to extract the timestamp and IP address from
+
+-------
+"2012-03-04T22:33:01.003Z,127.0.0.1"
+-------
+
+one would use the Grok expression
+------
+`%{TIMESTAMP_ISO8601:timestamp},%{IP:client_ip}?`
+------
+
+One can use named regular expressions, with the syntax `?P<name>`.
+
+The syntax of this processor is 
+
+[source,yaml]
+-------
+processors:
+ - grok:
+     field: "field_name"
+     patterns: ["patter1", "pattern2", ...]
+     additional_pattern_definitions: 
+         custom_patter1: custom_pattern_definition
+         custom_patter2: custom_pattern_definition2
+     when:
+         condition
+-------
+
+For example, in order to parse a Windows firewall pfirewall.log  file, one can use the following configuration
+[source,yaml]
+-------
+processors:
+ - grok:
+     field: "message"
+     patterns: ["%{TIMESTAMP_ISO8601:timestamp} %{WORD:action} %{WORD:protocol} (?:%{IP:source_ip}|[-]) (?:%{IP:destination_ip}|-) (?:%{INT:source_port}|-) (?:%{INT:destination_port}|-) 			`(?:%{INT:size}|-) (?:-|%{WORD:tcp_flags}) (?:-|%{WORD:tcp_syn}) (?:-|%{WORD:tcp_ack}) (?:-|%{WORD:tcp_win}) (?:-|%{WORD:icmp_type}) (?:-|%{WORD:icmp_code}) (?:-|%{WORD:info}) (?:-|%{WORD:direction})"]
+-------
+
+that would turn the next event
+-------
+{"message": "2015-11-22 04:14:00 DROP TCP 10.31.42.53 10.0.0.1 52209 359 52 S 3190407656 0 8192 - - - RECEIVE" }
+-------
+into
+-------
+{
+		"message":          "2015-11-22 04:14:00 DROP TCP 10.31.42.53 10.0.0.1 52209 359 52 S 3190407656 0 8192 - - - RECEIVE",
+		"timestamp":        "2015-11-22 04:14:00",
+		"action":           "DROP",
+		"protocol":         "TCP",
+		"source_ip":        "10.31.42.53",
+		"destination_ip":   "10.0.0.1",
+		"source_port":      "52209",
+		"destination_port": "359",
+		"size":             "52",
+		"tcp_flags":        "S",
+		"tcp_syn":          "3190407656",
+		"tcp_ack":          "0",
+		"tcp_win":          "8192",
+		"direction":        "RECEIVE",
+	}
+-------
+
 
 [[drop-event]]
 === Drop events
