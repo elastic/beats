@@ -170,27 +170,28 @@ func TestGrokLinuxFirewall(t *testing.T) {
 	}
 	var testGrokLinuxFirewallLog, _ = common.NewConfigFrom(map[string]interface{}{
 		"field": "msg",
-		"patterns": []string{`%{TIMESTAMP_ISO8601:timestamp} %{WORD:host} %{WORD:subsystem}\s+\[\s*\d+.\d+\]\+iptables rejected input ` +
-			`IN=(?:%{INTERFACE:in_interface}|-) ` +
-			`OUT=(?:%{INTERFACE:out_interface}|-) MAC=%{MAC:dest_mac}:%{MAC:src_mac}:\d{2}:\d{2} ` +
-			`SRC=%{IP:src_ip} DST=%{IP:src_ip} LEN=%{NUMBER:len} TOS=%{NUMBER:tos} PREC=%{BASE16NUM:prec} ` +
-			`TTL=%{NUMBER:ttl} ID=%{NUMBER:id} %{WORD:flags} PROTO=%{WORD:proto} ` +
-			`SPT=%{NUMBER:source_port} DPT=%{NUMBER:dest_port} WINDOW=%{NUMBER:window} ` +
-			`RES=%{BASE16NUM:res} %{WORD:syn} URGP=%{NUMBER:urg}`,
-			`%{TIMESTAMP_ISO8601:timestamp} %{WORD:host} %{WORD:subsystem}\s+\[\s*\d+.\d+\]\+iptables rejected input `,
+		"patterns": []string{
+			`%{TIMESTAMP_ISO8601:timestamp} %{WORD:host} %{WORD:subsystem}:\s+\[\s*\d+.\d+\]\s+iptables rejected input ` +
+				`IN=(?:%{INTERFACE:in_interface})? ` +
+				`OUT=(?:%{INTERFACE:out_interface})? MAC=%{MAC:dest_mac}:%{MAC:src_mac}:[0-9A-Fa-f]{2}:[0-9A-Fa-f]{2} ` +
+				`SRC=%{IP:src_ip} DST=%{IP:dst_ip} LEN=%{NUMBER:len} TOS=%{BASE16NUM:tos} PREC=%{BASE16NUM:prec} ` +
+				`TTL=%{NUMBER:ttl} ID=%{NUMBER:id} %{WORD:flags} PROTO=%{WORD:proto} ` +
+				`SPT=%{NUMBER:source_port} DPT=%{NUMBER:dest_port} WINDOW=%{NUMBER:window} ` +
+				`RES=%{BASE16NUM:res} %{WORD:syn} URGP=%{NUMBER:urg}`,
 		},
 		"additional_pattern_definitions": map[string]string{
 			"RSYSLOG_TIMESTAMP": `\d+-\d+-\d+T\d+:\d+:\d+.\d+(?:\+\d+:\d+)?`,
 			"INTERFACE":         `\w+\d+`,
-			"MAC":               `\d{2}:\d{2}:\d{2}:\d{2}:\d{2}:\d{2}`,
+			"MAC":               `[0-9A-Fa-f]{2}:[0-9A-Fa-f]{2}:[0-9A-Fa-f]{2}:[0-9A-Fa-f]{2}:[0-9A-Fa-f]{2}:[0-9A-Fa-f]{2}`,
 		},
 		//"patterns": []string{`%{IP:client_ip}`},
 	})
 
 	actual := getGrokActualValue(t, testGrokLinuxFirewallLog, input)
 	expected := common.MapStr{
+		"msg":          input["msg"],
 		"timestamp":    "2017-10-12T20:03:28.64642+01:00",
-		"host":         "fumanchu",
+		"host":         "fumunchu",
 		"subsystem":    "kernel",
 		"in_interface": "eth0",
 		"dest_mac":     "5b:1d:87:11:a2:c3",
@@ -208,7 +209,7 @@ func TestGrokLinuxFirewall(t *testing.T) {
 		"source_port":  "78965",
 		"window":       "29200",
 		"res":          "0x00",
-		"syn":          "syn",
+		"syn":          "SYN",
 		"urg":          "0",
 	}
 	assert.Equal(t, expected.String(), actual.String())
