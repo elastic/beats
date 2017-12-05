@@ -17,6 +17,7 @@ https://github.com/elastic/beats/compare/v6.0.0-beta2...master[Check the HEAD di
 - Support dashboard loading without Elasticseach {pull}5653[5653]
 - Addition and update of the following libraries: pbkdf2, terminal, windows, unix {pull}5735[5735]
 - Update the command line library cobra and add support for zsh completion {pull}5761[5761]
+- Allow cobra command function to be wrapped into a function that with handle error handling. {issue}5760[5760]
 
 *Auditbeat*
 
