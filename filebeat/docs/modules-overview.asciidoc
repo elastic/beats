@@ -132,17 +132,6 @@ filebeat.modules:
     var.paths: ["/var/log/nginx/access.log*"]
 ----------------------------------------------------------------------
 
-The Nginx `access` fileset also has a `pipeline` variables which allows
-selecting which of the available Ingest Node pipelines is used for parsing. At
-the moment, two such pipelines are available, one that requires the two ingest
-plugins (`ingest-geoip` and `ingest-user-agent`) and one that doesn't. If you
-cannot install the plugins, you can use the following:
-
-
-[source,shell]
-----------------------------------------------------------------------
-./filebeat -e -modules=nginx -M "nginx.access.var.pipeline=no_plugins"
-----------------------------------------------------------------------
 
 ==== Advanced settings
 
