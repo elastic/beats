@@ -120,6 +120,8 @@ func grokExpandPattern(pattern string, knownGrokNames []string) (string, error) 
 			if len(match) >= 6 && match[4] >= 0 && match[5] >= 0 {
 				substName := pattern[match[4]:match[5]]
 				patternExpand = namedMatch(patternExpand, substName)
+			} else {
+				patternExpand = unNamedMatch(patternExpand)
 			}
 			if match[0] >= i+1 {
 				result = append(result, pattern[i:match[0]]...)
@@ -158,4 +160,8 @@ func grokSearchPattern(patternName string, knownGrokNames []string) (string, err
 
 func namedMatch(pattern string, name string) string {
 	return "(?P<" + name + ">" + pattern + ")"
+}
+
+func unNamedMatch(pattern string) string {
+	return "(?:" + pattern + ")"
 }
