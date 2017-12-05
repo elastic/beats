@@ -11188,6 +11188,61 @@ Number of processes for which the state couldn't be retrieved or is unknown.
 
 
 [float]
+== raid fields
+
+raid
+
+
+
+[float]
+=== `system.raid.name`
+
+type: keyword
+
+Name of the device.
+
+
+[float]
+=== `system.raid.activity_state`
+
+type: keyword
+
+activity-state of the device.
+
+
+[float]
+=== `system.raid.disks.active`
+
+type: long
+
+Number of active disks.
+
+
+[float]
+=== `system.raid.disks.total`
+
+type: long
+
+Total number of disks the device consists of.
+
+
+[float]
+=== `system.raid.blocks.total`
+
+type: long
+
+Number of blocks the device holds.
+
+
+[float]
+=== `system.raid.blocks.synced`
+
+type: long
+
+Number of blocks on the device that are in sync.
+
+
+[float]
 == socket fields
 
 TCP sockets that are active.
