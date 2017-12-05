@@ -307,3 +307,17 @@ class Test(WriteReadTest):
         })
         self.assertTrue(len(evts), 1)
         self.assertEqual(evts[0]["message"], msg)
+
+    def test_registry_data(self):
+        """
+        wineventlog - Registry is updated
+        """
+        self.write_event_log("Hello world!")
+        evts = self.read_events()
+        self.assertTrue(len(evts), 1)
+
+        event_logs = self.read_registry()
+        self.assertTrue(len(event_logs.keys()), 1)
+        self.assertIn(self.providerName, event_logs)
+        record_number = event_logs[self.providerName]["record_number"]
+        self.assertGreater(record_number, 0)
