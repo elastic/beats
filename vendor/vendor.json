@@ -1001,12 +1001,76 @@
 			"revisionTime": "2016-08-17T18:24:57Z"
 		},
 		{
-			"checksumSHA1": "jvqovQm7I5xa3e6TCAxWh/fLNKs=",
+			"checksumSHA1": "ci7skUhpD1VwkoR0tKVdggTkYrE=",
 			"path": "github.com/urso/go-structform",
-			"revision": "a59a4e97c96431f4ad25ed3bd027981f2e0ff5c2",
-			"revisionTime": "2017-07-17T20:28:29Z",
-			"version": "v0.0.1",
-			"versionExact": "v0.0.1"
+			"revision": "844d7d44009e9e8c0f08016fc4dab64e136ca040",
+			"revisionTime": "2017-12-05T17:32:58Z",
+			"version": "v0.0.2",
+			"versionExact": "v0.0.2"
+		},
+		{
+			"checksumSHA1": "da75fv5z2n4AHmTzUWLBs7pNkog=",
+			"path": "github.com/urso/go-structform/cborl",
+			"revision": "844d7d44009e9e8c0f08016fc4dab64e136ca040",
+			"revisionTime": "2017-12-05T17:32:58Z",
+			"version": "v0.0.2",
+			"versionExact": "v0.0.2"
+		},
+		{
+			"checksumSHA1": "AkYoBxV+Imq2EBwNcb53hEGh7sQ=",
+			"path": "github.com/urso/go-structform/gotype",
+			"revision": "844d7d44009e9e8c0f08016fc4dab64e136ca040",
+			"revisionTime": "2017-12-05T17:32:58Z",
+			"version": "v0.0.2",
+			"versionExact": "v0.0.2"
+		},
+		{
+			"checksumSHA1": "25sJtDsLVmS+aCILjB8zm/JBgPs=",
+			"path": "github.com/urso/go-structform/internal/gen",
+			"revision": "844d7d44009e9e8c0f08016fc4dab64e136ca040",
+			"revisionTime": "2017-12-05T17:32:58Z",
+			"version": "v0.0.2",
+			"versionExact": "v0.0.2"
+		},
+		{
+			"checksumSHA1": "m9H8/w6okS+8ixvkq+eYLd/Kk3g=",
+			"path": "github.com/urso/go-structform/internal/unsafe",
+			"revision": "844d7d44009e9e8c0f08016fc4dab64e136ca040",
+			"revisionTime": "2017-12-05T17:32:58Z",
+			"version": "v0.0.2",
+			"versionExact": "v0.0.2"
+		},
+		{
+			"checksumSHA1": "UXf4TzYK1UB8xAa6Phy9CvkvWL0=",
+			"path": "github.com/urso/go-structform/json",
+			"revision": "844d7d44009e9e8c0f08016fc4dab64e136ca040",
+			"revisionTime": "2017-12-05T17:32:58Z",
+			"version": "v0.0.2",
+			"versionExact": "v0.0.2"
+		},
+		{
+			"checksumSHA1": "SVGAVpMy8NbNCI7GVBLCKuJ7JNQ=",
+			"path": "github.com/urso/go-structform/sftest",
+			"revision": "844d7d44009e9e8c0f08016fc4dab64e136ca040",
+			"revisionTime": "2017-12-05T17:32:58Z",
+			"version": "v0.0.2",
+			"versionExact": "v0.0.2"
+		},
+		{
+			"checksumSHA1": "ttk3rguPusHM0+Pkp5diTbps/18=",
+			"path": "github.com/urso/go-structform/ubjson",
+			"revision": "844d7d44009e9e8c0f08016fc4dab64e136ca040",
+			"revisionTime": "2017-12-05T17:32:58Z",
+			"version": "v0.0.2",
+			"versionExact": "v0.0.2"
+		},
+		{
+			"checksumSHA1": "MytQct/960akBAZm7xmbpi2BKGs=",
+			"path": "github.com/urso/go-structform/visitors",
+			"revision": "844d7d44009e9e8c0f08016fc4dab64e136ca040",
+			"revisionTime": "2017-12-05T17:32:58Z",
+			"version": "v0.0.2",
+			"versionExact": "v0.0.2"
 		},
 		{
 			"checksumSHA1": "Und+nhgN1YsNWvd0aDYO+0cMcAo=",
