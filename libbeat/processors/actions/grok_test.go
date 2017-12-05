@@ -46,6 +46,30 @@ func TestGrokSimpleMessage(t *testing.T) {
 	assert.Equal(t, expected.String(), actual.String())
 }
 
+func TestGrokIp(t *testing.T) {
+	var testGrokConfigIP, _ = common.NewConfigFrom(map[string]interface{}{
+		"field":    "msg",
+		"patterns": []string{`%{TIMESTAMP_ISO8601:timestamp},%{IP:client_ip}?`},
+		//"patterns": []string{`%{IP:client_ip}`},
+	})
+
+	input := common.MapStr{
+		"datacenter": "watson",
+		"msg":        "2012-03-04T22:33:01.003Z,127.0.0.1",
+	}
+
+	actual := getGrokActualValue(t, testGrokConfigIP, input)
+
+	expected := common.MapStr{
+		"datacenter": "watson",
+		"msg":        "2012-03-04T22:33:01.003Z,127.0.0.1",
+		"timestamp":  "2012-03-04T22:33:01.003Z",
+		"client_ip":  "127.0.0.1",
+	}
+
+	assert.Equal(t, expected.String(), actual.String())
+}
+
 func getGrokActualValue(t *testing.T, config *common.Config, input common.MapStr) common.MapStr {
 	if testing.Verbose() {
 		logp.LogInit(logp.LOG_DEBUG, "", false, true, []string{"*"})
