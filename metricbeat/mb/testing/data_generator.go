@@ -12,7 +12,6 @@ import (
 	"github.com/elastic/beats/libbeat/beat"
 	"github.com/elastic/beats/libbeat/common"
 	"github.com/elastic/beats/metricbeat/mb"
-	"github.com/elastic/beats/metricbeat/mb/module"
 )
 
 var (
@@ -67,19 +66,13 @@ func CreateFullEvent(ms mb.MetricSet, metricSetData common.MapStr) beat.Event {
 		panic(err)
 	}
 
-	build := module.EventBuilder{
-		ModuleName:    ms.Module().Name(),
-		MetricSetName: ms.Name(),
-		Host:          ms.Host(),
-		StartTime:     startTime,
-		FetchDuration: 115 * time.Microsecond,
-		Event:         metricSetData,
-	}
+	mbEvent := mb.TransformMapStrToEvent(metricSetData, nil)
+	mbEvent.Timestamp = startTime
+	mbEvent.Took = 115 * time.Microsecond
+	mbEvent.Host = ms.Host()
 
-	fullEvent, err := build.Build()
-	if err != nil {
-		panic(err)
-	}
+	fullEvent := mbEvent.BeatEvent(ms.Module().Name(), ms.Name(), mb.AddMetricSetInfo)
+
 	fullEvent.Fields["beat"] = common.MapStr{
 		"name":     "host.example.com",
 		"hostname": "host.example.com",

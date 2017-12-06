@@ -12,6 +12,11 @@ import (
 )
 
 const (
+	// TimestampKey is the key used in events created by MetricSets to add their
+	// own timestamp to an event. If a timestamp is not specified then the that
+	// the fetch started will be used.
+	TimestampKey string = "@timestamp"
+
 	// ModuleDataKey is the key used in events created by MetricSets to add data
 	// to an event that is common to the module. The data must be a
 	// common.MapStr and when the final event is built the object will be stored
@@ -104,6 +109,8 @@ type EventsFetcher interface {
 // Reporter is used by a MetricSet to report events, errors, or errors with
 // metadata. The methods return false if and only if publishing failed because
 // the MetricSet is being closed.
+//
+// Deprecated: Use ReporterV2.
 type Reporter interface {
 	Event(event common.MapStr) bool               // Event reports a single successful event.
 	ErrorWith(err error, meta common.MapStr) bool // ErrorWith reports a single error event with the additional metadata.
@@ -112,6 +119,8 @@ type Reporter interface {
 
 // ReportingMetricSet is a MetricSet that reports events or errors through the
 // Reporter interface. Fetch is called periodically to collect events.
+//
+// Deprecated: Use ReportingMetricSetV2.
 type ReportingMetricSet interface {
 	MetricSet
 	Fetch(r Reporter)
@@ -120,6 +129,8 @@ type ReportingMetricSet interface {
 // PushReporter is used by a MetricSet to report events, errors, or errors with
 // metadata. It provides a done channel used to signal that reporter should
 // stop.
+//
+// Deprecated: Use PushReporterV2.
 type PushReporter interface {
 	Reporter
 
@@ -132,9 +143,47 @@ type PushReporter interface {
 // periodically via a Fetch callback). Run is invoked to start the event
 // subscription and it should block until the MetricSet is ready to stop or
 // the PushReporter's done channel is closed.
+//
+// Deprecated: Use PushMetricSetV2.
 type PushMetricSet interface {
 	MetricSet
 	Run(r PushReporter)
+}
+
+// V2 Interfaces
+
+// ReporterV2 is used by a MetricSet to report Events. The methods return false
+// if and only if publishing failed because the MetricSet is being closed.
+type ReporterV2 interface {
+	Event(event Event) bool // Event reports a single successful event.
+	Error(err error) bool
+}
+
+// PushReporterV2 is used by a MetricSet to report events, errors, or errors with
+// metadata. It provides a done channel used to signal that reporter should
+// stop.
+type PushReporterV2 interface {
+	ReporterV2
+
+	// Done returns a channel that's closed when work done on behalf of this
+	// reporter should be canceled.
+	Done() <-chan struct{}
+}
+
+// ReportingMetricSetV2 is a MetricSet that reports events or errors through the
+// ReporterV2 interface. Fetch is called periodically to collect events.
+type ReportingMetricSetV2 interface {
+	MetricSet
+	Fetch(r ReporterV2)
+}
+
+// PushMetricSetV2 is a MetricSet that pushes events (rather than pulling them
+// periodically via a Fetch callback). Run is invoked to start the event
+// subscription and it should block until the MetricSet is ready to stop or
+// the PushReporterV2's done channel is closed.
+type PushMetricSetV2 interface {
+	MetricSet
+	Run(r PushReporterV2)
 }
 
 // HostData contains values parsed from the 'host' configuration. Other

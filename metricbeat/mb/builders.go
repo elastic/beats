@@ -8,10 +8,7 @@ import (
 	"github.com/pkg/errors"
 
 	"github.com/elastic/beats/libbeat/common"
-	"github.com/elastic/beats/libbeat/logp"
 )
-
-var debugf = logp.MakeDebug("mb")
 
 var (
 	// ErrEmptyConfig indicates that modules configuration list is nil or empty.
@@ -51,26 +48,6 @@ func NewModule(config *common.Config, r *Register) (Module, []MetricSet, error) 
 	}
 
 	return module, metricsets, nil
-}
-
-// newBaseModulesFromConfig creates new BaseModules from a list of configs
-// each containing ModuleConfig data.
-func newBaseModulesFromConfig(config []*common.Config) ([]BaseModule, error) {
-	var errs multierror.Errors
-	baseModules := make([]BaseModule, 0, len(config))
-	for _, rawConfig := range config {
-		bm, err := newBaseModuleFromConfig(rawConfig)
-		if err != nil {
-			errs = append(errs, err)
-			continue
-		}
-
-		if bm.config.Enabled {
-			baseModules = append(baseModules, bm)
-		}
-	}
-
-	return baseModules, errs.Err()
 }
 
 // newBaseModuleFromConfig creates a new BaseModule from config. The returned
@@ -219,11 +196,20 @@ func mustImplementFetcher(ms MetricSet) error {
 		ifcs = append(ifcs, "PushMetricSet")
 	}
 
+	if _, ok := ms.(ReportingMetricSetV2); ok {
+		ifcs = append(ifcs, "ReportingMetricSetV2")
+	}
+
+	if _, ok := ms.(PushMetricSetV2); ok {
+		ifcs = append(ifcs, "PushMetricSetV2")
+	}
+
 	switch len(ifcs) {
 	case 0:
 		return fmt.Errorf("MetricSet '%s/%s' does not implement an event "+
 			"producing interface (EventFetcher, EventsFetcher, "+
-			"ReportingMetricSet, or PushMetricSet)",
+			"ReportingMetricSet, ReportingMetricSetV2, PushMetricSet, or "+
+			"PushMetricSetV2)",
 			ms.Module().Name(), ms.Name())
 	case 1:
 		return nil
