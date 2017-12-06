@@ -28,25 +28,32 @@ Make sure Kibana is running before you perform this step. If you are accessing a
 secured Kibana instance, make sure you've configured credentials as described in
 <<{beatname_lc}-configuration>>.
 
-To set up the Kibana dashboards for {beatname_uc}:
+To set up the Kibana dashboards for {beatname_uc}, use the appropriate command
+for your system.
 
 ifdef::allplatforms[]
 
-*deb, rpm, and mac:*
+ifeval::["{requires-sudo}"=="yes"]
 
-From the directory where you installed {beatname_uc}, run:
+include::../../libbeat/docs/shared-note-sudo.asciidoc[]
 
-["source","sh",subs="attributes,callouts"]
+endif::[]
+
+*deb and rpm:*
+
+["source","sh",subs="attributes"]
+----------------------------------------------------------------------
+{beatname_lc} setup --dashboards
+----------------------------------------------------------------------
+
+
+*mac:*
+
+["source","sh",subs="attributes"]
 ----------------------------------------------------------------------
 ./{beatname_lc} setup --dashboards
 ----------------------------------------------------------------------
 
-ifeval::["{requires-sudo}"=="yes"]
-
-If you changed ownership of the config file to root, you'll need preface this
-command with `sudo`.
-
-endif::[]
 
 ifeval::["{beatname_lc}"!="auditbeat"]
 
