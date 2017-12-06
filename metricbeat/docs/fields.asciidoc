@@ -1192,6 +1192,85 @@ Last updated
 
 
 [float]
+== osd_df fields
+
+ceph osd disk usage information
+
+
+
+[float]
+=== `ceph.osd_df.id`
+
+type: long
+
+osd node id
+
+
+[float]
+=== `ceph.osd_df.name`
+
+type: text
+
+osd node name
+
+
+[float]
+=== `ceph.osd_df.device_class`
+
+type: keyword
+
+osd node type, illegal type include hdd, ssd etc.
+
+
+[float]
+=== `ceph.osd_df.total.byte`
+
+type: long
+
+format: bytes
+
+osd disk total volume
+
+
+[float]
+=== `ceph.osd_df.used.byte`
+
+type: long
+
+format: bytes
+
+osd disk usage volume
+
+
+[float]
+=== `ceph.osd_df.available.bytes`
+
+type: long
+
+format: bytes
+
+osd disk available volume
+
+
+[float]
+=== `ceph.osd_df.pg_num`
+
+type: long
+
+shows how many pg located on this osd
+
+
+[float]
+=== `ceph.osd_df.used.pct`
+
+type: scaled_float
+
+format: percent
+
+osd disk usage percentage
+
+
+[float]
 == osd_tree fields
 
 ceph osd tree info
@@ -3376,7 +3455,7 @@ Total bytes obtained from system (sum of XxxSys below).
 
 
 [float]
-=== `golang.heap.system.optained`
+=== `golang.heap.system.obtained`
 
 type: long
 
@@ -11109,6 +11188,61 @@ Number of processes for which the state couldn't be retrieved or is unknown.
 
 
 [float]
+== raid fields
+
+raid
+
+
+
+[float]
+=== `system.raid.name`
+
+type: keyword
+
+Name of the device.
+
+
+[float]
+=== `system.raid.activity_state`
+
+type: keyword
+
+activity-state of the device.
+
+
+[float]
+=== `system.raid.disks.active`
+
+type: long
+
+Number of active disks.
+
+
+[float]
+=== `system.raid.disks.total`
+
+type: long
+
+Total number of disks the device consists of.
+
+
+[float]
+=== `system.raid.blocks.total`
+
+type: long
+
+Number of blocks the device holds.
+
+
+[float]
+=== `system.raid.blocks.synced`
+
+type: long
+
+Number of blocks on the device that are in sync.
+
+
+[float]
 == socket fields
 
 TCP sockets that are active.
@@ -11288,14 +11422,6 @@ datastore
 
 
 [float]
-=== `vsphere.datastore.datacenter`
-
-type: keyword
-
-Datacenter name
-
-
-[float]
 === `vsphere.datastore.name`
 
 type: keyword
@@ -11356,14 +11482,6 @@ Used percent of the datastore
 
 host
 
-
-
-[float]
-=== `vsphere.host.datacenter`
-
-type: keyword
-
-Datacenter name
 
 
 [float]
@@ -11429,6 +11547,14 @@ Free Memory in bytes
 
 
 [float]
+=== `vsphere.host.network_names`
+
+type: keyword
+
+Network names
+
+
+[float]
 == virtualmachine fields
 
 virtualmachine
@@ -11436,11 +11562,11 @@ virtualmachine
 
 
 [float]
-=== `vsphere.virtualmachine.datacenter`
+=== `vsphere.virtualmachine.host`
 
 type: keyword
 
-Datacenter name
+Host name
 
 
 [float]
@@ -11505,6 +11631,14 @@ Free Memory of Guest in bytes
 type: object
 
 Custom fields
+
+
+[float]
+=== `vsphere.virtualmachine.network_names`
+
+type: keyword
+
+Network names
 
 
 [[exported-fields-windows]]

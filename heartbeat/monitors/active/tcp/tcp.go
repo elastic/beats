@@ -9,8 +9,10 @@ import (
 	"github.com/elastic/beats/libbeat/common"
 	"github.com/elastic/beats/libbeat/logp"
 	"github.com/elastic/beats/libbeat/outputs"
+	"github.com/elastic/beats/libbeat/outputs/transport"
 
 	"github.com/elastic/beats/heartbeat/monitors"
+	"github.com/elastic/beats/heartbeat/monitors/active/dialchain"
 )
 
 func init() {
@@ -43,38 +45,47 @@ func create(
 	if tls != nil {
 		defaultScheme = "ssl"
 	}
-	addrs, err := collectHosts(&config, defaultScheme)
+
+	endpoints, err := collectHosts(&config, defaultScheme)
 	if err != nil {
 		return nil, err
 	}
 
-	if config.Socks5.URL != "" && !config.Socks5.LocalResolve {
-		var jobs []monitors.Job
-		for _, addr := range addrs {
-			scheme, host := addr.Scheme, addr.Host
-			for _, port := range addr.Ports {
-				job, err := newTCPMonitorHostJob(scheme, host, port, tls, &config)
-				if err != nil {
-					return nil, err
-				}
-				jobs = append(jobs, job)
-			}
-		}
-		return jobs, nil
-	}
+	typ := config.Name
+	timeout := config.Timeout
+	validator := makeValidateConn(&config)
 
-	jobs := make([]monitors.Job, len(addrs))
-	for i, addr := range addrs {
-		jobs[i], err = newTCPMonitorIPsJob(addr, tls, &config)
+	var jobs []monitors.Job
+	for scheme, eps := range endpoints {
+		schemeTLS := tls
+		if scheme == "tcp" || scheme == "plain" {
+			schemeTLS = nil
+		}
+
+		db, err := dialchain.NewBuilder(dialchain.BuilderSettings{
+			Timeout: timeout,
+			Socks5:  config.Socks5,
+			TLS:     schemeTLS,
+		})
 		if err != nil {
 			return nil, err
 		}
+
+		epJobs, err := dialchain.MakeDialerJobs(db, typ, scheme, eps, config.Mode,
+			func(dialer transport.Dialer, addr string) (common.MapStr, error) {
+				return pingHost(dialer, addr, timeout, validator)
+			})
+		if err != nil {
+			return nil, err
+		}
+
+		jobs = append(jobs, epJobs...)
 	}
 	return jobs, nil
 }
 
-func collectHosts(config *Config, defaultScheme string) ([]connURL, error) {
-	var addrs []connURL
+func collectHosts(config *Config, defaultScheme string) (map[string][]dialchain.Endpoint, error) {
+	endpoints := map[string][]dialchain.Endpoint{}
 	for _, h := range config.Hosts {
 		scheme := defaultScheme
 		host := ""
@@ -109,11 +120,10 @@ func collectHosts(config *Config, defaultScheme string) ([]connURL, error) {
 			return nil, fmt.Errorf("host '%v' missing port number", h)
 		}
 
-		addrs = append(addrs, connURL{
-			Scheme: scheme,
-			Host:   host,
-			Ports:  ports,
+		endpoints[scheme] = append(endpoints[scheme], dialchain.Endpoint{
+			Host:  host,
+			Ports: ports,
 		})
 	}
-	return addrs, nil
+	return endpoints, nil
 }

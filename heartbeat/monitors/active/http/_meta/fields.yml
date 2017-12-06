@@ -69,7 +69,7 @@
               type: group
               description:
                 Time required between sending the start of sending the HTTP
-                request and first by from HTTP response being read. Duration
+                request and first byte from HTTP response being read. Duration
                 based on already available network connection.
               fields:
                 - name: us

@@ -225,7 +225,7 @@ func TestParserHello(t *testing.T) {
 	assert.Equal(t, "TLS_ECDHE_ECDSA_WITH_AES_256_CBC_SHA", mapGet(t, helloMap, "selected_cipher"))
 	assert.Equal(t, "DEFLATE", mapGet(t, helloMap, "selected_compression_method"))
 	assert.Equal(t, "abcdef", parser.hello.sessionID)
-	hasExts := parser.hello.extensions != nil
+	hasExts := parser.hello.extensions.Parsed != nil
 	assert.False(t, hasExts)
 
 	// Correct server hello, with empty extensions
@@ -245,7 +245,7 @@ func TestParserHello(t *testing.T) {
 	assert.Equal(t, "TLS_ECDHE_ECDSA_WITH_AES_256_CBC_SHA", mapGet(t, helloMap, "selected_cipher"))
 	assert.Equal(t, "DEFLATE", mapGet(t, helloMap, "selected_compression_method"))
 	assert.Equal(t, "abcdef", parser.hello.sessionID)
-	hasExts = parser.hello.extensions != nil
+	hasExts = parser.hello.extensions.Parsed != nil
 	assert.False(t, hasExts)
 
 	// Server hello with bad version

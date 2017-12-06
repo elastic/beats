@@ -437,6 +437,8 @@ packetbeat.protocols:
 - type: thrift
   ports: [9090]
 
+- type: tls
+  ports: [443]
 
 ------------------------------------------------------------------------------
 
@@ -1089,6 +1091,184 @@ at the end of the document.
 
 Note that limiting documents in this way means that they are no longer correctly
 formatted JSON objects.
+
+[[configuration-tls]]
+=== Capture TLS traffic
+
+++++
+<titleabbrev>TLS</titleabbrev>
+++++
+
+TLS is a cryptographic protocol that provides secure communications on top of
+an existing application protocol, like HTTP or MySQL.
+
+Packetbeat intercepts the initial handshake in a TLS connection and extracts
+useful information which helps an operator to diagnose problems as well as
+strengthen the security of his or her network and systems. It does not
+decrypt any information from the encapsulated protocol nor does it reveal any
+sensitive information such as cryptographic keys. TLS versions 1.0 to 1.3 and
+SSL 3.0 are supported.
+
+It works by intercepting the client and server "hello" messages, which contain
+the negotiated parameters for the connection such as cryptographic ciphers and
+protocol versions. It can also intercept TLS alerts, which are sent by one
+of the parties to signal a problem with the negotiation, such as an expired
+certificate or a cryptographic error.
+
+An example of indexed event:
+
+[source,json]
+------------------------------------------------------------------------------
+  "tls": {
+    "handshake_completed": true,
+    "server_certificate": {
+      "version": 3,
+      "issuer": {
+        "organization": "GlobalSign nv-sa",
+        "common_name": "GlobalSign CloudSSL CA - SHA256 - G3",
+        "country": "BE"
+      },
+      "subject": {
+        "organization": "Fastly, Inc.",
+        "locality": "San Francisco",
+        "province": "California",
+        "common_name": "r2.shared.global.fastly.net",
+        "country": "US"
+      },
+      "not_before": "2017-11-30T16:52:06.000Z",
+      "not_after": "2018-11-09T20:51:05.000Z",
+      "alternative_names": [
+        "elastic.co"
+      ],
+      "serial_number": "19260053873395556258503998518",
+      "signature_algorithm": "SHA256-RSA",
+      "public_key_algorithm": "RSA"
+    },
+    "server_certificate_chain": [
+      {
+        "not_after": "2025-08-19T00:00:00.000Z",
+        "version": 3,
+        "serial_number": "1438827024893517455116777811697460",
+        "signature_algorithm": "SHA256-RSA",
+        "public_key_algorithm": "RSA",
+        "not_before": "2015-08-19T00:00:00.000Z",
+        "issuer": {
+          "organizational_unit": "Root CA",
+          "common_name": "GlobalSign Root CA",
+          "country": "BE",
+          "organization": "GlobalSign nv-sa"
+        },
+        "subject": {
+          "country": "BE",
+          "organization": "GlobalSign nv-sa",
+          "common_name": "GlobalSign CloudSSL CA - SHA256 - G3"
+        }
+      }
+    ],
+    "resumed": false,
+    "client_hello": {
+      "extensions": {
+        "server_name_indication": [
+          "www.elastic.co"
+        ],
+        "supported_groups": [
+          "secp256r1",
+          "secp384r1",
+          "secp521r1"
+        ],
+        "ec_points_formats": [
+          "uncompressed"
+        ],
+        "signature_algorithms": [
+          "rsa_pkcs1_sha256",
+          "rsa_pkcs1_sha1",
+          [...]
+        ],
+        "application_layer_protocol_negotiation": [
+          "h2",
+          "h2-16",
+          [...]
+        ],
+      },
+      "version": "3.3",
+      "supported_ciphers": [
+        "TLS_EMPTY_RENEGOTIATION_INFO_SCSV",
+        "TLS_ECDHE_ECDSA_WITH_AES_256_GCM_SHA384",
+        [...]
+      ],
+      "supported_compression_methods": [
+        "NULL"
+      ]
+    },
+    "server_hello": {
+      "extensions": {
+        "ec_points_formats": [
+          "uncompressed",
+          "ansiX962_compressed_prime",
+          "ansiX962_compressed_char2"
+        ],
+        "application_layer_protocol_negotiation": [
+          "h2"
+        ],
+      },
+      "version": "3.3",
+      "selected_cipher": "TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256",
+      "selected_compression_method": "NULL"
+    },
+  }
+------------------------------------------------------------------------------
+
+The `client_hello` contains the algorithms and extensions supported by the
+client, as well as the maximum TLS version it supports (3.3).
+
+The `server_hello` contains the final settings for the TLS session: The
+selected cipher, compression method, TLS version to use and other extensions
+such as application layer protocol negotiation (ALPN).
+
+The `resumed` key indicates if the session has been resumed (`true`) or
+a full handshake has been performed (`false`). When true, an additional field
+is present: `resumption_method` which is `id` if the session has been
+resumed using session IDs (stateful) or `ticket` if it has resumed using
+session tickets (stateless).
+
+See the <<exported-fields-tls>> section for more detailed information.
+
+The following settings are specific to the TLS protocol. Here is a sample
+configuration for the `tls` section of the +{beatname_lc}.yml+ config file:
+
+[source,yaml]
+------------------------------------------------------------------------------
+packetbeat.protocols:
+- type: tls
+  send_certificates: true
+  include_raw_certificates: true
+------------------------------------------------------------------------------
+
+==== Configuration options
+
+The `send_certificates` and `include_raw_certificates` settings are useful
+for limiting the amount of data Packetbeat indexes, as multiple certificates
+are usually exchanged in a single transaction, and those can take a considerable
+amount of storage.
+
+Also see <<common-protocol-options>>.
+
+===== `send_certificates`
+
+This setting causes the certificates presented by the client and server to be
+included in the event. The server's certificate is indexed in the
+`server_certificate` field and its certification chain in the
+`server_certificate_chain` field. For the client, the
+`client_certificate` and `client_certificate_chain` fields are used.
+
+The default is true.
+
+===== `include_raw_certificates`
+
+When `send_certificates` is true, you can set `include_raw_certificates` to
+include the raw certificate encoded in PEM format as a `raw` field.
+
+If `send_certificates` is false, this setting is ignored. The default is false.
 
 [[configuration-processes]]
 == Specify which processes to monitor

@@ -1,0 +1,64 @@
+import:
+  - types.yml
+
+main: |
+  package gotype
+
+  import (
+    "reflect"
+
+    stunsafe "github.com/urso/go-structform/internal/unsafe"
+  )
+
+  var _mapInlineMapping = map[reflect.Type]reFoldFn{
+    {{ range data.primitiveTypes }}
+      {{- $t := capitalize . -}}
+    t{{ $t }}: foldMapInline{{ $t }},
+    {{ end }}
+  }
+
+  func getMapInlineByPrimitiveElem(t reflect.Type) reFoldFn {
+    if t == tInterface {
+      return foldMapInlineInterface
+    }
+    return _mapInlineMapping[t]
+  }
+
+  func foldMapInlineInterface(C *foldContext, v reflect.Value) (err error) {
+    ptr := unsafe.Pointer(v.Pointer())
+    if ptr == nil {
+      return nil
+    }
+
+    m := *((*map[string]interface{})(unsafe.Pointer(&ptr)))
+    for k, v := range m {
+      if err = C.OnKey(k); err != nil {
+        return err
+      }
+      if err = foldInterfaceValue(C, v); err != nil {
+        return err
+      }
+    }
+    return
+  }
+
+  {{ range data.primitiveTypes }}
+    {{ $t := capitalize . }}
+    func foldMapInline{{ $t }}(C *foldContext, v reflect.Value) (err error) {
+      ptr := unsafe.Pointer(v.Pointer())
+      if ptr == nil {
+        return nil
+      }
+
+      m := *((*map[string]{{ . }})(unsafe.Pointer(&ptr)))
+      for k, v := range m {
+        if err = C.OnKey(k); err != nil {
+          return err
+        }
+        if err = C.On{{ $t }}(v); err != nil {
+          return err
+        }
+      }
+      return
+    }
+  {{ end }}

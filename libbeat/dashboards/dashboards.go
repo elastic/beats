@@ -46,10 +46,6 @@ func ImportDashboards(
 		kibanaConfig = common.NewConfig()
 	}
 
-	if !kibanaConfig.HasField("host") {
-		// fallback to the beats hostname (localhost) if host is not configured
-		kibanaConfig.SetString("host", -1, hostname)
-	}
 	if esConfig.Enabled() {
 		username, _ := esConfig.String("username", -1)
 		password, _ := esConfig.String("password", -1)

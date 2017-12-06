@@ -3,17 +3,15 @@
 package schema
 
 const (
-	ActionNone               = 0
 	ActionAttributesModified = 1
 	ActionCreated            = 2
-	ActionDeleted            = 3
-	ActionUpdated            = 4
-	ActionMoved              = 5
-	ActionConfigChanged      = 6
+	ActionDeleted            = 4
+	ActionUpdated            = 8
+	ActionMoved              = 16
+	ActionConfigChanged      = 32
 )
 
 var EnumNamesAction = map[int]string{
-	ActionNone:               "None",
 	ActionAttributesModified: "AttributesModified",
 	ActionCreated:            "Created",
 	ActionDeleted:            "Deleted",

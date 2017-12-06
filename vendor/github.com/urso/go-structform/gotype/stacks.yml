@@ -1,0 +1,48 @@
+data.stacks:
+- name: unfolderStack
+  type: unfolder
+- name: reflectValueStack
+  type: reflect.Value
+- name: ptrStack
+  init: 'nil'
+  type: unsafe.Pointer
+- name: keyStack
+  type: string
+  init: '""'
+- name: idxStack
+  type: int
+  init: -1
+- name: structformTypeStack
+  type: structform.BaseType
+  init: structform.AnyType
+
+main: |
+  package gotype
+
+  {{ range .stacks }}
+  type {{ .name }} struct {
+    current {{ .type  }}
+    stack []{{ .type }}
+    stack0 [{{ if .size0 }}{{ .size0 }}{{ else }}32{{ end }}]{{ .type }}
+  }
+  {{ end }}
+  
+  {{ range .stacks }}
+  func (s *{{ .name }}) init({{ if isnil .init }}v {{ .type }}{{end}}) {
+    s.current = {{ if isnil .init }}v{{ else }}{{ .init }}{{end}}
+    s.stack = s.stack0[:0]
+  }
+  
+  func (s *{{ .name }}) push(v {{ .type }}) {
+    s.stack = append(s.stack, s.current)
+    s.current = v
+  }
+  
+  func (s *{{ .name }}) pop() {{ .type }} {
+    old := s.current
+    last := len(s.stack) - 1
+    s.current = s.stack[last]
+    s.stack = s.stack[:last]
+    return old
+  }
+  {{ end }}
