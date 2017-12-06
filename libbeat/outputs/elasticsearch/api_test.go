@@ -4,10 +4,12 @@ package elasticsearch
 import (
 	"encoding/json"
 	"testing"
+	"time"
 
 	"github.com/stretchr/testify/assert"
 
 	"github.com/elastic/beats/libbeat/logp"
+	"github.com/elastic/beats/libbeat/outputs/outil"
 )
 
 func GetValidQueryResult() QueryResult {
@@ -131,7 +133,16 @@ func TestReadSearchResult_invalid(t *testing.T) {
 }
 
 func newTestClient(url string) *Client {
-	return newTestClientAuth(url, "", "")
+	client, err := NewClient(ClientSettings{
+		URL:              url,
+		Index:            outil.MakeSelector(),
+		Timeout:          60 * time.Second,
+		CompressionLevel: 3,
+	}, nil)
+	if err != nil {
+		panic(err)
+	}
+	return client
 }
 
 func (r QueryResult) String() string {

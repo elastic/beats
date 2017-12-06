@@ -3,7 +3,7 @@
 package elasticsearch
 
 import (
-	"os"
+	"math/rand"
 	"strings"
 	"testing"
 	"time"
@@ -14,11 +14,13 @@ import (
 	"github.com/elastic/beats/libbeat/common"
 	"github.com/elastic/beats/libbeat/logp"
 	"github.com/elastic/beats/libbeat/outputs"
+	"github.com/elastic/beats/libbeat/outputs/elasticsearch/internal"
 	"github.com/elastic/beats/libbeat/outputs/outest"
+	"github.com/elastic/beats/libbeat/outputs/outil"
 )
 
 func TestClientConnect(t *testing.T) {
-	client := GetTestingElasticsearch(t)
+	client := getTestingElasticsearch(t)
 	err := client.Connect()
 	assert.NoError(t, err)
 }
@@ -229,9 +231,9 @@ func TestClientBulkPublishEventsWithPipeline(t *testing.T) {
 
 func connectTestEs(t *testing.T, cfg interface{}) (outputs.Client, *Client) {
 	config, err := common.NewConfigFrom(map[string]interface{}{
-		"hosts":            GetEsHost(),
-		"username":         os.Getenv("ES_USER"),
-		"password":         os.Getenv("ES_PASS"),
+		"hosts":            internal.GetEsHost(),
+		"username":         internal.GetUser(),
+		"password":         internal.GetPass(),
 		"template.enabled": false,
 	})
 	if err != nil {
@@ -263,4 +265,28 @@ func connectTestEs(t *testing.T, cfg interface{}) (outputs.Client, *Client) {
 	client.Connect()
 
 	return client, client
+}
+
+// getTestingElasticsearch creates a test client.
+func getTestingElasticsearch(t internal.TestLogger) *Client {
+	client, err := NewClient(ClientSettings{
+		URL:              internal.GetURL(),
+		Index:            outil.MakeSelector(),
+		Username:         internal.GetUser(),
+		Password:         internal.GetUser(),
+		Timeout:          60 * time.Second,
+		CompressionLevel: 3,
+	}, nil)
+	internal.InitClient(t, client, err)
+	return client
+}
+
+func randomClient(grp outputs.Group) outputs.NetworkClient {
+	L := len(grp.Clients)
+	if L == 0 {
+		panic("no elasticsearch client")
+	}
+
+	client := grp.Clients[rand.Intn(L)]
+	return client.(outputs.NetworkClient)
 }
