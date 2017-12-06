@@ -1,6 +1,6 @@
 // +build stresstest
 
-package stress
+package stress_test
 
 import (
 	"flag"
@@ -13,6 +13,7 @@ import (
 	"github.com/elastic/beats/libbeat/common"
 
 	// import queue types
+	"github.com/elastic/beats/libbeat/publisher/pipeline/stress"
 	_ "github.com/elastic/beats/libbeat/publisher/queue/memqueue"
 )
 
@@ -55,7 +56,7 @@ func TestPipeline(t *testing.T) {
 					t.Error(err)
 				}
 
-				if err := RunTests(info, duration, config, onErr); err != nil {
+				if err := stress.RunTests(info, duration, config, onErr); err != nil {
 					t.Error("Test failed with:", err)
 				}
 			})
