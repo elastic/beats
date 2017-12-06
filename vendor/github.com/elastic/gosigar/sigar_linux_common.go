@@ -7,7 +7,6 @@ package gosigar
 import (
 	"bufio"
 	"bytes"
-	"errors"
 	"fmt"
 	"io"
 	"io/ioutil"
@@ -71,7 +70,7 @@ func (self *Mem) Get() error {
 		self.ActualFree = self.Free + buffers + cached
 	}
 
-	self.Used = self.Total - self.ActualFree
+	self.Used = self.Total - self.Free
 	self.ActualUsed = self.Total - self.ActualFree
 
 	return nil
@@ -181,44 +180,58 @@ func (self *ProcList) Get() error {
 }
 
 func (self *ProcState) Get(pid int) error {
-	contents, err := readProcFile(pid, "stat")
+	data, err := readProcFile(pid, "stat")
 	if err != nil {
 		return err
 	}
 
-	headerAndStats := strings.SplitAfterN(string(contents), ")", 2)
-	pidAndName := headerAndStats[0]
-	fields := strings.Fields(headerAndStats[1])
+	// Extract the comm value with is surrounded by parentheses.
+	lIdx := bytes.Index(data, []byte("("))
+	rIdx := bytes.LastIndex(data, []byte(")"))
+	if lIdx < 0 || rIdx < 0 || lIdx >= rIdx || rIdx+2 >= len(data) {
+		return fmt.Errorf("failed to extract comm for pid %d from '%v'", pid, string(data))
+	}
+	self.Name = string(data[lIdx+1 : rIdx])
 
-	name := strings.SplitAfterN(pidAndName, " ", 2)[1]
-	if name[0] == '(' && name[len(name)-1] == ')' {
-		self.Name = name[1 : len(name)-1] // strip ()'s
-	} else {
-		return errors.New(fmt.Sprintf("Malformed process stats for pid %d", pid))
+	// Extract the rest of the fields that we are interested in.
+	fields := bytes.Fields(data[rIdx+2:])
+	if len(fields) <= 36 {
+		return fmt.Errorf("expected more stat fields for pid %d from '%v'", pid, string(data))
 	}
 
-	self.State = RunState(fields[0][0])
+	interests := bytes.Join([][]byte{
+		fields[0],  // state
+		fields[1],  // ppid
+		fields[2],  // pgrp
+		fields[4],  // tty_nr
+		fields[15], // priority
+		fields[16], // nice
+		fields[36], // processor (last processor executed on)
+	}, []byte(" "))
 
-	self.Ppid, _ = strconv.Atoi(fields[1])
-
-	self.Pgid, _ = strconv.Atoi(fields[2])
-
-	self.Tty, _ = strconv.Atoi(fields[4])
-
-	self.Priority, _ = strconv.Atoi(fields[15])
-
-	self.Nice, _ = strconv.Atoi(fields[16])
-
-	self.Processor, _ = strconv.Atoi(fields[36])
+	var state string
+	_, err = fmt.Fscan(bytes.NewBuffer(interests),
+		&state,
+		&self.Ppid,
+		&self.Pgid,
+		&self.Tty,
+		&self.Priority,
+		&self.Nice,
+		&self.Processor,
+	)
+	if err != nil {
+		return fmt.Errorf("failed to parse stat fields for pid %d from '%v': %v", pid, string(data), err)
+	}
+	self.State = RunState(state[0])
 
 	// Read /proc/[pid]/status to get the uid, then lookup uid to get username.
 	status, err := getProcStatus(pid)
 	if err != nil {
-		return fmt.Errorf("failed to read process status for pid %d. %v", pid, err)
+		return fmt.Errorf("failed to read process status for pid %d: %v", pid, err)
 	}
 	uids, err := getUIDs(status)
 	if err != nil {
-		return fmt.Errorf("failed to read process status for pid %d. %v", pid, err)
+		return fmt.Errorf("failed to read process status for pid %d: %v", pid, err)
 	}
 	user, err := user.LookupId(uids[0])
 	if err == nil {
