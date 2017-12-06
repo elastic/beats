@@ -184,6 +184,17 @@
           type: short
           description: >
             The shard ID or number.
+        - name: state
+          type: group
+          description: >
+            Contains fields related to the index state
+          fields:
+            - name: old_value
+              description: >
+                The old value of the index state.
+            - name: new_value
+              description: >
+                The new value of the index state.
         - name: setting
           type: group
           description: >

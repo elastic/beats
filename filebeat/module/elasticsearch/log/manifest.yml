@@ -7,5 +7,5 @@ var:
     os.darwin: []
     os.windows: []
 
-ingest_pipeline: ingest/pipeline.json
+ingest_pipeline: ingest/default.json
 prospector: config/log.yml

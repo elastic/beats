@@ -1,0 +1,204 @@
+{
+    "description": "Pipeline for parsing the Elasticsearch standard log file.",
+    "on_failure": [
+      {
+        "set": {
+          "field": "error.message",
+          "value": "{{ _ingest.on_failure_message }}"
+        }
+      }
+    ],
+    "processors": [
+      {
+        "grok": {
+          "field": "message",
+          "pattern_definitions": {
+            "GREEDYMULTILINE": "(.|\n)*"
+          },
+          "patterns": [
+            "%{TIMESTAMP_ISO8601:timestamp} %{GREEDYDATA:message}",
+            "\\[%{TIMESTAMP_ISO8601:timestamp}\\]\\[%{LOGLEVEL:elasticsearch.log_level}%{SPACE}?\\]\\[%{DATA:elasticsearch.log.component}%{SPACE}*\\]%{SPACE}\\[%{USER:elasticsearch.log.xpack.ml.job_id}\\] \\[%{WORD:elasticsearch.log.xpack.ml.process}/%{POSINT:elasticsearch.log.xpack.ml.process_id}\\] \\[%{DATA:elasticsearch.log.xpack.ml.code}\\] %{GREEDYDATA:elasticsearch.log.reason}",
+            "\\[%{TIMESTAMP_ISO8601:timestamp}\\]\\[%{LOGLEVEL:elasticsearch.log_level}%{SPACE}?\\]\\[%{DATA:elasticsearch.log.component}%{SPACE}*\\](%{SPACE}\\[%{USER:elasticsearch.log.node.name}?\\])? %{GREEDYMULTILINE:message}"
+          ]
+        }
+      },
+      {
+        "date": {
+          "field": "timestamp",
+          "target_field": "@timestamp",
+          "formats": [
+            "ISO8601",
+            "YYYY-MM-dd HH:mm:ss,SSS"
+          ]
+        }
+      },
+      {
+        "grok": {
+          "field": "message",
+          "pattern_definitions": {
+            "GREEDYMULTILINE": "(.|\n)*",
+            "INDEX_ID": "(\\[%{USER:elasticsearch.log.index.name}\\/%{DATA:elasticsearch.log.index.uuid}\\])|(\\[%{USER:elasticsearch.log.index.name}\\]\\[%{INT:elasticsearch.log.index.shard}\\])|(\\[%{USER:elasticsearch.log.index.name}\\])",
+            "INDEX_ACTION": "(creating|deleting) [Ii]ndex",
+            "MAPPING_ACTION": "((update|create)_mapping|failed to put mappings on indices)",
+            "SNAPSHOT_MSG": "fail(ed|ing) (snapshot of shard|to finalize snapshot)",
+            "WATCH_MSG": "([Ff]ailed to (execute|execute watch|update watch record)|executing watch)",
+            "NODES_LIST": "(pending|current) nodes: [\\{\\[]%{GREEDYDATA:meta.nodes}[\\}\\]]",
+            "NODES_MSG": "(failed to (execute|connect))",
+            "SHARD_MSG": "(received shard failed)",
+            "CLUSTER_ACTION": "(added|removed|cluster state update task|cluster state updated|detected_master|master_left|new_master|(set local|applying|publishing) cluster state)",
+            "ALLOC_MSG": "(rerouting shards|(low|high) disk watermark|explaining the allocation for)",
+            "NODE_UPDOWN": "(starting|started|initializing|initialized|stopping|stopped|closed|closing)"
+          },
+          "patterns": [
+            "version\\[%{DATA:elasticsearch.log.node.version}\\], pid\\[%{POSINT:elasticsearch.log.node.pid}\\], build\\[%{DATA:elasticsearch.log.node.build}\\](, OS\\[%{DATA:elasticsearch.log.node.os}\\], JVM\\[%{DATA:elasticsearch.log.node.jvm_details}\\])?",
+            "JVM arguments \\[%{DATA:elasticsearch.log.node.jvm_arguments}\\]",
+            "heap size \\[%{USER:elasticsearch.log.node.heap_size}\\], compressed ordinary object pointers \\[%{WORD:elasticsearch.log.node.oop}\\]",
+            "node name \\[%{DATA:elasticsearch.log.node.name}\\], node (id|ID) \\[%{DATA:elasticsearch.log.node.uuid}\\]",
+            "loaded module \\[%{USER:elasticsearch.log.node.modules}\\]",
+            "loaded plugin \\[%{USER:elasticsearch.log.node.plugins}\\]",
+            "using discovery type \\[%{USER:elasticsearch.log.cluster.discovery_type}\\]",
+            "license \\[%{DATA:elasticsearch.log.cluster.license.uid}\\] mode \\[%{WORD:elasticsearch.log.cluster.license.type}\\] - %{WORD:elasticsearch.log.cluster.license.status}",
+            "(current|previous) \\[%{DATA:meta.license}\\]",
+            "publish_address \\{%{DATA:elasticsearch.log.node.publish_addr}:%{INT:elasticsearch.log.node.publish_port}\\}, bound_addresses \\{%{DATA:elasticsearch.log.node.bound_addr}:%{INT:elasticsearch.log.node.bound_port}\\}",
+            "using \\[%{POSINT}\\] data paths, mounts \\[%{DATA:meta.data_paths}\\], net usable_space \\[%{DATA:elasticsearch.node.disk_usable_space}\\], net total_space \\[%{DATA:elasticsearch.node.disk_total_space}\\],",
+            "Using REST wrapper from plugin %{GREEDYDATA}",
+            "recovered \\[%{POSINT}\\] indices into cluster_state",
+            "Cluster health status changed from \\[%{WORD:elasticsearch.log.cluster.health.old_value}\\] to \\[%{WORD:elasticsearch.log.cluster.health.new_value}\\] %{GREEDYDATA:elasticsearch.log.reason}",
+            "%{ALLOC_MSG:message}: \\[%{DATA:elasticsearch.log.reason}\\]",
+            "%{ALLOC_MSG:message} \\[%{DATA:elasticsearch.log.node.data_path.watermark}\\] exceeded on \\[%{DATA:elasticsearch.log.node.uuid}\\]\\[%{DATA:elasticsearch.log.node.name}\\]\\[%{PATH:elasticsearch.log.node.data_path.location}\\] free: %{DATA:elasticsearch.log.node.data_path.free_space}\\[%{DATA:elasticsearch.log.node.data_path.free_space_pc}\\], %{GREEDYDATA:elasticsearch.log.reason}",
+            "%{ALLOC_MSG:message} \\[%{GREEDYDATA:elasticsearch.log.allocation_info}\\](\\n%{GREEDYMULTILINE:elasticsearch.log.exception})?",
+            "Updated breaker settings (for in-flight requests|field data): \\[%{WORD:elasticsearch.log.circuit_breaker.name},type=%{WORD:elasticsearch.log.circuit_breaker.type},limit=%{DATA:elasticsearch.log.circuit_breaker.limit},overhead=%{DATA:elasticsearch.log.circuit_breaker.overhead}\\]",
+            "%{WORD} (\\[)?%{USER:elasticsearch.log.cluster.setting.name}(\\])? from \\[%{DATA:elasticsearch.log.cluster.setting.old_value}\\] to \\[%{DATA:elasticsearch.log.cluster.setting.new_value}\\]",
+            "\\[%{INDEX_ID}\\] can not be imported as a dangling index, as index with same name already exists in cluster metadata",
+            "%{INDEX_ID} %{SHARD_MSG:message} for shard id \\[\\[%{USER:elasticsearch.log.index.name}\\]\\[%{INT:elasticsearch.log.index.shard}\\]\\], allocation id \\[%{DATA:elasticsearch.log.index.shard_allocation_id}\\], primary term \\[%{INT}\\], message %{GREEDYDATA:elasticsearch.log.reason}",
+            "%{WORD:elasticsearch.log.index.setting.action} %{USER:elasticsearch.log.index.setting.name} to \\[%{DATA:elasticsearch.log.index.setting.value}\\] for indices \\[%{DATA:elasticsearch.log.index.name}\\]",
+            "%{DATA:elasticsearch.log.index.field.action} \\[%{DATA:elasticsearch.log.index.field.name}\\]\\[%{DATA:elasticsearch.log.index.field.value}\\] took \\[%{DATA:elasticsearch.log.index.field.action_duration}\\]",
+            "%{INDEX_ID} %{INDEX_ACTION:message}, cause \\[%{DATA:elasticsearch.log.reason}\\], templates \\[%{DATA:elasticsearch.log.index.templates}\\], shards \\[%{POSINT:elasticsearch.log.index.primary_shards}\\]\\/\\[%{INT:elasticsearch.log.index.replica_shards}\\], mappings \\[%{DATA:elasticsearch.log.index.mappings}\\]",
+            "%{INDEX_ACTION:message} \\[%{INDEX_ID}\\], shards \\[%{POSINT:elasticsearch.log.index.primary_shards}\\]\\/\\[%{INT:elasticsearch.log.index.replica_shards}\\] - reason \\[%{DATA:elasticsearch.log.reason}\\]",
+            "%{INDEX_ID} auto expanded replicas to \\[%{INT:elasticsearch.log.index.replica_shards}\\]",
+            "%{INDEX_ID} %{INDEX_ACTION:message}( \\[%{DATA:elasticsearch.log.index.action_details}\\])?",
+            "%{INDEX_ID} %{MAPPING_ACTION:message}( \\[%{DATA:elasticsearch.log.index.mappings}\\])?",
+            "%{INDEX_ID} clearing all bitsets because \\[%{DATA:elasticsearch.log.reason}\\]",
+            "%{INDEX_ID} full cache clear, reason \\[%{DATA:elasticsearch.log.reason}\\]",
+            "%{INDEX_ID} opting out of the query cache. current request doesn't hold indices permissions",
+            "%{INDEX_ID} state: \\[%{WORD:elasticsearch.log.index.state.old_value}\\]->\\[%{WORD:elasticsearch.log.index.state.new_value}\\], reason \\[%{DATA:elasticsearch.log.reason}\\]",
+            "%{INDEX_ID} flushing shard on close - this might take some time to sync files to disk",
+            "%{INDEX_ID} (close now acquiring writeLock|close acquired writeLock)",
+            "%{INDEX_ID} store reference count on close: %{INT}",
+            "%{INDEX_ID} cleaning index, no longer part of the metadata",
+            "%{MAPPING_ACTION:message} \\[\\[%{INDEX_ID}\\]\\], type \\[%{USER:elasticsearch.log.index.mappings}\\](\\n%{GREEDYMULTILINE:elasticsearch.log.exception})?",
+            "%{CLUSTER_ACTION:message} (\\{)?%{DATA:meta.nodes}(\\,\\})?, reason: %{GREEDYDATA:elasticsearch.log.reason}",
+            "%{CLUSTER_ACTION:message} \\[%{DATA:elasticsearch.log.cluster.action.name}(\\[\\(\\[]%{DATA:meta.action_details}\\[\\)\\]])?\\] took \\[%{DATA}\\] above the warn threshold of %{GREEDYDATA}",
+            "processing \\[%{GREEDYDATA:elasticsearch.log.cluster.action.name}\\]: (execute|took \\[%{DATA:elasticsearch.log.cluster.action.duration}\\] (no change in cluster_state|done applying updated cluster_state \\(version: %{INT:elasticsearch.log.cluster.state.version}, uuid: %{DATA:elasticsearch.log.cluster.state.uuid}\\)))",
+            "%{CLUSTER_ACTION}(,)? (to version |version )?(\\[)?%{INT:elasticsearch.log.cluster.state.version}(\\])?( with uuid %{DATA:elasticsearch.log.cluster.state.uuid}, diff size %{INT:elasticsearch.log.cluster.state.diff}|, source \\[%{GREEDYDATA:elasticsearch.log.cluster.action.name}\\])?",
+            "received diff cluster state version \\[%{INT:elasticsearch.log.cluster.state.version}\\] with uuid \\[%{DATA:elasticsearch.log.cluster.state.uuid}\\], diff size \\[%{INT:elasticsearch.log.cluster.state.diff}\\]",
+            "failed to perform \\[%{DATA:elasticsearch.log.cluster.action.name}\\]\\n%{GREEDYMULTILINE:elasticsearch.log.exception}",
+            "connection exception while trying to forward request with action name \\[%{DATA:elasticsearch.log.cluster.action.name}\\] %{GREEDYDATA:elasticsearch.log.reason}",
+            "%{CLUSTER_ACTION:message} \\[%{DATA:meta.nodes}\\], reason \\[%{DATA:elasticsearch.log.reason}\\]",
+            "%{CLUSTER_ACTION:message} %{GREEDYDATA}",
+            "timed out waiting for all nodes to process published state \\[%{INT:elasticsearch.log.cluster.state_version}\\] \\(%{DATA:elasticsearch.log.reason}, %{NODES_LIST}\\)",
+            "%{GREEDYDATA:message}, sent \\[%{DATA}\\] ago, timed out \\[%{DATA}\\] ago, action \\[%{DATA:elasticsearch.log.request.type}\\], node \\[%{GREEDYDATA}\\], id \\[%{INT:elasticsearch.log.request.id}\\]",
+            "%{NODES_MSG:message}( \\[%{DATA:elasticsearch.log.request.type}\\])? on node \\[%{DATA}\\]\\n%{GREEDYMULTILINE:elasticsearch.log.exception}",
+            "%{NODES_MSG:message} to node %{DATA} \\(%{DATA:elasticsearch.log.reason}\\)\\n%{GREEDYMULTILINE:elasticsearch.log.exception}",
+            "%{INDEX_ID}: %{GREEDYDATA:message}\\n%{GREEDYMULTILINE:elasticsearch.log.exception}",
+            "%{INDEX_ID} %{DATA:message} \\(%{WORD:elasticsearch.log.bulk_action}\\) BulkShardRequest \\[\\[%{USER}\\]\\[%{DATA:elasticsearch.log.document.type}\\]\\] containing \\[index {\\[%{USER}\\]\\[%{DATA:elasticsearch.log.document.type}\\]\\[%{DATA:elasticsearch.log.document.id}\\], source\\[%{DATA:elasticsearch.log.document.source}\\]\\}\\]\\n%{GREEDYMULTILINE:elasticsearch.log.exception}",
+            "%{INDEX_ID} %{DATA:message} \\(%{WORD:elasticsearch.log.bulk_action}\\) BulkShardRequest \\[\\[%{USER}\\]\\[%{DATA:elasticsearch.log.document.type}\\]\\] containing \\[%{POSINT}\\] requests\\n%{GREEDYMULTILINE:elasticsearch.log.exception}",
+            "%{INDEX_ID} %{DATA:message} \\(%{WORD:elasticsearch.log.bulk_action}\\) index \\{\\[%{USER}\\]\\[%{USER:elasticsearch.log.document.type}\\]\\[%{DATA:elasticsearch.log.document.id}\\], source\\[%{DATA:elasticsearch.log.document.source}\\]\\}\\n%{GREEDYMULTILINE:elasticsearch.log.exception}",
+            "%{SHARD_MSG:message} \\[%{DATA}\\]\\n%{GREEDYMULTILINE:elasticsearch.log.exception}",
+            "\\[%{DATA:elasticsearch.log.snapshot}\\] %{SNAPSHOT_MSG:message}\\n%{GREEDYMULTILINE:elasticsearch.log.exception}",
+            "%{SNAPSHOT_MSG:message} \\[%{INDEX_ID}\\] on closed node \\[%{DATA}\\]",
+            "\\[gc\\]\\[%{INT:elasticsearch.gc.cycle}\\] overhead, spent \\[%{GREEDYDATA:elasticsearch.gc.overhead}\\] collecting in the last \\[%{GREEDYDATA:elasticsearch.gc.interval}\\]",
+            "\\[gc\\]\\[%{WORD:elasticsearch.gc.generation}\\]\\[%{POSINT:elasticsearch.gc.sequence}\\]\\[%{POSINT:elasticsearch.gc.total_count}\\] duration \\[%{DATA:elasticsearch.gc.collection.current_duration}\\], collections \\[%{POSINT:elasticsearch.gc.collection.count_since_last_cycle}\\]\\/\\[%{DATA:elasticsearch.gc.collection.time_since_last_cycle}\\], total \\[%{DATA}\\/\\[%{DATA:elasticsearch.gc.collection.total_duration}\\], memory \\[%{DATA:elasticsearch.gc.old_heap_use}\\]->\\[%{DATA:elasticsearch.gc.new_heap_use}\\]\\/\\[%{DATA:elasticsearch.gc.max_heap}\\], all_pools %{GREEDYDATA:elasticsearch.gc.pool_info}",
+            "http status code \\[%{INT}\\]",
+            "making \\[%{WORD}\\] request to \\[%{URI}\\]",
+            "%{WATCH_MSG:message} \\[%{USER:elasticsearch.log.xpack.watch.stage}\\] %{WORD} for watch \\[%{DATA:elasticsearch.log.xpack.watch.id}\\](, reason %{GREEDYDATA:elasticsearch.log.reason})?",
+            "%{WATCH_MSG:message} \\[%{DATA:elasticsearch.log.xpack.watch.id}\\](, reason %{GREEDYDATA:elasticsearch.log.reason})?",
+            "%{WATCH_MSG:message} \\[%{DATA:elasticsearch.log.watch.id}\\]%{GREEDYMULTILINE:elasticsearch.log.exception}",
+            "%{WATCH_MSG:message} \\[%{INT}\\]",
+            "\\[%{DATA:elasticsearch.log.watch.id}\\] found \\[%{INT}\\] hits",
+            "saving watch records \\[%{INT}\\]",
+            "collector \\[%{USER:elasticsearch.log.xpack.monitoring.collector}\\] %{GREEDYDATA:message}",
+            "monitoring %{GREEDYDATA}",
+            "updated roles \\(roles file \\[%{PATH:elasticsearch.log.xpack.security.roles_file}\\] changed\\)",
+            "users roles file \\[%{PATH:elasticsearch.log.xpack.security.roles_file}\\] changed. updating users roles\\.\\.\\.",
+            "users file \\[%{PATH:elasticsearch.log.xpack.security.users_file}\\] changed. updating users\\.\\.\\. \\)",
+            "role mappings file \\[%{PATH:elasticsearch.log.xpack.security.role_mappings_file}\\] changed for realm \\[%{USER:elasticsearch.log.xpack.security.realm}\\]. updating mappings\\.\\.\\.",
+            "(added|updated) role \\[%{USER:elasticsearch.log.xpack.security.role}\\]",
+            "(added|updated) user \\[%{USER:elasticsearch.log.xpack.security.user}\\]",
+            "Realm \\[%{USER:elasticsearch.log.xpack.security.realm}\\] is in (user-search|user-dn-template) mode( - base_dn=\\[%{DATA}\\], search filter=\\[%{DATA}\\]|: \\[%{GREEDYDATA}\\])",
+            "system key \\[%{PATH:elasticsearch.log.xpack.security.key_file}\\] has been loaded",
+            "Rejecting certificate \\[%{GREEDYDATA:elasticsearch.log.xpack.security.certificate_subjectdn}\\] \\[%{GREEDYDATA:elasticsearch.log.xpack.security.certificate_serial}\\] with common-names \\[%{GREEDYDATA:elasticsearch.log.xpack.security.certificate_common_names}\\]",
+            "reloaded \\[%{GREEDYDATA:elasticsearch.log.xpack.security.certificate_file}\\] and updated ssl contexts using this file",
+            "Authentication to realm %{USER:elasticsearch.log.xpack.security.realm} failed - %{GREEDYDATA:message}",
+            "realm \\[%{USER:elasticsearch.log.xpack.security.realm}\\] authenticated user \\[%{USER:elasticsearch.log.xpack.security.user}\\], with roles \\[%{DATA}\\]",
+            "Authentication of \\[%{USER:elasticsearch.log.xpack.security.user}\\] was terminated by realm \\[%{USER:elasticsearch.log.xpack.security.realm}\\] - %{GREEDYDATA:elasticsearch.log.reason}",
+            "failed to retrieve password hash for reserved user \\[%{USER:elasticsearch.log.xpack.security.user}\\]",
+            "failed to retrieve built in user \\[%{USER:elasticsearch.log.xpack.security.user}\\]",
+            "user \\[%{USER:elasticsearch.log.xpack.security.user}\\] not found in cache for realm \\[%{USER:elasticsearch.log.xpack.security.realm}\\], proceeding with normal authentication",
+            "An error occurred while attempting to authenticate \\[%{USER:elasticsearch.log.xpack.security.user}\\]",
+            "failed to bulk index audit events: \\[%{GREEDYDATA}\\]",
+            "(Opening|Closing|Killing) job \\[%{USER:elasticsearch.log.xpack.ml.job_id}\\](, because %{GREEDYDATA:elasticsearch.log.reason})?",
+            "Job \\[%{USER:elasticsearch.log.xpack.ml.job_id}\\] deleted",
+            "\\[%{USER:elasticsearch.log.xpack.ml.job_id}\\] Killing job",
+            "(Updated|Created) datafeed \\[%{USER:elasticsearch.log.xpack.ml.datafeed}\\]",
+            "Closing \\[%{INT}\\] (jobs|datafeeds), because \\[%{GREEDYDATA:elasticsearch.log.reason}\\]",
+            "\\[%{DATA:elasticsearch.log.reason}\\] datafeed \\[%{USER:elasticsearch.log.xpack.ml.datafeed}\\] for job \\[%{USER:elasticsearch.log.xpack.ml.job_id}\\] has been stopped%{GREEDYDATA}",
+            "Get( stats for)? job (\\[|')%{USER:elasticsearch.log.xpack.ml.job_id}(\\]|')",
+            "Get( stats for)? datafeed (\\[|')%{USER:elasticsearch.log.xpack.ml.datafeed}(\\]|')",
+            "All shards failed for phase: \\'%{WORD:elasticsearch.log.request.phase}\\]",
+            "%{NODE_UPDOWN:elasticsearch.log.node.status}( \\.\\.\\.)?",
+            "%{DATA:message}\\n%{GREEDYMULTILINE:elasticsearch.log.exception}",
+            "%{DATA:message} \\[%{DATA:elasticsearch.log.request.type} \\[%{DATA:elasticsearch.log.request.type}(\\[%{DATA:elasticsearch.log.request.phase}\\])?\\]\\]%{GREEDYMULTILINE:elasticsearch.log.exception}"
+            ]
+        }
+      },
+      {
+        "json": {
+          "field": "meta.license",
+          "target_field": "elasticsearch.log.cluster.license",
+          "ignore_failure": true
+        }
+      },
+      {
+        "grok": {
+          "field": "meta.data_paths",
+          "patterns": [
+            "\\[%{PATH:elasticsearch.log.node.data_path.location} \\(%{DATA}\\)\\]",
+            "\\[%{PATH:elasticsearch.log.node.data_path.location} \\(%{WORD:elasticsearch.log.node.data_path.fstype}\\)\\]"
+          ],
+          "ignore_missing": true
+        }
+      },
+      {
+        "split": {
+          "field": "elasticsearch.log.index.templates",
+          "separator": ",\\s",
+          "ignore_missing": true
+        }
+      },
+      {
+        "split": {
+          "field": "elasticsearch.log.index.mappings",
+          "separator": ",\\s",
+          "ignore_missing": true
+        }
+      },
+      {
+        "split": {
+          "field": "elasticsearch.log.node.jvm_arguments",
+          "separator": ",\\s",
+          "ignore_missing": true
+        }
+      },
+      {
+        "remove": {
+          "field": [
+            "timestamp",
+            "meta.data_paths",
+            "meta.license"
+          ],
+          "ignore_failure": true
+        }
+      }
+    ]
+  }

@@ -1010,6 +1010,25 @@ The shard ID or number.
 
 
 [float]
+== state fields
+
+Contains fields related to the index state
+
+
+
+[float]
+=== `elasticsearch.log.index.state.old_value`
+
+The old value of the index state.
+
+
+[float]
+=== `elasticsearch.log.index.state.new_value`
+
+The new value of the index state.
+
+
+[float]
 == setting fields
 
 Contains fields related to index settings.

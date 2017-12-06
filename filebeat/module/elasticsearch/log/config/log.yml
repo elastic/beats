@@ -1,4 +1,3 @@
-input_type: log
 paths:
 {{ range $i, $path := .paths }}
  - {{$path}}
