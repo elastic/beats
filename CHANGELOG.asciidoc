@@ -47,6 +47,7 @@ https://github.com/elastic/beats/compare/v6.0.0-beta2...master[Check the HEAD di
 - Fix console color output for Windows. {issue}5611[5611]
 - Fix documentation links in README.md files. {pull}5710[5710]
 - Fix logstash output debug message. {pull}5799{5799]
+- Fix isolation of modules when merging local and global field settings. {issue}5795[5795]
 
 *Auditbeat*
 
