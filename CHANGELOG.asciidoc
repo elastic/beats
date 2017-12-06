@@ -8,7 +8,7 @@
 // Template, add newest changes here
 
 === Beats version HEAD
-https://github.com/elastic/beats/compare/v6.0.0...master[Check the HEAD diff]
+https://github.com/elastic/beats/compare/v6.0.1...6.0[Check the HEAD diff]
 
 ==== Breaking changes
 
@@ -30,22 +30,13 @@ https://github.com/elastic/beats/compare/v6.0.0...master[Check the HEAD diff]
 
 *Affecting all Beats*
 
-- Fix documentation links in README.md files. {pull}5710[5710]
-- Fix `add_docker_metadata` dropping some containers. {pull}5788[5788]
-
 *Auditbeat*
 
 *Filebeat*
 
 *Heartbeat*
 
-- Fix the "HTTP up status" visualization. {pull}5564[5564]
-
 *Metricbeat*
-
-- Fix map overwrite in docker diskio module. {issue}5582[5582]
-- Fix connection leak in mongodb module. {issue}5688[5688]
-- Fix the include top N processes feature for cases where there are fewer processes than N. {pull}5729[5729]
 
 *Packetbeat*
 
@@ -88,6 +79,28 @@ https://github.com/elastic/beats/compare/v6.0.0...master[Check the HEAD diff]
 
 
 ////////////////////////////////////////////////////////////
+
+[[release-notes-6.0.1]]
+=== Beats version 6.0.1
+https://github.com/elastic/beats/compare/v6.0.0...v6.0.1[View commits]
+
+==== Bugfixes
+
+*Affecting all Beats*
+
+- Fix documentation links in README.md files. {pull}5710[5710]
+- Fix `add_docker_metadata` dropping some containers. {pull}5788[5788]
+
+*Heartbeat*
+
+- Fix the "HTTP up status" visualization. {pull}5564[5564]
+
+*Metricbeat*
+
+- Fix map overwrite in docker diskio module. {issue}5582[5582]
+- Fix connection leak in mongodb module. {issue}5688[5688]
+- Fix the include top N processes feature for cases where there are fewer
+  processes than N. {pull}5729[5729]
 
 include::libbeat/docs/release-notes/6.0.0.asciidoc[]
 
