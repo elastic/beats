@@ -8,6 +8,7 @@ import (
 	"io"
 	"io/ioutil"
 	"net"
+	"net/url"
 	"strings"
 
 	"github.com/elastic/beats/metricbeat/mb/parse"
@@ -137,60 +138,39 @@ type Info struct {
 }
 
 // Client is an instance of the HAProxy client
+type clientProto interface {
+	Stat() (*bytes.Buffer, error)
+	Info() (*bytes.Buffer, error)
+}
+
 type Client struct {
-	Address     string
-	ProtoScheme string
+	proto clientProto
 }
 
 // NewHaproxyClient returns a new instance of HaproxyClient
 func NewHaproxyClient(address string) (*Client, error) {
-	parts := strings.Split(address, "://")
-	if len(parts) != 2 {
-		return nil, errors.New("must have protocol scheme and address")
+	u, err := url.Parse(address)
+	if err != nil {
+		return nil, errors.New("invalid url")
 	}
 
-	if parts[0] != "tcp" && parts[0] != "unix" {
+	switch u.Scheme {
+	case "tcp":
+		return &Client{&unixProto{Network: u.Scheme, Address: u.Host}}, nil
+	case "unix":
+		return &Client{&unixProto{Network: u.Scheme, Address: u.Path}}, nil
+	/*
+		case "http", "https":
+			return &Client{&httpProto{URL: u}}, nil
+	*/
+	default:
 		return nil, errors.New("invalid protocol scheme")
 	}
-
-	return &Client{
-		Address:     parts[1],
-		ProtoScheme: parts[0],
-	}, nil
-}
-
-// Run sends a designated command to the haproxy stats socket
-func (c *Client) run(cmd string) (*bytes.Buffer, error) {
-	var conn net.Conn
-	response := bytes.NewBuffer(nil)
-
-	conn, err := net.Dial(c.ProtoScheme, c.Address)
-	if err != nil {
-		return response, err
-	}
-
-	defer conn.Close()
-
-	_, err = conn.Write([]byte(cmd + "\n"))
-	if err != nil {
-		return response, err
-	}
-
-	_, err = io.Copy(response, conn)
-	if err != nil {
-		return response, err
-	}
-
-	if strings.HasPrefix(response.String(), "Unknown command") {
-		return response, fmt.Errorf("unknown command: %s", cmd)
-	}
-
-	return response, nil
 }
 
 // GetStat returns the result from the 'show stat' command
 func (c *Client) GetStat() ([]*Stat, error) {
-	runResult, err := c.run("show stat")
+	runResult, err := c.proto.Stat()
 	if err != nil {
 		return nil, err
 	}
@@ -209,7 +189,7 @@ func (c *Client) GetStat() ([]*Stat, error) {
 
 // GetInfo returns the result from the 'show stat' command
 func (c *Client) GetInfo() (*Info, error) {
-	res, err := c.run("show info")
+	res, err := c.proto.Info()
 	if err != nil {
 		return nil, err
 	}
@@ -242,4 +222,45 @@ func (c *Client) GetInfo() (*Info, error) {
 	}
 
 	return nil, err
+}
+
+type unixProto struct {
+	Network string
+	Address string
+}
+
+// Run sends a designated command to the haproxy stats socket
+func (p *unixProto) run(cmd string) (*bytes.Buffer, error) {
+	var conn net.Conn
+	response := bytes.NewBuffer(nil)
+
+	conn, err := net.Dial(p.Network, p.Address)
+	if err != nil {
+		return response, err
+	}
+	defer conn.Close()
+
+	_, err = conn.Write([]byte(cmd + "\n"))
+	if err != nil {
+		return response, err
+	}
+
+	_, err = io.Copy(response, conn)
+	if err != nil {
+		return response, err
+	}
+
+	if strings.HasPrefix(response.String(), "Unknown command") {
+		return response, fmt.Errorf("unknown command: %s", cmd)
+	}
+
+	return response, nil
+}
+
+func (p *unixProto) Stat() (*bytes.Buffer, error) {
+	return p.run("show stat")
+}
+
+func (p *unixProto) Info() (*bytes.Buffer, error) {
+	return p.run("show info")
 }
