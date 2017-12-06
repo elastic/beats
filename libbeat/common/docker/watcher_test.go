@@ -216,8 +216,16 @@ func TestWatcherDie(t *testing.T) {
 		time.Sleep(50 * time.Millisecond)
 	}
 
-	// Now it should get removed
-	time.Sleep(300 * time.Millisecond)
+	// Checks a max of 10s for the watcher containers to be updated
+	for i := 0; i < 100; i++ {
+		// Now it should get removed
+		time.Sleep(100 * time.Millisecond)
+
+		if len(watcher.Containers()) == 0 {
+			break
+		}
+	}
+
 	assert.Equal(t, 0, len(watcher.Containers()))
 }
 
