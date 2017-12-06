@@ -90,6 +90,6 @@ run-module:
 
 .PHONY: test-module
 test-module: ## @testing Tests the given module. Needs $MODULE as param an run-module must be started first.
-test-module: python-env update
+test-module: python-env update metricbeat.test
 	go test -tags=integration ${BEAT_PATH}/module/${MODULE}/... -v
 	. ${PYTHON_ENV}/bin/activate && INTEGRATION_TESTS=1 nosetests tests/system/test_${MODULE}.py
