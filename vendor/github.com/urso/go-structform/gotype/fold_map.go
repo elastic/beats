@@ -7,7 +7,6 @@ import (
 )
 
 var (
-	// reflectMapAny     = reflectCast(map[string]interface{}(nil), visitMapInterface)
 	reFoldMapBool    = liftFold(map[string]bool(nil), foldMapBool)
 	reFoldMapInt     = liftFold(map[string]int(nil), foldMapInt)
 	reFoldMapInt8    = liftFold(map[string]int8(nil), foldMapInt8)
@@ -25,13 +24,6 @@ var (
 )
 
 var tMapAny = reflect.TypeOf(map[string]interface{}(nil))
-
-func reflectMapAny(C *foldContext, v reflect.Value) error {
-	if v.Type().Name() != "" {
-		v = v.Convert(tArrayAny)
-	}
-	return foldMapInterface(C, v.Interface())
-}
 
 func foldMapInterface(C *foldContext, v interface{}) error {
 	m := v.(map[string]interface{})
