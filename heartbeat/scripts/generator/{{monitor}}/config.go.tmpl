@@ -1,0 +1,76 @@
+package {{monitor}}
+
+import (
+	"time"
+
+	"github.com/elastic/beats/libbeat/outputs"
+	"github.com/elastic/beats/libbeat/outputs/transport"
+
+	"github.com/elastic/beats/heartbeat/monitors"
+)
+
+type config struct {
+	Name string `config:"name"`
+
+	// connection settings
+	Hosts  []string              `config:"hosts" validate:"required"`
+	Ports  []uint16              `config:"ports"`
+	Socks5 transport.ProxyConfig `config:",inline"`
+	Mode   monitors.IPSettings   `config:",inline"`
+
+	// configure tls
+	TLS *outputs.TLSConfig `config:"ssl"`
+
+	// configure validation
+	Check   checkConfig   `config:"check"`
+	Timeout time.Duration `config:"timeout"`
+}
+
+type checkConfig struct {
+	Request  requestConfig  `config:"request"`
+	Response responseConfig `config:"response"`
+}
+
+type requestConfig struct {
+	// IMPLEMENT_ME: configure request parameters
+}
+
+type responseConfig struct {
+	// IMPLEMENT_ME: configure response parameters for validation
+}
+
+// defaultConfig creates a new copy of the monitors default configuration.
+func defaultConfig() config {
+	return config{
+		Name:  "echo",
+		Hosts: []string{"localhost"},
+		Ports: nil,
+		Mode:  monitors.DefaultIPSettings,
+		TLS:   nil,
+		Check: checkConfig{
+			Request:  requestConfig{},
+			Response: responseConfig{},
+		},
+		Timeout: 16 * time.Second,
+	}
+}
+
+// IMPLEMENT_ME: implement optional config validation or remove method
+func (c *config) Validate() error {
+	return nil
+}
+
+// IMPLEMENT_ME: implement optional config validation or remove method
+func (c *checkConfig) Validate() error {
+	return nil
+}
+
+// IMPLEMENT_ME: implement optional config validation or remove method
+func (c *requestConfig) Validate() error {
+	return nil
+}
+
+// IMPLEMENT_ME: implement optional config validation or remove method
+func (c *responseConfig) Validate() error {
+	return nil
+}

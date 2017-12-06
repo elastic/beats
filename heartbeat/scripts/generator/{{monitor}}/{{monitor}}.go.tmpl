@@ -1,0 +1,121 @@
+package {{monitor}}
+
+import (
+	"fmt"
+	"net"
+	"strconv"
+
+	"github.com/elastic/beats/libbeat/common"
+	"github.com/elastic/beats/libbeat/logp"
+	"github.com/elastic/beats/libbeat/outputs"
+	"github.com/elastic/beats/libbeat/outputs/transport"
+
+	"github.com/elastic/beats/heartbeat/monitors"
+	"github.com/elastic/beats/heartbeat/monitors/active/dialchain"
+)
+
+const (
+        // internal monitor name (registry/config name)
+	monitorName = "{{monitor}}"
+
+	// monitor event namespace
+	namespace = "{{monitor}}"
+
+	// scheme names for `monitor.scheme`
+	plainScheme = "{{monitor}}"
+	tlsScheme = "{{monitor}}s"
+)
+
+var debugf = logp.MakeDebug(monitorName)
+
+func init() {
+	// Register active monitor type
+	monitors.RegisterActive(monitorName, create)
+}
+
+// create builds multiple monitoring jobs based on the endpoint configuration.
+// For each configured endpoint, exactly one job will be generated.
+func create(
+	info monitors.Info,
+	cfg *common.Config,
+) ([]monitors.Job, error) {
+	// unpack the monitors configuration
+	config := defaultConfig()
+	if err := cfg.Unpack(&config); err != nil {
+		return nil, err
+	}
+
+	// collect list of endpoints from configuration.
+	endpoints, err := collectEndpoints(&config)
+	if err != nil {
+		return nil, err
+	}
+
+	validator, err := makeValidator(&config)
+	if err != nil {
+		return nil, err
+	}
+
+	// load optional TLS settings
+	tls, err := outputs.LoadTLSConfig(config.TLS)
+	if err != nil {
+		return nil, err
+	}
+
+	typ := config.Name
+	timeout := config.Timeout
+	scheme := plainScheme
+	if tls != nil {
+	  scheme = tlsScheme
+	}
+
+	db, err := dialchain.NewBuilder(dialchain.BuilderSettings{
+		Timeout: timeout,
+		Socks5:  config.Socks5,
+		TLS:     tls,
+	})
+	if err != nil {
+		return nil, err
+	}
+
+	return dialchain.MakeDialerJobs(db, typ, scheme, endpoints, config.Mode,
+		func(dialer transport.Dialer, addr string) (common.MapStr, error) {
+			return pingHost(dialer, addr, timeout, validator)
+
+		})
+}
+
+// collectEndpoints creates an array of all endpoints to be monitored.
+// Each address returned matches the "<hostname>:<port>" scheme.
+func collectEndpoints(config *config) ([]dialchain.Endpoint, error) {
+	var addrs []dialchain.Endpoint
+	for _, h := range config.Hosts {
+		ports := config.Ports
+		host, port, err := splitHostnamePort(h)
+		if err != nil {
+			host = h
+		} else {
+			ports = []uint16{port}
+		}
+
+		if len(ports) == 0 {
+			return nil, fmt.Errorf("host '%v' without port configuration", host)
+		}
+
+		addrs = append(addrs, dialchain.Endpoint{Host: host, Ports: ports})
+	}
+
+	return addrs, nil
+}
+
+func splitHostnamePort(addr string) (string, uint16, error) {
+	host, port, err := net.SplitHostPort(addr)
+	if err != nil {
+		return "", 0, err
+	}
+	p, err := strconv.ParseUint(port, 10, 16)
+	if err != nil {
+		return "", 0, fmt.Errorf("'%v' is no valid port number in '%v'", port, addr)
+	}
+	return host, uint16(p), nil
+}

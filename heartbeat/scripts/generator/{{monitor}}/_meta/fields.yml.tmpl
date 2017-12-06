@@ -1,0 +1,22 @@
+- key: {{monitor}}
+  title: "{{monitor|upper}} monitor"
+  description:
+  fields:
+    - name: {{monitor}}
+      type: group
+      description: >
+        {{monitor|upper}} related fields.
+      fields:
+        - name: rtt
+          type: group
+          description: >
+            {{monitor|upper}} layer round trip times.
+          fields:
+            - name: validate
+              type: group
+              description: >
+                Duration of validation step based on existing {{monitor|upper}} connection.
+              fields:
+                - name: us
+                  type: long
+                  description: Duration in microseconds
