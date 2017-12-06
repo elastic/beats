@@ -7,7 +7,6 @@ import (
 )
 
 var (
-	// reFoldArrAny  = liftFold([]interface{}(nil), visitArrInterface)
 	reFoldArrBool    = liftFold([]bool(nil), foldArrBool)
 	reFoldArrInt     = liftFold([]int(nil), foldArrInt)
 	reFoldArrInt8    = liftFold([]int8(nil), foldArrInt8)
@@ -25,13 +24,6 @@ var (
 )
 
 var tArrayAny = reflect.TypeOf([]interface{}(nil))
-
-func reFoldArrAny(c *foldContext, v reflect.Value) error {
-	if v.Type().Name() != "" {
-		v = v.Convert(tArrayAny)
-	}
-	return foldArrInterface(c, v.Interface())
-}
 
 func foldArrInterface(C *foldContext, v interface{}) error {
 	a := v.([]interface{})

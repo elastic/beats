@@ -1,0 +1,51 @@
+data.numTypes: [
+    uint, uint8, uint16, uint32, uint64,
+    int, int8, int16, int32, int64,
+    float32, float64
+  ]
+
+data.primitiveTypes: [
+    bool,
+    string,
+    uint, uint8, uint16, uint32, uint64,
+    int, int8, int16, int32, int64,
+    float32, float64
+  ]
+
+data.mapTypes:
+  AnyType: 'interface{}'
+  ByteType: uint8
+  StringType: string
+  BoolType: bool
+  ZeroType: 'interface{}'
+  IntType: int
+  Int8Type: int8
+  Int16Type: int16
+  Int32Type: int32
+  Int64Type: int64
+  UintType: uint
+  Uint8Type: uint8
+  Uint16Type: uint16
+  Uint32Type: uint32
+  Uint64Type: uint64
+  Float32Type: float32
+  Float64Type: float64
+
+data.mapReflTypes:
+  AnyType: tInterface
+  ByteType: tByte
+  StringType: tString
+  BoolType: tBool
+  ZeroType: tInterface
+  IntType: tInt
+  Int8Type: tInt8
+  Int16Type: tInt16
+  Int32Type: tInt32
+  Int64Type: tInt64
+  UintType: tUint
+  Uint8Type: tUint8
+  Uint16Type: tUint16
+  Uint32Type: tUint32
+  Uint64Type: tUint64
+  Float32Type: tFloat32
+  Float64Type: tFloat64
