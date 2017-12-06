@@ -68,7 +68,8 @@ type pipelineProcessors struct {
 
 	processors beat.Processor
 
-	disabled bool // disabled is set if outputs have been disabled via CLI
+	disabled   bool // disabled is set if outputs have been disabled via CLI
+	alwaysCopy bool
 }
 
 // Settings is used to pass additional settings to a newly created pipeline instance.
@@ -300,8 +301,7 @@ func (p *Pipeline) ConnectWith(cfg beat.ClientConfig) (beat.Client, error) {
 		}
 	}
 
-	processors := p.newProcessorPipeline(cfg)
-
+	processors := newProcessorPipeline(p.beatInfo, p.processors, cfg)
 	acker := p.makeACKer(processors != nil, &cfg, waitClose)
 	producerCfg := queue.ProducerConfig{
 		// only cancel events from queue if acker is configured
