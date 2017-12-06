@@ -268,7 +268,7 @@ type httpProto struct {
 	URL *url.URL
 }
 
-func (p *httpProto) get(path string) (*bytes.Buffer, error) {
+func (p *httpProto) Stat() (*bytes.Buffer, error) {
 	url := p.URL.String()
 	// Force csv format
 	if !strings.HasSuffix(url, ";csv") {
@@ -302,10 +302,6 @@ func (p *httpProto) get(path string) (*bytes.Buffer, error) {
 	return bytes.NewBuffer(d), nil
 }
 
-func (p *httpProto) Stat() (*bytes.Buffer, error) {
-	return p.get("stat")
-}
-
 func (p *httpProto) Info() (*bytes.Buffer, error) {
-	return nil, errors.New("not implemented")
+	return nil, errors.New("not supported")
 }

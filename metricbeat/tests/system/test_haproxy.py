@@ -10,12 +10,6 @@ class Test(metricbeat.BaseTest):
 
     COMPOSE_SERVICES = ['haproxy']
 
-    CASES = [
-        ["tcp://%s:%d" % (os.getenv('HAPROXY_HOST', 'localhost'), 14567)],
-        ["http://%s:%d/stats" % (os.getenv('HAPROXY_HOST', 'localhost'), 14568)],
-        ["http://%s:%d/stats;csv" % (os.getenv('HAPROXY_HOST', 'localhost'), 14568)],
-    ]
-
     def _test_info(self):
         proc = self.start_beat()
         self.wait_until(lambda: self.output_lines() > 0)
@@ -30,7 +24,6 @@ class Test(metricbeat.BaseTest):
 
         self.assert_fields_are_documented(evt)
 
-
     @unittest.skipUnless(metricbeat.INTEGRATION_TESTS, "integration test")
     def test_info_socket(self):
         """
@@ -40,36 +33,6 @@ class Test(metricbeat.BaseTest):
             "name": "haproxy",
             "metricsets": ["info"],
             "hosts": ["tcp://%s:%d" % (os.getenv('HAPROXY_HOST', 'localhost'), 14567)],
-            "period": "5s"
-        }])
-        self._test_info()
-
-    @unittest.skip("WIP")
-    @unittest.skipUnless(metricbeat.INTEGRATION_TESTS, "integration test")
-    def test_info_http(self):
-        """
-        haproxy info http metricset test
-        """
-        self.render_config_template(modules=[{
-            "name": "haproxy",
-            "metricsets": ["info"],
-            "hosts": ["http://%s:%d" % (os.getenv('HAPROXY_HOST', 'localhost'), 14568)],
-            "period": "5s"
-        }])
-        self._test_info()
-
-    @unittest.skip("WIP")
-    @unittest.skipUnless(metricbeat.INTEGRATION_TESTS, "integration test")
-    def test_info_http_auth(self):
-        """
-        haproxy info http basic auth metricset test
-        """
-        self.render_config_template(modules=[{
-            "name": "haproxy",
-            "metricsets": ["info"],
-            "username": "admin",
-            "password": "admin",
-            "hosts": ["http://%s:%d" % (os.getenv('HAPROXY_HOST', 'localhost'), 14569)],
             "period": "5s"
         }])
         self._test_info()
