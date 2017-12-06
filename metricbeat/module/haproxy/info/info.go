@@ -36,9 +36,7 @@ func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
 
 // Fetch fetches info stats from the haproxy service.
 func (m *MetricSet) Fetch() (common.MapStr, error) {
-	// haproxy doesn't accept a username or password so ignore them if they
-	// are in the URL.
-	hapc, err := haproxy.NewHaproxyClient(m.HostData().SanitizedURI)
+	hapc, err := haproxy.NewHaproxyClient(m.HostData().URI)
 	if err != nil {
 		return nil, errors.Wrap(err, "failed creating haproxy client")
 	}

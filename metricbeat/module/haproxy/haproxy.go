@@ -8,6 +8,7 @@ import (
 	"io"
 	"io/ioutil"
 	"net"
+	"net/http"
 	"net/url"
 	"strings"
 
@@ -159,10 +160,8 @@ func NewHaproxyClient(address string) (*Client, error) {
 		return &Client{&unixProto{Network: u.Scheme, Address: u.Host}}, nil
 	case "unix":
 		return &Client{&unixProto{Network: u.Scheme, Address: u.Path}}, nil
-	/*
-		case "http", "https":
-			return &Client{&httpProto{URL: u}}, nil
-	*/
+	case "http", "https":
+		return &Client{&httpProto{URL: u}}, nil
 	default:
 		return nil, errors.New("invalid protocol scheme")
 	}
@@ -263,4 +262,50 @@ func (p *unixProto) Stat() (*bytes.Buffer, error) {
 
 func (p *unixProto) Info() (*bytes.Buffer, error) {
 	return p.run("show info")
+}
+
+type httpProto struct {
+	URL *url.URL
+}
+
+func (p *httpProto) get(path string) (*bytes.Buffer, error) {
+	url := p.URL.String()
+	// Force csv format
+	if !strings.HasSuffix(url, ";csv") {
+		url += ";csv"
+	}
+
+	req, err := http.NewRequest("GET", url, nil)
+	if err != nil {
+		return nil, err
+	}
+
+	if p.URL.User != nil {
+		password, _ := p.URL.User.Password()
+		req.SetBasicAuth(p.URL.User.Username(), password)
+	}
+
+	resp, err := http.DefaultClient.Do(req)
+	if err != nil {
+		return nil, fmt.Errorf("couldn't connect: %v", err)
+	}
+	defer resp.Body.Close()
+
+	if resp.StatusCode != http.StatusOK {
+		return nil, fmt.Errorf("invalid response: %s", resp.Status)
+	}
+
+	d, err := ioutil.ReadAll(resp.Body)
+	if err != nil {
+		return nil, fmt.Errorf("couldn't read response body: %v", err)
+	}
+	return bytes.NewBuffer(d), nil
+}
+
+func (p *httpProto) Stat() (*bytes.Buffer, error) {
+	return p.get("stat")
+}
+
+func (p *httpProto) Info() (*bytes.Buffer, error) {
+	return nil, errors.New("not implemented")
 }
