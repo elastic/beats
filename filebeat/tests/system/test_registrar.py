@@ -745,24 +745,16 @@ class Test(BaseTest):
             max_timeout=10)
 
         # Wait until registry file is created
-        self.wait_until(
-            lambda: self.log_contains_count("Registry file updated") > 1,
-            max_timeout=15)
+        self.wait_until(lambda: self.log_contains_count("Registry file updated") > 1)
 
-        if os.name == "nt":
-            # On windows registry recration can take a bit longer
-            time.sleep(1)
-
-        data = self.get_registry()
-        assert len(data) == 2
+        # Wait until registry is updated
+        self.wait_until(lambda: len(self.get_registry()) == 2)
+        assert len(self.get_registry()) == 2
 
         os.remove(testfile_path1)
 
         # Wait until states are removed from prospectors
-        self.wait_until(
-            lambda: self.log_contains(
-                "Remove state for file as file removed"),
-            max_timeout=15)
+        self.wait_until(lambda: self.log_contains("Remove state for file as file removed"))
 
         # Add one more line to make sure registry is written
         with open(testfile_path2, 'a') as testfile2:
