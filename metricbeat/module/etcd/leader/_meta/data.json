@@ -1,35 +1,19 @@
 {
-    "@timestamp":"2016-05-23T08:05:34.853Z",
-    "beat":{
-        "hostname":"host.example.com",
-        "name":"host.example.com"
+    "@timestamp": "2017-10-12T08:05:34.853Z",
+    "beat": {
+        "hostname": "host.example.com",
+        "name": "host.example.com"
     },
-
-    "etcd":{
-        "leader":{
-            "followers":{
-                "counts":{
-                    "success": 745,
-                    "fail": 0
-                },
-                "latency":{
-                    "average": 0.017039507382550306,
-                    "current": 0.000138,
-                    "maximum": 1.007649,
-                    "minimum": 0,
-                    "standarddeviation": 0.05289178277920594
-                }
-            },
-            "leader": "924e2e83e93f2560"
+    "etcd": {
+        "leader": {
+            "followers": {},
+            "leader": "8e9e05c52164694d"
         }
     },
-
-    "metricset":{
-        "host":"localhost",
-        "module":"etcd",
-        "name":"leader",
-        "rtt":44269
-    },
-
-    "type":"metricsets"
+    "metricset": {
+        "host": "etcd:2379",
+        "module": "etcd",
+        "name": "leader",
+        "rtt": 115
+    }
 }

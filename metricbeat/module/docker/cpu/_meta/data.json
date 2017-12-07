@@ -1,46 +1,38 @@
 {
-    "@timestamp": "2016-05-23T08:05:34.853Z",
+    "@timestamp": "2017-10-12T08:05:34.853Z",
     "beat": {
         "hostname": "host.example.com",
         "name": "host.example.com"
     },
     "docker": {
         "container": {
-            "id": "fa01dd9d2489b23968be9013ef55be34bdcaebddf1dab94ee9c895475052e130",
+            "id": "0b8f7cd09c17df586a8e56f5b2d45dd00735d44fcc2665776d07d33b027b4f09",
             "labels": {
-                "com_docker_compose_container-number": "5",
-                "com_docker_compose_oneoff": "True",
-                "com_docker_compose_project": "environments",
-                "com_docker_compose_service": "beat",
-                "com_docker_compose_version": "1.9.0-rc4"
+                "com_docker_compose_config-hash": "1c0f606c0e592b110060ad4e159cf25d361fb8fa",
+                "com_docker_compose_container-number": "1",
+                "com_docker_compose_oneoff": "False",
+                "com_docker_compose_project": "metricbeat",
+                "com_docker_compose_service": "phpfpm",
+                "com_docker_compose_version": "1.5.0"
             },
-            "name": "environments_beat_run_5",
+            "name": "metricbeat_phpfpm_1"
         },
         "cpu": {
-            "core": {
-                "0": {
-                    "pct": 0,
-                    "ticks": 481110059659
-                },
-                "1": {
-                    "pct": 0.996920377,
-                    "ticks": 1188388427420
-                }
-            },
+            "core": {},
             "kernel": {
                 "pct": 0,
-                "ticks": 123480000000
+                "ticks": 0
             },
             "system": {
-                "pct": 1.96,
-                "ticks": 43733560000000
+                "pct": 0,
+                "ticks": 0
             },
             "total": {
-                "pct": 0.996920377
+                "pct": 0
             },
             "user": {
-                "pct": 1,
-                "ticks": 1430680000000
+                "pct": 0,
+                "ticks": 0
             }
         }
     },
@@ -49,6 +41,5 @@
         "module": "docker",
         "name": "cpu",
         "rtt": 115
-    },
-    "type": "metricsets"
+    }
 }

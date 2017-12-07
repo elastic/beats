@@ -1,5 +1,5 @@
 {
-    "@timestamp": "2016-05-23T08:05:34.853Z",
+    "@timestamp": "2017-10-12T08:05:34.853Z",
     "beat": {
         "hostname": "host.example.com",
         "name": "host.example.com"
@@ -8,12 +8,12 @@
         "info": {
             "containers": {
                 "paused": 0,
-                "running": 11,
-                "stopped": 1,
-                "total": 12
+                "running": 29,
+                "stopped": 19,
+                "total": 48
             },
-            "id": "CRDS:UHQ6:W3IR:GROZ:IUG3:VS2E:4QJJ:FJWG:PRQ4:R25R:VNNP:NE62",
-            "images": 119
+            "id": "V727:GUJU:KXA5:Y5YS:RYFT:6IYQ:GQN7:IGGT:O4YO:NRU3:ZIRV:MHEJ",
+            "images": 168
         }
     },
     "metricset": {
@@ -21,6 +21,5 @@
         "module": "docker",
         "name": "info",
         "rtt": 115
-    },
-    "type": "metricsets"
+    }
 }
