@@ -1,55 +1,49 @@
 {
-  "@timestamp": "2017-08-24T03:14:20.525Z",
-  "ceph": {
-    "cluster_status": {
-      "version": 796,
-	  "osd": {
-        "full": false,
-        "nearfull": false,
-        "num_osds": 6,
-        "num_up_osds": 4,
-        "num_in_osds": 4,
-        "num_remapped_pgs": 211,
-        "epoch": 272
-      },
-      "traffic": {
-        "read_bytes_sec": 55667788,
-        "read_op_per_sec": 1234,
-        "write_bytes_sec": 11996158,
-        "write_op_per_sec": 10
-      },
-      "misplace": {
-        "total": 753,
-        "objects": 71,
-        "ratio": 0.09429
-      },
-      "degraded": {
-        "ratio": 0.146082,
-        "total": 753,
-        "objects": 110
-      },
-      "pg": {
-        "data_bytes": 1033052274,
-        "bytes_avail": 10016411648,
-        "bytes_total": 12838682624,
-        "bytes_used": 2822270976
-      },
-	  "pg_state": {
-          "state_name": "undersized+degraded+peered",
-          "version": 856,
-          "count": 214
-      }
+    "@timestamp": "2017-10-12T08:05:34.853Z",
+    "beat": {
+        "hostname": "host.example.com",
+        "name": "host.example.com"
+    },
+    "ceph": {
+        "cluster_status": {
+            "degraded": {
+                "objects": 0,
+                "pct": 0,
+                "total": 0
+            },
+            "misplace": {
+                "objects": 0,
+                "pct": 0,
+                "total": 0
+            },
+            "osd": {
+                "epoch": 18,
+                "full": false,
+                "in_osd_count": 1,
+                "nearfull": false,
+                "osd_count": 1,
+                "remapped_pg_count": 0,
+                "up_osd_count": 1
+            },
+            "pg": {
+                "avail_bytes": 50847313920,
+                "data_bytes": 3656,
+                "total_bytes": 67371577344,
+                "used_bytes": 13071564800
+            },
+            "traffic": {
+                "read_bytes": 0,
+                "read_op_per_sec": 0,
+                "write_bytes": 0,
+                "write_op_per_sec": 0
+            },
+            "version": 32
+        }
+    },
+    "metricset": {
+        "host": "ceph:5000",
+        "module": "ceph",
+        "name": "cluster_status",
+        "rtt": 115
     }
-  },
-  "metricset": {
-    "name": "cluster_status",
-    "host": "192.168.56.133:5000",
-    "rtt": 305059002,
-    "module": "ceph"
-  },
-  "beat": {
-    "name": "centos7gui",
-    "hostname": "centos7gui",
-    "version": "7.0.0-alpha1"
-  }
 }

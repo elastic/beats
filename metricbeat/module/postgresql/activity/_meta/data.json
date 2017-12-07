@@ -1,5 +1,5 @@
 {
-    "@timestamp": "2016-05-23T08:05:34.853Z",
+    "@timestamp": "2017-10-12T08:05:34.853Z",
     "beat": {
         "hostname": "host.example.com",
         "name": "host.example.com"
@@ -13,28 +13,27 @@
     "postgresql": {
         "activity": {
             "application_name": "",
-            "backend_start": "2016-09-06T07:33:18.323Z",
+            "backend_start": "2017-12-07T07:31:48.923Z",
             "client": {
-                "address": "172.17.0.14",
+                "address": "172.18.0.27",
                 "hostname": "",
-                "port": 57436
+                "port": 53398
             },
             "database": {
                 "name": "postgres",
                 "oid": 12379
             },
-            "pid": 162,
+            "pid": 348,
             "query": "SELECT * FROM pg_stat_activity",
-            "query_start": "2016-09-06T07:33:18.325Z",
+            "query_start": "2017-12-07T07:31:48.925Z",
             "state": "active",
-            "state_change": "2016-09-06T07:33:18.325Z",
-            "transaction_start": "2016-09-06T07:33:18.325Z",
+            "state_change": "2017-12-07T07:31:48.925Z",
+            "transaction_start": "2017-12-07T07:31:48.925Z",
             "user": {
                 "id": 10,
                 "name": "postgres"
             },
             "waiting": false
         }
-    },
-    "type": "metricsets"
+    }
 }

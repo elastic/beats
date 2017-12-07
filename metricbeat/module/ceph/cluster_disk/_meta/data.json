@@ -1,29 +1,26 @@
 {
-    "@timestamp": "2016-05-23T08:05:34.853Z",
+    "@timestamp": "2017-10-12T08:05:34.853Z",
     "beat": {
         "hostname": "host.example.com",
         "name": "host.example.com"
     },
     "ceph": {
-        "df": {
-            "stats": {
-                "available": {
-                    "bytes": 5040500736
-                },
-                "total": {
-                    "bytes": 6431965184
-                },
-                "used": {
-                    "bytes": 1391464448
-                }
+        "cluster_disk": {
+            "available": {
+                "bytes": 50847313920
+            },
+            "total": {
+                "bytes": 67371577344
+            },
+            "used": {
+                "bytes": 13071564800
             }
         }
     },
     "metricset": {
         "host": "ceph:5000",
         "module": "ceph",
-        "name": "df",
+        "name": "cluster_disk",
         "rtt": 115
-    },
-    "type": "metricsets"
+    }
 }
