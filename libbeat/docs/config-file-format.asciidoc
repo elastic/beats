@@ -77,11 +77,11 @@ For example this setting:
 
 output:
   elasticsearch:
-    index: 'beat-%{+yyyy.MM.dd}'
+    index: 'beat-%{[beat.version]}-%{+yyyy.MM.dd}'
 
 ------------------------------------------------------------------------------
 
-gets collapsed into `output.elasticsearch.index: 'beat-%{+yyyy.MM.dd}'`. The
+gets collapsed into `output.elasticsearch.index: 'beat-%{[beat.version]}-%{+yyyy.MM.dd}'`. The
 full name of a setting is based on all parent structures involved.
 
 Lists create numeric names starting with 0.
