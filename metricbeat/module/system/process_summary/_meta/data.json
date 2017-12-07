@@ -14,12 +14,12 @@
         "process": {
             "summary": {
                 "idle": 0,
-                "running": 239,
-                "sleeping": 0,
+                "running": 1,
+                "sleeping": 3,
                 "stopped": 0,
-                "total": 383,
-                "unknown": 144,
-                "zombie": 0
+                "total": 5,
+                "unknown": 0,
+                "zombie": 1
             }
         }
     }

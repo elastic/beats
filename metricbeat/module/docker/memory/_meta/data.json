@@ -1,34 +1,40 @@
 {
-    "@timestamp": "2016-05-23T08:05:34.853Z",
+    "@timestamp": "2017-10-12T08:05:34.853Z",
     "beat": {
         "hostname": "host.example.com",
         "name": "host.example.com"
     },
     "docker": {
         "container": {
-            "id": "1306772b6ca9a24207a2bc268d4cc3137b951886ca4df478cfe2ba3943636c54",
+            "id": "da57ef738524e5a4f6ae17b477f134d30719603db7b96d2c01b6f34010412e66",
             "labels": {
-                "com_docker_compose_container-number": "2",
-                "com_docker_compose_oneoff": "True",
-                "com_docker_compose_project": "environments",
-                "com_docker_compose_service": "beat",
-                "com_docker_compose_version": "1.8.0"
+                "build-date": "20170911",
+                "com_docker_compose_config-hash": "13a74b89a90a6fdcb6bbbc7eb37b7cb0615bdaf8",
+                "com_docker_compose_container-number": "1",
+                "com_docker_compose_oneoff": "False",
+                "com_docker_compose_project": "metricbeat",
+                "com_docker_compose_service": "elasticsearch",
+                "com_docker_compose_version": "1.5.0",
+                "license": "GPLv2",
+                "maintainer": "Elastic Docker Team \u003cdocker@elastic.co\u003e",
+                "name": "CentOS Base Image",
+                "vendor": "CentOS"
             },
-            "name": "environments_beat_run_2"
+            "name": "metricbeat_elasticsearch_1"
         },
         "memory": {
             "fail": {
                 "count": 0
             },
-            "limit": 4139544576,
+            "limit": 4139122688,
             "rss": {
-                "pct": 0.10530747622030197,
-                "total": 435924992
+                "pct": 0.08521683713860477,
+                "total": 352722944
             },
             "usage": {
-                "max": 465604608,
-                "pct": 0.11162827975789383,
-                "total": 462090240
+                "max": 370184192,
+                "pct": 0.08716433389277685,
+                "total": 360783872
             }
         }
     },
@@ -37,6 +43,5 @@
         "module": "docker",
         "name": "memory",
         "rtt": 115
-    },
-    "type": "metricsets"
+    }
 }

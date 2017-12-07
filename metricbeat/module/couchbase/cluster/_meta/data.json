@@ -1,5 +1,5 @@
 {
-    "@timestamp": "2016-05-23T08:05:34.853Z",
+    "@timestamp": "2017-10-12T08:05:34.853Z",
     "beat": {
         "hostname": "host.example.com",
         "name": "host.example.com"
@@ -8,7 +8,7 @@
         "cluster": {
             "hdd": {
                 "free": {
-                    "bytes": 49181251462
+                    "bytes": 53223546102
                 },
                 "quota": {
                     "total": {
@@ -20,10 +20,10 @@
                 },
                 "used": {
                     "by_data": {
-                        "bytes": 16356812
+                        "bytes": 12962692
                     },
                     "value": {
-                        "bytes": 18190325882
+                        "bytes": 14148031242
                     }
                 }
             },
@@ -56,24 +56,23 @@
                     }
                 },
                 "total": {
-                    "bytes": 2096275456
+                    "bytes": 4139122688
                 },
                 "used": {
                     "by_data": {
-                        "bytes": 53962160
+                        "bytes": 53962032
                     },
                     "value": {
-                        "bytes": 1235513344
+                        "bytes": 3484700672
                     }
                 }
             }
         }
     },
     "metricset": {
-        "host": "localhost:8091",
+        "host": "couchbase:8091",
         "module": "couchbase",
         "name": "cluster",
         "rtt": 115
-    },
-    "type": "metricsets"
+    }
 }

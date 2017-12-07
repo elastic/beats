@@ -1,118 +1,118 @@
 {
-    "@timestamp": "2016-05-23T08:05:34.853Z",
+    "@timestamp": "2017-10-12T08:05:34.853Z",
+    "beat": {
+        "hostname": "host.example.com",
+        "name": "host.example.com"
+    },
     "elasticsearch": {
+        "cluster": {
+            "name": "docker-cluster"
+        },
         "node": {
+            "name": "ab1_1Gw3Rtax_2l78Gq_CQ",
             "stats": {
-                "jvm": {
-                    "mem": {
-                        "pools": {
-                            "young": {
-                                "used": {
-                                    "bytes": 125648960
-                                },
-                                "max": {
-                                    "bytes": 139591680
-                                },
-                                "peak": {
-                                    "bytes": 139591680
-                                },
-                                "peak_max": {
-                                    "bytes": 139591680
-                                }
-                            },
-                            "survivor": {
-                                "peak_max": {
-                                    "bytes": 17432576
-                                },
-                                "used": {
-                                    "bytes": 12279056
-                                },
-                                "max": {
-                                    "bytes": 17432576
-                                },
-                                "peak": {
-                                    "bytes": 17432568
-                                }
-                            },
-                            "old": {
-                                "used": {
-                                    "bytes": 176528696
-                                },
-                                "max": {
-                                    "bytes": 362414080
-                                },
-                                "peak": {
-                                    "bytes": 176528696
-                                },
-                                "peak_max": {
-                                    "bytes": 362414080
-                                }
-                            }
-                        }
-                    },
-                    "gc": {
-                        "collectors": {
-                            "old": {
-                                "collection": {
-                                    "count": 3,
-                                    "ms": 693
-                                }
-                            },
-                            "young": {
-                                "collection": {
-                                    "ms": 10691,
-                                    "count": 209
-                                }
-                            }
+                "fs": {
+                    "summary": {
+                        "available": {
+                            "bytes": 50680381440
+                        },
+                        "free": {
+                            "bytes": 54133080064
+                        },
+                        "total": {
+                            "bytes": 67371577344
                         }
                     }
                 },
                 "indices": {
                     "docs": {
-                        "deleted": 42,
-                        "count": 3093
+                        "count": 52,
+                        "deleted": 4
+                    },
+                    "segments": {
+                        "count": 3,
+                        "memory": {
+                            "bytes": 20655
+                        }
                     },
                     "store": {
                         "size": {
-                            "bytes": 2062479
-                        }
-                    },
-                    "segments": {
-                        "count": 17,
-                        "memory": {
-                            "bytes": 179535
+                            "bytes": 107559
                         }
                     }
                 },
-                "fs": {
-                    "summary": {
-                        "total": {
-                            "bytes": 67371577344
-                        },
-                        "free": {
-                            "bytes": 56422297600
-                        },
-                        "available": {
-                            "bytes": 52969598976
+                "jvm": {
+                    "gc": {
+                        "collectors": {
+                            "old": {
+                                "collection": {
+                                    "count": 7,
+                                    "ms": 3801
+                                }
+                            },
+                            "young": {
+                                "collection": {
+                                    "count": 56,
+                                    "ms": 14782
+                                }
+                            }
+                        }
+                    },
+                    "mem": {
+                        "pools": {
+                            "old": {
+                                "max": {
+                                    "bytes": 62914560
+                                },
+                                "peak": {
+                                    "bytes": 53816432
+                                },
+                                "peak_max": {
+                                    "bytes": 62914560
+                                },
+                                "used": {
+                                    "bytes": 40017472
+                                }
+                            },
+                            "survivor": {
+                                "max": {
+                                    "bytes": 3145728
+                                },
+                                "peak": {
+                                    "bytes": 3145728
+                                },
+                                "peak_max": {
+                                    "bytes": 3145728
+                                },
+                                "used": {
+                                    "bytes": 3145728
+                                }
+                            },
+                            "young": {
+                                "max": {
+                                    "bytes": 25165824
+                                },
+                                "peak": {
+                                    "bytes": 25165824
+                                },
+                                "peak_max": {
+                                    "bytes": 25165824
+                                },
+                                "used": {
+                                    "bytes": 21071064
+                                }
+                            }
                         }
                     }
                 }
-            },
-            "name": "2jwM3tNWSr6tFlL8fLKtSg"
-        },
-        "cluster": {
-            "name": "elasticsearch"
+            }
         }
     },
     "metricset": {
-        "rtt": 115,
-        "namespace": "node.stats",
+        "host": "elasticsearch:9200",
         "module": "elasticsearch",
         "name": "node_stats",
-        "host": "127.0.0.1:9200"
-    },
-    "beat": {
-        "hostname": "host.example.com",
-        "name": "host.example.com"
+        "namespace": "node.stats",
+        "rtt": 115
     }
 }

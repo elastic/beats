@@ -1,31 +1,31 @@
 {
-    "@timestamp": "2016-05-23T08:05:34.853Z",
+    "@timestamp": "2017-10-12T08:05:34.853Z",
     "apache": {
         "status": {
-            "bytes_per_request": 1024,
-            "bytes_per_sec": 0.201113,
+            "bytes_per_request": 78.7692,
+            "bytes_per_sec": 4.94686,
             "connections": {
                 "async": {
                     "closing": 0,
-                    "keep_alive": 0,
+                    "keep_alive": 1,
                     "writing": 0
                 },
-                "total": 0
+                "total": 1
             },
             "cpu": {
                 "children_system": 0,
                 "children_user": 0,
-                "load": 0.00652482,
-                "system": 1.46,
-                "user": 1.53
+                "load": 3.99758,
+                "system": 16.39,
+                "user": 0.16
             },
             "hostname": "apache",
             "load": {
-                "1": 0.55,
-                "15": 0.31,
-                "5": 0.31
+                "1": 170.11,
+                "15": 77.62,
+                "5": 167.51
             },
-            "requests_per_sec": 0.000196399,
+            "requests_per_sec": 0.0628019,
             "scoreboard": {
                 "closing_connection": 0,
                 "dns_lookup": 0,
@@ -33,22 +33,22 @@
                 "idle_cleanup": 0,
                 "keepalive": 0,
                 "logging": 0,
-                "open_slot": 325,
+                "open_slot": 300,
                 "reading_request": 0,
                 "sending_reply": 1,
                 "starting_up": 0,
                 "total": 400,
-                "waiting_for_connection": 74
+                "waiting_for_connection": 99
             },
-            "total_accesses": 9,
-            "total_kbytes": 9,
+            "total_accesses": 26,
+            "total_kbytes": 2,
             "uptime": {
-                "server_uptime": 45825,
-                "uptime": 45825
+                "server_uptime": 414,
+                "uptime": 414
             },
             "workers": {
                 "busy": 1,
-                "idle": 74
+                "idle": 99
             }
         }
     },
@@ -61,6 +61,5 @@
         "module": "apache",
         "name": "status",
         "rtt": 115
-    },
-    "type": "metricsets"
+    }
 }

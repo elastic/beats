@@ -1,12 +1,12 @@
 {
-    "@timestamp": "2016-05-23T08:05:34.853Z",
+    "@timestamp": "2017-10-12T08:05:34.853Z",
     "beat": {
         "hostname": "host.example.com",
         "name": "host.example.com"
     },
     "ceph": {
         "cluster_health": {
-            "overall_status": "HEALTH_OK",
+            "overall_status": "HEALTH_WARN",
             "timechecks": {
                 "epoch": 3,
                 "round": {
@@ -17,10 +17,9 @@
         }
     },
     "metricset": {
-        "host": "127.0.0.1:5000",
+        "host": "ceph:5000",
         "module": "ceph",
         "name": "cluster_health",
         "rtt": 115
-    },
-    "type": "metricsets"
+    }
 }

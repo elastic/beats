@@ -1,5 +1,5 @@
 {
-    "@timestamp": "2016-05-23T08:05:34.853Z",
+    "@timestamp": "2017-10-12T08:05:34.853Z",
     "beat": {
         "hostname": "host.example.com",
         "name": "host.example.com"
@@ -10,10 +10,10 @@
             "couch": {
                 "docs": {
                     "data_size": {
-                        "bytes": 9796608
+                        "bytes": 11467776
                     },
                     "disk_size": {
-                        "bytes": 13567903
+                        "bytes": 11491038
                     }
                 },
                 "spatial": {
@@ -26,15 +26,15 @@
                 },
                 "views": {
                     "data_size": {
-                        "bytes": 2788909
+                        "bytes": 769520
                     },
                     "disk_size": {
-                        "bytes": 2788909
+                        "bytes": 769520
                     }
                 }
             },
             "cpu_utilization_rate": {
-                "pct": 4.568527918781726
+                "pct": 97
             },
             "current_items": {
                 "total": 7303,
@@ -42,46 +42,45 @@
             },
             "ep_bg_fetched": 0,
             "get_hits": 0,
-            "hostname": "172.20.0.2:8091",
+            "hostname": "172.18.0.19:8091",
             "mcd_memory": {
                 "allocated": {
-                    "bytes": 1599
+                    "bytes": 3157
                 },
                 "reserved": {
-                    "bytes": 1599
+                    "bytes": 3157
                 }
             },
             "memory": {
                 "free": {
-                    "bytes": 1435561984
+                    "bytes": 1033420800
                 },
                 "total": {
-                    "bytes": 2096275456
+                    "bytes": 4139122688
                 },
                 "used": {
-                    "bytes": 53962160
+                    "bytes": 53962032
                 }
             },
             "ops": 0,
             "swap": {
                 "total": {
-                    "bytes": 0
+                    "bytes": 1073737728
                 },
                 "used": {
-                    "bytes": 0
+                    "bytes": 1015877632
                 }
             },
             "uptime": {
-                "sec": 891
+                "sec": 382
             },
             "vb_replica_curr_items": 0
         }
     },
     "metricset": {
-        "host": "localhost:8091",
+        "host": "couchbase:8091",
         "module": "couchbase",
         "name": "node",
         "rtt": 115
-    },
-    "type": "metricsets"
+    }
 }
