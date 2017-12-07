@@ -42,7 +42,7 @@ Example configuration:
 
 output.elasticsearch:
   hosts: ["http://localhost:9200"]
-  index: "{beatname_lc}"
+  index: "{beatname_lc}-%{[beat.version]}-%{+yyyy.MM.dd}"
   ssl.certificate_authorities: ["/etc/pki/root/ca.pem"]
   ssl.certificate: "/etc/pki/client/cert.pem"
   ssl.key: "/etc/pki/client/cert.key"
@@ -175,9 +175,17 @@ then proxy environment variables are used. See the
 https://golang.org/pkg/net/http/#ProxyFromEnvironment[golang documentation]
 for more information about the environment variables.
 
+[[index-option-es]]
 ===== `index`
 
-The index name to write events to. The default is "{beatname_lc}-%{+yyyy.MM.dd}" (for example, "{beatname_lc}-2015.04.26").
+The index name to write events to. The default is
++"{beatname_lc}-%\{[beat.version]\}-%\{+yyyy.MM.dd\}"+ (for example,
++"{beatname_lc}-{version}-2017.04.26"+). If you change this setting, you also
+need to configure the `setup.template.name` and `setup.template.pattern` options
+(see <<configuration-template>>). If you are using the pre-built Kibana
+dashboards, you also need to set the `setup.dashboards.index` option (see
+<<configuration-dashboards>>).
+
 
 ===== `indices`
 
@@ -202,12 +210,12 @@ Examples elasticsearch output with `indices`:
 ------------------------------------------------------------------------------
 output.elasticsearch:
   hosts: ["http://localhost:9200"]
-  index: "logs-%{+yyyy.MM.dd}"
+  index: "logs-%{[beat.version]}-%{+yyyy.MM.dd}"
   indices:
-    - index: "critical-%{+yyyy.MM.dd}"
+    - index: "critical-%{[beat.version]}-%{+yyyy.MM.dd}"
       when.contains:
         message: "CRITICAL"
-    - index: "error-%{+yyyy.MM.dd}"
+    - index: "error-%{[beat.version]}-%{+yyyy.MM.dd}"
       when.contains:
         message: "ERR"
 ------------------------------------------------------------------------------
@@ -247,7 +255,7 @@ filebeat.prospectors:
 
 output.elasticsearch:
   hosts: ["http://localhost:9200"]
-  index: "filebeat-%{+yyyy.MM.dd}"
+  index: "filebeat-%{[beat.version]}-%{+yyyy.MM.dd}"
   pipelines:
     - pipeline: critical_pipeline
       when.equals:
@@ -365,9 +373,9 @@ output {
 ------------------------------------------------------------------------------
 <1> `%{[@metadata][beat]}` sets the first part of the index name to the value
 of the `beat` metadata field, `%{[@metadata][version]}` sets the second part to
-the beat's version, and `%{+YYYY.MM.dd}` sets the third part of the
+the Beat's version, and `%{+YYYY.MM.dd}` sets the third part of the
 name to a date based on the Logstash `@timestamp` field. For example:
-+{beatname_lc}-{stack-version}-2017.03.29+.
++{beatname_lc}-{version}-2017.03.29+.
 
 Events indexed into Elasticsearch with the Logstash configuration shown here
 will be similar to events directly indexed by Beats into Elasticsearch.
@@ -487,9 +495,9 @@ that when a proxy is used the name resolution occurs on the proxy server.
 [[logstash-index]]
 ===== `index`
 
-The index root name to write events to. The default is the Beat name.
-For example "{beatname_lc}" generates "[{beatname_lc}-]YYYY.MM.DD" indexes (for example,
-"{beatname_lc}-2015.04.26").
+The index root name to write events to. The default is the Beat name. For
+example +"{beatname_lc}"+ generates +"[{beatname_lc}-]{version}-YYYY.MM.DD"+
+indices (for example, +"{beatname_lc}-{version}-2017.04.26"+).
 
 ===== `ssl`
 
