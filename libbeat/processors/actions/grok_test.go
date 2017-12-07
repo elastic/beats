@@ -1,12 +1,10 @@
 package actions
 
 import (
+	"regexp"
 	"testing"
 
 	"github.com/elastic/beats/libbeat/beat"
-
-	"regexp"
-
 	"github.com/elastic/beats/libbeat/common"
 	"github.com/elastic/beats/libbeat/logp"
 	"github.com/stretchr/testify/assert"
