@@ -30,6 +30,8 @@ https://github.com/elastic/beats/compare/v6.0.1...6.0[Check the HEAD diff]
 
 *Affecting all Beats*
 
+- Fix isolation of modules when merging local and global field settings. {issue}5795[5795]
+
 *Auditbeat*
 
 *Filebeat*
