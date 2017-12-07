@@ -38,6 +38,11 @@ test:
 unit:
 	@$(foreach var,$(PROJECTS),$(MAKE) -C $(var) unit || exit 1;)
 
+# Crosscompile all beats.
+.PHONY: crosscompile
+crosscompile:
+	@$(foreach var,filebeat winlogbeat metricbeat heartbeat auditbeat,$(MAKE) -C $(var) crosscompile || exit 1;)
+
 .PHONY: coverage-report
 coverage-report:
 	@mkdir -p $(COVERAGE_DIR)
