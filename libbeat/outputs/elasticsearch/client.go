@@ -89,6 +89,13 @@ type bulkEventMeta struct {
 	ID       interface{} `json:"_id,omitempty" struct:"_id,omitempty"`
 }
 
+type bulkResultStats struct {
+	acked        int // number of events ACKed by Elasticsearch
+	duplicates   int // number of events failed with `create` due to ID already being indexed
+	fails        int // number of failed events (can be retried)
+	nonIndexable int // number of failed events (not indexable -> must be dropped)
+}
+
 var (
 	nameItems  = []byte("items")
 	nameStatus = []byte("status")
@@ -298,19 +305,25 @@ func (client *Client) publishEvents(
 
 	// check response for transient errors
 	var failedEvents []publisher.Event
+	var stats bulkResultStats
 	if status != 200 {
 		failedEvents = data
+		stats.fails = len(failedEvents)
 	} else {
 		client.json.init(result.raw)
-		failedEvents = bulkCollectPublishFails(&client.json, data)
+		failedEvents, stats = bulkCollectPublishFails(&client.json, data)
 	}
 
 	failed := len(failedEvents)
 	if st := client.observer; st != nil {
-		acked := len(data) - failed
+		dropped := stats.nonIndexable
+		duplicates := stats.duplicates
+		acked := len(data) - failed - dropped - duplicates
 
 		st.Acked(acked)
 		st.Failed(failed)
+		st.Dropped(dropped)
+		st.Duplicate(duplicates)
 	}
 
 	if failed > 0 {
@@ -423,10 +436,10 @@ func getIndex(event *beat.Event, index outil.Selector) (string, error) {
 func bulkCollectPublishFails(
 	reader *jsonReader,
 	data []publisher.Event,
-) []publisher.Event {
+) ([]publisher.Event, bulkResultStats) {
 	if err := reader.expectDict(); err != nil {
 		logp.Err("Failed to parse bulk respose: expected JSON object")
-		return nil
+		return nil, bulkResultStats{}
 	}
 
 	// find 'items' field in response
@@ -434,12 +447,12 @@ func bulkCollectPublishFails(
 		kind, name, err := reader.nextFieldName()
 		if err != nil {
 			logp.Err("Failed to parse bulk response")
-			return nil
+			return nil, bulkResultStats{}
 		}
 
 		if kind == dictEnd {
 			logp.Err("Failed to parse bulk response: no 'items' field in response")
-			return nil
+			return nil, bulkResultStats{}
 		}
 
 		// found items array -> continue
@@ -453,32 +466,43 @@ func bulkCollectPublishFails(
 	// check items field is an array
 	if err := reader.expectArray(); err != nil {
 		logp.Err("Failed to parse bulk respose: expected items array")
-		return nil
+		return nil, bulkResultStats{}
 	}
 
 	count := len(data)
 	failed := data[:0]
+	stats := bulkResultStats{}
 	for i := 0; i < count; i++ {
 		status, msg, err := itemStatus(reader)
 		if err != nil {
-			return nil
+			return nil, bulkResultStats{}
 		}
 
 		if status < 300 {
+			stats.acked++
 			continue // ok value
+		}
+
+		if status == 409 {
+			// 409 is used to indicate an event with same ID already exists if
+			// `create` op_type is used.
+			stats.duplicates++
+			continue // ok
 		}
 
 		if status < 500 && status != 429 {
 			// hard failure, don't collect
 			logp.Warn("Cannot index event %#v (status=%v): %s", data[i], status, msg)
+			stats.nonIndexable++
 			continue
 		}
 
 		debugf("Bulk item insert failed (i=%v, status=%v): %s", i, status, msg)
+		stats.fails++
 		failed = append(failed, data[i])
 	}
 
-	return failed
+	return failed, stats
 }
 
 func itemStatus(reader *jsonReader) (int, []byte, error) {
