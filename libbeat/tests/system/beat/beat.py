@@ -198,7 +198,7 @@ class TestCase(unittest.TestCase, ComposeMixin):
         if template_name is None:
             template_name = self.beat_name
 
-        template_path = "./tests/system/config/" + template_name + ".yml.j2"
+        template_path = os.path.join("./tests/system/config", template_name + ".yml.j2")
 
         if output is None:
             output = self.beat_name + ".yml"
@@ -207,7 +207,10 @@ class TestCase(unittest.TestCase, ComposeMixin):
 
         kargs["beat"] = self
         output_str = template.render(**kargs)
-        with open(os.path.join(self.working_dir, output), "wb") as f:
+
+        output_path = os.path.join(self.working_dir, output)
+        with open(output_path, "wb") as f:
+            os.chmod(output_path, 0600)
             f.write(output_str.encode('utf8'))
 
     # Returns output as JSON object with flattened fields (. notation)
