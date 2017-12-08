@@ -360,14 +360,20 @@ func (h *Harvester) onMessage(
 		jsonFields = f.(common.MapStr)
 	}
 
+	var meta common.MapStr
 	timestamp := message.Ts
-
 	if h.config.JSON != nil && len(jsonFields) > 0 {
-		ts := readjson.MergeJSONFields(fields, jsonFields, &text, *h.config.JSON)
+		id, ts := readjson.MergeJSONFields(fields, jsonFields, &text, *h.config.JSON)
 		if !ts.IsZero() {
 			// there was a `@timestamp` key in the event, so overwrite
 			// the resulting timestamp
 			timestamp = ts
+		}
+
+		if id != nil {
+			meta = common.MapStr{
+				"id": id,
+			}
 		}
 	} else if &text != nil {
 		if fields == nil {
@@ -379,6 +385,7 @@ func (h *Harvester) onMessage(
 	err := forwarder.Send(beat.Event{
 		Timestamp: timestamp,
 		Fields:    fields,
+		Meta:      meta,
 		Private:   state,
 	})
 	return err == nil

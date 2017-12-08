@@ -206,6 +206,7 @@ func TestAddJSONFields(t *testing.T) {
 		JSONConfig        Config
 		ExpectedItems     common.MapStr
 		ExpectedTimestamp time.Time
+		ExpectedID        interface{}
 	}{
 		{
 			// by default, don't overwrite keys
@@ -340,6 +341,13 @@ func TestAddJSONFields(t *testing.T) {
 			},
 			ExpectedTimestamp: time.Time{},
 		},
+		{
+			// if document_id is set, extract the ID from the event
+			Name:       "extract event id",
+			Data:       common.MapStr{"@timestamp": common.Time(now), "json": common.MapStr{"id": "test_id"}},
+			JSONConfig: Config{DocumentID: "id"},
+			ExpectedID: "test_id",
+		},
 	}
 
 	for _, test := range tests {
@@ -349,13 +357,14 @@ func TestAddJSONFields(t *testing.T) {
 				jsonFields = fields.(common.MapStr)
 			}
 
-			ts := MergeJSONFields(test.Data, jsonFields, test.Text, test.JSONConfig)
+			id, ts := MergeJSONFields(test.Data, jsonFields, test.Text, test.JSONConfig)
 
 			t.Log("Executing test:", test)
 			for k, v := range test.ExpectedItems {
 				assert.Equal(t, v, test.Data[k])
 			}
 			assert.Equal(t, test.ExpectedTimestamp, ts)
+			assert.Equal(t, test.ExpectedID, id)
 		})
 	}
 }
