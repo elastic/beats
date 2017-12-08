@@ -1,0 +1,22 @@
+[float]
+[[mysql-no-data]]
+=== {beatname_uc} isn't capturing MySQL performance data?
+
+You may be listening on the wrong interface or trying to capture data sent over
+an encrypted connection. {beatname_uc} is unable to capture data sent over
+encrypted connections. To resolve your issue:
+
+* Make sure {beatname_uc} is configured to listen on the `lo0` interface:
++
+[source,shell]
+-----
+packetbeat.interfaces.device: lo0
+-----
+
+* Make sure the client programs you are monitoring run `mysql` with SSL
+disabled. For example:
++
+[source,shell]
+-----
+mysql --protocol tcp --host=127.0.0.1 --port=3306 --ssl-mode=DISABLED
+-----
