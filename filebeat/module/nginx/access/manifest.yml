@@ -34,6 +34,9 @@ machine_learning:
   datafeed: machine_learning/datafeed_visitor_rate.json
   min_version: 5.5.0
 
+pipeline_script:
+- is-private-ip.painless
+
 requires.processors:
 - name: user_agent
   plugin: ingest-user-agent

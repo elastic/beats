@@ -23,13 +23,14 @@ import (
 
 // Fileset struct is the representation of a fileset.
 type Fileset struct {
-	name       string
-	mcfg       *ModuleConfig
-	fcfg       *FilesetConfig
-	modulePath string
-	manifest   *manifest
-	vars       map[string]interface{}
-	pipelineID string
+	name             string
+	mcfg             *ModuleConfig
+	fcfg             *FilesetConfig
+	modulePath       string
+	manifest         *manifest
+	vars             map[string]interface{}
+	pipelineID       string
+	scriptIDTemplate *template.Template
 }
 
 // New allocates a new Fileset object with the given configuration.
@@ -75,6 +76,11 @@ func (fs *Fileset) Read(beatVersion string) error {
 		return err
 	}
 
+	// if pipeline scripts are available generate a template for its ids
+	if len(fs.manifest.PipelineScripts) > 0 {
+		fs.scriptIDTemplate = fs.getScriptIDTemplate(beatVersion)
+	}
+
 	return nil
 }
 
@@ -95,6 +101,7 @@ type manifest struct {
 	Requires struct {
 		Processors []ProcessorRequirement `config:"processors"`
 	} `config:"requires"`
+	PipelineScripts []string `config:"pipeline_script"`
 }
 
 func newManifest(cfg *common.Config) (*manifest, error) {
@@ -334,27 +341,18 @@ func (fs *Fileset) getInputConfig() (*common.Config, error) {
 // Keys of the returned map are the filename and the values are the source code of the script
 func (fs *Fileset) GetScriptsToStore() (map[string]string, error) {
 	// return none if no scripts are available for the fileset
-	scriptsPath := filepath.Join(fs.modulePath, fs.name, "ingest", "script")
-	if _, err := os.Stat(scriptsPath); os.IsNotExist(err) {
-		return nil, nil
-	}
-
-	scriptFiles, err := ioutil.ReadDir(scriptsPath)
-	if err != nil {
-		return nil, fmt.Errorf("Error opening script directory for fileset %s: %v", fs.name, err)
-	}
-
-	// return if the folder is empty
-	if len(scriptFiles) == 0 {
+	if len(fs.manifest.PipelineScripts) == 0 {
 		return nil, nil
 	}
 
 	// read all scripts into a map
+	folder := filepath.Join(fs.modulePath, fs.name, "ingest", "script")
 	scripts := make(map[string]string)
-	for _, scriptFile := range scriptFiles {
-		name := scriptFile.Name()
+	for _, name := range fs.manifest.PipelineScripts {
+		scriptPath := filepath.Join(folder, name)
+
 		var source []byte
-		source, err = ioutil.ReadFile(filepath.Join(scriptsPath, name))
+		source, err := ioutil.ReadFile(scriptPath)
 		if err != nil {
 			return nil, fmt.Errorf("Error while reading script %s for fileset %s: %v", name, fs.name, err)
 		}
@@ -362,6 +360,12 @@ func (fs *Fileset) GetScriptsToStore() (map[string]string, error) {
 	}
 
 	return scripts, nil
+}
+
+// getScriptIDTemplate returns the Ingest Node pipeline ID
+func (fs *Fileset) getScriptIDTemplate(beatVersion string) *template.Template {
+	tStr := formatScriptIDTemplate(fs.mcfg.Module, fs.name, beatVersion)
+	return template.Must(template.New("script_id").Parse(tStr))
 }
 
 // getPipelineID returns the Ingest Node pipeline ID
@@ -401,6 +405,11 @@ func (fs *Fileset) GetPipeline(esVersion string) (pipelineID string, content map
 		return "", nil, fmt.Errorf("Error JSON decoding the pipeline file: %s: %v", path, err)
 	}
 	return fs.pipelineID, content, nil
+}
+
+// formatScriptIDTemplate generates the ID to be used for the pipeline ID in Elasticsearch
+func formatScriptIDTemplate(module, fileset, beatVersion string) string {
+	return fmt.Sprintf("filebeat-%s-%s-%s-{{.}}", beatVersion, module, fileset)
 }
 
 // formatPipelineID generates the ID to be used for the pipeline ID in Elasticsearch

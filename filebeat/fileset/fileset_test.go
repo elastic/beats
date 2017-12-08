@@ -31,6 +31,7 @@ func TestLoadManifestNginx(t *testing.T) {
 	assert.Equal(t, manifest.ModuleVersion, "1.0")
 	assert.Equal(t, manifest.IngestPipeline, "ingest/default.json")
 	assert.Equal(t, manifest.Input, "config/nginx-access.yml")
+	assert.Equal(t, manifest.PipelineScripts, []string{"is-private-ip.painless"})
 
 	vars := manifest.Vars
 	assert.Equal(t, "paths", vars[0]["name"])

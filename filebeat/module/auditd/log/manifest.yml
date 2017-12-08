@@ -10,6 +10,9 @@ var:
 ingest_pipeline: ingest/pipeline.json
 input: config/log.yml
 
+pipeline_script:
+- "trim-quotes.painless"
+
 requires.processors:
 - name: geoip
   plugin: ingest-geoip

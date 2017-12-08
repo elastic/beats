@@ -1,6 +1,7 @@
 package fileset
 
 import (
+	"bytes"
 	"encoding/json"
 	"fmt"
 	"io/ioutil"
@@ -282,6 +283,15 @@ func (reg *ModuleRegistry) LoadPipelines(esClient PipelineLoader) error {
 				}
 			}
 
+			scripts, err := fileset.GetScriptsToStore()
+			if err != nil {
+				return fmt.Errorf("Error getting scripts for fileset %s/%s: %v", module, name, err)
+			}
+			err = loadScripts(esClient, fileset, scripts)
+			if err != nil {
+				return fmt.Errorf("Error loading scripts for fileset %s/%s: %v", module, name, err)
+			}
+
 			pipelineID, content, err := fileset.GetPipeline(esClient.GetVersion())
 			if err != nil {
 				return fmt.Errorf("Error getting pipeline for fileset %s/%s: %v", module, name, err)
@@ -295,37 +305,51 @@ func (reg *ModuleRegistry) LoadPipelines(esClient PipelineLoader) error {
 	return nil
 }
 
-func loadScript(name, source string, esClient PipelineLoader) error {
+func scriptPayload(fs *Fileset, name, source string) (common.MapStr, string, error) {
 	parts := strings.Split(name, ".")
 	if len(parts) != 2 {
-		return fmt.Errorf("Invalid number of filename parts: %d (instead of 2)", len(parts))
+		return nil, "", fmt.Errorf("Invalid number of filename parts: %d (instead of 2)", len(parts))
 	}
 
 	if parts[1] != "painless" {
-		return fmt.Errorf("Only painless scripts can be stored for pipelines")
+		return nil, "", fmt.Errorf("Only painless scripts can be stored for pipelines")
 	}
 
-	url := strings.Join([]string{"/_scripts/", parts[0]}, "")
-	payload := common.MapStr{
+	scriptID := bytes.NewBufferString("")
+	err := fs.scriptIDTemplate.Execute(scriptID, parts[0])
+	if err != nil {
+		return nil, "", fmt.Errorf("error while generating id")
+	}
+
+	url := strings.Join([]string{"/_scripts/", scriptID.String()}, "")
+	return common.MapStr{
 		"script": common.MapStr{
-			"lang":   parts[1],
+			"lang":   "painless",
 			"source": source,
 		},
+	}, url, nil
+}
+
+func loadScript(esClient PipelineLoader, fs *Fileset, name, source string) error {
+	p, url, err := scriptPayload(fs, name, source)
+	if err != nil {
+		return fmt.Errorf("Error adding script: %v", err)
 	}
 
-	status, body, err := esClient.Request("POST", url, "", nil, payload)
+	status, body, err := esClient.Request("POST", url, "", nil, p)
 	if err != nil {
 		return fmt.Errorf("Error adding script: %v", err)
 	}
 	if status > 299 {
 		return fmt.Errorf("Error adding script. Status: %d. Response body: %s", status, body)
 	}
+	logp.Info("Loaded script: %v %v", name, url)
 	return nil
 }
 
-func loadScripts(esClient PipelineLoader, scripts map[string]string) error {
+func loadScripts(esClient PipelineLoader, fs *Fileset, scripts map[string]string) error {
 	for name, source := range scripts {
-		err := loadScript(name, source, esClient)
+		err := loadScript(esClient, fs, name, source)
 		if err != nil {
 			return err
 		}

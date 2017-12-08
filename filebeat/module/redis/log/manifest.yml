@@ -12,3 +12,7 @@ var:
 
 ingest_pipeline: ingest/pipeline.json
 input: config/log.yml
+
+pipeline_script:
+- "set-log-level.painless"
+- "set-log-role.painless"
