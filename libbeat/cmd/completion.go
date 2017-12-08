@@ -10,7 +10,7 @@ import (
 func genCompletionCmd(name, version string, rootCmd *BeatsRootCmd) *cobra.Command {
 	completionCmd := cobra.Command{
 		Use:   "completion SHELL",
-		Short: "Output shell completion code for the specified shell (bash only by the moment)",
+		Short: "Output shell completion code for the specified shell (bash and zsh only by the moment)",
 		// We don't want to expose this one in help:
 		Hidden: true,
 		Run: func(cmd *cobra.Command, args []string) {
@@ -25,7 +25,7 @@ func genCompletionCmd(name, version string, rootCmd *BeatsRootCmd) *cobra.Comman
 			case "zsh":
 				rootCmd.GenZshCompletion(os.Stdout)
 			default:
-				fmt.Printf("Unknown shell %s, only bash is available\n", args[0])
+				fmt.Printf("Unknown shell %s, only bash and zsh are available\n", args[0])
 				os.Exit(1)
 			}
 		},
