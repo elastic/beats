@@ -1314,7 +1314,7 @@ osd or bucket node typeID
 
 type: text
 
-bucket children list, seperate by comma.
+bucket children list, separated by comma.
 
 
 [float]

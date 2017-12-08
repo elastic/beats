@@ -23,7 +23,7 @@
     - name: children
       type: text
       description: >
-        bucket children list, seperate by comma.
+        bucket children list, separated by comma.
     - name: crush_weight
       type: float
       description: >
