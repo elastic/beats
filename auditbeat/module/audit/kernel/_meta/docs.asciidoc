@@ -24,6 +24,46 @@ metricset will buffer the messages in order to combine related messages into a
 single event even if they arrive interleaved or out of order.
 
 [float]
+=== Useful commands
+
+When running {beatname_uc} with the `kernel` metricset enabled, you might find
+that other monitoring systems interfere with {beatname_uc}.
+
+For example, you might encounter errors if another process, such as `auditd`, is
+registered to receive data from the Linux Audit Framework. You can use these
+commands to see if the `auditd` service is running and stop it:
+
+* See if `auditd` is running:
++
+[source,shell]
+-----
+service auditd status
+-----
+
+* Stop the `auditd` service:
++
+[source,shell]
+-----
+service auditd stop
+-----
+
+* Disable `auditd` from starting on boot:
++
+[source,shell]
+-----
+chkconfig auditd off
+-----
+
+To save CPU usage and disk space, you can use this command to stop `journald`
+from listening to audit messages:
+
+[source,shell]
+-----
+systemctl mask systemd-journald-audit.socket
+-----
+
+
+[float]
 === Configuration options
 
 This metricset has some configuration options for tuning its behavior. The
