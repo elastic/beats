@@ -34,8 +34,6 @@ include::./gettingstarted.asciidoc[]
 
 include::./installing-beats.asciidoc[]
 
-include::./repositories.asciidoc[]
-
 include::./breaking.asciidoc[]
 
 include::./upgrading.asciidoc[]
