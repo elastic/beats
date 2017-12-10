@@ -6460,6 +6460,182 @@ MongoDB metrics.
 
 
 [float]
+== collstats fields
+
+MongoDB collection statistics metrics.
+
+
+
+[float]
+=== `mongodb.collstats.db`
+
+type: keyword
+
+Database name.
+
+
+[float]
+=== `mongodb.collstats.collection`
+
+type: keyword
+
+Collection name.
+
+
+[float]
+=== `mongodb.collstats.name`
+
+type: keyword
+
+Combination of database and collection name.
+
+
+[float]
+=== `mongodb.collstats.total.time`
+
+type: long
+
+Total waiting time for locks in microseconds.
+
+
+[float]
+=== `mongodb.collstats.total.count`
+
+type: long
+
+Total number of lock wait events.
+
+
+
+[float]
+=== `mongodb.collstats.lock.read.time.us`
+
+type: long
+
+Time waiting for read locks in microseconds.
+
+
+[float]
+=== `mongodb.collstats.lock.read.count`
+
+type: long
+
+Number of read lock wait events.
+
+
+[float]
+=== `mongodb.collstats.lock.write.time.us`
+
+type: long
+
+Time waiting for write locks in microseconds.
+
+
+[float]
+=== `mongodb.collstats.lock.write.count`
+
+type: long
+
+Number of write lock wait events.
+
+
+[float]
+=== `mongodb.collstats.queries.time.us`
+
+type: long
+
+Time running queries in microseconds.
+
+
+[float]
+=== `mongodb.collstats.queries.count`
+
+type: long
+
+Number of queries executed.
+
+
+[float]
+=== `mongodb.collstats.getmore.time.us`
+
+type: long
+
+Time asking for more cursor rows in microseconds.
+
+
+[float]
+=== `mongodb.collstats.getmore.count`
+
+type: long
+
+Number of times a cursor asked for more data.
+
+
+[float]
+=== `mongodb.collstats.insert.time.us`
+
+type: long
+
+Time inserting new documents in microseconds.
+
+
+[float]
+=== `mongodb.collstats.insert.count`
+
+type: long
+
+Number of document insert events.
+
+
+[float]
+=== `mongodb.collstats.update.time.us`
+
+type: long
+
+Time updating documents in microseconds.
+
+
+[float]
+=== `mongodb.collstats.update.count`
+
+type: long
+
+Number of document update events.
+
+
+[float]
+=== `mongodb.collstats.remove.time.us`
+
+type: long
+
+Time deleting documents in microseconds.
+
+
+[float]
+=== `mongodb.collstats.remove.count`
+
+type: long
+
+Number of document delete events.
+
+
+[float]
+=== `mongodb.collstats.commands.time.us`
+
+type: long
+
+Time executing database commands in microseconds.
+
+
+[float]
+=== `mongodb.collstats.commands.count`
+
+type: long
+
+Number of database commands executed.
+
+
+[float]
 == dbstats fields
 
 dbstats provides an overview of a particular mongo database. This document is most concerned with data volumes of a database.
