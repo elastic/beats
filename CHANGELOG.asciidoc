@@ -177,6 +177,7 @@ https://github.com/elastic/beats/compare/v6.0.1...v6.1.0[View commits]
 - Add basic Logstash module. {pull}5540[5540]
 - Add dashboard for Windows service metricset. {pull}5603[5603]
 - Add experimental Docker autodiscover functionality. {pull}5245[5245]
+- Add Windows service metricset in the windows module. {pull}5332[5332]
 - Update gosigar to v0.6.0. {pull}5775[5775]
 
 *Packetbeat*
