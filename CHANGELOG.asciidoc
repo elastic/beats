@@ -179,6 +179,10 @@ https://github.com/elastic/beats/compare/v6.0.1...v6.1.0[View commits]
 - Add experimental Docker autodiscover functionality. {pull}5245[5245]
 - Update gosigar to v0.6.0. {pull}5775[5775]
 
+*Packetbeat*
+
+- Add support for decoding the TLS envelopes. {pull}5476[5476]
+
 [[release-notes-6.0.1]]
 === Beats version 6.0.1
 https://github.com/elastic/beats/compare/v6.0.0...v6.0.1[View commits]
