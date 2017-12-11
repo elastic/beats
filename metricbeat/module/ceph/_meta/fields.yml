@@ -4,6 +4,7 @@
     Ceph module
   short_config: false
   release: beta
+  settings: ["ssl"]
   fields:
     - name: ceph
       type: group

@@ -4,6 +4,7 @@
     Jolokia module
   short_config: false
   release: beta
+  settings: ["ssl"]
   fields:
     - name: jolokia
       type: group
