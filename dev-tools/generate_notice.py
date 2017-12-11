@@ -64,7 +64,7 @@ def gather_dependencies(vendor_dirs):
 
                     lib["license_contents"] = read_file(lib["license_file"])
                     lib["license_summary"] = detect_license_summary(lib["license_contents"])
-                    if lib["license_summary"] == "Unknown":
+                    if lib["license_summary"] == "UNKNOWN":
                         print("WARNING: Unknown license for: {}".format(lib_path))
 
                     if lib_path not in dependencies:
@@ -106,7 +106,7 @@ def write_notice_file(f, beat, copyright, dependencies):
             f.write("License type (autodetected): {}\n".format(lib["license_summary"]))
             f.write("{}:\n".format(lib["license_file"]))
             f.write("--------------------------------------------------------------------\n")
-            if lib["license_summary"] != "Apache License 2.0":
+            if lib["license_summary"] != "Apache-2.0":
                 f.write(lib["license_contents"])
             else:
                 # it's an Apache License, so include only the NOTICE file
@@ -186,30 +186,43 @@ BSD_LICENSE_4_CLAUSE = [
    must display the following acknowledgement"""),
 ]
 
+CC_SA_4_LICENSE_TITLE = [
+    "Creative Commons Attribution-ShareAlike 4.0 International"
+]
+
+LGPL_3_LICENSE_TITLE = [
+    "GNU LESSER GENERAL PUBLIC LICENSE Version 3"
+]
+
 MPL_LICENSE_TITLES = [
     "Mozilla Public License Version 2.0",
     "Mozilla Public License, version 2.0"
 ]
 
 
+# return SPDX identifiers from https://spdx.org/licenses/
 def detect_license_summary(content):
     # replace all white spaces with a single space
     content = re.sub(r"\s+", ' ', content)
     if any(sentence in content[0:1000] for sentence in APACHE2_LICENSE_TITLES):
-        return "Apache License 2.0"
+        return "Apache-2.0"
     if any(sentence in content[0:1000] for sentence in MIT_LICENSES):
-        return "MIT license"
+        return "MIT"
     if all(sentence in content[0:1000] for sentence in BSD_LICENSE_CONTENTS):
         if all(sentence in content[0:1000] for sentence in BSD_LICENSE_3_CLAUSE):
             if all(sentence in content[0:1000] for sentence in BSD_LICENSE_4_CLAUSE):
-                return "BSD 4-clause license"
-            return "BSD 3-clause license"
+                return "BSD-4-Clause"
+            return "BSD-3-Clause"
         else:
-            return "BSD 2-clause license"
+            return "BSD-2-Clause"
     if any(sentence in content[0:300] for sentence in MPL_LICENSE_TITLES):
-        return "Mozilla Public License 2.0"
+        return "MPL-2.0"
+    if any(sentence in content[0:3000] for sentence in CC_SA_4_LICENSE_TITLE):
+        return "CC-BY-SA-4.0"
+    if any(sentence in content[0:3000] for sentence in LGPL_3_LICENSE_TITLE):
+        return "LGPL-3.0"
 
-    return "Unknown"
+    return "UNKNOWN"
 
 
 EXCLUDES = ["dev-tools", "build"]
