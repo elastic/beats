@@ -32,7 +32,7 @@
   }, {
     "script": {
       "lang": "painless",
-      "id": "filebeat-stored-is-private-ip"
+      "id": "is-private-ip"
       }
   }, {
     "remove":{

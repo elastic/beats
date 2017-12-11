@@ -400,10 +400,26 @@ func (fs *Fileset) GetPipeline(esVersion string) (pipelineID string, content map
 		return "", nil, fmt.Errorf("Error interpreting the template of the ingest pipeline: %v", err)
 	}
 
+	for _, scriptName := range fs.manifest.PipelineScripts {
+		name := strings.Split(scriptName, ".")
+		scriptPipelinePattern := "\"lang\": \"painless\",\n      \"id\": \"%s\""
+		scriptElem := fmt.Sprintf(scriptPipelinePattern, name[0])
+
+		scriptID := bytes.NewBufferString("")
+		err := fs.scriptIDTemplate.Execute(scriptID, name[0])
+		if err != nil {
+			return "", nil, err
+		}
+
+		scriptElemFull := fmt.Sprintf(scriptPipelinePattern, scriptID.String())
+		jsonString = strings.Replace(jsonString, scriptElem, scriptElemFull, -1)
+	}
+
 	err = json.Unmarshal([]byte(jsonString), &content)
 	if err != nil {
 		return "", nil, fmt.Errorf("Error JSON decoding the pipeline file: %s: %v", path, err)
 	}
+
 	return fs.pipelineID, content, nil
 }
 

@@ -79,7 +79,7 @@
         {
             "script": {
                 "lang": "painless",
-                "id": "filebeat-stored-trim-quotes"
+                "id": "trim-quotes"
             }
         },
         {

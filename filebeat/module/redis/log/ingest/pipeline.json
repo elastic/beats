@@ -16,12 +16,12 @@
     }, {
       "script": {
         "lang": "painless",
-        "id": "filebeat-stored-set-log-level"
+        "id": "set-log-level"
       }
     }, {
       "script": {
         "lang": "painless",
-        "id": "filebeat-stored-set-log-role"
+        "id": "set-log-role"
       }
     }, {
       "remove": {
