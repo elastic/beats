@@ -31,6 +31,8 @@ metricbeat.modules:
   jmx.instance:
 ----
 
+This module supports TLS connection when using `ssl` config field, as described in <<configuration-ssl>>.
+
 [float]
 === Metricsets
 

@@ -83,6 +83,10 @@ in <<configuration-metricbeat>>. Here is an example configuration:
 
             module_file += "----\n\n"
 
+        # HTTP helper
+        if 'ssl' in get_settings(module_fields):
+            module_file += "This module supports TLS connection when using `ssl` config field, as described in <<configuration-ssl>>.\n\n"
+
         # Add metricsets title as below each metricset adds its link
         module_file += "[float]\n"
         module_file += "=== Metricsets\n\n"
@@ -208,7 +212,6 @@ For a description of each field in the metricset, see the
 
 
 def get_release(fields):
-
     # Fetch release flag from fields. Default if not set is experimental
     release = "experimental"
     if "release" in fields:
@@ -217,6 +220,11 @@ def get_release(fields):
             raise Exception("Invalid release config: {}".format(release))
 
     return release
+
+
+def get_settings(fields):
+    # Get the list of common settings flags
+    return fields.get('settings', [])
 
 
 if __name__ == "__main__":
