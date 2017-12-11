@@ -40,10 +40,23 @@ func TestIndex(t *testing.T) {
 		t.Fatalf("Index() fails: %s", resp)
 	}
 
+	body = map[string]interface{}{
+		"query": map[string]interface{}{
+			"match_all": map[string]interface{}{},
+		},
+	}
+	_, result, err := client.SearchURIWithBody(index, "", nil, map[string]interface{}{})
+	if err != nil {
+		t.Errorf("SearchUriWithBody() returns an error: %s", err)
+	}
+	if result.Hits.Total != 1 {
+		t.Errorf("Wrong number of search results: %d", result.Hits.Total)
+	}
+
 	params = map[string]string{
 		"q": "user:test",
 	}
-	_, result, err := client.SearchURI(index, "test", params)
+	_, result, err = client.SearchURI(index, "test", params)
 	if err != nil {
 		t.Errorf("SearchUri() returns an error: %s", err)
 	}
