@@ -1,2 +1,2 @@
-FROM docker.elastic.co/elasticsearch/elasticsearch:6.0.0-beta1
+FROM docker.elastic.co/elasticsearch/elasticsearch:6.0.1
 HEALTHCHECK --interval=1s --retries=90 CMD curl -f http://localhost:9200
