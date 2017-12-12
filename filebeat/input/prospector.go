@@ -22,13 +22,13 @@ type Input interface {
 
 // InputRunner contains the prospector
 type InputRunner struct {
-	config       inputConfig
-	prospectorer Input
-	done         chan struct{}
-	wg           *sync.WaitGroup
-	ID           uint64
-	Once         bool
-	beatDone     chan struct{}
+	config   inputConfig
+	input    Input
+	done     chan struct{}
+	wg       *sync.WaitGroup
+	ID       uint64
+	Once     bool
+	beatDone chan struct{}
 }
 
 // NewProspector instantiates a new prospector
@@ -76,7 +76,7 @@ func New(
 	if err != nil {
 		return prospector, err
 	}
-	prospector.prospectorer = prospectorer
+	prospector.input = prospectorer
 
 	return prospector, nil
 }
@@ -108,7 +108,7 @@ func (p *InputRunner) Start() {
 // Run starts scanning through all the file paths and fetch the related files. Start a harvester for each file
 func (p *InputRunner) Run() {
 	// Initial prospector run
-	p.prospectorer.Run()
+	p.input.Run()
 
 	// Shuts down after the first complete run of all prospectors
 	if p.Once {
@@ -122,7 +122,7 @@ func (p *InputRunner) Run() {
 			return
 		case <-time.After(p.config.ScanFrequency):
 			logp.Debug("prospector", "Run prospector")
-			p.prospectorer.Run()
+			p.input.Run()
 		}
 	}
 }
@@ -139,9 +139,9 @@ func (p *InputRunner) stop() {
 
 	// In case of once, it will be waited until harvesters close itself
 	if p.Once {
-		p.prospectorer.Wait()
+		p.input.Wait()
 	} else {
-		p.prospectorer.Stop()
+		p.input.Stop()
 	}
 }
 
