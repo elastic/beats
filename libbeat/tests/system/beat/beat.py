@@ -198,7 +198,7 @@ class TestCase(unittest.TestCase, ComposeMixin):
         if template_name is None:
             template_name = self.beat_name
 
-        template_path = os.path.join("./tests/system/config", template_name + ".yml.j2")
+        template_path = "./tests/system/config/" + template_name + ".yml.j2"
 
         if output is None:
             output = self.beat_name + ".yml"
