@@ -3,6 +3,19 @@
   description: >
     Contains fields for the Apache2 HTTPD access logs.
   fields:
+    - name: vhost
+      type: group
+      description: >
+        Contains the parsed Virtual Host.
+      fields:
+        - name: name
+          type: keyword
+          description: >
+            Virtual Host name.
+        - name: port
+          type: long
+          description: >
+            Virtual Host port.
     - name: remote_ip
       type: keyword
       description: >

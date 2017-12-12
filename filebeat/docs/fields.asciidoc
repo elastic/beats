@@ -52,6 +52,29 @@ Contains fields for the Apache2 HTTPD access logs.
 
 
 [float]
+== vhost fields
+
+Contains the parsed Virtual Host.
+
+
+
+[float]
+=== `apache2.access.vhost.name`
+
+type: keyword
+
+Virtual Host name.
+
+
+[float]
+=== `apache2.access.vhost.port`
+
+type: long
+
+Virtual Host port.
+
+
+[float]
 === `apache2.access.remote_ip`
 
 type: keyword
