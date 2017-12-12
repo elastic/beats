@@ -1,6 +1,6 @@
 ###################### Filebeat Config Template ###############################
 
-filebeat.prospectors:
+filebeat.{{input_config | default("prospectors")}}:
 {% if prospectors is not defined %}
 {% set prospectors = true %}
 {% endif %}

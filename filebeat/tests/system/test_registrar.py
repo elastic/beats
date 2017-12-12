@@ -1034,7 +1034,7 @@ class Test(BaseTest):
         # Wait until prospectors are started
         self.wait_until(
             lambda: self.log_contains_count(
-                "Starting prospector of type: log", logfile="filebeat2.log") >= 1,
+                "Starting input of type: log", logfile="filebeat2.log") >= 1,
             max_timeout=10)
 
         filebeat.check_kill_and_wait()
