@@ -1,0 +1,80 @@
+[[configuration-autodiscover]]
+== Autodiscover
+
+Autodiscover allows you to watch for system changes and dynamically adapt settings to them, as they happen.
+This is specially useful when running your infrastructure on containers.
+
+When you run an application on containers it becomes a moving target to the monitoring system, Autodiscover
+allows you to automatically detect what's running and update settings to monitor it.
+
+You can define configuration templates for different containers, Autodiscover subsystem will use them
+to monitor services as they start running.
+
+[float]
+=== Configuration options
+
+Autodiscover settings are defined under {beatname_lc}.autodiscover field, to enable it you must configure
+a list of providers to be used.
+
+["source","yaml",subs="attributes"]
+-------------------------------------------------------------------------------------
+{beatname_lc}.autodiscover:
+  providers:
+    - type: docker
+      ...
+-------------------------------------------------------------------------------------
+
+[float]
+=== Providers
+
+Autodiscover providers work by watching for events on the system and translating that into internal autodiscover
+events with a common format. Autodiscover events allow you to match certain conditions and launch configurations
+when they happen.
+
+NOTE: Currently only Docker provider is available.
+
+[float]
+===== Docker
+
+Docker autodiscover provider watches for Docker containers start and stop. These are the available fields on every
+event:
+
+  * host
+  * port
+  * docker.container.id
+  * docker.container.image
+  * docker.container.name
+  * docker.container.labels
+
+
+This is an example `docker` Autodiscover event:
+
+[source,yaml]
+-------------------------------------------------------------------------------------
+{
+  "host": "10.4.15.9",
+  "port": 6379,
+  "docker": {
+    "container": {
+      "id": "382184ecdb385cfd5d1f1a65f78911054c8511ae009635300ac28b4fc357ce51"
+      "name": "redis",
+      "image": "redis:3.2.11",
+      "labels": {
+        "io.kubernetes.pod.namespace": "default"
+        ...
+      }
+    }
+  }
+}
+-------------------------------------------------------------------------------------
+
+You can define a set of configuration templates to be applied when the condition matches a event. Templates define
+a condition to match on autodiscover events, together with the list of configurations to spawn when this condition
+happens.
+
+Conditions match events from the provider, the use the <<conditions,same format from processors conditions>>.
+
+Confiuration templates can contain variables from the autodiscover event, they can be accessed under `data` namespace.
+For example, with the example event, "`${data.port}`" will result into `6379`.
+
+include::../../{beatname_lc}/docs/autodiscover-docker-config.asciidoc[]
