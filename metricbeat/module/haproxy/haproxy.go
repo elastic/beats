@@ -3,8 +3,6 @@ package haproxy
 import (
 	"bytes"
 	"encoding/csv"
-	"errors"
-	"fmt"
 	"io"
 	"io/ioutil"
 	"net"
@@ -16,6 +14,7 @@ import (
 
 	"github.com/gocarina/gocsv"
 	"github.com/mitchellh/mapstructure"
+	"github.com/pkg/errors"
 )
 
 // HostParser is used for parsing the configured HAProxy hosts.
@@ -152,7 +151,7 @@ type Client struct {
 func NewHaproxyClient(address string) (*Client, error) {
 	u, err := url.Parse(address)
 	if err != nil {
-		return nil, errors.New("invalid url")
+		return nil, errors.Wrap(err, "invalid url")
 	}
 
 	switch u.Scheme {
@@ -163,7 +162,7 @@ func NewHaproxyClient(address string) (*Client, error) {
 	case "http", "https":
 		return &Client{&httpProto{URL: u}}, nil
 	default:
-		return nil, errors.New("invalid protocol scheme")
+		return nil, errors.Errorf("invalid protocol scheme: %s", u.Scheme)
 	}
 }
 
@@ -180,7 +179,7 @@ func (c *Client) GetStat() ([]*Stat, error) {
 
 	err = gocsv.UnmarshalCSV(csvReader, &statRes)
 	if err != nil {
-		return nil, fmt.Errorf("error parsing CSV: %s", err)
+		return nil, errors.Errorf("error parsing CSV: %s", err)
 	}
 
 	return statRes, nil
@@ -250,7 +249,7 @@ func (p *unixProto) run(cmd string) (*bytes.Buffer, error) {
 	}
 
 	if strings.HasPrefix(response.String(), "Unknown command") {
-		return response, fmt.Errorf("unknown command: %s", cmd)
+		return response, errors.Errorf("unknown command: %s", cmd)
 	}
 
 	return response, nil
@@ -287,17 +286,17 @@ func (p *httpProto) Stat() (*bytes.Buffer, error) {
 
 	resp, err := http.DefaultClient.Do(req)
 	if err != nil {
-		return nil, fmt.Errorf("couldn't connect: %v", err)
+		return nil, errors.Errorf("couldn't connect: %v", err)
 	}
 	defer resp.Body.Close()
 
 	if resp.StatusCode != http.StatusOK {
-		return nil, fmt.Errorf("invalid response: %s", resp.Status)
+		return nil, errors.Errorf("invalid response: %s", resp.Status)
 	}
 
 	d, err := ioutil.ReadAll(resp.Body)
 	if err != nil {
-		return nil, fmt.Errorf("couldn't read response body: %v", err)
+		return nil, errors.Errorf("couldn't read response body: %v", err)
 	}
 	return bytes.NewBuffer(d), nil
 }
