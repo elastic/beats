@@ -9,7 +9,7 @@ import (
 	"github.com/elastic/beats/libbeat/common"
 )
 
-var fakeFactory = func(config *common.Config, outletFactory channel.Factory, context Context) (Prospectorer, error) {
+var fakeFactory = func(config *common.Config, outletFactory channel.Factory, context Context) (Input, error) {
 	return nil, nil
 }
 

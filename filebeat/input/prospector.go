@@ -13,8 +13,8 @@ import (
 	"github.com/elastic/beats/libbeat/logp"
 )
 
-// Prospectorer is the interface common to all prospectors
-type Prospectorer interface {
+// Input is the interface common to all prospectors
+type Input interface {
 	Run()
 	Stop()
 	Wait()
@@ -23,7 +23,7 @@ type Prospectorer interface {
 // Prospector contains the prospector
 type Prospector struct {
 	config       prospectorConfig
-	prospectorer Prospectorer
+	prospectorer Input
 	done         chan struct{}
 	wg           *sync.WaitGroup
 	ID           uint64
@@ -71,7 +71,7 @@ func New(
 		BeatDone:      prospector.beatDone,
 		DynamicFields: dynFields,
 	}
-	var prospectorer Prospectorer
+	var prospectorer Input
 	prospectorer, err = f(conf, outlet, context)
 	if err != nil {
 		return prospector, err
