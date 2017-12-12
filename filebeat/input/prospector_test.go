@@ -1,3 +1,3 @@
 // +build !integration
 
-package prospector
+package input

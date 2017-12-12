@@ -1,4 +1,4 @@
-package prospector
+package input
 
 import (
 	"github.com/elastic/beats/filebeat/channel"

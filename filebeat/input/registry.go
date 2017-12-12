@@ -1,4 +1,4 @@
-package prospector
+package input
 
 import (
 	"fmt"
@@ -16,7 +16,7 @@ type Context struct {
 	DynamicFields *common.MapStrPointer
 }
 
-type Factory func(config *common.Config, outletFactory channel.Factory, context Context) (Prospectorer, error)
+type Factory = func(config *common.Config, outletFactory channel.Factory, context Context) (Prospectorer, error)
 
 var registry = make(map[string]Factory)
 
