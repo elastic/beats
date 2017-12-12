@@ -67,6 +67,7 @@ func CreateFullEvent(ms mb.MetricSet, metricSetData common.MapStr) beat.Event {
 	}
 
 	mbEvent := mb.TransformMapStrToEvent(ms.Module().Name(), metricSetData, nil)
+	mbEvent.Namespace = ms.Registration().Namespace
 	mbEvent.Timestamp = startTime
 	mbEvent.Took = 115 * time.Microsecond
 	mbEvent.Host = ms.Host()
