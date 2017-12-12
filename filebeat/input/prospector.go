@@ -20,8 +20,8 @@ type Input interface {
 	Wait()
 }
 
-// Prospector contains the prospector
-type Prospector struct {
+// InputRunner contains the prospector
+type InputRunner struct {
 	config       prospectorConfig
 	prospectorer Input
 	done         chan struct{}
@@ -38,8 +38,8 @@ func New(
 	beatDone chan struct{},
 	states []file.State,
 	dynFields *common.MapStrPointer,
-) (*Prospector, error) {
-	prospector := &Prospector{
+) (*InputRunner, error) {
+	prospector := &InputRunner{
 		config:   defaultConfig,
 		wg:       &sync.WaitGroup{},
 		done:     make(chan struct{}),
@@ -82,7 +82,7 @@ func New(
 }
 
 // Start starts the prospector
-func (p *Prospector) Start() {
+func (p *InputRunner) Start() {
 	p.wg.Add(1)
 	logp.Info("Starting prospector of type: %v; ID: %d ", p.config.Type, p.ID)
 
@@ -106,7 +106,7 @@ func (p *Prospector) Start() {
 }
 
 // Run starts scanning through all the file paths and fetch the related files. Start a harvester for each file
-func (p *Prospector) Run() {
+func (p *InputRunner) Run() {
 	// Initial prospector run
 	p.prospectorer.Run()
 
@@ -128,13 +128,13 @@ func (p *Prospector) Run() {
 }
 
 // Stop stops the prospector and with it all harvesters
-func (p *Prospector) Stop() {
+func (p *InputRunner) Stop() {
 	// Stop scanning and wait for completion
 	close(p.done)
 	p.wg.Wait()
 }
 
-func (p *Prospector) stop() {
+func (p *InputRunner) stop() {
 	logp.Info("Stopping Prospector: %d", p.ID)
 
 	// In case of once, it will be waited until harvesters close itself
@@ -145,6 +145,6 @@ func (p *Prospector) stop() {
 	}
 }
 
-func (p *Prospector) String() string {
+func (p *InputRunner) String() string {
 	return fmt.Sprintf("prospector [type=%s, ID=%d]", p.config.Type, p.ID)
 }
