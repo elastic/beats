@@ -22,7 +22,7 @@ type Input interface {
 
 // InputRunner contains the prospector
 type InputRunner struct {
-	config       prospectorConfig
+	config       inputConfig
 	prospectorer Input
 	done         chan struct{}
 	wg           *sync.WaitGroup
