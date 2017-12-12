@@ -43,8 +43,6 @@ const sampleJob = `
 const sampleDatafeed = `
 {
     "job_id": "PLACEHOLDER",
-    "query_delay": "60s",
-    "frequency": "60s",
     "indexes": [
       "filebeat-*"
     ],
