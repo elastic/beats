@@ -31,7 +31,6 @@
     }
   }, {
     "script": {
-      "lang": "painless",
       "id": "is-private-ip"
       }
   }, {

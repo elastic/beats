@@ -15,12 +15,10 @@
       }
     }, {
       "script": {
-        "lang": "painless",
         "id": "set-log-level"
       }
     }, {
       "script": {
-        "lang": "painless",
         "id": "set-log-role"
       }
     }, {

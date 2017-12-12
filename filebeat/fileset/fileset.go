@@ -400,19 +400,12 @@ func (fs *Fileset) GetPipeline(esVersion string) (pipelineID string, content map
 		return "", nil, fmt.Errorf("Error interpreting the template of the ingest pipeline: %v", err)
 	}
 
-	for _, scriptName := range fs.manifest.PipelineScripts {
-		name := strings.Split(scriptName, ".")
-		scriptPipelinePattern := "\"lang\": \"painless\",\n      \"id\": \"%s\""
-		scriptElem := fmt.Sprintf(scriptPipelinePattern, name[0])
-
-		scriptID := bytes.NewBufferString("")
-		err := fs.scriptIDTemplate.Execute(scriptID, name[0])
+	for _, name := range fs.manifest.PipelineScripts {
+		jsonString, err = substituteScriptIDs(jsonString, name, fs.scriptIDTemplate)
 		if err != nil {
 			return "", nil, err
 		}
 
-		scriptElemFull := fmt.Sprintf(scriptPipelinePattern, scriptID.String())
-		jsonString = strings.Replace(jsonString, scriptElem, scriptElemFull, -1)
 	}
 
 	err = json.Unmarshal([]byte(jsonString), &content)
@@ -421,6 +414,28 @@ func (fs *Fileset) GetPipeline(esVersion string) (pipelineID string, content map
 	}
 
 	return fs.pipelineID, content, nil
+}
+
+func substituteScriptIDs(jsonString, name string, t *template.Template) (string, error) {
+	p := strings.Split(name, ".")
+	if len(p) != 2 {
+		return "", fmt.Errorf("Error substituting script ids: invalid script name.")
+	}
+
+	scriptPipelinePattern := "\"script\": {\n      \"id\": \"%s\""
+	scriptElem := fmt.Sprintf(scriptPipelinePattern, p[0])
+
+	scriptID := bytes.NewBufferString("")
+	err := t.Execute(scriptID, p[0])
+	if err != nil {
+		return "", err
+	}
+
+	scriptElemFull := fmt.Sprintf(scriptPipelinePattern, scriptID.String())
+	jsonString = strings.Replace(jsonString, scriptElem, scriptElemFull, -1)
+
+	return jsonString, nil
+
 }
 
 // formatScriptIDTemplate generates the ID to be used for the pipeline ID in Elasticsearch
