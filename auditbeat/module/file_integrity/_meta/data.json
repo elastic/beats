@@ -1,0 +1,30 @@
+{
+    "@timestamp": "2017-10-12T08:05:34.853Z",
+    "audit": {
+        "file": {
+            "action": [
+                "created"
+            ],
+            "ctime": "2017-12-13T20:58:45.240217481Z",
+            "gid": 1000,
+            "group": "vagrant",
+            "hashed": true,
+            "inode": "38496",
+            "mode": "0600",
+            "mtime": "2017-12-13T20:58:45.240217481Z",
+            "owner": "vagrant",
+            "path": "/tmp/audit-file341509799/file.data",
+            "sha1": "2aae6c35c94fcfb415dbe95f408b9ce91ee846ed",
+            "size": 11,
+            "type": "file",
+            "uid": 1000
+        }
+    },
+    "beat": {
+        "hostname": "host.example.com",
+        "name": "host.example.com"
+    },
+    "dataset": {
+        "module": "file_integrity"
+    }
+}

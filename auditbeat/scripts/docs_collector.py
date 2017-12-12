@@ -72,11 +72,6 @@ is an example configuration:
 
             module_file += "----\n\n"
 
-        # Add metricsets title as below each metricset adds its link
-        module_file += "[float]\n"
-        module_file += "=== Metricsets\n\n"
-        module_file += "The following metricsets are available:\n\n"
-
         module_links = ""
         module_includes = ""
 
@@ -129,8 +124,13 @@ For a description of each field in the metricset, see the
             with open(os.path.abspath("docs") + "/modules/" + module + "/" + metricset + ".asciidoc", 'w') as f:
                 f.write(metricset_file)
 
-        module_file += module_links
-        module_file += module_includes
+        if len(module_links) > 0:
+            module_file += "[float]\n"
+            module_file += "=== Metricsets\n\n"
+            module_file += "The following metricsets are available:\n\n"
+
+            module_file += module_links
+            module_file += module_includes
 
         # Write module docs
         with open(os.path.abspath("docs") + "/modules/" + module + ".asciidoc", 'w') as f:
