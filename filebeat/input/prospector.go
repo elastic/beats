@@ -39,7 +39,7 @@ func New(
 	states []file.State,
 	dynFields *common.MapStrPointer,
 ) (*InputRunner, error) {
-	prospector := &InputRunner{
+	input := &InputRunner{
 		config:   defaultConfig,
 		wg:       &sync.WaitGroup{},
 		done:     make(chan struct{}),
@@ -48,37 +48,37 @@ func New(
 	}
 
 	var err error
-	if err = conf.Unpack(&prospector.config); err != nil {
+	if err = conf.Unpack(&input.config); err != nil {
 		return nil, err
 	}
 
 	var h map[string]interface{}
 	conf.Unpack(&h)
-	prospector.ID, err = hashstructure.Hash(h, nil)
+	input.ID, err = hashstructure.Hash(h, nil)
 	if err != nil {
 		return nil, err
 	}
 
 	var f Factory
-	f, err = GetFactory(prospector.config.Type)
+	f, err = GetFactory(input.config.Type)
 	if err != nil {
-		return prospector, err
+		return input, err
 	}
 
 	context := Context{
 		States:        states,
-		Done:          prospector.done,
-		BeatDone:      prospector.beatDone,
+		Done:          input.done,
+		BeatDone:      input.beatDone,
 		DynamicFields: dynFields,
 	}
-	var prospectorer Input
-	prospectorer, err = f(conf, outlet, context)
+	var ipt Input
+	ipt, err = f(conf, outlet, context)
 	if err != nil {
-		return prospector, err
+		return input, err
 	}
-	prospector.input = prospectorer
+	input.input = ipt
 
-	return prospector, nil
+	return input, nil
 }
 
 // Start starts the prospector
