@@ -98,15 +98,16 @@ func initMetricSets(r *Register, m Module) ([]MetricSet, error) {
 	}
 
 	for _, bm := range bms {
-		f, hostParser, err := r.metricSetFactory(bm.Module().Name(), bm.Name())
+		registration, err := r.metricSetRegistration(bm.Module().Name(), bm.Name())
 		if err != nil {
 			errs = append(errs, err)
 			continue
 		}
 
+		bm.registration = registration
 		bm.hostData = HostData{URI: bm.host}
-		if hostParser != nil {
-			bm.hostData, err = hostParser(bm.Module(), bm.host)
+		if registration.HostParser != nil {
+			bm.hostData, err = registration.HostParser(bm.Module(), bm.host)
 			if err != nil {
 				errs = append(errs, errors.Wrapf(err, "host parsing failed for %v-%v",
 					bm.Module().Name(), bm.Name()))
@@ -115,7 +116,7 @@ func initMetricSets(r *Register, m Module) ([]MetricSet, error) {
 			bm.host = bm.hostData.Host
 		}
 
-		metricSet, err := f(bm)
+		metricSet, err := registration.Factory(bm)
 		if err == nil {
 			err = mustHaveModule(metricSet, bm)
 			if err == nil {

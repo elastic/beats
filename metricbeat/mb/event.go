@@ -16,19 +16,13 @@ type EventModifier func(module, metricset string, event *Event)
 type Event struct {
 	RootFields      common.MapStr // Fields that will be added to the root of the event.
 	ModuleFields    common.MapStr // Fields that will be namespaced under [module].
-	MetricSetFields common.MapStr // Fields that will be namespaced under [module][metricset].
+	MetricSetFields common.MapStr // Fields that will be namespaced under [module].[metricset].
 
+	Namespace string        // Fully qualified namespace to use for MetricSetFields.
 	Timestamp time.Time     // Timestamp when the event data was collected.
 	Error     error         // Error that occurred while collecting the event data.
 	Host      string        // Host from which the data was collected.
 	Took      time.Duration // Amount of time it took to collect the event data.
-
-	// Namespace used by the metricset fields. This is private
-	// because namespaced data can be added directly to ModuleFields.
-	// TODO (andrewkroh on 2017-12-08): Create a WithNamespace option for
-	// controlling the namespace so it does not need to be set in each event
-	// constructed by the MetricSet.
-	namespace string
 }
 
 // BeatEvent returns a new beat.Event containing the data this Event. It does
@@ -53,7 +47,11 @@ func (e *Event) BeatEvent(module, metricSet string, modifiers ...EventModifier) 
 	}
 
 	if len(e.MetricSetFields) > 0 {
-		b.Fields.Put(module+"."+metricSet, e.MetricSetFields)
+		prefix := e.Namespace
+		if prefix == "" {
+			prefix = module + "." + metricSet
+		}
+		b.Fields.Put(prefix, e.MetricSetFields)
 		e.MetricSetFields = nil
 	}
 
@@ -88,8 +86,8 @@ func AddMetricSetInfo(module, metricset string, event *Event) {
 	if event.Took > 0 {
 		info["rtt"] = event.Took / time.Microsecond
 	}
-	if event.namespace != "" {
-		info["namespace"] = event.namespace
+	if event.Namespace != "" {
+		info["namespace"] = event.Namespace
 	}
 	info = common.MapStr{
 		"metricset": info,
@@ -106,7 +104,7 @@ func AddMetricSetInfo(module, metricset string, event *Event) {
 // (like any MetricSet that does not natively produce a mb.Event). It accounts
 // for the special key names and routes the data stored under those keys to the
 // correct location in the event.
-func TransformMapStrToEvent(m common.MapStr, err error) Event {
+func TransformMapStrToEvent(module string, m common.MapStr, err error) Event {
 	var (
 		event = Event{RootFields: common.MapStr{}, Error: err}
 	)
@@ -133,19 +131,14 @@ func TransformMapStrToEvent(m common.MapStr, err error) Event {
 		case NamespaceKey:
 			delete(m, NamespaceKey)
 			if ns, ok := v.(string); ok {
-				event.namespace = ns
+				// The _namespace value does not include the module name and
+				// it is required in the mb.Event.Namespace value.
+				event.Namespace = module + "." + ns
 			}
 		}
 	}
 
-	if event.namespace == "" {
-		event.MetricSetFields = m
-	} else {
-		if event.ModuleFields == nil {
-			event.ModuleFields = common.MapStr{}
-		}
-		event.ModuleFields.Put(event.namespace, m)
-	}
+	event.MetricSetFields = m
 	return event
 }
 

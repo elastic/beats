@@ -275,13 +275,16 @@ type eventReporter struct {
 
 // startFetchTimer demarcates the start of a new fetch. The elapsed time of a
 // fetch is computed based on the time of this call.
-func (r *eventReporter) StartFetchTimer()      { r.start = time.Now() }
-func (r *eventReporter) V1() mb.PushReporter   { return reporterV1{r.V2()} }
+func (r *eventReporter) StartFetchTimer() { r.start = time.Now() }
+func (r *eventReporter) V1() mb.PushReporter {
+	return reporterV1{v2: r.V2(), module: r.msw.module.Name()}
+}
 func (r *eventReporter) V2() mb.PushReporterV2 { return reporterV2{r} }
 
 // reporterV1 wraps V2 to provide a v1 interface.
 type reporterV1 struct {
-	v2 mb.PushReporterV2
+	v2     mb.PushReporterV2
+	module string
 }
 
 func (r reporterV1) Done() <-chan struct{}          { return r.v2.Done() }
@@ -292,7 +295,7 @@ func (r reporterV1) ErrorWith(err error, meta common.MapStr) bool {
 	if err == nil && meta == nil {
 		return true
 	}
-	return r.v2.Event(mb.TransformMapStrToEvent(meta, err))
+	return r.v2.Event(mb.TransformMapStrToEvent(r.module, meta, err))
 }
 
 type reporterV2 struct {
@@ -324,6 +327,9 @@ func (r reporterV2) Event(event mb.Event) bool {
 		r.msw.stats.failures.Add(1)
 	}
 
+	if event.Namespace == "" {
+		event.Namespace = r.msw.Registration().Namespace
+	}
 	beatEvent := event.BeatEvent(r.msw.module.Name(), r.msw.MetricSet.Name(), r.msw.module.eventModifiers...)
 	if !writeEvent(r.done, r.out, beatEvent) {
 		return false

@@ -168,7 +168,7 @@ func TestTransformMapStrToEvent(t *testing.T) {
 
 	t.Run("normal", func(t *testing.T) {
 		m := m.Clone()
-		e := TransformMapStrToEvent(m, failure)
+		e := TransformMapStrToEvent("module", m, failure)
 
 		assert.Equal(t, timestamp, e.Timestamp)
 		assert.Equal(t, took, e.Took)
@@ -181,19 +181,16 @@ func TestTransformMapStrToEvent(t *testing.T) {
 	t.Run("namespace", func(t *testing.T) {
 		const namespace = "foo.bar"
 
-		m := m.Clone()
-		m.Put(NamespaceKey, namespace)
+		mapWithNamespace := m.Clone()
+		mapWithNamespace.Put(NamespaceKey, namespace)
 
-		moduleData := moduleData.Clone()
-		moduleData.Put(namespace, metricSetData)
-
-		e := TransformMapStrToEvent(m, nil)
+		e := TransformMapStrToEvent("module", mapWithNamespace, nil)
 
 		assert.Equal(t, timestamp, e.Timestamp)
 		assert.Equal(t, took, e.Took)
 		assert.Empty(t, e.RootFields)
 		assert.Equal(t, moduleData, e.ModuleFields)
-		assert.Equal(t, namespace, e.namespace)
-		assert.Empty(t, e.MetricSetFields)
+		assert.Equal(t, "module."+namespace, e.Namespace)
+		assert.Equal(t, metricSetData, e.MetricSetFields)
 	})
 }

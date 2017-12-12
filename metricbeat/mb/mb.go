@@ -83,7 +83,8 @@ type MetricSet interface {
 	Host() string   // Host returns a hostname or other module specific value
 	// that identifies a specific host or service instance from which to collect
 	// metrics.
-	HostData() HostData // HostData returns the parsed host data.
+	HostData() HostData                  // HostData returns the parsed host data.
+	Registration() MetricSetRegistration // Params used in registration.
 }
 
 // Closer is an optional interface that a MetricSet can implement in order to
@@ -212,10 +213,11 @@ func (h HostData) GoString() string { return h.String() }
 // MetricSet interface requirements, leaving only the Fetch() method to be
 // implemented to have a complete MetricSet implementation.
 type BaseMetricSet struct {
-	name     string
-	module   Module
-	host     string
-	hostData HostData
+	name         string
+	module       Module
+	host         string
+	hostData     HostData
+	registration MetricSetRegistration
 }
 
 func (b *BaseMetricSet) String() string {
@@ -223,8 +225,8 @@ func (b *BaseMetricSet) String() string {
 	if b.module != nil {
 		moduleName = b.module.Name()
 	}
-	return fmt.Sprintf(`{name:"%v", module:"%v", hostData:%v}`,
-		b.name, moduleName, b.hostData.String())
+	return fmt.Sprintf(`{name:"%v", module:"%v", hostData:%v, registration:%v}`,
+		b.name, moduleName, b.hostData.String(), b.registration)
 }
 
 func (b *BaseMetricSet) GoString() string { return b.String() }
@@ -249,6 +251,12 @@ func (b *BaseMetricSet) Host() string {
 // HostData returns the parsed host data.
 func (b *BaseMetricSet) HostData() HostData {
 	return b.hostData
+}
+
+// Registration returns the parameters that were used when the MetricSet was
+// registered with the registry.
+func (b *BaseMetricSet) Registration() MetricSetRegistration {
+	return b.registration
 }
 
 // Configuration types
