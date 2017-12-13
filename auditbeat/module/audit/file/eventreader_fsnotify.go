@@ -3,27 +3,25 @@
 package file
 
 import (
-	"errors"
 	"syscall"
 	"time"
 
 	"github.com/fsnotify/fsnotify"
+	"github.com/pkg/errors"
 
+	"github.com/elastic/beats/auditbeat/module/audit/file/monitor"
 	"github.com/elastic/beats/libbeat/logp"
 )
 
 type reader struct {
-	watcher *fsnotify.Watcher
+	watcher monitor.Watcher
 	config  Config
 	eventC  chan Event
 }
 
 // NewEventReader creates a new EventProducer backed by fsnotify.
 func NewEventReader(c Config) (EventProducer, error) {
-	if c.Recursive {
-		return nil, errors.New("recursive file auditing not supported in this platform (see file.recursive)")
-	}
-	watcher, err := fsnotify.NewWatcher()
+	watcher, err := monitor.New(c.Recursive)
 	if err != nil {
 		return nil, err
 	}
@@ -47,8 +45,11 @@ func (r *reader) Start(done <-chan struct{}) (<-chan Event, error) {
 		}
 	}
 
+	if err := r.watcher.Start(); err != nil {
+		return nil, errors.Wrap(err, "unable to start watcher")
+	}
 	go r.consumeEvents()
-	logp.Info("%v started fsnotify watcher", logPrefix)
+	logp.Info("%v started fsnotify watcher recursive:%v", logPrefix, r.config.Recursive)
 	return r.eventC, nil
 }
 
@@ -58,7 +59,7 @@ func (r *reader) consumeEvents() {
 
 	for {
 		select {
-		case event := <-r.watcher.Events:
+		case event := <-r.watcher.EventChannel():
 			if event.Name == "" {
 				continue
 			}
@@ -71,7 +72,7 @@ func (r *reader) consumeEvents() {
 			e.rtt = time.Since(start)
 
 			r.eventC <- e
-		case err := <-r.watcher.Errors:
+		case err := <-r.watcher.ErrorChannel():
 			logp.Warn("%v fsnotify watcher error: %v", logPrefix, err)
 		}
 	}
