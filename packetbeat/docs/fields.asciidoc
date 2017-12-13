@@ -2920,6 +2920,13 @@ The algorithm used for this certificate's public key. One of RSA, DSA or ECDSA.
 
 
 [float]
+=== `tls.client_certificate.public_key_size`
+
+type: long
+
+Size of the public key.
+
+[float]
 === `tls.client_certificate.signature_algorithm`
 
 type: keyword
@@ -3064,6 +3071,13 @@ type: keyword
 
 The algorithm used for this certificate's public key. One of RSA, DSA or ECDSA.
 
+
+[float]
+=== `tls.server_certificate.public_key_size`
+
+type: long
+
+Size of the public key.
 
 [float]
 === `tls.server_certificate.signature_algorithm`
