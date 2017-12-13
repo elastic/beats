@@ -1882,6 +1882,10 @@
                 The algorithm used for this certificate's public key.
                 One of RSA, DSA or ECDSA.
 
+            - name: public_key_size
+              type: long
+              description: Size of the public key.
+
             - name: signature_algorithm
               type: keyword
               description: >
@@ -1970,6 +1974,10 @@
               description: >
                 The algorithm used for this certificate's public key.
                 One of RSA, DSA or ECDSA.
+
+            - name: public_key_size
+              type: long
+              description: Size of the public key.
 
             - name: signature_algorithm
               type: keyword
