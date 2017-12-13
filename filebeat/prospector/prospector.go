@@ -3,7 +3,7 @@ package prospector
 import "github.com/elastic/beats/filebeat/input"
 
 type Prospectorer = input.Input
-type Prospector = input.InputRunner
+type Prospector = input.Runner
 
 type Context = input.Context
 

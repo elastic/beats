@@ -13,15 +13,15 @@ import (
 	"github.com/elastic/beats/libbeat/logp"
 )
 
-// Input is the interface common to all prospectors
+// Input is the interface common to all input
 type Input interface {
 	Run()
 	Stop()
 	Wait()
 }
 
-// InputRunner contains the prospector
-type InputRunner struct {
+// Runner encapsulate the lifecycle of the input
+type Runner struct {
 	config   inputConfig
 	input    Input
 	done     chan struct{}
@@ -31,15 +31,15 @@ type InputRunner struct {
 	beatDone chan struct{}
 }
 
-// NewProspector instantiates a new prospector
+// New instantiates a new Runner
 func New(
 	conf *common.Config,
 	outlet channel.Factory,
 	beatDone chan struct{},
 	states []file.State,
 	dynFields *common.MapStrPointer,
-) (*InputRunner, error) {
-	input := &InputRunner{
+) (*Runner, error) {
+	input := &Runner{
 		config:   defaultConfig,
 		wg:       &sync.WaitGroup{},
 		done:     make(chan struct{}),
@@ -81,10 +81,10 @@ func New(
 	return input, nil
 }
 
-// Start starts the prospector
-func (p *InputRunner) Start() {
+// Start starts the input
+func (p *Runner) Start() {
 	p.wg.Add(1)
-	logp.Info("Starting prospector of type: %v; ID: %d ", p.config.Type, p.ID)
+	logp.Info("Starting input of type: %v; ID: %d ", p.config.Type, p.ID)
 
 	onceWg := sync.WaitGroup{}
 	if p.Once {
@@ -93,7 +93,7 @@ func (p *InputRunner) Start() {
 	}
 
 	onceWg.Add(1)
-	// Add waitgroup to make sure prospectors finished
+	// Add waitgroup to make sure input is finished
 	go func() {
 		defer func() {
 			onceWg.Done()
@@ -106,11 +106,11 @@ func (p *InputRunner) Start() {
 }
 
 // Run starts scanning through all the file paths and fetch the related files. Start a harvester for each file
-func (p *InputRunner) Run() {
-	// Initial prospector run
+func (p *Runner) Run() {
+	// Initial input run
 	p.input.Run()
 
-	// Shuts down after the first complete run of all prospectors
+	// Shuts down after the first complete run of all input
 	if p.Once {
 		return
 	}
@@ -118,24 +118,24 @@ func (p *InputRunner) Run() {
 	for {
 		select {
 		case <-p.done:
-			logp.Info("Prospector ticker stopped")
+			logp.Info("input ticker stopped")
 			return
 		case <-time.After(p.config.ScanFrequency):
-			logp.Debug("prospector", "Run prospector")
+			logp.Debug("input", "Run input")
 			p.input.Run()
 		}
 	}
 }
 
-// Stop stops the prospector and with it all harvesters
-func (p *InputRunner) Stop() {
+// Stop stops the input and with it all harvesters
+func (p *Runner) Stop() {
 	// Stop scanning and wait for completion
 	close(p.done)
 	p.wg.Wait()
 }
 
-func (p *InputRunner) stop() {
-	logp.Info("Stopping Prospector: %d", p.ID)
+func (p *Runner) stop() {
+	logp.Info("Stopping Input: %d", p.ID)
 
 	// In case of once, it will be waited until harvesters close itself
 	if p.Once {
@@ -145,6 +145,6 @@ func (p *InputRunner) stop() {
 	}
 }
 
-func (p *InputRunner) String() string {
-	return fmt.Sprintf("prospector [type=%s, ID=%d]", p.config.Type, p.ID)
+func (p *Runner) String() string {
+	return fmt.Sprintf("input [type=%s, ID=%d]", p.config.Type, p.ID)
 }
