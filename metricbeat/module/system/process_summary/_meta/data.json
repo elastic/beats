@@ -7,19 +7,19 @@
     "metricset": {
         "module": "system",
         "name": "process_summary",
-        "namespace": "process.summary",
+        "namespace": "system.process.summary",
         "rtt": 115
     },
     "system": {
         "process": {
             "summary": {
                 "idle": 0,
-                "running": 1,
-                "sleeping": 3,
+                "running": 2,
+                "sleeping": 2,
                 "stopped": 0,
-                "total": 5,
+                "total": 4,
                 "unknown": 0,
-                "zombie": 1
+                "zombie": 0
             }
         }
     }
