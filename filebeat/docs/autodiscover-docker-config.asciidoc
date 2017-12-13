@@ -16,7 +16,7 @@ filebeat.autodiscover:
               exclude_lines: ["^\\s+[\\-`('.|_]"]  # drop asciiart lines
 -------------------------------------------------------------------------------------
 
-This will launch `redis` prospector for all containers running a image with `redis` in its name.
+This will launch `docker` logs prospector for all containers running a image with `redis` in its name.
 
 When defining modules, you can override default prospector to use docker:
 
