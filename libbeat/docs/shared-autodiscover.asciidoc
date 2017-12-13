@@ -4,34 +4,24 @@
 Autodiscover allows you to watch for system changes and dynamically adapt settings to them, as they happen.
 This is specially useful when running your infrastructure on containers.
 
-When you run an application on containers it becomes a moving target to the monitoring system, Autodiscover
+When you run an application on containers it becomes a moving target to the monitoring system. Autodiscover
 allows you to automatically detect what's running and update settings to monitor it.
 
-You can define configuration templates for different containers, Autodiscover subsystem will use them
+You can define configuration templates for different containers. Autodiscover subsystem will use them
 to monitor services as they start running.
 
 [float]
 === Configuration options
 
-Autodiscover settings are defined under {beatname_lc}.autodiscover field, to enable it you must configure
-a list of providers to be used.
-
-["source","yaml",subs="attributes"]
--------------------------------------------------------------------------------------
-{beatname_lc}.autodiscover:
-  providers:
-    - type: docker
-      ...
--------------------------------------------------------------------------------------
+You define autodiscover settings in the  +{beatname_lc}.autodiscover+ section of the +{beatname_lc}.yml+
+config file. To enable autodiscover, you specify a list of providers.
 
 [float]
 === Providers
 
-Autodiscover providers work by watching for events on the system and translating that into internal autodiscover
-events with a common format. Autodiscover events allow you to match certain conditions and launch configurations
-when they happen.
-
-NOTE: Currently only Docker provider is available.
+Autodiscover providers work by watching for events on the system and translating those events into internal autodiscover
+events with a common format. When you configure the provider, you can use fields from the autodiscover event to set
+conditions that, when met, launch specific configurations.
 
 [float]
 ===== Docker
@@ -47,7 +37,7 @@ event:
   * docker.container.labels
 
 
-This is an example `docker` Autodiscover event:
+For example:
 
 [source,yaml]
 -------------------------------------------------------------------------------------
@@ -68,13 +58,14 @@ This is an example `docker` Autodiscover event:
 }
 -------------------------------------------------------------------------------------
 
-You can define a set of configuration templates to be applied when the condition matches a event. Templates define
-a condition to match on autodiscover events, together with the list of configurations to spawn when this condition
+You can define a set of configuration templates to be applied when the condition matches an event. Templates define
+a condition to match on autodiscover events, together with the list of configurations to launch when this condition
 happens.
 
-Conditions match events from the provider, the use the <<conditions,same format from processors conditions>>.
+Conditions match events from the provider. Providers use the same format for <<conditions>> that
+processors use.
 
-Confiuration templates can contain variables from the autodiscover event, they can be accessed under `data` namespace.
-For example, with the example event, "`${data.port}`" will result into `6379`.
+Configuration templates can contain variables from the autodiscover event. They can be accessed under `data` namespace.
+For example, with the example event, "`${data.port}`" will resolves to `6379`.
 
 include::../../{beatname_lc}/docs/autodiscover-docker-config.asciidoc[]

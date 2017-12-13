@@ -15,4 +15,4 @@ metricbeat.autodiscover:
               hosts: "${data.host}:6379"
 -------------------------------------------------------------------------------------
 
-This will launch `redis` module for all containers running a image with `redis` in its name.
+This configuration launches a `redis` module for all containers running an image with `redis` in the name.
