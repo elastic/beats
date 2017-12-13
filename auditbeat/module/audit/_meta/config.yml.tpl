@@ -85,4 +85,7 @@
   # sha224, sha256, sha384, sha512, sha512_224, sha512_256, sha3_224, sha3_256,
   # sha3_384 and sha3_512. Default is sha1.
   file.hash_types: [sha1]
+
+  # Detect changes to files included in subdirectories. Disabled by default.
+  file.recursive: false
   {{- end }}
