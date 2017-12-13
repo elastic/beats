@@ -165,7 +165,7 @@ func TestImportJobs(t *testing.T) {
 		if datafeed.DatafeedId == "datafeed-test-ml-config" {
 			found = true
 			assert.Equal(t, datafeed.JobId, "test-ml-config")
-			assert.Equal(t, datafeed.QueryDelay, "60s")
+			assert.Equal(t, datafeed.QueryDelay, "87034ms")
 		}
 	}
 	assert.True(t, found)
