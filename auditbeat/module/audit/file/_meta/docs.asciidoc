@@ -23,11 +23,11 @@ The operating system features that power this feature are as follows.
 
 * Linux - `inotify` is used, and therefore the kernel must have inotify support.
 Inotify was initially merged into the 2.6.13 Linux kernel.
-* macOS (Darwin) - `kqueue` is used. It requires one file descriptor for each
-file so please check the `ulimit` values used with {beatname_uc}. The FSEvents
-API was considered for the implementation, but FSEvents coalesces multiple
-notifications into a single event which is inconsistent with the metricset's
-behavior on other operating systems.
+* macOS (Darwin) - Uses the `FSEvents` API, present since macOS 10.5. This API
+coalesces multiple changes to a file into a single event. {beatname_uc} translates
+this coalesced changes into a meaningful sequence of actions. However,
+in rare situations the reported events may have a different ordering than what
+actually happened.
 * Windows - `ReadDirectoryChangesW` is used.
 
 The file metricset should not be used to monitor paths on network file systems.
@@ -53,11 +53,11 @@ Linux.
   file.scan_rate_per_sec: 50 MiB
   file.max_file_size: 100 MiB
   file.hash_types: [sha1]
+  file.recursive: false
 ----
 
-*`file.paths`*:: A list of paths (directories or files) to watch. The watches
-are non-recursive and globs are not supported. The specified paths should exist
-when the metricset is started.
+*`file.paths`*:: A list of paths (directories or files) to watch. Globs are
+not supported. The specified paths should exist when the metricset is started.
 
 *`file.scan_at_start`*:: A boolean value that controls if {beatname_uc} scans
 over the configured file paths at startup and send events for the files
@@ -84,4 +84,10 @@ a suffix to the value. The supported units are `b` (default), `kib`, `kb`, `mib`
 
 *`file.hash_types`*:: A list of hash types to compute when the file changes.
 The supported hash types are md5, sha1, sha224, sha256, sha384, sha512,
-sha512_224, sha512_256, sha3_224, sha3_256, sha3_384 and sha3_512. The default value is sha1.
+sha512_224, sha512_256, sha3_224, sha3_256, sha3_384 and sha3_512. The default
+value is sha1.
+
+*`file.recursive`*:: By default, the watches set to the paths specified in
+`file.paths` are not recursive. This means that only changes to the contents
+of this directories are watched. If `file.recursive` is set to `true`, the file
+metric will watch for changes on this directories and all their subdirectories.
