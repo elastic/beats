@@ -10,9 +10,6 @@ allows you to automatically detect what's running and update settings to monitor
 You can define configuration templates for different containers. Autodiscover subsystem will use them
 to monitor services as they start running.
 
-[float]
-=== Configuration options
-
 You define autodiscover settings in the  +{beatname_lc}.autodiscover+ section of the +{beatname_lc}.yml+
 config file. To enable autodiscover, you specify a list of providers.
 
