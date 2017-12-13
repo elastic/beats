@@ -36,6 +36,7 @@ COVERAGE_TOOL?=${BEAT_GOPATH}/bin/gotestcover
 COVERAGE_TOOL_REPO?=github.com/elastic/beats/vendor/github.com/pierrre/gotestcover
 TESTIFY_TOOL_REPO?=github.com/elastic/beats/vendor/github.com/stretchr/testify
 LIBCOMPOSE_TOOL_REPO?=github.com/docker/libcompose
+GOBUILD_FLAGS?=-i
 GOIMPORTS=goimports
 GOIMPORTS_REPO?=golang.org/x/tools/cmd/goimports
 GOIMPORTS_LOCAL_PREFIX?=github.com/elastic
@@ -91,7 +92,7 @@ endif
 
 
 ${BEAT_NAME}: $(GOFILES_ALL) ## @build build the beat application
-	go build -i
+	go build $(GOBUILD_FLAGS)
 
 # Create test coverage binary
 ${BEAT_NAME}.test: $(GOFILES_ALL)
