@@ -443,7 +443,7 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
 --------------------------------------------------------------------
 Dependency: github.com/fsnotify/fsevents
-Revision: 3ceee05210c3babaa38cdc9181dabdcc83076a44
+Revision: 690cb784149d5facd7fe613c52757445c43afcde
 License type (autodetected): BSD-3-Clause
 ./vendor/github.com/fsnotify/fsevents/LICENSE:
 --------------------------------------------------------------------
