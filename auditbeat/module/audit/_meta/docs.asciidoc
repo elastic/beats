@@ -1,6 +1,0 @@
-== Audit Module
-
-The `audit` module reports security-relevant information based on data captured
-from the operating system (OS) or services running on the OS. Although this
-feature doesn’t provide additional security to your system, it does make it
-easier for you to discover and track security policy violations.
