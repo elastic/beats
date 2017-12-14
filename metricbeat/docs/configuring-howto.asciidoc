@@ -33,6 +33,7 @@ The following topics describe how to configure Metricbeat:
 * <<configuration-template>>
 * <<configuration-logging>>
 * <<using-environ-vars>>
+* <<configuration-autodiscover>>
 * <<yaml-tips>>
 * <<regexp-support>>
 * <<{beatname_lc}-reference-yml>>
@@ -67,6 +68,8 @@ include::../../libbeat/docs/loggingconfig.asciidoc[]
 :standalone:
 include::../../libbeat/docs/shared-env-vars.asciidoc[]
 
+include::../../libbeat/docs/shared-autodiscover.asciidoc[]
+
 :standalone:
 :allplatforms:
 include::../../libbeat/docs/yaml.asciidoc[]
@@ -74,6 +77,3 @@ include::../../libbeat/docs/yaml.asciidoc[]
 include::../../libbeat/docs/regexp.asciidoc[]
 
 include::../../libbeat/docs/reference-yml.asciidoc[]
-
-
-
