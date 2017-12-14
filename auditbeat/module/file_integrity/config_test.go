@@ -18,6 +18,7 @@ func TestConfig(t *testing.T) {
 		"hash_types":        []string{"md5", "sha256"},
 		"max_file_size":     "1 GiB",
 		"scan_rate_per_sec": "10MiB",
+		"exclude_files":     []string{`\.DS_Store$`, `\.swp$`},
 	})
 	if err != nil {
 		t.Fatal(err)
@@ -31,6 +32,9 @@ func TestConfig(t *testing.T) {
 	assert.Equal(t, []HashType{MD5, SHA256}, c.HashTypes)
 	assert.EqualValues(t, 1024*1024*1024, c.MaxFileSizeBytes)
 	assert.EqualValues(t, 1024*1024*10, c.ScanRateBytesPerSec)
+	assert.Len(t, c.ExcludeMatchers, 2)
+	assert.EqualValues(t, `\.DS_Store(?-m:$)`, c.ExcludeMatchers[0].String())
+	assert.EqualValues(t, `\.swp(?-m:$)`, c.ExcludeMatchers[1].String())
 }
 
 func TestConfigInvalid(t *testing.T) {
@@ -39,6 +43,7 @@ func TestConfigInvalid(t *testing.T) {
 		"hash_types":        []string{"crc32", "sha256", "hmac"},
 		"max_file_size":     "32 Hz",
 		"scan_rate_per_sec": "32mb/sec",
+		"exclude_files":     []string{`unmatched(`},
 	})
 	if err != nil {
 		t.Fatal(err)
@@ -57,7 +62,7 @@ func TestConfigInvalid(t *testing.T) {
 		if !ok {
 			t.Fatal("expected MultiError")
 		}
-		assert.Len(t, merr.Errors, 4)
+		assert.Len(t, merr.Errors, 5)
 		return
 	}
 

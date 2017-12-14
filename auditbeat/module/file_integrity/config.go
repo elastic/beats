@@ -8,6 +8,8 @@ import (
 	"github.com/dustin/go-humanize"
 	"github.com/joeshaw/multierror"
 	"github.com/pkg/errors"
+
+	"github.com/elastic/beats/libbeat/common/match"
 )
 
 // HashType identifies a cryptographic algorithm.
@@ -40,14 +42,16 @@ const (
 // Config contains the configuration parameters for the file integrity
 // metricset.
 type Config struct {
-	Paths               []string   `config:"paths" validate:"required"`
-	HashTypes           []HashType `config:"hash_types"`
-	MaxFileSize         string     `config:"max_file_size"`
-	MaxFileSizeBytes    uint64     `config:",ignore"`
-	ScanAtStart         bool       `config:"scan_at_start"`
-	ScanRatePerSec      string     `config:"scan_rate_per_sec"`
-	ScanRateBytesPerSec uint64     `config:",ignore"`
-	Recursive           bool       `config:"recursive"` // Recursive enables recursive monitoring of directories.
+	Paths               []string        `config:"paths" validate:"required"`
+	HashTypes           []HashType      `config:"hash_types"`
+	MaxFileSize         string          `config:"max_file_size"`
+	MaxFileSizeBytes    uint64          `config:",ignore"`
+	ScanAtStart         bool            `config:"scan_at_start"`
+	ScanRatePerSec      string          `config:"scan_rate_per_sec"`
+	ScanRateBytesPerSec uint64          `config:",ignore"`
+	Recursive           bool            `config:"recursive"` // Recursive enables recursive monitoring of directories.
+	Exclude             []string        `config:"exclude_files"`
+	ExcludeMatchers     []match.Matcher `config:",ignore"`
 }
 
 // Validate validates the config data and return an error explaining all the
@@ -89,6 +93,13 @@ nextHash:
 		errs = append(errs, errors.Wrap(err, "invalid scan_rate_per_sec value"))
 	}
 
+	for _, expr := range c.Exclude {
+		if matcher, err := match.Compile(expr); err == nil {
+			c.ExcludeMatchers = append(c.ExcludeMatchers, matcher)
+		} else {
+			errs = append(errs, errors.Wrap(err, "invalid exclude_files value"))
+		}
+	}
 	return errs.Err()
 }
 

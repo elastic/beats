@@ -167,6 +167,13 @@ func (ms *MetricSet) init(reporter mb.PushReporterV2) bool {
 }
 
 func (ms *MetricSet) reportEvent(reporter mb.PushReporterV2, event *Event) bool {
+	// ignore excluded paths
+	for _, matcher := range ms.config.ExcludeMatchers {
+		if matcher.MatchString(event.Path) {
+			return false
+		}
+	}
+
 	if len(event.errors) > 0 && logp.IsDebug(moduleName) {
 		debugf("Errors on event for %v with action=%v: %v",
 			event.Path, event.Action, event.errors)
