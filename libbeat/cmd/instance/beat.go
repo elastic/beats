@@ -26,6 +26,7 @@ import (
 	"github.com/elastic/beats/libbeat/logp"
 	"github.com/elastic/beats/libbeat/monitoring"
 	"github.com/elastic/beats/libbeat/monitoring/report"
+	"github.com/elastic/beats/libbeat/monitoring/report/log"
 	"github.com/elastic/beats/libbeat/outputs/elasticsearch"
 	"github.com/elastic/beats/libbeat/paths"
 	"github.com/elastic/beats/libbeat/plugin"
@@ -69,9 +70,10 @@ type beatConfig struct {
 	MaxProcs int    `config:"max_procs"`
 
 	// beat internal components configurations
-	HTTP    *common.Config `config:"http"`
-	Path    paths.Path     `config:"path"`
-	Logging logp.Logging   `config:"logging"`
+	HTTP          *common.Config `config:"http"`
+	Path          paths.Path     `config:"path"`
+	Logging       logp.Logging   `config:"logging"`
+	MetricLogging *common.Config `config:"logging.metrics"`
 
 	// output/publishing related configurations
 	Pipeline   pipeline.Config `config:",inline"`
@@ -253,6 +255,14 @@ func (b *Beat) launch(bt beat.Creator) error {
 		defer reporter.Stop()
 	}
 
+	if b.Config.MetricLogging == nil || b.Config.MetricLogging.Enabled() {
+		reporter, err := log.MakeReporter(b.Info, b.Config.MetricLogging)
+		if err != nil {
+			return err
+		}
+		defer reporter.Stop()
+	}
+
 	// If -configtest was specified, exit now prior to run.
 	if cfgfile.IsTestConfig() {
 		cfgwarn.Deprecate("6.0", "-configtest flag has been deprecated, use configtest subcommand")
@@ -275,7 +285,6 @@ func (b *Beat) launch(bt beat.Creator) error {
 
 	logp.Info("%s start running.", b.Info.Beat)
 	defer logp.Info("%s stopped.", b.Info.Beat)
-	defer logp.LogTotalExpvars(&b.Config.Logging)
 
 	if b.Config.HTTP.Enabled() {
 		api.Start(b.Config.HTTP, b.Info)
