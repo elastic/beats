@@ -1,0 +1,18 @@
+Metricbeat supports templates for modules:
+
+["source","yaml",subs="attributes"]
+-------------------------------------------------------------------------------------
+metricbeat.autodiscover:
+  providers:
+    - type: docker
+      templates:
+        - condition:
+            contains:
+              docker.container.image: "redis"
+          config:
+            - module: redis
+              metricsets: ["info", "keyspace"]
+              hosts: "${data.host}:6379"
+-------------------------------------------------------------------------------------
+
+This configuration launches a `redis` module for all containers running an image with `redis` in the name.
