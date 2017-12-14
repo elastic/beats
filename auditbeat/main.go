@@ -5,9 +5,9 @@ import (
 
 	"github.com/elastic/beats/auditbeat/cmd"
 
-	_ "github.com/elastic/beats/auditbeat/module/audit"
-	_ "github.com/elastic/beats/auditbeat/module/audit/file"
-	_ "github.com/elastic/beats/auditbeat/module/audit/kernel"
+	// Register modules.
+	_ "github.com/elastic/beats/auditbeat/module/auditd"
+	_ "github.com/elastic/beats/auditbeat/module/file_integrity"
 )
 
 func main() {

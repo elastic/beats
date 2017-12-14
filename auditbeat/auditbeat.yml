@@ -10,9 +10,8 @@
 #==========================  Modules configuration =============================
 auditbeat.modules:
 
-- module: audit
-  metricsets: [kernel]
-  kernel.audit_rules: |
+- module: auditd
+  audit_rules: |
     ## Define audit rules here.
     ## Create file watches (-w) or syscall audits (-a or -A). Uncomment these
     ## examples or add your own rules.
@@ -38,9 +37,8 @@ auditbeat.modules:
     #-a always,exit -F arch=b64 -S open,creat,truncate,ftruncate,openat,open_by_handle_at -F exit=-EACCES -k access
     #-a always,exit -F arch=b64 -S open,creat,truncate,ftruncate,openat,open_by_handle_at -F exit=-EPERM -k access
 
-- module: audit
-  metricsets: [file]
-  file.paths:
+- module: file_integrity
+  paths:
   - /bin
   - /usr/bin
   - /sbin
