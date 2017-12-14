@@ -459,7 +459,7 @@ package-setup:
 
 .PHONY: package
 package: ## @packaging Create binary packages for the beat.
-package: package-setup
+package: update package-setup
 
 	echo "Start building packages for ${BEAT_NAME}"
 
