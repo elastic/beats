@@ -1,4 +1,4 @@
-=== Auditd Module
+== Auditd Module
 
 The `auditd` module receives audit events from the Linux Audit Framework that
 is a part of the Linux kernel.

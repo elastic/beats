@@ -1,4 +1,4 @@
-=== File Integrity Module
+== File Integrity Module
 
 The `file_integrity` module sends events when a file is changed (created,
 updated, or deleted) on disk. The events contain file metadata and hashes.

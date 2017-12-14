@@ -3,7 +3,7 @@ This file is generated! See scripts/docs_collector.py
 ////
 
 [id="{beatname_lc}-module-auditd"]
-=== Auditd Module
+== Auditd Module
 
 The `auditd` module receives audit events from the Linux Audit Framework that
 is a part of the Linux kernel.
