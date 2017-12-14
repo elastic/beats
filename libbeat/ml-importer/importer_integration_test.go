@@ -43,8 +43,6 @@ const sampleJob = `
 const sampleDatafeed = `
 {
     "job_id": "PLACEHOLDER",
-    "query_delay": "60s",
-    "frequency": "60s",
     "indexes": [
       "filebeat-*"
     ],
@@ -167,7 +165,7 @@ func TestImportJobs(t *testing.T) {
 		if datafeed.DatafeedId == "datafeed-test-ml-config" {
 			found = true
 			assert.Equal(t, datafeed.JobId, "test-ml-config")
-			assert.Equal(t, datafeed.QueryDelay, "60s")
+			assert.Equal(t, datafeed.QueryDelay, "87034ms")
 		}
 	}
 	assert.True(t, found)
