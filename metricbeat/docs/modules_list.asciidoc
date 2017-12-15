@@ -58,7 +58,7 @@ This file is generated! See scripts/docs_collector.py
 |<<metricbeat-module-kibana,Kibana>>  beta[]   |    
 .1+|   |<<metricbeat-metricset-kibana-status,status>> beta[]  
 |<<metricbeat-module-kubernetes,Kubernetes>>  beta[]   |    
-.11+|   |<<metricbeat-metricset-kubernetes-container,container>> beta[]  
+.12+|   |<<metricbeat-metricset-kubernetes-container,container>> beta[]  
 |<<metricbeat-metricset-kubernetes-event,event>> experimental[]  
 |<<metricbeat-metricset-kubernetes-node,node>> beta[]  
 |<<metricbeat-metricset-kubernetes-pod,pod>> beta[]  
@@ -67,6 +67,7 @@ This file is generated! See scripts/docs_collector.py
 |<<metricbeat-metricset-kubernetes-state_node,state_node>> beta[]  
 |<<metricbeat-metricset-kubernetes-state_pod,state_pod>> beta[]  
 |<<metricbeat-metricset-kubernetes-state_replicaset,state_replicaset>> beta[]  
+|<<metricbeat-metricset-kubernetes-state_statefulset,state_statefulset>> beta[]  
 |<<metricbeat-metricset-kubernetes-system,system>> beta[]  
 |<<metricbeat-metricset-kubernetes-volume,volume>> beta[]  
 |<<metricbeat-module-logstash,Logstash>>  experimental[]   |    
