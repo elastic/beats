@@ -109,6 +109,16 @@ func deduplicate(in []string) []string {
 	return out
 }
 
+// IsExcludedPath checks if a path matches the exclude_files regular expressions.
+func (c *Config) IsExcludedPath(path string) bool {
+	for _, matcher := range c.ExcludeFiles {
+		if matcher.MatchString(path) {
+			return true
+		}
+	}
+	return false
+}
+
 var defaultConfig = Config{
 	HashTypes:        []HashType{SHA1},
 	MaxFileSize:      "100 MiB",

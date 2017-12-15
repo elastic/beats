@@ -148,14 +148,13 @@ func TestExcludedFiles(t *testing.T) {
 		}
 	}
 
-	if !assert.Len(t, events, 3) {
-		return
-	}
-
 	wanted := map[string]bool{
 		dir: true,
 		filepath.Join(dir, "FILE.TXT"):   true,
 		filepath.Join(dir, ".gitignore"): true,
+	}
+	if !assert.Len(t, events, len(wanted)) {
+		return
 	}
 	for _, e := range events {
 		event := e.MetricSetFields

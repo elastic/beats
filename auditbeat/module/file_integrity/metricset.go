@@ -167,13 +167,6 @@ func (ms *MetricSet) init(reporter mb.PushReporterV2) bool {
 }
 
 func (ms *MetricSet) reportEvent(reporter mb.PushReporterV2, event *Event) bool {
-	// ignore excluded paths
-	for _, matcher := range ms.config.ExcludeFiles {
-		if matcher.MatchString(event.Path) {
-			return false
-		}
-	}
-
 	if len(event.errors) > 0 && logp.IsDebug(moduleName) {
 		debugf("Errors on event for %v with action=%v: %v",
 			event.Path, event.Action, event.errors)
@@ -230,8 +223,8 @@ func (ms *MetricSet) purgeDeleted(reporter mb.PushReporterV2) {
 
 		for _, e := range deleted {
 			// Don't persist!
-			if !reporter.Event(buildMetricbeatEvent(e, true)) {
-				return
+			if !ms.config.IsExcludedPath(e.Path) {
+				reporter.Event(buildMetricbeatEvent(e, true))
 			}
 		}
 	}
