@@ -50,11 +50,11 @@ To specify the same settings at the command line, you use:
 
 ["source","sh",subs="attributes"]
 -----
-./{beatname_lc} -M "nginx.access.var.paths=[/path/to/log/nginx/access.log*]" -M "nginx.error.var.paths=[/path/to/log/nginx/error.log*]"
+./{beatname_lc} --modules {modulename} -M "nginx.access.var.paths=[/path/to/log/nginx/access.log*]" -M "nginx.error.var.paths=[/path/to/log/nginx/error.log*]"
 -----
 
 
-The command in the example assumes that you have already enabled the +{modulename}+ module. 
+ 
 
 //set the fileset name used in the included example
 :fileset_ex: access

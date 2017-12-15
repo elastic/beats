@@ -49,11 +49,11 @@ To specify the same settings at the command line, you use:
 
 ["source","sh",subs="attributes"]
 -----
-./{beatname_lc} -M "icinga.main.var.paths=[/path/to/log/icinga2/icinga2.log*]" -M "icinga.debug.var.paths=[/path/to/log/icinga2/debug.log*]" -M "icinga.startup.var.paths=[/path/to/log/icinga2/startup.log]"
+./{beatname_lc} --modules {modulename} -M "icinga.main.var.paths=[/path/to/log/icinga2/icinga2.log*]" -M "icinga.debug.var.paths=[/path/to/log/icinga2/debug.log*]" -M "icinga.startup.var.paths=[/path/to/log/icinga2/startup.log]"
 -----
 
 
-The command in the example assumes that you have already enabled the +{modulename}+ module. 
+ 
 
 //set the fileset name used in the included example
 :fileset_ex: main
