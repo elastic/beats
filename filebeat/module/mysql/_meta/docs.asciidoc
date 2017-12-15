@@ -46,10 +46,10 @@ To specify the same settings at the command line, you use:
 
 ["source","sh",subs="attributes"]
 -----
-./{beatname_lc} -M "mysql.error.var.paths=[/path/to/log/mysql/error.log*]" -M "mysql.slowlog.var.paths=[/path/to/log/mysql/mysql-slow.log*]"
+./{beatname_lc} --modules {modulename} -M "mysql.error.var.paths=[/path/to/log/mysql/error.log*]" -M "mysql.slowlog.var.paths=[/path/to/log/mysql/mysql-slow.log*]"
 -----
 
-The command in the example assumes that you have already enabled the +{modulename}+ module. 
+ 
 
 //set the fileset name used in the included example
 :fileset_ex: error
