@@ -17,9 +17,6 @@ var (
 	verbose           *bool
 	toStderr          *bool
 	debugSelectorsStr *string
-
-	// Beat start time
-	startTime time.Time
 )
 
 type Logging struct {
@@ -29,17 +26,7 @@ type Logging struct {
 	ToFiles   *bool `config:"to_files"`
 	JSON      bool  `config:"json"`
 	Level     string
-	Metrics   LoggingMetricsConfig `config:"metrics"`
 }
-
-type LoggingMetricsConfig struct {
-	Enabled *bool          `config:"enabled"`
-	Period  *time.Duration `config:"period" validate:"nonzero,min=0s"`
-}
-
-var (
-	defaultMetricsPeriod = 30 * time.Second
-)
 
 func init() {
 	// Adds logging specific flags: -v, -e and -d.
@@ -125,8 +112,6 @@ func Init(name string, start time.Time, config *Logging) error {
 		toFiles = false
 	}
 
-	startTime = start
-
 	LogInit(Priority(logLevel), "", toSyslog, true, debugSelectors)
 	if len(debugSelectors) > 0 {
 		config.Selectors = debugSelectors
@@ -162,8 +147,6 @@ func Init(name string, start time.Time, config *Logging) error {
 
 	// Disable stderr logging if requested by cmdline flag
 	SetStderr()
-
-	go logMetrics(&config.Metrics)
 
 	return nil
 }
