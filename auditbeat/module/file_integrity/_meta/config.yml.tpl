@@ -24,8 +24,26 @@
   - /sbin
   - /usr/sbin
   - /etc
-  {{ end -}}
-  {{ if .reference }}
+  {{- end }}
+{{ if .reference }}
+  # List of regular expressions to filter out notifications for unwanted files.
+  # Wrap in single quotes to workaround YAML escaping rules. By default no files
+  # are ignored.
+  {{ if eq .goos "darwin" -}}
+  exclude_files:
+  - '\.DS_Store$'
+  - '\.swp$'
+  {{ else if eq .goos "windows" -}}
+  exclude_files:
+  - '(?i)\.lnk$'
+  - '(?i)\.swp$'
+  {{ else -}}
+  exclude_files:
+  - '(?i)\.sw[nop]$'
+  - '~$'
+  - '/\.git($|/)'
+  {{- end }}
+
   # Scan over the configured file paths at startup and send events for new or
   # modified files since the last time Auditbeat was running.
   scan_at_start: true
