@@ -61,8 +61,6 @@ To specify the same settings at the command line, you use:
 -----
 
 
-
-
 //set the fileset name used in the included example
 :fileset_ex: log
 
