@@ -217,29 +217,34 @@ func NewPushMetricSetV2(t testing.TB, config interface{}) mb.PushMetricSetV2 {
 	return pushMetricSet
 }
 
-type capturingReporterV2 struct {
-	events []mb.Event
-	done   chan struct{}
+// CapturingReporterV2 stores all the events and errors from a metricset's
+// Run method.
+type CapturingReporterV2 struct {
+	Events []mb.Event
+	DoneC  chan struct{}
 }
 
-func (r *capturingReporterV2) Event(event mb.Event) bool {
-	r.events = append(r.events, event)
+// Event stores the passed-in event into the events array
+func (r *CapturingReporterV2) Event(event mb.Event) bool {
+	r.Events = append(r.Events, event)
 	return true
 }
 
-func (r *capturingReporterV2) Error(err error) bool {
-	r.events = append(r.events, mb.Event{Error: err})
+// Error stores the given error into the errors array.
+func (r *CapturingReporterV2) Error(err error) bool {
+	r.Events = append(r.Events, mb.Event{Error: err})
 	return true
 }
 
-func (r *capturingReporterV2) Done() <-chan struct{} {
-	return r.done
+// Done returns the Done channel for this reporter.
+func (r *CapturingReporterV2) Done() <-chan struct{} {
+	return r.DoneC
 }
 
 // RunPushMetricSetV2 run the given push metricset for the specific amount of
 // time and returns all of the events and errors that occur during that period.
 func RunPushMetricSetV2(duration time.Duration, metricSet mb.PushMetricSetV2) []mb.Event {
-	r := &capturingReporterV2{done: make(chan struct{})}
+	r := &CapturingReporterV2{DoneC: make(chan struct{})}
 
 	// Run the metricset.
 	var wg sync.WaitGroup
@@ -251,12 +256,12 @@ func RunPushMetricSetV2(duration time.Duration, metricSet mb.PushMetricSetV2) []
 
 	// Let it run for some period, then stop it by closing the done channel.
 	time.AfterFunc(duration, func() {
-		close(r.done)
+		close(r.DoneC)
 	})
 
 	// Wait for the PushMetricSet to completely stop.
 	wg.Wait()
 
 	// Return all events and errors that were collected.
-	return r.events
+	return r.Events
 }
