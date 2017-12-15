@@ -31,7 +31,7 @@ func TestData(t *testing.T) {
 	}()
 
 	ms := mbtest.NewPushMetricSetV2(t, getConfig(dir))
-	events := mbtest.RunPushMetricSetV2(time.Second, ms)
+	events := mbtest.RunPushMetricSetV2(10*time.Second, 1, ms)
 	for _, e := range events {
 		if e.Error != nil {
 			t.Fatalf("received error: %+v", e.Error)
@@ -72,7 +72,7 @@ func TestDetectDeletedFiles(t *testing.T) {
 	}
 
 	ms := mbtest.NewPushMetricSetV2(t, getConfig(dir))
-	events := mbtest.RunPushMetricSetV2(time.Second, ms)
+	events := mbtest.RunPushMetricSetV2(10*time.Second, 2, ms)
 	for _, e := range events {
 		if e.Error != nil {
 			t.Fatalf("received error: %+v", e.Error)
@@ -126,22 +126,15 @@ func TestExcludedFiles(t *testing.T) {
 	}
 
 	ms := mbtest.NewPushMetricSetV2(t, getConfig(dir))
-	capture := &mbtest.CapturingReporterV2{DoneC: make(chan struct{})}
 
 	go func() {
 		for _, f := range []string{"FILE.TXT", "FILE.TXT.SWP", "file.txt.swo", ".git/HEAD", ".gitignore"} {
 			file := filepath.Join(dir, f)
 			ioutil.WriteFile(file, []byte("hello world"), 0600)
 		}
-		for i := 0; i < 100 && len(capture.Events) < 3; i++ {
-			time.Sleep(time.Millisecond * 100)
-		}
-		close(capture.DoneC)
 	}()
 
-	ms.Run(capture)
-
-	events := capture.Events
+	events := mbtest.RunPushMetricSetV2(10*time.Second, 3, ms)
 	for _, e := range events {
 		if e.Error != nil {
 			t.Fatalf("received error: %+v", e.Error)
