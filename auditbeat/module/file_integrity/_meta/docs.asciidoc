@@ -63,8 +63,9 @@ Linux.
 *`paths`*:: A list of paths (directories or files) to watch. Globs are
 not supported. The specified paths should exist when the metricset is started.
 
-*`exclude_files`:: A list of regular expressions used to filter out events
-for unwanted files. By default, no files are excluded. See <<regexp-support>>
+*`exclude_files`*:: A list of regular expressions used to filter out events
+for unwanted files. The expressions are matched against the full path of every
+file and directory. By default, no files are excluded. See <<regexp-support>>
 for a list of supported regexp patterns. It is recommended to wrap regular
 expressions in single quotation marks to avoid issues with YAML escaping
 rules.
