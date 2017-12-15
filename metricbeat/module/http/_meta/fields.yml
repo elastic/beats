@@ -3,6 +3,7 @@
   description: >
     HTTP module
   release: beta
+  settings: ["ssl"]
   fields:
     - name: http
       type: group
