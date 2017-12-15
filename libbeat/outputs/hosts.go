@@ -33,3 +33,17 @@ func ReadHostList(cfg *common.Config) ([]string, error) {
 
 	return hosts, nil
 }
+
+// OriginalHostList returns the list  of hosts to connect to as specified by
+func OriginalHostList(cfg *common.Config) ([]string, error) {
+	config := struct {
+		Hosts []string `config:"hosts"  validate:"required"`
+	}{}
+
+	err := cfg.Unpack(&config)
+	if err != nil {
+		return nil, err
+	}
+
+	return config.Hosts, nil
+}

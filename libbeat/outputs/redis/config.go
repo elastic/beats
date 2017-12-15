@@ -12,7 +12,7 @@ import (
 )
 
 type redisConfig struct {
-	Password    string                `config:"password"`
+	Password    []string              `config:"password"`
 	Index       string                `config:"index"`
 	Key         string                `config:"key"`
 	Port        int                   `config:"port"`

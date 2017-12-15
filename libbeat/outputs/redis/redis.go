@@ -92,6 +92,23 @@ func makeRedis(
 		Stats:   observer,
 	}
 
+	//Get the original list of hosts
+	rpwd := config.Password
+	rhosts, err := outputs.OriginalHostList(cfg)
+	if err != nil {
+		return outputs.Fail(err)
+	}
+	// making sure that we've same number of hosts and passwords
+	// if no password or default password is specified
+	if len(rpwd) > 1 && (len(rpwd) != len(rhosts)) {
+		return outputs.Fail(errors.New("Hosts and passwords should be equal"))
+	}
+	// passords of hosts
+	pwdhosts := make(map[string]string)
+	for p, password := range rpwd {
+		pwdhosts[rhosts[p]] = password
+	}
+
 	clients := make([]outputs.NetworkClient, len(hosts))
 	for i, host := range hosts {
 		enc, err := codec.CreateEncoder(beat, config.Codec)
@@ -105,8 +122,24 @@ func makeRedis(
 		}
 
 		clients[i] = newClient(conn, observer, config.Timeout,
-			config.Password, config.Db, key, dataType, config.Index, enc)
+			getRedisPWD(pwdhosts, host), config.Db, key, dataType, config.Index, enc)
 	}
 
 	return outputs.SuccessNet(config.LoadBalance, config.BulkMaxSize, config.MaxRetries, clients)
+}
+
+func getRedisPWD(rpwd map[string]string, host string) string {
+	// No password
+	if len(rpwd) == 0 {
+		return ""
+	}
+	//default password
+	if len(rpwd) == 1 {
+		for _, v := range rpwd {
+			return v
+		}
+	}
+	// password of host
+	return rpwd[host]
+
 }
