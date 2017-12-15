@@ -3,6 +3,7 @@ package file_integrity
 import (
 	"os"
 	"path/filepath"
+	"regexp/syntax"
 	"testing"
 
 	"github.com/joeshaw/multierror"
@@ -32,9 +33,9 @@ func TestConfig(t *testing.T) {
 	assert.Equal(t, []HashType{MD5, SHA256}, c.HashTypes)
 	assert.EqualValues(t, 1024*1024*1024, c.MaxFileSizeBytes)
 	assert.EqualValues(t, 1024*1024*10, c.ScanRateBytesPerSec)
-	assert.Len(t, c.ExcludeMatchers, 2)
-	assert.EqualValues(t, `\.DS_Store(?-m:$)`, c.ExcludeMatchers[0].String())
-	assert.EqualValues(t, `\.swp(?-m:$)`, c.ExcludeMatchers[1].String())
+	assert.Len(t, c.ExcludeFiles, 2)
+	assert.EqualValues(t, `\.DS_Store(?-m:$)`, c.ExcludeFiles[0].String())
+	assert.EqualValues(t, `\.swp(?-m:$)`, c.ExcludeFiles[1].String())
 }
 
 func TestConfigInvalid(t *testing.T) {
@@ -43,30 +44,54 @@ func TestConfigInvalid(t *testing.T) {
 		"hash_types":        []string{"crc32", "sha256", "hmac"},
 		"max_file_size":     "32 Hz",
 		"scan_rate_per_sec": "32mb/sec",
-		"exclude_files":     []string{`unmatched(`},
 	})
 	if err != nil {
 		t.Fatal(err)
 	}
 
 	c := defaultConfig
-	if err := config.Unpack(&c); err != nil {
-		t.Log(err)
-
-		ucfgErr, ok := err.(ucfg.Error)
-		if !ok {
-			t.Fatal("expected ucfg.Error")
-		}
-
-		merr, ok := ucfgErr.Reason().(*multierror.MultiError)
-		if !ok {
-			t.Fatal("expected MultiError")
-		}
-		assert.Len(t, merr.Errors, 5)
-		return
+	err = config.Unpack(&c)
+	if err == nil {
+		t.Fatal("expected error")
 	}
 
-	t.Fatal("expected error")
+	t.Log(err)
+
+	ucfgErr, ok := err.(ucfg.Error)
+	if !ok {
+		t.Fatal("expected ucfg.Error")
+	}
+
+	merr, ok := ucfgErr.Reason().(*multierror.MultiError)
+	if !ok {
+		t.Fatal("expected MultiError")
+	}
+	assert.Len(t, merr.Errors, 4)
+
+	config, err = common.NewConfigFrom(map[string]interface{}{
+		"paths":         []string{"/usr/bin"},
+		"hash_types":    []string{"crc32", "sha256", "hmac"},
+		"exclude_files": "unmatched)",
+	})
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	c = defaultConfig
+	err = config.Unpack(&c)
+	if err == nil {
+		t.Fatal("expected error")
+	}
+
+	t.Log(err)
+
+	ucfgErr, ok = err.(ucfg.Error)
+	if !ok {
+		t.Fatal("expected ucfg.Error")
+	}
+
+	_, ok = ucfgErr.Reason().(*syntax.Error)
+	assert.True(t, ok)
 }
 
 func TestConfigInvalidMaxFileSize(t *testing.T) {

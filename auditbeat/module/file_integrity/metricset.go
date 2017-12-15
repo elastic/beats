@@ -168,7 +168,7 @@ func (ms *MetricSet) init(reporter mb.PushReporterV2) bool {
 
 func (ms *MetricSet) reportEvent(reporter mb.PushReporterV2, event *Event) bool {
 	// ignore excluded paths
-	for _, matcher := range ms.config.ExcludeMatchers {
+	for _, matcher := range ms.config.ExcludeFiles {
 		if matcher.MatchString(event.Path) {
 			return false
 		}

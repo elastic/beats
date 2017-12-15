@@ -50,8 +50,7 @@ type Config struct {
 	ScanRatePerSec      string          `config:"scan_rate_per_sec"`
 	ScanRateBytesPerSec uint64          `config:",ignore"`
 	Recursive           bool            `config:"recursive"` // Recursive enables recursive monitoring of directories.
-	Exclude             []string        `config:"exclude_files"`
-	ExcludeMatchers     []match.Matcher `config:",ignore"`
+	ExcludeFiles        []match.Matcher `config:"exclude_files"`
 }
 
 // Validate validates the config data and return an error explaining all the
@@ -91,14 +90,6 @@ nextHash:
 	c.ScanRateBytesPerSec, err = humanize.ParseBytes(c.ScanRatePerSec)
 	if err != nil {
 		errs = append(errs, errors.Wrap(err, "invalid scan_rate_per_sec value"))
-	}
-
-	for _, expr := range c.Exclude {
-		if matcher, err := match.Compile(expr); err == nil {
-			c.ExcludeMatchers = append(c.ExcludeMatchers, matcher)
-		} else {
-			errs = append(errs, errors.Wrap(err, "invalid exclude_files value"))
-		}
 	}
 	return errs.Err()
 }
