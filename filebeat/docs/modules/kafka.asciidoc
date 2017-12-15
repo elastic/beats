@@ -69,10 +69,10 @@ include::../include/config-option-intro.asciidoc[]
 // REVIEWERS: I've added a description because this variable appears in the
 // kafka.yml file. However, I don't understand how it works.
 
-*`var.kafka_home`*::
+//*`var.kafka_home`*::
 
-The home path for Kafka. If this variable is not set,  {beatname_uc} looks under
-`/opt`.
+//The home path for Kafka. If this variable is not set,  {beatname_uc} looks under
+//`/opt`.
 
 include::../include/var-paths.asciidoc[]
 
