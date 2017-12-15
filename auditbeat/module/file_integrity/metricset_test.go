@@ -105,6 +105,68 @@ func TestDetectDeletedFiles(t *testing.T) {
 	}
 }
 
+func TestExcludedFiles(t *testing.T) {
+	defer setup(t)()
+
+	bucket, err := datastore.OpenBucket(bucketName)
+	if err != nil {
+		t.Fatal(err)
+	}
+	defer bucket.Close()
+
+	dir, err := ioutil.TempDir("", "audit-file")
+	if err != nil {
+		t.Fatal(err)
+	}
+	defer os.RemoveAll(dir)
+
+	dir, err = filepath.EvalSymlinks(dir)
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	ms := mbtest.NewPushMetricSetV2(t, getConfig(dir))
+	capture := &mbtest.CapturingReporterV2{DoneC: make(chan struct{})}
+
+	go func() {
+		for _, f := range []string{"FILE.TXT", "FILE.TXT.SWP", "file.txt.swo", ".git/HEAD", ".gitignore"} {
+			file := filepath.Join(dir, f)
+			ioutil.WriteFile(file, []byte("hello world"), 0600)
+		}
+		for i := 0; i < 100 && len(capture.Events) < 3; i++ {
+			time.Sleep(time.Millisecond * 100)
+		}
+		close(capture.DoneC)
+	}()
+
+	ms.Run(capture)
+
+	events := capture.Events
+	for _, e := range events {
+		if e.Error != nil {
+			t.Fatalf("received error: %+v", e.Error)
+		}
+	}
+
+	if !assert.Len(t, events, 3) {
+		return
+	}
+
+	wanted := map[string]bool{
+		dir: true,
+		filepath.Join(dir, "FILE.TXT"):   true,
+		filepath.Join(dir, ".gitignore"): true,
+	}
+	for _, e := range events {
+		event := e.MetricSetFields
+		path, err := event.GetValue("path")
+		if assert.NoError(t, err) {
+			_, ok := wanted[path.(string)]
+			assert.True(t, ok)
+		}
+	}
+}
+
 func setup(t testing.TB) func() {
 	// path.data should be set so that the DB is written to a predictable location.
 	var err error
@@ -117,7 +179,8 @@ func setup(t testing.TB) func() {
 
 func getConfig(path string) map[string]interface{} {
 	return map[string]interface{}{
-		"module": "file_integrity",
-		"paths":  []string{path},
+		"module":        "file_integrity",
+		"paths":         []string{path},
+		"exclude_files": []string{`(?i)\.sw[nop]$`, `[/\\]\.git([/\\]|$)`},
 	}
 }
