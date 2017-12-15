@@ -54,11 +54,11 @@ To specify the same settings at the command line, you use:
 
 ["source","sh",subs="attributes"]
 -----
-./{beatname_lc} -M "logstash.log.var.paths=[/path/to/log/logstash/logstash-server.log*]" -M "logstash.slowlog.var.paths=[/path/to/log/logstash/logstash-slowlog.log*]"
+./{beatname_lc} --modules {modulename} -M "logstash.log.var.paths=[/path/to/log/logstash/logstash-server.log*]" -M "logstash.slowlog.var.paths=[/path/to/log/logstash/logstash-slowlog.log*]"
 -----
 
 
-The command in the example assumes that you have already enabled the +{modulename}+ module.
+
 
 //set the fileset name used in the included example
 :fileset_ex: log
