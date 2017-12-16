@@ -3,15 +3,15 @@ package fileout
 import (
 	"fmt"
 
-	"github.com/elastic/beats/libbeat/logp"
+	"github.com/elastic/beats/libbeat/common/file"
 	"github.com/elastic/beats/libbeat/outputs/codec"
 )
 
 type config struct {
 	Path          string       `config:"path"`
 	Filename      string       `config:"filename"`
-	RotateEveryKb int          `config:"rotate_every_kb" validate:"min=1"`
-	NumberOfFiles int          `config:"number_of_files"`
+	RotateEveryKb uint         `config:"rotate_every_kb" validate:"min=1"`
+	NumberOfFiles uint         `config:"number_of_files"`
 	Codec         codec.Config `config:"codec"`
 	Permissions   uint32       `config:"permissions"`
 }
@@ -25,9 +25,9 @@ var (
 )
 
 func (c *config) Validate() error {
-	if c.NumberOfFiles < 2 || c.NumberOfFiles > logp.RotatorMaxFiles {
+	if c.NumberOfFiles < 2 || c.NumberOfFiles > file.MaxBackupsLimit {
 		return fmt.Errorf("The number_of_files to keep should be between 2 and %v",
-			logp.RotatorMaxFiles)
+			file.MaxBackupsLimit)
 	}
 
 	return nil

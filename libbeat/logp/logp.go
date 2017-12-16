@@ -6,10 +6,18 @@ import (
 	"io/ioutil"
 	"log"
 	"os"
+	"path/filepath"
 	"strings"
 	"time"
 
+	"github.com/elastic/beats/libbeat/common/file"
 	"github.com/elastic/beats/libbeat/paths"
+)
+
+const (
+	defaultKeepFiles               = 7
+	defaultRotateEveryBytes uint64 = 10 * 1024 * 1024
+	defaultPermissions      uint32 = 0600
 )
 
 var (
@@ -21,11 +29,20 @@ var (
 
 type Logging struct {
 	Selectors []string
-	Files     *FileRotator
+	Files     *FileConfig
 	ToSyslog  *bool `config:"to_syslog"`
 	ToFiles   *bool `config:"to_files"`
 	JSON      bool  `config:"json"`
 	Level     string
+}
+
+// FileConfig defines the logging.files config options.
+type FileConfig struct {
+	Path             string  `config:"path"`
+	Name             string  `config:"name"`
+	RotateEveryBytes *uint64 `config:"rotateeverybytes"`
+	KeepFiles        *int    `config:"keepfiles"`
+	Permissions      *uint32 `config:"permissions"`
 }
 
 func init() {
@@ -118,25 +135,43 @@ func Init(name string, start time.Time, config *Logging) error {
 	}
 
 	if toFiles {
-		if config.Files == nil {
-			config.Files = &FileRotator{
-				Path: defaultFilePath,
-				Name: name,
-			}
-		} else {
-			if config.Files.Path == "" {
-				config.Files.Path = defaultFilePath
-			}
+		var (
+			path        = defaultFilePath
+			filename    = name
+			maxSize     = defaultRotateEveryBytes
+			keepFiles   = defaultKeepFiles
+			permissions = defaultPermissions
+		)
 
-			if config.Files.Name == "" {
-				config.Files.Name = name
+		if config.Files != nil {
+			if config.Files.Path != "" {
+				path = defaultFilePath
+			}
+			if config.Files.Name != "" {
+				filename = name
+			}
+			if config.Files.RotateEveryBytes != nil {
+				maxSize = *config.Files.RotateEveryBytes
+			}
+			if config.Files.KeepFiles != nil {
+				keepFiles = *config.Files.KeepFiles
+			}
+			if config.Files.Permissions != nil {
+				permissions = *config.Files.Permissions
 			}
 		}
 
-		err := SetToFile(true, config.Files)
+		_log.rotator, err = file.NewFileRotator(
+			filepath.Join(path, filename),
+			file.MaxSizeBytes(uint(maxSize)),
+			file.MaxBackups(uint(keepFiles)),
+			file.Permissions(os.FileMode(permissions)),
+		)
 		if err != nil {
 			return err
 		}
+
+		_log.toFile = true
 	}
 
 	if IsDebug("stdlog") {
