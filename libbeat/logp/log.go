@@ -3,11 +3,14 @@ package logp
 import (
 	"encoding/json"
 	"fmt"
+	"io"
 	"log"
 	"os"
 	"runtime/debug"
 	"strings"
 	"time"
+
+	"github.com/elastic/beats/libbeat/common/file"
 )
 
 type Priority int
@@ -36,7 +39,7 @@ type logger struct {
 
 	logger  *log.Logger
 	syslog  [LOG_DEBUG + 1]*log.Logger
-	rotator *FileRotator
+	rotator *file.Rotator
 }
 
 // pre-init logger to debug mode + stderr before init
@@ -111,14 +114,12 @@ func send(calldepth int, level Priority, prefix string, format string, v ...inte
 		}
 	}
 	if _log.toFile {
-		if _log.JSON {
-			_log.rotator.WriteLine(bytes)
-		} else {
+		if !_log.JSON {
 			// Makes sure all prefixes have the same length
 			prefix = prefix + strings.Repeat(" ", 4-len(prefix))
 			bytes = []byte(fmt.Sprintf("%s %s %s", timestamp, prefix, message))
-			_log.rotator.WriteLine(bytes)
 		}
+		writeLine(_log.rotator, bytes)
 	}
 }
 
@@ -199,22 +200,10 @@ func SetToSyslog(toSyslog bool, prefix string) {
 	}
 }
 
-func SetToFile(toFile bool, rotator *FileRotator) error {
-	if toFile {
-		err := rotator.CreateDirectory()
-		if err != nil {
-			return err
-		}
-		err = rotator.CheckIfConfigSane()
-		if err != nil {
-			return err
-		}
-
-		// Only assign rotator on no errors
-		_log.rotator = rotator
+func writeLine(w io.Writer, p []byte) (n int, err error) {
+	if len(p) > 0 && p[len(p)-1] == '\n' {
+		return w.Write(p)
 	}
 
-	_log.toFile = toFile
-
-	return nil
+	return w.Write(append(p, '\n'))
 }
