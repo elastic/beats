@@ -68,9 +68,7 @@ func TestTimezoneFormat(t *testing.T) {
 }
 
 func getActualValue(t *testing.T, config *common.Config, input common.MapStr) common.MapStr {
-	if testing.Verbose() {
-		logp.LogInit(logp.LOG_DEBUG, "", false, true, []string{"*"})
-	}
+	logp.TestingSetup()
 
 	p, err := newAddLocale(config)
 	if err != nil {

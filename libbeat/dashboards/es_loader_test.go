@@ -14,9 +14,7 @@ import (
 )
 
 func TestImporter(t *testing.T) {
-	if testing.Verbose() {
-		logp.LogInit(logp.LOG_DEBUG, "", false, true, []string{"*"})
-	}
+	logp.TestingSetup()
 
 	dashboardsConfig := Config{
 		KibanaIndex: ".kibana-test",
@@ -52,9 +50,7 @@ func TestImporter(t *testing.T) {
 }
 
 func TestImporterEmptyBeat(t *testing.T) {
-	if testing.Verbose() {
-		logp.LogInit(logp.LOG_DEBUG, "", false, true, []string{"*"})
-	}
+	logp.TestingSetup()
 
 	dashboardsConfig := Config{
 		KibanaIndex: ".kibana-test-nobeat",

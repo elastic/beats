@@ -59,9 +59,7 @@ func expectTransaction(t *testing.T, e *eventStore) common.MapStr {
 
 // Test simple request / response.
 func TestSimpleFindLimit1(t *testing.T) {
-	if testing.Verbose() {
-		logp.LogInit(logp.LOG_DEBUG, "", false, true, []string{"mongodb", "mongodbdetailed"})
-	}
+	logp.TestingSetup(logp.WithSelectors("mongodb", "mongodbdetailed"))
 
 	results, mongodb := mongodbModForTests()
 
@@ -128,9 +126,7 @@ func TestSimpleFindLimit1(t *testing.T) {
 // Test simple request / response, where the response is split in
 // 3 messages
 func TestSimpleFindLimit1_split(t *testing.T) {
-	if testing.Verbose() {
-		logp.LogInit(logp.LOG_DEBUG, "", false, true, []string{"mongodb", "mongodbdetailed"})
-	}
+	logp.TestingSetup(logp.WithSelectors("mongodb", "mongodbdetailed"))
 
 	results, mongodb := mongodbModForTests()
 	mongodb.sendRequest = true
@@ -262,9 +258,7 @@ func TestReconstructQuery(t *testing.T) {
 
 // max_docs option should be respected
 func TestMaxDocs(t *testing.T) {
-	if testing.Verbose() {
-		logp.LogInit(logp.LOG_DEBUG, "", false, true, []string{"mongodb", "mongodbdetailed"})
-	}
+	logp.TestingSetup(logp.WithSelectors("mongodb", "mongodbdetailed"))
 
 	// more docs than configured
 	trans := transaction{
@@ -318,9 +312,7 @@ func TestMaxDocs(t *testing.T) {
 }
 
 func TestMaxDocSize(t *testing.T) {
-	if testing.Verbose() {
-		logp.LogInit(logp.LOG_DEBUG, "", false, true, []string{"mongodb", "mongodbdetailed"})
-	}
+	logp.TestingSetup(logp.WithSelectors("mongodb", "mongodbdetailed"))
 
 	// more docs than configured
 	trans := transaction{

@@ -16,9 +16,7 @@ import (
 )
 
 func TestIndex(t *testing.T) {
-	if testing.Verbose() {
-		logp.LogInit(logp.LOG_DEBUG, "", false, true, []string{"elasticsearch"})
-	}
+	logp.TestingSetup(logp.WithSelectors("elasticsearch"))
 
 	index := fmt.Sprintf("beats-test-index-%d", os.Getpid())
 
@@ -73,9 +71,7 @@ func TestIndex(t *testing.T) {
 func TestIngest(t *testing.T) {
 	type obj map[string]interface{}
 
-	if testing.Verbose() {
-		logp.LogInit(logp.LOG_DEBUG, "", false, true, []string{"elasticsearch"})
-	}
+	logp.TestingSetup(logp.WithSelectors("elasticsearch"))
 
 	index := fmt.Sprintf("beats-test-ingest-%d", os.Getpid())
 	pipeline := fmt.Sprintf("beats-test-pipeline-%d", os.Getpid())

@@ -863,7 +863,7 @@ class Test(BaseTest):
 
         # Make sure states written appears one more time
         self.wait_until(
-            lambda: self.log_contains("CRIT Exiting: Registry file path must be a file"),
+            lambda: self.log_contains("Exiting: Registry file path must be a file"),
             max_timeout=10)
 
         filebeat.check_kill_and_wait(exit_code=1)
@@ -896,7 +896,7 @@ class Test(BaseTest):
 
         # Make sure states written appears one more time
         self.wait_until(
-            lambda: self.log_contains("CRIT Exiting: Registry file path is not a regular file"),
+            lambda: self.log_contains("Exiting: Registry file path is not a regular file"),
             max_timeout=10)
 
         filebeat.check_kill_and_wait(exit_code=1)
@@ -926,7 +926,7 @@ class Test(BaseTest):
         # Make sure states written appears one more time
         self.wait_until(
             lambda: self.log_contains(
-                "CRIT Exiting: Could not start registrar: Error loading state"),
+                "Exiting: Could not start registrar: Error loading state"),
             max_timeout=10)
 
         filebeat.check_kill_and_wait(exit_code=1)

@@ -230,9 +230,7 @@ func TestWatcherDie(t *testing.T) {
 }
 
 func runWatcher(t *testing.T, kill bool, containers [][]types.Container, events []interface{}) *watcher {
-	if testing.Verbose() {
-		logp.LogInit(logp.LOG_DEBUG, "", false, true, []string{"*"})
-	}
+	logp.TestingSetup()
 
 	client := &MockClient{
 		containers: containers,
