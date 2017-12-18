@@ -13,12 +13,12 @@
         "core": {
             "id": 1,
             "idle": {
-                "pct": 0.22,
-                "ticks": 1716095
+                "pct": 0.3333,
+                "ticks": 51795238
             },
             "iowait": {
                 "pct": 0,
-                "ticks": 0
+                "ticks": 42254
             },
             "irq": {
                 "pct": 0,
@@ -26,23 +26,23 @@
             },
             "nice": {
                 "pct": 0,
-                "ticks": 0
+                "ticks": 15
             },
             "softirq": {
                 "pct": 0,
-                "ticks": 0
+                "ticks": 1469
             },
             "steal": {
                 "pct": 0,
                 "ticks": 0
             },
             "system": {
-                "pct": 0.32,
-                "ticks": 168895
+                "pct": 0.25,
+                "ticks": 109372
             },
             "user": {
-                "pct": 0.46,
-                "ticks": 227129
+                "pct": 0.4167,
+                "ticks": 185023
             }
         }
     }

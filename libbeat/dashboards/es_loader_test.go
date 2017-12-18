@@ -10,7 +10,7 @@ import (
 
 	"github.com/elastic/beats/libbeat/common"
 	"github.com/elastic/beats/libbeat/logp"
-	"github.com/elastic/beats/libbeat/outputs/elasticsearch"
+	"github.com/elastic/beats/libbeat/outputs/elasticsearch/estest"
 )
 
 func TestImporter(t *testing.T) {
@@ -24,7 +24,7 @@ func TestImporter(t *testing.T) {
 		Beat:        "testbeat",
 	}
 
-	client := elasticsearch.GetTestingElasticsearch(t)
+	client := estest.GetTestingElasticsearch(t)
 	if strings.HasPrefix(client.Connection.GetVersion(), "6.") ||
 		strings.HasPrefix(client.Connection.GetVersion(), "7.") {
 		t.Skip("Skipping tests for Elasticsearch 6.x releases")
@@ -62,7 +62,7 @@ func TestImporterEmptyBeat(t *testing.T) {
 		Beat:        "",
 	}
 
-	client := elasticsearch.GetTestingElasticsearch(t)
+	client := estest.GetTestingElasticsearch(t)
 	if strings.HasPrefix(client.Connection.GetVersion(), "6.") ||
 		strings.HasPrefix(client.Connection.GetVersion(), "7.") {
 		t.Skip("Skipping tests for Elasticsearch 6.x releases")

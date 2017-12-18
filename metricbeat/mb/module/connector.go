@@ -6,7 +6,7 @@ import (
 	"github.com/elastic/beats/libbeat/processors"
 )
 
-// Connector configures ann establishes a beat.Client for publishing events
+// Connector configures and establishes a beat.Client for publishing events
 // to the publisher pipeline.
 type Connector struct {
 	pipeline      beat.Pipeline

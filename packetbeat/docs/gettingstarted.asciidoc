@@ -224,6 +224,9 @@ packetbeat.protocols:
 - type: cassandra
   ports: [9042]
 
+- type: tls
+  ports: [443]
+
 ----------------------------------------------------------------------
 +
 . If you are sending output directly to Elasticsearch (and not using Logstash),
@@ -266,7 +269,9 @@ include::../../libbeat/docs/dashboards.asciidoc[]
 [[packetbeat-starting]]
 === Step 5: Start Packetbeat
 
-Run Packetbeat by issuing the command that is appropriate for your platform.
+Run Packetbeat by issuing the command that is appropriate for your platform. If
+you are accessing a secured Elasticsearch cluster, make sure you've configured
+credentials as described in <<{beatname_lc}-configuration>>.
 
 NOTE: If you use an init.d script to start Packetbeat on deb or rpm, you can't
 specify command line flags (see <<command-line-options>>). To specify flags,
@@ -313,12 +318,6 @@ PS C:\Program Files\Packetbeat> Start-Service packetbeat
 ----------------------------------------------------------------------
 
 By default the log files are stored in `C:\ProgramData\packetbeat\Logs`.
-
-[id="{beatname_lc}-passing-credentials"]
-==== Pass credentials
-
-:start-type: start
-include::../../libbeat/docs/shared-passing-credentials-setup.asciidoc[]
 
 ==== Test the Packetbeat installation
 

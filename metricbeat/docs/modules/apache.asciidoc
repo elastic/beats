@@ -40,6 +40,8 @@ metricbeat.modules:
   hosts: ["http://127.0.0.1"]
 ----
 
+This module supports TLS connection when using `ssl` config field, as described in <<configuration-ssl>>.
+
 [float]
 === Metricsets
 

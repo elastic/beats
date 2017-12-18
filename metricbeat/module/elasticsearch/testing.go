@@ -3,7 +3,7 @@ package elasticsearch
 import "os"
 
 func GetEnvHost() string {
-	host := os.Getenv("ELASTICSEARCH_HOST")
+	host := os.Getenv("ES_HOST")
 
 	if len(host) == 0 {
 		host = "127.0.0.1"
@@ -12,7 +12,7 @@ func GetEnvHost() string {
 }
 
 func GetEnvPort() string {
-	port := os.Getenv("ELASTICSEARCH_PORT")
+	port := os.Getenv("ES_PORT")
 
 	if len(port) == 0 {
 		port = "9200"

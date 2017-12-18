@@ -138,19 +138,19 @@ func TestProcessor(t *testing.T) {
 			},
 		},
 		{
-			output: p.object(&common.Field{Dynamic: common.DynamicType{false}}),
+			output: p.object(&common.Field{Dynamic: common.DynamicType{Value: false}}),
 			expected: common.MapStr{
 				"dynamic": false, "type": "object",
 			},
 		},
 		{
-			output: p.object(&common.Field{Dynamic: common.DynamicType{true}}),
+			output: p.object(&common.Field{Dynamic: common.DynamicType{Value: true}}),
 			expected: common.MapStr{
 				"dynamic": true, "type": "object",
 			},
 		},
 		{
-			output: p.object(&common.Field{Dynamic: common.DynamicType{"strict"}}),
+			output: p.object(&common.Field{Dynamic: common.DynamicType{Value: "strict"}}),
 			expected: common.MapStr{
 				"dynamic": "strict", "type": "object",
 			},
@@ -288,4 +288,54 @@ func TestPropertiesCombine(t *testing.T) {
 
 	assert.Equal(t, v1, common.MapStr{"type": "text", "norms": false})
 	assert.Equal(t, v2, common.MapStr{"type": "text", "norms": false})
+}
+
+func TestProcessNoName(t *testing.T) {
+	// Test common fields are combined even if they come from different objects
+	fields := common.Fields{
+		common.Field{
+			Fields: common.Fields{
+				common.Field{
+					Name: "one",
+					Type: "text",
+				},
+			},
+		},
+		common.Field{
+			Name: "test",
+			Type: "group",
+			Fields: common.Fields{
+				common.Field{
+					Name: "two",
+					Type: "text",
+				},
+			},
+		},
+	}
+
+	output := common.MapStr{}
+	version, err := common.NewVersion("6.0.0")
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	p := Processor{EsVersion: *version}
+	err = p.process(fields, "", output)
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	// Make sure fields without a name are skipped during template generation
+	expectedOutput := common.MapStr{
+		"test": common.MapStr{
+			"properties": common.MapStr{
+				"two": common.MapStr{
+					"norms": false,
+					"type":  "text",
+				},
+			},
+		},
+	}
+
+	assert.Equal(t, expectedOutput, output)
 }

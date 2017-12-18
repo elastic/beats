@@ -3,6 +3,7 @@
   description: >
     Elasticsearch module
   release: beta
+  settings: ["ssl"]
   short_config: false
   fields:
     - name: elasticsearch

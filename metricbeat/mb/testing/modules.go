@@ -202,3 +202,61 @@ func RunPushMetricSet(duration time.Duration, metricSet mb.PushMetricSet) ([]com
 	// Return all events and errors that were collected.
 	return r.events, r.errs
 }
+
+// NewPushMetricSetV2 instantiates a new PushMetricSetV2 using the given
+// configuration. The ModuleFactory and MetricSetFactory are obtained from the
+// global Registry.
+func NewPushMetricSetV2(t testing.TB, config interface{}) mb.PushMetricSetV2 {
+	metricSet := newMetricSet(t, config)
+
+	pushMetricSet, ok := metricSet.(mb.PushMetricSetV2)
+	if !ok {
+		t.Fatal("MetricSet does not implement PushMetricSet")
+	}
+
+	return pushMetricSet
+}
+
+type capturingReporterV2 struct {
+	events []mb.Event
+	done   chan struct{}
+}
+
+func (r *capturingReporterV2) Event(event mb.Event) bool {
+	r.events = append(r.events, event)
+	return true
+}
+
+func (r *capturingReporterV2) Error(err error) bool {
+	r.events = append(r.events, mb.Event{Error: err})
+	return true
+}
+
+func (r *capturingReporterV2) Done() <-chan struct{} {
+	return r.done
+}
+
+// RunPushMetricSetV2 run the given push metricset for the specific amount of
+// time and returns all of the events and errors that occur during that period.
+func RunPushMetricSetV2(duration time.Duration, metricSet mb.PushMetricSetV2) []mb.Event {
+	r := &capturingReporterV2{done: make(chan struct{})}
+
+	// Run the metricset.
+	var wg sync.WaitGroup
+	wg.Add(1)
+	go func() {
+		defer wg.Done()
+		metricSet.Run(r)
+	}()
+
+	// Let it run for some period, then stop it by closing the done channel.
+	time.AfterFunc(duration, func() {
+		close(r.done)
+	})
+
+	// Wait for the PushMetricSet to completely stop.
+	wg.Wait()
+
+	// Return all events and errors that were collected.
+	return r.events
+}

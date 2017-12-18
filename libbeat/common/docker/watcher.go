@@ -305,7 +305,7 @@ func (w *watcher) cleanupWorker() {
 			w.RLock()
 			for key, lastSeen := range w.deleted {
 				if lastSeen.Before(timeout) {
-					logp.Debug("docker", "Removing container %s after cool down timeout")
+					logp.Debug("docker", "Removing container %s after cool down timeout", key)
 					toDelete = append(toDelete, key)
 				}
 			}

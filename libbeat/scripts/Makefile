@@ -12,7 +12,7 @@ BEAT_LICENSE?=ASL 2.0 ## @packaging Software license of the application
 BEAT_VENDOR?=Elastic ## @packaging Name of the vendor of the application
 BEAT_GOPATH=$(firstword $(subst :, ,${GOPATH}))
 ES_BEATS?=..## @community_beat Must be set to ./vendor/github.com/elastic/beats. It must always be a relative path.
-GOPACKAGES?=$(shell go list ${BEAT_PATH}/... | grep -v /vendor/)
+GOPACKAGES?=$(shell go list ${BEAT_PATH}/... | grep -v /vendor/ | grep -v /scripts/cmd/ )
 PACKER_TEMPLATES_DIR?=${ES_BEATS}/dev-tools/packer ## @Building Directory of templates that are used by "make package"
 NOTICE_FILE?=../NOTICE.txt
 LICENSE_FILE?=../LICENSE.txt
@@ -26,6 +26,7 @@ export PATH := ./bin:$(PATH)
 GOFILES = $(shell find . -type f -name '*.go')
 GOFILES_NOVENDOR = $(shell find . -type f -name '*.go' -not -path "*/vendor/*")
 GOFILES_ALL = $(GOFILES) $(shell find $(ES_BEATS) -type f -name '*.go')
+GOPACKAGES_STRESSTESTS=$(shell find . -name '*.go' | xargs awk 'FNR>1 {nextfile} /\+build.*stresstest/ {print FILENAME; nextfile}' | xargs dirname | uniq)
 SHELL=bash
 ES_HOST?="elasticsearch"
 PWD=$(shell pwd)
@@ -35,6 +36,7 @@ COVERAGE_TOOL?=${BEAT_GOPATH}/bin/gotestcover
 COVERAGE_TOOL_REPO?=github.com/elastic/beats/vendor/github.com/pierrre/gotestcover
 TESTIFY_TOOL_REPO?=github.com/elastic/beats/vendor/github.com/stretchr/testify
 LIBCOMPOSE_TOOL_REPO?=github.com/docker/libcompose
+GOBUILD_FLAGS?=-i
 GOIMPORTS=goimports
 GOIMPORTS_REPO?=golang.org/x/tools/cmd/goimports
 GOIMPORTS_LOCAL_PREFIX?=github.com/elastic
@@ -48,6 +50,7 @@ TIMEOUT?= 90
 NOSETESTS_OPTIONS?=--process-timeout=$(TIMEOUT) --with-timer -v --with-xunit --xunit-file=${BUILD_DIR}/TEST-system.xml ## @testing the options to pass when calling nosetests
 TEST_ENVIRONMENT?=false ## @testing if true, "make testsuite" runs integration tests and system tests in a dockerized test environment
 SYSTEM_TESTS?=false ## @testing if true, "make test" and "make testsuite" run unit tests and system tests
+STRESS_TESTS?=false ## @testing if true, "make test" and "make testsuite" run also run the stress tests
 GOX_OS?=linux darwin windows solaris freebsd netbsd openbsd ## @Building List of all OS to be supported by "make crosscompile".
 GOX_OSARCH?=!darwin/arm !darwin/arm64 !darwin/386 ## @building Space separated list of GOOS/GOARCH pairs to build by "make crosscompile".
 GOX_FLAGS?= ## @building Additional flags to append to the gox command used by "make crosscompile".
@@ -59,11 +62,12 @@ DOCKER_COMPOSE?=TESTING_ENVIRONMENT=${TESTING_ENVIRONMENT} ES_BEATS=${ES_BEATS} 
 DOCKER_CACHE?=1 ## @miscellaneous If set to 0, all docker images are created without cache
 GOPACKAGES_COMMA_SEP=$(subst $(space),$(comma),$(strip ${GOPACKAGES}))
 PYTHON_ENV?=${BUILD_DIR}/python-env
+PIP_INSTALL_PARAMS?=
 BUILDID?=$(shell git rev-parse HEAD) ## @Building The build ID
 VIRTUALENV_PARAMS?=
 INTEGRATION_TESTS?=
 FIND=. ${PYTHON_ENV}/bin/activate; find . -type f -not -path "*/vendor/*" -not -path "*/build/*" -not -path "*/.git/*"
-PERM_EXEC=$(shell [ `uname -s` = "Darwin" ] && echo "+111" || echo "/a+x")
+PERM_EXEC?=$(shell [ `uname -s` = "Darwin" ] && echo "+111" || echo "/a+x")
 
 # Cross compiling targets
 CGO?=true ## @building if true, Build with C Go support
@@ -88,7 +92,7 @@ endif
 
 
 ${BEAT_NAME}: $(GOFILES_ALL) ## @build build the beat application
-	go build -i
+	go build $(GOBUILD_FLAGS)
 
 # Create test coverage binary
 ${BEAT_NAME}.test: $(GOFILES_ALL)
@@ -112,6 +116,7 @@ check: python-env ## @build Checks project and source code if everything is acco
 
 .PHONY: fmt
 fmt: python-env ## @build Runs `goimports -l -w` and `autopep8`on the project's source code, modifying any files that do not match its style.
+	@go get $(GOIMPORTS_REPO)
 	@goimports -local ${GOIMPORTS_LOCAL_PREFIX} -l -w ${GOFILES_NOVENDOR}
 	@${FIND} -name *.py -exec ${PYTHON_ENV}/bin/autopep8 --in-place --max-line-length 120  {} \;
 
@@ -192,6 +197,14 @@ fast-system-tests: ## @testing Runs system tests without coverage reports and in
 fast-system-tests: ${BEAT_NAME}.test python-env
 	. ${PYTHON_ENV}/bin/activate; nosetests -w tests/system ${NOSETESTS_OPTIONS}
 
+# Runs the go based stress tests
+.PHONY: stress-tests
+stress-tests: ## @testing Runs the stress tests with race detector enabled
+stress-tests:
+	if [ -n '${GOPACKAGES_STRESSTESTS}' ]; then \
+		go test -race --tags=stresstest -v ${GOPACKAGES_STRESSTESTS}; \
+	fi
+
 # Run benchmark tests
 .PHONY: benchmark-tests
 benchmark-tests: ## @testing Runs benchmarks (NOT YET IMPLEMENTED)
@@ -207,17 +220,21 @@ load-tests: ## @testing Runs load tests
 .PHONY: python-env
 python-env: ${ES_BEATS}/libbeat/tests/system/requirements.txt
 	@test -d ${PYTHON_ENV} || virtualenv ${VIRTUALENV_PARAMS} ${PYTHON_ENV}
-	@. ${PYTHON_ENV}/bin/activate && pip install -q --upgrade pip ; \
+	@. ${PYTHON_ENV}/bin/activate && pip install ${PIP_INSTALL_PARAMS} -q --upgrade pip ; \
 	if [ -a ./tests/system/requirements.txt ] && [ ! ${ES_BEATS}/libbeat/tests/system/requirements.txt -ef ./tests/system/requirements.txt ] ; then \
-		. ${PYTHON_ENV}/bin/activate && pip install -qUr ${ES_BEATS}/libbeat/tests/system/requirements.txt -Ur ./tests/system/requirements.txt ; \
+		. ${PYTHON_ENV}/bin/activate && pip install ${PIP_INSTALL_PARAMS} -qUr ${ES_BEATS}/libbeat/tests/system/requirements.txt -Ur ./tests/system/requirements.txt ; \
 	else \
-		. ${PYTHON_ENV}/bin/activate && pip install -qUr ${ES_BEATS}/libbeat/tests/system/requirements.txt ; \
+		. ${PYTHON_ENV}/bin/activate && pip install ${PIP_INSTALL_PARAMS} -qUr ${ES_BEATS}/libbeat/tests/system/requirements.txt ; \
 	fi
 
 
 .PHONY: test
 test: ## @testing Runs unit and system tests without coverage reports
 test: unit
+	if [ $(STRESS_TESTS) = true ]; then \
+		 $(MAKE) stress-tests; \
+	fi
+
 	if [ $(SYSTEM_TESTS) = true ]; then \
 		 $(MAKE) fast-system-tests; \
 	fi
@@ -226,6 +243,10 @@ test: unit
 testsuite: ## @testing Runs all tests and generates the coverage reports
 testsuite: clean update
 	$(MAKE) unit-tests
+
+	if [ $(STRESS_TESTS) = true ]; then \
+		 $(MAKE) stress-tests; \
+	fi
 
 	# Setups environment if TEST_ENVIRONMENT is set to true
 	# Only runs integration tests with test environment

@@ -26,6 +26,8 @@ metricbeat.modules:
   hosts: ["localhost:5000"]
 ----
 
+This module supports TLS connection when using `ssl` config field, as described in <<configuration-ssl>>.
+
 [float]
 === Metricsets
 
@@ -39,6 +41,8 @@ The following metricsets are available:
 
 * <<metricbeat-metricset-ceph-monitor_health,monitor_health>>
 
+* <<metricbeat-metricset-ceph-osd_df,osd_df>>
+
 * <<metricbeat-metricset-ceph-osd_tree,osd_tree>>
 
 * <<metricbeat-metricset-ceph-pool_disk,pool_disk>>
@@ -50,6 +54,8 @@ include::ceph/cluster_health.asciidoc[]
 include::ceph/cluster_status.asciidoc[]
 
 include::ceph/monitor_health.asciidoc[]
+
+include::ceph/osd_df.asciidoc[]
 
 include::ceph/osd_tree.asciidoc[]
 

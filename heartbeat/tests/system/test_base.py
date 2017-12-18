@@ -1,6 +1,9 @@
 import os
+import unittest
 
 from heartbeat import BaseTest
+from elasticsearch import Elasticsearch
+from beat.beat import INTEGRATION_TESTS
 
 
 class Test(BaseTest):
@@ -108,3 +111,22 @@ class Test(BaseTest):
         doc = self.read_output()[0]
         self.assertDictContainsSubset(expected, doc)
         return doc
+
+    @unittest.skipUnless(INTEGRATION_TESTS, "integration test")
+    def test_template(self):
+        """
+        Test that the template can be loaded with `setup --template`
+        """
+        es = Elasticsearch([self.get_elasticsearch_url()])
+        self.render_config_template(
+            monitors=[{
+                "type": "http",
+                "urls": ["http://localhost:9200"],
+            }],
+            elasticsearch={"host": self.get_elasticsearch_url()},
+        )
+        exit_code = self.run_beat(extra_args=["setup", "--template"])
+
+        assert exit_code == 0
+        assert self.log_contains('Loaded index template')
+        assert len(es.cat.templates(name='heartbeat-*', h='name')) > 0

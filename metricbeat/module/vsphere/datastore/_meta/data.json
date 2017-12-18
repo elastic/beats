@@ -1,31 +1,29 @@
 {
-    "@timestamp": "2016-05-23T08:05:34.853Z",
+    "@timestamp": "2017-10-12T08:05:34.853Z",
     "beat": {
         "hostname": "host.example.com",
         "name": "host.example.com"
     },
     "metricset": {
-        "host": "http://127.0.0.1:47557/sdk",
+        "host": "http://127.0.0.1:36937/sdk",
         "module": "vsphere",
         "name": "datastore",
         "rtt": 115
     },
-    "type": "metricsets",
     "vsphere": {
         "datastore": {
             "capacity": {
                 "free": {
-                    "bytes": 1612234752
+                    "bytes": 50021150720
                 },
                 "total": {
-                    "bytes": 14107459584
+                    "bytes": 63918878720
                 },
                 "used": {
-                    "bytes": 12495224832,
-                    "pct": 88
+                    "bytes": 13897728000,
+                    "pct": 21
                 }
             },
-            "datacenter": "ha-datacenter",
             "fstype": "local",
             "name": "LocalDS_0"
         }

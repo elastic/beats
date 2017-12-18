@@ -15,7 +15,7 @@ before-build:
 # Collects all module dashboards
 .PHONY: kibana
 kibana:
-	@rm -rf _meta/kibana/dashboard _meta/kibana/search _meta/kibana/visualization # Skip index-pattern
+	@rm -rf _meta/kibana
 	@mkdir -p _meta/kibana
 	@-cp -r module/*/_meta/kibana _meta/
 

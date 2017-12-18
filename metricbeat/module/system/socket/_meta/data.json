@@ -1,5 +1,5 @@
 {
-    "@timestamp": "2016-05-23T08:05:34.853Z",
+    "@timestamp": "2017-10-12T08:05:34.853Z",
     "beat": {
         "hostname": "host.example.com",
         "name": "host.example.com"
@@ -12,10 +12,10 @@
     "system": {
         "socket": {
             "direction": "listening",
-            "family": "ipv6",
+            "family": "ipv4",
             "local": {
-                "ip": "::",
-                "port": 42061
+                "ip": "127.0.0.11",
+                "port": 45723
             },
             "process": {
                 "cmdline": "/tmp/go-build519327234/github.com/elastic/beats/metricbeat/module/system/socket/_test/socket.test -test.v=true -data",
@@ -28,6 +28,5 @@
                 "name": "root"
             }
         }
-    },
-    "type": "metricsets"
+    }
 }

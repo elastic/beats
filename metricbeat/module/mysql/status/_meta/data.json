@@ -1,5 +1,5 @@
 {
-    "@timestamp": "2016-05-23T08:05:34.853Z",
+    "@timestamp": "2017-10-12T08:05:34.853Z",
     "beat": {
         "hostname": "host.example.com",
         "name": "host.example.com"
@@ -13,8 +13,8 @@
     "mysql": {
         "status": {
             "aborted": {
-                "clients": 4,
-                "connects": 2
+                "clients": 1,
+                "connects": 82
             },
             "binlog": {
                 "cache": {
@@ -23,16 +23,16 @@
                 }
             },
             "bytes": {
-                "received": 992,
-                "sent": 40657
+                "received": 572,
+                "sent": 26728
             },
             "command": {
-              "delete": 0,
-              "insert": 0,
-              "select": 9,
-              "update": 0
+                "delete": 0,
+                "insert": 0,
+                "select": 4,
+                "update": 0
             },
-            "connections": 11,
+            "connections": 88,
             "created": {
                 "tmp": {
                     "disk_tables": 0,
@@ -50,9 +50,9 @@
             "open": {
                 "files": 14,
                 "streams": 0,
-                "tables": 103
+                "tables": 101
             },
-            "opened_tables": 110,
+            "opened_tables": 108,
             "threads": {
                 "cached": 0,
                 "connected": 3,
@@ -60,6 +60,5 @@
                 "running": 1
             }
         }
-    },
-    "type": "metricsets"
+    }
 }
