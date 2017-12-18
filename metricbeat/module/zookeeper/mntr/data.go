@@ -65,7 +65,7 @@ func eventMapping(response io.Reader) common.MapStr {
 	}
 
 	// only available on Unix platforms
-	if _, ok := fullEvent["open_file_descriptor_count"]; ok {
+	if _, ok := fullEvent["zk_open_file_descriptor_count"]; ok {
 		schemaUnix.ApplyTo(event, fullEvent)
 	}
 
