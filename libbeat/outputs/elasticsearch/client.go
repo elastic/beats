@@ -462,7 +462,7 @@ func bulkCollectPublishFails(
 
 		if status < 500 && status != 429 {
 			// hard failure, don't collect
-			logp.Warn("Can not index event (status=%v): %s", status, msg)
+			logp.Warn("Cannot index event %#v (status=%v): %s", data[i], status, msg)
 			continue
 		}
 
