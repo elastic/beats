@@ -1,31 +1,31 @@
 {
-    "@timestamp": "2016-05-23T08:05:34.853Z",
+    "@timestamp": "2017-10-12T08:05:34.853Z",
     "beat": {
         "hostname": "host.example.com",
         "name": "host.example.com"
     },
     "docker": {
         "container": {
-            "id": "1bab78b8101e4d4df7de3dd9747512641bd0e97f886ca44be2f3f22a7b90ea2b",
+            "id": "228848ff8ea238430c4e9cc21deb3175ea5c77483a7f9f4b7c42f7cd6d18c0fb",
             "labels": {
-                "com_docker_compose_config-hash": "1b78c28e8f14c2d7804c5b002c0f1dd29afac4a82737d38d079d227029013732",
+                "com_docker_compose_config-hash": "13347b7d96bf1b3f1ddc089bdef099e42dde235e",
                 "com_docker_compose_container-number": "1",
                 "com_docker_compose_oneoff": "False",
-                "com_docker_compose_project": "metricbeatdocker",
-                "com_docker_compose_service": "elasticsearch",
-                "com_docker_compose_version": "1.11.1"
+                "com_docker_compose_project": "metricbeat",
+                "com_docker_compose_service": "aerospike",
+                "com_docker_compose_version": "1.5.0"
             },
-            "name": "elasticsearch"
+            "name": "metricbeat_aerospike_1"
         },
         "healthcheck": {
             "event": {
-                "end_date": "2017-03-02T05:19:07.701Z",
-                "exit_code": 0,
-                "output": "{\n  \"name\" : \"iElnwHE\",\n  \"cluster_name\" : \"elasticsearch\",\n  \"cluster_uuid\" : \"phQC_WOFRBK10LUqTQS5lA\",\n  \"version\" : {\n    \"number\" : \"6.0.0-alpha1\",\n    \"build_hash\" : \"d02170b\",\n    \"build_date\" : \"2017-02-06T12:00:50.817Z\",\n    \"build_snapshot\" : true,\n    \"lucene_version\" : \"6.4.1\"\n  },\n  \"tagline\" : \"You Know, for Search\"\n}\n",
-                "start_date": "2017-03-02T05:19:07.646Z"
+                "end_date": "2017-12-07T07:27:18.738Z",
+                "exit_code": 1,
+                "output": "",
+                "start_date": "2017-12-07T07:27:17.416Z"
             },
-            "failingstreak": 0,
-            "status": "healthy"
+            "failingstreak": 1,
+            "status": "starting"
         }
     },
     "metricset": {
@@ -33,6 +33,5 @@
         "module": "docker",
         "name": "healthcheck",
         "rtt": 115
-    },
-    "type": "metricsets"
+    }
 }

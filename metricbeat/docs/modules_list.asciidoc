@@ -2,37 +2,124 @@
 This file is generated! See scripts/docs_collector.py
 ////
 
-  * <<metricbeat-module-aerospike,Aerospike>>
-  * <<metricbeat-module-apache,Apache>>
-  * <<metricbeat-module-ceph,Ceph>>
-  * <<metricbeat-module-couchbase,Couchbase>>
-  * <<metricbeat-module-docker,Docker>>
-  * <<metricbeat-module-dropwizard,Dropwizard>>
-  * <<metricbeat-module-elasticsearch,Elasticsearch>>
-  * <<metricbeat-module-etcd,Etcd>>
-  * <<metricbeat-module-golang,Golang>>
-  * <<metricbeat-module-graphite,Graphite>>
-  * <<metricbeat-module-haproxy,HAProxy>>
-  * <<metricbeat-module-http,HTTP>>
-  * <<metricbeat-module-jolokia,Jolokia>>
-  * <<metricbeat-module-kafka,Kafka>>
-  * <<metricbeat-module-kibana,Kibana>>
-  * <<metricbeat-module-kubernetes,Kubernetes>>
-  * <<metricbeat-module-logstash,Logstash>>
-  * <<metricbeat-module-memcached,Memcached>>
-  * <<metricbeat-module-mongodb,MongoDB>>
-  * <<metricbeat-module-mysql,MySQL>>
-  * <<metricbeat-module-nginx,Nginx>>
-  * <<metricbeat-module-php_fpm,PHP_FPM>>
-  * <<metricbeat-module-postgresql,PostgreSQL>>
-  * <<metricbeat-module-prometheus,Prometheus>>
-  * <<metricbeat-module-rabbitmq,RabbitMQ>>
-  * <<metricbeat-module-redis,Redis>>
-  * <<metricbeat-module-system,System>>
-  * <<metricbeat-module-vsphere,vSphere>>
-  * <<metricbeat-module-windows,Windows>>
-  * <<metricbeat-module-zookeeper,ZooKeeper>>
-
+[options="header"]
+|========================
+|Modules   |Metricsets   
+|<<metricbeat-module-aerospike,Aerospike>>  beta[]   |    
+.1+|   |<<metricbeat-metricset-aerospike-namespace,namespace>> beta[]  
+|<<metricbeat-module-apache,Apache>>     |    
+.1+|   |<<metricbeat-metricset-apache-status,status>>   
+|<<metricbeat-module-ceph,Ceph>>  beta[]   |    
+.7+|   |<<metricbeat-metricset-ceph-cluster_disk,cluster_disk>> beta[]  
+|<<metricbeat-metricset-ceph-cluster_health,cluster_health>> beta[]  
+|<<metricbeat-metricset-ceph-cluster_status,cluster_status>> beta[]  
+|<<metricbeat-metricset-ceph-monitor_health,monitor_health>> beta[]  
+|<<metricbeat-metricset-ceph-osd_df,osd_df>> experimental[]  
+|<<metricbeat-metricset-ceph-osd_tree,osd_tree>> beta[]  
+|<<metricbeat-metricset-ceph-pool_disk,pool_disk>> beta[]  
+|<<metricbeat-module-couchbase,Couchbase>>  beta[]   |    
+.3+|   |<<metricbeat-metricset-couchbase-bucket,bucket>> beta[]  
+|<<metricbeat-metricset-couchbase-cluster,cluster>> beta[]  
+|<<metricbeat-metricset-couchbase-node,node>> beta[]  
+|<<metricbeat-module-docker,Docker>>  beta[]   |    
+.8+|   |<<metricbeat-metricset-docker-container,container>> beta[]  
+|<<metricbeat-metricset-docker-cpu,cpu>> beta[]  
+|<<metricbeat-metricset-docker-diskio,diskio>> beta[]  
+|<<metricbeat-metricset-docker-healthcheck,healthcheck>> beta[]  
+|<<metricbeat-metricset-docker-image,image>> beta[]  
+|<<metricbeat-metricset-docker-info,info>> beta[]  
+|<<metricbeat-metricset-docker-memory,memory>> beta[]  
+|<<metricbeat-metricset-docker-network,network>> beta[]  
+|<<metricbeat-module-dropwizard,Dropwizard>>  beta[]   |    
+.1+|   |<<metricbeat-metricset-dropwizard-collector,collector>> beta[]  
+|<<metricbeat-module-elasticsearch,Elasticsearch>>  beta[]   |    
+.2+|   |<<metricbeat-metricset-elasticsearch-node,node>> beta[]  
+|<<metricbeat-metricset-elasticsearch-node_stats,node_stats>> beta[]  
+|<<metricbeat-module-etcd,Etcd>>  beta[]   |    
+.3+|   |<<metricbeat-metricset-etcd-leader,leader>> beta[]  
+|<<metricbeat-metricset-etcd-self,self>> beta[]  
+|<<metricbeat-metricset-etcd-store,store>> beta[]  
+|<<metricbeat-module-golang,Golang>>  experimental[]   |    
+.2+|   |<<metricbeat-metricset-golang-expvar,expvar>> experimental[]  
+|<<metricbeat-metricset-golang-heap,heap>> experimental[]  
+|<<metricbeat-module-graphite,Graphite>>  beta[]   |    
+.1+|   |<<metricbeat-metricset-graphite-server,server>> beta[]  
+|<<metricbeat-module-haproxy,HAProxy>>     |    
+.2+|   |<<metricbeat-metricset-haproxy-info,info>>   
+|<<metricbeat-metricset-haproxy-stat,stat>>   
+|<<metricbeat-module-http,HTTP>>  beta[]   |    
+.2+|   |<<metricbeat-metricset-http-json,json>> beta[]  
+|<<metricbeat-metricset-http-server,server>> experimental[]  
+|<<metricbeat-module-jolokia,Jolokia>>  beta[]   |    
+.1+|   |<<metricbeat-metricset-jolokia-jmx,jmx>> beta[]  
+|<<metricbeat-module-kafka,Kafka>>  beta[]   |    
+.2+|   |<<metricbeat-metricset-kafka-consumergroup,consumergroup>> beta[]  
+|<<metricbeat-metricset-kafka-partition,partition>> beta[]  
+|<<metricbeat-module-kibana,Kibana>>  beta[]   |    
+.1+|   |<<metricbeat-metricset-kibana-status,status>> beta[]  
+|<<metricbeat-module-kubernetes,Kubernetes>>  beta[]   |    
+.11+|   |<<metricbeat-metricset-kubernetes-container,container>> beta[]  
+|<<metricbeat-metricset-kubernetes-event,event>> experimental[]  
+|<<metricbeat-metricset-kubernetes-node,node>> beta[]  
+|<<metricbeat-metricset-kubernetes-pod,pod>> beta[]  
+|<<metricbeat-metricset-kubernetes-state_container,state_container>> beta[]  
+|<<metricbeat-metricset-kubernetes-state_deployment,state_deployment>> beta[]  
+|<<metricbeat-metricset-kubernetes-state_node,state_node>> beta[]  
+|<<metricbeat-metricset-kubernetes-state_pod,state_pod>> beta[]  
+|<<metricbeat-metricset-kubernetes-state_replicaset,state_replicaset>> beta[]  
+|<<metricbeat-metricset-kubernetes-system,system>> beta[]  
+|<<metricbeat-metricset-kubernetes-volume,volume>> beta[]  
+|<<metricbeat-module-logstash,Logstash>>  experimental[]   |    
+.2+|   |<<metricbeat-metricset-logstash-node,node>> experimental[]  
+|<<metricbeat-metricset-logstash-node_stats,node_stats>> experimental[]  
+|<<metricbeat-module-memcached,Memcached>>  beta[]   |    
+.1+|   |<<metricbeat-metricset-memcached-stats,stats>> beta[]  
+|<<metricbeat-module-mongodb,MongoDB>>  beta[]   |    
+.2+|   |<<metricbeat-metricset-mongodb-dbstats,dbstats>> beta[]  
+|<<metricbeat-metricset-mongodb-status,status>> beta[]  
+|<<metricbeat-module-mysql,MySQL>>     |    
+.1+|   |<<metricbeat-metricset-mysql-status,status>>   
+|<<metricbeat-module-nginx,Nginx>>     |    
+.1+|   |<<metricbeat-metricset-nginx-stubstatus,stubstatus>>   
+|<<metricbeat-module-php_fpm,PHP_FPM>>  beta[]   |    
+.1+|   |<<metricbeat-metricset-php_fpm-pool,pool>> beta[]  
+|<<metricbeat-module-postgresql,PostgreSQL>>     |    
+.3+|   |<<metricbeat-metricset-postgresql-activity,activity>>   
+|<<metricbeat-metricset-postgresql-bgwriter,bgwriter>>   
+|<<metricbeat-metricset-postgresql-database,database>>   
+|<<metricbeat-module-prometheus,Prometheus>>  beta[]   |    
+.2+|   |<<metricbeat-metricset-prometheus-collector,collector>> beta[]  
+|<<metricbeat-metricset-prometheus-stats,stats>> beta[]  
+|<<metricbeat-module-rabbitmq,RabbitMQ>>  beta[]   |    
+.2+|   |<<metricbeat-metricset-rabbitmq-node,node>> beta[]  
+|<<metricbeat-metricset-rabbitmq-queue,queue>> beta[]  
+|<<metricbeat-module-redis,Redis>>     |    
+.2+|   |<<metricbeat-metricset-redis-info,info>>   
+|<<metricbeat-metricset-redis-keyspace,keyspace>>   
+|<<metricbeat-module-system,System>>     |    
+.13+|   |<<metricbeat-metricset-system-core,core>>   
+|<<metricbeat-metricset-system-cpu,cpu>>   
+|<<metricbeat-metricset-system-diskio,diskio>>   
+|<<metricbeat-metricset-system-filesystem,filesystem>>   
+|<<metricbeat-metricset-system-fsstat,fsstat>>   
+|<<metricbeat-metricset-system-load,load>>   
+|<<metricbeat-metricset-system-memory,memory>>   
+|<<metricbeat-metricset-system-network,network>>   
+|<<metricbeat-metricset-system-process,process>>   
+|<<metricbeat-metricset-system-process_summary,process_summary>>   
+|<<metricbeat-metricset-system-raid,raid>> experimental[]  
+|<<metricbeat-metricset-system-socket,socket>> beta[]  
+|<<metricbeat-metricset-system-uptime,uptime>>   
+|<<metricbeat-module-vsphere,vSphere>>  beta[]   |    
+.3+|   |<<metricbeat-metricset-vsphere-datastore,datastore>> beta[]  
+|<<metricbeat-metricset-vsphere-host,host>> beta[]  
+|<<metricbeat-metricset-vsphere-virtualmachine,virtualmachine>> beta[]  
+|<<metricbeat-module-windows,Windows>>  beta[]   |    
+.2+|   |<<metricbeat-metricset-windows-perfmon,perfmon>> beta[]  
+|<<metricbeat-metricset-windows-service,service>> beta[]  
+|<<metricbeat-module-zookeeper,ZooKeeper>>     |    
+.1+|   |<<metricbeat-metricset-zookeeper-mntr,mntr>>   
+|================================
 
 --
 

@@ -39,9 +39,8 @@ func NewProspector(cfg *common.Config, outlet channel.Factory, context prospecto
 }
 
 func (p *Prospector) Run() {
-	logp.Info("Starting udp prospector")
-
 	if !p.started {
+		logp.Info("Starting udp prospector")
 		p.started = true
 		go func() {
 			defer p.outlet.Close()

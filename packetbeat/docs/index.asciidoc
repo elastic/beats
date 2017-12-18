@@ -13,7 +13,7 @@ include::{asciidoc-dir}/../../shared/attributes.asciidoc[]
 :winlogbeat: http://www.elastic.co/guide/en/beats/winlogbeat/{doc-branch}
 :logstashdoc: https://www.elastic.co/guide/en/logstash/{doc-branch}
 :elasticsearch: https://www.elastic.co/guide/en/elasticsearch/reference/{doc-branch}
-:securitydoc: https://www.elastic.co/guide/en/x-pack/current
+:securitydoc: https://www.elastic.co/guide/en/x-pack/{doc-branch}
 :kibanadoc: https://www.elastic.co/guide/en/kibana/{doc-branch}
 :plugindoc: https://www.elastic.co/guide/en/elasticsearch/plugins/{doc-branch}
 :version: {stack-version}

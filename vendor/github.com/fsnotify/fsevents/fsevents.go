@@ -150,16 +150,18 @@ func (r *eventStreamRegistry) Delete(i uintptr) {
 
 // Start listening to an event stream.
 func (es *EventStream) Start() {
+	if es.Events == nil {
+		es.Events = make(chan []Event)
+	}
 
 	// register eventstream in the local registry for later lookup
 	// in C callback
 	cbInfo := registry.Add(es)
 	es.registryID = cbInfo
-	es.uuid = GetDeviceUUID(es.Device)
-	es.start(es.Paths, cbInfo)
-	if es.Events == nil {
-		es.Events = make(chan []Event)
+	if es.Device != 0 {
+		es.uuid = GetDeviceUUID(es.Device)
 	}
+	es.start(es.Paths, cbInfo)
 }
 
 // Flush events that have occurred but haven't been delivered.

@@ -14,17 +14,17 @@
             "cores": 4,
             "idle": {
                 "norm": {
-                    "pct": 0.0948
+                    "pct": 0.4208
                 },
-                "pct": 0.3791,
-                "ticks": 6154450
+                "pct": 1.6831,
+                "ticks": 207356495
             },
             "iowait": {
                 "norm": {
-                    "pct": 0
+                    "pct": 0.0437
                 },
-                "pct": 0,
-                "ticks": 0
+                "pct": 0.1749,
+                "ticks": 179383
             },
             "irq": {
                 "norm": {
@@ -38,14 +38,14 @@
                     "pct": 0
                 },
                 "pct": 0,
-                "ticks": 0
+                "ticks": 46
             },
             "softirq": {
                 "norm": {
                     "pct": 0
                 },
                 "pct": 0,
-                "ticks": 0
+                "ticks": 8835
             },
             "steal": {
                 "norm": {
@@ -56,23 +56,23 @@
             },
             "system": {
                 "norm": {
-                    "pct": 0.2818
+                    "pct": 0.1749
                 },
-                "pct": 1.1272,
-                "ticks": 1100833
+                "pct": 0.6995,
+                "ticks": 428558
             },
             "total": {
                 "norm": {
-                    "pct": 0.9052
+                    "pct": 0.5792
                 },
-                "pct": 3.6209
+                "pct": 2.3169
             },
             "user": {
                 "norm": {
-                    "pct": 0.6234
+                    "pct": 0.3607
                 },
-                "pct": 2.4938,
-                "ticks": 1193819
+                "pct": 1.4426,
+                "ticks": 725183
             }
         }
     }

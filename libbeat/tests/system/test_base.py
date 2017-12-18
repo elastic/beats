@@ -172,7 +172,7 @@ class Test(BaseTest):
             max_timeout=2)
         proc.check_kill_and_wait()
         self.wait_until(
-            lambda: self.log_contains("Total non-zero values:"),
+            lambda: self.log_contains("Total non-zero metrics:"),
             max_timeout=2)
 
     def test_persistent_uuid(self):

@@ -1,6 +1,9 @@
 package tls
 
 import (
+	"crypto/dsa"
+	"crypto/ecdsa"
+	"crypto/rsa"
 	"crypto/x509"
 	"crypto/x509/pkix"
 	"encoding/hex"
@@ -112,7 +115,7 @@ type helloMessage struct {
 		cipherSuite cipherSuite
 		compression compressionMethod
 	}
-	extensions common.MapStr
+	extensions Extensions
 }
 
 func readRecordHeader(buf *streambuf.Buffer) (*recordHeader, error) {
@@ -188,8 +191,8 @@ func (hello helloMessage) toMap() common.MapStr {
 		m["selected_compression_method"] = hello.selected.compression.String()
 	}
 
-	if hello.extensions != nil {
-		m["extensions"] = hello.extensions
+	if hello.extensions.Parsed != nil {
+		m["extensions"] = hello.extensions.Parsed
 	}
 	return m
 }
@@ -383,8 +386,8 @@ func parseCommonHello(buffer bufferView, dest *helloMessage) (int, bool) {
 }
 
 func (hello *helloMessage) parseExtensions(buffer bufferView) {
-	hello.extensions = parseExtensions(buffer)
-	if ticket, err := hello.extensions.GetValue("session_ticket"); err == nil {
+	hello.extensions = ParseExtensions(buffer)
+	if ticket, err := hello.extensions.Parsed.GetValue("session_ticket"); err == nil {
 		if value, ok := ticket.(string); ok {
 			hello.ticket.present = true
 			hello.ticket.value = value
@@ -413,7 +416,9 @@ func parseClientHello(buffer bufferView) *helloMessage {
 			logp.Warn("failed parsing client hello cipher suite")
 			return nil
 		}
-		result.supported.cipherSuites = append(result.supported.cipherSuites, cipherSuite(cipher))
+		if !isGreaseValue(cipher) {
+			result.supported.cipherSuites = append(result.supported.cipherSuites, cipherSuite(cipher))
+		}
 	}
 
 	pos += 2 + int(cipherSuitesLength)
@@ -486,6 +491,35 @@ func (version tlsVersion) String() string {
 	return fmt.Sprintf("%d.%d", version.major, version.minor)
 }
 
+func getKeySize(key interface{}) int {
+	if key == nil {
+		return 0
+	}
+	switch pubKey := key.(type) {
+	case *rsa.PublicKey:
+		if n := pubKey.N; n != nil {
+			return n.BitLen()
+		}
+
+	case *dsa.PublicKey:
+		if p := pubKey.Parameters.P; p != nil {
+			return p.BitLen()
+		}
+		if y := pubKey.Y; y != nil {
+			return y.BitLen()
+		}
+
+	case *ecdsa.PublicKey:
+		if params := pubKey.Params(); params != nil {
+			return params.BitSize
+		}
+		if y := pubKey.Y; y != nil {
+			return y.BitLen()
+		}
+	}
+	return 0
+}
+
 func certToMap(cert *x509.Certificate, includeRaw bool) common.MapStr {
 	certMap := common.MapStr{
 		"signature_algorithm":  cert.SignatureAlgorithm.String(),
@@ -496,6 +530,9 @@ func certToMap(cert *x509.Certificate, includeRaw bool) common.MapStr {
 		"subject":              toMap(&cert.Subject),
 		"not_before":           cert.NotBefore,
 		"not_after":            cert.NotAfter,
+	}
+	if keySize := getKeySize(cert.PublicKey); keySize > 0 {
+		certMap["public_key_size"] = keySize
 	}
 	san := make([]string, 0, len(cert.DNSNames)+len(cert.IPAddresses)+len(cert.EmailAddresses))
 	san = append(append(san, cert.DNSNames...), cert.EmailAddresses...)

@@ -1805,11 +1805,11 @@
               description: The hello extensions provided by the client.
               fields:
                 - name: server_name_indication
-                  type: array
+                  type: keyword
                   description: List of hostnames
 
                 - name: application_layer_protocol_negotiation
-                  type: array
+                  type: keyword
                   description: >
                     List of application-layer protocols the client is willing to use.
 
@@ -1855,7 +1855,6 @@
                     Used to announce that a session ticket will be provided
                     by the server. Always an empty string.
 
-
         - name: client_certificate
           type: group
           description: Certificate provided by the client for authentication.
@@ -1882,6 +1881,10 @@
               description: >
                 The algorithm used for this certificate's public key.
                 One of RSA, DSA or ECDSA.
+
+            - name: public_key_size
+              type: long
+              description: Size of the public key.
 
             - name: signature_algorithm
               type: keyword
@@ -1972,6 +1975,10 @@
                 The algorithm used for this certificate's public key.
                 One of RSA, DSA or ECDSA.
 
+            - name: public_key_size
+              type: long
+              description: Size of the public key.
+
             - name: signature_algorithm
               type: keyword
               description: >
@@ -2040,3 +2047,28 @@
         - name: client_certificate_chain
           type: array
           description: Chain of trust for the client certificate.
+
+        - name: alert_types
+          type: keyword
+          description: >
+            An array containing the TLS alert type for every alert received.
+
+        - name: fingerprints
+          type: group
+          description: Fingerprints for this TLS session.
+          fields:
+
+            - name: ja3
+              type: group
+              description: JA3 TLS client fingerprint
+              fields:
+
+                - name: hash
+                  type: keyword
+                  description: >
+                    The JA3 fingerprint hash for the client side.
+
+                - name: str
+                  type: keyword
+                  description: >
+                    The JA3 string used to calculate the hash.

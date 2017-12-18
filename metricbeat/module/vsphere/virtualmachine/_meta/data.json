@@ -1,16 +1,15 @@
 {
-    "@timestamp": "2016-05-23T08:05:34.853Z",
+    "@timestamp": "2017-10-12T08:05:34.853Z",
     "beat": {
         "hostname": "host.example.com",
         "name": "host.example.com"
     },
     "metricset": {
-        "host": "http://127.0.0.1:38179/sdk",
+        "host": "http://127.0.0.1:35887/sdk",
         "module": "vsphere",
         "name": "virtualmachine",
         "rtt": 115
     },
-    "type": "metricsets",
     "vsphere": {
         "virtualmachine": {
             "cpu": {
@@ -18,7 +17,7 @@
                     "mhz": 0
                 }
             },
-            "datacenter": "ha-datacenter",
+            "host": "ha-host",
             "memory": {
                 "free": {
                     "guest": {

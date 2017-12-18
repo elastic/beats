@@ -1,0 +1,18 @@
+generate:
+  worker: 3 # number of concurrent generators
+
+  # generator waits for event ACKs
+  ack: true
+
+  # maximum number of events per generator worker (<=0 for infinite)
+  max_events: 0
+
+  # generator shutdown blocks up to a duration of wait_close until all events
+  # have been ACKed.
+  wait_close: 0
+
+  # choose publish mode
+  #   - default: Retry count based on output. Blocks if queue is full
+  #   - guaranteed: Infinite retry + Block if queue is full (e.g. filebeat)
+  #   - drop_if_full: Drop event if queue can not accept the event (e.g. packetbeat)
+  publish_mode: "default"

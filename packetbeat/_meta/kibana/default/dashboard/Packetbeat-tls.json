@@ -1,0 +1,374 @@
+{
+  "objects": [
+    {
+      "attributes": {
+        "description": "",
+        "kibanaSavedObjectMeta": {
+          "searchSourceJSON": "{\"query\":{\"query\":{\"query_string\":{\"analyze_wildcard\":true,\"query\":\"*\"}},\"language\":\"lucene\"},\"filter\":[]}"
+        },
+        "title": "Navigation",
+        "uiStateJSON": "{}",
+        "version": 1,
+        "visState": "{\"title\":\"Navigation\",\"type\":\"markdown\",\"params\":{\"markdown\":\"### Packetbeat:\\n\\n[Overview](#/dashboard/Packetbeat-Dashboard)\\n\\n[Flows](#/dashboard/Packetbeat-Flows)\\n\\n[Web transactions](#/dashboard/Packetbeat-HTTP)\\n\\n[MySQL performance](#/dashboard/Packetbeat-MySQL-performance)\\n\\n[PostgreSQL performance](#/dashboard/Packetbeat-PgSQL-performance)\\n\\n[MongoDB performance](#/dashboard/Packetbeat-MongoDB-performance)\\n\\n[Thrift-RPC performance](#/dashboard/Packetbeat-Thrift-performance)\\n\\n[NFS transactions](#/dashboard/Packetbeat-NFS)\\n\\n[Cassandra performance](#/dashboard/Packetbeat-Cassandra)\",\"fontSize\":\"10\"},\"aggs\":[]}"
+      },
+      "id": "Navigation",
+      "type": "visualization",
+      "updated_at": "2017-11-29T15:31:44.592Z",
+      "version": 10
+    },
+    {
+      "attributes": {
+        "description": "",
+        "kibanaSavedObjectMeta": {
+          "searchSourceJSON": "{\"filter\":[],\"query\":{\"language\":\"lucene\",\"query\":\"\"}}"
+        },
+        "savedSearchId": "ffc3c0b0-d2d7-11e7-9914-4982455b3063",
+        "title": "TLS Sessions",
+        "uiStateJSON": "{\"vis\":{\"colors\":{\"false\":\"#E24D42\",\"true\":\"#7EB26D\"},\"legendOpen\":false}}",
+        "version": 1,
+        "visState": "{\"title\":\"TLS Sessions\",\"type\":\"histogram\",\"params\":{\"addLegend\":true,\"addTimeMarker\":false,\"addTooltip\":true,\"categoryAxes\":[{\"id\":\"CategoryAxis-1\",\"labels\":{\"show\":true,\"truncate\":100},\"position\":\"bottom\",\"scale\":{\"type\":\"linear\"},\"show\":true,\"style\":{},\"title\":{},\"type\":\"category\"}],\"grid\":{\"categoryLines\":false,\"style\":{\"color\":\"#eee\"},\"valueAxis\":\"ValueAxis-1\"},\"legendPosition\":\"right\",\"seriesParams\":[{\"data\":{\"id\":\"1\",\"label\":\"Count\"},\"drawLinesBetweenPoints\":true,\"mode\":\"stacked\",\"show\":\"true\",\"showCircles\":true,\"type\":\"histogram\",\"valueAxis\":\"ValueAxis-1\"}],\"times\":[],\"type\":\"histogram\",\"valueAxes\":[{\"id\":\"ValueAxis-1\",\"labels\":{\"filter\":false,\"rotate\":0,\"show\":true,\"truncate\":100},\"name\":\"LeftAxis-1\",\"position\":\"left\",\"scale\":{\"mode\":\"normal\",\"type\":\"linear\"},\"show\":true,\"style\":{},\"title\":{\"text\":\"Count\"},\"type\":\"value\"}]},\"aggs\":[{\"id\":\"1\",\"enabled\":true,\"type\":\"count\",\"schema\":\"metric\",\"params\":{}},{\"id\":\"2\",\"enabled\":true,\"type\":\"date_histogram\",\"schema\":\"segment\",\"params\":{\"field\":\"@timestamp\",\"interval\":\"auto\",\"customInterval\":\"2h\",\"min_doc_count\":1,\"extended_bounds\":{},\"customLabel\":\"Sessions per minute\"}},{\"id\":\"3\",\"enabled\":true,\"type\":\"terms\",\"schema\":\"group\",\"params\":{\"field\":\"tls.handshake_completed\",\"size\":5,\"order\":\"desc\",\"orderBy\":\"1\",\"json\":\"\",\"customLabel\":\"Handshake completed\"}}]}"
+      },
+      "id": "059fe5e0-d2dd-11e7-9914-4982455b3063",
+      "type": "visualization",
+      "updated_at": "2017-11-30T00:11:22.296Z",
+      "version": 2
+    },
+    {
+      "attributes": {
+        "description": "",
+        "kibanaSavedObjectMeta": {
+          "searchSourceJSON": "{\"index\":\"packetbeat-*\",\"filter\":[{\"query\":{\"exists\":{\"field\":\"tls\"}},\"meta\":{\"index\":\"packetbeat-*\",\"disabled\":false,\"alias\":null,\"type\":\"custom\",\"key\":\"query\",\"value\":\"{\\\"exists\\\":{\\\"field\\\":\\\"tls\\\"}}\",\"negate\":false},\"$state\":{\"store\":\"appState\"}}],\"query\":{\"query\":\"\",\"language\":\"lucene\"}}"
+        },
+        "title": "TLS Alerts",
+        "uiStateJSON": "{\"vis\":{\"colors\":{\"None\":\"#7EB26D\",\"handshake_failure\":\"#E24D42\"}}}",
+        "version": 1,
+        "visState": "{\"title\":\"TLS Alerts\",\"type\":\"pie\",\"params\":{\"type\":\"pie\",\"addTooltip\":true,\"addLegend\":true,\"legendPosition\":\"right\",\"isDonut\":true},\"aggs\":[{\"id\":\"1\",\"enabled\":true,\"type\":\"count\",\"schema\":\"metric\",\"params\":{}},{\"id\":\"2\",\"enabled\":true,\"type\":\"terms\",\"schema\":\"segment\",\"params\":{\"field\":\"tls.alert_types\",\"include\":\".*\",\"size\":5,\"order\":\"desc\",\"orderBy\":\"1\",\"json\":\"{\\\"missing\\\": \\\"None\\\"}\"}}]}"
+      },
+      "id": "c14377a0-d353-11e7-9914-4982455b3063",
+      "type": "visualization",
+      "updated_at": "2017-11-29T15:31:44.592Z",
+      "version": 1
+    },
+    {
+      "attributes": {
+        "description": "",
+        "kibanaSavedObjectMeta": {
+          "searchSourceJSON": "{\"index\":\"packetbeat-*\",\"filter\":[{\"meta\":{\"index\":\"packetbeat-*\",\"negate\":false,\"disabled\":false,\"alias\":null,\"type\":\"exists\",\"key\":\"tls.handshake_completed\",\"value\":\"exists\"},\"exists\":{\"field\":\"tls.handshake_completed\"},\"$state\":{\"store\":\"appState\"}}],\"query\":{\"language\":\"lucene\",\"query\":{\"query_string\":{\"analyze_wildcard\":true,\"default_field\":\"*\",\"query\":\"*\"}}}}"
+        },
+        "title": "Total Number of TLS Sessions",
+        "uiStateJSON": "{\"P-5\":{\"vis\":{\"defaultColors\":{\"0 - 100\":\"rgb(0,104,55)\"}}},\"P-7\":{\"vis\":{\"params\":{\"sort\":{\"columnIndex\":null,\"direction\":null}}}}}",
+        "version": 1,
+        "visState": "{\"title\":\"Total Number of TLS Sessions\",\"type\":\"metric\",\"params\":{\"addTooltip\":true,\"addLegend\":false,\"type\":\"metric\",\"metric\":{\"percentageMode\":false,\"useRanges\":false,\"colorSchema\":\"Green to Red\",\"metricColorMode\":\"None\",\"colorsRange\":[{\"from\":0,\"to\":10000}],\"labels\":{\"show\":true},\"invertColors\":false,\"style\":{\"bgFill\":\"#000\",\"bgColor\":false,\"labelColor\":false,\"subText\":\"\",\"fontSize\":60}}},\"aggs\":[{\"id\":\"1\",\"enabled\":true,\"type\":\"count\",\"schema\":\"metric\",\"params\":{}}]}"
+      },
+      "id": "061de380-d361-11e7-9914-4982455b3063",
+      "type": "visualization",
+      "updated_at": "2017-11-29T15:31:44.592Z",
+      "version": 1
+    },
+    {
+      "attributes": {
+        "description": "",
+        "kibanaSavedObjectMeta": {
+          "searchSourceJSON": "{\"filter\":[],\"query\":{\"language\":\"lucene\",\"query\":\"\"}}"
+        },
+        "savedSearchId": "94908e80-d2d8-11e7-9914-4982455b3063",
+        "title": "TLS Server Name Indication",
+        "uiStateJSON": "{}",
+        "version": 1,
+        "visState": "{\"title\":\"TLS Server Name Indication\",\"type\":\"tagcloud\",\"params\":{\"maxFontSize\":64,\"minFontSize\":14,\"orientation\":\"single\",\"scale\":\"linear\",\"hideLabel\":false},\"aggs\":[{\"id\":\"1\",\"enabled\":true,\"type\":\"count\",\"schema\":\"metric\",\"params\":{}},{\"id\":\"2\",\"enabled\":true,\"type\":\"terms\",\"schema\":\"segment\",\"params\":{\"field\":\"tls.client_hello.extensions.server_name_indication\",\"size\":5,\"order\":\"desc\",\"orderBy\":\"1\",\"customLabel\":\"Server Name Indication\"}}]}"
+      },
+      "id": "a28d09d0-d361-11e7-9914-4982455b3063",
+      "type": "visualization",
+      "updated_at": "2017-11-29T15:31:44.592Z",
+      "version": 1
+    },
+    {
+      "attributes": {
+        "description": "",
+        "kibanaSavedObjectMeta": {
+          "searchSourceJSON": "{\"filter\":[],\"query\":{\"query\":\"\",\"language\":\"lucene\"}}"
+        },
+        "savedSearchId": "bf3d23b0-d37c-11e7-9914-4982455b3063",
+        "title": "TLS Versions",
+        "uiStateJSON": "{}",
+        "version": 1,
+        "visState": "{\"title\":\"TLS Versions\",\"type\":\"pie\",\"params\":{\"type\":\"pie\",\"addTooltip\":true,\"addLegend\":true,\"legendPosition\":\"right\",\"isDonut\":true},\"aggs\":[{\"id\":\"1\",\"enabled\":true,\"type\":\"count\",\"schema\":\"metric\",\"params\":{}},{\"id\":\"2\",\"enabled\":true,\"type\":\"terms\",\"schema\":\"segment\",\"params\":{\"field\":\"tls.server_hello.version\",\"size\":5,\"order\":\"desc\",\"orderBy\":\"1\",\"customLabel\":\"TLS version\"}}]}"
+      },
+      "id": "0af0b790-d37d-11e7-9914-4982455b3063",
+      "type": "visualization",
+      "updated_at": "2017-11-29T15:31:44.592Z",
+      "version": 1
+    },
+    {
+      "attributes": {
+        "description": "",
+        "kibanaSavedObjectMeta": {
+          "searchSourceJSON": "{\"filter\":[],\"query\":{\"query\":\"\",\"language\":\"lucene\"}}"
+        },
+        "savedSearchId": "8f0ff590-d37d-11e7-9914-4982455b3063",
+        "title": "TLS Client Version",
+        "uiStateJSON": "{}",
+        "version": 1,
+        "visState": "{\"title\":\"TLS Client Version\",\"type\":\"pie\",\"params\":{\"type\":\"pie\",\"addTooltip\":true,\"addLegend\":true,\"legendPosition\":\"right\",\"isDonut\":true},\"aggs\":[{\"id\":\"1\",\"enabled\":true,\"type\":\"count\",\"schema\":\"metric\",\"params\":{}},{\"id\":\"2\",\"enabled\":true,\"type\":\"terms\",\"schema\":\"segment\",\"params\":{\"field\":\"tls.client_hello.version\",\"size\":5,\"order\":\"desc\",\"orderBy\":\"1\",\"customLabel\":\"Client version\"}}]}"
+      },
+      "id": "ae6e33c0-d37d-11e7-9914-4982455b3063",
+      "type": "visualization",
+      "updated_at": "2017-11-29T15:31:44.592Z",
+      "version": 1
+    },
+    {
+      "attributes": {
+        "description": "",
+        "kibanaSavedObjectMeta": {
+          "searchSourceJSON": "{\"filter\":[],\"query\":{\"query\":\"\",\"language\":\"lucene\"}}"
+        },
+        "savedSearchId": "ffc3c0b0-d2d7-11e7-9914-4982455b3063",
+        "title": "TLS Session Resume",
+        "uiStateJSON": "{}",
+        "version": 1,
+        "visState": "{\"title\":\"TLS Session Resume\",\"type\":\"pie\",\"params\":{\"type\":\"pie\",\"addTooltip\":true,\"addLegend\":true,\"legendPosition\":\"right\",\"isDonut\":true},\"aggs\":[{\"id\":\"1\",\"enabled\":true,\"type\":\"count\",\"schema\":\"metric\",\"params\":{}},{\"id\":\"2\",\"enabled\":true,\"type\":\"terms\",\"schema\":\"segment\",\"params\":{\"field\":\"tls.resumption_method\",\"exclude\":\"xxx-nope\",\"size\":5,\"order\":\"desc\",\"orderBy\":\"1\",\"json\":\"{\\n\\\"missing\\\": \\\"none\\\"\\n}\"}}]}"
+      },
+      "id": "2c467370-d392-11e7-8fa0-232aa9259081",
+      "type": "visualization",
+      "updated_at": "2017-11-29T15:31:44.592Z",
+      "version": 1
+    },
+    {
+      "attributes": {
+        "description": "",
+        "kibanaSavedObjectMeta": {
+          "searchSourceJSON": "{\"filter\":[],\"query\":{\"query\":\"\",\"language\":\"lucene\"}}"
+        },
+        "savedSearchId": "ffc3c0b0-d2d7-11e7-9914-4982455b3063",
+        "title": "TLS Server Certificates",
+        "uiStateJSON": "{\"vis\":{\"params\":{\"sort\":{\"columnIndex\":null,\"direction\":null}}}}",
+        "version": 1,
+        "visState": "{\"title\":\"TLS Server Certificates\",\"type\":\"table\",\"params\":{\"perPage\":10,\"showPartialRows\":false,\"showMeticsAtAllLevels\":false,\"sort\":{\"columnIndex\":null,\"direction\":null},\"showTotal\":false,\"totalFunc\":\"sum\"},\"aggs\":[{\"id\":\"1\",\"enabled\":true,\"type\":\"count\",\"schema\":\"metric\",\"params\":{\"customLabel\":\"\"}},{\"id\":\"4\",\"enabled\":true,\"type\":\"terms\",\"schema\":\"bucket\",\"params\":{\"field\":\"tls.server_certificate.subject.common_name\",\"size\":10,\"order\":\"desc\",\"orderBy\":\"1\",\"customLabel\":\"Subject Common Name\"}},{\"id\":\"3\",\"enabled\":true,\"type\":\"terms\",\"schema\":\"bucket\",\"params\":{\"field\":\"tls.server_certificate.subject.organization\",\"size\":5,\"order\":\"desc\",\"orderBy\":\"1\",\"customLabel\":\"Organization\"}}]}"
+      },
+      "id": "0958a910-d396-11e7-8fa0-232aa9259081",
+      "type": "visualization",
+      "updated_at": "2017-11-29T15:31:44.592Z",
+      "version": 1
+    },
+    {
+      "attributes": {
+        "description": "",
+        "kibanaSavedObjectMeta": {
+          "searchSourceJSON": "{\"filter\":[],\"query\":{\"query\":\"\",\"language\":\"lucene\"}}"
+        },
+        "savedSearchId": "ffc3c0b0-d2d7-11e7-9914-4982455b3063",
+        "title": "TLS Client Certificates",
+        "uiStateJSON": "{\"vis\":{\"params\":{\"sort\":{\"columnIndex\":null,\"direction\":null}}}}",
+        "version": 1,
+        "visState": "{\"title\":\"TLS Client Certificates\",\"type\":\"table\",\"params\":{\"perPage\":10,\"showPartialRows\":false,\"showMeticsAtAllLevels\":false,\"sort\":{\"columnIndex\":null,\"direction\":null},\"showTotal\":false,\"totalFunc\":\"sum\"},\"aggs\":[{\"id\":\"1\",\"enabled\":true,\"type\":\"count\",\"schema\":\"metric\",\"params\":{}},{\"id\":\"2\",\"enabled\":true,\"type\":\"terms\",\"schema\":\"bucket\",\"params\":{\"field\":\"tls.client_certificate.subject.common_name\",\"size\":5,\"order\":\"desc\",\"orderBy\":\"1\",\"customLabel\":\"Subject Common Name\"}},{\"id\":\"3\",\"enabled\":true,\"type\":\"terms\",\"schema\":\"bucket\",\"params\":{\"field\":\"tls.client_certificate.signature_algorithm\",\"size\":5,\"order\":\"desc\",\"orderBy\":\"1\",\"json\":\"{ \\\"missing\\\": \\\"N/A\\\" }\",\"customLabel\":\"Signature Algorithm\"}}]}"
+      },
+      "id": "86743f90-d396-11e7-8fa0-232aa9259081",
+      "type": "visualization",
+      "updated_at": "2017-11-29T15:31:44.592Z",
+      "version": 1
+    },
+    {
+      "attributes": {
+        "description": "",
+        "kibanaSavedObjectMeta": {
+          "searchSourceJSON": "{\"filter\":[],\"query\":{\"query\":\"\",\"language\":\"lucene\"}}"
+        },
+        "savedSearchId": "ffc3c0b0-d2d7-11e7-9914-4982455b3063",
+        "title": "TLS Cipher",
+        "uiStateJSON": "{\"vis\":{\"params\":{\"sort\":{\"columnIndex\":null,\"direction\":null}}}}",
+        "version": 1,
+        "visState": "{\"title\":\"TLS Cipher\",\"type\":\"table\",\"params\":{\"perPage\":10,\"showPartialRows\":false,\"showMeticsAtAllLevels\":false,\"sort\":{\"columnIndex\":null,\"direction\":null},\"showTotal\":false,\"totalFunc\":\"sum\"},\"aggs\":[{\"id\":\"1\",\"enabled\":true,\"type\":\"count\",\"schema\":\"metric\",\"params\":{}},{\"id\":\"2\",\"enabled\":true,\"type\":\"terms\",\"schema\":\"bucket\",\"params\":{\"field\":\"tls.server_hello.selected_cipher\",\"size\":5,\"order\":\"desc\",\"orderBy\":\"1\",\"customLabel\":\"Cipher\"}}]}"
+      },
+      "id": "463d2bf0-d3a8-11e7-9081-ab2af08e9961",
+      "type": "visualization",
+      "updated_at": "2017-11-29T15:31:44.592Z",
+      "version": 1
+    },
+    {
+      "attributes": {
+        "description": "",
+        "kibanaSavedObjectMeta": {
+          "searchSourceJSON": "{\"filter\":[],\"query\":{\"query\":\"\",\"language\":\"lucene\"}}"
+        },
+        "savedSearchId": "6b1b1360-d49d-11e7-996f-bd7c1ca4591b",
+        "title": "TLS Fingerprint",
+        "uiStateJSON": "{\"vis\":{\"params\":{\"sort\":{\"columnIndex\":null,\"direction\":null}}}}",
+        "version": 1,
+        "visState": "{\"title\":\"TLS Fingerprint\",\"type\":\"table\",\"params\":{\"perPage\":10,\"showPartialRows\":false,\"showMeticsAtAllLevels\":false,\"sort\":{\"columnIndex\":null,\"direction\":null},\"showTotal\":false,\"totalFunc\":\"sum\"},\"aggs\":[{\"id\":\"1\",\"enabled\":true,\"type\":\"count\",\"schema\":\"metric\",\"params\":{}},{\"id\":\"2\",\"enabled\":true,\"type\":\"terms\",\"schema\":\"bucket\",\"params\":{\"field\":\"tls.fingerprints.ja3.hash\",\"size\":5,\"order\":\"desc\",\"orderBy\":\"1\",\"customLabel\":\"JA3 Fingerprint\"}}]}"
+      },
+      "id": "ad2a8b50-d49d-11e7-996f-bd7c1ca4591b",
+      "type": "visualization",
+      "updated_at": "2017-11-29T15:31:44.592Z",
+      "version": 1
+    },
+    {
+      "attributes": {
+        "description": "",
+        "kibanaSavedObjectMeta": {
+          "searchSourceJSON": "{\"filter\":[{\"$state\":{\"store\":\"appState\"},\"meta\":{\"alias\":null,\"disabled\":false,\"index\":\"packetbeat-*\",\"key\":\"responsetime\",\"negate\":false,\"params\":{\"gte\":0,\"lt\":1000},\"type\":\"range\",\"value\":\"0 to 1,000\"},\"range\":{\"responsetime\":{\"gte\":0,\"lt\":1000}}}],\"query\":{\"language\":\"lucene\",\"query\":\"\"}}"
+        },
+        "savedSearchId": "8e2af860-d520-11e7-9fff-7b1ebf397ba9",
+        "title": "TLS handshake latency",
+        "uiStateJSON": "{\"vis\":{\"legendOpen\":false}}",
+        "version": 1,
+        "visState": "{\"title\":\"TLS handshake latency\",\"type\":\"area\",\"params\":{\"type\":\"area\",\"grid\":{\"categoryLines\":false,\"style\":{\"color\":\"#eee\"}},\"categoryAxes\":[{\"id\":\"CategoryAxis-1\",\"type\":\"category\",\"position\":\"bottom\",\"show\":true,\"style\":{},\"scale\":{\"type\":\"linear\"},\"labels\":{\"show\":true,\"truncate\":100,\"filter\":true},\"title\":{}}],\"valueAxes\":[{\"id\":\"ValueAxis-1\",\"name\":\"LeftAxis-1\",\"type\":\"value\",\"position\":\"left\",\"show\":true,\"style\":{},\"scale\":{\"type\":\"linear\",\"mode\":\"normal\"},\"labels\":{\"show\":true,\"rotate\":0,\"filter\":false,\"truncate\":100},\"title\":{\"text\":\"Count\"}}],\"seriesParams\":[{\"show\":\"true\",\"type\":\"area\",\"mode\":\"stacked\",\"data\":{\"label\":\"Count\",\"id\":\"1\"},\"drawLinesBetweenPoints\":true,\"showCircles\":true,\"interpolate\":\"linear\",\"valueAxis\":\"ValueAxis-1\"}],\"addTooltip\":true,\"addLegend\":true,\"legendPosition\":\"right\",\"times\":[],\"addTimeMarker\":false},\"aggs\":[{\"id\":\"1\",\"enabled\":true,\"type\":\"count\",\"schema\":\"metric\",\"params\":{}},{\"id\":\"2\",\"enabled\":true,\"type\":\"histogram\",\"schema\":\"segment\",\"params\":{\"field\":\"responsetime\",\"interval\":2,\"extended_bounds\":{},\"customLabel\":\"Handshake latency (milliseconds)\"}}]}"
+      },
+      "id": "d2e15950-d560-11e7-9fff-7b1ebf397ba9",
+      "type": "visualization",
+      "updated_at": "2017-11-30T00:10:49.715Z",
+      "version": 2
+    },
+    {
+      "attributes": {
+        "columns": [
+          "_source"
+        ],
+        "description": "",
+        "hits": 0,
+        "kibanaSavedObjectMeta": {
+          "searchSourceJSON": "{\"index\":\"packetbeat-*\",\"highlightAll\":true,\"version\":true,\"query\":{\"language\":\"lucene\",\"query\":{\"query_string\":{\"analyze_wildcard\":true,\"default_field\":\"*\",\"query\":\"*\"}}},\"filter\":[{\"$state\":{\"store\":\"appState\"},\"exists\":{\"field\":\"tls.handshake_completed\"},\"meta\":{\"alias\":\"TLS sessions\",\"disabled\":false,\"index\":\"packetbeat-*\",\"key\":\"tls.handshake_completed\",\"negate\":false,\"type\":\"exists\",\"value\":\"exists\"}}]}"
+        },
+        "sort": [
+          "@timestamp",
+          "desc"
+        ],
+        "title": "TLS Sessions",
+        "version": 1
+      },
+      "id": "ffc3c0b0-d2d7-11e7-9914-4982455b3063",
+      "type": "search",
+      "updated_at": "2017-11-29T15:31:44.592Z",
+      "version": 1
+    },
+    {
+      "attributes": {
+        "columns": [
+          "_source"
+        ],
+        "description": "",
+        "hits": 0,
+        "kibanaSavedObjectMeta": {
+          "searchSourceJSON": "{\"index\":\"packetbeat-*\",\"highlightAll\":true,\"version\":true,\"query\":{\"language\":\"lucene\",\"query\":{\"query_string\":{\"analyze_wildcard\":true,\"default_field\":\"*\",\"query\":\"*\"}}},\"filter\":[{\"meta\":{\"index\":\"packetbeat-*\",\"negate\":false,\"disabled\":false,\"alias\":null,\"type\":\"exists\",\"key\":\"tls.client_hello.extensions.server_name_indication\",\"value\":\"exists\"},\"exists\":{\"field\":\"tls.client_hello.extensions.server_name_indication\"},\"$state\":{\"store\":\"appState\"}}]}"
+        },
+        "sort": [
+          "@timestamp",
+          "desc"
+        ],
+        "title": "TLS Server Name Indication",
+        "version": 1
+      },
+      "id": "94908e80-d2d8-11e7-9914-4982455b3063",
+      "type": "search",
+      "updated_at": "2017-11-29T15:31:44.592Z",
+      "version": 1
+    },
+    {
+      "attributes": {
+        "columns": [
+          "_source"
+        ],
+        "description": "",
+        "hits": 0,
+        "kibanaSavedObjectMeta": {
+          "searchSourceJSON": "{\"index\":\"packetbeat-*\",\"highlightAll\":true,\"version\":true,\"query\":{\"language\":\"lucene\",\"query\":{\"query_string\":{\"analyze_wildcard\":true,\"default_field\":\"*\",\"query\":\"*\"}}},\"filter\":[{\"meta\":{\"index\":\"packetbeat-*\",\"negate\":false,\"disabled\":false,\"alias\":null,\"type\":\"exists\",\"key\":\"tls.server_hello.version\",\"value\":\"exists\"},\"exists\":{\"field\":\"tls.server_hello.version\"},\"$state\":{\"store\":\"appState\"}}]}"
+        },
+        "sort": [
+          "@timestamp",
+          "desc"
+        ],
+        "title": "TLS Version",
+        "version": 1
+      },
+      "id": "bf3d23b0-d37c-11e7-9914-4982455b3063",
+      "type": "search",
+      "updated_at": "2017-11-29T15:31:44.592Z",
+      "version": 1
+    },
+    {
+      "attributes": {
+        "columns": [
+          "_source"
+        ],
+        "description": "",
+        "hits": 0,
+        "kibanaSavedObjectMeta": {
+          "searchSourceJSON": "{\"index\":\"packetbeat-*\",\"highlightAll\":true,\"version\":true,\"query\":{\"language\":\"lucene\",\"query\":{\"query_string\":{\"analyze_wildcard\":true,\"default_field\":\"*\",\"query\":\"*\"}}},\"filter\":[{\"meta\":{\"index\":\"packetbeat-*\",\"negate\":false,\"disabled\":false,\"alias\":null,\"type\":\"exists\",\"key\":\"tls.client_hello.version\",\"value\":\"exists\"},\"exists\":{\"field\":\"tls.client_hello.version\"},\"$state\":{\"store\":\"appState\"}}]}"
+        },
+        "sort": [
+          "@timestamp",
+          "desc"
+        ],
+        "title": "TLS Client Version",
+        "version": 1
+      },
+      "id": "8f0ff590-d37d-11e7-9914-4982455b3063",
+      "type": "search",
+      "updated_at": "2017-11-29T15:31:44.592Z",
+      "version": 1
+    },
+    {
+      "attributes": {
+        "columns": [
+          "_source"
+        ],
+        "description": "",
+        "hits": 0,
+        "kibanaSavedObjectMeta": {
+          "searchSourceJSON": "{\"index\":\"packetbeat-*\",\"highlightAll\":true,\"version\":true,\"query\":{\"query\":\"\",\"language\":\"lucene\"},\"filter\":[{\"meta\":{\"index\":\"packetbeat-*\",\"negate\":false,\"disabled\":false,\"alias\":null,\"type\":\"exists\",\"key\":\"tls.fingerprints.ja3.hash\",\"value\":\"exists\"},\"exists\":{\"field\":\"tls.fingerprints.ja3.hash\"},\"$state\":{\"store\":\"appState\"}}]}"
+        },
+        "sort": [
+          "@timestamp",
+          "desc"
+        ],
+        "title": "TLS Fingerprint",
+        "version": 1
+      },
+      "id": "6b1b1360-d49d-11e7-996f-bd7c1ca4591b",
+      "type": "search",
+      "updated_at": "2017-11-29T15:31:44.592Z",
+      "version": 1
+    },
+    {
+      "attributes": {
+        "columns": [
+          "_source"
+        ],
+        "description": "",
+        "hits": 0,
+        "kibanaSavedObjectMeta": {
+          "searchSourceJSON": "{\"index\":\"packetbeat-*\",\"highlightAll\":true,\"version\":true,\"query\":{\"language\":\"lucene\",\"query\":\"\"},\"filter\":[{\"$state\":{\"store\":\"appState\"},\"exists\":{\"field\":\"tls.handshake_completed\"},\"meta\":{\"alias\":null,\"disabled\":false,\"index\":\"packetbeat-*\",\"key\":\"tls.handshake_completed\",\"negate\":false,\"type\":\"exists\",\"value\":\"exists\"}},{\"$state\":{\"store\":\"appState\"},\"exists\":{\"field\":\"responsetime\"},\"meta\":{\"alias\":null,\"disabled\":false,\"index\":\"packetbeat-*\",\"key\":\"responsetime\",\"negate\":false,\"type\":\"exists\",\"value\":\"exists\"}}]}"
+        },
+        "sort": [
+          "@timestamp",
+          "desc"
+        ],
+        "title": "TLS handshake latency",
+        "version": 1
+      },
+      "id": "8e2af860-d520-11e7-9fff-7b1ebf397ba9",
+      "type": "search",
+      "updated_at": "2017-11-29T16:33:23.311Z",
+      "version": 2
+    },
+    {
+      "attributes": {
+        "description": "TLS Sessions",
+        "hits": 0,
+        "kibanaSavedObjectMeta": {
+          "searchSourceJSON": "{\"filter\":[],\"query\":{\"language\":\"lucene\",\"query\":{\"query_string\":{\"analyze_wildcard\":true,\"default_field\":\"*\",\"query\":\"*\"}}},\"highlightAll\":true,\"version\":true}"
+        },
+        "optionsJSON": "{\"darkTheme\":false,\"useMargins\":false}",
+        "panelsJSON": "[{\"panelIndex\":\"4\",\"gridData\":{\"x\":0,\"y\":0,\"w\":3,\"h\":4,\"i\":\"4\"},\"id\":\"Navigation\",\"type\":\"visualization\",\"version\":\"7.0.0-alpha1-SNAPSHOT\"},{\"panelIndex\":\"8\",\"gridData\":{\"x\":3,\"y\":0,\"w\":9,\"h\":4,\"i\":\"8\"},\"id\":\"059fe5e0-d2dd-11e7-9914-4982455b3063\",\"type\":\"visualization\",\"version\":\"7.0.0-alpha1-SNAPSHOT\"},{\"panelIndex\":\"9\",\"gridData\":{\"x\":3,\"y\":7,\"w\":3,\"h\":3,\"i\":\"9\"},\"id\":\"c14377a0-d353-11e7-9914-4982455b3063\",\"type\":\"visualization\",\"version\":\"7.0.0-alpha1-SNAPSHOT\"},{\"panelIndex\":\"10\",\"gridData\":{\"x\":0,\"y\":4,\"w\":3,\"h\":3,\"i\":\"10\"},\"id\":\"061de380-d361-11e7-9914-4982455b3063\",\"type\":\"visualization\",\"version\":\"7.0.0-alpha1-SNAPSHOT\"},{\"panelIndex\":\"11\",\"gridData\":{\"x\":0,\"y\":10,\"w\":12,\"h\":3,\"i\":\"11\"},\"id\":\"a28d09d0-d361-11e7-9914-4982455b3063\",\"type\":\"visualization\",\"version\":\"7.0.0-alpha1-SNAPSHOT\"},{\"panelIndex\":\"12\",\"gridData\":{\"x\":6,\"y\":7,\"w\":3,\"h\":3,\"i\":\"12\"},\"id\":\"0af0b790-d37d-11e7-9914-4982455b3063\",\"type\":\"visualization\",\"version\":\"7.0.0-alpha1-SNAPSHOT\"},{\"panelIndex\":\"13\",\"gridData\":{\"x\":9,\"y\":7,\"w\":3,\"h\":3,\"i\":\"13\"},\"id\":\"ae6e33c0-d37d-11e7-9914-4982455b3063\",\"type\":\"visualization\",\"version\":\"7.0.0-alpha1-SNAPSHOT\"},{\"panelIndex\":\"14\",\"gridData\":{\"x\":0,\"y\":7,\"w\":3,\"h\":3,\"i\":\"14\"},\"id\":\"2c467370-d392-11e7-8fa0-232aa9259081\",\"type\":\"visualization\",\"version\":\"7.0.0-alpha1-SNAPSHOT\"},{\"panelIndex\":\"15\",\"gridData\":{\"x\":0,\"y\":13,\"w\":6,\"h\":3,\"i\":\"15\"},\"id\":\"0958a910-d396-11e7-8fa0-232aa9259081\",\"type\":\"visualization\",\"version\":\"7.0.0-alpha1-SNAPSHOT\"},{\"panelIndex\":\"16\",\"gridData\":{\"x\":0,\"y\":16,\"w\":6,\"h\":3,\"i\":\"16\"},\"id\":\"86743f90-d396-11e7-8fa0-232aa9259081\",\"type\":\"visualization\",\"version\":\"7.0.0-alpha1-SNAPSHOT\"},{\"panelIndex\":\"17\",\"gridData\":{\"x\":6,\"y\":13,\"w\":6,\"h\":3,\"i\":\"17\"},\"id\":\"463d2bf0-d3a8-11e7-9081-ab2af08e9961\",\"type\":\"visualization\",\"version\":\"7.0.0-alpha1-SNAPSHOT\"},{\"panelIndex\":\"18\",\"gridData\":{\"x\":6,\"y\":16,\"w\":6,\"h\":3,\"i\":\"18\"},\"id\":\"ad2a8b50-d49d-11e7-996f-bd7c1ca4591b\",\"type\":\"visualization\",\"version\":\"7.0.0-alpha1-SNAPSHOT\"},{\"panelIndex\":\"19\",\"gridData\":{\"x\":3,\"y\":4,\"w\":9,\"h\":3,\"i\":\"19\"},\"version\":\"7.0.0-alpha1-SNAPSHOT\",\"type\":\"visualization\",\"id\":\"d2e15950-d560-11e7-9fff-7b1ebf397ba9\"}]",
+        "timeRestore": false,
+        "title": "[Packetbeat] TLS Sessions",
+        "uiStateJSON": "{\"P-15\":{\"vis\":{\"params\":{\"sort\":{\"columnIndex\":null,\"direction\":null}}}},\"P-16\":{\"vis\":{\"params\":{\"sort\":{\"columnIndex\":null,\"direction\":null}}}},\"P-17\":{\"vis\":{\"params\":{\"sort\":{\"columnIndex\":null,\"direction\":null}}}},\"P-18\":{\"vis\":{\"params\":{\"sort\":{\"columnIndex\":null,\"direction\":null}}}},\"P-5\":{\"vis\":{\"defaultColors\":{\"0 - 100\":\"rgb(0,104,55)\"}}},\"P-7\":{\"vis\":{\"params\":{\"sort\":{\"columnIndex\":null,\"direction\":null}}}}}",
+        "version": 1
+      },
+      "id": "tls-sessions",
+      "type": "dashboard",
+      "updated_at": "2017-11-30T00:16:42.402Z",
+      "version": 2
+    }
+  ],
+  "version": "7.0.0-alpha1-SNAPSHOT"
+}

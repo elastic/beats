@@ -1,0 +1,30 @@
+- name: raid
+  type: group
+  description: >
+    raid
+  release: experimental
+  fields:
+    - name: name
+      type: keyword
+      description: >
+        Name of the device.
+    - name: activity_state
+      type: keyword
+      description: >
+        activity-state of the device.
+    - name: disks.active
+      type: long
+      description: >
+         Number of active disks.
+    - name: disks.total
+      type: long
+      description: >
+        Total number of disks the device consists of.
+    - name: blocks.total
+      type: long
+      description: >
+        Number of blocks the device holds.
+    - name: blocks.synced
+      type: long
+      description: >
+        Number of blocks on the device that are in sync.

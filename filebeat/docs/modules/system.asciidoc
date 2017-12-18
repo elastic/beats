@@ -18,6 +18,10 @@ include::../include/what-happens.asciidoc[]
 This module was tested with logs from OSes like Ubuntu 12.04, Centos 7, and
 macOS Sierra.
 
+This module requires the
+{elasticsearch-plugins}/ingest-user-agent.html[ingest-user-agent] and
+{elasticsearch-plugins}/ingest-geoip.html[ingest-geoip] Elasticsearch plugins.
+
 This module is not available for Windows.
 
 include::../include/running-modules.asciidoc[]
@@ -51,11 +55,11 @@ To specify the same settings at the command line, you use:
 
 ["source","sh",subs="attributes"]
 -----
-./{beatname_lc} -M "system.syslog.var.paths=[/path/to/log/syslog*]" -M "system.auth.var.paths=[/path/to/log/auth.log*]"
+./{beatname_lc} --modules {modulename} -M "system.syslog.var.paths=[/path/to/log/syslog*]" -M "system.auth.var.paths=[/path/to/log/auth.log*]"
 -----
 
 
-The command in the example assumes that you have already enabled the +{modulename}+ module.
+
 
 //set the fileset name used in the included example
 :fileset_ex: syslog

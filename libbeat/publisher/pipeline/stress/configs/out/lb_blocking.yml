@@ -1,0 +1,17 @@
+# configure testOutput
+output.test:
+  # number of consumer/output workers
+  worker: 4
+
+  # max batch size consumer is asking for (set <= 0 for all available buffered events)
+  bulk_max_size: 32
+
+  # min/max ime to wait before ACKing a batch. Set max_wait=0 to disable waiting
+  min_wait: 10ms # 1s
+  max_wait: 150ms # 3s
+
+  # number of retries on failure (set <0 for infinite retry)
+  retry: 3
+
+  # 
+  fail.every: 0

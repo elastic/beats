@@ -370,7 +370,7 @@ func (self *ProcMem) Get(pid int) error {
 }
 
 func (self *ProcTime) Get(pid int) error {
-	return nil
+	return ErrNotImplemented{runtime.GOOS}
 }
 
 func (self *ProcExe) Get(pid int) error {

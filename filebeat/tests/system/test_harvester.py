@@ -405,6 +405,9 @@ class Test(BaseTest):
         for n in range(0, iterations1):
             file.write("example data")
             file.write("\n")
+            # Make sure some contents are written to disk so the harvested is able to read it.
+            file.flush()
+            os.fsync(file)
             time.sleep(0.001)
 
         file.close()

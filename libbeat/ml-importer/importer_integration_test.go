@@ -11,7 +11,7 @@ import (
 	"github.com/stretchr/testify/assert"
 
 	"github.com/elastic/beats/libbeat/logp"
-	"github.com/elastic/beats/libbeat/outputs/elasticsearch"
+	"github.com/elastic/beats/libbeat/outputs/elasticsearch/estest"
 )
 
 const sampleJob = `
@@ -43,8 +43,6 @@ const sampleJob = `
 const sampleDatafeed = `
 {
     "job_id": "PLACEHOLDER",
-    "query_delay": "60s",
-    "frequency": "60s",
     "indexes": [
       "filebeat-*"
     ],
@@ -88,7 +86,7 @@ const sampleDatafeed = `
 `
 
 func TestImportJobs(t *testing.T) {
-	client := elasticsearch.GetTestingElasticsearch(t)
+	client := estest.GetTestingElasticsearch(t)
 
 	if testing.Verbose() {
 		logp.LogInit(logp.LOG_DEBUG, "", false, true, []string{"*"})
@@ -167,7 +165,7 @@ func TestImportJobs(t *testing.T) {
 		if datafeed.DatafeedId == "datafeed-test-ml-config" {
 			found = true
 			assert.Equal(t, datafeed.JobId, "test-ml-config")
-			assert.Equal(t, datafeed.QueryDelay, "60s")
+			assert.Equal(t, datafeed.QueryDelay, "87034ms")
 		}
 	}
 	assert.True(t, found)

@@ -26,7 +26,7 @@ func TestRunner(t *testing.T) {
 	}
 
 	// Create a new Wrapper based on the configuration.
-	m, err := module.NewWrapper(0, config, mb.Registry)
+	m, err := module.NewWrapper(config, mb.Registry, module.WithMetricSetInfo())
 	if err != nil {
 		t.Fatal(err)
 	}
