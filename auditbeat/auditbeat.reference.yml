@@ -73,7 +73,15 @@ auditbeat.modules:
   - /sbin
   - /usr/sbin
   - /etc
-  
+
+  # List of regular expressions to filter out notifications for unwanted files.
+  # Wrap in single quotes to workaround YAML escaping rules. By default no files
+  # are ignored.
+  exclude_files:
+  - '(?i)\.sw[nop]$'
+  - '~$'
+  - '/\.git($|/)'
+
   # Scan over the configured file paths at startup and send events for new or
   # modified files since the last time Auditbeat was running.
   scan_at_start: true

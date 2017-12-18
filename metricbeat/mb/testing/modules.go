@@ -38,6 +38,7 @@ package testing
 
 import (
 	"sync"
+	"sync/atomic"
 	"testing"
 	"time"
 
@@ -217,46 +218,61 @@ func NewPushMetricSetV2(t testing.TB, config interface{}) mb.PushMetricSetV2 {
 	return pushMetricSet
 }
 
+// capturingReporterV2 stores all the events and errors from a metricset's
+// Run method.
 type capturingReporterV2 struct {
-	events []mb.Event
-	done   chan struct{}
+	Events []mb.Event
+	DoneC  chan struct{}
+	count  int32
 }
 
+// Event stores the passed-in event into the events array
 func (r *capturingReporterV2) Event(event mb.Event) bool {
-	r.events = append(r.events, event)
+	r.Events = append(r.Events, event)
+	atomic.AddInt32(&r.count, 1)
 	return true
 }
 
+// Error stores the given error into the errors array.
 func (r *capturingReporterV2) Error(err error) bool {
-	r.events = append(r.events, mb.Event{Error: err})
+	r.Events = append(r.Events, mb.Event{Error: err})
 	return true
 }
 
+// Done returns the Done channel for this reporter.
 func (r *capturingReporterV2) Done() <-chan struct{} {
-	return r.done
+	return r.DoneC
+}
+
+func (r *capturingReporterV2) eventCount() int {
+	return int(atomic.LoadInt32(&r.count))
 }
 
 // RunPushMetricSetV2 run the given push metricset for the specific amount of
 // time and returns all of the events and errors that occur during that period.
-func RunPushMetricSetV2(duration time.Duration, metricSet mb.PushMetricSetV2) []mb.Event {
-	r := &capturingReporterV2{done: make(chan struct{})}
+func RunPushMetricSetV2(timeout time.Duration, waitEvents int, metricSet mb.PushMetricSetV2) []mb.Event {
+	r := &capturingReporterV2{DoneC: make(chan struct{})}
+	defer close(r.DoneC)
 
-	// Run the metricset.
-	var wg sync.WaitGroup
-	wg.Add(1)
+	termC := make(chan struct{}, 1)
+
 	go func() {
-		defer wg.Done()
+		defer close(termC)
 		metricSet.Run(r)
 	}()
 
-	// Let it run for some period, then stop it by closing the done channel.
-	time.AfterFunc(duration, func() {
-		close(r.done)
-	})
-
-	// Wait for the PushMetricSet to completely stop.
-	wg.Wait()
-
-	// Return all events and errors that were collected.
-	return r.events
+	timeoutC := time.After(timeout)
+	for {
+		select {
+		case <-termC:
+			return r.Events
+		case <-timeoutC:
+			return r.Events
+		default:
+			if waitEvents != 0 && waitEvents <= r.eventCount() {
+				return r.Events
+			}
+			time.Sleep(100 * time.Millisecond)
+		}
+	}
 }

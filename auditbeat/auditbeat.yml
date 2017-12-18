@@ -44,7 +44,7 @@ auditbeat.modules:
   - /sbin
   - /usr/sbin
   - /etc
-  
+
 
 
 #==================== Elasticsearch template setting ==========================

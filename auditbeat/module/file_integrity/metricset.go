@@ -223,8 +223,8 @@ func (ms *MetricSet) purgeDeleted(reporter mb.PushReporterV2) {
 
 		for _, e := range deleted {
 			// Don't persist!
-			if !reporter.Event(buildMetricbeatEvent(e, true)) {
-				return
+			if !ms.config.IsExcludedPath(e.Path) {
+				reporter.Event(buildMetricbeatEvent(e, true))
 			}
 		}
 	}

@@ -104,6 +104,12 @@ func (s *scanner) walkDir(dir string) error {
 	errDone := errors.New("done")
 	startTime := time.Now()
 	err := filepath.Walk(dir, func(path string, info os.FileInfo, err error) error {
+		if s.config.IsExcludedPath(path) {
+			if info.IsDir() {
+				return filepath.SkipDir
+			}
+			return nil
+		}
 		defer func() { startTime = time.Now() }()
 
 		event := s.newScanEvent(path, info, err)

@@ -60,7 +60,7 @@ func (r *reader) consumeEvents() {
 	for {
 		select {
 		case event := <-r.watcher.EventChannel():
-			if event.Name == "" {
+			if event.Name == "" || r.config.IsExcludedPath(event.Name) {
 				continue
 			}
 			debugf("Received fsnotify event: path=%v action=%v",
