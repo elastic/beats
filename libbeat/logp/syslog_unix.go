@@ -53,7 +53,7 @@ func (c *syslogCore) Write(entry zapcore.Entry, fields []zapcore.Field) error {
 	}
 
 	// Console encoder writes tabs which don't render nicely with syslog.
-	replaceTabsWithSpaces(buffer.Bytes(), 2)
+	replaceTabsWithSpaces(buffer.Bytes(), 4)
 
 	msg := buffer.String()
 	switch entry.Level {

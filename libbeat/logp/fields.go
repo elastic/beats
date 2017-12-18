@@ -38,7 +38,7 @@ var (
 	Int64s      = zap.Int64s
 	Namespace   = zap.Namespace
 	Reflect     = zap.Reflect
-	Stack       = zap.Reflect
+	Stack       = zap.Stack
 	String      = zap.String
 	Stringer    = zap.Stringer
 	Strings     = zap.Strings
