@@ -37,9 +37,7 @@ type eventInfo struct {
 }
 
 func TestKafkaPublish(t *testing.T) {
-	if testing.Verbose() {
-		logp.LogInit(logp.LOG_DEBUG, "", false, true, []string{"kafka"})
-	}
+	logp.TestingSetup(logp.WithSelectors("kafka"))
 
 	id := strconv.Itoa(rand.New(rand.NewSource(int64(time.Now().Nanosecond()))).Int())
 	testTopic := fmt.Sprintf("test-libbeat-%s", id)

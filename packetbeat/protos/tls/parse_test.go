@@ -118,7 +118,7 @@ func mapInt(t *testing.T, m common.MapStr, key string) uint32 {
 func TestParseRecordHeader(t *testing.T) {
 	if testing.Verbose() {
 		isDebug = true
-		logp.LogInit(logp.LOG_DEBUG, "", false, true, []string{"tls", "tlsdetailed"})
+		logp.TestingSetup(logp.WithSelectors("tls", "tlsdetailed"))
 	}
 
 	_, err := readRecordHeader(sBuf(t, ""))
@@ -145,7 +145,7 @@ func TestParseRecordHeader(t *testing.T) {
 func TestParseHandshakeHeader(t *testing.T) {
 	if testing.Verbose() {
 		isDebug = true
-		logp.LogInit(logp.LOG_DEBUG, "", false, true, []string{"tls", "tlsdetailed"})
+		logp.TestingSetup(logp.WithSelectors("tls", "tlsdetailed"))
 	}
 
 	_, err := readHandshakeHeader(sBuf(t, ""))
@@ -164,7 +164,7 @@ func TestParseHandshakeHeader(t *testing.T) {
 func TestParserParse(t *testing.T) {
 	if testing.Verbose() {
 		isDebug = true
-		logp.LogInit(logp.LOG_DEBUG, "", false, true, []string{"tls", "tlsdetailed"})
+		logp.TestingSetup(logp.WithSelectors("tls", "tlsdetailed"))
 	}
 
 	parser := &parser{}
@@ -192,7 +192,7 @@ func TestParserParse(t *testing.T) {
 func TestParserHello(t *testing.T) {
 	if testing.Verbose() {
 		isDebug = true
-		logp.LogInit(logp.LOG_DEBUG, "", false, true, []string{"tls", "tlsdetailed"})
+		logp.TestingSetup(logp.WithSelectors("tls", "tlsdetailed"))
 	}
 
 	parser := &parser{}

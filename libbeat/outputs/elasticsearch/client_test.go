@@ -128,9 +128,7 @@ func TestCollectPublishFailAll(t *testing.T) {
 }
 
 func TestCollectPipelinePublishFail(t *testing.T) {
-	if testing.Verbose() {
-		logp.LogInit(logp.LOG_DEBUG, "", false, true, []string{"elasticsearch"})
-	}
+	logp.TestingSetup(logp.WithSelectors("elasticsearch"))
 
 	response := []byte(`{
       "took": 0, "ingest_took": 0, "errors": true,

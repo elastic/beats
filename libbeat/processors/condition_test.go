@@ -24,9 +24,7 @@ func (c *countFilter) Run(e *beat.Event) (*beat.Event, error) {
 func (c *countFilter) String() string { return "count" }
 
 func TestConditions(t *testing.T) {
-	if testing.Verbose() {
-		logp.LogInit(logp.LOG_DEBUG, "", false, true, []string{"*"})
-	}
+	logp.TestingSetup()
 
 	configs := []ConditionConfig{
 		{
@@ -74,9 +72,7 @@ func GetConditions(t *testing.T, configs []ConditionConfig) []Condition {
 }
 
 func TestEqualsCondition(t *testing.T) {
-	if testing.Verbose() {
-		logp.LogInit(logp.LOG_DEBUG, "", false, true, []string{"*"})
-	}
+	logp.TestingSetup()
 
 	configs := []ConditionConfig{
 		{
@@ -128,9 +124,7 @@ func TestEqualsCondition(t *testing.T) {
 }
 
 func TestContainsCondition(t *testing.T) {
-	if testing.Verbose() {
-		logp.LogInit(logp.LOG_DEBUG, "", false, true, []string{"*"})
-	}
+	logp.TestingSetup()
 
 	configs := []ConditionConfig{
 		{
@@ -185,9 +179,7 @@ func TestContainsCondition(t *testing.T) {
 }
 
 func TestRegexpCondition(t *testing.T) {
-	if testing.Verbose() {
-		logp.LogInit(logp.LOG_DEBUG, "", false, true, []string{"*"})
-	}
+	logp.TestingSetup()
 
 	configs := []ConditionConfig{
 		{
@@ -243,9 +235,7 @@ func TestRegexpCondition(t *testing.T) {
 }
 
 func TestRangeCondition(t *testing.T) {
-	if testing.Verbose() {
-		logp.LogInit(logp.LOG_DEBUG, "", false, true, []string{"*"})
-	}
+	logp.TestingSetup()
 
 	configs := []ConditionConfig{
 		{
@@ -335,9 +325,8 @@ func TestRangeCondition(t *testing.T) {
 }
 
 func TestORCondition(t *testing.T) {
-	if testing.Verbose() {
-		logp.LogInit(logp.LOG_DEBUG, "", false, true, []string{"*"})
-	}
+	logp.TestingSetup()
+
 	configs := []ConditionConfig{
 		{
 			OR: []ConditionConfig{
@@ -394,9 +383,7 @@ func TestORCondition(t *testing.T) {
 }
 
 func TestANDCondition(t *testing.T) {
-	if testing.Verbose() {
-		logp.LogInit(logp.LOG_DEBUG, "", false, true, []string{"*"})
-	}
+	logp.TestingSetup()
 	configs := []ConditionConfig{
 		{
 			AND: []ConditionConfig{
@@ -452,9 +439,8 @@ func TestANDCondition(t *testing.T) {
 }
 
 func TestNOTCondition(t *testing.T) {
-	if testing.Verbose() {
-		logp.LogInit(logp.LOG_DEBUG, "", false, true, []string{"*"})
-	}
+	logp.TestingSetup()
+
 	configs := []ConditionConfig{
 		{
 			NOT: &ConditionConfig{
@@ -503,9 +489,7 @@ func TestNOTCondition(t *testing.T) {
 }
 
 func TestCombinedCondition(t *testing.T) {
-	if testing.Verbose() {
-		logp.LogInit(logp.LOG_DEBUG, "", false, true, []string{"*"})
-	}
+	logp.TestingSetup()
 	configs := []ConditionConfig{
 		{
 			OR: []ConditionConfig{

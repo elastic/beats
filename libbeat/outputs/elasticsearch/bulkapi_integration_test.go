@@ -11,9 +11,7 @@ import (
 )
 
 func TestBulk(t *testing.T) {
-	if testing.Verbose() {
-		logp.LogInit(logp.LOG_DEBUG, "", false, true, []string{"elasticsearch"})
-	}
+	logp.TestingSetup(logp.WithSelectors("elasticsearch"))
 
 	client := getTestingElasticsearch(t)
 	index := fmt.Sprintf("packetbeat-unittest-%d", os.Getpid())
@@ -62,9 +60,7 @@ func TestBulk(t *testing.T) {
 }
 
 func TestEmptyBulk(t *testing.T) {
-	if testing.Verbose() {
-		logp.LogInit(logp.LOG_DEBUG, "", false, true, []string{"elasticsearch"})
-	}
+	logp.TestingSetup(logp.WithSelectors("elasticsearch"))
 
 	client := getTestingElasticsearch(t)
 	index := fmt.Sprintf("packetbeat-unittest-%d", os.Getpid())
@@ -84,9 +80,7 @@ func TestEmptyBulk(t *testing.T) {
 }
 
 func TestBulkMoreOperations(t *testing.T) {
-	if testing.Verbose() {
-		logp.LogInit(logp.LOG_DEBUG, "", false, true, []string{"elasticsearch"})
-	}
+	logp.TestingSetup(logp.WithSelectors("elasticsearch"))
 
 	client := getTestingElasticsearch(t)
 	index := fmt.Sprintf("packetbeat-unittest-%d", os.Getpid())

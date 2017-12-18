@@ -88,9 +88,7 @@ type TestStruct struct {
 
 // Helper method for creating mocks and the Udp instance under test.
 func testSetup(t *testing.T) *TestStruct {
-	if testing.Verbose() {
-		logp.LogInit(logp.LOG_DEBUG, "", false, true, []string{"udp"})
-	}
+	logp.TestingSetup(logp.WithSelectors("udp"))
 
 	protocols := &TestProtocols{}
 	protocols.udp = make(map[protos.Protocol]protos.UDPPlugin)

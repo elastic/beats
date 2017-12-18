@@ -63,9 +63,7 @@ func TestClientPublishEvent(t *testing.T) {
 func TestClientPublishEventWithPipeline(t *testing.T) {
 	type obj map[string]interface{}
 
-	if testing.Verbose() {
-		logp.LogInit(logp.LOG_DEBUG, "", false, true, []string{"elasticsearch"})
-	}
+	logp.TestingSetup(logp.WithSelectors("elasticsearch"))
 
 	index := "beat-int-pub-single-with-pipeline"
 	pipeline := "beat-int-pub-single-pipeline"
@@ -147,9 +145,7 @@ func TestClientPublishEventWithPipeline(t *testing.T) {
 func TestClientBulkPublishEventsWithPipeline(t *testing.T) {
 	type obj map[string]interface{}
 
-	if testing.Verbose() {
-		logp.LogInit(logp.LOG_DEBUG, "", false, true, []string{"elasticsearch"})
-	}
+	logp.TestingSetup(logp.WithSelectors("elasticsearch"))
 
 	index := "beat-int-pub-bulk-with-pipeline"
 	pipeline := "beat-int-pub-bulk-pipeline"

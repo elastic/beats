@@ -35,9 +35,7 @@ func ElasticsearchMock(code int, body []byte) *httptest.Server {
 }
 
 func TestOneHostSuccessResp(t *testing.T) {
-	if testing.Verbose() {
-		logp.LogInit(logp.LOG_DEBUG, "", false, true, []string{"elasticsearch"})
-	}
+	logp.TestingSetup(logp.WithSelectors("elasticsearch"))
 
 	index := fmt.Sprintf("packetbeat-unittest-%d", os.Getpid())
 	body := map[string]interface{}{
@@ -64,9 +62,7 @@ func TestOneHostSuccessResp(t *testing.T) {
 }
 
 func TestOneHost500Resp(t *testing.T) {
-	if testing.Verbose() {
-		logp.LogInit(logp.LOG_DEBUG, "", false, true, []string{"elasticsearch"})
-	}
+	logp.TestingSetup(logp.WithSelectors("elasticsearch"))
 
 	index := fmt.Sprintf("packetbeat-unittest-%d", os.Getpid())
 	body := map[string]interface{}{
@@ -98,9 +94,7 @@ func TestOneHost500Resp(t *testing.T) {
 }
 
 func TestOneHost503Resp(t *testing.T) {
-	if testing.Verbose() {
-		logp.LogInit(logp.LOG_DEBUG, "", false, true, []string{"elasticsearch"})
-	}
+	logp.TestingSetup(logp.WithSelectors("elasticsearch"))
 
 	index := fmt.Sprintf("packetbeat-unittest-%d", os.Getpid())
 	body := map[string]interface{}{
