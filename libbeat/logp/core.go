@@ -55,6 +55,8 @@ func Configure(cfg Config) error {
 		sink, err = makeStderrOutput(cfg)
 	case cfg.ToSyslog:
 		sink, err = makeSyslogOutput(cfg)
+	case cfg.ToEventLog:
+		sink, err = makeEventLogOutput(cfg)
 	case cfg.ToFiles:
 		fallthrough
 	default:
@@ -156,6 +158,10 @@ func makeDiscardOutput(cfg Config) (zapcore.Core, error) {
 
 func makeSyslogOutput(cfg Config) (zapcore.Core, error) {
 	return newSyslog(buildEncoder(cfg), cfg.Level.zapLevel())
+}
+
+func makeEventLogOutput(cfg Config) (zapcore.Core, error) {
+	return newEventLog(cfg.Beat, buildEncoder(cfg), cfg.Level.zapLevel())
 }
 
 func makeFileOutput(cfg Config) (zapcore.Core, error) {

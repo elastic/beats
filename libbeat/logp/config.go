@@ -13,6 +13,7 @@ type Config struct {
 	ToStderr    bool `config:"to_stderr"`
 	ToSyslog    bool `config:"to_syslog"`
 	ToFiles     bool `config:"to_files"`
+	ToEventLog  bool `config:"to_eventlog"`
 
 	Files FileConfig `config:"files"`
 
