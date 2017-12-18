@@ -111,6 +111,8 @@ https://github.com/elastic/beats/compare/v6.0.0-beta2...master[Check the HEAD di
 - Moved `ip_port` indexer for `add_kubernetes_metadata` to all beats. {pull}5707[5707]
 - `ip_port` indexer now index both IP and IP:port pairs. {pull}5721[5721]
 - Add the ability to write structured logs. {pull}5901[5901]
+- Use structured logging for the metrics that are periodically logged via the
+  `logging.metrics` feature. {pull}5915[5915]
 
 *Auditbeat*
 
