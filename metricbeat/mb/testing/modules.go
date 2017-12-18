@@ -218,7 +218,7 @@ func NewPushMetricSetV2(t testing.TB, config interface{}) mb.PushMetricSetV2 {
 	return pushMetricSet
 }
 
-// CapturingReporterV2 stores all the events and errors from a metricset's
+// capturingReporterV2 stores all the events and errors from a metricset's
 // Run method.
 type capturingReporterV2 struct {
 	Events []mb.Event
