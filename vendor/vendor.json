@@ -1287,6 +1287,12 @@
 			"revisionTime": "2016-06-14T22:52:37Z"
 		},
 		{
+			"checksumSHA1": "uVlUSSKplihZG7N+QJ6fzDZ4Kh8=",
+			"path": "golang.org/x/sys/windows/svc/eventlog",
+			"revision": "571f7bbbe08da2a8955aed9d4db316e78630e9a3",
+			"revisionTime": "2017-12-16T14:55:03Z"
+		},
+		{
 			"checksumSHA1": "oaglBTpGgEUgk7m92i6nuZbpicE=",
 			"path": "golang.org/x/text/encoding",
 			"revision": "2910a502d2bf9e43193af9d68ca516529614eed3",
