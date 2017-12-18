@@ -6,6 +6,21 @@ import (
 	"go.uber.org/zap/zapcore"
 )
 
+var baseEncodingConfig = zapcore.EncoderConfig{
+	TimeKey:        "timestamp",
+	LevelKey:       "level",
+	NameKey:        "logger",
+	CallerKey:      "caller",
+	MessageKey:     "message",
+	StacktraceKey:  "stacktrace",
+	LineEnding:     zapcore.DefaultLineEnding,
+	EncodeLevel:    zapcore.LowercaseLevelEncoder,
+	EncodeTime:     zapcore.ISO8601TimeEncoder,
+	EncodeDuration: millisecondsDurationEncoder,
+	EncodeCaller:   zapcore.ShortCallerEncoder,
+	EncodeName:     zapcore.FullNameEncoder,
+}
+
 func buildEncoder(cfg Config) zapcore.Encoder {
 	if cfg.JSON {
 		return zapcore.NewJSONEncoder(jsonEncoderConfig())
@@ -17,37 +32,14 @@ func buildEncoder(cfg Config) zapcore.Encoder {
 }
 
 func jsonEncoderConfig() zapcore.EncoderConfig {
-	return zapcore.EncoderConfig{
-		TimeKey:        "timestamp",
-		LevelKey:       "level",
-		NameKey:        "logger",
-		CallerKey:      "caller",
-		MessageKey:     "message",
-		StacktraceKey:  "stacktrace",
-		LineEnding:     zapcore.DefaultLineEnding,
-		EncodeLevel:    zapcore.LowercaseLevelEncoder,
-		EncodeTime:     zapcore.ISO8601TimeEncoder,
-		EncodeDuration: millisecondsDurationEncoder,
-		EncodeCaller:   zapcore.ShortCallerEncoder,
-		EncodeName:     zapcore.FullNameEncoder,
-	}
+	return baseEncodingConfig
 }
 
 func consoleEncoderConfig() zapcore.EncoderConfig {
-	return zapcore.EncoderConfig{
-		TimeKey:        "timestamp",
-		LevelKey:       "level",
-		NameKey:        "logger",
-		CallerKey:      "caller",
-		MessageKey:     "message",
-		StacktraceKey:  "stacktrace",
-		LineEnding:     zapcore.DefaultLineEnding,
-		EncodeLevel:    zapcore.CapitalLevelEncoder,
-		EncodeTime:     zapcore.ISO8601TimeEncoder,
-		EncodeDuration: millisecondsDurationEncoder,
-		EncodeCaller:   zapcore.ShortCallerEncoder,
-		EncodeName:     bracketedNameEncoder,
-	}
+	c := baseEncodingConfig
+	c.EncodeLevel = zapcore.CapitalLevelEncoder
+	c.EncodeName = bracketedNameEncoder
+	return c
 }
 
 func syslogEncoderConfig() zapcore.EncoderConfig {

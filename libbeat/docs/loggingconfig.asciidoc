@@ -45,6 +45,11 @@ You can specify the following options in the `logging` section of the
 When true, writes all logging output to the syslog.
 
 [float]
+==== `logging.to_eventlog`
+
+When true, writes all logging output to the Windows Event Log.
+
+[float]
 ==== `logging.to_files`
 
 When true, writes all logging output to files. The log files are automatically
