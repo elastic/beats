@@ -24,6 +24,7 @@ import (
 	"github.com/elastic/beats/libbeat/common/file"
 	"github.com/elastic/beats/libbeat/dashboards"
 	"github.com/elastic/beats/libbeat/logp"
+	"github.com/elastic/beats/libbeat/logp/configure"
 	"github.com/elastic/beats/libbeat/monitoring"
 	"github.com/elastic/beats/libbeat/monitoring/report"
 	"github.com/elastic/beats/libbeat/monitoring/report/log"
@@ -72,7 +73,7 @@ type beatConfig struct {
 	// beat internal components configurations
 	HTTP          *common.Config `config:"http"`
 	Path          paths.Path     `config:"path"`
-	Logging       logp.Logging   `config:"logging"`
+	Logging       *common.Config `config:"logging"`
 	MetricLogging *common.Config `config:"logging.metrics"`
 
 	// output/publishing related configurations
@@ -88,14 +89,11 @@ type beatConfig struct {
 var (
 	printVersion bool
 	setup        bool
-	startTime    time.Time
 )
 
 var debugf = logp.MakeDebug("beat")
 
 func init() {
-	startTime = time.Now()
-
 	initRand()
 
 	flag.BoolVar(&printVersion, "version", false, "Print the version and exit")
@@ -234,6 +232,8 @@ func (b *Beat) createBeater(bt beat.Creator) (beat.Beater, error) {
 }
 
 func (b *Beat) launch(bt beat.Creator) error {
+	defer logp.Sync()
+
 	err := b.Init()
 	if err != nil {
 		return err
@@ -391,10 +391,6 @@ func (b *Beat) handleFlags() error {
 		return beat.GracefulExit
 	}
 
-	if err := logp.HandleFlags(b.Info.Beat); err != nil {
-		return err
-	}
-
 	return cfgfile.HandleFlags()
 }
 
@@ -436,8 +432,7 @@ func (b *Beat) configure() error {
 		return fmt.Errorf("error setting default paths: %v", err)
 	}
 
-	err = logp.Init(b.Info.Beat, startTime, &b.Config.Logging)
-	if err != nil {
+	if err := configure.Logging(b.Info.Beat, b.Config.Logging); err != nil {
 		return fmt.Errorf("error initializing logging: %v", err)
 	}
 

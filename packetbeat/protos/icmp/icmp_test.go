@@ -41,9 +41,7 @@ func TestIcmpDirection(t *testing.T) {
 }
 
 func BenchmarkIcmpProcessICMPv4(b *testing.B) {
-	if testing.Verbose() {
-		logp.LogInit(logp.LOG_DEBUG, "", false, true, []string{"icmp", "icmpdetailed"})
-	}
+	logp.TestingSetup(logp.WithSelectors("icmp", "icmpdetailed"))
 
 	icmp, err := New(true, func(beat.Event) {}, common.NewConfig())
 	if err != nil {

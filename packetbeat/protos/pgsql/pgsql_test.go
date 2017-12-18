@@ -76,9 +76,7 @@ func TestPgsqlParser_simpleRequest(t *testing.T) {
 
 // Test parsing a response with data attached
 func TestPgsqlParser_dataResponse(t *testing.T) {
-	if testing.Verbose() {
-		logp.LogInit(logp.LOG_DEBUG, "", false, true, []string{"pgsql", "pgsqldetailed"})
-	}
+	logp.TestingSetup(logp.WithSelectors("pgsql", "pgsqldetailed"))
 
 	pgsql := pgsqlModForTests(nil)
 	data := []byte(
@@ -169,9 +167,7 @@ func TestPgsqlParser_response(t *testing.T) {
 
 // Test parsing an incomplete pgsql response
 func TestPgsqlParser_incomplete_response(t *testing.T) {
-	if testing.Verbose() {
-		logp.LogInit(logp.LOG_DEBUG, "", false, true, []string{"pgsql", "pgsqldetailed"})
-	}
+	logp.TestingSetup(logp.WithSelectors("pgsql", "pgsqldetailed"))
 	pgsql := pgsqlModForTests(nil)
 
 	data := []byte(
@@ -234,9 +230,7 @@ func TestPgsqlParser_threeResponses(t *testing.T) {
 
 // Test parsing an error response
 func TestPgsqlParser_errorResponse(t *testing.T) {
-	if testing.Verbose() {
-		logp.LogInit(logp.LOG_DEBUG, "", false, true, []string{"pgsql", "pgsqldetailed"})
-	}
+	logp.TestingSetup(logp.WithSelectors("pgsql", "pgsqldetailed"))
 
 	pgsql := pgsqlModForTests(nil)
 	data := []byte(
@@ -280,9 +274,7 @@ func TestPgsqlParser_errorResponse(t *testing.T) {
 
 // Test parsing an error response
 func TestPgsqlParser_invalidMessage(t *testing.T) {
-	if testing.Verbose() {
-		logp.LogInit(logp.LOG_DEBUG, "", false, true, []string{"pgsql", "pgsqldetailed"})
-	}
+	logp.TestingSetup(logp.WithSelectors("pgsql", "pgsqldetailed"))
 	pgsql := pgsqlModForTests(nil)
 	data := []byte(
 		"4300000002")
@@ -329,9 +321,7 @@ func expectTransaction(t *testing.T, e *eventStore) common.MapStr {
 // Test that loss of data during the response (but not at the beginning)
 // don't cause the whole transaction to be dropped.
 func Test_gap_in_response(t *testing.T) {
-	if testing.Verbose() {
-		logp.LogInit(logp.LOG_DEBUG, "", false, true, []string{"pgsql", "pgsqldetailed"})
-	}
+	logp.TestingSetup(logp.WithSelectors("pgsql", "pgsqldetailed"))
 
 	store := &eventStore{}
 	pgsql := pgsqlModForTests(store)

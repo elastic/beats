@@ -17,6 +17,7 @@ https://github.com/elastic/beats/compare/v6.0.0-beta2...master[Check the HEAD di
 - Support dashboard loading without Elasticseach {pull}5653[5653]
 - Addition and update of the following libraries: pbkdf2, terminal, windows, unix {pull}5735[5735]
 - Update the command line library cobra and add support for zsh completion {pull}5761[5761]
+- The log format may differ due to logging library changes. {pull}5901[5901]
 
 *Auditbeat*
 
@@ -108,6 +109,7 @@ https://github.com/elastic/beats/compare/v6.0.0-beta2...master[Check the HEAD di
 - Set log level for kafka output. {pull}5397[5397]
 - Moved `ip_port` indexer for `add_kubernetes_metadata` to all beats. {pull}5707[5707]
 - `ip_port` indexer now index both IP and IP:port pairs. {pull}5721[5721]
+- Add the ability to write structured logs. {pull}5901[5901]
 
 *Auditbeat*
 

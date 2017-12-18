@@ -38,9 +38,7 @@ func GetProcessors(t *testing.T, yml []map[string]interface{}) *processors.Proce
 }
 
 func TestBadConfig(t *testing.T) {
-	if testing.Verbose() {
-		logp.LogInit(logp.LOG_DEBUG, "", false, true, []string{"*"})
-	}
+	logp.TestingSetup()
 
 	yml := []map[string]interface{}{
 		{
@@ -77,9 +75,7 @@ func TestBadConfig(t *testing.T) {
 }
 
 func TestIncludeFields(t *testing.T) {
-	if testing.Verbose() {
-		logp.LogInit(logp.LOG_DEBUG, "", false, true, []string{"*"})
-	}
+	logp.TestingSetup()
 
 	yml := []map[string]interface{}{
 		{
@@ -145,9 +141,7 @@ func TestIncludeFields(t *testing.T) {
 }
 
 func TestIncludeFields1(t *testing.T) {
-	if testing.Verbose() {
-		logp.LogInit(logp.LOG_DEBUG, "", false, true, []string{"*"})
-	}
+	logp.TestingSetup()
 
 	yml := []map[string]interface{}{
 		{
@@ -263,9 +257,7 @@ func TestDropFields(t *testing.T) {
 }
 
 func TestMultipleIncludeFields(t *testing.T) {
-	if testing.Verbose() {
-		logp.LogInit(logp.LOG_DEBUG, "", false, true, []string{"*"})
-	}
+	logp.TestingSetup()
 
 	yml := []map[string]interface{}{
 		{
@@ -362,9 +354,7 @@ func TestMultipleIncludeFields(t *testing.T) {
 }
 
 func TestDropEvent(t *testing.T) {
-	if testing.Verbose() {
-		logp.LogInit(logp.LOG_DEBUG, "", false, true, []string{"*"})
-	}
+	logp.TestingSetup()
 
 	yml := []map[string]interface{}{
 		{
@@ -416,9 +406,7 @@ func TestDropEvent(t *testing.T) {
 }
 
 func TestEmptyCondition(t *testing.T) {
-	if testing.Verbose() {
-		logp.LogInit(logp.LOG_DEBUG, "", false, true, []string{"*"})
-	}
+	logp.TestingSetup()
 
 	yml := []map[string]interface{}{
 		{
@@ -462,9 +450,7 @@ func TestEmptyCondition(t *testing.T) {
 }
 
 func TestBadCondition(t *testing.T) {
-	if testing.Verbose() {
-		logp.LogInit(logp.LOG_DEBUG, "", false, true, []string{"*"})
-	}
+	logp.TestingSetup()
 
 	yml := []map[string]interface{}{
 		{
@@ -499,9 +485,7 @@ func TestBadCondition(t *testing.T) {
 }
 
 func TestMissingFields(t *testing.T) {
-	if testing.Verbose() {
-		logp.LogInit(logp.LOG_DEBUG, "", false, true, []string{"*"})
-	}
+	logp.TestingSetup()
 
 	yml := []map[string]interface{}{
 		{
@@ -534,9 +518,7 @@ func TestMissingFields(t *testing.T) {
 }
 
 func TestBadConditionConfig(t *testing.T) {
-	if testing.Verbose() {
-		logp.LogInit(logp.LOG_DEBUG, "", false, true, []string{"*"})
-	}
+	logp.TestingSetup()
 
 	yml := []map[string]interface{}{
 		{

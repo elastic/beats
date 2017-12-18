@@ -7,6 +7,8 @@ import (
 	"github.com/elastic/beats/libbeat/monitoring"
 )
 
+var startTime = time.Now()
+
 func init() {
 	metrics := monitoring.Default.NewRegistry("beat")
 

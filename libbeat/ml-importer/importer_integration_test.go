@@ -86,11 +86,9 @@ const sampleDatafeed = `
 `
 
 func TestImportJobs(t *testing.T) {
-	client := estest.GetTestingElasticsearch(t)
+	logp.TestingSetup()
 
-	if testing.Verbose() {
-		logp.LogInit(logp.LOG_DEBUG, "", false, true, []string{"*"})
-	}
+	client := estest.GetTestingElasticsearch(t)
 
 	haveXpack, err := HaveXpackML(client)
 	assert.NoError(t, err)
