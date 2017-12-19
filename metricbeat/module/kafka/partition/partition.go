@@ -117,48 +117,43 @@ func (m *MetricSet) Fetch() ([]common.MapStr, error) {
 				continue
 			}
 
-			// collect offsets for all replicas
-			for _, id := range partition.Replicas {
+			// collect offsets for the primary partition
+			offOldest, offNewest, offOK, err := queryOffsetRange(b, -1, topic.Name, partition.ID)
 
-				// Get oldest and newest available offsets
-				offOldest, offNewest, offOK, err := queryOffsetRange(b, id, topic.Name, partition.ID)
-
-				if !offOK {
-					if err == nil {
-						err = errFailQueryOffset
-					}
-
-					logp.Err("Failed to query kafka partition (%v:%v) offsets: %v",
-						topic.Name, partition.ID, err)
-					continue
+			if !offOK {
+				if err == nil {
+					err = errFailQueryOffset
 				}
 
-				partitionEvent := common.MapStr{
-					"id":             partition.ID,
-					"leader":         partition.Leader,
-					"replica":        id,
-					"insync_replica": hasID(id, partition.Isr),
-				}
-
-				if partition.Err != 0 {
-					partitionEvent["error"] = common.MapStr{
-						"code": partition.Err,
-					}
-				}
-
-				// create event
-				event := common.MapStr{
-					"topic":     evtTopic,
-					"broker":    evtBroker,
-					"partition": partitionEvent,
-					"offset": common.MapStr{
-						"newest": offNewest,
-						"oldest": offOldest,
-					},
-				}
-
-				events = append(events, event)
+				logp.Err("Failed to query kafka partition (%v:%v) offsets: %v",
+					topic.Name, partition.ID, err)
+				continue
 			}
+
+			// Get oldest and newest available offsets
+			partitionEvent := common.MapStr{
+				"id":     partition.ID,
+				"leader": partition.Leader,
+			}
+
+			if partition.Err != 0 {
+				partitionEvent["error"] = common.MapStr{
+					"code": partition.Err,
+				}
+			}
+
+			// create event
+			event := common.MapStr{
+				"topic":     evtTopic,
+				"broker":    evtBroker,
+				"partition": partitionEvent,
+				"offset": common.MapStr{
+					"newest": offNewest,
+					"oldest": offOldest,
+				},
+			}
+
+			events = append(events, event)
 		}
 	}
 

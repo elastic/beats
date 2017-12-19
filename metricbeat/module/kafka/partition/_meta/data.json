@@ -16,9 +16,7 @@
             },
             "partition": {
                 "id": 0,
-                "insync_replica": true,
-                "leader": 0,
-                "replica": 0
+                "leader": 0
             },
             "topic": {
                 "name": "foo-1512631793-855878006"

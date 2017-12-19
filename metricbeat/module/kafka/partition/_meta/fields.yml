@@ -32,19 +32,6 @@
           type: long
           description: >
             Leader id (broker).
-        - name: isr
-          type: array
-          description: >
-            List of isr ids.
-        - name: replica
-          type: long
-          description: >
-            Replica id (broker).
-
-        - name: insync_replica
-          type: boolean
-          description: >
-            Indicates if replica is included in the in-sync replicate set (ISR).
 
         - name: error.code
           type: long

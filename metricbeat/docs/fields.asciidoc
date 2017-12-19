@@ -4839,30 +4839,6 @@ Leader id (broker).
 
 
 [float]
-=== `kafka.partition.partition.isr`
-
-type: array
-
-List of isr ids.
-
-
-[float]
-=== `kafka.partition.partition.replica`
-
-type: long
-
-Replica id (broker).
-
-
-[float]
-=== `kafka.partition.partition.insync_replica`
-
-type: boolean
-
-Indicates if replica is included in the in-sync replicate set (ISR).
-
-
-[float]
 === `kafka.partition.partition.error.code`
 
 type: long
