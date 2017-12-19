@@ -18,6 +18,7 @@ https://github.com/elastic/beats/compare/v6.0.0-beta2...master[Check the HEAD di
 - Addition and update of the following libraries: pbkdf2, terminal, windows, unix {pull}5735[5735]
 - Update the command line library cobra and add support for zsh completion {pull}5761[5761]
 - The log format may differ due to logging library changes. {pull}5901[5901]
+- Adding a local keystore to allow user to obfuscate password {pull}5687[5687]
 
 *Auditbeat*
 
