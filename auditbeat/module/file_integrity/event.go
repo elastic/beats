@@ -22,6 +22,7 @@ import (
 	"golang.org/x/crypto/sha3"
 
 	"github.com/elastic/beats/libbeat/common"
+	"github.com/elastic/beats/libbeat/common/file"
 	"github.com/elastic/beats/metricbeat/mb"
 )
 
@@ -343,7 +344,7 @@ func hashFile(name string, hashType ...HashType) (map[HashType][]byte, error) {
 		}
 	}
 
-	f, err := os.Open(name)
+	f, err := file.ReadOpen(name)
 	if err != nil {
 		return nil, errors.Wrap(err, "failed to open file for hashing")
 	}
