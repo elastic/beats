@@ -351,9 +351,9 @@ func TestMissingModuleFolder(t *testing.T) {
 	assert.NotNil(t, reg)
 
 	// this should return an empty list, but no error
-	prospectors, err := reg.GetInputConfigs()
+	inputs, err := reg.GetInputConfigs()
 	assert.NoError(t, err)
-	assert.Equal(t, 0, len(prospectors))
+	assert.Equal(t, 0, len(inputs))
 }
 
 func TestInterpretError(t *testing.T) {
