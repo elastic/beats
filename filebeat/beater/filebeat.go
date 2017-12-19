@@ -62,7 +62,7 @@ func New(b *beat.Beat, rawConfig *common.Config) (beat.Beater, error) {
 		logp.Info("Enabled modules/filesets: %s", moduleRegistry.InfoString())
 	}
 
-	moduleProspectors, err := moduleRegistry.GetInputConfigs()
+	moduleInputs, err := moduleRegistry.GetInputConfigs()
 	if err != nil {
 		return nil, err
 	}
@@ -71,28 +71,28 @@ func New(b *beat.Beat, rawConfig *common.Config) (beat.Beater, error) {
 		return nil, err
 	}
 
-	// Add prospectors created by the modules
-	config.Prospectors = append(config.Prospectors, moduleProspectors...)
+	// Add inputs created by the modules
+	config.Inputs = append(config.Inputs, moduleInputs...)
 
-	haveEnabledProspectors := false
-	for _, prospector := range config.Prospectors {
-		if prospector.Enabled() {
-			haveEnabledProspectors = true
+	haveEnabledInputs := false
+	for _, input := range config.Inputs {
+		if input.Enabled() {
+			haveEnabledInputs = true
 			break
 		}
 	}
 
-	if !config.ConfigProspector.Enabled() && !config.ConfigModules.Enabled() && !haveEnabledProspectors && config.Autodiscover == nil {
+	if !config.ConfigInput.Enabled() && !config.ConfigModules.Enabled() && !haveEnabledInputs && config.Autodiscover == nil {
 		if !b.InSetupCmd {
-			return nil, errors.New("No modules or prospectors enabled and configuration reloading disabled. What files do you want me to watch?")
+			return nil, errors.New("no modules or inputs enabled and configuration reloading disabled. What files do you want me to watch?")
 		}
 
 		// in the `setup` command, log this only as a warning
 		logp.Warn("Setup called, but no modules enabled.")
 	}
 
-	if *once && config.ConfigProspector.Enabled() && config.ConfigModules.Enabled() {
-		return nil, errors.New("prospector configs and -once cannot be used together")
+	if *once && config.ConfigInput.Enabled() && config.ConfigModules.Enabled() {
+		return nil, errors.New("input configs and -once cannot be used together")
 	}
 
 	fb := &Filebeat{
@@ -220,7 +220,7 @@ func (fb *Filebeat) Run(b *beat.Beat) error {
 	outDone := make(chan struct{}) // outDone closes down all active pipeline connections
 	crawler, err := crawler.New(
 		channel.NewOutletFactory(outDone, b.Publisher, wgEvents).Create,
-		config.Prospectors,
+		config.Inputs,
 		b.Info.Version,
 		fb.done,
 		*once)
@@ -261,7 +261,7 @@ func (fb *Filebeat) Run(b *beat.Beat) error {
 		logp.Warn(pipelinesWarning)
 	}
 
-	err = crawler.Start(registrar, config.ConfigProspector, config.ConfigModules, pipelineLoaderFactory)
+	err = crawler.Start(registrar, config.ConfigInput, config.ConfigModules, pipelineLoaderFactory)
 	if err != nil {
 		crawler.Stop()
 		return err
