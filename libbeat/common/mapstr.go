@@ -322,6 +322,17 @@ func walkMap(key string, data MapStr, op mapStrOperation) (interface{}, error) {
 	var err error
 	keyParts := strings.Split(key, ".")
 
+	// Only check for full key if key contains dots
+	if len(keyParts) > 1 {
+		// Converted dotted key in object to nested object
+		// This is needed for processors to support dotted keys
+		// The reason it needs to be readded is to also support deletion op type properly
+		if v, exists := data[key]; exists {
+			delete(data, key)
+			data.Put(key, v)
+		}
+	}
+
 	// Walk maps until reaching a leaf object.
 	m := data
 	for i, k := range keyParts[0 : len(keyParts)-1] {
