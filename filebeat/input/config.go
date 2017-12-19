@@ -22,7 +22,7 @@ type inputConfig struct {
 
 func (c *inputConfig) Validate() error {
 	if c.InputType != "" {
-		cfgwarn.Deprecate("6.0.0", "input_type prospector config is deprecated. Use type instead.")
+		cfgwarn.Deprecate("6.0.0", "input_type input config is deprecated. Use type instead.")
 		c.Type = c.InputType
 	}
 	return nil
