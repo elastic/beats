@@ -62,7 +62,7 @@ func New(b *beat.Beat, rawConfig *common.Config) (beat.Beater, error) {
 		logp.Info("Enabled modules/filesets: %s", moduleRegistry.InfoString())
 	}
 
-	moduleProspectors, err := moduleRegistry.GetProspectorConfigs()
+	moduleProspectors, err := moduleRegistry.GetInputConfigs()
 	if err != nil {
 		return nil, err
 	}

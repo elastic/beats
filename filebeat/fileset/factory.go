@@ -4,7 +4,7 @@ import (
 	"github.com/mitchellh/hashstructure"
 
 	"github.com/elastic/beats/filebeat/channel"
-	"github.com/elastic/beats/filebeat/prospector"
+	input "github.com/elastic/beats/filebeat/prospector"
 	"github.com/elastic/beats/filebeat/registrar"
 	"github.com/elastic/beats/libbeat/cfgfile"
 	"github.com/elastic/beats/libbeat/common"
@@ -21,11 +21,11 @@ type Factory struct {
 	beatDone              chan struct{}
 }
 
-// Wrap an array of prospectors and implements cfgfile.Runner interface
-type prospectorsRunner struct {
+// Wrap an array of inputs and implements cfgfile.Runner interface
+type inputsRunner struct {
 	id                    uint64
 	moduleRegistry        *ModuleRegistry
-	prospectors           []*prospector.Runner
+	inputs                []*input.Runner
 	pipelineLoaderFactory PipelineLoaderFactory
 }
 
@@ -49,7 +49,7 @@ func (f *Factory) Create(c *common.Config, meta *common.MapStrPointer) (cfgfile.
 		return nil, err
 	}
 
-	pConfigs, err := m.GetProspectorConfigs()
+	pConfigs, err := m.GetInputConfigs()
 	if err != nil {
 		return nil, err
 	}
@@ -62,24 +62,24 @@ func (f *Factory) Create(c *common.Config, meta *common.MapStrPointer) (cfgfile.
 		return nil, err
 	}
 
-	prospectors := make([]*prospector.Runner, len(pConfigs))
+	inputs := make([]*input.Runner, len(pConfigs))
 	for i, pConfig := range pConfigs {
-		prospectors[i], err = prospector.New(pConfig, f.outlet, f.beatDone, f.registrar.GetStates(), meta)
+		inputs[i], err = input.New(pConfig, f.outlet, f.beatDone, f.registrar.GetStates(), meta)
 		if err != nil {
-			logp.Err("Error creating prospector: %s", err)
+			logp.Err("Error creating input: %s", err)
 			return nil, err
 		}
 	}
 
-	return &prospectorsRunner{
+	return &inputsRunner{
 		id:                    id,
 		moduleRegistry:        m,
-		prospectors:           prospectors,
+		inputs:                inputs,
 		pipelineLoaderFactory: f.pipelineLoaderFactory,
 	}, nil
 }
 
-func (p *prospectorsRunner) Start() {
+func (p *inputsRunner) Start() {
 	// Load pipelines
 	if p.pipelineLoaderFactory != nil {
 		// Load pipelines instantly and then setup a callback for reconnections:
@@ -101,16 +101,16 @@ func (p *prospectorsRunner) Start() {
 		elasticsearch.RegisterConnectCallback(callback)
 	}
 
-	for _, prospector := range p.prospectors {
-		prospector.Start()
+	for _, input := range p.inputs {
+		input.Start()
 	}
 }
-func (p *prospectorsRunner) Stop() {
-	for _, prospector := range p.prospectors {
-		prospector.Stop()
+func (p *inputsRunner) Stop() {
+	for _, input := range p.inputs {
+		input.Stop()
 	}
 }
 
-func (p *prospectorsRunner) String() string {
+func (p *inputsRunner) String() string {
 	return p.moduleRegistry.InfoString()
 }

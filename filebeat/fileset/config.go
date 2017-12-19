@@ -14,4 +14,5 @@ type FilesetConfig struct {
 	Enabled    *bool                  `config:"enabled"`
 	Var        map[string]interface{} `config:"var"`
 	Prospector map[string]interface{} `config:"prospector"`
+	Input      map[string]interface{} `config:"input"`
 }

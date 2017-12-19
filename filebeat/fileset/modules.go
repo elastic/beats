@@ -238,7 +238,7 @@ func appendWithoutDuplicates(moduleConfigs []*ModuleConfig, modules []string) ([
 	return moduleConfigs, nil
 }
 
-func (reg *ModuleRegistry) GetProspectorConfigs() ([]*common.Config, error) {
+func (reg *ModuleRegistry) GetInputConfigs() ([]*common.Config, error) {
 	result := []*common.Config{}
 	for module, filesets := range reg.registry {
 		for name, fileset := range filesets {
