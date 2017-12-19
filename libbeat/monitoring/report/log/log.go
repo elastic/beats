@@ -1,7 +1,6 @@
 package log
 
 import (
-	"sort"
 	"sync"
 	"time"
 
@@ -162,28 +161,17 @@ func snapshotLen(s monitoring.FlatSnapshot) int {
 func toKeyValuePairs(s monitoring.FlatSnapshot) []interface{} {
 	data := make(common.MapStr, snapshotLen(s))
 	for k, v := range s.Bools {
-		data[k] = v
+		data.Put(k, v)
 	}
 	for k, v := range s.Floats {
-		data[k] = v
+		data.Put(k, v)
 	}
 	for k, v := range s.Ints {
-		data[k] = v
+		data.Put(k, v)
 	}
 	for k, v := range s.Strings {
-		data[k] = v
+		data.Put(k, v)
 	}
 
-	keys := make([]string, 0, len(data))
-	for k := range data {
-		keys = append(keys, k)
-	}
-	sort.Strings(keys)
-
-	metrics := make([]interface{}, 0, 2*len(data)+2)
-	metrics = append(metrics, logp.Namespace("monitoring"), logp.Namespace("metrics"))
-	for _, key := range keys {
-		metrics = append(metrics, key, data[key])
-	}
-	return metrics
+	return []interface{}{logp.Namespace("monitoring"), logp.Reflect("metrics", data)}
 }
