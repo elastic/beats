@@ -58,7 +58,7 @@ func TestNewModuleRegistry(t *testing.T) {
 
 	for module, filesets := range reg.registry {
 		for name, fileset := range filesets {
-			cfg, err := fileset.getProspectorConfig()
+			cfg, err := fileset.getInputConfig()
 			assert.NoError(t, err, fmt.Sprintf("module: %s, fileset: %s", module, name))
 
 			moduleName, err := cfg.String("_module_name", -1)
@@ -181,7 +181,7 @@ func TestApplyOverrides(t *testing.T) {
 				},
 			},
 			expected: FilesetConfig{
-				Prospector: map[string]interface{}{
+				Input: map[string]interface{}{
 					"close_eof": true,
 				},
 			},

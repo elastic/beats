@@ -84,7 +84,7 @@ type manifest struct {
 	ModuleVersion   string                   `config:"module_version"`
 	Vars            []map[string]interface{} `config:"var"`
 	IngestPipeline  string                   `config:"ingest_pipeline"`
-	Prospector      string                   `config:"prospector"`
+	Input           string                   `config:"prospector"`
 	MachineLearning []struct {
 		Name       string `config:"name"`
 		Job        string `config:"job"`
@@ -265,31 +265,31 @@ func (fs *Fileset) getBuiltinVars() (map[string]interface{}, error) {
 	}, nil
 }
 
-func (fs *Fileset) getProspectorConfig() (*common.Config, error) {
-	path, err := applyTemplate(fs.vars, fs.manifest.Prospector, false)
+func (fs *Fileset) getInputConfig() (*common.Config, error) {
+	path, err := applyTemplate(fs.vars, fs.manifest.Input, false)
 	if err != nil {
-		return nil, fmt.Errorf("Error expanding vars on the prospector path: %v", err)
+		return nil, fmt.Errorf("Error expanding vars on the input path: %v", err)
 	}
 	contents, err := ioutil.ReadFile(filepath.Join(fs.modulePath, fs.name, path))
 	if err != nil {
-		return nil, fmt.Errorf("Error reading prospector file %s: %v", path, err)
+		return nil, fmt.Errorf("Error reading input file %s: %v", path, err)
 	}
 
 	yaml, err := applyTemplate(fs.vars, string(contents), false)
 	if err != nil {
-		return nil, fmt.Errorf("Error interpreting the template of the prospector: %v", err)
+		return nil, fmt.Errorf("Error interpreting the template of the input: %v", err)
 	}
 
 	cfg, err := common.NewConfigWithYAML([]byte(yaml), "")
 	if err != nil {
-		return nil, fmt.Errorf("Error reading prospector config: %v", err)
+		return nil, fmt.Errorf("Error reading input config: %v", err)
 	}
 
 	// overrides
-	if len(fs.fcfg.Prospector) > 0 {
-		overrides, err := common.NewConfigFrom(fs.fcfg.Prospector)
+	if len(fs.fcfg.Input) > 0 {
+		overrides, err := common.NewConfigFrom(fs.fcfg.Input)
 		if err != nil {
-			return nil, fmt.Errorf("Error creating config from prospector overrides: %v", err)
+			return nil, fmt.Errorf("Error creating config from input overrides: %v", err)
 		}
 		cfg, err = common.MergeConfigs(cfg, overrides)
 		if err != nil {
@@ -300,20 +300,20 @@ func (fs *Fileset) getProspectorConfig() (*common.Config, error) {
 	// force our pipeline ID
 	err = cfg.SetString("pipeline", -1, fs.pipelineID)
 	if err != nil {
-		return nil, fmt.Errorf("Error setting the pipeline ID in the prospector config: %v", err)
+		return nil, fmt.Errorf("Error setting the pipeline ID in the input config: %v", err)
 	}
 
 	// force our the module/fileset name
 	err = cfg.SetString("_module_name", -1, fs.mcfg.Module)
 	if err != nil {
-		return nil, fmt.Errorf("Error setting the _module_name cfg in the prospector config: %v", err)
+		return nil, fmt.Errorf("Error setting the _module_name cfg in the input config: %v", err)
 	}
 	err = cfg.SetString("_fileset_name", -1, fs.name)
 	if err != nil {
-		return nil, fmt.Errorf("Error setting the _fileset_name cfg in the prospector config: %v", err)
+		return nil, fmt.Errorf("Error setting the _fileset_name cfg in the input config: %v", err)
 	}
 
-	cfg.PrintDebugf("Merged prospector config for fileset %s/%s", fs.mcfg.Module, fs.name)
+	cfg.PrintDebugf("Merged input config for fileset %s/%s", fs.mcfg.Module, fs.name)
 
 	return cfg, nil
 }
