@@ -124,6 +124,7 @@ https://github.com/elastic/beats/compare/v6.0.1...v6.1.0[View commits]
 - Change `MySQL active connections` visualization title to `MySQL total connections`. {issue}4812[4812]
 - Fix `ProcState` on Linux and FreeBSD when process names contain parentheses. {pull}5775[5775]
 - Fix incorrect `Mem.Used` calculation under linux. {pull}5775[5775]
+- Fix `open_file_descriptor_count` and `max_file_descriptor_count` lost in zookeeper module {pull}5902[5902]
 
 *Packetbeat*
 
