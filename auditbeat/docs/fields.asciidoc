@@ -2257,6 +2257,27 @@ type: boolean
 Boolean indicating if the event includes any file hashes.
 
 [float]
+=== `audit.file.blake2b_256`
+
+type: keyword
+
+BLAKE2b-256 hash of the file.
+
+[float]
+=== `audit.file.blake2b_384`
+
+type: keyword
+
+BLAKE2b-384 hash of the file.
+
+[float]
+=== `audit.file.blake2b_512`
+
+type: keyword
+
+BLAKE2b-512 hash of the file.
+
+[float]
 === `audit.file.md5`
 
 type: keyword

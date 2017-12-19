@@ -73,6 +73,18 @@
         type: boolean
         description: Boolean indicating if the event includes any file hashes.
 
+      - name: blake2b_256
+        type: keyword
+        description: BLAKE2b-256 hash of the file.
+
+      - name: blake2b_384
+        type: keyword
+        description: BLAKE2b-384 hash of the file.
+
+      - name: blake2b_512
+        type: keyword
+        description: BLAKE2b-512 hash of the file.
+
       - name: md5
         type: keyword
         description: MD5 hash of the file.

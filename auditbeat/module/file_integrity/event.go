@@ -18,7 +18,7 @@ import (
 	"time"
 
 	"github.com/pkg/errors"
-
+	"golang.org/x/crypto/blake2b"
 	"golang.org/x/crypto/sha3"
 
 	"github.com/elastic/beats/libbeat/common"
@@ -315,6 +315,15 @@ func hashFile(name string, hashType ...HashType) (map[HashType][]byte, error) {
 	var hashes []hash.Hash
 	for _, name := range hashType {
 		switch name {
+		case BLAKE2B_256:
+			h, _ := blake2b.New256(nil)
+			hashes = append(hashes, h)
+		case BLAKE2B_384:
+			h, _ := blake2b.New384(nil)
+			hashes = append(hashes, h)
+		case BLAKE2B_512:
+			h, _ := blake2b.New512(nil)
+			hashes = append(hashes, h)
 		case MD5:
 			hashes = append(hashes, md5.New())
 		case SHA1:

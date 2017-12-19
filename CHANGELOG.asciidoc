@@ -115,6 +115,7 @@ https://github.com/elastic/beats/compare/v6.0.0-beta2...master[Check the HEAD di
 *Auditbeat*
 
 - Add support for SHA3 hash algorithms to the file integrity module. {issue}5345[5345]
+- Add support for BLAKE2b hash algorithms to the file integrity module. {pull}5926[5926]
 - Add dashboards for Linux audit framework events (overview, executions, sockets). {pull}5516[5516]
 - Add support for recursive file watches under macOS {pull}5575[5575] and Linux. {pull}5833[5833]
 
