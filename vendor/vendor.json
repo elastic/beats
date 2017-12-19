@@ -1167,6 +1167,12 @@
 			"versionExact": "v1.7.1"
 		},
 		{
+			"checksumSHA1": "ppPg0bIlBAVJy0Pn13BfBnkp9V4=",
+			"path": "golang.org/x/crypto/blake2b",
+			"revision": "d585fd2cc9195196078f516b69daff6744ef5e84",
+			"revisionTime": "2017-12-16T04:08:15Z"
+		},
+		{
 			"checksumSHA1": "1MGpGDQqnUoRpv7VEcQrXOBydXE=",
 			"path": "golang.org/x/crypto/pbkdf2",
 			"revision": "e8f229864d71a49e5fdc4a9a134c5f85c4c33d64",
