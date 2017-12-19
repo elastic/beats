@@ -23,11 +23,11 @@ func NewRunnerFactory(outlet channel.Factory, registrar *registrar.Registrar, be
 	}
 }
 
-// Create creates a prospector based on a config
+// Create creates a input based on a config
 func (r *RunnerFactory) Create(c *common.Config, meta *common.MapStrPointer) (cfgfile.Runner, error) {
 	p, err := New(c, r.outlet, r.beatDone, r.registrar.GetStates(), meta)
 	if err != nil {
-		// In case of error with loading state, prospector is still returned
+		// In case of error with loading state, input is still returned
 		return p, err
 	}
 
