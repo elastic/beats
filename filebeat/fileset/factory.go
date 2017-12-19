@@ -25,7 +25,7 @@ type Factory struct {
 type prospectorsRunner struct {
 	id                    uint64
 	moduleRegistry        *ModuleRegistry
-	prospectors           []*prospector.Prospector
+	prospectors           []*prospector.Runner
 	pipelineLoaderFactory PipelineLoaderFactory
 }
 
@@ -62,7 +62,7 @@ func (f *Factory) Create(c *common.Config, meta *common.MapStrPointer) (cfgfile.
 		return nil, err
 	}
 
-	prospectors := make([]*prospector.Prospector, len(pConfigs))
+	prospectors := make([]*prospector.Runner, len(pConfigs))
 	for i, pConfig := range pConfigs {
 		prospectors[i], err = prospector.New(pConfig, f.outlet, f.beatDone, f.registrar.GetStates(), meta)
 		if err != nil {

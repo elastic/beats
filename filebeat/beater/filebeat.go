@@ -279,7 +279,7 @@ func (fb *Filebeat) Run(b *beat.Beat) error {
 
 	var adiscover *autodiscover.Autodiscover
 	if fb.config.Autodiscover != nil {
-		adapter := NewAutodiscoverAdapter(crawler.ProspectorsFactory, crawler.ModulesFactory)
+		adapter := NewAutodiscoverAdapter(crawler.InputsFactory, crawler.ModulesFactory)
 		adiscover, err = autodiscover.NewAutodiscover("filebeat", adapter, config.Autodiscover)
 		if err != nil {
 			return err
