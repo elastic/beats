@@ -1,0 +1,36 @@
+{
+  "@timestamp": "2017-12-19T08:02:41.740Z",
+  "@metadata": {
+    "beat": "metricbeat",
+    "type": "doc",
+    "version": "9.0.0"
+  },
+  "elasticsearch": {
+    "cluster": {
+      "name": "elasticsearch",
+      "status": "green",
+      "nodes": {
+        "active": {
+          "count": 5
+        }
+      },
+      "shards": {
+        "active": {
+          "count": 4312
+        }
+      }
+    }
+  },
+  "metricset": {
+    "name": "cluster_health",
+    "host": "192.168.31.32:9200",
+    "rtt": 15900,
+    "namespace": "cluster",
+    "module": "elasticsearch"
+  },
+  "beat": {
+    "name": "localhost",
+    "hostname": "localhost",
+    "version": "9.0.0"
+  }
+}
