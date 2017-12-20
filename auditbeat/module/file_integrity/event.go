@@ -36,6 +36,9 @@ func (s Source) String() string {
 	return "unknown"
 }
 
+// MarshalText marshals the Source to a textual representation of itself.
+func (s Source) MarshalText() ([]byte, error) { return []byte(s.String()), nil }
+
 const (
 	// SourceScan identifies events triggerd by a file system scan.
 	SourceScan Source = iota
@@ -59,6 +62,9 @@ func (t Type) String() string {
 	return "unknown"
 }
 
+// MarshalText marshals the Type to a textual representation of itself.
+func (t Type) MarshalText() ([]byte, error) { return []byte(t.String()), nil }
+
 // Enum of possible file.Types.
 const (
 	UnknownType Type = iota // Typically seen in deleted notifications where the object is gone.
@@ -73,6 +79,17 @@ var typeNames = map[Type]string{
 	SymlinkType: "symlink",
 }
 
+// Digest is a output of a hash function.
+type Digest []byte
+
+// String returns the digest value in lower-case hexadecimal form.
+func (d Digest) String() string {
+	return hex.EncodeToString(d)
+}
+
+// MarshalText encodes the digest to a hexadecimal representation of itself.
+func (d Digest) MarshalText() ([]byte, error) { return []byte(d.String()), nil }
+
 // Event describe the filesystem change and includes metadata about the file.
 type Event struct {
 	Timestamp  time.Time           // Time of event.
@@ -81,7 +98,7 @@ type Event struct {
 	Info       *Metadata           // File metadata (if the file exists).
 	Source     Source              // Source of the event.
 	Action     Action              // Action (like created, updated).
-	Hashes     map[HashType][]byte // File hashes.
+	Hashes     map[HashType]Digest // File hashes.
 
 	// Metadata
 	rtt    time.Duration // Time taken to collect the info.
@@ -240,8 +257,8 @@ func buildMetricbeatEvent(e *Event, existedBefore bool) mb.Event {
 		}
 	}
 
-	for hashType, hash := range e.Hashes {
-		m[string(hashType)] = hex.EncodeToString(hash)
+	for hashType, digest := range e.Hashes {
+		m[string(hashType)] = digest
 	}
 
 	out := mb.Event{
@@ -319,7 +336,7 @@ func diffEvents(old, new *Event) (Action, bool) {
 	return result, result != None
 }
 
-func hashFile(name string, hashType ...HashType) (map[HashType][]byte, error) {
+func hashFile(name string, hashType ...HashType) (map[HashType]Digest, error) {
 	if len(hashType) == 0 {
 		return nil, nil
 	}
@@ -376,7 +393,7 @@ func hashFile(name string, hashType ...HashType) (map[HashType][]byte, error) {
 		return nil, errors.Wrap(err, "failed to calculate file hashes")
 	}
 
-	nameToHash := make(map[HashType][]byte, len(hashes))
+	nameToHash := make(map[HashType]Digest, len(hashes))
 	for i, h := range hashes {
 		nameToHash[hashType[i]] = h.Sum(nil)
 	}

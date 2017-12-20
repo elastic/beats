@@ -52,7 +52,7 @@ func fbEncodeEvent(b *flatbuffers.Builder, e *Event) []byte {
 	return b.FinishedBytes()
 }
 
-func fbWriteHash(b *flatbuffers.Builder, hashes map[HashType][]byte) flatbuffers.UOffsetT {
+func fbWriteHash(b *flatbuffers.Builder, hashes map[HashType]Digest) flatbuffers.UOffsetT {
 	if len(hashes) == 0 {
 		return 0
 	}
@@ -252,13 +252,13 @@ func fbDecodeMetadata(e *schema.Event) *Metadata {
 	return rtn
 }
 
-func fbDecodeHash(e *schema.Event) map[HashType][]byte {
+func fbDecodeHash(e *schema.Event) map[HashType]Digest {
 	hash := e.Hashes(nil)
 	if hash == nil {
 		return nil
 	}
 
-	rtn := map[HashType][]byte{}
+	rtn := map[HashType]Digest{}
 	for _, hashType := range validHashes {
 		var length int
 		var producer func(i int) int8

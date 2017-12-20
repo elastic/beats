@@ -31,7 +31,7 @@ func testEvent() *Event {
 			MTime:  testEventTime,
 			SetGID: true,
 		},
-		Hashes: map[HashType][]byte{
+		Hashes: map[HashType]Digest{
 			SHA1:   mustDecodeHex("abcd"),
 			SHA256: mustDecodeHex("1234"),
 		},
@@ -109,7 +109,7 @@ func TestDiffEvents(t *testing.T) {
 
 	t.Run("different hash values", func(t *testing.T) {
 		e := testEvent()
-		e.Hashes = map[HashType][]byte{
+		e.Hashes = map[HashType]Digest{
 			SHA1:   mustDecodeHex("ef"),
 			SHA256: mustDecodeHex("1234"),
 		}
@@ -121,7 +121,7 @@ func TestDiffEvents(t *testing.T) {
 
 	t.Run("updated hashes and metadata", func(t *testing.T) {
 		e := testEvent()
-		e.Hashes = map[HashType][]byte{
+		e.Hashes = map[HashType]Digest{
 			SHA1:   mustDecodeHex("ef"),
 			SHA256: mustDecodeHex("1234"),
 		}
@@ -154,7 +154,7 @@ func TestDiffEvents(t *testing.T) {
 func TestHashFile(t *testing.T) {
 	t.Run("valid hashes", func(t *testing.T) {
 		// Computed externally.
-		expectedHashes := map[HashType][]byte{
+		expectedHashes := map[HashType]Digest{
 			BLAKE2B_256: mustDecodeHex("0f0cc1f0ea4ef962d6a150ae0b77bc320b57ed24e1609b933fa2274484f59145"),
 			BLAKE2B_384: mustDecodeHex("b819d90f648da6effff2393acb1884d2638642b3524c329832c073c9364149fcdedb522914ef9c2c92f007a42366139a"),
 			BLAKE2B_512: mustDecodeHex("fc13029e8a5ce67ad5a70f0cc659a4b30df9d791b125835e434606c6127ee37ebbc8b216389682ddfa84380789db09f2535d2a9837454414ea3ff00ec0801150"),
