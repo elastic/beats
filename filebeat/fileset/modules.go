@@ -133,7 +133,7 @@ func mcfgFromConfig(cfg *common.Config) (*ModuleConfig, error) {
 
 	err = cfg.Unpack(&dict)
 	if err != nil {
-		return nil, fmt.Errorf("Error unpacking module %s in a dict: %v", mcfg.Module, err)
+		return nil, fmt.Errorf("error unpacking module %s in a dict: %v", mcfg.Module, err)
 	}
 
 	mcfg.Filesets = map[string]*FilesetConfig{}
@@ -142,17 +142,16 @@ func mcfgFromConfig(cfg *common.Config) (*ModuleConfig, error) {
 			continue
 		}
 
-		var fcfg FilesetConfig
 		tmpCfg, err := common.NewConfigFrom(filesetConfig)
 		if err != nil {
-			return nil, fmt.Errorf("Error creating config from fileset %s/%s: %v", mcfg.Module, name, err)
+			return nil, fmt.Errorf("error creating config from fileset %s/%s: %v", mcfg.Module, name, err)
 		}
-		err = tmpCfg.Unpack(&fcfg)
-		if err != nil {
-			return nil, fmt.Errorf("Error unpacking fileset %s/%s: %v", mcfg.Module, name, err)
-		}
-		mcfg.Filesets[name] = &fcfg
 
+		fcfg, err := NewFilesetConfig(tmpCfg)
+		if err != nil {
+			return nil, fmt.Errorf("error creating config from fileset %s/%s: %v", mcfg.Module, name, err)
+		}
+		mcfg.Filesets[name] = fcfg
 	}
 
 	return &mcfg, nil

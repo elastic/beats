@@ -1,4 +1,4 @@
-// +build 1.9
+//
 
 // Package prospector allows to define new way of reading data in Filebeat
 // Deprecated: See the input package
@@ -10,9 +10,9 @@ import "github.com/elastic/beats/filebeat/input"
 // Deprecated: See input.input
 type Prospectorer = input.Input
 
-// Prospector encapsulate the lifecycle of a prospectorer
+// Runner encapsulate the lifecycle of a prospectorer
 // Deprecated: See input.Runner
-type Prospector = input.Runner
+type Runner = input.Runner
 
 // Context wrapper for backward compatibility
 // Deprecated: See input.Context
