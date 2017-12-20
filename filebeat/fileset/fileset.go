@@ -84,7 +84,8 @@ type manifest struct {
 	ModuleVersion   string                   `config:"module_version"`
 	Vars            []map[string]interface{} `config:"var"`
 	IngestPipeline  string                   `config:"ingest_pipeline"`
-	Input           string                   `config:"prospector"`
+	Input           string                   `config:"input"`
+	Prospector      string                   `config:"prospector"`
 	MachineLearning []struct {
 		Name       string `config:"name"`
 		Job        string `config:"job"`
@@ -94,6 +95,18 @@ type manifest struct {
 	Requires struct {
 		Processors []ProcessorRequirement `config:"processors"`
 	} `config:"requires"`
+}
+
+func newManifest(cfg *common.Config) (*manifest, error) {
+	var manifest manifest
+	err := cfg.Unpack(&manifest)
+	if err != nil {
+		return nil, err
+	}
+	if manifest.Prospector != "" {
+		manifest.Input = manifest.Prospector
+	}
+	return &manifest, nil
 }
 
 // ProcessorRequirement represents the declaration of a dependency to a particular
@@ -109,12 +122,11 @@ func (fs *Fileset) readManifest() (*manifest, error) {
 	if err != nil {
 		return nil, fmt.Errorf("Error reading manifest file: %v", err)
 	}
-	var manifest manifest
-	err = cfg.Unpack(&manifest)
+	manifest, err := newManifest(cfg)
 	if err != nil {
 		return nil, fmt.Errorf("Error unpacking manifest: %v", err)
 	}
-	return &manifest, nil
+	return manifest, nil
 }
 
 // evaluateVars resolves the fileset variables.
