@@ -1,0 +1,18 @@
+- name: cluster
+  type: group
+  description: >
+    cluster
+  release: beta
+  fields:
+    - name: status
+      type: keyword
+      description: >
+        Cluster status.
+    - name: nodes.active.count
+      type: long
+      description: >
+        The count of active nodes.
+    - name: shards.active.count
+      type: long
+      description: >
+        The count of active shards.    

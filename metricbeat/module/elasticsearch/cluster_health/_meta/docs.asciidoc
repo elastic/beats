@@ -1,0 +1,5 @@
+=== Elasticsearch cluster_health metricset
+
+The `cluster_health` metricset interrogates the
+https://www.elastic.co/guide/en/elasticsearch/reference/master/cluster-health.html[Cluster API endpoint] of
+Elasticsearch to get cluster health information.

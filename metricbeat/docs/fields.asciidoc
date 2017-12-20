@@ -2656,6 +2656,37 @@ Elasticsearch cluster name.
 
 
 [float]
+== cluster fields
+
+cluster
+
+
+
+[float]
+=== `elasticsearch.cluster.status`
+
+type: keyword
+
+Cluster status.
+
+
+[float]
+=== `elasticsearch.cluster.nodes.active.count`
+
+type: long
+
+The count of active nodes.
+
+
+[float]
+=== `elasticsearch.cluster.shards.active.count`
+
+type: long
+
+The count of active shards.    
+
+
+[float]
 == node fields
 
 node
