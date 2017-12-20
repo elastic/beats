@@ -1,5 +1,5 @@
 :stack-version: 6.1.1
-:doc-branch: master
+:doc-branch: 6.1
 :go-version: 1.9.2
 :release-state: released
 :python: 2.7.9
