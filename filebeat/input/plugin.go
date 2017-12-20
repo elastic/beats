@@ -11,7 +11,7 @@ type inputPlugin struct {
 	factory Factory
 }
 
-const pluginKey = "filebeat.prospector"
+const pluginKey = "filebeat.input"
 
 func init() {
 	plugin.MustRegisterLoader(pluginKey, func(ifc interface{}) error {
