@@ -17,6 +17,7 @@ type reader struct {
 	watcher monitor.Watcher
 	config  Config
 	eventC  chan Event
+	log     *logp.Logger
 }
 
 // NewEventReader creates a new EventProducer backed by fsnotify.
@@ -30,6 +31,7 @@ func NewEventReader(c Config) (EventProducer, error) {
 		watcher: watcher,
 		config:  c,
 		eventC:  make(chan Event, 1),
+		log:     logp.NewLogger(moduleName),
 	}, nil
 }
 
@@ -37,10 +39,11 @@ func (r *reader) Start(done <-chan struct{}) (<-chan Event, error) {
 	for _, p := range r.config.Paths {
 		if err := r.watcher.Add(p); err != nil {
 			if err == syscall.EMFILE {
-				logp.Warn("%v Failed to watch %v: %v (check the max number of "+
-					"open files allowed with 'ulimit -a')", logPrefix, p, err)
+				r.log.Warnw("Failed to add watch (check the max number of "+
+					"open files allowed with 'ulimit -a')",
+					"file_path", p, "error", err)
 			} else {
-				logp.Warn("%v Failed to watch %v: %v", logPrefix, p, err)
+				r.log.Warnw("Failed to add watch", "file_path", p, "error", err)
 			}
 		}
 	}
@@ -49,7 +52,9 @@ func (r *reader) Start(done <-chan struct{}) (<-chan Event, error) {
 		return nil, errors.Wrap(err, "unable to start watcher")
 	}
 	go r.consumeEvents()
-	logp.Info("%v started fsnotify watcher recursive:%v", logPrefix, r.config.Recursive)
+	r.log.Infow("Started fsnotify watcher",
+		"file_path", r.config.Paths,
+		"recursive", r.config.Recursive)
 	return r.eventC, nil
 }
 
@@ -63,8 +68,9 @@ func (r *reader) consumeEvents() {
 			if event.Name == "" || r.config.IsExcludedPath(event.Name) {
 				continue
 			}
-			debugf("Received fsnotify event: path=%v action=%v",
-				event.Name, event.Op.String())
+			r.log.Debugw("Received fsnotify event",
+				"file_path", event.Name,
+				"event_flags", event.Op)
 
 			start := time.Now()
 			e := NewEvent(event.Name, opToAction(event.Op), SourceFSNotify,
@@ -73,7 +79,7 @@ func (r *reader) consumeEvents() {
 
 			r.eventC <- e
 		case err := <-r.watcher.ErrorChannel():
-			logp.Warn("%v fsnotify watcher error: %v", logPrefix, err)
+			r.log.Warnw("fsnotify watcher error", "error", err)
 		}
 	}
 }

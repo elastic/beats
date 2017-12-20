@@ -18,15 +18,10 @@ import (
 const (
 	moduleName    = "file_integrity"
 	metricsetName = "file"
-	logPrefix     = "[" + moduleName + "]"
 	bucketName    = "file.v1"
 
 	// Use old namespace for data until we do some field renaming for GA.
 	namespace = "audit.file"
-)
-
-var (
-	debugf = logp.MakeDebug(moduleName)
 )
 
 func init() {
@@ -54,6 +49,7 @@ type MetricSet struct {
 	config  Config
 	reader  EventProducer
 	scanner EventProducer
+	log     *logp.Logger
 
 	// Runtime params that are initialized on Run().
 	bucket       datastore.BoltBucket
@@ -80,6 +76,7 @@ func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
 		BaseMetricSet: base,
 		config:        config,
 		reader:        r,
+		log:           logp.NewLogger(moduleName),
 	}
 
 	if config.ScanAtStart {
@@ -89,7 +86,7 @@ func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
 		}
 	}
 
-	debugf("Initialized the file event reader. Running as euid=%v", os.Geteuid())
+	ms.log.Debugf("Initialized the file event reader. Running as euid=%v", os.Geteuid())
 
 	return ms, nil
 }
@@ -139,7 +136,7 @@ func (ms *MetricSet) init(reporter mb.PushReporterV2) bool {
 	if err != nil {
 		err = errors.Wrap(err, "failed to open persistent datastore")
 		reporter.Error(err)
-		logp.Err("%v %v", logPrefix, err)
+		ms.log.Errorw("Failed to initialize", "error", err)
 		return false
 	}
 	ms.bucket = bucket.(datastore.BoltBucket)
@@ -148,7 +145,7 @@ func (ms *MetricSet) init(reporter mb.PushReporterV2) bool {
 	if err != nil {
 		err = errors.Wrap(err, "failed to start fsnotify event producer")
 		reporter.Error(err)
-		logp.Err("%v %v", logPrefix, err)
+		ms.log.Errorw("Failed to initialize", "error", err)
 		return false
 	}
 
@@ -158,7 +155,7 @@ func (ms *MetricSet) init(reporter mb.PushReporterV2) bool {
 		if err != nil {
 			err = errors.Wrap(err, "failed to start file scanner")
 			reporter.Error(err)
-			logp.Err("%v %v", logPrefix, err)
+			ms.log.Errorw("Failed to initialize", "error", err)
 			return false
 		}
 	}
@@ -167,9 +164,12 @@ func (ms *MetricSet) init(reporter mb.PushReporterV2) bool {
 }
 
 func (ms *MetricSet) reportEvent(reporter mb.PushReporterV2, event *Event) bool {
-	if len(event.errors) > 0 && logp.IsDebug(moduleName) {
-		debugf("Errors on event for %v with action=%v: %v",
-			event.Path, event.Action, event.errors)
+	if len(event.errors) == 1 {
+		ms.log.Debugw("Error in event", "file_path", event.Path,
+			"action", event.Action, "error", event.errors[0])
+	} else if len(event.errors) > 1 {
+		ms.log.Debugw("Multiple errors in event", "file_path", event.Path,
+			"action", event.Action, "errors", event.errors)
 	}
 
 	changed, lastEvent := ms.hasFileChangedSinceLastEvent(event)
@@ -183,11 +183,11 @@ func (ms *MetricSet) reportEvent(reporter mb.PushReporterV2, event *Event) bool 
 	// Persist event locally.
 	if event.Info == nil {
 		if err := ms.bucket.Delete(event.Path); err != nil {
-			logp.Err("%v %v", logPrefix, err)
+			ms.log.Errorw("Failed during DB delete", "error", err)
 		}
 	} else {
 		if err := store(ms.bucket, event); err != nil {
-			logp.Err("%v %v", logPrefix, err)
+			ms.log.Errorw("Failed during DB store", "error", err)
 		}
 	}
 	return true
@@ -197,7 +197,7 @@ func (ms *MetricSet) hasFileChangedSinceLastEvent(event *Event) (changed bool, l
 	// Load event from DB.
 	lastEvent, err := load(ms.bucket, event.Path)
 	if err != nil {
-		logp.Warn("%v %v", logPrefix, err)
+		ms.log.Warnw("Failed during DB load", "error", err)
 		return true, lastEvent
 	}
 
@@ -206,18 +206,19 @@ func (ms *MetricSet) hasFileChangedSinceLastEvent(event *Event) (changed bool, l
 		event.Action = action
 	}
 
-	if changed && logp.IsDebug(moduleName) {
-		debugf("file at %v has changed since last seen: old=%v, new=%v",
-			event.Path, lastEvent, event)
+	if changed {
+		ms.log.Debugw("File changed since it was last seen",
+			"file_path", event.Path, "took", event.rtt,
+			logp.Namespace("event"), "old", lastEvent, "new", event)
 	}
 	return changed, lastEvent
 }
 
 func (ms *MetricSet) purgeDeleted(reporter mb.PushReporterV2) {
 	for _, prefix := range ms.config.Paths {
-		deleted, err := purgeOlder(ms.bucket, ms.scanStart, prefix)
+		deleted, err := ms.purgeOlder(ms.scanStart, prefix)
 		if err != nil {
-			logp.Err("%v %v", logPrefix, err)
+			ms.log.Errorw("Failure while purging older records", "error", err)
 			continue
 		}
 
@@ -234,7 +235,7 @@ func (ms *MetricSet) purgeDeleted(reporter mb.PushReporterV2) {
 
 // purgeOlder does a prefix scan of the keys in the datastore and purges items
 // older than the specified time.
-func purgeOlder(b datastore.BoltBucket, t time.Time, prefix string) ([]*Event, error) {
+func (ms *MetricSet) purgeOlder(t time.Time, prefix string) ([]*Event, error) {
 	var (
 		deleted       []*Event
 		totalKeys     uint64
@@ -248,7 +249,7 @@ func purgeOlder(b datastore.BoltBucket, t time.Time, prefix string) ([]*Event, e
 		startTime = time.Now()
 	)
 
-	err := b.Update(func(b *bolt.Bucket) error {
+	err := ms.bucket.Update(func(b *bolt.Bucket) error {
 		c := b.Cursor()
 
 		for path, v := c.Seek(p); path != nil && matchesPrefix(path); path, v = c.Next() {
@@ -269,8 +270,14 @@ func purgeOlder(b datastore.BoltBucket, t time.Time, prefix string) ([]*Event, e
 		return nil
 	})
 
-	debugf("Purged %v of %v entries in %v for %v", len(deleted),
-		totalKeys, time.Since(startTime), prefix)
+	took := time.Since(startTime)
+	ms.log.With(
+		"file_path", prefix,
+		"took", took,
+		"items_total", totalKeys,
+		"items_deleted", len(deleted)).
+		Debugf("Purged %v of %v entries in %v for %v", len(deleted), totalKeys,
+			time.Since(startTime), prefix)
 	return deleted, err
 }
 
