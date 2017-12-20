@@ -184,6 +184,27 @@ func TestApplyOverrides(t *testing.T) {
 				Input: map[string]interface{}{
 					"close_eof": true,
 				},
+				Prospector: map[string]interface{}{
+					"close_eof": true,
+				},
+			},
+		},
+		{
+			name:    "input overrides",
+			fcfg:    FilesetConfig{},
+			module:  "nginx",
+			fileset: "access",
+			overrides: &ModuleOverrides{
+				"nginx": map[string]*common.Config{
+					"access": load(t, map[string]interface{}{
+						"input.close_eof": true,
+					}),
+				},
+			},
+			expected: FilesetConfig{
+				Input: map[string]interface{}{
+					"close_eof": true,
+				},
 			},
 		},
 	}

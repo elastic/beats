@@ -203,13 +203,12 @@ func applyOverrides(fcfg *FilesetConfig,
 		return nil, fmt.Errorf("Error merging configs: %v", err)
 	}
 
-	var res FilesetConfig
-	err = resultConfig.Unpack(&res)
+	res, err := NewFilesetConfig(resultConfig)
 	if err != nil {
 		return nil, fmt.Errorf("Error unpacking configs: %v", err)
 	}
 
-	return &res, nil
+	return res, nil
 }
 
 // appendWithoutDuplicates appends basic module configuration for each module in the
