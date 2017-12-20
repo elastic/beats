@@ -7,7 +7,6 @@ import (
 	"crypto/sha256"
 	"crypto/sha512"
 	"encoding/hex"
-	"encoding/json"
 	"fmt"
 	"hash"
 	"io"
@@ -92,13 +91,13 @@ func (d Digest) MarshalText() ([]byte, error) { return []byte(d.String()), nil }
 
 // Event describe the filesystem change and includes metadata about the file.
 type Event struct {
-	Timestamp  time.Time           // Time of event.
-	Path       string              // The path associated with the event.
-	TargetPath string              // Target path for symlinks.
-	Info       *Metadata           // File metadata (if the file exists).
-	Source     Source              // Source of the event.
-	Action     Action              // Action (like created, updated).
-	Hashes     map[HashType]Digest // File hashes.
+	Timestamp  time.Time           `json:"timestamp"`             // Time of event.
+	Path       string              `json:"path"`                  // The path associated with the event.
+	TargetPath string              `json:"target_path,omitempty"` // Target path for symlinks.
+	Info       *Metadata           `json:"info"`                  // File metadata (if the file exists).
+	Source     Source              `json:"source"`                // Source of the event.
+	Action     Action              `json:"action"`                // Action (like created, updated).
+	Hashes     map[HashType]Digest `json:"hash,omitempty"`        // File hashes.
 
 	// Metadata
 	rtt    time.Duration // Time taken to collect the info.
@@ -107,20 +106,20 @@ type Event struct {
 
 // Metadata contains file metadata.
 type Metadata struct {
-	Inode  uint64
-	UID    uint32
-	GID    uint32
-	SID    string
-	Owner  string
-	Group  string
-	Size   uint64
-	MTime  time.Time   // Last modification time.
-	CTime  time.Time   // Last metadata change time.
-	Type   Type        // File type (dir, file, symlink).
-	Mode   os.FileMode // Permissions
-	SetUID bool        // setuid bit (POSIX only)
-	SetGID bool        // setgid bit (POSIX only)
-	Origin []string    // External origin info for the file (MacOS only)
+	Inode  uint64      `json:"inode"`
+	UID    uint32      `json:"uid"`
+	GID    uint32      `json:"gid"`
+	SID    string      `json:"sid"`
+	Owner  string      `json:"owner"`
+	Group  string      `json:"group"`
+	Size   uint64      `json:"size"`
+	MTime  time.Time   `json:"mtime"`  // Last modification time.
+	CTime  time.Time   `json:"ctime"`  // Last metadata change time.
+	Type   Type        `json:"type"`   // File type (dir, file, symlink).
+	Mode   os.FileMode `json:"mode"`   // Permissions
+	SetUID bool        `json:"setuid"` // setuid bit (POSIX only)
+	SetGID bool        `json:"setgid"` // setgid bit (POSIX only)
+	Origin []string    `json:"origin"` // External origin info for the file (MacOS only)
 }
 
 // NewEventFromFileInfo creates a new Event based on data from a os.FileInfo
@@ -195,11 +194,6 @@ func NewEvent(
 	}
 	err = errors.Wrap(err, "failed to lstat")
 	return NewEventFromFileInfo(path, info, err, action, source, maxFileSize, hashTypes)
-}
-
-func (e *Event) String() string {
-	data, _ := json.Marshal(e)
-	return string(data)
 }
 
 func buildMetricbeatEvent(e *Event, existedBefore bool) mb.Event {
