@@ -83,6 +83,9 @@ func (action Action) String() string {
 	return strings.Join(list, "|")
 }
 
+// MarshalText marshals the Action to a textual representation of itself.
+func (action Action) MarshalText() ([]byte, error) { return []byte(action.String()), nil }
+
 func resolveActionOrder(action Action, existedBefore, existsNow bool) ActionArray {
 	if action == None {
 		return nil
