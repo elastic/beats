@@ -1,8 +1,6 @@
 package logp
 
 import (
-	"time"
-
 	"go.uber.org/zap/zapcore"
 )
 
@@ -16,7 +14,7 @@ var baseEncodingConfig = zapcore.EncoderConfig{
 	LineEnding:     zapcore.DefaultLineEnding,
 	EncodeLevel:    zapcore.LowercaseLevelEncoder,
 	EncodeTime:     zapcore.ISO8601TimeEncoder,
-	EncodeDuration: millisecondsDurationEncoder,
+	EncodeDuration: zapcore.NanosDurationEncoder,
 	EncodeCaller:   zapcore.ShortCallerEncoder,
 	EncodeName:     zapcore.FullNameEncoder,
 }
@@ -47,10 +45,6 @@ func syslogEncoderConfig() zapcore.EncoderConfig {
 	// Time is added by syslog.
 	c.TimeKey = ""
 	return c
-}
-
-func millisecondsDurationEncoder(d time.Duration, enc zapcore.PrimitiveArrayEncoder) {
-	enc.AppendFloat64(float64(d) / float64(time.Millisecond))
 }
 
 func bracketedNameEncoder(loggerName string, enc zapcore.PrimitiveArrayEncoder) {
