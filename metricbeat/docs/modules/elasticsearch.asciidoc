@@ -32,9 +32,13 @@ This module supports TLS connection when using `ssl` config field, as described 
 
 The following metricsets are available:
 
+* <<metricbeat-metricset-elasticsearch-cluster_stats,cluster_stats>>
+
 * <<metricbeat-metricset-elasticsearch-node,node>>
 
 * <<metricbeat-metricset-elasticsearch-node_stats,node_stats>>
+
+include::elasticsearch/cluster_stats.asciidoc[]
 
 include::elasticsearch/node.asciidoc[]
 

@@ -1,0 +1,64 @@
+{
+  "@timestamp": "2017-12-20T08:12:50.523Z",
+  "@metadata": {
+    "beat": "metricbeat",
+    "type": "doc",
+    "version": "7.0.0-alpha1"
+  },
+  "metricset": {
+    "host": "192.168.31.32:9200",
+    "rtt": 158732,
+    "namespace": "elasticsearch.cluster.stats",
+    "name": "cluster_stats",
+    "module": "elasticsearch"
+  },
+  "elasticsearch": {
+    "cluster": {
+      "name": "elasticsearch-dev5.4",
+      "stats": {
+        "status": "green",
+        "indices": {
+          "segments": {
+            "count": 10404
+          },
+          "count": 1010,
+          "shards": {
+            "total": 4452
+          },
+          "docs": {
+            "count": 198894297
+          }
+        },
+        "nodes": {
+          "count": {
+            "total": 5
+          },
+          "jvm": {
+            "mem": {
+              "heap": {
+                "max": 42382786560,
+                "used": 19500422672
+              }
+            }
+          },
+          "fs": {
+            "available": {
+              "bytes": 1340676612096
+            },
+            "total": {
+              "bytes": 1584643768320
+            },
+            "free": {
+              "bytes": 1421290070016
+            }
+          }
+        }
+      }
+    }
+  },
+  "beat": {
+    "version": "7.0.0-alpha1",
+    "name": "localhost",
+    "hostname": "localhost"
+  }
+}
