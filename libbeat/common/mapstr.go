@@ -3,9 +3,12 @@ package common
 import (
 	"encoding/json"
 	"fmt"
+	"sort"
 	"strings"
 
 	"github.com/pkg/errors"
+	"go.uber.org/zap"
+	"go.uber.org/zap/zapcore"
 )
 
 // Event metadata constants. These keys are used within libbeat to identify
@@ -153,6 +156,29 @@ func (m MapStr) String() string {
 		return fmt.Sprintf("Not valid json: %v", err)
 	}
 	return string(bytes)
+}
+
+// MarshalLogObject implements the zapcore.ObjectMarshaler interface and allows
+// for more efficient marshaling of MapStr in structured logging.
+func (m MapStr) MarshalLogObject(enc zapcore.ObjectEncoder) error {
+	if len(m) == 0 {
+		return nil
+	}
+
+	keys := make([]string, 0, len(m))
+	for k := range m {
+		keys = append(keys, k)
+	}
+	sort.Strings(keys)
+	for _, k := range keys {
+		v := m[k]
+		if inner, ok := tryToMapStr(v); ok {
+			enc.AddObject(k, inner)
+			continue
+		}
+		zap.Any(k, v).AddTo(enc)
+	}
+	return nil
 }
 
 // Flatten flattens the given MapStr and returns a flat MapStr.
