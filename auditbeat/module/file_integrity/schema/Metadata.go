@@ -130,8 +130,32 @@ func (rcv *Metadata) MutateType(n byte) bool {
 	return rcv._tab.MutateByteSlot(20, n)
 }
 
+func (rcv *Metadata) Setuid() byte {
+	o := flatbuffers.UOffsetT(rcv._tab.Offset(22))
+	if o != 0 {
+		return rcv._tab.GetByte(o + rcv._tab.Pos)
+	}
+	return 0
+}
+
+func (rcv *Metadata) MutateSetuid(n byte) bool {
+	return rcv._tab.MutateByteSlot(22, n)
+}
+
+func (rcv *Metadata) Setgid() byte {
+	o := flatbuffers.UOffsetT(rcv._tab.Offset(24))
+	if o != 0 {
+		return rcv._tab.GetByte(o + rcv._tab.Pos)
+	}
+	return 0
+}
+
+func (rcv *Metadata) MutateSetgid(n byte) bool {
+	return rcv._tab.MutateByteSlot(24, n)
+}
+
 func MetadataStart(builder *flatbuffers.Builder) {
-	builder.StartObject(9)
+	builder.StartObject(11)
 }
 func MetadataAddInode(builder *flatbuffers.Builder, inode uint64) {
 	builder.PrependUint64Slot(0, inode, 0)
@@ -159,6 +183,12 @@ func MetadataAddCtimeNs(builder *flatbuffers.Builder, ctimeNs int64) {
 }
 func MetadataAddType(builder *flatbuffers.Builder, type_ byte) {
 	builder.PrependByteSlot(8, type_, 1)
+}
+func MetadataAddSetuid(builder *flatbuffers.Builder, setuid byte) {
+	builder.PrependByteSlot(9, setuid, 0)
+}
+func MetadataAddSetgid(builder *flatbuffers.Builder, setgid byte) {
+	builder.PrependByteSlot(10, setgid, 0)
 }
 func MetadataEnd(builder *flatbuffers.Builder) flatbuffers.UOffsetT {
 	return builder.EndObject()

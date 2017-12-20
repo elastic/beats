@@ -31,6 +31,8 @@ table Metadata {
   mtime_ns:long;
   ctime_ns:long;
   type:Type = 1;
+  setuid:bool;
+  setgid:bool;
 }
 
 table Hash {

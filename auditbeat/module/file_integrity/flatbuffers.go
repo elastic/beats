@@ -127,6 +127,15 @@ func fbWriteMetadata(b *flatbuffers.Builder, m *Metadata) flatbuffers.UOffsetT {
 	case SymlinkType:
 		schema.MetadataAddType(b, schema.TypeSymlink)
 	}
+	var setuid, setgid byte
+	if m.SetUID {
+		setuid = 1
+	}
+	if m.SetGID {
+		setgid = 1
+	}
+	schema.MetadataAddSetuid(b, setuid)
+	schema.MetadataAddSetgid(b, setgid)
 	return schema.MetadataEnd(b)
 }
 
@@ -213,14 +222,16 @@ func fbDecodeMetadata(e *schema.Event) *Metadata {
 	}
 
 	rtn := &Metadata{
-		Inode: info.Inode(),
-		UID:   info.Uid(),
-		GID:   info.Gid(),
-		SID:   string(info.Sid()),
-		Mode:  os.FileMode(info.Mode()),
-		Size:  info.Size(),
-		MTime: time.Unix(0, info.MtimeNs()).UTC(),
-		CTime: time.Unix(0, info.CtimeNs()).UTC(),
+		Inode:  info.Inode(),
+		UID:    info.Uid(),
+		GID:    info.Gid(),
+		SID:    string(info.Sid()),
+		Mode:   os.FileMode(info.Mode()),
+		Size:   info.Size(),
+		MTime:  time.Unix(0, info.MtimeNs()).UTC(),
+		CTime:  time.Unix(0, info.CtimeNs()).UTC(),
+		SetUID: info.Setuid() != 0,
+		SetGID: info.Setgid() != 0,
 	}
 
 	switch info.Type() {

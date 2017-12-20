@@ -2229,6 +2229,24 @@ example: 416
 The mode of the file in octal representation.
 
 [float]
+=== `audit.file.setuid`
+
+type: boolean
+
+example: True
+
+Set if the file has the `setuid` bit set. Missing otherwise.
+
+[float]
+=== `audit.file.setgid`
+
+type: boolean
+
+example: True
+
+Set if the file has the `setgid` bit set. Missing otherwise.
+
+[float]
 === `audit.file.size`
 
 type: long

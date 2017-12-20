@@ -90,17 +90,19 @@ type Event struct {
 
 // Metadata contains file metadata.
 type Metadata struct {
-	Inode uint64
-	UID   uint32
-	GID   uint32
-	SID   string
-	Owner string
-	Group string
-	Size  uint64
-	MTime time.Time   // Last modification time.
-	CTime time.Time   // Last metdata change time.
-	Type  Type        // File type (dir, file, symlink).
-	Mode  os.FileMode // Permissions
+	Inode  uint64
+	UID    uint32
+	GID    uint32
+	SID    string
+	Owner  string
+	Group  string
+	Size   uint64
+	MTime  time.Time   // Last modification time.
+	CTime  time.Time   // Last metdata change time.
+	Type   Type        // File type (dir, file, symlink).
+	Mode   os.FileMode // Permissions
+	SetUID bool        // setuid bit (POSIX only)
+	SetGID bool        // setgid bit (POSIX only)
 }
 
 // NewEventFromFileInfo creates a new Event based on data from a os.FileInfo
@@ -226,6 +228,12 @@ func buildMetricbeatEvent(e *Event, existedBefore bool) mb.Event {
 		if info.Group != "" {
 			m["group"] = info.Group
 		}
+		if info.SetUID {
+			m["setuid"] = true
+		}
+		if info.SetGID {
+			m["setgid"] = true
+		}
 	}
 
 	for hashType, hash := range e.Hashes {
@@ -289,7 +297,7 @@ func diffEvents(old, new *Event) (Action, bool) {
 	if o, n := old.Info, new.Info; o != nil && n != nil {
 		// The owner and group names are ignored (they aren't persisted).
 		if o.Inode != n.Inode || o.UID != n.UID || o.GID != n.GID || o.SID != n.SID ||
-			o.Mode != n.Mode || o.Type != n.Type {
+			o.Mode != n.Mode || o.Type != n.Type || o.SetUID != n.SetUID || o.SetGID != n.SetGID {
 			result |= AttributesModified
 		}
 
