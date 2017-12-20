@@ -2235,7 +2235,7 @@ type: boolean
 
 example: True
 
-Set if the file has the `setuid` bit set. Missing otherwise.
+Set if the file has the `setuid` bit set. Omitted otherwise.
 
 [float]
 === `audit.file.setgid`
@@ -2244,7 +2244,7 @@ type: boolean
 
 example: True
 
-Set if the file has the `setgid` bit set. Missing otherwise.
+Set if the file has the `setgid` bit set. Omitted otherwise.
 
 [float]
 === `audit.file.size`

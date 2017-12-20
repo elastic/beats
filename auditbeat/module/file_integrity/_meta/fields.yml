@@ -60,12 +60,12 @@
       - name: setuid
         type: boolean
         example: true
-        description: Set if the file has the `setuid` bit set. Missing otherwise.
+        description: Set if the file has the `setuid` bit set. Omitted otherwise.
 
       - name: setgid
         type: boolean
         example: true
-        description: Set if the file has the `setgid` bit set. Missing otherwise.
+        description: Set if the file has the `setgid` bit set. Omitted otherwise.
 
       - name: size
         type: long

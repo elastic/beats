@@ -106,7 +106,7 @@ func TestSetUIDSetGIDBits(t *testing.T) {
 	assert.False(t, meta.SetGID)
 
 	if runtime.GOOS == "windows" {
-		t.Skip("Not setuid/setgid bits on Windows")
+		t.Skip("No setuid/setgid bits on Windows")
 	}
 
 	for _, flags := range []os.FileMode{
