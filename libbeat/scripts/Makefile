@@ -243,7 +243,7 @@ test: unit
 
 .PHONY: testsuite
 testsuite: ## @testing Runs all tests and generates the coverage reports
-testsuite: clean update
+testsuite: clean
 	$(MAKE) unit-tests
 
 	if [ $(STRESS_TESTS) = true ]; then \
