@@ -49,3 +49,25 @@ class Test(BaseTest):
         assert exit_code == 0
         assert self.log_contains('Loaded index template')
         assert len(es.cat.templates(name='auditbeat-*', h='name')) > 0
+
+    @unittest.skipUnless(INTEGRATION_TESTS, "integration test")
+    def test_dashboards(self):
+        """
+        Test that the dashboards can be loaded with `setup --dashboards`
+        """
+
+        kibana_dir = os.path.join(self.beat_path, "_meta", "kibana")
+        shutil.copytree(kibana_dir, os.path.join(self.working_dir, "kibana"))
+
+        es = Elasticsearch([self.get_elasticsearch_url()])
+        self.render_config_template(
+            modules=[{
+                "name": "auditd",
+            }],
+            elasticsearch={"host": self.get_elasticsearch_url()},
+            kibana={"host": self.get_kibana_url()},
+        )
+        exit_code = self.run_beat(extra_args=["setup", "--dashboards"])
+
+        assert exit_code == 0
+        assert self.log_contains("Kibana dashboards successfully loaded.")
