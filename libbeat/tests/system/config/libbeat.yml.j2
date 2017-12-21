@@ -17,16 +17,6 @@ tags: [
   {%- endif -%}
 ]
 
-{% if geoip_paths is not none %}
-geoip:
-  paths: [
-      {%- for path in geoip_paths -%}
-          "{{ beat.working_dir + '/' + path }}"
-          {%- if not loop.last %}, {% endif -%}
-      {%- endfor -%}
-  ]
-{%- endif %}
-
 {% if setup_template_name %}
 setup.template.name: setup_template_name
 setup.template.pattern: setup_template_pattern

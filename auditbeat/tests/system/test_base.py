@@ -62,8 +62,10 @@ class Test(BaseTest):
         es = Elasticsearch([self.get_elasticsearch_url()])
         self.render_config_template(
             modules=[{
-                "name": "auditd",
-            }],
+                "name": "file_integrity",
+                "extras": {
+                    "paths": ["file.example"],
+                }],
             elasticsearch={"host": self.get_elasticsearch_url()},
             kibana={"host": self.get_kibana_url()},
         )
