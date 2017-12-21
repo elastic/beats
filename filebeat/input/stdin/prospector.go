@@ -6,8 +6,8 @@ import (
 	"github.com/elastic/beats/filebeat/channel"
 	"github.com/elastic/beats/filebeat/harvester"
 	"github.com/elastic/beats/filebeat/input/file"
+	"github.com/elastic/beats/filebeat/input/log"
 	"github.com/elastic/beats/filebeat/prospector"
-	"github.com/elastic/beats/filebeat/prospector/log"
 	"github.com/elastic/beats/libbeat/common"
 	"github.com/elastic/beats/libbeat/logp"
 )
