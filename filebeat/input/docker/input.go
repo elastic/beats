@@ -1,11 +1,12 @@
 package docker
 
 import (
+	"context"
 	"path"
 
 	"github.com/elastic/beats/filebeat/channel"
+	"github.com/elastic/beats/filebeat/input"
 	"github.com/elastic/beats/filebeat/input/log"
-	"github.com/elastic/beats/filebeat/prospector"
 	"github.com/elastic/beats/libbeat/common"
 	"github.com/elastic/beats/libbeat/common/cfgwarn"
 
@@ -13,22 +14,22 @@ import (
 )
 
 func init() {
-	err := prospector.Register("docker", NewProspector)
+	err := input.Register("docker", NewInput)
 	if err != nil {
 		panic(err)
 	}
 }
 
-// NewProspector creates a new docker prospector
-func NewProspector(cfg *common.Config, outletFactory channel.Factory, context prospector.Context) (prospector.Prospectorer, error) {
-	cfgwarn.Experimental("Docker prospector is enabled.")
+// NewInput creates a new docker input
+func NewInput(cfg *common.Config, outletFactory channel.Factory, context context.Context) (input.Input, error) {
+	cfgwarn.Experimental("Docker input is enabled.")
 
 	config := defaultConfig
 	if err := cfg.Unpack(&config); err != nil {
-		return nil, errors.Wrap(err, "reading docker prospector config")
+		return nil, errors.Wrap(err, "reading docker input config")
 	}
 
-	// Wrap log prospector with custom docker settings
+	// Wrap log input with custom docker settings
 	if len(config.Containers.IDs) > 0 {
 		for idx, containerID := range config.Containers.IDs {
 			cfg.SetString("paths", idx, path.Join(config.Containers.Path, containerID, "*.log"))
@@ -36,7 +37,7 @@ func NewProspector(cfg *common.Config, outletFactory channel.Factory, context pr
 	}
 
 	if err := cfg.SetBool("docker-json", -1, true); err != nil {
-		return nil, errors.Wrap(err, "update prospector config")
+		return nil, errors.Wrap(err, "update input config")
 	}
 	return log.NewInput(cfg, outletFactory, context)
 }
