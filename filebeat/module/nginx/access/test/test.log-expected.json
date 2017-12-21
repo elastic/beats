@@ -52,6 +52,9 @@
       "prospector" : {
         "type" : "log"
       },
+      "input" : {
+        "type" : "log"
+      },
       "read_timestamp" : "2017-05-29T22:28:06.246Z",
       "source" : "/Users/tsg/src/github.com/elastic/beats/filebeat/module/nginx/access/test/test.log",
       "fileset" : {
@@ -100,6 +103,9 @@
         "version" : "6.0.0-alpha2"
       },
       "prospector" : {
+        "type" : "log"
+      },
+      "input" : {
         "type" : "log"
       },
       "read_timestamp" : "2017-05-29T22:28:06.246Z",
@@ -161,6 +167,9 @@
       "prospector" : {
         "type" : "log"
       },
+      "input" : {
+        "type" : "log"
+      },
       "read_timestamp" : "2017-05-29T22:28:06.246Z",
       "source" : "/Users/tsg/src/github.com/elastic/beats/filebeat/module/nginx/access/test/test.log",
       "fileset" : {
@@ -212,6 +221,9 @@
         "version" : "6.0.0-alpha2"
       },
       "prospector" : {
+        "type" : "log"
+      },
+      "input" : {
         "type" : "log"
       },
       "read_timestamp" : "2017-05-29T22:28:06.245Z",
@@ -274,6 +286,9 @@
       "prospector" : {
         "type" : "log"
       },
+      "input" : {
+        "type" : "log"
+      },
       "read_timestamp" : "2017-05-29T22:28:06.246Z",
       "source" : "/Users/tsg/src/github.com/elastic/beats/filebeat/module/nginx/access/test/test.log",
       "fileset" : {
@@ -331,6 +346,9 @@
         "version" : "6.0.0-alpha2"
       },
       "prospector" : {
+        "type" : "log"
+      },
+      "input" : {
         "type" : "log"
       },
       "read_timestamp" : "2017-05-29T22:28:06.246Z",
