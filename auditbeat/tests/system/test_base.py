@@ -1,5 +1,7 @@
 import re
 import sys
+import os
+import shutil
 import unittest
 from auditbeat import BaseTest
 from elasticsearch import Elasticsearch
@@ -65,7 +67,8 @@ class Test(BaseTest):
                 "name": "file_integrity",
                 "extras": {
                     "paths": ["file.example"],
-                }],
+                }
+            }],
             elasticsearch={"host": self.get_elasticsearch_url()},
             kibana={"host": self.get_kibana_url()},
         )
