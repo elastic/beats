@@ -99,9 +99,9 @@ a suffix to the value. The supported units are `b` (default), `kib`, `kb`, `mib`
 `mb`, `gib`, `gb`, `tib`, `tb`, `pib`, `pb`, `eib`, and `eb`.
 
 *`hash_types`*:: A list of hash types to compute when the file changes.
-The supported hash types are md5, sha1, sha224, sha256, sha384, sha512,
-sha512_224, sha512_256, sha3_224, sha3_256, sha3_384 and sha3_512. The default
-value is sha1.
+The supported hash types are `blake2b_256`, `blake2b_384`, `blake2b_512`, `md5`,
+`sha1`, `sha224`, `sha256`, `sha384`, `sha512`, `sha512_224`, `sha512_256`,
+`sha3_224`, `sha3_256`, `sha3_384`, and `sha3_512`. The default value is `sha1`.
 
 *`recursive`*:: By default, the watches set to the paths specified in
 `paths` are not recursive. This means that only changes to the contents

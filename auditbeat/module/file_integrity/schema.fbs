@@ -52,6 +52,11 @@ table Hash {
   sha3_256:[byte];
   sha3_384:[byte];
   sha3_512:[byte];
+
+  // Blake2b
+  blake2b_256: [byte];
+  blake2b_384: [byte];
+  blake2b_512: [byte];
 }
 
 table Event {

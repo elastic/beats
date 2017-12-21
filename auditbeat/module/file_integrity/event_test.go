@@ -8,6 +8,8 @@ import (
 	"testing"
 	"time"
 
+	"bytes"
+
 	"github.com/stretchr/testify/assert"
 )
 
@@ -153,18 +155,21 @@ func TestHashFile(t *testing.T) {
 	t.Run("valid hashes", func(t *testing.T) {
 		// Computed externally.
 		expectedHashes := map[HashType][]byte{
-			MD5:        mustDecodeHex("c897d1410af8f2c74fba11b1db511e9e"),
-			SHA1:       mustDecodeHex("f951b101989b2c3b7471710b4e78fc4dbdfa0ca6"),
-			SHA224:     mustDecodeHex("d301812e62eec9b1e68c0b861e62f374e0d77e8365f5ddd6cccc8693"),
-			SHA256:     mustDecodeHex("ecf701f727d9e2d77c4aa49ac6fbbcc997278aca010bddeeb961c10cf54d435a"),
-			SHA384:     mustDecodeHex("ec8d147738b2e4bf6f5c5ac50a9a7593fb1ee2de01474d6f8a6c7fdb7ac945580772a5225a4c7251a7c0697acb7b8405"),
-			SHA512:     mustDecodeHex("f5408390735bf3ef0bb8aaf66eff4f8ca716093d2fec50996b479b3527e5112e3ea3b403e9e62c72155ac1e08a49b476f43ab621e1a5fc2bbb0559d8258a614d"),
-			SHA512_224: mustDecodeHex("fde054253f43a95559f1b6eeb8e2edba4124957b43b85d7fcb4d20d5"),
-			SHA512_256: mustDecodeHex("3380f6a625aac19cbdddc598ab07aea195bae000f8d4c8cd6bb8870ac25df15d"),
-			SHA3_224:   mustDecodeHex("62e3515dae95bbd0e105bee840b7dc3b47f6d6bc772c259dbc0da31a"),
-			SHA3_256:   mustDecodeHex("3cb5385a2987ca45888d7877fbcf92b4854f7155ae19c96cecc7ea1300c6f5a4"),
-			SHA3_384:   mustDecodeHex("f19539818b4f29fa0ee599db4113fd81b77cd1119682e6d799a052849d2e40ef0dad84bc947ba2dee742d9731f1b9e9b"),
-			SHA3_512:   mustDecodeHex("f0a2c0f9090c1fd6dedf211192e36a6668d2b3c7f57a35419acb1c4fc7dfffc267bbcd90f5f38676caddcab652f6aacd1ed4e0ad0a8e1e4b98f890b62b6c7c5c"),
+			BLAKE2B_256: mustDecodeHex("0f0cc1f0ea4ef962d6a150ae0b77bc320b57ed24e1609b933fa2274484f59145"),
+			BLAKE2B_384: mustDecodeHex("b819d90f648da6effff2393acb1884d2638642b3524c329832c073c9364149fcdedb522914ef9c2c92f007a42366139a"),
+			BLAKE2B_512: mustDecodeHex("fc13029e8a5ce67ad5a70f0cc659a4b30df9d791b125835e434606c6127ee37ebbc8b216389682ddfa84380789db09f2535d2a9837454414ea3ff00ec0801150"),
+			MD5:         mustDecodeHex("c897d1410af8f2c74fba11b1db511e9e"),
+			SHA1:        mustDecodeHex("f951b101989b2c3b7471710b4e78fc4dbdfa0ca6"),
+			SHA224:      mustDecodeHex("d301812e62eec9b1e68c0b861e62f374e0d77e8365f5ddd6cccc8693"),
+			SHA256:      mustDecodeHex("ecf701f727d9e2d77c4aa49ac6fbbcc997278aca010bddeeb961c10cf54d435a"),
+			SHA384:      mustDecodeHex("ec8d147738b2e4bf6f5c5ac50a9a7593fb1ee2de01474d6f8a6c7fdb7ac945580772a5225a4c7251a7c0697acb7b8405"),
+			SHA512:      mustDecodeHex("f5408390735bf3ef0bb8aaf66eff4f8ca716093d2fec50996b479b3527e5112e3ea3b403e9e62c72155ac1e08a49b476f43ab621e1a5fc2bbb0559d8258a614d"),
+			SHA512_224:  mustDecodeHex("fde054253f43a95559f1b6eeb8e2edba4124957b43b85d7fcb4d20d5"),
+			SHA512_256:  mustDecodeHex("3380f6a625aac19cbdddc598ab07aea195bae000f8d4c8cd6bb8870ac25df15d"),
+			SHA3_224:    mustDecodeHex("62e3515dae95bbd0e105bee840b7dc3b47f6d6bc772c259dbc0da31a"),
+			SHA3_256:    mustDecodeHex("3cb5385a2987ca45888d7877fbcf92b4854f7155ae19c96cecc7ea1300c6f5a4"),
+			SHA3_384:    mustDecodeHex("f19539818b4f29fa0ee599db4113fd81b77cd1119682e6d799a052849d2e40ef0dad84bc947ba2dee742d9731f1b9e9b"),
+			SHA3_512:    mustDecodeHex("f0a2c0f9090c1fd6dedf211192e36a6668d2b3c7f57a35419acb1c4fc7dfffc267bbcd90f5f38676caddcab652f6aacd1ed4e0ad0a8e1e4b98f890b62b6c7c5c"),
 		}
 
 		f, err := ioutil.TempFile("", "input.txt")
@@ -191,7 +196,10 @@ func TestHashFile(t *testing.T) {
 				if !ok {
 					t.Fatalf("hash type not found in expected hashes: %v", hashType)
 				}
-				assert.Equal(t, expected, hash, "%v hash incorrect", hashType)
+				if !bytes.Equal(expected, hash) {
+					t.Errorf("%v hash incorrect, got: %v, want: %v", hashType,
+						hex.EncodeToString(hash), hex.EncodeToString(expected))
+				}
 			}
 		}
 
