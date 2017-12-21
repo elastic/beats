@@ -22,11 +22,13 @@ func NewMetadata(path string, info os.FileInfo) (*Metadata, error) {
 	}
 
 	fileInfo := &Metadata{
-		Inode: stat.Ino,
-		UID:   stat.Uid,
-		GID:   stat.Gid,
-		Mode:  info.Mode().Perm(),
-		Size:  uint64(info.Size()),
+		Inode:  stat.Ino,
+		UID:    stat.Uid,
+		GID:    stat.Gid,
+		Mode:   info.Mode().Perm(),
+		Size:   uint64(info.Size()),
+		SetUID: info.Mode()&os.ModeSetuid != 0,
+		SetGID: info.Mode()&os.ModeSetgid != 0,
 	}
 	_, fileInfo.MTime, fileInfo.CTime = fileTimes(stat)
 

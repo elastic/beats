@@ -20,13 +20,14 @@ func testEvent() *Event {
 		Source:    SourceScan,
 		Action:    ConfigChange,
 		Info: &Metadata{
-			Type:  FileType,
-			Inode: 123,
-			UID:   500,
-			GID:   500,
-			Mode:  0600,
-			CTime: testEventTime,
-			MTime: testEventTime,
+			Type:   FileType,
+			Inode:  123,
+			UID:    500,
+			GID:    500,
+			Mode:   0600,
+			CTime:  testEventTime,
+			MTime:  testEventTime,
+			SetGID: true,
 		},
 		Hashes: map[HashType][]byte{
 			SHA1:   mustDecodeHex("abcd"),
@@ -128,6 +129,24 @@ func TestDiffEvents(t *testing.T) {
 		assert.True(t, changed)
 		assert.EqualValues(t, Updated|AttributesModified, action)
 	})
+
+	t.Run("updated setuid field", func(t *testing.T) {
+		e := testEvent()
+		e.Info.SetUID = true
+
+		action, changed := diffEvents(testEvent(), e)
+		assert.True(t, changed)
+		assert.EqualValues(t, AttributesModified, action, "action: %v", action)
+	})
+
+	t.Run("updated setgid field", func(t *testing.T) {
+		e := testEvent()
+		e.Info.SetGID = false
+
+		action, changed := diffEvents(testEvent(), e)
+		assert.True(t, changed)
+		assert.EqualValues(t, AttributesModified, action, "action: %v", action)
+	})
 }
 
 func TestHashFile(t *testing.T) {
@@ -227,6 +246,68 @@ func BenchmarkHashFile(b *testing.B) {
 			}
 		})
 	}
+}
+
+func TestBuildEvent(t *testing.T) {
+	t.Run("no setuid/setgid", func(t *testing.T) {
+		e := testEvent()
+		e.Info.SetGID = false
+		fields := buildMetricbeatEvent(e, false).MetricSetFields
+		_, err := fields.GetValue("setuid")
+		assert.Error(t, err)
+		_, err = fields.GetValue("setgid")
+		assert.Error(t, err)
+	})
+	t.Run("setgid set", func(t *testing.T) {
+		e := testEvent()
+		fields := buildMetricbeatEvent(e, false).MetricSetFields
+		_, err := fields.GetValue("setuid")
+		assert.Error(t, err)
+
+		setgid, err := fields.GetValue("setgid")
+		if err != nil {
+			t.Fatal(err)
+		}
+		flag, ok := setgid.(bool)
+		assert.True(t, ok)
+		assert.True(t, flag)
+	})
+	t.Run("setuid set", func(t *testing.T) {
+		e := testEvent()
+		e.Info.SetUID = true
+		e.Info.SetGID = false
+		fields := buildMetricbeatEvent(e, false).MetricSetFields
+		_, err := fields.GetValue("setgid")
+		assert.Error(t, err)
+
+		setgid, err := fields.GetValue("setuid")
+		if err != nil {
+			t.Fatal(err)
+		}
+		flag, ok := setgid.(bool)
+		assert.True(t, ok)
+		assert.True(t, flag)
+	})
+	t.Run("both set", func(t *testing.T) {
+		e := testEvent()
+		e.Info.SetUID = true
+		fields := buildMetricbeatEvent(e, false).MetricSetFields
+		setuid, err := fields.GetValue("setgid")
+		if err != nil {
+			t.Fatal(err)
+		}
+		flag, ok := setuid.(bool)
+		assert.True(t, ok)
+		assert.True(t, flag)
+
+		setgid, err := fields.GetValue("setuid")
+		if err != nil {
+			t.Fatal(err)
+		}
+		flag, ok = setgid.(bool)
+		assert.True(t, ok)
+		assert.True(t, flag)
+	})
 }
 
 func mustDecodeHex(v string) []byte {
