@@ -9,8 +9,14 @@
       type: group
       fields:
       - name: path
-        type: keyword
+        type: text
         description: The path to the file.
+        multi_fields:
+        - name: raw
+          type: keyword
+          description: >
+            The path to the file. This is an non-analyzed field that is useful
+            for aggregations.
 
       - name: target_path
         type: keyword
