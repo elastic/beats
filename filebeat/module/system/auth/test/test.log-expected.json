@@ -29,6 +29,9 @@
             "prospector": {
                 "type": "log"
             },
+            "input": {
+                "type": "log"
+            },
             "source": "/Users/tsg/src/github.com/elastic/beats/filebeat/module/system/auth/test/test.log",
             "fileset": {
                 "module": "system",
@@ -63,6 +66,9 @@
                 "version": "6.0.0-alpha1"
             },
             "prospector": {
+                "type": "log"
+            },
+            "input": {
                 "type": "log"
             },
             "source": "/Users/tsg/src/github.com/elastic/beats/filebeat/module/system/auth/test/test.log",
@@ -100,6 +106,9 @@
             "prospector": {
                 "type": "log"
             },
+            "input": {
+                "type": "log"
+            },
             "source": "/Users/tsg/src/github.com/elastic/beats/filebeat/module/system/auth/test/test.log",
             "fileset": {
                 "module": "system",
@@ -131,6 +140,9 @@
                 "version": "6.0.0-alpha1"
             },
             "prospector": {
+                "type": "log"
+            },
+            "input": {
                 "type": "log"
             },
             "source": "/Users/tsg/src/github.com/elastic/beats/filebeat/module/system/auth/test/test.log",
@@ -170,6 +182,9 @@
             "prospector": {
                 "type": "log"
             },
+            "input": {
+                "type": "log"
+            },
             "source": "/Users/tsg/src/github.com/elastic/beats/filebeat/module/system/auth/test/test.log",
             "fileset": {
                 "module": "system",
@@ -202,6 +217,9 @@
                 "version": "6.0.0-alpha1"
             },
             "prospector": {
+                "type": "log"
+            },
+            "input": {
                 "type": "log"
             },
             "source": "/Users/tsg/src/github.com/elastic/beats/filebeat/module/system/auth/test/test.log",
@@ -241,6 +259,9 @@
             "prospector": {
                 "type": "log"
             },
+            "input": {
+                "type": "log"
+            },
             "source": "/Users/tsg/src/github.com/elastic/beats/filebeat/module/system/auth/test/test.log",
             "fileset": {
                 "module": "system",
@@ -277,6 +298,9 @@
                 "version": "6.0.0-alpha1"
             },
             "prospector": {
+                "type": "log"
+            },
+            "input": {
                 "type": "log"
             },
             "source": "/Users/tsg/src/github.com/elastic/beats/filebeat/module/system/auth/test/test.log",
@@ -326,6 +350,9 @@
             "prospector": {
                 "type": "log"
             },
+            "input": {
+                "type": "log"
+            },
             "source": "/Users/tsg/src/github.com/elastic/beats/filebeat/module/system/auth/test/test.log",
             "fileset": {
                 "module": "system",
@@ -360,6 +387,9 @@
                 "version": "6.0.0-alpha1"
             },
             "prospector": {
+                "type": "log"
+            },
+            "input": {
                 "type": "log"
             },
             "source": "/Users/tsg/src/github.com/elastic/beats/filebeat/module/system/auth/test/test.log",
