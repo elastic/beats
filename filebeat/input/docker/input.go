@@ -1,7 +1,6 @@
 package docker
 
 import (
-	"context"
 	"path"
 
 	"github.com/elastic/beats/filebeat/channel"
@@ -21,7 +20,7 @@ func init() {
 }
 
 // NewInput creates a new docker input
-func NewInput(cfg *common.Config, outletFactory channel.Factory, context context.Context) (input.Input, error) {
+func NewInput(cfg *common.Config, outletFactory channel.Factory, context input.Context) (input.Input, error) {
 	cfgwarn.Experimental("Docker input is enabled.")
 
 	config := defaultConfig
