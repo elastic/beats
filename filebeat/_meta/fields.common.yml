@@ -32,7 +32,12 @@
     - name: prospector.type
       required: true
       description: >
-        The prospector type from which the event was generated. This field is set to the value specified for the `type` option in the prospector section of the Filebeat config file.
+        The input type from which the event was generated. This field is set to the value specified for the `type` option in the input section of the Filebeat config file.
+
+    - name: input.type
+      required: true
+      description: >
+        The input type from which the event was generated. This field is set to the value specified for the `type` option in the input section of the Filebeat config file.
 
     - name: read_timestamp
       description: >
