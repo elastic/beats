@@ -21,22 +21,31 @@ func (t *HashType) Unpack(v string) error {
 	return nil
 }
 
-var validHashes = []HashType{MD5, SHA1, SHA224, SHA256, SHA384, SHA3_224, SHA3_256, SHA3_384, SHA3_512, SHA512, SHA512_224, SHA512_256}
+var validHashes = []HashType{
+	BLAKE2B_256, BLAKE2B_384, BLAKE2B_512,
+	MD5,
+	SHA1,
+	SHA224, SHA256, SHA384, SHA512, SHA512_224, SHA512_256,
+	SHA3_224, SHA3_256, SHA3_384, SHA3_512,
+}
 
 // Enum of hash types.
 const (
-	MD5        HashType = "md5"
-	SHA1       HashType = "sha1"
-	SHA224     HashType = "sha224"
-	SHA256     HashType = "sha256"
-	SHA384     HashType = "sha384"
-	SHA3_224   HashType = "sha3_224"
-	SHA3_256   HashType = "sha3_256"
-	SHA3_384   HashType = "sha3_384"
-	SHA3_512   HashType = "sha3_512"
-	SHA512     HashType = "sha512"
-	SHA512_224 HashType = "sha512_224"
-	SHA512_256 HashType = "sha512_256"
+	BLAKE2B_256 HashType = "blake2b_256"
+	BLAKE2B_384 HashType = "blake2b_384"
+	BLAKE2B_512 HashType = "blake2b_512"
+	MD5         HashType = "md5"
+	SHA1        HashType = "sha1"
+	SHA224      HashType = "sha224"
+	SHA256      HashType = "sha256"
+	SHA384      HashType = "sha384"
+	SHA3_224    HashType = "sha3_224"
+	SHA3_256    HashType = "sha3_256"
+	SHA3_384    HashType = "sha3_384"
+	SHA3_512    HashType = "sha3_512"
+	SHA512      HashType = "sha512"
+	SHA512_224  HashType = "sha512_224"
+	SHA512_256  HashType = "sha512_256"
 )
 
 // Config contains the configuration parameters for the file integrity

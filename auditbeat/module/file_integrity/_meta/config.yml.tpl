@@ -56,9 +56,10 @@
   # Limit on the size of files that will be hashed. Default is "100 MiB".
   max_file_size: 100 MiB
 
-  # Hash types to compute when the file changes. Supported types are md5, sha1,
-  # sha224, sha256, sha384, sha512, sha512_224, sha512_256, sha3_224, sha3_256,
-  # sha3_384 and sha3_512. Default is sha1.
+  # Hash types to compute when the file changes. Supported types are
+  # blake2b_256, blake2b_384, blake2b_512, md5, sha1, sha224, sha256, sha384,
+  # sha512, sha512_224, sha512_256, sha3_224, sha3_256, sha3_384 and sha3_512.
+  # Default is sha1.
   hash_types: [sha1]
 
   # Detect changes to files included in subdirectories. Disabled by default.

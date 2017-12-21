@@ -3651,7 +3651,7 @@ THE SOFTWARE.
 
 --------------------------------------------------------------------
 Dependency: golang.org/x/crypto
-Revision: e8f229864d71a49e5fdc4a9a134c5f85c4c33d64
+Revision: d585fd2cc9195196078f516b69daff6744ef5e84
 License type (autodetected): BSD-3-Clause
 ./vendor/golang.org/x/crypto/LICENSE:
 --------------------------------------------------------------------
