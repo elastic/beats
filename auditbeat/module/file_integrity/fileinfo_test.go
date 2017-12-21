@@ -1,6 +1,7 @@
 package file_integrity
 
 import (
+	"fmt"
 	"io/ioutil"
 	"os"
 	"os/user"
@@ -75,4 +76,60 @@ func TestNewMetadata(t *testing.T) {
 	assert.NotZero(t, meta.MTime, "mtime")
 	assert.NotZero(t, meta.CTime, "ctime")
 	assert.Equal(t, FileType, meta.Type, "type")
+}
+
+func TestSetUIDSetGIDBits(t *testing.T) {
+	f, err := ioutil.TempFile("", "setuid")
+	if err != nil {
+		t.Fatal(err)
+	}
+	defer os.Remove(f.Name())
+
+	_, err = f.WriteString("metadata test")
+	if err != nil {
+		t.Fatal(err)
+	}
+	f.Sync()
+	f.Close()
+
+	info, err := os.Lstat(f.Name())
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	meta, err := NewMetadata(f.Name(), info)
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	assert.False(t, meta.SetUID)
+	assert.False(t, meta.SetGID)
+
+	if runtime.GOOS == "windows" {
+		t.Skip("No setuid/setgid bits on Windows")
+	}
+
+	for _, flags := range []os.FileMode{
+		0600 | os.ModeSetuid,
+		0600 | os.ModeSetgid,
+		0600 | os.ModeSetuid | os.ModeSetuid,
+	} {
+		msg := fmt.Sprintf("checking flags %04o", flags)
+		if err = os.Chmod(f.Name(), flags); err != nil {
+			t.Fatal(err, msg)
+		}
+
+		info, err = os.Lstat(f.Name())
+		if err != nil {
+			t.Fatal(err, msg)
+		}
+
+		meta, err = NewMetadata(f.Name(), info)
+		if err != nil {
+			t.Fatal(err)
+		}
+
+		assert.Equal(t, flags&os.ModeSetuid != 0, meta.SetUID)
+		assert.Equal(t, flags&os.ModeSetgid != 0, meta.SetGID)
+	}
 }

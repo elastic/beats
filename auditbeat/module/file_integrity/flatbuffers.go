@@ -111,7 +111,14 @@ func fbWriteMetadata(b *flatbuffers.Builder, m *Metadata) flatbuffers.UOffsetT {
 	if sidOffset > 0 {
 		schema.MetadataAddSid(b, sidOffset)
 	}
-	schema.MetadataAddMode(b, uint32(m.Mode))
+	mode := m.Mode
+	if m.SetUID {
+		mode |= os.ModeSetuid
+	}
+	if m.SetGID {
+		mode |= os.ModeSetgid
+	}
+	schema.MetadataAddMode(b, uint32(mode))
 	switch m.Type {
 	case UnknownType:
 		schema.MetadataAddType(b, schema.TypeUnknown)
@@ -211,16 +218,18 @@ func fbDecodeMetadata(e *schema.Event) *Metadata {
 	if info == nil {
 		return nil
 	}
-
+	mode := os.FileMode(info.Mode())
 	rtn := &Metadata{
-		Inode: info.Inode(),
-		UID:   info.Uid(),
-		GID:   info.Gid(),
-		SID:   string(info.Sid()),
-		Mode:  os.FileMode(info.Mode()),
-		Size:  info.Size(),
-		MTime: time.Unix(0, info.MtimeNs()).UTC(),
-		CTime: time.Unix(0, info.CtimeNs()).UTC(),
+		Inode:  info.Inode(),
+		UID:    info.Uid(),
+		GID:    info.Gid(),
+		SID:    string(info.Sid()),
+		Mode:   mode & ^(os.ModeSetuid | os.ModeSetgid),
+		Size:   info.Size(),
+		MTime:  time.Unix(0, info.MtimeNs()).UTC(),
+		CTime:  time.Unix(0, info.CtimeNs()).UTC(),
+		SetUID: mode&os.ModeSetuid != 0,
+		SetGID: mode&os.ModeSetgid != 0,
 	}
 
 	switch info.Type() {
