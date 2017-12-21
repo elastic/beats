@@ -12,6 +12,7 @@ type Prospectorer = input.Input
 
 // Runner encapsulate the lifecycle of a prospectorer
 // Deprecated: See input.Runner
+type Prospector = input.Runner
 type Runner = input.Runner
 
 // Context wrapper for backward compatibility
