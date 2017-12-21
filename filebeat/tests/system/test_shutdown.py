@@ -172,7 +172,7 @@ class Test(BaseTest):
         time.sleep(2)
 
         # Wait until first flush
-        msg = "No paths were defined for prospector"
+        msg = "No paths were defined for input"
         self.wait_until(
             lambda: self.log_contains_count(msg) >= 1,
             max_timeout=5)
