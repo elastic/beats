@@ -7,15 +7,18 @@ from beat.beat import INTEGRATION_TESTS
 
 
 class Test(BaseTest):
-    @unittest.skipUnless(re.match("(?i)linux", sys.platform), "os")
     def test_start_stop(self):
         """
         Auditbeat starts and stops without error.
         """
-        self.render_config_template(modules=[{
-            "name": "audit",
-            "metricsets": ["kernel"],
-        }])
+        self.render_config_template(
+            modules=[{
+                "name": "file_integrity",
+                "extras": {
+                    "paths": ["file.example"],
+                }
+            }],
+        )
         proc = self.start_beat()
         self.wait_until(lambda: self.log_contains("start running"))
         proc.check_kill_and_wait()
@@ -35,11 +38,10 @@ class Test(BaseTest):
 
         self.render_config_template(
             modules=[{
-                "name": "audit",
-                "metricsets": ["file"],
+                "name": "file_integrity",
                 "extras": {
-                    "file.paths": ["file.example"],
-                },
+                    "paths": ["file.example"],
+                }
             }],
             elasticsearch={"host": self.get_elasticsearch_url()})
         exit_code = self.run_beat(extra_args=["setup", "--template"])

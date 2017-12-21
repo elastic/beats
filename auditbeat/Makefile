@@ -1,13 +1,15 @@
 BEAT_NAME=auditbeat
 BEAT_TITLE=Auditbeat
 BEAT_DESCRIPTION=Audit the activities of users and processes on your system.
-SYSTEM_TESTS=false
-TEST_ENVIRONMENT=false
+SYSTEM_TESTS=true
+TEST_ENVIRONMENT?=true
 GOX_OS?=linux windows ## @Building List of all OS to be supported by "make crosscompile".
 DEV_OS?=linux
+TESTING_ENVIRONMENT?=snapshot-noxpack
+ES_BEATS?=..
 
 # Path to the libbeat Makefile
--include ../libbeat/scripts/Makefile
+include ${ES_BEATS}/libbeat/scripts/Makefile
 
 # This is called by the beats packer before building starts
 .PHONY: before-build
