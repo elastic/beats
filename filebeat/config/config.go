@@ -21,7 +21,8 @@ const (
 )
 
 type Config struct {
-	Inputs          []*common.Config     `config:"prospectors"`
+	Inputs          []*common.Config     `config:"inputs"`
+	Prospectors     []*common.Config     `config:"prospectors"`
 	RegistryFile    string               `config:"registry_file"`
 	RegistryFlush   time.Duration        `config:"registry_flush"`
 	ConfigDir       string               `config:"config_dir"`
@@ -82,7 +83,15 @@ func mergeConfigFiles(configFiles []string, config *Config) error {
 			return fmt.Errorf("Failed to read %s: %s", file, err)
 		}
 
-		config.Inputs = append(config.Inputs, tmpConfig.Filebeat.Inputs...)
+		if len(tmpConfig.Filebeat.Prospectors) > 0 {
+			cfgwarn.Deprecate("7.0.0", "prospectors are deprecated, Use `inputs` instead.")
+			if len(tmpConfig.Filebeat.Inputs) > 0 {
+				return fmt.Errorf("prospectors and inputs used in the configuration file, define only inputs not both")
+			}
+			config.Inputs = append(config.Inputs, tmpConfig.Filebeat.Prospectors...)
+		} else {
+			config.Inputs = append(config.Inputs, tmpConfig.Filebeat.Inputs...)
+		}
 	}
 
 	return nil
