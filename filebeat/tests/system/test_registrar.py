@@ -980,13 +980,13 @@ class Test(BaseTest):
         # Make sure all 4 states are persisted
         self.wait_until(
             lambda: self.log_contains(
-                "Prospector states cleaned up. Before: 4, After: 4", logfile="filebeat2.log"),
+                "input states cleaned up. Before: 4, After: 4", logfile="filebeat2.log"),
             max_timeout=10)
 
         # Wait until registry file is cleaned
         self.wait_until(
             lambda: self.log_contains(
-                "Prospector states cleaned up. Before: 0, After: 0", logfile="filebeat2.log"),
+                "input states cleaned up. Before: 0, After: 0", logfile="filebeat2.log"),
             max_timeout=10)
 
         filebeat.check_kill_and_wait()

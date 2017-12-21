@@ -38,5 +38,5 @@ func NewProspector(cfg *common.Config, outletFactory channel.Factory, context pr
 	if err := cfg.SetBool("docker-json", -1, true); err != nil {
 		return nil, errors.Wrap(err, "update prospector config")
 	}
-	return log.NewProspector(cfg, outletFactory, context)
+	return log.NewInput(cfg, outletFactory, context)
 }
