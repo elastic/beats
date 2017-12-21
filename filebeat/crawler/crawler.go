@@ -6,8 +6,8 @@ import (
 
 	"github.com/elastic/beats/filebeat/channel"
 	"github.com/elastic/beats/filebeat/fileset"
+	"github.com/elastic/beats/filebeat/input"
 	"github.com/elastic/beats/filebeat/input/file"
-	input "github.com/elastic/beats/filebeat/prospector"
 	"github.com/elastic/beats/filebeat/registrar"
 	"github.com/elastic/beats/libbeat/cfgfile"
 	"github.com/elastic/beats/libbeat/common"

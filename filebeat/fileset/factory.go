@@ -4,7 +4,7 @@ import (
 	"github.com/mitchellh/hashstructure"
 
 	"github.com/elastic/beats/filebeat/channel"
-	input "github.com/elastic/beats/filebeat/prospector"
+	"github.com/elastic/beats/filebeat/input"
 	"github.com/elastic/beats/filebeat/registrar"
 	"github.com/elastic/beats/libbeat/cfgfile"
 	"github.com/elastic/beats/libbeat/common"
