@@ -37,13 +37,12 @@ type annotationCache struct {
 // pods from the cluster (filtered to the given host)
 func NewPodWatcher(kubeClient *k8s.Client, indexers *Indexers, syncPeriod, cleanupTimeout time.Duration, host string) *PodWatcher {
 	ctx, cancel := context.WithCancel(context.Background())
-	return &PodWatcher{
+	pw := &PodWatcher{
 		kubeClient:          kubeClient,
 		indexers:            indexers,
 		syncPeriod:          syncPeriod,
 		cleanupTimeout:      cleanupTimeout,
 		podQueue:            make(chan *corev1.Pod, 10),
-		nodeFilter:          k8s.QueryParam("fieldSelector", "spec.nodeName="+host),
 		lastResourceVersion: "0",
 		ctx:                 ctx,
 		stop:                cancel,
@@ -53,15 +52,23 @@ func NewPodWatcher(kubeClient *k8s.Client, indexers *Indexers, syncPeriod, clean
 			deleted:     make(map[string]time.Time),
 		},
 	}
+	if host != "" {
+		pw.nodeFilter = k8s.QueryParam("fieldSelector", "spec.nodeName="+host)
+	}
+	return pw
 }
 
 func (p *PodWatcher) syncPods() error {
 	logp.Info("kubernetes: %s", "Performing a pod sync")
+	opts := []k8s.Option{k8s.ResourceVersion(p.lastResourceVersion)}
+	if p.nodeFilter != nil {
+		opts = append(opts, p.nodeFilter)
+	}
 	pods, err := p.kubeClient.CoreV1().ListPods(
 		p.ctx,
-		"",
-		p.nodeFilter,
-		k8s.ResourceVersion(p.lastResourceVersion))
+		k8s.AllNamespaces,
+		opts...,
+	)
 
 	if err != nil {
 		return err
@@ -81,7 +88,11 @@ func (p *PodWatcher) syncPods() error {
 func (p *PodWatcher) watchPods() {
 	for {
 		logp.Info("kubernetes: %s", "Watching API for pod events")
-		watcher, err := p.kubeClient.CoreV1().WatchPods(p.ctx, "", p.nodeFilter)
+		var opts []k8s.Option
+		if p.nodeFilter != nil {
+			opts = append(opts, p.nodeFilter)
+		}
+		watcher, err := p.kubeClient.CoreV1().WatchPods(p.ctx, "", opts...)
 		if err != nil {
 			//watch pod failures should be logged and gracefully failed over as metadata retrieval
 			//should never stop.

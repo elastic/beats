@@ -38,6 +38,7 @@ func init() {
 	Indexing.AddIndexer(PodNameIndexerName, NewPodNameIndexer)
 	Indexing.AddIndexer(ContainerIndexerName, NewContainerIndexer)
 	Indexing.AddIndexer(IPPortIndexerName, NewIPPortIndexer)
+	Indexing.AddIndexer(EventInvolvedObjectUIDIndexerName, NewEventInvolvedObjectUIDIndexer)
 	Indexing.AddMatcher(FieldMatcherName, NewFieldMatcher)
 	Indexing.AddMatcher(FieldFormatMatcherName, NewFieldFormatMatcher)
 }
@@ -75,8 +76,7 @@ func newKubernetesAnnotator(cfg *common.Config) (processors.Processor, error) {
 		Indexing.RUnlock()
 	}
 
-	metaGen := NewGenDefaultMeta(config.IncludeAnnotations, config.IncludeLabels, config.ExcludeLabels)
-	indexers := NewIndexers(config.Indexers, metaGen)
+	indexers := NewIndexers(config.Indexers, config.IncludeAnnotations, config.IncludeLabels, config.ExcludeLabels)
 
 	matchers := NewMatchers(config.Matchers)
 
@@ -126,6 +126,10 @@ func newKubernetesAnnotator(cfg *common.Config) (processors.Processor, error) {
 		}
 	}
 
+	if !config.AsDaemonSet {
+		config.Host = ""
+	}
+
 	logp.Debug("kubernetes", "Using host ", config.Host)
 	logp.Debug("kubernetes", "Initializing watcher")
 	if client != nil {
@@ -155,13 +159,12 @@ func (k *kubernetesAnnotator) Run(event *beat.Event) (*beat.Event, error) {
 	meta := common.MapStr{}
 	metaIface, ok := event.Fields["kubernetes"]
 	if !ok {
-		event.Fields["kubernetes"] = common.MapStr{}
+		event.Fields["kubernetes"] = metadata
 	} else {
 		meta = metaIface.(common.MapStr)
+		meta.DeepUpdate(metadata)
+		event.Fields["kubernetes"] = meta
 	}
-
-	meta.Update(metadata)
-	event.Fields["kubernetes"] = meta
 
 	return event, nil
 }

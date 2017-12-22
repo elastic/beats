@@ -20,6 +20,10 @@ type ObjectMeta struct {
 	UID             string `json:"uid"`
 }
 
+type Resource interface {
+	GetMetadata() *ObjectMeta
+}
+
 type Container struct {
 	Image                  string          `json:"image"`
 	ImagePullPolicy        string          `json:"imagePullPolicy"`
@@ -97,4 +101,8 @@ type Pod struct {
 	Metadata   ObjectMeta `json:"metadata"`
 	Spec       PodSpec    `json:"spec"`
 	Status     PodStatus  `json:"status"`
+}
+
+func (p *Pod) GetMetadata() *ObjectMeta {
+	return &p.Metadata
 }
