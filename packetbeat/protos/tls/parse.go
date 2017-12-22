@@ -488,7 +488,13 @@ func parseCertificates(buffer bufferView) []*x509.Certificate {
 }
 
 func (version tlsVersion) String() string {
-	return fmt.Sprintf("%d.%d", version.major, version.minor)
+	if version.major == 3 {
+		if version.minor > 0 {
+			return fmt.Sprintf("TLS 1.%d", version.minor-1)
+		}
+		return "SSL 3.0"
+	}
+	return fmt.Sprintf("(raw %d.%d)", version.major, version.minor)
 }
 
 func getKeySize(key interface{}) int {
