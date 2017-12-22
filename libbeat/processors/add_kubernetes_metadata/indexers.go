@@ -262,9 +262,12 @@ func NewContainerIndexer(_ common.Config, genMeta GenMeta) (Indexer, error) {
 }
 
 func (c *ContainerIndexer) GetMetadata(r Resource) []MetadataIndex {
+	pod, ok := r.(*Pod)
+	if !ok {
+		return nil
+	}
 	commonMeta := c.genMeta.GenerateMetaData(r)
 	var metadata []MetadataIndex
-	pod := r.(*Pod)
 	for _, status := range append(pod.Status.ContainerStatuses, pod.Status.InitContainerStatuses...) {
 		cID := containerID(status)
 		if cID == "" {
@@ -285,8 +288,11 @@ func (c *ContainerIndexer) GetMetadata(r Resource) []MetadataIndex {
 }
 
 func (c *ContainerIndexer) GetIndexes(r Resource) []string {
+	pod, ok := r.(*Pod)
+	if !ok {
+		return nil
+	}
 	var containers []string
-	pod := r.(*Pod)
 	for _, status := range append(pod.Status.ContainerStatuses, pod.Status.InitContainerStatuses...) {
 		cID := containerID(status)
 		if cID == "" {
@@ -320,8 +326,11 @@ func NewIPPortIndexer(_ common.Config, genMeta GenMeta) (Indexer, error) {
 
 // GetMetadata returns metadata for the given pod, if it matches the index
 func (h *IPPortIndexer) GetMetadata(r Resource) []MetadataIndex {
+	pod, ok := r.(*Pod)
+	if !ok {
+		return nil
+	}
 	commonMeta := h.genMeta.GenerateMetaData(r)
-	pod := r.(*Pod)
 	hostPorts := h.GetIndexes(pod)
 	var metadata []MetadataIndex
 
@@ -370,9 +379,12 @@ func (h *IPPortIndexer) GetMetadata(r Resource) []MetadataIndex {
 
 // GetIndexes returns the indexes for the given Pod
 func (h *IPPortIndexer) GetIndexes(r Resource) []string {
+	pod, ok := r.(*Pod)
+	if !ok {
+		return nil
+	}
 	var hostPorts []string
 
-	pod := r.(*Pod)
 	ip := pod.Status.PodIP
 	if ip == "" {
 		return hostPorts

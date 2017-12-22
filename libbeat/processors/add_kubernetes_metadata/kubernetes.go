@@ -27,8 +27,8 @@ var (
 )
 
 type kubernetesAnnotator struct {
-	podWatcher *PodWatcher
-	matchers   *Matchers
+	resourceWatcher *ResourceWatcher
+	matchers        *Matchers
 }
 
 func init() {
@@ -133,10 +133,10 @@ func newKubernetesAnnotator(cfg *common.Config) (processors.Processor, error) {
 	logp.Debug("kubernetes", "Using host ", config.Host)
 	logp.Debug("kubernetes", "Initializing watcher")
 	if client != nil {
-		watcher := NewPodWatcher(client, indexers, config.SyncPeriod, config.CleanupTimeout, config.Host)
+		watcher := newResourceWatcher(client, indexers, config.CleanupTimeout, config.Host, newPodWatcher)
 
 		if watcher.Run() {
-			return &kubernetesAnnotator{podWatcher: watcher, matchers: matchers}, nil
+			return &kubernetesAnnotator{resourceWatcher: watcher, matchers: matchers}, nil
 		}
 
 		return nil, fatalError
@@ -151,7 +151,7 @@ func (k *kubernetesAnnotator) Run(event *beat.Event) (*beat.Event, error) {
 		return event, nil
 	}
 
-	metadata := k.podWatcher.GetMetaData(index)
+	metadata := k.resourceWatcher.GetMetaData(index)
 	if metadata == nil {
 		return event, nil
 	}
