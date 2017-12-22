@@ -50,6 +50,7 @@ func NewMetadata(path string, info os.FileInfo) (*Metadata, error) {
 	if !info.IsDir() {
 		fileInfo.SID, fileInfo.Owner, err = fileOwner(path)
 	}
+	fileInfo.Origin, err = GetFileOrigin(path)
 	return fileInfo, err
 }
 

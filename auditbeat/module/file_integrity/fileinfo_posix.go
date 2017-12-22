@@ -56,6 +56,8 @@ func NewMetadata(path string, info os.FileInfo) (*Metadata, error) {
 	} else {
 		fileInfo.Group = group.Name
 	}
-
+	if fileInfo.Origin, err = GetFileOrigin(path); err != nil {
+		errs = append(errs, err)
+	}
 	return fileInfo, errs.Err()
 }
