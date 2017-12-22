@@ -1449,6 +1449,12 @@
 			"revisionTime": "2017-04-07T17:21:22Z"
 		},
 		{
+			"checksumSHA1": "ZDOewomjpADMDyjKRW5rP15519M=",
+			"path": "howett.net/plist",
+			"revision": "233df3c4f07b0c562da0e8a6fb850681ac49bb90",
+			"revisionTime": "2017-11-05T00:43:39Z"
+		},
+		{
 			"path": "plugin",
 			"revision": ""
 		}
