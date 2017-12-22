@@ -79,4 +79,9 @@ setup.template:
 logging.metrics.period: {{ metrics_period }}
 {%- endif %}
 
+{% if keystore_path %}
+#================================ keystore =====================================
+keystore.path: {{keystore_path}}
+{% endif %}
+
 # vim: set ft=jinja:
