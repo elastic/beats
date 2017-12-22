@@ -142,3 +142,11 @@
       - name: sha512_256
         type: keyword
         description: SHA512/256 hash of the file.
+
+      - name: origin
+        type: keyword
+        description: >
+            An array of strings describing a possible external origin for
+            this file. For example, the URL it was downloaded from. Only
+            supported in macOS, via the kMDItemWhereFroms attribute.
+            Omitted if origin information is not available.
