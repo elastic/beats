@@ -98,11 +98,12 @@ type Metadata struct {
 	Group  string
 	Size   uint64
 	MTime  time.Time   // Last modification time.
-	CTime  time.Time   // Last metdata change time.
+	CTime  time.Time   // Last metadata change time.
 	Type   Type        // File type (dir, file, symlink).
 	Mode   os.FileMode // Permissions
 	SetUID bool        // setuid bit (POSIX only)
 	SetGID bool        // setgid bit (POSIX only)
+	Origin []string    // External origin info for the file (MacOS only)
 }
 
 // NewEventFromFileInfo creates a new Event based on data from a os.FileInfo
@@ -233,6 +234,9 @@ func buildMetricbeatEvent(e *Event, existedBefore bool) mb.Event {
 		}
 		if info.SetGID {
 			m["setgid"] = true
+		}
+		if len(info.Origin) > 0 {
+			m["origin"] = info.Origin
 		}
 	}
 
