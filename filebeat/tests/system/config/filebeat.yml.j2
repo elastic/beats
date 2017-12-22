@@ -212,3 +212,8 @@ output.file:
 path:
   data: {{path_data}}
 {% endif %}
+
+{% if keystore_path %}
+#================================ keystore =====================================
+keystore.path: {{keystore_path}}
+{% endif %}
