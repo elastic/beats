@@ -131,15 +131,15 @@ func TestParseRecordHeader(t *testing.T) {
 	assert.NotNil(t, err)
 	_, err = readRecordHeader(sBuf(t, "11223344"))
 	assert.NotNil(t, err)
-	header, err := readRecordHeader(sBuf(t, "1122334455"))
+	header, err := readRecordHeader(sBuf(t, "1103024455"))
 	assert.Nil(t, err)
 	assert.Equal(t, recordType(0x11), header.recordType)
-	assert.Equal(t, "34.51", header.version.String())
+	assert.Equal(t, "TLS 1.1", header.version.String())
 	assert.Equal(t, uint16(0x4455), header.length)
-	assert.Equal(t, "recordHeader type[17] version[34.51] length[17493]", header.String())
-	assert.False(t, header.isValid())
-	header.version.major = 3
+	assert.Equal(t, "recordHeader type[17] version[TLS 1.1] length[17493]", header.String())
 	assert.True(t, header.isValid())
+	header.version.major = 2
+	assert.False(t, header.isValid())
 }
 
 func TestParseHandshakeHeader(t *testing.T) {
