@@ -158,6 +158,7 @@ https://github.com/elastic/beats/compare/v6.0.0-beta2...master[Check the HEAD di
 *Packetbeat*
 
 - Configure good defaults for `add_kubernetes_metadata`. {pull}5707[5707]
+- Add support for condition on bool type {issue}5659[5659] {pull}5954[5954]
 
 *Winlogbeat*
 

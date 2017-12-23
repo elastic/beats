@@ -93,6 +93,18 @@ func TestEqualsCondition(t *testing.T) {
 				"proc.cpu.total_p.gt": 0.5,
 			}},
 		},
+
+		{
+			Equals: &ConditionFields{fields: map[string]interface{}{
+				"final": true,
+			}},
+		},
+
+		{
+			Equals: &ConditionFields{fields: map[string]interface{}{
+				"final": false,
+			}},
+		},
 	}
 
 	conds := GetConditions(t, configs)
@@ -115,12 +127,15 @@ func TestEqualsCondition(t *testing.T) {
 				"state":    "running",
 				"username": "monica",
 			},
-			"type": "process",
+			"type":  "process",
+			"final": true,
 		}}
 
 	assert.True(t, conds[0].Check(event))
 	assert.True(t, conds[1].Check(event))
 	assert.False(t, conds[2].Check(event))
+	assert.True(t, conds[3].Check(event))
+	assert.False(t, conds[4].Check(event))
 }
 
 func TestContainsCondition(t *testing.T) {

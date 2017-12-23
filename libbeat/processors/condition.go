@@ -21,8 +21,9 @@ type RangeValue struct {
 }
 
 type EqualsValue struct {
-	Int uint64
-	Str string
+	Int  uint64
+	Str  string
+	Bool bool
 }
 
 type Condition struct {
@@ -120,10 +121,17 @@ func (c *Condition) setEquals(cfg *ConditionFields) error {
 			c.equals[field] = EqualsValue{Int: uintValue}
 		} else {
 			sValue, err := extractString(value)
-			if err != nil {
-				return err
+			if err == nil {
+				c.equals[field] = EqualsValue{Str: sValue}
+			} else {
+				bValue, err := extractBool(value)
+
+				if err != nil {
+					return err
+				}
+
+				c.equals[field] = EqualsValue{Bool: bValue}
 			}
-			c.equals[field] = EqualsValue{Str: sValue}
 		}
 	}
 
@@ -259,12 +267,22 @@ func (c *Condition) checkEquals(event ValuesMap) bool {
 			}
 		} else {
 			sValue, err := extractString(value)
-			if err != nil {
-				logp.Warn("unexpected type %T in equals condition as it accepts only integers and strings. ", value)
-				return false
-			}
-			if sValue != equalValue.Str {
-				return false
+
+			if err == nil {
+				if sValue != equalValue.Str {
+					return false
+				}
+			} else {
+				bValue, err := extractBool(value)
+
+				if err != nil {
+					logp.Warn("unexpected type %T in equals condition as it accepts only integers, strings or bools. ", value)
+					return false
+				}
+
+				if bValue != equalValue.Bool {
+					return false
+				}
 			}
 		}
 	}
