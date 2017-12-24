@@ -127,6 +127,9 @@ jobs:
         - TARGETS="-C deploy/kubernetes test"
         - TRAVIS_KUBE_VERSION=v1.8.0
       stage: test
+  allow_failures:
+    - env: TARGETS="-C filebeat testsuite"
+    - env: TARGETS="-C libbeat testsuite"
 
 addons:
   apt:
