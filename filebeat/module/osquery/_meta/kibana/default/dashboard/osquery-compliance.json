@@ -1,0 +1,185 @@
+{
+  "objects": [
+    {
+      "attributes": {
+        "columns": [
+          "osquery.result.columns.path",
+          "osquery.result.columns.type",
+          "osquery.result.columns.flags"
+        ],
+        "description": "",
+        "hits": 0,
+        "kibanaSavedObjectMeta": {
+          "searchSourceJSON": "{\"index\":\"filebeat-*\",\"highlightAll\":true,\"version\":true,\"query\":{\"language\":\"lucene\",\"query\":\"*\"},\"filter\":[{\"$state\":{\"store\":\"appState\"},\"meta\":{\"alias\":null,\"disabled\":false,\"index\":\"filebeat-*\",\"key\":\"osquery.result.name\",\"negate\":false,\"params\":{\"query\":\"pack_it-compliance_mounts\",\"type\":\"phrase\"},\"type\":\"phrase\",\"value\":\"pack_it-compliance_mounts\"},\"query\":{\"match\":{\"osquery.result.name\":{\"query\":\"pack_it-compliance_mounts\",\"type\":\"phrase\"}}}}]}"
+        },
+        "sort": [
+          "@timestamp",
+          "desc"
+        ],
+        "title": "Mounts [Osquery results]",
+        "version": 1
+      },
+      "id": "7a9482d0-eb00-11e7-8f04-51231daa5b05",
+      "type": "search",
+      "updated_at": "2018-01-08T17:35:32.102Z",
+      "version": 1
+    },
+    {
+      "attributes": {
+        "description": "",
+        "kibanaSavedObjectMeta": {
+          "searchSourceJSON": "{\"filter\":[],\"query\":{\"language\":\"lucene\",\"query\":\"\"}}"
+        },
+        "savedSearchId": "7a9482d0-eb00-11e7-8f04-51231daa5b05",
+        "title": "Mounts by type [Osquery Result]",
+        "uiStateJSON": "{}",
+        "version": 1,
+        "visState": "{\"aggs\":[{\"enabled\":true,\"id\":\"1\",\"params\":{},\"schema\":\"metric\",\"type\":\"count\"},{\"enabled\":true,\"id\":\"2\",\"params\":{\"field\":\"osquery.result.columns.path\",\"order\":\"desc\",\"orderBy\":\"1\",\"size\":10},\"schema\":\"segment\",\"type\":\"terms\"},{\"enabled\":true,\"id\":\"3\",\"params\":{\"field\":\"osquery.result.columns.type\",\"order\":\"desc\",\"orderBy\":\"1\",\"size\":5},\"schema\":\"segment\",\"type\":\"terms\"}],\"params\":{\"addLegend\":true,\"addTooltip\":true,\"isDonut\":true,\"labels\":{\"last_level\":true,\"show\":false,\"truncate\":100,\"values\":true},\"legendPosition\":\"right\",\"type\":\"pie\"},\"title\":\"Mounts by type [Osquery Result]\",\"type\":\"pie\"}"
+      },
+      "id": "a9fd8bb0-eb01-11e7-8f04-51231daa5b05",
+      "type": "visualization",
+      "updated_at": "2018-01-08T17:35:32.102Z",
+      "version": 1
+    },
+    {
+      "attributes": {
+        "columns": [
+          "osquery.result.columns.name",
+          "osquery.result.columns.version",
+          "osquery.result.columns.revision"
+        ],
+        "description": "",
+        "hits": 0,
+        "kibanaSavedObjectMeta": {
+          "searchSourceJSON": "{\"index\":\"filebeat-*\",\"highlightAll\":true,\"version\":true,\"query\":{\"language\":\"lucene\",\"query\":\"*\"},\"filter\":[{\"meta\":{\"negate\":false,\"index\":\"filebeat-*\",\"type\":\"phrase\",\"key\":\"osquery.result.name\",\"value\":\"pack_it-compliance_deb_packages\",\"params\":{\"query\":\"pack_it-compliance_deb_packages\",\"type\":\"phrase\"},\"disabled\":false,\"alias\":null},\"query\":{\"match\":{\"osquery.result.name\":{\"query\":\"pack_it-compliance_deb_packages\",\"type\":\"phrase\"}}},\"$state\":{\"store\":\"appState\"}}]}"
+        },
+        "sort": [
+          "@timestamp",
+          "desc"
+        ],
+        "title": "DEB packages installed [Osquery results]",
+        "version": 1
+      },
+      "id": "3824b080-eb02-11e7-8f04-51231daa5b05",
+      "type": "search",
+      "updated_at": "2018-01-08T17:35:32.102Z",
+      "version": 1
+    },
+    {
+      "attributes": {
+        "description": "",
+        "kibanaSavedObjectMeta": {
+          "searchSourceJSON": "{\"filter\":[],\"query\":{\"language\":\"lucene\",\"query\":\"\"}}"
+        },
+        "savedSearchId": "b5d6baa0-eb02-11e7-8f04-51231daa5b05",
+        "title": "OS versions [Osquery result]",
+        "uiStateJSON": "{}",
+        "version": 1,
+        "visState": "{\"title\":\"OS versions [Osquery result]\",\"type\":\"pie\",\"params\":{\"addLegend\":true,\"addTooltip\":true,\"isDonut\":true,\"labels\":{\"last_level\":true,\"show\":false,\"truncate\":100,\"values\":true},\"legendPosition\":\"right\",\"type\":\"pie\"},\"aggs\":[{\"id\":\"1\",\"enabled\":true,\"type\":\"cardinality\",\"schema\":\"metric\",\"params\":{\"field\":\"osquery.result.host_identifier\"}},{\"id\":\"4\",\"enabled\":true,\"type\":\"terms\",\"schema\":\"segment\",\"params\":{\"field\":\"osquery.result.columns.platform_like\",\"size\":5,\"order\":\"desc\",\"orderBy\":\"1\"}},{\"id\":\"2\",\"enabled\":true,\"type\":\"terms\",\"schema\":\"segment\",\"params\":{\"field\":\"osquery.result.columns.name\",\"size\":5,\"order\":\"desc\",\"orderBy\":\"1\"}},{\"id\":\"3\",\"enabled\":true,\"type\":\"terms\",\"schema\":\"segment\",\"params\":{\"field\":\"osquery.result.columns.version\",\"size\":5,\"order\":\"desc\",\"orderBy\":\"1\"}}]}"
+      },
+      "id": "1da1ed30-eb03-11e7-8f04-51231daa5b05",
+      "type": "visualization",
+      "updated_at": "2018-01-08T17:35:32.102Z",
+      "version": 1
+    },
+    {
+      "attributes": {
+        "description": "",
+        "kibanaSavedObjectMeta": {
+          "searchSourceJSON": "{\"filter\":[{\"meta\":{\"index\":\"filebeat-*\",\"negate\":false,\"disabled\":false,\"alias\":null,\"type\":\"phrase\",\"key\":\"osquery.result.columns.status\",\"value\":\"Live\",\"params\":{\"query\":\"Live\",\"type\":\"phrase\"}},\"query\":{\"match\":{\"osquery.result.columns.status\":{\"query\":\"Live\",\"type\":\"phrase\"}}},\"$state\":{\"store\":\"appState\"}}],\"query\":{\"query\":\"\",\"language\":\"lucene\"}}"
+        },
+        "savedSearchId": "f59e21e0-eb03-11e7-8f04-51231daa5b05",
+        "title": "Number of Kernel modules [Osquery Result]",
+        "uiStateJSON": "{\"vis\":{\"defaultColors\":{\"0 - 100\":\"rgb(0,104,55)\"}}}",
+        "version": 1,
+        "visState": "{\"title\":\"Number of Kernel modules [Osquery Result]\",\"type\":\"gauge\",\"params\":{\"type\":\"gauge\",\"addTooltip\":true,\"addLegend\":true,\"isDisplayWarning\":false,\"gauge\":{\"verticalSplit\":false,\"extendRange\":true,\"percentageMode\":false,\"gaugeType\":\"Arc\",\"gaugeStyle\":\"Full\",\"backStyle\":\"Full\",\"orientation\":\"vertical\",\"colorSchema\":\"Green to Red\",\"gaugeColorMode\":\"Labels\",\"colorsRange\":[{\"from\":0,\"to\":100}],\"invertColors\":false,\"labels\":{\"show\":true,\"color\":\"black\"},\"scale\":{\"show\":true,\"labels\":false,\"color\":\"#333\"},\"type\":\"meter\",\"style\":{\"bgWidth\":0.9,\"width\":0.9,\"mask\":false,\"bgMask\":false,\"maskBars\":50,\"bgFill\":\"#eee\",\"bgColor\":false,\"subText\":\"\",\"fontSize\":60,\"labelColor\":true}}},\"aggs\":[{\"id\":\"1\",\"enabled\":true,\"type\":\"cardinality\",\"schema\":\"metric\",\"params\":{\"field\":\"osquery.result.columns.name\",\"customLabel\":\"Live Kernel modules\"}}]}"
+      },
+      "id": "240f3630-eb05-11e7-8f04-51231daa5b05",
+      "type": "visualization",
+      "updated_at": "2018-01-08T17:35:32.102Z",
+      "version": 1
+    },
+    {
+      "attributes": {
+        "description": "",
+        "kibanaSavedObjectMeta": {
+          "searchSourceJSON": "{}"
+        },
+        "title": "Navigation [Osquery Result]",
+        "uiStateJSON": "{}",
+        "version": 1,
+        "visState": "{\"title\":\"Navigation [Osquery Result]\",\"type\":\"markdown\",\"params\":{\"fontSize\":10,\"markdown\":\"[Compilance](#/dashboard/69f5ae20-eb02-11e7-8f04-51231daa5b05) | [OSSEC Rootkit](#/dashboard/c0a7ce90-f4aa-11e7-8647-534bb4c21040)\"},\"aggs\":[]}"
+      },
+      "id": "2d6e0760-f4ab-11e7-8647-534bb4c21040",
+      "type": "visualization",
+      "updated_at": "2018-01-08T19:41:10.264Z",
+      "version": 3
+    },
+    {
+      "attributes": {
+        "columns": [
+          "osquery.result.name"
+        ],
+        "description": "",
+        "hits": 0,
+        "kibanaSavedObjectMeta": {
+          "searchSourceJSON": "{\"index\":\"filebeat-*\",\"highlightAll\":true,\"version\":true,\"query\":{\"language\":\"lucene\",\"query\":\"*\"},\"filter\":[{\"meta\":{\"negate\":false,\"index\":\"filebeat-*\",\"type\":\"phrase\",\"key\":\"osquery.result.name\",\"value\":\"pack_it-compliance_os_version\",\"params\":{\"query\":\"pack_it-compliance_os_version\",\"type\":\"phrase\"},\"disabled\":false,\"alias\":null},\"query\":{\"match\":{\"osquery.result.name\":{\"query\":\"pack_it-compliance_os_version\",\"type\":\"phrase\"}}},\"$state\":{\"store\":\"appState\"}}]}"
+        },
+        "sort": [
+          "@timestamp",
+          "desc"
+        ],
+        "title": "OS versions [Osquery results]",
+        "version": 1
+      },
+      "id": "b5d6baa0-eb02-11e7-8f04-51231daa5b05",
+      "type": "search",
+      "updated_at": "2018-01-08T17:35:32.102Z",
+      "version": 1
+    },
+    {
+      "attributes": {
+        "columns": [
+          "osquery.result.name",
+          "osquery.result.columns.name",
+          "osquery.result.columns.status"
+        ],
+        "description": "",
+        "hits": 0,
+        "kibanaSavedObjectMeta": {
+          "searchSourceJSON": "{\"index\":\"filebeat-*\",\"highlightAll\":true,\"version\":true,\"query\":{\"language\":\"lucene\",\"query\":\"\"},\"filter\":[{\"$state\":{\"store\":\"appState\"},\"meta\":{\"alias\":null,\"disabled\":false,\"index\":\"filebeat-*\",\"key\":\"osquery.result.name\",\"negate\":false,\"params\":{\"query\":\"pack_it-compliance_kernel_modules\",\"type\":\"phrase\"},\"type\":\"phrase\",\"value\":\"pack_it-compliance_kernel_modules\"},\"query\":{\"match\":{\"osquery.result.name\":{\"query\":\"pack_it-compliance_kernel_modules\",\"type\":\"phrase\"}}}}]}"
+        },
+        "sort": [
+          "@timestamp",
+          "desc"
+        ],
+        "title": "Kernel modules [Osquery results]",
+        "version": 1
+      },
+      "id": "f59e21e0-eb03-11e7-8f04-51231daa5b05",
+      "type": "search",
+      "updated_at": "2018-01-08T17:35:32.102Z",
+      "version": 1
+    },
+    {
+      "attributes": {
+        "description": "Dashboard for visualizing the data collected by the Osquery compliance pack.",
+        "hits": 0,
+        "kibanaSavedObjectMeta": {
+          "searchSourceJSON": "{\"query\":{\"language\":\"lucene\",\"query\":\"\"},\"filter\":[],\"highlightAll\":true,\"version\":true}"
+        },
+        "optionsJSON": "{\"darkTheme\":false,\"hidePanelTitles\":false,\"useMargins\":true}",
+        "panelsJSON": "[{\"panelIndex\":\"1\",\"gridData\":{\"x\":6,\"y\":6,\"w\":6,\"h\":4,\"i\":\"1\"},\"id\":\"7a9482d0-eb00-11e7-8f04-51231daa5b05\",\"type\":\"search\",\"version\":\"7.0.0-alpha1\"},{\"panelIndex\":\"2\",\"gridData\":{\"x\":5,\"y\":1,\"w\":7,\"h\":5,\"i\":\"2\"},\"id\":\"a9fd8bb0-eb01-11e7-8f04-51231daa5b05\",\"type\":\"visualization\",\"version\":\"7.0.0-alpha1\"},{\"panelIndex\":\"3\",\"gridData\":{\"x\":0,\"y\":6,\"w\":6,\"h\":4,\"i\":\"3\"},\"id\":\"3824b080-eb02-11e7-8f04-51231daa5b05\",\"type\":\"search\",\"version\":\"7.0.0-alpha1\"},{\"panelIndex\":\"4\",\"gridData\":{\"x\":0,\"y\":1,\"w\":5,\"h\":3,\"i\":\"4\"},\"id\":\"1da1ed30-eb03-11e7-8f04-51231daa5b05\",\"type\":\"visualization\",\"version\":\"7.0.0-alpha1\"},{\"panelIndex\":\"5\",\"gridData\":{\"x\":0,\"y\":4,\"w\":5,\"h\":2,\"i\":\"5\"},\"embeddableConfig\":{\"vis\":{\"defaultColors\":{\"0 - 100\":\"rgb(0,104,55)\"},\"legendOpen\":false}},\"id\":\"240f3630-eb05-11e7-8f04-51231daa5b05\",\"type\":\"visualization\",\"version\":\"7.0.0-alpha1\"},{\"panelIndex\":\"6\",\"gridData\":{\"x\":0,\"y\":0,\"w\":12,\"h\":1,\"i\":\"6\"},\"version\":\"6.1.0-SNAPSHOT\",\"type\":\"visualization\",\"id\":\"2d6e0760-f4ab-11e7-8647-534bb4c21040\"}]",
+        "timeRestore": false,
+        "title": "[Osquery Result] Compliance pack",
+        "uiStateJSON": "{\"P-5\":{\"vis\":{\"defaultColors\":{\"0 - 100\":\"rgb(0,104,55)\"}}}}",
+        "version": 1
+      },
+      "id": "69f5ae20-eb02-11e7-8f04-51231daa5b05",
+      "type": "dashboard",
+      "updated_at": "2018-01-08T19:42:15.406Z",
+      "version": 2
+    }
+  ],
+  "version": "6.1.0-SNAPSHOT"
+}
