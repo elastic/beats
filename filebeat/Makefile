@@ -3,6 +3,7 @@ BEAT_TITLE?=Filebeat
 BEAT_DESCRIPTION?=Filebeat sends log files to Logstash or directly to Elasticsearch.
 SYSTEM_TESTS?=true
 TEST_ENVIRONMENT?=true
+TESTING_ENVIRONMENT?=snapshot-noxpack
 GOX_FLAGS=-arch="amd64 386 arm ppc64 ppc64le"
 ES_BEATS?=..
 
