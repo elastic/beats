@@ -2,7 +2,6 @@ package monitor
 
 import (
 	"errors"
-	"fmt"
 	"io/ioutil"
 	"os"
 	"path/filepath"
@@ -38,7 +37,7 @@ func TestNonRecursive(t *testing.T) {
 	subdir := filepath.Join(dir, "subdir")
 	os.Mkdir(subdir, 0750)
 
-	ev, err := readTimeout(watcher)
+	ev, err := readTimeout(t, watcher)
 	assertNoError(t, err)
 	assert.Equal(t, subdir, ev.Name)
 	assert.Equal(t, fsnotify.Create, ev.Op)
@@ -47,7 +46,7 @@ func TestNonRecursive(t *testing.T) {
 	subfile := filepath.Join(subdir, "file.dat")
 	assertNoError(t, ioutil.WriteFile(subfile, []byte("foo"), 0640))
 
-	_, err = readTimeout(watcher)
+	_, err = readTimeout(t, watcher)
 	assert.Error(t, err)
 	assert.Equal(t, errReadTimeout, err)
 
@@ -78,7 +77,7 @@ func TestRecursive(t *testing.T) {
 	subdir := filepath.Join(dir, "subdir")
 	os.Mkdir(subdir, 0750)
 
-	ev, err := readTimeout(watcher)
+	ev, err := readTimeout(t, watcher)
 	assertNoError(t, err)
 	assert.Equal(t, subdir, ev.Name)
 	assert.Equal(t, fsnotify.Create, ev.Op)
@@ -133,7 +132,7 @@ func TestRecursiveNoFollowSymlink(t *testing.T) {
 	assertNoError(t, ioutil.WriteFile(file, []byte("hello"), 0640))
 
 	// No event is received
-	ev, err := readTimeout(watcher)
+	ev, err := readTimeout(t, watcher)
 	assert.Equal(t, errReadTimeout, err)
 	if err == nil {
 		t.Fatalf("Expected timeout, got event %+v", ev)
@@ -193,7 +192,7 @@ func TestRecursiveSubdirPermissions(t *testing.T) {
 
 	// No event is received
 
-	ev, err := readTimeout(watcher)
+	ev, err := readTimeout(t, watcher)
 	assert.Equal(t, errReadTimeout, err)
 	if err != errReadTimeout {
 		t.Fatalf("Expected timeout, got event %+v", ev)
@@ -209,7 +208,7 @@ func TestRecursiveSubdirPermissions(t *testing.T) {
 	var evs []fsnotify.Event
 	for {
 		// No event is received
-		ev, err := readTimeout(watcher)
+		ev, err := readTimeout(t, watcher)
 		if err == errReadTimeout {
 			break
 		}
@@ -243,7 +242,7 @@ func testDirOps(t *testing.T, dir string, watcher Watcher) {
 	// Create
 	assertNoError(t, ioutil.WriteFile(fpath, []byte("hello"), 0640))
 
-	ev, err := readTimeout(watcher)
+	ev, err := readTimeout(t, watcher)
 	assertNoError(t, err)
 	assert.Equal(t, fpath, ev.Name)
 	assert.Equal(t, fsnotify.Create, ev.Op)
@@ -258,7 +257,7 @@ func testDirOps(t *testing.T, dir string, watcher Watcher) {
 		f.Sync()
 		f.Close()
 
-		ev, err = readTimeout(watcher)
+		ev, err = readTimeout(t, watcher)
 		if err == nil || err != errReadTimeout {
 			break
 		}
@@ -271,13 +270,13 @@ func testDirOps(t *testing.T, dir string, watcher Watcher) {
 	err = os.Rename(fpath, fpath2)
 	assertNoError(t, err)
 
-	evRename, err := readTimeout(watcher)
+	evRename, err := readTimeout(t, watcher)
 	assertNoError(t, err)
 	// Sometimes a duplicate Write can be received under Linux, skip
 	if evRename.Op == fsnotify.Write {
-		evRename, err = readTimeout(watcher)
+		evRename, err = readTimeout(t, watcher)
 	}
-	evCreate, err := readTimeout(watcher)
+	evCreate, err := readTimeout(t, watcher)
 	assertNoError(t, err)
 
 	if evRename.Op != fsnotify.Rename {
@@ -294,12 +293,12 @@ func testDirOps(t *testing.T, dir string, watcher Watcher) {
 	err = os.Remove(fpath2)
 	assertNoError(t, err)
 
-	ev, err = readTimeout(watcher)
+	ev, err = readTimeout(t, watcher)
 	assertNoError(t, err)
 
 	// Windows: A write to the parent directory sneaks in
 	if ev.Op == fsnotify.Write && ev.Name == dir {
-		ev, err = readTimeout(watcher)
+		ev, err = readTimeout(t, watcher)
 		assertNoError(t, err)
 	}
 	assert.Equal(t, fpath2, ev.Name)
@@ -309,7 +308,7 @@ func testDirOps(t *testing.T, dir string, watcher Watcher) {
 var errReadTimeout = errors.New("read timeout")
 
 // helper to read from channel
-func readTimeout(watcher Watcher) (fsnotify.Event, error) {
+func readTimeout(tb testing.TB, watcher Watcher) (fsnotify.Event, error) {
 	timer := time.NewTimer(3 * time.Second)
 	defer timer.Stop()
 	for {
@@ -324,7 +323,7 @@ func readTimeout(watcher Watcher) (fsnotify.Event, error) {
 			return msg, nil
 
 		case err := <-watcher.ErrorChannel():
-			fmt.Printf("readTimeout got error: %v\n", err)
+			tb.Log("readTimeout got error:", err)
 		}
 	}
 }
