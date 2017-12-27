@@ -28,6 +28,7 @@ https://github.com/elastic/beats/compare/v6.0.0-beta2...master[Check the HEAD di
   existing users to update their config. {issue}5422[5422]
 
 *Filebeat*
+- Switch to docker prospector in sample manifests for Kubernetes deployment {pull}5963[5963]
 
 *Heartbeat*
 
