@@ -70,7 +70,7 @@ func (m *MetricSet) Fetch() ([]common.MapStr, error) {
 	ctx, cancel := context.WithCancel(context.Background())
 	defer cancel()
 
-	events := []common.MapStr{}
+	var events []common.MapStr
 
 	client, err := govmomi.NewClient(ctx, m.HostURL, m.Insecure)
 	if err != nil {
@@ -201,7 +201,7 @@ func getNetworkNames(c *vim25.Client, ref types.ManagedObjectReference) ([]strin
 	ctx, cancel := context.WithCancel(context.Background())
 	defer cancel()
 
-	outputNetworkNames := []string{}
+	var outputNetworkNames []string
 
 	pc := property.DefaultCollector(c)
 
@@ -212,11 +212,23 @@ func getNetworkNames(c *vim25.Client, ref types.ManagedObjectReference) ([]strin
 	}
 
 	if len(vm.Network) == 0 {
-		return nil, errors.Wrap(err, "no networks found")
+		return nil, errors.New("no networks found")
+	}
+
+	var networkRefs []types.ManagedObjectReference
+	for _, obj := range vm.Network {
+		if obj.Type == "Network" {
+			networkRefs = append(networkRefs, obj)
+		}
+	}
+
+	// If only "Distributed port group" was found, for example.
+	if len(networkRefs) == 0 {
+		return nil, errors.New("no networks found")
 	}
 
 	var nets []mo.Network
-	err = pc.Retrieve(ctx, vm.Network, []string{"name"}, &nets)
+	err = pc.Retrieve(ctx, networkRefs, []string{"name"}, &nets)
 	if err != nil {
 		return nil, fmt.Errorf("error retrieving network from virtual machine: %v", err)
 	}
