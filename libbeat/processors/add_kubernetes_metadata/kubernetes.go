@@ -1,7 +1,6 @@
 package add_kubernetes_metadata
 
 import (
-	"context"
 	"errors"
 	"fmt"
 	"io/ioutil"
@@ -107,22 +106,15 @@ func newKubernetesAnnotator(cfg *common.Config) (processors.Processor, error) {
 		}
 	}
 
-	ctx := context.Background()
 	if config.Host == "" {
-		podName := os.Getenv("HOSTNAME")
-		logp.Info("Using pod name %s and namespace %s", podName, client.Namespace)
-		if podName == "localhost" {
-			config.Host = "localhost"
+		if nodeName := os.Getenv("NODE_NAME"); nodeName != "" {
+			config.Host = nodeName
 		} else {
-			pod, error := client.CoreV1().GetPod(ctx, podName, client.Namespace)
-			if error != nil {
-				logp.Err("Querying for pod failed with error: ", error.Error())
-				logp.Info("Unable to find pod, setting host to localhost")
-				config.Host = "localhost"
-			} else {
-				config.Host = pod.Spec.GetNodeName()
+			logp.Info("Unable to find NODE_NAME, setting host to os Hostname")
+			config.Host, err = os.Hostname()
+			if err != nil {
+				return nil, fmt.Errorf("read os hostname failed: %v", err)
 			}
-
 		}
 	}
 
@@ -174,6 +166,9 @@ func (*kubernetesAnnotator) String() string { return "add_kubernetes_metadata" }
 func validate(config kubeAnnotatorConfig) error {
 	if !config.InCluster && config.KubeConfig == "" {
 		return errors.New("`kube_config` path can't be empty when in_cluster is set to false")
+	}
+	if !config.InCluster && config.AsDaemonSet {
+		return errors.New("`as_daemonset` can't be true when in_cluster is set to false")
 	}
 	return nil
 }
