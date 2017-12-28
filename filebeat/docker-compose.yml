@@ -28,12 +28,12 @@ services:
 
   elasticsearch:
     extends:
-      file: ../testing/environments/${TESTING_ENVIRONMENT}.yml
+      file: ${ES_BEATS}/testing/environments/${TESTING_ENVIRONMENT}.yml
       service: elasticsearch
 
   kibana:
     extends:
-      file: ../testing/environments/${TESTING_ENVIRONMENT}.yml
+      file: ${ES_BEATS}/testing/environments/${TESTING_ENVIRONMENT}.yml
       service: kibana
 
   redis:

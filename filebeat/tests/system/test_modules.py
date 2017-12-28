@@ -89,7 +89,9 @@ class Test(BaseTest):
                 if ev["_source"][module] == obj[module]:
                     found = True
                     break
-            assert found, "The following expected object was not found: {}".format(obj)
+
+            assert found, "The following expected object was not found:\n {}\nSearched in: \n{}".format(
+                ev["_source"][module], objects)
 
     def run_on_file(self, module, fileset, test_file, cfgfile):
         print("Testing {}/{} on {}".format(module, fileset, test_file))
