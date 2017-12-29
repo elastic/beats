@@ -11,9 +11,10 @@ func init() {
 
 	//Add IP Port Indexer as a default indexer
 	kubernetes.Indexing.AddDefaultIndexerConfig(kubernetes.IPPortIndexerName, *cfg)
+	kubernetes.Indexing.AddDefaultIndexerConfig(kubernetes.EventInvolvedObjectUIDIndexerName, *cfg)
 
 	config := map[string]interface{}{
-		"lookup_fields": []string{"metricset.host"},
+		"lookup_fields": []string{"metricset.host", "kubernetes.event.involved_object.uid"},
 	}
 	fieldCfg, err := common.NewConfigFrom(config)
 	if err == nil {

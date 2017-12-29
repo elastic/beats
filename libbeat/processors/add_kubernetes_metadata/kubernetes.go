@@ -1,7 +1,6 @@
 package add_kubernetes_metadata
 
 import (
-	"context"
 	"errors"
 	"fmt"
 	"io/ioutil"
@@ -27,8 +26,8 @@ var (
 )
 
 type kubernetesAnnotator struct {
-	podWatcher *PodWatcher
-	matchers   *Matchers
+	resourceWatcher *ResourceWatcher
+	matchers        *Matchers
 }
 
 func init() {
@@ -38,6 +37,7 @@ func init() {
 	Indexing.AddIndexer(PodNameIndexerName, NewPodNameIndexer)
 	Indexing.AddIndexer(ContainerIndexerName, NewContainerIndexer)
 	Indexing.AddIndexer(IPPortIndexerName, NewIPPortIndexer)
+	Indexing.AddIndexer(EventInvolvedObjectUIDIndexerName, NewEventInvolvedObjectUIDIndexer)
 	Indexing.AddMatcher(FieldMatcherName, NewFieldMatcher)
 	Indexing.AddMatcher(FieldFormatMatcherName, NewFieldFormatMatcher)
 }
@@ -75,8 +75,7 @@ func newKubernetesAnnotator(cfg *common.Config) (processors.Processor, error) {
 		Indexing.RUnlock()
 	}
 
-	metaGen := NewGenDefaultMeta(config.IncludeAnnotations, config.IncludeLabels, config.ExcludeLabels)
-	indexers := NewIndexers(config.Indexers, metaGen)
+	indexers := NewIndexers(config.Indexers, config.IncludeAnnotations, config.IncludeLabels, config.ExcludeLabels)
 
 	matchers := NewMatchers(config.Matchers)
 
@@ -107,32 +106,29 @@ func newKubernetesAnnotator(cfg *common.Config) (processors.Processor, error) {
 		}
 	}
 
-	ctx := context.Background()
 	if config.Host == "" {
-		podName := os.Getenv("HOSTNAME")
-		logp.Info("Using pod name %s and namespace %s", podName, client.Namespace)
-		if podName == "localhost" {
-			config.Host = "localhost"
+		if nodeName := os.Getenv("NODE_NAME"); nodeName != "" {
+			config.Host = nodeName
 		} else {
-			pod, error := client.CoreV1().GetPod(ctx, podName, client.Namespace)
-			if error != nil {
-				logp.Err("Querying for pod failed with error: ", error.Error())
-				logp.Info("Unable to find pod, setting host to localhost")
-				config.Host = "localhost"
-			} else {
-				config.Host = pod.Spec.GetNodeName()
+			logp.Info("Unable to find NODE_NAME, setting host to os Hostname")
+			config.Host, err = os.Hostname()
+			if err != nil {
+				return nil, fmt.Errorf("read os hostname failed: %v", err)
 			}
-
 		}
+	}
+
+	if !config.AsDaemonSet {
+		config.Host = ""
 	}
 
 	logp.Debug("kubernetes", "Using host ", config.Host)
 	logp.Debug("kubernetes", "Initializing watcher")
 	if client != nil {
-		watcher := NewPodWatcher(client, indexers, config.SyncPeriod, config.CleanupTimeout, config.Host)
+		watcher := newResourceWatcher(client, indexers, config.CleanupTimeout, config.Host, newPodWatcher)
 
 		if watcher.Run() {
-			return &kubernetesAnnotator{podWatcher: watcher, matchers: matchers}, nil
+			return &kubernetesAnnotator{resourceWatcher: watcher, matchers: matchers}, nil
 		}
 
 		return nil, fatalError
@@ -147,7 +143,7 @@ func (k *kubernetesAnnotator) Run(event *beat.Event) (*beat.Event, error) {
 		return event, nil
 	}
 
-	metadata := k.podWatcher.GetMetaData(index)
+	metadata := k.resourceWatcher.GetMetaData(index)
 	if metadata == nil {
 		return event, nil
 	}
@@ -155,13 +151,12 @@ func (k *kubernetesAnnotator) Run(event *beat.Event) (*beat.Event, error) {
 	meta := common.MapStr{}
 	metaIface, ok := event.Fields["kubernetes"]
 	if !ok {
-		event.Fields["kubernetes"] = common.MapStr{}
+		event.Fields["kubernetes"] = metadata
 	} else {
 		meta = metaIface.(common.MapStr)
+		meta.DeepUpdate(metadata)
+		event.Fields["kubernetes"] = meta
 	}
-
-	meta.Update(metadata)
-	event.Fields["kubernetes"] = meta
 
 	return event, nil
 }
@@ -171,6 +166,9 @@ func (*kubernetesAnnotator) String() string { return "add_kubernetes_metadata" }
 func validate(config kubeAnnotatorConfig) error {
 	if !config.InCluster && config.KubeConfig == "" {
 		return errors.New("`kube_config` path can't be empty when in_cluster is set to false")
+	}
+	if !config.InCluster && config.AsDaemonSet {
+		return errors.New("`as_daemonset` can't be true when in_cluster is set to false")
 	}
 	return nil
 }

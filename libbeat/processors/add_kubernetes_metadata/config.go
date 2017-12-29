@@ -7,11 +7,11 @@ import (
 )
 
 type kubeAnnotatorConfig struct {
-	InCluster  bool          `config:"in_cluster"`
-	KubeConfig string        `config:"kube_config"`
-	Host       string        `config:"host"`
-	Namespace  string        `config:"namespace"`
-	SyncPeriod time.Duration `config:"sync_period"`
+	InCluster bool `config:"in_cluster"`
+	// If beat deployed as a k8s daemonset, Annotator will only cache localhost meta.
+	AsDaemonSet bool   `config:"as_daemonset"`
+	KubeConfig  string `config:"kube_config"`
+	Host        string `config:"host"`
 	// Annotations are kept after pod is removed, until they haven't been accessed
 	// for a full `cleanup_timeout`:
 	CleanupTimeout     time.Duration `config:"cleanup_timeout"`
@@ -33,7 +33,7 @@ type PluginConfig []map[string]common.Config
 func defaultKubernetesAnnotatorConfig() kubeAnnotatorConfig {
 	return kubeAnnotatorConfig{
 		InCluster:       true,
-		SyncPeriod:      1 * time.Second,
+		AsDaemonSet:     true,
 		CleanupTimeout:  60 * time.Second,
 		DefaultMatchers: Enabled{true},
 		DefaultIndexers: Enabled{true},
