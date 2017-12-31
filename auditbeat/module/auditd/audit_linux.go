@@ -1,6 +1,7 @@
 package auditd
 
 import (
+	"fmt"
 	"os"
 	"strconv"
 	"strings"
@@ -217,11 +218,15 @@ func (ms *MetricSet) initClient() error {
 			return errors.Wrap(err, "failed to enable auditing in the kernel")
 		}
 	}
-
-	if err := ms.client.SetPID(libaudit.NoWait); err != nil {
-		return errors.Wrap(err, "failed to set audit PID")
+	if err := ms.client.WaitForPendingACKs(); err != nil {
+		return errors.Wrap(err, "failed to wait for ACKs")
 	}
-
+	if err := ms.client.SetPID(libaudit.WaitForReply); err != nil {
+		if errno, ok := err.(syscall.Errno); ok && errno == syscall.EEXIST && status.PID != 0 {
+			return fmt.Errorf("failed to set audit PID. An audit process is already running (PID %d)", status.PID)
+		}
+		return errors.Wrapf(err, "failed to set audit PID (current audit PID %d)", status.PID)
+	}
 	return nil
 }
 
