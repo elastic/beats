@@ -39,6 +39,7 @@ https://github.com/elastic/beats/compare/v6.0.0-beta2...master[Check the HEAD di
 - Rename `golang.heap.system.optained` field to `golang.heap.system.obtained`. {issue}5703[5703]
 - Support haproxy stats gathering using http (additionaly to tcp socket). {pull}5819[5819]
 - De dot keys in jolokia/jmx metricset to prevent collisions. {pull}5957[5957]
+- Support to optionally 'de dot' keys in http/json metricset to prevent collisions. {pull}5957[5957]
 
 *Packetbeat*
 
