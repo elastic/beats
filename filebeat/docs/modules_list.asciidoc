@@ -6,6 +6,7 @@ This file is generated! See scripts/docs_collector.py
   * <<filebeat-module-apache2>>
   * <<filebeat-module-auditd>>
   * <<filebeat-module-icinga>>
+  * <<filebeat-module-iis>>
   * <<filebeat-module-kafka>>
   * <<filebeat-module-logstash>>
   * <<filebeat-module-mysql>>
@@ -23,6 +24,7 @@ include::modules-overview.asciidoc[]
 include::modules/apache2.asciidoc[]
 include::modules/auditd.asciidoc[]
 include::modules/icinga.asciidoc[]
+include::modules/iis.asciidoc[]
 include::modules/kafka.asciidoc[]
 include::modules/logstash.asciidoc[]
 include::modules/mysql.asciidoc[]
