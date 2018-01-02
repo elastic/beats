@@ -61,6 +61,7 @@ func NewWatcher(client Client, syncPeriod, cleanupTimeout time.Duration, host st
 	return &podWatcher{
 		client:              client,
 		cleanupTimeout:      cleanupTimeout,
+		syncPeriod:          syncPeriod,
 		nodeFilter:          k8s.QueryParam("fieldSelector", "spec.nodeName="+host),
 		lastResourceVersion: "0",
 		ctx:                 ctx,
