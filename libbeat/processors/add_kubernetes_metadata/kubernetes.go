@@ -143,9 +143,6 @@ func newKubernetesAnnotator(cfg *common.Config) (processors.Processor, error) {
 		stop := watcher.ListenStop()
 		update := watcher.ListenUpdate()
 
-		if err := watcher.Start(); err != nil {
-			return nil, err
-		}
 		processor := &kubernetesAnnotator{
 			watcher:        watcher,
 			indexers:       indexers,
@@ -158,6 +155,10 @@ func newKubernetesAnnotator(cfg *common.Config) (processors.Processor, error) {
 
 		// Start worker
 		go processor.worker()
+
+		if err := watcher.Start(); err != nil {
+			return nil, err
+		}
 		return processor, nil
 	}
 
@@ -170,8 +171,9 @@ func (k *kubernetesAnnotator) Run(event *beat.Event) (*beat.Event, error) {
 		return event, nil
 	}
 
-	// TODO get metadata from local map
-	metadata := common.MapStr{}
+	k.RLock()
+	metadata := k.metadata[index]
+	k.RUnlock()
 	if metadata == nil {
 		return event, nil
 	}
