@@ -40,27 +40,41 @@ func NewGenerator(indexName, beatName, beatDir, beatVersion string, version comm
 
 // Create the Index-Pattern for Kibana for 5.x and default.
 func (i *IndexPatternGenerator) Generate() (string, error) {
-	commonFields, err := common.LoadFieldsYaml(i.fieldsYaml)
-	if err != nil {
-		return "", err
-	}
-
-	transformed, err := generate(i.indexName, &i.version, commonFields)
+	idxPattern, err := i.generate()
 	if err != nil {
 		return "", err
 	}
 
 	if i.version.Major >= 6 {
-		transformed = i.generateMinVersion6(transformed)
+		idxPattern = i.generateMinVersion6(idxPattern)
 	}
 
 	file := filepath.Join(i.targetDir, i.targetFilename)
-	err = dumpToFile(file, transformed)
+	err = dumpToFile(file, idxPattern)
 
 	return file, err
 }
 
-func (i *IndexPatternGenerator) generateMinVersion6(transformed common.MapStr) common.MapStr {
+func (i *IndexPatternGenerator) generate() (common.MapStr, error) {
+	indexPattern := common.MapStr{
+		"timeFieldName": "@timestamp",
+		"title":         i.indexName,
+	}
+
+	err := i.addGeneral(&indexPattern)
+	if err != nil {
+		return nil, err
+	}
+
+	err = i.addFieldsSpecific(&indexPattern)
+	if err != nil {
+		return nil, err
+	}
+
+	return indexPattern, nil
+}
+
+func (i *IndexPatternGenerator) generateMinVersion6(attrs common.MapStr) common.MapStr {
 	out := common.MapStr{
 		"version": i.beatVersion,
 		"objects": []common.MapStr{
@@ -68,38 +82,56 @@ func (i *IndexPatternGenerator) generateMinVersion6(transformed common.MapStr) c
 				"type":       "index-pattern",
 				"id":         i.indexName,
 				"version":    1,
-				"attributes": transformed,
+				"attributes": attrs,
 			},
 		},
 	}
 
 	return out
-
 }
 
-func generate(indexName string, version *common.Version, f common.Fields) (common.MapStr, error) {
-	transformer, err := newTransformer("@timestamp", indexName, version, f)
-
+func (i *IndexPatternGenerator) addGeneral(indexPattern *common.MapStr) error {
+	kibanaEntries, err := loadKibanaEntriesFromYaml(i.fieldsYaml)
 	if err != nil {
-		return nil, err
+		return err
 	}
-	transformed, err := transformer.transformFields()
+	transformed := newTransformer(kibanaEntries).transform()
+	if srcFilters, ok := transformed["sourceFilters"].([]common.MapStr); ok {
+		sourceFiltersBytes, err := json.Marshal(srcFilters)
+		if err != nil {
+			return err
+		}
+		(*indexPattern)["sourceFilters"] = string(sourceFiltersBytes)
+	}
+	return nil
+}
+
+func (i *IndexPatternGenerator) addFieldsSpecific(indexPattern *common.MapStr) error {
+	fields, err := common.LoadFieldsYaml(i.fieldsYaml)
 	if err != nil {
-		return nil, err
+		return err
+	}
+	transformer, err := newFieldsTransformer(&i.version, fields)
+	if err != nil {
+		return err
+	}
+	transformed, err := transformer.transform()
+	if err != nil {
+		return err
 	}
 
 	fieldsBytes, err := json.Marshal(transformed["fields"])
 	if err != nil {
-		return nil, err
+		return err
 	}
-	transformed["fields"] = string(fieldsBytes)
+	(*indexPattern)["fields"] = string(fieldsBytes)
 
 	fieldFormatBytes, err := json.Marshal(transformed["fieldFormatMap"])
 	if err != nil {
-		return nil, err
+		return err
 	}
-	transformed["fieldFormatMap"] = string(fieldFormatBytes)
-	return transformed, nil
+	(*indexPattern)["fieldFormatMap"] = string(fieldFormatBytes)
+	return nil
 }
 
 func clean(name string) string {
