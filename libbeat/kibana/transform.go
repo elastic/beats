@@ -118,6 +118,14 @@ func transformField(version *common.Version, f common.Field) (common.MapStr, com
 		field["type"] = t
 	}
 
+	if f.Type == "binary" {
+		field["aggregatable"] = false
+		field["analyzed"] = false
+		field["doc_values"] = getVal(f.DocValues, false)
+		field["indexed"] = false
+		field["searchable"] = false
+	}
+
 	if f.Type == "text" {
 		field["aggregatable"] = false
 	}
@@ -210,6 +218,7 @@ func createParam(f *common.MapStr) {
 
 var (
 	typeMapping = map[string]string{
+		"binary":       "binary",
 		"half_float":   "number",
 		"scaled_float": "number",
 		"float":        "number",
