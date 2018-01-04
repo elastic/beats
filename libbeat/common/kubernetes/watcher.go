@@ -21,9 +21,6 @@ type Watcher interface {
 	// Stop watching Kubernetes API for new containers
 	Stop()
 
-	// Pod returns the running container with the given ID or nil if unknown
-	Pod(ID string) *Pod
-
 	// ListenStart returns a bus listener to receive pod started events, with a `pod` key holding it
 	ListenStart() bus.Listener
 
