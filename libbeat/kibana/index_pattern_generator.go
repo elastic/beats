@@ -45,33 +45,22 @@ func (i *IndexPatternGenerator) Generate() (string, error) {
 		return "", err
 	}
 
-	var path string
+	transformed, err := generate(i.indexName, &i.version, commonFields)
+	if err != nil {
+		return "", err
+	}
 
 	if i.version.Major >= 6 {
-		path, err = i.generateMinVersion6(commonFields)
-	} else {
-		path, err = i.generateMinVersion5(commonFields)
+		transformed = i.generateMinVersion6(transformed)
 	}
 
-	return path, err
+	file := filepath.Join(i.targetDir, i.targetFilename)
+	err = dumpToFile(file, transformed)
+
+	return file, err
 }
 
-func (i *IndexPatternGenerator) generateMinVersion5(fields common.Fields) (string, error) {
-	transformed, err := generate(i.indexName, &i.version, fields)
-	if err != nil {
-		return "", err
-	}
-
-	file5x := filepath.Join(i.targetDir, i.targetFilename)
-	err = dumpToFile(file5x, transformed)
-	return file5x, err
-}
-
-func (i *IndexPatternGenerator) generateMinVersion6(fields common.Fields) (string, error) {
-	transformed, err := generate(i.indexName, &i.version, fields)
-	if err != nil {
-		return "", err
-	}
+func (i *IndexPatternGenerator) generateMinVersion6(transformed common.MapStr) common.MapStr {
 	out := common.MapStr{
 		"version": i.beatVersion,
 		"objects": []common.MapStr{
@@ -83,13 +72,14 @@ func (i *IndexPatternGenerator) generateMinVersion6(fields common.Fields) (strin
 			},
 		},
 	}
-	file6x := filepath.Join(i.targetDir, i.targetFilename)
-	err = dumpToFile(file6x, out)
-	return file6x, err
+
+	return out
+
 }
 
 func generate(indexName string, version *common.Version, f common.Fields) (common.MapStr, error) {
 	transformer, err := newTransformer("@timestamp", indexName, version, f)
+
 	if err != nil {
 		return nil, err
 	}
@@ -138,10 +128,9 @@ func createTargetDir(baseDir string, version common.Version) string {
 }
 
 func getVersionPath(version common.Version) string {
-	versionPath := "default"
+	versionPath := "6"
 	if version.Major == 5 {
-		versionPath = "5.x"
+		versionPath = "5"
 	}
 	return versionPath
-
 }
