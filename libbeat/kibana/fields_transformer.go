@@ -7,23 +7,19 @@ import (
 	"github.com/elastic/beats/libbeat/common"
 )
 
-type transformer struct {
+type fieldsTransformer struct {
 	fields                    common.Fields
 	transformedFields         []common.MapStr
 	transformedFieldFormatMap common.MapStr
-	timeFieldName             string
-	title                     string
 	version                   *common.Version
 	keys                      common.MapStr
 }
 
-func newTransformer(timeFieldName, title string, version *common.Version, fields common.Fields) (*transformer, error) {
+func newFieldsTransformer(version *common.Version, fields common.Fields) (*fieldsTransformer, error) {
 	if version == nil {
 		return nil, errors.New("Version must be given")
 	}
-	return &transformer{
-		timeFieldName:             timeFieldName,
-		title:                     title,
+	return &fieldsTransformer{
 		fields:                    fields,
 		version:                   version,
 		transformedFields:         []common.MapStr{},
@@ -32,7 +28,7 @@ func newTransformer(timeFieldName, title string, version *common.Version, fields
 	}, nil
 }
 
-func (t *transformer) transformFields() (transformed common.MapStr, err error) {
+func (t *fieldsTransformer) transform() (transformed common.MapStr, err error) {
 	defer func() {
 		if r := recover(); r != nil {
 			var ok bool
@@ -42,7 +38,7 @@ func (t *transformer) transformFields() (transformed common.MapStr, err error) {
 		}
 	}()
 
-	t.transform(t.fields, "")
+	t.transformFields(t.fields, "")
 
 	// add some meta fields
 	truthy := true
@@ -53,15 +49,13 @@ func (t *transformer) transformFields() (transformed common.MapStr, err error) {
 	t.add(common.Field{Path: "_score", Type: "integer", Index: &falsy, Analyzed: &falsy, DocValues: &falsy, Searchable: &falsy, Aggregatable: &falsy})
 
 	transformed = common.MapStr{
-		"timeFieldName":  t.timeFieldName,
-		"title":          t.title,
 		"fields":         t.transformedFields,
 		"fieldFormatMap": t.transformedFieldFormatMap,
 	}
 	return
 }
 
-func (t *transformer) transform(commonFields common.Fields, path string) {
+func (t *fieldsTransformer) transformFields(commonFields common.Fields, path string) {
 	for _, f := range commonFields {
 		f.Path = f.Name
 		if path != "" {
@@ -75,7 +69,7 @@ func (t *transformer) transform(commonFields common.Fields, path string) {
 
 		if f.Type == "group" {
 			if f.Enabled == nil || *f.Enabled {
-				t.transform(f.Fields, f.Path)
+				t.transformFields(f.Fields, f.Path)
 			}
 		} else {
 			t.keys[f.Path] = true
@@ -93,7 +87,7 @@ func (t *transformer) transform(commonFields common.Fields, path string) {
 	}
 }
 
-func (t *transformer) add(f common.Field) {
+func (t *fieldsTransformer) add(f common.Field) {
 	field, fieldFormat := transformField(t.version, f)
 	t.transformedFields = append(t.transformedFields, field)
 	if fieldFormat != nil {
