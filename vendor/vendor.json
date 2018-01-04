@@ -1263,10 +1263,10 @@
 			"revisionTime": "2016-07-15T16:59:30Z"
 		},
 		{
-			"checksumSHA1": "l/AvVB/e1LjZ28XXItkdOW9tKMQ=",
+			"checksumSHA1": "qBUydQrkduNII5wQvcX6WR8qE08=",
 			"path": "golang.org/x/sys/unix",
-			"revision": "b76f9891dc1d975623261def70f9b89661f5baab",
-			"revisionTime": "2017-11-28T14:20:51Z"
+			"revision": "28a7276518d399b9634904daad79e18b44d481bc",
+			"revisionTime": "2018-01-02T11:13:44Z"
 		},
 		{
 			"checksumSHA1": "cQoW6a5F9mbu10APPXM39YJtv48=",
