@@ -144,6 +144,7 @@ func (p *podWatcher) watch() {
 			_, apiPod, err := watcher.Next()
 			if err != nil {
 				logp.Err("kubernetes: Watching API error %v", err)
+				watcher.Close()
 				break
 			}
 
