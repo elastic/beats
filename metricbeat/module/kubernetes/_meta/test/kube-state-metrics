@@ -273,7 +273,9 @@ kube_pod_info{host_ip="192.168.99.100",namespace="kube-system",node="minikube",p
 kube_pod_info{host_ip="192.168.99.100",namespace="kube-system",node="minikube",pod="tiller-deploy-3067024529-9lpmb",pod_ip="172.17.0.2"} 1
 # HELP kube_pod_status_phase The pods current phase.
 # TYPE kube_pod_status_phase gauge
-kube_pod_status_phase{namespace="default",phase="Running",pod="jumpy-owl-redis-3481028193-s78x9"} 1
+kube_pod_status_phase{namespace="default",phase="Running",pod="jumpy-owl-redis-3481028193-s78x9"} 0
+kube_pod_status_phase{namespace="default",phase="Succeeded",pod="jumpy-owl-redis-3481028193-s78x9"} 1
+kube_pod_status_phase{namespace="default",phase="Unknown",pod="jumpy-owl-redis-3481028193-s78x9"} 0
 kube_pod_status_phase{namespace="jenkins",phase="Running",pod="wise-lynx-jenkins-1616735317-svn6k"} 1
 kube_pod_status_phase{namespace="kube-system",phase="Pending",pod="kube-state-metrics-1303537707-mnzbp"} 1
 kube_pod_status_phase{namespace="kube-system",phase="Running",pod="kube-addon-manager-minikube"} 1
