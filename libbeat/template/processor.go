@@ -34,12 +34,14 @@ func (p *Processor) process(fields common.Fields, path string, output common.Map
 			mapping = p.scaledFloat(&field)
 		case "half_float":
 			mapping = p.halfFloat(&field)
-		case "integer":
-			mapping = p.integer(&field)
+		case "integer", "long":
+			// don't explicitly include the integers, ES automatically detects them
+			//mapping = p.integer(&field)
 		case "text":
 			mapping = p.text(&field)
 		case "", "keyword":
-			mapping = p.keyword(&field)
+			// don't explicitly include the keywords, let the dynamic rule handle them
+			//mapping = p.keyword(&field)
 		case "object":
 			mapping = p.object(&field)
 		case "array":
@@ -72,7 +74,9 @@ func (p *Processor) process(fields common.Fields, path string, output common.Map
 			if err := p.process(field.Fields, newPath, properties); err != nil {
 				return err
 			}
-			mapping["properties"] = properties
+			if len(properties) > 0 {
+				mapping["properties"] = properties
+			}
 		default:
 			mapping = p.other(&field)
 		}
