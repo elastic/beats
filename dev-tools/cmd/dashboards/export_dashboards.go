@@ -143,7 +143,7 @@ func main() {
 		for _, dashboard := range dashboards {
 			fmt.Printf("id=%s, name=%s\n", dashboard["id"], dashboard["file"])
 			err := Export(client, *kibanaURL, dashboard["id"], path.Join(path.Dir(*ymlFile),
-				"_meta/kibana/default/dashboard", dashboard["file"]))
+				"_meta/kibana/6/dashboard", dashboard["file"]))
 			if err != nil {
 				fmt.Printf("ERROR: fail to export the dashboards: %s\n", err)
 			}
