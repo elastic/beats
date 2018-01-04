@@ -1,0 +1,10 @@
+package main
+
+import (
+	"github.com/elastic/beats/libbeat/beat"
+)
+
+func Run(event *beat.Event) (*beat.Event, error) {
+	event.PutValue("foo", "bar")
+	return event, nil
+}

@@ -14,6 +14,7 @@ https://github.com/elastic/beats/compare/v6.0.0-beta2...master[Check the HEAD di
 
 *Affecting all Beats*
 
+- Add new `plugin` processor that allow to use go plugins to process events. {pull}5956[5956]
 - Support dashboard loading without Elasticseach {pull}5653[5653]
 - Addition and update of the following libraries: pbkdf2, terminal, windows, unix {pull}5735[5735]
 - Update the command line library cobra and add support for zsh completion {pull}5761[5761]
