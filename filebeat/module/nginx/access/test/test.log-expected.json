@@ -16,11 +16,9 @@
             "continent_name" : "Europe",
             "country_iso_code" : "DE",
             "location" : {
-              "lon" : 13.4,
-              "lat" : 52.5167
-            },
-            "region_name": "Land Berlin",
-            "city_name": "Berlin"
+              "lon" : 9.0,
+              "lat" : 51.0
+            }
           },
           "method" : "GET",
           "user_name" : "-",
@@ -129,11 +127,9 @@
             "continent_name" : "Europe",
             "country_iso_code" : "DE",
             "location" : {
-              "lon" : 13.4,
-              "lat" : 52.5167
-            },
-            "region_name": "Land Berlin",
-            "city_name": "Berlin"
+              "lon" : 9.0,
+              "lat" : 51.0
+            }
           },
           "method" : "GET",
           "user_name" : "-",
@@ -303,8 +299,8 @@
             "continent_name" : "Europe",
             "country_iso_code" : "PT",
             "location" : {
-              "lon" : -8.0,
-              "lat" : 39.5
+              "lon" : -8.13057,
+              "lat" : 39.6945
             }
           },
           "method" : "GET",

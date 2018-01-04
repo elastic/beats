@@ -299,12 +299,12 @@
                     "ssh": {
                         "geoip": {
                             "continent_name": "Asia",
-                            "city_name": "Shenzhen",
+                            "city_name": "Guangzhou",
                             "country_iso_code": "CN",
                             "region_name": "Guangdong",
                             "location": {
-                                "lon": 114.1333,
-                                "lat": 22.5333
+                                "lon": 113.25,
+                                "lat": 23.1167
                             }
                         },
                         "method": "password",
