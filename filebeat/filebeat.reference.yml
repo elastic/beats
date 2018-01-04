@@ -22,7 +22,7 @@ filebeat.modules:
     #var.paths:
 
     # Convert the timestamp to UTC. Requires Elasticsearch >= 6.1.
-    #convert_timezone: false
+    #var.convert_timezone: false
 
     # Prospector configuration (advanced). Any prospector configuration option
     # can be added under this section.
@@ -37,7 +37,7 @@ filebeat.modules:
     #var.paths:
 
     # Convert the timestamp to UTC. Requires Elasticsearch >= 6.1.
-    #convert_timezone: false
+    #var.convert_timezone: false
 
     # Prospector configuration (advanced). Any prospector configuration option
     # can be added under this section.
