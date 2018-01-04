@@ -7,7 +7,6 @@ import (
 	"crypto/sha256"
 	"crypto/sha512"
 	"encoding/hex"
-	"encoding/json"
 	"fmt"
 	"hash"
 	"io"
@@ -18,10 +17,11 @@ import (
 	"time"
 
 	"github.com/pkg/errors"
-
+	"golang.org/x/crypto/blake2b"
 	"golang.org/x/crypto/sha3"
 
 	"github.com/elastic/beats/libbeat/common"
+	"github.com/elastic/beats/libbeat/common/file"
 	"github.com/elastic/beats/metricbeat/mb"
 )
 
@@ -34,6 +34,9 @@ func (s Source) String() string {
 	}
 	return "unknown"
 }
+
+// MarshalText marshals the Source to a textual representation of itself.
+func (s Source) MarshalText() ([]byte, error) { return []byte(s.String()), nil }
 
 const (
 	// SourceScan identifies events triggerd by a file system scan.
@@ -58,6 +61,9 @@ func (t Type) String() string {
 	return "unknown"
 }
 
+// MarshalText marshals the Type to a textual representation of itself.
+func (t Type) MarshalText() ([]byte, error) { return []byte(t.String()), nil }
+
 // Enum of possible file.Types.
 const (
 	UnknownType Type = iota // Typically seen in deleted notifications where the object is gone.
@@ -72,15 +78,26 @@ var typeNames = map[Type]string{
 	SymlinkType: "symlink",
 }
 
+// Digest is a output of a hash function.
+type Digest []byte
+
+// String returns the digest value in lower-case hexadecimal form.
+func (d Digest) String() string {
+	return hex.EncodeToString(d)
+}
+
+// MarshalText encodes the digest to a hexadecimal representation of itself.
+func (d Digest) MarshalText() ([]byte, error) { return []byte(d.String()), nil }
+
 // Event describe the filesystem change and includes metadata about the file.
 type Event struct {
-	Timestamp  time.Time           // Time of event.
-	Path       string              // The path associated with the event.
-	TargetPath string              // Target path for symlinks.
-	Info       *Metadata           // File metadata (if the file exists).
-	Source     Source              // Source of the event.
-	Action     Action              // Action (like created, updated).
-	Hashes     map[HashType][]byte // File hashes.
+	Timestamp  time.Time           `json:"timestamp"`             // Time of event.
+	Path       string              `json:"path"`                  // The path associated with the event.
+	TargetPath string              `json:"target_path,omitempty"` // Target path for symlinks.
+	Info       *Metadata           `json:"info"`                  // File metadata (if the file exists).
+	Source     Source              `json:"source"`                // Source of the event.
+	Action     Action              `json:"action"`                // Action (like created, updated).
+	Hashes     map[HashType]Digest `json:"hash,omitempty"`        // File hashes.
 
 	// Metadata
 	rtt    time.Duration // Time taken to collect the info.
@@ -89,17 +106,20 @@ type Event struct {
 
 // Metadata contains file metadata.
 type Metadata struct {
-	Inode uint64
-	UID   uint32
-	GID   uint32
-	SID   string
-	Owner string
-	Group string
-	Size  uint64
-	MTime time.Time   // Last modification time.
-	CTime time.Time   // Last metdata change time.
-	Type  Type        // File type (dir, file, symlink).
-	Mode  os.FileMode // Permissions
+	Inode  uint64      `json:"inode"`
+	UID    uint32      `json:"uid"`
+	GID    uint32      `json:"gid"`
+	SID    string      `json:"sid"`
+	Owner  string      `json:"owner"`
+	Group  string      `json:"group"`
+	Size   uint64      `json:"size"`
+	MTime  time.Time   `json:"mtime"`  // Last modification time.
+	CTime  time.Time   `json:"ctime"`  // Last metadata change time.
+	Type   Type        `json:"type"`   // File type (dir, file, symlink).
+	Mode   os.FileMode `json:"mode"`   // Permissions
+	SetUID bool        `json:"setuid"` // setuid bit (POSIX only)
+	SetGID bool        `json:"setgid"` // setgid bit (POSIX only)
+	Origin []string    `json:"origin"` // External origin info for the file (MacOS only)
 }
 
 // NewEventFromFileInfo creates a new Event based on data from a os.FileInfo
@@ -176,11 +196,6 @@ func NewEvent(
 	return NewEventFromFileInfo(path, info, err, action, source, maxFileSize, hashTypes)
 }
 
-func (e *Event) String() string {
-	data, _ := json.Marshal(e)
-	return string(data)
-}
-
 func buildMetricbeatEvent(e *Event, existedBefore bool) mb.Event {
 	m := common.MapStr{
 		"path":   e.Path,
@@ -225,10 +240,19 @@ func buildMetricbeatEvent(e *Event, existedBefore bool) mb.Event {
 		if info.Group != "" {
 			m["group"] = info.Group
 		}
+		if info.SetUID {
+			m["setuid"] = true
+		}
+		if info.SetGID {
+			m["setgid"] = true
+		}
+		if len(info.Origin) > 0 {
+			m["origin"] = info.Origin
+		}
 	}
 
-	for hashType, hash := range e.Hashes {
-		m[string(hashType)] = hex.EncodeToString(hash)
+	for hashType, digest := range e.Hashes {
+		m[string(hashType)] = digest
 	}
 
 	out := mb.Event{
@@ -288,7 +312,7 @@ func diffEvents(old, new *Event) (Action, bool) {
 	if o, n := old.Info, new.Info; o != nil && n != nil {
 		// The owner and group names are ignored (they aren't persisted).
 		if o.Inode != n.Inode || o.UID != n.UID || o.GID != n.GID || o.SID != n.SID ||
-			o.Mode != n.Mode || o.Type != n.Type {
+			o.Mode != n.Mode || o.Type != n.Type || o.SetUID != n.SetUID || o.SetGID != n.SetGID {
 			result |= AttributesModified
 		}
 
@@ -306,7 +330,7 @@ func diffEvents(old, new *Event) (Action, bool) {
 	return result, result != None
 }
 
-func hashFile(name string, hashType ...HashType) (map[HashType][]byte, error) {
+func hashFile(name string, hashType ...HashType) (map[HashType]Digest, error) {
 	if len(hashType) == 0 {
 		return nil, nil
 	}
@@ -314,6 +338,15 @@ func hashFile(name string, hashType ...HashType) (map[HashType][]byte, error) {
 	var hashes []hash.Hash
 	for _, name := range hashType {
 		switch name {
+		case BLAKE2B_256:
+			h, _ := blake2b.New256(nil)
+			hashes = append(hashes, h)
+		case BLAKE2B_384:
+			h, _ := blake2b.New384(nil)
+			hashes = append(hashes, h)
+		case BLAKE2B_512:
+			h, _ := blake2b.New512(nil)
+			hashes = append(hashes, h)
 		case MD5:
 			hashes = append(hashes, md5.New())
 		case SHA1:
@@ -343,7 +376,7 @@ func hashFile(name string, hashType ...HashType) (map[HashType][]byte, error) {
 		}
 	}
 
-	f, err := os.Open(name)
+	f, err := file.ReadOpen(name)
 	if err != nil {
 		return nil, errors.Wrap(err, "failed to open file for hashing")
 	}
@@ -354,7 +387,7 @@ func hashFile(name string, hashType ...HashType) (map[HashType][]byte, error) {
 		return nil, errors.Wrap(err, "failed to calculate file hashes")
 	}
 
-	nameToHash := make(map[HashType][]byte, len(hashes))
+	nameToHash := make(map[HashType]Digest, len(hashes))
 	for i, h := range hashes {
 		nameToHash[hashType[i]] = h.Sum(nil)
 	}

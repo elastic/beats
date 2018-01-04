@@ -8,6 +8,8 @@ import (
 	"github.com/dustin/go-humanize"
 	"github.com/joeshaw/multierror"
 	"github.com/pkg/errors"
+
+	"github.com/elastic/beats/libbeat/common/match"
 )
 
 // HashType identifies a cryptographic algorithm.
@@ -19,35 +21,45 @@ func (t *HashType) Unpack(v string) error {
 	return nil
 }
 
-var validHashes = []HashType{MD5, SHA1, SHA224, SHA256, SHA384, SHA3_224, SHA3_256, SHA3_384, SHA3_512, SHA512, SHA512_224, SHA512_256}
+var validHashes = []HashType{
+	BLAKE2B_256, BLAKE2B_384, BLAKE2B_512,
+	MD5,
+	SHA1,
+	SHA224, SHA256, SHA384, SHA512, SHA512_224, SHA512_256,
+	SHA3_224, SHA3_256, SHA3_384, SHA3_512,
+}
 
 // Enum of hash types.
 const (
-	MD5        HashType = "md5"
-	SHA1       HashType = "sha1"
-	SHA224     HashType = "sha224"
-	SHA256     HashType = "sha256"
-	SHA384     HashType = "sha384"
-	SHA3_224   HashType = "sha3_224"
-	SHA3_256   HashType = "sha3_256"
-	SHA3_384   HashType = "sha3_384"
-	SHA3_512   HashType = "sha3_512"
-	SHA512     HashType = "sha512"
-	SHA512_224 HashType = "sha512_224"
-	SHA512_256 HashType = "sha512_256"
+	BLAKE2B_256 HashType = "blake2b_256"
+	BLAKE2B_384 HashType = "blake2b_384"
+	BLAKE2B_512 HashType = "blake2b_512"
+	MD5         HashType = "md5"
+	SHA1        HashType = "sha1"
+	SHA224      HashType = "sha224"
+	SHA256      HashType = "sha256"
+	SHA384      HashType = "sha384"
+	SHA3_224    HashType = "sha3_224"
+	SHA3_256    HashType = "sha3_256"
+	SHA3_384    HashType = "sha3_384"
+	SHA3_512    HashType = "sha3_512"
+	SHA512      HashType = "sha512"
+	SHA512_224  HashType = "sha512_224"
+	SHA512_256  HashType = "sha512_256"
 )
 
 // Config contains the configuration parameters for the file integrity
 // metricset.
 type Config struct {
-	Paths               []string   `config:"paths" validate:"required"`
-	HashTypes           []HashType `config:"hash_types"`
-	MaxFileSize         string     `config:"max_file_size"`
-	MaxFileSizeBytes    uint64     `config:",ignore"`
-	ScanAtStart         bool       `config:"scan_at_start"`
-	ScanRatePerSec      string     `config:"scan_rate_per_sec"`
-	ScanRateBytesPerSec uint64     `config:",ignore"`
-	Recursive           bool       `config:"recursive"` // Recursive enables recursive monitoring of directories.
+	Paths               []string        `config:"paths" validate:"required"`
+	HashTypes           []HashType      `config:"hash_types"`
+	MaxFileSize         string          `config:"max_file_size"`
+	MaxFileSizeBytes    uint64          `config:",ignore"`
+	ScanAtStart         bool            `config:"scan_at_start"`
+	ScanRatePerSec      string          `config:"scan_rate_per_sec"`
+	ScanRateBytesPerSec uint64          `config:",ignore"`
+	Recursive           bool            `config:"recursive"` // Recursive enables recursive monitoring of directories.
+	ExcludeFiles        []match.Matcher `config:"exclude_files"`
 }
 
 // Validate validates the config data and return an error explaining all the
@@ -88,7 +100,6 @@ nextHash:
 	if err != nil {
 		errs = append(errs, errors.Wrap(err, "invalid scan_rate_per_sec value"))
 	}
-
 	return errs.Err()
 }
 
@@ -105,6 +116,16 @@ func deduplicate(in []string) []string {
 		lastValue = value
 	}
 	return out
+}
+
+// IsExcludedPath checks if a path matches the exclude_files regular expressions.
+func (c *Config) IsExcludedPath(path string) bool {
+	for _, matcher := range c.ExcludeFiles {
+		if matcher.MatchString(path) {
+			return true
+		}
+	}
+	return false
 }
 
 var defaultConfig = Config{

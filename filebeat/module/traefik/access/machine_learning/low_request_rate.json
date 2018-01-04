@@ -6,8 +6,7 @@
     "detectors": [
       {
         "detector_description": "traefik_access_low_request_rate",
-        "function": "low_count",
-        "detector_rules": []
+        "function": "low_count"
       }
     ],
     "influencers": []

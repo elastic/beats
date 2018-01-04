@@ -11,7 +11,7 @@ import (
 )
 
 func TestConvertNestedMapStr(t *testing.T) {
-	logp.LogInit(logp.LOG_DEBUG, "", false, true, []string{"*"})
+	logp.TestingSetup()
 
 	type io struct {
 		Input  MapStr
@@ -121,7 +121,7 @@ func TestConvertNestedMapStr(t *testing.T) {
 }
 
 func TestConvertNestedStruct(t *testing.T) {
-	logp.LogInit(logp.LOG_DEBUG, "", false, true, []string{"*"})
+	logp.TestingSetup()
 
 	type io struct {
 		Input  MapStr
@@ -178,7 +178,7 @@ func TestConvertNestedStruct(t *testing.T) {
 }
 
 func TestNormalizeValue(t *testing.T) {
-	logp.LogInit(logp.LOG_DEBUG, "", false, true, []string{"*"})
+	logp.TestingSetup()
 
 	var nilStringPtr *string
 	someString := "foo"

@@ -6,8 +6,7 @@
         {
         "detector_description": "traefik_access_response_code_rate",
         "function": "count",
-        "partition_field_name": "traefik.access.response_code",
-        "detector_rules": []
+        "partition_field_name": "traefik.access.response_code"
       }
     ],
     "influencers": [

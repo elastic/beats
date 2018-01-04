@@ -254,7 +254,7 @@ func (p *Pipeline) Close() error {
 	// shutdown queue
 	err := p.queue.Close()
 	if err != nil {
-		log.Err("pipeline queue shutdown error: ", err)
+		log.Error("pipeline queue shutdown error: ", err)
 	}
 
 	p.observer.cleanup()
