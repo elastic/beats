@@ -3,10 +3,15 @@
 package common
 
 import (
+	"encoding/json"
 	"fmt"
+	"strings"
 	"testing"
 
 	"github.com/stretchr/testify/assert"
+	"go.uber.org/zap/zapcore"
+
+	"github.com/elastic/beats/libbeat/logp"
 )
 
 func TestMapStrUpdate(t *testing.T) {
@@ -499,5 +504,68 @@ func BenchmarkMapStrFlatten(b *testing.B) {
 	b.ResetTimer()
 	for i := 0; i < b.N; i++ {
 		_ = m.Flatten()
+	}
+}
+
+// Ensure the MapStr is marshaled in logs the same way it is by json.Marshal.
+func TestMapStrJSONLog(t *testing.T) {
+	logp.DevelopmentSetup(logp.ToObserverOutput())
+
+	m := MapStr{
+		"test": 15,
+		"hello": MapStr{
+			"world": MapStr{
+				"ok": "test",
+			},
+		},
+		"elastic": MapStr{
+			"for": "search",
+		},
+	}
+
+	data, err := json.Marshal(MapStr{"m": m})
+	if err != nil {
+		t.Fatal(err)
+	}
+	expectedJSON := string(data)
+
+	logp.NewLogger("test").Infow("msg", "m", m)
+	logs := logp.ObserverLogs().TakeAll()
+	if assert.Len(t, logs, 1) {
+		log := logs[0]
+
+		// Encode like zap does.
+		e := zapcore.NewJSONEncoder(zapcore.EncoderConfig{})
+		buf, err := e.EncodeEntry(log.Entry, log.Context)
+		if err != nil {
+			t.Fatal(err)
+		}
+
+		// Zap adds a newline to end the JSON object.
+		actualJSON := strings.TrimSpace(buf.String())
+
+		assert.Equal(t, string(expectedJSON), actualJSON)
+	}
+}
+
+func BenchmarkMapStrLogging(b *testing.B) {
+	logp.DevelopmentSetup(logp.ToDiscardOutput())
+	logger := logp.NewLogger("benchtest")
+
+	m := MapStr{
+		"test": 15,
+		"hello": MapStr{
+			"world": MapStr{
+				"ok": "test",
+			},
+		},
+		"elastic": MapStr{
+			"for": "search",
+		},
+	}
+
+	b.ResetTimer()
+	for i := 0; i < b.N; i++ {
+		logger.Infow("test", "mapstr", m)
 	}
 }

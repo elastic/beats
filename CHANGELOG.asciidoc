@@ -17,6 +17,8 @@ https://github.com/elastic/beats/compare/v6.0.0-beta2...master[Check the HEAD di
 - Support dashboard loading without Elasticseach {pull}5653[5653]
 - Addition and update of the following libraries: pbkdf2, terminal, windows, unix {pull}5735[5735]
 - Update the command line library cobra and add support for zsh completion {pull}5761[5761]
+- The log format may differ due to logging library changes. {pull}5901[5901]
+- Adding a local keystore to allow user to obfuscate password {pull}5687[5687]
 
 *Auditbeat*
 
@@ -26,6 +28,7 @@ https://github.com/elastic/beats/compare/v6.0.0-beta2...master[Check the HEAD di
   existing users to update their config. {issue}5422[5422]
 
 *Filebeat*
+- Switch to docker prospector in sample manifests for Kubernetes deployment {pull}5963[5963]
 
 *Heartbeat*
 
@@ -34,6 +37,7 @@ https://github.com/elastic/beats/compare/v6.0.0-beta2...master[Check the HEAD di
 - Rename `heap_init` field to `heap.init`. {pull}5320[5320]
 - Rename `http.response.status_code` field to `http.response.code`. {pull}5521[5521]
 - Rename `golang.heap.system.optained` field to `golang.heap.system.obtained`. {issue}5703[5703]
+- Support haproxy stats gathering using http (additionaly to tcp socket). {pull}5819[5819]
 
 *Packetbeat*
 
@@ -79,6 +83,8 @@ https://github.com/elastic/beats/compare/v6.0.0-beta2...master[Check the HEAD di
 - Fix `ProcState` on Linux and FreeBSD when process names contain parentheses. {pull}5775[5775]
 - Fix incorrect `Mem.Used` calculation under linux. {pull}5775[5775]
 - Fix mongodb session consistency mode to allow command execution on secondary nodes. {issue}4689[4689]
+- Fix `open_file_descriptor_count` and `max_file_descriptor_count` lost in zookeeper module {pull}5902[5902]
+- Fix kubernetes `state_pod` `status.phase` so that the active phase is returned instead of `unknown`. {pull}5980[5980]
 
 *Packetbeat*
 
@@ -108,10 +114,15 @@ https://github.com/elastic/beats/compare/v6.0.0-beta2...master[Check the HEAD di
 - Set log level for kafka output. {pull}5397[5397]
 - Moved `ip_port` indexer for `add_kubernetes_metadata` to all beats. {pull}5707[5707]
 - `ip_port` indexer now index both IP and IP:port pairs. {pull}5721[5721]
+- Add the ability to write structured logs. {pull}5901[5901]
+- Use structured logging for the metrics that are periodically logged via the
+  `logging.metrics` feature. {pull}5915[5915]
+- Add the ability to log to the Windows Event Log. {pull}5913[5813]
 
 *Auditbeat*
 
 - Add support for SHA3 hash algorithms to the file integrity module. {issue}5345[5345]
+- Add support for BLAKE2b hash algorithms to the file integrity module. {pull}5926[5926]
 - Add dashboards for Linux audit framework events (overview, executions, sockets). {pull}5516[5516]
 - Add support for recursive file watches under macOS {pull}5575[5575] and Linux. {pull}5833[5833]
 

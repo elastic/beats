@@ -12,7 +12,7 @@ import (
 	"github.com/joeshaw/multierror"
 	"github.com/pkg/errors"
 
-	"github.com/elastic/beats/filebeat/input/file"
+	"github.com/elastic/beats/libbeat/common/file"
 )
 
 // NewMetadata returns a new Metadata object. If an error is returned it is
@@ -50,12 +50,13 @@ func NewMetadata(path string, info os.FileInfo) (*Metadata, error) {
 	if !info.IsDir() {
 		fileInfo.SID, fileInfo.Owner, err = fileOwner(path)
 	}
+	fileInfo.Origin, err = GetFileOrigin(path)
 	return fileInfo, err
 }
 
 // fileOwner returns the SID and name (domain\user) of the file's owner.
 func fileOwner(path string) (sid, owner string, err error) {
-	f, err := os.Open(path)
+	f, err := file.ReadOpen(path)
 	if err != nil {
 		return "", "", errors.Wrap(err, "failed to open file to get owner")
 	}

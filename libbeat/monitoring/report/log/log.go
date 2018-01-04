@@ -1,9 +1,6 @@
 package log
 
 import (
-	"bytes"
-	"fmt"
-	"sort"
 	"sync"
 	"time"
 
@@ -30,16 +27,13 @@ var gauges = map[string]bool{
 	"beat.memstats.memory_total":     true,
 	"beat.memstats.memory_alloc":     true,
 	"beat.memstats.gc_next":          true,
+	"beat.info.uptime.ms":            true,
 }
 
 var (
 	// startTime is the time that the process was started.
 	startTime = time.Now()
 )
-
-type logger interface {
-	Infof(format string, v ...interface{})
-}
 
 type reporter struct {
 	wg       sync.WaitGroup
@@ -48,7 +42,7 @@ type reporter struct {
 	registry *monitoring.Registry
 
 	// output
-	logger logger
+	logger *logp.Logger
 }
 
 // MakeReporter returns a new Reporter that periodically reports metrics via
@@ -64,7 +58,7 @@ func MakeReporter(beat beat.Info, cfg *common.Config) (report.Reporter, error) {
 	r := &reporter{
 		done:     make(chan struct{}),
 		period:   config.Period,
-		logger:   logp.NewLogger("metrics"),
+		logger:   logp.NewLogger("monitoring"),
 		registry: monitoring.Default,
 	}
 
@@ -84,7 +78,9 @@ func (r *reporter) Stop() {
 func (r *reporter) snapshotLoop() {
 	r.logger.Infof("Starting metrics logging every %v", r.period)
 	defer r.logger.Infof("Stopping metrics logging.")
-	defer r.logTotals(makeSnapshot(r.registry))
+	defer func() {
+		r.logTotals(makeDeltaSnapshot(monitoring.MakeFlatSnapshot(), makeSnapshot(r.registry)))
+	}()
 
 	ticker := time.NewTicker(r.period)
 	defer ticker.Stop()
@@ -107,7 +103,7 @@ func (r *reporter) snapshotLoop() {
 
 func (r *reporter) logSnapshot(s monitoring.FlatSnapshot) {
 	if snapshotLen(s) > 0 {
-		r.logger.Infof("Non-zero metrics in the last %v: %v", r.period, toKeyValuePairs(s))
+		r.logger.Infow("Non-zero metrics in the last "+r.period.String(), toKeyValuePairs(s)...)
 		return
 	}
 
@@ -115,7 +111,7 @@ func (r *reporter) logSnapshot(s monitoring.FlatSnapshot) {
 }
 
 func (r *reporter) logTotals(s monitoring.FlatSnapshot) {
-	r.logger.Infof("Total non-zero metrics: %v", toKeyValuePairs(s))
+	r.logger.Infow("Total non-zero metrics", toKeyValuePairs(s)...)
 	r.logger.Infof("Uptime: %v", time.Since(startTime))
 }
 
@@ -162,35 +158,20 @@ func snapshotLen(s monitoring.FlatSnapshot) int {
 	return len(s.Bools) + len(s.Floats) + len(s.Ints) + len(s.Strings)
 }
 
-func toKeyValuePairs(s monitoring.FlatSnapshot) string {
+func toKeyValuePairs(s monitoring.FlatSnapshot) []interface{} {
 	data := make(common.MapStr, snapshotLen(s))
 	for k, v := range s.Bools {
-		data[k] = v
+		data.Put(k, v)
 	}
 	for k, v := range s.Floats {
-		data[k] = v
+		data.Put(k, v)
 	}
 	for k, v := range s.Ints {
-		data[k] = v
+		data.Put(k, v)
 	}
 	for k, v := range s.Strings {
-		data[k] = v
+		data.Put(k, v)
 	}
 
-	keys := make([]string, 0, len(data))
-	for k := range data {
-		keys = append(keys, k)
-	}
-	sort.Strings(keys)
-
-	var buf bytes.Buffer
-	for _, key := range keys {
-		if buf.Len() != 0 {
-			buf.WriteByte(' ')
-		}
-		buf.WriteString(key)
-		buf.WriteString("=")
-		buf.WriteString(fmt.Sprintf("%v", data[key]))
-	}
-	return buf.String()
+	return []interface{}{logp.Namespace("monitoring"), logp.Reflect("metrics", data)}
 }

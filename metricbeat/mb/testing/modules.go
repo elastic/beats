@@ -217,46 +217,67 @@ func NewPushMetricSetV2(t testing.TB, config interface{}) mb.PushMetricSetV2 {
 	return pushMetricSet
 }
 
+// capturingReporterV2 stores all the events and errors from a metricset's
+// Run method.
 type capturingReporterV2 struct {
-	events []mb.Event
-	done   chan struct{}
+	doneC   chan struct{}
+	eventsC chan mb.Event
 }
 
+// Event stores the passed-in event into the events array
 func (r *capturingReporterV2) Event(event mb.Event) bool {
-	r.events = append(r.events, event)
+	r.eventsC <- event
 	return true
 }
 
+// Error stores the given error into the errors array.
 func (r *capturingReporterV2) Error(err error) bool {
-	r.events = append(r.events, mb.Event{Error: err})
+	r.eventsC <- mb.Event{Error: err}
 	return true
 }
 
+// Done returns the Done channel for this reporter.
 func (r *capturingReporterV2) Done() <-chan struct{} {
-	return r.done
+	return r.doneC
 }
 
 // RunPushMetricSetV2 run the given push metricset for the specific amount of
 // time and returns all of the events and errors that occur during that period.
-func RunPushMetricSetV2(duration time.Duration, metricSet mb.PushMetricSetV2) []mb.Event {
-	r := &capturingReporterV2{done: make(chan struct{})}
+func RunPushMetricSetV2(timeout time.Duration, waitEvents int, metricSet mb.PushMetricSetV2) []mb.Event {
+	var (
+		r      = &capturingReporterV2{doneC: make(chan struct{}), eventsC: make(chan mb.Event)}
+		wg     sync.WaitGroup
+		events []mb.Event
+	)
+	wg.Add(2)
 
-	// Run the metricset.
-	var wg sync.WaitGroup
-	wg.Add(1)
+	// Producer
 	go func() {
 		defer wg.Done()
+		defer close(r.eventsC)
 		metricSet.Run(r)
 	}()
 
-	// Let it run for some period, then stop it by closing the done channel.
-	time.AfterFunc(duration, func() {
-		close(r.done)
-	})
+	// Consumer
+	go func() {
+		defer wg.Done()
+		defer close(r.doneC)
 
-	// Wait for the PushMetricSet to completely stop.
+		timer := time.NewTimer(timeout)
+		defer timer.Stop()
+		for {
+			select {
+			case <-timer.C:
+				return
+			case e := <-r.eventsC:
+				events = append(events, e)
+				if waitEvents > 0 && waitEvents <= len(events) {
+					return
+				}
+			}
+		}
+	}()
+
 	wg.Wait()
-
-	// Return all events and errors that were collected.
-	return r.events
+	return events
 }

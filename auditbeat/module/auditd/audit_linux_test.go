@@ -38,7 +38,7 @@ func TestData(t *testing.T) {
 	auditMetricSet.client.Close()
 	auditMetricSet.client = &libaudit.AuditClient{Netlink: mock}
 
-	events := mbtest.RunPushMetricSetV2(time.Second, ms)
+	events := mbtest.RunPushMetricSetV2(10*time.Second, 1, ms)
 	for _, e := range events {
 		if e.Error != nil {
 			t.Fatalf("received error: %+v", e.Error)
@@ -80,7 +80,7 @@ func TestUnicastClient(t *testing.T) {
 	time.AfterFunc(time.Second, func() { exec.Command("cat", "/proc/self/status").Output() })
 
 	ms := mbtest.NewPushMetricSetV2(t, c)
-	events := mbtest.RunPushMetricSetV2(5*time.Second, ms)
+	events := mbtest.RunPushMetricSetV2(5*time.Second, 0, ms)
 	for _, e := range events {
 		t.Log(e)
 
@@ -124,7 +124,7 @@ func TestMulticastClient(t *testing.T) {
 	time.AfterFunc(time.Second, func() { exec.Command("cat", "/proc/self/status").Output() })
 
 	ms := mbtest.NewPushMetricSetV2(t, c)
-	events := mbtest.RunPushMetricSetV2(5*time.Second, ms)
+	events := mbtest.RunPushMetricSetV2(5*time.Second, 0, ms)
 	for _, e := range events {
 		if e.Error != nil {
 			t.Fatalf("received error: %+v", e.Error)

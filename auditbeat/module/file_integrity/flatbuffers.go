@@ -52,7 +52,7 @@ func fbEncodeEvent(b *flatbuffers.Builder, e *Event) []byte {
 	return b.FinishedBytes()
 }
 
-func fbWriteHash(b *flatbuffers.Builder, hashes map[HashType][]byte) flatbuffers.UOffsetT {
+func fbWriteHash(b *flatbuffers.Builder, hashes map[HashType]Digest) flatbuffers.UOffsetT {
 	if len(hashes) == 0 {
 		return 0
 	}
@@ -65,6 +65,12 @@ func fbWriteHash(b *flatbuffers.Builder, hashes map[HashType][]byte) flatbuffers
 	schema.HashStart(b)
 	for hashType, offset := range offsets {
 		switch hashType {
+		case BLAKE2B_256:
+			schema.HashAddBlake2b256(b, offset)
+		case BLAKE2B_384:
+			schema.HashAddBlake2b384(b, offset)
+		case BLAKE2B_512:
+			schema.HashAddBlake2b512(b, offset)
 		case MD5:
 			schema.HashAddMd5(b, offset)
 		case SHA1:
@@ -111,7 +117,14 @@ func fbWriteMetadata(b *flatbuffers.Builder, m *Metadata) flatbuffers.UOffsetT {
 	if sidOffset > 0 {
 		schema.MetadataAddSid(b, sidOffset)
 	}
-	schema.MetadataAddMode(b, uint32(m.Mode))
+	mode := m.Mode
+	if m.SetUID {
+		mode |= os.ModeSetuid
+	}
+	if m.SetGID {
+		mode |= os.ModeSetgid
+	}
+	schema.MetadataAddMode(b, uint32(mode))
 	switch m.Type {
 	case UnknownType:
 		schema.MetadataAddType(b, schema.TypeUnknown)
@@ -211,16 +224,18 @@ func fbDecodeMetadata(e *schema.Event) *Metadata {
 	if info == nil {
 		return nil
 	}
-
+	mode := os.FileMode(info.Mode())
 	rtn := &Metadata{
-		Inode: info.Inode(),
-		UID:   info.Uid(),
-		GID:   info.Gid(),
-		SID:   string(info.Sid()),
-		Mode:  os.FileMode(info.Mode()),
-		Size:  info.Size(),
-		MTime: time.Unix(0, info.MtimeNs()).UTC(),
-		CTime: time.Unix(0, info.CtimeNs()).UTC(),
+		Inode:  info.Inode(),
+		UID:    info.Uid(),
+		GID:    info.Gid(),
+		SID:    string(info.Sid()),
+		Mode:   mode & ^(os.ModeSetuid | os.ModeSetgid),
+		Size:   info.Size(),
+		MTime:  time.Unix(0, info.MtimeNs()).UTC(),
+		CTime:  time.Unix(0, info.CtimeNs()).UTC(),
+		SetUID: mode&os.ModeSetuid != 0,
+		SetGID: mode&os.ModeSetgid != 0,
 	}
 
 	switch info.Type() {
@@ -237,18 +252,27 @@ func fbDecodeMetadata(e *schema.Event) *Metadata {
 	return rtn
 }
 
-func fbDecodeHash(e *schema.Event) map[HashType][]byte {
+func fbDecodeHash(e *schema.Event) map[HashType]Digest {
 	hash := e.Hashes(nil)
 	if hash == nil {
 		return nil
 	}
 
-	rtn := map[HashType][]byte{}
+	rtn := map[HashType]Digest{}
 	for _, hashType := range validHashes {
 		var length int
 		var producer func(i int) int8
 
 		switch hashType {
+		case BLAKE2B_256:
+			length = hash.Blake2b256Length()
+			producer = hash.Blake2b256
+		case BLAKE2B_384:
+			length = hash.Blake2b384Length()
+			producer = hash.Blake2b384
+		case BLAKE2B_512:
+			length = hash.Blake2b512Length()
+			producer = hash.Blake2b512
 		case MD5:
 			length = hash.Md5Length()
 			producer = hash.Md5

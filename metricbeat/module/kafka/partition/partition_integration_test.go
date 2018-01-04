@@ -40,9 +40,7 @@ func TestTopic(t *testing.T) {
 
 	compose.EnsureUp(t, "kafka")
 
-	if testing.Verbose() {
-		logp.LogInit(logp.LOG_DEBUG, "", false, true, []string{"kafka"})
-	}
+	logp.TestingSetup(logp.WithSelectors("kafka"))
 
 	id := strconv.Itoa(rand.New(rand.NewSource(int64(time.Now().Nanosecond()))).Int())
 	testTopic := fmt.Sprintf("test-metricbeat-%s", id)
