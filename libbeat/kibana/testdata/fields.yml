@@ -27,3 +27,8 @@
       multi_fields:
         - name: keyword
           type: keyword
+
+    - name: blob
+      type: binary
+      description: >
+        Some binary blob.

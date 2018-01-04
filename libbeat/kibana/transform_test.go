@@ -198,11 +198,15 @@ func TestTransformMisc(t *testing.T) {
 		{commonField: common.Field{}, expected: true, attr: "searchable"},
 		{commonField: common.Field{Searchable: &truthy}, expected: true, attr: "searchable"},
 		{commonField: common.Field{Searchable: &falsy}, expected: false, attr: "searchable"},
+		{commonField: common.Field{Type: "binary"}, expected: false, attr: "searchable"},
+		{commonField: common.Field{Searchable: &truthy, Type: "binary"}, expected: false, attr: "searchable"},
 
 		// aggregatable
 		{commonField: common.Field{}, expected: true, attr: "aggregatable"},
 		{commonField: common.Field{Aggregatable: &truthy}, expected: true, attr: "aggregatable"},
 		{commonField: common.Field{Aggregatable: &falsy}, expected: false, attr: "aggregatable"},
+		{commonField: common.Field{Type: "binary"}, expected: false, attr: "aggregatable"},
+		{commonField: common.Field{Aggregatable: &truthy, Type: "binary"}, expected: false, attr: "aggregatable"},
 		{commonField: common.Field{Type: "keyword"}, expected: true, attr: "aggregatable"},
 		{commonField: common.Field{Aggregatable: &truthy, Type: "text"}, expected: false, attr: "aggregatable"},
 		{commonField: common.Field{Type: "text"}, expected: false, attr: "aggregatable"},
@@ -211,6 +215,8 @@ func TestTransformMisc(t *testing.T) {
 		{commonField: common.Field{}, expected: false, attr: "analyzed"},
 		{commonField: common.Field{Analyzed: &truthy}, expected: true, attr: "analyzed"},
 		{commonField: common.Field{Analyzed: &falsy}, expected: false, attr: "analyzed"},
+		{commonField: common.Field{Type: "binary"}, expected: false, attr: "analyzed"},
+		{commonField: common.Field{Analyzed: &truthy, Type: "binary"}, expected: false, attr: "analyzed"},
 
 		// doc_values always set to true except for meta fields
 		{commonField: common.Field{}, expected: true, attr: "doc_values"},
@@ -218,12 +224,19 @@ func TestTransformMisc(t *testing.T) {
 		{commonField: common.Field{DocValues: &falsy}, expected: false, attr: "doc_values"},
 		{commonField: common.Field{Script: "doc[]"}, expected: false, attr: "doc_values"},
 		{commonField: common.Field{DocValues: &truthy, Script: "doc[]"}, expected: false, attr: "doc_values"},
+		{commonField: common.Field{Type: "binary"}, expected: false, attr: "doc_values"},
+		{commonField: common.Field{DocValues: &truthy, Type: "binary"}, expected: true, attr: "doc_values"},
+
+		// indexed
+		{commonField: common.Field{Type: "binary"}, expected: false, attr: "indexed"},
+		{commonField: common.Field{Index: &truthy, Type: "binary"}, expected: false, attr: "indexed"},
 
 		// script, scripted
 		{commonField: common.Field{}, expected: false, attr: "scripted"},
 		{commonField: common.Field{}, expected: nil, attr: "script"},
 		{commonField: common.Field{Script: "doc[]"}, expected: true, attr: "scripted"},
 		{commonField: common.Field{Script: "doc[]"}, expected: "doc[]", attr: "script"},
+		{commonField: common.Field{Type: "binary"}, expected: false, attr: "scripted"},
 
 		// language
 		{commonField: common.Field{}, expected: nil, attr: "lang"},
