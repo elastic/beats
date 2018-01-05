@@ -1,3 +1,5 @@
+// +build darwin freebsd linux windows
+
 package process
 
 import (
