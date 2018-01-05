@@ -22,6 +22,8 @@ var (
 	errNoTimestamp = errors.New("value is no timestamp")
 )
 
+// SetID overwrites the "id" field in the events metadata.
+// If Meta is nil, a new Meta dictionary is created.
 func (e *Event) SetID(id string) {
 	if e.Meta == nil {
 		e.Meta = common.MapStr{}
