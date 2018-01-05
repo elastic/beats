@@ -48,6 +48,8 @@ include::./fields.asciidoc[]
 
 include::./securing-filebeat.asciidoc[]
 
+include::../../libbeat/docs/security/securing-beats.asciidoc[]
+
 include::./troubleshooting.asciidoc[]
 
 include::./faq.asciidoc[]
