@@ -52,5 +52,5 @@ echo "Created upload/{{.beat_name}}-${VERSION}-{{.deb_arch}}.deb"
 
 # create sha512 file
 cd upload
-sha512sum {{.beat_name}}-${VERSION}-{{.deb_arch}}.deb | awk '{print $1;}' > {{.beat_name}}-${VERSION}-{{.deb_arch}}.deb.sha512
+sha512sum {{.beat_name}}-${VERSION}-{{.deb_arch}}.deb > {{.beat_name}}-${VERSION}-{{.deb_arch}}.deb.sha512
 echo "Created upload/{{.beat_name}}-${VERSION}-{{.deb_arch}}.deb.sha512"

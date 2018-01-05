@@ -55,5 +55,5 @@ echo "Created upload/{{.beat_name}}-${VERSION}-{{.rpm_arch}}.rpm"
 
 # create sha512 file
 cd upload
-sha512sum {{.beat_name}}-${VERSION}-{{.rpm_arch}}.rpm | awk '{print $1;}' > {{.beat_name}}-${VERSION}-{{.rpm_arch}}.rpm.sha512
+sha512sum {{.beat_name}}-${VERSION}-{{.rpm_arch}}.rpm > {{.beat_name}}-${VERSION}-{{.rpm_arch}}.rpm.sha512
 echo "Created upload/{{.beat_name}}-${VERSION}-{{.rpm_arch}}.rpm.sha512"
