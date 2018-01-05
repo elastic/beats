@@ -22,6 +22,13 @@ var (
 	errNoTimestamp = errors.New("value is no timestamp")
 )
 
+func (e *Event) SetID(id string) {
+	if e.Meta == nil {
+		e.Meta = common.MapStr{}
+	}
+	e.Meta["id"] = id
+}
+
 func (e *Event) GetValue(key string) (interface{}, error) {
 	if key == "@timestamp" {
 		return e.Timestamp, nil
