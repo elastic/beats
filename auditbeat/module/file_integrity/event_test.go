@@ -6,6 +6,7 @@ import (
 	"fmt"
 	"io/ioutil"
 	"os"
+	"runtime"
 	"testing"
 	"time"
 
@@ -261,6 +262,7 @@ func TestBuildEvent(t *testing.T) {
 	t.Run("all fields", func(t *testing.T) {
 		e := testEvent()
 		e.TargetPath = "link_target"
+		e.Info.SID = "S-123-4"
 		e.Info.Owner = "beats"
 		e.Info.Group = "staff"
 		e.Info.SetUID = true
@@ -275,17 +277,19 @@ func TestBuildEvent(t *testing.T) {
 		assertHasKey(t, fields, "file.target_path")
 		assertHasKey(t, fields, "file.inode")
 		assertHasKey(t, fields, "file.uid")
-		assertHasKey(t, fields, "file.gid")
 		assertHasKey(t, fields, "file.owner")
 		assertHasKey(t, fields, "file.group")
 		assertHasKey(t, fields, "file.size")
 		assertHasKey(t, fields, "file.mtime")
 		assertHasKey(t, fields, "file.ctime")
 		assertHasKey(t, fields, "file.type")
-		assertHasKey(t, fields, "file.mode")
 		assertHasKey(t, fields, "file.setuid")
 		assertHasKey(t, fields, "file.setgid")
 		assertHasKey(t, fields, "file.origin")
+		if runtime.GOOS != "windows" {
+			assertHasKey(t, fields, "file.gid")
+			assertHasKey(t, fields, "file.mode")
+		}
 
 		assertHasKey(t, fields, "hash.sha1")
 		assertHasKey(t, fields, "hash.sha256")
