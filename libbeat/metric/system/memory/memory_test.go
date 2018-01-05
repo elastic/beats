@@ -13,7 +13,7 @@ import (
 )
 
 func TestGetMemory(t *testing.T) {
-	mem, err := GetMemory()
+	mem, err := Get()
 
 	assert.NotNil(t, mem)
 	assert.Nil(t, err)
