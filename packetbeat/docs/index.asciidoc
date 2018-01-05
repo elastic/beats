@@ -43,6 +43,8 @@ include::./fields.asciidoc[]
 
 include::./securing-packetbeat.asciidoc[]
 
+include::../../libbeat/docs/security/securing-beats.asciidoc[]
+
 include::./visualizing-data-packetbeat.asciidoc[]
 
 include::./filtering.asciidoc[]

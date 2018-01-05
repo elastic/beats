@@ -1,8 +1,0 @@
-
-include::visualizing-data-packetbeat.asciidoc[]
-
-include::filtering.asciidoc[]
-
-include::troubleshooting.asciidoc[]
-
-include::faq.asciidoc[]
