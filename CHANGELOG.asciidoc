@@ -158,6 +158,7 @@ https://github.com/elastic/beats/compare/v6.0.0-beta2...master[Check the HEAD di
 - Add field network_names of hosts and virtual machines. {issue}5646[5646]
 - Update gosigar to v0.6.0. {pull}5775[5775]
 - Add experimental system/raid metricset. {pull}5642[5642]
+- Add a dashboard for the Nginx module. {pull}5991[5991]
 
 *Packetbeat*
 
