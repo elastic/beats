@@ -29,7 +29,7 @@ output.elasticsearch:
 Elasticsearch doesn't have built-in basic authentication, but you can achieve it
 either by using a web proxy or by using X-Pack to secure Elasticsearch. For more
 information, see the X-Pack documentation about
-{securitydoc}/xpack-security.html[securing Elasticsearch]. 
+{securitydoc}/xpack-security.html[securing Elasticsearch] and <<securing-beats>>. 
 
 {beatname_uc} verifies the validity of the server certificates and only accepts trusted
 certificates. Creating a correct SSL/TLS infrastructure is outside the scope of
