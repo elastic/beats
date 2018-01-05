@@ -11,7 +11,7 @@ filebeat.autodiscover:
               docker.container.image: redis
           config:
             - type: docker
-              container.ids:
+              containers.ids:
                 - "${data.docker.container.id}"
               exclude_lines: ["^\\s+[\\-`('.|_]"]  # drop asciiart lines
 -------------------------------------------------------------------------------------
@@ -34,6 +34,6 @@ filebeat.autodiscover:
               log:
                 prospector:
                   type: docker
-                  container.ids:
+                  containers.ids:
                     - "${data.docker.container.id}"
 -------------------------------------------------------------------------------------
