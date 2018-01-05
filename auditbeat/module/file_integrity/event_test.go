@@ -1,6 +1,7 @@
 package file_integrity
 
 import (
+	"bytes"
 	"encoding/hex"
 	"fmt"
 	"io/ioutil"
@@ -8,9 +9,9 @@ import (
 	"testing"
 	"time"
 
-	"bytes"
-
 	"github.com/stretchr/testify/assert"
+
+	"github.com/elastic/beats/libbeat/common"
 )
 
 var testEventTime = time.Now().UTC()
@@ -257,22 +258,54 @@ func BenchmarkHashFile(b *testing.B) {
 }
 
 func TestBuildEvent(t *testing.T) {
+	t.Run("all fields", func(t *testing.T) {
+		e := testEvent()
+		e.TargetPath = "link_target"
+		e.Info.Owner = "beats"
+		e.Info.Group = "staff"
+		e.Info.SetUID = true
+		e.Info.Origin = []string{"google.com"}
+
+		fields := buildMetricbeatEvent(e, false).MetricSetFields
+		assert.Equal(t, testEventTime, e.Timestamp)
+
+		assertHasKey(t, fields, "event.action")
+
+		assertHasKey(t, fields, "file.path")
+		assertHasKey(t, fields, "file.target_path")
+		assertHasKey(t, fields, "file.inode")
+		assertHasKey(t, fields, "file.uid")
+		assertHasKey(t, fields, "file.gid")
+		assertHasKey(t, fields, "file.owner")
+		assertHasKey(t, fields, "file.group")
+		assertHasKey(t, fields, "file.size")
+		assertHasKey(t, fields, "file.mtime")
+		assertHasKey(t, fields, "file.ctime")
+		assertHasKey(t, fields, "file.type")
+		assertHasKey(t, fields, "file.mode")
+		assertHasKey(t, fields, "file.setuid")
+		assertHasKey(t, fields, "file.setgid")
+		assertHasKey(t, fields, "file.origin")
+
+		assertHasKey(t, fields, "hash.sha1")
+		assertHasKey(t, fields, "hash.sha256")
+	})
 	t.Run("no setuid/setgid", func(t *testing.T) {
 		e := testEvent()
 		e.Info.SetGID = false
 		fields := buildMetricbeatEvent(e, false).MetricSetFields
-		_, err := fields.GetValue("setuid")
+		_, err := fields.GetValue("file.setuid")
 		assert.Error(t, err)
-		_, err = fields.GetValue("setgid")
+		_, err = fields.GetValue("file.setgid")
 		assert.Error(t, err)
 	})
 	t.Run("setgid set", func(t *testing.T) {
 		e := testEvent()
 		fields := buildMetricbeatEvent(e, false).MetricSetFields
-		_, err := fields.GetValue("setuid")
+		_, err := fields.GetValue("file.setuid")
 		assert.Error(t, err)
 
-		setgid, err := fields.GetValue("setgid")
+		setgid, err := fields.GetValue("file.setgid")
 		if err != nil {
 			t.Fatal(err)
 		}
@@ -285,10 +318,10 @@ func TestBuildEvent(t *testing.T) {
 		e.Info.SetUID = true
 		e.Info.SetGID = false
 		fields := buildMetricbeatEvent(e, false).MetricSetFields
-		_, err := fields.GetValue("setgid")
+		_, err := fields.GetValue("file.setgid")
 		assert.Error(t, err)
 
-		setgid, err := fields.GetValue("setuid")
+		setgid, err := fields.GetValue("file.setuid")
 		if err != nil {
 			t.Fatal(err)
 		}
@@ -296,11 +329,11 @@ func TestBuildEvent(t *testing.T) {
 		assert.True(t, ok)
 		assert.True(t, flag)
 	})
-	t.Run("both set", func(t *testing.T) {
+	t.Run("setuid and setgid set", func(t *testing.T) {
 		e := testEvent()
 		e.Info.SetUID = true
 		fields := buildMetricbeatEvent(e, false).MetricSetFields
-		setuid, err := fields.GetValue("setgid")
+		setuid, err := fields.GetValue("file.setgid")
 		if err != nil {
 			t.Fatal(err)
 		}
@@ -308,7 +341,7 @@ func TestBuildEvent(t *testing.T) {
 		assert.True(t, ok)
 		assert.True(t, flag)
 
-		setgid, err := fields.GetValue("setuid")
+		setgid, err := fields.GetValue("file.setuid")
 		if err != nil {
 			t.Fatal(err)
 		}
@@ -324,4 +357,12 @@ func mustDecodeHex(v string) []byte {
 		panic(fmt.Errorf("invalid hex value: %v", err))
 	}
 	return data
+}
+
+func assertHasKey(t testing.TB, m common.MapStr, key string) {
+	t.Helper()
+	found, err := m.HasKey(key)
+	if err != nil || !found {
+		t.Errorf("key %v not found: %v", key, err)
+	}
 }
