@@ -76,28 +76,28 @@ func TestProcState(t *testing.T) {
 }
 
 func TestMatchProcs(t *testing.T) {
-	var procStats = ProcStats{}
+	var procStats = Stats{}
 
 	procStats.Procs = []string{".*"}
-	err := procStats.InitProcStats()
+	err := procStats.Init()
 	assert.NoError(t, err)
 
-	assert.True(t, procStats.MatchProcess("metricbeat"))
+	assert.True(t, procStats.matchProcess("metricbeat"))
 
 	procStats.Procs = []string{"metricbeat"}
-	err = procStats.InitProcStats()
+	err = procStats.Init()
 	assert.NoError(t, err)
-	assert.False(t, procStats.MatchProcess("burn"))
+	assert.False(t, procStats.matchProcess("burn"))
 
 	// match no processes
 	procStats.Procs = []string{"$^"}
-	err = procStats.InitProcStats()
+	err = procStats.Init()
 	assert.NoError(t, err)
-	assert.False(t, procStats.MatchProcess("burn"))
+	assert.False(t, procStats.matchProcess("burn"))
 }
 
 func TestProcMemPercentage(t *testing.T) {
-	procStats := ProcStats{}
+	procStats := Stats{}
 
 	p := Process{
 		Pid: 3456,
@@ -136,9 +136,10 @@ func TestProcCpuPercentage(t *testing.T) {
 	NumCPU = 48
 	defer func() { NumCPU = runtime.NumCPU() }()
 
-	totalPercentNormalized, totalPercent := GetProcCpuPercentage(p1, p2)
+	totalPercentNormalized, totalPercent, totalValue := GetProcCPUPercentage(p1, p2)
 	assert.EqualValues(t, 0.0721, totalPercentNormalized)
 	assert.EqualValues(t, 3.459, totalPercent)
+	assert.EqualValues(t, 14841, totalValue)
 }
 
 // BenchmarkGetProcess runs a benchmark of the GetProcess method with caching
@@ -229,78 +230,78 @@ func TestIncludeTopProcesses(t *testing.T) {
 
 	tests := []struct {
 		Name         string
-		Cfg          includeTopConfig
+		Cfg          IncludeTopConfig
 		ExpectedPids []int
 	}{
 		{
 			Name:         "top 2 processes by CPU",
-			Cfg:          includeTopConfig{Enabled: true, ByCPU: 2},
+			Cfg:          IncludeTopConfig{Enabled: true, ByCPU: 2},
 			ExpectedPids: []int{7, 10},
 		},
 		{
 			Name:         "top 4 processes by CPU",
-			Cfg:          includeTopConfig{Enabled: true, ByCPU: 4},
+			Cfg:          IncludeTopConfig{Enabled: true, ByCPU: 4},
 			ExpectedPids: []int{7, 10, 8, 9},
 		},
 		{
 			Name:         "top 2 processes by memory",
-			Cfg:          includeTopConfig{Enabled: true, ByMemory: 2},
+			Cfg:          IncludeTopConfig{Enabled: true, ByMemory: 2},
 			ExpectedPids: []int{8, 7},
 		},
 		{
 			Name:         "top 4 processes by memory",
-			Cfg:          includeTopConfig{Enabled: true, ByMemory: 4},
+			Cfg:          IncludeTopConfig{Enabled: true, ByMemory: 4},
 			ExpectedPids: []int{8, 7, 5, 4},
 		},
 		{
 			Name:         "top 2 processes by CPU + top 2 by memory",
-			Cfg:          includeTopConfig{Enabled: true, ByCPU: 2, ByMemory: 2},
+			Cfg:          IncludeTopConfig{Enabled: true, ByCPU: 2, ByMemory: 2},
 			ExpectedPids: []int{7, 10, 8},
 		},
 		{
 			Name:         "top 4 processes by CPU + top 4 by memory",
-			Cfg:          includeTopConfig{Enabled: true, ByCPU: 4, ByMemory: 4},
+			Cfg:          IncludeTopConfig{Enabled: true, ByCPU: 4, ByMemory: 4},
 			ExpectedPids: []int{7, 10, 8, 9, 5, 4},
 		},
 		{
 			Name:         "enabled false",
-			Cfg:          includeTopConfig{Enabled: false, ByCPU: 4, ByMemory: 4},
+			Cfg:          IncludeTopConfig{Enabled: false, ByCPU: 4, ByMemory: 4},
 			ExpectedPids: []int{1, 2, 3, 4, 5, 6, 7, 8, 9, 10},
 		},
 		{
 			Name:         "enabled true but cpu & mem not configured",
-			Cfg:          includeTopConfig{Enabled: true},
+			Cfg:          IncludeTopConfig{Enabled: true},
 			ExpectedPids: []int{1, 2, 3, 4, 5, 6, 7, 8, 9, 10},
 		},
 		{
 			Name:         "top 12 by cpu (out of 10)",
-			Cfg:          includeTopConfig{Enabled: true, ByCPU: 12},
+			Cfg:          IncludeTopConfig{Enabled: true, ByCPU: 12},
 			ExpectedPids: []int{1, 2, 3, 4, 5, 6, 7, 8, 9, 10},
 		},
 		{
 			Name:         "top 12 by cpu and top 14 memory (out of 10)",
-			Cfg:          includeTopConfig{Enabled: true, ByCPU: 12, ByMemory: 14},
+			Cfg:          IncludeTopConfig{Enabled: true, ByCPU: 12, ByMemory: 14},
 			ExpectedPids: []int{1, 2, 3, 4, 5, 6, 7, 8, 9, 10},
 		},
 		{
 			Name:         "top 14 by cpu and top 12 memory (out of 10)",
-			Cfg:          includeTopConfig{Enabled: true, ByCPU: 14, ByMemory: 12},
+			Cfg:          IncludeTopConfig{Enabled: true, ByCPU: 14, ByMemory: 12},
 			ExpectedPids: []int{1, 2, 3, 4, 5, 6, 7, 8, 9, 10},
 		},
 		{
 			Name:         "top 1 by cpu and top 3 memory",
-			Cfg:          includeTopConfig{Enabled: true, ByCPU: 1, ByMemory: 3},
+			Cfg:          IncludeTopConfig{Enabled: true, ByCPU: 1, ByMemory: 3},
 			ExpectedPids: []int{5, 7, 8},
 		},
 		{
 			Name:         "top 3 by cpu and top 1 memory",
-			Cfg:          includeTopConfig{Enabled: true, ByCPU: 3, ByMemory: 1},
+			Cfg:          IncludeTopConfig{Enabled: true, ByCPU: 3, ByMemory: 1},
 			ExpectedPids: []int{7, 8, 10},
 		},
 	}
 
 	for _, test := range tests {
-		procStats := ProcStats{IncludeTop: test.Cfg}
+		procStats := Stats{IncludeTop: test.Cfg}
 		res := procStats.includeTopProcesses(processes)
 
 		resPids := []int{}

@@ -9717,6 +9717,14 @@ The percentage of CPU time spent in non-idle state.
 
 
 [float]
+=== `system.cpu.total.value`
+
+type: long
+
+The value of CPU usage since starting the process.
+
+
+[float]
 === `system.cpu.user.ticks`
 
 type: long
@@ -10480,6 +10488,14 @@ CPU-specific statistics per process.
 type: long
 
 The amount of CPU time the process spent in user space.
+
+
+[float]
+=== `system.process.cpu.total.value`
+
+type: long
+
+The value of CPU usage since starting the process.
 
 
 [float]

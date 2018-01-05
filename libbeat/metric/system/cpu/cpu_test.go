@@ -1,11 +1,9 @@
 // +build !integration
 // +build darwin freebsd linux openbsd windows
 
-package system
+package cpu
 
 import (
-	"bytes"
-	"io/ioutil"
 	"runtime"
 	"testing"
 
@@ -14,8 +12,8 @@ import (
 	"github.com/elastic/gosigar"
 )
 
-func TestCPUMonitorSample(t *testing.T) {
-	cpu := &CPUMonitor{lastSample: &gosigar.Cpu{}}
+func TestMonitorSample(t *testing.T) {
+	cpu := &Monitor{lastSample: &gosigar.Cpu{}}
 	s, err := cpu.Sample()
 	if err != nil {
 		t.Fatal(err)
@@ -39,8 +37,8 @@ func TestCPUMonitorSample(t *testing.T) {
 	assert.True(t, ticks.System > 0)
 }
 
-func TestCPUCoresMonitorSample(t *testing.T) {
-	cores := &CPUCoresMonitor{lastSample: make([]gosigar.Cpu, NumCPU)}
+func TestCoresMonitorSample(t *testing.T) {
+	cores := &CoresMonitor{lastSample: make([]gosigar.Cpu, NumCores)}
 	sample, err := cores.Sample()
 	if err != nil {
 		t.Fatal(err)
@@ -63,10 +61,10 @@ func TestCPUCoresMonitorSample(t *testing.T) {
 	}
 }
 
-// TestCPUMetricsRounding tests that the returned percentages are rounded to
+// TestMetricsRounding tests that the returned percentages are rounded to
 // four decimal places.
-func TestCPUMetricsRounding(t *testing.T) {
-	sample := CPUMetrics{
+func TestMetricsRounding(t *testing.T) {
+	sample := Metrics{
 		previousSample: &gosigar.Cpu{
 			User: 10855311,
 			Sys:  2021040,
@@ -84,11 +82,11 @@ func TestCPUMetricsRounding(t *testing.T) {
 	assert.Equal(t, pct.System, 0.0448)
 }
 
-// TestCPUMetricsPercentages tests that CPUMetrics returns the correct
+// TestMetricsPercentages tests that Metrics returns the correct
 // percentages and normalized percentages.
-func TestCPUMetricsPercentages(t *testing.T) {
-	NumCPU = 10
-	defer func() { NumCPU = runtime.NumCPU() }()
+func TestMetricsPercentages(t *testing.T) {
+	NumCores = 10
+	defer func() { NumCores = runtime.NumCPU() }()
 
 	// This test simulates 30% user and 70% system (normalized), or 3% and 7%
 	// respectively when there are 10 CPUs.
@@ -106,7 +104,7 @@ func TestCPUMetricsPercentages(t *testing.T) {
 		Idle: s0.Idle,
 		Nice: 0,
 	}
-	sample := CPUMetrics{
+	sample := Metrics{
 		previousSample: &s0,
 		currentSample:  &s1,
 	}
@@ -118,32 +116,8 @@ func TestCPUMetricsPercentages(t *testing.T) {
 	assert.EqualValues(t, 1., pct.Total)
 
 	pct = sample.Percentages()
-	assert.EqualValues(t, .3*float64(NumCPU), pct.User)
-	assert.EqualValues(t, .7*float64(NumCPU), pct.System)
-	assert.EqualValues(t, .0*float64(NumCPU), pct.Idle)
-	assert.EqualValues(t, 1.*float64(NumCPU), pct.Total)
-}
-
-func TestRound(t *testing.T) {
-	assert.EqualValues(t, 0.5, Round(0.5))
-	assert.EqualValues(t, 0.5, Round(0.50004))
-	assert.EqualValues(t, 0.5001, Round(0.50005))
-
-	assert.EqualValues(t, 1234.5, Round(1234.5))
-	assert.EqualValues(t, 1234.5, Round(1234.50004))
-	assert.EqualValues(t, 1234.5001, Round(1234.50005))
-}
-
-// Checks that the Host Overview dashboard contains the CHANGEME_HOSTNAME variable
-// that the dashboard loader code magically changes to the hostname on which the Beat
-// is running.
-func TestHostDashboardHasChangeableHost(t *testing.T) {
-	dashPath := "_meta/kibana/6/dashboard/Metricbeat-host-overview.json"
-	contents, err := ioutil.ReadFile(dashPath)
-	if err != nil {
-		t.Fatalf("Error reading file %s: %v", dashPath, err)
-	}
-	if !bytes.Contains(contents, []byte("CHANGEME_HOSTNAME")) {
-		t.Errorf("Dashboard '%s' doesn't contain string 'CHANGEME_HOSTNAME'. See elastic/beats#5340", dashPath)
-	}
+	assert.EqualValues(t, .3*float64(NumCores), pct.User)
+	assert.EqualValues(t, .7*float64(NumCores), pct.System)
+	assert.EqualValues(t, .0*float64(NumCores), pct.Idle)
+	assert.EqualValues(t, 1.*float64(NumCores), pct.Total)
 }
