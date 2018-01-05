@@ -378,7 +378,7 @@ func (procStats *Stats) Get() ([]common.MapStr, error) {
 
 		process, err := newProcess(pid, cmdline, env)
 		if err != nil {
-			logp.Debug("metricbeat", "Skip process pid=%d: %v", pid, err)
+			logp.Debug("processes", "Skip process pid=%d: %v", pid, err)
 			continue
 		}
 
