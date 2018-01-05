@@ -2172,7 +2172,7 @@ The path to the file.
 
 type: keyword
 
-The path to the file. This is an non-analyzed field that is useful for aggregations.
+The path to the file. This is a non-analyzed field that is useful for aggregations.
 
 
 [float]
@@ -2276,9 +2276,17 @@ The last change time of the file (time when metadata was changed).
 [float]
 === `file.origin`
 
-type: keyword
+type: text
 
 An array of strings describing a possible external origin for this file. For example, the URL it was downloaded from. Only supported in macOS, via the kMDItemWhereFroms attribute. Omitted if origin information is not available.
+
+
+[float]
+=== `file.origin.raw`
+
+type: keyword
+
+This is a non-analyzed field that is useful for aggregations on the origin data.
 
 
 [float]

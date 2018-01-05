@@ -21,7 +21,7 @@
       - name: raw
         type: keyword
         description: >
-          The path to the file. This is an non-analyzed field that is useful
+          The path to the file. This is a non-analyzed field that is useful
           for aggregations.
 
     - name: target_path
@@ -81,12 +81,18 @@
       description: The last change time of the file (time when metadata was changed).
 
     - name: origin
-      type: keyword
+      type: text
       description: >
           An array of strings describing a possible external origin for
           this file. For example, the URL it was downloaded from. Only
           supported in macOS, via the kMDItemWhereFroms attribute.
           Omitted if origin information is not available.
+      multi_fields:
+      - name: raw
+        type: keyword
+        description: >
+          This is a non-analyzed field that is useful for aggregations on the
+          origin data.
 
   - name: hash
     type: group
