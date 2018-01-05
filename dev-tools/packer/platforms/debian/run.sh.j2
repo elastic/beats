@@ -50,7 +50,7 @@ mkdir -p upload
 mv {{.beat_pkg_name}}_${VERSION}_{{.deb_arch}}.deb upload/{{.beat_name}}-${VERSION}-{{.deb_arch}}.deb
 echo "Created upload/{{.beat_name}}-${VERSION}-{{.deb_arch}}.deb"
 
-# create sha1 file
+# create sha512 file
 cd upload
-sha1sum {{.beat_name}}-${VERSION}-{{.deb_arch}}.deb | awk '{print $1;}' > {{.beat_name}}-${VERSION}-{{.deb_arch}}.deb.sha1
-echo "Created upload/{{.beat_name}}-${VERSION}-{{.deb_arch}}.deb.sha1"
+sha512sum {{.beat_name}}-${VERSION}-{{.deb_arch}}.deb > {{.beat_name}}-${VERSION}-{{.deb_arch}}.deb.sha512
+echo "Created upload/{{.beat_name}}-${VERSION}-{{.deb_arch}}.deb.sha512"
