@@ -29,6 +29,8 @@ include::./fields.asciidoc[]
 
 include::./securing-auditbeat.asciidoc[]
 
+include::../../libbeat/docs/security/securing-beats.asciidoc[]
+
 include::./troubleshooting.asciidoc[]
 
 include::./faq.asciidoc[]
