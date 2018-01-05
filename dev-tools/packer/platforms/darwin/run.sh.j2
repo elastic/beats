@@ -23,5 +23,5 @@ tar czvf upload/{{.beat_name}}-${VERSION}-darwin-x86_64.tar.gz /{{.beat_name}}-$
 echo "Created upload/{{.beat_name}}-${VERSION}-darwin-x86_64.tar.gz"
 
 cd upload
-sha1sum {{.beat_name}}-${VERSION}-darwin-x86_64.tar.gz | awk '{print $1;}' > {{.beat_name}}-${VERSION}-darwin-x86_64.tar.gz.sha1
-echo "Created upload/{{.beat_name}}-${VERSION}-darwin-x86_64.tar.gz.sha1"
+sha512sum {{.beat_name}}-${VERSION}-darwin-x86_64.tar.gz | awk '{print $1;}' > {{.beat_name}}-${VERSION}-darwin-x86_64.tar.gz.sha512
+echo "Created upload/{{.beat_name}}-${VERSION}-darwin-x86_64.tar.gz.sha512"
