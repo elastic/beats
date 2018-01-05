@@ -44,6 +44,8 @@ include::./fields.asciidoc[]
 
 include::./securing-heartbeat.asciidoc[]
 
+include::../../libbeat/docs/security/securing-beats.asciidoc[]
+
 include::./troubleshooting.asciidoc[]
 
 include::./faq.asciidoc[]
