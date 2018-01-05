@@ -90,7 +90,7 @@ The event that's sent to Elasticsearch should now include a
 
 To visualize the location of your Packetbeat clients, you can either
 <<load-kibana-dashboards,set up the example Kibana dashboards>> (if
-you haven't already), or create a new {kibanadoc}/tilemap.html[Tile map] in
+you haven't already), or create a new {kibana-ref}/tilemap.html[Tile map] in
 Kibana and use the `client_geoip.location` field as the Geohash.
 
 image:./images/kibana-update-map.png[Update Packetbeat client location map in Kibana]
