@@ -83,10 +83,10 @@ type bulkCreateAction struct {
 }
 
 type bulkEventMeta struct {
-	Index    string      `json:"_index" struct:"_index"`
-	DocType  string      `json:"_type" struct:"_type"`
-	Pipeline string      `json:"pipeline,omitempty" struct:"pipeline,omitempty"`
-	ID       interface{} `json:"_id,omitempty" struct:"_id,omitempty"`
+	Index    string `json:"_index" struct:"_index"`
+	DocType  string `json:"_type" struct:"_type"`
+	Pipeline string `json:"pipeline,omitempty" struct:"pipeline,omitempty"`
+	ID       string `json:"_id,omitempty" struct:"_id,omitempty"`
 }
 
 type bulkResultStats struct {
@@ -348,7 +348,7 @@ func bulkEncodePublishRequest(
 		event := &data[i].Content
 		meta, err := createEventBulkMeta(index, pipeline, event)
 		if err != nil {
-			logp.Err("Failed to encode event meta dat: %s", err)
+			logp.Err("Failed to encode event meta data: %s", err)
 			continue
 		}
 		if err := body.Add(meta, event); err != nil {
@@ -377,9 +377,15 @@ func createEventBulkMeta(
 		return nil, err
 	}
 
-	var id interface{}
+	var id string
 	if m := event.Meta; m != nil {
-		id = m["id"]
+		if tmp := m["id"]; tmp != nil {
+			if s, ok := tmp.(string); ok {
+				id = s
+			} else {
+				logp.Err("Event ID '%v' is no string value", id)
+			}
+		}
 	}
 
 	meta := bulkEventMeta{
@@ -389,7 +395,7 @@ func createEventBulkMeta(
 		ID:       id,
 	}
 
-	if id != nil {
+	if id != "" {
 		return bulkCreateAction{meta}, nil
 	}
 	return bulkIndexAction{meta}, nil
