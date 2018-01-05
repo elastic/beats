@@ -38,6 +38,7 @@ https://github.com/elastic/beats/compare/v6.0.0-beta2...master[Check the HEAD di
 - Rename `http.response.status_code` field to `http.response.code`. {pull}5521[5521]
 - Rename `golang.heap.system.optained` field to `golang.heap.system.obtained`. {issue}5703[5703]
 - Support haproxy stats gathering using http (additionaly to tcp socket). {pull}5819[5819]
+- De dot keys in jolokia/jmx metricset to prevent collisions. {pull}5957[5957]
 
 *Packetbeat*
 
