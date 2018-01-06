@@ -1,9 +1,11 @@
-import os, logging
+import os
+import logging
 import metricbeat
 import unittest
 from nose.plugins.attrib import attr
 
 logger = logging.getLogger(__name__)
+
 
 class Test(metricbeat.BaseTest):
 
