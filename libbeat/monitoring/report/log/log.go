@@ -154,7 +154,9 @@ func makeDeltaSnapshot(prev, cur monitoring.FlatSnapshot) monitoring.FlatSnapsho
 	}
 
 	for k, f := range cur.Floats {
-		if p := prev.Floats[k]; p != f {
+		if _, found := gauges[k]; found {
+			delta.Floats[k] = f
+		} else if p := prev.Floats[k]; p != f {
 			delta.Floats[k] = f - p
 		}
 	}
