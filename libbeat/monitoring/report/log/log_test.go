@@ -18,11 +18,19 @@ var (
 			"count": 10,
 			"gone":  1,
 		},
+		Floats: map[string]float64{
+			"system.load.1": 2.0,
+			"float_counter": 1,
+		},
 	}
 	curSnap = monitoring.FlatSnapshot{
 		Ints: map[string]int64{
 			"count": 20,
 			"new":   1,
+		},
+		Floats: map[string]float64{
+			"system.load.1": 1.2,
+			"float_counter": 3,
 		},
 	}
 )
@@ -40,6 +48,8 @@ func TestMakeDeltaSnapshot(t *testing.T) {
 	delta := makeDeltaSnapshot(prevSnap, curSnap)
 	assert.EqualValues(t, 10, delta.Ints["count"])
 	assert.EqualValues(t, 1, delta.Ints["new"])
+	assert.EqualValues(t, 1.2, delta.Floats["system.load.1"])
+	assert.EqualValues(t, 2, delta.Floats["float_counter"])
 	assert.NotContains(t, delta.Ints, "gone")
 }
 
