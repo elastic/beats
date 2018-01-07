@@ -59,6 +59,9 @@ https://github.com/elastic/beats/compare/v6.0.0-beta2...master[Check the HEAD di
 
 *Auditbeat*
 
+- Add an error check to the file integrity scanner to prevent a panic when
+  there is an error reading file info via lstat. {issue}6005[6005]
+
 *Filebeat*
 
 - Add support for adding string tags {pull}5395{5395}
