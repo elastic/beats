@@ -106,6 +106,14 @@ func (s *scanner) walkDir(dir string) error {
 	err := filepath.Walk(dir, func(path string, info os.FileInfo, err error) error {
 		defer func() { startTime = time.Now() }()
 
+		if err != nil {
+			if !os.IsNotExist(err) {
+				logp.Warn("%v Scanner is skipping a path=%v because of an error: %v",
+					s.logPrefix, path, err)
+			}
+			return nil
+		}
+
 		event := s.newScanEvent(path, info, err)
 		event.rtt = time.Since(startTime)
 		select {

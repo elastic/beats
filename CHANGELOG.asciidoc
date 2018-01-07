@@ -32,6 +32,9 @@ https://github.com/elastic/beats/compare/v6.1.1...6.1[Check the HEAD diff]
 
 *Auditbeat*
 
+- Add an error check to the file integrity scanner to prevent a panic when
+  there is an error reading file info via lstat. {issue}6005[6005]
+
 *Filebeat*
 
 *Heartbeat*
