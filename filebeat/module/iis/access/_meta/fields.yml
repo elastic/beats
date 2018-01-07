@@ -52,6 +52,36 @@
       type: long
       description: >
         The request time in milliseconds.
+    - name: site_name
+      type: keyword
+      description: >
+        The site name and instance number.
+    - name: server_name
+      type: keyword
+      description: >
+        The name of the server on which the log file entry was generated.
+    - name: http_version
+      type: keyword
+      description: >
+        The HTTP version.
+    - name: cookie
+      type: keyword
+      description: >
+        The content of the cookie sent or received, if any.
+    - name: hostname
+      type: keyword
+      description: >
+        The host header name, if any.
+    - name: body_sent.bytes
+      type: long
+      format: bytes
+      description: >
+        The number of bytes of the server response body.
+    - name: body_received.bytes
+      type: long
+      format: bytes
+      description: >
+        The number of bytes of the server request body.
     - name: agent
       type: text
       description: >
