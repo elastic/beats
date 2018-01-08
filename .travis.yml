@@ -63,11 +63,10 @@ jobs:
       env: TARGETS="-C libbeat testsuite"
       go: $GO_VERSION
       stage: test
-      # Skip tests: see https://github.com/elastic/beats/issues/5984
-      #    - os: linux
-      #      env: TARGETS="-C libbeat crosscompile"
-      #      go: $GO_VERSION
-      #      stage: test
+    - os: linux
+      env: TARGETS="-C libbeat crosscompile"
+      go: $GO_VERSION
+      stage: test
     - os: linux
       env: TARGETS="-C libbeat stress-tests"
       go: $GO_VERSION
@@ -82,11 +81,10 @@ jobs:
       env: TARGETS="TEST_ENVIRONMENT=0 -C metricbeat testsuite"
       go: $GO_VERSION
       stage: test
-      # Skip tests: see https://github.com/elastic/beats/issues/5984
-      #    - os: linux
-      #      env: TARGETS="-C metricbeat crosscompile"
-      #      go: $GO_VERSION
-      #      stage: test
+    - os: linux
+      env: TARGETS="-C metricbeat crosscompile"
+      go: $GO_VERSION
+      stage: test
 
     # Packetbeat
     - os: linux

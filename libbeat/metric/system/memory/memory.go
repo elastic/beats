@@ -1,3 +1,5 @@
+// +build darwin freebsd linux openbsd windows
+
 package memory
 
 import (
