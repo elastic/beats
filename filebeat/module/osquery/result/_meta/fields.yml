@@ -20,7 +20,7 @@
     - name: unix_time
       type: long
       description: >
-        Unix timestamp of the event. Used for computing the `@timestamp` column.
+        Unix timestamp of the event, in seconds since the epoch. Used for computing the `@timestamp` column.
     - name: calendar_time
       tupe: keyword
       description: >
