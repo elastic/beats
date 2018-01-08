@@ -352,7 +352,7 @@ func (procStats *Stats) Init() error {
 	return nil
 }
 
-// Get fetches process data which matche the provided regexes from the host.
+// Get fetches process data which matches the provided regexes from the host.
 func (procStats *Stats) Get() ([]common.MapStr, error) {
 	if len(procStats.Procs) == 0 {
 		return nil, nil
@@ -367,33 +367,11 @@ func (procStats *Stats) Get() ([]common.MapStr, error) {
 	newProcs := make(ProcsMap, len(pids))
 
 	for _, pid := range pids {
-		var cmdline string
-		var env common.MapStr
-		if previousProc := procStats.ProcsMap[pid]; previousProc != nil {
-			if procStats.CacheCmdLine {
-				cmdline = previousProc.CmdLine
-			}
-			env = previousProc.Env
-		}
-
-		process, err := newProcess(pid, cmdline, env)
-		if err != nil {
-			logp.Debug("processes", "Skip process pid=%d: %v", pid, err)
+		process := procStats.getSingleProcess(pid, newProcs)
+		if process == nil {
 			continue
 		}
-
-		if procStats.matchProcess(process.Name) {
-			err = process.getDetails(procStats.isWhitelistedEnvVar)
-			if err != nil {
-				logp.Err("Error getting process details. pid=%d: %v", process.Pid, err)
-				continue
-			}
-
-			newProcs[process.Pid] = process
-			last := procStats.ProcsMap[process.Pid]
-			process.cpuTotalPctNorm, process.cpuTotalPct, process.cpuSinceStart = GetProcCPUPercentage(last, process)
-			processes = append(processes, *process)
-		}
+		processes = append(processes, *process)
 	}
 	procStats.ProcsMap = newProcs
 
@@ -407,6 +385,56 @@ func (procStats *Stats) Get() ([]common.MapStr, error) {
 	}
 
 	return procs, nil
+}
+
+// GetOne fetches process data for a given PID if its name matches the regexes provided from the host.
+func (procStats *Stats) GetOne(pid int) (common.MapStr, error) {
+	if len(procStats.Procs) == 0 {
+		return nil, nil
+	}
+
+	newProcs := make(ProcsMap, 1)
+	p := procStats.getSingleProcess(pid, newProcs)
+	if p == nil {
+		return nil, fmt.Errorf("cannot find matching process for pid=%d", pid)
+	}
+
+	e := procStats.getProcessEvent(p)
+
+	return e, nil
+}
+
+func (procStats *Stats) getSingleProcess(pid int, newProcs ProcsMap) *Process {
+	var cmdline string
+	var env common.MapStr
+	if previousProc := procStats.ProcsMap[pid]; previousProc != nil {
+		if procStats.CacheCmdLine {
+			cmdline = previousProc.CmdLine
+		}
+		env = previousProc.Env
+	}
+
+	process, err := newProcess(pid, cmdline, env)
+	if err != nil {
+		logp.Debug("processes", "Skip process pid=%d: %v", pid, err)
+		return nil
+	}
+
+	if !procStats.matchProcess(process.Name) {
+		logp.Debug("processes", "Process name does not matches the provided regex; pid=%d; name=%s: %v", pid, process.Name, err)
+		return nil
+	}
+
+	err = process.getDetails(procStats.isWhitelistedEnvVar)
+	if err != nil {
+		logp.Err("Error getting process details. pid=%d: %v", process.Pid, err)
+		return nil
+	}
+
+	newProcs[process.Pid] = process
+	last := procStats.ProcsMap[process.Pid]
+	process.cpuTotalPctNorm, process.cpuTotalPct, process.cpuSinceStart = GetProcCPUPercentage(last, process)
+	return process
 }
 
 func (procStats *Stats) includeTopProcesses(processes []Process) []Process {
