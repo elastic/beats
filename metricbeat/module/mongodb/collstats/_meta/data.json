@@ -1,0 +1,77 @@
+{
+  "@timestamp": "2016-05-23T08:05:34.853Z",
+  "beat": {
+    "hostname": "beathost",
+    "name": "beathost"
+  },
+  "metricset": {
+    "host": "localhost",
+    "module": "mongodb",
+    "name": "collstats",
+    "rtt": 44269
+  },
+  "mongodb": {
+    "collstats": {
+      "db": "admin",
+      "collection": "system.users",
+      "name": "admin.system.users",
+      "total": {
+        "time": {
+          "us": 54756221
+        },
+        "count": 3159951
+      },
+      "lock": {
+        "read": {
+          "time": {
+            "us": 54747284
+          },
+          "count": 3159944
+        },
+        "write": {
+          "time": {
+            "us": 8937
+          },
+          "count": 7
+        }
+      },
+      "queries": {
+        "time": {
+          "us": 2310
+        },
+        "count": 15
+      },
+      "getmore": {
+        "time": {
+          "us": 0
+        },
+        "count": 0
+      },
+      "insert": {
+        "time": {
+          "us": 8937
+        },
+        "count": 7
+      },
+      "update": {
+        "time": {
+          "us": 0
+        },
+        "count": 0
+      },
+      "remove": {
+        "time": {
+          "us": 0
+        },
+        "count": 0
+      },
+      "commands": {
+        "time": {
+          "us": 50743698
+        },
+        "count": 45793
+      }
+    }
+  },
+  "type": "metricsets"
+}
