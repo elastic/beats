@@ -2,6 +2,11 @@
   "description": "Pipeline for parsing osquery result logs",
   "processors": [
     {
+      "rename": {
+        "field": "@timestamp",
+        "target_field": "read_timestamp"
+      }
+    }, {
       "date": {
         "field": "json.unixTime",
         "target_field": "@timestamp",
