@@ -5,6 +5,7 @@ package instance
 
 import (
 	"fmt"
+	"os"
 	"runtime"
 	"time"
 
@@ -85,26 +86,22 @@ func reportBeatCPU(_ monitoring.Mode, V monitoring.Visitor) {
 }
 
 func getCPUPercentages() (float64, float64, float64, error) {
-	state, err := beatProcessStats.Get()
+	beatPID := os.Getpid()
+	state, err := beatProcessStats.GetOne(beatPID)
 	if err != nil {
 		return 0.0, 0.0, 0.0, fmt.Errorf("error retrieving process stats")
 	}
 
-	if len(state) != 1 {
-		return 0.0, 0.0, 0.0, fmt.Errorf("more or less than one processes: %v", len(state))
-	}
-
-	beatState := state[0]
-	iCPUUsage, err := beatState.GetValue("cpu.total.pct")
+	iCPUUsage, err := state.GetValue("cpu.total.pct")
 	if err != nil {
 		return 0.0, 0.0, 0.0, fmt.Errorf("error getting total CPU usage: %v", err)
 	}
-	iCPUUsageNorm, err := beatState.GetValue("cpu.total.norm.pct")
+	iCPUUsageNorm, err := state.GetValue("cpu.total.norm.pct")
 	if err != nil {
 		return 0.0, 0.0, 0.0, fmt.Errorf("error getting normalized CPU percentage: %v", err)
 	}
 
-	iTotalCPUUsage, err := beatState.GetValue("cpu.total.value")
+	iTotalCPUUsage, err := state.GetValue("cpu.total.value")
 	if err != nil {
 		return 0.0, 0.0, 0.0, fmt.Errorf("error getting total CPU since start: %v", err)
 	}
