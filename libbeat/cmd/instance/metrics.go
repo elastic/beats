@@ -1,3 +1,6 @@
+// +build darwin linux windows
+// +build cgo
+
 package instance
 
 import (
