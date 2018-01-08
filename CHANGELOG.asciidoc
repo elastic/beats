@@ -164,6 +164,7 @@ https://github.com/elastic/beats/compare/v6.0.0-beta2...master[Check the HEAD di
 - Update gosigar to v0.6.0. {pull}5775[5775]
 - Add experimental system/raid metricset. {pull}5642[5642]
 - Add a dashboard for the Nginx module. {pull}5991[5991]
+- Update the MySQL dashboard to use the Time Series Visual Builder. {pull}5996[5996]
 
 *Packetbeat*
 

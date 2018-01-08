@@ -4,130 +4,113 @@
       "attributes": {
         "description": "",
         "kibanaSavedObjectMeta": {
-          "searchSourceJSON": "{\"filter\":[]}"
+          "searchSourceJSON": "{}"
         },
-        "savedSearchId": "67e88e60-0005-11e7-aaf1-b342e4b94bb0",
-        "title": "Active connections [Metricbeat MySQL]",
+        "title": "Connections rate [Metricbeat MySQL]",
         "uiStateJSON": "{}",
         "version": 1,
-        "visState": "{\"title\":\"Active connections [Metricbeat MySQL]\",\"type\":\"line\",\"params\":{\"addTooltip\":true,\"addLegend\":true,\"legendPosition\":\"bottom\",\"showCircles\":true,\"interpolate\":\"linear\",\"scale\":\"linear\",\"drawLinesBetweenPoints\":true,\"radiusRatio\":9,\"times\":[],\"addTimeMarker\":false,\"defaultYExtents\":false,\"setYExtents\":false,\"type\":\"line\",\"grid\":{\"categoryLines\":false,\"style\":{\"color\":\"#eee\"}},\"categoryAxes\":[{\"id\":\"CategoryAxis-1\",\"type\":\"category\",\"position\":\"bottom\",\"show\":true,\"style\":{},\"scale\":{\"type\":\"linear\"},\"labels\":{\"show\":true,\"truncate\":100},\"title\":{}}],\"valueAxes\":[{\"id\":\"ValueAxis-1\",\"name\":\"LeftAxis-1\",\"type\":\"value\",\"position\":\"left\",\"show\":true,\"style\":{},\"scale\":{\"type\":\"linear\",\"mode\":\"normal\"},\"labels\":{\"show\":true,\"rotate\":0,\"filter\":false,\"truncate\":100},\"title\":{\"text\":\"Count\"}}],\"seriesParams\":[{\"show\":\"true\",\"type\":\"line\",\"mode\":\"normal\",\"data\":{\"label\":\"Count\",\"id\":\"1\"},\"valueAxis\":\"ValueAxis-1\",\"drawLinesBetweenPoints\":true,\"showCircles\":true}]},\"aggs\":[{\"id\":\"1\",\"enabled\":true,\"type\":\"avg\",\"schema\":\"metric\",\"params\":{\"field\":\"mysql.status.connections\"}},{\"id\":\"2\",\"enabled\":true,\"type\":\"date_histogram\",\"schema\":\"segment\",\"params\":{\"field\":\"@timestamp\",\"interval\":\"auto\",\"customInterval\":\"2h\",\"min_doc_count\":1,\"extended_bounds\":{}}}]}"
+        "visState": "{\"title\":\"Connections rate [Metricbeat MySQL]\",\"type\":\"metrics\",\"params\":{\"id\":\"61ca57f0-469d-11e7-af02-69e470af7417\",\"type\":\"timeseries\",\"series\":[{\"id\":\"61ca57f1-469d-11e7-af02-69e470af7417\",\"color\":\"#68BC00\",\"split_mode\":\"everything\",\"metrics\":[{\"id\":\"61ca57f2-469d-11e7-af02-69e470af7417\",\"type\":\"avg\",\"field\":\"mysql.status.connections\"},{\"unit\":\"\",\"id\":\"aee9bbf0-f1f3-11e7-a752-236fe3270d99\",\"type\":\"derivative\",\"field\":\"61ca57f2-469d-11e7-af02-69e470af7417\"}],\"seperate_axis\":0,\"axis_position\":\"right\",\"formatter\":\"number\",\"chart_type\":\"line\",\"line_width\":1,\"point_size\":1,\"fill\":0.5,\"stacked\":\"none\",\"label\":\"Connections rate\"}],\"time_field\":\"@timestamp\",\"index_pattern\":\"metricbeat-*\",\"interval\":\"auto\",\"axis_position\":\"left\",\"axis_formatter\":\"number\",\"show_legend\":1,\"show_grid\":1,\"legend_position\":\"bottom\"},\"aggs\":[]}"
       },
-      "id": "e784dc50-0005-11e7-bf7f-c9acc3d3e306",
+      "id": "d7e6bee0-f1f3-11e7-85ab-594b1652e0d1",
       "type": "visualization",
+      "updated_at": "2018-01-05T09:14:45.934Z",
       "version": 2
     },
     {
       "attributes": {
         "description": "",
         "kibanaSavedObjectMeta": {
-          "searchSourceJSON": "{\"filter\":[]}"
+          "searchSourceJSON": "{}"
         },
-        "savedSearchId": "67e88e60-0005-11e7-aaf1-b342e4b94bb0",
-        "title": "Files opened [Metricbeat MySQL]",
+        "title": "Command rates [Metricbeat MySQL]",
         "uiStateJSON": "{}",
         "version": 1,
-        "visState": "{\"title\":\"Files opened [Metricbeat MySQL]\",\"type\":\"line\",\"params\":{\"addTooltip\":true,\"addLegend\":true,\"legendPosition\":\"bottom\",\"showCircles\":true,\"interpolate\":\"linear\",\"scale\":\"linear\",\"drawLinesBetweenPoints\":true,\"radiusRatio\":9,\"times\":[],\"addTimeMarker\":false,\"defaultYExtents\":false,\"setYExtents\":false,\"type\":\"line\",\"grid\":{\"categoryLines\":false,\"style\":{\"color\":\"#eee\"}},\"categoryAxes\":[{\"id\":\"CategoryAxis-1\",\"type\":\"category\",\"position\":\"bottom\",\"show\":true,\"style\":{},\"scale\":{\"type\":\"linear\"},\"labels\":{\"show\":true,\"truncate\":100},\"title\":{}}],\"valueAxes\":[{\"id\":\"ValueAxis-1\",\"name\":\"LeftAxis-1\",\"type\":\"value\",\"position\":\"left\",\"show\":true,\"style\":{},\"scale\":{\"type\":\"linear\",\"mode\":\"normal\"},\"labels\":{\"show\":true,\"rotate\":0,\"filter\":false,\"truncate\":100},\"title\":{\"text\":\"Count\"}}],\"seriesParams\":[{\"show\":\"true\",\"type\":\"line\",\"mode\":\"normal\",\"data\":{\"label\":\"Count\",\"id\":\"1\"},\"valueAxis\":\"ValueAxis-1\",\"drawLinesBetweenPoints\":true,\"showCircles\":true}]},\"aggs\":[{\"id\":\"1\",\"enabled\":true,\"type\":\"avg\",\"schema\":\"metric\",\"params\":{\"field\":\"mysql.status.open.files\"}},{\"id\":\"2\",\"enabled\":true,\"type\":\"date_histogram\",\"schema\":\"segment\",\"params\":{\"field\":\"@timestamp\",\"interval\":\"auto\",\"customInterval\":\"2h\",\"min_doc_count\":1,\"extended_bounds\":{}}}]}"
+        "visState": "{\"title\":\"Command rates [Metricbeat MySQL]\",\"type\":\"metrics\",\"params\":{\"id\":\"61ca57f0-469d-11e7-af02-69e470af7417\",\"type\":\"timeseries\",\"series\":[{\"id\":\"61ca57f1-469d-11e7-af02-69e470af7417\",\"color\":\"#68BC00\",\"split_mode\":\"everything\",\"metrics\":[{\"id\":\"61ca57f2-469d-11e7-af02-69e470af7417\",\"type\":\"avg\",\"field\":\"mysql.status.command.select\"},{\"unit\":\"\",\"id\":\"2d149f90-f1f4-11e7-a752-236fe3270d99\",\"type\":\"derivative\",\"field\":\"61ca57f2-469d-11e7-af02-69e470af7417\"}],\"seperate_axis\":0,\"axis_position\":\"right\",\"formatter\":\"number\",\"chart_type\":\"line\",\"line_width\":1,\"point_size\":1,\"fill\":\"0.2\",\"stacked\":\"none\",\"label\":\"SELECT\"},{\"id\":\"3c2a2a40-f1f4-11e7-a752-236fe3270d99\",\"color\":\"rgba(104,204,202,1)\",\"split_mode\":\"everything\",\"metrics\":[{\"id\":\"3c2a2a41-f1f4-11e7-a752-236fe3270d99\",\"type\":\"avg\",\"field\":\"mysql.status.command.insert\"},{\"unit\":\"\",\"id\":\"3c2a2a42-f1f4-11e7-a752-236fe3270d99\",\"type\":\"derivative\",\"field\":\"3c2a2a41-f1f4-11e7-a752-236fe3270d99\"}],\"seperate_axis\":0,\"axis_position\":\"right\",\"formatter\":\"number\",\"chart_type\":\"line\",\"line_width\":1,\"point_size\":1,\"fill\":\"0.2\",\"stacked\":\"none\",\"label\":\"INSERT\"},{\"id\":\"485ce050-f1f4-11e7-a752-236fe3270d99\",\"color\":\"rgba(252,220,0,1)\",\"split_mode\":\"everything\",\"metrics\":[{\"id\":\"485ce051-f1f4-11e7-a752-236fe3270d99\",\"type\":\"avg\",\"field\":\"mysql.status.command.update\"},{\"unit\":\"\",\"id\":\"485ce052-f1f4-11e7-a752-236fe3270d99\",\"type\":\"derivative\",\"field\":\"485ce051-f1f4-11e7-a752-236fe3270d99\"}],\"seperate_axis\":0,\"axis_position\":\"right\",\"formatter\":\"number\",\"chart_type\":\"line\",\"line_width\":1,\"point_size\":1,\"fill\":\"0.2\",\"stacked\":\"none\",\"label\":\"UPDATE\"},{\"id\":\"543a4a70-f1f4-11e7-a752-236fe3270d99\",\"color\":\"rgba(244,78,59,1)\",\"split_mode\":\"everything\",\"metrics\":[{\"id\":\"543a4a71-f1f4-11e7-a752-236fe3270d99\",\"type\":\"avg\",\"field\":\"mysql.status.command.delete\"},{\"unit\":\"\",\"id\":\"543a4a72-f1f4-11e7-a752-236fe3270d99\",\"type\":\"derivative\",\"field\":\"543a4a71-f1f4-11e7-a752-236fe3270d99\"}],\"seperate_axis\":0,\"axis_position\":\"right\",\"formatter\":\"number\",\"chart_type\":\"line\",\"line_width\":1,\"point_size\":1,\"fill\":\"0.2\",\"stacked\":\"none\",\"label\":\"DELETE\"}],\"time_field\":\"@timestamp\",\"index_pattern\":\"metricbeat-*\",\"interval\":\"auto\",\"axis_position\":\"left\",\"axis_formatter\":\"number\",\"show_legend\":1,\"show_grid\":1},\"aggs\":[]}"
       },
-      "id": "0f506420-0006-11e7-bf7f-c9acc3d3e306",
+      "id": "695a4f90-f1f4-11e7-85ab-594b1652e0d1",
       "type": "visualization",
-      "version": 4
+      "updated_at": "2018-01-05T09:14:45.934Z",
+      "version": 2
     },
     {
       "attributes": {
         "description": "",
         "kibanaSavedObjectMeta": {
-          "searchSourceJSON": "{\"filter\":[]}"
+          "searchSourceJSON": "{}"
         },
-        "savedSearchId": "67e88e60-0005-11e7-aaf1-b342e4b94bb0",
         "title": "Running threads [Metricbeat MySQL]",
         "uiStateJSON": "{}",
         "version": 1,
-        "visState": "{\"title\":\"Running threads [Metricbeat MySQL]\",\"type\":\"line\",\"params\":{\"addTooltip\":true,\"addLegend\":true,\"legendPosition\":\"bottom\",\"showCircles\":true,\"interpolate\":\"linear\",\"scale\":\"linear\",\"drawLinesBetweenPoints\":true,\"radiusRatio\":9,\"times\":[],\"addTimeMarker\":false,\"defaultYExtents\":false,\"setYExtents\":false,\"type\":\"line\",\"grid\":{\"categoryLines\":false,\"style\":{\"color\":\"#eee\"}},\"categoryAxes\":[{\"id\":\"CategoryAxis-1\",\"type\":\"category\",\"position\":\"bottom\",\"show\":true,\"style\":{},\"scale\":{\"type\":\"linear\"},\"labels\":{\"show\":true,\"truncate\":100},\"title\":{}}],\"valueAxes\":[{\"id\":\"ValueAxis-1\",\"name\":\"LeftAxis-1\",\"type\":\"value\",\"position\":\"left\",\"show\":true,\"style\":{},\"scale\":{\"type\":\"linear\",\"mode\":\"normal\"},\"labels\":{\"show\":true,\"rotate\":0,\"filter\":false,\"truncate\":100},\"title\":{\"text\":\"Count\"}}],\"seriesParams\":[{\"show\":\"true\",\"type\":\"line\",\"mode\":\"normal\",\"data\":{\"label\":\"Count\",\"id\":\"1\"},\"valueAxis\":\"ValueAxis-1\",\"drawLinesBetweenPoints\":true,\"showCircles\":true}]},\"aggs\":[{\"id\":\"1\",\"enabled\":true,\"type\":\"avg\",\"schema\":\"metric\",\"params\":{\"field\":\"mysql.status.threads.running\"}},{\"id\":\"2\",\"enabled\":true,\"type\":\"date_histogram\",\"schema\":\"segment\",\"params\":{\"field\":\"@timestamp\",\"interval\":\"auto\",\"customInterval\":\"2h\",\"min_doc_count\":1,\"extended_bounds\":{}}}]}"
+        "visState": "{\"title\":\"Running threads [Metricbeat MySQL]\",\"type\":\"metrics\",\"params\":{\"id\":\"61ca57f0-469d-11e7-af02-69e470af7417\",\"type\":\"timeseries\",\"series\":[{\"id\":\"61ca57f1-469d-11e7-af02-69e470af7417\",\"color\":\"rgba(174,161,255,1)\",\"split_mode\":\"everything\",\"metrics\":[{\"id\":\"61ca57f2-469d-11e7-af02-69e470af7417\",\"type\":\"avg\",\"field\":\"mysql.status.threads.running\"}],\"seperate_axis\":0,\"axis_position\":\"right\",\"formatter\":\"number\",\"chart_type\":\"line\",\"line_width\":1,\"point_size\":1,\"fill\":0.5,\"stacked\":\"none\",\"label\":\"Running threads\"}],\"time_field\":\"@timestamp\",\"index_pattern\":\"metricbeat-*\",\"interval\":\"auto\",\"axis_position\":\"left\",\"axis_formatter\":\"number\",\"show_legend\":1,\"show_grid\":1,\"legend_position\":\"bottom\"},\"aggs\":[]}"
       },
-      "id": "45a00c10-0006-11e7-bf7f-c9acc3d3e306",
+      "id": "124dce60-f1f5-11e7-85ab-594b1652e0d1",
       "type": "visualization",
+      "updated_at": "2018-01-05T09:14:45.934Z",
       "version": 2
     },
     {
       "attributes": {
         "description": "",
         "kibanaSavedObjectMeta": {
-          "searchSourceJSON": "{\"query\":{\"query\":{\"query_string\":{\"analyze_wildcard\":true,\"query\":\"*\"}},\"language\":\"lucene\"},\"filter\":[]}"
+          "searchSourceJSON": "{}"
         },
-        "title": "MySQL commands [Metricbeat MySQL]",
+        "title": "Opened tables rate [Metricbeat MySQL]",
         "uiStateJSON": "{}",
         "version": 1,
-        "visState": "{\"title\":\"MySQL commands [Metricbeat MySQL]\",\"type\":\"timelion\",\"params\":{\"expression\":\".es(*, metric='avg:mysql.status.command.select').derivative().label(\\\"SELECT\\\"),.es(*, metric='avg:mysql.status.command.insert').derivative().label(\\\"INSERT\\\"),.es(*, metric='avg:mysql.status.command.update').derivative().label(\\\"UPDATE\\\"),.es(*, metric='avg:mysql.status.command.delete').derivative().label(\\\"DELETE\\\")\",\"interval\":\"1m\"},\"aggs\":[]}"
+        "visState": "{\"title\":\"Opened tables rate [Metricbeat MySQL]\",\"type\":\"metrics\",\"params\":{\"axis_formatter\":\"number\",\"axis_position\":\"left\",\"id\":\"61ca57f0-469d-11e7-af02-69e470af7417\",\"index_pattern\":\"metricbeat-*\",\"interval\":\"auto\",\"legend_position\":\"bottom\",\"series\":[{\"axis_position\":\"right\",\"chart_type\":\"line\",\"color\":\"rgba(252,196,0,1)\",\"fill\":0.5,\"formatter\":\"number\",\"id\":\"61ca57f1-469d-11e7-af02-69e470af7417\",\"line_width\":1,\"metrics\":[{\"field\":\"mysql.status.opened_tables\",\"id\":\"61ca57f2-469d-11e7-af02-69e470af7417\",\"type\":\"avg\"},{\"unit\":\"\",\"id\":\"9972d250-f1f5-11e7-a752-236fe3270d99\",\"type\":\"derivative\",\"field\":\"61ca57f2-469d-11e7-af02-69e470af7417\"}],\"point_size\":1,\"seperate_axis\":0,\"split_mode\":\"everything\",\"stacked\":\"none\",\"label\":\"Opened tables rate\"}],\"show_grid\":1,\"show_legend\":1,\"time_field\":\"@timestamp\",\"type\":\"timeseries\"},\"aggs\":[]}"
       },
-      "id": "1eda2280-0008-11e7-82f3-2f380154876c",
+      "id": "aaa326b0-f1f5-11e7-85ab-594b1652e0d1",
       "type": "visualization",
+      "updated_at": "2018-01-05T09:14:45.934Z",
+      "version": 3
+    },
+    {
+      "attributes": {
+        "description": "",
+        "kibanaSavedObjectMeta": {
+          "searchSourceJSON": "{}"
+        },
+        "title": "Threads created rate [Metricbeat MySQL]",
+        "uiStateJSON": "{}",
+        "version": 1,
+        "visState": "{\"title\":\"Threads created rate [Metricbeat MySQL]\",\"type\":\"metrics\",\"params\":{\"axis_formatter\":\"number\",\"axis_position\":\"left\",\"id\":\"61ca57f0-469d-11e7-af02-69e470af7417\",\"index_pattern\":\"metricbeat-*\",\"interval\":\"auto\",\"legend_position\":\"bottom\",\"series\":[{\"axis_position\":\"right\",\"chart_type\":\"line\",\"color\":\"rgba(123,100,255,1)\",\"fill\":0.5,\"formatter\":\"number\",\"id\":\"61ca57f1-469d-11e7-af02-69e470af7417\",\"line_width\":1,\"metrics\":[{\"field\":\"mysql.status.threads.created\",\"id\":\"61ca57f2-469d-11e7-af02-69e470af7417\",\"type\":\"avg\"},{\"unit\":\"\",\"id\":\"9972d250-f1f5-11e7-a752-236fe3270d99\",\"type\":\"derivative\",\"field\":\"61ca57f2-469d-11e7-af02-69e470af7417\"}],\"point_size\":1,\"seperate_axis\":0,\"split_mode\":\"everything\",\"stacked\":\"none\",\"label\":\"Threads created rate\"}],\"show_grid\":1,\"show_legend\":1,\"time_field\":\"@timestamp\",\"type\":\"timeseries\"},\"aggs\":[]}"
+      },
+      "id": "fb1f3f20-f1f5-11e7-85ab-594b1652e0d1",
+      "type": "visualization",
+      "updated_at": "2018-01-05T09:14:45.934Z",
       "version": 2
     },
     {
       "attributes": {
         "description": "",
         "kibanaSavedObjectMeta": {
-          "searchSourceJSON": "{\"query\":{\"query\":{\"query_string\":{\"analyze_wildcard\":true,\"query\":\"*\"}},\"language\":\"lucene\"},\"filter\":[]}"
+          "searchSourceJSON": "{}"
         },
-        "title": "Threads created [Metricbeat MySQL]",
+        "title": "Open files [Metricbeat MySQL]",
         "uiStateJSON": "{}",
         "version": 1,
-        "visState": "{\"title\":\"Threads created [Metricbeat MySQL]\",\"type\":\"timelion\",\"params\":{\"expression\":\".es(*, metric='avg:mysql.status.threads.created').derivative().label(\\\"Threads created\\\")\",\"interval\":\"1m\"},\"aggs\":[]}"
+        "visState": "{\"title\":\"Open files [Metricbeat MySQL]\",\"type\":\"metrics\",\"params\":{\"id\":\"61ca57f0-469d-11e7-af02-69e470af7417\",\"type\":\"timeseries\",\"series\":[{\"id\":\"61ca57f1-469d-11e7-af02-69e470af7417\",\"color\":\"rgba(22,165,165,1)\",\"split_mode\":\"everything\",\"metrics\":[{\"id\":\"61ca57f2-469d-11e7-af02-69e470af7417\",\"type\":\"avg\",\"field\":\"mysql.status.open.files\"}],\"seperate_axis\":0,\"axis_position\":\"right\",\"formatter\":\"number\",\"chart_type\":\"line\",\"line_width\":1,\"point_size\":1,\"fill\":0.5,\"stacked\":\"none\",\"label\":\"Open files\"}],\"time_field\":\"@timestamp\",\"index_pattern\":\"metricbeat-*\",\"interval\":\"auto\",\"axis_position\":\"left\",\"axis_formatter\":\"number\",\"show_legend\":1,\"show_grid\":1,\"legend_position\":\"bottom\"},\"aggs\":[]}"
       },
-      "id": "1ede99e0-0009-11e7-8cd4-73b67e9e3f3c",
+      "id": "f5b35930-f1f6-11e7-85ab-594b1652e0d1",
       "type": "visualization",
+      "updated_at": "2018-01-05T09:14:45.934Z",
       "version": 2
     },
     {
       "attributes": {
         "description": "",
         "kibanaSavedObjectMeta": {
-          "searchSourceJSON": "{\"query\":{\"query\":{\"query_string\":{\"analyze_wildcard\":true,\"query\":\"*\"}},\"language\":\"lucene\"},\"filter\":[]}"
+          "searchSourceJSON": "{}"
         },
-        "title": "Tables opened [Metricbeat MySQL]",
+        "title": "Sent and received bytes rates [Metricbeat MySQL]",
         "uiStateJSON": "{}",
         "version": 1,
-        "visState": "{\"title\":\"Tables opened [Metricbeat MySQL]\",\"type\":\"timelion\",\"params\":{\"expression\":\".es(*, metric='avg:mysql.status.opened_tables').derivative().label(\\\"Opened tables\\\")\",\"interval\":\"1m\"},\"aggs\":[]}"
+        "visState": "{\"title\":\"Sent and received bytes rates [Metricbeat MySQL]\",\"type\":\"metrics\",\"params\":{\"id\":\"61ca57f0-469d-11e7-af02-69e470af7417\",\"type\":\"timeseries\",\"series\":[{\"id\":\"2b1c2390-f1f7-11e7-a752-236fe3270d99\",\"color\":\"rgba(0,98,177,1)\",\"split_mode\":\"everything\",\"metrics\":[{\"id\":\"2b1c2391-f1f7-11e7-a752-236fe3270d99\",\"type\":\"avg\",\"field\":\"mysql.status.bytes.received\"},{\"unit\":\"\",\"id\":\"2b1c2392-f1f7-11e7-a752-236fe3270d99\",\"type\":\"derivative\",\"field\":\"2b1c2391-f1f7-11e7-a752-236fe3270d99\"}],\"seperate_axis\":0,\"axis_position\":\"right\",\"formatter\":\"number\",\"chart_type\":\"line\",\"line_width\":1,\"point_size\":1,\"fill\":0.5,\"stacked\":\"none\",\"label\":\"Received bytes\"},{\"id\":\"61ca57f1-469d-11e7-af02-69e470af7417\",\"color\":\"#68BC00\",\"split_mode\":\"everything\",\"metrics\":[{\"id\":\"61ca57f2-469d-11e7-af02-69e470af7417\",\"type\":\"avg\",\"field\":\"mysql.status.bytes.sent\"},{\"unit\":\"\",\"id\":\"23cfda50-f1f7-11e7-a752-236fe3270d99\",\"type\":\"derivative\",\"field\":\"61ca57f2-469d-11e7-af02-69e470af7417\"}],\"seperate_axis\":0,\"axis_position\":\"right\",\"formatter\":\"number\",\"chart_type\":\"line\",\"line_width\":1,\"point_size\":1,\"fill\":0.5,\"stacked\":\"none\",\"label\":\"Sent bytes\"}],\"time_field\":\"@timestamp\",\"index_pattern\":\"metricbeat-*\",\"interval\":\"auto\",\"axis_position\":\"left\",\"axis_formatter\":\"number\",\"show_legend\":1,\"show_grid\":1,\"legend_position\":\"bottom\"},\"aggs\":[]}"
       },
-      "id": "4c36c420-000a-11e7-8cd4-73b67e9e3f3c",
+      "id": "7404feb0-f1f7-11e7-85ab-594b1652e0d1",
       "type": "visualization",
-      "version": 4
-    },
-    {
-      "attributes": {
-        "description": "",
-        "kibanaSavedObjectMeta": {
-          "searchSourceJSON": "{\"query\":{\"query\":{\"query_string\":{\"analyze_wildcard\":true,\"query\":\"*\"}},\"language\":\"lucene\"},\"filter\":[]}"
-        },
-        "title": "Sent and received bytes [Metricbeat MySQL]",
-        "uiStateJSON": "{}",
-        "version": 1,
-        "visState": "{\"title\":\"Sent and received bytes [Metricbeat MySQL]\",\"type\":\"timelion\",\"params\":{\"expression\":\".es(*,metric=\\\"avg:mysql.status.bytes.sent\\\").derivative().divide(1000).label(\\\"Sent bytes (KB)\\\"),.es(*,metric=\\\"avg:mysql.status.bytes.received\\\").derivative().multiply(-1).divide(1000).label(\\\"Received bytes (KB)\\\")\",\"interval\":\"1m\"},\"aggs\":[]}"
-      },
-      "id": "a2175300-000a-11e7-b001-85aac4878445",
-      "type": "visualization",
-      "version": 2
-    },
-    {
-      "attributes": {
-        "columns": [
-          "_source"
-        ],
-        "description": "",
-        "hits": 0,
-        "kibanaSavedObjectMeta": {
-          "searchSourceJSON": "{\"index\":\"metricbeat-*\",\"highlightAll\":true,\"query\":{\"query_string\":{\"query\":\"_exists_:mysql.status\",\"analyze_wildcard\":true}},\"filter\":[]}"
-        },
-        "sort": [
-          "@timestamp",
-          "desc"
-        ],
-        "title": "Metricbeat MySQL status",
-        "version": 1
-      },
-      "id": "67e88e60-0005-11e7-aaf1-b342e4b94bb0",
-      "type": "search",
-      "version": 1
+      "updated_at": "2018-01-05T09:15:49.714Z",
+      "version": 3
     },
     {
       "attributes": {
@@ -136,17 +119,17 @@
         "kibanaSavedObjectMeta": {
           "searchSourceJSON": "{\"filter\":[],\"query\":{\"language\":\"lucene\",\"query\":{\"query_string\":{\"analyze_wildcard\":true,\"default_field\":\"*\",\"query\":\"*\"}}},\"highlightAll\":true,\"version\":true}"
         },
-        "optionsJSON": "{\"darkTheme\":false}",
-        "panelsJSON": "[{\"col\":1,\"id\":\"e784dc50-0005-11e7-bf7f-c9acc3d3e306\",\"panelIndex\":1,\"row\":4,\"size_x\":6,\"size_y\":3,\"type\":\"visualization\"},{\"col\":7,\"id\":\"0f506420-0006-11e7-bf7f-c9acc3d3e306\",\"panelIndex\":2,\"row\":7,\"size_x\":6,\"size_y\":3,\"type\":\"visualization\"},{\"col\":7,\"id\":\"45a00c10-0006-11e7-bf7f-c9acc3d3e306\",\"panelIndex\":4,\"row\":4,\"size_x\":6,\"size_y\":3,\"type\":\"visualization\"},{\"col\":1,\"id\":\"1eda2280-0008-11e7-82f3-2f380154876c\",\"panelIndex\":5,\"row\":1,\"size_x\":12,\"size_y\":3,\"type\":\"visualization\"},{\"col\":1,\"id\":\"1ede99e0-0009-11e7-8cd4-73b67e9e3f3c\",\"panelIndex\":7,\"row\":10,\"size_x\":6,\"size_y\":3,\"type\":\"visualization\"},{\"col\":1,\"id\":\"4c36c420-000a-11e7-8cd4-73b67e9e3f3c\",\"panelIndex\":8,\"row\":7,\"size_x\":6,\"size_y\":3,\"type\":\"visualization\"},{\"col\":7,\"id\":\"a2175300-000a-11e7-b001-85aac4878445\",\"panelIndex\":9,\"row\":10,\"size_x\":6,\"size_y\":3,\"type\":\"visualization\"}]",
+        "optionsJSON": "{\"darkTheme\":false,\"useMargins\":false}",
+        "panelsJSON": "[{\"panelIndex\":\"10\",\"gridData\":{\"x\":0,\"y\":3,\"w\":6,\"h\":3,\"i\":\"10\"},\"id\":\"d7e6bee0-f1f3-11e7-85ab-594b1652e0d1\",\"type\":\"visualization\",\"version\":\"7.0.0-alpha1\"},{\"panelIndex\":\"11\",\"gridData\":{\"x\":0,\"y\":0,\"w\":12,\"h\":3,\"i\":\"11\"},\"id\":\"695a4f90-f1f4-11e7-85ab-594b1652e0d1\",\"type\":\"visualization\",\"version\":\"7.0.0-alpha1\"},{\"panelIndex\":\"13\",\"gridData\":{\"x\":6,\"y\":3,\"w\":6,\"h\":3,\"i\":\"13\"},\"id\":\"124dce60-f1f5-11e7-85ab-594b1652e0d1\",\"type\":\"visualization\",\"version\":\"7.0.0-alpha1\"},{\"panelIndex\":\"14\",\"gridData\":{\"x\":0,\"y\":6,\"w\":6,\"h\":3,\"i\":\"14\"},\"id\":\"aaa326b0-f1f5-11e7-85ab-594b1652e0d1\",\"type\":\"visualization\",\"version\":\"7.0.0-alpha1\"},{\"panelIndex\":\"15\",\"gridData\":{\"x\":6,\"y\":6,\"w\":6,\"h\":3,\"i\":\"15\"},\"id\":\"fb1f3f20-f1f5-11e7-85ab-594b1652e0d1\",\"type\":\"visualization\",\"version\":\"7.0.0-alpha1\"},{\"panelIndex\":\"16\",\"gridData\":{\"x\":6,\"y\":9,\"w\":6,\"h\":3,\"i\":\"16\"},\"id\":\"f5b35930-f1f6-11e7-85ab-594b1652e0d1\",\"type\":\"visualization\",\"version\":\"7.0.0-alpha1\"},{\"panelIndex\":\"17\",\"gridData\":{\"x\":0,\"y\":9,\"w\":6,\"h\":3,\"i\":\"17\"},\"version\":\"7.0.0-alpha1\",\"type\":\"visualization\",\"id\":\"7404feb0-f1f7-11e7-85ab-594b1652e0d1\"}]",
         "timeRestore": false,
         "title": "[Metricbeat MySQL] Overview",
-        "uiStateJSON": "{}",
         "version": 1
       },
       "id": "66881e90-0006-11e7-bf7f-c9acc3d3e306",
       "type": "dashboard",
+      "updated_at": "2018-01-05T09:14:45.934Z",
       "version": 3
     }
   ],
-  "version": "6.0.0-beta1-SNAPSHOT"
+  "version": "7.0.0-alpha1"
 }
