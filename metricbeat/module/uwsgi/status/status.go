@@ -9,6 +9,7 @@ import (
 	"net/url"
 	"strings"
 
+	"github.com/elastic/beats/libbeat/common/cfgwarn"
 	"github.com/elastic/beats/libbeat/logp"
 
 	"github.com/elastic/beats/libbeat/common"
@@ -27,6 +28,7 @@ type MetricSet struct {
 
 // New creates a new instance of the MetricSet.
 func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
+	cfgwarn.Experimental("The uWSGI status metricset is experimental")
 	return &MetricSet{BaseMetricSet: base}, nil
 }
 

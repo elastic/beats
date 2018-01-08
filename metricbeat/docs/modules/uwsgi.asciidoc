@@ -39,11 +39,8 @@ in <<configuration-metricbeat>>. Here is an example configuration:
 metricbeat.modules:
 - module: uwsgi
   metricsets: ["status"]
-  enabled: false
   period: 10s
   hosts: ["tcp://127.0.0.1:9191"]
-
-
 ----
 
 [float]

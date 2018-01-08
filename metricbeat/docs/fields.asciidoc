@@ -11607,15 +11607,15 @@ Parent worker PID
 
 
 [float]
-=== `uwsgi.status.core.requests`
+=== `uwsgi.status.core.requests.total`
 
 type: long
 
-Number of requests served
+Number of total requests served
 
 
 [float]
-=== `uwsgi.status.core.static_requests`
+=== `uwsgi.status.core.requests.static`
 
 type: long
 
@@ -11623,7 +11623,7 @@ Number of static file serves
 
 
 [float]
-=== `uwsgi.status.core.routed_requests`
+=== `uwsgi.status.core.requests.routed`
 
 type: long
 
@@ -11631,7 +11631,7 @@ Routed requests
 
 
 [float]
-=== `uwsgi.status.core.offloaded_requests`
+=== `uwsgi.status.core.requests.offloaded`
 
 type: long
 

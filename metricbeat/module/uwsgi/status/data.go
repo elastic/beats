@@ -104,14 +104,16 @@ func eventsMapping(content []byte) ([]common.MapStr, error) {
 
 			coreEvent := common.MapStr{
 				"core": common.MapStr{
-					"id":                 coreID,
-					"worker_pid":         worker.PID,
-					"requests":           core.Requests,
-					"static_requests":    core.StaticRequests,
-					"routed_requests":    core.RoutedRequests,
-					"offloaded_requests": core.OffloadedRequests,
-					"write_errors":       core.WriteErrors,
-					"read_errors":        core.ReadErrors,
+					"id":         coreID,
+					"worker_pid": worker.PID,
+					"requests": common.MapStr{
+						"total":     core.Requests,
+						"static":    core.StaticRequests,
+						"routed":    core.RoutedRequests,
+						"offloaded": core.OffloadedRequests,
+					},
+					"write_errors": core.WriteErrors,
+					"read_errors":  core.ReadErrors,
 				},
 			}
 			events = append(events, coreEvent)

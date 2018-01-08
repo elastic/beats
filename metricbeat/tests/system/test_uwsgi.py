@@ -17,6 +17,7 @@ class Test(metricbeat.BaseTest):
 
         cores = []
         total = None
+        workers = []
 
         for evt in output:
             top_level_fields = metricbeat.COMMON_FIELDS + ["uwsgi"]
@@ -30,12 +31,23 @@ class Test(metricbeat.BaseTest):
             if "core" in evt["uwsgi"]["status"]:
                 cores.append(evt["uwsgi"]["status"]["core"])
 
+            if "worker" in evt["uwsgi"]["status"]:
+                workers.append(evt["uwsgi"]["status"]["worker"])
+
         requests = 0
         for core in cores:
-            requests += core["requests"]
+            requests += core["requests"]["total"]
 
         assert requests == total["requests"]
         assert requests > 0
+
+        assert len(workers) > 0
+        assert len(cores) > 0
+
+        assert "accepting" in workers[0]
+        assert "worker_pid" in cores[0]
+        assert "requests" in cores[0]
+        assert "static" in cores[0]["requests"]
 
     @unittest.skipUnless(metricbeat.INTEGRATION_TESTS, "integration test")
     @attr('integration')

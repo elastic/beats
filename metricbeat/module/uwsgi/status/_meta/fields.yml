@@ -95,19 +95,19 @@
       type: long
       description: >
         Parent worker PID
-    - name: core.requests
+    - name: core.requests.total
       type: long
       description: >
-        Number of requests served
-    - name: core.static_requests
+        Number of total requests served
+    - name: core.requests.static
       type: long
       description: >
         Number of static file serves
-    - name: core.routed_requests
+    - name: core.requests.routed
       type: long
       description: >
         Routed requests
-    - name: core.offloaded_requests
+    - name: core.requests.offloaded
       type: long
       description: >
         Offloaded requests
@@ -119,4 +119,3 @@
       type: long
       description: >
         Number of failed reads
-
