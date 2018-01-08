@@ -6,7 +6,7 @@ If encryption is enabled on the {es} cluster, you need to connect to {es} via
 HTTPS. If the certificate authority (CA) that signed your node certificates
 is not in the host system's trusted certificate authorities list, you also need
 to add the path to the `.pem` file that contains your CA's certificate to the
-Beat configuration.
+{beatname_uc} configuration.
 
 To configure a {beatname_uc} to connect to {es} via HTTPS, add the `https`
 protocol to all host URLs:
