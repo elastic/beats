@@ -138,7 +138,7 @@ Vagrant.configure(2) do |config|
 
     c.vm.provision "shell", inline: $unixProvision, privileged: false
     c.vm.provision "shell", inline: $linuxGvmProvision, privileged: false
-    config.vm.provision "shell", inline: "dnf install -y make gcc python-pip python-virtualenv git"
+    c.vm.provision "shell", inline: "dnf install -y make gcc python-pip python-virtualenv git"
 
     c.vm.synced_folder ".", "/vagrant", type: "virtualbox"
   end
