@@ -24,6 +24,8 @@ import (
 const (
 	// Use old namespace for data until we do some field renaming for GA.
 	namespace = "audit.kernel"
+
+	auditLocked = 2
 )
 
 var (
@@ -153,6 +155,17 @@ func (ms *MetricSet) addRules(reporter mb.PushReporterV2) error {
 		return errors.Wrap(err, "failed to create audit client for adding rules")
 	}
 	defer client.Close()
+
+	// Don't attempt to change configuration if audit rules are locked (enabled == 2).
+	// Will result in EPERM.
+	status, err := client.GetStatus()
+	if err != nil {
+		return errors.Wrap(err, "failed to get audit status before adding rules")
+	}
+	if status.Enabled == auditLocked {
+		ms.log.Warn("Skipping rule configuration: Audit rules are locked")
+		return nil
+	}
 
 	// Delete existing rules.
 	n, err := client.DeleteRules()
