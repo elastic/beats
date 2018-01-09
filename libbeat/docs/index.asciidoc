@@ -5,11 +5,11 @@ include::./version.asciidoc[]
 
 include::{asciidoc-dir}/../../shared/attributes.asciidoc[]
 
-include::../../libbeat/docs/shared-beats-attributes.asciidoc[]
-
 :beatname_lc: beatname
 :beatname_uc: a Beat
 :beatname_pkg: {beatname_lc}
+
+include::../../libbeat/docs/shared-beats-attributes.asciidoc[]
 
 include::./overview.asciidoc[]
 
