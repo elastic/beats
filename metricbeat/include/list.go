@@ -115,6 +115,8 @@ import (
 	_ "github.com/elastic/beats/metricbeat/module/system/raid"
 	_ "github.com/elastic/beats/metricbeat/module/system/socket"
 	_ "github.com/elastic/beats/metricbeat/module/system/uptime"
+	_ "github.com/elastic/beats/metricbeat/module/uwsgi"
+	_ "github.com/elastic/beats/metricbeat/module/uwsgi/status"
 	_ "github.com/elastic/beats/metricbeat/module/vsphere"
 	_ "github.com/elastic/beats/metricbeat/module/vsphere/datastore"
 	_ "github.com/elastic/beats/metricbeat/module/vsphere/host"

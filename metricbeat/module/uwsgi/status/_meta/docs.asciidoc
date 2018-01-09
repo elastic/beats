@@ -1,0 +1,7 @@
+This module periodically fetches metrics from http://uwsgi-docs.readthedocs.io/en/latest/StatsServer.html[uWSGI] servers.
+
+[float]
+=== Compatibility
+
+The uWSGI metricsets were tested with uWSGI 2.0.15 and are expected to work with all version
+>= 1.4.9

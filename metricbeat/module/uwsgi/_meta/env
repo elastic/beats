@@ -1,0 +1,2 @@
+UWSGI_STAT_TCP_SERVER=tcp://uwsgi_tcp:9191
+UWSGI_STAT_HTTP_SERVER=http://uwsgi_http:9192
