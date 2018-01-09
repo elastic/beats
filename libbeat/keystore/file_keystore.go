@@ -277,7 +277,7 @@ func (k *FileKeystore) encrypt(reader io.Reader) (io.Reader, error) {
 
 	// Stretch the user provided key
 	password, _ := k.password.Get()
-	passwordBytes := pbkdf2.Key(password, salt, iterationsCount, keyLength, sha512.New)
+	passwordBytes := k.hashPassword(password, salt)
 
 	// Select AES-256: because len(passwordBytes) == 32 bytes
 	block, err := aes.NewCipher(passwordBytes)
@@ -323,7 +323,7 @@ func (k *FileKeystore) decrypt(reader io.Reader) (io.Reader, error) {
 	encodedBytes := data[saltLength+iVLength:]
 
 	password, _ := k.password.Get()
-	passwordBytes := pbkdf2.Key(password, salt, iterationsCount, keyLength, sha512.New)
+	passwordBytes := k.hashPassword(password, salt)
 
 	block, err := aes.NewCipher(passwordBytes)
 	if err != nil {
@@ -377,4 +377,8 @@ func (k *FileKeystore) checkPermissions(f string) error {
 	}
 
 	return nil
+}
+
+func (k *FileKeystore) hashPassword(password, salt []byte) []byte {
+	return pbkdf2.Key(password, salt, iterationsCount, keyLength, sha512.New)
 }
