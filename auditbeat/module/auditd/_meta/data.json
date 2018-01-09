@@ -36,7 +36,7 @@
         "hostname": "host.example.com",
         "name": "host.example.com"
     },
-    "dataset": {
+    "event": {
         "module": "auditd"
     }
 }

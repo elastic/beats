@@ -26,6 +26,7 @@ https://github.com/elastic/beats/compare/v6.0.0-beta2...master[Check the HEAD di
 - Split the audit.kernel and audit.file metricsets into their own modules
   named auditd and file_integrity, respectively. This change requires
   existing users to update their config. {issue}5422[5422]
+- Renamed file_integrity module fields. {issue}5423[5423] {pull}5995[5995]
 
 *Filebeat*
 - Switch to docker prospector in sample manifests for Kubernetes deployment {pull}5963[5963]
