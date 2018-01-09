@@ -136,6 +136,49 @@ Example:
 }
 ----
 
+[float]
+==== dedot.enabled
+With this configuration enabled dots in json field names  are replaced with `_` character,
+
+Example:
+
+[source,json]
+----
+{
+  "@timestamp": "2017-05-01T13:00:24.745Z",
+  "beat": {
+    "hostname": "mbp",
+    "name": "mbp",
+    "version": "6.0.0-alpha1"
+  },
+  "http": {
+    "http_json_namespace": {
+      "date": "05-01-2017",
+      "milliseconds_since_epoch": 1493643625474.000000,
+      "time": "01:00:25 PM"
+    },
+    "response": {
+      "headers": {
+        "Access-Control-Allow-Origin": "*",
+        "Content-Length": "100",
+        "Content-Type": "application/json; charset=ISO-8859-1",
+        "Date": "Mon, 01 May 2017 13:08:38 GMT",
+        "Server": "Google Frontend",
+        "X-Cloud-Trace-Context": "3f532d170112fc5b2a0b94fcbd6493b3"
+      },
+      "code": 200
+    }
+  },
+  "metricset": {
+    "host": "date.jsontest.com",
+    "module": "http",
+    "name": "json",
+    "namespace": "http_json_namespace",
+    "rtt": 238397
+  },
+  "type": "metricsets"
+}
+----
 
 [float]
 === Exposed fields, Dashboards, Indexes, etc.
