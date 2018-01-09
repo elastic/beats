@@ -219,6 +219,7 @@ metricbeat.modules:
   #method: "GET"
   #request.enabled: false
   #response.enabled: false
+  #dedot.enabled: false
 
 - module: http
   metricsets: ["server"]
