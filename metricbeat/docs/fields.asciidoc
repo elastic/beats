@@ -44,6 +44,7 @@ grouped in the following categories:
 * <<exported-fields-rabbitmq>>
 * <<exported-fields-redis>>
 * <<exported-fields-system>>
+* <<exported-fields-uwsgi>>
 * <<exported-fields-vsphere>>
 * <<exported-fields-windows>>
 * <<exported-fields-zookeeper>>
@@ -11591,6 +11592,258 @@ type: long
 format: duration
 
 The OS uptime in milliseconds.
+
+
+[[exported-fields-uwsgi]]
+== uwsgi fields
+
+uwsgi module
+
+
+
+[float]
+== uwsgi fields
+
+
+
+
+[float]
+== status fields
+
+uwsgi.status metricset fields
+
+
+
+[float]
+=== `uwsgi.status.total.requests`
+
+type: long
+
+Total requests handled
+
+
+[float]
+=== `uwsgi.status.total.exceptions`
+
+type: long
+
+Total exceptions
+
+
+[float]
+=== `uwsgi.status.total.write_errors`
+
+type: long
+
+Total requests write errors
+
+
+[float]
+=== `uwsgi.status.total.read_errors`
+
+type: long
+
+Total read errors
+
+
+[float]
+=== `uwsgi.status.total.pid`
+
+type: long
+
+Process id
+
+
+[float]
+=== `uwsgi.status.worker.id`
+
+type: long
+
+Worker id
+
+
+[float]
+=== `uwsgi.status.worker.pid`
+
+type: long
+
+Worker process id
+
+
+[float]
+=== `uwsgi.status.worker.accepting`
+
+type: long
+
+State of worker, 1 if still accepting new requests otherwise 0
+
+
+[float]
+=== `uwsgi.status.worker.requests`
+
+type: long
+
+Number of requests served by this worker
+
+
+[float]
+=== `uwsgi.status.worker.delta_requests`
+
+type: long
+
+Number of requests served by this worker after worker is reloaded when reached MAX_REQUESTS
+
+
+[float]
+=== `uwsgi.status.worker.exceptions`
+
+type: long
+
+Exceptions raised
+
+
+[float]
+=== `uwsgi.status.worker.harakiri_count`
+
+type: long
+
+Dropped requests by timeout
+
+
+[float]
+=== `uwsgi.status.worker.signals`
+
+type: long
+
+Emitted signals count
+
+
+[float]
+=== `uwsgi.status.worker.signal_queue`
+
+type: long
+
+Number of signals waiting to be handled
+
+
+[float]
+=== `uwsgi.status.worker.status`
+
+type: keyword
+
+Worker status (cheap, pause, sig, busy, idle)
+
+
+[float]
+=== `uwsgi.status.worker.rss`
+
+type: keyword
+
+Resident Set Size. memory currently used by a process. if always zero try `--memory-report` option of uwsgi
+
+
+[float]
+=== `uwsgi.status.worker.vsz`
+
+type: long
+
+Virtual Set Size. memory size assigned to a process. if always zero try `--memory-report` option of uwsgi
+
+
+[float]
+=== `uwsgi.status.worker.running_time`
+
+type: long
+
+Process running time
+
+
+[float]
+=== `uwsgi.status.worker.respawn_count`
+
+type: long
+
+Respawn count
+
+
+[float]
+=== `uwsgi.status.worker.tx`
+
+type: long
+
+Transmitted size
+
+
+[float]
+=== `uwsgi.status.worker.avg_rt`
+
+type: long
+
+Average response time
+
+
+[float]
+=== `uwsgi.status.core.id`
+
+type: long
+
+worker ID
+
+
+[float]
+=== `uwsgi.status.core.worker_pid`
+
+type: long
+
+Parent worker PID
+
+
+[float]
+=== `uwsgi.status.core.requests.total`
+
+type: long
+
+Number of total requests served
+
+
+[float]
+=== `uwsgi.status.core.requests.static`
+
+type: long
+
+Number of static file serves
+
+
+[float]
+=== `uwsgi.status.core.requests.routed`
+
+type: long
+
+Routed requests
+
+
+[float]
+=== `uwsgi.status.core.requests.offloaded`
+
+type: long
+
+Offloaded requests
+
+
+[float]
+=== `uwsgi.status.core.write_errors`
+
+type: long
+
+Number of failed writes
+
+
+[float]
+=== `uwsgi.status.core.read_errors`
+
+type: long
+
+Number of failed reads
 
 
 [[exported-fields-vsphere]]

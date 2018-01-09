@@ -450,6 +450,12 @@ metricbeat.modules:
   # Redis AUTH password. Empty by default.
   #password: foobared
 
+#-------------------------------- uwsgi Module -------------------------------
+- module: uwsgi
+  metricsets: ["status"]
+  period: 10s
+  hosts: ["tcp://127.0.0.1:9191"]
+
 #------------------------------- vSphere Module ------------------------------
 - module: vsphere
   metricsets: ["datastore", "host", "virtualmachine"]
