@@ -41,6 +41,11 @@ var gauges = map[string]bool{
 	"system.load.norm.15":            true,
 }
 
+// TODO: Change this when gauges are refactored, too.
+var strConsts = map[string]bool{
+	"beat.info.ephemeral_id": true,
+}
+
 var (
 	// StartTime is the time that the process was started.
 	StartTime = time.Now()
@@ -141,7 +146,9 @@ func makeDeltaSnapshot(prev, cur monitoring.FlatSnapshot) monitoring.FlatSnapsho
 	}
 
 	for k, s := range cur.Strings {
-		if p, ok := prev.Strings[k]; !ok || p != s {
+		if _, found := strConsts[k]; found {
+			delta.Strings[k] = s
+		} else if p, ok := prev.Strings[k]; !ok || p != s {
 			delta.Strings[k] = s
 		}
 	}
