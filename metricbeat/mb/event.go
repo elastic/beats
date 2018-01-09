@@ -47,11 +47,16 @@ func (e *Event) BeatEvent(module, metricSet string, modifiers ...EventModifier) 
 	}
 
 	if len(e.MetricSetFields) > 0 {
-		prefix := e.Namespace
-		if prefix == "" {
-			prefix = module + "." + metricSet
+		switch e.Namespace {
+		case ".":
+			// Add fields to root.
+			b.Fields.DeepUpdate(e.MetricSetFields)
+		case "":
+			b.Fields.Put(module+"."+metricSet, e.MetricSetFields)
+		default:
+			b.Fields.Put(e.Namespace, e.MetricSetFields)
 		}
-		b.Fields.Put(prefix, e.MetricSetFields)
+
 		e.MetricSetFields = nil
 	}
 
