@@ -4,12 +4,12 @@ include::../../libbeat/docs/version.asciidoc[]
 
 include::{asciidoc-dir}/../../shared/attributes.asciidoc[]
 
-include::../../libbeat/docs/shared-beats-attributes.asciidoc[]
-
 :version: {stack-version}
 :beatname_lc: heartbeat
 :beatname_uc: Heartbeat
 :beatname_pkg: heartbeat-elastic
+
+include::../../libbeat/docs/shared-beats-attributes.asciidoc[]
 
 include::./overview.asciidoc[]
 
