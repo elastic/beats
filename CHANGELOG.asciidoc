@@ -170,6 +170,7 @@ https://github.com/elastic/beats/compare/v6.0.0-beta2...master[Check the HEAD di
 - Add a dashboard for the Nginx module. {pull}5991[5991]
 - Add experimental mongodb/collstats metricset. {pull}5852[5852]
 - Update the MySQL dashboard to use the Time Series Visual Builder. {pull}5996[5996]
+- Add experimental uwsgi metricset. {pull}6006[6006]
 
 *Packetbeat*
 
