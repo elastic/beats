@@ -84,7 +84,7 @@ func New(
 // Start starts the prospector
 func (p *Prospector) Start() {
 	p.wg.Add(1)
-	logp.Info("Starting prospector of type: %v; ID: %d ", p.config.Type, p.ID)
+	logp.Debug("prospector", "Starting prospector of type: %v; ID: %d ", p.config.Type, p.ID)
 
 	onceWg := sync.WaitGroup{}
 	if p.Once {
