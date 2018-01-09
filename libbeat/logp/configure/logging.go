@@ -48,7 +48,7 @@ func applyFlags(cfg *logp.Config) {
 	}
 
 	// Elevate level if selectors are specified on the CLI.
-	if len(cfg.Selectors) > 0 {
+	if len(debugSelectors) > 0 {
 		cfg.Level = logp.DebugLevel
 	}
 }
