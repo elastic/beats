@@ -9,6 +9,8 @@ import (
 	"runtime"
 	"time"
 
+	"github.com/satori/go.uuid"
+
 	"github.com/elastic/beats/libbeat/logp"
 	"github.com/elastic/beats/libbeat/metric/system/cpu"
 	"github.com/elastic/beats/libbeat/metric/system/process"
@@ -19,6 +21,7 @@ import (
 var (
 	cpuMonitor       *cpu.Monitor
 	beatProcessStats *process.Stats
+	ephemeralID      uuid.UUID
 )
 
 func init() {
@@ -30,6 +33,8 @@ func init() {
 	systemMetrics := monitoring.Default.NewRegistry("system")
 	monitoring.NewFunc(systemMetrics, "load", reportSystemLoadAverage, monitoring.Report)
 	monitoring.NewFunc(systemMetrics, "cpu", reportSystemCPUUsage, monitoring.Report)
+
+	ephemeralID = uuid.NewV4()
 }
 
 func setupMetrics(name string) error {
@@ -68,6 +73,7 @@ func reportInfo(_ monitoring.Mode, V monitoring.Visitor) {
 	delta := time.Since(log.StartTime)
 	uptime := int64(delta / time.Millisecond)
 	monitoring.ReportInt(V, "uptime.ms", uptime)
+	monitoring.ReportString(V, "ephemeral_id", ephemeralID.String())
 }
 
 func reportBeatCPU(_ monitoring.Mode, V monitoring.Visitor) {
