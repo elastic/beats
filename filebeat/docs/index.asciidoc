@@ -4,12 +4,12 @@ include::../../libbeat/docs/version.asciidoc[]
 
 include::{asciidoc-dir}/../../shared/attributes.asciidoc[]
 
-include::../../libbeat/docs/shared-beats-attributes.asciidoc[]
-
 :version: {stack-version}
 :beatname_lc: filebeat
 :beatname_uc: Filebeat
 :beatname_pkg: {beatname_lc}
+
+include::../../libbeat/docs/shared-beats-attributes.asciidoc[]
 
 include::./overview.asciidoc[]
 
