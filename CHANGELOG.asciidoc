@@ -187,6 +187,7 @@ https://github.com/elastic/beats/compare/v6.0.0-beta2...master[Check the HEAD di
 - Add builder support for autodiscover and annotations builder {pull}6408[6408]
 - Add plugin support for autodiscover builders, providers {pull}6457[6457]
 - Preserve runtime from container statuses in Kubernetes autodiscover {pull}6456[6456]
+- Experimental feature setup.template.append_fields added. {pull}6024[6024]
 
 *Auditbeat*
 
