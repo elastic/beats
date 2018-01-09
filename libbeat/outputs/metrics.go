@@ -11,9 +11,11 @@ type Stats struct {
 	batches *monitoring.Uint // total number of batches processed by output
 	events  *monitoring.Uint // total number of events processed by output
 
-	acked  *monitoring.Uint // total number of events ACKed by output
-	failed *monitoring.Uint // total number of events failed in output
-	active *monitoring.Uint // events sent and waiting for ACK/fail from output
+	acked      *monitoring.Uint // total number of events ACKed by output
+	failed     *monitoring.Uint // total number of events failed in output
+	active     *monitoring.Uint // events sent and waiting for ACK/fail from output
+	duplicates *monitoring.Uint // events sent and waiting for ACK/fail from output
+	dropped    *monitoring.Uint // total number of invalid events dropped by the output
 
 	//
 	// Output network connection stats
@@ -30,11 +32,13 @@ type Stats struct {
 // The registry must not be null.
 func NewStats(reg *monitoring.Registry) *Stats {
 	return &Stats{
-		batches: monitoring.NewUint(reg, "events.batches"),
-		events:  monitoring.NewUint(reg, "events.total"),
-		acked:   monitoring.NewUint(reg, "events.acked"),
-		failed:  monitoring.NewUint(reg, "events.failed"),
-		active:  monitoring.NewUint(reg, "events.active"),
+		batches:    monitoring.NewUint(reg, "events.batches"),
+		events:     monitoring.NewUint(reg, "events.total"),
+		acked:      monitoring.NewUint(reg, "events.acked"),
+		failed:     monitoring.NewUint(reg, "events.failed"),
+		dropped:    monitoring.NewUint(reg, "events.dropped"),
+		duplicates: monitoring.NewUint(reg, "events.duplicates"),
+		active:     monitoring.NewUint(reg, "events.active"),
 
 		writeBytes:  monitoring.NewUint(reg, "write.bytes"),
 		writeErrors: monitoring.NewUint(reg, "write.errors"),
@@ -69,6 +73,14 @@ func (s *Stats) Failed(n int) {
 	}
 }
 
+// Duplicate updats the active and duplicate event metrics.
+func (s *Stats) Duplicate(n int) {
+	if s != nil {
+		s.duplicates.Add(uint64(n))
+		s.active.Sub(uint64(n))
+	}
+}
+
 // Dropped updates total number of event drops as reported by the output.
 // Outputs will only report dropped events on fatal errors which lead to the
 // event not being publishabel. For example encoding errors or total event size
@@ -77,6 +89,7 @@ func (s *Stats) Dropped(n int) {
 	// number of dropped events (e.g. encoding failures)
 	if s != nil {
 		s.active.Sub(uint64(n))
+		s.dropped.Add(uint64(n))
 	}
 }
 
