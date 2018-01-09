@@ -1,0 +1,67 @@
+- key: sip
+  title: "SIP"
+  description: SIP-specific event fields.
+  fields:
+    - name: sip
+      type: group
+      fields:
+        - name: method
+          type: keyword
+          description: >
+            SIP Request Method
+          example: INVITE
+        - name: request-uri
+          type: keyword
+          description: >
+            SIP Request URI
+          example: sip:hoge@example.com:5060;transport=udp
+        - name: status-code
+          type: long
+          description: >
+            SIP Response code, status code
+          example: 200
+        - name: status-phrase
+          type: keyword
+          description: >
+            SIP Response , status phrase
+          example: OK
+        - name: from
+          type: keyword
+          description: >
+            SIP From header value
+          example: "\"sipp\" <sip:sipp@10.0.0.1>;tag=2363SIPpTag001"
+        - name: to
+          type: keyword
+          description: >
+            SIP To header value
+          example: "\"sut\" <sip:6505550252@192.168.0.1>;tag=16489SIPpTag012"
+        - name: call-id
+          type: keyword
+          description: >
+            SIP Call-ID header value
+          example: ""
+        - name: cseq
+          type: keyword
+          description: >
+            SIP CSeq header value
+          example: 1 INVITE
+        - name: body
+          type: object
+          object_type: keyword
+          description: The body of the SIP message. 
+        - name: src
+          type: keyword
+          description: >
+            Source IP address and port
+          example: 192.168.0.1:5060
+        - name: dst
+          type: keyword
+          description: >
+            Destination IP address and port
+          example: 192.168.0.1:5060
+    - name: unixtimenano
+      type: long
+      description: >
+        unixtime as nanosec
+      example: 1516199666016756000
+
