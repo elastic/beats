@@ -36,7 +36,8 @@ COVERAGE_TOOL?=${BEAT_GOPATH}/bin/gotestcover
 COVERAGE_TOOL_REPO?=github.com/elastic/beats/vendor/github.com/pierrre/gotestcover
 TESTIFY_TOOL_REPO?=github.com/elastic/beats/vendor/github.com/stretchr/testify
 LIBCOMPOSE_TOOL_REPO?=github.com/docker/libcompose
-GOBUILD_FLAGS?=-i
+NOW=$(shell date -u '+%Y-%m-%dT%H:%M:%SZ')
+GOBUILD_FLAGS?=-i -ldflags "-X github.com/elastic/beats/libbeat/version.buildTime=$(NOW) -X github.com/elastic/beats/libbeat/version.commit=$(COMMIT_ID)"
 GOIMPORTS=goimports
 GOIMPORTS_REPO?=golang.org/x/tools/cmd/goimports
 GOIMPORTS_LOCAL_PREFIX?=github.com/elastic
@@ -314,8 +315,8 @@ endif
 	@${PYTHON_ENV}/bin/python ${ES_BEATS}/libbeat/scripts/generate_fields_docs.py $(PWD) ${BEAT_TITLE} ${ES_BEATS}
 
 	@# Generate Kibana index pattern
-	@mkdir -p $(PWD)/_meta/kibana/5.x/index-pattern
-	@mkdir -p $(PWD)/_meta/kibana/default/index-pattern
+	@mkdir -p $(PWD)/_meta/kibana/5/index-pattern
+	@mkdir -p $(PWD)/_meta/kibana/6/index-pattern
 	@go run ${ES_BEATS}/dev-tools/cmd/kibana_index_pattern/kibana_index_pattern.go -index '${BEAT_INDEX_PREFIX}-*' -beat-name ${BEAT_NAME} -beat-dir $(PWD) -version ${BEAT_VERSION}
 
 .PHONY: docs

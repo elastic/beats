@@ -21,7 +21,7 @@ const (
 	bucketName    = "file.v1"
 
 	// Use old namespace for data until we do some field renaming for GA.
-	namespace = "audit.file"
+	namespace = "."
 )
 
 func init() {

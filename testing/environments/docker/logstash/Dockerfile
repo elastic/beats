@@ -22,7 +22,7 @@ COPY docker-entrypoint.sh /entrypoint.sh
 
 COPY pki /etc/pki
 
-HEALTHCHECK CMD nc -z localhost 5044
+HEALTHCHECK --interval=1s --retries=600 CMD nc -z localhost 5044
 
 ENTRYPOINT ["/entrypoint.sh"]
 

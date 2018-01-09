@@ -605,8 +605,8 @@ func (mysql *mysqlPlugin) receivedMysqlRequest(msg *mysqlMessage) {
 
 	// Extract the method, by simply taking the first word and
 	// making it upper case.
-	query := strings.Trim(msg.query, " \n\t")
-	index := strings.IndexAny(query, " \n\t")
+	query := strings.Trim(msg.query, " \r\n\t")
+	index := strings.IndexAny(query, " \r\n\t")
 	var method string
 	if index > 0 {
 		method = strings.ToUpper(query[:index])

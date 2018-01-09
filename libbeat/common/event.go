@@ -250,3 +250,9 @@ func joinKeys(keys ...string) string {
 func (f Float) MarshalJSON() ([]byte, error) {
 	return []byte(fmt.Sprintf("%.6f", f)), nil
 }
+
+// DeDot a string by replacing all . with _
+// This helps when sending data to Elasticsearch to prevent object and key collisions.
+func DeDot(s string) string {
+	return strings.Replace(s, ".", "_", -1)
+}

@@ -75,7 +75,8 @@ This file is generated! See scripts/docs_collector.py
 |<<metricbeat-module-memcached,Memcached>>  beta[]   |    
 .1+|   |<<metricbeat-metricset-memcached-stats,stats>> beta[]  
 |<<metricbeat-module-mongodb,MongoDB>>  beta[]   |    
-.2+|   |<<metricbeat-metricset-mongodb-dbstats,dbstats>> beta[]  
+.3+|   |<<metricbeat-metricset-mongodb-collstats,collstats>> experimental[]  
+|<<metricbeat-metricset-mongodb-dbstats,dbstats>> beta[]  
 |<<metricbeat-metricset-mongodb-status,status>> beta[]  
 |<<metricbeat-module-mysql,MySQL>>     |    
 .1+|   |<<metricbeat-metricset-mysql-status,status>>   

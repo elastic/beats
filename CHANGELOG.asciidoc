@@ -26,6 +26,7 @@ https://github.com/elastic/beats/compare/v6.0.0-beta2...master[Check the HEAD di
 - Split the audit.kernel and audit.file metricsets into their own modules
   named auditd and file_integrity, respectively. This change requires
   existing users to update their config. {issue}5422[5422]
+- Renamed file_integrity module fields. {issue}5423[5423] {pull}5995[5995]
 
 *Filebeat*
 - Switch to docker prospector in sample manifests for Kubernetes deployment {pull}5963[5963]
@@ -38,6 +39,8 @@ https://github.com/elastic/beats/compare/v6.0.0-beta2...master[Check the HEAD di
 - Rename `http.response.status_code` field to `http.response.code`. {pull}5521[5521]
 - Rename `golang.heap.system.optained` field to `golang.heap.system.obtained`. {issue}5703[5703]
 - Support haproxy stats gathering using http (additionaly to tcp socket). {pull}5819[5819]
+- De dot keys in jolokia/jmx metricset to prevent collisions. {pull}5957[5957]
+- Support to optionally 'de dot' keys in http/json metricset to prevent collisions. {pull}5957[5957]
 
 *Packetbeat*
 
@@ -58,6 +61,9 @@ https://github.com/elastic/beats/compare/v6.0.0-beta2...master[Check the HEAD di
 
 *Auditbeat*
 
+- Add an error check to the file integrity scanner to prevent a panic when
+  there is an error reading file info via lstat. {issue}6005[6005]
+
 *Filebeat*
 
 - Add support for adding string tags {pull}5395{5395}
@@ -65,6 +71,7 @@ https://github.com/elastic/beats/compare/v6.0.0-beta2...master[Check the HEAD di
 - Fix relative paths in the prospector definitions. {pull}5443[5433]
 - Fix `recursive_globe.enabled` option. {pull}5443[5443]
 - Change pipeline delimiter to `{<` and `>}`. {pull}5702[5702]
+- Fix variable name for `convert_timezone` in the system module. {pull}5936[5936]
 
 *Heartbeat*
 
@@ -84,11 +91,14 @@ https://github.com/elastic/beats/compare/v6.0.0-beta2...master[Check the HEAD di
 - Fix incorrect `Mem.Used` calculation under linux. {pull}5775[5775]
 - Fix mongodb session consistency mode to allow command execution on secondary nodes. {issue}4689[4689]
 - Fix `open_file_descriptor_count` and `max_file_descriptor_count` lost in zookeeper module {pull}5902[5902]
+- Fix kubernetes `state_pod` `status.phase` so that the active phase is returned instead of `unknown`. {pull}5980[5980]
+- Fix error collecting network_names in Vsphere module. {pull}5962[5962]
 
 *Packetbeat*
 
 - Fix http status phrase parsing not allow spaces. {pull}5312[5312]
 - Fix http parse to allow to parse get request with space in the URI. {pull}5495[5495]
+- Fix mysql SQL parser to trim `\r` from Windows Server `SELECT\r\n\t1`. {pull}5572[5572]
 
 *Winlogbeat*
 
@@ -117,6 +127,7 @@ https://github.com/elastic/beats/compare/v6.0.0-beta2...master[Check the HEAD di
 - Use structured logging for the metrics that are periodically logged via the
   `logging.metrics` feature. {pull}5915[5915]
 - Add the ability to log to the Windows Event Log. {pull}5913[5813]
+- Improve Elasticsearch output metrics to count number of dropped and duplicate (if event ID is given) events. {pull}5811[5811]
 
 *Auditbeat*
 
@@ -156,6 +167,9 @@ https://github.com/elastic/beats/compare/v6.0.0-beta2...master[Check the HEAD di
 - Add field network_names of hosts and virtual machines. {issue}5646[5646]
 - Update gosigar to v0.6.0. {pull}5775[5775]
 - Add experimental system/raid metricset. {pull}5642[5642]
+- Add a dashboard for the Nginx module. {pull}5991[5991]
+- Add experimental mongodb/collstats metricset. {pull}5852[5852]
+- Update the MySQL dashboard to use the Time Series Visual Builder. {pull}5996[5996]
 
 *Packetbeat*
 

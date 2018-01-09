@@ -101,6 +101,14 @@ func (s *scanner) walkDir(dir string) error {
 	errDone := errors.New("done")
 	startTime := time.Now()
 	err := filepath.Walk(dir, func(path string, info os.FileInfo, err error) error {
+		if err != nil {
+			if !os.IsNotExist(err) {
+				s.log.Warnw("Scanner is skipping a path because of an error",
+					"file_path", path, "error", err)
+			}
+			return nil
+		}
+
 		if s.config.IsExcludedPath(path) {
 			if info.IsDir() {
 				return filepath.SkipDir

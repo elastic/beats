@@ -28,11 +28,22 @@ var gauges = map[string]bool{
 	"beat.memstats.memory_alloc":     true,
 	"beat.memstats.gc_next":          true,
 	"beat.info.uptime.ms":            true,
+	"beat.cpu.total.pct":             true,
+	"beat.cpu.total.norm.pct":        true,
+	"beat.cpu.total.value":           true,
+	"system.cpu.total.pct":           true,
+	"system.cpu.total.norm.pct":      true,
+	"system.load.1":                  true,
+	"system.load.5":                  true,
+	"system.load.15":                 true,
+	"system.load.norm.1":             true,
+	"system.load.norm.5":             true,
+	"system.load.norm.15":            true,
 }
 
 var (
-	// startTime is the time that the process was started.
-	startTime = time.Now()
+	// StartTime is the time that the process was started.
+	StartTime = time.Now()
 )
 
 type reporter struct {
@@ -112,7 +123,7 @@ func (r *reporter) logSnapshot(s monitoring.FlatSnapshot) {
 
 func (r *reporter) logTotals(s monitoring.FlatSnapshot) {
 	r.logger.Infow("Total non-zero metrics", toKeyValuePairs(s)...)
-	r.logger.Infof("Uptime: %v", time.Since(startTime))
+	r.logger.Infof("Uptime: %v", time.Since(StartTime))
 }
 
 func makeSnapshot(R *monitoring.Registry) monitoring.FlatSnapshot {
@@ -146,7 +157,9 @@ func makeDeltaSnapshot(prev, cur monitoring.FlatSnapshot) monitoring.FlatSnapsho
 	}
 
 	for k, f := range cur.Floats {
-		if p := prev.Floats[k]; p != f {
+		if _, found := gauges[k]; found {
+			delta.Floats[k] = f
+		} else if p := prev.Floats[k]; p != f {
 			delta.Floats[k] = f - p
 		}
 	}

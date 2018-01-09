@@ -40,38 +40,41 @@ func NewGenerator(indexName, beatName, beatDir, beatVersion string, version comm
 
 // Create the Index-Pattern for Kibana for 5.x and default.
 func (i *IndexPatternGenerator) Generate() (string, error) {
-	commonFields, err := common.LoadFieldsYaml(i.fieldsYaml)
+	idxPattern, err := i.generate()
 	if err != nil {
 		return "", err
 	}
-
-	var path string
 
 	if i.version.Major >= 6 {
-		path, err = i.generateMinVersion6(commonFields)
-	} else {
-		path, err = i.generateMinVersion5(commonFields)
+		idxPattern = i.generateMinVersion6(idxPattern)
 	}
 
-	return path, err
+	file := filepath.Join(i.targetDir, i.targetFilename)
+	err = dumpToFile(file, idxPattern)
+
+	return file, err
 }
 
-func (i *IndexPatternGenerator) generateMinVersion5(fields common.Fields) (string, error) {
-	transformed, err := generate(i.indexName, &i.version, fields)
-	if err != nil {
-		return "", err
+func (i *IndexPatternGenerator) generate() (common.MapStr, error) {
+	indexPattern := common.MapStr{
+		"timeFieldName": "@timestamp",
+		"title":         i.indexName,
 	}
 
-	file5x := filepath.Join(i.targetDir, i.targetFilename)
-	err = dumpToFile(file5x, transformed)
-	return file5x, err
+	err := i.addGeneral(&indexPattern)
+	if err != nil {
+		return nil, err
+	}
+
+	err = i.addFieldsSpecific(&indexPattern)
+	if err != nil {
+		return nil, err
+	}
+
+	return indexPattern, nil
 }
 
-func (i *IndexPatternGenerator) generateMinVersion6(fields common.Fields) (string, error) {
-	transformed, err := generate(i.indexName, &i.version, fields)
-	if err != nil {
-		return "", err
-	}
+func (i *IndexPatternGenerator) generateMinVersion6(attrs common.MapStr) common.MapStr {
 	out := common.MapStr{
 		"version": i.beatVersion,
 		"objects": []common.MapStr{
@@ -79,37 +82,56 @@ func (i *IndexPatternGenerator) generateMinVersion6(fields common.Fields) (strin
 				"type":       "index-pattern",
 				"id":         i.indexName,
 				"version":    1,
-				"attributes": transformed,
+				"attributes": attrs,
 			},
 		},
 	}
-	file6x := filepath.Join(i.targetDir, i.targetFilename)
-	err = dumpToFile(file6x, out)
-	return file6x, err
+
+	return out
 }
 
-func generate(indexName string, version *common.Version, f common.Fields) (common.MapStr, error) {
-	transformer, err := newTransformer("@timestamp", indexName, version, f)
+func (i *IndexPatternGenerator) addGeneral(indexPattern *common.MapStr) error {
+	kibanaEntries, err := loadKibanaEntriesFromYaml(i.fieldsYaml)
 	if err != nil {
-		return nil, err
+		return err
 	}
-	transformed, err := transformer.transformFields()
+	transformed := newTransformer(kibanaEntries).transform()
+	if srcFilters, ok := transformed["sourceFilters"].([]common.MapStr); ok {
+		sourceFiltersBytes, err := json.Marshal(srcFilters)
+		if err != nil {
+			return err
+		}
+		(*indexPattern)["sourceFilters"] = string(sourceFiltersBytes)
+	}
+	return nil
+}
+
+func (i *IndexPatternGenerator) addFieldsSpecific(indexPattern *common.MapStr) error {
+	fields, err := common.LoadFieldsYaml(i.fieldsYaml)
 	if err != nil {
-		return nil, err
+		return err
+	}
+	transformer, err := newFieldsTransformer(&i.version, fields)
+	if err != nil {
+		return err
+	}
+	transformed, err := transformer.transform()
+	if err != nil {
+		return err
 	}
 
 	fieldsBytes, err := json.Marshal(transformed["fields"])
 	if err != nil {
-		return nil, err
+		return err
 	}
-	transformed["fields"] = string(fieldsBytes)
+	(*indexPattern)["fields"] = string(fieldsBytes)
 
 	fieldFormatBytes, err := json.Marshal(transformed["fieldFormatMap"])
 	if err != nil {
-		return nil, err
+		return err
 	}
-	transformed["fieldFormatMap"] = string(fieldFormatBytes)
-	return transformed, nil
+	(*indexPattern)["fieldFormatMap"] = string(fieldFormatBytes)
+	return nil
 }
 
 func clean(name string) string {
@@ -138,10 +160,9 @@ func createTargetDir(baseDir string, version common.Version) string {
 }
 
 func getVersionPath(version common.Version) string {
-	versionPath := "default"
+	versionPath := "6"
 	if version.Major == 5 {
-		versionPath = "5.x"
+		versionPath = "5"
 	}
 	return versionPath
-
 }

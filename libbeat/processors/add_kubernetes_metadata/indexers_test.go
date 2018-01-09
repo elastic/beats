@@ -7,9 +7,10 @@ import (
 	"github.com/stretchr/testify/assert"
 
 	"github.com/elastic/beats/libbeat/common"
+	"github.com/elastic/beats/libbeat/common/kubernetes"
 )
 
-var metagen = &GenDefaultMeta{}
+var metagen = kubernetes.NewMetaGenerator([]string{}, []string{}, []string{})
 
 func TestPodIndexer(t *testing.T) {
 	var testConfig = common.NewConfig()
@@ -19,15 +20,15 @@ func TestPodIndexer(t *testing.T) {
 
 	podName := "testpod"
 	ns := "testns"
-	pod := Pod{
-		Metadata: ObjectMeta{
+	pod := kubernetes.Pod{
+		Metadata: kubernetes.ObjectMeta{
 			Name:      podName,
 			Namespace: ns,
 			Labels: map[string]string{
 				"labelkey": "labelvalue",
 			},
 		},
-		Spec: PodSpec{},
+		Spec: kubernetes.PodSpec{},
 	}
 
 	indexers := podIndexer.GetMetadata(&pod)
@@ -62,17 +63,17 @@ func TestContainerIndexer(t *testing.T) {
 	container := "container"
 	initContainer := "initcontainer"
 
-	pod := Pod{
-		Metadata: ObjectMeta{
+	pod := kubernetes.Pod{
+		Metadata: kubernetes.ObjectMeta{
 			Name:      podName,
 			Namespace: ns,
 			Labels: map[string]string{
 				"labelkey": "labelvalue",
 			},
 		},
-		Status: PodStatus{
-			ContainerStatuses:     make([]PodContainerStatus, 0),
-			InitContainerStatuses: make([]PodContainerStatus, 0),
+		Status: kubernetes.PodStatus{
+			ContainerStatuses:     make([]kubernetes.PodContainerStatus, 0),
+			InitContainerStatuses: make([]kubernetes.PodContainerStatus, 0),
 		},
 	}
 
@@ -90,13 +91,13 @@ func TestContainerIndexer(t *testing.T) {
 		},
 	}
 
-	pod.Status.ContainerStatuses = []PodContainerStatus{
+	pod.Status.ContainerStatuses = []kubernetes.PodContainerStatus{
 		{
 			Name:        container,
 			ContainerID: "docker://abcde",
 		},
 	}
-	pod.Status.InitContainerStatuses = []PodContainerStatus{
+	pod.Status.InitContainerStatuses = []kubernetes.PodContainerStatus{
 		{
 			Name:        initContainer,
 			ContainerID: "docker://fghij",
@@ -127,14 +128,13 @@ func TestContainerIndexer(t *testing.T) {
 func TestFilteredGenMeta(t *testing.T) {
 	var testConfig = common.NewConfig()
 
-	filteredGen := &GenDefaultMeta{}
-	podIndexer, err := NewPodNameIndexer(*testConfig, filteredGen)
+	podIndexer, err := NewPodNameIndexer(*testConfig, metagen)
 	assert.Nil(t, err)
 
 	podName := "testpod"
 	ns := "testns"
-	pod := Pod{
-		Metadata: ObjectMeta{
+	pod := kubernetes.Pod{
+		Metadata: kubernetes.ObjectMeta{
 			Name:      podName,
 			Namespace: ns,
 			Labels: map[string]string{
@@ -146,7 +146,7 @@ func TestFilteredGenMeta(t *testing.T) {
 				"c": "d",
 			},
 		},
-		Spec: PodSpec{},
+		Spec: kubernetes.PodSpec{},
 	}
 
 	indexers := podIndexer.GetMetadata(&pod)
@@ -162,9 +162,7 @@ func TestFilteredGenMeta(t *testing.T) {
 	rawAnnotations := indexers[0].Data["annotations"]
 	assert.Nil(t, rawAnnotations)
 
-	filteredGen.labels = []string{"foo"}
-	filteredGen.annotations = []string{"a"}
-
+	filteredGen := kubernetes.NewMetaGenerator([]string{"a"}, []string{"foo"}, []string{})
 	podIndexer, err = NewPodNameIndexer(*testConfig, filteredGen)
 	assert.Nil(t, err)
 
@@ -195,16 +193,14 @@ func TestFilteredGenMeta(t *testing.T) {
 func TestFilteredGenMetaExclusion(t *testing.T) {
 	var testConfig = common.NewConfig()
 
-	filteredGen := &GenDefaultMeta{
-		labelsExclude: []string{"x"},
-	}
+	filteredGen := kubernetes.NewMetaGenerator([]string{}, []string{}, []string{"x"})
 	podIndexer, err := NewPodNameIndexer(*testConfig, filteredGen)
 	assert.Nil(t, err)
 
 	podName := "testpod"
 	ns := "testns"
-	pod := Pod{
-		Metadata: ObjectMeta{
+	pod := kubernetes.Pod{
+		Metadata: kubernetes.ObjectMeta{
 			Name:      podName,
 			Namespace: ns,
 			Labels: map[string]string{
@@ -216,7 +212,7 @@ func TestFilteredGenMetaExclusion(t *testing.T) {
 				"c": "d",
 			},
 		},
-		Spec: PodSpec{},
+		Spec: kubernetes.PodSpec{},
 	}
 
 	assert.Nil(t, err)
@@ -249,19 +245,19 @@ func TestIpPortIndexer(t *testing.T) {
 	container := "container"
 	ip := "1.2.3.4"
 	port := int64(80)
-	pod := Pod{
-		Metadata: ObjectMeta{
+	pod := kubernetes.Pod{
+		Metadata: kubernetes.ObjectMeta{
 			Name:      podName,
 			Namespace: ns,
 			Labels: map[string]string{
 				"labelkey": "labelvalue",
 			},
 		},
-		Spec: PodSpec{
-			Containers: make([]Container, 0),
+		Spec: kubernetes.PodSpec{
+			Containers: make([]kubernetes.Container, 0),
 		},
 
-		Status: PodStatus{
+		Status: kubernetes.PodStatus{
 			PodIP: ip,
 		},
 	}
@@ -288,10 +284,10 @@ func TestIpPortIndexer(t *testing.T) {
 		},
 	}
 
-	pod.Spec.Containers = []Container{
+	pod.Spec.Containers = []kubernetes.Container{
 		{
 			Name: container,
-			Ports: []ContainerPort{
+			Ports: []kubernetes.ContainerPort{
 				{
 					Name:          container,
 					ContainerPort: port,
