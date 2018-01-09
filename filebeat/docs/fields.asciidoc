@@ -1585,7 +1585,7 @@ The identifier for the host on which the osquery agent is running. Normally the 
 
 type: long
 
-Unix timestamp of the event. Used for computing the `@timestamp` column.
+Unix timestamp of the event, in seconds since the epoch. Used for computing the `@timestamp` column.
 
 
 [float]
