@@ -90,6 +90,7 @@ https://github.com/elastic/beats/compare/v6.0.0-beta2...master[Check the HEAD di
 - Fix mongodb session consistency mode to allow command execution on secondary nodes. {issue}4689[4689]
 - Fix `open_file_descriptor_count` and `max_file_descriptor_count` lost in zookeeper module {pull}5902[5902]
 - Fix kubernetes `state_pod` `status.phase` so that the active phase is returned instead of `unknown`. {pull}5980[5980]
+- Fix error collecting network_names in Vsphere module. {pull}5962[5962]
 
 *Packetbeat*
 
