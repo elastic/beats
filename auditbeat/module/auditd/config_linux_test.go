@@ -14,7 +14,7 @@ audit_rules: |
   # Comments and empty lines are ignored.
   -w /etc/passwd -p wa -k auth
 
-  -a always,exit -F arch=b64 -S execve -k exec`
+  -a always,exit -F arch=s390x || arch=b64 -S execve -k exec`
 
 	config, err := parseConfig(t, data)
 	if err != nil {
@@ -26,7 +26,7 @@ audit_rules: |
 	}
 	assert.EqualValues(t, []string{
 		"-w /etc/passwd -p wa -k auth",
-		"-a always,exit -F arch=b64 -S execve -k exec",
+		"-a always,exit -F arch=s390x || arch=b64 -S execve -k exec",
 	}, commands(rules))
 }
 
@@ -35,7 +35,7 @@ func TestConfigValidateWithError(t *testing.T) {
 audit_rules: |
   -x bad -F flag
   -a always,exit -w /etc/passwd
-  -a always,exit -F arch=b64 -S fake -k exec`
+  -a always,exit -F arch=s390x || arch=b64 -S fake -k exec`
 
 	_, err := parseConfig(t, data)
 	if err == nil {
