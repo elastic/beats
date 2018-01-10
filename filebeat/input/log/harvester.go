@@ -408,7 +408,7 @@ func (h *Harvester) validateFile(f *os.File) error {
 		return fmt.Errorf("Tried to open non regular file: %q %s", info.Mode(), info.Name())
 	}
 
-	// Compares the stat of the opened file to the state given by the prospector. Abort if not match.
+	// Compares the stat of the opened file to the state given by the input. Abort if not match.
 	if !os.SameFile(h.state.Fileinfo, info) {
 		return errors.New("file info is not identical with opened file. Aborting harvesting and retrying file later again")
 	}

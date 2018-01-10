@@ -14,7 +14,7 @@ import (
 )
 
 func TestProspectorFileExclude(t *testing.T) {
-	p := Prospector{
+	p := Input{
 		config: config{
 			ExcludeFiles: []match.Matcher{match.MustCompile(`\.gz$`)},
 		},
@@ -49,7 +49,7 @@ var cleanInactiveTests = []struct {
 func TestIsCleanInactive(t *testing.T) {
 	for _, test := range cleanInactiveTests {
 
-		l := Prospector{
+		l := Input{
 			config: config{
 				CleanInactive: test.cleanInactive,
 			},

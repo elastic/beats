@@ -239,7 +239,7 @@ class Test(BaseTest):
 
         # Wait until offset for new line is updated
         self.wait_until(
-            lambda: self.log_contains("No paths were defined for prospector accessing"),
+            lambda: self.log_contains("No paths were defined for input accessing"),
             max_timeout=10)
 
         assert exit_code == 1

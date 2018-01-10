@@ -25,6 +25,9 @@
       "prospector": {
         "type": "log"
       },
+      "input": {
+        "type": "log"
+      },
       "source": "/home/n/go/src/github.com/elastic/beats/filebeat/module/kafka/log/test/controller.log",
       "fileset": {
         "module": "kafka",
@@ -46,7 +49,7 @@
       1501847065113
     ]
   },
-  
+
   {
     "_index": "filebeat-7.0.0-alpha1-2017.08.11",
     "_type": "doc",
@@ -73,6 +76,9 @@
       "prospector": {
         "type": "log"
       },
+      "input": {
+        "type": "log"
+      },
       "source": "/home/n/go/src/github.com/elastic/beats/filebeat/module/kafka/log/test/controller.log",
       "message": "[2017-08-04 11:44:25,112] INFO [Controller-0-to-broker-0-send-thread]: Shutting down (kafka.controller.RequestSendThread)",
       "fileset": {
@@ -94,7 +100,7 @@
       1501847065112
     ]
   },
-  
+
   {
     "_index": "filebeat-7.0.0-alpha1-2017.08.11",
     "_type": "doc",
@@ -121,6 +127,9 @@
       "prospector": {
         "type": "log"
       },
+      "input": {
+        "type": "log"
+      },
       "source": "/home/n/go/src/github.com/elastic/beats/filebeat/module/kafka/log/test/controller.log",
       "message": "[2017-08-04 11:44:25,112] INFO [Controller-0-to-broker-0-send-thread]: Stopped (kafka.controller.RequestSendThread)",
       "fileset": {
@@ -142,7 +151,7 @@
       1501847065112
     ]
   },
-  
+
   {
     "_index": "filebeat-7.0.0-alpha1-2017.08.11",
     "_type": "doc",
@@ -169,6 +178,9 @@
       "prospector": {
         "type": "log"
       },
+      "input": {
+        "type": "log"
+      },
       "source": "/home/n/go/src/github.com/elastic/beats/filebeat/module/kafka/log/test/controller.log",
       "fileset": {
         "module": "kafka",
@@ -190,7 +202,7 @@
       1501847065111
     ]
   },
-  
+
   {
     "_index": "filebeat-7.0.0-alpha1-2017.08.11",
     "_type": "doc",
@@ -217,6 +229,9 @@
       "prospector": {
         "type": "log"
       },
+      "input": {
+        "type": "log"
+      },
       "source": "/home/n/go/src/github.com/elastic/beats/filebeat/module/kafka/log/test/controller.log",
       "fileset": {
         "module": "kafka",
@@ -238,7 +253,7 @@
       1501847065105
     ]
   },
-  
+
   {
     "_index": "filebeat-7.0.0-alpha1-2017.08.11",
     "_type": "doc",
@@ -265,6 +280,9 @@
       "prospector": {
         "type": "log"
       },
+      "input": {
+        "type": "log"
+      },
       "source": "/home/n/go/src/github.com/elastic/beats/filebeat/module/kafka/log/test/controller.log",
       "message": "[2017-08-04 11:44:25,100] DEBUG [Controller 0]: De-registering IsrChangeNotificationListener (kafka.controller.KafkaController)",
       "fileset": {
@@ -286,7 +304,7 @@
       1501847065100
     ]
   },
-  
+
   {
     "_index": "filebeat-7.0.0-alpha1-2017.08.11",
     "_type": "doc",
@@ -313,6 +331,9 @@
       "prospector": {
         "type": "log"
       },
+      "input": {
+        "type": "log"
+      },
       "source": "/home/n/go/src/github.com/elastic/beats/filebeat/module/kafka/log/test/controller.log",
       "message": "[2017-08-04 11:44:25,099] DEBUG [Controller 0]: Controller resigning, broker id 0 (kafka.controller.KafkaController)",
       "fileset": {
@@ -334,7 +355,7 @@
       1501847065099
     ]
   },
-  
+
   {
     "_index": "filebeat-7.0.0-alpha1-2017.08.11",
     "_type": "doc",
@@ -361,6 +382,9 @@
       "prospector": {
         "type": "log"
       },
+      "input": {
+        "type": "log"
+      },
       "source": "/home/n/go/src/github.com/elastic/beats/filebeat/module/kafka/log/test/controller.log",
       "fileset": {
         "module": "kafka",
@@ -382,7 +406,7 @@
       1501847065097
     ]
   },
-  
+
   {
     "_index": "filebeat-7.0.0-alpha1-2017.08.11",
     "_type": "doc",
@@ -409,6 +433,9 @@
       "prospector": {
         "type": "log"
       },
+      "input": {
+        "type": "log"
+      },
       "source": "/home/n/go/src/github.com/elastic/beats/filebeat/module/kafka/log/test/controller.log",
       "message": "[2017-08-04 11:44:25,095] INFO [controller-event-thread]: Stopped (kafka.controller.ControllerEventManager$ControllerEventThread)",
       "fileset": {
@@ -430,7 +457,7 @@
       1501847065095
     ]
   },
-  
+
   {
     "_index": "filebeat-7.0.0-alpha1-2017.08.11",
     "_type": "doc",
@@ -457,6 +484,9 @@
       "prospector": {
         "type": "log"
       },
+      "input": {
+        "type": "log"
+      },
       "source": "/home/n/go/src/github.com/elastic/beats/filebeat/module/kafka/log/test/controller.log",
       "message": "[2017-08-04 11:44:25,094] INFO [controller-event-thread]: Shutting down (kafka.controller.ControllerEventManager$ControllerEventThread)",
       "fileset": {
@@ -478,7 +508,7 @@
       1501847065094
     ]
   },
-  
+
   {
     "_index": "filebeat-7.0.0-alpha1-2017.08.11",
     "_type": "doc",
@@ -505,6 +535,9 @@
       "prospector": {
         "type": "log"
       },
+      "input": {
+        "type": "log"
+      },
       "source": "/home/n/go/src/github.com/elastic/beats/filebeat/module/kafka/log/test/controller.log",
       "message": "[2017-08-04 11:44:22,588] DEBUG [Controller 0]: Live brokers:  (kafka.controller.KafkaController)",
       "fileset": {
@@ -526,7 +559,7 @@
       1501847062588
     ]
   },
-  
+
   {
     "_index": "filebeat-7.0.0-alpha1-2017.08.11",
     "_type": "doc",
@@ -553,6 +586,9 @@
       "prospector": {
         "type": "log"
       },
+      "input": {
+        "type": "log"
+      },
       "source": "/home/n/go/src/github.com/elastic/beats/filebeat/module/kafka/log/test/controller.log",
       "message": "[2017-08-04 10:48:21,165] INFO [Partition state machine on Controller 0]: Invoking state change to OnlinePartition for partitions  (kafka.controller.PartitionStateMachine)",
       "fileset": {
@@ -574,7 +610,7 @@
       1501843701165
     ]
   },
-  
+
   {
     "_index": "filebeat-7.0.0-alpha1-2017.08.11",
     "_type": "doc",
@@ -601,6 +637,9 @@
       "prospector": {
         "type": "log"
       },
+      "input": {
+        "type": "log"
+      },
       "source": "/home/n/go/src/github.com/elastic/beats/filebeat/module/kafka/log/test/controller.log",
       "fileset": {
         "module": "kafka",
@@ -622,7 +661,7 @@
       1501843701157
     ]
   },
-  
+
   {
     "_index": "filebeat-7.0.0-alpha1-2017.08.11",
     "_type": "doc",
@@ -649,6 +688,9 @@
       "prospector": {
         "type": "log"
       },
+      "input": {
+        "type": "log"
+      },
       "source": "/home/n/go/src/github.com/elastic/beats/filebeat/module/kafka/log/test/controller.log",
       "message": "[2017-08-04 10:48:21,156] INFO [Partition state machine on Controller 0]: Started partition state machine with initial state -> Map() (kafka.controller.PartitionStateMachine)",
       "fileset": {
@@ -670,7 +712,7 @@
       1501843701156
     ]
   },
-  
+
   {
     "_index": "filebeat-7.0.0-alpha1-2017.08.11",
     "_type": "doc",
@@ -697,6 +739,9 @@
       "prospector": {
         "type": "log"
       },
+      "input": {
+        "type": "log"
+      },
       "source": "/home/n/go/src/github.com/elastic/beats/filebeat/module/kafka/log/test/controller.log",
       "message": "[2017-08-04 10:48:21,154] INFO [Replica state machine on controller 0]: Started replica state machine with initial state -> Map() (kafka.controller.ReplicaStateMachine)",
       "fileset": {
@@ -718,7 +763,7 @@
       1501843701154
     ]
   },
-  
+
   {
     "_index": "filebeat-7.0.0-alpha1-2017.08.11",
     "_type": "doc",
@@ -745,6 +790,9 @@
       "prospector": {
         "type": "log"
       },
+      "input": {
+        "type": "log"
+      },
       "source": "/home/n/go/src/github.com/elastic/beats/filebeat/module/kafka/log/test/controller.log",
       "fileset": {
         "module": "kafka",
@@ -766,7 +814,7 @@
       1501843701085
     ]
   },
-  
+
   {
     "_index": "filebeat-7.0.0-alpha1-2017.08.11",
     "_type": "doc",
@@ -793,6 +841,9 @@
       "prospector": {
         "type": "log"
       },
+      "input": {
+        "type": "log"
+      },
       "source": "/home/n/go/src/github.com/elastic/beats/filebeat/module/kafka/log/test/controller.log",
       "message": "[2017-08-04 10:48:21,082] INFO [Controller 0]: Controller 0 incremented epoch to 1 (kafka.controller.KafkaController)",
       "fileset": {
@@ -814,7 +865,7 @@
       1501843701082
     ]
   },
-  
+
   {
     "_index": "filebeat-7.0.0-alpha1-2017.08.11",
     "_type": "doc",
@@ -841,6 +892,9 @@
       "prospector": {
         "type": "log"
       },
+      "input": {
+        "type": "log"
+      },
       "source": "/home/n/go/src/github.com/elastic/beats/filebeat/module/kafka/log/test/controller.log",
       "message": "[2017-08-04 10:48:21,064] INFO [Controller 0]: Broker 0 starting become controller state transition (kafka.controller.KafkaController)",
       "fileset": {
@@ -862,7 +916,7 @@
       1501843701064
     ]
   },
-  
+
   {
     "_index": "filebeat-7.0.0-alpha1-2017.08.11",
     "_type": "doc",
@@ -889,6 +943,9 @@
       "prospector": {
         "type": "log"
       },
+      "input": {
+        "type": "log"
+      },
       "source": "/home/n/go/src/github.com/elastic/beats/filebeat/module/kafka/log/test/controller.log",
       "fileset": {
         "module": "kafka",
@@ -910,7 +967,7 @@
       1501843701063
     ]
   },
-  
+
   {
     "_index": "filebeat-7.0.0-alpha1-2017.08.11",
     "_type": "doc",
@@ -935,6 +992,9 @@
         "version": "7.0.0-alpha1"
       },
       "prospector": {
+        "type": "log"
+      },
+      "input": {
         "type": "log"
       },
       "source": "/home/n/go/src/github.com/elastic/beats/filebeat/module/kafka/log/test/controller.log",

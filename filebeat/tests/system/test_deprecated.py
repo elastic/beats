@@ -37,4 +37,4 @@ class Test(BaseTest):
 
         filebeat.check_kill_and_wait()
 
-        assert self.log_contains("DEPRECATED: input_type prospector config is deprecated")
+        assert self.log_contains("DEPRECATED: input_type input config is deprecated")

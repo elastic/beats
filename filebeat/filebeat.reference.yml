@@ -24,9 +24,9 @@ filebeat.modules:
     # Convert the timestamp to UTC. Requires Elasticsearch >= 6.1.
     #var.convert_timezone: false
 
-    # Prospector configuration (advanced). Any prospector configuration option
+    # Input configuration (advanced). Any input configuration option
     # can be added under this section.
-    #prospector:
+    #input:
 
   # Authorization logs
   #auth:
@@ -39,9 +39,9 @@ filebeat.modules:
     # Convert the timestamp to UTC. Requires Elasticsearch >= 6.1.
     #var.convert_timezone: false
 
-    # Prospector configuration (advanced). Any prospector configuration option
+    # Input configuration (advanced). Any input configuration option
     # can be added under this section.
-    #prospector:
+    #input:
 
 #------------------------------- Apache2 Module ------------------------------
 #- module: apache2
@@ -53,9 +53,9 @@ filebeat.modules:
     # Filebeat will choose the paths depending on your OS.
     #var.paths:
 
-    # Prospector configuration (advanced). Any prospector configuration option
+    # Input configuration (advanced). Any input configuration option
     # can be added under this section.
-    #prospector:
+    #input:
 
   # Error logs
   #error:
@@ -65,9 +65,9 @@ filebeat.modules:
     # Filebeat will choose the paths depending on your OS.
     #var.paths:
 
-    # Prospector configuration (advanced). Any prospector configuration option
+    # Input configuration (advanced). Any input configuration option
     # can be added under this section.
-    #prospector:
+    #input:
 
 #------------------------------- Auditd Module -------------------------------
 #- module: auditd
@@ -78,9 +78,9 @@ filebeat.modules:
     # Filebeat will choose the paths depending on your OS.
     #var.paths:
 
-    # Prospector configuration (advanced). Any prospector configuration option
+    # Input configuration (advanced). Any input configuration option
     # can be added under this section.
-    #prospector:
+    #input:
 
 #------------------------------- Icinga Module -------------------------------
 #- module: icinga
@@ -92,9 +92,9 @@ filebeat.modules:
     # Filebeat will choose the paths depending on your OS.
     #var.paths:
 
-    # Prospector configuration (advanced). Any prospector configuration option
+    # Input configuration (advanced). Any input configuration option
     # can be added under this section.
-    #prospector:
+    #input:
 
   # Debug logs
   #debug:
@@ -104,9 +104,9 @@ filebeat.modules:
     # Filebeat will choose the paths depending on your OS.
     #var.paths:
 
-    # Prospector configuration (advanced). Any prospector configuration option
+    # Input configuration (advanced). Any input configuration option
     # can be added under this section.
-    #prospector:
+    #input:
 
   # Startup logs
   #startup:
@@ -116,9 +116,9 @@ filebeat.modules:
     # Filebeat will choose the paths depending on your OS.
     #var.paths:
 
-    # Prospector configuration (advanced). Any prospector configuration option
+    # Input configuration (advanced). Any input configuration option
     # can be added under this section.
-    #prospector:
+    #input:
 
 #-------------------------------- Kafka Module -------------------------------
 - module: kafka
@@ -162,9 +162,9 @@ filebeat.modules:
     # Filebeat will choose the paths depending on your OS.
     #var.paths:
 
-    # Prospector configuration (advanced). Any prospector configuration option
+    # Input configuration (advanced). Any input configuration option
     # can be added under this section.
-    #prospector:
+    #input:
 
   # Slow logs
   #slowlog:
@@ -174,9 +174,9 @@ filebeat.modules:
     # Filebeat will choose the paths depending on your OS.
     #var.paths:
 
-    # Prospector configuration (advanced). Any prospector configuration option
+    # Input configuration (advanced). Any input configuration option
     # can be added under this section.
-    #prospector:
+    #input:
 
 #-------------------------------- Nginx Module -------------------------------
 #- module: nginx
@@ -200,9 +200,9 @@ filebeat.modules:
     # Filebeat will choose the paths depending on your OS.
     #var.paths:
 
-    # Prospector configuration (advanced). Any prospector configuration option
+    # Input configuration (advanced). Any input configuration option
     # can be added under this section.
-    #prospector:
+    #input:
 
 #------------------------------- Osquery Module ------------------------------
 - module: osquery
@@ -228,9 +228,9 @@ filebeat.modules:
     # Filebeat will choose the paths depending on your OS.
     #var.paths:
 
-    # Prospector configuration (advanced). Any prospector configuration option
+    # Input configuration (advanced). Any input configuration option
     # can be added under this section.
-    #prospector:
+    #input:
 
 #-------------------------------- Redis Module -------------------------------
 #- module: redis
@@ -262,30 +262,30 @@ filebeat.modules:
     # Filebeat will choose the paths depending on your OS.
     #var.paths:
 
-    # Prospector configuration (advanced). Any prospector configuration option
+    # Input configuration (advanced). Any input configuration option
     # can be added under this section.
-    #prospector:
+    #input:
 
 
-#=========================== Filebeat prospectors =============================
+#=========================== Filebeat inputs =============================
 
-# List of prospectors to fetch data.
-filebeat.prospectors:
-# Each - is a prospector. Most options can be set at the prospector level, so
-# you can use different prospectors for various configurations.
-# Below are the prospector specific configurations.
+# List of input to fetch data.
+filebeat.inputs:
+# Each - is an input. Most options can be set at the input level, so
+# you can use different inputs for various configurations.
+# Below are the input specific configurations.
 
 # Type of the files. Based on this the way the file is read is decided.
-# The different types cannot be mixed in one prospector
+# The different types cannot be mixed in one input
 #
 # Possible options are:
 # * log: Reads every line of the log file (default)
 # * stdin: Reads the standard in
 
-#------------------------------ Log prospector --------------------------------
+#------------------------------ Log input --------------------------------
 - type: log
 
-  # Change to true to enable this prospector configuration.
+  # Change to true to enable this input configuration.
   enabled: false
 
   # Paths that should be crawled and fetched. Glob based paths.
@@ -336,7 +336,7 @@ filebeat.prospectors:
   # Time strings like 2h (2 hours), 5m (5 minutes) can be used.
   #ignore_older: 0
 
-  # How often the prospector checks for new files in the paths that are specified
+  # How often the input checks for new files in the paths that are specified
   # for harvesting. Specify 1s to scan the directory as frequently as possible
   # without causing Filebeat to scan too frequently. Default: 10s.
   #scan_frequency: 10s
@@ -406,7 +406,7 @@ filebeat.prospectors:
   # this can mean that the first entries of a new file are skipped.
   #tail_files: false
 
-  # The Ingest Node pipeline ID associated with this prospector. If this is set, it
+  # The Ingest Node pipeline ID associated with this input. If this is set, it
   # overwrites the pipeline option from the Elasticsearch output.
   #pipeline:
 
@@ -472,15 +472,15 @@ filebeat.prospectors:
   # Note: Potential data loss. Make sure to read and understand the docs for this option.
   #close_timeout: 0
 
-  # Defines if prospectors is enabled
+  # Defines if input is enabled
   #enabled: true
 
-#----------------------------- Stdin prospector -------------------------------
+#----------------------------- Stdin input -------------------------------
 # Configuration to use stdin input
 #- type: stdin
 
-#------------------------- Redis slowlog prospector ---------------------------
-# Experimental: Config options for the redis slow log prospector
+#------------------------- Redis slowlog input ---------------------------
+# Experimental: Config options for the redis slow log input
 #- type: redis
   #hosts: ["localhost:6379"]
   #username:
@@ -488,7 +488,7 @@ filebeat.prospectors:
   #enabled: false
   #scan_frequency: 10s
 
-  # Timeout after which time the prospector should return an error
+  # Timeout after which time the input should return an error
   #timeout: 1s
 
   # Network type to be used for redis connection. Default: tcp
@@ -500,8 +500,8 @@ filebeat.prospectors:
   # Redis AUTH password. Empty by default.
   #password: foobared
 
-#------------------------------ Udp prospector --------------------------------
-# Experimental: Config options for the udp prospector
+#------------------------------ Udp input --------------------------------
+# Experimental: Config options for the udp input
 #- type: udp
 
   # Maximum size of the message received over UDP
@@ -510,7 +510,7 @@ filebeat.prospectors:
 #========================== Filebeat autodiscover ==============================
 
 # Autodiscover allows you to detect changes in the system and spawn new modules
-# or prospectors as they happen.
+# or inputs as they happen.
 
 #filebeat.autodiscover:
   # List of enabled autodiscover providers
@@ -531,7 +531,7 @@ filebeat.prospectors:
 #filebeat.registry_file: ${path.data}/registry
 
 # These config files must have the full filebeat config part inside, but only
-# the prospector part is processed. All global options like spool_size are ignored.
+# the input part is processed. All global options like spool_size are ignored.
 # The config_dir MUST point to a different directory then where the main filebeat config file is in.
 #filebeat.config_dir:
 
@@ -541,9 +541,9 @@ filebeat.prospectors:
 
 # Enable filebeat config reloading
 #filebeat.config:
-  #prospectors:
+  #inputs:
     #enabled: false
-    #path: prospectors.d/*.yml
+    #path: inputs.d/*.yml
     #reload.enabled: true
     #reload.period: 10s
   #modules:

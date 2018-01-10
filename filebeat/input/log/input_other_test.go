@@ -59,7 +59,7 @@ var matchTests = []struct {
 func TestMatchFile(t *testing.T) {
 	for _, test := range matchTests {
 
-		p := Prospector{
+		p := Input{
 			config: config{
 				Paths:        test.paths,
 				ExcludeFiles: test.excludeFiles,
@@ -127,7 +127,7 @@ var initStateTests = []struct {
 // This means only the ones that match the glob and not exclude files
 func TestInit(t *testing.T) {
 	for _, test := range initStateTests {
-		p := Prospector{
+		p := Input{
 			config: config{
 				Paths: test.paths,
 			},

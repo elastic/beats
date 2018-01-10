@@ -1,4 +1,4 @@
-// Package redis package contains prospector and harvester to read the redis slow log
+// Package redis package contains input and harvester to read the redis slow log
 //
 // The redis slow log is stored in memory. The slow log can be activate on the redis command line as following:
 //
