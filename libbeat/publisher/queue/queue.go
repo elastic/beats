@@ -60,6 +60,10 @@ type ProducerConfig struct {
 	// DropOnCancel is a hint to the queue to drop events if the producer disconnects
 	// via Cancel.
 	DropOnCancel bool
+
+	// Weight is the weight of the producer to determine the priority. Weight is a value
+	// between 0 and 9.
+	Weight int
 }
 
 // Producer interface to be used by the pipelines client to forward events to be

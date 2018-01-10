@@ -19,8 +19,6 @@ import (
 // command line flags
 var publishDisabled = false
 
-const defaultQueueType = "mem"
-
 func init() {
 	flag.BoolVar(&publishDisabled, "N", false, "Disable actual publishing for testing")
 }
@@ -116,22 +114,7 @@ func loadOutput(
 }
 
 func createQueueBuilder(config common.ConfigNamespace) (func(queue.Eventer) (queue.Queue, error), error) {
-	queueType := defaultQueueType
-	if b := config.Name(); b != "" {
-		queueType = b
-	}
-
-	queueFactory := queue.FindFactory(queueType)
-	if queueFactory == nil {
-		return nil, fmt.Errorf("'%v' is no valid queue type", queueType)
-	}
-
-	queueConfig := config.Config()
-	if queueConfig == nil {
-		queueConfig = common.NewConfig()
-	}
-
 	return func(eventer queue.Eventer) (queue.Queue, error) {
-		return queueFactory(eventer, queueConfig)
+		return queue.Load(eventer, config)
 	}, nil
 }

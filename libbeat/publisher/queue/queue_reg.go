@@ -6,6 +6,8 @@ import (
 	"github.com/elastic/beats/libbeat/common"
 )
 
+const defaultQueueType = "mem"
+
 // Global queue type registry for configuring and loading a queue instance
 // via common.Config
 var queueReg = map[string]Factory{}
@@ -25,14 +27,25 @@ func FindFactory(name string) Factory {
 
 // Load instantiates a new queue.
 func Load(eventer Eventer, config common.ConfigNamespace) (Queue, error) {
-	t, cfg := config.Name(), config.Config()
+	t := config.Name()
 	if t == "" {
-		t = "mem"
+		t = defaultQueueType
+	}
+
+	queueConfig := config.Config()
+	if queueConfig == nil {
+		queueConfig = common.NewConfig()
 	}
 
 	factory := FindFactory(t)
 	if factory == nil {
 		return nil, fmt.Errorf("queue type %v undefined", t)
 	}
-	return factory(eventer, cfg)
+	q, err := factory(eventer, queueConfig)
+	if err != nil {
+		return nil, err
+	}
+
+	// Return a wrapped queue that can do QoS.
+	return NewQueueWrapper(q, queueConfig), nil
 }

@@ -209,6 +209,9 @@ func (l *chanList) concat(other *chanList) {
 		return
 	}
 
+	m := sync.Mutex{}
+	s := sync.NewCond(&m)
+	s.Signal()
 	l.tail.next = other.head
 	l.tail = other.tail
 }

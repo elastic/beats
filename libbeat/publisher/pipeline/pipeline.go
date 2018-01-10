@@ -311,6 +311,7 @@ func (p *Pipeline) ConnectWith(cfg beat.ClientConfig) (beat.Client, error) {
 		// Cancel events from queue if acker is configured
 		// and no pipeline-wide ACK handler is registered.
 		DropOnCancel: dropOnCancel && acker != nil && p.eventer.cb == nil,
+		Weight:       cfg.Weight,
 	}
 
 	if reportEvents || cfg.Events != nil {

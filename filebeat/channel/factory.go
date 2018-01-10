@@ -41,6 +41,8 @@ type prospectorOutletConfig struct {
 	// Output meta data settings
 	Pipeline string `config:"pipeline"` // ES Ingest pipeline name
 
+	// Priority to set for the prospector
+	Weight int `config:"weight" validate:"min=0, max=9"`
 }
 
 // NewOutletFactory creates a new outlet factory for
@@ -109,6 +111,7 @@ func (f *OutletFactory) Create(cfg *common.Config, dynFields *common.MapStrPoint
 		Fields:        fields,
 		Processor:     processors,
 		Events:        f.eventer,
+		Weight:        config.Weight,
 	})
 	if err != nil {
 		return nil, err
