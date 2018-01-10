@@ -41,6 +41,8 @@ https://github.com/elastic/beats/compare/v6.1.1...6.1[Check the HEAD diff]
 
 *Metricbeat*
 
+- Fix process cgroup memory metrics for memsw, kmem, and kmem_tcp. {issue}6033[6033]
+
 *Packetbeat*
 
 *Winlogbeat*
