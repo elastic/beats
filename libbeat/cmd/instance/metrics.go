@@ -98,7 +98,10 @@ func reportInfo(_ monitoring.Mode, V monitoring.Visitor) {
 
 	delta := time.Since(log.StartTime)
 	uptime := int64(delta / time.Millisecond)
-	monitoring.ReportInt(V, "uptime.ms", uptime)
+	monitoring.ReportNamespace(V, "uptime", func() {
+		monitoring.ReportInt(V, "ms", uptime)
+	})
+
 	monitoring.ReportString(V, "ephemeral_id", ephemeralID.String())
 }
 
@@ -111,9 +114,14 @@ func reportBeatCPU(_ monitoring.Mode, V monitoring.Visitor) {
 		logp.Err("Error retrieving CPU percentages: %v", err)
 		return
 	}
-	monitoring.ReportFloat(V, "total.pct", cpuUsage)
-	monitoring.ReportFloat(V, "total.norm.pct", cpuUsageNorm)
-	monitoring.ReportFloat(V, "total.value", totalCPUUsage)
+
+	monitoring.ReportNamespace(V, "total", func() {
+		monitoring.ReportFloat(V, "value", totalCPUUsage)
+		monitoring.ReportFloat(V, "pct", cpuUsage)
+		monitoring.ReportNamespace(V, "norm", func() {
+			monitoring.ReportFloat(V, "pct", cpuUsageNorm)
+		})
+	})
 
 }
 
@@ -171,9 +179,11 @@ func reportSystemLoadAverage(_ monitoring.Mode, V monitoring.Visitor) {
 	monitoring.ReportFloat(V, "15", avgs.FifteenMinute)
 
 	normAvgs := load.NormalizedAverages()
-	monitoring.ReportFloat(V, "norm.1", normAvgs.OneMinute)
-	monitoring.ReportFloat(V, "norm.5", normAvgs.FiveMinute)
-	monitoring.ReportFloat(V, "norm.15", normAvgs.FifteenMinute)
+	monitoring.ReportNamespace(V, "norm", func() {
+		monitoring.ReportFloat(V, "1", normAvgs.OneMinute)
+		monitoring.ReportFloat(V, "5", normAvgs.FiveMinute)
+		monitoring.ReportFloat(V, "15", normAvgs.FifteenMinute)
+	})
 }
 
 func reportSystemCPUUsage(_ monitoring.Mode, V monitoring.Visitor) {
@@ -187,10 +197,14 @@ func reportSystemCPUUsage(_ monitoring.Mode, V monitoring.Visitor) {
 	}
 
 	pct := sample.Percentages()
-	monitoring.ReportFloat(V, "total.pct", pct.Total)
-
 	normalizedPct := sample.NormalizedPercentages()
-	monitoring.ReportFloat(V, "total.norm.pct", normalizedPct.Total)
+
+	monitoring.ReportNamespace(V, "total", func() {
+		monitoring.ReportFloat(V, "pct", pct.Total)
+		monitoring.ReportNamespace(V, "norm", func() {
+			monitoring.ReportFloat(V, "pct", normalizedPct.Total)
+		})
+	})
 
 	monitoring.ReportInt(V, "cores", int64(process.NumCPU))
 }
