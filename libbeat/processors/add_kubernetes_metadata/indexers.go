@@ -2,7 +2,6 @@ package add_kubernetes_metadata
 
 import (
 	"fmt"
-	"strings"
 	"sync"
 
 	"github.com/elastic/beats/libbeat/common"
@@ -143,7 +142,7 @@ func NewContainerIndexer(_ common.Config, metaGen kubernetes.MetaGenerator) (Ind
 func (c *ContainerIndexer) GetMetadata(pod *kubernetes.Pod) []MetadataIndex {
 	var metadata []MetadataIndex
 	for _, status := range append(pod.Status.ContainerStatuses, pod.Status.InitContainerStatuses...) {
-		cID := containerID(status)
+		cID := status.ContainerID
 		if cID == "" {
 			continue
 		}
@@ -160,24 +159,13 @@ func (c *ContainerIndexer) GetMetadata(pod *kubernetes.Pod) []MetadataIndex {
 func (c *ContainerIndexer) GetIndexes(pod *kubernetes.Pod) []string {
 	var containers []string
 	for _, status := range append(pod.Status.ContainerStatuses, pod.Status.InitContainerStatuses...) {
-		cID := containerID(status)
+		cID := status.GetContainerID()
 		if cID == "" {
 			continue
 		}
 		containers = append(containers, cID)
 	}
 	return containers
-}
-
-func containerID(status kubernetes.PodContainerStatus) string {
-	cID := status.ContainerID
-	if cID != "" {
-		parts := strings.Split(cID, "//")
-		if len(parts) == 2 {
-			return parts[1]
-		}
-	}
-	return ""
 }
 
 // IPPortIndexer indexes pods based on all their host:port combinations
