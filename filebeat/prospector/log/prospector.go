@@ -108,7 +108,7 @@ func NewProspector(
 		return nil, err
 	}
 
-	logp.Debug("prospector", "File Configs: %v", p.config.Paths)
+	logp.Info("Configured paths: %v", p.config.Paths)
 
 	return p, nil
 }
