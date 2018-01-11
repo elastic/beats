@@ -85,7 +85,7 @@ func (r *Registrar) Init() error {
 		return fmt.Errorf("Registry file path is not a regular file: %s", r.registryFile)
 	}
 
-	logp.Info("Registry file set to: %s", r.registryFile)
+	logp.Debug("registrar", "Registry file set to: %s", r.registryFile)
 
 	return nil
 }
@@ -147,7 +147,7 @@ func (r *Registrar) Start() error {
 }
 
 func (r *Registrar) Run() {
-	logp.Info("Starting Registrar")
+	logp.Debug("registrar", "Starting Registrar")
 	// Writes registry on shutdown
 	defer func() {
 		r.writeRegistry()
