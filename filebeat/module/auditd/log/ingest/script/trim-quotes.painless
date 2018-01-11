@@ -4,14 +4,14 @@ String trimQuotes(def v) {
     }
     if (v.endsWith(\"'\") || v.endsWith('\"')) {
         v = v.substring(0, v.length()-1);
-    }  
+    }
     return v;
 }
 
 boolean isHexAscii(String v) {
     def len = v.length();
     if (len == 0 || len % 2 != 0) {
-        return false; 
+        return false;
     }
 
     for (int i = 0 ; i < len ; i++) {
@@ -42,7 +42,7 @@ Iterator entries = audit.entrySet().iterator();
 while (entries.hasNext()) {
     def e = entries.next();
     def k = e.getKey();
-    def v = e.getValue(); 
+    def v = e.getValue();
 
     // Remove entries whose value is ?
     if (v == \"?\" || v == \"(null)\" || v == \"\") {

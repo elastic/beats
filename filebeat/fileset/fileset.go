@@ -362,7 +362,7 @@ func (fs *Fileset) GetScriptsToStore() (map[string]string, error) {
 	return scripts, nil
 }
 
-// getScriptIDTemplate returns the Ingest Node pipeline ID
+// getScriptIDTemplate returns the Ingest Node script ID template
 func (fs *Fileset) getScriptIDTemplate(beatVersion string) *template.Template {
 	tStr := formatScriptIDTemplate(fs.mcfg.Module, fs.name, beatVersion)
 	return template.Must(template.New("script_id").Parse(tStr))
@@ -438,7 +438,7 @@ func substituteScriptIDs(jsonString, name string, t *template.Template) (string,
 
 }
 
-// formatScriptIDTemplate generates the ID to be used for the pipeline ID in Elasticsearch
+// formatScriptIDTemplate generates the ID to be used for the pipeline script ID in Elasticsearch
 func formatScriptIDTemplate(module, fileset, beatVersion string) string {
 	return fmt.Sprintf("filebeat-%s-%s-%s-{{.}}", beatVersion, module, fileset)
 }
