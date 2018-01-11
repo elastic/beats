@@ -54,7 +54,26 @@ metricbeat.modules:
     - event
 ----
 
-This module supports TLS connection when using `ssl` config field, as described in <<configuration-ssl>>.
+This module supports TLS connection when using `ssl` config field, as described in <<configuration-ssl>> e.g.:
+[source,yaml]
+----
+metricbeat.modules:
+# Node metrics, from kubelet:
+- module: kubernetes
+  metricsets:
+    - node
+    - system
+    - pod
+    - container
+    - volume
+  period: 10s
+  hosts: ["localhost:10255"]
+  hosts: ["localhost:10255"]
+  ssl.certificate_authorities: ["/etc/pki/root/ca.pem"]
+  ssl.certificate: "/etc/pki/client/cert.pem"
+  ssl.key: "/etc/pki/client/cert.key"
+----
+
 
 [float]
 === Metricsets
