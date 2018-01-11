@@ -25,6 +25,15 @@ include::../include/configuring-intro.asciidoc[]
 
 TODO: provide an example configuration
 
+:fileset_ex: {fileset}
+
 include::../include/config-option-intro.asciidoc[]
 
-TODO: document: fileset variables
+TODO: document the variables from each fileset. If you're describing a variable
+that's common to other modules, you can reuse shared descriptions by including
+the relevant file. For example:
+
+[float]
+==== `{fileset}` log fileset settings
+
+include::../include/var-paths.asciidoc[]
