@@ -64,6 +64,32 @@ func reportMemStats(m monitoring.Mode, V monitoring.Visitor) {
 		monitoring.ReportInt(V, "memory_alloc", int64(stats.Alloc))
 		monitoring.ReportInt(V, "gc_next", int64(stats.NextGC))
 	}
+
+	rss, err := getRSSSize()
+	if err != nil {
+		logp.Err("Error while getting memory usage: %v", err)
+		return
+	}
+	monitoring.ReportInt(V, "rss", int64(rss))
+}
+
+func getRSSSize() (uint64, error) {
+	beatPID := os.Getpid()
+	state, err := beatProcessStats.GetOne(beatPID)
+	if err != nil {
+		return 0, fmt.Errorf("error retrieving process stats")
+	}
+
+	iRss, err := state.GetValue("memory.rss.bytes")
+	if err != nil {
+		return 0, fmt.Errorf("error getting Resident Set Size: %v", err)
+	}
+
+	rss, ok := iRss.(uint64)
+	if !ok {
+		return 0, fmt.Errorf("error converting Resident Set Size: %v", err)
+	}
+	return rss, nil
 }
 
 func reportInfo(_ monitoring.Mode, V monitoring.Visitor) {
