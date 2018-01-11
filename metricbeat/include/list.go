@@ -42,6 +42,8 @@ import (
 	_ "github.com/elastic/beats/metricbeat/module/etcd/leader"
 	_ "github.com/elastic/beats/metricbeat/module/etcd/self"
 	_ "github.com/elastic/beats/metricbeat/module/etcd/store"
+	_ "github.com/elastic/beats/metricbeat/module/galera"
+	_ "github.com/elastic/beats/metricbeat/module/galera/status"
 	_ "github.com/elastic/beats/metricbeat/module/golang"
 	_ "github.com/elastic/beats/metricbeat/module/golang/expvar"
 	_ "github.com/elastic/beats/metricbeat/module/golang/heap"

@@ -1,0 +1,4 @@
+== galera module
+
+This is the galera module.
+

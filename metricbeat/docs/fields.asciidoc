@@ -24,6 +24,7 @@ grouped in the following categories:
 * <<exported-fields-dropwizard>>
 * <<exported-fields-elasticsearch>>
 * <<exported-fields-etcd>>
+* <<exported-fields-galera>>
 * <<exported-fields-golang>>
 * <<exported-fields-graphite>>
 * <<exported-fields-haproxy>>
@@ -3286,6 +3287,432 @@ type: integer
 === `etcd.store.watchers`
 
 type: integer
+
+[[exported-fields-galera]]
+== galera fields
+
+Galera Cluster status metrics collected from the Galera Cluster.
+
+
+
+[float]
+== galera fields
+
+`galera` contains the metrics that were obtained from the galera cluster via MySQL query.
+
+
+
+[float]
+== status fields
+
+`status` contains the metrics that were obtained by the status SQL-Galera query.
+
+
+
+[float]
+== apply fields
+
+Apply status fields.
+
+
+
+[float]
+=== `galera.status.apply.oooe`
+
+type: double
+
+How often applier started write-set applying out-of-order (parallelization efficiency).
+
+
+[float]
+=== `galera.status.apply.oool`
+
+type: double
+
+How often write-set was so slow to apply that write-set with higher seqno's were applied earlier. Values closer to 0 refer to a greater gap between slow and fast write-sets.
+
+
+[float]
+=== `galera.status.apply.window`
+
+type: double
+
+Average distance between highest and lowest concurrently applied seqno.
+
+
+[float]
+== cert fields
+
+Certification status fields.
+
+
+
+[float]
+=== `galera.status.cert.deps_distance`
+
+type: double
+
+Average distance between highest and lowest seqno value that can be possibly applied in parallel (potential degree of parallelization).
+
+
+[float]
+=== `galera.status.cert.index_size`
+
+type: long
+
+The number of entries in the certification index.
+
+
+[float]
+=== `galera.status.cert.interval`
+
+type: double
+
+Average number of transactions received while a transaction replicates.
+
+
+[float]
+== cluster fields
+
+Cluster status fields.
+
+
+
+[float]
+=== `galera.status.cluster.conf_id`
+
+type: long
+
+Total number of cluster membership changes happened.
+
+
+[float]
+=== `galera.status.cluster.size`
+
+type: long
+
+Current number of members in the cluster.
+
+
+[float]
+=== `galera.status.cluster.status`
+
+type: keyword
+
+Status of this cluster component. That is, whether the node is part of a PRIMARY or NON_PRIMARY component.
+
+
+[float]
+== commit fields
+
+Commit status fields.
+
+
+
+[float]
+=== `galera.status.commit.oooe`
+
+type: double
+
+How often a transaction was committed out of order.
+
+
+[float]
+=== `galera.status.commit.window`
+
+type: long
+
+Average distance between highest and lowest concurrently committed seqno.
+
+
+[float]
+=== `galera.status.connected`
+
+type: keyword
+
+If the value is OFF, the node has not yet connected to any of the cluster components. This may be due to misconfiguration. Check the error log for proper diagnostics.
+
+
+[float]
+== evs fields
+
+Evs Fields.
+
+
+
+[float]
+=== `galera.status.evs.evict`
+
+type: keyword
+
+Lists the UUID's of all nodes evicted from the cluster. Evicted nodes cannot rejoin the cluster until you restart their mysqld processes.
+
+
+[float]
+=== `galera.status.evs.state`
+
+type: keyword
+
+Shows the internal state of the EVS Protocol.
+
+
+[float]
+== flow_ctl fields
+
+Flow Control fields.
+
+
+
+[float]
+=== `galera.status.flow_ctl.paused`
+
+type: double
+
+The fraction of time since the last FLUSH STATUS command that replication was paused due to flow control. In other words, how much the slave lag is slowing down the cluster.
+
+
+[float]
+=== `galera.status.flow_ctl.paused_ns`
+
+type: long
+
+The total time spent in a paused state measured in nanoseconds.
+
+
+[float]
+=== `galera.status.flow_ctl.recv`
+
+type: long
+
+Returns the number of FC_PAUSE events the node has received, including those the node has sent. Unlike most status variables, the counter for this one does not reset every time you run the query.
+
+
+[float]
+=== `galera.status.flow_ctl.sent`
+
+type: long
+
+Returns the number of FC_PAUSE events the node has sent. Unlike most status variables, the counter for this one does not reset every time you run the query.
+
+
+[float]
+=== `galera.status.last_committed`
+
+type: long
+
+The sequence number, or seqno, of the last committed transaction.
+
+
+[float]
+== local fields
+
+Node specific Cluster status fields.
+
+
+
+[float]
+=== `galera.status.local.bf_aborts`
+
+type: long
+
+Total number of local transactions that were aborted by slave transactions while in execution.
+
+
+[float]
+=== `galera.status.local.cert_failures`
+
+type: long
+
+Total number of local transactions that failed certification test.
+
+
+[float]
+=== `galera.status.local.commits`
+
+type: long
+
+Total number of local transactions committed.
+
+
+[float]
+== recv fields
+
+Node specific recv fields.
+
+
+
+[float]
+=== `galera.status.local.recv.queue`
+
+type: long
+
+Current (instantaneous) length of the recv queue.
+
+
+[float]
+=== `galera.status.local.recv.queue_avg`
+
+type: double
+
+Recv queue length averaged over interval since the last FLUSH STATUS command. Values considerably larger than 0.0 mean that the node cannot apply write-sets as fast as they are received and will generate a lot of replication throttling.
+
+
+[float]
+=== `galera.status.local.recv.queue_max`
+
+type: long
+
+The maximum length of the recv queue since the last FLUSH STATUS command.
+
+
+[float]
+=== `galera.status.local.recv.queue_min`
+
+type: long
+
+The minimum length of the recv queue since the last FLUSH STATUS command.
+
+
+[float]
+=== `galera.status.local.replays`
+
+type: long
+
+Total number of transaction replays due to asymmetric lock granularity.
+
+
+[float]
+== send fields
+
+Node specific sent fields.
+
+
+
+[float]
+=== `galera.status.local.send.queue`
+
+type: long
+
+Current (instantaneous) length of the send queue.
+
+
+[float]
+=== `galera.status.local.send.queue_avg`
+
+type: double
+
+Send queue length averaged over time since the last FLUSH STATUS command. Values considerably larger than 0.0 indicate replication throttling or network throughput issue.
+
+
+[float]
+=== `galera.status.local.send.queue_max`
+
+type: long
+
+The maximum length of the send queue since the last FLUSH STATUS command.
+
+
+[float]
+=== `galera.status.local.send.queue_min`
+
+type: long
+
+The minimum length of the send queue since the last FLUSH STATUS command.
+
+
+[float]
+=== `galera.status.local.state`
+
+type: keyword
+
+Internal Galera Cluster FSM state number.
+
+
+[float]
+=== `galera.status.ready`
+
+type: keyword
+
+Whether the server is ready to accept queries.
+
+
+[float]
+== received fields
+
+Write-Set receive status fields.
+
+
+
+[float]
+=== `galera.status.received.count`
+
+type: long
+
+Total number of write-sets received from other nodes.
+
+
+[float]
+=== `galera.status.received.bytes`
+
+type: long
+
+Total size of write-sets received from other nodes.
+
+
+[float]
+== repl fields
+
+Replication status fields.
+
+
+
+[float]
+=== `galera.status.repl.data_bytes`
+
+type: long
+
+Total size of data replicated.
+
+
+[float]
+=== `galera.status.repl.keys`
+
+type: long
+
+Total number of keys replicated.
+
+
+[float]
+=== `galera.status.repl.keys_bytes`
+
+type: long
+
+Total size of keys replicated.
+
+
+[float]
+=== `galera.status.repl.other_bytes`
+
+type: long
+
+Total size of other bits replicated.
+
+
+[float]
+=== `galera.status.repl.count`
+
+type: long
+
+Total number of write-sets replicated (sent to other nodes).
+
+
+[float]
+=== `galera.status.repl.bytes`
+
+type: long
+
+Total size of write-sets replicated.
+
 
 [[exported-fields-golang]]
 == Golang fields

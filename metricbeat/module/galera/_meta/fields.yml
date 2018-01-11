@@ -1,0 +1,12 @@
+- key: galera
+  title: "galera"
+  description: >
+    Galera Cluster status metrics collected from the Galera Cluster.
+  short_config: false
+  fields:
+    - name: galera
+      type: group
+      description: >
+        `galera` contains the metrics that were obtained from the galera
+        cluster via MySQL query.
+      fields:

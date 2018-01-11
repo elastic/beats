@@ -1,0 +1,3 @@
+=== galera status MetricSet
+
+This is the status metricset of the module galera.

@@ -39,6 +39,8 @@ This file is generated! See scripts/docs_collector.py
 .3+|   |<<metricbeat-metricset-etcd-leader,leader>> beta[]  
 |<<metricbeat-metricset-etcd-self,self>> beta[]  
 |<<metricbeat-metricset-etcd-store,store>> beta[]  
+|<<metricbeat-module-galera,galera>>  experimental[]   |    
+.1+|   |<<metricbeat-metricset-galera-status,status>> experimental[]  
 |<<metricbeat-module-golang,Golang>>  experimental[]   |    
 .2+|   |<<metricbeat-metricset-golang-expvar,expvar>> experimental[]  
 |<<metricbeat-metricset-golang-heap,heap>> experimental[]  
@@ -134,6 +136,7 @@ include::modules/docker.asciidoc[]
 include::modules/dropwizard.asciidoc[]
 include::modules/elasticsearch.asciidoc[]
 include::modules/etcd.asciidoc[]
+include::modules/galera.asciidoc[]
 include::modules/golang.asciidoc[]
 include::modules/graphite.asciidoc[]
 include::modules/haproxy.asciidoc[]
