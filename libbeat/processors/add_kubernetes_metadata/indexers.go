@@ -142,7 +142,7 @@ func NewContainerIndexer(_ common.Config, metaGen kubernetes.MetaGenerator) (Ind
 func (c *ContainerIndexer) GetMetadata(pod *kubernetes.Pod) []MetadataIndex {
 	var metadata []MetadataIndex
 	for _, status := range append(pod.Status.ContainerStatuses, pod.Status.InitContainerStatuses...) {
-		cID := status.ContainerID
+		cID := status.GetContainerID()
 		if cID == "" {
 			continue
 		}
