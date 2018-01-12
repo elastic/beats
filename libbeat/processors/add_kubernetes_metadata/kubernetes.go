@@ -1,11 +1,8 @@
 package add_kubernetes_metadata
 
 import (
-	"context"
 	"errors"
 	"fmt"
-	"io/ioutil"
-	"os"
 	"sync"
 	"time"
 
@@ -16,9 +13,6 @@ import (
 	"github.com/elastic/beats/libbeat/common/kubernetes"
 	"github.com/elastic/beats/libbeat/logp"
 	"github.com/elastic/beats/libbeat/processors"
-
-	"github.com/ericchiang/k8s"
-	"github.com/ghodss/yaml"
 )
 
 const (
@@ -93,47 +87,12 @@ func newKubernetesAnnotator(cfg *common.Config) (processors.Processor, error) {
 		return nil, fmt.Errorf("Can not initialize kubernetes plugin with zero matcher plugins")
 	}
 
-	var client *k8s.Client
-	if config.InCluster == true {
-		client, err = k8s.NewInClusterClient()
-		if err != nil {
-			return nil, fmt.Errorf("Unable to get in cluster configuration: %v", err)
-		}
-	} else {
-		data, err := ioutil.ReadFile(config.KubeConfig)
-		if err != nil {
-			return nil, fmt.Errorf("read kubeconfig: %v", err)
-		}
-
-		// Unmarshal YAML into a Kubernetes config object.
-		var config k8s.Config
-		if err = yaml.Unmarshal(data, &config); err != nil {
-			return nil, fmt.Errorf("unmarshal kubeconfig: %v", err)
-		}
-		client, err = k8s.NewClient(&config)
-		if err != nil {
-			return nil, err
-		}
+	client, err := kubernetes.GetKubernetesClient(config.InCluster, config.KubeConfig)
+	if err != nil {
+		return nil, err
 	}
 
-	ctx := context.Background()
-	if config.Host == "" {
-		podName := os.Getenv("HOSTNAME")
-		logp.Info("Using pod name %s and namespace %s", podName, client.Namespace)
-		if podName == "localhost" {
-			config.Host = "localhost"
-		} else {
-			pod, error := client.CoreV1().GetPod(ctx, podName, client.Namespace)
-			if error != nil {
-				logp.Err("Querying for pod failed with error: ", error.Error())
-				logp.Info("Unable to find pod, setting host to localhost")
-				config.Host = "localhost"
-			} else {
-				config.Host = pod.Spec.GetNodeName()
-			}
-
-		}
-	}
+	config.Host = kubernetes.DiscoverKubernetesNode(config.Host, client)
 
 	logp.Debug("kubernetes", "Using host ", config.Host)
 	logp.Debug("kubernetes", "Initializing watcher")

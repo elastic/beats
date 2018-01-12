@@ -50,6 +50,7 @@ import (
 
 	// Register autodiscover providers
 	_ "github.com/elastic/beats/libbeat/autodiscover/providers/docker"
+	_ "github.com/elastic/beats/libbeat/autodiscover/providers/kubernetes"
 
 	// Register default monitoring reporting
 	_ "github.com/elastic/beats/libbeat/monitoring/report/elasticsearch"

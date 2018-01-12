@@ -4,10 +4,6 @@
     kubernetes node metrics
   release: beta
   fields:
-    - name: name
-      type: keyword
-      description: >
-        Node name
     - name: start_time
       type: date
       description: >
