@@ -47,6 +47,9 @@ func (g *metaGenerator) PodMetadata(pod *Pod) common.MapStr {
 		"pod": common.MapStr{
 			"name": pod.Metadata.Name,
 		},
+		"node": common.MapStr{
+			"name": pod.Spec.NodeName,
+		},
 		"namespace": pod.Metadata.Namespace,
 	}
 
