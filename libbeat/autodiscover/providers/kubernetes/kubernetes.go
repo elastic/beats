@@ -70,6 +70,9 @@ func AutodiscoverBuilder(bus bus.Bus, c *common.Config) (autodiscover.Provider, 
 	}, nil
 }
 
+// Start the autodiscover provider. Start and stop listeners work the
+// conventional way. Update listener triggers a stop and then a start
+// to simulate an update.
 func (p *Provider) Start() {
 	go func() {
 		for {
@@ -166,10 +169,12 @@ func (p *Provider) publish(event bus.Event) {
 	p.bus.Publish(event)
 }
 
+// Stop signals the stop channel to force the watch loop routine to stop.
 func (p *Provider) Stop() {
 	close(p.stop)
 }
 
+// String returns a description of kubernetes autodiscover provider.
 func (p *Provider) String() string {
 	return "kubernetes"
 }

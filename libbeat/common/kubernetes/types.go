@@ -108,6 +108,7 @@ type Pod struct {
 	Status     PodStatus  `json:"status"`
 }
 
+// GetContainerID parses the container ID to get the actual ID string
 func (s *PodContainerStatus) GetContainerID() string {
 	cID := s.ContainerID
 	if cID != "" {

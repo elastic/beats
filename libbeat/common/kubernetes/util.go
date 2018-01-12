@@ -12,6 +12,9 @@ import (
 	"github.com/elastic/beats/libbeat/logp"
 )
 
+// GetKubernetesClient returns a kubernetes client. If inCluster is true, it returns an
+// in cluster configuration based on the secrets mounted in the Pod. If kubeConfig is passed,
+// it parses the config file to get the config required to build a client.
 func GetKubernetesClient(inCluster bool, kubeConfig string) (client *k8s.Client, err error) {
 	if inCluster == true {
 		client, err = k8s.NewInClusterClient()
@@ -38,6 +41,9 @@ func GetKubernetesClient(inCluster bool, kubeConfig string) (client *k8s.Client,
 	return client, nil
 }
 
+// DiscoverKubernetesNode figures out the Kubernetes host to use. If host is provided in the config
+// use it directly. Else use hostname of the pod which is the Pod ID to query the Pod and get the Node
+// name from the specification. Else, return localhost as a default.
 func DiscoverKubernetesNode(host string, client *k8s.Client) string {
 	ctx := context.Background()
 	if host == "" {
