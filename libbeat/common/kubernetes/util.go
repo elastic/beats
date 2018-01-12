@@ -12,14 +12,14 @@ import (
 	"github.com/elastic/beats/libbeat/logp"
 )
 
-func GetKubernetesClient(in_cluster bool, kube_config string) (client *k8s.Client, err error) {
-	if in_cluster == true {
+func GetKubernetesClient(inCluster bool, kubeConfig string) (client *k8s.Client, err error) {
+	if inCluster == true {
 		client, err = k8s.NewInClusterClient()
 		if err != nil {
 			return nil, fmt.Errorf("Unable to get in cluster configuration: %v", err)
 		}
 	} else {
-		data, err := ioutil.ReadFile(kube_config)
+		data, err := ioutil.ReadFile(kubeConfig)
 		if err != nil {
 			return nil, fmt.Errorf("read kubeconfig: %v", err)
 		}
@@ -46,9 +46,9 @@ func DiscoverKubernetesNode(host string, client *k8s.Client) string {
 		if podName == "localhost" {
 			host = "localhost"
 		} else {
-			pod, error := client.CoreV1().GetPod(ctx, podName, client.Namespace)
-			if error != nil {
-				logp.Err("Querying for pod failed with error: ", error.Error())
+			pod, err := client.CoreV1().GetPod(ctx, podName, client.Namespace)
+			if err != nil {
+				logp.Err("Querying for pod failed with error: ", err.Error())
 				logp.Info("Unable to find pod, setting host to localhost")
 				host = "localhost"
 			} else {
