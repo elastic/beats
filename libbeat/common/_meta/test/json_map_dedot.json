@@ -3,8 +3,8 @@
         "key_with_dot_l2": 1,
         "key_with_multiple_dots_l2": 2,
         "key_without_dot_l2": {
-            "key_with_dot_l2": 3,
-            "key_with_multiple_dots_l2": 4
+            "key_with_dot_l3": 3,
+            "key_with_multiple_dots_l3": 4
         }
     }
 }
