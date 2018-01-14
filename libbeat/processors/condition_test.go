@@ -131,16 +131,16 @@ func TestCondition(t *testing.T) {
 		},
 		{
 			config: ConditionConfig{
-				Contains: &ConditionFields{fields: map[string]interface{}{
-				"final": true,
+				Equals: &ConditionFields{fields: map[string]interface{}{
+					"final": true,
 				}},
 			},
 			result: false,
 		},
 		{
 			config: ConditionConfig{
-				Contains: &ConditionFields{fields: map[string]interface{}{
-				"final": false,
+				Equals: &ConditionFields{fields: map[string]interface{}{
+					"final": false,
 				}},
 			},
 			result: true,
@@ -167,6 +167,7 @@ func TestCondition(t *testing.T) {
 				"keywords": []string{"foo", "bar"},
 			},
 			"type": "process",
+			"final": false,
 		},
 	}
 
