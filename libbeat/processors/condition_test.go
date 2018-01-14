@@ -166,7 +166,7 @@ func TestCondition(t *testing.T) {
 				"username": "monica",
 				"keywords": []string{"foo", "bar"},
 			},
-			"type": "process",
+			"type":  "process",
 			"final": false,
 		},
 	}
