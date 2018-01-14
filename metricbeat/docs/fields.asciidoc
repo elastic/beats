@@ -6492,7 +6492,7 @@ Combination of database and collection name.
 
 
 [float]
-=== `mongodb.collstats.total.time`
+=== `mongodb.collstats.total.time.us`
 
 type: long
 
