@@ -31,7 +31,7 @@ func TestData(t *testing.T) {
 	}()
 
 	ms := mbtest.NewPushMetricSetV2(t, getConfig(dir))
-	events := mbtest.RunPushMetricSetV2(10*time.Second, 1, ms)
+	events := mbtest.RunPushMetricSetV2(10*time.Second, 2, ms)
 	for _, e := range events {
 		if e.Error != nil {
 			t.Fatalf("received error: %+v", e.Error)
@@ -83,23 +83,23 @@ func TestDetectDeletedFiles(t *testing.T) {
 		return
 	}
 	event := events[0].MetricSetFields
-	path, err := event.GetValue("path")
+	path, err := event.GetValue("file.path")
 	if assert.NoError(t, err) {
 		assert.Equal(t, dir, path)
 	}
 
-	action, err := event.GetValue("action")
+	action, err := event.GetValue("event.action")
 	if assert.NoError(t, err) {
 		assert.Equal(t, []string{"created"}, action)
 	}
 
 	event = events[1].MetricSetFields
-	path, err = event.GetValue("path")
+	path, err = event.GetValue("file.path")
 	if assert.NoError(t, err) {
 		assert.Equal(t, e.Path, path)
 	}
 
-	action, err = event.GetValue("action")
+	action, err = event.GetValue("event.action")
 	if assert.NoError(t, err) {
 		assert.Equal(t, []string{"deleted"}, action)
 	}
@@ -151,7 +151,7 @@ func TestExcludedFiles(t *testing.T) {
 	}
 	for _, e := range events {
 		event := e.MetricSetFields
-		path, err := event.GetValue("path")
+		path, err := event.GetValue("file.path")
 		if assert.NoError(t, err) {
 			_, ok := wanted[path.(string)]
 			assert.True(t, ok)

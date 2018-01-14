@@ -20,6 +20,11 @@
           description: >
             Kubernetes namespace
 
+        - name: node.name
+          type: keyword
+          description: >
+            Kubernetes node name
+
         - name: labels
           type: object
           description: >

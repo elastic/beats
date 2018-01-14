@@ -4,25 +4,12 @@ include::../../libbeat/docs/version.asciidoc[]
 
 include::{asciidoc-dir}/../../shared/attributes.asciidoc[]
 
-:libbeat: http://www.elastic.co/guide/en/beats/libbeat/{doc-branch}
-:kibana-ref: https://www.elastic.co/guide/en/kibana/{doc-branch}
-:beatsdevguide: http://www.elastic.co/guide/en/beats/devguide/{doc-branch}
-:packetbeat: http://www.elastic.co/guide/en/beats/packetbeat/{doc-branch}
-:metricbeat: http://www.elastic.co/guide/en/beats/metricbeat/{doc-branch}
-:filebeat: http://www.elastic.co/guide/en/beats/filebeat/{doc-branch}
-:winlogbeat: http://www.elastic.co/guide/en/beats/winlogbeat/{doc-branch}
-:logstashdoc: https://www.elastic.co/guide/en/logstash/{doc-branch}
-:elasticsearch: https://www.elastic.co/guide/en/elasticsearch/reference/{doc-branch}
-:securitydoc: https://www.elastic.co/guide/en/x-pack/{doc-branch}
-:downloads: https://artifacts.elastic.co/downloads/beats
 :version: {stack-version}
 :beatname_lc: heartbeat
 :beatname_uc: Heartbeat
 :beatname_pkg: heartbeat-elastic
-:security: X-Pack Security
-:dockerimage: docker.elastic.co/beats/{beatname_lc}:{version}
-:dockergithub: https://github.com/elastic/beats-docker/tree/{doc-branch}
 
+include::../../libbeat/docs/shared-beats-attributes.asciidoc[]
 
 include::./overview.asciidoc[]
 
@@ -45,6 +32,8 @@ include::./configuring-howto.asciidoc[]
 include::./fields.asciidoc[]
 
 include::./securing-heartbeat.asciidoc[]
+
+include::../../libbeat/docs/security/securing-beats.asciidoc[]
 
 include::./troubleshooting.asciidoc[]
 

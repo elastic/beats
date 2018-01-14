@@ -4,22 +4,12 @@ include::../../libbeat/docs/version.asciidoc[]
 
 include::{asciidoc-dir}/../../shared/attributes.asciidoc[]
 
-:libbeat: http://www.elastic.co/guide/en/beats/libbeat/{doc-branch}
-:kibana-ref: https://www.elastic.co/guide/en/kibana/{doc-branch}
-:beatsdevguide: http://www.elastic.co/guide/en/beats/devguide/{doc-branch}
-:filebeat: http://www.elastic.co/guide/en/beats/filebeat/{doc-branch}
-:logstashdoc: https://www.elastic.co/guide/en/logstash/{doc-branch}
-:elasticsearch: https://www.elastic.co/guide/en/elasticsearch/reference/{doc-branch}
-:securitydoc: https://www.elastic.co/guide/en/x-pack/{doc-branch}
 :version: {stack-version}
 :beatname_lc: metricbeat
 :beatname_uc: Metricbeat
 :beatname_pkg: {beatname_lc}
-:security: X-Pack Security
-:monitoringdoc: https://www.elastic.co/guide/en/x-pack/current
-:dockerimage: docker.elastic.co/beats/{beatname_lc}:{version}
-:dockergithub: https://github.com/elastic/beats-docker/tree/{doc-branch}
 
+include::../../libbeat/docs/shared-beats-attributes.asciidoc[]
 
 include::./overview.asciidoc[]
 
@@ -42,6 +32,8 @@ include::./modules.asciidoc[]
 include::./fields.asciidoc[]
 
 include::./securing-metricbeat.asciidoc[]
+
+include::../../libbeat/docs/security/securing-beats.asciidoc[]
 
 include::./troubleshooting.asciidoc[]
 

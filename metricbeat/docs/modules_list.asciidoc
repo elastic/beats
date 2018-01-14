@@ -75,7 +75,8 @@ This file is generated! See scripts/docs_collector.py
 |<<metricbeat-module-memcached,Memcached>>  beta[]   |    
 .1+|   |<<metricbeat-metricset-memcached-stats,stats>> beta[]  
 |<<metricbeat-module-mongodb,MongoDB>>  beta[]   |    
-.2+|   |<<metricbeat-metricset-mongodb-dbstats,dbstats>> beta[]  
+.3+|   |<<metricbeat-metricset-mongodb-collstats,collstats>> experimental[]  
+|<<metricbeat-metricset-mongodb-dbstats,dbstats>> beta[]  
 |<<metricbeat-metricset-mongodb-status,status>> beta[]  
 |<<metricbeat-module-mysql,MySQL>>     |    
 .1+|   |<<metricbeat-metricset-mysql-status,status>>   
@@ -110,6 +111,8 @@ This file is generated! See scripts/docs_collector.py
 |<<metricbeat-metricset-system-raid,raid>> experimental[]  
 |<<metricbeat-metricset-system-socket,socket>> beta[]  
 |<<metricbeat-metricset-system-uptime,uptime>>   
+|<<metricbeat-module-uwsgi,uwsgi>>  experimental[]   |    
+.1+|   |<<metricbeat-metricset-uwsgi-status,status>> experimental[]  
 |<<metricbeat-module-vsphere,vSphere>>  beta[]   |    
 .3+|   |<<metricbeat-metricset-vsphere-datastore,datastore>> beta[]  
 |<<metricbeat-metricset-vsphere-host,host>> beta[]  
@@ -150,6 +153,7 @@ include::modules/prometheus.asciidoc[]
 include::modules/rabbitmq.asciidoc[]
 include::modules/redis.asciidoc[]
 include::modules/system.asciidoc[]
+include::modules/uwsgi.asciidoc[]
 include::modules/vsphere.asciidoc[]
 include::modules/windows.asciidoc[]
 include::modules/zookeeper.asciidoc[]

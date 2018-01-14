@@ -21,15 +21,11 @@ import (
 )
 
 const (
-	logPrefix = "[" + moduleName + "]"
-
 	// Use old namespace for data until we do some field renaming for GA.
 	namespace = "audit.kernel"
 )
 
 var (
-	debugf = logp.MakeDebug(moduleName)
-
 	auditdMetrics = monitoring.Default.NewRegistry(moduleName)
 	lostMetric    = monitoring.NewInt(auditdMetrics, "lost")
 )
@@ -50,6 +46,7 @@ type MetricSet struct {
 	mb.BaseMetricSet
 	config Config
 	client *libaudit.AuditClient
+	log    *logp.Logger
 }
 
 // New constructs a new MetricSet.
@@ -61,10 +58,11 @@ func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
 		return nil, errors.Wrap(err, "failed to unpack the auditd config")
 	}
 
+	log := logp.NewLogger(moduleName)
 	_, _, kernel, _ := kernelVersion()
-	debugf("auditd module is running as euid=%v on kernel=%v", os.Geteuid(), kernel)
+	log.Infof("auditd module is running as euid=%v on kernel=%v", os.Geteuid(), kernel)
 
-	client, err := newAuditClient(&config)
+	client, err := newAuditClient(&config, log)
 	if err != nil {
 		return nil, errors.Wrap(err, "failed to create audit client")
 	}
@@ -75,10 +73,11 @@ func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
 		BaseMetricSet: base,
 		client:        client,
 		config:        config,
+		log:           log,
 	}, nil
 }
 
-func newAuditClient(c *Config) (*libaudit.AuditClient, error) {
+func newAuditClient(c *Config, log *logp.Logger) (*libaudit.AuditClient, error) {
 	hasMulticast := hasMulticastSupport()
 
 	switch c.SocketType {
@@ -89,13 +88,13 @@ func newAuditClient(c *Config) (*libaudit.AuditClient, error) {
 		// using unicast.
 		if rules, _ := c.rules(); len(rules) == 0 && hasMulticast {
 			c.SocketType = "multicast"
-			logp.Info("%v socket_type=multicast will be used.", logPrefix)
+			log.Info("socket_type=multicast will be used.")
 		}
 	case "multicast":
 		if !hasMulticast {
-			logp.Warn("%v socket_type is set to multicast "+
-				"but based on the kernel version multicast audit subscriptions "+
-				"are not supported. unicast will be used instead.", logPrefix)
+			log.Warn("socket_type is set to multicast but based on the " +
+				"kernel version multicast audit subscriptions are not " +
+				"supported. unicast will be used instead.")
 			c.SocketType = "unicast"
 		}
 	}
@@ -116,14 +115,14 @@ func (ms *MetricSet) Run(reporter mb.PushReporterV2) {
 
 	if err := ms.addRules(reporter); err != nil {
 		reporter.Error(err)
-		logp.Err("%v %v", logPrefix, err)
+		ms.log.Errorw("Failure adding audit rules", "error", err)
 		return
 	}
 
 	out, err := ms.receiveEvents(reporter.Done())
 	if err != nil {
 		reporter.Error(err)
-		logp.Err("%v %v", logPrefix, err)
+		ms.log.Errorw("Failure receiving audit events", "error", err)
 		return
 	}
 
@@ -144,7 +143,7 @@ func (ms *MetricSet) addRules(reporter mb.PushReporterV2) error {
 	}
 
 	if len(rules) == 0 {
-		logp.Info("%v No audit_rules were specified.", logPrefix)
+		ms.log.Info("No audit_rules were specified.")
 		return nil
 	}
 
@@ -159,7 +158,7 @@ func (ms *MetricSet) addRules(reporter mb.PushReporterV2) error {
 	if err != nil {
 		return errors.Wrap(err, "failed to delete existing rules")
 	}
-	logp.Info("%v Deleted %v pre-existing audit rules.", logPrefix, n)
+	ms.log.Infof("Deleted %v pre-existing audit rules.", n)
 
 	// Add rules from config.
 	var failCount int
@@ -168,12 +167,12 @@ func (ms *MetricSet) addRules(reporter mb.PushReporterV2) error {
 			// Treat rule add errors as warnings and continue.
 			err = errors.Wrapf(err, "failed to add audit rule '%v'", rule.flags)
 			reporter.Error(err)
-			logp.Warn("%v %v", logPrefix, err)
+			ms.log.Warnw("Failure adding audit rule", err)
 			failCount++
 		}
 	}
-	logp.Info("%v Successfully added %d of %d audit rules.",
-		logPrefix, len(rules)-failCount, len(rules))
+	ms.log.Infof("Successfully added %d of %d audit rules.",
+		len(rules)-failCount, len(rules))
 	return nil
 }
 
@@ -193,7 +192,7 @@ func (ms *MetricSet) initClient() error {
 	if err != nil {
 		return errors.Wrap(err, "failed to get audit status")
 	}
-	debugf("audit status from kernel at start: status=%+v", status)
+	ms.log.Infow("audit status from kernel at start", "audit_status", status)
 
 	if fm, _ := ms.config.failureMode(); status.Failure != fm {
 		if err = ms.client.SetFailure(libaudit.FailureMode(fm), libaudit.NoWait); err != nil {
@@ -253,8 +252,10 @@ func (ms *MetricSet) receiveEvents(done <-chan struct{}) (<-chan []*auparse.Audi
 			}
 
 			if err := reassembler.Push(raw.Type, raw.Data); err != nil {
-				debugf("dropping message record_type=%v message='%v': ",
-					raw.Type, string(raw.Data), err)
+				ms.log.Debugw("Dropping audit message",
+					"record_type", raw.Type,
+					"message", string(raw.Data),
+					"error", err)
 				continue
 			}
 		}

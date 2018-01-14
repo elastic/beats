@@ -20,7 +20,7 @@ To use SSL mutual authentication:
 document. There are many online resources available that describe how to create certificates.
 +
 TIP: If you are using X-Pack, you can use the
-{elasticsearch}/certgen.html[certgen tool] to generate certificates.
+{elasticsearch}/certutil.html[certutil tool] to generate certificates.
 
 . Configure {beatname_uc} to use SSL. In the +{beatname_lc}.yml+ config file, specify the following settings under
 `ssl`:

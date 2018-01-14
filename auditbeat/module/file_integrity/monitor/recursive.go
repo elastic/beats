@@ -5,6 +5,7 @@ import (
 	"path/filepath"
 
 	"github.com/fsnotify/fsnotify"
+	"github.com/joeshaw/multierror"
 	"github.com/pkg/errors"
 )
 
@@ -52,19 +53,28 @@ func (watcher *recursiveWatcher) ErrorChannel() <-chan error {
 }
 
 func (watcher *recursiveWatcher) addRecursive(path string) error {
-	return filepath.Walk(path, func(path string, info os.FileInfo, err error) error {
+	var errs multierror.Errors
+	err := filepath.Walk(path, func(path string, info os.FileInfo, err error) error {
 		if err != nil {
-			return errors.Wrap(err, "file tree recursion failed")
+			errs = append(errs, errors.Wrapf(watcher.inner.Add(path), "recursion into dir '%s' failed", path))
+			return nil
 		}
 		if info.IsDir() {
 			if err = watcher.tree.AddDir(path); err == nil {
-				err = watcher.inner.Add(path)
+				if err = watcher.inner.Add(path); err != nil {
+					errs = append(errs, errors.Wrapf(err, "failed adding watcher to '%s'", path))
+					return nil
+				}
 			}
 		} else {
 			err = watcher.tree.AddFile(path)
 		}
 		return err
 	})
+	if err != nil {
+		errs = append(errs, errors.Wrapf(err, "failed to walk path '%s'", path))
+	}
+	return errs.Err()
 }
 
 func (watcher *recursiveWatcher) close() error {
@@ -91,7 +101,6 @@ func (watcher *recursiveWatcher) forwardEvents() error {
 			case fsnotify.Create:
 				if err := watcher.addRecursive(event.Name); err != nil {
 					watcher.inner.Errors <- errors.Wrapf(err, "unable to recurse path '%s'", event.Name)
-					continue
 				}
 				watcher.tree.Visit(event.Name, PreOrder, func(path string, _ bool) error {
 					watcher.eventC <- fsnotify.Event{

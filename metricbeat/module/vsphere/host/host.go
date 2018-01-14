@@ -65,7 +65,7 @@ func (m *MetricSet) Fetch() ([]common.MapStr, error) {
 	ctx, cancel := context.WithCancel(context.Background())
 	defer cancel()
 
-	events := []common.MapStr{}
+	var events []common.MapStr
 
 	client, err := govmomi.NewClient(ctx, m.HostURL, m.Insecure)
 	if err != nil {
@@ -142,7 +142,7 @@ func (m *MetricSet) Fetch() ([]common.MapStr, error) {
 }
 
 func getNetworkNames(ctx context.Context, c *vim25.Client, ref types.ManagedObjectReference) ([]string, error) {
-	outputNetworkNames := []string{}
+	var outputNetworkNames []string
 
 	pc := property.DefaultCollector(c)
 
@@ -153,18 +153,22 @@ func getNetworkNames(ctx context.Context, c *vim25.Client, ref types.ManagedObje
 	}
 
 	if len(hs.Network) == 0 {
-		return nil, errors.Wrap(err, "no networks found")
+		return nil, errors.New("no networks found")
 	}
 
-	networksRefs := []types.ManagedObjectReference{}
+	var networkRefs []types.ManagedObjectReference
 	for _, obj := range hs.Network {
 		if obj.Type == "Network" {
-			networksRefs = append(networksRefs, obj)
+			networkRefs = append(networkRefs, obj)
 		}
 	}
 
+	if len(networkRefs) == 0 {
+		return nil, errors.New("no networks found")
+	}
+
 	var nets []mo.Network
-	err = pc.Retrieve(ctx, networksRefs, []string{"name"}, &nets)
+	err = pc.Retrieve(ctx, networkRefs, []string{"name"}, &nets)
 	if err != nil {
 		return nil, fmt.Errorf("error retrieving network from host: %v", err)
 	}

@@ -24,7 +24,6 @@ const sampleJob = `
       {
         "detector_description": "Event rate for nginx.access.response_code",
         "function": "count",
-        "detector_rules": [],
         "partition_field_name": "nginx.access.response_code"
       }
     ],
