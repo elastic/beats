@@ -146,11 +146,12 @@ func (ms *MetricSet) addRules(reporter mb.PushReporterV2) error {
 	// Will result in EPERM.
 	status, err := client.GetStatus()
 	if err != nil {
-		return errors.Wrap(err, "failed to get audit status before adding rules")
+		err = errors.Wrap(err, "failed to get audit status before adding rules")
+		reporter.Error(err)
+		return err
 	}
 	if status.Enabled == auditLocked {
-		ms.log.Warn("Skipping rule configuration: Audit rules are locked")
-		return nil
+		return errors.New("Skipping rule configuration: Audit rules are locked")
 	}
 
 	// Delete existing rules.
