@@ -1,5 +1,9 @@
 - key: test
   title: Test fields.yml
+  kibana:
+    source_filters: 
+      - user.name
+      - url.*
   fields:
     - name: group_disabled
       type: group
@@ -21,9 +25,20 @@
         - min_version: 6.0.0
           value: "_a=(query:(language:lucene,query:'context.app.name:\"{{value}}\"'))"
 
+- key: with source filter 
+  title: Test
+  kibana:
+    source_filters: 
+      - user.email
+  fields:
     - name: multifield_field
       type: text
       index: true
       multi_fields:
         - name: keyword
           type: keyword
+
+    - name: blob
+      type: binary
+      description: >
+        Some binary blob.

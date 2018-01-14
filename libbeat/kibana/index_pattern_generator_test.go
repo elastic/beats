@@ -130,7 +130,7 @@ func TestGenerate(t *testing.T) {
 		{"existing": "beat-5.json", "created": "_meta/kibana/5/index-pattern/beat.json"},
 		{"existing": "beat-6.json", "created": "_meta/kibana/6/index-pattern/beat.json"},
 	}
-	testGenerate(t, beatDir, tests)
+	testGenerate(t, beatDir, tests, true)
 }
 
 func TestGenerateExtensive(t *testing.T) {
@@ -155,10 +155,10 @@ func TestGenerateExtensive(t *testing.T) {
 		{"existing": "metricbeat-5.json", "created": "_meta/kibana/5/index-pattern/metricbeat.json"},
 		{"existing": "metricbeat-6.json", "created": "_meta/kibana/6/index-pattern/metricbeat.json"},
 	}
-	testGenerate(t, beatDir, tests)
+	testGenerate(t, beatDir, tests, false)
 }
 
-func testGenerate(t *testing.T, beatDir string, tests []map[string]string) {
+func testGenerate(t *testing.T, beatDir string, tests []map[string]string, sourceFilters bool) {
 	for _, test := range tests {
 		// compare default
 		existing, err := readJson(filepath.Join(beatDir, test["existing"]))
@@ -201,16 +201,31 @@ func testGenerate(t *testing.T, beatDir string, tests []map[string]string) {
 		assert.NoError(t, err)
 		assert.Equal(t, len(fieldsExisting), len(fieldsCreated))
 		for _, e := range fieldsExisting {
-			idx := find(fieldsCreated, e["name"].(string))
+			idx := find(fieldsCreated, "name", e["name"].(string))
 			assert.NotEqual(t, -1, idx)
 			assert.Equal(t, e, fieldsCreated[idx])
+		}
+
+		// check sourceFilters
+		if sourceFilters {
+			var sfExisting, sfCreated []map[string]interface{}
+			err = json.Unmarshal([]byte(attrExisting["sourceFilters"].(string)), &sfExisting)
+			assert.NoError(t, err)
+			err = json.Unmarshal([]byte(attrCreated["sourceFilters"].(string)), &sfCreated)
+			assert.NoError(t, err)
+			assert.Equal(t, len(sfExisting), len(sfCreated))
+			for _, e := range sfExisting {
+				idx := find(sfCreated, "value", e["value"].(string))
+				assert.NotEqual(t, -1, idx)
+				assert.Equal(t, e, sfCreated[idx])
+			}
 		}
 	}
 }
 
-func find(a []map[string]interface{}, k string) int {
+func find(a []map[string]interface{}, key, val string) int {
 	for idx, e := range a {
-		if e["name"].(string) == k {
+		if e[key].(string) == val {
 			return idx
 		}
 	}

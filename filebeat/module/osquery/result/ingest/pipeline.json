@@ -1,0 +1,53 @@
+{
+  "description": "Pipeline for parsing osquery result logs",
+  "processors": [
+    {
+      "rename": {
+        "field": "@timestamp",
+        "target_field": "read_timestamp"
+      }
+    }, {
+      "date": {
+        "field": "json.unixTime",
+        "target_field": "@timestamp",
+        "formats": ["UNIX"],
+        "ignore_failure": true
+      }
+    },
+    {<if .use_namespace >}
+    {
+      "script": {
+        "lang": "painless",
+        "source": "def dict = ['result': new HashMap()]; for (entry in ctx['json'].entrySet()) { dict['result'][entry.getKey()] = entry.getValue(); } ctx['osquery'] = dict; ctx.remove('json');"
+      }
+    },
+    {< end >}
+    {
+        "rename": {
+            "field": "osquery.result.hostIdentifier",
+            "target_field": "osquery.result.host_identifier",
+            "ignore_missing": true
+        }
+    },
+    {
+        "rename": {
+            "field": "osquery.result.unixTime",
+            "target_field": "osquery.result.unix_time",
+            "ignore_missing": true
+        }
+    },
+    {
+        "rename": {
+            "field": "osquery.result.calendarTime",
+            "target_field": "osquery.result.calendar_time",
+            "ignore_missing": true
+        }
+    }
+  ],
+  "on_failure" : [{
+    "set" : {
+      "field" : "error.message",
+      "value" : "{{ _ingest.on_failure_message }}"
+    }
+  }]
+}

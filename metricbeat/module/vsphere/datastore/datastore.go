@@ -57,7 +57,7 @@ func (m *MetricSet) Fetch() ([]common.MapStr, error) {
 	ctx, cancel := context.WithCancel(context.Background())
 	defer cancel()
 
-	events := []common.MapStr{}
+	var events []common.MapStr
 
 	client, err := govmomi.NewClient(ctx, m.HostURL, m.Insecure)
 	if err != nil {

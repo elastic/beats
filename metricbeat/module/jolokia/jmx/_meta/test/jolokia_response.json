@@ -52,5 +52,24 @@
         },
         "timestamp": 1472298687,
         "status": 200
+    },
+    {
+        "request": {
+            "mbean": "org.springframework.boot:type=Endpoint,name=metricsEndpoint",
+            "attribute": [
+                "Metrics"
+            ],
+            "type": "read"
+        },
+        "value": {
+            "Metrics": {
+                "atomikos.nbTransactions": 0.000000,
+                "classes": 18857.000000,
+                "classes.loaded": 19127.000000,
+                "classes.unloaded": 270.000000
+            }
+        },
+        "timestamp": 1472298687,
+        "status": 200
     }
 ]

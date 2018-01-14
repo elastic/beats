@@ -11,6 +11,7 @@ import (
 	"github.com/stretchr/testify/assert"
 
 	"github.com/elastic/beats/auditbeat/core"
+	"github.com/elastic/beats/libbeat/logp"
 	mbtest "github.com/elastic/beats/metricbeat/mb/testing"
 	"github.com/elastic/go-libaudit"
 	"github.com/elastic/procfs"
@@ -25,6 +26,8 @@ var audit = flag.Bool("audit", false, "interact with the real audit framework")
 var userLoginMsg = `type=USER_LOGIN msg=audit(1492896301.818:19955): pid=12635 uid=0 auid=4294967295 ses=4294967295 msg='op=login acct=28696E76616C6964207573657229 exe="/usr/sbin/sshd" hostname=? addr=179.38.151.221 terminal=sshd res=failed'`
 
 func TestData(t *testing.T) {
+	logp.TestingSetup()
+
 	// Create a mock netlink client that provides the expected responses.
 	mock := NewMock().
 		// Get Status response for initClient
@@ -65,6 +68,7 @@ func TestUnicastClient(t *testing.T) {
 		t.Skip("-audit was not specified")
 	}
 
+	logp.TestingSetup()
 	FailIfAuditdIsRunning(t)
 
 	c := map[string]interface{}{
@@ -109,6 +113,7 @@ func TestMulticastClient(t *testing.T) {
 		t.Skip("no multicast support")
 	}
 
+	logp.TestingSetup()
 	FailIfAuditdIsRunning(t)
 
 	c := map[string]interface{}{

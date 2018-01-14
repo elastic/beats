@@ -1,0 +1,9 @@
+- key: osquery
+  title: "Osquery"
+  description: >
+    Fields exported by the `osquery` module
+  fields:
+    - name: osquery
+      type: group
+      description: >
+      fields:
