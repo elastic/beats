@@ -18,7 +18,7 @@
       description: >
         Combination of database and collection name.
 
-    - name: total.time
+    - name: total.time.us
       type: long
       description: >
         Total waiting time for locks in microseconds.
