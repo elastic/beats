@@ -277,7 +277,7 @@ func (ns *ConfigNamespace) Unpack(cfg *Config) error {
 		}
 
 		if ns.name != "" {
-			return errors.New("more then one namespace configured")
+			return errors.New("more than one namespace configured")
 		}
 
 		ns.name = name
