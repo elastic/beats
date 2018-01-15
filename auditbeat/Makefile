@@ -18,7 +18,7 @@ before-build:
 	     ${ES_BEATS}/libbeat/_meta/config.yml > \
 	     ${PREFIX}/${BEAT_NAME}-win.yml
 	@cat ${ES_BEATS}/auditbeat/_meta/common.reference.yml \
-	     <(go run scripts/generate_config.go -os windows -concat) \
+	     <(go run scripts/generate_config.go -os windows -concat -ref) \
 	     ${ES_BEATS}/libbeat/_meta/config.reference.yml > \
 	     ${PREFIX}/${BEAT_NAME}-win.reference.yml
 
@@ -28,7 +28,7 @@ before-build:
 	     ${ES_BEATS}/libbeat/_meta/config.yml > \
 	     ${PREFIX}/${BEAT_NAME}-darwin.yml
 	@cat ${ES_BEATS}/auditbeat/_meta/common.reference.yml \
-	     <(go run scripts/generate_config.go -os darwin -concat) \
+	     <(go run scripts/generate_config.go -os darwin -concat -ref) \
 	     ${ES_BEATS}/libbeat/_meta/config.reference.yml > \
 	     ${PREFIX}/${BEAT_NAME}-darwin.reference.yml
 
@@ -38,7 +38,7 @@ before-build:
 	     ${ES_BEATS}/libbeat/_meta/config.yml > \
 	     ${PREFIX}/${BEAT_NAME}-linux.yml
 	@cat ${ES_BEATS}/auditbeat/_meta/common.reference.yml \
-	     <(go run scripts/generate_config.go -os linux -concat) \
+	     <(go run scripts/generate_config.go -os linux -concat -ref) \
 	     ${ES_BEATS}/libbeat/_meta/config.reference.yml > \
 	     ${PREFIX}/${BEAT_NAME}-linux.reference.yml
 

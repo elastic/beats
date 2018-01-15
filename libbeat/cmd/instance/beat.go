@@ -50,6 +50,7 @@ import (
 
 	// Register autodiscover providers
 	_ "github.com/elastic/beats/libbeat/autodiscover/providers/docker"
+	_ "github.com/elastic/beats/libbeat/autodiscover/providers/kubernetes"
 
 	// Register default monitoring reporting
 	_ "github.com/elastic/beats/libbeat/monitoring/report/elasticsearch"
@@ -219,6 +220,11 @@ func (b *Beat) createBeater(bt beat.Creator) (beat.Beater, error) {
 	reg := monitoring.Default.GetRegistry("libbeat")
 	if reg == nil {
 		reg = monitoring.Default.NewRegistry("libbeat")
+	}
+
+	err = setupMetrics(b.Info.Beat)
+	if err != nil {
+		return nil, err
 	}
 
 	debugf("Initializing output plugins")

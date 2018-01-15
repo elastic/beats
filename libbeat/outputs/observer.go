@@ -7,6 +7,7 @@ type Observer interface {
 	Acked(int)        // report number of acked events
 	Failed(int)       // report number of failed events
 	Dropped(int)      // report number of dropped events
+	Duplicate(int)    // report number of events detected as duplicates (e.g. on resends)
 	Cancelled(int)    // report number of cancelled events
 	WriteError(error) // report an I/O error on write
 	WriteBytes(int)   // report number of bytes being written
@@ -25,6 +26,7 @@ func NewNilObserver() Observer {
 
 func (*emptyObserver) NewBatch(int)     {}
 func (*emptyObserver) Acked(int)        {}
+func (*emptyObserver) Duplicate(int)    {}
 func (*emptyObserver) Failed(int)       {}
 func (*emptyObserver) Dropped(int)      {}
 func (*emptyObserver) Cancelled(int)    {}

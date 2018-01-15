@@ -269,7 +269,10 @@ func RunPushMetricSetV2(timeout time.Duration, waitEvents int, metricSet mb.Push
 			select {
 			case <-timer.C:
 				return
-			case e := <-r.eventsC:
+			case e, ok := <-r.eventsC:
+				if !ok {
+					return
+				}
 				events = append(events, e)
 				if waitEvents > 0 && waitEvents <= len(events) {
 					return

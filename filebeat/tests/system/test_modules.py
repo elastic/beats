@@ -140,8 +140,11 @@ class Test(BaseTest):
 
             assert "error" not in obj, "not error expected but got: {}".format(obj)
 
-            if (module != "auditd" and fileset != "log"):
-                # There are dynamic fields in audit logs that are not documented.
+            if (module == "auditd" and fileset == "log") \
+                    or (module == "osquery" and fileset == "result"):
+                # There are dynamic fields that are not documented.
+                pass
+            else:
                 self.assert_fields_are_documented(obj)
 
         if os.path.exists(test_file + "-expected.json"):

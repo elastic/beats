@@ -12,5 +12,5 @@ func AddDatasetToEvent(module, metricSet string, event *mb.Event) {
 		event.RootFields = common.MapStr{}
 	}
 
-	event.RootFields.Put("dataset.module", module)
+	event.RootFields.Put("event.module", module)
 }

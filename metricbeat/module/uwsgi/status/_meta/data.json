@@ -1,0 +1,53 @@
+{
+    "@timestamp": "2011-11-11T00:00:00.000Z",
+    "metricset": {
+      "rtt": 3069,
+      "name": "stat",
+      "module": "uwsgi"
+    },
+    "uwsgi": {
+      "status": {
+        "total": {
+          "requests": 102,
+          "exceptions": 1,
+          "write_errors": 0,
+          "read_errors": 0,
+          "pid": 1
+        },
+
+        "worker": {
+          "signals": 0,
+          "status": "idle",
+          "id": 1,
+          "pid": 7,
+          "accepting": 1,
+          "rss": 0,
+          "respawn_count": 1,
+          "tx": 5599,
+          "requests": 102,
+          "delta_requests": 102,
+          "running_time": 10103,
+          "exceptions": 1,
+          "avg_rt": 91,
+          "vsz": 0,
+          "signal_queue": 0,
+          "harakiri_count": 0
+        },
+
+        "core": {
+          "worker_pid": 7,
+          "requests": 75,
+          "static_requests": 0,
+          "routed_requests": 0,
+          "offloaded_requests": 0,
+          "write_errors": 0,
+          "read_errors": 0
+        }
+      }
+    },
+    "beat": {
+      "name": "beatname",
+      "hostname": "hostname",
+      "version": "7.0.0-alpha1"
+    }
+}

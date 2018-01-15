@@ -197,69 +197,75 @@ func NewEvent(
 }
 
 func buildMetricbeatEvent(e *Event, existedBefore bool) mb.Event {
-	m := common.MapStr{
-		"path":   e.Path,
-		"hashed": len(e.Hashes) > 0,
+	file := common.MapStr{
+		"path": e.Path,
 	}
-
-	if e.Action > 0 {
-		m["action"] = e.Action.InOrder(existedBefore, e.Info != nil).StringArray()
+	out := mb.Event{
+		Timestamp: e.Timestamp,
+		Took:      e.rtt,
+		MetricSetFields: common.MapStr{
+			"file": file,
+		},
 	}
 
 	if e.TargetPath != "" {
-		m["target_path"] = e.TargetPath
+		file["target_path"] = e.TargetPath
 	}
 
 	if e.Info != nil {
 		info := e.Info
-		m["inode"] = strconv.FormatUint(info.Inode, 10)
-		m["mtime"] = info.MTime
-		m["ctime"] = info.CTime
+		file["inode"] = strconv.FormatUint(info.Inode, 10)
+		file["mtime"] = info.MTime
+		file["ctime"] = info.CTime
 
 		if e.Info.Type == FileType {
-			m["size"] = info.Size
+			file["size"] = info.Size
 		}
 
 		if info.Type != UnknownType {
-			m["type"] = info.Type.String()
+			file["type"] = info.Type.String()
 		}
 
 		if runtime.GOOS == "windows" {
 			if info.SID != "" {
-				m["sid"] = info.SID
+				file["uid"] = info.SID
 			}
 		} else {
-			m["uid"] = info.UID
-			m["gid"] = info.GID
-			m["mode"] = fmt.Sprintf("%#04o", uint32(info.Mode))
+			file["uid"] = info.UID
+			file["gid"] = info.GID
+			file["mode"] = fmt.Sprintf("%#04o", uint32(info.Mode))
 		}
 
 		if info.Owner != "" {
-			m["owner"] = info.Owner
+			file["owner"] = info.Owner
 		}
 		if info.Group != "" {
-			m["group"] = info.Group
+			file["group"] = info.Group
 		}
 		if info.SetUID {
-			m["setuid"] = true
+			file["setuid"] = true
 		}
 		if info.SetGID {
-			m["setgid"] = true
+			file["setgid"] = true
 		}
 		if len(info.Origin) > 0 {
-			m["origin"] = info.Origin
+			file["origin"] = info.Origin
 		}
 	}
 
-	for hashType, digest := range e.Hashes {
-		m[string(hashType)] = digest
+	if len(e.Hashes) > 0 {
+		hashes := make(common.MapStr, len(e.Hashes))
+		for hashType, digest := range e.Hashes {
+			hashes[string(hashType)] = digest
+		}
+		out.MetricSetFields.Put("hash", hashes)
 	}
 
-	out := mb.Event{
-		Timestamp:       e.Timestamp,
-		Took:            e.rtt,
-		MetricSetFields: m,
+	if e.Action > 0 {
+		actions := e.Action.InOrder(existedBefore, e.Info != nil).StringArray()
+		out.MetricSetFields.Put("event.action", actions)
 	}
+
 	return out
 }
 
