@@ -66,3 +66,55 @@ Configuration templates can contain variables from the autodiscover event. They 
 For example, with the example event, "`${data.port}`" will resolves to `6379`.
 
 include::../../{beatname_lc}/docs/autodiscover-docker-config.asciidoc[]
+
+[float]
+===== Kubernetes
+
+Kubernetes autodiscover provider watches for Kubernetes pods start, update and stop. These are the available fields on every
+event:
+
+  * host
+  * port
+  * kubernetes.container.id
+  * kubernetes.container.image
+  * kubernetes.container.name
+  * kubernetes.labels
+  * kubernetes.namespace
+  * kubernetes.node.name
+  * kubernetes.pod.name
+
+If the `include_annotations` config is added to the provider config then the list of annotations present in the config
+are added to the event.
+
+For example:
+
+[source,yaml]
+-------------------------------------------------------------------------------------
+{
+  "host": "172.17.0.21",
+  "port": 9090,
+  "kubernetes": {
+    "container": {
+      "id": "bb3a50625c01b16a88aa224779c39262a9ad14264c3034669a50cd9a90af1527",
+      "image": "prom/prometheus",
+      "name": "prometheus"
+    },
+    "labels": {
+      "project": "prometheus",
+      ...
+    },
+    "namespace": "default",
+    "node": {
+      "name": "minikube"
+    },
+    "pod": {
+      "name": "prometheus-2657348378-k1pnh"
+    }
+  },
+}
+-------------------------------------------------------------------------------------
+
+Configuration of templates and conditions are exactly similar as that of Docker provider. Configuration templates can
+contain variables from the autodiscover event. They can be accessed under data namespace.
+
+include::../../{beatname_lc}/docs/autodiscover-kubernetes-config.asciidoc[]
