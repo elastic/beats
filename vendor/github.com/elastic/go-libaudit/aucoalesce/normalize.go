@@ -1,4 +1,4 @@
-// Copyright 2017 Elasticsearch Inc.
+// Copyright 2017-2018 Elasticsearch Inc.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -68,6 +68,7 @@ type Normalization struct {
 	How         Strings        `yaml:"how"`
 	RecordTypes Strings        `yaml:"record_types"`
 	Syscalls    Strings        `yaml:"syscalls"`
+	SourceIP    Strings        `yaml:"source_ip"`
 }
 
 type SubjectMapping struct {
