@@ -1,0 +1,95 @@
+{
+    "auditd": {
+        "data": {
+            "a0": "10812c8",
+            "a1": "1070208",
+            "a2": "1152008",
+            "a3": "59a",
+            "arch": "x86_64",
+            "argc": "2",
+            "exit": "0",
+            "syscall": "execve",
+            "tty": "pts0"
+        },
+        "paths": [
+            {
+                "dev": "08:01",
+                "inode": "155",
+                "item": "0",
+                "mode": "0100755",
+                "name": "/bin/uname",
+                "nametype": "NORMAL",
+                "ogid": "0",
+                "ouid": "0",
+                "rdev": "00:00"
+            },
+            {
+                "dev": "08:01",
+                "inode": "1923",
+                "item": "1",
+                "mode": "0100755",
+                "name": "/lib64/ld-linux-x86-64.so.2",
+                "nametype": "NORMAL",
+                "ogid": "0",
+                "ouid": "0",
+                "rdev": "00:00"
+            }
+        ],
+        "result": "success",
+        "sequence": 8972,
+        "session": "11",
+        "summary": {
+            "actor": {
+                "primary": "1001",
+                "secondary": "1001"
+            },
+            "how": "/bin/uname",
+            "object": {
+                "primary": "/bin/uname",
+                "type": "file"
+            }
+        }
+    },
+    "event": {
+        "action": "executed",
+        "category": "audit-rule",
+        "module": "auditd",
+        "type": "syscall"
+    },
+    "file": {
+        "device": "00:00",
+        "gid": "0",
+        "group": "root",
+        "inode": "155",
+        "mode": "0755",
+        "owner": "root",
+        "path": "/bin/uname",
+        "uid": "0"
+    },
+    "process": {
+        "args": [
+            "uname",
+            "-a"
+        ],
+        "cwd": "/home/andrew_kroh",
+        "exe": "/bin/uname",
+        "name": "uname",
+        "pid": "10043",
+        "ppid": "10027",
+        "title": "uname -a"
+    },
+    "tags": [
+        "user_commands"
+    ],
+    "user": {
+        "auid": "1001",
+        "egid": "1002",
+        "euid": "1001",
+        "fsgid": "1002",
+        "fsuid": "1001",
+        "gid": "1002",
+        "sgid": "1002",
+        "suid": "1001",
+        "uid": "1001"
+    }
+}
