@@ -75,7 +75,8 @@ const (
 // AuditClient is a client for communicating with the Linux kernels audit
 // interface over netlink.
 type AuditClient struct {
-	Netlink NetlinkSendReceiver
+	Netlink     NetlinkSendReceiver
+	pendingAcks []uint32
 }
 
 // NewMulticastAuditClient creates a new AuditClient that binds to the multicast
@@ -372,6 +373,26 @@ func (c *AuditClient) Close() error {
 	return c.Netlink.Close()
 }
 
+// WaitForPendingACKs waits for acknowledgements messages for operations
+// executed with a WaitMode of NoWait. Such ACK messages are expected in the
+// same order as the operations have been performed. If it receives an error,
+// it is returned and no further ACKs are processed.
+func (c *AuditClient) WaitForPendingACKs() error {
+	for _, reqId := range c.pendingAcks {
+		ack, err := c.getReply(reqId)
+		if err != nil {
+			return err
+		}
+		if ack.Header.Type != syscall.NLMSG_ERROR {
+			return errors.Errorf("unexpected ACK to SET, type=%d", ack.Header.Type)
+		}
+		if err := ParseNetlinkError(ack.Data); err != nil {
+			return err
+		}
+	}
+	return nil
+}
+
 // getReply reads from the netlink socket and find the message with the given
 // sequence number. The caller should inspect the returned message's type,
 // flags, and error code.
@@ -424,6 +445,7 @@ func (c *AuditClient) set(status AuditStatus, mode WaitMode) error {
 	}
 
 	if mode == NoWait {
+		c.storePendingAck(seq)
 		return nil
 	}
 
@@ -540,4 +562,8 @@ func (s *AuditStatus) fromWireFormat(buf []byte) error {
 	}
 
 	return nil
+}
+
+func (c *AuditClient) storePendingAck(requestID uint32) {
+	c.pendingAcks = append(c.pendingAcks, requestID)
 }

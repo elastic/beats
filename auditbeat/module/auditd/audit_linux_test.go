@@ -32,6 +32,8 @@ func TestData(t *testing.T) {
 	mock := NewMock().
 		// Get Status response for initClient
 		returnACK().returnStatus().
+		// Send expected ACKs for initialization
+		returnACK().returnACK().returnACK().returnACK().
 		// Send a single audit message from the kernel.
 		returnMessage(userLoginMsg)
 
