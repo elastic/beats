@@ -402,6 +402,7 @@ func (procStats *Stats) GetOne(pid int) (common.MapStr, error) {
 	}
 
 	e := procStats.getProcessEvent(p)
+	procStats.ProcsMap = newProcs
 
 	return e, nil
 }
