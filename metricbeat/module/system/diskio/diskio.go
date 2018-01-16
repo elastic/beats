@@ -4,8 +4,11 @@ package diskio
 
 import (
 	"github.com/elastic/beats/libbeat/common"
+	"github.com/elastic/beats/libbeat/logp"
 	"github.com/elastic/beats/metricbeat/mb"
 	"github.com/elastic/beats/metricbeat/mb/parse"
+
+	"regexp"
 
 	"github.com/pkg/errors"
 	"github.com/shirou/gopsutil/disk"
@@ -21,14 +24,33 @@ func init() {
 type MetricSet struct {
 	mb.BaseMetricSet
 	statistics *DiskIOStat
+	nameRegexp *regexp.Regexp
 }
 
 // New is a mb.MetricSetFactory that returns a new MetricSet.
 func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
+	config := struct {
+		Regexp string `config:"diskio.name.regexp"`
+	}{Regexp: ""}
+
+	if err := base.Module().UnpackConfig(&config); err != nil {
+		return nil, err
+	}
+
 	ms := &MetricSet{
 		BaseMetricSet: base,
 		statistics:    NewDiskIOStat(),
 	}
+
+	if len(config.Regexp) > 0 {
+		r, err := regexp.Compile(config.Regexp)
+		if err != nil {
+			logp.Warn("diskio", "Invalid regular expression: (%s), error: %s", config.Regexp, err.Error())
+			return nil, err
+		}
+		ms.nameRegexp = r
+	}
+
 	return ms, nil
 }
 
@@ -44,6 +66,9 @@ func (m *MetricSet) Fetch() ([]common.MapStr, error) {
 
 	events := make([]common.MapStr, 0, len(stats))
 	for _, counters := range stats {
+		if m.nameRegexp != nil && !m.nameRegexp.MatchString(counters.Name) {
+			continue
+		}
 
 		event := common.MapStr{
 			"name": counters.Name,

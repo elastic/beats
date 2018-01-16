@@ -60,3 +60,9 @@
   #socket.reverse_lookup.enabled: false
   #socket.reverse_lookup.success_ttl: 60s
   #socket.reverse_lookup.failure_ttl: 60s
+
+  # Diskio configurations
+  #diskio.name.regexp: ^sda
+
+  # RAID configurations
+  #raid.name.regexp: ^md

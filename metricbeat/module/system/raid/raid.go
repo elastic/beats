@@ -2,9 +2,11 @@ package raid
 
 import (
 	"path/filepath"
+	"regexp"
 
 	"github.com/elastic/beats/libbeat/common"
 	"github.com/elastic/beats/libbeat/common/cfgwarn"
+	"github.com/elastic/beats/libbeat/logp"
 	"github.com/elastic/beats/metricbeat/mb"
 	"github.com/elastic/beats/metricbeat/mb/parse"
 	"github.com/elastic/beats/metricbeat/module/system"
@@ -22,7 +24,8 @@ func init() {
 // MetricSet contains proc fs data.
 type MetricSet struct {
 	mb.BaseMetricSet
-	fs procfs.FS
+	fs         procfs.FS
+	nameRegexp *regexp.Regexp
 }
 
 // New creates a new instance of the raid metricset.
@@ -37,7 +40,10 @@ func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
 	// Additional configuration options
 	config := struct {
 		MountPoint string `config:"raid.mount_point"`
-	}{}
+		Regexp     string `config:"raid.name.regexp"`
+	}{
+		Regexp: "",
+	}
 
 	if err := base.Module().UnpackConfig(&config); err != nil {
 		return nil, err
@@ -58,6 +64,15 @@ func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
 		fs:            fs,
 	}
 
+	if len(config.Regexp) > 0 {
+		r, err := regexp.Compile(config.Regexp)
+		if err != nil {
+			logp.Warn("raid", "Invalid regular expression: (%s), error: %s", config.Regexp, err.Error())
+			return nil, err
+		}
+		m.nameRegexp = r
+	}
+
 	return m, nil
 }
 
@@ -71,6 +86,10 @@ func (m *MetricSet) Fetch() ([]common.MapStr, error) {
 
 	events := make([]common.MapStr, 0, len(stats))
 	for _, stat := range stats {
+		if m.nameRegexp != nil && !m.nameRegexp.MatchString(stat.Name) {
+			continue
+		}
+
 		event := common.MapStr{
 			"name":           stat.Name,
 			"activity_state": stat.ActivityState,
