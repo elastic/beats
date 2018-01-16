@@ -222,11 +222,6 @@ func (b *Beat) createBeater(bt beat.Creator) (beat.Beater, error) {
 		reg = monitoring.Default.NewRegistry("libbeat")
 	}
 
-	err = setupMetrics(b.Info.Beat)
-	if err != nil {
-		return nil, err
-	}
-
 	debugf("Initializing output plugins")
 	pipeline, err := pipeline.Load(b.Info, reg, b.Config.Pipeline, b.Config.Output)
 	if err != nil {
@@ -271,6 +266,13 @@ func (b *Beat) launch(bt beat.Creator) error {
 	}
 
 	if b.Config.MetricLogging == nil || b.Config.MetricLogging.Enabled() {
+		metrics, err := monitoring.MakeCollector(b.Info.Beat)
+		if err != nil {
+			return err
+		}
+		defer metrics.Stop()
+		setupMetrics(metrics)
+
 		reporter, err := log.MakeReporter(b.Info, b.Config.MetricLogging)
 		if err != nil {
 			return err
