@@ -1,6 +1,7 @@
 package auditd
 
 import (
+	"fmt"
 	"os"
 	"strconv"
 	"strings"
@@ -23,6 +24,11 @@ import (
 const (
 	// Use old namespace for data until we do some field renaming for GA.
 	namespace = "audit.kernel"
+
+	auditLocked = 2
+
+	unicast   = "unicast"
+	multicast = "multicast"
 )
 
 var (
@@ -78,34 +84,17 @@ func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
 }
 
 func newAuditClient(c *Config, log *logp.Logger) (*libaudit.AuditClient, error) {
-	hasMulticast := hasMulticastSupport()
-
-	switch c.SocketType {
-	// Attempt to determine the optimal socket_type.
-	case "":
-		// Use multicast only when no rules are present. Specifying rules
-		// implies you want control over the audit framework so you should be
-		// using unicast.
-		if rules, _ := c.rules(); len(rules) == 0 && hasMulticast {
-			c.SocketType = "multicast"
-			log.Info("socket_type=multicast will be used.")
-		}
-	case "multicast":
-		if !hasMulticast {
-			log.Warn("socket_type is set to multicast but based on the " +
-				"kernel version multicast audit subscriptions are not " +
-				"supported. unicast will be used instead.")
-			c.SocketType = "unicast"
-		}
+	var err error
+	c.SocketType, err = determineSocketType(c, log)
+	if err != nil {
+		return nil, err
 	}
+	log.Infof("socket_type=%s will be used.", c.SocketType)
 
-	switch c.SocketType {
-	case "multicast":
+	if c.SocketType == multicast {
 		return libaudit.NewMulticastAuditClient(nil)
-	default:
-		c.SocketType = "unicast"
-		return libaudit.NewAuditClient(nil)
 	}
+	return libaudit.NewAuditClient(nil)
 }
 
 // Run initializes the audit client and receives audit messages from the
@@ -153,6 +142,18 @@ func (ms *MetricSet) addRules(reporter mb.PushReporterV2) error {
 	}
 	defer client.Close()
 
+	// Don't attempt to change configuration if audit rules are locked (enabled == 2).
+	// Will result in EPERM.
+	status, err := client.GetStatus()
+	if err != nil {
+		err = errors.Wrap(err, "failed to get audit status before adding rules")
+		reporter.Error(err)
+		return err
+	}
+	if status.Enabled == auditLocked {
+		return errors.New("Skipping rule configuration: Audit rules are locked")
+	}
+
 	// Delete existing rules.
 	n, err := client.DeleteRules()
 	if err != nil {
@@ -194,6 +195,10 @@ func (ms *MetricSet) initClient() error {
 	}
 	ms.log.Infow("audit status from kernel at start", "audit_status", status)
 
+	if status.Enabled == auditLocked {
+		return errors.New("failed to configure: The audit system is locked")
+	}
+
 	if fm, _ := ms.config.failureMode(); status.Failure != fm {
 		if err = ms.client.SetFailure(libaudit.FailureMode(fm), libaudit.NoWait); err != nil {
 			return errors.Wrap(err, "failed to set audit failure mode in kernel")
@@ -217,11 +222,15 @@ func (ms *MetricSet) initClient() error {
 			return errors.Wrap(err, "failed to enable auditing in the kernel")
 		}
 	}
-
-	if err := ms.client.SetPID(libaudit.NoWait); err != nil {
-		return errors.Wrap(err, "failed to set audit PID")
+	if err := ms.client.WaitForPendingACKs(); err != nil {
+		return errors.Wrap(err, "failed to wait for ACKs")
 	}
-
+	if err := ms.client.SetPID(libaudit.WaitForReply); err != nil {
+		if errno, ok := err.(syscall.Errno); ok && errno == syscall.EEXIST && status.PID != 0 {
+			return fmt.Errorf("failed to set audit PID. An audit process is already running (PID %d)", status.PID)
+		}
+		return errors.Wrapf(err, "failed to set audit PID (current audit PID %d)", status.PID)
+	}
 	return nil
 }
 
@@ -453,4 +462,81 @@ func kernelVersion() (major, minor int, full string, err error) {
 	}
 
 	return major, minor, release, nil
+}
+
+func determineSocketType(c *Config, log *logp.Logger) (string, error) {
+	client, err := libaudit.NewAuditClient(nil)
+	if err != nil {
+		if c.SocketType == "" {
+			return "", errors.Wrap(err, "failed to create audit client")
+		}
+		// Ignore errors if a socket type has been specified. It will fail during
+		// further setup and its necessary for unit tests to pass
+		return c.SocketType, nil
+	}
+	defer client.Close()
+	status, err := client.GetStatus()
+	if err != nil {
+		if c.SocketType == "" {
+			return "", errors.Wrap(err, "failed to get audit status")
+		}
+		return c.SocketType, nil
+	}
+	rules, _ := c.rules()
+
+	isLocked := status.Enabled == auditLocked
+	hasMulticast := hasMulticastSupport()
+	hasRules := len(rules) > 0
+
+	const useAutodetect = "Remove the socket_type option to have auditbeat " +
+		"select the most suitable subscription method."
+	switch c.SocketType {
+	case unicast:
+		if isLocked {
+			log.Errorf("requested unicast socket_type is not available "+
+				"because audit configuration is locked in the kernel "+
+				"(enabled=2). %s", useAutodetect)
+			return "", errors.New("unicast socket_type not available")
+		}
+		return c.SocketType, nil
+
+	case multicast:
+		if hasMulticast {
+			if hasRules {
+				log.Warn("The audit rules specified in the configuration " +
+					"cannot be applied when using a multicast socket_type.")
+			}
+			return c.SocketType, nil
+		}
+		log.Errorf("socket_type is set to multicast but based on the "+
+			"kernel version, multicast audit subscriptions are not supported. %s",
+			useAutodetect)
+		return "", errors.New("multicast socket_type not available")
+
+	default:
+		// attempt to determine the optimal socket_type
+		if hasMulticast {
+			if hasRules {
+				if isLocked {
+					log.Warn("Audit rules specified in the configuration " +
+						"cannot be applied because the audit rules have been locked " +
+						"in the kernel (enabled=2). A multicast audit subscription " +
+						"will be used instead, which does not support setting rules")
+					return multicast, nil
+				}
+				return unicast, nil
+			}
+			return multicast, nil
+		}
+		if isLocked {
+			log.Errorf("Cannot continue: audit configuration is locked " +
+				"in the kernel (enabled=2) which prevents using unicast " +
+				"sockets. Multicast audit subscriptions are not available " +
+				"in this kernel. Disable locking the audit configuration " +
+				"to use auditbeat.")
+			return "", errors.New("no connection to audit available")
+		}
+		return unicast, nil
+	}
+
 }

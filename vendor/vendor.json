@@ -367,12 +367,12 @@
 			"revisionTime": "2016-08-05T00:47:13Z"
 		},
 		{
-			"checksumSHA1": "/JppfHtRGQSFjB9FlY2jpHhmlhk=",
+			"checksumSHA1": "OTJwg7UBb6439K8/feoQooocpEE=",
 			"path": "github.com/elastic/go-libaudit",
-			"revision": "df0d4981f3fce65ffd3d7411dfec3e03231b491c",
-			"revisionTime": "2017-09-07T20:19:58Z",
-			"version": "v0.0.6",
-			"versionExact": "v0.0.6"
+			"revision": "b4e44a5c8972a15dd2fc03c55b9406ff2a623e8b",
+			"revisionTime": "2018-01-08T14:54:56Z",
+			"version": "master",
+			"versionExact": "master"
 		},
 		{
 			"checksumSHA1": "n8bRlhOdmfREBoCgStzHWGWiwSY=",
