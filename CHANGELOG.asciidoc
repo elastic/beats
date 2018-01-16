@@ -27,6 +27,7 @@ https://github.com/elastic/beats/compare/v6.0.0-beta2...master[Check the HEAD di
   named auditd and file_integrity, respectively. This change requires
   existing users to update their config. {issue}5422[5422]
 - Renamed file_integrity module fields. {issue}5423[5423] {pull}5995[5995]
+- Renamed auditd module fields. {issue}5423[5423] {pull}6080[6080]
 
 *Filebeat*
 - Switch to docker prospector in sample manifests for Kubernetes deployment {pull}5963[5963]
@@ -63,6 +64,9 @@ https://github.com/elastic/beats/compare/v6.0.0-beta2...master[Check the HEAD di
 
 - Add an error check to the file integrity scanner to prevent a panic when
   there is an error reading file info via lstat. {issue}6005[6005]
+- Fixed an issue where the proctitle value was being truncated.
+- Fixed an issue where values were incorrectly interpretted as hex data.
+- Fixed parsing of the `key` value when multiple keys are present.
 
 *Filebeat*
 
