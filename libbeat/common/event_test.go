@@ -387,7 +387,7 @@ func TestDeDotJsonMap(t *testing.T) {
 	var actualJSONBody map[string]interface{}
 	var expectedJSONBody map[string]interface{}
 
-	absPath, err := filepath.Abs("./_meta/test")
+	absPath, err := filepath.Abs("./testdata")
 	assert.NotNil(t, absPath)
 	assert.Nil(t, err)
 
@@ -410,7 +410,7 @@ func TestDeDotJsonArray(t *testing.T) {
 	var actualJSONBody []interface{}
 	var expectedJSONBody []interface{}
 
-	absPath, err := filepath.Abs("./_meta/test")
+	absPath, err := filepath.Abs("./testdata")
 	assert.NotNil(t, absPath)
 	assert.Nil(t, err)
 
