@@ -130,6 +130,7 @@ func SupportedSubsystems(rootfsMountpoint string) (map[string]struct{}, error) {
 		}
 		return nil, err
 	}
+	defer cgroups.Close()
 
 	subsystemSet := map[string]struct{}{}
 	sc := bufio.NewScanner(cgroups)
@@ -163,7 +164,7 @@ func SupportedSubsystems(rootfsMountpoint string) (map[string]struct{}, error) {
 		subsystemSet[subsystem] = struct{}{}
 	}
 
-	return subsystemSet, nil
+	return subsystemSet, sc.Err()
 }
 
 // SubsystemMountpoints returns the mountpoints for each of the given subsystems.
@@ -178,6 +179,7 @@ func SubsystemMountpoints(rootfsMountpoint string, subsystems map[string]struct{
 	if err != nil {
 		return nil, err
 	}
+	defer mountinfo.Close()
 
 	mounts := map[string]string{}
 	sc := bufio.NewScanner(mountinfo)
@@ -220,7 +222,7 @@ func SubsystemMountpoints(rootfsMountpoint string, subsystems map[string]struct{
 		}
 	}
 
-	return mounts, nil
+	return mounts, sc.Err()
 }
 
 // ProcessCgroupPaths returns the cgroups to which a process belongs and the
@@ -234,6 +236,7 @@ func ProcessCgroupPaths(rootfsMountpoint string, pid int) (map[string]string, er
 	if err != nil {
 		return nil, err
 	}
+	defer cgroup.Close()
 
 	paths := map[string]string{}
 	sc := bufio.NewScanner(cgroup)
@@ -256,5 +259,5 @@ func ProcessCgroupPaths(rootfsMountpoint string, pid int) (map[string]string, er
 		}
 	}
 
-	return paths, nil
+	return paths, sc.Err()
 }
