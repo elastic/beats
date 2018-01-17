@@ -118,7 +118,7 @@ func (m *MetricSet) Fetch() (common.MapStr, error) {
 	}
 
 	if m.deDotEnabled {
-		event = replaceDots(jsonBody).(map[string]interface{})
+		event = common.DeDotJSON(jsonBody).(map[string]interface{})
 	} else {
 		event = jsonBody
 	}
@@ -161,17 +161,4 @@ func (m *MetricSet) getHeaders(header http.Header) map[string]string {
 		headers[k] = value
 	}
 	return headers
-}
-
-func replaceDots(data interface{}) interface{} {
-	switch data.(type) {
-	case map[string]interface{}:
-		result := map[string]interface{}{}
-		for key, value := range data.(map[string]interface{}) {
-			result[common.DeDot(key)] = replaceDots(value)
-		}
-		return result
-	default:
-		return data
-	}
 }
