@@ -7,6 +7,9 @@ import (
 
 	"github.com/stretchr/testify/assert"
 
+	"io/ioutil"
+	"path/filepath"
+
 	"github.com/elastic/beats/libbeat/logp"
 )
 
@@ -378,4 +381,50 @@ func BenchmarkConvertToGenericEventStringPointer(b *testing.B) {
 	for i := 0; i < b.N; i++ {
 		ConvertToGenericEvent(MapStr{"key": &val})
 	}
+}
+
+func TestDeDotJsonMap(t *testing.T) {
+	var actualJSONBody map[string]interface{}
+	var expectedJSONBody map[string]interface{}
+
+	absPath, err := filepath.Abs("./testdata")
+	assert.NotNil(t, absPath)
+	assert.Nil(t, err)
+
+	actualJSONResponse, err := ioutil.ReadFile(absPath + "/json_map_with_dots.json")
+	assert.Nil(t, err)
+	err = json.Unmarshal(actualJSONResponse, &actualJSONBody)
+	assert.Nil(t, err)
+
+	dedottedJSONResponse, err := ioutil.ReadFile(absPath + "/json_map_dedot.json")
+	assert.Nil(t, err)
+	err = json.Unmarshal(dedottedJSONResponse, &expectedJSONBody)
+	assert.Nil(t, err)
+
+	actualJSONBody = DeDotJSON(actualJSONBody).(map[string]interface{})
+
+	assert.Equal(t, expectedJSONBody, actualJSONBody)
+}
+
+func TestDeDotJsonArray(t *testing.T) {
+	var actualJSONBody []interface{}
+	var expectedJSONBody []interface{}
+
+	absPath, err := filepath.Abs("./testdata")
+	assert.NotNil(t, absPath)
+	assert.Nil(t, err)
+
+	actualJSONResponse, err := ioutil.ReadFile(absPath + "/json_array_with_dots.json")
+	assert.Nil(t, err)
+	err = json.Unmarshal(actualJSONResponse, &actualJSONBody)
+	assert.Nil(t, err)
+
+	dedottedJSONResponse, err := ioutil.ReadFile(absPath + "/json_array_dedot.json")
+	assert.Nil(t, err)
+	err = json.Unmarshal(dedottedJSONResponse, &expectedJSONBody)
+	assert.Nil(t, err)
+
+	actualJSONBody = DeDotJSON(actualJSONBody).([]interface{})
+
+	assert.Equal(t, expectedJSONBody, actualJSONBody)
 }

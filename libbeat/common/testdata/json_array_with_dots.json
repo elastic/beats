@@ -1,0 +1,5 @@
+[
+    {"key_with_dot.1":"value1_1"},
+    {"key_without_dot_2":"value1_2"},
+    {"key_with_multiple.dots.3": {"key_with_dot.2":"value2_1"}}
+]
