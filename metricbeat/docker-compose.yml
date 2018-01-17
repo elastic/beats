@@ -18,6 +18,7 @@ services:
       - ./module/dropwizard/_meta/env
       - ./module/elasticsearch/_meta/env
       - ./module/etcd/_meta/env
+      - ./module/galera/_meta/evn
       - ./module/haproxy/_meta/env
       - ./module/http/_meta/env
       - ./module/jolokia/_meta/env
@@ -64,6 +65,9 @@ services:
 
   etcd:
     build: ./module/etcd/_meta
+
+  galera:
+    build: ./module/galera/_meta
 
   haproxy:
     build: ./module/haproxy/_meta

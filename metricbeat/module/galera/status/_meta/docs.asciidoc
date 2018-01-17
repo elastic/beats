@@ -1,3 +1,50 @@
+This module periodically fetches metrics from http://galeracluster.com/[Galera]-MySQL
+cluster servers.
+
+[float]
+=== Module-specific configuration notes
+
+When configuring the `hosts` option, you must use a MySQL Data Source Name (DSN)
+of the following format:
+
+----
+[username[:password]@][protocol[(address)]]/
+----
+
+You can also separately specify the username and password using the respective
+configuration options. Usernames and passwords specified in the DSN take
+precedence over those specified in the `username` and `password` config options.
+
+Additionally you are able to choose between a `small` or a `full` set of
+values to fetch from the cluster. The default setting is `small`.
+
+----
+- module: mysql
+  metricsets: ["status"]
+  hosts: ["tcp(127.0.0.1:3306)/"]
+  username: root
+  password: secret
+  query_mode: small
+----
+
+The minimal set contains the following values:
+----
+- wsrep_local_state_comment
+- wsrep_evs_state
+- wsrep_cluster_size
+- wsrep_cluster_status
+- wsrep_connected
+- wsrep_ready
+
+----
+[float]
+=== Compatibility
+
+The galera MetricSets were tested with galera 3.22 (MySQL 5.7.20) and are expected to work with
+all versions >= 3.0 (MySQL >= 5.7.0)
+
+
+
 === galera status MetricSet
 
 This is the status metricset of the module galera.

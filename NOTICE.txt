@@ -608,9 +608,9 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 --------------------------------------------------------------------
 Dependency: github.com/go-sql-driver/mysql
-Revision: 9dee4ca50b83acdf57a35fb9e6fb4be640afa2f3
+Revision: cd4cb909ce1a31435164be29bf3682031f61539a
 License type (autodetected): MPL-2.0
-./metricbeat/module/mysql/vendor/github.com/go-sql-driver/mysql/LICENSE:
+./metricbeat/vendor/github.com/go-sql-driver/mysql/LICENSE:
 --------------------------------------------------------------------
 Mozilla Public License Version 2.0
 ==================================

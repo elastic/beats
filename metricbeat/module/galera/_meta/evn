@@ -1,0 +1,3 @@
+GALERA_DSN=root:test@tcp(galera:3306)/
+GALERA_HOST=galera
+GALERA_PORT=3306

@@ -9,6 +9,7 @@ import (
 	mbSql "github.com/elastic/beats/metricbeat/module/mysql"
 
 	"github.com/stretchr/testify/assert"
+	"regexp"
 )
 
 func TestFetch(t *testing.T) {
@@ -23,16 +24,23 @@ func TestFetch(t *testing.T) {
 	t.Logf("%s/%s event: %+v", f.Module().Name(), f.Name(), event)
 
 	// Check event fields
-	connections := event["local"].(common.MapStr)["state"].(string)
-	open := event["open"].(common.MapStr)
-	openTables := open["tables"].(int64)
-	openFiles := open["files"].(int64)
-	openStreams := open["streams"].(int64)
+	status := event["status"].(common.MapStr)
+	clusterSize := status["cluster"].(common.MapStr)["size"].(int)
+	clusterStatus := status["cluster"].(common.MapStr)["status"].(string)
+	connected := status["cluster"].(common.MapStr)["connected"].(string)
+	evsState := status["evs"].(common.MapStr)["state"].(string)
+	localState := status["local"].(common.MapStr)["state"].(string)
+	ready := status["reads"].(string)
 
-	if assert.Equal(t, "")
-	assert.True(t, openTables > 0)
-	assert.True(t, openFiles >= 0)
-	assert.True(t, openStreams == 0)
+	expState := regexp.MustCompile(`(?i)^primary|open|joiner|joined|synced|donor$`)
+	expOnOff := regexp.MustCompile(`^ON|OFF$`)
+
+	assert.True(t, clusterSize > 0)
+	assert.Regexp(t, "^(NON_)?PRIMARY$", clusterStatus)
+	assert.Regexp(t, expOnOff, connected)
+	assert.Regexp(t, expState, evsState)
+	assert.Regexp(t, expState, localState)
+	assert.Regexp(t, expOnOff, ready)
 }
 
 func TestFetchRaw(t *testing.T) {
