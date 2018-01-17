@@ -98,6 +98,7 @@ https://github.com/elastic/beats/compare/v6.0.0-beta2...master[Check the HEAD di
 - Fix kubernetes `state_pod` `status.phase` so that the active phase is returned instead of `unknown`. {pull}5980[5980]
 - Fix error collecting network_names in Vsphere module. {pull}5962[5962]
 - Fix process cgroup memory metrics for memsw, kmem, and kmem_tcp. {issue}6033[6033]
+- Fix kafka OffsetFetch request missing topic and partition parameters. {pull}5880[5880]
 
 *Packetbeat*
 
