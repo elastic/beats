@@ -1,0 +1,20 @@
+{
+  "sort": [
+    "@timestamp", 
+    "desc"
+  ], 
+  "hits": 0, 
+  "description": "", 
+  "title": "Process Executions [Auditbeat Auditd]", 
+  "version": 1, 
+  "kibanaSavedObjectMeta": {
+    "searchSourceJSON": "{\n  \"index\": \"auditbeat-*\",\n  \"highlightAll\": true,\n  \"version\": true,\n  \"filter\": [\n    {\n      \"$state\": {\n        \"store\": \"appState\"\n      },\n      \"meta\": {\n        \"alias\": null,\n        \"disabled\": false,\n        \"index\": \"auditbeat-*\",\n        \"key\": \"event.module\",\n        \"negate\": false,\n        \"params\": {\n          \"query\": \"auditd\",\n          \"type\": \"phrase\"\n        },\n        \"type\": \"phrase\",\n        \"value\": \"auditd\"\n      },\n      \"query\": {\n        \"match\": {\n          \"event.module\": {\n            \"query\": \"auditd\",\n            \"type\": \"phrase\"\n          }\n        }\n      }\n    },\n    {\n      \"$state\": {\n        \"store\": \"appState\"\n      },\n      \"meta\": {\n        \"alias\": null,\n        \"disabled\": false,\n        \"index\": \"auditbeat-*\",\n        \"key\": \"event.action\",\n        \"negate\": false,\n        \"params\": {\n          \"query\": \"executed\",\n          \"type\": \"phrase\"\n        },\n        \"type\": \"phrase\",\n        \"value\": \"executed\"\n      },\n      \"query\": {\n        \"match\": {\n          \"event.action\": {\n            \"query\": \"executed\",\n            \"type\": \"phrase\"\n          }\n        }\n      }\n    }\n  ]\n}"
+  }, 
+  "columns": [
+    "beat.hostname", 
+    "process.args", 
+    "auditd.summary.actor.primary", 
+    "auditd.summary.actor.secondary", 
+    "process.exe"
+  ]
+}
