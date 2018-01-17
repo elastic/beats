@@ -157,7 +157,7 @@
       "attributes": {
         "description": "",
         "kibanaSavedObjectMeta": {
-          "searchSourceJSON": "{\n  \"index\": \"auditbeat-*\",\n  \"query\": {\n    \"query\": {\n      \"query_string\": {\n        \"analyze_wildcard\": true,\n        \"query\": \"file.action:deleted\",\n        \"default_field\": \"*\"\n      }\n    },\n    \"language\": \"lucene\"\n  },\n  \"filter\": []\n}"
+          "searchSourceJSON": "{\n  \"index\": \"auditbeat-*\",\n  \"query\": {\n    \"query\": {\n      \"query_string\": {\n        \"analyze_wildcard\": true,\n        \"query\": \"event.action:deleted\",\n        \"default_field\": \"*\"\n      }\n    },\n    \"language\": \"lucene\"\n  },\n  \"filter\": []\n}"
         },
         "savedSearchId": "a380a060-cb44-11e7-9835-2f31fe08873b",
         "title": "Top deleted [Auditbeat File Integrity]",
@@ -174,7 +174,7 @@
       "attributes": {
         "description": "",
         "kibanaSavedObjectMeta": {
-          "searchSourceJSON": "{\n  \"index\": \"auditbeat-*\",\n  \"query\": {\n    \"query\": {\n      \"query_string\": {\n        \"query\": \"file.action:created\",\n        \"analyze_wildcard\": true,\n        \"default_field\": \"*\"\n      }\n    },\n    \"language\": \"lucene\"\n  },\n  \"filter\": []\n}"
+          "searchSourceJSON": "{\n  \"index\": \"auditbeat-*\",\n  \"query\": {\n    \"query\": {\n      \"query_string\": {\n        \"query\": \"event.action:created\",\n        \"analyze_wildcard\": true,\n        \"default_field\": \"*\"\n      }\n    },\n    \"language\": \"lucene\"\n  },\n  \"filter\": []\n}"
         },
         "savedSearchId": "a380a060-cb44-11e7-9835-2f31fe08873b",
         "title": "Top created [Auditbeat File Integrity]",
