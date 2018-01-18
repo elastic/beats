@@ -2,11 +2,12 @@
 All notable changes to this project will be documented in this file.
 This project adheres to [Semantic Versioning](http://semver.org/).
 
-## [Unreleased]
+## [0.0.7]
  
 ### Added
 
 - Added WaitForPendingACKs to receive pending ACK messages from the kernel. #14
+- The AuditClient will unregister with the kernel if `SetPID` has been called. #19
  
 ### Changed
 
@@ -17,10 +18,8 @@ This project adheres to [Semantic Versioning](http://semver.org/).
 - auparse - The `cmdline` key is no longer created for EXECVE records. #17
 - aucoalesce - Changed the event format to have objects for user, process, file,
   and network data. #17
-
-### Deprecated
-
-### Removed
+- Fixed an issue when an audit notification is received while waiting for the
+  response to a control command.
 
 ## [0.0.6]
 
