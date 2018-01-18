@@ -2,7 +2,7 @@
   title: "Kubernetes"
   description: >
     Kubernetes metrics
-  release: beta
+  release: ga
   settings: ["ssl"]
   short_config: false
   fields:
