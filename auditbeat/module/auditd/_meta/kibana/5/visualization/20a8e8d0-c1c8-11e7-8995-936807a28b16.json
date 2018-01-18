@@ -1,0 +1,11 @@
+{
+  "visState": "{\n  \"title\": \"Error Codes [Auditbeat Auditd Executions]\",\n  \"type\": \"pie\",\n  \"params\": {\n    \"type\": \"pie\",\n    \"addTooltip\": true,\n    \"addLegend\": true,\n    \"legendPosition\": \"right\",\n    \"isDonut\": true\n  },\n  \"aggs\": [\n    {\n      \"id\": \"1\",\n      \"enabled\": true,\n      \"type\": \"count\",\n      \"schema\": \"metric\",\n      \"params\": {}\n    },\n    {\n      \"id\": \"2\",\n      \"enabled\": true,\n      \"type\": \"terms\",\n      \"schema\": \"segment\",\n      \"params\": {\n        \"field\": \"auditd.data.exit\",\n        \"exclude\": \"0\",\n        \"size\": 10,\n        \"order\": \"desc\",\n        \"orderBy\": \"1\"\n      }\n    }\n  ]\n}", 
+  "description": "", 
+  "title": "Error Codes [Auditbeat Auditd Executions]", 
+  "uiStateJSON": "{}", 
+  "version": 1, 
+  "savedSearchId": "d382f5b0-c1c6-11e7-8995-936807a28b16", 
+  "kibanaSavedObjectMeta": {
+    "searchSourceJSON": ""
+  }
+}
