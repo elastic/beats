@@ -13,7 +13,7 @@ func (kl kafkaLogger) Print(v ...interface{}) {
 }
 
 func (kl kafkaLogger) Printf(format string, v ...interface{}) {
-	kl.Log(format, v)
+	kl.Log(format, v...)
 }
 
 func (kl kafkaLogger) Println(v ...interface{}) {
@@ -31,8 +31,8 @@ func (kafkaLogger) Log(format string, v ...interface{}) {
 		}
 	}
 	if warn {
-		logp.Warn(format, v)
+		logp.Warn(format, v...)
 	} else {
-		logp.Info(format, v)
+		logp.Info(format, v...)
 	}
 }
