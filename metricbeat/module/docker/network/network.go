@@ -2,7 +2,6 @@ package network
 
 import (
 	"github.com/elastic/beats/libbeat/common"
-	"github.com/elastic/beats/libbeat/common/cfgwarn"
 	"github.com/elastic/beats/metricbeat/mb"
 	"github.com/elastic/beats/metricbeat/module/docker"
 
@@ -23,8 +22,6 @@ type MetricSet struct {
 
 // New creates a new instance of the docker network MetricSet.
 func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
-	cfgwarn.Beta("The docker network metricset is beta")
-
 	config := docker.Config{}
 	if err := base.Module().UnpackConfig(&config); err != nil {
 		return nil, err

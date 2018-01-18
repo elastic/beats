@@ -12,7 +12,6 @@ import (
 
 	"github.com/elastic/beats/libbeat/beat"
 	"github.com/elastic/beats/libbeat/common"
-	"github.com/elastic/beats/libbeat/common/cfgwarn"
 	"github.com/elastic/beats/libbeat/common/docker"
 	"github.com/elastic/beats/libbeat/logp"
 	"github.com/elastic/beats/libbeat/processors"
@@ -46,7 +45,6 @@ type addDockerMetadata struct {
 }
 
 func newDockerMetadataProcessor(cfg *common.Config) (processors.Processor, error) {
-	cfgwarn.Beta("The %v processor is beta", processorName)
 	return buildDockerMetadataProcessor(cfg, docker.NewWatcher)
 }
 
