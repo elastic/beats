@@ -135,6 +135,7 @@ https://github.com/elastic/beats/compare/v6.0.0-beta2...master[Check the HEAD di
 - Add the ability to log to the Windows Event Log. {pull}5913[5813]
 - Improve Elasticsearch output metrics to count number of dropped and duplicate (if event ID is given) events. {pull}5811[5811]
 - Add autodiscover for kubernetes. {pull}6055[6055]
+- Add the abilility for the add_docker_metadata process to enrich based on process ID. {pull}6100[6100]
 
 *Auditbeat*
 

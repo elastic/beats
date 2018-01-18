@@ -616,6 +616,7 @@ processors:
 - add_docker_metadata:
     host: "unix:///var/run/docker.sock"
     #match_fields: ["system.process.cgroup.id"]
+    #match_pids: ["process.pid", "process.ppid"]
     #match_source: true
     #match_source_index: 4
     #cleanup_timeout: 60
@@ -629,13 +630,24 @@ processors:
 It has the following settings:
 
 `host`:: (Optional) Docker socket (UNIX or TCP socket). It uses
-  `unix:///var/run/docker.sock` by default.
-`match_fields`:: (Optional) A list of fields to match a container id, at least
-  one of them should hold a container id to get the event enriched.
-`match_source`:: (Optional) Match container id from a log path present in
-  `source` field. Enabled by default.
-`match_source_index`:: (Optional) Index in the source path split by / to look
-  for container id. It defaults to 4 to match
-  `/var/lib/docker/containers/<container_id>/*.log`
+`unix:///var/run/docker.sock` by default.
+
+`ssl`:: (Optional) SSL configuration to use when connecting to the Docker
+socket.
+
+`match_fields`:: (Optional) A list of fields to match a container ID, at least
+one of them should hold a container ID to get the event enriched.
+
+`match_pids`:: (Optional) A list of fields that contain process IDs. If the
+process is running in Docker then the event will be enriched. The default value
+is `["process.pid", "process.ppid"]`.
+
+`match_source`:: (Optional) Match container ID from a log path present in the
+`source` field. Enabled by default.
+
+`match_source_index`:: (Optional) Index in the source path split by `/` to look
+for container ID. It defaults to 4 to match
+`/var/lib/docker/containers/<container_id>/*.log`
+
 `cleanup_timeout`:: (Optional) Time of inactivity to consider we can clean and
 forget metadata for a container, 60s by default.
