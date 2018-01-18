@@ -2302,7 +2302,6 @@ The object's SELinux level.
 [[exported-fields-docker-processor]]
 == Docker fields
 
-beta[]
 Docker stats collected from Docker.
 
 
@@ -2461,7 +2460,6 @@ SHA512/256 hash of the file.
 [[exported-fields-kubernetes-processor]]
 == Kubernetes fields
 
-beta[]
 Kubernetes metadata added by the kubernetes processor
 
 

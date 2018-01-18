@@ -186,7 +186,6 @@ The Event Logging API was designed for Windows Server 2003, Windows XP, or Windo
 [[exported-fields-docker-processor]]
 == Docker fields
 
-beta[]
 Docker stats collected from Docker.
 
 
@@ -479,7 +478,6 @@ The XML representation of the event is useful for troubleshooting purposes. The 
 [[exported-fields-kubernetes-processor]]
 == Kubernetes fields
 
-beta[]
 Kubernetes metadata added by the kubernetes processor
 
 
