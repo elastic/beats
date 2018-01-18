@@ -1,0 +1,36 @@
+policy_module(journalbeat, 1.0.0)
+
+#####
+# Beats Boilerplate
+
+require {
+  attribute beats_type;
+  attribute beats_var_lib_type;
+  attribute beats_log_type;
+}
+
+type journalbeat_t;
+typeattribute journalbeat_t beats_type;
+
+type journalbeat_exec_t;
+init_daemon_domain(journalbeat_t, journalbeat_exec_t)
+
+type journalbeat_log_t;
+typeattribute journalbeat_log_t beats_log_type;
+logging_log_file(journalbeat_log_t)
+logging_log_filetrans(journalbeat_t, journalbeat_log_t, { dir file lnk_file })
+
+type journalbeat_var_lib_t;
+typeattribute journalbeat_var_lib_t beats_var_lib_type;
+files_type(journalbeat_var_lib_t)
+files_var_lib_filetrans(journalbeat_t, journalbeat_var_lib_t, { dir file lnk_file })
+
+type journalbeat_unit_file_t;
+systemd_unit_file(journalbeat_unit_file_t)
+
+#
+#####
+
+logging_read_syslog_pid(journalbeat_t)
+#init_stream_connect(journalbeat_t)
+init_read_var_lib_files(journalbeat_t)

@@ -1,0 +1,8 @@
+/etc/rc\.d/init\.d/auditbeat			--	gen_context(system_u:object_r:auditbeat_initrc_exec_t,s0)
+/lib/systemd/system/auditbeat.service		--	gen_context(system_u:object_r:auditbeat_unit_file_t,s0)
+
+/usr/bin/auditbeat				--	gen_context(system_u:object_r:auditbeat_exec_t,s0)
+/usr/share/auditbeat/bin/auditbeat		--	gen_context(system_u:object_r:auditbeat_exec_t,s0)
+
+/var/lib/auditbeat(/.*)?			--	gen_context(system_u:object_r:auditbeat_var_lib_t,s0)
+/var/log/auditbeat(/.*)?			--	gen_context(system_u:object_r:auditbeat_log_t,s0)

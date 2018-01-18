@@ -1,0 +1,185 @@
+
+## <summary>policy for journalbeat</summary>
+
+########################################
+## <summary>
+##	Execute journalbeat_exec_t in the journalbeat domain.
+## </summary>
+## <param name="domain">
+## <summary>
+##	Domain allowed to transition.
+## </summary>
+## </param>
+#
+interface(`journalbeat_domtrans',`
+	gen_require(`
+		type journalbeat_t, journalbeat_exec_t;
+	')
+
+	corecmd_search_bin($1)
+	domtrans_pattern($1, journalbeat_exec_t, journalbeat_t)
+')
+
+######################################
+## <summary>
+##	Execute journalbeat in the caller domain.
+## </summary>
+## <param name="domain">
+##	<summary>
+##	Domain allowed access.
+##	</summary>
+## </param>
+#
+interface(`journalbeat_exec',`
+	gen_require(`
+		type journalbeat_exec_t;
+	')
+
+	corecmd_search_bin($1)
+	can_exec($1, journalbeat_exec_t)
+')
+
+########################################
+## <summary>
+##	Search journalbeat cache directories.
+## </summary>
+## <param name="domain">
+##	<summary>
+##	Domain allowed access.
+##	</summary>
+## </param>
+#
+interface(`journalbeat_search_cache',`
+	gen_require(`
+		type journalbeat_cache_t;
+	')
+
+	allow $1 journalbeat_cache_t:dir search_dir_perms;
+	files_search_var($1)
+')
+
+########################################
+## <summary>
+##	Read journalbeat cache files.
+## </summary>
+## <param name="domain">
+##	<summary>
+##	Domain allowed access.
+##	</summary>
+## </param>
+#
+interface(`journalbeat_read_cache_files',`
+	gen_require(`
+		type journalbeat_cache_t;
+	')
+
+	files_search_var($1)
+	read_files_pattern($1, journalbeat_cache_t, journalbeat_cache_t)
+')
+
+########################################
+## <summary>
+##	Create, read, write, and delete
+##	journalbeat cache files.
+## </summary>
+## <param name="domain">
+##	<summary>
+##	Domain allowed access.
+##	</summary>
+## </param>
+#
+interface(`journalbeat_manage_cache_files',`
+	gen_require(`
+		type journalbeat_cache_t;
+	')
+
+	files_search_var($1)
+	manage_files_pattern($1, journalbeat_cache_t, journalbeat_cache_t)
+')
+
+########################################
+## <summary>
+##	Manage journalbeat cache dirs.
+## </summary>
+## <param name="domain">
+##	<summary>
+##	Domain allowed access.
+##	</summary>
+## </param>
+#
+interface(`journalbeat_manage_cache_dirs',`
+	gen_require(`
+		type journalbeat_cache_t;
+	')
+
+	files_search_var($1)
+	manage_dirs_pattern($1, journalbeat_cache_t, journalbeat_cache_t)
+')
+
+########################################
+## <summary>
+##	Execute journalbeat server in the journalbeat domain.
+## </summary>
+## <param name="domain">
+##	<summary>
+##	Domain allowed to transition.
+##	</summary>
+## </param>
+#
+interface(`journalbeat_systemctl',`
+	gen_require(`
+		type journalbeat_t;
+		type journalbeat_unit_file_t;
+	')
+
+	systemd_exec_systemctl($1)
+        systemd_read_fifo_file_passwd_run($1)
+	allow $1 journalbeat_unit_file_t:file read_file_perms;
+	allow $1 journalbeat_unit_file_t:service manage_service_perms;
+
+	ps_process_pattern($1, journalbeat_t)
+')
+
+
+########################################
+## <summary>
+##	All of the rules required to administrate
+##	an journalbeat environment
+## </summary>
+## <param name="domain">
+##	<summary>
+##	Domain allowed access.
+##	</summary>
+## </param>
+## <param name="role">
+##	<summary>
+##	Role allowed access.
+##	</summary>
+## </param>
+## <rolecap/>
+#
+interface(`journalbeat_admin',`
+	gen_require(`
+		type journalbeat_t;
+		type journalbeat_cache_t;
+	type journalbeat_unit_file_t;
+	')
+
+	allow $1 journalbeat_t:process { signal_perms };
+	ps_process_pattern($1, journalbeat_t)
+
+    tunable_policy(`deny_ptrace',`',`
+        allow $1 journalbeat_t:process ptrace;
+    ')
+
+	files_search_var($1)
+	admin_pattern($1, journalbeat_cache_t)
+
+	journalbeat_systemctl($1)
+	admin_pattern($1, journalbeat_unit_file_t)
+	allow $1 journalbeat_unit_file_t:service all_service_perms;
+	optional_policy(`
+		systemd_passwd_agent_exec($1)
+		systemd_read_fifo_file_passwd_run($1)
+	')
+')

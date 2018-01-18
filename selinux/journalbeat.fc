@@ -1,0 +1,6 @@
+/usr/bin/journalbeat					--	gen_context(system_u:object_r:journalbeat_exec_t,s0)
+
+/usr/lib/systemd/system/journalbeat.service		--	gen_context(system_u:object_r:journalbeat_unit_file_t,s0)
+
+/var/lib/journalbeat(/.*)?				--	gen_context(system_u:object_r:journalbeat_var_lib_t,s0)
+/var/log/journalbeat(/.*)?				--	gen_context(system_u:object_r:journalbeat_log_t,s0)

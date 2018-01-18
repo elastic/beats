@@ -1,0 +1,40 @@
+policy_module(filebeat, 1.0.0)
+
+require {
+  attribute beats_type;
+  attribute beats_log_type;
+  attribute beats_var_lib_type;
+}
+
+type filebeat_t;
+typeattribute filebeat_t beats_type;
+
+type filebeat_exec_t;
+init_daemon_domain(filebeat_t, filebeat_exec_t)
+
+type filebeat_log_t;
+typeattribute filebeat_log_t beats_log_type;
+logging_log_file(filebeat_log_t)
+logging_log_filetrans(filebeat_t, filebeat_log_t, { dir file lnk_file })
+
+type filebeat_var_lib_t;
+typeattribute filebeat_var_lib_t beats_var_lib_type;
+files_type(filebeat_var_lib_t)
+files_var_lib_filetrans(filebeat_t, filebeat_var_lib_t, { dir file lnk_file })
+
+type filebeat_unit_file_t;
+systemd_unit_file(filebeat_unit_file_t)
+
+type filebeat_initrc_exec_t;
+init_script_file(filebeat_initrc_exec_t)
+
+gen_tunable(filebeat_can_read_all_logs, true)
+tunable_policy(`filebeat_can_read_all_logs', `
+    logging_read_all_logs(filebeat_t)
+    logging_read_audit_log(filebeat_t)    
+')
+
+gen_tunable(filebeat_can_manage_all_logs, false)
+tunable_policy(`filebeat_can_manage_all_logs', `
+    logging_manage_all_logs(filebeat_t)
+')

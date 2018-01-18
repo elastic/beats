@@ -1,0 +1,53 @@
+########################################
+## <summary>
+##      Make a TCP connection to the logstash port.
+## </summary>
+## <param name="domain">
+##      <summary>
+##      Domain allowed access.
+##      </summary>
+## </param>
+#
+interface(`beats_tcp_connect_logstash_port',`
+        gen_require(`
+                type logstash_port_t;
+        ')
+
+        allow $1 logstash_port_t:tcp_socket name_connect;
+')
+
+########################################
+## <summary>
+##      Make a TCP connection to the kafka port.
+## </summary>
+## <param name="domain">
+##      <summary>
+##      Domain allowed access.
+##      </summary>
+## </param>
+#
+interface(`beats_tcp_connect_kafka_port',`
+        gen_require(`
+                type kafka_port_t;
+        ')
+
+        allow $1 kafka_port_t:tcp_socket name_connect;
+')
+
+########################################
+## <summary>
+##      Make a TCP connection to the elasticsearch port.
+## </summary>
+## <param name="domain">
+##      <summary>
+##      Domain allowed access.
+##      </summary>
+## </param>
+#
+interface(`beats_tcp_connect_elasticsearch_port',`
+        gen_require(`
+                type elasticsearch_port_t;
+        ')
+
+        allow $1 elasticsearch_port_t:tcp_socket name_connect;
+')

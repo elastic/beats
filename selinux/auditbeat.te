@@ -1,0 +1,39 @@
+policy_module(auditbeat, 1.0.0)
+
+require {
+  attribute beats_type;
+  attribute beats_log_type;
+  attribute beats_var_lib_type;
+
+  class capability { audit_control dac_override };
+  class file { create rename unlink write };
+  class netlink_audit_socket { bind create getattr nlmsg_read nlmsg_readpriv nlmsg_write };
+}
+
+type auditbeat_t;
+typeattribute auditbeat_t beats_type;
+
+type auditbeat_exec_t;
+init_daemon_domain(auditbeat_t, auditbeat_exec_t)
+
+type auditbeat_log_t;
+typeattribute auditbeat_log_t beats_log_type;
+logging_log_file(auditbeat_log_t)
+logging_log_filetrans(auditbeat_t, auditbeat_log_t, { dir file lnk_file })
+
+type auditbeat_var_lib_t;
+typeattribute auditbeat_var_lib_t beats_var_lib_type;
+files_type(auditbeat_var_lib_t)
+files_var_lib_filetrans(auditbeat_t, auditbeat_var_lib_t, { dir file lnk_file })
+
+type auditbeat_unit_file_t;
+systemd_unit_file(auditbeat_unit_file_t)
+
+type auditbeat_initrc_exec_t;
+init_script_file(auditbeat_initrc_exec_t)
+
+files_read_all_files(auditbeat_t)
+files_read_all_symlinks(auditbeat_t)
+
+allow auditbeat_t self:capability { audit_control dac_override };
+allow auditbeat_t self:netlink_audit_socket { bind create getattr nlmsg_read nlmsg_readpriv nlmsg_write };

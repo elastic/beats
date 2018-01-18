@@ -1,0 +1,54 @@
+policy_module(beats, 1.0.0)
+
+#
+# Rules for all *beat log collectors
+#   inherit by assigning a type attribute
+#
+
+type logstash_port_t;
+type kafka_port_t;
+type elasticsearch_port_t;
+
+attribute beats_type;
+attribute beats_cache_type;
+attribute beats_var_lib_type;
+attribute beats_log_type;
+
+corenet_port(logstash_port_t)
+corenet_port(kafka_port_t)
+corenet_port(elasticsearch_port_t)
+
+allow beats_type self:fifo_file rw_fifo_file_perms;
+allow beats_type self:unix_stream_socket create_stream_socket_perms;
+allow beats_type self:capability2 block_suspend;
+
+domain_use_interactive_fds(beats_type)
+files_read_etc_files(beats_type)
+
+miscfiles_read_localization(beats_type)
+miscfiles_read_generic_certs(beats_type)
+
+kernel_read_net_sysctls(beats_type)
+
+sysnet_dns_name_resolve(beats_type)
+corenet_tcp_bind_generic_node(beats_type)
+
+corenet_tcp_connect_redis_port(beats_type)
+# semanage port -p tcp -t logstash_port_t -a 5044
+beats_tcp_connect_logstash_port(beats_type)
+# semanage port -p tcp -t kafka_port_t -a 9092
+beats_tcp_connect_kafka_port(beats_type)
+# semanage port -p tcp -t elasticsearch_port_t -a 9200
+beats_tcp_connect_elasticsearch_port(beats_type)
+
+manage_dirs_pattern(beats_type, beats_cache_type, beats_cache_type)
+manage_files_pattern(beats_type, beats_cache_type, beats_cache_type)
+manage_lnk_files_pattern(beats_type, beats_cache_type, beats_cache_type)
+
+manage_dirs_pattern(beats_type, beats_var_lib_type, beats_var_lib_type)
+manage_files_pattern(beats_type, beats_var_lib_type, beats_var_lib_type)
+manage_lnk_files_pattern(beats_type, beats_var_lib_type, beats_var_lib_type)
+
+manage_dirs_pattern(beats_type, beats_log_type, beats_log_type)
+manage_files_pattern(beats_type, beats_log_type, beats_log_type)
+manage_lnk_files_pattern(beats_type, beats_log_type, beats_log_type)
