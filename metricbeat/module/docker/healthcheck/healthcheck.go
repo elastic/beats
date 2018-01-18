@@ -1,7 +1,10 @@
 package healthcheck
 
 import (
-	dc "github.com/fsouza/go-dockerclient"
+	"context"
+
+	"github.com/docker/docker/api/types"
+	"github.com/docker/docker/client"
 
 	"github.com/elastic/beats/libbeat/common"
 	"github.com/elastic/beats/libbeat/common/cfgwarn"
@@ -17,7 +20,7 @@ func init() {
 
 type MetricSet struct {
 	mb.BaseMetricSet
-	dockerClient *dc.Client
+	dockerClient *client.Client
 }
 
 // New creates a new instance of the docker healthcheck MetricSet.
@@ -44,7 +47,7 @@ func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
 // This is based on https://docs.docker.com/engine/reference/api/docker_remote_api_v1.24/#/list-containers.
 func (m *MetricSet) Fetch() ([]common.MapStr, error) {
 	// Fetch a list of all containers.
-	containers, err := m.dockerClient.ListContainers(dc.ListContainersOptions{})
+	containers, err := m.dockerClient.ContainerList(context.TODO(), types.ContainerListOptions{})
 	if err != nil {
 		return nil, err
 	}
