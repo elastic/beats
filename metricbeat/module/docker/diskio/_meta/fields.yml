@@ -2,7 +2,7 @@
   type: group
   description: >
     Disk I/O metrics.
-  release: beta
+  release: ga
   fields:
     - name: reads
       type: scaled_float
