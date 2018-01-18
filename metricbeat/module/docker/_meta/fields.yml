@@ -2,7 +2,7 @@
   title: "Docker"
   description: >
     Docker stats collected from Docker.
-  release: beta
+  release: ga
   short_config: false
   fields:
     - name: docker
