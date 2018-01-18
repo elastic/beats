@@ -9,6 +9,8 @@ import (
 
 	"github.com/joeshaw/multierror"
 
+	"github.com/elastic/beats/winlogbeat/checkpoint"
+
 	"github.com/elastic/beats/libbeat/common"
 	"github.com/elastic/beats/libbeat/logp"
 	"github.com/elastic/beats/winlogbeat/sys"
@@ -76,9 +78,9 @@ func (l eventLogging) Name() string {
 	return l.name
 }
 
-func (l *eventLogging) Open(recordNumber uint64) error {
+func (l *eventLogging) Open(state checkpoint.EventLogState) error {
 	detailf("%s Open(recordNumber=%d) calling OpenEventLog(uncServerPath=, "+
-		"providerName=%s)", l.logPrefix, recordNumber, l.name)
+		"providerName=%s)", l.logPrefix, state.RecordNumber, l.name)
 	handle, err := win.OpenEventLog("", l.name)
 	if err != nil {
 		return err
@@ -91,7 +93,7 @@ func (l *eventLogging) Open(recordNumber uint64) error {
 
 	var oldestRecord, newestRecord uint32
 	if numRecords > 0 {
-		l.recordNumber = uint32(recordNumber)
+		l.recordNumber = uint32(state.RecordNumber)
 		l.seek = true
 		l.ignoreFirst = true
 
@@ -169,6 +171,11 @@ func (l *eventLogging) Read() ([]Record, error) {
 		records = append(records, Record{
 			API:   eventLoggingAPIName,
 			Event: e,
+			Offset: checkpoint.EventLogState{
+				Name:         l.name,
+				RecordNumber: e.RecordID,
+				Timestamp:    e.TimeCreated.SystemTime,
+			},
 		})
 	}
 
@@ -208,7 +215,10 @@ func (l *eventLogging) readRetryErrorHandler(err error) error {
 
 		if reopen {
 			l.Close()
-			return l.Open(uint64(l.recordNumber))
+			return l.Open(checkpoint.EventLogState{
+				Name:         l.name,
+				RecordNumber: uint64(l.recordNumber),
+			})
 		}
 	}
 	return err
