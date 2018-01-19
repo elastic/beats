@@ -227,6 +227,20 @@ func getProcState(b byte) string {
 	return "unknown"
 }
 
+// GetOwnResourceUsageTimeInMillis return the user and system CPU usage time in milliseconds
+func GetOwnResourceUsageTimeInMillis() (int64, int64, error) {
+	r := sigar.Rusage{}
+	err := r.Get(0)
+	if err != nil {
+		return 0, 0, err
+	}
+
+	uTime := int64(r.Utime / time.Millisecond)
+	sTime := int64(r.Stime / time.Millisecond)
+
+	return uTime, sTime, nil
+}
+
 func (procStats *Stats) getProcessEvent(process *Process) common.MapStr {
 	proc := common.MapStr{
 		"pid":      process.Pid,
