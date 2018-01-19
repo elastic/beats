@@ -535,3 +535,5 @@ When using `docker` prospector type you must define `containers.ids`, these are 
 *`ids`*:: Required, the list of Docker container IDs to read logs from, `'*'` can be used as ID to read from all containers.
 
 *`path`*:: Base path where Docker logs are located. The default is `/var/lib/docker/containers`.
+
+*`stream`*:: Only read the given stream, this can be: `all`, `stdout` or `stderr`. The default is `all`.

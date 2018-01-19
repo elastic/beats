@@ -9,7 +9,6 @@ import (
 	"github.com/elastic/beats/libbeat/beat"
 	"github.com/elastic/beats/libbeat/common"
 	"github.com/elastic/beats/libbeat/common/bus"
-	"github.com/elastic/beats/libbeat/common/cfgwarn"
 	"github.com/elastic/beats/libbeat/common/kubernetes"
 	"github.com/elastic/beats/libbeat/logp"
 	"github.com/elastic/beats/libbeat/processors"
@@ -46,8 +45,6 @@ func init() {
 }
 
 func newKubernetesAnnotator(cfg *common.Config) (processors.Processor, error) {
-	cfgwarn.Beta("The kubernetes processor is beta")
-
 	config := defaultKubernetesAnnotatorConfig()
 
 	err := cfg.Unpack(&config)

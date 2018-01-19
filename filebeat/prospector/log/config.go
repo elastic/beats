@@ -85,7 +85,7 @@ type config struct {
 	JSON         *reader.JSONConfig      `config:"json"`
 
 	// Hidden on purpose, used by the docker prospector:
-	DockerJSON bool `config:"docker-json"`
+	DockerJSON string `config:"docker-json"`
 }
 
 type LogConfig struct {

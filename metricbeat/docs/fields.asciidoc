@@ -2013,7 +2013,6 @@ Number of items/documents that are replicas.
 [[exported-fields-docker-processor]]
 == Docker fields
 
-beta[]
 Docker stats collected from Docker.
 
 
@@ -4996,7 +4995,6 @@ Total number of connections.
 [[exported-fields-kubernetes-processor]]
 == Kubernetes fields
 
-beta[]
 Kubernetes metadata added by the kubernetes processor
 
 
@@ -6492,7 +6490,7 @@ Combination of database and collection name.
 
 
 [float]
-=== `mongodb.collstats.total.time`
+=== `mongodb.collstats.total.time.us`
 
 type: long
 

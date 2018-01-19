@@ -1,0 +1,11 @@
+{
+  "visState": "{\"aggs\":[{\"enabled\":true,\"id\":\"1\",\"params\":{},\"schema\":\"metric\",\"type\":\"count\"},{\"enabled\":true,\"id\":\"2\",\"params\":{\"customLabel\":\"Exe\",\"field\":\"auditd.summary.how\",\"order\":\"desc\",\"orderBy\":\"_term\",\"size\":50},\"schema\":\"bucket\",\"type\":\"terms\"},{\"enabled\":true,\"id\":\"3\",\"params\":{\"customLabel\":\"Address\",\"field\":\"auditd.summary.object.primary\",\"order\":\"desc\",\"orderBy\":\"_term\",\"size\":10},\"schema\":\"bucket\",\"type\":\"terms\"},{\"enabled\":true,\"id\":\"4\",\"params\":{\"customLabel\":\"Port\",\"field\":\"auditd.summary.object.secondary\",\"order\":\"desc\",\"orderBy\":\"_term\",\"size\":10},\"schema\":\"bucket\",\"type\":\"terms\"}],\"listeners\":{},\"params\":{\"perPage\":10,\"showMeticsAtAllLevels\":false,\"showPartialRows\":false,\"showTotal\":false,\"sort\":{\"columnIndex\":null,\"direction\":null},\"totalFunc\":\"sum\",\"type\":\"table\"},\"title\":\"Bind (non-ephemeral) [Auditbeat Auditd]\",\"type\":\"table\"}", 
+  "description": "", 
+  "title": "Bind (non-ephemeral) [Auditbeat Auditd]", 
+  "uiStateJSON": "{\"vis\":{\"params\":{\"sort\":{\"columnIndex\":null,\"direction\":null}}}}", 
+  "version": 1, 
+  "savedSearchId": "b4c93470-c240-11e7-8692-232bd1143e8a", 
+  "kibanaSavedObjectMeta": {
+    "searchSourceJSON": "{\"filter\":[]}"
+  }
+}
