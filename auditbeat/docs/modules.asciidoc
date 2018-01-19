@@ -4,8 +4,8 @@
 [partintro]
 --
 This section contains detailed information about the metric collecting modules
-contained in {beatname_uc}. Each module contains one or multiple metricsets. More details
-about each module can be found under the links below.
+contained in {beatname_uc}. More details about each module can be found under
+the links below.
 
 //pass macro block used here to remove Edit links from modules documentation because it is generated
 pass::[<?edit_url?>]

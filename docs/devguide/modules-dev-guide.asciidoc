@@ -26,11 +26,11 @@ the procedure is similar. Run the following command in the `filebeat` folder:
 
 [source,bash]
 ----
-make create-fileset
+make create-fileset MODULE={module} FILESET={fileset}
 ----
 
-You'll be prompted to enter a module and fileset name. Only use characters
-`[a-z]` and, if required, underscores (`_`). No other characters are allowed.
+Only use characters `[a-z]` and, if required, underscores (`_`).
+No other characters are allowed.
 For the module name, you can us either a new module name or an existing module
 name. If the module doesn't exist, it will be created.
 
@@ -265,6 +265,16 @@ at the module level, placed under `module/{module}/_meta/fields.yml`, which
 should contain the fields defined at the module level, and the description of
 the module itself. In most cases, you should add the fields at the fileset
 level.
+
+After `pipeline.json` is created, it is possible to generate a base `field.yml`.
+
+[source,bash]
+----
+make create-fields MODULE={module} FILESET={fileset}
+----
+
+Please, always check the generated file and make sure the fields are correct.
+Documenatation of fields must be added manually.
 
 [float]
 ==== test

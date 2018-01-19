@@ -1,8 +1,6 @@
 - key: kubernetes
   title: Kubernetes
   description: >
-    beta[]
-
     Kubernetes metadata added by the kubernetes processor
   short_config: false
   anchor: kubernetes-processor

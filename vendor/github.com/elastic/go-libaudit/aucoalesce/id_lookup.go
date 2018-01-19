@@ -1,3 +1,17 @@
+// Copyright 2017-2018 Elasticsearch Inc.
+//
+// Licensed under the Apache License, Version 2.0 (the "License");
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+// http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an "AS IS" BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
+
 package aucoalesce
 
 import (
@@ -92,28 +106,38 @@ func (c GroupCache) LookupGID(gid string) string {
 // ResolveIDs translates all uid and gid values to their associated names.
 // This requires cgo on Linux.
 func ResolveIDs(event *Event) {
-	if v := userLookup.LookupUID(event.Subject.Primary); v != "" {
-		event.Subject.Primary = v
+	// Actor
+	if v := userLookup.LookupUID(event.Summary.Actor.Primary); v != "" {
+		event.Summary.Actor.Primary = v
 	}
-	if v := userLookup.LookupUID(event.Subject.Secondary); v != "" {
-		event.Subject.Secondary = v
+	if v := userLookup.LookupUID(event.Summary.Actor.Secondary); v != "" {
+		event.Summary.Actor.Secondary = v
 	}
 
-	processMap := func(m map[string]string) {
-		for key, id := range m {
-			if strings.HasSuffix(key, "uid") {
-				if v := userLookup.LookupUID(id); v != "" {
-					m[key] = v
-				}
-			} else if strings.HasSuffix(key, "gid") {
-				if v := groupLookup.LookupGID(id); v != "" {
-					m[key] = v
-				}
+	// User
+	names := map[string]string{}
+	for key, id := range event.User.IDs {
+		if strings.HasSuffix(key, "uid") {
+			if v := userLookup.LookupUID(id); v != "" {
+				names[key] = v
+			}
+		} else if strings.HasSuffix(key, "gid") {
+			if v := groupLookup.LookupGID(id); v != "" {
+				names[key] = v
 			}
 		}
 	}
-	processMap(event.Subject.Attributes)
-	for _, path := range event.Paths {
-		processMap(path)
+	if len(names) > 0 {
+		event.User.Names = names
+	}
+
+	// File owner/group
+	if event.File != nil {
+		if event.File.UID != "" {
+			event.File.Owner = userLookup.LookupUID(event.File.UID)
+		}
+		if event.File.GID != "" {
+			event.File.Group = groupLookup.LookupGID(event.File.GID)
+		}
 	}
 }

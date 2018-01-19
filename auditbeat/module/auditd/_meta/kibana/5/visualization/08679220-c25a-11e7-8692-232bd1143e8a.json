@@ -1,0 +1,11 @@
+{
+  "visState": "{\n  \"title\": \"Event Categories [Auditbeat Auditd]\",\n  \"type\": \"pie\",\n  \"params\": {\n    \"type\": \"pie\",\n    \"addTooltip\": true,\n    \"addLegend\": true,\n    \"legendPosition\": \"right\",\n    \"isDonut\": true\n  },\n  \"aggs\": [\n    {\n      \"id\": \"1\",\n      \"enabled\": true,\n      \"type\": \"count\",\n      \"schema\": \"metric\",\n      \"params\": {}\n    },\n    {\n      \"id\": \"2\",\n      \"enabled\": true,\n      \"type\": \"terms\",\n      \"schema\": \"segment\",\n      \"params\": {\n        \"field\": \"event.category\",\n        \"size\": 5,\n        \"order\": \"desc\",\n        \"orderBy\": \"1\",\n        \"customLabel\": \"Category\"\n      }\n    },\n    {\n      \"id\": \"3\",\n      \"enabled\": true,\n      \"type\": \"terms\",\n      \"schema\": \"segment\",\n      \"params\": {\n        \"field\": \"event.action\",\n        \"size\": 20,\n        \"order\": \"desc\",\n        \"orderBy\": \"1\",\n        \"customLabel\": \"Action\"\n      }\n    }\n  ]\n}", 
+  "description": "", 
+  "title": "Event Categories [Auditbeat Auditd]", 
+  "uiStateJSON": "{}", 
+  "version": 1, 
+  "savedSearchId": "0f10c430-c1c3-11e7-8995-936807a28b16", 
+  "kibanaSavedObjectMeta": {
+    "searchSourceJSON": ""
+  }
+}

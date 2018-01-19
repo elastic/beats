@@ -1,0 +1,10 @@
+{
+    "key_without_dot_l1": {
+        "key_with_dot.l2": 1,
+        "key.with.multiple.dots_l2": 2,
+        "key_without_dot_l2": {
+            "key_with_dot.l3": 3,
+            "key.with.multiple.dots_l3": 4
+        }
+    }
+}

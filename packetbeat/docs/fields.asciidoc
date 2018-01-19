@@ -1503,7 +1503,6 @@ Requestor's UDP payload size (in bytes).
 [[exported-fields-docker-processor]]
 == Docker fields
 
-beta[]
 Docker stats collected from Docker.
 
 
@@ -1954,7 +1953,6 @@ The response code.
 [[exported-fields-kubernetes-processor]]
 == Kubernetes fields
 
-beta[]
 Kubernetes metadata added by the kubernetes processor
 
 

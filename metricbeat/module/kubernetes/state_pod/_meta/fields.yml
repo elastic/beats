@@ -2,7 +2,7 @@
   type: group
   description: >
     kubernetes pod metrics
-  release: beta
+  release: ga
   fields:
     - name: ip
       type: ip
