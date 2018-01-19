@@ -59,6 +59,13 @@ type Stats struct {
 	envRegexps  []match.Matcher // List of regular expressions used to whitelist env vars.
 }
 
+// Ticks of CPU for a process
+type Ticks struct {
+	User   uint64
+	System uint64
+	Total  uint64
+}
+
 // newProcess creates a new Process object and initializes it with process
 // state information. If the process's command line and environment variables
 // are known they should be passed in to avoid re-fetching the information.
