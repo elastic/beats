@@ -518,7 +518,7 @@ func createAuditdData(data map[string]string) common.MapStr {
 
 // stream type
 
-// stream receives callbacks from the libaudit.Reassmbler for completed events
+// stream receives callbacks from the libaudit.Reassembler for completed events
 // or lost events that are detected by gaps in sequence numbers.
 type stream struct {
 	done <-chan struct{}
@@ -561,15 +561,17 @@ func kernelVersion() (major, minor int, full string, err error) {
 		return 0, 0, "", err
 	}
 
-	data := make([]byte, len(uname.Release))
+	length := len(uname.Release)
+	data := make([]byte, length)
 	for i, v := range uname.Release {
 		if v == 0 {
+			length = i
 			break
 		}
 		data[i] = byte(v)
 	}
 
-	release := string(data)
+	release := string(data[:length])
 	parts := strings.SplitN(release, ".", 3)
 	if len(parts) < 2 {
 		return 0, 0, release, errors.Errorf("failed to parse uname release '%v'", release)
