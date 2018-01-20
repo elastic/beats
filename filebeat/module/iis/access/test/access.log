@@ -1,5 +1,0 @@
-#Software: Microsoft Internet Information Services 10.0
-#Version: 1.0
-#Date: 2018-01-01 09:10:11
-#Fields: date time s-ip cs-method cs-uri-stem cs-uri-query s-port cs-username c-ip cs(User-Agent) cs(Referer) sc-status sc-substatus sc-win32-status time-taken
-2018-01-01 09:10:11 127.0.0.1 GET / - 80 - 127.0.0.1 Mozilla/5.0+(Windows+NT+6.1;+Win64;+x64;+rv:57.0)+Gecko/20100101+Firefox/57.0 - 200 0 0 123
