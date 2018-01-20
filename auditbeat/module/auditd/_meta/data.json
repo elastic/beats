@@ -1,34 +1,24 @@
 {
     "@timestamp": "2017-10-12T08:05:34.853Z",
-    "audit": {
-        "kernel": {
-            "action": "logged-in",
+    "auditd": {
+        "data": {
+            "acct": "(invalid user)",
+            "op": "login",
+            "terminal": "sshd"
+        },
+        "result": "fail",
+        "sequence": 19955,
+        "session": "unset",
+        "summary": {
             "actor": {
-                "attrs": {
-                    "auid": "unset",
-                    "uid": "root"
-                },
                 "primary": "unset",
                 "secondary": "(invalid user)"
             },
-            "category": "user-login",
-            "data": {
-                "acct": "(invalid user)",
-                "addr": "179.38.151.221",
-                "exe": "/usr/sbin/sshd",
-                "op": "login",
-                "pid": "12635",
-                "terminal": "sshd"
-            },
             "how": "/usr/sbin/sshd",
-            "record_type": "user_login",
-            "result": "fail",
-            "sequence": 19955,
-            "session": "unset",
-            "thing": {
+            "object": {
                 "primary": "sshd",
                 "secondary": "179.38.151.221",
-                "what": "user-session"
+                "type": "user-session"
             }
         }
     },
@@ -37,6 +27,20 @@
         "name": "host.example.com"
     },
     "event": {
-        "module": "auditd"
+        "action": "logged-in",
+        "category": "user-login",
+        "module": "auditd",
+        "type": "user_login"
+    },
+    "process": {
+        "exe": "/usr/sbin/sshd",
+        "pid": "12635"
+    },
+    "user": {
+        "auid": "unset",
+        "name_map": {
+            "uid": "root"
+        },
+        "uid": "0"
     }
 }

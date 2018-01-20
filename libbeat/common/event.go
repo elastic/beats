@@ -256,3 +256,24 @@ func (f Float) MarshalJSON() ([]byte, error) {
 func DeDot(s string) string {
 	return strings.Replace(s, ".", "_", -1)
 }
+
+// DeDotJSON replaces in keys all . with _
+// This helps when sending data to Elasticsearch to prevent object and key collisions.
+func DeDotJSON(json interface{}) interface{} {
+	switch json.(type) {
+	case map[string]interface{}:
+		result := map[string]interface{}{}
+		for key, value := range json.(map[string]interface{}) {
+			result[DeDot(key)] = DeDotJSON(value)
+		}
+		return result
+	case []interface{}:
+		result := make([]interface{}, len(json.([]interface{})))
+		for i, value := range json.([]interface{}) {
+			result[i] = DeDotJSON(value)
+		}
+		return result
+	default:
+		return json
+	}
+}

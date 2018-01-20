@@ -2,7 +2,7 @@
   type: group
   description: >
     Runtime CPU metrics.
-  release: beta
+  release: ga
   fields:
     - name: kernel.pct
       type: scaled_float

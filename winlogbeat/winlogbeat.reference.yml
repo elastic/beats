@@ -126,6 +126,10 @@ winlogbeat.event_logs:
 #- add_docker_metadata:
 #    host: "unix:///var/run/docker.sock"
 #    match_fields: ["system.process.cgroup.id"]
+#    match_pids: ["process.pid", "process.ppid"]
+#    match_source: true
+#    match_source_index: 4
+#    cleanup_timeout: 60
 #    # To connect to Docker over TLS you must specify a client and CA certificate.
 #    #ssl:
 #    #  certificate_authority: "/etc/pki/root/ca.pem"
@@ -807,3 +811,19 @@ logging.files:
 
 # Set to true to log messages in json format.
 #logging.json: false
+
+
+#================================ HTTP Endpoint ======================================
+# Each beat can expose internal metrics through a HTTP endpoint. For security
+# reasons the endpoint is disabled by default. This feature is currently experimental.
+# Stats can be access through http://localhost:5066/stats . For pretty JSON output
+# append ?pretty to the URL.
+
+# Defines if the HTTP endpoint is enabled.
+#http.enabled: false
+
+# The HTTP endpoint will bind to this hostname or IP address. It is recommended to use only localhost.
+#http.host: localhost
+
+# Port on which the HTTP endpoint will bind. Default is 5066.
+#http.port: 5066
