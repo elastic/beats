@@ -11,16 +11,17 @@ This metricset is available on:
 [float]
 === Configuration
 
-*`diskio.name.regexp`*:: When the `diskio` metricset is enabled, you can use the
-`diskio.name.regexp` option to define a list of regexp expressions to filter the
-disk devices that are reported. If not set all disk devices are returned
+*`diskio.include_devices`*:: When the `diskio` metricset is enabled, you can use the
+`diskio.include_devices` option to define a list of device names to pre-filter the
+devices that are reported. Filters only exact matches
+If not set, all disk devices are returned
 +
-The following example config returns metrics for devices starting with name sda:
+The following example config returns metrics for devices matching include_devices:
 +
 [source,yaml]
 ----
 metricbeat.modules:
 - module: system
   metricsets: ["diskio"]
-  diskio.name.regexp: ^sda
+  diskio.include_devices: ["sda", "sda1"]
 ----

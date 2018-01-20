@@ -1,20 +1,3 @@
 === system raid MetricSet
 
 This is the raid metricset of the module system.
-
-[float]
-=== Configuration
-
-*`raid.name.regexp`*:: When the `raid` metricset is enabled, you can use the
-`raid.name.regexp` option to define a list of regexp expressions to filter the
-RAID controllers that are reported. If not set all controllers are returned
-+
-The following example config returns metrics for controllers starting with name md1:
-+
-[source,yaml]
-----
-metricbeat.modules:
-- module: system
-  metricsets: ["raid"]
-  raid.name.regexp: ^md1
-----

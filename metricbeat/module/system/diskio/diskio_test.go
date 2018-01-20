@@ -18,9 +18,13 @@ func TestData(t *testing.T) {
 	if err := mbtest.WriteEvents(f, t); err != nil {
 		t.Fatal("write", err)
 	}
+
+	data, err := f.Fetch()
+	assert.NoError(t, err)
+	assert.Equal(t, 10, len(data))
 }
 
-func TestDataRegexp(t *testing.T) {
+func TestDataNameFilter(t *testing.T) {
 	oldFS := system.HostFS
 	newFS := "_meta/testdata"
 	system.HostFS = &newFS
@@ -29,7 +33,7 @@ func TestDataRegexp(t *testing.T) {
 	}()
 
 	conf := getConfig()
-	conf["diskio.name.regexp"] = "^sda"
+	conf["diskio.include_devices"] = []string{"sda", "sda1", "sda2"}
 	f := mbtest.NewEventsFetcher(t, getConfig())
 
 	if err := mbtest.WriteEvents(f, t); err != nil {
@@ -38,7 +42,7 @@ func TestDataRegexp(t *testing.T) {
 
 	data, err := f.Fetch()
 	assert.NoError(t, err)
-	assert.Equal(t, 7, len(data))
+	assert.Equal(t, 3, len(data))
 }
 
 func getConfig() map[string]interface{} {

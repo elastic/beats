@@ -23,15 +23,6 @@ func TestFetch(t *testing.T) {
 	assert.Equal(t, 8, len(data))
 }
 
-func TestFetchRegexp(t *testing.T) {
-	conf := getConfig()
-	conf["raid.name.regexp"] = "^md1"
-	f := mbtest.NewEventsFetcher(t, conf)
-	data, err := f.Fetch()
-	assert.NoError(t, err)
-	assert.Equal(t, 2, len(data))
-}
-
 func getConfig() map[string]interface{} {
 	return map[string]interface{}{
 		"module":           "system",

@@ -41,8 +41,7 @@ metricbeat.modules:
   process.include_top_n:
     by_cpu: 5      # include top 5 processes by CPU
     by_memory: 5   # include top 5 processes by memory
-  #diskio.name.regexp: ^sda
-  #raid.name.regexp: ^md
+  #diskio.include_devices: ["sda", "sda1", "sda2"]
 
 - module: system
   period: 1m
