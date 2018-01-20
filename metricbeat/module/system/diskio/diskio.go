@@ -43,7 +43,7 @@ func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
 
 // Fetch fetches disk IO metrics from the OS.
 func (m *MetricSet) Fetch() ([]common.MapStr, error) {
-	stats, err := disk.IOCounters()
+	stats, err := disk.IOCounters(m.names...)
 	if err != nil {
 		return nil, errors.Wrap(err, "disk io counters")
 	}
