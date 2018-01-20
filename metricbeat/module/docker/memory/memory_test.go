@@ -73,13 +73,15 @@ func TestMemoryService_GetMemoryStats(t *testing.T) {
 func getMemoryStats(read time.Time, number uint64) types.StatsJSON {
 
 	myMemoryStats := types.StatsJSON{
-		Read: read,
-		MemoryStats: types.MemoryStats{
-			MaxUsage: number,
-			Usage:    number * 2,
-			Failcnt:  number * 3,
-			Limit:    number * 4,
-			Stats:    map[string]uint64{},
+		Stats: types.Stats{
+			Read: read,
+			MemoryStats: types.MemoryStats{
+				MaxUsage: number,
+				Usage:    number * 2,
+				Failcnt:  number * 3,
+				Limit:    number * 4,
+				Stats:    map[string]uint64{},
+			},
 		},
 	}
 
