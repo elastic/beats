@@ -3,7 +3,7 @@
   description: >
     Contains fields for IIS access logs.
   fields:
-      - name: server_ip
+    - name: server_ip
       type: keyword
       description: >
         The server IP address.

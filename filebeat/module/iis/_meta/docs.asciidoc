@@ -20,27 +20,37 @@ Note: Running IIS on anything other than Windows is not supported.
 
 include::../include/running-modules.asciidoc[]
 
+[float]
+=== Example dashboard
+
+This module comes with a sample dashboard. For example:
+
+[role="screenshot"]
+image::./images/kibana-iis.png[]
+
 include::../include/configuring-intro.asciidoc[]
 
 The following example shows how to set paths in the +modules.d/{modulename}.yml+
-file to override the default paths for access logs and error logs:
+file to override the default paths for IIS access logs and error logs:
 
 ["source","yaml",subs="attributes"]
 -----
 - module: iis
   access:
     enabled: true
-    var.paths: ["C:\inetpub\logs\LogFiles\*\*.log"]
+    var.paths: ["C:/inetpub/logs/LogFiles/*/*.log"]
+  error:
+    enabled: true
+    var.paths: ["C:/Windows/System32/LogFiles/HTTPERR/*.log"]
 -----
 
 To specify the same settings at the command line, you use:
 
 ["source","sh",subs="attributes"]
 -----
-./{beatname_lc} -M "nginx.access.var.paths=[C:\inetpub\logs\LogFiles\*\*.log]"
+./{beatname_lc} --modules {modulename} -M "iis.access.var.paths=[C:/inetpub/logs/LogFiles/*/*.log]" -M "iis.error.var.paths=[C:/Windows/System32/LogFiles/HTTPERR/*.log]"
 -----
 
-The command in the example assumes that you have already enabled the +{modulename}+ module. 
 
 //set the fileset name used in the included example
 :fileset_ex: access
@@ -49,5 +59,10 @@ include::../include/config-option-intro.asciidoc[]
 
 [float]
 ==== `access` log fileset settings
+
+include::../include/var-paths.asciidoc[]
+
+[float]
+==== `error` log fileset settings
 
 include::../include/var-paths.asciidoc[]
