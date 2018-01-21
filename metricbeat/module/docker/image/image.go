@@ -1,11 +1,14 @@
 package image
 
 import (
+	"context"
+
+	"github.com/docker/docker/api/types"
+	"github.com/docker/docker/client"
+
 	"github.com/elastic/beats/libbeat/common"
 	"github.com/elastic/beats/metricbeat/mb"
 	"github.com/elastic/beats/metricbeat/module/docker"
-
-	dc "github.com/fsouza/go-dockerclient"
 )
 
 // init registers the MetricSet with the central registry.
@@ -22,7 +25,7 @@ func init() {
 // multiple fetch calls.
 type MetricSet struct {
 	mb.BaseMetricSet
-	dockerClient *dc.Client
+	dockerClient *client.Client
 }
 
 // New create a new instance of the MetricSet
@@ -49,7 +52,7 @@ func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
 // It returns the event which is then forward to the output. In case of an error, a
 // descriptive error must be returned.
 func (m *MetricSet) Fetch() ([]common.MapStr, error) {
-	images, err := m.dockerClient.ListImages(dc.ListImagesOptions{})
+	images, err := m.dockerClient.ImageList(context.TODO(), types.ImageListOptions{})
 	if err != nil {
 		return nil, err
 	}

@@ -1,11 +1,11 @@
 package memory
 
 import (
+	"github.com/docker/docker/client"
+
 	"github.com/elastic/beats/libbeat/common"
 	"github.com/elastic/beats/metricbeat/mb"
 	"github.com/elastic/beats/metricbeat/module/docker"
-
-	dc "github.com/fsouza/go-dockerclient"
 )
 
 func init() {
@@ -17,7 +17,7 @@ func init() {
 type MetricSet struct {
 	mb.BaseMetricSet
 	memoryService *MemoryService
-	dockerClient  *dc.Client
+	dockerClient  *client.Client
 }
 
 // New creates a new instance of the docker memory MetricSet.
