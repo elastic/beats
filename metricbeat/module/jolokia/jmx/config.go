@@ -5,11 +5,18 @@ import "encoding/json"
 type JMXMapping struct {
 	MBean      string
 	Attributes []Attribute
+	Target     Target
 }
 
 type Attribute struct {
 	Attr  string
 	Field string
+}
+
+type Target struct {
+	Url      string
+	User     string
+	Password string
 }
 
 // RequestBlock is used to build the request blocks of the following format:
@@ -35,6 +42,13 @@ type RequestBlock struct {
 	Type      string   `json:"type"`
 	MBean     string   `json:"mbean"`
 	Attribute []string `json:"attribute"`
+	Target    TargetBlock `json:"target"`
+}
+
+type TargetBlock struct {
+	Url      string `json:"url"`
+	User     string `json:"user"`
+	Password string `json:"password"`
 }
 
 func buildRequestBodyAndMapping(mappings []JMXMapping) ([]byte, map[string]string, error) {
@@ -45,6 +59,11 @@ func buildRequestBodyAndMapping(mappings []JMXMapping) ([]byte, map[string]strin
 		rb := RequestBlock{
 			Type:  "read",
 			MBean: mapping.MBean,
+			Target: TargetBlock {
+				Url: mapping.Target.Url,
+				User: mapping.Target.User,
+				Password: mapping.Target.Password,
+			},
 		}
 
 		for _, attribute := range mapping.Attributes {
