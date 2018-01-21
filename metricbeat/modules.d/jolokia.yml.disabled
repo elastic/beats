@@ -4,6 +4,6 @@
   hosts: ["localhost"]
   namespace: "metrics"
   path: "/jolokia/?ignoreErrors=true&canonicalNaming=false"
-  jmx.mapping:
+  jmx.mappings:
   jmx.application:
   jmx.instance:
