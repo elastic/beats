@@ -19,7 +19,6 @@ import (
 )
 
 var (
-	cpuMonitor       *cpu.Monitor
 	beatProcessStats *process.Stats
 	ephemeralID      uuid.UUID
 )
@@ -38,8 +37,6 @@ func init() {
 }
 
 func setupMetrics(name string) error {
-	cpuMonitor = new(cpu.Monitor)
-
 	beatProcessStats = &process.Stats{
 		Procs:        []string{name},
 		EnvWhitelist: nil,
@@ -109,7 +106,7 @@ func reportBeatCPU(_ monitoring.Mode, V monitoring.Visitor) {
 	V.OnRegistryStart()
 	defer V.OnRegistryFinished()
 
-	cpuUsage, cpuUsageNorm, totalCPUUsage, err := getCPUPercentages()
+	totalCPUUsage, err := getCPUUsage()
 	if err != nil {
 		logp.Err("Error retrieving CPU percentages: %v", err)
 		return
@@ -117,51 +114,28 @@ func reportBeatCPU(_ monitoring.Mode, V monitoring.Visitor) {
 
 	monitoring.ReportNamespace(V, "total", func() {
 		monitoring.ReportFloat(V, "value", totalCPUUsage)
-		monitoring.ReportFloat(V, "pct", cpuUsage)
-		monitoring.ReportNamespace(V, "norm", func() {
-			monitoring.ReportFloat(V, "pct", cpuUsageNorm)
-		})
 	})
 
 }
 
-func getCPUPercentages() (float64, float64, float64, error) {
+func getCPUUsage() (float64, error) {
 	beatPID := os.Getpid()
 	state, err := beatProcessStats.GetOne(beatPID)
 	if err != nil {
-		return 0.0, 0.0, 0.0, fmt.Errorf("error retrieving process stats")
-	}
-
-	iCPUUsage, err := state.GetValue("cpu.total.pct")
-	if err != nil {
-		return 0.0, 0.0, 0.0, fmt.Errorf("error getting total CPU usage: %v", err)
-	}
-	iCPUUsageNorm, err := state.GetValue("cpu.total.norm.pct")
-	if err != nil {
-		return 0.0, 0.0, 0.0, fmt.Errorf("error getting normalized CPU percentage: %v", err)
+		return 0.0, fmt.Errorf("error retrieving process stats")
 	}
 
 	iTotalCPUUsage, err := state.GetValue("cpu.total.value")
 	if err != nil {
-		return 0.0, 0.0, 0.0, fmt.Errorf("error getting total CPU since start: %v", err)
-	}
-
-	cpuUsage, ok := iCPUUsage.(float64)
-	if !ok {
-		return 0.0, 0.0, 0.0, fmt.Errorf("error converting value of CPU usage")
-	}
-
-	cpuUsageNorm, ok := iCPUUsageNorm.(float64)
-	if !ok {
-		return 0.0, 0.0, 0.0, fmt.Errorf("error converting value of normalized CPU usage")
+		return 0.0, fmt.Errorf("error getting total CPU since start: %v", err)
 	}
 
 	totalCPUUsage, ok := iTotalCPUUsage.(float64)
 	if !ok {
-		return 0.0, 0.0, 0.0, fmt.Errorf("error converting value of CPU usage since start")
+		return 0.0, fmt.Errorf("error converting value of CPU usage since start")
 	}
 
-	return cpuUsage, cpuUsageNorm, totalCPUUsage, nil
+	return totalCPUUsage, nil
 }
 
 func reportSystemLoadAverage(_ monitoring.Mode, V monitoring.Visitor) {
@@ -189,22 +163,6 @@ func reportSystemLoadAverage(_ monitoring.Mode, V monitoring.Visitor) {
 func reportSystemCPUUsage(_ monitoring.Mode, V monitoring.Visitor) {
 	V.OnRegistryStart()
 	defer V.OnRegistryFinished()
-
-	sample, err := cpuMonitor.Sample()
-	if err != nil {
-		logp.Err("Error retrieving CPU usage of the host: %v", err)
-		return
-	}
-
-	pct := sample.Percentages()
-	normalizedPct := sample.NormalizedPercentages()
-
-	monitoring.ReportNamespace(V, "total", func() {
-		monitoring.ReportFloat(V, "pct", pct.Total)
-		monitoring.ReportNamespace(V, "norm", func() {
-			monitoring.ReportFloat(V, "pct", normalizedPct.Total)
-		})
-	})
 
 	monitoring.ReportInt(V, "cores", int64(process.NumCPU))
 }

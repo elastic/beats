@@ -13,8 +13,20 @@ import (
 	"github.com/elastic/beats/libbeat/common"
 )
 
-var keyValue = "output.elasticsearch.password"
+var keyValue = "output_elasticsearch_password"
 var secretValue = []byte("secret")
+
+func TestInvalidKey(t *testing.T) {
+	path := GetTemporaryKeystoreFile()
+	defer os.Remove(path)
+
+	keystore, err := NewFileKeystore(path)
+	assert.NoError(t, err)
+	err = keystore.Store("output.elasticsearch.password", secretValue)
+	if assert.Error(t, err) {
+		assert.Equal(t, err.Error(), "invalid key format. '.' in keys are not supported yet. key: output.elasticsearch.password")
+	}
+}
 
 func TestCanCreateAKeyStore(t *testing.T) {
 	path := GetTemporaryKeystoreFile()
@@ -185,18 +197,18 @@ func TestGetConfig(t *testing.T) {
 	keystore := CreateAnExistingKeystore(path)
 
 	// Add a bit more data of different type
-	keystore.Store("super.nested", []byte("hello"))
+	keystore.Store("super_nested", []byte("hello"))
 	keystore.Save()
 
 	cfg, err := keystore.GetConfig()
 	assert.NotNil(t, cfg)
 	assert.NoError(t, err)
 
-	secret, err := cfg.String("output.elasticsearch.password", 0)
+	secret, err := cfg.String("output_elasticsearch_password", 0)
 	assert.NoError(t, err)
 	assert.Equal(t, secret, "secret")
 
-	port, err := cfg.String("super.nested", 0)
+	port, err := cfg.String("super_nested", 0)
 	assert.Equal(t, port, "hello")
 }
 

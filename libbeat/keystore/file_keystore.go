@@ -13,6 +13,7 @@ import (
 	"os"
 	"path/filepath"
 	"runtime"
+	"strings"
 	"sync"
 
 	"golang.org/x/crypto/pbkdf2"
@@ -88,6 +89,9 @@ func (k *FileKeystore) Retrieve(key string) (*SecureString, error) {
 
 // Store add the key pair to the secret store and mark the store as dirty.
 func (k *FileKeystore) Store(key string, value []byte) error {
+	if err := k.validateKey(key); err != nil {
+		return err
+	}
 	k.Lock()
 	defer k.Unlock()
 
@@ -381,4 +385,12 @@ func (k *FileKeystore) checkPermissions(f string) error {
 
 func (k *FileKeystore) hashPassword(password, salt []byte) []byte {
 	return pbkdf2.Key(password, salt, iterationsCount, keyLength, sha512.New)
+}
+
+func (k *FileKeystore) validateKey(key string) error {
+	if strings.IndexAny(key, ".") != -1 {
+		return fmt.Errorf("invalid key format. '.' in keys are not supported yet. key: %s", key)
+	}
+
+	return nil
 }

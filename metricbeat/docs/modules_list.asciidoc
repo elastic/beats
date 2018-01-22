@@ -21,15 +21,15 @@ This file is generated! See scripts/docs_collector.py
 .3+|   |<<metricbeat-metricset-couchbase-bucket,bucket>> beta[]  
 |<<metricbeat-metricset-couchbase-cluster,cluster>> beta[]  
 |<<metricbeat-metricset-couchbase-node,node>> beta[]  
-|<<metricbeat-module-docker,Docker>>  beta[]   |    
-.8+|   |<<metricbeat-metricset-docker-container,container>> beta[]  
-|<<metricbeat-metricset-docker-cpu,cpu>> beta[]  
-|<<metricbeat-metricset-docker-diskio,diskio>> beta[]  
-|<<metricbeat-metricset-docker-healthcheck,healthcheck>> beta[]  
-|<<metricbeat-metricset-docker-image,image>> beta[]  
-|<<metricbeat-metricset-docker-info,info>> beta[]  
-|<<metricbeat-metricset-docker-memory,memory>> beta[]  
-|<<metricbeat-metricset-docker-network,network>> beta[]  
+|<<metricbeat-module-docker,Docker>>     |    
+.8+|   |<<metricbeat-metricset-docker-container,container>>   
+|<<metricbeat-metricset-docker-cpu,cpu>>   
+|<<metricbeat-metricset-docker-diskio,diskio>>   
+|<<metricbeat-metricset-docker-healthcheck,healthcheck>>   
+|<<metricbeat-metricset-docker-image,image>>   
+|<<metricbeat-metricset-docker-info,info>>   
+|<<metricbeat-metricset-docker-memory,memory>>   
+|<<metricbeat-metricset-docker-network,network>>   
 |<<metricbeat-module-dropwizard,Dropwizard>>  beta[]   |    
 .1+|   |<<metricbeat-metricset-dropwizard-collector,collector>> beta[]  
 |<<metricbeat-module-elasticsearch,Elasticsearch>>  beta[]   |    
@@ -57,18 +57,18 @@ This file is generated! See scripts/docs_collector.py
 |<<metricbeat-metricset-kafka-partition,partition>> beta[]  
 |<<metricbeat-module-kibana,Kibana>>  beta[]   |    
 .1+|   |<<metricbeat-metricset-kibana-status,status>> beta[]  
-|<<metricbeat-module-kubernetes,Kubernetes>>  beta[]   |    
-.11+|   |<<metricbeat-metricset-kubernetes-container,container>> beta[]  
+|<<metricbeat-module-kubernetes,Kubernetes>>     |    
+.11+|   |<<metricbeat-metricset-kubernetes-container,container>>   
 |<<metricbeat-metricset-kubernetes-event,event>> experimental[]  
-|<<metricbeat-metricset-kubernetes-node,node>> beta[]  
-|<<metricbeat-metricset-kubernetes-pod,pod>> beta[]  
-|<<metricbeat-metricset-kubernetes-state_container,state_container>> beta[]  
-|<<metricbeat-metricset-kubernetes-state_deployment,state_deployment>> beta[]  
-|<<metricbeat-metricset-kubernetes-state_node,state_node>> beta[]  
-|<<metricbeat-metricset-kubernetes-state_pod,state_pod>> beta[]  
-|<<metricbeat-metricset-kubernetes-state_replicaset,state_replicaset>> beta[]  
-|<<metricbeat-metricset-kubernetes-system,system>> beta[]  
-|<<metricbeat-metricset-kubernetes-volume,volume>> beta[]  
+|<<metricbeat-metricset-kubernetes-node,node>>   
+|<<metricbeat-metricset-kubernetes-pod,pod>>   
+|<<metricbeat-metricset-kubernetes-state_container,state_container>>   
+|<<metricbeat-metricset-kubernetes-state_deployment,state_deployment>>   
+|<<metricbeat-metricset-kubernetes-state_node,state_node>>   
+|<<metricbeat-metricset-kubernetes-state_pod,state_pod>>   
+|<<metricbeat-metricset-kubernetes-state_replicaset,state_replicaset>>   
+|<<metricbeat-metricset-kubernetes-system,system>>   
+|<<metricbeat-metricset-kubernetes-volume,volume>>   
 |<<metricbeat-module-logstash,Logstash>>  experimental[]   |    
 .2+|   |<<metricbeat-metricset-logstash-node,node>> experimental[]  
 |<<metricbeat-metricset-logstash-node_stats,node_stats>> experimental[]  

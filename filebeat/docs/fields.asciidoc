@@ -609,7 +609,6 @@ Region in which this host is running.
 [[exported-fields-docker-processor]]
 == Docker fields
 
-beta[]
 Docker stats collected from Docker.
 
 
@@ -845,7 +844,6 @@ The full trace in the log line.
 [[exported-fields-kubernetes-processor]]
 == Kubernetes fields
 
-beta[]
 Kubernetes metadata added by the kubernetes processor
 
 

@@ -27,6 +27,7 @@ https://github.com/elastic/beats/compare/v6.0.0-beta2...master[Check the HEAD di
   named auditd and file_integrity, respectively. This change requires
   existing users to update their config. {issue}5422[5422]
 - Renamed file_integrity module fields. {issue}5423[5423] {pull}5995[5995]
+- Renamed auditd module fields. {issue}5423[5423] {pull}6080[6080]
 
 *Filebeat*
 - Switch to docker prospector in sample manifests for Kubernetes deployment {pull}5963[5963]
@@ -63,6 +64,9 @@ https://github.com/elastic/beats/compare/v6.0.0-beta2...master[Check the HEAD di
 
 - Add an error check to the file integrity scanner to prevent a panic when
   there is an error reading file info via lstat. {issue}6005[6005]
+- Fixed an issue where the proctitle value was being truncated.
+- Fixed an issue where values were incorrectly interpretted as hex data.
+- Fixed parsing of the `key` value when multiple keys are present.
 
 *Filebeat*
 
@@ -94,6 +98,7 @@ https://github.com/elastic/beats/compare/v6.0.0-beta2...master[Check the HEAD di
 - Fix kubernetes `state_pod` `status.phase` so that the active phase is returned instead of `unknown`. {pull}5980[5980]
 - Fix error collecting network_names in Vsphere module. {pull}5962[5962]
 - Fix process cgroup memory metrics for memsw, kmem, and kmem_tcp. {issue}6033[6033]
+- Fix kafka OffsetFetch request missing topic and partition parameters. {pull}5880[5880]
 
 *Packetbeat*
 
@@ -130,6 +135,8 @@ https://github.com/elastic/beats/compare/v6.0.0-beta2...master[Check the HEAD di
 - Add the ability to log to the Windows Event Log. {pull}5913[5813]
 - Improve Elasticsearch output metrics to count number of dropped and duplicate (if event ID is given) events. {pull}5811[5811]
 - Add autodiscover for kubernetes. {pull}6055[6055]
+- Add the abilility for the add_docker_metadata process to enrich based on process ID. {pull}6100[6100]
+- The `add_docker_metadata` and `add_kubernetes_metadata` processors are now GA, instead of Beta. {pull}6105[6105]
 
 *Auditbeat*
 
@@ -148,6 +155,7 @@ https://github.com/elastic/beats/compare/v6.0.0-beta2...master[Check the HEAD di
 - Add experimental Docker autodiscover functionality. {pull}5245[5245]
 - Add option to convert the timestamps to UTC in the system module. {pull}5647[5647]
 - Add Logstash module support for main log and the slow log, support the plain text or structured JSON format {pull}5481[5481]
+- Add stream filtering when using `docker` prospector. {pull}6057[6057]
 
 *Heartbeat*
 
@@ -173,6 +181,7 @@ https://github.com/elastic/beats/compare/v6.0.0-beta2...master[Check the HEAD di
 - Add experimental mongodb/collstats metricset. {pull}5852[5852]
 - Update the MySQL dashboard to use the Time Series Visual Builder. {pull}5996[5996]
 - Add experimental uwsgi module. {pull}6006[6006]
+- Docker and Kubernetes modules are now GA, instead of Beta. {pull}6105[6105]
 
 *Packetbeat*
 
