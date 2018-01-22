@@ -1,4 +1,4 @@
-package prospector
+package input
 
 import (
 	"testing"
@@ -9,21 +9,21 @@ import (
 	"github.com/elastic/beats/libbeat/common"
 )
 
-var fakeFactory = func(config *common.Config, outletFactory channel.Factory, context Context) (Prospectorer, error) {
+var fakeFactory = func(config *common.Config, outletFactory channel.Factory, context Context) (Input, error) {
 	return nil, nil
 }
 
 func TestAddFactoryEmptyName(t *testing.T) {
 	err := Register("", nil)
 	if assert.Error(t, err) {
-		assert.Equal(t, "Error registering prospector: name cannot be empty", err.Error())
+		assert.Equal(t, "Error registering input: name cannot be empty", err.Error())
 	}
 }
 
 func TestAddNilFactory(t *testing.T) {
 	err := Register("name", nil)
 	if assert.Error(t, err) {
-		assert.Equal(t, "Error registering prospector 'name': factory cannot be empty", err.Error())
+		assert.Equal(t, "Error registering input 'name': factory cannot be empty", err.Error())
 	}
 }
 
@@ -36,7 +36,7 @@ func TestAddFactoryTwice(t *testing.T) {
 
 	err = Register("name", fakeFactory)
 	if assert.Error(t, err) {
-		assert.Equal(t, "Error registering prospector 'name': already registered", err.Error())
+		assert.Equal(t, "Error registering input 'name': already registered", err.Error())
 	}
 }
 
@@ -52,6 +52,6 @@ func TestGetNonExistentFactory(t *testing.T) {
 	f, err := GetFactory("noSuchFactory")
 	assert.Nil(t, f)
 	if assert.Error(t, err) {
-		assert.Equal(t, "Error creating prospector. No such prospector type exist: 'noSuchFactory'", err.Error())
+		assert.Equal(t, "Error creating input. No such input type exist: 'noSuchFactory'", err.Error())
 	}
 }

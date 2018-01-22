@@ -21,15 +21,16 @@ const (
 )
 
 type Config struct {
-	Prospectors      []*common.Config     `config:"prospectors"`
-	RegistryFile     string               `config:"registry_file"`
-	RegistryFlush    time.Duration        `config:"registry_flush"`
-	ConfigDir        string               `config:"config_dir"`
-	ShutdownTimeout  time.Duration        `config:"shutdown_timeout"`
-	Modules          []*common.Config     `config:"modules"`
-	ConfigProspector *common.Config       `config:"config.prospectors"`
-	ConfigModules    *common.Config       `config:"config.modules"`
-	Autodiscover     *autodiscover.Config `config:"autodiscover"`
+	Inputs          []*common.Config     `config:"inputs"`
+	Prospectors     []*common.Config     `config:"prospectors"`
+	RegistryFile    string               `config:"registry_file"`
+	RegistryFlush   time.Duration        `config:"registry_flush"`
+	ConfigDir       string               `config:"config_dir"`
+	ShutdownTimeout time.Duration        `config:"shutdown_timeout"`
+	Modules         []*common.Config     `config:"modules"`
+	ConfigInput     *common.Config       `config:"config.prospectors"`
+	ConfigModules   *common.Config       `config:"config.modules"`
+	Autodiscover    *autodiscover.Config `config:"autodiscover"`
 }
 
 var (
@@ -82,7 +83,15 @@ func mergeConfigFiles(configFiles []string, config *Config) error {
 			return fmt.Errorf("Failed to read %s: %s", file, err)
 		}
 
-		config.Prospectors = append(config.Prospectors, tmpConfig.Filebeat.Prospectors...)
+		if len(tmpConfig.Filebeat.Prospectors) > 0 {
+			cfgwarn.Deprecate("7.0.0", "prospectors are deprecated, Use `inputs` instead.")
+			if len(tmpConfig.Filebeat.Inputs) > 0 {
+				return fmt.Errorf("prospectors and inputs used in the configuration file, define only inputs not both")
+			}
+			tmpConfig.Filebeat.Inputs = append(tmpConfig.Filebeat.Inputs, tmpConfig.Filebeat.Prospectors...)
+		}
+
+		config.Inputs = append(config.Inputs, tmpConfig.Filebeat.Inputs...)
 	}
 
 	return nil
@@ -97,7 +106,7 @@ func (config *Config) FetchConfigs() error {
 		return nil
 	}
 
-	cfgwarn.Deprecate("7.0.0", "config_dir is deprecated. Use `filebeat.config.prospectors` instead.")
+	cfgwarn.Deprecate("7.0.0", "config_dir is deprecated. Use `filebeat.config.inputs` instead.")
 
 	// If configDir is relative, consider it relative to the config path
 	configDir = paths.Resolve(paths.Config, configDir)
