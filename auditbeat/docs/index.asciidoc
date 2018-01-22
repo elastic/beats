@@ -17,6 +17,8 @@ include::../../libbeat/docs/contributing-to-beats.asciidoc[]
 
 include::./getting-started.asciidoc[]
 
+include::./breaking.asciidoc[]
+
 include::../../libbeat/docs/repositories.asciidoc[]
 
 include::./setting-up-running.asciidoc[]
