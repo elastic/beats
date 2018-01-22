@@ -134,7 +134,7 @@ func (c *Condition) setEquals(cfg *ConditionFields) error {
 			continue
 		}
 
-		return err
+		return fmt.Errorf("unexpected type %T in equals condition", value)
 	}
 
 	return nil
@@ -272,7 +272,6 @@ func (c *Condition) checkEquals(event ValuesMap) bool {
 		}
 
 		sValue, err := extractString(value)
-
 		if err == nil {
 			if sValue != equalValue.Str {
 				return false
@@ -282,7 +281,6 @@ func (c *Condition) checkEquals(event ValuesMap) bool {
 		}
 
 		bValue, err := extractBool(value)
-
 		if err == nil {
 			if bValue != equalValue.Bool {
 				return false
@@ -291,7 +289,7 @@ func (c *Condition) checkEquals(event ValuesMap) bool {
 			continue
 		}
 
-		logp.Warn("unexpected type %T in equals condition as it accepts only integers, strings or bools. ", value)
+		logp.Err("unexpected type %T in equals condition as it accepts only integers, strings or bools. ", value)
 		return false
 	}
 
