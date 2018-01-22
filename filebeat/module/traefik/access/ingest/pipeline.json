@@ -4,13 +4,15 @@
         "grok": {
             "field": "message",
             "patterns":[
-                "%{IPORHOST:traefik.access.remote_ip} - %{DATA:traefik.access.user_name} \\[%{HTTPDATE:traefik.access.time}\\] \"%{WORD:traefik.access.method} %{DATA:traefik.access.url} HTTP/%{NUMBER:traefik.access.http_version}\" %{NUMBER:traefik.access.response_code} (?:%{NUMBER:traefik.access.body_sent.bytes}|-)( \"%{DATA:traefik.access.referrer}\")?( \"%{DATA:traefik.access.agent}\")?(?:%{NUMBER:traefik.access.request_count}|-)?( \"%{DATA:traefik.access.frontend_name}\")?( \"%{DATA:traefik.access.backend_url}\")?"
+                "%{IPORHOST:traefik.access.remote_ip} - (?:-|\"%{DATA:traefik.access.user_name}\") \\[%{HTTPDATE:traefik.access.time}\\] \"%{WORD:traefik.access.method} %{DATA:traefik.access.url} HTTP/%{NUMBER:traefik.access.http_version}\" (?:-|%{NUMBER:traefik.access.response_code:int}) (?:-|%{NUMBER:traefik.access.body_sent.bytes:int}) \"(?:-|%{DATA:traefik.access.referrer})\" \"(?:-|%{DATA:traefik.access.agent})\" (?:-|%{NUMBER:traefik.access.request_count:int}) (?:-|\"%{DATA:traefik.access.frontend_name}\") (?:-|\"%{DATA:traefik.access.backend_url}\") %{NUMBER:traefik.access.duration:int}ms",
+                "%{IPORHOST:traefik.access.remote_ip} - (?:-|\"%{DATA:traefik.access.user_name}\") \\[%{HTTPDATE:traefik.access.time}\\] \"%{WORD:traefik.access.method} %{DATA:traefik.access.url} HTTP/%{NUMBER:traefik.access.http_version}\" (?:-|%{NUMBER:traefik.access.response_code:int}) (?:-|%{NUMBER:traefik.access.body_sent.bytes:int}) (?:-|\"%{DATA:traefik.access.referrer}\") (?:-|\"%{DATA:traefik.access.agent}\") (?:-|%{NUMBER:traefik.access.request_count:int}) (?:-|\"%{DATA:traefik.access.frontend_name}\") (?:-|\"%{DATA:traefik.access.backend_url}\") %{NUMBER:traefik.access.duration:int}ms"
             ],
             "ignore_missing": true
         }
     },{
         "remove":{
-            "field": "message"
+            "field": "message",
+            "ignore_failure": true
         }
     }, {
         "rename": {
@@ -25,7 +27,8 @@
         }
     }, {
         "remove": {
-            "field": "traefik.access.time"
+            "field": "traefik.access.time",
+            "ignore_failure": true
         }
     }, {
         "user_agent": {
@@ -35,7 +38,8 @@
         }
     }, {
         "remove": {
-            "field": "traefik.access.agent"
+            "field": "traefik.access.agent",
+            "ignore_failure": true
         }
     }, {
         "geoip": {
