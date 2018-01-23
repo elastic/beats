@@ -479,12 +479,12 @@
 			"revisionTime": "2017-02-07T06:38:51Z"
 		},
 		{
-			"checksumSHA1": "zI9rslrfjyPyysz15OKWNsObfQI=",
+			"checksumSHA1": "386qAesaBQFadNHu7di78fZT7xk=",
 			"path": "github.com/elastic/gosigar",
-			"revision": "cdcbd8c3b8bf28ef6d8639ec1e45bf31d2745f2d",
-			"revisionTime": "2018-01-17T18:54:32Z",
-			"version": "v0.7.0",
-			"versionExact": "v0.7.0"
+			"revision": "16df19fe5efee4ea2938bde5f56c02d9929dc054",
+			"revisionTime": "2018-01-22T22:24:54Z",
+			"version": "v0.8.0",
+			"versionExact": "v0.8.0"
 		},
 		{
 			"checksumSHA1": "TX9y4oPL5YmT4Gb/OU4GIPTdQB4=",
