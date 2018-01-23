@@ -152,8 +152,10 @@ func normalizeValue(value interface{}, keys ...string) (interface{}, []error) {
 	case []int, []int8, []int16, []int32, []int64:
 	case uint, uint8, uint16, uint32, uint64:
 	case []uint, []uint8, []uint16, []uint32, []uint64:
-	case float32, float64:
+	case float64:
 		return Float(value.(float64)), nil
+	case float32:
+		return Float(value.(float32)), nil
 	case []float32, []float64:
 	case complex64, complex128:
 	case []complex64, []complex128:

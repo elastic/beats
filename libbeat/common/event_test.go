@@ -237,6 +237,23 @@ func TestNormalizeValue(t *testing.T) {
 
 		assert.Equal(t, test.out, out, "Test case %v", i)
 	}
+
+	var floatTests = []struct {
+		in  interface{}
+		out interface{}
+	}{
+		{float32(1), float64(1)},
+		{float64(1), float64(1)},
+	}
+
+	for i, test := range floatTests {
+		out, err := normalizeValue(test.in)
+		if err != nil {
+			t.Error(err)
+			continue
+		}
+		assert.InDelta(t, test.out, float64(out.(Float)), 0.000001, "(approximate) Test case %v", i)
+	}
 }
 
 func TestNormalizeMapError(t *testing.T) {
