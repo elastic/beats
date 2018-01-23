@@ -11,10 +11,12 @@ There are changes that affect both the configuration and the event schema.
 [float]
 === Configuration Changes
 
-The modules and metricsets were renamed and your configuration must be updated.
+The audit module has been renamed and is now two separate modules: the
+<<auditbeat-module-auditd,auditd module>> and the
+<<auditbeat-module-file_integrity,file_integrity module>>. You must update your
+configuration to use these modules.
 
-The `kernel` metricset has been renamed to the
-<<auditbeat-module-auditd,auditd module>>.
+The `kernel` metricset has become the <<auditbeat-module-auditd,auditd module>>.
 
 .Old Config
 [source,yaml]
@@ -45,7 +47,7 @@ The `kernel` metricset has been renamed to the
     # Rules
 ----
 
-The `file` metricset has been renamed to the
+The `file` metricset has become the
 <<auditbeat-module-file_integrity,file_integrity module>>.
 
 .Old Config
@@ -81,26 +83,21 @@ The `file` metricset has been renamed to the
   hash_types: [sha1]
   recursive: false <1>
 ----
-<1> `recursive` is a new option in 6.2 and is disabled by default. By setting
-the value to `true` it will watch for changes in all sub-directories.
+<1> `recursive` is a new option in 6.2 and is disabled by default. Set the value
+to true to watch for changes in all sub-directories.
 
 [float]
 === Event Schema Changes
 
-Most field names were changed in 6.2. This is because of the module renames as
-well as a desire to use common field names for similar data types between
-the modules (and future modules). The table below provides a summary of the
-field changes.
+Most field names were changed in 6.2. We wanted to rename the modules and use
+common field names for similar data types across all the modules. The table
+below provides a summary of the field changes.
 
-If you are using the default index naming and template settings then no action
-is required because the Auditbeat version number is included in then index
-and template names. This prevents any field mapping issues between versions.
+In Kibana you need to <<load-kibana-dashboards,import>> the latest dashboards
+that work with the new event format. The new dashboards will not work with data
+produced by older versions of Auditbeat.
 
-In Kibana you will need to import the latest dashboards that work with the
-new event format. The new dashboards will not work with data produced by older
-versions of Auditbeat.
-
-.Summary of Field Renames
+.Renamed Fields
 [frame="topbot",options="header"]
 |======================
 |Old Field|New Field
