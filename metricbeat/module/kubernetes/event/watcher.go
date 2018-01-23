@@ -8,8 +8,13 @@ import (
 	"github.com/elastic/beats/libbeat/logp"
 
 	"github.com/ericchiang/k8s"
-	corev1 "github.com/ericchiang/k8s/api/v1"
+	corev1 "github.com/ericchiang/k8s/apis/core/v1"
 )
+
+func init() {
+	k8s.Register("", "v1", "events", true, &corev1.Event{})
+	k8s.RegisterList("", "v1", "events", true, &corev1.EventList{})
+}
 
 // Watcher is a controller that synchronizes Pods.
 type Watcher struct {
@@ -42,10 +47,8 @@ func NewWatcher(kubeClient *k8s.Client, syncPeriod time.Duration, namespace stri
 func (w *Watcher) watchEvents() {
 	for {
 		//To avoid writing old events, list events to get last resource version
-		events, err := w.kubeClient.CoreV1().ListEvents(
-			w.ctx,
-			w.namespace,
-		)
+		events := &corev1.EventList{}
+		err := w.kubeClient.List(w.ctx, w.namespace, events)
 
 		if err != nil {
 			//if listing fails try again after sometime
@@ -59,11 +62,7 @@ func (w *Watcher) watchEvents() {
 		w.lastResourceVersion = events.Metadata.GetResourceVersion()
 
 		logp.Info("kubernetes: %s", "Watching API for events")
-		watcher, err := w.kubeClient.CoreV1().WatchEvents(
-			w.ctx,
-			w.namespace,
-			k8s.ResourceVersion(w.lastResourceVersion),
-		)
+		watcher, err := w.kubeClient.Watch(w.ctx, w.namespace, &corev1.Event{}, k8s.ResourceVersion(w.lastResourceVersion))
 		if err != nil {
 			//watch events failures should be logged and gracefully failed over as metadata retrieval
 			//should never stop.
@@ -75,7 +74,8 @@ func (w *Watcher) watchEvents() {
 		}
 
 		for {
-			_, eve, err := watcher.Next()
+			eve := &corev1.Event{}
+			_, err := watcher.Next(eve)
 			if err != nil {
 				logp.Err("kubernetes: Watching API error %v", err)
 				break

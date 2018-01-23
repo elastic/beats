@@ -8,6 +8,7 @@ import (
 	"strings"
 
 	"github.com/ericchiang/k8s"
+	"github.com/ericchiang/k8s/apis/core/v1"
 	"github.com/ghodss/yaml"
 
 	"github.com/elastic/beats/libbeat/logp"
@@ -66,7 +67,8 @@ func DiscoverKubernetesNode(host string, inCluster bool, client *k8s.Client) (no
 			return defaultNode
 		}
 		logp.Info("kubernetes: Using pod name %s and namespace %s to discover kubernetes node", podName, ns)
-		pod, err := client.CoreV1().GetPod(context.TODO(), podName, ns)
+		pod := &v1.Pod{}
+		err = client.Get(context.TODO(), ns, podName, pod)
 		if err != nil {
 			logp.Err("kubernetes: Querying for pod failed with error: ", err.Error())
 			return defaultNode
@@ -81,7 +83,8 @@ func DiscoverKubernetesNode(host string, inCluster bool, client *k8s.Client) (no
 		return defaultNode
 	}
 
-	nodes, err := client.CoreV1().ListNodes(context.TODO())
+	nodes := &v1.NodeList{}
+	err := client.List(context.TODO(), k8s.AllNamespaces, nodes)
 	if err != nil {
 		logp.Err("kubernetes: Querying for nodes failed with error: ", err.Error())
 		return defaultNode

@@ -47,7 +47,7 @@ func AutodiscoverBuilder(bus bus.Bus, c *common.Config) (autodiscover.Provider, 
 	metagen := kubernetes.NewMetaGenerator(config.IncludeAnnotations, config.IncludeLabels, config.ExcludeLabels)
 
 	config.Host = kubernetes.DiscoverKubernetesNode(config.Host, config.InCluster, client)
-	watcher := kubernetes.NewWatcher(client.CoreV1(), config.SyncPeriod, config.CleanupTimeout, config.Host)
+	watcher := kubernetes.NewWatcher(client, config.SyncPeriod, config.CleanupTimeout, config.Host)
 
 	start := watcher.ListenStart()
 	stop := watcher.ListenStop()

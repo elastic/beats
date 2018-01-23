@@ -10,7 +10,7 @@ import (
 	"github.com/elastic/beats/libbeat/logp"
 
 	"github.com/ericchiang/k8s"
-	corev1 "github.com/ericchiang/k8s/api/v1"
+	corev1 "github.com/ericchiang/k8s/apis/core/v1"
 )
 
 // Watcher reads Kubernetes events and keeps a list of known pods
@@ -47,8 +47,8 @@ type podWatcher struct {
 
 // Client for Kubernetes interface
 type Client interface {
-	ListPods(ctx context.Context, namespace string, options ...k8s.Option) (*corev1.PodList, error)
-	WatchPods(ctx context.Context, namespace string, options ...k8s.Option) (*k8s.CoreV1PodWatcher, error)
+	List(ctx context.Context, namespace string, resource k8s.ResourceList, options ...k8s.Option) error
+	Watch(ctx context.Context, namespace string, resource k8s.Resource, options ...k8s.Option) (*k8s.Watcher, error)
 }
 
 // NewWatcher initializes the watcher client to provide a local state of
@@ -71,9 +71,11 @@ func NewWatcher(client Client, syncPeriod, cleanupTimeout time.Duration, host st
 
 func (p *podWatcher) syncPods() error {
 	logp.Info("kubernetes: %s", "Performing a pod sync")
-	pods, err := p.client.ListPods(
+	pods := &corev1.PodList{}
+	err := p.client.List(
 		p.ctx,
 		"",
+		pods,
 		p.nodeFilter,
 		k8s.ResourceVersion(p.lastResourceVersion))
 
@@ -131,7 +133,7 @@ func (p *podWatcher) Start() error {
 func (p *podWatcher) watch() {
 	for {
 		logp.Info("kubernetes: %s", "Watching API for pod events")
-		watcher, err := p.client.WatchPods(p.ctx, "", p.nodeFilter)
+		watcher, err := p.client.Watch(p.ctx, "", &corev1.Pod{}, p.nodeFilter)
 		if err != nil {
 			//watch pod failures should be logged and gracefully failed over as metadata retrieval
 			//should never stop.
@@ -141,7 +143,8 @@ func (p *podWatcher) watch() {
 		}
 
 		for {
-			_, apiPod, err := watcher.Next()
+			apiPod := &corev1.Pod{}
+			_, err := watcher.Next(apiPod)
 			if err != nil {
 				logp.Err("kubernetes: Watching API error %v", err)
 				watcher.Close()

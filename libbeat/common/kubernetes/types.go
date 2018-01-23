@@ -6,7 +6,7 @@ import (
 
 	"github.com/elastic/beats/libbeat/logp"
 
-	corev1 "github.com/ericchiang/k8s/api/v1"
+	corev1 "github.com/ericchiang/k8s/apis/core/v1"
 )
 
 type ObjectMeta struct {
