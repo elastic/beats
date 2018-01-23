@@ -27,7 +27,7 @@
           "port": "80",
           "server_ip": "127.0.0.1",
           "win32_status": "0",
-          "query_string": "-",
+          "query_string": "q=100",
           "user_agent": {
             "major": "57",
             "minor": "0",
