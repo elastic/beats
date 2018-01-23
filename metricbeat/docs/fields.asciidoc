@@ -5876,7 +5876,7 @@ Node unschedulable status
 [float]
 === `kubernetes.node.cpu.allocatable.cores`
 
-type: long
+type: float
 
 Node CPU allocatable cores
 
