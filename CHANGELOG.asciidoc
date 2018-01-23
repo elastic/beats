@@ -70,6 +70,8 @@ https://github.com/elastic/beats/compare/v6.0.0-beta2...master[Check the HEAD di
 
 *Filebeat*
 
+- Right check of module/fileset exists for create-fileset command {issue}5657[5657]
+- Place fields.yml and docs.asciidoc to _meta folder at create-fileset command {issue}5657[5657]
 - Add support for adding string tags {pull}5395{5395}
 - Fix race condition when limiting the number of harvesters running in parallel {issue}5458[5458]
 - Fix relative paths in the prospector definitions. {pull}5443[5433]
@@ -147,6 +149,7 @@ https://github.com/elastic/beats/compare/v6.0.0-beta2...master[Check the HEAD di
 
 *Filebeat*
 
+- Create module.yml at create-fileset command {issue}5657[5657]
 - Add PostgreSQL module with slowlog support. {pull}4763[4763]
 - Add Kafka log module. {pull}4885[4885]
 - Add support for `/var/log/containers/` log path in `add_kubernetes_metadata` processor. {pull}4981[4981]

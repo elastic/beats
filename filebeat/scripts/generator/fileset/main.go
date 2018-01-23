@@ -29,7 +29,7 @@ func copyTemplatesToDest(templatesPath, name, filesetPath, module, fileset strin
 
 func generateModule(module, fileset, modulePath, beatsPath string) error {
 	p := path.Join(modulePath, "module", module)
-	if _, err := os.Stat(p); os.IsExist(err) {
+	if _, err := os.Stat(p); !os.IsNotExist(err) {
 		return fmt.Errorf("module already exists: %s at %s", module, p)
 	}
 
@@ -40,9 +40,9 @@ func generateModule(module, fileset, modulePath, beatsPath string) error {
 	}
 
 	templatesPath := path.Join(beatsPath, "scripts", "module")
-	filesToCopy := []string{path.Join("fields.yml"), path.Join("docs.asciidoc")}
+	filesToCopy := []string{path.Join("_meta", "fields.yml"), path.Join("_meta", "docs.asciidoc"), path.Join("module.yml")}
 	for _, f := range filesToCopy {
-		err := copyTemplatesToDest(templatesPath, f, p, module, "")
+		err := copyTemplatesToDest(templatesPath, f, p, module, fileset)
 		if err != nil {
 			return err
 		}
@@ -53,7 +53,7 @@ func generateModule(module, fileset, modulePath, beatsPath string) error {
 
 func generateFileset(module, fileset, modulePath, beatsPath string) error {
 	filesetPath := path.Join(modulePath, "module", module, fileset)
-	if _, err := os.Stat(filesetPath); os.IsExist(err) {
+	if _, err := os.Stat(filesetPath); !os.IsNotExist(err) {
 		return fmt.Errorf("fileset already exists: %s", fileset)
 	}
 
