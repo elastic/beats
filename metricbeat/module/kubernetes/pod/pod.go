@@ -5,6 +5,7 @@ import (
 	"github.com/elastic/beats/metricbeat/helper"
 	"github.com/elastic/beats/metricbeat/mb"
 	"github.com/elastic/beats/metricbeat/mb/parse"
+	"github.com/elastic/beats/metricbeat/module/kubernetes/util"
 )
 
 const (
@@ -55,7 +56,7 @@ func (m *MetricSet) Fetch() ([]common.MapStr, error) {
 		return nil, err
 	}
 
-	events, err := eventMapping(body)
+	events, err := eventMapping(body, util.PerfMetrics)
 	if err != nil {
 		return nil, err
 	}
