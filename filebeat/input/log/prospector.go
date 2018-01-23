@@ -46,7 +46,7 @@ type Prospector struct {
 	outlet        channel.Outleter
 	stateOutlet   channel.Outleter
 	done          chan struct{}
-	numHarvesters atomic.Uint64
+	numHarvesters atomic.Uint32
 }
 
 // NewProspector instantiates a new Log
