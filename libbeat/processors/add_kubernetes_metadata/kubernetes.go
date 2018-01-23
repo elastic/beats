@@ -89,7 +89,7 @@ func newKubernetesAnnotator(cfg *common.Config) (processors.Processor, error) {
 		return nil, err
 	}
 
-	config.Host = kubernetes.DiscoverKubernetesNode(config.Host, client)
+	config.Host = kubernetes.DiscoverKubernetesNode(config.Host, config.InCluster, client)
 
 	logp.Debug("kubernetes", "Using host ", config.Host)
 	logp.Debug("kubernetes", "Initializing watcher")
