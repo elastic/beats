@@ -39,16 +39,16 @@ type Target struct {
 //    }
 // ]
 type RequestBlock struct {
-	Type      string   `json:"type"`
-	MBean     string   `json:"mbean"`
-	Attribute []string `json:"attribute"`
-	Target    TargetBlock `json:"target"`
+	Type      string       `json:"type"`
+	MBean     string       `json:"mbean"`
+	Attribute []string     `json:"attribute"`
+	Target    *TargetBlock `json:"target,omitempty"`
 }
 
 type TargetBlock struct {
 	Url      string `json:"url"`
-	User     string `json:"user"`
-	Password string `json:"password"`
+	User     string `json:"user,omitempty"`
+	Password string `json:"password,omitempty"`
 }
 
 func buildRequestBodyAndMapping(mappings []JMXMapping) ([]byte, map[string]string, error) {
@@ -59,11 +59,13 @@ func buildRequestBodyAndMapping(mappings []JMXMapping) ([]byte, map[string]strin
 		rb := RequestBlock{
 			Type:  "read",
 			MBean: mapping.MBean,
-			Target: TargetBlock {
-				Url: mapping.Target.Url,
-				User: mapping.Target.User,
-				Password: mapping.Target.Password,
-			},
+		}
+
+		if len(mapping.Target.Url) != 0 {
+			rb.Target = new(TargetBlock)
+			rb.Target.Url = mapping.Target.Url
+			rb.Target.User = mapping.Target.User
+			rb.Target.Password = mapping.Target.Password
 		}
 
 		for _, attribute := range mapping.Attributes {
