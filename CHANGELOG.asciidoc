@@ -240,6 +240,7 @@ https://github.com/elastic/beats/compare/v6.0.0-beta2...master[Check the HEAD di
 - Update prometheus dependencies to latest {pull}6333[6333]
 - Making the http/json metricset GA. {pull}6471[6471]
 - Add support for array in http/json metricset. {pull}6480[6480]
+- Making the jolokia/jmx module GA. {pull}6143[6143]
 
 *Packetbeat*
 
