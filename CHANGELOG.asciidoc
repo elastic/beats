@@ -76,6 +76,7 @@ https://github.com/elastic/beats/compare/v6.0.0-beta2...master[Check the HEAD di
 - Fix `recursive_globe.enabled` option. {pull}5443[5443]
 - Change pipeline delimiter to `{<` and `>}`. {pull}5702[5702]
 - Fix variable name for `convert_timezone` in the system module. {pull}5936[5936]
+- Fix grok expression for traefik module {pull}6136[6136]
 
 *Heartbeat*
 
