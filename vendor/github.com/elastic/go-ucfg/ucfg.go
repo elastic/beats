@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"reflect"
 	"regexp"
+	"sort"
 	"time"
 )
 
@@ -130,6 +131,47 @@ func (c *Config) Parent() *Config {
 			return nil
 		}
 	}
+}
+
+// FlattenedKeys return a sorted flattened views of the set keys in the configuration
+func (c *Config) FlattenedKeys(opts ...Option) []string {
+	var keys []string
+	normalizedOptions := makeOptions(opts)
+
+	if normalizedOptions.pathSep == "" {
+		normalizedOptions.pathSep = "."
+	}
+
+	if c.IsDict() {
+		for _, v := range c.fields.dict() {
+
+			subcfg, err := v.toConfig(normalizedOptions)
+			if err != nil {
+				ctx := v.Context()
+				p := ctx.path(normalizedOptions.pathSep)
+				keys = append(keys, p)
+			} else {
+				newKeys := subcfg.FlattenedKeys(opts...)
+				keys = append(keys, newKeys...)
+			}
+		}
+	} else if c.IsArray() {
+		for _, a := range c.fields.array() {
+			scfg, err := a.toConfig(normalizedOptions)
+
+			if err != nil {
+				ctx := a.Context()
+				p := ctx.path(normalizedOptions.pathSep)
+				keys = append(keys, p)
+			} else {
+				newKeys := scfg.FlattenedKeys(opts...)
+				keys = append(keys, newKeys...)
+			}
+		}
+	}
+
+	sort.Strings(keys)
+	return keys
 }
 
 func (f *fields) get(name string) (value, bool) {

@@ -14,6 +14,12 @@ This project adheres to [Semantic Versioning](http://semver.org/).
 
 ### Fixed
 
+## [0.5.0]
+
+### Added
+- Detect cyclic reference and allow to search top level key with the other resolvers. #97
+- Allow to diff keys of two different configuration #93
+
 ## [0.4.6]
 
 ### Added
@@ -34,7 +40,7 @@ This project adheres to [Semantic Versioning](http://semver.org/).
 ## [0.4.4]
 
 ### Added
-- Add support for pure array config files #82 
+- Add support for pure array config files #82
 
 ### Changed
 - Invalid top-level types return non-critical error (no stack-trace) on merge #82
@@ -177,7 +183,8 @@ This project adheres to [Semantic Versioning](http://semver.org/).
 - Introduced CHANGELOG.md for documenting changes to ucfg.
 
 
-[Unreleased]: https://github.com/elastic/go-ucfg/compare/v0.4.6...HEAD
+[Unreleased]: https://github.com/elastic/go-ucfg/compare/v0.5.0...HEAD
+[0.5.0]: https://github.com/elastic/go-ucfg/compare/v0.4.6...v0.5.0
 [0.4.6]: https://github.com/elastic/go-ucfg/compare/v0.4.5...v0.4.6
 [0.4.5]: https://github.com/elastic/go-ucfg/compare/v0.4.4...v0.4.5
 [0.4.4]: https://github.com/elastic/go-ucfg/compare/v0.4.3...v0.4.4
