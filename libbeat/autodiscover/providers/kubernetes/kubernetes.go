@@ -15,15 +15,12 @@ func init() {
 
 // Provider implements autodiscover provider for docker containers
 type Provider struct {
-	config         *Config
-	bus            bus.Bus
-	watcher        kubernetes.Watcher
-	metagen        kubernetes.MetaGenerator
-	templates      *template.Mapper
-	stop           chan interface{}
-	startListener  bus.Listener
-	stopListener   bus.Listener
-	updateListener bus.Listener
+	config    *Config
+	bus       bus.Bus
+	watcher   kubernetes.Watcher
+	metagen   kubernetes.MetaGenerator
+	templates *template.Mapper
+	stop      chan interface{}
 }
 
 // AutodiscoverBuilder builds and returns an autodiscover provider
@@ -39,71 +36,54 @@ func AutodiscoverBuilder(bus bus.Bus, c *common.Config) (autodiscover.Provider, 
 		return nil, err
 	}
 
-	client, err := kubernetes.GetKubernetesClient(config.InCluster, config.KubeConfig)
+	client, err := kubernetes.GetKubernetesClientset(config.InCluster, config.KubeConfig)
 	if err != nil {
 		return nil, err
 	}
 
 	metagen := kubernetes.NewMetaGenerator(config.IncludeAnnotations, config.IncludeLabels, config.ExcludeLabels)
 
-	config.Host = kubernetes.DiscoverKubernetesNode(config.Host, client)
-	watcher := kubernetes.NewWatcher(client.CoreV1(), config.SyncPeriod, config.CleanupTimeout, config.Host)
+	config.Host = kubernetes.DiscoverKubernetesNode(config.Host, config.InCluster, client)
+	watcher, err := kubernetes.NewWatcher(client, config.SyncPeriod, config.Host, config.Namespace, &kubernetes.Pod{})
+	if err != nil {
+		logp.Err("kubernetes: Couldn't create watcher for %t", &kubernetes.Pod{})
+		return nil, err
+	}
 
-	start := watcher.ListenStart()
-	stop := watcher.ListenStop()
-	update := watcher.ListenUpdate()
+	p := &Provider{
+		config:    config,
+		bus:       bus,
+		templates: mapper,
+		metagen:   metagen,
+		watcher:   watcher,
+		stop:      make(chan interface{}),
+	}
+
+	watcher.AddEventHandler(kubernetes.ResourceEventHandlerFuncs{
+		AddFunc: func(obj kubernetes.Resource) {
+			p.emit(obj.(*kubernetes.Pod), "start")
+		},
+		UpdateFunc: func(old, new kubernetes.Resource) {
+			p.emit(old.(*kubernetes.Pod), "stop")
+			p.emit(new.(*kubernetes.Pod), "start")
+		},
+		DeleteFunc: func(obj kubernetes.Resource) {
+			p.emit(obj.(*kubernetes.Pod), "stop")
+		},
+	})
 
 	if err := watcher.Start(); err != nil {
 		return nil, err
 	}
 
-	return &Provider{
-		config:         config,
-		bus:            bus,
-		templates:      mapper,
-		metagen:        metagen,
-		watcher:        watcher,
-		stop:           make(chan interface{}),
-		startListener:  start,
-		stopListener:   stop,
-		updateListener: update,
-	}, nil
+	return p, nil
 }
 
-// Start the autodiscover provider. Start and stop listeners work the
-// conventional way. Update listener triggers a stop and then a start
-// to simulate an update.
-func (p *Provider) Start() {
-	go func() {
-		for {
-			select {
-			case <-p.stop:
-				p.startListener.Stop()
-				p.stopListener.Stop()
-				return
+// Start for Runner interface.
+// Provider was actually started in AutodiscoverBuilder.
+func (p *Provider) Start() {}
 
-			case event := <-p.startListener.Events():
-				p.emit(event, "start")
-
-			case event := <-p.stopListener.Events():
-				p.emit(event, "stop")
-
-			case event := <-p.updateListener.Events():
-				//On updates, first send a stop signal followed by a start signal to simulate a restart
-				p.emit(event, "stop")
-				p.emit(event, "start")
-			}
-		}
-	}()
-}
-
-func (p *Provider) emit(event bus.Event, flag string) {
-	pod, ok := event["pod"].(*kubernetes.Pod)
-	if !ok {
-		logp.Err("Couldn't get a pod from watcher event")
-		return
-	}
-
+func (p *Provider) emit(pod *kubernetes.Pod, flag string) {
 	host := pod.Status.PodIP
 
 	// Emit pod container IDs
@@ -171,7 +151,7 @@ func (p *Provider) publish(event bus.Event) {
 
 // Stop signals the stop channel to force the watch loop routine to stop.
 func (p *Provider) Stop() {
-	close(p.stop)
+	p.watcher.Stop()
 }
 
 // String returns a description of kubernetes autodiscover provider.
