@@ -32,7 +32,7 @@ https://github.com/elastic/beats/compare/v6.0.0-beta2...master[Check the HEAD di
 *Filebeat*
 - Switch to docker prospector in sample manifests for Kubernetes deployment {pull}5963[5963]
 
-- Add IIS module. {pull}6127[6127]
+- Add IIS module to parse access log and error log. {pull}6127[6127]
 
 *Heartbeat*
 

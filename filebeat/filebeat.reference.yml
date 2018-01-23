@@ -120,7 +120,7 @@ filebeat.modules:
     # can be added under this section.
     #prospector:
 
-#-------------------------------- IIS Module -------------------------------
+#--------------------------------- IIS Module --------------------------------
 #- module: iis
   # Access logs
   #access:

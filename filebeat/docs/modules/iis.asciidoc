@@ -21,8 +21,6 @@ This module requires the
 
 The IIS module was tested with logs from version 10.
 
-Note: Running IIS on anything other than Windows is not supported.
-
 include::../include/running-modules.asciidoc[]
 
 [float]

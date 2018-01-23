@@ -48,7 +48,7 @@
       type: long
       description: >
         The Windows status code.
-    - name: time_taken_ms
+    - name: request_time_ms
       type: long
       description: >
         The request time in milliseconds.
