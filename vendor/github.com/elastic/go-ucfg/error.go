@@ -44,6 +44,8 @@ type criticalError struct {
 var (
 	ErrMissing = errors.New("missing field")
 
+	ErrCyclicReference = errors.New("cyclic reference detected")
+
 	ErrDuplicateValidator = errors.New("validator already registered")
 
 	ErrTypeNoArray = errors.New("field is no array")
@@ -66,7 +68,7 @@ var (
 
 	ErrTODO = errors.New("TODO - implement me")
 
-	ErrDuplicateKeey = errors.New("duplicate key")
+	ErrDuplicateKey = errors.New("duplicate key")
 
 	ErrOverflow = errors.New("integer overflow")
 
@@ -161,7 +163,17 @@ func messagePath(reason error, meta *Meta, message, path string) string {
 }
 
 func raiseDuplicateKey(cfg *Config, name string) Error {
-	return raisePathErr(ErrDuplicateKeey, cfg.metadata, "", cfg.PathOf(name, "."))
+	return raisePathErr(ErrDuplicateKey, cfg.metadata, "", cfg.PathOf(name, "."))
+}
+
+func raiseCyclicErr(field string) Error {
+	message := fmt.Sprintf("cyclic reference detected for key: '%s'", field)
+
+	return baseError{
+		reason:  ErrCyclicReference,
+		class:   ErrConfig,
+		message: message,
+	}
 }
 
 func raiseMissing(c *Config, field string) Error {
