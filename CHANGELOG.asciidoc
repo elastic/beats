@@ -8,7 +8,7 @@
 // Template, add newest changes here
 
 === Beats version HEAD
-https://github.com/elastic/beats/compare/v6.1.2...6.1[Check the HEAD diff]
+https://github.com/elastic/beats/compare/v6.1.3...6.1[Check the HEAD diff]
 
 ==== Breaking changes
 
@@ -76,6 +76,12 @@ https://github.com/elastic/beats/compare/v6.1.2...6.1[Check the HEAD diff]
 
 
 ////////////////////////////////////////////////////////////
+
+[[release-notes-6.1.3]]
+=== Beats version 6.1.3
+https://github.com/elastic/beats/compare/v6.1.2...v6.1.3[View commits]
+
+No changes in this release.
 
 [[release-notes-6.1.2]]
 === Beats version 6.1.2
