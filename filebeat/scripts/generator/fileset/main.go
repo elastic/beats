@@ -30,7 +30,7 @@ func copyTemplatesToDest(templatesPath, name, filesetPath, module, fileset strin
 func generateModule(module, fileset, modulePath, beatsPath string) error {
 	p := path.Join(modulePath, "module", module)
 	if _, err := os.Stat(p); !os.IsNotExist(err) {
-		return fmt.Errorf("module already exists: %s at %s", module, p)
+		return nil
 	}
 
 	d := path.Join(p, "_meta", "kibana", "default")
