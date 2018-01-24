@@ -16,6 +16,7 @@
 
 :export-command-short-desc: Exports the configuration or index template to stdout
 :help-command-short-desc: Shows help for any command
+:keystore-command-short-desc: Manages the <<keystore,secrets keystore>>
 :modules-command-short-desc: Manages configured modules
 :run-command-short-desc: Runs {beatname_uc}. This command is used by default if you start {beatname_uc} without specifying a command
 :setup-command-short-desc: Sets up the initial environment, including the index template, Kibana dashboards (when available), and machine learning jobs (when available)
@@ -24,7 +25,11 @@
 
 
 [[command-line-options]]
-=== {beatname_uc} commands
+=== {beatname_uc} command reference
+
+++++
+<titleabbrev>Command reference</titleabbrev>
+++++
 
 {beatname_uc} provides a command-line interface for running the Beat and
 performing common tasks, like testing configuration files and loading
@@ -50,6 +55,9 @@ endif::[]
 
 <<help-command,`help`>>::
 {help-command-short-desc}.
+
+<<keystore-command,`keystore`>>::
+{keystore-command-short-desc}.
 
 ifeval::[("{beatname_lc}"=="filebeat") or ("{beatname_lc}"=="metricbeat")]
 
@@ -152,6 +160,62 @@ Specifies the name of the command to show help for.
 -----
 {beatname_lc} help export
 -----
+
+[[keystore-command]]
+==== `keystore` command
+
+{keystore-command-short-desc}. 
+
+*SYNOPSIS*
+
+["source","sh",subs="attributes"]
+----
+{beatname_lc} keystore SUBCOMMAND [FLAGS]
+----
+
+*SUBCOMMANDS*
+
+*`add KEY`*::
+Adds the specified key to the keystore. Use the `--force` flag to overwrite an
+existing key. Use the `--stdin` flag to pass the value through `stdin`.
+
+*`create`*::
+Creates a keystore to hold secrets. Use the `--force` flag to overwrite the
+existing keystore.
+
+*`list`*::
+Lists the keys in the keystore.
+
+*`remove KEY`*::
+Removes the specified key from the keystore.
+
+*FLAGS*
+
+*`--force`*::
+Valid with the `add` and `create` subcommands. When used with `add`, overwrites
+the specified key. When used with `create`, overwrites the keystore.
+
+*`--stdin`*::
+When used with `add`, uses the stdin as the source of the key's value.
+
+*`-h, --help`*::
+Shows help for the `keystore` command.
+
+
+{global-flags}
+
+*EXAMPLES*
+
+["source","sh",subs="attributes"]
+-----
+{beatname_lc} keystore create
+{beatname_lc} keystore add ES_PWD
+{beatname_lc} keystore remove ES_PWD
+{beatname_lc} keystore list
+-----
+
+see <<keystore>> for more examples.
+
 
 ifeval::[("{beatname_lc}"=="filebeat") or ("{beatname_lc}"=="metricbeat")]
 
