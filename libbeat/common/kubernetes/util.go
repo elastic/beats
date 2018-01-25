@@ -67,8 +67,8 @@ func DiscoverKubernetesNode(host string, inCluster bool, client *k8s.Client) (no
 			return defaultNode
 		}
 		logp.Info("kubernetes: Using pod name %s and namespace %s to discover kubernetes node", podName, ns)
-		pod := &v1.Pod{}
-		err = client.Get(context.TODO(), ns, podName, pod)
+		pod := v1.Pod{}
+		err = client.Get(context.TODO(), ns, podName, &pod)
 		if err != nil {
 			logp.Err("kubernetes: Querying for pod failed with error: ", err.Error())
 			return defaultNode
@@ -83,8 +83,8 @@ func DiscoverKubernetesNode(host string, inCluster bool, client *k8s.Client) (no
 		return defaultNode
 	}
 
-	nodes := &v1.NodeList{}
-	err := client.List(context.TODO(), k8s.AllNamespaces, nodes)
+	nodes := v1.NodeList{}
+	err := client.List(context.TODO(), k8s.AllNamespaces, &nodes)
 	if err != nil {
 		logp.Err("kubernetes: Querying for nodes failed with error: ", err.Error())
 		return defaultNode
