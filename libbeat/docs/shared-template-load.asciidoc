@@ -31,14 +31,23 @@ configuring template loading options in the {beatname_uc} configuration file.
 
 You can also set options to change the name of the index and index template.
 
+ifndef::only-elasticsearch[]
 NOTE: A connection to Elasticsearch is required to load the index template. If
 the output is Logstash, you must
 <<load-template-manually,load the template manually>>. 
+endif::[]
 
 For more information, see:
 
-* <<load-template-auto>> 
+ifdef::only-elasticsearch[]
+* <<load-template-auto>>
+* <<load-template-manually>>
+endif::[]
+
+ifndef::only-elasticsearch[]
+* <<load-template-auto>>
 * <<load-template-manually>> - required for Logstash output
+endif::[]
 
 [[load-template-auto]]
 ==== Configure template loading
