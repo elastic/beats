@@ -7,22 +7,22 @@ import (
 
 	"github.com/elastic/beats/filebeat/channel"
 	"github.com/elastic/beats/filebeat/harvester"
+	"github.com/elastic/beats/filebeat/input"
 	"github.com/elastic/beats/filebeat/input/file"
-	"github.com/elastic/beats/filebeat/prospector"
 	"github.com/elastic/beats/libbeat/common"
 	"github.com/elastic/beats/libbeat/common/cfgwarn"
 	"github.com/elastic/beats/libbeat/logp"
 )
 
 func init() {
-	err := prospector.Register("redis", NewProspector)
+	err := input.Register("redis", NewInput)
 	if err != nil {
 		panic(err)
 	}
 }
 
-// Prospector is a prospector for redis
-type Prospector struct {
+// Input is a input for redis
+type Input struct {
 	started  bool
 	outlet   channel.Outleter
 	config   config
@@ -30,9 +30,9 @@ type Prospector struct {
 	registry *harvester.Registry
 }
 
-// NewProspector creates a new redis prospector
-func NewProspector(cfg *common.Config, outletFactory channel.Factory, context prospector.Context) (prospector.Prospectorer, error) {
-	cfgwarn.Experimental("Redis slowlog prospector is enabled.")
+// NewInput creates a new redis input
+func NewInput(cfg *common.Config, outletFactory channel.Factory, context input.Context) (input.Input, error) {
+	cfgwarn.Experimental("Redis slowlog input is enabled.")
 
 	config := defaultConfig
 
@@ -46,7 +46,7 @@ func NewProspector(cfg *common.Config, outletFactory channel.Factory, context pr
 		return nil, err
 	}
 
-	p := &Prospector{
+	p := &Input{
 		started:  false,
 		outlet:   outlet,
 		config:   config,
@@ -58,13 +58,13 @@ func NewProspector(cfg *common.Config, outletFactory channel.Factory, context pr
 }
 
 // LoadStates loads the states
-func (p *Prospector) LoadStates(states []file.State) error {
+func (p *Input) LoadStates(states []file.State) error {
 	return nil
 }
 
-// Run runs the prospector
-func (p *Prospector) Run() {
-	logp.Debug("redis", "Run redis prospector with hosts: %+v", p.config.Hosts)
+// Run runs the input
+func (p *Input) Run() {
+	logp.Debug("redis", "Run redis input with hosts: %+v", p.config.Hosts)
 
 	if len(p.config.Hosts) == 0 {
 		logp.Err("No redis hosts configured")
@@ -85,14 +85,14 @@ func (p *Prospector) Run() {
 	}
 }
 
-// Stop stopps the prospector and all its harvesters
-func (p *Prospector) Stop() {
+// Stop stops the input and all its harvesters
+func (p *Input) Stop() {
 	p.registry.Stop()
 	p.outlet.Close()
 }
 
-// Wait waits for the propsector to be completed. Not implemented.
-func (p *Prospector) Wait() {}
+// Wait waits for the input to be completed. Not implemented.
+func (p *Input) Wait() {}
 
 // CreatePool creates a redis connection pool
 // NOTE: This code is copied from the redis pool handling in metricbeat
