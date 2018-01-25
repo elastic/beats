@@ -3,12 +3,12 @@ package reader
 import (
 	"bytes"
 	"encoding/json"
+	"strings"
 	"time"
 
 	"github.com/elastic/beats/libbeat/common"
 
 	"github.com/pkg/errors"
-	"strings"
 )
 
 // DockerJSON processor renames a given field
