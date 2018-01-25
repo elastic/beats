@@ -38,9 +38,9 @@ var (
 
 // EventLog is an interface to a Windows Event Log.
 type EventLog interface {
-	// Open the event log. recordNumber is the last successfully read event log
-	// record number. Read will resume from recordNumber + 1. To start reading
-	// from the first event specify a recordNumber of 0.
+	// Open the event log. state points to the last successfully read event
+	// in this event log. Read will resume from the next record. To start reading
+	// from the first event specify a zero-valued EventLogState.
 	Open(state checkpoint.EventLogState) error
 
 	// Read records from the event log.
