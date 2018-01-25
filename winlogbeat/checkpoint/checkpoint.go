@@ -45,7 +45,7 @@ type EventLogState struct {
 	Name         string    `yaml:"name"`
 	RecordNumber uint64    `yaml:"record_number"`
 	Timestamp    time.Time `yaml:"timestamp"`
-	Bookmark     string    `yaml:"bookmark"`
+	Bookmark     string    `yaml:"bookmark,omitempty"`
 }
 
 // NewCheckpoint creates and returns a new Checkpoint. This method loads state
