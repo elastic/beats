@@ -2,7 +2,6 @@ package pipeline
 
 import (
 	"github.com/elastic/beats/libbeat/logp"
-	"github.com/elastic/beats/libbeat/publisher"
 )
 
 // retryer is responsible for accepting and managing failed send attempts. It
@@ -206,7 +205,7 @@ func decBatch(batch *Batch) {
 	// filter for evens with guaranteed send flags
 	events := batch.events[:0]
 	for _, event := range batch.events {
-		if (event.Flags & publisher.GuaranteedSend) == publisher.GuaranteedSend {
+		if event.Guaranteed() {
 			events = append(events, event)
 		}
 	}
