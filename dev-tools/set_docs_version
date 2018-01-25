@@ -11,14 +11,14 @@ def main():
     version = args.version
 
     # make sure we have no dirty files in this branch (might throw off `make update`)
-    #check_call("git clean -dfx", shell=True)
+    check_call("git clean -dfx", shell=True)
 
     # edit the file
     with open("libbeat/docs/version.asciidoc", "r") as f:
         lines = f.readlines()
     for i, line in enumerate(lines):
         if line.startswith(":stack-version:"):
-            lines[i] = ":stack-version: {}".format(version)
+            lines[i] = ":stack-version: {}\n".format(version)
     with open("libbeat/docs/version.asciidoc", "w") as f:
         f.writelines(lines)
 
