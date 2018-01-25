@@ -226,6 +226,7 @@ output.elasticsearch:
         message: "ERR"
 ------------------------------------------------------------------------------
 
+ifndef::no-pipeline[]
 ===== `pipeline`
 
 A format string value that specifies the ingest node pipeline to write events to.
@@ -270,6 +271,7 @@ output.elasticsearch:
       when.equals:
         fields.type: "normal"
 ------------------------------------------------------------------------------
+endif::[]
 
 ===== `max_retries`
 
