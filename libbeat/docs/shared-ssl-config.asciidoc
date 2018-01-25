@@ -1,5 +1,5 @@
 [[configuration-ssl]]
-== Specify SSL settings
+== SSL settings for outputs
 
 You can specify SSL options for any <<configuring-output,output>> that supports
 SSL. You can also specify SSL options when you
@@ -15,7 +15,9 @@ output.elasticsearch.ssl.certificate: "/etc/pki/client/cert.pem"
 output.elasticsearch.ssl.key: "/etc/pki/client/cert.key"
 ----
 
+ifndef::only-elasticsearch[]
 Also see <<configuring-ssl-logstash>>.
+endif::[]
 
 Example Kibana endpoint config with SSL enabled:
 

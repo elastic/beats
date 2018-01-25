@@ -8,9 +8,13 @@ mappings in Elasticsearch. If template loading is enabled (the default),
 {beatname_uc} loads the index template automatically after successfully
 connecting to Elasticsearch.
 
+ifndef::only-elasticsearch[]
+
 NOTE: A connection to Elasticsearch is required to load the index template. If
 the output is Logstash, you must <<load-template-manually,load the template
 manually>>.
+
+endif::[]
 
 You can adjust the following settings to load your own template or overwrite an
 existing one.
