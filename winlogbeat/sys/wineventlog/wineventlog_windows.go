@@ -186,7 +186,7 @@ func RenderEvent(
 			return err
 		}
 
-		err = RenderEventXML(eventHandle, EvtRenderEventXml, renderBuf, out)
+		err = RenderEventXML(eventHandle, renderBuf, out)
 	}
 
 	return err
@@ -197,23 +197,13 @@ func RenderEvent(
 // include the RenderingInfo (message). If the event is not rendered then the
 // XML will not include the message, and in this case RenderEvent should be
 // used.
-func RenderEventXML(eventHandle EvtHandle, flag EvtRenderFlag, renderBuf []byte, out io.Writer) error {
-	var bufferUsed, propertyCount uint32
-	err := _EvtRender(0, eventHandle, flag, uint32(len(renderBuf)),
-		&renderBuf[0], &bufferUsed, &propertyCount)
-	if err == ERROR_INSUFFICIENT_BUFFER {
-		return sys.InsufficientBufferError{err, int(bufferUsed)}
-	}
-	if err != nil {
-		return err
-	}
+func RenderEventXML(eventHandle EvtHandle, renderBuf []byte, out io.Writer) error {
+	return renderXML(eventHandle, EvtRenderEventXml, renderBuf, out)
+}
 
-	if int(bufferUsed) > len(renderBuf) {
-		return fmt.Errorf("Windows EvtRender reported that wrote %d bytes "+
-			"to the buffer, but the buffer can only hold %d bytes",
-			bufferUsed, len(renderBuf))
-	}
-	return sys.UTF16ToUTF8Bytes(renderBuf[:bufferUsed], out)
+// RenderBookmarkXML renders a bookmark as XML.
+func RenderBookmarkXML(bookmarkHandle EvtHandle, renderBuf []byte, out io.Writer) error {
+	return renderXML(bookmarkHandle, EvtRenderBookmark, renderBuf, out)
 }
 
 // CreateBookmarkFromRecordID creates a new bookmark pointing to the given recordID
@@ -436,4 +426,23 @@ func evtRenderProviderName(renderBuf []byte, eventHandle EvtHandle) (string, err
 
 	reader := bytes.NewReader(renderBuf)
 	return readString(renderBuf, reader)
+}
+
+func renderXML(eventHandle EvtHandle, flag EvtRenderFlag, renderBuf []byte, out io.Writer) error {
+	var bufferUsed, propertyCount uint32
+	err := _EvtRender(0, eventHandle, flag, uint32(len(renderBuf)),
+		&renderBuf[0], &bufferUsed, &propertyCount)
+	if err == ERROR_INSUFFICIENT_BUFFER {
+		return sys.InsufficientBufferError{err, int(bufferUsed)}
+	}
+	if err != nil {
+		return err
+	}
+
+	if int(bufferUsed) > len(renderBuf) {
+		return fmt.Errorf("Windows EvtRender reported that wrote %d bytes "+
+			"to the buffer, but the buffer can only hold %d bytes",
+			bufferUsed, len(renderBuf))
+	}
+	return sys.UTF16ToUTF8Bytes(renderBuf[:bufferUsed], out)
 }

@@ -305,7 +305,7 @@ func newWinEventLog(options *common.Config) (EventLog, error) {
 	case c.Forwarded == nil && c.Name == "ForwardedEvents",
 		c.Forwarded != nil && *c.Forwarded == true:
 		l.render = func(event win.EvtHandle, out io.Writer) error {
-			return win.RenderEventXML(event, win.EvtRenderEventXml, l.renderBuf, out)
+			return win.RenderEventXML(event, l.renderBuf, out)
 		}
 	default:
 		l.render = func(event win.EvtHandle, out io.Writer) error {
@@ -322,7 +322,7 @@ func (l *winEventLog) createBookmarkFromEvent(evtHandle win.EvtHandle) (string, 
 		return "", err
 	}
 	l.outputBuf.Reset()
-	err = win.RenderEventXML(bmHandle, win.EvtRenderBookmark, l.renderBuf, l.outputBuf)
+	err = win.RenderBookmarkXML(bmHandle, l.renderBuf, l.outputBuf)
 	win.Close(bmHandle)
 	return string(l.outputBuf.Bytes()), err
 }
