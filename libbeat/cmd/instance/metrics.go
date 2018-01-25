@@ -40,7 +40,7 @@ func setupMetrics(name string) error {
 	beatProcessStats = &process.Stats{
 		Procs:        []string{name},
 		EnvWhitelist: nil,
-		CpuTicks:     false,
+		CpuTicks:     true,
 		CacheCmdLine: true,
 		IncludeTop:   process.IncludeTopConfig{},
 	}
@@ -106,36 +106,87 @@ func reportBeatCPU(_ monitoring.Mode, V monitoring.Visitor) {
 	V.OnRegistryStart()
 	defer V.OnRegistryFinished()
 
-	totalCPUUsage, err := getCPUUsage()
+	totalCPUUsage, cpuTicks, err := getCPUUsage()
 	if err != nil {
 		logp.Err("Error retrieving CPU percentages: %v", err)
 		return
 	}
 
+	userTime, systemTime, err := process.GetOwnResourceUsageTimeInMillis()
+	if err != nil {
+		logp.Err("Error retrieving CPU usage time: %v", err)
+		return
+	}
+
+	monitoring.ReportNamespace(V, "user", func() {
+		monitoring.ReportInt(V, "ticks", int64(cpuTicks.User))
+		monitoring.ReportInt(V, "time", userTime)
+	})
+	monitoring.ReportNamespace(V, "system", func() {
+		monitoring.ReportInt(V, "ticks", int64(cpuTicks.System))
+		monitoring.ReportInt(V, "time", systemTime)
+	})
 	monitoring.ReportNamespace(V, "total", func() {
 		monitoring.ReportFloat(V, "value", totalCPUUsage)
+		monitoring.ReportInt(V, "ticks", int64(cpuTicks.Total))
+		monitoring.ReportInt(V, "time", userTime+systemTime)
 	})
-
 }
 
-func getCPUUsage() (float64, error) {
+func getCPUUsage() (float64, *process.Ticks, error) {
 	beatPID := os.Getpid()
 	state, err := beatProcessStats.GetOne(beatPID)
 	if err != nil {
-		return 0.0, fmt.Errorf("error retrieving process stats")
+		return 0.0, nil, fmt.Errorf("error retrieving process stats")
 	}
 
 	iTotalCPUUsage, err := state.GetValue("cpu.total.value")
 	if err != nil {
-		return 0.0, fmt.Errorf("error getting total CPU since start: %v", err)
+		return 0.0, nil, fmt.Errorf("error getting total CPU since start: %v", err)
 	}
 
 	totalCPUUsage, ok := iTotalCPUUsage.(float64)
 	if !ok {
-		return 0.0, fmt.Errorf("error converting value of CPU usage since start")
+		return 0.0, nil, fmt.Errorf("error converting value of CPU usage since start")
 	}
 
-	return totalCPUUsage, nil
+	iTotalCPUUserTicks, err := state.GetValue("cpu.user.ticks")
+	if err != nil {
+		return 0.0, nil, fmt.Errorf("error getting number of user CPU ticks since start: %v", err)
+	}
+
+	totalCPUUserTicks, ok := iTotalCPUUserTicks.(uint64)
+	if !ok {
+		return 0.0, nil, fmt.Errorf("error converting value of user CPU ticks since start")
+	}
+
+	iTotalCPUSystemTicks, err := state.GetValue("cpu.system.ticks")
+	if err != nil {
+		return 0.0, nil, fmt.Errorf("error getting number of system CPU ticks since start: %v", err)
+	}
+
+	totalCPUSystemTicks, ok := iTotalCPUSystemTicks.(uint64)
+	if !ok {
+		return 0.0, nil, fmt.Errorf("error converting value of system CPU ticks since start")
+	}
+
+	iTotalCPUTicks, err := state.GetValue("cpu.total.ticks")
+	if err != nil {
+		return 0.0, nil, fmt.Errorf("error getting total number of CPU ticks since start: %v", err)
+	}
+
+	totalCPUTicks, ok := iTotalCPUTicks.(uint64)
+	if !ok {
+		return 0.0, nil, fmt.Errorf("error converting total value of CPU ticks since start")
+	}
+
+	p := process.Ticks{
+		User:   totalCPUUserTicks,
+		System: totalCPUSystemTicks,
+		Total:  totalCPUTicks,
+	}
+
+	return totalCPUUsage, &p, nil
 }
 
 func reportSystemLoadAverage(_ monitoring.Mode, V monitoring.Visitor) {
