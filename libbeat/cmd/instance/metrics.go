@@ -30,8 +30,10 @@ func init() {
 	monitoring.NewFunc(beatMetrics, "info", reportInfo, monitoring.Report)
 
 	systemMetrics := monitoring.Default.NewRegistry("system")
-	monitoring.NewFunc(systemMetrics, "load", reportSystemLoadAverage, monitoring.Report)
 	monitoring.NewFunc(systemMetrics, "cpu", reportSystemCPUUsage, monitoring.Report)
+	if runtime.GOOS != "windows" {
+		monitoring.NewFunc(systemMetrics, "load", reportSystemLoadAverage, monitoring.Report)
+	}
 
 	ephemeralID = uuid.NewV4()
 }
