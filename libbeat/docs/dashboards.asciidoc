@@ -9,16 +9,15 @@
 //// include::../../libbeat/docs/dashboards.asciidoc[]
 //////////////////////////////////////////////////////////////////////////
 
-
 {beatname_uc} comes packaged with example Kibana dashboards, visualizations,
 and searches for visualizing {beatname_uc} data in Kibana. Before you can use
-the dashboards, you need to create the index  pattern, +{beatname_lc}-*+, and
+the dashboards, you need to create the index pattern, +{beat_default_index_prefix}-*+, and
 load the dashboards into Kibana. To do this, you can either run the `setup`
 command (as described here) or
 <<configuration-dashboards,configure dashboard loading>> in the
 +{beatname_lc}.yml+ config file.
 
-NOTE: Starting with Beats 6.0.0, the dashboards are loaded via the Kibana API.
+NOTE: Starting with {beatname_uc} 6.0.0, the dashboards are loaded via the Kibana API.
 This requires a Kibana endpoint configuration. You should have configured the
 endpoint earlier when you
 <<{beatname_lc}-configuration,configured {beatname_uc}>>. If you didn't,
