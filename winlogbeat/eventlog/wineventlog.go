@@ -97,9 +97,9 @@ func (l *winEventLog) Open(state checkpoint.EventLogState) error {
 		bookmark, err = win.CreateBookmarkFromXML(state.Bookmark)
 	} else {
 		bookmark, err = win.CreateBookmarkFromRecordID(l.channelName, state.RecordNumber)
-		if err != nil {
-			return err
-		}
+	}
+	if err != nil {
+		return err
 	}
 	defer win.Close(bookmark)
 
