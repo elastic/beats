@@ -240,6 +240,7 @@ The list below covers the changes between 6.0.0-rc2 and 6.0.0 GA only.
 *Filebeat*
 
 - Add Kubernetes manifests to deploy Filebeat. {pull}5349[5349]
+- Add container short ID matching to add_docker_metadata. {pull}6172[6172]
 
 *Metricbeat*
 

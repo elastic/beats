@@ -37,7 +37,7 @@ func AutodiscoverBuilder(bus bus.Bus, c *common.Config) (autodiscover.Provider, 
 		return nil, err
 	}
 
-	watcher, err := docker.NewWatcher(config.Host, config.TLS)
+	watcher, err := docker.NewWatcher(config.Host, config.TLS, false)
 	if err != nil {
 		return nil, err
 	}
