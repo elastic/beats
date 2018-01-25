@@ -129,6 +129,22 @@ func TestCondition(t *testing.T) {
 			},
 			result: true,
 		},
+		{
+			config: ConditionConfig{
+				Equals: &ConditionFields{fields: map[string]interface{}{
+					"final": true,
+				}},
+			},
+			result: false,
+		},
+		{
+			config: ConditionConfig{
+				Equals: &ConditionFields{fields: map[string]interface{}{
+					"final": false,
+				}},
+			},
+			result: true,
+		},
 	}
 
 	event := &beat.Event{
@@ -150,7 +166,8 @@ func TestCondition(t *testing.T) {
 				"username": "monica",
 				"keywords": []string{"foo", "bar"},
 			},
-			"type": "process",
+			"type":  "process",
+			"final": false,
 		},
 	}
 
