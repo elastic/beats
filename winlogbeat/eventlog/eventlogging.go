@@ -9,10 +9,9 @@ import (
 
 	"github.com/joeshaw/multierror"
 
-	"github.com/elastic/beats/winlogbeat/checkpoint"
-
 	"github.com/elastic/beats/libbeat/common"
 	"github.com/elastic/beats/libbeat/logp"
+	"github.com/elastic/beats/winlogbeat/checkpoint"
 	"github.com/elastic/beats/winlogbeat/sys"
 	win "github.com/elastic/beats/winlogbeat/sys/eventlogging"
 )
