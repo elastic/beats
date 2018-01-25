@@ -204,19 +204,22 @@ func (p *podWatcher) cleanupWorker() {
 			p.RLock()
 			for key, lastSeen := range p.deleted {
 				if lastSeen.Before(timeout) {
+					logp.Debug("kubernetes", "Removing container %s after cool down timeout", key)
 					toDelete = append(toDelete, key)
 				}
 			}
 			p.RUnlock()
 
 			// Delete timed out entries:
-			p.Lock()
 			for _, key := range toDelete {
 				p.bus.Publish(bus.Event{
 					"stop": true,
 					"pod":  p.Pod(key),
 				})
+			}
 
+			p.Lock()
+			for _, key := range toDelete {
 				delete(p.deleted, key)
 				delete(p.pods, key)
 			}
