@@ -20,11 +20,15 @@ output may be defined.
 The following topics describe how to configure each supported output:
 
 * <<elasticsearch-output>>
+
+ifndef::only-elasticsearch[]
 * <<logstash-output>>
 * <<kafka-output>>
 * <<redis-output>>
 * <<file-output>>
 * <<console-output>>
+endif::[]
+
 
 [[elasticsearch-output]]
 === Configure the Elasticsearch output
@@ -33,7 +37,7 @@ The following topics describe how to configure each supported output:
 <titleabbrev>Elasticsearch</titleabbrev>
 ++++
 
-When you specify Elasticsearch for the output, the Beat sends the transactions directly to Elasticsearch by using the Elasticsearch HTTP API.
+When you specify Elasticsearch for the output, {beatname_uc} sends the transactions directly to Elasticsearch by using the Elasticsearch HTTP API.
 
 Example configuration:
 
@@ -282,9 +286,8 @@ The default is 3.
 
 The maximum number of events to bulk in a single Elasticsearch bulk API index request. The default is 50.
 
-If the Beat sends single events, the events are collected into batches. If the Beat publishes
-a large batch of events (larger than the value specified by `bulk_max_size`), the batch is
-split.
+Events can be collected into batches. {beatname_uc} will split batches larger than `bulk_max_size`
+into multiple batches.
 
 Specifying a larger batch size can improve performance by lowering the overhead of sending events.
 However big batch sizes can also increase processing times, which might result in
@@ -307,6 +310,7 @@ Elasticsearch.
 
 See <<configuration-ssl>> for more information.
 
+ifndef::only-elasticsearch[]
 
 [[logstash-output]]
 === Configure the Logstash output
@@ -1162,3 +1166,5 @@ When specified, the `cloud.auth` overwrites the `output.elasticsearch.username` 
 `output.elasticsearch.password` settings. Because the Kibana settings inherit
 the username and password from the Elasticsearch output, this can also be used
 to set the `setup.kibana.username` and `setup.kibana.password` options.
+
+endif::[]

@@ -89,7 +89,7 @@ under a custom prefix.
 ==== `setup.kibana.ssl.enabled`
 
 Enables {beatname_uc} to use SSL settings when connecting to Kibana via HTTPS.
-If you configure the Beat to connect over HTTPS, this setting defaults to
+If you configure {beatname_uc} to connect over HTTPS, this setting defaults to
 `true` and {beatname_uc} uses the default SSL settings.
 
 Example configuration:
