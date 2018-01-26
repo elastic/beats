@@ -407,7 +407,8 @@ SoundCloud Ltd. (http://soundcloud.com/).
 
 --------------------------------------------------------------------
 Dependency: github.com/ericchiang/k8s
-Revision: 5803ed75e31fc1998b5f781ac08e22ff985c3f8f
+Version: v1.0.0
+Revision: 5912993f00cb7c971aaa54529a06bd3eecd6c3d4
 License type (autodetected): Apache-2.0
 ./vendor/github.com/ericchiang/k8s/LICENSE:
 --------------------------------------------------------------------
