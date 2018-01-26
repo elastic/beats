@@ -20,30 +20,30 @@ func init() {
 // MetricSet for fetching system disk IO metrics.
 type MetricSet struct {
 	mb.BaseMetricSet
-	statistics *DiskIOStat
-	names      []string
+	statistics     *DiskIOStat
+	includeDevices []string
 }
 
 // New is a mb.MetricSetFactory that returns a new MetricSet.
 func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
 	config := struct {
-		Names []string `config:"diskio.include_devices"`
-	}{Names: []string{}}
+		IncludeDevices []string `config:"diskio.include_devices"`
+	}{IncludeDevices: []string{}}
 
 	if err := base.Module().UnpackConfig(&config); err != nil {
 		return nil, err
 	}
 
 	return &MetricSet{
-		BaseMetricSet: base,
-		statistics:    NewDiskIOStat(),
-		names:         config.Names,
+		BaseMetricSet:  base,
+		statistics:     NewDiskIOStat(),
+		includeDevices: config.IncludeDevices,
 	}, nil
 }
 
 // Fetch fetches disk IO metrics from the OS.
 func (m *MetricSet) Fetch() ([]common.MapStr, error) {
-	stats, err := disk.IOCounters(m.names...)
+	stats, err := disk.IOCounters(m.includeDevices...)
 	if err != nil {
 		return nil, errors.Wrap(err, "disk io counters")
 	}
