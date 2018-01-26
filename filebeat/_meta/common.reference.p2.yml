@@ -240,6 +240,20 @@ filebeat.inputs:
   # Maximum size of the message received over UDP
   #max_message_size: 10240
 
+#------------------------------ TCP prospector --------------------------------
+# Experimental: Config options for the TCP input
+#- type: tcp
+  #enabled: false
+
+  # The host and port to receive the new event
+  #host: "localhost:9000"
+
+  # Character used to split new message
+  #line_delimiter: "\n"
+
+  # Maximum size in bytes of the message received over TCP
+  #max_message_size: 20971520
+
 #========================== Filebeat autodiscover ==============================
 
 # Autodiscover allows you to detect changes in the system and spawn new modules
