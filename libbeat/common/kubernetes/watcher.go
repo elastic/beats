@@ -3,7 +3,6 @@ package kubernetes
 import (
 	"context"
 	"fmt"
-	"reflect"
 	"time"
 
 	"github.com/ericchiang/k8s"
@@ -47,6 +46,7 @@ type watcher struct {
 	resourceList        k8s.ResourceList
 	k8sResourceFactory  func() k8s.Resource
 	resourceFactory     func() Resource
+	items               func() []k8s.Resource
 	handler             ResourceEventHandler
 }
 
@@ -62,14 +62,35 @@ func NewWatcher(client *k8s.Client, resource Resource, options WatchOptions) (Wa
 		stop:                cancel,
 	}
 	switch resource.(type) {
+	// add resource type which you want to support watching here
+	// note that you might need add Register like event in types.go init func
+	// if types were not registered by k8s library
+	// k8s.Register("", "v1", "events", true, &v1.Event{})
+	// k8s.RegisterList("", "v1", "events", true, &v1.EventList{})
 	case *Pod:
-		w.resourceList = &v1.PodList{}
+		list := &v1.PodList{}
+		w.resourceList = list
 		w.k8sResourceFactory = func() k8s.Resource { return &v1.Pod{} }
 		w.resourceFactory = func() Resource { return &Pod{} }
+		w.items = func() []k8s.Resource {
+			rs := make([]k8s.Resource, 0, len(list.Items))
+			for _, item := range list.Items {
+				rs = append(rs, item)
+			}
+			return rs
+		}
 	case *Event:
-		w.resourceList = &v1.EventList{}
+		list := &v1.EventList{}
+		w.resourceList = list
 		w.k8sResourceFactory = func() k8s.Resource { return &v1.Event{} }
 		w.resourceFactory = func() Resource { return &Event{} }
+		w.items = func() []k8s.Resource {
+			rs := make([]k8s.Resource, 0, len(list.Items))
+			for _, item := range list.Items {
+				rs = append(rs, item)
+			}
+			return rs
+		}
 	default:
 		return nil, fmt.Errorf("unsupported resource type for watching %T", resource)
 	}
@@ -100,11 +121,8 @@ func (w *watcher) sync() error {
 		return err
 	}
 
-	// ugly reflect since ResourceList does not exposed Items
-	// can be avoid by using k8s.io/client-go
-	list := reflect.ValueOf(w.resourceList).Elem().FieldByName("Items")
-	for i := 0; i < list.Len(); i++ {
-		w.onAdd(list.Index(i).Interface().(k8s.Resource))
+	for _, item := range w.items() {
+		w.onAdd(item)
 	}
 
 	// Store last version
