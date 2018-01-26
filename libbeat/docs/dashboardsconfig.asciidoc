@@ -20,7 +20,7 @@ To load the dashboards, you can either enable dashboard loading in the
 run the `setup` command. Dashboard loading is disabled by default.
 
 When dashboard loading is enabled, {beatname_uc} uses the Kibana API to load the
-sample dashboards. Dashboard loading is only attempted when {beatname_uc} startups up.
+sample dashboards. Dashboard loading is only attempted when {beatname_uc} starts up.
 If Kibana is not available at startup, {beatname_uc} will stop with an error.
 
 To enable dashboard loading, add the following setting to the config file:
