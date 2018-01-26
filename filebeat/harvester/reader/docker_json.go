@@ -51,12 +51,9 @@ func parseCRILog(message Message, msg *crioLog) (Message, error) {
 		return message, errors.Wrap(err, "parsing CRI timestamp")
 	}
 
-	stream := log[1]
-	// Anything after stream.
-	logMessage := log[2:]
 	msg.Timestamp = ts
-	msg.Stream = stream
-	msg.Log = []byte(strings.Join(logMessage, " "))
+	msg.Stream = log[1]
+	msg.Log = []byte(log[2])
 	message.AddFields(common.MapStr{
 		"stream": msg.Stream,
 	})
