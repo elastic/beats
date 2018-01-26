@@ -12,7 +12,7 @@
 [[setup-kibana-endpoint]]
 == Set up the Kibana endpoint
 
-Starting with Beats 6.0.0, the Kibana dashboards are loaded into Kibana
+Starting with {beatname_uc} 6.0.0, the Kibana dashboards are loaded into Kibana
 via the Kibana API. This requires a Kibana endpoint configuration.
 
 You configure the endpoint in the `setup.kibana` section of the
