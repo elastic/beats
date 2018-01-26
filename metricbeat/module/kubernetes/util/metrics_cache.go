@@ -6,13 +6,9 @@ import (
 )
 
 // PerfMetrics stores known metrics from Kubernetes nodes and containers
-var PerfMetrics *PerfMetricsCache
+var PerfMetrics = NewPerfMetricsCache()
 
 const defaultTimeout = 120 * time.Second
-
-func init() {
-	PerfMetrics = NewPerfMetricsCache()
-}
 
 // NewPerfMetricsCache initializes and returns a new PerfMetricsCache
 func NewPerfMetricsCache() *PerfMetricsCache {
