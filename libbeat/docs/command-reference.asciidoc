@@ -524,7 +524,7 @@ For example:
 +
 ["source","sh",subs="attributes"]
 ----------------------------------------------------------------------
-{beatname_lc} -E "name=mybeat" -E "output.elasticsearch.hosts=["http://myhost:9200"]"
+{beatname_lc} -E "name=mybeat" -E "output.elasticsearch.hosts=['http://myhost:9200']"
 ----------------------------------------------------------------------
 +
 This setting is applied to the currently running {beatname_uc} process.
@@ -537,7 +537,7 @@ ifeval::["{beatname_lc}"=="filebeat"]
 +
 ["source","sh",subs="attributes"]
 ----------------------------------------------------------------------
-{beatname_lc} -modules=nginx -M "nginx.access.var.paths=[/var/log/nginx/access.log*]" -M "nginx.access.var.pipeline=no_plugins"
+{beatname_lc} -modules=nginx -M "nginx.access.var.paths=['/var/log/nginx/access.log*']" -M "nginx.access.var.pipeline=no_plugins"
 ----------------------------------------------------------------------
 
 endif::[]
