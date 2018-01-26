@@ -41,16 +41,19 @@ func NewDockerJSON(r Reader, stream string) *DockerJSON {
 // parseCRILog parses logs in CRI log format.
 // CRI log format example :
 // 2017-09-12T22:32:21.212861448Z stdout 2017-09-12 22:32:21.212 [INFO][88] table.go 710: Invalidating dataplane cache
-func parseCRILog(b []byte, msg *crioLog, message Message) (Message, error) {
-	log := string(b)
-	ts, err := time.Parse(time.RFC3339, strings.Fields(log)[0])
+func parseCRILog(message Message, msg *crioLog) (Message, error) {
+	log := strings.SplitN(string(message.Content), " ", 3)
+	if len(log) < 3 {
+		return message, errors.New("invalid CRI log")
+	}
+	ts, err := time.Parse(time.RFC3339, log[0])
 	if err != nil {
 		return message, errors.Wrap(err, "parsing CRI timestamp")
 	}
 
-	stream := strings.Fields(log)[1]
+	stream := log[1]
 	// Anything after stream.
-	logMessage := strings.Fields(log)[2:]
+	logMessage := log[2:]
 	msg.Timestamp = ts
 	msg.Stream = stream
 	msg.Log = []byte(strings.Join(logMessage, " "))
@@ -66,8 +69,8 @@ func parseCRILog(b []byte, msg *crioLog, message Message) (Message, error) {
 // parseDockerJSONLog parses logs in Docker JSON log format.
 // Docker JSON log format example:
 // {"log":"1:M 09 Nov 13:27:36.276 # User requested shutdown...\n","stream":"stdout"}
-func parseDockerJSONLog(b []byte, msg *dockerLog, message Message) (Message, error) {
-	dec := json.NewDecoder(bytes.NewReader(b))
+func parseDockerJSONLog(message Message, msg *dockerLog) (Message, error) {
+	dec := json.NewDecoder(bytes.NewReader(message.Content))
 	if err := dec.Decode(&msg); err != nil {
 		return message, errors.Wrap(err, "decoding docker JSON")
 	}
@@ -99,9 +102,9 @@ func (p *DockerJSON) Next() (Message, error) {
 		var crioLine crioLog
 
 		if strings.HasPrefix(string(message.Content), "{") {
-			message, err = parseDockerJSONLog(message.Content, &dockerLine, message)
+			message, err = parseDockerJSONLog(message, &dockerLine)
 		} else {
-			message, err = parseCRILog(message.Content, &crioLine, message)
+			message, err = parseCRILog(message, &crioLine)
 		}
 
 		if p.stream != "all" && p.stream != dockerLine.Stream && p.stream != crioLine.Stream {

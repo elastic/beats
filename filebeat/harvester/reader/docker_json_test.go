@@ -34,6 +34,12 @@ func TestDockerJSON(t *testing.T) {
 		},
 		// Wrong CRI
 		{
+			input:         [][]byte{[]byte(`2017-09-12T22:32:21.212861448Z stdout`)},
+			stream:        "all",
+			expectedError: true,
+		},
+		// Wrong CRI
+		{
 			input:         [][]byte{[]byte(`{this is not JSON nor CRI`)},
 			stream:        "all",
 			expectedError: true,
