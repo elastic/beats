@@ -74,6 +74,8 @@ https://github.com/elastic/beats/compare/v6.0.0-beta2...master[Check the HEAD di
 - Fixed an issue where the proctitle value was being truncated.
 - Fixed an issue where values were incorrectly interpretted as hex data.
 - Fixed parsing of the `key` value when multiple keys are present.
+- Fix possible resource leak if file_integrity module is used with config
+  reloading on Windows or Linux. {pull}6198[6198]
 
 *Filebeat*
 

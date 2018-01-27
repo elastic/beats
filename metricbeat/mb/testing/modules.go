@@ -224,16 +224,26 @@ type capturingReporterV2 struct {
 	eventsC chan mb.Event
 }
 
+// report writes an event to the output channel and returns true. If the output
+// is closed it returns false.
+func (r *capturingReporterV2) report(event mb.Event) bool {
+	select {
+	case <-r.doneC:
+		// Publisher is stopped.
+		return false
+	case r.eventsC <- event:
+		return true
+	}
+}
+
 // Event stores the passed-in event into the events array
 func (r *capturingReporterV2) Event(event mb.Event) bool {
-	r.eventsC <- event
-	return true
+	return r.report(event)
 }
 
 // Error stores the given error into the errors array.
 func (r *capturingReporterV2) Error(err error) bool {
-	r.eventsC <- mb.Event{Error: err}
-	return true
+	return r.report(mb.Event{Error: err})
 }
 
 // Done returns the Done channel for this reporter.
@@ -255,6 +265,9 @@ func RunPushMetricSetV2(timeout time.Duration, waitEvents int, metricSet mb.Push
 	go func() {
 		defer wg.Done()
 		defer close(r.eventsC)
+		if closer, ok := metricSet.(mb.Closer); ok {
+			defer closer.Close()
+		}
 		metricSet.Run(r)
 	}()
 
