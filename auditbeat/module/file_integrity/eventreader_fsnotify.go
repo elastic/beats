@@ -51,19 +51,22 @@ func (r *reader) Start(done <-chan struct{}) (<-chan Event, error) {
 	if err := r.watcher.Start(); err != nil {
 		return nil, errors.Wrap(err, "unable to start watcher")
 	}
-	go r.consumeEvents()
+	go r.consumeEvents(done)
 	r.log.Infow("Started fsnotify watcher",
 		"file_path", r.config.Paths,
 		"recursive", r.config.Recursive)
 	return r.eventC, nil
 }
 
-func (r *reader) consumeEvents() {
+func (r *reader) consumeEvents(done <-chan struct{}) {
 	defer close(r.eventC)
 	defer r.watcher.Close()
 
 	for {
 		select {
+		case <-done:
+			r.log.Debug("fsnotify reader terminated")
+			return
 		case event := <-r.watcher.EventChannel():
 			if event.Name == "" || r.config.IsExcludedPath(event.Name) {
 				continue
