@@ -15,9 +15,12 @@ type Prometheus struct {
 }
 
 // NewPrometheusClient creates new prometheus helper
-func NewPrometheusClient(base mb.BaseMetricSet) *Prometheus {
-	http := NewHTTP(base)
-	return &Prometheus{*http}
+func NewPrometheusClient(base mb.BaseMetricSet) (*Prometheus, error) {
+	http, err := NewHTTP(base)
+	if err != nil {
+		return nil, err
+	}
+	return &Prometheus{*http}, nil
 }
 
 // GetFamilies requests metric families from prometheus endpoint and returns them

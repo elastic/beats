@@ -48,9 +48,13 @@ type MetricSet struct {
 
 // New creates new instance of MetricSet.
 func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
+	http, err := helper.NewHTTP(base)
+	if err != nil {
+		return nil, err
+	}
 	return &MetricSet{
 		base,
-		helper.NewHTTP(base),
+		http,
 	}, nil
 }
 
