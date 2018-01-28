@@ -1,3 +1,1 @@
 dashboards:
-- id: Filebeat-{module}-{fileset}-Dashboard
-  file: Filebeat-{module}-{fileset}.json
