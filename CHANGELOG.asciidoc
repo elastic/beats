@@ -59,6 +59,8 @@ https://github.com/elastic/beats/compare/v5.6.8...5.6[Check the HEAD diff]
 
 *Packetbeat*
 
+- HTTP parses successfully on empty status phrase. {issue}6176[6176]
+
 *Winlogbeat*
 
 ==== Deprecated

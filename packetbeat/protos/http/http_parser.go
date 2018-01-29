@@ -221,9 +221,6 @@ func parseResponseStatus(s []byte) (uint16, []byte, error) {
 		return 0, nil, fmt.Errorf("Unable to parse status code from [%s]", s)
 	}
 	phrase := s[p+1:]
-	if len(phrase) == 0 {
-		return 0, nil, fmt.Errorf("Unable to parse status phrase from [%s]", s)
-	}
 	return uint16(statusCode), phrase, nil
 }
 
