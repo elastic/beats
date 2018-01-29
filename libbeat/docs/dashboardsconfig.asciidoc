@@ -92,7 +92,7 @@ is `".kibana"`
 The Elasticsearch index name. This setting overwrites the index name defined
 in the dashboards and index pattern. Example: `"testbeat-*"`
 
-NOTE: Changing this setting while trying to load dashboards into Elasticsearch 5.x using {beatname_uc} 6.x will not work.
+NOTE: This setting only works for Kibana 6.0 and newer.
 
 [float]
 ==== `setup.dashboards.always_kibana`
