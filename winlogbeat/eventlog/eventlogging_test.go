@@ -15,6 +15,7 @@ import (
 	"github.com/stretchr/testify/assert"
 
 	"github.com/elastic/beats/libbeat/logp"
+	"github.com/elastic/beats/winlogbeat/checkpoint"
 	"github.com/elastic/beats/winlogbeat/sys/eventlogging"
 )
 
@@ -389,7 +390,7 @@ func TestOpenInvalidProvider(t *testing.T) {
 	configureLogp()
 
 	el := newTestEventLogging(t, map[string]interface{}{"name": "nonExistentProvider"})
-	assert.NoError(t, el.Open(0), "Calling Open() on an unknown provider "+
+	assert.NoError(t, el.Open(checkpoint.EventLogState{}), "Calling Open() on an unknown provider "+
 		"should automatically open Application.")
 	_, err := el.Read()
 	assert.NoError(t, err)
