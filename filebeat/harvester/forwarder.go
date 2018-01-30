@@ -27,13 +27,13 @@ func NewForwarder(outlet Outlet) *Forwarder {
 	return &Forwarder{Outlet: outlet}
 }
 
-// Send updates the prospector state and sends the event to the spooler
-// All state updates done by the prospector itself are synchronous to make sure no states are overwritten
+// Send updates the input state and sends the event to the spooler
+// All state updates done by the input itself are synchronous to make sure no states are overwritten
 func (f *Forwarder) Send(data *util.Data) error {
 	ok := f.Outlet.OnEvent(data)
 	if !ok {
-		logp.Info("Prospector outlet closed")
-		return errors.New("prospector outlet closed")
+		logp.Info("Input outlet closed")
+		return errors.New("input outlet closed")
 	}
 
 	return nil

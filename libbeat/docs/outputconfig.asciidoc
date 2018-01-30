@@ -125,6 +125,8 @@ The number of workers per configured host publishing events to Elasticsearch. Th
 is best used with load balancing mode enabled. Example: If you have 2 hosts and
 3 workers, in total 6 workers are started (3 for each host).
 
+The default value is 1.
+
 ===== `username`
 
 The basic authentication username for connecting to Elasticsearch.
@@ -564,7 +566,7 @@ output.kafka:
   hosts: ["kafka1:9092", "kafka2:9092", "kafka3:9092"]
 
   # message topic selection + partitioning
-  topic: '%{[type]}'
+  topic: '%{[fields.log_topic]}'
   partition.round_robin:
     reachable_only: false
 
@@ -616,7 +618,16 @@ The password for connecting to Kafka.
 ===== `topic`
 
 The Kafka topic used for produced events. The setting can be a format string
-using any event field. To set the topic from document type use `%{[type]}`.
+using any event field. For example, you can use the
+<<libbeat-configuration-fields,`fields`>> configuration option to add a custom
+field called `log_topic` to the event, and then set `topic` to the value of the
+custom field:
+
+[source,yaml]
+-----
+topic: '%{[fields.log_topic]}'
+-----
+
 
 ===== `topics`
 
@@ -851,7 +862,7 @@ output.redis:
     - key: "debug_list"  # send to debug_list if `message` field contains DEBUG
       when.contains:
         message: "DEBUG"
-    - key: "%{[type]}"
+    - key: "%{[fields.list]}"
       mapping:
         "http": "frontend_list"
         "nginx": "frontend_list"

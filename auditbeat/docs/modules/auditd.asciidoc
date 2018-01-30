@@ -1,0 +1,222 @@
+////
+This file is generated! See scripts/docs_collector.py
+////
+
+[id="{beatname_lc}-module-auditd"]
+== Auditd Module
+
+The `auditd` module receives audit events from the Linux Audit Framework that
+is a part of the Linux kernel.
+
+This module is available only for Linux.
+
+[float]
+=== How it works
+
+This module establishes a subscription to the kernel to receive the events
+as they occur. So unlike most other modules, the `period` configuration
+option is unused because it is not implemented using polling.
+
+The Linux Audit Framework can send multiple messages for a single auditable
+event. For example, a `rename` syscall causes the kernel to send eight separate
+messages. Each message describes a different aspect of the activity that is
+occurring (the syscall itself, file paths, current working directory, process
+title). This module will combine all of the data from each of the messages
+into a single event.
+
+Messages for one event can be interleaved with messages from another event. This
+module will buffer the messages in order to combine related messages into a
+single event even if they arrive interleaved or out of order.
+
+[float]
+=== Useful commands
+
+When running {beatname_uc} with the `auditd` module enabled, you might find
+that other monitoring tools interfere with {beatname_uc}.
+
+For example, you might encounter errors if another process, such as `auditd`, is
+registered to receive data from the Linux Audit Framework. You can use these
+commands to see if the `auditd` service is running and stop it:
+
+* See if `auditd` is running:
++
+[source,shell]
+-----
+service auditd status
+-----
+
+* Stop the `auditd` service:
++
+[source,shell]
+-----
+service auditd stop
+-----
+
+* Disable `auditd` from starting on boot:
++
+[source,shell]
+-----
+chkconfig auditd off
+-----
+
+To save CPU usage and disk space, you can use this command to stop `journald`
+from listening to audit messages:
+
+[source,shell]
+-----
+systemctl mask systemd-journald-audit.socket
+-----
+
+
+[float]
+=== Configuration options
+
+This module has some configuration options for tuning its behavior. The
+following example shows all configuration options with their default values.
+
+[source,yaml]
+----
+- module: auditd
+  resolve_ids: true
+  failure_mode: silent
+  backlog_limit: 8196
+  rate_limit: 0
+  include_raw_message: false
+  include_warnings: false
+----
+
+*`socket_type`*:: This optional setting controls the type of
+socket that {beatname_uc} uses to receive events from the kernel. The two
+options are `unicast` and `multicast`.
++
+`unicast` should be used when {beatname_uc} is the primary userspace daemon for
+receiving audit events and managing the rules. Only a single process can receive
+audit events through the "unicast" connection so any other daemons should be
+stopped (e.g. stop `auditd`).
++
+`multicast` can be used in kernel versions 3.16 and newer. By using `multicast`
+{beatname_uc} will receive an audit event broadcast that is not exclusive to a
+a single process. This is ideal for situations where `auditd` is running and
+managing the rules. If `multicast` is specified, but the kernel version is less
+than 3.16 {beatname_uc} will automatically revert to `unicast`.
++
+By default {beatname_uc} will use `multicast` if the kernel version is 3.16 or
+newer and no rules have been defined. Otherwise `unicast` will be used.
+
+*`resolve_ids`*:: This boolean setting enables the resolution of UIDs and
+GIDs to their associated names. The default value is true.
+
+*`failure_mode`*:: This determines the kernel's behavior on critical
+failures such as errors sending events to {beatname_uc}, the backlog limit was
+exceeded, the kernel ran out of memory, or the rate limit was exceeded. The
+options are `silent`, `log`, or `panic`. `silent` basically makes the kernel
+ignore the errors, `log` makes the kernel write the audit messages using
+`printk` so they show up in system's syslog, and `panic` causes the kernel to
+panic to prevent use of the machine. {beatname_uc}'s default is `silent`.
+
+*`backlog_limit`*:: This controls the maximum number of audit messages
+that will be buffered by the kernel.
+
+*`rate_limit`*:: This sets a rate limit on the number of messages/sec
+delivered by the kernel. The default is 0, which disables rate limiting.
+Changing this value to anything other than zero can cause messages to be lost.
+The preferred approach to reduce the messaging rate is be more selective in the
+audit ruleset.
+
+*`include_raw_message`*:: This boolean setting causes {beatname_uc} to
+include each of the raw messages that contributed to the event in the document
+as a field called `messages`. The default value is false. This setting is
+primarily used for development and debugging purposes.
+
+*`include_warnings`*:: This boolean setting causes {beatname_uc} to
+include as warnings any issues that were encountered while parsing the raw
+messages. The default value is false. When this setting is enabled the raw
+messages will be included in the event regardless of the
+`include_raw_message` config setting. This setting is primarily used for
+development and debugging purposes.
+
+*`audit_rules`*:: A string containing the audit rules that should be
+installed to the kernel. There should be one rule per line. Comments can be
+embedded in the string using `#` as a prefix. The format for rules is the same
+used by the Linux `auditctl` utility. {beatname_uc} supports adding file watches
+(`-w`) and syscall rules (`-a` or `-A`).
+
+[float]
+=== Audit rules
+
+The audit rules are where you configure the activities that are audited. These
+rules are configured as either syscalls or files that should be monitored. For
+example you can track all `connect` syscalls or file system writes to
+`/etc/passwd`.
+
+Auditing a large number of syscalls can place a heavy load on the system so
+consider carefully the rules you define and try to apply filters in the rules
+themselves to be as selective as possible.
+
+The kernel evaluates the rules in the order in which they were defined so place
+the most active rules first in order to speed up evaluation.
+
+You can assign keys to each rule for better identification of the rule that
+triggered an event and easier filtering later in Elasticsearch.
+
+Defining any audit rules in the config causes {beatname_uc} to purge all
+existing audit rules prior to adding the rules specified in the config.
+Therefore it is unnecessary and unsupported to include a `-D` (delete all) rule.
+
+["source","sh",subs="attributes"]
+----
+{beatname_lc}.modules:
+- module: auditd
+  audit_rules: |
+    # Things that affect identity.
+    -w /etc/group -p wa -k identity
+    -w /etc/passwd -p wa -k identity
+    -w /etc/gshadow -p wa -k identity
+    -w /etc/shadow -p wa -k identity
+
+    # Unauthorized access attempts to files (unsuccessful).
+    -a always,exit -F arch=b32 -S open,creat,truncate,ftruncate,openat,open_by_handle_at -F exit=-EACCES -F auid>=1000 -F auid!=4294967295 -F key=access
+    -a always,exit -F arch=b32 -S open,creat,truncate,ftruncate,openat,open_by_handle_at -F exit=-EPERM -F auid>=1000 -F auid!=4294967295 -F key=access
+    -a always,exit -F arch=b64 -S open,truncate,ftruncate,creat,openat,open_by_handle_at -F exit=-EACCES -F auid>=1000 -F auid!=4294967295 -F key=access
+    -a always,exit -F arch=b64 -S open,truncate,ftruncate,creat,openat,open_by_handle_at -F exit=-EPERM -F auid>=1000 -F auid!=4294967295 -F key=access
+----
+
+
+[float]
+=== Example configuration
+
+The Auditd module supports the common configuration options that are
+described under <<configuration-{beatname_lc},configuring {beatname_uc}>>. Here
+is an example configuration:
+
+[source,yaml]
+----
+auditbeat.modules:
+- module: auditd
+  audit_rules: |
+    ## Define audit rules here.
+    ## Create file watches (-w) or syscall audits (-a or -A). Uncomment these
+    ## examples or add your own rules.
+
+    ## If you are on a 64 bit platform, everything should be running
+    ## in 64 bit mode. This rule will detect any use of the 32 bit syscalls
+    ## because this might be a sign of someone exploiting a hole in the 32
+    ## bit API.
+    #-a always,exit -F arch=b32 -S all -F key=32bit-abi
+
+    ## Executions.
+    #-a always,exit -F arch=b64 -S execve,execveat -k exec
+
+    ## External access (warning: these can be expensive to audit).
+    #-a always,exit -F arch=b64 -S accept,bind,connect -F key=external-access
+
+    ## Identity changes.
+    #-w /etc/group -p wa -k identity
+    #-w /etc/passwd -p wa -k identity
+    #-w /etc/gshadow -p wa -k identity
+
+    ## Unauthorized access attempts.
+    #-a always,exit -F arch=b64 -S open,creat,truncate,ftruncate,openat,open_by_handle_at -F exit=-EACCES -k access
+    #-a always,exit -F arch=b64 -S open,creat,truncate,ftruncate,openat,open_by_handle_at -F exit=-EPERM -k access
+----
+

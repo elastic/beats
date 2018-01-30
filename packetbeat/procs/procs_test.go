@@ -79,7 +79,7 @@ func assertUint64ArraysAreEqual(t *testing.T, expected []uint64, result []uint64
 }
 
 func TestFindPidsByCmdlineGrep(t *testing.T) {
-	logp.LogInit(logp.LOG_DEBUG, "", false, true, []string{})
+	logp.TestingSetup()
 	proc := []testProcFile{
 		{path: "/proc/1/cmdline", contents: "/sbin/init"},
 		{path: "/proc/1/cgroup", contents: ""},
@@ -170,7 +170,7 @@ func TestRefreshPids(t *testing.T) {
 }
 
 func TestFindSocketsOfPid(t *testing.T) {
-	logp.LogInit(logp.LOG_DEBUG, "", false, true, []string{})
+	logp.TestingSetup()
 
 	proc := []testProcFile{
 		{path: "/proc/766/fd/0", isLink: true, contents: "/dev/null"},

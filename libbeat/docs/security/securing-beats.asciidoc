@@ -1,0 +1,25 @@
+[role="xpack"]
+[[securing-beats]]
+== {beatname_uc} and {security}
+
+If you want {beatname_uc} to connect to a cluster that has {security} enabled,
+there are extra configuration steps.
+
+To send data to a secured cluster through the `elasticsearch` output,
+{beatname_uc} needs to authenticate as a user who can manage index templates,
+monitor the cluster, create indices, and read, and write to the indices
+it creates. See <<beats-basic-auth>>.
+
+If encryption is enabled on the cluster, you also need to enable HTTPS in the
+{beatname_uc} configuration. See <<beats-tls>>.
+
+In addition to configuring authentication credentials for the {beatname_uc}
+itself, you need to grant authorized users permission to access the indices it
+creates. See <<beats-user-access>>.
+
+For more information about {security}, see
+{xpack-ref}/xpack-security.html[Securing {es} and {kib}].
+
+include::basic-auth.asciidoc[]
+include::user-access.asciidoc[]
+include::tls.asciidoc[]

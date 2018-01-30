@@ -17,12 +17,26 @@ https://github.com/elastic/beats/compare/v6.0.0-beta2...master[Check the HEAD di
 - Support dashboard loading without Elasticseach {pull}5653[5653]
 - Addition and update of the following libraries: pbkdf2, terminal, windows, unix {pull}5735[5735]
 - Update the command line library cobra and add support for zsh completion {pull}5761[5761]
+- The log format may differ due to logging library changes. {pull}5901[5901]
+- Adding a local keystore to allow user to obfuscate password {pull}5687[5687]
+- Update go-ucfg library to support top level key reference and cyclic key reference for the
+  keystore {pull}6098[6098]
 
 *Auditbeat*
 
 - Changed `audit.file.path` to be a multi-field so that path is searchable. {pull}5625[5625]
+- Split the audit.kernel and audit.file metricsets into their own modules
+  named auditd and file_integrity, respectively. This change requires
+  existing users to update their config. {issue}5422[5422]
+- Renamed file_integrity module fields. {issue}5423[5423] {pull}5995[5995]
+- Renamed auditd module fields. {issue}5423[5423] {pull}6080[6080]
 
 *Filebeat*
+- Switch to docker prospector in sample manifests for Kubernetes deployment {pull}5963[5963]
+- Renaming of the prospector type to the input type and all prospectors are now moved to the input
+  folder, to maintain backward compatibility type aliasing was used to map the old type to the new
+  one. This change also affect YAML configuration. {pull}6078[6078]
+- Refactor the Redis prospector to use the input interface {pull}6116[6116]
 
 *Heartbeat*
 
@@ -31,6 +45,9 @@ https://github.com/elastic/beats/compare/v6.0.0-beta2...master[Check the HEAD di
 - Rename `heap_init` field to `heap.init`. {pull}5320[5320]
 - Rename `http.response.status_code` field to `http.response.code`. {pull}5521[5521]
 - Rename `golang.heap.system.optained` field to `golang.heap.system.obtained`. {issue}5703[5703]
+- Support haproxy stats gathering using http (additionaly to tcp socket). {pull}5819[5819]
+- De dot keys in jolokia/jmx metricset to prevent collisions. {pull}5957[5957]
+- Support to optionally 'de dot' keys in http/json metricset to prevent collisions. {pull}5957[5957]
 
 *Packetbeat*
 
@@ -48,16 +65,28 @@ https://github.com/elastic/beats/compare/v6.0.0-beta2...master[Check the HEAD di
 - Fix documentation links in README.md files. {pull}5710[5710]
 - Fix logstash output debug message. {pull}5799{5799]
 - Fix isolation of modules when merging local and global field settings. {issue}5795[5795]
+- Fix panic when Events containing a float32 value are normalized. {pull}6129[6129]
 
 *Auditbeat*
 
+- Add an error check to the file integrity scanner to prevent a panic when
+  there is an error reading file info via lstat. {issue}6005[6005]
+- Fixed an issue where the proctitle value was being truncated.
+- Fixed an issue where values were incorrectly interpretted as hex data.
+- Fixed parsing of the `key` value when multiple keys are present.
+- Fix possible resource leak if file_integrity module is used with config
+  reloading on Windows or Linux. {pull}6198[6198]
+
 *Filebeat*
 
+- Right check of module/fileset exists for create-fileset command {issue}5657[5657]
+- Place fields.yml and docs.asciidoc to _meta folder at create-fileset command {issue}5657[5657]
 - Add support for adding string tags {pull}5395{5395}
 - Fix race condition when limiting the number of harvesters running in parallel {issue}5458[5458]
 - Fix relative paths in the prospector definitions. {pull}5443[5433]
 - Fix `recursive_globe.enabled` option. {pull}5443[5443]
 - Change pipeline delimiter to `{<` and `>}`. {pull}5702[5702]
+- Fix variable name for `convert_timezone` in the system module. {pull}5936[5936]
 
 *Heartbeat*
 
@@ -76,11 +105,18 @@ https://github.com/elastic/beats/compare/v6.0.0-beta2...master[Check the HEAD di
 - Fix `ProcState` on Linux and FreeBSD when process names contain parentheses. {pull}5775[5775]
 - Fix incorrect `Mem.Used` calculation under linux. {pull}5775[5775]
 - Fix mongodb session consistency mode to allow command execution on secondary nodes. {issue}4689[4689]
+- Fix `open_file_descriptor_count` and `max_file_descriptor_count` lost in zookeeper module {pull}5902[5902]
+- Fix kubernetes `state_pod` `status.phase` so that the active phase is returned instead of `unknown`. {pull}5980[5980]
+- Fix error collecting network_names in Vsphere module. {pull}5962[5962]
+- Fix process cgroup memory metrics for memsw, kmem, and kmem_tcp. {issue}6033[6033]
+- Fix kafka OffsetFetch request missing topic and partition parameters. {pull}5880[5880]
+- Change kubernetes.node.cpu.allocatable.cores to float. {pull}6130[6130]
 
 *Packetbeat*
 
 - Fix http status phrase parsing not allow spaces. {pull}5312[5312]
 - Fix http parse to allow to parse get request with space in the URI. {pull}5495[5495]
+- Fix mysql SQL parser to trim `\r` from Windows Server `SELECT\r\n\t1`. {pull}5572[5572]
 
 *Winlogbeat*
 
@@ -105,15 +141,26 @@ https://github.com/elastic/beats/compare/v6.0.0-beta2...master[Check the HEAD di
 - Set log level for kafka output. {pull}5397[5397]
 - Moved `ip_port` indexer for `add_kubernetes_metadata` to all beats. {pull}5707[5707]
 - `ip_port` indexer now index both IP and IP:port pairs. {pull}5721[5721]
+- Add the ability to write structured logs. {pull}5901[5901]
+- Use structured logging for the metrics that are periodically logged via the
+  `logging.metrics` feature. {pull}5915[5915]
+- Add the ability to log to the Windows Event Log. {pull}5913[5813]
+- Improve Elasticsearch output metrics to count number of dropped and duplicate (if event ID is given) events. {pull}5811[5811]
+- Add autodiscover for kubernetes. {pull}6055[6055]
+- Add the abilility for the add_docker_metadata process to enrich based on process ID. {pull}6100[6100]
+- The `add_docker_metadata` and `add_kubernetes_metadata` processors are now GA, instead of Beta. {pull}6105[6105]
+- The node name can be discovered automatically by machine-id matching when beat deployed outside kubernetes cluster. {pull}6146[6146]
 
 *Auditbeat*
 
 - Add support for SHA3 hash algorithms to the file integrity module. {issue}5345[5345]
+- Add support for BLAKE2b hash algorithms to the file integrity module. {pull}5926[5926]
 - Add dashboards for Linux audit framework events (overview, executions, sockets). {pull}5516[5516]
 - Add support for recursive file watches under macOS {pull}5575[5575] and Linux. {pull}5833[5833]
 
 *Filebeat*
 
+- Create module.yml at create-fileset command {issue}5657[5657]
 - Add PostgreSQL module with slowlog support. {pull}4763[4763]
 - Add Kafka log module. {pull}4885[4885]
 - Add support for `/var/log/containers/` log path in `add_kubernetes_metadata` processor. {pull}4981[4981]
@@ -122,6 +169,8 @@ https://github.com/elastic/beats/compare/v6.0.0-beta2...master[Check the HEAD di
 - Add experimental Docker autodiscover functionality. {pull}5245[5245]
 - Add option to convert the timestamps to UTC in the system module. {pull}5647[5647]
 - Add Logstash module support for main log and the slow log, support the plain text or structured JSON format {pull}5481[5481]
+- Add stream filtering when using `docker` prospector. {pull}6057[6057]
+- Add support for CRI logs format. {issue}5630[5630]
 
 *Heartbeat*
 
@@ -143,10 +192,17 @@ https://github.com/elastic/beats/compare/v6.0.0-beta2...master[Check the HEAD di
 - Add field network_names of hosts and virtual machines. {issue}5646[5646]
 - Update gosigar to v0.6.0. {pull}5775[5775]
 - Add experimental system/raid metricset. {pull}5642[5642]
+- Add a dashboard for the Nginx module. {pull}5991[5991]
+- Add experimental mongodb/collstats metricset. {pull}5852[5852]
+- Update the MySQL dashboard to use the Time Series Visual Builder. {pull}5996[5996]
+- Add experimental uwsgi module. {pull}6006[6006]
+- Docker and Kubernetes modules are now GA, instead of Beta. {pull}6105[6105]
+- Add pct calculated fields for Pod and container CPU and memory usages. {pull}6158[6158]
 
 *Packetbeat*
 
 - Configure good defaults for `add_kubernetes_metadata`. {pull}5707[5707]
+- Add support for condition on bool type {issue}5659[5659] {pull}5954[5954]
 
 *Winlogbeat*
 

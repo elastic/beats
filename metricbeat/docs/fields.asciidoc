@@ -44,6 +44,7 @@ grouped in the following categories:
 * <<exported-fields-rabbitmq>>
 * <<exported-fields-redis>>
 * <<exported-fields-system>>
+* <<exported-fields-uwsgi>>
 * <<exported-fields-vsphere>>
 * <<exported-fields-windows>>
 * <<exported-fields-zookeeper>>
@@ -2012,7 +2013,6 @@ Number of items/documents that are replicas.
 [[exported-fields-docker-processor]]
 == Docker fields
 
-beta[]
 Docker stats collected from Docker.
 
 
@@ -4995,7 +4995,6 @@ Total number of connections.
 [[exported-fields-kubernetes-processor]]
 == Kubernetes fields
 
-beta[]
 Kubernetes metadata added by the kubernetes processor
 
 
@@ -5015,6 +5014,14 @@ Kubernetes pod name
 type: keyword
 
 Kubernetes namespace
+
+
+[float]
+=== `kubernetes.node.name`
+
+type: keyword
+
+Kubernetes node name
 
 
 [float]
@@ -5104,6 +5111,26 @@ CPU used nanocores
 
 
 [float]
+=== `kubernetes.container.cpu.usage.node.pct`
+
+type: scaled_float
+
+format: percentage
+
+CPU usage as a percentage of the total node allocatable CPU
+
+
+[float]
+=== `kubernetes.container.cpu.usage.limit.pct`
+
+type: scaled_float
+
+format: percentage
+
+CPU usage as a percentage of the defined limit for the container (or total node allocatable CPU if unlimited)
+
+
+[float]
 == logs fields
 
 Logs info
@@ -5189,6 +5216,26 @@ type: long
 format: bytes
 
 Total memory usage
+
+
+[float]
+=== `kubernetes.container.memory.usage.node.pct`
+
+type: scaled_float
+
+format: percentage
+
+Memory usage as a percentage of the total node allocatable memory
+
+
+[float]
+=== `kubernetes.container.memory.usage.limit.pct`
+
+type: scaled_float
+
+format: percentage
+
+Memory usage as a percentage of the defined limit for the container (or total node allocatable memory if unlimited)
 
 
 
@@ -5419,14 +5466,6 @@ UUID version of the object
 
 kubernetes node metrics
 
-
-
-[float]
-=== `kubernetes.node.name`
-
-type: keyword
-
-Node name
 
 
 [float]
@@ -5711,6 +5750,74 @@ Tx errors
 
 
 [float]
+== cpu fields
+
+CPU usage metrics
+
+
+
+
+[float]
+=== `kubernetes.pod.cpu.usage.nanocores`
+
+type: long
+
+CPU used nanocores
+
+
+[float]
+=== `kubernetes.pod.cpu.usage.node.pct`
+
+type: scaled_float
+
+format: percentage
+
+CPU usage as a percentage of the total node CPU
+
+
+[float]
+=== `kubernetes.pod.cpu.usage.limit.pct`
+
+type: scaled_float
+
+format: percentage
+
+CPU usage as a percentage of the defined limit for the pod containers (or total node CPU if unlimited)
+
+
+
+
+[float]
+=== `kubernetes.pod.memory.usage.bytes`
+
+type: long
+
+format: bytes
+
+Total memory usage
+
+
+[float]
+=== `kubernetes.pod.memory.usage.node.pct`
+
+type: scaled_float
+
+format: percentage
+
+Memory usage as a percentage of the total node allocatable memory
+
+
+[float]
+=== `kubernetes.pod.memory.usage.limit.pct`
+
+type: scaled_float
+
+format: percentage
+
+Memory usage as a percentage of the defined limit for the pod containers (or total node allocatable memory if unlimited)
+
+
+[float]
 == container fields
 
 kubernetes container metrics
@@ -5877,7 +5984,7 @@ Node unschedulable status
 [float]
 === `kubernetes.node.cpu.allocatable.cores`
 
-type: long
+type: float
 
 Node CPU allocatable cores
 
@@ -6526,6 +6633,182 @@ Metrics collected from MongoDB servers.
 
 MongoDB metrics.
 
+
+
+[float]
+== collstats fields
+
+MongoDB collection statistics metrics.
+
+
+
+[float]
+=== `mongodb.collstats.db`
+
+type: keyword
+
+Database name.
+
+
+[float]
+=== `mongodb.collstats.collection`
+
+type: keyword
+
+Collection name.
+
+
+[float]
+=== `mongodb.collstats.name`
+
+type: keyword
+
+Combination of database and collection name.
+
+
+[float]
+=== `mongodb.collstats.total.time.us`
+
+type: long
+
+Total waiting time for locks in microseconds.
+
+
+[float]
+=== `mongodb.collstats.total.count`
+
+type: long
+
+Total number of lock wait events.
+
+
+
+[float]
+=== `mongodb.collstats.lock.read.time.us`
+
+type: long
+
+Time waiting for read locks in microseconds.
+
+
+[float]
+=== `mongodb.collstats.lock.read.count`
+
+type: long
+
+Number of read lock wait events.
+
+
+[float]
+=== `mongodb.collstats.lock.write.time.us`
+
+type: long
+
+Time waiting for write locks in microseconds.
+
+
+[float]
+=== `mongodb.collstats.lock.write.count`
+
+type: long
+
+Number of write lock wait events.
+
+
+[float]
+=== `mongodb.collstats.queries.time.us`
+
+type: long
+
+Time running queries in microseconds.
+
+
+[float]
+=== `mongodb.collstats.queries.count`
+
+type: long
+
+Number of queries executed.
+
+
+[float]
+=== `mongodb.collstats.getmore.time.us`
+
+type: long
+
+Time asking for more cursor rows in microseconds.
+
+
+[float]
+=== `mongodb.collstats.getmore.count`
+
+type: long
+
+Number of times a cursor asked for more data.
+
+
+[float]
+=== `mongodb.collstats.insert.time.us`
+
+type: long
+
+Time inserting new documents in microseconds.
+
+
+[float]
+=== `mongodb.collstats.insert.count`
+
+type: long
+
+Number of document insert events.
+
+
+[float]
+=== `mongodb.collstats.update.time.us`
+
+type: long
+
+Time updating documents in microseconds.
+
+
+[float]
+=== `mongodb.collstats.update.count`
+
+type: long
+
+Number of document update events.
+
+
+[float]
+=== `mongodb.collstats.remove.time.us`
+
+type: long
+
+Time deleting documents in microseconds.
+
+
+[float]
+=== `mongodb.collstats.remove.count`
+
+type: long
+
+Number of document delete events.
+
+
+[float]
+=== `mongodb.collstats.commands.time.us`
+
+type: long
+
+Time executing database commands in microseconds.
+
+
+[float]
+=== `mongodb.collstats.commands.count`
+
+type: long
+
+Number of database commands executed.
 
 
 [float]
@@ -9786,6 +10069,14 @@ The percentage of CPU time spent in non-idle state.
 
 
 [float]
+=== `system.cpu.total.value`
+
+type: long
+
+The value of CPU usage since starting the process.
+
+
+[float]
 === `system.cpu.user.ticks`
 
 type: long
@@ -10549,6 +10840,14 @@ CPU-specific statistics per process.
 type: long
 
 The amount of CPU time the process spent in user space.
+
+
+[float]
+=== `system.process.cpu.total.value`
+
+type: long
+
+The value of CPU usage since starting the process.
 
 
 [float]
@@ -11468,6 +11767,258 @@ type: long
 format: duration
 
 The OS uptime in milliseconds.
+
+
+[[exported-fields-uwsgi]]
+== uwsgi fields
+
+uwsgi module
+
+
+
+[float]
+== uwsgi fields
+
+
+
+
+[float]
+== status fields
+
+uwsgi.status metricset fields
+
+
+
+[float]
+=== `uwsgi.status.total.requests`
+
+type: long
+
+Total requests handled
+
+
+[float]
+=== `uwsgi.status.total.exceptions`
+
+type: long
+
+Total exceptions
+
+
+[float]
+=== `uwsgi.status.total.write_errors`
+
+type: long
+
+Total requests write errors
+
+
+[float]
+=== `uwsgi.status.total.read_errors`
+
+type: long
+
+Total read errors
+
+
+[float]
+=== `uwsgi.status.total.pid`
+
+type: long
+
+Process id
+
+
+[float]
+=== `uwsgi.status.worker.id`
+
+type: long
+
+Worker id
+
+
+[float]
+=== `uwsgi.status.worker.pid`
+
+type: long
+
+Worker process id
+
+
+[float]
+=== `uwsgi.status.worker.accepting`
+
+type: long
+
+State of worker, 1 if still accepting new requests otherwise 0
+
+
+[float]
+=== `uwsgi.status.worker.requests`
+
+type: long
+
+Number of requests served by this worker
+
+
+[float]
+=== `uwsgi.status.worker.delta_requests`
+
+type: long
+
+Number of requests served by this worker after worker is reloaded when reached MAX_REQUESTS
+
+
+[float]
+=== `uwsgi.status.worker.exceptions`
+
+type: long
+
+Exceptions raised
+
+
+[float]
+=== `uwsgi.status.worker.harakiri_count`
+
+type: long
+
+Dropped requests by timeout
+
+
+[float]
+=== `uwsgi.status.worker.signals`
+
+type: long
+
+Emitted signals count
+
+
+[float]
+=== `uwsgi.status.worker.signal_queue`
+
+type: long
+
+Number of signals waiting to be handled
+
+
+[float]
+=== `uwsgi.status.worker.status`
+
+type: keyword
+
+Worker status (cheap, pause, sig, busy, idle)
+
+
+[float]
+=== `uwsgi.status.worker.rss`
+
+type: keyword
+
+Resident Set Size. memory currently used by a process. if always zero try `--memory-report` option of uwsgi
+
+
+[float]
+=== `uwsgi.status.worker.vsz`
+
+type: long
+
+Virtual Set Size. memory size assigned to a process. if always zero try `--memory-report` option of uwsgi
+
+
+[float]
+=== `uwsgi.status.worker.running_time`
+
+type: long
+
+Process running time
+
+
+[float]
+=== `uwsgi.status.worker.respawn_count`
+
+type: long
+
+Respawn count
+
+
+[float]
+=== `uwsgi.status.worker.tx`
+
+type: long
+
+Transmitted size
+
+
+[float]
+=== `uwsgi.status.worker.avg_rt`
+
+type: long
+
+Average response time
+
+
+[float]
+=== `uwsgi.status.core.id`
+
+type: long
+
+worker ID
+
+
+[float]
+=== `uwsgi.status.core.worker_pid`
+
+type: long
+
+Parent worker PID
+
+
+[float]
+=== `uwsgi.status.core.requests.total`
+
+type: long
+
+Number of total requests served
+
+
+[float]
+=== `uwsgi.status.core.requests.static`
+
+type: long
+
+Number of static file serves
+
+
+[float]
+=== `uwsgi.status.core.requests.routed`
+
+type: long
+
+Routed requests
+
+
+[float]
+=== `uwsgi.status.core.requests.offloaded`
+
+type: long
+
+Offloaded requests
+
+
+[float]
+=== `uwsgi.status.core.write_errors`
+
+type: long
+
+Number of failed writes
+
+
+[float]
+=== `uwsgi.status.core.read_errors`
+
+type: long
+
+Number of failed reads
 
 
 [[exported-fields-vsphere]]

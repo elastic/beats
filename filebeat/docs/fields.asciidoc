@@ -24,6 +24,7 @@ grouped in the following categories:
 * <<exported-fields-logstash>>
 * <<exported-fields-mysql>>
 * <<exported-fields-nginx>>
+* <<exported-fields-osquery>>
 * <<exported-fields-postgresql>>
 * <<exported-fields-redis>>
 * <<exported-fields-system>>
@@ -608,7 +609,6 @@ Region in which this host is running.
 [[exported-fields-docker-processor]]
 == Docker fields
 
-beta[]
 Docker stats collected from Docker.
 
 
@@ -844,7 +844,6 @@ The full trace in the log line.
 [[exported-fields-kubernetes-processor]]
 == Kubernetes fields
 
-beta[]
 Kubernetes metadata added by the kubernetes processor
 
 
@@ -864,6 +863,14 @@ Kubernetes pod name
 type: keyword
 
 Kubernetes namespace
+
+
+[float]
+=== `kubernetes.node.name`
+
+type: keyword
+
+Kubernetes node name
 
 
 [float]
@@ -950,7 +957,15 @@ Log stream when reading container logs, can be 'stdout' or 'stderr'
 
 required: True
 
-The prospector type from which the event was generated. This field is set to the value specified for the `type` option in the prospector section of the Filebeat config file.
+The input type from which the event was generated. This field is set to the value specified for the `type` option in the input section of the Filebeat config file. (DEPRECATED: see `event.type`)
+
+
+[float]
+=== `event.type`
+
+required: True
+
+The input type from which the event was generated. This field is set to the value specified for the `type` option in the input section of the Filebeat config file.
 
 
 [float]
@@ -1533,6 +1548,64 @@ Connection identifier.
 type: text
 
 The error message
+
+
+[[exported-fields-osquery]]
+== Osquery fields
+
+Fields exported by the `osquery` module
+
+
+
+[float]
+== osquery fields
+
+
+
+
+[float]
+== result fields
+
+Common fields exported by the result metricset.
+
+
+
+[float]
+=== `osquery.result.name`
+
+type: keyword
+
+The name of the query that generated this event.
+
+
+[float]
+=== `osquery.result.action`
+
+type: keyword
+
+For incremental data, marks whether the entry was added or removed. It can be one of "added", "removed", or "snapshot".
+
+
+[float]
+=== `osquery.result.host_identifier`
+
+type: keyword
+
+The identifier for the host on which the osquery agent is running. Normally the hostname.
+
+
+[float]
+=== `osquery.result.unix_time`
+
+type: long
+
+Unix timestamp of the event, in seconds since the epoch. Used for computing the `@timestamp` column.
+
+
+[float]
+=== `osquery.result.calendar_time`
+
+String representation of the collection time, as formatted by osquery.
 
 
 [[exported-fields-postgresql]]

@@ -31,10 +31,12 @@ Packetbeat is unable to capture traffic from the loopback device (127.0.0.1 traf
 because the Windows TCP/IP stack does not implement a network loopback interface,
 making it difficult for Windows packet capture drivers like WinPcap to sniff traffic.
 
-As a workaround, you can try installing https://github.com/nmap/npcap/releases[Npcap],
-an update of WinPcap. Make sure that you restart Windows after installing Npcap.
-Npcap creates an Npcap Loopback Adapter that you can select if you want to capture
-loopback traffic.
+As a workaround, you can try installing
+https://github.com/nmap/npcap/releases[Npcap], an update of WinPcap. Make sure
+you install Npcap in WinPcap API-compatible mode (`/winpcap_mode=yes`), or
+{beatname_uc} will be unable to find the required DLLs. After installing Npcap,
+restart Windows. Npcap creates an Npcap Loopback Adapter that you can select if
+you want to capture loopback traffic.
 
 For the list of devices shown here, you would configure Packetbeat
 to use device `4`:
@@ -60,6 +62,7 @@ To process long running transactions, you can specify a larger value for the <<t
 option. However, keep in mind that very large timeout values can increase memory usage if messages are lost or transaction
 response messages are not sent.
 
+include::./faq-mysql-ssl.asciidoc[]
 include::../../libbeat/docs/faq-limit-bandwidth.asciidoc[]
 include::../../libbeat/docs/shared-faq.asciidoc[]
 include::../../libbeat/docs/faq-refresh-index.asciidoc[]

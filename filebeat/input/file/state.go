@@ -5,6 +5,7 @@ import (
 	"sync"
 	"time"
 
+	"github.com/elastic/beats/libbeat/common/file"
 	"github.com/elastic/beats/libbeat/logp"
 )
 
@@ -18,7 +19,7 @@ type State struct {
 	Timestamp   time.Time     `json:"timestamp"`
 	TTL         time.Duration `json:"ttl"`
 	Type        string        `json:"type"`
-	FileStateOS StateOS
+	FileStateOS file.StateOS
 }
 
 // NewState creates a new file state
@@ -27,7 +28,7 @@ func NewState(fileInfo os.FileInfo, path string, t string) State {
 		Fileinfo:    fileInfo,
 		Source:      path,
 		Finished:    false,
-		FileStateOS: GetOSState(fileInfo),
+		FileStateOS: file.GetOSState(fileInfo),
 		Timestamp:   time.Now(),
 		TTL:         -1, // By default, state does have an infinite ttl
 		Type:        t,
@@ -78,7 +79,7 @@ func (s *States) Update(newState State) {
 	} else {
 		// No existing state found, add new one
 		s.states = append(s.states, newState)
-		logp.Debug("prospector", "New state added for %s", newState.Source)
+		logp.Debug("input", "New state added for %s", newState.Source)
 	}
 }
 

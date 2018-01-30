@@ -1,6 +1,6 @@
 ###################### Filebeat Config Template ###############################
 
-filebeat.prospectors:
+filebeat.{{input_config | default("prospectors")}}:
 {% if prospectors is not defined %}
 {% set prospectors = true %}
 {% endif %}
@@ -211,4 +211,9 @@ output.file:
 #================================ Paths =====================================
 path:
   data: {{path_data}}
+{% endif %}
+
+{% if keystore_path %}
+#================================ keystore =====================================
+keystore.path: {{keystore_path}}
 {% endif %}

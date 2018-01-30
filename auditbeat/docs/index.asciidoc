@@ -4,20 +4,12 @@ include::../../libbeat/docs/version.asciidoc[]
 
 include::{asciidoc-dir}/../../shared/attributes.asciidoc[]
 
-:libbeat: http://www.elastic.co/guide/en/beats/libbeat/{doc-branch}
-:kibana-ref: https://www.elastic.co/guide/en/kibana/{doc-branch}
-:beatsdevguide: http://www.elastic.co/guide/en/beats/devguide/{doc-branch}
-:filebeat: http://www.elastic.co/guide/en/beats/filebeat/{doc-branch}
-:logstashdoc: https://www.elastic.co/guide/en/logstash/{doc-branch}
-:elasticsearch: https://www.elastic.co/guide/en/elasticsearch/reference/{doc-branch}
-:securitydoc: https://www.elastic.co/guide/en/x-pack/{doc-branch}
-:monitoringdoc: https://www.elastic.co/guide/en/x-pack/{doc-branch}
 :version: {stack-version}
 :beatname_lc: auditbeat
 :beatname_uc: Auditbeat
 :beatname_pkg: {beatname_lc}
-:security: X-Pack Security
-:dockerimage: docker.elastic.co/beats/{beatname_lc}:{version}
+
+include::../../libbeat/docs/shared-beats-attributes.asciidoc[]
 
 include::./overview.asciidoc[]
 
@@ -26,6 +18,8 @@ include::../../libbeat/docs/contributing-to-beats.asciidoc[]
 include::./getting-started.asciidoc[]
 
 include::../../libbeat/docs/repositories.asciidoc[]
+
+include::./breaking.asciidoc[]
 
 include::./setting-up-running.asciidoc[]
 
@@ -36,6 +30,8 @@ include::./modules.asciidoc[]
 include::./fields.asciidoc[]
 
 include::./securing-auditbeat.asciidoc[]
+
+include::../../libbeat/docs/security/securing-beats.asciidoc[]
 
 include::./troubleshooting.asciidoc[]
 

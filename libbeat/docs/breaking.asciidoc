@@ -7,6 +7,12 @@ changes, but there are breaking changes between major versions (e.g. 5.x to
 6.y). Migrating directly between non consecutive major versions (e.g. 1.x to
 6.x) is not recommended.
 
+See the following topics for a description of breaking changes:
+
+* <<breaking-changes-6.0>>
+* {auditbeat}/auditbeat-breaking-changes.html[Breaking changes in Auditbeat 6.2]
+
+
 [[breaking-changes-6.0]]
 === Breaking changes in 6.0
 
@@ -98,13 +104,13 @@ Prior to 6.0, the recommended setting was:
 
 [source,yaml]
 ----
-    index => "%{[@metadata][beat]}-%{+YYYY.MM.dd}" 
+    index => "%{[@metadata][beat]}-%{+YYYY.MM.dd}"
 ----
 
-    
+
 The index templates that ship with 6.0 are applied to new indexes that match the
 pattern `[beat]-[version]-*`. You must update your Logstash config, or the
-templates will not be applied. 
+templates will not be applied.
 
 [[breaking-changes-types]]
 ==== Filebeat prospector type and document type changes
@@ -116,7 +122,7 @@ the `document_type` setting, you can use a custom field.
 
 This has led also to the rename of the `input_type` configuration setting to
 `type`. This change is backwards compatible because the old setting still
-works. However, the `input_type` output field was renamed to `prospector_type`.
+works. However, the `input_type` output field was renamed to `prospector.type`.
 
 [[breaking-changes-default-config]]
 ==== Filebeat default prospector disabled in the configuration file

@@ -84,7 +84,7 @@ class Test(BaseTest):
 
         # Wait until it tries the first time to publish
         self.wait_until(
-            lambda: self.log_contains("ERR Failed to connect"),
+            lambda: self.log_contains("Failed to connect"),
             max_timeout=15)
 
         filebeat.check_kill_and_wait()

@@ -22,8 +22,13 @@ func genVersionCmd(name, beatVersion string) *cobra.Command {
 					return fmt.Errorf("error initializing beat: %s", err)
 				}
 
-				fmt.Printf("%s version %s (%s), libbeat %s\n",
-					beat.Info.Beat, beat.Info.Version, runtime.GOARCH, version.GetDefaultVersion())
+				buildTime := "unknown"
+				if bt := version.BuildTime(); !bt.IsZero() {
+					buildTime = bt.String()
+				}
+				fmt.Printf("%s version %s (%s), libbeat %s [%s built %s]\n",
+					beat.Info.Beat, beat.Info.Version, runtime.GOARCH, version.GetDefaultVersion(),
+					version.Commit(), buildTime)
 				return nil
 			}),
 	}

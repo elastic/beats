@@ -1,0 +1,11 @@
+{
+  "visState": "{\n  \"title\": \"Most common mode by count [Auditbeat File Integrity]\",\n  \"type\": \"metric\",\n  \"params\": {\n    \"addTooltip\": true,\n    \"addLegend\": false,\n    \"type\": \"gauge\",\n    \"gauge\": {\n      \"verticalSplit\": false,\n      \"autoExtend\": false,\n      \"percentageMode\": false,\n      \"gaugeType\": \"Metric\",\n      \"gaugeStyle\": \"Full\",\n      \"backStyle\": \"Full\",\n      \"orientation\": \"vertical\",\n      \"colorSchema\": \"Green to Red\",\n      \"gaugeColorMode\": \"None\",\n      \"useRange\": false,\n      \"colorsRange\": [\n        {\n          \"from\": 0,\n          \"to\": 100\n        }\n      ],\n      \"invertColors\": false,\n      \"labels\": {\n        \"show\": true,\n        \"color\": \"black\"\n      },\n      \"scale\": {\n        \"show\": false,\n        \"labels\": false,\n        \"color\": \"#333\",\n        \"width\": 2\n      },\n      \"type\": \"simple\",\n      \"style\": {\n        \"fontSize\": \"20\",\n        \"bgFill\": \"#000\",\n        \"bgColor\": false,\n        \"labelColor\": false,\n        \"subText\": \"\"\n      }\n    }\n  },\n  \"aggs\": [\n    {\n      \"id\": \"1\",\n      \"enabled\": true,\n      \"type\": \"count\",\n      \"schema\": \"metric\",\n      \"params\": {\n        \"customLabel\": \"Most common mode by count\"\n      }\n    },\n    {\n      \"id\": \"2\",\n      \"enabled\": true,\n      \"type\": \"terms\",\n      \"schema\": \"group\",\n      \"params\": {\n        \"field\": \"file.mode\",\n        \"size\": 1,\n        \"order\": \"desc\",\n        \"orderBy\": \"1\",\n        \"customLabel\": \"Mode\"\n      }\n    }\n  ]\n}", 
+  "description": "", 
+  "title": "Most common mode by count [Auditbeat File Integrity]", 
+  "uiStateJSON": "{\n  \"vis\": {\n    \"defaultColors\": {\n      \"0 - 100\": \"rgb(0,104,55)\"\n    }\n  }\n}", 
+  "version": 1, 
+  "savedSearchId": "a380a060-cb44-11e7-9835-2f31fe08873b", 
+  "kibanaSavedObjectMeta": {
+    "searchSourceJSON": ""
+  }
+}

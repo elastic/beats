@@ -10,6 +10,8 @@ import (
 	"net/url"
 	"strings"
 
+	"github.com/pkg/errors"
+
 	"github.com/elastic/beats/libbeat/common"
 	"github.com/elastic/beats/libbeat/logp"
 	"github.com/elastic/beats/libbeat/outputs"
@@ -36,6 +38,25 @@ func addToURL(_url, _path string, params url.Values) string {
 	}
 
 	return strings.Join([]string{_url, _path, "?", params.Encode()}, "")
+}
+
+func extractError(result []byte) error {
+	var kibanaResult struct {
+		Objects []struct {
+			Error struct {
+				Message string
+			}
+		}
+	}
+	if err := json.Unmarshal(result, &kibanaResult); err != nil {
+		return errors.Wrap(err, "parsing kibana response")
+	}
+	for _, o := range kibanaResult.Objects {
+		if o.Error.Message != "" {
+			return errors.New(kibanaResult.Objects[0].Error.Message)
+		}
+	}
+	return nil
 }
 
 func NewKibanaClient(cfg *common.Config) (*Client, error) {
@@ -140,6 +161,7 @@ func (conn *Connection) Request(method, extraPath string,
 		return 0, nil, fmt.Errorf("fail to read response %s", err)
 	}
 
+	retError = extractError(result)
 	return resp.StatusCode, result, retError
 }
 

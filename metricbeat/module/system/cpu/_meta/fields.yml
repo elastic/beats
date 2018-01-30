@@ -129,6 +129,13 @@
         The percentage of CPU time spent in non-idle state.
 
 
+    # Total
+    - name: total.value
+      type: long
+      description: >
+        The value of CPU usage since starting the process.
+
+
     # Ticks
     - name: user.ticks
       type: long
