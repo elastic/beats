@@ -99,7 +99,7 @@ func (f *OutletFactory) Create(cfg *common.Config, dynFields *common.MapStrPoint
 		fields["prospector"] = common.MapStr{
 			"type": config.Type,
 		}
-		fields["event"] = common.MapStr{
+		fields["input"] = common.MapStr{
 			"type": config.Type,
 		}
 	}
