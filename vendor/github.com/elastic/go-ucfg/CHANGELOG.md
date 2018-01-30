@@ -14,6 +14,12 @@ This project adheres to [Semantic Versioning](http://semver.org/).
 
 ### Fixed
 
+## [0.5.1]
+
+### Fixed
+- Fix: an issue with the Cyclic reference algorithm when a direct reference was pointing
+  to another reference. #100
+
 ## [0.5.0]
 
 ### Added
@@ -183,7 +189,8 @@ This project adheres to [Semantic Versioning](http://semver.org/).
 - Introduced CHANGELOG.md for documenting changes to ucfg.
 
 
-[Unreleased]: https://github.com/elastic/go-ucfg/compare/v0.5.0...HEAD
+[Unreleased]: https://github.com/elastic/go-ucfg/compare/v0.5.1...HEAD
+[0.5.1]: https://github.com/elastic/go-ucfg/compare/v0.5.0...v0.5.1
 [0.5.0]: https://github.com/elastic/go-ucfg/compare/v0.4.6...v0.5.0
 [0.4.6]: https://github.com/elastic/go-ucfg/compare/v0.4.5...v0.4.6
 [0.4.5]: https://github.com/elastic/go-ucfg/compare/v0.4.4...v0.4.5
