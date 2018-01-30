@@ -197,6 +197,8 @@ https://github.com/elastic/beats/compare/v6.0.0-beta2...master[Check the HEAD di
 
 *Winlogbeat*
 
+- Use bookmarks to persist the last published event. {pull}6150[6150]
+
 ==== Deprecated
 
 *Affecting all Beats*
