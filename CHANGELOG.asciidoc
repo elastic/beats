@@ -116,6 +116,7 @@ https://github.com/elastic/beats/compare/v6.0.0-beta2...master[Check the HEAD di
 - Change kubernetes.node.cpu.allocatable.cores to float. {pull}6130[6130]
 - Fix system process metricset for kernel processes. {issue}5700[5700]
 - Fix panic in http dependent modules when invalid config was used.
+- Fix system.filesystem.used.pct value to match what df reports. {issue}5494[5494]
 
 *Packetbeat*
 
