@@ -76,7 +76,7 @@ func newProcess(pid int, cmdline string, env common.MapStr) (*Process, error) {
 	}
 
 	exe := sigar.ProcExe{}
-	if err := exe.Get(pid); err != nil && !sigar.IsNotImplemented(err) && !os.IsPermission(err) {
+	if err := exe.Get(pid); err != nil && !sigar.IsNotImplemented(err) && !os.IsPermission(err) && !os.IsNotExist(err) {
 		return nil, fmt.Errorf("error getting process exe for pid=%d: %v", pid, err)
 	}
 
