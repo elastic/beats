@@ -148,7 +148,7 @@ func TestLoggerLevel(t *testing.T) {
 }
 
 func TestRecover(t *testing.T) {
-	const recoveryExplanation = "Something went wrong."
+	const recoveryExplanation = "Something went wrong"
 	const cause = "unexpected condition"
 
 	DevelopmentSetup(ToObserverOutput())
@@ -160,8 +160,9 @@ func TestRecover(t *testing.T) {
 			assert.Equal(t, zap.ErrorLevel, log.Level)
 			assert.Equal(t, "logp/core_test.go",
 				strings.Split(log.Caller.TrimmedPath(), ":")[0])
-			assert.Contains(t, log.Message, recoveryExplanation)
-			assert.Contains(t, log.Message, cause)
+			assert.Contains(t, log.Message, recoveryExplanation+
+				". Recovering, but please report this.")
+			assert.Contains(t, log.ContextMap(), "panic")
 		}
 	}()
 
