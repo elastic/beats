@@ -10,4 +10,4 @@ import (
 var Name = "{beat}"
 
 // RootCmd to handle beats cli
-var RootCmd = cmd.GenRootCmd(Name, "", beater.New)
+var RootCmd = cmd.GenRootCmd(Name, appVersion, beater.New)

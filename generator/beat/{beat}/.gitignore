@@ -5,3 +5,6 @@
 /{beat}
 /{beat}.test
 *.pyc
+
+# _beats folder
+/_beats/repo

@@ -1,0 +1,27 @@
+version: '2.1'
+services:
+  {beat}:
+    build:
+      context: .
+    environment:
+      - TEST_ENVIRONMENT=false
+    working_dir: /go/src/{beat_path}
+    volumes:
+      - ./:/go/src/{beat_path}
+      # This is required to on-demand launching the rest on containers for tests & also docker module tests:
+      - /var/run/docker.sock:/var/run/docker.sock
+    command: make
+
+  elasticsearch:
+    extends:
+      file: ${ES_BEATS}/testing/environments/${TESTING_ENVIRONMENT}.yml
+      service: elasticsearch
+    ports:
+    - 9200:9200
+
+  kibana:
+    extends:
+      file: ${ES_BEATS}/testing/environments/${TESTING_ENVIRONMENT}.yml
+      service: kibana
+    ports:
+    - 5601:5601

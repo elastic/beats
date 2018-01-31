@@ -1,0 +1,3 @@
+package cmd
+
+const appVersion = ""

@@ -11,6 +11,7 @@ beat_path = ""
 full_name = ""
 current_year = datetime.datetime.now().year
 
+
 def generate_beat(args):
 
     global project_name, github_name, beat, beat_path, full_name, current_year
