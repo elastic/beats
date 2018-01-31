@@ -754,9 +754,9 @@ The logged message.
 
 
 [[exported-fields-iis]]
-== iis fields
+== IIS fields
 
-iis Module
+IIS Module
 
 
 
