@@ -77,15 +77,14 @@ func AutodiscoverBuilder(bus bus.Bus, c *common.Config) (autodiscover.Provider, 
 		},
 	})
 
-	if err := watcher.Start(); err != nil {
-		return nil, err
-	}
-
 	return p, nil
 }
 
 // Start for Runner interface.
 func (p *Provider) Start() {
+	if err := p.watcher.Start(); err != nil {
+		logp.Err("Error starting kubernetes autodiscover provider: %s", err)
+	}
 }
 
 func (p *Provider) emit(pod *kubernetes.Pod, flag string) {
