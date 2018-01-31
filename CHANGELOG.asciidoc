@@ -22,7 +22,7 @@ https://github.com/elastic/beats/compare/v6.0.0-beta2...master[Check the HEAD di
 
 *Filebeat*
 
-- Added IIS Module in order to ingest W3SVC logs from Windows IIS web server.
+- Add IIS module. {pull}5685[5685].
 
 *Heartbeat*
 
