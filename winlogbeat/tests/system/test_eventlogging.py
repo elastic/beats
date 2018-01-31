@@ -205,3 +205,30 @@ class Test(WriteReadTest):
         self.assertIn(self.providerName, event_logs)
         record_number = event_logs[self.providerName]["record_number"]
         self.assertGreater(record_number, 0)
+
+    def test_processors(self):
+        """
+        eventlogging - Processors are applied
+        """
+        self.write_event_log("Hello world!")
+
+        config = {
+            "event_logs": [
+                {
+                    "name": self.providerName,
+                    "api": self.api,
+                    "extras": {
+                        "processors": [
+                            {
+                                "drop_fields": {
+                                    "fields": ["message"],
+                                }
+                            }
+                        ],
+                    },
+                }
+            ]
+        }
+        evts = self.read_events(config)
+        self.assertTrue(len(evts), 1)
+        self.assertNotIn("message", evts[0])
