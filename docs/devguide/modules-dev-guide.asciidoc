@@ -26,11 +26,11 @@ the procedure is similar. Run the following command in the `filebeat` folder:
 
 [source,bash]
 ----
-make create-fileset
+make create-fileset MODULE={module} FILESET={fileset}
 ----
 
-You'll be prompted to enter a module and fileset name. Only use characters
-`[a-z]` and, if required, underscores (`_`). No other characters are allowed.
+Only use characters `[a-z]` and, if required, underscores (`_`).
+No other characters are allowed.
 For the module name, you can us either a new module name or an existing module
 name. If the module doesn't exist, it will be created.
 
@@ -266,6 +266,16 @@ should contain the fields defined at the module level, and the description of
 the module itself. In most cases, you should add the fields at the fileset
 level.
 
+After `pipeline.json` is created, it is possible to generate a base `field.yml`.
+
+[source,bash]
+----
+make create-fields MODULE={module} FILESET={fileset}
+----
+
+Please, always check the generated file and make sure the fields are correct.
+Documenatation of fields must be added manually.
+
 [float]
 ==== test
 
@@ -285,6 +295,14 @@ run.
 
 Besides the files in the fileset folder, there is also data that needs to be
 filled at the module level.
+
+[float]
+==== module.yml
+
+This file contains list of all the dashboards available for the module and used by `export_dashboards.go` script for exporting dashboards.
+Each dashboard is defined by an id and the name of json file where the dashboard is saved locally.
+At generation new fileset this file will be automatically updated with "default" dashboard settings for new fileset.
+Please ensure that this settings are correct.
 
 [float]
 ==== _meta/docs.asciidoc

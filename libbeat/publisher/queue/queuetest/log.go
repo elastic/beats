@@ -65,11 +65,11 @@ func withLogOutput(fn func(*testing.T)) func(*testing.T) {
 			wg.Wait()
 		}()
 
-		level := logp.LOG_INFO
+		level := logp.InfoLevel
 		if debug {
-			level = logp.LOG_DEBUG
+			level = logp.DebugLevel
 		}
-		logp.LogInit(level, "", false, true, []string{"*"})
+		logp.DevelopmentSetup(logp.WithLevel(level))
 		fn(t)
 	}
 }

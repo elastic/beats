@@ -7,9 +7,10 @@ import (
 	"github.com/stretchr/testify/assert"
 
 	"github.com/elastic/beats/libbeat/common"
+	"github.com/elastic/beats/libbeat/common/kubernetes"
 )
 
-var metagen = &GenDefaultMeta{}
+var metagen = kubernetes.NewMetaGenerator([]string{}, []string{}, []string{})
 
 func TestPodIndexer(t *testing.T) {
 	var testConfig = common.NewConfig()
@@ -19,15 +20,17 @@ func TestPodIndexer(t *testing.T) {
 
 	podName := "testpod"
 	ns := "testns"
-	pod := Pod{
-		Metadata: ObjectMeta{
+	pod := kubernetes.Pod{
+		Metadata: kubernetes.ObjectMeta{
 			Name:      podName,
 			Namespace: ns,
 			Labels: map[string]string{
 				"labelkey": "labelvalue",
 			},
 		},
-		Spec: PodSpec{},
+		Spec: kubernetes.PodSpec{
+			NodeName: "testnode",
+		},
 	}
 
 	indexers := podIndexer.GetMetadata(&pod)
@@ -41,6 +44,9 @@ func TestPodIndexer(t *testing.T) {
 		"namespace": "testns",
 		"labels": common.MapStr{
 			"labelkey": "labelvalue",
+		},
+		"node": common.MapStr{
+			"name": "testnode",
 		},
 	}
 
@@ -62,17 +68,17 @@ func TestContainerIndexer(t *testing.T) {
 	container := "container"
 	initContainer := "initcontainer"
 
-	pod := Pod{
-		Metadata: ObjectMeta{
+	pod := kubernetes.Pod{
+		Metadata: kubernetes.ObjectMeta{
 			Name:      podName,
 			Namespace: ns,
 			Labels: map[string]string{
 				"labelkey": "labelvalue",
 			},
 		},
-		Status: PodStatus{
-			ContainerStatuses:     make([]PodContainerStatus, 0),
-			InitContainerStatuses: make([]PodContainerStatus, 0),
+		Status: kubernetes.PodStatus{
+			ContainerStatuses:     make([]kubernetes.PodContainerStatus, 0),
+			InitContainerStatuses: make([]kubernetes.PodContainerStatus, 0),
 		},
 	}
 
@@ -88,15 +94,18 @@ func TestContainerIndexer(t *testing.T) {
 		"labels": common.MapStr{
 			"labelkey": "labelvalue",
 		},
+		"node": common.MapStr{
+			"name": "testnode",
+		},
 	}
-
-	pod.Status.ContainerStatuses = []PodContainerStatus{
+	pod.Spec.NodeName = "testnode"
+	pod.Status.ContainerStatuses = []kubernetes.PodContainerStatus{
 		{
 			Name:        container,
 			ContainerID: "docker://abcde",
 		},
 	}
-	pod.Status.InitContainerStatuses = []PodContainerStatus{
+	pod.Status.InitContainerStatuses = []kubernetes.PodContainerStatus{
 		{
 			Name:        initContainer,
 			ContainerID: "docker://fghij",
@@ -127,14 +136,13 @@ func TestContainerIndexer(t *testing.T) {
 func TestFilteredGenMeta(t *testing.T) {
 	var testConfig = common.NewConfig()
 
-	filteredGen := &GenDefaultMeta{}
-	podIndexer, err := NewPodNameIndexer(*testConfig, filteredGen)
+	podIndexer, err := NewPodNameIndexer(*testConfig, metagen)
 	assert.Nil(t, err)
 
 	podName := "testpod"
 	ns := "testns"
-	pod := Pod{
-		Metadata: ObjectMeta{
+	pod := kubernetes.Pod{
+		Metadata: kubernetes.ObjectMeta{
 			Name:      podName,
 			Namespace: ns,
 			Labels: map[string]string{
@@ -146,7 +154,7 @@ func TestFilteredGenMeta(t *testing.T) {
 				"c": "d",
 			},
 		},
-		Spec: PodSpec{},
+		Spec: kubernetes.PodSpec{},
 	}
 
 	indexers := podIndexer.GetMetadata(&pod)
@@ -162,9 +170,7 @@ func TestFilteredGenMeta(t *testing.T) {
 	rawAnnotations := indexers[0].Data["annotations"]
 	assert.Nil(t, rawAnnotations)
 
-	filteredGen.labels = []string{"foo"}
-	filteredGen.annotations = []string{"a"}
-
+	filteredGen := kubernetes.NewMetaGenerator([]string{"a"}, []string{"foo"}, []string{})
 	podIndexer, err = NewPodNameIndexer(*testConfig, filteredGen)
 	assert.Nil(t, err)
 
@@ -195,16 +201,14 @@ func TestFilteredGenMeta(t *testing.T) {
 func TestFilteredGenMetaExclusion(t *testing.T) {
 	var testConfig = common.NewConfig()
 
-	filteredGen := &GenDefaultMeta{
-		labelsExclude: []string{"x"},
-	}
+	filteredGen := kubernetes.NewMetaGenerator([]string{}, []string{}, []string{"x"})
 	podIndexer, err := NewPodNameIndexer(*testConfig, filteredGen)
 	assert.Nil(t, err)
 
 	podName := "testpod"
 	ns := "testns"
-	pod := Pod{
-		Metadata: ObjectMeta{
+	pod := kubernetes.Pod{
+		Metadata: kubernetes.ObjectMeta{
 			Name:      podName,
 			Namespace: ns,
 			Labels: map[string]string{
@@ -216,7 +220,7 @@ func TestFilteredGenMetaExclusion(t *testing.T) {
 				"c": "d",
 			},
 		},
-		Spec: PodSpec{},
+		Spec: kubernetes.PodSpec{},
 	}
 
 	assert.Nil(t, err)
@@ -236,4 +240,85 @@ func TestFilteredGenMetaExclusion(t *testing.T) {
 
 	ok, _ = labelMap.HasKey("x")
 	assert.Equal(t, ok, false)
+}
+
+func TestIpPortIndexer(t *testing.T) {
+	var testConfig = common.NewConfig()
+
+	ipIndexer, err := NewIPPortIndexer(*testConfig, metagen)
+	assert.Nil(t, err)
+
+	podName := "testpod"
+	ns := "testns"
+	container := "container"
+	ip := "1.2.3.4"
+	port := int64(80)
+	pod := kubernetes.Pod{
+		Metadata: kubernetes.ObjectMeta{
+			Name:      podName,
+			Namespace: ns,
+			Labels: map[string]string{
+				"labelkey": "labelvalue",
+			},
+		},
+		Spec: kubernetes.PodSpec{
+			Containers: make([]kubernetes.Container, 0),
+		},
+
+		Status: kubernetes.PodStatus{
+			PodIP: ip,
+		},
+	}
+
+	indexers := ipIndexer.GetMetadata(&pod)
+	indices := ipIndexer.GetIndexes(&pod)
+
+	assert.Equal(t, 1, len(indexers))
+	assert.Equal(t, 1, len(indices))
+	assert.Equal(t, ip, indices[0])
+	assert.Equal(t, ip, indexers[0].Index)
+
+	// Meta doesn't have container info
+	_, err = indexers[0].Data.GetValue("kubernetes.container.name")
+	assert.NotNil(t, err)
+
+	expected := common.MapStr{
+		"pod": common.MapStr{
+			"name": "testpod",
+		},
+		"namespace": "testns",
+		"labels": common.MapStr{
+			"labelkey": "labelvalue",
+		},
+		"node": common.MapStr{
+			"name": "testnode",
+		},
+	}
+
+	pod.Spec.Containers = []kubernetes.Container{
+		{
+			Name: container,
+			Ports: []kubernetes.ContainerPort{
+				{
+					Name:          container,
+					ContainerPort: port,
+				},
+			},
+		},
+	}
+	pod.Spec.NodeName = "testnode"
+
+	indexers = ipIndexer.GetMetadata(&pod)
+	assert.Equal(t, 2, len(indexers))
+	assert.Equal(t, ip, indexers[0].Index)
+	assert.Equal(t, fmt.Sprintf("%s:%d", ip, port), indexers[1].Index)
+
+	indices = ipIndexer.GetIndexes(&pod)
+	assert.Equal(t, 2, len(indices))
+	assert.Equal(t, ip, indices[0])
+	assert.Equal(t, fmt.Sprintf("%s:%d", ip, port), indices[1])
+
+	assert.Equal(t, expected.String(), indexers[0].Data.String())
+	expected["container"] = common.MapStr{"name": container}
+	assert.Equal(t, expected.String(), indexers[1].Data.String())
 }

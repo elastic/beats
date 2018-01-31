@@ -10,8 +10,7 @@ class Test(metricbeat.BaseTest):
 
     def common_checks(self, output):
         # Ensure no errors or warnings exist in the log.
-        log = self.get_log()
-        self.assertNotRegexpMatches(log, "ERR|WARN")
+        self.assert_no_logged_warnings()
 
         for evt in output:
             top_level_fields = metricbeat.COMMON_FIELDS + ["postgresql"]

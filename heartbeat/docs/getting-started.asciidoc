@@ -240,7 +240,9 @@ include::../../libbeat/docs/dashboards.asciidoc[]
 [[heartbeat-starting]]
 === Step 5: Start Heartbeat
 
-Start Heartbeat by issuing the appropriate command for your platform.
+Start Heartbeat by issuing the appropriate command for your platform. If you
+are accessing a secured Elasticsearch cluster, make sure you've configured
+credentials as described in <<{beatname_lc}-configuration>>.
 
 NOTE: If you use an init.d script to start Heartbeat on deb or rpm, you can't
 specify command line flags (see <<command-line-options>>). To specify flags,
@@ -283,12 +285,6 @@ By default, Windows log files are stored in +C:\ProgramData\heartbeat\Logs+.
 
 Heartbeat is now ready to check the status of your services and send
 events to your defined output.
-
-[id="{beatname_lc}-passing-credentials"]
-==== Pass credentials
-
-:start-type: start
-include::../../libbeat/docs/shared-passing-credentials-setup.asciidoc[]
 
 [[view-kibana-dashboards]]
 === Step 6: View the sample Kibana dashboards

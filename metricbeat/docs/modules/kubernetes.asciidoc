@@ -5,8 +5,6 @@ This file is generated! See scripts/docs_collector.py
 [[metricbeat-module-kubernetes]]
 == Kubernetes module
 
-beta[]
-
 This module fetches metrics from Kubernetes https://kubernetes.io/docs/admin/kubelet/[kubelet]
 agent and https://github.com/kubernetes/kube-state-metrics[kube-state-metrics] service.
 
@@ -53,6 +51,8 @@ metricbeat.modules:
   metricsets:
     - event
 ----
+
+This module supports TLS connection when using `ssl` config field, as described in <<configuration-ssl>>.
 
 [float]
 === Metricsets

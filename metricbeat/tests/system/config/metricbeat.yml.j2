@@ -162,17 +162,34 @@ queue.mem:
   flush.min_events: {{ flush_min_events|default(8) }}
   flush.timeout: 0.1s
 
+{% if kibana -%}
+setup.kibana.host: "{{ kibana.host }}"
+{%- endif %}
+
 #================================ Outputs =====================================
 
 # Configure what outputs to use when sending the data collected by the beat.
 # Multiple outputs may be used.
 
-#------------------------------- File output ----------------------------------
-output.file:
-  path: {{ output_file_path|default(beat.working_dir + "/output") }}
-  filename: "{{ output_file_filename|default("metricbeat") }}"
-  rotate_every_kb: 1000
-  #number_of_files: 7
+output:
+  {% if elasticsearch -%}
+  elasticsearch:
+    hosts: ["{{ elasticsearch.host }}"]
+  {%- endif %}
+
+  # File as output
+  # Options
+  # path: where to save the files
+  # filename: name of the files
+  # rotate_every_kb: maximum size of the files in path
+  # number of files: maximum number of files in path
+  {% if not (console or elasticsearch) -%}
+  file:
+    path: {{ output_file_path|default(beat.working_dir + "/output") }}
+    filename: "{{ output_file_filename|default("metricbeat") }}"
+    rotate_every_kb: 1000
+    #number_of_files: 7
+  {%- endif %}
 
 {% if path_data %}
 #================================ Paths =====================================

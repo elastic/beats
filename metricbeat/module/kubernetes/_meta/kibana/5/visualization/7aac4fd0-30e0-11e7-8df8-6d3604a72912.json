@@ -1,0 +1,10 @@
+{
+  "visState": "{\"title\":\"Kubernetes - Unavailable pods per deployment\",\"type\":\"metrics\",\"params\":{\"id\":\"117fadf0-30df-11e7-8df8-6d3604a72912\",\"type\":\"timeseries\",\"series\":[{\"id\":\"64456840-30df-11e7-8df8-6d3604a72912\",\"color\":\"rgba(254,146,0,1)\",\"split_mode\":\"terms\",\"metrics\":[{\"id\":\"64456841-30df-11e7-8df8-6d3604a72912\",\"type\":\"sum\",\"field\":\"kubernetes.deployment.replicas.unavailable\"}],\"seperate_axis\":0,\"axis_position\":\"right\",\"formatter\":\"number\",\"chart_type\":\"line\",\"line_width\":1,\"point_size\":1,\"fill\":0.5,\"stacked\":\"stacked\",\"split_filters\":[{\"color\":\"#68BC00\",\"id\":\"53d35ad0-30df-11e7-8df8-6d3604a72912\"}],\"terms_field\":\"kubernetes.deployment.name\",\"label\":\"Unavailable pods\",\"terms_size\":\"10000\"}],\"time_field\":\"@timestamp\",\"index_pattern\":\"metricbeat-*\",\"interval\":\"auto\",\"axis_position\":\"left\",\"axis_formatter\":\"number\",\"show_legend\":1,\"filter\":\"metricset.module:kubernetes AND metricset.name:state_deployment\"},\"aggs\":[],\"listeners\":{}}",
+  "description": "",
+  "title": "Kubernetes - Unavailable pods per deployment",
+  "uiStateJSON": "{}",
+  "version": 1,
+  "kibanaSavedObjectMeta": {
+    "searchSourceJSON": "{\"query\":{\"query_string\":{\"query\":\"*\"}},\"filter\":[]}"
+  }
+}

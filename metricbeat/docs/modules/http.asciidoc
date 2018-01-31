@@ -37,6 +37,7 @@ metricbeat.modules:
   #method: "GET"
   #request.enabled: false
   #response.enabled: false
+  #dedot.enabled: false
 
 - module: http
   metricsets: ["server"]
@@ -49,6 +50,8 @@ metricbeat.modules:
 #      fields: # added to the the response in root. overwrites existing fields
 #        key: "value"
 ----
+
+This module supports TLS connection when using `ssl` config field, as described in <<configuration-ssl>>.
 
 [float]
 === Metricsets

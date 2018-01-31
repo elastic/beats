@@ -158,16 +158,15 @@ To configure {beatname_uc}:
 modules to collect the audit information. For each module, specify the
 metricsets that you want to collect.
 +
-The following example shows the `file` metricset configured to generate
+The following example shows the `file_integrity` module configured to generate
 events whenever a file in one of the specified paths changes on disk:
 +
 ["source","sh",subs="attributes"]
 -------------------------------------
 auditbeat.modules:
 
-- module: audit
-  metricsets: [file]
-  file.paths:
+- module: file_integrity
+  paths:
   - /bin
   - /usr/bin
   - /sbin
@@ -216,7 +215,9 @@ include::../../libbeat/docs/dashboards.asciidoc[]
 [id="{beatname_lc}-starting"]
 === Step 5: Start {beatname_uc}
 
-Run {beatname_uc} by issuing the appropriate command for your platform.
+Run {beatname_uc} by issuing the appropriate command for your platform. If you
+are accessing a secured Elasticsearch cluster, make sure you've configured
+credentials as described in <<{beatname_lc}-configuration>>.
 
 NOTE: If you use an init.d script to start {beatname_uc} on deb or rpm, you can't
 specify command line flags (see <<command-line-options>>). To specify flags,
@@ -260,12 +261,6 @@ PS C:{backslash}Program Files{backslash}{beatname_uc}> Start-Service {beatname_l
 ----------------------------------------------------------------------
 
 By default the log files are stored in +C:{backslash}ProgramData{backslash}{beatname_lc}{backslash}Logs+.
-
-[id="{beatname_lc}-passing-credentials"]
-==== Pass credentials
-
-:start-type: start
-include::../../libbeat/docs/shared-passing-credentials-setup.asciidoc[]
 
 ==== Test the {beatname_uc} installation
 

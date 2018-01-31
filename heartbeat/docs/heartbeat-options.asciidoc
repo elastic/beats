@@ -422,7 +422,7 @@ Example configuration:
 -------------------------------------------------------------------------------
 - type: http
   schedule: '@every 5s'
-  urls: ["https://myhost:80"]
+  urls: ["https://myhost:443"]
   ssl:
     certificate_authorities: ['/etc/ca.crt']
     supported_protocols: ["TLSv1.0", "TLSv1.1", "TLSv1.2"]

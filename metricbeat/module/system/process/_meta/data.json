@@ -11,30 +11,188 @@
     },
     "system": {
         "process": {
-            "cmdline": "/var/folders/k3/xlwbcsmj6dd7vjv2tg1d7c_40000gn/T/go-build217299100/github.com/elastic/beats/metricbeat/module/system/process/_test/process.test -data",
+            "cgroup": {
+                "blkio": {
+                    "id": "d88e67bb6961a5bb70c1c1c48094c6030e43768eed91e827f437111888f9967e",
+                    "path": "/docker/d88e67bb6961a5bb70c1c1c48094c6030e43768eed91e827f437111888f9967e",
+                    "total": {
+                        "bytes": 0,
+                        "ios": 0
+                    }
+                },
+                "cpu": {
+                    "cfs": {
+                        "period": {
+                            "us": 0
+                        },
+                        "quota": {
+                            "us": 0
+                        },
+                        "shares": 0
+                    },
+                    "id": "d88e67bb6961a5bb70c1c1c48094c6030e43768eed91e827f437111888f9967e",
+                    "path": "/docker/d88e67bb6961a5bb70c1c1c48094c6030e43768eed91e827f437111888f9967e",
+                    "rt": {
+                        "period": {
+                            "us": 0
+                        },
+                        "runtime": {
+                            "us": 0
+                        }
+                    },
+                    "stats": {
+                        "periods": 0,
+                        "throttled": {
+                            "ns": 0,
+                            "periods": 0
+                        }
+                    }
+                },
+                "cpuacct": {
+                    "id": "d88e67bb6961a5bb70c1c1c48094c6030e43768eed91e827f437111888f9967e",
+                    "path": "/docker/d88e67bb6961a5bb70c1c1c48094c6030e43768eed91e827f437111888f9967e",
+                    "percpu": {},
+                    "stats": {
+                        "system": {
+                            "ns": 0
+                        },
+                        "user": {
+                            "ns": 0
+                        }
+                    },
+                    "total": {
+                        "ns": 0
+                    }
+                },
+                "id": "d88e67bb6961a5bb70c1c1c48094c6030e43768eed91e827f437111888f9967e",
+                "memory": {
+                    "id": "d88e67bb6961a5bb70c1c1c48094c6030e43768eed91e827f437111888f9967e",
+                    "kmem": {
+                        "failures": 0,
+                        "limit": {
+                            "bytes": 0
+                        },
+                        "usage": {
+                            "bytes": 0,
+                            "max": {
+                                "bytes": 0
+                            }
+                        }
+                    },
+                    "kmem_tcp": {
+                        "failures": 0,
+                        "limit": {
+                            "bytes": 0
+                        },
+                        "usage": {
+                            "bytes": 0,
+                            "max": {
+                                "bytes": 0
+                            }
+                        }
+                    },
+                    "mem": {
+                        "failures": 0,
+                        "limit": {
+                            "bytes": 0
+                        },
+                        "usage": {
+                            "bytes": 0,
+                            "max": {
+                                "bytes": 0
+                            }
+                        }
+                    },
+                    "memsw": {
+                        "failures": 0,
+                        "limit": {
+                            "bytes": 0
+                        },
+                        "usage": {
+                            "bytes": 0,
+                            "max": {
+                                "bytes": 0
+                            }
+                        }
+                    },
+                    "path": "/docker/d88e67bb6961a5bb70c1c1c48094c6030e43768eed91e827f437111888f9967e",
+                    "stats": {
+                        "active_anon": {
+                            "bytes": 0
+                        },
+                        "active_file": {
+                            "bytes": 0
+                        },
+                        "cache": {
+                            "bytes": 0
+                        },
+                        "hierarchical_memory_limit": {
+                            "bytes": 0
+                        },
+                        "hierarchical_memsw_limit": {
+                            "bytes": 0
+                        },
+                        "inactive_anon": {
+                            "bytes": 0
+                        },
+                        "inactive_file": {
+                            "bytes": 0
+                        },
+                        "major_page_faults": 0,
+                        "mapped_file": {
+                            "bytes": 0
+                        },
+                        "page_faults": 0,
+                        "pages_in": 0,
+                        "pages_out": 0,
+                        "rss": {
+                            "bytes": 0
+                        },
+                        "rss_huge": {
+                            "bytes": 0
+                        },
+                        "swap": {
+                            "bytes": 0
+                        },
+                        "unevictable": {
+                            "bytes": 0
+                        }
+                    }
+                },
+                "path": "/docker/d88e67bb6961a5bb70c1c1c48094c6030e43768eed91e827f437111888f9967e"
+            },
+            "cmdline": "go test -tags=integration github.com/elastic/beats/metricbeat/module/... -data",
             "cpu": {
-                "start_time": "2017-10-12T10:41:40.406Z",
+                "start_time": "2017-12-07T07:20:59.000Z",
                 "total": {
                     "norm": {
-                        "pct": 0.0226
+                        "pct": 0.0099
                     },
-                    "pct": 0.0902
+                    "pct": 0.0397
                 }
+            },
+            "cwd": "/go/src/github.com/elastic/beats/metricbeat",
+            "fd": {
+                "limit": {
+                    "hard": 1048576,
+                    "soft": 1048576
+                },
+                "open": 8
             },
             "memory": {
                 "rss": {
-                    "bytes": 11612160,
-                    "pct": 0.0007
+                    "bytes": 14540800,
+                    "pct": 0.0035
                 },
                 "share": 0,
-                "size": 569977466880
+                "size": 402231296
             },
-            "name": "process.test",
-            "pgid": 10585,
-            "pid": 10731,
-            "ppid": 10585,
-            "state": "running",
-            "username": "ruflin"
+            "name": "go",
+            "pgid": 1,
+            "pid": 1,
+            "ppid": 0,
+            "state": "sleeping",
+            "username": "root"
         }
     }
 }

@@ -77,7 +77,9 @@ https://github.com/chrsblck/redisbeat[redisbeat]:: Used for Redis monitoring.
 https://github.com/consulthys/retsbeat[retsbeat]:: Collects counts of http://www.reso.org[RETS] resource/class records from https://en.wikipedia.org/wiki/Multiple_listing_service[Multiple Listing Service] (MLS) servers.
 https://github.com/yourdream/rsbeat[rsbeat]:: Ships redis slow logs to elasticsearch and anlyze by Kibana.
 https://github.com/martinhoefling/saltbeat[saltbeat]:: Reads events from salt master event bus.
+https://github.com/benben/serialbeat[serialbeat]:: Reads from a serial device.
 https://github.com/consulthys/springbeat[springbeat]:: Collects health and metrics data from Spring Boot applications running with the actuator module.
+https://github.com/berfinsari/tracebeat[tracebeat]:: Reads traceroute output and indexes them into Elasticsearch.
 https://github.com/buehler/go-elastic-twitterbeat[twitterbeat]:: Reads tweets for specified screen names.
 https://github.com/gravitational/udpbeat[udpbeat]:: Ships structured logs via UDP.
 https://github.com/hartfordfive/udplogbeat[udplogbeat]:: Accept events via local UDP socket (in plain-text or JSON with ability to enforce schemas).  Can also be used for applications only supporting syslog logging.

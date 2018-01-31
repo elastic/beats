@@ -1,0 +1,173 @@
+{
+  "objects": [
+    {
+      "attributes": {
+        "description": "",
+        "kibanaSavedObjectMeta": {
+          "searchSourceJSON": "{\"query\":{\"query\":{\"query_string\":{\"analyze_wildcard\":true,\"query\":\"*\"}},\"language\":\"lucene\"},\"filter\":[]}"
+        },
+        "title": "System Navigation [Metricbeat System]",
+        "uiStateJSON": "{}",
+        "version": 1,
+        "visState": "{\"title\":\"System Navigation [Metricbeat System]\",\"type\":\"markdown\",\"params\":{\"markdown\":\"[System Overview](#/dashboard/Metricbeat-system-overview)  | [Host Overview](#/dashboard/79ffd6e0-faa0-11e6-947f-177f697178b8) |\\n[Containers overview](#/dashboard/CPU-slash-Memory-per-container)\",\"fontSize\":12},\"aggs\":[]}"
+      },
+      "id": "System-Navigation",
+      "type": "visualization",
+      "version": 3
+    },
+    {
+      "attributes": {
+        "description": "",
+        "kibanaSavedObjectMeta": {
+          "searchSourceJSON": "{\"index\":\"metricbeat-*\",\"query\":{\"query\":{\"query_string\":{\"query\":\"*\",\"analyze_wildcard\":true,\"default_field\":\"*\"}},\"language\":\"lucene\"},\"filter\":[]}"
+        },
+        "title": "Number of hosts [Metricbeat System]",
+        "uiStateJSON": "{\"vis\":{\"defaultColors\":{\"0 - 100\":\"rgb(0,104,55)\"}}}",
+        "version": 1,
+        "visState": "{\"title\":\"Number of hosts [Metricbeat System]\",\"type\":\"metric\",\"params\":{\"addTooltip\":true,\"addLegend\":false,\"type\":\"gauge\",\"gauge\":{\"verticalSplit\":false,\"autoExtend\":false,\"percentageMode\":false,\"gaugeType\":\"Metric\",\"gaugeStyle\":\"Full\",\"backStyle\":\"Full\",\"orientation\":\"vertical\",\"colorSchema\":\"Green to Red\",\"gaugeColorMode\":\"None\",\"useRange\":false,\"colorsRange\":[{\"from\":0,\"to\":100}],\"invertColors\":false,\"labels\":{\"show\":false,\"color\":\"black\"},\"scale\":{\"show\":false,\"labels\":false,\"color\":\"#333\",\"width\":2},\"type\":\"simple\",\"style\":{\"fontSize\":\"63\",\"bgFill\":\"#000\",\"bgColor\":false,\"labelColor\":false,\"subText\":\"\"}}},\"aggs\":[{\"id\":\"1\",\"enabled\":true,\"type\":\"cardinality\",\"schema\":\"metric\",\"params\":{\"field\":\"beat.name\",\"customLabel\":\"Number of hosts\"}}]}"
+      },
+      "id": "c6f2ffd0-4d17-11e7-a196-69b9a7a020a9",
+      "type": "visualization",
+      "version": 2
+    },
+    {
+      "attributes": {
+        "description": "",
+        "kibanaSavedObjectMeta": {
+          "searchSourceJSON": "{\"query\":{\"query\":{\"query_string\":{\"query\":\"*\"}},\"language\":\"lucene\"},\"filter\":[]}"
+        },
+        "title": "Top Hosts By Memory (Realtime) [Metricbeat System]",
+        "uiStateJSON": "{}",
+        "version": 1,
+        "visState": "{\"title\":\"Top Hosts By Memory (Realtime) [Metricbeat System]\",\"type\":\"metrics\",\"params\":{\"id\":\"31e5afa0-1b1c-11e7-b09e-037021c4f8df\",\"type\":\"top_n\",\"series\":[{\"id\":\"31e5afa1-1b1c-11e7-b09e-037021c4f8df\",\"color\":\"#68BC00\",\"split_mode\":\"terms\",\"metrics\":[{\"id\":\"31e5afa2-1b1c-11e7-b09e-037021c4f8df\",\"type\":\"avg\",\"field\":\"system.memory.actual.used.pct\"}],\"seperate_axis\":0,\"axis_position\":\"right\",\"formatter\":\"percent\",\"chart_type\":\"line\",\"line_width\":1,\"point_size\":1,\"fill\":0.5,\"stacked\":\"none\",\"terms_field\":\"beat.name\",\"terms_order_by\":\"31e5afa2-1b1c-11e7-b09e-037021c4f8df\",\"terms_size\":\"10\"}],\"time_field\":\"@timestamp\",\"index_pattern\":\"metricbeat-*\",\"interval\":\"auto\",\"axis_position\":\"left\",\"axis_formatter\":\"number\",\"show_legend\":1,\"bar_color_rules\":[{\"value\":0,\"id\":\"33349dd0-1b1c-11e7-b09e-037021c4f8df\",\"bar_color\":\"rgba(104,188,0,1)\",\"opperator\":\"gte\"},{\"value\":0.6,\"id\":\"997dc440-1b1c-11e7-b09e-037021c4f8df\",\"bar_color\":\"rgba(254,146,0,1)\",\"opperator\":\"gte\"},{\"value\":0.85,\"id\":\"a10d7f20-1b1c-11e7-b09e-037021c4f8df\",\"bar_color\":\"rgba(211,49,21,1)\",\"opperator\":\"gte\"}],\"drilldown_url\":\"../app/kibana#/dashboard/79ffd6e0-faa0-11e6-947f-177f697178b8?_a=(query:(query_string:(analyze_wildcard:!t,query:'beat.name:\\\"{{key}}\\\"')))\",\"filter\":\"\",\"show_grid\":1},\"aggs\":[]}"
+      },
+      "id": "fe064790-1b1f-11e7-bec4-a5e9ec5cab8b",
+      "type": "visualization",
+      "version": 2
+    },
+    {
+      "attributes": {
+        "description": "",
+        "kibanaSavedObjectMeta": {
+          "searchSourceJSON": "{\"query\":{\"query\":{\"query_string\":{\"query\":\"*\"}},\"language\":\"lucene\"},\"filter\":[]}"
+        },
+        "title": "Top Hosts By CPU (Realtime) [Metricbeat System]",
+        "uiStateJSON": "{}",
+        "version": 1,
+        "visState": "{\"title\":\"Top Hosts By CPU (Realtime) [Metricbeat System]\",\"type\":\"metrics\",\"params\":{\"id\":\"31e5afa0-1b1c-11e7-b09e-037021c4f8df\",\"type\":\"top_n\",\"series\":[{\"id\":\"31e5afa1-1b1c-11e7-b09e-037021c4f8df\",\"color\":\"#68BC00\",\"split_mode\":\"terms\",\"metrics\":[{\"id\":\"31e5afa2-1b1c-11e7-b09e-037021c4f8df\",\"type\":\"avg\",\"field\":\"system.cpu.user.pct\"}],\"seperate_axis\":0,\"axis_position\":\"right\",\"formatter\":\"percent\",\"chart_type\":\"line\",\"line_width\":1,\"point_size\":1,\"fill\":0.5,\"stacked\":\"none\",\"terms_field\":\"beat.name\",\"terms_order_by\":\"31e5afa2-1b1c-11e7-b09e-037021c4f8df\",\"terms_size\":\"10\"}],\"time_field\":\"@timestamp\",\"index_pattern\":\"metricbeat-*\",\"interval\":\"auto\",\"axis_position\":\"left\",\"axis_formatter\":\"number\",\"show_legend\":1,\"bar_color_rules\":[{\"value\":0,\"id\":\"33349dd0-1b1c-11e7-b09e-037021c4f8df\",\"bar_color\":\"rgba(104,188,0,1)\",\"opperator\":\"gte\"},{\"value\":0.6,\"id\":\"997dc440-1b1c-11e7-b09e-037021c4f8df\",\"bar_color\":\"rgba(254,146,0,1)\",\"opperator\":\"gte\"},{\"value\":0.85,\"id\":\"a10d7f20-1b1c-11e7-b09e-037021c4f8df\",\"bar_color\":\"rgba(211,49,21,1)\",\"opperator\":\"gte\"}],\"drilldown_url\":\"../app/kibana#/dashboard/79ffd6e0-faa0-11e6-947f-177f697178b8?_a=(query:(query_string:(analyze_wildcard:!t,query:'beat.name:\\\"{{key}}\\\"')))\",\"filter\":\"\",\"show_grid\":1},\"aggs\":[]}"
+      },
+      "id": "855899e0-1b1c-11e7-b09e-037021c4f8df",
+      "type": "visualization",
+      "version": 2
+    },
+    {
+      "attributes": {
+        "description": "",
+        "kibanaSavedObjectMeta": {
+          "searchSourceJSON": "{\"index\":\"metricbeat-*\",\"query\":{\"query\":{\"query_string\":{\"query\":\"*\",\"analyze_wildcard\":true,\"default_field\":\"*\"}},\"language\":\"lucene\"},\"filter\":[]}"
+        },
+        "title": "Hosts histogram by CPU usage [Metricbeat System]",
+        "uiStateJSON": "{\"vis\":{\"defaultColors\":{\"0% - 5%\":\"rgb(247,252,245)\",\"5% - 10%\":\"rgb(199,233,192)\",\"10% - 15%\":\"rgb(116,196,118)\",\"15% - 20%\":\"rgb(35,139,69)\"}}}",
+        "version": 1,
+        "visState": "{\"title\":\"Hosts histogram by CPU usage [Metricbeat System]\",\"type\":\"heatmap\",\"params\":{\"addTooltip\":true,\"addLegend\":true,\"enableHover\":false,\"legendPosition\":\"right\",\"times\":[],\"colorsNumber\":4,\"colorSchema\":\"Greens\",\"setColorRange\":false,\"colorsRange\":[],\"invertColors\":false,\"percentageMode\":false,\"valueAxes\":[{\"show\":false,\"id\":\"ValueAxis-1\",\"type\":\"value\",\"scale\":{\"type\":\"linear\",\"defaultYExtents\":false},\"labels\":{\"show\":false,\"rotate\":0,\"color\":\"#555\"}}],\"type\":\"heatmap\"},\"aggs\":[{\"id\":\"1\",\"enabled\":true,\"type\":\"avg\",\"schema\":\"metric\",\"params\":{\"field\":\"system.cpu.user.pct\",\"customLabel\":\"CPU usage\"}},{\"id\":\"2\",\"enabled\":true,\"type\":\"date_histogram\",\"schema\":\"segment\",\"params\":{\"field\":\"@timestamp\",\"interval\":\"auto\",\"customInterval\":\"2h\",\"min_doc_count\":1,\"extended_bounds\":{}}},{\"id\":\"3\",\"enabled\":true,\"type\":\"terms\",\"schema\":\"group\",\"params\":{\"field\":\"beat.name\",\"size\":20,\"order\":\"desc\",\"orderBy\":\"1\",\"customLabel\":\"Hosts\"}}]}"
+      },
+      "id": "7cdb1330-4d1a-11e7-a196-69b9a7a020a9",
+      "type": "visualization",
+      "version": 1
+    },
+    {
+      "attributes": {
+        "description": "",
+        "kibanaSavedObjectMeta": {
+          "searchSourceJSON": "{\"query\":{\"query\":{\"query_string\":{\"query\":\"*\"}},\"language\":\"lucene\"},\"filter\":[]}"
+        },
+        "title": "Inbound Traffic [Metricbeat System]",
+        "uiStateJSON": "{}",
+        "version": 1,
+        "visState": "{\"title\":\"Inbound Traffic [Metricbeat System]\",\"type\":\"metrics\",\"params\":{\"axis_formatter\":\"number\",\"axis_position\":\"left\",\"background_color_rules\":[{\"id\":\"0e346760-1b92-11e7-bec4-a5e9ec5cab8b\"}],\"filter\":\"-system.network.name:l*\",\"id\":\"0c761590-1b92-11e7-bec4-a5e9ec5cab8b\",\"index_pattern\":\"metricbeat-*\",\"interval\":\"auto\",\"series\":[{\"axis_position\":\"right\",\"chart_type\":\"line\",\"color\":\"#68BC00\",\"fill\":0.5,\"formatter\":\"bytes\",\"id\":\"0c761591-1b92-11e7-bec4-a5e9ec5cab8b\",\"label\":\"Inbound Traffic\",\"line_width\":1,\"metrics\":[{\"field\":\"system.network.in.bytes\",\"id\":\"0c761592-1b92-11e7-bec4-a5e9ec5cab8b\",\"type\":\"max\"},{\"field\":\"0c761592-1b92-11e7-bec4-a5e9ec5cab8b\",\"id\":\"1d659060-1b92-11e7-bec4-a5e9ec5cab8b\",\"type\":\"derivative\",\"unit\":\"1s\"},{\"field\":\"1d659060-1b92-11e7-bec4-a5e9ec5cab8b\",\"id\":\"f2074f70-1b92-11e7-a416-41f5ccdba2e6\",\"type\":\"positive_only\",\"unit\":\"\"},{\"id\":\"c40e18f0-2c55-11e7-a0ad-277ce466684d\",\"type\":\"series_agg\",\"function\":\"sum\"}],\"point_size\":1,\"seperate_axis\":0,\"split_mode\":\"terms\",\"stacked\":\"none\",\"value_template\":\"{{value}}/s\",\"terms_field\":\"system.network.name\"},{\"axis_position\":\"right\",\"chart_type\":\"line\",\"color\":\"#68BC00\",\"fill\":0.5,\"formatter\":\"bytes\",\"id\":\"37f70440-1b92-11e7-bec4-a5e9ec5cab8b\",\"label\":\"Total Transferred\",\"line_width\":1,\"metrics\":[{\"field\":\"system.network.in.bytes\",\"id\":\"37f72b50-1b92-11e7-bec4-a5e9ec5cab8b\",\"type\":\"max\"},{\"field\":\"37f72b50-1b92-11e7-bec4-a5e9ec5cab8b\",\"id\":\"37f72b51-1b92-11e7-bec4-a5e9ec5cab8b\",\"type\":\"derivative\",\"unit\":\"\"},{\"unit\":\"\",\"id\":\"f9da2dd0-1b92-11e7-a416-41f5ccdba2e6\",\"type\":\"positive_only\",\"field\":\"37f72b51-1b92-11e7-bec4-a5e9ec5cab8b\"},{\"sigma\":\"\",\"field\":\"f9da2dd0-1b92-11e7-a416-41f5ccdba2e6\",\"id\":\"3e63c2f0-1b92-11e7-bec4-a5e9ec5cab8b\",\"type\":\"series_agg\",\"function\":\"overall_sum\"}],\"point_size\":1,\"seperate_axis\":0,\"split_mode\":\"terms\",\"stacked\":\"none\",\"value_template\":\"{{value}}\",\"terms_field\":\"system.network.name\"}],\"show_legend\":1,\"time_field\":\"@timestamp\",\"type\":\"metric\",\"show_grid\":1},\"aggs\":[]}"
+      },
+      "id": "522ee670-1b92-11e7-bec4-a5e9ec5cab8b",
+      "type": "visualization",
+      "version": 2
+    },
+    {
+      "attributes": {
+        "description": "",
+        "kibanaSavedObjectMeta": {
+          "searchSourceJSON": "{\"query\":{\"query\":{\"query_string\":{\"query\":\"*\"}},\"language\":\"lucene\"},\"filter\":[]}"
+        },
+        "title": "Outbound Traffic [Metricbeat System]",
+        "uiStateJSON": "{}",
+        "version": 1,
+        "visState": "{\"title\":\"Outbound Traffic [Metricbeat System]\",\"type\":\"metrics\",\"params\":{\"axis_formatter\":\"number\",\"axis_position\":\"left\",\"background_color_rules\":[{\"id\":\"0e346760-1b92-11e7-bec4-a5e9ec5cab8b\"}],\"filter\":\"-system.network.name:l*\",\"id\":\"0c761590-1b92-11e7-bec4-a5e9ec5cab8b\",\"index_pattern\":\"metricbeat-*\",\"interval\":\"auto\",\"series\":[{\"axis_position\":\"right\",\"chart_type\":\"line\",\"color\":\"#68BC00\",\"fill\":0.5,\"formatter\":\"bytes\",\"id\":\"0c761591-1b92-11e7-bec4-a5e9ec5cab8b\",\"label\":\"Outbound Traffic\",\"line_width\":1,\"metrics\":[{\"field\":\"system.network.out.bytes\",\"id\":\"0c761592-1b92-11e7-bec4-a5e9ec5cab8b\",\"type\":\"max\"},{\"field\":\"0c761592-1b92-11e7-bec4-a5e9ec5cab8b\",\"id\":\"1d659060-1b92-11e7-bec4-a5e9ec5cab8b\",\"type\":\"derivative\",\"unit\":\"1s\"},{\"field\":\"1d659060-1b92-11e7-bec4-a5e9ec5cab8b\",\"id\":\"f2074f70-1b92-11e7-a416-41f5ccdba2e6\",\"type\":\"positive_only\",\"unit\":\"\"},{\"id\":\"a1737470-2c55-11e7-a0ad-277ce466684d\",\"type\":\"series_agg\",\"function\":\"sum\"}],\"point_size\":1,\"seperate_axis\":0,\"split_mode\":\"terms\",\"stacked\":\"none\",\"value_template\":\"{{value}}/s\",\"terms_field\":\"system.network.name\"},{\"axis_position\":\"right\",\"chart_type\":\"line\",\"color\":\"#68BC00\",\"fill\":0.5,\"formatter\":\"bytes\",\"id\":\"37f70440-1b92-11e7-bec4-a5e9ec5cab8b\",\"label\":\"Total Transferred\",\"line_width\":1,\"metrics\":[{\"field\":\"system.network.out.bytes\",\"id\":\"37f72b50-1b92-11e7-bec4-a5e9ec5cab8b\",\"type\":\"max\"},{\"field\":\"37f72b50-1b92-11e7-bec4-a5e9ec5cab8b\",\"id\":\"37f72b51-1b92-11e7-bec4-a5e9ec5cab8b\",\"type\":\"derivative\",\"unit\":\"\"},{\"unit\":\"\",\"id\":\"f9da2dd0-1b92-11e7-a416-41f5ccdba2e6\",\"type\":\"positive_only\",\"field\":\"37f72b51-1b92-11e7-bec4-a5e9ec5cab8b\"},{\"sigma\":\"\",\"field\":\"f9da2dd0-1b92-11e7-a416-41f5ccdba2e6\",\"id\":\"3e63c2f0-1b92-11e7-bec4-a5e9ec5cab8b\",\"type\":\"series_agg\",\"function\":\"overall_sum\"}],\"point_size\":1,\"seperate_axis\":0,\"split_mode\":\"terms\",\"stacked\":\"none\",\"value_template\":\"{{value}}\",\"terms_field\":\"system.network.name\"}],\"show_legend\":1,\"time_field\":\"@timestamp\",\"type\":\"metric\",\"show_grid\":1},\"aggs\":[]}"
+      },
+      "id": "1aae9140-1b93-11e7-8ada-3df93aab833e",
+      "type": "visualization",
+      "version": 2
+    },
+    {
+      "attributes": {
+        "description": "",
+        "kibanaSavedObjectMeta": {
+          "searchSourceJSON": "{\"query\":{\"query\":{\"query_string\":{\"query\":\"*\"}},\"language\":\"lucene\"},\"filter\":[]}"
+        },
+        "title": "Disk used [Metricbeat System]",
+        "uiStateJSON": "{}",
+        "version": 1,
+        "visState": "{\"title\":\"Disk used [Metricbeat System]\",\"type\":\"metrics\",\"params\":{\"id\":\"4e4dc780-4d1d-11e7-b5f2-2b7c1895bf32\",\"type\":\"gauge\",\"series\":[{\"id\":\"4e4dee90-4d1d-11e7-b5f2-2b7c1895bf32\",\"color\":\"#68BC00\",\"split_mode\":\"everything\",\"metrics\":[{\"id\":\"4e4dee91-4d1d-11e7-b5f2-2b7c1895bf32\",\"type\":\"avg\",\"field\":\"system.fsstat.total_size.used\"},{\"id\":\"57c96ee0-4d54-11e7-b5f2-2b7c1895bf32\",\"type\":\"avg\",\"field\":\"system.fsstat.total_size.total\"},{\"script\":\"params.total != null \u0026\u0026 params.total \u003e 0 ? params.used/params.total : null\",\"id\":\"6304cca0-4d54-11e7-b5f2-2b7c1895bf32\",\"type\":\"calculation\",\"variables\":[{\"id\":\"6da10430-4d54-11e7-b5f2-2b7c1895bf32\",\"field\":\"4e4dee91-4d1d-11e7-b5f2-2b7c1895bf32\",\"name\":\"used\"},{\"id\":\"73b8c510-4d54-11e7-b5f2-2b7c1895bf32\",\"name\":\"total\",\"field\":\"57c96ee0-4d54-11e7-b5f2-2b7c1895bf32\"}]}],\"seperate_axis\":0,\"axis_position\":\"right\",\"formatter\":\"percent\",\"chart_type\":\"line\",\"line_width\":1,\"point_size\":1,\"fill\":0.5,\"stacked\":\"none\",\"label\":\"Disk used\"}],\"time_field\":\"@timestamp\",\"index_pattern\":\"metricbeat-*\",\"interval\":\"auto\",\"axis_position\":\"left\",\"axis_formatter\":\"number\",\"show_legend\":1,\"gauge_color_rules\":[{\"value\":0,\"id\":\"51921d10-4d1d-11e7-b5f2-2b7c1895bf32\",\"gauge\":\"rgba(104,188,0,1)\",\"opperator\":\"gte\"},{\"value\":0.7,\"id\":\"f26de750-4d54-11e7-b5f2-2b7c1895bf32\",\"gauge\":\"rgba(251,158,0,1)\",\"opperator\":\"gte\"},{\"value\":0.85,\"id\":\"fa31d190-4d54-11e7-b5f2-2b7c1895bf32\",\"gauge\":\"rgba(211,49,21,1)\",\"opperator\":\"gte\"}],\"gauge_width\":10,\"gauge_inner_width\":10,\"gauge_style\":\"half\",\"gauge_max\":\"1\",\"filter\":\"\",\"show_grid\":1},\"aggs\":[]}"
+      },
+      "id": "825fdb80-4d1d-11e7-b5f2-2b7c1895bf32",
+      "type": "visualization",
+      "version": 2
+    },
+    {
+      "attributes": {
+        "description": "",
+        "kibanaSavedObjectMeta": {
+          "searchSourceJSON": "{\"query\":{\"query\":{\"query_string\":{\"query\":\"*\"}},\"language\":\"lucene\"},\"filter\":[]}"
+        },
+        "title": "Memory Usage Gauge [Metricbeat System]",
+        "uiStateJSON": "{}",
+        "version": 1,
+        "visState": "{\"title\":\"Memory Usage Gauge [Metricbeat System]\",\"type\":\"metrics\",\"params\":{\"id\":\"9f51b730-1b91-11e7-bec4-a5e9ec5cab8b\",\"type\":\"gauge\",\"series\":[{\"id\":\"9f51b731-1b91-11e7-bec4-a5e9ec5cab8b\",\"color\":\"#68BC00\",\"split_mode\":\"everything\",\"metrics\":[{\"id\":\"9f51b732-1b91-11e7-bec4-a5e9ec5cab8b\",\"type\":\"avg\",\"field\":\"system.memory.actual.used.pct\"}],\"seperate_axis\":0,\"axis_position\":\"right\",\"formatter\":\"percent\",\"chart_type\":\"line\",\"line_width\":1,\"point_size\":1,\"fill\":0.5,\"stacked\":\"none\",\"label\":\"Memory Usage\"}],\"time_field\":\"@timestamp\",\"index_pattern\":\"metricbeat-*\",\"interval\":\"auto\",\"axis_position\":\"left\",\"axis_formatter\":\"number\",\"show_legend\":1,\"gauge_color_rules\":[{\"value\":0,\"id\":\"a0d522e0-1b91-11e7-bec4-a5e9ec5cab8b\",\"gauge\":\"rgba(104,188,0,1)\",\"opperator\":\"gte\"},{\"value\":0.7,\"id\":\"b45ad8f0-1b91-11e7-bec4-a5e9ec5cab8b\",\"gauge\":\"rgba(254,146,0,1)\",\"opperator\":\"gte\"},{\"value\":0.85,\"id\":\"c06e9550-1b91-11e7-bec4-a5e9ec5cab8b\",\"gauge\":\"rgba(211,49,21,1)\",\"opperator\":\"gte\"}],\"gauge_width\":10,\"gauge_inner_width\":10,\"gauge_style\":\"half\",\"gauge_max\":\"1\",\"filter\":\"\",\"show_grid\":1},\"aggs\":[]}"
+      },
+      "id": "d3166e80-1b91-11e7-bec4-a5e9ec5cab8b",
+      "type": "visualization",
+      "version": 2
+    },
+    {
+      "attributes": {
+        "description": "",
+        "kibanaSavedObjectMeta": {
+          "searchSourceJSON": "{\"query\":{\"query\":{\"query_string\":{\"query\":\"*\"}},\"language\":\"lucene\"},\"filter\":[]}"
+        },
+        "title": "CPU Usage Gauge [Metricbeat System]",
+        "uiStateJSON": "{}",
+        "version": 1,
+        "visState": "{\"title\":\"CPU Usage Gauge [Metricbeat System]\",\"type\":\"metrics\",\"params\":{\"axis_formatter\":\"number\",\"axis_position\":\"left\",\"filter\":\"\",\"gauge_color_rules\":[{\"gauge\":\"rgba(104,188,0,1)\",\"id\":\"4ef2c3b0-1b91-11e7-bec4-a5e9ec5cab8b\",\"opperator\":\"gte\",\"value\":0},{\"gauge\":\"rgba(254,146,0,1)\",\"id\":\"e6561ae0-1b91-11e7-bec4-a5e9ec5cab8b\",\"opperator\":\"gte\",\"value\":0.7},{\"gauge\":\"rgba(211,49,21,1)\",\"id\":\"ec655040-1b91-11e7-bec4-a5e9ec5cab8b\",\"opperator\":\"gte\",\"value\":0.85}],\"gauge_inner_width\":10,\"gauge_max\":\"1\",\"gauge_style\":\"half\",\"gauge_width\":10,\"id\":\"4c9e2550-1b91-11e7-bec4-a5e9ec5cab8b\",\"index_pattern\":\"metricbeat-*\",\"interval\":\"auto\",\"series\":[{\"axis_position\":\"right\",\"chart_type\":\"line\",\"color\":\"#68BC00\",\"fill\":0.5,\"formatter\":\"percent\",\"id\":\"4c9e2551-1b91-11e7-bec4-a5e9ec5cab8b\",\"label\":\"CPU Usage\",\"line_width\":1,\"metrics\":[{\"field\":\"system.cpu.user.pct\",\"id\":\"4c9e2552-1b91-11e7-bec4-a5e9ec5cab8b\",\"type\":\"avg\"},{\"field\":\"system.cpu.system.pct\",\"id\":\"225c2140-5fd7-11e7-a63a-a937b7c1a7e1\",\"type\":\"avg\"},{\"field\":\"system.cpu.cores\",\"id\":\"837a30c0-5fd7-11e7-a63a-a937b7c1a7e1\",\"type\":\"avg\"},{\"script\":\"params.n \u003e 0 ? (params.user+params.system)/params.n : null\",\"id\":\"587aa510-1b91-11e7-bec4-a5e9ec5cab8b\",\"type\":\"calculation\",\"variables\":[{\"field\":\"4c9e2552-1b91-11e7-bec4-a5e9ec5cab8b\",\"id\":\"5a19af10-1b91-11e7-bec4-a5e9ec5cab8b\",\"name\":\"user\"},{\"field\":\"225c2140-5fd7-11e7-a63a-a937b7c1a7e1\",\"id\":\"32b54f80-5fd7-11e7-a63a-a937b7c1a7e1\",\"name\":\"system\"},{\"field\":\"837a30c0-5fd7-11e7-a63a-a937b7c1a7e1\",\"id\":\"8ba6eef0-5fd7-11e7-a63a-a937b7c1a7e1\",\"name\":\"n\"}]}],\"point_size\":1,\"seperate_axis\":0,\"split_mode\":\"everything\",\"stacked\":\"none\"}],\"show_legend\":1,\"time_field\":\"@timestamp\",\"type\":\"gauge\",\"show_grid\":1},\"aggs\":[]}"
+      },
+      "id": "83e12df0-1b91-11e7-bec4-a5e9ec5cab8b",
+      "type": "visualization",
+      "version": 2
+    },
+    {
+      "attributes": {
+        "description": "",
+        "hits": 0,
+        "kibanaSavedObjectMeta": {
+          "searchSourceJSON": "{\"filter\":[],\"highlightAll\":true,\"version\":true,\"query\":{\"language\":\"lucene\",\"query\":{\"query_string\":{\"analyze_wildcard\":true,\"default_field\":\"*\",\"query\":\"*\"}}}}"
+        },
+        "optionsJSON": "{\"darkTheme\":false}",
+        "panelsJSON": "[{\"col\":1,\"id\":\"System-Navigation\",\"panelIndex\":9,\"row\":1,\"size_x\":12,\"size_y\":1,\"type\":\"visualization\"},{\"col\":1,\"id\":\"c6f2ffd0-4d17-11e7-a196-69b9a7a020a9\",\"panelIndex\":11,\"row\":2,\"size_x\":2,\"size_y\":2,\"type\":\"visualization\"},{\"col\":7,\"id\":\"fe064790-1b1f-11e7-bec4-a5e9ec5cab8b\",\"panelIndex\":12,\"row\":4,\"size_x\":6,\"size_y\":5,\"type\":\"visualization\"},{\"col\":1,\"id\":\"855899e0-1b1c-11e7-b09e-037021c4f8df\",\"panelIndex\":13,\"row\":4,\"size_x\":6,\"size_y\":5,\"type\":\"visualization\"},{\"col\":1,\"id\":\"7cdb1330-4d1a-11e7-a196-69b9a7a020a9\",\"panelIndex\":14,\"row\":9,\"size_x\":12,\"size_y\":6,\"type\":\"visualization\"},{\"col\":9,\"id\":\"522ee670-1b92-11e7-bec4-a5e9ec5cab8b\",\"panelIndex\":16,\"row\":2,\"size_x\":2,\"size_y\":2,\"type\":\"visualization\"},{\"col\":11,\"id\":\"1aae9140-1b93-11e7-8ada-3df93aab833e\",\"panelIndex\":17,\"row\":2,\"size_x\":2,\"size_y\":2,\"type\":\"visualization\"},{\"col\":7,\"id\":\"825fdb80-4d1d-11e7-b5f2-2b7c1895bf32\",\"panelIndex\":18,\"row\":2,\"size_x\":2,\"size_y\":2,\"type\":\"visualization\"},{\"col\":5,\"id\":\"d3166e80-1b91-11e7-bec4-a5e9ec5cab8b\",\"panelIndex\":19,\"row\":2,\"size_x\":2,\"size_y\":2,\"type\":\"visualization\"},{\"col\":3,\"id\":\"83e12df0-1b91-11e7-bec4-a5e9ec5cab8b\",\"panelIndex\":20,\"row\":2,\"size_x\":2,\"size_y\":2,\"type\":\"visualization\"}]",
+        "timeRestore": false,
+        "title": "[Metricbeat System] Overview",
+        "uiStateJSON": "{\"P-11\":{\"vis\":{\"defaultColors\":{\"0 - 100\":\"rgb(0,104,55)\"}}},\"P-12\":{\"vis\":{\"defaultColors\":{\"0 - 100\":\"rgb(0,104,55)\"}}},\"P-14\":{\"vis\":{\"defaultColors\":{\"0% - 15%\":\"rgb(247,252,245)\",\"15% - 30%\":\"rgb(199,233,192)\",\"30% - 45%\":\"rgb(116,196,118)\",\"45% - 60%\":\"rgb(35,139,69)\"}}},\"P-16\":{\"vis\":{\"defaultColors\":{\"0 - 100\":\"rgb(0,104,55)\"}}},\"P-2\":{\"vis\":{\"defaultColors\":{\"0 - 100\":\"rgb(0,104,55)\"}}},\"P-3\":{\"vis\":{\"defaultColors\":{\"0 - 100\":\"rgb(0,104,55)\"}}}}",
+        "version": 1
+      },
+      "id": "Metricbeat-system-overview",
+      "type": "dashboard",
+      "version": 2
+    }
+  ],
+  "version": "6.0.0-rc1-SNAPSHOT"
+}

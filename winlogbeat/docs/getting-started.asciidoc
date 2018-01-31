@@ -148,7 +148,9 @@ include::../../libbeat/docs/dashboards.asciidoc[]
 [[winlogbeat-starting]]
 === Step 6: Start Winlogbeat
 
-Start the Winlogbeat service with the following command:
+Start the Winlogbeat service with the following command. If you are accessing a
+secured Elasticsearch cluster, make sure you've configured credentials as
+described in <<{beatname_lc}-configuration>>.
 
 [source,shell]
 ----------------------------------------------------------------------
@@ -166,12 +168,6 @@ this command:
 ----------------------------------------------------------------------
 PS C:\Program Files\Winlogbeat> services.msc
 ----------------------------------------------------------------------
-
-[id="{beatname_lc}-passing-credentials"]
-==== Pass credentials
-
-:start-type: start
-include::../../libbeat/docs/shared-passing-credentials-setup.asciidoc[]
 
 
 ==== Stop Winlogbeat

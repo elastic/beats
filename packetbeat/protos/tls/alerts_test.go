@@ -13,9 +13,7 @@ import (
 )
 
 func getParser() *parser {
-	if testing.Verbose() {
-		logp.LogInit(logp.LOG_DEBUG, "", false, true, []string{"tls", "tlsdetailed"})
-	}
+	logp.TestingSetup(logp.WithSelectors("tls", "tlsdetailed"))
 	return &parser{}
 }
 

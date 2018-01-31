@@ -1,6 +1,7 @@
 package kafka
 
 import (
+	"errors"
 	"fmt"
 	"sync"
 	"sync/atomic"
@@ -38,6 +39,10 @@ type msgRef struct {
 
 	err error
 }
+
+var (
+	errNoTopicsSelected = errors.New("no topic could be selected")
+)
 
 func newKafkaClient(
 	observer outputs.Observer,
@@ -139,6 +144,9 @@ func (c *client) getEventMessage(data *publisher.Event) (*message, error) {
 		topic, err := c.topic.Select(event)
 		if err != nil {
 			return nil, fmt.Errorf("setting kafka topic failed with %v", err)
+		}
+		if topic == "" {
+			return nil, errNoTopicsSelected
 		}
 		msg.topic = topic
 		if event.Meta == nil {

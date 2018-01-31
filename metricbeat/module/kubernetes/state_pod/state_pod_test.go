@@ -54,7 +54,7 @@ func TestEventMapping(t *testing.T) {
 		"host_ip": "192.168.99.100",
 		"ip":      "172.17.0.4",
 
-		"status.phase":     "running",
+		"status.phase":     "succeeded",
 		"status.ready":     "false",
 		"status.scheduled": "true",
 	}

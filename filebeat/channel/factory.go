@@ -24,15 +24,15 @@ type clientEventer struct {
 	wgEvents eventCounter
 }
 
-// prospectorOutletConfig defines common prospector settings
+// inputOutletConfig defines common input settings
 // for the publisher pipline.
-type prospectorOutletConfig struct {
+type inputOutletConfig struct {
 	// event processing
 	common.EventMetadata `config:",inline"`      // Fields and tags to add to events.
 	Processors           processors.PluginConfig `config:"processors"`
 
 	// implicit event fields
-	Type string `config:"type"` // prospector.type
+	Type string `config:"type"` // input.type
 
 	// hidden filebeat modules settings
 	Module  string `config:"_module_name"`  // hidden setting
@@ -44,7 +44,7 @@ type prospectorOutletConfig struct {
 }
 
 // NewOutletFactory creates a new outlet factory for
-// connecting a prospector to the publisher pipeline.
+// connecting an input to the publisher pipeline.
 func NewOutletFactory(
 	done <-chan struct{},
 	pipeline beat.Pipeline,
@@ -63,12 +63,12 @@ func NewOutletFactory(
 	return o
 }
 
-// Create builds a new Outleter, while applying common prospector settings.
-// Prospectors and all harvesters use the same pipeline client instance.
+// Create builds a new Outleter, while applying common input settings.
+// Inputs and all harvesters use the same pipeline client instance.
 // This guarantees ordering between events as required by the registrar for
 // file.State updates
 func (f *OutletFactory) Create(cfg *common.Config, dynFields *common.MapStrPointer) (Outleter, error) {
-	config := prospectorOutletConfig{}
+	config := inputOutletConfig{}
 	if err := cfg.Unpack(&config); err != nil {
 		return nil, err
 	}
@@ -97,6 +97,9 @@ func (f *OutletFactory) Create(cfg *common.Config, dynFields *common.MapStrPoint
 	}
 	if config.Type != "" {
 		fields["prospector"] = common.MapStr{
+			"type": config.Type,
+		}
+		fields["input"] = common.MapStr{
 			"type": config.Type,
 		}
 	}

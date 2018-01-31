@@ -10,41 +10,56 @@ import (
 	"github.com/golang/protobuf/proto"
 )
 
-type codec struct {
-	contentType string
-	marshal     func(interface{}) ([]byte, error)
-	unmarshal   func([]byte, interface{}) error
+const (
+	contentTypePB   = "application/vnd.kubernetes.protobuf"
+	contentTypeJSON = "application/json"
+)
+
+func contentTypeFor(i interface{}) string {
+	if _, ok := i.(proto.Message); ok {
+		return contentTypePB
+	}
+	return contentTypeJSON
 }
 
-var (
-	// Kubernetes implements its own custom protobuf format to allow clients (and possibly
-	// servers) to use either JSON or protocol buffers. The protocol introduces a custom content
-	// type and magic bytes to signal the use of protobufs, and wraps each object with API group,
-	// version and resource data.
-	//
-	// The protocol spec which this client implements can be found here:
-	//
-	//   https://github.com/kubernetes/kubernetes/blob/master/docs/proposals/protobuf.md
-	//
-	pbCodec = &codec{
-		contentType: "application/vnd.kubernetes.protobuf",
-		marshal:     marshalPB,
-		unmarshal:   unmarshalPB,
+// marshal encodes an object and returns the content type of that resource
+// and the marshaled representation.
+//
+// marshal prefers protobuf encoding, but falls back to JSON.
+func marshal(i interface{}) (string, []byte, error) {
+	if _, ok := i.(proto.Message); ok {
+		data, err := marshalPB(i)
+		return contentTypePB, data, err
 	}
-	jsonCodec = &codec{
-		contentType: "application/json",
-		marshal:     json.Marshal,
-		unmarshal:   json.Unmarshal,
+	data, err := json.Marshal(i)
+	return contentTypeJSON, data, err
+}
+
+// unmarshal decoded an object given the content type of the encoded form.
+func unmarshal(data []byte, contentType string, i interface{}) error {
+	msg, isPBMsg := i.(proto.Message)
+	if contentType == contentTypePB && isPBMsg {
+		if err := unmarshalPB(data, msg); err != nil {
+			return fmt.Errorf("decode protobuf: %v", err)
+		}
+		return nil
 	}
-)
+	if isPBMsg {
+		// only decode into JSON of a protobuf message if the type
+		// explicitly implements json.Unmarshaler
+		if _, ok := i.(json.Unmarshaler); !ok {
+			return errors.New("cannot decode json payload into protobuf object")
+		}
+	}
+	if err := json.Unmarshal(data, i); err != nil {
+		return fmt.Errorf("decode json: %v", err)
+	}
+	return nil
+}
 
 var magicBytes = []byte{0x6b, 0x38, 0x73, 0x00}
 
-func unmarshalPB(b []byte, obj interface{}) error {
-	message, ok := obj.(proto.Message)
-	if !ok {
-		return fmt.Errorf("expected obj of type proto.Message, got %T", obj)
-	}
+func unmarshalPB(b []byte, msg proto.Message) error {
 	if len(b) < len(magicBytes) {
 		return errors.New("payload is not a kubernetes protobuf object")
 	}
@@ -56,7 +71,7 @@ func unmarshalPB(b []byte, obj interface{}) error {
 	if err := u.Unmarshal(b[len(magicBytes):]); err != nil {
 		return fmt.Errorf("unmarshal unknown: %v", err)
 	}
-	return proto.Unmarshal(u.Raw, message)
+	return proto.Unmarshal(u.Raw, msg)
 }
 
 func marshalPB(obj interface{}) ([]byte, error) {

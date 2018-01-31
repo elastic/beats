@@ -1,0 +1,9 @@
+dashboards:
+- id:   c0ac2c00-c1c0-11e7-8995-936807a28b16
+  file: auditbeat-kernel-overview.json
+
+- id:   7de391b0-c1ca-11e7-8995-936807a28b16
+  file: auditbeat-kernel-executions.json
+
+- id:   693a5f40-c243-11e7-8692-232bd1143e8a
+  file: auditbeat-kernel-sockets.json

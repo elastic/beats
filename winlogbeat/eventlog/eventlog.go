@@ -38,10 +38,10 @@ var (
 
 // EventLog is an interface to a Windows Event Log.
 type EventLog interface {
-	// Open the event log. recordNumber is the last successfully read event log
-	// record number. Read will resume from recordNumber + 1. To start reading
-	// from the first event specify a recordNumber of 0.
-	Open(recordNumber uint64) error
+	// Open the event log. state points to the last successfully read event
+	// in this event log. Read will resume from the next record. To start reading
+	// from the first event specify a zero-valued EventLogState.
+	Open(state checkpoint.EventLogState) error
 
 	// Read records from the event log.
 	Read() ([]Record, error)
@@ -56,8 +56,9 @@ type EventLog interface {
 // Record represents a single event from the log.
 type Record struct {
 	sys.Event
-	API string // The event log API type used to read the record.
-	XML string // XML representation of the event.
+	API    string                   // The event log API type used to read the record.
+	XML    string                   // XML representation of the event.
+	Offset checkpoint.EventLogState // Position of the record within its source stream.
 }
 
 // ToMapStr returns a new MapStr containing the data from this Record.
@@ -112,11 +113,7 @@ func (e Record) ToEvent() beat.Event {
 	return beat.Event{
 		Timestamp: e.TimeCreated.SystemTime,
 		Fields:    m,
-		Private: checkpoint.EventLogState{
-			Name:         e.API,
-			RecordNumber: e.RecordID,
-			Timestamp:    e.TimeCreated.SystemTime,
-		},
+		Private:   e.Offset,
 	}
 }
 

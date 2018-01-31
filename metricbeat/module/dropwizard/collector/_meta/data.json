@@ -1,19 +1,51 @@
 {
-    "@timestamp": "2017-04-16T06:42:37.441Z",
+    "@timestamp": "2017-10-12T08:05:34.853Z",
     "beat": {
-        "hostname": "beathost",
-        "name": "beathost",
-        "version": "6.0.0-alpha1"
+        "hostname": "host.example.com",
+        "name": "host.example.com"
     },
     "dropwizard": {
-        "test": {}
+        "testnamespace": {
+            "my_gauge": {},
+            "my_histogram": {
+                "count": 0,
+                "max": 0,
+                "mean": 0,
+                "min": 0,
+                "p50": 0,
+                "p75": 0,
+                "p95": 0,
+                "p98": 0,
+                "p99": 0,
+                "p999": 0,
+                "stddev": 0
+            },
+            "my_timer": {
+                "count": 0,
+                "duration_units": "seconds",
+                "m15_rate": 0,
+                "m1_rate": 0,
+                "m5_rate": 0,
+                "max": 0,
+                "mean": 0,
+                "mean_rate": 0,
+                "min": 0,
+                "p50": 0,
+                "p75": 0,
+                "p95": 0,
+                "p98": 0,
+                "p99": 0,
+                "p999": 0,
+                "rate_units": "calls/second",
+                "stddev": 0
+            }
+        }
     },
     "metricset": {
-        "host": "localhost:8080",
+        "host": "dropwizard:8080",
         "module": "dropwizard",
         "name": "collector",
-        "namespace": "test",
-        "rtt": 8008
-    },
-    "type": "metricsets"
+        "namespace": "testnamespace",
+        "rtt": 115
+    }
 }

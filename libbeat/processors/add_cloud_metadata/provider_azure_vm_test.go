@@ -38,9 +38,7 @@ func initAzureTestServer() *httptest.Server {
 }
 
 func TestRetrieveAzureMetadata(t *testing.T) {
-	if testing.Verbose() {
-		logp.LogInit(logp.LOG_DEBUG, "", false, true, []string{"*"})
-	}
+	logp.TestingSetup()
 
 	server := initAzureTestServer()
 	defer server.Close()

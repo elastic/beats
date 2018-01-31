@@ -8,6 +8,8 @@ import (
 	"github.com/docker/docker/api/types/events"
 	"github.com/stretchr/testify/assert"
 	"golang.org/x/net/context"
+
+	"github.com/elastic/beats/libbeat/logp"
 )
 
 type MockClient struct {
@@ -66,7 +68,7 @@ func TestWatcherInitialization(t *testing.T) {
 		},
 		nil)
 
-	assert.Equal(t, watcher.Containers(), map[string]*Container{
+	assert.Equal(t, map[string]*Container{
 		"0332dbd79e20": &Container{
 			ID:     "0332dbd79e20",
 			Name:   "containername",
@@ -79,7 +81,7 @@ func TestWatcherInitialization(t *testing.T) {
 			Image:  "nginx",
 			Labels: map[string]string{},
 		},
-	})
+	}, watcher.Containers())
 }
 
 func TestWatcherAddEvents(t *testing.T) {
@@ -119,7 +121,7 @@ func TestWatcherAddEvents(t *testing.T) {
 		},
 	)
 
-	assert.Equal(t, watcher.Containers(), map[string]*Container{
+	assert.Equal(t, map[string]*Container{
 		"0332dbd79e20": &Container{
 			ID:     "0332dbd79e20",
 			Name:   "containername",
@@ -132,7 +134,7 @@ func TestWatcherAddEvents(t *testing.T) {
 			Image:  "nginx",
 			Labels: map[string]string{"label": "value"},
 		},
-	})
+	}, watcher.Containers())
 }
 
 func TestWatcherUpdateEvent(t *testing.T) {
@@ -172,15 +174,15 @@ func TestWatcherUpdateEvent(t *testing.T) {
 		},
 	)
 
-	assert.Equal(t, watcher.Containers(), map[string]*Container{
+	assert.Equal(t, map[string]*Container{
 		"0332dbd79e20": &Container{
 			ID:     "0332dbd79e20",
 			Name:   "containername",
 			Image:  "busybox",
 			Labels: map[string]string{"label": "bar"},
 		},
-	})
-	assert.Equal(t, len(watcher.deleted), 0)
+	}, watcher.Containers())
+	assert.Equal(t, 0, len(watcher.deleted))
 }
 
 func TestWatcherDie(t *testing.T) {
@@ -205,27 +207,38 @@ func TestWatcherDie(t *testing.T) {
 			},
 		},
 	)
+	defer watcher.Stop()
 
 	// Check it doesn't get removed while we request meta for the container
 	for i := 0; i < 18; i++ {
 		watcher.Container("0332dbd79e20")
-		assert.Equal(t, len(watcher.Containers()), 1)
+		assert.Equal(t, 1, len(watcher.Containers()))
 		time.Sleep(50 * time.Millisecond)
 	}
 
-	// Now it should get removed
-	time.Sleep(150 * time.Millisecond)
-	assert.Equal(t, len(watcher.Containers()), 0)
+	// Checks a max of 10s for the watcher containers to be updated
+	for i := 0; i < 100; i++ {
+		// Now it should get removed
+		time.Sleep(100 * time.Millisecond)
+
+		if len(watcher.Containers()) == 0 {
+			break
+		}
+	}
+
+	assert.Equal(t, 0, len(watcher.Containers()))
 }
 
 func runWatcher(t *testing.T, kill bool, containers [][]types.Container, events []interface{}) *watcher {
+	logp.TestingSetup()
+
 	client := &MockClient{
 		containers: containers,
 		events:     events,
 		done:       make(chan interface{}),
 	}
 
-	watcher, err := NewWatcherWithClient(client, 100*time.Millisecond)
+	watcher, err := NewWatcherWithClient(client, 200*time.Millisecond)
 	if err != nil {
 		t.Fatal(err)
 	}

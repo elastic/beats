@@ -5,23 +5,11 @@ include::./version.asciidoc[]
 
 include::{asciidoc-dir}/../../shared/attributes.asciidoc[]
 
-:packetbeat: http://www.elastic.co/guide/en/beats/packetbeat/{doc-branch}
-:metricbeat: http://www.elastic.co/guide/en/beats/metricbeat/{doc-branch}
-:filebeat: http://www.elastic.co/guide/en/beats/filebeat/{doc-branch}
-:winlogbeat: http://www.elastic.co/guide/en/beats/winlogbeat/{doc-branch}
-:heartbeat: http://www.elastic.co/guide/en/beats/heartbeat/{doc-branch}
-:beatsdevguide: http://www.elastic.co/guide/en/beats/devguide/{doc-branch}
-:securitydoc: https://www.elastic.co/guide/en/x-pack/5.2
-:logstashdoc: https://www.elastic.co/guide/en/logstash/{doc-branch}
-:elasticsearch: https://www.elastic.co/guide/en/elasticsearch/reference/{doc-branch}
 :beatname_lc: beatname
 :beatname_uc: a Beat
-:security: X-Pack Security
-:ES-version: {stack-version}
-:LS-version: {stack-version}
-:Kibana-version: {stack-version}
-:dashboards: https://artifacts.elastic.co/downloads/beats/beats-dashboards/beats-dashboards-{stack-version}.zip
 :beatname_pkg: {beatname_lc}
+
+include::../../libbeat/docs/shared-beats-attributes.asciidoc[]
 
 include::./overview.asciidoc[]
 
@@ -32,8 +20,6 @@ include::../../libbeat/docs/contributing-to-beats.asciidoc[]
 include::./gettingstarted.asciidoc[]
 
 include::./installing-beats.asciidoc[]
-
-include::./repositories.asciidoc[]
 
 include::./breaking.asciidoc[]
 

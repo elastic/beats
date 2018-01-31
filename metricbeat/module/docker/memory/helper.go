@@ -29,14 +29,15 @@ func (s *MemoryService) getMemoryStatsList(rawStats []docker.Stat) []MemoryData 
 }
 
 func (s *MemoryService) GetMemoryStats(myRawStat docker.Stat) MemoryData {
+	totalRSS := myRawStat.Stats.MemoryStats.Stats["total_rss"]
 	return MemoryData{
 		Time:      common.Time(myRawStat.Stats.Read),
-		Container: docker.NewContainer(&myRawStat.Container),
+		Container: docker.NewContainer(myRawStat.Container),
 		Failcnt:   myRawStat.Stats.MemoryStats.Failcnt,
 		Limit:     myRawStat.Stats.MemoryStats.Limit,
 		MaxUsage:  myRawStat.Stats.MemoryStats.MaxUsage,
-		TotalRss:  myRawStat.Stats.MemoryStats.Stats.TotalRss,
-		TotalRssP: float64(myRawStat.Stats.MemoryStats.Stats.TotalRss) / float64(myRawStat.Stats.MemoryStats.Limit),
+		TotalRss:  totalRSS,
+		TotalRssP: float64(totalRSS) / float64(myRawStat.Stats.MemoryStats.Limit),
 		Usage:     myRawStat.Stats.MemoryStats.Usage,
 		UsageP:    float64(myRawStat.Stats.MemoryStats.Usage) / float64(myRawStat.Stats.MemoryStats.Limit),
 	}

@@ -142,8 +142,12 @@ func main() {
 
 		for _, dashboard := range dashboards {
 			fmt.Printf("id=%s, name=%s\n", dashboard["id"], dashboard["file"])
-			err := Export(client, *kibanaURL, dashboard["id"], path.Join(path.Dir(*ymlFile),
-				"_meta/kibana/default/dashboard", dashboard["file"]))
+			directory := path.Join(path.Dir(*ymlFile), "_meta/kibana/6/dashboard")
+			err := os.MkdirAll(directory, 0755)
+			if err != nil {
+				fmt.Printf("ERROR: fail to create directory %s: %v", directory, err)
+			}
+			err = Export(client, *kibanaURL, dashboard["id"], path.Join(directory, dashboard["file"]))
 			if err != nil {
 				fmt.Printf("ERROR: fail to export the dashboards: %s\n", err)
 			}

@@ -125,6 +125,6 @@ func (c *mockClient) ListGroups() ([]string, error) { return c.listGroups() }
 func (c *mockClient) DescribeGroups(groups []string) (map[string]kafka.GroupDescription, error) {
 	return c.describeGroups(groups)
 }
-func (c *mockClient) FetchGroupOffsets(group string) (*sarama.OffsetFetchResponse, error) {
+func (c *mockClient) FetchGroupOffsets(group string, partitions map[string][]int32) (*sarama.OffsetFetchResponse, error) {
 	return c.fetchGroupOffsets(group)
 }
