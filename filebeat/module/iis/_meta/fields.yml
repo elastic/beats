@@ -1,7 +1,7 @@
 - key: iis
-  title: "iis"
+  title: "IIS"
   description: >
-    iis Module
+    IIS Module
   fields:
     - name: iis
       type: group
