@@ -364,8 +364,8 @@ Apache License 2.0
 
 --------------------------------------------------------------------
 Dependency: github.com/elastic/go-ucfg
-Version: v0.5.0
-Revision: bda09c7b9afc6263a3fd592fcd7063d03f6acf0f
+Version: v0.5.1
+Revision: 0ba28e36add27704e6b49a7ed8557989a8f4a635
 License type (autodetected): Apache-2.0
 ./vendor/github.com/elastic/go-ucfg/LICENSE:
 --------------------------------------------------------------------
