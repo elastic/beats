@@ -1,3 +1,4 @@
+#Software: Microsoft Internet Information Services 10.0
 #Version: 1.0
 #Date: 2018-01-01 08:09:10
 #Fields: date time s-ip cs-method cs-uri-stem cs-uri-query s-port cs-username c-ip cs(User-Agent) cs(Referer) sc-status sc-substatus sc-win32-status time-taken
