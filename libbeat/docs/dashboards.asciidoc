@@ -17,11 +17,8 @@ command (as described here) or
 <<configuration-dashboards,configure dashboard loading>> in the
 +{beatname_lc}.yml+ config file.
 
-NOTE: Starting with {beatname_uc} 6.0.0, the dashboards are loaded via the Kibana API.
-This requires a Kibana endpoint configuration. You should have configured the
-endpoint earlier when you
-<<{beatname_lc}-configuration,configured {beatname_uc}>>. If you didn't,
-configure it now.
+This requires a Kibana endpoint configuration. If you didn't already configure
+a Kibana endpoint, see <<{beatname_lc}-configuration,configured {beatname_uc}>> 
 
 Make sure Kibana is running before you perform this step. If you are accessing a
 secured Kibana instance, make sure you've configured credentials as described in
