@@ -24,12 +24,14 @@ in the `output` section of the +{beatname_lc}.yml+ config file. Only a single
 output may be defined.
 
 The following topics describe how to configure each supported output:
+
 * <<elasticsearch-output>>
 * <<logstash-output>>
 * <<kafka-output>>
 * <<redis-output>>
 * <<file-output>>
 * <<console-output>>
+
 endif::[]
 
 [[elasticsearch-output]]
