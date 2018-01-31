@@ -63,7 +63,7 @@ errors, there will be no log file in the directory specified for logs.
 [[level]]
 ==== `logging.level`
 
-Minimum log level. One of `debug`, `info`, `warning`, or `error`. The default
+Minimum log level. One of `debug`, `info`, `warn`, or `error`. The default
 log level is `info`.
 
 `debug`:: Logs debug messages, including a detailed printout of all events
@@ -76,7 +76,7 @@ for all components.
 `info`:: Logs informational messages, including the number of events that are
 published. Also logs any warnings, errors, or critical errors.
 
-`warning`:: Logs warnings, errors, and critical errors.
+`warn`:: Logs warnings, errors, and critical errors.
 
 `error`:: Logs errors and critical errors.
 
