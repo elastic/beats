@@ -54,6 +54,8 @@ metricbeat.modules:
   hosts: ["localhost:8080"]
 ----
 
+This module supports TLS connection when using `ssl` config field, as described in <<configuration-ssl>>.
+
 [float]
 === Metricsets
 

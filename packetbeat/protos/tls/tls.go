@@ -26,6 +26,7 @@ type tlsConnectionData struct {
 
 	handshakeCompleted int8
 	eventSent          bool
+	startTime, endTime time.Time
 }
 
 // TLS protocol plugin
@@ -103,6 +104,9 @@ func (plugin *tlsPlugin) Parse(
 	defer logp.Recover("ParseTLS exception")
 
 	conn := ensureTLSConnection(private)
+	if private == nil {
+		conn.startTime = pkt.Ts
+	}
 	conn = plugin.doParse(conn, pkt, tcptuple, dir)
 	if conn == nil {
 		return nil
@@ -171,6 +175,7 @@ func (plugin *tlsPlugin) doParse(
 		case resultEncrypted:
 			conn.handshakeCompleted |= 1 << dir
 			if conn.handshakeCompleted == 3 {
+				conn.endTime = pkt.Ts
 				plugin.sendEvent(conn)
 			}
 		}
@@ -237,17 +242,26 @@ func (plugin *tlsPlugin) createEvent(conn *tlsConnectionData) beat.Event {
 		"handshake_completed": conn.handshakeCompleted > 1,
 	}
 
+	fingerprints := common.MapStr{}
 	emptyHello := &helloMessage{}
 	var clientHello, serverHello *helloMessage
 	if client.parser.hello != nil {
 		clientHello = client.parser.hello
 		tls["client_hello"] = clientHello.toMap()
+		hash, str := getJa3Fingerprint(clientHello)
+		ja3 := common.MapStr{
+			"hash": hash,
+			"str":  str,
+		}
+		fingerprints["ja3"] = ja3
 	} else {
 		clientHello = emptyHello
 	}
 	if server.parser.hello != nil {
 		serverHello = server.parser.hello
 		tls["server_hello"] = serverHello.toMap()
+	} else {
+		serverHello = emptyHello
 	}
 	if cert, chain := getCerts(client.parser.certificates, plugin.includeRawCertificates); cert != nil {
 		tls["client_certificate"] = cert
@@ -281,15 +295,20 @@ func (plugin *tlsPlugin) createEvent(conn *tlsConnectionData) beat.Event {
 		}
 	}
 
-	alerts := make([]common.MapStr, 0, len(client.parser.alerts)+len(server.parser.alerts))
+	numAlerts := len(client.parser.alerts) + len(server.parser.alerts)
+	alerts := make([]common.MapStr, 0, numAlerts)
+	alertTypes := make([]string, 0, numAlerts)
 	for _, alert := range client.parser.alerts {
 		alerts = append(alerts, alert.toMap("client"))
+		alertTypes = append(alertTypes, alert.code.String())
 	}
 	for _, alert := range server.parser.alerts {
 		alerts = append(alerts, alert.toMap("server"))
+		alertTypes = append(alertTypes, alert.code.String())
 	}
-	if len(alerts) != 0 {
+	if numAlerts != 0 {
 		tls["alerts"] = alerts
+		tls["alert_types"] = alertTypes
 	}
 
 	src := &common.Endpoint{}
@@ -314,6 +333,9 @@ func (plugin *tlsPlugin) createEvent(conn *tlsConnectionData) beat.Event {
 		dst.Proc = string(server.cmdlineTuple.Src)
 	}
 
+	if len(fingerprints) > 0 {
+		tls["fingerprints"] = fingerprints
+	}
 	fields := common.MapStr{
 		"type":   "tls",
 		"status": status,
@@ -322,10 +344,16 @@ func (plugin *tlsPlugin) createEvent(conn *tlsConnectionData) beat.Event {
 		"dst":    dst,
 	}
 	// set "server" to SNI, if provided
-	if value, ok := clientHello.extensions["server_name_indication"]; ok {
+	if value, ok := clientHello.extensions.Parsed["server_name_indication"]; ok {
 		if list, ok := value.([]string); ok && len(list) > 0 {
 			fields["server"] = list[0]
 		}
+	}
+
+	// set "responsetime" if handshake completed
+	responseTime := int32(conn.endTime.Sub(conn.startTime) / time.Millisecond)
+	if responseTime >= 0 {
+		fields["responsetime"] = responseTime
 	}
 
 	timestamp := time.Now()

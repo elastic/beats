@@ -51,11 +51,9 @@ To specify the same settings at the command line, you use:
 
 ["source","sh",subs="attributes"]
 -----
-./{beatname_lc} -M "apache2.access.var.paths=[/path/to/apache2/access.log*]" -M "apache2.error.var.paths=[/path/to/log/apache2/error.log*]"
+./{beatname_lc} --modules {modulename} -M "apache2.access.var.paths=[/path/to/apache2/access.log*]" -M "apache2.error.var.paths=[/path/to/log/apache2/error.log*]"
 -----
 
-
-The command in the example assumes that you have already enabled the +{modulename}+ module.
 
 //set the fileset name used in the included example
 :fileset_ex: access

@@ -50,11 +50,11 @@ To specify the same settings at the command line, you use:
 
 ["source","sh",subs="attributes"]
 -----
-./{beatname_lc} -M "auditd.log.var.paths=[/path/to/log/audit/audit.log*]"
+./{beatname_lc} --modules {modulename} -M "auditd.log.var.paths=[/path/to/log/audit/audit.log*]"
 -----
 
 
-The command in the example assumes that you have already enabled the +{modulename}+ module. 
+ 
 
 //set the fileset name used in the included example
 :fileset_ex: log

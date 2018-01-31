@@ -9,6 +9,7 @@ import (
 	"math/big"
 	"math/rand"
 	"os"
+	"path/filepath"
 	"runtime"
 	"strings"
 	"time"
@@ -23,9 +24,12 @@ import (
 	"github.com/elastic/beats/libbeat/common/cfgwarn"
 	"github.com/elastic/beats/libbeat/common/file"
 	"github.com/elastic/beats/libbeat/dashboards"
+	"github.com/elastic/beats/libbeat/keystore"
 	"github.com/elastic/beats/libbeat/logp"
+	"github.com/elastic/beats/libbeat/logp/configure"
 	"github.com/elastic/beats/libbeat/monitoring"
 	"github.com/elastic/beats/libbeat/monitoring/report"
+	"github.com/elastic/beats/libbeat/monitoring/report/log"
 	"github.com/elastic/beats/libbeat/outputs/elasticsearch"
 	"github.com/elastic/beats/libbeat/paths"
 	"github.com/elastic/beats/libbeat/plugin"
@@ -46,6 +50,7 @@ import (
 
 	// Register autodiscover providers
 	_ "github.com/elastic/beats/libbeat/autodiscover/providers/docker"
+	_ "github.com/elastic/beats/libbeat/autodiscover/providers/kubernetes"
 
 	// Register default monitoring reporting
 	_ "github.com/elastic/beats/libbeat/monitoring/report/elasticsearch"
@@ -57,6 +62,7 @@ type Beat struct {
 
 	Config    beatConfig
 	RawConfig *common.Config // Raw config that can be unpacked to get Beat specific config data.
+	keystore  keystore.Keystore
 }
 
 type beatConfig struct {
@@ -69,9 +75,11 @@ type beatConfig struct {
 	MaxProcs int    `config:"max_procs"`
 
 	// beat internal components configurations
-	HTTP    *common.Config `config:"http"`
-	Path    paths.Path     `config:"path"`
-	Logging logp.Logging   `config:"logging"`
+	HTTP          *common.Config `config:"http"`
+	Path          paths.Path     `config:"path"`
+	Logging       *common.Config `config:"logging"`
+	MetricLogging *common.Config `config:"logging.metrics"`
+	Keystore      *common.Config `config:"keystore"`
 
 	// output/publishing related configurations
 	Pipeline   pipeline.Config `config:",inline"`
@@ -86,14 +94,11 @@ type beatConfig struct {
 var (
 	printVersion bool
 	setup        bool
-	startTime    time.Time
 )
 
 var debugf = logp.MakeDebug("beat")
 
 func init() {
-	startTime = time.Now()
-
 	initRand()
 
 	flag.BoolVar(&printVersion, "version", false, "Print the version and exit")
@@ -192,6 +197,11 @@ func (b *Beat) BeatConfig() (*common.Config, error) {
 	return common.NewConfig(), nil
 }
 
+// Keystore return the configured keystore for this beat
+func (b *Beat) Keystore() keystore.Keystore {
+	return b.keystore
+}
+
 // create and return the beater, this method also initializes all needed items,
 // including template registering, publisher, xpack monitoring
 func (b *Beat) createBeater(bt beat.Creator) (beat.Beater, error) {
@@ -210,6 +220,11 @@ func (b *Beat) createBeater(bt beat.Creator) (beat.Beater, error) {
 	reg := monitoring.Default.GetRegistry("libbeat")
 	if reg == nil {
 		reg = monitoring.Default.NewRegistry("libbeat")
+	}
+
+	err = setupMetrics(b.Info.Beat)
+	if err != nil {
+		return nil, err
 	}
 
 	debugf("Initializing output plugins")
@@ -232,6 +247,8 @@ func (b *Beat) createBeater(bt beat.Creator) (beat.Beater, error) {
 }
 
 func (b *Beat) launch(bt beat.Creator) error {
+	defer logp.Sync()
+
 	err := b.Init()
 	if err != nil {
 		return err
@@ -247,6 +264,14 @@ func (b *Beat) launch(bt beat.Creator) error {
 
 	if b.Config.Monitoring.Enabled() {
 		reporter, err := report.New(b.Info, b.Config.Monitoring, b.Config.Output)
+		if err != nil {
+			return err
+		}
+		defer reporter.Stop()
+	}
+
+	if b.Config.MetricLogging == nil || b.Config.MetricLogging.Enabled() {
+		reporter, err := log.MakeReporter(b.Info, b.Config.MetricLogging)
 		if err != nil {
 			return err
 		}
@@ -275,7 +300,6 @@ func (b *Beat) launch(bt beat.Creator) error {
 
 	logp.Info("%s start running.", b.Info.Beat)
 	defer logp.Info("%s stopped.", b.Info.Beat)
-	defer logp.LogTotalExpvars(&b.Config.Logging)
 
 	if b.Config.HTTP.Enabled() {
 		api.Start(b.Config.HTTP, b.Info)
@@ -382,10 +406,6 @@ func (b *Beat) handleFlags() error {
 		return beat.GracefulExit
 	}
 
-	if err := logp.HandleFlags(b.Info.Beat); err != nil {
-		return err
-	}
-
 	return cfgfile.HandleFlags()
 }
 
@@ -400,6 +420,19 @@ func (b *Beat) configure() error {
 		return fmt.Errorf("error loading config file: %v", err)
 	}
 
+	// We have to initialize the keystore before any unpack or merging the cloud
+	// options.
+	keystoreCfg, _ := cfg.Child("keystore", -1)
+	defaultPathConfig, _ := cfg.String("path.config", -1)
+	defaultPathConfig = filepath.Join(defaultPathConfig, fmt.Sprintf("%s.keystore", b.Info.Beat))
+	store, err := keystore.Factory(keystoreCfg, defaultPathConfig)
+	if err != nil {
+		return fmt.Errorf("could not initialize the keystore: %v", err)
+	}
+
+	// TODO: Allow the options to be more flexible for dynamic changes
+	common.OverwriteConfigOpts(keystore.ConfigOpts(store))
+	b.keystore = store
 	err = cloudid.OverwriteSettings(cfg)
 	if err != nil {
 		return err
@@ -427,8 +460,7 @@ func (b *Beat) configure() error {
 		return fmt.Errorf("error setting default paths: %v", err)
 	}
 
-	err = logp.Init(b.Info.Beat, startTime, &b.Config.Logging)
-	if err != nil {
+	if err := configure.Logging(b.Info.Beat, b.Config.Logging); err != nil {
 		return fmt.Errorf("error initializing logging: %v", err)
 	}
 
@@ -537,13 +569,13 @@ func (b *Beat) loadDashboards(force bool) error {
 		}
 	}
 
-	if b.Config.Dashboards != nil && b.Config.Dashboards.Enabled() {
+	if b.Config.Dashboards.Enabled() {
 		var esConfig *common.Config
 
 		if b.Config.Output.Name() == "elasticsearch" {
 			esConfig = b.Config.Output.Config()
 		}
-		err := dashboards.ImportDashboards(b.Info.Beat, b.Info.Name, paths.Resolve(paths.Home, ""),
+		err := dashboards.ImportDashboards(b.Info.Beat, b.Info.Hostname, paths.Resolve(paths.Home, ""),
 			b.Config.Kibana, esConfig, b.Config.Dashboards, nil)
 		if err != nil {
 			return fmt.Errorf("Error importing Kibana dashboards: %v", err)

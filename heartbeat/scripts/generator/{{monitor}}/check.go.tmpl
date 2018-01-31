@@ -1,0 +1,15 @@
+package {{monitor}}
+
+import "net"
+
+// IMPLEMENT_ME: implement validator
+type validator struct {
+}
+
+func makeValidator(config *config) (*validator, error) {
+	return &validator{}, nil
+}
+
+func (v *validator) Check(conn net.Conn) error {
+	return nil
+}

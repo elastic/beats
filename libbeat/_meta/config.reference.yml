@@ -97,6 +97,10 @@
 #- add_docker_metadata:
 #    host: "unix:///var/run/docker.sock"
 #    match_fields: ["system.process.cgroup.id"]
+#    match_pids: ["process.pid", "process.ppid"]
+#    match_source: true
+#    match_source_index: 4
+#    cleanup_timeout: 60
 #    # To connect to Docker over TLS you must specify a client and CA certificate.
 #    #ssl:
 #    #  certificate_authority: "/etc/pki/root/ca.pem"
@@ -628,8 +632,9 @@ output.elasticsearch:
 # dashboards and index pattern. Example: testbeat-*
 #setup.dashboards.index:
 
-# Force loading of dashboards using the Kibana API without querying Elasticsearch for the version
-#always_kibana: false
+# Always use the Kibana API for loading the dashboards instead of autodetecting
+# how to install the dashboards by first querying Elasticsearch.
+#setup.dashboards.always_kibana: false
 
 #============================== Template =====================================
 
@@ -726,12 +731,11 @@ setup.kibana:
 
 
 #================================ Logging ======================================
-# There are three options for the log output: syslog, file, stderr.
-# Under Windows systems, the log files are per default sent to the file output,
-# under all other system per default to syslog.
+# There are four options for the log output: file, stderr, syslog, eventlog
+# The file output is the default.
 
 # Sets log level. The default log level is info.
-# Available log levels are: critical, error, warning, info, debug
+# Available log levels are: error, warning, info, debug
 #logging.level: info
 
 # Enable debug output for selected components. To enable all selectors use ["*"]
@@ -740,7 +744,10 @@ setup.kibana:
 #logging.selectors: [ ]
 
 # Send all logging output to syslog. The default is false.
-#logging.to_syslog: true
+#logging.to_syslog: false
+
+# Send all logging output to Windows Event Logs. The default is false.
+#logging.to_eventlog: false
 
 # If enabled, beatname periodically logs its internal metrics that have changed
 # in the last period. For each metric that changed, the delta from the value at
@@ -775,3 +782,19 @@ logging.files:
 
 # Set to true to log messages in json format.
 #logging.json: false
+
+
+#================================ HTTP Endpoint ======================================
+# Each beat can expose internal metrics through a HTTP endpoint. For security
+# reasons the endpoint is disabled by default. This feature is currently experimental.
+# Stats can be access through http://localhost:5066/stats . For pretty JSON output
+# append ?pretty to the URL.
+
+# Defines if the HTTP endpoint is enabled.
+#http.enabled: false
+
+# The HTTP endpoint will bind to this hostname or IP address. It is recommended to use only localhost.
+#http.host: localhost
+
+# Port on which the HTTP endpoint will bind. Default is 5066.
+#http.port: 5066

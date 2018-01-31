@@ -32,6 +32,7 @@ type BeatsRootCmd struct {
 	CompletionCmd *cobra.Command
 	ExportCmd     *cobra.Command
 	TestCmd       *cobra.Command
+	KeystoreCmd   *cobra.Command
 }
 
 // GenRootCmd returns the root command to use for your beat. It takes
@@ -67,6 +68,7 @@ func GenRootCmdWithIndexPrefixWithRunFlags(name, indexPrefix, version string, be
 	rootCmd.CompletionCmd = genCompletionCmd(name, version, rootCmd)
 	rootCmd.ExportCmd = genExportCmd(name, indexPrefix, version)
 	rootCmd.TestCmd = genTestCmd(name, version, beatCreator)
+	rootCmd.KeystoreCmd = genKeystoreCmd(name, indexPrefix, version, beatCreator, runFlags)
 
 	// Root command is an alias for run
 	rootCmd.Run = rootCmd.RunCmd.Run
@@ -97,6 +99,7 @@ func GenRootCmdWithIndexPrefixWithRunFlags(name, indexPrefix, version string, be
 	rootCmd.AddCommand(rootCmd.CompletionCmd)
 	rootCmd.AddCommand(rootCmd.ExportCmd)
 	rootCmd.AddCommand(rootCmd.TestCmd)
+	rootCmd.AddCommand(rootCmd.KeystoreCmd)
 
 	return rootCmd
 }

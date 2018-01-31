@@ -1,0 +1,5 @@
+dashboards:
+- id: 69f5ae20-eb02-11e7-8f04-51231daa5b05
+  file: osquery-compliance.json
+- id: c0a7ce90-f4aa-11e7-8647-534bb4c21040
+  file: osquery-rootkit.json

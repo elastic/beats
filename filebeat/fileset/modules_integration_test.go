@@ -11,10 +11,11 @@ import (
 	"github.com/stretchr/testify/assert"
 
 	"github.com/elastic/beats/libbeat/outputs/elasticsearch"
+	"github.com/elastic/beats/libbeat/outputs/elasticsearch/estest"
 )
 
 func TestLoadPipeline(t *testing.T) {
-	client := elasticsearch.GetTestingElasticsearch(t)
+	client := estest.GetTestingElasticsearch(t)
 	if !hasIngest(client) {
 		t.Skip("Skip tests because ingest is missing in this elasticsearch version: %s", client.GetVersion())
 	}
@@ -57,7 +58,7 @@ func TestLoadPipeline(t *testing.T) {
 }
 
 func TestSetupNginx(t *testing.T) {
-	client := elasticsearch.GetTestingElasticsearch(t)
+	client := estest.GetTestingElasticsearch(t)
 	if !hasIngest(client) {
 		t.Skip("Skip tests because ingest is missing in this elasticsearch version: %s", client.GetVersion())
 	}
@@ -89,7 +90,7 @@ func TestSetupNginx(t *testing.T) {
 }
 
 func TestAvailableProcessors(t *testing.T) {
-	client := elasticsearch.GetTestingElasticsearch(t)
+	client := estest.GetTestingElasticsearch(t)
 	if !hasIngest(client) {
 		t.Skip("Skip tests because ingest is missing in this elasticsearch version: %s", client.GetVersion())
 	}

@@ -1,8 +1,25 @@
 - module: iis
+<<<<<<< HEAD
   # Win IIS logs
   w3svc:
+=======
+  # Access logs
+  access:
+>>>>>>> beats-cgwrench/iis-filebeat-module
     enabled: true
 
     # Set custom paths for the log files. If left empty,
     # Filebeat will choose the paths depending on your OS.
     #var.paths:
+<<<<<<< HEAD
+=======
+
+  # Error logs
+  error:
+    enabled: true
+
+    # Set custom paths for the log files. If left empty,
+    # Filebeat will choose the paths depending on your OS.
+    #var.paths:
+    
+>>>>>>> beats-cgwrench/iis-filebeat-module

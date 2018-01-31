@@ -1,0 +1,25 @@
+{
+    "@timestamp": "2017-10-12T08:05:34.853Z",
+    "beat": {
+        "hostname": "host.example.com",
+        "name": "host.example.com"
+    },
+    "ceph": {
+        "osd_df": {
+            "available.byte": 49655580,
+            "device_class": "",
+            "id": 0,
+            "name": "osd.0",
+            "pg_num": 120,
+            "total.byte": 65792556,
+            "used.byte": 12765200,
+            "used.pct": 0.1940219498388237
+        }
+    },
+    "metricset": {
+        "host": "ceph:5000",
+        "module": "ceph",
+        "name": "osd_df",
+        "rtt": 115
+    }
+}

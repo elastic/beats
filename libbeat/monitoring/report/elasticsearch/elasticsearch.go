@@ -78,10 +78,10 @@ func makeReporter(beat beat.Info, cfg *common.Config) (report.Reporter, error) {
 	}
 
 	params := map[string]string{}
-	for k, v := range config.Params {
+	for k, v := range defaultParams {
 		params[k] = v
 	}
-	for k, v := range defaultParams {
+	for k, v := range config.Params {
 		params[k] = v
 	}
 	params["interval"] = config.Period.String()

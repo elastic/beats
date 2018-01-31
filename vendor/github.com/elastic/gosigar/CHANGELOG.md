@@ -2,15 +2,34 @@
 All notable changes to this project will be documented in this file.
 This project adheres to [Semantic Versioning](http://semver.org/).
 
-## [Unreleased]
+## [0.7.0]
 
 ### Added
+- Added method stubs for process handling for operating system that are not supported
+  by gosigar. All methods return `ErrNotImplemented` on such systems. #88
+
+### Fixed
+- Fix freebsd build by using the common version of Get(pid). #91
 
 ### Changed
+- Fixed issues in cgroup package by adding missing error checks and closing
+  file handles. #92
 
-### Deprecated
+## [0.6.0]
+
+### Added
+- Added method stubs to enable compilation for operating systems that are not
+  supported by gosigar. All methods return `ErrNotImplemented` on these unsupported
+  operating systems. #83
+- FreeBSD returns `ErrNotImplemented` for `ProcTime.Get`. #83
+
+### Changed
+- OpenBSD returns `ErrNotImplemented` for `ProcTime.Get` instead of `nil`. #83
+- Fixed incorrect `Mem.Used` calculation under linux. #82
+- Fixed `ProcState` on Linux and FreeBSD when process names contain parentheses. #81
 
 ### Removed
+- Remove NetBSD build from sigar_unix.go as it is not supported by gosigar. #83
 
 ## [0.5.0]
 

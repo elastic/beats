@@ -4,6 +4,7 @@
     Stats collected from Prometheus.
   short_config: false
   release: beta
+  settings: ["ssl"]
   fields:
     - name: prometheus
       type: group

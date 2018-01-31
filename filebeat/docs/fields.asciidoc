@@ -25,6 +25,7 @@ grouped in the following categories:
 * <<exported-fields-logstash>>
 * <<exported-fields-mysql>>
 * <<exported-fields-nginx>>
+* <<exported-fields-osquery>>
 * <<exported-fields-postgresql>>
 * <<exported-fields-redis>>
 * <<exported-fields-system>>
@@ -609,7 +610,6 @@ Region in which this host is running.
 [[exported-fields-docker-processor]]
 == Docker fields
 
-beta[]
 Docker stats collected from Docker.
 
 
@@ -756,13 +756,21 @@ The logged message.
 [[exported-fields-iis]]
 == IIS fields
 
+<<<<<<< HEAD
 IIS Module
+=======
+Module for parsing IIS log files.
+>>>>>>> beats-cgwrench/iis-filebeat-module
 
 
 
 [float]
 == iis fields
 
+<<<<<<< HEAD
+=======
+Fields from IIS log files.
+>>>>>>> beats-cgwrench/iis-filebeat-module
 
 
 
@@ -1067,6 +1075,145 @@ type: keyword
 The city name.
 
 
+<<<<<<< HEAD
+=======
+[float]
+== error fields
+
+Contains fields for IIS error logs.
+
+
+
+[float]
+=== `iis.error.remote_ip`
+
+type: keyword
+
+The client IP address.
+
+
+[float]
+=== `iis.error.remote_port`
+
+type: long
+
+The client port number.
+
+
+[float]
+=== `iis.error.server_ip`
+
+type: keyword
+
+The server IP address.
+
+
+[float]
+=== `iis.error.server_port`
+
+type: long
+
+The server port number.
+
+
+[float]
+=== `iis.error.http_version`
+
+type: keyword
+
+The HTTP version.
+
+
+[float]
+=== `iis.error.method`
+
+type: keyword
+
+example: GET
+
+The request HTTP method.
+
+
+[float]
+=== `iis.error.url`
+
+type: keyword
+
+The request HTTP URL.
+
+
+[float]
+=== `iis.error.response_code`
+
+type: long
+
+The HTTP response code.
+
+
+[float]
+=== `iis.error.reason_phrase`
+
+type: keyword
+
+The HTTP reason phrase.
+
+
+[float]
+=== `iis.error.queue_name`
+
+type: keyword
+
+The IIS application pool name.
+
+
+[float]
+== geoip fields
+
+Contains GeoIP information gathered based on the remote_ip field. Only present if the GeoIP Elasticsearch plugin is available and used.
+
+
+
+[float]
+=== `iis.error.geoip.continent_name`
+
+type: keyword
+
+The name of the continent.
+
+
+[float]
+=== `iis.error.geoip.country_iso_code`
+
+type: keyword
+
+Country ISO code.
+
+
+[float]
+=== `iis.error.geoip.location`
+
+type: geo_point
+
+The longitude and latitude.
+
+
+[float]
+=== `iis.error.geoip.region_name`
+
+type: keyword
+
+The region name.
+
+
+[float]
+=== `iis.error.geoip.city_name`
+
+type: keyword
+
+The city name.
+
+
+>>>>>>> beats-cgwrench/iis-filebeat-module
 [[exported-fields-kafka]]
 == Kafka fields
 
@@ -1159,7 +1306,6 @@ The full trace in the log line.
 [[exported-fields-kubernetes-processor]]
 == Kubernetes fields
 
-beta[]
 Kubernetes metadata added by the kubernetes processor
 
 
@@ -1179,6 +1325,14 @@ Kubernetes pod name
 type: keyword
 
 Kubernetes namespace
+
+
+[float]
+=== `kubernetes.node.name`
+
+type: keyword
+
+Kubernetes node name
 
 
 [float]
@@ -1848,6 +2002,64 @@ Connection identifier.
 type: text
 
 The error message
+
+
+[[exported-fields-osquery]]
+== Osquery fields
+
+Fields exported by the `osquery` module
+
+
+
+[float]
+== osquery fields
+
+
+
+
+[float]
+== result fields
+
+Common fields exported by the result metricset.
+
+
+
+[float]
+=== `osquery.result.name`
+
+type: keyword
+
+The name of the query that generated this event.
+
+
+[float]
+=== `osquery.result.action`
+
+type: keyword
+
+For incremental data, marks whether the entry was added or removed. It can be one of "added", "removed", or "snapshot".
+
+
+[float]
+=== `osquery.result.host_identifier`
+
+type: keyword
+
+The identifier for the host on which the osquery agent is running. Normally the hostname.
+
+
+[float]
+=== `osquery.result.unix_time`
+
+type: long
+
+Unix timestamp of the event, in seconds since the epoch. Used for computing the `@timestamp` column.
+
+
+[float]
+=== `osquery.result.calendar_time`
+
+String representation of the collection time, as formatted by osquery.
 
 
 [[exported-fields-postgresql]]

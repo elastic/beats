@@ -14,9 +14,7 @@ import (
 )
 
 func TestOneHostSuccessResp_Bulk(t *testing.T) {
-	if testing.Verbose() {
-		logp.LogInit(logp.LOG_DEBUG, "", false, true, []string{"elasticsearch"})
-	}
+	logp.TestingSetup(logp.WithSelectors("elasticsearch"))
 
 	index := fmt.Sprintf("packetbeat-unittest-%d", os.Getpid())
 	expectedResp, _ := json.Marshal(QueryResult{Ok: true, Index: index, Type: "type1", ID: "1", Version: 1, Created: true})
@@ -56,9 +54,7 @@ func TestOneHostSuccessResp_Bulk(t *testing.T) {
 }
 
 func TestOneHost500Resp_Bulk(t *testing.T) {
-	if testing.Verbose() {
-		logp.LogInit(logp.LOG_DEBUG, "", false, true, []string{"elasticsearch"})
-	}
+	logp.TestingSetup(logp.WithSelectors("elasticsearch"))
 
 	index := fmt.Sprintf("packetbeat-unittest-%d", os.Getpid())
 
@@ -98,9 +94,7 @@ func TestOneHost500Resp_Bulk(t *testing.T) {
 }
 
 func TestOneHost503Resp_Bulk(t *testing.T) {
-	if testing.Verbose() {
-		logp.LogInit(logp.LOG_DEBUG, "", false, true, []string{"elasticsearch"})
-	}
+	logp.TestingSetup(logp.WithSelectors("elasticsearch"))
 
 	index := fmt.Sprintf("packetbeat-unittest-%d", os.Getpid())
 

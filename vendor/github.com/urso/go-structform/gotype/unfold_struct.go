@@ -116,7 +116,7 @@ func makeFieldUnfolder(ctx *unfoldCtx, st reflect.StructField) (fieldUnfolder, e
 		if su, ok := ru.(*unfolderStruct); ok {
 			fu.initState = su.initStatePtr
 		} else {
-			fu.initState = wrapReflUnfolder(targetType, ru)
+			fu.initState = wrapReflUnfolder(st.Type, ru)
 		}
 	}
 
@@ -125,7 +125,7 @@ func makeFieldUnfolder(ctx *unfoldCtx, st reflect.StructField) (fieldUnfolder, e
 
 func wrapReflUnfolder(t reflect.Type, ru reflUnfolder) func(*unfoldCtx, unsafe.Pointer) {
 	return func(ctx *unfoldCtx, ptr unsafe.Pointer) {
-		v := reflect.NewAt(reflect.PtrTo(t), ptr)
+		v := reflect.NewAt(t, ptr)
 		ru.initState(ctx, v)
 	}
 }

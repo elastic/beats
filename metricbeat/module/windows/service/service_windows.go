@@ -27,6 +27,7 @@ import (
 //sys _EnumServicesStatusEx(handle ServiceDatabaseHandle, infoLevel ServiceInfoLevel, serviceType ServiceType, serviceState ServiceEnumState, services *byte, bufSize uint32, bytesNeeded *uint32, servicesReturned *uint32, resumeHandle *uintptr, groupName *uintptr) (err error) [failretval==0] = advapi32.EnumServicesStatusExW
 //sys _OpenService(handle ServiceDatabaseHandle, serviceName *uint16, desiredAccess ServiceAccessRight) (serviceHandle ServiceHandle, err error) = advapi32.OpenServiceW
 //sys _QueryServiceConfig(serviceHandle ServiceHandle, serviceConfig *byte, bufSize uint32, bytesNeeded *uint32) (err error) [failretval==0] = advapi32.QueryServiceConfigW
+//sys _QueryServiceConfig2(serviceHandle ServiceHandle, infoLevel ServiceConfigInformation, configBuffer *byte, bufSize uint32, bytesNeeded *uint32) (err error) [failretval==0] = advapi32.QueryServiceConfig2W
 //sys _CloseServiceHandle(handle uintptr) (err error) = advapi32.CloseServiceHandle
 
 var (
@@ -39,6 +40,31 @@ type ServiceHandle uintptr
 
 type ProcessHandle uintptr
 
+type ServiceConfigInformation uint32
+
+const (
+	ServiceConfigDelayedAutoStartInfo   ServiceConfigInformation = 3
+	ServiceConfigDescription            ServiceConfigInformation = 1
+	ServiceConfigFailureActions         ServiceConfigInformation = 2
+	ServiceConfigFailureActionsFlag     ServiceConfigInformation = 4
+	ServiceConfigPreferredNode          ServiceConfigInformation = 9
+	ServiceConfigPreshutdownInfo        ServiceConfigInformation = 7
+	ServiceConfigRequiredPrivilegesInfo ServiceConfigInformation = 6
+	ServiceConfigServiceSidInfo         ServiceConfigInformation = 5
+	ServiceConfigTriggerInfo            ServiceConfigInformation = 8
+	ServiceConfigLaunchProtected        ServiceConfigInformation = 12
+)
+
+type serviceDelayedAutoStartInfo struct {
+	delayedAutoStart bool
+}
+
+type serviceTriggerInfo struct {
+	cTriggers uint32
+	pTriggers uintptr
+	pReserved uintptr
+}
+
 var serviceStates = map[ServiceState]string{
 	ServiceContinuePending: "Continuing",
 	ServicePausePending:    "Pausing",
@@ -49,12 +75,32 @@ var serviceStates = map[ServiceState]string{
 	ServiceStopped:         "Stopped",
 }
 
+const (
+	StartTypeBoot ServiceStartType = iota
+	StartTypeSystem
+	StartTypeAutomatic
+	StartTypeManual
+	StartTypeDisabled
+	StartTypeAutomaticDelayed
+	StartTypeAutomaticTriggered
+	StartTypeAutomaticDelayedTriggered
+	StartTypeManualTriggered
+)
+
 var serviceStartTypes = map[ServiceStartType]string{
-	ServiceAutoStart:   "Automatic",
-	ServiceBootStart:   "Boot",
-	ServiceDemandStart: "Manual",
-	ServiceDisabled:    "Disabled",
-	ServiceSystemStart: "System",
+	StartTypeBoot:                      "Boot",
+	StartTypeSystem:                    "System",
+	StartTypeAutomatic:                 "Automatic",
+	StartTypeManual:                    "Manual",
+	StartTypeDisabled:                  "Disabled",
+	StartTypeAutomaticDelayed:          "Automatic (Delayed)",
+	StartTypeAutomaticTriggered:        "Automatic (Triggered)",
+	StartTypeAutomaticDelayedTriggered: "Automatic (Delayed, Triggered)",
+	StartTypeManualTriggered:           "Manual (Triggered)",
+}
+
+func (startType ServiceStartType) String() string {
+	return serviceStartTypes[startType]
 }
 
 func (state ServiceState) String() string {
@@ -74,17 +120,18 @@ type ServiceStatus struct {
 	DisplayName  string
 	ServiceName  string
 	CurrentState string
-	StartType    string
+	StartType    ServiceStartType
 	PID          uint32 // ID of the associated process.
 	Uptime       time.Duration
 	ExitCode     uint32 // Exit code for stopped services.
 }
 
 type ServiceReader struct {
-	handle ServiceDatabaseHandle
-	state  ServiceEnumState
-	guid   string            // Host's MachineGuid value (a unique ID for the host).
-	ids    map[string]string // Cache of service IDs.
+	handle            ServiceDatabaseHandle
+	state             ServiceEnumState
+	guid              string            // Host's MachineGuid value (a unique ID for the host).
+	ids               map[string]string // Cache of service IDs.
+	protectedServices map[string]struct{}
 }
 
 var InvalidServiceDatabaseHandle = ^ServiceDatabaseHandle(0)
@@ -135,7 +182,32 @@ func OpenService(handle ServiceDatabaseHandle, serviceName string, desiredAccess
 	return serviceHandle, nil
 }
 
-func getServiceStates(handle ServiceDatabaseHandle, state ServiceEnumState) ([]ServiceStatus, error) {
+func QueryServiceConfig2(serviceHandle ServiceHandle, infoLevel ServiceConfigInformation) ([]byte, error) {
+	var buffer []byte
+
+	for {
+		var bytesNeeded uint32
+		var bufPtr *byte
+		if len(buffer) > 0 {
+			bufPtr = &buffer[0]
+		}
+
+		if err := _QueryServiceConfig2(serviceHandle, infoLevel, bufPtr, uint32(len(buffer)), &bytesNeeded); err != nil {
+			if ServiceErrno(err.(syscall.Errno)) == SERVICE_ERROR_INSUFFICIENT_BUFFER {
+				// Increase buffer size and retry.
+				buffer = make([]byte, len(buffer)+int(bytesNeeded))
+				continue
+			}
+			return nil, err
+		}
+
+		break
+	}
+
+	return buffer, nil
+}
+
+func getServiceStates(handle ServiceDatabaseHandle, state ServiceEnumState, protectedServices map[string]struct{}) ([]ServiceStatus, error) {
 	var servicesReturned uint32
 	var servicesBuffer []byte
 
@@ -169,7 +241,7 @@ func getServiceStates(handle ServiceDatabaseHandle, state ServiceEnumState) ([]S
 	for i := 0; i < int(servicesReturned); i++ {
 		serviceTemp := (*EnumServiceStatusProcess)(unsafe.Pointer(&servicesBuffer[i*sizeofEnumServiceStatusProcess]))
 
-		service, err := getServiceInformation(serviceTemp, servicesBuffer, handle)
+		service, err := getServiceInformation(serviceTemp, servicesBuffer, handle, protectedServices)
 		if err != nil {
 			return nil, err
 		}
@@ -180,7 +252,7 @@ func getServiceStates(handle ServiceDatabaseHandle, state ServiceEnumState) ([]S
 	return services, nil
 }
 
-func getServiceInformation(rawService *EnumServiceStatusProcess, servicesBuffer []byte, handle ServiceDatabaseHandle) (ServiceStatus, error) {
+func getServiceInformation(rawService *EnumServiceStatusProcess, servicesBuffer []byte, handle ServiceDatabaseHandle, protectedServices map[string]struct{}) (ServiceStatus, error) {
 	service := ServiceStatus{
 		PID: rawService.ServiceStatusProcess.DwProcessId,
 	}
@@ -216,8 +288,20 @@ func getServiceInformation(rawService *EnumServiceStatusProcess, servicesBuffer 
 		service.ExitCode = rawService.ServiceStatusProcess.DwServiceSpecificExitCode
 	}
 
+	serviceHandle, err := OpenService(handle, service.ServiceName, ServiceQueryConfig)
+	if err != nil {
+		return service, err
+	}
+
+	defer CloseServiceHandle(serviceHandle)
+
 	// Get detailed information
-	if err := getDetailedServiceInfo(handle, service.ServiceName, ServiceQueryConfig, &service); err != nil {
+	if err := getAdditionalServiceInfo(serviceHandle, &service); err != nil {
+		return service, err
+	}
+
+	// Get optional information
+	if err := getOptionalServiceInfo(serviceHandle, &service); err != nil {
 		return service, err
 	}
 
@@ -225,7 +309,12 @@ func getServiceInformation(rawService *EnumServiceStatusProcess, servicesBuffer 
 	if ServiceState(rawService.ServiceStatusProcess.DwCurrentState) != ServiceStopped {
 		processUpTime, err := getServiceUptime(rawService.ServiceStatusProcess.DwProcessId)
 		if err != nil {
-			logp.Warn("Uptime for service %v is not available", service.ServiceName)
+			if _, ok := protectedServices[service.ServiceName]; errors.Cause(err) == syscall.ERROR_ACCESS_DENIED && !ok {
+				protectedServices[service.ServiceName] = struct{}{}
+				logp.Warn("Uptime for service %v is not available because of insufficient rights", service.ServiceName)
+			} else {
+				return service, err
+			}
 		}
 		service.Uptime = processUpTime / time.Millisecond
 	}
@@ -247,40 +336,69 @@ func getServiceUptime(processID uint32) (time.Duration, error) {
 	return uptime, nil
 }
 
-func getDetailedServiceInfo(handle ServiceDatabaseHandle, serviceName string, accessRight ServiceAccessRight, service *ServiceStatus) error {
-	var serviceBufSize uint32
-	var serviceBytesNeeded uint32
+func getAdditionalServiceInfo(serviceHandle ServiceHandle, service *ServiceStatus) error {
+	var buffer []byte
 
-	serviceHandle, err := OpenService(handle, service.ServiceName, ServiceQueryConfig)
-	if err != nil {
-		return err
+	for {
+		var bytesNeeded uint32
+		var bufPtr *byte
+		if len(buffer) > 0 {
+			bufPtr = &buffer[0]
+		}
+
+		if err := _QueryServiceConfig(serviceHandle, bufPtr, uint32(len(buffer)), &bytesNeeded); err != nil {
+			if ServiceErrno(err.(syscall.Errno)) == SERVICE_ERROR_INSUFFICIENT_BUFFER {
+				// Increase buffer size and retry.
+				buffer = make([]byte, len(buffer)+int(bytesNeeded))
+				continue
+			}
+			return ServiceErrno(err.(syscall.Errno))
+		}
+		serviceQueryConfig := (*QueryServiceConfig)(unsafe.Pointer(&buffer[0]))
+		service.StartType = ServiceStartType(serviceQueryConfig.DwStartType)
+		break
 	}
 
-	if err := _QueryServiceConfig(serviceHandle, nil, serviceBufSize, &serviceBytesNeeded); err != nil {
-		if ServiceErrno(err.(syscall.Errno)) != SERVICE_ERROR_INSUFFICIENT_BUFFER {
-			err := CloseServiceHandle(serviceHandle)
+	return nil
+}
+
+func getOptionalServiceInfo(serviceHandle ServiceHandle, service *ServiceStatus) error {
+	// Get information if the service is started delayed or triggered. Only valid for automatic or manual services. So filter them first.
+	if service.StartType == StartTypeAutomatic || service.StartType == StartTypeManual {
+		var delayedInfo *serviceDelayedAutoStartInfo
+		if service.StartType == StartTypeAutomatic {
+			delayedInfoBuffer, err := QueryServiceConfig2(serviceHandle, ServiceConfigDelayedAutoStartInfo)
+			if err != nil {
+				return err
+			}
+
+			delayedInfo = (*serviceDelayedAutoStartInfo)(unsafe.Pointer(&delayedInfoBuffer[0]))
+		}
+
+		// Get information if the service is triggered.
+		triggeredInfoBuffer, err := QueryServiceConfig2(serviceHandle, ServiceConfigTriggerInfo)
+		if err != nil {
 			return err
 		}
-		serviceBufSize += serviceBytesNeeded
-		buffer := make([]byte, serviceBufSize)
 
-		for {
-			if err := _QueryServiceConfig(serviceHandle, &buffer[0], serviceBufSize, &serviceBytesNeeded); err != nil {
-				if ServiceErrno(err.(syscall.Errno)) != SERVICE_ERROR_INSUFFICIENT_BUFFER {
-					err := CloseServiceHandle(serviceHandle)
-					return err
-				}
-				serviceBufSize += serviceBytesNeeded
-			} else {
-				serviceQueryConfig := (*QueryServiceConfig)(unsafe.Pointer(&buffer[0]))
-				service.StartType = serviceStartTypes[ServiceStartType(serviceQueryConfig.DwStartType)]
-				if err := CloseServiceHandle(serviceHandle); err != nil {
-					return err
-				}
-				break
+		triggeredInfo := (*serviceTriggerInfo)(unsafe.Pointer(&triggeredInfoBuffer[0]))
+
+		if service.StartType == StartTypeAutomatic {
+			if triggeredInfo.cTriggers > 0 && delayedInfo.delayedAutoStart {
+				service.StartType = StartTypeAutomaticDelayedTriggered
+			} else if triggeredInfo.cTriggers > 0 {
+				service.StartType = StartTypeAutomaticTriggered
+			} else if delayedInfo.delayedAutoStart {
+				service.StartType = StartTypeAutomaticDelayed
 			}
+			return nil
+		}
+
+		if service.StartType == StartTypeManual && triggeredInfo.cTriggers > 0 {
+			service.StartType = StartTypeManualTriggered
 		}
 	}
+
 	return nil
 }
 
@@ -316,17 +434,18 @@ func NewServiceReader() (*ServiceReader, error) {
 	}
 
 	r := &ServiceReader{
-		handle: hndl,
-		state:  ServiceStateAll,
-		guid:   guid,
-		ids:    map[string]string{},
+		handle:            hndl,
+		state:             ServiceStateAll,
+		guid:              guid,
+		ids:               map[string]string{},
+		protectedServices: map[string]struct{}{},
 	}
 
 	return r, nil
 }
 
 func (reader *ServiceReader) Read() ([]common.MapStr, error) {
-	services, err := getServiceStates(reader.handle, reader.state)
+	services, err := getServiceStates(reader.handle, reader.state, reader.protectedServices)
 	if err != nil {
 		return nil, err
 	}
@@ -339,7 +458,7 @@ func (reader *ServiceReader) Read() ([]common.MapStr, error) {
 			"display_name": service.DisplayName,
 			"name":         service.ServiceName,
 			"state":        service.CurrentState,
-			"start_type":   service.StartType,
+			"start_type":   service.StartType.String(),
 		}
 
 		if service.CurrentState == "Stopped" {

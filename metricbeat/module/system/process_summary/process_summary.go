@@ -7,9 +7,9 @@ import (
 
 	"github.com/elastic/beats/libbeat/common"
 	"github.com/elastic/beats/libbeat/logp"
+	"github.com/elastic/beats/libbeat/metric/system/process"
 	"github.com/elastic/beats/metricbeat/mb"
 	"github.com/elastic/beats/metricbeat/mb/parse"
-	"github.com/elastic/beats/metricbeat/module/system/process"
 	sigar "github.com/elastic/gosigar"
 )
 

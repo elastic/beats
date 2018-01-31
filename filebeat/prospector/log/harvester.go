@@ -25,6 +25,7 @@ import (
 
 	"github.com/elastic/beats/libbeat/beat"
 	"github.com/elastic/beats/libbeat/common"
+	file_helper "github.com/elastic/beats/libbeat/common/file"
 	"github.com/elastic/beats/libbeat/logp"
 	"github.com/elastic/beats/libbeat/monitoring"
 
@@ -378,7 +379,7 @@ func (h *Harvester) shouldExportLine(line string) bool {
 // is returned and the harvester is closed. The file will be picked up again the next time
 // the file system is scanned
 func (h *Harvester) openFile() error {
-	f, err := file.ReadOpen(h.state.Source)
+	f, err := file_helper.ReadOpen(h.state.Source)
 	if err != nil {
 		return fmt.Errorf("Failed opening %s: %s", h.state.Source, err)
 	}
@@ -456,7 +457,7 @@ func (h *Harvester) getState() file.State {
 	state := h.state
 
 	// refreshes the values in State with the values from the harvester itself
-	state.FileStateOS = file.GetOSState(h.state.Fileinfo)
+	state.FileStateOS = file_helper.GetOSState(h.state.Fileinfo)
 	return state
 }
 
@@ -517,9 +518,9 @@ func (h *Harvester) newLogFileReader() (reader.Reader, error) {
 		return nil, err
 	}
 
-	if h.config.DockerJSON {
+	if h.config.DockerJSON != "" {
 		// Docker json-file format, add custom parsing to the pipeline
-		r = reader.NewDockerJSON(r)
+		r = reader.NewDockerJSON(r, h.config.DockerJSON)
 	}
 
 	if h.config.JSON != nil {

@@ -41,7 +41,9 @@ func eventMapping(families []*dto.MetricFamily) ([]common.MapStr, error) {
 				}
 
 			case "kube_pod_status_phase":
-				event.Put("status.phase", strings.ToLower(util.GetLabel(metric, "phase")))
+				if metric.GetGauge().GetValue() == 1 {
+					event.Put("status.phase", strings.ToLower(util.GetLabel(metric, "phase")))
+				}
 
 			case "kube_pod_status_ready":
 				if metric.GetGauge().GetValue() == 1 {

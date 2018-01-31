@@ -44,6 +44,7 @@ grouped in the following categories:
 * <<exported-fields-rabbitmq>>
 * <<exported-fields-redis>>
 * <<exported-fields-system>>
+* <<exported-fields-uwsgi>>
 * <<exported-fields-vsphere>>
 * <<exported-fields-windows>>
 * <<exported-fields-zookeeper>>
@@ -1192,6 +1193,85 @@ Last updated
 
 
 [float]
+== osd_df fields
+
+ceph osd disk usage information
+
+
+
+[float]
+=== `ceph.osd_df.id`
+
+type: long
+
+osd node id
+
+
+[float]
+=== `ceph.osd_df.name`
+
+type: text
+
+osd node name
+
+
+[float]
+=== `ceph.osd_df.device_class`
+
+type: keyword
+
+osd node type, illegal type include hdd, ssd etc.
+
+
+[float]
+=== `ceph.osd_df.total.byte`
+
+type: long
+
+format: bytes
+
+osd disk total volume
+
+
+[float]
+=== `ceph.osd_df.used.byte`
+
+type: long
+
+format: bytes
+
+osd disk usage volume
+
+
+[float]
+=== `ceph.osd_df.available.bytes`
+
+type: long
+
+format: bytes
+
+osd disk available volume
+
+
+[float]
+=== `ceph.osd_df.pg_num`
+
+type: long
+
+shows how many pg located on this osd
+
+
+[float]
+=== `ceph.osd_df.used.pct`
+
+type: scaled_float
+
+format: percent
+
+osd disk usage percentage
+
+
+[float]
 == osd_tree fields
 
 ceph osd tree info
@@ -1235,7 +1315,7 @@ osd or bucket node typeID
 
 type: text
 
-bucket children list, seperate by comma.
+bucket children list, separated by comma.
 
 
 [float]
@@ -1933,7 +2013,6 @@ Number of items/documents that are replicas.
 [[exported-fields-docker-processor]]
 == Docker fields
 
-beta[]
 Docker stats collected from Docker.
 
 
@@ -3376,7 +3455,7 @@ Total bytes obtained from system (sum of XxxSys below).
 
 
 [float]
-=== `golang.heap.system.optained`
+=== `golang.heap.system.obtained`
 
 type: long
 
@@ -4916,7 +4995,6 @@ Total number of connections.
 [[exported-fields-kubernetes-processor]]
 == Kubernetes fields
 
-beta[]
 Kubernetes metadata added by the kubernetes processor
 
 
@@ -4936,6 +5014,14 @@ Kubernetes pod name
 type: keyword
 
 Kubernetes namespace
+
+
+[float]
+=== `kubernetes.node.name`
+
+type: keyword
+
+Kubernetes node name
 
 
 [float]
@@ -5340,14 +5426,6 @@ UUID version of the object
 
 kubernetes node metrics
 
-
-
-[float]
-=== `kubernetes.node.name`
-
-type: keyword
-
-Node name
 
 
 [float]
@@ -6378,6 +6456,182 @@ Metrics collected from MongoDB servers.
 
 MongoDB metrics.
 
+
+
+[float]
+== collstats fields
+
+MongoDB collection statistics metrics.
+
+
+
+[float]
+=== `mongodb.collstats.db`
+
+type: keyword
+
+Database name.
+
+
+[float]
+=== `mongodb.collstats.collection`
+
+type: keyword
+
+Collection name.
+
+
+[float]
+=== `mongodb.collstats.name`
+
+type: keyword
+
+Combination of database and collection name.
+
+
+[float]
+=== `mongodb.collstats.total.time.us`
+
+type: long
+
+Total waiting time for locks in microseconds.
+
+
+[float]
+=== `mongodb.collstats.total.count`
+
+type: long
+
+Total number of lock wait events.
+
+
+
+[float]
+=== `mongodb.collstats.lock.read.time.us`
+
+type: long
+
+Time waiting for read locks in microseconds.
+
+
+[float]
+=== `mongodb.collstats.lock.read.count`
+
+type: long
+
+Number of read lock wait events.
+
+
+[float]
+=== `mongodb.collstats.lock.write.time.us`
+
+type: long
+
+Time waiting for write locks in microseconds.
+
+
+[float]
+=== `mongodb.collstats.lock.write.count`
+
+type: long
+
+Number of write lock wait events.
+
+
+[float]
+=== `mongodb.collstats.queries.time.us`
+
+type: long
+
+Time running queries in microseconds.
+
+
+[float]
+=== `mongodb.collstats.queries.count`
+
+type: long
+
+Number of queries executed.
+
+
+[float]
+=== `mongodb.collstats.getmore.time.us`
+
+type: long
+
+Time asking for more cursor rows in microseconds.
+
+
+[float]
+=== `mongodb.collstats.getmore.count`
+
+type: long
+
+Number of times a cursor asked for more data.
+
+
+[float]
+=== `mongodb.collstats.insert.time.us`
+
+type: long
+
+Time inserting new documents in microseconds.
+
+
+[float]
+=== `mongodb.collstats.insert.count`
+
+type: long
+
+Number of document insert events.
+
+
+[float]
+=== `mongodb.collstats.update.time.us`
+
+type: long
+
+Time updating documents in microseconds.
+
+
+[float]
+=== `mongodb.collstats.update.count`
+
+type: long
+
+Number of document update events.
+
+
+[float]
+=== `mongodb.collstats.remove.time.us`
+
+type: long
+
+Time deleting documents in microseconds.
+
+
+[float]
+=== `mongodb.collstats.remove.count`
+
+type: long
+
+Number of document delete events.
+
+
+[float]
+=== `mongodb.collstats.commands.time.us`
+
+type: long
+
+Time executing database commands in microseconds.
+
+
+[float]
+=== `mongodb.collstats.commands.count`
+
+type: long
+
+Number of database commands executed.
 
 
 [float]
@@ -9638,6 +9892,14 @@ The percentage of CPU time spent in non-idle state.
 
 
 [float]
+=== `system.cpu.total.value`
+
+type: long
+
+The value of CPU usage since starting the process.
+
+
+[float]
 === `system.cpu.user.ticks`
 
 type: long
@@ -10404,6 +10666,14 @@ The amount of CPU time the process spent in user space.
 
 
 [float]
+=== `system.process.cpu.total.value`
+
+type: long
+
+The value of CPU usage since starting the process.
+
+
+[float]
 === `system.process.cpu.total.pct`
 
 type: scaled_float
@@ -11109,6 +11379,61 @@ Number of processes for which the state couldn't be retrieved or is unknown.
 
 
 [float]
+== raid fields
+
+raid
+
+
+
+[float]
+=== `system.raid.name`
+
+type: keyword
+
+Name of the device.
+
+
+[float]
+=== `system.raid.activity_state`
+
+type: keyword
+
+activity-state of the device.
+
+
+[float]
+=== `system.raid.disks.active`
+
+type: long
+
+Number of active disks.
+
+
+[float]
+=== `system.raid.disks.total`
+
+type: long
+
+Total number of disks the device consists of.
+
+
+[float]
+=== `system.raid.blocks.total`
+
+type: long
+
+Number of blocks the device holds.
+
+
+[float]
+=== `system.raid.blocks.synced`
+
+type: long
+
+Number of blocks on the device that are in sync.
+
+
+[float]
 == socket fields
 
 TCP sockets that are active.
@@ -11267,6 +11592,258 @@ format: duration
 The OS uptime in milliseconds.
 
 
+[[exported-fields-uwsgi]]
+== uwsgi fields
+
+uwsgi module
+
+
+
+[float]
+== uwsgi fields
+
+
+
+
+[float]
+== status fields
+
+uwsgi.status metricset fields
+
+
+
+[float]
+=== `uwsgi.status.total.requests`
+
+type: long
+
+Total requests handled
+
+
+[float]
+=== `uwsgi.status.total.exceptions`
+
+type: long
+
+Total exceptions
+
+
+[float]
+=== `uwsgi.status.total.write_errors`
+
+type: long
+
+Total requests write errors
+
+
+[float]
+=== `uwsgi.status.total.read_errors`
+
+type: long
+
+Total read errors
+
+
+[float]
+=== `uwsgi.status.total.pid`
+
+type: long
+
+Process id
+
+
+[float]
+=== `uwsgi.status.worker.id`
+
+type: long
+
+Worker id
+
+
+[float]
+=== `uwsgi.status.worker.pid`
+
+type: long
+
+Worker process id
+
+
+[float]
+=== `uwsgi.status.worker.accepting`
+
+type: long
+
+State of worker, 1 if still accepting new requests otherwise 0
+
+
+[float]
+=== `uwsgi.status.worker.requests`
+
+type: long
+
+Number of requests served by this worker
+
+
+[float]
+=== `uwsgi.status.worker.delta_requests`
+
+type: long
+
+Number of requests served by this worker after worker is reloaded when reached MAX_REQUESTS
+
+
+[float]
+=== `uwsgi.status.worker.exceptions`
+
+type: long
+
+Exceptions raised
+
+
+[float]
+=== `uwsgi.status.worker.harakiri_count`
+
+type: long
+
+Dropped requests by timeout
+
+
+[float]
+=== `uwsgi.status.worker.signals`
+
+type: long
+
+Emitted signals count
+
+
+[float]
+=== `uwsgi.status.worker.signal_queue`
+
+type: long
+
+Number of signals waiting to be handled
+
+
+[float]
+=== `uwsgi.status.worker.status`
+
+type: keyword
+
+Worker status (cheap, pause, sig, busy, idle)
+
+
+[float]
+=== `uwsgi.status.worker.rss`
+
+type: keyword
+
+Resident Set Size. memory currently used by a process. if always zero try `--memory-report` option of uwsgi
+
+
+[float]
+=== `uwsgi.status.worker.vsz`
+
+type: long
+
+Virtual Set Size. memory size assigned to a process. if always zero try `--memory-report` option of uwsgi
+
+
+[float]
+=== `uwsgi.status.worker.running_time`
+
+type: long
+
+Process running time
+
+
+[float]
+=== `uwsgi.status.worker.respawn_count`
+
+type: long
+
+Respawn count
+
+
+[float]
+=== `uwsgi.status.worker.tx`
+
+type: long
+
+Transmitted size
+
+
+[float]
+=== `uwsgi.status.worker.avg_rt`
+
+type: long
+
+Average response time
+
+
+[float]
+=== `uwsgi.status.core.id`
+
+type: long
+
+worker ID
+
+
+[float]
+=== `uwsgi.status.core.worker_pid`
+
+type: long
+
+Parent worker PID
+
+
+[float]
+=== `uwsgi.status.core.requests.total`
+
+type: long
+
+Number of total requests served
+
+
+[float]
+=== `uwsgi.status.core.requests.static`
+
+type: long
+
+Number of static file serves
+
+
+[float]
+=== `uwsgi.status.core.requests.routed`
+
+type: long
+
+Routed requests
+
+
+[float]
+=== `uwsgi.status.core.requests.offloaded`
+
+type: long
+
+Offloaded requests
+
+
+[float]
+=== `uwsgi.status.core.write_errors`
+
+type: long
+
+Number of failed writes
+
+
+[float]
+=== `uwsgi.status.core.read_errors`
+
+type: long
+
+Number of failed reads
+
+
 [[exported-fields-vsphere]]
 == vSphere fields
 
@@ -11285,14 +11862,6 @@ vSphere module
 
 datastore
 
-
-
-[float]
-=== `vsphere.datastore.datacenter`
-
-type: keyword
-
-Datacenter name
 
 
 [float]
@@ -11359,14 +11928,6 @@ host
 
 
 [float]
-=== `vsphere.host.datacenter`
-
-type: keyword
-
-Datacenter name
-
-
-[float]
 === `vsphere.host.name`
 
 type: keyword
@@ -11429,6 +11990,14 @@ Free Memory in bytes
 
 
 [float]
+=== `vsphere.host.network_names`
+
+type: keyword
+
+Network names
+
+
+[float]
 == virtualmachine fields
 
 virtualmachine
@@ -11436,11 +12005,11 @@ virtualmachine
 
 
 [float]
-=== `vsphere.virtualmachine.datacenter`
+=== `vsphere.virtualmachine.host`
 
 type: keyword
 
-Datacenter name
+Host name
 
 
 [float]
@@ -11505,6 +12074,14 @@ Free Memory of Guest in bytes
 type: object
 
 Custom fields
+
+
+[float]
+=== `vsphere.virtualmachine.network_names`
+
+type: keyword
+
+Network names
 
 
 [[exported-fields-windows]]

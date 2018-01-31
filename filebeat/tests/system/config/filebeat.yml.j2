@@ -148,7 +148,7 @@ geoip:
   ]
 {%- endif %}
 
-{% if setup_template_name is not none %}
+{% if setup_template_name %}
 setup.template.name: setup_template_name
 setup.template.pattern: setup_template_pattern
 {%- endif %}
@@ -211,4 +211,9 @@ output.file:
 #================================ Paths =====================================
 path:
   data: {{path_data}}
+{% endif %}
+
+{% if keystore_path %}
+#================================ keystore =====================================
+keystore.path: {{keystore_path}}
 {% endif %}

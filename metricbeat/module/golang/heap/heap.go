@@ -96,7 +96,7 @@ func (m *MetricSet) Fetch() (common.MapStr, error) {
 
 	event["system"] = common.MapStr{
 		"total":    ms.Sys,
-		"optained": ms.HeapSys,
+		"obtained": ms.HeapSys,
 		"stack":    ms.StackSys,
 		"released": ms.HeapReleased,
 	}

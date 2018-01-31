@@ -1,31 +1,147 @@
 package logp
 
-import "fmt"
+import (
+	"go.uber.org/zap"
+)
 
-// Logger provides a logging type using the global logp functionality.
-// The Logger should be used to use with libraries havng a configurable logging
-// functionality.
+// LogOption configures a Logger.
+type LogOption = zap.Option
+
+// Logger logs messages to the configured output.
 type Logger struct {
-	selector string
+	sugar *zap.SugaredLogger
 }
 
-// NewLogger creates a new Logger instance with custom debug selector.
-func NewLogger(selector string) *Logger {
-	return &Logger{selector: selector}
+// NewLogger returns a new Logger labeled with the name of the selector. This
+// should never be used from any global contexts (instead create "per instance"
+// loggers).
+func NewLogger(selector string, options ...LogOption) *Logger {
+	log := loadLogger().rootLogger.
+		WithOptions(zap.AddCallerSkip(1)).
+		WithOptions(options...).
+		Named(selector)
+	return &Logger{log.Sugar()}
 }
 
-func (l *Logger) Debug(vs ...interface{}) {
-	Debug(l.selector, "%v", fmt.Sprint(vs...))
+// With creates a child logger and adds structured context to it. Fields added
+// to the child don't affect the parent, and vice versa.
+func (l *Logger) With(args ...interface{}) *Logger {
+	return &Logger{l.sugar.With(args...)}
 }
 
-func (*Logger) Info(vs ...interface{}) {
-	Info("%v", fmt.Sprint(vs...))
+// Sprint
+
+// Debug uses fmt.Sprint to construct and log a message.
+func (l *Logger) Debug(args ...interface{}) {
+	l.sugar.Debug(args...)
 }
 
-func (*Logger) Err(vs ...interface{}) {
-	Err("%v", fmt.Sprint(vs...))
+// Info uses fmt.Sprint to construct and log a message.
+func (l *Logger) Info(args ...interface{}) {
+	l.sugar.Info(args...)
 }
 
-func (l *Logger) Debugf(format string, v ...interface{}) { Debug(l.selector, format, v...) }
-func (*Logger) Infof(format string, v ...interface{})    { Info(format, v...) }
-func (*Logger) Errf(format string, v ...interface{})     { Err(format, v...) }
+// Warn uses fmt.Sprint to construct and log a message.
+func (l *Logger) Warn(args ...interface{}) {
+	l.sugar.Warn(args...)
+}
+
+// Error uses fmt.Sprint to construct and log a message.
+func (l *Logger) Error(args ...interface{}) {
+	l.sugar.Error(args...)
+}
+
+// Panic uses fmt.Sprint to construct and log a message, then panics.
+func (l *Logger) Panic(args ...interface{}) {
+	l.sugar.Panic(args...)
+}
+
+// DPanic uses fmt.Sprint to construct and log a message. In development, the
+// logger then panics.
+func (l *Logger) DPanic(args ...interface{}) {
+	l.sugar.DPanic(args...)
+}
+
+// Sprintf
+
+// Debugf uses fmt.Sprintf to construct and log a message.
+func (l *Logger) Debugf(format string, args ...interface{}) {
+	l.sugar.Debugf(format, args...)
+}
+
+// Infof uses fmt.Sprintf to log a templated message.
+func (l *Logger) Infof(format string, args ...interface{}) {
+	l.sugar.Infof(format, args...)
+}
+
+// Warnf uses fmt.Sprintf to log a templated message.
+func (l *Logger) Warnf(format string, args ...interface{}) {
+	l.sugar.Warnf(format, args...)
+}
+
+// Errorf uses fmt.Sprintf to log a templated message.
+func (l *Logger) Errorf(format string, args ...interface{}) {
+	l.sugar.Errorf(format, args...)
+}
+
+// Panicf uses fmt.Sprintf to log a templated message, then panics.
+func (l *Logger) Panicf(format string, args ...interface{}) {
+	l.sugar.Panicf(format, args...)
+}
+
+// DPanicf uses fmt.Sprintf to log a templated message. In development, the
+// logger then panics.
+func (l *Logger) DPanicf(format string, args ...interface{}) {
+	l.sugar.DPanicf(format, args...)
+}
+
+// With context (reflection based)
+
+// Debugw logs a message with some additional context. The additional context
+// is added in the form of key-value pairs. The optimal way to write the value
+// to the log message will be inferred by the value's type. To explicitly
+// specify a type you can pass a Field such as logp.Stringer.
+func (l *Logger) Debugw(msg string, keysAndValues ...interface{}) {
+	l.sugar.Debugw(msg, keysAndValues...)
+}
+
+// Infow logs a message with some additional context. The additional context
+// is added in the form of key-value pairs. The optimal way to write the value
+// to the log message will be inferred by the value's type. To explicitly
+// specify a type you can pass a Field such as logp.Stringer.
+func (l *Logger) Infow(msg string, keysAndValues ...interface{}) {
+	l.sugar.Infow(msg, keysAndValues...)
+}
+
+// Warnw logs a message with some additional context. The additional context
+// is added in the form of key-value pairs. The optimal way to write the value
+// to the log message will be inferred by the value's type. To explicitly
+// specify a type you can pass a Field such as logp.Stringer.
+func (l *Logger) Warnw(msg string, keysAndValues ...interface{}) {
+	l.sugar.Warnw(msg, keysAndValues...)
+}
+
+// Errorw logs a message with some additional context. The additional context
+// is added in the form of key-value pairs. The optimal way to write the value
+// to the log message will be inferred by the value's type. To explicitly
+// specify a type you can pass a Field such as logp.Stringer.
+func (l *Logger) Errorw(msg string, keysAndValues ...interface{}) {
+	l.sugar.Errorw(msg, keysAndValues...)
+}
+
+// Panicw logs a message with some additional context, then panics. The
+// additional context is added in the form of key-value pairs. The optimal way
+// to write the value to the log message will be inferred by the value's type.
+// To explicitly specify a type you can pass a Field such as logp.Stringer.
+func (l *Logger) Panicw(msg string, keysAndValues ...interface{}) {
+	l.sugar.Panicw(msg, keysAndValues...)
+}
+
+// DPanicw logs a message with some additional context. The logger panics only
+// in Development mode.  The additional context is added in the form of
+// key-value pairs. The optimal way to write the value to the log message will
+// be inferred by the value's type. To explicitly specify a type you can pass a
+// Field such as logp.Stringer.
+func (l *Logger) DPanicw(msg string, keysAndValues ...interface{}) {
+	l.sugar.DPanicw(msg, keysAndValues...)
+}

@@ -1,0 +1,10 @@
+{
+  "visState": "{\"title\":\"Metricbeat: Memory Usage Gauge\",\"type\":\"metrics\",\"params\":{\"id\":\"9f51b730-1b91-11e7-bec4-a5e9ec5cab8b\",\"type\":\"gauge\",\"series\":[{\"id\":\"9f51b731-1b91-11e7-bec4-a5e9ec5cab8b\",\"color\":\"#68BC00\",\"split_mode\":\"everything\",\"metrics\":[{\"id\":\"9f51b732-1b91-11e7-bec4-a5e9ec5cab8b\",\"type\":\"avg\",\"field\":\"system.memory.actual.used.pct\"}],\"seperate_axis\":0,\"axis_position\":\"right\",\"formatter\":\"percent\",\"chart_type\":\"line\",\"line_width\":1,\"point_size\":1,\"fill\":0.5,\"stacked\":\"none\",\"label\":\"Memory Usage\"}],\"time_field\":\"@timestamp\",\"index_pattern\":\"metricbeat-*\",\"interval\":\"auto\",\"axis_position\":\"left\",\"axis_formatter\":\"number\",\"show_legend\":1,\"gauge_color_rules\":[{\"value\":0,\"id\":\"a0d522e0-1b91-11e7-bec4-a5e9ec5cab8b\",\"gauge\":\"rgba(104,188,0,1)\",\"opperator\":\"gte\"},{\"value\":0.7,\"id\":\"b45ad8f0-1b91-11e7-bec4-a5e9ec5cab8b\",\"gauge\":\"rgba(254,146,0,1)\",\"opperator\":\"gte\"},{\"value\":0.85,\"id\":\"c06e9550-1b91-11e7-bec4-a5e9ec5cab8b\",\"gauge\":\"rgba(211,49,21,1)\",\"opperator\":\"gte\"}],\"gauge_width\":10,\"gauge_inner_width\":10,\"gauge_style\":\"half\",\"gauge_max\":\"1\",\"filter\":\"\"},\"aggs\":[],\"listeners\":{}}",
+  "description": "",
+  "title": "Metricbeat: Memory Usage Gauge",
+  "uiStateJSON": "{}",
+  "version": 1,
+  "kibanaSavedObjectMeta": {
+    "searchSourceJSON": "{\"query\":{\"query_string\":{\"query\":\"*\"}},\"filter\":[]}"
+  }
+}

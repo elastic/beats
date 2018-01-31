@@ -1,0 +1,13 @@
+{
+  "description": "",
+  "hits": 0,
+  "kibanaSavedObjectMeta": {
+    "searchSourceJSON": "{\"query\":{\"language\":\"lucene\",\"query\":\"\"},\"filter\":[],\"highlightAll\":true,\"version\":true}"
+  },
+  "optionsJSON": "{\"darkTheme\":false}",
+  "panelsJSON": "[{\"col\":1,\"id\":\"a5058e70-f0ae-11e7-b9ff-9f96241065de\",\"panelIndex\":1,\"row\":1,\"size_x\":6,\"size_y\":3,\"type\":\"visualization\"},{\"col\":7,\"id\":\"ac7194b0-f0ae-11e7-b9ff-9f96241065de\",\"panelIndex\":2,\"row\":1,\"size_x\":6,\"size_y\":3,\"type\":\"visualization\"},{\"col\":1,\"id\":\"8c5f96e0-f0ae-11e7-b9ff-9f96241065de\",\"panelIndex\":3,\"row\":4,\"size_x\":6,\"size_y\":3,\"type\":\"visualization\"},{\"col\":7,\"id\":\"ba4a80b0-f0ae-11e7-b9ff-9f96241065de\",\"panelIndex\":4,\"row\":4,\"size_x\":6,\"size_y\":3,\"type\":\"visualization\"}]",
+  "timeRestore": false,
+  "title": "[Metricbeat uWSGI] Overview",
+  "uiStateJSON": "{}",
+  "version": 1
+}

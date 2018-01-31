@@ -19,12 +19,18 @@ jenkins_setup
 cleanup() {
   echo "Running cleanup..."
   rm -rf $TEMP_PYTHON_ENV
-  make stop-environment || true
-  make fix-permissions || true
-  echo "Killing all running containers..."
-  docker ps -q | xargs -r docker kill || true
-  echo "Cleaning stopped docker containers and dangling images/networks/volumes..."
-  docker system prune -f || true
+
+  if docker info > /dev/null ; then
+    make stop-environment || true
+    make fix-permissions || true
+    echo "Killing all running containers..."
+    ids=$(docker ps -q)
+    if [ -n "$ids" ]; then
+      docker kill $ids
+    fi  
+    echo "Cleaning stopped docker containers and dangling images/networks/volumes..."
+    docker system prune -f || true
+  fi
   echo "Cleanup complete."
 }
 trap cleanup EXIT
