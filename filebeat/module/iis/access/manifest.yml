@@ -3,7 +3,6 @@ module_version: 1.0
 var:
   - name: paths
     default:
-<<<<<<< HEAD
       - C:/inetpub/logs/LogFiles/*/*
     os.darwin: [""]
     os.linux: [""]
@@ -12,7 +11,6 @@ var:
 
 ingest_pipeline: ingest/pipeline.json
 prospector: config/w3svc.yml
-=======
       - C:/inetpub/logs/LogFiles/*/*.log
     os.darwin: [""]
     os.linux: [""]
@@ -21,7 +19,6 @@ prospector: config/w3svc.yml
 
 ingest_pipeline: ingest/default.json
 prospector: config/iis-access.yml
->>>>>>> beats-cgwrench/iis-filebeat-module
 
 requires.processors:
 - name: user_agent

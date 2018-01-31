@@ -1,17 +1,11 @@
 - key: iis
   title: "IIS"
   description: >
-<<<<<<< HEAD
     IIS Module
-=======
     Module for parsing IIS log files.
->>>>>>> beats-cgwrench/iis-filebeat-module
   fields:
     - name: iis
       type: group
       description: >
-<<<<<<< HEAD
-=======
         Fields from IIS log files.
->>>>>>> beats-cgwrench/iis-filebeat-module
       fields:

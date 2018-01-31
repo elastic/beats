@@ -756,21 +756,14 @@ The logged message.
 [[exported-fields-iis]]
 == IIS fields
 
-<<<<<<< HEAD
-IIS Module
-=======
-Module for parsing IIS log files.
->>>>>>> beats-cgwrench/iis-filebeat-module
+IIS Module Module for parsing IIS log files.
 
 
 
 [float]
 == iis fields
 
-<<<<<<< HEAD
-=======
 Fields from IIS log files.
->>>>>>> beats-cgwrench/iis-filebeat-module
 
 
 
@@ -1075,8 +1068,6 @@ type: keyword
 The city name.
 
 
-<<<<<<< HEAD
-=======
 [float]
 == error fields
 
@@ -1213,7 +1204,6 @@ type: keyword
 The city name.
 
 
->>>>>>> beats-cgwrench/iis-filebeat-module
 [[exported-fields-kafka]]
 == Kafka fields
 
