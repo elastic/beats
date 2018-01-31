@@ -40,12 +40,7 @@ func (m *AutodiscoverAdapter) Create(c *common.Config, meta *common.MapStrPointe
 	return m.factory.Create(c, meta)
 }
 
-// StartFilter returns the bus filter to retrieve runner start triggering events
-func (m *AutodiscoverAdapter) StartFilter() []string {
-	return []string{"start", "config"}
-}
-
-// StopFilter returns the bus filter to retrieve runner stop triggering events
-func (m *AutodiscoverAdapter) StopFilter() []string {
-	return []string{"stop", "config"}
+// EventFilter returns the bus filter to retrieve runner start/stop triggering events
+func (m *AutodiscoverAdapter) EventFilter() []string {
+	return []string{"config"}
 }
