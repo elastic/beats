@@ -31,7 +31,7 @@ func TestGetWithDefault(t *testing.T) {
 }
 
 func TestTimeout(t *testing.T) {
-	test := newValueMap(20 * time.Millisecond)
+	test := newValueMap(10 * time.Millisecond)
 
 	test.Set("foo", 3.14)
 	assert.Equal(t, 3.14, test.Get("foo"))
