@@ -1,0 +1,81 @@
+//////////////////////////////////////////////////////////////////////////
+//// This content is shared by all Elastic Beats. Make sure you keep the
+//// descriptions here generic enough to work for all Beats that include
+//// this file. When using cross references, make sure that the cross
+//// references resolve correctly for any files that include this one.
+//// Use the appropriate variables defined in the index.asciidoc file to
+//// resolve Beat names: beatname_uc and beatname_lc.
+//// Use the following include to pull this content into a doc file:
+//// include::../../libbeat/docs/monitoring/configuring.asciidoc[]
+//// Make sure this content appears below a level 2 heading.
+//////////////////////////////////////////////////////////////////////////
+
+[role="xpack"]
+[[configuring-monitoring]]
+== Configuring monitoring for {beatname_uc}
+++++
+<titleabbrev>Configure monitoring</titleabbrev>
+++++
+
+{monitoring} enables you to easily monitor {beatname_uc} from {kib}. For more
+information, see {kibana-ref}/xpack-monitoring.html[Monitoring].
+
+. Configure {beatname_uc} to send metrics to your {es} cluster by setting the
+`xpack.monitoring` settings in the {beatname_uc} configuration file. For
+example:
++
+--
+[source, yml]
+--------------------
+xpack.monitoring:
+  enabled: true
+  elasticsearch:
+    url: ["https://example.com:9200", "https://example2.com:9200"]
+    username: elastic
+    password: changeme
+--------------------
+
+--
+
+. {kibana-ref}/monitoring-xpack-kibana.html[Configure monitoring in {kib}].
+
+. To verify your monitoring configuration, point your web browser at your {kib}
+host, and select Monitoring from the side navigation. Metrics reported from
+{beatname_uc} should be visible in the Beats section. When {security} is enabled,
+to view the monitoring dashboards you must log in to {kib} as a user who has the
+`kibana_user` and `monitoring_user` roles.
+
+[float]
+=== Configuration options
+
+You can specify the following options in the `xpack.monitoring` section of the
++{beatname_lc}.yml+ config file:
+
+[float]
+==== `enabled`
+
+Monitoring is disabled by default. Set to `true` to enable {monitoring}.
+
+[float]
+==== `elasticsearch`
+
+The {es} instances that you want to ship your {beatname_uc} metrics to. This
+configuration option contains the following fields:
+
+[float]
+===== `url`
+
+The URL for the {es} instances. You can specify a single host as a string or
+specify multiple hosts as an array. Defaults to `http://localhost:9200`.
+
+[float]
+===== `username`
+
+The user ID that {beatname_uc} uses to authenticate with the {es} instances for
+shipping monitoring data.
+
+[float]
+===== `password`
+
+The password that {beatname_uc} uses to authenticate with the {es} instances for 
+shipping monitoring data.
