@@ -1,5 +1,6 @@
 import os
 import argparse
+import datetime
 
 # Creates a new beat or metricbeat based on the given parameters
 
@@ -8,11 +9,11 @@ github_name = ""
 beat = ""
 beat_path = ""
 full_name = ""
-
+current_year = datetime.datetime.now().year
 
 def generate_beat(args):
 
-    global project_name, github_name, beat, beat_path, full_name
+    global project_name, github_name, beat, beat_path, full_name, current_year
 
     if args.project_name is not None:
         project_name = args.project_name
@@ -33,7 +34,7 @@ def generate_beat(args):
 def read_input():
     """Requests input form the command line for empty variables if needed.
     """
-    global project_name, github_name, beat, beat_path, full_name
+    global project_name, github_name, beat, beat_path, full_name, current_year
 
     if project_name == "":
         project_name = raw_input("Beat Name [Examplebeat]: ") or "examplebeat"
@@ -97,7 +98,8 @@ def replace_variables(content):
         .replace("{beat}", beat) \
         .replace("{Beat}", beat.capitalize()) \
         .replace("{beat_path}", beat_path) \
-        .replace("{full_name}", full_name)
+        .replace("{full_name}", full_name) \
+        .replace("{current_year}", str(current_year))
 
 
 def get_parser():

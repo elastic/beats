@@ -78,13 +78,13 @@ def gather_dependencies(vendor_dirs):
     return dependencies
 
 
-def write_notice_file(f, beat, copyright, dependencies):
+def write_notice_file(f, beat, copyright_start_year, copyright_text, dependencies):
 
     now = datetime.datetime.now()
 
     # Add header
     f.write("{}\n".format(beat))
-    f.write("Copyright 2014-{0} {1}\n".format(now.year, copyright))
+    f.write("Copyright {0}-{1} {2}\n".format(copyright_start_year, now.year, copyright_text))
     f.write("\n")
     f.write("This product includes software developed by The Apache Software \n" +
             "Foundation (http://www.apache.org/).\n\n")
@@ -137,11 +137,11 @@ def get_url(repo):
     return "https://github.com/{}/{}".format(words[1], words[2])
 
 
-def create_notice(filename, beat, copyright, vendor_dirs, csvfile):
+def create_notice(filename, beat, copyright_start_year, copyright_text, vendor_dirs, csvfile):
     dependencies = gather_dependencies(vendor_dirs)
     if not csvfile:
         with open(filename, "w+") as f:
-            write_notice_file(f, beat, copyright, dependencies)
+            write_notice_file(f, beat, copyright_start_year, copyright_text, dependencies)
     else:
         with open(csvfile, "wb") as f:
             csvwriter = csv.writer(f)
@@ -242,6 +242,8 @@ if __name__ == "__main__":
                         help="Beat name")
     parser.add_argument("-c", "--copyright", default="Elasticsearch BV",
                         help="copyright owner")
+    parser.add_argument("-y", "--copyright-year", default="2018",
+                        help="year to start the copyright")
     parser.add_argument("--csv", dest="csvfile",
                         help="Output to a csv file")
     parser.add_argument("-e", "--excludes", default=["dev-tools", "build"],
@@ -274,6 +276,6 @@ if __name__ == "__main__":
                 dirs.remove(exclude)
 
     print("Get the licenses available from {}".format(vendor_dirs))
-    create_notice(notice, args.beat, args.copyright, vendor_dirs, args.csvfile)
+    create_notice(notice, args.beat, args.copyright_year, args.copyright, vendor_dirs, args.csvfile)
 
     print("Available at {}".format(notice))
