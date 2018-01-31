@@ -258,6 +258,7 @@ The city name.
 
 [float]
 == error fields
+<<<<<<< HEAD
 Fields from the Apache error logs.
 
 
@@ -296,6 +297,15 @@ The logged message.
 
 [float]
 === `apache2.error.pid`
+=======
+
+Fields from the Apache error logs.
+
+
+
+[float]
+=== `apache2.error.level`
+>>>>>>> e41791964fe4ba91e473f90efe743c0f74a673ef
 
 type: long
 
@@ -308,6 +318,7 @@ The severity level of the message.
 type: keyword
 
 The IP address of the client that generated the error.
+<<<<<<< HEAD
 
 
 [float]
@@ -381,9 +392,32 @@ The SSL cipher used during the connection.
 
 [float]
 === `apache2.ssl_request.url`
+=======
 
-type: keyword
 
+[float]
+=== `apache2.error.message`
+
+type: text
+
+The logged message.
+
+
+[float]
+=== `apache2.error.pid`
+
+type: long
+
+The process ID.
+
+
+[float]
+=== `apache2.error.tid`
+>>>>>>> e41791964fe4ba91e473f90efe743c0f74a673ef
+
+type: long
+
+<<<<<<< HEAD
 The request HTTP URL.
 
 
@@ -396,11 +430,18 @@ The thread ID.
 
 
 [float]
+=======
+The thread ID.
+
+
+[float]
+>>>>>>> e41791964fe4ba91e473f90efe743c0f74a673ef
 === `apache2.error.module`
 
 type: keyword
 
 The module producing the logged message.
+<<<<<<< HEAD
 
 
 [float]
@@ -415,9 +456,16 @@ The request HTTP method.
 
 [float]
 === `apache2.ssl_request.http_version`
+=======
 
-type: keyword
 
+[float]
+== access fields
+>>>>>>> e41791964fe4ba91e473f90efe743c0f74a673ef
+
+Contains fields for the Apache2 HTTPD ssl access logs.
+
+<<<<<<< HEAD
 The HTTP version.
 
 
@@ -440,6 +488,11 @@ Contains GeoIP information gathered based on the remote_ip field. Only present i
 
 
 [float]
+=======
+
+
+[float]
+>>>>>>> e41791964fe4ba91e473f90efe743c0f74a673ef
 === `apache2.access.ssl_protocol`
 
 type: keyword
@@ -449,6 +502,7 @@ The SSL protocol used during the connection.
 
 [float]
 === `apache2.access.ssl_cipher`
+<<<<<<< HEAD
 
 type: keyword
 
@@ -492,6 +546,12 @@ type: keyword
 
 The city name.
 >>>>>>> replaced ssl with ssl_request
+=======
+
+type: keyword
+
+The SSL cipher used during the connection.
+>>>>>>> e41791964fe4ba91e473f90efe743c0f74a673ef
 
 
 [[exported-fields-auditd]]

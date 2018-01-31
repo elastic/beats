@@ -3,10 +3,13 @@
   description: >
     Contains fields for the Apache2 HTTPD ssl access logs.
   fields:
+<<<<<<< HEAD
     - name: remote_ip
       type: keyword
       description: >
         Client IP address.
+=======
+>>>>>>> e41791964fe4ba91e473f90efe743c0f74a673ef
     - name: ssl_protocol
       type: keyword
       description: >
@@ -15,6 +18,7 @@
       type: keyword
       description: >
         The SSL cipher used during the connection.
+<<<<<<< HEAD
     - name: url
       type: keyword
       description: >
@@ -60,4 +64,6 @@
           type: keyword
           description: >
             The city name.
+=======
+>>>>>>> e41791964fe4ba91e473f90efe743c0f74a673ef
 
