@@ -81,12 +81,12 @@ func TestGlobalLoggerLevel(t *testing.T) {
 		assert.Equal(t, "info", logs[0].Message)
 	}
 
-	Warn("warn")
+	Warn("warning")
 	logs = ObserverLogs().TakeAll()
 	if assert.Len(t, logs, 1) {
 		assert.Equal(t, zap.WarnLevel, logs[0].Level)
 		assert.Equal(t, "", logs[0].LoggerName)
-		assert.Equal(t, "warn", logs[0].Message)
+		assert.Equal(t, "warning", logs[0].Message)
 	}
 
 	Err("error")
