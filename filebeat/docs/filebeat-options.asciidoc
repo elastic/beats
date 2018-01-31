@@ -34,6 +34,7 @@ filebeat.prospectors:
 === Configuration options
 
 [float]
+[[prospector-type]]
 ==== `type`
 
 One of the following input types:
