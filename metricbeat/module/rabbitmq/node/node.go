@@ -34,7 +34,10 @@ type MetricSet struct {
 func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
 	cfgwarn.Experimental("The rabbitmq node metricset is experimental")
 
-	http := helper.NewHTTP(base)
+	http, err := helper.NewHTTP(base)
+	if err != nil {
+		return nil, err
+	}
 	http.SetHeader("Accept", "application/json")
 
 	return &MetricSet{
