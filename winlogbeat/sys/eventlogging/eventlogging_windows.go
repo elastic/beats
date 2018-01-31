@@ -3,6 +3,7 @@ package eventlogging
 import (
 	"bytes"
 	"encoding/binary"
+	"errors"
 	"fmt"
 	"reflect"
 	"strings"
@@ -21,8 +22,14 @@ import (
 // identifier and the Qualifier attribute contains the high-order 16 bits of the
 // event identifier.
 const (
-	eventIDLowerMask uint32 = 0xFFFF
-	eventIDUpperMask uint32 = 0xFFFF0000
+	eventIDLowerMask              uint32 = 0xFFFF
+	eventIDUpperMask              uint32 = 0xFFFF0000
+	maxInsertArgumentPlaceholders        = 99
+)
+
+var (
+	// "(null)" utf16 string in little-endian format
+	nullUtf16 = []byte{'(', 0, 'n', 0, 'u', 0, 'l', 0, 'l', 0, ')', 0, 0, 0}
 )
 
 // IsAvailable returns true if the Event Logging API is supported by this
@@ -184,33 +191,30 @@ func formatMessage(
 	buffer []byte,
 	pubHandleProvider func(string) sys.MessageFiles,
 ) (string, error) {
-	var addr uintptr
-	if len(stringInserts) > 0 {
-		addr = reflect.ValueOf(&stringInserts[0]).Pointer()
-	}
-
 	messageFiles := pubHandleProvider(sourceName)
 
+	const sizeErrMsg = "Windows FormatMessage reported that message contains " +
+		"%d characters plus a null-terminator (%d bytes), but the buffer can " +
+		"only hold %d bytes"
 	var lastErr error
 	var fh sys.FileHandle
 	var message string
+	var bufferUsed int
 	for _, fh = range messageFiles.Handles {
 		if fh.Err != nil {
-			lastErr = fh.Err
 			continue
 		}
-
 		numChars, err := _FormatMessage(
 			windows.FORMAT_MESSAGE_FROM_HMODULE|
-				windows.FORMAT_MESSAGE_ARGUMENT_ARRAY,
+				windows.FORMAT_MESSAGE_IGNORE_INSERTS,
 			Handle(fh.Handle),
 			eventID,
 			lang,
 			&buffer[0],            // Max size allowed is 64k bytes.
 			uint32(len(buffer)/2), // Size of buffer in TCHARS
-			addr)
+			0)
 		// bufferUsed = numChars * sizeof(TCHAR) + sizeof(null-terminator)
-		bufferUsed := int(numChars*2 + 2)
+		bufferUsed = int(numChars*2 + 2)
 		if err == syscall.ERROR_INSUFFICIENT_BUFFER {
 			return "", err
 		}
@@ -220,18 +224,11 @@ func formatMessage(
 		}
 
 		if bufferUsed > len(buffer) {
-			return "", fmt.Errorf("Windows FormatMessage reported that "+
-				"message contains %d characters plus a null-terminator "+
-				"(%d bytes), but the buffer can only hold %d bytes",
-				numChars, bufferUsed, len(buffer))
-		}
-		message, _, err = sys.UTF16BytesToString(buffer[:bufferUsed])
-		if err != nil {
-			return "", err
+			return "", fmt.Errorf(sizeErrMsg, numChars, bufferUsed, len(buffer))
 		}
 	}
 
-	if message == "" {
+	if bufferUsed <= 2 {
 		switch lastErr {
 		case nil:
 			return "", messageFiles.Err
@@ -243,6 +240,55 @@ func formatMessage(
 		}
 	}
 
+	// found the format string, validate insert arguments
+	fmtString := make([]byte, bufferUsed)
+	copy(fmtString, buffer)
+	if maxArgument, err := getMaxInsertArgument(fmtString); err != nil {
+		logp.Warn("Failed to get max insert argument for format string %v", fmtString)
+	} else {
+		if maxArgument > maxInsertArgumentPlaceholders {
+			logp.Warn("Insert argument out of range: %d. Limiting to %d. Format string: %v",
+				maxArgument, maxInsertArgumentPlaceholders, fmtString)
+			maxArgument = maxInsertArgumentPlaceholders
+		}
+		current := len(stringInserts)
+		if current < maxArgument {
+			logp.Debug("eventlog", "Broken event: extending format argument list from %d to %d entries", current, maxArgument)
+			padding := make([]uintptr, maxArgument-current)
+			for idx := range padding {
+				padding[idx] = uintptr(unsafe.Pointer(&nullUtf16[0]))
+			}
+			stringInserts = append(stringInserts, padding...)
+		}
+	}
+
+	var addr uintptr
+	if len(stringInserts) > 0 {
+		addr = reflect.ValueOf(&stringInserts[0]).Pointer()
+	}
+	numChars, err := _FormatMessage(
+		windows.FORMAT_MESSAGE_FROM_STRING|
+			windows.FORMAT_MESSAGE_ARGUMENT_ARRAY,
+		Handle(unsafe.Pointer(&fmtString[0])),
+		0,
+		0,
+		&buffer[0],            // Max size allowed is 64k bytes.
+		uint32(len(buffer)/2), // Size of buffer in TCHARS
+		addr)
+	// bufferUsed = numChars * sizeof(TCHAR) + sizeof(null-terminator)
+	bufferUsed = int(numChars*2 + 2)
+	if err != nil {
+		return "", err
+	}
+
+	if bufferUsed > len(buffer) {
+		return "", fmt.Errorf(sizeErrMsg, numChars, bufferUsed, len(buffer))
+	}
+
+	message, _, err = sys.UTF16BytesToString(buffer[:bufferUsed])
+	if err != nil {
+		return "", err
+	}
 	return message, nil
 }
 
@@ -562,4 +608,41 @@ func QueryEventMessageFiles(providerName, sourceName string) sys.MessageFiles {
 		sourceName)
 	mf.Handles = files
 	return mf
+}
+
+// getMaxInsertArgument receives an UTF-16 string and returns the maximum value
+// of an insert argument placeholder as expected by the FormatMessage API
+// For "The %1 service entered state %2" it returns 2.
+// The maximum value supported by FormatMessage is 99, but this is not checked
+// by this function.
+func getMaxInsertArgument(msg []byte) (int, error) {
+	var (
+		max, num int
+		escape   bool
+	)
+	n := len(msg)
+	if n&1 != 0 {
+		return 0, errors.New("utf16 string has odd length")
+	}
+	if n < 2 || msg[n-1] != 0 || msg[n-2] != 0 {
+		return 0, errors.New("utf16 string is not terminated")
+	}
+	for i := 0; i < n; i += 2 {
+		chr := msg[i]
+		zero := msg[i+1]
+		if !escape {
+			escape = zero == 0 && chr == '%'
+		} else {
+			if zero == 0 && chr >= '0' && chr <= '9' {
+				num = num*10 + int(chr) - '0'
+			} else {
+				if num > max {
+					max = num
+				}
+				num = 0
+				escape = false
+			}
+		}
+	}
+	return max, nil
 }
