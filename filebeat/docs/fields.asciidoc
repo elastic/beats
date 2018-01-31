@@ -769,24 +769,16 @@ iis Module
 [float]
 == access fields
 
-Contains fields for the Apache2 HTTPD access logs.
+Contains fields for IIS access logs.
 
 
 
 [float]
-=== `iis.access.remote_ip`
+=== `iis.access.server_ip`
 
 type: keyword
 
-Client IP address.
-
-
-[float]
-=== `iis.access.user_name`
-
-type: keyword
-
-The user name used when basic authentication is used.
+The server IP address.
 
 
 [float]
@@ -808,11 +800,43 @@ The request HTTP URL.
 
 
 [float]
-=== `iis.access.http_version`
+=== `iis.access.query_string`
 
 type: keyword
 
-The HTTP version.
+The request query string, if any.
+
+
+[float]
+=== `iis.access.port`
+
+type: long
+
+The request port number.
+
+
+[float]
+=== `iis.access.user_name`
+
+type: keyword
+
+The user name used when basic authentication is used.
+
+
+[float]
+=== `iis.access.remote_ip`
+
+type: keyword
+
+The client IP address.
+
+
+[float]
+=== `iis.access.referrer`
+
+type: keyword
+
+The HTTP referrer.
 
 
 [float]
@@ -821,6 +845,70 @@ The HTTP version.
 type: long
 
 The HTTP response code.
+
+
+[float]
+=== `iis.access.sub_status`
+
+type: long
+
+The HTTP substatus code.
+
+
+[float]
+=== `iis.access.win32_status`
+
+type: long
+
+The Windows status code.
+
+
+[float]
+=== `iis.access.request_time_ms`
+
+type: long
+
+The request time in milliseconds.
+
+
+[float]
+=== `iis.access.site_name`
+
+type: keyword
+
+The site name and instance number.
+
+
+[float]
+=== `iis.access.server_name`
+
+type: keyword
+
+The name of the server on which the log file entry was generated.
+
+
+[float]
+=== `iis.access.http_version`
+
+type: keyword
+
+The HTTP version.
+
+
+[float]
+=== `iis.access.cookie`
+
+type: keyword
+
+The content of the cookie sent or received, if any.
+
+
+[float]
+=== `iis.access.hostname`
+
+type: keyword
+
+The host header name, if any.
 
 
 [float]
@@ -834,11 +922,13 @@ The number of bytes of the server response body.
 
 
 [float]
-=== `iis.access.referrer`
+=== `iis.access.body_received.bytes`
 
-type: keyword
+type: long
 
-The HTTP referrer.
+format: bytes
+
+The number of bytes of the server request body.
 
 
 [float]
@@ -852,7 +942,7 @@ Contains the un-parsed user agent string. Only present if the user agent Elastic
 [float]
 == user_agent fields
 
-Contains the parsed User agent field. Only present if the user agent Elasticsearch plugin is available and used.
+Contains the parsed user agent field. Only present if the user agent Elasticsearch plugin is available and used.
 
 
 

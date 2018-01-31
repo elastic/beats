@@ -121,10 +121,10 @@ filebeat.modules:
     #prospector:
 
 #--------------------------------- iis Module --------------------------------
-- module: iis
+#- module: iis
   # Win IIS logs
-  w3svc:
-    enabled: true
+  #access:
+    #enabled: true
 
     # Set custom paths for the log files. If left empty,
     # Filebeat will choose the paths depending on your OS.
