@@ -7,6 +7,12 @@ changes, but there are breaking changes between major versions (e.g. 5.x to
 6.y). Migrating directly between non consecutive major versions (e.g. 1.x to
 6.x) is not recommended.
 
+See the following topics for a description of breaking changes:
+
+* <<breaking-changes-6.0>>
+* {auditbeat}/auditbeat-breaking-changes.html[Breaking changes in Auditbeat 6.2]
+
+
 [[breaking-changes-6.0]]
 === Breaking changes in 6.0
 
