@@ -1171,7 +1171,7 @@ The GeoIP information of the client.
 
 type: geo_point
 
-example: {'lat': 51, 'lon': 9}
+example: {'lon': 9, 'lat': 51}
 
 The GeoIP location of the `client_ip` address. This field is available only if you define a https://www.elastic.co/guide/en/elasticsearch/plugins/master/using-ingest-geoip.html[GeoIP Processor] as a pipeline in the https://www.elastic.co/guide/en/elasticsearch/plugins/master/ingest-geoip.html[Ingest GeoIP processor plugin] or using Logstash.
 
