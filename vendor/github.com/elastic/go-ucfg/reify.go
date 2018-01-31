@@ -576,11 +576,14 @@ func doReifyPrimitive(
 		tRegexp:   reifyRegexp,
 	}
 
+	previous := opts.opts.activeFields
+	opts.opts.activeFields = NewFieldSet(previous)
 	valT, err := val.typ(opts.opts)
 	if err != nil {
 		ctx := val.Context()
 		return reflect.Value{}, raisePathErr(err, val.meta(), "", ctx.path("."))
 	}
+	opts.opts.activeFields = previous
 
 	// try primitive conversion
 	kind := baseType.Kind()
