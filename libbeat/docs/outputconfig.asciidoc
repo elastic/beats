@@ -13,22 +13,24 @@
 [[configuring-output]]
 == Configure the output
 
+ifdef::only-elasticsearch[]
+You configure {beatname_uc} to write to Elasticsearch by setting options in
+the `output.elasticsearch` of the +{beatname_lc}.yml+ config file.
+endif::[]
+
+ifndef::only-elasticsearch[]
 You configure {beatname_uc} to write to a specific output by setting options
 in the `output` section of the +{beatname_lc}.yml+ config file. Only a single
 output may be defined.
 
 The following topics describe how to configure each supported output:
-
 * <<elasticsearch-output>>
-
-ifndef::only-elasticsearch[]
 * <<logstash-output>>
 * <<kafka-output>>
 * <<redis-output>>
 * <<file-output>>
 * <<console-output>>
 endif::[]
-
 
 [[elasticsearch-output]]
 === Configure the Elasticsearch output
