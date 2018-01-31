@@ -474,6 +474,49 @@ func TestReadWhileCleared(t *testing.T) {
 	}
 }
 
+// Test event messages that include less parameters than required for message
+// formating (caused a crash in previous versions)
+func TestReadMissingParameters(t *testing.T) {
+	configureLogp()
+	log, err := initLog(providerName, sourceName, servicesMsgFile)
+	if err != nil {
+		t.Fatal(err)
+	}
+	defer func() {
+		err := uninstallLog(providerName, sourceName, log)
+		if err != nil {
+			t.Fatal(err)
+		}
+	}()
+
+	var eventID uint32 = 1073748860
+	// Missing parameters will be substituted by "(null)"
+	template := "The %s service entered the (null) state."
+	msgs := []string{"Windows Update"}
+	err = log.Report(elog.Info, eventID, msgs)
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	// Read messages:
+	eventlog, teardown := setupEventLogging(t, 0, map[string]interface{}{"name": providerName})
+	defer teardown()
+
+	records, err := eventlog.Read()
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	// Verify the message contents:
+	assert.Len(t, records, 1)
+	if len(records) != 1 {
+		t.FailNow()
+	}
+	assert.Equal(t, eventID&0xFFFF, records[0].EventIdentifier.ID)
+	assert.Equal(t, fmt.Sprintf(template, msgs[0]),
+		strings.TrimRight(records[0].Message, "\r\n"))
+}
+
 func newTestEventLogging(t *testing.T, options map[string]interface{}) EventLog {
 	return newTestEventLog(t, newEventLogging, options)
 }
