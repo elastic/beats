@@ -3292,7 +3292,7 @@ THE SOFTWARE.
 
 --------------------------------------------------------------------
 Dependency: golang.org/x/crypto
-Revision: d585fd2cc9195196078f516b69daff6744ef5e84
+Revision: 1875d0a70c90e57f11972aefd42276df65e895b9
 License type (autodetected): BSD-3-Clause
 ./vendor/golang.org/x/crypto/LICENSE:
 --------------------------------------------------------------------
@@ -3326,7 +3326,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 --------------------------------------------------------------------
 Dependency: golang.org/x/net
-Revision: e90d6d0afc4c315a0d87a568ae68577cc15149a0
+Revision: 0ed95abb35c445290478a5348a7b38bb154135fd
 License type (autodetected): BSD-3-Clause
 ./vendor/golang.org/x/net/LICENSE:
 --------------------------------------------------------------------
@@ -3360,7 +3360,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 --------------------------------------------------------------------
 Dependency: golang.org/x/sys
-Revision: b76f9891dc1d975623261def70f9b89661f5baab
+Revision: 3dbebcf8efb6a5011a60c2b4591c1022a759af8a
 License type (autodetected): BSD-3-Clause
 ./vendor/golang.org/x/sys/LICENSE:
 --------------------------------------------------------------------
@@ -3394,7 +3394,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 --------------------------------------------------------------------
 Dependency: golang.org/x/text
-Revision: 2910a502d2bf9e43193af9d68ca516529614eed3
+Revision: e19ae1496984b1c655b8044a65c0300a3c878dd3
 License type (autodetected): BSD-3-Clause
 ./vendor/golang.org/x/text/LICENSE:
 --------------------------------------------------------------------
@@ -3428,7 +3428,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 --------------------------------------------------------------------
 Dependency: golang.org/x/tools
-Revision: 9be3b7cbc7ccd19baaa3b7704c22f57db5ebbdf2
+Revision: 25101aadb97aa42907eee6a238d6d26a6cb3c756
 License type (autodetected): BSD-3-Clause
 ./vendor/golang.org/x/tools/LICENSE:
 --------------------------------------------------------------------
