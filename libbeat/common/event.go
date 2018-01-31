@@ -262,16 +262,22 @@ func DeDot(s string) string {
 // DeDotJSON replaces in keys all . with _
 // This helps when sending data to Elasticsearch to prevent object and key collisions.
 func DeDotJSON(json interface{}) interface{} {
-	switch json.(type) {
+	switch json := json.(type) {
 	case map[string]interface{}:
 		result := map[string]interface{}{}
-		for key, value := range json.(map[string]interface{}) {
+		for key, value := range json {
+			result[DeDot(key)] = DeDotJSON(value)
+		}
+		return result
+	case MapStr:
+		result := MapStr{}
+		for key, value := range json {
 			result[DeDot(key)] = DeDotJSON(value)
 		}
 		return result
 	case []interface{}:
-		result := make([]interface{}, len(json.([]interface{})))
-		for i, value := range json.([]interface{}) {
+		result := make([]interface{}, len(json))
+		for i, value := range json {
 			result[i] = DeDotJSON(value)
 		}
 		return result
