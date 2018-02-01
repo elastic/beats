@@ -124,7 +124,7 @@ func showResp(resp *http.Response) {
 
 func main() {
 	esURL := flag.String("elasticsearch", "http://localhost:9200", "Elasticsearch URL")
-	path := flag.String("path", "", "Path to pipeline")
+	path := flag.String("pipeline", "", "Path to pipeline")
 	log := flag.String("log", "", "Single log line to test")
 	logfile := flag.String("logfile", "", "Path to log file")
 	multiPattern := flag.String("multiline-pattern", "", "Multiline pattern")
