@@ -17,11 +17,11 @@ func eventMapping(families []*dto.MetricFamily) ([]common.MapStr, error) {
 				continue
 			}
 			namespace := util.GetLabel(metric, "namespace")
-			statefulset_key := namespace + "::" + statefulset
-			event, ok := eventsMap[statefulset_key]
+			statefulsetKey := namespace + "::" + statefulset
+			event, ok := eventsMap[statefulsetKey]
 			if !ok {
 				event = common.MapStr{}
-				eventsMap[statefulset_key] = event
+				eventsMap[statefulsetKey] = event
 			}
 			switch family.GetName() {
 			case "kube_statefulset_metadata_generation":
@@ -44,7 +44,8 @@ func eventMapping(families []*dto.MetricFamily) ([]common.MapStr, error) {
 		}
 	}
 
-	var events []common.MapStr
+	// initialize, populate events array from values in eventsMap
+	events := make([]common.MapStr, 0, len(eventsMap))
 	for _, event := range eventsMap {
 		events = append(events, event)
 	}
