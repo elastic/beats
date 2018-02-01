@@ -21,6 +21,7 @@ https://github.com/elastic/beats/compare/v6.0.0-beta2...master[Check the HEAD di
 - Adding a local keystore to allow user to obfuscate password {pull}5687[5687]
 - Update go-ucfg library to support top level key reference and cyclic key reference for the
   keystore {pull}6098[6098]
+- The default value for pipelining is reduced to 2 to avoid high memory in the Logstash beats input. {pull}6250[6250]
 
 *Auditbeat*
 
