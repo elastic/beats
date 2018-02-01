@@ -785,7 +785,7 @@ class Test(BaseTest):
         """
         self.render_config_template(
             path=os.path.abspath(self.working_dir) + "/log/*",
-            encoding="GBK",  # Set invalid encoding for entry below which is actually uft-8
+            encoding="utf-16be",
         )
 
         os.mkdir(self.working_dir + "/log/")
@@ -793,10 +793,9 @@ class Test(BaseTest):
         logfile = self.working_dir + "/log/test.log"
 
         with open(logfile, 'w') as file:
-            file.write("hello world1" + "\n")
-
-            file.write('<meta content="瞭解「Google 商業解決方案」提供的各類服務軟件如何助您分析資料、刊登廣告、提升網站成效等。" name="description">' + '\n')
-            file.write("hello world2" + "\n")
+            file.write("hello world1\n".encode("utf-16be"))
+            file.write("\U00012345=Ra" + u"\n".encode("utf-16be"))
+            file.write("hello world2\n".encode("utf-16be"))
 
         filebeat = self.start_beat()
 
@@ -807,7 +806,7 @@ class Test(BaseTest):
 
         # Wait until error shows up
         self.wait_until(
-            lambda: self.log_contains("Error decoding line: simplifiedchinese: invalid GBK encoding"),
+            lambda: self.log_contains("Error decoding line: transform: short source buffer"),
             max_timeout=5)
 
         filebeat.check_kill_and_wait()
