@@ -137,7 +137,12 @@ func main() {
 	}
 
 	if *log == "" && *logfile == "" {
-		fmt.Println("Error: -log or -logs has to be specified")
+		os.Stderr.WriteString("Error: -log or -logs has to be specified\n")
+		os.Exit(1)
+	}
+
+	if *multiPattern != "" && *logfile == "" {
+		os.Stderr.WriteString("Error: -multiline-pattern is set but -logfile is not\n")
 		os.Exit(1)
 	}
 
@@ -146,7 +151,7 @@ func main() {
 	if *logfile != "" {
 		logs, err = getLogsFromFile(*logfile, *multiPattern, *multiNegate)
 		if err != nil {
-			fmt.Println("Error while reading logs from file:", err)
+			os.Stderr.WriteString(fmt.Sprintf("Error while reading logs from file: %v\n", err))
 			os.Exit(2)
 		}
 	} else {
@@ -155,13 +160,13 @@ func main() {
 
 	pipeline, err := readPipeline(*path)
 	if err != nil {
-		fmt.Println("Error while reading pipeline:", err)
+		os.Stderr.WriteString(fmt.Sprintf("Error while reading pipeline: %v\n", err))
 		os.Exit(2)
 	}
 
 	resp, err := runSimulate(*esURL, pipeline, logs)
 	if err != nil {
-		fmt.Println("Error while sending request to Elasticsearch:", err)
+		os.Stderr.WriteString(fmt.Sprintf("Error while sending request to Elasticsearch: %v\n", err))
 		os.Exit(2)
 	}
 
