@@ -30,8 +30,42 @@ func getLogsFromFile(logfile, multiPattern string, multiNegate bool) ([]string, 
 	var logs []string
 	s := bufio.NewScanner(f)
 	for s.Scan() {
-		line := s.Text()
+		l := getCompleteLine(s, s.Text(), multiNegate, regex)
+		logs = append(logs, l...)
 	}
+	return logs, nil
+}
+
+func getCompleteLine(s *bufio.Scanner, line string, multiNegate bool, regex *regexp.Regexp) []string {
+	if regex.String() == "" {
+		return []string{line}
+	}
+	return getMultiline(s, line, multiNegate, regex)
+}
+
+func getMultiline(s *bufio.Scanner, line string, multiNegate bool, regex *regexp.Regexp) []string {
+	matches := regex.MatchString(line)
+	fullLine := line
+	if matches || !matches && multiNegate {
+		if !s.Scan() {
+			return []string{fullLine}
+		}
+
+		line = s.Text()
+		matches = regex.MatchString(line)
+		for !matches || matches && multiNegate {
+			fullLine = strings.Join([]string{fullLine, line}, "\n")
+			if !s.Scan() {
+				return []string{fullLine}
+			}
+			line = s.Text()
+			matches = regex.MatchString(line)
+		}
+		return []string{fullLine, line}
+
+	}
+	return []string{fullLine}
+
 }
 
 func readPipeline(path string) (map[string]interface{}, error) {
@@ -92,7 +126,7 @@ func main() {
 	esURL := flag.String("elasticsearch", "http://localhost:9200", "Elasticsearch URL")
 	path := flag.String("path", "", "Path to pipeline")
 	log := flag.String("log", "", "Single log line to test")
-	logfile := flag.String("logs", "", "Path to log file")
+	logfile := flag.String("logfile", "", "Path to log file")
 	multiPattern := flag.String("multiline-pattern", "", "Multiline pattern")
 	multiNegate := flag.Bool("multiline-negate", false, "Multiline negate")
 	flag.Parse()
@@ -108,8 +142,9 @@ func main() {
 	}
 
 	var logs []string
-	if logfile != "" {
-		logs, err = getLogsFromFile(logfile, multiPattern, multiNegate)
+	var err error
+	if *logfile != "" {
+		logs, err = getLogsFromFile(*logfile, *multiPattern, *multiNegate)
 		if err != nil {
 			fmt.Println("Error while reading logs from file:", err)
 			os.Exit(2)
