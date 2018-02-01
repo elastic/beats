@@ -38,6 +38,7 @@ https://github.com/elastic/beats/compare/v6.0.0-beta2...master[Check the HEAD di
   folder, to maintain backward compatibility type aliasing was used to map the old type to the new
   one. This change also affect YAML configuration. {pull}6078[6078]
 - Refactor the Redis prospector to use the input interface {pull}6116[6116]
+- Refactor the UDP prospector to use the input interface {pull}6118[6118]
 
 *Heartbeat*
 
