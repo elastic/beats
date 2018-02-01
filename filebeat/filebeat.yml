@@ -184,8 +184,8 @@ output.elasticsearch:
 #xpack.monitoring.enabled: false
 
 # Uncomment to send the metrics to Elasticsearch. Most settings from the
-# elasticsearch output are accepted here as well. Any setting that is not set is
-# automatically inherited from the output configuration, so if you want to use
-# the same cluster for monitoring data, you can simply uncomment the following
-# line.
+# Elasticsearch output are accepted here as well. Any setting that is not set is
+# automatically inherited from the Elasticsearch output configuration, so if you
+# have the Elasticsearch output configured, you can simply uncomment the
+# following line.
 #xpack.monitoring.elasticsearch:
