@@ -105,7 +105,7 @@ func generateMapStrFromEvent(eve *kubernetes.Event) common.MapStr {
 	if len(eve.Metadata.Labels) != 0 {
 		labels := make(common.MapStr, len(eve.Metadata.Labels))
 		for k, v := range eve.Metadata.Labels {
-			labels[k] = v
+			labels[common.DeDot(k)] = v
 		}
 
 		eventMeta["labels"] = labels
@@ -114,7 +114,7 @@ func generateMapStrFromEvent(eve *kubernetes.Event) common.MapStr {
 	if len(eve.Metadata.Annotations) != 0 {
 		annotations := make(common.MapStr, len(eve.Metadata.Annotations))
 		for k, v := range eve.Metadata.Annotations {
-			annotations[k] = v
+			annotations[common.DeDot(k)] = v
 		}
 
 		eventMeta["annotations"] = annotations

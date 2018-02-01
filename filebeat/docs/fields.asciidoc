@@ -957,11 +957,11 @@ Log stream when reading container logs, can be 'stdout' or 'stderr'
 
 required: True
 
-The input type from which the event was generated. This field is set to the value specified for the `type` option in the input section of the Filebeat config file. (DEPRECATED: see `event.type`)
+The input type from which the event was generated. This field is set to the value specified for the `type` option in the input section of the Filebeat config file. (DEPRECATED: see `input.type`)
 
 
 [float]
-=== `event.type`
+=== `input.type`
 
 required: True
 

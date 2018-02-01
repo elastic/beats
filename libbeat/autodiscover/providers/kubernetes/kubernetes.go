@@ -77,24 +77,27 @@ func AutodiscoverBuilder(bus bus.Bus, c *common.Config) (autodiscover.Provider, 
 		},
 	})
 
-	if err := watcher.Start(); err != nil {
-		return nil, err
-	}
-
 	return p, nil
 }
 
 // Start for Runner interface.
 func (p *Provider) Start() {
+	if err := p.watcher.Start(); err != nil {
+		logp.Err("Error starting kubernetes autodiscover provider: %s", err)
+	}
 }
 
 func (p *Provider) emit(pod *kubernetes.Pod, flag string) {
 	host := pod.Status.PodIP
+	containerIDs := map[string]string{}
 
 	// Emit pod container IDs
 	for _, c := range append(pod.Status.ContainerStatuses, pod.Status.InitContainerStatuses...) {
+		cid := c.GetContainerID()
+		containerIDs[c.Name] = cid
+
 		cmeta := common.MapStr{
-			"id":    c.GetContainerID(),
+			"id":    cid,
 			"name":  c.Name,
 			"image": c.Image,
 		}
@@ -120,6 +123,7 @@ func (p *Provider) emit(pod *kubernetes.Pod, flag string) {
 	// Emit pod ports
 	for _, c := range pod.Spec.Containers {
 		cmeta := common.MapStr{
+			"id":    containerIDs[c.Name],
 			"name":  c.Name,
 			"image": c.Image,
 		}

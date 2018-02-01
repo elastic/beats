@@ -199,10 +199,6 @@ func (client *Client) SetVersion() error {
 				client.Connection.URL, truncateString(result), err5x, err)
 		}
 		client.version = kibanaVersion5x.Version
-
-		return fmt.Errorf("fail to unmarshal the response from GET %s/api/status: %v. Response: %s",
-			client.Connection.URL, err, truncateString(result))
-
 	} else {
 
 		client.version = kibanaVersion.Version.Number
