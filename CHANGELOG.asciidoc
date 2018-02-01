@@ -153,7 +153,7 @@ https://github.com/elastic/beats/compare/v6.1.3...v6.2.0[View commits]
 
 - Auditbeat is marked as GA, no longer Beta. {issue}5432[5432]
 - Add support for BLAKE2b hash algorithms to the file integrity module. {pull}5926[5926]
-- Add support for recursive file watches under macOS {pull}5575[5575] and Linux. {pull}5833[5833]
+- Add support for recursive file watches. {pull}5575[5575] {pull}5833[5833]
 
 *Filebeat*
 
