@@ -10,9 +10,9 @@ import (
 	"testing"
 
 	"github.com/elastic/beats/libbeat/common"
-	mbtest "github.com/elastic/beats/metricbeat/mb/testing"
-
 	"github.com/stretchr/testify/assert"
+
+	mbtest "github.com/elastic/beats/metricbeat/mb/testing"
 )
 
 const testFile = "../_meta/test/kube-state-metrics"
@@ -81,31 +81,31 @@ func testCases() map[string]map[string]interface{} {
 			"_module.namespace": "default",
 			"name":              "elasticsearch",
 
-			"created":   1511973651,
-			"replicas.observed":  1,
-			"replicas.desired":   4,
-			"generation.observed":  1,
-			"generation.desired":   3,
+			"created":             1511973651,
+			"replicas.observed":   1,
+			"replicas.desired":    4,
+			"generation.observed": 1,
+			"generation.desired":  3,
 		},
 		"default@mysql": {
 			"_module.namespace": "default",
 			"name":              "mysql",
 
-			"created":   1511989697,
-			"replicas.observed":  2,
-			"replicas.desired":   5,
-			"generation.observed":  2,
-			"generation.desired":   4,
+			"created":             1511989697,
+			"replicas.observed":   2,
+			"replicas.desired":    5,
+			"generation.observed": 2,
+			"generation.desired":  4,
 		},
 		"custom@mysql": {
 			"_module.namespace": "custom",
 			"name":              "mysql",
 
-			"created":   1511999697,
-			"replicas.observed":  3,
-			"replicas.desired":   6,
-			"generation.observed":  3,
-			"generation.desired":   5,
+			"created":             1511999697,
+			"replicas.observed":   3,
+			"replicas.desired":    6,
+			"generation.observed": 3,
+			"generation.desired":  5,
 		},
 	}
 }
