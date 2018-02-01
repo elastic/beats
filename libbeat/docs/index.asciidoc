@@ -8,6 +8,9 @@ include::{asciidoc-dir}/../../shared/attributes.asciidoc[]
 :beatname_lc: beatname
 :beatname_uc: a Beat
 :beatname_pkg: {beatname_lc}
+:github_repo_name: beats
+:discuss_forum: beats/{beatname_lc}
+
 
 include::../../libbeat/docs/shared-beats-attributes.asciidoc[]
 

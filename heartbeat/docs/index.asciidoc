@@ -8,6 +8,8 @@ include::{asciidoc-dir}/../../shared/attributes.asciidoc[]
 :beatname_lc: heartbeat
 :beatname_uc: Heartbeat
 :beatname_pkg: heartbeat-elastic
+:github_repo_name: beats
+:discuss_forum: beats/{beatname_lc}
 
 include::../../libbeat/docs/shared-beats-attributes.asciidoc[]
 
