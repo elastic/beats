@@ -211,7 +211,7 @@ PS > Invoke-RestMethod -Method Delete "http://localhost:9200/{beatname_lc}-*"
 ----------------------------------------------------------------------
 
 
-This command deletes all indices that match the pattern +{beatname_lc}-*+.
+This command deletes all indices that match the pattern +{beat_default_index_prefix}-*+.
 Before running this command, make sure you want to delete all indices that match
 the pattern.
 
