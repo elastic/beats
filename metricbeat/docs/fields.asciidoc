@@ -6152,6 +6152,75 @@ The number of fully labeled replicas per ReplicaSet
 
 
 [float]
+== statefulset fields
+
+kubernetes stateful set metrics
+
+
+
+[float]
+=== `kubernetes.statefulset.name`
+
+type: keyword
+
+Kubernetes stateful set name
+
+
+[float]
+=== `kubernetes.statefulset.created`
+
+type: long
+
+The creation timestamp (epoch) for StatefulSet
+
+
+[float]
+== replicas fields
+
+Kubernetes stateful set replicas status
+
+
+
+[float]
+=== `kubernetes.statefulset.replicas.observed`
+
+type: long
+
+The number of observed replicas per StatefulSet
+
+
+[float]
+=== `kubernetes.statefulset.replicas.desired`
+
+type: long
+
+The number of desired replicas per StatefulSet
+
+
+[float]
+== generation fields
+
+Kubernetes stateful set generation information
+
+
+
+[float]
+=== `kubernetes.statefulset.generation.observed`
+
+type: long
+
+The observed generation per StatefulSet
+
+
+[float]
+=== `kubernetes.statefulset.generation.desired`
+
+type: long
+
+The desired generation per StatefulSet
+
+
+[float]
 == system fields
 
 kubernetes system containers metrics

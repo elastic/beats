@@ -16,6 +16,7 @@
     - state_node
     - state_deployment
     - state_replicaset
+    - state_statefulset
     - state_pod
     - state_container
   period: 10s

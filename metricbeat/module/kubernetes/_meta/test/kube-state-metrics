@@ -386,3 +386,34 @@ process_start_time_seconds 1.4939719827e+09
 # HELP process_virtual_memory_bytes Virtual memory size in bytes.
 # TYPE process_virtual_memory_bytes gauge
 process_virtual_memory_bytes 5.2932608e+07
+# HELP kube_statefulset_created Unix creation timestamp
+# TYPE kube_statefulset_created gauge
+kube_statefulset_created{namespace="default",statefulset="elasticsearch"} 1.511973651e+09
+kube_statefulset_created{namespace="default",statefulset="mysql"} 1.511989697e+09
+kube_statefulset_created{namespace="custom",statefulset="mysql"} 1.511999697e+09
+# HELP kube_statefulset_labels Kubernetes labels converted to Prometheus labels.
+# TYPE kube_statefulset_labels gauge
+kube_statefulset_labels{label_app="oci",label_io_kompose_service="elasticsearch",namespace="default",statefulset="elasticsearch"} 1
+kube_statefulset_labels{label_app="oci",label_custom_pod="true",label_io_kompose_service="s-mysql",namespace="default",statefulset="mysql"} 1
+kube_statefulset_labels{label_app="oci",label_custom_pod="true",label_io_kompose_service="s-mysql",namespace="custom",statefulset="mysql"} 1
+# HELP kube_statefulset_metadata_generation Sequence number representing a specific generation of the desired state for the StatefulSet.
+# TYPE kube_statefulset_metadata_generation gauge
+kube_statefulset_metadata_generation{namespace="default",statefulset="elasticsearch"} 3
+kube_statefulset_metadata_generation{namespace="default",statefulset="mysql"} 4
+kube_statefulset_metadata_generation{namespace="custom",statefulset="mysql"} 5
+# HELP kube_statefulset_replicas Number of desired pods for a StatefulSet.
+# TYPE kube_statefulset_replicas gauge
+kube_statefulset_replicas{namespace="default",statefulset="elasticsearch"} 4
+kube_statefulset_replicas{namespace="default",statefulset="mysql"} 5
+kube_statefulset_replicas{namespace="custom",statefulset="mysql"} 6
+# HELP kube_statefulset_status_observed_generation The generation observed by the StatefulSet controller.
+# TYPE kube_statefulset_status_observed_generation gauge
+kube_statefulset_status_observed_generation{namespace="default",statefulset="elasticsearch"} 1
+kube_statefulset_status_observed_generation{namespace="default",statefulset="mysql"} 2
+kube_statefulset_status_observed_generation{namespace="custom",statefulset="mysql"} 3
+# HELP kube_statefulset_status_replicas The number of replicas per StatefulSet.
+# TYPE kube_statefulset_status_replicas gauge
+kube_statefulset_status_replicas{namespace="default",statefulset="elasticsearch"} 1
+kube_statefulset_status_replicas{namespace="default",statefulset="mysql"} 2
+kube_statefulset_status_replicas{namespace="custom",statefulset="mysql"} 3
+
