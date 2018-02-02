@@ -30,13 +30,14 @@ func getLogsFromFile(logfile, multiPattern string, multiNegate bool) ([]string, 
 	var logs []string
 	s := bufio.NewScanner(f)
 	for s.Scan() {
-		l := getCompleteLine(s, s.Text(), multiNegate, regex)
+		l := getCompleteLine(s, multiNegate, regex)
 		logs = append(logs, l...)
 	}
 	return logs, nil
 }
 
-func getCompleteLine(s *bufio.Scanner, line string, multiNegate bool, regex *regexp.Regexp) []string {
+func getCompleteLine(s *bufio.Scanner, multiNegate bool, regex *regexp.Regexp) []string {
+	line := s.Text()
 	if regex.String() == "" {
 		return []string{line}
 	}
@@ -61,7 +62,7 @@ func getMultiline(s *bufio.Scanner, line string, multiNegate bool, regex *regexp
 			line = s.Text()
 			matches = regex.MatchString(line)
 		}
-		return []string{fullLine, line}
+		return append([]string{fullLine}, getMultiline(s, line, multiNegate, regex)...)
 
 	}
 	return []string{fullLine}
