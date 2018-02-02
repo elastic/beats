@@ -86,6 +86,7 @@ https://github.com/elastic/beats/compare/v6.1.3...v6.2.0[View commits]
 *Affecting all Beats*
 
 - The log format may differ due to logging library changes. {pull}5901[5901]
+- The default value for pipelining is reduced to 2 to avoid high memory in the Logstash beats input. {pull}6250[6250]
 
 *Auditbeat*
 
