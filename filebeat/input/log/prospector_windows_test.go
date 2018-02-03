@@ -59,7 +59,7 @@ var matchTestsWindows = []struct {
 func TestMatchFileWindows(t *testing.T) {
 	for _, test := range matchTestsWindows {
 
-		p := Prospector{
+		p := Input{
 			config: config{
 				Paths:        test.paths,
 				ExcludeFiles: test.excludeFiles,

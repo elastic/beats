@@ -45,7 +45,7 @@ func NewProspector(cfg *common.Config, outletFactory channel.Factory, context pr
 	if err := cfg.SetString("docker-json", -1, config.Containers.Stream); err != nil {
 		return nil, errors.Wrap(err, "update prospector config")
 	}
-	return log.NewProspector(cfg, outletFactory, context)
+	return log.NewInput(cfg, outletFactory, context)
 }
 
 func checkStream(val string) error {
