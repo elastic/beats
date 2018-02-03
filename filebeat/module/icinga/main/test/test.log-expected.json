@@ -15,6 +15,9 @@
             "prospector": {
                 "type": "log"
             },
+            "input": {
+                "type": "log"
+            },
             "icinga": {
                 "main": {
                     "severity": "warning",
@@ -53,6 +56,9 @@
             "prospector": {
                 "type": "log"
             },
+            "input": {
+                "type": "log"
+            },
             "icinga": {
                 "main": {
                     "severity": "information",
@@ -89,6 +95,9 @@
                 "version": "5.3.0"
             },
             "prospector": {
+                "type": "log"
+            },
+            "input": {
                 "type": "log"
             },
             "icinga": {
