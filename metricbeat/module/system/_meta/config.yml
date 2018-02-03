@@ -14,7 +14,6 @@
   process.include_top_n:
     by_cpu: 5      # include top 5 processes by CPU
     by_memory: 5   # include top 5 processes by memory
-  #diskio.include_devices: []
 
 - module: system
   period: 1m
