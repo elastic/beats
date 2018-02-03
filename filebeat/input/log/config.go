@@ -24,7 +24,7 @@ var (
 		},
 		CleanInactive: 0,
 
-		// Prospector
+		// Input
 		Enabled:        true,
 		IgnoreOlder:    0,
 		ScanFrequency:  10 * time.Second,
@@ -60,7 +60,7 @@ type config struct {
 	InputType     string        `config:"input_type"`
 	CleanInactive time.Duration `config:"clean_inactive" validate:"min=0"`
 
-	// Prospector
+	// Input
 	Enabled        bool            `config:"enabled"`
 	ExcludeFiles   []match.Matcher `config:"exclude_files"`
 	IgnoreOlder    time.Duration   `config:"ignore_older"`
@@ -84,7 +84,7 @@ type config struct {
 	Multiline    *reader.MultilineConfig `config:"multiline"`
 	JSON         *reader.JSONConfig      `config:"json"`
 
-	// Hidden on purpose, used by the docker prospector:
+	// Hidden on purpose, used by the docker input:
 	DockerJSON string `config:"docker-json"`
 }
 
@@ -127,9 +127,9 @@ func (c *config) Validate() error {
 		c.Type = c.InputType
 	}
 
-	// Prospector
+	// Input
 	if c.Type == harvester.LogType && len(c.Paths) == 0 {
-		return fmt.Errorf("No paths were defined for prospector")
+		return fmt.Errorf("No paths were defined for input")
 	}
 
 	if c.CleanInactive != 0 && c.IgnoreOlder == 0 {
@@ -171,11 +171,11 @@ func (c *config) Validate() error {
 // resolveRecursiveGlobs expands `**` from the globs in multiple patterns
 func (c *config) resolveRecursiveGlobs() error {
 	if !c.RecursiveGlob {
-		logp.Debug("prospector", "recursive glob disabled")
+		logp.Debug("input", "recursive glob disabled")
 		return nil
 	}
 
-	logp.Debug("prospector", "recursive glob enabled")
+	logp.Debug("input", "recursive glob enabled")
 	var paths []string
 	for _, path := range c.Paths {
 		patterns, err := file.GlobPatterns(path, recursiveGlobDepth)
@@ -183,7 +183,7 @@ func (c *config) resolveRecursiveGlobs() error {
 			return err
 		}
 		if len(patterns) > 1 {
-			logp.Debug("prospector", "%q expanded to %#v", path, patterns)
+			logp.Debug("input", "%q expanded to %#v", path, patterns)
 		}
 		paths = append(paths, patterns...)
 	}
