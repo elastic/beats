@@ -283,7 +283,7 @@ class Test(BaseTest):
 
         # Make sure error shows up in log file
         self.wait_until(
-            lambda: self.log_contains("Can only start a prospector when all related states are finished"),
+            lambda: self.log_contains("Can only start an input when all related states are finished"),
             max_timeout=15)
 
         # Wait until old runner is stopped

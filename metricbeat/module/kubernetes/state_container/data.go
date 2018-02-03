@@ -39,6 +39,8 @@ func eventMapping(families []*dto.MetricFamily) ([]common.MapStr, error) {
 			case "kube_pod_container_resource_limits_cpu_cores":
 				event.Put(mb.ModuleDataKey+".node.name", util.GetLabel(metric, "node"))
 				event.Put("cpu.limit.nanocores", metric.GetGauge().GetValue()*nanocores)
+				cuid := util.ContainerUID(util.GetLabel(metric, "namespace"), util.GetLabel(metric, "pod"), util.GetLabel(metric, "container"))
+				util.PerfMetrics.ContainerCoresLimit.Set(cuid, metric.GetGauge().GetValue())
 
 			case "kube_pod_container_resource_requests_cpu_cores":
 				event.Put(mb.ModuleDataKey+".node.name", util.GetLabel(metric, "node"))
@@ -47,6 +49,8 @@ func eventMapping(families []*dto.MetricFamily) ([]common.MapStr, error) {
 			case "kube_pod_container_resource_limits_memory_bytes":
 				event.Put(mb.ModuleDataKey+".node.name", util.GetLabel(metric, "node"))
 				event.Put("memory.limit.bytes", metric.GetGauge().GetValue())
+				cuid := util.ContainerUID(util.GetLabel(metric, "namespace"), util.GetLabel(metric, "pod"), util.GetLabel(metric, "container"))
+				util.PerfMetrics.ContainerMemLimit.Set(cuid, metric.GetGauge().GetValue())
 
 			case "kube_pod_container_resource_requests_memory_bytes":
 				event.Put(mb.ModuleDataKey+".node.name", util.GetLabel(metric, "node"))

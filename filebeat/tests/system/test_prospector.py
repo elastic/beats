@@ -281,7 +281,7 @@ class Test(BaseTest):
 
         self.wait_until(
             lambda: self.log_contains(
-                "No modules or prospectors enabled"),
+                "no modules or inputs enabled"),
             max_timeout=10)
 
         filebeat.check_wait(exit_code=1)
@@ -299,7 +299,7 @@ class Test(BaseTest):
         # wait for first  "Start next scan" log message
         self.wait_until(
             lambda: self.log_contains(
-                "No paths were defined for prospector"),
+                "No paths were defined for input"),
             max_timeout=10)
 
         self.wait_until(

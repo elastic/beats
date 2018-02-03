@@ -4,13 +4,13 @@ import (
 	"reflect"
 	"testing"
 
-	"github.com/elastic/beats/libbeat/common"
+	"github.com/docker/docker/api/types"
 
-	dc "github.com/fsouza/go-dockerclient"
+	"github.com/elastic/beats/libbeat/common"
 )
 
 var cpuService CPUService
-var statsList = make([]dc.Stats, 3)
+var statsList = make([]types.StatsJSON, 3)
 
 func TestCPUService_PerCpuUsage(t *testing.T) {
 	oldPerCpuValuesTest := [][]uint64{{1, 9, 9, 5}, {1, 2, 3, 4}, {0, 0, 0, 0}}
@@ -20,7 +20,7 @@ func TestCPUService_PerCpuUsage(t *testing.T) {
 		statsList[index].CPUStats.CPUUsage.PercpuUsage = newPerCpuValuesTest[index]
 	}
 	testCase := []struct {
-		given    dc.Stats
+		given    types.StatsJSON
 		expected common.MapStr
 	}{
 		{statsList[0], common.MapStr{
@@ -62,7 +62,7 @@ func TestCPUService_TotalUsage(t *testing.T) {
 		statsList[index].CPUStats.CPUUsage.TotalUsage = totalValuesTest[index]
 	}
 	testCase := []struct {
-		given    dc.Stats
+		given    types.StatsJSON
 		expected float64
 	}{
 		{statsList[0], -1},
@@ -85,7 +85,7 @@ func TestCPUService_UsageInKernelmode(t *testing.T) {
 		statsList[index].CPUStats.CPUUsage.UsageInKernelmode = usageValuesTest[index]
 	}
 	testCase := []struct {
-		given    dc.Stats
+		given    types.StatsJSON
 		expected float64
 	}{
 		{statsList[0], -1},
@@ -108,7 +108,7 @@ func TestCPUService_UsageInUsermode(t *testing.T) {
 		statsList[index].CPUStats.CPUUsage.UsageInUsermode = usageValuesTest[index]
 	}
 	testCase := []struct {
-		given    dc.Stats
+		given    types.StatsJSON
 		expected float64
 	}{
 		{statsList[0], 0.50},

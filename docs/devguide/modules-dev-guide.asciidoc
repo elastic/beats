@@ -297,6 +297,14 @@ Besides the files in the fileset folder, there is also data that needs to be
 filled at the module level.
 
 [float]
+==== module.yml
+
+This file contains list of all the dashboards available for the module and used by `export_dashboards.go` script for exporting dashboards.
+Each dashboard is defined by an id and the name of json file where the dashboard is saved locally.
+At generation new fileset this file will be automatically updated with "default" dashboard settings for new fileset.
+Please ensure that this settings are correct.
+
+[float]
 ==== _meta/docs.asciidoc
 
 This file contains module-specific documentation. You should include information

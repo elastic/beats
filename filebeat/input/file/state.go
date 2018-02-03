@@ -79,7 +79,7 @@ func (s *States) Update(newState State) {
 	} else {
 		// No existing state found, add new one
 		s.states = append(s.states, newState)
-		logp.Debug("prospector", "New state added for %s", newState.Source)
+		logp.Debug("input", "New state added for %s", newState.Source)
 	}
 }
 

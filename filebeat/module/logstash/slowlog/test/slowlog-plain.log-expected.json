@@ -31,6 +31,9 @@
             "prospector": {
                 "type": "log"
             },
+            "input": {
+                "type": "log"
+            },
             "read_timestamp": "2017-11-21T05:34:25.435Z",
             "source": "/Users/ph/go/src/github.com/elastic/beats/filebeat/module/logstash/slowlog/test/slowlog-plain.log"
         },
