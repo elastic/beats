@@ -13,7 +13,7 @@ test: prepare-test
 	export GOPATH=${PWD}/build ; \
 	export PATH=${PATH}:${PWD}/build/bin; \
 	cd ${BEAT_PATH} ; \
-	$(MAKE) copy-vendor || exit 1  ; \
+	$(MAKE) setup || exit 1  ; \
 	${PREPARE_COMMAND} \
 	$(MAKE) check || exit 1 ; \
 	$(MAKE) update || exit 1 ; \
