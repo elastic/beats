@@ -188,7 +188,10 @@ output.elasticsearch:
   # Configure http request timeout before failing an request to Elasticsearch.
   #timeout: 90
 
-  # Use SSL settings for HTTPS.
+  # The time interval (in seconds) when metrics are set to Elasticsearch.
+  #period: 60 * time.Second
+
+  # Use SSL settings for HTTPS. Default is true.
   #ssl.enabled: true
 
   # Configure SSL verification mode. If `none` is configured, all server hosts
