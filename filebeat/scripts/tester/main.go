@@ -1,7 +1,6 @@
 package main
 
 import (
-	"bufio"
 	"bytes"
 	"encoding/json"
 	"flag"
@@ -9,64 +8,63 @@ import (
 	"io/ioutil"
 	"net/http"
 	"os"
-	"regexp"
 	"strings"
 
+	"github.com/elastic/beats/filebeat/harvester/encoding"
+	"github.com/elastic/beats/filebeat/harvester/reader"
 	"github.com/elastic/beats/libbeat/common"
+	"github.com/elastic/beats/libbeat/common/match"
 )
 
-func getLogsFromFile(logfile, multiPattern string, multiNegate bool) ([]string, error) {
-	regex, err := regexp.Compile(multiPattern)
-	if err != nil {
-		return nil, err
-	}
-
+func getLogsFromFile(logfile, multiPattern string, multiNegate bool, matchMode string) ([]string, error) {
 	f, err := os.Open(logfile)
 	if err != nil {
 		return nil, err
 	}
 	defer f.Close()
 
+	encFactory, ok := encoding.FindEncoding("utf8")
+	if !ok {
+		return nil, fmt.Errorf("unable to find 'utf8' encoding")
+	}
+
+	enc, err := encFactory(f)
+	if err != nil {
+		return nil, fmt.Errorf("failed to initialize encoding: %v", err)
+	}
+
+	var r reader.Reader
+	r, err = reader.NewEncode(f, enc, 4096)
+	if err != nil {
+		return nil, err
+	}
+
+	r = reader.NewStripNewline(r)
+
+	if multiPattern != "" {
+		p := match.MustCompile(multiPattern)
+		c := reader.MultilineConfig{
+			Negate:  multiNegate,
+			Match:   matchMode,
+			Pattern: &p,
+		}
+		r, err = reader.NewMultiline(r, "\n", 1<<20, &c)
+		if err != nil {
+			return nil, err
+		}
+	}
+	r = reader.NewLimit(r, 10485760)
+
 	var logs []string
-	s := bufio.NewScanner(f)
-	for s.Scan() {
-		l := getCompleteLine(s, multiNegate, regex)
-		logs = append(logs, l...)
+	for {
+		msg, err := r.Next()
+		if err != nil {
+			break
+		}
+		logs = append(logs, string(msg.Content))
 	}
+
 	return logs, nil
-}
-
-func getCompleteLine(s *bufio.Scanner, multiNegate bool, regex *regexp.Regexp) []string {
-	line := s.Text()
-	if regex.String() == "" {
-		return []string{line}
-	}
-	return getMultiline(s, line, multiNegate, regex)
-}
-
-func getMultiline(s *bufio.Scanner, line string, multiNegate bool, regex *regexp.Regexp) []string {
-	matches := regex.MatchString(line)
-	fullLine := line
-	if matches || !matches && multiNegate {
-		if !s.Scan() {
-			return []string{fullLine}
-		}
-
-		line = s.Text()
-		matches = regex.MatchString(line)
-		for !matches || matches && multiNegate {
-			fullLine = strings.Join([]string{fullLine, line}, "\n")
-			if !s.Scan() {
-				return []string{fullLine}
-			}
-			line = s.Text()
-			matches = regex.MatchString(line)
-		}
-		return append([]string{fullLine}, getMultiline(s, line, multiNegate, regex)...)
-
-	}
-	return []string{fullLine}
-
 }
 
 func readPipeline(path string) (map[string]interface{}, error) {
@@ -130,6 +128,7 @@ func main() {
 	logfile := flag.String("logfile", "", "Path to log file")
 	multiPattern := flag.String("multiline-pattern", "", "Multiline pattern")
 	multiNegate := flag.Bool("multiline-negate", false, "Multiline negate")
+	multiMode := flag.String("multiline-mode", "before", "Multiline mode")
 	flag.Parse()
 
 	if *path == "" {
@@ -150,7 +149,7 @@ func main() {
 	var logs []string
 	var err error
 	if *logfile != "" {
-		logs, err = getLogsFromFile(*logfile, *multiPattern, *multiNegate)
+		logs, err = getLogsFromFile(*logfile, *multiPattern, *multiNegate, *multiMode)
 		if err != nil {
 			os.Stderr.WriteString(fmt.Sprintf("Error while reading logs from file: %v\n", err))
 			os.Exit(2)
