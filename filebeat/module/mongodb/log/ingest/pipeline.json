@@ -1,0 +1,23 @@
+{
+  "description": "Pipeline for parsing MongoDB log logs",
+  "processors": [{
+    "grok": {
+      "field": "message",
+      "patterns":[
+        "%{TIMESTAMP_ISO8601:mongodb.log.timestamp} %{WORD:mongodb.log.severity} %{WORD:mongodb.log.component}  \\[%{WORD:mongodb.log.context}\\] %{GREEDYDATA:mongodb.log.message}"
+      ],
+      "ignore_missing": true
+    }
+  },
+  {
+    "remove": {
+      "field": "message"
+    }
+  }],
+  "on_failure" : [{
+    "set" : {
+      "field" : "error.message",
+      "value" : "{{ _ingest.on_failure_message }}"
+    }
+  }]
+}

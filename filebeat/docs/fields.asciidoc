@@ -24,6 +24,7 @@ grouped in the following categories:
 * <<exported-fields-kubernetes-processor>>
 * <<exported-fields-log>>
 * <<exported-fields-logstash>>
+* <<exported-fields-mongodb>>
 * <<exported-fields-mysql>>
 * <<exported-fields-nginx>>
 * <<exported-fields-osquery>>
@@ -1648,6 +1649,71 @@ String value of the plugin configuration
 type: object
 
 key -> value of the configuration used by the plugin.
+
+
+[[exported-fields-mongodb]]
+== mongodb fields
+
+Module for parsing MongoDB log files.
+
+
+
+[float]
+== mongodb fields
+
+Fields from MongoDB logs.
+
+
+
+[float]
+== log fields
+
+Contains fields from MongoDB logs.
+
+
+
+[float]
+=== `mongodb.log.timestamp`
+
+Timestamp of message
+
+
+[float]
+=== `mongodb.log.severity`
+
+type: keyword
+
+example: I
+
+Severity level of message
+
+
+[float]
+=== `mongodb.log.component`
+
+type: keyword
+
+example: COMMAND
+
+Functional categorization of message
+
+
+[float]
+=== `mongodb.log.context`
+
+type: keyword
+
+example: initandlisten
+
+Context of message
+
+
+[float]
+=== `mongodb.log.message`
+
+type: text
+
+The message in the log line.
 
 
 [[exported-fields-mysql]]
