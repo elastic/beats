@@ -10,11 +10,14 @@ if [ "$SNAPSHOT" = "yes" ]; then
     VERSION="${VERSION}-SNAPSHOT"
 fi
 
+BEATS_YML_NAME="{{.beat_name}}-linux-{{.arch}}"
+[ -f "${BEATS_YML_NAME}.yml" ] || BEATS_YML_NAME="{{.beat_name}}-linux"
+
 mkdir /{{.beat_name}}-${VERSION}-linux-{{.bin_arch}}
 cp -a homedir/. /{{.beat_name}}-${VERSION}-linux-{{.bin_arch}}/
 cp {{.beat_name}}-linux-{{.arch}} /{{.beat_name}}-${VERSION}-linux-{{.bin_arch}}/{{.beat_name}}
-cp {{.beat_name}}-linux.yml /{{.beat_name}}-${VERSION}-linux-{{.bin_arch}}/{{.beat_name}}.yml
-cp {{.beat_name}}-linux.reference.yml /{{.beat_name}}-${VERSION}-linux-{{.bin_arch}}/{{.beat_name}}.reference.yml
+cp ${BEATS_YML_NAME}.yml /{{.beat_name}}-${VERSION}-linux-{{.bin_arch}}/{{.beat_name}}.yml
+cp ${BEATS_YML_NAME}.reference.yml /{{.beat_name}}-${VERSION}-linux-{{.bin_arch}}/{{.beat_name}}.reference.yml
 cp fields.yml /{{.beat_name}}-${VERSION}-linux-{{.bin_arch}}/
 cp -a modules.d-linux/ /{{.beat_name}}-${VERSION}-linux-{{.bin_arch}}/modules.d || true
 
