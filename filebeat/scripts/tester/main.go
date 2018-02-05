@@ -126,9 +126,9 @@ func main() {
 	path := flag.String("pipeline", "", "Path to pipeline")
 	log := flag.String("log", "", "Single log line to test")
 	logfile := flag.String("logfile", "", "Path to log file")
-	multiPattern := flag.String("multiline-pattern", "", "Multiline pattern")
-	multiNegate := flag.Bool("multiline-negate", false, "Multiline negate")
-	multiMode := flag.String("multiline-mode", "before", "Multiline mode")
+	multiPattern := flag.String("multiline.pattern", "", "Multiline pattern")
+	multiNegate := flag.Bool("multiline.negate", false, "Multiline negate")
+	multiMode := flag.String("multiline.mode", "before", "Multiline mode")
 	flag.Parse()
 
 	if *path == "" {
