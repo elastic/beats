@@ -1,6 +1,5 @@
 from filebeat import BaseTest
 import socket
-import time
 
 
 class Test(BaseTest):
@@ -9,17 +8,17 @@ class Test(BaseTest):
 
         host = "127.0.0.1"
         port = 8080
-        prospector_raw = """
+        input_raw = """
 - type: udp
   host: "{}:{}"
   enabled: true
 """
 
-        prospector_raw = prospector_raw.format(host, port)
+        input_raw = input_raw.format(host, port)
 
         self.render_config_template(
-            prospector_raw=prospector_raw,
-            prospectors=False,
+            input_raw=input_raw,
+            inputs=False,
         )
 
         filebeat = self.start_beat()
