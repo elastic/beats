@@ -10,6 +10,7 @@ import (
 	"log"
 	"net/http"
 	"net/url"
+	"time"
 
 	"golang.org/x/net/http2/hpack"
 	"golang.org/x/net/lex/httplex"
@@ -89,7 +90,11 @@ type writeGoAway struct {
 
 func (p *writeGoAway) writeFrame(ctx writeContext) error {
 	err := ctx.Framer().WriteGoAway(p.maxStreamID, p.code, nil)
-	ctx.Flush() // ignore error: we're hanging up on them anyway
+	if p.code != 0 {
+		ctx.Flush() // ignore error: we're hanging up on them anyway
+		time.Sleep(50 * time.Millisecond)
+		ctx.CloseConn()
+	}
 	return err
 }
 
