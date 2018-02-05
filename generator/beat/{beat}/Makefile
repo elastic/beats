@@ -83,4 +83,4 @@ check-full: check
 .PHONY: notice
 notice: python-env
 	@echo "Generating NOTICE.txt"
-	$(PYTHON_ENV)/bin/python ${ES_BEATS}/dev-tools/generate_notice.py . -e '_beats' -s "./vendor/github.com/elastic/beats" -b "$(BEAT_NAME)" -c "$(COPYRIGHT_TXT)" -y "$(COPYRIGHT_YEAR)"
+	$(PYTHON_ENV)/bin/python ${ES_BEATS}/dev-tools/generate_notice.py . -e '_beats' -s "./vendor/github.com/elastic/beats" -b "$(BEAT_NAME)" -c "$(COPYRIGHT_TXT)"
