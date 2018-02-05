@@ -11,11 +11,13 @@
           "response_code": "200",
           "geoip": {
             "continent_name": "Europe",
-            "country_iso_code": "DE",
+            "city_name": "Berlin",
             "location": {
-              "lon": 9,
-              "lat": 51
-            }
+                "lat": 52.5167,
+                "lon": 13.4
+            },
+            "region_name": "Land Berlin",
+            "country_iso_code": "DE"
           },
           "method": "GET",
           "sub_status": "0",
@@ -49,7 +51,7 @@
         "type": "log"
       },
       "read_timestamp": "2018-01-20T17:19:39.236Z",
-      "source": "C:\\inetpub\\logs\\LogFiles\\W3SVC1\\access.log",
+      "source": "/go/src/github.com/elastic/beats/filebeat/module/iis/access/test/test.log",
       "fileset": {
         "module": "iis",
         "name": "access"
@@ -106,7 +108,7 @@
         "type": "log"
       },
       "read_timestamp": "2018-01-20T17:19:39.237Z",
-      "source": "C:\\inetpub\\logs\\LogFiles\\W3SVC1\\access.log",
+      "source": "/go/src/github.com/elastic/beats/filebeat/module/iis/access/test/test.log",
       "fileset": {
         "module": "iis",
         "name": "access"
@@ -126,11 +128,13 @@
           "response_code": "200",
           "geoip": {
             "continent_name": "Europe",
-            "country_iso_code": "DE",
+            "city_name": "Berlin",
             "location": {
-              "lon": 9,
-              "lat": 51
-            }
+                "lat": 52.5167,
+                "lon": 13.4
+            },
+            "region_name": "Land Berlin",
+            "country_iso_code": "DE"
           },
           "cookie": "-",
           "method": "GET",
@@ -174,7 +178,7 @@
         "type": "log"
       },
       "read_timestamp": "2018-01-20T17:19:39.237Z",
-      "source": "C:\\inetpub\\logs\\LogFiles\\W3SVC1\\access.log",
+      "source": "/go/src/github.com/elastic/beats/filebeat/module/iis/access/test/test.log",
       "fileset": {
         "module": "iis",
         "name": "access"
