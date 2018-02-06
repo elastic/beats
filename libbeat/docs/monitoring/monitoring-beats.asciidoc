@@ -24,7 +24,11 @@ information, see
 To configure {beatname_uc} to collect and send monitoring metrics:
 
 . Create a user that has appropriate authority to send system-level monitoring
-data to {es}.
+data to {es}. For example, you can use the built-in `logstash_system` user or
+assign the built-in `logstash_system` role to another user. For more
+information, see
+{xpack-ref}/setting-up-authentication.html[Setting Up User Authentication] and
+{xpack-ref}/built-in-roles.html[Built-in Roles].
 
 . Add the `xpack.monitoring` settings in the {beatname_uc} configuration file.
 If you configured {es} output and you want to use the same {es} production
