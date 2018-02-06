@@ -65,7 +65,7 @@ func TestEventMapping(t *testing.T) {
 	}
 
 	if len(testCases) > 0 {
-		t.Errorf("Test reference events not found: %v\n\n got: %v", testCases)
+		t.Errorf("Test reference events not found: %v\n\n got: %v", testCases, events)
 	}
 }
 
