@@ -33,7 +33,7 @@ before-build:
 	     ${PREFIX}/${BEAT_NAME}-darwin.reference.yml
 
 	@cat ${ES_BEATS}/auditbeat/_meta/common.p1.yml \
-	     <(go run scripts/generate_config.go -os linux -concat) \
+	     <(go run scripts/generate_config.go -os linux -arch amd64 -concat) \
 	     ${ES_BEATS}/auditbeat/_meta/common.p2.yml \
 	     ${ES_BEATS}/libbeat/_meta/config.yml > \
 	     ${PREFIX}/${BEAT_NAME}-linux.yml
@@ -41,6 +41,16 @@ before-build:
 	     <(go run scripts/generate_config.go -os linux -concat -ref) \
 	     ${ES_BEATS}/libbeat/_meta/config.reference.yml > \
 	     ${PREFIX}/${BEAT_NAME}-linux.reference.yml
+
+	@cat ${ES_BEATS}/auditbeat/_meta/common.p1.yml \
+	     <(go run scripts/generate_config.go -os linux -arch i386 -concat) \
+	     ${ES_BEATS}/auditbeat/_meta/common.p2.yml \
+	     ${ES_BEATS}/libbeat/_meta/config.yml > \
+	     ${PREFIX}/${BEAT_NAME}-linux-386.yml
+	@cat ${ES_BEATS}/auditbeat/_meta/common.reference.yml \
+	     <(go run scripts/generate_config.go -os linux -concat -ref) \
+	     ${ES_BEATS}/libbeat/_meta/config.reference.yml > \
+	     ${PREFIX}/${BEAT_NAME}-linux-386.reference.yml
 
 # Collects all dependencies and then calls update
 .PHONY: collect

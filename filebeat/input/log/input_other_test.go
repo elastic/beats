@@ -59,7 +59,7 @@ var matchTests = []struct {
 func TestMatchFile(t *testing.T) {
 	for _, test := range matchTests {
 
-		p := Prospector{
+		p := Input{
 			config: config{
 				Paths:        test.paths,
 				ExcludeFiles: test.excludeFiles,
@@ -72,8 +72,8 @@ func TestMatchFile(t *testing.T) {
 
 var initStateTests = []struct {
 	states []file.State // list of states
-	paths  []string     // prospector glob
-	count  int          // expected states in prospector
+	paths  []string     // input glob
+	count  int          // expected states in input
 }{
 	{
 		[]file.State{
@@ -123,11 +123,11 @@ var initStateTests = []struct {
 	},
 }
 
-// TestInit checks that the correct states are in a prospector after the init phase
+// TestInit checks that the correct states are in an input after the init phase
 // This means only the ones that match the glob and not exclude files
 func TestInit(t *testing.T) {
 	for _, test := range initStateTests {
-		p := Prospector{
+		p := Input{
 			config: config{
 				Paths: test.paths,
 			},
