@@ -36,7 +36,6 @@ The following topics describe how to configure {beatname_uc}:
 * <<yaml-tips>>
 * <<regexp-support>>
 * <<{beatname_lc}-reference-yml>>
-* <<configuring-monitoring>>
 
 After changing configuration settings, you need to restart {beatname_uc} to
 pick up the changes.
@@ -78,5 +77,3 @@ include::../../libbeat/docs/yaml.asciidoc[]
 include::../../libbeat/docs/regexp.asciidoc[]
 
 include::../../libbeat/docs/reference-yml.asciidoc[]
-
-include::../../libbeat/docs/monitoring/configuring.asciidoc[]

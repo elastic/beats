@@ -37,7 +37,6 @@ The following topics describe how to configure Heartbeat:
 * <<yaml-tips>>
 * <<regexp-support>>
 * <<{beatname_lc}-reference-yml>>
-* <<configuring-monitoring>>
 
 --
 
@@ -74,5 +73,3 @@ include::../../libbeat/docs/yaml.asciidoc[]
 include::../../libbeat/docs/regexp.asciidoc[]
 
 include::../../libbeat/docs/reference-yml.asciidoc[]
-
-include::../../libbeat/docs/monitoring/configuring.asciidoc[]

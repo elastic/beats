@@ -38,7 +38,6 @@ The following topics describe how to configure Packetbeat:
 * <<using-environ-vars>>
 * <<yaml-tips>>
 * <<{beatname_lc}-reference-yml>>
-* <<configuring-monitoring>>
 
 --
 
@@ -75,5 +74,3 @@ include::../../libbeat/docs/shared-env-vars.asciidoc[]
 include::../../libbeat/docs/yaml.asciidoc[]
 
 include::../../libbeat/docs/reference-yml.asciidoc[]
-
-include::../../libbeat/docs/monitoring/configuring.asciidoc[]
