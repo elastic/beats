@@ -12,18 +12,20 @@
 
 [role="xpack"]
 [[configuring-monitoring]]
-== Configuring monitoring for {beatname_uc}
+== Configuring Monitoring in {beatname_uc}
 ++++
 <titleabbrev>Configure monitoring</titleabbrev>
 ++++
 
-{monitoring} enables you to easily monitor {beatname_uc} from {kib}. For more
-information, see {kibana-ref}/xpack-monitoring.html[Monitoring].
+To configure {beatname_uc} to collect and send monitoring metrics:
 
-. Configure {beatname_uc} to send metrics by using the `xpack.monitoring`
-settings in the {beatname_uc} configuration file. If you configured {es} output
-and you want to use the same {es} production cluster and credentials, you can
-specify the following minimal configuration options:
+. Create a user that has appropriate authority to send system-level monitoring
+data to {es}.
+
+. Add the `xpack.monitoring` settings in the {beatname_uc} configuration file.
+If you configured {es} output and you want to use the same {es} production
+cluster and credentials, you can specify the following minimal configuration
+options:
 +
 --
 [source, yml]
@@ -139,12 +141,6 @@ however, the value of protocol is overridden by the scheme you specify in the UR
 
 The URL of the proxy to use when connecting to the {es} cluster. For more
 information, see <<elasticsearch-output>>.
-////
-[float]
-===== `tags`
-
-TBD
-////
 
 [float]
 ===== `timeout`
@@ -163,6 +159,4 @@ HTTPS connections to {es}. For more information, see <<configuration-ssl>>.
 ===== `username`
 
 The user ID that {beatname_uc} uses to authenticate with the {es} instances for
-shipping monitoring data. The default is `beats_system`, which is a built-in
-user ID.  For more information, see
-{xpack-ref}/setting-up-authentication.html#built-in-users[Built-in Users].
+shipping monitoring data. 

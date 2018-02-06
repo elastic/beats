@@ -29,6 +29,8 @@ include::./fields.asciidoc[]
 
 include::./securing-winlogbeat.asciidoc[]
 
+include::../../libbeat/docs/monitoring/index.asciidoc[]
+
 include::../../libbeat/docs/security/securing-beats.asciidoc[]
 
 include::./troubleshooting.asciidoc[]

@@ -29,6 +29,8 @@ include::./configuring-howto.asciidoc[]
 
 include::./fields.asciidoc[]
 
+include::../../libbeat/docs/monitoring/index.asciidoc[]
+
 include::./securing-packetbeat.asciidoc[]
 
 include::../../libbeat/docs/security/securing-beats.asciidoc[]
