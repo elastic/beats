@@ -31,7 +31,7 @@ include::./modules.asciidoc[]
 
 include::./fields.asciidoc[]
 
-include::../../libbeat/docs/monitoring/index.asciidoc[]
+include::../../libbeat/docs/monitoring/monitoring-beats.asciidoc[]
 
 include::./securing-auditbeat.asciidoc[]
 

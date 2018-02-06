@@ -33,9 +33,9 @@ include::./modules.asciidoc[]
 
 include::./fields.asciidoc[]
 
-include::./securing-metricbeat.asciidoc[]
+include::../../libbeat/docs/monitoring/monitoring-beats.asciidoc[]
 
-include::../../libbeat/docs/monitoring/index.asciidoc[]
+include::./securing-metricbeat.asciidoc[]
 
 include::../../libbeat/docs/security/securing-beats.asciidoc[]
 
