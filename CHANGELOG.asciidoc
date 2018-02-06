@@ -158,6 +158,7 @@ https://github.com/elastic/beats/compare/v6.1.3...v6.2.0[View commits]
 
 *Filebeat*
 
+- Add Osquery module. {pull}5971[5971]
 - Add stream filtering when using `docker` prospector. {pull}6057[6057]
 
 *Metricbeat*
