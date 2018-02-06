@@ -10,61 +10,17 @@
 //// Make sure this content appears below a level 2 heading.
 //////////////////////////////////////////////////////////////////////////
 
-[role="xpack"]
-[[configuring-monitoring]]
-== Configuring Monitoring in {beatname_uc}
+[[configuration-monitor]]
+== Monitoring configuration options
 ++++
-<titleabbrev>Configure monitoring</titleabbrev>
+<titleabbrev>Configuration options</titleabbrev>
 ++++
-
-To configure {beatname_uc} to collect and send monitoring metrics:
-
-. Create a user that has appropriate authority to send system-level monitoring
-data to {es}.
-
-. Add the `xpack.monitoring` settings in the {beatname_uc} configuration file.
-If you configured {es} output and you want to use the same {es} production
-cluster and credentials, you can specify the following minimal configuration
-options:
-+
---
-[source, yml]
---------------------
-xpack.monitoring:
-  enabled: true
-  elasticsearch:
---------------------
-
-Otherwise, you must specify additional configuration options. For example:
-
-[source, yml]
---------------------
-xpack.monitoring:
-  enabled: true
-  elasticsearch:
-    hosts: ["https://example.com:9200", "https://example2.com:9200"]
-    username: elastic
-    password: changeme
---------------------
-
---
-
-. {kibana-ref}/monitoring-xpack-kibana.html[Configure monitoring in {kib}].
-
-. To verify your monitoring configuration, point your web browser at your {kib}
-host, and select Monitoring from the side navigation. Metrics reported from
-{beatname_uc} should be visible in the Beats section. When {security} is enabled,
-to view the monitoring dashboards you must log in to {kib} as a user who has the
-`kibana_user` and `monitoring_user` roles.
-
-[float]
-=== Configuration options
 
 You can specify the following options in the `xpack.monitoring` section of the
 +{beatname_lc}.yml+ config file:
 
 [float]
-==== `enabled`
+=== `enabled`
 
 The `enabled` config is a boolean setting to enable or disable {monitoring}.
 If set to `true`, monitoring is enabled.
@@ -72,19 +28,19 @@ If set to `true`, monitoring is enabled.
 The default value is `false`.
 
 [float]
-==== `elasticsearch`
+=== `elasticsearch`
 
 The {es} instances that you want to ship your {beatname_uc} metrics to. This
 configuration option contains the following fields:
 
 [float]
-===== `bulk_max_size`
+==== `bulk_max_size`
 
 The maximum number of metrics to bulk in a single {es} bulk API index request.
 The default is `50`. For more information, see <<elasticsearch-output>>.
 
 [float]
-===== `compression_level`
+==== `compression_level`
 
 The gzip compression level. Setting this value to `0` disables compression. The
 compression level must be in the range of `1` (best speed) to `9` (best
@@ -92,63 +48,63 @@ compression). The default value is `0`. Increasing the compression level
 reduces the network usage but increases the CPU usage.
 
 [float]
-===== `headers`
+==== `headers`
 
 Custom HTTP headers to add to each request. For more information, see
 <<elasticsearch-output>>.
 
 [float]
-===== `hosts`
+==== `hosts`
 
 The list of {es} nodes to connect to. Monitoring metrics are distributed to
 these nodes in round robin order. For more information, see
 <<elasticsearch-output>>.
 
 [float]
-===== `max_retries`
+==== `max_retries`
 
 The number of times to retry sending the monitoring metrics after a failure.
 After the specified number of retries, the metrics are typically dropped. The
 default value is `3`. For more information, see <<elasticsearch-output>>.
 
 [float]
-===== `parameters`
+==== `parameters`
 
 Dictionary of HTTP parameters to pass within the url with index operations.
 
 [float]
-===== `password`
+==== `password`
 
 The password that {beatname_uc} uses to authenticate with the {es} instances for
 shipping monitoring data.
 
 [float]
-===== `period`
+==== `period`
 
 The time interval (in seconds) when metrics are sent to the {es} cluster. A new
 snapshot of {beatname_uc} metrics is generated and scheduled for publishing each
 period. The default value is 60 * time.Second.
 
 [float]
-===== `protocol`
+==== `protocol`
 
 The name of the protocol to use when connecting to the {es} cluster. The options
 are: `http` or `https`. The default is `http`. If you specify a URL for `hosts`,
 however, the value of protocol is overridden by the scheme you specify in the URL.
 
 [float]
-===== `proxy_url`
+==== `proxy_url`
 
 The URL of the proxy to use when connecting to the {es} cluster. For more
 information, see <<elasticsearch-output>>.
 
 [float]
-===== `timeout`
+==== `timeout`
 
 The HTTP request timeout in seconds for the {es} request. The default is `90`.
 
 [float]
-===== `ssl`
+==== `ssl`
 
 Configuration options for Transport Layer Security (TLS) or Secure Sockets Layer
 (SSL) parameters like the certificate authority (CA) to use for HTTPS-based
@@ -156,7 +112,7 @@ connections. If the `ssl` section is missing, the host CAs are used for
 HTTPS connections to {es}. For more information, see <<configuration-ssl>>.
 
 [float]
-===== `username`
+==== `username`
 
 The user ID that {beatname_uc} uses to authenticate with the {es} instances for
-shipping monitoring data. 
+shipping monitoring data.
