@@ -1,6 +1,8 @@
 BUILD_DIR=$(CURDIR)/build
 COVERAGE_DIR=$(BUILD_DIR)/coverage
 BEATS=packetbeat filebeat winlogbeat metricbeat heartbeat auditbeat
+OSX_BEATS=packetbeat filebeat metricbeat heartbeat auditbeat
+XCOMPILE_BEATS=filebeat winlogbeat metricbeat heartbeat auditbeat
 PROJECTS=libbeat $(BEATS)
 PROJECTS_ENV=libbeat filebeat metricbeat
 SNAPSHOT?=yes
@@ -41,7 +43,7 @@ unit:
 # Crosscompile all beats.
 .PHONY: crosscompile
 crosscompile:
-	@$(foreach var,filebeat winlogbeat metricbeat heartbeat auditbeat,$(MAKE) -C $(var) crosscompile || exit 1;)
+	@$(foreach var,$(XCOMPILE_BEATS),$(MAKE) -C $(var) crosscompile || exit 1;)
 
 .PHONY: coverage-report
 coverage-report:
@@ -125,6 +127,13 @@ package-all: update beats-dashboards
 	@cp -r build/dashboards-upload build/upload/dashboards
 	@# Run tests on the generated packages.
 	@go test ./dev-tools/package_test.go -files "${BUILD_DIR}/upload/*/*"
+
+.PHONY: osx-package
+osx-package:
+	@$(test "$(uname -s)" = Darwin || { echo "Must run on Darwin" ; exit 1;} )
+	@$(foreach var,$(OSX_BEATS),$(MAKE) -C $(var) osx-package || exit 1;)
+	@mkdir -p build/upload/
+	@$(foreach var,$(OSX_BEATS),cp -r $(var)/build/upload/*.dmg $(var)/build/upload/*.pkg build/upload/$(var)  || exit 1;)
 
 # Upload nightly builds to S3
 .PHONY: upload-nightlies-s3

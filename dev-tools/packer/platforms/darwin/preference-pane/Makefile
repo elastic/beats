@@ -12,11 +12,12 @@ default: build
 build:
 	xcodebuild build -project $(PROJECT) -alltargets -configuration $(CONFIGURATION) CODE_SIGN_IDENTITY="" CODE_SIGNING_REQUIRED=NO
 	echo version="${VERSION}"
-	test -n '$(SIGN_IDENTITY_APP)' && \
-	    codesign -s '$(SIGN_IDENTITY_APP)' --force --keychain '$(KEYCHAIN)' --timestamp \
-	    build/$(CONFIGURATION)/*.prefPane/Contents/MacOS/helper && \
-	    codesign -s '$(SIGN_IDENTITY_APP)' --force --keychain '$(KEYCHAIN)' --timestamp \
-	    build/$(CONFIGURATION)/*.prefPane
+	if test -n '$(SIGN_IDENTITY_APP)' ; then \
+		codesign -s '$(SIGN_IDENTITY_APP)' --timestamp \
+			build/$(CONFIGURATION)/*.prefPane/Contents/MacOS/helper && \
+		codesign -s '$(SIGN_IDENTITY_APP)' --timestamp \
+			build/$(CONFIGURATION)/*.prefPane ; \
+	fi
 
 .PHONY: clean pkg
 
@@ -30,7 +31,7 @@ $(PACKAGE_NAME): build
 	pkgbuild --root build/root/ \
 	    --identifier $(IDENTIFIER) \
 	    --version '$(VERSION)' \
-	    $$SIGN_ARGS --keychain "$(KEYCHAIN)" --timestamp \
+	    $$SIGN_ARGS --timestamp \
 	    $(PACKAGE_NAME)
 
 clean:

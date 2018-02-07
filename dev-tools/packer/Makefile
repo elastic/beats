@@ -25,7 +25,7 @@ beat_abspath=${BEATS_GOPATH}/src/${BEAT_PATH}
 	ARCH=amd64 BEAT=$(@D) BUILD_DIR=${BUILD_DIR} UPLOAD_DIR=${UPLOAD_DIR} BEAT_PATH=$(beat_abspath) BUILDID=$(BUILDID) SNAPSHOT=$(SNAPSHOT) BEAT_REF_YAML=${BEAT_REF_YAML} $(packer_absdir)/platforms/darwin/build.sh
 
 %/win:
-	echo Creating Darwin packages for $(@D)
+	echo Creating Windows packages for $(@D)
 	ARCH=386 BEAT=$(@D) BUILD_DIR=${BUILD_DIR} UPLOAD_DIR=${UPLOAD_DIR} BEAT_PATH=$(beat_abspath) BUILDID=$(BUILDID) SNAPSHOT=$(SNAPSHOT) BEAT_REF_YAML=${BEAT_REF_YAML} $(packer_absdir)/platforms/windows/build.sh
 	ARCH=amd64 BEAT=$(@D) BUILD_DIR=${BUILD_DIR} UPLOAD_DIR=${UPLOAD_DIR} BEAT_PATH=$(beat_abspath) BUILDID=$(BUILDID) SNAPSHOT=$(SNAPSHOT) BEAT_REF_YAML=${BEAT_REF_YAML} $(packer_absdir)/platforms/windows/build.sh
 
@@ -37,6 +37,10 @@ beat_abspath=${BEATS_GOPATH}/src/${BEAT_PATH}
 %/arm:
 	echo Creating ARM packages for $(@D)
 	ARCH=arm BEAT=$(@D) BUILD_DIR=${BUILD_DIR} BEAT_PATH=$(beat_abspath) BUILDID=$(BUILDID) SNAPSHOT=$(SNAPSHOT) $(packer_absdir)/platforms/binary/build.sh
+
+%/dmg:
+	echo Creating OSX packages for $(@D)
+	ARCH=amd64 BEAT=$(@D) BUILD_DIR=${BUILD_DIR} UPLOAD_DIR=${UPLOAD_DIR} BEAT_PATH=$(beat_abspath) BUILDID=$(BUILDID) SNAPSHOT=$(SNAPSHOT) $(packer_absdir)/platforms/darwin/pkg/build.sh
 
 .PHONY: package-dashboards
 package-dashboards:
