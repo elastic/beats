@@ -57,7 +57,7 @@ var cleanupTests = []struct {
 func TestCleanup(t *testing.T) {
 	for _, test := range cleanupTests {
 		states := NewStates()
-		states.states = append(states.states, test.state)
+		states.SetStates([]State{test.state})
 
 		assert.Equal(t, test.countBefore, states.Count())
 		assert.Equal(t, test.cleanupCount, states.Cleanup())
