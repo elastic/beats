@@ -1117,6 +1117,28 @@ func Test_gap_in_body_http1dot0(t *testing.T) {
 	assert.Equal(t, false, complete)
 }
 
+func TestHttpParser_composedHeaders(t *testing.T) {
+	data := "HTTP/1.1 200 OK\r\n" +
+		"Content-Length: 0\r\n" +
+		"Date: Tue, 14 Aug 2012 22:31:45 GMT\r\n" +
+		"Set-Cookie: aCookie=yummy\r\n" +
+		"Set-Cookie: anotherCookie=why%20not\r\n" +
+		"\r\n"
+	http := httpModForTests(nil)
+	http.parserConfig.sendHeaders = true
+	http.parserConfig.sendAllHeaders = true
+	message, ok, complete := testParse(http, data)
+
+	assert.True(t, ok)
+	assert.True(t, complete)
+	assert.False(t, message.isRequest)
+	assert.Equal(t, 200, int(message.statusCode))
+	assert.Equal(t, "OK", string(message.statusPhrase))
+	header, ok := message.headers["set-cookie"]
+	assert.True(t, ok)
+	assert.Equal(t, "aCookie=yummy, anotherCookie=why%20not", string(header))
+}
+
 func testCreateTCPTuple() *common.TCPTuple {
 	t := &common.TCPTuple{
 		IPLength: 4,
