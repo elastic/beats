@@ -2843,8 +2843,8 @@ WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
 --------------------------------------------------------------------
 Dependency: github.com/shirou/gopsutil
-Version: v2.17.04
-Revision: 9af92986dda65a8c367157a82b484553e1ec1c55
+Version: v2.18.01
+Revision: c432be29ccce470088d07eea25b3ea7e68a8afbb
 License type (autodetected): BSD-3-Clause
 ./vendor/github.com/shirou/gopsutil/LICENSE:
 --------------------------------------------------------------------

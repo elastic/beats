@@ -1026,6 +1026,14 @@
 			"revisionTime": "2017-03-21T23:07:31Z"
 		},
 		{
+			"checksumSHA1": "JDLkZ5oQHhfdtBVh/0K4hlE8y5g=",
+			"path": "github.com/shirou/gopsutil",
+			"revision": "c432be29ccce470088d07eea25b3ea7e68a8afbb",
+			"revisionTime": "2018-01-30T01:13:38Z",
+			"version": "v2.18.01",
+			"versionExact": "v2.18.01"
+		},
+		{
 			"checksumSHA1": "9ev6lHyQOxl1/VndOHAnMfbLmvs=",
 			"path": "github.com/shirou/gopsutil/disk",
 			"revision": "9af92986dda65a8c367157a82b484553e1ec1c55",
