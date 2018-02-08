@@ -134,6 +134,7 @@ https://github.com/elastic/beats/compare/v6.0.0-beta2...master[Check the HEAD di
 - Fix the registry file. It was not correctly storing event log names, and
   upon restart it would begin reading at the start of each event log. {issue}5813[5813]
 - Fix config validation to allow `event_logs.processors`. [pull]6217[6217]
+- Fixed a crash under Windows 2003 and XP when an event had less insert strings than required by its format string. {pull}6247[6247]
 
 ==== Added
 
