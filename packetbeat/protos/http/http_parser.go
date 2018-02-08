@@ -359,8 +359,8 @@ func (parser *parser) parseHeader(m *message, data []byte) (bool, bool, int) {
 				if val, ok := m.headers[string(headerName)]; ok {
 					composed := make([]byte, len(val)+len(headerVal)+2)
 					off := copy(composed, val)
-					off = copy(composed[off:], []byte(", "))
-					copy(composed[off:], headerVal)
+					copy(composed[off:], []byte(", "))
+					copy(composed[off+2:], headerVal)
 
 					m.headers[string(headerName)] = composed
 				} else {
