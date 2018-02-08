@@ -78,7 +78,7 @@ func NewInput(
 		harvesters:  harvester.NewRegistry(),
 		outlet:      out,
 		stateOutlet: stateOut,
-		states:      &file.States{},
+		states:      file.NewStates(),
 		done:        context.Done,
 	}
 
