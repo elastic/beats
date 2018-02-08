@@ -122,7 +122,7 @@ func (s *States) Cleanup() (int, int) {
 		}
 
 		expired := (state.TTL > 0 && currentTime.Sub(state.Timestamp) > state.TTL)
-		if !canExpire && expired {
+		if !canExpire && !expired {
 			continue
 		}
 
