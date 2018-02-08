@@ -107,16 +107,22 @@ func (s *States) findPrevious(newState State) (State, bool) {
 
 // Cleanup cleans up the state array. All states which are older then `older` are removed
 // The number of states that were cleaned up is returned
-func (s *States) Cleanup() int {
+func (s *States) Cleanup() (int, int) {
 	s.Lock()
 	defer s.Unlock()
 
 	statesBefore := len(s.states)
+	numCanExpire := 0
 
 	currentTime := time.Now()
 	for id, state := range s.states {
+		canExpire := state.TTL >= 0
+		if canExpire {
+			numCanExpire++
+		}
+
 		expired := (state.TTL > 0 && currentTime.Sub(state.Timestamp) > state.TTL)
-		if !(state.TTL == 0 || expired) {
+		if !canExpire && expired {
 			continue
 		}
 
@@ -127,10 +133,11 @@ func (s *States) Cleanup() int {
 
 		// drop state
 		delete(s.states, id)
+		numCanExpire-- // event removed -> reduce count of pending events again
 		logp.Debug("state", "State removed for %v because of older: %v", state.Source, state.TTL)
 	}
 
-	return statesBefore - len(s.states)
+	return statesBefore - len(s.states), numCanExpire
 }
 
 // Count returns number of states
