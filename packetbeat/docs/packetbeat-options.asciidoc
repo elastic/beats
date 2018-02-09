@@ -204,7 +204,7 @@ You can use the `bpf_filter` setting to overwrite the generated BPF filter. For 
 [source,yaml]
 ------------------------------------------------------------------------------
 packetbeat.interfaces.device: eth0
-packetbeat.interfaces.bpf_filter: "net 192.168.238.0/0 and port 80 and port 3306"
+packetbeat.interfaces.bpf_filter: "net 192.168.238.0/0 and port 80 or port 3306"
 ------------------------------------------------------------------------------
 
 NOTE: This setting disables automatic generation of the BPF filter. If
