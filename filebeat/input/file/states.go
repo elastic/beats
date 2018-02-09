@@ -85,34 +85,37 @@ func (s *States) Cleanup() (int, int) {
 	statesBefore := len(s.states)
 	numCanExpire := 0
 
-	for i := 0; i < len(s.states); i++ {
+	L := len(s.states)
+	for i := 0; i < L; {
 		state := &s.states[i]
-		expired := (state.TTL > 0 && currentTime.Sub(state.Timestamp) > state.TTL)
+		canExpire := state.TTL > 0
+		expired := (canExpire && currentTime.Sub(state.Timestamp) > state.TTL)
 
 		if state.TTL == 0 || expired {
 			if !state.Finished {
 				logp.Err("State for %s should have been dropped, but couldn't as state is not finished.", state.Source)
+				i++
 				continue
 			}
 
-			// remove state from index
 			delete(s.idx, state.ID())
+			logp.Debug("state", "State removed for %v because of older: %v", state.Source, state.TTL)
 
-			// remove entry by relocating last entry + shrink states array
-			last := len(s.states) - 1
-			s.states[i] = s.states[last]
-			s.states = s.states[:last]
-
-			// update index if replacement state still in registry
-			if i < len(s.states) {
+			L--
+			if L != i {
+				s.states[i] = s.states[L]
 				s.idx[s.states[i].ID()] = i
 			}
-		} else if state.TTL > 0 {
-			numCanExpire++
+		} else {
+			i++
+			if canExpire {
+				numCanExpire++
+			}
 		}
 	}
 
-	return statesBefore - len(s.states), numCanExpire
+	s.states = s.states[:L]
+	return statesBefore - L, numCanExpire
 }
 
 // Count returns number of states
