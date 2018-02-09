@@ -52,6 +52,8 @@ func (s *States) UpdateWithTs(newState State, ts time.Time) {
 	}
 }
 
+// FindPrevious lookups a registered state, that matching the new state.
+// Returns a zero-state if no match is found.
 func (s *States) FindPrevious(newState State) State {
 	s.RLock()
 	defer s.RUnlock()
@@ -62,7 +64,7 @@ func (s *States) FindPrevious(newState State) State {
 	return s.states[i]
 }
 
-// findPreviousState returns the previous state fo the file
+// findPrevious returns the previous state fo the file
 // In case no previous state exists, index -1 is returned
 func (s *States) findPrevious(id string) int {
 	if i, exists := s.idx[id]; exists {
@@ -116,7 +118,7 @@ func (s *States) Count() int {
 	return len(s.states)
 }
 
-// Returns a copy of the file states
+// GetStates creates copy of the file states.
 func (s *States) GetStates() []State {
 	s.RLock()
 	defer s.RUnlock()
