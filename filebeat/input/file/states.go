@@ -64,7 +64,7 @@ func (s *States) FindPrevious(newState State) State {
 	return s.states[i]
 }
 
-// findPrevious returns the previous state fo the file
+// findPrevious returns the previous state for the file.
 // In case no previous state exists, index -1 is returned
 func (s *States) findPrevious(id string) int {
 	if i, exists := s.idx[id]; exists {
@@ -76,7 +76,6 @@ func (s *States) findPrevious(id string) int {
 // Cleanup cleans up the state array. All states which are older then `older` are removed
 // The number of states that were cleaned up and number of states that can be
 // cleaned up in the future is returned.
-
 func (s *States) Cleanup() (int, int) {
 	s.Lock()
 	defer s.Unlock()
