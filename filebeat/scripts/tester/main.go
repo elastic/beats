@@ -105,7 +105,11 @@ func getLogsFromFile(logfile, multiPattern string, multiNegate bool, matchMode s
 	r = reader.NewStripNewline(r)
 
 	if multiPattern != "" {
-		p := match.MustCompile(multiPattern)
+		p, err := match.Compile(multiPattern)
+		if err != nil {
+			return nil, err
+		}
+
 		c := reader.MultilineConfig{
 			Negate:  multiNegate,
 			Match:   matchMode,
