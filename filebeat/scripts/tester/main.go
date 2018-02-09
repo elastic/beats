@@ -135,11 +135,6 @@ func getLogsFromFile(logfile, multiPattern string, multiNegate bool, matchMode s
 }
 
 func getPipelinePath(path, modulesPath string) ([]string, error) {
-	isPipelineFile := strings.HasSuffix(path, ".json")
-	if isPipelineFile {
-		return []string{path}, nil
-	}
-
 	var paths []string
 	stat, err := os.Stat(path)
 	if err != nil {
@@ -151,6 +146,10 @@ func getPipelinePath(path, modulesPath string) ([]string, error) {
 		fileset := parts[1]
 
 		pathToPipeline := filepath.Join(modulesPath, module, fileset, "ingest", "pipeline.json")
+		_, err := os.Stat(pathToPipeline)
+		if err != nil {
+			return nil, fmt.Errorf("Cannot find pipeline in %s: %v %v\n", path, err, pathToPipeline)
+		}
 		return []string{pathToPipeline}, nil
 	}
 
@@ -166,8 +165,17 @@ func getPipelinePath(path, modulesPath string) ([]string, error) {
 				paths = append(paths, fullPath)
 			}
 		}
+		if len(paths) == 0 {
+			return paths, fmt.Errorf("Cannot find pipeline in %s", path)
+		}
 		return paths, nil
 	}
+
+	isPipelineFile := strings.HasSuffix(path, ".json")
+	if isPipelineFile {
+		return []string{path}, nil
+	}
+
 	return paths, nil
 
 }
@@ -242,6 +250,10 @@ func runSimulate(url string, pipeline map[string]interface{}, logs []string, ver
 }
 
 func showResp(resp *http.Response, verbose, simulateVerbose bool) error {
+	if resp.StatusCode != 200 {
+		return fmt.Errorf("response code is %d not 200", resp.StatusCode)
+	}
+
 	b := new(bytes.Buffer)
 	b.ReadFrom(resp.Body)
 	var r common.MapStr
