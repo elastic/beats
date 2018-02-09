@@ -56,83 +56,85 @@ func (s *State) IsEmpty() bool {
 
 // States handles list of FileState
 type States struct {
-	states []State
+	states map[string]State
 	sync.RWMutex
 }
 
 func NewStates() *States {
 	return &States{
-		states: []State{},
+		states: map[string]State{},
 	}
 }
 
 // Update updates a state. If previous state didn't exist, new one is created
 func (s *States) Update(newState State) {
+	s.UpdateWithTimestamp(newState, time.Now())
+}
+
+// UpdateWithTimestamp updates a state, using the passed timestamp. If the
+// previous state didn't exist, a new entry is created.
+func (s *States) UpdateWithTimestamp(newState State, ts time.Time) {
 	s.Lock()
 	defer s.Unlock()
 
-	index, _ := s.findPrevious(newState)
-	newState.Timestamp = time.Now()
+	// ensure ID is set, so it won't be generated in find and on insert
+	id := newState.ID()
 
-	if index >= 0 {
-		s.states[index] = newState
-	} else {
-		// No existing state found, add new one
-		s.states = append(s.states, newState)
-		logp.Debug("input", "New state added for %s", newState.Source)
+	if logp.IsDebug("input") {
+		_, exists := s.findPrevious(newState)
+		if !exists {
+			logp.Debug("input", "New state added for %s", newState.Source)
+		}
 	}
+
+	newState.Timestamp = ts
+	s.states[id] = newState
 }
 
 func (s *States) FindPrevious(newState State) State {
 	s.RLock()
 	defer s.RUnlock()
-	_, state := s.findPrevious(newState)
+	state, _ := s.findPrevious(newState)
 	return state
 }
 
 // findPreviousState returns the previous state fo the file
 // In case no previous state exists, index -1 is returned
-func (s *States) findPrevious(newState State) (int, State) {
-	// TODO: This could be made potentially more performance by using an index (harvester id) and only use iteration as fall back
-	for index, oldState := range s.states {
-		// This is using the FileStateOS for comparison as FileInfo identifiers can only be fetched for existing files
-		if oldState.IsEqual(&newState) {
-			return index, oldState
-		}
-	}
-
-	return -1, State{}
+func (s *States) findPrevious(newState State) (State, bool) {
+	state, exists := s.states[newState.ID()]
+	return state, exists
 }
 
 // Cleanup cleans up the state array. All states which are older then `older` are removed
 // The number of states that were cleaned up is returned
-func (s *States) Cleanup() int {
+func (s *States) Cleanup() (int, int) {
 	s.Lock()
 	defer s.Unlock()
 
 	statesBefore := len(s.states)
+	numCanExpire := 0
 
 	currentTime := time.Now()
-	states := s.states[:0]
-
-	for _, state := range s.states {
-
-		expired := (state.TTL > 0 && currentTime.Sub(state.Timestamp) > state.TTL)
-
-		if state.TTL == 0 || expired {
-			if state.Finished {
-				logp.Debug("state", "State removed for %v because of older: %v", state.Source, state.TTL)
-				continue // drop state
-			} else {
-				logp.Err("State for %s should have been dropped, but couldn't as state is not finished.", state.Source)
-			}
+	for id, state := range s.states {
+		canExpire := state.TTL >= 0
+		if canExpire {
+			numCanExpire++
 		}
 
-		states = append(states, state) // in-place copy old state
-	}
-	s.states = states
+		expired := (state.TTL > 0 && currentTime.Sub(state.Timestamp) > state.TTL)
+		if state.TTL == 0 || expired {
+			if !state.Finished {
+				logp.Err("State for %s should have been dropped, but couldn't as state is not finished.", state.Source)
+			} else {
+				logp.Debug("state", "State removed for %v because of older: %v", state.Source, state.TTL)
 
-	return statesBefore - len(s.states)
+				delete(s.states, id)
+				numCanExpire-- // event removed -> reduce count of pending events again
+			}
+		}
+	}
+
+	return statesBefore - len(s.states), numCanExpire
 }
 
 // Count returns number of states
@@ -148,22 +150,37 @@ func (s *States) GetStates() []State {
 	s.RLock()
 	defer s.RUnlock()
 
-	newStates := make([]State, len(s.states))
-	copy(newStates, s.states)
+	newStates, i := make([]State, len(s.states)), 0
+	for _, state := range s.states {
+		newStates[i], i = state, i+1
+	}
 
 	return newStates
+}
+
+// GetIndexedStates returns a copy of the states, indexed by ID.
+func (s *States) GetIndexedStates() map[string]State {
+	m := make(map[string]State, len(s.states))
+	for k, v := range s.states {
+		m[k] = v
+	}
+	return m
 }
 
 // SetStates overwrites all internal states with the given states array
 func (s *States) SetStates(states []State) {
 	s.Lock()
 	defer s.Unlock()
-	s.states = states
+	newStates := make(map[string]State, len(states))
+	for _, state := range states {
+		newStates[state.ID()] = state
+	}
+	s.states = newStates
 }
 
 // Copy create a new copy of the states object
 func (s *States) Copy() *States {
 	states := NewStates()
-	states.states = s.GetStates()
+	states.states = s.GetIndexedStates()
 	return states
 }

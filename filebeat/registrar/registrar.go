@@ -148,16 +148,28 @@ func (r *Registrar) Start() error {
 
 func (r *Registrar) Run() {
 	logp.Debug("registrar", "Starting Registrar")
-	// Writes registry on shutdown
-	defer func() {
-		r.writeRegistry()
-		r.wg.Done()
-	}()
 
 	var (
 		timer  *time.Timer
 		flushC <-chan time.Time
+
+		// Set to true if any events can be gc'ed.
+		gcEnabled = false
+
+		// Set to true if gcEnabled and new set of events of have been send
+		// to the registry. We must not clean the registry if beat is blocked by outputs.
+		gcRequired = false
 	)
+
+	// Writes registry on shutdown
+	defer func() {
+		if gcRequired {
+			gcEnabled = r.gcStates()
+			gcRequired = false
+		}
+		r.writeRegistry()
+		r.wg.Done()
+	}()
 
 	for {
 		select {
@@ -167,15 +179,38 @@ func (r *Registrar) Run() {
 		case <-flushC:
 			flushC = nil
 			timer.Stop()
+			if gcRequired {
+				gcEnabled = r.gcStates()
+				gcRequired = false
+			}
 			r.flushRegistry()
 		case states := <-r.Channel:
 			r.onEvents(states)
+
+			// Check if any new states will require to be cleaned at some point.
+			// Enable state gc if so.
+			if !gcEnabled {
+				for i := range states {
+					if states[i].TTL >= 0 {
+						gcEnabled = true
+						break
+					}
+				}
+			}
+
+			gcRequired = gcEnabled
+
 			if r.flushTimeout <= 0 {
+				if gcRequired {
+					gcEnabled = r.gcStates()
+					gcRequired = false
+				}
 				r.flushRegistry()
 			} else if flushC == nil {
 				timer = time.NewTimer(r.flushTimeout)
 				flushC = timer.C
 			}
+
 		}
 	}
 }
@@ -183,24 +218,29 @@ func (r *Registrar) Run() {
 // onEvents processes events received from the publisher pipeline
 func (r *Registrar) onEvents(states []file.State) {
 	r.processEventStates(states)
-
-	beforeCount := r.states.Count()
-	cleanedStates := r.states.Cleanup()
-	statesCleanup.Add(int64(cleanedStates))
-
 	r.bufferedStateUpdates += len(states)
+}
+
+func (r *Registrar) gcStates() bool {
+	beforeCount := r.states.Count()
+
+	cleanedStates, numCanExpire := r.states.Cleanup()
+	statesCleanup.Add(int64(cleanedStates))
 
 	logp.Debug("registrar",
 		"Registrar states cleaned up. Before: %d, After: %d",
 		beforeCount, beforeCount-cleanedStates)
+
+	return numCanExpire > 0
 }
 
 // processEventStates gets the states from the events and writes them to the registrar state
 func (r *Registrar) processEventStates(states []file.State) {
 	logp.Debug("registrar", "Processing %d events", len(states))
 
+	ts := time.Now()
 	for i := range states {
-		r.states.Update(states[i])
+		r.states.UpdateWithTimestamp(states[i], ts)
 		statesUpdate.Add(1)
 	}
 }
