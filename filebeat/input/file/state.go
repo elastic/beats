@@ -122,19 +122,16 @@ func (s *States) Cleanup() (int, int) {
 		}
 
 		expired := (state.TTL > 0 && currentTime.Sub(state.Timestamp) > state.TTL)
-		if !canExpire && !expired {
-			continue
-		}
+		if state.TTL == 0 || expired {
+			if !state.Finished {
+				logp.Err("State for %s should have been dropped, but couldn't as state is not finished.", state.Source)
+			} else {
+				logp.Debug("state", "State removed for %v because of older: %v", state.Source, state.TTL)
 
-		if !state.Finished {
-			logp.Err("State for %s should have been dropped, but couldn't as state is not finished.", state.Source)
-			continue
+				delete(s.states, id)
+				numCanExpire-- // event removed -> reduce count of pending events again
+			}
 		}
-
-		// drop state
-		delete(s.states, id)
-		numCanExpire-- // event removed -> reduce count of pending events again
-		logp.Debug("state", "State removed for %v because of older: %v", state.Source, state.TTL)
 	}
 
 	return statesBefore - len(s.states), numCanExpire
