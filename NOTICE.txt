@@ -3428,7 +3428,8 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 --------------------------------------------------------------------
 Dependency: golang.org/x/tools
-Revision: 9be3b7cbc7ccd19baaa3b7704c22f57db5ebbdf2
+Version: release-branch.go1.9
+Revision: 5d2fd3ccab986d52112bf301d47a819783339d0e
 License type (autodetected): BSD-3-Clause
 ./vendor/golang.org/x/tools/LICENSE:
 --------------------------------------------------------------------
