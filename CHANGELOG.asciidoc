@@ -30,6 +30,8 @@ https://github.com/elastic/beats/compare/v6.2.0...6.2[Check the HEAD diff]
 
 *Affecting all Beats*
 
+- Fix infinite loop when event unmarshal fails in Kubernetes pod watcher. {pull}6353[6353]
+
 *Auditbeat*
 
 *Filebeat*

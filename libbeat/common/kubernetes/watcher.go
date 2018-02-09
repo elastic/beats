@@ -3,6 +3,7 @@ package kubernetes
 import (
 	"context"
 	"errors"
+	"io"
 	"sync"
 	"time"
 
@@ -144,8 +145,16 @@ func (p *podWatcher) watch() {
 			_, apiPod, err := watcher.Next()
 			if err != nil {
 				logp.Err("kubernetes: Watching API error %v", err)
-				watcher.Close()
-				break
+
+				// In case of EOF, stop watching and restart the process
+				if err == io.EOF || err == io.ErrUnexpectedEOF {
+					watcher.Close()
+					time.Sleep(time.Second)
+					break
+				}
+
+				// Otherwise, this is probably an unknown event (unmarshal error), ignore it
+				continue
 			}
 
 			// Update last resource version
