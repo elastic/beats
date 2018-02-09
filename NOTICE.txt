@@ -3394,7 +3394,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 --------------------------------------------------------------------
 Dependency: golang.org/x/text
-Revision: 2910a502d2bf9e43193af9d68ca516529614eed3
+Revision: 4e4a3210bb54bb31f6ab2cdca2edcc0b50c420c1
 License type (autodetected): BSD-3-Clause
 ./vendor/golang.org/x/text/LICENSE:
 --------------------------------------------------------------------
