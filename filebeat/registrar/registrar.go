@@ -225,8 +225,9 @@ func (r *Registrar) gcStates() {
 func (r *Registrar) processEventStates(states []file.State) {
 	logp.Debug("registrar", "Processing %d events", len(states))
 
+	ts := time.Now()
 	for i := range states {
-		r.states.Update(states[i])
+		r.states.UpdateWithTs(states[i], ts)
 		statesUpdate.Add(1)
 	}
 }
