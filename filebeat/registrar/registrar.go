@@ -190,12 +190,14 @@ func (r *Registrar) onEvents(states []file.State) {
 	// check if we need to enable state cleanup
 	if !r.gcEnabled {
 		for i := range states {
-			if states[i].TTL >= 0 {
+			if states[i].TTL >= 0 || states[i].Finished {
 				r.gcEnabled = true
 				break
 			}
 		}
 	}
+
+	logp.Debug("registrar", "Registrar state updates processed. Count: %v", len(states))
 
 	// new set of events received -> mark state registry ready for next
 	// cleanup phase in case gc'able events are stored in the registry.

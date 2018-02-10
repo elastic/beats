@@ -277,7 +277,7 @@ class Test(BaseTest):
         # Wait until state is written
         self.wait_until(
             lambda: self.log_contains(
-                "Registrar states cleaned up"),
+                "Registrar state updates processed"),
             max_timeout=15)
 
         filebeat.check_kill_and_wait()
