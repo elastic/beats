@@ -285,6 +285,7 @@ After the specified number of retries, the events are typically dropped.
 ifeval::["{beatname_lc}" == "filebeat"]
 Filebeat will ignore the `max_retries` setting and retry until all
 events are published.
+endif::[]
 ifeval::["{beatname_lc}" != "filebeat"]
 Set `max_retries` to a value less than 0 to retry until all events are published.
 endif::[]
@@ -532,6 +533,7 @@ After the specified number of retries, the events are typically dropped.
 ifeval::["{beatname_lc}" == "filebeat"]
 Filebeat will ignore the `max_retries` setting and retry until all
 events are published.
+endif::[]
 ifeval::["{beatname_lc}" != "filebeat"]
 Set `max_retries` to a value less than 0 to retry until all events are published.
 endif::[]
@@ -726,6 +728,8 @@ After the specified number of retries, the events are typically dropped.
 ifeval::["{beatname_lc}" == "filebeat"]
 Filebeat will ignore the `max_retries` setting and retry until all
 events are published.
+endif::[]
+
 ifeval::["{beatname_lc}" != "filebeat"]
 Set `max_retries` to a value less than 0 to retry until all events are published.
 endif::[]
@@ -951,6 +955,7 @@ After the specified number of retries, the events are typically dropped.
 ifeval::["{beatname_lc}" == "filebeat"]
 Filebeat will ignore the `max_retries` setting and retry until all
 events are published.
+endif::[]
 ifeval::["{beatname_lc}" != "filebeat"]
 Set `max_retries` to a value less than 0 to retry until all events are published.
 endif::[]
