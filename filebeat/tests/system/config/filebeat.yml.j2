@@ -1,10 +1,10 @@
 ###################### Filebeat Config Template ###############################
 
-filebeat.{{input_config | default("prospectors")}}:
-{% if prospectors is not defined %}
-{% set prospectors = true %}
+filebeat.{{input_config | default("inputs")}}:
+{% if inputs is not defined %}
+{% set inputs = true %}
 {% endif %}
-{% if prospectors %}
+{% if inputs %}
 - type: {{type | default("log") }}
   input_type: {{input_type_deprecated }}
   # Paths that should be crawled and fetched
@@ -31,9 +31,9 @@ filebeat.{{input_config | default("prospectors")}}:
   harvester_limit: {{harvester_limit | default(0) }}
   symlinks: {{symlinks}}
   pipeline: {{pipeline}}
-  {%- if prospector_processors %}
+  {%- if input_processors %}
   processors:
-    {%- for processor in prospector_processors %}
+    {%- for processor in input_processors %}
     {%- for name, settings in processor.items() %}
     - {{name}}:
       {%- if settings %}
@@ -85,8 +85,8 @@ filebeat.{{input_config | default("prospectors")}}:
     max_lines: {{ max_lines|default(500) }}
   {% endif %}
 {% endif %}
-{% if prospector_raw %}
-{{prospector_raw}}
+{% if input_raw %}
+{{input_raw}}
 {% endif %}
 
 filebeat.shutdown_timeout: {{ shutdown_timeout|default(0) }}
@@ -95,7 +95,7 @@ filebeat.registry_file: {{ beat.working_dir + '/' }}{{ registryFile|default("reg
 {%endif%}
 
 {% if reload or reload_path -%}
-filebeat.config.{{ reload_type|default("prospectors") }}:
+filebeat.config.{{ reload_type|default("inputs") }}:
   path: {{ reload_path }}
   {% if reload  -%}
   reload.period: 1s

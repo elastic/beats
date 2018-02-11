@@ -20,7 +20,7 @@ class TestAutodiscover(filebeat.BaseTest):
         docker_client = docker.from_env()
 
         self.render_config_template(
-            prospectors=False,
+            inputs=False,
             autodiscover={
                 'docker': {
                     'templates': '''

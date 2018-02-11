@@ -62,6 +62,14 @@ func New(b *beat.Beat, rawConfig *common.Config) (beat.Beater, error) {
 		config.Inputs = config.Prospectors
 	}
 
+	if config.ConfigProspector != nil {
+		cfgwarn.Deprecate("7.0.0", "config.prospectors are deprecated, Use `config.inputs` instead.")
+		if config.ConfigInput != nil {
+			return nil, fmt.Errorf("config.prospectors and config.inputs used in the configuration file, define only config.inputs not both")
+		}
+		config.ConfigInput = config.ConfigProspector
+	}
+
 	moduleRegistry, err := fileset.NewModuleRegistry(config.Modules, b.Info.Version, true)
 	if err != nil {
 		return nil, err
