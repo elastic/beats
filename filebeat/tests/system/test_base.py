@@ -25,6 +25,7 @@ class Test(BaseTest):
         output = self.read_output()[0]
         assert "@timestamp" in output
         assert "prospector.type" in output
+        assert "input.type" in output
 
     def test_invalid_config_with_removed_settings(self):
         """

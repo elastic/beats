@@ -1,12 +1,9 @@
-import re
-import sys
-import unittest
 import os
 import time
 from filebeat import BaseTest
 
 
-prospectorConfigTemplate = """
+inputConfigTemplate = """
 - type: log
   paths:
     - {}
@@ -18,12 +15,12 @@ class Test(BaseTest):
 
     def test_reload(self):
         """
-        Test basic prospectors reload
+        Test basic input reload
         """
         self.render_config_template(
             reload=True,
             reload_path=self.working_dir + "/configs/*.yml",
-            prospectors=False,
+            inputs=False,
         )
 
         proc = self.start_beat()
@@ -32,8 +29,8 @@ class Test(BaseTest):
         logfile = self.working_dir + "/logs/test.log"
         os.mkdir(self.working_dir + "/configs/")
 
-        with open(self.working_dir + "/configs/prospector.yml", 'w') as f:
-            f.write(prospectorConfigTemplate.format(self.working_dir + "/logs/*"))
+        with open(self.working_dir + "/configs/input.yml", 'w') as f:
+            f.write(inputConfigTemplate.format(self.working_dir + "/logs/*"))
 
         with open(logfile, 'w') as f:
             f.write("Hello world\n")
@@ -43,12 +40,12 @@ class Test(BaseTest):
 
     def test_start_stop(self):
         """
-        Test basic prospectors start and stop
+        Test basic input start and stop
         """
         self.render_config_template(
             reload=True,
             reload_path=self.working_dir + "/configs/*.yml",
-            prospectors=False,
+            inputs=False,
         )
 
         proc = self.start_beat()
@@ -57,19 +54,19 @@ class Test(BaseTest):
         logfile = self.working_dir + "/logs/test.log"
         os.mkdir(self.working_dir + "/configs/")
 
-        with open(self.working_dir + "/configs/prospector.yml", 'w') as f:
-            f.write(prospectorConfigTemplate.format(self.working_dir + "/logs/*"))
+        with open(self.working_dir + "/configs/input.yml", 'w') as f:
+            f.write(inputConfigTemplate.format(self.working_dir + "/logs/*"))
 
         with open(logfile, 'w') as f:
             f.write("Hello world\n")
 
         self.wait_until(lambda: self.output_lines() == 1)
 
-        # Remove prospector
-        with open(self.working_dir + "/configs/prospector.yml", 'w') as f:
+        # Remove input
+        with open(self.working_dir + "/configs/input.yml", 'w') as f:
             f.write("")
 
-        # Wait until prospector is stopped
+        # Wait until input is stopped
         self.wait_until(
             lambda: self.log_contains("Runner stopped:"),
             max_timeout=15)
@@ -86,12 +83,12 @@ class Test(BaseTest):
 
     def test_start_stop_replace(self):
         """
-        Test basic start and replace with another prospector
+        Test basic start and replace with another input
         """
         self.render_config_template(
             reload=True,
             reload_path=self.working_dir + "/configs/*.yml",
-            prospectors=False,
+            inputs=False,
         )
 
         proc = self.start_beat()
@@ -103,25 +100,25 @@ class Test(BaseTest):
         first_line = "First log file"
         second_line = "Second log file"
 
-        with open(self.working_dir + "/configs/prospector.yml", 'w') as f:
-            f.write(prospectorConfigTemplate.format(self.working_dir + "/logs/test1.log"))
+        with open(self.working_dir + "/configs/input.yml", 'w') as f:
+            f.write(inputConfigTemplate.format(self.working_dir + "/logs/test1.log"))
 
         with open(logfile1, 'w') as f:
             f.write(first_line + "\n")
 
         self.wait_until(lambda: self.output_lines() == 1)
 
-        # Remove prospector
-        with open(self.working_dir + "/configs/prospector.yml", 'w') as f:
+        # Remove input
+        with open(self.working_dir + "/configs/input.yml", 'w') as f:
             f.write("")
 
-        # Wait until prospector is stopped
+        # Wait until input is stopped
         self.wait_until(
             lambda: self.log_contains("Runner stopped:"),
             max_timeout=15)
 
-        with open(self.working_dir + "/configs/prospector.yml", 'w') as f:
-            f.write(prospectorConfigTemplate.format(self.working_dir + "/logs/test2.log"))
+        with open(self.working_dir + "/configs/input.yml", 'w') as f:
+            f.write(inputConfigTemplate.format(self.working_dir + "/logs/test2.log"))
 
         # Update both log files, only 1 change should be picke dup
         with open(logfile1, 'a') as f:
@@ -140,14 +137,14 @@ class Test(BaseTest):
         assert output[1]["message"] == second_line
         assert self.output_lines() == 2
 
-    def test_reload_same_prospector(self):
+    def test_reload_same_input(self):
         """
-        Test reloading same prospector
+        Test reloading same input
         """
         self.render_config_template(
             reload=True,
             reload_path=self.working_dir + "/configs/*.yml",
-            prospectors=False,
+            inputs=False,
         )
 
         proc = self.start_beat()
@@ -158,11 +155,11 @@ class Test(BaseTest):
         first_line = "First log file"
         second_line = "Second log file"
 
-        config = prospectorConfigTemplate.format(self.working_dir + "/logs/test.log")
+        config = inputConfigTemplate.format(self.working_dir + "/logs/test.log")
         config = config + """
   close_eof: true
 """
-        with open(self.working_dir + "/configs/prospector.yml", 'w') as f:
+        with open(self.working_dir + "/configs/input.yml", 'w') as f:
             f.write(config)
 
         with open(logfile, 'w') as f:
@@ -170,15 +167,15 @@ class Test(BaseTest):
 
         self.wait_until(lambda: self.output_lines() == 1)
 
-        # Overwrite prospector with same path but new fields
-        with open(self.working_dir + "/configs/prospector.yml", 'w') as f:
+        # Overwrite input with same path but new fields
+        with open(self.working_dir + "/configs/input.yml", 'w') as f:
             config = config + """
   fields:
     hello: world
 """
             f.write(config)
 
-        # Wait until prospector is stopped
+        # Wait until input is stopped
         self.wait_until(
             lambda: self.log_contains("Runner stopped:"),
             max_timeout=15)
@@ -204,11 +201,11 @@ class Test(BaseTest):
 
     def test_load_configs(self):
         """
-        Test loading separate prospectors configs
+        Test loading separate inputs configs
         """
         self.render_config_template(
             reload_path=self.working_dir + "/configs/*.yml",
-            prospectors=False,
+            inputs=False,
         )
 
         os.mkdir(self.working_dir + "/logs/")
@@ -218,11 +215,11 @@ class Test(BaseTest):
         first_line = "First log file"
         second_line = "Second log file"
 
-        config = prospectorConfigTemplate.format(self.working_dir + "/logs/test.log")
+        config = inputConfigTemplate.format(self.working_dir + "/logs/test.log")
         config = config + """
   close_eof: true
 """
-        with open(self.working_dir + "/configs/prospector.yml", 'w') as f:
+        with open(self.working_dir + "/configs/input.yml", 'w') as f:
             f.write(config)
 
         with open(logfile, 'w') as f:
@@ -259,15 +256,15 @@ class Test(BaseTest):
         self.render_config_template(
             reload=True,
             reload_path=self.working_dir + "/configs/*.yml",
-            prospectors=False,
+            inputs=False,
         )
 
         os.mkdir(self.working_dir + "/logs/")
         logfile = self.working_dir + "/logs/test.log"
         os.mkdir(self.working_dir + "/configs/")
 
-        with open(self.working_dir + "/configs/prospector.yml", 'w') as f:
-            f.write(prospectorConfigTemplate.format(self.working_dir + "/logs/*"))
+        with open(self.working_dir + "/configs/input.yml", 'w') as f:
+            f.write(inputConfigTemplate.format(self.working_dir + "/logs/*"))
 
         proc = self.start_beat()
 
@@ -277,9 +274,9 @@ class Test(BaseTest):
         self.wait_until(lambda: self.output_lines() > 0)
 
         # New config with same config file but a bit different to make it reload
-        # Add it intentionally when other prospector is still running to cause an error
-        with open(self.working_dir + "/configs/prospector.yml", 'w') as f:
-            f.write(prospectorConfigTemplate.format(self.working_dir + "/logs/test.log"))
+        # Add it intentionally when other input is still running to cause an error
+        with open(self.working_dir + "/configs/input.yml", 'w') as f:
+            f.write(inputConfigTemplate.format(self.working_dir + "/logs/test.log"))
 
         # Make sure error shows up in log file
         self.wait_until(
@@ -291,7 +288,7 @@ class Test(BaseTest):
             lambda: self.log_contains("Runner stopped:"),
             max_timeout=15)
 
-        # Add new log line and see if it is picked up = new prospector is running
+        # Add new log line and see if it is picked up = new input is running
         with open(logfile, 'a') as f:
             f.write("Hello world2\n")
 
@@ -301,12 +298,12 @@ class Test(BaseTest):
 
     def test_reload_add(self):
         """
-        Test adding a prospector and makes sure both are still running
+        Test adding a input and makes sure both are still running
         """
         self.render_config_template(
             reload=True,
             reload_path=self.working_dir + "/configs/*.yml",
-            prospectors=False,
+            inputs=False,
         )
 
         os.mkdir(self.working_dir + "/logs/")
@@ -314,8 +311,8 @@ class Test(BaseTest):
         logfile2 = self.working_dir + "/logs/test2.log"
         os.mkdir(self.working_dir + "/configs/")
 
-        with open(self.working_dir + "/configs/prospector1.yml", 'w') as f:
-            f.write(prospectorConfigTemplate.format(self.working_dir + "/logs/test1.log"))
+        with open(self.working_dir + "/configs/input.yml", 'w') as f:
+            f.write(inputConfigTemplate.format(self.working_dir + "/logs/test1.log"))
 
         proc = self.start_beat()
 
@@ -324,18 +321,18 @@ class Test(BaseTest):
 
         self.wait_until(lambda: self.output_lines() > 0)
 
-        with open(self.working_dir + "/configs/prospector2.yml", 'w') as f:
-            f.write(prospectorConfigTemplate.format(self.working_dir + "/logs/test2.log"))
+        with open(self.working_dir + "/configs/input2.yml", 'w') as f:
+            f.write(inputConfigTemplate.format(self.working_dir + "/logs/test2.log"))
 
         self.wait_until(
             lambda: self.log_contains_count("New runner started") == 2,
             max_timeout=15)
 
-        # Add new log line and see if it is picked up = new prospector is running
+        # Add new log line and see if it is picked up = new input is running
         with open(logfile1, 'a') as f:
             f.write("Hello world2\n")
 
-        # Add new log line and see if it is picked up = new prospector is running
+        # Add new log line and see if it is picked up = new input is running
         with open(logfile2, 'a') as f:
             f.write("Hello world3\n")
 
