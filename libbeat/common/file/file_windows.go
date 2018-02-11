@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"os"
 	"reflect"
+	"strconv"
 	"syscall"
 )
 
@@ -43,7 +44,13 @@ func (fs StateOS) IsSame(state StateOS) bool {
 }
 
 func (fs StateOS) String() string {
-	return fmt.Sprintf("%d-%d-%d", fs.IdxHi, fs.IdxLo, fs.Vol)
+	var buf [92]byte
+	current := strconv.AppendUint(buf[:0], fs.IdxHi, 10)
+	current = append(current, '-')
+	current = strconv.AppendUint(current, fs.IdxLo, 10)
+	current = append(current, '-')
+	current = strconv.AppendUint(current, fs.Vol, 10)
+	return string(current)
 }
 
 // ReadOpen opens a file for reading only
