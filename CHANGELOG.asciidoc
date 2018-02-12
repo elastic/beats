@@ -54,6 +54,7 @@ https://github.com/elastic/beats/compare/v6.0.0-beta2...master[Check the HEAD di
 - Support to optionally 'de dot' keys in http/json metricset to prevent collisions. {pull}5970[5970]
 - De dot keys in kubernetes/event metricset to prevent collisions. {pull}6203[6203]
 - Fix the default configuration for Logstash to include the default port. {pull}6279[6279]
+- Add filtering option by exact device names in system.diskio. `diskio.include_devices`. {pull}6085[6085]
 - Fix dealing with new process status codes in Linux kernel 4.14+. {pull}6306[6306]
 
 *Packetbeat*
