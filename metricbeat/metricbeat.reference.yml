@@ -111,6 +111,9 @@ metricbeat.modules:
   #socket.reverse_lookup.success_ttl: 60s
   #socket.reverse_lookup.failure_ttl: 60s
 
+  # Diskio configurations
+  #diskio.include_devices: []
+
 #------------------------------ Aerospike Module -----------------------------
 - module: aerospike
   metricsets: ["namespace"]
