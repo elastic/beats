@@ -64,6 +64,7 @@ type eventLogging struct {
 	handle    win.Handle         // Handle to the event log.
 	readBuf   []byte             // Buffer for reading in events.
 	formatBuf []byte             // Buffer for formatting messages.
+	insertBuf win.StringInserts  // Buffer for parsing insert strings.
 	handles   *messageFilesCache // Cached mapping of source name to event message file handles.
 	logPrefix string             // Prefix to add to all log entries.
 
@@ -149,7 +150,7 @@ func (l *eventLogging) Read() ([]Record, error) {
 
 	l.readBuf = l.readBuf[0:numBytesRead]
 	events, _, err := win.RenderEvents(
-		l.readBuf[:numBytesRead], 0, l.formatBuf, l.handles.get)
+		l.readBuf[:numBytesRead], 0, l.formatBuf, &l.insertBuf, l.handles.get)
 	if err != nil {
 		return nil, err
 	}

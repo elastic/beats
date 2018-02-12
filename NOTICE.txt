@@ -3292,7 +3292,7 @@ THE SOFTWARE.
 
 --------------------------------------------------------------------
 Dependency: golang.org/x/crypto
-Revision: d585fd2cc9195196078f516b69daff6744ef5e84
+Revision: 5119cf507ed5294cc409c092980c7497ee5d6fd2
 License type (autodetected): BSD-3-Clause
 ./vendor/golang.org/x/crypto/LICENSE:
 --------------------------------------------------------------------
@@ -3360,7 +3360,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 --------------------------------------------------------------------
 Dependency: golang.org/x/sys
-Revision: b76f9891dc1d975623261def70f9b89661f5baab
+Revision: 37707fdb30a5b38865cfb95e5aab41707daec7fd
 License type (autodetected): BSD-3-Clause
 ./vendor/golang.org/x/sys/LICENSE:
 --------------------------------------------------------------------
@@ -3428,7 +3428,8 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 --------------------------------------------------------------------
 Dependency: golang.org/x/tools
-Revision: 9be3b7cbc7ccd19baaa3b7704c22f57db5ebbdf2
+Version: release-branch.go1.9
+Revision: 5d2fd3ccab986d52112bf301d47a819783339d0e
 License type (autodetected): BSD-3-Clause
 ./vendor/golang.org/x/tools/LICENSE:
 --------------------------------------------------------------------

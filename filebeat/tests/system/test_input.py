@@ -3,12 +3,11 @@
 from filebeat import BaseTest
 import os
 import time
-import unittest
 
 from beat.beat import Proc
 
 """
-Tests for the prospector functionality.
+Tests for the input functionality.
 """
 
 
@@ -269,12 +268,12 @@ class Test(BaseTest):
 
         filebeat.check_kill_and_wait()
 
-    def test_shutdown_no_prospectors(self):
+    def test_shutdown_no_inputs(self):
         """
-        In case no prospectors are defined, filebeat must shut down and report an error
+        In case no inputs are defined, filebeat must shut down and report an error
         """
         self.render_config_template(
-            prospectors=False,
+            inputs=False,
         )
 
         filebeat = self.start_beat()
@@ -288,7 +287,7 @@ class Test(BaseTest):
 
     def test_no_paths_defined(self):
         """
-        In case a prospector is defined but doesn't contain any paths, prospector must return error which
+        In case a input is defined but doesn't contain any paths, input must return error which
         leads to shutdown of filebeat because of configuration error
         """
         self.render_config_template(
@@ -299,7 +298,7 @@ class Test(BaseTest):
         # wait for first  "Start next scan" log message
         self.wait_until(
             lambda: self.log_contains(
-                "No paths were defined for input"),
+                "No paths were defined for "),
             max_timeout=10)
 
         self.wait_until(
@@ -311,7 +310,7 @@ class Test(BaseTest):
 
     def test_files_added_late(self):
         """
-        Tests that prospectors stay running even though no harvesters are started yet
+        Tests that inputs stay running even though no harvesters are started yet
         """
         self.render_config_template(
             path=os.path.abspath(self.working_dir) + "/log/*",
@@ -627,13 +626,13 @@ class Test(BaseTest):
 
         filebeat.check_kill_and_wait()
 
-    def test_prospector_filter_dropfields(self):
+    def test_input_filter_dropfields(self):
         """
-        Check drop_fields filtering action at a prospector level
+        Check drop_fields filtering action at a input level
         """
         self.render_config_template(
             path=os.path.abspath(self.working_dir) + "/test.log",
-            prospector_processors=[{
+            input_processors=[{
                 "drop_fields": {
                     "fields": ["offset"],
                 },
@@ -652,13 +651,13 @@ class Test(BaseTest):
         assert "offset" not in output
         assert "message" in output
 
-    def test_prospector_filter_includefields(self):
+    def test_input_filter_includefields(self):
         """
-        Check include_fields filtering action at a prospector level
+        Check include_fields filtering action at a input level
         """
         self.render_config_template(
             path=os.path.abspath(self.working_dir) + "/test.log",
-            prospector_processors=[{
+            input_processors=[{
                 "include_fields": {
                     "fields": ["offset"],
                 },

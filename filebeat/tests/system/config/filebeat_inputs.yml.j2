@@ -1,9 +1,9 @@
-filebeat.prospectors:
-{% for prospector in prospectors %}
+filebeat.inputs:
+{% for input in inputs %}
 - paths:
-    - {{prospector.path}}
+    - {{input.path}}
   scan_frequency: 0.5s
-  encoding: {{prospector.encoding | default("plain") }}
+  encoding: {{input.encoding | default("plain") }}
 {% endfor %}
 filebeat.registry_file: {{ beat.working_dir + '/' }}{{ registryFile|default("registry")}}
 

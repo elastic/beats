@@ -55,6 +55,7 @@ https://github.com/elastic/beats/compare/v6.0.0-beta2...master[Check the HEAD di
 - De dot keys in kubernetes/event metricset to prevent collisions. {pull}6203[6203]
 - Fix the default configuration for Logstash to include the default port. {pull}6279[6279]
 - Add filtering option by exact device names in system.diskio. `diskio.include_devices`. {pull}6085[6085]
+- Fix dealing with new process status codes in Linux kernel 4.14+. {pull}6306[6306]
 
 *Packetbeat*
 
@@ -93,6 +94,8 @@ https://github.com/elastic/beats/compare/v6.0.0-beta2...master[Check the HEAD di
 - Fix `recursive_globe.enabled` option. {pull}5443[5443]
 - Change pipeline delimiter to `{<` and `>}`. {pull}5702[5702]
 - Fix variable name for `convert_timezone` in the system module. {pull}5936[5936]
+- Fix a conversion issue for time related fields in the Logstash module for the slowlog
+  fileset. {issue}6317[6317]
 
 *Heartbeat*
 
@@ -120,18 +123,21 @@ https://github.com/elastic/beats/compare/v6.0.0-beta2...master[Check the HEAD di
 - Fix system process metricset for kernel processes. {issue}5700[5700]
 - Fix panic in http dependent modules when invalid config was used.
 - Fix system.filesystem.used.pct value to match what df reports. {issue}5494[5494]
+- Fix namespace disambiguation in Kubernetes state_* metricsets. {issue}6281[6281]
 
 *Packetbeat*
 
 - Fix http status phrase parsing not allow spaces. {pull}5312[5312]
 - Fix http parse to allow to parse get request with space in the URI. {pull}5495[5495]
 - Fix mysql SQL parser to trim `\r` from Windows Server `SELECT\r\n\t1`. {pull}5572[5572]
+- Fix corruption when parsing repeated headers in an HTTP request or response. {pull}6325[6325]
 
 *Winlogbeat*
 
 - Fix the registry file. It was not correctly storing event log names, and
   upon restart it would begin reading at the start of each event log. {issue}5813[5813]
 - Fix config validation to allow `event_logs.processors`. [pull]6217[6217]
+- Fixed a crash under Windows 2003 and XP when an event had less insert strings than required by its format string. {pull}6247[6247]
 
 ==== Added
 
