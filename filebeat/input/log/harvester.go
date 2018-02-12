@@ -370,7 +370,7 @@ func (h *Harvester) onMessage(
 			timestamp = ts
 		}
 
-		if id != nil {
+		if id != "" {
 			meta = common.MapStr{
 				"id": id,
 			}

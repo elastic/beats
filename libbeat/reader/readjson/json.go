@@ -114,7 +114,7 @@ func createJSONError(message string) common.MapStr {
 // respecting the KeysUnderRoot and OverwriteKeys configuration options.
 // If MessageKey is defined, the Text value from the event always
 // takes precedence.
-func MergeJSONFields(data common.MapStr, jsonFields common.MapStr, text *string, config Config) (interface{}, time.Time) {
+func MergeJSONFields(data common.MapStr, jsonFields common.MapStr, text *string, config Config) (string, time.Time) {
 	// The message key might have been modified by multiline
 	if len(config.MessageKey) > 0 && text != nil {
 		jsonFields[config.MessageKey] = *text
@@ -127,12 +127,14 @@ func MergeJSONFields(data common.MapStr, jsonFields common.MapStr, text *string,
 		data["message"] = *text
 	}
 
-	var id interface{}
+	var id string
 	if key := config.DocumentID; key != "" {
 		if tmp, err := jsonFields.GetValue(key); err == nil {
-			id = tmp
+			if v, ok := tmp.(string); ok {
+				id = v
+				jsonFields.Delete(key)
+			}
 		}
-		jsonFields.Delete(key)
 	}
 
 	if config.KeysUnderRoot {
