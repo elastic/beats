@@ -18,15 +18,15 @@ type {Beat} struct {
 }
 
 // Creates beater
-func New(b *beat.Beat, c *common.Config) (beat.Beater, error) {
-	cfg := config.DefaultConfig
-	if err := c.Unpack(&cfg); err != nil {
+func New(b *beat.Beat, cfg *common.Config) (beat.Beater, error) {
+	c := config.DefaultConfig
+	if err := cfg.Unpack(&c); err != nil {
 		return nil, fmt.Errorf("Error reading config file: %v", err)
 	}
 
 	bt := &{Beat}{
 		done:   make(chan struct{}),
-		config: cfg,
+		config: c,
 	}
 	return bt, nil
 }
