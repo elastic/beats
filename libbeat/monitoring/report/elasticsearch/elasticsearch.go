@@ -159,6 +159,7 @@ func (r *reporter) initLoop() {
 		client := r.out.Clients[rand.Intn(len(r.out.Clients))].(outputs.NetworkClient)
 		err := client.Connect()
 		if err == nil {
+			logp.Err("Monitoring could not connect to elasticsearch, failed with %v", err)
 			closing(client)
 			break
 		}
