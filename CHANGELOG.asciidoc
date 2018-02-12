@@ -140,6 +140,7 @@ https://github.com/elastic/beats/compare/v6.0.0-beta2...master[Check the HEAD di
 - Fix mysql SQL parser to trim `\r` from Windows Server `SELECT\r\n\t1`. {pull}5572[5572]
 - Fix corruption when parsing repeated headers in an HTTP request or response. {pull}6325[6325]
 - Fix panic when parsing partial AMQP messages. {pull}6384[6384]
+- Fix out of bounds access to slice in MongoDB parser. {pull}6256[6256]
 
 *Winlogbeat*
 
