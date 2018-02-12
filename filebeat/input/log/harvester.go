@@ -193,7 +193,7 @@ func (h *Harvester) Run() error {
 
 	// Closes reader after timeout or when done channel is closed
 	// This routine is also responsible to properly stop the reader
-	go func() {
+	go func(source string) {
 
 		closeTimeout := make(<-chan time.Time)
 		// starts close_timeout timer
@@ -204,14 +204,14 @@ func (h *Harvester) Run() error {
 		select {
 		// Applies when timeout is reached
 		case <-closeTimeout:
-			logp.Info("Closing harvester because close_timeout was reached.")
+			logp.Info("Closing harvester because close_timeout was reached: %s", source)
 		// Required when reader loop returns and reader finished
 		case <-h.done:
 		}
 
 		h.stop()
 		h.log.Close()
-	}()
+	}(h.state.Source)
 
 	logp.Info("Harvester started for file: %s", h.state.Source)
 
