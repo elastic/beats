@@ -1548,7 +1548,7 @@ example: metricsets
 
 required: True
 
-The document type. Always set to "metricsets".
+The document type. Always set to "doc".
 
 
 [[exported-fields-couchbase]]
