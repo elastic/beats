@@ -41,7 +41,11 @@ https://github.com/elastic/beats/compare/v6.0.0-beta2...master[Check the HEAD di
   one. This change also affect YAML configuration. {pull}6078[6078]
 - Refactor the Redis prospector to use the input interface {pull}6116[6116]
 - Refactor the UDP prospector to use the input interface {pull}6118[6118]
-- Refactor the usage of prospector to input in the YAML reference {pull}6121[6121]
+- Refactor the Docker prospector to use the input interface {pull}6278[6278]
+- Refactor the Log prospector to use the input interface {pull}6116[6116]
+- Refactor the Stdin prospector to use the input interface {pull}6116[6116]
+- Refactor the usage of prospector to input in the YAML reference and
+  the system test. {pull}6121[6121]
 
 *Heartbeat*
 
