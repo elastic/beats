@@ -6,7 +6,7 @@ EXPOSE 5601
 
 ### Beats specific args ####
 ARG DOWNLOAD_URL=https://snapshots.elastic.co/downloads
-ARG ELASTIC_VERSION=7.0.0-alpha1-SNAPSHOT
+ARG ELASTIC_VERSION=6.2.2-SNAPSHOT
 ARG CACHE_BUST=1
 ARG XPACK=1
 
