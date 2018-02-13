@@ -12,7 +12,7 @@ filebeat.autodiscover:
           config:
             - type: docker
               containers.ids:
-                - "${data.docker.container.id}"
+                - "${data.kubernetes.container.id}"
               exclude_lines: ["^\\s+[\\-`('.|_]"]  # drop asciiart lines
 -------------------------------------------------------------------------------------
 
@@ -36,5 +36,5 @@ filebeat.autodiscover:
                 prospector:
                   type: docker
                   containers.ids:
-                    - "${data.docker.container.id}"
+                    - "${data.kubernetes.container.id}"
 -------------------------------------------------------------------------------------
