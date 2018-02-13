@@ -1673,12 +1673,6 @@ Contains fields from MongoDB logs.
 
 
 [float]
-=== `mongodb.log.timestamp`
-
-Timestamp of message
-
-
-[float]
 === `mongodb.log.severity`
 
 type: keyword

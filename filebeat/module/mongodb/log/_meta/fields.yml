@@ -3,9 +3,6 @@
   description: >
       Contains fields from MongoDB logs.
   fields:
-  - name: timestamp
-    description: >
-        Timestamp of message
   - name: severity
     description: >
         Severity level of message
