@@ -17,6 +17,14 @@ import (
 	"github.com/elastic/beats/libbeat/common/match"
 )
 
+type logReaderConfig struct {
+	multiPattern string
+	multiNegate  bool
+	maxBytes     int
+	matchMode    string
+	encoding     string
+}
+
 func main() {
 	esURL := flag.String("elasticsearch", "http://localhost:9200", "Elasticsearch URL")
 	path := flag.String("pipeline", "", "Path to pipeline")
@@ -29,6 +37,7 @@ func main() {
 	multiNegate := flag.Bool("multiline.negate", false, "Multiline negate")
 	multiMode := flag.String("multiline.mode", "before", "Multiline mode")
 	maxBytes := flag.Int("maxbytes", 10485760, "Number of max bytes to be read")
+	fileEncoding := flag.String("encoding", "utf8", "Encoding of logfile")
 
 	verbose := flag.Bool("verbose", false, "Call Simulate API with verbose option")
 	simulateVerbose := flag.Bool("simulate.verbose", false, "Print full output of Simulate API with verbose option")
@@ -52,7 +61,14 @@ func main() {
 	var logs []string
 	var err error
 	if *logfile != "" {
-		logs, err = getLogsFromFile(*logfile, *multiPattern, *multiNegate, *multiMode, *maxBytes)
+		c := logReaderConfig{
+			multiPattern: *multiPattern,
+			multiNegate:  *multiNegate,
+			matchMode:    *multiMode,
+			maxBytes:     *maxBytes,
+			encoding:     *fileEncoding,
+		}
+		logs, err = getLogsFromFile(*logfile, &c)
 		if err != nil {
 			os.Stderr.WriteString(fmt.Sprintf("Error while reading logs from file: %v\n", err))
 			os.Exit(2)
@@ -79,14 +95,14 @@ func main() {
 		}
 	}
 }
-func getLogsFromFile(logfile, multiPattern string, multiNegate bool, matchMode string, maxBytes int) ([]string, error) {
+func getLogsFromFile(logfile string, conf *logReaderConfig) ([]string, error) {
 	f, err := os.Open(logfile)
 	if err != nil {
 		return nil, err
 	}
 	defer f.Close()
 
-	encFactory, ok := encoding.FindEncoding("utf8")
+	encFactory, ok := encoding.FindEncoding(conf.encoding)
 	if !ok {
 		return nil, fmt.Errorf("unable to find 'utf8' encoding")
 	}
@@ -104,15 +120,15 @@ func getLogsFromFile(logfile, multiPattern string, multiNegate bool, matchMode s
 
 	r = reader.NewStripNewline(r)
 
-	if multiPattern != "" {
-		p, err := match.Compile(multiPattern)
+	if conf.multiPattern != "" {
+		p, err := match.Compile(conf.multiPattern)
 		if err != nil {
 			return nil, err
 		}
 
 		c := reader.MultilineConfig{
-			Negate:  multiNegate,
-			Match:   matchMode,
+			Negate:  conf.multiNegate,
+			Match:   conf.matchMode,
 			Pattern: &p,
 		}
 		r, err = reader.NewMultiline(r, "\n", 1<<20, &c)
@@ -120,7 +136,7 @@ func getLogsFromFile(logfile, multiPattern string, multiNegate bool, matchMode s
 			return nil, err
 		}
 	}
-	r = reader.NewLimit(r, maxBytes)
+	r = reader.NewLimit(r, conf.maxBytes)
 
 	var logs []string
 	for {
