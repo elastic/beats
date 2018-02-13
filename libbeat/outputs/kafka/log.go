@@ -9,11 +9,11 @@ import (
 type kafkaLogger struct{}
 
 func (kl kafkaLogger) Print(v ...interface{}) {
-	kl.Log("kafka message: %v", v)
+	kl.Log("kafka message: %v", v...)
 }
 
 func (kl kafkaLogger) Printf(format string, v ...interface{}) {
-	kl.Log(format, v)
+	kl.Log(format, v...)
 }
 
 func (kl kafkaLogger) Println(v ...interface{}) {
