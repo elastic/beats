@@ -3,6 +3,7 @@ package kubernetes
 import (
 	"context"
 	"errors"
+	"io"
 	"sync"
 	"time"
 
@@ -12,6 +13,9 @@ import (
 	"github.com/ericchiang/k8s"
 	corev1 "github.com/ericchiang/k8s/api/v1"
 )
+
+// Max back off time for retries
+const maxBackoff = 30 * time.Second
 
 // Watcher reads Kubernetes events and keeps a list of known pods
 type Watcher interface {
@@ -129,6 +133,9 @@ func (p *podWatcher) Start() error {
 }
 
 func (p *podWatcher) watch() {
+	// Failures counter, do exponential backoff on retries
+	var failures uint
+
 	for {
 		logp.Info("kubernetes: %s", "Watching API for pod events")
 		watcher, err := p.client.WatchPods(p.ctx, "", p.nodeFilter, k8s.ResourceVersion(p.lastResourceVersion))
@@ -136,7 +143,8 @@ func (p *podWatcher) watch() {
 			//watch pod failures should be logged and gracefully failed over as metadata retrieval
 			//should never stop.
 			logp.Err("kubernetes: Watching API error %v", err)
-			time.Sleep(time.Second)
+			backoff(failures)
+			failures++
 			continue
 		}
 
@@ -144,12 +152,22 @@ func (p *podWatcher) watch() {
 			_, apiPod, err := watcher.Next()
 			if err != nil {
 				logp.Err("kubernetes: Watching API error %v", err)
-				watcher.Close()
-				break
+
+				// In case of EOF, stop watching and restart the process
+				if err == io.EOF || err == io.ErrUnexpectedEOF {
+					watcher.Close()
+					backoff(failures)
+					failures++
+					break
+				}
+
+				// Otherwise, this is probably an unknown event (unmarshal error), ignore it
+				continue
 			}
 
-			// Update last resource version
+			// Update last resource version and reset failure counter
 			p.lastResourceVersion = apiPod.Metadata.GetResourceVersion()
+			failures = 0
 
 			pod := GetPod(apiPod)
 			if pod.Metadata.DeletionTimestamp != "" {
@@ -188,6 +206,14 @@ func (p *podWatcher) watch() {
 			}
 		}
 	}
+}
+
+func backoff(failures uint) {
+	wait := 1 << failures * time.Second
+	if wait > maxBackoff {
+		wait = maxBackoff
+	}
+	time.Sleep(wait)
 }
 
 // Check annotations flagged as deleted for their last access time, fully delete
