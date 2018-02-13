@@ -87,6 +87,10 @@ https://github.com/elastic/beats/compare/v6.2.1...v6.2.2[View commits]
 
 - Add logging when monitoring cannot connect to Elasticsearch. {pull}6365[6365]
 
+*Filebeat*
+
+- Fix a conversion issue for time related fields in the Logstash module for the slowlog
+  fileset. {issue}6317[6317]
 
 [[release-notes-6.2.1]]
 === Beats version 6.2.1
