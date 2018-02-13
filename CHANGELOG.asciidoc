@@ -82,6 +82,7 @@ https://github.com/elastic/beats/compare/v6.0.0-beta2...master[Check the HEAD di
 - Fix isolation of modules when merging local and global field settings. {issue}5795[5795]
 - Fix panic when Events containing a float32 value are normalized. {pull}6129[6129]
 - Fix `setup.dashboards.always_kibana` when using Kibana 5.6. {issue}6090[6090]
+- Update Golang 1.9.4 {pull}6326[6326]
 
 *Auditbeat*
 
