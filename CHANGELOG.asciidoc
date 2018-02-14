@@ -308,6 +308,7 @@ https://github.com/elastic/beats/compare/v6.0.1...v6.1.0[View commits]
 - Fix http parse to allow to parse get request with space in the URI. {pull}5495[5495]
 - Fix mysql SQL parser to trim `\r` from Windows Server `SELECT\r\n\t1`. {pull}5572[5572]
 - Fix corruption when parsing repeated headers in an HTTP request or response. {pull}6325[6325]
+- Fix panic when parsing partial AMQP messages. {pull}6384[6384]
 
 *Winlogbeat*
 
