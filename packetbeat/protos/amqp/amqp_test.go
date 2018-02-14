@@ -83,6 +83,30 @@ func TestAmqp_FrameSize(t *testing.T) {
 	}
 }
 
+// Test that the parser doesn't panic on a partial message that includes
+// a client header
+func TestAmqp_PartialFrameSize(t *testing.T) {
+	if testing.Verbose() {
+		logp.LogInit(logp.LOG_DEBUG, "", false, true, []string{"amqp", "amqpdetailed"})
+	}
+
+	amqp := amqpModForTests()
+
+	//incomplete frame
+	data, err := hex.DecodeString("414d515000060606010000000000")
+	assert.Nil(t, err)
+
+	stream := &amqpStream{data: data, message: new(amqpMessage)}
+	ok, complete := amqp.amqpMessageParser(stream)
+
+	if !ok {
+		t.Errorf("Parsing should not raise an error")
+	}
+	if complete {
+		t.Errorf("message should not be complete")
+	}
+}
+
 func TestAmqp_WrongShortStringSize(t *testing.T) {
 	if testing.Verbose() {
 		logp.LogInit(logp.LOG_DEBUG, "", false, true, []string{"amqp", "amqpdetailed"})
