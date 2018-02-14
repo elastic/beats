@@ -104,7 +104,7 @@ func getLogsFromFile(logfile string, conf *logReaderConfig) ([]string, error) {
 
 	encFactory, ok := encoding.FindEncoding(conf.encoding)
 	if !ok {
-		return nil, fmt.Errorf("unable to find 'utf8' encoding")
+		return nil, fmt.Errorf("unable to find encoding: %s", conf.encoding)
 	}
 
 	enc, err := encFactory(f)
