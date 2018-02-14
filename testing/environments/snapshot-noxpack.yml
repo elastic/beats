@@ -24,8 +24,6 @@ services:
     build:
       context: ./docker/logstash
       dockerfile: Dockerfile
-      args:
-        XPACK: 0
     environment:
       - ES_HOST=elasticsearch
 
@@ -36,3 +34,5 @@ services:
     build:
       context: ./docker/kibana
       dockerfile: Dockerfile
+      args:
+        XPACK: 0
