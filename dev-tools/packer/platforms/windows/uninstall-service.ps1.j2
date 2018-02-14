@@ -1,5 +1,7 @@
-# delete service if it exists
+# delete service if it already exists
 if (Get-Service {{.beat_name}} -ErrorAction SilentlyContinue) {
   $service = Get-WmiObject -Class Win32_Service -Filter "name='{{.beat_name}}'"
+  $service.StopService()
+  Start-Sleep -s 1
   $service.delete()
 }
