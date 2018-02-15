@@ -1028,7 +1028,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 --------------------------------------------------------------------
 Dependency: github.com/golang/protobuf
-Revision: 18c9bb3261723cd5401db4d0c9fbc5c3b6c70fe8
+Revision: bbd03ef6da3a115852eaf24c8a1c46aeb39aa175
 License type (autodetected): BSD-3-Clause
 ./metricbeat/vendor/github.com/golang/protobuf/LICENSE:
 --------------------------------------------------------------------
@@ -2718,7 +2718,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 --------------------------------------------------------------------
 Dependency: github.com/prometheus/client_model
-Revision: 6f3806018612930941127f2a7c6c453ba2c527d2
+Revision: 99fa1f4be8e564e8a6b613da7fa6f46c9edafc6c
 License type (autodetected): Apache-2.0
 ./metricbeat/vendor/github.com/prometheus/client_model/LICENSE:
 --------------------------------------------------------------------
@@ -2733,7 +2733,7 @@ SoundCloud Ltd. (http://soundcloud.com/).
 
 --------------------------------------------------------------------
 Dependency: github.com/prometheus/common
-Revision: 13ba4ddd0caa9c28ca7b7bffe1dfa9ed8d5ef207
+Revision: 89604d197083d4781071d3c65855d24ecfb0a563
 License type (autodetected): Apache-2.0
 ./metricbeat/vendor/github.com/prometheus/common/LICENSE:
 --------------------------------------------------------------------
