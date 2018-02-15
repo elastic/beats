@@ -57,7 +57,7 @@ version 2.2.8 or later.
 ==  Update the registry file
 
 The registry file stores the state and location information that Filebeat uses to track
-where it was last reading. Under Logstash Forwarder, this file was called `.logstash-fowarder`. For Filebeat,
+where it was last reading. Under Logstash Forwarder, this file was called `.logstash-forwarder`. For Filebeat,
 the file was renamed. The name varies depending on the package type:
 
  * `data/registry` for `.tar.gz` and `.tgz` archives
@@ -432,7 +432,7 @@ type:
 [float]
 === Publisher improvements
 
-Behind the scenes, Filebeat uses a sightly improved protocol for communicating
+Behind the scenes, Filebeat uses a slightly improved protocol for communicating
 with Logstash.
 
 [float]
