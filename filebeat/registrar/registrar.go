@@ -185,14 +185,14 @@ func (r *Registrar) onEvents(states []file.State) {
 	r.processEventStates(states)
 
 	beforeCount := r.states.Count()
-	cleanedStates := r.states.Cleanup()
+	cleanedStates, pendingClean := r.states.Cleanup()
 	statesCleanup.Add(int64(cleanedStates))
 
 	r.bufferedStateUpdates += len(states)
 
 	logp.Debug("registrar",
-		"Registrar states cleaned up. Before: %d, After: %d",
-		beforeCount, beforeCount-cleanedStates)
+		"Registrar states cleaned up. Before: %d, After: %d, Pending: %d",
+		beforeCount, beforeCount-cleanedStates, pendingClean)
 }
 
 // processEventStates gets the states from the events and writes them to the registrar state
