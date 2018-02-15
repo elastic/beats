@@ -78,7 +78,7 @@ func NewInput(
 		harvesters:  harvester.NewRegistry(),
 		outlet:      out,
 		stateOutlet: stateOut,
-		states:      &file.States{},
+		states:      file.NewStates(),
 		done:        context.Done,
 	}
 
@@ -164,8 +164,9 @@ func (p *Input) Run() {
 	// It is important that a first scan is run before cleanup to make sure all new states are read first
 	if p.config.CleanInactive > 0 || p.config.CleanRemoved {
 		beforeCount := p.states.Count()
-		cleanedStates := p.states.Cleanup()
-		logp.Debug("input", "input states cleaned up. Before: %d, After: %d", beforeCount, beforeCount-cleanedStates)
+		cleanedStates, pendingClean := p.states.Cleanup()
+		logp.Debug("input", "input states cleaned up. Before: %d, After: %d, Pending: %d",
+			beforeCount, beforeCount-cleanedStates, pendingClean)
 	}
 
 	// Marking removed files to be cleaned up. Cleanup happens after next scan to make sure all states are updated first
