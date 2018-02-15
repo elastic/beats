@@ -131,7 +131,7 @@ func TestInit(t *testing.T) {
 			config: config{
 				Paths: test.paths,
 			},
-			states: &file.States{},
+			states: file.NewStates(),
 			outlet: TestOutlet{},
 		}
 
