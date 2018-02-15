@@ -15,7 +15,7 @@ func generateModule(module, modulesPath, beatsPath string) error {
 		return fmt.Errorf("module already exists: %s", module)
 	}
 
-	err := generator.CreateDirectories(modulePath, []string{path.Join("_meta", "kibana", "default")})
+	err := generator.CreateDirectories(modulePath, []string{path.Join("_meta", "kibana", "6")})
 	if err != nil {
 		return err
 	}

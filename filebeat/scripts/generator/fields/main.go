@@ -33,6 +33,7 @@ var (
 		"POSINT":          "long",
 		"SYSLOGHOST":      "keyword",
 		"SYSLOGTIMESTAMP": "text",
+		"LOCALDATETIME":   "text",
 		"TIMESTAMP":       "text",
 		"USERNAME":        "keyword",
 		"WORD":            "keyword",
