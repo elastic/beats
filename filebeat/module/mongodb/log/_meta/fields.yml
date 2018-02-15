@@ -21,3 +21,4 @@
   - name: message
     description: >
         The message in the log line.
+    type: text

@@ -1705,6 +1705,8 @@ Context of message
 [float]
 === `mongodb.log.message`
 
+type: text
+
 The message in the log line.
 
 
