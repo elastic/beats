@@ -27,6 +27,7 @@ func generateFileset(module, fileset, modulesPath, beatsPath string) error {
 	if err != nil {
 		return err
 	}
+	err = generator.RenameConfigYml(modulesPath, module, fileset)
 	if err != nil {
 		return err
 	}
