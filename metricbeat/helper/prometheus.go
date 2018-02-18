@@ -2,11 +2,12 @@ package helper
 
 import (
 	"fmt"
-
-	"github.com/elastic/beats/metricbeat/mb"
+	"io"
 
 	dto "github.com/prometheus/client_model/go"
 	"github.com/prometheus/common/expfmt"
+
+	"github.com/elastic/beats/metricbeat/mb"
 )
 
 // Prometheus helper retrieves prometheus formatted metrics
@@ -42,10 +43,14 @@ func (p *Prometheus) GetFamilies() ([]*dto.MetricFamily, error) {
 	}
 
 	families := []*dto.MetricFamily{}
-	for err == nil {
+	for {
 		mf := &dto.MetricFamily{}
 		err = decoder.Decode(mf)
-		if err == nil {
+		if err != nil {
+			if err == io.EOF {
+				break
+			}
+		} else {
 			families = append(families, mf)
 		}
 	}
