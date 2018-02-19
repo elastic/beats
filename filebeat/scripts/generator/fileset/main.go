@@ -23,7 +23,11 @@ func generateFileset(module, fileset, modulesPath, beatsPath string) error {
 	replace := map[string]string{"module": module, "fileset": fileset}
 	templatesPath := path.Join(beatsPath, "scripts", "fileset")
 	filesToCopy := []string{path.Join("config", "config.yml"), path.Join("ingest", "pipeline.json"), "manifest.yml"}
-	generator.CopyTemplates(templatesPath, filesetPath, filesToCopy, replace)
+	err = generator.CopyTemplates(templatesPath, filesetPath, filesToCopy, replace)
+	if err != nil {
+		return err
+	}
+	err = generator.RenameConfigYml(modulesPath, module, fileset)
 	if err != nil {
 		return err
 	}
