@@ -60,6 +60,16 @@ func TestMapStrDeepUpdate(t *testing.T) {
 			MapStr{"a": 1},
 			MapStr{"a": 1},
 		},
+		{
+			MapStr{"a.b": 1},
+			MapStr{"a": 1},
+			MapStr{"a": 1, "a.b": 1},
+		},
+		{
+			MapStr{"a": 1},
+			MapStr{"a.b": 1},
+			MapStr{"a": 1, "a.b": 1},
+		},
 	}
 
 	for i, test := range tests {
@@ -173,7 +183,9 @@ func TestHasKey(t *testing.T) {
 				"c31": 1,
 				"c32": 2,
 			},
+			"c4.f": 19,
 		},
+		"d.f": 1,
 	}
 
 	hasKey, err := m.HasKey("c.c2")
@@ -191,6 +203,14 @@ func TestHasKey(t *testing.T) {
 	hasKey, err = m.HasKey("dd")
 	assert.Equal(nil, err)
 	assert.Equal(false, hasKey)
+
+	//hasKey, err = m.HasKey("d.f")
+	//assert.Equal(nil, err)
+	//assert.Equal(true, hasKey)
+
+	/*hasKey, err = m.HasKey("c.c4.f")
+	assert.Equal(nil, err)
+	assert.Equal(true, hasKey)*/
 }
 
 func TestMapStrPut(t *testing.T) {
@@ -568,4 +588,84 @@ func BenchmarkMapStrLogging(b *testing.B) {
 	for i := 0; i < b.N; i++ {
 		logger.Infow("test", "mapstr", m)
 	}
+}
+
+func BenchmarkWalkMap(b *testing.B) {
+
+	b.Run("Get", func(b *testing.B) {
+		m := MapStr{
+			"test": 15,
+			"hello": MapStr{
+				"world": MapStr{
+					"ok": "test",
+				},
+			},
+			"elastic": MapStr{
+				"for": "search",
+			},
+		}
+		b.ResetTimer()
+
+		for i := 0; i < b.N; i++ {
+			m.GetValue("test.world.ok")
+		}
+	})
+
+	b.Run("Put", func(b *testing.B) {
+
+		for i := 0; i < b.N; i++ {
+			m := MapStr{
+				"test": 15,
+				"hello": MapStr{
+					"world": MapStr{
+						"ok": "test",
+					},
+				},
+				"elastic": MapStr{
+					"for": "search",
+				},
+			}
+
+			m.Put("test.world.tt", 17)
+		}
+	})
+
+	b.Run("HasKey", func(b *testing.B) {
+		b.ResetTimer()
+
+		for i := 0; i < b.N; i++ {
+			m := MapStr{
+				"test": 15,
+				"hello": MapStr{
+					"world": MapStr{
+						"ok": "test",
+					},
+				},
+				"elastic": MapStr{
+					"for": "search",
+				},
+			}
+			m.HasKey("test.world.tt")
+		}
+	})
+
+	b.Run("Delete", func(b *testing.B) {
+		b.ResetTimer()
+
+		for i := 0; i < b.N; i++ {
+			m := MapStr{
+				"test": 15,
+				"hello": MapStr{
+					"world": MapStr{
+						"ok": "test",
+					},
+				},
+				"elastic": MapStr{
+					"for": "search",
+				},
+			}
+			m.Put("test.world.tt", 17)
+		}
+	})
+
 }
