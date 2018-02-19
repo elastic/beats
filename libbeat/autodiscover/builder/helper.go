@@ -13,6 +13,11 @@ func GetContainerID(container common.MapStr) string {
 	return id
 }
 
+func GetContainerName(container common.MapStr) string {
+	name, _ := container["name"].(string)
+	return name
+}
+
 func GetAnnotationAsString(annotations map[string]string, prefix, key string) string {
 	value, _ := annotations[fmt.Sprintf("%s/%s", prefix, key)]
 	return value

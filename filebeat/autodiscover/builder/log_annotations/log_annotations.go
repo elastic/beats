@@ -48,24 +48,25 @@ func (l *logAnnotations) CreateConfig(event bus.Event) []*common.Config {
 	if !ok {
 		return config
 	}
-	id := builder.GetContainerID(container)
 
-	if builder.IsContainerNoOp(annotations, l.Prefix, id) == true {
+	name := builder.GetContainerName(container)
+
+	if builder.IsContainerNoOp(annotations, l.Prefix, name) == true {
 		return config
 	}
 
 	//TODO: Add module support
 
 	tempCfg := common.MapStr{}
-	multiline := l.getMultiline(annotations, id)
+	multiline := l.getMultiline(annotations, name)
 
 	for k, v := range multiline {
 		tempCfg.Put(k, v)
 	}
-	if includeLines := l.getIncludeLines(annotations, id); len(includeLines) != 0 {
+	if includeLines := l.getIncludeLines(annotations, name); len(includeLines) != 0 {
 		tempCfg.Put("include_lines", includeLines)
 	}
-	if excludeLines := l.getExcludeLines(annotations, id); len(excludeLines) != 0 {
+	if excludeLines := l.getExcludeLines(annotations, name); len(excludeLines) != 0 {
 		tempCfg.Put("exclude_lines", excludeLines)
 	}
 
