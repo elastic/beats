@@ -10,6 +10,7 @@ import (
 	"os"
 	"path/filepath"
 	"strings"
+	"time"
 
 	"github.com/elastic/beats/filebeat/harvester/encoding"
 	"github.com/elastic/beats/filebeat/harvester/reader"
@@ -230,10 +231,12 @@ func readPipeline(path string) (map[string]interface{}, error) {
 }
 
 func runSimulate(url string, pipeline map[string]interface{}, logs []string, verbose bool) (*http.Response, error) {
-	var sources []map[string]string
+	var sources []common.MapStr
+	now := time.Now().UTC()
 	for _, l := range logs {
-		s := map[string]string{
-			"message": l,
+		s := common.MapStr{
+			"@timestamp": common.Time(now),
+			"message":    l,
 		}
 		sources = append(sources, s)
 	}
