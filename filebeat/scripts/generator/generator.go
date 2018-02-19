@@ -85,3 +85,11 @@ func readTemplate(template string, replace map[string]string) ([]byte, error) {
 
 	return c, nil
 }
+
+// RenameConfigYml renemas config.yml to the name of the fileset, otherwise Filebeat refuses to start
+func RenameConfigYml(modulesPath, module, fileset string) error {
+	old := path.Join(modulesPath, "module", module, fileset, "config", "config.yml")
+	new := path.Join(modulesPath, "module", module, fileset, "config", fileset+".yml")
+
+	return os.Rename(old, new)
+}
