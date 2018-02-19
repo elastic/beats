@@ -318,96 +318,48 @@ func tryToMapStr(v interface{}) (MapStr, bool) {
 // walkMap walks the data MapStr to arrive at the value specified by the key.
 // The key is expressed in dot-notation (eg. x.y.z). When the key is found then
 // the given mapStrOperation is invoked.
-func walkMap2(key string, data MapStr, op mapStrOperation) (interface{}, error) {
-	var err error
-	keyParts := strings.Split(key, ".")
+func walkMapRecursive(key string, data MapStr, op mapStrOperation) (interface{}, error) {
 
-	// Only check for full key if key contains dots
-	//if len(keyParts) > 1 {
-	//	// Converted dotted key in object to nested object
-	//	// This is needed for processors to support dotted keys
-	//	// The reason it needs to be readded is to also support deletion op type properly
-	//	if v, exists := data[key]; exists {
-	//		delete(data, key)
-	//		data.Put(key, v)
-	//	}
-	//}
-
-	// Walk maps until reaching a leaf object.
-	m := data
-	for i, k := range keyParts[0 : len(keyParts)-1] {
-		v, exists := m[k]
-		if !exists {
-			if op.CreateMissingKeys {
-				newMap := MapStr{}
-				m[k] = newMap
-				// Makes m the same as m[k] for the next iteration
-				m = newMap
-				continue
-			}
-			return nil, errors.Wrapf(ErrKeyNotFound, "key=%v", strings.Join(keyParts[0:i+1], "."))
-		}
-
-		m, err = toMapStr(v)
-		if err != nil {
-			return nil, errors.Wrapf(err, "key=%v", strings.Join(keyParts[0:i+1], "."))
-		}
-	}
-
-	// Execute the mapStrOperator on the leaf object.
-	v, err := op.Do(keyParts[len(keyParts)-1], m)
-	if err != nil {
-		return nil, errors.Wrapf(err, "key=%v", key)
-	}
-
-	return v, nil
-}
-
-func walkMap(key string, data MapStr, op mapStrOperation) (interface{}, error) {
-
+	// Splits up the key in two parts: full key and first part before the dot
 	keyParts := strings.SplitN(key, ".", 2)
 	_, exists := data[key]
 
-	// If key matches or last keyParts or directly
+	// If leave node or key exists directly
 	if len(keyParts) == 1 || exists {
 		// Execute the mapStrOperator on the leaf object.
-		v, err := op.Do(keyParts[len(keyParts)-1], data)
+		v, err := op.Do(key, data)
 		if err != nil {
-			return nil, errors.Wrapf(err, "key=%v", key)
+			return nil, err
 		}
 		return v, nil
 	}
 
+	// Checks if first part of the key exists
 	k := keyParts[0]
-	_, keyPartExists := data[k]
-	if !keyPartExists {
+	_, keyExist := data[k]
+	if !keyExist {
 		if op.CreateMissingKeys {
-			newMap := MapStr{}
-			data[k] = newMap
-			// Makes m the same as m[k] for the next iteration
-			//data = newMap
+			data[k] = MapStr{}
 		} else {
-			return nil, errors.Wrapf(ErrKeyNotFound, "key=%v", strings.Join(keyParts[0:1], "."))
+			return nil, ErrKeyNotFound
 		}
 	}
 
 	data, err := toMapStr(data[k])
 	if err != nil {
-		return nil, errors.Wrapf(err, "key=%v", strings.Join(keyParts[0:1], "."))
+		return nil, err
 	}
 
-	return walkMap2(keyParts[1], data, op)
+	return walkMapRecursive(keyParts[1], data, op)
+}
 
-	//// Walk maps until reaching a leaf object.
-	//m := data
-	//k := keyParts[0]
-	//
-	//m, err = toMapStr(v)
-	//if err != nil {
-	//	return nil, errors.Wrapf(err, "key=%v", strings.Join(keyParts[0:i+1], "."))
-	//}
-	//
-	//return v, nil
+func walkMap(key string, data MapStr, op mapStrOperation) (interface{}, error) {
+	v, err := walkMapRecursive(key, data, op)
+	if err != nil {
+		// Add key to error
+		err = errors.Wrapf(err, "key=%v", key)
+	}
+	return v, err
 }
 
 // mapStrOperation types
