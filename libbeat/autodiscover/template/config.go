@@ -6,6 +6,8 @@ import (
 	"github.com/elastic/beats/libbeat/logp"
 	"github.com/elastic/beats/libbeat/processors"
 
+	"fmt"
+
 	ucfg "github.com/elastic/go-ucfg"
 )
 
@@ -63,40 +65,50 @@ func (c *Mapper) GetConfig(event bus.Event) []*common.Config {
 			continue
 		}
 
-		// unpack input
-		vars, err := ucfg.NewFrom(map[string]interface{}{
-			"data": event,
-		})
+		configs := ApplyConfigTemplate(event, mapping.Configs)
+		if configs != nil {
+			result = append(result, configs...)
+		}
+	}
+	return result
+}
+
+func ApplyConfigTemplate(event bus.Event, configs []*common.Config) []*common.Config {
+	var result []*common.Config
+	// unpack input
+	vars, err := ucfg.NewFrom(map[string]interface{}{
+		"data": event,
+	})
+	if err != nil {
+		logp.Err("Error building config: %v", err)
+	}
+	opts := []ucfg.Option{
+		ucfg.PathSep("."),
+		ucfg.Env(vars),
+		ucfg.ResolveEnv,
+		ucfg.VarExp,
+	}
+	for _, config := range configs {
+		c, err := ucfg.NewFrom(config, opts...)
 		if err != nil {
-			logp.Err("Error building config: %v", err)
+			logp.Err("Error parsing config: %v", err)
+			continue
 		}
-		opts := []ucfg.Option{
-			ucfg.PathSep("."),
-			ucfg.Env(vars),
-			ucfg.ResolveEnv,
-			ucfg.VarExp,
+		// Unpack config to process any vars in the template:
+		var unpacked map[string]interface{}
+		c.Unpack(&unpacked, opts...)
+		if err != nil {
+			logp.Err("Error unpacking config: %v", err)
+			continue
 		}
-		for _, config := range mapping.Configs {
-			c, err := ucfg.NewFrom(config, opts...)
-			if err != nil {
-				logp.Err("Error parsing config: %v", err)
-				continue
-			}
-			// Unpack config to process any vars in the template:
-			var unpacked map[string]interface{}
-			c.Unpack(&unpacked, opts...)
-			if err != nil {
-				logp.Err("Error unpacking config: %v", err)
-				continue
-			}
-			// Repack again:
-			res, err := common.NewConfigFrom(unpacked)
-			if err != nil {
-				logp.Err("Error creating config from unpack: %v", err)
-				continue
-			}
-			result = append(result, res)
+		fmt.Println(unpacked)
+		// Repack again:
+		res, err := common.NewConfigFrom(unpacked)
+		if err != nil {
+			logp.Err("Error creating config from unpack: %v", err)
+			continue
 		}
+		result = append(result, res)
 	}
 	return result
 }

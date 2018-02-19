@@ -2,8 +2,6 @@ package kubernetes
 
 import (
 	"time"
-
-	"github.com/elastic/beats/libbeat/autodiscover/template"
 )
 
 // Config for kubernetes autodiscover provider
@@ -18,8 +16,6 @@ type Config struct {
 	IncludeLabels      []string `config:"include_labels"`
 	ExcludeLabels      []string `config:"exclude_labels"`
 	IncludeAnnotations []string `config:"include_annotations"`
-
-	Templates template.MapperSettings `config:"templates"`
 }
 
 func defaultConfig() *Config {

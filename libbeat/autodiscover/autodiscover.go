@@ -51,7 +51,7 @@ func NewAutodiscover(name string, adapter Adapter, config *Config) (*Autodiscove
 	// Init providers
 	var providers []Provider
 	for _, providerCfg := range config.Providers {
-		provider, err := ProviderRegistry.BuildProvider(bus, providerCfg)
+		provider, err := Registry.BuildProvider(bus, providerCfg)
 		if err != nil {
 			return nil, err
 		}

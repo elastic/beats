@@ -10,13 +10,14 @@ import (
 )
 
 func init() {
-	autodiscover.ProviderRegistry.AddProvider("docker", AutodiscoverBuilder)
+	autodiscover.Registry.AddProvider("docker", AutodiscoverBuilder)
 }
 
 // Provider implements autodiscover provider for docker containers
 type Provider struct {
 	config        *Config
 	bus           bus.Bus
+	builders      autodiscover.Builders
 	watcher       docker.Watcher
 	templates     *template.Mapper
 	stop          chan interface{}
@@ -25,14 +26,9 @@ type Provider struct {
 }
 
 // AutodiscoverBuilder builds and returns an autodiscover provider
-func AutodiscoverBuilder(bus bus.Bus, c *common.Config) (autodiscover.Provider, error) {
+func AutodiscoverBuilder(bus bus.Bus, mapper *template.Mapper, builders autodiscover.Builders, c *common.Config) (autodiscover.Provider, error) {
 	config := defaultConfig()
 	err := c.Unpack(&config)
-	if err != nil {
-		return nil, err
-	}
-
-	mapper, err := template.NewConfigMapper(config.Templates)
 	if err != nil {
 		return nil, err
 	}
@@ -52,6 +48,7 @@ func AutodiscoverBuilder(bus bus.Bus, c *common.Config) (autodiscover.Provider, 
 	return &Provider{
 		config:        config,
 		bus:           bus,
+		builders:      builders,
 		templates:     mapper,
 		watcher:       watcher,
 		stop:          make(chan interface{}),
@@ -106,17 +103,21 @@ func (d *Provider) emitContainer(event bus.Event, flag string) {
 		},
 	}
 
-	// Emit container info
-	d.publish(bus.Event{
-		flag:     true,
-		"host":   host,
-		"docker": meta,
-		"meta": common.MapStr{
+	// Without this check there would be overlapping configurations with and without ports.
+	if len(container.Ports) == 0 {
+		event := bus.Event{
+			flag:     true,
+			"host":   host,
 			"docker": meta,
-		},
-	})
+			"meta": common.MapStr{
+				"docker": meta,
+			},
+		}
 
-	// Emit container private ports
+		d.publish(event)
+	}
+
+	// Emit container container and port information
 	for _, port := range container.Ports {
 		event := bus.Event{
 			flag:     true,
@@ -136,6 +137,25 @@ func (d *Provider) publish(event bus.Event) {
 	// Try to match a config
 	if config := d.templates.GetConfig(event); config != nil {
 		event["config"] = config
+	} else {
+		// Try to build a config with enabled builders. Send a provider agnostic payload.
+		// Builders are Beat specific.
+		e := bus.Event{}
+		dockerMeta, _ := event["docker"].(common.MapStr)
+		if host, ok := event["host"]; ok {
+			e["host"] = host
+		}
+		if port, ok := event["port"]; ok {
+			e["port"] = port
+		}
+		if labels, err := dockerMeta.GetValue("docker.labels"); err == nil {
+			e["annotations"] = labels
+		}
+		e["container"] = dockerMeta["container"]
+
+		if config := d.builders.GetConfig(event); config != nil {
+			event["config"] = config
+		}
 	}
 	d.bus.Publish(event)
 }

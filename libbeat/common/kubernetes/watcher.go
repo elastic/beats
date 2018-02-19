@@ -114,7 +114,6 @@ func (w *watcher) sync() error {
 	defer cancel()
 
 	logp.Info("kubernetes: Performing a resource sync for %T", w.resourceList)
-
 	err := w.client.List(ctx, w.options.Namespace, w.resourceList, w.buildOpts()...)
 	if err != nil {
 		logp.Err("kubernetes: Performing a resource sync err %s for %T", err.Error(), w.resourceList)

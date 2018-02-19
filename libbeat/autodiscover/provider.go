@@ -3,8 +3,8 @@ package autodiscover
 import (
 	"fmt"
 	"strings"
-	"sync"
 
+	"github.com/elastic/beats/libbeat/autodiscover/template"
 	"github.com/elastic/beats/libbeat/cfgfile"
 	"github.com/elastic/beats/libbeat/common"
 	"github.com/elastic/beats/libbeat/common/bus"
@@ -16,26 +16,8 @@ type Provider interface {
 	cfgfile.Runner
 }
 
-// ProviderRegistry holds all known autodiscover providers, they must be added to it to enable them for use
-var ProviderRegistry = NewRegistry()
-
 // ProviderBuilder creates a new provider based on the given config and returns it
-type ProviderBuilder func(bus.Bus, *common.Config) (Provider, error)
-
-// Register of autodiscover providers
-type registry struct {
-	// Lock to control concurrent read/writes
-	lock sync.RWMutex
-	// A map of provider name to ProviderBuilder.
-	providers map[string]ProviderBuilder
-}
-
-// NewRegistry creates and returns a new Registry
-func NewRegistry() *registry {
-	return &registry{
-		providers: make(map[string]ProviderBuilder, 0),
-	}
-}
+type ProviderBuilder func(bus.Bus, *template.Mapper, Builders, *common.Config) (Provider, error)
 
 // AddProvider registers a new ProviderBuilder
 func (r *registry) AddProvider(name string, provider ProviderBuilder) error {
@@ -82,5 +64,20 @@ func (r *registry) BuildProvider(bus bus.Bus, c *common.Config) (Provider, error
 		return nil, fmt.Errorf("Unknown autodiscover provider %s", config.Type)
 	}
 
-	return builder(bus, c)
+	mapper, err := template.NewConfigMapper(config.Templates)
+	if err != nil {
+		return nil, err
+	}
+
+	builders := Builders{}
+	for _, bCfg := range config.Builders {
+		builder, err := r.ConstructBuilder(bCfg)
+		if err != nil {
+			logp.Debug(debugK, "Could not generate builder due to error: %v", err)
+		} else {
+			builders = append(builders, builder)
+		}
+	}
+
+	return builder(bus, mapper, builders, c)
 }
