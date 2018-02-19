@@ -30,8 +30,6 @@ https://github.com/elastic/beats/compare/v6.2.2...6.2[Check the HEAD diff]
 
 *Affecting all Beats*
 
-- Fix infinite loop when event unmarshal fails in Kubernetes pod watcher. {pull}6353[6353]
-
 *Auditbeat*
 
 *Filebeat*
@@ -88,6 +86,7 @@ https://github.com/elastic/beats/compare/v6.2.1...v6.2.2[View commits]
 *Affecting all Beats*
 
 - Add logging when monitoring cannot connect to Elasticsearch. {pull}6365[6365]
+- Fix infinite loop when event unmarshal fails in Kubernetes pod watcher. {pull}6353[6353]
 
 *Filebeat*
 
