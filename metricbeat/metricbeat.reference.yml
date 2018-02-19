@@ -593,6 +593,7 @@ metricbeat.modules:
 #    match_pids: ["process.pid", "process.ppid"]
 #    match_source: true
 #    match_source_index: 4
+#    match_short_id: false
 #    cleanup_timeout: 60
 #    # To connect to Docker over TLS you must specify a client and CA certificate.
 #    #ssl:
