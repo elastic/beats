@@ -22,7 +22,9 @@
 
 ifeval::["{has_ml_jobs}"=="yes"]
 :setup-command-short-desc: Sets up the initial environment, including the index template, Kibana dashboards (when available), and machine learning jobs (when available)
-else::[]
+endif::[]
+
+ifeval::["{has_ml_jobs}"!="yes"]
 :setup-command-short-desc: Sets up the initial environment, including the index template, Kibana dashboards (when available)
 endif::[]
 

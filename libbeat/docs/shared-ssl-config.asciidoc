@@ -1,5 +1,5 @@
 [[configuration-ssl]]
-== SSL settings for outputs
+== Specify SSL settings
 
 You can specify SSL options for any <<configuring-output,output>> that supports
 SSL. You can also specify SSL options when you
