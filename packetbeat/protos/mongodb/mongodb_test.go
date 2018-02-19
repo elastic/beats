@@ -345,3 +345,29 @@ func TestOpCodeNames(t *testing.T) {
 		assert.Equal(t, testData.expected, opCode(testData.code).String())
 	}
 }
+
+// Test for a (recovered) panic parsing document length in request/response messages
+func TestDocumentLengthBoundsChecked(t *testing.T) {
+	logp.TestingSetup(logp.WithSelectors("mongodb", "mongodbdetailed"))
+
+	_, mongodb := mongodbModForTests()
+
+	// request and response from tests/pcaps/mongo_one_row.pcap
+	reqData, err := hex.DecodeString(
+		// Request message with out of bounds document
+		"320000000a000000ffffffffd4070000" +
+			"00000000746573742e72667374617572" +
+			"616e7473000000000001000000" +
+			// Document length (including itself)
+			"06000000" +
+			// Document (1 byte instead of 2)
+			"00")
+	assert.Nil(t, err)
+
+	tcptuple := testTCPTuple()
+	req := protos.Packet{Payload: reqData}
+	private := protos.ProtocolData(new(mongodbConnectionData))
+
+	private = mongodb.Parse(&req, tcptuple, 0, private)
+	assert.NotNil(t, private, "mongodb parser recovered from a panic")
+}
