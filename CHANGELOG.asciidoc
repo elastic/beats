@@ -14,6 +14,8 @@ https://github.com/elastic/beats/compare/v6.2.2...6.2[Check the HEAD diff]
 
 *Affecting all Beats*
 
+- Fix conditions checking on autodiscover Docker labels. {pull}6412[6412]
+
 *Auditbeat*
 
 *Filebeat*
