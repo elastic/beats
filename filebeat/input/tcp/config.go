@@ -20,6 +20,6 @@ var defaultConfig = config{
 	},
 	LineDelimiter:  "\n",
 	Host:           "localhost:9000",
-	Timeout:        time.Second * 5 * 60,
+	Timeout:        time.Minute * 5,
 	MaxMessageSize: 20 * 1024 * 1024,
 }
