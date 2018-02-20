@@ -315,40 +315,53 @@ func tryToMapStr(v interface{}) (MapStr, bool) {
 	}
 }
 
-// walkMap walks the data MapStr to arrive at the value specified by the key.
+// walkMapRecursive walks the data MapStr to arrive at the value specified by the key.
 // The key is expressed in dot-notation (eg. x.y.z). When the key is found then
 // the given mapStrOperation is invoked.
-func walkMap(key string, data MapStr, op mapStrOperation) (interface{}, error) {
-	var err error
-	keyParts := strings.Split(key, ".")
+func walkMapRecursive(key string, data MapStr, op mapStrOperation) (interface{}, error) {
 
-	// Walk maps until reaching a leaf object.
-	m := data
-	for i, k := range keyParts[0 : len(keyParts)-1] {
-		v, exists := m[k]
-		if !exists {
-			if op.CreateMissingKeys {
-				newMap := MapStr{}
-				m[k] = newMap
-				m = newMap
-				continue
-			}
-			return nil, errors.Wrapf(ErrKeyNotFound, "key=%v", strings.Join(keyParts[0:i+1], "."))
-		}
+	// Splits up the key in two parts: full key and first part before the dot
+	_, exists := data[key]
+	// If leave node or key exists directly
+	if exists {
+		// Execute the mapStrOperator on the leaf object.
+		return op.Do(key, data)
+	}
 
-		m, err = toMapStr(v)
-		if err != nil {
-			return nil, errors.Wrapf(err, "key=%v", strings.Join(keyParts[0:i+1], "."))
+	keyParts := strings.SplitN(key, ".", 2)
+	// If leave node or key exists directly
+	if len(keyParts) == 1 {
+		// Execute the mapStrOperator on the leaf object.
+		return op.Do(key, data)
+	}
+
+	// Checks if first part of the key exists
+	k := keyParts[0]
+	d, keyExist := data[k]
+	if !keyExist {
+		if op.CreateMissingKeys {
+			d = MapStr{}
+			data[k] = d
+		} else {
+			return nil, ErrKeyNotFound
 		}
 	}
 
-	// Execute the mapStrOperator on the leaf object.
-	v, err := op.Do(keyParts[len(keyParts)-1], m)
+	v, err := toMapStr(d)
 	if err != nil {
-		return nil, errors.Wrapf(err, "key=%v", key)
+		return nil, err
 	}
 
-	return v, nil
+	return walkMapRecursive(keyParts[1], v, op)
+}
+
+func walkMap(key string, data MapStr, op mapStrOperation) (interface{}, error) {
+	v, err := walkMapRecursive(key, data, op)
+	if err != nil {
+		// Add key to error
+		err = errors.Wrapf(err, "key=%v", key)
+	}
+	return v, err
 }
 
 // mapStrOperation types
