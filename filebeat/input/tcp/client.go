@@ -48,7 +48,7 @@ func NewClient(
 
 // Handle is reading message from the specified TCP socket.
 func (c *Client) Handle() error {
-	r := NewMeteredReader(NewDeadlineReader(c.conn, c.timeout), c.maxReadMessage)
+	r := NewResetableLimitedReader(NewDeadlineReader(c.conn, c.timeout), c.maxReadMessage)
 	buf := bufio.NewReader(r)
 	scanner := bufio.NewScanner(buf)
 	scanner.Split(c.splitFunc)

@@ -7,12 +7,12 @@ import (
 	"github.com/stretchr/testify/assert"
 )
 
-func TestMeteredReader(t *testing.T) {
+func TestResetableLimitedReader(t *testing.T) {
 	maxReadBuffer := 400
 
 	t.Run("WhenMaxReadIsReachedInMultipleRead", func(t *testing.T) {
 		r := strings.NewReader(randomString(maxReadBuffer * 2))
-		m := NewMeteredReader(r, uint64(maxReadBuffer))
+		m := NewResetableLimitedReader(r, uint64(maxReadBuffer))
 		toRead := make([]byte, maxReadBuffer)
 		_, err := m.Read(toRead)
 		assert.NoError(t, err)
@@ -23,7 +23,7 @@ func TestMeteredReader(t *testing.T) {
 
 	t.Run("WhenMaxReadIsNotReached", func(t *testing.T) {
 		r := strings.NewReader(randomString(maxReadBuffer * 2))
-		m := NewMeteredReader(r, uint64(maxReadBuffer))
+		m := NewResetableLimitedReader(r, uint64(maxReadBuffer))
 		toRead := make([]byte, maxReadBuffer)
 		_, err := m.Read(toRead)
 		assert.NoError(t, err)
@@ -31,7 +31,7 @@ func TestMeteredReader(t *testing.T) {
 
 	t.Run("WhenResetIsCalled", func(t *testing.T) {
 		r := strings.NewReader(randomString(maxReadBuffer * 2))
-		m := NewMeteredReader(r, uint64(maxReadBuffer))
+		m := NewResetableLimitedReader(r, uint64(maxReadBuffer))
 		toRead := make([]byte, maxReadBuffer)
 		_, err := m.Read(toRead)
 		assert.NoError(t, err)

@@ -11,24 +11,24 @@ import (
 // ErrMaxReadBuffer returns when too many bytes was read on the io.Reader
 var ErrMaxReadBuffer = errors.New("max read buffer reached")
 
-// MeteredReader is based on LimitedReader but allow to reset the byte read and return a specific
+// ResetableLimitedReader is based on LimitedReader but allow to reset the byte read and return a specific
 // error when we reach the limit.
-type MeteredReader struct {
+type ResetableLimitedReader struct {
 	reader        io.Reader
 	maxReadBuffer uint64
 	byteRead      uint64
 }
 
-// NewMeteredReader returns a new MeteredReader
-func NewMeteredReader(reader io.Reader, maxReadBuffer uint64) *MeteredReader {
-	return &MeteredReader{
+// NewResetableLimitedReader returns a new ResetableLimitedReader
+func NewResetableLimitedReader(reader io.Reader, maxReadBuffer uint64) *ResetableLimitedReader {
+	return &ResetableLimitedReader{
 		reader:        reader,
 		maxReadBuffer: maxReadBuffer,
 	}
 }
 
 // Read reads the specified amount of byte
-func (m *MeteredReader) Read(p []byte) (n int, err error) {
+func (m *ResetableLimitedReader) Read(p []byte) (n int, err error) {
 	if m.byteRead >= m.maxReadBuffer {
 		return 0, ErrMaxReadBuffer
 	}
@@ -38,7 +38,7 @@ func (m *MeteredReader) Read(p []byte) (n int, err error) {
 }
 
 // Reset resets the number of byte read
-func (m *MeteredReader) Reset() {
+func (m *ResetableLimitedReader) Reset() {
 	m.byteRead = 0
 }
 
