@@ -46,7 +46,6 @@ https://github.com/elastic/beats/compare/v6.0.0-beta2...master[Check the HEAD di
 - Refactor the Stdin prospector to use the input interface {pull}6116[6116]
 - Refactor the usage of prospector to input in the YAML reference and
   the system test. {pull}6121[6121]
-
 - Add IIS module to parse access log and error log. {pull}6127[6127]
 
 *Heartbeat*
