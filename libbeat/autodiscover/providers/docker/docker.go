@@ -92,12 +92,17 @@ func (d *Provider) emitContainer(event bus.Event, flag string) {
 		host = container.IPAddresses[0]
 	}
 
+	labelMap := common.MapStr{}
+	for k, v := range container.Labels {
+		labelMap[k] = v
+	}
+
 	meta := common.MapStr{
 		"container": common.MapStr{
 			"id":     container.ID,
 			"name":   container.Name,
 			"image":  container.Image,
-			"labels": container.Labels,
+			"labels": labelMap,
 		},
 	}
 
