@@ -21,10 +21,15 @@ type Input struct {
 	harvester *Harvester
 	started   bool
 	outlet    channel.Outleter
+	config    *config
 }
 
 // NewInput creates a new TCP input
-func NewInput(cfg *common.Config, outlet channel.Factory, context input.Context) (input.Input, error) {
+func NewInput(
+	cfg *common.Config,
+	outlet channel.Factory,
+	context input.Context,
+) (input.Input, error) {
 	cfgwarn.Experimental("TCP input type is used")
 
 	out, err := outlet(cfg, context.DynamicFields)
@@ -33,21 +38,30 @@ func NewInput(cfg *common.Config, outlet channel.Factory, context input.Context)
 	}
 
 	forwarder := harvester.NewForwarder(out)
-	harvester, err := NewHarvester(forwarder, cfg)
+
+	config := defaultConfig
+	err = cfg.Unpack(&config)
 	if err != nil {
 		return nil, err
 	}
+
+	harvester, err := NewHarvester(forwarder, &config)
+	if err != nil {
+		return nil, err
+	}
+
 	return &Input{
-		outlet:    out,
 		harvester: harvester,
 		started:   false,
+		outlet:    out,
+		config:    &config,
 	}, nil
 }
 
 // Run start a TCP input
 func (p *Input) Run() {
 	if !p.started {
-		logp.Info("Starting TCP input")
+		logp.Info("Starting TCP input on: %s", p.config.Host)
 		p.started = true
 
 		go func() {
@@ -62,7 +76,7 @@ func (p *Input) Run() {
 
 // Stop stops TCP server
 func (p *Input) Stop() {
-	logp.Info("Stopping TCP input")
+	logp.Info("Stopping TCP input on: %s", p.config.Host)
 	p.harvester.Stop()
 }
 

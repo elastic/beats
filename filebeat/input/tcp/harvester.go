@@ -6,7 +6,6 @@ import (
 	"net"
 	"sync"
 
-	"github.com/elastic/beats/libbeat/common"
 	"github.com/elastic/beats/libbeat/logp"
 
 	"github.com/elastic/beats/filebeat/harvester"
@@ -16,7 +15,7 @@ import (
 type Harvester struct {
 	sync.RWMutex
 	forwarder *harvester.Forwarder
-	config    config
+	config    *config
 	server    net.Listener
 	clients   map[*Client]struct{}
 	wg        sync.WaitGroup
@@ -27,14 +26,8 @@ type Harvester struct {
 // NewHarvester creates a new harvester that will forward events
 func NewHarvester(
 	forwarder *harvester.Forwarder,
-	cfg *common.Config,
+	config *config,
 ) (*Harvester, error) {
-
-	config := defaultConfig
-	err := cfg.Unpack(&config)
-	if err != nil {
-		return nil, err
-	}
 
 	server, err := net.Listen("tcp", config.Host)
 	if err != nil {

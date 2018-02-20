@@ -52,8 +52,8 @@ func TestErrorOnEmptyLineDelimiter(t *testing.T) {
 	}
 
 	c, _ := common.NewConfigFrom(cfg)
-	forwarder := harvester.NewForwarder(nil)
-	_, err := NewHarvester(forwarder, c)
+	config := defaultConfig
+	err := c.Unpack(&config)
 	assert.Error(t, err)
 }
 
@@ -63,8 +63,16 @@ func TestOverrideHostAndPort(t *testing.T) {
 		"host": host,
 	}
 	c, _ := common.NewConfigFrom(cfg)
+	config := defaultConfig
+	err := c.Unpack(&config)
+	if !assert.NoError(t, err) {
+		return
+	}
 	forwarder := harvester.NewForwarder(nil)
-	harvester, err := NewHarvester(forwarder, c)
+	harvester, err := NewHarvester(forwarder, &config)
+	if !assert.NoError(t, err) {
+		return
+	}
 	defer harvester.Stop()
 	go func() {
 		err := harvester.Run()
@@ -83,7 +91,15 @@ func TestReceiveNewEventsConcurrently(t *testing.T) {
 	to := newTestingOutlet(ch)
 	forwarder := harvester.NewForwarder(to)
 	cfg := common.NewConfig()
-	harvester, err := NewHarvester(forwarder, cfg)
+	config := defaultConfig
+	err := cfg.Unpack(&config)
+	if !assert.NoError(t, err) {
+		return
+	}
+	harvester, err := NewHarvester(forwarder, &config)
+	if !assert.NoError(t, err) {
+		return
+	}
 	defer harvester.Stop()
 	if !assert.NoError(t, err) {
 		return
@@ -220,7 +236,12 @@ func TestReceiveEventsAndMetadata(t *testing.T) {
 			forwarder := harvester.NewForwarder(to)
 			test.cfg["host"] = fmt.Sprintf("localhost:%d", port)
 			cfg, _ := common.NewConfigFrom(test.cfg)
-			harvester, err := NewHarvester(forwarder, cfg)
+			config := defaultConfig
+			err := cfg.Unpack(&config)
+			if !assert.NoError(t, err) {
+				return
+			}
+			harvester, err := NewHarvester(forwarder, &config)
 			if !assert.NoError(t, err) {
 				return
 			}
