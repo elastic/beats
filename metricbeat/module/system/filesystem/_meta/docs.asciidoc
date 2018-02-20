@@ -1,5 +1,3 @@
-=== System filesystem metricset
-
 The System `filesystem` metricset provides file system statistics. For each file
 system, one document is provided.
 
@@ -37,9 +35,9 @@ metricbeat.modules:
 ----
 
 Another strategy to deal with these filesystems is to configure a `drop_event`
-filter that matches the `mount_point` using a regular expression. This type of
-filtering occurs after the data has been collected so it can be less efficient
-than the previous method.
+processor that matches the `mount_point` using a regular expression. This type
+of filtering occurs after the data has been collected so it can be less
+efficient than the previous method.
 
 [source,yaml]
 ----
@@ -47,6 +45,7 @@ metricbeat.modules:
   - module: system
     period: 30s
     metricsets: ["filesystem"]
-    filters:
-      - drop_event.when.regexp.mount_point: '^/(sys|cgroup|proc|dev|etc|host)($|/)'
+    processors:
+    - drop_event.when.regexp:
+        system.filesystem.mount_point: '^/(sys|cgroup|proc|dev|etc|host)($|/)'
 ----

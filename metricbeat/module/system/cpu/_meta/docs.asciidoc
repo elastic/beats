@@ -1,5 +1,3 @@
-=== System cpu metricset
-
 The System `cpu` metricset provides CPU statistics.
 
 This metricset is available on:
@@ -22,6 +20,6 @@ is a list and three metric types are supported - `percentages`,
 ----
 metricbeat.modules:
 - module: system
-  metricsets: [core]
-  core.metrics: [percentages, normalized_percentages, ticks]
+  metricsets: [cpu]
+  cpu.metrics: [percentages, normalized_percentages, ticks]
 ----

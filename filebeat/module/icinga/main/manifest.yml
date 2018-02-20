@@ -10,4 +10,4 @@ var:
       - c:/programdata/icinga2/var/log/icinga2/icinga2.log*
 
 ingest_pipeline: ingest/pipeline.json
-prospector: config/main.yml
+input: config/main.yml

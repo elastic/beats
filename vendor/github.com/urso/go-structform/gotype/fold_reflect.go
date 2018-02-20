@@ -137,7 +137,7 @@ func getStructFieldsFolds(c *foldContext, t reflect.Type) ([]reFoldFn, error) {
 	fields := make([]reFoldFn, 0, count)
 
 	for i := 0; i < count; i++ {
-		fv, err := fieldFold(c, t, i)
+		fv, err := buildFieldFold(c, t, i)
 		if err != nil {
 			return nil, err
 		}
@@ -182,7 +182,7 @@ func makeFieldsFold(fields []reFoldFn) reFoldFn {
 	}
 }
 
-func fieldFold(C *foldContext, t reflect.Type, idx int) (reFoldFn, error) {
+func buildFieldFold(C *foldContext, t reflect.Type, idx int) (reFoldFn, error) {
 	st := t.Field(idx)
 
 	name := st.Name
@@ -193,11 +193,19 @@ func fieldFold(C *foldContext, t reflect.Type, idx int) (reFoldFn, error) {
 	}
 
 	tagName, tagOpts := parseTags(st.Tag.Get(C.opts.tag))
-	if tagOpts.squash {
-		return fieldFoldInline(C, t, idx)
+	if tagOpts.squash && tagOpts.omitEmpty {
+		return nil, errInlineAndOmitEmpty
 	}
 
-	valueVisitor, err := getReflectFold(C, st.Type)
+	if tagOpts.squash {
+		return buildFieldFoldInline(C, t, idx, tagOpts.omitEmpty)
+	}
+
+	foldT := st.Type
+	if tagOpts.omitEmpty {
+		_, foldT = baseType(st.Type)
+	}
+	valueVisitor, err := getReflectFold(C, foldT)
 	if err != nil {
 		return nil, err
 	}
@@ -207,10 +215,19 @@ func fieldFold(C *foldContext, t reflect.Type, idx int) (reFoldFn, error) {
 	} else {
 		name = strings.ToLower(name)
 	}
+
+	if tagOpts.omitEmpty {
+		return makeNonEmptyFieldFold(name, idx, st.Type, valueVisitor)
+	}
 	return makeFieldFold(name, idx, valueVisitor)
 }
 
-func fieldFoldInline(C *foldContext, t reflect.Type, idx int) (reFoldFn, error) {
+func buildFieldFoldInline(
+	C *foldContext,
+	t reflect.Type,
+	idx int,
+	omitEmpty bool,
+) (reFoldFn, error) {
 	var (
 		st          = t.Field(idx)
 		N, bt       = baseType(st.Type)
@@ -273,6 +290,83 @@ func makeFieldFold(name string, idx int, fn reFoldFn) (reFoldFn, error) {
 func makeFieldInlineFold(idx int, fn reFoldFn) reFoldFn {
 	return func(C *foldContext, v reflect.Value) error {
 		return fn(C, v.Field(idx))
+	}
+}
+
+func makeNonEmptyFieldFold(name string, idx int, t reflect.Type, fn reFoldFn) (reFoldFn, error) {
+	resolver := makeResolveValue(t)
+	if resolver == nil {
+		return makeFieldFold(name, idx, fn)
+	}
+
+	return func(C *foldContext, v reflect.Value) (err error) {
+		field, ok := resolver(v.Field(idx))
+		if ok {
+			if err = C.OnKey(name); err != nil {
+				return
+			}
+			err = fn(C, field)
+		}
+		return
+	}, nil
+}
+
+func makeResolveValue(st reflect.Type) func(reflect.Value) (reflect.Value, bool) {
+	type resolver func(reflect.Value) (reflect.Value, bool)
+
+	resolveBySize := func(v reflect.Value) (reflect.Value, bool) {
+		return v, v.Len() > 0
+	}
+
+	resolveNonNil := func(v reflect.Value) (reflect.Value, bool) {
+		return v, !v.IsNil()
+	}
+
+	var resolvers []resolver
+	for {
+		switch st.Kind() {
+		case reflect.Ptr:
+			var r resolver
+			st, r = makeResolvePointers(st)
+			resolvers = append(resolvers, r)
+			continue
+		case reflect.Interface:
+			resolvers = append(resolvers, resolveNonNil)
+		case reflect.Map, reflect.String, reflect.Slice, reflect.Array:
+			resolvers = append(resolvers, resolveBySize)
+		default:
+		}
+		break
+	}
+
+	if len(resolvers) == 0 {
+		return nil
+	}
+	if len(resolvers) == 1 {
+		return resolvers[0]
+	}
+
+	return func(v reflect.Value) (reflect.Value, bool) {
+		for _, r := range resolvers {
+			var ok bool
+			if v, ok = r(v); !ok {
+				return v, ok
+			}
+		}
+		return v, true
+	}
+}
+
+func makeResolvePointers(st reflect.Type) (reflect.Type, func(reflect.Value) (reflect.Value, bool)) {
+	N, bt := baseType(st)
+	return bt, func(v reflect.Value) (reflect.Value, bool) {
+		for i := 0; i < N; i++ {
+			if v.IsNil() {
+				return v, false
+			}
+			v = v.Elem()
+		}
+		return v, true
 	}
 }
 

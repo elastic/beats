@@ -3,6 +3,7 @@
   description: >
     One row per database, showing database-wide statistics. Collected by querying
     pg_stat_database
+  release: ga
   fields:
     - name: oid
       type: long

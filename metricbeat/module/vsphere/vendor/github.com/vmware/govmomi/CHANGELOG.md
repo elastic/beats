@@ -1,5 +1,24 @@
 # changelog
 
+### 0.15.0 (2017-06-19)
+
+* WaitOptions.MaxWaitSeconds is now optional
+
+* Support removal of ExtraConfig entries
+
+* GuestPosixFileAttributes OwnerId and GroupId fields are now pointers,
+  rather than omitempty ints to allow chown with root uid:gid
+
+* Updated examples/ using view package
+
+* Add DatastoreFile.TailFunc method
+
+* Export VirtualMachine.FindSnapshot method
+
+* Add AuthorizationManager {Enable,Disable}Methods
+
+* Add PBM client
+
 ### 0.14.0 (2017-04-08)
 
 * Add view.ContainerView type and methods

@@ -3,6 +3,10 @@ This file is generated! See scripts/docs_collector.py
 ////
 
 [[metricbeat-metricset-vsphere-virtualmachine]]
+=== vSphere virtualmachine metricset
+
+beta[]
+
 include::../../../module/vsphere/virtualmachine/_meta/docs.asciidoc[]
 
 

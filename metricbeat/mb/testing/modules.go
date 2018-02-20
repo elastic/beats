@@ -202,3 +202,98 @@ func RunPushMetricSet(duration time.Duration, metricSet mb.PushMetricSet) ([]com
 	// Return all events and errors that were collected.
 	return r.events, r.errs
 }
+
+// NewPushMetricSetV2 instantiates a new PushMetricSetV2 using the given
+// configuration. The ModuleFactory and MetricSetFactory are obtained from the
+// global Registry.
+func NewPushMetricSetV2(t testing.TB, config interface{}) mb.PushMetricSetV2 {
+	metricSet := newMetricSet(t, config)
+
+	pushMetricSet, ok := metricSet.(mb.PushMetricSetV2)
+	if !ok {
+		t.Fatal("MetricSet does not implement PushMetricSet")
+	}
+
+	return pushMetricSet
+}
+
+// capturingReporterV2 stores all the events and errors from a metricset's
+// Run method.
+type capturingReporterV2 struct {
+	doneC   chan struct{}
+	eventsC chan mb.Event
+}
+
+// report writes an event to the output channel and returns true. If the output
+// is closed it returns false.
+func (r *capturingReporterV2) report(event mb.Event) bool {
+	select {
+	case <-r.doneC:
+		// Publisher is stopped.
+		return false
+	case r.eventsC <- event:
+		return true
+	}
+}
+
+// Event stores the passed-in event into the events array
+func (r *capturingReporterV2) Event(event mb.Event) bool {
+	return r.report(event)
+}
+
+// Error stores the given error into the errors array.
+func (r *capturingReporterV2) Error(err error) bool {
+	return r.report(mb.Event{Error: err})
+}
+
+// Done returns the Done channel for this reporter.
+func (r *capturingReporterV2) Done() <-chan struct{} {
+	return r.doneC
+}
+
+// RunPushMetricSetV2 run the given push metricset for the specific amount of
+// time and returns all of the events and errors that occur during that period.
+func RunPushMetricSetV2(timeout time.Duration, waitEvents int, metricSet mb.PushMetricSetV2) []mb.Event {
+	var (
+		r      = &capturingReporterV2{doneC: make(chan struct{}), eventsC: make(chan mb.Event)}
+		wg     sync.WaitGroup
+		events []mb.Event
+	)
+	wg.Add(2)
+
+	// Producer
+	go func() {
+		defer wg.Done()
+		defer close(r.eventsC)
+		if closer, ok := metricSet.(mb.Closer); ok {
+			defer closer.Close()
+		}
+		metricSet.Run(r)
+	}()
+
+	// Consumer
+	go func() {
+		defer wg.Done()
+		defer close(r.doneC)
+
+		timer := time.NewTimer(timeout)
+		defer timer.Stop()
+		for {
+			select {
+			case <-timer.C:
+				return
+			case e, ok := <-r.eventsC:
+				if !ok {
+					return
+				}
+				events = append(events, e)
+				if waitEvents > 0 && waitEvents <= len(events) {
+					return
+				}
+			}
+		}
+	}()
+
+	wg.Wait()
+	return events
+}

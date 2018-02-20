@@ -1,0 +1,45 @@
+[
+    {
+        "_id": "ODTMbl8Bn67eEiQ32rRH",
+        "_index": "filebeat-7.0.0-alpha1-2017.10.30",
+        "_score": null,
+        "_source": {
+            "@timestamp": "2017-10-23T14:21:54,698",
+            "beat": {
+                "hostname": "sashimi",
+                "name": "sashimi",
+                "version": "7.0.0-alpha1"
+            },
+            "fileset": {
+                "module": "logstash",
+                "name": "log"
+            },
+            "logstash": {
+                "log": {
+                    "level": "INFO",
+                    "message": "Initializing module {:module_name=>\"fb_apache\", :directory=>\"/usr/share/logstash/modules/fb_apache/configuration\"}",
+                    "module": "logstash.modules.scaffold"
+                }
+            },
+            "offset": 897,
+            "prospector": {
+                "type": "log"
+            },
+            "input": {
+                "type": "log"
+            },
+            "read_timestamp": "2017-10-30T19:40:38.780Z",
+            "source": "/tmp/logstash-plain.log"
+        },
+        "_type": "doc",
+        "_version": 1,
+        "fields": {
+            "@timestamp": [
+                "2017-10-23T14:21:54.698Z"
+            ]
+        },
+        "sort": [
+            1508768514698
+        ]
+    }
+]

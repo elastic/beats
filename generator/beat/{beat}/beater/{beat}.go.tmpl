@@ -19,14 +19,14 @@ type {Beat} struct {
 
 // Creates beater
 func New(b *beat.Beat, cfg *common.Config) (beat.Beater, error) {
-	config := config.DefaultConfig
-	if err := cfg.Unpack(&config); err != nil {
+	c := config.DefaultConfig
+	if err := cfg.Unpack(&c); err != nil {
 		return nil, fmt.Errorf("Error reading config file: %v", err)
 	}
 
 	bt := &{Beat}{
 		done:   make(chan struct{}),
-		config: config,
+		config: c,
 	}
 	return bt, nil
 }
@@ -52,8 +52,8 @@ func (bt *{Beat}) Run(b *beat.Beat) error {
 		event := beat.Event{
 			Timestamp: time.Now(),
 			Fields: common.MapStr{
-				"type":       b.Info.Name,
-				"counter":    counter,
+				"type":    b.Info.Name,
+				"counter": counter,
 			},
 		}
 		bt.client.Publish(event)

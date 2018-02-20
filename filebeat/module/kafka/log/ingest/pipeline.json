@@ -45,7 +45,7 @@
     {
       "rename": {
         "field": "@timestamp",
-        "target_field": "beat.read_time"
+        "target_field": "read_timestamp"
       }
     },
     {

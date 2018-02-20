@@ -7,8 +7,6 @@ This file is generated! See scripts/docs_collector.py
 
 == Redis module
 
-experimental[]
-
 The +{modulename}+ module parses logs and slowlogs created by
 https://redis.io/[Redis].
 
@@ -70,11 +68,11 @@ To specify the same settings at the command line, you use:
 
 ["source","sh",subs="attributes"]
 -----
-./{beatname_lc} -M "redis.log.var.paths=[/path/to/log/redis/redis-server.log*]" -M "redis.slowlog.var.hosts=[localhost:6378]" -M "redis.slowlog.var.password=[YOUR_PASSWORD]"
+./{beatname_lc} --modules {modulename} -M "redis.log.var.paths=[/path/to/log/redis/redis-server.log*]" -M "redis.slowlog.var.hosts=[localhost:6378]" -M "redis.slowlog.var.password=[YOUR_PASSWORD]"
 -----
 
 
-The command in the example assumes that you have already enabled the +{modulename}+ module. 
+ 
 
 //set the fileset name used in the included example
 :fileset_ex: log

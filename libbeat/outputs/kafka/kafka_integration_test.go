@@ -20,6 +20,7 @@ import (
 	"github.com/elastic/beats/libbeat/common"
 	"github.com/elastic/beats/libbeat/common/fmtstr"
 	"github.com/elastic/beats/libbeat/logp"
+	"github.com/elastic/beats/libbeat/outputs"
 	"github.com/elastic/beats/libbeat/outputs/outest"
 
 	_ "github.com/elastic/beats/libbeat/outputs/codec/format"
@@ -36,9 +37,7 @@ type eventInfo struct {
 }
 
 func TestKafkaPublish(t *testing.T) {
-	if testing.Verbose() {
-		logp.LogInit(logp.LOG_DEBUG, "", false, true, []string{"kafka"})
-	}
+	logp.TestingSetup(logp.WithSelectors("kafka"))
 
 	id := strconv.Itoa(rand.New(rand.NewSource(int64(time.Now().Nanosecond()))).Int())
 	testTopic := fmt.Sprintf("test-libbeat-%s", id)
@@ -185,7 +184,7 @@ func TestKafkaPublish(t *testing.T) {
 		}
 
 		t.Run(name, func(t *testing.T) {
-			grp, err := makeKafka(beat.Info{Beat: "libbeat"}, nil, cfg)
+			grp, err := makeKafka(beat.Info{Beat: "libbeat"}, outputs.NewNilObserver(), cfg)
 			if err != nil {
 				t.Fatal(err)
 			}

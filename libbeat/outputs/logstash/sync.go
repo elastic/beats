@@ -13,23 +13,23 @@ import (
 
 type syncClient struct {
 	*transport.Client
-	client *v2.SyncClient
-	stats  *outputs.Stats
-	win    *window
-	ttl    time.Duration
-	ticker *time.Ticker
+	client   *v2.SyncClient
+	observer outputs.Observer
+	win      *window
+	ttl      time.Duration
+	ticker   *time.Ticker
 }
 
 func newSyncClient(
 	beat beat.Info,
 	conn *transport.Client,
-	stats *outputs.Stats,
+	observer outputs.Observer,
 	config *Config,
 ) (*syncClient, error) {
 	c := &syncClient{
-		Client: conn,
-		stats:  stats,
-		ttl:    config.TTL,
+		Client:   conn,
+		observer: observer,
+		ttl:      config.TTL,
 	}
 
 	if config.SlowStart {
@@ -83,7 +83,7 @@ func (c *syncClient) reconnect() error {
 
 func (c *syncClient) Publish(batch publisher.Batch) error {
 	events := batch.Events()
-	st := c.stats
+	st := c.observer
 
 	st.NewBatch(len(events))
 
@@ -120,12 +120,12 @@ func (c *syncClient) Publish(batch publisher.Batch) error {
 		} else {
 			n, err = c.publishWindowed(events)
 		}
-		events = events[n:]
-		st.Acked(n)
 
 		debugf("%v events out of %v events sent to logstash host %s. Continue sending",
 			n, len(events), c.Host())
 
+		events = events[n:]
+		st.Acked(n)
 		if err != nil {
 			// return batch to pipeline before reporting/counting error
 			batch.RetryEvents(events)

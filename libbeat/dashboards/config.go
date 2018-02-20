@@ -10,10 +10,12 @@ type Config struct {
 	URL            string `config:"url"`
 	OnlyDashboards bool   `config:"only_dashboards"`
 	OnlyIndex      bool   `config:"only_index"`
+	AlwaysKibana   bool   `config:"always_kibana"`
 }
 
 var defaultConfig = Config{
-	KibanaIndex: ".kibana",
+	KibanaIndex:  ".kibana",
+	AlwaysKibana: false,
 }
 var (
 	defaultDirectory = "kibana"

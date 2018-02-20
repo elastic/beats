@@ -2,6 +2,7 @@
   type: group
   description: >
     The golang program heap information exposed by expvar.
+  release: experimental
   fields:
     - name: cmdline
       type: keyword
@@ -82,7 +83,7 @@
           format: bytes
           description: >
             Total bytes obtained from system (sum of XxxSys below).
-        - name: optained
+        - name: obtained
           type: long
           format: bytes
           description: >

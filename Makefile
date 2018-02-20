@@ -16,14 +16,14 @@ REVIEWDOG_REPO=github.com/haya14busa/reviewdog/cmd/reviewdog
 # Runs complete testsuites (unit, system, integration) for all beats with coverage and race detection.
 # Also it builds the docs and the generators
 
+.PHONY: testsuite
+testsuite:
+	@$(foreach var,$(PROJECTS),$(MAKE) -C $(var) testsuite || exit 1;)
+
 .PHONY: setup-commit-hook
 setup-commit-hook:
 	@cp script/pre_commit.sh .git/hooks/pre-commit
 	@chmod 751 .git/hooks/pre-commit
-
-.PHONY: testsuite
-testsuite:
-	@$(foreach var,$(PROJECTS),$(MAKE) -C $(var) testsuite || exit 1;)
 
 stop-environments:
 	@$(foreach var,$(PROJECTS_ENV),$(MAKE) -C $(var) stop-environment || exit 0;)
@@ -37,6 +37,11 @@ test:
 .PHONY: unit
 unit:
 	@$(foreach var,$(PROJECTS),$(MAKE) -C $(var) unit || exit 1;)
+
+# Crosscompile all beats.
+.PHONY: crosscompile
+crosscompile:
+	@$(foreach var,filebeat winlogbeat metricbeat heartbeat auditbeat,$(MAKE) -C $(var) crosscompile || exit 1;)
 
 .PHONY: coverage-report
 coverage-report:

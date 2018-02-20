@@ -10,9 +10,8 @@
 #==========================  Modules configuration =============================
 auditbeat.modules:
 
-- module: audit
-  metricsets: [kernel]
-  kernel.audit_rules: |
+- module: auditd
+  audit_rules: |
     ## Define audit rules here.
     ## Create file watches (-w) or syscall audits (-a or -A). Uncomment these
     ## examples or add your own rules.
@@ -26,8 +25,8 @@ auditbeat.modules:
     ## Executions.
     #-a always,exit -F arch=b64 -S execve,execveat -k exec
 
-    ## External access.
-    #-a always,exit -F arch=b64 -S accept,bind,connect,recvfrom -F key=external-access
+    ## External access (warning: these can be expensive to audit).
+    #-a always,exit -F arch=b64 -S accept,bind,connect -F key=external-access
 
     ## Identity changes.
     #-w /etc/group -p wa -k identity
@@ -38,15 +37,14 @@ auditbeat.modules:
     #-a always,exit -F arch=b64 -S open,creat,truncate,ftruncate,openat,open_by_handle_at -F exit=-EACCES -k access
     #-a always,exit -F arch=b64 -S open,creat,truncate,ftruncate,openat,open_by_handle_at -F exit=-EPERM -k access
 
-- module: audit
-  metricsets: [file]
-  file.paths:
+- module: file_integrity
+  paths:
   - /bin
   - /usr/bin
   - /sbin
   - /usr/sbin
   - /etc
-  
+
 
 
 #==================== Elasticsearch template setting ==========================
@@ -140,10 +138,25 @@ output.elasticsearch:
 #================================ Logging =====================================
 
 # Sets log level. The default log level is info.
-# Available log levels are: critical, error, warning, info, debug
+# Available log levels are: error, warning, info, debug
 #logging.level: debug
 
 # At debug level, you can selectively enable logging only for some components.
 # To enable all selectors use ["*"]. Examples of other selectors are "beat",
 # "publish", "service".
 #logging.selectors: ["*"]
+
+#============================== Xpack Monitoring ===============================
+# auditbeat can export internal metrics to a central Elasticsearch monitoring
+# cluster.  This requires xpack monitoring to be enabled in Elasticsearch.  The
+# reporting is disabled by default.
+
+# Set to true to enable the monitoring reporter.
+#xpack.monitoring.enabled: false
+
+# Uncomment to send the metrics to Elasticsearch. Most settings from the
+# Elasticsearch output are accepted here as well. Any setting that is not set is
+# automatically inherited from the Elasticsearch output configuration, so if you
+# have the Elasticsearch output configured, you can simply uncomment the
+# following line.
+#xpack.monitoring.elasticsearch:

@@ -3,6 +3,8 @@ This file is generated! See scripts/docs_collector.py
 ////
 
 [[metricbeat-metricset-docker-image]]
+=== Docker image metricset
+
 include::../../../module/docker/image/_meta/docs.asciidoc[]
 
 

@@ -5,6 +5,8 @@ This file is generated! See scripts/docs_collector.py
 [[metricbeat-module-mongodb]]
 == MongoDB module
 
+beta[]
+
 This module periodically fetches metrics from https://www.mongodb.com[MongoDB]
 servers.
 
@@ -86,9 +88,13 @@ metricbeat.modules:
 
 The following metricsets are available:
 
+* <<metricbeat-metricset-mongodb-collstats,collstats>>
+
 * <<metricbeat-metricset-mongodb-dbstats,dbstats>>
 
 * <<metricbeat-metricset-mongodb-status,status>>
+
+include::mongodb/collstats.asciidoc[]
 
 include::mongodb/dbstats.asciidoc[]
 

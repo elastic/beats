@@ -80,11 +80,6 @@ func (c *Common) SetInventoryPath(p string) {
 func (c Common) ObjectName(ctx context.Context) (string, error) {
 	var o mo.ManagedEntity
 
-	name := c.Name()
-	if name != "" {
-		return name, nil
-	}
-
 	err := c.Properties(ctx, c.Reference(), []string{"name"}, &o)
 	if err != nil {
 		return "", err

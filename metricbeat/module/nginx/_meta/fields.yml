@@ -3,6 +3,8 @@
   description: >
     Nginx server status metrics collected from various modules.
   short_config: false
+  release: ga
+  settings: ["ssl"]
   fields:
     - name: nginx
       type: group

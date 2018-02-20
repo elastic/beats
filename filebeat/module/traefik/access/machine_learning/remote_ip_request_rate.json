@@ -6,8 +6,7 @@
         {
         "detector_description": "traefik_access_remote_ip_high_count",
         "function": "high_count",
-        "over_field_name": "traefik.access.remote_ip",
-        "detector_rules": []
+        "over_field_name": "traefik.access.remote_ip"
       }
     ],
     "influencers": [

@@ -3,7 +3,7 @@ package docker
 import (
 	"strings"
 
-	"github.com/fsouza/go-dockerclient"
+	"github.com/docker/docker/api/types"
 
 	"github.com/elastic/beats/libbeat/common"
 )
@@ -26,7 +26,7 @@ func (c *Container) ToMapStr() common.MapStr {
 	return m
 }
 
-func NewContainer(container *docker.APIContainers) *Container {
+func NewContainer(container *types.Container) *Container {
 	return &Container{
 		ID:     container.ID,
 		Name:   ExtractContainerName(container.Names),
@@ -54,7 +54,7 @@ func DeDotLabels(labels map[string]string) common.MapStr {
 	for k, v := range labels {
 		// This is necessary so that ES does not interpret '.' fields as new
 		// nested JSON objects, and also makes this compatible with ES 2.x.
-		label := strings.Replace(k, ".", "_", -1)
+		label := common.DeDot(k)
 		outputLabels.Put(label, v)
 	}
 

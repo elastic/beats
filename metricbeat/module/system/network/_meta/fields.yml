@@ -2,6 +2,7 @@
   type: group
   description: >
     `network` contains network IO metrics for a single network interface.
+  release: ga
   fields:
     - name: name
       type: keyword

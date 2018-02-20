@@ -273,11 +273,11 @@ func TestWildcardQuery(t *testing.T) {
 		t.Fatal(err)
 	}
 
-	pcts, err := values[0].GetValue("processor.time.pct")
+	pctKey, err := values[0].HasKey("processor.time.pct")
 	if err != nil {
 		t.Fatal(err)
 	}
-	assert.NotEmpty(t, pcts)
+	assert.True(t, pctKey)
 
 	t.Log(values)
 }

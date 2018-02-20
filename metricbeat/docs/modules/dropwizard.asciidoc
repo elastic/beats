@@ -5,6 +5,8 @@ This file is generated! See scripts/docs_collector.py
 [[metricbeat-module-dropwizard]]
 == Dropwizard module
 
+beta[]
+
 This is the http://dropwizard.io[Dropwizard] module.
 
 
@@ -25,6 +27,8 @@ metricbeat.modules:
   metrics_path: /metrics/metrics
   namespace: example
 ----
+
+This module supports TLS connection when using `ssl` config field, as described in <<configuration-ssl>>.
 
 [float]
 === Metricsets

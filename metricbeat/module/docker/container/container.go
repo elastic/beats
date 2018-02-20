@@ -1,10 +1,12 @@
 package container
 
 import (
-	dc "github.com/fsouza/go-dockerclient"
+	"context"
+
+	"github.com/docker/docker/api/types"
+	"github.com/docker/docker/client"
 
 	"github.com/elastic/beats/libbeat/common"
-	"github.com/elastic/beats/libbeat/common/cfgwarn"
 	"github.com/elastic/beats/metricbeat/mb"
 	"github.com/elastic/beats/metricbeat/module/docker"
 )
@@ -17,13 +19,11 @@ func init() {
 
 type MetricSet struct {
 	mb.BaseMetricSet
-	dockerClient *dc.Client
+	dockerClient *client.Client
 }
 
 // New creates a new instance of the docker container MetricSet.
 func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
-	cfgwarn.Beta("The docker container metricset is beta")
-
 	config := docker.Config{}
 	if err := base.Module().UnpackConfig(&config); err != nil {
 		return nil, err
@@ -44,7 +44,7 @@ func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
 // This is based on https://docs.docker.com/engine/reference/api/docker_remote_api_v1.24/#/list-containers.
 func (m *MetricSet) Fetch() ([]common.MapStr, error) {
 	// Fetch a list of all containers.
-	containers, err := m.dockerClient.ListContainers(dc.ListContainersOptions{})
+	containers, err := m.dockerClient.ContainerList(context.Background(), types.ContainerListOptions{})
 	if err != nil {
 		return nil, err
 	}

@@ -11,17 +11,17 @@
     },
     "system": {
         "filesystem": {
-            "available": 60083531776,
-            "device_name": "/dev/disk1",
-            "files": 4294967279,
-            "free": 60345675776,
-            "free_files": 4291998784,
+            "available": 50085941248,
+            "device_name": "overlay",
+            "files": 4194304,
+            "free": 53538639872,
+            "free_files": 3862303,
             "mount_point": "/",
-            "total": 249779191808,
-            "type": "hfs",
+            "total": 67371577344,
+            "type": "overlay",
             "used": {
-                "bytes": 189433516032,
-                "pct": 0.7584
+                "bytes": 13832937472,
+                "pct": 0.2053
             }
         }
     }

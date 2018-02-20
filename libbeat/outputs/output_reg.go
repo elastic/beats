@@ -13,7 +13,7 @@ var outputReg = map[string]Factory{}
 // Factory is used by output plugins to build an output instance
 type Factory func(
 	beat beat.Info,
-	stats *Stats,
+	stats Observer,
 	cfg *common.Config) (Group, error)
 
 // Group configures and combines multiple clients into load-balanced group of clients
@@ -38,7 +38,7 @@ func FindFactory(name string) Factory {
 }
 
 // Load creates and configures a output Group using a configuration object..
-func Load(info beat.Info, stats *Stats, name string, config *common.Config) (Group, error) {
+func Load(info beat.Info, stats Observer, name string, config *common.Config) (Group, error) {
 	factory := FindFactory(name)
 	if factory == nil {
 		return Group{}, fmt.Errorf("output type %v undefined", name)
@@ -48,5 +48,8 @@ func Load(info beat.Info, stats *Stats, name string, config *common.Config) (Gro
 		return Fail(err)
 	}
 
+	if stats == nil {
+		stats = NewNilObserver()
+	}
 	return factory(info, stats, config)
 }

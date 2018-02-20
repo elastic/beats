@@ -3,6 +3,8 @@ This file is generated! See scripts/docs_collector.py
 ////
 
 [[metricbeat-metricset-docker-healthcheck]]
+=== Docker healthcheck metricset
+
 include::../../../module/docker/healthcheck/_meta/docs.asciidoc[]
 
 

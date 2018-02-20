@@ -7,9 +7,12 @@
     # Filebeat will choose the paths depending on your OS.
     #var.paths:
 
-    # Prospector configuration (advanced). Any prospector configuration option
+    # Convert the timestamp to UTC. Requires Elasticsearch >= 6.1.
+    #var.convert_timezone: false
+
+    # Input configuration (advanced). Any input configuration option
     # can be added under this section.
-    #prospector:
+    #input:
 
   # Authorization logs
   #auth:
@@ -19,6 +22,9 @@
     # Filebeat will choose the paths depending on your OS.
     #var.paths:
 
-    # Prospector configuration (advanced). Any prospector configuration option
+    # Convert the timestamp to UTC. Requires Elasticsearch >= 6.1.
+    #var.convert_timezone: false
+
+    # Input configuration (advanced). Any input configuration option
     # can be added under this section.
-    #prospector:
+    #input:

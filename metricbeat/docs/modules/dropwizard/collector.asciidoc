@@ -3,6 +3,10 @@ This file is generated! See scripts/docs_collector.py
 ////
 
 [[metricbeat-metricset-dropwizard-collector]]
+=== Dropwizard collector metricset
+
+beta[]
+
 include::../../../module/dropwizard/collector/_meta/docs.asciidoc[]
 
 

@@ -80,7 +80,8 @@ class Test(BaseTest):
                                        "size": len(expected)})
             objects = [o["_source"] for o in res["hits"]["hits"]]
 
-        assert len(expected) == res['hits']['total'], "expected {} but got {}".format(len(expected), len(objects))
+        assert len(expected) == res['hits']['total'], "expected {} but got {}".format(
+            len(expected), res['hits']['total'])
 
         for ev in expected:
             found = False
@@ -88,7 +89,9 @@ class Test(BaseTest):
                 if ev["_source"][module] == obj[module]:
                     found = True
                     break
-            assert found, "The following expected object was not found: {}".format(obj)
+
+            assert found, "The following expected object was not found:\n {}\nSearched in: \n{}".format(
+                ev["_source"][module], objects)
 
     def run_on_file(self, module, fileset, test_file, cfgfile):
         print("Testing {}/{} on {}".format(module, fileset, test_file))
@@ -108,7 +111,7 @@ class Test(BaseTest):
             "-M", "{module}.{fileset}.enabled=true".format(module=module, fileset=fileset),
             "-M", "{module}.{fileset}.var.paths=[{test_file}]".format(
                 module=module, fileset=fileset, test_file=test_file),
-            "-M", "*.*.prospector.close_eof=true",
+            "-M", "*.*.input.close_eof=true",
         ]
 
         output_path = os.path.join(self.working_dir, module, fileset, os.path.basename(test_file))
@@ -137,8 +140,11 @@ class Test(BaseTest):
 
             assert "error" not in obj, "not error expected but got: {}".format(obj)
 
-            if module != "auditd" and fileset != "log":
-                # There are dynamic fields in audit logs that are not documented.
+            if (module == "auditd" and fileset == "log") \
+                    or (module == "osquery" and fileset == "result"):
+                # There are dynamic fields that are not documented.
+                pass
+            else:
                 self.assert_fields_are_documented(obj)
 
         if os.path.exists(test_file + "-expected.json"):
@@ -147,13 +153,13 @@ class Test(BaseTest):
     @unittest.skipIf(not INTEGRATION_TESTS or
                      os.getenv("TESTING_ENVIRONMENT") == "2x",
                      "integration test not available on 2.x")
-    def test_prospector_pipeline_config(self):
+    def test_input_pipeline_config(self):
         """
-        Tests that the pipeline configured in the prospector overwrites
+        Tests that the pipeline configured in the input overwrites
         the one from the output.
         """
         self.init()
-        index_name = "filebeat-test-prospector"
+        index_name = "filebeat-test-input"
         try:
             self.es.indices.delete(index=index_name)
         except:

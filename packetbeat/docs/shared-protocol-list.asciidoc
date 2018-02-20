@@ -15,3 +15,4 @@
  - Thrift-RPC
  - MongoDB
  - Memcache
+ - TLS

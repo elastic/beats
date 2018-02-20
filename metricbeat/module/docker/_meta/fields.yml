@@ -1,9 +1,8 @@
 - key: docker
   title: "Docker"
   description: >
-    beta[]
-
     Docker stats collected from Docker.
+  release: ga
   short_config: false
   fields:
     - name: docker

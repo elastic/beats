@@ -18,6 +18,7 @@ cp fields.yml $PREFIX/fields.yml
 # linux
 cp $BEAT_NAME.yml $PREFIX/$BEAT_NAME-linux.yml
 chmod 0600 $PREFIX/$BEAT_NAME-linux.yml
+chmod 0600 $PREFIX/$BEAT_NAME-linux-386.yml || true
 cp $BEAT_NAME.reference.yml $PREFIX/$BEAT_NAME-linux.reference.yml
 rm -rf $PREFIX/modules.d-linux
 cp -r modules.d/ $PREFIX/modules.d-linux || true
@@ -54,7 +55,8 @@ fi
 cat ${ES_BEATS}/libbeat/docs/version.asciidoc >> ${PREFIX}/package.yml
 
 # Make variable naming of doc-branch compatible with gotpl. Generate and copy README.md into homedir
-sed -i -e 's/:doc-branch/doc_branch/g' ${PREFIX}/package.yml
+# Add " to the version as gotpl interprets 6.0 as 6
+sed -i -e 's/:doc-branch: \(.*\)/doc_branch: "\1" /g' ${PREFIX}/package.yml
 
 # Create README file
 /go/bin/gotpl /templates/readme.md.j2 < ${PREFIX}/package.yml > ${PREFIX}/homedir/README.md

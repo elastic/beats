@@ -44,36 +44,79 @@ func TestEventMapping(t *testing.T) {
 	events, err := f.Fetch()
 	assert.NoError(t, err)
 
-	assert.Equal(t, 8, len(events), "Wrong number of returned events")
+	assert.Equal(t, 11, len(events), "Wrong number of returned events")
 
-	testCases := map[string]interface{}{
-		"_module.namespace": "default",
-		"_module.node.name": "minikube",
-		"name":              "jumpy-owl-redis-3481028193-s78x9",
-
-		"host_ip": "192.168.99.100",
-		"ip":      "172.17.0.4",
-
-		"status.phase":     "running",
-		"status.ready":     "false",
-		"status.scheduled": "true",
-	}
-
+	testCases := testCases()
 	for _, event := range events {
 		name, err := event.GetValue("name")
-		if err == nil && name == "jumpy-owl-redis-3481028193-s78x9" {
-			for k, v := range testCases {
-				testValue(t, event, k, v)
+		if err == nil {
+			namespace, err := event.GetValue("_module.namespace")
+			if err == nil {
+				eventKey := namespace.(string) + "@" + name.(string)
+				oneTestCase, oneTestCaseFound := testCases[eventKey]
+				if oneTestCaseFound {
+					for k, v := range oneTestCase {
+						testValue(eventKey, t, event, k, v)
+					}
+					delete(testCases, eventKey)
+				}
 			}
-			return
 		}
 	}
 
-	t.Error("Test reference event not found")
+	if len(testCases) > 0 {
+		t.Errorf("Test reference events not found: %v\n\n got: %v", testCases, events)
+	}
 }
 
-func testValue(t *testing.T, event common.MapStr, field string, expected interface{}) {
+func testValue(eventKey string, t *testing.T, event common.MapStr, field string, expected interface{}) {
 	data, err := event.GetValue(field)
-	assert.NoError(t, err, "Could not read field "+field)
-	assert.EqualValues(t, expected, data, "Wrong value for field "+field)
+	assert.NoError(t, err, eventKey+": Could not read field "+field)
+	assert.EqualValues(t, expected, data, eventKey+": Wrong value for field "+field)
+}
+
+// Test cases built to match 3 examples in 'module/kubernetes/_meta/test/kube-state-metrics'.
+// In particular, test same named pods in different namespaces
+func testCases() map[string]map[string]interface{} {
+	return map[string]map[string]interface{}{
+		"default@jumpy-owl-redis-3481028193-s78x9": {
+			"_namespace":        "pod",
+			"_module.namespace": "default",
+			"_module.node.name": "minikube",
+			"name":              "jumpy-owl-redis-3481028193-s78x9",
+
+			"host_ip": "192.168.99.100",
+			"ip":      "172.17.0.4",
+
+			"status.phase":     "succeeded",
+			"status.ready":     "false",
+			"status.scheduled": "true",
+		},
+		"test@jumpy-owl-redis-3481028193-s78x9": {
+			"_namespace":        "pod",
+			"_module.namespace": "test",
+			"_module.node.name": "minikube-test",
+			"name":              "jumpy-owl-redis-3481028193-s78x9",
+
+			"host_ip": "192.168.99.200",
+			"ip":      "172.17.0.5",
+
+			"status.phase":     "running",
+			"status.ready":     "true",
+			"status.scheduled": "false",
+		},
+		"jenkins@wise-lynx-jenkins-1616735317-svn6k": {
+			"_namespace":        "pod",
+			"_module.namespace": "jenkins",
+			"_module.node.name": "minikube",
+			"name":              "wise-lynx-jenkins-1616735317-svn6k",
+
+			"host_ip": "192.168.99.100",
+			"ip":      "172.17.0.7",
+
+			"status.phase":     "running",
+			"status.ready":     "true",
+			"status.scheduled": "true",
+		},
+	}
 }

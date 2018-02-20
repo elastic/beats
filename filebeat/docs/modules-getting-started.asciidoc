@@ -1,8 +1,6 @@
 [[filebeat-modules-quickstart]]
 === Quick start for common log formats
 
-beta[]
-
 Filebeat provides a set of pre-built modules that you can use to rapidly
 implement and deploy a log monitoring solution, complete with sample dashboards
 and data visualizations, in about 5 minutes. These modules support common log
@@ -19,7 +17,7 @@ following the numbered steps under <<filebeat-getting-started>>.
 
 ==== Prerequisites
 
-Before running Filebeat with modules enabled, you need to:
+Before running Filebeat modules, you need to:
 
 * Install and configure the Elastic stack. See
 {libbeat}/getting-started.html[Getting Started with Beats and the Elastic Stack].
@@ -48,9 +46,11 @@ enable the two plugins from the configuration page.
 ready to receive data from Filebeat.
 
 [[running-modules-quickstart]]
-==== Running Filebeat with modules enabled
+==== Running Filebeat modules
 
 To set up and run Filebeat modules:
+
+include::../../libbeat/docs/step-configure-credentials.asciidoc[]
 
 . Run the `setup` command to set up the initial environment. This command
 loads the recommended index template for writing to Elasticsearch and deploys
@@ -124,11 +124,6 @@ logs:
 See <<configuration-filebeat-modules>> for more information about setting
 variables and advanced options.
 
-[[passing-credentials-modules]]
-==== Pass credentials
-
-:start-type: modules
-include::../../libbeat/docs/shared-passing-credentials-setup.asciidoc[]
 
 [[visualizing-data]]
 ==== Visualize the data in Kibana

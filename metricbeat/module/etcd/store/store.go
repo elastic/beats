@@ -32,16 +32,20 @@ type MetricSet struct {
 }
 
 func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
-	cfgwarn.Experimental("The etcd store metricset is experimental")
+	cfgwarn.Beta("The etcd store metricset is beta")
 
 	config := struct{}{}
 	if err := base.Module().UnpackConfig(&config); err != nil {
 		return nil, err
 	}
 
+	http, err := helper.NewHTTP(base)
+	if err != nil {
+		return nil, err
+	}
 	return &MetricSet{
 		base,
-		helper.NewHTTP(base),
+		http,
 	}, nil
 }
 

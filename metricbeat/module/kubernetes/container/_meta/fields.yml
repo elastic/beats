@@ -2,6 +2,7 @@
   type: group
   description: >
     kubernetes container metrics
+  release: ga
   fields:
     - name: start_time
       type: date
@@ -26,6 +27,16 @@
               type: long
               description: >
                 CPU used nanocores
+            - name: node.pct
+              type: scaled_float
+              format: percentage
+              description: >
+                CPU usage as a percentage of the total node allocatable CPU
+            - name: limit.pct
+              type: scaled_float
+              format: percentage
+              description: >
+                CPU usage as a percentage of the defined limit for the container (or total node allocatable CPU if unlimited)
     - name: logs
       type: group
       description: >
@@ -89,6 +100,16 @@
               format: bytes
               description: >
                 Total memory usage
+            - name: node.pct
+              type: scaled_float
+              format: percentage
+              description: >
+                Memory usage as a percentage of the total node allocatable memory
+            - name: limit.pct
+              type: scaled_float
+              format: percentage
+              description: >
+                Memory usage as a percentage of the defined limit for the container (or total node allocatable memory if unlimited)
         - name: rss
           type: group
           fields:

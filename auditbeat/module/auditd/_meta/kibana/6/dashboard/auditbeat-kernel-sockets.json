@@ -1,0 +1,188 @@
+{
+  "objects": [
+    {
+      "attributes": {
+        "description": "",
+        "kibanaSavedObjectMeta": {
+          "searchSourceJSON": "{\n  \"filter\": [\n    {\n      \"meta\": {\n        \"index\": \"auditbeat-*\",\n        \"negate\": true,\n        \"type\": \"phrase\",\n        \"key\": \"auditd.summary.object.secondary\",\n        \"value\": \"0\",\n        \"params\": {\n          \"query\": \"0\",\n          \"type\": \"phrase\"\n        },\n        \"disabled\": false,\n        \"alias\": null,\n        \"apply\": true\n      },\n      \"query\": {\n        \"match\": {\n          \"auditd.summary.object.secondary\": {\n            \"query\": \"0\",\n            \"type\": \"phrase\"\n          }\n        }\n      },\n      \"$state\": {\n        \"store\": \"appState\"\n      }\n    }\n  ],\n  \"query\": {\n    \"query\": \"\",\n    \"language\": \"lucene\"\n  }\n}"
+        },
+        "savedSearchId": "b4c93470-c240-11e7-8692-232bd1143e8a",
+        "title": "Bind (non-ephemeral) [Auditbeat Auditd]",
+        "uiStateJSON": "{\n  \"vis\": {\n    \"params\": {\n      \"sort\": {\n        \"columnIndex\": null,\n        \"direction\": null\n      }\n    }\n  }\n}",
+        "version": 1,
+        "visState": "{\n  \"title\": \"Bind (non-ephemeral) [Auditbeat Auditd]\",\n  \"type\": \"table\",\n  \"params\": {\n    \"perPage\": 10,\n    \"showPartialRows\": false,\n    \"showMeticsAtAllLevels\": false,\n    \"sort\": {\n      \"columnIndex\": null,\n      \"direction\": null\n    },\n    \"showTotal\": false,\n    \"totalFunc\": \"sum\"\n  },\n  \"aggs\": [\n    {\n      \"id\": \"1\",\n      \"enabled\": true,\n      \"type\": \"count\",\n      \"schema\": \"metric\",\n      \"params\": {}\n    },\n    {\n      \"id\": \"2\",\n      \"enabled\": true,\n      \"type\": \"terms\",\n      \"schema\": \"bucket\",\n      \"params\": {\n        \"field\": \"auditd.summary.how\",\n        \"size\": 50,\n        \"order\": \"desc\",\n        \"orderBy\": \"_term\",\n        \"customLabel\": \"Exe\"\n      }\n    },\n    {\n      \"id\": \"3\",\n      \"enabled\": true,\n      \"type\": \"terms\",\n      \"schema\": \"bucket\",\n      \"params\": {\n        \"field\": \"auditd.summary.object.primary\",\n        \"size\": 10,\n        \"order\": \"desc\",\n        \"orderBy\": \"_term\",\n        \"customLabel\": \"Address\"\n      }\n    },\n    {\n      \"id\": \"4\",\n      \"enabled\": true,\n      \"type\": \"terms\",\n      \"schema\": \"bucket\",\n      \"params\": {\n        \"field\": \"auditd.summary.object.secondary\",\n        \"size\": 10,\n        \"order\": \"desc\",\n        \"orderBy\": \"_term\",\n        \"customLabel\": \"Port\"\n      }\n    }\n  ]\n}"
+      },
+      "id": "faf882f0-c242-11e7-8692-232bd1143e8a",
+      "type": "visualization",
+      "updated_at": "2018-01-16T22:08:02.522Z",
+      "version": 3
+    },
+    {
+      "attributes": {
+        "description": "",
+        "kibanaSavedObjectMeta": {
+          "searchSourceJSON": "{\n  \"filter\": [],\n  \"query\": {\n    \"query\": \"\",\n    \"language\": \"lucene\"\n  }\n}"
+        },
+        "savedSearchId": "5438b030-c246-11e7-8692-232bd1143e8a",
+        "title": "Connect [Auditbeat Auditd]",
+        "uiStateJSON": "{\n  \"vis\": {\n    \"params\": {\n      \"sort\": {\n        \"columnIndex\": null,\n        \"direction\": null\n      }\n    }\n  }\n}",
+        "version": 1,
+        "visState": "{\n  \"title\": \"Connect [Auditbeat Auditd]\",\n  \"type\": \"table\",\n  \"params\": {\n    \"perPage\": 10,\n    \"showPartialRows\": false,\n    \"showMeticsAtAllLevels\": false,\n    \"sort\": {\n      \"columnIndex\": null,\n      \"direction\": null\n    },\n    \"showTotal\": false,\n    \"totalFunc\": \"sum\"\n  },\n  \"aggs\": [\n    {\n      \"id\": \"1\",\n      \"enabled\": true,\n      \"type\": \"count\",\n      \"schema\": \"metric\",\n      \"params\": {}\n    },\n    {\n      \"id\": \"2\",\n      \"enabled\": true,\n      \"type\": \"terms\",\n      \"schema\": \"bucket\",\n      \"params\": {\n        \"field\": \"process.exe\",\n        \"size\": 50,\n        \"order\": \"desc\",\n        \"orderBy\": \"1\",\n        \"customLabel\": \"Exe\"\n      }\n    },\n    {\n      \"id\": \"3\",\n      \"enabled\": true,\n      \"type\": \"terms\",\n      \"schema\": \"bucket\",\n      \"params\": {\n        \"field\": \"auditd.summary.object.primary\",\n        \"size\": 10,\n        \"order\": \"desc\",\n        \"orderBy\": \"1\",\n        \"customLabel\": \"Address\"\n      }\n    },\n    {\n      \"id\": \"4\",\n      \"enabled\": true,\n      \"type\": \"terms\",\n      \"schema\": \"bucket\",\n      \"params\": {\n        \"field\": \"auditd.summary.object.secondary\",\n        \"size\": 5,\n        \"order\": \"desc\",\n        \"orderBy\": \"1\",\n        \"customLabel\": \"Port\"\n      }\n    }\n  ]\n}"
+      },
+      "id": "ea483730-c246-11e7-8692-232bd1143e8a",
+      "type": "visualization",
+      "updated_at": "2018-01-16T23:24:16.851Z",
+      "version": 4
+    },
+    {
+      "attributes": {
+        "description": "",
+        "kibanaSavedObjectMeta": {
+          "searchSourceJSON": "{\n  \"filter\": [],\n  \"query\": {\n    \"query\": \"\",\n    \"language\": \"lucene\"\n  }\n}"
+        },
+        "savedSearchId": "e8734160-c24c-11e7-8692-232bd1143e8a",
+        "title": "Accept / Recvfrom Unique Address Table [Auditbeat Auditd]",
+        "uiStateJSON": "{\n  \"vis\": {\n    \"params\": {\n      \"sort\": {\n        \"columnIndex\": null,\n        \"direction\": null\n      }\n    }\n  },\n  \"spy\": {\n    \"mode\": {\n      \"name\": null,\n      \"fill\": false\n    }\n  }\n}",
+        "version": 1,
+        "visState": "{\n  \"title\": \"Accept / Recvfrom Unique Address Table [Auditbeat Auditd]\",\n  \"type\": \"table\",\n  \"params\": {\n    \"perPage\": 10,\n    \"showPartialRows\": false,\n    \"showMeticsAtAllLevels\": false,\n    \"sort\": {\n      \"columnIndex\": null,\n      \"direction\": null\n    },\n    \"showTotal\": false,\n    \"totalFunc\": \"sum\"\n  },\n  \"aggs\": [\n    {\n      \"id\": \"1\",\n      \"enabled\": true,\n      \"type\": \"cardinality\",\n      \"schema\": \"metric\",\n      \"params\": {\n        \"field\": \"auditd.summary.object.primary\",\n        \"customLabel\": \"Unique Addresses\"\n      }\n    },\n    {\n      \"id\": \"2\",\n      \"enabled\": true,\n      \"type\": \"terms\",\n      \"schema\": \"bucket\",\n      \"params\": {\n        \"field\": \"process.exe\",\n        \"size\": 50,\n        \"order\": \"desc\",\n        \"orderBy\": \"1\",\n        \"customLabel\": \"Exe\"\n      }\n    },\n    {\n      \"id\": \"3\",\n      \"enabled\": true,\n      \"type\": \"terms\",\n      \"schema\": \"bucket\",\n      \"params\": {\n        \"field\": \"auditd.data.syscall\",\n        \"size\": 5,\n        \"order\": \"desc\",\n        \"orderBy\": \"1\",\n        \"customLabel\": \"Syscall\"\n      }\n    }\n  ]\n}"
+      },
+      "id": "ceb91de0-c250-11e7-8692-232bd1143e8a",
+      "type": "visualization",
+      "updated_at": "2018-01-16T22:16:51.535Z",
+      "version": 5
+    },
+    {
+      "attributes": {
+        "description": "",
+        "kibanaSavedObjectMeta": {
+          "searchSourceJSON": "{}"
+        },
+        "title": "Socket Syscalls Time Series [Auditbeat Auditd]",
+        "uiStateJSON": "{}",
+        "version": 1,
+        "visState": "{\n  \"title\": \"Socket Syscalls Time Series [Auditbeat Auditd]\",\n  \"type\": \"metrics\",\n  \"params\": {\n    \"id\": \"61ca57f0-469d-11e7-af02-69e470af7417\",\n    \"type\": \"timeseries\",\n    \"series\": [\n      {\n        \"id\": \"61ca57f1-469d-11e7-af02-69e470af7417\",\n        \"color\": \"#68BC00\",\n        \"split_mode\": \"terms\",\n        \"metrics\": [\n          {\n            \"id\": \"61ca57f2-469d-11e7-af02-69e470af7417\",\n            \"type\": \"count\"\n          }\n        ],\n        \"seperate_axis\": 0,\n        \"axis_position\": \"right\",\n        \"formatter\": \"number\",\n        \"chart_type\": \"line\",\n        \"line_width\": 1,\n        \"point_size\": 1,\n        \"fill\": 0.5,\n        \"stacked\": \"none\",\n        \"terms_field\": \"auditd.data.syscall\",\n        \"label\": \"syscall\"\n      }\n    ],\n    \"time_field\": \"@timestamp\",\n    \"index_pattern\": \"auditbeat-*\",\n    \"interval\": \"auto\",\n    \"axis_position\": \"left\",\n    \"axis_formatter\": \"number\",\n    \"show_legend\": 1,\n    \"show_grid\": 1,\n    \"filter\": \"auditd.summary.object.type:socket\",\n    \"legend_position\": \"left\",\n    \"bar_color_rules\": [\n      {\n        \"id\": \"2cebb0c0-c252-11e7-8a68-93ffe9ec5950\"\n      }\n    ],\n    \"gauge_color_rules\": [\n      {\n        \"id\": \"6c891740-c252-11e7-8a68-93ffe9ec5950\"\n      }\n    ],\n    \"gauge_width\": 10,\n    \"gauge_inner_width\": 10,\n    \"gauge_style\": \"half\",\n    \"background_color_rules\": [\n      {\n        \"id\": \"95b603d0-c252-11e7-8a68-93ffe9ec5950\"\n      }\n    ]\n  },\n  \"aggs\": []\n}"
+      },
+      "id": "b21e0c70-c252-11e7-8692-232bd1143e8a",
+      "type": "visualization",
+      "updated_at": "2018-01-16T22:13:38.857Z",
+      "version": 3
+    },
+    {
+      "attributes": {
+        "description": "",
+        "kibanaSavedObjectMeta": {
+          "searchSourceJSON": "{\n  \"index\": \"auditbeat-*\",\n  \"filter\": [],\n  \"query\": {\n    \"query\": \"\",\n    \"language\": \"lucene\"\n  }\n}"
+        },
+        "title": "Socket Families [Auditbeat Auditd]",
+        "uiStateJSON": "{}",
+        "version": 1,
+        "visState": "{\n  \"title\": \"Socket Families [Auditbeat Auditd]\",\n  \"type\": \"pie\",\n  \"params\": {\n    \"type\": \"pie\",\n    \"addTooltip\": true,\n    \"addLegend\": true,\n    \"legendPosition\": \"left\",\n    \"isDonut\": true\n  },\n  \"aggs\": [\n    {\n      \"id\": \"1\",\n      \"enabled\": true,\n      \"type\": \"count\",\n      \"schema\": \"metric\",\n      \"params\": {}\n    },\n    {\n      \"id\": \"2\",\n      \"enabled\": true,\n      \"type\": \"terms\",\n      \"schema\": \"segment\",\n      \"params\": {\n        \"field\": \"auditd.data.socket.family\",\n        \"size\": 10,\n        \"order\": \"desc\",\n        \"orderBy\": \"1\",\n        \"customLabel\": \"Socket Family\"\n      }\n    },\n    {\n      \"id\": \"3\",\n      \"enabled\": true,\n      \"type\": \"terms\",\n      \"schema\": \"segment\",\n      \"params\": {\n        \"field\": \"auditd.data.syscall\",\n        \"size\": 10,\n        \"order\": \"desc\",\n        \"orderBy\": \"1\",\n        \"customLabel\": \"Syscall\"\n      }\n    }\n  ]\n}"
+      },
+      "id": "a8e20450-c256-11e7-8692-232bd1143e8a",
+      "type": "visualization",
+      "updated_at": "2018-01-16T22:12:51.655Z",
+      "version": 3
+    },
+    {
+      "attributes": {
+        "columns": [
+          "beat.hostname",
+          "auditd.summary.how",
+          "auditd.summary.object.primary",
+          "auditd.summary.object.secondary",
+          "auditd.data.socket.family",
+          "auditd.result"
+        ],
+        "description": "",
+        "hits": 0,
+        "kibanaSavedObjectMeta": {
+          "searchSourceJSON": "{\"index\":\"auditbeat-*\",\"highlightAll\":true,\"version\":true,\"query\":{\"language\":\"lucene\",\"query\":\"\"},\"filter\":[{\"$state\":{\"store\":\"appState\"},\"meta\":{\"alias\":null,\"disabled\":false,\"index\":\"auditbeat-*\",\"key\":\"event.module\",\"negate\":false,\"params\":{\"query\":\"auditd\",\"type\":\"phrase\"},\"type\":\"phrase\",\"value\":\"auditd\"},\"query\":{\"match\":{\"event.module\":{\"query\":\"auditd\",\"type\":\"phrase\"}}}},{\"meta\":{\"index\":\"auditbeat-*\",\"negate\":false,\"disabled\":false,\"alias\":null,\"type\":\"phrase\",\"key\":\"auditd.data.syscall\",\"value\":\"bind\",\"params\":{\"query\":\"bind\",\"type\":\"phrase\"}},\"query\":{\"match\":{\"auditd.data.syscall\":{\"query\":\"bind\",\"type\":\"phrase\"}}},\"$state\":{\"store\":\"appState\"}},{\"meta\":{\"negate\":true,\"index\":\"auditbeat-*\",\"type\":\"phrase\",\"key\":\"auditd.data.socket.family\",\"value\":\"netlink\",\"params\":{\"query\":\"netlink\",\"type\":\"phrase\"},\"disabled\":false,\"alias\":null},\"query\":{\"match\":{\"auditd.data.socket.family\":{\"query\":\"netlink\",\"type\":\"phrase\"}}},\"$state\":{\"store\":\"appState\"}}]}"
+        },
+        "sort": [
+          "@timestamp",
+          "desc"
+        ],
+        "title": "Socket Binds [Auditbeat Auditd]",
+        "version": 1
+      },
+      "id": "b4c93470-c240-11e7-8692-232bd1143e8a",
+      "type": "search",
+      "updated_at": "2018-01-16T23:05:58.935Z",
+      "version": 5
+    },
+    {
+      "attributes": {
+        "columns": [
+          "beat.hostname",
+          "auditd.summary.how",
+          "auditd.summary.object.primary",
+          "auditd.summary.object.secondary",
+          "auditd.data.socket.family",
+          "auditd.result",
+          "auditd.data.exit"
+        ],
+        "description": "",
+        "hits": 0,
+        "kibanaSavedObjectMeta": {
+          "searchSourceJSON": "{\"index\":\"auditbeat-*\",\"highlightAll\":true,\"version\":true,\"query\":{\"language\":\"lucene\",\"query\":\"\"},\"filter\":[{\"$state\":{\"store\":\"appState\"},\"meta\":{\"alias\":null,\"disabled\":false,\"index\":\"auditbeat-*\",\"key\":\"event.module\",\"negate\":false,\"params\":{\"query\":\"auditd\",\"type\":\"phrase\"},\"type\":\"phrase\",\"value\":\"auditd\"},\"query\":{\"match\":{\"event.module\":{\"query\":\"auditd\",\"type\":\"phrase\"}}}},{\"meta\":{\"negate\":false,\"index\":\"auditbeat-*\",\"type\":\"phrase\",\"key\":\"event.action\",\"value\":\"connected-to\",\"params\":{\"query\":\"connected-to\",\"type\":\"phrase\"},\"disabled\":false,\"alias\":null},\"query\":{\"match\":{\"event.action\":{\"query\":\"connected-to\",\"type\":\"phrase\"}}},\"$state\":{\"store\":\"appState\"}},{\"meta\":{\"index\":\"auditbeat-*\",\"negate\":false,\"disabled\":false,\"alias\":null,\"type\":\"exists\",\"key\":\"auditd.summary.object.primary\",\"value\":\"exists\"},\"exists\":{\"field\":\"auditd.summary.object.primary\"},\"$state\":{\"store\":\"appState\"}}]}"
+        },
+        "sort": [
+          "@timestamp",
+          "desc"
+        ],
+        "title": "Socket Connects [Auditbeat Auditd]",
+        "version": 1
+      },
+      "id": "5438b030-c246-11e7-8692-232bd1143e8a",
+      "type": "search",
+      "updated_at": "2018-01-16T23:09:43.937Z",
+      "version": 5
+    },
+    {
+      "attributes": {
+        "columns": [
+          "beat.hostname",
+          "auditd.summary.how",
+          "auditd.summary.object.primary",
+          "auditd.summary.object.secondary",
+          "auditd.data.socket.family",
+          "event.action"
+        ],
+        "description": "",
+        "hits": 0,
+        "kibanaSavedObjectMeta": {
+          "searchSourceJSON": "{\"index\":\"auditbeat-*\",\"highlightAll\":true,\"version\":true,\"query\":{\"language\":\"lucene\",\"query\":\"\"},\"filter\":[{\"$state\":{\"store\":\"appState\"},\"meta\":{\"alias\":null,\"disabled\":false,\"index\":\"auditbeat-*\",\"key\":\"event.module\",\"negate\":false,\"params\":{\"query\":\"auditd\",\"type\":\"phrase\"},\"type\":\"phrase\",\"value\":\"auditd\"},\"query\":{\"match\":{\"event.module\":{\"query\":\"auditd\",\"type\":\"phrase\"}}}},{\"meta\":{\"negate\":false,\"index\":\"auditbeat-*\",\"type\":\"phrase\",\"key\":\"auditd.summary.object.type\",\"value\":\"socket\",\"params\":{\"query\":\"socket\",\"type\":\"phrase\"},\"disabled\":false,\"alias\":null},\"query\":{\"match\":{\"auditd.summary.object.type\":{\"query\":\"socket\",\"type\":\"phrase\"}}},\"$state\":{\"store\":\"appState\"}},{\"meta\":{\"index\":\"auditbeat-*\",\"negate\":false,\"disabled\":false,\"alias\":null,\"type\":\"exists\",\"key\":\"auditd.summary.object.primary\",\"value\":\"exists\"},\"exists\":{\"field\":\"auditd.summary.object.primary\"},\"$state\":{\"store\":\"appState\"}},{\"query\":{\"terms\":{\"auditd.data.syscall\":[\"accept\",\"accept4\",\"recvfrom\",\"recvmsg\"]}},\"meta\":{\"negate\":false,\"index\":\"auditbeat-*\",\"disabled\":false,\"alias\":null,\"type\":\"custom\",\"key\":\"query\",\"value\":\"{\\\"terms\\\":{\\\"auditd.data.syscall\\\":[\\\"accept\\\",\\\"accept4\\\",\\\"recvfrom\\\",\\\"recvmsg\\\"]}}\"},\"$state\":{\"store\":\"appState\"}}]}"
+        },
+        "sort": [
+          "@timestamp",
+          "desc"
+        ],
+        "title": "Socket Accept / Recvfrom [Auditbeat Auditd]",
+        "version": 1
+      },
+      "id": "e8734160-c24c-11e7-8692-232bd1143e8a",
+      "type": "search",
+      "updated_at": "2018-01-16T23:20:51.403Z",
+      "version": 4
+    },
+    {
+      "attributes": {
+        "description": "Summary of socket related syscall events.",
+        "hits": 0,
+        "kibanaSavedObjectMeta": {
+          "searchSourceJSON": "{\"query\":{\"language\":\"lucene\",\"query\":\"*\"},\"filter\":[],\"highlightAll\":true,\"version\":true}"
+        },
+        "optionsJSON": "{\"darkTheme\":false,\"useMargins\":false}",
+        "panelsJSON": "[{\"embeddableConfig\":{\"vis\":{\"params\":{\"sort\":{\"columnIndex\":null,\"direction\":null}}}},\"gridData\":{\"h\":4,\"i\":\"1\",\"w\":6,\"x\":6,\"y\":3},\"id\":\"faf882f0-c242-11e7-8692-232bd1143e8a\",\"panelIndex\":\"1\",\"type\":\"visualization\",\"version\":\"7.0.0-alpha1-SNAPSHOT\"},{\"embeddableConfig\":{\"vis\":{\"params\":{\"sort\":{\"columnIndex\":null,\"direction\":null}}}},\"gridData\":{\"h\":5,\"i\":\"2\",\"w\":6,\"x\":0,\"y\":7},\"id\":\"ea483730-c246-11e7-8692-232bd1143e8a\",\"panelIndex\":\"2\",\"type\":\"visualization\",\"version\":\"7.0.0-alpha1-SNAPSHOT\"},{\"embeddableConfig\":{\"vis\":{\"params\":{\"sort\":{\"columnIndex\":null,\"direction\":null}}}},\"gridData\":{\"h\":5,\"i\":\"3\",\"w\":6,\"x\":6,\"y\":7},\"id\":\"ceb91de0-c250-11e7-8692-232bd1143e8a\",\"panelIndex\":\"3\",\"type\":\"visualization\",\"version\":\"7.0.0-alpha1-SNAPSHOT\"},{\"gridData\":{\"h\":3,\"i\":\"4\",\"w\":12,\"x\":0,\"y\":0},\"id\":\"b21e0c70-c252-11e7-8692-232bd1143e8a\",\"panelIndex\":\"4\",\"type\":\"visualization\",\"version\":\"7.0.0-alpha1-SNAPSHOT\"},{\"gridData\":{\"h\":4,\"i\":\"5\",\"w\":6,\"x\":0,\"y\":3},\"id\":\"a8e20450-c256-11e7-8692-232bd1143e8a\",\"panelIndex\":\"5\",\"type\":\"visualization\",\"version\":\"7.0.0-alpha1-SNAPSHOT\"}]",
+        "timeRestore": false,
+        "title": "[Auditbeat Auditd] Sockets",
+        "version": 1
+      },
+      "id": "693a5f40-c243-11e7-8692-232bd1143e8a",
+      "type": "dashboard",
+      "updated_at": "2018-01-16T23:24:37.521Z",
+      "version": 4
+    }
+  ],
+  "version": "7.0.0-alpha1-SNAPSHOT"
+}

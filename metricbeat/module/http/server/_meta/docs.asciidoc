@@ -1,3 +1,1 @@
-=== http server MetricSet
-
 This is the server metricset of the module http.

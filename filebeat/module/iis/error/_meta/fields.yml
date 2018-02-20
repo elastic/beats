@@ -1,0 +1,73 @@
+- name: error
+  type: group
+  description: >
+    Contains fields for IIS error logs.
+  fields:
+    - name: remote_ip
+      type: keyword
+      description: >
+        The client IP address.
+    - name: remote_port
+      type: long
+      description: >
+        The client port number.
+    - name: server_ip
+      type: keyword
+      description: >
+        The server IP address.
+    - name: server_port
+      type: long
+      description: >
+        The server port number.
+    - name: http_version
+      type: keyword
+      description: >
+        The HTTP version.
+    - name: method
+      type: keyword
+      example: GET
+      description: >
+        The request HTTP method.
+    - name: url
+      type: keyword
+      description: >
+        The request HTTP URL.
+    - name: response_code
+      type: long
+      description: >
+        The HTTP response code.
+    - name: reason_phrase
+      type: keyword
+      description: >
+        The HTTP reason phrase.
+    - name: queue_name
+      type: keyword
+      description: >
+        The IIS application pool name.
+    - name: geoip
+      type: group
+      description: >
+        Contains GeoIP information gathered based on the remote_ip field.
+        Only present if the GeoIP Elasticsearch plugin is available and
+        used.
+      fields:
+        - name: continent_name
+          type: keyword
+          description: >
+            The name of the continent.
+        - name: country_iso_code
+          type: keyword
+          description: >
+            Country ISO code.
+        - name: location
+          type: geo_point
+          description: >
+            The longitude and latitude.
+        - name: region_name
+          type: keyword
+          description: >
+            The region name.
+        - name: city_name
+          type: keyword
+          description: >
+            The city name.

@@ -147,9 +147,10 @@ func (c *composeProject) KillOld(except []string) error {
 	return nil
 }
 
-// Lock acquires the lock (30s) timeout
+// Lock acquires the lock (300s) timeout
+// Normally it should only be seconds that the lock is used, but in some cases it can take longer.
 func (c *composeProject) Lock() {
-	seconds := 30
+	seconds := 300
 	for seconds > 0 {
 		file, err := os.OpenFile(c.file+".lock", os.O_CREATE|os.O_EXCL, 0500)
 		file.Close()
@@ -163,7 +164,7 @@ func (c *composeProject) Lock() {
 	}
 
 	// This should rarely happen as we lock for start only, less than a second
-	panic(errors.New("Timeout waiting for lock, please remove docker-comose.yml.lock"))
+	panic(errors.New("Timeout waiting for lock, please remove docker-compose.yml.lock"))
 }
 
 func (c *composeProject) Unlock() {

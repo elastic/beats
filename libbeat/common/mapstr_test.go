@@ -3,10 +3,15 @@
 package common
 
 import (
+	"encoding/json"
 	"fmt"
+	"strings"
 	"testing"
 
 	"github.com/stretchr/testify/assert"
+	"go.uber.org/zap/zapcore"
+
+	"github.com/elastic/beats/libbeat/logp"
 )
 
 func TestMapStrUpdate(t *testing.T) {
@@ -54,6 +59,16 @@ func TestMapStrDeepUpdate(t *testing.T) {
 			MapStr{"a": MapStr{"b": 1}},
 			MapStr{"a": 1},
 			MapStr{"a": 1},
+		},
+		{
+			MapStr{"a.b": 1},
+			MapStr{"a": 1},
+			MapStr{"a": 1, "a.b": 1},
+		},
+		{
+			MapStr{"a": 1},
+			MapStr{"a.b": 1},
+			MapStr{"a": 1, "a.b": 1},
 		},
 	}
 
@@ -168,7 +183,9 @@ func TestHasKey(t *testing.T) {
 				"c31": 1,
 				"c32": 2,
 			},
+			"c4.f": 19,
 		},
+		"d.f": 1,
 	}
 
 	hasKey, err := m.HasKey("c.c2")
@@ -186,6 +203,14 @@ func TestHasKey(t *testing.T) {
 	hasKey, err = m.HasKey("dd")
 	assert.Equal(nil, err)
 	assert.Equal(false, hasKey)
+
+	hasKey, err = m.HasKey("d.f")
+	assert.Equal(nil, err)
+	assert.Equal(true, hasKey)
+
+	hasKey, err = m.HasKey("c.c4.f")
+	assert.Equal(nil, err)
+	assert.Equal(true, hasKey)
 }
 
 func TestMapStrPut(t *testing.T) {
@@ -219,6 +244,76 @@ func TestMapStrPut(t *testing.T) {
 	assert.NoError(t, err)
 	assert.Nil(t, v)
 	assert.Equal(t, MapStr{"subMap": MapStr{"newMap": MapStr{"a": 1}}}, m)
+}
+
+func TestMapStrGetValue(t *testing.T) {
+
+	tests := []struct {
+		input  MapStr
+		key    string
+		output interface{}
+		error  bool
+	}{
+		{
+			MapStr{"a": 1},
+			"a",
+			1,
+			false,
+		},
+		{
+			MapStr{"a": MapStr{"b": 1}},
+			"a",
+			MapStr{"b": 1},
+			false,
+		},
+		{
+			MapStr{"a": MapStr{"b": 1}},
+			"a.b",
+			1,
+			false,
+		},
+		{
+			MapStr{"a": MapStr{"b.c": 1}},
+			"a",
+			MapStr{"b.c": 1},
+			false,
+		},
+		{
+			MapStr{"a": MapStr{"b.c": 1}},
+			"a.b",
+			nil,
+			true,
+		},
+		{
+			MapStr{"a.b": MapStr{"c": 1}},
+			"a.b",
+			MapStr{"c": 1},
+			false,
+		},
+		{
+			MapStr{"a.b": MapStr{"c": 1}},
+			"a.b.c",
+			nil,
+			true,
+		},
+		{
+			MapStr{"a": MapStr{"b.c": 1}},
+			"a.b.c",
+			1,
+			false,
+		},
+	}
+
+	for _, test := range tests {
+		v, err := test.input.GetValue(test.key)
+		if test.error {
+			assert.Error(t, err)
+		} else {
+			assert.NoError(t, err)
+		}
+		assert.Equal(t, test.output, v)
+
+	}
 }
 
 func TestClone(t *testing.T) {
@@ -500,4 +595,142 @@ func BenchmarkMapStrFlatten(b *testing.B) {
 	for i := 0; i < b.N; i++ {
 		_ = m.Flatten()
 	}
+}
+
+// Ensure the MapStr is marshaled in logs the same way it is by json.Marshal.
+func TestMapStrJSONLog(t *testing.T) {
+	logp.DevelopmentSetup(logp.ToObserverOutput())
+
+	m := MapStr{
+		"test": 15,
+		"hello": MapStr{
+			"world": MapStr{
+				"ok": "test",
+			},
+		},
+		"elastic": MapStr{
+			"for": "search",
+		},
+	}
+
+	data, err := json.Marshal(MapStr{"m": m})
+	if err != nil {
+		t.Fatal(err)
+	}
+	expectedJSON := string(data)
+
+	logp.NewLogger("test").Infow("msg", "m", m)
+	logs := logp.ObserverLogs().TakeAll()
+	if assert.Len(t, logs, 1) {
+		log := logs[0]
+
+		// Encode like zap does.
+		e := zapcore.NewJSONEncoder(zapcore.EncoderConfig{})
+		buf, err := e.EncodeEntry(log.Entry, log.Context)
+		if err != nil {
+			t.Fatal(err)
+		}
+
+		// Zap adds a newline to end the JSON object.
+		actualJSON := strings.TrimSpace(buf.String())
+
+		assert.Equal(t, string(expectedJSON), actualJSON)
+	}
+}
+
+func BenchmarkMapStrLogging(b *testing.B) {
+	logp.DevelopmentSetup(logp.ToDiscardOutput())
+	logger := logp.NewLogger("benchtest")
+
+	m := MapStr{
+		"test": 15,
+		"hello": MapStr{
+			"world": MapStr{
+				"ok": "test",
+			},
+		},
+		"elastic": MapStr{
+			"for": "search",
+		},
+	}
+
+	b.ResetTimer()
+	for i := 0; i < b.N; i++ {
+		logger.Infow("test", "mapstr", m)
+	}
+}
+
+func BenchmarkWalkMap(b *testing.B) {
+
+	globalM := MapStr{
+		"hello": MapStr{
+			"world": MapStr{
+				"ok": "test",
+			},
+		},
+	}
+
+	b.Run("Get", func(b *testing.B) {
+		b.ResetTimer()
+
+		for i := 0; i < b.N; i++ {
+			globalM.GetValue("test.world.ok")
+		}
+	})
+
+	b.Run("Put", func(b *testing.B) {
+		b.ResetTimer()
+		for i := 0; i < b.N; i++ {
+			m := MapStr{
+				"hello": MapStr{
+					"world": MapStr{
+						"ok": "test",
+					},
+				},
+			}
+
+			m.Put("hello.world.new", 17)
+		}
+	})
+
+	b.Run("PutMissing", func(b *testing.B) {
+		b.ResetTimer()
+		for i := 0; i < b.N; i++ {
+			m := MapStr{}
+
+			m.Put("a.b.c", 17)
+		}
+	})
+
+	b.Run("HasKey", func(b *testing.B) {
+		b.ResetTimer()
+
+		for i := 0; i < b.N; i++ {
+			globalM.HasKey("hello.world.ok")
+			globalM.HasKey("hello.world.no_ok")
+		}
+	})
+
+	b.Run("HasKeyFirst", func(b *testing.B) {
+		b.ResetTimer()
+
+		for i := 0; i < b.N; i++ {
+			globalM.HasKey("hello")
+		}
+	})
+
+	b.Run("Delete", func(b *testing.B) {
+		b.ResetTimer()
+
+		for i := 0; i < b.N; i++ {
+			m := MapStr{
+				"hello": MapStr{
+					"world": MapStr{
+						"ok": "test",
+					},
+				},
+			}
+			m.Put("hello.world.test", 17)
+		}
+	})
 }

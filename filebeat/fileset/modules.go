@@ -133,7 +133,7 @@ func mcfgFromConfig(cfg *common.Config) (*ModuleConfig, error) {
 
 	err = cfg.Unpack(&dict)
 	if err != nil {
-		return nil, fmt.Errorf("Error unpacking module %s in a dict: %v", mcfg.Module, err)
+		return nil, fmt.Errorf("error unpacking module %s in a dict: %v", mcfg.Module, err)
 	}
 
 	mcfg.Filesets = map[string]*FilesetConfig{}
@@ -142,17 +142,16 @@ func mcfgFromConfig(cfg *common.Config) (*ModuleConfig, error) {
 			continue
 		}
 
-		var fcfg FilesetConfig
 		tmpCfg, err := common.NewConfigFrom(filesetConfig)
 		if err != nil {
-			return nil, fmt.Errorf("Error creating config from fileset %s/%s: %v", mcfg.Module, name, err)
+			return nil, fmt.Errorf("error creating config from fileset %s/%s: %v", mcfg.Module, name, err)
 		}
-		err = tmpCfg.Unpack(&fcfg)
-		if err != nil {
-			return nil, fmt.Errorf("Error unpacking fileset %s/%s: %v", mcfg.Module, name, err)
-		}
-		mcfg.Filesets[name] = &fcfg
 
+		fcfg, err := NewFilesetConfig(tmpCfg)
+		if err != nil {
+			return nil, fmt.Errorf("error creating config from fileset %s/%s: %v", mcfg.Module, name, err)
+		}
+		mcfg.Filesets[name] = fcfg
 	}
 
 	return &mcfg, nil
@@ -204,13 +203,12 @@ func applyOverrides(fcfg *FilesetConfig,
 		return nil, fmt.Errorf("Error merging configs: %v", err)
 	}
 
-	var res FilesetConfig
-	err = resultConfig.Unpack(&res)
+	res, err := NewFilesetConfig(resultConfig)
 	if err != nil {
 		return nil, fmt.Errorf("Error unpacking configs: %v", err)
 	}
 
-	return &res, nil
+	return res, nil
 }
 
 // appendWithoutDuplicates appends basic module configuration for each module in the
@@ -238,11 +236,11 @@ func appendWithoutDuplicates(moduleConfigs []*ModuleConfig, modules []string) ([
 	return moduleConfigs, nil
 }
 
-func (reg *ModuleRegistry) GetProspectorConfigs() ([]*common.Config, error) {
+func (reg *ModuleRegistry) GetInputConfigs() ([]*common.Config, error) {
 	result := []*common.Config{}
 	for module, filesets := range reg.registry {
 		for name, fileset := range filesets {
-			fcfg, err := fileset.getProspectorConfig()
+			fcfg, err := fileset.getInputConfig()
 			if err != nil {
 				return result, fmt.Errorf("Error getting config for fielset %s/%s: %v",
 					module, name, err)
@@ -278,7 +276,7 @@ func (reg *ModuleRegistry) LoadPipelines(esClient PipelineLoader) error {
 				}
 			}
 
-			pipelineID, content, err := fileset.GetPipeline()
+			pipelineID, content, err := fileset.GetPipeline(esClient.GetVersion())
 			if err != nil {
 				return fmt.Errorf("Error getting pipeline for fileset %s/%s: %v", module, name, err)
 			}

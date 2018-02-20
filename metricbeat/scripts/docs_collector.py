@@ -32,19 +32,31 @@ This file is generated! See scripts/docs_collector.py
         os.mkdir(os.path.abspath("docs") + "/modules/" + module)
 
         module_file = generated_note
+        beat_path = path + "/" + module + "/_meta"
+
+        # Load module fields.yml
+        module_fields = ""
+        with open(beat_path + "/fields.yml") as f:
+            module_fields = yaml.load(f.read())
+            module_fields = module_fields[0]
+
+        title = module_fields["title"]
+
         module_file += "[[metricbeat-module-" + module + "]]\n"
+
+        module_file += "== {} module\n\n".format(title)
+
+        release = get_release(module_fields)
+        if release != "ga":
+            module_file += "{}[]\n\n".format(release)
 
         with open(module_doc) as f:
             module_file += f.read()
 
-        beat_path = path + "/" + module + "/_meta"
-
-        # Load title from fields.yml
-        with open(beat_path + "/fields.yml") as f:
-            fields = yaml.load(f.read())
-            title = fields[0]["title"]
-
-        modules_list[module] = title
+        modules_list[module] = {}
+        modules_list[module]["title"] = title
+        modules_list[module]["release"] = release
+        modules_list[module]["metricsets"] = {}
 
         config_file = beat_path + "/config.yml"
 
@@ -71,6 +83,10 @@ in <<configuration-metricbeat>>. Here is an example configuration:
 
             module_file += "----\n\n"
 
+        # HTTP helper
+        if 'ssl' in get_settings(module_fields):
+            module_file += "This module supports TLS connection when using `ssl` config field, as described in <<configuration-ssl>>.\n\n"
+
         # Add metricsets title as below each metricset adds its link
         module_file += "[float]\n"
         module_file += "=== Metricsets\n\n"
@@ -82,15 +98,21 @@ in <<configuration-metricbeat>>. Here is an example configuration:
         # Iterate over all metricsets
         for metricset in sorted(os.listdir(base_dir + "/" + module)):
 
-            metricset_docs = path + "/" + module + "/" + metricset + "/_meta/docs.asciidoc"
+            metricset_meta = path + "/" + module + "/" + metricset + "/_meta"
+            metricset_docs = metricset_meta + "/docs.asciidoc"
+            metricset_fields_path = metricset_meta + "/fields.yml"
 
-            # Only check folders where fields.yml exists
+            # Only check folders where docs.asciidoc exists
             if os.path.isfile(metricset_docs) == False:
                 continue
 
             link_name = "metricbeat-metricset-" + module + "-" + metricset
             link = "<<" + link_name + "," + metricset + ">>"
             reference = "[[" + link_name + "]]"
+
+            modules_list[module]["metricsets"][metricset] = {}
+            modules_list[module]["metricsets"][metricset]["title"] = metricset
+            modules_list[module]["metricsets"][metricset]["link"] = link
 
             module_links += "* " + link + "\n\n"
 
@@ -100,6 +122,23 @@ in <<configuration-metricbeat>>. Here is an example configuration:
 
             # Add reference to metricset file and include file
             metricset_file += reference + "\n"
+
+            metricset_fields = ""
+            with open(metricset_fields_path) as f:
+                metricset_fields = yaml.load(f.read())
+                metricset_fields = metricset_fields[0]
+
+            # Read local fields.yml
+            # create title out of module and metricset set name
+            # Add relase fag
+            metricset_file += "=== {} {} metricset\n\n".format(title, metricset)
+
+            release = get_release(metricset_fields)
+            if release != "ga":
+                metricset_file += "{}[]\n\n".format(get_release(metricset_fields))
+
+            modules_list[module]["metricsets"][metricset]["release"] = release
+
             metricset_file += 'include::../../../module/' + module + '/' + metricset + '/_meta/docs.asciidoc[]' + "\n"
 
             # TODO: This should point directly to the exported fields of the metricset, not the whole module
@@ -136,16 +175,56 @@ For a description of each field in the metricset, see the
             f.write(module_file)
 
     module_list_output = generated_note
-    for m, title in sorted(six.iteritems(modules_list)):
-        module_list_output += "  * <<metricbeat-module-" + m + "," + title + ">>\n"
+
+    module_list_output += '[options="header"]\n'
+    module_list_output += '|========================\n'
+    module_list_output += '|Modules   |Metricsets   \n'
+
+    for key, m in sorted(six.iteritems(modules_list)):
+
+        release_label = ""
+        if m["release"] != "ga":
+            release_label = m["release"] + "[]"
+
+        module_list_output += '|{} {}   |{}    \n'.format("<<metricbeat-module-" +
+                                                          key + "," + m["title"] + ">> ", release_label, "")
+
+        # Make sure empty entry row spans over all metricset rows for this module
+        module_list_output += '.{}+|   '.format(len(m["metricsets"]))
+
+        for key, ms in sorted(six.iteritems(m["metricsets"])):
+
+            release_label = ""
+            if ms["release"] != "ga":
+                release_label = ms["release"] + "[]"
+
+            module_list_output += '|{} {}  \n'.format(ms["link"], release_label)
+
+    module_list_output += '|================================'
 
     module_list_output += "\n\n--\n\n"
-    for m, title in sorted(six.iteritems(modules_list)):
-        module_list_output += "include::modules/" + m + ".asciidoc[]\n"
+    for key, m in sorted(six.iteritems(modules_list)):
+        module_list_output += "include::modules/" + key + ".asciidoc[]\n"
 
     # Write module link list
     with open(os.path.abspath("docs") + "/modules_list.asciidoc", 'w') as f:
         f.write(module_list_output)
+
+
+def get_release(fields):
+    # Fetch release flag from fields. Default if not set is experimental
+    release = "experimental"
+    if "release" in fields:
+        release = fields["release"]
+        if release not in ["experimental", "beta", "ga"]:
+            raise Exception("Invalid release config: {}".format(release))
+
+    return release
+
+
+def get_settings(fields):
+    # Get the list of common settings flags
+    return fields.get('settings', [])
 
 
 if __name__ == "__main__":

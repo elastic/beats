@@ -31,7 +31,7 @@ func ExampleWrapper() {
 	}
 
 	// Create a new Wrapper based on the configuration.
-	m, err := module.NewWrapper(0, config, mb.Registry)
+	m, err := module.NewWrapper(config, mb.Registry, module.WithMetricSetInfo())
 	if err != nil {
 		fmt.Println("Error:", err)
 		return
@@ -47,8 +47,7 @@ func ExampleWrapper() {
 	go func() {
 		defer wg.Done()
 		for event := range output {
-			// Make rtt a constant so that the output is constant.
-			event.Fields["metricset"].(common.MapStr)["rtt"] = 111
+			event.Fields.Put("metricset.rtt", 111)
 
 			output, err := encodeEvent(event)
 			if err == nil {
@@ -104,12 +103,12 @@ func ExampleRunner() {
 	}
 
 	// Create a new Wrapper based on the configuration.
-	m, err := module.NewWrapper(0, config, mb.Registry)
+	m, err := module.NewWrapper(config, mb.Registry, module.WithMetricSetInfo())
 	if err != nil {
 		return
 	}
 
-	connector, err := module.NewConnector(b.Publisher, config)
+	connector, err := module.NewConnector(b.Publisher, config, nil)
 	if err != nil {
 		return
 	}

@@ -3,6 +3,8 @@ This file is generated! See scripts/docs_collector.py
 ////
 
 [[metricbeat-metricset-kubernetes-node]]
+=== Kubernetes node metricset
+
 include::../../../module/kubernetes/node/_meta/docs.asciidoc[]
 
 

@@ -3,6 +3,8 @@
   description: >
     Golang module
   short_config: false
+  release: experimental
+  settings: ["ssl"]
   fields:
     - name: golang
       type: group

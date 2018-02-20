@@ -3,7 +3,9 @@ This file is generated! See scripts/docs_collector.py
 ////
 
 [[metricbeat-module-graphite]]
-== graphite Module
+== Graphite module
+
+beta[]
 
 This is the graphite Module.
 
@@ -12,7 +14,7 @@ This is the graphite Module.
 [float]
 === Example configuration
 
-The graphite module supports the standard configuration options that are described
+The Graphite module supports the standard configuration options that are described
 in <<configuration-metricbeat>>. Here is an example configuration:
 
 [source,yaml]

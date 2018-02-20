@@ -1,9 +1,9 @@
 - key: elasticsearch
   title: "Elasticsearch"
   description: >
-    experimental[]
-
     Elasticsearch module
+  release: beta
+  settings: ["ssl"]
   short_config: false
   fields:
     - name: elasticsearch

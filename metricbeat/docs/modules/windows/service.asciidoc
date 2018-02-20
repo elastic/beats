@@ -3,6 +3,10 @@ This file is generated! See scripts/docs_collector.py
 ////
 
 [[metricbeat-metricset-windows-service]]
+=== Windows service metricset
+
+beta[]
+
 include::../../../module/windows/service/_meta/docs.asciidoc[]
 
 

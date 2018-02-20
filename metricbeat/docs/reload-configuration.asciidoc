@@ -29,7 +29,7 @@ definitions. For example:
 - module: system
   metricsets: ["cpu"]
   enabled: false
-  perdiod: 1s
+  period: 1s
 
 - module: system
   metricsets: ["network"]
@@ -41,8 +41,6 @@ definitions. For example:
 include::../../libbeat/docs/shared-note-file-permissions.asciidoc[]
 
 === Live reloading
-
-beta[]
 
 You can configure Metricbeat to dynamically reload configuration files when
 there are changes. To do this, you specify a path
@@ -73,7 +71,7 @@ metricbeat.config.modules:
 +
 This setting must point to the `modules.d` directory if you want to use the
 <<modules-command,`modules`>> command to enable and disable module
-configurations. 
+configurations.
 
 `reload.enabled`:: When set to `true`, enables dynamic config reload.
 

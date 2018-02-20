@@ -3,6 +3,8 @@
   description: >
     Apache HTTPD server metricsets collected from the Apache web server.
   short_config: false
+  release: ga
+  settings: ["ssl"]
   fields:
     - name: apache
       type: group

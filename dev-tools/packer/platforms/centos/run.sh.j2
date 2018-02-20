@@ -17,6 +17,9 @@ if [ "$SNAPSHOT" = "yes" ]; then
     VERSION="${VERSION}-SNAPSHOT"
 fi
 
+BEATS_YML_NAME="{{.beat_name}}-linux-{{.arch}}"
+[ -f "${BEATS_YML_NAME}.yml" ] || BEATS_YML_NAME="{{.beat_name}}-linux"
+
 # fpm replaces - with _ in the version
 RPM_VERSION=`echo ${VERSION} | sed 's/-/_/g'`
 
@@ -35,8 +38,8 @@ FPM_ARGS=(
         homedir/=/usr/share/{{.beat_name}}
         beatname-${RUNID}.sh=/usr/bin/{{.beat_name}}
         {{.beat_name}}-linux-{{.arch}}=/usr/share/{{.beat_name}}/bin/{{.beat_name}}
-        {{.beat_name}}-linux.yml=/etc/{{.beat_name}}/{{.beat_name}}.yml
-        {{.beat_name}}-linux.reference.yml=/etc/{{.beat_name}}/{{.beat_name}}.reference.yml
+        ${BEATS_YML_NAME}.yml=/etc/{{.beat_name}}/{{.beat_name}}.yml
+        ${BEATS_YML_NAME}.reference.yml=/etc/{{.beat_name}}/{{.beat_name}}.reference.yml
         fields.yml=/etc/{{.beat_name}}/fields.yml
         ${RUNID}.service=/lib/systemd/system/{{.beat_pkg_name}}.service
         god-linux-{{.arch}}=/usr/share/{{.beat_name}}/bin/{{.beat_name}}-god
@@ -53,7 +56,7 @@ mkdir -p upload
 mv {{.beat_pkg_name}}-${RPM_VERSION}-1.{{.rpm_arch}}.rpm upload/{{.beat_name}}-${VERSION}-{{.rpm_arch}}.rpm
 echo "Created upload/{{.beat_name}}-${VERSION}-{{.rpm_arch}}.rpm"
 
-# create sha1 file
+# create sha512 file
 cd upload
-sha1sum {{.beat_name}}-${VERSION}-{{.rpm_arch}}.rpm | awk '{print $1;}' > {{.beat_name}}-${VERSION}-{{.rpm_arch}}.rpm.sha1
-echo "Created upload/{{.beat_name}}-${VERSION}-{{.rpm_arch}}.rpm.sha1"
+sha512sum {{.beat_name}}-${VERSION}-{{.rpm_arch}}.rpm > {{.beat_name}}-${VERSION}-{{.rpm_arch}}.rpm.sha512
+echo "Created upload/{{.beat_name}}-${VERSION}-{{.rpm_arch}}.rpm.sha512"

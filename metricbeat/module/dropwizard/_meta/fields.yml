@@ -1,9 +1,9 @@
 - key: dropwizard
   title: "Dropwizard"
   description: >
-    beta[]
-
     Stats collected from Dropwizard.
+  release: beta
+  settings: ["ssl"]
   short_config: false
   fields:
     - name: dropwizard

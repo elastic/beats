@@ -168,7 +168,18 @@ func (es *Connection) DeletePipeline(
 // SearchURI executes a search request using a URI by providing request parameters.
 // Implements: http://www.elastic.co/guide/en/elasticsearch/reference/current/search-uri-request.html
 func (es *Connection) SearchURI(index string, docType string, params map[string]string) (int, *SearchResults, error) {
-	status, resp, err := es.apiCall("GET", index, docType, "_search", "", params, nil)
+	return es.SearchURIWithBody(index, docType, params, nil)
+}
+
+// SearchURIWithBody executes a search request using a URI by providing request
+// parameters and a request body.
+func (es *Connection) SearchURIWithBody(
+	index string,
+	docType string,
+	params map[string]string,
+	body interface{},
+) (int, *SearchResults, error) {
+	status, resp, err := es.apiCall("GET", index, docType, "_search", "", params, body)
 	if err != nil {
 		return status, nil, err
 	}

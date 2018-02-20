@@ -3,6 +3,7 @@
 package common
 
 import (
+	"bytes"
 	"errors"
 	"testing"
 
@@ -218,4 +219,23 @@ func TestReadString(t *testing.T) {
 		assert.Equal(t, test.Err, err)
 		assert.Equal(t, test.Output, res)
 	}
+}
+
+func TestRandomBytesLength(t *testing.T) {
+	r1, _ := RandomBytes(5)
+	assert.Equal(t, len(r1), 5)
+
+	r2, _ := RandomBytes(4)
+	assert.Equal(t, len(r2), 4)
+	assert.NotEqual(t, string(r1[:]), string(r2[:]))
+}
+
+func TestRandomBytes(t *testing.T) {
+	v1, err := RandomBytes(10)
+	assert.NoError(t, err)
+	v2, err := RandomBytes(10)
+	assert.NoError(t, err)
+
+	// unlikely to get 2 times the same results
+	assert.False(t, bytes.Equal(v1, v2))
 }

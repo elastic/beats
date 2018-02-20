@@ -25,6 +25,8 @@ var (
 	errExpectedArray            = errors.New("expected array")
 	errExpectedObject           = errors.New("expected object")
 	errExpectedObjectValue      = errors.New("expected object value")
+	errExpectedObjectClose      = errors.New("missing object close")
+	errInlineAndOmitEmpty       = errors.New("inline and omitempty must not be set at the same time")
 )
 
 func errTODO() error {

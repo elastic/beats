@@ -33,6 +33,7 @@ grouped in the following categories:
 * <<exported-fields-kibana>>
 * <<exported-fields-kubernetes-processor>>
 * <<exported-fields-kubernetes>>
+* <<exported-fields-logstash>>
 * <<exported-fields-memcached>>
 * <<exported-fields-mongodb>>
 * <<exported-fields-mysql>>
@@ -43,6 +44,7 @@ grouped in the following categories:
 * <<exported-fields-rabbitmq>>
 * <<exported-fields-redis>>
 * <<exported-fields-system>>
+* <<exported-fields-uwsgi>>
 * <<exported-fields-vsphere>>
 * <<exported-fields-windows>>
 * <<exported-fields-zookeeper>>
@@ -51,7 +53,6 @@ grouped in the following categories:
 [[exported-fields-aerospike]]
 == Aerospike fields
 
-experimental[]
 Aerospike module
 
 
@@ -770,7 +771,6 @@ Error type.
 [[exported-fields-ceph]]
 == Ceph fields
 
-beta[]
 Ceph module
 
 
@@ -1193,6 +1193,85 @@ Last updated
 
 
 [float]
+== osd_df fields
+
+ceph osd disk usage information
+
+
+
+[float]
+=== `ceph.osd_df.id`
+
+type: long
+
+osd node id
+
+
+[float]
+=== `ceph.osd_df.name`
+
+type: text
+
+osd node name
+
+
+[float]
+=== `ceph.osd_df.device_class`
+
+type: keyword
+
+osd node type, illegal type include hdd, ssd etc.
+
+
+[float]
+=== `ceph.osd_df.total.byte`
+
+type: long
+
+format: bytes
+
+osd disk total volume
+
+
+[float]
+=== `ceph.osd_df.used.byte`
+
+type: long
+
+format: bytes
+
+osd disk usage volume
+
+
+[float]
+=== `ceph.osd_df.available.bytes`
+
+type: long
+
+format: bytes
+
+osd disk available volume
+
+
+[float]
+=== `ceph.osd_df.pg_num`
+
+type: long
+
+shows how many pg located on this osd
+
+
+[float]
+=== `ceph.osd_df.used.pct`
+
+type: scaled_float
+
+format: percent
+
+osd disk usage percentage
+
+
+[float]
 == osd_tree fields
 
 ceph osd tree info
@@ -1236,7 +1315,7 @@ osd or bucket node typeID
 
 type: text
 
-bucket children list, seperate by comma.
+bucket children list, separated by comma.
 
 
 [float]
@@ -1469,13 +1548,12 @@ example: metricsets
 
 required: True
 
-The document type. Always set to "metricsets".
+The document type. Always set to "doc".
 
 
 [[exported-fields-couchbase]]
 == Couchbase fields
 
-beta[]
 Metrics collected from Couchbase servers.
 
 
@@ -1935,7 +2013,6 @@ Number of items/documents that are replicas.
 [[exported-fields-docker-processor]]
 == Docker fields
 
-beta[]
 Docker stats collected from Docker.
 
 
@@ -1976,7 +2053,6 @@ Image labels.
 [[exported-fields-docker]]
 == Docker fields
 
-beta[]
 Docker stats collected from Docker.
 
 
@@ -2300,7 +2376,6 @@ Image tags.
 [float]
 == info fields
 
-beta[]
 Info metrics based on https://docs.docker.com/engine/reference/api/docker_remote_api_v1.24/#/display-system-wide-information.
 
 
@@ -2549,7 +2624,6 @@ Total number of outgoing packets.
 [[exported-fields-dropwizard]]
 == Dropwizard fields
 
-beta[]
 Stats collected from Dropwizard.
 
 
@@ -2559,10 +2633,10 @@ Stats collected from Dropwizard.
 
 
 
+
 [[exported-fields-elasticsearch]]
 == Elasticsearch fields
 
-experimental[]
 Elasticsearch module
 
 
@@ -2945,7 +3019,6 @@ format: bytes
 [[exported-fields-etcd]]
 == Etcd fields
 
-[]experimental
 etcd Module
 
 
@@ -3382,7 +3455,7 @@ Total bytes obtained from system (sum of XxxSys below).
 
 
 [float]
-=== `golang.heap.system.optained`
+=== `golang.heap.system.obtained`
 
 type: long
 
@@ -3483,9 +3556,8 @@ Bytes in non-idle span.
 
 
 [[exported-fields-graphite]]
-== graphite fields
+== Graphite fields
 
-[]experimental
 graphite Module
 
 
@@ -4140,7 +4212,7 @@ Total number of HTTP requests received.
 
 type: long
 
-Number of response errors. This value includes the number of data transfers aborted by the server (haproxy.stat.server.aborted).  Some other errors are:
+Number of response errors. This value includes the number of data transfers aborted by the server (haproxy.stat.server.aborted). Some other errors are:
 * write errors on the client socket (won't be counted for the server stat) * failure applying filters to the response
 
 
@@ -4385,7 +4457,7 @@ Number of data transfers aborted by the server. This value is included in haprox
 
 type: integer
 
-Number of backend servers that are active, meaning that they are healthy and can receive requests from the load balancer. 
+Number of backend servers that are active, meaning that they are healthy and can receive requests from the load balancer.
 
 
 [float]
@@ -4588,7 +4660,6 @@ server
 [[exported-fields-jolokia]]
 == Jolokia fields
 
-beta[]
 Jolokia module
 
 
@@ -4599,11 +4670,11 @@ Jolokia module
 jolokia contains metrics exposed via jolokia agent
 
 
+
 [[exported-fields-kafka]]
 == Kafka fields
 
 Kafka module
-beta[]
 
 
 
@@ -4834,7 +4905,6 @@ Broker address
 [[exported-fields-kibana]]
 == Kibana fields
 
-experimental[]
 Kibana module
 
 
@@ -4925,7 +4995,6 @@ Total number of connections.
 [[exported-fields-kubernetes-processor]]
 == Kubernetes fields
 
-beta[]
 Kubernetes metadata added by the kubernetes processor
 
 
@@ -4945,6 +5014,14 @@ Kubernetes pod name
 type: keyword
 
 Kubernetes namespace
+
+
+[float]
+=== `kubernetes.node.name`
+
+type: keyword
+
+Kubernetes node name
 
 
 [float]
@@ -4982,7 +5059,6 @@ Kubernetes container image
 [[exported-fields-kubernetes]]
 == Kubernetes fields
 
-beta[]
 Kubernetes metrics
 
 
@@ -5032,6 +5108,26 @@ Container CPU Core usage nanoseconds
 type: long
 
 CPU used nanocores
+
+
+[float]
+=== `kubernetes.container.cpu.usage.node.pct`
+
+type: scaled_float
+
+format: percentage
+
+CPU usage as a percentage of the total node allocatable CPU
+
+
+[float]
+=== `kubernetes.container.cpu.usage.limit.pct`
+
+type: scaled_float
+
+format: percentage
+
+CPU usage as a percentage of the defined limit for the container (or total node allocatable CPU if unlimited)
 
 
 [float]
@@ -5120,6 +5216,26 @@ type: long
 format: bytes
 
 Total memory usage
+
+
+[float]
+=== `kubernetes.container.memory.usage.node.pct`
+
+type: scaled_float
+
+format: percentage
+
+Memory usage as a percentage of the total node allocatable memory
+
+
+[float]
+=== `kubernetes.container.memory.usage.limit.pct`
+
+type: scaled_float
+
+format: percentage
+
+Memory usage as a percentage of the defined limit for the container (or total node allocatable memory if unlimited)
 
 
 
@@ -5350,14 +5466,6 @@ UUID version of the object
 
 kubernetes node metrics
 
-
-
-[float]
-=== `kubernetes.node.name`
-
-type: keyword
-
-Node name
 
 
 [float]
@@ -5642,6 +5750,74 @@ Tx errors
 
 
 [float]
+== cpu fields
+
+CPU usage metrics
+
+
+
+
+[float]
+=== `kubernetes.pod.cpu.usage.nanocores`
+
+type: long
+
+CPU used nanocores
+
+
+[float]
+=== `kubernetes.pod.cpu.usage.node.pct`
+
+type: scaled_float
+
+format: percentage
+
+CPU usage as a percentage of the total node CPU
+
+
+[float]
+=== `kubernetes.pod.cpu.usage.limit.pct`
+
+type: scaled_float
+
+format: percentage
+
+CPU usage as a percentage of the defined limit for the pod containers (or total node CPU if unlimited)
+
+
+
+
+[float]
+=== `kubernetes.pod.memory.usage.bytes`
+
+type: long
+
+format: bytes
+
+Total memory usage
+
+
+[float]
+=== `kubernetes.pod.memory.usage.node.pct`
+
+type: scaled_float
+
+format: percentage
+
+Memory usage as a percentage of the total node allocatable memory
+
+
+[float]
+=== `kubernetes.pod.memory.usage.limit.pct`
+
+type: scaled_float
+
+format: percentage
+
+Memory usage as a percentage of the defined limit for the pod containers (or total node allocatable memory if unlimited)
+
+
+[float]
 == container fields
 
 kubernetes container metrics
@@ -5808,7 +5984,7 @@ Node unschedulable status
 [float]
 === `kubernetes.node.cpu.allocatable.cores`
 
-type: long
+type: float
 
 Node CPU allocatable cores
 
@@ -5973,6 +6149,75 @@ The generation observed by the ReplicaSet controller
 type: long
 
 The number of fully labeled replicas per ReplicaSet
+
+
+[float]
+== statefulset fields
+
+kubernetes stateful set metrics
+
+
+
+[float]
+=== `kubernetes.statefulset.name`
+
+type: keyword
+
+Kubernetes stateful set name
+
+
+[float]
+=== `kubernetes.statefulset.created`
+
+type: long
+
+The creation timestamp (epoch) for StatefulSet
+
+
+[float]
+== replicas fields
+
+Kubernetes stateful set replicas status
+
+
+
+[float]
+=== `kubernetes.statefulset.replicas.observed`
+
+type: long
+
+The number of observed replicas per StatefulSet
+
+
+[float]
+=== `kubernetes.statefulset.replicas.desired`
+
+type: long
+
+The number of desired replicas per StatefulSet
+
+
+[float]
+== generation fields
+
+Kubernetes stateful set generation information
+
+
+
+[float]
+=== `kubernetes.statefulset.generation.observed`
+
+type: long
+
+The observed generation per StatefulSet
+
+
+[float]
+=== `kubernetes.statefulset.generation.desired`
+
+type: long
+
+The desired generation per StatefulSet
 
 
 [float]
@@ -6147,10 +6392,106 @@ type: long
 Total inodes
 
 
+[[exported-fields-logstash]]
+== Logstash fields
+
+Logstash module
+
+
+
+[float]
+== logstash fields
+
+
+
+
+[float]
+== node fields
+
+node
+
+
+
+[float]
+=== `logstash.node.host`
+
+type: keyword
+
+Host name
+
+
+[float]
+=== `logstash.node.version`
+
+type: keyword
+
+Logstash Version
+
+
+[float]
+== jvm fields
+
+JVM Info
+
+
+
+[float]
+=== `logstash.node.jvm.version`
+
+type: keyword
+
+Version
+
+
+[float]
+=== `logstash.node.jvm.pid`
+
+type: long
+
+Pid
+
+
+[float]
+== node_stats fields
+
+node_stats metrics.
+
+
+
+[float]
+== events fields
+
+Events stats
+
+
+
+[float]
+=== `logstash.node_stats.events.in`
+
+type: long
+
+Incoming events counter.
+
+
+[float]
+=== `logstash.node_stats.events.out`
+
+type: long
+
+Outgoing events counter.
+
+
+[float]
+=== `logstash.node_stats.events.filtered`
+
+type: long
+
+Filtered events counter.
+
+
 [[exported-fields-memcached]]
 == Memcached fields
 
-beta[]
 Memcached module
 
 
@@ -6292,6 +6633,182 @@ Metrics collected from MongoDB servers.
 
 MongoDB metrics.
 
+
+
+[float]
+== collstats fields
+
+MongoDB collection statistics metrics.
+
+
+
+[float]
+=== `mongodb.collstats.db`
+
+type: keyword
+
+Database name.
+
+
+[float]
+=== `mongodb.collstats.collection`
+
+type: keyword
+
+Collection name.
+
+
+[float]
+=== `mongodb.collstats.name`
+
+type: keyword
+
+Combination of database and collection name.
+
+
+[float]
+=== `mongodb.collstats.total.time.us`
+
+type: long
+
+Total waiting time for locks in microseconds.
+
+
+[float]
+=== `mongodb.collstats.total.count`
+
+type: long
+
+Total number of lock wait events.
+
+
+
+[float]
+=== `mongodb.collstats.lock.read.time.us`
+
+type: long
+
+Time waiting for read locks in microseconds.
+
+
+[float]
+=== `mongodb.collstats.lock.read.count`
+
+type: long
+
+Number of read lock wait events.
+
+
+[float]
+=== `mongodb.collstats.lock.write.time.us`
+
+type: long
+
+Time waiting for write locks in microseconds.
+
+
+[float]
+=== `mongodb.collstats.lock.write.count`
+
+type: long
+
+Number of write lock wait events.
+
+
+[float]
+=== `mongodb.collstats.queries.time.us`
+
+type: long
+
+Time running queries in microseconds.
+
+
+[float]
+=== `mongodb.collstats.queries.count`
+
+type: long
+
+Number of queries executed.
+
+
+[float]
+=== `mongodb.collstats.getmore.time.us`
+
+type: long
+
+Time asking for more cursor rows in microseconds.
+
+
+[float]
+=== `mongodb.collstats.getmore.count`
+
+type: long
+
+Number of times a cursor asked for more data.
+
+
+[float]
+=== `mongodb.collstats.insert.time.us`
+
+type: long
+
+Time inserting new documents in microseconds.
+
+
+[float]
+=== `mongodb.collstats.insert.count`
+
+type: long
+
+Number of document insert events.
+
+
+[float]
+=== `mongodb.collstats.update.time.us`
+
+type: long
+
+Time updating documents in microseconds.
+
+
+[float]
+=== `mongodb.collstats.update.count`
+
+type: long
+
+Number of document update events.
+
+
+[float]
+=== `mongodb.collstats.remove.time.us`
+
+type: long
+
+Time deleting documents in microseconds.
+
+
+[float]
+=== `mongodb.collstats.remove.count`
+
+type: long
+
+Number of document delete events.
+
+
+[float]
+=== `mongodb.collstats.commands.time.us`
+
+type: long
+
+Time executing database commands in microseconds.
+
+
+[float]
+=== `mongodb.collstats.commands.count`
+
+type: long
+
+Number of database commands executed.
 
 
 [float]
@@ -8014,7 +8531,6 @@ Time at which these statistics were last reset.
 [[exported-fields-prometheus]]
 == Prometheus fields
 
-beta[]
 Stats collected from Prometheus.
 
 
@@ -8074,7 +8590,6 @@ Number of memory chunks that are not yet persisted to disk.
 [[exported-fields-rabbitmq]]
 == RabbitMQ fields
 
-experimental[]
 RabbitMQ module
 
 
@@ -8261,7 +8776,7 @@ type: long
 
 format: bytes
 
-Point at which the memory alarm will go off. 
+Point at which the memory alarm will go off.
 
 
 [float]
@@ -8269,7 +8784,7 @@ Point at which the memory alarm will go off.
 
 type: long
 
-Memory used in bytes. 
+Memory used in bytes.
 
 
 [float]
@@ -8293,7 +8808,7 @@ Number of Mnesia transactions which have been performed that did not require wri
 
 type: long
 
-Number of messages which have been read from the message store. 
+Number of messages which have been read from the message store.
 
 
 [float]
@@ -8301,7 +8816,7 @@ Number of messages which have been read from the message store.
 
 type: long
 
-Number of messages which have been written to the message store. 
+Number of messages which have been written to the message store.
 
 
 [float]
@@ -8349,7 +8864,7 @@ Number of records written to the queue index journal.
 
 type: long
 
-Number of records read from the queue index. 
+Number of records read from the queue index.
 
 
 [float]
@@ -8357,7 +8872,7 @@ Number of records read from the queue index.
 
 type: long
 
-Number of records written to the queue index. 
+Number of records written to the queue index.
 
 
 [float]
@@ -8365,7 +8880,7 @@ Number of records written to the queue index.
 
 type: long
 
-Average number of Erlang processes waiting to run. 
+Average number of Erlang processes waiting to run.
 
 
 [float]
@@ -8373,7 +8888,7 @@ Average number of Erlang processes waiting to run.
 
 type: long
 
-File descriptors available for use as sockets. 
+File descriptors available for use as sockets.
 
 
 [float]
@@ -9554,6 +10069,14 @@ The percentage of CPU time spent in non-idle state.
 
 
 [float]
+=== `system.cpu.total.value`
+
+type: long
+
+The value of CPU usage since starting the process.
+
+
+[float]
 === `system.cpu.user.ticks`
 
 type: long
@@ -9775,7 +10298,7 @@ The average queue length of the requests that were issued to the device.
 
 type: float
 
-The average queue length of the requests that were issued to the device.
+The average time spent for requests issued to the device to be served.
 
 
 [float]
@@ -10317,6 +10840,14 @@ CPU-specific statistics per process.
 type: long
 
 The amount of CPU time the process spent in user space.
+
+
+[float]
+=== `system.process.cpu.total.value`
+
+type: long
+
+The value of CPU usage since starting the process.
 
 
 [float]
@@ -11025,6 +11556,61 @@ Number of processes for which the state couldn't be retrieved or is unknown.
 
 
 [float]
+== raid fields
+
+raid
+
+
+
+[float]
+=== `system.raid.name`
+
+type: keyword
+
+Name of the device.
+
+
+[float]
+=== `system.raid.activity_state`
+
+type: keyword
+
+activity-state of the device.
+
+
+[float]
+=== `system.raid.disks.active`
+
+type: long
+
+Number of active disks.
+
+
+[float]
+=== `system.raid.disks.total`
+
+type: long
+
+Total number of disks the device consists of.
+
+
+[float]
+=== `system.raid.blocks.total`
+
+type: long
+
+Number of blocks the device holds.
+
+
+[float]
+=== `system.raid.blocks.synced`
+
+type: long
+
+Number of blocks on the device that are in sync.
+
+
+[float]
 == socket fields
 
 TCP sockets that are active.
@@ -11183,6 +11769,258 @@ format: duration
 The OS uptime in milliseconds.
 
 
+[[exported-fields-uwsgi]]
+== uwsgi fields
+
+uwsgi module
+
+
+
+[float]
+== uwsgi fields
+
+
+
+
+[float]
+== status fields
+
+uwsgi.status metricset fields
+
+
+
+[float]
+=== `uwsgi.status.total.requests`
+
+type: long
+
+Total requests handled
+
+
+[float]
+=== `uwsgi.status.total.exceptions`
+
+type: long
+
+Total exceptions
+
+
+[float]
+=== `uwsgi.status.total.write_errors`
+
+type: long
+
+Total requests write errors
+
+
+[float]
+=== `uwsgi.status.total.read_errors`
+
+type: long
+
+Total read errors
+
+
+[float]
+=== `uwsgi.status.total.pid`
+
+type: long
+
+Process id
+
+
+[float]
+=== `uwsgi.status.worker.id`
+
+type: long
+
+Worker id
+
+
+[float]
+=== `uwsgi.status.worker.pid`
+
+type: long
+
+Worker process id
+
+
+[float]
+=== `uwsgi.status.worker.accepting`
+
+type: long
+
+State of worker, 1 if still accepting new requests otherwise 0
+
+
+[float]
+=== `uwsgi.status.worker.requests`
+
+type: long
+
+Number of requests served by this worker
+
+
+[float]
+=== `uwsgi.status.worker.delta_requests`
+
+type: long
+
+Number of requests served by this worker after worker is reloaded when reached MAX_REQUESTS
+
+
+[float]
+=== `uwsgi.status.worker.exceptions`
+
+type: long
+
+Exceptions raised
+
+
+[float]
+=== `uwsgi.status.worker.harakiri_count`
+
+type: long
+
+Dropped requests by timeout
+
+
+[float]
+=== `uwsgi.status.worker.signals`
+
+type: long
+
+Emitted signals count
+
+
+[float]
+=== `uwsgi.status.worker.signal_queue`
+
+type: long
+
+Number of signals waiting to be handled
+
+
+[float]
+=== `uwsgi.status.worker.status`
+
+type: keyword
+
+Worker status (cheap, pause, sig, busy, idle)
+
+
+[float]
+=== `uwsgi.status.worker.rss`
+
+type: keyword
+
+Resident Set Size. memory currently used by a process. if always zero try `--memory-report` option of uwsgi
+
+
+[float]
+=== `uwsgi.status.worker.vsz`
+
+type: long
+
+Virtual Set Size. memory size assigned to a process. if always zero try `--memory-report` option of uwsgi
+
+
+[float]
+=== `uwsgi.status.worker.running_time`
+
+type: long
+
+Process running time
+
+
+[float]
+=== `uwsgi.status.worker.respawn_count`
+
+type: long
+
+Respawn count
+
+
+[float]
+=== `uwsgi.status.worker.tx`
+
+type: long
+
+Transmitted size
+
+
+[float]
+=== `uwsgi.status.worker.avg_rt`
+
+type: long
+
+Average response time
+
+
+[float]
+=== `uwsgi.status.core.id`
+
+type: long
+
+worker ID
+
+
+[float]
+=== `uwsgi.status.core.worker_pid`
+
+type: long
+
+Parent worker PID
+
+
+[float]
+=== `uwsgi.status.core.requests.total`
+
+type: long
+
+Number of total requests served
+
+
+[float]
+=== `uwsgi.status.core.requests.static`
+
+type: long
+
+Number of static file serves
+
+
+[float]
+=== `uwsgi.status.core.requests.routed`
+
+type: long
+
+Routed requests
+
+
+[float]
+=== `uwsgi.status.core.requests.offloaded`
+
+type: long
+
+Offloaded requests
+
+
+[float]
+=== `uwsgi.status.core.write_errors`
+
+type: long
+
+Number of failed writes
+
+
+[float]
+=== `uwsgi.status.core.read_errors`
+
+type: long
+
+Number of failed reads
+
+
 [[exported-fields-vsphere]]
 == vSphere fields
 
@@ -11201,14 +12039,6 @@ vSphere module
 
 datastore
 
-
-
-[float]
-=== `vsphere.datastore.datacenter`
-
-type: keyword
-
-Datacenter name
 
 
 [float]
@@ -11275,14 +12105,6 @@ host
 
 
 [float]
-=== `vsphere.host.datacenter`
-
-type: keyword
-
-Datacenter name
-
-
-[float]
 === `vsphere.host.name`
 
 type: keyword
@@ -11345,6 +12167,14 @@ Free Memory in bytes
 
 
 [float]
+=== `vsphere.host.network_names`
+
+type: keyword
+
+Network names
+
+
+[float]
 == virtualmachine fields
 
 virtualmachine
@@ -11352,11 +12182,11 @@ virtualmachine
 
 
 [float]
-=== `vsphere.virtualmachine.datacenter`
+=== `vsphere.virtualmachine.host`
 
 type: keyword
 
-Datacenter name
+Host name
 
 
 [float]
@@ -11420,7 +12250,15 @@ Free Memory of Guest in bytes
 
 type: object
 
-Custom fields      
+Custom fields
+
+
+[float]
+=== `vsphere.virtualmachine.network_names`
+
+type: keyword
+
+Network names
 
 
 [[exported-fields-windows]]
@@ -11439,24 +12277,26 @@ beta[] Module for Windows
 [float]
 == service fields
 
-`service` contains the status for windows services.
+`service` contains the status for Windows services.
 
 
 
 [float]
-=== `windows.service.uptime.ms`
+=== `windows.service.id`
 
-type: long
+type: keyword
 
-format: duration
+example: hW3NJFc1Ap
 
-`uptime` contains the service uptime metric.
+A unique ID for the service. It is a hash of the machine's GUID and the service name.
 
 
 [float]
 === `windows.service.name`
 
 type: keyword
+
+example: Wecsvc
 
 The service name.
 
@@ -11466,6 +12306,8 @@ The service name.
 
 type: keyword
 
+example: Windows Event Collector
+
 The display name of the service.
 
 
@@ -11474,7 +12316,7 @@ The display name of the service.
 
 type: keyword
 
-The start type of the service. The possible values are `ServiceAutoStart`, `ServiceBootStart`, `ServiceDemandStart`, `ServiceDisabled`, and `ServiceSystemStart`.
+The startup type of the service. The possible values are `Automatic`, `Boot`, `Disabled`, `Manual`, and `System`.
 
 
 [float]
@@ -11482,7 +12324,35 @@ The start type of the service. The possible values are `ServiceAutoStart`, `Serv
 
 type: keyword
 
-The actual state of the service. The possible values are `ServiceContinuePending`, `ServicePausePending`, `ServicePaused`, `ServiceRunning`, `ServiceStartPending`, `ServiceStopPending`, and `ServiceStopped`.
+The actual state of the service. The possible values are `Continuing`, `Pausing`, `Paused`, `Running`, `Starting`, `Stopping`, and `Stopped`.
+
+
+[float]
+=== `windows.service.exit_code`
+
+type: keyword
+
+For `Stopped` services this is the error code that service reports when starting to stopping. This will be the generic Windows service error code unless the service provides a service-specific error code.
+
+
+[float]
+=== `windows.service.pid`
+
+type: long
+
+example: 1092
+
+For `Running` services this is the associated process PID.
+
+
+[float]
+=== `windows.service.uptime.ms`
+
+type: long
+
+format: duration
+
+The service's uptime specified in milliseconds.
 
 
 [[exported-fields-zookeeper]]

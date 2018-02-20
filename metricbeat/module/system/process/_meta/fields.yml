@@ -2,6 +2,7 @@
   type: group
   description: >
     `process` contains process metadata, CPU metrics, and memory metrics.
+  release: ga
   fields:
     - name: name
       type: keyword
@@ -55,6 +56,10 @@
           type: long
           description: >
             The amount of CPU time the process spent in user space.
+        - name: total.value
+          type: long
+          description: >
+            The value of CPU usage since starting the process.
         - name: total.pct
           type: scaled_float
           format: percent

@@ -421,6 +421,22 @@ packetbeat.protocols:
   # incoming responses, but sent to Elasticsearch immediately.
   #transaction_timeout: 10s
 
+- type: tls
+  # Enable TLS monitoring. Default: true
+  #enabled: true
+
+  # Configure the ports where to listen for TLS traffic. You can disable
+  # the TLS protocol by commenting out the list of ports.
+  ports: [443]
+
+  # If this option is enabled, the client and server certificates and
+  # certificate chains are sent to Elasticsearch. The default is true.
+  #send_certificates: true
+
+  # If this option is enabled, the raw certificates will be stored
+  # in PEM format under the `raw` key. The default is false.
+  #include_raw_certificates: false
+
 #=========================== Monitored processes ==============================
 
 # Configure the processes to be monitored and how to find them. If a process is

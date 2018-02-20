@@ -18,11 +18,14 @@ grouped in the following categories:
 * <<exported-fields-cloud>>
 * <<exported-fields-docker-processor>>
 * <<exported-fields-icinga>>
+* <<exported-fields-iis>>
 * <<exported-fields-kafka>>
 * <<exported-fields-kubernetes-processor>>
 * <<exported-fields-log>>
+* <<exported-fields-logstash>>
 * <<exported-fields-mysql>>
 * <<exported-fields-nginx>>
+* <<exported-fields-osquery>>
 * <<exported-fields-postgresql>>
 * <<exported-fields-redis>>
 * <<exported-fields-system>>
@@ -607,7 +610,6 @@ Region in which this host is running.
 [[exported-fields-docker-processor]]
 == Docker fields
 
-beta[]
 Docker stats collected from Docker.
 
 
@@ -751,6 +753,457 @@ type: text
 The logged message.
 
 
+[[exported-fields-iis]]
+== IIS fields
+
+Module for parsing IIS log files.
+
+
+
+[float]
+== iis fields
+
+Fields from IIS log files.
+
+
+
+[float]
+== access fields
+
+Contains fields for IIS access logs.
+
+
+
+[float]
+=== `iis.access.server_ip`
+
+type: keyword
+
+The server IP address.
+
+
+[float]
+=== `iis.access.method`
+
+type: keyword
+
+example: GET
+
+The request HTTP method.
+
+
+[float]
+=== `iis.access.url`
+
+type: keyword
+
+The request HTTP URL.
+
+
+[float]
+=== `iis.access.query_string`
+
+type: keyword
+
+The request query string, if any.
+
+
+[float]
+=== `iis.access.port`
+
+type: long
+
+The request port number.
+
+
+[float]
+=== `iis.access.user_name`
+
+type: keyword
+
+The user name used when basic authentication is used.
+
+
+[float]
+=== `iis.access.remote_ip`
+
+type: keyword
+
+The client IP address.
+
+
+[float]
+=== `iis.access.referrer`
+
+type: keyword
+
+The HTTP referrer.
+
+
+[float]
+=== `iis.access.response_code`
+
+type: long
+
+The HTTP response code.
+
+
+[float]
+=== `iis.access.sub_status`
+
+type: long
+
+The HTTP substatus code.
+
+
+[float]
+=== `iis.access.win32_status`
+
+type: long
+
+The Windows status code.
+
+
+[float]
+=== `iis.access.request_time_ms`
+
+type: long
+
+The request time in milliseconds.
+
+
+[float]
+=== `iis.access.site_name`
+
+type: keyword
+
+The site name and instance number.
+
+
+[float]
+=== `iis.access.server_name`
+
+type: keyword
+
+The name of the server on which the log file entry was generated.
+
+
+[float]
+=== `iis.access.http_version`
+
+type: keyword
+
+The HTTP version.
+
+
+[float]
+=== `iis.access.cookie`
+
+type: keyword
+
+The content of the cookie sent or received, if any.
+
+
+[float]
+=== `iis.access.hostname`
+
+type: keyword
+
+The host header name, if any.
+
+
+[float]
+=== `iis.access.body_sent.bytes`
+
+type: long
+
+format: bytes
+
+The number of bytes of the server response body.
+
+
+[float]
+=== `iis.access.body_received.bytes`
+
+type: long
+
+format: bytes
+
+The number of bytes of the server request body.
+
+
+[float]
+=== `iis.access.agent`
+
+type: text
+
+Contains the un-parsed user agent string. Only present if the user agent Elasticsearch plugin is not available or not used.
+
+
+[float]
+== user_agent fields
+
+Contains the parsed user agent field. Only present if the user agent Elasticsearch plugin is available and used.
+
+
+
+[float]
+=== `iis.access.user_agent.device`
+
+type: keyword
+
+The name of the physical device.
+
+
+[float]
+=== `iis.access.user_agent.major`
+
+type: long
+
+The major version of the user agent.
+
+
+[float]
+=== `iis.access.user_agent.minor`
+
+type: long
+
+The minor version of the user agent.
+
+
+[float]
+=== `iis.access.user_agent.patch`
+
+type: keyword
+
+The patch version of the user agent.
+
+
+[float]
+=== `iis.access.user_agent.name`
+
+type: keyword
+
+example: Chrome
+
+The name of the user agent.
+
+
+[float]
+=== `iis.access.user_agent.os`
+
+type: keyword
+
+The name of the operating system.
+
+
+[float]
+=== `iis.access.user_agent.os_major`
+
+type: long
+
+The major version of the operating system.
+
+
+[float]
+=== `iis.access.user_agent.os_minor`
+
+type: long
+
+The minor version of the operating system.
+
+
+[float]
+=== `iis.access.user_agent.os_name`
+
+type: keyword
+
+The name of the operating system.
+
+
+[float]
+== geoip fields
+
+Contains GeoIP information gathered based on the remote_ip field. Only present if the GeoIP Elasticsearch plugin is available and used.
+
+
+
+[float]
+=== `iis.access.geoip.continent_name`
+
+type: keyword
+
+The name of the continent.
+
+
+[float]
+=== `iis.access.geoip.country_iso_code`
+
+type: keyword
+
+Country ISO code.
+
+
+[float]
+=== `iis.access.geoip.location`
+
+type: geo_point
+
+The longitude and latitude.
+
+
+[float]
+=== `iis.access.geoip.region_name`
+
+type: keyword
+
+The region name.
+
+
+[float]
+=== `iis.access.geoip.city_name`
+
+type: keyword
+
+The city name.
+
+
+[float]
+== error fields
+
+Contains fields for IIS error logs.
+
+
+
+[float]
+=== `iis.error.remote_ip`
+
+type: keyword
+
+The client IP address.
+
+
+[float]
+=== `iis.error.remote_port`
+
+type: long
+
+The client port number.
+
+
+[float]
+=== `iis.error.server_ip`
+
+type: keyword
+
+The server IP address.
+
+
+[float]
+=== `iis.error.server_port`
+
+type: long
+
+The server port number.
+
+
+[float]
+=== `iis.error.http_version`
+
+type: keyword
+
+The HTTP version.
+
+
+[float]
+=== `iis.error.method`
+
+type: keyword
+
+example: GET
+
+The request HTTP method.
+
+
+[float]
+=== `iis.error.url`
+
+type: keyword
+
+The request HTTP URL.
+
+
+[float]
+=== `iis.error.response_code`
+
+type: long
+
+The HTTP response code.
+
+
+[float]
+=== `iis.error.reason_phrase`
+
+type: keyword
+
+The HTTP reason phrase.
+
+
+[float]
+=== `iis.error.queue_name`
+
+type: keyword
+
+The IIS application pool name.
+
+
+[float]
+== geoip fields
+
+Contains GeoIP information gathered based on the remote_ip field. Only present if the GeoIP Elasticsearch plugin is available and used.
+
+
+
+[float]
+=== `iis.error.geoip.continent_name`
+
+type: keyword
+
+The name of the continent.
+
+
+[float]
+=== `iis.error.geoip.country_iso_code`
+
+type: keyword
+
+Country ISO code.
+
+
+[float]
+=== `iis.error.geoip.location`
+
+type: geo_point
+
+The longitude and latitude.
+
+
+[float]
+=== `iis.error.geoip.region_name`
+
+type: keyword
+
+The region name.
+
+
+[float]
+=== `iis.error.geoip.city_name`
+
+type: keyword
+
+The city name.
+
+
 [[exported-fields-kafka]]
 == Kafka fields
 
@@ -843,7 +1296,6 @@ The full trace in the log line.
 [[exported-fields-kubernetes-processor]]
 == Kubernetes fields
 
-beta[]
 Kubernetes metadata added by the kubernetes processor
 
 
@@ -863,6 +1315,14 @@ Kubernetes pod name
 type: keyword
 
 Kubernetes namespace
+
+
+[float]
+=== `kubernetes.node.name`
+
+type: keyword
+
+Kubernetes node name
 
 
 [float]
@@ -935,11 +1395,29 @@ The content of the line read from the log file.
 
 
 [float]
+=== `stream`
+
+type: keyword
+
+required: False
+
+Log stream when reading container logs, can be 'stdout' or 'stderr'
+
+
+[float]
 === `prospector.type`
 
 required: True
 
-The prospector type from which the event was generated. This field is set to the value specified for the `type` option in the prospector section of the Filebeat config file.
+The input type from which the event was generated. This field is set to the value specified for the `type` option in the input section of the Filebeat config file. (DEPRECATED: see `input.type`)
+
+
+[float]
+=== `input.type`
+
+required: True
+
+The input type from which the event was generated. This field is set to the value specified for the `type` option in the input section of the Filebeat config file.
 
 
 [float]
@@ -958,6 +1436,161 @@ The Filebeat module that generated this event.
 === `fileset.name`
 
 The Filebeat fileset that generated this event.
+
+
+[[exported-fields-logstash]]
+== logstash fields
+
+logstash Module
+
+
+
+[float]
+== logstash fields
+
+
+
+
+[float]
+== log fields
+
+Fields from the Logstash logs.
+
+
+
+[float]
+=== `logstash.log.message`
+
+type: text
+
+Contains the un-parsed log message
+
+
+[float]
+=== `logstash.log.level`
+
+type: keyword
+
+The log level of the message, this correspond to Log4j levels.
+
+
+[float]
+=== `logstash.log.module`
+
+type: keyword
+
+The module or class where the event originate.
+
+
+[float]
+=== `logstash.log.thread`
+
+type: text
+
+Information about the running thread where the log originate.
+
+
+[float]
+=== `logstash.log.log_event`
+
+type: object
+
+key and value debugging information.
+
+
+[float]
+== slowlog fields
+
+slowlog
+
+
+
+[float]
+=== `logstash.slowlog.message`
+
+type: text
+
+Contains the un-parsed log message
+
+
+[float]
+=== `logstash.slowlog.level`
+
+type: keyword
+
+The log level of the message, this correspond to Log4j levels.
+
+
+[float]
+=== `logstash.slowlog.module`
+
+type: keyword
+
+The module or class where the event originate.
+
+
+[float]
+=== `logstash.slowlog.thread`
+
+type: text
+
+Information about the running thread where the log originate.
+
+
+[float]
+=== `logstash.slowlog.event`
+
+type: text
+
+Raw dump of the original event
+
+
+[float]
+=== `logstash.slowlog.plugin_name`
+
+type: keyword
+
+Name of the plugin
+
+
+[float]
+=== `logstash.slowlog.plugin_type`
+
+type: keyword
+
+Type of the plugin: Inputs, Filters, Outputs or Codecs.
+
+
+[float]
+=== `logstash.slowlog.took_in_millis`
+
+type: long
+
+Execution time for the plugin in milliseconds.
+
+
+[float]
+=== `logstash.slowlog.took_in_nanos`
+
+type: long
+
+Execution time for the plugin in nanoseconds.
+
+
+[float]
+=== `logstash.slowlog.plugin_params`
+
+type: text
+
+String value of the plugin configuration
+
+
+[float]
+=== `logstash.slowlog.plugin_params_object`
+
+type: object
+
+key -> value of the configuration used by the plugin.
 
 
 [[exported-fields-mysql]]
@@ -1367,6 +2000,64 @@ Connection identifier.
 type: text
 
 The error message
+
+
+[[exported-fields-osquery]]
+== Osquery fields
+
+Fields exported by the `osquery` module
+
+
+
+[float]
+== osquery fields
+
+
+
+
+[float]
+== result fields
+
+Common fields exported by the result metricset.
+
+
+
+[float]
+=== `osquery.result.name`
+
+type: keyword
+
+The name of the query that generated this event.
+
+
+[float]
+=== `osquery.result.action`
+
+type: keyword
+
+For incremental data, marks whether the entry was added or removed. It can be one of "added", "removed", or "snapshot".
+
+
+[float]
+=== `osquery.result.host_identifier`
+
+type: keyword
+
+The identifier for the host on which the osquery agent is running. Normally the hostname.
+
+
+[float]
+=== `osquery.result.unix_time`
+
+type: long
+
+Unix timestamp of the event, in seconds since the epoch. Used for computing the `@timestamp` column.
+
+
+[float]
+=== `osquery.result.calendar_time`
+
+String representation of the collection time, as formatted by osquery.
 
 
 [[exported-fields-postgresql]]

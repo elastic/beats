@@ -21,8 +21,9 @@ type RangeValue struct {
 }
 
 type EqualsValue struct {
-	Int uint64
-	Str string
+	Int  uint64
+	Str  string
+	Bool bool
 }
 
 type Condition struct {
@@ -40,6 +41,12 @@ type Condition struct {
 type WhenProcessor struct {
 	condition *Condition
 	p         Processor
+}
+
+// ValuesMap provides a common interface to read fields for condition checking
+type ValuesMap interface {
+	// GetValue returns the given field from the map
+	GetValue(string) (interface{}, error)
 }
 
 func NewConditional(
@@ -112,13 +119,22 @@ func (c *Condition) setEquals(cfg *ConditionFields) error {
 		uintValue, err := extractInt(value)
 		if err == nil {
 			c.equals[field] = EqualsValue{Int: uintValue}
-		} else {
-			sValue, err := extractString(value)
-			if err != nil {
-				return err
-			}
-			c.equals[field] = EqualsValue{Str: sValue}
+			continue
 		}
+
+		sValue, err := extractString(value)
+		if err == nil {
+			c.equals[field] = EqualsValue{Str: sValue}
+			continue
+		}
+
+		bValue, err := extractBool(value)
+		if err == nil {
+			c.equals[field] = EqualsValue{Bool: bValue}
+			continue
+		}
+
+		return fmt.Errorf("unexpected type %T in equals condition", value)
 	}
 
 	return nil
@@ -195,7 +211,7 @@ func (c *Condition) setRange(cfg *ConditionFields) error {
 	return nil
 }
 
-func (c *Condition) Check(event *beat.Event) bool {
+func (c *Condition) Check(event ValuesMap) bool {
 	if len(c.or) > 0 {
 		return c.checkOR(event)
 	}
@@ -213,7 +229,7 @@ func (c *Condition) Check(event *beat.Event) bool {
 		c.checkRange(event)
 }
 
-func (c *Condition) checkOR(event *beat.Event) bool {
+func (c *Condition) checkOR(event ValuesMap) bool {
 	for _, cond := range c.or {
 		if cond.Check(event) {
 			return true
@@ -222,7 +238,7 @@ func (c *Condition) checkOR(event *beat.Event) bool {
 	return false
 }
 
-func (c *Condition) checkAND(event *beat.Event) bool {
+func (c *Condition) checkAND(event ValuesMap) bool {
 	for _, cond := range c.and {
 		if !cond.Check(event) {
 			return false
@@ -231,14 +247,14 @@ func (c *Condition) checkAND(event *beat.Event) bool {
 	return true
 }
 
-func (c *Condition) checkNOT(event *beat.Event) bool {
+func (c *Condition) checkNOT(event ValuesMap) bool {
 	if c.not.Check(event) {
 		return false
 	}
 	return true
 }
 
-func (c *Condition) checkEquals(event *beat.Event) bool {
+func (c *Condition) checkEquals(event ValuesMap) bool {
 	for field, equalValue := range c.equals {
 
 		value, err := event.GetValue(field)
@@ -251,22 +267,36 @@ func (c *Condition) checkEquals(event *beat.Event) bool {
 			if intValue != equalValue.Int {
 				return false
 			}
-		} else {
-			sValue, err := extractString(value)
-			if err != nil {
-				logp.Warn("unexpected type %T in equals condition as it accepts only integers and strings. ", value)
-				return false
-			}
+
+			continue
+		}
+
+		sValue, err := extractString(value)
+		if err == nil {
 			if sValue != equalValue.Str {
 				return false
 			}
+
+			continue
 		}
+
+		bValue, err := extractBool(value)
+		if err == nil {
+			if bValue != equalValue.Bool {
+				return false
+			}
+
+			continue
+		}
+
+		logp.Err("unexpected type %T in equals condition as it accepts only integers, strings or bools. ", value)
+		return false
 	}
 
 	return true
 }
 
-func (c *Condition) checkMatches(event *beat.Event) bool {
+func (c *Condition) checkMatches(event ValuesMap) bool {
 	matchers := c.matches.filters
 	if matchers == nil {
 		return true
@@ -305,7 +335,7 @@ func (c *Condition) checkMatches(event *beat.Event) bool {
 	return true
 }
 
-func (c *Condition) checkRange(event *beat.Event) bool {
+func (c *Condition) checkRange(event ValuesMap) bool {
 	checkValue := func(value float64, rangeValue RangeValue) bool {
 
 		if rangeValue.gte != nil {

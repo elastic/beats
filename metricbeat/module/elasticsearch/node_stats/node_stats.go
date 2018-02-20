@@ -2,6 +2,7 @@ package node_stats
 
 import (
 	"github.com/elastic/beats/libbeat/common"
+	"github.com/elastic/beats/libbeat/common/cfgwarn"
 	"github.com/elastic/beats/metricbeat/helper"
 	"github.com/elastic/beats/metricbeat/mb"
 	"github.com/elastic/beats/metricbeat/mb/parse"
@@ -32,9 +33,15 @@ type MetricSet struct {
 
 // New create a new instance of the MetricSet
 func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
+	cfgwarn.Beta("The elasticsearch node_stats metricset is beta")
+
+	http, err := helper.NewHTTP(base)
+	if err != nil {
+		return nil, err
+	}
 	return &MetricSet{
 		base,
-		helper.NewHTTP(base),
+		http,
 	}, nil
 }
 

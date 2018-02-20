@@ -24,6 +24,7 @@ services:
       - ./module/kafka/_meta/env
       - ./module/kibana/_meta/env
       - ./module/kubernetes/_meta/env
+      - ./module/logstash/_meta/env
       - ./module/memcached/_meta/env
       - ./module/mongodb/_meta/env
       - ./module/mysql/_meta/env
@@ -33,6 +34,7 @@ services:
       - ./module/prometheus/_meta/env
       - ./module/rabbitmq/_meta/env
       - ./module/redis/_meta/env
+      - ./module/uwsgi/_meta/env
       - ./module/zookeeper/_meta/env
 
   # Modules
@@ -96,6 +98,9 @@ services:
     depends_on:
       - kubernetes
 
+  logstash:
+    build: ./module/logstash/_meta
+
   memcached:
     build: ./module/memcached/_meta
 
@@ -122,6 +127,14 @@ services:
 
   redis:
     build: ./module/redis/_meta
+
+  uwsgi_tcp:
+    build: ./module/uwsgi/_meta
+    command: uwsgi --http :8080 --master --processes 1 --threads 2 --stats 0.0.0.0:9191 --memory-report --wsgi-file app.py
+
+  uwsgi_http:
+    build: ./module/uwsgi/_meta
+    command: uwsgi --http :8080 --master --processes 1 --threads 2 --stats 0.0.0.0:9192 --memory-report --stats-http --wsgi-file app.py
 
   zookeeper:
     build: ./module/zookeeper/_meta

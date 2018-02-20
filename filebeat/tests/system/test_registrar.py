@@ -685,7 +685,7 @@ class Test(BaseTest):
         data = self.get_registry()
         assert len(data) == 2
 
-        # Wait until states are removed from prospectors
+        # Wait until states are removed from inputs
         self.wait_until(
             lambda: self.log_contains_count(
                 "State removed for") == 2,
@@ -699,7 +699,7 @@ class Test(BaseTest):
             lambda: self.output_has(lines=3),
             max_timeout=30)
 
-        # Wait until states are removed from prospectors
+        # Wait until states are removed from inputs
         self.wait_until(
             lambda: self.log_contains_count(
                 "State removed for") >= 3,
@@ -745,24 +745,16 @@ class Test(BaseTest):
             max_timeout=10)
 
         # Wait until registry file is created
-        self.wait_until(
-            lambda: self.log_contains_count("Registry file updated") > 1,
-            max_timeout=15)
+        self.wait_until(lambda: self.log_contains_count("Registry file updated") > 1)
 
-        if os.name == "nt":
-            # On windows registry recration can take a bit longer
-            time.sleep(1)
-
-        data = self.get_registry()
-        assert len(data) == 2
+        # Wait until registry is updated
+        self.wait_until(lambda: len(self.get_registry()) == 2)
+        assert len(self.get_registry()) == 2
 
         os.remove(testfile_path1)
 
-        # Wait until states are removed from prospectors
-        self.wait_until(
-            lambda: self.log_contains(
-                "Remove state for file as file removed"),
-            max_timeout=15)
+        # Wait until states are removed from inputs
+        self.wait_until(lambda: self.log_contains("Remove state for file as file removed"))
 
         # Add one more line to make sure registry is written
         with open(testfile_path2, 'a') as testfile2:
@@ -823,7 +815,7 @@ class Test(BaseTest):
 
         os.remove(testfile_path1)
 
-        # Wait until states are removed from prospectors
+        # Wait until states are removed from inputs
         self.wait_until(
             lambda: self.log_contains(
                 "Remove state for file as file removed"),
@@ -871,7 +863,7 @@ class Test(BaseTest):
 
         # Make sure states written appears one more time
         self.wait_until(
-            lambda: self.log_contains("CRIT Exiting: Registry file path must be a file"),
+            lambda: self.log_contains("Exiting: Registry file path must be a file"),
             max_timeout=10)
 
         filebeat.check_kill_and_wait(exit_code=1)
@@ -904,7 +896,7 @@ class Test(BaseTest):
 
         # Make sure states written appears one more time
         self.wait_until(
-            lambda: self.log_contains("CRIT Exiting: Registry file path is not a regular file"),
+            lambda: self.log_contains("Exiting: Registry file path is not a regular file"),
             max_timeout=10)
 
         filebeat.check_kill_and_wait(exit_code=1)
@@ -934,7 +926,7 @@ class Test(BaseTest):
         # Make sure states written appears one more time
         self.wait_until(
             lambda: self.log_contains(
-                "CRIT Exiting: Could not start registrar: Error loading state"),
+                "Exiting: Could not start registrar: Error loading state"),
             max_timeout=10)
 
         filebeat.check_kill_and_wait(exit_code=1)
@@ -988,20 +980,20 @@ class Test(BaseTest):
         # Make sure all 4 states are persisted
         self.wait_until(
             lambda: self.log_contains(
-                "Prospector states cleaned up. Before: 4, After: 4", logfile="filebeat2.log"),
+                "input states cleaned up. Before: 4, After: 4", logfile="filebeat2.log"),
             max_timeout=10)
 
         # Wait until registry file is cleaned
         self.wait_until(
             lambda: self.log_contains(
-                "Prospector states cleaned up. Before: 0, After: 0", logfile="filebeat2.log"),
+                "input states cleaned up. Before: 0, After: 0", logfile="filebeat2.log"),
             max_timeout=10)
 
         filebeat.check_kill_and_wait()
 
     def test_restart_state_reset(self):
         """
-        Test that ttl is set to -1 after restart and no prospector covering it
+        Test that ttl is set to -1 after restart and no inputs covering it
         """
 
         self.render_config_template(
@@ -1039,10 +1031,10 @@ class Test(BaseTest):
 
         filebeat = self.start_beat(output="filebeat2.log")
 
-        # Wait until prospectors are started
+        # Wait until inputs are started
         self.wait_until(
             lambda: self.log_contains_count(
-                "Starting prospector of type: log", logfile="filebeat2.log") >= 1,
+                "Starting input of type: log", logfile="filebeat2.log") >= 1,
             max_timeout=10)
 
         filebeat.check_kill_and_wait()
@@ -1205,7 +1197,7 @@ class Test(BaseTest):
 
         filebeat = self.start_beat(output="filebeat2.log")
 
-        # Wait until prospectors are started
+        # Wait until inputs are started
         self.wait_until(
             lambda: self.log_contains("Registry file updated",
                                       logfile="filebeat2.log"), max_timeout=10)
@@ -1309,14 +1301,14 @@ class Test(BaseTest):
         data = self.get_registry()
         assert len(data) == 0
 
-    def test_registrar_files_with_prospector_level_processors(self):
+    def test_registrar_files_with_input_level_processors(self):
         """
         Check that multiple files are put into registrar file with drop event processor
         """
 
         self.render_config_template(
             path=os.path.abspath(self.working_dir) + "/log/*",
-            prospector_processors=[{
+            input_processors=[{
                 "drop_event": {},
             }]
         )

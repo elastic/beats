@@ -1,22 +1,22 @@
 {
-    "@timestamp": "2016-05-23T08:05:34.853Z",
+    "@timestamp": "2017-10-12T08:05:34.853Z",
     "beat": {
         "hostname": "host.example.com",
         "name": "host.example.com"
     },
     "docker": {
         "image": {
-            "created": "2017-01-30T23:22:04.000Z",
+            "created": "2017-12-07T06:18:10.000Z",
             "id": {
-                "current": "sha256:67c7d2208cddecd2135be7bbb10769952eb27407085f8a5d44e177c0c9caec78",
-                "parent": "sha256:eeb83c4591a16ade6d97b9175b2fbb015a9933c644170dda762af3ccfe09dbb3"
+                "current": "sha256:8af9af305016ff6501ad0605e390e0a3b535265c0d0cf43375ea8149b794d1d3",
+                "parent": "sha256:d082cc35db8aef622e2a3e659cca62962158e72fbad5c8edd9f664007ae048f1"
             },
             "size": {
-                "regular": 484864857,
-                "virtual": 484864857
+                "regular": 799052371,
+                "virtual": 799052371
             },
             "tags": [
-                "kibana:latest"
+                "metricbeatsnapshotnoxpack700alpha1d71419298b58ed8b0a5b60a6d1e4a476ffaf80a8_beat:latest"
             ]
         }
     },
@@ -25,6 +25,5 @@
         "module": "docker",
         "name": "image",
         "rtt": 115
-    },
-    "type": "metricsets"
+    }
 }

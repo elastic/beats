@@ -1683,7 +1683,7 @@
                   format: bytes
                   description: >
                     Total bytes obtained from system (sum of XxxSys below).
-                - name: optained
+                - name: obtained
                   type: long
                   format: bytes
                   description: >
@@ -2105,7 +2105,7 @@
                   type: long
                   description: >
                     Requests denied because of security concerns.
-            
+
                       * For TCP this is because of a matched tcp-request content rule.
                       * For HTTP this is because of a matched http-request or tarpit rule.
 
@@ -2124,7 +2124,7 @@
                   type: long
                   description: >
                     Request errors. Some of the possible causes are:
-            
+
                       * early termination from the client, before the request has been sent
                       * read error from the client
                       * client timeout
@@ -2175,7 +2175,7 @@
                   type: long
                   description: >
                     Number of response errors. This value includes the number of data
-                    transfers aborted by the server (haproxy.stat.server.aborted). 
+                    transfers aborted by the server (haproxy.stat.server.aborted).
                     Some other errors are:
 
                     * write errors on the client socket (won't be counted for the server stat)
@@ -2276,7 +2276,7 @@
                   type: keyword
                   description: >
                     Status of the last health check. One of:
-            
+
                       UNK     -> unknown
                       INI     -> initializing
                       SOCKERR -> socket error
@@ -2356,7 +2356,7 @@
                   type: integer
                   description: >
                     Number of backend servers that are active, meaning that they are
-                    healthy and can receive requests from the load balancer. 
+                    healthy and can receive requests from the load balancer.
 
                 - name: backup
                   type: integer
@@ -3272,7 +3272,7 @@
               type: group
               fields:
                 - name: allocatable.cores
-                  type: long
+                  type: float
                   description: >
                     Node CPU allocatable cores
                 - name: capacity.cores
@@ -4635,7 +4635,7 @@
   title: "Prometheus"
   description: >
     beta[]
-    
+
     Stats collected from Prometheus.
   short_config: false
   fields:
@@ -4705,7 +4705,7 @@
               type: long
               description: >
                 Used file descriptors.
-            - name: gc.num.count  
+            - name: gc.num.count
               type: long
               description: >
                 Number of GC operations.
@@ -4771,12 +4771,12 @@
             - name: mem.limit.bytes
               type: long
               description: >
-                Point at which the memory alarm will go off. 
+                Point at which the memory alarm will go off.
               format: bytes
             - name: mem.used.bytes
               type: long
               description: >
-                Memory used in bytes. 
+                Memory used in bytes.
             - name: mnesia.disk.tx.count
               type: long
               description: >
@@ -4785,14 +4785,14 @@
               type: long
               description: >
                 Number of Mnesia transactions which have been performed that did not require writes to disk.
-            - name: msg.store_read.count 
+            - name: msg.store_read.count
               type: long
               description: >
-                Number of messages which have been read from the message store. 
+                Number of messages which have been read from the message store.
             - name: msg.store_write.count
               type: long
               description: >
-                Number of messages which have been written to the message store. 
+                Number of messages which have been written to the message store.
             - name: name
               type: keyword
               description: >
@@ -4809,26 +4809,26 @@
               type: long
               description: >
                 Number of cores detected and usable by Erlang.
-            - name: queue.index.journal_write.count 
+            - name: queue.index.journal_write.count
               type: long
               description: >
                 Number of records written to the queue index journal.
             - name: queue.index.read.count
               type: long
               description: >
-                Number of records read from the queue index. 
-            - name: queue.index.write.count 
+                Number of records read from the queue index.
+            - name: queue.index.write.count
               type: long
               description: >
-                Number of records written to the queue index. 
-            - name: run.queue 
+                Number of records written to the queue index.
+            - name: run.queue
               type: long
               description: >
-                Average number of Erlang processes waiting to run. 
+                Average number of Erlang processes waiting to run.
             - name: socket.total
               type: long
               description: >
-                File descriptors available for use as sockets. 
+                File descriptors available for use as sockets.
             - name: socket.used
               type: long
               description: >
@@ -5882,7 +5882,7 @@
                   description: >
                     Actual used memory in bytes. It represents the difference between the total and the available memory. The
                     available memory depends on the OS. For more details, please check `system.actual.free`.
- 
+
                 - name: free
                   type: long
                   format: bytes
@@ -6643,7 +6643,7 @@
               description: >
                 Filesystem type
             - name: capacity.total.bytes
-              type: long      
+              type: long
               description: >
                 Total bytes of the datastore
               format: bytes
@@ -6746,7 +6746,7 @@
               type: object
               object_type: keyword
               description: >
-                Custom fields      
+                Custom fields
 
 - key: windows
   title: "Windows"

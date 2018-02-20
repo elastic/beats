@@ -1,10 +1,10 @@
 ###################### Filebeat Config Template ###############################
 
-filebeat.prospectors:
-{% if prospectors is not defined %}
-{% set prospectors = true %}
+filebeat.{{input_config | default("inputs")}}:
+{% if inputs is not defined %}
+{% set inputs = true %}
 {% endif %}
-{% if prospectors %}
+{% if inputs %}
 - type: {{type | default("log") }}
   input_type: {{input_type_deprecated }}
   # Paths that should be crawled and fetched
@@ -31,9 +31,9 @@ filebeat.prospectors:
   harvester_limit: {{harvester_limit | default(0) }}
   symlinks: {{symlinks}}
   pipeline: {{pipeline}}
-  {%- if prospector_processors %}
+  {%- if input_processors %}
   processors:
-    {%- for processor in prospector_processors %}
+    {%- for processor in input_processors %}
     {%- for name, settings in processor.items() %}
     - {{name}}:
       {%- if settings %}
@@ -85,8 +85,8 @@ filebeat.prospectors:
     max_lines: {{ max_lines|default(500) }}
   {% endif %}
 {% endif %}
-{% if prospector_raw %}
-{{prospector_raw}}
+{% if input_raw %}
+{{input_raw}}
 {% endif %}
 
 filebeat.shutdown_timeout: {{ shutdown_timeout|default(0) }}
@@ -95,13 +95,29 @@ filebeat.registry_file: {{ beat.working_dir + '/' }}{{ registryFile|default("reg
 {%endif%}
 
 {% if reload or reload_path -%}
-filebeat.config.{{ reload_type|default("prospectors") }}:
+filebeat.config.{{ reload_type|default("inputs") }}:
   path: {{ reload_path }}
   {% if reload  -%}
   reload.period: 1s
   reload.enabled: {{ reload|default("false") }}
   {% endif -%}
 {% endif -%}
+
+#============================== Autodiscover ==================================
+
+{% if autodiscover %}
+filebeat.autodiscover:
+  providers:
+  {%- for provider, settings in autodiscover.items() %}
+  - type: {{provider}}
+    {%- if settings %}
+    {%- for k, v in settings.items() %}
+    {{k}}:
+      {{v | default([])}}
+    {%- endfor %}
+    {%- endif %}
+  {%- endfor %}
+{% endif %}
 
 #================================ General =====================================
 
@@ -132,7 +148,7 @@ geoip:
   ]
 {%- endif %}
 
-{% if setup_template_name is not none %}
+{% if setup_template_name %}
 setup.template.name: setup_template_name
 setup.template.pattern: setup_template_pattern
 {%- endif %}
@@ -195,4 +211,9 @@ output.file:
 #================================ Paths =====================================
 path:
   data: {{path_data}}
+{% endif %}
+
+{% if keystore_path %}
+#================================ keystore =====================================
+keystore.path: {{keystore_path}}
 {% endif %}
