@@ -21,7 +21,7 @@ kibana:
 
 # Collects all module and dataset fields
 .PHONY: fields
-fields:
+fields: python-env
 	@mkdir -p _meta/
 	@cp ${ES_BEATS}/filebeat/_meta/fields.common.yml  _meta/fields.generated.yml
 	@${PYTHON_ENV}/bin/python ${ES_BEATS}/metricbeat/scripts/fields_collector.py >> _meta/fields.generated.yml
