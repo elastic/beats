@@ -15,37 +15,6 @@ import (
 	"github.com/elastic/beats/libbeat/common"
 )
 
-type testingOutlet struct {
-	ch chan *util.Data
-}
-
-func (o *testingOutlet) OnEvent(data *util.Data) bool {
-	o.ch <- data
-	return true
-}
-
-func newTestingOutlet(ch chan *util.Data) *testingOutlet {
-	return &testingOutlet{ch: ch}
-}
-
-// This could be extracted into testing utils and we could add some unicode chars to the charsets.
-func randomString(l int) string {
-	charsets := []byte("abcdefghijklmnopqrstuvwzyzABCDEFGHIJKLMNOPQRSTUVWZYZ0123456789")
-	message := make([]byte, l)
-	for i := range message {
-		message[i] = charsets[rand.Intn(len(charsets))]
-	}
-	return string(message)
-}
-
-func generateMessages(c int, l int) []string {
-	messages := make([]string, c)
-	for i := range messages {
-		messages[i] = randomString(l)
-	}
-	return messages
-}
-
 func TestErrorOnEmptyLineDelimiter(t *testing.T) {
 	cfg := map[string]interface{}{
 		"line_delimiter": "",
@@ -81,56 +50,6 @@ func TestOverrideHostAndPort(t *testing.T) {
 	conn, err := net.Dial("tcp", host)
 	defer conn.Close()
 	assert.NoError(t, err)
-}
-
-func TestReceiveNewEventsConcurrently(t *testing.T) {
-	workers := 4
-	eventsCount := 100
-	ch := make(chan *util.Data, eventsCount*workers)
-	defer close(ch)
-	to := newTestingOutlet(ch)
-	forwarder := harvester.NewForwarder(to)
-	cfg := common.NewConfig()
-	config := defaultConfig
-	err := cfg.Unpack(&config)
-	if !assert.NoError(t, err) {
-		return
-	}
-	harvester, err := NewHarvester(forwarder, &config)
-	if !assert.NoError(t, err) {
-		return
-	}
-	defer harvester.Stop()
-	if !assert.NoError(t, err) {
-		return
-	}
-	go func() {
-		err := harvester.Run()
-		assert.NoError(t, err)
-	}()
-
-	samples := generateMessages(eventsCount, 1024)
-	for w := 0; w < workers; w++ {
-		go func() {
-			conn, err := net.Dial("tcp", "localhost:9000")
-			defer conn.Close()
-			assert.NoError(t, err)
-			for _, sample := range samples {
-				fmt.Fprintln(conn, sample)
-			}
-		}()
-	}
-
-	var events []*util.Data
-	for len(events) < eventsCount*workers {
-		select {
-		case event := <-ch:
-			events = append(events, event)
-		case <-time.After(time.Second * 10):
-			t.Fatal("timeout when waiting on channel")
-			return
-		}
-	}
 }
 
 func TestReceiveEventsAndMetadata(t *testing.T) {
@@ -284,4 +203,85 @@ func TestReceiveEventsAndMetadata(t *testing.T) {
 		})
 		port++
 	}
+}
+
+func TestReceiveNewEventsConcurrently(t *testing.T) {
+	workers := 4
+	eventsCount := 100
+	ch := make(chan *util.Data, eventsCount*workers)
+	defer close(ch)
+	to := newTestingOutlet(ch)
+	forwarder := harvester.NewForwarder(to)
+	cfg := common.NewConfig()
+	config := defaultConfig
+	err := cfg.Unpack(&config)
+	if !assert.NoError(t, err) {
+		return
+	}
+	harvester, err := NewHarvester(forwarder, &config)
+	if !assert.NoError(t, err) {
+		return
+	}
+	defer harvester.Stop()
+	if !assert.NoError(t, err) {
+		return
+	}
+	go func() {
+		err := harvester.Run()
+		assert.NoError(t, err)
+	}()
+
+	samples := generateMessages(eventsCount, 1024)
+	for w := 0; w < workers; w++ {
+		go func() {
+			conn, err := net.Dial("tcp", "localhost:9000")
+			defer conn.Close()
+			assert.NoError(t, err)
+			for _, sample := range samples {
+				fmt.Fprintln(conn, sample)
+			}
+		}()
+	}
+
+	var events []*util.Data
+	for len(events) < eventsCount*workers {
+		select {
+		case event := <-ch:
+			events = append(events, event)
+		case <-time.After(time.Second * 10):
+			t.Fatal("timeout when waiting on channel")
+			return
+		}
+	}
+}
+
+type testingOutlet struct {
+	ch chan *util.Data
+}
+
+func (o *testingOutlet) OnEvent(data *util.Data) bool {
+	o.ch <- data
+	return true
+}
+
+func newTestingOutlet(ch chan *util.Data) *testingOutlet {
+	return &testingOutlet{ch: ch}
+}
+
+// This could be extracted into testing utils and we could add some unicode chars to the charsets.
+func randomString(l int) string {
+	charsets := []byte("abcdefghijklmnopqrstuvwzyzABCDEFGHIJKLMNOPQRSTUVWZYZ0123456789")
+	message := make([]byte, l)
+	for i := range message {
+		message[i] = charsets[rand.Intn(len(charsets))]
+	}
+	return string(message)
+}
+
+func generateMessages(c int, l int) []string {
+	messages := make([]string, c)
+	for i := range messages {
+		messages[i] = randomString(l)
+	}
+	return messages
 }
