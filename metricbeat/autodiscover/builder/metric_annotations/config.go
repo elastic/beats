@@ -1,11 +1,11 @@
 package metric_annotations
 
 type config struct {
-	Prefix string `config:"prefix"`
+	Key string `config:"key"`
 }
 
 func defaultConfig() config {
 	return config{
-		Prefix: "co.elastic.metrics",
+		Key: "metrics",
 	}
 }

@@ -3,6 +3,8 @@ package metric_annotations
 import (
 	"fmt"
 
+	"strings"
+
 	"github.com/elastic/beats/libbeat/autodiscover"
 	"github.com/elastic/beats/libbeat/autodiscover/builder"
 	"github.com/elastic/beats/libbeat/autodiscover/template"
@@ -30,9 +32,10 @@ const (
 )
 
 type metricAnnotations struct {
-	Prefix string
+	Key string
 }
 
+// Build a new metrics annotation builder
 func NewMetricAnnotations(cfg *common.Config) (autodiscover.Builder, error) {
 	config := defaultConfig()
 	err := cfg.Unpack(&config)
@@ -41,9 +44,10 @@ func NewMetricAnnotations(cfg *common.Config) (autodiscover.Builder, error) {
 		return nil, fmt.Errorf("unable to unpack metric.annotations config due to error: %v", err)
 	}
 
-	return &metricAnnotations{config.Prefix}, nil
+	return &metricAnnotations{config.Key}, nil
 }
 
+// Create configs based on hints passed from providers
 func (m *metricAnnotations) CreateConfig(event bus.Event) []*common.Config {
 	var config []*common.Config
 	host, _ := event["host"].(string)
@@ -51,30 +55,24 @@ func (m *metricAnnotations) CreateConfig(event bus.Event) []*common.Config {
 		return config
 	}
 
-	annotations, ok := event["annotations"].(map[string]string)
+	port, _ := event["port"].(int64)
+
+	hints, ok := event["hints"].(common.MapStr)
 	if !ok {
 		return config
 	}
 
-	container, ok := event["container"].(common.MapStr)
-	if !ok {
-		return config
-	}
-
-	name := builder.GetContainerName(container)
-
-	mod := builder.GetContainerAnnotationAsString(annotations, m.Prefix, name, module)
+	mod := m.getModule(hints)
 	if mod == "" {
 		return config
 	}
 
-	hsts := builder.GetContainerAnnotationAsString(annotations, m.Prefix, name, hosts)
-	ns := builder.GetContainerAnnotationAsString(annotations, m.Prefix, name, namespace)
-	msets := m.getMetricSets(annotations, name, mod)
-	tout := m.getTimeout(annotations, name)
-	ival := m.getPeriod(annotations, name)
-
-	sslConf := builder.GetContainerAnnotationsWithPrefix(annotations, m.Prefix, name, ssl)
+	hsts := m.getHostsWithPort(hints, port)
+	ns := m.getNamespace(hints)
+	msets := m.getMetricSets(hints, mod)
+	tout := m.getTimeout(hints)
+	ival := m.getPeriod(hints)
+	sslConf := m.getSSLConfig(hints)
 
 	moduleConfig := common.MapStr{
 		"module":     mod,
@@ -92,12 +90,12 @@ func (m *metricAnnotations) CreateConfig(event bus.Event) []*common.Config {
 	for k, v := range sslConf {
 		moduleConfig.Put(k, v)
 	}
-	logp.Debug("metric.annotations", "generated config: %v", moduleConfig.String())
+	logp.Debug("metric.hints", "generated config: %v", moduleConfig.String())
 
 	// Create config object
 	cfg, err := common.NewConfigFrom(moduleConfig)
 	if err != nil {
-		logp.Debug("metric.annotations", "config merge failed with error: %v", err)
+		logp.Debug("metric.hints", "config merge failed with error: %v", err)
 	}
 	config = append(config, cfg)
 
@@ -108,9 +106,13 @@ func (m *metricAnnotations) CreateConfig(event bus.Event) []*common.Config {
 	return config
 }
 
-func (m *metricAnnotations) getMetricSets(annotations map[string]string, container, module string) []string {
+func (m *metricAnnotations) getModule(hints common.MapStr) string {
+	return builder.GetHintString(hints, m.Key, module)
+}
+
+func (m *metricAnnotations) getMetricSets(hints common.MapStr, module string) []string {
 	var msets []string
-	msets = builder.GetContainerAnnotationsAsList(annotations, m.Prefix, container, metricsets)
+	msets = builder.GetHintAsList(hints, m.Key, metricsets)
 
 	if len(msets) == 0 {
 		// Special handling for prometheus as most use cases rely on exporters/instrumentation.
@@ -124,18 +126,41 @@ func (m *metricAnnotations) getMetricSets(annotations map[string]string, contain
 	return msets
 }
 
-func (m *metricAnnotations) getPeriod(annotations map[string]string, container string) string {
-	if ival := builder.GetContainerAnnotationAsString(annotations, m.Prefix, container, period); ival != "" {
+func (m *metricAnnotations) getHostsWithPort(hints common.MapStr, port int64) []string {
+	var result []string
+	thosts := builder.GetHintAsList(hints, m.Key, hosts)
+
+	// Only pick hosts that have ${data.port} or the port on current event. This will make
+	// sure that incorrect meta mapping doesn't happen
+	for _, h := range thosts {
+		if strings.Contains(h, "data.port") || strings.Contains(h, fmt.Sprintf("%d", port)) {
+			result = append(result, h)
+		}
+	}
+
+	return result
+}
+
+func (m *metricAnnotations) getNamespace(hints common.MapStr) string {
+	return builder.GetHintString(hints, m.Key, namespace)
+}
+
+func (m *metricAnnotations) getPeriod(hints common.MapStr) string {
+	if ival := builder.GetHintString(hints, m.Key, period); ival != "" {
 		return ival
 	} else {
 		return default_interval
 	}
 }
 
-func (m *metricAnnotations) getTimeout(annotations map[string]string, container string) string {
-	if tout := builder.GetContainerAnnotationAsString(annotations, m.Prefix, container, timeout); tout != "" {
+func (m *metricAnnotations) getTimeout(hints common.MapStr) string {
+	if tout := builder.GetHintString(hints, m.Key, timeout); tout != "" {
 		return tout
 	} else {
 		return default_timeout
 	}
+}
+
+func (m *metricAnnotations) getSSLConfig(hints common.MapStr) common.MapStr {
+	return builder.GetHintMapStr(hints, m.Key, ssl)
 }

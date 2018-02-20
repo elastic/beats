@@ -4,6 +4,7 @@ import (
 	"time"
 
 	"github.com/elastic/beats/libbeat/autodiscover"
+	"github.com/elastic/beats/libbeat/autodiscover/builder"
 	"github.com/elastic/beats/libbeat/autodiscover/template"
 	"github.com/elastic/beats/libbeat/common"
 	"github.com/elastic/beats/libbeat/common/bus"
@@ -96,22 +97,23 @@ func (p *Provider) emitEvents(pod *kubernetes.Pod, flag string, containers []kub
 	containerstatuses []kubernetes.PodContainerStatus) {
 	host := pod.Status.PodIP
 
-	// Collect all container IDs from status information
+	// Collect all container IDs and runtimes from status information. Kubernetes has both docker and rkt
 	containerIDs := map[string]string{}
+	runtimes := map[string]string{}
 	for _, c := range containerstatuses {
-		cid := c.GetContainerID()
+		cid, runtime := c.GetContainerIDWithRuntime()
 		containerIDs[c.Name] = cid
+		runtimes[c.Name] = runtime
 	}
 
 	// Emit container and port information
 	for _, c := range containers {
 		cmeta := common.MapStr{
-			"id":    containerIDs[c.Name],
-			"name":  c.Name,
-			"image": c.Image,
+			"id":      containerIDs[c.Name],
+			"name":    c.Name,
+			"image":   c.Image,
+			"runtime": runtimes[c.Name],
 		}
-
-		// Metadata appended to each event
 		meta := p.metagen.ContainerMetadata(pod, c.Name)
 
 		// Information that can be used in discovering a workload
@@ -164,11 +166,33 @@ func (p *Provider) publish(event bus.Event) {
 		if port, ok := event["port"]; ok {
 			e["port"] = port
 		}
-		e["annotations"] = kubeMeta["annotations"]
-		e["container"] = kubeMeta["container"]
+		// The builder base config can configure any of the field values of kubernetes if need be.
+		e["kubernetes"] = kubeMeta
+
+		annotations, _ := kubeMeta["annotations"].(map[string]string)
+		container, _ := kubeMeta["container"].(common.MapStr)
+
+		// This would end up adding a docker|rkt.container entry into the event. This would make sure
+		// that there is not an attempt to spin up a docker input for a rkt container and when a
+		// rkt input exists it would be natively supported.
+		if runtime, ok := container["runtime"]; ok {
+			e[runtime.(string)] = common.MapStr{
+				"container": container,
+			}
+		}
+
+		cname := builder.GetContainerName(container)
+		hints := builder.GenerateHints(annotations, cname, p.config.Prefix)
+		if len(hints) != 0 {
+			e["hints"] = hints
+		}
+
+		logp.Debug("kubernetes", "Generated builder event %v", event)
+
 		if config := p.builders.GetConfig(e); config != nil {
 			event["config"] = config
 		}
+
 	}
 	p.bus.Publish(event)
 }

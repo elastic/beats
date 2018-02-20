@@ -3,7 +3,7 @@ package log_annotations
 import "github.com/elastic/beats/libbeat/common"
 
 type config struct {
-	Prefix string           `config:"prefix"`
+	Key    string           `config:"key"`
 	Config []*common.Config `config:"config"`
 }
 
@@ -12,13 +12,13 @@ func defaultConfig() config {
 		"type": "docker",
 		"containers": map[string]interface{}{
 			"ids": []string{
-				"${data.container.id}",
+				"${data.docker.container.id}",
 			},
 		},
 	}
 	cfg, _ := common.NewConfigFrom(rawCfg)
 	return config{
-		Prefix: "co.elastic.logs",
+		Key:    "logs",
 		Config: []*common.Config{cfg},
 	}
 }

@@ -2,6 +2,7 @@ package docker
 
 import (
 	"github.com/elastic/beats/libbeat/autodiscover"
+	"github.com/elastic/beats/libbeat/autodiscover/builder"
 	"github.com/elastic/beats/libbeat/autodiscover/template"
 	"github.com/elastic/beats/libbeat/common"
 	"github.com/elastic/beats/libbeat/common/bus"
@@ -142,6 +143,8 @@ func (d *Provider) publish(event bus.Event) {
 		// Builders are Beat specific.
 		e := bus.Event{}
 		dockerMeta, _ := event["docker"].(common.MapStr)
+		e["docker"] = dockerMeta
+
 		if host, ok := event["host"]; ok {
 			e["host"] = host
 		}
@@ -149,11 +152,11 @@ func (d *Provider) publish(event bus.Event) {
 			e["port"] = port
 		}
 		if labels, err := dockerMeta.GetValue("docker.labels"); err == nil {
-			e["annotations"] = labels
+			hints := builder.GenerateHints(labels.(map[string]string), "", d.config.Prefix)
+			e["hints"] = hints
 		}
-		e["container"] = dockerMeta["container"]
 
-		if config := d.builders.GetConfig(event); config != nil {
+		if config := d.builders.GetConfig(e); config != nil {
 			event["config"] = config
 		}
 	}

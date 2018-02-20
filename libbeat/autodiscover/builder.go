@@ -9,12 +9,16 @@ import (
 	"github.com/elastic/beats/libbeat/logp"
 )
 
+// Builder provides an interface by which configs can be built from provider metadata
 type Builder interface {
+	// CreateConfig creates a config from hints passed from providers
 	CreateConfig(event bus.Event) []*common.Config
 }
 
+// Builders is a list of Builder objects
 type Builders []Builder
 
+// BuilderConstructor is a func used to generate a Builder object
 type BuilderConstructor func(*common.Config) (Builder, error)
 
 // AddBuilder registers a new BuilderConstructor
@@ -65,6 +69,7 @@ func (r *registry) ConstructBuilder(c *common.Config) (Builder, error) {
 	return builder(c)
 }
 
+// GetConfig creates configs for all builders initalized.
 func (b Builders) GetConfig(event bus.Event) []*common.Config {
 	var configs []*common.Config
 

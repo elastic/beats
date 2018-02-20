@@ -16,10 +16,11 @@ func init() {
 }
 
 type logAnnotations struct {
-	Prefix string
+	Key    string
 	Config []*common.Config
 }
 
+// Construct a log annotations builder
 func NewLogAnnotations(cfg *common.Config) (autodiscover.Builder, error) {
 	config := defaultConfig()
 	err := cfg.Unpack(&config)
@@ -28,9 +29,10 @@ func NewLogAnnotations(cfg *common.Config) (autodiscover.Builder, error) {
 		return nil, fmt.Errorf("unable to unpack log.annotations config due to error: %v", err)
 	}
 
-	return &logAnnotations{config.Prefix, config.Config}, nil
+	return &logAnnotations{config.Key, config.Config}, nil
 }
 
+// Create config based on input hints in the bus event
 func (l *logAnnotations) CreateConfig(event bus.Event) []*common.Config {
 	var config []*common.Config
 
@@ -39,34 +41,30 @@ func (l *logAnnotations) CreateConfig(event bus.Event) []*common.Config {
 		return config
 	}
 
-	annotations, ok := event["annotations"].(map[string]string)
+	var hints common.MapStr
+	hIface, ok := event["hints"]
 	if !ok {
 		return config
+	} else {
+		hints, _ = hIface.(common.MapStr)
 	}
 
-	container, ok := event["container"].(common.MapStr)
-	if !ok {
-		return config
-	}
-
-	name := builder.GetContainerName(container)
-
-	if builder.IsContainerNoOp(annotations, l.Prefix, name) == true {
+	if builder.IsNoOp(hints, l.Key) == true {
 		return config
 	}
 
 	//TODO: Add module support
 
 	tempCfg := common.MapStr{}
-	multiline := l.getMultiline(annotations, name)
+	multiline := l.getMultiline(hints)
 
 	for k, v := range multiline {
 		tempCfg.Put(k, v)
 	}
-	if includeLines := l.getIncludeLines(annotations, name); len(includeLines) != 0 {
+	if includeLines := l.getIncludeLines(hints); len(includeLines) != 0 {
 		tempCfg.Put("include_lines", includeLines)
 	}
-	if excludeLines := l.getExcludeLines(annotations, name); len(excludeLines) != 0 {
+	if excludeLines := l.getExcludeLines(hints); len(excludeLines) != 0 {
 		tempCfg.Put("exclude_lines", excludeLines)
 	}
 
@@ -87,14 +85,14 @@ func (l *logAnnotations) CreateConfig(event bus.Event) []*common.Config {
 	return config
 }
 
-func (l *logAnnotations) getMultiline(annotations map[string]string, container string) map[string]string {
-	return builder.GetContainerAnnotationsWithPrefix(annotations, l.Prefix, container, "multiline")
+func (l *logAnnotations) getMultiline(hints common.MapStr) common.MapStr {
+	return builder.GetHintMapStr(hints, l.Key, "multiline")
 }
 
-func (l *logAnnotations) getIncludeLines(annotations map[string]string, container string) []string {
-	return builder.GetContainerAnnotationsAsList(annotations, l.Prefix, container, "include_lines")
+func (l *logAnnotations) getIncludeLines(hints common.MapStr) []string {
+	return builder.GetHintAsList(hints, l.Key, "include_lines")
 }
 
-func (l *logAnnotations) getExcludeLines(annotations map[string]string, container string) []string {
-	return builder.GetContainerAnnotationsAsList(annotations, l.Prefix, container, "exclude_lines")
+func (l *logAnnotations) getExcludeLines(hints common.MapStr) []string {
+	return builder.GetHintAsList(hints, l.Key, "exclude_lines")
 }
