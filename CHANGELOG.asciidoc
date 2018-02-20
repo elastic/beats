@@ -14,6 +14,8 @@ https://github.com/elastic/beats/compare/v6.2.2...6.2[Check the HEAD diff]
 
 *Affecting all Beats*
 
+- Fix conditions checking on autodiscover Docker labels. {pull}6412[6412]
+
 *Auditbeat*
 
 *Filebeat*
@@ -255,7 +257,6 @@ https://github.com/elastic/beats/compare/v6.0.1...v6.1.0[View commits]
 - Fix console color output for Windows. {issue}5611[5611]
 - Fix logstash output debug message. {pull}5799{5799]
 - Fix isolation of modules when merging local and global field settings. {issue}5795[5795]
-- Fix conditions checking on autodiscover Docker labels. {pull}6412[6412]
 
 *Filebeat*
 
