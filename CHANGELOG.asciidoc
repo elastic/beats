@@ -255,20 +255,7 @@ https://github.com/elastic/beats/compare/v6.0.1...v6.1.0[View commits]
 - Fix console color output for Windows. {issue}5611[5611]
 - Fix logstash output debug message. {pull}5799{5799]
 - Fix isolation of modules when merging local and global field settings. {issue}5795[5795]
-- Fix panic when Events containing a float32 value are normalized. {pull}6129[6129]
-- Fix `setup.dashboards.always_kibana` when using Kibana 5.6. {issue}6090[6090]
-- Update Golang 1.9.4 {pull}6326[6326]
 - Fix conditions checking on autodiscover Docker labels. {pull}6412[6412]
-
-*Auditbeat*
-
-- Add an error check to the file integrity scanner to prevent a panic when
-  there is an error reading file info via lstat. {issue}6005[6005]
-- Fixed an issue where the proctitle value was being truncated.
-- Fixed an issue where values were incorrectly interpretted as hex data.
-- Fixed parsing of the `key` value when multiple keys are present.
-- Fix possible resource leak if file_integrity module is used with config
-  reloading on Windows or Linux. {pull}6198[6198]
 
 *Filebeat*
 
