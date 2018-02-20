@@ -22,7 +22,7 @@ type Client struct {
 	done           chan struct{}
 	metadata       common.MapStr
 	splitFunc      bufio.SplitFunc
-	maxReadMessage int64
+	maxReadMessage uint64
 	timeout        time.Duration
 }
 
@@ -31,7 +31,7 @@ func NewClient(
 	conn net.Conn,
 	forwarder *harvester.Forwarder,
 	splitFunc bufio.SplitFunc,
-	maxReadMessage int64,
+	maxReadMessage uint64,
 	timeout time.Duration,
 ) *Client {
 	client := &Client{
@@ -54,7 +54,8 @@ func (c *Client) Handle() error {
 	scanner.Split(c.splitFunc)
 
 	for scanner.Scan() {
-		if scanner.Err() != nil {
+		err := scanner.Err()
+		if err != nil {
 			// we are forcing a close on the socket, lets ignore any error that could happen.
 			select {
 			case <-c.done:
@@ -62,10 +63,10 @@ func (c *Client) Handle() error {
 			default:
 			}
 			// This is a user defined limit and we should notify the user.
-			if IsMaxReadBufferErr(scanner.Err()) {
-				logp.Err("tcp client error: %s", scanner.Err())
+			if IsMaxReadBufferErr(err) {
+				logp.Err("tcp client error: %s", err)
 			}
-			return errors.Wrap(scanner.Err(), "tcp client error")
+			return errors.Wrap(err, "tcp client error")
 		}
 		r.Reset()
 		c.forwarder.Send(c.createEvent(scanner.Text()))

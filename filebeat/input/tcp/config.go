@@ -11,7 +11,7 @@ type config struct {
 	Host                      string        `config:"host"`
 	LineDelimiter             string        `config:"line_delimiter" validate:"nonzero"`
 	Timeout                   time.Duration `config:"timeout" validate:"nonzero,positive"`
-	MaxMessageSize            int64         `config:"max_message_size" validate:"nonzero,positive"`
+	MaxMessageSize            uint64        `config:"max_message_size" validate:"nonzero,positive"`
 }
 
 var defaultConfig = config{

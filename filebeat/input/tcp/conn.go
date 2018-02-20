@@ -15,12 +15,12 @@ var ErrMaxReadBuffer = errors.New("max read buffer reached")
 // error when we reach the limit.
 type MeteredReader struct {
 	reader        io.Reader
-	maxReadBuffer int64
-	byteRead      int64
+	maxReadBuffer uint64
+	byteRead      uint64
 }
 
 // NewMeteredReader returns a new MeteredReader
-func NewMeteredReader(reader io.Reader, maxReadBuffer int64) *MeteredReader {
+func NewMeteredReader(reader io.Reader, maxReadBuffer uint64) *MeteredReader {
 	return &MeteredReader{
 		reader:        reader,
 		maxReadBuffer: maxReadBuffer,
@@ -33,7 +33,7 @@ func (m *MeteredReader) Read(p []byte) (n int, err error) {
 		return 0, ErrMaxReadBuffer
 	}
 	n, err = m.reader.Read(p)
-	m.byteRead += int64(n)
+	m.byteRead += uint64(n)
 	return
 }
 

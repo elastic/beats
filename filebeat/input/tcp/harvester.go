@@ -54,7 +54,7 @@ func NewHarvester(
 
 // Run start and run a new TCP listener to receive new data
 func (h *Harvester) Run() error {
-	logp.Info("Started listening for incoming TCP connection on: %s:", h.config.Host)
+	logp.Info("Started listening for incoming TCP connection on: %s", h.config.Host)
 	for {
 		conn, err := h.server.Accept()
 		if err != nil {
@@ -62,7 +62,7 @@ func (h *Harvester) Run() error {
 			case <-h.done:
 				return nil
 			default:
-				logp.Debug("tcp", "Can not accept the connection", err)
+				logp.Debug("tcp", "Can not accept the connection: %s", err)
 				continue
 			}
 		}
@@ -87,7 +87,7 @@ func (h *Harvester) Run() error {
 			h.registerClient(client)
 			err := client.Handle()
 			if err != nil {
-				logp.Debug("tcp", "Client error", err)
+				logp.Debug("tcp", "Client error: %s", err)
 			}
 			h.unregisterClient(client)
 			logp.Debug(
