@@ -104,12 +104,17 @@ func (d *Provider) emitContainer(event bus.Event, flag string) {
 		host = container.IPAddresses[0]
 	}
 
+	labelMap := common.MapStr{}
+	for k, v := range container.Labels {
+		labelMap[k] = v
+	}
+
 	meta := common.MapStr{
 		"container": common.MapStr{
 			"id":     container.ID,
 			"name":   container.Name,
 			"image":  container.Image,
-			"labels": container.Labels,
+			"labels": labelMap,
 		},
 	}
 
@@ -173,7 +178,7 @@ func (d *Provider) generateHints(event bus.Event) bus.Event {
 		e["port"] = port
 	}
 	if labels, err := dockerMeta.GetValue("container.labels"); err == nil {
-		hints := builder.GenerateHints(labels.(map[string]string), "", d.config.Prefix)
+		hints := builder.GenerateHints(labels.(common.MapStr), "", d.config.Prefix)
 		e["hints"] = hints
 	}
 

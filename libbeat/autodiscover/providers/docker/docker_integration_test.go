@@ -71,7 +71,7 @@ func checkEvent(t *testing.T, listener bus.Listener, start bool) {
 				assert.Nil(t, getValue(e, "start"))
 			}
 			assert.Equal(t, getValue(e, "docker.container.image"), "busybox")
-			assert.Equal(t, getValue(e, "docker.container.labels"), map[string]string{"label": "value"})
+			assert.Equal(t, getValue(e, "docker.container.labels"), common.MapStr{"label": "value"})
 			assert.NotNil(t, getValue(e, "docker.container.id"))
 			assert.NotNil(t, getValue(e, "docker.container.name"))
 			assert.NotNil(t, getValue(e, "host"))

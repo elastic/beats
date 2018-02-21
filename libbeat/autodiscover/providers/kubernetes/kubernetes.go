@@ -132,7 +132,11 @@ func (p *Provider) emitEvents(pod *kubernetes.Pod, flag string, containers []kub
 		kubemeta["container"] = cmeta
 
 		// Pass annotations to all events so that it can be used in templating and by annotation builders.
-		kubemeta["annotations"] = pod.GetMetadata().Annotations
+		annotations := common.MapStr{}
+		for k, v := range pod.GetMetadata().Annotations {
+			annotations[k] = v
+		}
+		kubemeta["annotations"] = annotations
 
 		// Without this check there would be overlapping configurations with and without ports.
 		if len(c.Ports) == 0 {
@@ -180,7 +184,7 @@ func (p *Provider) generateHints(event bus.Event) bus.Event {
 	// Try to build a config with enabled builders. Send a provider agnostic payload.
 	// Builders are Beat specific.
 	e := bus.Event{}
-	var annotations map[string]string
+	var annotations common.MapStr
 	var kubeMeta, container common.MapStr
 	rawMeta, ok := event["kubernetes"]
 	if ok {
@@ -188,7 +192,7 @@ func (p *Provider) generateHints(event bus.Event) bus.Event {
 		// The builder base config can configure any of the field values of kubernetes if need be.
 		e["kubernetes"] = kubeMeta
 		if rawAnn, ok := kubeMeta["annotations"]; ok {
-			annotations = rawAnn.(map[string]string)
+			annotations = rawAnn.(common.MapStr)
 		}
 	}
 	if host, ok := event["host"]; ok {

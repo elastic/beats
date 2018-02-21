@@ -47,7 +47,7 @@ func TestGenerateHints(t *testing.T) {
 					"container": common.MapStr{
 						"id":   "abc",
 						"name": "foobar",
-						"labels": map[string]string{
+						"labels": common.MapStr{
 							"do.not.include":          "true",
 							"co.elastic.logs/disable": "true",
 						},
@@ -59,7 +59,7 @@ func TestGenerateHints(t *testing.T) {
 					"container": common.MapStr{
 						"id":   "abc",
 						"name": "foobar",
-						"labels": map[string]string{
+						"labels": common.MapStr{
 							"do.not.include":          "true",
 							"co.elastic.logs/disable": "true",
 						},

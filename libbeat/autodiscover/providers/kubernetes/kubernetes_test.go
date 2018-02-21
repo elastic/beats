@@ -69,7 +69,7 @@ func TestGenerateHints(t *testing.T) {
 		{
 			event: bus.Event{
 				"kubernetes": common.MapStr{
-					"annotations": map[string]string{
+					"annotations": common.MapStr{
 						"co.elastic.logs/multiline.pattern": "^test",
 						"co.elastic.metrics/module":         "prometheus",
 						"co.elastic.metrics/period":         "10s",
@@ -84,7 +84,7 @@ func TestGenerateHints(t *testing.T) {
 			},
 			result: bus.Event{
 				"kubernetes": common.MapStr{
-					"annotations": map[string]string{
+					"annotations": common.MapStr{
 						"co.elastic.logs/multiline.pattern": "^test",
 						"co.elastic.metrics/module":         "prometheus",
 						"not.to.include":                    "true",

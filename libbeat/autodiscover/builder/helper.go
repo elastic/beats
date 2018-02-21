@@ -75,7 +75,7 @@ func IsNoOp(hints common.MapStr, key string) bool {
 }
 
 // GenerateHints parses annotations based on a prefix and sets up hints that can be picked up by individual Beats.
-func GenerateHints(annotations map[string]string, container, prefix string) common.MapStr {
+func GenerateHints(annotations common.MapStr, container, prefix string) common.MapStr {
 	hints := common.MapStr{}
 	plen := len(prefix)
 
