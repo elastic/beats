@@ -10883,6 +10883,82 @@ The percentage of used swap memory.
 
 
 [float]
+== hugepages fields
+
+This group contains statistics related to huge pages usage on the system.
+
+
+[float]
+=== `system.memory.hugepages.total`
+
+type: long
+
+format: number
+
+Number of huge pages in the pool.
+
+
+[float]
+=== `system.memory.hugepages.used.bytes`
+
+type: long
+
+format: bytes
+
+Memory used in allocated huge pages.
+
+
+[float]
+=== `system.memory.hugepages.used.pct`
+
+type: long
+
+format: percent
+
+Percentage of huge pages used.
+
+
+[float]
+=== `system.memory.hugepages.free`
+
+type: long
+
+format: number
+
+Number of available huge pages in the pool.
+
+
+[float]
+=== `system.memory.hugepages.reserved`
+
+type: long
+
+format: number
+
+Number of reserved but not allocated huge pages in the pool.
+
+
+[float]
+=== `system.memory.hugepages.surplus`
+
+type: long
+
+format: number
+
+Number of overcommited huge pages.
+
+
+[float]
+=== `system.memory.hugepages.default_size`
+
+type: long
+
+format: bytes
+
+Default size for huge pages.
+
+
+[float]
 == network fields
 
 `network` contains network IO metrics for a single network interface.
