@@ -23,7 +23,7 @@ class Test(BaseTest):
 
         filebeat = self.start_beat()
 
-        self.wait_until(lambda: self.log_contains("Started listening for udp"))
+        self.wait_until(lambda: self.log_contains("Started listening for UDP connection"))
 
         sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)  # UDP
 
