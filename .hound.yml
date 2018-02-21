@@ -1,2 +1,2 @@
 go:
-  ignore_file: filebeat/input/syslog/parser.go
+  ignore_file: filebeat/input/syslog/
