@@ -38,10 +38,15 @@ func NewInput(
 		return nil, err
 	}
 
+	config := defaultConfig
+	if err = cfg.Unpack(&config); err != nil {
+		return nil, err
+	}
+
 	forwarder := harvester.NewForwarder(out)
 	return &Input{
 		outlet:    out,
-		harvester: NewHarvester(nil, cfg),
+		harvester: factory(config, forwarder),
 		started:   false,
 	}
 }
@@ -61,13 +66,19 @@ func (p *Input) Run() {
 	}
 }
 
-// Stop stops the UDP input
+// Stop stops the TCP input
 func (p *Input) Stop() {
 	logp.Info("stopping Syslog input")
 	p.harvester.Stop()
 }
 
-// Wait suspends the UDP input
+// Wait suspends the TCP input
 func (p *Input) Wait() {
 	p.Stop()
+}
+
+func factory(forwarder *harvester.Forwarder, config *Config) *harvester.Harvester {
+	if config.isUDP() {
+		havester.NewHarvester(forwarder, config)
+	}
 }

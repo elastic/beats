@@ -25,3 +25,7 @@ var defaultUDPConfig = udpConfig{
 	MaxMessageSize: 10240,
 	Host:           "localhost:8080",
 }
+
+func (c *config) isUDP() bool {
+	return strings.Upper(c.Protocol) == "UDP"
+}
