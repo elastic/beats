@@ -587,36 +587,44 @@
 			"revisionTime": "2018-02-07T18:09:04Z"
 		},
 		{
-			"checksumSHA1": "386qAesaBQFadNHu7di78fZT7xk=",
+			"checksumSHA1": "RPOLNUpw00QUUaA/U4YbPVf6WlA=",
 			"path": "github.com/elastic/gosigar",
-			"revision": "16df19fe5efee4ea2938bde5f56c02d9929dc054",
-			"revisionTime": "2018-01-22T22:24:54Z",
-			"version": "v0.8.0",
-			"versionExact": "v0.8.0"
+			"revision": "237dff72b4ba95da2cd985f96a9c0ede4aefc760",
+			"revisionTime": "2018-03-16T16:52:25Z",
+			"version": "v0.9.0",
+			"versionExact": "v0.9.0"
 		},
 		{
 			"checksumSHA1": "TX9y4oPL5YmT4Gb/OU4GIPTdQB4=",
 			"path": "github.com/elastic/gosigar/cgroup",
-			"revision": "cdcbd8c3b8bf28ef6d8639ec1e45bf31d2745f2d",
-			"revisionTime": "2018-01-17T18:54:32Z",
-			"version": "v0.7.0",
-			"versionExact": "v0.7.0"
+			"revision": "237dff72b4ba95da2cd985f96a9c0ede4aefc760",
+			"revisionTime": "2018-03-16T16:52:25Z",
+			"version": "v0.9.0",
+			"versionExact": "v0.9.0"
 		},
 		{
-			"checksumSHA1": "2VhOsaR4sv3S79HO6X+6dEphNKU=",
+			"checksumSHA1": "hPqGM3DENaGfipEODoyZ4mKogTQ=",
+			"path": "github.com/elastic/gosigar/sys",
+			"revision": "237dff72b4ba95da2cd985f96a9c0ede4aefc760",
+			"revisionTime": "2018-03-16T16:52:25Z",
+			"version": "v0.9.0",
+			"versionExact": "v0.9.0"
+		},
+		{
+			"checksumSHA1": "mLq5lOyD0ZU39ysXuf1ETOLJ+f0=",
 			"path": "github.com/elastic/gosigar/sys/linux",
-			"revision": "cdcbd8c3b8bf28ef6d8639ec1e45bf31d2745f2d",
-			"revisionTime": "2018-01-17T18:54:32Z",
-			"version": "v0.7.0",
-			"versionExact": "v0.7.0"
+			"revision": "237dff72b4ba95da2cd985f96a9c0ede4aefc760",
+			"revisionTime": "2018-03-16T16:52:25Z",
+			"version": "v0.9.0",
+			"versionExact": "v0.9.0"
 		},
 		{
 			"checksumSHA1": "qDsgp2kAeI9nhj565HUScaUyjU4=",
 			"path": "github.com/elastic/gosigar/sys/windows",
-			"revision": "cdcbd8c3b8bf28ef6d8639ec1e45bf31d2745f2d",
-			"revisionTime": "2018-01-17T18:54:32Z",
-			"version": "v0.7.0",
-			"versionExact": "v0.7.0"
+			"revision": "237dff72b4ba95da2cd985f96a9c0ede4aefc760",
+			"revisionTime": "2018-03-16T16:52:25Z",
+			"version": "v0.9.0",
+			"versionExact": "v0.9.0"
 		},
 		{
 			"checksumSHA1": "hTxFrbA619JCHysWjXHa9U6bfto=",

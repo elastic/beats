@@ -379,12 +379,16 @@ func parseMeminfo() (map[string]uint64, error) {
 			return true // skip on errors
 		}
 
-		num := strings.TrimLeft(fields[1], " ")
-		val, err := strtoull(strings.Fields(num)[0])
+		valueUnit := strings.Fields(fields[1])
+		value, err := strtoull(valueUnit[0])
 		if err != nil {
 			return true // skip on errors
 		}
-		table[fields[0]] = val * 1024 //in bytes
+
+		if len(valueUnit) > 1 && valueUnit[1] == "kB" {
+			value *= 1024
+		}
+		table[fields[0]] = value
 
 		return true
 	})
