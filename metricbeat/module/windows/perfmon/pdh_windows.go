@@ -10,6 +10,8 @@ import (
 	"unicode/utf16"
 	"unsafe"
 
+	"github.com/elastic/beats/libbeat/logp"
+
 	"github.com/joeshaw/multierror"
 	"github.com/pkg/errors"
 	"golang.org/x/sys/windows"
@@ -222,7 +224,7 @@ func (q *Query) AddCounter(counterPath string, format Format, instanceName strin
 
 	h, err := PdhAddCounter(q.handle, counterPath, 0)
 	if err != nil {
-		return errors.Wrapf(err, `failed to add counter (path="%v")`, counterPath)
+		return err
 	}
 
 	wildcard := wildcardRegexp.MatchString(counterPath)
@@ -314,7 +316,7 @@ type PerfmonReader struct {
 	executed      bool // Indicates if the query has been executed.
 }
 
-func NewPerfmonReader(config []CounterConfig) (*PerfmonReader, error) {
+func NewPerfmonReader(config PerfmonConfig) (*PerfmonReader, error) {
 	query, err := NewQuery("")
 	if err != nil {
 		return nil, err
@@ -326,7 +328,7 @@ func NewPerfmonReader(config []CounterConfig) (*PerfmonReader, error) {
 		measurement:   map[string]string{},
 	}
 
-	for _, counter := range config {
+	for _, counter := range config.CounterConfig {
 		var format Format
 		switch counter.Format {
 		case "float":
@@ -335,8 +337,14 @@ func NewPerfmonReader(config []CounterConfig) (*PerfmonReader, error) {
 			format = LongFormat
 		}
 		if err := query.AddCounter(counter.Query, format, counter.InstanceName); err != nil {
+			if config.IgnoreNECounters {
+				if err == PDH_CSTATUS_NO_COUNTER {
+					logp.Info(`ignore non existent counter (path="%v")`, counter.Query)
+					continue
+				}
+			}
 			query.Close()
-			return nil, err
+			return nil, errors.Wrapf(err, `failed to add counter (path="%v")`, counter.Query)
 		}
 
 		r.instanceLabel[counter.Query] = counter.InstanceLabel

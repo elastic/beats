@@ -21,6 +21,11 @@ type CounterConfig struct {
 	Format           string `config:"format"`
 }
 
+type PerfmonConfig struct {
+	IgnoreNECounters bool            `config:"perfmon.ignore_non_existent_counters"`
+	CounterConfig    []CounterConfig `config:"perfmon.counters" validate:"required"`
+}
+
 func init() {
 	if err := mb.Registry.AddMetricSet("windows", "perfmon", New); err != nil {
 		panic(err)
@@ -36,9 +41,7 @@ type MetricSet struct {
 func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
 	cfgwarn.Beta("The perfmon metricset is beta")
 
-	config := struct {
-		CounterConfig []CounterConfig `config:"perfmon.counters" validate:"required"`
-	}{}
+	config := PerfmonConfig{}
 
 	if err := base.Module().UnpackConfig(&config); err != nil {
 		return nil, err
@@ -57,7 +60,7 @@ func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
 
 	}
 
-	reader, err := NewPerfmonReader(config.CounterConfig)
+	reader, err := NewPerfmonReader(config)
 	if err != nil {
 		return nil, errors.Wrap(err, "initialization failed")
 	}
