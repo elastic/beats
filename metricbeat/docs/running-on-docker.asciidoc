@@ -18,7 +18,7 @@ docker run \
   --volume=/proc:/hostfs/proc:ro \ <1>
   --volume=/sys/fs/cgroup:/hostfs/sys/fs/cgroup:ro \ <2>
   --volume=/:/hostfs:ro \ <3>
-  --net=host <4>
+  --net=host \ <4>
   {dockerimage} -e -system.hostfs=/hostfs
 ----
 
