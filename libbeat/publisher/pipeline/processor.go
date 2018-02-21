@@ -175,6 +175,9 @@ var generalizeProcessor = newProcessor("generalizeEvent", func(event *beat.Event
 	if len(event.Fields) == 0 {
 		return nil, nil
 	}
+	if event.Normalized {
+		return event, nil
+	}
 
 	fields := common.ConvertToGenericEvent(event.Fields)
 	if fields == nil {
@@ -183,6 +186,7 @@ var generalizeProcessor = newProcessor("generalizeEvent", func(event *beat.Event
 	}
 
 	event.Fields = fields
+	event.Normalized = true
 	return event, nil
 })
 
