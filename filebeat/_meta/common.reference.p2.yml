@@ -261,6 +261,10 @@ filebeat.inputs:
 # data path.
 #filebeat.registry_file: ${path.data}/registry
 
+# The permissions mask to apply on registry file. The default value is 0600.
+# Must be a valid Unix-style file permissions mask expressed in octal notation.
+#filebeat.registry_file_permissions: 0600
+
 # These config files must have the full filebeat config part inside, but only
 # the input part is processed. All global options like spool_size are ignored.
 # The config_dir MUST point to a different directory then where the main filebeat config file is in.
