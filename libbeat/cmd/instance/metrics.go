@@ -86,7 +86,7 @@ func getRSSSize() (uint64, error) {
 
 	rss, ok := iRss.(uint64)
 	if !ok {
-		return 0, fmt.Errorf("error converting Resident Set Size to uint64")
+		return 0, fmt.Errorf("error converting Resident Set Size to uint64: %v", iRss)
 	}
 	return rss, nil
 }
@@ -149,7 +149,7 @@ func getCPUUsage() (float64, *process.Ticks, error) {
 
 	totalCPUUsage, ok := iTotalCPUUsage.(float64)
 	if !ok {
-		return 0.0, nil, fmt.Errorf("error converting value of CPU usage since start to float64")
+		return 0.0, nil, fmt.Errorf("error converting value of CPU usage since start to float64: %v", iTotalCPUUsage)
 	}
 
 	iTotalCPUUserTicks, err := state.GetValue("cpu.user.ticks")
@@ -159,7 +159,7 @@ func getCPUUsage() (float64, *process.Ticks, error) {
 
 	totalCPUUserTicks, ok := iTotalCPUUserTicks.(uint64)
 	if !ok {
-		return 0.0, nil, fmt.Errorf("error converting value of user CPU ticks since start to uint64")
+		return 0.0, nil, fmt.Errorf("error converting value of user CPU ticks since start to uint64: %v", iTotalCPUUserTicks)
 	}
 
 	iTotalCPUSystemTicks, err := state.GetValue("cpu.system.ticks")
@@ -169,7 +169,7 @@ func getCPUUsage() (float64, *process.Ticks, error) {
 
 	totalCPUSystemTicks, ok := iTotalCPUSystemTicks.(uint64)
 	if !ok {
-		return 0.0, nil, fmt.Errorf("error converting value of system CPU ticks since start to uint64")
+		return 0.0, nil, fmt.Errorf("error converting value of system CPU ticks since start to uint64: %v", iTotalCPUSystemTicks)
 	}
 
 	iTotalCPUTicks, err := state.GetValue("cpu.total.ticks")
@@ -179,7 +179,7 @@ func getCPUUsage() (float64, *process.Ticks, error) {
 
 	totalCPUTicks, ok := iTotalCPUTicks.(uint64)
 	if !ok {
-		return 0.0, nil, fmt.Errorf("error converting total value of CPU ticks since start to uint64")
+		return 0.0, nil, fmt.Errorf("error converting total value of CPU ticks since start to uint64: %v", iTotalCPUTicks)
 	}
 
 	p := process.Ticks{
