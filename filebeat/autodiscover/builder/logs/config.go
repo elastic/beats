@@ -1,4 +1,4 @@
-package log_annotations
+package logs
 
 import "github.com/elastic/beats/libbeat/common"
 

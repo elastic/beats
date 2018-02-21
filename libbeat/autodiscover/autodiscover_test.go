@@ -10,8 +10,6 @@ import (
 	"github.com/elastic/beats/libbeat/common/bus"
 
 	"github.com/stretchr/testify/assert"
-
-	"github.com/elastic/beats/libbeat/autodiscover/template"
 )
 
 type mockRunner struct {
@@ -105,7 +103,7 @@ func TestAutodiscover(t *testing.T) {
 	// Register mock autodiscover provider
 	busChan := make(chan bus.Bus, 1)
 	Registry = NewRegistry()
-	Registry.AddProvider("mock", func(b bus.Bus, mapper *template.Mapper, builders Builders, c *common.Config) (Provider, error) {
+	Registry.AddProvider("mock", func(b bus.Bus, c *common.Config) (Provider, error) {
 		// intercept bus to mock events
 		busChan <- b
 
@@ -208,7 +206,7 @@ func TestAutodiscoverHash(t *testing.T) {
 	busChan := make(chan bus.Bus, 1)
 
 	Registry = NewRegistry()
-	Registry.AddProvider("mock", func(b bus.Bus, mapper *template.Mapper, builders Builders, c *common.Config) (Provider, error) {
+	Registry.AddProvider("mock", func(b bus.Bus, c *common.Config) (Provider, error) {
 		// intercept bus to mock events
 		busChan <- b
 

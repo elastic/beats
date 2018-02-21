@@ -1,4 +1,4 @@
-package metric_annotations
+package metrics
 
 import (
 	"fmt"
@@ -15,7 +15,7 @@ import (
 )
 
 func init() {
-	autodiscover.Registry.AddBuilder("metric.annotations", NewMetricAnnotations)
+	autodiscover.Registry.AddBuilder("metrics", NewMetricAnnotations)
 }
 
 const (
@@ -27,15 +27,15 @@ const (
 	timeout    = "timeout"
 	ssl        = "ssl"
 
-	default_timeout  = "3s"
-	default_interval = "1m"
+	defaultTimeout  = "3s"
+	defaultInterval = "1m"
 )
 
 type metricAnnotations struct {
 	Key string
 }
 
-// Build a new metrics annotation builder
+// NewMetricAnnotations builds a new metrics annotation builder
 func NewMetricAnnotations(cfg *common.Config) (autodiscover.Builder, error) {
 	config := defaultConfig()
 	err := cfg.Unpack(&config)
@@ -90,13 +90,14 @@ func (m *metricAnnotations) CreateConfig(event bus.Event) []*common.Config {
 	for k, v := range sslConf {
 		moduleConfig.Put(k, v)
 	}
-	logp.Debug("metric.hints", "generated config: %v", moduleConfig.String())
+	logp.Debug("metrics.builder", "generated config: %v", moduleConfig.String())
 
 	// Create config object
 	cfg, err := common.NewConfigFrom(moduleConfig)
 	if err != nil {
-		logp.Debug("metric.hints", "config merge failed with error: %v", err)
+		logp.Debug("metrics.builder", "config merge failed with error: %v", err)
 	}
+	logp.Debug("metrics.builder", "generated config: %v", *cfg)
 	config = append(config, cfg)
 
 	// Apply information in event to the template to generate the final config
@@ -118,7 +119,7 @@ func (m *metricAnnotations) getMetricSets(hints common.MapStr, module string) []
 		// Special handling for prometheus as most use cases rely on exporters/instrumentation.
 		// Prometheus stats can be explicitly configured if need be.
 		if module == "prometheus" {
-			return []string{"collector"}
+			msets = []string{"collector"}
 		} else {
 			msets = mb.Registry.MetricSets(module)
 		}
@@ -133,7 +134,7 @@ func (m *metricAnnotations) getHostsWithPort(hints common.MapStr, port int64) []
 	// Only pick hosts that have ${data.port} or the port on current event. This will make
 	// sure that incorrect meta mapping doesn't happen
 	for _, h := range thosts {
-		if strings.Contains(h, "data.port") || strings.Contains(h, fmt.Sprintf("%d", port)) {
+		if strings.Contains(h, "data.port") || strings.Contains(h, fmt.Sprintf(":%d", port)) {
 			result = append(result, h)
 		}
 	}
@@ -148,17 +149,16 @@ func (m *metricAnnotations) getNamespace(hints common.MapStr) string {
 func (m *metricAnnotations) getPeriod(hints common.MapStr) string {
 	if ival := builder.GetHintString(hints, m.Key, period); ival != "" {
 		return ival
-	} else {
-		return default_interval
 	}
+
+	return defaultInterval
 }
 
 func (m *metricAnnotations) getTimeout(hints common.MapStr) string {
 	if tout := builder.GetHintString(hints, m.Key, timeout); tout != "" {
 		return tout
-	} else {
-		return default_timeout
 	}
+	return defaultTimeout
 }
 
 func (m *metricAnnotations) getSSLConfig(hints common.MapStr) common.MapStr {

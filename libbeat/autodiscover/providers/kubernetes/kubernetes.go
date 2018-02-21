@@ -27,7 +27,7 @@ type Provider struct {
 }
 
 // AutodiscoverBuilder builds and returns an autodiscover provider
-func AutodiscoverBuilder(bus bus.Bus, mapper *template.Mapper, builders autodiscover.Builders, c *common.Config) (autodiscover.Provider, error) {
+func AutodiscoverBuilder(bus bus.Bus, c *common.Config) (autodiscover.Provider, error) {
 	config := defaultConfig()
 	err := c.Unpack(&config)
 	if err != nil {
@@ -51,6 +51,20 @@ func AutodiscoverBuilder(bus bus.Bus, mapper *template.Mapper, builders autodisc
 	if err != nil {
 		logp.Err("kubernetes: Couldn't create watcher for %t", &kubernetes.Pod{})
 		return nil, err
+	}
+
+	mapper, err := template.NewConfigMapper(config.Templates)
+	if err != nil {
+		return nil, err
+	}
+
+	var builders autodiscover.Builders
+	for _, bcfg := range config.Builders {
+		if builder, err := autodiscover.Registry.BuildBuilder(bcfg); err != nil {
+			logp.Debug("kubernetes", "failed to construct autodiscover builder due to error: %v", err)
+		} else {
+			builders = append(builders, builder)
+		}
 	}
 
 	p := &Provider{
@@ -97,22 +111,19 @@ func (p *Provider) emitEvents(pod *kubernetes.Pod, flag string, containers []kub
 	containerstatuses []kubernetes.PodContainerStatus) {
 	host := pod.Status.PodIP
 
-	// Collect all container IDs and runtimes from status information. Kubernetes has both docker and rkt
+	// Collect all container IDs
 	containerIDs := map[string]string{}
-	runtimes := map[string]string{}
 	for _, c := range containerstatuses {
-		cid, runtime := c.GetContainerIDWithRuntime()
+		cid := c.GetContainerID()
 		containerIDs[c.Name] = cid
-		runtimes[c.Name] = runtime
 	}
 
 	// Emit container and port information
 	for _, c := range containers {
 		cmeta := common.MapStr{
-			"id":      containerIDs[c.Name],
-			"name":    c.Name,
-			"image":   c.Image,
-			"runtime": runtimes[c.Name],
+			"id":    containerIDs[c.Name],
+			"name":  c.Name,
+			"image": c.Image,
 		}
 		meta := p.metagen.ContainerMetadata(pod, c.Name)
 
@@ -156,45 +167,53 @@ func (p *Provider) publish(event bus.Event) {
 	if config := p.templates.GetConfig(event); config != nil {
 		event["config"] = config
 	} else {
-		// Try to build a config with enabled builders. Send a provider agnostic payload.
-		// Builders are Beat specific.
-		e := bus.Event{}
-		kubeMeta, _ := event["kubernetes"].(common.MapStr)
-		if host, ok := event["host"]; ok {
-			e["host"] = host
-		}
-		if port, ok := event["port"]; ok {
-			e["port"] = port
-		}
-		// The builder base config can configure any of the field values of kubernetes if need be.
-		e["kubernetes"] = kubeMeta
-
-		annotations, _ := kubeMeta["annotations"].(map[string]string)
-		container, _ := kubeMeta["container"].(common.MapStr)
-
-		// This would end up adding a docker|rkt.container entry into the event. This would make sure
-		// that there is not an attempt to spin up a docker input for a rkt container and when a
-		// rkt input exists it would be natively supported.
-		if runtime, ok := container["runtime"]; ok {
-			e[runtime.(string)] = common.MapStr{
-				"container": container,
-			}
-		}
-
-		cname := builder.GetContainerName(container)
-		hints := builder.GenerateHints(annotations, cname, p.config.Prefix)
-		if len(hints) != 0 {
-			e["hints"] = hints
-		}
-
-		logp.Debug("kubernetes", "Generated builder event %v", event)
-
-		if config := p.builders.GetConfig(e); config != nil {
+		// If there isn't a default template then attempt to use builders
+		if config := p.builders.GetConfig(p.generateHints(event)); config != nil {
 			event["config"] = config
 		}
-
 	}
+
 	p.bus.Publish(event)
+}
+
+func (p *Provider) generateHints(event bus.Event) bus.Event {
+	// Try to build a config with enabled builders. Send a provider agnostic payload.
+	// Builders are Beat specific.
+	e := bus.Event{}
+	var annotations map[string]string
+	var kubeMeta, container common.MapStr
+	rawMeta, ok := event["kubernetes"]
+	if ok {
+		kubeMeta = rawMeta.(common.MapStr)
+		// The builder base config can configure any of the field values of kubernetes if need be.
+		e["kubernetes"] = kubeMeta
+		if rawAnn, ok := kubeMeta["annotations"]; ok {
+			annotations = rawAnn.(map[string]string)
+		}
+	}
+	if host, ok := event["host"]; ok {
+		e["host"] = host
+	}
+	if port, ok := event["port"]; ok {
+		e["port"] = port
+	}
+
+	if rawCont, ok := kubeMeta["container"]; ok {
+		container = rawCont.(common.MapStr)
+		e["docker"] = common.MapStr{
+			"container": container,
+		}
+	}
+
+	cname := builder.GetContainerName(container)
+	hints := builder.GenerateHints(annotations, cname, p.config.Prefix)
+	if len(hints) != 0 {
+		e["hints"] = hints
+	}
+
+	logp.Debug("kubernetes", "Generated builder event %v", event)
+
+	return e
 }
 
 // Stop signals the stop channel to force the watch loop routine to stop.

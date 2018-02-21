@@ -2,5 +2,5 @@ package autodiscover
 
 import (
 	// include all filebeat specific builders
-	_ "github.com/elastic/beats/filebeat/autodiscover/builder/log_annotations"
+	_ "github.com/elastic/beats/filebeat/autodiscover/builder/logs"
 )

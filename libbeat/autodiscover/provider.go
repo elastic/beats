@@ -4,7 +4,6 @@ import (
 	"fmt"
 	"strings"
 
-	"github.com/elastic/beats/libbeat/autodiscover/template"
 	"github.com/elastic/beats/libbeat/cfgfile"
 	"github.com/elastic/beats/libbeat/common"
 	"github.com/elastic/beats/libbeat/common/bus"
@@ -17,7 +16,7 @@ type Provider interface {
 }
 
 // ProviderBuilder creates a new provider based on the given config and returns it
-type ProviderBuilder func(bus.Bus, *template.Mapper, Builders, *common.Config) (Provider, error)
+type ProviderBuilder func(bus.Bus, *common.Config) (Provider, error)
 
 // AddProvider registers a new ProviderBuilder
 func (r *registry) AddProvider(name string, provider ProviderBuilder) error {
@@ -64,20 +63,5 @@ func (r *registry) BuildProvider(bus bus.Bus, c *common.Config) (Provider, error
 		return nil, fmt.Errorf("Unknown autodiscover provider %s", config.Type)
 	}
 
-	mapper, err := template.NewConfigMapper(config.Templates)
-	if err != nil {
-		return nil, err
-	}
-
-	builders := Builders{}
-	for _, bCfg := range config.Builders {
-		builder, err := r.ConstructBuilder(bCfg)
-		if err != nil {
-			logp.Debug(debugK, "Could not generate builder due to error: %v", err)
-		} else {
-			builders = append(builders, builder)
-		}
-	}
-
-	return builder(bus, mapper, builders, c)
+	return builder(bus, c)
 }

@@ -1,7 +1,6 @@
 package autodiscover
 
 import (
-	"github.com/elastic/beats/libbeat/autodiscover/template"
 	"github.com/elastic/beats/libbeat/common"
 )
 
@@ -12,9 +11,7 @@ type Config struct {
 
 // ProviderConfig settings
 type ProviderConfig struct {
-	Type      string                  `config:"type"`
-	Builders  []*common.Config        `config:"builders"`
-	Templates template.MapperSettings `config:"templates"`
+	Type string `config:"type"`
 }
 
 // BuilderConfig settings

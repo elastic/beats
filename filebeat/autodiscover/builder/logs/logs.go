@@ -1,4 +1,4 @@
-package log_annotations
+package logs
 
 import (
 	"fmt"
@@ -12,15 +12,21 @@ import (
 )
 
 func init() {
-	autodiscover.Registry.AddBuilder("log.annotations", NewLogAnnotations)
+	autodiscover.Registry.AddBuilder("logs", NewLogAnnotations)
 }
+
+const (
+	multiline    = "multiline"
+	includeLines = "include_lines"
+	excludeLines = "exclude_lines"
+)
 
 type logAnnotations struct {
 	Key    string
 	Config []*common.Config
 }
 
-// Construct a log annotations builder
+// NewLogAnnotations builds a log annotations builder
 func NewLogAnnotations(cfg *common.Config) (autodiscover.Builder, error) {
 	config := defaultConfig()
 	err := cfg.Unpack(&config)
@@ -43,9 +49,7 @@ func (l *logAnnotations) CreateConfig(event bus.Event) []*common.Config {
 
 	var hints common.MapStr
 	hIface, ok := event["hints"]
-	if !ok {
-		return config
-	} else {
+	if ok {
 		hints, _ = hIface.(common.MapStr)
 	}
 
@@ -56,26 +60,23 @@ func (l *logAnnotations) CreateConfig(event bus.Event) []*common.Config {
 	//TODO: Add module support
 
 	tempCfg := common.MapStr{}
-	multiline := l.getMultiline(hints)
-
-	for k, v := range multiline {
-		tempCfg.Put(k, v)
+	mline := l.getMultiline(hints)
+	if len(mline) != 0 {
+		tempCfg.Put(multiline, mline)
 	}
-	if includeLines := l.getIncludeLines(hints); len(includeLines) != 0 {
-		tempCfg.Put("include_lines", includeLines)
+	if ilines := l.getIncludeLines(hints); len(ilines) != 0 {
+		tempCfg.Put(includeLines, ilines)
 	}
-	if excludeLines := l.getExcludeLines(hints); len(excludeLines) != 0 {
-		tempCfg.Put("exclude_lines", excludeLines)
+	if elines := l.getExcludeLines(hints); len(elines) != 0 {
+		tempCfg.Put(excludeLines, elines)
 	}
 
 	// Merge config template with the configs from the annotations
 	for _, c := range l.Config {
 		if err := c.Merge(tempCfg); err != nil {
-			logp.Debug("log.annotations", "config merge failed with error: %v", err)
+			logp.Debug("logs.builder", "config merge failed with error: %v", err)
 		} else {
-			cfg := common.MapStr{}
-			c.Unpack(cfg)
-			logp.Debug("log.annotations", "generated config %v", cfg.String())
+			logp.Debug("logs.builder", "generated config %v", *c)
 			config = append(config, c)
 		}
 	}
@@ -86,13 +87,13 @@ func (l *logAnnotations) CreateConfig(event bus.Event) []*common.Config {
 }
 
 func (l *logAnnotations) getMultiline(hints common.MapStr) common.MapStr {
-	return builder.GetHintMapStr(hints, l.Key, "multiline")
+	return builder.GetHintMapStr(hints, l.Key, multiline)
 }
 
 func (l *logAnnotations) getIncludeLines(hints common.MapStr) []string {
-	return builder.GetHintAsList(hints, l.Key, "include_lines")
+	return builder.GetHintAsList(hints, l.Key, includeLines)
 }
 
 func (l *logAnnotations) getExcludeLines(hints common.MapStr) []string {
-	return builder.GetHintAsList(hints, l.Key, "exclude_lines")
+	return builder.GetHintAsList(hints, l.Key, excludeLines)
 }

@@ -27,7 +27,7 @@ type Provider struct {
 }
 
 // AutodiscoverBuilder builds and returns an autodiscover provider
-func AutodiscoverBuilder(bus bus.Bus, mapper *template.Mapper, builders autodiscover.Builders, c *common.Config) (autodiscover.Provider, error) {
+func AutodiscoverBuilder(bus bus.Bus, c *common.Config) (autodiscover.Provider, error) {
 	config := defaultConfig()
 	err := c.Unpack(&config)
 	if err != nil {
@@ -37,6 +37,20 @@ func AutodiscoverBuilder(bus bus.Bus, mapper *template.Mapper, builders autodisc
 	watcher, err := docker.NewWatcher(config.Host, config.TLS, false)
 	if err != nil {
 		return nil, err
+	}
+
+	mapper, err := template.NewConfigMapper(config.Templates)
+	if err != nil {
+		return nil, err
+	}
+
+	var builders autodiscover.Builders
+	for _, bcfg := range config.Builders {
+		if builder, err := autodiscover.Registry.BuildBuilder(bcfg); err != nil {
+			logp.Debug("docker", "failed to construct autodiscover builder due to error: %v", err)
+		} else {
+			builders = append(builders, builder)
+		}
 	}
 
 	start := watcher.ListenStart()
@@ -90,17 +104,12 @@ func (d *Provider) emitContainer(event bus.Event, flag string) {
 		host = container.IPAddresses[0]
 	}
 
-	labelMap := common.MapStr{}
-	for k, v := range container.Labels {
-		labelMap[k] = v
-	}
-
 	meta := common.MapStr{
 		"container": common.MapStr{
 			"id":     container.ID,
 			"name":   container.Name,
 			"image":  container.Image,
-			"labels": labelMap,
+			"labels": container.Labels,
 		},
 	}
 
@@ -139,28 +148,36 @@ func (d *Provider) publish(event bus.Event) {
 	if config := d.templates.GetConfig(event); config != nil {
 		event["config"] = config
 	} else {
-		// Try to build a config with enabled builders. Send a provider agnostic payload.
-		// Builders are Beat specific.
-		e := bus.Event{}
-		dockerMeta, _ := event["docker"].(common.MapStr)
-		e["docker"] = dockerMeta
-
-		if host, ok := event["host"]; ok {
-			e["host"] = host
-		}
-		if port, ok := event["port"]; ok {
-			e["port"] = port
-		}
-		if labels, err := dockerMeta.GetValue("docker.labels"); err == nil {
-			hints := builder.GenerateHints(labels.(map[string]string), "", d.config.Prefix)
-			e["hints"] = hints
-		}
-
-		if config := d.builders.GetConfig(e); config != nil {
+		if config := d.builders.GetConfig(d.generateHints(event)); config != nil {
 			event["config"] = config
 		}
 	}
 	d.bus.Publish(event)
+}
+
+func (d *Provider) generateHints(event bus.Event) bus.Event {
+	// Try to build a config with enabled builders. Send a provider agnostic payload.
+	// Builders are Beat specific.
+	e := bus.Event{}
+	var dockerMeta common.MapStr
+
+	if rawDocker, ok := event["docker"]; ok {
+		dockerMeta = rawDocker.(common.MapStr)
+		e["docker"] = dockerMeta
+	}
+
+	if host, ok := event["host"]; ok {
+		e["host"] = host
+	}
+	if port, ok := event["port"]; ok {
+		e["port"] = port
+	}
+	if labels, err := dockerMeta.GetValue("container.labels"); err == nil {
+		hints := builder.GenerateHints(labels.(map[string]string), "", d.config.Prefix)
+		e["hints"] = hints
+	}
+
+	return e
 }
 
 // Stop the autodiscover process

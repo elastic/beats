@@ -53,8 +53,8 @@ func (r *registry) GetBuilder(name string) BuilderConstructor {
 	return r.builders[name]
 }
 
-// ConstructBuilder reads provider configuration and instatiate one
-func (r *registry) ConstructBuilder(c *common.Config) (Builder, error) {
+// BuildBuilder reads provider configuration and instatiate one
+func (r *registry) BuildBuilder(c *common.Config) (Builder, error) {
 	var config BuilderConfig
 	err := c.Unpack(&config)
 	if err != nil {

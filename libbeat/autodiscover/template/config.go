@@ -6,8 +6,6 @@ import (
 	"github.com/elastic/beats/libbeat/logp"
 	"github.com/elastic/beats/libbeat/processors"
 
-	"fmt"
-
 	ucfg "github.com/elastic/go-ucfg"
 )
 
@@ -73,6 +71,7 @@ func (c *Mapper) GetConfig(event bus.Event) []*common.Config {
 	return result
 }
 
+// ApplyConfigTemplate takes a set of templated configs and applys information in an event map
 func ApplyConfigTemplate(event bus.Event, configs []*common.Config) []*common.Config {
 	var result []*common.Config
 	// unpack input
@@ -101,7 +100,6 @@ func ApplyConfigTemplate(event bus.Event, configs []*common.Config) []*common.Co
 			logp.Err("Error unpacking config: %v", err)
 			continue
 		}
-		fmt.Println(unpacked)
 		// Repack again:
 		res, err := common.NewConfigFrom(unpacked)
 		if err != nil {

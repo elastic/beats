@@ -1,4 +1,4 @@
-package metric_annotations
+package metrics
 
 type config struct {
 	Key string `config:"key"`

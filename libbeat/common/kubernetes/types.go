@@ -133,20 +133,14 @@ func (p *Pod) GetMetadata() *ObjectMeta {
 
 // GetContainerID parses the container ID to get the actual ID string
 func (s *PodContainerStatus) GetContainerID() string {
-	cID, _ := s.GetContainerIDWithRuntime()
-	return cID
-}
-
-// GetContainerID parses the container ID to get the actual ID string
-func (s *PodContainerStatus) GetContainerIDWithRuntime() (string, string) {
 	cID := s.ContainerID
 	if cID != "" {
-		parts := strings.Split(cID, "://")
+		parts := strings.Split(cID, "//")
 		if len(parts) == 2 {
-			return parts[1], parts[0]
+			return parts[1]
 		}
 	}
-	return "", ""
+	return ""
 }
 
 // Event is kubernetes event
