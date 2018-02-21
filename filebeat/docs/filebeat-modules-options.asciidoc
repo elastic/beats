@@ -1,16 +1,16 @@
 [[configuration-filebeat-modules]]
 == Specify which modules to run
 
-NOTE: Using Filebeat modules is optional. You may decide to
-<<configuration-filebeat-options,set up prospectors manually>> if you are using
+NOTE: Using {beatname_uc} modules is optional. You may decide to
+<<configuration-filebeat-options,configure inputs manually>> if you are using
 a log file type that isn't supported, or you want to use a different setup.
 
-Filebeat <<filebeat-modules,modules>> provide a quick way for you to get started
+{beatname_uc} <<filebeat-modules,modules>> provide a quick way for you to get started
 processing common log formats. They contain default configurations,
 Elasticsearch ingest node pipeline definitions, and Kibana dashboards to help you
 implement and deploy a log monitoring solution.
 
-Filebeat provides a few different ways to enable modules. You can:
+{beatname_uc} provides a few different ways to enable modules. You can:
 
 * <<enable-modules-d-configs>>
 * <<enable-modules-cli>>
@@ -21,9 +21,9 @@ include::../../libbeat/docs/shared-note-file-permissions.asciidoc[]
 When you enable modules, you can also
 <<specify-variable-settings,specify variable settings>> to change the default
 behavior of the modules, and you can specify
-<<advanced-settings,advanced settings>> to override prospector settings.
+<<advanced-settings,advanced settings>> to override input settings.
 
-Before running Filebeat with modules enabled, make sure you also set up the
+Before running {beatname_uc} with modules enabled, make sure you also set up the
 environment to use Kibana dashboards. See <<filebeat-modules-quickstart>> for
 more information.
 
@@ -32,7 +32,7 @@ more information.
 === Enable module configs in the `modules.d` directory
 
 The `modules.d` directory contains default configurations for all the modules
-available in Filebeat. You can enable or disable specific module configurations
+available in {beatname_uc}. You can enable or disable specific module configurations
 under `modules.d` by running the
 <<modules-command,`modules enable` or `modules disable`>> commands.
 
@@ -44,7 +44,7 @@ directory, you use:
 ./filebeat modules enable apache2 mysql
 ----
 
-Then when you run Filebeat, it loads the corresponding module configurations
+Then when you run {beatname_uc}, it loads the corresponding module configurations
 specified in the `modules.d` directory (for example, `modules.d/apache2.yml` and
 `modules.d/mysql.yml`).
 
@@ -62,12 +62,12 @@ to specify variable settings. See <<specify-variable-settings>>.
 
 [float]
 [[enable-modules-cli]]
-=== Enable modules when you run Filebeat
+=== Enable modules when you run {beatname_uc}
 
-To enable specific <<filebeat-modules,modules>> when you run Filebeat at the
+To enable specific <<filebeat-modules,modules>> when you run {beatname_uc} at the
 command line, you can use the `--modules` flag. This approach works well when
 you're getting started and want to specify different modules and settings each
-time you run Filebeat. Any modules specified at the command line will be loaded
+time you run {beatname_uc}. Any modules specified at the command line will be loaded
 along with any modules that are enabled in the configuration file or `modules.d`
 directory. If there's a conflict, the configuration specified at the command
 line is used.
@@ -159,15 +159,15 @@ see the <<filebeat-modules,documentation for the modules>>.
 [[advanced-settings]]
 === Advanced settings
 
-Behind the scenes, each module starts a Filebeat prospector. Advanced users
-can add or override any prospector settings. For example, you can set
+Behind the scenes, each module starts a {beatname_uc} input. Advanced users
+can add or override any input settings. For example, you can set
 <<close-eof,close_eof>> to `true` in the module configuration:
 
 [source,yaml]
 ----------------------------------------------------------------------
 - module: nginx
   access:
-    prospector:
+    input:
       close_eof: true
 ----------------------------------------------------------------------
 
@@ -175,7 +175,7 @@ Or at the command line like this:
 
 [source,shell]
 ----------------------------------------------------------------------
-./filebeat -M "nginx.access.prospector.close_eof=true"
+./filebeat -M "nginx.access.input.close_eof=true"
 ----------------------------------------------------------------------
 
 
@@ -183,7 +183,7 @@ Here you see how to use the `-M` flag along with the `--modules` flag:
 
 [source,shell]
 ----------------------------------------------------------------------
-./filebeat --modules nginx -M "nginx.access.prospector.close_eof=true"
+./filebeat --modules nginx -M "nginx.access.input.close_eof=true"
 ----------------------------------------------------------------------
 
 
@@ -193,13 +193,13 @@ modules/filesets at once. For example, the following command enables
 
 [source,shell]
 ----------------------------------------------------------------------
-./filebeat -M "nginx.*.prospector.close_eof=true"
+./filebeat -M "nginx.*.input.close_eof=true"
 ----------------------------------------------------------------------
 
-The following command enables `close_eof` for all prospectors created by any of
+The following command enables `close_eof` for all inputs created by any of
 the modules:
 
 [source,shell]
 ----------------------------------------------------------------------
-./filebeat -M "*.*.prospector.close_eof=true"
+./filebeat -M "*.*.input.close_eof=true"
 ----------------------------------------------------------------------

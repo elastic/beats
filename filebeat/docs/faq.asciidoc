@@ -74,7 +74,7 @@ You can use <<clean-removed,`clean_removed`>> for files that are removed from di
 
 On Windows, you might have problems renaming or removing files because Filebeat keeps the file handlers open. This can lead to issues with the file rotating system. To avoid this issue, you can use the <<close-removed,`close_removed`>> and <<close-renamed,`close_renamed`>> options together.
 
-IMPORTANT: When you configure these options, files may be closed before the harvester has finished reading the files. If the file cannot be picked up again by the prospector and the harvester hasn't finish reading the file, the missing lines will never be sent to the output.
+IMPORTANT: When you configure these options, files may be closed before the harvester has finished reading the files. If the file cannot be picked up again by the input and the harvester hasn't finish reading the file, the missing lines will never be sent to the output.
 
 
 [float]

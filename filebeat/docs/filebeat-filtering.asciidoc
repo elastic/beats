@@ -6,11 +6,11 @@ you might need to enhance the exported data (for example, by adding metadata).
 Filebeat provides a couple of options for filtering and enhancing exported
 data.
 
-You can configure each prospector to include or exclude specific lines or files.
-This allows you to specify different filtering criteria for each prospector.
+You can configure each input to include or exclude specific lines or files.
+This allows you to specify different filtering criteria for each input.
 To do this, you use the <<include-lines,`include_lines`>>,
 <<exclude-lines,`exclude_lines`>>, and <<exclude-files,`exclude_files`>>
-options under the `filebeat.prospectors` section of the config file (see
+options under the `filebeat.inputs` section of the config file (see
 <<configuration-filebeat-options>>). The disadvantage of this approach is that
 you need to implement a configuration option for each filtering criteria that
 you need.
@@ -67,7 +67,7 @@ The following configuration decodes the inner JSON object:
 
 [source,yaml]
 -----------------------------------------------------
-filebeat.prospectors:
+filebeat.inputs:
 - type: log
   paths:
     - input.json
@@ -94,7 +94,7 @@ The resulting output looks something like this:
   "inner": {
     "data": "value"
   },
-  "prospector": {
+  "input": {
     "type": "log",
   },
   "offset": 55,

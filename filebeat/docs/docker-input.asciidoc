@@ -1,0 +1,64 @@
+:type: docker
+
+[[docker-input]]
+=== Docker input
+
+++++
+<titleabbrev>Docker</titleabbrev>
+++++
+
+experimental[]
+
+Use the `docker` input to read logs from Docker containers. 
+
+This input searches for container logs under its path, and parse them into
+common message lines, extracting timestamps too. Everything happens before line
+filtering, multiline, and JSON decoding, so this input can be used in
+combination with those settings.
+
+Example configuration:
+
+// REVIEWERS: The filebeat.reference.yml file does not show a docker input type
+// so I'm not sure if the following config is correct. docker only shows up under
+// autodiscover.
+
+["source","yaml",subs="attributes"]
+----
+{beatname_lc}.inputs:
+- type: docker
+  containers.ids: <1>
+    - '8b6fe7dc9e067b58476dc57d6986dd96d7100430c5de3b109a99cd56ac655347'
+----
+
+<1> `containers.ids` is required. All other settings are optional.
+
+==== Configuration options
+
+The `docker` input supports the following configuration options plus the
+<<{type}-input-common-options>> described later.
+
+[[config-container-ids]]
+===== `containers.ids`
+
+The list of Docker container IDs to read logs from. Specify
+`containers.ids: '*'` to read from all containers.
+
+===== `containers.path`
+
+The base path where Docker logs are located. The default
+is `/var/lib/docker/containers`.
+
+===== `containers.stream`
+
+Reads from the specified streams only: `all`, `stdout` or `stderr`. The default
+is `all`.
+
+// REVIEWERS: I'm guessing where these settings live in the config 
+// because it's not clear from the docs or the reference.yml. Would be nice to
+// have a realistic example here.
+
+// REVIEWERS: Sounds like I definitely need to add multiline to the docs here.
+// which other config options from the harvester are used by the docker input?
+
+[id="{type}-input-common-options"]
+include::include/common-input-options.asciidoc[]

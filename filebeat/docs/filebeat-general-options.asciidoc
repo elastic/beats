@@ -53,9 +53,9 @@ filebeat.registry_file_permissions: 0600
 [float]
 ==== `config_dir`
 
-The full path to the directory that contains additional prospector configuration files.
+The full path to the directory that contains additional input configuration files.
 Each configuration file must end with `.yml`. Each config file must also specify the full Filebeat
-config hierarchy even though only the prospector part of the file is processed. All global
+config hierarchy even though only the `inputs` part of each file is processed. All global
 options, such as `registry_file`, are ignored.
 
 The `config_dir` option MUST point to a directory other than the directory where the main Filebeat config file resides.

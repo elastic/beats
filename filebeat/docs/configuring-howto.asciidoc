@@ -47,8 +47,6 @@ include::./filebeat-modules-options.asciidoc[]
 
 include::./filebeat-options.asciidoc[]
 
-include::./multiple-prospectors.asciidoc[]
-
 include::./multiline.asciidoc[]
 
 include::./filebeat-general-options.asciidoc[]

@@ -1,0 +1,93 @@
+:type: redis
+
+[[redis-input]]
+=== Redis input
+
+++++
+<titleabbrev>Redis</titleabbrev>
+++++
+
+experimental[]
+
+Use the `redis` input to read entries from Redis slowlogs.
+
+Example configuration:
+
+["source","yaml",subs="attributes"]
+----
+{beatname_lc}.inputs:
+- type: redis
+  hosts: ["localhost:6379"]
+  username: "$\{redis_user\}"
+  password: "$\{redis_pwd\}"
+----
+
+
+// REVIEWERS: Which options should I show in the example config? Incidentally,
+// in the reference.yml, password shows up twice in the same namespace. This
+// needs to be fixed in the reference.yml file
+
+==== Configuration options
+
+The `redis` input supports the following configuration options plus the
+<<{type}-input-common-options>> described later.
+
+//REVIEWERS: These descriptions are new, so please review carefully.
+
+[float]
+[[redis-hosts]]
+===== `hosts`
+
+The list of Redis hosts to connect to.
+
+[float]
+[[redis-username]]
+===== `username`
+
+The username to use when connecting to Redis.
+
+[float]
+[[redis-password]]
+===== `password`
+
+The password to use when connecting to Redis.
+
+[float]
+[[redis-enabled]]
+===== `enable`
+
+When set to `true`, enables the `redis` input. The default is `false`.
+
+[float]
+[[redis-scan_frequency]]
+===== `scan_frequency`
+
+How often {beatname_uc} reads entries from Redis slowlogs. Specify `1s` to scan
+Redis as frequently as possible without causing {beatname_uc} to scan too
+frequently. Do not set this value to less than `1s`.
+
+The default is `10s`.
+
+[float]
+[[redis-timeout]]
+===== `timeout`
+
+How long to wait for a response from Redis before the input returns an error.
+The default is `1s`.
+
+[float]
+[[redis-network]]
+===== `network`
+
+The network type to use for the Redis connection. The default is `tcp`.
+
+//REVIEWERS: What (if any) other network types are supported here?
+
+[float]
+[[redis-maxconn]]
+===== `maxconn`
+
+The maximum number of concurrent connections. The default is `10`.
+
+[id="{type}-input-common-options"]
+include::include/common-input-options.asciidoc[]

@@ -17,7 +17,7 @@ Also read <<yaml-tips>> and <<regexp-support>> to avoid common mistakes.
 [[multiline]]
 === Configuration options
 
-You can specify the following options in the `filebeat.prospectors` section of
+You can specify the following options in the `filebeat.inputs` section of
 the +{beatname_lc}.yml+ config file to control how Filebeat deals with messages
 that span multiple lines. 
 

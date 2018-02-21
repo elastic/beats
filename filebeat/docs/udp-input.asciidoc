@@ -1,0 +1,40 @@
+:type: udp
+
+[[udp-input]]
+=== UDP input
+
+++++
+<titleabbrev>UDP</titleabbrev>
+++++
+
+Use the `udp` input to read events over UDP.
+
+Example configuration:
+
+["source","yaml",subs="attributes"]
+----
+{beatname_lc}.inputs:
+- type: udp
+  max_message_size: 10240
+----
+
+
+==== Configuration options
+
+The `udp` input supports the following configuration options plus the
+<<{type}-input-common-options>> described later.
+
+//REVIEWERS: What other options need to be documented here? I don't see host
+//and port listed in the reference.yml. Are the host and port separate options?
+//What guidance should we provide to help users set these options? Config ex
+//above should include this as an eample, too.
+
+[float]
+[[max-message-size]]
+==== `max_message_size`
+
+Specifies the maximum size of the message received over UDP. The default is
+`10240`.
+
+[id="{type}-input-common-options"]
+include::include/common-input-options.asciidoc[]

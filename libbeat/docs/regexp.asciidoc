@@ -20,7 +20,7 @@ ifeval::["{beatname_lc}"=="filebeat"]
 For example, <<multiline,`multiline.pattern`>>,
 <<include-lines,`include_lines`>>, <<exclude-lines,`exclude_lines`>>, and
 <<exclude-files,`exclude_files`>> all accept regular expressions. Some options,
-however, such as the prospector <<prospector-paths,`paths`>> option, accept only
+however, such as the input <<input-paths,`paths`>> option, accept only
 glob-based paths.
 
 endif::[]

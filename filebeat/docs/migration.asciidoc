@@ -96,7 +96,7 @@ section to understand the Filebeat options.
 [float]
 === Migrate the "files" section
 
-To migrate the `files` section from the Logstash Forwarder configuration, create a  `prospectors` section in the Filebeat config file. For example, assuming that you start
+To migrate the `files` section from the Logstash Forwarder configuration, create an  `inputs` section in the Filebeat config file. For example, assuming that you start
 with this configuration in Logstash Forwarder:
 
 [source,json]
@@ -130,11 +130,11 @@ with this configuration in Logstash Forwarder:
   ]
 -------------------------------------------------------------------------------------
 
-The equivalent `prospectors` section would look like this:
+The equivalent `inputs` section would look like this:
 
 [source,yaml]
 -------------------------------------------------------------------------------------
-filebeat.prospectors:
+filebeat.inputs:
 - type: log
   paths:
     - /var/log/messages
@@ -156,9 +156,9 @@ As you can see, apart from the new `type` options,
 which were before implicitly defined via the `type` custom field, the remaining
 options can be migrated mechanically.
 
-The Filebeat configuration gives you more control over how each prospector behaves
+The Filebeat configuration gives you more control over how each input behaves
 by allowing you to configure options that were previously global in Logstash Forwarder
-and set them separately for each prospector. See <<configuring-howto-filebeat>>.
+and set them separately for each input. See <<configuring-howto-filebeat>>.
 
 [float]
 === Migrate the "network" section
@@ -278,7 +278,7 @@ Filebeat configuration:
 
 [source,yaml]
 -------------------------------------------------------------------------------------
-filebeat.prospectors:
+filebeat.inputs:
 - type: log
   paths:
     - /var/log/*.log
@@ -334,7 +334,7 @@ The `config_dir` option specifies the path to the directory that contains additi
 
 |`-tail`
 |`tail_files`
-|`tail_files` was moved to the config file and removed as a flag. You can now configure this option separately for each prospector.
+|`tail_files` was moved to the config file and removed as a flag. You can now configure this option separately for each input.
 
 |`-cpuProfileFile`
 |
@@ -361,11 +361,11 @@ Forwarder.
 The custom fields (added from the configuration file) are set as top-level
 fields in Logstash Forwarder but are grouped together under a `fields`
 dictionary in Filebeat. If you need the old behavior during the migration phase,
-you can use the <<fields-under-root>> configuration option:
+you can use the <<fields-under-root-log>> configuration option:
 
 [source,yaml]
 -------------------------------------------------------------------------------------
-filebeat.prospectors:
+filebeat.inputs:
 - type: log
   paths:
     - /var/log/*.log
