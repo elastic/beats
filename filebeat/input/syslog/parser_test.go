@@ -248,12 +248,3 @@ func BenchmarkParser(b *testing.B) {
 		Parse(log, l)
 	}
 }
-
-func BenchmarkParserRegexp(b *testing.B) {
-	b.ReportAllocs()
-	l := &SyslogMessage{}
-	log := []byte("<34>Oct 11 22:14:15 mymachine su: 'su root' failed for lonvick on /dev/pts/8")
-	for n := 0; n < b.N; n++ {
-		ParseRe(log, l)
-	}
-}
