@@ -232,14 +232,6 @@ func TestPriority(t *testing.T) {
 	}
 }
 
-func TestParserRe(t *testing.T) {
-	t.SkipNow()
-	l := &SyslogMessage{}
-	log := []byte("<34>Oct 11 22:14:15 mymachine su: 'su root' failed for lonvick on /dev/pts/8")
-	ParseRe(log, l)
-	assert.Equal(t, []byte("mymachine su: 'su root' failed for lonvick on /dev/pts/8"), l.Message)
-}
-
 func BenchmarkParser(b *testing.B) {
 	b.ReportAllocs()
 	l := &SyslogMessage{}
