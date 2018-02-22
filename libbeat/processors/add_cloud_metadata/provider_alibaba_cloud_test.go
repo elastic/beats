@@ -32,9 +32,7 @@ func initECSTestServer() *httptest.Server {
 }
 
 func TestRetrieveAlibabaCloudMetadata(t *testing.T) {
-	if testing.Verbose() {
-		logp.LogInit(logp.LOG_DEBUG, "", false, true, []string{"*"})
-	}
+	logp.TestingSetup()
 
 	server := initECSTestServer()
 	defer server.Close()

@@ -5,8 +5,6 @@ This file is generated! See scripts/docs_collector.py
 [[metricbeat-metricset-docker-info]]
 === Docker info metricset
 
-beta[]
-
 include::../../../module/docker/info/_meta/docs.asciidoc[]
 
 

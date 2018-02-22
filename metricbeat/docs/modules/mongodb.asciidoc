@@ -88,9 +88,13 @@ metricbeat.modules:
 
 The following metricsets are available:
 
+* <<metricbeat-metricset-mongodb-collstats,collstats>>
+
 * <<metricbeat-metricset-mongodb-dbstats,dbstats>>
 
 * <<metricbeat-metricset-mongodb-status,status>>
+
+include::mongodb/collstats.asciidoc[]
 
 include::mongodb/dbstats.asciidoc[]
 

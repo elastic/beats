@@ -7,8 +7,7 @@
         "detector_description": "nginx_access_remote_ip_high_dc_url",
         "function": "high_distinct_count",
         "field_name": "nginx.access.url",
-        "over_field_name": "nginx.access.remote_ip",
-        "detector_rules": []
+        "over_field_name": "nginx.access.remote_ip"
       }
     ],
     "influencers": [

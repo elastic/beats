@@ -5,8 +5,6 @@ This file is generated! See scripts/docs_collector.py
 [[metricbeat-module-kubernetes]]
 == Kubernetes module
 
-beta[]
-
 This module fetches metrics from Kubernetes https://kubernetes.io/docs/admin/kubelet/[kubelet]
 agent and https://github.com/kubernetes/kube-state-metrics[kube-state-metrics] service.
 
@@ -42,6 +40,7 @@ metricbeat.modules:
     - state_node
     - state_deployment
     - state_replicaset
+    - state_statefulset
     - state_pod
     - state_container
   period: 10s
@@ -53,6 +52,8 @@ metricbeat.modules:
   metricsets:
     - event
 ----
+
+This module supports TLS connection when using `ssl` config field, as described in <<configuration-ssl>>.
 
 [float]
 === Metricsets
@@ -77,6 +78,8 @@ The following metricsets are available:
 
 * <<metricbeat-metricset-kubernetes-state_replicaset,state_replicaset>>
 
+* <<metricbeat-metricset-kubernetes-state_statefulset,state_statefulset>>
+
 * <<metricbeat-metricset-kubernetes-system,system>>
 
 * <<metricbeat-metricset-kubernetes-volume,volume>>
@@ -98,6 +101,8 @@ include::kubernetes/state_node.asciidoc[]
 include::kubernetes/state_pod.asciidoc[]
 
 include::kubernetes/state_replicaset.asciidoc[]
+
+include::kubernetes/state_statefulset.asciidoc[]
 
 include::kubernetes/system.asciidoc[]
 

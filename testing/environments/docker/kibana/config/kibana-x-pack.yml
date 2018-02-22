@@ -1,0 +1,20 @@
+---
+# Default Kibana configuration from kibana-docker.
+
+server.name: kibana
+server.host: "0"
+elasticsearch.url: http://elasticsearch:9200
+elasticsearch.username: elastic
+elasticsearch.password: changeme
+
+# The following config options are currently commented out as they would cause a rebuild of kibana which takes a long time.
+
+#xpack.monitoring.ui.container.elasticsearch.enabled: true
+
+# Potentially disabled for beats testing when rebuilding is not needed
+#xpack.apm.enabled: false
+#xpack.graph.enabled: false
+#xpack.ml.enabled: false
+#xpack.monitoring.enabled: false
+#xpack.reporting.enabled: false
+#xpack.watcher.enabled: false

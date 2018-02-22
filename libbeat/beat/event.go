@@ -12,15 +12,25 @@ import (
 // The `Meta`-fields can be used to pass additional meta-data to the outputs.
 // Output can optionally publish a subset of Meta, or ignore Meta.
 type Event struct {
-	Timestamp time.Time
-	Meta      common.MapStr
-	Fields    common.MapStr
-	Private   interface{} // for beats private use
+	Timestamp  time.Time
+	Meta       common.MapStr
+	Fields     common.MapStr
+	Private    interface{} // for beats private use
+	Normalized bool
 }
 
 var (
 	errNoTimestamp = errors.New("value is no timestamp")
 )
+
+// SetID overwrites the "id" field in the events metadata.
+// If Meta is nil, a new Meta dictionary is created.
+func (e *Event) SetID(id string) {
+	if e.Meta == nil {
+		e.Meta = common.MapStr{}
+	}
+	e.Meta["id"] = id
+}
 
 func (e *Event) GetValue(key string) (interface{}, error) {
 	if key == "@timestamp" {

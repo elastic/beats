@@ -1,0 +1,120 @@
+[[configuration-autodiscover]]
+== Autodiscover
+
+Autodiscover allows you to watch for system changes and dynamically adapt settings to them, as they happen.
+This is especially useful when running your infrastructure on containers.
+
+When you run an application on containers, it becomes a moving target to the monitoring system. Autodiscover
+allows you to automatically detect what's running and update settings to monitor it.
+
+You can define configuration templates for different containers. The autodiscover subsystem will use them
+to monitor services as they start running.
+
+You define autodiscover settings in the  +{beatname_lc}.autodiscover+ section of the +{beatname_lc}.yml+
+config file. To enable autodiscover, you specify a list of providers.
+
+[float]
+=== Providers
+
+Autodiscover providers work by watching for events on the system and translating those events into internal autodiscover
+events with a common format. When you configure the provider, you can use fields from the autodiscover event to set
+conditions that, when met, launch specific configurations.
+
+[float]
+===== Docker
+
+The Docker autodiscover provider watches for Docker containers to start and stop. These are the available fields on every
+event:
+
+  * host
+  * port
+  * docker.container.id
+  * docker.container.image
+  * docker.container.name
+  * docker.container.labels
+
+
+For example:
+
+[source,yaml]
+-------------------------------------------------------------------------------------
+{
+  "host": "10.4.15.9",
+  "port": 6379,
+  "docker": {
+    "container": {
+      "id": "382184ecdb385cfd5d1f1a65f78911054c8511ae009635300ac28b4fc357ce51"
+      "name": "redis",
+      "image": "redis:3.2.11",
+      "labels": {
+        "io.kubernetes.pod.namespace": "default"
+        ...
+      }
+    }
+  }
+}
+-------------------------------------------------------------------------------------
+
+You can define a set of configuration templates to be applied when the condition matches an event. Templates define
+a condition to match on autodiscover events, together with the list of configurations to launch when this condition
+happens.
+
+Conditions match events from the provider. Providers use the same format for <<conditions>> that
+processors use.
+
+Configuration templates can contain variables from the autodiscover event. They can be accessed under the `data` namespace.
+For example, with the example event, "`${data.port}`" resolves to `6379`.
+
+include::../../{beatname_lc}/docs/autodiscover-docker-config.asciidoc[]
+
+[float]
+===== Kubernetes
+
+The Kubernetes autodiscover provider watches for Kubernetes pods to start, update, and stop. These are the available fields on every
+event:
+
+  * host
+  * port
+  * kubernetes.container.id
+  * kubernetes.container.image
+  * kubernetes.container.name
+  * kubernetes.labels
+  * kubernetes.namespace
+  * kubernetes.node.name
+  * kubernetes.pod.name
+
+If the `include_annotations` config is added to the provider config, then the list of annotations present in the config
+are added to the event.
+
+For example:
+
+[source,yaml]
+-------------------------------------------------------------------------------------
+{
+  "host": "172.17.0.21",
+  "port": 9090,
+  "kubernetes": {
+    "container": {
+      "id": "bb3a50625c01b16a88aa224779c39262a9ad14264c3034669a50cd9a90af1527",
+      "image": "prom/prometheus",
+      "name": "prometheus"
+    },
+    "labels": {
+      "project": "prometheus",
+      ...
+    },
+    "namespace": "default",
+    "node": {
+      "name": "minikube"
+    },
+    "pod": {
+      "name": "prometheus-2657348378-k1pnh"
+    }
+  },
+}
+-------------------------------------------------------------------------------------
+
+The configuration of templates and conditions is similar to that of the Docker provider. Configuration templates can
+contain variables from the autodiscover event. They can be accessed under data namespace.
+
+include::../../{beatname_lc}/docs/autodiscover-kubernetes-config.asciidoc[]

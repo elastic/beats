@@ -11,24 +11,23 @@
 //////////////////////////////////////////////////////////////////////////
 
 [[configuration-logging]]
-== Set up logging
+== Configure logging
 
 The `logging` section of the +{beatname_lc}.yml+ config file contains options
-for configuring the Beats logging output. The logging system can write logs to
-the syslog or rotate log files. If logging is not explicitly configured, file
-output is used on Windows systems, and syslog output is used on Linux and OS X.
+for configuring the logging output. The logging system can write logs to
+the syslog or rotate log files. If logging is not explicitly configured the file
+output is used.
 
-[source,yaml]
-------------------------------------------------------------------------------
-logging.level: warning
+["source","yaml",subs="attributes"]
+--------------------------------------------------------------------------------
+logging.level: info
 logging.to_files: true
-logging.to_syslog: false
 logging.files:
-  path: /var/log/mybeat
-  name: mybeat.log
+  path: /var/log/{beatname_lc}
+  name: {beatname_lc}
   keepfiles: 7
   permissions: 0644
-------------------------------------------------------------------------------
+--------------------------------------------------------------------------------
 
 TIP: In addition to setting logging options in the config file, you can modify
 the logging output configuration from the command line. See
@@ -37,12 +36,18 @@ the logging output configuration from the command line. See
 [float]
 === Configuration options
 
-You can specify the following options in the `logging` section of the +{beatname_lc}.yml+ config file:
+You can specify the following options in the `logging` section of the
++{beatname_lc}.yml+ config file:
 
 [float]
 ==== `logging.to_syslog`
 
 When true, writes all logging output to the syslog.
+
+[float]
+==== `logging.to_eventlog`
+
+When true, writes all logging output to the Windows Event Log.
 
 [float]
 ==== `logging.to_files`
@@ -51,39 +56,37 @@ When true, writes all logging output to files. The log files are automatically
 rotated when the log file size limit is reached.
 
 NOTE: {beatname_uc} only creates a log file if there is logging output. For
-example, if you set the log <<level,`level`>> to `error` and there are no errors,
-there will be no log file in the directory specified for logs.
+example, if you set the log <<level,`level`>> to `error` and there are no
+errors, there will be no log file in the directory specified for logs.
 
 [float]
 [[level]]
 ==== `logging.level`
 
-Minimum log level. One of `debug`, `info`, `warning`, `error`, or `critical`.
-The default log level is `info`.
+Minimum log level. One of `debug`, `info`, `warning`, or `error`. The default
+log level is `info`.
 
 `debug`:: Logs debug messages, including a detailed printout of all events
-flushed by the Beat. Also logs informational messages, warnings, errors, and
+flushed. Also logs informational messages, warnings, errors, and
 critical errors. When the log level is `debug`, you can specify a list of
-<<selectors,`selectors`>> to display debug messages for specific components.
-If no selectors are specified, the `*` selector is used to display debug
-messages for all components.
+<<selectors,`selectors`>> to display debug messages for specific components. If
+no selectors are specified, the `*` selector is used to display debug messages
+for all components.
 
-`info`:: Logs informational messages, including the number of events
-that are published. Also logs any warnings, errors, or critical errors.
+`info`:: Logs informational messages, including the number of events that are
+published. Also logs any warnings, errors, or critical errors.
 
 `warning`:: Logs warnings, errors, and critical errors.
 
 `error`:: Logs errors and critical errors.
 
-`critical`:: Logs critical errors only.
-
 [float]
 [[selectors]]
 ==== `logging.selectors`
 
-The list of debugging-only selector tags used by different Beats components. Use `*`
-to enable debug output for all components. For example add `publish` to display
-all the debug messages related to event publishing. When starting the Beat,
+The list of debugging-only selector tags used by different {beatname_uc} components.
+Use `*` to enable debug output for all components. For example add `publish` to display
+all the debug messages related to event publishing. When starting {beatname_lc},
 selectors can be overwritten using the `-d` command line option (`-d` also sets
 the debug log level).
 
@@ -92,14 +95,14 @@ the debug log level).
 
 If enabled, {beatname_uc} periodically logs its internal metrics that have
 changed in the last period. For each metric that changed, the delta from the
-value at the beginning of the period is logged. Also, the total values for
-all non-zero internal metrics are logged on shutdown. The default is true.
+value at the beginning of the period is logged. Also, the total values for all
+non-zero internal metrics are logged on shutdown. The default is true.
 
 Here is an example log line:
 
 [source,shell]
 ----------------------------------------------------------------------------------------------------------------------------------------------------
-2016/07/04 12:16:10.821047 logp.go:194: INFO Non-zero metrics in the last 30s:  libbeatEsPublishedAndAckedEvents=18 libbeatEsPublishWriteBytes=10045
+2017-12-17T19:17:42.667-0500    INFO    [metrics]       log/log.go:110  Non-zero metrics in the last 30s: beat.info.uptime.ms=30004 beat.memstats.gc_next=5046416
 ----------------------------------------------------------------------------------------------------------------------------------------------------
 
 Note that we currently offer no backwards compatible guarantees for the internal
@@ -114,34 +117,34 @@ The period after which to log the internal metrics. The default is 30s.
 [float]
 ==== `logging.files.path`
 
-The directory that log files are written to. The default is the logs path. See the
-<<directory-layout>> section for details.
+The directory that log files are written to. The default is the logs path. See
+the <<directory-layout>> section for details.
 
 [float]
 ==== `logging.files.name`
 
-The name of the file that logs are written to. By default, the name of the Beat
-is used.
+The name of the file that logs are written to. The default is '{beatname_lc}'.
 
 [float]
 ==== `logging.files.rotateeverybytes`
 
-The maximum size of a log file. If the limit is reached, a new log file is generated.
-The default size limit is 10485760 (10 MB).
+The maximum size of a log file. If the limit is reached, a new log file is
+generated. The default size limit is 10485760 (10 MB).
 
 [float]
 ==== `logging.files.keepfiles`
 
 The number of most recent rotated log files to keep on disk. Older files are
-deleted during log rotation. The default value is 7. The `keepfiles` options has to be
-in the range of 2 to 1024 files.
+deleted during log rotation. The default value is 7. The `keepfiles` options has
+to be in the range of 2 to 1024 files.
 
 [float]
 ==== `logging.files.permissions`
 
-The permissions mask to apply when rotating log files. The default value is 0600. The
- `permissions` option must be a valid Unix-style file permissions mask expressed
- in octal notation. In Go, numbers in octal notation must start with '0'.
+The permissions mask to apply when rotating log files. The default value is
+0600. The `permissions` option must be a valid Unix-style file permissions mask
+expressed in octal notation. In Go, numbers in octal notation must start with
+'0'.
 
 Examples:
 
@@ -158,14 +161,23 @@ When true, logs messages in JSON format. The default is false.
 [float]
 === Logging format
 
-The logging format is different for each logging type:
+The logging format is generally the same for each logging output. The one
+exception is with the syslog output where the timestamp is not included in the
+message because syslog adds its own timestamp.
 
-* to syslog: Syslog adds the timestamp itself.
+Each log message consists of the following parts:
 
-* to file: RFC 3339 format is used for the timestamp: `2006-01-02T15:04:05Z07:00 WARN log-message`. The format includes the timezone followed by the logging level.
+* Timestamp in ISO8601 format
+* Level
+* Logger name contained in brackets (Optional)
+* File name and line number of the caller
+* Message
+* Structured data encoded in JSON (Optional)
 
-* to stderr: UTC format is used for the timestamp: `2015/11/12 09:03:37.369262
-geolite.go:52: WARN log-message`. The format includes the UTC timestamp with
-the milliseconds, then the name of the caller that sent the log entry followed
-by the logging level. This option should be used mainly for debugging.
+Below are some samples:
 
+`2017-12-17T18:54:16.241-0500	INFO	logp/core_test.go:13	unnamed global logger`
+
+`2017-12-17T18:54:16.242-0500	INFO	[example]	logp/core_test.go:16	some message`
+
+`2017-12-17T18:54:16.242-0500	INFO	[example]	logp/core_test.go:19	some message	{"x": 1}`

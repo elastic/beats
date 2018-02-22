@@ -1,0 +1,46 @@
+{
+    "@timestamp": "2017-10-12T08:05:34.853Z",
+    "auditd": {
+        "data": {
+            "acct": "(invalid user)",
+            "op": "login",
+            "terminal": "sshd"
+        },
+        "result": "fail",
+        "sequence": 19955,
+        "session": "unset",
+        "summary": {
+            "actor": {
+                "primary": "unset",
+                "secondary": "(invalid user)"
+            },
+            "how": "/usr/sbin/sshd",
+            "object": {
+                "primary": "sshd",
+                "secondary": "179.38.151.221",
+                "type": "user-session"
+            }
+        }
+    },
+    "beat": {
+        "hostname": "host.example.com",
+        "name": "host.example.com"
+    },
+    "event": {
+        "action": "logged-in",
+        "category": "user-login",
+        "module": "auditd",
+        "type": "user_login"
+    },
+    "process": {
+        "exe": "/usr/sbin/sshd",
+        "pid": "12635"
+    },
+    "user": {
+        "auid": "unset",
+        "name_map": {
+            "uid": "root"
+        },
+        "uid": "0"
+    }
+}

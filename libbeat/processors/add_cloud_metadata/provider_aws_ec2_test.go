@@ -41,9 +41,7 @@ func initEC2TestServer() *httptest.Server {
 }
 
 func TestRetrieveAWSMetadata(t *testing.T) {
-	if testing.Verbose() {
-		logp.LogInit(logp.LOG_DEBUG, "", false, true, []string{"*"})
-	}
+	logp.TestingSetup()
 
 	server := initEC2TestServer()
 	defer server.Close()

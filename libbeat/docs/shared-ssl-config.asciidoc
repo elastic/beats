@@ -15,7 +15,9 @@ output.elasticsearch.ssl.certificate: "/etc/pki/client/cert.pem"
 output.elasticsearch.ssl.key: "/etc/pki/client/cert.key"
 ----
 
+ifndef::only-elasticsearch[]
 Also see <<configuring-ssl-logstash>>.
+endif::[]
 
 Example Kibana endpoint config with SSL enabled:
 

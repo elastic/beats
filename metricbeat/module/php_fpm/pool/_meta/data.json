@@ -1,11 +1,11 @@
 {
-    "@timestamp": "2017-09-30T12:03:14.242Z",
+    "@timestamp": "2017-10-12T08:05:34.853Z",
     "beat": {
         "hostname": "host.example.com",
         "name": "host.example.com"
     },
     "metricset": {
-        "host": "127.0.0.1:81",
+        "host": "phpfpm:81",
         "module": "php_fpm",
         "name": "pool",
         "rtt": 115
@@ -13,24 +13,23 @@
     "php_fpm": {
         "pool": {
             "connections": {
-                "accepted": 28729,
-                "listen_queue_len": 128,
-                "max_listen_queue": 1,
+                "accepted": 1,
+                "listen_queue_len": 0,
+                "max_listen_queue": 0,
                 "queued": 0
             },
             "name": "www",
             "process_manager": "dynamic",
             "processes": {
-                "active": 2,
-                "idle": 3,
-                "max_active": 8,
-                "max_children_reached": 2,
-                "total": 5
+                "active": 1,
+                "idle": 1,
+                "max_active": 1,
+                "max_children_reached": 0,
+                "total": 2
             },
             "slow_requests": 0,
-            "start_since": 171707,
-            "start_time": 1506604034
+            "start_since": 670,
+            "start_time": 1512631228
         }
-    },
-    "type": "metricsets"
+    }
 }

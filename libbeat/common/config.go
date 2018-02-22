@@ -96,6 +96,11 @@ func NewConfigWithYAML(in []byte, source string) (*Config, error) {
 	return fromConfig(c), err
 }
 
+// OverwriteConfigOpts allow to change the globally set config option
+func OverwriteConfigOpts(options []ucfg.Option) {
+	configOpts = options
+}
+
 func LoadFile(path string) (*Config, error) {
 	if IsStrictPerms() {
 		if err := ownerHasExclusiveWritePerms(path); err != nil {
@@ -272,7 +277,7 @@ func (ns *ConfigNamespace) Unpack(cfg *Config) error {
 		}
 
 		if ns.name != "" {
-			return errors.New("more then one namespace configured")
+			return errors.New("more than one namespace configured")
 		}
 
 		ns.name = name

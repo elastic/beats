@@ -49,7 +49,7 @@ If you need to use a literal `${` in your configuration file then you can write
 `$${` to escape the expansion.
 
 After changing the value of an environment variable, you need to restart
-the Beat to pick up the new value.
+{beatname_uc} to pick up the new value.
 
 [NOTE]
 ==================================
@@ -104,7 +104,7 @@ output.elasticsearch:
   hosts: '${ES_HOSTS}'
 -------------------------------------------------------------------------------
 
-When the Beat loads the config file, it resolves the environment variable and
+When {beatname_uc} loads the config file, it resolves the environment variable and
 replaces it with the specified list before reading the `hosts` setting.
 
 NOTE: Do not use double-quotes (`"`) to wrap regular expressions, or the backslash (`\`) will be interpreted as an escape character.

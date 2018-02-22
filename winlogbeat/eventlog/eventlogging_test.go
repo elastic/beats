@@ -15,6 +15,7 @@ import (
 	"github.com/stretchr/testify/assert"
 
 	"github.com/elastic/beats/libbeat/logp"
+	"github.com/elastic/beats/winlogbeat/checkpoint"
 	"github.com/elastic/beats/winlogbeat/sys/eventlogging"
 )
 
@@ -77,10 +78,10 @@ var oneTimeLogpInit sync.Once
 func configureLogp() {
 	oneTimeLogpInit.Do(func() {
 		if testing.Verbose() {
-			logp.LogInit(logp.LOG_DEBUG, "", false, true, []string{"eventlog"})
+			logp.DevelopmentSetup(logp.WithSelectors("eventlog"))
 			logp.Info("DEBUG enabled for eventlog.")
 		} else {
-			logp.LogInit(logp.LOG_WARNING, "", false, true, []string{})
+			logp.DevelopmentSetup(logp.WithLevel(logp.WarnLevel))
 		}
 
 		// Clear the event log before starting.
@@ -389,7 +390,7 @@ func TestOpenInvalidProvider(t *testing.T) {
 	configureLogp()
 
 	el := newTestEventLogging(t, map[string]interface{}{"name": "nonExistentProvider"})
-	assert.NoError(t, el.Open(0), "Calling Open() on an unknown provider "+
+	assert.NoError(t, el.Open(checkpoint.EventLogState{}), "Calling Open() on an unknown provider "+
 		"should automatically open Application.")
 	_, err := el.Read()
 	assert.NoError(t, err)
@@ -472,6 +473,49 @@ func TestReadWhileCleared(t *testing.T) {
 	if len(lr) > 0 {
 		assert.Equal(t, uint32(3), lr[0].EventIdentifier.ID)
 	}
+}
+
+// Test event messages that include less parameters than required for message
+// formating (caused a crash in previous versions)
+func TestReadMissingParameters(t *testing.T) {
+	configureLogp()
+	log, err := initLog(providerName, sourceName, servicesMsgFile)
+	if err != nil {
+		t.Fatal(err)
+	}
+	defer func() {
+		err := uninstallLog(providerName, sourceName, log)
+		if err != nil {
+			t.Fatal(err)
+		}
+	}()
+
+	var eventID uint32 = 1073748860
+	// Missing parameters will be substituted by "(null)"
+	template := "The %s service entered the (null) state."
+	msgs := []string{"Windows Update"}
+	err = log.Report(elog.Info, eventID, msgs)
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	// Read messages:
+	eventlog, teardown := setupEventLogging(t, 0, map[string]interface{}{"name": providerName})
+	defer teardown()
+
+	records, err := eventlog.Read()
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	// Verify the message contents:
+	assert.Len(t, records, 1)
+	if len(records) != 1 {
+		t.FailNow()
+	}
+	assert.Equal(t, eventID&0xFFFF, records[0].EventIdentifier.ID)
+	assert.Equal(t, fmt.Sprintf(template, msgs[0]),
+		strings.TrimRight(records[0].Message, "\r\n"))
 }
 
 func newTestEventLogging(t *testing.T, options map[string]interface{}) EventLog {

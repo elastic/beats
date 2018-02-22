@@ -1,53 +1,49 @@
 {
-    "@timestamp":"2016-05-23T08:05:34.853Z",
-    "beat":{
-        "hostname":"host.example.com",
-        "name":"host.example.com"
+    "@timestamp": "2017-10-12T08:05:34.853Z",
+    "beat": {
+        "hostname": "host.example.com",
+        "name": "host.example.com"
     },
-
-    "etcd":{
-        "store":{
-            "gets":{
-                "success": 75,
-                "fail": 4
+    "etcd": {
+        "store": {
+            "compareanddelete": {
+                "fail": 0,
+                "success": 0
             },
-            "sets":{
-                "success": 4,
-                "fail": 2
+            "compareandswap": {
+                "fail": 0,
+                "success": 0
             },
-            "delete":{
-                "success": 0,
-                "fail": 0
+            "create": {
+                "fail": 0,
+                "success": 1
             },
-            "update":{
-                "success": 0,
-                "fail": 0
+            "delete": {
+                "fail": 0,
+                "success": 0
             },
-            "create":{
-                "success":2,
-                "fail": 0
-            },
-            "compareandswap":{
-                "success": 0,
-                "fail": 0
-            },  
-            "compareanddelete":{
-                "success": 0,
-                "fail": 0
-            },
-            "expire":{
+            "expire": {
                 "count": 0
+            },
+            "gets": {
+                "fail": 1,
+                "success": 35
+            },
+            "sets": {
+                "fail": 0,
+                "success": 2
+            },
+            "update": {
+                "fail": 0,
+                "success": 0
             },
             "watchers": 0
         }
-    },    
-
-    "metricset":{
-        "host":"localhost",
-        "module":"etcd",
-        "name":"store",
-        "rtt":44269
     },
-
-    "type":"metricsets"
+    "metricset": {
+        "host": "etcd:2379",
+        "module": "etcd",
+        "name": "store",
+        "rtt": 115
+    }
 }

@@ -73,3 +73,11 @@ func (c *ConcreteSigar) GetFDUsage() (FDUsage, error) {
 	err := fd.Get()
 	return fd, err
 }
+
+// GetRusage return the resource usage of the process
+// Possible params: 0 = RUSAGE_SELF, 1 = RUSAGE_CHILDREN, 2 = RUSAGE_THREAD
+func (c *ConcreteSigar) GetRusage(who int) (Rusage, error) {
+	r := Rusage{}
+	err := r.Get(who)
+	return r, err
+}

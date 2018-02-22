@@ -19,5 +19,5 @@ zip -r upload/${BEAT_NAME:-beats}-dashboards-${VERSION}.zip /${BEAT_NAME:-beats}
 echo "Created upload/${BEAT_NAME:-beats}-dashboards-${VERSION}.zip"
 
 cd upload
-sha1sum ${BEAT_NAME:-beats}-dashboards-${VERSION}.zip | awk '{print $1;}' > ${BEAT_NAME:-beats}-dashboards-${VERSION}.zip.sha1
-echo "Created upload/${BEAT_NAME:-beats}-dashboards-${VERSION}.zip.sha1"
+sha512sum ${BEAT_NAME:-beats}-dashboards-${VERSION}.zip > ${BEAT_NAME:-beats}-dashboards-${VERSION}.zip.sha512
+echo "Created upload/${BEAT_NAME:-beats}-dashboards-${VERSION}.zip.sha512"

@@ -1,0 +1,132 @@
+////
+This file is generated! See scripts/docs_collector.py
+////
+
+[id="{beatname_lc}-module-file_integrity"]
+== File Integrity Module
+
+The `file_integrity` module sends events when a file is changed (created,
+updated, or deleted) on disk. The events contain file metadata and hashes.
+
+The module is implemented for Linux, macOS (Darwin), and Windows.
+
+[float]
+=== How it works
+
+This module uses features of the operating system to monitor file changes in
+realtime. When the module starts it creates a subscription with the OS to
+receive notifications of changes to the specified files or directories. Upon
+receiving notification of a change the module will read the file's metadata
+and the compute a hash of the file's contents.
+
+At startup this module will perform an initial scan of the configured files
+and directories to generate baseline data for the monitored paths and detect
+changes since the last time it was run. It uses locally persisted data in order
+to only send events for new or modified files.
+
+The operating system features that power this feature are as follows.
+
+* Linux - `inotify` is used, and therefore the kernel must have inotify support.
+Inotify was initially merged into the 2.6.13 Linux kernel.
+* macOS (Darwin) - Uses the `FSEvents` API, present since macOS 10.5. This API
+coalesces multiple changes to a file into a single event. {beatname_uc} translates
+this coalesced changes into a meaningful sequence of actions. However,
+in rare situations the reported events may have a different ordering than what
+actually happened.
+* Windows - `ReadDirectoryChangesW` is used.
+
+The file integrity module should not be used to monitor paths on network file
+systems.
+
+[float]
+=== Configuration options
+
+This module has some configuration options for tuning its behavior. The
+following example shows all configuration options with their default values for
+Linux.
+
+[source,yaml]
+----
+- module: file_integrity
+  paths:
+  - /bin
+  - /usr/bin
+  - /sbin
+  - /usr/sbin
+  - /etc
+  exclude_files:
+  - '(?i)\.sw[nop]$'
+  - '~$'
+  - '/\.git($|/)'
+  scan_at_start: true
+  scan_rate_per_sec: 50 MiB
+  max_file_size: 100 MiB
+  hash_types: [sha1]
+  recursive: false
+----
+
+*`paths`*:: A list of paths (directories or files) to watch. Globs are
+not supported. The specified paths should exist when the metricset is started.
+
+*`exclude_files`*:: A list of regular expressions used to filter out events
+for unwanted files. The expressions are matched against the full path of every
+file and directory. By default, no files are excluded. See <<regexp-support>>
+for a list of supported regexp patterns. It is recommended to wrap regular
+expressions in single quotation marks to avoid issues with YAML escaping
+rules.
+
+*`scan_at_start`*:: A boolean value that controls if {beatname_uc} scans
+over the configured file paths at startup and send events for the files
+that have been modified since the last time {beatname_uc} was running. The
+default value is true.
++
+This feature depends on data stored locally in `path.data` in order to determine
+if a file has changed. The first time {beatname_uc} runs it will send an event
+for each file it encounters.
+
+*`scan_rate_per_sec`*:: When `scan_at_start` is enabled this sets an
+average read rate defined in bytes per second for the initial scan. This
+throttles the amount of CPU and I/O that {beatname_uc} consumes at startup.
+The default value is "50 MiB". Setting the value to "0" disables throttling.
+For convenience units can be specified as a suffix to the value. The supported
+units are `b` (default), `kib`, `kb`, `mib`, `mb`, `gib`, `gb`, `tib`, `tb`,
+`pib`, `pb`, `eib`, and `eb`.
+
+*`max_file_size`*:: The maximum size of a file in bytes for which
+{beatname_uc} will compute hashes. Files larger than this size will not be
+hashed. The default value is 100 MiB. For convenience units can be specified as
+a suffix to the value. The supported units are `b` (default), `kib`, `kb`, `mib`,
+`mb`, `gib`, `gb`, `tib`, `tb`, `pib`, `pb`, `eib`, and `eb`.
+
+*`hash_types`*:: A list of hash types to compute when the file changes.
+The supported hash types are `blake2b_256`, `blake2b_384`, `blake2b_512`, `md5`,
+`sha1`, `sha224`, `sha256`, `sha384`, `sha512`, `sha512_224`, `sha512_256`,
+`sha3_224`, `sha3_256`, `sha3_384`, and `sha3_512`. The default value is `sha1`.
+
+*`recursive`*:: By default, the watches set to the paths specified in
+`paths` are not recursive. This means that only changes to the contents
+of this directories are watched. If `recursive` is set to `true`, the
+`file_integrity` module will watch for changes on this directories and all
+their subdirectories.
+
+
+[float]
+=== Example configuration
+
+The File Integrity module supports the common configuration options that are
+described under <<configuration-{beatname_lc},configuring {beatname_uc}>>. Here
+is an example configuration:
+
+[source,yaml]
+----
+auditbeat.modules:
+- module: file_integrity
+  paths:
+  - /bin
+  - /usr/bin
+  - /sbin
+  - /usr/sbin
+  - /etc
+
+----
+

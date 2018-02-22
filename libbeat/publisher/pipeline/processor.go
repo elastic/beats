@@ -39,7 +39,9 @@ type processorFn struct {
 //  8. (P) pipeline processors list
 //  9. (P) (if publish/debug enabled) log event
 // 10. (P) (if output disabled) dropEvent
-func (p *Pipeline) newProcessorPipeline(
+func newProcessorPipeline(
+	info beat.Info,
+	global pipelineProcessors,
 	config beat.ClientConfig,
 ) beat.Processor {
 	var (
@@ -49,12 +51,9 @@ func (p *Pipeline) newProcessorPipeline(
 		// client fields and metadata
 		clientMeta      = config.Meta
 		localProcessors = makeClientProcessors(config)
-
-		// pipeline global
-		global = p.processors
 	)
 
-	needsCopy := localProcessors != nil || global.processors != nil
+	needsCopy := global.alwaysCopy || localProcessors != nil || global.processors != nil
 
 	// setup 1: generalize/normalize output (P)
 	processors.add(generalizeProcessor)
@@ -74,10 +73,11 @@ func (p *Pipeline) newProcessorPipeline(
 
 	// setup 3, 4, 5: client config fields + pipeline fields + client fields + dyn metadata
 	fields := config.Fields.Clone()
-	fields.DeepUpdate(global.fields)
+	fields.DeepUpdate(global.fields.Clone())
 	if em := config.EventMetadata; len(em.Fields) > 0 {
 		common.MergeFields(fields, em.Fields.Clone(), em.FieldsUnderRoot)
 	}
+
 	if len(fields) > 0 {
 		processors.add(makeAddFieldsProcessor("fields", fields, needsCopy))
 	}
@@ -99,7 +99,7 @@ func (p *Pipeline) newProcessorPipeline(
 
 	// setup 9: debug print final event (P)
 	if logp.IsDebug("publish") {
-		processors.add(debugPrintProcessor(p.beatInfo))
+		processors.add(debugPrintProcessor(info))
 	}
 
 	// setup 10: drop all events if outputs are disabled (P)
@@ -175,6 +175,9 @@ var generalizeProcessor = newProcessor("generalizeEvent", func(event *beat.Event
 	if len(event.Fields) == 0 {
 		return nil, nil
 	}
+	if event.Normalized {
+		return event, nil
+	}
 
 	fields := common.ConvertToGenericEvent(event.Fields)
 	if fields == nil {
@@ -183,6 +186,7 @@ var generalizeProcessor = newProcessor("generalizeEvent", func(event *beat.Event
 	}
 
 	event.Fields = fields
+	event.Normalized = true
 	return event, nil
 })
 

@@ -13,6 +13,12 @@
 [[configuring-output]]
 == Configure the output
 
+ifdef::only-elasticsearch[]
+You configure {beatname_uc} to write to Elasticsearch by setting options 
+in the `output.elasticsearch` section of the +{beatname_lc}.yml+ config file
+endif::[]
+
+ifndef::only-elasticsearch[]
 You configure {beatname_uc} to write to a specific output by setting options
 in the `output` section of the +{beatname_lc}.yml+ config file. Only a single
 output may be defined.
@@ -26,6 +32,8 @@ The following topics describe how to configure each supported output:
 * <<file-output>>
 * <<console-output>>
 
+endif::[]
+
 [[elasticsearch-output]]
 === Configure the Elasticsearch output
 
@@ -33,7 +41,7 @@ The following topics describe how to configure each supported output:
 <titleabbrev>Elasticsearch</titleabbrev>
 ++++
 
-When you specify Elasticsearch for the output, the Beat sends the transactions directly to Elasticsearch by using the Elasticsearch HTTP API.
+When you specify Elasticsearch for the output, {beatname_uc} sends the transactions directly to Elasticsearch by using the Elasticsearch HTTP API.
 
 Example configuration:
 
@@ -42,7 +50,7 @@ Example configuration:
 
 output.elasticsearch:
   hosts: ["http://localhost:9200"]
-  index: "{beatname_lc}"
+  index: "{beatname_lc}-%{[beat.version]}-%{+yyyy.MM.dd}"
   ssl.certificate_authorities: ["/etc/pki/root/ca.pem"]
   ssl.certificate: "/etc/pki/client/cert.pem"
   ssl.key: "/etc/pki/client/cert.key"
@@ -125,6 +133,8 @@ The number of workers per configured host publishing events to Elasticsearch. Th
 is best used with load balancing mode enabled. Example: If you have 2 hosts and
 3 workers, in total 6 workers are started (3 for each host).
 
+The default value is 1.
+
 ===== `username`
 
 The basic authentication username for connecting to Elasticsearch.
@@ -175,9 +185,17 @@ then proxy environment variables are used. See the
 https://golang.org/pkg/net/http/#ProxyFromEnvironment[golang documentation]
 for more information about the environment variables.
 
+[[index-option-es]]
 ===== `index`
 
-The index name to write events to. The default is "{beatname_lc}-%{+yyyy.MM.dd}" (for example, "{beatname_lc}-2015.04.26").
+The index name to write events to. The default is
++"{beatname_lc}-%\{[beat.version]\}-%\{+yyyy.MM.dd\}"+ (for example,
++"{beatname_lc}-{version}-2017.04.26"+). If you change this setting, you also
+need to configure the `setup.template.name` and `setup.template.pattern` options
+(see <<configuration-template>>). If you are using the pre-built Kibana
+dashboards, you also need to set the `setup.dashboards.index` option (see
+<<configuration-dashboards>>).
+
 
 ===== `indices`
 
@@ -202,16 +220,17 @@ Examples elasticsearch output with `indices`:
 ------------------------------------------------------------------------------
 output.elasticsearch:
   hosts: ["http://localhost:9200"]
-  index: "logs-%{+yyyy.MM.dd}"
+  index: "logs-%{[beat.version]}-%{+yyyy.MM.dd}"
   indices:
-    - index: "critical-%{+yyyy.MM.dd}"
+    - index: "critical-%{[beat.version]}-%{+yyyy.MM.dd}"
       when.contains:
         message: "CRITICAL"
-    - index: "error-%{+yyyy.MM.dd}"
+    - index: "error-%{[beat.version]}-%{+yyyy.MM.dd}"
       when.contains:
         message: "ERR"
 ------------------------------------------------------------------------------
 
+ifndef::no-pipeline[]
 ===== `pipeline`
 
 A format string value that specifies the ingest node pipeline to write events to.
@@ -247,7 +266,7 @@ filebeat.prospectors:
 
 output.elasticsearch:
   hosts: ["http://localhost:9200"]
-  index: "filebeat-%{+yyyy.MM.dd}"
+  index: "filebeat-%{[beat.version]}-%{+yyyy.MM.dd}"
   pipelines:
     - pipeline: critical_pipeline
       when.equals:
@@ -256,15 +275,20 @@ output.elasticsearch:
       when.equals:
         fields.type: "normal"
 ------------------------------------------------------------------------------
+endif::[]
 
 ===== `max_retries`
 
 The number of times to retry publishing an event after a publishing failure.
 After the specified number of retries, the events are typically dropped.
-Some Beats, such as Filebeat, ignore the `max_retries` setting and retry until all
-events are published.
 
+ifeval::["{beatname_lc}" == "filebeat"]
+Filebeat will ignore the `max_retries` setting and retry until all
+events are published.
+endif::[]
+ifeval::["{beatname_lc}" != "filebeat"]
 Set `max_retries` to a value less than 0 to retry until all events are published.
+endif::[]
 
 The default is 3.
 
@@ -272,9 +296,8 @@ The default is 3.
 
 The maximum number of events to bulk in a single Elasticsearch bulk API index request. The default is 50.
 
-If the Beat sends single events, the events are collected into batches. If the Beat publishes
-a large batch of events (larger than the value specified by `bulk_max_size`), the batch is
-split.
+Events can be collected into batches. {beatname_uc} will split batches larger than `bulk_max_size`
+into multiple batches.
 
 Specifying a larger batch size can improve performance by lowering the overhead of sending events.
 However big batch sizes can also increase processing times, which might result in
@@ -297,6 +320,7 @@ Elasticsearch.
 
 See <<configuration-ssl>> for more information.
 
+ifndef::only-elasticsearch[]
 
 [[logstash-output]]
 === Configure the Logstash output
@@ -365,9 +389,9 @@ output {
 ------------------------------------------------------------------------------
 <1> `%{[@metadata][beat]}` sets the first part of the index name to the value
 of the `beat` metadata field, `%{[@metadata][version]}` sets the second part to
-the beat's version, and `%{+YYYY.MM.dd}` sets the third part of the
+the Beat's version, and `%{+YYYY.MM.dd}` sets the third part of the
 name to a date based on the Logstash `@timestamp` field. For example:
-+{beatname_lc}-{stack-version}-2017.03.29+.
++{beatname_lc}-{version}-2017.03.29+.
 
 Events indexed into Elasticsearch with the Logstash configuration shown here
 will be similar to events directly indexed by Beats into Elasticsearch.
@@ -422,6 +446,14 @@ load balances published events onto all Logstash hosts. If set to false,
 the output plugin sends all events to only one host (determined at random) and
 will switch to another host if the selected one becomes unresponsive. The default value is false.
 
+["source","yaml",subs="attributes"]
+------------------------------------------------------------------------------
+output.logstash:
+  hosts: ["localhost:5044", "localhost:5045"]
+  loadbalance: true
+  index: {beatname_lc}
+------------------------------------------------------------------------------
+
 ===== `ttl`
 
 Time to live for a connection to Logstash after which the connection will be re-established.
@@ -434,20 +466,12 @@ The default value is 0.
 
 NOTE: The "ttl" option is not yet supported on an async Logstash client (one with the "pipelining" option set).
 
-["source","yaml",subs="attributes"]
-------------------------------------------------------------------------------
-output.logstash:
-  hosts: ["localhost:5044", "localhost:5045"]
-  loadbalance: true
-  index: {beatname_lc}
-------------------------------------------------------------------------------
-
 ===== `pipelining`
 
 Configures number of batches to be sent asynchronously to logstash while waiting
 for ACK from logstash. Output only becomes blocking once number of `pipelining`
 batches have been written. Pipelining is disabled if a values of 0 is
-configured. The default value is 5.
+configured. The default value is 2.
 
 [[port]]
 ===== `port`
@@ -487,9 +511,9 @@ that when a proxy is used the name resolution occurs on the proxy server.
 [[logstash-index]]
 ===== `index`
 
-The index root name to write events to. The default is the Beat name.
-For example "{beatname_lc}" generates "[{beatname_lc}-]YYYY.MM.DD" indexes (for example,
-"{beatname_lc}-2015.04.26").
+The index root name to write events to. The default is the Beat name. For
+example +"{beatname_lc}"+ generates +"[{beatname_lc}-]{version}-YYYY.MM.DD"+
+indices (for example, +"{beatname_lc}-{version}-2017.04.26"+).
 
 ===== `ssl`
 
@@ -505,10 +529,14 @@ The number of seconds to wait for responses from the Logstash server before timi
 
 The number of times to retry publishing an event after a publishing failure.
 After the specified number of retries, the events are typically dropped.
-Some Beats, such as Filebeat, ignore the `max_retries` setting and retry until all
-events are published.
 
+ifeval::["{beatname_lc}" == "filebeat"]
+Filebeat will ignore the `max_retries` setting and retry until all
+events are published.
+endif::[]
+ifeval::["{beatname_lc}" != "filebeat"]
 Set `max_retries` to a value less than 0 to retry until all events are published.
+endif::[]
 
 The default is 3.
 
@@ -556,7 +584,7 @@ output.kafka:
   hosts: ["kafka1:9092", "kafka2:9092", "kafka3:9092"]
 
   # message topic selection + partitioning
-  topic: '%{[type]}'
+  topic: '%{[fields.log_topic]}'
   partition.round_robin:
     reachable_only: false
 
@@ -608,7 +636,16 @@ The password for connecting to Kafka.
 ===== `topic`
 
 The Kafka topic used for produced events. The setting can be a format string
-using any event field. To set the topic from document type use `%{[type]}`.
+using any event field. For example, you can use the
+<<libbeat-configuration-fields,`fields`>> configuration option to add a custom
+field called `log_topic` to the event, and then set `topic` to the value of the
+custom field:
+
+[source,yaml]
+-----
+topic: '%{[fields.log_topic]}'
+-----
+
 
 ===== `topics`
 
@@ -687,10 +724,15 @@ brokers, topics, partition, and active leaders to use for publishing.
 
 The number of times to retry publishing an event after a publishing failure.
 After the specified number of retries, the events are typically dropped.
-Some Beats, such as Filebeat, ignore the `max_retries` setting and retry until all
-events are published.
 
+ifeval::["{beatname_lc}" == "filebeat"]
+Filebeat will ignore the `max_retries` setting and retry until all
+events are published.
+endif::[]
+
+ifeval::["{beatname_lc}" != "filebeat"]
 Set `max_retries` to a value less than 0 to retry until all events are published.
+endif::[]
 
 The default is 3.
 
@@ -843,7 +885,7 @@ output.redis:
     - key: "debug_list"  # send to debug_list if `message` field contains DEBUG
       when.contains:
         message: "DEBUG"
-    - key: "%{[type]}"
+    - key: "%{[fields.list]}"
       mapping:
         "http": "frontend_list"
         "nginx": "frontend_list"
@@ -909,12 +951,17 @@ The Redis connection timeout in seconds. The default is 5 seconds.
 
 The number of times to retry publishing an event after a publishing failure.
 After the specified number of retries, the events are typically dropped.
-Some Beats, such as Filebeat, ignore the `max_retries` setting and retry until all
-events are published.
 
+ifeval::["{beatname_lc}" == "filebeat"]
+Filebeat will ignore the `max_retries` setting and retry until all
+events are published.
+endif::[]
+ifeval::["{beatname_lc}" != "filebeat"]
 Set `max_retries` to a value less than 0 to retry until all events are published.
+endif::[]
 
 The default is 3.
+
 
 ===== `bulk_max_size`
 
@@ -1143,3 +1190,5 @@ When specified, the `cloud.auth` overwrites the `output.elasticsearch.username` 
 `output.elasticsearch.password` settings. Because the Kibana settings inherit
 the username and password from the Elasticsearch output, this can also be used
 to set the `setup.kibana.username` and `setup.kibana.password` options.
+
+endif::[]

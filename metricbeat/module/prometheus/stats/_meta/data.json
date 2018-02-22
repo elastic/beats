@@ -1,11 +1,11 @@
 {
-    "@timestamp": "2016-05-23T08:05:34.853Z",
+    "@timestamp": "2017-10-12T08:05:34.853Z",
     "beat": {
         "hostname": "host.example.com",
         "name": "host.example.com"
     },
     "metricset": {
-        "host": "127.0.0.1:9090",
+        "host": "prometheus:9090",
         "module": "prometheus",
         "name": "stats",
         "rtt": 115
@@ -17,12 +17,11 @@
                 "queue_length": 0
             },
             "processes": {
-                "open_fds": 24
+                "open_fds": 25
             },
             "storage": {
-                "chunks_to_persist": 465
+                "chunks_to_persist": 0
             }
         }
-    },
-    "type": "metricsets"
+    }
 }

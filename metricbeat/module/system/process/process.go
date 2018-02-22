@@ -10,6 +10,7 @@ import (
 
 	"github.com/elastic/beats/libbeat/common"
 	"github.com/elastic/beats/libbeat/logp"
+	"github.com/elastic/beats/libbeat/metric/system/process"
 	"github.com/elastic/beats/metricbeat/mb"
 	"github.com/elastic/beats/metricbeat/mb/parse"
 	"github.com/elastic/beats/metricbeat/module/system"
@@ -27,7 +28,7 @@ func init() {
 // MetricSet that fetches process metrics.
 type MetricSet struct {
 	mb.BaseMetricSet
-	stats        *ProcStats
+	stats        *process.Stats
 	cgroup       *cgroup.Reader
 	cacheCmdLine bool
 }
@@ -41,7 +42,7 @@ func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
 
 	m := &MetricSet{
 		BaseMetricSet: base,
-		stats: &ProcStats{
+		stats: &process.Stats{
 			Procs:        config.Procs,
 			EnvWhitelist: config.EnvWhitelist,
 			CpuTicks:     config.IncludeCPUTicks || (config.CPUTicks != nil && *config.CPUTicks),
@@ -49,7 +50,7 @@ func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
 			IncludeTop:   config.IncludeTop,
 		},
 	}
-	err := m.stats.InitProcStats()
+	err := m.stats.Init()
 	if err != nil {
 		return nil, err
 	}
@@ -79,7 +80,7 @@ func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
 // Fetch fetches metrics for all processes. It iterates over each PID and
 // collects process metadata, CPU metrics, and memory metrics.
 func (m *MetricSet) Fetch() ([]common.MapStr, error) {
-	procs, err := m.stats.GetProcStats()
+	procs, err := m.stats.Get()
 	if err != nil {
 		return nil, errors.Wrap(err, "process stats")
 	}

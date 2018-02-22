@@ -4,6 +4,7 @@ package gosigar
 
 import (
 	"fmt"
+	"os"
 	"path/filepath"
 	"runtime"
 	"strings"
@@ -328,28 +329,37 @@ func (self *ProcMem) Get(pid int) error {
 }
 
 func (self *ProcTime) Get(pid int) error {
-	handle, err := syscall.OpenProcess(processQueryLimitedInfoAccess, false, uint32(pid))
+	cpu, err := getProcTimes(pid)
 	if err != nil {
-		return errors.Wrapf(err, "OpenProcess failed for pid=%v", pid)
-	}
-	defer syscall.CloseHandle(handle)
-
-	var CPU syscall.Rusage
-	if err := syscall.GetProcessTimes(handle, &CPU.CreationTime, &CPU.ExitTime, &CPU.KernelTime, &CPU.UserTime); err != nil {
-		return errors.Wrapf(err, "GetProcessTimes failed for pid=%v", pid)
+		return err
 	}
 
 	// Windows epoch times are expressed as time elapsed since midnight on
 	// January 1, 1601 at Greenwich, England. This converts the Filetime to
 	// unix epoch in milliseconds.
-	self.StartTime = uint64(CPU.CreationTime.Nanoseconds() / 1e6)
+	self.StartTime = uint64(cpu.CreationTime.Nanoseconds() / 1e6)
 
 	// Convert to millis.
-	self.User = uint64(windows.FiletimeToDuration(&CPU.UserTime).Nanoseconds() / 1e6)
-	self.Sys = uint64(windows.FiletimeToDuration(&CPU.KernelTime).Nanoseconds() / 1e6)
+	self.User = uint64(windows.FiletimeToDuration(&cpu.UserTime).Nanoseconds() / 1e6)
+	self.Sys = uint64(windows.FiletimeToDuration(&cpu.KernelTime).Nanoseconds() / 1e6)
 	self.Total = self.User + self.Sys
 
 	return nil
+}
+
+func getProcTimes(pid int) (*syscall.Rusage, error) {
+	handle, err := syscall.OpenProcess(processQueryLimitedInfoAccess, false, uint32(pid))
+	if err != nil {
+		return nil, errors.Wrapf(err, "OpenProcess failed for pid=%v", pid)
+	}
+	defer syscall.CloseHandle(handle)
+
+	var cpu syscall.Rusage
+	if err := syscall.GetProcessTimes(handle, &cpu.CreationTime, &cpu.ExitTime, &cpu.KernelTime, &cpu.UserTime); err != nil {
+		return nil, errors.Wrapf(err, "GetProcessTimes failed for pid=%v", pid)
+	}
+
+	return &cpu, nil
 }
 
 func (self *ProcArgs) Get(pid int) error {
@@ -407,4 +417,21 @@ func getWin32OperatingSystem() (Win32_OperatingSystem, error) {
 		return Win32_OperatingSystem{}, errors.New("wmi query for Win32_OperatingSystem failed")
 	}
 	return dst[0], nil
+}
+
+func (self *Rusage) Get(who int) error {
+	if who != 0 {
+		return ErrNotImplemented{runtime.GOOS}
+	}
+
+	pid := os.Getpid()
+	cpu, err := getProcTimes(pid)
+	if err != nil {
+		return err
+	}
+
+	self.Utime = windows.FiletimeToDuration(&cpu.UserTime)
+	self.Stime = windows.FiletimeToDuration(&cpu.KernelTime)
+
+	return nil
 }

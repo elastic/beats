@@ -7,6 +7,7 @@
 /*/logs
 /*/fields.yml
 /*/*.template*.json
+**/html_docs
 
 # Files
 .DS_Store
@@ -16,6 +17,7 @@
 coverage.out
 .python-version
 beat.db
+*.keystore
 
 # Editor swap files
 *.swp

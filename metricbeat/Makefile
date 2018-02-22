@@ -11,7 +11,7 @@ GOPACKAGES=$(shell go list ${BEAT_PATH}/... | grep -v /vendor/)
 ES_BEATS?=..
 
 # Metricbeat can only be cross-compiled on platforms not requiring CGO.
-GOX_OS=solaris netbsd linux windows
+GOX_OS=netbsd linux windows
 GOX_FLAGS=-arch="amd64 386 arm ppc64 ppc64le"
 
 
@@ -90,6 +90,6 @@ run-module:
 
 .PHONY: test-module
 test-module: ## @testing Tests the given module. Needs $MODULE as param an run-module must be started first.
-test-module: python-env
+test-module: python-env update metricbeat.test
 	go test -tags=integration ${BEAT_PATH}/module/${MODULE}/... -v
 	. ${PYTHON_ENV}/bin/activate && INTEGRATION_TESTS=1 nosetests tests/system/test_${MODULE}.py

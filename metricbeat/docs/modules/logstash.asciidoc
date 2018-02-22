@@ -24,9 +24,11 @@ metricbeat.modules:
   metricsets: ["node", "node_stats"]
   enabled: false
   period: 10s
-  hosts: ["localhost"]
+  hosts: ["localhost:9600"]
 
 ----
+
+This module supports TLS connection when using `ssl` config field, as described in <<configuration-ssl>>.
 
 [float]
 === Metricsets

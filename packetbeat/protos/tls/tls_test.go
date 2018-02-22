@@ -32,9 +32,7 @@ func (e *eventStore) publish(event beat.Event) {
 // Helper function returning a TLS module that can be used
 // in tests. It publishes the transactions in the results structure.
 func testInit() (*eventStore, *tlsPlugin) {
-	if testing.Verbose() {
-		logp.LogInit(logp.LOG_DEBUG, "", false, true, []string{"tls", "tlsdetailed"})
-	}
+	logp.TestingSetup(logp.WithSelectors("tls", "tlsdetailed"))
 
 	results := &eventStore{}
 	tls, err := New(true, results.publish, nil)

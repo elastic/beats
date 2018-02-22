@@ -50,6 +50,7 @@ type MetricSet struct {
 	body            string
 	requestEnabled  bool
 	responseEnabled bool
+	deDotEnabled    bool
 }
 
 // New create a new instance of the MetricSet
@@ -64,18 +65,23 @@ func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
 		Body            string `config:"body"`
 		RequestEnabled  bool   `config:"request.enabled"`
 		ResponseEnabled bool   `config:"response.enabled"`
+		DeDotEnabled    bool   `config:"dedot.enabled"`
 	}{
 		Method:          "GET",
 		Body:            "",
 		RequestEnabled:  false,
 		ResponseEnabled: false,
+		DeDotEnabled:    false,
 	}
 
 	if err := base.Module().UnpackConfig(&config); err != nil {
 		return nil, err
 	}
 
-	http := helper.NewHTTP(base)
+	http, err := helper.NewHTTP(base)
+	if err != nil {
+		return nil, err
+	}
 	http.SetMethod(config.Method)
 	http.SetBody([]byte(config.Body))
 
@@ -87,6 +93,7 @@ func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
 		http:            http,
 		requestEnabled:  config.RequestEnabled,
 		responseEnabled: config.ResponseEnabled,
+		deDotEnabled:    config.DeDotEnabled,
 	}, nil
 }
 
@@ -101,6 +108,7 @@ func (m *MetricSet) Fetch() (common.MapStr, error) {
 	defer response.Body.Close()
 
 	var jsonBody map[string]interface{}
+	var event map[string]interface{}
 
 	body, err := ioutil.ReadAll(response.Body)
 	if err != nil {
@@ -112,7 +120,11 @@ func (m *MetricSet) Fetch() (common.MapStr, error) {
 		return nil, err
 	}
 
-	event := jsonBody
+	if m.deDotEnabled {
+		event = common.DeDotJSON(jsonBody).(map[string]interface{})
+	} else {
+		event = jsonBody
+	}
 
 	if m.requestEnabled {
 		event[mb.ModuleDataKey] = common.MapStr{

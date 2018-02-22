@@ -50,9 +50,13 @@ type MetricSet struct {
 func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
 	cfgwarn.Experimental("The golang heap metricset is experimental")
 
+	http, err := helper.NewHTTP(base)
+	if err != nil {
+		return nil, err
+	}
 	return &MetricSet{
 		BaseMetricSet: base,
-		http:          helper.NewHTTP(base),
+		http:          http,
 	}, nil
 }
 

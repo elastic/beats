@@ -27,55 +27,99 @@ after successfully connecting to Elasticsearch. If the template already exists,
 it's not overwritten unless you configure {beatname_uc} to do so.
 
 You can disable automatic template loading, or load your own template, by
-configuring template loading optons in the {beatname_uc} configuration file.
+configuring template loading options in the {beatname_uc} configuration file.
 
+You can also set options to change the name of the index and index template.
+
+ifndef::only-elasticsearch[]
 NOTE: A connection to Elasticsearch is required to load the index template. If
-the output is Logstash, you must load the template manually.
+the output is Logstash, you must
+<<load-template-manually,load the template manually>>. 
+endif::[]
 
 For more information, see:
 
-* <<load-template-auto>> - supported for Elasticsearch output only
+ifdef::only-elasticsearch[]
+* <<load-template-auto>>
+* <<load-template-manually>>
+endif::[]
+
+ifndef::only-elasticsearch[]
+* <<load-template-auto>>
 * <<load-template-manually>> - required for Logstash output
+endif::[]
 
 [[load-template-auto]]
 ==== Configure template loading
 
 By default, {beatname_uc} automatically loads the recommended template file,
-+fields.yml+, if Elasticsearch output is enabled. You can configure
-{beatname_lc} to load a different template by adjusting the
-`setup.template.name` and `setup.template.fields` options in +{beatname_lc}.yml+
-file:
++fields.yml+, if the Elasticsearch output is enabled. You can change the
+defaults in the +{beatname_lc}.yml+ config file to:
 
-["source","yaml",subs="attributes,callouts"]
-----------------------------------------------------------------------
-setup.template.name: "{beatname_lc}"
+* **Load a different template**
++
+[source,yaml]
+-----
+setup.template.name: "your_template_name"
 setup.template.fields: "path/to/fields.yml"
-setup.template.overwrite: false
-----------------------------------------------------------------------
+-----
++
+If the template already exists, it’s not overwritten unless you configure
+{beatname_uc} to do so.
 
+* **Overwrite an existing template**
++
+[source,yaml]
+-----
+setup.template.overwrite: true
+-----
 
-If a template already exists in the index, it is not overwritten. To overwrite
-an existing template, set `setup.template.overwrite: true` in the configuration
-file.
+* **Disable automatic template loading** 
++
+[source,yaml]
+-----
+setup.template.enabled: false
+-----
++
+If you disable automatic template loading, you need to
+<<load-template-manually,load the template manually>>.
 
-To disable automatic template loading, set `setup.template.enabled: false`. If
-you disable automatic template loading, you need to load the template manually.
+* **Change the index name**
++
+By default, {beatname_uc} writes events to indices named
++{beatname_lc}-{version}-yyyy.MM.dd+, where `yyyy.MM.dd` is the date when the
+events were indexed. To use a different name, you set the
+<<index-option-es,`index`>> option in the Elasticsearch output. The value
+that you specify should include the root name of the index plus version and
+date information. You also need to configure the `setup.template.name` and
+`setup.template.pattern` options to match the new name. For example:
++
+["source","sh",subs="attributes,callouts"]
+-----
+output.elasticsearch.index: "customname-%{[beat.version]}-%{+yyyy.MM.dd}"
+setup.template.name: "customname"
+setup.template.pattern: "customname-*"
+setup.dashboards.index: "customname-*" <1>
+-----
+<1> If you plan to
+<<load-kibana-dashboards, set up the Kibana dashboards>>, also set
+this option to overwrite the index name defined in the dashboards and index
+pattern.
 
 See <<configuration-template>> for the full list of configuration options.
 
-The options for auto loading the template are not supported if Logstash output
-is enabled.
 
 [[load-template-manually]]
 ==== Load the template manually
 
 To load the template manually, run the <<setup-command,`setup`>> command. A
-connection to Elasticsearch is required. If Logstash output is enabled, you need
+connection to Elasticsearch is required. 
+ifndef::only-elasticsearch[]
+If Logstash output is enabled, you need
 to temporarily disable the Logstash output and enable Elasticsearch by using the
-`-E` option.
-
-The examples here assume that Logstash output is enabled. You can omit the `-E`
-flags if Elasticsearch output is already enabled.
+`-E` option. The examples here assume that Logstash output is enabled. You can
+omit the `-E` flags if Elasticsearch output is already enabled.
+endif::[]
 
 If you are connecting to a secured Elasticsearch cluster, make sure you've
 configured credentials as described in <<{beatname_lc}-configuration>>.
@@ -83,24 +127,37 @@ configured credentials as described in <<{beatname_lc}-configuration>>.
 If the host running {beatname_uc} does not have direct connectivity to
 Elasticsearch, see <<load-template-manually-alternate>>.
 
-To load the template:
+To load the template, use the appropriate command for your system.
+
+ifndef::only-elasticsearch[]
+:disable_logstash: {sp}-E output.logstash.enabled=false
+endif::[]
+
+ifdef::only-elasticsearch[]
+:disable_logstash:
+endif::[]
 
 ifdef::allplatforms[]
 
-*deb, rpm, and mac:*
+ifeval::["{requires-sudo}"=="yes"]
+
+include::./shared-note-sudo.asciidoc[]
+
+endif::[]
+
+*deb and rpm:*
+["source","sh",subs="attributes"]
+----
+{beatname_lc} setup --template{disable_logstash} -E 'output.elasticsearch.hosts=["localhost:9200"]'
+----
+
+*mac:*
 
 ["source","sh",subs="attributes"]
 ----
-./{beatname_lc} setup --template -E output.logstash.enabled=false -E 'output.elasticsearch.hosts=["localhost:9200"]'
+./{beatname_lc} setup --template{disable_logstash} -E 'output.elasticsearch.hosts=["localhost:9200"]'
 ----
 
-
-ifeval::["{requires-sudo}"=="yes"]
-
-If you changed ownership of the config file to root, you'll need preface this
-command with `sudo`.
-
-endif::[]
 
 ifeval::["{beatname_lc}"!="auditbeat"]
 
@@ -108,7 +165,7 @@ ifeval::["{beatname_lc}"!="auditbeat"]
 
 ["source","sh",subs="attributes"]
 ----------------------------------------------------------------------
-docker run {dockerimage} setup --template -E output.logstash.enabled=false -E 'output.elasticsearch.hosts=["localhost:9200"]'
+docker run {dockerimage} setup --template{disable_logstash} -E 'output.elasticsearch.hosts=["localhost:9200"]'
 ----------------------------------------------------------------------
 
 
@@ -127,7 +184,7 @@ and run:
 
 ["source","sh",subs="attributes,callouts"]
 ----------------------------------------------------------------------
-PS > {beatname_lc} setup --template -E output.logstash.enabled=false -E 'output.elasticsearch.hosts=["localhost:9200"]'
+PS > .{backslash}{beatname_lc} setup --template{disable_logstash} -E 'output.elasticsearch.hosts=["localhost:9200"]'
 ----------------------------------------------------------------------
 
 
@@ -154,8 +211,8 @@ PS > Invoke-RestMethod -Method Delete "http://localhost:9200/{beatname_lc}-*"
 ----------------------------------------------------------------------
 
 
-This command deletes all indexes that match the pattern +{beatname_lc}-*+.
-Before running this command, make sure you want to delete all indexes that match
+This command deletes all indices that match the pattern +{beat_default_index_prefix}-*+.
+Before running this command, make sure you want to delete all indices that match
 the pattern.
 
 [[load-template-manually-alternate]]
@@ -168,7 +225,14 @@ machine that does have connectivity, and then install the template manually.
 . Export the index template:
 +
 ifdef::allplatforms[]
-*deb, rpm, and mac:*
+*deb and rpm:*
++
+["source","sh",subs="attributes"]
+----
+{beatname_lc} export template > {beatname_lc}.template.json
+----
++
+*mac:*
 +
 ["source","sh",subs="attributes"]
 ----

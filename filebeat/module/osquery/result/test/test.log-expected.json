@@ -1,0 +1,56 @@
+[
+  {
+	"_index": "filebeat-7.0.0-alpha1-2018.01.01",
+	"_type": "doc",
+	"_id": "2tYQsmAB8Jfw7mP_O73E",
+	"_score": 1,
+	"_source": {
+	  "@timestamp": "2017-12-28T14:40:08.000Z",
+	  "offset": 574,
+	  "osquery": {
+		"result": {
+		  "columns": {
+			"path": "/private/var/vm",
+			"inodes": "9223372036854775807",
+			"blocks": "122061322",
+			"flags": "345018372",
+			"inodes_free": "9223372036854775804",
+			"blocks_size": "4096",
+			"blocks_available": "75966945",
+			"type": "apfs",
+			"device_alias": "/dev/disk1s4",
+			"device": "/dev/disk1s4",
+			"blocks_free": "121274885"
+		  },
+		  "name": "pack_it-compliance_mounts",
+		  "unix_time": "1514472008",
+		  "action": "removed",
+		  "epoch": "0",
+		  "decorations": {
+			"host_uuid": "4AB2906D-5516-5794-AF54-86D1D7F533F3",
+			"username": "tsg"
+		  },
+		  "counter": "1",
+		  "calendar_time": "Thu Dec 28 14:40:08 2017 UTC",
+		  "host_identifier": "192-168-0-4.rdsnet.ro"
+		}
+	  },
+	  "beat": {
+		"hostname": "where-is-my-esc-key.local",
+		"name": "where-is-my-esc-key.local",
+		"version": "7.0.0-alpha1"
+	  },
+	  "prospector": {
+		"type": "log"
+	  },
+	  "input": {
+		"type": "log"
+	  },
+	  "source": "/Users/tsg/src/github.com/elastic/beats/filebeat/module/osquery/result/test/test.log",
+	  "fileset": {
+		"module": "osquery",
+		"name": "result"
+	  }
+	}
+  }
+]

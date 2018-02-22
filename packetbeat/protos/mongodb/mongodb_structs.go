@@ -2,6 +2,7 @@ package mongodb
 
 // Represent a mongodb message being parsed
 import (
+	"fmt"
 	"time"
 
 	"github.com/elastic/beats/libbeat/common"
@@ -113,7 +114,10 @@ func validOpcode(o opCode) bool {
 }
 
 func (o opCode) String() string {
-	return opCodeNames[o]
+	if name, found := opCodeNames[o]; found {
+		return name
+	}
+	return fmt.Sprintf("(value=%d)", int32(o))
 }
 
 func awaitsReply(c opCode) bool {

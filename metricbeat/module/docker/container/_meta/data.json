@@ -1,31 +1,31 @@
 {
-    "@timestamp": "2016-05-23T08:05:34.853Z",
+    "@timestamp": "2017-10-12T08:05:34.853Z",
     "beat": {
         "hostname": "host.example.com",
         "name": "host.example.com"
     },
     "docker": {
         "container": {
-            "command": "bash",
-            "created": "2016-11-21T12:39:48.000Z",
-            "id": "4be260de8fc1212c9ff58789b8221e70c53f5af5d5a3915ff7de4b81b357d851",
-            "image": "environments_beat",
+            "command": "go test -tags=integration github.com/elastic/beats/metricbeat/module/... -data",
+            "created": "2017-12-07T07:20:57.000Z",
+            "id": "d88e67bb6961a5bb70c1c1c48094c6030e43768eed91e827f437111888f9967e",
+            "image": "metricbeatsnapshotnoxpack700alpha1d71419298b58ed8b0a5b60a6d1e4a476ffaf80a8_beat",
+            "ip_addresses": [
+                "172.18.0.27"
+            ],
             "labels": {
                 "com_docker_compose_container-number": "1",
                 "com_docker_compose_oneoff": "True",
-                "com_docker_compose_project": "environments",
+                "com_docker_compose_project": "metricbeatsnapshotnoxpack700alpha1d71419298b58ed8b0a5b60a6d1e4a476ffaf80a8",
                 "com_docker_compose_service": "beat",
-                "com_docker_compose_version": "1.9.0-rc4"
+                "com_docker_compose_version": "1.16.1"
             },
-            "name": "environments_beat_run_1",
-            "ip_addresses": [
-              "10.0.0.1"
-            ],
+            "name": "metricbeatsnapshotnoxpack700alpha1d71419298b58ed8b0a5b60a6d1e4a476ffaf80a8_beat_run_1",
             "size": {
                 "root_fs": 0,
                 "rw": 0
             },
-            "status": "Up 15 minutes"
+            "status": "Up 6 minutes (healthy)"
         }
     },
     "metricset": {
@@ -33,6 +33,5 @@
         "module": "docker",
         "name": "container",
         "rtt": 115
-    },
-    "type": "metricsets"
+    }
 }

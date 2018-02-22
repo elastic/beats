@@ -1,6 +1,9 @@
 package tls
 
 import (
+	"crypto/dsa"
+	"crypto/ecdsa"
+	"crypto/rsa"
 	"crypto/x509"
 	"crypto/x509/pkix"
 	"encoding/hex"
@@ -485,7 +488,42 @@ func parseCertificates(buffer bufferView) []*x509.Certificate {
 }
 
 func (version tlsVersion) String() string {
-	return fmt.Sprintf("%d.%d", version.major, version.minor)
+	if version.major == 3 {
+		if version.minor > 0 {
+			return fmt.Sprintf("TLS 1.%d", version.minor-1)
+		}
+		return "SSL 3.0"
+	}
+	return fmt.Sprintf("(raw %d.%d)", version.major, version.minor)
+}
+
+func getKeySize(key interface{}) int {
+	if key == nil {
+		return 0
+	}
+	switch pubKey := key.(type) {
+	case *rsa.PublicKey:
+		if n := pubKey.N; n != nil {
+			return n.BitLen()
+		}
+
+	case *dsa.PublicKey:
+		if p := pubKey.Parameters.P; p != nil {
+			return p.BitLen()
+		}
+		if y := pubKey.Y; y != nil {
+			return y.BitLen()
+		}
+
+	case *ecdsa.PublicKey:
+		if params := pubKey.Params(); params != nil {
+			return params.BitSize
+		}
+		if y := pubKey.Y; y != nil {
+			return y.BitLen()
+		}
+	}
+	return 0
 }
 
 func certToMap(cert *x509.Certificate, includeRaw bool) common.MapStr {
@@ -498,6 +536,9 @@ func certToMap(cert *x509.Certificate, includeRaw bool) common.MapStr {
 		"subject":              toMap(&cert.Subject),
 		"not_before":           cert.NotBefore,
 		"not_after":            cert.NotAfter,
+	}
+	if keySize := getKeySize(cert.PublicKey); keySize > 0 {
+		certMap["public_key_size"] = keySize
 	}
 	san := make([]string, 0, len(cert.DNSNames)+len(cert.IPAddresses)+len(cert.EmailAddresses))
 	san = append(append(san, cert.DNSNames...), cert.EmailAddresses...)

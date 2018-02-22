@@ -1,5 +1,5 @@
 {
-    "@timestamp": "2016-05-23T08:05:34.853Z",
+    "@timestamp": "2017-10-12T08:05:34.853Z",
     "beat": {
         "hostname": "host.example.com",
         "name": "host.example.com"
@@ -27,7 +27,7 @@
                     "max": 0,
                     "total": 0
                 },
-                "total": 13
+                "total": 39
             },
             "idle": {
                 "pct": 1
@@ -37,7 +37,7 @@
                     "bytes": 0
                 }
             },
-            "pid": 7,
+            "pid": 8,
             "pipes": {
                 "free": 0,
                 "max": 0,
@@ -46,7 +46,7 @@
             "process_num": 1,
             "processes": 1,
             "requests": {
-                "total": 13
+                "total": 39
             },
             "run_queue": 1,
             "session": {
@@ -86,7 +86,7 @@
             "tasks": 5,
             "ulimit_n": 8032,
             "uptime": {
-                "sec": 346
+                "sec": 441
             },
             "zlib_mem_usage": {
                 "max": 0,
@@ -99,6 +99,5 @@
         "module": "haproxy",
         "name": "info",
         "rtt": 115
-    },
-    "type": "metricsets"
+    }
 }

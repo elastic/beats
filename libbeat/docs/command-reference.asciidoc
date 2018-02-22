@@ -16,29 +16,42 @@
 
 :export-command-short-desc: Exports the configuration or index template to stdout
 :help-command-short-desc: Shows help for any command
+:keystore-command-short-desc: Manages the <<keystore,secrets keystore>>
 :modules-command-short-desc: Manages configured modules
 :run-command-short-desc: Runs {beatname_uc}. This command is used by default if you start {beatname_uc} without specifying a command
+
+ifeval::["{has_ml_jobs}"=="yes"]
 :setup-command-short-desc: Sets up the initial environment, including the index template, Kibana dashboards (when available), and machine learning jobs (when available)
+endif::[]
+
+ifeval::["{has_ml_jobs}"!="yes"]
+:setup-command-short-desc: Sets up the initial environment, including the index template, Kibana dashboards (when available)
+endif::[]
+
 :test-command-short-desc: Tests the configuration
 :version-command-short-desc: Shows information about the current version
 
 
 [[command-line-options]]
-=== {beatname_uc} commands
+=== {beatname_uc} command reference
 
-{beatname_uc} provides a command-line interface for running the Beat and
+++++
+<titleabbrev>Command reference</titleabbrev>
+++++
+
+{beatname_uc} provides a command-line interface for starting {beatname_uc} and
 performing common tasks, like testing configuration files and loading
 dashboards. The command-line also supports <<global-flags,global flags>>
 for controlling global behaviors.
 
 ifeval::["{beatname_lc}"!="winlogbeat"]
 
-[NOTE]
+[TIP]
 =========================
-You may need to use `sudo` to run the following commands if you've:
+Use `sudo` to run the following commands if:
 
-* changed ownership of the config file to `root`
-* enabled the Beat to capture data that requires `root` access
+* the config file is owned by `root`, or
+* {beatname_uc} is configured to capture data that requires `root` access
 
 =========================
 
@@ -50,6 +63,9 @@ endif::[]
 
 <<help-command,`help`>>::
 {help-command-short-desc}.
+
+<<keystore-command,`keystore`>>::
+{keystore-command-short-desc}.
 
 ifeval::[("{beatname_lc}"=="filebeat") or ("{beatname_lc}"=="metricbeat")]
 
@@ -152,6 +168,62 @@ Specifies the name of the command to show help for.
 -----
 {beatname_lc} help export
 -----
+
+[[keystore-command]]
+==== `keystore` command
+
+{keystore-command-short-desc}. 
+
+*SYNOPSIS*
+
+["source","sh",subs="attributes"]
+----
+{beatname_lc} keystore SUBCOMMAND [FLAGS]
+----
+
+*SUBCOMMANDS*
+
+*`add KEY`*::
+Adds the specified key to the keystore. Use the `--force` flag to overwrite an
+existing key. Use the `--stdin` flag to pass the value through `stdin`.
+
+*`create`*::
+Creates a keystore to hold secrets. Use the `--force` flag to overwrite the
+existing keystore.
+
+*`list`*::
+Lists the keys in the keystore.
+
+*`remove KEY`*::
+Removes the specified key from the keystore.
+
+*FLAGS*
+
+*`--force`*::
+Valid with the `add` and `create` subcommands. When used with `add`, overwrites
+the specified key. When used with `create`, overwrites the keystore.
+
+*`--stdin`*::
+When used with `add`, uses the stdin as the source of the key's value.
+
+*`-h, --help`*::
+Shows help for the `keystore` command.
+
+
+{global-flags}
+
+*EXAMPLES*
+
+["source","sh",subs="attributes"]
+-----
+{beatname_lc} keystore create
+{beatname_lc} keystore add ES_PWD
+{beatname_lc} keystore remove ES_PWD
+{beatname_lc} keystore list
+-----
+
+see <<keystore>> for more examples.
+
 
 ifeval::[("{beatname_lc}"=="filebeat") or ("{beatname_lc}"=="metricbeat")]
 
@@ -524,7 +596,7 @@ For example:
 +
 ["source","sh",subs="attributes"]
 ----------------------------------------------------------------------
-{beatname_lc} -E "name=mybeat" -E "output.elasticsearch.hosts=["http://myhost:9200"]"
+{beatname_lc} -E "name=mybeat" -E "output.elasticsearch.hosts=['http://myhost:9200']"
 ----------------------------------------------------------------------
 +
 This setting is applied to the currently running {beatname_uc} process.
@@ -537,7 +609,7 @@ ifeval::["{beatname_lc}"=="filebeat"]
 +
 ["source","sh",subs="attributes"]
 ----------------------------------------------------------------------
-{beatname_lc} -modules=nginx -M "nginx.access.var.paths=[/var/log/nginx/access.log*]" -M "nginx.access.var.pipeline=no_plugins"
+{beatname_lc} -modules=nginx -M "nginx.access.var.paths=['/var/log/nginx/access.log*']" -M "nginx.access.var.pipeline=no_plugins"
 ----------------------------------------------------------------------
 
 endif::[]

@@ -52,6 +52,9 @@ exec { Get-Content build/TEST-go-unit.out | go-junit-report.exe -set-exit-code |
 echo "System testing $env:beat"
 # TODO (elastic/beats#5050): Use a vendored copy of this.
 exec { go get github.com/docker/libcompose }
-exec { go test -race -c -cover -covermode=atomic -coverpkg ./... }
+# Get a CSV list of package names.
+$packages = $(go list ./... | select-string -Pattern "/vendor/" -NotMatch | select-string -Pattern "/scripts/cmd/" -NotMatch)
+$packages = ($packages|group|Select -ExpandProperty Name) -join ","
+exec { go test -race -c -cover -covermode=atomic -coverpkg $packages }
 exec { cd tests/system }
 exec { nosetests --with-timer --with-xunit --xunit-file=../../build/TEST-system.xml } "System test FAILURE"

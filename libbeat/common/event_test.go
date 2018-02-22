@@ -11,7 +11,7 @@ import (
 )
 
 func TestConvertNestedMapStr(t *testing.T) {
-	logp.LogInit(logp.LOG_DEBUG, "", false, true, []string{"*"})
+	logp.TestingSetup()
 
 	type io struct {
 		Input  MapStr
@@ -121,7 +121,7 @@ func TestConvertNestedMapStr(t *testing.T) {
 }
 
 func TestConvertNestedStruct(t *testing.T) {
-	logp.LogInit(logp.LOG_DEBUG, "", false, true, []string{"*"})
+	logp.TestingSetup()
 
 	type io struct {
 		Input  MapStr
@@ -178,7 +178,7 @@ func TestConvertNestedStruct(t *testing.T) {
 }
 
 func TestNormalizeValue(t *testing.T) {
-	logp.LogInit(logp.LOG_DEBUG, "", false, true, []string{"*"})
+	logp.TestingSetup()
 
 	var nilStringPtr *string
 	someString := "foo"
@@ -233,6 +233,23 @@ func TestNormalizeValue(t *testing.T) {
 		}
 
 		assert.Equal(t, test.out, out, "Test case %v", i)
+	}
+
+	var floatTests = []struct {
+		in  interface{}
+		out interface{}
+	}{
+		{float32(1), float64(1)},
+		{float64(1), float64(1)},
+	}
+
+	for i, test := range floatTests {
+		out, err := normalizeValue(test.in)
+		if err != nil {
+			t.Error(err)
+			continue
+		}
+		assert.InDelta(t, test.out, float64(out.(Float)), 0.000001, "(approximate) Test case %v", i)
 	}
 }
 
@@ -377,5 +394,62 @@ func BenchmarkConvertToGenericEventStringPointer(b *testing.B) {
 	val := "foo"
 	for i := 0; i < b.N; i++ {
 		ConvertToGenericEvent(MapStr{"key": &val})
+	}
+}
+func TestDeDotJSON(t *testing.T) {
+	var tests = []struct {
+		input  []byte
+		output []byte
+		valuer func() interface{}
+	}{
+		{
+			input: []byte(`[
+				{"key_with_dot.1":"value1_1"},
+				{"key_without_dot_2":"value1_2"},
+				{"key_with_multiple.dots.3": {"key_with_dot.2":"value2_1"}}
+			]
+			`),
+			output: []byte(`[
+				{"key_with_dot_1":"value1_1"},
+				{"key_without_dot_2":"value1_2"},
+				{"key_with_multiple_dots_3": {"key_with_dot_2":"value2_1"}}
+			]
+			`),
+			valuer: func() interface{} { return []interface{}{} },
+		},
+		{
+			input: []byte(`{
+				"key_without_dot_l1": {
+					"key_with_dot.l2": 1,
+					"key.with.multiple.dots_l2": 2,
+					"key_without_dot_l2": {
+						"key_with_dot.l3": 3,
+						"key.with.multiple.dots_l3": 4
+					}
+				}
+			}
+			`),
+			output: []byte(`{
+				"key_without_dot_l1": {
+					"key_with_dot_l2": 1,
+					"key_with_multiple_dots_l2": 2,
+					"key_without_dot_l2": {
+						"key_with_dot_l3": 3,
+						"key_with_multiple_dots_l3": 4
+					}
+				}
+			}
+			`),
+			valuer: func() interface{} { return map[string]interface{}{} },
+		},
+	}
+	for _, test := range tests {
+		input, output := test.valuer(), test.valuer()
+		assert.Nil(t, json.Unmarshal(test.input, &input))
+		assert.Nil(t, json.Unmarshal(test.output, &output))
+		assert.Equal(t, output, DeDotJSON(input))
+		if _, ok := test.valuer().(map[string]interface{}); ok {
+			assert.Equal(t, MapStr(output.(map[string]interface{})), DeDotJSON(MapStr(input.(map[string]interface{}))))
+		}
 	}
 }

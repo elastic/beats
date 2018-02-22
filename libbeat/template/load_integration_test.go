@@ -9,14 +9,14 @@ import (
 
 	"github.com/elastic/beats/libbeat/beat"
 	"github.com/elastic/beats/libbeat/common"
-	"github.com/elastic/beats/libbeat/outputs/elasticsearch"
+	"github.com/elastic/beats/libbeat/outputs/elasticsearch/estest"
 	"github.com/elastic/beats/libbeat/version"
 
 	"github.com/stretchr/testify/assert"
 )
 
 func TestCheckTemplate(t *testing.T) {
-	client := elasticsearch.GetTestingElasticsearch(t)
+	client := estest.GetTestingElasticsearch(t)
 	if err := client.Connect(); err != nil {
 		t.Fatal(err)
 	}
@@ -31,7 +31,7 @@ func TestCheckTemplate(t *testing.T) {
 
 func TestLoadTemplate(t *testing.T) {
 	// Setup ES
-	client := elasticsearch.GetTestingElasticsearch(t)
+	client := estest.GetTestingElasticsearch(t)
 	if err := client.Connect(); err != nil {
 		t.Fatal(err)
 	}
@@ -74,7 +74,7 @@ func TestLoadInvalidTemplate(t *testing.T) {
 	}
 
 	// Setup ES
-	client := elasticsearch.GetTestingElasticsearch(t)
+	client := estest.GetTestingElasticsearch(t)
 	if err := client.Connect(); err != nil {
 		t.Fatal(err)
 	}
@@ -124,7 +124,7 @@ func TestLoadBeatsTemplate(t *testing.T) {
 		assert.Nil(t, err)
 
 		// Setup ES
-		client := elasticsearch.GetTestingElasticsearch(t)
+		client := estest.GetTestingElasticsearch(t)
 		if err := client.Connect(); err != nil {
 			t.Fatal(err)
 		}
@@ -158,7 +158,7 @@ func TestLoadBeatsTemplate(t *testing.T) {
 
 func TestTemplateSettings(t *testing.T) {
 	// Setup ES
-	client := elasticsearch.GetTestingElasticsearch(t)
+	client := estest.GetTestingElasticsearch(t)
 	if err := client.Connect(); err != nil {
 		t.Fatal(err)
 	}
@@ -213,7 +213,7 @@ func TestTemplateSettings(t *testing.T) {
 
 func TestOverwrite(t *testing.T) {
 	// Setup ES
-	client := elasticsearch.GetTestingElasticsearch(t)
+	client := estest.GetTestingElasticsearch(t)
 	if err := client.Connect(); err != nil {
 		t.Fatal(err)
 	}
@@ -337,7 +337,7 @@ func TestTemplateWithData(t *testing.T) {
 	assert.Nil(t, err)
 
 	// Setup ES
-	client := elasticsearch.GetTestingElasticsearch(t)
+	client := estest.GetTestingElasticsearch(t)
 
 	tmpl, err := New(version.GetDefaultVersion(), "testindex", client.GetVersion(), TemplateConfig{})
 	assert.NoError(t, err)
