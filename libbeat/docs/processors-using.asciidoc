@@ -543,7 +543,7 @@ default. For example, FileBeat enables the `container` indexer, which indexes
 pod metadata based on all container IDs, and a `logs_path` matcher, which takes
 the `source` field, extracts the container ID, and uses it to retrieve metadata.
 
-The configuration below enables the processor when the Beat is run as a pod in
+The configuration below enables the processor when {beatname_lc} is run as a pod in
 Kubernetes.
 
 [source,yaml]

@@ -19,7 +19,15 @@
 :keystore-command-short-desc: Manages the <<keystore,secrets keystore>>
 :modules-command-short-desc: Manages configured modules
 :run-command-short-desc: Runs {beatname_uc}. This command is used by default if you start {beatname_uc} without specifying a command
+
+ifeval::["{has_ml_jobs}"=="yes"]
 :setup-command-short-desc: Sets up the initial environment, including the index template, Kibana dashboards (when available), and machine learning jobs (when available)
+endif::[]
+
+ifeval::["{has_ml_jobs}"!="yes"]
+:setup-command-short-desc: Sets up the initial environment, including the index template, Kibana dashboards (when available)
+endif::[]
+
 :test-command-short-desc: Tests the configuration
 :version-command-short-desc: Shows information about the current version
 
@@ -31,7 +39,7 @@
 <titleabbrev>Command reference</titleabbrev>
 ++++
 
-{beatname_uc} provides a command-line interface for running the Beat and
+{beatname_uc} provides a command-line interface for starting {beatname_uc} and
 performing common tasks, like testing configuration files and loading
 dashboards. The command-line also supports <<global-flags,global flags>>
 for controlling global behaviors.

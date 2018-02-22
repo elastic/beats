@@ -12,23 +12,23 @@ To configure authentication credentials for {beatname_uc}:
 `monitor` cluster privileges, and `read`, `write`, and `create_index`
 privileges for the indices that {beatname_uc} creates. You can create roles from the
 **Management / Roles** UI in {kib} or through the `role` API.
-For example, the following request creates a ++{beatname_lc}_writer++ role:
+For example, the following request creates a ++{beat_default_index_prefix}_writer++ role:
 +
 ["source","sh",subs="attributes,callouts"]
 ---------------------------------------------------------------
-POST _xpack/security/role/{beatname_lc}_writer
+POST _xpack/security/role/{beat_default_index_prefix}_writer
 {
   "cluster": ["manage_index_templates", "monitor"],
   "indices": [
     {
-      "names": [ "{beatname_lc}-*" ], <1>
+      "names": [ "{beat_default_index_prefix}-*" ], <1>
       "privileges": ["write","create_index"]
     }
   ]
 }
 ---------------------------------------------------------------
 <1> If you use a custom {beatname_uc} index pattern, specify that pattern
-instead of the default ++{beatname_lc}-*++ pattern.
+instead of the default ++{beat_default_index_prefix}-*++ pattern.
 
 . Assign the writer role to the user that {beatname_uc} will use to connect to
 {es}:
@@ -36,15 +36,15 @@ instead of the default ++{beatname_lc}-*++ pattern.
 .. To authenticate as a native user, create a user for the {beatname_uc} to use
 internally and assign it the writer role. You can create users from the
 **Management / Users** UI in {kib} or through the `user` API. For example, the
-following request creates a ++{beatname_lc}_internal++ user that has the
-++{beatname_lc}_writer++ role:
+following request creates a ++{beat_default_index_prefix}_internal++ user that has the
+++{beat_default_index_prefix}_writer++ role:
 +
 ["source","sh",subs="attributes,callouts"]
 ---------------------------------------------------------------
-POST /_xpack/security/user/{beatname_lc}_internal
+POST /_xpack/security/user/{beat_default_index_prefix}_internal
 {
   "password" : "x-pack-test-password",
-  "roles" : [ "{beatname_lc}_writer"],
+  "roles" : [ "{beat_default_index_prefix}_writer"],
   "full_name" : "Internal {beatname_uc} User"
 }
 ---------------------------------------------------------------
@@ -56,7 +56,7 @@ the user by the distinguished name that appears in its certificate.
 --
 ["source","yaml",subs="attributes,callouts"]
 ---------------------------------------------------------------
-{beatname_lc}_writer:
+{beat_default_index_prefix}_writer:
   - "cn=Internal {beatname_uc} User,ou=example,o=com"
 ---------------------------------------------------------------
 For more information, see
@@ -68,14 +68,14 @@ in the {beatname_uc} configuration file:
 
 .. To use basic authentication, configure the `username` and `password`
 settings. For example, the following {beatname_uc} output configuration
-uses the native ++{beatname_lc}_internal++ user to connect to {es}:
+uses the native ++{beat_default_index_prefix}_internal++ user to connect to {es}:
 +
 ["source","js",subs="attributes,callouts"]
 --------------------------------------------------
 output.elasticsearch:
     hosts: ["localhost:9200"]
-    index: "{beatname_lc}"
-    username: "{beatname_lc}_internal"
+    index: "{beat_default_index_prefix}"
+    username: "{beat_default_index_prefix}_internal"
     password: "x-pack-test-password"
 --------------------------------------------------
 
@@ -86,7 +86,7 @@ output.elasticsearch:
 --------------------------------------------------
 output.elasticsearch:
     hosts: ["localhost:9200"]
-    index: "{beatname_lc}"
+    index: "{beat_default_index_prefix}"
     ssl.certificate: "/etc/pki/client/cert.pem" <1>
     ssl.key: "/etc/pki/client/cert.key"
 --------------------------------------------------
