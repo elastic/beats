@@ -2,138 +2,179 @@ package kubernetes
 
 import (
 	"context"
-	"errors"
-	"sync"
+	"fmt"
 	"time"
 
-	"github.com/elastic/beats/libbeat/common/bus"
-	"github.com/elastic/beats/libbeat/logp"
-
 	"github.com/ericchiang/k8s"
-	corev1 "github.com/ericchiang/k8s/api/v1"
+	"github.com/ericchiang/k8s/apis/core/v1"
+
+	"github.com/elastic/beats/libbeat/logp"
 )
 
-// Watcher reads Kubernetes events and keeps a list of known pods
-type Watcher interface {
-	// Start watching Kubernetes API for new containers
-	Start() error
-
-	// Stop watching Kubernetes API for new containers
-	Stop()
-
-	// ListenStart returns a bus listener to receive pod started events, with a `pod` key holding it
-	ListenStart() bus.Listener
-
-	// ListenUpdate returns a bus listener to receive pod updated events, with a `pod` key holding it
-	ListenUpdate() bus.Listener
-
-	// ListenStop returns a bus listener to receive pod stopped events, with a `pod` key holding it
-	ListenStop() bus.Listener
+func filterByNode(node string) k8s.Option {
+	return k8s.QueryParam("fieldSelector", "spec.nodeName="+node)
 }
 
-type podWatcher struct {
-	sync.RWMutex
-	client              Client
-	syncPeriod          time.Duration
-	cleanupTimeout      time.Duration
-	nodeFilter          k8s.Option
+// Watcher watches Kubernetes resources events
+type Watcher interface {
+	// Start watching Kubernetes API for new events after resources were listed
+	Start() error
+
+	// Stop watching Kubernetes API for new events
+	Stop()
+
+	// AddEventHandler add event handlers for corresponding event type watched
+	AddEventHandler(ResourceEventHandler)
+}
+
+// WatchOptions controls watch behaviors
+type WatchOptions struct {
+	// SyncTimeout is a timeout for listing historical resources
+	SyncTimeout time.Duration
+	// Node is used for filtering watched resource to given node, use "" for all nodes
+	Node string
+	// Namespace is used for filtering watched resource to given namespace, use "" for all namespaces
+	Namespace string
+}
+
+type watcher struct {
+	client              *k8s.Client
+	options             WatchOptions
 	lastResourceVersion string
 	ctx                 context.Context
 	stop                context.CancelFunc
-	bus                 bus.Bus
-	pods                map[string]*Pod      // pod id -> Pod
-	deleted             map[string]time.Time // deleted annotations key -> last access time
+	resourceList        k8s.ResourceList
+	k8sResourceFactory  func() k8s.Resource
+	resourceFactory     func() Resource
+	items               func() []k8s.Resource
+	handler             ResourceEventHandler
 }
 
-// Client for Kubernetes interface
-type Client interface {
-	ListPods(ctx context.Context, namespace string, options ...k8s.Option) (*corev1.PodList, error)
-	WatchPods(ctx context.Context, namespace string, options ...k8s.Option) (*k8s.CoreV1PodWatcher, error)
-}
-
-// NewWatcher initializes the watcher client to provide a local state of
-// pods from the cluster (filtered to the given host)
-func NewWatcher(client Client, syncPeriod, cleanupTimeout time.Duration, host string) Watcher {
+// NewWatcher initializes the watcher client to provide a events handler for
+// resource from the cluster (filtered to the given node)
+func NewWatcher(client *k8s.Client, resource Resource, options WatchOptions) (Watcher, error) {
 	ctx, cancel := context.WithCancel(context.Background())
-	return &podWatcher{
+	w := &watcher{
 		client:              client,
-		cleanupTimeout:      cleanupTimeout,
-		syncPeriod:          syncPeriod,
-		nodeFilter:          k8s.QueryParam("fieldSelector", "spec.nodeName="+host),
+		options:             options,
 		lastResourceVersion: "0",
 		ctx:                 ctx,
 		stop:                cancel,
-		pods:                make(map[string]*Pod),
-		deleted:             make(map[string]time.Time),
-		bus:                 bus.New("kubernetes"),
 	}
+	switch resource.(type) {
+	// add resource type which you want to support watching here
+	// note that you might need add Register like event in types.go init func
+	// if types were not registered by k8s library
+	// k8s.Register("", "v1", "events", true, &v1.Event{})
+	// k8s.RegisterList("", "v1", "events", true, &v1.EventList{})
+	case *Pod:
+		list := &v1.PodList{}
+		w.resourceList = list
+		w.k8sResourceFactory = func() k8s.Resource { return &v1.Pod{} }
+		w.resourceFactory = func() Resource { return &Pod{} }
+		w.items = func() []k8s.Resource {
+			rs := make([]k8s.Resource, 0, len(list.Items))
+			for _, item := range list.Items {
+				rs = append(rs, item)
+			}
+			return rs
+		}
+	case *Event:
+		list := &v1.EventList{}
+		w.resourceList = list
+		w.k8sResourceFactory = func() k8s.Resource { return &v1.Event{} }
+		w.resourceFactory = func() Resource { return &Event{} }
+		w.items = func() []k8s.Resource {
+			rs := make([]k8s.Resource, 0, len(list.Items))
+			for _, item := range list.Items {
+				rs = append(rs, item)
+			}
+			return rs
+		}
+	default:
+		return nil, fmt.Errorf("unsupported resource type for watching %T", resource)
+	}
+	return w, nil
 }
 
-func (p *podWatcher) syncPods() error {
-	logp.Info("kubernetes: %s", "Performing a pod sync")
-	pods, err := p.client.ListPods(
-		p.ctx,
-		"",
-		p.nodeFilter,
-		k8s.ResourceVersion(p.lastResourceVersion))
+func (w *watcher) AddEventHandler(h ResourceEventHandler) {
+	w.handler = h
+}
 
+func (w *watcher) buildOpts() []k8s.Option {
+	options := []k8s.Option{k8s.ResourceVersion(w.lastResourceVersion)}
+	if w.options.Node != "" {
+		options = append(options, filterByNode(w.options.Node))
+	}
+	return options
+}
+
+func (w *watcher) sync() error {
+	ctx, cancel := context.WithTimeout(w.ctx, w.options.SyncTimeout)
+	defer cancel()
+
+	logp.Info("kubernetes: Performing a resource sync for %T", w.resourceList)
+
+	err := w.client.List(ctx, w.options.Namespace, w.resourceList, w.buildOpts()...)
 	if err != nil {
+		logp.Err("kubernetes: Performing a resource sync err %s for %T", err.Error(), w.resourceList)
 		return err
 	}
 
-	p.Lock()
-	for _, apiPod := range pods.Items {
-		pod := GetPod(apiPod)
-		p.pods[pod.Metadata.UID] = pod
+	for _, item := range w.items() {
+		w.onAdd(item)
 	}
-	p.Unlock()
-
-	// Emit all start events (avoid blocking if the bus get's blocked)
-	go func() {
-		for _, pod := range p.pods {
-			p.bus.Publish(bus.Event{
-				"start": true,
-				"pod":   pod,
-			})
-		}
-	}()
 
 	// Store last version
-	p.lastResourceVersion = pods.Metadata.GetResourceVersion()
+	w.lastResourceVersion = w.resourceList.GetMetadata().GetResourceVersion()
 
-	logp.Info("kubernetes: %s", "Pod sync done")
+	logp.Info("kubernetes: %s", "Resource sync done")
 	return nil
 }
 
+func (w *watcher) onAdd(obj k8s.Resource) {
+	w.handler.OnAdd(resourceConverter(obj, w.resourceFactory()))
+}
+
+func (w *watcher) onUpdate(obj k8s.Resource) {
+	w.handler.OnUpdate(resourceConverter(obj, w.resourceFactory()))
+}
+
+func (w *watcher) onDelete(obj k8s.Resource) {
+	w.handler.OnDelete(resourceConverter(obj, w.resourceFactory()))
+}
+
 // Start watching pods
-func (p *podWatcher) Start() error {
+func (w *watcher) Start() error {
 
 	// Make sure that events don't flow into the annotator before informer is fully set up
 	// Sync initial state:
-	synced := make(chan struct{})
-	go func() {
-		p.syncPods()
-		close(synced)
-	}()
-
-	select {
-	case <-time.After(p.syncPeriod):
-		p.Stop()
-		return errors.New("Timeout while doing initial Kubernetes pods sync")
-	case <-synced:
-		// Watch for new changes
-		go p.watch()
-		go p.cleanupWorker()
-		return nil
+	err := w.sync()
+	if err != nil {
+		w.Stop()
+		return err
 	}
+
+	// Watch for new changes
+	go w.watch()
+
+	return nil
 }
 
-func (p *podWatcher) watch() {
+func (w *watcher) watch() {
 	for {
-		logp.Info("kubernetes: %s", "Watching API for pod events")
-		watcher, err := p.client.WatchPods(p.ctx, "", p.nodeFilter)
+		select {
+		case <-w.ctx.Done():
+			logp.Info("kubernetes: %s", "Watching API for resource events stopped")
+			return
+		default:
+		}
+
+		logp.Info("kubernetes: %s", "Watching API for resource events")
+
+		watcher, err := w.client.Watch(w.ctx, w.options.Namespace, w.k8sResourceFactory(), w.buildOpts()...)
 		if err != nil {
-			//watch pod failures should be logged and gracefully failed over as metadata retrieval
+			//watch failures should be logged and gracefully failed over as metadata retrieval
 			//should never stop.
 			logp.Err("kubernetes: Watching API error %v", err)
 			time.Sleep(time.Second)
@@ -141,121 +182,27 @@ func (p *podWatcher) watch() {
 		}
 
 		for {
-			_, apiPod, err := watcher.Next()
+			r := w.k8sResourceFactory()
+			eventType, err := watcher.Next(r)
 			if err != nil {
 				logp.Err("kubernetes: Watching API error %v", err)
 				watcher.Close()
 				break
 			}
-
-			pod := GetPod(apiPod)
-			if pod.Metadata.DeletionTimestamp != "" {
-				// Pod deleted
-				p.Lock()
-				p.deleted[pod.Metadata.UID] = time.Now()
-				p.Unlock()
-
-			} else {
-				if p.Pod(pod.Metadata.UID) != nil {
-					// Pod updated
-					p.Lock()
-					p.pods[pod.Metadata.UID] = pod
-					// un-delete if it's flagged (in case of update or recreation)
-					delete(p.deleted, pod.Metadata.UID)
-					p.Unlock()
-
-					p.bus.Publish(bus.Event{
-						"update": true,
-						"pod":    pod,
-					})
-
-				} else {
-					// Pod added
-					p.Lock()
-					p.pods[pod.Metadata.UID] = pod
-					// un-delete if it's flagged (in case of update or recreation)
-					delete(p.deleted, pod.Metadata.UID)
-					p.Unlock()
-
-					p.bus.Publish(bus.Event{
-						"start": true,
-						"pod":   pod,
-					})
-				}
+			switch eventType {
+			case k8s.EventAdded:
+				w.onAdd(r)
+			case k8s.EventModified:
+				w.onUpdate(r)
+			case k8s.EventDeleted:
+				w.onDelete(r)
+			default:
+				logp.Err("kubernetes: Watching API error with event type %s", eventType)
 			}
 		}
 	}
 }
 
-// Check annotations flagged as deleted for their last access time, fully delete
-// the ones older than p.cleanupTimeout
-func (p *podWatcher) cleanupWorker() {
-	for {
-		// Wait a full period
-		time.Sleep(p.cleanupTimeout)
-
-		select {
-		case <-p.ctx.Done():
-			return
-		default:
-			// Check entries for timeout
-			var toDelete []string
-			timeout := time.Now().Add(-p.cleanupTimeout)
-			p.RLock()
-			for key, lastSeen := range p.deleted {
-				if lastSeen.Before(timeout) {
-					toDelete = append(toDelete, key)
-				}
-			}
-			p.RUnlock()
-
-			// Delete timed out entries:
-			p.Lock()
-			for _, key := range toDelete {
-				p.bus.Publish(bus.Event{
-					"stop": true,
-					"pod":  p.Pod(key),
-				})
-
-				delete(p.deleted, key)
-				delete(p.pods, key)
-			}
-			p.Unlock()
-		}
-	}
-}
-
-func (p *podWatcher) Pod(uid string) *Pod {
-	p.RLock()
-	pod := p.pods[uid]
-	_, deleted := p.deleted[uid]
-	p.RUnlock()
-
-	// Update deleted last access
-	if deleted {
-		p.Lock()
-		p.deleted[uid] = time.Now()
-		p.Unlock()
-	}
-
-	return pod
-}
-
-// ListenStart returns a bus listener to receive pod started events, with a `pod` key holding it
-func (p *podWatcher) ListenStart() bus.Listener {
-	return p.bus.Subscribe("start")
-}
-
-// ListenStop returns a bus listener to receive pod stopped events, with a `pod` key holding it
-func (p *podWatcher) ListenStop() bus.Listener {
-	return p.bus.Subscribe("stop")
-}
-
-// ListenUpdate returns a bus listener to receive updated pod events, with a `pod` key holding it
-func (p *podWatcher) ListenUpdate() bus.Listener {
-	return p.bus.Subscribe("update")
-}
-
-func (p *podWatcher) Stop() {
-	p.stop()
+func (w *watcher) Stop() {
+	w.stop()
 }

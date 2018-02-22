@@ -1548,7 +1548,7 @@ example: metricsets
 
 required: True
 
-The document type. Always set to "metricsets".
+The document type. Always set to "doc".
 
 
 [[exported-fields-couchbase]]
@@ -5111,6 +5111,26 @@ CPU used nanocores
 
 
 [float]
+=== `kubernetes.container.cpu.usage.node.pct`
+
+type: scaled_float
+
+format: percentage
+
+CPU usage as a percentage of the total node allocatable CPU
+
+
+[float]
+=== `kubernetes.container.cpu.usage.limit.pct`
+
+type: scaled_float
+
+format: percentage
+
+CPU usage as a percentage of the defined limit for the container (or total node allocatable CPU if unlimited)
+
+
+[float]
 == logs fields
 
 Logs info
@@ -5196,6 +5216,26 @@ type: long
 format: bytes
 
 Total memory usage
+
+
+[float]
+=== `kubernetes.container.memory.usage.node.pct`
+
+type: scaled_float
+
+format: percentage
+
+Memory usage as a percentage of the total node allocatable memory
+
+
+[float]
+=== `kubernetes.container.memory.usage.limit.pct`
+
+type: scaled_float
+
+format: percentage
+
+Memory usage as a percentage of the defined limit for the container (or total node allocatable memory if unlimited)
 
 
 
@@ -5710,6 +5750,74 @@ Tx errors
 
 
 [float]
+== cpu fields
+
+CPU usage metrics
+
+
+
+
+[float]
+=== `kubernetes.pod.cpu.usage.nanocores`
+
+type: long
+
+CPU used nanocores
+
+
+[float]
+=== `kubernetes.pod.cpu.usage.node.pct`
+
+type: scaled_float
+
+format: percentage
+
+CPU usage as a percentage of the total node CPU
+
+
+[float]
+=== `kubernetes.pod.cpu.usage.limit.pct`
+
+type: scaled_float
+
+format: percentage
+
+CPU usage as a percentage of the defined limit for the pod containers (or total node CPU if unlimited)
+
+
+
+
+[float]
+=== `kubernetes.pod.memory.usage.bytes`
+
+type: long
+
+format: bytes
+
+Total memory usage
+
+
+[float]
+=== `kubernetes.pod.memory.usage.node.pct`
+
+type: scaled_float
+
+format: percentage
+
+Memory usage as a percentage of the total node allocatable memory
+
+
+[float]
+=== `kubernetes.pod.memory.usage.limit.pct`
+
+type: scaled_float
+
+format: percentage
+
+Memory usage as a percentage of the defined limit for the pod containers (or total node allocatable memory if unlimited)
+
+
+[float]
 == container fields
 
 kubernetes container metrics
@@ -5876,7 +5984,7 @@ Node unschedulable status
 [float]
 === `kubernetes.node.cpu.allocatable.cores`
 
-type: long
+type: float
 
 Node CPU allocatable cores
 
@@ -6041,6 +6149,75 @@ The generation observed by the ReplicaSet controller
 type: long
 
 The number of fully labeled replicas per ReplicaSet
+
+
+[float]
+== statefulset fields
+
+kubernetes stateful set metrics
+
+
+
+[float]
+=== `kubernetes.statefulset.name`
+
+type: keyword
+
+Kubernetes stateful set name
+
+
+[float]
+=== `kubernetes.statefulset.created`
+
+type: long
+
+The creation timestamp (epoch) for StatefulSet
+
+
+[float]
+== replicas fields
+
+Kubernetes stateful set replicas status
+
+
+
+[float]
+=== `kubernetes.statefulset.replicas.observed`
+
+type: long
+
+The number of observed replicas per StatefulSet
+
+
+[float]
+=== `kubernetes.statefulset.replicas.desired`
+
+type: long
+
+The number of desired replicas per StatefulSet
+
+
+[float]
+== generation fields
+
+Kubernetes stateful set generation information
+
+
+
+[float]
+=== `kubernetes.statefulset.generation.observed`
+
+type: long
+
+The observed generation per StatefulSet
+
+
+[float]
+=== `kubernetes.statefulset.generation.desired`
+
+type: long
+
+The desired generation per StatefulSet
 
 
 [float]

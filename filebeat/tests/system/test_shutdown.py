@@ -156,23 +156,23 @@ class Test(BaseTest):
 
     def test_stopping_empty_path(self):
         """
-        Test filebeat stops properly when 1 prospector has an invalid config.
+        Test filebeat stops properly when 1 input has an invalid config.
         """
 
-        prospector_raw = """
+        input_raw = """
 - type: log
   paths: []
 """
 
         self.render_config_template(
             path=os.path.abspath(self.working_dir) + "/log/*",
-            prospector_raw=prospector_raw,
+            input_raw=input_raw,
         )
         filebeat = self.start_beat()
         time.sleep(2)
 
         # Wait until first flush
-        msg = "No paths were defined for prospector"
+        msg = "No paths were defined for input"
         self.wait_until(
             lambda: self.log_contains_count(msg) >= 1,
             max_timeout=5)

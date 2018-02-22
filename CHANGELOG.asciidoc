@@ -19,6 +19,11 @@ https://github.com/elastic/beats/compare/v6.0.0-beta2...master[Check the HEAD di
 - Update the command line library cobra and add support for zsh completion {pull}5761[5761]
 - The log format may differ due to logging library changes. {pull}5901[5901]
 - Adding a local keystore to allow user to obfuscate password {pull}5687[5687]
+- Update go-ucfg library to support top level key reference and cyclic key reference for the
+  keystore {pull}6098[6098]
+- De dot keys of labels and annotations in kubernetes meta processors to prevent collisions. {pull}6203[6203]
+- The default value for pipelining is reduced to 2 to avoid high memory in the Logstash beats input. {pull}6250[6250]
+- Add logging when monitoring cannot connect to Elasticsearch. {pull}6365[6365]
 
 *Auditbeat*
 
@@ -31,6 +36,17 @@ https://github.com/elastic/beats/compare/v6.0.0-beta2...master[Check the HEAD di
 
 *Filebeat*
 - Switch to docker prospector in sample manifests for Kubernetes deployment {pull}5963[5963]
+- Renaming of the prospector type to the input type and all prospectors are now moved to the input
+  folder, to maintain backward compatibility type aliasing was used to map the old type to the new
+  one. This change also affect YAML configuration. {pull}6078[6078]
+- Refactor the Redis prospector to use the input interface {pull}6116[6116]
+- Refactor the UDP prospector to use the input interface {pull}6118[6118]
+- Refactor the Docker prospector to use the input interface {pull}6278[6278]
+- Refactor the Log prospector to use the input interface {pull}6116[6116]
+- Refactor the Stdin prospector to use the input interface {pull}6116[6116]
+- Refactor the usage of prospector to input in the YAML reference and
+  the system test. {pull}6121[6121]
+- Add IIS module to parse access log and error log. {pull}6127[6127]
 
 *Heartbeat*
 
@@ -41,7 +57,11 @@ https://github.com/elastic/beats/compare/v6.0.0-beta2...master[Check the HEAD di
 - Rename `golang.heap.system.optained` field to `golang.heap.system.obtained`. {issue}5703[5703]
 - Support haproxy stats gathering using http (additionaly to tcp socket). {pull}5819[5819]
 - De dot keys in jolokia/jmx metricset to prevent collisions. {pull}5957[5957]
-- Support to optionally 'de dot' keys in http/json metricset to prevent collisions. {pull}5957[5957]
+- Support to optionally 'de dot' keys in http/json metricset to prevent collisions. {pull}5970[5970]
+- De dot keys in kubernetes/event metricset to prevent collisions. {pull}6203[6203]
+- Fix the default configuration for Logstash to include the default port. {pull}6279[6279]
+- Add filtering option by exact device names in system.diskio. `diskio.include_devices`. {pull}6085[6085]
+- Fix dealing with new process status codes in Linux kernel 4.14+. {pull}6306[6306]
 
 *Packetbeat*
 
@@ -59,6 +79,11 @@ https://github.com/elastic/beats/compare/v6.0.0-beta2...master[Check the HEAD di
 - Fix documentation links in README.md files. {pull}5710[5710]
 - Fix logstash output debug message. {pull}5799{5799]
 - Fix isolation of modules when merging local and global field settings. {issue}5795[5795]
+- Fix panic when Events containing a float32 value are normalized. {pull}6129[6129]
+- Fix `setup.dashboards.always_kibana` when using Kibana 5.6. {issue}6090[6090]
+- Update Golang 1.9.4 {pull}6326[6326]
+- Fix conditions checking on autodiscover Docker labels. {pull}6412[6412]
+- Fix for kafka logger. {pull}6430[6430]
 
 *Auditbeat*
 
@@ -67,6 +92,8 @@ https://github.com/elastic/beats/compare/v6.0.0-beta2...master[Check the HEAD di
 - Fixed an issue where the proctitle value was being truncated.
 - Fixed an issue where values were incorrectly interpretted as hex data.
 - Fixed parsing of the `key` value when multiple keys are present.
+- Fix possible resource leak if file_integrity module is used with config
+  reloading on Windows or Linux. {pull}6198[6198]
 
 *Filebeat*
 
@@ -76,6 +103,8 @@ https://github.com/elastic/beats/compare/v6.0.0-beta2...master[Check the HEAD di
 - Fix `recursive_globe.enabled` option. {pull}5443[5443]
 - Change pipeline delimiter to `{<` and `>}`. {pull}5702[5702]
 - Fix variable name for `convert_timezone` in the system module. {pull}5936[5936]
+- Fix a conversion issue for time related fields in the Logstash module for the slowlog
+  fileset. {issue}6317[6317]
 
 *Heartbeat*
 
@@ -99,17 +128,27 @@ https://github.com/elastic/beats/compare/v6.0.0-beta2...master[Check the HEAD di
 - Fix error collecting network_names in Vsphere module. {pull}5962[5962]
 - Fix process cgroup memory metrics for memsw, kmem, and kmem_tcp. {issue}6033[6033]
 - Fix kafka OffsetFetch request missing topic and partition parameters. {pull}5880[5880]
+- Change kubernetes.node.cpu.allocatable.cores to float. {pull}6130[6130]
+- Fix system process metricset for kernel processes. {issue}5700[5700]
+- Fix panic in http dependent modules when invalid config was used.
+- Fix system.filesystem.used.pct value to match what df reports. {issue}5494[5494]
+- Fix namespace disambiguation in Kubernetes state_* metricsets. {issue}6281[6281]
 
 *Packetbeat*
 
 - Fix http status phrase parsing not allow spaces. {pull}5312[5312]
 - Fix http parse to allow to parse get request with space in the URI. {pull}5495[5495]
 - Fix mysql SQL parser to trim `\r` from Windows Server `SELECT\r\n\t1`. {pull}5572[5572]
+- Fix corruption when parsing repeated headers in an HTTP request or response. {pull}6325[6325]
+- Fix panic when parsing partial AMQP messages. {pull}6384[6384]
+- Fix out of bounds access to slice in MongoDB parser. {pull}6256[6256]
 
 *Winlogbeat*
 
 - Fix the registry file. It was not correctly storing event log names, and
   upon restart it would begin reading at the start of each event log. {issue}5813[5813]
+- Fix config validation to allow `event_logs.processors`. [pull]6217[6217]
+- Fixed a crash under Windows 2003 and XP when an event had less insert strings than required by its format string. {pull}6247[6247]
 
 ==== Added
 
@@ -137,6 +176,8 @@ https://github.com/elastic/beats/compare/v6.0.0-beta2...master[Check the HEAD di
 - Add autodiscover for kubernetes. {pull}6055[6055]
 - Add the abilility for the add_docker_metadata process to enrich based on process ID. {pull}6100[6100]
 - The `add_docker_metadata` and `add_kubernetes_metadata` processors are now GA, instead of Beta. {pull}6105[6105]
+- The node name can be discovered automatically by machine-id matching when beat deployed outside kubernetes cluster. {pull}6146[6146]
+- Panics will be written to the logger before exiting. {pull}6199[6199]
 
 *Auditbeat*
 
@@ -156,6 +197,7 @@ https://github.com/elastic/beats/compare/v6.0.0-beta2...master[Check the HEAD di
 - Add option to convert the timestamps to UTC in the system module. {pull}5647[5647]
 - Add Logstash module support for main log and the slow log, support the plain text or structured JSON format {pull}5481[5481]
 - Add stream filtering when using `docker` prospector. {pull}6057[6057]
+- Add support for CRI logs format. {issue}5630[5630]
 
 *Heartbeat*
 
@@ -182,12 +224,20 @@ https://github.com/elastic/beats/compare/v6.0.0-beta2...master[Check the HEAD di
 - Update the MySQL dashboard to use the Time Series Visual Builder. {pull}5996[5996]
 - Add experimental uwsgi module. {pull}6006[6006]
 - Docker and Kubernetes modules are now GA, instead of Beta. {pull}6105[6105]
+- Add pct calculated fields for Pod and container CPU and memory usages. {pull}6158[6158]
+- Add statefulset support to Kubernetes module. {pull}6236[6236]
+- Refactor prometheus endpoint parsing to look similar to upstream prometheus {pull}6332[6332]
+- Update prometheus dependencies to latest {pull}6333[6333]
 
 *Packetbeat*
 
 - Configure good defaults for `add_kubernetes_metadata`. {pull}5707[5707]
+- Add support for condition on bool type {issue}5659[5659] {pull}5954[5954]
+- HTTP parses successfully on empty status phrase. {issue}6176[6176]
 
 *Winlogbeat*
+
+- Use bookmarks to persist the last published event. {pull}6150[6150]
 
 ==== Deprecated
 
@@ -232,6 +282,7 @@ The list below covers the changes between 6.0.0-rc2 and 6.0.0 GA only.
 *Filebeat*
 
 - Add Kubernetes manifests to deploy Filebeat. {pull}5349[5349]
+- Add container short ID matching to add_docker_metadata. {pull}6172[6172]
 
 *Metricbeat*
 

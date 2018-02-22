@@ -10,7 +10,7 @@ var:
       - c:/programdata/nginx/logs/*access.log*
 
 ingest_pipeline: ingest/default.json
-prospector: config/nginx-access.yml
+input: config/nginx-access.yml
 
 machine_learning:
 - name: response_code

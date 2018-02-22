@@ -2,6 +2,12 @@
 All notable changes to this project will be documented in this file.
 This project adheres to [Semantic Versioning](http://semver.org/).
 
+## [0.8.0]
+
+### Added
+- Added partial `getrusage` support for Windows to retrieve system CPU time and user CPU time. #95
+- Added full `getrusage` support for Unix. #95
+
 ## [0.7.0]
 
 ### Added

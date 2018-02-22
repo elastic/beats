@@ -59,6 +59,13 @@ type Stats struct {
 	envRegexps  []match.Matcher // List of regular expressions used to whitelist env vars.
 }
 
+// Ticks of CPU for a process
+type Ticks struct {
+	User   uint64
+	System uint64
+	Total  uint64
+}
+
 // newProcess creates a new Process object and initializes it with process
 // state information. If the process's command line and environment variables
 // are known they should be passed in to avoid re-fetching the information.
@@ -69,7 +76,7 @@ func newProcess(pid int, cmdline string, env common.MapStr) (*Process, error) {
 	}
 
 	exe := sigar.ProcExe{}
-	if err := exe.Get(pid); err != nil && !sigar.IsNotImplemented(err) && !os.IsPermission(err) {
+	if err := exe.Get(pid); err != nil && !sigar.IsNotImplemented(err) && !os.IsPermission(err) && !os.IsNotExist(err) {
 		return nil, fmt.Errorf("error getting process exe for pid=%d: %v", pid, err)
 	}
 
@@ -225,6 +232,20 @@ func getProcState(b byte) string {
 		return "zombie"
 	}
 	return "unknown"
+}
+
+// GetOwnResourceUsageTimeInMillis return the user and system CPU usage time in milliseconds
+func GetOwnResourceUsageTimeInMillis() (int64, int64, error) {
+	r := sigar.Rusage{}
+	err := r.Get(0)
+	if err != nil {
+		return 0, 0, err
+	}
+
+	uTime := int64(r.Utime / time.Millisecond)
+	sTime := int64(r.Stime / time.Millisecond)
+
+	return uTime, sTime, nil
 }
 
 func (procStats *Stats) getProcessEvent(process *Process) common.MapStr {

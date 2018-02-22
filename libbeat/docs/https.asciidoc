@@ -26,6 +26,9 @@ output.elasticsearch:
 <3> This setting enables the HTTPS protocol.
 <4> The IP and port of the Elasticsearch nodes.
 
+TIP: To obfuscate passwords and other sensitive settings, use the
+<<keystore,secrets keystore>>.
+
 Elasticsearch doesn't have built-in basic authentication, but you can achieve it
 either by using a web proxy or by using X-Pack to secure Elasticsearch. For more
 information, see the X-Pack documentation about

@@ -1,6 +1,8 @@
 package kubernetes
 
 import (
+	"time"
+
 	"github.com/elastic/beats/libbeat/autodiscover"
 	"github.com/elastic/beats/libbeat/autodiscover/template"
 	"github.com/elastic/beats/libbeat/common"
@@ -15,15 +17,11 @@ func init() {
 
 // Provider implements autodiscover provider for docker containers
 type Provider struct {
-	config         *Config
-	bus            bus.Bus
-	watcher        kubernetes.Watcher
-	metagen        kubernetes.MetaGenerator
-	templates      *template.Mapper
-	stop           chan interface{}
-	startListener  bus.Listener
-	stopListener   bus.Listener
-	updateListener bus.Listener
+	config    *Config
+	bus       bus.Bus
+	watcher   kubernetes.Watcher
+	metagen   kubernetes.MetaGenerator
+	templates *template.Mapper
 }
 
 // AutodiscoverBuilder builds and returns an autodiscover provider
@@ -46,70 +44,60 @@ func AutodiscoverBuilder(bus bus.Bus, c *common.Config) (autodiscover.Provider, 
 
 	metagen := kubernetes.NewMetaGenerator(config.IncludeAnnotations, config.IncludeLabels, config.ExcludeLabels)
 
-	config.Host = kubernetes.DiscoverKubernetesNode(config.Host, client)
-	watcher := kubernetes.NewWatcher(client.CoreV1(), config.SyncPeriod, config.CleanupTimeout, config.Host)
+	config.Host = kubernetes.DiscoverKubernetesNode(config.Host, config.InCluster, client)
 
-	start := watcher.ListenStart()
-	stop := watcher.ListenStop()
-	update := watcher.ListenUpdate()
-
-	if err := watcher.Start(); err != nil {
+	watcher, err := kubernetes.NewWatcher(client, &kubernetes.Pod{}, kubernetes.WatchOptions{
+		SyncTimeout: config.SyncPeriod,
+		Node:        config.Host,
+		Namespace:   config.Namespace,
+	})
+	if err != nil {
+		logp.Err("kubernetes: Couldn't create watcher for %t", &kubernetes.Pod{})
 		return nil, err
 	}
 
-	return &Provider{
-		config:         config,
-		bus:            bus,
-		templates:      mapper,
-		metagen:        metagen,
-		watcher:        watcher,
-		stop:           make(chan interface{}),
-		startListener:  start,
-		stopListener:   stop,
-		updateListener: update,
-	}, nil
-}
-
-// Start the autodiscover provider. Start and stop listeners work the
-// conventional way. Update listener triggers a stop and then a start
-// to simulate an update.
-func (p *Provider) Start() {
-	go func() {
-		for {
-			select {
-			case <-p.stop:
-				p.startListener.Stop()
-				p.stopListener.Stop()
-				return
-
-			case event := <-p.startListener.Events():
-				p.emit(event, "start")
-
-			case event := <-p.stopListener.Events():
-				p.emit(event, "stop")
-
-			case event := <-p.updateListener.Events():
-				//On updates, first send a stop signal followed by a start signal to simulate a restart
-				p.emit(event, "stop")
-				p.emit(event, "start")
-			}
-		}
-	}()
-}
-
-func (p *Provider) emit(event bus.Event, flag string) {
-	pod, ok := event["pod"].(*kubernetes.Pod)
-	if !ok {
-		logp.Err("Couldn't get a pod from watcher event")
-		return
+	p := &Provider{
+		config:    config,
+		bus:       bus,
+		templates: mapper,
+		metagen:   metagen,
+		watcher:   watcher,
 	}
 
+	watcher.AddEventHandler(kubernetes.ResourceEventHandlerFuncs{
+		AddFunc: func(obj kubernetes.Resource) {
+			p.emit(obj.(*kubernetes.Pod), "start")
+		},
+		UpdateFunc: func(obj kubernetes.Resource) {
+			p.emit(obj.(*kubernetes.Pod), "stop")
+			p.emit(obj.(*kubernetes.Pod), "start")
+		},
+		DeleteFunc: func(obj kubernetes.Resource) {
+			time.AfterFunc(config.CleanupTimeout, func() { p.emit(obj.(*kubernetes.Pod), "stop") })
+		},
+	})
+
+	return p, nil
+}
+
+// Start for Runner interface.
+func (p *Provider) Start() {
+	if err := p.watcher.Start(); err != nil {
+		logp.Err("Error starting kubernetes autodiscover provider: %s", err)
+	}
+}
+
+func (p *Provider) emit(pod *kubernetes.Pod, flag string) {
 	host := pod.Status.PodIP
+	containerIDs := map[string]string{}
 
 	// Emit pod container IDs
 	for _, c := range append(pod.Status.ContainerStatuses, pod.Status.InitContainerStatuses...) {
+		cid := c.GetContainerID()
+		containerIDs[c.Name] = cid
+
 		cmeta := common.MapStr{
-			"id":    c.GetContainerID(),
+			"id":    cid,
 			"name":  c.Name,
 			"image": c.Image,
 		}
@@ -135,6 +123,7 @@ func (p *Provider) emit(event bus.Event, flag string) {
 	// Emit pod ports
 	for _, c := range pod.Spec.Containers {
 		cmeta := common.MapStr{
+			"id":    containerIDs[c.Name],
 			"name":  c.Name,
 			"image": c.Image,
 		}
@@ -171,7 +160,7 @@ func (p *Provider) publish(event bus.Event) {
 
 // Stop signals the stop channel to force the watch loop routine to stop.
 func (p *Provider) Stop() {
-	close(p.stop)
+	p.watcher.Stop()
 }
 
 // String returns a description of kubernetes autodiscover provider.

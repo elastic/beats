@@ -78,7 +78,10 @@ func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
 		return nil, err
 	}
 
-	http := helper.NewHTTP(base)
+	http, err := helper.NewHTTP(base)
+	if err != nil {
+		return nil, err
+	}
 	http.SetMethod(config.Method)
 	http.SetBody([]byte(config.Body))
 

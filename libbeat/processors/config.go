@@ -130,3 +130,12 @@ func extractString(unk interface{}) (string, error) {
 		return "", fmt.Errorf("unknown type %T passed to extractString", unk)
 	}
 }
+
+func extractBool(unk interface{}) (bool, error) {
+	switch b := unk.(type) {
+	case bool:
+		return b, nil
+	default:
+		return false, fmt.Errorf("unknown type %T passed to extractBool", unk)
+	}
+}

@@ -24,7 +24,8 @@ type Config struct {
 
 func defaultConfig() *Config {
 	return &Config{
-		InCluster:  true,
-		SyncPeriod: 1 * time.Second,
+		InCluster:      true,
+		SyncPeriod:     1 * time.Second,
+		CleanupTimeout: 60 * time.Second,
 	}
 }
