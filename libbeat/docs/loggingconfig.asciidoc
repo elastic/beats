@@ -14,7 +14,7 @@
 == Configure logging
 
 The `logging` section of the +{beatname_lc}.yml+ config file contains options
-for configuring the Beats logging output. The logging system can write logs to
+for configuring the logging output. The logging system can write logs to
 the syslog or rotate log files. If logging is not explicitly configured the file
 output is used.
 
@@ -67,7 +67,7 @@ Minimum log level. One of `debug`, `info`, `warning`, or `error`. The default
 log level is `info`.
 
 `debug`:: Logs debug messages, including a detailed printout of all events
-flushed by the Beat. Also logs informational messages, warnings, errors, and
+flushed. Also logs informational messages, warnings, errors, and
 critical errors. When the log level is `debug`, you can specify a list of
 <<selectors,`selectors`>> to display debug messages for specific components. If
 no selectors are specified, the `*` selector is used to display debug messages
@@ -84,9 +84,9 @@ published. Also logs any warnings, errors, or critical errors.
 [[selectors]]
 ==== `logging.selectors`
 
-The list of debugging-only selector tags used by different Beats components. Use `*`
-to enable debug output for all components. For example add `publish` to display
-all the debug messages related to event publishing. When starting the Beat,
+The list of debugging-only selector tags used by different {beatname_uc} components.
+Use `*` to enable debug output for all components. For example add `publish` to display
+all the debug messages related to event publishing. When starting {beatname_lc},
 selectors can be overwritten using the `-d` command line option (`-d` also sets
 the debug log level).
 
@@ -123,8 +123,7 @@ the <<directory-layout>> section for details.
 [float]
 ==== `logging.files.name`
 
-The name of the file that logs are written to. By default, the name of the Beat
-is used.
+The name of the file that logs are written to. The default is '{beatname_lc}'.
 
 [float]
 ==== `logging.files.rotateeverybytes`
