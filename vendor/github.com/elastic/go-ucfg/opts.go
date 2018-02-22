@@ -1,6 +1,8 @@
 package ucfg
 
-import "os"
+import (
+	"os"
+)
 
 // Option type implementing additional options to be passed
 // to go-ucfg library functions.
@@ -18,6 +20,8 @@ type options struct {
 	// temporary cache of parsed splice values for lifetime of call to
 	// Unpack/Pack/Get/...
 	parsed valueCache
+
+	activeFields *fieldSet
 }
 
 type valueCache map[string]spliceValue
@@ -111,6 +115,7 @@ func makeOptions(opts []Option) *options {
 		validatorTag: "validate",
 		pathSep:      "", // no separator by default
 		parsed:       map[string]spliceValue{},
+		activeFields: NewFieldSet(nil),
 	}
 	for _, opt := range opts {
 		opt(&o)
@@ -130,6 +135,10 @@ func (cache valueCache) cachedValue(
 	}
 
 	v, err := f()
-	cache[string(id)] = spliceValue{err, v}
+
+	// Only primitives can be cached, allowing us to get out of infinite loop
+	if v != nil && v.canCache() {
+		cache[string(id)] = spliceValue{err, v}
+	}
 	return v, err
 }

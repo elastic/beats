@@ -5,7 +5,7 @@ package logp
 type Config struct {
 	Beat      string   `config:",ignore"`   // Name of the Beat (for default file name).
 	JSON      bool     `config:"json"`      // Write logs as JSON.
-	Level     Level    `config:"level"`     // Logging level (error, warn, info, debug).
+	Level     Level    `config:"level"`     // Logging level (error, warning, info, debug).
 	Selectors []string `config:"selectors"` // Selectors for debug level logging.
 
 	toObserver  bool

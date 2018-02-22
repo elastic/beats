@@ -23,6 +23,9 @@
             "prospector": {
                 "type": "log"
             },
+            "input": {
+                "type": "log"
+            },
             "source": "module/apache2/error/test/test.log",
             "fields": {
                 "pipeline_id": "apache2-error-pipeline",
@@ -56,6 +59,9 @@
             "prospector": {
                 "type": "log"
             },
+            "input": {
+                "type": "log"
+            },
             "source": "module/apache2/error/test/test.log",
             "fields": {
                 "pipeline_id": "apache2-error-pipeline",
@@ -84,6 +90,9 @@
                 "version": "6.0.0-alpha1"
             },
             "prospector": {
+                "type": "log"
+            },
+            "input": {
                 "type": "log"
             },
             "source": "module/apache2/error/test/test.log",

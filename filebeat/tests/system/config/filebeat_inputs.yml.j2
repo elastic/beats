@@ -1,0 +1,14 @@
+filebeat.inputs:
+{% for input in inputs %}
+- paths:
+    - {{input.path}}
+  scan_frequency: 0.5s
+  encoding: {{input.encoding | default("plain") }}
+{% endfor %}
+filebeat.registry_file: {{ beat.working_dir + '/' }}{{ registryFile|default("registry")}}
+
+output.file:
+  path: {{ output_file_path|default(beat.working_dir + "/output") }}
+  filename: "{{ output_file_filename|default("filebeat") }}"
+  rotate_every_kb: 1000
+  #number_of_files: 7

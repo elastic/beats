@@ -122,11 +122,11 @@ func (r *Registrar) loadStates() error {
 }
 
 // resetStates sets all states to finished and disable TTL on restart
-// For all states covered by a prospector, TTL will be overwritten with the prospector value
+// For all states covered by an input, TTL will be overwritten with the input value
 func resetStates(states []file.State) []file.State {
 	for key, state := range states {
 		state.Finished = true
-		// Set ttl to -2 to easily spot which states are not managed by a prospector
+		// Set ttl to -2 to easily spot which states are not managed by a input
 		state.TTL = -2
 		states[key] = state
 	}
@@ -134,7 +134,7 @@ func resetStates(states []file.State) []file.State {
 }
 
 func (r *Registrar) Start() error {
-	// Load the previous log file locations now, for use in prospector
+	// Load the previous log file locations now, for use in input
 	err := r.loadStates()
 	if err != nil {
 		return fmt.Errorf("Error loading state: %v", err)
@@ -185,14 +185,14 @@ func (r *Registrar) onEvents(states []file.State) {
 	r.processEventStates(states)
 
 	beforeCount := r.states.Count()
-	cleanedStates := r.states.Cleanup()
+	cleanedStates, pendingClean := r.states.Cleanup()
 	statesCleanup.Add(int64(cleanedStates))
 
 	r.bufferedStateUpdates += len(states)
 
 	logp.Debug("registrar",
-		"Registrar states cleaned up. Before: %d, After: %d",
-		beforeCount, beforeCount-cleanedStates)
+		"Registrar states cleaned up. Before: %d, After: %d, Pending: %d",
+		beforeCount, beforeCount-cleanedStates, pendingClean)
 }
 
 // processEventStates gets the states from the events and writes them to the registrar state

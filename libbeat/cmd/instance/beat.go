@@ -15,6 +15,7 @@ import (
 	"time"
 
 	"github.com/satori/go.uuid"
+	"go.uber.org/zap"
 
 	"github.com/elastic/beats/libbeat/api"
 	"github.com/elastic/beats/libbeat/beat"
@@ -128,6 +129,12 @@ func initRand() {
 // XXX Move this as a *Beat method?
 func Run(name, idxPrefix, version string, bt beat.Creator) error {
 	return handleError(func() error {
+		defer func() {
+			if r := recover(); r != nil {
+				logp.NewLogger(name).Fatalw("Failed due to panic.",
+					"panic", r, zap.Stack("stack"))
+			}
+		}()
 		b, err := NewBeat(name, idxPrefix, version)
 		if err != nil {
 			return err
@@ -248,6 +255,7 @@ func (b *Beat) createBeater(bt beat.Creator) (beat.Beater, error) {
 
 func (b *Beat) launch(bt beat.Creator) error {
 	defer logp.Sync()
+	defer logp.Info("%s stopped.", b.Info.Beat)
 
 	err := b.Init()
 	if err != nil {
@@ -299,7 +307,6 @@ func (b *Beat) launch(bt beat.Creator) error {
 	}
 
 	logp.Info("%s start running.", b.Info.Beat)
-	defer logp.Info("%s stopped.", b.Info.Beat)
 
 	if b.Config.HTTP.Enabled() {
 		api.Start(b.Config.HTTP, b.Info)

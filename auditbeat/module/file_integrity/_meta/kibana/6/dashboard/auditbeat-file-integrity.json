@@ -14,8 +14,8 @@
       },
       "id": "AV0tVcg6g1PYniApZa-v",
       "type": "visualization",
-      "updated_at": "2018-01-16T23:26:19.186Z",
-      "version": 3
+      "updated_at": "2018-01-22T15:54:25.278Z",
+      "version": 6
     },
     {
       "attributes": {
@@ -31,8 +31,8 @@
       },
       "id": "AV0tV05vg1PYniApZbA2",
       "type": "visualization",
-      "updated_at": "2018-01-16T23:26:32.206Z",
-      "version": 3
+      "updated_at": "2018-01-22T15:54:25.278Z",
+      "version": 6
     },
     {
       "attributes": {
@@ -48,8 +48,8 @@
       },
       "id": "AV0tWL-Yg1PYniApZbCs",
       "type": "visualization",
-      "updated_at": "2018-01-16T23:27:54.841Z",
-      "version": 3
+      "updated_at": "2018-01-22T15:54:25.278Z",
+      "version": 6
     },
     {
       "attributes": {
@@ -65,8 +65,8 @@
       },
       "id": "AV0tWSdXg1PYniApZbDU",
       "type": "visualization",
-      "updated_at": "2018-01-16T23:27:45.309Z",
-      "version": 3
+      "updated_at": "2018-01-22T15:54:25.278Z",
+      "version": 6
     },
     {
       "attributes": {
@@ -82,25 +82,25 @@
       },
       "id": "AV0tW0djg1PYniApZbGL",
       "type": "visualization",
-      "updated_at": "2018-01-16T23:28:06.060Z",
-      "version": 3
+      "updated_at": "2018-01-22T15:54:25.278Z",
+      "version": 6
     },
     {
       "attributes": {
         "description": "",
         "kibanaSavedObjectMeta": {
-          "searchSourceJSON": "{\n  \"index\": \"auditbeat-*\",\n  \"query\": {\n    \"query\": \"file.mode:/0..[2367]/\",\n    \"language\": \"lucene\"\n  },\n  \"filter\": []\n}"
+          "searchSourceJSON": "{\"index\":\"auditbeat-*\",\"query\":{\"query\":\"file.mode:/0..[2367]/ NOT file.type:symlink\",\"language\":\"lucene\"},\"filter\":[]}"
         },
         "savedSearchId": "a380a060-cb44-11e7-9835-2f31fe08873b",
         "title": "World Writable File Count [Auditbeat File Integrity]",
-        "uiStateJSON": "{\n  \"vis\": {\n    \"defaultColors\": {\n      \"0 - 100\": \"rgb(0,104,55)\"\n    }\n  }\n}",
+        "uiStateJSON": "{\"vis\":{\"defaultColors\":{\"0 - 100\":\"rgb(0,104,55)\"}}}",
         "version": 1,
-        "visState": "{\n  \"title\": \"World Writable File Count [Auditbeat File Integrity]\",\n  \"type\": \"metric\",\n  \"params\": {\n    \"addTooltip\": true,\n    \"addLegend\": false,\n    \"type\": \"gauge\",\n    \"gauge\": {\n      \"verticalSplit\": false,\n      \"autoExtend\": false,\n      \"percentageMode\": false,\n      \"gaugeType\": \"Metric\",\n      \"gaugeStyle\": \"Full\",\n      \"backStyle\": \"Full\",\n      \"orientation\": \"vertical\",\n      \"colorSchema\": \"Green to Red\",\n      \"gaugeColorMode\": \"None\",\n      \"useRange\": false,\n      \"colorsRange\": [\n        {\n          \"from\": 0,\n          \"to\": 100\n        }\n      ],\n      \"invertColors\": false,\n      \"labels\": {\n        \"show\": false,\n        \"color\": \"black\"\n      },\n      \"scale\": {\n        \"show\": false,\n        \"labels\": false,\n        \"color\": \"#333\",\n        \"width\": 2\n      },\n      \"type\": \"simple\",\n      \"style\": {\n        \"fontSize\": \"23\",\n        \"bgFill\": \"#000\",\n        \"bgColor\": false,\n        \"labelColor\": false,\n        \"subText\": \"\"\n      }\n    }\n  },\n  \"aggs\": [\n    {\n      \"id\": \"1\",\n      \"enabled\": true,\n      \"type\": \"cardinality\",\n      \"schema\": \"metric\",\n      \"params\": {\n        \"field\": \"file.inode\",\n        \"customLabel\": \"World Writable Files\"\n      }\n    }\n  ]\n}"
+        "visState": "{\"title\":\"World Writable File Count [Auditbeat File Integrity]\",\"type\":\"metric\",\"params\":{\"addTooltip\":true,\"addLegend\":false,\"type\":\"metric\",\"metric\":{\"percentageMode\":false,\"colorSchema\":\"Green to Red\",\"useRange\":false,\"colorsRange\":[{\"from\":0,\"to\":100}],\"invertColors\":false,\"labels\":{\"show\":false,\"color\":\"black\"},\"style\":{\"fontSize\":\"23\",\"bgFill\":\"#000\",\"bgColor\":false,\"labelColor\":false,\"subText\":\"\"},\"metricColorMode\":\"None\"}},\"aggs\":[{\"id\":\"1\",\"enabled\":true,\"type\":\"cardinality\",\"schema\":\"metric\",\"params\":{\"field\":\"file.inode\",\"customLabel\":\"World Writable Files\"}}]}"
       },
       "id": "AV0tY6jwg1PYniApZbRY",
       "type": "visualization",
-      "updated_at": "2018-01-16T23:28:16.492Z",
-      "version": 3
+      "updated_at": "2018-01-22T17:48:29.232Z",
+      "version": 7
     },
     {
       "attributes": {
@@ -116,8 +116,8 @@
       },
       "id": "AV0tav8Ag1PYniApZbbK",
       "type": "visualization",
-      "updated_at": "2018-01-16T23:26:57.647Z",
-      "version": 3
+      "updated_at": "2018-01-22T15:54:25.278Z",
+      "version": 6
     },
     {
       "attributes": {
@@ -133,8 +133,8 @@
       },
       "id": "AV0tbcUdg1PYniApZbe1",
       "type": "visualization",
-      "updated_at": "2018-01-16T23:27:09.798Z",
-      "version": 3
+      "updated_at": "2018-01-22T15:54:25.278Z",
+      "version": 6
     },
     {
       "attributes": {
@@ -150,8 +150,8 @@
       },
       "id": "AV0tc_xZg1PYniApZbnL",
       "type": "visualization",
-      "updated_at": "2018-01-16T23:26:44.392Z",
-      "version": 3
+      "updated_at": "2018-01-22T15:54:25.278Z",
+      "version": 6
     },
     {
       "attributes": {
@@ -167,8 +167,8 @@
       },
       "id": "AV0tes4Eg1PYniApZbwV",
       "type": "visualization",
-      "updated_at": "2018-01-16T23:27:31.392Z",
-      "version": 3
+      "updated_at": "2018-01-22T15:54:25.278Z",
+      "version": 6
     },
     {
       "attributes": {
@@ -184,8 +184,8 @@
       },
       "id": "AV0te0TCg1PYniApZbw9",
       "type": "visualization",
-      "updated_at": "2018-01-16T23:27:20.556Z",
-      "version": 3
+      "updated_at": "2018-01-22T15:54:25.278Z",
+      "version": 6
     },
     {
       "attributes": {
@@ -207,8 +207,8 @@
       },
       "id": "a380a060-cb44-11e7-9835-2f31fe08873b",
       "type": "search",
-      "updated_at": "2018-01-16T23:25:56.544Z",
-      "version": 3
+      "updated_at": "2018-01-22T15:54:25.278Z",
+      "version": 6
     },
     {
       "attributes": {
@@ -225,9 +225,9 @@
       },
       "id": "AV0tXkjYg1PYniApZbKP",
       "type": "dashboard",
-      "updated_at": "2018-01-17T00:03:43.718Z",
-      "version": 3
+      "updated_at": "2018-01-22T15:54:25.278Z",
+      "version": 6
     }
   ],
-  "version": "7.0.0-alpha1-SNAPSHOT"
+  "version": "6.1.2"
 }

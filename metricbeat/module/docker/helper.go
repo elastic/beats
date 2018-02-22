@@ -3,7 +3,7 @@ package docker
 import (
 	"strings"
 
-	"github.com/fsouza/go-dockerclient"
+	"github.com/docker/docker/api/types"
 
 	"github.com/elastic/beats/libbeat/common"
 )
@@ -26,7 +26,7 @@ func (c *Container) ToMapStr() common.MapStr {
 	return m
 }
 
-func NewContainer(container *docker.APIContainers) *Container {
+func NewContainer(container *types.Container) *Container {
 	return &Container{
 		ID:     container.ID,
 		Name:   ExtractContainerName(container.Names),

@@ -341,6 +341,9 @@ func (d *decoder) readDocument() (bson.M, error) {
 	start := d.i
 	documentLength, err := d.readInt32()
 	d.i = start + documentLength
+	if len(d.in) < d.i {
+		return nil, errors.New("document out of bounds")
+	}
 
 	documentMap := bson.M{}
 

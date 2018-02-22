@@ -1,0 +1,159 @@
+- name: access
+  type: group
+  description: >
+    Contains fields for IIS access logs.
+  fields:
+    - name: server_ip
+      type: keyword
+      description: >
+        The server IP address.
+    - name: method
+      type: keyword
+      example: GET
+      description: >
+        The request HTTP method.
+    - name: url
+      type: keyword
+      description: >
+        The request HTTP URL.
+    - name: query_string
+      type: keyword
+      description: >
+        The request query string, if any.
+    - name: port
+      type: long
+      description: >
+        The request port number.
+    - name: user_name
+      type: keyword
+      description: >
+        The user name used when basic authentication is used.
+    - name: remote_ip
+      type: keyword
+      description: >
+        The client IP address.
+    - name: referrer
+      type: keyword
+      description: >
+        The HTTP referrer.
+    - name: response_code
+      type: long
+      description: >
+        The HTTP response code.
+    - name: sub_status
+      type: long
+      description: >
+        The HTTP substatus code.
+    - name: win32_status
+      type: long
+      description: >
+        The Windows status code.
+    - name: request_time_ms
+      type: long
+      description: >
+        The request time in milliseconds.
+    - name: site_name
+      type: keyword
+      description: >
+        The site name and instance number.
+    - name: server_name
+      type: keyword
+      description: >
+        The name of the server on which the log file entry was generated.
+    - name: http_version
+      type: keyword
+      description: >
+        The HTTP version.
+    - name: cookie
+      type: keyword
+      description: >
+        The content of the cookie sent or received, if any.
+    - name: hostname
+      type: keyword
+      description: >
+        The host header name, if any.
+    - name: body_sent.bytes
+      type: long
+      format: bytes
+      description: >
+        The number of bytes of the server response body.
+    - name: body_received.bytes
+      type: long
+      format: bytes
+      description: >
+        The number of bytes of the server request body.
+    - name: agent
+      type: text
+      description: >
+        Contains the un-parsed user agent string. Only present if the user
+        agent Elasticsearch plugin is not available or not used.
+    - name: user_agent
+      type: group
+      description: >
+        Contains the parsed user agent field. Only present if the user
+        agent Elasticsearch plugin is available and used.
+      fields:
+        - name: device
+          type: keyword
+          description: >
+            The name of the physical device.
+        - name: major
+          type: long
+          description: >
+            The major version of the user agent.
+        - name: minor
+          type: long
+          description: >
+            The minor version of the user agent.
+        - name: patch
+          type: keyword
+          description: >
+            The patch version of the user agent.
+        - name: name
+          type: keyword
+          example: Chrome
+          description: >
+            The name of the user agent.
+        - name: os
+          type: keyword
+          description: >
+            The name of the operating system.
+        - name: os_major
+          type: long
+          description: >
+            The major version of the operating system.
+        - name: os_minor
+          type: long
+          description: >
+            The minor version of the operating system.
+        - name: os_name
+          type: keyword
+          description: >
+            The name of the operating system.
+    - name: geoip
+      type: group
+      description: >
+        Contains GeoIP information gathered based on the remote_ip field.
+        Only present if the GeoIP Elasticsearch plugin is available and
+        used.
+      fields:
+        - name: continent_name
+          type: keyword
+          description: >
+            The name of the continent.
+        - name: country_iso_code
+          type: keyword
+          description: >
+            Country ISO code.
+        - name: location
+          type: geo_point
+          description: >
+            The longitude and latitude.
+        - name: region_name
+          type: keyword
+          description: >
+            The region name.
+        - name: city_name
+          type: keyword
+          description: >
+            The city name.

@@ -54,11 +54,11 @@ func (g *metaGenerator) PodMetadata(pod *Pod) common.MapStr {
 	}
 
 	if len(labelMap) != 0 {
-		meta["labels"] = labelMap
+		meta["labels"] = common.DeDotJSON(labelMap)
 	}
 
 	if len(annotationsMap) != 0 {
-		meta["annotations"] = annotationsMap
+		meta["annotations"] = common.DeDotJSON(annotationsMap)
 	}
 
 	return meta

@@ -543,7 +543,7 @@ default. For example, FileBeat enables the `container` indexer, which indexes
 pod metadata based on all container IDs, and a `logs_path` matcher, which takes
 the `source` field, extracts the container ID, and uses it to retrieve metadata.
 
-The configuration below enables the processor when the Beat is run as a pod in
+The configuration below enables the processor when {beatname_lc} is run as a pod in
 Kubernetes.
 
 [source,yaml]
@@ -619,6 +619,7 @@ processors:
     #match_pids: ["process.pid", "process.ppid"]
     #match_source: true
     #match_source_index: 4
+    #match_short_id: true
     #cleanup_timeout: 60
     # To connect to Docker over TLS you must specify a client and CA certificate.
     #ssl:
@@ -644,6 +645,11 @@ is `["process.pid", "process.ppid"]`.
 
 `match_source`:: (Optional) Match container ID from a log path present in the
 `source` field. Enabled by default.
+
+`match_short_id`:: (Optional) Match container short ID from a log path present
+in the `source` field. Disabled by default.
+This allows to match directories names that have the first 12 characters
+of the container ID. For example, `/var/log/containers/b7e3460e2b21/*.log`.
 
 `match_source_index`:: (Optional) Index in the source path split by `/` to look
 for container ID. It defaults to 4 to match

@@ -37,7 +37,7 @@ func AutodiscoverBuilder(bus bus.Bus, c *common.Config) (autodiscover.Provider, 
 		return nil, err
 	}
 
-	watcher, err := docker.NewWatcher(config.Host, config.TLS)
+	watcher, err := docker.NewWatcher(config.Host, config.TLS, false)
 	if err != nil {
 		return nil, err
 	}
@@ -92,12 +92,17 @@ func (d *Provider) emitContainer(event bus.Event, flag string) {
 		host = container.IPAddresses[0]
 	}
 
+	labelMap := common.MapStr{}
+	for k, v := range container.Labels {
+		labelMap[k] = v
+	}
+
 	meta := common.MapStr{
 		"container": common.MapStr{
 			"id":     container.ID,
 			"name":   container.Name,
 			"image":  container.Image,
-			"labels": container.Labels,
+			"labels": labelMap,
 		},
 	}
 
