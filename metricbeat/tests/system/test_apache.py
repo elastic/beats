@@ -7,13 +7,24 @@ import time
 
 APACHE_FIELDS = metricbeat.COMMON_FIELDS + ["apache"]
 
-APACHE_STATUS_FIELDS = ["hostname", "total_accesses", "total_kbytes",
-                        "requests_per_sec", "bytes_per_sec", "bytes_per_request",
-                        "workers.busy", "workers.idle", "uptime", "cpu",
-                        "connections", "load", "scoreboard"]
+APACHE_STATUS_FIELDS = [
+    "hostname", "total_accesses", "total_kbytes",
+    "requests_per_sec", "bytes_per_sec", "bytes_per_request",
+    "workers.busy", "workers.idle", "uptime", "cpu",
+    "connections", "load", "scoreboard"
+]
 
-CPU_FIELDS = ["load", "user", "system", "children_user",
-              "children_system"]
+APACHE_OLD_STATUS_FIELDS = [
+    "hostname", "total_accesses", "total_kbytes",
+    "requests_per_sec", "bytes_per_sec",
+    "workers.busy", "workers.idle", "uptime",
+    "connections", "scoreboard"
+]
+
+
+CPU_FIELDS = [
+    "load", "user", "system", "children_user", "children_system"
+]
 
 
 class ApacheStatusTest(metricbeat.BaseTest):
@@ -37,7 +48,7 @@ class ApacheStatusTest(metricbeat.BaseTest):
 
         found = False
         # Waits until CPULoad is part of the status
-        while found == False:
+        while not found:
             res = urllib2.urlopen(hosts[0] + "/server-status?auto").read()
             if "CPULoad" in res:
                 found = True
@@ -52,16 +63,35 @@ class ApacheStatusTest(metricbeat.BaseTest):
         self.assertEqual(len(output), 1)
         evt = output[0]
 
-        # Verify the required fields are present.
-        self.assertItemsEqual(self.de_dot(APACHE_FIELDS), evt.keys())
-        apache_status = evt["apache"]["status"]
-        self.assertItemsEqual(self.de_dot(APACHE_STATUS_FIELDS), apache_status.keys())
-        self.assertItemsEqual(self.de_dot(CPU_FIELDS), apache_status["cpu"].keys())
-        # There are more fields that could be checked.
+        self.verify_fields(evt)
 
         # Verify all fields present are documented.
         self.assert_fields_are_documented(evt)
 
+    def verify_fields(self, evt):
+        self.assertItemsEqual(self.de_dot(APACHE_FIELDS), evt.keys())
+        apache_status = evt["apache"]["status"]
+        self.assertItemsEqual(
+            self.de_dot(APACHE_STATUS_FIELDS), apache_status.keys())
+        self.assertItemsEqual(
+            self.de_dot(CPU_FIELDS), apache_status["cpu"].keys())
+        # There are more fields that could be checked.
+
     def get_hosts(self):
         return ['http://' + os.getenv('APACHE_HOST', 'localhost') + ':' +
+                os.getenv('APACHE_PORT', '80')]
+
+
+class ApacheOldStatusTest(ApacheStatusTest):
+
+    COMPOSE_SERVICES = ['apache_2_4_12']
+
+    def verify_fields(self, evt):
+        self.assertItemsEqual(self.de_dot(APACHE_FIELDS), evt.keys())
+        apache_status = evt["apache"]["status"]
+        self.assertItemsEqual(
+            self.de_dot(APACHE_OLD_STATUS_FIELDS), apache_status.keys())
+
+    def get_hosts(self):
+        return ['http://' + os.getenv('APACHE_OLD_HOST', 'localhost') + ':' +
                 os.getenv('APACHE_PORT', '80')]
