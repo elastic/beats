@@ -242,7 +242,7 @@ func (reg *ModuleRegistry) GetInputConfigs() ([]*common.Config, error) {
 		for name, fileset := range filesets {
 			fcfg, err := fileset.getInputConfig()
 			if err != nil {
-				return result, fmt.Errorf("Error getting config for fielset %s/%s: %v",
+				return result, fmt.Errorf("Error getting config for fileset %s/%s: %v",
 					module, name, err)
 			}
 			result = append(result, fcfg)
