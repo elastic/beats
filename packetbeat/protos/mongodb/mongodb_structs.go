@@ -83,15 +83,17 @@ type transaction struct {
 type opCode int32
 
 const (
-	opReply      opCode = 1
-	opMsg        opCode = 1000
-	opUpdate     opCode = 2001
-	opInsert     opCode = 2002
-	opReserved   opCode = 2003
-	opQuery      opCode = 2004
-	opGetMore    opCode = 2005
-	opDelete     opCode = 2006
-	opKillCursor opCode = 2007
+	opReply        opCode = 1
+	opMsg          opCode = 1000
+	opUpdate       opCode = 2001
+	opInsert       opCode = 2002
+	opReserved     opCode = 2003
+	opQuery        opCode = 2004
+	opGetMore      opCode = 2005
+	opDelete       opCode = 2006
+	opKillCursor   opCode = 2007
+	opCommand      opCode = 2010
+	opCommandreply opCode = 2011
 )
 
 // List of valid mongodb wire protocol operation codes
@@ -106,6 +108,8 @@ var opCodeNames = map[opCode]string{
 	2005: "OP_GET_MORE",
 	2006: "OP_DELETE",
 	2007: "OP_KILL_CURSORS",
+	2010: "OP_COMMAND",
+	2011: "OP_COMMANDREPLY",
 }
 
 func validOpcode(o opCode) bool {

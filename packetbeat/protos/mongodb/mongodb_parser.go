@@ -77,6 +77,12 @@ func mongodbMessageParser(s *stream) (bool, bool) {
 	case opKillCursor:
 		s.message.method = "killCursors"
 		return opKillCursorsParse(d, s.message)
+	case opCommand:
+		s.message.method = "command"
+		return opCommandParse(d, s.message)
+	case opCommandreply:
+		s.message.method = "commandreply"
+		return opCommandreplyParse(d, s.message)
 	}
 
 	return false, false
@@ -272,6 +278,18 @@ func opDeleteParse(d *decoder, m *mongodbMessage) (bool, bool) {
 
 func opKillCursorsParse(d *decoder, m *mongodbMessage) (bool, bool) {
 	// TODO ? Or not, content is not very interesting.
+	return true, true
+}
+
+func opCommandParse(d *decoder, m *mongodbMessage) (bool, bool) {
+	// TODO ? Or not, content is not very interesting.
+	// Changed in version 3.6: Deprecated and may be removed in a future release of MongoDB.
+	return true, true
+}
+
+func opCommandreplyParse(d *decoder, m *mongodbMessage) (bool, bool) {
+	// TODO ? Or not, content is not very interesting.
+	// Changed in version 3.6: Deprecated and may be removed in a future release of MongoDB.
 	return true, true
 }
 
