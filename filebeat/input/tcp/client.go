@@ -41,8 +41,12 @@ func NewClient(
 		splitFunc:      splitFunc,
 		maxReadMessage: maxReadMessage,
 		timeout:        timeout,
+		metadata: common.MapStr{
+			"hostnames":  remoteHosts(conn),
+			"ip_address": c.conn.RemoteAddr().String(),
+		},
 	}
-	client.cacheMetadata()
+
 	return client
 }
 
@@ -94,8 +98,8 @@ func (c *Client) createEvent(rawString string) *util.Data {
 
 // GetRemoteHosts take the IP address of the client and try to resolve the name, if it fails we
 // fallback to the IP, IP can resolve to multiple hostname.
-func (c *Client) getRemoteHosts() []string {
-	ip := c.conn.RemoteAddr().String()
+func remoteHosts(conn net.Conn) []string {
+	ip := conn.RemoteAddr().String()
 	idx := strings.Index(ip, ":")
 	if idx == -1 {
 		return []string{ip}
@@ -106,11 +110,4 @@ func (c *Client) getRemoteHosts() []string {
 		hosts = []string{ip}
 	}
 	return hosts
-}
-
-func (c *Client) cacheMetadata() {
-	c.metadata = common.MapStr{
-		"hostnames":  c.getRemoteHosts(),
-		"ip_address": c.conn.RemoteAddr().String(),
-	}
 }
