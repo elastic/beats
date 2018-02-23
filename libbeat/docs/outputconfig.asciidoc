@@ -257,10 +257,12 @@ Example elasticsearch output with `pipelines`:
 ["source","yaml"]
 ------------------------------------------------------------------------------
 filebeat.prospectors:
-- paths: ["/var/log/app/normal/*.log"]
+- type: log
+  paths: ["/var/log/app/normal/*.log"]
   fields:
     type: "normal"
-- paths: ["/var/log/app/critical/*.log"]
+- type: log
+  paths: ["/var/log/app/critical/*.log"]
   fields:
     type: "critical"
 
