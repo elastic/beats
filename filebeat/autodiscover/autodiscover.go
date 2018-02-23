@@ -1,4 +1,4 @@
-package beater
+package autodiscover
 
 import (
 	"errors"
@@ -8,15 +8,17 @@ import (
 	"github.com/elastic/beats/libbeat/common/bus"
 )
 
-// AutodiscoverAdapter for Metricbeat modules
+// AutodiscoverAdapter for Filebeat modules & input
 type AutodiscoverAdapter struct {
-	factory cfgfile.RunnerFactory
+	inputFactory  cfgfile.RunnerFactory
+	moduleFactory cfgfile.RunnerFactory
 }
 
-// NewAutodiscoverAdapter builds and returns an autodiscover adapter for Metricbeat modules
-func NewAutodiscoverAdapter(factory cfgfile.RunnerFactory) *AutodiscoverAdapter {
+// NewAutodiscoverAdapter builds and returns an autodiscover adapter for Filebeat modules & input
+func NewAutodiscoverAdapter(inputFactory, moduleFactory cfgfile.RunnerFactory) *AutodiscoverAdapter {
 	return &AutodiscoverAdapter{
-		factory: factory,
+		inputFactory:  inputFactory,
+		moduleFactory: moduleFactory,
 	}
 }
 
@@ -35,9 +37,12 @@ func (m *AutodiscoverAdapter) CheckConfig(c *common.Config) error {
 	return nil
 }
 
-// Create a module or prospector from the given config
+// Create a module or input from the given config
 func (m *AutodiscoverAdapter) Create(c *common.Config, meta *common.MapStrPointer) (cfgfile.Runner, error) {
-	return m.factory.Create(c, meta)
+	if c.HasField("module") {
+		return m.moduleFactory.Create(c, meta)
+	}
+	return m.inputFactory.Create(c, meta)
 }
 
 // EventFilter returns the bus filter to retrieve runner start/stop triggering events

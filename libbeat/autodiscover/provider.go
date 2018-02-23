@@ -3,7 +3,6 @@ package autodiscover
 import (
 	"fmt"
 	"strings"
-	"sync"
 
 	"github.com/elastic/beats/libbeat/cfgfile"
 	"github.com/elastic/beats/libbeat/common"
@@ -16,26 +15,8 @@ type Provider interface {
 	cfgfile.Runner
 }
 
-// ProviderRegistry holds all known autodiscover providers, they must be added to it to enable them for use
-var ProviderRegistry = NewRegistry()
-
 // ProviderBuilder creates a new provider based on the given config and returns it
 type ProviderBuilder func(bus.Bus, *common.Config) (Provider, error)
-
-// Register of autodiscover providers
-type registry struct {
-	// Lock to control concurrent read/writes
-	lock sync.RWMutex
-	// A map of provider name to ProviderBuilder.
-	providers map[string]ProviderBuilder
-}
-
-// NewRegistry creates and returns a new Registry
-func NewRegistry() *registry {
-	return &registry{
-		providers: make(map[string]ProviderBuilder, 0),
-	}
-}
 
 // AddProvider registers a new ProviderBuilder
 func (r *registry) AddProvider(name string, provider ProviderBuilder) error {

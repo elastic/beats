@@ -102,8 +102,8 @@ func TestNilAutodiscover(t *testing.T) {
 func TestAutodiscover(t *testing.T) {
 	// Register mock autodiscover provider
 	busChan := make(chan bus.Bus, 1)
-	ProviderRegistry = NewRegistry()
-	ProviderRegistry.AddProvider("mock", func(b bus.Bus, c *common.Config) (Provider, error) {
+	Registry = NewRegistry()
+	Registry.AddProvider("mock", func(b bus.Bus, c *common.Config) (Provider, error) {
 		// intercept bus to mock events
 		busChan <- b
 
@@ -205,8 +205,8 @@ func TestAutodiscoverHash(t *testing.T) {
 	// Register mock autodiscover provider
 	busChan := make(chan bus.Bus, 1)
 
-	ProviderRegistry = NewRegistry()
-	ProviderRegistry.AddProvider("mock", func(b bus.Bus, c *common.Config) (Provider, error) {
+	Registry = NewRegistry()
+	Registry.AddProvider("mock", func(b bus.Bus, c *common.Config) (Provider, error) {
 		// intercept bus to mock events
 		busChan <- b
 
