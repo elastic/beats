@@ -27,11 +27,8 @@ type Adapter interface {
 	// RunnerFactory provides runner creation by feeding valid configs
 	cfgfile.RunnerFactory
 
-	// StartFilter returns the bus filter to retrieve runner start triggering events
-	StartFilter() []string
-
-	// StopFilter returns the bus filter to retrieve runner stop triggering events
-	StopFilter() []string
+	// EventFilter returns the bus filter to retrieve runner start/stop triggering events
+	EventFilter() []string
 }
 
 // Autodiscover process, it takes a beat adapter and user config and runs autodiscover process, spawning
@@ -43,8 +40,7 @@ type Autodiscover struct {
 	runners   *cfgfile.Registry
 	meta      *meta.Map
 
-	startListener bus.Listener
-	stopListener  bus.Listener
+	listener bus.Listener
 }
 
 // NewAutodiscover instantiates and returns a new Autodiscover manager
@@ -55,7 +51,7 @@ func NewAutodiscover(name string, adapter Adapter, config *Config) (*Autodiscove
 	// Init providers
 	var providers []Provider
 	for _, providerCfg := range config.Providers {
-		provider, err := ProviderRegistry.BuildProvider(bus, providerCfg)
+		provider, err := Registry.BuildProvider(bus, providerCfg)
 		if err != nil {
 			return nil, err
 		}
@@ -79,105 +75,111 @@ func (a *Autodiscover) Start() {
 	}
 
 	logp.Info("Starting autodiscover manager")
-	a.startListener = a.bus.Subscribe(a.adapter.StartFilter()...)
-	a.stopListener = a.bus.Subscribe(a.adapter.StopFilter()...)
+	a.listener = a.bus.Subscribe(a.adapter.EventFilter()...)
 
 	for _, provider := range a.providers {
 		provider.Start()
 	}
 
-	go a.startWorker()
-	go a.stopWorker()
+	go a.worker()
 }
 
-func (a *Autodiscover) startWorker() {
-	for event := range a.startListener.Events() {
+func (a *Autodiscover) worker() {
+	for event := range a.listener.Events() {
 		// This will happen on Stop:
 		if event == nil {
 			return
 		}
 
-		configs, err := a.adapter.CreateConfig(event)
-		if err != nil {
-			logp.Debug(debugK, "Could not generate config from event %v: %v", event, err)
-			continue
+		if _, ok := event["start"]; ok {
+			a.handleStart(event)
 		}
-		logp.Debug(debugK, "Got a start event: %v, generated configs: %+v", event, configs)
-
-		meta := getMeta(event)
-		for _, config := range configs {
-			rawCfg := map[string]interface{}{}
-			err := config.Unpack(rawCfg)
-
-			hash, err := hashstructure.Hash(rawCfg, nil)
-			if err != nil {
-				logp.Debug(debugK, "Could not hash config %v: %v", config, err)
-				continue
-			}
-
-			err = a.adapter.CheckConfig(config)
-			if err != nil {
-				logp.Debug(debugK, "Check failed for config %v: %v, won't start runner", config, err)
-				continue
-			}
-
-			// Update meta no matter what
-			dynFields := a.meta.Store(hash, meta)
-
-			if a.runners.Has(hash) {
-				logp.Debug(debugK, "Config %v is already running", config)
-				continue
-			}
-
-			runner, err := a.adapter.Create(config, &dynFields)
-			if err != nil {
-				logp.Debug(debugK, "Failed to create runner with config %v: %v", config, err)
-				continue
-			}
-
-			logp.Info("Autodiscover starting runner: %s", runner)
-			a.runners.Add(hash, runner)
-			runner.Start()
+		if _, ok := event["stop"]; ok {
+			a.handleStop(event)
 		}
 	}
 }
 
-func (a *Autodiscover) stopWorker() {
-	for event := range a.stopListener.Events() {
-		// This will happen on Stop:
-		if event == nil {
-			return
-		}
+func (a *Autodiscover) handleStart(event bus.Event) {
+	configs, err := a.adapter.CreateConfig(event)
+	if err != nil {
+		logp.Debug(debugK, "Could not generate config from event %v: %v", event, err)
+		return
+	}
+	logp.Debug(debugK, "Got a start event: %v, generated configs: %+v", event, configs)
 
-		configs, err := a.adapter.CreateConfig(event)
-		if err != nil {
-			logp.Debug(debugK, "Could not generate config from event %v: %v", event, err)
+	meta := getMeta(event)
+	for _, config := range configs {
+		rawCfg := map[string]interface{}{}
+		if err := config.Unpack(rawCfg); err != nil {
+			logp.Debug(debugK, "Error unpacking config: %v", err)
 			continue
 		}
-		logp.Debug(debugK, "Got a stop event: %v, generated configs: %+v", event, configs)
 
-		for _, config := range configs {
-			rawCfg := map[string]interface{}{}
-			err := config.Unpack(rawCfg)
+		hash, err := hashstructure.Hash(rawCfg, nil)
+		if err != nil {
+			logp.Debug(debugK, "Could not hash config %v: %v", config, err)
+			continue
+		}
 
-			hash, err := hashstructure.Hash(rawCfg, nil)
-			if err != nil {
-				logp.Debug(debugK, "Could not hash config %v: %v", config, err)
-				continue
-			}
+		err = a.adapter.CheckConfig(config)
+		if err != nil {
+			logp.Debug(debugK, "Check failed for config %v: %v, won't start runner", config, err)
+			continue
+		}
 
-			if !a.runners.Has(hash) {
-				logp.Debug(debugK, "Config %v is not running", config)
-				continue
-			}
+		// Update meta no matter what
+		dynFields := a.meta.Store(hash, meta)
 
-			if runner := a.runners.Get(hash); runner != nil {
-				logp.Info("Autodiscover stopping runner: %s", runner)
-				runner.Stop()
-				a.runners.Remove(hash)
-			} else {
-				logp.Debug(debugK, "Runner not found for stopping: %s", hash)
-			}
+		if a.runners.Has(hash) {
+			logp.Debug(debugK, "Config %v is already running", config)
+			continue
+		}
+
+		runner, err := a.adapter.Create(config, &dynFields)
+		if err != nil {
+			logp.Debug(debugK, "Failed to create runner with config %v: %v", config, err)
+			continue
+		}
+
+		logp.Info("Autodiscover starting runner: %s", runner)
+		a.runners.Add(hash, runner)
+		runner.Start()
+	}
+}
+
+func (a *Autodiscover) handleStop(event bus.Event) {
+	configs, err := a.adapter.CreateConfig(event)
+	if err != nil {
+		logp.Debug(debugK, "Could not generate config from event %v: %v", event, err)
+		return
+	}
+	logp.Debug(debugK, "Got a stop event: %v, generated configs: %+v", event, configs)
+
+	for _, config := range configs {
+		rawCfg := map[string]interface{}{}
+		if err := config.Unpack(rawCfg); err != nil {
+			logp.Debug(debugK, "Error unpacking config: %v", err)
+			continue
+		}
+
+		hash, err := hashstructure.Hash(rawCfg, nil)
+		if err != nil {
+			logp.Debug(debugK, "Could not hash config %v: %v", config, err)
+			continue
+		}
+
+		if !a.runners.Has(hash) {
+			logp.Debug(debugK, "Config %v is not running", config)
+			continue
+		}
+
+		if runner := a.runners.Get(hash); runner != nil {
+			logp.Info("Autodiscover stopping runner: %s", runner)
+			runner.Stop()
+			a.runners.Remove(hash)
+		} else {
+			logp.Debug(debugK, "Runner not found for stopping: %s", hash)
 		}
 	}
 }
@@ -204,8 +206,7 @@ func (a *Autodiscover) Stop() {
 	}
 
 	// Stop listening for events
-	a.startListener.Stop()
-	a.stopListener.Stop()
+	a.listener.Stop()
 
 	// Stop providers
 	for _, provider := range a.providers {

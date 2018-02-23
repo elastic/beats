@@ -298,7 +298,7 @@ func MockWatcherFactory(containers map[string]*docker.Container) docker.WatcherC
 	if containers == nil {
 		containers = make(map[string]*docker.Container)
 	}
-	return func(host string, tls *docker.TLSConfig) (docker.Watcher, error) {
+	return func(host string, tls *docker.TLSConfig, shortID bool) (docker.Watcher, error) {
 		return &mockWatcher{containers: containers}, nil
 	}
 }

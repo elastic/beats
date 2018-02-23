@@ -51,6 +51,11 @@ func (l *Logger) Error(args ...interface{}) {
 	l.sugar.Error(args...)
 }
 
+// Fatal uses fmt.Sprint to construct and log a message, then calls os.Exit(1).
+func (l *Logger) Fatal(args ...interface{}) {
+	l.sugar.Fatal(args...)
+}
+
 // Panic uses fmt.Sprint to construct and log a message, then panics.
 func (l *Logger) Panic(args ...interface{}) {
 	l.sugar.Panic(args...)
@@ -82,6 +87,11 @@ func (l *Logger) Warnf(format string, args ...interface{}) {
 // Errorf uses fmt.Sprintf to log a templated message.
 func (l *Logger) Errorf(format string, args ...interface{}) {
 	l.sugar.Errorf(format, args...)
+}
+
+// Fatalf uses fmt.Sprintf to log a templated message, then calls os.Exit(1).
+func (l *Logger) Fatalf(format string, args ...interface{}) {
+	l.sugar.Fatalf(format, args...)
 }
 
 // Panicf uses fmt.Sprintf to log a templated message, then panics.
@@ -127,6 +137,15 @@ func (l *Logger) Warnw(msg string, keysAndValues ...interface{}) {
 // specify a type you can pass a Field such as logp.Stringer.
 func (l *Logger) Errorw(msg string, keysAndValues ...interface{}) {
 	l.sugar.Errorw(msg, keysAndValues...)
+}
+
+// Fatalw logs a message with some additional context, then calls os.Exit(1).
+// The additional context is added in the form of key-value pairs. The optimal
+// way to write the value to the log message will be inferred by the value's
+// type. To explicitly specify a type you can pass a Field such as
+// logp.Stringer.
+func (l *Logger) Fatalw(msg string, keysAndValues ...interface{}) {
+	l.sugar.Fatalw(msg, keysAndValues...)
 }
 
 // Panicw logs a message with some additional context, then panics. The

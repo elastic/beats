@@ -46,9 +46,14 @@ func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
 		return nil, err
 	}
 
+	prometheus, err := helper.NewPrometheusClient(base)
+	if err != nil {
+		return nil, err
+	}
+
 	return &MetricSet{
 		BaseMetricSet: base,
-		prometheus:    helper.NewPrometheusClient(base),
+		prometheus:    prometheus,
 		namespace:     config.Namespace,
 	}, nil
 }

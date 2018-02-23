@@ -151,6 +151,9 @@ func reifyInto(opts *options, to reflect.Value, from *Config) Error {
 }
 
 func reifyMap(opts *options, to reflect.Value, from *Config) Error {
+	parentFields := opts.activeFields
+	defer func() { opts.activeFields = parentFields }()
+
 	if to.Type().Key().Kind() != reflect.String {
 		return raiseKeyInvalidTypeUnpack(to.Type(), from)
 	}
@@ -164,6 +167,7 @@ func reifyMap(opts *options, to reflect.Value, from *Config) Error {
 		to.Set(reflect.MakeMap(to.Type()))
 	}
 	for k, value := range fields {
+		opts.activeFields = NewFieldSet(parentFields)
 		key := reflect.ValueOf(k)
 
 		old := to.MapIndex(key)
@@ -186,6 +190,9 @@ func reifyMap(opts *options, to reflect.Value, from *Config) Error {
 }
 
 func reifyStruct(opts *options, orig reflect.Value, cfg *Config) Error {
+	parentFields := opts.activeFields
+	defer func() { opts.activeFields = parentFields }()
+
 	orig = chaseValuePointers(orig)
 
 	to := chaseValuePointers(reflect.New(chaseTypePointers(orig.Type())))
@@ -211,6 +218,8 @@ func reifyStruct(opts *options, orig reflect.Value, cfg *Config) Error {
 			if tagOpts.ignore {
 				continue
 			}
+
+			opts.activeFields = NewFieldSet(parentFields)
 
 			vField := to.Field(i)
 			validators, err := parseValidatorTags(stField.Tag.Get(opts.validatorTag))
@@ -567,11 +576,14 @@ func doReifyPrimitive(
 		tRegexp:   reifyRegexp,
 	}
 
+	previous := opts.opts.activeFields
+	opts.opts.activeFields = NewFieldSet(previous)
 	valT, err := val.typ(opts.opts)
 	if err != nil {
 		ctx := val.Context()
 		return reflect.Value{}, raisePathErr(err, val.meta(), "", ctx.path("."))
 	}
+	opts.opts.activeFields = previous
 
 	// try primitive conversion
 	kind := baseType.Kind()

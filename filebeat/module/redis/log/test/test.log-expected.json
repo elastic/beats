@@ -15,6 +15,9 @@
       "prospector" : {
         "type" : "log"
       },
+      "event" : {
+        "type" : "log"
+      },
       "read_timestamp" : "2017-06-01T22:43:37.024Z",
       "source" : "/Users/tsg/src/github.com/elastic/beats/filebeat/module/redis/log/test/test.log",
       "fileset" : {
@@ -43,6 +46,9 @@
         "version" : "6.0.0-alpha2"
       },
       "prospector" : {
+        "type" : "log"
+      },
+      "event" : {
         "type" : "log"
       },
       "read_timestamp" : "2017-06-01T22:43:37.024Z",
@@ -77,6 +83,9 @@
       "prospector" : {
         "type" : "log"
       },
+      "event" : {
+        "type" : "log"
+      },
       "read_timestamp" : "2017-06-01T22:43:37.024Z",
       "source" : "/Users/tsg/src/github.com/elastic/beats/filebeat/module/redis/log/test/test.log",
       "fileset" : {
@@ -105,6 +114,9 @@
         "version" : "6.0.0-alpha2"
       },
       "prospector" : {
+        "type" : "log"
+      },
+      "event" : {
         "type" : "log"
       },
       "read_timestamp" : "2017-06-01T22:43:37.024Z",

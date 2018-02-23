@@ -23,6 +23,8 @@ type Registrar struct {
 	wg           sync.WaitGroup
 
 	states               *file.States // Map with all file paths inside and the corresponding state
+	gcRequired           bool         // gcRequired is set if registry state needs to be gc'ed before the next write
+	gcEnabled            bool         // gcEnabled indictes the registry contains some state that can be gc'ed in the future
 	flushTimeout         time.Duration
 	bufferedStateUpdates int
 }
@@ -122,11 +124,11 @@ func (r *Registrar) loadStates() error {
 }
 
 // resetStates sets all states to finished and disable TTL on restart
-// For all states covered by a prospector, TTL will be overwritten with the prospector value
+// For all states covered by an input, TTL will be overwritten with the input value
 func resetStates(states []file.State) []file.State {
 	for key, state := range states {
 		state.Finished = true
-		// Set ttl to -2 to easily spot which states are not managed by a prospector
+		// Set ttl to -2 to easily spot which states are not managed by a input
 		state.TTL = -2
 		states[key] = state
 	}
@@ -134,7 +136,7 @@ func resetStates(states []file.State) []file.State {
 }
 
 func (r *Registrar) Start() error {
-	// Load the previous log file locations now, for use in prospector
+	// Load the previous log file locations now, for use in input
 	err := r.loadStates()
 	if err != nil {
 		return fmt.Errorf("Error loading state: %v", err)
@@ -183,24 +185,51 @@ func (r *Registrar) Run() {
 // onEvents processes events received from the publisher pipeline
 func (r *Registrar) onEvents(states []file.State) {
 	r.processEventStates(states)
-
-	beforeCount := r.states.Count()
-	cleanedStates := r.states.Cleanup()
-	statesCleanup.Add(int64(cleanedStates))
-
 	r.bufferedStateUpdates += len(states)
 
+	// check if we need to enable state cleanup
+	if !r.gcEnabled {
+		for i := range states {
+			if states[i].TTL >= 0 || states[i].Finished {
+				r.gcEnabled = true
+				break
+			}
+		}
+	}
+
+	logp.Debug("registrar", "Registrar state updates processed. Count: %v", len(states))
+
+	// new set of events received -> mark state registry ready for next
+	// cleanup phase in case gc'able events are stored in the registry.
+	r.gcRequired = r.gcEnabled
+}
+
+// gcStates runs a registry Cleanup. The bool returned indicates wether more
+// events in the registry can be gc'ed in the future.
+func (r *Registrar) gcStates() {
+	if !r.gcRequired {
+		return
+	}
+
+	beforeCount := r.states.Count()
+	cleanedStates, pendingClean := r.states.Cleanup()
+	statesCleanup.Add(int64(cleanedStates))
+
 	logp.Debug("registrar",
-		"Registrar states cleaned up. Before: %d, After: %d",
-		beforeCount, beforeCount-cleanedStates)
+		"Registrar states cleaned up. Before: %d, After: %d, Pending: %d",
+		beforeCount, beforeCount-cleanedStates, pendingClean)
+
+	r.gcRequired = false
+	r.gcEnabled = pendingClean > 0
 }
 
 // processEventStates gets the states from the events and writes them to the registrar state
 func (r *Registrar) processEventStates(states []file.State) {
 	logp.Debug("registrar", "Processing %d events", len(states))
 
+	ts := time.Now()
 	for i := range states {
-		r.states.Update(states[i])
+		r.states.UpdateWithTs(states[i], ts)
 		statesUpdate.Add(1)
 	}
 }
@@ -225,6 +254,8 @@ func (r *Registrar) flushRegistry() {
 
 // writeRegistry writes the new json registry file to disk.
 func (r *Registrar) writeRegistry() error {
+	r.gcStates()
+
 	logp.Debug("registrar", "Write registry file: %s", r.registryFile)
 
 	tempfile := r.registryFile + ".new"

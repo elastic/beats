@@ -25,6 +25,9 @@
             "prospector": {
                 "type": "log"
             },
+            "input": {
+                "type": "log"
+            },
             "read_timestamp": "2017-10-30T19:40:38.780Z",
             "source": "/tmp/logstash-plain.log"
         },

@@ -10,4 +10,4 @@ var:
       - c:/programdata/nginx/logs/error.log*
 
 ingest_pipeline: ingest/pipeline.json
-prospector: config/nginx-error.yml
+input: config/nginx-error.yml

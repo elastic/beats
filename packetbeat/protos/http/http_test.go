@@ -393,6 +393,54 @@ func TestHttpParser_Response_HTTP_10_without_content_length(t *testing.T) {
 	assert.Equal(t, 4, message.contentLength)
 }
 
+func TestHttpParser_Response_without_phrase(t *testing.T) {
+	data := "HTTP/1.1 200 \r\n" +
+		"Date: Tue, 14 Aug 2012 22:31:45 GMT\r\n" +
+		"Expires: -1\r\n" +
+		"Cache-Control: private, max-age=0\r\n" +
+		"Content-Type: text/html; charset=UTF-8\r\n" +
+		"Content-Encoding: gzip\r\n" +
+		"Server: gws\r\n" +
+		"Content-Length: 0\r\n" +
+		"X-XSS-Protection: 1; mode=block\r\n" +
+		"X-Frame-Options: SAMEORIGIN\r\n" +
+		"\r\n"
+	r, ok, complete := testParse(nil, data)
+
+	assert.True(t, ok)
+	assert.True(t, complete)
+	assert.False(t, r.isRequest)
+	assert.Equal(t, 200, int(r.statusCode))
+	assert.Equal(t, "", string(r.statusPhrase))
+	assert.Equal(t, 0, r.contentLength)
+
+	broken := "HTTP/1.1 301 \r\n" +
+		"Date: Sun, 29 Sep 2013 16:53:59 GMT\r\n" +
+		"Server: Apache\r\n" +
+		"Location: http://www.hotnews.ro/\r\n" +
+		"Vary: Accept-Encoding\r\n" +
+		"Content-Length: 290\r\n" +
+		"Connection: close\r\n" +
+		"Content-Type: text/html; charset=iso-8859-1\r\n" +
+		"\r\n" +
+		"<!DOCTYPE HTML PUBLIC \"-//IETF//DTD HTML 2.0//EN\">\r\n" +
+		"<html><head>\r\n" +
+		"<title>301 Moved Permanently</title>\r\n" +
+		"</head><body>\r\n" +
+		"<h1>Moved Permanently</h1>\r\n" +
+		"<p>The document has moved <a href=\"http://www.hotnews.ro/\">here</a>.</p>\r\n" +
+		"<hr>\r\n" +
+		"<address>Apache Server at hotnews.ro Port 80</address>\r\n" +
+		"</body></html>"
+	r, ok, complete = testParse(nil, broken)
+
+	assert.True(t, ok)
+	assert.True(t, complete)
+	assert.Equal(t, 290, r.contentLength)
+	assert.Equal(t, "", string(r.statusPhrase))
+	assert.Equal(t, 301, int(r.statusCode))
+}
+
 func TestHttpParser_splitResponse_midBody(t *testing.T) {
 	data1 := "HTTP/1.1 200 OK\r\n" +
 		"Date: Tue, 14 Aug 2012 22:31:45 GMT\r\n" +
@@ -573,8 +621,11 @@ func TestHttpParser_PhraseContainsSpaces(t *testing.T) {
 		"\r\n" +
 		"xx"
 	r, ok, complete = testParse(nil, broken)
-	assert.False(t, ok)
-	assert.False(t, complete)
+	assert.True(t, ok)
+	assert.True(t, complete)
+	assert.Equal(t, 2, r.contentLength)
+	assert.Equal(t, "", string(r.statusPhrase))
+	assert.Equal(t, 500, int(r.statusCode))
 }
 
 func TestEatBodyChunked(t *testing.T) {
@@ -1115,6 +1166,28 @@ func Test_gap_in_body_http1dot0(t *testing.T) {
 	ok, complete = http.messageGap(st, 10)
 	assert.Equal(t, true, ok)
 	assert.Equal(t, false, complete)
+}
+
+func TestHttpParser_composedHeaders(t *testing.T) {
+	data := "HTTP/1.1 200 OK\r\n" +
+		"Content-Length: 0\r\n" +
+		"Date: Tue, 14 Aug 2012 22:31:45 GMT\r\n" +
+		"Set-Cookie: aCookie=yummy\r\n" +
+		"Set-Cookie: anotherCookie=why%20not\r\n" +
+		"\r\n"
+	http := httpModForTests(nil)
+	http.parserConfig.sendHeaders = true
+	http.parserConfig.sendAllHeaders = true
+	message, ok, complete := testParse(http, data)
+
+	assert.True(t, ok)
+	assert.True(t, complete)
+	assert.False(t, message.isRequest)
+	assert.Equal(t, 200, int(message.statusCode))
+	assert.Equal(t, "OK", string(message.statusPhrase))
+	header, ok := message.headers["set-cookie"]
+	assert.True(t, ok)
+	assert.Equal(t, "aCookie=yummy, anotherCookie=why%20not", string(header))
 }
 
 func testCreateTCPTuple() *common.TCPTuple {
