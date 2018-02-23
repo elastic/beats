@@ -75,21 +75,25 @@ func (h *Harvester) Run() error {
 		)
 		h.wg.Add(1)
 		go func() {
+			defer logp.Recover("recovering from a tcp client crash")
+
+			defer h.wg.Done()
 			defer conn.Close()
 
 			h.registerClient(client)
+			defer h.unregisterClient(client)
+
 			err := client.Handle()
 			if err != nil {
 				logp.Debug("tcp", "Client error: %s", err)
 			}
-			h.unregisterClient(client)
+
 			logp.Debug(
 				"tcp",
 				"Client disconnected, remote: %s (total clients: %d)",
 				conn.RemoteAddr(),
 				h.clientsCount(),
 			)
-			h.wg.Done()
 		}()
 	}
 }
