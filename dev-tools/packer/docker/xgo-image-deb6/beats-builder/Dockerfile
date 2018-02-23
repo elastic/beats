@@ -20,11 +20,14 @@ RUN ./fetch.sh http://www.tcpdump.org/release/libpcap-1.8.1.tar.gz 32d7526dde8f8
   ./configure --enable-usb=no --enable-bluetooth=no --enable-dbus=no && \
   make
 
-# Old git version which does not support proxy with go get requires to fetch go-yaml directly
-RUN git clone https://github.com/go-yaml/yaml.git /go/src/gopkg.in/yaml.v2
+# Old git version which does not support proxy with go get directly, and git cloning
+# from github also no longer works.
+ADD yaml.v2 /go/src/gopkg.in/yaml.v2
+ADD gotpl /go/src/github.com/tsg/gotpl
 
 # Load gotpl which is needed for creating the templates.
-RUN go get github.com/tsg/gotpl
+RUN cd /go/src/github.com/tsg/gotpl && \
+  go install
 
 # add patch for gopacket
 ADD gopacket_pcap.patch /gopacket_pcap.patch
