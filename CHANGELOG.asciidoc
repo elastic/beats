@@ -1,4 +1,3 @@
-
 // Use these for links to issue and pulls. Note issues and pulls redirect one to
 // each other on Github, so don't worry too much on using the right prefix.
 :issue: https://github.com/elastic/beats/issues/
@@ -112,6 +111,7 @@ https://github.com/elastic/beats/compare/v6.0.0-beta2...master[Check the HEAD di
 
 *Metricbeat*
 
+- Add connections metricset to RabbitMQ module {pull}6548[6548]
 - Change field type of http header from nested to object {pull}5258[5258]
 - Fix the fetching of process information when some data is missing under MacOS X. {issue}5337[5337]
 - Change `MySQL active connections` visualization title to `MySQL total connections`. {issue}4812[4812]

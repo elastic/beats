@@ -21,7 +21,7 @@ in <<configuration-metricbeat>>. Here is an example configuration:
 ----
 metricbeat.modules:
 - module: rabbitmq
-  metricsets: ["node", "queue"]
+  metricsets: ["node", "queue", "connection"]
   period: 10s
   hosts: ["localhost:15672"]
 
@@ -36,9 +36,13 @@ This module supports TLS connection when using `ssl` config field, as described 
 
 The following metricsets are available:
 
+* <<metricbeat-metricset-rabbitmq-connection,connection>>
+
 * <<metricbeat-metricset-rabbitmq-node,node>>
 
 * <<metricbeat-metricset-rabbitmq-queue,queue>>
+
+include::rabbitmq/connection.asciidoc[]
 
 include::rabbitmq/node.asciidoc[]
 
