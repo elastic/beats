@@ -43,7 +43,7 @@ func NewClient(
 		timeout:        timeout,
 		metadata: common.MapStr{
 			"hostnames":  remoteHosts(conn),
-			"ip_address": c.conn.RemoteAddr().String(),
+			"ip_address": conn.RemoteAddr().String(),
 		},
 	}
 
