@@ -16,6 +16,7 @@ import (
 	"github.com/elastic/beats/libbeat/monitoring"
 	"github.com/elastic/beats/libbeat/outputs/elasticsearch"
 
+	fbautodiscover "github.com/elastic/beats/filebeat/autodiscover"
 	"github.com/elastic/beats/filebeat/channel"
 	cfg "github.com/elastic/beats/filebeat/config"
 	"github.com/elastic/beats/filebeat/crawler"
@@ -295,7 +296,7 @@ func (fb *Filebeat) Run(b *beat.Beat) error {
 
 	var adiscover *autodiscover.Autodiscover
 	if fb.config.Autodiscover != nil {
-		adapter := NewAutodiscoverAdapter(crawler.InputsFactory, crawler.ModulesFactory)
+		adapter := fbautodiscover.NewAutodiscoverAdapter(crawler.InputsFactory, crawler.ModulesFactory)
 		adiscover, err = autodiscover.NewAutodiscover("filebeat", adapter, config.Autodiscover)
 		if err != nil {
 			return err

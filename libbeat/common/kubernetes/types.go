@@ -68,6 +68,7 @@ type ContainerPort struct {
 
 type PodSpec struct {
 	Containers                    []Container `json:"containers"`
+	InitContainers                []Container `json:"initContainers"`
 	DNSPolicy                     string      `json:"dnsPolicy"`
 	NodeName                      string      `json:"nodeName"`
 	RestartPolicy                 string      `json:"restartPolicy"`
