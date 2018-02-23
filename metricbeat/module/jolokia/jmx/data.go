@@ -2,6 +2,7 @@ package jmx
 
 import (
 	"encoding/json"
+	"strings"
 
 	"github.com/joeshaw/multierror"
 	"github.com/pkg/errors"
@@ -47,6 +48,28 @@ type Entry struct {
 //        "status": 200
 //     }
 //  ]
+//
+// With wildcards there is an additional nesting level:
+//
+//  [
+//     {
+//        "request": {
+//           "type": "read",
+//           "attribute": "maxConnections",
+//           "mbean": "Catalina:name=*,type=ThreadPool"
+//        },
+//        "value": {
+//           "Catalina:name=\"http-bio-8080\",type=ThreadPool": {
+//              "maxConnections": 200
+//           },
+//           "Catalina:name=\"ajp-bio-8009\",type=ThreadPool": {
+//              "maxConnections": 200
+//           }
+//        },
+//        "timestamp": 1519409583
+//        "status": 200,
+//     }
+//  }
 func eventMapping(content []byte, mapping map[string]string) (common.MapStr, error) {
 	var entries []Entry
 	if err := json.Unmarshal(content, &entries); err != nil {
@@ -58,10 +81,27 @@ func eventMapping(content []byte, mapping map[string]string) (common.MapStr, err
 
 	for _, v := range entries {
 		for attribute, value := range v.Value {
-			// Extend existing event
-			err := parseResponseEntry(v.Request.Mbean, attribute, value, event, mapping)
-			if err != nil {
-				errs = append(errs, err)
+			responseMbean := v.Request.Mbean
+			valuesMbean := map[string]interface{}{attribute: value}
+
+			// If there was a wildcard, we are going to have an additional
+			// nesting level in response values, and attribute here is going
+			// to be actually the matching mbean name
+			if strings.Contains(v.Request.Mbean, "*") {
+				responseMbean = attribute
+				values, ok := value.(map[string]interface{})
+				if !ok {
+					errs = append(errs, errors.Errorf("expected map of values for %s", responseMbean))
+					continue
+				}
+				valuesMbean = values
+			}
+
+			for attribute, value := range valuesMbean {
+				err := parseResponseEntry(v.Request.Mbean, responseMbean, attribute, value, event, mapping)
+				if err != nil {
+					errs = append(errs, err)
+				}
 			}
 		}
 	}
@@ -70,18 +110,19 @@ func eventMapping(content []byte, mapping map[string]string) (common.MapStr, err
 }
 
 func parseResponseEntry(
-	mbeanName string,
+	requestMbeanName string,
+	responseMbeanName string, // XXX: mbean not used for event? it can be important for wildcards
 	attributeName string,
 	attibuteValue interface{},
 	event common.MapStr,
 	mapping map[string]string,
 ) error {
 	// Create metric name by merging mbean and attribute fields.
-	var metricName = mbeanName + "_" + attributeName
+	var metricName = requestMbeanName + "_" + attributeName
 
 	key, exists := mapping[metricName]
 	if !exists {
-		return errors.Errorf("metric key '%v' not found in response", metricName)
+		return errors.Errorf("metric key '%v' not found in response (%+v)", metricName, mapping)
 	}
 
 	var err error
