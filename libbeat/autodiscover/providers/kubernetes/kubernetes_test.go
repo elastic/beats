@@ -41,22 +41,25 @@ func TestGenerateHints(t *testing.T) {
 			event: bus.Event{
 				"kubernetes": common.MapStr{
 					"container": common.MapStr{
-						"name": "foobar",
-						"id":   "abc",
+						"name":    "foobar",
+						"id":      "abc",
+						"runtime": "rkt",
 					},
 				},
 			},
 			result: bus.Event{
 				"kubernetes": common.MapStr{
 					"container": common.MapStr{
-						"name": "foobar",
-						"id":   "abc",
+						"name":    "foobar",
+						"id":      "abc",
+						"runtime": "rkt",
 					},
 				},
-				"docker": common.MapStr{
+				"rkt": common.MapStr{
 					"container": common.MapStr{
-						"name": "foobar",
-						"id":   "abc",
+						"name":    "foobar",
+						"id":      "abc",
+						"runtime": "rkt",
 					},
 				},
 			},
@@ -77,8 +80,9 @@ func TestGenerateHints(t *testing.T) {
 						"not.to.include":                    "true",
 					},
 					"container": common.MapStr{
-						"name": "foobar",
-						"id":   "abc",
+						"name":    "foobar",
+						"id":      "abc",
+						"runtime": "docker",
 					},
 				},
 			},
@@ -92,8 +96,9 @@ func TestGenerateHints(t *testing.T) {
 						"co.elastic.metrics.foobar/period":  "15s",
 					},
 					"container": common.MapStr{
-						"name": "foobar",
-						"id":   "abc",
+						"name":    "foobar",
+						"id":      "abc",
+						"runtime": "docker",
 					},
 				},
 				"hints": common.MapStr{
@@ -109,8 +114,9 @@ func TestGenerateHints(t *testing.T) {
 				},
 				"docker": common.MapStr{
 					"container": common.MapStr{
-						"name": "foobar",
-						"id":   "abc",
+						"name":    "foobar",
+						"id":      "abc",
+						"runtime": "docker",
 					},
 				},
 			},
