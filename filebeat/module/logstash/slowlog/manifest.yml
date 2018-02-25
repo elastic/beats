@@ -10,4 +10,4 @@ var:
       - c:/programdata/logstash/logs/logstash-slowlog-{{.format}}*.log
 
 ingest_pipeline: ingest/pipeline-{{.format}}.json
-prospector: config/slowlog.yml
+input: config/slowlog.yml

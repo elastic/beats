@@ -5,9 +5,9 @@ import (
 	"testing"
 	"time"
 
-	"github.com/elastic/beats/metricbeat/module/docker"
+	"github.com/docker/docker/api/types"
 
-	dc "github.com/fsouza/go-dockerclient"
+	"github.com/elastic/beats/metricbeat/module/docker"
 )
 
 var blkioService BLkioService
@@ -17,7 +17,7 @@ var newBlkioRaw = make([]BlkioRaw, 3)
 func TestDeltaMultipleContainers(t *testing.T) {
 	var apiContainer1 docker.Stat
 	var apiContainer2 docker.Stat
-	metrics := dc.BlkioStatsEntry{
+	metrics := types.BlkioStatEntry{
 		Major: 123,
 		Minor: 123,
 		Op:    "Total",
@@ -31,18 +31,18 @@ func TestDeltaMultipleContainers(t *testing.T) {
              "Id": "8dfafdbc3a41",
 			 "Names": ["container1"]
      }]`
-	var containers []dc.APIContainers
+	var containers []types.Container
 	err := json.Unmarshal([]byte(jsonContainers), &containers)
 	if err != nil {
 		t.Fatal(err)
 	}
 
 	apiContainer1.Stats.Read = time.Now()
-	apiContainer1.Container = containers[0]
-	apiContainer1.Stats.BlkioStats.IOServicedRecursive = append(apiContainer1.Stats.BlkioStats.IOServicedRecursive, metrics)
+	apiContainer1.Container = &containers[0]
+	apiContainer1.Stats.BlkioStats.IoServicedRecursive = append(apiContainer1.Stats.BlkioStats.IoServicedRecursive, metrics)
 	apiContainer2.Stats.Read = time.Now()
-	apiContainer2.Container = containers[1]
-	apiContainer2.Stats.BlkioStats.IOServicedRecursive = append(apiContainer2.Stats.BlkioStats.IOServicedRecursive, metrics)
+	apiContainer2.Container = &containers[1]
+	apiContainer2.Stats.BlkioStats.IoServicedRecursive = append(apiContainer2.Stats.BlkioStats.IoServicedRecursive, metrics)
 	dockerStats := []docker.Stat{apiContainer1, apiContainer2}
 	stats := blkioService.getBlkioStatsList(dockerStats)
 	totals := make([]float64, 2)
@@ -50,9 +50,9 @@ func TestDeltaMultipleContainers(t *testing.T) {
 		totals[0] = stat.totals
 	}
 
-	dockerStats[0].Stats.BlkioStats.IOServicedRecursive[0].Value = 1000
+	dockerStats[0].Stats.BlkioStats.IoServicedRecursive[0].Value = 1000
 	dockerStats[0].Stats.Read = dockerStats[0].Stats.Read.Add(time.Second * 10)
-	dockerStats[1].Stats.BlkioStats.IOServicedRecursive[0].Value = 1000
+	dockerStats[1].Stats.BlkioStats.IoServicedRecursive[0].Value = 1000
 	dockerStats[1].Stats.Read = dockerStats[0].Stats.Read.Add(time.Second * 10)
 	stats = blkioService.getBlkioStatsList(dockerStats)
 	for _, stat := range stats {
@@ -63,8 +63,8 @@ func TestDeltaMultipleContainers(t *testing.T) {
 	}
 
 	dockerStats[0].Stats.Read = dockerStats[0].Stats.Read.Add(time.Second * 15)
-	dockerStats[0].Stats.BlkioStats.IOServicedRecursive[0].Value = 2000
-	dockerStats[1].Stats.BlkioStats.IOServicedRecursive[0].Value = 2000
+	dockerStats[0].Stats.BlkioStats.IoServicedRecursive[0].Value = 2000
+	dockerStats[1].Stats.BlkioStats.IoServicedRecursive[0].Value = 2000
 	dockerStats[1].Stats.Read = dockerStats[0].Stats.Read.Add(time.Second * 15)
 	stats = blkioService.getBlkioStatsList(dockerStats)
 	for _, stat := range stats {
@@ -77,7 +77,7 @@ func TestDeltaMultipleContainers(t *testing.T) {
 
 func TestDeltaOneContainer(t *testing.T) {
 	var apiContainer docker.Stat
-	metrics := dc.BlkioStatsEntry{
+	metrics := types.BlkioStatEntry{
 		Major: 123,
 		Minor: 123,
 		Op:    "Total",
@@ -88,15 +88,15 @@ func TestDeltaOneContainer(t *testing.T) {
              "Id": "8dfafdbc3a40",
 			 "Names": ["container"]
      }`
-	var containers dc.APIContainers
+	var containers types.Container
 	err := json.Unmarshal([]byte(jsonContainers), &containers)
 	if err != nil {
 		t.Fatal(err)
 	}
 
 	apiContainer.Stats.Read = time.Now()
-	apiContainer.Container = containers
-	apiContainer.Stats.BlkioStats.IOServicedRecursive = append(apiContainer.Stats.BlkioStats.IOServicedRecursive, metrics)
+	apiContainer.Container = &containers
+	apiContainer.Stats.BlkioStats.IoServicedRecursive = append(apiContainer.Stats.BlkioStats.IoServicedRecursive, metrics)
 	dockerStats := []docker.Stat{apiContainer}
 	stats := blkioService.getBlkioStatsList(dockerStats)
 	totals := make([]float64, 2)
@@ -104,7 +104,7 @@ func TestDeltaOneContainer(t *testing.T) {
 		totals[0] = stat.totals
 	}
 
-	dockerStats[0].Stats.BlkioStats.IOServicedRecursive[0].Value = 1000
+	dockerStats[0].Stats.BlkioStats.IoServicedRecursive[0].Value = 1000
 	dockerStats[0].Stats.Read = dockerStats[0].Stats.Read.Add(time.Second * 10)
 	stats = blkioService.getBlkioStatsList(dockerStats)
 	for _, stat := range stats {
@@ -113,7 +113,7 @@ func TestDeltaOneContainer(t *testing.T) {
 		}
 	}
 
-	dockerStats[0].Stats.BlkioStats.IOServicedRecursive[0].Value = 2000
+	dockerStats[0].Stats.BlkioStats.IoServicedRecursive[0].Value = 2000
 	dockerStats[0].Stats.Read = dockerStats[0].Stats.Read.Add(time.Second * 15)
 	stats = blkioService.getBlkioStatsList(dockerStats)
 	for _, stat := range stats {

@@ -18,11 +18,14 @@ func eventMapping(families []*dto.MetricFamily) ([]common.MapStr, error) {
 			if pod == "" {
 				continue
 			}
-			event, ok := eventsMap[pod]
+			namespace := util.GetLabel(metric, "namespace")
+			podKey := namespace + "::" + pod
+			event, ok := eventsMap[podKey]
 			if !ok {
 				event = common.MapStr{}
-				eventsMap[pod] = event
+				eventsMap[podKey] = event
 			}
+
 			switch family.GetName() {
 			case "kube_pod_info":
 				event.Put(mb.ModuleDataKey+".node.name", util.GetLabel(metric, "node"))
@@ -62,7 +65,8 @@ func eventMapping(families []*dto.MetricFamily) ([]common.MapStr, error) {
 		}
 	}
 
-	var events []common.MapStr
+	// initialize, populate events array from values in eventsMap
+	events := make([]common.MapStr, 0, len(eventsMap))
 	for _, event := range eventsMap {
 		events = append(events, event)
 	}

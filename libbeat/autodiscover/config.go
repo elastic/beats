@@ -1,6 +1,8 @@
 package autodiscover
 
-import "github.com/elastic/beats/libbeat/common"
+import (
+	"github.com/elastic/beats/libbeat/common"
+)
 
 // Config settings for Autodiscover
 type Config struct {
@@ -9,5 +11,10 @@ type Config struct {
 
 // ProviderConfig settings
 type ProviderConfig struct {
+	Type string `config:"type"`
+}
+
+// BuilderConfig settings
+type BuilderConfig struct {
 	Type string `config:"type"`
 }

@@ -1,5 +1,3 @@
-// +build integration
-
 package autodiscover
 
 import (
@@ -79,14 +77,8 @@ func (m *mockAdapter) Runners() []*mockRunner {
 	return res
 }
 
-// StartFilter returns the bus filter to retrieve runner start triggering events
-func (m *mockAdapter) StartFilter() []string {
-	return []string{"start"}
-}
-
-// StopFilter returns the bus filter to retrieve runner stop triggering events
-func (m *mockAdapter) StopFilter() []string {
-	return []string{"stop"}
+func (m *mockAdapter) EventFilter() []string {
+	return []string{"meta"}
 }
 
 type mockProvider struct{}
@@ -110,8 +102,8 @@ func TestNilAutodiscover(t *testing.T) {
 func TestAutodiscover(t *testing.T) {
 	// Register mock autodiscover provider
 	busChan := make(chan bus.Bus, 1)
-	ProviderRegistry = NewRegistry()
-	ProviderRegistry.AddProvider("mock", func(b bus.Bus, c *common.Config) (Provider, error) {
+	Registry = NewRegistry()
+	Registry.AddProvider("mock", func(b bus.Bus, c *common.Config) (Provider, error) {
 		// intercept bus to mock events
 		busChan <- b
 
@@ -173,6 +165,27 @@ func TestAutodiscover(t *testing.T) {
 	assert.True(t, runners[0].started)
 	assert.False(t, runners[0].stopped)
 
+	// Test stop/start
+	eventBus.Publish(bus.Event{
+		"stop": true,
+		"meta": common.MapStr{
+			"foo": "baz",
+		},
+	})
+	eventBus.Publish(bus.Event{
+		"start": true,
+		"meta": common.MapStr{
+			"foo": "baz",
+		},
+	})
+	time.Sleep(10 * time.Millisecond)
+	runners = adapter.Runners()
+	assert.Equal(t, len(runners), 2)
+	assert.True(t, runners[0].stopped)
+	assert.Equal(t, runners[1].meta.Get()["foo"], "baz")
+	assert.True(t, runners[1].started)
+	assert.False(t, runners[1].stopped)
+
 	// Test stop event
 	eventBus.Publish(bus.Event{
 		"stop": true,
@@ -182,18 +195,18 @@ func TestAutodiscover(t *testing.T) {
 	})
 	time.Sleep(10 * time.Millisecond)
 	runners = adapter.Runners()
-	assert.Equal(t, len(runners), 1)
-	assert.Equal(t, runners[0].meta.Get()["foo"], "baz")
-	assert.True(t, runners[0].started)
-	assert.True(t, runners[0].stopped)
+	assert.Equal(t, len(runners), 2)
+	assert.Equal(t, runners[1].meta.Get()["foo"], "baz")
+	assert.True(t, runners[1].started)
+	assert.True(t, runners[1].stopped)
 }
 
 func TestAutodiscoverHash(t *testing.T) {
 	// Register mock autodiscover provider
 	busChan := make(chan bus.Bus, 1)
 
-	ProviderRegistry = NewRegistry()
-	ProviderRegistry.AddProvider("mock", func(b bus.Bus, c *common.Config) (Provider, error) {
+	Registry = NewRegistry()
+	Registry.AddProvider("mock", func(b bus.Bus, c *common.Config) (Provider, error) {
 		// intercept bus to mock events
 		busChan <- b
 

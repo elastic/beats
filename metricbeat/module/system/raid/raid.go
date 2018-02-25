@@ -53,12 +53,10 @@ func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
 		return nil, err
 	}
 
-	m := &MetricSet{
+	return &MetricSet{
 		BaseMetricSet: base,
 		fs:            fs,
-	}
-
-	return m, nil
+	}, nil
 }
 
 // Fetch fetches one event for each device

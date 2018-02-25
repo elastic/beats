@@ -73,4 +73,3 @@ include::../../libbeat/docs/yaml.asciidoc[]
 include::../../libbeat/docs/regexp.asciidoc[]
 
 include::../../libbeat/docs/reference-yml.asciidoc[]
-

@@ -63,7 +63,7 @@ if [ ! -e "~/bin/gvm" ]; then
   chmod +x ~/bin/gvm
   echo 'export GOPATH=$HOME/go' >> ~/.bash_profile
   echo 'export PATH=$HOME/bin:$GOPATH/bin:$PATH' >> ~/.bash_profile
-  echo 'eval "$(gvm 1.9.2)"' >> ~/.bash_profile
+  echo 'eval "$(gvm 1.9.4)"' >> ~/.bash_profile
 fi
 SCRIPT
 

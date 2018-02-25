@@ -8,8 +8,9 @@ import (
 	"strings"
 	"sync/atomic"
 
-	"github.com/elastic/go-ucfg/internal/parse"
 	uuid "github.com/satori/go.uuid"
+
+	"github.com/elastic/go-ucfg/internal/parse"
 )
 
 type value interface {
@@ -34,6 +35,7 @@ type value interface {
 	toUint(opts *options) (uint64, error)
 	toFloat(opts *options) (float64, error)
 	toConfig(opts *options) (*Config, error)
+	canCache() bool
 }
 
 type typeInfo struct {
@@ -182,6 +184,7 @@ func (cfgPrimitive) toInt(*options) (int64, error)      { return 0, ErrTypeMisma
 func (cfgPrimitive) toUint(*options) (uint64, error)    { return 0, ErrTypeMismatch }
 func (cfgPrimitive) toFloat(*options) (float64, error)  { return 0, ErrTypeMismatch }
 func (cfgPrimitive) toConfig(*options) (*Config, error) { return nil, ErrTypeMismatch }
+func (cfgPrimitive) canCache() bool                     { return true }
 
 func (c *cfgNil) cpy(ctx context) value             { return &cfgNil{cfgPrimitive{ctx, c.metadata}} }
 func (*cfgNil) Len(*options) (int, error)           { return 0, nil }
@@ -283,6 +286,7 @@ func (cfgSub) toInt(*options) (int64, error)        { return 0, ErrTypeMismatch 
 func (cfgSub) toUint(*options) (uint64, error)      { return 0, ErrTypeMismatch }
 func (cfgSub) toFloat(*options) (float64, error)    { return 0, ErrTypeMismatch }
 func (c cfgSub) toConfig(*options) (*Config, error) { return c.c, nil }
+func (c cfgSub) canCache() bool                     { return false }
 
 func (c cfgSub) Len(*options) (int, error) {
 	arr := c.c.fields.array()
@@ -343,6 +347,9 @@ func (c cfgSub) SetContext(ctx context) {
 }
 
 func (c cfgSub) reify(opts *options) (interface{}, error) {
+	parentFields := opts.activeFields
+	defer func() { opts.activeFields = parentFields }()
+
 	fields := c.c.fields.dict()
 	arr := c.c.fields.array()
 
@@ -352,6 +359,7 @@ func (c cfgSub) reify(opts *options) (interface{}, error) {
 	case len(fields) > 0 && len(arr) == 0:
 		m := make(map[string]interface{})
 		for k, v := range fields {
+			opts.activeFields = NewFieldSet(parentFields)
 			var err error
 			if m[k], err = v.reify(opts); err != nil {
 				return nil, err
@@ -361,6 +369,7 @@ func (c cfgSub) reify(opts *options) (interface{}, error) {
 	case len(fields) == 0 && len(arr) > 0:
 		m := make([]interface{}, len(arr))
 		for i, v := range arr {
+			opts.activeFields = NewFieldSet(parentFields)
 			var err error
 			if m[i], err = v.reify(opts); err != nil {
 				return nil, err
@@ -370,12 +379,14 @@ func (c cfgSub) reify(opts *options) (interface{}, error) {
 	default:
 		m := make(map[string]interface{})
 		for k, v := range fields {
+			opts.activeFields = NewFieldSet(parentFields)
 			var err error
 			if m[k], err = v.reify(opts); err != nil {
 				return nil, err
 			}
 		}
 		for i, v := range arr {
+			opts.activeFields = NewFieldSet(parentFields)
 			var err error
 			m[fmt.Sprintf("%d", i)], err = v.reify(opts)
 			if err != nil {
@@ -473,6 +484,10 @@ func (d *cfgDynamic) getValue(opts *options) (value, error) {
 	})
 }
 
+func (d cfgDynamic) canCache() bool {
+	return false
+}
+
 func (r *refDynValue) String() string {
 	ref := (*reference)(r)
 	return ref.String()
@@ -484,12 +499,20 @@ func (r *refDynValue) getValue(
 ) (value, error) {
 	ref := (*reference)(r)
 	v, err := ref.resolveRef(p.ctx.getParent(), opts)
-	if v != nil || err != nil {
+	// If not found or we have a cyclic reference we try the environment resolvers
+	if v != nil || criticalResolveError(err) {
 		return v, err
 	}
+	previousErr := err
 
 	str, err := ref.resolveEnv(p.ctx.getParent(), opts)
 	if err != nil {
+		// TODO(ph): Not everything is an Error, will do some cleanup in another PR.
+		if v, ok := previousErr.(Error); ok {
+			if v.Reason() == ErrCyclicReference {
+				return nil, previousErr
+			}
+		}
 		return nil, err
 	}
 	return parseValue(p, opts, str)

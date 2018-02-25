@@ -161,6 +161,8 @@ func (r *reporter) initLoop() {
 		if err == nil {
 			closing(client)
 			break
+		} else {
+			logp.Err("Monitoring could not connect to elasticsearch, failed with %v", err)
 		}
 
 		select {

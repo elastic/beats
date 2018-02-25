@@ -100,7 +100,8 @@ The following example configures Filebeat to drop any lines that start with "DBG
 [source,yaml]
 -------------------------------------------------------------------------------------
 filebeat.prospectors:
-- paths:
+- type: log
+  paths:
     - /var/log/myapp/*.log
   exclude_lines: ['^DBG']
 -------------------------------------------------------------------------------------
@@ -120,7 +121,8 @@ The following example configures Filebeat to export any lines that start with "E
 [source,yaml]
 -------------------------------------------------------------------------------------
 filebeat.prospectors:
-- paths:
+- type: log
+  paths:
     - /var/log/myapp/*.log
   include_lines: ['^ERR', '^WARN']
 -------------------------------------------------------------------------------------
@@ -167,7 +169,8 @@ Example:
 [source,yaml]
 --------------------------------------------------------------------------------
 filebeat.prospectors:
-- paths: ["/var/log/app/*.json"]
+- type: log
+  paths: ["/var/log/app/*.json"]
   tags: ["json"]
 --------------------------------------------------------------------------------
 
@@ -187,7 +190,8 @@ will be overwritten by the value declared here.
 [source,yaml]
 --------------------------------------------------------------------------------
 filebeat.prospectors:
-- paths: ["/var/log/app/*.log"]
+- type: log
+  paths: ["/var/log/app/*.log"]
   fields:
     app_id: query_engine_12
 --------------------------------------------------------------------------------

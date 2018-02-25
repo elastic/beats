@@ -210,3 +210,47 @@ func TestAtomicUint64(t *testing.T) {
 	assert.True(ok, "check CAS succeeds")
 	check(23, v.Load(), "check CAS did store new value")
 }
+
+func TestAtomicUint(t *testing.T) {
+	assert := assert.New(t)
+	check := func(expected, actual uint, msg string) {
+		assert.Equal(expected, actual, msg)
+	}
+
+	var v Uint
+	check(0, v.Load(), "check zero value")
+
+	v = MakeUint(23)
+	check(23, v.Load(), "check value initializer")
+
+	v.Store(42)
+	check(42, v.Load(), "check store new value")
+
+	new := v.Inc()
+	check(43, new, "check increment returns new value")
+	check(43, v.Load(), "check increment did store new value")
+
+	new = v.Dec()
+	check(42, new, "check decrement returns new value")
+	check(42, v.Load(), "check decrement did store new value")
+
+	new = v.Add(8)
+	check(50, new, "check add returns new value")
+	check(50, v.Load(), "check add did store new value")
+
+	new = v.Sub(8)
+	check(42, new, "check sub returns new value")
+	check(42, v.Load(), "check sub did store new value")
+
+	old := v.Swap(101)
+	check(42, old, "check swap returns old value")
+	check(101, v.Load(), "check swap stores new value")
+
+	ok := v.CAS(0, 23)
+	assert.False(ok, "check CAS with wrong old value fails")
+	check(101, v.Load(), "check failed CAS did not change value")
+
+	ok = v.CAS(101, 23)
+	assert.True(ok, "check CAS succeeds")
+	check(23, v.Load(), "check CAS did store new value")
+}

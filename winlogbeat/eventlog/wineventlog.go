@@ -14,6 +14,7 @@ import (
 
 	"github.com/elastic/beats/libbeat/common"
 	"github.com/elastic/beats/libbeat/logp"
+	"github.com/elastic/beats/winlogbeat/checkpoint"
 	"github.com/elastic/beats/winlogbeat/sys"
 	win "github.com/elastic/beats/winlogbeat/sys/wineventlog"
 )
@@ -71,10 +72,10 @@ var _ EventLog = &winEventLog{}
 type winEventLog struct {
 	config       winEventLogConfig
 	query        string
-	channelName  string        // Name of the channel from which to read.
-	subscription win.EvtHandle // Handle to the subscription.
-	maxRead      int           // Maximum number returned in one Read.
-	lastRead     uint64        // Record number of the last read event.
+	channelName  string                   // Name of the channel from which to read.
+	subscription win.EvtHandle            // Handle to the subscription.
+	maxRead      int                      // Maximum number returned in one Read.
+	lastRead     checkpoint.EventLogState // Record number of the last read event.
 
 	render    func(event win.EvtHandle, out io.Writer) error // Function for rendering the event to XML.
 	renderBuf []byte                                         // Buffer used for rendering event.
@@ -89,8 +90,14 @@ func (l *winEventLog) Name() string {
 	return l.channelName
 }
 
-func (l *winEventLog) Open(recordNumber uint64) error {
-	bookmark, err := win.CreateBookmark(l.channelName, recordNumber)
+func (l *winEventLog) Open(state checkpoint.EventLogState) error {
+	var bookmark win.EvtHandle
+	var err error
+	if len(state.Bookmark) > 0 {
+		bookmark, err = win.CreateBookmarkFromXML(state.Bookmark)
+	} else {
+		bookmark, err = win.CreateBookmarkFromRecordID(l.channelName, state.RecordNumber)
+	}
 	if err != nil {
 		return err
 	}
@@ -154,8 +161,17 @@ func (l *winEventLog) Read() ([]Record, error) {
 			incrementMetric(dropReasons, err)
 			continue
 		}
+
+		r.Offset = checkpoint.EventLogState{
+			Name:         l.channelName,
+			RecordNumber: r.RecordID,
+			Timestamp:    r.TimeCreated.SystemTime,
+		}
+		if r.Offset.Bookmark, err = l.createBookmarkFromEvent(h); err != nil {
+			logp.Warn("%s failed creating bookmark: %v", l.logPrefix, err)
+		}
 		records = append(records, r)
-		l.lastRead = r.RecordID
+		l.lastRead = r.Offset
 	}
 
 	debugf("%s Read() is returning %d records", l.logPrefix, len(records))
@@ -298,6 +314,17 @@ func newWinEventLog(options *common.Config) (EventLog, error) {
 	}
 
 	return l, nil
+}
+
+func (l *winEventLog) createBookmarkFromEvent(evtHandle win.EvtHandle) (string, error) {
+	bmHandle, err := win.CreateBookmarkFromEvent(evtHandle)
+	if err != nil {
+		return "", err
+	}
+	l.outputBuf.Reset()
+	err = win.RenderBookmarkXML(bmHandle, l.renderBuf, l.outputBuf)
+	win.Close(bmHandle)
+	return string(l.outputBuf.Bytes()), err
 }
 
 func init() {

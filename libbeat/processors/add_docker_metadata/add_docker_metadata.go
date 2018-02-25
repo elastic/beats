@@ -54,7 +54,7 @@ func buildDockerMetadataProcessor(cfg *common.Config, watcherConstructor docker.
 		return nil, errors.Wrapf(err, "fail to unpack the %v configuration", processorName)
 	}
 
-	watcher, err := watcherConstructor(config.Host, config.TLS)
+	watcher, err := watcherConstructor(config.Host, config.TLS, config.MatchShortID)
 	if err != nil {
 		return nil, err
 	}

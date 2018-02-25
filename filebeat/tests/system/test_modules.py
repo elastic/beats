@@ -111,7 +111,7 @@ class Test(BaseTest):
             "-M", "{module}.{fileset}.enabled=true".format(module=module, fileset=fileset),
             "-M", "{module}.{fileset}.var.paths=[{test_file}]".format(
                 module=module, fileset=fileset, test_file=test_file),
-            "-M", "*.*.prospector.close_eof=true",
+            "-M", "*.*.input.close_eof=true",
         ]
 
         output_path = os.path.join(self.working_dir, module, fileset, os.path.basename(test_file))
@@ -153,13 +153,13 @@ class Test(BaseTest):
     @unittest.skipIf(not INTEGRATION_TESTS or
                      os.getenv("TESTING_ENVIRONMENT") == "2x",
                      "integration test not available on 2.x")
-    def test_prospector_pipeline_config(self):
+    def test_input_pipeline_config(self):
         """
-        Tests that the pipeline configured in the prospector overwrites
+        Tests that the pipeline configured in the input overwrites
         the one from the output.
         """
         self.init()
-        index_name = "filebeat-test-prospector"
+        index_name = "filebeat-test-input"
         try:
             self.es.indices.delete(index=index_name)
         except:
