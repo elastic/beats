@@ -47,8 +47,8 @@ This file is generated! See scripts/docs_collector.py
 |<<metricbeat-module-haproxy,HAProxy>>     |    
 .2+|   |<<metricbeat-metricset-haproxy-info,info>>   
 |<<metricbeat-metricset-haproxy-stat,stat>>   
-|<<metricbeat-module-http,HTTP>>  beta[]   |    
-.2+|   |<<metricbeat-metricset-http-json,json>> beta[]  
+|<<metricbeat-module-http,HTTP>>     |    
+.2+|   |<<metricbeat-metricset-http-json,json>>   
 |<<metricbeat-metricset-http-server,server>> experimental[]  
 |<<metricbeat-module-jolokia,Jolokia>>  beta[]   |    
 .1+|   |<<metricbeat-metricset-jolokia-jmx,jmx>> beta[]  
