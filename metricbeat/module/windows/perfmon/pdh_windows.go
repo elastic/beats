@@ -317,7 +317,7 @@ type PerfmonReader struct {
 }
 
 // NewPerfmonReader creates a new instance of PerfmonReader.
-func NewPerfmonReader(config PerfmonConfig) (*PerfmonReader, error) {
+func NewPerfmonReader(config Config) (*PerfmonReader, error) {
 	query, err := NewQuery("")
 	if err != nil {
 		return nil, err
