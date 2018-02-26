@@ -13,6 +13,7 @@ import (
 	"github.com/elastic/beats/metricbeat/mb"
 )
 
+// Config for perfmon counters.
 type CounterConfig struct {
 	InstanceLabel    string `config:"instance_label" validate:"required"`
 	InstanceName     string `config:"instance_name"`
@@ -21,6 +22,7 @@ type CounterConfig struct {
 	Format           string `config:"format"`
 }
 
+// Config for the windows perfmon metricset.
 type PerfmonConfig struct {
 	IgnoreNECounters bool            `config:"perfmon.ignore_non_existent_counters"`
 	CounterConfig    []CounterConfig `config:"perfmon.counters" validate:"required"`
