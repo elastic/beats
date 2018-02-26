@@ -19,6 +19,7 @@ type Provider struct {
 	config        *Config
 	bus           bus.Bus
 	builders      autodiscover.Builders
+	appenders     autodiscover.Appenders
 	watcher       docker.Watcher
 	templates     *template.Mapper
 	stop          chan interface{}
@@ -53,6 +54,15 @@ func AutodiscoverBuilder(bus bus.Bus, c *common.Config) (autodiscover.Provider, 
 		}
 	}
 
+	var appenders autodiscover.Appenders
+	for _, acfg := range config.Builders {
+		if appender, err := autodiscover.Registry.BuildAppender(acfg); err != nil {
+			logp.Debug("docker", "failed to construct autodiscover appender due to error: %v", err)
+		} else {
+			appenders = append(appenders, appender)
+		}
+	}
+
 	start := watcher.ListenStart()
 	stop := watcher.ListenStop()
 
@@ -64,6 +74,7 @@ func AutodiscoverBuilder(bus bus.Bus, c *common.Config) (autodiscover.Provider, 
 		config:        config,
 		bus:           bus,
 		builders:      builders,
+		appenders:     appenders,
 		templates:     mapper,
 		watcher:       watcher,
 		stop:          make(chan interface{}),
@@ -157,6 +168,9 @@ func (d *Provider) publish(event bus.Event) {
 			event["config"] = config
 		}
 	}
+
+	// Call all appenders to append any extra configuration
+	d.appenders.Append(event)
 	d.bus.Publish(event)
 }
 

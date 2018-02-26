@@ -24,6 +24,7 @@ type Provider struct {
 	metagen   kubernetes.MetaGenerator
 	templates *template.Mapper
 	builders  autodiscover.Builders
+	appenders autodiscover.Appenders
 }
 
 // AutodiscoverBuilder builds and returns an autodiscover provider
@@ -67,11 +68,21 @@ func AutodiscoverBuilder(bus bus.Bus, c *common.Config) (autodiscover.Provider, 
 		}
 	}
 
+	var appenders autodiscover.Appenders
+	for _, acfg := range config.Appenders {
+		if appender, err := autodiscover.Registry.BuildAppender(acfg); err != nil {
+			logp.Debug("kubernetes", "failed to construct autodiscover appender due to error: %v", err)
+		} else {
+			appenders = append(appenders, appender)
+		}
+	}
+
 	p := &Provider{
 		config:    config,
 		bus:       bus,
 		templates: mapper,
 		builders:  builders,
+		appenders: appenders,
 		metagen:   metagen,
 		watcher:   watcher,
 	}
@@ -180,6 +191,8 @@ func (p *Provider) publish(event bus.Event) {
 		}
 	}
 
+	// Call all appenders to append any extra configuration
+	p.appenders.Append(event)
 	p.bus.Publish(event)
 }
 
