@@ -31,6 +31,7 @@ type configAppender struct {
 	configMaps []configMap
 }
 
+// NewConfigAppender creates a configAppender that can append tempatized configs into built configs
 func NewConfigAppender(cfg *common.Config) (autodiscover.Appender, error) {
 	confs := configs{}
 	err := cfg.Unpack(&confs)
@@ -62,6 +63,8 @@ func NewConfigAppender(cfg *common.Config) (autodiscover.Appender, error) {
 	return &configAppender{configMaps: configMaps}, nil
 }
 
+// Append adds configuration into configs built by builds/templates. It applies conditions to filter out
+// configs to apply, applies them and tries to apply templates if any are present.
 func (c *configAppender) Append(event bus.Event) {
 	cfgsRaw, ok := event["config"]
 	// There are no configs

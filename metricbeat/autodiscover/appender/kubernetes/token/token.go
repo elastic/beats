@@ -20,6 +20,8 @@ type tokenAppender struct {
 	Condition *processors.Condition
 }
 
+// NewTokenAppender creates a token appender that can append a bearer token required to authenticate with
+// protected endpoints
 func NewTokenAppender(cfg *common.Config) (autodiscover.Appender, error) {
 	conf := defaultConfig()
 
@@ -41,6 +43,7 @@ func NewTokenAppender(cfg *common.Config) (autodiscover.Appender, error) {
 	return &appender, nil
 }
 
+// Append picks up a token from a file and adds it to the headers.Authorization section of the metricbeat module
 func (t *tokenAppender) Append(event bus.Event) {
 	cfgsRaw, ok := event["config"]
 	// There are no configs
