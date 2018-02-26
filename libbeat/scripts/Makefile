@@ -52,8 +52,8 @@ NOSETESTS_OPTIONS?=--process-timeout=$(TIMEOUT) --with-timer -v --with-xunit --x
 TEST_ENVIRONMENT?=false ## @testing if true, "make testsuite" runs integration tests and system tests in a dockerized test environment
 SYSTEM_TESTS?=false ## @testing if true, "make test" and "make testsuite" run unit tests and system tests
 STRESS_TESTS?=false ## @testing if true, "make test" and "make testsuite" run also run the stress tests
-GOX_OS?=linux darwin windows freebsd netbsd openbsd ## @Building List of all OS to be supported by "make crosscompile".
-GOX_OSARCH?=!darwin/arm !darwin/arm64 !darwin/386 ## @building Space separated list of GOOS/GOARCH pairs to build by "make crosscompile".
+GOX_OS?=## @Building List of all OS to be supported by "make crosscompile".
+GOX_OSARCH?=## @building Space separated list of GOOS/GOARCH pairs to build by "make crosscompile".
 GOX_FLAGS?= ## @building Additional flags to append to the gox command used by "make crosscompile".
 # XXX: Should be switched back to `snapshot` once the Elasticsearch
 # snapshots are working. https://github.com/elastic/beats/pull/6416
