@@ -316,7 +316,7 @@ type PerfmonReader struct {
 	executed      bool // Indicates if the query has been executed.
 }
 
-// Creates a new instance of PerfmonReader.
+// NewPerfmonReader creates a new instance of PerfmonReader.
 func NewPerfmonReader(config PerfmonConfig) (*PerfmonReader, error) {
 	query, err := NewQuery("")
 	if err != nil {

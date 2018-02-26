@@ -85,7 +85,7 @@ func TestQuery(t *testing.T) {
 }
 
 func TestExistingCounter(t *testing.T) {
-	config := PerfmonConfig{
+	config := Config{
 		CounterConfig: make([]CounterConfig, 1),
 	}
 	config.CounterConfig[0].InstanceLabel = "processor.name"
@@ -126,7 +126,7 @@ func TestNonExistingCounter(t *testing.T) {
 }
 
 func TestIgnoreNonExistentCounter(t *testing.T) {
-	config := PerfmonConfig{
+	config := Config{
 		CounterConfig:    make([]CounterConfig, 1),
 		IgnoreNECounters: true,
 	}
@@ -153,7 +153,7 @@ func TestIgnoreNonExistentCounter(t *testing.T) {
 }
 
 func TestNonExistingObject(t *testing.T) {
-	config := PerfmonConfig{
+	config := Config{
 		CounterConfig: make([]CounterConfig, 1),
 	}
 	config.CounterConfig[0].InstanceLabel = "processor.name"
@@ -286,7 +286,7 @@ func TestRawValues(t *testing.T) {
 }
 
 func TestWildcardQuery(t *testing.T) {
-	config := PerfmonConfig{
+	config := Config{
 		CounterConfig: make([]CounterConfig, 1),
 	}
 	config.CounterConfig[0].InstanceLabel = "processor.name"

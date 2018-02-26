@@ -23,7 +23,7 @@ type CounterConfig struct {
 }
 
 // Config for the windows perfmon metricset.
-type PerfmonConfig struct {
+type Config struct {
 	IgnoreNECounters bool            `config:"perfmon.ignore_non_existent_counters"`
 	CounterConfig    []CounterConfig `config:"perfmon.counters" validate:"required"`
 }
@@ -43,7 +43,7 @@ type MetricSet struct {
 func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
 	cfgwarn.Beta("The perfmon metricset is beta")
 
-	config := PerfmonConfig{}
+	config := Config{}
 
 	if err := base.Module().UnpackConfig(&config); err != nil {
 		return nil, err
