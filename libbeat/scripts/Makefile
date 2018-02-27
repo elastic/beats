@@ -85,6 +85,10 @@ ifeq ($(DOCKER_CACHE),0)
 	DOCKER_NOCACHE=--no-cache
 endif
 
+ifeq ($(shell uname -s),Linux)
+	DOCKER_USER=-u $(shell id -u):$(shell id -g)
+endif
+
 # Conditionally enable the race detector when RACE_DETECTOR=1.
 ifeq ($(RACE_DETECTOR),1)
 	RACE=-race
@@ -180,7 +184,7 @@ integration-tests: prepare-tests
 .PHONY: integration-tests-environment
 integration-tests-environment:  ## @testing Runs the integration inside a virtual environment. This can be run on any docker-machine (local, remote)
 integration-tests-environment: prepare-tests build-image
-	${DOCKER_COMPOSE} run beat make integration-tests RACE_DETECTOR=$(RACE_DETECTOR) DOCKER_COMPOSE_PROJECT_NAME=${DOCKER_COMPOSE_PROJECT_NAME}
+	${DOCKER_COMPOSE} run ${DOCKER_USER} beat make integration-tests RACE_DETECTOR=$(RACE_DETECTOR) DOCKER_COMPOSE_PROJECT_NAME=${DOCKER_COMPOSE_PROJECT_NAME}
 
 # Runs the system tests
 .PHONY: system-tests
@@ -193,8 +197,7 @@ system-tests: prepare-tests ${BEAT_NAME}.test python-env ${ES_BEATS}/dev-tools/c
 .PHONY: system-tests-environment
 system-tests-environment:  ## @testing Runs the system tests inside a virtual environment. This can be run on any docker-machine (local, remote)
 system-tests-environment: prepare-tests build-image
-	${DOCKER_COMPOSE} run -e INTEGRATION_TESTS=1 -e TESTING_ENVIRONMENT=${TESTING_ENVIRONMENT} -e DOCKER_COMPOSE_PROJECT_NAME=${DOCKER_COMPOSE_PROJECT_NAME} beat make system-tests
-
+	${DOCKER_COMPOSE} run ${DOCKER_USER} -e INTEGRATION_TESTS=1 -e TESTING_ENVIRONMENT=${TESTING_ENVIRONMENT} -e DOCKER_COMPOSE_PROJECT_NAME=${DOCKER_COMPOSE_PROJECT_NAME} beat make system-tests
 
 .PHONY: fast-system-tests
 fast-system-tests: ## @testing Runs system tests without coverage reports and in parallel
@@ -265,10 +268,6 @@ testsuite: clean update
     	else \
 			$(MAKE) system-tests; \
 		fi \
-	fi
-
-	if [ $(TEST_ENVIRONMENT) = true ]; then \
-		$(MAKE) fix-permissions; \
 	fi
 
 	$(MAKE) benchmark-tests
