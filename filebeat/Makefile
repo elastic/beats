@@ -24,7 +24,7 @@ kibana:
 fields:
 	@mkdir -p _meta/
 	@cp ${ES_BEATS}/filebeat/_meta/fields.common.yml  _meta/fields.generated.yml
-	@${PYTHON_ENV}/bin/python ${ES_BEATS}/metricbeat/scripts/fields_collector.py >> _meta/fields.generated.yml
+	${PYTHON_ENV}/bin/python ${ES_BEATS}/metricbeat/scripts/fields_collector.py >> _meta/fields.generated.yml
 
 # Collects all modules files to be packaged in a temporary folder
 .PHONY: modules
@@ -39,7 +39,7 @@ configs: python-env
 	@cp ${ES_BEATS}/filebeat/_meta/common.p1.yml _meta/beat.yml
 	@cat ${ES_BEATS}/filebeat/_meta/common.p2.yml >> _meta/beat.yml
 	@cat ${ES_BEATS}/filebeat/_meta/common.reference.p1.yml > _meta/beat.reference.yml
-	@${PYTHON_ENV}/bin/python  ${ES_BEATS}/script/config_collector.py --beat ${BEAT_NAME} --full $(PWD) >> _meta/beat.reference.yml
+	${PYTHON_ENV}/bin/python  ${ES_BEATS}/script/config_collector.py --beat ${BEAT_NAME} --full $(PWD) >> _meta/beat.reference.yml
 	@cat ${ES_BEATS}/filebeat/_meta/common.reference.p2.yml >> _meta/beat.reference.yml
 	@rm -rf modules.d && mkdir -p modules.d
 	@for MODULE in `find module -type d -maxdepth 1 -mindepth 1 -exec basename {} \;`; do cp -a $(PWD)/module/$$MODULE/_meta/config.yml modules.d/$$MODULE.yml.disabled; done
@@ -50,13 +50,13 @@ configs: python-env
 collect-docs: python-env
 	@rm -rf docs/modules
 	@mkdir -p docs/modules
-	@${PYTHON_ENV}/bin/python ${ES_BEATS}/filebeat/scripts/docs_collector.py --beat ${BEAT_NAME}
+	${PYTHON_ENV}/bin/python ${ES_BEATS}/filebeat/scripts/docs_collector.py --beat ${BEAT_NAME}
 
 # Generate imports for prospectors
 .PHONY: imports
 imports: python-env
 	@mkdir -p include
-	@${PYTHON_ENV}/bin/python ${ES_BEATS}/script/generate_imports.py ${BEAT_PATH}
+	${PYTHON_ENV}/bin/python ${ES_BEATS}/script/generate_imports.py ${BEAT_PATH}
 
 # Runs all collection steps and updates afterwards
 .PHONY: collect
