@@ -243,7 +243,7 @@ func (fs *EventFormatString) collectFields(
 	}
 
 	if fs.timestamp {
-		ctx.ts = event.Timestamp
+		ctx.ts = event.Timestamp.UTC()
 	}
 
 	return nil

@@ -85,24 +85,24 @@ func TestEventFormatString(t *testing.T) {
 			"test timestamp formatter",
 			"%{[key]}: %{+YYYY.MM.dd}",
 			beat.Event{
-				Timestamp: time.Date(2015, 5, 1, 20, 12, 34, 0, time.Local),
+				Timestamp: time.Date(2015, 5, 1, 20, 12, 34, 0, time.FixedZone("GMT-5", -3600*5)),
 				Fields: common.MapStr{
 					"key": "timestamp",
 				},
 			},
-			"timestamp: 2015.05.01",
+			"timestamp: 2015.05.02", // expect UTC time
 			[]string{"key"},
 		},
 		{
 			"test timestamp formatter",
 			"%{[@timestamp]}: %{+YYYY.MM.dd}",
 			beat.Event{
-				Timestamp: time.Date(2015, 5, 1, 20, 12, 34, 0, time.Local),
+				Timestamp: time.Date(2015, 5, 1, 20, 12, 34, 0, time.FixedZone("GMT-5", -3600*5)),
 				Fields: common.MapStr{
 					"key": "timestamp",
 				},
 			},
-			"2015-05-01T20:12:34.000Z: 2015.05.01",
+			"2015-05-01T20:12:34.000Z: 2015.05.02", // expect UTC time
 			[]string{"@timestamp"},
 		},
 	}

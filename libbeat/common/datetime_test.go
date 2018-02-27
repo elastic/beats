@@ -67,9 +67,9 @@ func TestTimeMarshal(t *testing.T) {
 	tests := []inputOutput{
 		{
 			Input: MapStr{
-				"@timestamp": Time(time.Date(2015, time.March, 01, 11, 19, 05, 112*1e6, time.UTC)),
+				"@timestamp": Time(time.Date(2015, time.March, 01, 11, 19, 05, 112*1e6, time.FixedZone("GMT-5", -3600*5))),
 			},
-			Output: `{"@timestamp":"2015-03-01T11:19:05.112Z"}`,
+			Output: `{"@timestamp":"2015-03-01T16:19:05.112Z"}`, // expect GMT
 		},
 		{
 			Input: MapStr{

@@ -169,8 +169,10 @@ func TestCollectPipelinePublishFail(t *testing.T) {
 }
 
 func TestGetIndexStandard(t *testing.T) {
-	ts := time.Now().UTC()
-	extension := fmt.Sprintf("%d.%02d.%02d", ts.Year(), ts.Month(), ts.Day())
+	// use a time that falls in between UTC and local time midnight
+	// this is to make sure index pattern uses UTC date and not local date
+	ts := time.Date(2018, 01, 01, 22, 00, 00, 00, time.FixedZone("GMT-5", -5*3600))
+	extension := "2018.01.02" // in UTC it is the next day already
 	fields := common.MapStr{"field": 1}
 
 	pattern := "beatname-%{+yyyy.MM.dd}"
@@ -183,8 +185,10 @@ func TestGetIndexStandard(t *testing.T) {
 }
 
 func TestGetIndexOverwrite(t *testing.T) {
-	time := time.Now().UTC()
-	extension := fmt.Sprintf("%d.%02d.%02d", time.Year(), time.Month(), time.Day())
+	// use a time that falls in between UTC and local time midnight
+	// this is to make sure index pattern uses UTC date and not local date
+	time := time.Date(2018, 01, 01, 22, 00, 00, 00, time.FixedZone("GMT-5", -5*3600))
+	extension := "2018.01.02" // in UTC it is the next day already
 
 	fields := common.MapStr{
 		"@timestamp": common.Time(time),
