@@ -13,7 +13,7 @@ import (
 	"github.com/elastic/beats/metricbeat/mb"
 )
 
-// Config for perfmon counters.
+// CounterConfig for perfmon counters.
 type CounterConfig struct {
 	InstanceLabel    string `config:"instance_label" validate:"required"`
 	InstanceName     string `config:"instance_name"`
