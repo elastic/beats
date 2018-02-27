@@ -138,8 +138,6 @@ func TestIgnoreNonExistentCounter(t *testing.T) {
 
 	values, err := handle.Read()
 
-	time.Sleep(time.Millisecond * 1000)
-
 	if assert.Error(t, err) {
 		assert.EqualValues(t, PDH_NO_DATA, errors.Cause(err))
 	}
