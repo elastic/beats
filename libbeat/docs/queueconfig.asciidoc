@@ -19,7 +19,7 @@ queue.mem:
 
 [float]
 [[configuration-internal-queue-memory]]
-=== Configure the memory qeueue
+=== Configure the memory queue
 
 The memory queue keeps all events in memory. It is the only queue type
 supported right now.  By default no flush interval is configured. All events
