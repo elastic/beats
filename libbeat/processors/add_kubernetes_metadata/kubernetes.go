@@ -168,8 +168,8 @@ func (k *kubernetesAnnotator) worker() {
 // Run pod actions while handling errors
 func processEvent(f func(pod *kubernetes.Pod), event bus.Event) {
 	pod, ok := event["pod"].(*kubernetes.Pod)
-	if !ok {
-		logp.Err("Couldn't get a pod from watcher event")
+	if !ok || pod == nil {
+		logp.Err("Couldn't get a pod from watcher event: %v", event)
 		return
 	}
 	f(pod)
