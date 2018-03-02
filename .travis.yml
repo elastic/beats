@@ -20,7 +20,9 @@ jobs:
   include:
     # General checks
     - os: linux
-      env: TARGETS="check"
+      env:
+        - TARGETS="check"
+        - GOCSFIXER_DIFF="git diff HEAD^ --name-status | grep \"^D\" -v | sed 's/^.\t//g' | grep \"\.go\$\$\""
       go: $GO_VERSION
       stage: check
 

@@ -1,0 +1,5 @@
+fixers:
+   no_new_line_before_error_check:
+       recommend: true
+       lint: true
+       fix: false
