@@ -6,6 +6,7 @@ import (
 	"github.com/elastic/beats/libbeat/autodiscover/template"
 	"github.com/elastic/beats/libbeat/common"
 	"github.com/elastic/beats/libbeat/common/bus"
+	"github.com/elastic/beats/libbeat/common/cfgwarn"
 	"github.com/elastic/beats/libbeat/common/docker"
 	"github.com/elastic/beats/libbeat/logp"
 )
@@ -29,6 +30,7 @@ type Provider struct {
 
 // AutodiscoverBuilder builds and returns an autodiscover provider
 func AutodiscoverBuilder(bus bus.Bus, c *common.Config) (autodiscover.Provider, error) {
+	cfgwarn.Beta("The docker autodiscover is beta")
 	config := defaultConfig()
 	err := c.Unpack(&config)
 	if err != nil {

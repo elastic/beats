@@ -7,6 +7,7 @@ import (
 	"github.com/elastic/beats/libbeat/autodiscover/template"
 	"github.com/elastic/beats/libbeat/common"
 	"github.com/elastic/beats/libbeat/common/bus"
+	"github.com/elastic/beats/libbeat/common/cfgwarn"
 	"github.com/elastic/beats/libbeat/logp"
 	"github.com/elastic/beats/libbeat/processors"
 )
@@ -33,6 +34,8 @@ type configAppender struct {
 
 // NewConfigAppender creates a configAppender that can append tempatized configs into built configs
 func NewConfigAppender(cfg *common.Config) (autodiscover.Appender, error) {
+	cfgwarn.Beta("The config appender is beta")
+
 	confs := configs{}
 	err := cfg.Unpack(&confs)
 	if err != nil {

@@ -7,6 +7,7 @@ import (
 	"github.com/elastic/beats/libbeat/autodiscover"
 	"github.com/elastic/beats/libbeat/common"
 	"github.com/elastic/beats/libbeat/common/bus"
+	"github.com/elastic/beats/libbeat/common/cfgwarn"
 	"github.com/elastic/beats/libbeat/logp"
 	"github.com/elastic/beats/libbeat/processors"
 )
@@ -23,6 +24,7 @@ type tokenAppender struct {
 // NewTokenAppender creates a token appender that can append a bearer token required to authenticate with
 // protected endpoints
 func NewTokenAppender(cfg *common.Config) (autodiscover.Appender, error) {
+	cfgwarn.Beta("The token appender is beta")
 	conf := defaultConfig()
 
 	err := cfg.Unpack(&conf)
