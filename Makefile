@@ -76,7 +76,6 @@ clean-vendor:
 check: python-env
 	@go get $(GOCSFIXER_REPO)
 	export GOCSFIXER='$(GOCSFIXER)' && ($(GOCSFIXER_DIFF) | sh ./script/cscheck.sh)
-	false
 	@$(foreach var,$(PROJECTS),$(MAKE) -C $(var) check || exit 1;)
 	@# Checks also python files which are not part of the beats
 	@$(FIND) -name *.py -exec $(PYTHON_ENV)/bin/autopep8 -d --max-line-length 120  {} \; | (! grep . -q) || (echo "Code differs from autopep8's style" && false)
