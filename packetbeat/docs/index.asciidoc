@@ -8,6 +8,10 @@ include::{asciidoc-dir}/../../shared/attributes.asciidoc[]
 :beatname_lc: packetbeat
 :beatname_uc: Packetbeat
 :beatname_pkg: {beatname_lc}
+:github_repo_name: beats
+:discuss_forum: beats/{beatname_lc}
+:beat_default_index_prefix: {beatname_lc}
+:has_ml_jobs: yes
 
 include::../../libbeat/docs/shared-beats-attributes.asciidoc[]
 
@@ -26,6 +30,8 @@ include::./upgrading.asciidoc[]
 include::./configuring-howto.asciidoc[]
 
 include::./fields.asciidoc[]
+
+include::../../libbeat/docs/monitoring/monitoring-beats.asciidoc[]
 
 include::./securing-packetbeat.asciidoc[]
 

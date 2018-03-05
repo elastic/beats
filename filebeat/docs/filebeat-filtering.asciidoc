@@ -68,7 +68,8 @@ The following configuration decodes the inner JSON object:
 [source,yaml]
 -----------------------------------------------------
 filebeat.prospectors:
-- paths:
+- type: log
+  paths:
     - input.json
   json.keys_under_root: true
 

@@ -21,11 +21,14 @@ func eventMapping(families []*dto.MetricFamily) ([]common.MapStr, error) {
 			if deployment == "" {
 				continue
 			}
-			event, ok := eventsMap[deployment]
+			namespace := util.GetLabel(metric, "namespace")
+			deploymentKey := namespace + "::" + deployment
+			event, ok := eventsMap[deploymentKey]
 			if !ok {
 				event = common.MapStr{}
-				eventsMap[deployment] = event
+				eventsMap[deploymentKey] = event
 			}
+
 			switch family.GetName() {
 			case "kube_deployment_metadata_generation":
 				event.Put(mb.ModuleDataKey+".namespace", util.GetLabel(metric, "namespace"))
@@ -54,7 +57,8 @@ func eventMapping(families []*dto.MetricFamily) ([]common.MapStr, error) {
 		}
 	}
 
-	var events []common.MapStr
+	// initialize, populate events array from values in eventsMap
+	events := make([]common.MapStr, 0, len(eventsMap))
 	for _, event := range eventsMap {
 		events = append(events, event)
 	}

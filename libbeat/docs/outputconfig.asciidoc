@@ -13,6 +13,12 @@
 [[configuring-output]]
 == Configure the output
 
+ifdef::only-elasticsearch[]
+You configure {beatname_uc} to write to Elasticsearch by setting options 
+in the `output.elasticsearch` section of the +{beatname_lc}.yml+ config file
+endif::[]
+
+ifndef::only-elasticsearch[]
 You configure {beatname_uc} to write to a specific output by setting options
 in the `output` section of the +{beatname_lc}.yml+ config file. Only a single
 output may be defined.
@@ -26,6 +32,8 @@ The following topics describe how to configure each supported output:
 * <<file-output>>
 * <<console-output>>
 
+endif::[]
+
 [[elasticsearch-output]]
 === Configure the Elasticsearch output
 
@@ -33,7 +41,7 @@ The following topics describe how to configure each supported output:
 <titleabbrev>Elasticsearch</titleabbrev>
 ++++
 
-When you specify Elasticsearch for the output, the Beat sends the transactions directly to Elasticsearch by using the Elasticsearch HTTP API.
+When you specify Elasticsearch for the output, {beatname_uc} sends the transactions directly to Elasticsearch by using the Elasticsearch HTTP API.
 
 Example configuration:
 
@@ -124,6 +132,8 @@ The default value is 0.
 The number of workers per configured host publishing events to Elasticsearch. This
 is best used with load balancing mode enabled. Example: If you have 2 hosts and
 3 workers, in total 6 workers are started (3 for each host).
+
+The default value is 1.
 
 ===== `username`
 
@@ -220,6 +230,7 @@ output.elasticsearch:
         message: "ERR"
 ------------------------------------------------------------------------------
 
+ifndef::no-pipeline[]
 ===== `pipeline`
 
 A format string value that specifies the ingest node pipeline to write events to.
@@ -246,10 +257,12 @@ Example elasticsearch output with `pipelines`:
 ["source","yaml"]
 ------------------------------------------------------------------------------
 filebeat.prospectors:
-- paths: ["/var/log/app/normal/*.log"]
+- type: log
+  paths: ["/var/log/app/normal/*.log"]
   fields:
     type: "normal"
-- paths: ["/var/log/app/critical/*.log"]
+- type: log
+  paths: ["/var/log/app/critical/*.log"]
   fields:
     type: "critical"
 
@@ -264,15 +277,20 @@ output.elasticsearch:
       when.equals:
         fields.type: "normal"
 ------------------------------------------------------------------------------
+endif::[]
 
 ===== `max_retries`
 
 The number of times to retry publishing an event after a publishing failure.
 After the specified number of retries, the events are typically dropped.
-Some Beats, such as Filebeat, ignore the `max_retries` setting and retry until all
-events are published.
 
+ifeval::["{beatname_lc}" == "filebeat"]
+Filebeat will ignore the `max_retries` setting and retry until all
+events are published.
+endif::[]
+ifeval::["{beatname_lc}" != "filebeat"]
 Set `max_retries` to a value less than 0 to retry until all events are published.
+endif::[]
 
 The default is 3.
 
@@ -280,9 +298,8 @@ The default is 3.
 
 The maximum number of events to bulk in a single Elasticsearch bulk API index request. The default is 50.
 
-If the Beat sends single events, the events are collected into batches. If the Beat publishes
-a large batch of events (larger than the value specified by `bulk_max_size`), the batch is
-split.
+Events can be collected into batches. {beatname_uc} will split batches larger than `bulk_max_size`
+into multiple batches.
 
 Specifying a larger batch size can improve performance by lowering the overhead of sending events.
 However big batch sizes can also increase processing times, which might result in
@@ -305,6 +322,7 @@ Elasticsearch.
 
 See <<configuration-ssl>> for more information.
 
+ifndef::only-elasticsearch[]
 
 [[logstash-output]]
 === Configure the Logstash output
@@ -430,6 +448,14 @@ load balances published events onto all Logstash hosts. If set to false,
 the output plugin sends all events to only one host (determined at random) and
 will switch to another host if the selected one becomes unresponsive. The default value is false.
 
+["source","yaml",subs="attributes"]
+------------------------------------------------------------------------------
+output.logstash:
+  hosts: ["localhost:5044", "localhost:5045"]
+  loadbalance: true
+  index: {beatname_lc}
+------------------------------------------------------------------------------
+
 ===== `ttl`
 
 Time to live for a connection to Logstash after which the connection will be re-established.
@@ -442,20 +468,12 @@ The default value is 0.
 
 NOTE: The "ttl" option is not yet supported on an async Logstash client (one with the "pipelining" option set).
 
-["source","yaml",subs="attributes"]
-------------------------------------------------------------------------------
-output.logstash:
-  hosts: ["localhost:5044", "localhost:5045"]
-  loadbalance: true
-  index: {beatname_lc}
-------------------------------------------------------------------------------
-
 ===== `pipelining`
 
 Configures number of batches to be sent asynchronously to logstash while waiting
 for ACK from logstash. Output only becomes blocking once number of `pipelining`
 batches have been written. Pipelining is disabled if a values of 0 is
-configured. The default value is 5.
+configured. The default value is 2.
 
 [[port]]
 ===== `port`
@@ -513,10 +531,14 @@ The number of seconds to wait for responses from the Logstash server before timi
 
 The number of times to retry publishing an event after a publishing failure.
 After the specified number of retries, the events are typically dropped.
-Some Beats, such as Filebeat, ignore the `max_retries` setting and retry until all
-events are published.
 
+ifeval::["{beatname_lc}" == "filebeat"]
+Filebeat will ignore the `max_retries` setting and retry until all
+events are published.
+endif::[]
+ifeval::["{beatname_lc}" != "filebeat"]
 Set `max_retries` to a value less than 0 to retry until all events are published.
+endif::[]
 
 The default is 3.
 
@@ -704,10 +726,15 @@ brokers, topics, partition, and active leaders to use for publishing.
 
 The number of times to retry publishing an event after a publishing failure.
 After the specified number of retries, the events are typically dropped.
-Some Beats, such as Filebeat, ignore the `max_retries` setting and retry until all
-events are published.
 
+ifeval::["{beatname_lc}" == "filebeat"]
+Filebeat will ignore the `max_retries` setting and retry until all
+events are published.
+endif::[]
+
+ifeval::["{beatname_lc}" != "filebeat"]
 Set `max_retries` to a value less than 0 to retry until all events are published.
+endif::[]
 
 The default is 3.
 
@@ -926,12 +953,17 @@ The Redis connection timeout in seconds. The default is 5 seconds.
 
 The number of times to retry publishing an event after a publishing failure.
 After the specified number of retries, the events are typically dropped.
-Some Beats, such as Filebeat, ignore the `max_retries` setting and retry until all
-events are published.
 
+ifeval::["{beatname_lc}" == "filebeat"]
+Filebeat will ignore the `max_retries` setting and retry until all
+events are published.
+endif::[]
+ifeval::["{beatname_lc}" != "filebeat"]
 Set `max_retries` to a value less than 0 to retry until all events are published.
+endif::[]
 
 The default is 3.
+
 
 ===== `bulk_max_size`
 
@@ -1160,3 +1192,5 @@ When specified, the `cloud.auth` overwrites the `output.elasticsearch.username` 
 `output.elasticsearch.password` settings. Because the Kibana settings inherit
 the username and password from the Elasticsearch output, this can also be used
 to set the `setup.kibana.username` and `setup.kibana.password` options.
+
+endif::[]

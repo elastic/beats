@@ -145,11 +145,14 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
 --------------------------------------------------------------------
 Dependency: github.com/davecgh/go-spew
-Revision: 5215b55f46b2b919f50a1df0eaa5886afe4e3b3d
+Version: v1.1.0
+Revision: 346938d642f2ec3594ed81d874461961cd0faa76
 License type (autodetected): MIT
 ./vendor/github.com/davecgh/go-spew/LICENSE:
 --------------------------------------------------------------------
-Copyright (c) 2012-2013 Dave Collins <dave@davec.name>
+ISC License
+
+Copyright (c) 2012-2016 Dave Collins <dave@davec.name>
 
 Permission to use, copy, modify, and distribute this software for any
 purpose with or without fee is hereby granted, provided that the above
@@ -361,7 +364,8 @@ Apache License 2.0
 
 --------------------------------------------------------------------
 Dependency: github.com/elastic/go-ucfg
-Revision: ec8488a52542c0c51e42e8ea204dcaff400bc644
+Version: v0.5.1
+Revision: 0ba28e36add27704e6b49a7ed8557989a8f4a635
 License type (autodetected): Apache-2.0
 ./vendor/github.com/elastic/go-ucfg/LICENSE:
 --------------------------------------------------------------------
@@ -370,8 +374,8 @@ Apache License 2.0
 
 --------------------------------------------------------------------
 Dependency: github.com/elastic/gosigar
-Version: v0.7.0
-Revision: cdcbd8c3b8bf28ef6d8639ec1e45bf31d2745f2d
+Version: v0.8.0
+Revision: 16df19fe5efee4ea2938bde5f56c02d9929dc054
 License type (autodetected): Apache-2.0
 ./vendor/github.com/elastic/gosigar/LICENSE:
 --------------------------------------------------------------------
@@ -406,7 +410,8 @@ SoundCloud Ltd. (http://soundcloud.com/).
 
 --------------------------------------------------------------------
 Dependency: github.com/ericchiang/k8s
-Revision: 5803ed75e31fc1998b5f781ac08e22ff985c3f8f
+Version: v1.0.0
+Revision: 5912993f00cb7c971aaa54529a06bd3eecd6c3d4
 License type (autodetected): Apache-2.0
 ./vendor/github.com/ericchiang/k8s/LICENSE:
 --------------------------------------------------------------------
@@ -1023,7 +1028,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 --------------------------------------------------------------------
 Dependency: github.com/golang/protobuf
-Revision: 18c9bb3261723cd5401db4d0c9fbc5c3b6c70fe8
+Revision: bbd03ef6da3a115852eaf24c8a1c46aeb39aa175
 License type (autodetected): BSD-3-Clause
 ./metricbeat/vendor/github.com/golang/protobuf/LICENSE:
 --------------------------------------------------------------------
@@ -2677,8 +2682,43 @@ OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 --------------------------------------------------------------------
+Dependency: github.com/pmezard/go-difflib
+Version: v1.0.0
+Revision: 792786c7400a136282c1664665ae0a8db921c6c2
+License type (autodetected): BSD-2-Clause
+./vendor/github.com/pmezard/go-difflib/LICENSE:
+--------------------------------------------------------------------
+Copyright (c) 2013, Patrick Mezard
+All rights reserved.
+
+Redistribution and use in source and binary forms, with or without
+modification, are permitted provided that the following conditions are
+met:
+
+    Redistributions of source code must retain the above copyright
+notice, this list of conditions and the following disclaimer.
+    Redistributions in binary form must reproduce the above copyright
+notice, this list of conditions and the following disclaimer in the
+documentation and/or other materials provided with the distribution.
+    The names of its contributors may not be used to endorse or promote
+products derived from this software without specific prior written
+permission.
+
+THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS
+IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED
+TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A
+PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT
+HOLDER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL,
+SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED
+TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR
+PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF
+LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
+NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
+SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+
+--------------------------------------------------------------------
 Dependency: github.com/prometheus/client_model
-Revision: 6f3806018612930941127f2a7c6c453ba2c527d2
+Revision: 99fa1f4be8e564e8a6b613da7fa6f46c9edafc6c
 License type (autodetected): Apache-2.0
 ./metricbeat/vendor/github.com/prometheus/client_model/LICENSE:
 --------------------------------------------------------------------
@@ -2693,7 +2733,7 @@ SoundCloud Ltd. (http://soundcloud.com/).
 
 --------------------------------------------------------------------
 Dependency: github.com/prometheus/common
-Revision: 13ba4ddd0caa9c28ca7b7bffe1dfa9ed8d5ef207
+Revision: 89604d197083d4781071d3c65855d24ecfb0a563
 License type (autodetected): Apache-2.0
 ./metricbeat/vendor/github.com/prometheus/common/LICENSE:
 --------------------------------------------------------------------
@@ -2803,8 +2843,8 @@ WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
 --------------------------------------------------------------------
 Dependency: github.com/shirou/gopsutil
-Version: v2.17.04
-Revision: 9af92986dda65a8c367157a82b484553e1ec1c55
+Version: v2.18.01
+Revision: c432be29ccce470088d07eea25b3ea7e68a8afbb
 License type (autodetected): BSD-3-Clause
 ./vendor/github.com/shirou/gopsutil/LICENSE:
 --------------------------------------------------------------------
@@ -3027,7 +3067,8 @@ SOFTWARE.
 
 --------------------------------------------------------------------
 Dependency: github.com/stretchr/testify
-Revision: f390dcf405f7b83c997eac1b06768bb9f44dec18
+Version: v1.2.0
+Revision: b91bfb9ebec76498946beb6af7c0230c7cc7ba6c
 License type (autodetected): MIT
 ./vendor/github.com/stretchr/testify/LICENSE:
 --------------------------------------------------------------------
@@ -3251,7 +3292,7 @@ THE SOFTWARE.
 
 --------------------------------------------------------------------
 Dependency: golang.org/x/crypto
-Revision: d585fd2cc9195196078f516b69daff6744ef5e84
+Revision: 5119cf507ed5294cc409c092980c7497ee5d6fd2
 License type (autodetected): BSD-3-Clause
 ./vendor/golang.org/x/crypto/LICENSE:
 --------------------------------------------------------------------
@@ -3319,7 +3360,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 --------------------------------------------------------------------
 Dependency: golang.org/x/sys
-Revision: b76f9891dc1d975623261def70f9b89661f5baab
+Revision: 37707fdb30a5b38865cfb95e5aab41707daec7fd
 License type (autodetected): BSD-3-Clause
 ./vendor/golang.org/x/sys/LICENSE:
 --------------------------------------------------------------------
@@ -3353,7 +3394,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 --------------------------------------------------------------------
 Dependency: golang.org/x/text
-Revision: 2910a502d2bf9e43193af9d68ca516529614eed3
+Revision: 4e4a3210bb54bb31f6ab2cdca2edcc0b50c420c1
 License type (autodetected): BSD-3-Clause
 ./vendor/golang.org/x/text/LICENSE:
 --------------------------------------------------------------------
@@ -3387,7 +3428,8 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 --------------------------------------------------------------------
 Dependency: golang.org/x/tools
-Revision: 9be3b7cbc7ccd19baaa3b7704c22f57db5ebbdf2
+Version: release-branch.go1.9
+Revision: 5d2fd3ccab986d52112bf301d47a819783339d0e
 License type (autodetected): BSD-3-Clause
 ./vendor/golang.org/x/tools/LICENSE:
 --------------------------------------------------------------------

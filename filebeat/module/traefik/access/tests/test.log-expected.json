@@ -47,6 +47,9 @@
             "prospector": {
                 "type": "log"
             },
+            "input": {
+                "type": "log"
+            },
             "read_timestamp": "2017-10-09T18:56:25.032Z",
             "source": "/var/log/traefik/access.log",
             "fileset": {
@@ -101,6 +104,9 @@
                 "version": "7.0.0-alpha1"
             },
             "prospector": {
+                "type": "log"
+            },
+            "input": {
                 "type": "log"
             },
             "read_timestamp": "2017-10-09T18:56:25.031Z",

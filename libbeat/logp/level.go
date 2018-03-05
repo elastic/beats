@@ -24,7 +24,7 @@ const (
 var levelStrings = map[Level]string{
 	DebugLevel:    "debug",
 	InfoLevel:     "info",
-	WarnLevel:     "warn",
+	WarnLevel:     "warning",
 	ErrorLevel:    "error",
 	CriticalLevel: "critical",
 }

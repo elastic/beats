@@ -16,6 +16,7 @@ import (
 	"github.com/elastic/beats/libbeat/monitoring"
 	"github.com/elastic/beats/libbeat/outputs/elasticsearch"
 
+	fbautodiscover "github.com/elastic/beats/filebeat/autodiscover"
 	"github.com/elastic/beats/filebeat/channel"
 	cfg "github.com/elastic/beats/filebeat/config"
 	"github.com/elastic/beats/filebeat/crawler"
@@ -54,6 +55,22 @@ func New(b *beat.Beat, rawConfig *common.Config) (beat.Beater, error) {
 		return nil, err
 	}
 
+	if len(config.Prospectors) > 0 {
+		cfgwarn.Deprecate("7.0.0", "prospectors are deprecated, Use `inputs` instead.")
+		if len(config.Inputs) > 0 {
+			return nil, fmt.Errorf("prospectors and inputs used in the configuration file, define only inputs not both")
+		}
+		config.Inputs = config.Prospectors
+	}
+
+	if config.ConfigProspector != nil {
+		cfgwarn.Deprecate("7.0.0", "config.prospectors are deprecated, Use `config.inputs` instead.")
+		if config.ConfigInput != nil {
+			return nil, fmt.Errorf("config.prospectors and config.inputs used in the configuration file, define only config.inputs not both")
+		}
+		config.ConfigInput = config.ConfigProspector
+	}
+
 	moduleRegistry, err := fileset.NewModuleRegistry(config.Modules, b.Info.Version, true)
 	if err != nil {
 		return nil, err
@@ -62,7 +79,7 @@ func New(b *beat.Beat, rawConfig *common.Config) (beat.Beater, error) {
 		logp.Info("Enabled modules/filesets: %s", moduleRegistry.InfoString())
 	}
 
-	moduleProspectors, err := moduleRegistry.GetProspectorConfigs()
+	moduleInputs, err := moduleRegistry.GetInputConfigs()
 	if err != nil {
 		return nil, err
 	}
@@ -71,28 +88,28 @@ func New(b *beat.Beat, rawConfig *common.Config) (beat.Beater, error) {
 		return nil, err
 	}
 
-	// Add prospectors created by the modules
-	config.Prospectors = append(config.Prospectors, moduleProspectors...)
+	// Add inputs created by the modules
+	config.Inputs = append(config.Inputs, moduleInputs...)
 
-	haveEnabledProspectors := false
-	for _, prospector := range config.Prospectors {
-		if prospector.Enabled() {
-			haveEnabledProspectors = true
+	haveEnabledInputs := false
+	for _, input := range config.Inputs {
+		if input.Enabled() {
+			haveEnabledInputs = true
 			break
 		}
 	}
 
-	if !config.ConfigProspector.Enabled() && !config.ConfigModules.Enabled() && !haveEnabledProspectors && config.Autodiscover == nil {
+	if !config.ConfigInput.Enabled() && !config.ConfigModules.Enabled() && !haveEnabledInputs && config.Autodiscover == nil {
 		if !b.InSetupCmd {
-			return nil, errors.New("No modules or prospectors enabled and configuration reloading disabled. What files do you want me to watch?")
+			return nil, errors.New("no modules or inputs enabled and configuration reloading disabled. What files do you want me to watch?")
 		}
 
 		// in the `setup` command, log this only as a warning
 		logp.Warn("Setup called, but no modules enabled.")
 	}
 
-	if *once && config.ConfigProspector.Enabled() && config.ConfigModules.Enabled() {
-		return nil, errors.New("prospector configs and -once cannot be used together")
+	if *once && config.ConfigInput.Enabled() && config.ConfigModules.Enabled() {
+		return nil, errors.New("input configs and -once cannot be used together")
 	}
 
 	fb := &Filebeat{
@@ -220,7 +237,7 @@ func (fb *Filebeat) Run(b *beat.Beat) error {
 	outDone := make(chan struct{}) // outDone closes down all active pipeline connections
 	crawler, err := crawler.New(
 		channel.NewOutletFactory(outDone, b.Publisher, wgEvents).Create,
-		config.Prospectors,
+		config.Inputs,
 		b.Info.Version,
 		fb.done,
 		*once)
@@ -261,7 +278,7 @@ func (fb *Filebeat) Run(b *beat.Beat) error {
 		logp.Warn(pipelinesWarning)
 	}
 
-	err = crawler.Start(registrar, config.ConfigProspector, config.ConfigModules, pipelineLoaderFactory)
+	err = crawler.Start(registrar, config.ConfigInput, config.ConfigModules, pipelineLoaderFactory)
 	if err != nil {
 		crawler.Stop()
 		return err
@@ -279,7 +296,7 @@ func (fb *Filebeat) Run(b *beat.Beat) error {
 
 	var adiscover *autodiscover.Autodiscover
 	if fb.config.Autodiscover != nil {
-		adapter := NewAutodiscoverAdapter(crawler.ProspectorsFactory, crawler.ModulesFactory)
+		adapter := fbautodiscover.NewAutodiscoverAdapter(crawler.InputsFactory, crawler.ModulesFactory)
 		adiscover, err = autodiscover.NewAutodiscover("filebeat", adapter, config.Autodiscover)
 		if err != nil {
 			return err
@@ -291,7 +308,7 @@ func (fb *Filebeat) Run(b *beat.Beat) error {
 	waitFinished.AddChan(fb.done)
 	waitFinished.Wait()
 
-	// Stop autodiscover -> Stop crawler -> stop prospectors -> stop harvesters
+	// Stop autodiscover -> Stop crawler -> stop inputs -> stop harvesters
 	// Note: waiting for crawlers to stop here in order to install wgEvents.Wait
 	//       after all events have been enqueued for publishing. Otherwise wgEvents.Wait
 	//       or publisher might panic due to concurrent updates.

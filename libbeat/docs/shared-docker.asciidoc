@@ -51,6 +51,8 @@ docker run \
 It's possible to embed your {beatname_uc} configuration in a custom image.
 Here is an example Dockerfile to achieve this:
 
+ifeval::["{beatname_lc}"!="auditbeat"]
+
 ["source", "dockerfile", subs="attributes"]
 --------------------------------------------
 FROM {dockerimage}
@@ -59,3 +61,15 @@ USER root
 RUN chown {beatname_lc} /usr/share/{beatname_lc}/{beatname_lc}.yml
 USER {beatname_lc}
 --------------------------------------------
+
+endif::[]
+
+ifeval::["{beatname_lc}"=="auditbeat"]
+
+["source", "dockerfile", subs="attributes"]
+--------------------------------------------
+FROM {dockerimage}
+COPY {beatname_lc}.yml /usr/share/{beatname_lc}/{beatname_lc}.yml
+--------------------------------------------
+
+endif::[]

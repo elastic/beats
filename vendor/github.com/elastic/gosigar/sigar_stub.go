@@ -65,3 +65,7 @@ func (p *ProcList) Get() error {
 func (p *ProcArgs) Get(int) error {
 	return ErrNotImplemented{runtime.GOOS}
 }
+
+func (self *Rusage) Get(int) error {
+	return ErrNotImplemented{runtime.GOOS}
+}

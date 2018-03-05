@@ -31,7 +31,7 @@ type Backoff struct {
 var defaultConfig = Config{
 	Port:             5044,
 	LoadBalance:      false,
-	Pipelining:       5,
+	Pipelining:       2,
 	BulkMaxSize:      2048,
 	SlowStart:        false,
 	CompressionLevel: 3,
