@@ -86,6 +86,10 @@ func (c *configAppender) Append(event bus.Event) {
 			for _, cfg := range cfgs {
 				cf := common.MapStr{}
 				err := cfg.Unpack(&cf)
+				if err != nil {
+					logp.Debug("config", "unable to unpack config due to error: %v", err)
+					continue
+				}
 				err = cfg.Merge(&configMap.config)
 				if err != nil {
 					logp.Debug("config", "unable to merge configs due to error: %v", err)
