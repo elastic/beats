@@ -1,4 +1,4 @@
-// +build !darwin,!linux,!windows darwin,!cgo linux,!cgo windows,!cgo
+// +build !darwin,!linux,!cgo darwin,!cgo freebsd,!cgo openbsd
 
 package instance
 
