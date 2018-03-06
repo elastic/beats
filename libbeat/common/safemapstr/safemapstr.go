@@ -6,6 +6,8 @@ import (
 	"github.com/elastic/beats/libbeat/common"
 )
 
+const alternativeKey = "value"
+
 // Put This method implements a way to put dotted keys into a MapStr while
 // ensuring they don't override each other. For example:
 //
@@ -19,6 +21,7 @@ import (
 // Put detects this scenario and renames the common base key, by appending
 // `.value`
 func Put(data common.MapStr, key string, value interface{}) error {
+	// XXX This implementation mimics `common.MapStr.Put`, both should be updated to have similar behavior
 	keyParts := strings.SplitN(key, ".", 2)
 
 	// If leaf node or key exists directly
@@ -28,7 +31,7 @@ func Put(data common.MapStr, key string, value interface{}) error {
 			switch oldValue.(type) {
 			case common.MapStr:
 				// This would replace a whole object, change its key to avoid that:
-				oldValue.(common.MapStr)["value"] = value
+				oldValue.(common.MapStr)[alternativeKey] = value
 				return nil
 			}
 		}
@@ -47,7 +50,7 @@ func Put(data common.MapStr, key string, value interface{}) error {
 	v, ok := tryToMapStr(d)
 	if !ok {
 		// This would replace a leaf with an object, change its key to avoid that:
-		v = common.MapStr{"value": d}
+		v = common.MapStr{alternativeKey: d}
 		data[k] = v
 	}
 
