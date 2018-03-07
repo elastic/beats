@@ -83,6 +83,7 @@ https://github.com/elastic/beats/compare/v6.0.0-beta2...master[Check the HEAD di
 - Update Golang 1.9.4 {pull}6326[6326]
 - Fix conditions checking on autodiscover Docker labels. {pull}6412[6412]
 - Fix for kafka logger. {pull}6430[6430]
+- Remove double slashes in Windows service script. {pull}6491[6491]
 
 *Auditbeat*
 
