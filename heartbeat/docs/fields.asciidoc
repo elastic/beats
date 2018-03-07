@@ -318,6 +318,14 @@ Service url used by monitor.
 
 
 [float]
+=== `http.url.raw`
+
+type: keyword
+
+The service url used by monitor. This is a non-analyzed field that is useful for aggregations.
+
+
+[float]
 == response fields
 
 Service response parameters.
