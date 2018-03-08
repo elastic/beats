@@ -55,8 +55,10 @@ func newProcessorPipeline(
 
 	needsCopy := global.alwaysCopy || localProcessors != nil || global.processors != nil
 
-	// setup 1: generalize/normalize output (P)
-	processors.add(generalizeProcessor)
+	if !config.SkipNormalization {
+		// setup 1: generalize/normalize output (P)
+		processors.add(generalizeProcessor)
+	}
 
 	// setup 2: add Meta from client config (C)
 	if m := clientMeta; len(m) > 0 {
@@ -175,9 +177,6 @@ var generalizeProcessor = newProcessor("generalizeEvent", func(event *beat.Event
 	if len(event.Fields) == 0 {
 		return nil, nil
 	}
-	if event.Normalized {
-		return event, nil
-	}
 
 	fields := common.ConvertToGenericEvent(event.Fields)
 	if fields == nil {
@@ -186,7 +185,6 @@ var generalizeProcessor = newProcessor("generalizeEvent", func(event *beat.Event
 	}
 
 	event.Fields = fields
-	event.Normalized = true
 	return event, nil
 })
 
