@@ -34,11 +34,14 @@ All metrics from a single mapping will be POSTed to the defined host/port and se
 To make it possible to differentiate between metrics from multiple similar applications running on the same host,
 please configure multiple modules.
 
+When wildcards are used, an event will be sent to Elastic for each matching mbean, in that case a `mbean` field is
+added.
+
 It is required to set a namespace in the general module config section.
 
 [float]
 === Limitations
-No authentication against Jolokia is supported yet. No wildcards in Jolokia requests supported yet.
+No authentication against Jolokia is supported yet.
 All Jolokia requests have canonicalNaming set to false (details see here: https://jolokia.org/reference/html/protocol.html).
 
 
