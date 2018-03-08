@@ -32,14 +32,14 @@ type configAppender struct {
 	configMaps []configMap
 }
 
-// NewConfigAppender creates a configAppender that can append tempatized configs into built configs
+// NewConfigAppender creates a configAppender that can append templatized configs into built configs
 func NewConfigAppender(cfg *common.Config) (autodiscover.Appender, error) {
 	cfgwarn.Beta("The config appender is beta")
 
 	confs := configs{}
 	err := cfg.Unpack(&confs)
 	if err != nil {
-		return nil, fmt.Errorf("Unable to unpack config appender due to error: %v", err)
+		return nil, fmt.Errorf("unable to unpack config appender due to error: %v", err)
 	}
 
 	var configMaps []configMap
@@ -48,7 +48,7 @@ func NewConfigAppender(cfg *common.Config) (autodiscover.Appender, error) {
 		cond, err := processors.NewCondition(conf.ConditionConfig)
 
 		if err != nil {
-			logp.Debug("config", "unable to create condition due to error: %v", err)
+			logp.Warn("config", "unable to create condition due to error: %v", err)
 			continue
 		}
 		cm := configMap{condition: cond}
@@ -57,7 +57,7 @@ func NewConfigAppender(cfg *common.Config) (autodiscover.Appender, error) {
 		cf := common.MapStr{}
 		err = conf.Config.Unpack(&cf)
 		if err != nil {
-			logp.Debug("config", "unable to unpack config due to error: %v", err)
+			logp.Warn("config", "unable to unpack config due to error: %v", err)
 			continue
 		}
 		cm.config = cf

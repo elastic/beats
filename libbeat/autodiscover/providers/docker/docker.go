@@ -50,7 +50,7 @@ func AutodiscoverBuilder(bus bus.Bus, c *common.Config) (autodiscover.Provider, 
 	var builders autodiscover.Builders
 	for _, bcfg := range config.Builders {
 		if builder, err := autodiscover.Registry.BuildBuilder(bcfg); err != nil {
-			logp.Debug("docker", "failed to construct autodiscover builder due to error: %v", err)
+			logp.Warn("docker", "failed to construct autodiscover builder due to error: %v", err)
 		} else {
 			builders = append(builders, builder)
 		}
@@ -59,7 +59,7 @@ func AutodiscoverBuilder(bus bus.Bus, c *common.Config) (autodiscover.Provider, 
 	var appenders autodiscover.Appenders
 	for _, acfg := range config.Builders {
 		if appender, err := autodiscover.Registry.BuildAppender(acfg); err != nil {
-			logp.Debug("docker", "failed to construct autodiscover appender due to error: %v", err)
+			logp.Warn("docker", "failed to construct autodiscover appender due to error: %v", err)
 		} else {
 			appenders = append(appenders, appender)
 		}

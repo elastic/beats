@@ -63,7 +63,7 @@ func (r *registry) BuildAppender(c *common.Config) (Appender, error) {
 
 	appender := r.GetAppender(config.Type)
 	if appender == nil {
-		return nil, fmt.Errorf("Unknown autodiscover appender %s", config.Type)
+		return nil, fmt.Errorf("unknown autodiscover appender %s", config.Type)
 	}
 
 	return appender(c)
