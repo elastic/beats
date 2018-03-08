@@ -16,22 +16,22 @@ func TestFetch(t *testing.T) {
 	compose.EnsureUp(t, "jolokia")
 
 	for _, config := range getConfigs() {
-		f := mbtest.NewEventFetcher(t, config)
-		event, err := f.Fetch()
+		f := mbtest.NewEventsFetcher(t, config)
+		events, err := f.Fetch()
 		if !assert.NoError(t, err) {
 			t.FailNow()
 		}
-		t.Logf("%s/%s event: %+v", f.Module().Name(), f.Name(), event)
-		if len(event) <= 1 {
-			t.Fatal("Empty event")
+		t.Logf("%s/%s events: %+v", f.Module().Name(), f.Name(), events)
+		if len(events) == 0 || len(events[0]) <= 1 {
+			t.Fatal("Empty events")
 		}
 	}
 }
 
 func TestData(t *testing.T) {
 	for _, config := range getConfigs() {
-		f := mbtest.NewEventFetcher(t, config)
-		err := mbtest.WriteEvent(f, t)
+		f := mbtest.NewEventsFetcher(t, config)
+		err := mbtest.WriteEvents(f, t)
 		if err != nil {
 			t.Fatal("write", err)
 		}
