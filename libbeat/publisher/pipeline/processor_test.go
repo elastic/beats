@@ -15,10 +15,9 @@ func TestProcessors(t *testing.T) {
 	info := beat.Info{}
 
 	type local struct {
-		config     beat.ClientConfig
-		events     []common.MapStr
-		expected   []common.MapStr
-		normalized bool
+		config   beat.ClientConfig
+		events   []common.MapStr
+		expected []common.MapStr
 	}
 
 	tests := []struct {
@@ -35,27 +34,10 @@ func TestProcessors(t *testing.T) {
 			[]local{
 				{
 					config: beat.ClientConfig{},
-					events: []common.MapStr{{"value": "abc", "user": nil}},
+					events: []common.MapStr{{"value": "abc"}},
 					expected: []common.MapStr{
 						{"value": "abc", "global": 1, "tags": []string{"tag"}},
 					},
-				},
-			},
-		},
-		{
-			"no normalization",
-			pipelineProcessors{
-				fields: common.MapStr{"global": 1},
-				tags:   []string{"tag"},
-			},
-			[]local{
-				{
-					config: beat.ClientConfig{},
-					events: []common.MapStr{{"value": "abc", "user": nil}},
-					expected: []common.MapStr{
-						{"value": "abc", "user": nil, "global": 1, "tags": []string{"tag"}},
-					},
-					normalized: true,
 				},
 			},
 		},
@@ -318,9 +300,8 @@ func TestProcessors(t *testing.T) {
 					actual := make([]common.MapStr, len(local.events))
 					for i, event := range local.events {
 						out, _ := program.Run(&beat.Event{
-							Timestamp:  time.Now(),
-							Fields:     event,
-							Normalized: local.normalized,
+							Timestamp: time.Now(),
+							Fields:    event,
 						})
 						actual[i] = out.Fields
 					}
