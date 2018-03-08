@@ -1,1 +1,1 @@
-{"source": "hello", "message": "test source"}
+{"source": "hello", "message": "test source", "@metadata": {"foo": "bar"}}
