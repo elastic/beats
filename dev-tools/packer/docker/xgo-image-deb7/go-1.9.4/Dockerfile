@@ -3,7 +3,7 @@
 #
 # Released under the MIT license.
 
-FROM tudorg/xgo-deb6-base
+FROM tudorg/xgo-deb7-base
 
 MAINTAINER Tudor Golubenco <tudor@elastic.co>
 
