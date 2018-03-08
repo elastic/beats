@@ -199,7 +199,7 @@ system-tests-environment: prepare-tests build-image
 .PHONY: fast-system-tests
 fast-system-tests: ## @testing Runs system tests without coverage reports and in parallel
 fast-system-tests: ${BEAT_NAME}.test python-env
-	. ${PYTHON_ENV}/bin/activate; nosetests -w tests/system ${NOSETESTS_OPTIONS}
+	. ${PYTHON_ENV}/bin/activate; nosetests -w tests/system test_json.py:Test.test_simple_json_overwrite ${NOSETESTS_OPTIONS}
 
 # Runs the go based stress tests
 .PHONY: stress-tests

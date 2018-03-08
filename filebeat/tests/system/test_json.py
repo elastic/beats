@@ -129,7 +129,7 @@ class Test(BaseTest):
         output = self.read_output()[0]
         assert output["source"] == "hello"
         assert output["message"] == "test source"
-        assert output["@metadata"]["foo"] == "bar"
+        assert output["@metadata.foo"] == "bar"
 
     def test_json_add_tags(self):
         self.render_config_template(

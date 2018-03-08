@@ -281,10 +281,11 @@ func (h *Harvester) Run() error {
 
 			data.Event = beat.Event{
 				Timestamp: message.Ts,
+				Meta: common.MapStr{},
 			}
 
 			if h.config.JSON != nil && len(jsonFields) > 0 {
-				ts := reader.MergeJSONFields(fields, jsonFields, &text, *h.config.JSON)
+				ts := reader.MergeJSONFields(fields, data.Event.Meta, jsonFields, &text, *h.config.JSON)
 				if !ts.IsZero() {
 					// there was a `@timestamp` key in the event, so overwrite
 					// the resulting timestamp
