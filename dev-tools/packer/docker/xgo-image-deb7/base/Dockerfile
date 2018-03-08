@@ -3,12 +3,9 @@
 #
 # Released under the MIT license.
 
-FROM debian:6
+FROM debian:7
 
 MAINTAINER Tudor Golubenco <tudor@elastic.co>
-
-# Use sources list from the archive
-ADD sources.list /etc/apt/sources.list
 
 # Configure the Go environment, since it's not going to change
 ENV PATH   /usr/local/go/bin:$PATH
@@ -23,7 +20,7 @@ RUN chmod +x $FETCH
 
 # Make sure apt-get is up to date and dependent packages are installed
 RUN \
-  apt-get -o Acquire::Check-Valid-Until=false update && \
+  apt-get update && \
   apt-get install -y automake autogen build-essential ca-certificates \
     gcc-multilib \
     clang llvm-dev  libtool libxml2-dev uuid-dev libssl-dev pkg-config \
