@@ -116,7 +116,7 @@ func MergeJSONFields(data, meta common.MapStr, jsonFields common.MapStr, text *s
 		event := &beat.Event{
 			Timestamp: ts,
 			Fields:    data,
-			Meta: meta,
+			Meta:      meta,
 		}
 		jsontransform.WriteJSONKeys(event, jsonFields, config.OverwriteKeys)
 

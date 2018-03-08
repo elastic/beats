@@ -281,7 +281,7 @@ func (h *Harvester) Run() error {
 
 			data.Event = beat.Event{
 				Timestamp: message.Ts,
-				Meta: common.MapStr{},
+				Meta:      common.MapStr{},
 			}
 
 			if h.config.JSON != nil && len(jsonFields) > 0 {
