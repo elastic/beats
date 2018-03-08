@@ -55,8 +55,10 @@ func newProcessorPipeline(
 
 	needsCopy := global.alwaysCopy || localProcessors != nil || global.processors != nil
 
-	// setup 1: generalize/normalize output (P)
-	processors.add(generalizeProcessor)
+	if !config.SkipNormalization {
+		// setup 1: generalize/normalize output (P)
+		processors.add(generalizeProcessor)
+	}
 
 	// setup 2: add Meta from client config (C)
 	if m := clientMeta; len(m) > 0 {
