@@ -76,7 +76,7 @@ TARGETS_OLD?="linux/amd64 linux/386" ## @building list of Debian6 architecture t
 PACKAGES?=${BEAT_NAME}/deb ${BEAT_NAME}/rpm ${BEAT_NAME}/darwin ${BEAT_NAME}/win ${BEAT_NAME}/bin ## @Building List of OS to be supported by "make package"
 SNAPSHOT?=yes ## @Building If yes, builds a snapshot version
 BEATS_BUILDER_IMAGE?=tudorg/beats-builder ## @Building Name of the docker image to use when packaging the application
-BEATS_BUILDER_DEB6_IMAGE?=tudorg/beats-builder-deb6 ## @Building Name of the docker image to use when packaging the application for Debian 6
+BEATS_BUILDER_DEB_IMAGE?=tudorg/beats-builder-deb7 ## @Building Name of the docker image to use when packaging the application for Debian 7
 
 ifeq ($(DOCKER_CACHE),0)
 	DOCKER_NOCACHE=--no-cache
@@ -437,7 +437,7 @@ prepare-package-cgo:
 		-e BEAT_NAME=${BEAT_NAME} \
 		${BEATS_BUILDER_IMAGE}
 
-	# linux builds on debian 6 for compatibility
+	# linux builds on older debian for compatibility
 	docker run --rm \
 		-v ${BUILD_DIR}:/build \
 		-v $(abspath ${ES_BEATS}/dev-tools/packer/xgo-scripts):/scripts \
@@ -451,7 +451,7 @@ prepare-package-cgo:
 		-e ES_BEATS=${ES_BEATS} \
 		-e BEAT_PATH=${BEAT_PATH} \
 		-e BEAT_NAME=${BEAT_NAME} \
-        ${BEATS_BUILDER_DEB6_IMAGE}
+		${BEATS_BUILDER_DEB_IMAGE}
 
 # Prepares images for packaging
 .PHONY: package-setup

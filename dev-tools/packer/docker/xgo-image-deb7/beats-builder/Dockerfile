@@ -11,7 +11,7 @@ RUN \
 
 # Get libpcap-64 binaries by compiling from source
 RUN \
-	apt-get -o Acquire::Check-Valid-Until=false update && \
+	apt-get update && \
 	apt-get install -y flex bison
 RUN ./fetch.sh http://www.tcpdump.org/release/libpcap-1.8.1.tar.gz 32d7526dde8f8a2f75baf40c01670602aeef7e39 && \
   mkdir -p /libpcap/amd64 && \
