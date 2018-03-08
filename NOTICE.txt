@@ -1,4 +1,3 @@
-
 Elastic Beats
 Copyright 2014-2018 Elasticsearch BV
 
