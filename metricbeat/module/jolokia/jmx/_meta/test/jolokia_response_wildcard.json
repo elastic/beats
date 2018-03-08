@@ -1,0 +1,24 @@
+[
+    {
+        "value": {
+            "Catalina:name=\"http-bio-8080\",type=ThreadPool": {
+                "maxConnections": 200,
+                "port": 8080
+            },
+            "Catalina:name=\"ajp-bio-8009\",type=ThreadPool": {
+                "maxConnections": 200,
+                "port": 8009
+            }
+        },
+        "request": {
+            "type": "read",
+            "attribute": [
+                "port",
+            "maxConnections"
+                ],
+            "mbean": "Catalina:name=*,type=ThreadPool"
+        },
+        "status": 200,
+        "timestamp": 1520469345
+    }
+]

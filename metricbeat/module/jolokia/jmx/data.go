@@ -10,6 +10,10 @@ import (
 	"github.com/elastic/beats/libbeat/common"
 )
 
+const (
+	mbeanEventKey = "mbean"
+)
+
 type Entry struct {
 	Request struct {
 		Mbean string `json:"mbean"`
@@ -70,35 +74,51 @@ type Entry struct {
 //        "status": 200,
 //     }
 //  }
-func eventMapping(content []byte, mapping map[string]string) (common.MapStr, error) {
+func eventMapping(content []byte, mapping map[string]string) ([]common.MapStr, error) {
 	var entries []Entry
 	if err := json.Unmarshal(content, &entries); err != nil {
 		return nil, errors.Wrapf(err, "failed to unmarshal jolokia JSON response '%v'", string(content))
 	}
 
-	event := common.MapStr{}
+	// Generate a different event for each wildcard mbean, and and additional one
+	// for non-wildcard requested mbeans
+	mbeanEvents := make(map[string]common.MapStr)
 	var errs multierror.Errors
 
 	for _, v := range entries {
 		for attribute, value := range v.Value {
-			responseMbean := v.Request.Mbean
-			valuesMbean := map[string]interface{}{attribute: value}
+			if !strings.Contains(v.Request.Mbean, "*") {
+				event, found := mbeanEvents[""]
+				if !found {
+					event = common.MapStr{}
+					mbeanEvents[""] = event
+				}
+				err := parseResponseEntry(v.Request.Mbean, attribute, value, event, mapping)
+				if err != nil {
+					errs = append(errs, err)
+				}
+				continue
+			}
 
 			// If there was a wildcard, we are going to have an additional
 			// nesting level in response values, and attribute here is going
 			// to be actually the matching mbean name
-			if strings.Contains(v.Request.Mbean, "*") {
-				responseMbean = attribute
-				values, ok := value.(map[string]interface{})
-				if !ok {
-					errs = append(errs, errors.Errorf("expected map of values for %s", responseMbean))
-					continue
-				}
-				valuesMbean = values
+			values, ok := value.(map[string]interface{})
+			if !ok {
+				errs = append(errs, errors.Errorf("expected map of values for %s", v.Request.Mbean))
+				continue
 			}
 
-			for attribute, value := range valuesMbean {
-				err := parseResponseEntry(v.Request.Mbean, responseMbean, attribute, value, event, mapping)
+			responseMbean := attribute
+			event, found := mbeanEvents[responseMbean]
+			if !found {
+				event = common.MapStr{}
+				event.Put(mbeanEventKey, responseMbean)
+				mbeanEvents[responseMbean] = event
+			}
+
+			for attribute, value := range values {
+				err := parseResponseEntry(v.Request.Mbean, attribute, value, event, mapping)
 				if err != nil {
 					errs = append(errs, err)
 				}
@@ -106,12 +126,16 @@ func eventMapping(content []byte, mapping map[string]string) (common.MapStr, err
 		}
 	}
 
-	return event, errs.Err()
+	var events []common.MapStr
+	for _, event := range mbeanEvents {
+		events = append(events, event)
+	}
+
+	return events, errs.Err()
 }
 
 func parseResponseEntry(
 	requestMbeanName string,
-	responseMbeanName string, // XXX: mbean not used for event? it can be important for wildcards
 	attributeName string,
 	attibuteValue interface{},
 	event common.MapStr,

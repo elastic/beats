@@ -29,36 +29,73 @@ func TestEventMapper(t *testing.T) {
 		"org.springframework.boot:type=Endpoint,name=metricsEndpoint_Metrics":      "metrics",
 	}
 
-	event, err := eventMapping(jolokiaResponse, mapping)
+	events, err := eventMapping(jolokiaResponse, mapping)
 	assert.Nil(t, err)
 
-	expected := common.MapStr{
-		"uptime": float64(47283),
-		"gc": common.MapStr{
-			"cms_collection_time":  float64(53),
-			"cms_collection_count": float64(1),
-		},
-		"memory": common.MapStr{
-			"heap_usage": map[string]interface{}{
-				"init":      float64(1073741824),
-				"committed": float64(1037959168),
-				"max":       float64(1037959168),
-				"used":      float64(227420472),
+	expected := []common.MapStr{
+		{
+			"uptime": float64(47283),
+			"gc": common.MapStr{
+				"cms_collection_time":  float64(53),
+				"cms_collection_count": float64(1),
 			},
-			"non_heap_usage": map[string]interface{}{
-				"init":      float64(2555904),
-				"committed": float64(53477376),
-				"max":       float64(-1),
-				"used":      float64(50519768),
+			"memory": common.MapStr{
+				"heap_usage": map[string]interface{}{
+					"init":      float64(1073741824),
+					"committed": float64(1037959168),
+					"max":       float64(1037959168),
+					"used":      float64(227420472),
+				},
+				"non_heap_usage": map[string]interface{}{
+					"init":      float64(2555904),
+					"committed": float64(53477376),
+					"max":       float64(-1),
+					"used":      float64(50519768),
+				},
 			},
-		},
-		"metrics": map[string]interface{}{
-			"atomikos_nbTransactions": float64(0),
-			"classes":                 float64(18857),
-			"classes_loaded":          float64(19127),
-			"classes_unloaded":        float64(270),
+			"metrics": map[string]interface{}{
+				"atomikos_nbTransactions": float64(0),
+				"classes":                 float64(18857),
+				"classes_loaded":          float64(19127),
+				"classes_unloaded":        float64(270),
+			},
 		},
 	}
 
-	assert.Equal(t, expected, event)
+	assert.ElementsMatch(t, expected, events)
+}
+
+func TestEventMapperWithWildcard(t *testing.T) {
+	absPath, err := filepath.Abs("./_meta/test")
+
+	assert.NotNil(t, absPath)
+	assert.Nil(t, err)
+
+	jolokiaResponse, err := ioutil.ReadFile(absPath + "/jolokia_response_wildcard.json")
+
+	assert.Nil(t, err)
+
+	var mapping = map[string]string{
+		"Catalina:name=*,type=ThreadPool_port":           "port",
+		"Catalina:name=*,type=ThreadPool_maxConnections": "max_connections",
+	}
+
+	events, err := eventMapping(jolokiaResponse, mapping)
+	assert.Nil(t, err)
+	assert.Equal(t, 2, len(events))
+
+	expected := []common.MapStr{
+		{
+			"mbean":           "Catalina:name=\"http-bio-8080\",type=ThreadPool",
+			"max_connections": float64(200),
+			"port":            float64(8080),
+		},
+		{
+			"mbean":           "Catalina:name=\"ajp-bio-8009\",type=ThreadPool",
+			"max_connections": float64(200),
+			"port":            float64(8009),
+		},
+	}
+
+	assert.ElementsMatch(t, expected, events)
 }

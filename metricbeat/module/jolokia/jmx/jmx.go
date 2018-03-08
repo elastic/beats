@@ -1,6 +1,8 @@
 package jmx
 
 import (
+	"github.com/joeshaw/multierror"
+
 	"github.com/elastic/beats/libbeat/common"
 	"github.com/elastic/beats/libbeat/logp"
 	"github.com/elastic/beats/metricbeat/helper"
@@ -82,7 +84,7 @@ func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
 }
 
 // Fetch methods implements the data gathering and data conversion to the right format
-func (m *MetricSet) Fetch() (common.MapStr, error) {
+func (m *MetricSet) Fetch() ([]common.MapStr, error) {
 	body, err := m.http.FetchContent()
 	if err != nil {
 		return nil, err
@@ -93,16 +95,19 @@ func (m *MetricSet) Fetch() (common.MapStr, error) {
 			"host", m.HostData().Host, "body", string(body), "type", "response")
 	}
 
-	event, err := eventMapping(body, m.mapping)
+	events, err := eventMapping(body, m.mapping)
 	if err != nil {
 		return nil, err
 	}
 
 	// Set dynamic namespace.
-	_, err = event.Put(mb.NamespaceKey, m.namespace)
-	if err != nil {
-		return nil, err
+	var errs multierror.Errors
+	for _, event := range events {
+		_, err = event.Put(mb.NamespaceKey, m.namespace)
+		if err != nil {
+			errs = append(errs, err)
+		}
 	}
 
-	return event, nil
+	return events, errs.Err()
 }
