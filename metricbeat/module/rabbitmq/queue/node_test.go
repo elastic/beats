@@ -68,6 +68,9 @@ func TestFetchEventContents(t *testing.T) {
 	assert.EqualValues(t, 3, unacknowledged["count"])
 	assert.EqualValues(t, 73, persistent["count"])
 
+	unacknowledgedDetails := unacknowledged["details"].(common.MapStr)
+	assert.EqualValues(t, 0.5, unacknowledgedDetails["rate"])
+
 	disk := event["disk"].(common.MapStr)
 	reads := disk["reads"].(common.MapStr)
 	writes := disk["writes"].(common.MapStr)
