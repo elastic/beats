@@ -13,12 +13,19 @@ import (
 	"github.com/elastic/beats/metricbeat/mb"
 )
 
+// CounterConfig for perfmon counters.
 type CounterConfig struct {
 	InstanceLabel    string `config:"instance_label" validate:"required"`
 	InstanceName     string `config:"instance_name"`
 	MeasurementLabel string `config:"measurement_label" validate:"required"`
 	Query            string `config:"query" validate:"required"`
 	Format           string `config:"format"`
+}
+
+// Config for the windows perfmon metricset.
+type Config struct {
+	IgnoreNECounters bool            `config:"perfmon.ignore_non_existent_counters"`
+	CounterConfig    []CounterConfig `config:"perfmon.counters" validate:"required"`
 }
 
 func init() {
@@ -36,9 +43,7 @@ type MetricSet struct {
 func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
 	cfgwarn.Beta("The perfmon metricset is beta")
 
-	config := struct {
-		CounterConfig []CounterConfig `config:"perfmon.counters" validate:"required"`
-	}{}
+	config := Config{}
 
 	if err := base.Module().UnpackConfig(&config); err != nil {
 		return nil, err
@@ -57,7 +62,7 @@ func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
 
 	}
 
-	reader, err := NewPerfmonReader(config.CounterConfig)
+	reader, err := NewPerfmonReader(config)
 	if err != nil {
 		return nil, errors.Wrap(err, "initialization failed")
 	}
