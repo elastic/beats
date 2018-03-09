@@ -171,6 +171,11 @@ func Bool(key string, opts ...schema.SchemaOption) schema.Conv {
 	return schema.SetOptions(schema.Conv{Key: key, Func: toBool}, opts)
 }
 
+// Float creates a Conv object for parsing floats
+func Float(key string, opts ...schema.SchemaOption) schema.Conv {
+	return schema.SetOptions(schema.Conv{Key: key, Func: toInteger}, opts)
+}
+
 func toInteger(key string, data map[string]interface{}) (interface{}, error) {
 	emptyIface, exists := data[key]
 	if !exists {

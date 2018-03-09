@@ -36,6 +36,9 @@ var (
 			},
 			"unacknowledged": s.Object{
 				"count": c.Int("messages_unacknowledged"),
+				"details": c.Dict("messages_unacknowledged_details", s.Schema{
+					"rate": c.Float("rate"),
+				}),
 			},
 			"persistent": s.Object{
 				"count": c.Int("messages_persistent"),
