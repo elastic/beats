@@ -6,8 +6,9 @@ performance counters.
 
 You must configure queries for the Windows performance counters that you wish
 to collect. The example below collects processor time and disk writes.
-With `format` you can set the output format for a specific counter. Possible values are
-`float` and `long`. If nothing is selected the default value is `float`.
+`ignore_non_existent_counters` ignores failures for non-existent counters without
+to interrupt the service. With `format` you can set the output format for a specific counter.
+Possible values are `float` and `long`. If nothing is selected the default value is `float`.
 With `instance_name`, you can specify the name of the instance. Use this setting when:
 - You want to use an instance name that is different from the computed name. For example, `Total` instead of `_Total`.
 - You specify a counter that has no instance. For example, `\TCPIP Performance Diagnostics\IPv4 NBLs/sec indicated without prevalidation`.
@@ -19,6 +20,7 @@ For wildcard queries this setting has no effect.
 - module: windows
   metricsets: ["perfmon"]
   period: 10s
+  perfmon.ignore_non_existent_counters: true
   perfmon.counters:
     - instance_label: "processor.name"
       instance_name: "Total"
