@@ -107,7 +107,7 @@ func TestExistingCounter(t *testing.T) {
 }
 
 func TestNonExistingCounter(t *testing.T) {
-	config := PerfmonConfig{
+	config := Config{
 		CounterConfig: make([]CounterConfig, 1),
 	}
 	config.CounterConfig[0].InstanceLabel = "processor.name"
