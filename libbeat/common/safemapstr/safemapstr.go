@@ -28,10 +28,10 @@ func Put(data common.MapStr, key string, value interface{}) error {
 	if len(keyParts) == 1 {
 		oldValue, exists := data[key]
 		if exists {
-			switch oldValue.(type) {
-			case common.MapStr:
+			oldMap, ok := tryToMapStr(oldValue)
+			if ok {
 				// This would replace a whole object, change its key to avoid that:
-				oldValue.(common.MapStr)[alternativeKey] = value
+				oldMap[alternativeKey] = value
 				return nil
 			}
 		}
