@@ -55,12 +55,10 @@ func TestGenerateHints(t *testing.T) {
 						"runtime": "rkt",
 					},
 				},
-				"rkt": common.MapStr{
-					"container": common.MapStr{
-						"name":    "foobar",
-						"id":      "abc",
-						"runtime": "rkt",
-					},
+				"container": common.MapStr{
+					"name":    "foobar",
+					"id":      "abc",
+					"runtime": "rkt",
 				},
 			},
 		},
@@ -112,12 +110,10 @@ func TestGenerateHints(t *testing.T) {
 						"period": "15s",
 					},
 				},
-				"docker": common.MapStr{
-					"container": common.MapStr{
-						"name":    "foobar",
-						"id":      "abc",
-						"runtime": "docker",
-					},
+				"container": common.MapStr{
+					"name":    "foobar",
+					"id":      "abc",
+					"runtime": "docker",
 				},
 			},
 		},

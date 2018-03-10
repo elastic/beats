@@ -111,7 +111,7 @@ func (p *Provider) emitEvents(pod *kubernetes.Pod, flag string, containers []kub
 	containerstatuses []kubernetes.PodContainerStatus) {
 	host := pod.Status.PodIP
 
-	// Collect all container IDs and runtimes from status information. Kubernetes has both docker and rkt
+	// Collect all container IDs and runtimes from status information.
 	containerIDs := map[string]string{}
 	runtimes := map[string]string{}
 	for _, c := range containerstatuses {
@@ -207,14 +207,10 @@ func (p *Provider) generateHints(event bus.Event) bus.Event {
 
 	if rawCont, ok := kubeMeta["container"]; ok {
 		container = rawCont.(common.MapStr)
-		// This would end up adding a docker|rkt.container entry into the event. This would make sure
+		// This would end up adding a runtime entry into the event. This would make sure
 		// that there is not an attempt to spin up a docker input for a rkt container and when a
 		// rkt input exists it would be natively supported.
-		if runtime, ok := container["runtime"]; ok {
-			e[runtime.(string)] = common.MapStr{
-				"container": container,
-			}
-		}
+		e["container"] = container
 	}
 
 	cname := builder.GetContainerName(container)
