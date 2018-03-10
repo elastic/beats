@@ -30,9 +30,15 @@ var (
 		"messages": s.Object{
 			"total": s.Object{
 				"count": c.Int("messages"),
+				"details": c.Dict("messages_details", s.Schema{
+					"rate": c.Float("rate"),
+				}),
 			},
 			"ready": s.Object{
 				"count": c.Int("messages_ready"),
+				"details": c.Dict("messages_ready_details", s.Schema{
+					"rate": c.Float("rate"),
+				}),
 			},
 			"unacknowledged": s.Object{
 				"count": c.Int("messages_unacknowledged"),
