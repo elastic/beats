@@ -32,7 +32,7 @@ type MetricSet struct {
 func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
 	cfgwarn.Experimental("The kubernetes event metricset is experimental")
 
-	config := defaultKuberentesEventsConfig()
+	config := defaultKubernetesEventsConfig()
 
 	err := base.Module().UnpackConfig(&config)
 	if err != nil {
