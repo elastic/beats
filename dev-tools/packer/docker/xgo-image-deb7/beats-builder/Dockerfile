@@ -1,8 +1,4 @@
-<<<<<<< HEAD:dev-tools/packer/docker/xgo-image-deb6/beats-builder/Dockerfile
-FROM tudorg/xgo-deb6-1.9.2
-=======
-FROM tudorg/xgo-deb7-1.9.4
->>>>>>> cefe024e4... update build image from debian 6 to 7 (#6508):dev-tools/packer/docker/xgo-image-deb7/beats-builder/Dockerfile
+FROM tudorg/xgo-deb7-1.9.2
 
 MAINTAINER Tudor Golubenco <tudor@elastic.co>
 
