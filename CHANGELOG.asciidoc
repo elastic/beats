@@ -42,6 +42,8 @@ https://github.com/elastic/beats/compare/v6.2.2...6.2[Check the HEAD diff]
 
 *Metricbeat*
 
+- Fix Kubernetes overview dashboard views for non default time ranges. {issue}6395{6395}
+
 *Packetbeat*
 
 *Winlogbeat*
@@ -275,16 +277,6 @@ https://github.com/elastic/beats/compare/v6.0.1...v6.1.0[View commits]
 - Fix `ProcState` on Linux and FreeBSD when process names contain parentheses. {pull}5775[5775]
 - Fix incorrect `Mem.Used` calculation under linux. {pull}5775[5775]
 - Fix `open_file_descriptor_count` and `max_file_descriptor_count` lost in zookeeper module {pull}5902[5902]
-- Fix kubernetes `state_pod` `status.phase` so that the active phase is returned instead of `unknown`. {pull}5980[5980]
-- Fix error collecting network_names in Vsphere module. {pull}5962[5962]
-- Fix process cgroup memory metrics for memsw, kmem, and kmem_tcp. {issue}6033[6033]
-- Fix kafka OffsetFetch request missing topic and partition parameters. {pull}5880[5880]
-- Change kubernetes.node.cpu.allocatable.cores to float. {pull}6130[6130]
-- Fix system process metricset for kernel processes. {issue}5700[5700]
-- Fix panic in http dependent modules when invalid config was used.
-- Fix system.filesystem.used.pct value to match what df reports. {issue}5494[5494]
-- Fix namespace disambiguation in Kubernetes state_* metricsets. {issue}6281[6281]
-- Fix Kubernetes overview dashboard views for non default time ranges. {issue}6395{6395}
 
 *Packetbeat*
 
