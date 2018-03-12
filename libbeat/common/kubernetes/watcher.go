@@ -152,17 +152,14 @@ func (p *podWatcher) watch() {
 			_, apiPod, err := watcher.Next()
 			if err != nil {
 				logp.Err("kubernetes: Watching API error %v", err)
+				watcher.Close()
 
-				// In case of EOF, stop watching and restart the process
-				if err == io.EOF || err == io.ErrUnexpectedEOF {
-					watcher.Close()
-					backoff(failures)
-					failures++
-					break
+				if !(err == io.EOF || err == io.ErrUnexpectedEOF) {
+					// This is an error event which can be recovered by moving to the latest resource verison
+					logp.Info("kubernetes: Ignoring event, moving to most recent resource version")
+					p.lastResourceVersion = ""
 				}
-
-				// Otherwise, this is probably an unknown event (unmarshal error), ignore it
-				continue
+				break
 			}
 
 			// Update last resource version and reset failure counter

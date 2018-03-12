@@ -33,6 +33,7 @@ https://github.com/elastic/beats/compare/v6.2.2...6.2[Check the HEAD diff]
 *Affecting all Beats*
 
 - Avoid panic errors when processing nil Pod events in add_kubernetes_metadata. {issue}6372[6372]
+- Fix infinite failure on Kubernetes watch {pull}6504[6504]
 
 *Auditbeat*
 
