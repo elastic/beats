@@ -33,6 +33,7 @@ https://github.com/elastic/beats/compare/v6.2.2...6.2[Check the HEAD diff]
 *Affecting all Beats*
 
 - Avoid panic errors when processing nil Pod events in add_kubernetes_metadata. {issue}6372[6372]
+- Fix infinite failure on Kubernetes watch {pull}6504[6504]
 
 *Auditbeat*
 
@@ -261,6 +262,16 @@ https://github.com/elastic/beats/compare/v6.0.1...v6.1.0[View commits]
 - Fix console color output for Windows. {issue}5611[5611]
 - Fix logstash output debug message. {pull}5799{5799]
 - Fix isolation of modules when merging local and global field settings. {issue}5795[5795]
+
+*Auditbeat*
+
+- Add an error check to the file integrity scanner to prevent a panic when
+  there is an error reading file info via lstat. {issue}6005[6005]
+- Fixed an issue where the proctitle value was being truncated.
+- Fixed an issue where values were incorrectly interpretted as hex data.
+- Fixed parsing of the `key` value when multiple keys are present.
+- Fix possible resource leak if file_integrity module is used with config
+  reloading on Windows or Linux. {pull}6198[6198]
 
 *Filebeat*
 
