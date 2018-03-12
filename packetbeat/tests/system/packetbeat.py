@@ -72,7 +72,7 @@ class BaseTest(TestCase):
         return actual_exit_code
 
     def start_packetbeat(self,
-                         cmd="../../packetbeat.test",
+                         cmd=None,
                          config="packetbeat.yml",
                          output="packetbeat.log",
                          extra_args=[],
@@ -82,6 +82,9 @@ class BaseTest(TestCase):
         caller is responsible for stopping / waiting for the
         Proc instance.
         """
+        if cmd is None:
+            cmd = self.beat_path + "/packetbeat.test"
+
         args = [cmd,
                 "-e",
                 "-c", os.path.join(self.working_dir, config),
