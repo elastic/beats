@@ -42,6 +42,8 @@ https://github.com/elastic/beats/compare/v6.2.2...6.2[Check the HEAD diff]
 
 *Metricbeat*
 
+- Fix Kubernetes overview dashboard views for non default time ranges. {issue}6395{6395}
+
 *Packetbeat*
 
 *Winlogbeat*
