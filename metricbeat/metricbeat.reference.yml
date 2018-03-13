@@ -222,6 +222,7 @@ metricbeat.modules:
   #method: "GET"
   #request.enabled: false
   #response.enabled: false
+  #json.is_array: false
   #dedot.enabled: false
 
 - module: http
