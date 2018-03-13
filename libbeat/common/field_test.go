@@ -68,7 +68,7 @@ func TestDynamicYaml(t *testing.T) {
 	}{
 		{
 			input: []byte(`
-name: test 
+name: test
 dynamic: true`),
 			output: Field{
 				Name:    "test",
@@ -113,5 +113,62 @@ dynamic: "strict"`),
 		} else {
 			assert.Equal(t, test.output.Dynamic, keys.Dynamic)
 		}
+	}
+}
+
+func TestGetKeys(t *testing.T) {
+	tests := []struct {
+		fields Fields
+		keys   []string
+	}{
+		{
+			fields: Fields{
+				Field{
+					Name: "test", Fields: Fields{
+						Field{
+							Name: "find",
+						},
+					},
+				},
+			},
+			keys: []string{"test.find"},
+		},
+		{
+			fields: Fields{
+				Field{
+					Name: "a", Fields: Fields{
+						Field{
+							Name: "b",
+						},
+					},
+				},
+				Field{
+					Name: "a", Fields: Fields{
+						Field{
+							Name: "c",
+						},
+					},
+				},
+			},
+			keys: []string{"a.b", "a.c"},
+		},
+		{
+			fields: Fields{
+				Field{
+					Name: "a",
+				},
+				Field{
+					Name: "b",
+				},
+				Field{
+					Name: "c",
+				},
+			},
+			keys: []string{"a", "b", "c"},
+		},
+	}
+
+	for _, test := range tests {
+		assert.Equal(t, test.keys, test.fields.GetKeys())
 	}
 }
