@@ -83,6 +83,6 @@ setup.template.settings:
   _source.enabled: false
 ----------------------------------------------------------------------
 
-*`setup.template.append_fields`*:: A list of of fields to be added to the template and Kibana index pattern.
+*`setup.template.append_fields`*:: A list of of fields to be added to the template and Kibana index pattern. experimental[]
 
 NOTE: With append_fields only new fields can be added an no existing one overwritten or changed. This is especially useful if data is collected through the http/json metricset where the data structure is not known in advance. Changing the config of append_fields means the template has to be overwritten and only applies to new indices. If there are 2 Beats with different append_fields configs the last one writing the template will win. Any changes will also have an affect on the Kibana Index pattern.
