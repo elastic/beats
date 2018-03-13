@@ -6,6 +6,7 @@ import (
 	"github.com/docker/docker/api/types"
 
 	"github.com/elastic/beats/libbeat/common"
+	"github.com/elastic/beats/libbeat/common/safemapstr"
 )
 
 type Container struct {
@@ -48,14 +49,12 @@ func ExtractContainerName(names []string) string {
 }
 
 // DeDotLabels returns a new common.MapStr containing a copy of the labels
-// where the dots in each label name have been changed to an underscore.
+// where the dots have been converted into nested structure, avoiding
+// possible mapping errors
 func DeDotLabels(labels map[string]string) common.MapStr {
 	outputLabels := common.MapStr{}
 	for k, v := range labels {
-		// This is necessary so that ES does not interpret '.' fields as new
-		// nested JSON objects, and also makes this compatible with ES 2.x.
-		label := common.DeDot(k)
-		outputLabels.Put(label, v)
+		safemapstr.Put(outputLabels, k, v)
 	}
 
 	return outputLabels

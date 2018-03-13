@@ -30,8 +30,8 @@ func eventMapping(image *types.ImageSummary) common.MapStr {
 		},
 		"tags": image.RepoTags,
 	}
-	labels := docker.DeDotLabels(image.Labels)
-	if len(labels) > 0 {
+	if len(image.Labels) > 0 {
+		labels := docker.DeDotLabels(image.Labels)
 		event["labels"] = labels
 	}
 	return event
