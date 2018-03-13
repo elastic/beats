@@ -88,6 +88,7 @@ https://github.com/elastic/beats/compare/v6.0.0-beta2...master[Check the HEAD di
 - Fix for kafka logger. {pull}6430[6430]
 - Remove double slashes in Windows service script. {pull}6491[6491]
 - Fix infinite failure on Kubernetes watch {pull}6504[6504]
+- Ensure Kubernetes labels/annotations don't break mapping {pull}6490[6490]
 
 *Auditbeat*
 
