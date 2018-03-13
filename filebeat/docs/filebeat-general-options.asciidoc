@@ -37,6 +37,8 @@ That means in case there are some states where the TTL expired, these are only r
 
 The permissions mask to apply on registry file. The default value is 0600. The permissions option must be a valid Unix-style file permissions mask expressed in octal notation. In Go, numbers in octal notation must start with 0.
 
+This option is not supported on Windows.
+
 Examples:
 
     0644: give read and write access to the file owner, and read access to all others.

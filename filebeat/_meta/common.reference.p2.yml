@@ -263,6 +263,7 @@ filebeat.inputs:
 
 # The permissions mask to apply on registry file. The default value is 0600.
 # Must be a valid Unix-style file permissions mask expressed in octal notation.
+# This option is not supported on Windows.
 #filebeat.registry_file_permissions: 0600
 
 # These config files must have the full filebeat config part inside, but only
