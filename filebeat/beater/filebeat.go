@@ -118,6 +118,13 @@ func New(b *beat.Beat, rawConfig *common.Config) (beat.Beater, error) {
 		moduleRegistry: moduleRegistry,
 	}
 
+	dynamicConfig := cfgfile.DefaultDynamicConfig
+	fb.config.ConfigModules.Unpack(&dynamicConfig)
+
+	if config.ConfigModules.Enabled() && moduleRegistry.Empty() && !dynamicConfig.Reload.Enabled && config.Autodiscover == nil {
+		return nil, errors.New("modules feature configured but no modules are enabled and configuration reloading is disabled")
+	}
+
 	// register `setup` callback for ML jobs
 	b.SetupMLCallback = func(b *beat.Beat) error {
 		return fb.loadModulesML(b)

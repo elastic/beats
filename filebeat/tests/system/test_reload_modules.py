@@ -170,6 +170,7 @@ class Test(BaseTest):
         self.render_config_template(
             reload_path=self.working_dir + "/configs/*.yml",
             reload_type="modules",
+            reload=True,
             inputs=False,
         )
 

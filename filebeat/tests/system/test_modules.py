@@ -70,6 +70,29 @@ class Test(BaseTest):
                         test_file=test_file,
                         cfgfile=cfgfile)
 
+    def test_shutdown_no_modules(self):
+        """
+        In case modules are configured but no modules are enabled filebeat must shut down and report an error
+        """
+
+        self.init()
+        cfgfile = os.path.join(self.working_dir, "filebeat.yml")
+        self.render_config_template(
+            template_name="filebeat_modules",
+            output=cfgfile,
+            index_name=self.index_name,
+            elasticsearch_url=self.elasticsearch_url
+        )
+
+        filebeat = self.start_beat()
+
+        self.wait_until(
+            lambda: self.log_contains(
+                "modules feature configured but no modules are enabled and configuration reloading is disabled"),
+            max_timeout=10)
+
+        filebeat.check_wait(exit_code=1)
+
     def _test_expected_events(self, module, test_file, res, objects):
         with open(test_file + "-expected.json", "r") as f:
             expected = json.load(f)
