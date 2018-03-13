@@ -7,10 +7,11 @@ import (
 	"time"
 	"unsafe"
 
-	mbtest "github.com/elastic/beats/metricbeat/mb/testing"
-
 	"github.com/pkg/errors"
 	"github.com/stretchr/testify/assert"
+
+	"github.com/elastic/beats/metricbeat/mb"
+	mbtest "github.com/elastic/beats/metricbeat/mb/testing"
 )
 
 const processorTimeCounter = `\Processor Information(_Total)\% Processor Time`
@@ -38,16 +39,20 @@ func TestData(t *testing.T) {
 		},
 	}
 
-	f := mbtest.NewEventsFetcher(t, config)
-
-	f.Fetch()
-
+	ms := mbtest.NewReportingMetricSetV2(t, config)
+	mbtest.ReportingFetchV2(ms)
 	time.Sleep(60 * time.Millisecond)
 
-	err := mbtest.WriteEvents(f, t)
-	if err != nil {
-		t.Fatal("write", err)
+	events, errs := mbtest.ReportingFetchV2(ms)
+	if len(errs) > 0 {
+		t.Fatal(errs)
 	}
+	if len(events) == 0 {
+		t.Fatal("no events received")
+	}
+
+	beatEvent := mbtest.StandardizeEvent(ms, events[0], mb.AddMetricSetInfo)
+	mbtest.WriteEventToDataJSON(t, beatEvent)
 }
 
 func TestQuery(t *testing.T) {
@@ -306,7 +311,7 @@ func TestWildcardQuery(t *testing.T) {
 		t.Fatal(err)
 	}
 
-	pctKey, err := values[0].HasKey("processor.time.pct")
+	pctKey, err := values[0].MetricSetFields.HasKey("processor.time.pct")
 	if err != nil {
 		t.Fatal(err)
 	}
