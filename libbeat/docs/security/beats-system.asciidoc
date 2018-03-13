@@ -1,6 +1,6 @@
 [role="xpack"]
 [[beats-system-user]]
-=== Configuring the Built-In User for {beatname_uc}
+=== Configuring the built-in user for {beatname_uc}
 
 {security} provides built-in user credentials in {es} that have a fixed set of
 privileges. In 6.3.0 and later releases, there is a `beats_system` built-in user,

@@ -1,6 +1,6 @@
 [role="xpack"]
 [[beats-basic-auth]]
-=== Configuring Authentication Credentials for {beatname_uc}
+=== Configuring authentication credentials for {beatname_uc}
 
 When sending data to a secured cluster through the `elasticsearch`
 output, {beatname_uc} must either provide basic authentication credentials
