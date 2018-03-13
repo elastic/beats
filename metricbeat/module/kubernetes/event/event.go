@@ -7,6 +7,7 @@ import (
 	"github.com/elastic/beats/libbeat/common"
 	"github.com/elastic/beats/libbeat/common/cfgwarn"
 	"github.com/elastic/beats/libbeat/common/kubernetes"
+	"github.com/elastic/beats/libbeat/common/safemapstr"
 	"github.com/elastic/beats/metricbeat/mb"
 )
 
@@ -105,7 +106,7 @@ func generateMapStrFromEvent(eve *kubernetes.Event) common.MapStr {
 	if len(eve.Metadata.Labels) != 0 {
 		labels := make(common.MapStr, len(eve.Metadata.Labels))
 		for k, v := range eve.Metadata.Labels {
-			labels[common.DeDot(k)] = v
+			safemapstr.Put(labels, k, v)
 		}
 
 		eventMeta["labels"] = labels
@@ -114,7 +115,7 @@ func generateMapStrFromEvent(eve *kubernetes.Event) common.MapStr {
 	if len(eve.Metadata.Annotations) != 0 {
 		annotations := make(common.MapStr, len(eve.Metadata.Annotations))
 		for k, v := range eve.Metadata.Annotations {
-			annotations[common.DeDot(k)] = v
+			safemapstr.Put(annotations, k, v)
 		}
 
 		eventMeta["annotations"] = annotations
