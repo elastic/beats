@@ -50,6 +50,10 @@ type ClientConfig struct {
 	// Events configures callbacks for common client callbacks
 	Events ClientEventer
 
+	// By default events are normalized within processor pipeline,
+	// if the normalization step should be skipped set this to true.
+	SkipNormalization bool
+
 	// ACK handler strategies.
 	// Note: ack handlers are run in another go-routine owned by the publisher pipeline.
 	//       They should not block for to long, to not block the internal buffers for
