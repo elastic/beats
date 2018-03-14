@@ -195,6 +195,9 @@ func (h *Harvester) Run() error {
 	// This routine is also responsible to properly stop the reader
 	go func(source string) {
 
+		defer h.log.Close()
+		defer h.stop()
+
 		tickerChan := make(<-chan time.Time)
 		closeTimeout := make(<-chan time.Time)
 
@@ -215,7 +218,7 @@ func (h *Harvester) Run() error {
 			case <-tickerChan:
 
 				if err := h.log.closeChecks(); err != nil {
-					logp.Info("Closing harvester because close_timeout was reached: %s", source)
+					h.logErrorReason(err)
 					break OuterLoop
 				}
 			// Applies when close_timeout is reached
@@ -228,8 +231,6 @@ func (h *Harvester) Run() error {
 			}
 		}
 
-		h.stop()
-		h.log.Close()
 	}(h.state.Source)
 
 	logp.Info("Harvester started for file: %s", h.state.Source)
@@ -243,24 +244,7 @@ func (h *Harvester) Run() error {
 
 		message, err := h.reader.Next()
 		if err != nil {
-			switch err {
-			case ErrFileTruncate:
-				logp.Info("File was truncated. Begin reading file from offset 0: %s", h.state.Source)
-				h.state.Offset = 0
-				filesTruncated.Add(1)
-			case ErrRemoved:
-				logp.Info("File was removed: %s. Closing because close_removed is enabled.", h.state.Source)
-			case ErrRenamed:
-				logp.Info("File was renamed: %s. Closing because close_renamed is enabled.", h.state.Source)
-			case ErrClosed:
-				logp.Info("Reader was closed: %s. Closing.", h.state.Source)
-			case io.EOF:
-				logp.Info("End of file reached: %s. Closing because close_eof is enabled.", h.state.Source)
-			case ErrInactive:
-				logp.Info("File is inactive: %s. Closing because close_inactive of %v reached.", h.state.Source, h.config.CloseInactive)
-			default:
-				logp.Err("Read line error: %s; File: ", err, h.state.Source)
-			}
+			h.logErrorReason(err)
 			return nil
 		}
 
@@ -327,6 +311,27 @@ func (h *Harvester) Run() error {
 
 		// Update state of harvester as successfully sent
 		h.state = state
+	}
+}
+
+func (h *Harvester) logErrorReason(err error) {
+	switch err {
+	case ErrFileTruncate:
+		logp.Info("File was truncated. Begin reading file from offset 0: %s", h.state.Source)
+		h.state.Offset = 0
+		filesTruncated.Add(1)
+	case ErrRemoved:
+		logp.Info("File was removed: %s. Closing because close_removed is enabled.", h.state.Source)
+	case ErrRenamed:
+		logp.Info("File was renamed: %s. Closing because close_renamed is enabled.", h.state.Source)
+	case ErrClosed:
+		logp.Info("Reader was closed: %s. Closing.", h.state.Source)
+	case io.EOF:
+		logp.Info("End of file reached: %s. Closing because close_eof is enabled.", h.state.Source)
+	case ErrInactive:
+		logp.Info("File is inactive: %s. Closing because close_inactive of %v reached.", h.state.Source, h.config.CloseInactive)
+	default:
+		logp.Err("Read line error: %s; File: ", err, h.state.Source)
 	}
 }
 

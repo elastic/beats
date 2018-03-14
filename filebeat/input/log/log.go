@@ -60,8 +60,10 @@ func (f *Log) Read(buf []byte) (int, error) {
 
 		n, err := f.fs.Read(buf)
 		if n > 0 {
+			f.closeMutex.Lock()
 			f.offset += int64(n)
 			f.lastTimeRead = time.Now()
+			f.closeMutex.Unlock()
 		}
 		totalN += n
 
