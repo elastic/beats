@@ -24,8 +24,8 @@ information, see
 To configure {beatname_uc} to collect and send monitoring metrics:
 
 . Create a user that has appropriate authority to send system-level monitoring
-data to {es}. For example, you can use the built-in `logstash_system` user or
-assign the built-in `logstash_system` role to another user. For more
+data to {es}. For example, you can use the built-in `beats_system` user or
+assign the built-in `beats_system` role to another user. For more
 information, see
 {xpack-ref}/setting-up-authentication.html[Setting Up User Authentication] and
 {xpack-ref}/built-in-roles.html[Built-in Roles].
@@ -51,8 +51,8 @@ xpack.monitoring:
   enabled: true
   elasticsearch:
     hosts: ["https://example.com:9200", "https://example2.com:9200"]
-    username: elastic
-    password: changeme
+    username: beats_system
+    password: beatspassword
 --------------------
 
 --
