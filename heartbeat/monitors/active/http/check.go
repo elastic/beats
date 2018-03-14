@@ -91,7 +91,7 @@ func checkBody(body []match.Matcher) RespCheck {
 			return err
 		}
 		for _, m := range body {
-			if m.MatchString(string(content)) {
+			if m.Match(content) {
 				return nil
 			}
 		}
