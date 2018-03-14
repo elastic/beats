@@ -27,6 +27,9 @@ func (c *Container) ToMapStr() common.MapStr {
 	return m
 }
 
+// NewContainer converts Docker API container to an internal structure, it applies
+// dedot to container labels if dedot is true, or stores them in a nested way if it's
+// false
 func NewContainer(container *types.Container, dedot bool) *Container {
 	return &Container{
 		ID:     container.ID,

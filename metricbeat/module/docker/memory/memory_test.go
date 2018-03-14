@@ -69,7 +69,7 @@ func TestMemoryService_GetMemoryStats(t *testing.T) {
 		},
 	}
 	//WHEN
-	rawStats := memoryService.GetMemoryStats(memoryRawStats, false)
+	rawStats := memoryService.getMemoryStats(memoryRawStats, false)
 	event := eventMapping(&rawStats)
 	//THEN
 	assert.True(t, equalEvent(expectedEvent, event))

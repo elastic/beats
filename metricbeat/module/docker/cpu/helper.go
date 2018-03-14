@@ -33,13 +33,13 @@ func (c *CPUService) getCPUStatsList(rawStats []docker.Stat, dedot bool) []CPUSt
 	formattedStats := []CPUStats{}
 
 	for _, stats := range rawStats {
-		formattedStats = append(formattedStats, c.getCpuStats(&stats, dedot))
+		formattedStats = append(formattedStats, c.getCPUStats(&stats, dedot))
 	}
 
 	return formattedStats
 }
 
-func (c *CPUService) getCpuStats(myRawStat *docker.Stat, dedot bool) CPUStats {
+func (c *CPUService) getCPUStats(myRawStat *docker.Stat, dedot bool) CPUStats {
 	return CPUStats{
 		Time:                        common.Time(myRawStat.Stats.Read),
 		Container:                   docker.NewContainer(myRawStat.Container, dedot),

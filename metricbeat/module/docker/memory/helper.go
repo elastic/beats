@@ -22,13 +22,13 @@ type MemoryService struct{}
 func (s *MemoryService) getMemoryStatsList(rawStats []docker.Stat, dedot bool) []MemoryData {
 	formattedStats := []MemoryData{}
 	for _, myRawStats := range rawStats {
-		formattedStats = append(formattedStats, s.GetMemoryStats(myRawStats, dedot))
+		formattedStats = append(formattedStats, s.getMemoryStats(myRawStats, dedot))
 	}
 
 	return formattedStats
 }
 
-func (s *MemoryService) GetMemoryStats(myRawStat docker.Stat, dedot bool) MemoryData {
+func (s *MemoryService) getMemoryStats(myRawStat docker.Stat, dedot bool) MemoryData {
 	totalRSS := myRawStat.Stats.MemoryStats.Stats["total_rss"]
 	return MemoryData{
 		Time:      common.Time(myRawStat.Stats.Read),
