@@ -402,23 +402,6 @@ separate copyright notices and license terms. Your use of these
 subcomponents is subject to the terms and conditions of the 
 subcomponent's license, as noted in the LICENSE file.
 --------------------------------------------------------------------
-Dependency: github.com/elastic/procfs
-Revision: 664e6bc79eb43c956507b6e20a867140516ad15a
-License type (autodetected): Apache-2.0
-./vendor/github.com/elastic/procfs/LICENSE:
---------------------------------------------------------------------
-Apache License 2.0
-
--------NOTICE-----
-procfs provides functions to retrieve system, kernel and process
-metrics from the pseudo-filesystem proc.
-
-Copyright 2014-2015 The Prometheus Authors
-
-This product includes software developed at
-SoundCloud Ltd. (http://soundcloud.com/).
-
---------------------------------------------------------------------
 Dependency: github.com/ericchiang/k8s
 Version: v1.0.0
 Revision: 5912993f00cb7c971aaa54529a06bd3eecd6c3d4
@@ -2752,6 +2735,23 @@ Apache License 2.0
 -------NOTICE-----
 Common libraries shared by Prometheus Go components.
 Copyright 2015 The Prometheus Authors
+
+This product includes software developed at
+SoundCloud Ltd. (http://soundcloud.com/).
+
+--------------------------------------------------------------------
+Dependency: github.com/prometheus/procfs
+Revision: 54d17b57dd7d4a3aa092476596b3f8a933bde349
+License type (autodetected): Apache-2.0
+./vendor/github.com/prometheus/procfs/LICENSE:
+--------------------------------------------------------------------
+Apache License 2.0
+
+-------NOTICE-----
+procfs provides functions to retrieve system, kernel and process
+metrics from the pseudo-filesystem proc.
+
+Copyright 2014-2015 The Prometheus Authors
 
 This product includes software developed at
 SoundCloud Ltd. (http://soundcloud.com/).
