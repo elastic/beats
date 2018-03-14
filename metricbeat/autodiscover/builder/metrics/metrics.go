@@ -10,6 +10,7 @@ import (
 	"github.com/elastic/beats/libbeat/autodiscover/template"
 	"github.com/elastic/beats/libbeat/common"
 	"github.com/elastic/beats/libbeat/common/bus"
+	"github.com/elastic/beats/libbeat/common/cfgwarn"
 	"github.com/elastic/beats/libbeat/logp"
 	"github.com/elastic/beats/metricbeat/mb"
 )
@@ -37,6 +38,7 @@ type metricAnnotations struct {
 
 // NewMetricAnnotations builds a new metrics annotation builder
 func NewMetricAnnotations(cfg *common.Config) (autodiscover.Builder, error) {
+	cfgwarn.Beta("The metrics builder is beta")
 	config := defaultConfig()
 	err := cfg.Unpack(&config)
 

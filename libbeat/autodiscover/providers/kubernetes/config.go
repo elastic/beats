@@ -22,6 +22,7 @@ type Config struct {
 
 	Prefix    string                  `config:"prefix"`
 	Builders  []*common.Config        `config:"builders"`
+	Appenders []*common.Config        `config:"appenders"`
 	Templates template.MapperSettings `config:"templates"`
 }
 
