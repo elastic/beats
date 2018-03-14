@@ -12,6 +12,7 @@ type Config struct {
 	TLS       *docker.TLSConfig       `config:"ssl"`
 	Prefix    string                  `config:"string"`
 	Builders  []*common.Config        `config:"builders"`
+	Appenders []*common.Config        `config:"appenders"`
 	Templates template.MapperSettings `config:"templates"`
 }
 

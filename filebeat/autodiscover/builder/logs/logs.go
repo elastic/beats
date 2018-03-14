@@ -8,6 +8,7 @@ import (
 	"github.com/elastic/beats/libbeat/autodiscover/template"
 	"github.com/elastic/beats/libbeat/common"
 	"github.com/elastic/beats/libbeat/common/bus"
+	"github.com/elastic/beats/libbeat/common/cfgwarn"
 	"github.com/elastic/beats/libbeat/logp"
 )
 
@@ -28,6 +29,7 @@ type logAnnotations struct {
 
 // NewLogAnnotations builds a log annotations builder
 func NewLogAnnotations(cfg *common.Config) (autodiscover.Builder, error) {
+	cfgwarn.Beta("The logs builder is beta")
 	config := defaultConfig()
 	err := cfg.Unpack(&config)
 

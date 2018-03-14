@@ -6,6 +6,7 @@ import (
 	"github.com/elastic/beats/libbeat/autodiscover/template"
 	"github.com/elastic/beats/libbeat/common"
 	"github.com/elastic/beats/libbeat/common/bus"
+	"github.com/elastic/beats/libbeat/common/cfgwarn"
 	"github.com/elastic/beats/libbeat/common/docker"
 	"github.com/elastic/beats/libbeat/logp"
 )
@@ -19,6 +20,7 @@ type Provider struct {
 	config        *Config
 	bus           bus.Bus
 	builders      autodiscover.Builders
+	appenders     autodiscover.Appenders
 	watcher       docker.Watcher
 	templates     *template.Mapper
 	stop          chan interface{}
@@ -28,6 +30,7 @@ type Provider struct {
 
 // AutodiscoverBuilder builds and returns an autodiscover provider
 func AutodiscoverBuilder(bus bus.Bus, c *common.Config) (autodiscover.Provider, error) {
+	cfgwarn.Beta("The docker autodiscover is beta")
 	config := defaultConfig()
 	err := c.Unpack(&config)
 	if err != nil {
@@ -47,9 +50,18 @@ func AutodiscoverBuilder(bus bus.Bus, c *common.Config) (autodiscover.Provider, 
 	var builders autodiscover.Builders
 	for _, bcfg := range config.Builders {
 		if builder, err := autodiscover.Registry.BuildBuilder(bcfg); err != nil {
-			logp.Debug("docker", "failed to construct autodiscover builder due to error: %v", err)
+			logp.Warn("docker", "failed to construct autodiscover builder due to error: %v", err)
 		} else {
 			builders = append(builders, builder)
+		}
+	}
+
+	var appenders autodiscover.Appenders
+	for _, acfg := range config.Builders {
+		if appender, err := autodiscover.Registry.BuildAppender(acfg); err != nil {
+			logp.Warn("docker", "failed to construct autodiscover appender due to error: %v", err)
+		} else {
+			appenders = append(appenders, appender)
 		}
 	}
 
@@ -64,6 +76,7 @@ func AutodiscoverBuilder(bus bus.Bus, c *common.Config) (autodiscover.Provider, 
 		config:        config,
 		bus:           bus,
 		builders:      builders,
+		appenders:     appenders,
 		templates:     mapper,
 		watcher:       watcher,
 		stop:          make(chan interface{}),
@@ -157,6 +170,9 @@ func (d *Provider) publish(event bus.Event) {
 			event["config"] = config
 		}
 	}
+
+	// Call all appenders to append any extra configuration
+	d.appenders.Append(event)
 	d.bus.Publish(event)
 }
 
