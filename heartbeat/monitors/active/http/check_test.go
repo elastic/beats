@@ -15,33 +15,33 @@ func TestCheckBody(t *testing.T) {
 	var matchTests = []struct {
 		description string
 		body        string
-		patterns    []match.Matcher
+		patterns    []string
 		result      bool
 	}{
 		{
 			"Single regex that matches",
 			"ok",
-			[]match.Matcher{match.MustCompile("ok")},
+			[]string{"ok"},
 			true,
 		},
 		{
 			"Regex matching json example",
 			`{"status": "ok"}`,
-			[]match.Matcher{match.MustCompile(`{"status": "ok"}`)},
+			[]string{`{"status": "ok"}`},
 			true,
 		},
 		{
 			"Regex matching first line of multiline body string",
 			`first line
 			second line`,
-			[]match.Matcher{match.MustCompile("first")},
+			[]string{"first"},
 			true,
 		},
 		{
 			"Regex matching lastline of multiline body string",
 			`first line
 			second line`,
-			[]match.Matcher{match.MustCompile("second")},
+			[]string{"second"},
 			true,
 		},
 		{
@@ -49,7 +49,7 @@ func TestCheckBody(t *testing.T) {
 			`first line
 			second line
 			third line`,
-			[]match.Matcher{match.MustCompile("(?s)first.*second.*third")},
+			[]string{"(?s)first.*second.*third"},
 			true,
 		},
 		{
@@ -57,25 +57,25 @@ func TestCheckBody(t *testing.T) {
 			`first line
 			second line
 			third line`,
-			[]match.Matcher{match.MustCompile("(?s)first.*fourth.*third")},
+			[]string{"(?s)first.*fourth.*third"},
 			false,
 		},
 		{
 			"Single regex that doesn't match",
 			"ok",
-			[]match.Matcher{match.MustCompile("notok")},
+			[]string{"notok"},
 			false,
 		},
 		{
 			"Multiple regex match where at least one must match",
 			"ok",
-			[]match.Matcher{match.MustCompile("ok"), match.MustCompile("yay")},
+			[]string{"ok", "yay"},
 			true,
 		},
 		{
 			"Multiple regex match where none of the patterns match",
 			"ok",
-			[]match.Matcher{match.MustCompile("notok"), match.MustCompile("yay")},
+			[]string{"notok", "yay"},
 			false,
 		},
 	}
@@ -92,7 +92,11 @@ func TestCheckBody(t *testing.T) {
 				log.Fatal(err)
 			}
 
-			check := checkBody(test.patterns)(res)
+			patterns := []match.Matcher{}
+			for _, pattern := range test.patterns {
+				patterns = append(patterns, match.MustCompile(pattern))
+			}
+			check := checkBody(patterns)(res)
 
 			if result := (check == nil); result != test.result {
 				if test.result {
