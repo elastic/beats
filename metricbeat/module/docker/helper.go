@@ -27,11 +27,11 @@ func (c *Container) ToMapStr() common.MapStr {
 	return m
 }
 
-func NewContainer(container *types.Container) *Container {
+func NewContainer(container *types.Container, dedot bool) *Container {
 	return &Container{
 		ID:     container.ID,
 		Name:   ExtractContainerName(container.Names),
-		Labels: DeDotLabels(container.Labels),
+		Labels: DeDotLabels(container.Labels, dedot),
 	}
 }
 
@@ -51,10 +51,18 @@ func ExtractContainerName(names []string) string {
 // DeDotLabels returns a new common.MapStr containing a copy of the labels
 // where the dots have been converted into nested structure, avoiding
 // possible mapping errors
-func DeDotLabels(labels map[string]string) common.MapStr {
+func DeDotLabels(labels map[string]string, dedot bool) common.MapStr {
 	outputLabels := common.MapStr{}
 	for k, v := range labels {
-		safemapstr.Put(outputLabels, k, v)
+		if dedot {
+			// This is necessary so that ES does not interpret '.' fields as new
+			// nested JSON objects, and also makes this compatible with ES 2.x.
+			label := common.DeDot(k)
+			outputLabels.Put(label, v)
+		} else {
+			// If we don't dedot we ensure there are no mapping errors with safemapstr
+			safemapstr.Put(outputLabels, k, v)
+		}
 	}
 
 	return outputLabels

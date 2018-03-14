@@ -20,11 +20,12 @@ func init() {
 type MetricSet struct {
 	mb.BaseMetricSet
 	dockerClient *client.Client
+	dedot        bool
 }
 
 // New creates a new instance of the docker healthcheck MetricSet.
 func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
-	config := docker.Config{}
+	config := docker.DefaultConfig()
 	if err := base.Module().UnpackConfig(&config); err != nil {
 		return nil, err
 	}
@@ -37,6 +38,7 @@ func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
 	return &MetricSet{
 		BaseMetricSet: base,
 		dockerClient:  client,
+		dedot:         config.DeDot,
 	}, nil
 }
 
