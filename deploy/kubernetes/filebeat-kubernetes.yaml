@@ -148,6 +148,7 @@ rules:
   resources:
   - namespaces
   - pods
+  - events
   verbs:
   - get
   - watch
