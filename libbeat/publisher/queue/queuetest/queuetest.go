@@ -8,7 +8,7 @@ import (
 	"github.com/elastic/beats/libbeat/publisher/queue"
 )
 
-type QueueFactory func() queue.Queue
+type QueueFactory func(t *testing.T) queue.Queue
 
 type workerFactory func(*sync.WaitGroup, interface{}, *TestLogger, queue.Queue) func()
 
@@ -49,7 +49,7 @@ func TestSingleProducerConsumer(
 			log := NewTestLogger(t)
 			log.Debug("run test: ", test.name)
 
-			queue := factory()
+			queue := factory(t)
 			defer func() {
 				err := queue.Close()
 				if err != nil {
@@ -192,7 +192,7 @@ func TestMultiProducerConsumer(
 			log := NewTestLogger(t)
 			log.Debug("run test: ", test.name)
 
-			queue := factory()
+			queue := factory(t)
 			defer func() {
 				err := queue.Close()
 				if err != nil {
