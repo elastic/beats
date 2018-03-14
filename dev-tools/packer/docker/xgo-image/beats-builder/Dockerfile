@@ -4,6 +4,8 @@ MAINTAINER Tudor Golubenco <tudor@elastic.co>
 
 # Get libpcap binaries for linux
 RUN \
+	apt-get clean && \
+	rm -r /var/lib/apt/lists/* && \
 	dpkg --add-architecture i386 && \
 	apt-get update && \
 	apt-get install -y libpcap0.8-dev
