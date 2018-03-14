@@ -212,6 +212,7 @@ https://github.com/elastic/beats/compare/v6.0.0-beta2...master[Check the HEAD di
 - Add Logstash module support for main log and the slow log, support the plain text or structured JSON format {pull}5481[5481]
 - Add stream filtering when using `docker` prospector. {pull}6057[6057]
 - Add support for CRI logs format. {issue}5630[5630]
+- Add json.ignore_decoding_error config to not log json decoding erors. {issue}6547[6547]
 
 *Heartbeat*
 
