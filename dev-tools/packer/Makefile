@@ -41,7 +41,7 @@ package-dashboards:
 
 .PHONY: deps
 deps:
-	cd ../vendor/github.com/tsg/gotpl; go install
+	go get -u github.com/tsg/gotpl
 
 .PHONY: xgo-image
 xgo-image:

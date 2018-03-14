@@ -12,7 +12,7 @@ RUN \
 	rm libpcap0.8-dev*.deb
 RUN \
 	apt-get -o Acquire::Check-Valid-Until=false update && \
-	apt-get install -y libpcap0.8-dev
+	apt-get install -y --force-yes libpcap0.8-dev
 
 
 # Old git version which does not support proxy with go get directly, and git cloning
