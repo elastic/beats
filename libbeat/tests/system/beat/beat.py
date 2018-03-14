@@ -210,7 +210,7 @@ class TestCase(unittest.TestCase, ComposeMixin):
 
         output_path = os.path.join(self.working_dir, output)
         with open(output_path, "wb") as f:
-            os.chmod(output_path, 0600)
+            os.chmod(output_path, 0o600)
             f.write(output_str.encode('utf8'))
 
     # Returns output as JSON object with flattened fields (. notation)
