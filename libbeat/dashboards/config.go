@@ -27,6 +27,8 @@ var defaultConfig = Config{
 	AlwaysKibana: false,
 	Retry: &Retry{
 		Enabled: false,
+		Interval: time.Second,
+		Maximum: 0,
 	},
 }
 var (
