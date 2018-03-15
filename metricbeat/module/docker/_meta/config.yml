@@ -4,7 +4,7 @@
   period: 10s
 
   # Replace dots in labels with `_`. Set to false to keep dots
-  dedot: true
+  labels.dedot: true
 
   # To connect to Docker over TLS you must specify a client and CA certificate.
   #ssl:
