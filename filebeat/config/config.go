@@ -21,23 +21,25 @@ const (
 )
 
 type Config struct {
-	Inputs           []*common.Config     `config:"inputs"`
-	Prospectors      []*common.Config     `config:"prospectors"`
-	RegistryFile     string               `config:"registry_file"`
-	RegistryFlush    time.Duration        `config:"registry_flush"`
-	ConfigDir        string               `config:"config_dir"`
-	ShutdownTimeout  time.Duration        `config:"shutdown_timeout"`
-	Modules          []*common.Config     `config:"modules"`
-	ConfigInput      *common.Config       `config:"config.inputs"`
-	ConfigProspector *common.Config       `config:"config.prospectors"`
-	ConfigModules    *common.Config       `config:"config.modules"`
-	Autodiscover     *autodiscover.Config `config:"autodiscover"`
+	Inputs                  []*common.Config     `config:"inputs"`
+	Prospectors             []*common.Config     `config:"prospectors"`
+	RegistryFile            string               `config:"registry_file"`
+	RegistryFilePermissions os.FileMode          `config:"registry_file_permissions"`
+	RegistryFlush           time.Duration        `config:"registry_flush"`
+	ConfigDir               string               `config:"config_dir"`
+	ShutdownTimeout         time.Duration        `config:"shutdown_timeout"`
+	Modules                 []*common.Config     `config:"modules"`
+	ConfigInput             *common.Config       `config:"config.inputs"`
+	ConfigProspector        *common.Config       `config:"config.prospectors"`
+	ConfigModules           *common.Config       `config:"config.modules"`
+	Autodiscover            *autodiscover.Config `config:"autodiscover"`
 }
 
 var (
 	DefaultConfig = Config{
-		RegistryFile:    "registry",
-		ShutdownTimeout: 0,
+		RegistryFile:            "registry",
+		RegistryFilePermissions: 0600,
+		ShutdownTimeout:         0,
 	}
 )
 

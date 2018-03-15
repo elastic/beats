@@ -93,6 +93,7 @@ filebeat.{{input_config | default("inputs")}}:
 filebeat.shutdown_timeout: {{ shutdown_timeout|default(0) }}
 {% if not skip_registry_config %}
 filebeat.registry_file: {{ beat.working_dir + '/' }}{{ registryFile|default("registry")}}
+filebeat.registry_file_permissions: {{ registryFilePermissions|default("0600") }}
 {%endif%}
 
 {% if reload or reload_path -%}
