@@ -44,22 +44,27 @@ func TestEventMapping(t *testing.T) {
 	events, err := f.Fetch()
 	assert.NoError(t, err)
 
-	assert.Equal(t, 10, len(events), "Wrong number of returned events")
+	assert.Equal(t, 12, len(events), "Wrong number of returned events")
 
 	testCases := testCases()
 	for _, event := range events {
 		name, err := event.GetValue("name")
 		if err == nil {
 			namespace, err := event.GetValue("_module.namespace")
-			if err == nil {
-				eventKey := namespace.(string) + "@" + name.(string)
-				oneTestCase, oneTestCaseFound := testCases[eventKey]
-				if oneTestCaseFound {
-					for k, v := range oneTestCase {
-						testValue(eventKey, t, event, k, v)
-					}
-					delete(testCases, eventKey)
+			if err != nil {
+				continue
+			}
+			pod, err := event.GetValue("_module.pod.name")
+			if err != nil {
+				continue
+			}
+			eventKey := namespace.(string) + "@" + pod.(string) + "@" + name.(string)
+			oneTestCase, oneTestCaseFound := testCases[eventKey]
+			if oneTestCaseFound {
+				for k, v := range oneTestCase {
+					testValue(eventKey, t, event, k, v)
 				}
+				delete(testCases, eventKey)
 			}
 		}
 	}
@@ -79,7 +84,7 @@ func testValue(eventKey string, t *testing.T, event common.MapStr, field string,
 // In particular, test same named containers  in different namespaces
 func testCases() map[string]map[string]interface{} {
 	return map[string]map[string]interface{}{
-		"kube-system@kubedns": {
+		"kube-system@kube-dns-v20-5g5cb@kubedns": {
 			"_namespace":        "container",
 			"_module.namespace": "kube-system",
 			"_module.node.name": "minikube",
@@ -96,7 +101,7 @@ func testCases() map[string]map[string]interface{} {
 			"memory.request.bytes":  73400320,
 			"cpu.request.nanocores": float64(1e+08),
 		},
-		"test@kubedns": {
+		"test@kube-dns-v20-5g5cb-test@kubedns": {
 			"_namespace":        "container",
 			"_module.namespace": "test",
 			"_module.node.name": "minikube-test",
@@ -113,7 +118,7 @@ func testCases() map[string]map[string]interface{} {
 			"memory.request.bytes":  83400320,
 			"cpu.request.nanocores": float64(2e+08),
 		},
-		"kube-system@healthz": {
+		"kube-system@kube-dns-v20-5g5cb@healthz": {
 			"_namespace":        "container",
 			"_module.namespace": "kube-system",
 			"_module.node.name": "minikube",
