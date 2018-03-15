@@ -85,21 +85,24 @@ func (w *netClientWorker) run() {
 			batch.Cancelled()
 
 			if w.closed.Load() {
-				logp.Info("Closed connection")
+				logp.Info("Closed connection to %v", w.client)
 				return
 			}
 
 			if reconnectAttempts > 0 {
-				logp.Info("Attempting to reconnect with %d reconnect attempt(s)", reconnectAttempts)
+				logp.Info("Attempting to reconnect to %v with %d reconnect attempt(s)", w.client, reconnectAttempts)
+			} else {
+				logp.Info("Connecting to %v", w.client)
 			}
 
 			err := w.client.Connect()
 			if err != nil {
-				logp.Err("Failed to connect: %v", err)
+				logp.Err("Failed to connect to %v: %v", w.client, err)
 				reconnectAttempts++
 				continue
 			}
 
+			logp.Info("Connection to %v established", w.client)
 			reconnectAttempts = 0
 			break
 		}

@@ -169,6 +169,10 @@ func (c *asyncClient) Publish(batch publisher.Batch) error {
 	return nil
 }
 
+func (c *asyncClient) String() string {
+	return "async(" + c.Client.String() + ")"
+}
+
 func (c *asyncClient) publishWindowed(
 	ref *msgRef,
 	events []publisher.Event,

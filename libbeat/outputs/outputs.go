@@ -35,6 +35,8 @@ type Client interface {
 	// the publisher pipeline. The publisher pipeline (if configured by the output
 	// factory) will take care of retrying/dropping events.
 	Publish(publisher.Batch) error
+
+	String() string
 }
 
 // NetworkClient defines the required client capabilities for network based
