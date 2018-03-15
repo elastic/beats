@@ -26,9 +26,9 @@ var defaultConfig = Config{
 	KibanaIndex:  ".kibana",
 	AlwaysKibana: false,
 	Retry: &Retry{
-		Enabled: false,
+		Enabled:  false,
 		Interval: time.Second,
-		Maximum: 0,
+		Maximum:  0,
 	},
 }
 var (
