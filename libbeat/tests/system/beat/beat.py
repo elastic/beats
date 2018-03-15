@@ -277,7 +277,10 @@ class TestCase(unittest.TestCase, ComposeMixin):
     def setUp(self):
 
         self.template_env = jinja2.Environment(
-            loader=jinja2.FileSystemLoader(self.beat_path)
+            loader=jinja2.FileSystemLoader([
+                self.beat_path,
+                os.path.abspath(os.path.join(self.beat_path, "../libbeat"))
+            ])
         )
 
         # create working dir
