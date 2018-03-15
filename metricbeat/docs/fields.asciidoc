@@ -19479,6 +19479,43 @@ Name of the user running the process.
 --
 
 [float]
+== socket.summary fields
+
+ss
+
+
+
+*`system.socket.summary.tcp.listening`*::
++
+--
+type: integer
+
+TCP connections in listening state
+
+
+--
+
+*`system.socket.summary.tcp.connections`*::
++
+--
+type: integer
+
+All TCP connections
+
+
+--
+
+*`system.socket.summary.udp.connections`*::
++
+--
+type: integer
+
+All UDP connections
+
+
+--
+
+[float]
 == uptime fields
 
 `uptime` contains the operating system uptime metric.

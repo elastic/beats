@@ -1,0 +1,18 @@
+- name: socket.summary
+  title: Socket summary
+  type: group
+  description: >
+    ss
+  fields:
+    - name: tcp.listening
+      type: integer
+      description: >
+        TCP connections in listening state
+    - name: tcp.connections
+      type: integer
+      description: >
+        All TCP connections
+    - name: udp.connections
+      type: integer
+      description: >
+        All UDP connections
