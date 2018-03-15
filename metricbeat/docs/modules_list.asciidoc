@@ -75,10 +75,10 @@ This file is generated! See scripts/docs_collector.py
 |<<metricbeat-metricset-logstash-node_stats,node_stats>> experimental[]  
 |<<metricbeat-module-memcached,Memcached>>  beta[]   |    
 .1+|   |<<metricbeat-metricset-memcached-stats,stats>> beta[]  
-|<<metricbeat-module-mongodb,MongoDB>>  beta[]   |    
-.3+|   |<<metricbeat-metricset-mongodb-collstats,collstats>> experimental[]  
-|<<metricbeat-metricset-mongodb-dbstats,dbstats>> beta[]  
-|<<metricbeat-metricset-mongodb-status,status>> beta[]  
+|<<metricbeat-module-mongodb,MongoDB>>     |    
+.3+|   |<<metricbeat-metricset-mongodb-collstats,collstats>>   
+|<<metricbeat-metricset-mongodb-dbstats,dbstats>>   
+|<<metricbeat-metricset-mongodb-status,status>>   
 |<<metricbeat-module-mysql,MySQL>>     |    
 .1+|   |<<metricbeat-metricset-mysql-status,status>>   
 |<<metricbeat-module-nginx,Nginx>>     |    
