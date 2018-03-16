@@ -1606,6 +1606,11 @@ output.elasticsearch:
   # Permissions to use for file creation. The default is 0600.
   #permissions: 0600
 
+  # Compression algorithm for output file. Files are compressed when they are
+  # rotated as per the condition defined above. Supported values are 'none' and
+  # 'gzip'. The default is 'none', which is no compression.
+  #compression: 'none'
+
 
 #----------------------------- Console output ---------------------------------
 #output.console:

@@ -1,10 +1,9 @@
+from metricbeat import BaseTest as MetricbeatTest
 import jinja2
 import os
 import sys
 
 sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '../../../../metricbeat/tests/system')))
-
-from metricbeat import BaseTest as MetricbeatTest
 
 
 class AuditbeatXPackTest(MetricbeatTest):
