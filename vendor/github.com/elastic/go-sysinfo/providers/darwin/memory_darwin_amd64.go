@@ -12,23 +12,21 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+// +build darwin,amd64,cgo
+
 package darwin
 
 import (
-	"syscall"
-	"time"
-
 	"github.com/pkg/errors"
 )
 
-const kernBoottimeMIB = "kern.boottime"
+const hwMemsizeMIB = "hw.memsize"
 
-func BootTime() (time.Time, error) {
-	var tv syscall.Timeval32
-	if err := sysctlByName(kernBoottimeMIB, &tv); err != nil {
-		return time.Time{}, errors.Wrap(err, "failed to get host uptime")
+func MemTotal() (uint64, error) {
+	var size uint64
+	if err := sysctlByName(hwMemsizeMIB, &size); err != nil {
+		return 0, errors.Wrap(err, "failed to get mem total")
 	}
 
-	bootTime := time.Unix(int64(tv.Sec), int64(tv.Usec)*int64(time.Microsecond))
-	return bootTime, nil
+	return size, nil
 }
