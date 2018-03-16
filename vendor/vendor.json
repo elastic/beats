@@ -543,6 +543,62 @@
 			"revisionTime": "2018-03-16T07:12:44Z"
 		},
 		{
+			"checksumSHA1": "IMU9C/FvHiOI52jKElb62Gokv0s=",
+			"path": "github.com/elastic/go-txfile",
+			"revision": "7e7e33cc236f30fff545f3ee2c35ada5b70b6b13",
+			"revisionTime": "2018-03-29T16:52:21Z",
+			"version": "v0.0.1",
+			"versionExact": "v0.0.1"
+		},
+		{
+			"checksumSHA1": "cXIYcUhYjLs+sUW42/yIE9ellS0=",
+			"path": "github.com/elastic/go-txfile/internal/cleanup",
+			"revision": "7e7e33cc236f30fff545f3ee2c35ada5b70b6b13",
+			"revisionTime": "2018-03-29T16:52:21Z",
+			"version": "v0.0.1",
+			"versionExact": "v0.0.1"
+		},
+		{
+			"checksumSHA1": "ERbGKs6IgC062SkwB1jI0EHfAM8=",
+			"path": "github.com/elastic/go-txfile/internal/invariant",
+			"revision": "7e7e33cc236f30fff545f3ee2c35ada5b70b6b13",
+			"revisionTime": "2018-03-29T16:52:21Z",
+			"version": "v0.0.1",
+			"versionExact": "v0.0.1"
+		},
+		{
+			"checksumSHA1": "xaTyh6jlrYI94Kok8+QT2bpRkHM=",
+			"path": "github.com/elastic/go-txfile/internal/iter",
+			"revision": "7e7e33cc236f30fff545f3ee2c35ada5b70b6b13",
+			"revisionTime": "2018-03-29T16:52:21Z",
+			"version": "v0.0.1",
+			"versionExact": "v0.0.1"
+		},
+		{
+			"checksumSHA1": "5tZTXzITZkrmyx4tamhtW9ilmhE=",
+			"path": "github.com/elastic/go-txfile/internal/tracelog",
+			"revision": "7e7e33cc236f30fff545f3ee2c35ada5b70b6b13",
+			"revisionTime": "2018-03-29T16:52:21Z",
+			"version": "v0.0.1",
+			"versionExact": "v0.0.1"
+		},
+		{
+			"checksumSHA1": "cdu99vXUoUWPJww+ndmzlfh/Rsk=",
+			"path": "github.com/elastic/go-txfile/pq",
+			"revision": "7e7e33cc236f30fff545f3ee2c35ada5b70b6b13",
+			"revisionTime": "2018-03-29T16:52:21Z",
+			"version": "v0.0.1",
+			"versionExact": "v0.0.1"
+		},
+		{
+			"checksumSHA1": "1ltkQVfITTz9qKLzO2XvgG+K7Zs=",
+			"path": "github.com/elastic/go-txfile/txfiletest",
+			"revision": "7e7e33cc236f30fff545f3ee2c35ada5b70b6b13",
+			"revisionTime": "2018-03-29T16:52:21Z",
+			"version": "v0.0.1",
+			"versionExact": "v0.0.1"
+		},
+		{
 			"checksumSHA1": "61XUpyQ3zWnJ7Tlj0xLsHtnzwJY=",
 			"path": "github.com/elastic/go-ucfg",
 			"revision": "0ba28e36add27704e6b49a7ed8557989a8f4a635",
@@ -1194,6 +1250,14 @@
 			"versionExact": "v1.2.0"
 		},
 		{
+			"checksumSHA1": "CpcG17Q/0k1g2uy8AL26Uu7TouU=",
+			"path": "github.com/theckman/go-flock",
+			"revision": "b139a2487364247d91814e4a7c7b8fdc69e342b2",
+			"revisionTime": "2018-01-24T01:19:07Z",
+			"version": "v0.4.0",
+			"versionExact": "v0.4.0"
+		},
+		{
 			"checksumSHA1": "M0S9278lG9Fztu+ZUsLUi40GDJU=",
 			"path": "github.com/tsg/gopacket",
 			"revision": "f289b3ea3e41a01b2822be9caf5f40c01fdda05c",
@@ -1222,6 +1286,18 @@
 			"path": "github.com/tsg/gopacket/pfring",
 			"revision": "8e703b9968693c15f25cabb6ba8be4370cf431d0",
 			"revisionTime": "2016-08-17T18:24:57Z"
+		},
+		{
+			"checksumSHA1": "H7tCgNt2ajKK4FBJIDNlevu9MAc=",
+			"path": "github.com/urso/go-bin",
+			"revision": "781c575c9f0eb3cb9dca94521bd7ad7d5aec7fd4",
+			"revisionTime": "2018-02-20T13:58:11Z"
+		},
+		{
+			"checksumSHA1": "eNXPqquHSqrsae/NydhZJSqOP5c=",
+			"path": "github.com/urso/qcgen",
+			"revision": "0b059e7db4f40a062ca3d975b7500c6a0a968d87",
+			"revisionTime": "2018-01-31T10:30:24Z"
 		},
 		{
 			"checksumSHA1": "Und+nhgN1YsNWvd0aDYO+0cMcAo=",
