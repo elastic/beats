@@ -5,7 +5,10 @@ package stress_test
 import (
 	"flag"
 	"fmt"
+	"io/ioutil"
+	"os"
 	"path/filepath"
+	"strings"
 	"testing"
 	"time"
 
@@ -15,6 +18,7 @@ import (
 	// import queue types
 	"github.com/elastic/beats/libbeat/publisher/pipeline/stress"
 	_ "github.com/elastic/beats/libbeat/publisher/queue/memqueue"
+	_ "github.com/elastic/beats/libbeat/publisher/queue/spool"
 )
 
 // additional flags
@@ -42,8 +46,6 @@ func TestPipeline(t *testing.T) {
 		duration = 10 * time.Second
 	}
 
-	// TODO: if verbose, enable logging
-
 	configTest(t, "gen", genConfigs, func(t *testing.T, gen string) {
 		configTest(t, "pipeline", pipelineConfigs, func(t *testing.T, pipeline string) {
 			configTest(t, "out", outConfigs, func(t *testing.T, out string) {
@@ -52,6 +54,25 @@ func TestPipeline(t *testing.T) {
 					t.Fatal(err)
 				}
 
+				name := t.Name()
+				name = strings.Replace(name, "/", "-", -1)
+				name = strings.Replace(name, "\\", "-", -1)
+
+				dir, err := ioutil.TempDir("", "")
+				if err != nil {
+					t.Fatal(err)
+				}
+				defer os.RemoveAll(dir)
+
+				// Merge test info into config object
+				config.Merge(map[string]interface{}{
+					"test": map[string]interface{}{
+						"tmpdir": dir,
+						"name":   name,
+					},
+				})
+
+				// check if the pipeline configuration allows for parallel tests
 				onErr := func(err error) {
 					t.Error(err)
 				}
