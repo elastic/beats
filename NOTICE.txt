@@ -373,6 +373,16 @@ Apache License 2.0
 
 
 --------------------------------------------------------------------
+Dependency: github.com/elastic/go-txfile
+Version: v0.0.1
+Revision: 7e7e33cc236f30fff545f3ee2c35ada5b70b6b13
+License type (autodetected): Apache-2.0
+./vendor/github.com/elastic/go-txfile/LICENSE:
+--------------------------------------------------------------------
+Apache License 2.0
+
+
+--------------------------------------------------------------------
 Dependency: github.com/elastic/go-ucfg
 Version: v0.5.1
 Revision: 0ba28e36add27704e6b49a7ed8557989a8f4a635
@@ -2053,6 +2063,41 @@ OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE
 OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
 --------------------------------------------------------------------
+Dependency: github.com/theckman/go-flock
+Version: v0.4.0
+Revision: b139a2487364247d91814e4a7c7b8fdc69e342b2
+License type (autodetected): BSD-3-Clause
+./vendor/github.com/theckman/go-flock/LICENSE:
+--------------------------------------------------------------------
+Copyright (c) 2015, Tim Heckman
+All rights reserved.
+
+Redistribution and use in source and binary forms, with or without
+modification, are permitted provided that the following conditions are met:
+
+* Redistributions of source code must retain the above copyright notice, this
+  list of conditions and the following disclaimer.
+
+* Redistributions in binary form must reproduce the above copyright notice,
+  this list of conditions and the following disclaimer in the documentation
+  and/or other materials provided with the distribution.
+
+* Neither the name of linode-netint nor the names of its
+  contributors may be used to endorse or promote products derived from
+  this software without specific prior written permission.
+
+THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
+AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
+IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
+DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE LIABLE
+FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL
+DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR
+SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER
+CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY,
+OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
+OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+
+--------------------------------------------------------------------
 Dependency: github.com/tsg/gopacket
 Revision: f289b3ea3e41a01b2822be9caf5f40c01fdda05c
 License type (autodetected): BSD-3-Clause
@@ -2086,6 +2131,24 @@ DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY
 THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
 (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+
+--------------------------------------------------------------------
+Dependency: github.com/urso/go-bin
+Revision: 781c575c9f0eb3cb9dca94521bd7ad7d5aec7fd4
+License type (autodetected): Apache-2.0
+./vendor/github.com/urso/go-bin/LICENSE:
+--------------------------------------------------------------------
+Apache License 2.0
+
+
+--------------------------------------------------------------------
+Dependency: github.com/urso/qcgen
+Revision: 0b059e7db4f40a062ca3d975b7500c6a0a968d87
+License type (autodetected): Apache-2.0
+./vendor/github.com/urso/qcgen/LICENSE:
+--------------------------------------------------------------------
+Apache License 2.0
+
 
 --------------------------------------------------------------------
 Dependency: github.com/vmware/govmomi
