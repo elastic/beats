@@ -22,7 +22,7 @@ input type more than once. For example:
 
 ["source","yaml",subs="attributes"]
 ----
-filebeat.inputs:
+{beatname_lc}.inputs:
 - type: log
   paths:
     - /var/log/system.log
@@ -36,33 +36,26 @@ filebeat.inputs:
 ----
 
 
-//REVIEWERS: I'm using the same example here that's used in the topic about the
-//log input. I wonder if we have a better one that shows a couple of different
-//input types?
-
 [float]
-[[input-type]]
+[id="{beatname_lc}-input-types"]
 === Input types
 
 You can configure {beatname_uc} to use the following inputs:
 
-// REVIWERS: I would like to make the following list generated, if possible. Can
-// we reuse the logic that we use for generating the modules list?
-
-* <<log-input>>
-* <<stdin-input>>
-* <<redis-input>>
-* <<udp-input>>
-* <<docker-input>>
+* <<{beatname_lc}-input-log>>
+* <<{beatname_lc}-input-stdin>>
+* <<{beatname_lc}-input-redis>>
+* <<{beatname_lc}-input-udp>>
+* <<{beatname_lc}-input-docker>>
 
 
 
-include::./log-input.asciidoc[]
+include::inputs/input-log.asciidoc[]
 
-include::./stdin-input.asciidoc[]
+include::inputs/input-stdin.asciidoc[]
 
-include::./redis-input.asciidoc[]
+include::inputs/input-redis.asciidoc[]
 
-include::./udp-input.asciidoc[]
+include::inputs/input-udp.asciidoc[]
 
-include::./docker-input.asciidoc[]
+include::inputs/input-docker.asciidoc[]

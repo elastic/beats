@@ -1,6 +1,6 @@
 :type: docker
 
-[[docker-input]]
+[id="{beatname_lc}-input-{type}"]
 === Docker input
 
 ++++
@@ -18,10 +18,6 @@ combination with those settings.
 
 Example configuration:
 
-// REVIEWERS: The filebeat.reference.yml file does not show a docker input type
-// so I'm not sure if the following config is correct. docker only shows up under
-// autodiscover.
-
 ["source","yaml",subs="attributes"]
 ----
 {beatname_lc}.inputs:
@@ -35,7 +31,7 @@ Example configuration:
 ==== Configuration options
 
 The `docker` input supports the following configuration options plus the
-<<{type}-input-common-options>> described later.
+<<{beatname_lc}-input-{type}-common-options>> described later.
 
 [[config-container-ids]]
 ===== `containers.ids`
@@ -43,22 +39,35 @@ The `docker` input supports the following configuration options plus the
 The list of Docker container IDs to read logs from. Specify
 `containers.ids: '*'` to read from all containers.
 
-===== `containers.path`
+===== `containers.paths`
 
 The base path where Docker logs are located. The default
 is `/var/lib/docker/containers`.
+
+// REVIEWERS: Not clear to me if this setting accepts an array or a string. If
+// it's just a string, why is it paths (plural)?
 
 ===== `containers.stream`
 
 Reads from the specified streams only: `all`, `stdout` or `stderr`. The default
 is `all`.
 
-// REVIEWERS: I'm guessing where these settings live in the config 
-// because it's not clear from the docs or the reference.yml. Would be nice to
-// have a realistic example here.
+The following input configures {beatname_uc} to read the `stdout` stream from
+all containers under the default Docker containers path:
 
-// REVIEWERS: Sounds like I definitely need to add multiline to the docs here.
-// which other config options from the harvester are used by the docker input?
+[source,yaml]
+----
+- type: docker
+  containers:
+    paths: "/var/lib/docker/containers"
+    stream: "stdout"
+    ids:
+      - "*"
+----
 
-[id="{type}-input-common-options"]
-include::include/common-input-options.asciidoc[]
+include::../inputs/input-common-harvester-options.asciidoc[]
+
+include::../inputs/input-common-file-options.asciidoc[]
+
+[id="{beatname_lc}-input-{type}-common-options"]
+include::../inputs/input-common-options.asciidoc[]

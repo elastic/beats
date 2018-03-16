@@ -7,12 +7,9 @@
 
 {beatname_uc} is a lightweight shipper for forwarding and centralizing log data.
 Installed as an agent on your servers, {beatname_uc} monitors the log
-files or locations that you specify, tails the logs, and forwards log data
+files or locations that you specify, collects log events, and forwards them
 to either to https://www.elastic.co/products/elasticsearch[Elasticsearch] or
 https://www.elastic.co/products/logstash[Logstash] for indexing.
-
-// REVIEWERS: Is it still accurate to say "tails the logs" or is that a file
-// concept that doesn't make sense for some of the newer inputs that we've added.
 
 Here's how {beatname_uc} works: When you start {beatname_uc}, it starts one or
 more inputs that look in the locations you've specified for log data. For

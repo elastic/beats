@@ -1,6 +1,6 @@
 :type: redis
 
-[[redis-input]]
+[id="{beatname_lc}-input-{type}"]
 === Redis input
 
 ++++
@@ -23,16 +23,10 @@ Example configuration:
 ----
 
 
-// REVIEWERS: Which options should I show in the example config? Incidentally,
-// in the reference.yml, password shows up twice in the same namespace. This
-// needs to be fixed in the reference.yml file
-
 ==== Configuration options
 
 The `redis` input supports the following configuration options plus the
-<<{type}-input-common-options>> described later.
-
-//REVIEWERS: These descriptions are new, so please review carefully.
+<<{beatname_lc}-input-{type}-common-options>> described later.
 
 [float]
 [[redis-hosts]]
@@ -53,12 +47,6 @@ The username to use when connecting to Redis.
 The password to use when connecting to Redis.
 
 [float]
-[[redis-enabled]]
-===== `enable`
-
-When set to `true`, enables the `redis` input. The default is `false`.
-
-[float]
 [[redis-scan_frequency]]
 ===== `scan_frequency`
 
@@ -67,6 +55,11 @@ Redis as frequently as possible without causing {beatname_uc} to scan too
 frequently. Do not set this value to less than `1s`.
 
 The default is `10s`.
+
+IMPORTANT: Redis slowlogs are not permanent. To ensure that all slowlog entries
+are collected, set `scan_frequency` to a value that allows {beatname_uc}
+sufficient time to connect to Redis, query the logs, and buffer them to the
+output within the specified interval. 
 
 [float]
 [[redis-timeout]]
@@ -79,9 +72,8 @@ The default is `1s`.
 [[redis-network]]
 ===== `network`
 
-The network type to use for the Redis connection. The default is `tcp`.
-
-//REVIEWERS: What (if any) other network types are supported here?
+The network type to use for the Redis connection. Valid settings include: `tcp`,
+`tcp4`, `tcp6`, and `unix`. The default is `tcp`.
 
 [float]
 [[redis-maxconn]]
@@ -89,5 +81,5 @@ The network type to use for the Redis connection. The default is `tcp`.
 
 The maximum number of concurrent connections. The default is `10`.
 
-[id="{type}-input-common-options"]
-include::include/common-input-options.asciidoc[]
+[id="{beatname_lc}-input-{type}-common-options"]
+include::../inputs/input-common-options.asciidoc[]

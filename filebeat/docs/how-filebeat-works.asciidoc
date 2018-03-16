@@ -1,14 +1,8 @@
-[[how-filebeat-works]]
+[id="how-{beatname_lc}-works"]
 == How {beatname_uc} works
 
-// REVIWERS: I think we need to modify this topic to be more generic, or we
-// need to explain how different inputs handle the event data differently. It
-// doesn't seem accurate to use the word "file" everywhere as we do here. I
-// tried replacing file with log, but that doesn't work in all situations, so
-// I backed out my changes, and I'm looking for alternatives. Maybe we should
-// make this description more generic, and move the details about reading files
-// to the new topic about the log input. WDYT? I might do that in a separate
-// PR so we can get the refactoring merged.
+//TODO: Make this topic more generic and move harvester-specific content to
+//the topic about the log input
 
 In this topic, you learn about the key building blocks of {beatname_uc} and how they work together. Understanding these concepts will help you make informed decisions about configuring {beatname_uc} for specific use cases.
 
@@ -19,15 +13,15 @@ In this topic, you learn about the key building blocks of {beatname_uc} and how 
 [[harvester]]
 === What is a harvester?
 
-A harvester is responsible for reading the content of a single file. The harvester reads each file, line by line, and sends the content to the output. One harvester is started for each file. The harvester is responsible for opening and closing the file, which means that the file descriptor remains open while the harvester is running. If a file is removed or renamed while it's being harvested, {beatname_uc} continues to read the file. This has the side effect that the space on your disk is reserved until the harvester closes. By default, {beatname_uc} keeps the file open until <<close-inactive,`close_inactive`>> is reached.
+A harvester is responsible for reading the content of a single file. The harvester reads each file, line by line, and sends the content to the output. One harvester is started for each file. The harvester is responsible for opening and closing the file, which means that the file descriptor remains open while the harvester is running. If a file is removed or renamed while it's being harvested, {beatname_uc} continues to read the file. This has the side effect that the space on your disk is reserved until the harvester closes. By default, {beatname_uc} keeps the file open until <<{beatname_lc}-input-log-close-inactive,`close_inactive`>> is reached.
 
 Closing a harvester has the following consequences:
 
 * The file handler is closed, freeing up the underlying resources if the file was deleted while the harvester was still reading the file.
-* The harvesting of the file will only be started again after <<scan-frequency,`scan_frequency`>> has elapsed.
+* The harvesting of the file will only be started again after <<{beatname_lc}-input-log-scan-frequency,`scan_frequency`>> has elapsed.
 * If the file is moved or removed while the harvester is closed, harvesting of the file will not continue.
 
-To control when a harvester is closed, use the <<close-options,`close_*`>> configuration options.
+To control when a harvester is closed, use the <<{beatname_lc}-input-log-close-options,`close_*`>> configuration options.
 
 [float]
 [[input]]
@@ -48,7 +42,7 @@ The following example configures {beatname_uc} to harvest lines from all log fil
     - /var/path2/*.log
 -------------------------------------------------------------------------------------
 
-Filebeat currently supports <<input-type,several `input` types>>. Each input type can be defined multiple times. The `log` input checks each file to see whether a harvester needs to be started, whether one is already running, or whether the file can be ignored (see <<ignore-older,`ignore_older`>>). New lines are only picked up if the size of the file has changed since the harvester was closed.
+{beatname_uc} currently supports <<{beatname_lc}-input-types,several `input` types>>. Each input type can be defined multiple times. The `log` input checks each file to see whether a harvester needs to be started, whether one is already running, or whether the file can be ignored (see <<{beatname_lc}-input-log-ignore-older,`ignore_older`>>). New lines are only picked up if the size of the file has changed since the harvester was closed.
 
 [float]
 === How does {beatname_uc} keep the state of files?

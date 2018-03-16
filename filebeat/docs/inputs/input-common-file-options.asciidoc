@@ -1,176 +1,13 @@
-:type: log
-
-[[log-input]]
-=== Log input
-
-++++
-<titleabbrev>Log</titleabbrev>
-++++
-
-Use the `log` input to read lines from log files. 
-
-To configure this input, specify a list of glob-based <<input-paths,`paths`>>
-that must be crawled to locate and fetch the log lines. 
-
-Example configuration:
-
-["source","yaml",subs="attributes"]
-----
-filebeat.inputs:
-- type: log
-  paths:
-    - /var/log/messages
-    - /var/log/*.log
-----
-
-
-You can apply additional
-<<configuration-filebeat-options,configuration settings>> (such as `fields`,
-`include_lines`, `exclude_lines`, `multiline`, and so on) to the lines harvested
-from these files. The options that you specify are applied to all the files
-harvested by this input.
-
-To apply different configuration settings to different files, you need to define
-multiple input sections:
-
-["source","yaml",subs="attributes"]
-----
-filebeat.inputs:
-- type: log <1>
-  paths:
-    - /var/log/system.log
-    - /var/log/wifi.log
-- type: log <2>
-  paths:
-    - "/var/log/apache2/*"
-  fields:
-    apache: true
-  fields_under_root: true
-----
-
-<1> Harvests lines from two files:  `system.log` and
-`wifi.log`.
-<2> Harvests lines from every file in the `apache2` directory, and uses the
-`fields` configuration option to add a field called `apache` to the output.
-
-
-IMPORTANT: Make sure a file is not defined more than once across all inputs
-because this can lead to unexpected behaviour.
-
-
-[[log-input-options]]
-==== Configuration options
-
-The `log` input supports the following configuration options plus the
-<<{type}-input-common-options>> described later.
+//////////////////////////////////////////////////////////////////////////
+//// This content is shared by Filebeat inputs that use the prospector
+//// to process files on disk (includes options for managing physical files)
+//// If you add IDs to sections, make sure you use attributes to create
+//// unique IDs for each input that includes this file. Use the format:
+//// [id="{beatname_lc}-input-{type}-option-name"]
+//////////////////////////////////////////////////////////////////////////
 
 [float]
-[[input-paths]]
-===== `paths`
-
-A list of glob-based paths that should be crawled and fetched. All patterns
-supported by https://golang.org/pkg/path/filepath/#Glob[Golang Glob] are also
-supported here. For example, to fetch all files from a predefined level of
-subdirectories, the following pattern can be used: `/var/log/*/*.log`. This
-fetches all `.log` files from the subfolders of `/var/log`. It does not
-fetch log files from the `/var/log` folder itself.
-It is possible to recursively fetch all files in all subdirectories of a directory
-using the optional <<recursive_glob,`recursive_glob`>> settings.
-
-{beatname_uc} starts a harvester for each file that it finds under the specified
-paths. You can specify one path per line. Each line begins with a dash (-).
-
-[float]
-[[recursive_glob]]
-===== `recursive_glob.enabled`
-
-Enable expanding `**` into recursive glob patterns. With this feature enabled,
-the rightmost `**` in each path is expanded into a fixed number of glob
-patterns. For example: `/foo/**` expands to `/foo`, `/foo/*`, `/foo/*/*`, and so
-on. If enabled it expands a single `**` into a 8-level deep `*` pattern.
-
-This feature is enabled by default, set to `recursive_glob.enabled` to false to
-disable it.
-
-[float]
-===== `encoding`
-
-The file encoding to use for reading files that contain international characters.
-See the encoding names http://www.w3.org/TR/encoding/[recommended by the W3C for use in HTML5].
-
-Here are some sample encodings from W3C recommendation:
-
-    * plain, latin1, utf-8, utf-16be-bom, utf-16be, utf-16le, big5, gb18030,
-    gbk, hz-gb-2312,
-    * euc-kr, euc-jp, iso-2022-jp, shift-jis, and so on
-
-The `plain` encoding is special, because it does not validate or transform any input.
-
-[float]
-[[exclude-lines]]
-===== `exclude_lines`
-
-A list of regular expressions to match the lines that you want {beatname_uc} to
-exclude. {beatname_uc} drops any lines that match a regular expression in the
-list. By default, no lines are dropped.
-
-If <<multiline,multiline>> is also specified, each multiline message is combined
-into a single line before the lines are filtered by `exclude_lines`.
-
-The following example configures {beatname_uc} to drop any lines that start with
-"DBG".
-
-["source","yaml",subs="attributes"]
-----
-{beatname_lc}.inputs:
-- paths:
-    - /var/log/myapp/*.log
-  exclude_lines: ['^DBG']
-----
-
-See <<regexp-support>> for a list of supported regexp patterns.
-
-[float]
-[[include-lines]]
-===== `include_lines`
-
-A list of regular expressions to match the lines that you want {beatname_uc} to
-include. {beatname_uc} exports only the lines that match a regular expression in
-the list. By default, all lines are exported.
-
-If <<multiline,multiline>> is also specified, each multiline message is combined
-into a single line before the lines are filtered by `include_lines`.
-
-The following example configures {beatname_uc} to export any lines that start
-with "ERR" or "WARN":
-
-["source","yaml",subs="attributes"]
-----
-{beatname_lc}.inputs:
-- paths:
-    - /var/log/myapp/*.log
-  include_lines: ['^ERR', '^WARN']
-----
-
-NOTE: If both `include_lines` and `exclude_lines` are defined, {beatname_uc}
-executes `include_lines` first and then executes `exclude_lines`. The order in
-which the two options are defined doesn't matter. The `include_lines` option
-will always be executed before the `exclude_lines` option, even if
-`exclude_lines` appears before `include_lines` in the config file.
-
-The following example exports all Apache log lines except the debugging messages
-(DBGs):
-
-[source,yaml]
-----
-  include_lines: ['apache']
-  exclude_lines: ['^DBG']
-----
-
-See <<regexp-support>> for a list of supported regexp patterns.
-
-[float]
-[[exclude-files]]
+[id="{beatname_lc}-input-{type}-exclude-files"]
 ===== `exclude_files`
 
 A list of regular expressions to match the files that you want {beatname_uc} to
@@ -179,15 +16,18 @@ ignore. By default no files are excluded.
 The following example configures {beatname_uc} to ignore all the files that have
 a `gz` extension:
 
-[source,yaml]
+["source","yaml",subs="attributes"]
 ----
+{beatname_lc}.inputs:
+- type: {type}
+  ...
   exclude_files: ['\.gz$']
 ----
 
 See <<regexp-support>> for a list of supported regexp patterns.
 
 [float]
-[[ignore-older]]
+[id="{beatname_lc}-input-{type}-ignore-older"]
 ===== `ignore_older`
 
 If this option is enabled, {beatname_uc} ignores any files that were modified
@@ -229,7 +69,7 @@ harvester will first finish reading the file and close it after `close_inactive`
 is reached. Then, after that, the file will be ignored.
 
 [float]
-[[close-options]]
+[id="{beatname_lc}-input-{type}-close-options"]
 ===== `close_*`
 
 The `close_*` configuration options are used to close the harvester after a
@@ -241,7 +81,7 @@ the file again, and any data that the harvester hasn't read will be lost.
 
 
 [float]
-[[close-inactive]]
+[id="{beatname_lc}-input-{type}-close-inactive"]
 ===== `close_inactive`
 
 When this option is enabled, {beatname_uc} closes the file handle if a file has
@@ -271,7 +111,7 @@ You can use time strings like 2h (2 hours) and 5m (5 minutes). The default is
 5m.
 
 [float]
-[[close-renamed]]
+[id="{beatname_lc}-input-{type}-close-renamed"]
 ===== `close_renamed`
 
 WARNING: Only use this option if you understand that data loss is a potential
@@ -289,7 +129,7 @@ WINDOWS: If your Windows log rotation system shows errors because it can't
 rotate the files, you should enable this option.
 
 [float]
-[[close-removed]]
+[id="{beatname_lc}-input-{type}-close-removed"]
 ===== `close_removed`
 
 When this option is enabled, {beatname_uc} closes the harvester when a file is
@@ -307,7 +147,7 @@ WINDOWS: If your Windows log rotation system shows errors because it can't
 rotate files, make sure this option is enabled.
 
 [float]
-[[close-eof]]
+[id="{beatname_lc}-input-{type}-close-eof"]
 ===== `close_eof`
 
 WARNING: Only use this option if you understand that data loss is a potential
@@ -319,7 +159,7 @@ updated from time to time. For example, this happens when you are writing every
 single log event to a new file. This option is disabled by default.
 
 [float]
-[[close-timeout]]
+[id="{beatname_lc}-input-{type}-close-timeout"]
 ===== `close_timeout`
 
 WARNING: Only use this option if you understand that data loss is a potential
@@ -353,7 +193,7 @@ This option is set to 0 by default which means it is disabled.
 
 
 [float]
-[[clean-options]]
+[id="{beatname_lc}-input-{type}-clean-options"]
 ===== `clean_*`
 
 The `clean_*` options are used to clean up the state entries in the registry
@@ -361,7 +201,7 @@ file. These settings help to reduce the size of the registry file and can
 prevent a potential <<inode-reuse-issue,inode reuse issue>>.
 
 [float]
-[[clean-inactive]]
+[id="{beatname_lc}-input-{type}-clean-inactive"]
 ===== `clean_inactive`
 
 WARNING: Only use this option if you understand that data loss is a potential
@@ -388,7 +228,7 @@ NOTE: Every time a file is renamed, the file state is updated and the counter
 for `clean_inactive` starts at 0 again.
 
 [float]
-[[clean-removed]]
+[id="{beatname_lc}-input-{type}-clean-removed"]
 ===== `clean_removed`
 
 When this option is enabled, {beatname_uc} cleans files from the registry if
@@ -404,7 +244,7 @@ option.
 You must disable this option if you also disable `close_removed`.
 
 [float]
-[[scan-frequency]]
+[id="{beatname_lc}-input-{type}-scan-frequency"]
 ===== `scan_frequency`
 
 How often {beatname_uc} checks for new files in the paths that are specified
@@ -420,9 +260,8 @@ constantly polls your files.
 
 The default setting is 10s.
 
-
 [float]
-[[scan-sort]]
+[id="{beatname_lc}-input-{type}-scan-sort"]
 ===== `scan.sort`
 
 experimental[]
@@ -438,7 +277,7 @@ whether files are scanned in ascending or descending order.
 The default setting is disabled.
 
 [float]
-[[scan-order]]
+[id="{beatname_lc}-input-{type}-scan-order"]
 ===== `scan.order`
 
 experimental[]
@@ -446,66 +285,6 @@ experimental[]
 Specifies whether to use ascending or descending order when `scan.sort` is set to a value other than none. Possible values are `asc` or `desc`.
 
 The default setting is `asc`.
-
-[float]
-===== `harvester_buffer_size`
-
-The size in bytes of the buffer that each harvester uses when fetching a file. The default is 16384.
-
-[float]
-===== `max_bytes`
-
-The maximum number of bytes that a single log message can have. All bytes after `max_bytes` are discarded and not sent.
-This setting is especially useful for multiline log messages, which can get large. The default is 10MB (10485760).
-
-[float]
-[[config-json]]
-===== `json`
-These options make it possible for {beatname_uc} to decode logs structured as
-JSON messages. {beatname_uc} processes the logs line by line, so the JSON
-decoding only works if there is one JSON object per line.
-
-The decoding happens before line filtering and multiline. You can combine JSON
-decoding with filtering and multiline if you set the `message_key` option. This
-can be helpful in situations where the application logs are wrapped in JSON
-objects, like it happens for example with Docker.
-
-Example configuration:
-
-[source,yaml]
-----
-json.keys_under_root: true
-json.add_error_key: true
-json.message_key: log
-----
-
-You must specify at least one of the following settings to enable JSON parsing
-mode:
-
-*`keys_under_root`*:: By default, the decoded JSON is placed under a "json" key
-*in the output document. If you enable this setting, the keys are copied top
-*level in the output document. The default is false.
-
-*`overwrite_keys`*:: If `keys_under_root` and this setting are enabled, then the
-*values from the decoded JSON object overwrite the fields that {beatname_uc}
-*normally adds (type, source, offset, etc.) in case of conflicts.
-
-*`add_error_key`*:: If this setting is enabled, {beatname_uc} adds a
-*"error.message" and "error.type: json" key in case of JSON unmarshalling errors
-*or when a `message_key` is defined in the configuration but cannot be used.
-
-*`message_key`*:: An optional configuration setting that specifies a JSON key on
-*which to apply the line filtering and multiline settings. If specified the key
-*must be at the top level in the JSON object and the value associated with the
-*key must be a string, otherwise no filtering or multiline aggregation will
-*occur.
-
-[float]
-===== `multiline`
-
-Options that control how {beatname_uc} deals with log messages that span
-multiple lines. See <<multiline-examples>> for more information about
-configuring multiline options.
 
 [float]
 ===== `tail_files`
@@ -524,16 +303,6 @@ remove the registry file. Be aware that doing this removes ALL previous states.
 NOTE: You can use this setting to avoid indexing old log lines when you run
 {beatname_uc} on a set of log files for the first time. After the first run, we
 recommend disabling this option, or you risk losing lines during file rotation.
-
-[float]
-===== `pipeline`
-
-The Ingest Node pipeline ID to set for the events generated by this input.
-
-NOTE: The pipeline ID can also be configured in the Elasticsearch output, but
-this option usually results in simpler configuration files. If the pipeline is
-configured both in the input and output, the option from the
-input is used.
 
 [float]
 ===== `symlinks`
@@ -596,7 +365,7 @@ for waiting for new lines. The `backoff` value will be multiplied each time with
 the `backoff_factor` until `max_backoff` is reached. The default is 2.
 
 [float]
-[[harvester-limit]]
+[id="{beatname_lc}-input-{type}-harvester-limit"]
 ===== `harvester_limit`
 
 The `harvester_limit` option limits the number of harvesters that are started in
@@ -618,12 +387,3 @@ file that hasn't been harvested for a longer period of time.
 This configuration option applies per input. You can use this option to
 indirectly set higher priorities on certain inputs by assigning a higher
 limit of harvesters.
-
-[float]
-===== `enabled`
-
-Use the `enabled` option to enable and disable inputs. By default, enabled is
-set to true.
-
-[id="{type}-input-common-options"]
-include::include/common-input-options.asciidoc[]
