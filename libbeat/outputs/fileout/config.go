@@ -25,13 +25,13 @@ import (
 )
 
 type config struct {
-	Path          string       `config:"path"`
-	Filename      string       `config:"filename"`
-	RotateEveryKb uint         `config:"rotate_every_kb" validate:"min=1"`
-	NumberOfFiles uint         `config:"number_of_files"`
-	Compression   string       `config:"compression"`
-	Codec         codec.Config `config:"codec"`
-	Permissions   uint32       `config:"permissions"`
+	Path          string               `config:"path"`
+	Filename      string               `config:"filename"`
+	RotateEveryKb uint                 `config:"rotate_every_kb" validate:"min=1"`
+	NumberOfFiles uint                 `config:"number_of_files"`
+	Compression   file.CompressionType `config:"compression"`
+	Codec         codec.Config         `config:"codec"`
+	Permissions   uint32               `config:"permissions"`
 }
 
 var (
