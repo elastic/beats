@@ -18,6 +18,8 @@
 package file
 
 import (
+	"compress/gzip"
+	"io"
 	"os"
 	"path/filepath"
 	"strconv"
@@ -56,6 +58,12 @@ func (rr rotateReason) String() string {
 	}
 }
 
+// GzipCompression is the format string for GZIP
+const GzipCompression = "gzip"
+
+// NoCompression is the format string for uncompressed output
+const NoCompression = "none"
+
 // Rotator is a io.WriteCloser that automatically rotates the file it is
 // writing to when it reaches a maximum size and optionally on a time interval
 // basis. It also purges the oldest rotated files when the maximum number of
@@ -70,6 +78,7 @@ type Rotator struct {
 	rotateOnStartup bool
 	intervalRotator *intervalRotator // Optional, may be nil
 	redirectStderr  bool
+	compression     string
 
 	file  *os.File
 	size  uint
@@ -141,6 +150,14 @@ func RedirectStderr(redirect bool) RotatorOption {
 	}
 }
 
+// Compression configures the compression format to use. The default
+// is NoCompression
+func Compression(fmt string) RotatorOption {
+	return func(r *Rotator) {
+		r.compression = fmt
+	}
+}
+
 // NewFileRotator returns a new Rotator.
 func NewFileRotator(filename string, options ...RotatorOption) (*Rotator, error) {
 	r := &Rotator{
@@ -150,6 +167,7 @@ func NewFileRotator(filename string, options ...RotatorOption) (*Rotator, error)
 		permissions:     0600,
 		interval:        0,
 		rotateOnStartup: true,
+		compression:     NoCompression,
 	}
 
 	for _, opt := range options {
@@ -179,6 +197,10 @@ func NewFileRotator(filename string, options ...RotatorOption) (*Rotator, error)
 			"permissions", r.permissions,
 			"interval", r.interval,
 		)
+	}
+
+	if !isCompressionSupported(r.compression) {
+		return nil, errors.Errorf("Compression format '%v' is not supported", r.compression)
 	}
 
 	return r, nil
@@ -252,7 +274,8 @@ func (r *Rotator) backupName(n uint) string {
 	if n == 0 {
 		return r.filename
 	}
-	return r.filename + "." + strconv.Itoa(int(n))
+
+	return r.filename + "." + strconv.Itoa(int(n)) + compressionFormatSuffix(r.compression)
 }
 
 func (r *Rotator) dir() string {
@@ -452,7 +475,7 @@ func (r *Rotator) rotateByInterval(reason rotateReason) error {
 }
 
 func (r *Rotator) rotateBySize(reason rotateReason) error {
-	for i := r.maxBackups + 1; i > 0; i-- {
+	for i := r.maxBackups + 1; i > 1; i-- {
 		old := r.backupName(i - 1)
 		older := r.backupName(i)
 
@@ -474,5 +497,63 @@ func (r *Rotator) rotateBySize(reason rotateReason) error {
 			}
 		}
 	}
+
+	currentFileName := r.filename
+
+	if r.compression == NoCompression {
+		if err := os.Rename(currentFileName, r.backupName(1)); err != nil {
+			return errors.Wrap(err, "failed to rotate backups")
+		}
+	}
+	return compressFile(currentFileName, r.backupName(1), r.compression, r.permissions)
+}
+
+func compressFile(currentFileName, outputFileName, compression string, permissions os.FileMode) error {
+
+	inFile, err := os.Open(currentFileName)
+	if err != nil {
+		return errors.Wrap(err, "failed to compress backups")
+	}
+	defer inFile.Close()
+
+	outFile, err := os.OpenFile(outputFileName, os.O_CREATE|os.O_WRONLY|os.O_TRUNC, permissions)
+
+	if err != nil {
+		return errors.Wrap(err, "failed to compress backups")
+	}
+	defer outFile.Close()
+
+	writer := createCompressedWriter(outFile, compression)
+	defer writer.Close()
+
+	_, err = io.Copy(writer, inFile)
+	if err != nil {
+		return errors.Wrap(err, "failed to compress backups")
+	}
+
+	os.Remove(currentFileName)
+
 	return nil
+}
+
+func isCompressionSupported(format string) bool {
+	return NoCompression == format || GzipCompression == format
+}
+
+func compressionFormatSuffix(format string) string {
+	switch format {
+	case GzipCompression:
+		return ".gz"
+	default:
+		return ""
+	}
+}
+
+func createCompressedWriter(writer io.Writer, format string) io.WriteCloser {
+	switch format {
+	case GzipCompression:
+		return gzip.NewWriter(writer)
+	default:
+		return nil
+	}
 }

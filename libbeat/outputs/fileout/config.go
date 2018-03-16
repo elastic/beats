@@ -29,6 +29,7 @@ type config struct {
 	Filename      string       `config:"filename"`
 	RotateEveryKb uint         `config:"rotate_every_kb" validate:"min=1"`
 	NumberOfFiles uint         `config:"number_of_files"`
+	Compression   string       `config:"compression"`
 	Codec         codec.Config `config:"codec"`
 	Permissions   uint32       `config:"permissions"`
 }
@@ -38,6 +39,7 @@ var (
 		NumberOfFiles: 7,
 		RotateEveryKb: 10 * 1024,
 		Permissions:   0600,
+		Compression:   file.NoCompression,
 	}
 )
 

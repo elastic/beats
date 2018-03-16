@@ -85,6 +85,7 @@ func (out *fileOutput) init(beat beat.Info, c config) error {
 		file.MaxBackups(c.NumberOfFiles),
 		file.Permissions(os.FileMode(c.Permissions)),
 		file.WithLogger(logp.NewLogger("rotator").With(logp.Namespace("rotator"))),
+		file.Compression(c.Compression),
 	)
 	if err != nil {
 		return err
@@ -96,8 +97,8 @@ func (out *fileOutput) init(beat beat.Info, c config) error {
 	}
 
 	logp.Info("Initialized file output. "+
-		"path=%v max_size_bytes=%v max_backups=%v permissions=%v",
-		path, c.RotateEveryKb*1024, c.NumberOfFiles, os.FileMode(c.Permissions))
+		"path=%v max_size_bytes=%v max_backups=%v permissions=%v compression=%v",
+		path, c.RotateEveryKb*1024, c.NumberOfFiles, os.FileMode(c.Permissions), c.Compression)
 
 	return nil
 }

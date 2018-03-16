@@ -48,6 +48,7 @@ func TestFileRotator(t *testing.T) {
 		file.MaxBackups(2),
 		file.WithLogger(logp.NewLogger("rotator").With(logp.Namespace("rotator"))),
 	)
+
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -73,6 +74,41 @@ func TestFileRotator(t *testing.T) {
 
 	Rotate(t, r)
 	AssertDirContents(t, dir, "sample.log.2")
+}
+
+func TestFileRotatorCompressedOutput(t *testing.T) {
+	dir, err := ioutil.TempDir("", "file_rotator_compressed")
+	if err != nil {
+		t.Fatal(err)
+	}
+	defer os.RemoveAll(dir)
+
+	filename := filepath.Join(dir, "sample.log")
+	r, err := file.NewFileRotator(filename,
+		file.MaxBackups(2),
+		file.Compression(file.GzipCompression))
+
+	if err != nil {
+		t.Fatal(err)
+	}
+	defer r.Close()
+
+	WriteMsg(t, r)
+	AssertDirContents(t, dir, "sample.log")
+
+	Rotate(t, r)
+	WriteMsg(t, r)
+	AssertDirContents(t, dir, "sample.log", "sample.log.1.gz")
+
+	Rotate(t, r)
+	WriteMsg(t, r)
+	AssertDirContents(t, dir, "sample.log", "sample.log.1.gz", "sample.log.2.gz")
+
+	Rotate(t, r)
+	AssertDirContents(t, dir, "sample.log.1.gz", "sample.log.2.gz")
+
+	Rotate(t, r)
+	AssertDirContents(t, dir, "sample.log.2.gz")
 }
 
 func TestFileRotatorConcurrently(t *testing.T) {
