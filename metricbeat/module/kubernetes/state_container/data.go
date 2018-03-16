@@ -23,7 +23,8 @@ func eventMapping(families []*dto.MetricFamily) ([]common.MapStr, error) {
 			}
 
 			namespace := util.GetLabel(metric, "namespace")
-			containerKey := namespace + "::" + container
+			pod := util.GetLabel(metric, "pod")
+			containerKey := namespace + "::" + pod + "::" + container
 			event, ok := eventsMap[containerKey]
 			if !ok {
 				event = common.MapStr{}
