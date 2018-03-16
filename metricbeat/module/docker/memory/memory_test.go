@@ -17,8 +17,9 @@ func TestMemoryService_GetMemoryStats(t *testing.T) {
 	//Container  + dockerstats
 	containerID := "containerID"
 	labels := map[string]string{
-		"label1": "val1",
-		"label2": "val2",
+		"label1":     "val1",
+		"label2":     "val2",
+		"label2.foo": "val3",
 	}
 	container := types.Container{
 		ID:         containerID,
@@ -42,9 +43,15 @@ func TestMemoryService_GetMemoryStats(t *testing.T) {
 	expectedEvent := common.MapStr{
 		"_module": common.MapStr{
 			"container": common.MapStr{
-				"id":     containerID,
-				"name":   "name1",
-				"labels": docker.DeDotLabels(labels),
+				"id":   containerID,
+				"name": "name1",
+				"labels": common.MapStr{
+					"label1": "val1",
+					"label2": common.MapStr{
+						"foo":   "val3",
+						"value": "val2",
+					},
+				},
 			},
 		},
 		"fail": common.MapStr{
@@ -62,7 +69,7 @@ func TestMemoryService_GetMemoryStats(t *testing.T) {
 		},
 	}
 	//WHEN
-	rawStats := memoryService.GetMemoryStats(memoryRawStats)
+	rawStats := memoryService.getMemoryStats(memoryRawStats, false)
 	event := eventMapping(&rawStats)
 	//THEN
 	assert.True(t, equalEvent(expectedEvent, event))

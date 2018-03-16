@@ -18,11 +18,12 @@ type MetricSet struct {
 	mb.BaseMetricSet
 	netService   *NetService
 	dockerClient *client.Client
+	dedot        bool
 }
 
 // New creates a new instance of the docker network MetricSet.
 func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
-	config := docker.Config{}
+	config := docker.DefaultConfig()
 	if err := base.Module().UnpackConfig(&config); err != nil {
 		return nil, err
 	}
@@ -38,6 +39,7 @@ func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
 		netService: &NetService{
 			NetworkStatPerContainer: make(map[string]map[string]NetRaw),
 		},
+		dedot: config.DeDot,
 	}, nil
 }
 
@@ -48,6 +50,6 @@ func (m *MetricSet) Fetch() ([]common.MapStr, error) {
 		return nil, err
 	}
 
-	formattedStats := m.netService.getNetworkStatsPerContainer(stats)
+	formattedStats := m.netService.getNetworkStatsPerContainer(stats, m.dedot)
 	return eventsMapping(formattedStats), nil
 }

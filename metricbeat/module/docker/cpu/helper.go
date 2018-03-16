@@ -29,20 +29,20 @@ func NewCpuService() *CPUService {
 	return &CPUService{}
 }
 
-func (c *CPUService) getCPUStatsList(rawStats []docker.Stat) []CPUStats {
+func (c *CPUService) getCPUStatsList(rawStats []docker.Stat, dedot bool) []CPUStats {
 	formattedStats := []CPUStats{}
 
 	for _, stats := range rawStats {
-		formattedStats = append(formattedStats, c.getCpuStats(&stats))
+		formattedStats = append(formattedStats, c.getCPUStats(&stats, dedot))
 	}
 
 	return formattedStats
 }
 
-func (c *CPUService) getCpuStats(myRawStat *docker.Stat) CPUStats {
+func (c *CPUService) getCPUStats(myRawStat *docker.Stat, dedot bool) CPUStats {
 	return CPUStats{
 		Time:                        common.Time(myRawStat.Stats.Read),
-		Container:                   docker.NewContainer(myRawStat.Container),
+		Container:                   docker.NewContainer(myRawStat.Container, dedot),
 		PerCpuUsage:                 perCpuUsage(&myRawStat.Stats),
 		TotalUsage:                  totalUsage(&myRawStat.Stats),
 		UsageInKernelmode:           myRawStat.Stats.CPUStats.CPUUsage.UsageInKernelmode,
