@@ -33,25 +33,25 @@ type BLkioService struct {
 	BlkioSTatsPerContainer map[string]BlkioRaw
 }
 
-func (io *BLkioService) getBlkioStatsList(rawStats []docker.Stat) []BlkioStats {
+func (io *BLkioService) getBlkioStatsList(rawStats []docker.Stat, dedot bool) []BlkioStats {
 	formattedStats := []BlkioStats{}
 	if io.BlkioSTatsPerContainer == nil {
 		io.BlkioSTatsPerContainer = make(map[string]BlkioRaw)
 	}
 	for _, myRawStats := range rawStats {
-		formattedStats = append(formattedStats, io.getBlkioStats(&myRawStats))
+		formattedStats = append(formattedStats, io.getBlkioStats(&myRawStats, dedot))
 	}
 
 	return formattedStats
 }
 
-func (io *BLkioService) getBlkioStats(myRawStat *docker.Stat) BlkioStats {
+func (io *BLkioService) getBlkioStats(myRawStat *docker.Stat, dedot bool) BlkioStats {
 	newBlkioStats := io.getNewStats(myRawStat.Stats.Read, myRawStat.Stats.BlkioStats.IoServicedRecursive)
 	oldBlkioStats, exist := io.BlkioSTatsPerContainer[myRawStat.Container.ID]
 
 	myBlkioStats := BlkioStats{
 		Time:      myRawStat.Stats.Read,
-		Container: docker.NewContainer(myRawStat.Container),
+		Container: docker.NewContainer(myRawStat.Container, dedot),
 	}
 
 	if exist {

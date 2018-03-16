@@ -18,11 +18,12 @@ type MetricSet struct {
 	mb.BaseMetricSet
 	cpuService   *CPUService
 	dockerClient *client.Client
+	dedot        bool
 }
 
 // New creates a new instance of the docker cpu MetricSet.
 func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
-	config := docker.Config{}
+	config := docker.DefaultConfig()
 	if err := base.Module().UnpackConfig(&config); err != nil {
 		return nil, err
 	}
@@ -36,6 +37,7 @@ func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
 		BaseMetricSet: base,
 		dockerClient:  client,
 		cpuService:    &CPUService{},
+		dedot:         config.DeDot,
 	}, nil
 }
 
@@ -46,6 +48,6 @@ func (m *MetricSet) Fetch() ([]common.MapStr, error) {
 		return nil, err
 	}
 
-	formattedStats := m.cpuService.getCPUStatsList(stats)
+	formattedStats := m.cpuService.getCPUStatsList(stats, m.dedot)
 	return eventsMapping(formattedStats), nil
 }
