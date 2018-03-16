@@ -222,6 +222,7 @@ metricbeat.modules:
   #method: "GET"
   #request.enabled: false
   #response.enabled: false
+  #json.is_array: false
   #dedot.enabled: false
 
 - module: http
@@ -290,6 +291,9 @@ metricbeat.modules:
     - volume
   period: 10s
   hosts: ["localhost:10255"]
+  #ssl.certificate_authorities: ["/etc/pki/root/ca.pem"]
+  #ssl.certificate: "/etc/pki/client/cert.pem"
+  #ssl.key: "/etc/pki/client/cert.key"
 
 # State metrics from kube-state-metrics service:
 - module: kubernetes
@@ -416,7 +420,7 @@ metricbeat.modules:
 
 #------------------------------ RabbitMQ Module ------------------------------
 - module: rabbitmq
-  metricsets: ["node", "queue"]
+  metricsets: ["node", "queue", "connection"]
   period: 10s
   hosts: ["localhost:15672"]
 
@@ -527,7 +531,8 @@ metricbeat.modules:
 
     # Hints the minimum number of events stored in the queue,
     # before providing a batch of events to the outputs.
-    # A value of 0 (the default) ensures events are immediately available
+    # The default value is set to 2048.
+    # A value of 0 ensures events are immediately available
     # to be sent to the outputs.
     #flush.min_events: 2048
 

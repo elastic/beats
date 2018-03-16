@@ -1,6 +1,6 @@
 [role="xpack"]
 [[beats-user-access]]
-=== Granting Users Access to {beatname_uc} Indices
+=== Granting users access to {beatname_uc} indices
 
 To enable users to access the indices a {beatname_uc} creates, grant them `read`
 and `view_index_metadata` privileges on the {beatname_uc} indices:

@@ -1,5 +1,4 @@
-// +build darwin linux windows
-// +build cgo
+// +build darwin,cgo freebsd,cgo linux windows
 
 package instance
 
@@ -7,38 +6,31 @@ import (
 	"fmt"
 	"os"
 	"runtime"
-	"time"
-
-	"github.com/satori/go.uuid"
 
 	"github.com/elastic/beats/libbeat/logp"
 	"github.com/elastic/beats/libbeat/metric/system/cpu"
 	"github.com/elastic/beats/libbeat/metric/system/process"
 	"github.com/elastic/beats/libbeat/monitoring"
-	"github.com/elastic/beats/libbeat/monitoring/report/log"
 )
 
 var (
 	beatProcessStats *process.Stats
-	ephemeralID      uuid.UUID
+	systemMetrics    *monitoring.Registry
 )
 
 func init() {
-	beatMetrics := monitoring.Default.NewRegistry("beat")
+	systemMetrics = monitoring.Default.NewRegistry("system")
+}
+
+func setupMetrics(name string) error {
 	monitoring.NewFunc(beatMetrics, "memstats", reportMemStats, monitoring.Report)
 	monitoring.NewFunc(beatMetrics, "cpu", reportBeatCPU, monitoring.Report)
-	monitoring.NewFunc(beatMetrics, "info", reportInfo, monitoring.Report)
 
-	systemMetrics := monitoring.Default.NewRegistry("system")
 	monitoring.NewFunc(systemMetrics, "cpu", reportSystemCPUUsage, monitoring.Report)
 	if runtime.GOOS != "windows" {
 		monitoring.NewFunc(systemMetrics, "load", reportSystemLoadAverage, monitoring.Report)
 	}
 
-	ephemeralID = uuid.NewV4()
-}
-
-func setupMetrics(name string) error {
 	beatProcessStats = &process.Stats{
 		Procs:        []string{name},
 		EnvWhitelist: nil,
@@ -91,19 +83,6 @@ func getRSSSize() (uint64, error) {
 	return rss, nil
 }
 
-func reportInfo(_ monitoring.Mode, V monitoring.Visitor) {
-	V.OnRegistryStart()
-	defer V.OnRegistryFinished()
-
-	delta := time.Since(log.StartTime)
-	uptime := int64(delta / time.Millisecond)
-	monitoring.ReportNamespace(V, "uptime", func() {
-		monitoring.ReportInt(V, "ms", uptime)
-	})
-
-	monitoring.ReportString(V, "ephemeral_id", ephemeralID.String())
-}
-
 func reportBeatCPU(_ monitoring.Mode, V monitoring.Visitor) {
 	V.OnRegistryStart()
 	defer V.OnRegistryFinished()
@@ -122,16 +101,22 @@ func reportBeatCPU(_ monitoring.Mode, V monitoring.Visitor) {
 
 	monitoring.ReportNamespace(V, "user", func() {
 		monitoring.ReportInt(V, "ticks", int64(cpuTicks.User))
-		monitoring.ReportInt(V, "time", userTime)
+		monitoring.ReportNamespace(V, "time", func() {
+			monitoring.ReportInt(V, "ms", userTime)
+		})
 	})
 	monitoring.ReportNamespace(V, "system", func() {
 		monitoring.ReportInt(V, "ticks", int64(cpuTicks.System))
-		monitoring.ReportInt(V, "time", systemTime)
+		monitoring.ReportNamespace(V, "time", func() {
+			monitoring.ReportInt(V, "ms", systemTime)
+		})
 	})
 	monitoring.ReportNamespace(V, "total", func() {
 		monitoring.ReportFloat(V, "value", totalCPUUsage)
 		monitoring.ReportInt(V, "ticks", int64(cpuTicks.Total))
-		monitoring.ReportInt(V, "time", userTime+systemTime)
+		monitoring.ReportNamespace(V, "time", func() {
+			monitoring.ReportInt(V, "ms", userTime+systemTime)
+		})
 	})
 }
 

@@ -4,15 +4,17 @@ import (
 	"time"
 
 	"github.com/elastic/beats/libbeat/autodiscover"
+	"github.com/elastic/beats/libbeat/autodiscover/builder"
 	"github.com/elastic/beats/libbeat/autodiscover/template"
 	"github.com/elastic/beats/libbeat/common"
 	"github.com/elastic/beats/libbeat/common/bus"
+	"github.com/elastic/beats/libbeat/common/cfgwarn"
 	"github.com/elastic/beats/libbeat/common/kubernetes"
 	"github.com/elastic/beats/libbeat/logp"
 )
 
 func init() {
-	autodiscover.ProviderRegistry.AddProvider("kubernetes", AutodiscoverBuilder)
+	autodiscover.Registry.AddProvider("kubernetes", AutodiscoverBuilder)
 }
 
 // Provider implements autodiscover provider for docker containers
@@ -22,17 +24,15 @@ type Provider struct {
 	watcher   kubernetes.Watcher
 	metagen   kubernetes.MetaGenerator
 	templates *template.Mapper
+	builders  autodiscover.Builders
+	appenders autodiscover.Appenders
 }
 
 // AutodiscoverBuilder builds and returns an autodiscover provider
 func AutodiscoverBuilder(bus bus.Bus, c *common.Config) (autodiscover.Provider, error) {
+	cfgwarn.Beta("The kubernetes autodiscover is beta")
 	config := defaultConfig()
 	err := c.Unpack(&config)
-	if err != nil {
-		return nil, err
-	}
-
-	mapper, err := template.NewConfigMapper(config.Templates)
 	if err != nil {
 		return nil, err
 	}
@@ -56,10 +56,35 @@ func AutodiscoverBuilder(bus bus.Bus, c *common.Config) (autodiscover.Provider, 
 		return nil, err
 	}
 
+	mapper, err := template.NewConfigMapper(config.Templates)
+	if err != nil {
+		return nil, err
+	}
+
+	var builders autodiscover.Builders
+	for _, bcfg := range config.Builders {
+		if builder, err := autodiscover.Registry.BuildBuilder(bcfg); err != nil {
+			logp.Warn("kubernetes", "failed to construct autodiscover builder due to error: %v", err)
+		} else {
+			builders = append(builders, builder)
+		}
+	}
+
+	var appenders autodiscover.Appenders
+	for _, acfg := range config.Appenders {
+		if appender, err := autodiscover.Registry.BuildAppender(acfg); err != nil {
+			logp.Warn("kubernetes", "failed to construct autodiscover appender due to error: %v", err)
+		} else {
+			appenders = append(appenders, appender)
+		}
+	}
+
 	p := &Provider{
 		config:    config,
 		bus:       bus,
 		templates: mapper,
+		builders:  builders,
+		appenders: appenders,
 		metagen:   metagen,
 		watcher:   watcher,
 	}
@@ -88,52 +113,59 @@ func (p *Provider) Start() {
 }
 
 func (p *Provider) emit(pod *kubernetes.Pod, flag string) {
+	// Emit events for all containers
+	p.emitEvents(pod, flag, pod.Spec.Containers, pod.Status.ContainerStatuses)
+
+	// Emit events for all initContainers
+	p.emitEvents(pod, flag, pod.Spec.InitContainers, pod.Status.InitContainerStatuses)
+}
+
+func (p *Provider) emitEvents(pod *kubernetes.Pod, flag string, containers []kubernetes.Container,
+	containerstatuses []kubernetes.PodContainerStatus) {
 	host := pod.Status.PodIP
+
+	// Collect all container IDs and runtimes from status information.
 	containerIDs := map[string]string{}
-
-	// Emit pod container IDs
-	for _, c := range append(pod.Status.ContainerStatuses, pod.Status.InitContainerStatuses...) {
-		cid := c.GetContainerID()
+	runtimes := map[string]string{}
+	for _, c := range containerstatuses {
+		cid, runtime := c.GetContainerIDWithRuntime()
 		containerIDs[c.Name] = cid
-
-		cmeta := common.MapStr{
-			"id":    cid,
-			"name":  c.Name,
-			"image": c.Image,
-		}
-
-		// Metadata appended to each event
-		meta := p.metagen.ContainerMetadata(pod, c.Name)
-
-		// Information that can be used in discovering a workload
-		kubemeta := meta.Clone()
-		kubemeta["container"] = cmeta
-
-		// Emit container info
-		p.publish(bus.Event{
-			flag:         true,
-			"host":       host,
-			"kubernetes": kubemeta,
-			"meta": common.MapStr{
-				"kubernetes": meta,
-			},
-		})
+		runtimes[c.Name] = runtime
 	}
 
-	// Emit pod ports
-	for _, c := range pod.Spec.Containers {
+	// Emit container and port information
+	for _, c := range containers {
 		cmeta := common.MapStr{
-			"id":    containerIDs[c.Name],
-			"name":  c.Name,
-			"image": c.Image,
+			"id":      containerIDs[c.Name],
+			"name":    c.Name,
+			"image":   c.Image,
+			"runtime": runtimes[c.Name],
 		}
-
-		// Metadata appended to each event
 		meta := p.metagen.ContainerMetadata(pod, c.Name)
 
 		// Information that can be used in discovering a workload
 		kubemeta := meta.Clone()
 		kubemeta["container"] = cmeta
+
+		// Pass annotations to all events so that it can be used in templating and by annotation builders.
+		annotations := common.MapStr{}
+		for k, v := range pod.GetMetadata().Annotations {
+			annotations[k] = v
+		}
+		kubemeta["annotations"] = annotations
+
+		// Without this check there would be overlapping configurations with and without ports.
+		if len(c.Ports) == 0 {
+			event := bus.Event{
+				flag:         true,
+				"host":       host,
+				"kubernetes": kubemeta,
+				"meta": common.MapStr{
+					"kubernetes": meta,
+				},
+			}
+			p.publish(event)
+		}
 
 		for _, port := range c.Ports {
 			event := bus.Event{
@@ -154,8 +186,57 @@ func (p *Provider) publish(event bus.Event) {
 	// Try to match a config
 	if config := p.templates.GetConfig(event); config != nil {
 		event["config"] = config
+	} else {
+		// If there isn't a default template then attempt to use builders
+		if config := p.builders.GetConfig(p.generateHints(event)); config != nil {
+			event["config"] = config
+		}
 	}
+
+	// Call all appenders to append any extra configuration
+	p.appenders.Append(event)
 	p.bus.Publish(event)
+}
+
+func (p *Provider) generateHints(event bus.Event) bus.Event {
+	// Try to build a config with enabled builders. Send a provider agnostic payload.
+	// Builders are Beat specific.
+	e := bus.Event{}
+	var annotations common.MapStr
+	var kubeMeta, container common.MapStr
+	rawMeta, ok := event["kubernetes"]
+	if ok {
+		kubeMeta = rawMeta.(common.MapStr)
+		// The builder base config can configure any of the field values of kubernetes if need be.
+		e["kubernetes"] = kubeMeta
+		if rawAnn, ok := kubeMeta["annotations"]; ok {
+			annotations = rawAnn.(common.MapStr)
+		}
+	}
+	if host, ok := event["host"]; ok {
+		e["host"] = host
+	}
+	if port, ok := event["port"]; ok {
+		e["port"] = port
+	}
+
+	if rawCont, ok := kubeMeta["container"]; ok {
+		container = rawCont.(common.MapStr)
+		// This would end up adding a runtime entry into the event. This would make sure
+		// that there is not an attempt to spin up a docker input for a rkt container and when a
+		// rkt input exists it would be natively supported.
+		e["container"] = container
+	}
+
+	cname := builder.GetContainerName(container)
+	hints := builder.GenerateHints(annotations, cname, p.config.Prefix)
+	if len(hints) != 0 {
+		e["hints"] = hints
+	}
+
+	logp.Debug("kubernetes", "Generated builder event %v", event)
+
+	return e
 }
 
 // Stop signals the stop channel to force the watch loop routine to stop.

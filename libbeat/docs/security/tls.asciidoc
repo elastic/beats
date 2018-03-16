@@ -1,6 +1,6 @@
 [role="xpack"]
 [[beats-tls]]
-=== Configuring {beatname_uc} to use Encrypted Connections
+=== Configuring {beatname_uc} to use encrypted connections
 
 If encryption is enabled on the {es} cluster, you need to connect to {es} via
 HTTPS. If the certificate authority (CA) that signed your node certificates

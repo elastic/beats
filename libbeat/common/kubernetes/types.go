@@ -68,6 +68,7 @@ type ContainerPort struct {
 
 type PodSpec struct {
 	Containers                    []Container `json:"containers"`
+	InitContainers                []Container `json:"initContainers"`
 	DNSPolicy                     string      `json:"dnsPolicy"`
 	NodeName                      string      `json:"nodeName"`
 	RestartPolicy                 string      `json:"restartPolicy"`
@@ -132,14 +133,20 @@ func (p *Pod) GetMetadata() *ObjectMeta {
 
 // GetContainerID parses the container ID to get the actual ID string
 func (s *PodContainerStatus) GetContainerID() string {
+	cID, _ := s.GetContainerIDWithRuntime()
+	return cID
+}
+
+// GetContainerIDWithRuntime parses the container ID to get the actual ID string
+func (s *PodContainerStatus) GetContainerIDWithRuntime() (string, string) {
 	cID := s.ContainerID
 	if cID != "" {
-		parts := strings.Split(cID, "//")
+		parts := strings.Split(cID, "://")
 		if len(parts) == 2 {
-			return parts[1]
+			return parts[1], parts[0]
 		}
 	}
-	return ""
+	return "", ""
 }
 
 // Event is kubernetes event

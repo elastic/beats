@@ -1,14 +1,14 @@
 import os
 import sys
 
-sys.path.append('../../../libbeat/tests/system')
-from beat.beat import TestCase
+sys.path.append('../../../metricbeat/tests/system')
+from metricbeat import BaseTest as MetricbeatTest
 
 
-class BaseTest(TestCase):
+class BaseTest(MetricbeatTest):
     @classmethod
     def setUpClass(self):
         self.beat_name = "auditbeat"
         self.beat_path = os.path.abspath(
             os.path.join(os.path.dirname(__file__), "../../"))
-        super(BaseTest, self).setUpClass()
+        super(MetricbeatTest, self).setUpClass()

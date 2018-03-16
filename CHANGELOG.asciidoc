@@ -1,4 +1,3 @@
-
 // Use these for links to issue and pulls. Note issues and pulls redirect one to
 // each other on Github, so don't worry too much on using the right prefix.
 :issue: https://github.com/elastic/beats/issues/
@@ -24,6 +23,7 @@ https://github.com/elastic/beats/compare/v6.0.0-beta2...master[Check the HEAD di
 - De dot keys of labels and annotations in kubernetes meta processors to prevent collisions. {pull}6203[6203]
 - The default value for pipelining is reduced to 2 to avoid high memory in the Logstash beats input. {pull}6250[6250]
 - Add logging when monitoring cannot connect to Elasticsearch. {pull}6365[6365]
+- Rename beat.cpu.*.time metrics to beat.cpu.*.time.ms. {pull}6449[6449]
 
 *Auditbeat*
 
@@ -50,6 +50,8 @@ https://github.com/elastic/beats/compare/v6.0.0-beta2...master[Check the HEAD di
 
 *Heartbeat*
 
+- Made the url field of heartbeat aggregatable. {pull}6263[6263]
+
 *Metricbeat*
 
 - Rename `heap_init` field to `heap.init`. {pull}5320[5320]
@@ -62,6 +64,7 @@ https://github.com/elastic/beats/compare/v6.0.0-beta2...master[Check the HEAD di
 - Fix the default configuration for Logstash to include the default port. {pull}6279[6279]
 - Add filtering option by exact device names in system.diskio. `diskio.include_devices`. {pull}6085[6085]
 - Fix dealing with new process status codes in Linux kernel 4.14+. {pull}6306[6306]
+- Add config option for windows/perfmon metricset to ignore non existent counters. {pull}6432[6432]
 
 *Packetbeat*
 
@@ -84,6 +87,10 @@ https://github.com/elastic/beats/compare/v6.0.0-beta2...master[Check the HEAD di
 - Update Golang 1.9.4 {pull}6326[6326]
 - Fix conditions checking on autodiscover Docker labels. {pull}6412[6412]
 - Fix for kafka logger. {pull}6430[6430]
+- Remove double slashes in Windows service script. {pull}6491[6491]
+- Fix infinite failure on Kubernetes watch {pull}6504[6504]
+- Ensure Kubernetes labels/annotations don't break mapping {pull}6490[6490]
+- Report ephemeral ID and uptime in monitoring events on all platforms {pull}6501[6501]
 
 *Auditbeat*
 
@@ -112,6 +119,7 @@ https://github.com/elastic/beats/compare/v6.0.0-beta2...master[Check the HEAD di
 
 *Metricbeat*
 
+- Add connections metricset to RabbitMQ module {pull}6548[6548]
 - Change field type of http header from nested to object {pull}5258[5258]
 - Fix the fetching of process information when some data is missing under MacOS X. {issue}5337[5337]
 - Change `MySQL active connections` visualization title to `MySQL total connections`. {issue}4812[4812]
@@ -133,6 +141,8 @@ https://github.com/elastic/beats/compare/v6.0.0-beta2...master[Check the HEAD di
 - Fix panic in http dependent modules when invalid config was used.
 - Fix system.filesystem.used.pct value to match what df reports. {issue}5494[5494]
 - Fix namespace disambiguation in Kubernetes state_* metricsets. {issue}6281[6281]
+- Fix Kubernetes overview dashboard views for non default time ranges. {issue}6395{6395}
+- Fix Windows perfmon metricset so that it sends metrics when an error occurs. {pull}6542[6542]
 
 *Packetbeat*
 
@@ -178,6 +188,11 @@ https://github.com/elastic/beats/compare/v6.0.0-beta2...master[Check the HEAD di
 - The `add_docker_metadata` and `add_kubernetes_metadata` processors are now GA, instead of Beta. {pull}6105[6105]
 - The node name can be discovered automatically by machine-id matching when beat deployed outside kubernetes cluster. {pull}6146[6146]
 - Panics will be written to the logger before exiting. {pull}6199[6199]
+- Add builder support for autodiscover and annotations builder {pull}6408[6408]
+- Add plugin support for autodiscover builders, providers {pull}6457[6457]
+- Preserve runtime from container statuses in Kubernetes autodiscover {pull}6456[6456]
+- Experimental feature setup.template.append_fields added. {pull}6024[6024]
+- Add appender support to autodiscover {pull}6469[6469]
 
 *Auditbeat*
 
@@ -198,6 +213,8 @@ https://github.com/elastic/beats/compare/v6.0.0-beta2...master[Check the HEAD di
 - Add Logstash module support for main log and the slow log, support the plain text or structured JSON format {pull}5481[5481]
 - Add stream filtering when using `docker` prospector. {pull}6057[6057]
 - Add support for CRI logs format. {issue}5630[5630]
+- Add json.ignore_decoding_error config to not log json decoding erors. {issue}6547[6547]
+- Make registry file permission configurable. {pull}6455[6455]
 
 *Heartbeat*
 
@@ -228,6 +245,10 @@ https://github.com/elastic/beats/compare/v6.0.0-beta2...master[Check the HEAD di
 - Add statefulset support to Kubernetes module. {pull}6236[6236]
 - Refactor prometheus endpoint parsing to look similar to upstream prometheus {pull}6332[6332]
 - Update prometheus dependencies to latest {pull}6333[6333]
+- Making the http/json metricset GA. {pull}6471[6471]
+- Add support for array in http/json metricset. {pull}6480[6480]
+- Making the jolokia/jmx module GA. {pull}6143[6143]
+- Making the MongoDB module GA. {pull}6554[6554]
 
 *Packetbeat*
 

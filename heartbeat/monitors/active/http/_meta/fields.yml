@@ -11,6 +11,12 @@
           type: text
           description: >
             Service url used by monitor.
+          multi_fields:
+          - name: raw
+            type: keyword
+            description: >
+              The service url used by monitor. This is a non-analyzed field that is useful
+              for aggregations.
 
         - name: response
           type: group

@@ -34,6 +34,7 @@ filebeat.prospectors:
 === Configuration options
 
 [float]
+[[prospector-type]]
 ==== `type`
 
 One of the following input types:
@@ -100,7 +101,8 @@ The following example configures Filebeat to drop any lines that start with "DBG
 [source,yaml]
 -------------------------------------------------------------------------------------
 filebeat.prospectors:
-- paths:
+- type: log
+  paths:
     - /var/log/myapp/*.log
   exclude_lines: ['^DBG']
 -------------------------------------------------------------------------------------
@@ -120,7 +122,8 @@ The following example configures Filebeat to export any lines that start with "E
 [source,yaml]
 -------------------------------------------------------------------------------------
 filebeat.prospectors:
-- paths:
+- type: log
+  paths:
     - /var/log/myapp/*.log
   include_lines: ['^ERR', '^WARN']
 -------------------------------------------------------------------------------------
@@ -167,7 +170,8 @@ Example:
 [source,yaml]
 --------------------------------------------------------------------------------
 filebeat.prospectors:
-- paths: ["/var/log/app/*.json"]
+- type: log
+  paths: ["/var/log/app/*.json"]
   tags: ["json"]
 --------------------------------------------------------------------------------
 
@@ -187,7 +191,8 @@ will be overwritten by the value declared here.
 [source,yaml]
 --------------------------------------------------------------------------------
 filebeat.prospectors:
-- paths: ["/var/log/app/*.log"]
+- type: log
+  paths: ["/var/log/app/*.log"]
   fields:
     app_id: query_engine_12
 --------------------------------------------------------------------------------
@@ -416,6 +421,9 @@ which to apply the line filtering and multiline settings. If specified the
 key must be at the top level in the JSON object and the value associated with
 the key must be a string, otherwise no filtering or multiline aggregation will
 occur.
+
+*`ignore_decoding_error`*:: An optional configuration setting that specifies if JSON decoding errors should be
+logged or not. If set to true, errors will not be logged. The default is false.
 
 [float]
 ==== `multiline`

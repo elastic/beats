@@ -1,12 +1,12 @@
 version: '2'
 services:
   beat:
-    build: .
+    build: ${PWD}/.
     environment:
       - TEST_ENVIRONMENT=false
     working_dir: /go/src/github.com/elastic/beats/metricbeat
     volumes:
-      - ./..:/go/src/github.com/elastic/beats/
+      - ${PWD}/..:/go/src/github.com/elastic/beats/
       # This is required to on-demand launching the rest on containers for tests & also docker module tests:
       - /var/run/docker.sock:/var/run/docker.sock
     command: make

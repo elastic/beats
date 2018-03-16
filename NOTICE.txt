@@ -363,6 +363,16 @@ Apache License 2.0
 
 
 --------------------------------------------------------------------
+Dependency: github.com/elastic/go-structform
+Version: v0.0.3
+Revision: 0a66add879601f69f55663f4c913c72988218982
+License type (autodetected): Apache-2.0
+./vendor/github.com/elastic/go-structform/LICENSE:
+--------------------------------------------------------------------
+Apache License 2.0
+
+
+--------------------------------------------------------------------
 Dependency: github.com/elastic/go-ucfg
 Version: v0.5.1
 Revision: 0ba28e36add27704e6b49a7ed8557989a8f4a635
@@ -391,23 +401,6 @@ This product includes a number of subcomponents with
 separate copyright notices and license terms. Your use of these
 subcomponents is subject to the terms and conditions of the 
 subcomponent's license, as noted in the LICENSE file.
---------------------------------------------------------------------
-Dependency: github.com/elastic/procfs
-Revision: 664e6bc79eb43c956507b6e20a867140516ad15a
-License type (autodetected): Apache-2.0
-./vendor/github.com/elastic/procfs/LICENSE:
---------------------------------------------------------------------
-Apache License 2.0
-
--------NOTICE-----
-procfs provides functions to retrieve system, kernel and process
-metrics from the pseudo-filesystem proc.
-
-Copyright 2014-2015 The Prometheus Authors
-
-This product includes software developed at
-SoundCloud Ltd. (http://soundcloud.com/).
-
 --------------------------------------------------------------------
 Dependency: github.com/ericchiang/k8s
 Version: v1.0.0
@@ -2747,6 +2740,23 @@ This product includes software developed at
 SoundCloud Ltd. (http://soundcloud.com/).
 
 --------------------------------------------------------------------
+Dependency: github.com/prometheus/procfs
+Revision: 54d17b57dd7d4a3aa092476596b3f8a933bde349
+License type (autodetected): Apache-2.0
+./vendor/github.com/prometheus/procfs/LICENSE:
+--------------------------------------------------------------------
+Apache License 2.0
+
+-------NOTICE-----
+procfs provides functions to retrieve system, kernel and process
+metrics from the pseudo-filesystem proc.
+
+Copyright 2014-2015 The Prometheus Authors
+
+This product includes software developed at
+SoundCloud Ltd. (http://soundcloud.com/).
+
+--------------------------------------------------------------------
 Dependency: github.com/rcrowley/go-metrics
 Revision: 1f30fe9094a513ce4c700b9a54458bbb0c96996c
 License type (autodetected): BSD-2-Clause
@@ -3129,16 +3139,6 @@ DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY
 THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
 (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
-
---------------------------------------------------------------------
-Dependency: github.com/urso/go-structform
-Version: v0.0.2
-Revision: 844d7d44009e9e8c0f08016fc4dab64e136ca040
-License type (autodetected): Apache-2.0
-./vendor/github.com/urso/go-structform/LICENSE:
---------------------------------------------------------------------
-Apache License 2.0
-
 
 --------------------------------------------------------------------
 Dependency: github.com/vmware/govmomi

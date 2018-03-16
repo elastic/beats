@@ -114,4 +114,4 @@ The beat frameworks provides tools to crosscompile and package your beat for dif
 make package
 ```
 
-This will fetch and create all images required for the build process. The hole process to finish can take several minutes.
+This will fetch and create all images required for the build process. The whole process to finish can take several minutes.

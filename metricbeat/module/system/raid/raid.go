@@ -3,14 +3,14 @@ package raid
 import (
 	"path/filepath"
 
+	"github.com/pkg/errors"
+	"github.com/prometheus/procfs"
+
 	"github.com/elastic/beats/libbeat/common"
 	"github.com/elastic/beats/libbeat/common/cfgwarn"
 	"github.com/elastic/beats/metricbeat/mb"
 	"github.com/elastic/beats/metricbeat/mb/parse"
 	"github.com/elastic/beats/metricbeat/module/system"
-	"github.com/elastic/procfs"
-
-	"github.com/pkg/errors"
 )
 
 func init() {

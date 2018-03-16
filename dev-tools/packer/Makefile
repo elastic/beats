@@ -2,7 +2,7 @@ BUILDID?=$(shell git rev-parse HEAD)
 SNAPSHOT?=yes
 
 BEATS_BUILDER_IMAGE?=tudorg/beats-builder
-BEATS_BUILDER_DEB6_IMAGE?=tudorg/beats-builder-deb6
+BEATS_BUILDER_DEB_IMAGE?=tudorg/beats-builder-deb7
 BEATS_GOPATH=$(firstword $(subst :, ,${GOPATH}))
 
 makefile_abspath:=$(abspath $(lastword $(MAKEFILE_LIST)))
@@ -41,14 +41,14 @@ package-dashboards:
 
 .PHONY: deps
 deps:
-	go get -u github.com/tsg/gotpl
+	cd ../vendor/github.com/tsg/gotpl; go install
 
 .PHONY: xgo-image
 xgo-image:
 	cd $(packer_absdir)/docker/xgo-image/; ./build.sh
-	# copy build.sh script in the xgo-image-deb6 to avoid code duplication
-	cp $(packer_absdir)/docker/xgo-image/base/build.sh $(packer_absdir)/docker/xgo-image-deb6/base/build.sh
-	cd $(packer_absdir)/docker/xgo-image-deb6/; ./build.sh
+	# copy build.sh script in the xgo-image-deb7 to avoid code duplication
+	cp $(packer_absdir)/docker/xgo-image/base/build.sh $(packer_absdir)/docker/xgo-image-deb7/base/build.sh
+	cd $(packer_absdir)/docker/xgo-image-deb7/; ./build.sh
 
 .PHONY: fpm-image
 fpm-image:
@@ -72,12 +72,12 @@ ${BUILD_DIR}/upload/build_id.txt:
 deb-rpm-s3:
 	$(packer_absdir)/docker/deb-rpm-s3/build.sh
 
-.PHONY: run-interactive-builder-deb6
-run-interactive-builder-deb6:
+.PHONY: run-interactive-builder-deb
+run-interactive-builder-deb:
 	docker run -t -i -v $(shell pwd)/build:/build \
 		-v $(shell pwd)/xgo-scripts/:/scripts \
 		-v $(shell pwd)/../..:/source \
-		--entrypoint=bash ${BEATS_BUILDER_DEB6_IMAGE}
+		--entrypoint=bash ${BEATS_BUILDER_DEB_IMAGE}
 
 .PHONY: run-interactive-builder
 run-interactive-builder:
@@ -92,14 +92,14 @@ images: xgo-image fpm-image go-daemon-image
 .PHONY: push-images
 push-images:
 	docker push ${BEATS_BUILDER_IMAGE}
-	docker push ${BEATS_BUILDER_DEB6_IMAGE}
+	docker push ${BEATS_BUILDER_DEB_IMAGE}
 	docker push tudorg/fpm
 	docker push tudorg/go-daemon
 
 .PHONY: pull-images
 pull-images:
 	docker pull ${BEATS_BUILDER_IMAGE}
-	docker pull ${BEATS_BUILDER_DEB6_IMAGE}
+	docker pull ${BEATS_BUILDER_DEB_IMAGE}
 	docker pull tudorg/fpm
 	docker pull tudorg/go-daemon
 
@@ -119,7 +119,7 @@ endef
 
 .PHONY: clean-images
 clean-images:
-	@$(call rm-image, ${BEATS_BUILDER_DEB6_IMAGE})
+	@$(call rm-image, ${BEATS_BUILDER_DEB_IMAGE})
 	@$(call rm-image, ${BEATS_BUILDER_IMAGE})
 
 .PHONY: clean

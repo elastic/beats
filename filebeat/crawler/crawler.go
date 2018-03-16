@@ -43,7 +43,7 @@ func New(out channel.Factory, inputConfigs []*common.Config, beatVersion string,
 
 // Start starts the crawler with all inputs
 func (c *Crawler) Start(r *registrar.Registrar, configInputs *common.Config,
-	configModules *common.Config, pipelineLoaderFactory fileset.PipelineLoaderFactory) error {
+	configModules *common.Config, pipelineLoaderFactory fileset.PipelineLoaderFactory, updatePipelines bool) error {
 
 	logp.Info("Loading Inputs: %v", len(c.inputConfigs))
 
@@ -67,7 +67,7 @@ func (c *Crawler) Start(r *registrar.Registrar, configInputs *common.Config,
 		}()
 	}
 
-	c.ModulesFactory = fileset.NewFactory(c.out, r, c.beatVersion, pipelineLoaderFactory, c.beatDone)
+	c.ModulesFactory = fileset.NewFactory(c.out, r, c.beatVersion, pipelineLoaderFactory, updatePipelines, c.beatDone)
 	if configModules.Enabled() {
 		c.modulesReloader = cfgfile.NewReloader(configModules)
 		if err := c.modulesReloader.Check(c.ModulesFactory); err != nil {
