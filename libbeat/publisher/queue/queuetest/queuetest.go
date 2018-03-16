@@ -263,6 +263,7 @@ func makeProducer(
 				ACK: ackCB,
 			})
 			for i := 0; i < maxEvents; i++ {
+				log.Debug("publish event", i)
 				producer.Publish(makeEvent(makeFields(i)))
 			}
 
@@ -288,6 +289,7 @@ func multiConsumer(numConsumers, maxEvents, batchSize int) workerFactory {
 				consumers[i] = b.Consumer()
 			}
 
+			log.Debugf("consumer: wait for %v events\n", maxEvents)
 			events.Add(maxEvents)
 
 			for _, c := range consumers {
@@ -303,7 +305,10 @@ func multiConsumer(numConsumers, maxEvents, batchSize int) workerFactory {
 							return
 						}
 
-						for range batch.Events() {
+						collected := batch.Events()
+						log.Debug("consumer: process batch", len(collected))
+
+						for range collected {
 							events.Done()
 						}
 						batch.ACK()
