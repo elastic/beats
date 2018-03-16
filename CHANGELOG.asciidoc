@@ -47,6 +47,8 @@ https://github.com/elastic/beats/compare/v6.2.2...6.2[Check the HEAD diff]
 
 *Packetbeat*
 
+- HTTP parses successfully on empty status phrase. {issue}6176[6176]
+
 *Winlogbeat*
 
 ==== Added
