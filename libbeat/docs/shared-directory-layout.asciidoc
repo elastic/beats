@@ -59,7 +59,7 @@ Otherwise the paths might be set incorrectly.
 | bin    | The location for the binary files. | /usr/share/{beatname_lc}
 | config | The location for configuration files. | /usr/share/{beatname_lc}
 | data   | The location for persistent data files. | /usr/share/{beatname_lc}/data
-| logs   | The location for the logs created by {beatname_uc}. | /usr/share//{beatname_lc}/logs
+| logs   | The location for the logs created by {beatname_uc}. | /usr/share/{beatname_lc}/logs
 |=======================================================================
 
 endif::[]
