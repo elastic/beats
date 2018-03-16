@@ -699,6 +699,7 @@ filebeat.inputs:
 #
 #processors:
 #- add_docker_metadata: ~
+#- add_host_metadata: ~
 
 #============================= Elastic Cloud ==================================
 

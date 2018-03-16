@@ -501,6 +501,48 @@
 			"versionExact": "v0.0.3"
 		},
 		{
+			"checksumSHA1": "IdhOS26Kl7cvP0wWAglYOlRlTok=",
+			"path": "github.com/elastic/go-sysinfo",
+			"revision": "9c842019df6fc236a6f1ef5537109ac36357dd63",
+			"revisionTime": "2018-03-16T07:12:44Z"
+		},
+		{
+			"checksumSHA1": "jTbNB3zTWutaSKScd7UyLWt+jn0=",
+			"path": "github.com/elastic/go-sysinfo/internal/registry",
+			"revision": "9c842019df6fc236a6f1ef5537109ac36357dd63",
+			"revisionTime": "2018-03-16T07:12:44Z"
+		},
+		{
+			"checksumSHA1": "/4zxHe2iBgWg5L9x+LOpRo0c3i0=",
+			"path": "github.com/elastic/go-sysinfo/providers/darwin",
+			"revision": "9c842019df6fc236a6f1ef5537109ac36357dd63",
+			"revisionTime": "2018-03-16T07:12:44Z"
+		},
+		{
+			"checksumSHA1": "DZtaJU4DTt14eiDx5WXUHrmN6Kg=",
+			"path": "github.com/elastic/go-sysinfo/providers/linux",
+			"revision": "9c842019df6fc236a6f1ef5537109ac36357dd63",
+			"revisionTime": "2018-03-16T07:12:44Z"
+		},
+		{
+			"checksumSHA1": "oX0/bPid3LuReipgLLFy5Pc7gRc=",
+			"path": "github.com/elastic/go-sysinfo/providers/shared",
+			"revision": "9c842019df6fc236a6f1ef5537109ac36357dd63",
+			"revisionTime": "2018-03-16T07:12:44Z"
+		},
+		{
+			"checksumSHA1": "e+78LkI5GTavAzV9ySjdME4KgWk=",
+			"path": "github.com/elastic/go-sysinfo/providers/windows",
+			"revision": "9c842019df6fc236a6f1ef5537109ac36357dd63",
+			"revisionTime": "2018-03-16T07:12:44Z"
+		},
+		{
+			"checksumSHA1": "zqbmoQ1OSDWiV/XTXzPLc/Vxcxo=",
+			"path": "github.com/elastic/go-sysinfo/types",
+			"revision": "9c842019df6fc236a6f1ef5537109ac36357dd63",
+			"revisionTime": "2018-03-16T07:12:44Z"
+		},
+		{
 			"checksumSHA1": "61XUpyQ3zWnJ7Tlj0xLsHtnzwJY=",
 			"path": "github.com/elastic/go-ucfg",
 			"revision": "0ba28e36add27704e6b49a7ed8557989a8f4a635",
@@ -537,6 +579,12 @@
 			"path": "github.com/elastic/go-ucfg/yaml",
 			"revision": "ec8488a52542c0c51e42e8ea204dcaff400bc644",
 			"revisionTime": "2017-02-07T06:38:51Z"
+		},
+		{
+			"checksumSHA1": "DRu6+HSK/RVvCx0j2LdlL6vQjcA=",
+			"path": "github.com/elastic/go-windows",
+			"revision": "a8f9f07dec5f30c1e17afc9f360c0aed39225222",
+			"revisionTime": "2018-02-07T18:09:04Z"
 		},
 		{
 			"checksumSHA1": "386qAesaBQFadNHu7di78fZT7xk=",

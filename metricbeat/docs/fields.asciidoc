@@ -27,6 +27,7 @@ grouped in the following categories:
 * <<exported-fields-golang>>
 * <<exported-fields-graphite>>
 * <<exported-fields-haproxy>>
+* <<exported-fields-host-processor>>
 * <<exported-fields-http>>
 * <<exported-fields-jolokia>>
 * <<exported-fields-kafka>>
@@ -4556,6 +4557,62 @@ Configured queue limit (maxqueue) for the server, or nothing if the value of max
 type: integer
 
 The average queue time in ms over the last 1024 requests.
+
+
+[[exported-fields-host-processor]]
+== Host fields
+
+Info collected for the host machine.
+
+
+
+
+[float]
+=== `host.hostname`
+
+type: keyword
+
+Hostname.
+
+
+[float]
+=== `host.id`
+
+type: keyword
+
+Unique host id.
+
+
+[float]
+=== `host.architecture`
+
+type: keyword
+
+Host architecture (e.g. x86_64, arm, ppc, mips).
+
+
+[float]
+=== `host.os.platform`
+
+type: object
+
+OS platform (e.g. centos, ubuntu, windows).
+
+
+[float]
+=== `host.os.version`
+
+type: object
+
+OS version.
+
+
+[float]
+=== `host.os.family`
+
+type: object
+
+OS family (e.g. redhat, debian, freebsd, windows).
 
 
 [[exported-fields-http]]
