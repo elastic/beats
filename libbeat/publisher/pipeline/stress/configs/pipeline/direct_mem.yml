@@ -1,4 +1,4 @@
-queue.mem:
+pipeline.queue.mem:
   events: 4096
   flush:
     min_events: 0
