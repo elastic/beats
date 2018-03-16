@@ -12,6 +12,7 @@ With `instance_name`, you can specify the name of the instance. Use this setting
 
 * You want to use an instance name that is different from the computed name. For example, `Total` instead of `_Total`.
 * You specify a counter that has no instance. For example, `\TCPIP Performance Diagnostics\IPv4 NBLs/sec indicated without prevalidation`.
+
 For wildcard queries this setting has no effect.
 
 
