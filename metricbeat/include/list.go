@@ -98,6 +98,7 @@ import (
 	_ "github.com/elastic/beats/metricbeat/module/prometheus/stats"
 	_ "github.com/elastic/beats/metricbeat/module/rabbitmq"
 	_ "github.com/elastic/beats/metricbeat/module/rabbitmq/connection"
+	_ "github.com/elastic/beats/metricbeat/module/rabbitmq/exchange"
 	_ "github.com/elastic/beats/metricbeat/module/rabbitmq/node"
 	_ "github.com/elastic/beats/metricbeat/module/rabbitmq/queue"
 	_ "github.com/elastic/beats/metricbeat/module/redis"

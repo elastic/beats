@@ -8746,6 +8746,181 @@ Number of octets received on the connection.
 
 
 [float]
+== exchange fields
+
+exchange
+
+
+
+[float]
+=== `rabbitmq.exchange.name`
+
+type: keyword
+
+The name of the queue with non-ASCII characters escaped as in C.
+
+
+[float]
+=== `rabbitmq.exchange.vhost`
+
+type: keyword
+
+Virtual host name with non-ASCII characters escaped as in C.
+
+
+[float]
+=== `rabbitmq.exchange.durable`
+
+type: boolean
+
+Whether or not the queue survives server restarts.
+
+
+[float]
+=== `rabbitmq.exchange.auto_delete`
+
+type: boolean
+
+Whether the queue will be deleted automatically when no longer used.
+
+
+[float]
+=== `rabbitmq.exchange.internal`
+
+type: boolean
+
+Whether the exchange is internal, i.e. cannot be directly published to by a client.
+
+
+[float]
+=== `rabbitmq.exchange.messages.publish.count`
+
+type: long
+
+Count of messages published.
+
+
+[float]
+=== `rabbitmq.exchange.messages.publish.details.rate`
+
+type: long
+
+How much the exchange publish count has changed per second in the most recent sampling interval.
+
+
+[float]
+=== `rabbitmq.exchange.messages.publish_in.count`
+
+type: long
+
+Count of messages published "in" to an exchange, i.e. not taking account of routing.
+
+
+[float]
+=== `rabbitmq.exchange.messages.publish_in.details.rate`
+
+type: long
+
+How much the exchange publish-in count has changed per second in the most recent sampling interval.
+
+
+[float]
+=== `rabbitmq.exchange.messages.publish_out.count`
+
+type: long
+
+Count of messages published "out" of an exchange, i.e. taking account of routing.
+
+
+[float]
+=== `rabbitmq.exchange.messages.publish_out.details.rate`
+
+type: long
+
+How much the exchange publish-out count has changed per second in the most recent sampling interval.
+
+
+[float]
+=== `rabbitmq.exchange.messages.ack.count`
+
+type: long
+
+Count of acknowledged messages.
+
+
+[float]
+=== `rabbitmq.exchange.messages.ack.details.rate`
+
+type: long
+
+How much the exchange ack count has changed per second in the most recent sampling interval.
+
+
+[float]
+=== `rabbitmq.exchange.messages.deliver_get.count`
+
+type: long
+
+Count of all messages delivered to consumers.
+
+
+[float]
+=== `rabbitmq.exchange.messages.deliver_get.details.rate`
+
+type: long
+
+How much the exchange deliver-get count has changed per second in the most recent sampling interval.
+
+
+[float]
+=== `rabbitmq.exchange.messages.confirm.count`
+
+type: long
+
+Count of messages confirmed.
+
+
+[float]
+=== `rabbitmq.exchange.messages.confirm.details.rate`
+
+type: long
+
+How much the exchange confirm count has changed per second in the most recent sampling interval.
+
+
+[float]
+=== `rabbitmq.exchange.messages.return_unroutable.count`
+
+type: long
+
+Count of messages returned to publisher as unroutable.
+
+
+[float]
+=== `rabbitmq.exchange.messages.return_unroutable.details.rate`
+
+type: long
+
+How much the exchange return-unroutable count has changed per second in the most recent sampling interval.
+
+
+[float]
+=== `rabbitmq.exchange.messages.redeliver.count`
+
+type: long
+
+Count of subset of messages in deliver_get which had the redelivered flag set.
+
+
+[float]
+=== `rabbitmq.exchange.messages.redeliver.details.rate`
+
+type: long
+
+How much the exchange redeliver count has changed per second in the most recent sampling interval.
+
+
+[float]
 == node fields
 
 node
@@ -9158,6 +9333,14 @@ Sum of ready and unacknowledged messages (queue depth).
 
 
 [float]
+=== `rabbitmq.queue.messages.total.details.rate`
+
+type: long
+
+How much the queue depth has changed per second in the most recent sampling interval.
+
+
+[float]
 === `rabbitmq.queue.messages.ready.count`
 
 type: long
@@ -9166,11 +9349,27 @@ Number of messages ready to be delivered to clients.
 
 
 [float]
+=== `rabbitmq.queue.messages.ready.details.rate`
+
+type: long
+
+How much the count of messages ready has changed per second in the most recent sampling interval.
+
+
+[float]
 === `rabbitmq.queue.messages.unacknowledged.count`
 
 type: long
 
 Number of messages delivered to clients but not yet acknowledged.
+
+
+[float]
+=== `rabbitmq.queue.messages.unacknowledged.details.rate`
+
+type: long
+
+How much the count of unacknowledged messages has changed per second in the most recent sampling interval.
 
 
 [float]

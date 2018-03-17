@@ -5,7 +5,7 @@ This file is generated! See scripts/docs_collector.py
 [[metricbeat-metricset-rabbitmq-exchange]]
 === RabbitMQ exchange metricset
 
-experimental[]
+beta[]
 
 include::../../../module/rabbitmq/exchange/_meta/docs.asciidoc[]
 
