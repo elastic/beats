@@ -115,7 +115,6 @@ https://github.com/elastic/beats/compare/v6.0.0-beta2...master[Check the HEAD di
 
 *Metricbeat*
 
-- Add connections metricset to RabbitMQ module {pull}6548[6548]
 - Change field type of http header from nested to object {pull}5258[5258]
 - Fix the fetching of process information when some data is missing under MacOS X. {issue}5337[5337]
 - Change `MySQL active connections` visualization title to `MySQL total connections`. {issue}4812[4812]
@@ -235,6 +234,8 @@ https://github.com/elastic/beats/compare/v6.0.0-beta2...master[Check the HEAD di
 - Refactor prometheus endpoint parsing to look similar to upstream prometheus {pull}6332[6332]
 - Update prometheus dependencies to latest {pull}6333[6333]
 - Making the http/json metricset GA. {pull}6471[6471]
+- Add connections metricset to RabbitMQ module {pull}6548[6548]
+- Add exchanges metricset and queue message rates to RabbitMQ module {issue}6442[6442] {pull}6586[6586]
 
 *Packetbeat*
 
