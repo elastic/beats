@@ -95,7 +95,8 @@ This file is generated! See scripts/docs_collector.py
 .2+|   |<<metricbeat-metricset-prometheus-collector,collector>> beta[]  
 |<<metricbeat-metricset-prometheus-stats,stats>> beta[]  
 |<<metricbeat-module-rabbitmq,RabbitMQ>>  beta[]   |    
-.3+|   |<<metricbeat-metricset-rabbitmq-connection,connection>> beta[]  
+.4+|   |<<metricbeat-metricset-rabbitmq-connection,connection>> beta[]  
+|<<metricbeat-metricset-rabbitmq-exchange,exchange>> beta[]  
 |<<metricbeat-metricset-rabbitmq-node,node>> beta[]  
 |<<metricbeat-metricset-rabbitmq-queue,queue>> beta[]  
 |<<metricbeat-module-redis,Redis>>     |    
