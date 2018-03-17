@@ -65,7 +65,7 @@
         },
         "messages": 74,
         "messages_details": {
-            "rate": 0
+            "rate": 2.2
         },
         "messages_ready": 71,
         "messages_ready_details": {
@@ -73,7 +73,7 @@
         },
         "messages_unacknowledged": 3,
         "messages_unacknowledged_details": {
-            "rate": 0
+            "rate": 0.5
         },
         "idle_since": "2017-07-28 23:45:52",
         "consumer_utilisation": 0.7,
