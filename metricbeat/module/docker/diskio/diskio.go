@@ -18,11 +18,12 @@ type MetricSet struct {
 	mb.BaseMetricSet
 	blkioService *BLkioService
 	dockerClient *client.Client
+	dedot        bool
 }
 
 // New create a new instance of the docker diskio MetricSet.
 func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
-	config := docker.Config{}
+	config := docker.DefaultConfig()
 	if err := base.Module().UnpackConfig(&config); err != nil {
 		return nil, err
 	}
@@ -38,6 +39,7 @@ func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
 		blkioService: &BLkioService{
 			BlkioSTatsPerContainer: make(map[string]BlkioRaw),
 		},
+		dedot: config.DeDot,
 	}, nil
 }
 
@@ -48,6 +50,6 @@ func (m *MetricSet) Fetch() ([]common.MapStr, error) {
 		return nil, err
 	}
 
-	formattedStats := m.blkioService.getBlkioStatsList(stats)
+	formattedStats := m.blkioService.getBlkioStatsList(stats, m.dedot)
 	return eventsMapping(formattedStats), nil
 }

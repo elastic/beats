@@ -1,5 +1,5 @@
 {
-    "@timestamp": "2016-05-23T08:05:34.853Z",
+    "@timestamp": "2017-10-12T08:05:34.853Z",
     "beat": {
         "hostname": "host.example.com",
         "name": "host.example.com"
@@ -9,25 +9,13 @@
         "name": "perfmon",
         "rtt": 115
     },
-    "type": "metricsets",
     "windows": {
         "perfmon": {
-            "disk": {
-                "bytes": {
-                    "read": {
-                        "total": 0
-                    }
-                }
-            },
             "processor": {
+                "name": "_Total",
                 "time": {
-                    "idle": {
-                        "average": {
-                            "ns": 670661.5894039735
-                        }
-                    },
                     "total": {
-                        "pct": 3.135058464112306
+                        "pct": 1.4663385364361736
                     }
                 }
             }

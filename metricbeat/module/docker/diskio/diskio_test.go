@@ -44,7 +44,7 @@ func TestDeltaMultipleContainers(t *testing.T) {
 	apiContainer2.Container = &containers[1]
 	apiContainer2.Stats.BlkioStats.IoServicedRecursive = append(apiContainer2.Stats.BlkioStats.IoServicedRecursive, metrics)
 	dockerStats := []docker.Stat{apiContainer1, apiContainer2}
-	stats := blkioService.getBlkioStatsList(dockerStats)
+	stats := blkioService.getBlkioStatsList(dockerStats, true)
 	totals := make([]float64, 2)
 	for _, stat := range stats {
 		totals[0] = stat.totals
@@ -54,7 +54,7 @@ func TestDeltaMultipleContainers(t *testing.T) {
 	dockerStats[0].Stats.Read = dockerStats[0].Stats.Read.Add(time.Second * 10)
 	dockerStats[1].Stats.BlkioStats.IoServicedRecursive[0].Value = 1000
 	dockerStats[1].Stats.Read = dockerStats[0].Stats.Read.Add(time.Second * 10)
-	stats = blkioService.getBlkioStatsList(dockerStats)
+	stats = blkioService.getBlkioStatsList(dockerStats, true)
 	for _, stat := range stats {
 		totals[1] = stat.totals
 		if stat.totals < totals[0] {
@@ -66,7 +66,7 @@ func TestDeltaMultipleContainers(t *testing.T) {
 	dockerStats[0].Stats.BlkioStats.IoServicedRecursive[0].Value = 2000
 	dockerStats[1].Stats.BlkioStats.IoServicedRecursive[0].Value = 2000
 	dockerStats[1].Stats.Read = dockerStats[0].Stats.Read.Add(time.Second * 15)
-	stats = blkioService.getBlkioStatsList(dockerStats)
+	stats = blkioService.getBlkioStatsList(dockerStats, true)
 	for _, stat := range stats {
 		if stat.totals < totals[1] || stat.totals < totals[0] {
 			t.Errorf("getBlkioStatsList(%v) => %v, want value bigger than %v", dockerStats, stat.totals, totals[1])
@@ -98,7 +98,7 @@ func TestDeltaOneContainer(t *testing.T) {
 	apiContainer.Container = &containers
 	apiContainer.Stats.BlkioStats.IoServicedRecursive = append(apiContainer.Stats.BlkioStats.IoServicedRecursive, metrics)
 	dockerStats := []docker.Stat{apiContainer}
-	stats := blkioService.getBlkioStatsList(dockerStats)
+	stats := blkioService.getBlkioStatsList(dockerStats, true)
 	totals := make([]float64, 2)
 	for _, stat := range stats {
 		totals[0] = stat.totals
@@ -106,7 +106,7 @@ func TestDeltaOneContainer(t *testing.T) {
 
 	dockerStats[0].Stats.BlkioStats.IoServicedRecursive[0].Value = 1000
 	dockerStats[0].Stats.Read = dockerStats[0].Stats.Read.Add(time.Second * 10)
-	stats = blkioService.getBlkioStatsList(dockerStats)
+	stats = blkioService.getBlkioStatsList(dockerStats, true)
 	for _, stat := range stats {
 		if stat.totals < totals[0] {
 			t.Errorf("getBlkioStatsList(%v) => %v, want value bigger than %v", dockerStats, stat.totals, totals[0])
@@ -115,7 +115,7 @@ func TestDeltaOneContainer(t *testing.T) {
 
 	dockerStats[0].Stats.BlkioStats.IoServicedRecursive[0].Value = 2000
 	dockerStats[0].Stats.Read = dockerStats[0].Stats.Read.Add(time.Second * 15)
-	stats = blkioService.getBlkioStatsList(dockerStats)
+	stats = blkioService.getBlkioStatsList(dockerStats, true)
 	for _, stat := range stats {
 		if stat.totals < totals[1] || stat.totals < totals[0] {
 			t.Errorf("getBlkioStatsList(%v) => %v, want value bigger than %v", dockerStats, stat.totals, totals[1])

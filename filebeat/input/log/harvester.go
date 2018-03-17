@@ -62,6 +62,7 @@ type Harvester struct {
 	done     chan struct{}
 	stopOnce sync.Once
 	stopWg   *sync.WaitGroup
+	stopLock sync.Mutex
 
 	// internal harvester state
 	state  file.State
@@ -167,7 +168,12 @@ func (h *Harvester) Run() error {
 	// called before the harvester was started. The waitgroup is not incremented afterwards
 	// as otherwise it could happened that between checking for the close channel and incrementing
 	// the waitgroup, the harvester could be stopped.
+	// Here stopLock is used to prevent a data race where stopWg.Add(1) below is called
+	// while stopWg.Wait() is executing in a different goroutine, which is forbidden
+	// according to sync.WaitGroup docs.
+	h.stopLock.Lock()
 	h.stopWg.Add(1)
+	h.stopLock.Unlock()
 	select {
 	case <-h.done:
 		h.stopWg.Done()
@@ -321,7 +327,10 @@ func (h *Harvester) stop() {
 // Stop stops harvester and waits for completion
 func (h *Harvester) Stop() {
 	h.stop()
+	// Prevent stopWg.Wait() to be called at the same time as stopWg.Add(1)
+	h.stopLock.Lock()
 	h.stopWg.Wait()
+	h.stopLock.Unlock()
 }
 
 // sendEvent sends event to the spooler channel

@@ -34,7 +34,8 @@
 
     # Hints the minimum number of events stored in the queue,
     # before providing a batch of events to the outputs.
-    # A value of 0 (the default) ensures events are immediately available
+    # The default value is set to 2048.
+    # A value of 0 ensures events are immediately available
     # to be sent to the outputs.
     #flush.min_events: 2048
 
@@ -114,6 +115,7 @@
 #
 #processors:
 #- add_docker_metadata: ~
+#- add_host_metadata: ~
 
 #============================= Elastic Cloud ==================================
 

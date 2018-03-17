@@ -13,6 +13,7 @@ metricbeat.modules:
   headers:
     Accept: application/json
   request.enabled: true
+  json.is_array: false
   response.enabled: true
 
 #================================ Outputs =====================================

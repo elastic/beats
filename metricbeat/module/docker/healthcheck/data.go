@@ -42,7 +42,7 @@ func eventMapping(cont *types.Container, m *MetricSet) common.MapStr {
 
 	return common.MapStr{
 		mb.ModuleDataKey: common.MapStr{
-			"container": docker.NewContainer(cont).ToMapStr(),
+			"container": docker.NewContainer(cont, m.dedot).ToMapStr(),
 		},
 		"status":        container.State.Health.Status,
 		"failingstreak": container.State.Health.FailingStreak,
