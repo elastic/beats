@@ -71,6 +71,9 @@ func TestFetchEventContents(t *testing.T) {
 	totalDetails := total["details"].(common.MapStr)
 	assert.EqualValues(t, 2.2, totalDetails["rate"])
 
+	readyDetails := ready["details"].(common.MapStr)
+	assert.EqualValues(t, 0, readyDetails["rate"])
+
 	unacknowledgedDetails := unacknowledged["details"].(common.MapStr)
 	assert.EqualValues(t, 0.5, unacknowledgedDetails["rate"])
 
