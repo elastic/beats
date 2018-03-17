@@ -221,6 +221,7 @@ https://github.com/elastic/beats/compare/v6.2.3...master[Check the HEAD diff]
 - Add experimental Elasticsearch index metricset. {pull}6881[6881]
 - Add dashboards and visualizations for haproxy metrics. {pull}6934[6934]
 - Add message rates to the RabbitMQ queue metricset {issue}6442[6442] {pull}6606[6606]
+- Add exchanges metricset to the RabbitMQ module {issue}6442[6442] {pull}6607[6607]
 
 *Packetbeat*
 
