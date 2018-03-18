@@ -2352,6 +2352,8 @@ The PID of the process that sent the auth message.
 [float]
 === `system.auth.message`
 
+type: text
+
 The message in the log line.
 
 
@@ -2589,6 +2591,8 @@ The PID of the process that sent the syslog message.
 
 [float]
 === `system.syslog.message`
+
+type: text
 
 The message in the log line.
 

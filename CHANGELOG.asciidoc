@@ -24,6 +24,7 @@ https://github.com/elastic/beats/compare/v6.0.0-beta2...master[Check the HEAD di
 - The default value for pipelining is reduced to 2 to avoid high memory in the Logstash beats input. {pull}6250[6250]
 - Add logging when monitoring cannot connect to Elasticsearch. {pull}6365[6365]
 - Rename beat.cpu.*.time metrics to beat.cpu.*.time.ms. {pull}6449[6449]
+- Mark `system.syslog.message` and `system.auth.message` as `text` instead of `keyword`. {pull}6589[6589]
 
 *Auditbeat*
 
