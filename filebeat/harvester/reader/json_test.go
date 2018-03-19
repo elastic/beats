@@ -125,14 +125,14 @@ func TestDecodeJSON(t *testing.T) {
 			Text:         `null`,
 			Config:       JSONConfig{MessageKey: "value", AddErrorKey: true},
 			ExpectedText: `null`,
-			ExpectedMap:  common.MapStr{"error": common.MapStr{"message": "Error decoding JSON: <nil>", "type": "json"}},
+			ExpectedMap:  common.MapStr{"error": common.MapStr{"message": "Error decoding JSON: <nil>. Raw data: null", "type": "json"}},
 		},
 		{
 			// Add key error helps debugging this
 			Text:         `{"message": "test", "value": "`,
 			Config:       JSONConfig{MessageKey: "value", AddErrorKey: true},
 			ExpectedText: `{"message": "test", "value": "`,
-			ExpectedMap:  common.MapStr{"error": common.MapStr{"message": "Error decoding JSON: unexpected EOF", "type": "json"}},
+			ExpectedMap:  common.MapStr{"error": common.MapStr{"message": `Error decoding JSON: unexpected EOF. Raw data: {"message": "test", "value": "`, "type": "json"}},
 		},
 		{
 			// If the text key is not found, put an error
