@@ -14,8 +14,6 @@ https://github.com/elastic/beats/compare/v6.2.2...6.2[Check the HEAD diff]
 
 *Affecting all Beats*
 
-- Fix conditions checking on autodiscover Docker labels. {pull}6412[6412]
-
 *Auditbeat*
 
 *Filebeat*
@@ -32,9 +30,6 @@ https://github.com/elastic/beats/compare/v6.2.2...6.2[Check the HEAD diff]
 
 *Affecting all Beats*
 
-- Avoid panic errors when processing nil Pod events in add_kubernetes_metadata. {issue}6372[6372]
-- Fix infinite failure on Kubernetes watch {pull}6504[6504]
-
 *Auditbeat*
 
 *Filebeat*
@@ -42,8 +37,6 @@ https://github.com/elastic/beats/compare/v6.2.2...6.2[Check the HEAD diff]
 *Heartbeat*
 
 *Metricbeat*
-
-- Fix Kubernetes overview dashboard views for non default time ranges. {issue}6395{6395}
 
 *Packetbeat*
 
@@ -85,6 +78,29 @@ https://github.com/elastic/beats/compare/v6.2.2...6.2[Check the HEAD diff]
 
 
 ////////////////////////////////////////////////////////////
+
+
+[[release-notes-6.2.3]]
+=== Beats version 6.2.3
+https://github.com/elastic/beats/compare/v6.2.2...v6.2.3[View commits]
+
+==== Breaking changes
+
+*Affecting all Beats*
+
+- Fix conditions checking on autodiscover Docker labels. {pull}6412[6412]
+
+==== Bugfixes
+
+*Affecting all Beats*
+
+- Avoid panic errors when processing nil Pod events in add_kubernetes_metadata. {issue}6372[6372]
+- Fix infinite failure on Kubernetes watch {pull}6504[6504]
+
+*Metricbeat*
+
+- Fix Kubernetes overview dashboard views for non default time ranges. {issue}6395{6395}
+
 
 [[release-notes-6.2.2]]
 === Beats version 6.2.2
