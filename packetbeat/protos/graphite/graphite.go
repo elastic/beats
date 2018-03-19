@@ -26,10 +26,10 @@ type connection struct {
 }
 
 // graphite application layer data
-type GraphiteJson struct {
-	Metric_name      string
-	Metric_value     float64
-	Metric_timestamp int64
+type GraphiteJSON struct {
+	MetricName      string
+	MetricValue     float64
+	MetricTimestamp int64
 }
 
 // Uni-directioal tcp stream state for parsing messages.

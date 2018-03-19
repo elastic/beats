@@ -40,26 +40,26 @@ func (pub *transPub) createEvent(requ, resp *message) common.MapStr {
 	}
 	//fmt.Println("generation")
 	// To generate one event with all the records in pickle (Array of metrics returned)
-	type request_json []*GraphiteJson
-	var list request_json
-	var time_stamp int64
-	var m_value float64
+	type requestJSON []*GraphiteJSON
+	var list requestJSON
+	var timeStamp int64
+	var mValue float64
 	if len(requ.Notes) == 3 {
-		time_stamp, _ = strconv.ParseInt(requ.Notes[2], 10, 64)
-		m_value, _ = strconv.ParseFloat(requ.Notes[1], 64)
-		list = append(list, &GraphiteJson{
-			Metric_name:      requ.Notes[0],
-			Metric_value:     m_value,
-			Metric_timestamp: time_stamp,
+		timeStamp, _ = strconv.ParseInt(requ.Notes[2], 10, 64)
+		mValue, _ = strconv.ParseFloat(requ.Notes[1], 64)
+		list = append(list, &GraphiteJSON{
+			MetricName:      requ.Notes[0],
+			MetricValue:     mValue,
+			MetricTimestamp: timeStamp,
 		})
 	} else {
 		for k := 0; k < len(requ.Notes); k = k + 3 {
-			time_stamp, _ = strconv.ParseInt(requ.Notes[k+1], 10, 64)
-			m_value, _ = strconv.ParseFloat(requ.Notes[k+2], 64)
-			list = append(list, &GraphiteJson{
-				Metric_name:      requ.Notes[k],
-				Metric_value:     m_value,
-				Metric_timestamp: time_stamp,
+			timeStamp, _ = strconv.ParseInt(requ.Notes[k+1], 10, 64)
+			mValue, _ = strconv.ParseFloat(requ.Notes[k+2], 64)
+			list = append(list, &GraphiteJSON{
+				MetricName:      requ.Notes[k],
+				MetricValue:     mValue,
+				MetricTimestamp: timeStamp,
 			})
 		}
 	}
