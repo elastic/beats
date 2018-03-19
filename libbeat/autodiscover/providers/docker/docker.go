@@ -119,12 +119,8 @@ func (d *Provider) emitContainer(event bus.Event, flag string) {
 	}
 
 	labelMap := common.MapStr{}
-	labels := common.MapStr{}
 	for k, v := range container.Labels {
 		safemapstr.Put(labelMap, k, v)
-
-		// Needed for hint processing
-		labels[k] = v
 	}
 
 	meta := common.MapStr{
@@ -135,15 +131,12 @@ func (d *Provider) emitContainer(event bus.Event, flag string) {
 			"labels": labelMap,
 		},
 	}
-	dockerMeta := meta.Clone()
-	dockerMeta.Put("container.labels", labels)
-
 	// Without this check there would be overlapping configurations with and without ports.
 	if len(container.Ports) == 0 {
 		event := bus.Event{
 			flag:     true,
 			"host":   host,
-			"docker": dockerMeta,
+			"docker": meta,
 			"meta": common.MapStr{
 				"docker": meta,
 			},
@@ -158,7 +151,7 @@ func (d *Provider) emitContainer(event bus.Event, flag string) {
 			flag:     true,
 			"host":   host,
 			"port":   port.PrivatePort,
-			"docker": dockerMeta,
+			"docker": meta,
 			"meta": common.MapStr{
 				"docker": meta,
 			},

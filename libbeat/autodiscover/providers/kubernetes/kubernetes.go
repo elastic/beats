@@ -10,6 +10,7 @@ import (
 	"github.com/elastic/beats/libbeat/common/bus"
 	"github.com/elastic/beats/libbeat/common/cfgwarn"
 	"github.com/elastic/beats/libbeat/common/kubernetes"
+	"github.com/elastic/beats/libbeat/common/safemapstr"
 	"github.com/elastic/beats/libbeat/logp"
 )
 
@@ -150,7 +151,7 @@ func (p *Provider) emitEvents(pod *kubernetes.Pod, flag string, containers []kub
 		// Pass annotations to all events so that it can be used in templating and by annotation builders.
 		annotations := common.MapStr{}
 		for k, v := range pod.GetMetadata().Annotations {
-			annotations[k] = v
+			safemapstr.Put(annotations, k, v)
 		}
 		kubemeta["annotations"] = annotations
 
