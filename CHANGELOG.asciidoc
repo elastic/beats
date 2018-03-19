@@ -153,6 +153,7 @@ https://github.com/elastic/beats/compare/v6.0.0-beta2...master[Check the HEAD di
 - Fix corruption when parsing repeated headers in an HTTP request or response. {pull}6325[6325]
 - Fix panic when parsing partial AMQP messages. {pull}6384[6384]
 - Fix out of bounds access to slice in MongoDB parser. {pull}6256[6256]
+- Fix sniffer hanging on exit under Linux. {pull}6535[6535]
 
 *Winlogbeat*
 

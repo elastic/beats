@@ -16,14 +16,16 @@ package afpacket
 import (
 	"errors"
 	"fmt"
-	"github.com/tsg/gopacket"
-	"github.com/tsg/gopacket/layers"
-	"github.com/tsg/gopacket/pcap"
 	"net"
 	"runtime"
 	"sync"
+	"syscall"
 	"time"
 	"unsafe"
+
+	"github.com/tsg/gopacket"
+	"github.com/tsg/gopacket/layers"
+	"github.com/tsg/gopacket/pcap"
 )
 
 /*
@@ -310,7 +312,13 @@ func (h *TPacket) pollForFirstPacket(hdr header) error {
 		h.pollset.events = C.POLLIN
 		h.pollset.revents = 0
 		timeout := C.int(h.opts.timeout / time.Millisecond)
-		_, err := C.poll(&h.pollset, 1, timeout)
+		n, err := C.poll(&h.pollset, 1, timeout)
+		if n == 0 {
+			/* propagate timeout when no packets are available
+			   otherwise it will loop forever until a packet
+			  is received. */
+			return syscall.EINTR
+		}
 		h.stats.Polls++
 		if err != nil {
 			return err
