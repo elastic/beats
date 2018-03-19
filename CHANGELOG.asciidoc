@@ -308,6 +308,7 @@ https://github.com/elastic/beats/compare/v6.0.1...v6.1.0[View commits]
 
 - Fix the registry file. It was not correctly storing event log names, and
   upon restart it would begin reading at the start of each event log. {issue}5813[5813]
+- Fix config validation to allow `event_logs.processors`. [pull]6217[6217]
 
 ==== Added
 
