@@ -3107,7 +3107,7 @@ OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
 --------------------------------------------------------------------
 Dependency: github.com/tsg/gopacket
-Revision: 8e703b9968693c15f25cabb6ba8be4370cf431d0
+Revision: f289b3ea3e41a01b2822be9caf5f40c01fdda05c
 License type (autodetected): BSD-3-Clause
 ./vendor/github.com/tsg/gopacket/LICENSE:
 --------------------------------------------------------------------
