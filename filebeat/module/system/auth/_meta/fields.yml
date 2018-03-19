@@ -17,6 +17,7 @@
       description: >
         The PID of the process that sent the auth message.
     - name: message
+      type: text
       description: >
         The message in the log line.
     - name: user
