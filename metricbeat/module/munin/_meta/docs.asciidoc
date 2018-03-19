@@ -1,0 +1,4 @@
+== munin module
+
+This is the munin module.
+

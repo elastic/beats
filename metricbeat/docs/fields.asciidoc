@@ -37,6 +37,7 @@ grouped in the following categories:
 * <<exported-fields-logstash>>
 * <<exported-fields-memcached>>
 * <<exported-fields-mongodb>>
+* <<exported-fields-munin>>
 * <<exported-fields-mysql>>
 * <<exported-fields-nginx>>
 * <<exported-fields-php_fpm>>
@@ -7654,6 +7655,21 @@ Number of scan operations.
 type: long
 
 Number of sync operations.
+
+
+[[exported-fields-munin]]
+== Munin fields
+
+experimental[]
+Munin node metrics exporter
+
+
+
+[float]
+== munin fields
+
+munin contains metrics exposed by a munin node agent
+
 
 
 [[exported-fields-mysql]]

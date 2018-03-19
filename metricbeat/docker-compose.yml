@@ -27,6 +27,7 @@ services:
       - ./module/logstash/_meta/env
       - ./module/memcached/_meta/env
       - ./module/mongodb/_meta/env
+      - ./module/munin/_meta/env
       - ./module/mysql/_meta/env
       - ./module/nginx/_meta/env
       - ./module/php_fpm/_meta/env
@@ -106,6 +107,9 @@ services:
 
   mongodb:
     build: ./module/mongodb/_meta
+
+  munin:
+    build: ./module/munin/_meta
 
   mysql:
     build: ./module/mysql/_meta
