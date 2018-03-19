@@ -1139,6 +1139,17 @@ output.elasticsearch:
 # how to install the dashboards by first querying Elasticsearch.
 #setup.dashboards.always_kibana: false
 
+# If true and Kibana is not reachable at the time when dashboards are loaded,
+# it will retry to reconnect to Kibana instead of exiting with an error.
+#setup.dashboards.retry.enabled: false
+
+# Duration interval between Kibana connection retries.
+#setup.dashboards.retry.interval: 1s
+
+# Maximum number of retries before exiting with an error, 0 for unlimited retrying.
+#setup.dashboards.retry.maximum: 0
+
+
 #============================== Template =====================================
 
 # A template is used to set the mapping in Elasticsearch
