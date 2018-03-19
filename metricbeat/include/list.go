@@ -83,6 +83,8 @@ import (
 	_ "github.com/elastic/beats/metricbeat/module/mongodb/collstats"
 	_ "github.com/elastic/beats/metricbeat/module/mongodb/dbstats"
 	_ "github.com/elastic/beats/metricbeat/module/mongodb/status"
+	_ "github.com/elastic/beats/metricbeat/module/munin"
+	_ "github.com/elastic/beats/metricbeat/module/munin/node"
 	_ "github.com/elastic/beats/metricbeat/module/mysql"
 	_ "github.com/elastic/beats/metricbeat/module/mysql/status"
 	_ "github.com/elastic/beats/metricbeat/module/nginx"
