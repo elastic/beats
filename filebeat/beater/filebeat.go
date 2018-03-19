@@ -33,7 +33,8 @@ const pipelinesWarning = "Filebeat is unable to load the Ingest Node pipelines f
 	" can ignore this warning."
 
 var (
-	once = flag.Bool("once", false, "Run filebeat only once until all harvesters reach EOF")
+	once            = flag.Bool("once", false, "Run filebeat only once until all harvesters reach EOF")
+	updatePipelines = flag.Bool("update-pipelines", false, "Update Ingest pipelines")
 )
 
 // Filebeat is a beater object. Contains all objects needed to run the beat
@@ -136,7 +137,7 @@ func (fb *Filebeat) loadModulesPipelines(b *beat.Beat) error {
 	// register pipeline loading to happen every time a new ES connection is
 	// established
 	callback := func(esClient *elasticsearch.Client) error {
-		return fb.moduleRegistry.LoadPipelines(esClient)
+		return fb.moduleRegistry.LoadPipelines(esClient, *updatePipelines)
 	}
 	elasticsearch.RegisterConnectCallback(callback)
 
@@ -217,7 +218,7 @@ func (fb *Filebeat) Run(b *beat.Beat) error {
 	finishedLogger := newFinishedLogger(wgEvents)
 
 	// Setup registrar to persist state
-	registrar, err := registrar.New(config.RegistryFile, config.RegistryFlush, finishedLogger)
+	registrar, err := registrar.New(config.RegistryFile, config.RegistryFilePermissions, config.RegistryFlush, finishedLogger)
 	if err != nil {
 		logp.Err("Could not init registrar: %v", err)
 		return err
@@ -278,7 +279,11 @@ func (fb *Filebeat) Run(b *beat.Beat) error {
 		logp.Warn(pipelinesWarning)
 	}
 
-	err = crawler.Start(registrar, config.ConfigInput, config.ConfigModules, pipelineLoaderFactory)
+	if *updatePipelines {
+		logp.Debug("modules", "Existing Ingest pipelines will be updated")
+	}
+
+	err = crawler.Start(registrar, config.ConfigInput, config.ConfigModules, pipelineLoaderFactory, *updatePipelines)
 	if err != nil {
 		crawler.Stop()
 		return err

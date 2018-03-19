@@ -137,6 +137,7 @@ func (m MapStr) GetValue(key string) (interface{}, error) {
 // If you need insert keys containing dots then you must use bracket notation
 // to insert values (e.g. m[key] = value).
 func (m MapStr) Put(key string, value interface{}) (interface{}, error) {
+	// XXX `safemapstr.Put` mimics this implementation, both should be updated to have similar behavior
 	return walkMap(key, m, mapStrOperation{putOperation{value}, true})
 }
 

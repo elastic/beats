@@ -3,6 +3,7 @@ package kubernetes
 import (
 	"context"
 	"fmt"
+	"io"
 	"time"
 
 	"github.com/ericchiang/k8s"
@@ -10,6 +11,9 @@ import (
 
 	"github.com/elastic/beats/libbeat/logp"
 )
+
+// Max back off time for retries
+const maxBackoff = 30 * time.Second
 
 func filterByNode(node string) k8s.Option {
 	return k8s.QueryParam("fieldSelector", "spec.nodeName="+node)
@@ -161,6 +165,9 @@ func (w *watcher) Start() error {
 }
 
 func (w *watcher) watch() {
+	// Failures counter, do exponential backoff on retries
+	var failures uint
+
 	for {
 		select {
 		case <-w.ctx.Done():
@@ -176,7 +183,8 @@ func (w *watcher) watch() {
 			//watch failures should be logged and gracefully failed over as metadata retrieval
 			//should never stop.
 			logp.Err("kubernetes: Watching API error %v", err)
-			time.Sleep(time.Second)
+			backoff(failures)
+			failures++
 			continue
 		}
 
@@ -186,8 +194,14 @@ func (w *watcher) watch() {
 			if err != nil {
 				logp.Err("kubernetes: Watching API error %v", err)
 				watcher.Close()
+				if !(err == io.EOF || err == io.ErrUnexpectedEOF) {
+					// This is an error event which can be recovered by moving to the latest resource verison
+					logp.Info("kubernetes: Ignoring event, moving to most recent resource version")
+					w.lastResourceVersion = ""
+				}
 				break
 			}
+			failures = 0
 			switch eventType {
 			case k8s.EventAdded:
 				w.onAdd(r)
@@ -204,4 +218,11 @@ func (w *watcher) watch() {
 
 func (w *watcher) Stop() {
 	w.stop()
+}
+func backoff(failures uint) {
+	wait := 1 << failures * time.Second
+	if wait > maxBackoff {
+		wait = maxBackoff
+	}
+	time.Sleep(wait)
 }

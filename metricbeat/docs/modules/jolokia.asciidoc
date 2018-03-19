@@ -5,8 +5,6 @@ This file is generated! See scripts/docs_collector.py
 [[metricbeat-module-jolokia]]
 == Jolokia module
 
-beta[]
-
 This is the Jolokia module.
 
 

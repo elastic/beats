@@ -322,6 +322,9 @@ While developing the pipeline definition, we recommend making use of the
 {elasticsearch}/simulate-pipeline-api.html[Simulate Pipeline API] for testing
 and quick iteration.
 
+By default Filebeat does not update Ingest pipelines if already loaded. If you want to force updating your pipeline
+during development, use `--update-pipelines` flag. This uploads pipelines even if they are already available on the node.
+
 [float]
 ==== _meta/fields.yml
 

@@ -45,6 +45,7 @@ The supported processors are:
  * <<include-fields,`include_fields`>>
  * <<add-kubernetes-metadata,`add_kubernetes_metadata`>>
  * <<add-docker-metadata,`add_docker_metadata`>>
+ * <<add-host-metadata,`add_host_metadata`>>
 
 [[conditions]]
 ==== Conditions
@@ -657,3 +658,31 @@ for container ID. It defaults to 4 to match
 
 `cleanup_timeout`:: (Optional) Time of inactivity to consider we can clean and
 forget metadata for a container, 60s by default.
+
+
+[[add-host-metadata]]
+=== Add Host metadata
+
+beta[]
+
+The `add_host_metadata` processor annotates each event with relevant metadata from the host machine.
+The fields added to the event are looking as following:
+
+[source,json]
+-------------------------------------------------------------------------------
+{
+   "host":{
+      "architecture":"x86_64",
+      "hostname":"example-host",
+      "id":"",
+      "os":{
+         "family":"darwin",
+         "build":"16G1212",
+         "platform":"darwin",
+         "version":"10.12.6"
+      }
+   }
+}
+-------------------------------------------------------------------------------
+
+NOTE: The host information is refreshed every 5 minutes.

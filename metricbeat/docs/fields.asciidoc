@@ -27,6 +27,7 @@ grouped in the following categories:
 * <<exported-fields-golang>>
 * <<exported-fields-graphite>>
 * <<exported-fields-haproxy>>
+* <<exported-fields-host-processor>>
 * <<exported-fields-http>>
 * <<exported-fields-jolokia>>
 * <<exported-fields-kafka>>
@@ -4558,6 +4559,62 @@ type: integer
 The average queue time in ms over the last 1024 requests.
 
 
+[[exported-fields-host-processor]]
+== Host fields
+
+Info collected for the host machine.
+
+
+
+
+[float]
+=== `host.hostname`
+
+type: keyword
+
+Hostname.
+
+
+[float]
+=== `host.id`
+
+type: keyword
+
+Unique host id.
+
+
+[float]
+=== `host.architecture`
+
+type: keyword
+
+Host architecture (e.g. x86_64, arm, ppc, mips).
+
+
+[float]
+=== `host.os.platform`
+
+type: object
+
+OS platform (e.g. centos, ubuntu, windows).
+
+
+[float]
+=== `host.os.version`
+
+type: object
+
+OS version.
+
+
+[float]
+=== `host.os.family`
+
+type: object
+
+OS family (e.g. redhat, debian, freebsd, windows).
+
+
 [[exported-fields-http]]
 == HTTP fields
 
@@ -8598,6 +8655,151 @@ RabbitMQ module
 == rabbitmq fields
 
 
+
+
+[float]
+== connection fields
+
+connection
+
+
+
+[float]
+=== `rabbitmq.connection.name`
+
+type: keyword
+
+The name of the connection with non-ASCII characters escaped as in C.
+
+
+[float]
+=== `rabbitmq.connection.vhost`
+
+type: keyword
+
+Virtual host name with non-ASCII characters escaped as in C.
+
+
+[float]
+=== `rabbitmq.connection.user`
+
+type: keyword
+
+User name.
+
+
+[float]
+=== `rabbitmq.connection.node`
+
+type: keyword
+
+Node name.
+
+
+[float]
+=== `rabbitmq.connection.channels`
+
+type: long
+
+The number of channels on the connection.
+
+
+[float]
+=== `rabbitmq.connection.channel_max`
+
+type: long
+
+The maximum number of channels allowed on the connection.
+
+
+[float]
+=== `rabbitmq.connection.frame_max`
+
+type: long
+
+format: bytes
+
+Maximum permissible size of a frame (in bytes) to negotiate with clients.
+
+
+[float]
+=== `rabbitmq.connection.type`
+
+type: keyword
+
+Type of the connection.
+
+
+[float]
+=== `rabbitmq.connection.host`
+
+type: keyword
+
+Server hostname obtained via reverse DNS, or its IP address if reverse DNS failed or was disabled.
+
+
+[float]
+=== `rabbitmq.connection.peer.host`
+
+type: keyword
+
+Peer hostname obtained via reverse DNS, or its IP address if reverse DNS failed or was not enabled.
+
+
+[float]
+=== `rabbitmq.connection.port`
+
+type: long
+
+Server port.
+
+
+[float]
+=== `rabbitmq.connection.peer.port`
+
+type: long
+
+Peer port.
+
+
+[float]
+=== `rabbitmq.connection.packet_count.sent`
+
+type: long
+
+Number of packets sent on the connection.
+
+
+[float]
+=== `rabbitmq.connection.packet_count.received`
+
+type: long
+
+Number of packets received on the connection.
+
+
+[float]
+=== `rabbitmq.connection.packet_count.pending`
+
+type: long
+
+Number of packets pending on the connection.
+
+
+[float]
+=== `rabbitmq.connection.octet_count.sent`
+
+type: long
+
+Number of octets sent on the connection.
+
+
+[float]
+=== `rabbitmq.connection.octet_count.received`
+
+type: long
+
+Number of octets received on the connection.
 
 
 [float]
