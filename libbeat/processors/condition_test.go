@@ -3,28 +3,28 @@ package processors
 import (
 	"errors"
 	"testing"
+	"time"
 
+	"github.com/stretchr/testify/assert"
+
+	"github.com/elastic/beats/libbeat/beat"
 	"github.com/elastic/beats/libbeat/common"
 	"github.com/elastic/beats/libbeat/logp"
-	"github.com/stretchr/testify/assert"
 )
 
 type countFilter struct {
 	N int
 }
 
-func (c *countFilter) Run(e common.MapStr) (common.MapStr, error) {
+func (c *countFilter) Run(e *beat.Event) (*beat.Event, error) {
 	c.N++
 	return e, nil
 }
 
 func (c *countFilter) String() string { return "count" }
 
-func TestConditions(t *testing.T) {
-
-	if testing.Verbose() {
-		logp.LogInit(logp.LOG_DEBUG, "", false, true, []string{"*"})
-	}
+func TestCreateConditions(t *testing.T) {
+	logp.TestingSetup()
 
 	configs := []ConditionConfig{
 		{
@@ -71,121 +71,115 @@ func GetConditions(t *testing.T, configs []ConditionConfig) []Condition {
 	return conds
 }
 
-func TestEqualsCondition(t *testing.T) {
+func TestCondition(t *testing.T) {
+	logp.TestingSetup()
 
-	if testing.Verbose() {
-		logp.LogInit(logp.LOG_DEBUG, "", false, true, []string{"*"})
-	}
-
-	configs := []ConditionConfig{
+	tests := []struct {
+		config ConditionConfig
+		result bool
+	}{
 		{
-			Equals: &ConditionFields{fields: map[string]interface{}{
-				"type": "process",
-			}},
-		},
-
-		{
-			Equals: &ConditionFields{fields: map[string]interface{}{
-				"type":     "process",
-				"proc.pid": 305,
-			}},
-		},
-
-		{
-			Range: &ConditionFields{fields: map[string]interface{}{
-				"proc.cpu.total_p.gt": 0.5,
-			}},
-		},
-	}
-
-	conds := GetConditions(t, configs)
-
-	event := common.MapStr{
-		"@timestamp": "2016-04-14T20:41:06.258Z",
-		"proc": common.MapStr{
-			"cmdline": "/usr/libexec/secd",
-			"cpu": common.MapStr{
-				"start_time": "Apr10",
-				"system":     1988,
-				"total":      6029,
-				"total_p":    0.08,
-				"user":       4041,
+			config: ConditionConfig{
+				Equals: &ConditionFields{fields: map[string]interface{}{
+					"type": "process",
+				}},
 			},
-			"name":     "secd",
-			"pid":      305,
-			"ppid":     1,
-			"state":    "running",
-			"username": "monica",
+			result: true,
 		},
-		"type": "process",
-	}
-
-	assert.True(t, conds[0].Check(event))
-	assert.True(t, conds[1].Check(event))
-	assert.False(t, conds[2].Check(event))
-}
-
-func TestContainsCondition(t *testing.T) {
-
-	if testing.Verbose() {
-		logp.LogInit(logp.LOG_DEBUG, "", false, true, []string{"*"})
-	}
-
-	configs := []ConditionConfig{
 		{
-			Contains: &ConditionFields{fields: map[string]interface{}{
-				"proc.name":     "sec",
-				"proc.username": "monica",
-			}},
-		},
-
-		{
-			Contains: &ConditionFields{fields: map[string]interface{}{
-				"type":      "process",
-				"proc.name": "secddd",
-			}},
-		},
-
-		{
-			Contains: &ConditionFields{fields: map[string]interface{}{
-				"proc.keywords": "bar",
-			}},
-		},
-	}
-
-	conds := GetConditions(t, configs)
-
-	event := common.MapStr{
-		"@timestamp": "2016-04-14T20:41:06.258Z",
-		"proc": common.MapStr{
-			"cmdline": "/usr/libexec/secd",
-			"cpu": common.MapStr{
-				"start_time": "Apr10",
-				"system":     1988,
-				"total":      6029,
-				"total_p":    0.08,
-				"user":       4041,
+			config: ConditionConfig{
+				Equals: &ConditionFields{fields: map[string]interface{}{
+					"type":     "process",
+					"proc.pid": 305,
+				}},
 			},
-			"name":     "secd",
-			"pid":      305,
-			"ppid":     1,
-			"state":    "running",
-			"username": "monica",
-			"keywords": []string{"foo", "bar"},
+			result: true,
 		},
-		"type": "process",
+		{
+			config: ConditionConfig{
+				Range: &ConditionFields{fields: map[string]interface{}{
+					"proc.cpu.total_p.gt": 0.5,
+				}},
+			},
+			result: false,
+		},
+		{
+			config: ConditionConfig{
+				Contains: &ConditionFields{fields: map[string]interface{}{
+					"proc.name":     "sec",
+					"proc.username": "monica",
+				}},
+			},
+			result: true,
+		},
+		{
+			config: ConditionConfig{
+				Contains: &ConditionFields{fields: map[string]interface{}{
+					"type":      "process",
+					"proc.name": "secddd",
+				}},
+			},
+			result: false,
+		},
+		{
+			config: ConditionConfig{
+				Contains: &ConditionFields{fields: map[string]interface{}{
+					"proc.keywords": "bar",
+				}},
+			},
+			result: true,
+		},
+		{
+			config: ConditionConfig{
+				Equals: &ConditionFields{fields: map[string]interface{}{
+					"final": true,
+				}},
+			},
+			result: false,
+		},
+		{
+			config: ConditionConfig{
+				Equals: &ConditionFields{fields: map[string]interface{}{
+					"final": false,
+				}},
+			},
+			result: true,
+		},
 	}
 
-	assert.True(t, conds[0].Check(event))
-	assert.False(t, conds[1].Check(event))
-	assert.True(t, conds[2].Check(event))
+	event := &beat.Event{
+		Timestamp: time.Now(),
+		Fields: common.MapStr{
+			"proc": common.MapStr{
+				"cmdline": "/usr/libexec/secd",
+				"cpu": common.MapStr{
+					"start_time": "Apr10",
+					"system":     1988,
+					"total":      6029,
+					"total_p":    0.08,
+					"user":       4041,
+				},
+				"name":     "secd",
+				"pid":      305,
+				"ppid":     1,
+				"state":    "running",
+				"username": "monica",
+				"keywords": []string{"foo", "bar"},
+			},
+			"type":  "process",
+			"final": false,
+		},
+	}
+
+	for _, test := range tests {
+		cond, err := NewCondition(&test.config)
+		assert.Nil(t, err)
+		assert.Equal(t, test.result, cond.Check(event))
+	}
 }
 
 func TestRegexpCondition(t *testing.T) {
-
-	if testing.Verbose() {
-		logp.LogInit(logp.LOG_DEBUG, "", false, true, []string{"*"})
-	}
+	logp.TestingSetup()
 
 	configs := []ConditionConfig{
 		{
@@ -210,22 +204,26 @@ func TestRegexpCondition(t *testing.T) {
 
 	conds := GetConditions(t, configs)
 
-	event := common.MapStr{
-		"@timestamp": "2016-04-14T20:41:06.258Z",
-		"message":    `[Fri Dec 16 01:46:23 2005] [error] [client 1.2.3.4] Directory index forbidden by rule: /home/test/`,
-		"source":     "/var/log/apache2/error.log",
-		"type":       "log",
-		"input_type": "log",
-		"offset":     30,
+	event := &beat.Event{
+		Timestamp: time.Now(),
+		Fields: common.MapStr{
+			"message":    `[Fri Dec 16 01:46:23 2005] [error] [client 1.2.3.4] Directory index forbidden by rule: /home/test/`,
+			"source":     "/var/log/apache2/error.log",
+			"type":       "log",
+			"input_type": "log",
+			"offset":     30,
+		},
 	}
 
-	event1 := common.MapStr{
-		"@timestamp": "2016-04-14T20:41:06.258Z",
-		"message":    `127.0.0.1 - - [28/Jul/2006:10:27:32 -0300] "GET /hidden/ HTTP/1.0" 404 7218`,
-		"source":     "/var/log/apache2/access.log",
-		"type":       "log",
-		"input_type": "log",
-		"offset":     30,
+	event1 := &beat.Event{
+		Timestamp: time.Now(),
+		Fields: common.MapStr{
+			"message":    `127.0.0.1 - - [28/Jul/2006:10:27:32 -0300] "GET /hidden/ HTTP/1.0" 404 7218`,
+			"source":     "/var/log/apache2/access.log",
+			"type":       "log",
+			"input_type": "log",
+			"offset":     30,
+		},
 	}
 
 	assert.True(t, conds[0].Check(event))
@@ -237,10 +235,7 @@ func TestRegexpCondition(t *testing.T) {
 }
 
 func TestRangeCondition(t *testing.T) {
-
-	if testing.Verbose() {
-		logp.LogInit(logp.LOG_DEBUG, "", false, true, []string{"*"})
-	}
+	logp.TestingSetup()
 
 	configs := []ConditionConfig{
 		{
@@ -272,50 +267,54 @@ func TestRangeCondition(t *testing.T) {
 
 	conds := GetConditions(t, configs)
 
-	event := common.MapStr{
-		"@timestamp":    "2015-06-11T09:51:23.642Z",
-		"bytes_in":      126,
-		"bytes_out":     28033,
-		"client_ip":     "127.0.0.1",
-		"client_port":   42840,
-		"client_proc":   "",
-		"client_server": "mar.local",
-		"http": common.MapStr{
-			"code":           404,
-			"content_length": 76985,
-			"phrase":         "Not found",
+	event := &beat.Event{
+		Timestamp: time.Now(),
+		Fields: common.MapStr{
+			"bytes_in":      126,
+			"bytes_out":     28033,
+			"client_ip":     "127.0.0.1",
+			"client_port":   42840,
+			"client_proc":   "",
+			"client_server": "mar.local",
+			"http": common.MapStr{
+				"code":           404,
+				"content_length": 76985,
+				"phrase":         "Not found",
+			},
+			"ip":           "127.0.0.1",
+			"method":       "GET",
+			"params":       "",
+			"path":         "/jszip.min.js",
+			"port":         8000,
+			"proc":         "",
+			"query":        "GET /jszip.min.js",
+			"responsetime": 30,
+			"server":       "mar.local",
+			"status":       "OK",
+			"type":         "http",
 		},
-		"ip":           "127.0.0.1",
-		"method":       "GET",
-		"params":       "",
-		"path":         "/jszip.min.js",
-		"port":         8000,
-		"proc":         "",
-		"query":        "GET /jszip.min.js",
-		"responsetime": 30,
-		"server":       "mar.local",
-		"status":       "OK",
-		"type":         "http",
 	}
 
-	event1 := common.MapStr{
-		"@timestamp": "2016-04-20T07:46:44.633Z",
-		"proc": common.MapStr{
-			"cmdline": "/System/Library/Frameworks/CoreServices.framework/Frameworks/Metadata.framework/Versions/A/Support/mdworker -s mdworker -c MDSImporterWorker -m com.apple.mdworker.single",
-			"cpu": common.MapStr{
-				"start_time": "09:19",
-				"system":     22,
-				"total":      66,
-				"total_p":    0.6,
-				"user":       44,
+	event1 := &beat.Event{
+		Timestamp: time.Now(),
+		Fields: common.MapStr{
+			"proc": common.MapStr{
+				"cmdline": "/System/Library/Frameworks/CoreServices.framework/Frameworks/Metadata.framework/Versions/A/Support/mdworker -s mdworker -c MDSImporterWorker -m com.apple.mdworker.single",
+				"cpu": common.MapStr{
+					"start_time": "09:19",
+					"system":     22,
+					"total":      66,
+					"total_p":    0.6,
+					"user":       44,
+				},
+				"name":     "mdworker",
+				"pid":      44978,
+				"ppid":     1,
+				"state":    "running",
+				"username": "test",
 			},
-			"name":     "mdworker",
-			"pid":      44978,
-			"ppid":     1,
-			"state":    "running",
-			"username": "test",
+			"type": "process",
 		},
-		"type": "process",
 	}
 
 	assert.True(t, conds[0].Check(event))
@@ -326,9 +325,8 @@ func TestRangeCondition(t *testing.T) {
 }
 
 func TestORCondition(t *testing.T) {
-	if testing.Verbose() {
-		logp.LogInit(logp.LOG_DEBUG, "", false, true, []string{"*"})
-	}
+	logp.TestingSetup()
+
 	configs := []ConditionConfig{
 		{
 			OR: []ConditionConfig{
@@ -353,40 +351,39 @@ func TestORCondition(t *testing.T) {
 		logp.Debug("test", "%s", cond)
 	}
 
-	event := common.MapStr{
-		"@timestamp":    "2015-06-11T09:51:23.642Z",
-		"bytes_in":      126,
-		"bytes_out":     28033,
-		"client_ip":     "127.0.0.1",
-		"client_port":   42840,
-		"client_proc":   "",
-		"client_server": "mar.local",
-		"http": common.MapStr{
-			"code":           404,
-			"content_length": 76985,
-			"phrase":         "Not found",
+	event := &beat.Event{
+		Timestamp: time.Now(),
+		Fields: common.MapStr{
+			"bytes_in":      126,
+			"bytes_out":     28033,
+			"client_ip":     "127.0.0.1",
+			"client_port":   42840,
+			"client_proc":   "",
+			"client_server": "mar.local",
+			"http": common.MapStr{
+				"code":           404,
+				"content_length": 76985,
+				"phrase":         "Not found",
+			},
+			"ip":           "127.0.0.1",
+			"method":       "GET",
+			"params":       "",
+			"path":         "/jszip.min.js",
+			"port":         8000,
+			"proc":         "",
+			"query":        "GET /jszip.min.js",
+			"responsetime": 30,
+			"server":       "mar.local",
+			"status":       "OK",
+			"type":         "http",
 		},
-		"ip":           "127.0.0.1",
-		"method":       "GET",
-		"params":       "",
-		"path":         "/jszip.min.js",
-		"port":         8000,
-		"proc":         "",
-		"query":        "GET /jszip.min.js",
-		"responsetime": 30,
-		"server":       "mar.local",
-		"status":       "OK",
-		"type":         "http",
 	}
 
 	assert.True(t, conds[0].Check(event))
-
 }
 
 func TestANDCondition(t *testing.T) {
-	if testing.Verbose() {
-		logp.LogInit(logp.LOG_DEBUG, "", false, true, []string{"*"})
-	}
+	logp.TestingSetup()
 	configs := []ConditionConfig{
 		{
 			AND: []ConditionConfig{
@@ -410,40 +407,40 @@ func TestANDCondition(t *testing.T) {
 		logp.Debug("test", "%s", cond)
 	}
 
-	event := common.MapStr{
-		"@timestamp":    "2015-06-11T09:51:23.642Z",
-		"bytes_in":      126,
-		"bytes_out":     28033,
-		"client_ip":     "127.0.0.1",
-		"client_port":   42840,
-		"client_proc":   "",
-		"client_server": "mar.local",
-		"http": common.MapStr{
-			"code":           404,
-			"content_length": 76985,
-			"phrase":         "Not found",
+	event := &beat.Event{
+		Timestamp: time.Now(),
+		Fields: common.MapStr{
+			"bytes_in":      126,
+			"bytes_out":     28033,
+			"client_ip":     "127.0.0.1",
+			"client_port":   42840,
+			"client_proc":   "",
+			"client_server": "mar.local",
+			"http": common.MapStr{
+				"code":           404,
+				"content_length": 76985,
+				"phrase":         "Not found",
+			},
+			"ip":           "127.0.0.1",
+			"method":       "GET",
+			"params":       "",
+			"path":         "/jszip.min.js",
+			"port":         8000,
+			"proc":         "",
+			"query":        "GET /jszip.min.js",
+			"responsetime": 30,
+			"server":       "mar.local",
+			"status":       "OK",
+			"type":         "http",
 		},
-		"ip":           "127.0.0.1",
-		"method":       "GET",
-		"params":       "",
-		"path":         "/jszip.min.js",
-		"port":         8000,
-		"proc":         "",
-		"query":        "GET /jszip.min.js",
-		"responsetime": 30,
-		"server":       "mar.local",
-		"status":       "OK",
-		"type":         "http",
 	}
 
 	assert.True(t, conds[0].Check(event))
-
 }
 
 func TestNOTCondition(t *testing.T) {
-	if testing.Verbose() {
-		logp.LogInit(logp.LOG_DEBUG, "", false, true, []string{"*"})
-	}
+	logp.TestingSetup()
+
 	configs := []ConditionConfig{
 		{
 			NOT: &ConditionConfig{
@@ -459,40 +456,40 @@ func TestNOTCondition(t *testing.T) {
 		logp.Debug("test", "%s", cond)
 	}
 
-	event := common.MapStr{
-		"@timestamp":    "2015-06-11T09:51:23.642Z",
-		"bytes_in":      126,
-		"bytes_out":     28033,
-		"client_ip":     "127.0.0.1",
-		"client_port":   42840,
-		"client_proc":   "",
-		"client_server": "mar.local",
-		"http": common.MapStr{
-			"code":           404,
-			"content_length": 76985,
-			"phrase":         "Not found",
+	event := &beat.Event{
+		Timestamp: time.Now(),
+		Fields: common.MapStr{
+			"@timestamp":    "2015-06-11T09:51:23.642Z",
+			"bytes_in":      126,
+			"bytes_out":     28033,
+			"client_ip":     "127.0.0.1",
+			"client_port":   42840,
+			"client_proc":   "",
+			"client_server": "mar.local",
+			"http": common.MapStr{
+				"code":           404,
+				"content_length": 76985,
+				"phrase":         "Not found",
+			},
+			"ip":           "127.0.0.1",
+			"method":       "GET",
+			"params":       "",
+			"path":         "/jszip.min.js",
+			"port":         8000,
+			"proc":         "",
+			"query":        "GET /jszip.min.js",
+			"responsetime": 30,
+			"server":       "mar.local",
+			"status":       "OK",
+			"type":         "http",
 		},
-		"ip":           "127.0.0.1",
-		"method":       "GET",
-		"params":       "",
-		"path":         "/jszip.min.js",
-		"port":         8000,
-		"proc":         "",
-		"query":        "GET /jszip.min.js",
-		"responsetime": 30,
-		"server":       "mar.local",
-		"status":       "OK",
-		"type":         "http",
 	}
 
 	assert.False(t, conds[0].Check(event))
-
 }
 
 func TestCombinedCondition(t *testing.T) {
-	if testing.Verbose() {
-		logp.LogInit(logp.LOG_DEBUG, "", false, true, []string{"*"})
-	}
+	logp.TestingSetup()
 	configs := []ConditionConfig{
 		{
 			OR: []ConditionConfig{
@@ -525,34 +522,36 @@ func TestCombinedCondition(t *testing.T) {
 		logp.Debug("test", "%s", cond)
 	}
 
-	event := common.MapStr{
-		"@timestamp":    "2015-06-11T09:51:23.642Z",
-		"bytes_in":      126,
-		"bytes_out":     28033,
-		"client_ip":     "127.0.0.1",
-		"client_port":   42840,
-		"client_proc":   "",
-		"client_server": "mar.local",
-		"http": common.MapStr{
-			"code":           200,
-			"content_length": 76985,
-			"phrase":         "OK",
+	event := &beat.Event{
+		Timestamp: time.Now(),
+		Fields: common.MapStr{
+			"@timestamp":    "2015-06-11T09:51:23.642Z",
+			"bytes_in":      126,
+			"bytes_out":     28033,
+			"client_ip":     "127.0.0.1",
+			"client_port":   42840,
+			"client_proc":   "",
+			"client_server": "mar.local",
+			"http": common.MapStr{
+				"code":           200,
+				"content_length": 76985,
+				"phrase":         "OK",
+			},
+			"ip":           "127.0.0.1",
+			"method":       "GET",
+			"params":       "",
+			"path":         "/jszip.min.js",
+			"port":         8000,
+			"proc":         "",
+			"query":        "GET /jszip.min.js",
+			"responsetime": 30,
+			"server":       "mar.local",
+			"status":       "OK",
+			"type":         "http",
 		},
-		"ip":           "127.0.0.1",
-		"method":       "GET",
-		"params":       "",
-		"path":         "/jszip.min.js",
-		"port":         8000,
-		"proc":         "",
-		"query":        "GET /jszip.min.js",
-		"responsetime": 30,
-		"server":       "mar.local",
-		"status":       "OK",
-		"type":         "http",
 	}
 
 	assert.True(t, conds[0].Check(event))
-
 }
 
 func TestWhenProcessor(t *testing.T) {
@@ -594,15 +593,19 @@ func TestWhenProcessor(t *testing.T) {
 		}
 
 		cf := &countFilter{}
-		filter, err := NewConditional(func(_ common.Config) (Processor, error) {
+		filter, err := NewConditional(func(_ *common.Config) (Processor, error) {
 			return cf, nil
-		})(*config)
+		})(config)
 		if err != nil {
 			t.Error(err)
 			continue
 		}
 
-		for _, event := range test.events {
+		for _, fields := range test.events {
+			event := &beat.Event{
+				Timestamp: time.Now(),
+				Fields:    fields,
+			}
 			_, err := filter.Run(event)
 			if err != nil {
 				t.Error(err)
@@ -615,9 +618,9 @@ func TestWhenProcessor(t *testing.T) {
 
 func TestConditionRuleInitErrorPropagates(t *testing.T) {
 	testErr := errors.New("test")
-	filter, err := NewConditional(func(_ common.Config) (Processor, error) {
+	filter, err := NewConditional(func(_ *common.Config) (Processor, error) {
 		return nil, testErr
-	})(common.Config{})
+	})(common.NewConfig())
 
 	assert.Equal(t, testErr, err)
 	assert.Nil(t, filter)

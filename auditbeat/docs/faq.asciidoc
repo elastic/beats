@@ -1,0 +1,12 @@
+[[faq]]
+== Frequently asked questions
+
+This section contains frequently asked questions about {beatname_uc}. Also check
+out the
+https://discuss.elastic.co/c/beats/{beatname_lc}[{beatname_uc} discussion forum].
+
+include::./faq-ulimit.asciidoc[]
+
+include::../../libbeat/docs/faq-limit-bandwidth.asciidoc[]
+
+include::../../libbeat/docs/shared-faq.asciidoc[]

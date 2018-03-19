@@ -1,0 +1,293 @@
+[id="{beatname_lc}-getting-started"]
+== Getting started with {beatname_uc}
+
+To get started with your own {beatname_uc} setup, install and configure these
+related products:
+
+ * Elasticsearch for storage and indexing the data.
+ * Kibana for the UI.
+ * Logstash (optional) for inserting data into Elasticsearch.
+
+See {libbeat}/getting-started.html[Getting Started with Beats and the Elastic Stack]
+for more information.
+
+After installing the Elastic Stack, read the following topics to learn how to
+install, configure, and run {beatname_uc}:
+
+* <<{beatname_lc}-installation>>
+* <<{beatname_lc}-configuration>>
+* <<{beatname_lc}-template>>
+* <<load-kibana-dashboards>>
+* <<{beatname_lc}-starting>>
+* <<view-kibana-dashboards>>
+* <<setup-repositories>>
+
+[id="{beatname_lc}-installation"]
+=== Step 1: Install {beatname_uc}
+
+You should install {beatname_uc} on all the servers you want to monitor.
+
+include::../../libbeat/docs/shared-download-and-install.asciidoc[]
+
+[[deb]]
+*deb:*
+
+ifeval::["{release-state}"=="unreleased"]
+
+Version {stack-version} of {beatname_uc} has not yet been released.
+
+endif::[]
+
+ifeval::["{release-state}"!="unreleased"]
+
+["source","sh",subs="attributes"]
+------------------------------------------------
+curl -L -O https://artifacts.elastic.co/downloads/beats/{beatname_lc}/{beatname_lc}-{version}-amd64.deb
+sudo dpkg -i {beatname_lc}-{version}-amd64.deb
+------------------------------------------------
+
+endif::[]
+
+[[rpm]]
+*rpm:*
+
+ifeval::["{release-state}"=="unreleased"]
+
+Version {stack-version} of {beatname_uc} has not yet been released.
+
+endif::[]
+
+ifeval::["{release-state}"!="unreleased"]
+
+["source","sh",subs="attributes"]
+------------------------------------------------
+curl -L -O https://artifacts.elastic.co/downloads/beats/{beatname_lc}/{beatname_lc}-{version}-x86_64.rpm
+sudo rpm -vi {beatname_lc}-{version}-x86_64.rpm
+------------------------------------------------
+
+endif::[]
+
+[[mac]]
+*mac:*
+
+ifeval::["{release-state}"=="unreleased"]
+
+Version {stack-version} of {beatname_uc} has not yet been released.
+
+endif::[]
+
+ifeval::["{release-state}"!="unreleased"]
+
+["source","sh",subs="attributes"]
+------------------------------------------------
+curl -L -O https://artifacts.elastic.co/downloads/beats/{beatname_lc}/{beatname_lc}-{version}-darwin-x86_64.tar.gz
+tar xzvf {beatname_lc}-{version}-darwin-x86_64.tar.gz
+------------------------------------------------
+
+endif::[]
+
+[[docker]]
+*docker:*
+
+ifeval::["{release-state}"=="unreleased"]
+
+Version {stack-version} of {beatname_uc} has not yet been released.
+
+endif::[]
+
+ifeval::["{release-state}"!="unreleased"]
+
+["source", "shell", subs="attributes"]
+------------------------------------------------
+docker pull {dockerimage}
+------------------------------------------------
+
+endif::[]
+
+[[win]]
+*win:*
+
+ifeval::["{release-state}"=="unreleased"]
+
+Version {stack-version} of {beatname_uc} has not yet been released.
+
+endif::[]
+
+ifeval::["{release-state}"!="unreleased"]
+
+. Download the {beatname_uc} Windows zip file from the
+https://www.elastic.co/downloads/beats/{beatname_lc}[downloads page].
+
+. Extract the contents of the zip file into `C:\Program Files`.
+
+. Rename the +{beatname_lc}-<version>-windows+ directory to +{beatname_uc}+.
+
+. Open a PowerShell prompt as an Administrator (right-click the PowerShell icon
+and select *Run As Administrator*). If you are running Windows XP, you may need
+to download and install PowerShell.
+
+. From the PowerShell prompt, run the following commands to install {beatname_uc}
+as a Windows service:
++
+["source","sh",subs="attributes"]
+----------------------------------------------------------------------
+PS > cd 'C:{backslash}Program Files{backslash}{beatname_uc}'
+PS C:{backslash}Program Files{backslash}{beatname_uc}> .{backslash}install-service-{beatname_lc}.ps1
+----------------------------------------------------------------------
+
+NOTE: If script execution is disabled on your system, you need to set the
+execution policy for the current session to allow the script to run. For
+example: +PowerShell.exe -ExecutionPolicy UnRestricted -File
+.\install-service-{beatname_lc}.ps1+.
+
+endif::[]
+
+Before starting {beatname_uc}, you should look at the configuration options in the
+configuration file, for example +C:{backslash}Program Files{backslash}{beatname_uc}{backslash}{beatname_lc}.yml+.
+For more information about these options, see
+<<configuring-howto-{beatname_lc}>>.
+
+[id="{beatname_lc}-configuration"]
+=== Step 2: Configure {beatname_uc}
+
+include::../../libbeat/docs/shared-configuring.asciidoc[]
+
+To configure {beatname_uc}:
+
+. Define the {beatname_uc} modules that you want to enable. {beatname_uc} uses
+modules to collect the audit information. For each module, specify the
+metricsets that you want to collect.
++
+The following example shows the `file_integrity` module configured to generate
+events whenever a file in one of the specified paths changes on disk:
++
+["source","sh",subs="attributes"]
+-------------------------------------
+auditbeat.modules:
+
+- module: file_integrity
+  paths:
+  - /bin
+  - /usr/bin
+  - /sbin
+  - /usr/sbin
+  - /etc
+-------------------------------------
++
+If you accept the default configuration without specifying additional modules,
+{beatname_uc} uses a configuration that's tailored to the operating system where
+{beatname_uc} is running.
++
+See <<configuring-howto-{beatname_lc}>> for more details about configuring modules.
+
+. If you are sending output to Elasticsearch (and not using Logstash), set the
+IP address and port where {beatname_uc} can find the Elasticsearch installation:
++
+[source,yaml]
+----------------------------------------------------------------------
+output.elasticsearch:
+  hosts: ["127.0.0.1:9200"]
+----------------------------------------------------------------------
++
+If you are sending output to Logstash, make sure you
+<<logstash-output,Configure the Logstash output>> instead.
+
+include::../../libbeat/docs/step-configure-kibana-endpoint.asciidoc[]
+
+include::../../libbeat/docs/step-configure-credentials.asciidoc[]
+
+include::../../libbeat/docs/step-test-config.asciidoc[]
+
+include::../../libbeat/docs/step-look-at-config.asciidoc[]
+
+[id="{beatname_lc}-template"]
+=== Step 3: Load the index template in Elasticsearch
+
+:allplatforms:
+include::../../libbeat/docs/shared-template-load.asciidoc[]
+
+[[load-kibana-dashboards]]
+=== Step 4: Set up the Kibana dashboards
+
+:allplatforms:
+include::../../libbeat/docs/dashboards.asciidoc[]
+
+[id="{beatname_lc}-starting"]
+=== Step 5: Start {beatname_uc}
+
+Run {beatname_uc} by issuing the appropriate command for your platform. If you
+are accessing a secured Elasticsearch cluster, make sure you've configured
+credentials as described in <<{beatname_lc}-configuration>>.
+
+NOTE: If you use an init.d script to start {beatname_uc} on deb or rpm, you can't
+specify command line flags (see <<command-line-options>>). To specify flags,
+start {beatname_uc} in the foreground.
+
+*deb:*
+
+["source","sh",subs="attributes"]
+----------------------------------------------------------------------
+sudo service {beatname_lc} start
+----------------------------------------------------------------------
+
+*rpm:*
+
+["source","sh",subs="attributes"]
+----------------------------------------------------------------------
+sudo service {beatname_lc} start
+----------------------------------------------------------------------
+
+*mac:*
+
+["source","sh",subs="attributes"]
+----------------------------------------------------------------------
+sudo chown root {beatname_lc}.yml <1>
+sudo ./{beatname_lc} -e -c {beatname_lc}.yml -d "publish"
+----------------------------------------------------------------------
+<1> To monitor system files, you'll be running {beatname_uc} as root, so you
+need to change ownership of the configuration file, or run {beatname_uc} with
+`-strict.perms=false` specified. See
+{libbeat}/config-file-permissions.html[Config File Ownership and Permissions]
+in the _Beats Platform Reference_.
+
+If you see a warning about too many open files, you need to increase the
+`ulimit`. See the <<ulimit,FAQ>> for more details.
+
+*win:*
+
+["source","sh",subs="attributes"]
+----------------------------------------------------------------------
+PS C:{backslash}Program Files{backslash}{beatname_uc}> Start-Service {beatname_lc}
+----------------------------------------------------------------------
+
+By default the log files are stored in +C:{backslash}ProgramData{backslash}{beatname_lc}{backslash}Logs+.
+
+==== Test the {beatname_uc} installation
+
+To verify that your server's statistics are present in Elasticsearch, issue
+the following command:
+
+["source","sh",subs="attributes"]
+----------------------------------------------------------------------
+curl -XGET 'http://localhost:9200/{beatname_lc}-*/_search?pretty'
+----------------------------------------------------------------------
+
+Make sure that you replace `localhost:9200` with the address of your
+Elasticsearch instance.
+
+On Windows, if you don't have cURL installed, simply point your browser to the
+URL.
+
+[[view-kibana-dashboards]]
+=== Step 6: View the sample Kibana dashboards
+
+To make it easier for you to start auditing the activities of users and
+processes on your system, we have created example {beatname_uc} dashboards.
+You loaded the dashboards earlier when you ran the `setup` command.
+
+include::../../libbeat/docs/opendashboards.asciidoc[]
+
+The dashboards are provided as examples. We recommend that you
+{kibana-ref}/dashboard.html[customize] them to meet your needs.
+
+image:./images/auditbeat-file-integrity-dashboard.png[Auditbeat File Integrity Dashboard]

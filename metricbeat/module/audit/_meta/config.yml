@@ -1,3 +1,0 @@
-- module: audit
-  metricsets: ["kernel"]
-

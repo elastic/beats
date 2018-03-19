@@ -3,6 +3,8 @@ This file is generated! See scripts/docs_collector.py
 ////
 
 [[metricbeat-metricset-jolokia-jmx]]
+=== Jolokia jmx metricset
+
 include::../../../module/jolokia/jmx/_meta/docs.asciidoc[]
 
 

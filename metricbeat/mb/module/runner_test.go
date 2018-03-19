@@ -5,8 +5,8 @@ package module_test
 import (
 	"testing"
 
+	"github.com/elastic/beats/libbeat/beat"
 	"github.com/elastic/beats/libbeat/common"
-	"github.com/elastic/beats/libbeat/publisher"
 	pubtest "github.com/elastic/beats/libbeat/publisher/testing"
 	"github.com/elastic/beats/metricbeat/mb"
 	"github.com/elastic/beats/metricbeat/mb/module"
@@ -26,13 +26,13 @@ func TestRunner(t *testing.T) {
 	}
 
 	// Create a new Wrapper based on the configuration.
-	m, err := module.NewWrapper(0, config, mb.Registry)
+	m, err := module.NewWrapper(config, mb.Registry, module.WithMetricSetInfo())
 	if err != nil {
 		t.Fatal(err)
 	}
 
 	// Create the Runner facade.
-	runner := module.NewRunner(factory, m)
+	runner := module.NewRunner(factory(), m)
 
 	// Start the module and have it publish to a new publisher.Client.
 	runner.Start()
@@ -47,7 +47,7 @@ func TestRunner(t *testing.T) {
 // newPubClientFactory returns a new ChanClient and a function that returns
 // the same Client when invoked. This simulates the return value of
 // Publisher.Connect.
-func newPubClientFactory() (*pubtest.ChanClient, func() publisher.Client) {
+func newPubClientFactory() (*pubtest.ChanClient, func() beat.Client) {
 	client := pubtest.NewChanClient(10)
-	return client, func() publisher.Client { return client }
+	return client, func() beat.Client { return client }
 }

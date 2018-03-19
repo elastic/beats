@@ -1,0 +1,132 @@
+[[filebeat-configuration-reloading]]
+== Load external configuration files
+
+Filebeat can load external configuration files for prospectors and modules,
+which allows you to separate your configuration into multiple smaller
+configuration files. See the <<load-prospector-config>> and the
+<<load-module-config>> sections for details.
+
+include::../../libbeat/docs/shared-note-file-permissions.asciidoc[]
+
+[float]
+[[load-prospector-config]]
+=== Prospector config
+
+For prospector configurations, you specify the `path` option in the
+`filebeat.config.prospectors` section of the +{beatname_lc}.yml+ file. For
+example:
+
+[source,yaml]
+------------------------------------------------------------------------------
+filebeat.config.prospectors:
+  enabled: true
+  path: configs/*.yml
+------------------------------------------------------------------------------
+
+
+Each file found by the `path` Glob must contain a list of one or more prospector
+definitions. 
+ 
+TIP: The first line of each external configuration file must be a prospector
+definition that starts with `- type`. Make sure you omit the line
+`filebeat.config.prospectors` from this file.
+ 
+For example:
+
+[source,yaml]
+------------------------------------------------------------------------------
+- type: log
+  paths:
+    - /var/log/mysql.log
+  scan_frequency: 10s
+
+- type: log
+  paths:
+    - /var/log/apache.log
+  scan_frequency: 5s
+------------------------------------------------------------------------------
+
+
+WARNING: It is critical that two running prospectors DO NOT have overlapping
+file paths defined. If more than one prospector harvests the same file at the
+same time, it can lead to unexpected behavior.
+
+[float]
+[[load-module-config]]
+=== Module config
+
+For module configurations, you specify the `path` option in the
+`filebeat.config.modules` section of the +{beatname_lc}.yml+ file. By default,
+Filebeat loads the module configurations enabled in the
+<<enable-modules-d-configs,`modules.d`>> directory. For example:
+
+[source,yaml]
+------------------------------------------------------------------------------
+filebeat.config.modules:
+  enabled: true
+  path: ${path.config}/modules.d/*.yml
+------------------------------------------------------------------------------
+
+
+The `path` setting must point to the `modules.d` directory if you want to use
+the <<modules-command,`modules`>> command to enable and disable module
+configurations.
+
+Each file found by the Glob must contain a list of one or more module
+definitions. 
+ 
+TIP: The first line of each external configuration file must be a module
+definition that starts with `- module`. Make sure you omit the line
+`filebeat.config.modules` from this file.
+
+For example:
+
+[source,yaml]
+------------------------------------------------------------------------------
+- module: apache2
+  access:
+    enabled: true
+    var.paths: [/var/log/apache2/access.log*]
+  error:
+    enabled: true
+    var.paths: [/var/log/apache2/error.log*]
+------------------------------------------------------------------------------
+
+
+=== Live reloading
+
+You can configure Filebeat to dynamically reload external configuration files
+when there are changes. This feature is available for prospector and module
+configurations that are loaded as
+<<filebeat-configuration-reloading,external configuration files>>. You cannot
+use this feature to reload the main +{beatname_lc}.yml+ configuration file.
+
+To configure this feature, you specify a path
+(https://golang.org/pkg/path/filepath/#Glob[Glob]) to watch for configuration
+changes. When the files found by the Glob change, new prospectors and/or
+modules are started and stopped according to changes in the configuration files.
+
+This feature is especially useful in container environments where one container
+is used to tail logs for services running in other containers on the same host.
+
+To enable dynamic config reloading, you specify the `path` and `reload` options
+under `filebeat.config.prospectors` or `filebeat.config.modules` sections. For
+example:
+
+[source,yaml]
+------------------------------------------------------------------------------
+filebeat.config.prospectors:
+  enabled: true
+  path: configs/*.yml
+  reload.enabled: true
+  reload.period: 10s
+------------------------------------------------------------------------------
+
+`path`:: A Glob that defines the files to check for changes.
+`reload.enabled`:: When set to `true`, enables dynamic config reload.
+`reload.period`:: Specifies how often the files are checked for changes. Do not
+set the `period` to less than 1s because the modification time of files is often
+stored in seconds. Setting the `period` to less than 1s will result in
+unnecessary overhead.
+
+include::../../libbeat/docs/shared-note-file-permissions.asciidoc[]

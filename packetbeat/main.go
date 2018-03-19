@@ -3,9 +3,6 @@ package main
 import (
 	"os"
 
-	// import protocol modules
-	_ "github.com/elastic/beats/packetbeat/include"
-
 	"github.com/elastic/beats/packetbeat/cmd"
 )
 

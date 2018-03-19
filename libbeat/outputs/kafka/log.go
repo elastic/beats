@@ -1,17 +1,38 @@
 package kafka
 
-import "github.com/elastic/beats/libbeat/logp"
+import (
+	"github.com/Shopify/sarama"
+
+	"github.com/elastic/beats/libbeat/logp"
+)
 
 type kafkaLogger struct{}
 
-func (kafkaLogger) Print(v ...interface{}) {
-	logp.Warn("kafka message: %v", v...)
+func (kl kafkaLogger) Print(v ...interface{}) {
+	kl.Log("kafka message: %v", v...)
 }
 
-func (kafkaLogger) Printf(format string, v ...interface{}) {
-	logp.Warn(format, v...)
+func (kl kafkaLogger) Printf(format string, v ...interface{}) {
+	kl.Log(format, v...)
 }
 
-func (kafkaLogger) Println(v ...interface{}) {
-	logp.Warn("kafka message: %v", v...)
+func (kl kafkaLogger) Println(v ...interface{}) {
+	kl.Log("kafka message: %v", v...)
+}
+
+func (kafkaLogger) Log(format string, v ...interface{}) {
+	warn := false
+	for _, val := range v {
+		if err, ok := val.(sarama.KError); ok {
+			if err != sarama.ErrNoError {
+				warn = true
+				break
+			}
+		}
+	}
+	if warn {
+		logp.Warn(format, v...)
+	} else {
+		logp.Info(format, v...)
+	}
 }

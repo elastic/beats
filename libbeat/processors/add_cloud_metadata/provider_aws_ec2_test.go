@@ -5,9 +5,11 @@ import (
 	"net/http/httptest"
 	"testing"
 
+	"github.com/stretchr/testify/assert"
+
+	"github.com/elastic/beats/libbeat/beat"
 	"github.com/elastic/beats/libbeat/common"
 	"github.com/elastic/beats/libbeat/logp"
-	"github.com/stretchr/testify/assert"
 )
 
 const ec2InstanceIdentityDocument = `{
@@ -39,9 +41,7 @@ func initEC2TestServer() *httptest.Server {
 }
 
 func TestRetrieveAWSMetadata(t *testing.T) {
-	if testing.Verbose() {
-		logp.LogInit(logp.LOG_DEBUG, "", false, true, []string{"*"})
-	}
+	logp.TestingSetup()
 
 	server := initEC2TestServer()
 	defer server.Close()
@@ -53,12 +53,12 @@ func TestRetrieveAWSMetadata(t *testing.T) {
 		t.Fatal(err)
 	}
 
-	p, err := newCloudMetadata(*config)
+	p, err := newCloudMetadata(config)
 	if err != nil {
 		t.Fatal(err)
 	}
 
-	actual, err := p.Run(common.MapStr{})
+	actual, err := p.Run(&beat.Event{Fields: common.MapStr{}})
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -74,5 +74,5 @@ func TestRetrieveAWSMetadata(t *testing.T) {
 			},
 		},
 	}
-	assert.Equal(t, expected, actual)
+	assert.Equal(t, expected, actual.Fields)
 }

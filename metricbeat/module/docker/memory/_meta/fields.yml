@@ -2,6 +2,7 @@
   type: group
   description: >
     Memory metrics.
+  release: ga
   fields:
 
     - name: fail.count
@@ -25,6 +26,7 @@
             Total memory resident set size.
         - name: pct
           type: scaled_float
+          format: percentage
           description: >
             Memory resident set size percentage.
     - name: usage
@@ -39,6 +41,7 @@
             Max memory usage.
         - name: pct
           type: scaled_float
+          format: percentage
           description: >
             Memory usage percentage.
         - name: total

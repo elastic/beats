@@ -2,21 +2,18 @@
 
 include::../../libbeat/docs/version.asciidoc[]
 
-:libbeat: http://www.elastic.co/guide/en/beats/libbeat/{doc-branch}
-:beatsdevguide: http://www.elastic.co/guide/en/beats/devguide/{doc-branch}
-:packetbeat: http://www.elastic.co/guide/en/beats/packetbeat/{doc-branch}
-:metricbeat: http://www.elastic.co/guide/en/beats/metricbeat/{doc-branch}
-:filebeat: http://www.elastic.co/guide/en/beats/filebeat/{doc-branch}
-:winlogbeat: http://www.elastic.co/guide/en/beats/winlogbeat/{doc-branch}
-:logstashdoc: https://www.elastic.co/guide/en/logstash/{doc-branch}
-:elasticsearch: https://www.elastic.co/guide/en/elasticsearch/reference/{doc-branch}
-:securitydoc: https://www.elastic.co/guide/en/x-pack/current
-:downloads: https://artifacts.elastic.co/downloads/beats
+include::{asciidoc-dir}/../../shared/attributes.asciidoc[]
+
 :version: {stack-version}
 :beatname_lc: heartbeat
 :beatname_uc: Heartbeat
-:security: X-Pack Security
-:dockerimage: docker.elastic.co/beats/{beatname_lc}:{version}
+:beatname_pkg: heartbeat-elastic
+:github_repo_name: beats
+:discuss_forum: beats/{beatname_lc}
+:beat_default_index_prefix: {beatname_lc}
+:has_ml_jobs: yes
+
+include::../../libbeat/docs/shared-beats-attributes.asciidoc[]
 
 include::./overview.asciidoc[]
 
@@ -24,13 +21,9 @@ include::../../libbeat/docs/contributing-to-beats.asciidoc[]
 
 include::./getting-started.asciidoc[]
 
-include::./command-line.asciidoc[]
-
-include::../../libbeat/docs/shared-directory-layout.asciidoc[]
-
 include::../../libbeat/docs/repositories.asciidoc[]
 
-include::./running-on-docker.asciidoc[]
+include::./setting-up-running.asciidoc[]
 
 //
 //include::./upgrading.asciidoc[]
@@ -40,25 +33,13 @@ include::./running-on-docker.asciidoc[]
 
 include::./configuring-howto.asciidoc[]
 
-include::./heartbeat-filtering.asciidoc[]
-
-include::../../libbeat/docs/shared-config-ingest.asciidoc[]
-
-//points to shared topic because configuring-logstash.asciidoc is just a wrapper
-include::./configuring-logstash.asciidoc[]
-
-:standalone:
-include::../../libbeat/docs/shared-env-vars.asciidoc[]
-
-:standalone:
-:allplatforms:
-include::../../libbeat/docs/yaml.asciidoc[]
-
-include::../../libbeat/docs/regexp.asciidoc[]
-
 include::./fields.asciidoc[]
 
+include::../../libbeat/docs/monitoring/monitoring-beats.asciidoc[]
+
 include::./securing-heartbeat.asciidoc[]
+
+include::../../libbeat/docs/security/securing-beats.asciidoc[]
 
 include::./troubleshooting.asciidoc[]
 

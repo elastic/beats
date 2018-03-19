@@ -11,6 +11,7 @@ import (
 	"time"
 
 	"github.com/Shopify/sarama"
+
 	"github.com/elastic/beats/libbeat/common"
 )
 
@@ -229,10 +230,17 @@ func (b *Broker) DescribeGroups(
 	return groups, nil
 }
 
-func (b *Broker) FetchGroupOffsets(group string) (*sarama.OffsetFetchResponse, error) {
+// FetchGroupOffsets fetches the consume offset of group.
+// The partitions is a MAP mapping from topic name to partitionid array.
+func (b *Broker) FetchGroupOffsets(group string, partitions map[string][]int32) (*sarama.OffsetFetchResponse, error) {
 	requ := &sarama.OffsetFetchRequest{
 		ConsumerGroup: group,
 		Version:       1,
+	}
+	for topic, partition := range partitions {
+		for _, partitionID := range partition {
+			requ.AddPartition(topic, partitionID)
+		}
 	}
 	return b.broker.FetchOffset(requ)
 }

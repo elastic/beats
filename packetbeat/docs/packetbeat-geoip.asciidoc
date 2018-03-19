@@ -1,8 +1,8 @@
 [[packetbeat-geoip]]
-== Exporting GeoIP Information 
+== Export GeoIP Information
 
 You can use Packetbeat along with the
-{plugindoc}/ingest-geoip.html[ingest geoIP processor plugin] in Elasticsearch 
+{plugindoc}/ingest-geoip.html[ingest geoIP processor plugin] in Elasticsearch
 to export geographic location information about source IPs for incoming HTTP
 requests. Then you can use this info to visualize the location of your
 clients on a map in Kibana.
@@ -24,7 +24,7 @@ Logstash.
 
 [float]
 [[packetbeat-configuring-geoip]]
-=== Configuring the Ingest GeoIP Processor Plugin
+=== Configuring the ingest geoIP processor plugin
 
 To configure Packetbeat and the ingest geoIP processor plugin:
 
@@ -46,7 +46,7 @@ PUT _ingest/pipeline/geoip-info
         "field": "client_ip",
         "target_field": "client_geoip",
         "properties": ["location"],
-        "ignore_failure": true 
+        "ignore_failure": true
       }
     }
   ]
@@ -57,15 +57,15 @@ This pipeline adds a `client_geoip.location` field of type `geo_point` to the
 event. The ID of the pipeline is `geoip-info`. `client_ip` is the output field
 in Packetbeat that contains the IP address of the client. You set
 `ignore_failure` to `true` so that the pipeline will continue processing events
-when it encounters an event that doesn't have a `client_ip` field.   
+when it encounters an event that doesn't have a `client_ip` field.
 +
-See 
+See
 {plugindoc}/using-ingest-geoip.html[Using the Geoip Processor in a Pipeline]
 for more options.
 
 3. In the Packetbeat config file, configure the Elasticsearch output to use the
 pipeline. Specify the pipeline ID in the `pipeline` option under
-`output.elasticsearch`. For example: 
+`output.elasticsearch`. For example:
 +
 [source,yaml]
 -------------------------------------------------------------------------------
@@ -86,12 +86,12 @@ The event that's sent to Elasticsearch should now include a
 
 [float]
 [[packetbeat-visualizing-location]]
-=== Visualizing the Location of Your Packetbeat Clients
+=== Visualizing the location of your Packetbeat clients
 
 To visualize the location of your Packetbeat clients, you can either
-<<packetbeat-sample-dashboards,import the Kibana dashboard for Packetbeat>> (if
-you haven't already), or create a new {kibanadoc}/tilemap.html[Tile map] in
-Kibana and use the `client_geoip.location` field as the Geohash. 
+<<load-kibana-dashboards,set up the example Kibana dashboards>> (if
+you haven't already), or create a new {kibana-ref}/tilemap.html[Tile map] in
+Kibana and use the `client_geoip.location` field as the Geohash.
 
 image:./images/kibana-update-map.png[Update Packetbeat client location map in Kibana]
 

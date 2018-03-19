@@ -5,6 +5,7 @@ import (
 	"sort"
 	"strings"
 
+	"github.com/elastic/beats/libbeat/beat"
 	"github.com/elastic/beats/libbeat/common"
 )
 
@@ -14,8 +15,10 @@ type ActiveBuilder func(Info, *common.Config) ([]Job, error)
 
 type Job interface {
 	Name() string
-	TaskRunner
+	Run() (beat.Event, []JobRunner, error)
 }
+
+type JobRunner func() (beat.Event, []JobRunner, error)
 
 type TaskRunner interface {
 	Run() (common.MapStr, []TaskRunner, error)

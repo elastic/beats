@@ -11,13 +11,15 @@
 //////////////////////////////////////////////////////////////////////////
 
 [[configuration-path]]
-=== Paths
+== Set up project paths
 
 The `path` section of the +{beatname_lc}.yml+ config file contains configuration
-options that define where the Beat looks for its files. For example, all Beats
-look for the Elasticsearch template file in the configuration path, Filebeat and
-Winlogbeat look for their registry files in the data path, and all Beats write
-their log files in the logs path.
+options that define where {beatname_lc} looks for its files. For example, {beatname_uc}
+looks for the Elasticsearch template file in the configuration path and writes
+log files in the logs path.
+ifeval::["{beatname_lc}"=="filebeat" or "{beatname_lc}"=="winlogbeat"]
+Filebeat and Winlogbeat look for their registry files in the data path.
+endif::[]
 
 Please see the <<directory-layout>> section for more details.
 
@@ -26,18 +28,20 @@ Here is an example configuration:
 [source,yaml]
 ------------------------------------------------------------------------------
 path.home: /usr/share/beat
-path.conf: /etc/beat
+path.config: /etc/beat
 path.data: /var/lib/beat
 path.logs: /var/log/
 ------------------------------------------------------------------------------
 
-Note that it is possible to override these options by using command line flags. 
+Note that it is possible to override these options by using command line flags.
 
-==== Path Options
+[float]
+=== Configuration options
 
 You can specify the following options in the `path` section of the +{beatname_lc}.yml+ config file:
 
-===== home
+[float]
+==== `home`
 
 The home path for the {beatname_uc} installation. This is the default base path for all
 other path settings and for miscellaneous files that come with the distribution (for example, the
@@ -51,7 +55,8 @@ Example:
 path.home: /usr/share/beats
 ------------------------------------------------------------------------------
 
-===== conf
+[float]
+==== `config`
 
 The configuration path for the {beatname_uc} installation. This is the default base path
 for configuration files, including the main YAML configuration file and the
@@ -62,10 +67,11 @@ Example:
 
 [source,yaml]
 ------------------------------------------------------------------------------
-path.conf: /usr/share/beats/config
+path.config: /usr/share/beats/config
 ------------------------------------------------------------------------------
 
-===== data
+[float]
+==== `data`
 
 The data path for the {beatname_uc} installation. This is the default base path for all
 the files in which {beatname_uc} needs to store its data. If not set by a CLI
@@ -80,9 +86,10 @@ Example:
 path.data: /var/lib/beats
 ------------------------------------------------------------------------------
 
-===== logs
+[float]
+==== `logs`
 
-The logs path for a {beatname_uc} installation. This is the default location for the Beat's
+The logs path for a {beatname_uc} installation. This is the default location for {beatname_uc}'s
 log files. If not set by a CLI flag or in the configuration file, the default
 for the logs path is a `logs` subdirectory inside the home path.
 

@@ -3,6 +3,8 @@ This file is generated! See scripts/docs_collector.py
 ////
 
 [[metricbeat-metricset-kubernetes-system]]
+=== Kubernetes system metricset
+
 include::../../../module/kubernetes/system/_meta/docs.asciidoc[]
 
 

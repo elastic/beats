@@ -1,0 +1,62 @@
+- name: self
+  type: group
+  description: >
+    Contains etcd self statistics.
+  release: beta
+  fields:
+    - name: id
+      type: keyword
+      description: >
+       the unique identifier for the member
+
+    - name: leaderinfo.leader
+      type: keyword
+      description: >
+        id of the current leader member
+    - name: leaderinfo.starttime
+      type: keyword
+    - name: leaderinfo.uptime
+      type: keyword
+      description: >
+        id of the current leader member
+
+    - name: name
+      type: keyword
+      description: >
+        this member's name
+
+    - name: recv.appendrequest.count
+      type: integer
+      description: >
+        number of append requests this node has processed
+    - name: recv.bandwithrate
+      type: scaled_float
+      description: >
+        number of bytes per second this node is receiving (follower only)
+    - name: recv.pkgrate
+      type: scaled_float
+      description: >
+        number of requests per second this node is receiving (follower only)
+
+    - name: send.appendrequest.count
+      type: integer
+      description: >
+         number of requests that this node has sent
+    - name: send.bandwithrate
+      type: scaled_float
+      description: >
+        number of bytes per second this node is sending (leader only). This value is undefined on single member clusters.
+    - name: send.pkgrate
+      type: scaled_float
+      description: >
+        number of requests per second this node is sending (leader only). This value is undefined on single member clusters.
+
+    - name: starttime
+      type: keyword
+      description: >
+        the time when this node was started
+
+    - name: state
+      type: keyword
+      description: >
+        either leader or follower

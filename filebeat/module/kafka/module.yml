@@ -1,0 +1,3 @@
+dashboards:
+- id: 943caca0-87ee-11e7-ad9c-db80de0bf8d3
+  file: Filebeat-Kafka-overview.json

@@ -1,34 +1,55 @@
 package module
 
 import (
-	"time"
+	"github.com/joeshaw/multierror"
 
+	"github.com/elastic/beats/libbeat/beat"
 	"github.com/elastic/beats/libbeat/cfgfile"
 	"github.com/elastic/beats/libbeat/common"
-	"github.com/elastic/beats/libbeat/publisher"
+	"github.com/elastic/beats/libbeat/common/cfgwarn"
 	"github.com/elastic/beats/metricbeat/mb"
 )
 
-// Factory is used to register and reload modules
+// Factory creates new Runner instances from configuration objects.
+// It is used to register and reload modules.
 type Factory struct {
-	client        func() publisher.Client
-	maxStartDelay time.Duration
+	pipeline beat.Pipeline
+	options  []Option
 }
 
 // NewFactory creates new Reloader instance for the given config
-func NewFactory(maxStartDelay time.Duration, p publisher.Publisher) *Factory {
+func NewFactory(p beat.Pipeline, options ...Option) *Factory {
 	return &Factory{
-		client:        p.Connect,
-		maxStartDelay: maxStartDelay,
+		pipeline: p,
+		options:  options,
 	}
 }
 
-func (r *Factory) Create(c *common.Config) (cfgfile.Runner, error) {
-	w, err := NewWrapper(r.maxStartDelay, c, mb.Registry)
+func (r *Factory) Create(c *common.Config, meta *common.MapStrPointer) (cfgfile.Runner, error) {
+	var errs multierror.Errors
+
+	err := cfgwarn.CheckRemoved5xSettings(c, "filters")
+	if err != nil {
+		errs = append(errs, err)
+	}
+	connector, err := NewConnector(r.pipeline, c, meta)
+	if err != nil {
+		errs = append(errs, err)
+	}
+	w, err := NewWrapper(c, mb.Registry, r.options...)
+	if err != nil {
+		errs = append(errs, err)
+	}
+
+	if err := errs.Err(); err != nil {
+		return nil, err
+	}
+
+	client, err := connector.Connect()
 	if err != nil {
 		return nil, err
 	}
 
-	mr := NewRunner(r.client, w)
+	mr := NewRunner(client, w)
 	return mr, nil
 }

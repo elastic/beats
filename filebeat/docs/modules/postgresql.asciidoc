@@ -1,0 +1,78 @@
+////
+This file is generated! See scripts/docs_collector.py
+////
+
+[[filebeat-module-postgresql]]
+:modulename: postgresql
+
+== PostgreSQL module
+
+The +{modulename}+ module  collects and parses logs created by
+https://www.postgresql.org/[PostgreSQL].
+
+include::../include/what-happens.asciidoc[]
+
+[float]
+=== Compatibility
+
+The +{modulename}+ module was tested with logs from versions 9.5 on Ubuntu and 9.6
+on Debian.
+
+include::../include/running-modules.asciidoc[]
+
+[float]
+=== Example dashboards
+
+This module comes with two sample dashboards.
+
+The first dashboard is for regular logs.
+
+[role="screenshot"]
+image::./images/filebeat-postgresql-overview.png[]
+
+The second one shows the slowlogs of PostgreSQL.
+
+[role="screenshot"]
+image::./images/filebeat-postgresql-slowlog-overview.png[]
+
+include::../include/configuring-intro.asciidoc[]
+
+The following example shows how to set paths in the +modules.d/{modulename}.yml+
+file to override the default paths for PostgreSQL logs:
+
+
+["source","yaml",subs="attributes"]
+-----
+- module: postgresql
+  log:
+    enabled: true
+    var.paths: ["/path/to/log/postgres/*.log*"]
+-----
+
+
+To specify the same settings at the command line, you use:
+
+["source","sh",subs="attributes"]
+-----
+./{beatname_lc} --modules {modulename} -M "postgresql.log.var.paths=[/path/to/log/postgres/*.log*]"
+-----
+
+
+//set the fileset name used in the included example
+:fileset_ex: log
+
+include::../include/config-option-intro.asciidoc[]
+
+[float]
+==== `log` fileset settings
+
+include::../include/var-paths.asciidoc[]
+
+
+
+[float]
+=== Fields
+
+For a description of each field in the module, see the
+<<exported-fields-postgresql,exported fields>> section.
+

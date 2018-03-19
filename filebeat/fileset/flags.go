@@ -11,7 +11,7 @@ import (
 // Modules related command line flags.
 var (
 	modulesFlag     = flag.String("modules", "", "List of enabled modules (comma separated)")
-	moduleOverrides = common.NewFlagConfig(nil, nil, "M", "Module configuration overwrite")
+	moduleOverrides = common.SettingFlag(nil, "M", "Module configuration overwrite")
 )
 
 type ModuleOverrides map[string]map[string]*common.Config // module -> fileset -> Config
@@ -39,7 +39,6 @@ func (mo *ModuleOverrides) Get(module, fileset string) []*common.Config {
 }
 
 func getModulesCLIConfig() ([]string, *ModuleOverrides, error) {
-
 	modulesList := []string{}
 	if modulesFlag != nil {
 		modulesList = strings.Split(*modulesFlag, ",")

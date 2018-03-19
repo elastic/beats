@@ -1,0 +1,19 @@
+{
+    "@timestamp": "2017-10-12T08:05:34.853Z",
+    "beat": {
+        "hostname": "host.example.com",
+        "name": "host.example.com"
+    },
+    "etcd": {
+        "leader": {
+            "followers": {},
+            "leader": "8e9e05c52164694d"
+        }
+    },
+    "metricset": {
+        "host": "etcd:2379",
+        "module": "etcd",
+        "name": "leader",
+        "rtt": 115
+    }
+}

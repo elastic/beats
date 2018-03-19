@@ -6,6 +6,10 @@ from nose.plugins.skip import SkipTest
 
 class Test(metricbeat.BaseTest):
 
+    COMPOSE_SERVICES = ['elasticsearch', 'kibana']
+
+    COMPOSE_TIMEOUT = 600
+
     @unittest.skipUnless(metricbeat.INTEGRATION_TESTS, "integration test")
     def test_status(self):
         """

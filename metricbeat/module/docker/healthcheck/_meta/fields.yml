@@ -2,6 +2,7 @@
   type: group
   description: >
     Docker container metrics.
+  release: ga
   fields:
     - name: failingstreak
       type: integer

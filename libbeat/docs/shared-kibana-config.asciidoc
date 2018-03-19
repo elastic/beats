@@ -1,0 +1,116 @@
+//////////////////////////////////////////////////////////////////////////
+//// This content is shared by all Elastic Beats. Make sure you keep the
+//// descriptions here generic enough to work for all Beats that include
+//// this file. When using cross references, make sure that the cross
+//// references resolve correctly for any files that include this one.
+//// Use the appropriate variables defined in the index.asciidoc file to
+//// resolve Beat names: beatname_uc and beatname_lc.
+//// Use the following include to pull this content into a doc file:
+//// include::../../libbeat/docs/shared-kibana-config.asciidoc[]
+//////////////////////////////////////////////////////////////////////////
+
+[[setup-kibana-endpoint]]
+== Set up the Kibana endpoint
+
+ifeval::["{beatname_lc}" == "apm-server"]
+The Kibana dashboards are loaded into Kibana via the Kibana API.
+This requires a Kibana endpoint configuration.
+endif::[]
+
+ifeval::["{beatname_lc}" != "apm-server"]
+Starting with {beatname_uc} 6.0.0, the Kibana dashboards are loaded into Kibana
+via the Kibana API. This requires a Kibana endpoint configuration.
+endif::[]
+
+
+You configure the endpoint in the `setup.kibana` section of the
++{beatname_lc}.yml+ config file.
+
+Here is an example configuration:
+
+[source,yaml]
+----
+setup.kibana.host: "localhost:5601"
+----
+
+[float]
+=== Configuration options
+
+You can specify the following options in the `setup.kibana` section of the
++{beatname_lc}.yml+ config file:
+
+[float]
+==== `setup.kibana.host`
+
+The Kibana host where the dashboards will be loaded. The default is
+`127.0.0.1:5601`. The value of `host` can be a `URL` or `IP:PORT`. For example: `http://192.15.3.2`, `192:15.3.2:5601` or `http://192.15.3.2:6701/path`. If no
+port is specified, `5601` is used.
+
+NOTE: When a node is defined as an `IP:PORT`, the _scheme_ and _path_ are taken
+from the <<kibana-protocol-option,setup.kibana.protocol>> and
+<<kibana-path-option,setup.kibana.path>> config options.
+
+IPv6 addresses must be defined using the following format:
+`https://[2001:db8::1]:5601`.
+
+[float]
+[[kibana-protocol-option]]
+==== `setup.kibana.protocol`
+
+The name of the protocol Kibana is reachable on. The options are: `http` or
+`https`. The default is `http`. However, if you specify a URL for host, the
+value of `protocol` is overridden by whatever scheme you specify in the URL.
+
+Example config:
+
+[source,yaml]
+----
+setup.kibana.host: "192.0.2.255:5601"
+setup.kibana.protocol: "https"
+setup.kibana.path: /kibana
+----
+
+
+[float]
+==== `setup.kibana.username`
+
+The basic authentication username for connecting to Kibana. If you don't
+specify a value for this setting, {beatname_uc} uses the `username` specified
+for the Elasticsearch output.
+
+[float]
+==== `setup.kibana.password`
+
+The basic authentication password for connecting to Kibana. If you don't
+specify a value for this setting, {beatname_uc} uses the `password` specified
+for the Elasticsearch output.
+
+[float]
+[[kibana-path-option]]
+==== `setup.kibana.path`
+
+An HTTP path prefix that is prepended to the HTTP API calls. This is useful for
+the cases where Kibana listens behind an HTTP reverse proxy that exports the API
+under a custom prefix.
+
+[float]
+==== `setup.kibana.ssl.enabled`
+
+Enables {beatname_uc} to use SSL settings when connecting to Kibana via HTTPS.
+If you configure {beatname_uc} to connect over HTTPS, this setting defaults to
+`true` and {beatname_uc} uses the default SSL settings.
+
+Example configuration:
+
+[source,yaml]
+----
+setup.kibana.host: "192.0.2.255:5601"
+setup.kibana.protocol: "https"
+setup.kibana.ssl.enabled: true
+setup.kibana.ssl.certificate_authorities: ["/etc/pki/root/ca.pem"]
+setup.kibana.ssl.certificate: "/etc/pki/client/cert.pem"
+setup.kibana.ssl.key: "/etc/pki/client/cert.key
+----
+
+See <<configuration-ssl>> for more information.
+

@@ -3,17 +3,19 @@ package common
 import (
 	"encoding/json"
 	"fmt"
+	"sort"
 	"strings"
 
 	"github.com/pkg/errors"
+	"go.uber.org/zap"
+	"go.uber.org/zap/zapcore"
 )
 
 // Event metadata constants. These keys are used within libbeat to identify
 // metadata stored in an event.
 const (
-	EventMetadataKey = "_event_metadata"
-	FieldsKey        = "fields"
-	TagsKey          = "tags"
+	FieldsKey = "fields"
+	TagsKey   = "tags"
 )
 
 var (
@@ -101,12 +103,10 @@ func (m MapStr) Clone() MapStr {
 	result := MapStr{}
 
 	for k, v := range m {
-		innerMap, err := toMapStr(v)
-		if err == nil {
-			result[k] = innerMap.Clone()
-		} else {
-			result[k] = v
+		if innerMap, ok := tryToMapStr(v); ok {
+			v = innerMap.Clone()
 		}
+		result[k] = v
 	}
 
 	return result
@@ -137,6 +137,7 @@ func (m MapStr) GetValue(key string) (interface{}, error) {
 // If you need insert keys containing dots then you must use bracket notation
 // to insert values (e.g. m[key] = value).
 func (m MapStr) Put(key string, value interface{}) (interface{}, error) {
+	// XXX `safemapstr.Put` mimics this implementation, both should be updated to have similar behavior
 	return walkMap(key, m, mapStrOperation{putOperation{value}, true})
 }
 
@@ -156,6 +157,62 @@ func (m MapStr) String() string {
 		return fmt.Sprintf("Not valid json: %v", err)
 	}
 	return string(bytes)
+}
+
+// MarshalLogObject implements the zapcore.ObjectMarshaler interface and allows
+// for more efficient marshaling of MapStr in structured logging.
+func (m MapStr) MarshalLogObject(enc zapcore.ObjectEncoder) error {
+	if len(m) == 0 {
+		return nil
+	}
+
+	keys := make([]string, 0, len(m))
+	for k := range m {
+		keys = append(keys, k)
+	}
+	sort.Strings(keys)
+	for _, k := range keys {
+		v := m[k]
+		if inner, ok := tryToMapStr(v); ok {
+			enc.AddObject(k, inner)
+			continue
+		}
+		zap.Any(k, v).AddTo(enc)
+	}
+	return nil
+}
+
+// Flatten flattens the given MapStr and returns a flat MapStr.
+//
+// Example:
+//   "hello": MapStr{"world": "test" }
+//
+// This is converted to:
+//   "hello.world": "test"
+//
+// This can be useful for testing or logging.
+func (m MapStr) Flatten() MapStr {
+	return flatten("", m, MapStr{})
+}
+
+// flatten is a helper for Flatten. See docs for Flatten. For convenience the
+// out parameter is returned.
+func flatten(prefix string, in, out MapStr) MapStr {
+	for k, v := range in {
+		var fullKey string
+		if prefix == "" {
+			fullKey = k
+		} else {
+			fullKey = fmt.Sprintf("%s.%s", prefix, k)
+		}
+
+		if m, ok := tryToMapStr(v); ok {
+			flatten(fullKey, m, out)
+		} else {
+			out[fullKey] = v
+		}
+	}
+	return out
 }
 
 // MapStrUnion creates a new MapStr containing the union of the
@@ -217,19 +274,23 @@ func AddTags(ms MapStr, tags []string) error {
 	if ms == nil || len(tags) == 0 {
 		return nil
 	}
-
-	tagsIfc, ok := ms[TagsKey]
-	if !ok {
+	eventTags, exists := ms[TagsKey]
+	if !exists {
 		ms[TagsKey] = tags
 		return nil
 	}
 
-	existingTags, ok := tagsIfc.([]string)
-	if !ok {
-		return errors.Errorf("expected string array by type is %T", tagsIfc)
+	switch arr := eventTags.(type) {
+	case []string:
+		ms[TagsKey] = append(arr, tags...)
+	case []interface{}:
+		for _, tag := range tags {
+			arr = append(arr, tag)
+		}
+		ms[TagsKey] = arr
+	default:
+		return errors.Errorf("expected string array by type is %T", eventTags)
 	}
-
-	ms[TagsKey] = append(existingTags, tags...)
 	return nil
 }
 
@@ -237,51 +298,71 @@ func AddTags(ms MapStr, tags []string) error {
 // a MapStr or a map[string]interface{}. If it's any other type or nil then
 // an error is returned.
 func toMapStr(v interface{}) (MapStr, error) {
-	switch v.(type) {
-	case MapStr:
-		return v.(MapStr), nil
-	case map[string]interface{}:
-		m := v.(map[string]interface{})
-		return MapStr(m), nil
-	default:
+	m, ok := tryToMapStr(v)
+	if !ok {
 		return nil, errors.Errorf("expected map but type is %T", v)
+	}
+	return m, nil
+}
+
+func tryToMapStr(v interface{}) (MapStr, bool) {
+	switch m := v.(type) {
+	case MapStr:
+		return m, true
+	case map[string]interface{}:
+		return MapStr(m), true
+	default:
+		return nil, false
 	}
 }
 
-// walkMap walks the data MapStr to arrive at the value specified by the key.
+// walkMapRecursive walks the data MapStr to arrive at the value specified by the key.
 // The key is expressed in dot-notation (eg. x.y.z). When the key is found then
 // the given mapStrOperation is invoked.
-func walkMap(key string, data MapStr, op mapStrOperation) (interface{}, error) {
-	var err error
-	keyParts := strings.Split(key, ".")
+func walkMapRecursive(key string, data MapStr, op mapStrOperation) (interface{}, error) {
 
-	// Walk maps until reaching a leaf object.
-	m := data
-	for i, k := range keyParts[0 : len(keyParts)-1] {
-		v, exists := m[k]
-		if !exists {
-			if op.CreateMissingKeys {
-				newMap := MapStr{}
-				m[k] = newMap
-				m = newMap
-				continue
-			}
-			return nil, errors.Wrapf(ErrKeyNotFound, "key=%v", strings.Join(keyParts[0:i+1], "."))
-		}
+	// Splits up the key in two parts: full key and first part before the dot
+	_, exists := data[key]
+	// If leave node or key exists directly
+	if exists {
+		// Execute the mapStrOperator on the leaf object.
+		return op.Do(key, data)
+	}
 
-		m, err = toMapStr(v)
-		if err != nil {
-			return nil, errors.Wrapf(err, "key=%v", strings.Join(keyParts[0:i+1], "."))
+	keyParts := strings.SplitN(key, ".", 2)
+	// If leave node or key exists directly
+	if len(keyParts) == 1 {
+		// Execute the mapStrOperator on the leaf object.
+		return op.Do(key, data)
+	}
+
+	// Checks if first part of the key exists
+	k := keyParts[0]
+	d, keyExist := data[k]
+	if !keyExist {
+		if op.CreateMissingKeys {
+			d = MapStr{}
+			data[k] = d
+		} else {
+			return nil, ErrKeyNotFound
 		}
 	}
 
-	// Execute the mapStrOperator on the leaf object.
-	v, err := op.Do(keyParts[len(keyParts)-1], m)
+	v, err := toMapStr(d)
 	if err != nil {
-		return nil, errors.Wrapf(err, "key=%v", key)
+		return nil, err
 	}
 
-	return v, nil
+	return walkMapRecursive(keyParts[1], v, op)
+}
+
+func walkMap(key string, data MapStr, op mapStrOperation) (interface{}, error) {
+	v, err := walkMapRecursive(key, data, op)
+	if err != nil {
+		// Add key to error
+		err = errors.Wrapf(err, "key=%v", key)
+	}
+	return v, err
 }
 
 // mapStrOperation types

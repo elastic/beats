@@ -46,9 +46,9 @@ func GetPromEventsFromMetricFamily(mf *dto.MetricFamily) []PromEvent {
 			value["value"] = int64(counter.GetValue())
 		}
 
-		guage := metric.GetGauge()
-		if guage != nil {
-			value["value"] = guage.GetValue()
+		gauge := metric.GetGauge()
+		if gauge != nil {
+			value["value"] = gauge.GetValue()
 		}
 
 		summary := metric.GetSummary()

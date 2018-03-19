@@ -1,0 +1,26 @@
+diff --git a/vendor/github.com/tsg/gopacket/pcap/pcap.go b/vendor/github.com/tsg/gopacket/pcap/pcap.go
+index f5612e6..0c77efa 100644
+--- a/vendor/github.com/tsg/gopacket/pcap/pcap.go
++++ b/vendor/github.com/tsg/gopacket/pcap/pcap.go
+@@ -8,14 +8,17 @@
+ package pcap
+
+ /*
+-#cgo linux LDFLAGS: -lpcap
++#cgo linux,386 CFLAGS: -I/libpcap/i386/usr/include/
++#cgo linux,386 LDFLAGS: -L/libpcap/i386/usr/lib/ -lpcap
++#cgo linux,amd64 CFLAGS: -I/libpcap/amd64/libpcap-1.8.1
++#cgo linux,amd64 LDFLAGS: -L/libpcap/amd64/libpcap-1.8.1 -lpcap
+ #cgo freebsd LDFLAGS: -lpcap
+ #cgo openbsd LDFLAGS: -lpcap
+ #cgo darwin LDFLAGS: -lpcap
+ #cgo solaris LDFLAGS: -lpcap
+-#cgo windows CFLAGS: -I C:/WpdPack/Include
+-#cgo windows,386 LDFLAGS: -L C:/WpdPack/Lib -lwpcap
+-#cgo windows,amd64 LDFLAGS: -L C:/WpdPack/Lib/x64 -lwpcap
++#cgo windows CFLAGS: -I/libpcap/win/WpdPack/Include
++#cgo windows,386 LDFLAGS: -L/libpcap/win/WpdPack/Lib -lwpcap
++#cgo windows,amd64 LDFLAGS: -L/libpcap/win/WpdPack/Lib/x64 -lwpcap
+ #include <stdlib.h>
+ #include <pcap.h>
+

@@ -1,38 +1,191 @@
 {
-    "@timestamp": "2016-05-23T08:05:34.853Z",
+    "@timestamp": "2017-10-12T08:05:34.853Z",
     "beat": {
         "hostname": "host.example.com",
         "name": "host.example.com"
     },
     "metricset": {
-        "host": "localhost",
         "module": "system",
         "name": "process",
         "rtt": 115
     },
     "system": {
         "process": {
+            "cgroup": {
+                "blkio": {
+                    "id": "d88e67bb6961a5bb70c1c1c48094c6030e43768eed91e827f437111888f9967e",
+                    "path": "/docker/d88e67bb6961a5bb70c1c1c48094c6030e43768eed91e827f437111888f9967e",
+                    "total": {
+                        "bytes": 0,
+                        "ios": 0
+                    }
+                },
+                "cpu": {
+                    "cfs": {
+                        "period": {
+                            "us": 0
+                        },
+                        "quota": {
+                            "us": 0
+                        },
+                        "shares": 0
+                    },
+                    "id": "d88e67bb6961a5bb70c1c1c48094c6030e43768eed91e827f437111888f9967e",
+                    "path": "/docker/d88e67bb6961a5bb70c1c1c48094c6030e43768eed91e827f437111888f9967e",
+                    "rt": {
+                        "period": {
+                            "us": 0
+                        },
+                        "runtime": {
+                            "us": 0
+                        }
+                    },
+                    "stats": {
+                        "periods": 0,
+                        "throttled": {
+                            "ns": 0,
+                            "periods": 0
+                        }
+                    }
+                },
+                "cpuacct": {
+                    "id": "d88e67bb6961a5bb70c1c1c48094c6030e43768eed91e827f437111888f9967e",
+                    "path": "/docker/d88e67bb6961a5bb70c1c1c48094c6030e43768eed91e827f437111888f9967e",
+                    "percpu": {},
+                    "stats": {
+                        "system": {
+                            "ns": 0
+                        },
+                        "user": {
+                            "ns": 0
+                        }
+                    },
+                    "total": {
+                        "ns": 0
+                    }
+                },
+                "id": "d88e67bb6961a5bb70c1c1c48094c6030e43768eed91e827f437111888f9967e",
+                "memory": {
+                    "id": "d88e67bb6961a5bb70c1c1c48094c6030e43768eed91e827f437111888f9967e",
+                    "kmem": {
+                        "failures": 0,
+                        "limit": {
+                            "bytes": 0
+                        },
+                        "usage": {
+                            "bytes": 0,
+                            "max": {
+                                "bytes": 0
+                            }
+                        }
+                    },
+                    "kmem_tcp": {
+                        "failures": 0,
+                        "limit": {
+                            "bytes": 0
+                        },
+                        "usage": {
+                            "bytes": 0,
+                            "max": {
+                                "bytes": 0
+                            }
+                        }
+                    },
+                    "mem": {
+                        "failures": 0,
+                        "limit": {
+                            "bytes": 0
+                        },
+                        "usage": {
+                            "bytes": 0,
+                            "max": {
+                                "bytes": 0
+                            }
+                        }
+                    },
+                    "memsw": {
+                        "failures": 0,
+                        "limit": {
+                            "bytes": 0
+                        },
+                        "usage": {
+                            "bytes": 0,
+                            "max": {
+                                "bytes": 0
+                            }
+                        }
+                    },
+                    "path": "/docker/d88e67bb6961a5bb70c1c1c48094c6030e43768eed91e827f437111888f9967e",
+                    "stats": {
+                        "active_anon": {
+                            "bytes": 0
+                        },
+                        "active_file": {
+                            "bytes": 0
+                        },
+                        "cache": {
+                            "bytes": 0
+                        },
+                        "hierarchical_memory_limit": {
+                            "bytes": 0
+                        },
+                        "hierarchical_memsw_limit": {
+                            "bytes": 0
+                        },
+                        "inactive_anon": {
+                            "bytes": 0
+                        },
+                        "inactive_file": {
+                            "bytes": 0
+                        },
+                        "major_page_faults": 0,
+                        "mapped_file": {
+                            "bytes": 0
+                        },
+                        "page_faults": 0,
+                        "pages_in": 0,
+                        "pages_out": 0,
+                        "rss": {
+                            "bytes": 0
+                        },
+                        "rss_huge": {
+                            "bytes": 0
+                        },
+                        "swap": {
+                            "bytes": 0
+                        },
+                        "unevictable": {
+                            "bytes": 0
+                        }
+                    }
+                },
+                "path": "/docker/d88e67bb6961a5bb70c1c1c48094c6030e43768eed91e827f437111888f9967e"
+            },
             "cmdline": "go test -tags=integration github.com/elastic/beats/metricbeat/module/... -data",
             "cpu": {
-                "start_time": "2016-09-06T07:33:04.000Z",
+                "start_time": "2017-12-07T07:20:59.000Z",
                 "total": {
-                    "pct": 0
+                    "norm": {
+                        "pct": 0.0099
+                    },
+                    "pct": 0.0397
                 }
             },
+            "cwd": "/go/src/github.com/elastic/beats/metricbeat",
             "fd": {
                 "limit": {
                     "hard": 1048576,
                     "soft": 1048576
                 },
-                "open": 4
+                "open": 8
             },
             "memory": {
                 "rss": {
-                    "bytes": 13770752,
-                    "pct": 0.0016
+                    "bytes": 14540800,
+                    "pct": 0.0035
                 },
-                "share": 6594560,
-                "size": 232972288
+                "share": 0,
+                "size": 402231296
             },
             "name": "go",
             "pgid": 1,
@@ -41,6 +194,5 @@
             "state": "sleeping",
             "username": "root"
         }
-    },
-    "type": "metricsets"
+    }
 }

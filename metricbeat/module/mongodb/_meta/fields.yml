@@ -3,6 +3,7 @@
   description: >
     Metrics collected from MongoDB servers.
   short_config: false
+  release: ga
   fields:
     - name: mongodb
       type: group

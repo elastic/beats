@@ -10,7 +10,6 @@ import (
 	"github.com/elastic/beats/libbeat/common"
 	"github.com/elastic/beats/libbeat/logp"
 	"github.com/elastic/beats/packetbeat/protos"
-	"github.com/elastic/beats/packetbeat/publish"
 
 	// import plugins for testing
 	_ "github.com/elastic/beats/packetbeat/protos/http"
@@ -69,7 +68,7 @@ type TestProtocol struct {
 	pkt   *protos.Packet // UDP packet that the plugin was called to process.
 }
 
-func (proto *TestProtocol) Init(testMode bool, results publish.Transactions) error {
+func (proto *TestProtocol) Init(testMode bool, results protos.Reporter) error {
 	return nil
 }
 
@@ -89,9 +88,7 @@ type TestStruct struct {
 
 // Helper method for creating mocks and the Udp instance under test.
 func testSetup(t *testing.T) *TestStruct {
-	if testing.Verbose() {
-		logp.LogInit(logp.LOG_DEBUG, "", false, true, []string{"udp"})
-	}
+	logp.TestingSetup(logp.WithSelectors("udp"))
 
 	protocols := &TestProtocols{}
 	protocols.udp = make(map[protos.Protocol]protos.UDPPlugin)

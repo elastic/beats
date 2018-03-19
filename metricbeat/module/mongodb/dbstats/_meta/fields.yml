@@ -3,6 +3,7 @@
   description: >
     dbstats provides an overview of a particular mongo database. This document
     is most concerned with data volumes of a database.
+  release: ga
   fields:
     - name: avg_obj_size.bytes
       type: long

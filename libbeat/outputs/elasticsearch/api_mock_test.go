@@ -5,7 +5,6 @@ package elasticsearch
 import (
 	"fmt"
 	"os"
-	"time"
 
 	"encoding/json"
 	"net/http"
@@ -17,7 +16,6 @@ import (
 )
 
 func ElasticsearchMock(code int, body []byte) *httptest.Server {
-
 	server := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		if r.URL.Path == "/" { // send ok and a minimal JSON on ping
 			w.WriteHeader(200)
@@ -37,10 +35,7 @@ func ElasticsearchMock(code int, body []byte) *httptest.Server {
 }
 
 func TestOneHostSuccessResp(t *testing.T) {
-
-	if testing.Verbose() {
-		logp.LogInit(logp.LOG_DEBUG, "", false, true, []string{"elasticsearch"})
-	}
+	logp.TestingSetup(logp.WithSelectors("elasticsearch"))
 
 	index := fmt.Sprintf("packetbeat-unittest-%d", os.Getpid())
 	body := map[string]interface{}{
@@ -67,10 +62,7 @@ func TestOneHostSuccessResp(t *testing.T) {
 }
 
 func TestOneHost500Resp(t *testing.T) {
-
-	if testing.Verbose() {
-		logp.LogInit(logp.LOG_DEBUG, "", false, true, []string{"elasticsearch"})
-	}
+	logp.TestingSetup(logp.WithSelectors("elasticsearch"))
 
 	index := fmt.Sprintf("packetbeat-unittest-%d", os.Getpid())
 	body := map[string]interface{}{
@@ -82,7 +74,7 @@ func TestOneHost500Resp(t *testing.T) {
 	server := ElasticsearchMock(http.StatusInternalServerError, []byte("Something wrong happened"))
 
 	client := newTestClient(server.URL)
-	err := client.Connect(1 * time.Second)
+	err := client.Connect()
 	if err != nil {
 		t.Fatalf("Failed to connect: %v", err)
 	}
@@ -102,10 +94,7 @@ func TestOneHost500Resp(t *testing.T) {
 }
 
 func TestOneHost503Resp(t *testing.T) {
-
-	if testing.Verbose() {
-		logp.LogInit(logp.LOG_DEBUG, "", false, true, []string{"elasticsearch"})
-	}
+	logp.TestingSetup(logp.WithSelectors("elasticsearch"))
 
 	index := fmt.Sprintf("packetbeat-unittest-%d", os.Getpid())
 	body := map[string]interface{}{

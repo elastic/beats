@@ -1,4 +1,3 @@
-
 // Use these for links to issue and pulls. Note issues and pulls redirect one to
 // each other on Github, so don't worry too much on using the right prefix.
 :issue: https://github.com/elastic/beats/issues/
@@ -8,19 +7,65 @@
 // Template, add newest changes here
 
 === Beats version HEAD
-https://github.com/elastic/beats/compare/v6.0.0-alpha1...master[Check the HEAD diff]
+https://github.com/elastic/beats/compare/v6.0.0-beta2...master[Check the HEAD diff]
 
 ==== Breaking changes
 
 *Affecting all Beats*
 
-- Rename `kubernetes` processor to `add_kubernetes_metadata`. {pull}4473[4473]
+- Support dashboard loading without Elasticseach {pull}5653[5653]
+- Addition and update of the following libraries: pbkdf2, terminal, windows, unix {pull}5735[5735]
+- Update the command line library cobra and add support for zsh completion {pull}5761[5761]
+- The log format may differ due to logging library changes. {pull}5901[5901]
+- Adding a local keystore to allow user to obfuscate password {pull}5687[5687]
+- Update go-ucfg library to support top level key reference and cyclic key reference for the
+  keystore {pull}6098[6098]
+- De dot keys of labels and annotations in kubernetes meta processors to prevent collisions. {pull}6203[6203]
+- The default value for pipelining is reduced to 2 to avoid high memory in the Logstash beats input. {pull}6250[6250]
+- Add logging when monitoring cannot connect to Elasticsearch. {pull}6365[6365]
+- Rename beat.cpu.*.time metrics to beat.cpu.*.time.ms. {pull}6449[6449]
+- Mark `system.syslog.message` and `system.auth.message` as `text` instead of `keyword`. {pull}6589[6589]
+
+*Auditbeat*
+
+- Changed `audit.file.path` to be a multi-field so that path is searchable. {pull}5625[5625]
+- Split the audit.kernel and audit.file metricsets into their own modules
+  named auditd and file_integrity, respectively. This change requires
+  existing users to update their config. {issue}5422[5422]
+- Renamed file_integrity module fields. {issue}5423[5423] {pull}5995[5995]
+- Renamed auditd module fields. {issue}5423[5423] {pull}6080[6080]
 
 *Filebeat*
+- Switch to docker prospector in sample manifests for Kubernetes deployment {pull}5963[5963]
+- Renaming of the prospector type to the input type and all prospectors are now moved to the input
+  folder, to maintain backward compatibility type aliasing was used to map the old type to the new
+  one. This change also affect YAML configuration. {pull}6078[6078]
+- Refactor the Redis prospector to use the input interface {pull}6116[6116]
+- Refactor the UDP prospector to use the input interface {pull}6118[6118]
+- Refactor the Docker prospector to use the input interface {pull}6278[6278]
+- Refactor the Log prospector to use the input interface {pull}6116[6116]
+- Refactor the Stdin prospector to use the input interface {pull}6116[6116]
+- Refactor the usage of prospector to input in the YAML reference and
+  the system test. {pull}6121[6121]
+- Add IIS module to parse access log and error log. {pull}6127[6127]
 
 *Heartbeat*
 
+- Made the url field of heartbeat aggregatable. {pull}6263[6263]
+
 *Metricbeat*
+
+- Rename `heap_init` field to `heap.init`. {pull}5320[5320]
+- Rename `http.response.status_code` field to `http.response.code`. {pull}5521[5521]
+- Rename `golang.heap.system.optained` field to `golang.heap.system.obtained`. {issue}5703[5703]
+- Support haproxy stats gathering using http (additionaly to tcp socket). {pull}5819[5819]
+- De dot keys in jolokia/jmx metricset to prevent collisions. {pull}5957[5957]
+- Support to optionally 'de dot' keys in http/json metricset to prevent collisions. {pull}5970[5970]
+- De dot keys in kubernetes/event metricset to prevent collisions. {pull}6203[6203]
+- Fix the default configuration for Logstash to include the default port. {pull}6279[6279]
+- Add filtering option by exact device names in system.diskio. `diskio.include_devices`. {pull}6085[6085]
+- Fix dealing with new process status codes in Linux kernel 4.14+. {pull}6306[6306]
+- Add config option for windows/perfmon metricset to ignore non existent counters. {pull}6432[6432]
 
 *Packetbeat*
 
@@ -30,42 +75,194 @@ https://github.com/elastic/beats/compare/v6.0.0-alpha1...master[Check the HEAD d
 
 *Affecting all Beats*
 
-- Don't stop with error loading the ES template if the ES output is not enabled. {pull}4436[4436]
+- Remove ID() from Runner interface {issue}5153[5153]
+- Correctly send configured `Host` header to the remote server. {issue}4842[4842]
+- Change add_kubernetes_metadata to attempt detection of namespace. {pull}5482[5482]
+- Avoid double slash when join url and path {pull}5517[5517]
+- Fix console color output for Windows. {issue}5611[5611]
+- Fix documentation links in README.md files. {pull}5710[5710]
+- Fix logstash output debug message. {pull}5799{5799]
+- Fix isolation of modules when merging local and global field settings. {issue}5795[5795]
+- Fix panic when Events containing a float32 value are normalized. {pull}6129[6129]
+- Fix `setup.dashboards.always_kibana` when using Kibana 5.6. {issue}6090[6090]
+- Update Golang 1.9.4 {pull}6326[6326]
+- Fix conditions checking on autodiscover Docker labels. {pull}6412[6412]
+- Fix for kafka logger. {pull}6430[6430]
+- Remove double slashes in Windows service script. {pull}6491[6491]
+- Fix infinite failure on Kubernetes watch {pull}6504[6504]
+- Ensure Kubernetes labels/annotations don't break mapping {pull}6490[6490]
+- Report ephemeral ID and uptime in monitoring events on all platforms {pull}6501[6501]
+
+*Auditbeat*
+
+- Add an error check to the file integrity scanner to prevent a panic when
+  there is an error reading file info via lstat. {issue}6005[6005]
+- Fixed an issue where the proctitle value was being truncated.
+- Fixed an issue where values were incorrectly interpretted as hex data.
+- Fixed parsing of the `key` value when multiple keys are present.
+- Fix possible resource leak if file_integrity module is used with config
+  reloading on Windows or Linux. {pull}6198[6198]
 
 *Filebeat*
 
+- Add support for adding string tags {pull}5395{5395}
+- Fix race condition when limiting the number of harvesters running in parallel {issue}5458[5458]
+- Fix relative paths in the prospector definitions. {pull}5443[5433]
+- Fix `recursive_globe.enabled` option. {pull}5443[5443]
+- Change pipeline delimiter to `{<` and `>}`. {pull}5702[5702]
+- Fix variable name for `convert_timezone` in the system module. {pull}5936[5936]
+- Fix a conversion issue for time related fields in the Logstash module for the slowlog
+  fileset. {issue}6317[6317]
+
 *Heartbeat*
+
+- Fix the "HTTP up status" visualization. {pull}5564[5564]
 
 *Metricbeat*
 
-- Fix issue affecting Windows services timing out at startup. {pull}4491[4491]
+- Add connections metricset to RabbitMQ module {pull}6548[6548]
+- Change field type of http header from nested to object {pull}5258[5258]
+- Fix the fetching of process information when some data is missing under MacOS X. {issue}5337[5337]
+- Change `MySQL active connections` visualization title to `MySQL total connections`. {issue}4812[4812]
+- Fix map overwrite in docker diskio module. {issue}5582[5582]
+- Fix error `datastore '*' not found` in Vsphere module. {issue}4879[4879]
+- Fix error `NotAuthenticated` in Vsphere module. {issue}4673[4673]
+- Fix connection leak in mongodb module. {issue}5688[5688]
+- Fix the include top N processes feature for cases where there are fewer processes than N. {pull}5729[5729]
+- Fix `ProcState` on Linux and FreeBSD when process names contain parentheses. {pull}5775[5775]
+- Fix incorrect `Mem.Used` calculation under linux. {pull}5775[5775]
+- Fix mongodb session consistency mode to allow command execution on secondary nodes. {issue}4689[4689]
+- Fix `open_file_descriptor_count` and `max_file_descriptor_count` lost in zookeeper module {pull}5902[5902]
+- Fix kubernetes `state_pod` `status.phase` so that the active phase is returned instead of `unknown`. {pull}5980[5980]
+- Fix error collecting network_names in Vsphere module. {pull}5962[5962]
+- Fix process cgroup memory metrics for memsw, kmem, and kmem_tcp. {issue}6033[6033]
+- Fix kafka OffsetFetch request missing topic and partition parameters. {pull}5880[5880]
+- Change kubernetes.node.cpu.allocatable.cores to float. {pull}6130[6130]
+- Fix system process metricset for kernel processes. {issue}5700[5700]
+- Fix panic in http dependent modules when invalid config was used.
+- Fix system.filesystem.used.pct value to match what df reports. {issue}5494[5494]
+- Fix namespace disambiguation in Kubernetes state_* metricsets. {issue}6281[6281]
+- Fix Kubernetes overview dashboard views for non default time ranges. {issue}6395{6395}
+- Fix Windows perfmon metricset so that it sends metrics when an error occurs. {pull}6542[6542]
 
 *Packetbeat*
 
-- Enabled /proc/net/tcp6 scanning and fixed ip v6 parsing. {pull}4442[4442]
+- Fix http status phrase parsing not allow spaces. {pull}5312[5312]
+- Fix http parse to allow to parse get request with space in the URI. {pull}5495[5495]
+- Fix mysql SQL parser to trim `\r` from Windows Server `SELECT\r\n\t1`. {pull}5572[5572]
+- Fix corruption when parsing repeated headers in an HTTP request or response. {pull}6325[6325]
+- Fix panic when parsing partial AMQP messages. {pull}6384[6384]
+- Fix out of bounds access to slice in MongoDB parser. {pull}6256[6256]
 
 *Winlogbeat*
+
+- Fix the registry file. It was not correctly storing event log names, and
+  upon restart it would begin reading at the start of each event log. {issue}5813[5813]
+- Fix config validation to allow `event_logs.processors`. [pull]6217[6217]
+- Fixed a crash under Windows 2003 and XP when an event had less insert strings than required by its format string. {pull}6247[6247]
 
 ==== Added
 
 *Affecting all Beats*
 
-- New cli subcommands interface. {pull}4420[4420]
+- Move TCP UDP start up into `server.Start()` {pull}4903[4903]
+- Changed the hashbang used in the beat helper script from `/bin/bash` to `/usr/bin/env bash`. {pull}5051[5051]
+- Changed beat helper script to use `exec` when running the beat. {pull}5051[5051]
+- Fix reloader error message to only print on actual error {pull}5066[5066]
+- Add support for enabling TLS renegotiation. {issue}4386[4386]
+- Add Azure VM support for add_cloud_metadata processor {pull}5355[5355]
+- Add `output.file.permission` config option. {pull}4638[4638]
+- Refactor add_kubernetes_metadata to support autodiscovery {pull}5434[5434]
+- Improve custom flag handling and CLI flags usage message. {pull}5543[5543]
+- Update to Golang 1.9.2
+- Add number_of_routing_shards config set to 30 {pull}5570[5570]
+- Set log level for kafka output. {pull}5397[5397]
+- Moved `ip_port` indexer for `add_kubernetes_metadata` to all beats. {pull}5707[5707]
+- `ip_port` indexer now index both IP and IP:port pairs. {pull}5721[5721]
+- Add the ability to write structured logs. {pull}5901[5901]
+- Use structured logging for the metrics that are periodically logged via the
+  `logging.metrics` feature. {pull}5915[5915]
+- Add the ability to log to the Windows Event Log. {pull}5913[5813]
+- Improve Elasticsearch output metrics to count number of dropped and duplicate (if event ID is given) events. {pull}5811[5811]
+- Add autodiscover for kubernetes. {pull}6055[6055]
+- Add the abilility for the add_docker_metadata process to enrich based on process ID. {pull}6100[6100]
+- The `add_docker_metadata` and `add_kubernetes_metadata` processors are now GA, instead of Beta. {pull}6105[6105]
+- The node name can be discovered automatically by machine-id matching when beat deployed outside kubernetes cluster. {pull}6146[6146]
+- Panics will be written to the logger before exiting. {pull}6199[6199]
+- Add builder support for autodiscover and annotations builder {pull}6408[6408]
+- Add plugin support for autodiscover builders, providers {pull}6457[6457]
+- Preserve runtime from container statuses in Kubernetes autodiscover {pull}6456[6456]
+- Experimental feature setup.template.append_fields added. {pull}6024[6024]
+- Add appender support to autodiscover {pull}6469[6469]
+- Add add_host_metadata processor {pull}5968[5968]
+
+*Auditbeat*
+
+- Add support for SHA3 hash algorithms to the file integrity module. {issue}5345[5345]
+- Add support for BLAKE2b hash algorithms to the file integrity module. {pull}5926[5926]
+- Add dashboards for Linux audit framework events (overview, executions, sockets). {pull}5516[5516]
+- Add support for recursive file watches under macOS {pull}5575[5575] and Linux. {pull}5833[5833]
 
 *Filebeat*
 
-- Add experimental Redis module. {pull}4441[4441]
-- Nginx module: use the first not-private IP address as the remote_ip. {pull}4417[4417]
-- Load Ingest Node pipelines when the Elasticsearch connection is established, instead of only once at startup. {pull}4479[4479]
+- Add PostgreSQL module with slowlog support. {pull}4763[4763]
+- Add Kafka log module. {pull}4885[4885]
+- Add support for `/var/log/containers/` log path in `add_kubernetes_metadata` processor. {pull}4981[4981]
+- Remove error log from runnerfactory as error is returned by API. {pull}5085[5085]
+- Add experimental Docker `json-file` prospector . {pull}5402[5402]
+- Add experimental Docker autodiscover functionality. {pull}5245[5245]
+- Add option to convert the timestamps to UTC in the system module. {pull}5647[5647]
+- Add Logstash module support for main log and the slow log, support the plain text or structured JSON format {pull}5481[5481]
+- Add stream filtering when using `docker` prospector. {pull}6057[6057]
+- Add support for CRI logs format. {issue}5630[5630]
+- Add json.ignore_decoding_error config to not log json decoding erors. {issue}6547[6547]
+- Make registry file permission configurable. {pull}6455[6455]
 
 *Heartbeat*
 
 *Metricbeat*
-- Add random startup delay to each metricset to avoid the thundering herd problem. {issue}4010[4010]
+
+- Add graphite protocol metricbeat module. {pull}4734[4734]
+- Add http server metricset to support push metrics via http. {pull}4770[4770]
+- Make config object public for graphite and http server {pull}4820[4820]
+- Add system uptime metricset. {issue}4848[4848]
+- Add experimental `queue` metricset to RabbitMQ module. {pull}4788[4788]
+- Add additional php-fpm pool status kpis for Metricbeat module {pull}5287[5287]
+- Add etcd module. {issue}4970[4970]
+- Add ip address of docker containers to event. {pull}5379[5379]
+- Add ceph osd tree information to metricbeat {pull}5498[5498]
+- Add ceph osd_df to metricbeat {pull}5606[5606]
+- Add basic Logstash module. {pull}5540[5540]
+- Add dashboard for Windows service metricset. {pull}5603[5603]
+- Add experimental Docker autodiscover functionality. {pull}5245[5245]
+- Add field network_names of hosts and virtual machines. {issue}5646[5646]
+- Update gosigar to v0.6.0. {pull}5775[5775]
+- Add experimental system/raid metricset. {pull}5642[5642]
+- Add a dashboard for the Nginx module. {pull}5991[5991]
+- Add experimental mongodb/collstats metricset. {pull}5852[5852]
+- Update the MySQL dashboard to use the Time Series Visual Builder. {pull}5996[5996]
+- Add experimental uwsgi module. {pull}6006[6006]
+- Docker and Kubernetes modules are now GA, instead of Beta. {pull}6105[6105]
+- Add pct calculated fields for Pod and container CPU and memory usages. {pull}6158[6158]
+- Add statefulset support to Kubernetes module. {pull}6236[6236]
+- Refactor prometheus endpoint parsing to look similar to upstream prometheus {pull}6332[6332]
+- Update prometheus dependencies to latest {pull}6333[6333]
+- Making the http/json metricset GA. {pull}6471[6471]
+- Add support for array in http/json metricset. {pull}6480[6480]
+- Making the jolokia/jmx module GA. {pull}6143[6143]
+- Making the MongoDB module GA. {pull}6554[6554]
+- Allow to disable labels `dedot` in Docker module, in favor of a safe way to keep dots. {pull}6490[6490]
+- Add experimental module to collect metrics from munin nodes. {pull}6517[6517]
 
 *Packetbeat*
 
+- Configure good defaults for `add_kubernetes_metadata`. {pull}5707[5707]
+- Add support for condition on bool type {issue}5659[5659] {pull}5954[5954]
+- HTTP parses successfully on empty status phrase. {issue}6176[6176]
+
 *Winlogbeat*
+
+- Use bookmarks to persist the last published event. {pull}6150[6150]
 
 ==== Deprecated
 
@@ -85,6 +282,320 @@ https://github.com/elastic/beats/compare/v6.0.0-alpha1...master[Check the HEAD d
 
 
 ////////////////////////////////////////////////////////////
+
+include::libbeat/docs/release-notes/6.0.0.asciidoc[]
+
+[[release-notes-6.0.0-ga]]
+=== Beats version 6.0.0-GA
+https://github.com/elastic/beats/compare/v6.0.0-rc2...v6.0.0[View commits]
+
+The list below covers the changes between 6.0.0-rc2 and 6.0.0 GA only.
+
+==== Bugfixes
+
+*Filebeat*
+
+- Fix machine learning jobs setup for dynamic modules. {pull}5509[5509]
+
+*Packetbeat*
+
+- Fix missing length check in the PostgreSQL module. {pull}5457[5457]
+- Fix panic in ACK handler if event is dropped on blocked queue {issue}5524[5524]
+
+==== Added
+
+*Filebeat*
+
+- Add Kubernetes manifests to deploy Filebeat. {pull}5349[5349]
+- Add container short ID matching to add_docker_metadata. {pull}6172[6172]
+
+*Metricbeat*
+
+- Add Kubernetes manifests to deploy Metricbeat. {pull}5349[5349]
+
+
+[[release-notes-6.0.0-rc2]]
+=== Beats version 6.0.0-rc2
+https://github.com/elastic/beats/compare/v6.0.0-rc1...v6.0.0-rc2[View commits]
+
+==== Breaking changes
+
+*Packetbeat*
+
+- Remove not-working `runoptions.uid` and `runoptions.gid` options in Packetbeat. {pull}5261[5261]
+
+==== Bugfixes
+
+*Affecting all Beats*
+
+- Fix data race accessing watched containers. {issue}5147[5147]
+- Do not require template if index change and template disabled {pull}5319[5319]
+- Fix missing ACK in redis output. {issue}5404[5404]
+
+*Filebeat*
+
+- Fix default paths for redis 4.0.1 logs on macOS {pull}5173[5173]
+- Fix Filebeat not starting if command line and modules configs are used together. {issue}5376[5376]
+- Fix double `@timestamp` field when JSON decoding was used. {pull}5436[5436]
+
+*Metricbeat*
+
+- Use `beat.name` instead of `beat.hostname` in the Host Overview dashboard. {pull}5340[5340]
+- Fix the loading of 5.x dashboards. {issue}5277[5277]
+
+==== Added
+
+*Metricbeat*
+
+- Auto-select a hostname (based on the host on which the Beat is running) in the Host Overview dashboard. {pull}5340[5340]
+
+==== Deprecated
+
+*Filebeat*
+
+- The `filebeat.config_dir` option is deprecated. Use `filebeat.config.prospector` options instead. {pull}5321[5321]
+
+[[release-notes-6.0.0-rc1]]
+=== Beats version 6.0.0-rc1
+https://github.com/elastic/beats/compare/v6.0.0-beta2...v6.0.0-rc1[View commits]
+
+==== Bugfixes
+
+*Affecting all Beats*
+
+- Fix the `/usr/bin/beatname` script to accept `-d "*"` as a parameter. {issue}5040[5040]
+- Combine `fields.yml` properties when they are defined in different sources. {issue}5075[5075]
+- Keep Docker & Kubernetes pod metadata after container dies while they are needed by processors. {pull}5084[5084]
+- Fix `fields.yml` lookup when using `export template` with a custom `path.config` param. {issue}5089[5089]
+- Remove runner creation from every reload check {pull}5141[5141]
+- Fix add_kubernetes_metadata matcher registry lookup. {pull}5159[5159]
+
+*Metricbeat*
+
+- Fix a memory allocation issue where more memory was allocated than needed in the windows-perfmon metricset. {issue}5035[5035]
+- Don't start metricbeat if external modules config is wrong and reload is disabled {pull}5053[5053]
+- The MongoDB module now connects on each fetch, to avoid stopping the whole Metricbeat instance if MongoDB is not up when starting. {pull}5120[5120]
+- Fix kubernetes events module to be able to index time fields properly. {issue}5093[5093]
+- Fixed `cmd_set` and `cmd_get` being mixed in the Memcache module. {pull}5189[5189]
+
+
+==== Added
+
+*Affecting all Beats*
+
+- Enable flush timeout by default. {pull}5150[5150]
+- Add @metadata.version to events send to Logstash. {pull}5166[5166]
+
+*Auditbeat*
+
+- Changed the number of shards in the default configuration to 3. {issue}5095[5095]
+- Add support for receiving audit events using a multicast socket. {issue}4850[4850]
+
+*Filebeat*
+
+- Changed the number of shards in the default configuration to 3. {issue}5095[5095]
+- Don't start filebeat if external modules/prospectors config is wrong and reload is disabled {pull}5053[5053]
+- Add `filebeat.registry_flush` setting, to delay the registry updates. {pull}5146[5146]
+
+*Heartbeat*
+
+- Changed the number of shards in the default configuration to 1. {issue}5095[5095]
+
+*Packetbeat*
+
+- Changed the number of shards in the default configuration to 3. {issue}5095[5095]
+
+*Winlogbeat*
+
+- Changed the number of shards in the default configuration to 3. {issue}5095[5095]
+
+[[release-notes-6.0.0-beta2]]
+=== Beats version 6.0.0-beta2
+https://github.com/elastic/beats/compare/v6.0.0-beta1...v6.0.0-beta2[View commits]
+
+==== Breaking changes
+
+*Affecting all Beats*
+
+- The log directory (`path.log`) for Windows services is now set to `C:\ProgramData\[beatname]\logs`. {issue}4764[4764]
+- The _all field is disabled in Elasticsearch 6.0. This means that searching by individual
+  words only work on text fields. {issue}4901[4901]
+- Fail if removed setting output.X.flush_interval is explicitly configured.
+- Rename the `/usr/bin/beatname.sh` script (e.g. `metricbeat.sh`) to `/usr/bin/beatname`. {pull}4933[4933]
+- Beat does not start if elasticsearch index pattern was modified but not the template name and pattern. {issue}4769[4769]
+- Fail if removed setting output.X.flush_interval is explicitly configured. {pull}4880[4880]
+
+==== Bugfixes
+
+*Affecting all Beats*
+
+- Register kubernetes `field_format` matcher and remove logger in `Encode` API {pull}4888[4888]
+- Fix go plugins not loaded when beat starts {pull}4799[4799]
+- Add support for `initContainers` in `add_kubernetes_metadata` processor. {issue}4825[4825]
+- Eliminate deprecated _default_ mapping in 6.x {pull}4864[4864]
+- Fix pod name indexer to use both namespace, pod name to frame index key {pull}4775[4775]
+
+*Filebeat*
+
+- Fix issue where the `fileset.module` could have the wrong value. {issue}4761[4761]
+
+*Heartbeat*
+
+- Fix monitor.name being empty by default. {issue}4852[4852]
+- Fix wrong event timestamps. {issue}4851[4851]
+
+*Metricbeat*
+
+- Added missing mongodb configuration file to the `modules.d` folder. {pull}4870[4870]
+- Fix wrong MySQL CRUD queries timelion visualization {pull}4857[4857]
+- Add new metrics to CPU metricsset {pull}4969[4969]
+
+*Packetbeat*
+
+- Update flow timestamp on each packet being received. {issue}4895[4895]
+
+==== Added
+
+*Affecting all Beats*
+
+- Add setting to enable/disable the slow start in logstash output. {pull}4972[4972]
+- Update init scripts to use the `test config` subcommand instead of the deprecated `-configtest` flag. {issue}4600[4600]
+- Get by default the credentials for connecting to Kibana from the Elasticsearch output configuration. {pull}4867[4867]
+- Added `cloud.id` and `cloud.auth` settings, for simplifying using Beats with the Elastic Cloud. {issue}4959[4959]
+- Add lz4 compression support to kafka output. {pull}4977[4977]
+- Add newer kafka versions to kafka output. {pull}4977[4977]
+- Configure the index name when loading the dashboards and the index pattern. {pull}4949[4949]
+
+*Metricbeat*
+
+- Add `filesystem.ignore_types` to system module for ignoring filesystem types. {issue}4685[4685]
+- Add support to exclude labels from kubernetes pod metadata. {pull}4757[4757]
+
+[[release-notes-6.0.0-beta1]]
+=== Beats version 6.0.0-beta1
+https://github.com/elastic/beats/compare/v6.0.0-alpha2...v6.0.0-beta1[View commits]
+
+==== Breaking changes
+
+*Affecting all Beats*
+
+- Rename `kubernetes` processor to `add_kubernetes_metadata`. {pull}4473[4473]
+- Rename `*.full.yml` config files to `*.reference.yml`. {pull}4563[4563]
+- The `scripts/import_dashboards` is removed from packages. Use the `setup` command instead. {pull}4586[4586]
+- Change format of the saved kibana dashboards to have a single JSON file for each dashboard {pull}4413[4413]
+- Rename `configtest` command to `test config`. {pull}4590[4590]
+- Remove setting `queue_size` and `bulk_queue_size`. {pull}4650[4650]
+- Remove setting `dashboard.snapshot` and `dashboard.snapshot_url`. They are no longer needed because the
+  dashboards are included in the packages by default. {pull}4675[4675]
+- Beats can no longer be launched from Windows Explorer (GUI), command line is required. {pull}4420[4420]
+
+*Auditbeat*
+
+- Changed file metricset config to make `file.paths` a list instead of a dictionary. {pull}4796[4796]
+
+*Heartbeat*
+
+- Renamed the heartbeat RPM/DEB name to `heartbeat-elastic`. {pull}4601[4601]
+
+*Metricbeat*
+
+- Change all `system.cpu.*.pct` metrics to be scaled by the number of CPU cores.
+  This will make the CPU usage percentages from the system cpu metricset consistent
+  with the system process metricset. The documentation for these metrics already
+  stated that on multi-core systems the percentages could be greater than 100%. {pull}4544[4544]
+- Remove filters setting from metricbeat modules. {pull}4699[4699]
+- Added `type` field to filesystem metrics. {pull}4717[4717]
+
+*Packetbeat*
+
+- Remove the already unsupported `pf_ring` sniffer option. {pull}4608[4608]
+
+==== Bugfixes
+
+*Affecting all Beats*
+
+- Don't stop with error loading the ES template if the ES output is not enabled. {pull}4436[4436]
+- Fix race condition in internal logging rotator. {pull}4519[4519]
+- Normalize all times to UTC to ensure proper index naming. {issue}4569[4569]
+- Fix issue with loading dashboards to ES 6.0 when .kibana index did not already exist. {issue}4659[4659]
+
+*Auditbeat*
+
+- Fix `file.max_file_size` config option for the audit file metricset. {pull}4796[4796]
+
+*Filebeat*
+
+- Fix issue where the `fileset.module` could have the wrong value. {issue}4761[4761]
+
+*Metricbeat*
+
+- Fix issue affecting Windows services timing out at startup. {pull}4491[4491]
+- Fix incorrect docker.diskio.total metric calculation. {pull}4507[4507]
+- Vsphere module: used memory field corrected. {issue}4461[4461]
+
+*Packetbeat*
+
+- Enabled /proc/net/tcp6 scanning and fixed ip v6 parsing. {pull}4442[4442]
+
+*Winlogbeat*
+
+- Removed validation of top-level config keys. This behavior was inconsistent with other Beats
+  and caused maintainability issues. {pull}4657[4657]
+
+==== Added
+
+*Affecting all Beats*
+
+- New cli subcommands interface. {pull}4420[4420]
+- Allow source path matching in `add_docker_metadata` processor. {pull}4495[4495]
+- Add support for analyzers and multifields in fields.yml. {pull}4574[4574]
+- Add support for JSON logging. {pull}4523[4523]
+- Add `test output` command, to test Elasticsearch and Logstash output settings. {pull}4590[4590]
+- Introduce configurable event queue settings: queue.mem.events, queue.mem.flush.min_events and queue.mem.flush.timeout. {pull}4650[4650]
+- Enable pipelining in Logstash output by default. {pull}4650[4650]
+- Added 'result' field to Elasticsearch QueryResult struct for compatibility with 6.x Index and Delete API responses. {issue]4661[4661]
+- The sample dashboards are now included in the Beats packages. {pull}4675[4675]
+- Add `pattern` option to be used in the fields.yml to specify the pattern for a number field. {pull}4731[4731]
+
+*Auditbeat*
+
+- Added `file.hash_types` config option for controlling the hash types. {pull}4796[4796]
+- Added the ability to specify byte unit suffixes to `file.max_file_size`. {pull}4796[4796]
+
+*Filebeat*
+
+- Add experimental Redis module. {pull}4441[4441]
+- Nginx module: use the first not-private IP address as the remote_ip. {pull}4417[4417]
+- Load Ingest Node pipelines when the Elasticsearch connection is established, instead of only once at startup. {pull}4479[4479]
+- Add support for loading Xpack Machine Learning configurations from the modules, and added sample configurations for the Nginx module. {pull}4506[4506] {pull}4609[4609]
+
+- Add udp prospector type. {pull}4452[4452]
+- Enabled Cgo which means libc is dynamically compiled. {pull}4546[4546]
+- Add Beta module config reloading mechanism {pull}4566[4566]
+- Remove spooler and publisher components and settings. {pull}4644[4644]
+
+*Heartbeat*
+
+- Enabled Cgo which means libc is dynamically compiled. {pull}4546[4546]
+
+*Metricbeat*
+
+- Add random startup delay to each metricset to avoid the thundering herd problem. {issue}4010[4010]
+- Add the ability to configure audit rules to the kernel module. {pull}4482[4482]
+- Add the ability to configure kernel's audit failure mode. {pull}4516[4516]
+- Add experimental Aerospike module. {pull}4560[4560]
+- Vsphere module: collect custom fields from virtual machines. {issue}4464[4464]
+- Add `test modules` command, to test modules expected output. {pull}4656[4656]
+- Add `processors` setting to metricbeat modules. {pull}4699[4699]
+- Support `npipe` protocol (Windows) in Docker module. {pull}4751[4751]
+
+*Winlogbeat*
+
+- Add the ability to use LevelRaw if Level isn't populated in the event XML. {pull}4257[4257]
+
+*Auditbeat*
+
+- Add file integrity metricset to the audit module. {pull}4486[4486]
 
 [[release-notes-6.0.0-alpha2]]
 === Beats version 6.0.0-alpha2
@@ -114,6 +625,7 @@ https://github.com/elastic/beats/compare/v6.0.0-alpha1...v6.0.0-alpha2[View comm
 
 *Metricbeat*
 
+- Set correct format for percent fields in memory module. {pull}4619[4619]
 - Fix a debug statement that said a module wrapper had stopped when it hadn't. {pull}4264[4264]
 - Use MemAvailable value from /proc/meminfo on Linux 3.14. {pull}4316[4316]
 - Fix panic when events were dropped by filters. {issue}4327[4327]
@@ -139,7 +651,7 @@ https://github.com/elastic/beats/compare/v6.0.0-alpha1...v6.0.0-alpha2[View comm
 - Add `logging.files` `permissions` option. {pull}4295[4295]
 
 *Filebeat*
-
+- Added ability to sort harvested files. {pull}4374[4374]
 - Add experimental Redis slow log prospector type. {pull}4180[4180]
 
 *Metricbeat*
@@ -152,6 +664,10 @@ https://github.com/elastic/beats/compare/v6.0.0-alpha1...v6.0.0-alpha2[View comm
 - Change Metricbeat default configuration file to be better optimized for most users. {pull}4329[4329]
 - Add experimental RabbitMQ module. {pull}4394[4394]
 - Add Kibana dashboard for the Kubernetes modules. {pull}4138[4138]
+
+*Packetbeat*
+
+*Winlogbeat*
 
 ==== Deprecated
 
@@ -295,6 +811,154 @@ https://github.com/elastic/beats/compare/v5.4.0...v6.0.0-alpha1[View commits]
 *Filebeat*
 
 - Prospector reloading only works properly with new files. {pull}3546[3546]
+
+[[release-notes-5.6.2]]
+=== Beats version 5.6.2
+https://github.com/elastic/beats/compare/v5.6.1...v5.6.2[View commits]
+
+No changes in this release.
+
+[[release-notes-5.6.1]]
+=== Beats version 5.6.1
+https://github.com/elastic/beats/compare/v5.6.0...v5.6.1[View commits]
+
+No changes in this release.
+
+[[release-notes-5.6.0]]
+=== Beats version 5.6.0
+https://github.com/elastic/beats/compare/v5.5.3...v5.6.0[View commits]
+
+==== Breaking changes
+
+*Affecting all Beats*
+
+- The _all.norms setting in the Elasticsearch template is no longer disabled.
+  This increases the storage size with one byte per document, but allows for a
+  better upgrade experience to 6.0. {issue}4901[4901]
+
+
+==== Bugfixes
+
+*Filebeat*
+
+- Fix issue where the `fileset.module` could have the wrong value. {issue}4761[4761]
+
+*Packetbeat*
+
+- Update flow timestamp on each packet being received. {issue}4895[4895]
+
+*Metricbeat*
+
+- Fix a debug statement that said a module wrapper had stopped when it hadn't. {pull}4264[4264]
+- Use MemAvailable value from /proc/meminfo on Linux 3.14. {pull}4316[4316]
+- Fix panic when events were dropped by filters. {issue}4327[4327]
+
+==== Added
+
+*Affecting all Beats*
+
+- Add option to the import_dashboards script to load the dashboards via Kibana API. {pull}4682[4682]
+
+*Filebeat*
+
+- Add support for loading Xpack Machine Learning configurations from the modules, and added sample configurations for the Nginx module. {pull}4506[4506] {pull}4609[4609]
+-  Add ability to parse nginx logs exposing the X-Forwarded-For header instead of the remote address. {pull}4351[4351]
+
+*Metricbeat*
+
+- Add `filesystem.ignore_types` to system module for ignoring filesystem types. {issue}4685[4685]
+
+==== Deprecated
+
+*Affecting all Beats*
+
+- Loading more than one output is deprecated and will be removed in 6.0. {pull}4907[4907]
+
+[[release-notes-5.5.3]]
+=== Beats version 5.5.3
+https://github.com/elastic/beats/compare/v5.5.2...v5.5.3[View commits]
+
+No changes in this release.
+
+[[release-notes-5.5.2]]
+=== Beats version 5.5.2
+https://github.com/elastic/beats/compare/v5.5.1...v5.5.2[View commits]
+
+No changes in this release.
+[[release-notes-5.5.1]]
+=== Beats version 5.5.1
+https://github.com/elastic/beats/compare/v5.5.0...v5.5.1[View commits]
+
+==== Bugfixes
+
+*Affecting all Beats*
+
+- Normalize all times to UTC to ensure proper index naming. {issue}4569[4569]
+
+[[release-notes-5.5.0]]
+=== Beats version 5.5.0
+https://github.com/elastic/beats/compare/v5.4.2...v5.5.0[View commits]
+
+==== Breaking changes
+
+*Affecting all Beats*
+
+- Usage of field `_type` is now ignored and hardcoded to `doc`. {pull}3757[3757]
+
+*Metricbeat*
+- Change all `system.cpu.*.pct` metrics to be scaled by the number of CPU cores.
+  This will make the CPU usage percentages from the system cpu metricset consistent
+  with the system process metricset. The documentation for these metrics already
+  stated that on multi-core systems the percentages could be greater than 100%. {pull}4544[4544]
+
+==== Bugfixes
+
+*Affecting all Beats*
+
+- Fix console output. {pull}4045[4045]
+
+*Filebeat*
+
+- Allow string characters in user agent patch version (NGINX and Apache) {pull}4415[4415]
+
+*Metricbeat*
+
+- Fix type of field `haproxy.stat.check.health.last`. {issue}4407[4407]
+
+*Packetbeat*
+
+- Fix `packetbeat.interface` options that contain underscores (e.g. `with_vlans` or `bpf_filter`). {pull}4378[4378]
+- Enabled /proc/net/tcp6 scanning and fixed ip v6 parsing. {pull}4442[4442]
+
+==== Deprecated
+
+*Filebeat*
+
+- Deprecate `document_type` prospector config option as _type is removed in elasticsearch 6.0. Use fields instead. {pull}4225[4225]
+
+*Winlogbeat*
+
+- Deprecated metrics endpoint. It is superseded by a libbeat feature that can serve metrics on an HTTP endpoint. {pull}4145[4145]
+
+[[release-notes-5.4.2]]
+=== Beats version 5.4.2
+https://github.com/elastic/beats/compare/v5.4.1...v5.4.2[View commits]
+
+==== Bugfixes
+
+*Affecting all Beats*
+
+- Removed empty sections from the template files, causing indexing errors for array objects. {pull}4488[4488]
+
+*Metricbeat*
+
+- Fix issue affecting Windows services timing out at startup. {pull}4491[4491]
+- Add filtering to system filesystem metricset to remove relative mountpoints like those
+  from Linux network namespaces. {pull}4370[4370]
+
+*Packetbeat*
+
+- Clean configured geoip.paths before attempting to open the database. {pull}4306[4306]
 
 [[release-notes-5.4.1]]
 === Beats version 5.4.1
@@ -474,6 +1138,9 @@ https://github.com/elastic/beats/compare/v5.2.2...v5.3.0[View commits]
 - Improve handling of different path variants on Windows. {pull}3781[3781]
 - Add multiline.flush_pattern option, for specifying the 'end' of a multiline pattern {pull}4019[4019]
 
+*Heartbeat*
+
+- Add `tags`, `fields` and `fields_under_root` in monitors configuration. {pull}3623[3623]
 
 *Metricbeat*
 

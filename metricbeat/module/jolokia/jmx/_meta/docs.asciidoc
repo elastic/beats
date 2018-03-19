@@ -1,6 +1,4 @@
-=== Jolokia jmx Metricset
-
-This is the jmx metricset of the module jolokia.
+This is the `jmx` metricset of the Jolokia module.
 
 [float]
 === Features and configuration
@@ -45,6 +43,6 @@ All Jolokia requests have canonicalNaming set to false (details see here: https:
 
 
 [float]
-=== Exposed fields, Dashboards, Indexes, etc.
+=== Exposed fields, dashboards, indexes, etc.
 Since this is a very general module that can be tailored for any application that exposes its metrics over Jolokia, it
 comes with no exposed fields description, dashboards or index patterns.

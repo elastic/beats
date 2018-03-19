@@ -1,0 +1,33 @@
+{
+  "description": "Traefik Access Logs: Detect unusual remote_ips - high distinct count of urls",
+  "analysis_config" : {
+    "bucket_span": "1h",
+    "detectors": [
+        {
+        "detector_description": "traefik_access_remote_ip_high_dc_url",
+        "function": "high_distinct_count",
+        "field_name": "traefik.access.url",
+        "over_field_name": "traefik.access.remote_ip"
+      }
+    ],
+    "influencers": [
+      "traefik.access.remote_ip"
+    ]
+  },
+  "data_description": {
+    "time_field": "@timestamp",
+    "time_format": "epoch_ms"
+  },
+  "custom_settings": {
+    "custom_urls": [
+      {
+        "url_name": "URL Explorer",
+        "url_value": "kibana#/dashboard/ML-Traefik-Remote-IP-URL-Explorer?_g=(refreshInterval:(display:Off,pause:!f,value:0),time:(from:\u0027$earliest$\u0027,mode:absolute,to:\u0027$latest$\u0027))&_a=(description:\u0027\u0027,filters:!((\u0027$state\u0027:(store:appState),meta:(alias:!n,disabled:!f,index:\u0027filebeat-*\u0027,key:traefik.access.remote_ip,negate:!f,type:phrase,value:\u0027$traefik.access.remote_ip$\u0027),query:(match:(traefik.access.remote_ip:(query:\u0027$traefik.access.remote_ip$\u0027,type:phrase))))),options:(darkTheme:!f),panels:!((col:1,id:ML-Traefik-Access-Unique-Count-URL-Timechart,panelIndex:1,row:1,size_x:6,size_y:3,type:visualization),(col:7,id:ML-Traefik-Access-Response-Code-Timechart,panelIndex:2,row:1,size_x:6,size_y:3,type:visualization),(col:1,id:ML-Traefik-Access-Top-Remote-IPs-Table,panelIndex:3,row:4,size_x:6,size_y:3,type:visualization),(col:7,id:ML-Traefik-Access-Map,panelIndex:4,row:4,size_x:6,size_y:3,type:visualization),(col:1,id:ML-Traefik-Access-Top-URLs-Table,panelIndex:5,row:7,size_x:12,size_y:8,type:visualization)),query:(query_string:(analyze_wildcard:!t,query:\u0027*\u0027)),timeRestore:!f,title:\u0027ML%20Traefik%20Access%20Remote%20IP%20URL%20Explorer\u0027,uiState:(P-2:(vis:(params:(sort:(columnIndex:!n,direction:!n)))),P-3:(vis:(params:(sort:(columnIndex:!n,direction:!n)))),P-5:(vis:(params:(sort:(columnIndex:!n,direction:!n))))),viewMode:view)"
+      },
+      {
+        "url_name": "Raw Data",
+        "url_value": "kibana#/discover/ML-Filebeat-Traefik-Access?_g=(refreshInterval:(display:Off,pause:!f,value:0),time:(from:\u0027$earliest$\u0027,mode:absolute,to:\u0027$latest$\u0027))&_a=(columns:!(_source),filters:!((\u0027$state\u0027:(store:appState),meta:(alias:!n,disabled:!f,index:\u0027filebeat-*\u0027,key:traefik.access.remote_ip,negate:!f,type:phrase,value:\u0027$traefik.access.remote_ip$\u0027),query:(match:(traefik.access.remote_ip:(query:\u0027$traefik.access.remote_ip$\u0027,type:phrase))))),index:\u0027filebeat-*\u0027,interval:auto,query:(query_string:(analyze_wildcard:!t,query:\u0027*\u0027)),sort:!(\u0027@timestamp\u0027,desc))"
+      }
+    ]
+  }
+}

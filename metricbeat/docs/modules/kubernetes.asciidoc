@@ -3,9 +3,7 @@ This file is generated! See scripts/docs_collector.py
 ////
 
 [[metricbeat-module-kubernetes]]
-== kubernetes Module
-
-beta[]
+== Kubernetes module
 
 This module fetches metrics from Kubernetes https://kubernetes.io/docs/admin/kubelet/[kubelet]
 agent and https://github.com/kubernetes/kube-state-metrics[kube-state-metrics] service.
@@ -16,9 +14,9 @@ example configuration on how to do it.
 
 
 [float]
-=== Example Configuration
+=== Example configuration
 
-The kubernetes module supports the standard configuration options that are described
+The Kubernetes module supports the standard configuration options that are described
 in <<configuration-metricbeat>>. Here is an example configuration:
 
 [source,yaml]
@@ -26,7 +24,6 @@ in <<configuration-metricbeat>>. Here is an example configuration:
 metricbeat.modules:
 # Node metrics, from kubelet:
 - module: kubernetes
-  enabled: false
   metricsets:
     - node
     - system
@@ -35,6 +32,9 @@ metricbeat.modules:
     - volume
   period: 10s
   hosts: ["localhost:10255"]
+  #ssl.certificate_authorities: ["/etc/pki/root/ca.pem"]
+  #ssl.certificate: "/etc/pki/client/cert.pem"
+  #ssl.key: "/etc/pki/client/cert.key"
 
 # State metrics from kube-state-metrics service:
 - module: kubernetes
@@ -43,6 +43,7 @@ metricbeat.modules:
     - state_node
     - state_deployment
     - state_replicaset
+    - state_statefulset
     - state_pod
     - state_container
   period: 10s
@@ -53,8 +54,9 @@ metricbeat.modules:
   enabled: false
   metricsets:
     - event
-  in_cluster: true
 ----
+
+This module supports TLS connection when using `ssl` config field, as described in <<configuration-ssl>>.
 
 [float]
 === Metricsets
@@ -79,6 +81,8 @@ The following metricsets are available:
 
 * <<metricbeat-metricset-kubernetes-state_replicaset,state_replicaset>>
 
+* <<metricbeat-metricset-kubernetes-state_statefulset,state_statefulset>>
+
 * <<metricbeat-metricset-kubernetes-system,system>>
 
 * <<metricbeat-metricset-kubernetes-volume,volume>>
@@ -100,6 +104,8 @@ include::kubernetes/state_node.asciidoc[]
 include::kubernetes/state_pod.asciidoc[]
 
 include::kubernetes/state_replicaset.asciidoc[]
+
+include::kubernetes/state_statefulset.asciidoc[]
 
 include::kubernetes/system.asciidoc[]
 

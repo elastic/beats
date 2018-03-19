@@ -4,7 +4,7 @@ import "github.com/elastic/beats/libbeat/common"
 
 // Alibaba Cloud Metadata Service
 // Document https://help.aliyun.com/knowledge_detail/49122.html
-func newAlibabaCloudMetadataFetcher(c common.Config) (*metadataFetcher, error) {
+func newAlibabaCloudMetadataFetcher(c *common.Config) (*metadataFetcher, error) {
 	ecsMetadataHost := "100.100.100.200"
 	ecsMetadataInstanceIDURI := "/latest/meta-data/instance-id"
 	ecsMetadataRegionURI := "/latest/meta-data/region-id"

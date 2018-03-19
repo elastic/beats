@@ -3,9 +3,10 @@ package jmx
 import (
 	"encoding/json"
 
-	"github.com/elastic/beats/libbeat/common"
 	"github.com/joeshaw/multierror"
 	"github.com/pkg/errors"
+
+	"github.com/elastic/beats/libbeat/common"
 )
 
 type Entry struct {
@@ -80,9 +81,22 @@ func parseResponseEntry(
 
 	key, exists := mapping[metricName]
 	if !exists {
-		return errors.Errorf("metric key '%v' not found in response", key)
+		return errors.Errorf("metric key '%v' not found in response", metricName)
 	}
 
-	_, err := event.Put(key, attibuteValue)
+	var err error
+
+	// In case the attributeValue is a map the keys are dedotted
+	c, ok := attibuteValue.(map[string]interface{})
+	if ok {
+		newData := map[string]interface{}{}
+		for k, v := range c {
+			newData[common.DeDot(k)] = v
+		}
+		_, err = event.Put(key, newData)
+	} else {
+		_, err = event.Put(key, attibuteValue)
+	}
+
 	return err
 }

@@ -53,27 +53,13 @@ func TestBenchmarkBatchReadSize(t *testing.T) {
 		}
 	}
 
-	setup := func(t testing.TB, batchReadSize int) (EventLog, func()) {
-		eventlog, err := newWinEventLog(map[string]interface{}{"name": providerName, "batch_read_size": batchReadSize})
-		if err != nil {
-			t.Fatal(err)
-		}
-		err = eventlog.Open(0)
-		if err != nil {
-			t.Fatal(err)
-		}
-		return eventlog, func() {
-			err := eventlog.Close()
-			if err != nil {
-				t.Fatal(err)
-			}
-		}
-	}
-
 	benchTest := func(batchSize int) {
 		var err error
 		result := testing.Benchmark(func(b *testing.B) {
-			eventlog, tearDown := setup(b, batchSize)
+			eventlog, tearDown := setupWinEventLog(t, 0, map[string]interface{}{
+				"name":            providerName,
+				"batch_read_size": batchSize,
+			})
 			defer tearDown()
 			b.ResetTimer()
 

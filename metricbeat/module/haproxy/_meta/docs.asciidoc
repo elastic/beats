@@ -1,14 +1,35 @@
-== HAProxy Module
+This module collects stats from http://www.haproxy.org/[HAProxy]. It supports
+collection from using TCP sockets or HTTP with or without basic authentication.
 
-This module collects stats from http://www.haproxy.org/[HAProxy]. To configure
-HAProxy to collect stats, you must enable the stats socket via TCP. For example,
-to enable stats reporting via any local IP on port 14567, place this statement
-under the `global` or `default` section of the haproxy config:
+To configure HAProxy to collect stats, you must enable the stats module, it can
+be done by enabling a TCP socket, or by adding an HTTP stats frontend.
 
-`stats socket 127.0.0.1:14567`
+Metricbeat can collect two metric sets from HAproxy, `info` and `stats`. `info`
+is not available when using HTTP stats frontend.
+
+For example, to enable stats reporting via any local IP on port 14567, place
+this statement under the `global` or `default` section of the haproxy config:
+
+[source,haproxy]
+----
+ stats socket 127.0.0.1:14567
+----
 
 NOTE: You should use an internal private IP, or secure this with a firewall
 rule, so that only designated hosts can access this data.
+
+To configure the HTTP stats frontend, a frontend with stats enabled has to
+be added. For example, to open this frontend to any IP on port 14567 with
+required authentication add this to the haproxy config:
+
+[source,haproxy]
+----
+ listen stats
+   bind 0.0.0.0:14569
+   stats enable
+   stats uri /stats
+   stats auth admin:admin
+----
 
 [float]
 === Compatibility

@@ -74,7 +74,6 @@ func (b *Buffer) ReadNetUint16At(index int) (uint16, error) {
 		return 0, b.bufferEndError()
 	}
 	return common.BytesNtohs(b.data[index+b.mark:]), nil
-
 }
 
 // Write 16bit binary value at index in network byte order to buffer.
@@ -117,7 +116,6 @@ func (b *Buffer) ReadNetUint32At(index int) (uint32, error) {
 		return 0, b.bufferEndError()
 	}
 	return common.BytesNtohl(b.data[index+b.mark:]), nil
-
 }
 
 // Write 32bit binary value at index in network byte order to buffer.
@@ -162,7 +160,6 @@ func (b *Buffer) ReadNetUint64At(index int) (uint64, error) {
 		return 0, b.bufferEndError()
 	}
 	return common.BytesNtohll(b.data[index+b.mark:]), nil
-
 }
 
 // Write 64bit binary value at index in network byte order to buffer.

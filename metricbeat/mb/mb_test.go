@@ -68,19 +68,6 @@ func TestModuleConfig(t *testing.T) {
 		},
 		{
 			in: map[string]interface{}{
-				"module": "example",
-			},
-			err: "missing required field accessing 'metricsets'",
-		},
-		{
-			in: map[string]interface{}{
-				"module":     "example",
-				"metricsets": []string{},
-			},
-			err: "empty field accessing 'metricsets'",
-		},
-		{
-			in: map[string]interface{}{
 				"module":     "example",
 				"metricsets": []string{"test"},
 			},
@@ -159,29 +146,6 @@ func TestModuleConfigDefaults(t *testing.T) {
 	assert.Empty(t, mc.Hosts)
 }
 
-// TestNewModulesWithEmptyModulesConfig verifies that an error is returned if
-// the modules configuration list is empty.
-func TestNewModulesWithEmptyModulesConfig(t *testing.T) {
-	r := newTestRegistry(t)
-	_, err := NewModules(nil, r)
-	assert.Equal(t, ErrEmptyConfig, err)
-}
-
-// TestNewModulesWithAllDisabled verifies that an error is returned if all
-// modules defined in the config are disabled.
-func TestNewModulesWithAllDisabled(t *testing.T) {
-	r := newTestRegistry(t)
-
-	c := newConfig(t, map[string]interface{}{
-		"module":     moduleName,
-		"metricsets": []string{metricSetName},
-		"enabled":    false,
-	})
-
-	_, err := NewModules(c, r)
-	assert.Equal(t, ErrAllModulesDisabled, err)
-}
-
 // TestNewModulesDuplicateHosts verifies that an error is returned by
 // NewModules if any module configuration contains duplicate hosts.
 func TestNewModulesDuplicateHosts(t *testing.T) {
@@ -193,8 +157,26 @@ func TestNewModulesDuplicateHosts(t *testing.T) {
 		"hosts":      []string{"a", "b", "a"},
 	})
 
-	_, err := NewModules(c, r)
+	_, _, err := NewModule(c, r)
 	assert.Error(t, err)
+}
+
+// TestNewModulesWithDefaultMetricSet verifies that the default MetricSet is
+// instantiated when no metricsets are specified in the config.
+func TestNewModulesWithDefaultMetricSet(t *testing.T) {
+	r := newTestRegistry(t, DefaultMetricSet())
+
+	c := newConfig(t, map[string]interface{}{
+		"module": moduleName,
+	})
+
+	_, metricSets, err := NewModule(c, r)
+	if err != nil {
+		t.Fatal(err)
+	}
+	if assert.Len(t, metricSets, 1) {
+		assert.Equal(t, metricSetName, metricSets[0].Name())
+	}
 }
 
 func TestNewModulesHostParser(t *testing.T) {
@@ -219,51 +201,28 @@ func TestNewModulesHostParser(t *testing.T) {
 	}
 
 	t.Run("MetricSet without HostParser", func(t *testing.T) {
-		c := newConfig(t, map[string]interface{}{
+		ms := newTestMetricSet(t, r, map[string]interface{}{
 			"module":     moduleName,
 			"metricsets": []string{metricSetName},
 			"hosts":      []string{uri},
 		})
 
-		modules, err := NewModules(c, r)
-		if err != nil {
-			t.Fatal(err)
-		}
-
-		for _, metricSets := range modules {
-			metricSet := metricSets[0]
-
-			// The URI is passed through in the Host() and HostData().URI.
-			assert.Equal(t, uri, metricSet.Host())
-			assert.Equal(t, HostData{URI: uri}, metricSet.HostData())
-			return
-		}
-		assert.FailNow(t, "no modules found")
+		// The URI is passed through in the Host() and HostData().URI.
+		assert.Equal(t, uri, ms.Host())
+		assert.Equal(t, HostData{URI: uri}, ms.HostData())
 	})
 
 	t.Run("MetricSet with HostParser", func(t *testing.T) {
-		c := newConfig(t, map[string]interface{}{
+		ms := newTestMetricSet(t, r, map[string]interface{}{
 			"module":     moduleName,
 			"metricsets": []string{name},
 			"hosts":      []string{uri},
 		})
 
-		modules, err := NewModules(c, r)
-		if err != nil {
-			t.Fatal(err)
-		}
-
-		for _, metricSets := range modules {
-			metricSet := metricSets[0]
-
-			// The URI is passed through in the Host() and HostData().URI.
-			assert.Equal(t, host, metricSet.Host())
-			assert.Equal(t, HostData{URI: uri, Host: host}, metricSet.HostData())
-			return
-		}
-		assert.FailNow(t, "no modules found")
+		// The URI is passed through in the Host() and HostData().URI.
+		assert.Equal(t, host, ms.Host())
+		assert.Equal(t, HostData{URI: uri, Host: host}, ms.HostData())
 	})
-
 }
 
 func TestNewModulesMetricSetTypes(t *testing.T) {
@@ -279,24 +238,12 @@ func TestNewModulesMetricSetTypes(t *testing.T) {
 	}
 
 	t.Run(name+" MetricSet", func(t *testing.T) {
-		c := newConfig(t, map[string]interface{}{
+		ms := newTestMetricSet(t, r, map[string]interface{}{
 			"module":     moduleName,
 			"metricsets": []string{name},
 		})
-
-		modules, err := NewModules(c, r)
-		if err != nil {
-			t.Fatal(err)
-		}
-		assert.Len(t, modules, 1)
-
-		for _, metricSets := range modules {
-			if assert.Len(t, metricSets, 1) {
-				metricSet := metricSets[0]
-				_, ok := metricSet.(EventFetcher)
-				assert.True(t, ok, name+" not implemented")
-			}
-		}
+		_, ok := ms.(EventFetcher)
+		assert.True(t, ok, name+" not implemented")
 	})
 
 	factory = func(base BaseMetricSet) (MetricSet, error) {
@@ -309,24 +256,12 @@ func TestNewModulesMetricSetTypes(t *testing.T) {
 	}
 
 	t.Run(name+" MetricSet", func(t *testing.T) {
-		c := newConfig(t, map[string]interface{}{
+		ms := newTestMetricSet(t, r, map[string]interface{}{
 			"module":     moduleName,
 			"metricsets": []string{name},
 		})
-
-		modules, err := NewModules(c, r)
-		if err != nil {
-			t.Fatal(err)
-		}
-		assert.Len(t, modules, 1)
-
-		for _, metricSets := range modules {
-			if assert.Len(t, metricSets, 1) {
-				metricSet := metricSets[0]
-				_, ok := metricSet.(EventsFetcher)
-				assert.True(t, ok, name+" not implemented")
-			}
-		}
+		_, ok := ms.(EventsFetcher)
+		assert.True(t, ok, name+" not implemented")
 	})
 
 	factory = func(base BaseMetricSet) (MetricSet, error) {
@@ -339,24 +274,13 @@ func TestNewModulesMetricSetTypes(t *testing.T) {
 	}
 
 	t.Run(name+" MetricSet", func(t *testing.T) {
-		c := newConfig(t, map[string]interface{}{
+		ms := newTestMetricSet(t, r, map[string]interface{}{
 			"module":     moduleName,
 			"metricsets": []string{name},
 		})
 
-		modules, err := NewModules(c, r)
-		if err != nil {
-			t.Fatal(err)
-		}
-		assert.Len(t, modules, 1)
-
-		for _, metricSets := range modules {
-			if assert.Len(t, metricSets, 1) {
-				metricSet := metricSets[0]
-				_, ok := metricSet.(ReportingMetricSet)
-				assert.True(t, ok, name+" not implemented")
-			}
-		}
+		_, ok := ms.(ReportingMetricSet)
+		assert.True(t, ok, name+" not implemented")
 	})
 
 	factory = func(base BaseMetricSet) (MetricSet, error) {
@@ -369,24 +293,12 @@ func TestNewModulesMetricSetTypes(t *testing.T) {
 	}
 
 	t.Run(name+" MetricSet", func(t *testing.T) {
-		c := newConfig(t, map[string]interface{}{
+		ms := newTestMetricSet(t, r, map[string]interface{}{
 			"module":     moduleName,
 			"metricsets": []string{name},
 		})
-
-		modules, err := NewModules(c, r)
-		if err != nil {
-			t.Fatal(err)
-		}
-		assert.Len(t, modules, 1)
-
-		for _, metricSets := range modules {
-			if assert.Len(t, metricSets, 1) {
-				metricSet := metricSets[0]
-				_, ok := metricSet.(PushMetricSet)
-				assert.True(t, ok, name+" not implemented")
-			}
-		}
+		_, ok := ms.(PushMetricSet)
+		assert.True(t, ok, name+" not implemented")
 	})
 }
 
@@ -398,7 +310,7 @@ func TestNewBaseModuleFromModuleConfigStruct(t *testing.T) {
 
 	c := newConfig(t, moduleConf)
 
-	baseModule, err := newBaseModuleFromConfig(c[0])
+	baseModule, err := newBaseModuleFromConfig(c)
 	assert.NoError(t, err)
 
 	assert.Equal(t, moduleName, baseModule.Name())
@@ -409,7 +321,7 @@ func TestNewBaseModuleFromModuleConfigStruct(t *testing.T) {
 	assert.Empty(t, baseModule.Config().Hosts)
 }
 
-func newTestRegistry(t testing.TB) *Register {
+func newTestRegistry(t testing.TB, metricSetOptions ...MetricSetOption) *Register {
 	r := NewRegister()
 
 	if err := r.AddModule(moduleName, DefaultModuleFactory); err != nil {
@@ -420,18 +332,29 @@ func newTestRegistry(t testing.TB) *Register {
 		return &testMetricSet{base}, nil
 	}
 
-	if err := r.AddMetricSet(moduleName, metricSetName, factory); err != nil {
+	if err := r.addMetricSet(moduleName, metricSetName, factory, metricSetOptions...); err != nil {
 		t.Fatal(err)
 	}
 
 	return r
 }
 
-func newConfig(t testing.TB, moduleConfig interface{}) []*common.Config {
+func newTestMetricSet(t testing.TB, r *Register, config map[string]interface{}) MetricSet {
+	_, metricsets, err := NewModule(newConfig(t, config), r)
+	if err != nil {
+		t.Fatal(err)
+	}
+	if !assert.Len(t, metricsets, 1) {
+		assert.FailNow(t, "invalid number of metricsets")
+	}
+
+	return metricsets[0]
+}
+
+func newConfig(t testing.TB, moduleConfig interface{}) *common.Config {
 	config, err := common.NewConfigFrom(moduleConfig)
 	if err != nil {
 		t.Fatal(err)
 	}
-
-	return []*common.Config{config}
+	return config
 }

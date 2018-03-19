@@ -1,5 +1,6 @@
 - name: status
   type: group
+  release: ga
   description: >
     `status` contains the metrics that were scraped from the Apache status page.
   fields:

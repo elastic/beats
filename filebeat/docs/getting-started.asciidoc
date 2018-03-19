@@ -15,14 +15,14 @@ After installing the Elastic Stack, read the following topics to learn how to in
 * <<filebeat-configuration>>
 * <<config-filebeat-logstash>>
 * <<filebeat-template>>
+* <<load-kibana-dashboards>>
 * <<filebeat-starting>>
-* <<filebeat-index-pattern>>
+* <<view-kibana-dashboards>>
 * <<filebeat-modules-quickstart>>
-* <<command-line-options>>
-* <<directory-layout>>
+* <<setup-repositories>>
 
 [[filebeat-installation]]
-=== Step 1: Installing Filebeat
+=== Step 1: Install Filebeat
 
 Before running Filebeat, you need to install and configure the Elastic stack. See
 {libbeat}/getting-started.html[Getting Started with Beats and the Elastic Stack].
@@ -138,7 +138,7 @@ NOTE: If script execution is disabled on your system, you need to set the execut
 endif::[]
 
 [[filebeat-configuration]]
-=== Step 2: Configuring Filebeat
+=== Step 2: Configure Filebeat
 
 TIP: <<filebeat-modules-overview,Filebeat modules>> provide the fastest getting
 started experience for common log formats. See <<filebeat-modules-quickstart>>
@@ -156,6 +156,7 @@ default values for most configuration options.
 -------------------------------------------------------------------------------------
 filebeat.prospectors:
 - type: log
+  enabled: true
   paths:
     - /var/log/*.log
     #- c:\programdata\elasticsearch\logs\*
@@ -171,6 +172,7 @@ For the most basic Filebeat configuration, you can define a single prospector wi
 -------------------------------------------------------------------------------------
 filebeat.prospectors:
 - type: log
+  enabled: true
   paths:
     - /var/log/*.log
 -------------------------------------------------------------------------------------
@@ -184,7 +186,8 @@ To fetch all files from a predefined level of subdirectories, the following patt
 fetch log files from the `/var/log` folder itself. Currently it is not possible to recursively
 fetch all files in all subdirectories of a directory.
 
-. If you are sending output to Elasticsearch, set the IP address and port where Filebeat can find the Elasticsearch installation:
+. If you are sending output directly to Elasticsearch (and not using Logstash),
+set the IP address and port where Filebeat can find the Elasticsearch installation:
 +
 [source,yaml]
 ----------------------------------------------------------------------
@@ -192,35 +195,41 @@ output.elasticsearch:
   hosts: ["192.168.1.42:9200"]
 ----------------------------------------------------------------------
 +
-If you are sending output to Logstash, see <<config-filebeat-logstash>> instead.
+If you are sending output to Logstash, make sure you
+configure the Logstash output in <<config-filebeat-logstash>>.
 
-TIP: To test your configuration file, change to the directory where the Filebeat
-binary is installed, and run Filebeat in the foreground with the following
-options specified: +./filebeat -configtest -e+. Make sure your config files are
-in the path expected by Filebeat (see <<directory-layout>>). If you
-installed from DEB or RPM packages, run +./filebeat.sh -configtest -e+.
+include::../../libbeat/docs/step-configure-kibana-endpoint.asciidoc[]
 
-Before starting Filebeat, you should look at the configuration options in the
-configuration file, for example `C:\Program Files\Filebeat\filebeat.yml` or
-`/etc/filebeat/filebeat.yml`. For more information about these options,
-see <<filebeat-configuration-details>>.
+include::../../libbeat/docs/step-configure-credentials.asciidoc[]
+
+include::../../libbeat/docs/step-test-config.asciidoc[]
+
+include::../../libbeat/docs/step-look-at-config.asciidoc[]
 
 [[config-filebeat-logstash]]
-=== Step 3: Configuring Filebeat to Use Logstash
+=== Step 3: Configure Filebeat to use Logstash
 
 :allplatforms:
 include::../../libbeat/docs/shared-logstash-config.asciidoc[]
 
 [[filebeat-template]]
-=== Step 4: Loading the Index Template in Elasticsearch
+=== Step 4: Load the index template in Elasticsearch
 
 :allplatforms:
 include::../../libbeat/docs/shared-template-load.asciidoc[]
 
-[[filebeat-starting]]
-=== Step 5: Starting Filebeat
+[[load-kibana-dashboards]]
+=== Step 5: Set up the Kibana dashboards
 
-Start Filebeat by issuing the appropriate command for your platform.
+:allplatforms:
+include::../../libbeat/docs/dashboards.asciidoc[]
+
+[[filebeat-starting]]
+=== Step 6: Start Filebeat
+
+Start Filebeat by issuing the appropriate command for your platform. If you
+are accessing a secured Elasticsearch cluster, make sure you've configured
+credentials as described in <<{beatname_lc}-configuration>>.
 
 NOTE: If you use an init.d script to start Filebeat on deb or rpm, you can't
 specify command line flags (see <<command-line-options>>). To specify flags,
@@ -228,16 +237,16 @@ start Filebeat in the foreground.
 
 *deb:*
 
-[source,shell]
+["source","sh",subs="attributes"]
 ----------------------------------------------------------------------
-sudo /etc/init.d/filebeat start
+sudo service {beatname_lc} start
 ----------------------------------------------------------------------
 
 *rpm:*
 
-[source,shell]
+["source","sh",subs="attributes"]
 ----------------------------------------------------------------------
-sudo /etc/init.d/filebeat start
+sudo service {beatname_lc} start
 ----------------------------------------------------------------------
 
 *docker:*
@@ -255,9 +264,10 @@ sudo chown root filebeat.yml <1>
 sudo ./filebeat -e -c filebeat.yml -d "publish"
 ----------------------------------------------------------------------
 <1> You'll be running Filebeat as root, so you need to change ownership
-of the configuration file (see
+of the configuration file, or run Filebeat with `--strict.perms=false`
+specified. See
 {libbeat}/config-file-permissions.html[Config File Ownership and Permissions]
-in the _Beats Platform Reference_).
+in the _Beats Platform Reference_.
 
 *win:*
 
@@ -266,28 +276,34 @@ in the _Beats Platform Reference_).
 PS C:\Program Files\Filebeat> Start-Service filebeat
 ----------------------------------------------------------------------
 
+
 By default, Windows log files are stored in `C:\ProgramData\filebeat\Logs`.
 
 Filebeat is now ready to send log files to your defined output.
 
-[[filebeat-index-pattern]]
-=== Step 6: Loading the Kibana Index Pattern
+[[view-kibana-dashboards]]
+=== Step 7: View the sample Kibana dashboards
 
-We don't offer prebuilt dashboards for visualizing Filebeat data. However, to make it easier for you to explore Filebeat
-data in Kibana, we've created a Filebeat index pattern: `filebeat-*`. To load this pattern, you can use the script
-that's provided for importing dashboards:
+To make it easier for you to explore Filebeat data in Kibana, we've created
+example {beatname_uc} dashboards. You loaded the dashboards earlier when you
+ran the `setup` command.
 
-[source,shell]
-----------------------------------------------------------------------
-./scripts/import_dashboards -only-index
-----------------------------------------------------------------------
+include::../../libbeat/docs/opendashboards.asciidoc[]
 
-For more information about running the script, see
-{beatsdevguide}/import-dashboards.html[Importing Existing Beat Dashboards] in the _Beats Platform Reference_.
+These dashboards are designed to work out-of-the box when you use
+<<filebeat-modules-overview,Filebeat modules>>. However, you can also use them
+as examples and {kibana-ref}/dashboard.html[customize] them to meet your needs
+even if you aren't using Filebeat modules.
 
-After you've created the index pattern, you can select the `filebeat-*` index pattern in Kibana to explore
-Filebeat data.
+To populate the example dashboards with data, you need to either
+<<configuring-ingest-node,define ingest node pipelines>> or use Logstash to
+parse the data into the fields expected by the dashboards. If you are using
+Logstash, see the
+{logstashdoc}/logstash-config-for-filebeat-modules.html[configuration examples]
+in the Logstash documentation for help parsing the log formats supported
+by the dashboards.
 
-image:./images/filebeat-discover-tab.png[]
+Here is an example of the Filebeat system dashboard:
 
-TIP: If you don't see `filebeat-*` in the list of available index patterns, try refreshing the page in your browser.
+[role="screenshot"]
+image:./images/kibana-system.png[]

@@ -1,3 +1,1 @@
-=== kubernetes pod MetricSet
-
-This is the pod metricset of the module kubernetes.
+This is the `pod` metricset of the Kubernetes module.

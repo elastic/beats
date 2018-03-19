@@ -1,0 +1,66 @@
+{
+  "description": "Pipeline for parsing Kafka log messages",
+  "processors": [
+    {
+      "grok": {
+        "field": "message",
+        "trace_match": true,
+        "patterns": [
+          "(?m)%{TIMESTAMP_ISO8601:kafka.log.timestamp}. %{LOGLEVEL:kafka.log.level} +%{JAVALOGMESSAGE:kafka.log.message} \\(%{JAVACLASS:kafka.log.class}\\)$[ \\n]*(?'kafka.log.trace.full'.*)"
+        ]
+      }
+    },
+    {
+      "grok": {
+        "field": "kafka.log.message",
+        "patterns": [
+          "\\[%{DATA:kafka.log.component}\\][,:. ] +%{JAVALOGMESSAGE:kafka.log.message}"
+        ],
+        "on_failure": [
+          {
+            "set": {
+              "field": "kafka.log.component",
+              "value": "unknown"
+            }
+          }
+        ]
+      }
+    },
+    {
+      "grok": {
+        "field": "kafka.log.trace.full",
+        "ignore_missing": true,
+        "patterns": [
+          "%{JAVACLASS:kafka.log.trace.class}:\\s*%{JAVALOGMESSAGE:kafka.log.trace.message}"
+        ],
+        "on_failure": [
+          {
+            "remove": {
+              "field": "kafka.log.trace"
+            }
+          }
+        ]
+      }
+    },
+    {
+      "rename": {
+        "field": "@timestamp",
+        "target_field": "read_timestamp"
+      }
+    },
+    {
+      "date": {
+        "field": "kafka.log.timestamp",
+        "target_field": "@timestamp",
+        "formats": ["yyyy-MM-dd HH:mm:ss,SSS"]
+      }
+    },
+    {"remove": {"field": "kafka.log.timestamp" }}
+  ],
+  "on_failure" : [{
+    "set" : {
+      "field" : "error.log",
+      "value" : "{{ _ingest.on_failure_message }}"
+    }
+  }]
+}

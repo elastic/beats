@@ -11,6 +11,9 @@ import time
 import yaml
 from datetime import datetime, timedelta
 
+from .compose import ComposeMixin
+
+
 BEAT_REQUIRED_FIELDS = ["@timestamp",
                         "beat.name", "beat.hostname", "beat.version"]
 
@@ -101,7 +104,7 @@ class Proc(object):
             pass
 
 
-class TestCase(unittest.TestCase):
+class TestCase(unittest.TestCase, ComposeMixin):
 
     @classmethod
     def setUpClass(self):
@@ -120,6 +123,13 @@ class TestCase(unittest.TestCase):
         # Create build path
         build_dir = self.beat_path + "/build"
         self.build_path = build_dir + "/system-tests/"
+
+        # Start the containers needed to run these tests
+        self.compose_up()
+
+    @classmethod
+    def tearDownClass(self):
+        self.compose_down()
 
     def run_beat(self,
                  cmd=None,
@@ -168,7 +178,7 @@ class TestCase(unittest.TestCase):
                 "-test.coverprofile",
                 os.path.join(self.working_dir, "coverage.cov"),
                 "-path.home", os.path.normpath(self.working_dir),
-                "-c", os.path.join(self.working_dir, config)
+                "-c", os.path.join(self.working_dir, config),
                 ]
 
         if logging_args:
@@ -197,7 +207,10 @@ class TestCase(unittest.TestCase):
 
         kargs["beat"] = self
         output_str = template.render(**kargs)
-        with open(os.path.join(self.working_dir, output), "wb") as f:
+
+        output_path = os.path.join(self.working_dir, output)
+        with open(output_path, "wb") as f:
+            os.chmod(output_path, 0o600)
             f.write(output_str.encode('utf8'))
 
     # Returns output as JSON object with flattened fields (. notation)
@@ -217,7 +230,8 @@ class TestCase(unittest.TestCase):
                     break
 
                 try:
-                    jsons.append(self.flatten_object(json.loads(line), []))
+                    jsons.append(self.flatten_object(json.loads(
+                        line, object_pairs_hook=self.json_raise_on_duplicates), []))
                 except:
                     print("Fail to load the json {}".format(line))
                     raise
@@ -239,8 +253,21 @@ class TestCase(unittest.TestCase):
                     # hit EOF
                     break
 
-                jsons.append(json.loads(line))
+                event = json.loads(line, object_pairs_hook=self.json_raise_on_duplicates)
+                del event['@metadata']
+                jsons.append(event)
         return jsons
+
+    def json_raise_on_duplicates(self, ordered_pairs):
+        """Reject duplicate keys. To be used as a custom hook in JSON unmarshaling
+           to error out in case of any duplicates in the keys."""
+        d = {}
+        for k, v in ordered_pairs:
+            if k in d:
+                raise ValueError("duplicate key: %r" % (k,))
+            else:
+                d[k] = v
+        return d
 
     def copy_files(self, files, source_dir="files/"):
         for file_ in files:
@@ -250,7 +277,10 @@ class TestCase(unittest.TestCase):
     def setUp(self):
 
         self.template_env = jinja2.Environment(
-            loader=jinja2.FileSystemLoader(self.beat_path)
+            loader=jinja2.FileSystemLoader([
+                self.beat_path,
+                os.path.abspath(os.path.join(self.beat_path, "../libbeat"))
+            ])
         )
 
         # create working dir
@@ -259,6 +289,11 @@ class TestCase(unittest.TestCase):
         if os.path.exists(self.working_dir):
             shutil.rmtree(self.working_dir)
         os.makedirs(self.working_dir)
+
+        fields_yml = os.path.join(self.beat_path, "fields.yml")
+        # Only add it if it exists
+        if os.path.isfile(fields_yml):
+            shutil.copyfile(fields_yml, os.path.join(self.working_dir, "fields.yml"))
 
         try:
             # update the last_run link
@@ -298,6 +333,15 @@ class TestCase(unittest.TestCase):
             data = f.read()
 
         return data
+
+    def wait_log_contains(self, msg, logfile=None,
+                          max_timeout=10, poll_interval=0.1,
+                          name="log_contains"):
+        self.wait_until(
+            cond=lambda: self.log_contains(msg, logfile),
+            max_timeout=max_timeout,
+            poll_interval=poll_interval,
+            name=name)
 
     def log_contains(self, msg, logfile=None):
         """
@@ -392,7 +436,9 @@ class TestCase(unittest.TestCase):
         """
         for o in objs:
             for key in o.keys():
-                if key not in dict_fields and key not in expected_fields:
+                known = key in dict_fields or key in expected_fields
+                ismeta = key.startswith('@metadata.')
+                if not(known or ismeta):
                     raise Exception("Unexpected key '{}' found"
                                     .format(key))
 
@@ -416,6 +462,10 @@ class TestCase(unittest.TestCase):
                 return fields, dictfields
 
             for field in doc_list:
+
+                # Skip fields without name entry
+                if "name" not in field:
+                    continue
 
                 # Chain together names
                 if name != "":
@@ -501,4 +551,13 @@ class TestCase(unittest.TestCase):
         return "http://{host}:{port}".format(
             host=os.getenv("ES_HOST", "localhost"),
             port=os.getenv("ES_PORT", "9200"),
+        )
+
+    def get_kibana_url(self):
+        """
+        Returns kibana host URL
+        """
+        return "http://{host}:{port}".format(
+            host=os.getenv("KIBANA_HOST", "localhost"),
+            port=os.getenv("KIBANA_PORT", "5601"),
         )

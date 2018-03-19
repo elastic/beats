@@ -1,17 +1,17 @@
 package nfs
 
 import (
+	"github.com/elastic/beats/libbeat/beat"
 	"github.com/elastic/beats/libbeat/common"
 )
 
 type nfs struct {
 	vers  uint32
 	proc  uint32
-	event common.MapStr
+	event beat.Event
 }
 
 func (nfs *nfs) getRequestInfo(xdr *xdr) common.MapStr {
-
 	nfsInfo := common.MapStr{}
 	nfsInfo["version"] = nfs.vers
 

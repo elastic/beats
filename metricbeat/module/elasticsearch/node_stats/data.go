@@ -43,6 +43,19 @@ var (
 				},
 			}),
 		}),
+		"fs": c.Dict("fs", s.Schema{
+			"summary": c.Dict("total", s.Schema{
+				"total": s.Object{
+					"bytes": c.Int("total_in_bytes"),
+				},
+				"free": s.Object{
+					"bytes": c.Int("free_in_bytes"),
+				},
+				"available": s.Object{
+					"bytes": c.Int("available_in_bytes"),
+				},
+			}),
+		}),
 	}
 
 	poolSchema = s.Schema{
@@ -69,7 +82,6 @@ var (
 )
 
 func eventsMapping(content []byte) ([]common.MapStr, error) {
-
 	nodesStruct := struct {
 		ClusterName string                            `json:"cluster_name"`
 		Nodes       map[string]map[string]interface{} `json:"nodes"`

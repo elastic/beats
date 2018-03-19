@@ -1,10 +1,10 @@
 - key: jolokia
   title: "Jolokia"
   description: >
-    []beta
-
-    Jolokia Module
+    Jolokia module
   short_config: false
+  release: ga
+  settings: ["ssl"]
   fields:
     - name: jolokia
       type: group

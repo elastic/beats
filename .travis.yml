@@ -14,6 +14,7 @@ env:
     - GOX_FLAGS="-arch amd64"
     - DOCKER_COMPOSE_VERSION=1.11.1
     - GO_VERSION="$(cat .go-version)"
+    - TRAVIS_ETCD_VERSION=v3.2.8
 
 jobs:
   include:
@@ -43,6 +44,20 @@ jobs:
       go: $GO_VERSION
       stage: test
 
+    # Auditbeat
+    - os: linux
+      env: TARGETS="-C auditbeat testsuite"
+      go: $GO_VERSION
+      stage: test
+    - os: osx
+      env: TARGETS="TEST_ENVIRONMENT=0 -C auditbeat testsuite"
+      go: $GO_VERSION
+      stage: test
+    - os: linux
+      env: TARGETS="-C auditbeat crosscompile"
+      go: $GO_VERSION
+      stage: test
+
     # Libbeat
     - os: linux
       env: TARGETS="-C libbeat testsuite"
@@ -50,6 +65,10 @@ jobs:
       stage: test
     - os: linux
       env: TARGETS="-C libbeat crosscompile"
+      go: $GO_VERSION
+      stage: test
+    - os: linux
+      env: TARGETS="-C libbeat stress-tests"
       go: $GO_VERSION
       stage: test
 
@@ -79,12 +98,6 @@ jobs:
       go: $GO_VERSION
       stage: test
 
-    # Dashboards
-    - os: linux
-      env: TARGETS="-C dev-tools/cmd/import_dashboards"
-      go: $GO_VERSION
-      stage: test
-
     # Generators
     - os: linux
       env: TARGETS="-C generator/metricbeat test"
@@ -93,6 +106,26 @@ jobs:
     - os: linux
       env: TARGETS="-C generator/beat test"
       go: $GO_VERSION
+      stage: test
+
+    # Kubernetes
+    - os: linux
+      install: deploy/kubernetes/.travis/setup.sh
+      env:
+        - TARGETS="-C deploy/kubernetes test"
+        - TRAVIS_KUBE_VERSION=v1.6.11
+      stage: test
+    - os: linux
+      install: deploy/kubernetes/.travis/setup.sh
+      env:
+        - TARGETS="-C deploy/kubernetes test"
+        - TRAVIS_KUBE_VERSION=v1.7.7
+      stage: test
+    - os: linux
+      install: deploy/kubernetes/.travis/setup.sh
+      env:
+        - TARGETS="-C deploy/kubernetes test"
+        - TRAVIS_KUBE_VERSION=v1.8.0
       stage: test
 
 addons:
@@ -127,6 +160,7 @@ notifications:
 
 after_success:
   # Copy full.cov to coverage.txt because codecov.io requires this file
+  - test -f auditbeat/build/coverage/full.cov && bash <(curl -s https://codecov.io/bash) -f auditbeat/build/coverage/full.cov
   - test -f filebeat/build/coverage/full.cov && bash <(curl -s https://codecov.io/bash) -f filebeat/build/coverage/full.cov
   - test -f heartbeat/build/coverage/full.cov && bash <(curl -s https://codecov.io/bash) -f heartbeat/build/coverage/full.cov
   - test -f libbeat/build/coverage/full.cov && bash <(curl -s https://codecov.io/bash) -f libbeat/build/coverage/full.cov

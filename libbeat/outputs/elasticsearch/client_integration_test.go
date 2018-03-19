@@ -3,22 +3,25 @@
 package elasticsearch
 
 import (
-	"os"
+	"math/rand"
 	"strings"
 	"testing"
 	"time"
 
+	"github.com/stretchr/testify/assert"
+
+	"github.com/elastic/beats/libbeat/beat"
 	"github.com/elastic/beats/libbeat/common"
 	"github.com/elastic/beats/libbeat/logp"
 	"github.com/elastic/beats/libbeat/outputs"
-
-	"github.com/stretchr/testify/assert"
+	"github.com/elastic/beats/libbeat/outputs/elasticsearch/internal"
+	"github.com/elastic/beats/libbeat/outputs/outest"
+	"github.com/elastic/beats/libbeat/outputs/outil"
 )
 
 func TestClientConnect(t *testing.T) {
-
-	client := GetTestingElasticsearch()
-	err := client.Connect(5 * time.Second)
+	client := getTestingElasticsearch(t)
+	err := client.Connect()
 	assert.NoError(t, err)
 }
 
@@ -31,12 +34,15 @@ func TestClientPublishEvent(t *testing.T) {
 	// drop old index preparing test
 	client.Delete(index, "", "", nil)
 
-	event := outputs.Data{Event: common.MapStr{
-		"@timestamp": common.Time(time.Now()),
-		"type":       "libbeat",
-		"message":    "Test message from libbeat",
-	}}
-	err := output.PublishEvent(nil, outputs.Options{Guaranteed: true}, event)
+	batch := outest.NewBatch(beat.Event{
+		Timestamp: time.Now(),
+		Fields: common.MapStr{
+			"type":    "libbeat",
+			"message": "Test message from libbeat",
+		},
+	})
+
+	err := output.Publish(batch)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -57,9 +63,7 @@ func TestClientPublishEvent(t *testing.T) {
 func TestClientPublishEventWithPipeline(t *testing.T) {
 	type obj map[string]interface{}
 
-	if testing.Verbose() {
-		logp.LogInit(logp.LOG_DEBUG, "", false, true, []string{"elasticsearch"})
-	}
+	logp.TestingSetup(logp.WithSelectors("elasticsearch"))
 
 	index := "beat-int-pub-single-with-pipeline"
 	pipeline := "beat-int-pub-single-pipeline"
@@ -75,9 +79,8 @@ func TestClientPublishEventWithPipeline(t *testing.T) {
 		t.Skip("Skipping tests as pipeline not available in 2.x releases")
 	}
 
-	publish := func(event common.MapStr) {
-		opts := outputs.Options{Guaranteed: true}
-		err := output.PublishEvent(nil, opts, outputs.Data{Event: event})
+	publish := func(event beat.Event) {
+		err := output.Publish(outest.NewBatch(event))
 		if err != nil {
 			t.Fatal(err)
 		}
@@ -114,19 +117,21 @@ func TestClientPublishEventWithPipeline(t *testing.T) {
 		t.Fatalf("Test pipeline %v not created", pipeline)
 	}
 
-	publish(common.MapStr{
-		"@timestamp": common.Time(time.Now()),
-		"type":       "libbeat",
-		"message":    "Test message 1",
-		"pipeline":   pipeline,
-		"testfield":  0,
-	})
-	publish(common.MapStr{
-		"@timestamp": common.Time(time.Now()),
-		"type":       "libbeat",
-		"message":    "Test message 2",
-		"testfield":  0,
-	})
+	publish(beat.Event{
+		Timestamp: time.Now(),
+		Fields: common.MapStr{
+			"type":      "libbeat",
+			"message":   "Test message 1",
+			"pipeline":  pipeline,
+			"testfield": 0,
+		}})
+	publish(beat.Event{
+		Timestamp: time.Now(),
+		Fields: common.MapStr{
+			"type":      "libbeat",
+			"message":   "Test message 2",
+			"testfield": 0,
+		}})
 
 	_, _, err = client.Refresh(index)
 	if err != nil {
@@ -140,9 +145,7 @@ func TestClientPublishEventWithPipeline(t *testing.T) {
 func TestClientBulkPublishEventsWithPipeline(t *testing.T) {
 	type obj map[string]interface{}
 
-	if testing.Verbose() {
-		logp.LogInit(logp.LOG_DEBUG, "", false, true, []string{"elasticsearch"})
-	}
+	logp.TestingSetup(logp.WithSelectors("elasticsearch"))
 
 	index := "beat-int-pub-bulk-with-pipeline"
 	pipeline := "beat-int-pub-bulk-pipeline"
@@ -157,9 +160,8 @@ func TestClientBulkPublishEventsWithPipeline(t *testing.T) {
 		t.Skip("Skipping tests as pipeline not available in 2.x releases")
 	}
 
-	publish := func(events ...outputs.Data) {
-		opts := outputs.Options{Guaranteed: true}
-		err := output.BulkPublish(nil, opts, events)
+	publish := func(events ...beat.Event) {
+		err := output.Publish(outest.NewBatch(events...))
 		if err != nil {
 			t.Fatal(err)
 		}
@@ -197,19 +199,21 @@ func TestClientBulkPublishEventsWithPipeline(t *testing.T) {
 	}
 
 	publish(
-		outputs.Data{Event: common.MapStr{
-			"@timestamp": common.Time(time.Now()),
-			"type":       "libbeat",
-			"message":    "Test message 1",
-			"pipeline":   pipeline,
-			"testfield":  0,
-		}},
-		outputs.Data{Event: common.MapStr{
-			"@timestamp": common.Time(time.Now()),
-			"type":       "libbeat",
-			"message":    "Test message 2",
-			"testfield":  0,
-		}},
+		beat.Event{
+			Timestamp: time.Now(),
+			Fields: common.MapStr{
+				"type":      "libbeat",
+				"message":   "Test message 1",
+				"pipeline":  pipeline,
+				"testfield": 0,
+			}},
+		beat.Event{
+			Timestamp: time.Now(),
+			Fields: common.MapStr{
+				"type":      "libbeat",
+				"message":   "Test message 2",
+				"testfield": 0,
+			}},
 	)
 
 	_, _, err = client.Refresh(index)
@@ -221,11 +225,11 @@ func TestClientBulkPublishEventsWithPipeline(t *testing.T) {
 	assert.Equal(t, 1, getCount("testfield:0")) // no pipeline
 }
 
-func connectTestEs(t *testing.T, cfg interface{}) (outputs.BulkOutputer, *Client) {
+func connectTestEs(t *testing.T, cfg interface{}) (outputs.Client, *Client) {
 	config, err := common.NewConfigFrom(map[string]interface{}{
-		"hosts":            GetEsHost(),
-		"username":         os.Getenv("ES_USER"),
-		"password":         os.Getenv("ES_PASS"),
+		"hosts":            internal.GetEsHost(),
+		"username":         internal.GetUser(),
+		"password":         internal.GetPass(),
 		"template.enabled": false,
 	})
 	if err != nil {
@@ -242,15 +246,43 @@ func connectTestEs(t *testing.T, cfg interface{}) (outputs.BulkOutputer, *Client
 		t.Fatal(err)
 	}
 
-	output, err := New(common.BeatInfo{Beat: "libbeat"}, config)
+	output, err := makeES(beat.Info{Beat: "libbeat"}, outputs.NewNilObserver(), config)
 	if err != nil {
 		t.Fatal(err)
 	}
 
-	es := output.(*elasticsearchOutput)
-	client := es.randomClient()
-	// Load version number
-	client.Connect(3 * time.Second)
+	type clientWrap interface {
+		outputs.NetworkClient
+		Client() outputs.NetworkClient
+	}
+	client := randomClient(output).(clientWrap).Client().(*Client)
 
-	return es, client
+	// Load version number
+	client.Connect()
+
+	return client, client
+}
+
+// getTestingElasticsearch creates a test client.
+func getTestingElasticsearch(t internal.TestLogger) *Client {
+	client, err := NewClient(ClientSettings{
+		URL:              internal.GetURL(),
+		Index:            outil.MakeSelector(),
+		Username:         internal.GetUser(),
+		Password:         internal.GetUser(),
+		Timeout:          60 * time.Second,
+		CompressionLevel: 3,
+	}, nil)
+	internal.InitClient(t, client, err)
+	return client
+}
+
+func randomClient(grp outputs.Group) outputs.NetworkClient {
+	L := len(grp.Clients)
+	if L == 0 {
+		panic("no elasticsearch client")
+	}
+
+	client := grp.Clients[rand.Intn(L)]
+	return client.(outputs.NetworkClient)
 }

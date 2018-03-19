@@ -6,10 +6,15 @@ services:
       - proxy_dep
     env_file:
       - ${PWD}/build/test.env
-      - ${PWD}/prospector/redis/_meta/env
+      - ${PWD}/input/redis/_meta/env
+    environment:
+      - KIBANA_HOST=kibana
+      - KIBANA_PORT=5601
     working_dir: /go/src/github.com/elastic/beats/filebeat
     volumes:
       - ${PWD}/..:/go/src/github.com/elastic/beats/
+      # We launch docker containers to test docker autodiscover:
+      - /var/run/docker.sock:/var/run/docker.sock
     command: make
 
   # This is a proxy used to block beats until all services are healthy.
@@ -18,12 +23,18 @@ services:
     image: busybox
     depends_on:
       elasticsearch: { condition: service_healthy }
+      kibana:        { condition: service_healthy }
       redis:         { condition: service_healthy }
 
   elasticsearch:
     extends:
-      file: ../testing/environments/${TESTING_ENVIRONMENT}.yml
+      file: ${ES_BEATS}/testing/environments/${TESTING_ENVIRONMENT}.yml
       service: elasticsearch
 
+  kibana:
+    extends:
+      file: ${ES_BEATS}/testing/environments/${TESTING_ENVIRONMENT}.yml
+      service: kibana
+
   redis:
-    build: ${PWD}/prospector/redis/_meta
+    build: ${PWD}/input/redis/_meta

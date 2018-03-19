@@ -1,0 +1,170 @@
+[[configuration-ssl]]
+== Specify SSL settings
+
+You can specify SSL options for any <<configuring-output,output>> that supports
+SSL. You can also specify SSL options when you
+<<setup-kibana-endpoint,set up the Kibana endpoint>>.
+
+Example output config with SSL enabled:
+
+[source,yaml]
+----
+output.elasticsearch.hosts: ["192.168.1.42:9200"]
+output.elasticsearch.ssl.certificate_authorities: ["/etc/pki/root/ca.pem"]
+output.elasticsearch.ssl.certificate: "/etc/pki/client/cert.pem"
+output.elasticsearch.ssl.key: "/etc/pki/client/cert.key"
+----
+
+ifndef::only-elasticsearch[]
+Also see <<configuring-ssl-logstash>>.
+endif::[]
+
+Example Kibana endpoint config with SSL enabled:
+
+[source,yaml]
+----
+setup.kibana.host: "192.0.2.255:5601"
+setup.kibana.protocol: "https"
+setup.kibana.ssl.enabled: true
+setup.kibana.ssl.certificate_authorities: ["/etc/pki/root/ca.pem"]
+setup.kibana.ssl.certificate: "/etc/pki/client/cert.pem"
+setup.kibana.ssl.key: "/etc/pki/client/cert.key
+----
+
+[float]
+=== Configuration options
+
+You can specify the following options in the `ssl` section of the +{beatname_lc}.yml+ config file:
+
+[float]
+==== `enabled`
+
+The `enabled` setting can be used to disable the ssl configuration by setting
+it to `false`. The default value is `true`.
+
+NOTE: SSL settings are disabled if either `enabled` is set to `false` or the
+`ssl` section is missing.
+
+[float]
+==== `certificate_authorities`
+
+The list of root certificates for server verifications. If `certificate_authorities` is empty or not set, the trusted certificate authorities of the host system are used.
+
+[float]
+[[certificate]]
+==== `certificate: "/etc/pki/client/cert.pem"`
+
+The path to the certificate for SSL client authentication. If the certificate
+is not specified, client authentication is not available. The connection
+might fail if the server requests client authentication. If the SSL server does not
+require client authentication, the certificate will be loaded, but not requested or used
+by the server.
+
+When this option is configured, the <<certificate_key,`certificate_key`>> option is also required.
+
+[float]
+[[certificate_key]]
+==== `key: "/etc/pki/client/cert.key"`
+
+The client certificate key used for client authentication. This option is required if <<certificate,`certificate`>> is specified.
+
+[float]
+==== `key_passphrase`
+
+The passphrase used to decrypt an encrypted key stored in the configured `key` file.
+
+[float]
+==== `supported_protocols`
+
+List of allowed SSL/TLS versions. If SSL/TLS server decides for protocol versions
+not configured, the connection will be dropped during or after the handshake. The
+setting is a list of allowed protocol versions:
+`SSLv3`, `TLSv1` for TLS version 1.0, `TLSv1.0`, `TLSv1.1` and `TLSv1.2`.
+
+The default value is `[TLSv1.0, TLSv1.1, TLSv1.2]`.
+
+[float]
+==== `verification_mode`
+
+This option controls whether the client verifies server certificates and host
+names. Valid values are `none` and `full`. If `verification_mode` is set
+to `none`, all server host names and certificates are accepted. In this mode,
+TLS-based connections are susceptible to man-in-the-middle attacks. Use this
+option for testing only.
+
+The default is `full`.
+
+[float]
+==== `cipher_suites`
+
+The list of cipher suites to use. The first entry has the highest priority.
+If this option is omitted, the Go crypto library's default
+suites are used (recommended).
+
+The following cipher suites are available:
+
+* RSA-RC4-128-SHA (disabled by default - RC4 not recommended)
+* RSA-3DES-CBC3-SHA
+* RSA-AES-128-CBC-SHA
+* RSA-AES-256-CBC-SHA
+* ECDHE-ECDSA-RC4-128-SHA (disabled by default - RC4 not recommended)
+* ECDHE-ECDSA-AES-128-CBC-SHA
+* ECDHE-ECDSA-AES-256-CBC-SHA
+* ECDHE-RSA-RC4-128-SHA (disabled by default- RC4 not recommended)
+* ECDHE-RSA-3DES-CBC3-SHA
+* ECDHE-RSA-AES-128-CBC-SHA
+* ECDHE-RSA-AES-256-CBC-SHA
+* ECDHE-RSA-AES-128-GCM-SHA256 (TLS 1.2 only)
+* ECDHE-ECDSA-AES-128-GCM-SHA256 (TLS 1.2 only)
+* ECDHE-RSA-AES-256-GCM-SHA384 (TLS 1.2 only)
+* ECDHE-ECDSA-AES-256-GCM-SHA384 (TLS 1.2 only)
+
+Here is a list of acronyms used in defining the cipher suites:
+
+* 3DES:
+  Cipher suites using triple DES
+
+* AES-128/256:
+  Cipher suites using AES with 128/256-bit keys.
+
+* CBC:
+  Cipher using Cipher Block Chaining as block cipher mode.
+
+* ECDHE:
+  Cipher suites using Elliptic Curve Diffie-Hellman (DH) ephemeral key exchange.
+
+* ECDSA:
+  Cipher suites using Elliptic Curve Digital Signature Algorithm for authentication.
+
+* GCM:
+  Galois/Counter mode is used for symmetric key cryptography.
+
+* RC4:
+  Cipher suites using RC4.
+
+* RSA:
+  Cipher suites using RSA.
+
+* SHA, SHA256, SHA384:
+  Cipher suites using SHA-1, SHA-256 or SHA-384.
+
+[float]
+==== `curve_types`
+
+The list of curve types for ECDHE (Elliptic Curve Diffie-Hellman ephemeral key exchange).
+
+The following elliptic curve types are available:
+
+* P-256
+* P-384
+* P-521
+
+[float]
+==== `renegotiation`
+
+This configures what types of TLS renegotiation are supported. The valid options
+are `never`, `once`, and `freely`. The default value is never.
+
+* `never` - Disables renegotiation.
+* `once` - Allows a remote server to request renegotiation once per connection.
+* `freely` - Allows a remote server to repeatedly request renegotiation.

@@ -4,6 +4,7 @@ from filebeat import BaseTest
 import os
 import codecs
 import time
+import io
 
 """
 Test Harvesters
@@ -58,12 +59,19 @@ class Test(BaseTest):
         self.wait_until(
             lambda: self.output_has(lines=iterations1 + 1), max_timeout=10)
 
-        filebeat.check_kill_and_wait()
-
-        data = self.get_registry()
+        # Wait until registry file is created
+        self.wait_until(
+            lambda: self.log_contains_count("Registry file updated") > 1)
 
         # Make sure new file was picked up. As it has the same file name,
         # one entry for the new and one for the old should exist
+        self.wait_until(
+            lambda: len(self.get_registry()) == 2, max_timeout=10)
+
+        filebeat.check_kill_and_wait()
+
+        # Check registry has 2 entries after shutdown
+        data = self.get_registry()
         assert len(data) == 2
 
     def test_close_removed(self):
@@ -261,10 +269,15 @@ class Test(BaseTest):
         with open(logfile, 'w') as f:
             f.write(message + "\n")
 
+        # wait for at least one event being written
+        self.wait_until(
+            lambda: self.output_has(lines=1),
+            max_timeout=10)
+
         # Wait until state is written
         self.wait_until(
             lambda: self.log_contains(
-                "Registrar states cleaned up"),
+                "Registrar state updates processed"),
             max_timeout=15)
 
         filebeat.check_kill_and_wait()
@@ -393,6 +406,9 @@ class Test(BaseTest):
         for n in range(0, iterations1):
             file.write("example data")
             file.write("\n")
+            # Make sure some contents are written to disk so the harvested is able to read it.
+            file.flush()
+            os.fsync(file)
             time.sleep(0.001)
 
         file.close()
@@ -770,18 +786,22 @@ class Test(BaseTest):
         """
         self.render_config_template(
             path=os.path.abspath(self.working_dir) + "/log/*",
-            encoding="GBK",  # Set invalid encoding for entry below which is actually uft-8
+            encoding="utf-16be",
         )
 
         os.mkdir(self.working_dir + "/log/")
 
         logfile = self.working_dir + "/log/test.log"
 
-        with open(logfile, 'w') as file:
-            file.write("hello world1" + "\n")
-
-            file.write('<meta content="瞭解「Google 商業解決方案」提供的各類服務軟件如何助您分析資料、刊登廣告、提升網站成效等。" name="description">' + '\n')
-            file.write("hello world2" + "\n")
+        with io.open(logfile, 'w', encoding="utf-16") as file:
+            file.write(u'hello world1')
+            file.write(u"\n")
+        with io.open(logfile, 'a', encoding="utf-16") as file:
+            file.write(u"\U00012345=Ra")
+        with io.open(logfile, 'a', encoding="utf-16") as file:
+            file.write(u"\n")
+            file.write(u"hello world2")
+            file.write(u"\n")
 
         filebeat = self.start_beat()
 
@@ -792,7 +812,7 @@ class Test(BaseTest):
 
         # Wait until error shows up
         self.wait_until(
-            lambda: self.log_contains("Error decoding line: simplifiedchinese: invalid GBK encoding"),
+            lambda: self.log_contains("Error decoding line: transform: short source buffer"),
             max_timeout=5)
 
         filebeat.check_kill_and_wait()

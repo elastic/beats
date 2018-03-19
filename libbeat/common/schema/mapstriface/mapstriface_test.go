@@ -5,9 +5,10 @@ import (
 	"testing"
 	"time"
 
+	"github.com/stretchr/testify/assert"
+
 	"github.com/elastic/beats/libbeat/common"
 	s "github.com/elastic/beats/libbeat/common/schema"
-	"github.com/stretchr/testify/assert"
 )
 
 func TestConversions(t *testing.T) {
@@ -26,6 +27,12 @@ func TestConversions(t *testing.T) {
 		"testObj": map[string]interface{}{
 			"testObjString": "hello, object",
 		},
+		"rawObject": map[string]interface{}{
+			"nest1": map[string]interface{}{
+				"nest2": "world",
+			},
+		},
+		"testArray":        []string{"a", "b", "c"},
 		"testNonNestedObj": "hello from top level",
 		"testTime":         ts,
 		"commonTime":       cTs,
@@ -54,6 +61,8 @@ func TestConversions(t *testing.T) {
 		"test_obj_2": Dict("testObj", s.Schema{
 			"test": Str("testObjString"),
 		}),
+		"test_nested":       Ifc("rawObject"),
+		"test_array":        Ifc("testArray"),
 		"test_error_int":    Int("testErrorInt", s.Optional),
 		"test_error_time":   Time("testErrorTime", s.Optional),
 		"test_error_bool":   Bool("testErrorBool", s.Optional),
@@ -77,6 +86,12 @@ func TestConversions(t *testing.T) {
 		"test_obj_2": common.MapStr{
 			"test": "hello, object",
 		},
+		"test_nested": map[string]interface{}{
+			"nest1": map[string]interface{}{
+				"nest2": "world",
+			},
+		},
+		"test_array": []string{"a", "b", "c"},
 	}
 
 	output, _ := schema.Apply(input)

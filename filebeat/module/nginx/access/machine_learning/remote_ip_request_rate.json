@@ -1,0 +1,32 @@
+{
+  "description": "Nginx Access Logs: Detect unusual remote_ips - high request rates",
+  "analysis_config" : {
+    "bucket_span": "1h",
+    "detectors": [
+        {
+        "detector_description": "nginx_access_remote_ip_high_count",
+        "function": "high_count",
+        "over_field_name": "nginx.access.remote_ip"
+      }
+    ],
+    "influencers": [
+      "nginx.access.remote_ip"
+    ]
+  },
+  "data_description": {
+    "time_field": "@timestamp",
+    "time_format": "epoch_ms"
+  },
+  "custom_settings": {
+    "custom_urls": [
+      {
+        "url_name": "Count Explorer",
+        "url_value": "kibana#/dashboard/ML-Nginx-Access-Remote-IP-Count-Explorer?_g=(refreshInterval:(display:Off,pause:!f,value:0),time:(from:\u0027$earliest$\u0027,mode:absolute,to:\u0027$latest$\u0027))&_a=(description:\u0027\u0027,filters:!((\u0027$state\u0027:(store:appState),meta:(alias:!n,disabled:!f,index:\u0027filebeat-*\u0027,key:nginx.access.remote_ip,negate:!f,type:phrase,value:\u0027$nginx.access.remote_ip$\u0027),query:(match:(nginx.access.remote_ip:(query:\u0027$nginx.access.remote_ip$\u0027,type:phrase))))),options:(darkTheme:!f),panels:!((col:1,id:ML-Nginx-Access-Remote-IP-Timechart,panelIndex:1,row:1,size_x:6,size_y:3,type:visualization),(col:7,id:ML-Nginx-Access-Response-Code-Timechart,panelIndex:2,row:1,size_x:6,size_y:3,type:visualization),(col:1,id:ML-Nginx-Access-Top-Remote-IPs-Table,panelIndex:3,row:4,size_x:6,size_y:3,type:visualization),(col:7,id:ML-Nginx-Access-Map,panelIndex:4,row:4,size_x:6,size_y:3,type:visualization),(col:1,id:ML-Nginx-Access-Top-URLs-Table,panelIndex:5,row:7,size_x:12,size_y:9,type:visualization)),query:(query_string:(analyze_wildcard:!t,query:\u0027*\u0027)),timeRestore:!f,title:\u0027ML%20Nginx%20Access%20Remote%20IP%20Count%20Explorer\u0027,uiState:(P-3:(vis:(params:(sort:(columnIndex:!n,direction:!n)))),P-5:(vis:(params:(sort:(columnIndex:!n,direction:!n))))),viewMode:view)"
+      },
+      {
+        "url_name": "Raw Data",
+        "url_value": "kibana#/discover/ML-Filebeat-Nginx-Access?_g=(refreshInterval:(display:Off,pause:!f,value:0),time:(from:\u0027$earliest$\u0027,mode:absolute,to:\u0027$latest$\u0027))&_a=(columns:!(_source),filters:!((\u0027$state\u0027:(store:appState),meta:(alias:!n,disabled:!f,index:\u0027filebeat-*\u0027,key:nginx.access.remote_ip,negate:!f,type:phrase,value:\u0027$nginx.access.remote_ip$\u0027),query:(match:(nginx.access.remote_ip:(query:\u0027$nginx.access.remote_ip$\u0027,type:phrase))))),index:\u0027filebeat-*\u0027,interval:auto,query:(query_string:(analyze_wildcard:!t,query:\u0027*\u0027)),sort:!(\u0027@timestamp\u0027,desc))"
+      }
+    ]
+  }
+}

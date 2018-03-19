@@ -101,7 +101,7 @@ func TestAddMetricSet(t *testing.T) {
 	}
 	f, found := registry.metricSets[moduleName][metricSetName]
 	assert.True(t, found, "metricset not found")
-	assert.NotNil(t, f, "factory fuction is nil")
+	assert.NotNil(t, f, "factory function is nil")
 }
 
 func TestModuleFactory(t *testing.T) {
@@ -126,12 +126,15 @@ func TestMetricSetFactory(t *testing.T) {
 			t.Fatal(err)
 		}
 
-		ms, hp, err := registry.metricSetFactory(moduleName, metricSetName)
+		reg, err := registry.metricSetRegistration(moduleName, metricSetName)
 		if err != nil {
 			t.Fatal(err)
 		}
-		assert.NotNil(t, ms)
-		assert.Nil(t, hp)
+		assert.Equal(t, metricSetName, reg.Name)
+		assert.NotNil(t, reg.Factory)
+		assert.Nil(t, reg.HostParser)
+		assert.False(t, reg.IsDefault)
+		assert.Empty(t, reg.Namespace)
 	})
 
 	t.Run("with HostParser", func(t *testing.T) {
@@ -142,13 +145,61 @@ func TestMetricSetFactory(t *testing.T) {
 			t.Fatal(err)
 		}
 
-		ms, hp, err := registry.metricSetFactory(moduleName, metricSetName)
+		reg, err := registry.metricSetRegistration(moduleName, metricSetName)
 		if err != nil {
 			t.Fatal(err)
 		}
-		assert.NotNil(t, ms)
-		assert.NotNil(t, hp) // Can't compare functions in Go so just check for non-nil.
+		assert.NotNil(t, reg.HostParser) // Can't compare functions in Go so just check for non-nil.
 	})
+
+	t.Run("with options HostParser", func(t *testing.T) {
+		registry := NewRegister()
+		hostParser := func(Module, string) (HostData, error) { return HostData{}, nil }
+		err := registry.addMetricSet(moduleName, metricSetName, fakeMetricSetFactory, WithHostParser(hostParser))
+		if err != nil {
+			t.Fatal(err)
+		}
+
+		reg, err := registry.metricSetRegistration(moduleName, metricSetName)
+		if err != nil {
+			t.Fatal(err)
+		}
+		assert.NotNil(t, reg.HostParser) // Can't compare functions in Go so just check for non-nil.
+	})
+
+	t.Run("with namespace", func(t *testing.T) {
+		const ns = moduleName + "foo.bar"
+
+		registry := NewRegister()
+		err := registry.addMetricSet(moduleName, metricSetName, fakeMetricSetFactory, WithNamespace(ns))
+		if err != nil {
+			t.Fatal(err)
+		}
+
+		reg, err := registry.metricSetRegistration(moduleName, metricSetName)
+		if err != nil {
+			t.Fatal(err)
+		}
+		assert.Equal(t, metricSetName, reg.Name)
+		assert.NotNil(t, reg.Factory)
+		assert.Nil(t, reg.HostParser)
+		assert.False(t, reg.IsDefault)
+		assert.Equal(t, ns, reg.Namespace)
+	})
+}
+
+func TestDefaultMetricSet(t *testing.T) {
+	registry := NewRegister()
+	err := registry.addMetricSet(moduleName, metricSetName, fakeMetricSetFactory, DefaultMetricSet())
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	names, err := registry.defaultMetricSets(moduleName)
+	if err != nil {
+		t.Fatal(err)
+	}
+	assert.Contains(t, names, metricSetName)
 }
 
 func TestMetricSetQuery(t *testing.T) {

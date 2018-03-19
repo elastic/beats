@@ -3,11 +3,16 @@
   description: >
     `pool` contains the metrics that were obtained from the PHP-FPM process
     pool.
+  release: beta
   fields:
     - name: name
       type: keyword
       description: >
         The name of the pool.
+    - name: process_manager
+      type: keyword
+      description: >
+        Static, dynamic or ondemand.
     - name: connections
       type: group
       description: >
@@ -29,6 +34,15 @@
           keep this number low. This property follows from the fact that
           PHP-FPM listens via a socket (TCP or file based), and thus inherits
           some of the characteristics of sockets.
+      - name: max_listen_queue
+        type: long
+        description: >
+          The maximum number of requests in the queue of pending
+          connections since FPM has started.
+      - name: listen_queue_len
+        type: long
+        description: >
+          The size of the socket queue of pending connections.
     - name: processes
       type: group
       description: >
@@ -46,8 +60,31 @@
         description: >
           The number of servers current processing a page - the minimum is `1`
           (so even on a fully idle server, the result will be not read `0`).
+      - name: total
+        type: long
+        description: >
+          The number of idle + active processes.
+      - name: max_active
+        type: long
+        description: >
+          The maximum number of active processes since FPM has started.
+      - name: max_children_reached
+        type: long
+        description: >
+          Number of times, the process limit has been reached,
+          when pm tries to start more children (works only for
+          pm 'dynamic' and 'ondemand').
     - name: slow_requests
       type: long
       description: >
         The number of times a request execution time has exceeded
         `request_slowlog_timeout`.
+    - name: start_since
+      type: long
+      description: >
+        Number of seconds since FPM has started.
+    - name: start_time
+      type: date
+      format: epoch_second
+      description: >
+        The date and time FPM has started.

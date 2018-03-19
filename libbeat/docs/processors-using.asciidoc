@@ -1,5 +1,5 @@
 [[defining-processors]]
-=== Defining Processors
+=== Define processors
 
 You define processors in the +{beatname_lc}.yml+ file to filter and enhance the
 data before sending events to the configured output.
@@ -24,13 +24,13 @@ processors:
 
 Where:
 
-* <processor_name> specifies a <<processors,processor>> that performs some kind
+* `<processor_name>` specifies a <<processors,processor>> that performs some kind
 of action, such as selecting the fields that are exported or adding metadata to
 the event.
-* <when: condition> specifies an optional <<conditions,condition>>. If the
+* `<when: condition>` specifies an optional <<conditions,condition>>. If the
 condition is present, then the action is executed only if the condition is
 fulfilled. If no condition is passed, then the action is always executed.
-* <parameters> is the list of parameters to pass to the processor.
+* `<parameters>` is the list of parameters to pass to the processor.
 
 [[processors]]
 ==== Processors
@@ -45,6 +45,7 @@ The supported processors are:
  * <<include-fields,`include_fields`>>
  * <<add-kubernetes-metadata,`add_kubernetes_metadata`>>
  * <<add-docker-metadata,`add_docker_metadata`>>
+ * <<add-host-metadata,`add_host_metadata`>>
 
 [[conditions]]
 ==== Conditions
@@ -72,7 +73,7 @@ The supported conditions are:
 
 [float]
 [[condition-equals]]
-===== equals
+===== `equals`
 
 With the `equals` condition, you can compare if a field has a certain value.
 The condition accepts only an integer or a string value.
@@ -88,7 +89,7 @@ equals:
 
 [float]
 [[condition-contains]]
-===== contains
+===== `contains`
 
 The `contains` condition checks if a value is part of a field. The field can be
 a string or an array of strings. The condition accepts only a string value.
@@ -104,7 +105,7 @@ contains:
 
 [float]
 [[condition-regexp]]
-===== regexp
+===== `regexp`
 
 The `regexp` condition checks the field against a regular expression. The
 condition accepts only strings.
@@ -120,7 +121,7 @@ regexp:
 
 [float]
 [[condition-range]]
-===== range
+===== `range`
 
 The `range` condition checks if the field is in a certain range of values. The
 condition supports `lt`, `lte`, `gt` and `gte`. The condition accepts only
@@ -158,7 +159,7 @@ range:
 
 [float]
 [[condition-or]]
-===== OR
+===== `or`
 
 The `or` operator receives a list of conditions.
 
@@ -186,7 +187,7 @@ or:
 
 [float]
 [[condition-and]]
-===== AND
+===== `and`
 
 The `and` operator receives a list of conditions.
 
@@ -226,7 +227,7 @@ or:
 
 [float]
 [[condition-not]]
-===== NOT
+===== `not`
 
 The `not` operator receives the condition to negate.
 
@@ -247,7 +248,7 @@ not:
 ------
 
 [[add-cloud-metadata]]
-=== Adding Cloud Metadata
+=== Add cloud metadata
 
 The `add_cloud_metadata` processor enriches each event with instance metadata
 from the machine's hosting provider. At startup it will detect the hosting
@@ -260,6 +261,7 @@ The following cloud providers are supported:
 - Google Compute Engine (GCE)
 - https://www.qcloud.com/?lang=en[Tencent Cloud] (QCloud)
 - Alibaba Cloud (ECS)
+- Azure Virtual Machine
 
 The simple configuration below enables the processor.
 
@@ -365,8 +367,26 @@ ECS instance.
 }
 -------------------------------------------------------------------------------
 
+_Azure Virtual Machine_
+
+[source,json]
+-------------------------------------------------------------------------------
+{
+  "meta": {
+    "cloud": {
+      "provider": "az",
+      "instance_id": "04ab04c3-63de-4709-a9f9-9ab8c0411d5e",
+      "instance_name": "test-az-vm",
+      "machine_type": "Standard_D3_v2",
+      "region": "eastus2"
+    }
+  }
+}
+-------------------------------------------------------------------------------
+
+
 [[add-locale]]
-=== Adding the Local Time Zone
+=== Add the local time zone
 
 The `add_locale` processor enriches each event with the machine's time zone
 offset from UTC or with the name of the time zone. It supports one configuration
@@ -398,7 +418,7 @@ regular time.
 
 
 [[decode-json-fields]]
-=== Decoding JSON Fields
+=== Decode JSON fields
 
 The `decode_json_fields` processor decodes fields containing JSON strings and
 replaces the strings with valid JSON objects.
@@ -410,7 +430,7 @@ processors:
      fields: ["field1", "field2", ...]
      process_array: false
      max_depth: 1
-     target:
+     target: ""
      overwrite_keys: false
 -----------------------------------------------------
 
@@ -423,13 +443,14 @@ arrays. The default is false.
 `target`:: (Optional) The field under which the decoded JSON will be written. By
 default the decoded JSON object replaces the string field from which it was
 read. To merge the decoded JSON fields into the root of the event, specify
-`target` with an empty value (`target:`).
+`target` with an empty string (`target: ""`). Note that the `null` value (`target:`)
+is treated as if the field was not set at all.
 `overwrite_keys`:: (Optional) A boolean that specifies whether keys that already
 exist in the event are overwritten by keys from the decoded JSON object. The
 default value is false.
 
 [[drop-event]]
-=== Dropping Events
+=== Drop events
 
 The `drop_event` processor drops the entire event if the associated condition
 is fulfilled. The condition is mandatory, because without one, all the events
@@ -446,7 +467,7 @@ processors:
 See <<conditions>> for a list of supported conditions.
 
 [[drop-fields]]
-=== Dropping Fields from Events
+=== Drop fields from events
 
 The `drop_fields` processor specifies which fields to drop if a certain
 condition is fulfilled. The condition is optional. If it's missing, the
@@ -468,7 +489,7 @@ NOTE: If you define an empty list of fields under `drop_fields`, then no fields
 are dropped.
 
 [[include-fields]]
-=== Adding Additional Fields to Events
+=== Keep fields from events
 
 The `include_fields` processor specifies which fields to export if a certain
 condition is fulfilled. The condition is optional. If it's missing, the
@@ -493,7 +514,9 @@ NOTE: If you define an empty list of fields under `include_fields`, then only
 the required fields, `@timestamp` and `type`, are exported.
 
 [[add-kubernetes-metadata]]
-=== Adding Kubernetes Metadata
+=== Add Kubernetes metadata
+
+beta[]
 
 The `add_kubernetes_metadata` processor annotates each event with relevant
 metadata based on which Kubernetes pod the event originated from. Each event is
@@ -521,7 +544,7 @@ default. For example, FileBeat enables the `container` indexer, which indexes
 pod metadata based on all container IDs, and a `logs_path` matcher, which takes
 the `source` field, extracts the container ID, and uses it to retrieve metadata.
 
-The configuration below enables the processor when the Beat is run as a pod in
+The configuration below enables the processor when {beatname_lc} is run as a pod in
 Kubernetes.
 
 [source,yaml]
@@ -562,8 +585,23 @@ processors:
           lookup_fields: ["metricset.host"]
 -------------------------------------------------------------------------------
 
+The `add_kubernetes_metadata` processor has the following configuration settings:
+
+`in_cluster`:: (Optional) Use in cluster settings for Kubernetes client, `true`
+by default.
+`host`:: (Optional) In case `in_cluster` is false, use this host to connect to
+Kubernetes API.
+`kube_config`:: (Optional) Use given config file as configuration for Kubernetes
+client.
+`default_indexers.enabled`:: (Optional) Enable/Disable default pod indexers, in
+case you want to specify your own.
+`default_matchers.enabled`:: (Optional) Enable/Disable default pod matchers, in
+case you want to specify your own.
+
 [[add-docker-metadata]]
-=== Adding Docker metadata
+=== Add Docker metadata
+
+beta[]
 
 The `add_docker_metadata` processor annotates each event with relevant metadata
 from Docker containers:
@@ -573,20 +611,78 @@ from Docker containers:
 * Image
 * Labels
 
-Currently it supports enriching events by matching existing fields with the
-container ID in them, for example, cgroup IDs retrieved by metricbeat system
-module:
-
 [source,yaml]
 -------------------------------------------------------------------------------
 processors:
 - add_docker_metadata:
-    match_fields: ["system.process.cgroup.id"]
-  host: "unix:///var/run/docker.sock"
-
-  # To connect to Docker over TLS you must specify a client and CA certificate.
-  #ssl:
-  #  certificate_authority: "/etc/pki/root/ca.pem"
-  #  certificate:           "/etc/pki/client/cert.pem"
-  #  key:                   "/etc/pki/client/cert.key"
+    host: "unix:///var/run/docker.sock"
+    #match_fields: ["system.process.cgroup.id"]
+    #match_pids: ["process.pid", "process.ppid"]
+    #match_source: true
+    #match_source_index: 4
+    #match_short_id: true
+    #cleanup_timeout: 60
+    # To connect to Docker over TLS you must specify a client and CA certificate.
+    #ssl:
+    #  certificate_authority: "/etc/pki/root/ca.pem"
+    #  certificate:           "/etc/pki/client/cert.pem"
+    #  key:                   "/etc/pki/client/cert.key"
 -------------------------------------------------------------------------------
+
+It has the following settings:
+
+`host`:: (Optional) Docker socket (UNIX or TCP socket). It uses
+`unix:///var/run/docker.sock` by default.
+
+`ssl`:: (Optional) SSL configuration to use when connecting to the Docker
+socket.
+
+`match_fields`:: (Optional) A list of fields to match a container ID, at least
+one of them should hold a container ID to get the event enriched.
+
+`match_pids`:: (Optional) A list of fields that contain process IDs. If the
+process is running in Docker then the event will be enriched. The default value
+is `["process.pid", "process.ppid"]`.
+
+`match_source`:: (Optional) Match container ID from a log path present in the
+`source` field. Enabled by default.
+
+`match_short_id`:: (Optional) Match container short ID from a log path present
+in the `source` field. Disabled by default.
+This allows to match directories names that have the first 12 characters
+of the container ID. For example, `/var/log/containers/b7e3460e2b21/*.log`.
+
+`match_source_index`:: (Optional) Index in the source path split by `/` to look
+for container ID. It defaults to 4 to match
+`/var/lib/docker/containers/<container_id>/*.log`
+
+`cleanup_timeout`:: (Optional) Time of inactivity to consider we can clean and
+forget metadata for a container, 60s by default.
+
+
+[[add-host-metadata]]
+=== Add Host metadata
+
+beta[]
+
+The `add_host_metadata` processor annotates each event with relevant metadata from the host machine.
+The fields added to the event are looking as following:
+
+[source,json]
+-------------------------------------------------------------------------------
+{
+   "host":{
+      "architecture":"x86_64",
+      "hostname":"example-host",
+      "id":"",
+      "os":{
+         "family":"darwin",
+         "build":"16G1212",
+         "platform":"darwin",
+         "version":"10.12.6"
+      }
+   }
+}
+-------------------------------------------------------------------------------
+
+NOTE: The host information is refreshed every 5 minutes.

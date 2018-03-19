@@ -3,9 +3,12 @@ package outil
 import (
 	"strings"
 	"testing"
+	"time"
 
-	"github.com/elastic/beats/libbeat/common"
 	"github.com/stretchr/testify/assert"
+
+	"github.com/elastic/beats/libbeat/beat"
+	"github.com/elastic/beats/libbeat/common"
 )
 
 type node map[string]interface{}
@@ -183,7 +186,11 @@ func TestSelector(t *testing.T) {
 			continue
 		}
 
-		actual, err := sel.Select(test.event)
+		event := beat.Event{
+			Timestamp: time.Now(),
+			Fields:    test.event,
+		}
+		actual, err := sel.Select(&event)
 		if err != nil {
 			t.Error(err)
 			continue

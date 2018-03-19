@@ -3,9 +3,10 @@ package docker
 import (
 	"strings"
 
-	"github.com/elastic/beats/libbeat/common"
+	"github.com/docker/docker/api/types"
 
-	"github.com/fsouza/go-dockerclient"
+	"github.com/elastic/beats/libbeat/common"
+	"github.com/elastic/beats/libbeat/common/safemapstr"
 )
 
 type Container struct {
@@ -26,11 +27,14 @@ func (c *Container) ToMapStr() common.MapStr {
 	return m
 }
 
-func NewContainer(container *docker.APIContainers) *Container {
+// NewContainer converts Docker API container to an internal structure, it applies
+// dedot to container labels if dedot is true, or stores them in a nested way if it's
+// false
+func NewContainer(container *types.Container, dedot bool) *Container {
 	return &Container{
 		ID:     container.ID,
 		Name:   ExtractContainerName(container.Names),
-		Labels: DeDotLabels(container.Labels),
+		Labels: DeDotLabels(container.Labels, dedot),
 	}
 }
 
@@ -48,14 +52,20 @@ func ExtractContainerName(names []string) string {
 }
 
 // DeDotLabels returns a new common.MapStr containing a copy of the labels
-// where the dots in each label name have been changed to an underscore.
-func DeDotLabels(labels map[string]string) common.MapStr {
+// where the dots have been converted into nested structure, avoiding
+// possible mapping errors
+func DeDotLabels(labels map[string]string, dedot bool) common.MapStr {
 	outputLabels := common.MapStr{}
 	for k, v := range labels {
-		// This is necessary so that ES does not interpret '.' fields as new
-		// nested JSON objects, and also makes this compatible with ES 2.x.
-		label := strings.Replace(k, ".", "_", -1)
-		outputLabels.Put(label, v)
+		if dedot {
+			// This is necessary so that ES does not interpret '.' fields as new
+			// nested JSON objects, and also makes this compatible with ES 2.x.
+			label := common.DeDot(k)
+			outputLabels.Put(label, v)
+		} else {
+			// If we don't dedot we ensure there are no mapping errors with safemapstr
+			safemapstr.Put(outputLabels, k, v)
+		}
 	}
 
 	return outputLabels

@@ -1,0 +1,40 @@
+{
+    "@timestamp": "2017-10-12T08:05:34.853Z",
+    "beat": {
+        "hostname": "host.example.com",
+        "name": "host.example.com"
+    },
+    "etcd": {
+        "self": {
+            "id": "8e9e05c52164694d",
+            "leaderinfo": {
+                "leader": "8e9e05c52164694d",
+                "starttime": "2017-12-07T07:20:33.241031712Z",
+                "uptime": "9m4.919923089s"
+            },
+            "name": "default",
+            "recv": {
+                "appendrequest": {
+                    "count": 0
+                },
+                "bandwithrate": 0,
+                "pkgrate": 0
+            },
+            "send": {
+                "appendrequest": {
+                    "count": 0
+                },
+                "bandwithrate": 0,
+                "pkgrate": 0
+            },
+            "starttime": "2017-12-07T07:20:32.340598119Z",
+            "state": "StateLeader"
+        }
+    },
+    "metricset": {
+        "host": "etcd:2379",
+        "module": "etcd",
+        "name": "self",
+        "rtt": 115
+    }
+}

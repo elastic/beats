@@ -1,3 +1,1 @@
-=== kafka consumergroup MetricSet
-
-This is the consumergroup metricset of the module kafka.
+This is the `consumergroup` metricset of the Kafka module.

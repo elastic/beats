@@ -1,0 +1,78 @@
+[[configuring-internal-queue]]
+== Configure the internal queue
+
+{beatname_uc} uses an internal queue to store events before publishing them. The
+queue is responsible for buffering and combining events into batches that can
+be consumed by the outputs. The outputs will use bulk operations to send a
+batch of events in one transaction.
+
+You can configure the type and behavior of the internal queue by setting options in the `queue` section of the +{beatname_lc}.yml+ config file.
+
+
+Example configuration:
+
+[source,yaml]
+------------------------------------------------------------------------------
+queue.mem:
+  events: 4096
+------------------------------------------------------------------------------
+
+[float]
+[[configuration-internal-queue-memory]]
+=== Configure the memory qeueue
+
+The memory queue keeps all events in memory. It is the only queue type
+supported right now. 
+
+If no flush interval and no number of events to flush is configured, 
+all events published to this queue will be directly consumed by the outputs.
+To enforce spooling in the queue, set the `flush.min_events` and `flush.timeout` options.
+
+By default `flush.min.events` is set to 2048 and `flush.timeout` is set to 1s.
+
+The output's `bulk_max_size` setting limits the number of events being processed at once.
+
+The memory queue waits for the output to acknowledge or drop events. If
+the queue is full, no new events can be inserted into the memeory queue. Only
+after the signal from the output will the queue free up space for more events to be accepted.
+
+This sample configuration forwards events to the output if 512 events are
+available or the oldest available event is already waiting for 5s in the queue:
+
+[source,yaml]
+------------------------------------------------------------------------------
+queue.mem:
+  events: 4096
+  flush.min_events: 512
+  flush.timeout: 5s
+------------------------------------------------------------------------------
+
+[float]
+==== Configuration options
+
+You can specify the following options in the `queue.mem` section of the +{beatname_lc}.yml+ config file:
+
+[float]
+===== `events`
+
+Number of events the queue can store. 
+
+The default value is 4096 events.
+
+[float]
+===== `flush.min_events`
+
+Minimum number of events required for publishing. If this value is set to 0, the
+output can start publishing events without additional waiting times. Otherwise
+the output has to wait for more events to become available.
+
+The default value is 0.
+
+[float]
+===== `flush.timeout`
+
+Maximum wait time for `flush.min_events` to be fulfilled. If set to 0s, events
+will be immediately available for consumption.
+
+The default values is 0s.
+

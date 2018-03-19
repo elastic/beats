@@ -1,3 +1,4 @@
+import re
 import sys
 import os
 
@@ -28,7 +29,9 @@ class BaseTest(TestCase):
         flat = self.flatten_object(evt, [])
 
         for key in flat.keys():
-            if key not in expected_fields:
+            documented = key in expected_fields
+            metaKey = key.startswith('@metadata.')
+            if not(documented or metaKey):
                 raise Exception("Key '{}' found in event is not documented!".format(key))
 
     def de_dot(self, existing_fields):
@@ -55,15 +58,23 @@ class BaseTest(TestCase):
 
     def assert_no_logged_warnings(self, replace=None):
         """
-        Assert that the log file contains no ERR or WARN lines.
+        Assert that the log file contains no ERROR or WARN lines.
         """
         log = self.get_log()
-        log = log.replace("WARN EXPERIMENTAL", "")
-        log = log.replace("WARN BETA", "")
-        # Jenkins runs as a Windows service and when Jenkins executes theses
+
+        pattern = self.build_log_regex("[cfgwarn]")
+        log = pattern.sub("", log)
+
+        # Jenkins runs as a Windows service and when Jenkins executes these
         # tests the Beat is confused since it thinks it is running as a service.
-        log = log.replace("ERR Error: The service process could not connect to the service controller.", "")
+        pattern = self.build_log_regex("The service process could not connect to the service controller.")
+        log = pattern.sub("", log)
+
         if replace:
             for r in replace:
-                log = log.replace(r, "")
-        self.assertNotRegexpMatches(log, "ERR|WARN")
+                pattern = self.build_log_regex(r)
+                log = pattern.sub("", log)
+        self.assertNotRegexpMatches(log, "ERROR|WARN")
+
+    def build_log_regex(self, message):
+        return re.compile(r"^.*\t(?:ERROR|WARN)\t.*" + message + r".*$", re.MULTILINE)

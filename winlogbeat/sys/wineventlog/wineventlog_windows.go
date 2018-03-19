@@ -10,8 +10,9 @@ import (
 	"runtime"
 	"syscall"
 
-	"github.com/elastic/beats/winlogbeat/sys"
 	"golang.org/x/sys/windows"
+
+	"github.com/elastic/beats/winlogbeat/sys"
 )
 
 // Errors
@@ -197,27 +198,18 @@ func RenderEvent(
 // XML will not include the message, and in this case RenderEvent should be
 // used.
 func RenderEventXML(eventHandle EvtHandle, renderBuf []byte, out io.Writer) error {
-	var bufferUsed, propertyCount uint32
-	err := _EvtRender(0, eventHandle, EvtRenderEventXml, uint32(len(renderBuf)),
-		&renderBuf[0], &bufferUsed, &propertyCount)
-	if err == ERROR_INSUFFICIENT_BUFFER {
-		return sys.InsufficientBufferError{err, int(bufferUsed)}
-	}
-	if err != nil {
-		return err
-	}
-
-	if int(bufferUsed) > len(renderBuf) {
-		return fmt.Errorf("Windows EvtRender reported that wrote %d bytes "+
-			"to the buffer, but the buffer can only hold %d bytes",
-			bufferUsed, len(renderBuf))
-	}
-	return sys.UTF16ToUTF8Bytes(renderBuf[:bufferUsed], out)
+	return renderXML(eventHandle, EvtRenderEventXml, renderBuf, out)
 }
 
-// CreateBookmark creates a new handle to a bookmark. Close must be called on
-// returned EvtHandle when finished with the handle.
-func CreateBookmark(channel string, recordID uint64) (EvtHandle, error) {
+// RenderBookmarkXML renders a bookmark as XML.
+func RenderBookmarkXML(bookmarkHandle EvtHandle, renderBuf []byte, out io.Writer) error {
+	return renderXML(bookmarkHandle, EvtRenderBookmark, renderBuf, out)
+}
+
+// CreateBookmarkFromRecordID creates a new bookmark pointing to the given recordID
+// within the supplied channel. Close must be called on returned EvtHandle when
+// finished with the handle.
+func CreateBookmarkFromRecordID(channel string, recordID uint64) (EvtHandle, error) {
 	xml := fmt.Sprintf(bookmarkTemplate, channel, recordID)
 	p, err := syscall.UTF16PtrFromString(xml)
 	if err != nil {
@@ -230,6 +222,30 @@ func CreateBookmark(channel string, recordID uint64) (EvtHandle, error) {
 	}
 
 	return h, nil
+}
+
+// CreateBookmarkFromEvent creates a new bookmark pointing to the given event.
+// Close must be called on returned EvtHandle when finished with the handle.
+func CreateBookmarkFromEvent(handle EvtHandle) (EvtHandle, error) {
+	h, err := _EvtCreateBookmark(nil)
+	if err != nil {
+		return 0, err
+	}
+	if err = _EvtUpdateBookmark(h, handle); err != nil {
+		return 0, err
+	}
+	return h, nil
+}
+
+// CreateBookmarkFromXML creates a new bookmark from the serialised representation
+// of an existing bookmark. Close must be called on returned EvtHandle when
+// finished with the handle.
+func CreateBookmarkFromXML(bookmarkXML string) (EvtHandle, error) {
+	xml, err := syscall.UTF16PtrFromString(bookmarkXML)
+	if err != nil {
+		return 0, err
+	}
+	return _EvtCreateBookmark(xml)
 }
 
 // CreateRenderContext creates a render context. Close must be called on
@@ -410,4 +426,23 @@ func evtRenderProviderName(renderBuf []byte, eventHandle EvtHandle) (string, err
 
 	reader := bytes.NewReader(renderBuf)
 	return readString(renderBuf, reader)
+}
+
+func renderXML(eventHandle EvtHandle, flag EvtRenderFlag, renderBuf []byte, out io.Writer) error {
+	var bufferUsed, propertyCount uint32
+	err := _EvtRender(0, eventHandle, flag, uint32(len(renderBuf)),
+		&renderBuf[0], &bufferUsed, &propertyCount)
+	if err == ERROR_INSUFFICIENT_BUFFER {
+		return sys.InsufficientBufferError{err, int(bufferUsed)}
+	}
+	if err != nil {
+		return err
+	}
+
+	if int(bufferUsed) > len(renderBuf) {
+		return fmt.Errorf("Windows EvtRender reported that wrote %d bytes "+
+			"to the buffer, but the buffer can only hold %d bytes",
+			bufferUsed, len(renderBuf))
+	}
+	return sys.UTF16ToUTF8Bytes(renderBuf[:bufferUsed], out)
 }

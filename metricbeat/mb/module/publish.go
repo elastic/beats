@@ -3,8 +3,7 @@ package module
 import (
 	"sync"
 
-	"github.com/elastic/beats/libbeat/common"
-	"github.com/elastic/beats/libbeat/publisher"
+	"github.com/elastic/beats/libbeat/beat"
 )
 
 // PublishChannels publishes the events read from each channel to the given
@@ -15,14 +14,14 @@ import (
 // and are fully read. To stop the method immediately, close the channels and
 // close the publisher client to ensure that publishing does not block. This
 // may result is some events being discarded.
-func PublishChannels(client publisher.Client, cs ...<-chan common.MapStr) {
+func PublishChannels(client beat.Client, cs ...<-chan beat.Event) {
 	var wg sync.WaitGroup
 
 	// output publishes values from c until c is closed, then calls wg.Done.
-	output := func(c <-chan common.MapStr) {
+	output := func(c <-chan beat.Event) {
 		defer wg.Done()
 		for event := range c {
-			client.PublishEvent(event)
+			client.Publish(event)
 		}
 	}
 

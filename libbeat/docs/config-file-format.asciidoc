@@ -58,6 +58,7 @@ The following topics provide more detail to help you understand and work with co
 * <<config-file-format-type>>
 * <<config-file-format-env-vars>>
 * <<config-gile-format-refs>>
+* <<config-file-permissions>>
 * <<config-file-format-cli>>
 * <<config-file-format-tips>>
 
@@ -76,11 +77,11 @@ For example this setting:
 
 output:
   elasticsearch:
-    index: 'beat-%{+yyyy.MM.dd}'
+    index: 'beat-%{[beat.version]}-%{+yyyy.MM.dd}'
 
 ------------------------------------------------------------------------------
 
-gets collapsed into `output.elasticsearch.index: 'beat-%{+yyyy.MM.dd}'`. The
+gets collapsed into `output.elasticsearch.index: 'beat-%{[beat.version]}-%{+yyyy.MM.dd}'`. The
 full name of a setting is based on all parent structures involved.
 
 Lists create numeric names starting with 0.
@@ -119,7 +120,7 @@ output.elasticsearch.hosts: ["http://localhost:9200"]
 ------------------------------------------------------------------------------
 
 [[config-file-format-type]]
-=== Config file Data Types
+=== Config file data types
 
 Values of configuration settings are interpreted as required by beats.
 If a value can not be correctly interpreted as the required type - for example a
@@ -180,7 +181,7 @@ duration2: 6h
 duration_disabled: -1s
 ------------------------------------------------------------------------------
 
-==== Regular Expression
+==== Regular expression
 
 Regular expressions are special strings getting compiled into regular
 expressions at load time.
@@ -211,12 +212,12 @@ format-string-with-date: '%{[fieldname]}-%{+yyyy.MM.dd}'
 
 
 [[config-file-format-env-vars]]
-=== Environment Variables
+=== Environment variables
 
 include::shared-env-vars.asciidoc[]
 
 [[config-gile-format-refs]]
-=== Reference Variables
+=== Reference variables
 
 Beats settings can reference other settings splicing multiple optionally custom
 named settings into new values. References use the same syntax as
@@ -281,15 +282,15 @@ when using plain references.
 
 
 [[config-file-permissions]]
-=== Config File Ownership and Permissions
+=== Config file ownership and permissions
 
 NOTE: This section does not apply to Windows or other non-POSIX operating systems.
 
 On systems with POSIX file permissions, all Beats configuration files are
 subject to ownership and file permission checks. The purpose of these checks is
 to prevent unauthorized users from providing or modifying configurations that
-are run by the Beat. The owner of the configuration file must be either `root`
-or the user who is executing the Beat process. The permissions on the file must
+are run by the Beat. The owner of the configuration files must be either `root`
+or the user who is executing the Beat process. The permissions on each file must
 disallow writes by anyone other than the owner.
 
 When installed via an RPM or DEB package, the config file at
@@ -317,7 +318,10 @@ permissions use: 'chmod go-w /etc/{beatname}/{beatname}.yml')
 To correct this problem, use `chmod go-w /etc/{beatname}/{beatname}.yml` to
 remove write privileges from anyone other than the owner.
 
-==== Disabling Strict Permission Checks
+Other config files, such as the files in the `modules.d` directory, are subject
+to the same ownership and file permission checks. 
+
+==== Disabling strict permission checks
 
 You can disable strict permission checks from the command line by using
 `-strict.perms=false`, but we strongly encourage you to leave the checks enabled.
@@ -372,7 +376,7 @@ output.console:
 
 
 [[config-file-format-tips]]
-=== YAML Tips and Gotchas
+=== YAML tips and gotchas
 
 :allplatforms:
 include::yaml.asciidoc[]

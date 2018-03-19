@@ -1,0 +1,114 @@
+- name: cluster_status
+  type: group
+  release: beta
+  description: >
+    cluster_status
+  fields:
+    - name: version
+      type: long
+      description: >
+        Ceph Status version
+    - name: traffic.read_bytes
+      type: long
+      format: bytes
+      description: >
+        Cluster read throughput per second
+    - name: traffic.write_bytes
+      type: long
+      format: bytes
+      description: >
+        Cluster write throughput per second
+    - name: traffic.read_op_per_sec
+      type: long
+      description: >
+        Cluster read iops per second
+    - name: traffic.write_op_per_sec
+      type: long
+      description: >
+        Cluster write iops per second
+    - name: misplace.total
+      type: long
+      description: >
+        Cluster misplace pg number
+    - name: misplace.objects
+      type: long
+      description: >
+        Cluster misplace objects number
+    - name: misplace.ratio
+      type: scaled_float
+      format: percent
+      description: >
+        Cluster misplace ratio
+    - name: degraded.total
+      type: long
+      description: >
+        Cluster degraded pg number
+    - name: degraded.objects
+      type: long
+      description: >
+        Cluster degraded objects number
+    - name: degraded.ratio
+      type: scaled_float
+      format: percent
+      description: >
+        Cluster degraded ratio
+    - name: pg.data_bytes
+      type: long
+      format: bytes
+      description: >
+        Cluster pg data bytes
+    - name: pg.avail_bytes
+      type: long
+      format: bytes
+      description: >
+        Cluster available bytes
+    - name: pg.total_bytes
+      type: long
+      format: bytes
+      description: >
+        Cluster total bytes
+    - name: pg.used_bytes
+      type: long
+      format: bytes
+      description: >
+        Cluster used bytes
+    - name: pg_state.state_name
+      type: long
+      description: >
+        Pg state description
+    - name: pg_state.count
+      type: long
+      description: >
+        Shows how many pgs are in state of pg_state.state_name
+    - name: pg_state.version
+      type: long
+      description: >
+        Cluster status version
+    - name: osd.full
+      type: boolean
+      description: >
+        Is osd full
+    - name: osd.nearfull
+      type: boolean
+      description: >
+        Is osd near full
+    - name: osd.num_osds
+      type: long
+      description: >
+        Shows how many osds in the cluster
+    - name: osd.num_up_osds
+      type: long
+      description: >
+        Shows how many osds are on the state of UP
+    - name: osd.num_in_osds
+      type: long
+      description: >
+        Shows how many osds are on the state of IN
+    - name: osd.num_remapped_pgs
+      type: long
+      description: >
+        Shows how many osds are on the state of REMAPPED
+    - name: osd.epoch
+      type: long
+      description: >
+        epoch number

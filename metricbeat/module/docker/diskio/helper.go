@@ -3,9 +3,9 @@ package diskio
 import (
 	"time"
 
-	"github.com/elastic/beats/metricbeat/module/docker"
+	"github.com/docker/docker/api/types"
 
-	dc "github.com/fsouza/go-dockerclient"
+	"github.com/elastic/beats/metricbeat/module/docker"
 )
 
 type BlkioStats struct {
@@ -33,31 +33,31 @@ type BLkioService struct {
 	BlkioSTatsPerContainer map[string]BlkioRaw
 }
 
-func (io *BLkioService) getBlkioStatsList(rawStats []docker.Stat) []BlkioStats {
+func (io *BLkioService) getBlkioStatsList(rawStats []docker.Stat, dedot bool) []BlkioStats {
 	formattedStats := []BlkioStats{}
-
+	if io.BlkioSTatsPerContainer == nil {
+		io.BlkioSTatsPerContainer = make(map[string]BlkioRaw)
+	}
 	for _, myRawStats := range rawStats {
-		formattedStats = append(formattedStats, io.getBlkioStats(&myRawStats))
+		formattedStats = append(formattedStats, io.getBlkioStats(&myRawStats, dedot))
 	}
 
 	return formattedStats
 }
 
-func (io *BLkioService) getBlkioStats(myRawStat *docker.Stat) BlkioStats {
-	newBlkioStats := io.getNewStats(myRawStat.Stats.Read, myRawStat.Stats.BlkioStats.IOServicedRecursive)
+func (io *BLkioService) getBlkioStats(myRawStat *docker.Stat, dedot bool) BlkioStats {
+	newBlkioStats := io.getNewStats(myRawStat.Stats.Read, myRawStat.Stats.BlkioStats.IoServicedRecursive)
 	oldBlkioStats, exist := io.BlkioSTatsPerContainer[myRawStat.Container.ID]
 
 	myBlkioStats := BlkioStats{
 		Time:      myRawStat.Stats.Read,
-		Container: docker.NewContainer(&myRawStat.Container),
+		Container: docker.NewContainer(myRawStat.Container, dedot),
 	}
 
 	if exist {
 		myBlkioStats.reads = io.getReadPs(&oldBlkioStats, &newBlkioStats)
 		myBlkioStats.writes = io.getWritePs(&oldBlkioStats, &newBlkioStats)
-		myBlkioStats.totals = io.getReadPs(&oldBlkioStats, &newBlkioStats)
-	} else {
-		io.BlkioSTatsPerContainer = make(map[string]BlkioRaw)
+		myBlkioStats.totals = io.getTotalPs(&oldBlkioStats, &newBlkioStats)
 	}
 
 	io.BlkioSTatsPerContainer[myRawStat.Container.ID] = newBlkioStats
@@ -65,7 +65,7 @@ func (io *BLkioService) getBlkioStats(myRawStat *docker.Stat) BlkioStats {
 	return myBlkioStats
 }
 
-func (io *BLkioService) getNewStats(time time.Time, blkioEntry []dc.BlkioStatsEntry) BlkioRaw {
+func (io *BLkioService) getNewStats(time time.Time, blkioEntry []types.BlkioStatEntry) BlkioRaw {
 	stats := BlkioRaw{
 		Time:   time,
 		reads:  0,

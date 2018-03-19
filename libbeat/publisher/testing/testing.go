@@ -2,42 +2,42 @@ package testing
 
 // ChanClient implements Client interface, forwarding published events to some
 import (
-	"github.com/elastic/beats/libbeat/common"
-	"github.com/elastic/beats/libbeat/publisher"
+	"github.com/elastic/beats/libbeat/beat"
 )
 
 type TestPublisher struct {
-	client publisher.Client
+	client beat.Client
 }
 
 // given channel only.
 type ChanClient struct {
 	done    chan struct{}
-	Channel chan PublishMessage
-
-	recvBuf []common.MapStr
+	Channel chan beat.Event
 }
 
-type PublishMessage struct {
-	Context publisher.Context
-	Events  []common.MapStr
-}
-
-func PublisherWithClient(client publisher.Client) publisher.Publisher {
+func PublisherWithClient(client beat.Client) beat.Pipeline {
 	return &TestPublisher{client}
 }
 
-func (pub *TestPublisher) Connect() publisher.Client {
-	return pub.client
+func (pub *TestPublisher) Connect() (beat.Client, error) {
+	return pub.client, nil
+}
+
+func (pub *TestPublisher) ConnectWith(_ beat.ClientConfig) (beat.Client, error) {
+	return pub.client, nil
+}
+
+func (pub *TestPublisher) SetACKHandler(_ beat.PipelineACKHandler) error {
+	panic("Not supported")
 }
 
 func NewChanClient(bufSize int) *ChanClient {
-	return NewChanClientWith(make(chan PublishMessage, bufSize))
+	return NewChanClientWith(make(chan beat.Event, bufSize))
 }
 
-func NewChanClientWith(ch chan PublishMessage) *ChanClient {
+func NewChanClientWith(ch chan beat.Event) *ChanClient {
 	if ch == nil {
-		ch = make(chan PublishMessage, 1)
+		ch = make(chan beat.Event, 1)
 	}
 	c := &ChanClient{
 		done:    make(chan struct{}),
@@ -53,40 +53,19 @@ func (c *ChanClient) Close() error {
 
 // PublishEvent will publish the event on the channel. Options will be ignored.
 // Always returns true.
-func (c *ChanClient) PublishEvent(event common.MapStr, opts ...publisher.ClientOption) bool {
-	return c.PublishEvents([]common.MapStr{event}, opts...)
-}
-
-// PublishEvents publishes all event on the configured channel. Options will be ignored.
-// Always returns true.
-func (c *ChanClient) PublishEvents(events []common.MapStr, opts ...publisher.ClientOption) bool {
-	_, ctx := publisher.MakeContext(opts)
-	msg := PublishMessage{ctx, events}
+func (c *ChanClient) Publish(event beat.Event) {
 	select {
 	case <-c.done:
-		return false
-	case c.Channel <- msg:
-		return true
+	case c.Channel <- event:
 	}
 }
 
-func (c *ChanClient) ReceiveEvent() common.MapStr {
-	if len(c.recvBuf) > 0 {
-		evt := c.recvBuf[0]
-		c.recvBuf = c.recvBuf[1:]
-		return evt
+func (c *ChanClient) PublishAll(event []beat.Event) {
+	for _, e := range event {
+		c.Publish(e)
 	}
-
-	msg := <-c.Channel
-	c.recvBuf = msg.Events
-	return c.ReceiveEvent()
 }
 
-func (c *ChanClient) ReceiveEvents() []common.MapStr {
-	if len(c.recvBuf) > 0 {
-		return c.recvBuf
-	}
-
-	msg := <-c.Channel
-	return msg.Events
+func (c *ChanClient) ReceiveEvent() beat.Event {
+	return <-c.Channel
 }

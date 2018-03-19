@@ -1,0 +1,78 @@
+{
+  "objects": [
+    {
+      "attributes": {
+        "description": "",
+        "kibanaSavedObjectMeta": {
+          "searchSourceJSON": "{\n  \"filter\": []\n}"
+        },
+        "savedSearchId": "c876e6a0-2418-11e7-a83b-d5f4cebac9ff",
+        "title": "Debuglog Facility [Filebeat Icinga]",
+        "uiStateJSON": "{}",
+        "version": 1,
+        "visState": "{\n  \"title\": \"Icinga Debuglog Facility\",\n  \"type\": \"histogram\",\n  \"params\": {\n    \"addTooltip\": true,\n    \"addLegend\": true,\n    \"legendPosition\": \"right\",\n    \"scale\": \"linear\",\n    \"mode\": \"stacked\",\n    \"times\": [],\n    \"addTimeMarker\": false,\n    \"defaultYExtents\": false,\n    \"setYExtents\": false\n  },\n  \"aggs\": [\n    {\n      \"id\": \"1\",\n      \"enabled\": true,\n      \"type\": \"count\",\n      \"schema\": \"metric\",\n      \"params\": {}\n    },\n    {\n      \"id\": \"2\",\n      \"enabled\": true,\n      \"type\": \"date_histogram\",\n      \"schema\": \"segment\",\n      \"params\": {\n        \"field\": \"@timestamp\",\n        \"interval\": \"auto\",\n        \"customInterval\": \"2h\",\n        \"min_doc_count\": 1,\n        \"extended_bounds\": {}\n      }\n    },\n    {\n      \"id\": \"3\",\n      \"enabled\": true,\n      \"type\": \"terms\",\n      \"schema\": \"group\",\n      \"params\": {\n        \"field\": \"icinga.debug.facility\",\n        \"size\": 5,\n        \"order\": \"desc\",\n        \"orderBy\": \"1\"\n      }\n    }\n  ],\n  \"listeners\": {}\n}"
+      },
+      "id": "0bc34b60-2419-11e7-a83b-d5f4cebac9ff",
+      "type": "visualization",
+      "version": 2
+    },
+    {
+      "attributes": {
+        "description": "",
+        "kibanaSavedObjectMeta": {
+          "searchSourceJSON": "{\n  \"filter\": []\n}"
+        },
+        "savedSearchId": "c876e6a0-2418-11e7-a83b-d5f4cebac9ff",
+        "title": "Debuglog Severity [Filebeat Icinga]",
+        "uiStateJSON": "{\n  \"vis\": {\n    \"colors\": {\n      \"information\": \"#629E51\",\n      \"warning\": \"#E5AC0E\",\n      \"debug\": \"#BA43A9\",\n      \"notice\": \"#6ED0E0\"\n    }\n  }\n}",
+        "version": 1,
+        "visState": "{\n  \"title\": \"Icinga Debuglog Severity\",\n  \"type\": \"histogram\",\n  \"params\": {\n    \"addTooltip\": true,\n    \"addLegend\": true,\n    \"legendPosition\": \"right\",\n    \"scale\": \"linear\",\n    \"mode\": \"stacked\",\n    \"times\": [],\n    \"addTimeMarker\": false,\n    \"defaultYExtents\": false,\n    \"setYExtents\": false\n  },\n  \"aggs\": [\n    {\n      \"id\": \"1\",\n      \"enabled\": true,\n      \"type\": \"count\",\n      \"schema\": \"metric\",\n      \"params\": {}\n    },\n    {\n      \"id\": \"2\",\n      \"enabled\": true,\n      \"type\": \"date_histogram\",\n      \"schema\": \"segment\",\n      \"params\": {\n        \"field\": \"@timestamp\",\n        \"interval\": \"auto\",\n        \"customInterval\": \"2h\",\n        \"min_doc_count\": 1,\n        \"extended_bounds\": {}\n      }\n    },\n    {\n      \"id\": \"3\",\n      \"enabled\": true,\n      \"type\": \"terms\",\n      \"schema\": \"group\",\n      \"params\": {\n        \"field\": \"icinga.debug.severity\",\n        \"size\": 5,\n        \"order\": \"desc\",\n        \"orderBy\": \"1\"\n      }\n    }\n  ],\n  \"listeners\": {}\n}"
+      },
+      "id": "fb09d4b0-2418-11e7-a83b-d5f4cebac9ff",
+      "type": "visualization",
+      "version": 2
+    },
+    {
+      "attributes": {
+        "columns": [
+          "icinga.debug.facility",
+          "icinga.debug.severity",
+          "icinga.debug.message"
+        ],
+        "description": "",
+        "hits": 0,
+        "kibanaSavedObjectMeta": {
+          "searchSourceJSON": "{\"index\":\"filebeat-*\",\"highlightAll\":true,\"query\":{\"query\":\"*\",\"language\":\"lucene\"},\"filter\":[{\"meta\":{\"index\":\"filebeat-*\",\"negate\":false,\"disabled\":false,\"alias\":null,\"type\":\"phrase\",\"key\":\"fileset.module\",\"value\":\"icinga\",\"params\":{\"query\":\"icinga\",\"type\":\"phrase\"}},\"query\":{\"match\":{\"fileset.module\":{\"query\":\"icinga\",\"type\":\"phrase\"}}},\"$state\":{\"store\":\"appState\"}},{\"meta\":{\"index\":\"filebeat-*\",\"negate\":false,\"disabled\":false,\"alias\":null,\"type\":\"phrase\",\"key\":\"fileset.name\",\"value\":\"debug\",\"params\":{\"query\":\"debug\",\"type\":\"phrase\"}},\"query\":{\"match\":{\"fileset.name\":{\"query\":\"debug\",\"type\":\"phrase\"}}},\"$state\":{\"store\":\"appState\"}}],\"version\":true}"
+        },
+        "sort": [
+          "@timestamp",
+          "desc"
+        ],
+        "title": "Debug Log [Filebeat Icinga]",
+        "version": 1
+      },
+      "id": "c876e6a0-2418-11e7-a83b-d5f4cebac9ff",
+      "type": "search",
+      "version": 2
+    },
+    {
+      "attributes": {
+        "description": "Filebeat Icinga module dashboard for the debug logs",
+        "hits": 0,
+        "kibanaSavedObjectMeta": {
+          "searchSourceJSON": "{\"filter\":[],\"query\":{\"language\":\"lucene\",\"query\":{\"query_string\":{\"analyze_wildcard\":true,\"default_field\":\"*\",\"query\":\"*\"}}},\"highlightAll\":true,\"version\":true}"
+        },
+        "optionsJSON": "{\"darkTheme\":false}",
+        "panelsJSON": "[{\"col\":1,\"id\":\"0bc34b60-2419-11e7-a83b-d5f4cebac9ff\",\"panelIndex\":1,\"row\":1,\"size_x\":6,\"size_y\":3,\"type\":\"visualization\"},{\"col\":7,\"id\":\"fb09d4b0-2418-11e7-a83b-d5f4cebac9ff\",\"panelIndex\":2,\"row\":1,\"size_x\":6,\"size_y\":3,\"type\":\"visualization\"},{\"col\":1,\"columns\":[\"icinga.debug.facility\",\"icinga.debug.severity\",\"icinga.debug.message\"],\"id\":\"c876e6a0-2418-11e7-a83b-d5f4cebac9ff\",\"panelIndex\":3,\"row\":4,\"size_x\":12,\"size_y\":29,\"sort\":[\"@timestamp\",\"desc\"],\"type\":\"search\"}]",
+        "timeRestore": false,
+        "title": "[Filebeat Icinga] Debug Log",
+        "uiStateJSON": "{}",
+        "version": 1
+      },
+      "id": "26309570-2419-11e7-a83b-d5f4cebac9ff",
+      "type": "dashboard",
+      "version": 2
+    }
+  ],
+  "version": "6.0.0-beta1-SNAPSHOT"
+}

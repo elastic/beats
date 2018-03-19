@@ -2,20 +2,22 @@ package transport
 
 import (
 	"net"
-
-	"github.com/elastic/beats/libbeat/monitoring"
 )
 
-type IOStats struct {
-	Read, Write, ReadErrors, WriteErrors, OutputsWrite, OutputsWriteErrors *monitoring.Int
+type IOStatser interface {
+	WriteError(err error)
+	WriteBytes(int)
+
+	ReadError(err error)
+	ReadBytes(int)
 }
 
 type statsConn struct {
 	net.Conn
-	stats *IOStats
+	stats IOStatser
 }
 
-func StatsDialer(d Dialer, s *IOStats) Dialer {
+func StatsDialer(d Dialer, s IOStatser) Dialer {
 	return ConnWrapper(d, func(c net.Conn) net.Conn {
 		return &statsConn{c, s}
 	})
@@ -24,19 +26,17 @@ func StatsDialer(d Dialer, s *IOStats) Dialer {
 func (s *statsConn) Read(b []byte) (int, error) {
 	n, err := s.Conn.Read(b)
 	if err != nil {
-		s.stats.ReadErrors.Add(1)
+		s.stats.ReadError(err)
 	}
-	s.stats.Read.Add(int64(n))
+	s.stats.ReadBytes(n)
 	return n, err
 }
 
 func (s *statsConn) Write(b []byte) (int, error) {
 	n, err := s.Conn.Write(b)
 	if err != nil {
-		s.stats.WriteErrors.Add(1)
-		s.stats.OutputsWriteErrors.Add(1)
+		s.stats.WriteError(err)
 	}
-	s.stats.Write.Add(int64(n))
-	s.stats.OutputsWrite.Add(int64(n))
+	s.stats.WriteBytes(n)
 	return n, err
 }

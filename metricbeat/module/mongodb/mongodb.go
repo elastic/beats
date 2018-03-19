@@ -69,19 +69,21 @@ func ParseURL(module mb.Module, host string) (mb.HostData, error) {
 // NewDirectSession estbalishes direct connections with a list of hosts. It uses the supplied
 // dialInfo parameter as a template for establishing more direct connections
 func NewDirectSession(dialInfo *mgo.DialInfo) (*mgo.Session, error) {
-
 	// make a copy
 	nodeDialInfo := *dialInfo
 	nodeDialInfo.Direct = true
 	nodeDialInfo.FailFast = true
 
-	logp.Info("Connecting to MongoDB node at %v", nodeDialInfo.Addrs)
+	logp.Debug("mongodb", "Connecting to MongoDB node at %v", nodeDialInfo.Addrs)
 
 	session, err := mgo.DialWithInfo(&nodeDialInfo)
 	if err != nil {
 		logp.Err("Error establishing direct connection to mongo node at %v. Error output: %s", nodeDialInfo.Addrs, err.Error())
 		return nil, err
 	}
+
+	// Relax consistency mode so reading from a secondary is allowed
+	session.SetMode(mgo.Monotonic, true)
 
 	return session, nil
 }

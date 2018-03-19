@@ -1,0 +1,10 @@
+{
+  "visState": "{\"title\":\"Kubernetes - Top CPU intensive pods\",\"type\":\"metrics\",\"params\":{\"id\":\"5d3692a0-2bfc-11e7-859b-f78b612cde28\",\"type\":\"top_n\",\"series\":[{\"id\":\"5d3692a1-2bfc-11e7-859b-f78b612cde28\",\"color\":\"#68BC00\",\"split_mode\":\"terms\",\"metrics\":[{\"id\":\"5d3692a2-2bfc-11e7-859b-f78b612cde28\",\"type\":\"sum\",\"field\":\"kubernetes.container.cpu.usage.core.ns\"},{\"unit\":\"1s\",\"id\":\"6c905240-2bfc-11e7-859b-f78b612cde28\",\"type\":\"derivative\",\"field\":\"5d3692a2-2bfc-11e7-859b-f78b612cde28\"},{\"unit\":\"\",\"id\":\"9a51f710-359d-11e7-aa4a-8313a0c92a88\",\"type\":\"positive_only\",\"field\":\"6c905240-2bfc-11e7-859b-f78b612cde28\"}],\"seperate_axis\":0,\"axis_position\":\"right\",\"formatter\":\"0.0 a\",\"chart_type\":\"line\",\"line_width\":1,\"point_size\":1,\"fill\":0.5,\"stacked\":\"none\",\"terms_field\":\"kubernetes.pod.name\",\"terms_order_by\":\"5d3692a2-2bfc-11e7-859b-f78b612cde28\",\"value_template\":\"{{value}} ns\",\"offset_time\":\"\",\"override_index_pattern\":0}],\"time_field\":\"@timestamp\",\"index_pattern\":\"metricbeat-*\",\"interval\":\"auto\",\"axis_position\":\"left\",\"axis_formatter\":\"number\",\"show_legend\":1,\"bar_color_rules\":[{\"id\":\"802104d0-2bfc-11e7-859b-f78b612cde28\"}],\"filter\":\"metricset.module:kubernetes AND metricset.name:container\"},\"aggs\":[],\"listeners\":{}}",
+  "description": "",
+  "title": "Kubernetes - Top CPU intensive pods",
+  "uiStateJSON": "{}",
+  "version": 1,
+  "kibanaSavedObjectMeta": {
+    "searchSourceJSON": "{\"query\":{\"query_string\":{\"query\":\"*\"}},\"filter\":[]}"
+  }
+}

@@ -1,0 +1,25 @@
+auditbeat.modules:
+{% for m in modules -%}
+- module: {{ m.name }}
+  {% if m.metricsets -%}
+  metricsets:
+    {% for ms in m.metricsets -%}
+    - {{ ms }}
+    {% endfor %}
+  {% endif -%}
+  {% if m.extras -%}
+  {% for k, v in m.extras.items() -%}
+  {{ k }}: {{ v }}
+  {% endfor %}
+  {% endif -%}
+  {% if m.additional_content -%}
+  {{ m.additional_content }}
+  {% endif -%}
+{%- endfor %}
+
+queue.mem:
+  events: 4096
+  flush.min_events: 8
+  flush.timeout: 0.1s
+
+{% include './tests/system/config/libbeat.yml.j2' %}

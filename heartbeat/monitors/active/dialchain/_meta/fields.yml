@@ -1,5 +1,5 @@
 - key: socks5
-  title: "SOCKS5 Proxy"
+  title: "SOCKS5 proxy"
   description:
   fields:
     - name: socks5
@@ -24,7 +24,7 @@
 
 
 - key: tls
-  title: "TLS Encryption Layer"
+  title: "TLS encryption layer"
   description:
   fields:
     - name: tls

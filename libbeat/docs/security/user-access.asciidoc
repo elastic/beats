@@ -1,0 +1,61 @@
+[role="xpack"]
+[[beats-user-access]]
+=== Granting users access to {beatname_uc} indices
+
+To enable users to access the indices a {beatname_uc} creates, grant them `read`
+and `view_index_metadata` privileges on the {beatname_uc} indices:
+
+. Create a role that has the `read` and `view_index_metadata`
+privileges  for the {beatname_uc} indices. You can create roles from the
+**Management > Roles** UI in {kib} or through the `role` API.
+For example, the following request creates a ++{beat_default_index_prefix}_reader++
+role:
++
+--
+["source","sh",subs="attributes,callouts"]
+---------------------------------------------------------------
+POST _xpack/security/role/{beat_default_index_prefix}_reader
+{
+  "indices": [
+    {
+      "names": [ "{beat_default_index_prefix}-*" ], <1>
+      "privileges": ["read","view_index_metadata"]
+    }
+  ]
+}
+---------------------------------------------------------------
+<1> If you use a custom {beatname_uc} index pattern, specify that pattern
+instead of the default ++{beat_default_index_prefix}-*++ pattern.
+--
+. Assign your users the reader role so they can access the {beatname_uc} indices:
+
+.. If you're using the `native` realm, you can assign roles with the
+**Management > Users** UI in {kib} or through the `user` API. For
+example, the following request grants ++{beat_default_index_prefix}_user++ the
+++{beat_default_index_prefix}_reader++ role:
++
+--
+["source", "sh", subs="attributes,callouts"]
+---------------------------------------------------------------
+POST /_xpack/security/user/{beat_default_index_prefix}_user
+{
+  "password" : "x-pack-test-password",
+  "roles" : [ "{beat_default_index_prefix}_reader"],
+  "full_name" : "{beatname_uc} User"
+}
+---------------------------------------------------------------
+--
+.. If you're using the LDAP, Active Directory, or PKI realms, you
+assign the roles in the `role_mapping.yml` configuration
+file. For example, the following snippet grants ++{beatname_uc} User++
+the ++{beat_default_index_prefix}_reader++ role:
++
+--
+["source", "yaml", subs="attributes,callouts"]
+---------------------------------------------------------------
+{beat_default_index_prefix}_reader:
+  - "cn={beatname_uc} User,dc=example,dc=com"
+---------------------------------------------------------------
+For more information, see
+{xpack-ref}/mapping-roles.html#mapping-roles-file[Using Role Mapping Files].
+--

@@ -16,16 +16,31 @@ var (
 		"jvm": c.Dict("jvm", s.Schema{
 			"version": c.Str("version"),
 			"memory": c.Dict("mem", s.Schema{
-				"heap_init": s.Object{
-					"bytes": c.Int("heap_init_in_bytes"),
+				"heap": s.Object{
+					"init": s.Object{
+						"bytes": c.Int("heap_init_in_bytes"),
+					},
+					"max": s.Object{
+						"bytes": c.Int("heap_max_in_bytes"),
+					},
+				},
+				"nonheap": s.Object{
+					"init": s.Object{
+						"bytes": c.Int("non_heap_init_in_bytes"),
+					},
+					"max": s.Object{
+						"bytes": c.Int("non_heap_max_in_bytes"),
+					},
 				},
 			}),
+		}),
+		"process": c.Dict("process", s.Schema{
+			"mlockall": c.Bool("mlockall"),
 		}),
 	}
 )
 
 func eventsMapping(content []byte) ([]common.MapStr, error) {
-
 	nodesStruct := struct {
 		ClusterName string                            `json:"cluster_name"`
 		Nodes       map[string]map[string]interface{} `json:"nodes"`

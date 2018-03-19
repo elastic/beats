@@ -1,3 +1,1 @@
-=== php_fpm pool MetricSet
-
-This is the pool metricset of the module php_fpm.
+This is the `pool` metricset of the PHP_FPM module.

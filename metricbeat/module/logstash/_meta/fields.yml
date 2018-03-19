@@ -1,0 +1,11 @@
+- key: logstash
+  title: "Logstash"
+  description: >
+    Logstash module
+  release: experimental
+  settings: ["ssl"]
+  fields:
+    - name: logstash
+      type: group
+      description: >
+      fields:

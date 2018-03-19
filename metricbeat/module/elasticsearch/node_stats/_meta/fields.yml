@@ -2,6 +2,7 @@
   type: group
   description: >
     node_stats
+  release: beta
   fields:
     - name: indices
       type: group
@@ -137,3 +138,21 @@
             - name: ms
               type: long
               description: >
+
+    - name: fs.summary
+      type: group
+      description: >
+        File system summary
+      fields:
+        - name: total.bytes
+          type: long
+          format: bytes
+          description: >
+        - name: free.bytes
+          type: long
+          format: bytes
+          description: >
+        - name: available.bytes
+          type: long
+          format: bytes
+          description: >

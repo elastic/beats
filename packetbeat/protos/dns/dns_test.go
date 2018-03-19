@@ -11,13 +11,14 @@ import (
 	"testing"
 	"time"
 
-	"github.com/elastic/beats/packetbeat/protos"
-	"github.com/elastic/beats/packetbeat/publish"
-
-	"github.com/elastic/beats/libbeat/common"
-	"github.com/elastic/beats/libbeat/logp"
 	mkdns "github.com/miekg/dns"
 	"github.com/stretchr/testify/assert"
+
+	"github.com/elastic/beats/libbeat/beat"
+	"github.com/elastic/beats/libbeat/common"
+	"github.com/elastic/beats/libbeat/logp"
+
+	"github.com/elastic/beats/packetbeat/protos"
 )
 
 // Test Constants
@@ -56,14 +57,33 @@ var (
 		net.ParseIP(serverIP), serverPort)
 )
 
-func newDNS(verbose bool) *dnsPlugin {
+type eventStore struct {
+	events []beat.Event
+}
+
+func (e *eventStore) publish(event beat.Event) {
+	e.events = append(e.events, event)
+}
+
+func (e *eventStore) empty() bool {
+	return len(e.events) == 0
+}
+
+func newDNS(store *eventStore, verbose bool) *dnsPlugin {
+	level := logp.WarnLevel
 	if verbose {
-		logp.LogInit(logp.LOG_DEBUG, "", false, true, []string{"dns"})
-	} else {
-		logp.LogInit(logp.LOG_EMERG, "", false, true, []string{"dns"})
+		level = logp.DebugLevel
+	}
+	logp.DevelopmentSetup(
+		logp.WithLevel(level),
+		logp.WithSelectors("dns"),
+	)
+
+	callback := func(beat.Event) {}
+	if store != nil {
+		callback = store.publish
 	}
 
-	results := &publish.ChanTransactions{Channel: make(chan common.MapStr, 100)}
 	cfg, _ := common.NewConfigFrom(map[string]interface{}{
 		"ports":               []int{serverPort},
 		"include_authorities": true,
@@ -71,7 +91,7 @@ func newDNS(verbose bool) *dnsPlugin {
 		"send_request":        true,
 		"send_response":       true,
 	})
-	dns, err := New(false, results, cfg)
+	dns, err := New(false, callback, cfg)
 	if err != nil {
 		panic(err)
 	}
@@ -89,15 +109,15 @@ func newPacket(t common.IPPortTuple, payload []byte) *protos.Packet {
 
 // expectResult returns one MapStr result from the Dns results channel. If
 // no result is available then the test fails.
-func expectResult(t testing.TB, dns *dnsPlugin) common.MapStr {
-	client := dns.results.(*publish.ChanTransactions)
-	select {
-	case result := <-client.Channel:
-		return result
-	default:
-		t.Error("Expected a result to be published.")
+func expectResult(t testing.TB, e *eventStore) common.MapStr {
+	if len(e.events) == 0 {
+		t.Error("No transaction")
+		return nil
 	}
-	return nil
+
+	event := e.events[0]
+	e.events = e.events[1:]
+	return event.Fields
 }
 
 // Retrieves a map value. The key should be the full dotted path to the element.

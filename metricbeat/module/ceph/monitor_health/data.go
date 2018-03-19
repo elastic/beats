@@ -69,7 +69,6 @@ type HealthRequest struct {
 }
 
 func eventsMapping(content []byte) []common.MapStr {
-
 	var d HealthRequest
 	err := json.Unmarshal(content, &d)
 	if err != nil {

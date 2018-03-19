@@ -1,12 +1,11 @@
 package memory
 
 import (
+	"github.com/docker/docker/client"
+
 	"github.com/elastic/beats/libbeat/common"
-	"github.com/elastic/beats/libbeat/logp"
 	"github.com/elastic/beats/metricbeat/mb"
 	"github.com/elastic/beats/metricbeat/module/docker"
-
-	dc "github.com/fsouza/go-dockerclient"
 )
 
 func init() {
@@ -18,14 +17,13 @@ func init() {
 type MetricSet struct {
 	mb.BaseMetricSet
 	memoryService *MemoryService
-	dockerClient  *dc.Client
+	dockerClient  *client.Client
+	dedot         bool
 }
 
 // New creates a new instance of the docker memory MetricSet.
 func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
-	logp.Beta("The docker memory metricset is beta")
-
-	config := docker.Config{}
+	config := docker.DefaultConfig()
 	if err := base.Module().UnpackConfig(&config); err != nil {
 		return nil, err
 	}
@@ -39,6 +37,7 @@ func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
 		BaseMetricSet: base,
 		memoryService: &MemoryService{},
 		dockerClient:  client,
+		dedot:         config.DeDot,
 	}, nil
 }
 
@@ -49,6 +48,6 @@ func (m *MetricSet) Fetch() ([]common.MapStr, error) {
 		return nil, err
 	}
 
-	memoryStats := m.memoryService.getMemoryStatsList(stats)
+	memoryStats := m.memoryService.getMemoryStatsList(stats, m.dedot)
 	return eventsMapping(memoryStats), nil
 }

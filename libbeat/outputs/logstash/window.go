@@ -11,6 +11,12 @@ type window struct {
 	maxWindowSize   int
 }
 
+func newWindower(start, max int) *window {
+	w := &window{}
+	w.init(start, max)
+	return w
+}
+
 func (w *window) init(start, max int) {
 	*w = window{
 		windowSize:    int32(start),
@@ -30,29 +36,21 @@ func (w *window) tryGrowWindow(batchSize int) {
 
 	if windowSize <= batchSize {
 		if w.maxOkWindowSize < windowSize {
-			debug("update max ok window size: %v < %v",
-				w.maxOkWindowSize, w.windowSize)
 			w.maxOkWindowSize = windowSize
 
 			newWindowSize := int(math.Ceil(1.5 * float64(windowSize)))
-			debug("increase window size to: %v", newWindowSize)
 
 			if windowSize <= batchSize && batchSize < newWindowSize {
-				debug("set to batchSize: %v", batchSize)
 				newWindowSize = batchSize
 			}
 			if newWindowSize > w.maxWindowSize {
-				debug("set to max window size: %v", w.maxWindowSize)
 				newWindowSize = int(w.maxWindowSize)
 			}
 
 			windowSize = newWindowSize
 		} else if windowSize < w.maxOkWindowSize {
-			debug("update current window size: %v", w.windowSize)
-
 			windowSize = int(math.Ceil(1.5 * float64(windowSize)))
 			if windowSize > w.maxOkWindowSize {
-				debug("set to max ok window size: %v", w.maxOkWindowSize)
 				windowSize = w.maxOkWindowSize
 			}
 		}

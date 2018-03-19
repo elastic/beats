@@ -1,19 +1,132 @@
 {
-    "@timestamp":"2016-05-23T08:05:34.853Z",
-    "beat":{
-        "hostname":"beathost",
-        "name":"beathost"
+    "@timestamp": "2017-10-12T08:05:34.853Z",
+    "beat": {
+        "hostname": "host.example.com",
+        "name": "host.example.com"
     },
-    "metricset":{
-        "host":"localhost",
-        "module":"rabbitmq",
-        "name":"node",
-        "rtt":44269
+    "metricset": {
+        "host": "rabbitmq:15672",
+        "module": "rabbitmq",
+        "name": "node",
+        "rtt": 115
     },
-    "rabbitmq":{
-        "node":{
-            "example": "node"
+    "rabbitmq": {
+        "node": {
+            "disk": {
+                "free": {
+                    "bytes": 50068475904,
+                    "limit": {
+                        "bytes": 50000000
+                    }
+                }
+            },
+            "fd": {
+                "total": 1048576,
+                "used": 24
+            },
+            "gc": {
+                "num": {
+                    "count": 4500
+                },
+                "reclaimed": {
+                    "bytes": 305711168
+                }
+            },
+            "io": {
+                "file_handle": {
+                    "open_attempt": {
+                        "avg": {
+                            "ms": 0
+                        },
+                        "count": 10
+                    }
+                },
+                "read": {
+                    "avg": {
+                        "ms": 3
+                    },
+                    "bytes": 1,
+                    "count": 1
+                },
+                "reopen": {
+                    "count": 1
+                },
+                "seek": {
+                    "avg": {
+                        "ms": 0
+                    },
+                    "count": 0
+                },
+                "sync": {
+                    "avg": {
+                        "ms": 0
+                    },
+                    "count": 0
+                },
+                "write": {
+                    "avg": {
+                        "ms": 0
+                    },
+                    "bytes": 0,
+                    "count": 0
+                }
+            },
+            "mem": {
+                "limit": {
+                    "bytes": 1655649075
+                },
+                "used": {
+                    "bytes": 34004992
+                }
+            },
+            "mnesia": {
+                "disk": {
+                    "tx": {
+                        "count": 12
+                    }
+                },
+                "ram": {
+                    "tx": {
+                        "count": 2
+                    }
+                }
+            },
+            "msg": {
+                "store_read": {
+                    "count": 0
+                },
+                "store_write": {
+                    "count": 0
+                }
+            },
+            "name": "rabbit@bd8e0cf4f153",
+            "proc": {
+                "total": 1048576,
+                "used": 323
+            },
+            "processors": 4,
+            "queue": {
+                "index": {
+                    "journal_write": {
+                        "count": 0
+                    },
+                    "read": {
+                        "count": 0
+                    },
+                    "write": {
+                        "count": 0
+                    }
+                }
+            },
+            "run": {
+                "queue": 0
+            },
+            "socket": {
+                "total": 943626,
+                "used": 0
+            },
+            "type": "disc",
+            "uptime": 677901
         }
-    },
-    "type":"metricsets"
+    }
 }

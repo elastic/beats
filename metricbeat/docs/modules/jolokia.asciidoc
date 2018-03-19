@@ -3,16 +3,14 @@ This file is generated! See scripts/docs_collector.py
 ////
 
 [[metricbeat-module-jolokia]]
-== Jolokia Module
+== Jolokia module
 
-beta[]
-
-This is the Jolokia Module.
+This is the Jolokia module.
 
 
 
 [float]
-=== Example Configuration
+=== Example configuration
 
 The Jolokia module supports the standard configuration options that are described
 in <<configuration-metricbeat>>. Here is an example configuration:
@@ -22,7 +20,6 @@ in <<configuration-metricbeat>>. Here is an example configuration:
 metricbeat.modules:
 - module: jolokia
   metricsets: ["jmx"]
-  enabled: false
   period: 10s
   hosts: ["localhost"]
   namespace: "metrics"
@@ -31,6 +28,8 @@ metricbeat.modules:
   jmx.application:
   jmx.instance:
 ----
+
+This module supports TLS connection when using `ssl` config field, as described in <<configuration-ssl>>.
 
 [float]
 === Metricsets

@@ -1,0 +1,40 @@
+- name: log
+  type: group
+  description: >
+    Fields from the PostgreSQL log files.
+  fields:
+    - name: timestamp
+      description: >
+        The timestamp from the log line.
+    - name: timezone
+      description: >
+        The timezone of timestamp.
+    - name: thread_id
+      type: long
+      description: >
+          Process id
+    - name: user
+      example: "admin"
+      description:
+        Name of user
+    - name: database
+      example: "mydb"
+      description:
+        Name of database
+    - name: level
+      example: "FATAL"
+      description:
+        The log level.
+    - name: duration
+      type: float
+      example: "30.0"
+      description:
+        Duration of a query.
+    - name: query
+      example: "SELECT * FROM users;"
+      description:
+        Query statement.
+    - name: message
+      type: text
+      description: >
+        The logged message.

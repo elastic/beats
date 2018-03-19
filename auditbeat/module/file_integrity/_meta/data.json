@@ -1,0 +1,30 @@
+{
+    "@timestamp": "2017-10-12T08:05:34.853Z",
+    "beat": {
+        "hostname": "host.example.com",
+        "name": "host.example.com"
+    },
+    "event": {
+        "action": [
+            "created",
+            "updated"
+        ],
+        "module": "file_integrity"
+    },
+    "file": {
+        "ctime": "2018-01-05T03:28:26Z",
+        "gid": 20,
+        "group": "staff",
+        "inode": "20164115",
+        "mode": "0600",
+        "mtime": "2018-01-05T03:28:26Z",
+        "owner": "akroh",
+        "path": "/private/var/folders/8x/rnyk6yxn6w97lddn3bs02gf00000gn/T/audit-file864778064/file.data",
+        "size": 11,
+        "type": "file",
+        "uid": 501
+    },
+    "hash": {
+        "sha1": "2aae6c35c94fcfb415dbe95f408b9ce91ee846ed"
+    }
+}

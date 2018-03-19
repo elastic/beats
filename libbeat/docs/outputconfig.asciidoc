@@ -10,10 +10,38 @@
 //// Make sure this content appears below a level 2 heading.
 //////////////////////////////////////////////////////////////////////////
 
-[[elasticsearch-output]]
-=== Elasticsearch Output
+[[configuring-output]]
+== Configure the output
 
-When you specify Elasticsearch for the output, the Beat sends the transactions directly to Elasticsearch by using the Elasticsearch HTTP API.
+ifdef::only-elasticsearch[]
+You configure {beatname_uc} to write to Elasticsearch by setting options 
+in the `output.elasticsearch` section of the +{beatname_lc}.yml+ config file
+endif::[]
+
+ifndef::only-elasticsearch[]
+You configure {beatname_uc} to write to a specific output by setting options
+in the `output` section of the +{beatname_lc}.yml+ config file. Only a single
+output may be defined.
+
+The following topics describe how to configure each supported output:
+
+* <<elasticsearch-output>>
+* <<logstash-output>>
+* <<kafka-output>>
+* <<redis-output>>
+* <<file-output>>
+* <<console-output>>
+
+endif::[]
+
+[[elasticsearch-output]]
+=== Configure the Elasticsearch output
+
+++++
+<titleabbrev>Elasticsearch</titleabbrev>
+++++
+
+When you specify Elasticsearch for the output, {beatname_uc} sends the transactions directly to Elasticsearch by using the Elasticsearch HTTP API.
 
 Example configuration:
 
@@ -22,10 +50,7 @@ Example configuration:
 
 output.elasticsearch:
   hosts: ["http://localhost:9200"]
-  template.enabled: true
-  template.fields: "fields.yml"
-  template.overwrite: false
-  index: "{beatname_lc}"
+  index: "{beatname_lc}-%{[beat.version]}-%{+yyyy.MM.dd}"
   ssl.certificate_authorities: ["/etc/pki/root/ca.pem"]
   ssl.certificate: "/etc/pki/client/cert.pem"
   ssl.key: "/etc/pki/client/cert.key"
@@ -58,11 +83,11 @@ output.elasticsearch:
 
 This output works with all compatible versions of Elasticsearch. See "Supported Beats Versions" in the https://www.elastic.co/support/matrix#show_compatibility[Elastic Support Matrix].
 
-==== Elasticsearch Output Options
+==== Configuration options
 
 You can specify the following options in the `elasticsearch` section of the +{beatname_lc}.yml+ config file:
 
-===== enabled
+===== `enabled`
 
 The enabled config is a boolean setting to enable or disable the output. If set
 to false, the output is disabled.
@@ -71,7 +96,7 @@ The default value is true.
 
 
 [[hosts-option]]
-===== hosts
+===== `hosts`
 
 The list of Elasticsearch nodes to connect to. The events are distributed to
 these nodes in round robin order. If one node becomes unreachable, the event is
@@ -80,7 +105,7 @@ For example: `http://192.15.3.2`, `https://es.found.io:9230` or `192.24.3.2:9300
 If no port is specified, `9200` is used.
 
 NOTE: When a node is defined as an `IP:PORT`, the _scheme_ and _path_ are taken from the
-<<protocol-option>> and <<path-option>> config options.
+<<protocol-option,`protocol`>> and <<path-option,`path`>> config options.
 
 [source,yaml]
 ------------------------------------------------------------------------------
@@ -93,7 +118,7 @@ output.elasticsearch:
 In the previous example, the Elasticsearch nodes are available at `https://10.45.3.2:9220/elasticsearch` and
 `https://10.45.3.1:9230/elasticsearch`.
 
-===== compression_level
+===== `compression_level`
 
 The gzip compression level. Setting this value to 0 disables compression.
 The compression level must be in the range of 1 (best speed) to 9 (best compression).
@@ -102,40 +127,42 @@ Increasing the compression level will reduce the network usage but will increase
 
 The default value is 0.
 
-===== worker
+===== `worker`
 
 The number of workers per configured host publishing events to Elasticsearch. This
 is best used with load balancing mode enabled. Example: If you have 2 hosts and
 3 workers, in total 6 workers are started (3 for each host).
 
-===== username
+The default value is 1.
+
+===== `username`
 
 The basic authentication username for connecting to Elasticsearch.
 
-===== password
+===== `password`
 
 The basic authentication password for connecting to Elasticsearch.
 
-===== parameters
+===== `parameters`
 
 Dictionary of HTTP parameters to pass within the url with index operations.
 
 [[protocol-option]]
-===== protocol
+===== `protocol`
 
 The name of the protocol Elasticsearch is reachable on. The options are:
 `http` or `https`. The default is `http`. However, if you specify a URL for
-<<hosts-option>>, the value of `protocol` is overridden by whatever scheme you
+<<hosts-option,`hosts`>>, the value of `protocol` is overridden by whatever scheme you
 specify in the URL.
 
 [[path-option]]
-===== path
+===== `path`
 
 An HTTP path prefix that is prepended to the HTTP API calls. This is useful for
 the cases where Elasticsearch listens behind an HTTP reverse proxy that exports
 the API under a custom prefix.
 
-===== headers
+===== `headers`
 
 Custom HTTP headers to add to each request created by the Elasticsearch output.
 Example:
@@ -149,7 +176,7 @@ output.elasticsearch.headers:
 It is generally possible to specify multiple header values for the same header
 name by separating them with a comma.
 
-===== proxy_url
+===== `proxy_url`
 
 The URL of the proxy to use when connecting to the Elasticsearch servers. The
 value may be either a complete URL or a "host[:port]", in which case the "http"
@@ -158,11 +185,19 @@ then proxy environment variables are used. See the
 https://golang.org/pkg/net/http/#ProxyFromEnvironment[golang documentation]
 for more information about the environment variables.
 
-===== index
+[[index-option-es]]
+===== `index`
 
-The index name to write events to. The default is "{beatname_lc}-%{+yyyy.MM.dd}" (for example, "{beatname_lc}-2015.04.26").
+The index name to write events to. The default is
++"{beatname_lc}-%\{[beat.version]\}-%\{+yyyy.MM.dd\}"+ (for example,
++"{beatname_lc}-{version}-2017.04.26"+). If you change this setting, you also
+need to configure the `setup.template.name` and `setup.template.pattern` options
+(see <<configuration-template>>). If you are using the pre-built Kibana
+dashboards, you also need to set the `setup.dashboards.index` option (see
+<<configuration-dashboards>>).
 
-===== indices
+
+===== `indices`
 
 Array of index selector rules supporting conditionals, format string
 based field access and name mappings. The first rule matching will be used to
@@ -185,17 +220,18 @@ Examples elasticsearch output with `indices`:
 ------------------------------------------------------------------------------
 output.elasticsearch:
   hosts: ["http://localhost:9200"]
-  index: "logs-%{+yyyy.MM.dd}"
+  index: "logs-%{[beat.version]}-%{+yyyy.MM.dd}"
   indices:
-    - index: "critical-%{+yyyy.MM.dd}"
+    - index: "critical-%{[beat.version]}-%{+yyyy.MM.dd}"
       when.contains:
         message: "CRITICAL"
-    - index: "error-%{+yyyy.MM.dd}"
+    - index: "error-%{[beat.version]}-%{+yyyy.MM.dd}"
       when.contains:
         message: "ERR"
 ------------------------------------------------------------------------------
 
-===== pipeline
+ifndef::no-pipeline[]
+===== `pipeline`
 
 A format string value that specifies the ingest node pipeline to write events to.
 
@@ -208,7 +244,7 @@ output.elasticsearch:
 
 For more information, see <<configuring-ingest-node>>.
 
-===== pipelines
+===== `pipelines`
 
 Similar to the `indices` array, this is an array of pipeline selector
 configurations supporting conditionals, format string based field access
@@ -221,16 +257,18 @@ Example elasticsearch output with `pipelines`:
 ["source","yaml"]
 ------------------------------------------------------------------------------
 filebeat.prospectors:
-- paths: ["/var/log/app/normal/*.log"]
+- type: log
+  paths: ["/var/log/app/normal/*.log"]
   fields:
     type: "normal"
-- paths: ["/var/log/app/critical/*.log"]
+- type: log
+  paths: ["/var/log/app/critical/*.log"]
   fields:
     type: "critical"
 
 output.elasticsearch:
   hosts: ["http://localhost:9200"]
-  index: "filebeat-%{+yyyy.MM.dd}"
+  index: "filebeat-%{[beat.version]}-%{+yyyy.MM.dd}"
   pipelines:
     - pipeline: critical_pipeline
       when.equals:
@@ -239,75 +277,67 @@ output.elasticsearch:
       when.equals:
         fields.type: "normal"
 ------------------------------------------------------------------------------
+endif::[]
 
-===== max_retries
+===== `max_retries`
 
 The number of times to retry publishing an event after a publishing failure.
 After the specified number of retries, the events are typically dropped.
-Some Beats, such as Filebeat, ignore the `max_retries` setting and retry until all
-events are published.
 
+ifeval::["{beatname_lc}" == "filebeat"]
+Filebeat will ignore the `max_retries` setting and retry until all
+events are published.
+endif::[]
+ifeval::["{beatname_lc}" != "filebeat"]
 Set `max_retries` to a value less than 0 to retry until all events are published.
+endif::[]
 
 The default is 3.
 
-===== bulk_max_size
+===== `bulk_max_size`
 
 The maximum number of events to bulk in a single Elasticsearch bulk API index request. The default is 50.
 
-If the Beat sends single events, the events are collected into batches. If the Beat publishes
-a large batch of events (larger than the value specified by `bulk_max_size`), the batch is
-split.
+Events can be collected into batches. {beatname_uc} will split batches larger than `bulk_max_size`
+into multiple batches.
 
 Specifying a larger batch size can improve performance by lowering the overhead of sending events.
 However big batch sizes can also increase processing times, which might result in
 API errors, killed connections, timed-out publishing requests, and, ultimately, lower
 throughput.
 
-Setting `bulk_max_size` to values less than or equal to 0 disables buffering in libbeat. When buffering is disabled,
-Beats that publish single events (such as Packetbeat) send each event directly to
-Elasticsearch. Beats that publish data in batches (such as Filebeat) send events in batches based on the
-spooler size.
+Setting `bulk_max_size` to values less than or equal to 0 disables the
+splitting of batches. When splitting is disabled, the queue decides on the
+number of events to be contained in a batch.
 
-===== timeout
+===== `timeout`
 
 The http request timeout in seconds for the Elasticsearch request. The default is 90.
 
-===== flush_interval
-
-The number of seconds to wait for new events between two bulk API index requests.
-If `bulk_max_size` is reached before this interval expires, additional bulk index
-requests are made.
-
-===== ssl
+===== `ssl`
 
 Configuration options for SSL parameters like the certificate authority to use
-for HTTPS-based connections. If the `tls` section is missing, the host CAs are used for HTTPS connections to
+for HTTPS-based connections. If the `ssl` section is missing, the host CAs are used for HTTPS connections to
 Elasticsearch.
 
-See <<configuration-output-ssl>> for more information.
+See <<configuration-ssl>> for more information.
 
+ifndef::only-elasticsearch[]
 
 [[logstash-output]]
-=== Logstash Output
+=== Configure the Logstash output
 
-*Prerequisite:* To use Logstash as an output, you must
-{libbeat}/logstash-installation.html#logstash-setup[install and configure] the Beats input
-plugin for Logstash.
+++++
+<titleabbrev>Logstash</titleabbrev>
+++++
 
-The Logstash output sends the events directly to Logstash by using the lumberjack
+The Logstash output sends events directly to Logstash by using the lumberjack
 protocol, which runs over TCP. Logstash allows for additional processing and routing of
 generated events.
 
-Here is an example of how to configure {beatname_uc} to use Logstash:
+include::../../libbeat/docs/shared-logstash-config.asciidoc[]
 
-["source","yaml",subs="attributes"]
-------------------------------------------------------------------------------
-output.logstash:
-  hosts: ["localhost:5044"]
-------------------------------------------------------------------------------
-
-==== Accessing Metadata Fields
+==== Accessing metadata fields
 
 Every event sent to Logstash contains the following metadata fields that you can
 use in Logstash for indexing and filtering:
@@ -318,18 +348,18 @@ use in Logstash for indexing and filtering:
     ...
     "@metadata": { <1>
       "beat": "{beatname_lc}", <2>
-      "type": "doc" <3>
+      "version": "{stack-version}" <3>
+      "type": "doc" <4>
     }
 }
 ------------------------------------------------------------------------------
-<1> {beatname_uc} uses the `@metadata` field to send metadata to Logstash. The
-contents of the `@metadata` field only exist in Logstash and are not part of any
-events sent from Logstash. See the
+<1> {beatname_uc} uses the `@metadata` field to send metadata to Logstash. See the
 {logstashdoc}/event-dependent-configuration.html#metadata[Logstash documentation]
 for more about the `@metadata` field.
 <2> The default is {beatname_lc}. To change this value, set the
 <<logstash-index,`index`>> option in the {beatname_uc} config file.
-<3> The value of `type` is currently hardcoded to `doc`. It was used by previous
+<3> The beats current version.
+<4> The value of `type` is currently hardcoded to `doc`. It was used by previous
 Logstash configs to set the type of the document in Elasticsearch.
 
 
@@ -355,14 +385,15 @@ input {
 output {
   elasticsearch {
     hosts => ["http://localhost:9200"]
-    index => "%{[@metadata][beat]}-%{+YYYY.MM.dd}" <1>
+    index => "%{[@metadata][beat]}-%{[@metadata][version]}-%{+YYYY.MM.dd}" <1>
   }
 }
 ------------------------------------------------------------------------------
 <1> `%{[@metadata][beat]}` sets the first part of the index name to the value
-of the `beat` metadata field, and `%{+YYYY.MM.dd}` sets the second part of the
+of the `beat` metadata field, `%{[@metadata][version]}` sets the second part to
+the Beat's version, and `%{+YYYY.MM.dd}` sets the third part of the
 name to a date based on the Logstash `@timestamp` field. For example:
-+{beatname_lc}-2017.03.29+.
++{beatname_lc}-{version}-2017.03.29+.
 
 Events indexed into Elasticsearch with the Logstash configuration shown here
 will be similar to events directly indexed by Beats into Elasticsearch.
@@ -372,12 +403,12 @@ will be similar to events directly indexed by Beats into Elasticsearch.
 
 This output works with all compatible versions of Logstash. See "Supported Beats Versions" in the https://www.elastic.co/support/matrix#show_compatibility[Elastic Support Matrix].
 
-==== Logstash Output Options
+==== Configuration options
 
 You can specify the following options in the `logstash` section of the
 +{beatname_lc}.yml+ config file:
 
-===== enabled
+===== `enabled`
 
 The enabled config is a boolean setting to enable or disable the output. If set
 to false, the output is disabled.
@@ -385,16 +416,16 @@ to false, the output is disabled.
 The default value is true.
 
 [[hosts]]
-===== hosts
+===== `hosts`
 
 The list of known Logstash servers to connect to. If load balancing is disabled, but
 multiple hosts are configured, one host is selected randomly (there is no precedence).
 If one host becomes unreachable, another one is selected randomly.
 
 All entries in this list can contain a port number. If no port number is given, the
-value specified for <<port>> is used as the default port number.
+value specified for <<port,`port`>> is used as the default port number.
 
-===== compression_level
+===== `compression_level`
 
 The gzip compression level. Setting this value to 0 disables compression.
 The compression level must be in the range of 1 (best speed) to 9 (best compression).
@@ -403,21 +434,29 @@ Increasing the compression level will reduce the network usage but will increase
 
 The default value is 3.
 
-===== worker
+===== `worker`
 
 The number of workers per configured host publishing events to Logstash. This
 is best used with load balancing mode enabled. Example: If you have 2 hosts and
 3 workers, in total 6 workers are started (3 for each host).
 
 [[loadbalance]]
-===== loadbalance
+===== `loadbalance`
 
 If set to true and multiple Logstash hosts are configured, the output plugin
 load balances published events onto all Logstash hosts. If set to false,
 the output plugin sends all events to only one host (determined at random) and
 will switch to another host if the selected one becomes unresponsive. The default value is false.
 
-===== ttl
+["source","yaml",subs="attributes"]
+------------------------------------------------------------------------------
+output.logstash:
+  hosts: ["localhost:5044", "localhost:5045"]
+  loadbalance: true
+  index: {beatname_lc}
+------------------------------------------------------------------------------
+
+===== `ttl`
 
 Time to live for a connection to Logstash after which the connection will be re-established.
 Useful when Logstash hosts represent load balancers. Since the connections to Logstash hosts
@@ -429,30 +468,22 @@ The default value is 0.
 
 NOTE: The "ttl" option is not yet supported on an async Logstash client (one with the "pipelining" option set).
 
-["source","yaml",subs="attributes"]
-------------------------------------------------------------------------------
-output.logstash:
-  hosts: ["localhost:5044", "localhost:5045"]
-  loadbalance: true
-  index: {beatname_lc}
-------------------------------------------------------------------------------
+===== `pipelining`
 
-===== pipelining
-
-Configures number of batches to be send asynchronously to logstash while waiting
+Configures number of batches to be sent asynchronously to logstash while waiting
 for ACK from logstash. Output only becomes blocking once number of `pipelining`
 batches have been written. Pipelining is disabled if a values of 0 is
-configured. The default value is 0.
+configured. The default value is 2.
 
 [[port]]
-===== port
+===== `port`
 
 deprecated[5.0.0]
 
-The default port to use if the port number is not given in <<hosts>>. The default port number
+The default port to use if the port number is not given in <<hosts,`hosts`>>. The default port number
 is 10200.
 
-===== proxy_url
+===== `proxy_url`
 
 The URL of the SOCKS5 proxy to use when connecting to the Logstash servers. The
 value must be a URL with a scheme of `socks5://`. The protocol used to
@@ -463,7 +494,7 @@ password can be embedded in the URL as shown in the example.
 
 When using a proxy, hostnames are resolved on the proxy server instead of on the
 client. You can change this behavior by setting the
-<<logstash-proxy-use-local-resolver,proxy_use_local_resolver>> option.
+<<logstash-proxy-use-local-resolver,`proxy_use_local_resolver`>> option.
 
 ["source","yaml",subs="attributes"]
 ------------------------------------------------------------------------------
@@ -473,41 +504,45 @@ output.logstash:
 ------------------------------------------------------------------------------
 
 [[logstash-proxy-use-local-resolver]]
-===== proxy_use_local_resolver
+===== `proxy_use_local_resolver`
 
 The `proxy_use_local_resolver` option determines if Logstash hostnames are
 resolved locally when using a proxy. The default value is false which means
 that when a proxy is used the name resolution occurs on the proxy server.
 
 [[logstash-index]]
-===== index
+===== `index`
 
-The index root name to write events to. The default is the Beat name.
-For example "{beatname_lc}" generates "[{beatname_lc}-]YYYY.MM.DD" indexes (for example,
-"{beatname_lc}-2015.04.26").
+The index root name to write events to. The default is the Beat name. For
+example +"{beatname_lc}"+ generates +"[{beatname_lc}-]{version}-YYYY.MM.DD"+
+indices (for example, +"{beatname_lc}-{version}-2017.04.26"+).
 
-===== ssl
+===== `ssl`
 
 Configuration options for SSL parameters like the root CA for Logstash connections. See
-<<configuration-output-ssl>> for more information. To use SSL, you must also configure the
+<<configuration-ssl>> for more information. To use SSL, you must also configure the
 https://www.elastic.co/guide/en/logstash/current/plugins-inputs-beats.html[Beats input plugin for Logstash] to use SSL/TLS.
 
-===== timeout
+===== `timeout`
 
 The number of seconds to wait for responses from the Logstash server before timing out. The default is 30 (seconds).
 
-===== max_retries
+===== `max_retries`
 
 The number of times to retry publishing an event after a publishing failure.
 After the specified number of retries, the events are typically dropped.
-Some Beats, such as Filebeat, ignore the `max_retries` setting and retry until all
-events are published.
 
+ifeval::["{beatname_lc}" == "filebeat"]
+Filebeat will ignore the `max_retries` setting and retry until all
+events are published.
+endif::[]
+ifeval::["{beatname_lc}" != "filebeat"]
 Set `max_retries` to a value less than 0 to retry until all events are published.
+endif::[]
 
 The default is 3.
 
-===== bulk_max_size
+===== `bulk_max_size`
 
 The maximum number of events to bulk in a single Logstash request. The default is 2048.
 
@@ -520,13 +555,25 @@ However big batch sizes can also increase processing times, which might result i
 API errors, killed connections, timed-out publishing requests, and, ultimately, lower
 throughput.
 
-Setting `bulk_max_size` to values less than or equal to 0 disables buffering in libbeat. When buffering is disabled,
-Beats that publish single events (such as Packetbeat) send each event directly to
-Elasticsearch. Beats that publish data in batches (such as Filebeat) send events in batches based on the
-spooler size.
+Setting `bulk_max_size` to values less than or equal to 0 disables the
+splitting of batches. When splitting is disabled, the queue decides on the
+number of events to be contained in a batch.
+
+
+===== `slow_start`
+
+If enabled only a subset of events in a batch of events is transferred per transaction.
+The number of events to be sent increases up to `bulk_max_size` if no error is encountered.
+On error the number of events per transaction is reduced again.
+
+The default is `false`.
 
 [[kafka-output]]
-=== Kafka Output
+=== Configure the Kafka output
+
+++++
+<titleabbrev>Kafka</titleabbrev>
+++++
 
 The Kafka output sends the events to Apache Kafka.
 
@@ -539,7 +586,7 @@ output.kafka:
   hosts: ["kafka1:9092", "kafka2:9092", "kafka3:9092"]
 
   # message topic selection + partitioning
-  topic: '%{[type]}'
+  topic: '%{[fields.log_topic]}'
   partition.round_robin:
     reachable_only: false
 
@@ -554,47 +601,55 @@ NOTE: Events bigger than <<kafka-max_message_bytes,`max_message_bytes`>> will be
 
 This output works with Kafka 0.8, 0.9, and 0.10.
 
-==== Kafka Output Options
+==== Configuration options
 
 You can specify the following options in the `kafka` section of the +{beatname_lc}.yml+ config file:
 
-===== enabled
+===== `enabled`
 
-The enabled config is a boolean setting to enable or disable the output. If set
+The `enabled` config is a boolean setting to enable or disable the output. If set
 to false, the output is disabled.
 
 The default value is true.
 
-===== hosts
+===== `hosts`
 
 The list of Kafka broker addresses from where to fetch the cluster metadata.
 The cluster metadata contain the actual Kafka brokers events are published to.
 
-===== version
+===== `version`
 
 Kafka version ${beatname_lc} is assumed to run against. Defaults to oldest
 supported stable version (currently version 0.8.2.0).
 
 Event timestamps will be added, if version 0.10.0.0+ is enabled.
 
-Valid values are `0.8.2.0`, `0.8.2.1`, `0.8.2.2`, `0.8.2`, `0.8`, `0.9.0.0`,
-`0.9.0.1`, `0.9.0`, `0.9`, `0.10.0.0`, `0.10.0`, and `0.10`.
+Valid values are all kafka releases in between `0.8.2.0` and `0.11.0.0`.
 
-===== username
+===== `username`
 
 The username for connecting to Kafka. If username is configured, the password
 must be configured as well. Only SASL/PLAIN is supported.
 
-===== password
+===== `password`
 
 The password for connecting to Kafka.
 
-===== topic
+===== `topic`
 
 The Kafka topic used for produced events. The setting can be a format string
-using any event field. To set the topic from document type use `%{[type]}`.
+using any event field. For example, you can use the
+<<libbeat-configuration-fields,`fields`>> configuration option to add a custom
+field called `log_topic` to the event, and then set `topic` to the value of the
+custom field:
 
-===== topics
+[source,yaml]
+-----
+topic: '%{[fields.log_topic]}'
+-----
+
+
+===== `topics`
 
 Array of topic selector rules supporting conditionals, format string
 based field access and name mappings. The first rule matching will be used to
@@ -612,11 +667,11 @@ Rule settings:
 
 *`when`*: Condition which must succeed in order to execute the current rule.
 
-===== key
+===== `key`
 
 Optional Kafka event key. If configured, the event key must be unique and can be extracted from the event using a format string.
 
-===== partition
+===== `partition`
 
 Kafka output broker event partitioning strategy. Must be one of `random`,
 `round_robin`, or `hash`. By default the `hash` partitioner is used.
@@ -642,21 +697,21 @@ available partitions only.
 
 NOTE: Publishing to a subset of available partitions potentially increases resource usage because events may become unevenly distributed.
 
-===== client_id
+===== `client_id`
 
 The configurable ClientID used for logging, debugging, and auditing purposes. The default is "beats".
 
-===== worker
+===== `worker`
 
 The number of concurrent load-balanced Kafka output workers.
 
-===== codec
+===== `codec`
 
 Output codec configuration. If the `codec` section is missing, events will be json encoded.
 
 See <<configuration-output-codec>> for more information.
 
-===== metadata
+===== `metadata`
 
 Kafka metadata update settings. The metadata do contain information about
 brokers, topics, partition, and active leaders to use for publishing.
@@ -667,64 +722,69 @@ brokers, topics, partition, and active leaders to use for publishing.
 
 *`retry.backoff`*:: Waiting time between retries during leader elections. Default is 250ms.
 
-===== max_retries
+===== `max_retries`
 
 The number of times to retry publishing an event after a publishing failure.
 After the specified number of retries, the events are typically dropped.
-Some Beats, such as Filebeat, ignore the `max_retries` setting and retry until all
-events are published.
 
+ifeval::["{beatname_lc}" == "filebeat"]
+Filebeat will ignore the `max_retries` setting and retry until all
+events are published.
+endif::[]
+
+ifeval::["{beatname_lc}" != "filebeat"]
 Set `max_retries` to a value less than 0 to retry until all events are published.
+endif::[]
 
 The default is 3.
 
-===== bulk_max_size
+===== `bulk_max_size`
 
 The maximum number of events to bulk in a single Kafka request. The default is 2048.
 
-===== timeout
+===== `timeout`
 
 The number of seconds to wait for responses from the Kafka brokers before timing
 out. The default is 30 (seconds).
 
-===== broker_timeout
+===== `broker_timeout`
 
 The maximum duration a broker will wait for number of required ACKs. The default is 10s.
 
-===== channel_buffer_size
+===== `channel_buffer_size`
 
 Per Kafka broker number of messages buffered in output pipeline. The default is 256.
 
-===== keep_alive
+===== `keep_alive`
 
 The keep-alive period for an active network connection. If 0s, keep-alives are disabled. The default is 0 seconds.
 
-===== compression
+===== `compression`
 
-Sets the output compression codec. Must be one of `none`, `snappy` and `gzip`. The default is `gzip`.
+Sets the output compression codec. Must be one of `none`, `snappy`, `lz4` and `gzip`. The default is `gzip`.
 
 [[kafka-max_message_bytes]]
-===== max_message_bytes
+===== `max_message_bytes`
 
 The maximum permitted size of JSON-encoded messages. Bigger messages will be dropped. The default value is 1000000 (bytes). This value should be equal to or less than the broker's `message.max.bytes`.
 
-===== required_acks
+===== `required_acks`
 
 The ACK reliability level required from broker. 0=no response, 1=wait for local commit, -1=wait for all replicas to commit. The default is 1.
 
 Note: If set to 0, no ACKs are returned by Kafka. Messages might be lost silently on error.
 
-===== flush_interval
-
-The number of seconds to wait for new events between two producer API calls.
-
-===== ssl
+===== `ssl`
 
 Configuration options for SSL parameters like the root CA for Kafka connections. See
-<<configuration-output-ssl>> for more information.
+<<configuration-ssl>> for more information.
 
 [[redis-output]]
-=== Redis Output
+=== Configure the Redis output
+
+++++
+<titleabbrev>Redis</titleabbrev>
+++++
 
 The Redis output inserts the events into a Redis list or a Redis channel.
 This output plugin is compatible with
@@ -746,18 +806,18 @@ output.redis:
 
 This output works with Redis 3.2.4.
 
-==== Redis Output Options
+==== Configuration options
 
 You can specify the following options in the `redis` section of the +{beatname_lc}.yml+ config file:
 
-===== enabled
+===== `enabled`
 
 The enabled config is a boolean setting to enable or disable the output. If set
 to false, the output is disabled.
 
 The default value is true.
 
-===== hosts
+===== `hosts`
 
 The list of Redis servers to connect to. If load balancing is enabled, the events are
 distributed to the servers in the list. If one server becomes unreachable, the events are
@@ -765,20 +825,20 @@ distributed to the reachable servers only. You can define each Redis server by s
 `HOST` or `HOST:PORT`. For example: `"192.15.3.2"` or `"test.redis.io:12345"`. If you
 don't specify a port number, the value configured by `port` is used.
 
-===== port
+===== `port`
 
 deprecated[5.0.0]
 
 The Redis port to use if `hosts` does not contain a port number. The default is 6379.
 
-===== index
+===== `index`
 
 deprecated[5.0.0,The `index` setting is renamed to `key`]
 
 The name of the Redis list or channel the events are published to. The default is
 "{beatname_lc}".
 
-===== key
+===== `key`
 
 The name of the Redis list or channel the events are published to. The default is
 "{beatname_lc}".
@@ -796,7 +856,7 @@ output.redis:
   key: "%{[fields.list]:fallback}"
 ------------------------------------------------------------------------------
 
-===== keys
+===== `keys`
 
 Array of key selector configurations supporting conditionals, format string
 based field access and name mappings. The first rule matching will be used to
@@ -827,22 +887,22 @@ output.redis:
     - key: "debug_list"  # send to debug_list if `message` field contains DEBUG
       when.contains:
         message: "DEBUG"
-    - key: "%{[type]}"
+    - key: "%{[fields.list]}"
       mapping:
         "http": "frontend_list"
         "nginx": "frontend_list"
         "mysql": "backend_list"
 ------------------------------------------------------------------------------
 
-===== password
+===== `password`
 
 The password to authenticate with. The default is no authentication.
 
-===== db
+===== `db`
 
 The Redis database number where the events are published. The default is 0.
 
-===== datatype
+===== `datatype`
 
 The Redis data type to use for publishing events.If the data type is `list`, the
 Redis RPUSH command is used and all events are added to the list with the key defined under `key`.
@@ -850,57 +910,62 @@ If the data type `channel` is used, the Redis `PUBLISH` command is used and mean
 are pushed to the pub/sub mechanism of Redis. The name of the channel is the one defined under `key`.
 The default value is `list`.
 
-===== codec
+===== `codec`
 
 Output codec configuration. If the `codec` section is missing, events will be json encoded.
 
 See <<configuration-output-codec>> for more information.
 
-===== host_topology
+===== `host_topology`
 
 deprecated[5.0.0]
 
 The Redis host to connect to when using topology map support. Topology map support is disabled if this option is not set.
 
-===== password_topology
+===== `password_topology`
 
 deprecated[5.0.0]
 
 The password to use for authenticating with the Redis topology server. The default is no authentication.
 
-===== db_topology
+===== `db_topology`
 
 deprecated[5.0.0]
 
 The Redis database number where the topology information is stored. The default is 1.
 
-===== worker
+===== `worker`
 
 The number of workers to use for each host configured to publish events to Redis. Use this setting along with the
 `loadbalance` option. For example, if you have 2 hosts and 3 workers, in total 6 workers are started (3 for each host).
 
-===== loadbalance
+===== `loadbalance`
 
 If set to true and multiple hosts or workers are configured, the output plugin load balances published events onto all
 Redis hosts. If set to false, the output plugin sends all events to only one host (determined at random) and will switch
 to another host if the currently selected one becomes unreachable. The default value is true.
 
-===== timeout
+===== `timeout`
 
 The Redis connection timeout in seconds. The default is 5 seconds.
 
-===== max_retries
+===== `max_retries`
 
 The number of times to retry publishing an event after a publishing failure.
 After the specified number of retries, the events are typically dropped.
-Some Beats, such as Filebeat, ignore the `max_retries` setting and retry until all
-events are published.
 
+ifeval::["{beatname_lc}" == "filebeat"]
+Filebeat will ignore the `max_retries` setting and retry until all
+events are published.
+endif::[]
+ifeval::["{beatname_lc}" != "filebeat"]
 Set `max_retries` to a value less than 0 to retry until all events are published.
+endif::[]
 
 The default is 3.
 
-===== bulk_max_size
+
+===== `bulk_max_size`
 
 The maximum number of events to bulk in a single Redis request or pipeline. The default is 2048.
 
@@ -913,19 +978,17 @@ of sending events. However big batch sizes can also increase processing times,
 which might result in API errors, killed connections, timed-out publishing
 requests, and, ultimately, lower throughput.
 
-Setting `bulk_max_size` to values less than or equal to 0 disables buffering in
-libbeat. When buffering is disabled, Beats that publish single events (such as
-Packetbeat) send each event directly to Redis. Beats that publish
-data in batches (such as Filebeat) send events in batches based on the spooler
-size.
+Setting `bulk_max_size` to values less than or equal to 0 disables the
+splitting of batches. When splitting is disabled, the queue decides on the
+number of events to be contained in a batch.
 
-===== ssl
+===== `ssl`
 
 Configuration options for SSL parameters like the root CA for Redis connections
 guarded by SSL proxies (for example https://www.stunnel.org[stunnel]). See
-<<configuration-output-ssl>> for more information.
+<<configuration-ssl>> for more information.
 
-===== proxy_url
+===== `proxy_url`
 
 The URL of the SOCKS5 proxy to use when connecting to the Redis servers. The
 value must be a URL with a scheme of `socks5://`. You cannot use a web proxy
@@ -936,16 +999,20 @@ a username and password in the URL.
 
 When using a proxy, hostnames are resolved on the proxy server instead of on the
 client. You can change this behavior by setting the
-<<redis-proxy-use-local-resolver,proxy_use_local_resolver>> option.
+<<redis-proxy-use-local-resolver,`proxy_use_local_resolver`>> option.
 
 [[redis-proxy-use-local-resolver]]
-===== proxy_use_local_resolver
+===== `proxy_use_local_resolver`
 
 This option determines whether Redis hostnames are resolved locally when using a proxy.
 The default value is false, which means that name resolution occurs on the proxy server.
 
 [[file-output]]
-=== File Output
+=== Configure the File output
+
+++++
+<titleabbrev>File</titleabbrev>
+++++
 
 The File output dumps the transactions into a file where each transaction is in a JSON format.
 Currently, this output is used for testing, but it can be used as input for
@@ -958,13 +1025,14 @@ output.file:
   filename: {beatname_lc}
   #rotate_every_kb: 10000
   #number_of_files: 7
+  #permissions: 0600
 ------------------------------------------------------------------------------
 
-==== File Output Options
+==== Configuration options
 
 You can specify the following options in the `file` section of the +{beatname_lc}.yml+ config file:
 
-===== enabled
+===== `enabled`
 
 The enabled config is a boolean setting to enable or disable the output. If set
 to false, the output is disabled.
@@ -972,35 +1040,43 @@ to false, the output is disabled.
 The default value is true.
 
 [[path]]
-===== path
+===== `path`
 
 The path to the directory where the generated files will be saved. This option is
 mandatory.
 
-===== filename
+===== `filename`
 
 The name of the generated files. The default is set to the Beat name. For example, the files
 generated by default for {beatname_uc} would be "{beatname_lc}", "{beatname_lc}.1", "{beatname_lc}.2", and so on.
 
-===== rotate_every_kb
+===== `rotate_every_kb`
 
 The maximum size in kilobytes of each file. When this size is reached, the files are
 rotated. The default value is 10240 KB.
 
-===== number_of_files
+===== `number_of_files`
 
-The maximum number of files to save under <<path>>. When this number of files is reached, the
+The maximum number of files to save under <<path,`path`>>. When this number of files is reached, the
 oldest file is deleted, and the rest of the files are shifted from last to first. The default
 is 7 files.
 
-===== codec
+===== `permissions`
+
+Permissions to use for file creation. The default is 0600.
+
+===== `codec`
 
 Output codec configuration. If the `codec` section is missing, events will be json encoded.
 
 See <<configuration-output-codec>> for more information.
 
 [[console-output]]
-=== Console Output
+=== Configure the Console output
+
+++++
+<titleabbrev>Console</titleabbrev>
+++++
 
 The Console output writes events in JSON format to stdout.
 
@@ -1010,176 +1086,45 @@ output.console:
   pretty: true
 ------------------------------------------------------------------------------
 
-==== Console Output Options
+==== Configuration options
 
 You can specify the following options in the `console` section of the +{beatname_lc}.yml+ config file:
 
-===== pretty
+===== `pretty`
 
 If `pretty` is set to true, events written to stdout will be nicely formatted. The default is false.
 
-===== codec
+===== `codec`
 
 Output codec configuration. If the `codec` section is missing, events will be json encoded using the `pretty` option.
 
 See <<configuration-output-codec>> for more information.
 
 
-===== enabled
+===== `enabled`
 
 The enabled config is a boolean setting to enable or disable the output. If set
 to false, the output is disabled.
 
 The default value is true.
 
-===== bulk_max_size
+===== `bulk_max_size`
 
 The maximum number of events to buffer internally during publishing. The default is 2048.
 
 Specifying a larger batch size may add some latency and buffering during publishing. However, for Console output, this
 setting does not affect how events are published.
 
-Setting `bulk_max_size` to 0 disables buffering in libbeat.
-
-[[configuration-output-ssl]]
-
-=== SSL
-
-You can specify SSL options for any output that supports SSL.
-
-Example configuration:
-
-[source,yaml]
-------------------------------------------------------------------------------
-output.elasticsearch:
-  hosts: ["192.168.1.42:9200"]
-  ssl.certificate_authorities: ["/etc/pki/root/ca.pem"]
-  ssl.certificate: "/etc/pki/client/cert.pem"
-  ssl.key: "/etc/pki/client/cert.key"
-------------------------------------------------------------------------------
-
-==== SSL Options
-
-You can specify the following options in the `ssl` section of the +{beatname_lc}.yml+ config file:
-
-===== enabled
-
-The `enabled` setting can be used to disable the ssl configuration by setting
-it to `false`. The default value is `true`.
-
-Note: SSL settings are disabled if either `enabled` is set to `false` or the
-`ssl` section is missing.
-
-===== certificate_authorities
-
-The list of root certificates for server verifications. If `certificate_authorities` is empty or not set, the trusted certificate authorities of the host system are used.
-
-[[certificate]]
-
-===== certificate: "/etc/pki/client/cert.pem"
-
-The path to the certificate for SSL client authentication. If the certificate
-is not specified, client authentication is not available. The connection
-might fail if the server requests client authentication. If the SSL server does not
-require client authentication, the certificate will be loaded, but not requested or used
-by the server.
-
-When this option is configured, the <<certificate_key>> option is also required.
-
-[[certificate_key]]
-===== key: "/etc/pki/client/cert.key"
-
-The client certificate key used for client authentication. This option is required if <<certificate>> is specified.
-
-===== key_passphrase
-
-The passphrase used to decrypt an encrypted key stored in the configured `key` file.
-
-===== supported_protocols
-
-List of allowed SSL/TLS versions. If SSL/TLS server decides for protocol versions
-not configured, the connection will be dropped during or after the handshake. The
-setting is a list of allowed protocol versions:
-`SSLv3`, `TLSv1` for TLS version 1.0, `TLSv1.0`, `TLSv1.1` and `TLSv1.2`.
-
-The default value is `[TLSv1.0, TLSv1.1, TLSv1.2]`.
-
-===== verification_mode
-
-This option controls whether the client verifies server certificates and host
-names. The values `none` and `full` can be used. If `verification_mode` is set
-to `none`, all server host names and certificates are accepted. In this mode,
-TLS-based connections are susceptible to man-in-the-middle attacks. Use this
-option for testing only.
-
-The default is `full`.
-
-===== cipher_suites
-
-The list of cipher suites to use. The first entry has the highest priority.
-If this option is omitted, the Go crypto library's default
-suites are used (recommended).
-
-The following cipher suites are available:
-
-* RSA-RC4-128-SHA (disabled by default - RC4 not recommended)
-* RSA-3DES-CBC3-SHA
-* RSA-AES-128-CBC-SHA
-* RSA-AES-256-CBC-SHA
-* ECDHE-ECDSA-RC4-128-SHA (disabled by default - RC4 not recommended)
-* ECDHE-ECDSA-AES-128-CBC-SHA
-* ECDHE-ECDSA-AES-256-CBC-SHA
-* ECDHE-RSA-RC4-128-SHA (disabled by default- RC4 not recommended)
-* ECDHE-RSA-3DES-CBC3-SHA
-* ECDHE-RSA-AES-128-CBC-SHA
-* ECDHE-RSA-AES-256-CBC-SHA
-* ECDHE-RSA-AES-128-GCM-SHA256 (TLS 1.2 only)
-* ECDHE-ECDSA-AES-128-GCM-SHA256 (TLS 1.2 only)
-* ECDHE-RSA-AES-256-GCM-SHA384 (TLS 1.2 only)
-* ECDHE-ECDSA-AES-256-GCM-SHA384 (TLS 1.2 only)
-
-Here is a list of acronyms used in defining the cipher suites:
-
-* 3DES:
-  Cipher suites using triple DES
-
-* AES-128/256:
-  Cipher suites using AES with 128/256-bit keys.
-
-* CBC:
-  Cipher using Cipher Block Chaining as block cipher mode.
-
-* ECDHE:
-  Cipher suites using Elliptic Curve Diffie-Hellman (DH) ephemeral key exchange.
-
-* ECDSA:
-  Cipher suites using Elliptic Curve Digital Signature Algorithm for authentication.
-
-* GCM:
-  Galois/Counter mode is used for symmetric key cryptography.
-
-* RC4:
-  Cipher suites using RC4.
-
-* RSA:
-  Cipher suites using RSA.
-
-* SHA, SHA256, SHA384:
-  Cipher suites using SHA-1, SHA-256 or SHA-384.
-
-
-===== curve_types
-
-The list of curve types for ECDHE (Elliptic Curve Diffie-Hellman ephemeral key exchange).
-
-The following elliptic curve types are available:
-
-* P-256
-* P-384
-* P-521
+Setting `bulk_max_size` to values less than or equal to 0 disables the
+splitting of batches. When splitting is disabled, the queue decides on the
+number of events to be contained in a batch.
 
 [[configuration-output-codec]]
-=== Output Codec
+=== Configure the output codec
+
+++++
+<titleabbrev>Output codec</titleabbrev>
+++++
 
 For outputs that do not require a specific encoding, you can change the encoding
 by using the codec configuration. You can specify either the `json` or `format`
@@ -1206,3 +1151,46 @@ output.console:
   codec.format:
     string: '%{[@timestamp]} %{[message]}'
 ------------------------------------------------------------------------------
+
+[[configure-cloud-id]]
+=== Configure the output for the Elastic Cloud
+
+++++
+<titleabbrev>Cloud</titleabbrev>
+++++
+
+{beatname_uc} comes with two settings that simplify the output configuration
+when used together with https://cloud.elastic.co/[Elastic Cloud]. When defined,
+these setting overwrite settings from other parts in the configuration.
+
+Example:
+
+["source","yaml",subs="attributes"]
+------------------------------------------------------------------------------
+cloud.id: "staging:dXMtZWFzdC0xLmF3cy5mb3VuZC5pbyRjZWM2ZjI2MWE3NGJmMjRjZTMzYmI4ODExYjg0Mjk0ZiRjNmMyY2E2ZDA0MjI0OWFmMGNjN2Q3YTllOTYyNTc0Mw=="
+cloud.auth: "elastic:{pwd}"
+------------------------------------------------------------------------------
+
+These settings can be also specified at the command line, like this:
+
+
+["source","sh",subs="attributes"]
+------------------------------------------------------------------------------
+{beatname_lc} -e -E cloud.id="<cloud-id>" -E cloud.auth="<cloud.auth>"
+------------------------------------------------------------------------------
+
+
+==== `cloud.id`
+
+The Cloud ID, which can be found in the Elastic Cloud web console, is used by
+{beatname_uc} to resolve the Elasticsearch and Kibana URLs. This setting
+overwrites the `output.elasticsearch.hosts` and `setup.kibana.host` settings.
+
+==== `cloud.auth`
+
+When specified, the `cloud.auth` overwrites the `output.elasticsearch.username` and
+`output.elasticsearch.password` settings. Because the Kibana settings inherit
+the username and password from the Elasticsearch output, this can also be used
+to set the `setup.kibana.username` and `setup.kibana.password` options.
+
+endif::[]

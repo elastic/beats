@@ -1,0 +1,132 @@
+{
+  "objects": [
+    {
+      "attributes": {
+        "description": "",
+        "kibanaSavedObjectMeta": {
+          "searchSourceJSON": "{\n  \"filter\": []\n}"
+        },
+        "savedSearchId": "02014c80-29d2-11e7-a68f-bfaa2341cc52",
+        "title": "HTTP ping times",
+        "uiStateJSON": "{}",
+        "version": 1,
+        "visState": "{\n  \"title\": \"HTTP ping times\",\n  \"type\": \"area\",\n  \"params\": {\n    \"addTooltip\": true,\n    \"addLegend\": true,\n    \"legendPosition\": \"right\",\n    \"scale\": \"linear\",\n    \"interpolate\": \"linear\",\n    \"mode\": \"stacked\",\n    \"times\": [],\n    \"addTimeMarker\": false,\n    \"defaultYExtents\": false,\n    \"setYExtents\": false\n  },\n  \"aggs\": [\n    {\n      \"id\": \"1\",\n      \"enabled\": true,\n      \"type\": \"max\",\n      \"schema\": \"metric\",\n      \"params\": {\n        \"field\": \"resolve.rtt.us\",\n        \"customLabel\": \"\"\n      }\n    },\n    {\n      \"id\": \"3\",\n      \"enabled\": true,\n      \"type\": \"max\",\n      \"schema\": \"metric\",\n      \"params\": {\n        \"field\": \"tcp.rtt.connect.us\"\n      }\n    },\n    {\n      \"id\": \"5\",\n      \"enabled\": true,\n      \"type\": \"max\",\n      \"schema\": \"metric\",\n      \"params\": {\n        \"field\": \"tls.rtt.handshake.us\"\n      }\n    },\n    {\n      \"id\": \"4\",\n      \"enabled\": true,\n      \"type\": \"max\",\n      \"schema\": \"metric\",\n      \"params\": {\n        \"field\": \"http.rtt.response_header.us\"\n      }\n    },\n    {\n      \"id\": \"2\",\n      \"enabled\": true,\n      \"type\": \"date_histogram\",\n      \"schema\": \"segment\",\n      \"params\": {\n        \"field\": \"@timestamp\",\n        \"interval\": \"auto\",\n        \"customInterval\": \"2h\",\n        \"min_doc_count\": 1,\n        \"extended_bounds\": {}\n      }\n    }\n  ],\n  \"listeners\": {}\n}"
+      },
+      "id": "c65ef340-eb19-11e6-be20-559646f8b9ba",
+      "type": "visualization",
+      "version": 1
+    },
+    {
+      "attributes": {
+        "description": "",
+        "kibanaSavedObjectMeta": {
+          "searchSourceJSON": "{\n  \"filter\": []\n}"
+        },
+        "savedSearchId": "02014c80-29d2-11e7-a68f-bfaa2341cc52",
+        "title": "HTTP monitors status",
+        "uiStateJSON": "{\n  \"vis\": {\n    \"colors\": {\n      \"200\": \"#B7DBAB\",\n      \"monitor.status: up\": \"#629E51\",\n      \"monitor.status: down\": \"#E24D42\"\n    },\n    \"legendOpen\": true\n  }\n}",
+        "version": 1,
+        "visState": "{\n  \"title\": \"HTTP monitors status\",\n  \"type\": \"pie\",\n  \"params\": {\n    \"addTooltip\": true,\n    \"addLegend\": true,\n    \"legendPosition\": \"bottom\",\n    \"isDonut\": false\n  },\n  \"aggs\": [\n    {\n      \"id\": \"1\",\n      \"enabled\": true,\n      \"type\": \"cardinality\",\n      \"schema\": \"metric\",\n      \"params\": {\n        \"field\": \"monitor.id\"\n      }\n    },\n    {\n      \"id\": \"3\",\n      \"enabled\": true,\n      \"type\": \"filters\",\n      \"schema\": \"segment\",\n      \"params\": {\n        \"filters\": [\n          {\n            \"input\": {\n              \"query\": {\n                \"query_string\": {\n                  \"query\": \"monitor.status: up\",\n                  \"analyze_wildcard\": true\n                }\n              }\n            },\n            \"label\": \"\"\n          },\n          {\n            \"input\": {\n              \"query\": {\n                \"query_string\": {\n                  \"query\": \"monitor.status: down\",\n                  \"analyze_wildcard\": true\n                }\n              }\n            }\n          }\n        ]\n      }\n    },\n    {\n      \"id\": \"2\",\n      \"enabled\": true,\n      \"type\": \"terms\",\n      \"schema\": \"segment\",\n      \"params\": {\n        \"field\": \"http.response.status\",\n        \"size\": 5,\n        \"order\": \"desc\",\n        \"orderBy\": \"1\"\n      }\n    }\n  ],\n  \"listeners\": {}\n}"
+      },
+      "id": "920e8140-eb1a-11e6-be20-559646f8b9ba",
+      "type": "visualization",
+      "version": 1
+    },
+    {
+      "attributes": {
+        "description": "",
+        "kibanaSavedObjectMeta": {
+          "searchSourceJSON": "{\n  \"filter\": []\n}"
+        },
+        "savedSearchId": "02014c80-29d2-11e7-a68f-bfaa2341cc52",
+        "title": "HTTP monitors",
+        "uiStateJSON": "{\n  \"vis\": {\n    \"params\": {\n      \"sort\": {\n        \"columnIndex\": null,\n        \"direction\": null\n      }\n    }\n  }\n}",
+        "version": 1,
+        "visState": "{\n  \"title\": \"HTTP monitors\",\n  \"type\": \"table\",\n  \"params\": {\n    \"perPage\": 10,\n    \"showPartialRows\": false,\n    \"showMeticsAtAllLevels\": false,\n    \"sort\": {\n      \"columnIndex\": null,\n      \"direction\": null\n    },\n    \"showTotal\": false,\n    \"totalFunc\": \"sum\"\n  },\n  \"aggs\": [\n    {\n      \"id\": \"1\",\n      \"enabled\": true,\n      \"type\": \"max\",\n      \"schema\": \"metric\",\n      \"params\": {\n        \"field\": \"monitor.duration.us\"\n      }\n    },\n    {\n      \"id\": \"2\",\n      \"enabled\": true,\n      \"type\": \"terms\",\n      \"schema\": \"bucket\",\n      \"params\": {\n        \"field\": \"monitor.id\",\n        \"size\": 5,\n        \"order\": \"desc\",\n        \"orderBy\": \"1\"\n      }\n    },\n    {\n      \"id\": \"5\",\n      \"enabled\": true,\n      \"type\": \"max\",\n      \"schema\": \"metric\",\n      \"params\": {\n        \"field\": \"resolve.rtt.us\"\n      }\n    },\n    {\n      \"id\": \"6\",\n      \"enabled\": true,\n      \"type\": \"max\",\n      \"schema\": \"metric\",\n      \"params\": {\n        \"field\": \"tcp.rtt.connect.us\"\n      }\n    },\n    {\n      \"id\": \"7\",\n      \"enabled\": true,\n      \"type\": \"max\",\n      \"schema\": \"metric\",\n      \"params\": {\n        \"field\": \"tls.rtt.handshake.us\"\n      }\n    },\n    {\n      \"id\": \"8\",\n      \"enabled\": true,\n      \"type\": \"max\",\n      \"schema\": \"metric\",\n      \"params\": {\n        \"field\": \"http.rtt.response_header.us\"\n      }\n    }\n  ],\n  \"listeners\": {}\n}"
+      },
+      "id": "1738dbc0-eb1d-11e6-be20-559646f8b9ba",
+      "type": "visualization",
+      "version": 1
+    },
+    {
+      "attributes": {
+        "description": "",
+        "kibanaSavedObjectMeta": {
+          "searchSourceJSON": "{\"filter\":[],\"query\":{\"query\":\"\",\"language\":\"lucene\"}}"
+        },
+        "savedSearchId": "02014c80-29d2-11e7-a68f-bfaa2341cc52",
+        "title": "HTTP up status",
+        "uiStateJSON": "{\"vis\":{\"colors\":{\"monitor.status: up\":\"#629E51\",\"monitor.status: down\":\"#E24D42\"}}}",
+        "version": 1,
+        "visState": "{\"title\":\"HTTP up status\",\"type\":\"area\",\"params\":{\"addTooltip\":true,\"addLegend\":true,\"legendPosition\":\"right\",\"scale\":\"linear\",\"interpolate\":\"linear\",\"mode\":\"percentage\",\"times\":[],\"addTimeMarker\":false,\"defaultYExtents\":false,\"setYExtents\":true,\"yAxis\":{\"max\":100,\"min\":0},\"type\":\"area\",\"grid\":{\"categoryLines\":false,\"style\":{\"color\":\"#eee\"}},\"categoryAxes\":[{\"id\":\"CategoryAxis-1\",\"type\":\"category\",\"position\":\"bottom\",\"show\":true,\"style\":{},\"scale\":{\"type\":\"linear\"},\"labels\":{\"show\":true,\"truncate\":100},\"title\":{}}],\"valueAxes\":[{\"id\":\"ValueAxis-1\",\"name\":\"LeftAxis-1\",\"type\":\"value\",\"position\":\"left\",\"show\":true,\"style\":{},\"scale\":{\"type\":\"linear\",\"mode\":\"percentage\",\"setYExtents\":true,\"defaultYExtents\":false,\"min\":0,\"max\":100},\"labels\":{\"show\":true,\"rotate\":0,\"filter\":false,\"truncate\":100},\"title\":{\"text\":\"Percentage of Count\"}}],\"seriesParams\":[{\"show\":\"true\",\"type\":\"area\",\"mode\":\"stacked\",\"data\":{\"label\":\"Percentage of Count\",\"id\":\"1\"},\"interpolate\":\"linear\",\"valueAxis\":\"ValueAxis-1\"}]},\"aggs\":[{\"id\":\"1\",\"enabled\":true,\"type\":\"count\",\"schema\":\"metric\",\"params\":{}},{\"id\":\"2\",\"enabled\":true,\"type\":\"date_histogram\",\"schema\":\"segment\",\"params\":{\"field\":\"@timestamp\",\"interval\":\"auto\",\"customInterval\":\"2h\",\"min_doc_count\":1,\"extended_bounds\":{}}},{\"id\":\"3\",\"enabled\":true,\"type\":\"filters\",\"schema\":\"group\",\"params\":{\"filters\":[{\"input\":{\"query\":\"monitor.status: down\"},\"label\":\"\"},{\"input\":{\"query\":\"monitor.status: up\"}}]}}]}"
+      },
+      "id": "091c3a90-eb1e-11e6-be20-559646f8b9ba",
+      "type": "visualization",
+      "version": 2
+    },
+    {
+      "attributes": {
+        "description": "",
+        "kibanaSavedObjectMeta": {
+          "searchSourceJSON": "{\n  \"filter\": []\n}"
+        },
+        "savedSearchId": "02014c80-29d2-11e7-a68f-bfaa2341cc52",
+        "title": "HTTP duration heatmap",
+        "uiStateJSON": "{\n  \"vis\": {\n    \"defaultColors\": {\n      \"0 - 2\": \"rgb(247,251,255)\",\n      \"2 - 3\": \"rgb(227,238,249)\",\n      \"3 - 4\": \"rgb(208,225,242)\",\n      \"4 - 5\": \"rgb(182,212,233)\",\n      \"5 - 6\": \"rgb(148,196,223)\",\n      \"6 - 8\": \"rgb(107,174,214)\",\n      \"8 - 9\": \"rgb(74,152,201)\",\n      \"9 - 10\": \"rgb(46,126,188)\",\n      \"10 - 11\": \"rgb(23,100,171)\",\n      \"11 - 12\": \"rgb(8,74,145)\"\n    }\n  }\n}",
+        "version": 1,
+        "visState": "{\n  \"title\": \"HTTP duration heatmap\",\n  \"type\": \"heatmap\",\n  \"params\": {\n    \"addTooltip\": true,\n    \"addLegend\": true,\n    \"enableHover\": false,\n    \"legendPosition\": \"right\",\n    \"times\": [],\n    \"colorsNumber\": 10,\n    \"colorSchema\": \"Blues\",\n    \"setColorRange\": false,\n    \"colorsRange\": [],\n    \"invertColors\": false,\n    \"percentageMode\": false,\n    \"valueAxes\": [\n      {\n        \"show\": false,\n        \"id\": \"ValueAxis-1\",\n        \"type\": \"value\",\n        \"scale\": {\n          \"type\": \"linear\",\n          \"defaultYExtents\": false\n        },\n        \"labels\": {\n          \"show\": false,\n          \"rotate\": 0,\n          \"color\": \"#555\"\n        }\n      }\n    ]\n  },\n  \"aggs\": [\n    {\n      \"id\": \"1\",\n      \"enabled\": true,\n      \"type\": \"count\",\n      \"schema\": \"metric\",\n      \"params\": {}\n    },\n    {\n      \"id\": \"2\",\n      \"enabled\": true,\n      \"type\": \"date_histogram\",\n      \"schema\": \"segment\",\n      \"params\": {\n        \"field\": \"@timestamp\",\n        \"interval\": \"auto\",\n        \"customInterval\": \"2h\",\n        \"min_doc_count\": 1,\n        \"extended_bounds\": {}\n      }\n    },\n    {\n      \"id\": \"3\",\n      \"enabled\": true,\n      \"type\": \"histogram\",\n      \"schema\": \"group\",\n      \"params\": {\n        \"field\": \"monitor.duration.us\",\n        \"interval\": 50000,\n        \"extended_bounds\": {}\n      }\n    }\n  ],\n  \"listeners\": {}\n}"
+      },
+      "id": "0f4c0560-eb20-11e6-9f11-159ff202874a",
+      "type": "visualization",
+      "version": 1
+    },
+    {
+      "attributes": {
+        "columns": [
+          "monitor.id",
+          "http.url",
+          "monitor.status",
+          "http.response.status",
+          "monitor.duration.us",
+          "tcp.rtt.connect.us",
+          "tls.rtt.handshake.us",
+          "resolve.rtt.us",
+          "http.rtt.content.us"
+        ],
+        "description": "",
+        "hits": 0,
+        "kibanaSavedObjectMeta": {
+          "searchSourceJSON": "{\n  \"index\": \"heartbeat-*\",\n  \"highlightAll\": true,\n  \"query\": {\n    \"query_string\": {\n      \"analyze_wildcard\": true,\n      \"query\": \"*\"\n    }\n  },\n  \"filter\": [\n    {\n      \"$state\": {\n        \"store\": \"appState\"\n      },\n      \"meta\": {\n        \"alias\": null,\n        \"disabled\": false,\n        \"index\": \"heartbeat-*\",\n        \"key\": \"monitor.type\",\n        \"negate\": false,\n        \"value\": \"http\"\n      },\n      \"query\": {\n        \"match\": {\n          \"monitor.type\": {\n            \"query\": \"http\",\n            \"type\": \"phrase\"\n          }\n        }\n      }\n    }\n  ]\n}"
+        },
+        "sort": [
+          "@timestamp",
+          "desc"
+        ],
+        "title": "Heartbeat HTTP pings",
+        "version": 1
+      },
+      "id": "02014c80-29d2-11e7-a68f-bfaa2341cc52",
+      "type": "search",
+      "version": 1
+    },
+    {
+      "attributes": {
+        "description": "",
+        "hits": 0,
+        "kibanaSavedObjectMeta": {
+          "searchSourceJSON": "{\"filter\":[{\"query\":{\"query_string\":{\"analyze_wildcard\":true,\"query\":\"*\"}}}]}"
+        },
+        "optionsJSON": "{\"darkTheme\":false}",
+        "panelsJSON": "[{\"col\":1,\"id\":\"c65ef340-eb19-11e6-be20-559646f8b9ba\",\"panelIndex\":1,\"row\":7,\"size_x\":12,\"size_y\":4,\"type\":\"visualization\"},{\"col\":9,\"id\":\"920e8140-eb1a-11e6-be20-559646f8b9ba\",\"panelIndex\":2,\"row\":1,\"size_x\":4,\"size_y\":4,\"type\":\"visualization\"},{\"col\":1,\"id\":\"1738dbc0-eb1d-11e6-be20-559646f8b9ba\",\"panelIndex\":3,\"row\":1,\"size_x\":8,\"size_y\":4,\"type\":\"visualization\"},{\"col\":1,\"id\":\"091c3a90-eb1e-11e6-be20-559646f8b9ba\",\"panelIndex\":4,\"row\":5,\"size_x\":12,\"size_y\":2,\"type\":\"visualization\"},{\"col\":1,\"id\":\"0f4c0560-eb20-11e6-9f11-159ff202874a\",\"panelIndex\":5,\"row\":11,\"size_x\":12,\"size_y\":5,\"type\":\"visualization\"}]",
+        "timeRestore": false,
+        "title": "Heartbeat HTTP monitoring",
+        "uiStateJSON": "{\"P-3\":{\"vis\":{\"params\":{\"sort\":{\"columnIndex\":null,\"direction\":null}}}},\"P-5\":{\"vis\":{\"defaultColors\":{\"0 - 2\":\"rgb(247,251,255)\",\"2 - 3\":\"rgb(227,238,249)\",\"3 - 4\":\"rgb(208,225,242)\",\"4 - 5\":\"rgb(182,212,233)\",\"5 - 6\":\"rgb(148,196,223)\",\"6 - 8\":\"rgb(107,174,214)\",\"8 - 9\":\"rgb(74,152,201)\",\"9 - 10\":\"rgb(46,126,188)\",\"10 - 11\":\"rgb(23,100,171)\",\"11 - 12\":\"rgb(8,74,145)\"}}}}",
+        "version": 1
+      },
+      "id": "f3e771c0-eb19-11e6-be20-559646f8b9ba",
+      "type": "dashboard",
+      "version": 1
+    }
+  ],
+  "version": "6.0.0-SNAPSHOT"
+}

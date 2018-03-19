@@ -3,32 +3,73 @@
 
 [partintro]
 --
-After following the <<heartbeat-configuration,configuration steps>> in the
-Getting Started, you might want to fine tune the behavior of Heartbeat.
+Before modifying configuration settings, make sure you've completed the
+<<heartbeat-configuration,configuration steps>> in the Getting Started.
 This section describes some common use cases for changing configuration options.
 
 To configure Heartbeat, you edit the configuration file. For rpm and deb,
 you’ll find the default configuration file at
 +/etc/heartbeat/heartbeat.yml+. There's also a full example
-configuration file at +/etc/heartbeat/heartbeat.full.yml+ that shows
+configuration file at +/etc/heartbeat/heartbeat.reference.yml+ that shows
 all non-deprecated options. For mac and win, look in the archive that you
 extracted.
 
+The Heartbeat configuration file uses http://yaml.org/[YAML] for its syntax.
 See the
 {libbeat}/config-file-format.html[Config File Format] section of the
 _Beats Platform Reference_ for more about the structure of the config file.
 
 The following topics describe how to configure Heartbeat:
 
-* <<heartbeat-configuration-details>>
-* <<configuration-processors>>
+* <<configuration-heartbeat-options>>
+* <<configuration-general-options>>
+* <<configuring-internal-queue>>
+* <<configuring-output>>
+* <<configuration-ssl>>
 * <<filtering-and-enhancing-data>>
 * <<configuring-ingest-node>>
-* <<config-heartbeat-logstash>>
+* <<configuration-path>>
+* <<setup-kibana-endpoint>>
+* <<configuration-dashboards>>
+* <<configuration-template>>
+* <<configuration-logging>>
 * <<using-environ-vars>>
 * <<yaml-tips>>
 * <<regexp-support>>
+* <<{beatname_lc}-reference-yml>>
 
 --
 
-include::reference/configuration.asciidoc[]
+include::./heartbeat-options.asciidoc[]
+
+include::./heartbeat-general-options.asciidoc[]
+
+:allplatforms:
+include::../../libbeat/docs/queueconfig.asciidoc[]
+
+include::../../libbeat/docs/outputconfig.asciidoc[]
+
+include::../../libbeat/docs/shared-ssl-config.asciidoc[]
+
+include::./heartbeat-filtering.asciidoc[]
+
+include::../../libbeat/docs/shared-config-ingest.asciidoc[]
+
+include::../../libbeat/docs/shared-path-config.asciidoc[]
+
+include::../../libbeat/docs/shared-kibana-config.asciidoc[]
+
+include::../../libbeat/docs/setup-config.asciidoc[]
+
+include::../../libbeat/docs/loggingconfig.asciidoc[]
+
+:standalone:
+include::../../libbeat/docs/shared-env-vars.asciidoc[]
+
+:standalone:
+:allplatforms:
+include::../../libbeat/docs/yaml.asciidoc[]
+
+include::../../libbeat/docs/regexp.asciidoc[]
+
+include::../../libbeat/docs/reference-yml.asciidoc[]

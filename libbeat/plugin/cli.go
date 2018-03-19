@@ -1,4 +1,5 @@
-//+build linux,go1.8,cgo
+//+build linux,go1.8 darwin,go1.10
+//+build cgo
 
 package plugin
 
@@ -18,8 +19,12 @@ func (p *pluginList) String() string {
 }
 
 func (p *pluginList) Set(v string) error {
-	// TODO: check file exists
-
+	for _, path := range p.paths {
+		if path == v {
+			logp.Warn("%s is already a registered plugin")
+			return nil
+		}
+	}
 	p.paths = append(p.paths, v)
 	return nil
 }

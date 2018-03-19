@@ -1,7 +1,5 @@
 [[filebeat-modules-quickstart]]
-=== Quick Start for Common Log Formats
-
-beta[]
+=== Quick start for common log formats
 
 Filebeat provides a set of pre-built modules that you can use to rapidly
 implement and deploy a log monitoring solution, complete with sample dashboards
@@ -19,7 +17,7 @@ following the numbered steps under <<filebeat-getting-started>>.
 
 ==== Prerequisites
 
-Before running Filebeat with modules enabled, you need to:
+Before running Filebeat modules, you need to:
 
 * Install and configure the Elastic stack. See
 {libbeat}/getting-started.html[Getting Started with Beats and the Elastic Stack].
@@ -40,36 +38,62 @@ sudo bin/elasticsearch-plugin install ingest-user-agent
 ----------------------------------------------------------------------
 +
 You need to restart Elasticsearch after running these commands.
++
+If you are using an https://cloud.elastic.co/[Elastic Cloud] instance, you can
+enable the two plugins from the configuration page.
 
 * Verify that Elasticsearch and Kibana are running and that Elasticsearch is
 ready to receive data from Filebeat.
 
 [[running-modules-quickstart]]
-==== Running Filebeat with Modules Enabled
+==== Running Filebeat modules
 
-To run one or more Filebeat modules, you issue the following command:
+To set up and run Filebeat modules:
 
+include::../../libbeat/docs/step-configure-credentials.asciidoc[]
+
+. Run the `setup` command to set up the initial environment. This command
+loads the recommended index template for writing to Elasticsearch and deploys
+the sample dashboards for visualizing the data in Kibana. For example:
++
 [source,shell]
 ----------------------------------------------------------------------
-./filebeat -e -modules=MODULES -setup
+./filebeat setup -e
 ----------------------------------------------------------------------
++
+The `-e` flag is optional and sends output to standard error instead of syslog.
 
-Where `MODULES` is the name of the module (or a comma-separated list of
-modules) that you want to enable. The `-e` flag is optional and sends output
-to standard error instead of syslog. The `-setup` flag is a one-time setup step.
-For subsequent runs of Filebeat, do not specify this flag.
-
-The following example starts Filebeat with the `system` module enabled and
-loads the sample Kibana dashboards:
-
+. Start Filebeat and use the `--modules` flag to specify a comma-separated list
+of modules you want to run. The following example starts Filebeat with the
+`system` module enabled (it's assumed that you've already loaded the sample
+dashboards):
++
 [source,shell]
 ----------------------------------------------------------------------
-./filebeat -e -modules=system -setup
+./filebeat -e --modules system
 ----------------------------------------------------------------------
-
-This command takes care of configuring Filebeat, loading the recommended index
-template for writing to Elasticsearch, and deploying the sample dashboards
-for visualizing the data in Kibana.
++
+This command takes care of configuring Filebeat and loading the ingest node
+pipelines and other configuration settings required to parse the log files.
++
+To run more than one module, specify a comma-separated list of modules. For
+example:
++
+[source,shell]
+----------------------------------------------------------------------
+./filebeat -e --modules system,nginx,mysql
+----------------------------------------------------------------------
++
+When you start Filebeat, you should see messages indicating that Filebeat
+has started harvesters for all enabled modules. For example:
++
+[source,shell]
+----------------------------------------------------------------------
+2017/08/16 23:39:15.414375 harvester.go:206: INFO Harvester started for file: /var/log/displaypolicyd.stdout.log
+----------------------------------------------------------------------
++
+If you don't see this message for each log file that needs to be read,
+see <<setting-variables>> to find out how to set the path the files.
 
 NOTE: Depending on how you've installed Filebeat, you might see errors
 related to file ownership or permissions when you try to run Filebeat modules.
@@ -77,42 +101,41 @@ See {libbeat}/config-file-permissions.html[Config File Ownership and Permissions
 in the _Beats Platform Reference_ if you encounter errors related to file
 ownership or permissions.
 
-include::system-module-note.asciidoc[]
+This getting started guide uses the `--modules` flag to enable modules
+at the command line when you run Filebeat. In a production environment, you'll
+probably want to use the configs in the `modules.d` directory instead. See
+<<configuration-filebeat-modules>> for more information.
 
-To start Filebeat with the `system`, `nginx`, and `mysql` modules enabled
-and load the sample dashboards, run:
+[[setting-variables]]
+==== Set the path variable
 
-[source,shell]
-----------------------------------------------------------------------
-./filebeat -e -modules=system,nginx,mysql -setup
-----------------------------------------------------------------------
-
-To start Filebeat with the `system` module enabled (it's assumed that
-you've already loaded the sample dashboards), run:
-
-[source,shell]
-----------------------------------------------------------------------
-./filebeat -e -modules=system
-----------------------------------------------------------------------
-
-TIP: In a production environment, you'll probably want to use a configuration
-file, rather than command-line flags, to specify which modules to run. See the
-detailed documentation for more about configuring and running modules.
-
-These examples assume that the logs you're harvesting are in the location
+The examples here assume that the logs you're harvesting are in the location
 expected for your OS and that the default behavior of Filebeat is appropriate
-for your environment. Each module provides a set of variables that you can set
-to fine tune the behavior of Filebeat, including the location where it looks
-for log files. See <<filebeat-modules>> for more info.
+for your environment. Each module provides variables that you can set to fine
+tune the behavior of Filebeat, including the location where it looks for log
+files. For example, the following command sets the path for the Nginx access
+logs:
+
+[source,shell]
+----
+./filebeat -e --modules nginx -M "nginx.access.var.paths=[/var/log/nginx/access.log*]"
+----
+
+See <<configuration-filebeat-modules>> for more information about setting
+variables and advanced options.
+
 
 [[visualizing-data]]
-==== Visualizing the Data in Kibana
+==== Visualize the data in Kibana
 
 After you've confirmed that Filebeat is sending events to Elasticsearch, launch
 the Kibana web interface by pointing your browser to port 5601. For example,
 http://127.0.0.1:5601[http://127.0.0.1:5601].
 
 Open the dashboard and explore the visualizations for your parsed logs.
+
+TIP: If you don't see data in Kibana, try changing the date range to a larger
+range. By default, Kibana shows the last 15 minutes.
 
 Here's an example of the syslog dashboard:
 

@@ -63,7 +63,6 @@ func (s *amqpStream) prepareForNewMessage() {
 }
 
 func isProtocolHeader(data []byte) (isHeader bool, version string) {
-
 	if (string(data[:4]) == "AMQP") && data[4] == 0 {
 		return true, string(data[5:8])
 	}
@@ -73,7 +72,10 @@ func isProtocolHeader(data []byte) (isHeader bool, version string) {
 //func to read a frame header and check if it is valid and complete
 func readFrameHeader(data []byte) (ret *amqpFrame, err bool) {
 	var frame amqpFrame
-
+	if len(data) < 8 {
+		logp.Warn("Partial frame header, waiting for more data")
+		return nil, false
+	}
 	frame.size = binary.BigEndian.Uint32(data[3:7])
 	if len(data) < int(frame.size)+8 {
 		logp.Warn("Frame shorter than declared size, waiting for more data")

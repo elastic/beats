@@ -1,10 +1,12 @@
 package harvester
 
 import (
+	"errors"
 	"sync"
 
-	"github.com/elastic/beats/libbeat/logp"
 	uuid "github.com/satori/go.uuid"
+
+	"github.com/elastic/beats/libbeat/logp"
 )
 
 // Registry struct manages (start / stop) a list of harvesters
@@ -50,7 +52,6 @@ func (r *Registry) Stop() {
 			h.Stop()
 		}(hv)
 	}
-
 }
 
 // WaitForCompletion can be used to wait until all harvesters are stopped
@@ -59,15 +60,14 @@ func (r *Registry) WaitForCompletion() {
 }
 
 // Start starts the given harvester and add its to the registry
-func (r *Registry) Start(h Harvester) {
-
+func (r *Registry) Start(h Harvester) error {
 	// Make sure stop is not called during starting a harvester
 	r.Lock()
 	defer r.Unlock()
 
 	// Make sure no new harvesters are started after stop was called
 	if !r.active() {
-		return
+		return errors.New("registry already stopped")
 	}
 
 	r.wg.Add(1)
@@ -80,9 +80,10 @@ func (r *Registry) Start(h Harvester) {
 		// Starts harvester and picks the right type. In case type is not set, set it to default (log)
 		err := h.Run()
 		if err != nil {
-			logp.Err("Error running prospector: %v", err)
+			logp.Err("Error running input: %v", err)
 		}
 	}()
+	return nil
 }
 
 // Len returns the current number of harvesters in the registry

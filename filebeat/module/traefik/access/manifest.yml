@@ -1,0 +1,19 @@
+module_version: 1.0
+
+var:
+  - name: paths
+    default:
+      - /var/log/traefik/access.log*
+    os.darwin:
+      - /usr/local/traefik/access.log*
+    os.windows:
+      - c:/programdata/traefik/logs/*access.log*
+
+ingest_pipeline: ingest/pipeline.json
+input: config/traefik-access.yml
+
+requires.processors:
+- name: user_agent
+  plugin: ingest-user-agent
+- name: geoip
+  plugin: ingest-geoip

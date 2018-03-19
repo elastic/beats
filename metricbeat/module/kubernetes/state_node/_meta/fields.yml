@@ -2,6 +2,7 @@
   type: group
   description: >
     kubernetes node metrics
+  release: ga
   fields:
     - name: status
       type: group
@@ -18,7 +19,7 @@
       type: group
       fields:
         - name: allocatable.cores
-          type: long
+          type: float
           description: >
             Node CPU allocatable cores
         - name: capacity.cores

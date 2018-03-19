@@ -3,6 +3,8 @@ This file is generated! See scripts/docs_collector.py
 ////
 
 [[metricbeat-metricset-redis-keyspace]]
+=== Redis keyspace metricset
+
 include::../../../module/redis/keyspace/_meta/docs.asciidoc[]
 
 

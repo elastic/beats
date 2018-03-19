@@ -1,5 +1,5 @@
 {
-    "@timestamp": "2016-05-23T08:05:34.853Z",
+    "@timestamp": "2017-10-12T08:05:34.853Z",
     "beat": {
         "hostname": "host.example.com",
         "name": "host.example.com"
@@ -11,14 +11,14 @@
     },
     "system": {
         "core": {
-            "id": 0,
+            "id": 1,
             "idle": {
-                "pct": 0.9063,
-                "ticks": 22204290
+                "pct": 0.3333,
+                "ticks": 51795238
             },
             "iowait": {
                 "pct": 0,
-                "ticks": 79386
+                "ticks": 42254
             },
             "irq": {
                 "pct": 0,
@@ -26,25 +26,24 @@
             },
             "nice": {
                 "pct": 0,
-                "ticks": 0
+                "ticks": 15
             },
             "softirq": {
                 "pct": 0,
-                "ticks": 7944
+                "ticks": 1469
             },
             "steal": {
                 "pct": 0,
                 "ticks": 0
             },
             "system": {
-                "pct": 0.0208,
-                "ticks": 160489
+                "pct": 0.25,
+                "ticks": 109372
             },
             "user": {
-                "pct": 0.0729,
-                "ticks": 417331
+                "pct": 0.4167,
+                "ticks": 185023
             }
         }
-    },
-    "type": "metricsets"
+    }
 }

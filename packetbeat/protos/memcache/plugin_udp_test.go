@@ -43,7 +43,6 @@ func Test_UdpDatagramMultiple(t *testing.T) {
 
 	assert.Equal(t, 8, buf.Len())
 	assert.Equal(t, []byte{1, 2, 3, 4, 5, 6, 7, 8}, buf.Bytes())
-
 }
 
 func Test_UdpDatagramMultipleDups(t *testing.T) {

@@ -20,7 +20,7 @@ To use SSL mutual authentication:
 document. There are many online resources available that describe how to create certificates.
 +
 TIP: If you are using X-Pack, you can use the
-{securitydoc}/ssl-tls.html#generating-signed-certificates[certgen tool] to generate certificates.
+{elasticsearch}/certutil.html[certutil tool] to generate certificates.
 
 . Configure {beatname_uc} to use SSL. In the +{beatname_lc}.yml+ config file, specify the following settings under
 `ssl`:
@@ -42,7 +42,7 @@ output.logstash:
   ssl.key: "/etc/client.key"
 ------------------------------------------------------------------------------
 +
-For more information about these configuration options, see <<configuration-output-ssl>>.
+For more information about these configuration options, see <<configuration-ssl>>.
 
 . Configure Logstash to use SSL. In the Logstash config file, specify the following settings for the https://www.elastic.co/guide/en/logstash/current/plugins-inputs-beats.html[Beats input plugin for Logstash]:
 +
@@ -74,7 +74,7 @@ https://www.elastic.co/guide/en/logstash/current/plugins-inputs-beats.html[docum
 
 [float]
 [[testing-ssl-logstash]]
-=== Validating the Logstash Server's Certificate
+=== Validate the Logstash server's certificate
 
 Before running {beatname_uc}, you should validate the Logstash server's certificate. You can use `curl` to validate the certificate even though the protocol used to communicate with Logstash is not based on HTTP. For example:
 
@@ -126,7 +126,7 @@ curl: (51) SSL: certificate verification failed (result: 5)
 See the <<ssl-client-fails,troubleshooting docs>> for info about resolving this issue.
 
 [float]
-=== Testing the Beats to Logstash Connection
+=== Test the Beats to Logstash connection
 
 If you have {beatname_uc} running as a service, first stop the service. Then test your setup by running {beatname_uc} in
 the foreground so you can quickly see any errors that occur:
@@ -138,4 +138,3 @@ the foreground so you can quickly see any errors that occur:
 
 Any errors will be printed to the console. See the <<ssl-client-fails,troubleshooting docs>> for info about
 resolving common errors.
-

@@ -3,17 +3,18 @@ package haproxy
 import (
 	"bytes"
 	"encoding/csv"
-	"errors"
-	"fmt"
 	"io"
 	"io/ioutil"
 	"net"
+	"net/http"
+	"net/url"
 	"strings"
 
 	"github.com/elastic/beats/metricbeat/mb/parse"
 
 	"github.com/gocarina/gocsv"
 	"github.com/mitchellh/mapstructure"
+	"github.com/pkg/errors"
 )
 
 // HostParser is used for parsing the configured HAProxy hosts.
@@ -137,61 +138,37 @@ type Info struct {
 }
 
 // Client is an instance of the HAProxy client
+type clientProto interface {
+	Stat() (*bytes.Buffer, error)
+	Info() (*bytes.Buffer, error)
+}
+
 type Client struct {
-	Address     string
-	ProtoScheme string
+	proto clientProto
 }
 
 // NewHaproxyClient returns a new instance of HaproxyClient
 func NewHaproxyClient(address string) (*Client, error) {
-	parts := strings.Split(address, "://")
-	if len(parts) != 2 {
-		return nil, errors.New("must have protocol scheme and address")
-	}
-
-	if parts[0] != "tcp" && parts[0] != "unix" {
-		return nil, errors.New("invalid protocol scheme")
-	}
-
-	return &Client{
-		Address:     parts[1],
-		ProtoScheme: parts[0],
-	}, nil
-}
-
-// Run sends a designated command to the haproxy stats socket
-func (c *Client) run(cmd string) (*bytes.Buffer, error) {
-	var conn net.Conn
-	response := bytes.NewBuffer(nil)
-
-	conn, err := net.Dial(c.ProtoScheme, c.Address)
+	u, err := url.Parse(address)
 	if err != nil {
-		return response, err
+		return nil, errors.Wrap(err, "invalid url")
 	}
 
-	defer conn.Close()
-
-	_, err = conn.Write([]byte(cmd + "\n"))
-	if err != nil {
-		return response, err
+	switch u.Scheme {
+	case "tcp":
+		return &Client{&unixProto{Network: u.Scheme, Address: u.Host}}, nil
+	case "unix":
+		return &Client{&unixProto{Network: u.Scheme, Address: u.Path}}, nil
+	case "http", "https":
+		return &Client{&httpProto{URL: u}}, nil
+	default:
+		return nil, errors.Errorf("invalid protocol scheme: %s", u.Scheme)
 	}
-
-	_, err = io.Copy(response, conn)
-	if err != nil {
-		return response, err
-	}
-
-	if strings.HasPrefix(response.String(), "Unknown command") {
-		return response, fmt.Errorf("unknown command: %s", cmd)
-	}
-
-	return response, nil
 }
 
 // GetStat returns the result from the 'show stat' command
 func (c *Client) GetStat() ([]*Stat, error) {
-
-	runResult, err := c.run("show stat")
+	runResult, err := c.proto.Stat()
 	if err != nil {
 		return nil, err
 	}
@@ -202,17 +179,15 @@ func (c *Client) GetStat() ([]*Stat, error) {
 
 	err = gocsv.UnmarshalCSV(csvReader, &statRes)
 	if err != nil {
-		return nil, fmt.Errorf("error parsing CSV: %s", err)
+		return nil, errors.Errorf("error parsing CSV: %s", err)
 	}
 
 	return statRes, nil
-
 }
 
 // GetInfo returns the result from the 'show stat' command
 func (c *Client) GetInfo() (*Info, error) {
-
-	res, err := c.run("show info")
+	res, err := c.proto.Info()
 	if err != nil {
 		return nil, err
 	}
@@ -245,5 +220,87 @@ func (c *Client) GetInfo() (*Info, error) {
 	}
 
 	return nil, err
+}
 
+type unixProto struct {
+	Network string
+	Address string
+}
+
+// Run sends a designated command to the haproxy stats socket
+func (p *unixProto) run(cmd string) (*bytes.Buffer, error) {
+	var conn net.Conn
+	response := bytes.NewBuffer(nil)
+
+	conn, err := net.Dial(p.Network, p.Address)
+	if err != nil {
+		return response, err
+	}
+	defer conn.Close()
+
+	_, err = conn.Write([]byte(cmd + "\n"))
+	if err != nil {
+		return response, err
+	}
+
+	_, err = io.Copy(response, conn)
+	if err != nil {
+		return response, err
+	}
+
+	if strings.HasPrefix(response.String(), "Unknown command") {
+		return response, errors.Errorf("unknown command: %s", cmd)
+	}
+
+	return response, nil
+}
+
+func (p *unixProto) Stat() (*bytes.Buffer, error) {
+	return p.run("show stat")
+}
+
+func (p *unixProto) Info() (*bytes.Buffer, error) {
+	return p.run("show info")
+}
+
+type httpProto struct {
+	URL *url.URL
+}
+
+func (p *httpProto) Stat() (*bytes.Buffer, error) {
+	url := p.URL.String()
+	// Force csv format
+	if !strings.HasSuffix(url, ";csv") {
+		url += ";csv"
+	}
+
+	req, err := http.NewRequest("GET", url, nil)
+	if err != nil {
+		return nil, err
+	}
+
+	if p.URL.User != nil {
+		password, _ := p.URL.User.Password()
+		req.SetBasicAuth(p.URL.User.Username(), password)
+	}
+
+	resp, err := http.DefaultClient.Do(req)
+	if err != nil {
+		return nil, errors.Errorf("couldn't connect: %v", err)
+	}
+	defer resp.Body.Close()
+
+	if resp.StatusCode != http.StatusOK {
+		return nil, errors.Errorf("invalid response: %s", resp.Status)
+	}
+
+	d, err := ioutil.ReadAll(resp.Body)
+	if err != nil {
+		return nil, errors.Errorf("couldn't read response body: %v", err)
+	}
+	return bytes.NewBuffer(d), nil
+}
+
+func (p *httpProto) Info() (*bytes.Buffer, error) {
+	return nil, errors.New("not supported")
 }

@@ -1,0 +1,23 @@
+dashboards:
+- id: Packetbeat-Dashboard
+  file: Packetbeat-overview.json
+- id: Packetbeat-HTTP
+  file: Packetbeat-http.json
+- id: Packetbeat-Flows
+  file: Packetbeat-flows.json
+- id: Packetbeat-MySQL-performance
+  file: Packetbeat-mysql.json
+- id: Packetbeat-PgSQL-performance
+  file: Packetbeat-pgsql.json
+- id: Packetbeat-MongoDB-performance
+  file: Packetbeat-mongodb.json
+- id: Packetbeat-Thrift-performance
+  file: Packetbeat-thrift.json
+- id: Packetbeat-NFS
+  file: Packetbeat-nfs.json
+- id: Packetbeat-Cassandra
+  file: Packetbeat-cassandra.json
+- id: DNS-Unique-Domains
+  file: Packetbeat-dns-tunneling.json
+- id: TLS-Sessions
+  file: Packetbeat-tls.json

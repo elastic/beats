@@ -5,6 +5,7 @@ import (
 	"errors"
 	"fmt"
 	"time"
+	"unicode"
 
 	"github.com/elastic/beats/libbeat/common"
 	"github.com/elastic/beats/libbeat/common/streambuf"
@@ -74,8 +75,9 @@ var (
 
 	constCRLF = []byte("\r\n")
 
-	constClose     = []byte("close")
-	constKeepAlive = []byte("keep-alive")
+	constClose       = []byte("close")
+	constKeepAlive   = []byte("keep-alive")
+	constHTTPVersion = []byte("HTTP/")
 
 	nameContentLength    = []byte("content-length")
 	nameContentType      = []byte("content-type")
@@ -145,7 +147,7 @@ func (*parser) parseHTTPLine(s *stream, m *message) (cont, ok, complete bool) {
 		}
 		return false, false, false
 	}
-	if bytes.Equal(fline[0:5], []byte("HTTP/")) {
+	if bytes.Equal(fline[0:5], constHTTPVersion) {
 		//RESPONSE
 		m.isRequest = false
 		version = fline[5:8]
@@ -160,20 +162,23 @@ func (*parser) parseHTTPLine(s *stream, m *message) (cont, ok, complete bool) {
 		}
 	} else {
 		// REQUEST
-		slices := bytes.Fields(fline)
-		if len(slices) != 3 {
+		afterMethodIdx := bytes.IndexFunc(fline, unicode.IsSpace)
+		afterRequestURIIdx := bytes.LastIndexFunc(fline, unicode.IsSpace)
+
+		// Make sure we have the VERB + URI + HTTP_VERSION
+		if afterMethodIdx == -1 || afterRequestURIIdx == -1 || afterMethodIdx == afterRequestURIIdx {
 			if isDebug {
 				debugf("Couldn't understand HTTP request: %s", fline)
 			}
 			return false, false, false
 		}
 
-		m.method = common.NetString(slices[0])
-		m.requestURI = common.NetString(slices[1])
+		m.method = common.NetString(fline[:afterMethodIdx])
+		m.requestURI = common.NetString(fline[afterMethodIdx+1 : afterRequestURIIdx])
 
-		if bytes.Equal(slices[2][:5], []byte("HTTP/")) {
+		if bytes.Equal(fline[afterRequestURIIdx+1:afterRequestURIIdx+len(constHTTPVersion)+1], constHTTPVersion) {
 			m.isRequest = true
-			version = slices[2][5:]
+			version = fline[afterRequestURIIdx+len(constHTTPVersion)+1:]
 		} else {
 			if isDebug {
 				debugf("Couldn't understand HTTP version: %s", fline)
@@ -211,15 +216,12 @@ func parseResponseStatus(s []byte) (uint16, []byte, error) {
 	if p == -1 {
 		return 0, nil, errors.New("Not able to identify status code")
 	}
-
-	code, _ := parseInt(s[0:p])
-
-	p = bytes.LastIndexByte(s, ' ')
-	if p == -1 {
-		return uint16(code), nil, errors.New("Not able to identify status code")
+	statusCode, err := parseInt(s[0:p])
+	if err != nil {
+		return 0, nil, fmt.Errorf("Unable to parse status code from [%s]", s)
 	}
 	phrase := s[p+1:]
-	return uint16(code), phrase, nil
+	return uint16(statusCode), phrase, nil
 }
 
 func parseVersion(s []byte) (uint8, uint8, error) {
@@ -354,8 +356,8 @@ func (parser *parser) parseHeader(m *message, data []byte) (bool, bool, int) {
 				if val, ok := m.headers[string(headerName)]; ok {
 					composed := make([]byte, len(val)+len(headerVal)+2)
 					off := copy(composed, val)
-					off = copy(composed[off:], []byte(", "))
-					copy(composed[off:], headerVal)
+					copy(composed[off:], []byte(", "))
+					copy(composed[off+2:], headerVal)
 
 					m.headers[string(headerName)] = composed
 				} else {
@@ -466,7 +468,6 @@ func (*parser) parseBodyChunkedStart(s *stream, m *message) (cont, ok, complete 
 }
 
 func (*parser) parseBodyChunked(s *stream, m *message) (cont, ok, complete bool) {
-
 	if len(s.data[s.parseOffset:]) >= m.chunkedLength-s.bodyReceived+2 /*\r\n*/ {
 		// Received more data than expected
 		m.chunkedBody = append(m.chunkedBody, s.data[s.parseOffset:s.parseOffset+m.chunkedLength-s.bodyReceived]...)

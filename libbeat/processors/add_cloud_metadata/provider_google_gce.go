@@ -7,7 +7,7 @@ import (
 )
 
 // Google GCE Metadata Service
-func newGceMetadataFetcher(config common.Config) (*metadataFetcher, error) {
+func newGceMetadataFetcher(config *common.Config) (*metadataFetcher, error) {
 	gceMetadataURI := "/computeMetadata/v1/?recursive=true&alt=json"
 	gceHeaders := map[string]string{"Metadata-Flavor": "Google"}
 	gceSchema := func(m map[string]interface{}) common.MapStr {

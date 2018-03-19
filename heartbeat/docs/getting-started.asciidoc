@@ -17,13 +17,14 @@ install, configure, and run Heartbeat:
 * <<heartbeat-installation>>
 * <<heartbeat-configuration>>
 * <<heartbeat-template>>
+* <<load-kibana-dashboards>>
 * <<heartbeat-starting>>
-* <<command-line-options>>
-* <<directory-layout>>
+* <<view-kibana-dashboards>>
+* <<setup-repositories>>
 
 
 [[heartbeat-installation]]
-=== Step 1: Installing Heartbeat
+=== Step 1: Install Heartbeat
 
 Unlike most Beats, which you install on edge nodes, you typically install
 Heartbeat as part of monitoring service that runs on a separate machine
@@ -151,10 +152,10 @@ endif::[]
 Before starting Heartbeat, you should look at the configuration options in
 the configuration file, for example +C:\Program Files\Heartbeat\heartbeat.yml+
 or +/etc/heartbeat/heartbeat.yml+. For more information about these
-options, see <<heartbeat-configuration-details>>.
+options, see <<configuring-howto-heartbeat>>.
 
 [[heartbeat-configuration]]
-=== Step 2: Configuring Heartbeat
+=== Step 2: Configure Heartbeat
 
 include::../../libbeat/docs/shared-configuring.asciidoc[]
 
@@ -171,7 +172,7 @@ heartbeat.monitors:
   schedule: '*/5 * * * * * *'
   hosts: ["myhost"]
 output.elasticsearch:
-  hosts: ["myhost:9200"]
+  hosts: ["myEShost:9200"]
 ----------------------------------------------------------------------
 
 To configure Heartbeat:
@@ -200,11 +201,12 @@ was started. Heartbeat adds the `@every` keyword to the syntax provided by the
 <3> The `mode` specifies whether to ping one IP (`any`) or all resolvable IPs
 (`all`).
 +
-See <<heartbeat-configuration-details>> for a full description of each
+See <<configuring-howto-heartbeat>> for a full description of each
 configuration option.
 
-. If you are sending output to Elasticsearch, set the IP address and port where
-Heartbeat can find the Elasticsearch installation:
+. If you are sending output directly to Elasticsearch (and not using Logstash),
+set the IP address and port where Heartbeat can find the Elasticsearch
+installation:
 +
 [source,yaml]
 ----------------------------------------------------------------------
@@ -212,26 +214,35 @@ output.elasticsearch:
   hosts: ["192.168.1.42:9200"]
 ----------------------------------------------------------------------
 +
-If you are sending output to Logstash, see <<config-heartbeat-logstash>>
-instead.
+If you are sending output to Logstash, make sure you
+<<logstash-output,Configure the Logstash output>> instead.
 
-TIP: To test your configuration file, change to the directory where the
-Heartbeat binary is installed, and run Heartbeat in the foreground with
-the following options specified: +./heartbeat -configtest -e+. Make sure
-your config files are in the path expected by Heartbeat
-(see <<directory-layout>>). If you installed from DEB or RPM packages, run
-+./heartbeat.sh -configtest -e+.
+include::../../libbeat/docs/step-configure-kibana-endpoint.asciidoc[]
+
+include::../../libbeat/docs/step-configure-credentials.asciidoc[]
+
+include::../../libbeat/docs/step-test-config.asciidoc[]
+
+include::../../libbeat/docs/step-look-at-config.asciidoc[]
 
 [[heartbeat-template]]
-=== Step 3: Loading the Index Template in Elasticsearch
+=== Step 3: Load the index template in Elasticsearch
 
 :allplatforms:
 include::../../libbeat/docs/shared-template-load.asciidoc[]
 
-[[heartbeat-starting]]
-=== Step 4: Starting Heartbeat
+[[load-kibana-dashboards]]
+=== Step 4: Set up the Kibana dashboards
 
-Start Heartbeat by issuing the appropriate command for your platform.
+:allplatforms:
+include::../../libbeat/docs/dashboards.asciidoc[]
+
+[[heartbeat-starting]]
+=== Step 5: Start Heartbeat
+
+Start Heartbeat by issuing the appropriate command for your platform. If you
+are accessing a secured Elasticsearch cluster, make sure you've configured
+credentials as described in <<{beatname_lc}-configuration>>.
 
 NOTE: If you use an init.d script to start Heartbeat on deb or rpm, you can't
 specify command line flags (see <<command-line-options>>). To specify flags,
@@ -241,14 +252,14 @@ start Heartbeat in the foreground.
 
 ["source","sh",subs="attributes"]
 ----------------------------------------------------------------------
-sudo /etc/init.d/heartbeat start
+sudo service {beatname_lc}-elastic start
 ----------------------------------------------------------------------
 
 *rpm:*
 
 ["source","sh",subs="attributes"]
 ----------------------------------------------------------------------
-sudo /etc/init.d/heartbeat start
+sudo service {beatname_lc}-elastic start
 ----------------------------------------------------------------------
 
 *mac:*
@@ -258,10 +269,10 @@ sudo /etc/init.d/heartbeat start
 sudo chown root heartbeat.yml <1>
 sudo ./heartbeat -e -c heartbeat.yml -d "publish"
 ----------------------------------------------------------------------
-<1> You'll be running Heartbeat as root, so you need to change ownership
-of the configuration file (see
+<1> You'll be running Heartbeat as root, so you need to change ownership of the
+configuration file, or run Heartbeat with `-strict.perms=false` specified. See
 {libbeat}/config-file-permissions.html[Config File Ownership and Permissions]
-in the _Beats Platform Reference_).
+in the _Beats Platform Reference_.
 
 *win:*
 
@@ -275,16 +286,16 @@ By default, Windows log files are stored in +C:\ProgramData\heartbeat\Logs+.
 Heartbeat is now ready to check the status of your services and send
 events to your defined output.
 
-[[heartbeat-sample-dashboards]]
-=== Step 5: Loading Sample Kibana Dashboards
+[[view-kibana-dashboards]]
+=== Step 6: View the sample Kibana dashboards
 
 To make it easier for you to visualize the status of your services, we have
-created sample Heartbeat dashboards. The dashboards are provided as
-examples. We recommend that you
-http://www.elastic.co/guide/en/kibana/current/dashboard.html[customize] them
-to meet your needs.
+created example {beatname_uc} dashboards. You loaded the dashboards earlier when
+you ran the `setup` command.
+
+include::../../libbeat/docs/opendashboards.asciidoc[]
+
+The dashboards are provided as examples. We recommend that you
+{kibana-ref}/dashboard.html[customize] them to meet your needs.
 
 image:./images/heartbeat-statistics.png[Heartbeat statistics]
-
-:allplatforms:
-include::../../libbeat/docs/dashboards.asciidoc[]

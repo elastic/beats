@@ -11,10 +11,12 @@ import (
 	"testing"
 
 	elog "github.com/andrewkroh/sys/windows/svc/eventlog"
-	"github.com/elastic/beats/libbeat/logp"
-	"github.com/elastic/beats/winlogbeat/sys/eventlogging"
 	"github.com/joeshaw/multierror"
 	"github.com/stretchr/testify/assert"
+
+	"github.com/elastic/beats/libbeat/logp"
+	"github.com/elastic/beats/winlogbeat/checkpoint"
+	"github.com/elastic/beats/winlogbeat/sys/eventlogging"
 )
 
 // Names that are registered by the test for logging events.
@@ -76,10 +78,10 @@ var oneTimeLogpInit sync.Once
 func configureLogp() {
 	oneTimeLogpInit.Do(func() {
 		if testing.Verbose() {
-			logp.LogInit(logp.LOG_DEBUG, "", false, true, []string{"eventlog"})
+			logp.DevelopmentSetup(logp.WithSelectors("eventlog"))
 			logp.Info("DEBUG enabled for eventlog.")
 		} else {
-			logp.LogInit(logp.LOG_WARNING, "", false, true, []string{})
+			logp.DevelopmentSetup(logp.WithLevel(logp.WarnLevel))
 		}
 
 		// Clear the event log before starting.
@@ -157,7 +159,6 @@ func setLogSize(t testing.TB, provider string, sizeBytes int) {
 
 // Verify that all messages are read from the event log.
 func TestRead(t *testing.T) {
-
 	configureLogp()
 	log, err := initLog(providerName, sourceName, eventCreateMsgFile)
 	if err != nil {
@@ -179,20 +180,9 @@ func TestRead(t *testing.T) {
 	}
 
 	// Read messages:
-	eventlog, err := newEventLogging(map[string]interface{}{"name": providerName})
-	if err != nil {
-		t.Fatal(err)
-	}
-	err = eventlog.Open(0)
-	if err != nil {
-		t.Fatal(err)
-	}
-	defer func() {
-		err := eventlog.Close()
-		if err != nil {
-			t.Fatal(err)
-		}
-	}()
+	eventlog, teardown := setupEventLogging(t, 0, map[string]interface{}{"name": providerName})
+	defer teardown()
+
 	records, err := eventlog.Read()
 	if err != nil {
 		t.Fatal(err)
@@ -244,24 +234,13 @@ func TestFormatMessageWithLargeMessage(t *testing.T) {
 	requiredBufferSize := len(message+"\r\n")*2 + 2
 
 	// Read messages:
-	eventlog, err := newEventLogging(map[string]interface{}{
+	eventlog, teardown := setupEventLogging(t, 0, map[string]interface{}{
 		"name": providerName,
 		// Use a buffer smaller than what is required.
 		"format_buffer_size": requiredBufferSize / 2,
 	})
-	if err != nil {
-		t.Fatal(err)
-	}
-	err = eventlog.Open(0)
-	if err != nil {
-		t.Fatal(err)
-	}
-	defer func() {
-		err := eventlog.Close()
-		if err != nil {
-			t.Fatal(err)
-		}
-	}()
+	defer teardown()
+
 	records, err := eventlog.Read()
 	if err != nil {
 		t.Fatal(err)
@@ -278,7 +257,6 @@ func TestFormatMessageWithLargeMessage(t *testing.T) {
 // Test that when an unknown Event ID is found, that a message containing the
 // insert strings (the message parameters) is returned.
 func TestReadUnknownEventId(t *testing.T) {
-
 	configureLogp()
 	log, err := initLog(providerName, sourceName, servicesMsgFile)
 	if err != nil {
@@ -299,20 +277,9 @@ func TestReadUnknownEventId(t *testing.T) {
 	}
 
 	// Read messages:
-	eventlog, err := newEventLogging(map[string]interface{}{"name": providerName})
-	if err != nil {
-		t.Fatal(err)
-	}
-	err = eventlog.Open(0)
-	if err != nil {
-		t.Fatal(err)
-	}
-	defer func() {
-		err := eventlog.Close()
-		if err != nil {
-			t.Fatal(err)
-		}
-	}()
+	eventlog, teardown := setupEventLogging(t, 0, map[string]interface{}{"name": providerName})
+	defer teardown()
+
 	records, err := eventlog.Read()
 	if err != nil {
 		t.Fatal(err)
@@ -334,7 +301,6 @@ func TestReadUnknownEventId(t *testing.T) {
 // separated list of files. If the message for an event ID is not found in one
 // of the files then the next file should be checked.
 func TestReadTriesMultipleEventMsgFiles(t *testing.T) {
-
 	configureLogp()
 	log, err := initLog(providerName, sourceName,
 		servicesMsgFile+";"+eventCreateMsgFile)
@@ -356,20 +322,9 @@ func TestReadTriesMultipleEventMsgFiles(t *testing.T) {
 	}
 
 	// Read messages:
-	eventlog, err := newEventLogging(map[string]interface{}{"name": providerName})
-	if err != nil {
-		t.Fatal(err)
-	}
-	err = eventlog.Open(0)
-	if err != nil {
-		t.Fatal(err)
-	}
-	defer func() {
-		err := eventlog.Close()
-		if err != nil {
-			t.Fatal(err)
-		}
-	}()
+	eventlog, teardown := setupEventLogging(t, 0, map[string]interface{}{"name": providerName})
+	defer teardown()
+
 	records, err := eventlog.Read()
 	if err != nil {
 		t.Fatal(err)
@@ -386,7 +341,6 @@ func TestReadTriesMultipleEventMsgFiles(t *testing.T) {
 
 // Test event messages that require more than one message parameter.
 func TestReadMultiParameterMsg(t *testing.T) {
-
 	configureLogp()
 	log, err := initLog(providerName, sourceName, servicesMsgFile)
 	if err != nil {
@@ -412,20 +366,9 @@ func TestReadMultiParameterMsg(t *testing.T) {
 	}
 
 	// Read messages:
-	eventlog, err := newEventLogging(map[string]interface{}{"name": providerName})
-	if err != nil {
-		t.Fatal(err)
-	}
-	err = eventlog.Open(0)
-	if err != nil {
-		t.Fatal(err)
-	}
-	defer func() {
-		err := eventlog.Close()
-		if err != nil {
-			t.Fatal(err)
-		}
-	}()
+	eventlog, teardown := setupEventLogging(t, 0, map[string]interface{}{"name": providerName})
+	defer teardown()
+
 	records, err := eventlog.Read()
 	if err != nil {
 		t.Fatal(err)
@@ -444,22 +387,17 @@ func TestReadMultiParameterMsg(t *testing.T) {
 // Verify that opening an invalid provider succeeds. Windows opens the
 // Application event log provider when this happens (unfortunately).
 func TestOpenInvalidProvider(t *testing.T) {
-
 	configureLogp()
 
-	el, err := newEventLogging(map[string]interface{}{"name": "nonExistentProvider"})
-	if err != nil {
-		t.Fatal(err)
-	}
-	assert.NoError(t, el.Open(0), "Calling Open() on an unknown provider "+
+	el := newTestEventLogging(t, map[string]interface{}{"name": "nonExistentProvider"})
+	assert.NoError(t, el.Open(checkpoint.EventLogState{}), "Calling Open() on an unknown provider "+
 		"should automatically open Application.")
-	_, err = el.Read()
+	_, err := el.Read()
 	assert.NoError(t, err)
 }
 
 // Test event messages that require no parameters.
 func TestReadNoParameterMsg(t *testing.T) {
-
 	configureLogp()
 	log, err := initLog(providerName, sourceName, netEventMsgFile)
 	if err != nil {
@@ -481,20 +419,9 @@ func TestReadNoParameterMsg(t *testing.T) {
 	}
 
 	// Read messages:
-	eventlog, err := newEventLogging(map[string]interface{}{"name": providerName})
-	if err != nil {
-		t.Fatal(err)
-	}
-	err = eventlog.Open(0)
-	if err != nil {
-		t.Fatal(err)
-	}
-	defer func() {
-		err := eventlog.Close()
-		if err != nil {
-			t.Fatal(err)
-		}
-	}()
+	eventlog, teardown := setupEventLogging(t, 0, map[string]interface{}{"name": providerName})
+	defer teardown()
+
 	records, err := eventlog.Read()
 	if err != nil {
 		t.Fatal(err)
@@ -513,7 +440,6 @@ func TestReadNoParameterMsg(t *testing.T) {
 // TestReadWhileCleared tests that the Read method recovers from the event log
 // being cleared or reset while reading.
 func TestReadWhileCleared(t *testing.T) {
-
 	configureLogp()
 	log, err := initLog(providerName, sourceName, eventCreateMsgFile)
 	if err != nil {
@@ -526,20 +452,8 @@ func TestReadWhileCleared(t *testing.T) {
 		}
 	}()
 
-	eventlog, err := newEventLogging(map[string]interface{}{"name": providerName})
-	if err != nil {
-		t.Fatal(err)
-	}
-	err = eventlog.Open(0)
-	if err != nil {
-		t.Fatal(err)
-	}
-	defer func() {
-		err := eventlog.Close()
-		if err != nil {
-			t.Fatal(err)
-		}
-	}()
+	eventlog, teardown := setupEventLogging(t, 0, map[string]interface{}{"name": providerName})
+	defer teardown()
 
 	log.Info(1, "Message 1")
 	log.Info(2, "Message 2")
@@ -559,6 +473,57 @@ func TestReadWhileCleared(t *testing.T) {
 	if len(lr) > 0 {
 		assert.Equal(t, uint32(3), lr[0].EventIdentifier.ID)
 	}
+}
+
+// Test event messages that include less parameters than required for message
+// formating (caused a crash in previous versions)
+func TestReadMissingParameters(t *testing.T) {
+	configureLogp()
+	log, err := initLog(providerName, sourceName, servicesMsgFile)
+	if err != nil {
+		t.Fatal(err)
+	}
+	defer func() {
+		err := uninstallLog(providerName, sourceName, log)
+		if err != nil {
+			t.Fatal(err)
+		}
+	}()
+
+	var eventID uint32 = 1073748860
+	// Missing parameters will be substituted by "(null)"
+	template := "The %s service entered the (null) state."
+	msgs := []string{"Windows Update"}
+	err = log.Report(elog.Info, eventID, msgs)
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	// Read messages:
+	eventlog, teardown := setupEventLogging(t, 0, map[string]interface{}{"name": providerName})
+	defer teardown()
+
+	records, err := eventlog.Read()
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	// Verify the message contents:
+	assert.Len(t, records, 1)
+	if len(records) != 1 {
+		t.FailNow()
+	}
+	assert.Equal(t, eventID&0xFFFF, records[0].EventIdentifier.ID)
+	assert.Equal(t, fmt.Sprintf(template, msgs[0]),
+		strings.TrimRight(records[0].Message, "\r\n"))
+}
+
+func newTestEventLogging(t *testing.T, options map[string]interface{}) EventLog {
+	return newTestEventLog(t, newEventLogging, options)
+}
+
+func setupEventLogging(t *testing.T, recordID uint64, options map[string]interface{}) (EventLog, func()) {
+	return setupEventLog(t, newEventLogging, recordID, options)
 }
 
 // TODO: Add more test cases:

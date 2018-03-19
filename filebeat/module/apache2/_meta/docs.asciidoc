@@ -1,7 +1,11 @@
+:modulename: apache2
+
 == Apache2 module
 
-This module parses access and error logs created by the
+The +{modulename}+ module parses access and error logs created by the
 https://httpd.apache.org/[Apache HTTP] server.
+
+include::../include/what-happens.asciidoc[]
 
 [float]
 === Compatibility
@@ -11,32 +15,57 @@ This module requires the
 {elasticsearch-plugins}/ingest-geoip.html[ingest-geoip] Elasticsearch plugins.
 
 
-The Apache2 module was tested with logs from versions 2.2.22 and 2.4.23.
+The +{modulename}+ module was tested with logs from versions 2.2.22 and 2.4.23.
 
 On Windows, the module was tested with Apache2 installed from the Chocolatey
 repository.
 
+include::../include/running-modules.asciidoc[]
+
 [float]
-=== Dashboard
+=== Example dashboard
 
-This module comes with a sample dashboard.
+This module comes with a sample dashboard. For example:
 
+[role="screenshot"]
 image::./images/kibana-apache2.png[]
 
-[float]
-=== Access logs fileset settings
+include::../include/configuring-intro.asciidoc[]
+
+The following example shows how to set paths in the +modules.d/{modulename}.yml+
+file to override the default paths for Apache2 access and error logs:
+
+["source","yaml",subs="attributes"]
+-----
+- module: apache2
+  access:
+    enabled: true
+    var.paths: ["/path/to/log/apache2/access.log*"]
+  error:
+    enabled: true
+    var.paths: ["/path/to/log/apache2/error.log*"]
+-----
+
+
+To specify the same settings at the command line, you use:
+
+["source","sh",subs="attributes"]
+-----
+./{beatname_lc} --modules {modulename} -M "apache2.access.var.paths=[/path/to/apache2/access.log*]" -M "apache2.error.var.paths=[/path/to/log/apache2/error.log*]"
+-----
+
+
+//set the fileset name used in the included example
+:fileset_ex: access
+
+include::../include/config-option-intro.asciidoc[]
 
 [float]
-==== var.paths
+==== `access` log fileset settings
 
-An array of paths where to look for the log files. If left empty, Filebeat
-will choose the paths depending on your operating systems.
-
-[float]
-=== Error logs fileset settings
+include::../include/var-paths.asciidoc[]
 
 [float]
-==== var.paths
+==== `error` log fileset settings
 
-An array of paths where to look for the log files. If left empty, Filebeat
-will choose the paths depending on your operating systems.
+include::../include/var-paths.asciidoc[]

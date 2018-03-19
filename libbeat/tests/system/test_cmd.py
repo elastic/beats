@@ -45,12 +45,11 @@ class TestCommands(BaseTest):
         """
         # Delete any existing template
         try:
-            for t in self.es.cat.templates(h='name').strip().split('\n'):
-                self.es.indices.delete_template(t)
+            self.es.indices.delete_template('mockbeat-*')
         except:
             pass
 
-        assert len(self.es.cat.templates(h='name')) == 0
+        assert len(self.es.cat.templates(name='mockbeat-*', h='name')) == 0
 
         shutil.copy(self.beat_path + "/_meta/config.yml",
                     os.path.join(self.working_dir, "libbeat.yml"))
@@ -66,37 +65,149 @@ class TestCommands(BaseTest):
             config="libbeat.yml")
 
         assert exit_code == 0
-        assert len(self.es.cat.templates(h='name')) > 0
+        assert len(self.es.cat.templates(name='mockbeat-*', h='name')) > 0
 
     @unittest.skipUnless(INTEGRATION_TESTS, "integration test")
     @attr('integration')
-    def test_configtest(self):
+    def test_setup_flag(self):
         """
-        Test configtest command
+        Test --setup flag on run command
+        """
+        # Delete any existing template
+        try:
+            self.es.indices.delete_template('mockbeat-*')
+        except:
+            pass
+
+        assert len(self.es.cat.templates(name='mockbeat-*', h='name')) == 0
+
+        shutil.copy(self.beat_path + "/_meta/config.yml",
+                    os.path.join(self.working_dir, "libbeat.yml"))
+        shutil.copy(self.beat_path + "/fields.yml",
+                    os.path.join(self.working_dir, "fields.yml"))
+
+        proc = self.start_beat(
+            extra_args=["--setup",
+                        "--path.config", self.working_dir,
+                        "-E", "setup.dashboards.file=" +
+                        os.path.join("../../dashboards/testdata", "testbeat-dashboards.zip"),
+                        "-E", "setup.dashboards.beat=testbeat",
+                        "-E", "setup.kibana.protocol=http",
+                        "-E", "setup.kibana.host=" + self.get_kibana_host(),
+                        "-E", "setup.kibana.port=" + self.get_kibana_port(),
+                        "-E", "output.elasticsearch.hosts=['" + self.get_host() + "']"],
+            config="libbeat.yml")
+
+        self.wait_until(lambda: self.es.cat.templates(name='mockbeat-*', h='name') > 0)
+        self.wait_until(lambda: self.log_contains("Kibana dashboards successfully loaded"))
+        proc.check_kill_and_wait()
+
+    @unittest.skipUnless(INTEGRATION_TESTS, "integration test")
+    @attr('integration')
+    def test_test_config(self):
+        """
+        Test test config command
         """
         self.render_config_template("mockbeat",
                                     os.path.join(self.working_dir, "libbeat.yml"))
 
         exit_code = self.run_beat(
             logging_args=[],
-            extra_args=["configtest"],
+            extra_args=["test", "config"],
             config="libbeat.yml")
 
-        print(self.get_log())
         assert exit_code == 0
         assert self.log_contains("Config OK")
 
-    def test_configtest_bad_config(self):
+    def test_test_bad_config(self):
         """
-        Test configtest command with bad config
+        Test test config command with bad config
         """
         exit_code = self.run_beat(
             logging_args=[],
-            extra_args=["configtest"],
+            extra_args=["test", "config"],
             config="libbeat-missing.yml")
 
         assert exit_code == 1
         assert self.log_contains("Config OK") is False
 
+    def test_export_config(self):
+        """
+        Test export config works
+        """
+        self.render_config_template("mockbeat",
+                                    os.path.join(self.working_dir,
+                                                 "libbeat.yml"),
+                                    metrics_period=1234)
+
+        exit_code = self.run_beat(
+            logging_args=[],
+            extra_args=["export", "config"],
+            config="libbeat.yml")
+
+        assert exit_code == 0
+        assert self.log_contains("filename: mockbeat")
+        assert self.log_contains("period: 1234")
+
+    def test_export_template(self):
+        """
+        Test export template works
+        """
+        self.render_config_template("mockbeat",
+                                    os.path.join(self.working_dir,
+                                                 "mockbeat.yml"),
+                                    fields=os.path.join(self.working_dir, "fields.yml"))
+        shutil.copy(self.beat_path + "/fields.yml",
+                    os.path.join(self.working_dir, "fields.yml"))
+        exit_code = self.run_beat(
+            logging_args=[],
+            extra_args=["export", "template"],
+            config="mockbeat.yml")
+
+        assert exit_code == 0
+        assert self.log_contains('"mockbeat-9.9.9-*"')
+        assert self.log_contains('"codec": "best_compression"')
+
+    @unittest.skipUnless(INTEGRATION_TESTS, "integration test")
+    @attr('integration')
+    def test_test_output(self):
+        """
+        Test test output works
+        """
+        self.render_config_template("mockbeat",
+                                    os.path.join(self.working_dir,
+                                                 "mockbeat.yml"),
+                                    elasticsearch={"hosts": '["{}"]'.format(self.get_host())})
+        exit_code = self.run_beat(
+            extra_args=["test", "output"],
+            config="mockbeat.yml")
+
+        assert exit_code == 0
+        assert self.log_contains('parse url... OK')
+        assert self.log_contains('TLS... WARN secure connection disabled')
+        assert self.log_contains('talk to server... OK')
+
+    def test_test_wrong_output(self):
+        """
+        Test test wrong output works
+        """
+        self.render_config_template("mockbeat",
+                                    os.path.join(self.working_dir,
+                                                 "mockbeat.yml"),
+                                    elasticsearch={"hosts": '["badhost:9200"]'})
+        exit_code = self.run_beat(
+            extra_args=["test", "output"],
+            config="mockbeat.yml")
+
+        assert exit_code == 1
+        assert self.log_contains('parse url... OK')
+        assert self.log_contains('dns lookup... ERROR')
+
     def get_host(self):
         return os.getenv('ES_HOST', 'localhost') + ':' + os.getenv('ES_PORT', '9200')
+
+    def get_kibana_host(self):
+        return os.getenv('KIBANA_HOST', 'localhost')
+
+    def get_kibana_port(self):
+        return os.getenv('KIBANA_PORT', '5601')

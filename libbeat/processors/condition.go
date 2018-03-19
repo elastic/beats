@@ -7,6 +7,7 @@ import (
 	"strconv"
 	"strings"
 
+	"github.com/elastic/beats/libbeat/beat"
 	"github.com/elastic/beats/libbeat/common"
 	"github.com/elastic/beats/libbeat/common/match"
 	"github.com/elastic/beats/libbeat/logp"
@@ -20,8 +21,9 @@ type RangeValue struct {
 }
 
 type EqualsValue struct {
-	Int uint64
-	Str string
+	Int  uint64
+	Str  string
+	Bool bool
 }
 
 type Condition struct {
@@ -41,10 +43,16 @@ type WhenProcessor struct {
 	p         Processor
 }
 
+// ValuesMap provides a common interface to read fields for condition checking
+type ValuesMap interface {
+	// GetValue returns the given field from the map
+	GetValue(string) (interface{}, error)
+}
+
 func NewConditional(
 	ruleFactory Constructor,
 ) Constructor {
-	return func(cfg common.Config) (Processor, error) {
+	return func(cfg *common.Config) (Processor, error) {
 		rule, err := ruleFactory(cfg)
 		if err != nil {
 			return nil, err
@@ -105,20 +113,28 @@ func NewConditionList(config []ConditionConfig) ([]Condition, error) {
 }
 
 func (c *Condition) setEquals(cfg *ConditionFields) error {
-
 	c.equals = map[string]EqualsValue{}
 
 	for field, value := range cfg.fields {
 		uintValue, err := extractInt(value)
 		if err == nil {
 			c.equals[field] = EqualsValue{Int: uintValue}
-		} else {
-			sValue, err := extractString(value)
-			if err != nil {
-				return err
-			}
-			c.equals[field] = EqualsValue{Str: sValue}
+			continue
 		}
+
+		sValue, err := extractString(value)
+		if err == nil {
+			c.equals[field] = EqualsValue{Str: sValue}
+			continue
+		}
+
+		bValue, err := extractBool(value)
+		if err == nil {
+			c.equals[field] = EqualsValue{Bool: bValue}
+			continue
+		}
+
+		return fmt.Errorf("unexpected type %T in equals condition", value)
 	}
 
 	return nil
@@ -151,7 +167,6 @@ func compileMatches(
 }
 
 func (c *Condition) setRange(cfg *ConditionFields) error {
-
 	c.rangexp = map[string]RangeValue{}
 
 	updateRangeValue := func(key string, op string, value float64) error {
@@ -196,8 +211,7 @@ func (c *Condition) setRange(cfg *ConditionFields) error {
 	return nil
 }
 
-func (c *Condition) Check(event common.MapStr) bool {
-
+func (c *Condition) Check(event ValuesMap) bool {
 	if len(c.or) > 0 {
 		return c.checkOR(event)
 	}
@@ -215,8 +229,32 @@ func (c *Condition) Check(event common.MapStr) bool {
 		c.checkRange(event)
 }
 
-func (c *Condition) checkEquals(event common.MapStr) bool {
+func (c *Condition) checkOR(event ValuesMap) bool {
+	for _, cond := range c.or {
+		if cond.Check(event) {
+			return true
+		}
+	}
+	return false
+}
 
+func (c *Condition) checkAND(event ValuesMap) bool {
+	for _, cond := range c.and {
+		if !cond.Check(event) {
+			return false
+		}
+	}
+	return true
+}
+
+func (c *Condition) checkNOT(event ValuesMap) bool {
+	if c.not.Check(event) {
+		return false
+	}
+	return true
+}
+
+func (c *Condition) checkEquals(event ValuesMap) bool {
 	for field, equalValue := range c.equals {
 
 		value, err := event.GetValue(field)
@@ -229,23 +267,36 @@ func (c *Condition) checkEquals(event common.MapStr) bool {
 			if intValue != equalValue.Int {
 				return false
 			}
-		} else {
-			sValue, err := extractString(value)
-			if err != nil {
-				logp.Warn("unexpected type %T in equals condition as it accepts only integers and strings. ", value)
-				return false
-			}
+
+			continue
+		}
+
+		sValue, err := extractString(value)
+		if err == nil {
 			if sValue != equalValue.Str {
 				return false
 			}
+
+			continue
 		}
+
+		bValue, err := extractBool(value)
+		if err == nil {
+			if bValue != equalValue.Bool {
+				return false
+			}
+
+			continue
+		}
+
+		logp.Err("unexpected type %T in equals condition as it accepts only integers, strings or bools. ", value)
+		return false
 	}
 
 	return true
-
 }
 
-func (c *Condition) checkMatches(event common.MapStr) bool {
+func (c *Condition) checkMatches(event ValuesMap) bool {
 	matchers := c.matches.filters
 	if matchers == nil {
 		return true
@@ -284,8 +335,7 @@ func (c *Condition) checkMatches(event common.MapStr) bool {
 	return true
 }
 
-func (c *Condition) checkRange(event common.MapStr) bool {
-
+func (c *Condition) checkRange(event ValuesMap) bool {
 	checkValue := func(value float64, rangeValue RangeValue) bool {
 
 		if rangeValue.gte != nil {
@@ -349,36 +399,7 @@ func (c *Condition) checkRange(event common.MapStr) bool {
 	return true
 }
 
-func (c *Condition) checkOR(event common.MapStr) bool {
-
-	for _, cond := range c.or {
-		if cond.Check(event) {
-			return true
-		}
-	}
-	return false
-}
-
-func (c *Condition) checkAND(event common.MapStr) bool {
-
-	for _, cond := range c.and {
-		if !cond.Check(event) {
-			return false
-		}
-	}
-	return true
-}
-
-func (c *Condition) checkNOT(event common.MapStr) bool {
-
-	if c.not.Check(event) {
-		return false
-	}
-	return true
-}
-
 func (c Condition) String() string {
-
 	s := ""
 
 	if len(c.equals) > 0 {
@@ -410,7 +431,6 @@ func (c Condition) String() string {
 }
 
 func (r RangeValue) String() string {
-
 	s := ""
 	if r.gte != nil {
 		s = s + fmt.Sprintf(">= %v", *r.gte)
@@ -439,7 +459,6 @@ func (r RangeValue) String() string {
 }
 
 func (e EqualsValue) String() string {
-
 	if len(e.Str) > 0 {
 		return e.Str
 	}
@@ -462,7 +481,7 @@ func NewConditionRule(
 	return &WhenProcessor{cond, p}, nil
 }
 
-func (r *WhenProcessor) Run(event common.MapStr) (common.MapStr, error) {
+func (r *WhenProcessor) Run(event *beat.Event) (*beat.Event, error) {
 	if !r.condition.Check(event) {
 		return event, nil
 	}
@@ -474,7 +493,7 @@ func (r *WhenProcessor) String() string {
 }
 
 func addCondition(
-	cfg common.Config,
+	cfg *common.Config,
 	p Processor,
 ) (Processor, error) {
 	if !cfg.HasField("when") {

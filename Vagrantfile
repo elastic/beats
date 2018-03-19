@@ -52,7 +52,19 @@ echo 'Creating github.com/elastic in the GOPATH'
 mkdir -p ~/go/src/github.com/elastic
 echo 'Symlinking /vagrant to ~/go/src/github.com/elastic'
 cd ~/go/src/github.com/elastic
-if [ -d "/vagrant" ]; then ln -s /vagrant beats; fi
+if [ -d "/vagrant" ]  && [ ! -e "beats" ]; then ln -s /vagrant beats; fi
+SCRIPT
+
+# Linux GVM
+$linuxGvmProvision = <<SCRIPT
+mkdir -p ~/bin
+if [ ! -e "~/bin/gvm" ]; then
+  curl -sL -o ~/bin/gvm https://github.com/andrewkroh/gvm/releases/download/v0.0.5/gvm-linux-amd64
+  chmod +x ~/bin/gvm
+  echo 'export GOPATH=$HOME/go' >> ~/.bash_profile
+  echo 'export PATH=$HOME/bin:$GOPATH/bin:$PATH' >> ~/.bash_profile
+  echo 'eval "$(gvm 1.9.4)"' >> ~/.bash_profile
+fi
 SCRIPT
 
 Vagrant.configure(2) do |config|
@@ -108,6 +120,27 @@ Vagrant.configure(2) do |config|
     end
 
     openbsd.vm.provision "shell", inline: $unixProvision, privileged: false
+  end
+
+  config.vm.define "precise64", primary: true do |c|
+    c.vm.box = "ubuntu/precise64"
+    c.vm.network :forwarded_port, guest: 22,   host: 2226,  id: "ssh", auto_correct: true
+
+    c.vm.provision "shell", inline: $unixProvision, privileged: false
+    c.vm.provision "shell", inline: $linuxGvmProvision, privileged: false
+
+    c.vm.synced_folder ".", "/vagrant", type: "virtualbox"
+  end
+
+  config.vm.define "fedora26", primary: true do |c|
+    c.vm.box = "bento/fedora-26"
+    c.vm.network :forwarded_port, guest: 22,   host: 2227,  id: "ssh", auto_correct: true
+
+    c.vm.provision "shell", inline: $unixProvision, privileged: false
+    c.vm.provision "shell", inline: $linuxGvmProvision, privileged: false
+    c.vm.provision "shell", inline: "dnf install -y make gcc python-pip python-virtualenv git"
+
+    c.vm.synced_folder ".", "/vagrant", type: "virtualbox"
   end
 
 end

@@ -7,7 +7,6 @@ import (
 	"github.com/elastic/beats/libbeat/beat"
 	"github.com/elastic/beats/libbeat/common"
 	"github.com/elastic/beats/libbeat/logp"
-	"github.com/elastic/beats/libbeat/publisher"
 
 	"{beat_path}/config"
 )
@@ -15,19 +14,19 @@ import (
 type {Beat} struct {
 	done   chan struct{}
 	config config.Config
-	client publisher.Client
+	client beat.Client
 }
 
 // Creates beater
 func New(b *beat.Beat, cfg *common.Config) (beat.Beater, error) {
-	config := config.DefaultConfig
-	if err := cfg.Unpack(&config); err != nil {
+	c := config.DefaultConfig
+	if err := cfg.Unpack(&c); err != nil {
 		return nil, fmt.Errorf("Error reading config file: %v", err)
 	}
 
 	bt := &{Beat}{
 		done:   make(chan struct{}),
-		config: config,
+		config: c,
 	}
 	return bt, nil
 }
@@ -35,7 +34,12 @@ func New(b *beat.Beat, cfg *common.Config) (beat.Beater, error) {
 func (bt *{Beat}) Run(b *beat.Beat) error {
 	logp.Info("{beat} is running! Hit CTRL-C to stop it.")
 
-	bt.client = b.Publisher.Connect()
+	var err error
+	bt.client, err = b.Publisher.Connect()
+	if err != nil {
+		return err
+	}
+
 	ticker := time.NewTicker(bt.config.Period)
 	counter := 1
 	for {
@@ -45,12 +49,14 @@ func (bt *{Beat}) Run(b *beat.Beat) error {
 		case <-ticker.C:
 		}
 
-		event := common.MapStr{
-			"@timestamp": common.Time(time.Now()),
-			"type":       b.Info.Name,
-			"counter":    counter,
+		event := beat.Event{
+			Timestamp: time.Now(),
+			Fields: common.MapStr{
+				"type":    b.Info.Name,
+				"counter": counter,
+			},
 		}
-		bt.client.PublishEvent(event)
+		bt.client.Publish(event)
 		logp.Info("Event sent")
 		counter++
 	}

@@ -1,0 +1,80 @@
+{
+    "@timestamp": "2017-10-12T08:05:34.853Z",
+    "aerospike": {
+        "namespace": {
+            "client": {
+                "delete": {
+                    "error": 0,
+                    "not_found": 0,
+                    "success": 0,
+                    "timeout": 0
+                },
+                "read": {
+                    "error": 0,
+                    "not_found": 0,
+                    "success": 0,
+                    "timeout": 0
+                },
+                "write": {
+                    "error": 0,
+                    "success": 0,
+                    "timeout": 0
+                }
+            },
+            "device": {
+                "available": {
+                    "pct": 99
+                },
+                "free": {
+                    "pct": 100
+                },
+                "total": {
+                    "bytes": 4294967296
+                },
+                "used": {
+                    "bytes": 0
+                }
+            },
+            "hwm_breached": false,
+            "memory": {
+                "free": {
+                    "pct": 100
+                },
+                "used": {
+                    "data": {
+                        "bytes": 0
+                    },
+                    "index": {
+                        "bytes": 0
+                    },
+                    "sindex": {
+                        "bytes": 0
+                    },
+                    "total": {
+                        "bytes": 0
+                    }
+                }
+            },
+            "name": "test",
+            "node": {
+                "host": "172.18.0.4:3000",
+                "name": "BB9040012AC4202"
+            },
+            "objects": {
+                "master": 0,
+                "total": 0
+            },
+            "stop_writes": false
+        }
+    },
+    "beat": {
+        "hostname": "host.example.com",
+        "name": "host.example.com"
+    },
+    "metricset": {
+        "host": "aerospike:3000",
+        "module": "aerospike",
+        "name": "namespace",
+        "rtt": 115
+    }
+}

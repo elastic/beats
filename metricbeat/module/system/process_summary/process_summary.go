@@ -3,13 +3,13 @@
 package process_summary
 
 import (
-	"github.com/elastic/beats/libbeat/common"
-	"github.com/elastic/beats/libbeat/logp"
-	"github.com/elastic/beats/metricbeat/mb"
-	"github.com/elastic/beats/metricbeat/mb/parse"
-	"github.com/elastic/beats/metricbeat/module/system/process"
 	"github.com/pkg/errors"
 
+	"github.com/elastic/beats/libbeat/common"
+	"github.com/elastic/beats/libbeat/logp"
+	"github.com/elastic/beats/libbeat/metric/system/process"
+	"github.com/elastic/beats/metricbeat/mb"
+	"github.com/elastic/beats/metricbeat/mb/parse"
 	sigar "github.com/elastic/gosigar"
 )
 
@@ -33,7 +33,6 @@ type MetricSet struct {
 // Part of new is also setting up the configuration by processing additional
 // configuration entries if needed.
 func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
-
 	return &MetricSet{
 		BaseMetricSet: base,
 	}, nil
@@ -43,7 +42,6 @@ func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
 // It returns the event which is then forward to the output. In case of an error, a
 // descriptive error must be returned.
 func (m *MetricSet) Fetch() (common.MapStr, error) {
-
 	pids, err := process.Pids()
 	if err != nil {
 		return nil, errors.Wrap(err, "failed to fetch the list of PIDs")
@@ -72,6 +70,8 @@ func (m *MetricSet) Fetch() (common.MapStr, error) {
 		case 'R':
 			summary.running++
 		case 'D':
+			summary.idle++
+		case 'I':
 			summary.idle++
 		case 'T':
 			summary.stopped++

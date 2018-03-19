@@ -1,10 +1,8 @@
-== PostgreSQL Module
-
 This module periodically fetches metrics from
 https://www.postgresql.org/[PostgreSQL] servers.
 
 [float]
-=== Module-Specific Configuration Notes
+=== Module-specific configuration notes
 
 When configuring the `hosts` option, you must use Postgres URLs of the following
 format:

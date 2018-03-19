@@ -3,15 +3,17 @@ This file is generated! See scripts/docs_collector.py
 ////
 
 [[metricbeat-module-kibana]]
-== Kibana Module
+== Kibana module
 
-This is the Kibana Module and only tracks the high level metrics. To monitor more Kibana metrics, use our {monitoringdoc}/xpack-monitoring.html[X-Pack monitoring] which is available under a free basic license.
+beta[]
+
+The Kibana module only tracks the high-level metrics. To monitor more Kibana metrics, use our {monitoringdoc}/xpack-monitoring.html[X-Pack monitoring] which is available under a free basic license.
 
 
 [float]
-=== Example Configuration
+=== Example configuration
 
-The kibana module supports the standard configuration options that are described
+The Kibana module supports the standard configuration options that are described
 in <<configuration-metricbeat>>. Here is an example configuration:
 
 [source,yaml]
@@ -19,10 +21,11 @@ in <<configuration-metricbeat>>. Here is an example configuration:
 metricbeat.modules:
 - module: kibana
   metricsets: ["status"]
-  enabled: false
   period: 10s
   hosts: ["localhost:5601"]
 ----
+
+This module supports TLS connection when using `ssl` config field, as described in <<configuration-ssl>>.
 
 [float]
 === Metricsets

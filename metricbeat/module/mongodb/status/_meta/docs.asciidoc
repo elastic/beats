@@ -1,3 +1,1 @@
-=== MongoDB Status Metricset
-
 This is the `status` metricset of the MongoDB module.

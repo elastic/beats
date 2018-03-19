@@ -1,0 +1,12 @@
+- key: etcd
+  title: "Etcd"
+  description: >
+    etcd Module
+  release: beta
+  settings: ["ssl"]
+  fields:
+    - name: etcd
+      type: group
+      description: >
+        `etcd` contains statistics that were read from Etcd
+      fields:

@@ -3,7 +3,7 @@ This file is generated! See scripts/docs_collector.py
 ////
 
 [[metricbeat-module-zookeeper]]
-== ZooKeeper Module
+== ZooKeeper module
 
 The ZooKeeper module fetches statistics from the ZooKeeper service.
 
@@ -15,7 +15,7 @@ The ZooKeeper metricsets were tested with ZooKeeper 3.4.8 and are expected to wo
 
 
 [float]
-=== Example Configuration
+=== Example configuration
 
 The ZooKeeper module supports the standard configuration options that are described
 in <<configuration-metricbeat>>. Here is an example configuration:
@@ -25,7 +25,6 @@ in <<configuration-metricbeat>>. Here is an example configuration:
 metricbeat.modules:
 - module: zookeeper
   metricsets: ["mntr"]
-  enabled: false
   period: 10s
   hosts: ["localhost:2181"]
 ----

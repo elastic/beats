@@ -1,11 +1,14 @@
-=== System Memory Metricset
-
 The System `memory` metricset provides memory statistics.
 
 This metricset is available on:
 
-- Darwin
 - FreeBSD
 - Linux
+- macOS
 - OpenBSD
 - Windows
+
+[float]
+=== Configuration
+
+There are no configuration options for this metricset.

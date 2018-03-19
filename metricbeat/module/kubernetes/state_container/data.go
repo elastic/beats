@@ -21,11 +21,16 @@ func eventMapping(families []*dto.MetricFamily) ([]common.MapStr, error) {
 			if container == "" {
 				continue
 			}
-			event, ok := eventsMap[container]
+
+			namespace := util.GetLabel(metric, "namespace")
+			pod := util.GetLabel(metric, "pod")
+			containerKey := namespace + "::" + pod + "::" + container
+			event, ok := eventsMap[containerKey]
 			if !ok {
 				event = common.MapStr{}
-				eventsMap[container] = event
+				eventsMap[containerKey] = event
 			}
+
 			switch family.GetName() {
 			case "kube_pod_container_info":
 				event.Put(mb.ModuleDataKey+".pod.name", util.GetLabel(metric, "pod"))
@@ -39,6 +44,8 @@ func eventMapping(families []*dto.MetricFamily) ([]common.MapStr, error) {
 			case "kube_pod_container_resource_limits_cpu_cores":
 				event.Put(mb.ModuleDataKey+".node.name", util.GetLabel(metric, "node"))
 				event.Put("cpu.limit.nanocores", metric.GetGauge().GetValue()*nanocores)
+				cuid := util.ContainerUID(util.GetLabel(metric, "namespace"), util.GetLabel(metric, "pod"), util.GetLabel(metric, "container"))
+				util.PerfMetrics.ContainerCoresLimit.Set(cuid, metric.GetGauge().GetValue())
 
 			case "kube_pod_container_resource_requests_cpu_cores":
 				event.Put(mb.ModuleDataKey+".node.name", util.GetLabel(metric, "node"))
@@ -47,6 +54,8 @@ func eventMapping(families []*dto.MetricFamily) ([]common.MapStr, error) {
 			case "kube_pod_container_resource_limits_memory_bytes":
 				event.Put(mb.ModuleDataKey+".node.name", util.GetLabel(metric, "node"))
 				event.Put("memory.limit.bytes", metric.GetGauge().GetValue())
+				cuid := util.ContainerUID(util.GetLabel(metric, "namespace"), util.GetLabel(metric, "pod"), util.GetLabel(metric, "container"))
+				util.PerfMetrics.ContainerMemLimit.Set(cuid, metric.GetGauge().GetValue())
 
 			case "kube_pod_container_resource_requests_memory_bytes":
 				event.Put(mb.ModuleDataKey+".node.name", util.GetLabel(metric, "node"))
@@ -80,7 +89,8 @@ func eventMapping(families []*dto.MetricFamily) ([]common.MapStr, error) {
 		}
 	}
 
-	var events []common.MapStr
+	// initialize, populate events array from values in eventsMap
+	events := make([]common.MapStr, 0, len(eventsMap))
 	for _, event := range eventsMap {
 		events = append(events, event)
 	}

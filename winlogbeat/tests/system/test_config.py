@@ -33,7 +33,8 @@ class Test(BaseTest):
         )
         self.start_beat(extra_args=["-configtest"]).check_wait(exit_code=1)
         assert self.log_contains(
-            "unknown unit  hour in duration 1 hour accessing 'ignore_older'")
+            "unknown unit  hour in duration 1 hour "
+            "accessing 'winlogbeat.event_logs.0.ignore_older'")
 
     def test_invalid_level(self):
         """
@@ -58,5 +59,5 @@ class Test(BaseTest):
             ]
         )
         self.start_beat(extra_args=["-configtest"]).check_wait(exit_code=1)
-        assert self.log_contains(("Failed to create new event log. file API is "
-                                  "not available"))
+        assert self.log_contains("Failed to create new event log. "
+                                 "file API is not available")

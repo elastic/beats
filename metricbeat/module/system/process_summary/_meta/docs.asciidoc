@@ -1,4 +1,14 @@
-=== System Process Summary MetricSet
+The `process_summary` metricset collects high level statistics about the running
+processes.
 
-This is the `process_summary` metricset of the module system. It collects high
-level statistics about the running processes.
+This metricset is available on:
+
+- FreeBSD
+- Linux
+- macOS
+- Windows
+
+[float]
+=== Configuration
+
+There are no configuration options for this metricset.

@@ -3,16 +3,14 @@ This file is generated! See scripts/docs_collector.py
 ////
 
 [[metricbeat-module-docker]]
-== Docker Module
-
-beta[]
+== Docker module
 
 This module fetches metrics from https://www.docker.com/[Docker] containers.
 
-The docker module is currently not tested on Windows.
+The Docker module is currently not tested on Windows.
 
 [float]
-=== Module-Specific Configuration Notes
+=== Module-specific configuration notes
 
 It is strongly recommended that you run Docker metricsets with a
 <<metricset-period,`period`>> that is 3 seconds or longer. The request to the
@@ -22,7 +20,7 @@ requests.
 
 
 [float]
-=== Example Configuration
+=== Example configuration
 
 The Docker module supports the standard configuration options that are described
 in <<configuration-metricbeat>>. Here is an example configuration:
@@ -33,8 +31,10 @@ metricbeat.modules:
 - module: docker
   metricsets: ["container", "cpu", "diskio", "healthcheck", "info", "memory", "network"]
   hosts: ["unix:///var/run/docker.sock"]
-  enabled: false
   period: 10s
+
+  # Replace dots in labels with `_`. Set to false to keep dots
+  labels.dedot: true
 
   # To connect to Docker over TLS you must specify a client and CA certificate.
   #ssl:

@@ -1,0 +1,95 @@
+[role="xpack"]
+[[beats-basic-auth]]
+=== Configuring authentication credentials for {beatname_uc}
+
+When sending data to a secured cluster through the `elasticsearch`
+output, {beatname_uc} must either provide basic authentication credentials
+or present a client certificate.
+
+To configure authentication credentials for {beatname_uc}:
+
+. Create a role that has the `manage_index_templates` and
+`monitor` cluster privileges, and `read`, `write`, and `create_index`
+privileges for the indices that {beatname_uc} creates. You can create roles from the
+**Management / Roles** UI in {kib} or through the `role` API.
+For example, the following request creates a ++{beat_default_index_prefix}_writer++ role:
++
+["source","sh",subs="attributes,callouts"]
+---------------------------------------------------------------
+POST _xpack/security/role/{beat_default_index_prefix}_writer
+{
+  "cluster": ["manage_index_templates", "monitor"],
+  "indices": [
+    {
+      "names": [ "{beat_default_index_prefix}-*" ], <1>
+      "privileges": ["write","create_index"]
+    }
+  ]
+}
+---------------------------------------------------------------
+<1> If you use a custom {beatname_uc} index pattern, specify that pattern
+instead of the default ++{beat_default_index_prefix}-*++ pattern.
+
+. Assign the writer role to the user that {beatname_uc} will use to connect to
+{es}:
+
+.. To authenticate as a native user, create a user for the {beatname_uc} to use
+internally and assign it the writer role. You can create users from the
+**Management / Users** UI in {kib} or through the `user` API. For example, the
+following request creates a ++{beat_default_index_prefix}_internal++ user that has the
+++{beat_default_index_prefix}_writer++ role:
++
+["source","sh",subs="attributes,callouts"]
+---------------------------------------------------------------
+POST /_xpack/security/user/{beat_default_index_prefix}_internal
+{
+  "password" : "x-pack-test-password",
+  "roles" : [ "{beat_default_index_prefix}_writer"],
+  "full_name" : "Internal {beatname_uc} User"
+}
+---------------------------------------------------------------
+
+.. To authenticate using PKI authentication, assign the writer role
+to the internal {beatname_uc} user in the `role_mapping.yml` configuration file. Specify
+the user by the distinguished name that appears in its certificate.
++
+--
+["source","yaml",subs="attributes,callouts"]
+---------------------------------------------------------------
+{beat_default_index_prefix}_writer:
+  - "cn=Internal {beatname_uc} User,ou=example,o=com"
+---------------------------------------------------------------
+For more information, see
+{xpack-ref}/mapping-roles.html#mapping-roles-file[Using Role Mapping Files].
+--
+
+. Configure authentication credentials for the `elasticsearch` output
+in the {beatname_uc} configuration file:
+
+.. To use basic authentication, configure the `username` and `password`
+settings. For example, the following {beatname_uc} output configuration
+uses the native ++{beat_default_index_prefix}_internal++ user to connect to {es}:
++
+["source","js",subs="attributes,callouts"]
+--------------------------------------------------
+output.elasticsearch:
+    hosts: ["localhost:9200"]
+    index: "{beat_default_index_prefix}"
+    username: "{beat_default_index_prefix}_internal"
+    password: "x-pack-test-password"
+--------------------------------------------------
+
+.. To use PKI authentication, configure the `certificate` and
+`key` settings:
++
+["source","js",subs="attributes,callouts"]
+--------------------------------------------------
+output.elasticsearch:
+    hosts: ["localhost:9200"]
+    index: "{beat_default_index_prefix}"
+    ssl.certificate: "/etc/pki/client/cert.pem" <1>
+    ssl.key: "/etc/pki/client/cert.key"
+--------------------------------------------------
+<1> The distinguished name (DN) in the certificate must be mapped to
+the writer role in the `role_mapping.yml` configuration file on each
+node in the {es} cluster.

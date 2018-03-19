@@ -5,9 +5,11 @@ import (
 
 	"github.com/spf13/pflag"
 
-	"github.com/elastic/beats/packetbeat/beater"
+	// import protocol modules
+	_ "github.com/elastic/beats/packetbeat/include"
 
 	cmd "github.com/elastic/beats/libbeat/cmd"
+	"github.com/elastic/beats/packetbeat/beater"
 )
 
 // Name of this beat
@@ -24,8 +26,6 @@ func init() {
 	runFlags.AddGoFlag(flag.CommandLine.Lookup("l"))
 	runFlags.AddGoFlag(flag.CommandLine.Lookup("dump"))
 
-	// TODO Deprecate this one in favor of subcommand
-	runFlags.AddGoFlag(flag.CommandLine.Lookup("devices"))
-
 	RootCmd = cmd.GenRootCmdWithRunFlags(Name, "", beater.New, runFlags)
+	RootCmd.AddCommand(genDevicesCommand())
 }

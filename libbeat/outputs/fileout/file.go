@@ -1,107 +1,133 @@
 package fileout
 
 import (
+	"os"
+	"path/filepath"
+
+	"github.com/elastic/beats/libbeat/beat"
 	"github.com/elastic/beats/libbeat/common"
-	"github.com/elastic/beats/libbeat/common/op"
+	"github.com/elastic/beats/libbeat/common/file"
 	"github.com/elastic/beats/libbeat/logp"
 	"github.com/elastic/beats/libbeat/outputs"
+	"github.com/elastic/beats/libbeat/outputs/codec"
+	"github.com/elastic/beats/libbeat/publisher"
 )
 
 func init() {
-	outputs.RegisterOutputPlugin("file", New)
+	outputs.RegisterType("file", makeFileout)
 }
 
 type fileOutput struct {
-	beat    common.BeatInfo
-	rotator logp.FileRotator
-	codec   outputs.Codec
+	beat     beat.Info
+	observer outputs.Observer
+	rotator  *file.Rotator
+	codec    codec.Codec
 }
 
-// New instantiates a new file output instance.
-func New(beat common.BeatInfo, cfg *common.Config) (outputs.Outputer, error) {
+// makeFileout instantiates a new file output instance.
+func makeFileout(
+	beat beat.Info,
+	observer outputs.Observer,
+	cfg *common.Config,
+) (outputs.Group, error) {
 	config := defaultConfig
 	if err := cfg.Unpack(&config); err != nil {
-		return nil, err
+		return outputs.Fail(err)
 	}
 
 	// disable bulk support in publisher pipeline
-	cfg.SetInt("flush_interval", -1, -1)
 	cfg.SetInt("bulk_max_size", -1, -1)
 
-	output := &fileOutput{beat: beat}
-	if err := output.init(config); err != nil {
-		return nil, err
+	fo := &fileOutput{
+		beat:     beat,
+		observer: observer,
 	}
-	return output, nil
+	if err := fo.init(beat, config); err != nil {
+		return outputs.Fail(err)
+	}
+
+	return outputs.Success(-1, 0, fo)
 }
 
-func (out *fileOutput) init(config config) error {
+func (out *fileOutput) init(beat beat.Info, c config) error {
+	var path string
+	if c.Filename != "" {
+		path = filepath.Join(c.Path, c.Filename)
+	} else {
+		path = filepath.Join(c.Path, out.beat.Beat)
+	}
+
 	var err error
-
-	out.rotator.Path = config.Path
-	out.rotator.Name = config.Filename
-	if out.rotator.Name == "" {
-		out.rotator.Name = out.beat.Beat
-	}
-
-	codec, err := outputs.CreateEncoder(config.Codec)
+	out.rotator, err = file.NewFileRotator(
+		path,
+		file.MaxSizeBytes(c.RotateEveryKb*1024),
+		file.MaxBackups(c.NumberOfFiles),
+		file.Permissions(os.FileMode(c.Permissions)),
+	)
 	if err != nil {
 		return err
 	}
 
-	out.codec = codec
-
-	logp.Info("File output path set to: %v", out.rotator.Path)
-	logp.Info("File output base filename set to: %v", out.rotator.Name)
-
-	rotateeverybytes := uint64(config.RotateEveryKb) * 1024
-	logp.Info("Rotate every bytes set to: %v", rotateeverybytes)
-	out.rotator.RotateEveryBytes = &rotateeverybytes
-
-	keepfiles := config.NumberOfFiles
-	logp.Info("Number of files set to: %v", keepfiles)
-	out.rotator.KeepFiles = &keepfiles
-
-	err = out.rotator.CreateDirectory()
+	out.codec, err = codec.CreateEncoder(beat, c.Codec)
 	if err != nil {
 		return err
 	}
 
-	err = out.rotator.CheckIfConfigSane()
-	if err != nil {
-		return err
-	}
+	logp.Info("Initialized file output. "+
+		"path=%v max_size_bytes=%v max_backups=%v permissions=%v",
+		path, c.RotateEveryKb*1024, c.NumberOfFiles, os.FileMode(c.Permissions))
 
 	return nil
 }
 
 // Implement Outputer
 func (out *fileOutput) Close() error {
-	return nil
+	return out.rotator.Close()
 }
 
-func (out *fileOutput) PublishEvent(
-	sig op.Signaler,
-	opts outputs.Options,
-	data outputs.Data,
+func (out *fileOutput) Publish(
+	batch publisher.Batch,
 ) error {
-	var serializedEvent []byte
-	var err error
+	defer batch.ACK()
 
-	serializedEvent, err = out.codec.Encode(data.Event)
-	if err != nil {
-		op.SigCompleted(sig)
-		return err
-	}
+	st := out.observer
+	events := batch.Events()
+	st.NewBatch(len(events))
 
-	err = out.rotator.WriteLine(serializedEvent)
-	if err != nil {
-		if opts.Guaranteed {
-			logp.Critical("Unable to write events to file: %s", err)
-		} else {
-			logp.Err("Error when writing line to file: %s", err)
+	dropped := 0
+	for i := range events {
+		event := &events[i]
+
+		serializedEvent, err := out.codec.Encode(out.beat.Beat, &event.Content)
+		if err != nil {
+			if event.Guaranteed() {
+				logp.Critical("Failed to serialize the event: %v", err)
+			} else {
+				logp.Warn("Failed to serialize the event: %v", err)
+			}
+
+			dropped++
+			continue
 		}
+
+		if _, err = out.rotator.Write(append(serializedEvent, '\n')); err != nil {
+			st.WriteError(err)
+
+			if event.Guaranteed() {
+				logp.Critical("Writing event to file failed with: %v", err)
+			} else {
+				logp.Warn("Writing event to file failed with: %v", err)
+			}
+
+			dropped++
+			continue
+		}
+
+		st.WriteBytes(len(serializedEvent) + 1)
 	}
-	op.Sig(sig, err)
-	return err
+
+	st.Dropped(dropped)
+	st.Acked(len(events) - dropped)
+
+	return nil
 }

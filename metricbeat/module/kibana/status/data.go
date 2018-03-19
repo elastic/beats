@@ -35,7 +35,6 @@ type OverallMetrics struct {
 }
 
 func eventMapping(content []byte) common.MapStr {
-
 	var data map[string]interface{}
 	json.Unmarshal(content, &data)
 	event, _ := schema.Apply(data)

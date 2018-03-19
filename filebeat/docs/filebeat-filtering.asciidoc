@@ -1,5 +1,5 @@
 [[filtering-and-enhancing-data]]
-== Filtering and Enhancing the Exported Data
+== Filter and enhance the exported data
 
 Your use case might require only a subset of the data exported by Filebeat, or
 you might need to enhance the exported data (for example, by adding metadata).
@@ -11,9 +11,9 @@ This allows you to specify different filtering criteria for each prospector.
 To do this, you use the <<include-lines,`include_lines`>>,
 <<exclude-lines,`exclude_lines`>>, and <<exclude-files,`exclude_files`>>
 options under the `filebeat.prospectors` section of the config file (see
-<<configuration-filebeat-options,Filebeat configuration options>>). The
-disadvantage of this approach is that you need to implement a configuration
-option for each filtering criteria that you need.
+<<configuration-filebeat-options>>). The disadvantage of this approach is that
+you need to implement a configuration option for each filtering criteria that
+you need.
 
 Another approach (the one described here) is to define processors to configure
 global processing across all data exported by Filebeat.
@@ -27,7 +27,7 @@ include::../../libbeat/docs/processors.asciidoc[]
 
 [float]
 [[drop-event-example]]
-==== Drop Event Example
+==== Drop event example
 
 The following configuration drops all the DEBUG messages.
 
@@ -53,7 +53,7 @@ processors:
 
 [float]
 [[decode-json-example]]
-==== Decode JSON Example
+==== Decode JSON example
 
 In the following example, the fields exported by Filebeat include a
 field, `inner`, whose value is a JSON object encoded as a string:
@@ -68,7 +68,8 @@ The following configuration decodes the inner JSON object:
 [source,yaml]
 -----------------------------------------------------
 filebeat.prospectors:
-- paths:
+- type: log
+  paths:
     - input.json
   json.keys_under_root: true
 

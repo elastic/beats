@@ -10,8 +10,6 @@ import (
 
 var (
 	metricsetName = "jolokia.jmx"
-	logPrefix     = "[" + metricsetName + "]"
-	debugf        = logp.MakeDebug(metricsetName)
 )
 
 // init registers the MetricSet with the central registry.
@@ -22,12 +20,8 @@ func init() {
 }
 
 const (
-	// defaultScheme is the default scheme to use when it is not specified in
-	// the host config.
 	defaultScheme = "http"
-
-	// defaultPath is the default path to the ngx_http_stub_status_module endpoint on Nginx.
-	defaultPath = "/jolokia/?ignoreErrors=true&canonicalNaming=false"
+	defaultPath   = "/jolokia/?ignoreErrors=true&canonicalNaming=false"
 )
 
 var (
@@ -44,13 +38,12 @@ type MetricSet struct {
 	mapping   map[string]string
 	namespace string
 	http      *helper.HTTP
+	log       *logp.Logger
 }
 
 // New create a new instance of the MetricSet
 func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
-	logp.Beta("The jolokia jmx metricset is beta")
 
-	// Additional configuration options
 	config := struct {
 		Namespace string       `config:"namespace" validate:"required"`
 		Mappings  []JMXMapping `config:"jmx.mappings" validate:"required"`
@@ -65,13 +58,18 @@ func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
 		return nil, err
 	}
 
-	http := helper.NewHTTP(base)
+	http, err := helper.NewHTTP(base)
+	if err != nil {
+		return nil, err
+	}
 	http.SetMethod("POST")
 	http.SetBody(body)
 
+	log := logp.NewLogger(metricsetName).With("host", base.HostData().Host)
+
 	if logp.IsDebug(metricsetName) {
-		debugf("%v The body for POST requests to jolokia host %v is: %v",
-			logPrefix, base.HostData().Host, string(body))
+		log.Debugw("Jolokia request body",
+			"body", string(body), "type", "request")
 	}
 
 	return &MetricSet{
@@ -79,8 +77,8 @@ func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
 		mapping:       mapping,
 		namespace:     config.Namespace,
 		http:          http,
+		log:           log,
 	}, nil
-
 }
 
 // Fetch methods implements the data gathering and data conversion to the right format
@@ -91,8 +89,8 @@ func (m *MetricSet) Fetch() (common.MapStr, error) {
 	}
 
 	if logp.IsDebug(metricsetName) {
-		debugf("%v The response body from jolokia host %v is: %v",
-			logPrefix, m.HostData().Host, string(body))
+		m.log.Debugw("Jolokia response body",
+			"host", m.HostData().Host, "body", string(body), "type", "response")
 	}
 
 	event, err := eventMapping(body, m.mapping)
@@ -101,7 +99,10 @@ func (m *MetricSet) Fetch() (common.MapStr, error) {
 	}
 
 	// Set dynamic namespace.
-	event[mb.NamespaceKey] = m.namespace
+	_, err = event.Put(mb.NamespaceKey, m.namespace)
+	if err != nil {
+		return nil, err
+	}
 
 	return event, nil
 }

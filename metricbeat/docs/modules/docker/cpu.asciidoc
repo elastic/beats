@@ -3,6 +3,8 @@ This file is generated! See scripts/docs_collector.py
 ////
 
 [[metricbeat-metricset-docker-cpu]]
+=== Docker cpu metricset
+
 include::../../../module/docker/cpu/_meta/docs.asciidoc[]
 
 

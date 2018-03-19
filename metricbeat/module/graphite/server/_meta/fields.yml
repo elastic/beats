@@ -1,0 +1,10 @@
+- name: server
+  type: group
+  description: >
+    server
+  release: beta
+  fields:
+    - name: example
+      type: keyword
+      description: >
+        Example field

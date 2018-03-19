@@ -12,16 +12,6 @@ class Test(metricbeat.BaseTest):
         """
         test container fields
         """
-
-        test_env = os.environ.get('DOCKER_COMPOSE_PROJECT_NAME')
-        processors = None
-        if test_env:
-            processors = [{
-                "drop_event": {
-                    "when.not": "contains.docker.container.name: " + test_env,
-                },
-            }]
-
         self.render_config_template(
             modules=[{
                 "name": "docker",
@@ -29,16 +19,13 @@ class Test(metricbeat.BaseTest):
                 "hosts": ["unix:///var/run/docker.sock"],
                 "period": "10s",
             }],
-            processors=processors,
         )
 
         proc = self.start_beat()
         self.wait_until(lambda: self.output_lines() > 0, max_timeout=20)
         proc.check_kill_and_wait()
-        self.assert_no_logged_warnings(["WARN Container stopped when recovering stats",
-                                        "ERR An error occurred while getting docker stats"])
-
-        print(os.environ.get('TESTING_ENVIRONMENT'))
+        self.assert_no_logged_warnings(["Container stopped when recovering stats",
+                                        "An error occurred while getting docker stats"])
 
         output = self.read_output_json()
         evt = output[0]
@@ -61,8 +48,8 @@ class Test(metricbeat.BaseTest):
         proc = self.start_beat()
         self.wait_until(lambda: self.output_lines() > 0, max_timeout=30)
         proc.check_kill_and_wait()
-        self.assert_no_logged_warnings(["WARN Container stopped when recovering stats",
-                                        "ERR An error occurred while getting docker stats"])
+        self.assert_no_logged_warnings(["Container stopped when recovering stats",
+                                        "An error occurred while getting docker stats"])
 
         output = self.read_output_json()
         evt = output[0]
@@ -89,8 +76,8 @@ class Test(metricbeat.BaseTest):
         proc = self.start_beat()
         self.wait_until(lambda: self.output_lines() > 0, max_timeout=30)
         proc.check_kill_and_wait()
-        self.assert_no_logged_warnings(["WARN Container stopped when recovering stats",
-                                        "ERR An error occurred while getting docker stats"])
+        self.assert_no_logged_warnings(["Container stopped when recovering stats",
+                                        "An error occurred while getting docker stats"])
 
         output = self.read_output_json()
         evt = output[0]
@@ -114,8 +101,8 @@ class Test(metricbeat.BaseTest):
         proc = self.start_beat()
         self.wait_until(lambda: self.output_lines() > 0, max_timeout=30)
         proc.check_kill_and_wait()
-        self.assert_no_logged_warnings(["WARN Container stopped when recovering stats",
-                                        "ERR An error occurred while getting docker stats"])
+        self.assert_no_logged_warnings(["Container stopped when recovering stats",
+                                        "An error occurred while getting docker stats"])
 
         output = self.read_output_json()
         evt = output[0]
@@ -137,8 +124,8 @@ class Test(metricbeat.BaseTest):
         proc = self.start_beat()
         self.wait_until(lambda: self.output_lines() > 0, max_timeout=30)
         proc.check_kill_and_wait()
-        self.assert_no_logged_warnings(["WARN Container stopped when recovering stats",
-                                        "ERR An error occurred while getting docker stats"])
+        self.assert_no_logged_warnings(["Container stopped when recovering stats",
+                                        "An error occurred while getting docker stats"])
 
         output = self.read_output_json()
         evt = output[0]
@@ -161,8 +148,8 @@ class Test(metricbeat.BaseTest):
         proc = self.start_beat()
         self.wait_until(lambda: self.output_lines() > 0, max_timeout=30)
         proc.check_kill_and_wait()
-        self.assert_no_logged_warnings(["WARN Container stopped when recovering stats",
-                                        "ERR An error occurred while getting docker stats"])
+        self.assert_no_logged_warnings(["Container stopped when recovering stats",
+                                        "An error occurred while getting docker stats"])
 
         output = self.read_output_json()
         evt = output[0]
@@ -185,8 +172,8 @@ class Test(metricbeat.BaseTest):
         proc = self.start_beat()
         self.wait_until(lambda: self.output_lines() > 0, max_timeout=20)
         proc.check_kill_and_wait()
-        self.assert_no_logged_warnings(["WARN Container stopped when recovering stats",
-                                        "ERR An error occurred while getting docker stats"])
+        self.assert_no_logged_warnings(["Container stopped when recovering stats",
+                                        "An error occurred while getting docker stats"])
 
         output = self.read_output_json()
         evt = output[0]
@@ -209,8 +196,8 @@ class Test(metricbeat.BaseTest):
         proc = self.start_beat()
         self.wait_until(lambda: self.output_lines() > 0, max_timeout=20)
         proc.check_kill_and_wait()
-        self.assert_no_logged_warnings(["WARN Container stopped when recovering stats",
-                                        "ERR An error occurred while getting docker stats"])
+        self.assert_no_logged_warnings(["Container stopped when recovering stats",
+                                        "An error occurred while getting docker stats"])
 
         output = self.read_output_json()
         evt = output[0]

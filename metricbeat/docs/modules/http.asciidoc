@@ -3,7 +3,7 @@ This file is generated! See scripts/docs_collector.py
 ////
 
 [[metricbeat-module-http]]
-== HTTP Module
+== HTTP module
 
 The HTTP module is a Metricbeat module used to call arbitrary HTTP endpoints for which a dedicated Metricbeat module is not available.
 
@@ -13,9 +13,11 @@ This module is inspired by the Logstash https://www.elastic.co/guide/en/logstash
 
 This is often necessary in security restricted network setups, where Logstash is not able to reach all servers. Instead the server to be monitored itself has Metricbeat installed and can send the data or a collector server has Metricbeat installed which is deployed in the secured network environment and can reach all servers to be monitored.
 
+NOTE: As the HTTP mertricsets also fetch headers, this can lead to lots of fields in Elasticsearch in case there are many different headers. If this is the case for you and you don't need the headers, we recommend to use processors to filter out the header field.
+
 
 [float]
-=== Example Configuration
+=== Example configuration
 
 The HTTP module supports the standard configuration options that are described
 in <<configuration-metricbeat>>. Here is an example configuration:
@@ -25,7 +27,6 @@ in <<configuration-metricbeat>>. Here is an example configuration:
 metricbeat.modules:
 - module: http
   metricsets: ["json"]
-  enabled: false
   period: 10s
   hosts: ["localhost:80"]
   namespace: "json_namespace"
@@ -34,7 +35,22 @@ metricbeat.modules:
   #method: "GET"
   #request.enabled: false
   #response.enabled: false
+  #json.is_array: false
+  #dedot.enabled: false
+
+- module: http
+  metricsets: ["server"]
+  host: "localhost"
+  port: "8080"
+  enabled: false
+#  paths:
+#    - path: "/foo"
+#      namespace: "foo"
+#      fields: # added to the the response in root. overwrites existing fields
+#        key: "value"
 ----
+
+This module supports TLS connection when using `ssl` config field, as described in <<configuration-ssl>>.
 
 [float]
 === Metricsets
@@ -43,5 +59,9 @@ The following metricsets are available:
 
 * <<metricbeat-metricset-http-json,json>>
 
+* <<metricbeat-metricset-http-server,server>>
+
 include::http/json.asciidoc[]
+
+include::http/server.asciidoc[]
 

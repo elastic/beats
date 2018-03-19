@@ -3,19 +3,12 @@ package cpu
 import (
 	"strconv"
 
+	"github.com/docker/docker/api/types"
+
 	"github.com/elastic/beats/libbeat/common"
 	"github.com/elastic/beats/libbeat/logp"
 	"github.com/elastic/beats/metricbeat/module/docker"
-
-	dc "github.com/fsouza/go-dockerclient"
 )
-
-type CPUCalculator interface {
-	perCpuUsage(stats *dc.Stats) common.MapStr
-	totalUsage(stats *dc.Stats) float64
-	usageInKernelmode(stats *dc.Stats) float64
-	usageInUsermode(stats *dc.Stats) float64
-}
 
 type CPUStats struct {
 	Time                        common.Time
@@ -36,33 +29,32 @@ func NewCpuService() *CPUService {
 	return &CPUService{}
 }
 
-func (c *CPUService) getCPUStatsList(rawStats []docker.Stat) []CPUStats {
+func (c *CPUService) getCPUStatsList(rawStats []docker.Stat, dedot bool) []CPUStats {
 	formattedStats := []CPUStats{}
 
 	for _, stats := range rawStats {
-		formattedStats = append(formattedStats, c.getCpuStats(&stats))
+		formattedStats = append(formattedStats, c.getCPUStats(&stats, dedot))
 	}
 
 	return formattedStats
 }
 
-func (c *CPUService) getCpuStats(myRawStat *docker.Stat) CPUStats {
-
+func (c *CPUService) getCPUStats(myRawStat *docker.Stat, dedot bool) CPUStats {
 	return CPUStats{
 		Time:                        common.Time(myRawStat.Stats.Read),
-		Container:                   docker.NewContainer(&myRawStat.Container),
+		Container:                   docker.NewContainer(myRawStat.Container, dedot),
 		PerCpuUsage:                 perCpuUsage(&myRawStat.Stats),
 		TotalUsage:                  totalUsage(&myRawStat.Stats),
 		UsageInKernelmode:           myRawStat.Stats.CPUStats.CPUUsage.UsageInKernelmode,
 		UsageInKernelmodePercentage: usageInKernelmode(&myRawStat.Stats),
 		UsageInUsermode:             myRawStat.Stats.CPUStats.CPUUsage.UsageInUsermode,
 		UsageInUsermodePercentage:   usageInUsermode(&myRawStat.Stats),
-		SystemUsage:                 myRawStat.Stats.CPUStats.SystemCPUUsage,
+		SystemUsage:                 myRawStat.Stats.CPUStats.SystemUsage,
 		SystemUsagePercentage:       systemUsage(&myRawStat.Stats),
 	}
 }
 
-func perCpuUsage(stats *dc.Stats) common.MapStr {
+func perCpuUsage(stats *types.StatsJSON) common.MapStr {
 	var output common.MapStr
 	if len(stats.CPUStats.CPUUsage.PercpuUsage) == len(stats.PreCPUStats.CPUUsage.PercpuUsage) {
 		output = common.MapStr{}
@@ -78,20 +70,20 @@ func perCpuUsage(stats *dc.Stats) common.MapStr {
 
 // TODO: These helper should be merged with the cpu helper in system/cpu
 
-func totalUsage(stats *dc.Stats) float64 {
+func totalUsage(stats *types.StatsJSON) float64 {
 	return calculateLoad(stats.CPUStats.CPUUsage.TotalUsage, stats.PreCPUStats.CPUUsage.TotalUsage)
 }
 
-func usageInKernelmode(stats *dc.Stats) float64 {
+func usageInKernelmode(stats *types.StatsJSON) float64 {
 	return calculateLoad(stats.CPUStats.CPUUsage.UsageInKernelmode, stats.PreCPUStats.CPUUsage.UsageInKernelmode)
 }
 
-func usageInUsermode(stats *dc.Stats) float64 {
+func usageInUsermode(stats *types.StatsJSON) float64 {
 	return calculateLoad(stats.CPUStats.CPUUsage.UsageInUsermode, stats.PreCPUStats.CPUUsage.UsageInUsermode)
 }
 
-func systemUsage(stats *dc.Stats) float64 {
-	return calculateLoad(stats.CPUStats.SystemCPUUsage, stats.PreCPUStats.SystemCPUUsage)
+func systemUsage(stats *types.StatsJSON) float64 {
+	return calculateLoad(stats.CPUStats.SystemUsage, stats.PreCPUStats.SystemUsage)
 }
 
 // This function is meant to calculate the % CPU time change between two successive readings.

@@ -1,0 +1,324 @@
+- key: tls
+  title: "TLS"
+  description: >
+    TLS-specific event fields.
+  fields:
+    - name: tls
+      type: group
+      fields:
+        - name: handshake_completed
+          type: boolean
+          description: >
+            Whether the TLS negotiation has been successful and the session has
+            transitioned to encrypted mode.
+
+        - name: resumed
+          type: boolean
+          description: >
+            If the TLS session has been resumed from a previous session.
+
+        - name: resumption_method
+          type: keyword
+          description: >
+            If the session has been resumed, the underlying method used. One of
+            "id" for TLS session ID or "ticket" for TLS ticket extension.
+
+        - name: client_certificate_requested
+          type: boolean
+          description: >
+            Whether the server has requested the client to authenticate itself
+            using a client certificate.
+
+        - name: client_hello
+          type: group
+          fields:
+            - name: version
+              type: keyword
+              description: >
+                The version of the TLS protocol by which the client wishes to
+                communicate during this session.
+
+            - name: supported_ciphers
+              type: array
+              description: >
+                List of ciphers the client is willing to use for this session.
+                See https://www.iana.org/assignments/tls-parameters/tls-parameters.xhtml#tls-parameters-4
+
+            - name: supported_compression_methods
+              type: array
+              description: >
+                The list of compression methods the client supports.
+                See https://www.iana.org/assignments/comp-meth-ids/comp-meth-ids.xhtml
+
+            - name: extensions
+              type: group
+              description: The hello extensions provided by the client.
+              fields:
+                - name: server_name_indication
+                  type: keyword
+                  description: List of hostnames
+
+                - name: application_layer_protocol_negotiation
+                  type: keyword
+                  description: >
+                    List of application-layer protocols the client is willing to use.
+
+                - name: session_ticket
+                  type: keyword
+                  description: >
+                    Length of the session ticket, if provided, or an empty string
+                    to advertise support for tickets.
+
+        - name: server_hello
+          type: group
+          fields:
+            - name: version
+              type: keyword
+              description: >
+                The version of the TLS protocol that is used for this session.
+                It is the highest version supported by the server not exceeding
+                the version requested in the client hello.
+
+            - name: selected_cipher
+              type: keyword
+              description: >
+                The cipher suite selected by the server from the list provided
+                by in the client hello.
+
+            - name: selected_compression_method
+              type: keyword
+              description: >
+                The compression method selected by the server from the list
+                provided in the client hello.
+
+            - name: extensions
+              type: group
+              description: The hello extensions provided by the server.
+              fields:
+                - name: application_layer_protocol_negotiation
+                  type: array
+                  description: Negotiated application layer protocol
+
+                - name: session_ticket
+                  type: keyword
+                  description: >
+                    Used to announce that a session ticket will be provided
+                    by the server. Always an empty string.
+
+        - name: client_certificate
+          type: group
+          description: Certificate provided by the client for authentication.
+          fields:
+
+            - name: version
+              type: long
+              description: X509 format version.
+
+            - name: serial_number
+              type: keyword
+              description: The certificate's serial number.
+
+            - name: not_before
+              type: date
+              description: Date before which the certificate is not valid.
+
+            - name: not_after
+              type: date
+              description: Date after which the certificate expires.
+
+            - name: public_key_algorithm
+              type: keyword
+              description: >
+                The algorithm used for this certificate's public key.
+                One of RSA, DSA or ECDSA.
+
+            - name: public_key_size
+              type: long
+              description: Size of the public key.
+
+            - name: signature_algorithm
+              type: keyword
+              description: >
+                The algorithm used for the certificate's signature.
+
+            - name: alternative_names
+              type: array
+              description: Subject Alternative Names for this certificate.
+
+            - name: raw
+              type: keyword
+              description: The raw certificate in PEM format.
+
+            - name: subject
+              type: group
+              description: Subject represented by this certificate.
+              fields:
+                - name: country
+                  type: keyword
+                  description: Country code.
+
+                - name: organization
+                  type: keyword
+                  description: Organization name.
+
+                - name: organizational_unit
+                  type: keyword
+                  description: Unit within organization.
+
+                - name: province
+                  type: keyword
+                  description: Province or region within country.
+
+                - name: common_name
+                  type: keyword
+                  description: Name or host name identified by the certificate.
+
+            - name: issuer
+              type: group
+              description: Entity that issued and signed this certificate.
+              fields:
+                - name: country
+                  type: keyword
+                  description: Country code.
+
+                - name: organization
+                  type: keyword
+                  description: Organization name.
+
+                - name: organizational_unit
+                  type: keyword
+                  description: Unit within organization.
+
+                - name: province
+                  type: keyword
+                  description: Province or region within country.
+
+                - name: common_name
+                  type: keyword
+                  description: Name or host name identified by the certificate.
+
+
+        - name: server_certificate
+          type: group
+          description: Certificate provided by the server for authentication.
+          fields:
+
+            - name: version
+              type: long
+              description: X509 format version.
+
+            - name: serial_number
+              type: keyword
+              description: The certificate's serial number.
+
+            - name: not_before
+              type: date
+              description: Date before which the certificate is not valid.
+
+            - name: not_after
+              type: date
+              description: Date after which the certificate expires.
+
+            - name: public_key_algorithm
+              type: keyword
+              description: >
+                The algorithm used for this certificate's public key.
+                One of RSA, DSA or ECDSA.
+
+            - name: public_key_size
+              type: long
+              description: Size of the public key.
+
+            - name: signature_algorithm
+              type: keyword
+              description: >
+                The algorithm used for the certificate's signature.
+
+            - name: alternative_names
+              type: array
+              description: Subject Alternative Names for this certificate.
+
+            - name: raw
+              type: keyword
+              description: The raw certificate in PEM format.
+
+            - name: subject
+              type: group
+              description: Subject represented by this certificate.
+              fields:
+                - name: country
+                  type: keyword
+                  description: Country code.
+
+                - name: organization
+                  type: keyword
+                  description: Organization name.
+
+                - name: organizational_unit
+                  type: keyword
+                  description: Unit within organization.
+
+                - name: province
+                  type: keyword
+                  description: Province or region within country.
+
+                - name: common_name
+                  type: keyword
+                  description: Name or host name identified by the certificate.
+
+            - name: issuer
+              type: group
+              description: Entity that issued and signed this certificate.
+              fields:
+                - name: country
+                  type: keyword
+                  description: Country code.
+
+                - name: organization
+                  type: keyword
+                  description: Organization name.
+
+                - name: organizational_unit
+                  type: keyword
+                  description: Unit within organization.
+
+                - name: province
+                  type: keyword
+                  description: Province or region within country.
+
+                - name: common_name
+                  type: keyword
+                  description: Name or host name identified by the certificate.
+
+        - name: server_certificate_chain
+          type: array
+          description: Chain of trust for the server certificate.
+
+        - name: client_certificate_chain
+          type: array
+          description: Chain of trust for the client certificate.
+
+        - name: alert_types
+          type: keyword
+          description: >
+            An array containing the TLS alert type for every alert received.
+
+        - name: fingerprints
+          type: group
+          description: Fingerprints for this TLS session.
+          fields:
+
+            - name: ja3
+              type: group
+              description: JA3 TLS client fingerprint
+              fields:
+
+                - name: hash
+                  type: keyword
+                  description: >
+                    The JA3 fingerprint hash for the client side.
+
+                - name: str
+                  type: keyword
+                  description: >
+                    The JA3 string used to calculate the hash.

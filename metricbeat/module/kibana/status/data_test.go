@@ -12,7 +12,6 @@ import (
 )
 
 func TestEventMapping(t *testing.T) {
-
 	content, err := ioutil.ReadFile("./_meta/test/input.json")
 	assert.NoError(t, err)
 

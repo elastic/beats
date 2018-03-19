@@ -1,0 +1,10 @@
+- key: aerospike
+  title: "Aerospike"
+  description: >
+    Aerospike module
+  release: beta
+  fields:
+    - name: aerospike
+      type: group
+      description: >
+      fields:

@@ -38,7 +38,7 @@ PR.
 def main():
     """Main"""
     parser = argparse.ArgumentParser(
-        description="Creates a PR for merging two branches",
+        description="Creates a PR for cherry-picking commits",
         formatter_class=argparse.RawDescriptionHelpFormatter,
         epilog=usage)
     parser.add_argument("to_branch",
@@ -57,6 +57,8 @@ def main():
     parser.add_argument("--create_pr", action="store_true",
                         help="Create a PR using the Github API " +
                         "(requires token in ~/.elastic/github.token)")
+    parser.add_argument("--diff", action="store_true",
+                        help="Display the diff before pushing the PR")
     args = parser.parse_args()
 
     print(args)
@@ -96,6 +98,12 @@ def main():
                         shell=True).strip()) == 0:
         print("No commit to push")
         return 1
+
+    if args.diff:
+        call("git diff {}".format(args.to_branch), shell=True)
+        if raw_input("Continue? [y/n]: ") != "y":
+            print("Aborting cherry-pick.")
+            return 1
 
     print("Ready to push branch.")
     remote = raw_input("To which remote should I push? (your fork): ")

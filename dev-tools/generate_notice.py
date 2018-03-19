@@ -64,7 +64,7 @@ def gather_dependencies(vendor_dirs):
 
                     lib["license_contents"] = read_file(lib["license_file"])
                     lib["license_summary"] = detect_license_summary(lib["license_contents"])
-                    if lib["license_summary"] == "Unknown":
+                    if lib["license_summary"] == "UNKNOWN":
                         print("WARNING: Unknown license for: {}".format(lib_path))
 
                     if lib_path not in dependencies:
@@ -91,7 +91,7 @@ def write_notice_file(f, beat, copyright, dependencies):
 
     # Add licenses for 3rd party libraries
     f.write("==========================================================================\n")
-    f.write("Third party libraries used by the Beats project:\n")
+    f.write("Third party libraries used by the {} project:\n".format(beat))
     f.write("==========================================================================\n\n")
 
     # Sort licenses by package path, ignore upper / lower case
@@ -106,11 +106,16 @@ def write_notice_file(f, beat, copyright, dependencies):
             f.write("License type (autodetected): {}\n".format(lib["license_summary"]))
             f.write("{}:\n".format(lib["license_file"]))
             f.write("--------------------------------------------------------------------\n")
-            if lib["license_summary"] != "Apache License 2.0":
+            if lib["license_summary"] != "Apache-2.0":
                 f.write(lib["license_contents"])
             else:
                 # it's an Apache License, so include only the NOTICE file
                 f.write("Apache License 2.0\n\n")
+
+                # Skip NOTICE files which are not needed
+                if os.path.join(os.path.dirname(lib["license_file"])) in SKIP_NOTICE:
+                    continue
+
                 for notice_file in glob.glob(os.path.join(os.path.dirname(lib["license_file"]), "NOTICE*")):
                     notice_file_hdr = "-------{}-----\n".format(os.path.basename(notice_file))
                     f.write(notice_file_hdr)
@@ -118,11 +123,18 @@ def write_notice_file(f, beat, copyright, dependencies):
 
 
 def write_csv_file(csvwriter, dependencies):
-    csvwriter.writerow(["Dependency", "Version", "Revision", "License type (autodetected)", "License text"])
+    csvwriter.writerow(["name", "url", "version", "revision", "license"])
     for key in sorted(dependencies, key=str.lower):
         for lib in dependencies[key]:
-            csvwriter.writerow([key, lib.get("version", ""), lib.get("revision", ""),
-                                lib["license_summary"], lib["license_contents"]])
+            csvwriter.writerow([key, get_url(key), lib.get("version", ""), lib.get("revision", ""),
+                                lib["license_summary"]])
+
+
+def get_url(repo):
+    words = repo.split("/")
+    if words[0] != "github.com":
+        return repo
+    return "https://github.com/{}/{}".format(words[1], words[2])
 
 
 def create_notice(filename, beat, copyright, vendor_dirs, csvfile):
@@ -179,33 +191,46 @@ BSD_LICENSE_4_CLAUSE = [
    must display the following acknowledgement"""),
 ]
 
+CC_SA_4_LICENSE_TITLE = [
+    "Creative Commons Attribution-ShareAlike 4.0 International"
+]
+
+LGPL_3_LICENSE_TITLE = [
+    "GNU LESSER GENERAL PUBLIC LICENSE Version 3"
+]
+
 MPL_LICENSE_TITLES = [
     "Mozilla Public License Version 2.0",
     "Mozilla Public License, version 2.0"
 ]
 
 
+# return SPDX identifiers from https://spdx.org/licenses/
 def detect_license_summary(content):
     # replace all white spaces with a single space
     content = re.sub(r"\s+", ' ', content)
     if any(sentence in content[0:1000] for sentence in APACHE2_LICENSE_TITLES):
-        return "Apache License 2.0"
+        return "Apache-2.0"
     if any(sentence in content[0:1000] for sentence in MIT_LICENSES):
-        return "MIT license"
+        return "MIT"
     if all(sentence in content[0:1000] for sentence in BSD_LICENSE_CONTENTS):
         if all(sentence in content[0:1000] for sentence in BSD_LICENSE_3_CLAUSE):
             if all(sentence in content[0:1000] for sentence in BSD_LICENSE_4_CLAUSE):
-                return "BSD 4-clause license"
-            return "BSD 3-clause license"
+                return "BSD-4-Clause"
+            return "BSD-3-Clause"
         else:
-            return "BSD 2-clause license"
+            return "BSD-2-Clause"
     if any(sentence in content[0:300] for sentence in MPL_LICENSE_TITLES):
-        return "Mozilla Public License 2.0"
+        return "MPL-2.0"
+    if any(sentence in content[0:3000] for sentence in CC_SA_4_LICENSE_TITLE):
+        return "CC-BY-SA-4.0"
+    if any(sentence in content[0:3000] for sentence in LGPL_3_LICENSE_TITLE):
+        return "LGPL-3.0"
 
-    return "Unknown"
+    return "UNKNOWN"
 
 
-EXCLUDES = ["dev-tools"]
+SKIP_NOTICE = []
 
 if __name__ == "__main__":
 
@@ -219,14 +244,20 @@ if __name__ == "__main__":
                         help="copyright owner")
     parser.add_argument("--csv", dest="csvfile",
                         help="Output to a csv file")
-
+    parser.add_argument("-e", "--excludes", default=["dev-tools", "build"],
+                        help="List of top directories to exclude")
+    parser.add_argument("-s", "--skip-notice", default=[],
+                        help="List of NOTICE files to skip")
     args = parser.parse_args()
 
     cwd = os.getcwd()
-    notice = os.path.join(cwd, "NOTICE")
+    notice = os.path.join(cwd, "NOTICE.txt")
     vendor_dirs = []
 
-    print(args.vendor)
+    excludes = args.excludes
+    if not isinstance(excludes, list):
+        excludes = [excludes]
+    SKIP_NOTICE = args.skip_notice
 
     for root, dirs, files in os.walk(args.vendor):
 
@@ -238,11 +269,11 @@ if __name__ == "__main__":
             vendor_dirs.append(os.path.join(root, 'vendor'))
             dirs.remove('vendor')   # don't walk down into sub-vendors
 
-        for exclude in EXCLUDES:
+        for exclude in excludes:
             if exclude in dirs:
                 dirs.remove(exclude)
 
     print("Get the licenses available from {}".format(vendor_dirs))
     create_notice(notice, args.beat, args.copyright, vendor_dirs, args.csvfile)
 
-    print("Available at {}\n".format(notice))
+    print("Available at {}".format(notice))

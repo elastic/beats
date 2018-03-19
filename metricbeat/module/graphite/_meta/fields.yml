@@ -1,0 +1,10 @@
+- key: graphite
+  title: "Graphite"
+  description: >
+    graphite Module
+  release: beta
+  fields:
+    - name: graphite
+      type: group
+      description: >
+      fields:

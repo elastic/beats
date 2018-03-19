@@ -8,9 +8,10 @@ import (
 	"path/filepath"
 	"testing"
 
+	"github.com/stretchr/testify/assert"
+
 	"github.com/elastic/beats/libbeat/common"
 	"github.com/elastic/beats/libbeat/paths"
-	"github.com/stretchr/testify/assert"
 )
 
 func load(t *testing.T, from interface{}) *common.Config {
@@ -25,11 +26,11 @@ func TestNewModuleRegistry(t *testing.T) {
 	modulesPath, err := filepath.Abs("../module")
 	assert.NoError(t, err)
 
-	configs := []ModuleConfig{
-		{Module: "nginx"},
-		{Module: "mysql"},
-		{Module: "system"},
-		{Module: "auditd"},
+	configs := []*ModuleConfig{
+		&ModuleConfig{Module: "nginx"},
+		&ModuleConfig{Module: "mysql"},
+		&ModuleConfig{Module: "system"},
+		&ModuleConfig{Module: "auditd"},
 	}
 
 	reg, err := newModuleRegistry(modulesPath, configs, nil, "5.2.0")
@@ -57,8 +58,16 @@ func TestNewModuleRegistry(t *testing.T) {
 
 	for module, filesets := range reg.registry {
 		for name, fileset := range filesets {
-			_, err = fileset.getProspectorConfig()
+			cfg, err := fileset.getInputConfig()
 			assert.NoError(t, err, fmt.Sprintf("module: %s, fileset: %s", module, name))
+
+			moduleName, err := cfg.String("_module_name", -1)
+			assert.NoError(t, err)
+			assert.Equal(t, module, moduleName)
+
+			filesetName, err := cfg.String("_fileset_name", -1)
+			assert.NoError(t, err)
+			assert.Equal(t, name, filesetName)
 		}
 	}
 }
@@ -69,8 +78,8 @@ func TestNewModuleRegistryConfig(t *testing.T) {
 
 	falseVar := false
 
-	configs := []ModuleConfig{
-		{
+	configs := []*ModuleConfig{
+		&ModuleConfig{
 			Module: "nginx",
 			Filesets: map[string]*FilesetConfig{
 				"access": {
@@ -83,7 +92,7 @@ func TestNewModuleRegistryConfig(t *testing.T) {
 				},
 			},
 		},
-		{
+		&ModuleConfig{
 			Module:  "mysql",
 			Enabled: &falseVar,
 		},
@@ -101,7 +110,6 @@ func TestNewModuleRegistryConfig(t *testing.T) {
 }
 
 func TestApplyOverrides(t *testing.T) {
-
 	falseVar := false
 	trueVar := true
 
@@ -173,7 +181,28 @@ func TestApplyOverrides(t *testing.T) {
 				},
 			},
 			expected: FilesetConfig{
+				Input: map[string]interface{}{
+					"close_eof": true,
+				},
 				Prospector: map[string]interface{}{
+					"close_eof": true,
+				},
+			},
+		},
+		{
+			name:    "input overrides",
+			fcfg:    FilesetConfig{},
+			module:  "nginx",
+			fileset: "access",
+			overrides: &ModuleOverrides{
+				"nginx": map[string]*common.Config{
+					"access": load(t, map[string]interface{}{
+						"input.close_eof": true,
+					}),
+				},
+			},
+			expected: FilesetConfig{
+				Input: map[string]interface{}{
 					"close_eof": true,
 				},
 			},
@@ -191,24 +220,24 @@ func TestAppendWithoutDuplicates(t *testing.T) {
 	falseVar := false
 	tests := []struct {
 		name     string
-		configs  []ModuleConfig
+		configs  []*ModuleConfig
 		modules  []string
-		expected []ModuleConfig
+		expected []*ModuleConfig
 	}{
 		{
 			name:    "just modules",
-			configs: []ModuleConfig{},
+			configs: []*ModuleConfig{},
 			modules: []string{"moduleA", "moduleB", "moduleC"},
-			expected: []ModuleConfig{
-				{Module: "moduleA"},
-				{Module: "moduleB"},
-				{Module: "moduleC"},
+			expected: []*ModuleConfig{
+				&ModuleConfig{Module: "moduleA"},
+				&ModuleConfig{Module: "moduleB"},
+				&ModuleConfig{Module: "moduleC"},
 			},
 		},
 		{
 			name: "eliminate a duplicate, no override",
-			configs: []ModuleConfig{
-				{
+			configs: []*ModuleConfig{
+				&ModuleConfig{
 					Module: "moduleB",
 					Filesets: map[string]*FilesetConfig{
 						"fileset": {
@@ -220,8 +249,8 @@ func TestAppendWithoutDuplicates(t *testing.T) {
 				},
 			},
 			modules: []string{"moduleA", "moduleB", "moduleC"},
-			expected: []ModuleConfig{
-				{
+			expected: []*ModuleConfig{
+				&ModuleConfig{
 					Module: "moduleB",
 					Filesets: map[string]*FilesetConfig{
 						"fileset": {
@@ -231,14 +260,14 @@ func TestAppendWithoutDuplicates(t *testing.T) {
 						},
 					},
 				},
-				{Module: "moduleA"},
-				{Module: "moduleC"},
+				&ModuleConfig{Module: "moduleA"},
+				&ModuleConfig{Module: "moduleC"},
 			},
 		},
 		{
 			name: "disabled config",
-			configs: []ModuleConfig{
-				{
+			configs: []*ModuleConfig{
+				&ModuleConfig{
 					Module:  "moduleB",
 					Enabled: &falseVar,
 					Filesets: map[string]*FilesetConfig{
@@ -251,8 +280,8 @@ func TestAppendWithoutDuplicates(t *testing.T) {
 				},
 			},
 			modules: []string{"moduleA", "moduleB", "moduleC"},
-			expected: []ModuleConfig{
-				{
+			expected: []*ModuleConfig{
+				&ModuleConfig{
 					Module:  "moduleB",
 					Enabled: &falseVar,
 					Filesets: map[string]*FilesetConfig{
@@ -263,9 +292,9 @@ func TestAppendWithoutDuplicates(t *testing.T) {
 						},
 					},
 				},
-				{Module: "moduleA"},
-				{Module: "moduleB"},
-				{Module: "moduleC"},
+				&ModuleConfig{Module: "moduleA"},
+				&ModuleConfig{Module: "moduleB"},
+				&ModuleConfig{Module: "moduleC"},
 			},
 		},
 	}
@@ -338,14 +367,14 @@ func TestMissingModuleFolder(t *testing.T) {
 		load(t, map[string]interface{}{"module": "nginx"}),
 	}
 
-	reg, err := NewModuleRegistry(configs, "5.2.0")
+	reg, err := NewModuleRegistry(configs, "5.2.0", true)
 	assert.NoError(t, err)
 	assert.NotNil(t, reg)
 
 	// this should return an empty list, but no error
-	prospectors, err := reg.GetProspectorConfigs()
+	inputs, err := reg.GetInputConfigs()
 	assert.NoError(t, err)
-	assert.Equal(t, 0, len(prospectors))
+	assert.Equal(t, 0, len(inputs))
 }
 
 func TestInterpretError(t *testing.T) {

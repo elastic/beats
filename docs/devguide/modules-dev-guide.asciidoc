@@ -18,25 +18,97 @@ example, the Nginx module has `access` and `error` filesets. You can contribute
 a new module (with at least one fileset), or a new fileset for an existing
 module.
 
-[float]
-=== Creating a new fileset
+NOTE: In this guide we use `{module}` and `{fileset}` as placeholders for the
+module and fileset names. You need to replace these with the actual names you
+entered when your created the module and fileset. Only use characters `[a-z]` and, if required, underscores (`_`). No other characters are allowed.
 
-Regardless of whether you are creating a fileset in a new or existing module,
-the procedure is similar. Run the following command in the `filebeat` folder:
+[float]
+=== Creating a new module
+
+Run the following command in the `filebeat` folder:
 
 [source,bash]
 ----
-make create-fileset
+make create-module MODULE={module}
 ----
 
-You'll be prompted to enter a module and fileset name. Only use characters
-`[a-z]` and, if required, underscores (`_`). No other characters are allowed.
-For the module name, you can us either a new module name or an existing module
-name. If the module doesn't exist, it will be created.
+After running the `make create-module` command, you'll find the module,
+along with its generated files, under `module/{module}`. This
+directory contains the following files:
 
-NOTE: In this guide we use `{fileset}` and `{module}` as placeholders for the
-fileset and module names. You need to replace these with the actual names you
-entered when your created the module and fileset.
+[source,bash]
+----
+module/{module}
+├── module.yml
+└── _meta
+    └── docs.asciidoc
+    └── fields.yml
+    └── kibana
+----
+
+Let's look at these files one by one.
+
+[float]
+==== module.yml
+
+This file contains list of all the dashboards available for the module and used by `export_dashboards.go` script for exporting dashboards.
+Each dashboard is defined by an id and the name of json file where the dashboard is saved locally.
+At generation new fileset this file will be automatically updated with "default" dashboard settings for new fileset.
+Please ensure that this settings are correct.
+
+[float]
+==== _meta/docs.asciidoc
+
+This file contains module-specific documentation. You should include information
+about which versions of the service were tested and the variables that are
+defined in each fileset.
+
+[float]
+==== _meta/fields.yml
+
+The module level `fields.yml` contains descriptions for the module-level fields.
+Please review and update the title and the descriptions in this file. The title
+is used as a title in the docs, so it's best to capitalize it.
+
+[float]
+==== _meta/kibana
+
+This folder contains the sample Kibana dashboards for this module. To create
+them, you can build them visually in Kibana and then run the following command:
+
+[source,shell]
+----
+$ cd dev-tools/cmd/dashboards
+$ make # if export_dashboard is not built
+$ ./export_dashboards -dashboard '{dashboard-id}' -output '../../../filebeat/module/{module}/_meta/kibana/default/dashboard'
+----
+
+New Filebeat modules might not be compatible with Kibana 5.x. To export dashboards that are compatible with 5.x, run the following command inside the developer virtualenv:
+
+[source,shell]
+----
+$ cd filebeat
+$ make python-env
+$ cd module/{module}/
+$ python ../../../dev-tools/export_5x_dashboards.py --regex {module} --dir _meta/kibana/5.x
+----
+
+Where the `--regex` parameter should match the dashboard you want to export.
+
+Please note that dashboards exported from Kibana 5.x are not compatible with Kibana 6.x.
+
+You can find more details about the process of creating and exporting the Kibana
+dashboards by reading {beatsdevguide}/new-dashboards.html[this guide].
+
+[float]
+=== Creating a new fileset
+
+Run the following command in the `filebeat` folder:
+
+[source,bash]
+----
+make create-fileset MODULE={module} FILESET={fileset}
+----
 
 After running the `make create-fileset` command, you'll find the fileset,
 along with its generated files, under `module/{module}/{fileset}`. This
@@ -52,6 +124,8 @@ module/{module}/{fileset}
 │   └── pipeline.json
 ├── _meta
 │   └── fields.yml
+│   └── kibana
+│       └── default
 └── test
 ----
 
@@ -248,6 +322,9 @@ While developing the pipeline definition, we recommend making use of the
 {elasticsearch}/simulate-pipeline-api.html[Simulate Pipeline API] for testing
 and quick iteration.
 
+By default Filebeat does not update Ingest pipelines if already loaded. If you want to force updating your pipeline
+during development, use `--update-pipelines` flag. This uploads pipelines even if they are already available on the node.
+
 [float]
 ==== _meta/fields.yml
 
@@ -264,6 +341,16 @@ should contain the fields defined at the module level, and the description of
 the module itself. In most cases, you should add the fields at the fileset
 level.
 
+After `pipeline.json` is created, it is possible to generate a base `field.yml`.
+
+[source,bash]
+----
+make create-fields MODULE={module} FILESET={fileset}
+----
+
+Please, always check the generated file and make sure the fields are correct.
+Documenatation of fields must be added manually.
+
 [float]
 ==== test
 
@@ -277,40 +364,3 @@ In addition, assuming you have a `test.log` file, you can add a
 documents as they are found via an Elasticsearch search. In this case, the
 integration tests will automatically check that the result is the same on each
 run.
-
-[float]
-=== Module-level files
-
-Besides the files in the fileset folder, there is also data that needs to be
-filled at the module level.
-
-[float]
-==== _meta/docs.asciidoc
-
-This file contains module-specific documentation. You should include information
-about which versions of the service were tested and the variables that are
-defined in each fileset.
-
-[float]
-==== _meta/fields.yml
-
-The module level `fields.yml` contains descriptions for the module-level fields.
-Please review and update the title and the descriptions in this file. The title
-is used as a title in the docs, so it's best to capitalize it.
-
-[float]
-==== _meta/kibana
-
-This folder contains the sample Kibana dashboards for this module. To create
-them, you can build them visually in Kibana and then run the following command:
-
-[source,shell]
-----
-$ cd filebeat/module/{module}/
-python ../../../dev-tools/export_dashboards.py --regex {module} --dir _meta/kibana
-----
-
-Where the `--regex` parameter should match the dashboard you want to export.
-
-You can find more details about the process of creating and exporting the Kibana
-dashboards by reading {beatsdevguide}/new-dashboards.html[this guide].

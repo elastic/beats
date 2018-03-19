@@ -1,0 +1,123 @@
+{
+  "objects": [
+    {
+      "attributes": {
+        "description": "",
+        "kibanaSavedObjectMeta": {
+          "searchSourceJSON": "{\n  \"filter\": [],\n  \"index\": \"filebeat-*\",\n  \"highlightAll\": true,\n  \"query\": {\n    \"query_string\": {\n      \"query\": \"system.auth.ssh.event:Accepted\",\n      \"analyze_wildcard\": true\n    }\n  }\n}"
+        },
+        "title": "Successful SSH logins [Filebeat System]",
+        "uiStateJSON": "{\n  \"vis\": {\n    \"colors\": {\n      \"Accepted\": \"#3F6833\",\n      \"Failed\": \"#F9934E\",\n      \"Invalid\": \"#447EBC\",\n      \"publickey\": \"#629E51\",\n      \"password\": \"#BF1B00\"\n    }\n  }\n}",
+        "version": 1,
+        "visState": "{\n  \"title\": \"Successful SSH logins\",\n  \"type\": \"histogram\",\n  \"params\": {\n    \"addTooltip\": true,\n    \"addLegend\": true,\n    \"legendPosition\": \"right\",\n    \"scale\": \"linear\",\n    \"mode\": \"stacked\",\n    \"times\": [],\n    \"addTimeMarker\": false,\n    \"defaultYExtents\": false,\n    \"setYExtents\": false\n  },\n  \"aggs\": [\n    {\n      \"id\": \"1\",\n      \"enabled\": true,\n      \"type\": \"count\",\n      \"schema\": \"metric\",\n      \"params\": {}\n    },\n    {\n      \"id\": \"2\",\n      \"enabled\": true,\n      \"type\": \"date_histogram\",\n      \"schema\": \"segment\",\n      \"params\": {\n        \"field\": \"@timestamp\",\n        \"interval\": \"auto\",\n        \"customInterval\": \"2h\",\n        \"min_doc_count\": 1,\n        \"extended_bounds\": {}\n      }\n    },\n    {\n      \"id\": \"3\",\n      \"enabled\": true,\n      \"type\": \"terms\",\n      \"schema\": \"group\",\n      \"params\": {\n        \"field\": \"system.auth.ssh.method\",\n        \"size\": 5,\n        \"order\": \"desc\",\n        \"orderBy\": \"1\"\n      }\n    }\n  ],\n  \"listeners\": {}\n}"
+      },
+      "id": "d16bb400-f9cc-11e6-8115-a7c18106d86a",
+      "type": "visualization",
+      "version": 2
+    },
+    {
+      "attributes": {
+        "description": "",
+        "kibanaSavedObjectMeta": {
+          "searchSourceJSON": "{\n  \"filter\": [],\n  \"index\": \"filebeat-*\",\n  \"highlightAll\": true\n}"
+        },
+        "title": "SSH login attempts [Filebeat System]",
+        "uiStateJSON": "{\n  \"vis\": {\n    \"colors\": {\n      \"Accepted\": \"#3F6833\",\n      \"Failed\": \"#F9934E\",\n      \"Invalid\": \"#447EBC\"\n    }\n  }\n}",
+        "version": 1,
+        "visState": "{\n  \"aggs\": [\n    {\n      \"enabled\": true,\n      \"id\": \"1\",\n      \"params\": {},\n      \"schema\": \"metric\",\n      \"type\": \"count\"\n    },\n    {\n      \"enabled\": true,\n      \"id\": \"2\",\n      \"params\": {\n        \"customInterval\": \"2h\",\n        \"extended_bounds\": {},\n        \"field\": \"@timestamp\",\n        \"interval\": \"auto\",\n        \"min_doc_count\": 1\n      },\n      \"schema\": \"segment\",\n      \"type\": \"date_histogram\"\n    },\n    {\n      \"enabled\": true,\n      \"id\": \"3\",\n      \"params\": {\n        \"field\": \"system.auth.ssh.event\",\n        \"order\": \"desc\",\n        \"orderBy\": \"1\",\n        \"size\": 5\n      },\n      \"schema\": \"group\",\n      \"type\": \"terms\"\n    }\n  ],\n  \"listeners\": {},\n  \"params\": {\n    \"addLegend\": true,\n    \"addTimeMarker\": false,\n    \"addTooltip\": true,\n    \"defaultYExtents\": false,\n    \"legendPosition\": \"right\",\n    \"mode\": \"stacked\",\n    \"scale\": \"linear\",\n    \"setYExtents\": false,\n    \"times\": []\n  },\n  \"title\": \"SSH login attempts\",\n  \"type\": \"histogram\"\n}"
+      },
+      "id": "78b74f30-f9cd-11e6-8115-a7c18106d86a",
+      "type": "visualization",
+      "version": 2
+    },
+    {
+      "attributes": {
+        "description": "",
+        "kibanaSavedObjectMeta": {
+          "searchSourceJSON": "{\n  \"filter\": [],\n  \"index\": \"filebeat-*\",\n  \"highlightAll\": true,\n  \"query\": {\n    \"query_string\": {\n      \"query\": \"system.auth.ssh.event:Failed OR system.auth.ssh.event:Invalid\",\n      \"analyze_wildcard\": true\n    }\n  }\n}"
+        },
+        "title": "SSH users of failed login attempts [Filebeat System]",
+        "uiStateJSON": "{}",
+        "version": 1,
+        "visState": "{\n  \"title\": \"SSH users of failed login attempts\",\n  \"type\": \"tagcloud\",\n  \"params\": {\n    \"maxFontSize\": 72,\n    \"minFontSize\": 18,\n    \"orientation\": \"single\",\n    \"scale\": \"linear\"\n  },\n  \"aggs\": [\n    {\n      \"id\": \"1\",\n      \"enabled\": true,\n      \"type\": \"count\",\n      \"schema\": \"metric\",\n      \"params\": {}\n    },\n    {\n      \"id\": \"2\",\n      \"enabled\": true,\n      \"type\": \"terms\",\n      \"schema\": \"segment\",\n      \"params\": {\n        \"field\": \"system.auth.user\",\n        \"size\": 50,\n        \"order\": \"desc\",\n        \"orderBy\": \"1\"\n      }\n    }\n  ],\n  \"listeners\": {}\n}"
+      },
+      "id": "341ffe70-f9ce-11e6-8115-a7c18106d86a",
+      "type": "visualization",
+      "version": 2
+    },
+    {
+      "attributes": {
+        "description": "",
+        "kibanaSavedObjectMeta": {
+          "searchSourceJSON": "{\n  \"filter\": [],\n  \"index\": \"filebeat-*\",\n  \"highlightAll\": true,\n  \"query\": {\n    \"query_string\": {\n      \"query\": \"system.auth.ssh.event:Failed OR system.auth.ssh.event:Invalid\",\n      \"analyze_wildcard\": true\n    }\n  }\n}"
+        },
+        "title": "SSH failed login attempts source locations [Filebeat System]",
+        "uiStateJSON": "{\n  \"mapZoom\": 2,\n  \"mapCenter\": [\n    17.602139123350838,\n    69.697265625\n  ]\n}",
+        "version": 1,
+        "visState": "{\n  \"title\": \"SSH failed login attempts source locations\",\n  \"type\": \"tile_map\",\n  \"params\": {\n    \"mapType\": \"Shaded Circle Markers\",\n    \"isDesaturated\": true,\n    \"addTooltip\": true,\n    \"heatMaxZoom\": 16,\n    \"heatMinOpacity\": 0.1,\n    \"heatRadius\": 25,\n    \"heatBlur\": 15,\n    \"heatNormalizeData\": true,\n    \"legendPosition\": \"bottomright\",\n    \"mapZoom\": 2,\n    \"mapCenter\": [\n      15,\n      5\n    ],\n    \"wms\": {\n      \"enabled\": false,\n      \"url\": \"https://basemap.nationalmap.gov/arcgis/services/USGSTopo/MapServer/WMSServer\",\n      \"options\": {\n        \"version\": \"1.3.0\",\n        \"layers\": \"0\",\n        \"format\": \"image/png\",\n        \"transparent\": true,\n        \"attribution\": \"Maps provided by USGS\",\n        \"styles\": \"\"\n      }\n    }\n  },\n  \"aggs\": [\n    {\n      \"id\": \"1\",\n      \"enabled\": true,\n      \"type\": \"count\",\n      \"schema\": \"metric\",\n      \"params\": {}\n    },\n    {\n      \"id\": \"2\",\n      \"enabled\": true,\n      \"type\": \"geohash_grid\",\n      \"schema\": \"segment\",\n      \"params\": {\n        \"field\": \"system.auth.ssh.geoip.location\",\n        \"autoPrecision\": true,\n        \"precision\": 2\n      }\n    }\n  ],\n  \"listeners\": {}\n}"
+      },
+      "id": "3cec3eb0-f9d3-11e6-8a3e-2b904044ea1d",
+      "type": "visualization",
+      "version": 2
+    },
+    {
+      "attributes": {
+        "columns": [
+          "system.auth.ssh.event",
+          "system.auth.ssh.method",
+          "system.auth.user",
+          "system.auth.ssh.ip",
+          "system.auth.ssh.geoip.country_iso_code"
+        ],
+        "description": "",
+        "hits": 0,
+        "kibanaSavedObjectMeta": {
+          "searchSourceJSON": "{\n  \"index\": \"filebeat-*\",\n  \"highlightAll\": true,\n  \"query\": {\n    \"query_string\": {\n      \"query\": \"_exists_:system.auth.ssh.event\",\n      \"analyze_wildcard\": true\n    }\n  },\n  \"filter\": []\n}"
+        },
+        "sort": [
+          "@timestamp",
+          "desc"
+        ],
+        "title": "SSH login attempts [Filebeat System]",
+        "version": 1
+      },
+      "id": "62439dc0-f9c9-11e6-a747-6121780e0414",
+      "type": "search",
+      "version": 2
+    },
+    {
+      "attributes": {
+        "description": "",
+        "kibanaSavedObjectMeta": {
+          "searchSourceJSON": "{}"
+        },
+        "title": "Dashboards [Filebeat System]",
+        "uiStateJSON": "{}",
+        "version": 1,
+        "visState": "{\"title\":\"Dashboards [Filebeat System]\",\"type\":\"markdown\",\"params\":{\"fontSize\":12,\"markdown\":\"[Syslog](#/dashboard/Filebeat-syslog-dashboard) | [Sudo commands](#/dashboard/277876d0-fa2c-11e6-bbd3-29c986c96e5a) | [SSH logins](#/dashboard/5517a150-f9ce-11e6-8115-a7c18106d86a) | [New users and groups](#/dashboard/0d3f2380-fa78-11e6-ae9b-81e5311e8cab)\"},\"aggs\":[]}"
+      },
+      "id": "327417e0-8462-11e7-bab8-bd2f0fb42c54",
+      "type": "visualization",
+      "version": 1
+    },
+    {
+      "attributes": {
+        "description": "SSH dashboard for the System module in Filebeat",
+        "hits": 0,
+        "kibanaSavedObjectMeta": {
+          "searchSourceJSON": "{\"filter\":[],\"query\":{\"query\":{\"query_string\":{\"analyze_wildcard\":true,\"query\":\"*\",\"default_field\":\"*\"}},\"language\":\"lucene\"},\"highlightAll\":true,\"version\":true}"
+        },
+        "optionsJSON": "{\"darkTheme\":false}",
+        "panelsJSON": "[{\"col\":1,\"id\":\"d16bb400-f9cc-11e6-8115-a7c18106d86a\",\"panelIndex\":1,\"row\":5,\"size_x\":12,\"size_y\":3,\"type\":\"visualization\"},{\"col\":1,\"id\":\"78b74f30-f9cd-11e6-8115-a7c18106d86a\",\"panelIndex\":2,\"row\":2,\"size_x\":12,\"size_y\":3,\"type\":\"visualization\"},{\"col\":1,\"id\":\"341ffe70-f9ce-11e6-8115-a7c18106d86a\",\"panelIndex\":3,\"row\":8,\"size_x\":6,\"size_y\":4,\"type\":\"visualization\"},{\"col\":7,\"id\":\"3cec3eb0-f9d3-11e6-8a3e-2b904044ea1d\",\"panelIndex\":4,\"row\":8,\"size_x\":6,\"size_y\":4,\"type\":\"visualization\"},{\"size_x\":12,\"size_y\":3,\"panelIndex\":5,\"type\":\"search\",\"id\":\"62439dc0-f9c9-11e6-a747-6121780e0414\",\"col\":1,\"row\":12,\"columns\":[\"system.auth.ssh.event\",\"system.auth.ssh.method\",\"system.auth.user\",\"system.auth.ssh.ip\",\"system.auth.ssh.geoip.country_iso_code\"],\"sort\":[\"@timestamp\",\"desc\"]},{\"size_x\":12,\"size_y\":1,\"panelIndex\":6,\"type\":\"visualization\",\"id\":\"327417e0-8462-11e7-bab8-bd2f0fb42c54\",\"col\":1,\"row\":1}]",
+        "timeRestore": false,
+        "title": "[Filebeat System] SSH login attempts",
+        "uiStateJSON": "{\"P-4\":{\"mapCenter\":[39.774769485295465,23.203125],\"mapZoom\":3,\"mapBounds\":{\"bottom_right\":{\"lat\":10.31491928581316,\"lon\":74.53125},\"top_left\":{\"lat\":60.50052541051131,\"lon\":-27.94921875}},\"mapCollar\":{\"top_left\":{\"lat\":85.593335,\"lon\":-79.189455},\"bottom_right\":{\"lat\":-14.777884999999998,\"lon\":125.771485},\"zoom\":3}}}",
+        "version": 1
+      },
+      "id": "5517a150-f9ce-11e6-8115-a7c18106d86a",
+      "type": "dashboard",
+      "version": 7
+    }
+  ],
+  "version": "6.0.0-beta1-SNAPSHOT"
+}

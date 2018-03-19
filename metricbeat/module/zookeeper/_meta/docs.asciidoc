@@ -1,5 +1,3 @@
-== ZooKeeper Module
-
 The ZooKeeper module fetches statistics from the ZooKeeper service.
 
 [float]

@@ -1,4 +1,3 @@
-
 # Runs test build for the count metricset
 .PHONY: test
 test:
@@ -8,5 +7,5 @@ test:
 # Cleans up environment
 .PHONY: clean
 clean:
-	$(MAKE) -C beat clean
-	$(MAKE) -C metricbeat clean
+	@$(MAKE) -C beat clean
+	@$(MAKE) -C metricbeat clean

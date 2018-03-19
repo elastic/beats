@@ -7,11 +7,13 @@ import (
 	"syscall"
 	"time"
 
+	"github.com/joeshaw/multierror"
+
 	"github.com/elastic/beats/libbeat/common"
 	"github.com/elastic/beats/libbeat/logp"
+	"github.com/elastic/beats/winlogbeat/checkpoint"
 	"github.com/elastic/beats/winlogbeat/sys"
 	win "github.com/elastic/beats/winlogbeat/sys/eventlogging"
-	"github.com/joeshaw/multierror"
 )
 
 const (
@@ -25,10 +27,9 @@ var eventLoggingConfigKeys = append(commonConfigKeys, "ignore_older",
 
 type eventLoggingConfig struct {
 	ConfigCommon     `config:",inline"`
-	IgnoreOlder      time.Duration          `config:"ignore_older"`
-	ReadBufferSize   uint                   `config:"read_buffer_size"   validate:"min=1"`
-	FormatBufferSize uint                   `config:"format_buffer_size" validate:"min=1"`
-	Raw              map[string]interface{} `config:",inline"`
+	IgnoreOlder      time.Duration `config:"ignore_older"`
+	ReadBufferSize   uint          `config:"read_buffer_size"   validate:"min=1"`
+	FormatBufferSize uint          `config:"format_buffer_size" validate:"min=1"`
 }
 
 // Validate validates the eventLoggingConfig data and returns an error
@@ -58,14 +59,14 @@ var _ EventLog = &eventLogging{}
 // eventLogging implements the EventLog interface for reading from the Event
 // Logging API.
 type eventLogging struct {
-	config        eventLoggingConfig
-	name          string               // Name of the log that is opened.
-	handle        win.Handle           // Handle to the event log.
-	readBuf       []byte               // Buffer for reading in events.
-	formatBuf     []byte               // Buffer for formatting messages.
-	handles       *messageFilesCache   // Cached mapping of source name to event message file handles.
-	logPrefix     string               // Prefix to add to all log entries.
-	eventMetadata common.EventMetadata // Fields and tags to add to each event.
+	config    eventLoggingConfig
+	name      string             // Name of the log that is opened.
+	handle    win.Handle         // Handle to the event log.
+	readBuf   []byte             // Buffer for reading in events.
+	formatBuf []byte             // Buffer for formatting messages.
+	insertBuf win.StringInserts  // Buffer for parsing insert strings.
+	handles   *messageFilesCache // Cached mapping of source name to event message file handles.
+	logPrefix string             // Prefix to add to all log entries.
 
 	recordNumber uint32 // First record number to read.
 	seek         bool   // Read should use seek.
@@ -77,9 +78,9 @@ func (l eventLogging) Name() string {
 	return l.name
 }
 
-func (l *eventLogging) Open(recordNumber uint64) error {
+func (l *eventLogging) Open(state checkpoint.EventLogState) error {
 	detailf("%s Open(recordNumber=%d) calling OpenEventLog(uncServerPath=, "+
-		"providerName=%s)", l.logPrefix, recordNumber, l.name)
+		"providerName=%s)", l.logPrefix, state.RecordNumber, l.name)
 	handle, err := win.OpenEventLog("", l.name)
 	if err != nil {
 		return err
@@ -92,7 +93,7 @@ func (l *eventLogging) Open(recordNumber uint64) error {
 
 	var oldestRecord, newestRecord uint32
 	if numRecords > 0 {
-		l.recordNumber = uint32(recordNumber)
+		l.recordNumber = uint32(state.RecordNumber)
 		l.seek = true
 		l.ignoreFirst = true
 
@@ -149,7 +150,7 @@ func (l *eventLogging) Read() ([]Record, error) {
 
 	l.readBuf = l.readBuf[0:numBytesRead]
 	events, _, err := win.RenderEvents(
-		l.readBuf[:numBytesRead], 0, l.formatBuf, l.handles.get)
+		l.readBuf[:numBytesRead], 0, l.formatBuf, &l.insertBuf, l.handles.get)
 	if err != nil {
 		return nil, err
 	}
@@ -168,9 +169,13 @@ func (l *eventLogging) Read() ([]Record, error) {
 		}
 
 		records = append(records, Record{
-			API:           eventLoggingAPIName,
-			EventMetadata: l.eventMetadata,
-			Event:         e,
+			API:   eventLoggingAPIName,
+			Event: e,
+			Offset: checkpoint.EventLogState{
+				Name:         l.name,
+				RecordNumber: e.RecordID,
+				Timestamp:    e.TimeCreated.SystemTime,
+			},
 		})
 	}
 
@@ -210,7 +215,10 @@ func (l *eventLogging) readRetryErrorHandler(err error) error {
 
 		if reopen {
 			l.Close()
-			return l.Open(uint64(l.recordNumber))
+			return l.Open(checkpoint.EventLogState{
+				Name:         l.name,
+				RecordNumber: uint64(l.recordNumber),
+			})
 		}
 	}
 	return err
@@ -251,7 +259,7 @@ func (l *eventLogging) ignoreOlder(r *Record) bool {
 
 // newEventLogging creates and returns a new EventLog for reading event logs
 // using the Event Logging API.
-func newEventLogging(options map[string]interface{}) (EventLog, error) {
+func newEventLogging(options *common.Config) (EventLog, error) {
 	c := eventLoggingConfig{
 		ReadBufferSize:   win.MaxEventBufferSize,
 		FormatBufferSize: win.MaxFormatMessageBufferSize,
@@ -265,10 +273,9 @@ func newEventLogging(options map[string]interface{}) (EventLog, error) {
 		name:   c.Name,
 		handles: newMessageFilesCache(c.Name, win.QueryEventMessageFiles,
 			win.FreeLibrary),
-		logPrefix:     fmt.Sprintf("EventLogging[%s]", c.Name),
-		readBuf:       make([]byte, 0, c.ReadBufferSize),
-		formatBuf:     make([]byte, c.FormatBufferSize),
-		eventMetadata: c.EventMetadata,
+		logPrefix: fmt.Sprintf("EventLogging[%s]", c.Name),
+		readBuf:   make([]byte, 0, c.ReadBufferSize),
+		formatBuf: make([]byte, c.FormatBufferSize),
 	}, nil
 }
 

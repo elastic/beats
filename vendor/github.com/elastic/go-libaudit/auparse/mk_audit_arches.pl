@@ -64,21 +64,21 @@ import "C"
 
 import "fmt"
 
-// auditArch represents a machine architecture (i.e. arm, ppc, x86_64).
-type auditArch uint32
+// AuditArch represents a machine architecture (i.e. arm, ppc, x86_64).
+type AuditArch uint32
 
 // List of architectures constants used by then kernel.
 const(
 EOF
 
 foreach my $arch (sort @arches) {
-    print FILE "\t$arch auditArch = C.$arch\n";
+    print FILE "\t$arch AuditArch = C.$arch\n";
 }
 
 print FILE <<EOF;
 )
 
-var auditArchNames = map[auditArch]string{
+var AuditArchNames = map[AuditArch]string{
 EOF
 
 foreach my $arch (sort @arches) {
@@ -91,8 +91,8 @@ foreach my $arch (sort @arches) {
 print FILE <<EOF;
 }
 
-func (a auditArch) String() string {
-    name, found := auditArchNames[a]
+func (a AuditArch) String() string {
+    name, found := AuditArchNames[a]
     if found {
         return name
     }

@@ -5,19 +5,20 @@ import (
 	"sort"
 	"strings"
 
-	"github.com/elastic/beats/libbeat/common"
 	"github.com/joeshaw/multierror"
+
+	"github.com/elastic/beats/libbeat/common"
 )
 
-var commonConfigKeys = []string{"api", "name", "fields", "fields_under_root", "tags"}
+var commonConfigKeys = []string{"api", "name", "fields", "fields_under_root",
+	"tags", "processors"}
 
 // ConfigCommon is the common configuration data used to instantiate a new
 // EventLog. Each implementation is free to support additional configuration
 // options.
 type ConfigCommon struct {
-	API                  string             `config:"api"`  // Name of the API to use. Optional.
-	Name                 string             `config:"name"` // Name of the event log or channel.
-	common.EventMetadata `config:",inline"` // Fields and tags to add to each event.
+	API  string `config:"api"`  // Name of the API to use. Optional.
+	Name string `config:"name"` // Name of the event log or channel.
 }
 
 type validator interface {
@@ -25,15 +26,10 @@ type validator interface {
 }
 
 func readConfig(
-	data map[string]interface{},
+	c *common.Config,
 	config interface{},
 	validKeys []string,
 ) error {
-	c, err := common.NewConfigFrom(data)
-	if err != nil {
-		return fmt.Errorf("Failed reading config. %v", err)
-	}
-
 	if err := c.Unpack(config); err != nil {
 		return fmt.Errorf("Failed unpacking config. %v", err)
 	}
@@ -43,7 +39,7 @@ func readConfig(
 		sort.Strings(validKeys)
 
 		// Check for invalid keys.
-		for k := range data {
+		for _, k := range c.GetFields() {
 			k = strings.ToLower(k)
 			i := sort.SearchStrings(validKeys, k)
 			if i >= len(validKeys) || validKeys[i] != k {
@@ -63,7 +59,7 @@ func readConfig(
 }
 
 // Producer produces a new event log instance for reading event log records.
-type producer func(map[string]interface{}) (EventLog, error)
+type producer func(*common.Config) (EventLog, error)
 
 // Channels lists the available channels (event logs).
 type channels func() ([]string, error)
@@ -99,7 +95,7 @@ func Register(apiName string, priority int, producer producer, channels channels
 
 // New creates and returns a new EventLog instance based on the given config
 // and the registered EventLog producers.
-func New(options map[string]interface{}) (EventLog, error) {
+func New(options *common.Config) (EventLog, error) {
 	if len(eventLogs) == 0 {
 		return nil, fmt.Errorf("No event log API is available on this system")
 	}

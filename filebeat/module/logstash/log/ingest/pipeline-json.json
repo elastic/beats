@@ -1,0 +1,66 @@
+{
+    "description": "Pipeline for parsing logstash log logs",
+    "on_failure": [
+        {
+            "set": {
+                "field": "error.message",
+                "value": "{{ _ingest.on_failure_message }}"
+            }
+        }
+    ],
+    "processors": [
+        {
+            "json": {
+                "field": "message",
+                "target_field": "logstash.log"
+            }
+        },
+        {
+            "rename": {
+                "field": "@timestamp",
+                "target_field": "read_timestamp"
+            }
+        },
+        {
+            "convert": {
+                "field": "logstash.log.timeMillis",
+                "type": "string"
+            }
+        },
+        {
+            "date": {
+                "field": "logstash.log.timeMillis",
+                "formats": [
+                    "UNIX_MS"
+                ],
+                "target_field": "@timestamp"
+            }
+        },
+        {
+            "rename": {
+                "field": "logstash.log.loggerName",
+                "target_field": "logstash.log.module"
+            }
+        },
+        {
+            "remove": {
+                "field": [
+                    "message",
+                    "logstash.log.timeMillis"
+                ]
+            }
+        },
+        {
+            "rename": {
+                "field": "logstash.log.logEvent.message",
+                "target_field": "logstash.log.message"
+            }
+        },
+        {
+            "rename": {
+                "field": "logstash.log.logEvent",
+                "target_field": "logstash.log.log_event"
+            }
+        }
+    ]
+}

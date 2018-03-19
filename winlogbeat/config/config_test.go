@@ -6,10 +6,12 @@ import (
 	"testing"
 
 	"github.com/stretchr/testify/assert"
+
+	"github.com/elastic/beats/libbeat/common"
 )
 
 type validationTestCase struct {
-	config Validator
+	config WinlogbeatConfig
 	errMsg string
 }
 
@@ -31,24 +33,13 @@ func TestConfigValidate(t *testing.T) {
 		// Top-level config
 		{
 			WinlogbeatConfig{
-				EventLogs: []map[string]interface{}{
-					{"Name": "App"},
+				EventLogs: []*common.Config{
+					newConfig(map[string]interface{}{
+						"Name": "App",
+					}),
 				},
 			},
 			"", // No Error
-		},
-		{
-			Settings{
-				WinlogbeatConfig{
-					EventLogs: []map[string]interface{}{
-						{"Name": "App"},
-					},
-				},
-				map[string]interface{}{"other": "value"},
-			},
-			"1 error: Invalid top-level key 'other' found. Valid keys are bulk_queue_size, dashboards, " +
-				"fields, fields_under_root, logging, max_procs, " +
-				"name, output, path, processors, queue_size, tags, winlogbeat",
 		},
 		{
 			WinlogbeatConfig{},
@@ -60,4 +51,12 @@ func TestConfigValidate(t *testing.T) {
 	for _, test := range testCases {
 		test.run(t)
 	}
+}
+
+func newConfig(from map[string]interface{}) *common.Config {
+	cfg, err := common.NewConfigFrom(from)
+	if err != nil {
+		panic(err)
+	}
+	return cfg
 }

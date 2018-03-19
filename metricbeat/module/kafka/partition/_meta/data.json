@@ -1,5 +1,5 @@
 {
-    "@timestamp": "2016-05-23T08:05:34.853Z",
+    "@timestamp": "2017-10-12T08:05:34.853Z",
     "beat": {
         "hostname": "host.example.com",
         "name": "host.example.com"
@@ -11,7 +11,7 @@
                 "id": 0
             },
             "offset": {
-                "newest": 11,
+                "newest": 0,
                 "oldest": 0
             },
             "partition": {
@@ -21,7 +21,7 @@
                 "replica": 0
             },
             "topic": {
-                "name": "test-metricbeat-70692474374989458"
+                "name": "foo-1512631793-855878006"
             }
         }
     },
@@ -30,6 +30,5 @@
         "module": "kafka",
         "name": "partition",
         "rtt": 115
-    },
-    "type": "metricsets"
+    }
 }

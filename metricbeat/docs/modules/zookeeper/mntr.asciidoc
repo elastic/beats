@@ -3,6 +3,8 @@ This file is generated! See scripts/docs_collector.py
 ////
 
 [[metricbeat-metricset-zookeeper-mntr]]
+=== ZooKeeper mntr metricset
+
 include::../../../module/zookeeper/mntr/_meta/docs.asciidoc[]
 
 

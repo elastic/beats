@@ -1,9 +1,7 @@
-== Redis Module
-
 This module periodically fetches metrics from http://redis.io/[Redis] servers.
 
 [float]
-=== Module-Specific Configuration Notes
+=== Module-specific configuration notes
 
 The Redis module has these additional config options:
 

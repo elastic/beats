@@ -10,6 +10,7 @@
 _obj
 _test
 _output
+_meta/kibana/*/index-pattern
 
 # Architecture specific extensions/prefixes
 *.[568vq]

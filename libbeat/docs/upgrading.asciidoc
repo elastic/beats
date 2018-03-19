@@ -4,213 +4,156 @@
 This section gives general recommendations for upgrading the Beats:
 
 * <<upgrading-minor-versions>>
-* <<upgrading-1-to-5>>
+* <<upgrading-5-to-6>>
 * <<upgrade-mapping-template>>
 
-[[upgrading-minor-versions]]
-=== Upgrading Between Minor Versions
+If you're upgrading other products in the stack, also read the
+{stack-ref}/index.html[Elastic Stack Installation and Upgrade Guide]. Want an
+upgrade list that's tailored to your stack? Try out our
+{upgrade_guide}[Interactive Upgrade Guide].
 
-As a general rule, upgrading between minor versions (e.g. 5.x to 5.y, where x <
+[[upgrading-minor-versions]]
+=== Upgrade between minor versions
+
+As a general rule, upgrading between minor versions (e.g. 6.x to 6.y, where x <
 y) can be done by simply installing the new release and restarting the Beat
 process, because the Beats keep backwards compatibility when it comes to
 configuration and exported fields. Please review the <<release-notes,release
 notes>> for potential exceptions.
 
-While we keep the backwards compatibility when it comes to the exported fields,
-a new minor version can add new fields (e.g. a new Metricbeat module is added).
-This can be problematic if the Elasticsearch mapping settings are not updated as
-well.
+Upgrading between non-consecutive major versions (e.g. 1.x to 6.x) is not
+supported. If you are on version 1.x of the Beats, we recommend first upgrading
+to 5.6.
 
-Please see the <<upgrade-mapping-template>> section for possible strategies in
-upgrading the Elasticsearch mapping templates.
-
-[[upgrading-1-to-5]]
-=== Upgrading from 1.x to 5.x
+[[upgrading-5-to-6]]
+=== Upgrade from 5.x to 6.x
 
 Before upgrading your Beats, please review the <<breaking-changes, breaking
 changes>> doc.
 
-In addition to the subsections here, please read <<upgrade-mapping-template>>.
+// TODO: link to the stack upgrade docs
+//
+// If you are planning an upgrade of the full stack (Elasticsearch, Kibama, or
+// Logstash, in addition to Beats), please read the stack upgrade guide.
 
-==== Migrating Configuration Files
+We recommend that you fully upgrade Elasticsearch and Kibana to version 6.0
+before upgrading Beats. If you are on a Beats 5.x version lower than 5.6, please
+follow the <<upgrading-to-5.6>> section *before* doing the Elasticsearch
+upgrade.
 
-Beats 5.0 comes with several backwards incompatible configuration changes.
-However, we provide a script that can automatically fixup the most common
-settings in your configuration files.
+If you're not ready to upgrade Elasticsearch and Kibana to 6.0, that's alright.
+Beats version 6.0 works with Elasticsearch and Kibana version 5.6, so you can
+upgrade Beats now and the rest of the stack later.
 
-You can find this script in the Beats download packages. For the `.tar.gz` and
-`.zip` archives, look under:
+[[upgrading-to-5.6]]
+==== Upgrade to 5.6
 
-[source,shell]
-------------------------------------------------------------------------------
-./scripts/migrate_beat_config_1_x_to_5_0.py
-------------------------------------------------------------------------------
+The upgrade procedure assumes that you have Beats version 5.6 installed. If you
+are on a previous 5.x version of Beats, please upgrade to version 5.6 first.
+The reason is that the Elasticsearch mapping template in 5.6 was modified to be
+compatible with Elasticsearch 6.0 (by removing the `_all` settings).
 
-For the `.deb` and `.rpm` packages, look under the
-`/usr/share/<beatname>/scripts/` folder, for example:
-
-
-[source,shell]
-------------------------------------------------------------------------------
-/usr/share/packetbeat/scripts/migrate_beat_config_1_x_to_5_0.py
-------------------------------------------------------------------------------
-
-Python 2.7 or later is required for executing the migration script.
-
-To upgrade your configuration file automatically, simply pass it as an argument
-to the migration script, for example:
+For this reason, after upgrading to 5.6, you need to make sure that the 5.6
+template is loaded. You can do this by temporarily enabling the
+`output.elasticsearch.template.overwrite` setting, for example with Metricbeat:
 
 [source,shell]
 ------------------------------------------------------------------------------
-> ./scripts/migrate_beat_config_1_x_to_5_0.py packetbeat.yml
-Backup file created: packetbeat.yml.bak
+metricbeat -e -E output.elasticsearch.template.overwrite=true
 ------------------------------------------------------------------------------
 
-The script will automatically create a backup file and overwrite the input file
-with the upgraded version. You can also use the `--dry` option, which doesn't
-modify the input file, but outputs the upgraded version to stdout instead.
+Alternatively, you can manually force loading the template:
 
-==== Filebeat Registry File Location and Format
-
-Filebeat stores the read offset in a registry file that it persists to disk.
-The format of this file has changed in version 5.0, but Filebeat automatically
-upgrades the format on the first run, so there's normally no action required on
-upgrading.
-
-If you have installed Filebeat from the DEB or RPM packages, the location of the
-file stays the same as well (`/var/lib/filebeat/registry`). Also if you've
-installed Filebeat as a service on Windows, the location stays the same
-(`C:\ProgramData\filebeat\registry`).
-
-If you are running Filebeat from the `tar.gz` archive, however, the location of
-the registry file has changed. In version 1.x it was by default named
-`.filebeat` in the current working directory. In version 5.0, it is
-`data/registry` relative to the binary location. For upgrading in this case, we
-recommend copying the `.filebeat` file to `data/registry`.
-
-==== Upgrading Topbeat to Metricbeat
-
-NOTE: When upgrading to Metricbeat, keep in mind that any data you've collected
-with Topbeat is not compatible with the 5.0 version of the Beats dashboards
-because the underlying event data structures have changed. 
-
-With the Beats 5.0 release, Topbeat is replaced by Metricbeat, which offers more
-functionality. More precisely, the Topbeat functionality is roughly equivalent
-to the "system" module in Metricbeat.
-
-While there is no automatic way to convert a Topbeat configuration file to the
-equivalent of a Metricbeat configuration file, both configurations are simple
-enough that migrating shouldn't take long.
-
-For example, this is the input section of the Topbeat configuration file:
-
-[source,yaml]
+[source,shell]
 ------------------------------------------------------------------------------
-input:
-  # In seconds, defines how often to read server statistics
-  period: 10
-
-  # Regular expression to match the processes that are monitored
-  # By default, all the processes are monitored
-  procs: [".*"]
-
-  # Statistics to collect (all enabled by default)
-  stats:
-    # per system statistics, by default is true
-    system: true
-
-    # per process statistics, by default is true
-    process: true
-
-    # file system information, by default is true
-    filesystem: true
-
-    # cpu usage per core, by default is false
-    cpu_per_core: false
+curl -XPUT -H'Content-Type: application/json'  http://localhost:9200/_template/metricbeat -d @metricbeat.template.json
 ------------------------------------------------------------------------------
 
-And here is the equivalent configuration for the system module in Metricbeat:
+To check which version of the template is loaded, open Kibana Console, call `GET
+/_template/metricbeat`, and look for the version string. Note that you need to
+do this for each Beat type that you are running (e.g. Filebeat, Metricbeat,
+Packetbeat).
 
-[source,yaml]
+==== Migrate configuration files
+
+Beats 6.0 comes with several backwards incompatible configuration changes.
+Please review the <<breaking-changes-6.0>> document. Where possible, we kept the
+old configuration options working, but deprecated them.  However, deprecation
+was not always possible, so if you use any of the settings mentioned in the
+Breaking Changes section of the release notes, make sure you understand the
+alternatives that we provide.
+
+===== modules.d configuration layout
+
+Starting with the 6.0 version, Filebeat and Metricbeat are moving to a directory
+layout for configuration, where each module is configured in its own
+configuration file.
+
+While the all-in-one configuration is still fully supported, we recommend moving
+to the new layout at upgrade time. This typically means starting off with the new
+default configuration and modifying it with the custom settings that you had in
+your old files.
+
+// TODO: link to the docs on modules.d
+
+===== New command `test config` command
+
+Beats 6.0 introduces a new test command for testing the configuration file. For
+example:
+
+[source,shell]
 ------------------------------------------------------------------------------
-metricbeat.modules:
-
-#------------------------------- System Module -------------------------------
-- module: system
-  metricsets:
-    # CPU stats
-    - cpu
-
-    # System Load stats
-    - load
-
-    # Per filesystem stats
-    - filesystem
-
-    # Memory stats
-    - memory
-
-    # Network stats
-    - network
-
-    # Per process stats
-    - process
-  enabled: true
-  period: 10s
-  processes: ['.*']
+metricbeat test config
 ------------------------------------------------------------------------------
 
-The remaining configuration options (outputs, name, tags) stay the same or can
-be upgraded using the migration script.
+The old `-configtest` flag is still available, but deprecated.
+
+===== Reference configuration files
+
+The `<beatname>.full.yml` file, which contains all the non-deprecated
+configuration options is renamed to `<beatname>.reference.yml` starting with
+Beats 6.0. We recommend using this file as a reference only. It's not intended
+to be used in production.
+
+==== Dashboard upgrades
+
+We recommend re-importing the Kibana dashboards after the Beats and Kibana
+upgrades are complete. This way, you will take advantage of the new Beats
+dashboards created for the 6.0 release.
+
+See <<breaking-changes-import-dashboards>> in the Breaking Changes
+documentation.
+
+NOTE: If you've modified the Beats dashboards manually, reimporting them will
+overwrite your changes. Consider saving your dashboards under new IDs, so
+that the reimport doesn't overwrite them.
+
+==== Heartbeat package names
+
+The DEB and RPM packages for Heartbeat are now named `heartbeat-elastic` to
+avoid conflicts with a different `heartbeat` project.  The `.deb` and `.rpm`
+file names haven't changed, just the package name in the repositories.
 
 [[upgrade-mapping-template]]
-=== Upgrading the Elasticsearch Mapping Template
+=== Upgrade the Elasticsearch mapping template
 
-By default, the Elasticsearch mapping template that comes with the Beats is not
-re-installed if it already exists.  This means that if the new Beats version
-adds new fields (e.g. a new module in Metricbeat), they won't be reflected in
-the Elasticsearch mapping, which can result in visualization problems or
-incorrect data.
-
-You can set the `output.elasticsearch.template.overwrite` option to `true` to
-make the Beats install the new mapping template even if a template with the same
-name already exists. You can set this option in the configuration file or as a
-CLI flag, for example:
+Starting with Beats 6.0, the mapping templates and the default index names are
+versioned. For example, Metricbeat 6.0.0 creates indices like this:
 
 [source,shell]
 ------------------------------------------------------------------------------
-packetbeat -e -E output.elasticsearch.template.overwrite=true
+metricbeat-6.0.0-2017-08-31
 ------------------------------------------------------------------------------
 
-However, the mapping template is applied on index creation, so it won't affect
-the current index if it was already created with the old version.
+And the corresponding Elasticsearch template is named `metricbeat-6.0.0`.
 
-You can force the start of a new index by renaming the old index before starting
-the new version of the Beat. As of Elasticsearch 5.0, this can be done via the
-re-index API:
+This means that each version of the Beat creates a new index, and it is
+guaranteed that the correct template for that version is applied.  With these
+changes in place, you generally don't have to do anything to upgrade the mapping
+template when you move to a new version.
 
-
-[source,json]
-------------------------------------------------------------------------------
-POST /_reindex
-{
-  "source": {
-    "index": "packetbeat-2016.09.20"
-  },
-  "dest": {
-    "index": "packetbeat-2016.09.20-old"
-  }
-}
-DELETE /packetbeat-2016.09.20
-------------------------------------------------------------------------------
-
-Note that the reindex API command can take a long time, depending on the size of
-the index. It is recommended that you stop the Beat during this time, so the
-order of operations should be:
-
-1. Stop the old version of the Beat
-2. Rename the index of the current day
-3. Start the new version of the Beat
+One exception is when upgrading from 5.x, in which case you should make sure to
+read the <<upgrading-to-5.6>> section.
 
 If downtime is not acceptable, another possible approach is to configure a
 different index pattern in the new Beat version, but this will likely require

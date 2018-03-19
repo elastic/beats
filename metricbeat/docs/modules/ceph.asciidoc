@@ -3,29 +3,30 @@ This file is generated! See scripts/docs_collector.py
 ////
 
 [[metricbeat-module-ceph]]
-== ceph Module
+== Ceph module
 
 beta[]
 
-This is the ceph Module. Metrics are collected submitting HTTP GET requests to ceph-rest-api.
-Reference: http://docs.ceph.com/docs/master/man/8/ceph-rest-api/
+The Ceph module collects metrics by submitting HTTP GET requests to
+the http://docs.ceph.com/docs/master/man/8/ceph-rest-api/[ceph-rest-api].
 
 
 [float]
-=== Example Configuration
+=== Example configuration
 
-The ceph module supports the standard configuration options that are described
+The Ceph module supports the standard configuration options that are described
 in <<configuration-metricbeat>>. Here is an example configuration:
 
 [source,yaml]
 ----
 metricbeat.modules:
 - module: ceph
-  metricsets: ["cluster_disk", "cluster_health", "monitor_health", "pool_disk"]
-  enabled: false
+  metricsets: ["cluster_disk", "cluster_health", "monitor_health", "pool_disk", "osd_tree"]
   period: 10s
   hosts: ["localhost:5000"]
 ----
+
+This module supports TLS connection when using `ssl` config field, as described in <<configuration-ssl>>.
 
 [float]
 === Metricsets
@@ -36,7 +37,13 @@ The following metricsets are available:
 
 * <<metricbeat-metricset-ceph-cluster_health,cluster_health>>
 
+* <<metricbeat-metricset-ceph-cluster_status,cluster_status>>
+
 * <<metricbeat-metricset-ceph-monitor_health,monitor_health>>
+
+* <<metricbeat-metricset-ceph-osd_df,osd_df>>
+
+* <<metricbeat-metricset-ceph-osd_tree,osd_tree>>
 
 * <<metricbeat-metricset-ceph-pool_disk,pool_disk>>
 
@@ -44,7 +51,13 @@ include::ceph/cluster_disk.asciidoc[]
 
 include::ceph/cluster_health.asciidoc[]
 
+include::ceph/cluster_status.asciidoc[]
+
 include::ceph/monitor_health.asciidoc[]
+
+include::ceph/osd_df.asciidoc[]
+
+include::ceph/osd_tree.asciidoc[]
 
 include::ceph/pool_disk.asciidoc[]
 

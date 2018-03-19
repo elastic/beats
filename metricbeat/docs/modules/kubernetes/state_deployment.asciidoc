@@ -3,6 +3,8 @@ This file is generated! See scripts/docs_collector.py
 ////
 
 [[metricbeat-metricset-kubernetes-state_deployment]]
+=== Kubernetes state_deployment metricset
+
 include::../../../module/kubernetes/state_deployment/_meta/docs.asciidoc[]
 
 

@@ -1,0 +1,71 @@
+namespace schema;
+
+enum Action : ubyte (bit_flags) {
+  AttributesModified,
+  Created,
+  Deleted,
+  Updated,
+  Moved,
+  ConfigChanged,
+}
+
+enum Source : ubyte {
+  Scan,
+  FSNotify,
+}
+
+enum Type : ubyte {
+  Unknown,
+  File,
+  Dir,
+  Symlink,
+}
+
+table Metadata {
+  inode:ulong;
+  uid:uint;
+  gid:uint;
+  sid:string;
+  mode:uint;
+  size:ulong;
+  mtime_ns:long;
+  ctime_ns:long;
+  type:Type = 1;
+}
+
+table Hash {
+  md5:[byte];
+
+  // SHA-1
+  sha1:[byte];
+
+  // SHA-2
+  sha224:[byte];
+  sha256:[byte];
+  sha384:[byte];
+  sha512:[byte];
+  sha512_224:[byte];
+  sha512_256:[byte];
+
+  // SHA-3
+  sha3_224:[byte];
+  sha3_256:[byte];
+  sha3_384:[byte];
+  sha3_512:[byte];
+
+  // Blake2b
+  blake2b_256: [byte];
+  blake2b_384: [byte];
+  blake2b_512: [byte];
+}
+
+table Event {
+  timestamp_ns:long;
+  target_path:string;
+  action:Action;
+  source:Source;
+  info:Metadata;
+  hashes:Hash;
+}
+
+root_type Event;

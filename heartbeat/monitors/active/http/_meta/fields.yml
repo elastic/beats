@@ -1,5 +1,5 @@
 - key: http
-  title: "HTTP Monitor"
+  title: "HTTP monitor"
   description:
   fields:
     - name: http
@@ -11,6 +11,12 @@
           type: text
           description: >
             Service url used by monitor.
+          multi_fields:
+          - name: raw
+            type: keyword
+            description: >
+              The service url used by monitor. This is a non-analyzed field that is useful
+              for aggregations.
 
         - name: response
           type: group
@@ -69,7 +75,7 @@
               type: group
               description:
                 Time required between sending the start of sending the HTTP
-                request and first by from HTTP response being read. Duration
+                request and first byte from HTTP response being read. Duration
                 based on already available network connection.
               fields:
                 - name: us

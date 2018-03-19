@@ -5,9 +5,11 @@ import (
 	"testing"
 	"time"
 
+	"github.com/stretchr/testify/assert"
+
+	"github.com/elastic/beats/libbeat/beat"
 	"github.com/elastic/beats/libbeat/common"
 	"github.com/elastic/beats/libbeat/logp"
-	"github.com/stretchr/testify/assert"
 )
 
 func TestExportTimezone(t *testing.T) {
@@ -66,19 +68,16 @@ func TestTimezoneFormat(t *testing.T) {
 }
 
 func getActualValue(t *testing.T, config *common.Config, input common.MapStr) common.MapStr {
-	if testing.Verbose() {
-		logp.LogInit(logp.LOG_DEBUG, "", false, true, []string{"*"})
-	}
+	logp.TestingSetup()
 
-	p, err := newAddLocale(*config)
+	p, err := newAddLocale(config)
 	if err != nil {
 		logp.Err("Error initializing add_locale")
 		t.Fatal(err)
 	}
 
-	actual, err := p.Run(input)
-
-	return actual
+	actual, err := p.Run(&beat.Event{Fields: input})
+	return actual.Fields
 }
 
 func BenchmarkConstruct(b *testing.B) {
@@ -86,12 +85,12 @@ func BenchmarkConstruct(b *testing.B) {
 
 	input := common.MapStr{}
 
-	p, err := newAddLocale(*testConfig)
+	p, err := newAddLocale(testConfig)
 	if err != nil {
 		b.Fatal(err)
 	}
 
 	for i := 0; i < b.N; i++ {
-		_, err = p.Run(input)
+		_, err = p.Run(&beat.Event{Fields: input})
 	}
 }

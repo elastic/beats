@@ -1,9 +1,8 @@
 - name: info
   type: group
   description: >
-    beta[]
-
     Info metrics based on https://docs.docker.com/engine/reference/api/docker_remote_api_v1.24/#/display-system-wide-information.
+  release: ga
   fields:
     - name: containers
       type: group

@@ -16,9 +16,11 @@
             "continent_name" : "Europe",
             "country_iso_code" : "DE",
             "location" : {
-              "lon" : 9.0,
-              "lat" : 51.0
-            }
+              "lon" : 13.4,
+              "lat" : 52.5167
+            },
+            "region_name": "Land Berlin",
+            "city_name": "Berlin"
           },
           "method" : "GET",
           "user_name" : "-",
@@ -50,6 +52,9 @@
         "version" : "6.0.0-alpha2"
       },
       "prospector" : {
+        "type" : "log"
+      },
+      "input" : {
         "type" : "log"
       },
       "read_timestamp" : "2017-05-29T22:28:06.246Z",
@@ -102,6 +107,9 @@
       "prospector" : {
         "type" : "log"
       },
+      "" : {
+        "type" : "log"
+      },
       "read_timestamp" : "2017-05-29T22:28:06.246Z",
       "source" : "/Users/tsg/src/github.com/elastic/beats/filebeat/module/nginx/access/test/test.log",
       "fileset" : {
@@ -127,9 +135,11 @@
             "continent_name" : "Europe",
             "country_iso_code" : "DE",
             "location" : {
-              "lon" : 9.0,
-              "lat" : 51.0
-            }
+              "lon" : 13.4,
+              "lat" : 52.5167
+            },
+            "region_name": "Land Berlin",
+            "city_name": "Berlin"
           },
           "method" : "GET",
           "user_name" : "-",
@@ -159,6 +169,9 @@
         "version" : "6.0.0-alpha2"
       },
       "prospector" : {
+        "type" : "log"
+      },
+      "input" : {
         "type" : "log"
       },
       "read_timestamp" : "2017-05-29T22:28:06.246Z",
@@ -212,6 +225,9 @@
         "version" : "6.0.0-alpha2"
       },
       "prospector" : {
+        "type" : "log"
+      },
+      "input" : {
         "type" : "log"
       },
       "read_timestamp" : "2017-05-29T22:28:06.245Z",
@@ -274,6 +290,9 @@
       "prospector" : {
         "type" : "log"
       },
+      "input" : {
+        "type" : "log"
+      },
       "read_timestamp" : "2017-05-29T22:28:06.246Z",
       "source" : "/Users/tsg/src/github.com/elastic/beats/filebeat/module/nginx/access/test/test.log",
       "fileset" : {
@@ -299,8 +318,8 @@
             "continent_name" : "Europe",
             "country_iso_code" : "PT",
             "location" : {
-              "lon" : -8.13057,
-              "lat" : 39.6945
+              "lon" : -8.0,
+              "lat" : 39.5
             }
           },
           "method" : "GET",
@@ -331,6 +350,9 @@
         "version" : "6.0.0-alpha2"
       },
       "prospector" : {
+        "type" : "log"
+      },
+      "input" : {
         "type" : "log"
       },
       "read_timestamp" : "2017-05-29T22:28:06.246Z",

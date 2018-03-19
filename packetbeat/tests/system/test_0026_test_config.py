@@ -27,7 +27,7 @@ class Test(BaseTest):
         return a non-zero error code.
         """
         self.render_config_template(
-            iface_device="NoSuchDevice"
+            bpf_filter="invalid BPF filter"
         )
         self.start_packetbeat(
             extra_args=["-configtest"]).check_wait(exit_code=1)

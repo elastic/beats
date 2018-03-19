@@ -1,0 +1,868 @@
+[
+  {
+    "_index": "filebeat-7.0.0-alpha1-2017.08.01",
+    "_type": "doc",
+    "_id": "t8S2ml0BVlT2mTAm4zRv",
+    "_version": 1,
+    "_score": null,
+    "_source": {
+      "@timestamp": "2017-07-31T13:36:42.585Z",
+      "offset": 100,
+      "postgresql": {
+        "log": {
+          "thread_id": "4974",
+          "level": "LOG",
+          "timezone": "CEST",
+          "message": "database system was shut down at 2017-06-17 16:58:04 CEST",
+          "timestamp": "2017-07-31 13:36:42.585"
+        }
+      },
+      "beat": {
+        "hostname": "baldur",
+        "name": "baldur",
+        "version": "7.0.0-alpha1"
+      },
+      "prospector": {
+        "type": "log"
+      },
+      "input": {
+        "type": "log"
+      },
+      "source": "/home/n/go/src/github.com/elastic/beats/filebeat/module/postgresql/log/test/postgresql-9.6-debian.log",
+      "message": "2017-07-31 13:36:42.585 CEST [4974] LOG:  database system was shut down at 2017-06-17 16:58:04 CEST",
+      "fileset": {
+        "module": "postgresql",
+        "name": "log"
+      }
+    },
+    "fields": {
+      "@timestamp": [
+        "2017-07-31T13:36:42.585Z"
+      ]
+    },
+    "sort": [
+      1501508202585
+    ]
+  },
+
+  {
+    "_index": "filebeat-7.0.0-alpha1-2017.08.01",
+    "_type": "doc",
+    "_id": "tcS2ml0BVlT2mTAm4jSf",
+    "_version": 1,
+    "_score": null,
+    "_source": {
+      "@timestamp": "2017-07-31T13:36:42.605Z",
+      "offset": 198,
+      "postgresql": {
+        "log": {
+          "thread_id": "4974",
+          "level": "LOG",
+          "timezone": "CEST",
+          "message": "MultiXact member wraparound protections are now enabled",
+          "timestamp": "2017-07-31 13:36:42.605"
+        }
+      },
+      "beat": {
+        "hostname": "baldur",
+        "name": "baldur",
+        "version": "7.0.0-alpha1"
+      },
+      "prospector": {
+        "type": "log"
+      },
+      "input": {
+        "type": "log"
+      },
+      "source": "/home/n/go/src/github.com/elastic/beats/filebeat/module/postgresql/log/test/postgresql-9.6-debian.log",
+      "message": "2017-07-31 13:36:42.605 CEST [4974] LOG:  MultiXact member wraparound protections are now enabled",
+      "fileset": {
+        "module": "postgresql",
+        "name": "log"
+      }
+    },
+    "fields": {
+      "@timestamp": [
+        "2017-07-31T13:36:42.605Z"
+      ]
+    },
+    "sort": [
+      1501508202605
+    ]
+  },
+
+  {
+    "_index": "filebeat-7.0.0-alpha1-2017.08.01",
+    "_type": "doc",
+    "_id": "tsS2ml0BVlT2mTAm4jSf",
+    "_version": 1,
+    "_score": null,
+    "_source": {
+      "@timestamp": "2017-07-31T13:36:42.615Z",
+      "offset": 268,
+      "postgresql": {
+        "log": {
+          "thread_id": "4978",
+          "level": "LOG",
+          "timezone": "CEST",
+          "message": "autovacuum launcher started",
+          "timestamp": "2017-07-31 13:36:42.615"
+        }
+      },
+      "beat": {
+        "hostname": "baldur",
+        "name": "baldur",
+        "version": "7.0.0-alpha1"
+      },
+      "prospector": {
+        "type": "log"
+      },
+      "input": {
+        "type": "log"
+      },
+      "source": "/home/n/go/src/github.com/elastic/beats/filebeat/module/postgresql/log/test/postgresql-9.6-debian.log",
+      "message": "2017-07-31 13:36:42.615 CEST [4978] LOG:  autovacuum launcher started",
+      "fileset": {
+        "module": "postgresql",
+        "name": "log"
+      }
+    },
+    "fields": {
+      "@timestamp": [
+        "2017-07-31T13:36:42.615Z"
+      ]
+    },
+    "sort": [
+      1501508202615
+    ]
+  },
+
+  {
+    "_index": "filebeat-7.0.0-alpha1-2017.08.01",
+    "_type": "doc",
+    "_id": "uMS2ml0BVlT2mTAm4zST",
+    "_version": 1,
+    "_score": null,
+    "_source": {
+      "@timestamp": "2017-07-31T13:36:42.616Z",
+      "offset": 357,
+      "postgresql": {
+        "log": {
+          "thread_id": "4973",
+          "level": "LOG",
+          "timezone": "CEST",
+          "message": "database system is ready to accept connections",
+          "timestamp": "2017-07-31 13:36:42.616"
+        }
+      },
+      "beat": {
+        "hostname": "baldur",
+        "name": "baldur",
+        "version": "7.0.0-alpha1"
+      },
+      "prospector": {
+        "type": "log"
+      },
+      "input": {
+        "type": "log"
+      },
+      "source": "/home/n/go/src/github.com/elastic/beats/filebeat/module/postgresql/log/test/postgresql-9.6-debian.log",
+      "message": "2017-07-31 13:36:42.616 CEST [4973] LOG:  database system is ready to accept connections",
+      "fileset": {
+        "module": "postgresql",
+        "name": "log"
+      }
+    },
+    "fields": {
+      "@timestamp": [
+        "2017-07-31T13:36:42.616Z"
+      ]
+    },
+    "sort": [
+      1501508202616
+    ]
+  },
+
+  {
+    "_index": "filebeat-7.0.0-alpha1-2017.08.01",
+    "_type": "doc",
+    "_id": "ucS2ml0BVlT2mTAm4zST",
+    "_version": 1,
+    "_score": null,
+    "_source": {
+      "@timestamp": "2017-07-31T13:36:42.956Z",
+      "offset": 445,
+      "postgresql": {
+        "log": {
+          "thread_id": "4980",
+          "database": "unknown",
+          "level": "LOG",
+          "timezone": "CEST",
+          "message": "incomplete startup packet",
+          "user": "unknown",
+          "timestamp": "2017-07-31 13:36:42.956"
+        }
+      },
+      "beat": {
+        "hostname": "baldur",
+        "name": "baldur",
+        "version": "7.0.0-alpha1"
+      },
+      "prospector": {
+        "type": "log"
+      },
+      "input": {
+        "type": "log"
+      },
+      "source": "/home/n/go/src/github.com/elastic/beats/filebeat/module/postgresql/log/test/postgresql-9.6-debian.log",
+      "fileset": {
+        "module": "postgresql",
+        "name": "log"
+      },
+      "message": "2017-07-31 13:36:42.956 CEST [4980] [unknown]@[unknown] LOG:  incomplete startup packet"
+    },
+    "fields": {
+      "@timestamp": [
+        "2017-07-31T13:36:42.956Z"
+      ]
+    },
+    "sort": [
+      1501508202956
+    ]
+  },
+
+  {
+    "_index": "filebeat-7.0.0-alpha1-2017.08.01",
+    "_type": "doc",
+    "_id": "usS2ml0BVlT2mTAm4zST",
+    "_version": 1,
+    "_score": null,
+    "_source": {
+      "@timestamp": "2017-07-31T13:36:43.557Z",
+      "offset": 873,
+      "postgresql": {
+        "log": {
+          "duration": "37.118",
+          "thread_id": "4983",
+          "database": "postgres",
+          "level": "LOG",
+          "timezone": "CEST",
+          "query": "SELECT d.datname as \"Name\",\n\t       pg_catalog.pg_get_userbyid(d.datdba) as \"Owner\",\n\t       pg_catalog.pg_encoding_to_char(d.encoding) as \"Encoding\",\n\t       d.datcollate as \"Collate\",\n\t       d.datctype as \"Ctype\",\n\t       pg_catalog.array_to_string(d.datacl, E'\\n') AS \"Access privileges\"\n\tFROM pg_catalog.pg_database d\n\tORDER BY 1;",
+          "user": "postgres",
+          "timestamp": "2017-07-31 13:36:43.557"
+        }
+      },
+      "beat": {
+        "hostname": "baldur",
+        "name": "baldur",
+        "version": "7.0.0-alpha1"
+      },
+      "prospector": {
+        "type": "log"
+      },
+      "input": {
+        "type": "log"
+      },
+      "source": "/home/n/go/src/github.com/elastic/beats/filebeat/module/postgresql/log/test/postgresql-9.6-debian.log",
+      "fileset": {
+        "module": "postgresql",
+        "name": "log"
+      },
+      "message": "2017-07-31 13:36:43.557 CEST [4983] postgres@postgres LOG:  duration: 37.118 ms  statement: SELECT d.datname as \"Name\",\n\t       pg_catalog.pg_get_userbyid(d.datdba) as \"Owner\",\n\t       pg_catalog.pg_encoding_to_char(d.encoding) as \"Encoding\",\n\t       d.datcollate as \"Collate\",\n\t       d.datctype as \"Ctype\",\n\t       pg_catalog.array_to_string(d.datacl, E'\\n') AS \"Access privileges\"\n\tFROM pg_catalog.pg_database d\n\tORDER BY 1;"
+    },
+    "fields": {
+      "@timestamp": [
+        "2017-07-31T13:36:43.557Z"
+      ]
+    },
+    "sort": [
+      1501508203557
+    ]
+  },
+
+  {
+    "_index": "filebeat-7.0.0-alpha1-2017.08.01",
+    "_type": "doc",
+    "_id": "u8S2ml0BVlT2mTAm4zST",
+    "_version": 1,
+    "_score": null,
+    "_source": {
+      "@timestamp": "2017-07-31T13:36:44.104Z",
+      "offset": 1300,
+      "postgresql": {
+        "log": {
+          "duration": "2.895",
+          "thread_id": "4986",
+          "database": "postgres",
+          "level": "LOG",
+          "timezone": "CEST",
+          "query": "SELECT d.datname as \"Name\",\n\t       pg_catalog.pg_get_userbyid(d.datdba) as \"Owner\",\n\t       pg_catalog.pg_encoding_to_char(d.encoding) as \"Encoding\",\n\t       d.datcollate as \"Collate\",\n\t       d.datctype as \"Ctype\",\n\t       pg_catalog.array_to_string(d.datacl, E'\\n') AS \"Access privileges\"\n\tFROM pg_catalog.pg_database d\n\tORDER BY 1;",
+          "user": "postgres",
+          "timestamp": "2017-07-31 13:36:44.104"
+        }
+      },
+      "beat": {
+        "hostname": "baldur",
+        "name": "baldur",
+        "version": "7.0.0-alpha1"
+      },
+      "prospector": {
+        "type": "log"
+      },
+      "input": {
+        "type": "log"
+      },
+      "source": "/home/n/go/src/github.com/elastic/beats/filebeat/module/postgresql/log/test/postgresql-9.6-debian.log",
+      "message": "2017-07-31 13:36:44.104 CEST [4986] postgres@postgres LOG:  duration: 2.895 ms  statement: SELECT d.datname as \"Name\",\n\t       pg_catalog.pg_get_userbyid(d.datdba) as \"Owner\",\n\t       pg_catalog.pg_encoding_to_char(d.encoding) as \"Encoding\",\n\t       d.datcollate as \"Collate\",\n\t       d.datctype as \"Ctype\",\n\t       pg_catalog.array_to_string(d.datacl, E'\\n') AS \"Access privileges\"\n\tFROM pg_catalog.pg_database d\n\tORDER BY 1;",
+      "fileset": {
+        "module": "postgresql",
+        "name": "log"
+      }
+    },
+    "fields": {
+      "@timestamp": [
+        "2017-07-31T13:36:44.104Z"
+      ]
+    },
+    "sort": [
+      1501508204104
+    ]
+  },
+
+  {
+    "_index": "filebeat-7.0.0-alpha1-2017.08.01",
+    "_type": "doc",
+    "_id": "vMS2ml0BVlT2mTAm4zST",
+    "_version": 1,
+    "_score": null,
+    "_source": {
+      "@timestamp": "2017-07-31T13:36:44.642Z",
+      "offset": 1727,
+      "postgresql": {
+        "log": {
+          "duration": "2.809",
+          "thread_id": "4989",
+          "database": "postgres",
+          "level": "LOG",
+          "timezone": "CEST",
+          "query": "SELECT d.datname as \"Name\",\n\t       pg_catalog.pg_get_userbyid(d.datdba) as \"Owner\",\n\t       pg_catalog.pg_encoding_to_char(d.encoding) as \"Encoding\",\n\t       d.datcollate as \"Collate\",\n\t       d.datctype as \"Ctype\",\n\t       pg_catalog.array_to_string(d.datacl, E'\\n') AS \"Access privileges\"\n\tFROM pg_catalog.pg_database d\n\tORDER BY 1;",
+          "user": "postgres",
+          "timestamp": "2017-07-31 13:36:44.642"
+        }
+      },
+      "beat": {
+        "hostname": "baldur",
+        "name": "baldur",
+        "version": "7.0.0-alpha1"
+      },
+      "prospector": {
+        "type": "log"
+      },
+      "input": {
+        "type": "log"
+      },
+      "source": "/home/n/go/src/github.com/elastic/beats/filebeat/module/postgresql/log/test/postgresql-9.6-debian.log",
+      "fileset": {
+        "module": "postgresql",
+        "name": "log"
+      },
+      "message": "2017-07-31 13:36:44.642 CEST [4989] postgres@postgres LOG:  duration: 2.809 ms  statement: SELECT d.datname as \"Name\",\n\t       pg_catalog.pg_get_userbyid(d.datdba) as \"Owner\",\n\t       pg_catalog.pg_encoding_to_char(d.encoding) as \"Encoding\",\n\t       d.datcollate as \"Collate\",\n\t       d.datctype as \"Ctype\",\n\t       pg_catalog.array_to_string(d.datacl, E'\\n') AS \"Access privileges\"\n\tFROM pg_catalog.pg_database d\n\tORDER BY 1;"
+    },
+    "fields": {
+      "@timestamp": [
+        "2017-07-31T13:36:44.642Z"
+      ]
+    },
+    "sort": [
+      1501508204642
+    ]
+  },
+
+  {
+    "_index": "filebeat-7.0.0-alpha1-2017.08.01",
+    "_type": "doc",
+    "_id": "vcS2ml0BVlT2mTAm4zST",
+    "_version": 1,
+    "_score": null,
+    "_source": {
+      "@timestamp": "2017-07-31T13:39:16.249Z",
+      "offset": 1818,
+      "postgresql": {
+        "log": {
+          "thread_id": "5407",
+          "database": "users",
+          "level": "FATAL",
+          "timezone": "CEST",
+          "message": "database \"users\" does not exist",
+          "user": "postgres",
+          "timestamp": "2017-07-31 13:39:16.249"
+        }
+      },
+      "beat": {
+        "hostname": "baldur",
+        "name": "baldur",
+        "version": "7.0.0-alpha1"
+      },
+      "prospector": {
+        "type": "log"
+      },
+      "input": {
+        "type": "log"
+      },
+      "source": "/home/n/go/src/github.com/elastic/beats/filebeat/module/postgresql/log/test/postgresql-9.6-debian.log",
+      "message": "2017-07-31 13:39:16.249 CEST [5407] postgres@users FATAL:  database \"users\" does not exist",
+      "fileset": {
+        "module": "postgresql",
+        "name": "log"
+      }
+    },
+    "fields": {
+      "@timestamp": [
+        "2017-07-31T13:39:16.249Z"
+      ]
+    },
+    "sort": [
+      1501508356249
+    ]
+  },
+
+  {
+    "_index": "filebeat-7.0.0-alpha1-2017.08.01",
+    "_type": "doc",
+    "_id": "vsS2ml0BVlT2mTAm4zST",
+    "_version": 1,
+    "_score": null,
+    "_source": {
+      "@timestamp": "2017-07-31T13:39:17.945Z",
+      "offset": 1907,
+      "postgresql": {
+        "log": {
+          "thread_id": "5500",
+          "database": "user",
+          "level": "FATAL",
+          "timezone": "CEST",
+          "message": "database \"user\" does not exist",
+          "user": "postgres",
+          "timestamp": "2017-07-31 13:39:17.945"
+        }
+      },
+      "beat": {
+        "hostname": "baldur",
+        "name": "baldur",
+        "version": "7.0.0-alpha1"
+      },
+      "prospector": {
+        "type": "log"
+      },
+      "input": {
+        "type": "log"
+      },
+      "source": "/home/n/go/src/github.com/elastic/beats/filebeat/module/postgresql/log/test/postgresql-9.6-debian.log",
+      "fileset": {
+        "module": "postgresql",
+        "name": "log"
+      },
+      "message": "2017-07-31 13:39:17.945 CEST [5500] postgres@user FATAL:  database \"user\" does not exist"
+    },
+    "fields": {
+      "@timestamp": [
+        "2017-07-31T13:39:17.945Z"
+      ]
+    },
+    "sort": [
+      1501508357945
+    ]
+  },
+
+  {
+    "_index": "filebeat-7.0.0-alpha1-2017.08.01",
+    "_type": "doc",
+    "_id": "v8S2ml0BVlT2mTAm4zST",
+    "_version": 1,
+    "_score": null,
+    "_source": {
+      "@timestamp": "2017-07-31T13:39:21.025Z",
+      "offset": 2620,
+      "postgresql": {
+        "log": {
+          "duration": "37.598",
+          "thread_id": "5404",
+          "database": "postgres",
+          "level": "LOG",
+          "timezone": "CEST",
+          "query": "SELECT n.nspname as \"Schema\",\n\t  c.relname as \"Name\",\n\t  CASE c.relkind WHEN 'r' THEN 'table' WHEN 'v' THEN 'view' WHEN 'm' THEN 'materialized view' WHEN 'i' THEN 'index' WHEN 'S' THEN 'sequence' WHEN 's' THEN 'special' WHEN 'f' THEN 'foreign table' END as \"Type\",\n\t  pg_catalog.pg_get_userbyid(c.relowner) as \"Owner\"\n\tFROM pg_catalog.pg_class c\n\t     LEFT JOIN pg_catalog.pg_namespace n ON n.oid = c.relnamespace\n\tWHERE c.relkind IN ('r','')\n\t      AND n.nspname <> 'pg_catalog'\n\t      AND n.nspname <> 'information_schema'\n\t      AND n.nspname !~ '^pg_toast'\n\t  AND pg_catalog.pg_table_is_visible(c.oid)\n\tORDER BY 1,2;",
+          "user": "postgres",
+          "timestamp": "2017-07-31 13:39:21.025"
+        }
+      },
+      "beat": {
+        "hostname": "baldur",
+        "name": "baldur",
+        "version": "7.0.0-alpha1"
+      },
+      "prospector": {
+        "type": "log"
+      },
+      "input": {
+        "type": "log"
+      },
+      "source": "/home/n/go/src/github.com/elastic/beats/filebeat/module/postgresql/log/test/postgresql-9.6-debian.log",
+      "message": "2017-07-31 13:39:21.025 CEST [5404] postgres@postgres LOG:  duration: 37.598 ms  statement: SELECT n.nspname as \"Schema\",\n\t  c.relname as \"Name\",\n\t  CASE c.relkind WHEN 'r' THEN 'table' WHEN 'v' THEN 'view' WHEN 'm' THEN 'materialized view' WHEN 'i' THEN 'index' WHEN 'S' THEN 'sequence' WHEN 's' THEN 'special' WHEN 'f' THEN 'foreign table' END as \"Type\",\n\t  pg_catalog.pg_get_userbyid(c.relowner) as \"Owner\"\n\tFROM pg_catalog.pg_class c\n\t     LEFT JOIN pg_catalog.pg_namespace n ON n.oid = c.relnamespace\n\tWHERE c.relkind IN ('r','')\n\t      AND n.nspname <> 'pg_catalog'\n\t      AND n.nspname <> 'information_schema'\n\t      AND n.nspname !~ '^pg_toast'\n\t  AND pg_catalog.pg_table_is_visible(c.oid)\n\tORDER BY 1,2;",
+      "fileset": {
+        "module": "postgresql",
+        "name": "log"
+      }
+    },
+    "fields": {
+      "@timestamp": [
+        "2017-07-31T13:39:21.025Z"
+      ]
+    },
+    "sort": [
+      1501508361025
+    ]
+  },
+
+  {
+    "_index": "filebeat-7.0.0-alpha1-2017.08.01",
+    "_type": "doc",
+    "_id": "wMS2ml0BVlT2mTAm4zST",
+    "_version": 1,
+    "_score": null,
+    "_source": {
+      "@timestamp": "2017-07-31T13:39:31.619Z",
+      "offset": 2733,
+      "postgresql": {
+        "log": {
+          "duration": "9.482",
+          "thread_id": "5502",
+          "database": "clients",
+          "level": "LOG",
+          "timezone": "CEST",
+          "query": "select * from clients;",
+          "user": "postgres",
+          "timestamp": "2017-07-31 13:39:31.619"
+        }
+      },
+      "beat": {
+        "hostname": "baldur",
+        "name": "baldur",
+        "version": "7.0.0-alpha1"
+      },
+      "prospector": {
+        "type": "log"
+      },
+      "input": {
+        "type": "log"
+      },
+      "source": "/home/n/go/src/github.com/elastic/beats/filebeat/module/postgresql/log/test/postgresql-9.6-debian.log",
+      "message": "2017-07-31 13:39:31.619 CEST [5502] postgres@clients LOG:  duration: 9.482 ms  statement: select * from clients;",
+      "fileset": {
+        "module": "postgresql",
+        "name": "log"
+      }
+    },
+    "fields": {
+      "@timestamp": [
+        "2017-07-31T13:39:31.619Z"
+      ]
+    },
+    "sort": [
+      1501508371619
+    ]
+  },
+
+  {
+    "_index": "filebeat-7.0.0-alpha1-2017.08.01",
+    "_type": "doc",
+    "_id": "wcS2ml0BVlT2mTAm4zST",
+    "_version": 1,
+    "_score": null,
+    "_source": {
+      "@timestamp": "2017-07-31T13:39:40.147Z",
+      "offset": 2847,
+      "postgresql": {
+        "log": {
+          "duration": "0.765",
+          "thread_id": "5502",
+          "database": "clients",
+          "level": "LOG",
+          "timezone": "CEST",
+          "query": "select id from clients;",
+          "user": "postgres",
+          "timestamp": "2017-07-31 13:39:40.147"
+        }
+      },
+      "beat": {
+        "hostname": "baldur",
+        "name": "baldur",
+        "version": "7.0.0-alpha1"
+      },
+      "prospector": {
+        "type": "log"
+      },
+      "input": {
+        "type": "log"
+      },
+      "source": "/home/n/go/src/github.com/elastic/beats/filebeat/module/postgresql/log/test/postgresql-9.6-debian.log",
+      "fileset": {
+        "module": "postgresql",
+        "name": "log"
+      },
+      "message": "2017-07-31 13:39:40.147 CEST [5502] postgres@clients LOG:  duration: 0.765 ms  statement: select id from clients;"
+    },
+    "fields": {
+      "@timestamp": [
+        "2017-07-31T13:39:40.147Z"
+      ]
+    },
+    "sort": [
+      1501508380147
+    ]
+  },
+
+  {
+    "_index": "filebeat-7.0.0-alpha1-2017.08.01",
+    "_type": "doc",
+    "_id": "wsS2ml0BVlT2mTAm4zST",
+    "_version": 1,
+    "_score": null,
+    "_source": {
+      "@timestamp": "2017-07-31T13:40:54.310Z",
+      "offset": 3559,
+      "postgresql": {
+        "log": {
+          "duration": "26.082",
+          "thread_id": "5502",
+          "database": "clients",
+          "level": "LOG",
+          "timezone": "CEST",
+          "query": "SELECT n.nspname as \"Schema\",\n\t  c.relname as \"Name\",\n\t  CASE c.relkind WHEN 'r' THEN 'table' WHEN 'v' THEN 'view' WHEN 'm' THEN 'materialized view' WHEN 'i' THEN 'index' WHEN 'S' THEN 'sequence' WHEN 's' THEN 'special' WHEN 'f' THEN 'foreign table' END as \"Type\",\n\t  pg_catalog.pg_get_userbyid(c.relowner) as \"Owner\"\n\tFROM pg_catalog.pg_class c\n\t     LEFT JOIN pg_catalog.pg_namespace n ON n.oid = c.relnamespace\n\tWHERE c.relkind IN ('r','')\n\t      AND n.nspname <> 'pg_catalog'\n\t      AND n.nspname <> 'information_schema'\n\t      AND n.nspname !~ '^pg_toast'\n\t  AND pg_catalog.pg_table_is_visible(c.oid)\n\tORDER BY 1,2;",
+          "user": "postgres",
+          "timestamp": "2017-07-31 13:40:54.310"
+        }
+      },
+      "beat": {
+        "hostname": "baldur",
+        "name": "baldur",
+        "version": "7.0.0-alpha1"
+      },
+      "prospector": {
+        "type": "log"
+      },
+      "input": {
+        "type": "log"
+      },
+      "source": "/home/n/go/src/github.com/elastic/beats/filebeat/module/postgresql/log/test/postgresql-9.6-debian.log",
+      "message": "2017-07-31 13:40:54.310 CEST [5502] postgres@clients LOG:  duration: 26.082 ms  statement: SELECT n.nspname as \"Schema\",\n\t  c.relname as \"Name\",\n\t  CASE c.relkind WHEN 'r' THEN 'table' WHEN 'v' THEN 'view' WHEN 'm' THEN 'materialized view' WHEN 'i' THEN 'index' WHEN 'S' THEN 'sequence' WHEN 's' THEN 'special' WHEN 'f' THEN 'foreign table' END as \"Type\",\n\t  pg_catalog.pg_get_userbyid(c.relowner) as \"Owner\"\n\tFROM pg_catalog.pg_class c\n\t     LEFT JOIN pg_catalog.pg_namespace n ON n.oid = c.relnamespace\n\tWHERE c.relkind IN ('r','')\n\t      AND n.nspname <> 'pg_catalog'\n\t      AND n.nspname <> 'information_schema'\n\t      AND n.nspname !~ '^pg_toast'\n\t  AND pg_catalog.pg_table_is_visible(c.oid)\n\tORDER BY 1,2;",
+      "fileset": {
+        "module": "postgresql",
+        "name": "log"
+      }
+    },
+    "fields": {
+      "@timestamp": [
+        "2017-07-31T13:40:54.310Z"
+      ]
+    },
+    "sort": [
+      1501508454310
+    ]
+  },
+
+  {
+    "_index": "filebeat-7.0.0-alpha1-2017.08.01",
+    "_type": "doc",
+    "_id": "w8S2ml0BVlT2mTAm4zST",
+    "_version": 1,
+    "_score": null,
+    "_source": {
+      "@timestamp": "2017-07-31T13:43:22.645Z",
+      "offset": 3751,
+      "postgresql": {
+        "log": {
+          "duration": "36.162",
+          "thread_id": "5502",
+          "database": "clients",
+          "level": "LOG",
+          "timezone": "CEST",
+          "query": "create table cats(name varchar(50) primary key, toy varchar (50) not null, born timestamp not null);",
+          "user": "postgres",
+          "timestamp": "2017-07-31 13:43:22.645"
+        }
+      },
+      "beat": {
+        "hostname": "baldur",
+        "name": "baldur",
+        "version": "7.0.0-alpha1"
+      },
+      "prospector": {
+        "type": "log"
+      },
+      "input": {
+        "type": "log"
+      },
+      "source": "/home/n/go/src/github.com/elastic/beats/filebeat/module/postgresql/log/test/postgresql-9.6-debian.log",
+      "message": "2017-07-31 13:43:22.645 CEST [5502] postgres@clients LOG:  duration: 36.162 ms  statement: create table cats(name varchar(50) primary key, toy varchar (50) not null, born timestamp not null);",
+      "fileset": {
+        "module": "postgresql",
+        "name": "log"
+      }
+    },
+    "fields": {
+      "@timestamp": [
+        "2017-07-31T13:43:22.645Z"
+      ]
+    },
+    "sort": [
+      1501508602645
+    ]
+  },
+
+  {
+    "_index": "filebeat-7.0.0-alpha1-2017.08.01",
+    "_type": "doc",
+    "_id": "xMS2ml0BVlT2mTAm4zST",
+    "_version": 1,
+    "_score": null,
+    "_source": {
+      "@timestamp": "2017-07-31T13:46:02.670Z",
+      "offset": 3907,
+      "postgresql": {
+        "log": {
+          "duration": "10.540",
+          "thread_id": "5502",
+          "database": "clients",
+          "level": "LOG",
+          "timezone": "CEST",
+          "query": "insert into cats(name, toy, born) values('kate', 'ball', now());",
+          "user": "postgres",
+          "timestamp": "2017-07-31 13:46:02.670"
+        }
+      },
+      "beat": {
+        "hostname": "baldur",
+        "name": "baldur",
+        "version": "7.0.0-alpha1"
+      },
+      "prospector": {
+        "type": "log"
+      },
+      "input": {
+        "type": "log"
+      },
+      "source": "/home/n/go/src/github.com/elastic/beats/filebeat/module/postgresql/log/test/postgresql-9.6-debian.log",
+      "fileset": {
+        "module": "postgresql",
+        "name": "log"
+      },
+      "message": "2017-07-31 13:46:02.670 CEST [5502] postgres@clients LOG:  duration: 10.540 ms  statement: insert into cats(name, toy, born) values('kate', 'ball', now());"
+    },
+    "fields": {
+      "@timestamp": [
+        "2017-07-31T13:46:02.670Z"
+      ]
+    },
+    "sort": [
+      1501508762670
+    ]
+  },
+
+  {
+    "_index": "filebeat-7.0.0-alpha1-2017.08.01",
+    "_type": "doc",
+    "_id": "xcS2ml0BVlT2mTAm4zST",
+    "_version": 1,
+    "_score": null,
+    "_source": {
+      "@timestamp": "2017-07-31T13:46:23.016Z",
+      "offset": 4064,
+      "postgresql": {
+        "log": {
+          "duration": "5.156",
+          "thread_id": "5502",
+          "database": "clients",
+          "level": "LOG",
+          "timezone": "CEST",
+          "query": "insert into cats(name, toy, born) values('frida', 'horse', now());",
+          "user": "postgres",
+          "timestamp": "2017-07-31 13:46:23.016"
+        }
+      },
+      "beat": {
+        "hostname": "baldur",
+        "name": "baldur",
+        "version": "7.0.0-alpha1"
+      },
+      "prospector": {
+        "type": "log"
+      },
+      "input": {
+        "type": "log"
+      },
+      "source": "/home/n/go/src/github.com/elastic/beats/filebeat/module/postgresql/log/test/postgresql-9.6-debian.log",
+      "message": "2017-07-31 13:46:23.016 CEST [5502] postgres@clients LOG:  duration: 5.156 ms  statement: insert into cats(name, toy, born) values('frida', 'horse', now());",
+      "fileset": {
+        "module": "postgresql",
+        "name": "log"
+      }
+    },
+    "fields": {
+      "@timestamp": [
+        "2017-07-31T13:46:23.016Z"
+      ]
+    },
+    "sort": [
+      1501508783016
+    ]
+  },
+
+  {
+    "_index": "filebeat-7.0.0-alpha1-2017.08.01",
+    "_type": "doc",
+    "_id": "x8S2ml0BVlT2mTAm8zQ2",
+    "_version": 1,
+    "_score": null,
+    "_source": {
+      "@timestamp": "2017-07-31T13:46:55.637Z",
+      "offset": 4258,
+      "postgresql": {
+        "log": {
+          "duration": "25.871",
+          "thread_id": "5502",
+          "database": "clients",
+          "level": "LOG",
+          "timezone": "CEST",
+          "query": "create table dogs(name varchar(50) primary key, owner varchar (50) not null, born timestamp not null);",
+          "user": "postgres",
+          "timestamp": "2017-07-31 13:46:55.637"
+        }
+      },
+      "beat": {
+        "hostname": "baldur",
+        "name": "baldur",
+        "version": "7.0.0-alpha1"
+      },
+      "prospector": {
+        "type": "log"
+      },
+      "input": {
+        "type": "log"
+      },
+      "source": "/home/n/go/src/github.com/elastic/beats/filebeat/module/postgresql/log/test/postgresql-9.6-debian.log",
+      "message": "2017-07-31 13:46:55.637 CEST [5502] postgres@clients LOG:  duration: 25.871 ms  statement: create table dogs(name varchar(50) primary key, owner varchar (50) not null, born timestamp not null);",
+      "fileset": {
+        "module": "postgresql",
+        "name": "log"
+      }
+    },
+    "fields": {
+      "@timestamp": [
+        "2017-07-31T13:46:55.637Z"
+      ]
+    },
+    "sort": [
+      1501508815637
+    ]
+  }
+]

@@ -1,9 +1,10 @@
 package healthcheck
 
 import (
+	"context"
 	"strings"
 
-	dc "github.com/fsouza/go-dockerclient"
+	"github.com/docker/docker/api/types"
 
 	"github.com/elastic/beats/libbeat/common"
 	"github.com/elastic/beats/libbeat/logp"
@@ -11,7 +12,7 @@ import (
 	"github.com/elastic/beats/metricbeat/module/docker"
 )
 
-func eventsMapping(containers []dc.APIContainers, m *MetricSet) []common.MapStr {
+func eventsMapping(containers []types.Container, m *MetricSet) []common.MapStr {
 	var events []common.MapStr
 	for _, container := range containers {
 		event := eventMapping(&container, m)
@@ -22,12 +23,12 @@ func eventsMapping(containers []dc.APIContainers, m *MetricSet) []common.MapStr 
 	return events
 }
 
-func eventMapping(cont *dc.APIContainers, m *MetricSet) common.MapStr {
+func eventMapping(cont *types.Container, m *MetricSet) common.MapStr {
 	if !hasHealthCheck(cont.Status) {
 		return nil
 	}
 
-	container, err := m.dockerClient.InspectContainer(cont.ID)
+	container, err := m.dockerClient.ContainerInspect(context.TODO(), cont.ID)
 	if err != nil {
 		logp.Err("Error inpsecting container %v: %v", cont.ID, err)
 		return nil
@@ -41,7 +42,7 @@ func eventMapping(cont *dc.APIContainers, m *MetricSet) common.MapStr {
 
 	return common.MapStr{
 		mb.ModuleDataKey: common.MapStr{
-			"container": docker.NewContainer(cont).ToMapStr(),
+			"container": docker.NewContainer(cont, m.dedot).ToMapStr(),
 		},
 		"status":        container.State.Health.Status,
 		"failingstreak": container.State.Health.FailingStreak,

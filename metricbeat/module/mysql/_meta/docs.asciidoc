@@ -1,10 +1,8 @@
-== MySQL Module
-
 This module periodically fetches metrics from https://www.mysql.com/[MySQL]
 servers.
 
 [float]
-=== Module-Specific Configuration Notes
+=== Module-specific configuration notes
 
 When configuring the `hosts` option, you must use a MySQL Data Source Name (DSN)
 of the following format:
@@ -30,3 +28,10 @@ precedence over those specified in the `username` and `password` config options.
 
 The mysql MetricSets were tested with mysql 5.7.12 and are expected to work with
 all versions >= 5.7.0.
+
+[float]
+=== Dashboard
+
+The mysql module comes with a predefined dashboard. For example:
+
+image::./images/metricbeat-mysql.png[]

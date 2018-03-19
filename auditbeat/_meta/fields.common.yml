@@ -1,0 +1,123 @@
+- key: common
+  title: Common
+  description: >
+    Contains common fields available in all event types.
+  fields:
+  - name: event.module
+    description: >
+      The name of the module that generated the event.
+
+  - name: event.action
+    type: keyword
+    example: logged-in
+    description: >
+      Action describes the change that triggered the event.
+
+      For the file integrity module the possible values are:
+      attributes_modified, created, deleted, updated, moved, and config_change.
+
+  - name: file
+    type: group
+    description: File attributes.
+    fields:
+    - name: path
+      type: text
+      description: The path to the file.
+      multi_fields:
+      - name: raw
+        type: keyword
+        description: >
+          The path to the file. This is a non-analyzed field that is useful
+          for aggregations.
+
+    - name: target_path
+      type: keyword
+      description: The target path for symlinks.
+
+    - name: type
+      type: keyword
+      description: The file type (file, dir, or symlink).
+
+    - name: device
+      type: keyword
+      description: The device.
+
+    - name: inode
+      type: keyword
+      description: The inode representing the file in the filesystem.
+
+    - name: uid
+      type: keyword
+      description: >
+        The user ID (UID) or security identifier (SID) of the file owner.
+
+    - name: owner
+      type: keyword
+      description: The file owner's username.
+
+    - name: gid
+      type: keyword
+      description: The primary group ID (GID) of the file.
+
+    - name: group
+      type: keyword
+      description: The primary group name of the file.
+
+    - name: mode
+      type: keyword
+      example: 0640
+      description: The mode of the file in octal representation.
+
+    - name: setuid
+      type: boolean
+      example: true
+      description: Set if the file has the `setuid` bit set. Omitted otherwise.
+
+    - name: setgid
+      type: boolean
+      example: true
+      description: Set if the file has the `setgid` bit set. Omitted otherwise.
+
+    - name: size
+      type: long
+      description: The file size in bytes (field is only added when `type` is `file`).
+
+    - name: mtime
+      type: date
+      description: The last modified time of the file (time when content was modified).
+
+    - name: ctime
+      type: date
+      description: The last change time of the file (time when metadata was changed).
+
+    - name: origin
+      type: text
+      description: >
+          An array of strings describing a possible external origin for
+          this file. For example, the URL it was downloaded from. Only
+          supported in macOS, via the kMDItemWhereFroms attribute.
+          Omitted if origin information is not available.
+      multi_fields:
+      - name: raw
+        type: keyword
+        description: >
+          This is a non-analyzed field that is useful for aggregations on the
+          origin data.
+
+    - name: selinux
+      type: group
+      description: The SELinux identity of the file.
+      fields:
+      - name: user
+        type: keyword
+        description: The owner of the object.
+      - name: role
+        type: keyword
+        description: The object's SELinux role.
+      - name: domain
+        type: keyword
+        description: The object's SELinux domain or type.
+      - name: level
+        type: keyword
+        example: s0
+        description: The object's SELinux level.

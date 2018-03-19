@@ -4,9 +4,10 @@ import (
 	"strings"
 	"testing"
 
-	"github.com/elastic/beats/libbeat/monitoring"
 	metrics "github.com/rcrowley/go-metrics"
 	"github.com/stretchr/testify/assert"
+
+	"github.com/elastic/beats/libbeat/monitoring"
 )
 
 func TestGoMetricsAdapter(t *testing.T) {

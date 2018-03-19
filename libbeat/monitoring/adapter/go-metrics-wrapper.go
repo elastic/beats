@@ -1,8 +1,9 @@
 package adapter
 
 import (
-	"github.com/elastic/beats/libbeat/monitoring"
 	metrics "github.com/rcrowley/go-metrics"
+
+	"github.com/elastic/beats/libbeat/monitoring"
 )
 
 // go-metrics wrapper interface required to unpack the original metric

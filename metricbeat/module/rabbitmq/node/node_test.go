@@ -135,5 +135,4 @@ func TestFetchEventContents(t *testing.T) {
 	assert.EqualValues(t, "disc", event["type"])
 
 	assert.EqualValues(t, 37139, event["uptime"])
-
 }

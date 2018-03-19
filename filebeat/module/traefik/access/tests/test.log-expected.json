@@ -1,0 +1,128 @@
+[
+    {
+        "_index": "filebeat-2017.10",
+        "_type": "doc",
+        "_id": "AV8CftO9KnxqdH7bMrjU",
+        "_version": 1,
+        "_score": null,
+        "_source": {
+            "@timestamp": "2017-10-02T20:22:08.000Z",
+            "offset": 552,
+            "traefik": {
+                "access": {
+                    "referrer": "http://example.com/login",
+                    "response_code": "304",
+                    "remote_ip": "85.181.35.98",
+                    "geoip": {
+                        "continent_name": "Europe",
+                        "country_iso_code": "DE",
+                        "location": {
+                            "lon": 9,
+                            "lat": 51
+                        }
+                    },
+                    "method": "GET",
+                    "user_name": "-",
+                    "http_version": "1.1",
+                    "body_sent": {
+                        "bytes": "0"
+                    },
+                    "url": "/ui/favicons/favicon.ico",
+                    "user_agent": {
+                        "patch": "3163",
+                        "major": "61",
+                        "minor": "0",
+                        "os": "Linux",
+                        "name": "Chrome",
+                        "os_name": "Linux",
+                        "device": "Other"
+                    }
+                }
+            },
+            "beat": {
+                "hostname": "MM-XPS-15",
+                "name": "MM-XPS-15",
+                "version": "7.0.0-alpha1"
+            },
+            "prospector": {
+                "type": "log"
+            },
+            "input": {
+                "type": "log"
+            },
+            "read_timestamp": "2017-10-09T18:56:25.032Z",
+            "source": "/var/log/traefik/access.log",
+            "fileset": {
+                "module": "traefik",
+                "name": "access"
+            }
+        },
+        "fields": {
+            "@timestamp": [
+                1506975728000
+            ]
+        },
+        "sort": [
+            1506975728000
+        ]
+    },
+    {
+        "_index": "filebeat-2017.10",
+        "_type": "doc",
+        "_id": "AV8CftO9KnxqdH7bMrjT",
+        "_version": 1,
+        "_score": null,
+        "_source": {
+            "@timestamp": "2017-10-02T20:22:07.000Z",
+            "offset": 280,
+            "traefik": {
+                "access": {
+                    "referrer": "http://example.com/login",
+                    "response_code": "304",
+                    "remote_ip": "192.168.33.1",
+                    "method": "GET",
+                    "user_name": "-",
+                    "http_version": "1.1",
+                    "body_sent": {
+                        "bytes": "0"
+                    },
+                    "url": "/ui/favicons/favicon-16x16.png",
+                    "user_agent": {
+                        "patch": "3163",
+                        "major": "61",
+                        "minor": "0",
+                        "os": "Linux",
+                        "name": "Chrome",
+                        "os_name": "Linux",
+                        "device": "Other"
+                    }
+                }
+            },
+            "beat": {
+                "hostname": "MM-XPS-15",
+                "name": "MM-XPS-15",
+                "version": "7.0.0-alpha1"
+            },
+            "prospector": {
+                "type": "log"
+            },
+            "input": {
+                "type": "log"
+            },
+            "read_timestamp": "2017-10-09T18:56:25.031Z",
+            "source": "/var/log/traefik/access.log",
+            "fileset": {
+                "module": "traefik",
+                "name": "access"
+            }
+        },
+        "fields": {
+            "@timestamp": [
+                1506975727000
+            ]
+        },
+        "sort": [
+            1506975727000
+        ]
+    }
+]

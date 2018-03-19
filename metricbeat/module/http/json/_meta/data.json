@@ -1,19 +1,18 @@
 {
-    "@timestamp":"2016-05-23T08:05:34.853Z",
-    "beat":{
-        "hostname":"beathost",
-        "name":"beathost"
+    "@timestamp": "2017-10-12T08:05:34.853Z",
+    "beat": {
+        "hostname": "host.example.com",
+        "name": "host.example.com"
     },
-    "metricset":{
-        "host":"localhost",
-        "module":"http",
-        "name":"json",
-        "rtt":44269
-    },
-    "http":{
-        "json":{
-            "example": "json"
+    "http": {
+        "json": {
+            "hello": "world"
         }
     },
-    "type":"metricsets"
+    "metricset": {
+        "host": "127.0.0.1:8080",
+        "module": "http",
+        "name": "json",
+        "rtt": 115
+    }
 }

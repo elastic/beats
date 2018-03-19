@@ -1,3 +1,1 @@
-=== dropwizard collector MetricSet
-
-This is the collector metricset of the module dropwizard.
+This is the `collector` metricset of the Dropwizard module.

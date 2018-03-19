@@ -1,3 +1,1 @@
-=== memcached stats MetricSet
-
-This is the stats metricset of the module memcached.
+This is the `stats` metricset of the Memcached module.

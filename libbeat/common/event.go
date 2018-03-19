@@ -7,6 +7,7 @@ import (
 	"reflect"
 	"strconv"
 	"strings"
+	"time"
 
 	"github.com/elastic/beats/libbeat/logp"
 
@@ -118,6 +119,26 @@ func normalizeValue(value interface{}, keys ...string) (interface{}, []error) {
 		return nil, nil
 	}
 
+	// Normalize time values to a common.Time with UTC time zone.
+	switch v := value.(type) {
+	case time.Time:
+		value = Time(v.UTC())
+	case []time.Time:
+		times := make([]Time, 0, len(v))
+		for _, t := range v {
+			times = append(times, Time(t.UTC()))
+		}
+		value = times
+	case Time:
+		value = Time(time.Time(v).UTC())
+	case []Time:
+		times := make([]Time, 0, len(v))
+		for _, t := range v {
+			times = append(times, Time(time.Time(t).UTC()))
+		}
+		value = times
+	}
+
 	switch value.(type) {
 	case encoding.TextMarshaler:
 		text, err := value.(encoding.TextMarshaler).MarshalText()
@@ -131,8 +152,10 @@ func normalizeValue(value interface{}, keys ...string) (interface{}, []error) {
 	case []int, []int8, []int16, []int32, []int64:
 	case uint, uint8, uint16, uint32, uint64:
 	case []uint, []uint8, []uint16, []uint32, []uint64:
-	case float32, float64:
+	case float64:
 		return Float(value.(float64)), nil
+	case float32:
+		return Float(value.(float32)), nil
 	case []float32, []float64:
 	case complex64, complex128:
 	case []complex64, []complex128:
@@ -228,4 +251,37 @@ func joinKeys(keys ...string) string {
 // Defines the marshal of the Float type
 func (f Float) MarshalJSON() ([]byte, error) {
 	return []byte(fmt.Sprintf("%.6f", f)), nil
+}
+
+// DeDot a string by replacing all . with _
+// This helps when sending data to Elasticsearch to prevent object and key collisions.
+func DeDot(s string) string {
+	return strings.Replace(s, ".", "_", -1)
+}
+
+// DeDotJSON replaces in keys all . with _
+// This helps when sending data to Elasticsearch to prevent object and key collisions.
+func DeDotJSON(json interface{}) interface{} {
+	switch json := json.(type) {
+	case map[string]interface{}:
+		result := map[string]interface{}{}
+		for key, value := range json {
+			result[DeDot(key)] = DeDotJSON(value)
+		}
+		return result
+	case MapStr:
+		result := MapStr{}
+		for key, value := range json {
+			result[DeDot(key)] = DeDotJSON(value)
+		}
+		return result
+	case []interface{}:
+		result := make([]interface{}, len(json))
+		for i, value := range json {
+			result[i] = DeDotJSON(value)
+		}
+		return result
+	default:
+		return json
+	}
 }

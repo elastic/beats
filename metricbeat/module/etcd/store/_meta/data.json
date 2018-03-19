@@ -1,0 +1,49 @@
+{
+    "@timestamp": "2017-10-12T08:05:34.853Z",
+    "beat": {
+        "hostname": "host.example.com",
+        "name": "host.example.com"
+    },
+    "etcd": {
+        "store": {
+            "compareanddelete": {
+                "fail": 0,
+                "success": 0
+            },
+            "compareandswap": {
+                "fail": 0,
+                "success": 0
+            },
+            "create": {
+                "fail": 0,
+                "success": 1
+            },
+            "delete": {
+                "fail": 0,
+                "success": 0
+            },
+            "expire": {
+                "count": 0
+            },
+            "gets": {
+                "fail": 1,
+                "success": 35
+            },
+            "sets": {
+                "fail": 0,
+                "success": 2
+            },
+            "update": {
+                "fail": 0,
+                "success": 0
+            },
+            "watchers": 0
+        }
+    },
+    "metricset": {
+        "host": "etcd:2379",
+        "module": "etcd",
+        "name": "store",
+        "rtt": 115
+    }
+}

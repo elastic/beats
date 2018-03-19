@@ -2,11 +2,8 @@
   type: group
   description: >
     host
+  release: beta
   fields:
-    - name: datacenter
-      type: keyword
-      description: >
-        Datacenter name
     - name: name
       type: keyword
       description: >
@@ -38,3 +35,7 @@
       description: >
         Free Memory in bytes
       format: bytes
+    - name: network_names
+      type: keyword
+      description: >
+        Network names

@@ -71,7 +71,7 @@ func newBulkRequest(
 		return nil, err
 	}
 
-	url := makeURL(urlStr, path, "", params)
+	url := addToURL(urlStr, path, "", params)
 
 	var reader io.Reader
 	if body != nil {

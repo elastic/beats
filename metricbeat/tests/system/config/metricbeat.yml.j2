@@ -53,10 +53,10 @@ metricbeat.modules:
   processes: {{ m.processes }}
   {% endif -%}
 
-  {% if m.filters is defined -%}
-  filters:
-    {% for f in m.filters -%}
-    {% for k, v in f.items() -%}
+  {% if m.processors is defined -%}
+  processors:
+    {% for p in m.processors -%}
+    {% for k, v in p.items() -%}
     - {{ k }}.fields: [
       {%- for field in v -%}
       '{{ field }}' {%- if not loop.last %}, {% endif -%}
@@ -91,68 +91,31 @@ metricbeat.modules:
   {% endif -%}
 {%- endfor %}
 
-{% if reload -%}
+{% if reload or reload_path -%}
 metricbeat.config.modules:
-  path: {{ reload_path }}
+  path: {{ reload_path|default("${path.config}/modules.d/*.yml") }}
   reload.period: 1s
-  reload.enabled: true
+  reload.enabled: {{ reload|default("false")}}
 {% endif -%}
 
 # Disable random start delay for metricsets.
 metricbeat.max_start_delay: 0
 
-#================================ General =====================================
 
-# The name of the shipper that publishes the network data. It can be used to group
-# all the transactions sent by a single shipper in the web interface.
-# If this options is not defined, the hostname is used.
-name: {{shipper_name}}
+#============================== Autodiscover ==================================
 
-# The tags of the shipper are included in their own field with each
-# transaction published. Tags make it easy to group servers by different
-# logical properties.
-tags: [
-  {%- if agent_tags -%}
-      {%- for tag in agent_tags -%}
-          "{{ tag }}"
-          {%- if not loop.last %}, {% endif -%}
-      {%- endfor -%}
-  {%- endif -%}
-]
-
-
-#================================ Processors =====================================
-
-{%- if processors %}
-processors:
-{%- for processor in processors %}
-{%- for name, settings in processor.items() %}
-- {{name}}:
-  {%- if settings %}
-  {%- for k, v in settings.items() %}
+{% if autodiscover %}
+metricbeat.autodiscover:
+  providers:
+  {%- for provider, settings in autodiscover.items() %}
+  - type: {{provider}}
+    {%- if settings %}
+    {%- for k, v in settings.items() %}
     {{k}}:
       {{v | default([])}}
+    {%- endfor %}
+    {%- endif %}
   {%- endfor %}
-  {%- endif %}
-{%- endfor %}
-{%- endfor %}
+{% endif %}
 
-{%- endif %}
-
-#================================ Outputs =====================================
-
-# Configure what outputs to use when sending the data collected by the beat.
-# Multiple outputs may be used.
-
-#------------------------------- File output ----------------------------------
-output.file:
-  path: {{ output_file_path|default(beat.working_dir + "/output") }}
-  filename: "{{ output_file_filename|default("metricbeat") }}"
-  rotate_every_kb: 1000
-  #number_of_files: 7
-
-{% if path_data %}
-#================================ Paths =====================================
-path:
-  data: {{path_data}}
-{%endif%}
+{% include './tests/system/config/libbeat.yml.j2' %}

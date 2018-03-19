@@ -1,7 +1,9 @@
 - key: http
   title: "HTTP"
   description: >
-    http Module
+    HTTP module
+  release: ga
+  settings: ["ssl"]
   fields:
     - name: http
       type: group
@@ -13,7 +15,7 @@
               HTTP request information
           fields:
             - name: header
-              type: nested
+              type: object
               description: >
                 The HTTP headers sent
             - name: method
@@ -30,13 +32,19 @@
               HTTP response information
           fields:
             - name: header
-              type: nested
+              type: object
               description: >
                 The HTTP headers received
-            - name: status_code
+            - name: code
               type: keyword
               description: >
                 The HTTP status code
+              example: 404
+            - name: phrase
+              type: keyword
+              example: Not found
+              description: >
+                The HTTP status phrase
             - name: body
               type: keyword
               description: >

@@ -1,5 +1,5 @@
 - key: common
-  title: "Common Heartbeat Monitor"
+  title: "Common heartbeat monitor"
   description:
   fields:
     - name: monitor
@@ -25,7 +25,7 @@
 
         - name: duration
           type: group
-          description: total monitoring test duration
+          description: Total monitoring test duration
           fields:
             - name: us
               type: long
@@ -55,7 +55,7 @@
             Indicator if monitor could validate the service to be available.
 
 - key: resolve
-  title: "Host Lookup"
+  title: "Host lookup"
   description:
   fields:
     - name: resolve

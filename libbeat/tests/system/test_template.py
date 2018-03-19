@@ -1,47 +1,74 @@
 from base import BaseTest
 
-import os
-import json
-
 
 class Test(BaseTest):
 
-    def test_generate_templates(self):
+    def test_index_modified(self):
         """
-        Generates templates from other Beats.
+        Test that beat stops in case elasticsearch index is modified and pattern not
         """
-        self.render_config_template()
+        self.render_config_template(
+            elasticsearch={"index": "test"},
+        )
 
-        output_json = os.path.join(self.working_dir, "template.json")
-        fields_yml = "../../../../fields.yml"
+        exit_code = self.run_beat()
 
-        exit_code = self.run_beat(extra_args=[
-            "-E", "setup.template.output_to_file.path={}".format(output_json),
-            "-E", "setup.template.fields={}".format(fields_yml)])
         assert exit_code == 1
+        assert self.log_contains(
+            "setup.template.name and setup.template.pattern have to be set if index name is modified.") is True
 
-        # check json file
-        with open(output_json) as f:
-            tmpl = json.load(f)
-        assert "mappings" in tmpl
-
-    def test_generate_templates_v5(self):
+    def test_index_not_modified(self):
         """
-        Generates templates from other Beats.
+        Test that beat starts running if elasticsearch output is set
         """
-        self.render_config_template()
+        self.render_config_template(
+            elasticsearch={"hosts": "localhost:9200"},
+        )
 
-        output_json = os.path.join(self.working_dir, "template-5x.json")
-        fields_yml = "../../../../fields.yml"
+        proc = self.start_beat()
+        self.wait_until(lambda: self.log_contains("mockbeat start running."))
+        proc.check_kill_and_wait()
 
-        exit_code = self.run_beat(extra_args=[
-            "-E", "setup.template.output_to_file.path={}".format(output_json),
-            "-E", "setup.template.output_to_file.version=5.0.0".format(output_json),
-            "-E", "setup.template.fields={}".format(fields_yml)])
+    def test_index_modified_no_pattern(self):
+        """
+        Test that beat stops in case elasticsearch index is modified and pattern not
+        """
+        self.render_config_template(
+            elasticsearch={"index": "test"},
+            es_template_name="test",
+        )
+
+        exit_code = self.run_beat()
+
         assert exit_code == 1
+        assert self.log_contains(
+            "setup.template.name and setup.template.pattern have to be set if index name is modified.") is True
 
-        # check json file
-        with open(output_json) as f:
-            tmpl = json.load(f)
-        assert "mappings" in tmpl
-        assert tmpl["mappings"]["_default_"]["_all"]["norms"]["enabled"] is False
+    def test_index_modified_no_name(self):
+        """
+        Test that beat stops in case elasticsearch index is modified and name not
+        """
+        self.render_config_template(
+            elasticsearch={"index": "test"},
+            es_template_pattern="test",
+        )
+
+        exit_code = self.run_beat()
+
+        assert exit_code == 1
+        assert self.log_contains(
+            "setup.template.name and setup.template.pattern have to be set if index name is modified.") is True
+
+    def test_index_with_pattern_name(self):
+        """
+        Test that beat starts running if elasticsearch output with modified index and pattern and name are set
+        """
+        self.render_config_template(
+            elasticsearch={"hosts": "localhost:9200"},
+            es_template_name="test",
+            es_template_pattern="test-*",
+        )
+
+        proc = self.start_beat()
+        self.wait_until(lambda: self.log_contains("mockbeat start running."))
+        proc.check_kill_and_wait()

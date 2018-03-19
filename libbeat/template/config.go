@@ -1,19 +1,15 @@
 package template
 
+import "github.com/elastic/beats/libbeat/common"
+
 type TemplateConfig struct {
 	Enabled      bool             `config:"enabled"`
 	Name         string           `config:"name"`
+	Pattern      string           `config:"pattern"`
 	Fields       string           `config:"fields"`
+	AppendFields common.Fields    `config:"append_fields"`
 	Overwrite    bool             `config:"overwrite"`
 	Settings     TemplateSettings `config:"settings"`
-	OutputToFile OutputToFile     `config:"output_to_file"`
-}
-
-// OutputToFile contains the configuration options for generating
-// and writing the template into a file.
-type OutputToFile struct {
-	Path    string `config:"path"`
-	Version string `config:"version"`
 }
 
 type TemplateSettings struct {
@@ -22,7 +18,8 @@ type TemplateSettings struct {
 }
 
 var (
-	defaultConfig = TemplateConfig{
+	// DefaultConfig for index template
+	DefaultConfig = TemplateConfig{
 		Enabled: true,
 		Fields:  "fields.yml",
 	}

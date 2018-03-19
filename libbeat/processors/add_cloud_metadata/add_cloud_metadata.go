@@ -10,10 +10,12 @@ import (
 	"net/http"
 	"time"
 
+	"github.com/pkg/errors"
+
+	"github.com/elastic/beats/libbeat/beat"
 	"github.com/elastic/beats/libbeat/common"
 	"github.com/elastic/beats/libbeat/logp"
 	"github.com/elastic/beats/libbeat/processors"
-	"github.com/pkg/errors"
 )
 
 const (
@@ -186,7 +188,7 @@ func fetchMetadata(metadataFetchers []*metadataFetcher, timeout time.Duration) *
 }
 
 // getMetadataURLs loads config and generates the metadata URLs.
-func getMetadataURLs(c common.Config, defaultHost string, metadataURIs []string) ([]string, error) {
+func getMetadataURLs(c *common.Config, defaultHost string, metadataURIs []string) ([]string, error) {
 	var urls []string
 	config := struct {
 		MetadataHostAndPort string `config:"host"` // Specifies the host and port of the metadata service (for testing purposes only).
@@ -220,7 +222,7 @@ func makeJSONPicker(provider string) responseHandler {
 
 // newMetadataFetcher return metadataFetcher with one pass JSON responseHandler.
 func newMetadataFetcher(
-	c common.Config,
+	c *common.Config,
 	provider string,
 	headers map[string]string,
 	host string,
@@ -236,7 +238,7 @@ func newMetadataFetcher(
 	return fetcher, nil
 }
 
-func setupFetchers(c common.Config) ([]*metadataFetcher, error) {
+func setupFetchers(c *common.Config) ([]*metadataFetcher, error) {
 	var fetchers []*metadataFetcher
 	doFetcher, err := newDoMetadataFetcher(c)
 	if err != nil {
@@ -258,6 +260,10 @@ func setupFetchers(c common.Config) ([]*metadataFetcher, error) {
 	if err != nil {
 		return fetchers, err
 	}
+	azFetcher, err := newAzureVmMetadataFetcher(c)
+	if err != nil {
+		return fetchers, err
+	}
 
 	fetchers = []*metadataFetcher{
 		doFetcher,
@@ -265,11 +271,12 @@ func setupFetchers(c common.Config) ([]*metadataFetcher, error) {
 		gceFetcher,
 		qcloudFetcher,
 		ecsFetcher,
+		azFetcher,
 	}
 	return fetchers, nil
 }
 
-func newCloudMetadata(c common.Config) (processors.Processor, error) {
+func newCloudMetadata(c *common.Config) (processors.Processor, error) {
 	config := struct {
 		Timeout time.Duration `config:"timeout"` // Amount of time to wait for responses from the metadata services.
 	}{
@@ -288,27 +295,27 @@ func newCloudMetadata(c common.Config) (processors.Processor, error) {
 	result := fetchMetadata(fetchers, config.Timeout)
 	if result == nil {
 		logp.Info("add_cloud_metadata: hosting provider type not detected.")
-		return addCloudMetadata{}, nil
+		return &addCloudMetadata{}, nil
 	}
 
 	logp.Info("add_cloud_metadata: hosting provider type detected as %v, metadata=%v",
 		result.provider, result.metadata.String())
 
-	return addCloudMetadata{metadata: result.metadata}, nil
+	return &addCloudMetadata{metadata: result.metadata}, nil
 }
 
 type addCloudMetadata struct {
 	metadata common.MapStr
 }
 
-func (p addCloudMetadata) Run(event common.MapStr) (common.MapStr, error) {
+func (p addCloudMetadata) Run(event *beat.Event) (*beat.Event, error) {
 	if len(p.metadata) == 0 {
 		return event, nil
 	}
 
 	// This overwrites the meta.cloud if it exists. But the cloud key should be
 	// reserved for this processor so this should happen.
-	_, err := event.Put("meta.cloud", p.metadata)
+	_, err := event.PutValue("meta.cloud", p.metadata)
 
 	return event, err
 }

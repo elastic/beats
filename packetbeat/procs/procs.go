@@ -62,7 +62,6 @@ type ProcessesWatcher struct {
 var ProcWatcher ProcessesWatcher
 
 func (proc *ProcessesWatcher) Init(config ProcsConfig) error {
-
 	proc.procPrefix = ""
 	proc.portProcMap = make(map[uint16]portProcMapping)
 	proc.lastMapUpdate = time.Now()
@@ -174,7 +173,7 @@ func findPidsByCmdlineGrep(prefix string, process string) ([]int, error) {
 			continue
 		}
 
-		if strings.Index(string(cmdline), process) >= 0 {
+		if strings.Contains(string(cmdline), process) {
 			pids = append(pids, pid)
 		}
 	}
@@ -283,7 +282,6 @@ func hexToIPPort(str []byte, ipv6 bool) (net.IP, uint16, error) {
 }
 
 func (proc *ProcessesWatcher) updateMap() {
-
 	logp.Debug("procs", "UpdateMap()")
 	ipv4socks, err := socketsFromProc("/proc/net/tcp", false)
 	if err != nil {
@@ -320,7 +318,6 @@ func (proc *ProcessesWatcher) updateMap() {
 
 		}
 	}
-
 }
 
 func socketsFromProc(filename string, ipv6 bool) ([]*socketInfo, error) {
@@ -389,7 +386,6 @@ func (proc *ProcessesWatcher) updateMappingEntry(port uint16, pid int, p *proces
 }
 
 func findSocketsOfPid(prefix string, pid int) (inodes []uint64, err error) {
-
 	dirname := filepath.Join(prefix, "/proc", strconv.Itoa(pid), "fd")
 	procfs, err := os.Open(dirname)
 	if err != nil {
@@ -423,7 +419,6 @@ func findSocketsOfPid(prefix string, pid int) (inodes []uint64, err error) {
 }
 
 func (proc *ProcessesWatcher) isLocalIP(ip net.IP) bool {
-
 	if ip.IsLoopback() {
 		return true
 	}

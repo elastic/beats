@@ -2,6 +2,7 @@
   title: "Redis"
   description: >
     Redis metrics collected from Redis.
+  release: ga
   fields:
     - name: redis
       type: group

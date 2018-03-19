@@ -1,0 +1,1021 @@
+[
+  {
+    "_index": "filebeat-7.0.0-alpha1-2017.08.11",
+    "_type": "doc",
+    "_id": "wYtR0l0Bed9fOYVUjuwB",
+    "_version": 1,
+    "_score": null,
+    "_source": {
+      "@timestamp": "2017-08-04T10:48:21.167Z",
+      "offset": 2641,
+      "kafka": {
+        "log": {
+          "component": "Transaction Marker Channel Manager 0",
+          "level": "INFO",
+          "message": "Starting",
+          "class": "kafka.coordinator.transaction.TransactionMarkerChannelManager"
+        }
+      },
+      "beat": {
+        "hostname": "baldur",
+        "read_time": "2017-08-11T17:22:21.385Z",
+        "name": "baldur",
+        "version": "7.0.0-alpha1"
+      },
+      "prospector": {
+        "type": "log"
+      },
+      "input": {
+        "type": "log"
+      },
+      "source": "/home/n/go/src/github.com/elastic/beats/filebeat/module/kafka/log/test/server.log",
+      "fileset": {
+        "module": "kafka",
+        "name": "log"
+      },
+      "message": "[2017-08-04 10:48:21,167] INFO [Transaction Marker Channel Manager 0]: Starting (kafka.coordinator.transaction.TransactionMarkerChannelManager)"
+    },
+    "fields": {
+      "@timestamp": [
+        "2017-08-04T10:48:21.167Z"
+      ]
+    },
+    "highlight": {
+      "source": [
+        "@kibana-highlighted-field@/home/n/go/src/github.com/elastic/beats/filebeat/module/kafka/log/test/server.log@/kibana-highlighted-field@"
+      ]
+    },
+    "sort": [
+      1501843701167
+    ]
+  },
+
+  {
+    "_index": "filebeat-7.0.0-alpha1-2017.08.11",
+    "_type": "doc",
+    "_id": "sotR0l0Bed9fOYVUfeyz",
+    "_version": 1,
+    "_score": null,
+    "_source": {
+      "@timestamp": "2017-08-04T10:48:21.162Z",
+      "offset": 2497,
+      "kafka": {
+        "log": {
+          "component": "Transaction Coordinator 0",
+          "level": "INFO",
+          "message": "Starting up.",
+          "class": "kafka.coordinator.transaction.TransactionCoordinator"
+        }
+      },
+      "beat": {
+        "hostname": "baldur",
+        "read_time": "2017-08-11T17:22:21.384Z",
+        "name": "baldur",
+        "version": "7.0.0-alpha1"
+      },
+      "prospector": {
+        "type": "log"
+      },
+      "input": {
+        "type": "log"
+      },
+      "source": "/home/n/go/src/github.com/elastic/beats/filebeat/module/kafka/log/test/server.log",
+      "fileset": {
+        "module": "kafka",
+        "name": "log"
+      },
+      "message": "[2017-08-04 10:48:21,162] INFO [Transaction Coordinator 0]: Starting up. (kafka.coordinator.transaction.TransactionCoordinator)"
+    },
+    "fields": {
+      "@timestamp": [
+        "2017-08-04T10:48:21.162Z"
+      ]
+    },
+    "highlight": {
+      "source": [
+        "@kibana-highlighted-field@/home/n/go/src/github.com/elastic/beats/filebeat/module/kafka/log/test/server.log@/kibana-highlighted-field@"
+      ]
+    },
+    "sort": [
+      1501843701162
+    ]
+  },
+
+  {
+    "_index": "filebeat-7.0.0-alpha1-2017.08.11",
+    "_type": "doc",
+    "_id": "sYtR0l0Bed9fOYVUfeyz",
+    "_version": 1,
+    "_score": null,
+    "_source": {
+      "@timestamp": "2017-08-04T10:48:21.127Z",
+      "offset": 2369,
+      "kafka": {
+        "log": {
+          "component": "ProducerId Manager 0",
+          "level": "INFO",
+          "message": "Acquired new producerId block (brokerId:0,blockStartProducerId:0,blockEndProducerId:999) by writing to Zk with path version 1",
+          "class": "kafka.coordinator.transaction.ProducerIdManager"
+        }
+      },
+      "beat": {
+        "hostname": "baldur",
+        "read_time": "2017-08-11T17:22:21.384Z",
+        "name": "baldur",
+        "version": "7.0.0-alpha1"
+      },
+      "prospector": {
+        "type": "log"
+      },
+      "input": {
+        "type": "log"
+      },
+      "source": "/home/n/go/src/github.com/elastic/beats/filebeat/module/kafka/log/test/server.log",
+      "fileset": {
+        "module": "kafka",
+        "name": "log"
+      },
+      "message": "[2017-08-04 10:48:21,127] INFO [ProducerId Manager 0]: Acquired new producerId block (brokerId:0,blockStartProducerId:0,blockEndProducerId:999) by writing to Zk with path version 1 (kafka.coordinator.transaction.ProducerIdManager)"
+    },
+    "fields": {
+      "@timestamp": [
+        "2017-08-04T10:48:21.127Z"
+      ]
+    },
+    "highlight": {
+      "source": [
+        "@kibana-highlighted-field@/home/n/go/src/github.com/elastic/beats/filebeat/module/kafka/log/test/server.log@/kibana-highlighted-field@"
+      ]
+    },
+    "sort": [
+      1501843701127
+    ]
+  },
+
+  {
+    "_index": "filebeat-7.0.0-alpha1-2017.08.11",
+    "_type": "doc",
+    "_id": "sItR0l0Bed9fOYVUfeyz",
+    "_version": 1,
+    "_score": null,
+    "_source": {
+      "@timestamp": "2017-08-04T10:48:21.095Z",
+      "offset": 2138,
+      "kafka": {
+        "log": {
+          "component": "Group Metadata Manager on Broker 0",
+          "level": "INFO",
+          "message": "Removed 0 expired offsets in 1 milliseconds.",
+          "class": "kafka.coordinator.group.GroupMetadataManager"
+        }
+      },
+      "beat": {
+        "hostname": "baldur",
+        "read_time": "2017-08-11T17:22:21.384Z",
+        "name": "baldur",
+        "version": "7.0.0-alpha1"
+      },
+      "prospector": {
+        "type": "log"
+      },
+      "input": {
+        "type": "log"
+      },
+      "source": "/home/n/go/src/github.com/elastic/beats/filebeat/module/kafka/log/test/server.log",
+      "message": "[2017-08-04 10:48:21,095] INFO [Group Metadata Manager on Broker 0]: Removed 0 expired offsets in 1 milliseconds. (kafka.coordinator.group.GroupMetadataManager)",
+      "fileset": {
+        "module": "kafka",
+        "name": "log"
+      }
+    },
+    "fields": {
+      "@timestamp": [
+        "2017-08-04T10:48:21.095Z"
+      ]
+    },
+    "highlight": {
+      "source": [
+        "@kibana-highlighted-field@/home/n/go/src/github.com/elastic/beats/filebeat/module/kafka/log/test/server.log@/kibana-highlighted-field@"
+      ]
+    },
+    "sort": [
+      1501843701095
+    ]
+  },
+
+  {
+    "_index": "filebeat-7.0.0-alpha1-2017.08.11",
+    "_type": "doc",
+    "_id": "r4tR0l0Bed9fOYVUfeyz",
+    "_version": 1,
+    "_score": null,
+    "_source": {
+      "@timestamp": "2017-08-04T10:48:21.063Z",
+      "offset": 1977,
+      "kafka": {
+        "log": {
+          "component": "unknown",
+          "level": "INFO",
+          "message": "Result of znode creation is: OK",
+          "class": "kafka.utils.ZKCheckedEphemeral"
+        }
+      },
+      "beat": {
+        "hostname": "baldur",
+        "read_time": "2017-08-11T17:22:21.384Z",
+        "name": "baldur",
+        "version": "7.0.0-alpha1"
+      },
+      "prospector": {
+        "type": "log"
+      },
+      "input": {
+        "type": "log"
+      },
+      "source": "/home/n/go/src/github.com/elastic/beats/filebeat/module/kafka/log/test/server.log",
+      "message": "[2017-08-04 10:48:21,063] INFO Result of znode creation is: OK (kafka.utils.ZKCheckedEphemeral)",
+      "fileset": {
+        "module": "kafka",
+        "name": "log"
+      }
+    },
+    "fields": {
+      "@timestamp": [
+        "2017-08-04T10:48:21.063Z"
+      ]
+    },
+    "highlight": {
+      "source": [
+        "@kibana-highlighted-field@/home/n/go/src/github.com/elastic/beats/filebeat/module/kafka/log/test/server.log@/kibana-highlighted-field@"
+      ]
+    },
+    "sort": [
+      1501843701063
+    ]
+  },
+
+  {
+    "_index": "filebeat-7.0.0-alpha1-2017.08.11",
+    "_type": "doc",
+    "_id": "rotR0l0Bed9fOYVUfeyz",
+    "_version": 1,
+    "_score": null,
+    "_source": {
+      "@timestamp": "2017-08-04T10:48:21.062Z",
+      "offset": 1881,
+      "kafka": {
+        "log": {
+          "component": "ExpirationReaper-0-Heartbeat",
+          "level": "INFO",
+          "message": "Starting",
+          "class": "kafka.server.DelayedOperationPurgatory$ExpiredOperationReaper"
+        }
+      },
+      "beat": {
+        "hostname": "baldur",
+        "read_time": "2017-08-11T17:22:21.381Z",
+        "name": "baldur",
+        "version": "7.0.0-alpha1"
+      },
+      "prospector": {
+        "type": "log"
+      },
+      "input": {
+        "type": "log"
+      },
+      "source": "/home/n/go/src/github.com/elastic/beats/filebeat/module/kafka/log/test/server.log",
+      "message": "[2017-08-04 10:48:21,062] INFO [ExpirationReaper-0-Heartbeat]: Starting (kafka.server.DelayedOperationPurgatory$ExpiredOperationReaper)",
+      "fileset": {
+        "module": "kafka",
+        "name": "log"
+      }
+    },
+    "fields": {
+      "@timestamp": [
+        "2017-08-04T10:48:21.062Z"
+      ]
+    },
+    "highlight": {
+      "source": [
+        "@kibana-highlighted-field@/home/n/go/src/github.com/elastic/beats/filebeat/module/kafka/log/test/server.log@/kibana-highlighted-field@"
+      ]
+    },
+    "sort": [
+      1501843701062
+    ]
+  },
+
+  {
+    "_index": "filebeat-7.0.0-alpha1-2017.08.11",
+    "_type": "doc",
+    "_id": "rYtR0l0Bed9fOYVUfeyz",
+    "_version": 1,
+    "_score": null,
+    "_source": {
+      "@timestamp": "2017-08-04T10:48:20.873Z",
+      "offset": 1745,
+      "kafka": {
+        "log": {
+          "component": "unknown",
+          "level": "INFO",
+          "message": "Loading logs.",
+          "class": "kafka.log.LogManager"
+        }
+      },
+      "beat": {
+        "hostname": "baldur",
+        "read_time": "2017-08-11T17:22:21.381Z",
+        "name": "baldur",
+        "version": "7.0.0-alpha1"
+      },
+      "prospector": {
+        "type": "log"
+      },
+      "input": {
+        "type": "log"
+      },
+      "source": "/home/n/go/src/github.com/elastic/beats/filebeat/module/kafka/log/test/server.log",
+      "message": "[2017-08-04 10:48:20,873] INFO Loading logs. (kafka.log.LogManager)",
+      "fileset": {
+        "module": "kafka",
+        "name": "log"
+      }
+    },
+    "fields": {
+      "@timestamp": [
+        "2017-08-04T10:48:20.873Z"
+      ]
+    },
+    "highlight": {
+      "source": [
+        "@kibana-highlighted-field@/home/n/go/src/github.com/elastic/beats/filebeat/module/kafka/log/test/server.log@/kibana-highlighted-field@"
+      ]
+    },
+    "sort": [
+      1501843700873
+    ]
+  },
+
+  {
+    "_index": "filebeat-7.0.0-alpha1-2017.08.11",
+    "_type": "doc",
+    "_id": "rItR0l0Bed9fOYVUfeyz",
+    "_version": 1,
+    "_score": null,
+    "_source": {
+      "@timestamp": "2017-08-04T10:48:20.866Z",
+      "offset": 1677,
+      "kafka": {
+        "log": {
+          "component": "unknown",
+          "level": "INFO",
+          "message": "Log directory '/tmp/kafka-logs' not found, creating it.",
+          "class": "kafka.log.LogManager"
+        }
+      },
+      "beat": {
+        "hostname": "baldur",
+        "read_time": "2017-08-11T17:22:21.381Z",
+        "name": "baldur",
+        "version": "7.0.0-alpha1"
+      },
+      "prospector": {
+        "type": "log"
+      },
+      "input": {
+        "type": "log"
+      },
+      "source": "/home/n/go/src/github.com/elastic/beats/filebeat/module/kafka/log/test/server.log",
+      "fileset": {
+        "module": "kafka",
+        "name": "log"
+      },
+      "message": "[2017-08-04 10:48:20,866] INFO Log directory '/tmp/kafka-logs' not found, creating it. (kafka.log.LogManager)"
+    },
+    "fields": {
+      "@timestamp": [
+        "2017-08-04T10:48:20.866Z"
+      ]
+    },
+    "highlight": {
+      "source": [
+        "@kibana-highlighted-field@/home/n/go/src/github.com/elastic/beats/filebeat/module/kafka/log/test/server.log@/kibana-highlighted-field@"
+      ]
+    },
+    "sort": [
+      1501843700866
+    ]
+  },
+
+  {
+    "_index": "filebeat-7.0.0-alpha1-2017.08.11",
+    "_type": "doc",
+    "_id": "q4tR0l0Bed9fOYVUfeyz",
+    "_version": 1,
+    "_score": null,
+    "_source": {
+      "@timestamp": "2017-08-04T10:48:20.800Z",
+      "offset": 1567,
+      "kafka": {
+        "log": {
+          "component": "ThrottledRequestReaper-Fetch",
+          "level": "INFO",
+          "message": "Starting",
+          "class": "kafka.server.ClientQuotaManager$ThrottledRequestReaper"
+        }
+      },
+      "beat": {
+        "hostname": "baldur",
+        "read_time": "2017-08-11T17:22:21.380Z",
+        "name": "baldur",
+        "version": "7.0.0-alpha1"
+      },
+      "prospector": {
+        "type": "log"
+      },
+      "input": {
+        "type": "log"
+      },
+      "source": "/home/n/go/src/github.com/elastic/beats/filebeat/module/kafka/log/test/server.log",
+      "message": "[2017-08-04 10:48:20,800] INFO [ThrottledRequestReaper-Fetch]: Starting (kafka.server.ClientQuotaManager$ThrottledRequestReaper)",
+      "fileset": {
+        "module": "kafka",
+        "name": "log"
+      }
+    },
+    "fields": {
+      "@timestamp": [
+        "2017-08-04T10:48:20.800Z"
+      ]
+    },
+    "highlight": {
+      "source": [
+        "@kibana-highlighted-field@/home/n/go/src/github.com/elastic/beats/filebeat/module/kafka/log/test/server.log@/kibana-highlighted-field@"
+      ]
+    },
+    "sort": [
+      1501843700800
+    ]
+  },
+
+  {
+    "_index": "filebeat-7.0.0-alpha1-2017.08.11",
+    "_type": "doc",
+    "_id": "qotR0l0Bed9fOYVUfeyz",
+    "_version": 1,
+    "_score": null,
+    "_source": {
+      "@timestamp": "2017-08-04T10:48:20.748Z",
+      "offset": 1438,
+      "kafka": {
+        "log": {
+          "component": "unknown",
+          "level": "WARN",
+          "message": "No meta.properties file under dir /tmp/kafka-logs/meta.properties",
+          "class": "kafka.server.BrokerMetadataCheckpoint"
+        }
+      },
+      "beat": {
+        "hostname": "baldur",
+        "read_time": "2017-08-11T17:22:21.380Z",
+        "name": "baldur",
+        "version": "7.0.0-alpha1"
+      },
+      "prospector": {
+        "type": "log"
+      },
+      "input": {
+        "type": "log"
+      },
+      "source": "/home/n/go/src/github.com/elastic/beats/filebeat/module/kafka/log/test/server.log",
+      "message": "[2017-08-04 10:48:20,748] WARN No meta.properties file under dir /tmp/kafka-logs/meta.properties (kafka.server.BrokerMetadataCheckpoint)",
+      "fileset": {
+        "module": "kafka",
+        "name": "log"
+      }
+    },
+    "fields": {
+      "@timestamp": [
+        "2017-08-04T10:48:20.748Z"
+      ]
+    },
+    "highlight": {
+      "source": [
+        "@kibana-highlighted-field@/home/n/go/src/github.com/elastic/beats/filebeat/module/kafka/log/test/server.log@/kibana-highlighted-field@"
+      ]
+    },
+    "sort": [
+      1501843700748
+    ]
+  },
+
+  {
+    "_index": "filebeat-7.0.0-alpha1-2017.08.11",
+    "_type": "doc",
+    "_id": "qYtR0l0Bed9fOYVUfeyz",
+    "_version": 1,
+    "_score": null,
+    "_source": {
+      "@timestamp": "2017-08-04T10:48:20.458Z",
+      "offset": 1301,
+      "kafka": {
+        "log": {
+          "component": "unknown",
+          "level": "INFO",
+          "message": "zookeeper state changed (SyncConnected)",
+          "class": "org.I0Itec.zkclient.ZkClient"
+        }
+      },
+      "beat": {
+        "hostname": "baldur",
+        "read_time": "2017-08-11T17:22:21.379Z",
+        "name": "baldur",
+        "version": "7.0.0-alpha1"
+      },
+      "prospector": {
+        "type": "log"
+      },
+      "input": {
+        "type": "log"
+      },
+      "source": "/home/n/go/src/github.com/elastic/beats/filebeat/module/kafka/log/test/server.log",
+      "fileset": {
+        "module": "kafka",
+        "name": "log"
+      },
+      "message": "[2017-08-04 10:48:20,458] INFO zookeeper state changed (SyncConnected) (org.I0Itec.zkclient.ZkClient)"
+    },
+    "fields": {
+      "@timestamp": [
+        "2017-08-04T10:48:20.458Z"
+      ]
+    },
+    "highlight": {
+      "source": [
+        "@kibana-highlighted-field@/home/n/go/src/github.com/elastic/beats/filebeat/module/kafka/log/test/server.log@/kibana-highlighted-field@"
+      ]
+    },
+    "sort": [
+      1501843700458
+    ]
+  },
+
+  {
+    "_index": "filebeat-7.0.0-alpha1-2017.08.11",
+    "_type": "doc",
+    "_id": "qItR0l0Bed9fOYVUfeyz",
+    "_version": 1,
+    "_score": null,
+    "_source": {
+      "@timestamp": "2017-08-04T10:48:20.457Z",
+      "offset": 1199,
+      "kafka": {
+        "log": {
+          "component": "unknown",
+          "level": "INFO",
+          "message": "Session establishment complete on server localhost/0:0:0:0:0:0:0:1:2181, sessionid = 0x15dabf8d4140000, negotiated timeout = 6000",
+          "class": "org.apache.zookeeper.ClientCnxn"
+        }
+      },
+      "beat": {
+        "hostname": "baldur",
+        "read_time": "2017-08-11T17:22:21.379Z",
+        "name": "baldur",
+        "version": "7.0.0-alpha1"
+      },
+      "prospector": {
+        "type": "log"
+      },
+      "input": {
+        "type": "log"
+      },
+      "source": "/home/n/go/src/github.com/elastic/beats/filebeat/module/kafka/log/test/server.log",
+      "message": "[2017-08-04 10:48:20,457] INFO Session establishment complete on server localhost/0:0:0:0:0:0:0:1:2181, sessionid = 0x15dabf8d4140000, negotiated timeout = 6000 (org.apache.zookeeper.ClientCnxn)",
+      "fileset": {
+        "module": "kafka",
+        "name": "log"
+      }
+    },
+    "fields": {
+      "@timestamp": [
+        "2017-08-04T10:48:20.457Z"
+      ]
+    },
+    "highlight": {
+      "source": [
+        "@kibana-highlighted-field@/home/n/go/src/github.com/elastic/beats/filebeat/module/kafka/log/test/server.log@/kibana-highlighted-field@"
+      ]
+    },
+    "sort": [
+      1501843700457
+    ]
+  },
+
+  {
+    "_index": "filebeat-7.0.0-alpha1-2017.08.11",
+    "_type": "doc",
+    "_id": "p4tR0l0Bed9fOYVUfeyz",
+    "_version": 1,
+    "_score": null,
+    "_source": {
+      "@timestamp": "2017-08-04T10:48:20.420Z",
+      "offset": 1004,
+      "kafka": {
+        "log": {
+          "component": "unknown",
+          "level": "INFO",
+          "message": "Socket connection established to localhost/0:0:0:0:0:0:0:1:2181, initiating session",
+          "class": "org.apache.zookeeper.ClientCnxn"
+        }
+      },
+      "beat": {
+        "hostname": "baldur",
+        "read_time": "2017-08-11T17:22:21.379Z",
+        "name": "baldur",
+        "version": "7.0.0-alpha1"
+      },
+      "prospector": {
+        "type": "log"
+      },
+      "input": {
+        "type": "log"
+      },
+      "source": "/home/n/go/src/github.com/elastic/beats/filebeat/module/kafka/log/test/server.log",
+      "message": "[2017-08-04 10:48:20,420] INFO Socket connection established to localhost/0:0:0:0:0:0:0:1:2181, initiating session (org.apache.zookeeper.ClientCnxn)",
+      "fileset": {
+        "module": "kafka",
+        "name": "log"
+      }
+    },
+    "fields": {
+      "@timestamp": [
+        "2017-08-04T10:48:20.420Z"
+      ]
+    },
+    "highlight": {
+      "source": [
+        "@kibana-highlighted-field@/home/n/go/src/github.com/elastic/beats/filebeat/module/kafka/log/test/server.log@/kibana-highlighted-field@"
+      ]
+    },
+    "sort": [
+      1501843700420
+    ]
+  },
+
+  {
+    "_index": "filebeat-7.0.0-alpha1-2017.08.11",
+    "_type": "doc",
+    "_id": "potR0l0Bed9fOYVUfeyz",
+    "_version": 1,
+    "_score": null,
+    "_source": {
+      "@timestamp": "2017-08-04T10:48:20.415Z",
+      "offset": 855,
+      "kafka": {
+        "log": {
+          "component": "unknown",
+          "level": "INFO",
+          "message": "Opening socket connection to server localhost/0:0:0:0:0:0:0:1:2181. Will not attempt to authenticate using SASL (unknown error)",
+          "class": "org.apache.zookeeper.ClientCnxn"
+        }
+      },
+      "beat": {
+        "hostname": "baldur",
+        "read_time": "2017-08-11T17:22:21.379Z",
+        "name": "baldur",
+        "version": "7.0.0-alpha1"
+      },
+      "prospector": {
+        "type": "log"
+      },
+      "input": {
+        "type": "log"
+      },
+      "source": "/home/n/go/src/github.com/elastic/beats/filebeat/module/kafka/log/test/server.log",
+      "message": "[2017-08-04 10:48:20,415] INFO Opening socket connection to server localhost/0:0:0:0:0:0:0:1:2181. Will not attempt to authenticate using SASL (unknown error) (org.apache.zookeeper.ClientCnxn)",
+      "fileset": {
+        "module": "kafka",
+        "name": "log"
+      }
+    },
+    "fields": {
+      "@timestamp": [
+        "2017-08-04T10:48:20.415Z"
+      ]
+    },
+    "highlight": {
+      "source": [
+        "@kibana-highlighted-field@/home/n/go/src/github.com/elastic/beats/filebeat/module/kafka/log/test/server.log@/kibana-highlighted-field@"
+      ]
+    },
+    "sort": [
+      1501843700415
+    ]
+  },
+
+  {
+    "_index": "filebeat-7.0.0-alpha1-2017.08.11",
+    "_type": "doc",
+    "_id": "pYtR0l0Bed9fOYVUfeyz",
+    "_version": 1,
+    "_score": null,
+    "_source": {
+      "@timestamp": "2017-08-04T10:48:20.413Z",
+      "offset": 662,
+      "kafka": {
+        "log": {
+          "component": "unknown",
+          "level": "INFO",
+          "message": "Waiting for keeper state SyncConnected",
+          "class": "org.I0Itec.zkclient.ZkClient"
+        }
+      },
+      "beat": {
+        "hostname": "baldur",
+        "read_time": "2017-08-11T17:22:21.378Z",
+        "name": "baldur",
+        "version": "7.0.0-alpha1"
+      },
+      "prospector": {
+        "type": "log"
+      },
+      "input": {
+        "type": "log"
+      },
+      "source": "/home/n/go/src/github.com/elastic/beats/filebeat/module/kafka/log/test/server.log",
+      "message": "[2017-08-04 10:48:20,413] INFO Waiting for keeper state SyncConnected (org.I0Itec.zkclient.ZkClient)",
+      "fileset": {
+        "module": "kafka",
+        "name": "log"
+      }
+    },
+    "fields": {
+      "@timestamp": [
+        "2017-08-04T10:48:20.413Z"
+      ]
+    },
+    "highlight": {
+      "source": [
+        "@kibana-highlighted-field@/home/n/go/src/github.com/elastic/beats/filebeat/module/kafka/log/test/server.log@/kibana-highlighted-field@"
+      ]
+    },
+    "sort": [
+      1501843700413
+    ]
+  },
+
+  {
+    "_index": "filebeat-7.0.0-alpha1-2017.08.11",
+    "_type": "doc",
+    "_id": "pItR0l0Bed9fOYVUfeyz",
+    "_version": 1,
+    "_score": null,
+    "_source": {
+      "@timestamp": "2017-08-04T10:48:20.401Z",
+      "offset": 561,
+      "kafka": {
+        "log": {
+          "component": "unknown",
+          "level": "INFO",
+          "message": "Initiating client connection, connectString=localhost:2181 sessionTimeout=6000 watcher=org.I0Itec.zkclient.ZkClient@5ffead27",
+          "class": "org.apache.zookeeper.ZooKeeper"
+        }
+      },
+      "beat": {
+        "hostname": "baldur",
+        "read_time": "2017-08-11T17:22:21.378Z",
+        "name": "baldur",
+        "version": "7.0.0-alpha1"
+      },
+      "prospector": {
+        "type": "log"
+      },
+      "input": {
+        "type": "log"
+      },
+      "source": "/home/n/go/src/github.com/elastic/beats/filebeat/module/kafka/log/test/server.log",
+      "message": "[2017-08-04 10:48:20,401] INFO Initiating client connection, connectString=localhost:2181 sessionTimeout=6000 watcher=org.I0Itec.zkclient.ZkClient@5ffead27 (org.apache.zookeeper.ZooKeeper)",
+      "fileset": {
+        "module": "kafka",
+        "name": "log"
+      }
+    },
+    "fields": {
+      "@timestamp": [
+        "2017-08-04T10:48:20.401Z"
+      ]
+    },
+    "highlight": {
+      "source": [
+        "@kibana-highlighted-field@/home/n/go/src/github.com/elastic/beats/filebeat/module/kafka/log/test/server.log@/kibana-highlighted-field@"
+      ]
+    },
+    "sort": [
+      1501843700401
+    ]
+  },
+
+  {
+    "_index": "filebeat-7.0.0-alpha1-2017.08.11",
+    "_type": "doc",
+    "_id": "o4tR0l0Bed9fOYVUfeyz",
+    "_version": 1,
+    "_score": null,
+    "_source": {
+      "@timestamp": "2017-08-04T10:48:20.400Z",
+      "offset": 372,
+      "kafka": {
+        "log": {
+          "component": "unknown",
+          "level": "INFO",
+          "message": "Client environment:java.compiler=<NA>",
+          "class": "org.apache.zookeeper.ZooKeeper"
+        }
+      },
+      "beat": {
+        "hostname": "baldur",
+        "read_time": "2017-08-11T17:22:21.359Z",
+        "name": "baldur",
+        "version": "7.0.0-alpha1"
+      },
+      "prospector": {
+        "type": "log"
+      },
+      "input": {
+        "type": "log"
+      },
+      "source": "/home/n/go/src/github.com/elastic/beats/filebeat/module/kafka/log/test/server.log",
+      "message": "[2017-08-04 10:48:20,400] INFO Client environment:java.compiler=<NA> (org.apache.zookeeper.ZooKeeper)",
+      "fileset": {
+        "module": "kafka",
+        "name": "log"
+      }
+    },
+    "fields": {
+      "@timestamp": [
+        "2017-08-04T10:48:20.400Z"
+      ]
+    },
+    "highlight": {
+      "source": [
+        "@kibana-highlighted-field@/home/n/go/src/github.com/elastic/beats/filebeat/module/kafka/log/test/server.log@/kibana-highlighted-field@"
+      ]
+    },
+    "sort": [
+      1501843700400
+    ]
+  },
+
+  {
+    "_index": "filebeat-7.0.0-alpha1-2017.08.11",
+    "_type": "doc",
+    "_id": "ootR0l0Bed9fOYVUfeyz",
+    "_version": 1,
+    "_score": null,
+    "_source": {
+      "@timestamp": "2017-08-04T10:48:20.400Z",
+      "offset": 270,
+      "kafka": {
+        "log": {
+          "component": "unknown",
+          "level": "INFO",
+          "message": "Client environment:java.io.tmpdir=/tmp",
+          "class": "org.apache.zookeeper.ZooKeeper"
+        }
+      },
+      "beat": {
+        "hostname": "baldur",
+        "read_time": "2017-08-11T17:22:21.359Z",
+        "name": "baldur",
+        "version": "7.0.0-alpha1"
+      },
+      "prospector": {
+        "type": "log"
+      },
+      "input": {
+        "type": "log"
+      },
+      "source": "/home/n/go/src/github.com/elastic/beats/filebeat/module/kafka/log/test/server.log",
+      "message": "[2017-08-04 10:48:20,400] INFO Client environment:java.io.tmpdir=/tmp (org.apache.zookeeper.ZooKeeper)",
+      "fileset": {
+        "module": "kafka",
+        "name": "log"
+      }
+    },
+    "fields": {
+      "@timestamp": [
+        "2017-08-04T10:48:20.400Z"
+      ]
+    },
+    "highlight": {
+      "source": [
+        "@kibana-highlighted-field@/home/n/go/src/github.com/elastic/beats/filebeat/module/kafka/log/test/server.log@/kibana-highlighted-field@"
+      ]
+    },
+    "sort": [
+      1501843700400
+    ]
+  },
+
+  {
+    "_index": "filebeat-7.0.0-alpha1-2017.08.11",
+    "_type": "doc",
+    "_id": "oYtR0l0Bed9fOYVUfeyz",
+    "_version": 1,
+    "_score": null,
+    "_source": {
+      "@timestamp": "2017-08-04T10:48:20.379Z",
+      "offset": 167,
+      "kafka": {
+        "log": {
+          "component": "unknown",
+          "level": "INFO",
+          "message": "Connecting to zookeeper on localhost:2181",
+          "class": "kafka.server.KafkaServer"
+        }
+      },
+      "beat": {
+        "hostname": "baldur",
+        "read_time": "2017-08-11T17:22:21.359Z",
+        "name": "baldur",
+        "version": "7.0.0-alpha1"
+      },
+      "prospector": {
+        "type": "log"
+      },
+      "input": {
+        "type": "log"
+      },
+      "source": "/home/n/go/src/github.com/elastic/beats/filebeat/module/kafka/log/test/server.log",
+      "message": "[2017-08-04 10:48:20,379] INFO Connecting to zookeeper on localhost:2181 (kafka.server.KafkaServer)",
+      "fileset": {
+        "module": "kafka",
+        "name": "log"
+      }
+    },
+    "fields": {
+      "@timestamp": [
+        "2017-08-04T10:48:20.379Z"
+      ]
+    },
+    "highlight": {
+      "source": [
+        "@kibana-highlighted-field@/home/n/go/src/github.com/elastic/beats/filebeat/module/kafka/log/test/server.log@/kibana-highlighted-field@"
+      ]
+    },
+    "sort": [
+      1501843700379
+    ]
+  },
+
+  {
+    "_index": "filebeat-7.0.0-alpha1-2017.08.11",
+    "_type": "doc",
+    "_id": "oItR0l0Bed9fOYVUfeyz",
+    "_version": 1,
+    "_score": null,
+    "_source": {
+      "@timestamp": "2017-08-04T10:48:20.377Z",
+      "offset": 67,
+      "kafka": {
+        "log": {
+          "component": "unknown",
+          "level": "INFO",
+          "message": "starting",
+          "class": "kafka.server.KafkaServer"
+        }
+      },
+      "beat": {
+        "hostname": "baldur",
+        "read_time": "2017-08-11T17:22:21.359Z",
+        "name": "baldur",
+        "version": "7.0.0-alpha1"
+      },
+      "prospector": {
+        "type": "log"
+      },
+      "input": {
+        "type": "log"
+      },
+      "source": "/home/n/go/src/github.com/elastic/beats/filebeat/module/kafka/log/test/server.log",
+      "fileset": {
+        "module": "kafka",
+        "name": "log"
+      },
+      "message": "[2017-08-04 10:48:20,377] INFO starting (kafka.server.KafkaServer)"
+    },
+    "fields": {
+      "@timestamp": [
+        "2017-08-04T10:48:20.377Z"
+      ]
+    },
+    "highlight": {
+      "source": [
+        "@kibana-highlighted-field@/home/n/go/src/github.com/elastic/beats/filebeat/module/kafka/log/test/server.log@/kibana-highlighted-field@"
+      ]
+    },
+    "sort": [
+      1501843700377
+    ]
+  }
+]

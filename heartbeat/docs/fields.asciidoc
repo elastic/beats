@@ -4,7 +4,7 @@ This file is generated! See _meta/fields.yml and scripts/generate_field_docs.py
 ////
 
 [[exported-fields]]
-= Exported Fields
+= Exported fields
 
 [partintro]
 
@@ -15,6 +15,8 @@ grouped in the following categories:
 * <<exported-fields-beat>>
 * <<exported-fields-cloud>>
 * <<exported-fields-common>>
+* <<exported-fields-docker-processor>>
+* <<exported-fields-host-processor>>
 * <<exported-fields-http>>
 * <<exported-fields-icmp>>
 * <<exported-fields-kubernetes-processor>>
@@ -25,38 +27,38 @@ grouped in the following categories:
 
 --
 [[exported-fields-beat]]
-== Beat Fields
+== Beat fields
 
 Contains common beat fields available in all event types.
 
 
 
 [float]
-=== beat.name
+=== `beat.name`
 
 The name of the Beat sending the log messages. If the Beat name is set in the configuration file, then that value is used. If it is not set, the hostname is used. To set the Beat name, use the `name` option in the configuration file.
 
 
 [float]
-=== beat.hostname
+=== `beat.hostname`
 
 The hostname as returned by the operating system on which the Beat is running.
 
 
 [float]
-=== beat.timezone
+=== `beat.timezone`
 
 The timezone as returned by the operating system on which the Beat is running.
 
 
 [float]
-=== beat.version
+=== `beat.version`
 
 The version of the beat that generated this event.
 
 
 [float]
-=== @timestamp
+=== `@timestamp`
 
 type: date
 
@@ -70,13 +72,13 @@ The timestamp when the event log record was generated.
 
 
 [float]
-=== tags
+=== `tags`
 
 Arbitrary tags that can be set per Beat and per transaction type.
 
 
 [float]
-=== fields
+=== `fields`
 
 type: object
 
@@ -84,14 +86,14 @@ Contains user configurable fields.
 
 
 [float]
-== error Fields
+== error fields
 
 Error fields containing additional info in case of errors.
 
 
 
 [float]
-=== error.message
+=== `error.message`
 
 type: text
 
@@ -99,7 +101,7 @@ Error message.
 
 
 [float]
-=== error.code
+=== `error.code`
 
 type: long
 
@@ -107,7 +109,7 @@ Error code.
 
 
 [float]
-=== error.type
+=== `error.type`
 
 type: keyword
 
@@ -115,14 +117,14 @@ Error type.
 
 
 [[exported-fields-cloud]]
-== Cloud Provider Metadata Fields
+== Cloud provider metadata fields
 
 Metadata from cloud providers added by the add_cloud_metadata processor.
 
 
 
 [float]
-=== meta.cloud.provider
+=== `meta.cloud.provider`
 
 example: ec2
 
@@ -130,19 +132,19 @@ Name of the cloud provider. Possible values are ec2, gce, or digitalocean.
 
 
 [float]
-=== meta.cloud.instance_id
+=== `meta.cloud.instance_id`
 
 Instance ID of the host machine.
 
 
 [float]
-=== meta.cloud.instance_name
+=== `meta.cloud.instance_name`
 
 Instance name of the host machine.
 
 
 [float]
-=== meta.cloud.machine_type
+=== `meta.cloud.machine_type`
 
 example: t2.medium
 
@@ -150,7 +152,7 @@ Machine type of the host machine.
 
 
 [float]
-=== meta.cloud.availability_zone
+=== `meta.cloud.availability_zone`
 
 example: us-east-1c
 
@@ -158,7 +160,7 @@ Availability zone in which this host is running.
 
 
 [float]
-=== meta.cloud.project_id
+=== `meta.cloud.project_id`
 
 example: project-x
 
@@ -166,26 +168,26 @@ Name of the project in Google Cloud.
 
 
 [float]
-=== meta.cloud.region
+=== `meta.cloud.region`
 
 Region in which this host is running.
 
 
 [[exported-fields-common]]
-== Common Heartbeat Monitor Fields
+== Common heartbeat monitor fields
 
 None
 
 
 [float]
-== monitor Fields
+== monitor fields
 
 Common monitor fields.
 
 
 
 [float]
-=== monitor.type
+=== `monitor.type`
 
 type: keyword
 
@@ -193,7 +195,7 @@ The monitor type.
 
 
 [float]
-=== monitor.name
+=== `monitor.name`
 
 type: keyword
 
@@ -201,7 +203,7 @@ The monitors configured name
 
 
 [float]
-=== monitor.id
+=== `monitor.id`
 
 type: keyword
 
@@ -209,20 +211,20 @@ The monitors full job ID as used by heartbeat.
 
 
 [float]
-== duration Fields
+== duration fields
 
-total monitoring test duration
+Total monitoring test duration
 
 
 [float]
-=== monitor.duration.us
+=== `monitor.duration.us`
 
 type: long
 
 Duration in microseconds
 
 [float]
-=== monitor.scheme
+=== `monitor.scheme`
 
 type: keyword
 
@@ -230,7 +232,7 @@ Address url scheme. For example `tcp`, `tls`, `http`, and `https`.
 
 
 [float]
-=== monitor.host
+=== `monitor.host`
 
 type: keyword
 
@@ -238,7 +240,7 @@ Hostname of service being monitored. Can be missing, if service is monitored by 
 
 
 [float]
-=== monitor.ip
+=== `monitor.ip`
 
 type: ip
 
@@ -246,7 +248,7 @@ IP of service being monitored. If service is monitored by hostname, the `ip` fie
 
 
 [float]
-=== monitor.status
+=== `monitor.status`
 
 type: keyword
 
@@ -255,21 +257,117 @@ required: True
 Indicator if monitor could validate the service to be available.
 
 
+[[exported-fields-docker-processor]]
+== Docker fields
+
+Docker stats collected from Docker.
+
+
+
+
+[float]
+=== `docker.container.id`
+
+type: keyword
+
+Unique container id.
+
+
+[float]
+=== `docker.container.image`
+
+type: keyword
+
+Name of the image the container was built on.
+
+
+[float]
+=== `docker.container.name`
+
+type: keyword
+
+Container name.
+
+
+[float]
+=== `docker.container.labels`
+
+type: object
+
+Image labels.
+
+
+[[exported-fields-host-processor]]
+== Host fields
+
+Info collected for the host machine.
+
+
+
+
+[float]
+=== `host.hostname`
+
+type: keyword
+
+Hostname.
+
+
+[float]
+=== `host.id`
+
+type: keyword
+
+Unique host id.
+
+
+[float]
+=== `host.architecture`
+
+type: keyword
+
+Host architecture (e.g. x86_64, arm, ppc, mips).
+
+
+[float]
+=== `host.os.platform`
+
+type: object
+
+OS platform (e.g. centos, ubuntu, windows).
+
+
+[float]
+=== `host.os.version`
+
+type: object
+
+OS version.
+
+
+[float]
+=== `host.os.family`
+
+type: object
+
+OS family (e.g. redhat, debian, freebsd, windows).
+
+
 [[exported-fields-http]]
-== HTTP Monitor Fields
+== HTTP monitor fields
 
 None
 
 
 [float]
-== http Fields
+== http fields
 
 HTTP related fields.
 
 
 
 [float]
-=== http.url
+=== `http.url`
 
 type: text
 
@@ -277,14 +375,22 @@ Service url used by monitor.
 
 
 [float]
-== response Fields
+=== `http.url.raw`
+
+type: keyword
+
+The service url used by monitor. This is a non-analyzed field that is useful for aggregations.
+
+
+[float]
+== response fields
 
 Service response parameters.
 
 
 
 [float]
-=== http.response.status
+=== `http.response.status`
 
 type: integer
 
@@ -292,14 +398,14 @@ Response status code.
 
 
 [float]
-== rtt Fields
+== rtt fields
 
 HTTP layer round trip times.
 
 
 
 [float]
-== validate Fields
+== validate fields
 
 Duration between first byte of HTTP request being written and
 response being processed by validator. Duration based on already
@@ -312,14 +418,14 @@ Note: if validator is not reading body or only a prefix, this
 
 
 [float]
-=== http.rtt.validate.us
+=== `http.rtt.validate.us`
 
 type: long
 
 Duration in microseconds
 
 [float]
-== validate_body Fields
+== validate_body fields
 
 Duration of validator required to read and validate the response
 body.
@@ -331,40 +437,40 @@ Note: if validator is not reading body or only a prefix, this
 
 
 [float]
-=== http.rtt.validate_body.us
+=== `http.rtt.validate_body.us`
 
 type: long
 
 Duration in microseconds
 
 [float]
-== write_request Fields
+== write_request fields
 
 Duration of sending the complete HTTP request. Duration based on already available network connection.
 
 
 [float]
-=== http.rtt.write_request.us
+=== `http.rtt.write_request.us`
 
 type: long
 
 Duration in microseconds
 
 [float]
-== response_header Fields
+== response_header fields
 
-Time required between sending the start of sending the HTTP request and first by from HTTP response being read. Duration based on already available network connection.
+Time required between sending the start of sending the HTTP request and first byte from HTTP response being read. Duration based on already available network connection.
 
 
 [float]
-=== http.rtt.response_header.us
+=== `http.rtt.response_header.us`
 
 type: long
 
 Duration in microseconds
 
 [float]
-== total Fields
+== total fields
 
 Duration required to process the HTTP transaction. Starts with
 the initial TCP connection attempt. Ends with after validator
@@ -376,27 +482,27 @@ Note: if validator is not reading body or only a prefix, this
 
 
 [float]
-=== http.rtt.total.us
+=== `http.rtt.total.us`
 
 type: long
 
 Duration in microseconds
 
 [[exported-fields-icmp]]
-== ICMP Fields
+== ICMP fields
 
 None
 
 
 [float]
-== icmp Fields
+== icmp fields
 
 IP ping fields.
 
 
 
 [float]
-=== icmp.requests
+=== `icmp.requests`
 
 type: integer
 
@@ -404,29 +510,28 @@ Number if ICMP EchoRequests send.
 
 
 [float]
-== rtt Fields
+== rtt fields
 
 ICMP Echo Request and Reply round trip time
 
 
 [float]
-=== icmp.rtt.us
+=== `icmp.rtt.us`
 
 type: long
 
 Duration in microseconds
 
 [[exported-fields-kubernetes-processor]]
-== kubernetes Fields
+== Kubernetes fields
 
-beta[]
 Kubernetes metadata added by the kubernetes processor
 
 
 
 
 [float]
-=== kubernetes.pod.name
+=== `kubernetes.pod.name`
 
 type: keyword
 
@@ -434,7 +539,7 @@ Kubernetes pod name
 
 
 [float]
-=== kubernetes.namespace
+=== `kubernetes.namespace`
 
 type: keyword
 
@@ -442,7 +547,15 @@ Kubernetes namespace
 
 
 [float]
-=== kubernetes.labels
+=== `kubernetes.node.name`
+
+type: keyword
+
+Kubernetes node name
+
+
+[float]
+=== `kubernetes.labels`
 
 type: object
 
@@ -450,7 +563,7 @@ Kubernetes labels map
 
 
 [float]
-=== kubernetes.annotations
+=== `kubernetes.annotations`
 
 type: object
 
@@ -458,7 +571,7 @@ Kubernetes annotations map
 
 
 [float]
-=== kubernetes.container.name
+=== `kubernetes.container.name`
 
 type: keyword
 
@@ -466,7 +579,7 @@ Kubernetes container name
 
 
 [float]
-=== kubernetes.container.image
+=== `kubernetes.container.image`
 
 type: keyword
 
@@ -474,20 +587,20 @@ Kubernetes container image
 
 
 [[exported-fields-resolve]]
-== Host Lookup Fields
+== Host lookup fields
 
 None
 
 
 [float]
-== resolve Fields
+== resolve fields
 
 Host lookup fields.
 
 
 
 [float]
-=== resolve.host
+=== `resolve.host`
 
 type: keyword
 
@@ -495,7 +608,7 @@ Hostname of service being monitored.
 
 
 [float]
-=== resolve.ip
+=== `resolve.ip`
 
 type: ip
 
@@ -503,67 +616,67 @@ IP address found for the given host.
 
 
 [float]
-== rtt Fields
+== rtt fields
 
 Duration required to resolve an IP from hostname.
 
 
 [float]
-=== resolve.rtt.us
+=== `resolve.rtt.us`
 
 type: long
 
 Duration in microseconds
 
 [[exported-fields-socks5]]
-== SOCKS5 Proxy Fields
+== SOCKS5 proxy fields
 
 None
 
 
 [float]
-== socks5 Fields
+== socks5 fields
 
 SOCKS5 proxy related fields:
 
 
 
 [float]
-== rtt Fields
+== rtt fields
 
 TLS layer round trip times.
 
 
 
 [float]
-== connect Fields
+== connect fields
 
 Time required to establish a connection via SOCKS5 to endpoint based on available connection to SOCKS5 proxy.
 
 
 
 [float]
-=== socks5.rtt.connect.us
+=== `socks5.rtt.connect.us`
 
 type: long
 
 Duration in microseconds
 
 [[exported-fields-tcp]]
-== TCP Layer Fields
+== TCP layer fields
 
 None
 
 
 [float]
-== tcp Fields
+== tcp fields
 
 TCP network layer related fields.
 
 
 
 [float]
-=== tcp.port
+=== `tcp.port`
 
 type: integer
 
@@ -571,69 +684,69 @@ Service port number.
 
 
 [float]
-== rtt Fields
+== rtt fields
 
 TCP layer round trip times.
 
 
 
 [float]
-== connect Fields
+== connect fields
 
 Duration required to establish a TCP connection based on already available IP address.
 
 
 
 [float]
-=== tcp.rtt.connect.us
+=== `tcp.rtt.connect.us`
 
 type: long
 
 Duration in microseconds
 
 [float]
-== validate Fields
+== validate fields
 
 Duration of validation step based on existing TCP connection.
 
 
 
 [float]
-=== tcp.rtt.validate.us
+=== `tcp.rtt.validate.us`
 
 type: long
 
 Duration in microseconds
 
 [[exported-fields-tls]]
-== TLS Encryption Layer Fields
+== TLS encryption layer fields
 
 None
 
 
 [float]
-== tls Fields
+== tls fields
 
 TLS layer related fields.
 
 
 
 [float]
-== rtt Fields
+== rtt fields
 
 TLS layer round trip times.
 
 
 
 [float]
-== handshake Fields
+== handshake fields
 
 Time required to finish TLS handshake based on already available network connection.
 
 
 
 [float]
-=== tls.rtt.handshake.us
+=== `tls.rtt.handshake.us`
 
 type: long
 

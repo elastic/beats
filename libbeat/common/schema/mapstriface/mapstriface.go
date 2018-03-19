@@ -71,7 +71,6 @@ type ConvMap struct {
 
 // Map drills down in the data dictionary by using the key
 func (convMap ConvMap) Map(key string, event common.MapStr, data map[string]interface{}) *schema.Errors {
-
 	subData, ok := data[convMap.Key].(map[string]interface{})
 	if !ok {
 		err := schema.NewError(convMap.Key, "Error accessing sub-dictionary")
@@ -140,6 +139,19 @@ func toStr(key string, data map[string]interface{}) (interface{}, error) {
 // Str creates a schema.Conv object for converting strings.
 func Str(key string, opts ...schema.SchemaOption) schema.Conv {
 	return schema.SetOptions(schema.Conv{Key: key, Func: toStr}, opts)
+}
+
+func toIfc(key string, data map[string]interface{}) (interface{}, error) {
+	intf, err := common.MapStr(data).GetValue(key)
+	if err != nil {
+		return "", fmt.Errorf("Key %s not found: %s", key, err.Error())
+	}
+	return intf, nil
+}
+
+// Ifc creates a schema.Conv object for converting the given data to interface.
+func Ifc(key string, opts ...schema.SchemaOption) schema.Conv {
+	return schema.SetOptions(schema.Conv{Key: key, Func: toIfc}, opts)
 }
 
 func toBool(key string, data map[string]interface{}) (interface{}, error) {
@@ -213,7 +225,6 @@ func toTime(key string, data map[string]interface{}) (interface{}, error) {
 	}
 
 	return common.Time(time.Unix(0, 0)), fmt.Errorf("Expected date, found %T", emptyIface)
-
 }
 
 // Time creates a Conv object for converting Time objects.

@@ -1,5 +1,5 @@
 {
-    "@timestamp": "2016-05-23T08:05:34.853Z",
+    "@timestamp": "2017-10-12T08:05:34.853Z",
     "beat": {
         "hostname": "host.example.com",
         "name": "host.example.com"
@@ -11,39 +11,69 @@
     },
     "system": {
         "cpu": {
+            "cores": 4,
             "idle": {
-                "pct": 0.852,
-                "ticks": 44421033
+                "norm": {
+                    "pct": 0.4208
+                },
+                "pct": 1.6831,
+                "ticks": 207356495
             },
             "iowait": {
-                "pct": 0,
-                "ticks": 159735
+                "norm": {
+                    "pct": 0.0437
+                },
+                "pct": 0.1749,
+                "ticks": 179383
             },
             "irq": {
+                "norm": {
+                    "pct": 0
+                },
                 "pct": 0,
                 "ticks": 0
             },
             "nice": {
+                "norm": {
+                    "pct": 0
+                },
                 "pct": 0,
-                "ticks": 0
+                "ticks": 46
             },
             "softirq": {
+                "norm": {
+                    "pct": 0
+                },
                 "pct": 0,
-                "ticks": 14070
+                "ticks": 8835
             },
             "steal": {
+                "norm": {
+                    "pct": 0
+                },
                 "pct": 0,
                 "ticks": 0
             },
             "system": {
-                "pct": 0.0408,
-                "ticks": 305704
+                "norm": {
+                    "pct": 0.1749
+                },
+                "pct": 0.6995,
+                "ticks": 428558
+            },
+            "total": {
+                "norm": {
+                    "pct": 0.5792
+                },
+                "pct": 2.3169
             },
             "user": {
-                "pct": 0.1071,
-                "ticks": 841974
+                "norm": {
+                    "pct": 0.3607
+                },
+                "pct": 1.4426,
+                "ticks": 725183
             }
         }
-    },
-    "type": "metricsets"
+    }
 }

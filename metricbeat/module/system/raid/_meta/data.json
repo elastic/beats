@@ -1,0 +1,26 @@
+{
+    "@timestamp": "2017-10-12T08:05:34.853Z",
+    "beat": {
+        "hostname": "host.example.com",
+        "name": "host.example.com"
+    },
+    "metricset": {
+        "module": "system",
+        "name": "raid",
+        "rtt": 115
+    },
+    "system": {
+        "raid": {
+            "activity_state": "active",
+            "blocks": {
+                "synced": 5853468288,
+                "total": 5853468288
+            },
+            "disks": {
+                "active": 8,
+                "total": 8
+            },
+            "name": "md3"
+        }
+    }
+}

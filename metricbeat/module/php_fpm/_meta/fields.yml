@@ -1,10 +1,12 @@
 - key: php_fpm
-  title: "php_fpm"
+  title: "PHP_FPM"
   description: >
     beta[]
 
     PHP-FPM server status metrics collected from PHP-FPM.
   short_config: false
+  release: beta
+  settings: ["ssl"]
   fields:
     - name: php_fpm
       type: group

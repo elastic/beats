@@ -11,4 +11,4 @@ $workdir = Split-Path $MyInvocation.MyCommand.Path
 # create new service
 New-Service -name {{.beat_name}} `
   -displayName {{.beat_name}} `
-  -binaryPathName "`"$workdir\\{{.beat_name}}.exe`" -c `"$workdir\\{{.beat_name}}.yml`" -path.home `"$workdir`" -path.data `"C:\\ProgramData\\{{.beat_name}}`""
+  -binaryPathName "`"$workdir\{{.beat_name}}.exe`" -c `"$workdir\{{.beat_name}}.yml`" -path.home `"$workdir`" -path.data `"C:\ProgramData\{{.beat_name}}`" -path.logs `"C:\ProgramData\{{.beat_name}}\logs`""

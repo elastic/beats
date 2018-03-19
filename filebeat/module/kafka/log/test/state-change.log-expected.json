@@ -1,0 +1,52 @@
+[
+  {
+    "_index": "filebeat-7.0.0-alpha1-2017.08.11",
+    "_type": "doc",
+    "_id": "v4tR0l0Bed9fOYVUjey6",
+    "_version": 1,
+    "_score": null,
+    "_source": {
+      "@timestamp": "2017-08-04T10:48:21.428Z",
+      "offset": 168,
+      "kafka": {
+        "log": {
+          "component": "unknown",
+          "level": "TRACE",
+          "message": "Controller 0 epoch 1 received response {error_code=0} for a request sent to broker baldur:9092 (id: 0 rack: null)",
+          "class": "state.change.logger"
+        }
+      },
+      "beat": {
+        "hostname": "baldur",
+        "read_time": "2017-08-11T17:22:21.359Z",
+        "name": "baldur",
+        "version": "7.0.0-alpha1"
+      },
+      "prospector": {
+        "type": "log"
+      },
+      "input": {
+        "type": "log"
+      },
+      "source": "/home/n/go/src/github.com/elastic/beats/filebeat/module/kafka/log/test/state-change.log",
+      "message": "[2017-08-04 10:48:21,428] TRACE Controller 0 epoch 1 received response {error_code=0} for a request sent to broker baldur:9092 (id: 0 rack: null) (state.change.logger)",
+      "fileset": {
+        "module": "kafka",
+        "name": "log"
+      }
+    },
+    "fields": {
+      "@timestamp": [
+        "2017-08-04T10:48:21.428Z"
+      ]
+    },
+    "highlight": {
+      "source": [
+        "@kibana-highlighted-field@/home/n/go/src/github.com/elastic/beats/filebeat/module/kafka/log/test/state-change.log@/kibana-highlighted-field@"
+      ]
+    },
+    "sort": [
+      1501843701428
+    ]
+  }
+]

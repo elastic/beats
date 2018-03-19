@@ -1,7 +1,7 @@
 #################### Packetbeat Configuration Example #########################
 
 # This file is an example configuration file highlighting only the most common
-# options. The packetbeat.full.yml file from the same directory contains all the
+# options. The packetbeat.reference.yml file from the same directory contains all the
 # supported options with more comments. You can use it as a reference.
 #
 # You can find the full configuration reference here:
@@ -92,3 +92,15 @@ packetbeat.protocols:
   # Configure the ports where to listen for NFS traffic. You can disable
   # the NFS protocol by commenting out the list of ports.
   ports: [2049]
+
+- type: tls
+  # Configure the ports where to listen for TLS traffic. You can disable
+  # the TLS protocol by commenting out the list of ports.
+  ports: [443]
+
+#==================== Elasticsearch template setting ==========================
+
+setup.template.settings:
+  index.number_of_shards: 3
+  #index.codec: best_compression
+  #_source.enabled: false

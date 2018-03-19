@@ -20,6 +20,8 @@ CLIENTS_FIELDS = ["blocked", "biggest_input_buf",
 
 class Test(metricbeat.BaseTest):
 
+    COMPOSE_SERVICES = ['redis']
+
     @unittest.skipUnless(metricbeat.INTEGRATION_TESTS, "integration test")
     @attr('integration')
     def test_info(self):
@@ -81,18 +83,20 @@ class Test(metricbeat.BaseTest):
 
     @unittest.skipUnless(metricbeat.INTEGRATION_TESTS, "integration test")
     @attr('integration')
-    def test_filters(self):
+    def test_module_processors(self):
         """
-        Test filters for Redis info event.
+        Test local processors for Redis info event.
         """
         fields = ["clients", "cpu"]
+        eventFields = ['beat', 'metricset']
+        eventFields += ['redis.info.' + f for f in fields]
         self.render_config_template(modules=[{
             "name": "redis",
             "metricsets": ["info"],
             "hosts": self.get_hosts(),
             "period": "5s",
-            "filters": [{
-                "include_fields": fields,
+            "processors": [{
+                "include_fields": eventFields,
             }],
         }])
         proc = self.start_beat()

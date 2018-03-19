@@ -1,3 +1,1 @@
-=== kubernetes state_replicaset MetricSet
-
-This is the state_replicaset metricset of the module kubernetes.
+This is the `state_replicaset` metricset of the Kubernetes module.

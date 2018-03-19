@@ -17,8 +17,15 @@ type elasticsearchConfig struct {
 	LoadBalance      bool               `config:"loadbalance"`
 	CompressionLevel int                `config:"compression_level" validate:"min=0, max=9"`
 	TLS              *outputs.TLSConfig `config:"ssl"`
+	BulkMaxSize      int                `config:"bulk_max_size"`
 	MaxRetries       int                `config:"max_retries"`
 	Timeout          time.Duration      `config:"timeout"`
+	Backoff          Backoff            `config:"backoff"`
+}
+
+type Backoff struct {
+	Init time.Duration
+	Max  time.Duration
 }
 
 const (
@@ -38,6 +45,10 @@ var (
 		CompressionLevel: 0,
 		TLS:              nil,
 		LoadBalance:      true,
+		Backoff: Backoff{
+			Init: 1 * time.Second,
+			Max:  60 * time.Second,
+		},
 	}
 )
 

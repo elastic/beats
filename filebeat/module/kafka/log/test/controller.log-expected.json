@@ -1,0 +1,1021 @@
+[
+  {
+    "_index": "filebeat-7.0.0-alpha1-2017.08.11",
+    "_type": "doc",
+    "_id": "wItR0l0Bed9fOYVUjezS",
+    "_version": 1,
+    "_score": null,
+    "_source": {
+      "@timestamp": "2017-08-04T11:44:25.113Z",
+      "offset": 2695,
+      "kafka": {
+        "log": {
+          "component": "Controller-0-to-broker-0-send-thread",
+          "level": "INFO",
+          "message": "Shutdown completed",
+          "class": "kafka.controller.RequestSendThread"
+        }
+      },
+      "beat": {
+        "hostname": "baldur",
+        "read_time": "2017-08-11T17:22:21.376Z",
+        "name": "baldur",
+        "version": "7.0.0-alpha1"
+      },
+      "prospector": {
+        "type": "log"
+      },
+      "input": {
+        "type": "log"
+      },
+      "source": "/home/n/go/src/github.com/elastic/beats/filebeat/module/kafka/log/test/controller.log",
+      "fileset": {
+        "module": "kafka",
+        "name": "log"
+      },
+      "message": "[2017-08-04 11:44:25,113] INFO [Controller-0-to-broker-0-send-thread]: Shutdown completed (kafka.controller.RequestSendThread)"
+    },
+    "fields": {
+      "@timestamp": [
+        "2017-08-04T11:44:25.113Z"
+      ]
+    },
+    "highlight": {
+      "source": [
+        "@kibana-highlighted-field@/home/n/go/src/github.com/elastic/beats/filebeat/module/kafka/log/test/controller.log@/kibana-highlighted-field@"
+      ]
+    },
+    "sort": [
+      1501847065113
+    ]
+  },
+
+  {
+    "_index": "filebeat-7.0.0-alpha1-2017.08.11",
+    "_type": "doc",
+    "_id": "notR0l0Bed9fOYVUfeyz",
+    "_version": 1,
+    "_score": null,
+    "_source": {
+      "@timestamp": "2017-08-04T11:44:25.112Z",
+      "offset": 2452,
+      "kafka": {
+        "log": {
+          "component": "Controller-0-to-broker-0-send-thread",
+          "level": "INFO",
+          "message": "Shutting down",
+          "class": "kafka.controller.RequestSendThread"
+        }
+      },
+      "beat": {
+        "hostname": "baldur",
+        "read_time": "2017-08-11T17:22:21.374Z",
+        "name": "baldur",
+        "version": "7.0.0-alpha1"
+      },
+      "prospector": {
+        "type": "log"
+      },
+      "input": {
+        "type": "log"
+      },
+      "source": "/home/n/go/src/github.com/elastic/beats/filebeat/module/kafka/log/test/controller.log",
+      "message": "[2017-08-04 11:44:25,112] INFO [Controller-0-to-broker-0-send-thread]: Shutting down (kafka.controller.RequestSendThread)",
+      "fileset": {
+        "module": "kafka",
+        "name": "log"
+      }
+    },
+    "fields": {
+      "@timestamp": [
+        "2017-08-04T11:44:25.112Z"
+      ]
+    },
+    "highlight": {
+      "source": [
+        "@kibana-highlighted-field@/home/n/go/src/github.com/elastic/beats/filebeat/module/kafka/log/test/controller.log@/kibana-highlighted-field@"
+      ]
+    },
+    "sort": [
+      1501847065112
+    ]
+  },
+
+  {
+    "_index": "filebeat-7.0.0-alpha1-2017.08.11",
+    "_type": "doc",
+    "_id": "n4tR0l0Bed9fOYVUfeyz",
+    "_version": 1,
+    "_score": null,
+    "_source": {
+      "@timestamp": "2017-08-04T11:44:25.112Z",
+      "offset": 2568,
+      "kafka": {
+        "log": {
+          "component": "Controller-0-to-broker-0-send-thread",
+          "level": "INFO",
+          "message": "Stopped",
+          "class": "kafka.controller.RequestSendThread"
+        }
+      },
+      "beat": {
+        "hostname": "baldur",
+        "read_time": "2017-08-11T17:22:21.376Z",
+        "name": "baldur",
+        "version": "7.0.0-alpha1"
+      },
+      "prospector": {
+        "type": "log"
+      },
+      "input": {
+        "type": "log"
+      },
+      "source": "/home/n/go/src/github.com/elastic/beats/filebeat/module/kafka/log/test/controller.log",
+      "message": "[2017-08-04 11:44:25,112] INFO [Controller-0-to-broker-0-send-thread]: Stopped (kafka.controller.RequestSendThread)",
+      "fileset": {
+        "module": "kafka",
+        "name": "log"
+      }
+    },
+    "fields": {
+      "@timestamp": [
+        "2017-08-04T11:44:25.112Z"
+      ]
+    },
+    "highlight": {
+      "source": [
+        "@kibana-highlighted-field@/home/n/go/src/github.com/elastic/beats/filebeat/module/kafka/log/test/controller.log@/kibana-highlighted-field@"
+      ]
+    },
+    "sort": [
+      1501847065112
+    ]
+  },
+
+  {
+    "_index": "filebeat-7.0.0-alpha1-2017.08.11",
+    "_type": "doc",
+    "_id": "nYtR0l0Bed9fOYVUfeyz",
+    "_version": 1,
+    "_score": null,
+    "_source": {
+      "@timestamp": "2017-08-04T11:44:25.111Z",
+      "offset": 2330,
+      "kafka": {
+        "log": {
+          "component": "Replica state machine on controller 0",
+          "level": "INFO",
+          "message": "Stopped replica state machine",
+          "class": "kafka.controller.ReplicaStateMachine"
+        }
+      },
+      "beat": {
+        "hostname": "baldur",
+        "read_time": "2017-08-11T17:22:21.373Z",
+        "name": "baldur",
+        "version": "7.0.0-alpha1"
+      },
+      "prospector": {
+        "type": "log"
+      },
+      "input": {
+        "type": "log"
+      },
+      "source": "/home/n/go/src/github.com/elastic/beats/filebeat/module/kafka/log/test/controller.log",
+      "fileset": {
+        "module": "kafka",
+        "name": "log"
+      },
+      "message": "[2017-08-04 11:44:25,111] INFO [Replica state machine on controller 0]: Stopped replica state machine (kafka.controller.ReplicaStateMachine)"
+    },
+    "fields": {
+      "@timestamp": [
+        "2017-08-04T11:44:25.111Z"
+      ]
+    },
+    "highlight": {
+      "source": [
+        "@kibana-highlighted-field@/home/n/go/src/github.com/elastic/beats/filebeat/module/kafka/log/test/controller.log@/kibana-highlighted-field@"
+      ]
+    },
+    "sort": [
+      1501847065111
+    ]
+  },
+
+  {
+    "_index": "filebeat-7.0.0-alpha1-2017.08.11",
+    "_type": "doc",
+    "_id": "nItR0l0Bed9fOYVUfeyz",
+    "_version": 1,
+    "_score": null,
+    "_source": {
+      "@timestamp": "2017-08-04T11:44:25.105Z",
+      "offset": 2189,
+      "kafka": {
+        "log": {
+          "component": "Partition state machine on Controller 0",
+          "level": "INFO",
+          "message": "Stopped partition state machine",
+          "class": "kafka.controller.PartitionStateMachine"
+        }
+      },
+      "beat": {
+        "hostname": "baldur",
+        "read_time": "2017-08-11T17:22:21.372Z",
+        "name": "baldur",
+        "version": "7.0.0-alpha1"
+      },
+      "prospector": {
+        "type": "log"
+      },
+      "input": {
+        "type": "log"
+      },
+      "source": "/home/n/go/src/github.com/elastic/beats/filebeat/module/kafka/log/test/controller.log",
+      "fileset": {
+        "module": "kafka",
+        "name": "log"
+      },
+      "message": "[2017-08-04 11:44:25,105] INFO [Partition state machine on Controller 0]: Stopped partition state machine (kafka.controller.PartitionStateMachine)"
+    },
+    "fields": {
+      "@timestamp": [
+        "2017-08-04T11:44:25.105Z"
+      ]
+    },
+    "highlight": {
+      "source": [
+        "@kibana-highlighted-field@/home/n/go/src/github.com/elastic/beats/filebeat/module/kafka/log/test/controller.log@/kibana-highlighted-field@"
+      ]
+    },
+    "sort": [
+      1501847065105
+    ]
+  },
+
+  {
+    "_index": "filebeat-7.0.0-alpha1-2017.08.11",
+    "_type": "doc",
+    "_id": "m4tR0l0Bed9fOYVUfeyz",
+    "_version": 1,
+    "_score": null,
+    "_source": {
+      "@timestamp": "2017-08-04T11:44:25.100Z",
+      "offset": 2042,
+      "kafka": {
+        "log": {
+          "component": "Controller 0",
+          "level": "DEBUG",
+          "message": "De-registering IsrChangeNotificationListener",
+          "class": "kafka.controller.KafkaController"
+        }
+      },
+      "beat": {
+        "hostname": "baldur",
+        "read_time": "2017-08-11T17:22:21.372Z",
+        "name": "baldur",
+        "version": "7.0.0-alpha1"
+      },
+      "prospector": {
+        "type": "log"
+      },
+      "input": {
+        "type": "log"
+      },
+      "source": "/home/n/go/src/github.com/elastic/beats/filebeat/module/kafka/log/test/controller.log",
+      "message": "[2017-08-04 11:44:25,100] DEBUG [Controller 0]: De-registering IsrChangeNotificationListener (kafka.controller.KafkaController)",
+      "fileset": {
+        "module": "kafka",
+        "name": "log"
+      }
+    },
+    "fields": {
+      "@timestamp": [
+        "2017-08-04T11:44:25.100Z"
+      ]
+    },
+    "highlight": {
+      "source": [
+        "@kibana-highlighted-field@/home/n/go/src/github.com/elastic/beats/filebeat/module/kafka/log/test/controller.log@/kibana-highlighted-field@"
+      ]
+    },
+    "sort": [
+      1501847065100
+    ]
+  },
+
+  {
+    "_index": "filebeat-7.0.0-alpha1-2017.08.11",
+    "_type": "doc",
+    "_id": "motR0l0Bed9fOYVUfeyz",
+    "_version": 1,
+    "_score": null,
+    "_source": {
+      "@timestamp": "2017-08-04T11:44:25.099Z",
+      "offset": 1914,
+      "kafka": {
+        "log": {
+          "component": "Controller 0",
+          "level": "DEBUG",
+          "message": "Controller resigning, broker id 0",
+          "class": "kafka.controller.KafkaController"
+        }
+      },
+      "beat": {
+        "hostname": "baldur",
+        "read_time": "2017-08-11T17:22:21.372Z",
+        "name": "baldur",
+        "version": "7.0.0-alpha1"
+      },
+      "prospector": {
+        "type": "log"
+      },
+      "input": {
+        "type": "log"
+      },
+      "source": "/home/n/go/src/github.com/elastic/beats/filebeat/module/kafka/log/test/controller.log",
+      "message": "[2017-08-04 11:44:25,099] DEBUG [Controller 0]: Controller resigning, broker id 0 (kafka.controller.KafkaController)",
+      "fileset": {
+        "module": "kafka",
+        "name": "log"
+      }
+    },
+    "fields": {
+      "@timestamp": [
+        "2017-08-04T11:44:25.099Z"
+      ]
+    },
+    "highlight": {
+      "source": [
+        "@kibana-highlighted-field@/home/n/go/src/github.com/elastic/beats/filebeat/module/kafka/log/test/controller.log@/kibana-highlighted-field@"
+      ]
+    },
+    "sort": [
+      1501847065099
+    ]
+  },
+
+  {
+    "_index": "filebeat-7.0.0-alpha1-2017.08.11",
+    "_type": "doc",
+    "_id": "mYtR0l0Bed9fOYVUfeyz",
+    "_version": 1,
+    "_score": null,
+    "_source": {
+      "@timestamp": "2017-08-04T11:44:25.097Z",
+      "offset": 1797,
+      "kafka": {
+        "log": {
+          "component": "controller-event-thread",
+          "level": "INFO",
+          "message": "Shutdown completed",
+          "class": "kafka.controller.ControllerEventManager$ControllerEventThread"
+        }
+      },
+      "beat": {
+        "hostname": "baldur",
+        "read_time": "2017-08-11T17:22:21.370Z",
+        "name": "baldur",
+        "version": "7.0.0-alpha1"
+      },
+      "prospector": {
+        "type": "log"
+      },
+      "input": {
+        "type": "log"
+      },
+      "source": "/home/n/go/src/github.com/elastic/beats/filebeat/module/kafka/log/test/controller.log",
+      "fileset": {
+        "module": "kafka",
+        "name": "log"
+      },
+      "message": "[2017-08-04 11:44:25,097] INFO [controller-event-thread]: Shutdown completed (kafka.controller.ControllerEventManager$ControllerEventThread)"
+    },
+    "fields": {
+      "@timestamp": [
+        "2017-08-04T11:44:25.097Z"
+      ]
+    },
+    "highlight": {
+      "source": [
+        "@kibana-highlighted-field@/home/n/go/src/github.com/elastic/beats/filebeat/module/kafka/log/test/controller.log@/kibana-highlighted-field@"
+      ]
+    },
+    "sort": [
+      1501847065097
+    ]
+  },
+
+  {
+    "_index": "filebeat-7.0.0-alpha1-2017.08.11",
+    "_type": "doc",
+    "_id": "mItR0l0Bed9fOYVUfeyz",
+    "_version": 1,
+    "_score": null,
+    "_source": {
+      "@timestamp": "2017-08-04T11:44:25.095Z",
+      "offset": 1656,
+      "kafka": {
+        "log": {
+          "component": "controller-event-thread",
+          "level": "INFO",
+          "message": "Stopped",
+          "class": "kafka.controller.ControllerEventManager$ControllerEventThread"
+        }
+      },
+      "beat": {
+        "hostname": "baldur",
+        "read_time": "2017-08-11T17:22:21.369Z",
+        "name": "baldur",
+        "version": "7.0.0-alpha1"
+      },
+      "prospector": {
+        "type": "log"
+      },
+      "input": {
+        "type": "log"
+      },
+      "source": "/home/n/go/src/github.com/elastic/beats/filebeat/module/kafka/log/test/controller.log",
+      "message": "[2017-08-04 11:44:25,095] INFO [controller-event-thread]: Stopped (kafka.controller.ControllerEventManager$ControllerEventThread)",
+      "fileset": {
+        "module": "kafka",
+        "name": "log"
+      }
+    },
+    "fields": {
+      "@timestamp": [
+        "2017-08-04T11:44:25.095Z"
+      ]
+    },
+    "highlight": {
+      "source": [
+        "@kibana-highlighted-field@/home/n/go/src/github.com/elastic/beats/filebeat/module/kafka/log/test/controller.log@/kibana-highlighted-field@"
+      ]
+    },
+    "sort": [
+      1501847065095
+    ]
+  },
+
+  {
+    "_index": "filebeat-7.0.0-alpha1-2017.08.11",
+    "_type": "doc",
+    "_id": "l4tR0l0Bed9fOYVUfeyz",
+    "_version": 1,
+    "_score": null,
+    "_source": {
+      "@timestamp": "2017-08-04T11:44:25.094Z",
+      "offset": 1526,
+      "kafka": {
+        "log": {
+          "component": "controller-event-thread",
+          "level": "INFO",
+          "message": "Shutting down",
+          "class": "kafka.controller.ControllerEventManager$ControllerEventThread"
+        }
+      },
+      "beat": {
+        "hostname": "baldur",
+        "read_time": "2017-08-11T17:22:21.367Z",
+        "name": "baldur",
+        "version": "7.0.0-alpha1"
+      },
+      "prospector": {
+        "type": "log"
+      },
+      "input": {
+        "type": "log"
+      },
+      "source": "/home/n/go/src/github.com/elastic/beats/filebeat/module/kafka/log/test/controller.log",
+      "message": "[2017-08-04 11:44:25,094] INFO [controller-event-thread]: Shutting down (kafka.controller.ControllerEventManager$ControllerEventThread)",
+      "fileset": {
+        "module": "kafka",
+        "name": "log"
+      }
+    },
+    "fields": {
+      "@timestamp": [
+        "2017-08-04T11:44:25.094Z"
+      ]
+    },
+    "highlight": {
+      "source": [
+        "@kibana-highlighted-field@/home/n/go/src/github.com/elastic/beats/filebeat/module/kafka/log/test/controller.log@/kibana-highlighted-field@"
+      ]
+    },
+    "sort": [
+      1501847065094
+    ]
+  },
+
+  {
+    "_index": "filebeat-7.0.0-alpha1-2017.08.11",
+    "_type": "doc",
+    "_id": "lotR0l0Bed9fOYVUfeyz",
+    "_version": 1,
+    "_score": null,
+    "_source": {
+      "@timestamp": "2017-08-04T11:44:22.588Z",
+      "offset": 1390,
+      "kafka": {
+        "log": {
+          "component": "Controller 0",
+          "level": "DEBUG",
+          "message": "Live brokers: ",
+          "class": "kafka.controller.KafkaController"
+        }
+      },
+      "beat": {
+        "hostname": "baldur",
+        "read_time": "2017-08-11T17:22:21.365Z",
+        "name": "baldur",
+        "version": "7.0.0-alpha1"
+      },
+      "prospector": {
+        "type": "log"
+      },
+      "input": {
+        "type": "log"
+      },
+      "source": "/home/n/go/src/github.com/elastic/beats/filebeat/module/kafka/log/test/controller.log",
+      "message": "[2017-08-04 11:44:22,588] DEBUG [Controller 0]: Live brokers:  (kafka.controller.KafkaController)",
+      "fileset": {
+        "module": "kafka",
+        "name": "log"
+      }
+    },
+    "fields": {
+      "@timestamp": [
+        "2017-08-04T11:44:22.588Z"
+      ]
+    },
+    "highlight": {
+      "source": [
+        "@kibana-highlighted-field@/home/n/go/src/github.com/elastic/beats/filebeat/module/kafka/log/test/controller.log@/kibana-highlighted-field@"
+      ]
+    },
+    "sort": [
+      1501847062588
+    ]
+  },
+
+  {
+    "_index": "filebeat-7.0.0-alpha1-2017.08.11",
+    "_type": "doc",
+    "_id": "lYtR0l0Bed9fOYVUfeyz",
+    "_version": 1,
+    "_score": null,
+    "_source": {
+      "@timestamp": "2017-08-04T10:48:21.165Z",
+      "offset": 1292,
+      "kafka": {
+        "log": {
+          "component": "Partition state machine on Controller 0",
+          "level": "INFO",
+          "message": "Invoking state change to OnlinePartition for partitions ",
+          "class": "kafka.controller.PartitionStateMachine"
+        }
+      },
+      "beat": {
+        "hostname": "baldur",
+        "read_time": "2017-08-11T17:22:21.364Z",
+        "name": "baldur",
+        "version": "7.0.0-alpha1"
+      },
+      "prospector": {
+        "type": "log"
+      },
+      "input": {
+        "type": "log"
+      },
+      "source": "/home/n/go/src/github.com/elastic/beats/filebeat/module/kafka/log/test/controller.log",
+      "message": "[2017-08-04 10:48:21,165] INFO [Partition state machine on Controller 0]: Invoking state change to OnlinePartition for partitions  (kafka.controller.PartitionStateMachine)",
+      "fileset": {
+        "module": "kafka",
+        "name": "log"
+      }
+    },
+    "fields": {
+      "@timestamp": [
+        "2017-08-04T10:48:21.165Z"
+      ]
+    },
+    "highlight": {
+      "source": [
+        "@kibana-highlighted-field@/home/n/go/src/github.com/elastic/beats/filebeat/module/kafka/log/test/controller.log@/kibana-highlighted-field@"
+      ]
+    },
+    "sort": [
+      1501843701165
+    ]
+  },
+
+  {
+    "_index": "filebeat-7.0.0-alpha1-2017.08.11",
+    "_type": "doc",
+    "_id": "lItR0l0Bed9fOYVUfeyz",
+    "_version": 1,
+    "_score": null,
+    "_source": {
+      "@timestamp": "2017-08-04T10:48:21.157Z",
+      "offset": 1120,
+      "kafka": {
+        "log": {
+          "component": "Controller 0",
+          "level": "INFO",
+          "message": "Broker 0 is ready to serve as the new controller with epoch 1",
+          "class": "kafka.controller.KafkaController"
+        }
+      },
+      "beat": {
+        "hostname": "baldur",
+        "read_time": "2017-08-11T17:22:21.363Z",
+        "name": "baldur",
+        "version": "7.0.0-alpha1"
+      },
+      "prospector": {
+        "type": "log"
+      },
+      "input": {
+        "type": "log"
+      },
+      "source": "/home/n/go/src/github.com/elastic/beats/filebeat/module/kafka/log/test/controller.log",
+      "fileset": {
+        "module": "kafka",
+        "name": "log"
+      },
+      "message": "[2017-08-04 10:48:21,157] INFO [Controller 0]: Broker 0 is ready to serve as the new controller with epoch 1 (kafka.controller.KafkaController)"
+    },
+    "fields": {
+      "@timestamp": [
+        "2017-08-04T10:48:21.157Z"
+      ]
+    },
+    "highlight": {
+      "source": [
+        "@kibana-highlighted-field@/home/n/go/src/github.com/elastic/beats/filebeat/module/kafka/log/test/controller.log@/kibana-highlighted-field@"
+      ]
+    },
+    "sort": [
+      1501843701157
+    ]
+  },
+
+  {
+    "_index": "filebeat-7.0.0-alpha1-2017.08.11",
+    "_type": "doc",
+    "_id": "k4tR0l0Bed9fOYVUfeyz",
+    "_version": 1,
+    "_score": null,
+    "_source": {
+      "@timestamp": "2017-08-04T10:48:21.156Z",
+      "offset": 976,
+      "kafka": {
+        "log": {
+          "component": "Partition state machine on Controller 0",
+          "level": "INFO",
+          "message": "Started partition state machine with initial state -> Map()",
+          "class": "kafka.controller.PartitionStateMachine"
+        }
+      },
+      "beat": {
+        "hostname": "baldur",
+        "read_time": "2017-08-11T17:22:21.362Z",
+        "name": "baldur",
+        "version": "7.0.0-alpha1"
+      },
+      "prospector": {
+        "type": "log"
+      },
+      "input": {
+        "type": "log"
+      },
+      "source": "/home/n/go/src/github.com/elastic/beats/filebeat/module/kafka/log/test/controller.log",
+      "message": "[2017-08-04 10:48:21,156] INFO [Partition state machine on Controller 0]: Started partition state machine with initial state -> Map() (kafka.controller.PartitionStateMachine)",
+      "fileset": {
+        "module": "kafka",
+        "name": "log"
+      }
+    },
+    "fields": {
+      "@timestamp": [
+        "2017-08-04T10:48:21.156Z"
+      ]
+    },
+    "highlight": {
+      "source": [
+        "@kibana-highlighted-field@/home/n/go/src/github.com/elastic/beats/filebeat/module/kafka/log/test/controller.log@/kibana-highlighted-field@"
+      ]
+    },
+    "sort": [
+      1501843701156
+    ]
+  },
+
+  {
+    "_index": "filebeat-7.0.0-alpha1-2017.08.11",
+    "_type": "doc",
+    "_id": "kotR0l0Bed9fOYVUfeyz",
+    "_version": 1,
+    "_score": null,
+    "_source": {
+      "@timestamp": "2017-08-04T10:48:21.154Z",
+      "offset": 801,
+      "kafka": {
+        "log": {
+          "component": "Replica state machine on controller 0",
+          "level": "INFO",
+          "message": "Started replica state machine with initial state -> Map()",
+          "class": "kafka.controller.ReplicaStateMachine"
+        }
+      },
+      "beat": {
+        "hostname": "baldur",
+        "read_time": "2017-08-11T17:22:21.361Z",
+        "name": "baldur",
+        "version": "7.0.0-alpha1"
+      },
+      "prospector": {
+        "type": "log"
+      },
+      "input": {
+        "type": "log"
+      },
+      "source": "/home/n/go/src/github.com/elastic/beats/filebeat/module/kafka/log/test/controller.log",
+      "message": "[2017-08-04 10:48:21,154] INFO [Replica state machine on controller 0]: Started replica state machine with initial state -> Map() (kafka.controller.ReplicaStateMachine)",
+      "fileset": {
+        "module": "kafka",
+        "name": "log"
+      }
+    },
+    "fields": {
+      "@timestamp": [
+        "2017-08-04T10:48:21.154Z"
+      ]
+    },
+    "highlight": {
+      "source": [
+        "@kibana-highlighted-field@/home/n/go/src/github.com/elastic/beats/filebeat/module/kafka/log/test/controller.log@/kibana-highlighted-field@"
+      ]
+    },
+    "sort": [
+      1501843701154
+    ]
+  },
+
+  {
+    "_index": "filebeat-7.0.0-alpha1-2017.08.11",
+    "_type": "doc",
+    "_id": "kYtR0l0Bed9fOYVUfeyz",
+    "_version": 1,
+    "_score": null,
+    "_source": {
+      "@timestamp": "2017-08-04T10:48:21.085Z",
+      "offset": 632,
+      "kafka": {
+        "log": {
+          "component": "Controller 0",
+          "level": "DEBUG",
+          "message": "Registering IsrChangeNotificationListener",
+          "class": "kafka.controller.KafkaController"
+        }
+      },
+      "beat": {
+        "hostname": "baldur",
+        "read_time": "2017-08-11T17:22:21.360Z",
+        "name": "baldur",
+        "version": "7.0.0-alpha1"
+      },
+      "prospector": {
+        "type": "log"
+      },
+      "input": {
+        "type": "log"
+      },
+      "source": "/home/n/go/src/github.com/elastic/beats/filebeat/module/kafka/log/test/controller.log",
+      "fileset": {
+        "module": "kafka",
+        "name": "log"
+      },
+      "message": "[2017-08-04 10:48:21,085] DEBUG [Controller 0]: Registering IsrChangeNotificationListener (kafka.controller.KafkaController)"
+    },
+    "fields": {
+      "@timestamp": [
+        "2017-08-04T10:48:21.085Z"
+      ]
+    },
+    "highlight": {
+      "source": [
+        "@kibana-highlighted-field@/home/n/go/src/github.com/elastic/beats/filebeat/module/kafka/log/test/controller.log@/kibana-highlighted-field@"
+      ]
+    },
+    "sort": [
+      1501843701085
+    ]
+  },
+
+  {
+    "_index": "filebeat-7.0.0-alpha1-2017.08.11",
+    "_type": "doc",
+    "_id": "kItR0l0Bed9fOYVUfeyz",
+    "_version": 1,
+    "_score": null,
+    "_source": {
+      "@timestamp": "2017-08-04T10:48:21.082Z",
+      "offset": 507,
+      "kafka": {
+        "log": {
+          "component": "Controller 0",
+          "level": "INFO",
+          "message": "Controller 0 incremented epoch to 1",
+          "class": "kafka.controller.KafkaController"
+        }
+      },
+      "beat": {
+        "hostname": "baldur",
+        "read_time": "2017-08-11T17:22:21.358Z",
+        "name": "baldur",
+        "version": "7.0.0-alpha1"
+      },
+      "prospector": {
+        "type": "log"
+      },
+      "input": {
+        "type": "log"
+      },
+      "source": "/home/n/go/src/github.com/elastic/beats/filebeat/module/kafka/log/test/controller.log",
+      "message": "[2017-08-04 10:48:21,082] INFO [Controller 0]: Controller 0 incremented epoch to 1 (kafka.controller.KafkaController)",
+      "fileset": {
+        "module": "kafka",
+        "name": "log"
+      }
+    },
+    "fields": {
+      "@timestamp": [
+        "2017-08-04T10:48:21.082Z"
+      ]
+    },
+    "highlight": {
+      "source": [
+        "@kibana-highlighted-field@/home/n/go/src/github.com/elastic/beats/filebeat/module/kafka/log/test/controller.log@/kibana-highlighted-field@"
+      ]
+    },
+    "sort": [
+      1501843701082
+    ]
+  },
+
+  {
+    "_index": "filebeat-7.0.0-alpha1-2017.08.11",
+    "_type": "doc",
+    "_id": "j4tR0l0Bed9fOYVUfeyz",
+    "_version": 1,
+    "_score": null,
+    "_source": {
+      "@timestamp": "2017-08-04T10:48:21.064Z",
+      "offset": 389,
+      "kafka": {
+        "log": {
+          "component": "Controller 0",
+          "level": "INFO",
+          "message": "Broker 0 starting become controller state transition",
+          "class": "kafka.controller.KafkaController"
+        }
+      },
+      "beat": {
+        "hostname": "baldur",
+        "read_time": "2017-08-11T17:22:21.358Z",
+        "name": "baldur",
+        "version": "7.0.0-alpha1"
+      },
+      "prospector": {
+        "type": "log"
+      },
+      "input": {
+        "type": "log"
+      },
+      "source": "/home/n/go/src/github.com/elastic/beats/filebeat/module/kafka/log/test/controller.log",
+      "message": "[2017-08-04 10:48:21,064] INFO [Controller 0]: Broker 0 starting become controller state transition (kafka.controller.KafkaController)",
+      "fileset": {
+        "module": "kafka",
+        "name": "log"
+      }
+    },
+    "fields": {
+      "@timestamp": [
+        "2017-08-04T10:48:21.064Z"
+      ]
+    },
+    "highlight": {
+      "source": [
+        "@kibana-highlighted-field@/home/n/go/src/github.com/elastic/beats/filebeat/module/kafka/log/test/controller.log@/kibana-highlighted-field@"
+      ]
+    },
+    "sort": [
+      1501843701064
+    ]
+  },
+
+  {
+    "_index": "filebeat-7.0.0-alpha1-2017.08.11",
+    "_type": "doc",
+    "_id": "jotR0l0Bed9fOYVUfexP",
+    "_version": 1,
+    "_score": null,
+    "_source": {
+      "@timestamp": "2017-08-04T10:48:21.063Z",
+      "offset": 254,
+      "kafka": {
+        "log": {
+          "component": "Controller 0",
+          "level": "INFO",
+          "message": "0 successfully elected as the controller",
+          "class": "kafka.controller.KafkaController"
+        }
+      },
+      "beat": {
+        "hostname": "baldur",
+        "read_time": "2017-08-11T17:22:21.358Z",
+        "name": "baldur",
+        "version": "7.0.0-alpha1"
+      },
+      "prospector": {
+        "type": "log"
+      },
+      "input": {
+        "type": "log"
+      },
+      "source": "/home/n/go/src/github.com/elastic/beats/filebeat/module/kafka/log/test/controller.log",
+      "fileset": {
+        "module": "kafka",
+        "name": "log"
+      },
+      "message": "[2017-08-04 10:48:21,063] INFO [Controller 0]: 0 successfully elected as the controller (kafka.controller.KafkaController)"
+    },
+    "fields": {
+      "@timestamp": [
+        "2017-08-04T10:48:21.063Z"
+      ]
+    },
+    "highlight": {
+      "source": [
+        "@kibana-highlighted-field@/home/n/go/src/github.com/elastic/beats/filebeat/module/kafka/log/test/controller.log@/kibana-highlighted-field@"
+      ]
+    },
+    "sort": [
+      1501843701063
+    ]
+  },
+
+  {
+    "_index": "filebeat-7.0.0-alpha1-2017.08.11",
+    "_type": "doc",
+    "_id": "jYtR0l0Bed9fOYVUfOzU",
+    "_version": 1,
+    "_score": null,
+    "_source": {
+      "@timestamp": "2017-08-04T10:48:21.048Z",
+      "offset": 131,
+      "kafka": {
+        "log": {
+          "component": "controller-event-thread",
+          "level": "INFO",
+          "message": "Starting",
+          "class": "kafka.controller.ControllerEventManager$ControllerEventThread"
+        }
+      },
+      "beat": {
+        "hostname": "baldur",
+        "read_time": "2017-08-11T17:22:21.358Z",
+        "name": "baldur",
+        "version": "7.0.0-alpha1"
+      },
+      "prospector": {
+        "type": "log"
+      },
+      "input": {
+        "type": "log"
+      },
+      "source": "/home/n/go/src/github.com/elastic/beats/filebeat/module/kafka/log/test/controller.log",
+      "fileset": {
+        "module": "kafka",
+        "name": "log"
+      },
+      "message": "[2017-08-04 10:48:21,048] INFO [controller-event-thread]: Starting (kafka.controller.ControllerEventManager$ControllerEventThread)"
+    },
+    "fields": {
+      "@timestamp": [
+        "2017-08-04T10:48:21.048Z"
+      ]
+    },
+    "highlight": {
+      "source": [
+        "@kibana-highlighted-field@/home/n/go/src/github.com/elastic/beats/filebeat/module/kafka/log/test/controller.log@/kibana-highlighted-field@"
+      ]
+    },
+    "sort": [
+      1501843701048
+    ]
+  }
+]

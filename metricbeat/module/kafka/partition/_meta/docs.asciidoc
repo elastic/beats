@@ -1,6 +1,4 @@
-=== kafka partition MetricSet
-
-This is the partition metricset of the module kafka.
+This is the partition metricset of the Kafka module.
 
 ==== Configuration
 

@@ -1,0 +1,23 @@
+{
+    "@timestamp": "2017-10-12T08:05:34.853Z",
+    "beat": {
+        "hostname": "host.example.com",
+        "name": "host.example.com"
+    },
+    "ceph": {
+        "osd_tree": {
+            "children": "-2",
+            "father": "",
+            "id": -1,
+            "name": "default",
+            "type": "root",
+            "type_id": 10
+        }
+    },
+    "metricset": {
+        "host": "ceph:5000",
+        "module": "ceph",
+        "name": "osd_tree",
+        "rtt": 115
+    }
+}

@@ -1,0 +1,14 @@
+{
+    "job_id": "JOB_ID",
+    "indexes": [
+      "filebeat-*"
+    ],
+    "query": {
+      "bool": {
+        "filter": [  
+          { "term":  { "fileset.module": "nginx" } },
+          { "term":  { "fileset.name": "access" } }
+        ]
+      }
+    }
+}
