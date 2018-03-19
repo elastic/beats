@@ -4,7 +4,6 @@ BEAT_TITLE?=Metricbeat
 BEAT_DESCRIPTION?=Metricbeat is a lightweight shipper for metrics.
 SYSTEM_TESTS?=true
 TEST_ENVIRONMENT?=true
-TESTING_ENVIRONMENT?=snapshot-noxpack
 ES_BEATS?=..
 
 # Metricbeat can only be cross-compiled on platforms not requiring CGO.
