@@ -144,6 +144,7 @@ https://github.com/elastic/beats/compare/v6.0.0-beta2...master[Check the HEAD di
 - Fix namespace disambiguation in Kubernetes state_* metricsets. {issue}6281[6281]
 - Fix Kubernetes overview dashboard views for non default time ranges. {issue}6395{6395}
 - Fix Windows perfmon metricset so that it sends metrics when an error occurs. {pull}6542[6542]
+- Fix Kubernetes calculated fields store. {pull}6564{6564}
 
 *Packetbeat*
 
