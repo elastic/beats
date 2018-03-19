@@ -30,10 +30,11 @@ func (r *JSON) decodeJSON(text []byte) ([]byte, common.MapStr) {
 	err := unmarshal(text, &jsonFields)
 	if err != nil || jsonFields == nil {
 		if !r.cfg.IgnoreDecodingError {
-			logp.Err("Error decoding JSON: %v", err)
+
+			logp.Err("Error decoding JSON: %v. Raw data: %s", err, string(text))
 		}
 		if r.cfg.AddErrorKey {
-			jsonFields = common.MapStr{"error": createJSONError(fmt.Sprintf("Error decoding JSON: %v", err))}
+			jsonFields = common.MapStr{"error": createJSONError(fmt.Sprintf("Error decoding JSON: %v. Raw data: %s", err, string(text)))}
 		}
 		return text, jsonFields
 	}
