@@ -90,4 +90,5 @@ network intrusion detection software and indexes the records in Elasticsearch.
 https://github.com/mrkschan/uwsgibeat[uwsgibeat]:: Reads stats from uWSGI.
 https://github.com/phenomenes/varnishlogbeat[varnishlogbeat]:: Reads log data from a Varnish instance and ships it to Elasticsearch.
 https://github.com/phenomenes/varnishstatbeat[varnishstatbeat]:: Reads stats data from a Varnish instance and ships it to Elasticsearch.
+https://gitlab.com/msvechla/vaultbeat[vaultbeat]:: Collects performance metrics and statistics from Hashicorp's Vault.
 https://github.com/eskibars/wmibeat[wmibeat]:: Uses WMI to grab your favorite, configurable Windows metrics.
