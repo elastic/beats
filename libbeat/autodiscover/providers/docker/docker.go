@@ -51,16 +51,16 @@ func AutodiscoverBuilder(bus bus.Bus, c *common.Config) (autodiscover.Provider, 
 	var builders autodiscover.Builders
 	for _, bcfg := range config.Builders {
 		if builder, err := autodiscover.Registry.BuildBuilder(bcfg); err != nil {
-			logp.Warn("docker", "failed to construct autodiscover builder due to error: %v", err)
+			logp.Info("docker: failed to construct autodiscover builder due to error: %v", err)
 		} else {
 			builders = append(builders, builder)
 		}
 	}
 
 	var appenders autodiscover.Appenders
-	for _, acfg := range config.Builders {
+	for _, acfg := range config.Appenders {
 		if appender, err := autodiscover.Registry.BuildAppender(acfg); err != nil {
-			logp.Warn("docker", "failed to construct autodiscover appender due to error: %v", err)
+			logp.Info("docker: failed to construct autodiscover appender due to error: %v", err)
 		} else {
 			appenders = append(appenders, appender)
 		}
@@ -119,8 +119,12 @@ func (d *Provider) emitContainer(event bus.Event, flag string) {
 	}
 
 	labelMap := common.MapStr{}
+	labels := common.MapStr{}
 	for k, v := range container.Labels {
 		safemapstr.Put(labelMap, k, v)
+
+		// Needed for hint processing
+		labels[k] = v
 	}
 
 	meta := common.MapStr{
@@ -131,13 +135,15 @@ func (d *Provider) emitContainer(event bus.Event, flag string) {
 			"labels": labelMap,
 		},
 	}
+	dockerMeta := meta.Clone()
+	dockerMeta.Put("container.labels", labels)
 
 	// Without this check there would be overlapping configurations with and without ports.
 	if len(container.Ports) == 0 {
 		event := bus.Event{
 			flag:     true,
 			"host":   host,
-			"docker": meta,
+			"docker": dockerMeta,
 			"meta": common.MapStr{
 				"docker": meta,
 			},
@@ -152,7 +158,7 @@ func (d *Provider) emitContainer(event bus.Event, flag string) {
 			flag:     true,
 			"host":   host,
 			"port":   port.PrivatePort,
-			"docker": meta,
+			"docker": dockerMeta,
 			"meta": common.MapStr{
 				"docker": meta,
 			},
@@ -198,7 +204,6 @@ func (d *Provider) generateHints(event bus.Event) bus.Event {
 		hints := builder.GenerateHints(labels.(common.MapStr), "", d.config.Prefix)
 		e["hints"] = hints
 	}
-
 	return e
 }
 

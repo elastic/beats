@@ -91,6 +91,7 @@ https://github.com/elastic/beats/compare/v6.0.0-beta2...master[Check the HEAD di
 - Fix infinite failure on Kubernetes watch {pull}6504[6504]
 - Ensure Kubernetes labels/annotations don't break mapping {pull}6490[6490]
 - Report ephemeral ID and uptime in monitoring events on all platforms {pull}6501[6501]
+- Fix docker autodiscover hint generation and autodiscover logging {pull}6590[6590]
 
 *Auditbeat*
 
