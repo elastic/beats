@@ -9,10 +9,17 @@ import (
 
 func TestTimeout(t *testing.T) {
 	// Mocknotonic time:
-	fakeTime := time.Now().Unix()
+	fakeTimeCh := make(chan int64)
+	go func() {
+		fakeTime := time.Now().Unix()
+		for {
+			fakeTime++
+			fakeTimeCh <- fakeTime
+		}
+	}()
+
 	now = func() time.Time {
-		fakeTime++
-		return time.Unix(fakeTime, 0)
+		return time.Unix(<-fakeTimeCh, 0)
 	}
 
 	// Blocking sleep:
