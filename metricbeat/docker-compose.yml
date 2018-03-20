@@ -45,6 +45,11 @@ services:
   apache:
     build: ./module/apache/_meta
 
+  apache_2_4_12:
+    build:
+      context: ./module/apache/_meta
+      dockerfile: Dockerfile.2.4.12
+
   ceph:
     build: ./module/ceph/_meta
 
