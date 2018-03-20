@@ -4,12 +4,24 @@ package mlimporter
 import (
 	"encoding/json"
 	"fmt"
+	"io"
 	"io/ioutil"
+	"net/url"
+	"strings"
 
+	"github.com/joeshaw/multierror"
 	"github.com/pkg/errors"
 
 	"github.com/elastic/beats/libbeat/common"
 	"github.com/elastic/beats/libbeat/logp"
+)
+
+var (
+	esDataFeedURL        = "/_xpack/ml/datafeeds/datafeed-%s"
+	esJobURL             = "/_xpack/ml/anomaly_detectors/%s"
+	kibanaGetModuleURL   = "/api/ml/modules/get_module/%s"
+	kibanaRecognizeURL   = "/api/ml/modules/recognize/%s"
+	kibanaSetupModuleURL = "/api/ml/modules/setup/%s"
 )
 
 // MLConfig contains the required configuration for loading one job and the associated
@@ -29,6 +41,46 @@ type MLLoader interface {
 	GetVersion() string
 }
 
+// MLLoader is a subset of the Kibana client API capable of setting up ML objects.
+type MLSetupper interface {
+	Request(method, path string, params url.Values, body io.Reader) (int, []byte, error)
+	GetVersion() string
+}
+
+type MLResponse struct {
+	Datafeeds []struct {
+		ID      string
+		Success bool
+		Error   struct {
+			Msg string
+		}
+	}
+	Jobs []struct {
+		ID      string
+		Success bool
+		Error   struct {
+			Msg string
+		}
+	}
+	Kibana struct {
+		Dashboard []struct {
+			Success bool
+			ID      string
+			Exists  bool
+		}
+		Search []struct {
+			Success bool
+			ID      string
+			Exists  bool
+		}
+		Visualization []struct {
+			Success bool
+			ID      string
+			Exists  bool
+		}
+	}
+}
+
 func readJSONFile(path string) (common.MapStr, error) {
 	file, err := ioutil.ReadFile(path)
 	if err != nil {
@@ -41,8 +93,8 @@ func readJSONFile(path string) (common.MapStr, error) {
 
 // ImportMachineLearningJob uploads the job and datafeed configuration to ES/xpack.
 func ImportMachineLearningJob(esClient MLLoader, cfg *MLConfig) error {
-	jobURL := fmt.Sprintf("/_xpack/ml/anomaly_detectors/%s", cfg.ID)
-	datafeedURL := fmt.Sprintf("/_xpack/ml/datafeeds/datafeed-%s", cfg.ID)
+	jobURL := fmt.Sprintf(esJobURL, cfg.ID)
+	datafeedURL := fmt.Sprintf(esDataFeedURL, cfg.ID)
 
 	if len(cfg.MinVersion) > 0 {
 		esVersion, err := common.NewVersion(esClient.GetVersion())
@@ -120,4 +172,70 @@ func HaveXpackML(esClient MLLoader) (bool, error) {
 		return false, errors.Wrap(err, "unmarshal")
 	}
 	return xpack.Features.ML.Available && xpack.Features.ML.Enabled, nil
+}
+
+// SetupModules creates ML jobs, data feeds and dashboards for modules.
+func SetupModule(kibanaClient MLSetupper, module string) error {
+	setupURL := fmt.Sprintf(kibanaSetupModuleURL, module)
+	prefix := fmt.Sprintf("{\"prefix\": \"filebeat_%s_\"}", module)
+	status, response, err := kibanaClient.Request("POST", setupURL, nil, strings.NewReader(prefix))
+	if status != 200 {
+		return errors.Errorf("cannot set up ML for module: %s %v", module, status)
+	}
+	if err != nil {
+		return err
+	}
+
+	return checkResponse(response)
+}
+
+func checkResponse(r []byte) error {
+	var errs multierror.Errors
+
+	var resp MLResponse
+	err := json.Unmarshal(r, &resp)
+	if err != nil {
+		return err
+	}
+
+	for _, feed := range resp.Datafeeds {
+		if !feed.Success {
+			errs = append(errs, errors.Errorf(feed.Error.Msg))
+		}
+	}
+	for _, job := range resp.Jobs {
+		if !job.Success {
+			errs = append(errs, errors.Errorf(job.Error.Msg))
+		}
+	}
+	for _, dashboard := range resp.Kibana.Dashboard {
+		if !dashboard.Success {
+			if dashboard.Exists {
+				errs = append(errs, errors.Errorf("dashboard already exists: %s", dashboard.ID))
+			} else {
+				errs = append(errs, errors.Errorf("error while setting up dashboard: %s", dashboard.ID))
+			}
+		}
+	}
+	for _, search := range resp.Kibana.Search {
+		if !search.Success {
+			if search.Exists {
+				errs = append(errs, errors.Errorf("search already exists: %s", search.ID))
+			} else {
+				errs = append(errs, errors.Errorf("error while setting up search: %s", search.ID))
+			}
+		}
+	}
+	for _, visualization := range resp.Kibana.Visualization {
+		if !visualization.Success {
+			if visualization.Exists {
+				errs = append(errs, errors.Errorf("visualization already exists: %s", visualization.ID))
+			} else {
+				errs = append(errs, errors.Errorf("error while setting up visualization: %s", visualization.ID))
+			}
+		}
+	}
+
+	return errs.Err()
+
 }

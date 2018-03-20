@@ -14,6 +14,7 @@ import (
 	"github.com/elastic/beats/libbeat/logp"
 	mlimporter "github.com/elastic/beats/libbeat/ml-importer"
 	"github.com/elastic/beats/libbeat/paths"
+	"github.com/elastic/beats/libbeat/setup/kibana"
 )
 
 type ModuleRegistry struct {
@@ -463,7 +464,7 @@ func (reg *ModuleRegistry) LoadML(esClient PipelineLoader) error {
 	for module, filesets := range reg.registry {
 		for name, fileset := range filesets {
 			for _, mlConfig := range fileset.GetMLConfigs() {
-				err = mlimporter.ImportMachineLearningJob(esClient, &mlConfig)
+				err := mlimporter.ImportMachineLearningJob(esClient, &mlConfig)
 				if err != nil {
 					return errors.Errorf("Error loading ML config from %s/%s: %v", module, name, err)
 				}
@@ -471,6 +472,30 @@ func (reg *ModuleRegistry) LoadML(esClient PipelineLoader) error {
 		}
 	}
 
+	return nil
+}
+
+// SetupML sets up the machine-learning configurations into Elasticsearch using Kibana, if Xpack is available
+func (reg *ModuleRegistry) SetupML(esClient PipelineLoader, kibanaClient *kibana.Client) error {
+	haveXpack, err := mlimporter.HaveXpackML(esClient)
+	if err != nil {
+		return errors.Errorf("Error checking if xpack is available: %v", err)
+	}
+	if !haveXpack {
+		logp.Warn("Xpack Machine Learning is not enabled")
+		return nil
+	}
+
+	for module, _ := range reg.registry {
+		if module == "" {
+			return errors.Errorf("No module is specified")
+		}
+
+		err := mlimporter.SetupModule(kibanaClient, module)
+		if err != nil {
+			return errors.Errorf("Error setting up ML for %s: %v", module, err)
+		}
+	}
 	return nil
 }
 

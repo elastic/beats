@@ -15,6 +15,7 @@ import (
 	"github.com/elastic/beats/libbeat/logp"
 	"github.com/elastic/beats/libbeat/monitoring"
 	"github.com/elastic/beats/libbeat/outputs/elasticsearch"
+	"github.com/elastic/beats/libbeat/setup/kibana"
 
 	fbautodiscover "github.com/elastic/beats/filebeat/autodiscover"
 	"github.com/elastic/beats/filebeat/channel"
@@ -120,8 +121,8 @@ func New(b *beat.Beat, rawConfig *common.Config) (beat.Beater, error) {
 	}
 
 	// register `setup` callback for ML jobs
-	b.SetupMLCallback = func(b *beat.Beat) error {
-		return fb.loadModulesML(b)
+	b.SetupMLCallback = func(b *beat.Beat, kibanaConfig *common.Config) error {
+		return fb.loadModulesML(b, kibanaConfig)
 	}
 	return fb, nil
 }
@@ -144,9 +145,10 @@ func (fb *Filebeat) loadModulesPipelines(b *beat.Beat) error {
 	return nil
 }
 
-func (fb *Filebeat) loadModulesML(b *beat.Beat) error {
-	logp.Debug("machine-learning", "Setting up ML jobs for modules")
+func (fb *Filebeat) loadModulesML(b *beat.Beat, kibanaConfig *common.Config) error {
 	var errs multierror.Errors
+
+	logp.Debug("machine-learning", "Setting up ML jobs for modules")
 
 	if b.Config.Output.Name() != "elasticsearch" {
 		logp.Warn("Filebeat is unable to load the Xpack Machine Learning configurations for the" +
@@ -159,7 +161,22 @@ func (fb *Filebeat) loadModulesML(b *beat.Beat) error {
 	if err != nil {
 		return errors.Errorf("Error creating Elasticsearch client: %v", err)
 	}
-	if err := fb.moduleRegistry.LoadML(esClient); err != nil {
+
+	if kibanaConfig == nil {
+		kibanaConfig = common.NewConfig()
+	}
+
+	kibanaClient, err := kibana.NewKibanaClient(kibanaConfig)
+	if err != nil {
+		return errors.Errorf("Error creating Kibana client: %v", err)
+	}
+
+	kibanaVersion, err := common.NewVersion(kibanaClient.GetVersion())
+	if err != nil {
+		return err
+	}
+
+	if err := setupMLBasedOnVersion(fb.moduleRegistry, esClient, kibanaClient, kibanaVersion); err != nil {
 		errs = append(errs, err)
 	}
 
@@ -185,13 +202,28 @@ func (fb *Filebeat) loadModulesML(b *beat.Beat) error {
 				continue
 			}
 
-			if err := set.LoadML(esClient); err != nil {
+			if err := setupMLBasedOnVersion(set, esClient, kibanaClient, kibanaVersion); err != nil {
 				errs = append(errs, err)
 			}
+
 		}
 	}
 
 	return errs.Err()
+}
+
+func setupMLBasedOnVersion(reg *fileset.ModuleRegistry, esClient *elasticsearch.Client, kibanaClient *kibana.Client, kibanaVersion *common.Version) error {
+	if isElasticsearchLoads(kibanaVersion) {
+		return reg.LoadML(esClient)
+	}
+	return reg.SetupML(esClient, kibanaClient)
+}
+
+func isElasticsearchLoads(kibanaVersion *common.Version) bool {
+	if kibanaVersion.Major < 6 && kibanaVersion.Minor < 1 {
+		return true
+	}
+	return false
 }
 
 // Run allows the beater to be run as a beat.
