@@ -121,7 +121,6 @@ https://github.com/elastic/beats/compare/v6.0.0-beta2...master[Check the HEAD di
 
 *Metricbeat*
 
-- Add connections metricset to RabbitMQ module {pull}6548[6548]
 - Change field type of http header from nested to object {pull}5258[5258]
 - Fix the fetching of process information when some data is missing under MacOS X. {issue}5337[5337]
 - Change `MySQL active connections` visualization title to `MySQL total connections`. {issue}4812[4812]
@@ -256,6 +255,8 @@ https://github.com/elastic/beats/compare/v6.0.0-beta2...master[Check the HEAD di
 - Making the MongoDB module GA. {pull}6554[6554]
 - Allow to disable labels `dedot` in Docker module, in favor of a safe way to keep dots. {pull}6490[6490]
 - Add experimental module to collect metrics from munin nodes. {pull}6517[6517]
+- Add connections metricset to RabbitMQ module {pull}6548[6548]
+- Add message rates to the RabbitMQ queue metricset {issue}6442[6442] {pull}6606[6606]
 
 *Packetbeat*
 
