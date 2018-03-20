@@ -3,11 +3,16 @@ package cmd
 import (
 	"{beat_path}/beater"
 
-	cmd "github.com/elastic/beats/libbeat/cmd"
+	"github.com/elastic/beats/libbeat/cmd"
 )
 
 // Name of this beat
 var Name = "{beat}"
 
+// RootCmd for running {beat}.
+var RootCmd *cmd.BeatsRootCmd
+
 // RootCmd to handle beats cli
-var RootCmd = cmd.GenRootCmd(Name, appVersion, beater.New)
+func init() {
+	RootCmd = cmd.GenRootCmd(Name, appVersion, beater.New)
+}
