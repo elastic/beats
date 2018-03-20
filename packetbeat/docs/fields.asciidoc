@@ -2926,13 +2926,6 @@ The algorithm used for this certificate's public key. One of RSA, DSA or ECDSA.
 
 
 [float]
-=== `tls.client_certificate.public_key_size`
-
-type: long
-
-Size of the public key.
-
-[float]
 === `tls.client_certificate.signature_algorithm`
 
 type: keyword
@@ -3079,13 +3072,6 @@ The algorithm used for this certificate's public key. One of RSA, DSA or ECDSA.
 
 
 [float]
-=== `tls.server_certificate.public_key_size`
-
-type: long
-
-Size of the public key.
-
-[float]
 === `tls.server_certificate.signature_algorithm`
 
 type: keyword
@@ -3209,34 +3195,6 @@ Chain of trust for the client certificate.
 type: keyword
 
 An array containing the TLS alert type for every alert received.
-
-
-[float]
-== fingerprints fields
-
-Fingerprints for this TLS session.
-
-
-[float]
-== ja3 fields
-
-JA3 TLS client fingerprint
-
-
-[float]
-=== `tls.fingerprints.ja3.hash`
-
-type: keyword
-
-The JA3 fingerprint hash for the client side.
-
-
-[float]
-=== `tls.fingerprints.ja3.str`
-
-type: keyword
-
-The JA3 string used to calculate the hash.
 
 
 [[exported-fields-trans_event]]
