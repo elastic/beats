@@ -69,6 +69,7 @@ https://github.com/elastic/beats/compare/v6.0.0-beta2...master[Check the HEAD di
 - Add config option for windows/perfmon metricset to ignore non existent counters. {pull}6432[6432]
 - Support apache status pages for versions older than 2.4.16. {pull}6450[6450]
 - Add support for huge pages on Linux. {pull}6436[6436]
+- Refactor docker CPU calculations to be more consistent with `docker stats`. {pull}6608[6608]
 
 *Packetbeat*
 

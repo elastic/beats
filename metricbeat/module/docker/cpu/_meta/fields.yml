@@ -8,15 +8,16 @@
       type: scaled_float
       format: percentage
       description: >
-        The system kernel consumed by the Docker server.
+        Percentage of time in kernel space.
     - name: kernel.ticks
       type: long
       description: >
-        CPU kernel ticks.
+        CPU ticks in kernel space.
     - name: system.pct
       type: scaled_float
       format: percentage
       description: >
+        Percentage of total CPU time in the system.
     - name: system.ticks
       type: long
       description: >
@@ -25,10 +26,11 @@
       type: scaled_float
       format: percentage
       description: >
+        Percentage of time in user space.
     - name: user.ticks
       type: long
       description: >
-        CPU user ticks
+        CPU ticks in user space.
     - name: total.pct
       type: scaled_float
       format: percentage
