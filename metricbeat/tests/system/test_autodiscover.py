@@ -41,6 +41,7 @@ class TestAutodiscover(metricbeat.BaseTest):
         container = docker_client.containers.run('memcached:1.5.3', detach=True)
 
         self.wait_until(lambda: self.log_contains('Autodiscover starting runner: memcached'))
+        sleep(2)
 
         container.stop()
         self.wait_until(lambda: self.log_contains('Autodiscover stopping runner: memcached'))
@@ -80,6 +81,7 @@ class TestAutodiscover(metricbeat.BaseTest):
         container = docker_client.containers.run('memcached:1.5.3', labels=labels, detach=True)
 
         self.wait_until(lambda: self.log_contains('Autodiscover starting runner: memcached'))
+        sleep(2)
 
         container.stop()
         self.wait_until(lambda: self.log_contains('Autodiscover stopping runner: memcached'))
