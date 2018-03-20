@@ -57,4 +57,4 @@ popd
 
 # use exactly the same beats revision rather than $BEATS_VERSION
 BEATS_REVISION=$(GIT_DIR=${BASEDIR}/${GIT_CLONE}/.git git rev-parse HEAD)
-${DIRNAME}/update_govendor_deps.py ${BEATS_REVISION}
+python ${DIRNAME}/update_govendor_deps.py ${BEATS_REVISION}

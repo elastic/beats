@@ -22,7 +22,7 @@ SYSTEM_TESTS=false
 TEST_ENVIRONMENT=true
 TESTING_ENVIRONMENT=snapshot-noxpack
 
-# Path to the libbeachmt Makefile
+# Path to the libbeat Makefile
 -include $(ES_BEATS)/libbeat/scripts/Makefile
 
 setup:
@@ -44,13 +44,13 @@ update-libbeat:
 	govendor fetch github.com/elastic/beats/...@$(BEATS_VERSION)
 	govendor fetch github.com/elastic/beats/libbeat/kibana/@$(BEATS_VERSION)
 	# Change the origin of all libbeat's dependencies to elastic/beats git repo
-	scripts/patch_vendorjson.py
+	python scripts/patch_vendorjson.py
 	# Update all dependencies with the new orign...
-	BEATS_VERSION=$(BEATS_VERSION) sh scripts/update_beats.sh
+	BEATS_VERSION=$(BEATS_VERSION) /bin/bash scripts/update_beats.sh
 	# Change the origin of all additional libbeat's dependencies to elastic/beats git repo
-	sh scripts/patch_vendorjson.py --done
+	python scripts/patch_vendorjson.py --done
 	# Update all libbeat's dependencies one more time with the new origin...
-	BEATS_VERSION=$(BEATS_VERSION) sh scripts/update_beats.sh
+	BEATS_VERSION=$(BEATS_VERSION) /bin/bash scripts/update_beats.sh
 	# Update documentation and configuration files
 	$(MAKE) update
 	@echo --- Use this commit message: Update beats framework to `cat vendor/vendor.json | python -c 'import sys, json; print([p["revision"] for p in json.load(sys.stdin)["package"] if p["path"] == "github.com/elastic/beats/libbeat/beat"][0][:7])'`
@@ -68,6 +68,7 @@ before-build:
 .PHONY: collect
 collect: notice
 
+.PHONY: check-full
 check-full: check
 	@# Validate that all updates were committed
 	@$(MAKE) update
