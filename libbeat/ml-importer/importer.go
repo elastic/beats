@@ -41,12 +41,13 @@ type MLLoader interface {
 	GetVersion() string
 }
 
-// MLLoader is a subset of the Kibana client API capable of setting up ML objects.
+// MLSetupper is a subset of the Kibana client API capable of setting up ML objects.
 type MLSetupper interface {
 	Request(method, path string, params url.Values, body io.Reader) (int, []byte, error)
 	GetVersion() string
 }
 
+// MLResponse stores the relevant parts of the response from Kibana to check for errors.
 type MLResponse struct {
 	Datafeeds []struct {
 		ID      string
@@ -174,7 +175,7 @@ func HaveXpackML(esClient MLLoader) (bool, error) {
 	return xpack.Features.ML.Available && xpack.Features.ML.Enabled, nil
 }
 
-// SetupModules creates ML jobs, data feeds and dashboards for modules.
+// SetupModule creates ML jobs, data feeds and dashboards for modules.
 func SetupModule(kibanaClient MLSetupper, module string) error {
 	setupURL := fmt.Sprintf(kibanaSetupModuleURL, module)
 	prefix := fmt.Sprintf("{\"prefix\": \"filebeat_%s_\"}", module)

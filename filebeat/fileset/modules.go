@@ -486,7 +486,7 @@ func (reg *ModuleRegistry) SetupML(esClient PipelineLoader, kibanaClient *kibana
 		return nil
 	}
 
-	for module, _ := range reg.registry {
+	for module := range reg.registry {
 		if module == "" {
 			return errors.Errorf("No module is specified")
 		}
