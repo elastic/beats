@@ -39,10 +39,6 @@ update-dependencies: vendor
 	$(MAKE) update-{beat}-dependencies
 
 update-libbeat:
-	@chmod +x scripts/clean_vendor.sh
-	@chmod +x scripts/patch_vendorjson.py
-	@chmod +x scripts/update_beats.sh
-	@chmod +x scripts/update_govendor_deps.py
 	rm -rf vendor/github.com/elastic/beats
 	# Fetch libbeat dependency to the vendor folder
 	govendor fetch github.com/elastic/beats/...@$(BEATS_VERSION)
@@ -50,11 +46,11 @@ update-libbeat:
 	# Change the origin of all libbeat's dependencies to elastic/beats git repo
 	scripts/patch_vendorjson.py
 	# Update all dependencies with the new orign...
-	BEATS_VERSION=$(BEATS_VERSION) scripts/update_beats.sh
+	BEATS_VERSION=$(BEATS_VERSION) sh scripts/update_beats.sh
 	# Change the origin of all additional libbeat's dependencies to elastic/beats git repo
-	scripts/patch_vendorjson.py --done
+	sh scripts/patch_vendorjson.py --done
 	# Update all libbeat's dependencies one more time with the new origin...
-	BEATS_VERSION=$(BEATS_VERSION) scripts/update_beats.sh
+	BEATS_VERSION=$(BEATS_VERSION) sh scripts/update_beats.sh
 	# Update documentation and configuration files
 	$(MAKE) update
 	@echo --- Use this commit message: Update beats framework to `cat vendor/vendor.json | python -c 'import sys, json; print([p["revision"] for p in json.load(sys.stdin)["package"] if p["path"] == "github.com/elastic/beats/libbeat/beat"][0][:7])'`
@@ -83,4 +79,4 @@ check-full: check
 .PHONY: notice
 notice: python-env
 	@echo "Generating NOTICE.txt"
-	$(PYTHON_ENV)/bin/python ${ES_BEATS}/dev-tools/generate_notice.py . -e '_beats' -s "./vendor/github.com/elastic/beats" -b "$(BEAT_NAME)" -c "$(COPYRIGHT_TXT)"
+	$(PYTHON_ENV)/bin/python ${ES_BEATS}/dev-tools/generate_notice.py  -s "./vendor/github.com/elastic/beats" -b "$(BEAT_NAME)" -c "$(COPYRIGHT_TXT)" .
