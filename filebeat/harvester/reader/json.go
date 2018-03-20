@@ -34,8 +34,9 @@ func (r *JSON) decodeJSON(text []byte) ([]byte, common.MapStr) {
 			logp.Err("Error decoding JSON: %v. Raw data: %s", err, string(text))
 		}
 		if r.cfg.AddErrorKey {
-			jsonFields = common.MapStr{"error": createJSONError(fmt.Sprintf("Error decoding JSON: %v. Raw data: %s", err, string(text)))}
+			jsonFields = common.MapStr{"error": createJSONError(fmt.Sprintf("Error decoding JSON: %v", err))}
 		}
+		appendRawJSONData(jsonFields, text)
 		return text, jsonFields
 	}
 
@@ -125,4 +126,11 @@ func MergeJSONFields(data common.MapStr, jsonFields common.MapStr, text *string,
 		return event.Timestamp
 	}
 	return time.Time{}
+}
+
+func appendRawJSONData(jsonFields map[string]interface{}, text []byte) {
+	if jsonFields == nil {
+		jsonFields = common.MapStr{}
+	}
+	jsonFields["message"] = fmt.Sprintf("Raw json data: %s", string(text))
 }

@@ -122,17 +122,19 @@ func TestDecodeJSON(t *testing.T) {
 		},
 		{
 			// in case the JSON is "null", we should just not panic
+			// We also put raw data in message key so that data is not lost
 			Text:         `null`,
 			Config:       JSONConfig{MessageKey: "value", AddErrorKey: true},
 			ExpectedText: `null`,
-			ExpectedMap:  common.MapStr{"error": common.MapStr{"message": "Error decoding JSON: <nil>. Raw data: null", "type": "json"}},
+			ExpectedMap:  common.MapStr{"error": common.MapStr{"message": "Error decoding JSON: <nil>", "type": "json"}, "message": "Raw json data: null"},
 		},
 		{
 			// Add key error helps debugging this
+			// We also put raw data in message key so that data is not lost
 			Text:         `{"message": "test", "value": "`,
 			Config:       JSONConfig{MessageKey: "value", AddErrorKey: true},
 			ExpectedText: `{"message": "test", "value": "`,
-			ExpectedMap:  common.MapStr{"error": common.MapStr{"message": `Error decoding JSON: unexpected EOF. Raw data: {"message": "test", "value": "`, "type": "json"}},
+			ExpectedMap:  common.MapStr{"error": common.MapStr{"message": "Error decoding JSON: unexpected EOF", "type": "json"}, "message": `Raw json data: {"message": "test", "value": "`},
 		},
 		{
 			// If the text key is not found, put an error
