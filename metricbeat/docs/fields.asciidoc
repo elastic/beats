@@ -9231,6 +9231,14 @@ Sum of ready and unacknowledged messages (queue depth).
 
 
 [float]
+=== `rabbitmq.queue.messages.total.details.rate`
+
+type: float
+
+How much the queue depth has changed per second in the most recent sampling interval.
+
+
+[float]
 === `rabbitmq.queue.messages.ready.count`
 
 type: long
@@ -9239,11 +9247,27 @@ Number of messages ready to be delivered to clients.
 
 
 [float]
+=== `rabbitmq.queue.messages.ready.details.rate`
+
+type: float
+
+How much the count of messages ready has changed per second in the most recent sampling interval.
+
+
+[float]
 === `rabbitmq.queue.messages.unacknowledged.count`
 
 type: long
 
 Number of messages delivered to clients but not yet acknowledged.
+
+
+[float]
+=== `rabbitmq.queue.messages.unacknowledged.details.rate`
+
+type: float
+
+How much the count of unacknowledged messages has changed per second in the most recent sampling interval.
 
 
 [float]
