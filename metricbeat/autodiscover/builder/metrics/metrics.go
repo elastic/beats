@@ -57,7 +57,7 @@ func (m *metricAnnotations) CreateConfig(event bus.Event) []*common.Config {
 		return config
 	}
 
-	port, _ := event["port"].(int64)
+	port, _ := common.TryToInt(event["port"])
 
 	hints, ok := event["hints"].(common.MapStr)
 	if !ok {
@@ -127,7 +127,7 @@ func (m *metricAnnotations) getMetricSets(hints common.MapStr, module string) []
 	return msets
 }
 
-func (m *metricAnnotations) getHostsWithPort(hints common.MapStr, port int64) []string {
+func (m *metricAnnotations) getHostsWithPort(hints common.MapStr, port int) []string {
 	var result []string
 	thosts := builder.GetHintAsList(hints, m.Key, hosts)
 

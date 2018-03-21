@@ -150,7 +150,7 @@ func (d *Provider) emitContainer(event bus.Event, flag string) {
 		event := bus.Event{
 			flag:     true,
 			"host":   host,
-			"port":   int64(port.PrivatePort),
+			"port":   port.PrivatePort,
 			"docker": meta,
 			"meta": common.MapStr{
 				"docker": meta,
