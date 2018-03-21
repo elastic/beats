@@ -67,7 +67,7 @@ class TestAutodiscover(metricbeat.BaseTest):
         self.render_config_template(
             autodiscover={
                 'docker': {
-                    'builders': '- type: metrics',
+                    'hints.enabled': 'true',
                 },
             },
         )
