@@ -450,14 +450,14 @@ func interpretError(initialErr error, body []byte) error {
 	return fmt.Errorf("couldn't load pipeline: %v. Response body: %s", initialErr, body)
 }
 
-// LoadML loads the machine-learning configurations into Elasticsearch, if Xpack is available
+// LoadML loads the machine-learning configurations into Elasticsearch, if X-Pack is available
 func (reg *ModuleRegistry) LoadML(esClient PipelineLoader) error {
 	haveXpack, err := mlimporter.HaveXpackML(esClient)
 	if err != nil {
-		return errors.Errorf("Error checking if xpack is available: %v", err)
+		return errors.Errorf("error checking if xpack is available: %v", err)
 	}
 	if !haveXpack {
-		logp.Warn("Xpack Machine Learning is not enabled")
+		logp.Warn("X-Pack Machine Learning is not enabled")
 		return nil
 	}
 
@@ -466,7 +466,7 @@ func (reg *ModuleRegistry) LoadML(esClient PipelineLoader) error {
 			for _, mlConfig := range fileset.GetMLConfigs() {
 				err := mlimporter.ImportMachineLearningJob(esClient, &mlConfig)
 				if err != nil {
-					return errors.Errorf("Error loading ML config from %s/%s: %v", module, name, err)
+					return errors.Errorf("error loading ML config from %s/%s: %v", module, name, err)
 				}
 			}
 		}
@@ -475,26 +475,30 @@ func (reg *ModuleRegistry) LoadML(esClient PipelineLoader) error {
 	return nil
 }
 
-// SetupML sets up the machine-learning configurations into Elasticsearch using Kibana, if Xpack is available
+// SetupML sets up the machine-learning configurations into Elasticsearch using Kibana, if X-Pack is available
 func (reg *ModuleRegistry) SetupML(esClient PipelineLoader, kibanaClient *kibana.Client) error {
 	haveXpack, err := mlimporter.HaveXpackML(esClient)
 	if err != nil {
 		return errors.Errorf("Error checking if xpack is available: %v", err)
 	}
 	if !haveXpack {
-		logp.Warn("Xpack Machine Learning is not enabled")
+		logp.Warn("X-Pack Machine Learning is not enabled")
 		return nil
 	}
 
-	var modules []string
+	var modules map[string]string
 	if reg.Empty() {
 		modules = mlimporter.AvailableModules
 	} else {
-		modules = reg.ModuleNames()
+		for _, module := range reg.ModuleNames() {
+			if fileset, ok := mlimporter.AvailableModules[module]; ok {
+				modules[module] = fileset
+			}
+		}
 	}
 
-	for _, module := range modules {
-		err := mlimporter.SetupModule(kibanaClient, module)
+	for module, fileset := range modules {
+		err := mlimporter.SetupModule(kibanaClient, module, fileset)
 		if err != nil {
 			return errors.Errorf("Error setting up ML for %s: %v", module, err)
 		}

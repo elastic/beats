@@ -24,9 +24,9 @@ var (
 	kibanaSetupModuleURL = "/api/ml/modules/setup/%s"
 
 	// AvailableModules is the list of modules available in ML
-	AvailableModules = []string{
-		"apache2",
-		"nginx",
+	AvailableModules = map[string]string{
+		"apache2": "access",
+		"nginx":   "access",
 	}
 )
 
@@ -182,12 +182,12 @@ func HaveXpackML(esClient MLLoader) (bool, error) {
 }
 
 // SetupModule creates ML jobs, data feeds and dashboards for modules.
-func SetupModule(kibanaClient MLSetupper, module string) error {
+func SetupModule(kibanaClient MLSetupper, module, fileset string) error {
 	setupURL := fmt.Sprintf(kibanaSetupModuleURL, module)
-	prefix := fmt.Sprintf("{\"prefix\": \"filebeat_%s_\"}", module)
+	prefix := fmt.Sprintf("{\"prefix\": \"filebeat-%s-%s-\"}", module, fileset)
 	status, response, err := kibanaClient.Request("POST", setupURL, nil, strings.NewReader(prefix))
 	if status != 200 {
-		return errors.Errorf("cannot set up ML for module: %s %v", module, status)
+		return errors.Errorf("cannot set up ML for module: %s/%s %v", module, fileset, status)
 	}
 	if err != nil {
 		return err
