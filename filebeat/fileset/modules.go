@@ -486,11 +486,14 @@ func (reg *ModuleRegistry) SetupML(esClient PipelineLoader, kibanaClient *kibana
 		return nil
 	}
 
-	for module := range reg.registry {
-		if module == "" {
-			return errors.Errorf("No module is specified")
-		}
+	var modules []string
+	if reg.Empty() {
+		modules = mlimporter.AvailableModules
+	} else {
+		modules = reg.ModuleNames()
+	}
 
+	for _, module := range modules {
 		err := mlimporter.SetupModule(kibanaClient, module)
 		if err != nil {
 			return errors.Errorf("Error setting up ML for %s: %v", module, err)
@@ -505,4 +508,12 @@ func (reg *ModuleRegistry) Empty() bool {
 		count += len(filesets)
 	}
 	return count == 0
+}
+
+func (reg *ModuleRegistry) ModuleNames() []string {
+	var modules []string
+	for m := range reg.registry {
+		modules = append(modules, m)
+	}
+	return modules
 }

@@ -22,6 +22,11 @@ var (
 	kibanaGetModuleURL   = "/api/ml/modules/get_module/%s"
 	kibanaRecognizeURL   = "/api/ml/modules/recognize/%s"
 	kibanaSetupModuleURL = "/api/ml/modules/setup/%s"
+
+	AvailableModules = []string{
+		"apache2",
+		"nginx",
+	}
 )
 
 // MLConfig contains the required configuration for loading one job and the associated
