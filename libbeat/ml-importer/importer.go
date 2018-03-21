@@ -23,6 +23,7 @@ var (
 	kibanaRecognizeURL   = "/api/ml/modules/recognize/%s"
 	kibanaSetupModuleURL = "/api/ml/modules/setup/%s"
 
+	// AvailableModules is the list of modules available in ML
 	AvailableModules = []string{
 		"apache2",
 		"nginx",

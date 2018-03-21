@@ -510,6 +510,7 @@ func (reg *ModuleRegistry) Empty() bool {
 	return count == 0
 }
 
+// ModuleNames returns the names of modules in the ModuleRegistry.
 func (reg *ModuleRegistry) ModuleNames() []string {
 	var modules []string
 	for m := range reg.registry {
