@@ -51,16 +51,16 @@ func AutodiscoverBuilder(bus bus.Bus, c *common.Config) (autodiscover.Provider, 
 	var builders autodiscover.Builders
 	for _, bcfg := range config.Builders {
 		if builder, err := autodiscover.Registry.BuildBuilder(bcfg); err != nil {
-			logp.Warn("docker", "failed to construct autodiscover builder due to error: %v", err)
+			logp.Info("docker: failed to construct autodiscover builder due to error: %v", err)
 		} else {
 			builders = append(builders, builder)
 		}
 	}
 
 	var appenders autodiscover.Appenders
-	for _, acfg := range config.Builders {
+	for _, acfg := range config.Appenders {
 		if appender, err := autodiscover.Registry.BuildAppender(acfg); err != nil {
-			logp.Warn("docker", "failed to construct autodiscover appender due to error: %v", err)
+			logp.Info("docker: failed to construct autodiscover appender due to error: %v", err)
 		} else {
 			appenders = append(appenders, appender)
 		}
@@ -131,7 +131,6 @@ func (d *Provider) emitContainer(event bus.Event, flag string) {
 			"labels": labelMap,
 		},
 	}
-
 	// Without this check there would be overlapping configurations with and without ports.
 	if len(container.Ports) == 0 {
 		event := bus.Event{
@@ -198,7 +197,6 @@ func (d *Provider) generateHints(event bus.Event) bus.Event {
 		hints := builder.GenerateHints(labels.(common.MapStr), "", d.config.Prefix)
 		e["hints"] = hints
 	}
-
 	return e
 }
 

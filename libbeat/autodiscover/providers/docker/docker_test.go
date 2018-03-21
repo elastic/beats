@@ -47,10 +47,10 @@ func TestGenerateHints(t *testing.T) {
 					"container": common.MapStr{
 						"id":   "abc",
 						"name": "foobar",
-						"labels": common.MapStr{
+						"labels": getNestedAnnotations(common.MapStr{
 							"do.not.include":          "true",
 							"co.elastic.logs/disable": "true",
-						},
+						}),
 					},
 				},
 			},
@@ -59,10 +59,10 @@ func TestGenerateHints(t *testing.T) {
 					"container": common.MapStr{
 						"id":   "abc",
 						"name": "foobar",
-						"labels": common.MapStr{
+						"labels": getNestedAnnotations(common.MapStr{
 							"do.not.include":          "true",
 							"co.elastic.logs/disable": "true",
-						},
+						}),
 					},
 				},
 				"hints": common.MapStr{
@@ -82,4 +82,13 @@ func TestGenerateHints(t *testing.T) {
 	for _, test := range tests {
 		assert.Equal(t, p.generateHints(test.event), test.result)
 	}
+}
+
+func getNestedAnnotations(in common.MapStr) common.MapStr {
+	out := common.MapStr{}
+
+	for k, v := range in {
+		out.Put(k, v)
+	}
+	return out
 }

@@ -1,0 +1,13 @@
+- key: munin
+  title: "Munin"
+  description: >
+    experimental[]
+
+    Munin node metrics exporter
+  release: experimental
+  fields:
+    - name: munin
+      type: group
+      description: >
+          munin contains metrics exposed by a munin node agent
+      fields:
