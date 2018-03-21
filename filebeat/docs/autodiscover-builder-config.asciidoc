@@ -1,4 +1,4 @@
-Filebeat supports a `logs` Builder for modules:
+Filebeat supports a `hints` Builder for modules:
 
 ["source","yaml",subs="attributes"]
 -------------------------------------------------------------------------------------
@@ -6,15 +6,15 @@ filebeat.autodiscover:
   providers:
     - type: kubernetes
       builders:
-        - type: logs
+        - type: hints
 -------------------------------------------------------------------------------------
 
-This configuration enables the `logs` Builder. The `logs` builder looks for hints
+This configuration enables the `hints` Builder. The `hints` builder looks for hints
 in the form of Kubernetes annotations or Docker labels which have the prefix `co.elastic.logs`.
 
 [float]
 ==== Kubernetes
-Kubernetes pods can annotate themselves with hints for the `logs` builder to be able to spin up
+Kubernetes pods can annotate themselves with hints for the `hints` builder to be able to spin up
 Filebeat inputs:
 
 ["source","yaml",subs="attributes"]

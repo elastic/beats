@@ -1,4 +1,4 @@
-package logs
+package hints
 
 import (
 	"fmt"
@@ -13,7 +13,7 @@ import (
 )
 
 func init() {
-	autodiscover.Registry.AddBuilder("logs", NewLogAnnotations)
+	autodiscover.Registry.AddBuilder("hints", NewLogHints)
 }
 
 const (
@@ -22,26 +22,26 @@ const (
 	excludeLines = "exclude_lines"
 )
 
-type logAnnotations struct {
+type logHints struct {
 	Key    string
 	Config []*common.Config
 }
 
-// NewLogAnnotations builds a log annotations builder
-func NewLogAnnotations(cfg *common.Config) (autodiscover.Builder, error) {
-	cfgwarn.Beta("The logs builder is beta")
+// NewLogHints builds a log hints builder
+func NewLogHints(cfg *common.Config) (autodiscover.Builder, error) {
+	cfgwarn.Beta("The hints builder is beta")
 	config := defaultConfig()
 	err := cfg.Unpack(&config)
 
 	if err != nil {
-		return nil, fmt.Errorf("unable to unpack log.annotations config due to error: %v", err)
+		return nil, fmt.Errorf("unable to unpack hints config due to error: %v", err)
 	}
 
-	return &logAnnotations{config.Key, config.Config}, nil
+	return &logHints{config.Key, config.Config}, nil
 }
 
 // Create config based on input hints in the bus event
-func (l *logAnnotations) CreateConfig(event bus.Event) []*common.Config {
+func (l *logHints) CreateConfig(event bus.Event) []*common.Config {
 	var config []*common.Config
 
 	host, _ := event["host"].(string)
@@ -76,9 +76,9 @@ func (l *logAnnotations) CreateConfig(event bus.Event) []*common.Config {
 	// Merge config template with the configs from the annotations
 	for _, c := range l.Config {
 		if err := c.Merge(tempCfg); err != nil {
-			logp.Debug("logs.builder", "config merge failed with error: %v", err)
+			logp.Debug("hints.builder", "config merge failed with error: %v", err)
 		} else {
-			logp.Debug("logs.builder", "generated config %v", *c)
+			logp.Debug("hints.builder", "generated config %v", *c)
 			config = append(config, c)
 		}
 	}
@@ -88,14 +88,14 @@ func (l *logAnnotations) CreateConfig(event bus.Event) []*common.Config {
 	return config
 }
 
-func (l *logAnnotations) getMultiline(hints common.MapStr) common.MapStr {
+func (l *logHints) getMultiline(hints common.MapStr) common.MapStr {
 	return builder.GetHintMapStr(hints, l.Key, multiline)
 }
 
-func (l *logAnnotations) getIncludeLines(hints common.MapStr) []string {
+func (l *logHints) getIncludeLines(hints common.MapStr) []string {
 	return builder.GetHintAsList(hints, l.Key, includeLines)
 }
 
-func (l *logAnnotations) getExcludeLines(hints common.MapStr) []string {
+func (l *logHints) getExcludeLines(hints common.MapStr) []string {
 	return builder.GetHintAsList(hints, l.Key, excludeLines)
 }

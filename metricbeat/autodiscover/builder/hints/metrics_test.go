@@ -1,4 +1,4 @@
-package metrics
+package hints
 
 import (
 	"testing"
@@ -137,7 +137,7 @@ func TestGenerateHints(t *testing.T) {
 	for _, test := range tests {
 		cfg := defaultConfig()
 
-		m := metricAnnotations{
+		m := metricHints{
 			Key: cfg.Key,
 		}
 		cfgs := m.CreateConfig(test.event)

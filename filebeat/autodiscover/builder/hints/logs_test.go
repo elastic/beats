@@ -1,4 +1,4 @@
-package logs
+package hints
 
 import (
 	"testing"
@@ -126,7 +126,7 @@ func TestGenerateHints(t *testing.T) {
 
 	for _, test := range tests {
 		cfg := defaultConfig()
-		l := logAnnotations{
+		l := logHints{
 			Key:    cfg.Key,
 			Config: cfg.Config,
 		}
