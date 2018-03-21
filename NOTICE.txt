@@ -3107,7 +3107,7 @@ OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
 --------------------------------------------------------------------
 Dependency: github.com/tsg/gopacket
-Revision: 8e703b9968693c15f25cabb6ba8be4370cf431d0
+Revision: f289b3ea3e41a01b2822be9caf5f40c01fdda05c
 License type (autodetected): BSD-3-Clause
 ./vendor/github.com/tsg/gopacket/LICENSE:
 --------------------------------------------------------------------
@@ -3326,7 +3326,8 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 --------------------------------------------------------------------
 Dependency: golang.org/x/net
-Revision: e90d6d0afc4c315a0d87a568ae68577cc15149a0
+Version: release-branch.go1.9
+Revision: 44b7c21cbf19450f38b337eb6b6fe4f6496fb5b3
 License type (autodetected): BSD-3-Clause
 ./vendor/golang.org/x/net/LICENSE:
 --------------------------------------------------------------------

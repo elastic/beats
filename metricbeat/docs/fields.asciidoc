@@ -37,6 +37,7 @@ grouped in the following categories:
 * <<exported-fields-logstash>>
 * <<exported-fields-memcached>>
 * <<exported-fields-mongodb>>
+* <<exported-fields-munin>>
 * <<exported-fields-mysql>>
 * <<exported-fields-nginx>>
 * <<exported-fields-php_fpm>>
@@ -4594,7 +4595,7 @@ Host architecture (e.g. x86_64, arm, ppc, mips).
 [float]
 === `host.os.platform`
 
-type: object
+type: keyword
 
 OS platform (e.g. centos, ubuntu, windows).
 
@@ -4602,7 +4603,7 @@ OS platform (e.g. centos, ubuntu, windows).
 [float]
 === `host.os.version`
 
-type: object
+type: keyword
 
 OS version.
 
@@ -4610,7 +4611,7 @@ OS version.
 [float]
 === `host.os.family`
 
-type: object
+type: keyword
 
 OS family (e.g. redhat, debian, freebsd, windows).
 
@@ -7654,6 +7655,21 @@ Number of scan operations.
 type: long
 
 Number of sync operations.
+
+
+[[exported-fields-munin]]
+== Munin fields
+
+experimental[]
+Munin node metrics exporter
+
+
+
+[float]
+== munin fields
+
+munin contains metrics exposed by a munin node agent
+
 
 
 [[exported-fields-mysql]]

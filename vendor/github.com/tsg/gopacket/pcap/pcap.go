@@ -131,6 +131,10 @@ type Handle struct {
 	// huge memory hit, so to handle that we store them here instead.
 	pkthdr  *C.struct_pcap_pkthdr
 	buf_ptr *C.u_char
+	// This is required to poll the pcap handle for incoming packets, due to
+	// newer Linux kernels supporting TPACKET_V3 not starting the timeout until
+	// the first packet is received.
+	packetPoller *packetPoll
 }
 
 // Stats contains statistics on how many packets were handled by a pcap handle,
@@ -206,9 +210,13 @@ func OpenLive(device string, snaplen int32, promisc bool, timeout time.Duration)
 	dev := C.CString(device)
 	defer C.free(unsafe.Pointer(dev))
 
-	p.cptr = C.pcap_open_live(dev, C.int(snaplen), pro, timeoutMillis(timeout), buf)
+	timeoutMs := timeoutMillis(timeout)
+	p.cptr = C.pcap_open_live(dev, C.int(snaplen), pro, timeoutMs, buf)
 	if p.cptr == nil {
 		return nil, errors.New(C.GoString(buf))
+	}
+	if !p.blockForever {
+		p.packetPoller = NewPacketPoll(p.cptr, timeoutMs)
 	}
 	return p, nil
 }
@@ -316,6 +324,9 @@ func (a activateError) Error() string {
 func (p *Handle) getNextBufPtrLocked(ci *gopacket.CaptureInfo) error {
 	var result NextError
 	for {
+		if !p.packetPoller.AwaitForPackets() {
+			return NextErrorTimeoutExpired
+		}
 		result = NextError(C.pcap_next_ex(p.cptr, &p.pkthdr, &p.buf_ptr))
 		if p.blockForever && result == NextErrorTimeoutExpired {
 			continue
@@ -544,6 +555,11 @@ func findalladdresses(addresses *_Ctype_struct_pcap_addr) (retval []InterfaceAdd
 	for curaddr := addresses; curaddr != nil; curaddr = (*_Ctype_struct_pcap_addr)(curaddr.next) {
 		var a InterfaceAddress
 		var err error
+		// In case of a tun device on Linux the link layer has no curaddr.addr.
+		// Do not crash trying to check the family type.
+		if curaddr.addr == nil {
+			continue
+		}
 		if a.IP, err = sockaddr_to_IP((*syscall.RawSockaddr)(unsafe.Pointer(curaddr.addr))); err != nil {
 			continue
 		}

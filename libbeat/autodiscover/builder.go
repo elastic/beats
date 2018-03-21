@@ -63,7 +63,7 @@ func (r *registry) BuildBuilder(c *common.Config) (Builder, error) {
 
 	builder := r.GetBuilder(config.Type)
 	if builder == nil {
-		return nil, fmt.Errorf("Unknown autodiscover builder %s", config.Type)
+		return nil, fmt.Errorf("unknown autodiscover builder %s", config.Type)
 	}
 
 	return builder(c)

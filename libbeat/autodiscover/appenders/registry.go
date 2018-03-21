@@ -23,7 +23,7 @@ func init() {
 	p.MustRegisterLoader(pluginKey, func(ifc interface{}) error {
 		app, ok := ifc.(appenderPlugin)
 		if !ok {
-			return errors.New("plugin does not match processor plugin type")
+			return errors.New("plugin does not match appender plugin type")
 		}
 
 		return autodiscover.Registry.AddAppender(app.name, app.appender)
