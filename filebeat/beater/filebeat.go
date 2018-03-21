@@ -220,7 +220,7 @@ func setupMLBasedOnVersion(reg *fileset.ModuleRegistry, esClient *elasticsearch.
 }
 
 func isElasticsearchLoads(kibanaVersion *common.Version) bool {
-	if kibanaVersion.Major < 6 && kibanaVersion.Minor < 1 {
+	if kibanaVersion.Major < 6 || kibanaVersion.Major == 6 && kibanaVersion.Minor < 1 {
 		return true
 	}
 	return false

@@ -486,7 +486,7 @@ func (reg *ModuleRegistry) SetupML(esClient PipelineLoader, kibanaClient *kibana
 		return nil
 	}
 
-	var modules map[string]string
+	modules := make(map[string]string)
 	if reg.Empty() {
 		modules = mlimporter.AvailableModules
 	} else {
