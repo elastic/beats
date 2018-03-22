@@ -390,7 +390,7 @@ func createEventBulkMeta(
 	}
 
 	meta := bulkEventMeta{
-		Index:    index,
+		Index:    TryLowercaseIndex(index),
 		DocType:  eventType,
 		Pipeline: pipeline,
 		ID:       id,
