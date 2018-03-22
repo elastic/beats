@@ -129,9 +129,9 @@ func (p *parser) parse() (*message, error) {
 			return nil, nil
 		}
 		// Line protocol
-		dataStr := string(pickledData)
+		data_str := string(pickledData)
 		var data []string
-		data = strings.Fields(dataStr)
+		data = strings.Fields(data_str)
 		for _, value := range data {
 			msg.Notes = append(msg.Notes, value) //data*/
 		}
