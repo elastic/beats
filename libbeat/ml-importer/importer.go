@@ -74,16 +74,25 @@ type MLResponse struct {
 			Success bool
 			ID      string
 			Exists  bool
+			Error   struct {
+				Message string
+			}
 		}
 		Search []struct {
 			Success bool
 			ID      string
 			Exists  bool
+			Error   struct {
+				Message string
+			}
 		}
 		Visualization []struct {
 			Success bool
 			ID      string
 			Exists  bool
+			Error   struct {
+				Message string
+			}
 		}
 	}
 }
@@ -207,10 +216,18 @@ func checkResponse(r []byte) error {
 
 	for _, feed := range resp.Datafeeds {
 		if !feed.Success {
+			if strings.HasPrefix(feed.Error.Msg, "[resource_already_exists_exception]") {
+				logp.Debug("machine-learning", "Datafeed already exists: %s", feed.ID)
+				continue
+			}
 			errs = append(errs, errors.Errorf(feed.Error.Msg))
 		}
 	}
 	for _, job := range resp.Jobs {
+		if strings.HasPrefix(job.Error.Msg, "[resource_already_exists_exception]") {
+			logp.Debug("machine-learning", "Job already exists: %s", job.ID)
+			continue
+		}
 		if !job.Success {
 			errs = append(errs, errors.Errorf(job.Error.Msg))
 		}
@@ -218,7 +235,9 @@ func checkResponse(r []byte) error {
 	for _, dashboard := range resp.Kibana.Dashboard {
 		if !dashboard.Success {
 			if dashboard.Exists {
-				errs = append(errs, errors.Errorf("dashboard already exists: %s", dashboard.ID))
+				logp.Debug("machine-learning", "Dashboard already exists: %s", dashboard.ID)
+			} else if strings.Contains(dashboard.Error.Message, "version conflict, document already exists") {
+				continue
 			} else {
 				errs = append(errs, errors.Errorf("error while setting up dashboard: %s", dashboard.ID))
 			}
@@ -227,7 +246,9 @@ func checkResponse(r []byte) error {
 	for _, search := range resp.Kibana.Search {
 		if !search.Success {
 			if search.Exists {
-				errs = append(errs, errors.Errorf("search already exists: %s", search.ID))
+				logp.Debug("machine-learning", "Search already exists: %s", search.ID)
+			} else if strings.Contains(search.Error.Message, "version conflict, document already exists") {
+				continue
 			} else {
 				errs = append(errs, errors.Errorf("error while setting up search: %s", search.ID))
 			}
@@ -236,7 +257,9 @@ func checkResponse(r []byte) error {
 	for _, visualization := range resp.Kibana.Visualization {
 		if !visualization.Success {
 			if visualization.Exists {
-				errs = append(errs, errors.Errorf("visualization already exists: %s", visualization.ID))
+				logp.Debug("machine-learning", "Visualization already exists: %s", visualization.ID)
+			} else if strings.Contains(visualization.Error.Message, "version conflict, document already exists") {
+				continue
 			} else {
 				errs = append(errs, errors.Errorf("error while setting up visualization: %s", visualization.ID))
 			}
@@ -244,5 +267,4 @@ func checkResponse(r []byte) error {
 	}
 
 	return errs.Err()
-
 }
