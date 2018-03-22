@@ -115,7 +115,7 @@ func(p * parser) parse()(*message, error) {
     length := p.buf.Len()
     // Read the entire buffer content
     buf, err := p.buf.Collect(length)
-    if err == streambuf.ErrNoMoreBytes | | length <= 2 {
+    if err == streambuf.ErrNoMoreBytes || length <= 2 {
         return nil, nil
     }
 
