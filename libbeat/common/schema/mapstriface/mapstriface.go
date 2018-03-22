@@ -171,9 +171,36 @@ func Bool(key string, opts ...schema.SchemaOption) schema.Conv {
 	return schema.SetOptions(schema.Conv{Key: key, Func: toBool}, opts)
 }
 
+func toFloat(key string, data map[string]interface{}) (interface{}, error) {
+	emptyIface, exists := data[key]
+	if !exists {
+		return 0, fmt.Errorf("Key %s not found", key)
+	}
+	switch emptyIface.(type) {
+	case float64:
+		return emptyIface.(float64), nil
+	case float32:
+		return float64(emptyIface.(float32)), nil
+	case int:
+		return float64(emptyIface.(int)), nil
+	case json.Number:
+		num := emptyIface.(json.Number)
+		f64, err := num.Float64()
+		if err == nil {
+			return f64, nil
+		}
+		i64, err := num.Int64()
+		if err == nil {
+			return float64(i64), nil
+		}
+		return 0, fmt.Errorf("Expected float, found json.Number (%v) that cannot be converted", num)
+	default:
+		return 0, fmt.Errorf("Expected float, found %T", emptyIface)
+	}
+}
 // Float creates a Conv object for parsing floats
 func Float(key string, opts ...schema.SchemaOption) schema.Conv {
-	return schema.SetOptions(schema.Conv{Key: key, Func: toInteger}, opts)
+	return schema.SetOptions(schema.Conv{Key: key, Func: toFloat}, opts)
 }
 
 func toInteger(key string, data map[string]interface{}) (interface{}, error) {
