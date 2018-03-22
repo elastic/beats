@@ -68,7 +68,9 @@ func (b *jsonEncoder) resetState() {
 	b.folder, err = gotype.NewIterator(visitor,
 		gotype.Folders(
 			codec.MakeTimestampEncoder(),
-			codec.MakeBCTimestampEncoder()))
+			codec.MakeBCTimestampEncoder(),
+			codec.MakeNanoTimestampEncoder(),
+			codec.MakeBCNanoTimestampEncoder()))
 	if err != nil {
 		panic(err)
 	}

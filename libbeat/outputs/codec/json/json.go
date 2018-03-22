@@ -58,6 +58,8 @@ func (e *Encoder) reset() {
 		gotype.Folders(
 			codec.MakeTimestampEncoder(),
 			codec.MakeBCTimestampEncoder(),
+			codec.MakeNanoTimestampEncoder(),
+			codec.MakeBCNanoTimestampEncoder(),
 		),
 	)
 	if err != nil {

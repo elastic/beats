@@ -98,6 +98,36 @@ func (b *builder) millisOfSecond(digits int) {
 	}
 }
 
+func (b *builder) nanoOfSecond(digits int) {
+	if digits <= 0 {
+		return
+	}
+
+	switch digits {
+	case 1:
+		b.appendExtDecimal(ftNanoOfSecond, 100000000, 1, 1)
+	case 2:
+		b.appendExtDecimal(ftNanoOfSecond, 10000000, 2, 2)
+	case 3:
+		b.appendExtDecimal(ftNanoOfSecond, 1000000, 3, 3)
+	case 4:
+		b.appendExtDecimal(ftNanoOfSecond, 100000, 4, 4)
+	case 5:
+		b.appendExtDecimal(ftNanoOfSecond, 10000, 5, 5)
+	case 6:
+		b.appendExtDecimal(ftNanoOfSecond, 1000, 6, 6)
+	case 7:
+		b.appendExtDecimal(ftNanoOfSecond, 100, 7, 7)
+	case 8:
+		b.appendExtDecimal(ftNanoOfSecond, 10, 8, 8)
+	case 9:
+		b.appendExtDecimal(ftNanoOfSecond, 0, 9, 9)
+	default:
+		b.appendExtDecimal(ftNanoOfSecond, 0, 9, 9)
+		b.appendZeros(digits - 9)
+	}
+}
+
 func (b *builder) millisOfDay(digits int) {
 	b.appendDecimal(ftMillisOfDay, digits, 8)
 }

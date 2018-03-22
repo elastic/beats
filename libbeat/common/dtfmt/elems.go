@@ -112,6 +112,10 @@ func numRequires(c *ctxConfig, ft fieldType) error {
 
 	case ftMillisOfSecond:
 		c.enableMillis()
+
+	case ftNanoOfSecond:
+		c.enableNano()
+
 	}
 
 	return nil

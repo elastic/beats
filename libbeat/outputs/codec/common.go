@@ -33,3 +33,29 @@ func MakeBCTimestampEncoder() func(*common.Time, structform.ExtVisitor) error {
 		return enc((*time.Time)(t), v)
 	}
 }
+
+func MakeNanoTimestampEncoder() func(*time.Time, structform.ExtVisitor) error {
+	formatter, err := dtfmt.NewFormatter("yyyy-MM-dd'T'HH:mm:ss.nnnnnnnnn'Z'")
+
+	if err != nil {
+		panic(err)
+	}
+
+	buf := make([]byte, 0, formatter.EstimateSize())
+	return func(t *time.Time, v structform.ExtVisitor) error {
+		tmp, err := formatter.AppendTo(buf, (*t).UTC())
+		if err != nil {
+			return err
+		}
+
+		buf = tmp[:0]
+		return v.OnStringRef(tmp)
+	}
+}
+
+func MakeBCNanoTimestampEncoder() func(*common.Time, structform.ExtVisitor) error {
+	enc := MakeNanoTimestampEncoder()
+	return func(t *common.Time, v structform.ExtVisitor) error {
+		return enc((*time.Time)(t), v)
+	}
+}
