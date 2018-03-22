@@ -66,6 +66,13 @@ func TestGetProcess(t *testing.T) {
 	}
 }
 
+// See https://github.com/elastic/beats/issues/6620
+func TestGetSelfPid(t *testing.T) {
+	pid, err := GetSelfPid()
+	assert.NoError(t, err)
+	assert.Equal(t, os.Getpid(), pid)
+}
+
 func TestProcState(t *testing.T) {
 	assert.Equal(t, getProcState('R'), "running")
 	assert.Equal(t, getProcState('S'), "sleeping")
