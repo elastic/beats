@@ -1,7 +1,7 @@
 package graphite
 
 import (
-	"bytes"
+    "bytes"
 	"errors"
 	"reflect"
 	"strconv"
@@ -44,7 +44,7 @@ var (
 )
 
 func (p *parser) init(
-	cfg *parserConfig, 
+	cfg *parserConfig,
 	onMessage func(*message) error,
 ) {
 	*p = parser{
