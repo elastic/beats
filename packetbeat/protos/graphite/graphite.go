@@ -11,7 +11,7 @@ import (
 	"github.com/elastic/beats/packetbeat/publish"
 )
 
-// tcp application level protocol analyzer plugin
+// TCP application level protocol analyzer plugin
 type tcp struct {
 	ports        protos.PortsConfig
 	parserConfig parserConfig
@@ -25,8 +25,8 @@ type connection struct {
 	trans   transactions
 }
 
-// graphite application layer data
-type GraphiteJSON struct {
+// JSON for Graphite application layer data
+type JSON struct {
 	MetricName      string
 	MetricValue     float64
 	MetricTimestamp int64
