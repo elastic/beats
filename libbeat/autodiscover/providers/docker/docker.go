@@ -50,20 +50,20 @@ func AutodiscoverBuilder(bus bus.Bus, c *common.Config) (autodiscover.Provider, 
 
 	var builders autodiscover.Builders
 	for _, bcfg := range config.Builders {
-		if builder, err := autodiscover.Registry.BuildBuilder(bcfg); err != nil {
-			logp.Warn("docker", "failed to construct autodiscover builder due to error: %v", err)
-		} else {
-			builders = append(builders, builder)
+		builder, err := autodiscover.Registry.BuildBuilder(bcfg)
+		if err != nil {
+			return nil, err
 		}
+		builders = append(builders, builder)
 	}
 
 	var appenders autodiscover.Appenders
-	for _, acfg := range config.Builders {
-		if appender, err := autodiscover.Registry.BuildAppender(acfg); err != nil {
-			logp.Warn("docker", "failed to construct autodiscover appender due to error: %v", err)
-		} else {
-			appenders = append(appenders, appender)
+	for _, acfg := range config.Appenders {
+		appender, err := autodiscover.Registry.BuildAppender(acfg)
+		if err != nil {
+			return nil, err
 		}
+		appenders = append(appenders, appender)
 	}
 
 	start := watcher.ListenStart()
@@ -131,7 +131,6 @@ func (d *Provider) emitContainer(event bus.Event, flag string) {
 			"labels": labelMap,
 		},
 	}
-
 	// Without this check there would be overlapping configurations with and without ports.
 	if len(container.Ports) == 0 {
 		event := bus.Event{
@@ -167,6 +166,7 @@ func (d *Provider) publish(event bus.Event) {
 	if config := d.templates.GetConfig(event); config != nil {
 		event["config"] = config
 	} else {
+		// If no template matches, try builders:
 		if config := d.builders.GetConfig(d.generateHints(event)); config != nil {
 			event["config"] = config
 		}
@@ -174,6 +174,7 @@ func (d *Provider) publish(event bus.Event) {
 
 	// Call all appenders to append any extra configuration
 	d.appenders.Append(event)
+
 	d.bus.Publish(event)
 }
 
@@ -198,7 +199,6 @@ func (d *Provider) generateHints(event bus.Event) bus.Event {
 		hints := builder.GenerateHints(labels.(common.MapStr), "", d.config.Prefix)
 		e["hints"] = hints
 	}
-
 	return e
 }
 

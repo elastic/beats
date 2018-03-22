@@ -511,7 +511,7 @@ Host architecture (e.g. x86_64, arm, ppc, mips).
 [float]
 === `host.os.platform`
 
-type: object
+type: keyword
 
 OS platform (e.g. centos, ubuntu, windows).
 
@@ -519,7 +519,7 @@ OS platform (e.g. centos, ubuntu, windows).
 [float]
 === `host.os.version`
 
-type: object
+type: keyword
 
 OS version.
 
@@ -527,7 +527,7 @@ OS version.
 [float]
 === `host.os.family`
 
-type: object
+type: keyword
 
 OS family (e.g. redhat, debian, freebsd, windows).
 

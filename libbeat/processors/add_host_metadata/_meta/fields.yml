@@ -20,15 +20,14 @@
           description: >
             Host architecture (e.g. x86_64, arm, ppc, mips).
         - name: os.platform
-          type: object
-          object_type: keyword
+          type: keyword
           description: >
             OS platform (e.g. centos, ubuntu, windows).
         - name: os.version
-          type: object
+          type: keyword
           description: >
             OS version.
         - name: os.family
-          type: object
+          type: keyword
           description: >
             OS family (e.g. redhat, debian, freebsd, windows).

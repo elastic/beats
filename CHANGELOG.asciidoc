@@ -66,6 +66,7 @@ https://github.com/elastic/beats/compare/v6.0.0-beta2...master[Check the HEAD di
 - Add filtering option by exact device names in system.diskio. `diskio.include_devices`. {pull}6085[6085]
 - Fix dealing with new process status codes in Linux kernel 4.14+. {pull}6306[6306]
 - Add config option for windows/perfmon metricset to ignore non existent counters. {pull}6432[6432]
+- Support apache status pages for versions older than 2.4.16. {pull}6450[6450]
 
 *Packetbeat*
 
@@ -144,6 +145,7 @@ https://github.com/elastic/beats/compare/v6.0.0-beta2...master[Check the HEAD di
 - Fix namespace disambiguation in Kubernetes state_* metricsets. {issue}6281[6281]
 - Fix Kubernetes overview dashboard views for non default time ranges. {issue}6395{6395}
 - Fix Windows perfmon metricset so that it sends metrics when an error occurs. {pull}6542[6542]
+- Fix Kubernetes calculated fields store. {pull}6564{6564}
 
 *Packetbeat*
 
@@ -153,6 +155,7 @@ https://github.com/elastic/beats/compare/v6.0.0-beta2...master[Check the HEAD di
 - Fix corruption when parsing repeated headers in an HTTP request or response. {pull}6325[6325]
 - Fix panic when parsing partial AMQP messages. {pull}6384[6384]
 - Fix out of bounds access to slice in MongoDB parser. {pull}6256[6256]
+- Fix sniffer hanging on exit under Linux. {pull}6535[6535]
 
 *Winlogbeat*
 
@@ -195,6 +198,7 @@ https://github.com/elastic/beats/compare/v6.0.0-beta2...master[Check the HEAD di
 - Experimental feature setup.template.append_fields added. {pull}6024[6024]
 - Add appender support to autodiscover {pull}6469[6469]
 - Add add_host_metadata processor {pull}5968[5968]
+- Retry configuration to load dashboards if Kibana is not reachable when the beat starts. {pull}6560[6560]
 
 *Auditbeat*
 

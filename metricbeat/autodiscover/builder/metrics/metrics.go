@@ -83,15 +83,13 @@ func (m *metricAnnotations) CreateConfig(event bus.Event) []*common.Config {
 		"timeout":    tout,
 		"period":     ival,
 		"enabled":    true,
+		"ssl":        sslConf,
 	}
 
 	if ns != "" {
 		moduleConfig["namespace"] = ns
 	}
 
-	for k, v := range sslConf {
-		moduleConfig.Put(k, v)
-	}
 	logp.Debug("metrics.builder", "generated config: %v", moduleConfig.String())
 
 	// Create config object
