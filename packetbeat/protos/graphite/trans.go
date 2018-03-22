@@ -64,8 +64,8 @@ func(trans * transactions) onRequest(
     dir uint8,
     msg * message,
 ) error {
-    prev: = trans.requests.last()
-    merged, err: = trans.tryMergeRequests(prev, msg)
+    prev := trans.requests.last()
+    merged, err := trans.tryMergeRequests(prev, msg)
     if err != nil {
         return err
     }
@@ -96,8 +96,8 @@ func(trans * transactions) onResponse(
     dir uint8,
     msg * message,
 ) error {
-    prev: = trans.responses.last()
-    merged, err: = trans.tryMergeResponses(prev, msg)
+    prev := trans.responses.last()
+    merged, err := trans.tryMergeResponses(prev, msg)
     if err != nil {
         return err
     }
@@ -134,8 +134,8 @@ func(trans * transactions) tryMergeResponses(prev, msg * message)(merged bool, e
 }
 
 func(trans * transactions) correlate() error {
-    requests: = &trans.requests
-    responses: = &trans.responses
+    requests := &trans.requests
+    responses := &trans.responses
 
     // drop responses with missing requests
     if requests.empty() {
@@ -149,15 +149,15 @@ func(trans * transactions) correlate() error {
     // merge requests with responses into transactions
     // merge requests with responses into transactions
     for !responses.empty() & & !requests.empty() {
-        resp: = responses.first()
+        resp := responses.first()
         if !resp.isComplete {
             break
         }
 
-        requ: = requests.pop()
+        requ := requests.pop()
         responses.pop()
 
-        if err: = trans.onTransaction(requ, resp)
+        if err := trans.onTransaction(requ, resp)
         err != nil {
             return err
         }
@@ -184,7 +184,7 @@ func(ml * messageList) pop() * message {
         return nil
     }
 
-    msg: = ml.head
+    msg := ml.head
     ml.head = ml.head.next
     if ml.head == nil {
         ml.tail = nil

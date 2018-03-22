@@ -55,16 +55,16 @@ func New(
     results publish.Transactions,
     cfg * common.Config,
 )(protos.Plugin, error) {
-    p: = &tcp{}
-    config: = defaultConfig
+    p := &tcp{}
+    config := defaultConfig
     if !testMode {
-        if err: = cfg.Unpack( & config)
+        if err := cfg.Unpack( & config)
         err != nil {
             return nil, err
         }
     }
 
-    if err: = p.init(results, & config)
+    if err := p.init(results, & config)
     err != nil {
         return nil, err
     }
@@ -72,7 +72,7 @@ func New(
 }
 
 func(tcp * tcp) init(results publish.Transactions, config * graphiteConfig) error {
-    if err: = tcp.setFromConfig(config)
+    if err := tcp.setFromConfig(config)
     err != nil {
         return err
     }
@@ -84,21 +84,21 @@ func(tcp * tcp) init(results publish.Transactions, config * graphiteConfig) erro
 func(tcp * tcp) setFromConfig(config * graphiteConfig) error {
 
     // set module configuration
-    if err: = tcp.ports.Set(config.Ports)
+    if err := tcp.ports.Set(config.Ports)
     err != nil {
         return err
     }
 
     // set parser configuration
-    parser: = &tcp.parserConfig
+    parser := &tcp.parserConfig
     parser.maxBytes = tcp1.TCPMaxDataInStream
 
     // set transaction correlator configuration
-    trans: = &tcp.transConfig
+    trans := &tcp.transConfig
     trans.transactionTimeout = config.TransactionTimeout
 
     // set transaction publisher configuration
-    pub: = &tcp.pub
+    pub := &tcp.pub
     pub.sendRequest = config.SendRequest
     pub.sendResponse = config.SendResponse
 
@@ -125,8 +125,8 @@ func(tcp * tcp) Parse(
 ) protos.ProtocolData {
     defer logp.Recover("Parse tcp exception")
 
-    conn: = tcp.ensureConnection(private)
-    st: = conn.streams[dir]
+    conn := tcp.ensureConnection(private)
+    st := conn.streams[dir]
     if st == nil {
         st = &stream{}
         st.parser.init( & tcp.parserConfig, func(msg * message) error {
@@ -135,7 +135,7 @@ func(tcp * tcp) Parse(
         conn.streams[dir] = st
     }
 
-    if err: = st.parser.feed(pkt.Ts, pkt.Payload)
+    if err := st.parser.feed(pkt.Ts, pkt.Payload)
     err != nil {
         debugf("%v, dropping TCP stream for error in direction %v.", err, dir)
         tcp.onDropConnection(conn)
@@ -157,7 +157,7 @@ func(tcp * tcp) GapInStream(tcptuple * common.TCPTuple, dir uint8,
                             nbytes int,
                             private protos.ProtocolData,
                             )(protos.ProtocolData, bool) {
-    conn: = getConnection(private)
+    conn := getConnection(private)
     if conn != nil {
         tcp.onDropConnection(conn)
     }
@@ -172,7 +172,7 @@ func(tcp * tcp) onDropConnection(conn * connection) {
 }
 
 func(tcp * tcp) ensureConnection(private protos.ProtocolData) * connection {
-    conn: = getConnection(private)
+    conn := getConnection(private)
     if conn == nil {
         conn = &connection{}
             conn.trans.init(& tcp.transConfig, tcp.pub.onTransaction)
@@ -189,7 +189,7 @@ func getConnection(private protos.ProtocolData) * connection {
     if private == nil {
         return nil
     }
-    priv, ok: = private.(*connection)
+    priv, ok := private.(*connection)
     if !ok {
         logp.Warn("graphite connection type error")
         return nil

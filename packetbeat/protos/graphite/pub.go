@@ -20,20 +20,20 @@ func(pub * transPub) onTransaction(requ, resp * message) error {
         return nil
     }
     // Generates one event for each metric in pickle 8
-    event: = pub.createEvent(requ, resp)
+    event := pub.createEvent(requ, resp)
     pub.results.PublishTransaction(event)
     return nil
 }
 
 func(pub * transPub) createEvent(requ, resp * message) common.MapStr {
-    status: = common.OK_STATUS
+    status := common.OK_STATUS
 
-    src: = &common.Endpoint{
+    src := &common.Endpoint{
         IP: requ.Tuple.SrcIP.String(),
         Port: requ.Tuple.SrcPort,
         Proc: string(requ.CmdlineTuple.Src),
     }
-    dst: = &common.Endpoint{
+    dst := &common.Endpoint{
         IP: requ.Tuple.DstIP.String(),
         Port: requ.Tuple.DstPort,
         Proc: string(requ.CmdlineTuple.Dst),
@@ -52,7 +52,7 @@ func(pub * transPub) createEvent(requ, resp * message) common.MapStr {
             MetricTimestamp: timeStamp,
         })
     } else {
-        for k: = 0
+        for k := 0
         k < len(requ.Notes)
         k = k + 3 {
             timeStamp, _ = strconv.ParseInt(requ.Notes[k + 1], 10, 64)
@@ -65,7 +65,7 @@ func(pub * transPub) createEvent(requ, resp * message) common.MapStr {
         }
     }
 
-    event: = common.MapStr{
+    event := common.MapStr{
         "@timestamp": common.Time(requ.Ts),
         "type": "graphite",
         "status": status,

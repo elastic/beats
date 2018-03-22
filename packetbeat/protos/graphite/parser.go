@@ -57,7 +57,7 @@ func(p * parser) init(
 }
 
 func(p * parser) append(data[]byte) error {
-    _, err: = p.buf.Write(data)
+    _, err := p.buf.Write(data)
     if err != nil {
         return err
     }
@@ -69,7 +69,7 @@ func(p * parser) append(data[]byte) error {
 }
 
 func(p * parser) feed(ts time.Time, data[]byte) error {
-    if err: = p.append(data)
+    if err := p.append(data)
     err != nil {
         return err
     }
@@ -80,7 +80,7 @@ func(p * parser) feed(ts time.Time, data[]byte) error {
             p.message = p.newMessage(ts)
         }
 
-        msg, err: = p.parse()
+        msg, err := p.parse()
         if err != nil {
             return err
         }
@@ -93,7 +93,7 @@ func(p * parser) feed(ts time.Time, data[]byte) error {
         p.message = nil
 
         // call message handler callback
-        if err: = p.onMessage(msg)
+        if err := p.onMessage(msg)
         err != nil {
             return err
         }
@@ -112,41 +112,41 @@ func(p * parser) newMessage(ts time.Time) * message {
 
 func(p * parser) parse()(*message, error) {
     // get the length of data in buffer
-    length: = p.buf.Len()
+    length := p.buf.Len()
     // Read the entire buffer content
-    buf, err: = p.buf.Collect(length)
+    buf, err := p.buf.Collect(length)
     if err == streambuf.ErrNoMoreBytes | | length <= 2 {
         return nil, nil
     }
 
-    msg: = p.message
+    msg := p.message
     msg.Size = uint64(p.buf.BufferConsumed())
 
-    isRequest: = true
-    dir: = applayer.NetOriginalDirection
-    pickledData: = common.NetString(buf)
-    pickledDataIo: = bytes.Buffer(string(pickledData))
+    isRequest := true
+    dir := applayer.NetOriginalDirection
+    pickledData := common.NetString(buf)
+    pickledDataIo := bytes.Buffer(string(pickledData))
     // Unpickle data into an interface
-    data, err: = stalecucumber.Unpickle(pickledDataIo)
+    data, err := stalecucumber.Unpickle(pickledDataIo)
     if err != nil {
         if strings.Contains(err.Error(), "Opcode is invalid") {
             return nil, nil
         }
         // Line protocol
-        dataStr: = string(pickledData)
+        dataStr := string(pickledData)
         var data[]string
         data = strings.Fields(dataStr)
-        for _, value: = range data {
+        for _, value := range data {
             msg.Notes = append(msg.Notes, value) // data * /
         }
     } else {
         // Extract pickle data fields
-        for _, i: = range data.([]interface{}) {
-            for _, j: = range i.([]interface{}) {
+        for _, i := range data.([]interface{}) {
+            for _, j := range i.([]interface{}) {
                 if reflect.TypeOf(j).Kind() == reflect.String {
                     msg.Notes = append(msg.Notes, j.(string))
                 } else {
-                    for _, k: = range j.([]interface{}) {
+                    for _, k := range j.([]interface{}) {
                         if reflect.TypeOf(k).Kind() == reflect.Int64 {
                             msg.Notes = append(msg.Notes, strconv.Itoa(int(k.(int64))))
 
