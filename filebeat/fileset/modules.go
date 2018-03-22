@@ -498,7 +498,8 @@ func (reg *ModuleRegistry) SetupML(esClient PipelineLoader, kibanaClient *kibana
 	}
 
 	for module, fileset := range modules {
-		err := mlimporter.SetupModule(kibanaClient, module, fileset)
+		prefix := fmt.Sprintf("filebeat-%s-%s-", module, fileset)
+		err := mlimporter.SetupModule(kibanaClient, module, prefix)
 		if err != nil {
 			return errors.Errorf("Error setting up ML for %s: %v", module, err)
 		}

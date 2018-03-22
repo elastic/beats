@@ -182,12 +182,12 @@ func HaveXpackML(esClient MLLoader) (bool, error) {
 }
 
 // SetupModule creates ML jobs, data feeds and dashboards for modules.
-func SetupModule(kibanaClient MLSetupper, module, fileset string) error {
+func SetupModule(kibanaClient MLSetupper, module, prefix string) error {
 	setupURL := fmt.Sprintf(kibanaSetupModuleURL, module)
-	prefix := fmt.Sprintf("{\"prefix\": \"filebeat-%s-%s-\"}", module, fileset)
-	status, response, err := kibanaClient.Request("POST", setupURL, nil, strings.NewReader(prefix))
+	prefixPayload := fmt.Sprintf("{\"prefix\": \"%s\"}", prefix)
+	status, response, err := kibanaClient.Request("POST", setupURL, nil, strings.NewReader(prefixPayload))
 	if status != 200 {
-		return errors.Errorf("cannot set up ML for module: %s/%s %v", module, fileset, status)
+		return errors.Errorf("cannot set up ML with prefix: %s", prefix)
 	}
 	if err != nil {
 		return err
