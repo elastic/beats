@@ -1,22 +1,22 @@
 package graphite
 
 import (
-	"github.com/elastic/beats/packetbeat/config"
-	"github.com/elastic/beats/packetbeat/protos"
+    "github.com/elastic/beats/packetbeat/config"
+    "github.com/elastic/beats/packetbeat/protos"
 )
 
 type graphiteConfig struct {
-	config.ProtocolCommon `config:",inline"`
+    config.ProtocolCommon `config: ",inline"`
 }
 
-var (
-	defaultConfig = graphiteConfig{
-		ProtocolCommon: config.ProtocolCommon{
-			TransactionTimeout: protos.DefaultTransactionExpiration,
-		},
-	}
+var(
+    defaultConfig=graphiteConfig{
+        ProtocolCommon: config.ProtocolCommon{
+            TransactionTimeout: protos.DefaultTransactionExpiration,
+        },
+    }
 )
 
-func (c *graphiteConfig) Validate() error {
-	return nil
+func(c * graphiteConfig) Validate() error {
+    return nil
 }
