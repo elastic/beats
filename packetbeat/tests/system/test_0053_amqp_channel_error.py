@@ -17,15 +17,15 @@ class Test(BaseTest):
         assert objs[0]["method"] == "exchange.declare"
         assert objs[0]["status"] == "OK"
         assert objs[0]["amqp.exchange"] == "titres"
-        assert objs[0]["amqp.durable"]
+        assert objs[0]["amqp.durable"] == True
         assert objs[0]["amqp.exchange-type"] == "fanout"
         assert objs[0]["amqp.passive"] == False
-        assert objs[0]["amqp.no-wait"]
+        assert objs[0]["amqp.no-wait"] == True
 
         assert objs[1]["method"] == "queue.declare"
         assert objs[1]["status"] == "OK"
         assert objs[1]["amqp.queue"] == "my_queue"
-        assert objs[1]["amqp.exclusive"]
+        assert objs[1]["amqp.exclusive"] == True
         assert objs[1]["amqp.no-wait"] == False
         assert objs[1]["amqp.durable"] == False
         assert objs[1]["amqp.auto-delete"] == False

@@ -18,7 +18,7 @@ class Test(BaseTest):
         assert objs[0]["method"] == "exchange.declare"
         assert objs[0]["status"] == "OK"
         assert objs[0]["amqp.exchange"] == "logs"
-        assert objs[0]["amqp.durable"]
+        assert objs[0]["amqp.durable"] == True
         assert objs[0]["amqp.exchange-type"] == "fanout"
         assert objs[0]["amqp.passive"] == False
         assert objs[0]["amqp.no-wait"] == False
@@ -26,7 +26,7 @@ class Test(BaseTest):
         assert objs[1]["method"] == "queue.declare"
         assert objs[1]["status"] == "OK"
         assert objs[1]["amqp.queue"] != ""
-        assert objs[1]["amqp.exclusive"]
+        assert objs[1]["amqp.exclusive"] == True
         assert objs[1]["amqp.no-wait"] == False
         assert objs[1]["amqp.durable"] == False
         assert objs[1]["amqp.auto-delete"] == False
@@ -41,7 +41,7 @@ class Test(BaseTest):
         assert objs[3]["method"] == "basic.consume"
         assert objs[3]["status"] == "OK"
         assert objs[3]["amqp.queue"] != ""
-        assert objs[3]["amqp.no-ack"]
+        assert objs[3]["amqp.no-ack"] == True
         assert objs[3]["amqp.no-wait"] == False
         assert objs[3]["amqp.no-local"] == False
         assert objs[3]["amqp.exclusive"] == False
@@ -49,7 +49,7 @@ class Test(BaseTest):
         assert objs[4]["method"] == "exchange.declare"
         assert objs[4]["status"] == "OK"
         assert objs[4]["amqp.exchange"] == "logs"
-        assert objs[4]["amqp.durable"]
+        assert objs[4]["amqp.durable"] == True
         assert objs[4]["amqp.exchange-type"] == "fanout"
         assert objs[4]["amqp.passive"] == False
         assert objs[4]["amqp.no-wait"] == False

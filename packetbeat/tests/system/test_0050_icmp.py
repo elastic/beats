@@ -5,9 +5,7 @@ class Test(BaseTest):
 
     def test_2_pings(self):
         self.render_config_template()
-        self.run_packetbeat(
-            pcap="icmp/icmp_2_pings.pcap",
-            debug_selectors=["*"])
+        self.run_packetbeat(pcap="icmp/icmp_2_pings.pcap", debug_selectors=["*"])
         objs = self.read_output()
 
         assert len(objs) == 2
@@ -34,9 +32,7 @@ class Test(BaseTest):
 
     def test_icmp4_ping_over_vlan(self):
         self.render_config_template()
-        self.run_packetbeat(
-            pcap="icmp/icmp4_ping_over_vlan.pcap",
-            debug_selectors=["*"])
+        self.run_packetbeat(pcap="icmp/icmp4_ping_over_vlan.pcap", debug_selectors=["*"])
         objs = self.read_output()
 
         assert len(objs) == 1
@@ -60,9 +56,7 @@ class Test(BaseTest):
 
     def test_icmp6_ping_over_vlan(self):
         self.render_config_template()
-        self.run_packetbeat(
-            pcap="icmp/icmp6_ping_over_vlan.pcap",
-            debug_selectors=["*"])
+        self.run_packetbeat(pcap="icmp/icmp6_ping_over_vlan.pcap", debug_selectors=["*"])
         objs = self.read_output()
 
         assert len(objs) == 1

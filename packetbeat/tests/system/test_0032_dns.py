@@ -224,7 +224,7 @@ class Test(BaseTest):
         assert o["query"] == "class IN, type DS, ietf.org."
         assert o["dns.question.type"] == "DS"
         assert o["status"] == "OK"
-        assert o["dns.opt.do"]
+        assert o["dns.opt.do"]  == True
         assert o["dns.opt.version"] == "0"
         assert o["dns.opt.udp_size"] == 4000
         assert o["dns.opt.ext_rcode"] == "Unknown 15"

@@ -964,6 +964,12 @@
 			"revision": "d520615e531a6bf3fb69406b9eba718261285ec8",
 			"revisionTime": "2016-12-05T14:13:22Z"
 		},
+                {
+			"checksumSHA1": "40vJyUB4ezQSn/NSadsKEOrudMc=",
+			"path": "github.com/inconshreveable/mousetrap",
+			"revision": "76626ae9c91c4f2a10f34cad8ce83ea42c93bb75",
+			"revisionTime": "2014-10-17T20:07:13Z"
+		},
 		{
 			"checksumSHA1": "qz0tMbqt+Hid8cnl8h5O5k2BiAE=",
 			"path": "github.com/hydrogen18/stalecucumber",

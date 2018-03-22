@@ -27,9 +27,7 @@ class Test(BaseTest):
             http_real_ip_header="X-Forwarded-For",
             http_send_all_headers=True,
         )
-        self.run_packetbeat(
-            pcap="http_x_forwarded_for.pcap",
-            debug_selectors=["http"])
+        self.run_packetbeat(pcap="http_x_forwarded_for.pcap", debug_selectors=["http"])
 
         objs = self.read_output()
         assert len(objs) == 1

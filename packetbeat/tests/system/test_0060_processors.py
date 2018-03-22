@@ -342,12 +342,8 @@ class Test(BaseTest):
             }]
         )
 
-        self.run_packetbeat(
-            pcap="http_minitwit.pcap",
-            debug_selectors=[
-                "http",
-                "httpdetailed",
-                "processors"])
+        self.run_packetbeat(pcap="http_minitwit.pcap",
+            debug_selectors=["http", "httpdetailed", "processors"])
         objs = self.read_output(
             required_fields=["@timestamp", "type"],
         )
@@ -372,12 +368,8 @@ class Test(BaseTest):
             }]
         )
 
-        self.run_packetbeat(
-            pcap="http_minitwit.pcap",
-            debug_selectors=[
-                "http",
-                "httpdetailed",
-                "processors"])
+        self.run_packetbeat(pcap="http_minitwit.pcap",
+            debug_selectors=["http", "httpdetailed", "processors"])
         objs = self.read_output(
             required_fields=["@timestamp", "type"],
         )
@@ -397,12 +389,8 @@ class Test(BaseTest):
             }]
         )
 
-        self.run_packetbeat(
-            pcap="http_minitwit.pcap",
-            debug_selectors=[
-                "http",
-                "httpdetailed",
-                "processors"])
+        self.run_packetbeat(pcap="http_minitwit.pcap",
+            debug_selectors=["http", "httpdetailed", "processors"])
         objs = self.read_output(
             required_fields=["@timestamp", "type"],
         )

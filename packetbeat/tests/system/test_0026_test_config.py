@@ -29,5 +29,4 @@ class Test(BaseTest):
         self.render_config_template(
             bpf_filter="invalid BPF filter"
         )
-        self.start_packetbeat(
-            extra_args=["-configtest"]).check_wait(exit_code=1)
+        self.start_packetbeat(extra_args=["-configtest"]).check_wait(exit_code=1)

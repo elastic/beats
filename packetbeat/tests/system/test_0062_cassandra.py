@@ -18,9 +18,7 @@ class Test(BaseTest):
             cassandra_send_request_header=True,
             cassandra_send_response_header=True,
         )
-        self.run_packetbeat(
-            pcap="cassandra/v4/cassandra_create_keyspace.pcap",
-            debug_selectors=["*"])
+        self.run_packetbeat(pcap="cassandra/v4/cassandra_create_keyspace.pcap", debug_selectors=["*"])
         objs = self.read_output()
         o = objs[0]
 
@@ -57,9 +55,7 @@ class Test(BaseTest):
             cassandra_send_request_header=True,
             cassandra_send_response_header=True,
         )
-        self.run_packetbeat(
-            pcap="cassandra/v4/cassandra_create_table.pcap",
-            debug_selectors=["*"])
+        self.run_packetbeat(pcap="cassandra/v4/cassandra_create_table.pcap", debug_selectors=["*"])
         objs = self.read_output()
         o = objs[0]
         assert o["type"] == "cassandra"
@@ -92,9 +88,7 @@ class Test(BaseTest):
             cassandra_send_request_header=True,
             cassandra_send_response_header=True,
         )
-        self.run_packetbeat(
-            pcap="cassandra/v4/cassandra_insert.pcap",
-            debug_selectors=["*"])
+        self.run_packetbeat(pcap="cassandra/v4/cassandra_insert.pcap", debug_selectors=["*"])
         objs = self.read_output()
         o = objs[0]
         print(o)
@@ -127,9 +121,7 @@ class Test(BaseTest):
             cassandra_send_request_header=True,
             cassandra_send_response_header=True,
         )
-        self.run_packetbeat(
-            pcap="cassandra/v4/cassandra_select.pcap",
-            debug_selectors=["*"])
+        self.run_packetbeat(pcap="cassandra/v4/cassandra_select.pcap", debug_selectors=["*"])
         objs = self.read_output()
         o = objs[0]
         assert o["type"] == "cassandra"
@@ -160,9 +152,7 @@ class Test(BaseTest):
             cassandra_send_request_header=True,
             cassandra_send_response_header=True,
         )
-        self.run_packetbeat(
-            pcap="cassandra/v4/cassandra_create_index.pcap",
-            debug_selectors=["*"])
+        self.run_packetbeat(pcap="cassandra/v4/cassandra_create_index.pcap", debug_selectors=["*"])
         objs = self.read_output()
         o = objs[0]
         assert o["type"] == "cassandra"
@@ -194,9 +184,7 @@ class Test(BaseTest):
             cassandra_send_request_header=True,
             cassandra_send_response_header=True,
         )
-        self.run_packetbeat(
-            pcap="cassandra/v4/cassandra_trace_err.pcap",
-            debug_selectors=["*"])
+        self.run_packetbeat(pcap="cassandra/v4/cassandra_trace_err.pcap", debug_selectors=["*"])
         objs = self.read_output()
         o = objs[0]
         assert o["type"] == "cassandra"
@@ -234,9 +222,7 @@ class Test(BaseTest):
             cassandra_send_request_header=True,
             cassandra_send_response_header=True,
         )
-        self.run_packetbeat(
-            pcap="cassandra/v4/cassandra_select_via_index.pcap",
-            debug_selectors=["*"])
+        self.run_packetbeat(pcap="cassandra/v4/cassandra_select_via_index.pcap", debug_selectors=["*"])
         objs = self.read_output()
         o = objs[0]
         print(o)
@@ -270,9 +256,7 @@ class Test(BaseTest):
             cassandra_send_response_header=True,
         )
 
-        self.run_packetbeat(
-            pcap="cassandra/v4/cassandra_mixed_frame.pcap",
-            debug_selectors=["*"])
+        self.run_packetbeat(pcap="cassandra/v4/cassandra_mixed_frame.pcap", debug_selectors=["*"])
         objs = self.read_output()
 
         o = objs[0]
@@ -345,9 +329,7 @@ class Test(BaseTest):
             cassandra_ignored_ops=["OPTIONS", "REGISTER"]
         )
 
-        self.run_packetbeat(
-            pcap="cassandra/v4/cassandra_mixed_frame.pcap",
-            debug_selectors=["*"])
+        self.run_packetbeat(pcap="cassandra/v4/cassandra_mixed_frame.pcap", debug_selectors=["*"])
         objs = self.read_output()
 
         o = objs[0]
