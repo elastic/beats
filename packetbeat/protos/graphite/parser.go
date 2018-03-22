@@ -9,7 +9,7 @@ import (
 	"time"
 
 	"github.com/hydrogen18/stalecucumber"
-	
+
 	"github.com/elastic/beats/libbeat/common"
 	"github.com/elastic/beats/libbeat/common/streambuf"
 	"github.com/elastic/beats/packetbeat/protos/applayer"
