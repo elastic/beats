@@ -27,3 +27,6 @@ include::../inputs/input-common-harvester-options.asciidoc[]
 
 [id="{beatname_lc}-input-{type}-common-options"]
 include::../inputs/input-common-options.asciidoc[]
+
+:type!:
+

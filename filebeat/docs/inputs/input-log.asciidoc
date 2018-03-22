@@ -98,3 +98,5 @@ include::../inputs/input-common-file-options.asciidoc[]
 
 [id="{beatname_lc}-input-{type}-common-options"]
 include::../inputs/input-common-options.asciidoc[]
+
+:type!:

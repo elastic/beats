@@ -38,3 +38,5 @@ Specifies the maximum size of the message received over UDP. The default is
 
 [id="{beatname_lc}-input-{type}-common-options"]
 include::../inputs/input-common-options.asciidoc[]
+
+:type!:
