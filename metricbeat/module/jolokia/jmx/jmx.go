@@ -37,7 +37,7 @@ var (
 // MetricSet type defines all fields of the MetricSet
 type MetricSet struct {
 	mb.BaseMetricSet
-	mapping   map[string]string
+	mapping   AttributeMapping
 	namespace string
 	http      *helper.HTTP
 	log       *logp.Logger

@@ -74,26 +74,26 @@ type Entry struct {
 //        "status": 200,
 //     }
 //  }
-func eventMapping(content []byte, mapping map[string]string) ([]common.MapStr, error) {
+type eventKey struct {
+	mbean, event string
+}
+
+func eventMapping(content []byte, mapping AttributeMapping) ([]common.MapStr, error) {
 	var entries []Entry
 	if err := json.Unmarshal(content, &entries); err != nil {
 		return nil, errors.Wrapf(err, "failed to unmarshal jolokia JSON response '%v'", string(content))
 	}
 
 	// Generate a different event for each wildcard mbean, and and additional one
-	// for non-wildcard requested mbeans
-	mbeanEvents := make(map[string]common.MapStr)
+	// for non-wildcard requested mbeans, group them by event name if defined
+	mbeanEvents := make(map[eventKey]common.MapStr)
 	var errs multierror.Errors
 
 	for _, v := range entries {
+		hasWildcard := strings.Contains(v.Request.Mbean, "*")
 		for attribute, value := range v.Value {
-			if !strings.Contains(v.Request.Mbean, "*") {
-				event, found := mbeanEvents[""]
-				if !found {
-					event = common.MapStr{}
-					mbeanEvents[""] = event
-				}
-				err := parseResponseEntry(v.Request.Mbean, attribute, value, event, mapping)
+			if !hasWildcard {
+				err := parseResponseEntry(v.Request.Mbean, v.Request.Mbean, attribute, value, mbeanEvents, mapping)
 				if err != nil {
 					errs = append(errs, err)
 				}
@@ -110,15 +110,8 @@ func eventMapping(content []byte, mapping map[string]string) ([]common.MapStr, e
 			}
 
 			responseMbean := attribute
-			event, found := mbeanEvents[responseMbean]
-			if !found {
-				event = common.MapStr{}
-				event.Put(mbeanEventKey, responseMbean)
-				mbeanEvents[responseMbean] = event
-			}
-
 			for attribute, value := range values {
-				err := parseResponseEntry(v.Request.Mbean, attribute, value, event, mapping)
+				err := parseResponseEntry(v.Request.Mbean, responseMbean, attribute, value, mbeanEvents, mapping)
 				if err != nil {
 					errs = append(errs, err)
 				}
@@ -134,34 +127,48 @@ func eventMapping(content []byte, mapping map[string]string) ([]common.MapStr, e
 	return events, errs.Err()
 }
 
+func selectEvent(events map[eventKey]common.MapStr, key eventKey) common.MapStr {
+	event, found := events[key]
+	if !found {
+		event = common.MapStr{}
+		if key.mbean != "" {
+			event.Put(mbeanEventKey, key.mbean)
+		}
+		events[key] = event
+	}
+	return event
+}
+
 func parseResponseEntry(
 	requestMbeanName string,
+	responseMbeanName string,
 	attributeName string,
-	attibuteValue interface{},
-	event common.MapStr,
-	mapping map[string]string,
+	attributeValue interface{},
+	events map[eventKey]common.MapStr,
+	mapping AttributeMapping,
 ) error {
-	// Create metric name by merging mbean and attribute fields.
-	var metricName = requestMbeanName + "_" + attributeName
-
-	key, exists := mapping[metricName]
+	field, exists := mapping.Get(requestMbeanName, attributeName)
 	if !exists {
-		return errors.Errorf("metric key '%v' not found in response (%+v)", metricName, mapping)
+		return errors.Errorf("metric key '%v' not found in response (%+v)", attributeName, mapping)
 	}
 
-	var err error
+	var key eventKey
+	key.event = field.Event
+	if responseMbeanName != requestMbeanName {
+		key.mbean = responseMbeanName
+	}
+	event := selectEvent(events, key)
 
 	// In case the attributeValue is a map the keys are dedotted
-	c, ok := attibuteValue.(map[string]interface{})
+	data := attributeValue
+	c, ok := data.(map[string]interface{})
 	if ok {
 		newData := map[string]interface{}{}
 		for k, v := range c {
 			newData[common.DeDot(k)] = v
 		}
-		_, err = event.Put(key, newData)
-	} else {
-		_, err = event.Put(key, attibuteValue)
+		data = newData
 	}
-
+	_, err := event.Put(field.Field, data)
 	return err
 }
