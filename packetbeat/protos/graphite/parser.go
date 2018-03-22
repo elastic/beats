@@ -1,6 +1,7 @@
 package graphite
 
 import (
+	"bytes"
 	"errors"
 	"reflect"
 	"strconv"
@@ -121,7 +122,7 @@ func (p *parser) parse() (*message, error) {
 	isRequest := true
 	dir := applayer.NetOriginalDirection
 	pickledData := common.NetString(buf)
-	pickledDataIo := strings.NewReader(string(pickledData))
+	pickledDataIo := bytes.Buffer(string(pickledData))
 	// Unpickle data into an interface
 	data, err := stalecucumber.Unpickle(pickledDataIo)
 	if err != nil {
