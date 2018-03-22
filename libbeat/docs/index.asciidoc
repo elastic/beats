@@ -3,7 +3,7 @@
 
 include::./version.asciidoc[]
 
-include::{asciidoc-dir}/../../shared/attributes.asciidoc[]
+include::{asciidoc-dir}/../../shared/attributes62.asciidoc[]
 
 :beatname_lc: beatname
 :beatname_uc: a Beat
