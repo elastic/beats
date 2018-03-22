@@ -1,7 +1,7 @@
 package graphite
 
 import (
-    "bytes"
+	"bytes"
 	"errors"
 	"reflect"
 	"strconv"
