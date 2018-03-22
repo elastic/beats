@@ -39,14 +39,14 @@ func (pub *transPub) createEvent(requ, resp *message) common.MapStr {
 		Proc: string(requ.CmdlineTuple.Dst),
 	}
 	// To generate one event with all the records in pickle (Array of metrics returned)
-	type requestJSON []*GraphiteJSON
+	type requestJSON []*JSON
 	var list requestJSON
 	var timeStamp int64
 	var mValue float64
 	if len(requ.Notes) == 3 {
 		timeStamp, _ = strconv.ParseInt(requ.Notes[2], 10, 64)
 		mValue, _ = strconv.ParseFloat(requ.Notes[1], 64)
-		list = append(list, &GraphiteJSON{
+		list = append(list, &JSON{
 			MetricName:      requ.Notes[0],
 			MetricValue:     mValue,
 			MetricTimestamp: timeStamp,
@@ -55,7 +55,7 @@ func (pub *transPub) createEvent(requ, resp *message) common.MapStr {
 		for k := 0; k < len(requ.Notes); k = k + 3 {
 			timeStamp, _ = strconv.ParseInt(requ.Notes[k+1], 10, 64)
 			mValue, _ = strconv.ParseFloat(requ.Notes[k+2], 64)
-			list = append(list, &GraphiteJSON{
+			list = append(list, &JSON{
 				MetricName:      requ.Notes[k],
 				MetricValue:     mValue,
 				MetricTimestamp: timeStamp,
