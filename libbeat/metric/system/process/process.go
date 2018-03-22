@@ -46,7 +46,7 @@ type Process struct {
 	cpuTotalPctNorm float64
 }
 
-// Stats stores the stats of preocesses on the host.
+// Stats stores the stats of processes on the host.
 type Stats struct {
 	Procs        []string
 	ProcsMap     ProcsMap
