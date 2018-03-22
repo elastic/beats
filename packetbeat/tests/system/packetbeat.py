@@ -116,8 +116,7 @@ class BaseTest(TestCase):
         jsons = []
         with open(os.path.join(self.working_dir, output_file), "r") as f:
             for line in f:
-                document = self.flatten_object(
-                    json.loads(line), self.dict_fields)
+                document = self.flatten_object(json.loads(line), self.dict_fields)
                 if not types or document["type"] in types:
                     jsons.append(document)
         self.all_have_fields(jsons, required_fields or TRANS_REQUIRED_FIELDS)

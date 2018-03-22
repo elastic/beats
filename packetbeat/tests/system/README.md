@@ -13,4 +13,5 @@ the setup and run all the tests with:
 Running a single test, e.g.:
 
     . env / bin / activate
-    nosetests test_0002_thrift_basics.py: Test.test_thrift_integration
+    nosetests
+    test_0002_thrift_basics.py: Test.test_thrift_integration

@@ -399,9 +399,7 @@ class Test(BaseTest):
             cassandra_compressor="snappy",
         )
 
-        self.run_packetbeat(
-            pcap="cassandra/v4/cassandra_compressed.pcap",
-            debug_selectors=["*"])
+        self.run_packetbeat(pcap="cassandra/v4/cassandra_compressed.pcap", debug_selectors=["*"])
         objs = self.read_output()
 
         o = objs[0]
