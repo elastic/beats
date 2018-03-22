@@ -121,7 +121,7 @@ func (p *parser) parse() (*message, error) {
 	isRequest := true
 	dir := applayer.NetOriginalDirection
 	pickledData := common.NetString(buf)
-	pickledDataIo := streambuf.StreamBuffer(string(pickledData))
+	pickledDataIo := strings.NewReader(string(pickledData))
 	// Unpickle data into an interface
 	data, err := stalecucumber.Unpickle(pickledDataIo)
 	if err != nil {
