@@ -42,7 +42,10 @@ var (
 	ErrStreamTooLarge = errors.New("Stream data too large")
 )
 
-func (p *parser) init(cfg *parserConfig, onMessage func(*message) error,) {
+func (p *parser) init(
+	cfg *parserConfig, 
+	onMessage func(*message) error,
+) {
 	*p = parser{
 		buf:       streambuf.Buffer{},
 		config:    cfg,
