@@ -19,7 +19,7 @@ func (pub *transPub) onTransaction(requ, resp *message) error {
 	if pub.results == nil {
 		return nil
 	}
-	/* Generates one event for each metric in pickle 8*/
+	// Generates one event for each metric in pickle 8
 	event := pub.createEvent(requ, resp)
 	pub.results.PublishTransaction(event)
 	return nil
@@ -38,7 +38,6 @@ func (pub *transPub) createEvent(requ, resp *message) common.MapStr {
 		Port: requ.Tuple.DstPort,
 		Proc: string(requ.CmdlineTuple.Dst),
 	}
-	//fmt.Println("generation")
 	// To generate one event with all the records in pickle (Array of metrics returned)
 	type requestJSON []*GraphiteJSON
 	var list requestJSON

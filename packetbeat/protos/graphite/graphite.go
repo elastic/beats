@@ -46,7 +46,6 @@ var (
 )
 
 func init() {
-	//	fmt.Printf("registering graphite")
 	protos.Register("graphite", New)
 }
 
