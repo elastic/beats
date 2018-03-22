@@ -60,6 +60,7 @@ func releaseCtx(c *ctx) {
 func NewFormatter(pattern string) (*Formatter, error) {
 	b := newBuilder()
 
+	// pattern: yyyy-MM-dd'T'HH:mm:ss.fffffffff'Z'
 	err := parsePatternTo(b, pattern)
 	if err != nil {
 		return nil, err
@@ -135,6 +136,7 @@ func (f *Formatter) Format(t time.Time) (string, error) {
 }
 
 func parsePatternTo(b *builder, pattern string) error {
+	// pattern: yyyy-MM-dd'T'HH:mm:ss.fffffffff'Z'
 	for i := 0; i < len(pattern); {
 		tok, tokText, err := parseToken(pattern, &i)
 		if err != nil {
@@ -209,10 +211,17 @@ func parsePatternTo(b *builder, pattern string) error {
 			b.secondOfMinute(tokLen)
 
 		case 'S': // fraction of second
-			b.millisOfSecond(tokLen)
+			b.nanoOfSecond(tokLen)
 
 		case 'z': // timezone offset
 			b.timeZoneOffsetText()
+
+		case 'n': // nano second
+			// if timestamp layout use `n`, it always return 9 digits nanoseconds.
+			if tokLen != 9 {
+				tokLen = 9
+			}
+			b.nanoOfSecond(tokLen)
 
 		case '\'': // literal
 			if tokLen == 1 {
@@ -234,7 +243,7 @@ func parseToken(pattern string, i *int) (rune, string, error) {
 	start := *i
 	idx := start
 	length := len(pattern)
-
+	// pattern: yyyy-MM-dd'T'HH:mm:ss.fffffffff'Z'
 	r, w := utf8.DecodeRuneInString(pattern[idx:])
 	idx += w
 	if ('A' <= r && r <= 'Z') || ('a' <= r && r <= 'z') {

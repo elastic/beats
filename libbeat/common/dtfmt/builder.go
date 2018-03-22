@@ -45,7 +45,6 @@ func (b *builder) createConfig() (ctxConfig, error) {
 
 func (b *builder) compile() (prog, error) {
 	p := prog{}
-
 	for _, e := range b.elements {
 		tmp, err := e.compile()
 		if err != nil {
@@ -97,26 +96,34 @@ func (b *builder) add(e element) {
 	b.elements = append(b.elements, e)
 }
 
-func (b *builder) millisOfSecond(digits int) {
+func (b *builder) nanoOfSecond(digits int) {
 	if digits <= 0 {
 		return
 	}
 
 	switch digits {
 	case 1:
-		b.appendExtDecimal(ftMillisOfSecond, 100, 1, 1)
+		b.appendExtDecimal(ftNanoOfSecond, 8, 1, 1)
 	case 2:
-		b.appendExtDecimal(ftMillisOfSecond, 10, 2, 2)
+		b.appendExtDecimal(ftNanoOfSecond, 7, 2, 2)
 	case 3:
-		b.appendExtDecimal(ftMillisOfSecond, 0, 3, 3)
+		b.appendExtDecimal(ftNanoOfSecond, 6, 3, 3)
+	case 4:
+		b.appendExtDecimal(ftNanoOfSecond, 5, 4, 4)
+	case 5:
+		b.appendExtDecimal(ftNanoOfSecond, 4, 5, 5)
+	case 6:
+		b.appendExtDecimal(ftNanoOfSecond, 3, 6, 6)
+	case 7:
+		b.appendExtDecimal(ftNanoOfSecond, 2, 7, 7)
+	case 8:
+		b.appendExtDecimal(ftNanoOfSecond, 1, 8, 8)
+	case 9:
+		b.appendExtDecimal(ftNanoOfSecond, 0, 9, 9)
 	default:
-		b.appendExtDecimal(ftMillisOfSecond, 0, 3, 3)
-		b.appendZeros(digits - 3)
+		b.appendExtDecimal(ftNanoOfSecond, 0, 9, 9)
+		b.appendZeros(digits - 9)
 	}
-}
-
-func (b *builder) millisOfDay(digits int) {
-	b.appendDecimal(ftMillisOfDay, digits, 8)
 }
 
 func (b *builder) secondOfMinute(digits int) {
@@ -237,8 +244,8 @@ func (b *builder) appendDecimalValue(ft fieldType, minDigits, maxDigits int, sig
 	}
 }
 
-func (b *builder) appendExtDecimal(ft fieldType, div, minDigits, maxDigits int) {
-	b.add(paddedNumber{ft, div, minDigits, maxDigits, false})
+func (b *builder) appendExtDecimal(ft fieldType, divExp, minDigits, maxDigits int) {
+	b.add(paddedNumber{ft, divExp, minDigits, maxDigits, false})
 }
 
 func (b *builder) appendDecimal(ft fieldType, minDigits, maxDigits int) {

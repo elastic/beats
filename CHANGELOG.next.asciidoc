@@ -30,6 +30,12 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Libbeat: Cleanup the x-pack licenser code to use the new license endpoint and the new format. {pull}15091[15091]
 - Users can now specify `monitoring.cloud.*` to override `monitoring.elasticsearch.*` settings. {issue}14399[14399] {pull}15254[15254]
 - Update to ECS 1.4.0. {pull}14844[14844]
+- Update add_cloud_metadata fields to adjust to ECS. {pull}9265[9265]
+- Automaticall cap signed integers to 63bits. {pull}8991[8991]
+- Rename beat.timezone to event.timezone. {pull}9458[9458]
+- Use _doc as document type. {pull}9056[9056]{pull}9573[9573]
+- Update to Golang 1.11.3. {pull}9560[9560]
+- Add @timestamp support nanoseconds. {pull}9818[9818]
 
 *Auditbeat*
 

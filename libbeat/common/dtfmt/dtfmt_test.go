@@ -103,6 +103,15 @@ func TestFormat(t *testing.T) {
 		{mkDateTimeWithLocation(2017, 1, 2, 4, 6, 7, 123, time.FixedZone("PST", -8*60*60)),
 			"yyyy-MM-dd'T'HH:mm:ss.SSSz",
 			"2017-01-02T04:06:07.123-08:00"},
+
+		// beats nanoseconds timestamp
+		{mkDateTime(2017, 1, 2, 4, 6, 7, 123),
+			"yyyy-MM-dd'T'HH:mm:ss.nnnnnnnnn'Z'",
+			"2017-01-02T04:06:07.123000000Z"},
+
+		{mkDateTimeWithLocation(2017, 1, 2, 4, 6, 7, 123, time.FixedZone("PST", -8*60*60)),
+			"yyyy-MM-dd'T'HH:mm:ss.nnnnnnnnnz",
+			"2017-01-02T04:06:07.123000000-08:00"},
 	}
 
 	for i, test := range tests {

@@ -36,12 +36,22 @@ const (
 	opCopyLong          // [op, len1, len, content[len1<<8 + len]]
 	opNum               // [op, ft]
 	opNumPadded         // [op, ft, digits]
-	opExtNumPadded      // [op, ft, div, digits]
+	opExtNumPadded      // [op, ft, divExp, digits]
 	opZeros             // [op, count]
 	opTwoDigit          // [op, ft]
 	opTextShort         // [op, ft]
 	opTextLong          // [op, ft]
 )
+
+var pow10Table [10]int
+
+func init() {
+	x := 1
+	for i := range pow10Table {
+		pow10Table[i] = x
+		x *= 10
+	}
+}
 
 func (p prog) eval(bytes []byte, ctx *ctx, t time.Time) ([]byte, error) {
 	for i := 0; i < len(p.p); {
@@ -90,7 +100,8 @@ func (p prog) eval(bytes []byte, ctx *ctx, t time.Time) ([]byte, error) {
 			}
 			bytes = appendPadded(bytes, v, digits)
 		case opExtNumPadded:
-			ft, div, digits := fieldType(p.p[i]), int(p.p[i+1]), int(p.p[i+2])
+			ft, divExp, digits := fieldType(p.p[i]), int(p.p[i+1]), int(p.p[i+2])
+			div := pow10Table[divExp]
 			i += 3
 			v, err := getIntField(ft, ctx, t)
 			if err != nil {

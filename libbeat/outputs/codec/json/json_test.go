@@ -37,13 +37,13 @@ func TestJsonCodec(t *testing.T) {
 		"default json": testCase{
 			config:   defaultConfig,
 			in:       common.MapStr{"msg": "message"},
-			expected: `{"@timestamp":"0001-01-01T00:00:00.000Z","@metadata":{"beat":"test","type":"_doc","version":"1.2.3"},"msg":"message"}`,
+			expected: `{"@timestamp":"0001-01-01T00:00:000000000Z","@metadata":{"beat":"test","type":"_doc","version":"1.2.3"},"msg":"message"}`,
 		},
 		"pretty enabled": testCase{
 			config: Config{Pretty: true},
 			in:     common.MapStr{"msg": "message"},
 			expected: `{
-  "@timestamp": "0001-01-01T00:00:00.000Z",
+  "@timestamp": "0001-01-01T00:00:00.000000000Z",
   "@metadata": {
     "beat": "test",
     "type": "_doc",
@@ -55,12 +55,12 @@ func TestJsonCodec(t *testing.T) {
 		"html escaping enabled": testCase{
 			config:   Config{EscapeHTML: true},
 			in:       common.MapStr{"msg": "<hello>world</hello>"},
-			expected: `{"@timestamp":"0001-01-01T00:00:00.000Z","@metadata":{"beat":"test","type":"_doc","version":"1.2.3"},"msg":"\u003chello\u003eworld\u003c/hello\u003e"}`,
+			expected: `{"@timestamp":"0001-01-01T00:00:00.000000000Z","@metadata":{"beat":"test","type":"_doc","version":"1.2.3"},"msg":"\u003chello\u003eworld\u003c/hello\u003e"}`,
 		},
 		"html escaping disabled": testCase{
 			config:   Config{EscapeHTML: false},
 			in:       common.MapStr{"msg": "<hello>world</hello>"},
-			expected: `{"@timestamp":"0001-01-01T00:00:00.000Z","@metadata":{"beat":"test","type":"_doc","version":"1.2.3"},"msg":"<hello>world</hello>"}`,
+			expected: `{"@timestamp":"0001-01-01T00:00:00.000000000Z","@metadata":{"beat":"test","type":"_doc","version":"1.2.3"},"msg":"<hello>world</hello>"}`,
 		},
 		"UTC timezone offset": testCase{
 			config:   Config{LocalTime: true},

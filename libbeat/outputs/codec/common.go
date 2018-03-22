@@ -36,9 +36,9 @@ func MakeTimestampEncoder() func(*time.Time, structform.ExtVisitor) error {
 func MakeUTCOrLocalTimestampEncoder(localTime bool) func(*time.Time, structform.ExtVisitor) error {
 	var dtPattern string
 	if localTime {
-		dtPattern = "yyyy-MM-dd'T'HH:mm:ss.SSSz"
+		dtPattern = "yyyy-MM-dd'T'HH:mm:ss.SSSSSSSSSz"
 	} else {
-		dtPattern = "yyyy-MM-dd'T'HH:mm:ss.SSS'Z'"
+		dtPattern = "yyyy-MM-dd'T'HH:mm:ss.SSSSSSSSS'Z'"
 	}
 
 	formatter, err := dtfmt.NewFormatter(dtPattern)
