@@ -863,6 +863,16 @@ func (mysql *mysqlPlugin) publishTransaction(t *mysqlTransaction) {
 	})
 }
 
+func (mysql *mysqlPlugin) restrictQuerySize(msg *mysqlMessage, limit int) []byte {
+	length := len(msg.query)
+	var cutQuery []byte
+	if length >= limit {
+		cutQuery = []byte(msg.query)[:limit]
+	}
+
+	return cutQuery
+}
+
 func readLstring(data []byte, offset int) ([]byte, int, bool, error) {
 	length, off, complete, err := readLinteger(data, offset)
 	if err != nil {
