@@ -36,7 +36,6 @@ func (r *JSON) decodeJSON(text []byte) ([]byte, common.MapStr) {
 		if r.cfg.AddErrorKey {
 			jsonFields = common.MapStr{"error": createJSONError(fmt.Sprintf("Error decoding JSON: %v", err))}
 		}
-		appendRawJSONData(jsonFields, text)
 		return text, jsonFields
 	}
 
@@ -103,6 +102,13 @@ func MergeJSONFields(data common.MapStr, jsonFields common.MapStr, text *string,
 		jsonFields[config.MessageKey] = *text
 	}
 
+	// handle the case in which r.cfg.AddErrorKey is set and len(jsonFields) == 1
+	// and only thing it contains is `error` key due to error in json decoding
+	// which results in loss of message key in the main beat event
+	if len(jsonFields) == 1 && jsonFields["error"] != nil {
+		data["message"] = *text
+	}
+
 	if config.KeysUnderRoot {
 		// Delete existing json key
 		delete(data, "json")
@@ -126,11 +132,4 @@ func MergeJSONFields(data common.MapStr, jsonFields common.MapStr, text *string,
 		return event.Timestamp
 	}
 	return time.Time{}
-}
-
-func appendRawJSONData(jsonFields map[string]interface{}, text []byte) {
-	if jsonFields == nil {
-		jsonFields = common.MapStr{}
-	}
-	jsonFields["message"] = fmt.Sprintf("Raw json data: %s", string(text))
 }
