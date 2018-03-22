@@ -6,7 +6,7 @@ import (
 )
 
 type graphiteConfig struct {
-    config.ProtocolCommon `config: ",inline"`
+    config.ProtocolCommon `config:",inline"`
 }
 
 var(
