@@ -150,7 +150,11 @@ def create_notice(filename, beat, copyright, vendor_dirs, csvfile):
 
 APACHE2_LICENSE_TITLES = [
     "Apache License Version 2.0",
-    "Apache License, Version 2.0"
+    "Apache License, Version 2.0",
+    re.sub(r"\s+", " ", """Apache License
+    ==============
+
+    _Version 2.0, January 2004_"""),
 ]
 
 MIT_LICENSES = [
