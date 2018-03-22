@@ -33,7 +33,8 @@ const (
 )
 
 type metricHints struct {
-	Key string
+	Key      string
+	Registry *mb.Register
 }
 
 // NewMetricHints builds a new metrics builder based on hints
@@ -46,7 +47,7 @@ func NewMetricHints(cfg *common.Config) (autodiscover.Builder, error) {
 		return nil, fmt.Errorf("unable to unpack hints config due to error: %v", err)
 	}
 
-	return &metricHints{config.Key}, nil
+	return &metricHints{config.Key, config.Registry}, nil
 }
 
 // Create configs based on hints passed from providers
@@ -113,17 +114,18 @@ func (m *metricHints) getModule(hints common.MapStr) string {
 
 func (m *metricHints) getMetricSets(hints common.MapStr, module string) []string {
 	var msets []string
+	var err error
 	msets = builder.GetHintAsList(hints, m.Key, metricsets)
 
 	if len(msets) == 0 {
-		// Special handling for prometheus as most use cases rely on exporters/instrumentation.
-		// Prometheus stats can be explicitly configured if need be.
-		if module == "prometheus" {
-			msets = []string{"collector"}
-		} else {
-			msets = mb.Registry.MetricSets(module)
+		// If no metricset list is given, take module defaults
+		// fallback to all metricsets if module has no defaults
+		msets, err = m.Registry.DefaultMetricSets(module)
+		if err != nil || len(msets) == 0 {
+			msets = m.Registry.MetricSets(module)
 		}
 	}
+
 	return msets
 }
 

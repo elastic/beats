@@ -7,6 +7,7 @@ import (
 
 	"github.com/elastic/beats/libbeat/common"
 	"github.com/elastic/beats/libbeat/common/bus"
+	"github.com/elastic/beats/metricbeat/mb"
 )
 
 func TestGenerateHints(t *testing.T) {
@@ -40,48 +41,66 @@ func TestGenerateHints(t *testing.T) {
 			event: bus.Event{
 				"hints": common.MapStr{
 					"metrics": common.MapStr{
-						"module": "prometheus",
+						"module": "mockmodule",
 					},
 				},
 			},
 			len:    0,
 			result: common.MapStr{},
 		},
-		// Only module hint should return empty config
+		// Only module hint should return all metricsets
 		{
 			event: bus.Event{
 				"host": "1.2.3.4",
 				"hints": common.MapStr{
 					"metrics": common.MapStr{
-						"module": "prometheus",
+						"module": "mockmodule",
 					},
 				},
 			},
 			len: 1,
 			result: common.MapStr{
-				"module":     "prometheus",
-				"metricsets": []interface{}{"collector"},
+				"module":     "mockmodule",
+				"metricsets": []interface{}{"one", "two"},
 				"timeout":    "3s",
 				"period":     "1m",
 				"enabled":    true,
 			},
 		},
-		// Only module, namespace hint should return empty config
+		// metricsets hint works
 		{
 			event: bus.Event{
 				"host": "1.2.3.4",
 				"hints": common.MapStr{
 					"metrics": common.MapStr{
-						"module":    "prometheus",
-						"namespace": "test",
+						"module":     "mockmodule",
+						"metricsets": "one",
 					},
 				},
 			},
 			len: 1,
 			result: common.MapStr{
-				"module":     "prometheus",
-				"namespace":  "test",
-				"metricsets": []interface{}{"collector"},
+				"module":     "mockmodule",
+				"metricsets": []interface{}{"one"},
+				"timeout":    "3s",
+				"period":     "1m",
+				"enabled":    true,
+			},
+		},
+		// Only module, it should return defaults
+		{
+			event: bus.Event{
+				"host": "1.2.3.4",
+				"hints": common.MapStr{
+					"metrics": common.MapStr{
+						"module": "mockmoduledefaults",
+					},
+				},
+			},
+			len: 1,
+			result: common.MapStr{
+				"module":     "mockmoduledefaults",
+				"metricsets": []interface{}{"default"},
 				"timeout":    "3s",
 				"period":     "1m",
 				"enabled":    true,
@@ -93,7 +112,7 @@ func TestGenerateHints(t *testing.T) {
 				"host": "1.2.3.4",
 				"hints": common.MapStr{
 					"metrics": common.MapStr{
-						"module":    "prometheus",
+						"module":    "mockmoduledefaults",
 						"namespace": "test",
 						"hosts":     "${data.host}:9090",
 					},
@@ -101,9 +120,9 @@ func TestGenerateHints(t *testing.T) {
 			},
 			len: 1,
 			result: common.MapStr{
-				"module":     "prometheus",
+				"module":     "mockmoduledefaults",
 				"namespace":  "test",
-				"metricsets": []interface{}{"collector"},
+				"metricsets": []interface{}{"default"},
 				"timeout":    "3s",
 				"period":     "1m",
 				"enabled":    true,
@@ -113,10 +132,10 @@ func TestGenerateHints(t *testing.T) {
 		{
 			event: bus.Event{
 				"host": "1.2.3.4",
-				"port": int64(9090),
+				"port": 9090,
 				"hints": common.MapStr{
 					"metrics": common.MapStr{
-						"module":    "prometheus",
+						"module":    "mockmoduledefaults",
 						"namespace": "test",
 						"hosts":     "${data.host}:9090",
 					},
@@ -124,9 +143,9 @@ func TestGenerateHints(t *testing.T) {
 			},
 			len: 1,
 			result: common.MapStr{
-				"module":     "prometheus",
+				"module":     "mockmoduledefaults",
 				"namespace":  "test",
-				"metricsets": []interface{}{"collector"},
+				"metricsets": []interface{}{"default"},
 				"hosts":      []interface{}{"1.2.3.4:9090"},
 				"timeout":    "3s",
 				"period":     "1m",
@@ -135,10 +154,15 @@ func TestGenerateHints(t *testing.T) {
 		},
 	}
 	for _, test := range tests {
-		cfg := defaultConfig()
+		mockRegister := mb.NewRegister()
+		mockRegister.MustAddMetricSet("mockmodule", "one", NewMockMetricSet, mb.DefaultMetricSet())
+		mockRegister.MustAddMetricSet("mockmodule", "two", NewMockMetricSet, mb.DefaultMetricSet())
+		mockRegister.MustAddMetricSet("mockmoduledefaults", "default", NewMockMetricSet, mb.DefaultMetricSet())
+		mockRegister.MustAddMetricSet("mockmoduledefaults", "other", NewMockMetricSet)
 
 		m := metricHints{
-			Key: cfg.Key,
+			Key:      defaultConfig().Key,
+			Registry: mockRegister,
 		}
 		cfgs := m.CreateConfig(test.event)
 		assert.Equal(t, len(cfgs), test.len)
@@ -152,4 +176,16 @@ func TestGenerateHints(t *testing.T) {
 		}
 
 	}
+}
+
+type MockMetricSet struct {
+	mb.BaseMetricSet
+}
+
+func NewMockMetricSet(base mb.BaseMetricSet) (mb.MetricSet, error) {
+	return &MockMetricSet{}, nil
+}
+
+func (ms *MockMetricSet) Fetch(report mb.Reporter) {
+
 }
