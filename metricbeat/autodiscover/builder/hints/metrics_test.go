@@ -12,12 +12,13 @@ import (
 
 func TestGenerateHints(t *testing.T) {
 	tests := []struct {
-		event  bus.Event
-		len    int
-		result common.MapStr
+		message string
+		event   bus.Event
+		len     int
+		result  common.MapStr
 	}{
-		// Empty event hints should return empty config
 		{
+			message: "Empty event hints should return empty config",
 			event: bus.Event{
 				"host": "1.2.3.4",
 				"kubernetes": common.MapStr{
@@ -36,8 +37,8 @@ func TestGenerateHints(t *testing.T) {
 			len:    0,
 			result: common.MapStr{},
 		},
-		// Hints without host should return nothing
 		{
+			message: "Hints without host should return nothing",
 			event: bus.Event{
 				"hints": common.MapStr{
 					"metrics": common.MapStr{
@@ -48,8 +49,8 @@ func TestGenerateHints(t *testing.T) {
 			len:    0,
 			result: common.MapStr{},
 		},
-		// Only module hint should return all metricsets
 		{
+			message: "Only module hint should return all metricsets",
 			event: bus.Event{
 				"host": "1.2.3.4",
 				"hints": common.MapStr{
@@ -67,8 +68,8 @@ func TestGenerateHints(t *testing.T) {
 				"enabled":    true,
 			},
 		},
-		// metricsets hint works
 		{
+			message: "metricsets hint works",
 			event: bus.Event{
 				"host": "1.2.3.4",
 				"hints": common.MapStr{
@@ -87,8 +88,8 @@ func TestGenerateHints(t *testing.T) {
 				"enabled":    true,
 			},
 		},
-		// Only module, it should return defaults
 		{
+			message: "Only module, it should return defaults",
 			event: bus.Event{
 				"host": "1.2.3.4",
 				"hints": common.MapStr{
@@ -106,8 +107,8 @@ func TestGenerateHints(t *testing.T) {
 				"enabled":    true,
 			},
 		},
-		// Module, namespace, host hint should return valid config without port should not return hosts
 		{
+			message: "Module, namespace, host hint should return valid config without port should not return hosts",
 			event: bus.Event{
 				"host": "1.2.3.4",
 				"hints": common.MapStr{
@@ -128,8 +129,8 @@ func TestGenerateHints(t *testing.T) {
 				"enabled":    true,
 			},
 		},
-		// Module, namespace, host hint should return valid config
 		{
+			message: "Module, namespace, host hint should return valid config",
 			event: bus.Event{
 				"host": "1.2.3.4",
 				"port": 9090,
@@ -170,9 +171,9 @@ func TestGenerateHints(t *testing.T) {
 		if test.len != 0 {
 			config := common.MapStr{}
 			err := cfgs[0].Unpack(&config)
-			assert.Nil(t, err)
+			assert.Nil(t, err, test.message)
 
-			assert.Equal(t, config, test.result)
+			assert.Equal(t, config, test.result, test.message)
 		}
 
 	}
