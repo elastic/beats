@@ -17,6 +17,11 @@ import (
 	"github.com/elastic/beats/libbeat/setup/kibana"
 )
 
+var availableMLModules = map[string]string{
+	"apache2": "access",
+	"nginx":   "access",
+}
+
 type ModuleRegistry struct {
 	registry map[string]map[string]*Fileset // module -> fileset -> Fileset
 }
@@ -488,10 +493,10 @@ func (reg *ModuleRegistry) SetupML(esClient PipelineLoader, kibanaClient *kibana
 
 	modules := make(map[string]string)
 	if reg.Empty() {
-		modules = mlimporter.AvailableModules
+		modules = availableMLModules
 	} else {
 		for _, module := range reg.ModuleNames() {
-			if fileset, ok := mlimporter.AvailableModules[module]; ok {
+			if fileset, ok := availableMLModules[module]; ok {
 				modules[module] = fileset
 			}
 		}
