@@ -1,4 +1,4 @@
-Filebeat supports templates for both prospectors and modules.
+Filebeat supports templates for inputs and modules.
 
 ["source","yaml",subs="attributes"]
 -------------------------------------------------------------------------------------
@@ -16,9 +16,9 @@ filebeat.autodiscover:
               exclude_lines: ["^\\s+[\\-`('.|_]"]  # drop asciiart lines
 -------------------------------------------------------------------------------------
 
-This configuration launches a `docker` logs prospector for all containers running an image with `redis` in the name.
+This configuration launches a `docker` logs input for all containers running an image with `redis` in the name.
 
-If you are using modules, you can override the default prospector and use the docker prospector instead.
+If you are using modules, you can override the default input and use the docker input instead.
 
 ["source","yaml",subs="attributes"]
 -------------------------------------------------------------------------------------
@@ -32,7 +32,7 @@ filebeat.autodiscover:
           config:
             - module: redis
               log:
-                prospector:
+                input:
                   type: docker
                   containers.ids:
                     - "${data.docker.container.id}"

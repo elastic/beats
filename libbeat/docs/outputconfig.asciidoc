@@ -256,7 +256,7 @@ Example elasticsearch output with `pipelines`:
 
 ["source","yaml"]
 ------------------------------------------------------------------------------
-filebeat.prospectors:
+filebeat.inputs:
 - type: log
   paths: ["/var/log/app/normal/*.log"]
   fields:
