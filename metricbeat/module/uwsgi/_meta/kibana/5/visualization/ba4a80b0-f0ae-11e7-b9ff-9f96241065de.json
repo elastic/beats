@@ -1,5 +1,5 @@
 {
-  "visState": "{\"type\":\"timelion\",\"title\":\"Errors [Metricbeat uWSGI]\",\"params\":{\"expression\":\".es(metric=max:uwsgi.status.total.read_errors).label('Read errors').title('Errors'),\\n.es(metric=max:uwsgi.status.total.write_errors).label('Write errors'),\\n.es(metric=max:uwsgi.status.worker.harakiri_count).label('Timeouted requests')\",\"interval\":\"15s\"}}",
+  "visState": "{\"type\":\"timelion\",\"title\":\"Errors [Metricbeat uWSGI]\",\"params\":{\"expression\":\".es(metric=max:uwsgi.status.total.read_errors).label('Read errors').title('Errors'),.es(metric=max:uwsgi.status.total.write_errors).label('Write errors'),.es(metric=max:uwsgi.status.worker.harakiri_count).label('Timeouted requests')\",\"interval\":\"15s\"}}",
   "description": "",
   "title": "Errors [Metricbeat uWSGI]",
   "uiStateJSON": "{}",
