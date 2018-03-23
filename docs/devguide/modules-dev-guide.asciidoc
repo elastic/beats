@@ -176,8 +176,7 @@ There's quite a lot going on in this file, so let's break it down:
   element: `"/example/test.log*"`.
 * Note that variable values don't have to be strings.
   They can be also numbers, objects, or as shown in this example, arrays.
-* We will use the `paths` variable to set the prospector
-  {filebeat}/configuration-filebeat-options.html#prospector-paths[paths]
+* We will use the `paths` variable to set the prospector `paths`
   setting, so "glob" values can be used here.
 * Besides the `default` value, the file defines values for particular
   operating systems: a default for darwin/OS X/macOS systems and a default for
@@ -233,7 +232,7 @@ exclude_files: [".gz$"]
 
 You'll find this example in the template file that gets generated automatically
 when you run `make create-fileset`. In this example, the `paths` variable is
-used to construct the `paths` list for the {filebeat}/configuration-filebeat-options.html#prospector-paths[paths] option.
+used to construct the `paths` list for the prospector `paths` option.
 
 Any template files that you add to the `config/` folder need to generate a valid
 Filebeat prospector configuration in YAML format. The options accepted by the
