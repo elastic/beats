@@ -39,13 +39,10 @@ The `docker` input supports the following configuration options plus the
 The list of Docker container IDs to read logs from. Specify
 `containers.ids: '*'` to read from all containers.
 
-===== `containers.paths`
+===== `containers.path`
 
 The base path where Docker logs are located. The default
 is `/var/lib/docker/containers`.
-
-// REVIEWERS: Not clear to me if this setting accepts an array or a string. If
-// it's just a string, why is it paths (plural)?
 
 ===== `containers.stream`
 
@@ -59,7 +56,7 @@ all containers under the default Docker containers path:
 ----
 - type: docker
   containers:
-    paths: "/var/lib/docker/containers"
+    path: "/var/lib/docker/containers"
     stream: "stdout"
     ids:
       - "*"

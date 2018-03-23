@@ -352,8 +352,6 @@ Requirement: max_backoff should always be set to `max_backoff <=
 scan_frequency`. In case `max_backoff` should be bigger, it is recommended to
 close the file handler instead let the {beatname_uc} pick up the file again.
 
-// REVIEWERS Not sure what we are trying to say here. ^^
-
 [float]
 ===== `backoff_factor`
 

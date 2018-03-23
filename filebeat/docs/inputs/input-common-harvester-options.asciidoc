@@ -33,9 +33,6 @@ list. By default, no lines are dropped.
 If <<multiline,multiline>> settings are also specified, each multiline message
 is combined into a single line before the lines are filtered by `exclude_lines`.
 
-// REVIEWERS: Do I need to make examples like this one more generic to work with
-// all the input types where this description will appear, or is this OK?
-
 The following example configures {beatname_uc} to drop any lines that start with
 `DBG`.
 

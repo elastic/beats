@@ -16,6 +16,7 @@ Example configuration:
 {beatname_lc}.inputs:
 - type: udp
   max_message_size: 10240
+  host: "localhost:8080"
 ----
 
 
@@ -24,17 +25,17 @@ Example configuration:
 The `udp` input supports the following configuration options plus the
 <<{beatname_lc}-input-{type}-common-options>> described later.
 
-//REVIEWERS: PH: What other options need to be documented here? I don't see host
-//and port listed in the reference.yml. Are the host and port separate options?
-//What guidance should we provide to help users set these options? Config ex
-//above should include this as an eample, too.
-
 [float]
-[[max-message-size]]
+[id="{beatname_lc}-input-{type}-max-message-size"]
 ==== `max_message_size`
 
-Specifies the maximum size of the message received over UDP. The default is
-`10240`.
+The maximum size of the message received over UDP. The default is `10240`.
+
+[float]
+[id="{beatname_lc}-input-{type}-host"]
+==== `host`
+
+The host and UDP port to listen on for event streams. 
 
 [id="{beatname_lc}-input-{type}-common-options"]
 include::../inputs/input-common-options.asciidoc[]
