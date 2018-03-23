@@ -263,6 +263,7 @@ https://github.com/elastic/beats/compare/v6.0.0-beta2...master[Check the HEAD di
 - Configure good defaults for `add_kubernetes_metadata`. {pull}5707[5707]
 - Add support for condition on bool type {issue}5659[5659] {pull}5954[5954]
 - HTTP parses successfully on empty status phrase. {issue}6176[6176]
+- HTTP parser supports broken status line. {pull}6631[6631]
 
 *Winlogbeat*
 
