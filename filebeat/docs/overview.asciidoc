@@ -5,14 +5,25 @@
 <titleabbrev>Overview</titleabbrev>
 ++++
 
-Filebeat is a log data shipper for local files. Installed as an agent on your servers, Filebeat monitors the log directories or specific log files, tails the files,
-and forwards them either to https://www.elastic.co/products/elasticsearch[Elasticsearch] or https://www.elastic.co/products/logstash[Logstash] for indexing.
+{beatname_uc} is a lightweight shipper for forwarding and centralizing log data.
+Installed as an agent on your servers, {beatname_uc} monitors the log
+files or locations that you specify, collects log events, and forwards them
+to either to https://www.elastic.co/products/elasticsearch[Elasticsearch] or
+https://www.elastic.co/products/logstash[Logstash] for indexing.
 
-Here's how Filebeat works: When you start Filebeat, it starts one or more prospectors that look in the local paths you've specified for log files. For each log file that the prospector locates, Filebeat starts a harvester. Each harvester reads a single log file for new content and sends the new log data to libbeat, which aggregates the events and sends the aggregated data to the output that you've configured for Filebeat.
+Here's how {beatname_uc} works: When you start {beatname_uc}, it starts one or
+more inputs that look in the locations you've specified for log data. For
+each log that {beatname_uc} locates, {beatname_uc} starts a harvester. Each
+harvester reads a single log for new content and sends the new log data to
+libbeat, which aggregates the events and sends the aggregated data to the output
+that you've configured for {beatname_uc}.
 
 image:./images/filebeat.png[Beats design]
 
-For more information about prospectors and harvesters, see <<how-filebeat-works>>.
+For more information about inputs and harvesters, see
+<<how-filebeat-works>>.
 
-Filebeat is a https://www.elastic.co/products/beats[Beat], and it is based on the libbeat framework.
-General information about libbeat and setting up Elasticsearch, Logstash, and Kibana are covered in the {libbeat}/index.html[Beats Platform Reference].
+{beatname_uc} is a https://www.elastic.co/products/beats[Beat], and it is based on
+the libbeat framework. General information about libbeat and setting up
+Elasticsearch, Logstash, and Kibana are covered in the
+{libbeat}/index.html[Beats Platform Reference].
