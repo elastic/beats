@@ -29,8 +29,10 @@ annotations:
 
 The above annotations are used to spin up a Prometheus collector metricset and it polls the
 parent container on port `9090` at a 1 minute interval and the container named `sidecar` on
-port `8080` every 10 minutes. Hints can also be provided for the following module configuration
-parameters:
+port `8080` every 10 minutes. If no metricsets parameter is given, Metricbeat will use default
+metricsets of the module, or all metricsets if there is no default list.
+
+Hints can also be provided for the following module configuration parameters:
 
 ["source","yaml",subs="attributes"]
 -------------------------------------------------------------------------------------
