@@ -10,18 +10,20 @@
 //////////////////////////////////////////////////////////////////////////
 
 [[configuring-ingest-node]]
-== Parse logs by using ingest node
+== Parse data by using ingest node
 
 When you use Elasticsearch for output, you can configure {beatname_uc} to use
-{elasticsearch}/ingest.html[ingest node] to pre-process documents
-before the actual indexing takes place in Elasticsearch. Ingest node is a convenient processing option when you
-want to do some extra processing on your data, but you do not require the full power of Logstash. For
-example, you can create an ingest node pipeline in Elasticsearch that consists of one processor
-that removes a field in a document followed by another processor that renames a field.
+{elasticsearch}/ingest.html[ingest node] to pre-process documents before the
+actual indexing takes place in Elasticsearch. Ingest node is a convenient
+processing option when you want to do some extra processing on your data, but
+you do not require the full power of Logstash. For example, you can create an
+ingest node pipeline in Elasticsearch that consists of one processor that
+removes a field in a document followed by another processor that renames a
+field.
 
-After defining the pipeline in Elasticsearch, you simply configure your Beat to use the pipeline. To configure
-{beatname_uc}, you specify the pipeline ID in the `parameters` option under `elasticsearch` in the
-+{beatname_lc}.yml+ file:
+After defining the pipeline in Elasticsearch, you simply configure {beatname_uc}
+to use the pipeline. To configure {beatname_uc}, you specify the pipeline ID in
+the `parameters` option under `elasticsearch` in the +{beatname_lc}.yml+ file:
 
 [source,yaml]
 ------------------------------------------------------------------------------
@@ -30,7 +32,8 @@ output.elasticsearch:
   pipeline: my_pipeline_id
 ------------------------------------------------------------------------------
 
-For example, let's say that you've defined the following pipeline in a file named `pipeline.json`:
+For example, let's say that you've defined the following pipeline in a file
+named `pipeline.json`:
 
 [source,json]
 ------------------------------------------------------------------------------
@@ -64,5 +67,5 @@ output.elasticsearch:
 
 When you run {beatname_uc}, the value of `beat.name` is converted to lowercase before indexing.
 
-For more information about defining a pre-processing pipeline, see the {elasticsearch}/ingest.html[Ingest Node]
-documentation.
+For more information about defining a pre-processing pipeline, see the
+{elasticsearch}/ingest.html[Ingest Node] documentation.
