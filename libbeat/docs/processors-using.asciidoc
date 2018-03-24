@@ -66,6 +66,7 @@ The supported conditions are:
 * <<condition-contains,`contains`>>
 * <<condition-regexp,`regexp`>>
 * <<condition-range, `range`>>
+* <<condition-has_fields, `has_fields`>>
 * <<condition-or, `or`>>
 * <<condition-and, `and`>>
 * <<condition-not, `not`>>
@@ -154,6 +155,23 @@ between 0.5 and 0.8.
 range:
     system.cpu.user.pct.gte: 0.5
     system.cpu.user.pct.lt: 0.8
+------
+
+
+[float]
+[[condition-has_fields]]
+===== `has_fields`
+
+The `has_fields` condition checks if the given fields exist in the
+event. The condition accepts a list of string values denoting the field names.
+
+For example, the following condition checks if the `http.response.code` field
+is present in the event.
+
+
+[source,yaml]
+------
+has_fields: ['http.response.code']
 ------
 
 

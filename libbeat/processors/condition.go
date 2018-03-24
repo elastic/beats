@@ -32,6 +32,9 @@ type Condition struct {
 		name    string
 		filters map[string]match.Matcher
 	}
+	hasfields struct {
+		fields []string
+	}
 	rangexp map[string]RangeValue
 	or      []Condition
 	and     []Condition
@@ -82,6 +85,8 @@ func NewCondition(config *ConditionConfig) (*Condition, error) {
 		c.matches.filters, err = compileMatches(config.Regexp.fields, match.Compile)
 	case config.Range != nil:
 		err = c.setRange(config.Range)
+	case config.HasFields != nil:
+		c.hasfields.fields = config.HasFields
 	case len(config.OR) > 0:
 		c.or, err = NewConditionList(config.OR)
 	case len(config.AND) > 0:
@@ -226,7 +231,8 @@ func (c *Condition) Check(event ValuesMap) bool {
 
 	return c.checkEquals(event) &&
 		c.checkMatches(event) &&
-		c.checkRange(event)
+		c.checkRange(event) &&
+		c.checkHasFields(event)
 }
 
 func (c *Condition) checkOR(event ValuesMap) bool {
@@ -399,6 +405,17 @@ func (c *Condition) checkRange(event ValuesMap) bool {
 	return true
 }
 
+func (c *Condition) checkHasFields(event ValuesMap) bool {
+	for _, field := range c.hasfields.fields {
+		_, err := event.GetValue(field)
+		if err != nil {
+			logp.Info("Field %v not present in the event", field)
+			return false
+		}
+	}
+	return true
+}
+
 func (c Condition) String() string {
 	s := ""
 
@@ -410,6 +427,9 @@ func (c Condition) String() string {
 	}
 	if len(c.rangexp) > 0 {
 		s = s + fmt.Sprintf("range: %v", c.rangexp)
+	}
+	if len(c.hasfields.fields) > 0 {
+		s = s + fmt.Sprintf("has_fields: %v", c.hasfields.fields)
 	}
 	if len(c.or) > 0 {
 		for _, cond := range c.or {
