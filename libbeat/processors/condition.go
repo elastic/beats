@@ -32,13 +32,11 @@ type Condition struct {
 		name    string
 		filters map[string]match.Matcher
 	}
-	hasfields struct {
-		fields []string
-	}
-	rangexp map[string]RangeValue
-	or      []Condition
-	and     []Condition
-	not     *Condition
+	hasfields []string
+	rangexp   map[string]RangeValue
+	or        []Condition
+	and       []Condition
+	not       *Condition
 }
 
 type WhenProcessor struct {
@@ -86,7 +84,7 @@ func NewCondition(config *ConditionConfig) (*Condition, error) {
 	case config.Range != nil:
 		err = c.setRange(config.Range)
 	case config.HasFields != nil:
-		c.hasfields.fields = config.HasFields
+		c.hasfields = config.HasFields
 	case len(config.OR) > 0:
 		c.or, err = NewConditionList(config.OR)
 	case len(config.AND) > 0:
@@ -406,10 +404,9 @@ func (c *Condition) checkRange(event ValuesMap) bool {
 }
 
 func (c *Condition) checkHasFields(event ValuesMap) bool {
-	for _, field := range c.hasfields.fields {
+	for _, field := range c.hasfields {
 		_, err := event.GetValue(field)
 		if err != nil {
-			logp.Info("Field %v not present in the event", field)
 			return false
 		}
 	}
@@ -428,8 +425,8 @@ func (c Condition) String() string {
 	if len(c.rangexp) > 0 {
 		s = s + fmt.Sprintf("range: %v", c.rangexp)
 	}
-	if len(c.hasfields.fields) > 0 {
-		s = s + fmt.Sprintf("has_fields: %v", c.hasfields.fields)
+	if len(c.hasfields) > 0 {
+		s = s + fmt.Sprintf("has_fields: %v", c.hasfields)
 	}
 	if len(c.or) > 0 {
 		for _, cond := range c.or {
