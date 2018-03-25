@@ -303,7 +303,7 @@ func (b *Beat) launch(bt beat.Creator) error {
 		return err
 	}
 	if setup && b.SetupMLCallback != nil {
-		err = b.SetupMLCallback(&b.Beat)
+		err = b.SetupMLCallback(&b.Beat, b.Config.Kibana)
 		if err != nil {
 			return err
 		}
@@ -394,7 +394,7 @@ func (b *Beat) Setup(bt beat.Creator, template, dashboards, machineLearning bool
 		}
 
 		if machineLearning && b.SetupMLCallback != nil {
-			err = b.SetupMLCallback(&b.Beat)
+			err = b.SetupMLCallback(&b.Beat, b.Config.Kibana)
 			if err != nil {
 				return err
 			}
