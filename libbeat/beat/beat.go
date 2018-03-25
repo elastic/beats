@@ -54,4 +54,4 @@ type BeatConfig struct {
 
 // SetupMLCallback can be used by the Beat to register MachineLearning configurations
 // for the enabled modules.
-type SetupMLCallback func(*Beat) error
+type SetupMLCallback func(*Beat, *common.Config) error
