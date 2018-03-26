@@ -11,13 +11,13 @@ import (
 // CLI flags for configuring logging.
 var (
 	verbose        bool
-	toStderr       bool
+	beQuiet       bool
 	debugSelectors []string
 )
 
 func init() {
 	flag.BoolVar(&verbose, "v", false, "Log at INFO level")
-	flag.BoolVar(&toStderr, "e", false, "Log to stderr and disable syslog/file output")
+	flag.BoolVar(&beQuiet, "q", false, "Don't log to stderr and enable syslog/file output")
 	common.StringArrVarFlag(nil, &debugSelectors, "d", "Enable certain debug selectors")
 }
 
@@ -37,7 +37,7 @@ func Logging(beatName string, cfg *common.Config) error {
 }
 
 func applyFlags(cfg *logp.Config) {
-	if toStderr {
+	if !beQuiet {
 		cfg.ToStderr = true
 	}
 	if cfg.Level > logp.InfoLevel && verbose {
