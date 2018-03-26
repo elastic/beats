@@ -1162,6 +1162,84 @@ func TestHttpParser_composedHeaders(t *testing.T) {
 	assert.Equal(t, "aCookie=yummy, anotherCookie=why%20not", string(header))
 }
 
+func TestHttpParser_includeBodyFor(t *testing.T) {
+	req := []byte("PUT /node HTTP/1.1\r\n" +
+		"Host: server\r\n" +
+		"Content-Length: 4\r\n" +
+		"Content-Type: application/x-foo\r\n" +
+		"\r\n" +
+		"body")
+	resp := []byte("HTTP/1.1 200 OK\r\n" +
+		"Content-Length: 5\r\n" +
+		"Content-Type: text/plain\r\n" +
+		"\r\n" +
+		"done.")
+
+	var store eventStore
+	http := httpModForTests(&store)
+	http.includeBodyFor = []string{"application/x-foo", "text/plain"}
+
+	tcptuple := testCreateTCPTuple()
+	packet := protos.Packet{Payload: req}
+	private := protos.ProtocolData(&httpConnectionData{})
+	private = http.Parse(&packet, tcptuple, 0, private)
+	http.ReceivedFin(tcptuple, 0, private)
+
+	packet.Payload = resp
+	private = http.Parse(&packet, tcptuple, 1, private)
+	http.ReceivedFin(tcptuple, 1, private)
+
+	trans := expectTransaction(t, &store)
+	assert.NotNil(t, trans)
+	hasKey, err := trans.HasKey("http.request.body")
+	if err != nil {
+		t.Fatal(err)
+	}
+	assert.True(t, hasKey)
+	contents, err := trans.GetValue("http.response.body")
+	if err != nil {
+		t.Fatal(err)
+	}
+	assert.Equal(t, "done.", contents)
+}
+
+func TestHttpParser_sendRequestResponse(t *testing.T) {
+	req := "POST / HTTP/1.1\r\n" +
+		"\r\n"
+	resp := "HTTP/1.1 404 Not Found\r\n" +
+		"Content-Length: 10\r\n" +
+		"\r\n"
+	respWithBody := resp + "not found"
+
+	var store eventStore
+	http := httpModForTests(&store)
+	http.sendRequest = true
+	http.sendResponse = true
+
+	tcptuple := testCreateTCPTuple()
+	packet := protos.Packet{Payload: []byte(req)}
+	private := protos.ProtocolData(&httpConnectionData{})
+	private = http.Parse(&packet, tcptuple, 0, private)
+	http.ReceivedFin(tcptuple, 0, private)
+
+	packet.Payload = []byte(respWithBody)
+	private = http.Parse(&packet, tcptuple, 1, private)
+	http.ReceivedFin(tcptuple, 1, private)
+
+	trans := expectTransaction(t, &store)
+	assert.NotNil(t, trans)
+	contents, err := trans.GetValue("request")
+	if err != nil {
+		t.Fatal(err)
+	}
+	assert.Equal(t, req, contents)
+	contents, err = trans.GetValue("response")
+	if err != nil {
+		t.Fatal(err)
+	}
+	assert.Equal(t, resp, contents)
+}
+
 func testCreateTCPTuple() *common.TCPTuple {
 	t := &common.TCPTuple{
 		IPLength: 4,
