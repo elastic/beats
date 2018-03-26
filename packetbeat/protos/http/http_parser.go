@@ -212,15 +212,17 @@ func parseResponseStatus(s []byte) (uint16, []byte, error) {
 		debugf("parseResponseStatus: %s", s)
 	}
 
+	var phrase []byte
 	p := bytes.IndexByte(s, ' ')
 	if p == -1 {
-		return 0, nil, errors.New("Not able to identify status code")
+		p = len(s)
+	} else {
+		phrase = s[p+1:]
 	}
 	statusCode, err := parseInt(s[0:p])
 	if err != nil {
 		return 0, nil, fmt.Errorf("Unable to parse status code from [%s]", s)
 	}
-	phrase := s[p+1:]
 	return uint16(statusCode), phrase, nil
 }
 
