@@ -1,21 +1,20 @@
-Filebeat supports a `logs` Builder for modules:
+Filebeat supports a autodiscover based on hints from the provider:
 
 ["source","yaml",subs="attributes"]
 -------------------------------------------------------------------------------------
 filebeat.autodiscover:
   providers:
     - type: kubernetes
-      builders:
-        - type: logs
+      hints.enabled: true
 -------------------------------------------------------------------------------------
 
-This configuration enables the `logs` Builder. The `logs` builder looks for hints
-in the form of Kubernetes annotations or Docker labels which have the prefix `co.elastic.logs`.
+This configuration enables the `hints` autodiscover for Kubernetes. The `hints` system looks for
+hints in Kubernetes annotations or Docker labels which have the prefix `co.elastic.logs`.
 
 [float]
 ==== Kubernetes
-Kubernetes pods can annotate themselves with hints for the `logs` builder to be able to spin up
-Filebeat inputs:
+
+You can annotate Kubernetes Pods with useful info to spin up Filebeat inputs or modules:
 
 ["source","yaml",subs="attributes"]
 -------------------------------------------------------------------------------------
@@ -38,8 +37,18 @@ include_lines
 
 [float]
 ==== Docker
-Docker allows providing hints through Docker labels. When containers are spun up the Builder understands
-labels that convey hints to convey additional configuration to the input.
+
+Docker autodiscover provider supports hints in labels, to enable it just set `hints.enabled`:
+
+["source","yaml",subs="attributes"]
+-------------------------------------------------------------------------------------
+metricbeat.autodiscover:
+  providers:
+    - type: docker
+      hints.enabled: true
+-------------------------------------------------------------------------------------
+
+You can label Docker containers with useful info to spin up Filebeat inputs, for example:
 
 ["source","yaml",subs="attributes"]
 -------------------------------------------------------------------------------------
@@ -48,5 +57,5 @@ labels that convey hints to convey additional configuration to the input.
   co.elastic.logs/multiline.match: after
 -------------------------------------------------------------------------------------
 
-The above labels would allow Filebeat to add a multiline pattern to the input that would be
+The above labels would allow Filebeat to add a multiline pattern to the input that will be
 generated for the logs of the running container.

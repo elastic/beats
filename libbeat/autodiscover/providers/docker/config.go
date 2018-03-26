@@ -8,12 +8,13 @@ import (
 
 // Config for docker autodiscover provider
 type Config struct {
-	Host      string                  `config:"host"`
-	TLS       *docker.TLSConfig       `config:"ssl"`
-	Prefix    string                  `config:"string"`
-	Builders  []*common.Config        `config:"builders"`
-	Appenders []*common.Config        `config:"appenders"`
-	Templates template.MapperSettings `config:"templates"`
+	Host         string                  `config:"host"`
+	TLS          *docker.TLSConfig       `config:"ssl"`
+	Prefix       string                  `config:"string"`
+	HintsEnabled bool                    `config:"hints.enabled"`
+	Builders     []*common.Config        `config:"builders"`
+	Appenders    []*common.Config        `config:"appenders"`
+	Templates    template.MapperSettings `config:"templates"`
 }
 
 func defaultConfig() *Config {

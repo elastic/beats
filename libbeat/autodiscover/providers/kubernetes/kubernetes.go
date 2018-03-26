@@ -62,22 +62,14 @@ func AutodiscoverBuilder(bus bus.Bus, c *common.Config) (autodiscover.Provider, 
 		return nil, err
 	}
 
-	var builders autodiscover.Builders
-	for _, bcfg := range config.Builders {
-		builder, err := autodiscover.Registry.BuildBuilder(bcfg)
-		if err != nil {
-			return nil, err
-		}
-		builders = append(builders, builder)
+	builders, err := autodiscover.NewBuilders(config.Builders, config.HintsEnabled)
+	if err != nil {
+		return nil, err
 	}
 
-	var appenders autodiscover.Appenders
-	for _, acfg := range config.Appenders {
-		appender, err := autodiscover.Registry.BuildAppender(acfg)
-		if err != nil {
-			return nil, err
-		}
-		appenders = append(appenders, appender)
+	appenders, err := autodiscover.NewAppenders(config.Appenders)
+	if err != nil {
+		return nil, err
 	}
 
 	p := &Provider{
