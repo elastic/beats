@@ -24,7 +24,6 @@ type parserState uint8
 
 const (
 	stateStart parserState = iota
-	stateFLine
 	stateHeaders
 	stateBody
 	stateBodyChunkedStart
