@@ -368,6 +368,8 @@ https://github.com/elastic/beats/compare/v6.0.1...v6.1.0[View commits]
 *Packetbeat*
 
 - Add support for decoding the TLS envelopes. {pull}5476[5476]
+- HTTP parses successfully on empty status phrase. {issue}6176[6176]
+- HTTP parser supports broken status line. {pull}6631[6631]
 
 [[release-notes-6.0.1]]
 === Beats version 6.0.1
