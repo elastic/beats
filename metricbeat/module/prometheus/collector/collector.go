@@ -24,9 +24,10 @@ var (
 )
 
 func init() {
-	if err := mb.Registry.AddMetricSet("prometheus", "collector", New, hostParser); err != nil {
-		panic(err)
-	}
+	mb.Registry.MustAddMetricSet("prometheus", "collector", New,
+		mb.WithHostParser(hostParser),
+		mb.DefaultMetricSet(),
+	)
 }
 
 type MetricSet struct {

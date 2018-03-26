@@ -258,6 +258,7 @@ https://github.com/elastic/beats/compare/v6.0.0-beta2...master[Check the HEAD di
 - Allow to disable labels `dedot` in Docker module, in favor of a safe way to keep dots. {pull}6490[6490]
 - Add experimental module to collect metrics from munin nodes. {pull}6517[6517]
 - Add support for wildcards and explicit metrics grouping in jolokia/jmx. {pull}6462[6462]
+- Set `collector` as default metricset in Prometheus module. {pull}6636[6636]
 
 *Packetbeat*
 
