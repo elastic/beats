@@ -1394,3 +1394,33 @@ func BenchmarkHttpSimpleTransaction(b *testing.B) {
 		http.ReceivedFin(tcptuple, 1, private)
 	}
 }
+
+func BenchmarkHttpLargeResponseBody(b *testing.B) {
+	const PacketSize = 1024
+	const BodySize = 10 * 1024 * PacketSize
+	const numPackets = BodySize / PacketSize
+	bodyPayload := &protos.Packet{Payload: make([]byte, PacketSize)}
+	for i := 0; i < PacketSize; i++ {
+		bodyPayload.Payload[i] = byte(0x30 + (i % 10))
+	}
+
+	http := httpModForTests(nil)
+	tcptuple := testCreateTCPTuple()
+	header := fmt.Sprintf("HTTP/1.1 200 OK\r\n"+
+		"Host: some.server\r\n"+
+		"Connection: Close\r\n"+
+		"Content-Length: %d\r\n"+
+		"\r\n", BodySize)
+
+	for i := 0; i < b.N; i++ {
+		headPkt := protos.Packet{Payload: []byte(header)}
+		private := protos.ProtocolData(&httpConnectionData{})
+		private = http.Parse(&headPkt, tcptuple, 0, private)
+
+		for j := 0; j < numPackets; j++ {
+			private = http.Parse(bodyPayload, tcptuple, 0, private)
+		}
+		http.ReceivedFin(tcptuple, 1, private)
+	}
+	b.ReportAllocs()
+}
