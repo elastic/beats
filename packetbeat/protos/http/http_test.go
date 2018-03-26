@@ -821,6 +821,7 @@ func TestHttpParser_censorPasswordPOST(t *testing.T) {
 	path, params, err := http.extractParameters(msg, rawMsg)
 	assert.Nil(t, err)
 	assert.Equal(t, "/users/login", path)
+	assert.True(t, strings.Contains(params, "username=ME"))
 	assert.False(t, strings.Contains(params, "secret"))
 }
 
