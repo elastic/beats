@@ -65,7 +65,26 @@ func (m *MetricSet) Fetch() (event common.MapStr, err error) {
 		},
 		"free": swapStat.Free,
 	}
-
 	memory["swap"] = swap
+
+	hugePagesStat, err := mem.GetHugeTLBPages()
+	if err != nil {
+		return nil, errors.Wrap(err, "hugepages")
+	}
+	if hugePagesStat != nil {
+		mem.AddHugeTLBPagesPercentage(hugePagesStat)
+		memory["hugepages"] = common.MapStr{
+			"total": hugePagesStat.Total,
+			"used": common.MapStr{
+				"bytes": hugePagesStat.TotalAllocatedSize,
+				"pct":   hugePagesStat.UsedPercent,
+			},
+			"free":         hugePagesStat.Free,
+			"reserved":     hugePagesStat.Reserved,
+			"surplus":      hugePagesStat.Surplus,
+			"default_size": hugePagesStat.DefaultSize,
+		}
+	}
+
 	return memory, nil
 }
