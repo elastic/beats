@@ -1,4 +1,4 @@
-package metrics
+package hints
 
 import (
 	"fmt"
@@ -16,7 +16,7 @@ import (
 )
 
 func init() {
-	autodiscover.Registry.AddBuilder("metrics", NewMetricAnnotations)
+	autodiscover.Registry.AddBuilder("hints", NewMetricHints)
 }
 
 const (
@@ -28,29 +28,29 @@ const (
 	timeout    = "timeout"
 	ssl        = "ssl"
 
-	defaultTimeout  = "3s"
-	defaultInterval = "1m"
+	defaultTimeout = "3s"
+	defaultPeriod  = "1m"
 )
 
-type metricAnnotations struct {
+type metricHints struct {
 	Key string
 }
 
-// NewMetricAnnotations builds a new metrics annotation builder
-func NewMetricAnnotations(cfg *common.Config) (autodiscover.Builder, error) {
-	cfgwarn.Beta("The metrics builder is beta")
+// NewMetricHints builds a new metrics builder based on hints
+func NewMetricHints(cfg *common.Config) (autodiscover.Builder, error) {
+	cfgwarn.Beta("The hints builder is beta")
 	config := defaultConfig()
 	err := cfg.Unpack(&config)
 
 	if err != nil {
-		return nil, fmt.Errorf("unable to unpack metric.annotations config due to error: %v", err)
+		return nil, fmt.Errorf("unable to unpack hints config due to error: %v", err)
 	}
 
-	return &metricAnnotations{config.Key}, nil
+	return &metricHints{config.Key}, nil
 }
 
 // Create configs based on hints passed from providers
-func (m *metricAnnotations) CreateConfig(event bus.Event) []*common.Config {
+func (m *metricHints) CreateConfig(event bus.Event) []*common.Config {
 	var config []*common.Config
 	host, _ := event["host"].(string)
 	if host == "" {
@@ -90,14 +90,14 @@ func (m *metricAnnotations) CreateConfig(event bus.Event) []*common.Config {
 		moduleConfig["namespace"] = ns
 	}
 
-	logp.Debug("metrics.builder", "generated config: %v", moduleConfig.String())
+	logp.Debug("hints.builder", "generated config: %v", moduleConfig.String())
 
 	// Create config object
 	cfg, err := common.NewConfigFrom(moduleConfig)
 	if err != nil {
-		logp.Debug("metrics.builder", "config merge failed with error: %v", err)
+		logp.Debug("hints.builder", "config merge failed with error: %v", err)
 	}
-	logp.Debug("metrics.builder", "generated config: %v", *cfg)
+	logp.Debug("hints.builder", "generated config: %v", *cfg)
 	config = append(config, cfg)
 
 	// Apply information in event to the template to generate the final config
@@ -107,11 +107,11 @@ func (m *metricAnnotations) CreateConfig(event bus.Event) []*common.Config {
 	return config
 }
 
-func (m *metricAnnotations) getModule(hints common.MapStr) string {
+func (m *metricHints) getModule(hints common.MapStr) string {
 	return builder.GetHintString(hints, m.Key, module)
 }
 
-func (m *metricAnnotations) getMetricSets(hints common.MapStr, module string) []string {
+func (m *metricHints) getMetricSets(hints common.MapStr, module string) []string {
 	var msets []string
 	msets = builder.GetHintAsList(hints, m.Key, metricsets)
 
@@ -127,7 +127,7 @@ func (m *metricAnnotations) getMetricSets(hints common.MapStr, module string) []
 	return msets
 }
 
-func (m *metricAnnotations) getHostsWithPort(hints common.MapStr, port int) []string {
+func (m *metricHints) getHostsWithPort(hints common.MapStr, port int) []string {
 	var result []string
 	thosts := builder.GetHintAsList(hints, m.Key, hosts)
 
@@ -142,25 +142,25 @@ func (m *metricAnnotations) getHostsWithPort(hints common.MapStr, port int) []st
 	return result
 }
 
-func (m *metricAnnotations) getNamespace(hints common.MapStr) string {
+func (m *metricHints) getNamespace(hints common.MapStr) string {
 	return builder.GetHintString(hints, m.Key, namespace)
 }
 
-func (m *metricAnnotations) getPeriod(hints common.MapStr) string {
+func (m *metricHints) getPeriod(hints common.MapStr) string {
 	if ival := builder.GetHintString(hints, m.Key, period); ival != "" {
 		return ival
 	}
 
-	return defaultInterval
+	return defaultPeriod
 }
 
-func (m *metricAnnotations) getTimeout(hints common.MapStr) string {
+func (m *metricHints) getTimeout(hints common.MapStr) string {
 	if tout := builder.GetHintString(hints, m.Key, timeout); tout != "" {
 		return tout
 	}
 	return defaultTimeout
 }
 
-func (m *metricAnnotations) getSSLConfig(hints common.MapStr) common.MapStr {
+func (m *metricHints) getSSLConfig(hints common.MapStr) common.MapStr {
 	return builder.GetHintMapStr(hints, m.Key, ssl)
 }

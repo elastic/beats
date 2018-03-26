@@ -75,3 +75,17 @@ func (a Appenders) Append(event bus.Event) {
 		appender.Append(event)
 	}
 }
+
+// NewAppenders instances and returns the given list of appenders.
+func NewAppenders(aConfigs []*common.Config) (Appenders, error) {
+	var appenders Appenders
+	for _, acfg := range aConfigs {
+		appender, err := Registry.BuildAppender(acfg)
+		if err != nil {
+			return nil, err
+		}
+		appender = append(appenders, appender)
+	}
+
+	return appenders, nil
+}

@@ -41,9 +41,10 @@ class TestAutodiscover(metricbeat.BaseTest):
         container = docker_client.containers.run('memcached:1.5.3', detach=True)
 
         self.wait_until(lambda: self.log_contains('Autodiscover starting runner: memcached'))
-        sleep(2)
 
+        self.wait_until(lambda: self.output_count(lambda x: x >= 1))
         container.stop()
+
         self.wait_until(lambda: self.log_contains('Autodiscover stopping runner: memcached'))
 
         output = self.read_output_json()
@@ -67,7 +68,7 @@ class TestAutodiscover(metricbeat.BaseTest):
         self.render_config_template(
             autodiscover={
                 'docker': {
-                    'builders': '- type: metrics',
+                    'hints.enabled': 'true',
                 },
             },
         )
@@ -76,14 +77,16 @@ class TestAutodiscover(metricbeat.BaseTest):
         docker_client.images.pull('memcached:1.5.3')
         labels = {
             'co.elastic.metrics/module': 'memcached',
+            'co.elastic.metrics/period': '1s',
             'co.elastic.metrics/hosts': "'${data.host}:11211'",
         }
         container = docker_client.containers.run('memcached:1.5.3', labels=labels, detach=True)
 
         self.wait_until(lambda: self.log_contains('Autodiscover starting runner: memcached'))
-        sleep(2)
 
+        self.wait_until(lambda: self.output_count(lambda x: x >= 1))
         container.stop()
+
         self.wait_until(lambda: self.log_contains('Autodiscover stopping runner: memcached'))
 
         output = self.read_output_json()

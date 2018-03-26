@@ -1,4 +1,4 @@
-package logs
+package hints
 
 import "github.com/elastic/beats/libbeat/common"
 

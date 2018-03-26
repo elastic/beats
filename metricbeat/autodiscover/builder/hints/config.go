@@ -1,4 +1,4 @@
-package metrics
+package hints
 
 type config struct {
 	Key string `config:"key"`

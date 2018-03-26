@@ -1,21 +1,20 @@
-Metricbeat supports a `metrics` Builder for modules:
+Metricbeat supports a autodiscover based on hints from the provider:
 
 ["source","yaml",subs="attributes"]
 -------------------------------------------------------------------------------------
 metricbeat.autodiscover:
   providers:
     - type: kubernetes
-      builders:
-        - type: metrics
+      hints.enabled: true
 -------------------------------------------------------------------------------------
 
-This configuration enables the `metrics` Builder. The `metrics` builder looks for hints
-in the form of Kubernetes annotations or Docker labels which have the prefix `co.elastic.metrics`.
+This configuration enables the `hints` autodiscover for Kubernetes. The `hints` system looks for
+hints in Kubernetes annotations or Docker labels which have the prefix `co.elastic.metrics`.
 
 [float]
 === Kubernetes
-Kubernetes pods can annotate themselves with hints for the `metrics` builder to be able to spin up
-Metricbeat modules:
+
+You can annotate Kubernetes Pods with useful info to spin up Metricbeat modules:
 
 ["source","yaml",subs="attributes"]
 -------------------------------------------------------------------------------------
@@ -41,8 +40,18 @@ ssl.*
 
 [float]
 === Docker
-Docker allows providing hints through Docker labels. When containers are spun up the Builder understands
-labels that convey hints to generate the Metricbeat module configurations. Label
+
+Docker autodiscover provider supports hints in labels, to enable it just set `hints.enabled`:
+
+["source","yaml",subs="attributes"]
+-------------------------------------------------------------------------------------
+metricbeat.autodiscover:
+  providers:
+    - type: docker
+      hints.enabled: true
+-------------------------------------------------------------------------------------
+
+You can label Docker containers with useful info to spin up Metricbeat modules, for example:
 
 ["source","yaml",subs="attributes"]
 -------------------------------------------------------------------------------------
