@@ -147,13 +147,19 @@ func TestCondition(t *testing.T) {
 		},
 		{
 			config: ConditionConfig{
-				HasFields: []string{"proc.cmdline"},
+				HasFields: []string{"proc.cmdline", "type"},
 			},
 			result: true,
 		},
 		{
 			config: ConditionConfig{
 				HasFields: []string{"cpu"},
+			},
+			result: false,
+		},
+		{
+			config: ConditionConfig{
+				HasFields: []string{"proc", "beat"},
 			},
 			result: false,
 		},

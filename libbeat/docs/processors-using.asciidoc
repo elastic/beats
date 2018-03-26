@@ -162,7 +162,7 @@ range:
 [[condition-has_fields]]
 ===== `has_fields`
 
-The `has_fields` condition checks if the given fields exist in the
+The `has_fields` condition checks if all the given fields exist in the
 event. The condition accepts a list of string values denoting the field names.
 
 For example, the following condition checks if the `http.response.code` field
