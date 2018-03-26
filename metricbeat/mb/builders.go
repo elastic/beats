@@ -146,7 +146,7 @@ func newBaseMetricSets(r *Register, m Module) ([]BaseMetricSet, error) {
 	metricSetNames := m.Config().MetricSets
 	if len(metricSetNames) == 0 {
 		var err error
-		metricSetNames, err = r.defaultMetricSets(m.Name())
+		metricSetNames, err = r.DefaultMetricSets(m.Name())
 		if err != nil {
 			return nil, errors.Errorf("no metricsets configured for module '%s'", m.Name())
 		}

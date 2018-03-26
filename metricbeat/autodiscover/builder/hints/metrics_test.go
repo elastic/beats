@@ -7,16 +7,18 @@ import (
 
 	"github.com/elastic/beats/libbeat/common"
 	"github.com/elastic/beats/libbeat/common/bus"
+	"github.com/elastic/beats/metricbeat/mb"
 )
 
 func TestGenerateHints(t *testing.T) {
 	tests := []struct {
-		event  bus.Event
-		len    int
-		result common.MapStr
+		message string
+		event   bus.Event
+		len     int
+		result  common.MapStr
 	}{
-		// Empty event hints should return empty config
 		{
+			message: "Empty event hints should return empty config",
 			event: bus.Event{
 				"host": "1.2.3.4",
 				"kubernetes": common.MapStr{
@@ -35,88 +37,83 @@ func TestGenerateHints(t *testing.T) {
 			len:    0,
 			result: common.MapStr{},
 		},
-		// Hints without host should return nothing
 		{
+			message: "Hints without host should return nothing",
 			event: bus.Event{
 				"hints": common.MapStr{
 					"metrics": common.MapStr{
-						"module": "prometheus",
+						"module": "mockmodule",
 					},
 				},
 			},
 			len:    0,
 			result: common.MapStr{},
 		},
-		// Only module hint should return empty config
 		{
+			message: "Only module hint should return all metricsets",
 			event: bus.Event{
 				"host": "1.2.3.4",
 				"hints": common.MapStr{
 					"metrics": common.MapStr{
-						"module": "prometheus",
+						"module": "mockmodule",
 					},
 				},
 			},
 			len: 1,
 			result: common.MapStr{
-				"module":     "prometheus",
-				"metricsets": []interface{}{"collector"},
+				"module":     "mockmodule",
+				"metricsets": []interface{}{"one", "two"},
 				"timeout":    "3s",
 				"period":     "1m",
 				"enabled":    true,
 			},
 		},
-		// Only module, namespace hint should return empty config
 		{
+			message: "metricsets hint works",
 			event: bus.Event{
 				"host": "1.2.3.4",
 				"hints": common.MapStr{
 					"metrics": common.MapStr{
-						"module":    "prometheus",
-						"namespace": "test",
+						"module":     "mockmodule",
+						"metricsets": "one",
 					},
 				},
 			},
 			len: 1,
 			result: common.MapStr{
-				"module":     "prometheus",
-				"namespace":  "test",
-				"metricsets": []interface{}{"collector"},
+				"module":     "mockmodule",
+				"metricsets": []interface{}{"one"},
 				"timeout":    "3s",
 				"period":     "1m",
 				"enabled":    true,
 			},
 		},
-		// Module, namespace, host hint should return valid config without port should not return hosts
 		{
+			message: "Only module, it should return defaults",
 			event: bus.Event{
 				"host": "1.2.3.4",
 				"hints": common.MapStr{
 					"metrics": common.MapStr{
-						"module":    "prometheus",
-						"namespace": "test",
-						"hosts":     "${data.host}:9090",
+						"module": "mockmoduledefaults",
 					},
 				},
 			},
 			len: 1,
 			result: common.MapStr{
-				"module":     "prometheus",
-				"namespace":  "test",
-				"metricsets": []interface{}{"collector"},
+				"module":     "mockmoduledefaults",
+				"metricsets": []interface{}{"default"},
 				"timeout":    "3s",
 				"period":     "1m",
 				"enabled":    true,
 			},
 		},
-		// Module, namespace, host hint should return valid config
 		{
+			message: "Module, namespace, host hint should return valid config without port should not return hosts",
 			event: bus.Event{
 				"host": "1.2.3.4",
-				"port": int64(9090),
 				"hints": common.MapStr{
 					"metrics": common.MapStr{
-						"module":    "prometheus",
+						"module":    "mockmoduledefaults",
 						"namespace": "test",
 						"hosts":     "${data.host}:9090",
 					},
@@ -124,9 +121,32 @@ func TestGenerateHints(t *testing.T) {
 			},
 			len: 1,
 			result: common.MapStr{
-				"module":     "prometheus",
+				"module":     "mockmoduledefaults",
 				"namespace":  "test",
-				"metricsets": []interface{}{"collector"},
+				"metricsets": []interface{}{"default"},
+				"timeout":    "3s",
+				"period":     "1m",
+				"enabled":    true,
+			},
+		},
+		{
+			message: "Module, namespace, host hint should return valid config",
+			event: bus.Event{
+				"host": "1.2.3.4",
+				"port": 9090,
+				"hints": common.MapStr{
+					"metrics": common.MapStr{
+						"module":    "mockmoduledefaults",
+						"namespace": "test",
+						"hosts":     "${data.host}:9090",
+					},
+				},
+			},
+			len: 1,
+			result: common.MapStr{
+				"module":     "mockmoduledefaults",
+				"namespace":  "test",
+				"metricsets": []interface{}{"default"},
 				"hosts":      []interface{}{"1.2.3.4:9090"},
 				"timeout":    "3s",
 				"period":     "1m",
@@ -135,10 +155,15 @@ func TestGenerateHints(t *testing.T) {
 		},
 	}
 	for _, test := range tests {
-		cfg := defaultConfig()
+		mockRegister := mb.NewRegister()
+		mockRegister.MustAddMetricSet("mockmodule", "one", NewMockMetricSet, mb.DefaultMetricSet())
+		mockRegister.MustAddMetricSet("mockmodule", "two", NewMockMetricSet, mb.DefaultMetricSet())
+		mockRegister.MustAddMetricSet("mockmoduledefaults", "default", NewMockMetricSet, mb.DefaultMetricSet())
+		mockRegister.MustAddMetricSet("mockmoduledefaults", "other", NewMockMetricSet)
 
 		m := metricHints{
-			Key: cfg.Key,
+			Key:      defaultConfig().Key,
+			Registry: mockRegister,
 		}
 		cfgs := m.CreateConfig(test.event)
 		assert.Equal(t, len(cfgs), test.len)
@@ -146,10 +171,22 @@ func TestGenerateHints(t *testing.T) {
 		if test.len != 0 {
 			config := common.MapStr{}
 			err := cfgs[0].Unpack(&config)
-			assert.Nil(t, err)
+			assert.Nil(t, err, test.message)
 
-			assert.Equal(t, config, test.result)
+			assert.Equal(t, config, test.result, test.message)
 		}
 
 	}
+}
+
+type MockMetricSet struct {
+	mb.BaseMetricSet
+}
+
+func NewMockMetricSet(base mb.BaseMetricSet) (mb.MetricSet, error) {
+	return &MockMetricSet{}, nil
+}
+
+func (ms *MockMetricSet) Fetch(report mb.Reporter) {
+
 }
