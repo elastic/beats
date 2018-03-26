@@ -257,6 +257,7 @@ func (c *connection) ToMapStr() common.MapStr {
 			"id": c.UID,
 		},
 		"direction": c.Direction.String(),
+		"state":     getStateName(c.State),
 	}
 
 	if c.Username != "" {
@@ -301,4 +302,26 @@ func addOptionalString(m common.MapStr, key, value string) {
 		return
 	}
 	m[key] = value
+}
+
+func getStateName(state linux.TCPState) string {
+	name := tcpStateNames[state]
+	if name == "" {
+		name = "UNKNOWN"
+	}
+	return name
+}
+
+var tcpStateNames = map[linux.TCPState]string{
+	linux.TCP_ESTABLISHED: "ESTABLISHED",
+	linux.TCP_SYN_SENT:    "SYN_SENT",
+	linux.TCP_SYN_RECV:    "SYN_RECV",
+	linux.TCP_FIN_WAIT1:   "FIN_WAIT1",
+	linux.TCP_FIN_WAIT2:   "FIN_WAIT2",
+	linux.TCP_TIME_WAIT:   "TIME_WAIT",
+	linux.TCP_CLOSE:       "CLOSED",
+	linux.TCP_CLOSE_WAIT:  "CLOSE_WAIT",
+	linux.TCP_LAST_ACK:    "LAST_ACK",
+	linux.TCP_LISTEN:      "LISTEN",
+	linux.TCP_CLOSING:     "CLOSING",
 }

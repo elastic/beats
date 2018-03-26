@@ -90,3 +90,11 @@
       type: keyword
       description: >
         Name of the user running the process.
+
+    - name: state
+      type: keyword
+      example: ESTABLISHED
+      description: >
+        Socket connection state, possible values are: ESTABLISHED, SYN_SENT,
+        SYN_RECV, FIN_WAIT1, FIN_WAIT2, TIME_WAIT, CLOSED, CLOSE_WAIT, LAST_ACK,
+        LISTEN, CLOSING.
