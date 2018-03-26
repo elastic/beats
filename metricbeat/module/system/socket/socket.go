@@ -230,6 +230,11 @@ type connection struct {
 	// User identifiers.
 	UID      uint32 // UID of the socket owner.
 	Username string // Username of the socket.
+
+	// Timer info
+	Timer   uint8
+	Retrans uint8
+	Expires uint32
 }
 
 func newConnection(diag *linux.InetDiagMsg) *connection {
@@ -242,6 +247,9 @@ func newConnection(diag *linux.InetDiagMsg) *connection {
 		RemotePort: diag.DstPort(),
 		Inode:      diag.Inode,
 		UID:        diag.UID,
+		Timer:      diag.Timer,
+		Retrans:    diag.Retrans,
+		Expires:    diag.Expires,
 		PID:        -1,
 	}
 }
@@ -292,6 +300,13 @@ func (c *connection) ToMapStr() common.MapStr {
 			addOptionalString(remote, "host", c.DestHost)
 			addOptionalString(remote, "etld_plus_one", c.DestHostETLDPlusOne)
 		}
+	}
+
+	// Add details info if timer is keep-alive
+	// https://manpages.debian.org/unstable/manpages/sock_diag.7.en.html
+	if c.Timer == 2 {
+		evt.Put("keepalive.retransmits", c.Retrans)
+		evt.Put("keepalive.expires.ms", c.Expires)
 	}
 
 	return evt
