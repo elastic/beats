@@ -228,10 +228,8 @@ func checkResponse(r []byte) error {
 	}
 	for _, dashboard := range resp.Kibana.Dashboard {
 		if !dashboard.Success {
-			if dashboard.Exists {
+			if dashboard.Exists || strings.Contains(dashboard.Error.Message, "version conflict, document already exists") {
 				logp.Debug("machine-learning", "Dashboard already exists: %s", dashboard.ID)
-			} else if strings.Contains(dashboard.Error.Message, "version conflict, document already exists") {
-				continue
 			} else {
 				errs = append(errs, errors.Errorf("error while setting up dashboard: %s", dashboard.ID))
 			}
@@ -239,10 +237,8 @@ func checkResponse(r []byte) error {
 	}
 	for _, search := range resp.Kibana.Search {
 		if !search.Success {
-			if search.Exists {
+			if search.Exists || strings.Contains(search.Error.Message, "version conflict, document already exists") {
 				logp.Debug("machine-learning", "Search already exists: %s", search.ID)
-			} else if strings.Contains(search.Error.Message, "version conflict, document already exists") {
-				continue
 			} else {
 				errs = append(errs, errors.Errorf("error while setting up search: %s", search.ID))
 			}
@@ -250,10 +246,8 @@ func checkResponse(r []byte) error {
 	}
 	for _, visualization := range resp.Kibana.Visualization {
 		if !visualization.Success {
-			if visualization.Exists {
+			if visualization.Exists || strings.Contains(visualization.Error.Message, "version conflict, document already exists") {
 				logp.Debug("machine-learning", "Visualization already exists: %s", visualization.ID)
-			} else if strings.Contains(visualization.Error.Message, "version conflict, document already exists") {
-				continue
 			} else {
 				errs = append(errs, errors.Errorf("error while setting up visualization: %s", visualization.ID))
 			}
