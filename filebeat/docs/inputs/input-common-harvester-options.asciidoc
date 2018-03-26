@@ -28,7 +28,7 @@ The `plain` encoding is special, because it does not validate or transform any i
 
 A list of regular expressions to match the lines that you want {beatname_uc} to
 exclude. {beatname_uc} drops any lines that match a regular expression in the
-list. By default, no lines are dropped.
+list. By default, no lines are dropped. Empty lines are ignored.
 
 If <<multiline,multiline>> settings are also specified, each multiline message
 is combined into a single line before the lines are filtered by `exclude_lines`.
@@ -52,7 +52,7 @@ See <<regexp-support>> for a list of supported regexp patterns.
 
 A list of regular expressions to match the lines that you want {beatname_uc} to
 include. {beatname_uc} exports only the lines that match a regular expression in
-the list. By default, all lines are exported.
+the list. By default, all lines are exported. Empty lines are ignored.
 
 If <<multiline,multiline>> settings also specified, each multiline message is
 combined into a single line before the lines are filtered by `include_lines`.
