@@ -212,9 +212,12 @@ func TestReceiveNewEventsConcurrently(t *testing.T) {
 	defer close(ch)
 	to := newTestingOutlet(ch)
 	forwarder := harvester.NewForwarder(to)
-	cfg := common.NewConfig()
+	cfg, err := common.NewConfigFrom(map[string]interface{}{"host": "localhost:9000"})
+	if !assert.NoError(t, err) {
+		return
+	}
 	config := defaultConfig
-	err := cfg.Unpack(&config)
+	err = cfg.Unpack(&config)
 	if !assert.NoError(t, err) {
 		return
 	}
