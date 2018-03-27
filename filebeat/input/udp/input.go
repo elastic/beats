@@ -73,11 +73,11 @@ func NewInput(
 func (p *Input) Run() {
 	if !p.started.Load() {
 		logp.Info("Starting UDP input")
-		p.started.Store(true)
 		err := p.udp.Start()
 		if err != nil {
 			logp.Err("Error running harvester: %v", err)
 		}
+		p.started.Swap(true)
 	}
 }
 
