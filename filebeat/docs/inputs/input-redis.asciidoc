@@ -18,7 +18,6 @@ Example configuration:
 {beatname_lc}.inputs:
 - type: redis
   hosts: ["localhost:6379"]
-  username: "$\{redis_user\}"
   password: "$\{redis_pwd\}"
 ----
 
@@ -33,12 +32,6 @@ The `redis` input supports the following configuration options plus the
 ===== `hosts`
 
 The list of Redis hosts to connect to.
-
-[float]
-[[redis-username]]
-===== `username`
-
-The username to use when connecting to Redis.
 
 [float]
 [[redis-password]]
@@ -59,7 +52,7 @@ The default is `10s`.
 IMPORTANT: Redis slowlogs are not permanent. To ensure that all slowlog entries
 are collected, set `scan_frequency` to a value that allows {beatname_uc}
 sufficient time to connect to Redis, query the logs, and buffer them to the
-output within the specified interval. 
+output within the specified interval.
 
 [float]
 [[redis-timeout]]

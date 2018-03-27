@@ -508,10 +508,12 @@ filebeat.inputs:
 #------------------------- Redis slowlog input ---------------------------
 # Experimental: Config options for the redis slow log input
 #- type: redis
-  #hosts: ["localhost:6379"]
-  #username:
-  #password:
   #enabled: false
+
+  # List of hosts to pool to retrieve the slow log information.
+  #hosts: ["localhost:6379"]
+
+  # How often the input checks for redis slow log.
   #scan_frequency: 10s
 
   # Timeout after which time the input should return an error
