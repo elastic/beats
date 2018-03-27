@@ -19,8 +19,6 @@ This module requires the
 {elasticsearch-plugins}/ingest-user-agent.html[ingest-user-agent] and
 {elasticsearch-plugins}/ingest-geoip.html[ingest-geoip] Elasticsearch plugins.
 
-//REVIEWERS: Do we need to say anything else about compatibility here?
-
 include::../include/running-modules.asciidoc[]
 
 [float]
