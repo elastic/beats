@@ -2,7 +2,6 @@ package udp
 
 import (
 	"net"
-	"runtime"
 	"testing"
 	"time"
 
@@ -18,10 +17,6 @@ type info struct {
 }
 
 func TestReceiveEventFromUDP(t *testing.T) {
-	if runtime.GOOS == "window" {
-		t.Skipf("Skipped on windows")
-	}
-
 	tests := []struct {
 		name     string
 		message  []byte
@@ -40,25 +35,21 @@ func TestReceiveEventFromUDP(t *testing.T) {
 	}
 
 	ch := make(chan info)
-	host := "0.0.0.0:10000"
+	host := "127.0.0.1:"
 	config := &Config{Host: host, MaxMessageSize: maxMessageSize, Timeout: timeout}
 	fn := func(message []byte, addr net.Addr) {
 		ch <- info{message: message, addr: addr}
 	}
 	s := New(config, fn)
-	go func() {
-		s.Start()
-	}()
-	defer s.Stop()
-
-	// Give it some time to accept UDP connection.
-	for !s.IsRunning() {
-		time.Sleep(time.Second * 2)
+	err := s.Start()
+	if !assert.NoError(t, err) {
+		return
 	}
+	defer s.Stop()
 
 	for _, test := range tests {
 		t.Run(test.name, func(t *testing.T) {
-			conn, err := net.Dial("udp", host)
+			conn, err := net.Dial("udp", s.Listener.LocalAddr().String())
 			if !assert.NoError(t, err) {
 				return
 			}
