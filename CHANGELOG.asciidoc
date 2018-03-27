@@ -268,6 +268,7 @@ https://github.com/elastic/beats/compare/v6.0.0-beta2...master[Check the HEAD di
 - Set default metricsets in vSphere module. {pull}6676[6676]
 - Set `status` as default metricset in Apache module. {pull}6673[6673]
 - Set `namespace` as default metricset in Aerospike module. {pull}6669[6669]
+- Set `service` as default metricset in Windows module. {pull}6675[6675]
 
 *Packetbeat*
 
