@@ -265,6 +265,7 @@ https://github.com/elastic/beats/compare/v6.0.0-beta2...master[Check the HEAD di
 - Add support for wildcards and explicit metrics grouping in jolokia/jmx. {pull}6462[6462]
 - Set `collector` as default metricset in Prometheus module. {pull}6636[6636]
 - Set default metricsets in vSphere module. {pull}6676[6676]
+- Set `status` as default metricset in Apache module. {pull}[]
 
 *Packetbeat*
 
