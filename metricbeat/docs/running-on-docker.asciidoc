@@ -75,7 +75,7 @@ The mysql module configuration would look like this:
 metricbeat.modules:
 - module: mysql
   metricsets: ["status"]
-  hosts: ["mysql:3306"] <1>
+  hosts: ["tcp(mysql:3306)/"] <1>
   username: root
   password: ${MYSQL_PASSWORD} <2>
 ----

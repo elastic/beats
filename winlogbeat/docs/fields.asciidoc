@@ -17,6 +17,7 @@ grouped in the following categories:
 * <<exported-fields-common>>
 * <<exported-fields-docker-processor>>
 * <<exported-fields-eventlog>>
+* <<exported-fields-host-processor>>
 * <<exported-fields-kubernetes-processor>>
 
 --
@@ -473,6 +474,62 @@ required: False
 The raw XML representation of the event obtained from Windows. This field is only available on operating systems supporting the Windows Event Log API (Microsoft Windows Vista and newer). This field is not included by default and must be enabled by setting `include_xml: true` as a configuration option for an individual event log.
 
 The XML representation of the event is useful for troubleshooting purposes. The data in the fields reported by Winlogbeat can be compared to the data in the XML to diagnose problems.
+
+
+[[exported-fields-host-processor]]
+== Host fields
+
+Info collected for the host machine.
+
+
+
+
+[float]
+=== `host.hostname`
+
+type: keyword
+
+Hostname.
+
+
+[float]
+=== `host.id`
+
+type: keyword
+
+Unique host id.
+
+
+[float]
+=== `host.architecture`
+
+type: keyword
+
+Host architecture (e.g. x86_64, arm, ppc, mips).
+
+
+[float]
+=== `host.os.platform`
+
+type: keyword
+
+OS platform (e.g. centos, ubuntu, windows).
+
+
+[float]
+=== `host.os.version`
+
+type: keyword
+
+OS version.
+
+
+[float]
+=== `host.os.family`
+
+type: keyword
+
+OS family (e.g. redhat, debian, freebsd, windows).
 
 
 [[exported-fields-kubernetes-processor]]

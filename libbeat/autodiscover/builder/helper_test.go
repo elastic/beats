@@ -10,12 +10,12 @@ import (
 
 func TestGenerateHints(t *testing.T) {
 	tests := []struct {
-		annotations common.MapStr
+		annotations map[string]string
 		result      common.MapStr
 	}{
 		// Empty annotations should return empty hints
 		{
-			annotations: common.MapStr{},
+			annotations: map[string]string{},
 			result:      common.MapStr{},
 		},
 
@@ -25,11 +25,12 @@ func TestGenerateHints(t *testing.T) {
 		// not.to.include must not be part of hints
 		// period is annotated at both container and pod level. Container level value must be in hints
 		{
-			annotations: common.MapStr{
+			annotations: map[string]string{
 				"co.elastic.logs/multiline.pattern": "^test",
 				"co.elastic.metrics/module":         "prometheus",
 				"co.elastic.metrics/period":         "10s",
 				"co.elastic.metrics.foobar/period":  "15s",
+				"co.elastic.metrics.foobar1/period": "15s",
 				"not.to.include":                    "true",
 			},
 			result: common.MapStr{
@@ -47,6 +48,10 @@ func TestGenerateHints(t *testing.T) {
 	}
 
 	for _, test := range tests {
-		assert.Equal(t, GenerateHints(test.annotations, "foobar", "co.elastic."), test.result)
+		annMap := common.MapStr{}
+		for k, v := range test.annotations {
+			annMap.Put(k, v)
+		}
+		assert.Equal(t, GenerateHints(annMap, "foobar", "co.elastic"), test.result)
 	}
 }

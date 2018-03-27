@@ -518,10 +518,12 @@ filebeat.inputs:
 #------------------------- Redis slowlog input ---------------------------
 # Experimental: Config options for the redis slow log input
 #- type: redis
-  #hosts: ["localhost:6379"]
-  #username:
-  #password:
   #enabled: false
+
+  # List of hosts to pool to retrieve the slow log information.
+  #hosts: ["localhost:6379"]
+
+  # How often the input checks for redis slow log.
   #scan_frequency: 10s
 
   # Timeout after which time the input should return an error
@@ -709,6 +711,7 @@ filebeat.inputs:
 #
 #processors:
 #- add_docker_metadata: ~
+#- add_host_metadata: ~
 
 #============================= Elastic Cloud ==================================
 
@@ -1231,6 +1234,17 @@ output.elasticsearch:
 # Always use the Kibana API for loading the dashboards instead of autodetecting
 # how to install the dashboards by first querying Elasticsearch.
 #setup.dashboards.always_kibana: false
+
+# If true and Kibana is not reachable at the time when dashboards are loaded,
+# it will retry to reconnect to Kibana instead of exiting with an error.
+#setup.dashboards.retry.enabled: false
+
+# Duration interval between Kibana connection retries.
+#setup.dashboards.retry.interval: 1s
+
+# Maximum number of retries before exiting with an error, 0 for unlimited retrying.
+#setup.dashboards.retry.maximum: 0
+
 
 #============================== Template =====================================
 

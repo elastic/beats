@@ -24,6 +24,7 @@ https://github.com/elastic/beats/compare/v6.0.0-beta2...master[Check the HEAD di
 - The default value for pipelining is reduced to 2 to avoid high memory in the Logstash beats input. {pull}6250[6250]
 - Add logging when monitoring cannot connect to Elasticsearch. {pull}6365[6365]
 - Rename beat.cpu.*.time metrics to beat.cpu.*.time.ms. {pull}6449[6449]
+- Mark `system.syslog.message` and `system.auth.message` as `text` instead of `keyword`. {pull}6589[6589]
 
 *Auditbeat*
 
@@ -47,6 +48,7 @@ https://github.com/elastic/beats/compare/v6.0.0-beta2...master[Check the HEAD di
 - Refactor the usage of prospector to input in the YAML reference and
   the system test. {pull}6121[6121]
 - Add IIS module to parse access log and error log. {pull}6127[6127]
+- Remove the undefined `username` option from the Redis input and clarify the documentation. {pull}6662[6662]
 
 *Heartbeat*
 
@@ -65,6 +67,8 @@ https://github.com/elastic/beats/compare/v6.0.0-beta2...master[Check the HEAD di
 - Add filtering option by exact device names in system.diskio. `diskio.include_devices`. {pull}6085[6085]
 - Fix dealing with new process status codes in Linux kernel 4.14+. {pull}6306[6306]
 - Add config option for windows/perfmon metricset to ignore non existent counters. {pull}6432[6432]
+- Support apache status pages for versions older than 2.4.16. {pull}6450[6450]
+- Add support for huge pages on Linux. {pull}6436[6436]
 
 *Packetbeat*
 
@@ -143,6 +147,7 @@ https://github.com/elastic/beats/compare/v6.0.0-beta2...master[Check the HEAD di
 - Fix namespace disambiguation in Kubernetes state_* metricsets. {issue}6281[6281]
 - Fix Kubernetes overview dashboard views for non default time ranges. {issue}6395{6395}
 - Fix Windows perfmon metricset so that it sends metrics when an error occurs. {pull}6542[6542]
+- Fix Kubernetes calculated fields store. {pull}6564{6564}
 
 *Packetbeat*
 
@@ -152,6 +157,7 @@ https://github.com/elastic/beats/compare/v6.0.0-beta2...master[Check the HEAD di
 - Fix corruption when parsing repeated headers in an HTTP request or response. {pull}6325[6325]
 - Fix panic when parsing partial AMQP messages. {pull}6384[6384]
 - Fix out of bounds access to slice in MongoDB parser. {pull}6256[6256]
+- Fix sniffer hanging on exit under Linux. {pull}6535[6535]
 
 *Winlogbeat*
 
@@ -193,6 +199,8 @@ https://github.com/elastic/beats/compare/v6.0.0-beta2...master[Check the HEAD di
 - Preserve runtime from container statuses in Kubernetes autodiscover {pull}6456[6456]
 - Experimental feature setup.template.append_fields added. {pull}6024[6024]
 - Add appender support to autodiscover {pull}6469[6469]
+- Add add_host_metadata processor {pull}5968[5968]
+- Retry configuration to load dashboards if Kibana is not reachable when the beat starts. {pull}6560[6560]
 
 *Auditbeat*
 
@@ -249,12 +257,17 @@ https://github.com/elastic/beats/compare/v6.0.0-beta2...master[Check the HEAD di
 - Add support for array in http/json metricset. {pull}6480[6480]
 - Making the jolokia/jmx module GA. {pull}6143[6143]
 - Making the MongoDB module GA. {pull}6554[6554]
+- Allow to disable labels `dedot` in Docker module, in favor of a safe way to keep dots. {pull}6490[6490]
+- Add experimental module to collect metrics from munin nodes. {pull}6517[6517]
+- Add support for wildcards and explicit metrics grouping in jolokia/jmx. {pull}6462[6462]
+- Set `collector` as default metricset in Prometheus module. {pull}6636[6636]
 
 *Packetbeat*
 
 - Configure good defaults for `add_kubernetes_metadata`. {pull}5707[5707]
 - Add support for condition on bool type {issue}5659[5659] {pull}5954[5954]
 - HTTP parses successfully on empty status phrase. {issue}6176[6176]
+- HTTP parser supports broken status line. {pull}6631[6631]
 
 *Winlogbeat*
 

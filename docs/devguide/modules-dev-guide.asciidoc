@@ -176,8 +176,7 @@ There's quite a lot going on in this file, so let's break it down:
   element: `"/example/test.log*"`.
 * Note that variable values don't have to be strings.
   They can be also numbers, objects, or as shown in this example, arrays.
-* We will use the `paths` variable to set the prospector
-  {filebeat}/configuration-filebeat-options.html#prospector-paths[paths]
+* We will use the `paths` variable to set the input `paths`
   setting, so "glob" values can be used here.
 * Besides the `default` value, the file defines values for particular
   operating systems: a default for darwin/OS X/macOS systems and a default for
@@ -186,13 +185,13 @@ There's quite a lot going on in this file, so let's break it down:
   Filebeat is executed on the respective OS.
 
 Besides the variable definition, the `manifest.yml` file also contains
-references to the ingest pipeline and prospector configuration to use (see next
+references to the ingest pipeline and input configuration to use (see next
 sections):
 
 [source,yaml]
 ----
 ingest_pipeline: ingest/pipeline.json
-prospector: config/testfileset.yml
+input: config/testfileset.yml
 ----
 
 These should point to the respective files from the fileset.
@@ -214,8 +213,8 @@ overridden at runtime.)
 [float]
 ==== config/*.yml
 
-The `config/` folder contains template files that generate Filebeat prospector
-configurations. The Filebeat prospectors are primarily responsible for tailing
+The `config/` folder contains template files that generate Filebeat input
+configurations. The Filebeat inputs are primarily responsible for tailing
 files, filtering, and multi-line stitching, so that's what you configure in the
 template files.
 
@@ -233,12 +232,12 @@ exclude_files: [".gz$"]
 
 You'll find this example in the template file that gets generated automatically
 when you run `make create-fileset`. In this example, the `paths` variable is
-used to construct the `paths` list for the {filebeat}/configuration-filebeat-options.html#prospector-paths[paths] option.
+used to construct the `paths` list for the input `paths` option.
 
 Any template files that you add to the `config/` folder need to generate a valid
-Filebeat prospector configuration in YAML format. The options accepted by the
-prospector configuration are documented in the
-{filebeat}/configuration-filebeat-options.html[Filebeat Prospectors] section of
+Filebeat input configuration in YAML format. The options accepted by the
+input configuration are documented in the
+{filebeat}/configuration-filebeat-options.html[Filebeat Inputs] section of
 the Filebeat documentation.
 
 The template files use the templating language defined by the

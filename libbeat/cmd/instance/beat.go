@@ -1,6 +1,7 @@
 package instance
 
 import (
+	"context"
 	cryptRand "crypto/rand"
 	"encoding/json"
 	"flag"
@@ -46,6 +47,7 @@ import (
 	_ "github.com/elastic/beats/libbeat/processors/actions"
 	_ "github.com/elastic/beats/libbeat/processors/add_cloud_metadata"
 	_ "github.com/elastic/beats/libbeat/processors/add_docker_metadata"
+	_ "github.com/elastic/beats/libbeat/processors/add_host_metadata"
 	_ "github.com/elastic/beats/libbeat/processors/add_kubernetes_metadata"
 	_ "github.com/elastic/beats/libbeat/processors/add_locale"
 
@@ -293,14 +295,15 @@ func (b *Beat) launch(bt beat.Creator) error {
 		return beat.GracefulExit
 	}
 
-	svc.HandleSignals(beater.Stop)
+	ctx, cancel := context.WithCancel(context.Background())
+	svc.HandleSignals(beater.Stop, cancel)
 
-	err = b.loadDashboards(false)
+	err = b.loadDashboards(ctx, false)
 	if err != nil {
 		return err
 	}
 	if setup && b.SetupMLCallback != nil {
-		err = b.SetupMLCallback(&b.Beat)
+		err = b.SetupMLCallback(&b.Beat, b.Config.Kibana)
 		if err != nil {
 			return err
 		}
@@ -381,7 +384,8 @@ func (b *Beat) Setup(bt beat.Creator, template, dashboards, machineLearning bool
 		}
 
 		if dashboards {
-			err = b.loadDashboards(true)
+			fmt.Println("Loading dashboards (Kibana must be running and reachable)")
+			err = b.loadDashboards(context.Background(), true)
 			if err != nil {
 				return err
 			}
@@ -390,7 +394,7 @@ func (b *Beat) Setup(bt beat.Creator, template, dashboards, machineLearning bool
 		}
 
 		if machineLearning && b.SetupMLCallback != nil {
-			err = b.SetupMLCallback(&b.Beat)
+			err = b.SetupMLCallback(&b.Beat, b.Config.Kibana)
 			if err != nil {
 				return err
 			}
@@ -564,7 +568,7 @@ func openRegular(filename string) (*os.File, error) {
 	return f, nil
 }
 
-func (b *Beat) loadDashboards(force bool) error {
+func (b *Beat) loadDashboards(ctx context.Context, force bool) error {
 	if setup || force {
 		// -setup implies dashboards.enabled=true
 		if b.Config.Dashboards == nil {
@@ -582,7 +586,7 @@ func (b *Beat) loadDashboards(force bool) error {
 		if b.Config.Output.Name() == "elasticsearch" {
 			esConfig = b.Config.Output.Config()
 		}
-		err := dashboards.ImportDashboards(b.Info.Beat, b.Info.Hostname, paths.Resolve(paths.Home, ""),
+		err := dashboards.ImportDashboards(ctx, b.Info.Beat, b.Info.Hostname, paths.Resolve(paths.Home, ""),
 			b.Config.Kibana, esConfig, b.Config.Dashboards, nil)
 		if err != nil {
 			return fmt.Errorf("Error importing Kibana dashboards: %v", err)

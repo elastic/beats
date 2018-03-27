@@ -156,6 +156,9 @@ metricbeat.modules:
   hosts: ["unix:///var/run/docker.sock"]
   period: 10s
 
+  # Replace dots in labels with `_`. Set to false to keep dots
+  labels.dedot: true
+
   # To connect to Docker over TLS you must specify a client and CA certificate.
   #ssl:
     #certificate_authority: "/etc/pki/root/ca.pem"
@@ -345,6 +348,14 @@ metricbeat.modules:
 
   # Password to use when connecting to MongoDB. Empty by default.
   #password: pass
+
+#-------------------------------- Munin Module -------------------------------
+- module: munin
+  metricsets: ["node"]
+  enabled: false
+  period: 10s
+  hosts: ["localhost:4949"]
+  node.namespace: node
 
 #-------------------------------- MySQL Module -------------------------------
 - module: mysql
@@ -612,6 +623,7 @@ metricbeat.modules:
 #
 #processors:
 #- add_docker_metadata: ~
+#- add_host_metadata: ~
 
 #============================= Elastic Cloud ==================================
 
@@ -1134,6 +1146,17 @@ output.elasticsearch:
 # Always use the Kibana API for loading the dashboards instead of autodetecting
 # how to install the dashboards by first querying Elasticsearch.
 #setup.dashboards.always_kibana: false
+
+# If true and Kibana is not reachable at the time when dashboards are loaded,
+# it will retry to reconnect to Kibana instead of exiting with an error.
+#setup.dashboards.retry.enabled: false
+
+# Duration interval between Kibana connection retries.
+#setup.dashboards.retry.interval: 1s
+
+# Maximum number of retries before exiting with an error, 0 for unlimited retrying.
+#setup.dashboards.retry.maximum: 0
+
 
 #============================== Template =====================================
 

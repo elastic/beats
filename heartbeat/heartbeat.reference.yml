@@ -329,6 +329,7 @@ heartbeat.scheduler:
 #
 #processors:
 #- add_docker_metadata: ~
+#- add_host_metadata: ~
 
 #============================= Elastic Cloud ==================================
 
@@ -851,6 +852,17 @@ output.elasticsearch:
 # Always use the Kibana API for loading the dashboards instead of autodetecting
 # how to install the dashboards by first querying Elasticsearch.
 #setup.dashboards.always_kibana: false
+
+# If true and Kibana is not reachable at the time when dashboards are loaded,
+# it will retry to reconnect to Kibana instead of exiting with an error.
+#setup.dashboards.retry.enabled: false
+
+# Duration interval between Kibana connection retries.
+#setup.dashboards.retry.interval: 1s
+
+# Maximum number of retries before exiting with an error, 0 for unlimited retrying.
+#setup.dashboards.retry.maximum: 0
+
 
 #============================== Template =====================================
 

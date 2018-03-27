@@ -18,11 +18,12 @@ type MetricSet struct {
 	mb.BaseMetricSet
 	memoryService *MemoryService
 	dockerClient  *client.Client
+	dedot         bool
 }
 
 // New creates a new instance of the docker memory MetricSet.
 func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
-	config := docker.Config{}
+	config := docker.DefaultConfig()
 	if err := base.Module().UnpackConfig(&config); err != nil {
 		return nil, err
 	}
@@ -36,6 +37,7 @@ func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
 		BaseMetricSet: base,
 		memoryService: &MemoryService{},
 		dockerClient:  client,
+		dedot:         config.DeDot,
 	}, nil
 }
 
@@ -46,6 +48,6 @@ func (m *MetricSet) Fetch() ([]common.MapStr, error) {
 		return nil, err
 	}
 
-	memoryStats := m.memoryService.getMemoryStatsList(stats)
+	memoryStats := m.memoryService.getMemoryStatsList(stats, m.dedot)
 	return eventsMapping(memoryStats), nil
 }

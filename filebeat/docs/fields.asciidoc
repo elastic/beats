@@ -17,7 +17,11 @@ grouped in the following categories:
 * <<exported-fields-beat>>
 * <<exported-fields-cloud>>
 * <<exported-fields-docker-processor>>
+<<<<<<< HEAD
 * <<exported-fields-elasticsearch>>
+=======
+* <<exported-fields-host-processor>>
+>>>>>>> upstream/master
 * <<exported-fields-icinga>>
 * <<exported-fields-iis>>
 * <<exported-fields-kafka>>
@@ -648,6 +652,7 @@ type: object
 Image labels.
 
 
+<<<<<<< HEAD
 [[exported-fields-elasticsearch]]
 == Elasticsearch fields
 
@@ -1365,6 +1370,62 @@ The source code file and line number responsible for this message.
 === `elasticsearch.log.snapshot`
 
 The name/ID of a snapshot.
+=======
+[[exported-fields-host-processor]]
+== Host fields
+
+Info collected for the host machine.
+
+
+
+
+[float]
+=== `host.hostname`
+
+type: keyword
+
+Hostname.
+
+
+[float]
+=== `host.id`
+
+type: keyword
+
+Unique host id.
+
+
+[float]
+=== `host.architecture`
+
+type: keyword
+
+Host architecture (e.g. x86_64, arm, ppc, mips).
+
+
+[float]
+=== `host.os.platform`
+
+type: keyword
+
+OS platform (e.g. centos, ubuntu, windows).
+
+
+[float]
+=== `host.os.version`
+
+type: keyword
+
+OS version.
+
+
+[float]
+=== `host.os.family`
+
+type: keyword
+
+OS family (e.g. redhat, debian, freebsd, windows).
+>>>>>>> upstream/master
 
 
 [[exported-fields-icinga]]
@@ -3015,6 +3076,8 @@ The PID of the process that sent the auth message.
 [float]
 === `system.auth.message`
 
+type: text
+
 The message in the log line.
 
 
@@ -3252,6 +3315,8 @@ The PID of the process that sent the syslog message.
 
 [float]
 === `system.syslog.message`
+
+type: text
 
 The message in the log line.
 

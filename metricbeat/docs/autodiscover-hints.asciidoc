@@ -1,0 +1,67 @@
+Metricbeat supports a autodiscover based on hints from the provider:
+
+["source","yaml",subs="attributes"]
+-------------------------------------------------------------------------------------
+metricbeat.autodiscover:
+  providers:
+    - type: kubernetes
+      hints.enabled: true
+-------------------------------------------------------------------------------------
+
+This configuration enables the `hints` autodiscover for Kubernetes. The `hints` system looks for
+hints in Kubernetes annotations or Docker labels which have the prefix `co.elastic.metrics`.
+
+[float]
+=== Kubernetes
+
+You can annotate Kubernetes Pods with useful info to spin up Metricbeat modules:
+
+["source","yaml",subs="attributes"]
+-------------------------------------------------------------------------------------
+annotations:
+  co.elastic.metrics/module: prometheus
+  co.elastic.metrics/metricsets: collector
+  co.elastic.metrics/hosts: '${data.host}:9090'
+  co.elastic.metrics/period: 1m
+  co.elastic.metrics.sidecar/hosts: '${data.host}:8080'
+  co.elastic.metrics.sidecar/period: 10m
+-------------------------------------------------------------------------------------
+
+The above annotations are used to spin up a Prometheus collector metricset and it polls the
+parent container on port `9090` at a 1 minute interval and the container named `sidecar` on
+port `8080` every 10 minutes. If no metricsets parameter is given, Metricbeat will use default
+metricsets of the module, or all metricsets if there is no default list.
+
+Hints can also be provided for the following module configuration parameters:
+
+["source","yaml",subs="attributes"]
+-------------------------------------------------------------------------------------
+timeout
+ssl.*
+-------------------------------------------------------------------------------------
+
+[float]
+=== Docker
+
+Docker autodiscover provider supports hints in labels, to enable it just set `hints.enabled`:
+
+["source","yaml",subs="attributes"]
+-------------------------------------------------------------------------------------
+metricbeat.autodiscover:
+  providers:
+    - type: docker
+      hints.enabled: true
+-------------------------------------------------------------------------------------
+
+You can label Docker containers with useful info to spin up Metricbeat modules, for example:
+
+["source","yaml",subs="attributes"]
+-------------------------------------------------------------------------------------
+  co.elastic.metrics/module: prometheus
+  co.elastic.metrics/metricsets: collector
+  co.elastic.metrics/hosts: '${data.host}:9090'
+  co.elastic.metrics/period: 1m
+-------------------------------------------------------------------------------------
+
+The above labels would allow Metricbeat to configure a Prometheus collector to poll port `9090`
+of the Docker container every 1 minute.

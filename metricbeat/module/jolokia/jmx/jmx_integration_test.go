@@ -15,62 +15,91 @@ import (
 func TestFetch(t *testing.T) {
 	compose.EnsureUp(t, "jolokia")
 
-	f := mbtest.NewEventFetcher(t, getConfig())
-	event, err := f.Fetch()
-	if !assert.NoError(t, err) {
-		t.FailNow()
+	for _, config := range getConfigs() {
+		f := mbtest.NewEventsFetcher(t, config)
+		events, err := f.Fetch()
+		if !assert.NoError(t, err) {
+			t.FailNow()
+		}
+		t.Logf("%s/%s events: %+v", f.Module().Name(), f.Name(), events)
+		if len(events) == 0 || len(events[0]) <= 1 {
+			t.Fatal("Empty events")
+		}
 	}
-
-	t.Logf("%s/%s event: %+v", f.Module().Name(), f.Name(), event)
 }
 
 func TestData(t *testing.T) {
-	f := mbtest.NewEventFetcher(t, getConfig())
-	err := mbtest.WriteEvent(f, t)
-	if err != nil {
-		t.Fatal("write", err)
+	for _, config := range getConfigs() {
+		f := mbtest.NewEventsFetcher(t, config)
+		err := mbtest.WriteEvents(f, t)
+		if err != nil {
+			t.Fatal("write", err)
+		}
 	}
 }
 
-func getConfig() map[string]interface{} {
-	return map[string]interface{}{
-		"module":     "jolokia",
-		"metricsets": []string{"jmx"},
-		"hosts":      []string{getEnvHost() + ":" + getEnvPort()},
-		"namespace":  "testnamespace",
-		"jmx.mappings": []map[string]interface{}{
-			{
-				"mbean": "java.lang:type=Runtime",
-				"attributes": []map[string]string{
-					{
-						"attr":  "Uptime",
-						"field": "uptime",
+func getConfigs() []map[string]interface{} {
+	return []map[string]interface{}{
+		{
+			"module":     "jolokia",
+			"metricsets": []string{"jmx"},
+			"hosts":      []string{getEnvHost() + ":" + getEnvPort()},
+			"namespace":  "testnamespace",
+			"jmx.mappings": []map[string]interface{}{
+				{
+					"mbean": "java.lang:type=Runtime",
+					"attributes": []map[string]string{
+						{
+							"attr":  "Uptime",
+							"field": "uptime",
+						},
+					},
+				},
+				{
+					"mbean": "java.lang:type=GarbageCollector,name=ConcurrentMarkSweep",
+					"attributes": []map[string]string{
+						{
+							"attr":  "CollectionTime",
+							"field": "gc.cms_collection_time",
+						},
+						{
+							"attr":  "CollectionCount",
+							"field": "gc.cms_collection_count",
+						},
+					},
+				},
+				{
+					"mbean": "java.lang:type=Memory",
+					"attributes": []map[string]string{
+						{
+							"attr":  "HeapMemoryUsage",
+							"field": "memory.heap_usage",
+						},
+						{
+							"attr":  "NonHeapMemoryUsage",
+							"field": "memory.non_heap_usage",
+						},
 					},
 				},
 			},
-			{
-				"mbean": "java.lang:type=GarbageCollector,name=ConcurrentMarkSweep",
-				"attributes": []map[string]string{
-					{
-						"attr":  "CollectionTime",
-						"field": "gc.cms_collection_time",
-					},
-					{
-						"attr":  "CollectionCount",
-						"field": "gc.cms_collection_count",
-					},
-				},
-			},
-			{
-				"mbean": "java.lang:type=Memory",
-				"attributes": []map[string]string{
-					{
-						"attr":  "HeapMemoryUsage",
-						"field": "memory.heap_usage",
-					},
-					{
-						"attr":  "NonHeapMemoryUsage",
-						"field": "memory.non_heap_usage",
+		},
+		{
+			"module":     "jolokia",
+			"metricsets": []string{"jmx"},
+			"hosts":      []string{getEnvHost() + ":" + getEnvPort()},
+			"namespace":  "testnamespace",
+			"jmx.mappings": []map[string]interface{}{
+				{
+					"mbean": "Catalina:name=*,type=ThreadPool",
+					"attributes": []map[string]string{
+						{
+							"attr":  "maxConnections",
+							"field": "max_connections",
+						},
+						{
+							"attr":  "port",
+							"field": "port",
+						},
 					},
 				},
 			},

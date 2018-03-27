@@ -10,6 +10,9 @@ var PerfMetrics = NewPerfMetricsCache()
 
 const defaultTimeout = 120 * time.Second
 
+var now = time.Now
+var sleep = time.Sleep
+
 // NewPerfMetricsCache initializes and returns a new PerfMetricsCache
 func NewPerfMetricsCache() *PerfMetricsCache {
 	return &PerfMetricsCache{
@@ -47,7 +50,7 @@ type valueMap struct {
 
 type value struct {
 	value   float64
-	expires int
+	expires int64
 }
 
 // ContainerUID creates an unique ID for from namespace, pod name and container name
@@ -78,7 +81,7 @@ func (m *valueMap) Set(name string, val float64) {
 	m.Lock()
 	defer m.Unlock()
 	m.ensureCleanupWorker()
-	m.values[name] = value{val, time.Now().Add(m.timeout).Nanosecond()}
+	m.values[name] = value{val, now().Add(m.timeout).Unix()}
 }
 
 func (m *valueMap) ensureCleanupWorker() {
@@ -87,9 +90,9 @@ func (m *valueMap) ensureCleanupWorker() {
 		m.running = true
 		go func() {
 			for {
-				time.Sleep(m.timeout)
-				now := time.Now().Nanosecond()
+				sleep(m.timeout)
 				m.Lock()
+				now := now().Unix()
 				for name, val := range m.values {
 					if now > val.expires {
 						delete(m.values, name)

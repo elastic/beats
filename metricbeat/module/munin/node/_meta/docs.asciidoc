@@ -1,0 +1,58 @@
+=== munin node MetricSet
+
+This is the node metricset of the module munin.
+
+[float]
+=== Features and configuration
+
+The node metricset of the munin module collects metrics from a munin node agent
+and sends them as events to Elastic.
+
+[source,yaml]
+---
+- module: munin
+  metricsets: ["node"]
+  hosts: ["localhost:4949"]
+  node.namespace: node
+---
+
+All metrics exposed by a single munin node will be sent in a single event,
+grouped by munin items, e.g:
+
+[source,json]
+---
+"munin": {
+  "node": {
+    "swap": {
+      "swap_in": 198609,
+      "swap_out": 612629
+    },
+    "cpu": {
+      "softirq": 680,
+      "guest": 0,
+      "user": 158212,
+      "iowait": 71095,
+      "irq": 1,
+      "system": 35906,
+      "idle": 1185709,
+      "steal": 0,
+      "nice": 1633
+    }
+  }
+}
+---
+
+In principle this module can be used to collect metrics from any agent that
+implements the munin node protocol (http://guide.munin-monitoring.org/en/latest/master/network-protocol.html).
+
+[float]
+=== Limitations
+Currently this module only collects metrics using the basic protocol. It doesn't
+support capabilities or automatic dashboards generation based on munin
+configuration.
+
+[float]
+=== Exposed fields, dashboards, indexes, etc.
+Munin supports a great variety of plugins each of them can be used to obtain different
+sets of metrics. Metricbeat cannot know the metrics exposed beforehand, so no field
+description or dashboard is generated automatically.

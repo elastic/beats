@@ -26,7 +26,7 @@ Example:
 
 [source,yaml]
 -------------------------------------------------------------------------------
-filebeat.prospectors:
+filebeat.inputs:
 - type: log
   paths:
     - /var/log/*.log

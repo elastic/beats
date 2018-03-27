@@ -52,7 +52,7 @@ def gather_dependencies(vendor_dirs):
         # walk looking for LICENSE files
         for root, dirs, filenames in os.walk(vendor):
             for filename in sorted(filenames):
-                if filename.startswith("LICENSE"):
+                if filename.startswith("LICENSE") and "docs" not in filename:
                     lib_path = get_library_path(root)
                     lib_search = [l for l in libs if l["path"].startswith(lib_path)]
                     if len(lib_search) == 0:
@@ -150,7 +150,11 @@ def create_notice(filename, beat, copyright, vendor_dirs, csvfile):
 
 APACHE2_LICENSE_TITLES = [
     "Apache License Version 2.0",
-    "Apache License, Version 2.0"
+    "Apache License, Version 2.0",
+    re.sub(r"\s+", " ", """Apache License
+    ==============
+
+    _Version 2.0, January 2004_"""),
 ]
 
 MIT_LICENSES = [

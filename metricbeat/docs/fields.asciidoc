@@ -27,6 +27,7 @@ grouped in the following categories:
 * <<exported-fields-golang>>
 * <<exported-fields-graphite>>
 * <<exported-fields-haproxy>>
+* <<exported-fields-host-processor>>
 * <<exported-fields-http>>
 * <<exported-fields-jolokia>>
 * <<exported-fields-kafka>>
@@ -36,6 +37,7 @@ grouped in the following categories:
 * <<exported-fields-logstash>>
 * <<exported-fields-memcached>>
 * <<exported-fields-mongodb>>
+* <<exported-fields-munin>>
 * <<exported-fields-mysql>>
 * <<exported-fields-nginx>>
 * <<exported-fields-php_fpm>>
@@ -4558,6 +4560,62 @@ type: integer
 The average queue time in ms over the last 1024 requests.
 
 
+[[exported-fields-host-processor]]
+== Host fields
+
+Info collected for the host machine.
+
+
+
+
+[float]
+=== `host.hostname`
+
+type: keyword
+
+Hostname.
+
+
+[float]
+=== `host.id`
+
+type: keyword
+
+Unique host id.
+
+
+[float]
+=== `host.architecture`
+
+type: keyword
+
+Host architecture (e.g. x86_64, arm, ppc, mips).
+
+
+[float]
+=== `host.os.platform`
+
+type: keyword
+
+OS platform (e.g. centos, ubuntu, windows).
+
+
+[float]
+=== `host.os.version`
+
+type: keyword
+
+OS version.
+
+
+[float]
+=== `host.os.family`
+
+type: keyword
+
+OS family (e.g. redhat, debian, freebsd, windows).
+
+
 [[exported-fields-http]]
 == HTTP fields
 
@@ -7597,6 +7655,21 @@ Number of scan operations.
 type: long
 
 Number of sync operations.
+
+
+[[exported-fields-munin]]
+== Munin fields
+
+experimental[]
+Munin node metrics exporter
+
+
+
+[float]
+== munin fields
+
+munin contains metrics exposed by a munin node agent
+
 
 
 [[exported-fields-mysql]]
@@ -10807,6 +10880,82 @@ type: scaled_float
 format: percent
 
 The percentage of used swap memory.
+
+
+[float]
+== hugepages fields
+
+This group contains statistics related to huge pages usage on the system.
+
+
+[float]
+=== `system.memory.hugepages.total`
+
+type: long
+
+format: number
+
+Number of huge pages in the pool.
+
+
+[float]
+=== `system.memory.hugepages.used.bytes`
+
+type: long
+
+format: bytes
+
+Memory used in allocated huge pages.
+
+
+[float]
+=== `system.memory.hugepages.used.pct`
+
+type: long
+
+format: percent
+
+Percentage of huge pages used.
+
+
+[float]
+=== `system.memory.hugepages.free`
+
+type: long
+
+format: number
+
+Number of available huge pages in the pool.
+
+
+[float]
+=== `system.memory.hugepages.reserved`
+
+type: long
+
+format: number
+
+Number of reserved but not allocated huge pages in the pool.
+
+
+[float]
+=== `system.memory.hugepages.surplus`
+
+type: long
+
+format: number
+
+Number of overcommited huge pages.
+
+
+[float]
+=== `system.memory.hugepages.default_size`
+
+type: long
+
+format: bytes
+
+Default size for huge pages.
 
 
 [float]
