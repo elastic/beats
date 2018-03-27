@@ -280,6 +280,7 @@ https://github.com/elastic/beats/compare/v6.0.1...v6.1.0[View commits]
 - Fix console color output for Windows. {issue}5611[5611]
 - Fix logstash output debug message. {pull}5799{5799]
 - Fix isolation of modules when merging local and global field settings. {issue}5795[5795]
+- Report ephemeral ID and uptime in monitoring events on all platforms {pull}6501[6501]
 
 *Filebeat*
 
