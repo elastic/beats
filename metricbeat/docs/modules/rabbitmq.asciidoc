@@ -22,7 +22,13 @@ in <<configuration-metricbeat>>. Here is an example configuration:
 ----
 metricbeat.modules:
 - module: rabbitmq
+  metricsets: ["node", "queue", "connection"]
+  enabled: true
+  period: 10s
   hosts: ["localhost:15672"]
+
+  #username: guest
+  #password: guest
 ----
 
 This module supports TLS connection when using `ssl` config field, as described in <<configuration-ssl>>.
