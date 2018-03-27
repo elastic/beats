@@ -110,6 +110,15 @@ func normalizeSlice(v reflect.Value, keys ...string) (interface{}, []error) {
 
 		sliceValues = append(sliceValues, sliceValue)
 	}
+	if sliceValues != nil && errs != nil {
+		if _, ok := sliceValues[0].(string); ok {
+			strSlices := make([]string, n)
+			for i := 0; i < n; i++ {
+				strSlices[i] = sliceValues[i].(string)
+			}
+			return strSlices, errs
+		}
+	}
 
 	return sliceValues, errs
 }
