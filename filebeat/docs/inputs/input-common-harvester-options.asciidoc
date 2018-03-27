@@ -113,10 +113,6 @@ decoding with filtering and multiline if you set the `message_key` option. This
 can be helpful in situations where the application logs are wrapped in JSON
 objects, as with like it happens for example with Docker.
 
-// REVIEWERS: Is this setting required/necessary when the docker input is used?
-// If so, what should I say? I'll need to conditionally code anything related
-// to docker because this description shows up in multiple input types.
-
 Example configuration:
 
 [source,yaml]
