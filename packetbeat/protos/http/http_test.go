@@ -204,18 +204,17 @@ func TestHttpParser_eatBody(t *testing.T) {
 	ok, complete := testParseStream(http, st, 0)
 	assert.True(t, ok)
 	assert.False(t, complete)
-	assert.Equal(t, st.bodyReceived, 10)
+	assert.Equal(t, 10, st.bodyReceived)
 
 	ok, complete = testParseStream(http, st, 5)
 	assert.True(t, ok)
 	assert.False(t, complete)
-	assert.Equal(t, st.bodyReceived, 15)
+	assert.Equal(t, 15, st.bodyReceived)
 
 	ok, complete = testParseStream(http, st, 5)
 	assert.True(t, ok)
 	assert.True(t, complete)
-	assert.Equal(t, st.bodyReceived, 20)
-	assert.Equal(t, st.message.end, len(data))
+	assert.Equal(t, 20, st.bodyReceived)
 }
 
 func TestHttpParser_eatBody_connclose(t *testing.T) {
@@ -511,12 +510,10 @@ func TestHttpParser_RequestResponseBody(t *testing.T) {
 		"\r\n"
 	data := data1 + data2
 	tp := newTestParser(nil, data)
-
 	msg, ok, complete := tp.parse()
 	assert.True(t, ok)
 	assert.True(t, complete)
 	assert.Equal(t, 2, msg.contentLength)
-	assert.Equal(t, []byte(data1), tp.stream.data[tp.stream.message.start:tp.stream.message.end])
 
 	tp.stream.PrepareForNewMessage()
 	tp.stream.message = &message{ts: time.Now()}
@@ -623,38 +620,38 @@ func TestEatBodyChunked(t *testing.T) {
 	if cont != false || ok != true || complete != false {
 		t.Errorf("Wrong return values")
 	}
-	assert.Equal(t, 0, st.parseOffset)
+	assert.Equal(t, 0, len(msg.body))
 
 	st.data = append(st.data, msgs[1]...)
 	cont, ok, complete = parser.parseBodyChunkedStart(st, msg)
 	assert.True(t, cont)
 	assert.Equal(t, 3, msg.chunkedLength)
-	assert.Equal(t, 4, st.parseOffset)
+	assert.Equal(t, 0, len(msg.body))
 	assert.Equal(t, stateBodyChunked, st.parseState)
 
 	cont, ok, complete = parser.parseBodyChunked(st, msg)
 	assert.True(t, cont)
 	assert.Equal(t, stateBodyChunkedStart, st.parseState)
-	assert.Equal(t, 9, st.parseOffset)
+	assert.Equal(t, 3, msg.contentLength)
 
 	cont, ok, complete = parser.parseBodyChunkedStart(st, msg)
 	assert.True(t, cont)
 	assert.Equal(t, 3, msg.chunkedLength)
-	assert.Equal(t, 13, st.parseOffset)
+	assert.Equal(t, 3, msg.contentLength)
 	assert.Equal(t, stateBodyChunked, st.parseState)
 
 	cont, ok, complete = parser.parseBodyChunked(st, msg)
 	assert.False(t, cont)
 	assert.True(t, ok)
 	assert.False(t, complete)
-	assert.Equal(t, 13, st.parseOffset)
+	assert.Equal(t, 3, msg.contentLength)
 	assert.Equal(t, 0, st.bodyReceived)
 	assert.Equal(t, stateBodyChunked, st.parseState)
 
 	st.data = append(st.data, msgs[2]...)
 	cont, ok, complete = parser.parseBodyChunked(st, msg)
 	assert.True(t, cont)
-	assert.Equal(t, 18, st.parseOffset)
+	assert.Equal(t, 6, msg.contentLength)
 	assert.Equal(t, stateBodyChunkedStart, st.parseState)
 
 	cont, ok, complete = parser.parseBodyChunkedStart(st, msg)
@@ -719,9 +716,6 @@ func TestEatBodyChunkedWaitCRLF(t *testing.T) {
 	if ok != true || complete != true {
 		t.Error("Wrong return values", ok, complete)
 	}
-	if msg.end != 14 {
-		t.Error("Wrong message end", msg.end)
-	}
 }
 
 func TestHttpParser_requestURIWithSpace(t *testing.T) {
@@ -753,8 +747,7 @@ func TestHttpParser_requestURIWithSpace(t *testing.T) {
 	msg, ok, complete := tp.parse()
 	assert.True(t, ok)
 	assert.True(t, complete)
-	rawMsg := tp.stream.data[tp.stream.message.start:tp.stream.message.end]
-	path, params, err := http.extractParameters(msg, rawMsg)
+	path, params, err := http.extractParameters(msg)
 	assert.Nil(t, err)
 	assert.Equal(t, "/test", path)
 	assert.Equal(t, string(msg.requestURI), "http://localhost:8080/test?password=two secret")
@@ -789,8 +782,7 @@ func TestHttpParser_censorPasswordURL(t *testing.T) {
 	msg, ok, complete := tp.parse()
 	assert.True(t, ok)
 	assert.True(t, complete)
-	rawMsg := tp.stream.data[tp.stream.message.start:tp.stream.message.end]
-	path, params, err := http.extractParameters(msg, rawMsg)
+	path, params, err := http.extractParameters(msg)
 	assert.Nil(t, err)
 	assert.Equal(t, "/test", path)
 	assert.False(t, strings.Contains(params, "secret"))
@@ -817,8 +809,7 @@ func TestHttpParser_censorPasswordPOST(t *testing.T) {
 	assert.True(t, ok)
 	assert.True(t, complete)
 
-	rawMsg := tp.stream.data[tp.stream.message.start:tp.stream.message.end]
-	path, params, err := http.extractParameters(msg, rawMsg)
+	path, params, err := http.extractParameters(msg)
 	assert.Nil(t, err)
 	assert.Equal(t, "/users/login", path)
 	assert.True(t, strings.Contains(params, "username=ME"))
@@ -853,8 +844,7 @@ func TestHttpParser_censorPasswordGET(t *testing.T) {
 		t.Errorf("Expecting a complete message")
 	}
 
-	msg := st.data[st.message.start:st.message.end]
-	path, params, err := http.extractParameters(st.message, msg)
+	path, params, err := http.extractParameters(st.message)
 	if err != nil {
 		t.Errorf("Faile to parse parameters")
 	}
@@ -865,7 +855,7 @@ func TestHttpParser_censorPasswordGET(t *testing.T) {
 	}
 
 	if strings.Contains(params, "secret") {
-		t.Errorf("Failed to censor the password: %s", msg)
+		t.Errorf("Failed to censor the password: %s", string(st.message.rawHeaders))
 	}
 }
 
@@ -894,9 +884,8 @@ func TestHttpParser_RedactAuthorization(t *testing.T) {
 
 	ok, _ := testParseStream(http, st, 0)
 
-	st.message.raw = st.data[st.message.start:]
 	http.hideHeaders(st.message)
-	msg := st.message.raw
+	msg := st.message.rawHeaders
 
 	assert.True(t, ok)
 	assert.Equal(t, "*", string(st.message.headers["authorization"]))
@@ -930,9 +919,8 @@ func TestHttpParser_RedactAuthorization_raw(t *testing.T) {
 
 	ok, complete := testParseStream(http, st, 0)
 
-	st.message.raw = st.data[st.message.start:]
 	http.hideHeaders(st.message)
-	msg := st.message.raw
+	msg := st.message.rawHeaders
 
 	if !ok {
 		t.Errorf("Parsing returned error")
@@ -966,9 +954,8 @@ func TestHttpParser_RedactAuthorization_Proxy_raw(t *testing.T) {
 
 	ok, complete := testParseStream(http, st, 0)
 
-	st.message.raw = st.data[st.message.start:]
 	http.hideHeaders(st.message)
-	msg := st.message.raw
+	msg := st.message.rawHeaders
 
 	if !ok {
 		t.Errorf("Parsing returned error")
@@ -1177,7 +1164,7 @@ func TestHttpParser_includeBodyFor(t *testing.T) {
 
 	var store eventStore
 	http := httpModForTests(&store)
-	http.includeBodyFor = []string{"application/x-foo", "text/plain"}
+	http.parserConfig.includeBodyFor = []string{"application/x-foo", "text/plain"}
 
 	tcptuple := testCreateTCPTuple()
 	packet := protos.Packet{Payload: req}
