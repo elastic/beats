@@ -1,6 +1,7 @@
 package hints
 
 import (
+	"sort"
 	"testing"
 
 	"github.com/stretchr/testify/assert"
@@ -62,7 +63,7 @@ func TestGenerateHints(t *testing.T) {
 			len: 1,
 			result: common.MapStr{
 				"module":     "mockmodule",
-				"metricsets": []interface{}{"one", "two"},
+				"metricsets": []string{"one", "two"},
 				"timeout":    "3s",
 				"period":     "1m",
 				"enabled":    true,
@@ -82,7 +83,7 @@ func TestGenerateHints(t *testing.T) {
 			len: 1,
 			result: common.MapStr{
 				"module":     "mockmodule",
-				"metricsets": []interface{}{"one"},
+				"metricsets": []string{"one"},
 				"timeout":    "3s",
 				"period":     "1m",
 				"enabled":    true,
@@ -101,7 +102,7 @@ func TestGenerateHints(t *testing.T) {
 			len: 1,
 			result: common.MapStr{
 				"module":     "mockmoduledefaults",
-				"metricsets": []interface{}{"default"},
+				"metricsets": []string{"default"},
 				"timeout":    "3s",
 				"period":     "1m",
 				"enabled":    true,
@@ -123,7 +124,7 @@ func TestGenerateHints(t *testing.T) {
 			result: common.MapStr{
 				"module":     "mockmoduledefaults",
 				"namespace":  "test",
-				"metricsets": []interface{}{"default"},
+				"metricsets": []string{"default"},
 				"timeout":    "3s",
 				"period":     "1m",
 				"enabled":    true,
@@ -146,7 +147,7 @@ func TestGenerateHints(t *testing.T) {
 			result: common.MapStr{
 				"module":     "mockmoduledefaults",
 				"namespace":  "test",
-				"metricsets": []interface{}{"default"},
+				"metricsets": []string{"default"},
 				"hosts":      []interface{}{"1.2.3.4:9090"},
 				"timeout":    "3s",
 				"period":     "1m",
@@ -173,7 +174,19 @@ func TestGenerateHints(t *testing.T) {
 			err := cfgs[0].Unpack(&config)
 			assert.Nil(t, err, test.message)
 
-			assert.Equal(t, config, test.result, test.message)
+			// metricests order is random, order it for tests
+			if v, err := config.GetValue("metricsets"); err == nil {
+				if msets, ok := v.([]interface{}); ok {
+					metricsets := make([]string, len(msets))
+					for i, v := range msets {
+						metricsets[i] = v.(string)
+					}
+					sort.Strings(metricsets)
+					config["metricsets"] = metricsets
+				}
+			}
+
+			assert.Equal(t, test.result, config, test.message)
 		}
 
 	}
