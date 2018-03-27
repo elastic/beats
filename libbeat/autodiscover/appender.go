@@ -84,7 +84,7 @@ func NewAppenders(aConfigs []*common.Config) (Appenders, error) {
 		if err != nil {
 			return nil, err
 		}
-		appender = append(appenders, appender)
+		appenders = append(appenders, appender)
 	}
 
 	return appenders, nil
