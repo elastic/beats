@@ -1,5 +1,5 @@
 {
-  "description": "Pipeline for parsing MongoDB log logs",
+  "description": "Pipeline for parsing MongoDB logs",
   "processors": [{
     "grok": {
       "field": "message",
