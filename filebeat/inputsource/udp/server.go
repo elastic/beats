@@ -44,13 +44,11 @@ func (u *Server) Start() error {
 		return err
 	}
 	u.log.Info("Started listening for UDP connection")
-
 	u.wg.Add(1)
 	go func() {
 		defer u.wg.Done()
 		u.run()
 	}()
-
 	return nil
 }
 
