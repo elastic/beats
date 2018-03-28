@@ -15,9 +15,9 @@ import (
 var debugf = logp.MakeDebug("system-fsstat")
 
 func init() {
-	if err := mb.Registry.AddMetricSet("system", "fsstat", New, parse.EmptyHostParser); err != nil {
-		panic(err)
-	}
+	mb.Registry.MustAddMetricSet("system", "fsstat", New,
+		mb.WithHostParser(parse.EmptyHostParser),
+	)
 }
 
 // MetricSet for fetching a summary of filesystem stats.

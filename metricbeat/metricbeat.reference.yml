@@ -61,6 +61,7 @@ metricbeat.modules:
     - uptime          # System Uptime
     #- core           # Per CPU core usage
     #- diskio         # Disk IO
+    #- raid           # Raid
     #- socket         # Sockets and connection info (linux only)
   enabled: true
   period: 10s
@@ -105,6 +106,9 @@ metricbeat.modules:
   # Include the cumulative CPU tick values with the process metrics. Defaults
   # to false.
   #process.include_cpu_ticks: false
+
+  # Raid mount point to monitor
+  #raid.mount_point: '/'
 
   # Configure reverse DNS lookup on remote IP addresses in the socket metricset.
   #socket.reverse_lookup.enabled: false

@@ -8,6 +8,9 @@ This file is generated! See scripts/docs_collector.py
 The System module allows you to monitor your servers. Because the System module
 always applies to the local server, the `hosts` config option is not needed.
 
+The default metricsets are `cpu`, `load`, `memory`, `network`, `process` and
+`process_summary`.
+
 [float]
 === Dashboard
 
@@ -26,21 +29,15 @@ in <<configuration-metricbeat>>. Here is an example configuration:
 ----
 metricbeat.modules:
 - module: system
-  period: 10s
-  metricsets:
-    - cpu
-    - load
-    - memory
-    - network
-    - process
-    - process_summary
-    #- core
-    #- diskio
-    #- socket
-  processes: ['.*']
   process.include_top_n:
     by_cpu: 5      # include top 5 processes by CPU
     by_memory: 5   # include top 5 processes by memory
+
+#- module: system
+#  metricsets:
+#    - core
+#    - diskio
+#    - socket
 
 - module: system
   period: 1m
@@ -55,6 +52,12 @@ metricbeat.modules:
   period: 15m
   metricsets:
     - uptime
+
+#- module: system
+#  period: 5m
+#  metricsets:
+#    - raid
+#  raid.mount_point: '/'
 ----
 
 [float]
