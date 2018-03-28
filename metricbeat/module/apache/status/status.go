@@ -35,9 +35,10 @@ var (
 )
 
 func init() {
-	if err := mb.Registry.AddMetricSet("apache", "status", New, hostParser); err != nil {
-		panic(err)
-	}
+	mb.Registry.MustAddMetricSet("apache", "status", New,
+		mb.WithHostParser(hostParser),
+		mb.DefaultMetricSet(),
+	)
 }
 
 // MetricSet for fetching Apache HTTPD server status.
