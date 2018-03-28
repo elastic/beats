@@ -10,7 +10,7 @@ import (
 type Config struct {
 	Host         string                  `config:"host"`
 	TLS          *docker.TLSConfig       `config:"ssl"`
-	Prefix       string                  `config:"string"`
+	Prefix       string                  `config:"prefix"`
 	HintsEnabled bool                    `config:"hints.enabled"`
 	Builders     []*common.Config        `config:"builders"`
 	Appenders    []*common.Config        `config:"appenders"`
