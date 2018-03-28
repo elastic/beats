@@ -23,9 +23,9 @@ import (
 )
 
 func init() {
-	if err := mb.Registry.AddMetricSet("vsphere", "virtualmachine", New); err != nil {
-		panic(err)
-	}
+	mb.Registry.MustAddMetricSet("vsphere", "virtualmachine", New,
+		mb.DefaultMetricSet(),
+	)
 }
 
 type MetricSet struct {
