@@ -17,22 +17,23 @@ import (
 type Fields []Field
 
 type Field struct {
-	Name           string      `config:"name"`
-	Type           string      `config:"type"`
-	Description    string      `config:"description"`
-	Format         string      `config:"format"`
-	ScalingFactor  int         `config:"scaling_factor"`
-	Fields         Fields      `config:"fields"`
-	MultiFields    Fields      `config:"multi_fields"`
-	ObjectType     string      `config:"object_type"`
-	Enabled        *bool       `config:"enabled"`
-	Analyzer       string      `config:"analyzer"`
-	SearchAnalyzer string      `config:"search_analyzer"`
-	Norms          bool        `config:"norms"`
-	Dynamic        DynamicType `config:"dynamic"`
-	Index          *bool       `config:"index"`
-	DocValues      *bool       `config:"doc_values"`
-	CopyTo         string      `config:"copy_to"`
+	Name            string      `config:"name"`
+	Type            string      `config:"type"`
+	Description     string      `config:"description"`
+	Format          string      `config:"format"`
+	ScalingFactor   int         `config:"scaling_factor"`
+	Fields          Fields      `config:"fields"`
+	MultiFields     Fields      `config:"multi_fields"`
+	ObjectType      string      `config:"object_type"`
+	ForceObjectType *bool       `config:"force_object_type"`
+	Enabled         *bool       `config:"enabled"`
+	Analyzer        string      `config:"analyzer"`
+	SearchAnalyzer  string      `config:"search_analyzer"`
+	Norms           bool        `config:"norms"`
+	Dynamic         DynamicType `config:"dynamic"`
+	Index           *bool       `config:"index"`
+	DocValues       *bool       `config:"doc_values"`
+	CopyTo          string      `config:"copy_to"`
 
 	// Kibana specific
 	Analyzed     *bool  `config:"analyzed"`
