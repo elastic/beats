@@ -9,6 +9,8 @@
 
 Use the `stdin` input to read events from standard in.
 
+Note: This input cannot be run at the same time with other input types.
+
 Example configuration:
 
 ["source","yaml",subs="attributes"]
