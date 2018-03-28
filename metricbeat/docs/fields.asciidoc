@@ -2150,7 +2150,7 @@ type: scaled_float
 
 format: percentage
 
-The system kernel consumed by the Docker server.
+Percentage of time in kernel space.
 
 
 [float]
@@ -2158,7 +2158,7 @@ The system kernel consumed by the Docker server.
 
 type: long
 
-CPU kernel ticks.
+CPU ticks in kernel space.
 
 
 [float]
@@ -2168,6 +2168,7 @@ type: scaled_float
 
 format: percentage
 
+Percentage of total CPU time in the system.
 
 
 [float]
@@ -2185,6 +2186,7 @@ type: scaled_float
 
 format: percentage
 
+Percentage of time in user space.
 
 
 [float]
@@ -2192,7 +2194,7 @@ format: percentage
 
 type: long
 
-CPU user ticks
+CPU ticks in user space.
 
 
 [float]

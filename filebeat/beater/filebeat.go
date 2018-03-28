@@ -3,6 +3,7 @@ package beater
 import (
 	"flag"
 	"fmt"
+	"strings"
 
 	"github.com/joeshaw/multierror"
 	"github.com/pkg/errors"
@@ -93,12 +94,10 @@ func New(b *beat.Beat, rawConfig *common.Config) (beat.Beater, error) {
 	// Add inputs created by the modules
 	config.Inputs = append(config.Inputs, moduleInputs...)
 
-	haveEnabledInputs := false
-	for _, input := range config.Inputs {
-		if input.Enabled() {
-			haveEnabledInputs = true
-			break
-		}
+	enabledInputs := config.ListEnabledInputs()
+	var haveEnabledInputs bool
+	if len(enabledInputs) > 0 {
+		haveEnabledInputs = true
 	}
 
 	if !config.ConfigInput.Enabled() && !config.ConfigModules.Enabled() && !haveEnabledInputs && config.Autodiscover == nil {
@@ -112,6 +111,10 @@ func New(b *beat.Beat, rawConfig *common.Config) (beat.Beater, error) {
 
 	if *once && config.ConfigInput.Enabled() && config.ConfigModules.Enabled() {
 		return nil, errors.New("input configs and -once cannot be used together")
+	}
+
+	if config.IsInputEnabled("stdin") && len(enabledInputs) > 1 {
+		return nil, fmt.Errorf("stdin requires to be run in exclusive mode, configured inputs: %s", strings.Join(enabledInputs, ", "))
 	}
 
 	fb := &Filebeat{

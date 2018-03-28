@@ -477,6 +477,7 @@ metricbeat.modules:
 
 #------------------------------- vSphere Module ------------------------------
 - module: vsphere
+  enabled: true
   metricsets: ["datastore", "host", "virtualmachine"]
   period: 10s
   hosts: ["https://localhost/sdk"]
@@ -487,7 +488,6 @@ metricbeat.modules:
   insecure: false
   # Get custom fields when using virtualmachine metric set. Default false.
   # get_custom_fields: false
-  
 
 #------------------------------- Windows Module ------------------------------
 - module: windows

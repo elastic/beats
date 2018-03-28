@@ -5,6 +5,7 @@ import (
 	"log"
 	"os"
 	"path/filepath"
+	"sort"
 	"time"
 
 	"github.com/elastic/beats/libbeat/autodiscover"
@@ -131,4 +132,31 @@ func (config *Config) FetchConfigs() error {
 	}
 
 	return nil
+}
+
+// ListEnabledInputs returns a list of enabled inputs sorted by alphabetical order.
+func (config *Config) ListEnabledInputs() []string {
+	t := struct {
+		Type string `config:"type"`
+	}{}
+	var inputs []string
+	for _, input := range config.Inputs {
+		if input.Enabled() {
+			input.Unpack(&t)
+			inputs = append(inputs, t.Type)
+		}
+	}
+	sort.Strings(inputs)
+	return inputs
+}
+
+// IsInputEnabled returns true if the plugin name is enabled.
+func (config *Config) IsInputEnabled(name string) bool {
+	enabledInputs := config.ListEnabledInputs()
+	for _, input := range enabledInputs {
+		if name == input {
+			return true
+		}
+	}
+	return false
 }
