@@ -117,7 +117,7 @@ metricbeat.modules:
 #------------------------------ Aerospike Module -----------------------------
 - module: aerospike
   metricsets: ["namespace"]
-  enabled: false
+  enabled: true
   period: 10s
   hosts: ["localhost:3000"]
 
@@ -502,6 +502,7 @@ metricbeat.modules:
 
 #------------------------------ ZooKeeper Module -----------------------------
 - module: zookeeper
+  enabled: true
   metricsets: ["mntr"]
   period: 10s
   hosts: ["localhost:2181"]

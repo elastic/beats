@@ -264,8 +264,10 @@ https://github.com/elastic/beats/compare/v6.0.0-beta2...master[Check the HEAD di
 - Add experimental module to collect metrics from munin nodes. {pull}6517[6517]
 - Add support for wildcards and explicit metrics grouping in jolokia/jmx. {pull}6462[6462]
 - Set `collector` as default metricset in Prometheus module. {pull}6636[6636]
+- Set `mntr` as default metricset in Zookeeper module. {pull}6674[6674]
 - Set default metricsets in vSphere module. {pull}6676[6676]
-- Set `status` as default metricset in Apache module. {pull}[]
+- Set `status` as default metricset in Apache module. {pull}6673[6673]
+- Set `namespace` as default metricset in Aerospike module. {pull}6669[6669]
 
 *Packetbeat*
 
