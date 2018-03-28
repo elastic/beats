@@ -369,44 +369,44 @@
 			"revisionTime": "2016-08-05T00:47:13Z"
 		},
 		{
-			"checksumSHA1": "yxowcZEI5Qx1xwu9TI+L5NS87Sw=",
+			"checksumSHA1": "FmPMalgdsaNNmghFB2DWm8fJjVA=",
 			"path": "github.com/elastic/go-libaudit",
-			"revision": "c139147102117edd4175a74ce071e4cc7982259a",
-			"revisionTime": "2018-01-18T05:11:38Z",
-			"version": "v0.0.7",
-			"versionExact": "v0.0.7"
+			"revision": "4a806edf821706e315ef7d4f3b5d0cac6d638b34",
+			"revisionTime": "2018-03-28T14:46:34Z",
+			"version": "v0.1.0",
+			"versionExact": "v0.1.0"
 		},
 		{
-			"checksumSHA1": "n8bRlhOdmfREBoCgStzHWGWiwSY=",
+			"checksumSHA1": "uu4544BCRlonueK+mB7549opucs=",
 			"path": "github.com/elastic/go-libaudit/aucoalesce",
-			"revision": "df0d4981f3fce65ffd3d7411dfec3e03231b491c",
-			"revisionTime": "2017-09-07T20:19:58Z",
-			"version": "v0.0.6",
-			"versionExact": "v0.0.6"
+			"revision": "4a806edf821706e315ef7d4f3b5d0cac6d638b34",
+			"revisionTime": "2018-03-28T14:46:34Z",
+			"version": "v0.1.0",
+			"versionExact": "v0.1.0"
 		},
 		{
-			"checksumSHA1": "eUIiDm0pSFKNKjWme5s3PtWEoSU=",
+			"checksumSHA1": "+L/ZGneCw2zrkK5Vlto9UB3LaEk=",
 			"path": "github.com/elastic/go-libaudit/auparse",
-			"revision": "df0d4981f3fce65ffd3d7411dfec3e03231b491c",
-			"revisionTime": "2017-09-07T20:19:58Z",
-			"version": "v0.0.6",
-			"versionExact": "v0.0.6"
+			"revision": "4a806edf821706e315ef7d4f3b5d0cac6d638b34",
+			"revisionTime": "2018-03-28T14:46:34Z",
+			"version": "v0.1.0",
+			"versionExact": "v0.1.0"
 		},
 		{
 			"checksumSHA1": "H0rnscnKHbkjmXc4whC3gtIPR0c=",
 			"path": "github.com/elastic/go-libaudit/rule",
-			"revision": "df0d4981f3fce65ffd3d7411dfec3e03231b491c",
-			"revisionTime": "2017-09-07T20:19:58Z",
-			"version": "v0.0.6",
-			"versionExact": "v0.0.6"
+			"revision": "4a806edf821706e315ef7d4f3b5d0cac6d638b34",
+			"revisionTime": "2018-03-28T14:46:34Z",
+			"version": "v0.1.0",
+			"versionExact": "v0.1.0"
 		},
 		{
 			"checksumSHA1": "36UaYid29Kyhrsa5D8N6BoM8dVw=",
 			"path": "github.com/elastic/go-libaudit/rule/flags",
-			"revision": "df0d4981f3fce65ffd3d7411dfec3e03231b491c",
-			"revisionTime": "2017-09-07T20:19:58Z",
-			"version": "v0.0.6",
-			"versionExact": "v0.0.6"
+			"revision": "4a806edf821706e315ef7d4f3b5d0cac6d638b34",
+			"revisionTime": "2018-03-28T14:46:34Z",
+			"version": "v0.1.0",
+			"versionExact": "v0.1.0"
 		},
 		{
 			"checksumSHA1": "3jizmlZPCyo6FAZY8Trk9jA8NH4=",

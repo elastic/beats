@@ -108,6 +108,7 @@ https://github.com/elastic/beats/compare/v6.0.0-beta2...master[Check the HEAD di
 - Fixed parsing of the `key` value when multiple keys are present.
 - Fix possible resource leak if file_integrity module is used with config
   reloading on Windows or Linux. {pull}6198[6198]
+- Add hex decoding for the name field in audit path records. {pull}6687[6687]
 
 *Filebeat*
 
