@@ -36,9 +36,10 @@ import (
 )
 
 func init() {
-	if err := mb.Registry.AddMetricSet("zookeeper", "mntr", New, parse.PassThruHostParser); err != nil {
-		panic(err)
-	}
+	mb.Registry.MustAddMetricSet("zookeeper", "mntr", New,
+		mb.WithHostParser(parse.PassThruHostParser),
+		mb.DefaultMetricSet(),
+	)
 }
 
 // MetricSet for fetching ZooKeeper health metrics.
