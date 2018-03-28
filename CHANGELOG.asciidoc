@@ -204,6 +204,7 @@ https://github.com/elastic/beats/compare/v6.0.0-beta2...master[Check the HEAD di
 - Add appender support to autodiscover {pull}6469[6469]
 - Add add_host_metadata processor {pull}5968[5968]
 - Retry configuration to load dashboards if Kibana is not reachable when the beat starts. {pull}6560[6560]
+- Add `has_fields` conditional to filter events based on the existence of all the given fields. {issue}6285[6285] {pull}6653[6653]
 
 *Auditbeat*
 
