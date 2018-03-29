@@ -188,7 +188,6 @@ func TestProcessor(t *testing.T) {
 
 func TestDynamicTemplate(t *testing.T) {
 	p := &Processor{}
-	trueVar := true
 	tests := []struct {
 		field    common.Field
 		expected common.MapStr
@@ -208,7 +207,7 @@ func TestDynamicTemplate(t *testing.T) {
 		},
 		{
 			field: common.Field{
-				Type: "object", ObjectType: "long", ForceObjectType: &trueVar,
+				Type: "object", ObjectType: "long", ObjectTypeMappingType: "*",
 				Path: "language", Name: "english",
 			},
 			expected: common.MapStr{

@@ -201,7 +201,7 @@ func (p *Processor) object(f *common.Field) common.MapStr {
 	dynProperties := getDefaultProperties(f)
 
 	matchType := func(onlyType string) string {
-		if f.ForceObjectType != nil && *f.ForceObjectType {
+		if f.ObjectTypeMappingType != "" {
 			return "*"
 		}
 		return onlyType
