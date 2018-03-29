@@ -1,7 +1,6 @@
 package udp
 
 import (
-	"net"
 	"time"
 
 	"github.com/elastic/beats/filebeat/channel"
@@ -49,10 +48,14 @@ func NewInput(
 	}
 
 	forwarder := harvester.NewForwarder(out)
-	callback := func(data []byte, addr net.Addr) {
+	callback := func(data []byte, metadata udp.Metadata) {
 		e := util.NewData()
 		e.Event = beat.Event{
 			Timestamp: time.Now(),
+			Meta: common.MapStr{
+				"source":    metadata.Source.String(),
+				"truncated": metadata.Truncated,
+			},
 			Fields: common.MapStr{
 				"message": string(data),
 			},

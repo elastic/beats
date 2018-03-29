@@ -2,11 +2,23 @@ package udp
 
 import (
 	"net"
+	"runtime"
+	"strings"
 	"sync"
 	"time"
 
 	"github.com/elastic/beats/libbeat/logp"
 )
+
+const windowErrBuffer = "A message sent on a datagram socket was larger than the internal message" +
+	" buffer or some other network limit, or the buffer used to receive a datagram into was smaller" +
+	" than the datagram itself."
+
+// Metadata contains formations about the packet.
+type Metadata struct {
+	Source    net.Addr
+	Truncated bool
+}
 
 // Config options for the UDPServer
 type Config struct {
@@ -19,7 +31,7 @@ type Config struct {
 // event received to the callback method.
 type Server struct {
 	config   *Config
-	callback func(data []byte, addr net.Addr)
+	callback func(data []byte, mt Metadata)
 	Listener net.PacketConn
 	log      *logp.Logger
 	wg       sync.WaitGroup
@@ -27,7 +39,7 @@ type Server struct {
 }
 
 // New returns a new UDPServer instance.
-func New(config *Config, callback func(data []byte, addr net.Addr)) *Server {
+func New(config *Config, callback func(data []byte, mt Metadata)) *Server {
 	return &Server{
 		config:   config,
 		callback: callback,
@@ -62,8 +74,13 @@ func (u *Server) run() {
 
 		buffer := make([]byte, u.config.MaxMessageSize)
 		u.Listener.SetDeadline(time.Now().Add(u.config.Timeout))
-		length, addr, err := u.Listener.ReadFrom(buffer)
 
+		// If you are using Windows and you are using a fixed buffer and you get a datagram which
+		// is bigger than the specified size of the buffer, it will return an `err` and the buffer will
+		// contains a subset of the data.
+		//
+		// On Unix based system, the buffer will be truncated but no error will be returned.
+		length, addr, err := u.Listener.ReadFrom(buffer)
 		if err != nil {
 			// don't log any deadline events.
 			e, ok := err.(net.Error)
@@ -72,11 +89,17 @@ func (u *Server) run() {
 			}
 
 			u.log.Errorw("Error reading from the socket", "error", err)
-			continue
+
+			// On Windows send the current buffer and mark it as truncated.
+			// The buffer will have content but length will return 0, addr will be nil.
+			if isLargerThanBuffer(err) {
+				u.callback(buffer, Metadata{Source: addr, Truncated: true})
+				continue
+			}
 		}
 
 		if length > 0 {
-			u.callback(buffer[:length], addr)
+			u.callback(buffer[:length], Metadata{Source: addr})
 		}
 	}
 }
@@ -88,4 +111,11 @@ func (u *Server) Stop() {
 	close(u.done)
 	u.wg.Wait()
 	u.log.Info("UDP server stopped")
+}
+
+func isLargerThanBuffer(err error) bool {
+	if runtime.GOOS != "windows" {
+		return false
+	}
+	return strings.Contains(err.Error(), windowErrBuffer)
 }

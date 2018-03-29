@@ -2,6 +2,7 @@ package udp
 
 import (
 	"net"
+	"runtime"
 	"testing"
 	"time"
 
@@ -13,7 +14,7 @@ const timeout = time.Second * 15
 
 type info struct {
 	message []byte
-	addr    net.Addr
+	mt      Metadata
 }
 
 func TestReceiveEventFromUDP(t *testing.T) {
@@ -35,10 +36,10 @@ func TestReceiveEventFromUDP(t *testing.T) {
 	}
 
 	ch := make(chan info)
-	host := "127.0.0.1:"
+	host := "localhost:0"
 	config := &Config{Host: host, MaxMessageSize: maxMessageSize, Timeout: timeout}
-	fn := func(message []byte, addr net.Addr) {
-		ch <- info{message: message, addr: addr}
+	fn := func(message []byte, metadata Metadata) {
+		ch <- info{message: message, mt: metadata}
 	}
 	s := New(config, fn)
 	err := s.Start()
@@ -54,13 +55,25 @@ func TestReceiveEventFromUDP(t *testing.T) {
 				return
 			}
 			defer conn.Close()
+
 			_, err = conn.Write(test.message)
 			if !assert.NoError(t, err) {
 				return
 			}
 			info := <-ch
 			assert.Equal(t, test.expected, info.message)
-			assert.NotNil(t, info.addr)
+			if runtime.GOOS == "windows" {
+				if len(test.expected) < len(test.message) {
+					assert.Nil(t, info.mt.Source)
+					assert.True(t, info.mt.Truncated)
+				} else {
+					assert.NotNil(t, info.mt.Source)
+					assert.False(t, info.mt.Truncated)
+				}
+			} else {
+				assert.NotNil(t, info.mt.Source)
+				assert.False(t, info.mt.Truncated)
+			}
 		})
 	}
 }
