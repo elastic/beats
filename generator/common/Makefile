@@ -44,6 +44,7 @@ test-build: test
 python-env:
 	@test -d ${PYTHON_ENV} || virtualenv ${PYTHON_ENV}
 	@${PYTHON_ENV}/bin/pip install --upgrade pip PyYAML
+	@find $(PYTHON_ENV) -type d -name dist-packages -exec sh -c "echo dist-packages > {}.pth" ';'
 
 # Cleans up environment
 .PHONY: clean
