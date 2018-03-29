@@ -65,7 +65,7 @@ func TestReadLargeBatchSize(t *testing.T) {
 	// Publish large test messages.
 	totalEvents := 1000
 	for i := 0; i < totalEvents; i++ {
-		err = log.Report(elog.Info, uint32(i%1000), []string{strconv.Itoa(i) + " " + randString(31800)})
+		err = log.Report(elog.Info, uint32(i%1000), []string{strconv.Itoa(i) + " " + randomSentence(31800)})
 		if err != nil {
 			t.Fatal("ReportEvent error", err)
 		}
