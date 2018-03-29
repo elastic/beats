@@ -117,7 +117,7 @@ metricbeat.modules:
 #------------------------------ Aerospike Module -----------------------------
 - module: aerospike
   metricsets: ["namespace"]
-  enabled: false
+  enabled: true
   period: 10s
   hosts: ["localhost:3000"]
 
@@ -125,6 +125,7 @@ metricbeat.modules:
 - module: apache
   metricsets: ["status"]
   period: 10s
+  enabled: true
 
   # Apache hosts
   hosts: ["http://127.0.0.1"]
@@ -477,6 +478,7 @@ metricbeat.modules:
 
 #------------------------------- vSphere Module ------------------------------
 - module: vsphere
+  enabled: true
   metricsets: ["datastore", "host", "virtualmachine"]
   period: 10s
   hosts: ["https://localhost/sdk"]
@@ -487,7 +489,6 @@ metricbeat.modules:
   insecure: false
   # Get custom fields when using virtualmachine metric set. Default false.
   # get_custom_fields: false
-  
 
 #------------------------------- Windows Module ------------------------------
 - module: windows
@@ -501,6 +502,7 @@ metricbeat.modules:
 
 #------------------------------ ZooKeeper Module -----------------------------
 - module: zookeeper
+  enabled: true
   metricsets: ["mntr"]
   period: 10s
   hosts: ["localhost:2181"]

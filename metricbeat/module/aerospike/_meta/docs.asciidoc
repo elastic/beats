@@ -1,4 +1,4 @@
-The Aerospike module uses the http://www.aerospike.com/docs/reference/info[Info command] to collect metrics.
+The Aerospike module uses the http://www.aerospike.com/docs/reference/info[Info command] to collect metrics. The default metricset is `namespace`.
 
 [float]
 === Compatibility

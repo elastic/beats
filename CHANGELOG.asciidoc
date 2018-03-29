@@ -49,6 +49,8 @@ https://github.com/elastic/beats/compare/v6.0.0-beta2...master[Check the HEAD di
   the system test. {pull}6121[6121]
 - Add IIS module to parse access log and error log. {pull}6127[6127]
 - Remove the undefined `username` option from the Redis input and clarify the documentation. {pull}6662[6662]
+- Add validation for Stdin, when Filebeat is configured with Stdin and any other inputs, Filebeat
+  will now refuses to start. {pull}6463[6463]
 
 *Heartbeat*
 
@@ -69,6 +71,7 @@ https://github.com/elastic/beats/compare/v6.0.0-beta2...master[Check the HEAD di
 - Add config option for windows/perfmon metricset to ignore non existent counters. {pull}6432[6432]
 - Support apache status pages for versions older than 2.4.16. {pull}6450[6450]
 - Add support for huge pages on Linux. {pull}6436[6436]
+- Refactor docker CPU calculations to be more consistent with `docker stats`. {pull}6608[6608]
 
 *Packetbeat*
 
@@ -261,6 +264,10 @@ https://github.com/elastic/beats/compare/v6.0.0-beta2...master[Check the HEAD di
 - Add experimental module to collect metrics from munin nodes. {pull}6517[6517]
 - Add support for wildcards and explicit metrics grouping in jolokia/jmx. {pull}6462[6462]
 - Set `collector` as default metricset in Prometheus module. {pull}6636[6636]
+- Set `mntr` as default metricset in Zookeeper module. {pull}6674[6674]
+- Set default metricsets in vSphere module. {pull}6676[6676]
+- Set `status` as default metricset in Apache module. {pull}6673[6673]
+- Set `namespace` as default metricset in Aerospike module. {pull}6669[6669]
 
 *Packetbeat*
 
