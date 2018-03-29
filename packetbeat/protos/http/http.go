@@ -122,7 +122,12 @@ func (http *httpPlugin) setFromConfig(config *httpConfig) {
 	http.splitCookie = config.SplitCookie
 	http.parserConfig.realIPHeader = strings.ToLower(config.RealIPHeader)
 	http.transactionTimeout = config.TransactionTimeout
-	http.parserConfig.includeBodyFor = config.IncludeBodyFor
+	for _, list := range [][]string{config.IncludeBodyFor, config.IncludeRequestBodyFor} {
+		http.parserConfig.includeRequestBodyFor = append(http.parserConfig.includeRequestBodyFor, list...)
+	}
+	for _, list := range [][]string{config.IncludeBodyFor, config.IncludeResponseBodyFor} {
+		http.parserConfig.includeResponseBodyFor = append(http.parserConfig.includeResponseBodyFor, list...)
+	}
 	http.maxMessageSize = config.MaxMessageSize
 
 	if config.SendAllHeaders {

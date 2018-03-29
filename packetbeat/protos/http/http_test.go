@@ -1164,7 +1164,8 @@ func TestHttpParser_includeBodyFor(t *testing.T) {
 
 	var store eventStore
 	http := httpModForTests(&store)
-	http.parserConfig.includeBodyFor = []string{"application/x-foo", "text/plain"}
+	http.parserConfig.includeRequestBodyFor = []string{"application/x-foo", "text/plain"}
+	http.parserConfig.includeResponseBodyFor = []string{"application/x-foo", "text/plain"}
 
 	tcptuple := testCreateTCPTuple()
 	packet := protos.Packet{Payload: req}
@@ -1305,6 +1306,9 @@ func TestHttp_configsSettingAll(t *testing.T) {
 	config.SendAllHeaders = true
 	config.SplitCookie = true
 	config.RealIPHeader = "X-Forwarded-For"
+	config.IncludeBodyFor = []string{"body"}
+	config.IncludeRequestBodyFor = []string{"req1", "req2"}
+	config.IncludeResponseBodyFor = []string{"resp1", "resp2", "resp3"}
 
 	// Set config
 	http.setFromConfig(&config)
@@ -1320,6 +1324,8 @@ func TestHttp_configsSettingAll(t *testing.T) {
 	assert.True(t, http.parserConfig.sendAllHeaders)
 	assert.Equal(t, config.SplitCookie, http.splitCookie)
 	assert.Equal(t, strings.ToLower(config.RealIPHeader), http.parserConfig.realIPHeader)
+	assert.Equal(t, append(config.IncludeBodyFor, config.IncludeRequestBodyFor...), http.parserConfig.includeRequestBodyFor)
+	assert.Equal(t, append(config.IncludeBodyFor, config.IncludeResponseBodyFor...), http.parserConfig.includeResponseBodyFor)
 }
 
 func TestHttp_configsSettingHeaders(t *testing.T) {
@@ -1338,6 +1344,63 @@ func TestHttp_configsSettingHeaders(t *testing.T) {
 
 	for _, val := range http.parserConfig.headersWhitelist {
 		assert.True(t, val)
+	}
+}
+
+func TestHttp_includeBodies(t *testing.T) {
+	reqTp := "PUT /node HTTP/1.1\r\n" +
+		"Host: server\r\n" +
+		"Content-Length: 12\r\n" +
+		"Content-Type: %s\r\n" +
+		"\r\n" +
+		"request_body"
+	respTp := "HTTP/1.1 200 OK\r\n" +
+		"Content-Length: 5\r\n" +
+		"Content-Type: %s\r\n" +
+		"\r\n" +
+		"done."
+	var store eventStore
+	http := httpModForTests(&store)
+	config := defaultConfig
+	config.IncludeBodyFor = []string{"both"}
+	config.IncludeRequestBodyFor = []string{"req1", "req2"}
+	config.IncludeResponseBodyFor = []string{"resp1", "resp2", "resp3"}
+	http.setFromConfig(&config)
+
+	tcptuple := testCreateTCPTuple()
+
+	for idx, testCase := range []struct {
+		requestCt, responseCt   string
+		hasRequest, hasResponse bool
+	}{
+		{"none", "none", false, false},
+		{"both", "other", true, false},
+		{"other", "both", false, true},
+		{"both", "both", true, true},
+		{"req1", "none", true, false},
+		{"none", "req1", false, false},
+		{"req2", "resp1", true, true},
+		{"none", "resp2", false, true},
+		{"resp3", "req2", false, false},
+	} {
+		msg := fmt.Sprintf("test case %d (%s, %s)", idx, testCase.requestCt, testCase.responseCt)
+		req := fmt.Sprintf(reqTp, testCase.requestCt)
+		resp := fmt.Sprintf(respTp, testCase.responseCt)
+
+		packet := protos.Packet{Payload: []byte(req)}
+		private := protos.ProtocolData(&httpConnectionData{})
+		private = http.Parse(&packet, tcptuple, 0, private)
+
+		packet.Payload = []byte(resp)
+		private = http.Parse(&packet, tcptuple, 1, private)
+		http.ReceivedFin(tcptuple, 1, private)
+
+		trans := expectTransaction(t, &store)
+		assert.NotNil(t, trans)
+		hasKey, _ := trans.HasKey("http.request.body")
+		assert.Equal(t, testCase.hasRequest, hasKey, msg)
+		hasKey, _ = trans.HasKey("http.response.body")
+		assert.Equal(t, testCase.hasResponse, hasKey, msg)
 	}
 }
 
