@@ -297,6 +297,7 @@ https://github.com/elastic/beats/compare/v6.0.1...v6.1.0[View commits]
 - Fix `ProcState` on Linux and FreeBSD when process names contain parentheses. {pull}5775[5775]
 - Fix incorrect `Mem.Used` calculation under linux. {pull}5775[5775]
 - Fix `open_file_descriptor_count` and `max_file_descriptor_count` lost in zookeeper module {pull}5902[5902]
+- Fix system process metricset for kernel processes. {issue}5700[5700]
 
 *Packetbeat*
 
