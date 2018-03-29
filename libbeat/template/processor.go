@@ -202,7 +202,7 @@ func (p *Processor) object(f *common.Field) common.MapStr {
 
 	matchType := func(onlyType string) string {
 		if f.ObjectTypeMappingType != "" {
-			return "*"
+			return f.ObjectTypeMappingType
 		}
 		return onlyType
 	}
