@@ -10,7 +10,7 @@ import (
 	"github.com/elastic/beats/metricbeat/module/docker"
 )
 
-var blkioService BLkioService
+var blkioService BlkioService
 var oldBlkioRaw = make([]BlkioRaw, 3)
 var newBlkioRaw = make([]BlkioRaw, 3)
 
