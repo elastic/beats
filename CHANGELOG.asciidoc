@@ -272,6 +272,7 @@ https://github.com/elastic/beats/compare/v6.0.0-beta2...master[Check the HEAD di
 - Set `namespace` as default metricset in Aerospike module. {pull}6669[6669]
 - Set `service` as default metricset in Windows module. {pull}6675[6675]
 - Set all metricsets as default metricsets in uwsgi module. {pull}6688[6688]
+- Mark system.raid metricset as beta. {pull}6710[6710]
 
 *Packetbeat*
 
