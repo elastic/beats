@@ -112,7 +112,7 @@ This file is generated! See scripts/docs_collector.py
 |<<metricbeat-metricset-system-network,network>>   
 |<<metricbeat-metricset-system-process,process>>   
 |<<metricbeat-metricset-system-process_summary,process_summary>>   
-|<<metricbeat-metricset-system-raid,raid>> experimental[]  
+|<<metricbeat-metricset-system-raid,raid>> beta[]  
 |<<metricbeat-metricset-system-socket,socket>> beta[]  
 |<<metricbeat-metricset-system-uptime,uptime>>   
 |<<metricbeat-module-uwsgi,uwsgi>>  experimental[]   |    
