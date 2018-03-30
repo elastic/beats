@@ -71,6 +71,8 @@ type Container struct {
 	Labels      map[string]string
 	IPAddresses []string
 	Ports       []types.Port
+	// Only needed internally
+	gateways []string
 }
 
 // Client for docker interface
@@ -289,8 +291,15 @@ func (w *watcher) listContainers(options types.ContainerListOptions) ([]*Contain
 	var result []*Container
 	for _, c := range containers {
 		var ipaddresses []string
+		var gateways []string
 		for _, net := range c.NetworkSettings.Networks {
-			ipaddresses = append(ipaddresses, net.IPAddress)
+			if net.IPAddress != "" {
+				ipaddresses = append(ipaddresses, net.IPAddress)
+			}
+
+			if net.Gateway != "" {
+				gateways = append(gateways, net.Gateway)
+			}
 		}
 		result = append(result, &Container{
 			ID:          c.ID,
@@ -299,6 +308,7 @@ func (w *watcher) listContainers(options types.ContainerListOptions) ([]*Contain
 			Labels:      c.Labels,
 			Ports:       c.Ports,
 			IPAddresses: ipaddresses,
+			gateways:    gateways,
 		})
 	}
 

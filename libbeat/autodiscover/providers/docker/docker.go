@@ -24,6 +24,7 @@ type Provider struct {
 	appenders     autodiscover.Appenders
 	watcher       docker.Watcher
 	templates     *template.Mapper
+	hostIP        string
 	stop          chan interface{}
 	startListener bus.Listener
 	stopListener  bus.Listener
@@ -65,6 +66,8 @@ func AutodiscoverBuilder(bus bus.Bus, c *common.Config) (autodiscover.Provider, 
 		return nil, err
 	}
 
+	hostIP := docker.GetHostIP(watcher)
+
 	return &Provider{
 		config:        config,
 		bus:           bus,
@@ -72,6 +75,7 @@ func AutodiscoverBuilder(bus bus.Bus, c *common.Config) (autodiscover.Provider, 
 		appenders:     appenders,
 		templates:     mapper,
 		watcher:       watcher,
+		hostIP:        hostIP,
 		stop:          make(chan interface{}),
 		startListener: start,
 		stopListener:  stop,
@@ -108,6 +112,8 @@ func (d *Provider) emitContainer(event bus.Event, flag string) {
 	var host string
 	if len(container.IPAddresses) > 0 {
 		host = container.IPAddresses[0]
+	} else {
+		host = d.hostIP
 	}
 
 	labelMap := common.MapStr{}
