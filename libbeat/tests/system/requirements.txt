@@ -9,3 +9,4 @@ requests
 autopep8
 six
 docker-compose
+docker==3.1.4
