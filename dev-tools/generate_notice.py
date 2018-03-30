@@ -44,7 +44,7 @@ def read_versions(vendor):
     return libs
 
 
-def gather_dependencies(vendor_dirs):
+def gather_dependencies(vendor_dirs, overrides=None):
     dependencies = {}   # lib_path -> [array of lib]
     for vendor in vendor_dirs:
         libs = read_versions(vendor)
@@ -66,7 +66,9 @@ def gather_dependencies(vendor_dirs):
                     lib["license_summary"] = detect_license_summary(lib["license_contents"])
                     if lib["license_summary"] == "UNKNOWN":
                         print("WARNING: Unknown license for: {}".format(lib_path))
-
+                    revision = overrides.get(lib_path, {}).get("revision")
+                    if revision:
+                        lib["revision"] = revision
                     if lib_path not in dependencies:
                         dependencies[lib_path] = [lib]
                     else:
@@ -137,8 +139,8 @@ def get_url(repo):
     return "https://github.com/{}/{}".format(words[1], words[2])
 
 
-def create_notice(filename, beat, copyright, vendor_dirs, csvfile):
-    dependencies = gather_dependencies(vendor_dirs)
+def create_notice(filename, beat, copyright, vendor_dirs, csvfile, overrides=None):
+    dependencies = gather_dependencies(vendor_dirs, overrides=overrides)
     if not csvfile:
         with open(filename, "w+") as f:
             write_notice_file(f, beat, copyright, dependencies)
@@ -250,6 +252,9 @@ if __name__ == "__main__":
                         help="Output to a csv file")
     parser.add_argument("-e", "--excludes", default=["dev-tools", "build"],
                         help="List of top directories to exclude")
+    # no need to be generic for now, no other transitive dependency information available
+    parser.add_argument("--beats-origin", type=argparse.FileType('r'),
+                        help="path to beats vendor.json")
     parser.add_argument("-s", "--skip-notice", default=[],
                         help="List of NOTICE files to skip")
     args = parser.parse_args()
@@ -277,7 +282,12 @@ if __name__ == "__main__":
             if exclude in dirs:
                 dirs.remove(exclude)
 
+    overrides = {}  # revision overrides only for now
+    if args.beats_origin:
+        govendor = json.load(args.beats_origin)
+        overrides = {package['path']: package for package in govendor["package"]}
+
     print("Get the licenses available from {}".format(vendor_dirs))
-    create_notice(notice, args.beat, args.copyright, vendor_dirs, args.csvfile)
+    create_notice(notice, args.beat, args.copyright, vendor_dirs, args.csvfile, overrides=overrides)
 
     print("Available at {}".format(notice))
