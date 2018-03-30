@@ -342,8 +342,8 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 --------------------------------------------------------------------
 Dependency: github.com/elastic/go-libaudit
-Version: v0.0.7
-Revision: c139147102117edd4175a74ce071e4cc7982259a
+Version: v0.1.0
+Revision: 4a806edf821706e315ef7d4f3b5d0cac6d638b34
 License type (autodetected): Apache-2.0
 ./vendor/github.com/elastic/go-libaudit/LICENSE:
 --------------------------------------------------------------------
