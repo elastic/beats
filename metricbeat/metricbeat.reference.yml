@@ -173,6 +173,7 @@ metricbeat.modules:
   hosts: ["localhost:8080"]
   metrics_path: /metrics/metrics
   namespace: example
+  enabled: true
 
 #---------------------------- Elasticsearch Module ---------------------------
 - module: elasticsearch
