@@ -2,6 +2,13 @@
 All notable changes to this project will be documented in this file.
 This project adheres to [Semantic Versioning](http://semver.org/).
 
+## [0.1.0]
+
+### Changed
+
+- auparse - Fixed an issue where the name value was not being hex decoded from
+  PATH records. #20
+
 ## [0.0.7]
  
 ### Added
