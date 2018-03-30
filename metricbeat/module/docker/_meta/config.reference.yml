@@ -1,0 +1,22 @@
+- module: docker
+  metricsets:
+    - "container"
+    - "cpu"
+    - "diskio"
+    - "healthcheck"
+    - "info"
+    #- "image"
+    - "memory"
+    - "network"
+  hosts: ["unix:///var/run/docker.sock"]
+  period: 10s
+  enabled: true
+
+  # Replace dots in labels with `_`. Set to false to keep dots
+  labels.dedot: true
+
+  # To connect to Docker over TLS you must specify a client and CA certificate.
+  #ssl:
+    #certificate_authority: "/etc/pki/root/ca.pem"
+    #certificate:           "/etc/pki/client/cert.pem"
+    #key:                   "/etc/pki/client/cert.key"
