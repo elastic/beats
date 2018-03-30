@@ -2,13 +2,12 @@ package file_integrity
 
 import (
 	"errors"
-	"math"
 	"os"
 	"path/filepath"
 	"sync/atomic"
 	"time"
 
-	"github.com/juju/ratelimit"
+	"golang.org/x/time/rate"
 
 	"github.com/elastic/beats/libbeat/logp"
 )
@@ -21,7 +20,7 @@ var scannerID uint32
 type scanner struct {
 	fileCount   uint64
 	byteCount   uint64
-	tokenBucket *ratelimit.Bucket
+	tokenBucket *rate.Limiter
 
 	done   <-chan struct{}
 	eventC chan Event
@@ -55,10 +54,10 @@ func (s *scanner) Start(done <-chan struct{}) (<-chan Event, error) {
 				s.config.ScanRatePerSec,
 				s.config.MaxFileSize)
 
-		s.tokenBucket = ratelimit.NewBucketWithRate(
-			float64(s.config.ScanRateBytesPerSec)/2., // Fill Rate
-			int64(s.config.MaxFileSizeBytes))         // Max Capacity
-		s.tokenBucket.TakeAvailable(math.MaxInt64)
+		s.tokenBucket = rate.NewLimiter(
+			rate.Limit(s.config.ScanRateBytesPerSec), // Fill Rate
+			int(s.config.MaxFileSizeBytes))           // Max Capacity
+		s.tokenBucket.ReserveN(time.Now(), int(s.config.MaxFileSizeBytes))
 	}
 
 	go s.scan()
@@ -155,13 +154,24 @@ func (s *scanner) throttle(fileSize uint64) {
 		return
 	}
 
-	wait := s.tokenBucket.Take(int64(fileSize))
-	if wait > 0 {
-		timer := time.NewTimer(wait)
-		select {
-		case <-timer.C:
-		case <-s.done:
-		}
+	reservation := s.tokenBucket.ReserveN(time.Now(), int(fileSize))
+	if !reservation.OK() {
+		// This would happen if the file size was greater than the token
+		// buckets burst rate, but that can't happen because we don't hash files
+		// larger than the burst rate (scan_max_file_size).
+		return
+	}
+
+	delay := reservation.Delay()
+	if delay == 0 {
+		return
+	}
+
+	timer := time.NewTimer(delay)
+	defer timer.Stop()
+	select {
+	case <-s.done:
+	case <-timer.C:
 	}
 }
 
