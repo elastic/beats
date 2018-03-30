@@ -2,7 +2,7 @@
   title: "uwsgi"
   description: >
     uwsgi module
-
+  release: beta
   fields:
     - name: uwsgi
       type: group

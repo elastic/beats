@@ -274,6 +274,8 @@ https://github.com/elastic/beats/compare/v6.0.0-beta2...master[Check the HEAD di
 - Set all metricsets as default metricsets in uwsgi module. {pull}6688[6688]
 - Mark kubernetes.event metricset as beta. {pull}6715[6715]
 - Set all metricsets as default metricsets in couchbase module. {pull}6683[6683]
+- Mark kubernetes.event metricset as beta. {pull}[]
+- Mark uwsgi module and metricset as beta. {pull}6717[6717]
 
 *Packetbeat*
 
