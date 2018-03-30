@@ -18,7 +18,10 @@ import (
 )
 
 func init() {
-	mb.Registry.AddMetricSet("uwsgi", "status", New, uwsgi.HostParser)
+	mb.Registry.MustAddMetricSet("uwsgi", "status", New,
+		mb.WithHostParser(uwsgi.HostParser),
+		mb.DefaultMetricSet(),
+	)
 }
 
 // MetricSet for fetching uwsgi metrics from StatServer.
