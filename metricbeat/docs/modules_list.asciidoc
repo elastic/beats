@@ -39,9 +39,9 @@ This file is generated! See scripts/docs_collector.py
 .3+|   |<<metricbeat-metricset-etcd-leader,leader>> beta[]  
 |<<metricbeat-metricset-etcd-self,self>> beta[]  
 |<<metricbeat-metricset-etcd-store,store>> beta[]  
-|<<metricbeat-module-golang,Golang>>  experimental[]   |    
-.2+|   |<<metricbeat-metricset-golang-expvar,expvar>> experimental[]  
-|<<metricbeat-metricset-golang-heap,heap>> experimental[]  
+|<<metricbeat-module-golang,Golang>>  beta[]   |    
+.2+|   |<<metricbeat-metricset-golang-expvar,expvar>> beta[]  
+|<<metricbeat-metricset-golang-heap,heap>> beta[]  
 |<<metricbeat-module-graphite,Graphite>>  beta[]   |    
 .1+|   |<<metricbeat-metricset-graphite-server,server>> beta[]  
 |<<metricbeat-module-haproxy,HAProxy>>     |    
