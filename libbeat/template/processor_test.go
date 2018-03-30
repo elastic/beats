@@ -207,6 +207,32 @@ func TestDynamicTemplate(t *testing.T) {
 		},
 		{
 			field: common.Field{
+				Type: "object", ObjectType: "long", ObjectTypeMappingType: "futuretype",
+				Path: "language", Name: "english",
+			},
+			expected: common.MapStr{
+				"language.english": common.MapStr{
+					"mapping":            common.MapStr{"type": "long"},
+					"match_mapping_type": "futuretype",
+					"path_match":         "language.english.*",
+				},
+			},
+		},
+		{
+			field: common.Field{
+				Type: "object", ObjectType: "long", ObjectTypeMappingType: "*",
+				Path: "language", Name: "english",
+			},
+			expected: common.MapStr{
+				"language.english": common.MapStr{
+					"mapping":            common.MapStr{"type": "long"},
+					"match_mapping_type": "*",
+					"path_match":         "language.english.*",
+				},
+			},
+		},
+		{
+			field: common.Field{
 				Type: "object", ObjectType: "long",
 				Path: "language", Name: "english",
 			},

@@ -200,6 +200,13 @@ func (p *Processor) array(f *common.Field) common.MapStr {
 func (p *Processor) object(f *common.Field) common.MapStr {
 	dynProperties := getDefaultProperties(f)
 
+	matchType := func(onlyType string) string {
+		if f.ObjectTypeMappingType != "" {
+			return f.ObjectTypeMappingType
+		}
+		return onlyType
+	}
+
 	switch f.ObjectType {
 	case "text":
 		dynProperties["type"] = "text"
@@ -208,13 +215,13 @@ func (p *Processor) object(f *common.Field) common.MapStr {
 			dynProperties["type"] = "string"
 			dynProperties["index"] = "analyzed"
 		}
-		addDynamicTemplate(f, dynProperties, "string")
+		addDynamicTemplate(f, dynProperties, matchType("string"))
 	case "long":
 		dynProperties["type"] = f.ObjectType
-		addDynamicTemplate(f, dynProperties, "long")
+		addDynamicTemplate(f, dynProperties, matchType("long"))
 	case "keyword":
 		dynProperties["type"] = f.ObjectType
-		addDynamicTemplate(f, dynProperties, "string")
+		addDynamicTemplate(f, dynProperties, matchType("string"))
 	}
 
 	properties := getDefaultProperties(f)
