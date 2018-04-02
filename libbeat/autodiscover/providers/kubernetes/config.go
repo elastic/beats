@@ -16,6 +16,7 @@ type Config struct {
 	SyncPeriod     time.Duration `config:"sync_period"`
 	CleanupTimeout time.Duration `config:"cleanup_timeout"`
 
+	Cluster            string   `config:"cluster"`
 	IncludeLabels      []string `config:"include_labels"`
 	ExcludeLabels      []string `config:"exclude_labels"`
 	IncludeAnnotations []string `config:"include_annotations"`
@@ -30,6 +31,7 @@ type Config struct {
 func defaultConfig() *Config {
 	return &Config{
 		InCluster:      true,
+		Cluster:        "default",
 		SyncPeriod:     1 * time.Second,
 		CleanupTimeout: 60 * time.Second,
 		Prefix:         "co.elastic",

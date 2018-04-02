@@ -206,6 +206,7 @@ https://github.com/elastic/beats/compare/v6.0.0-beta2...master[Check the HEAD di
 - Add appender support to autodiscover {pull}6469[6469]
 - Add add_host_metadata processor {pull}5968[5968]
 - Retry configuration to load dashboards if Kibana is not reachable when the beat starts. {pull}6560[6560]
+- Add cluster config parameter to kubernetes metagenerator {pull}6728[6728]
 
 *Auditbeat*
 

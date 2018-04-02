@@ -16,14 +16,16 @@ type MetaGenerator interface {
 
 type metaGenerator struct {
 	annotations   []string
+	cluster       string
 	labels        []string
 	labelsExclude []string
 }
 
 // NewMetaGenerator initializes and returns a new kubernetes metadata generator
-func NewMetaGenerator(annotations, labels, labelsExclude []string) MetaGenerator {
+func NewMetaGenerator(cluster string, annotations, labels, labelsExclude []string) MetaGenerator {
 	return &metaGenerator{
 		annotations:   annotations,
+		cluster:       cluster,
 		labels:        labels,
 		labelsExclude: labelsExclude,
 	}
@@ -47,6 +49,9 @@ func (g *metaGenerator) PodMetadata(pod *Pod) common.MapStr {
 
 	annotationsMap := generateMapSubset(pod.Metadata.Annotations, g.annotations)
 	meta := common.MapStr{
+		"cluster": common.MapStr{
+			"name": g.cluster,
+		},
 		"pod": common.MapStr{
 			"name": pod.Metadata.Name,
 		},

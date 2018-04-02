@@ -2016,6 +2016,14 @@ Kubernetes metadata added by the kubernetes processor
 
 
 [float]
+=== `kubernetes.cluster.name`
+
+type: keyword
+
+Kubernetes cluster name
+
+
+[float]
 === `kubernetes.pod.name`
 
 type: keyword

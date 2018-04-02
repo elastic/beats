@@ -10,7 +10,7 @@ import (
 	"github.com/elastic/beats/libbeat/common/kubernetes"
 )
 
-var metagen = kubernetes.NewMetaGenerator([]string{}, []string{}, []string{})
+var metagen = kubernetes.NewMetaGenerator("default", []string{}, []string{}, []string{})
 
 func TestPodIndexer(t *testing.T) {
 	var testConfig = common.NewConfig()
@@ -38,6 +38,9 @@ func TestPodIndexer(t *testing.T) {
 	assert.Equal(t, indexers[0].Index, fmt.Sprintf("%s/%s", ns, podName))
 
 	expected := common.MapStr{
+		"cluster": common.MapStr{
+			"name": "default",
+		},
 		"pod": common.MapStr{
 			"name": "testpod",
 		},
@@ -87,6 +90,9 @@ func TestContainerIndexer(t *testing.T) {
 	assert.Equal(t, len(indexers), 0)
 	assert.Equal(t, len(indices), 0)
 	expected := common.MapStr{
+		"cluster": common.MapStr{
+			"name": "default",
+		},
 		"pod": common.MapStr{
 			"name": "testpod",
 		},
@@ -170,7 +176,7 @@ func TestFilteredGenMeta(t *testing.T) {
 	rawAnnotations := indexers[0].Data["annotations"]
 	assert.Nil(t, rawAnnotations)
 
-	filteredGen := kubernetes.NewMetaGenerator([]string{"a"}, []string{"foo"}, []string{})
+	filteredGen := kubernetes.NewMetaGenerator("default", []string{"a"}, []string{"foo"}, []string{})
 	podIndexer, err = NewPodNameIndexer(*testConfig, filteredGen)
 	assert.Nil(t, err)
 
@@ -201,7 +207,7 @@ func TestFilteredGenMeta(t *testing.T) {
 func TestFilteredGenMetaExclusion(t *testing.T) {
 	var testConfig = common.NewConfig()
 
-	filteredGen := kubernetes.NewMetaGenerator([]string{}, []string{}, []string{"x"})
+	filteredGen := kubernetes.NewMetaGenerator("default", []string{}, []string{}, []string{"x"})
 	podIndexer, err := NewPodNameIndexer(*testConfig, filteredGen)
 	assert.Nil(t, err)
 
@@ -283,6 +289,9 @@ func TestIpPortIndexer(t *testing.T) {
 	assert.NotNil(t, err)
 
 	expected := common.MapStr{
+		"cluster": common.MapStr{
+			"name": "default",
+		},
 		"pod": common.MapStr{
 			"name": "testpod",
 		},

@@ -9,6 +9,7 @@ import (
 type kubeAnnotatorConfig struct {
 	InCluster  bool          `config:"in_cluster"`
 	KubeConfig string        `config:"kube_config"`
+	Cluster    string        `config:"cluster"`
 	Host       string        `config:"host"`
 	Namespace  string        `config:"namespace"`
 	SyncPeriod time.Duration `config:"sync_period"`
@@ -33,6 +34,7 @@ type PluginConfig []map[string]common.Config
 func defaultKubernetesAnnotatorConfig() kubeAnnotatorConfig {
 	return kubeAnnotatorConfig{
 		InCluster:       true,
+		Cluster:         "default",
 		SyncPeriod:      1 * time.Second,
 		CleanupTimeout:  60 * time.Second,
 		DefaultMatchers: Enabled{true},

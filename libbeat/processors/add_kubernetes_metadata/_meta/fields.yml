@@ -8,6 +8,11 @@
     - name: kubernetes
       type: group
       fields:
+        - name: cluster.name
+          type: keyword
+          description: >
+            Kubernetes cluster name
+
         - name: pod.name
           type: keyword
           description: >

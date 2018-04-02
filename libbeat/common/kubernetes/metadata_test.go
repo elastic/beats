@@ -24,6 +24,8 @@ func TestPodMetadataDeDot(t *testing.T) {
 	}
 
 	for _, test := range tests {
-		assert.Equal(t, NewMetaGenerator(nil, nil, nil).PodMetadata(test.pod)["labels"], test.meta["labels"])
+		meta := NewMetaGenerator("default", nil, nil, nil)
+		assert.Equal(t, meta.PodMetadata(test.pod)["labels"], test.meta["labels"])
+		assert.Equal(t, meta.PodMetadata(test.pod)["cluster"].(common.MapStr)["name"], "default")
 	}
 }
