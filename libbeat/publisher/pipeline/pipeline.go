@@ -173,7 +173,18 @@ func New(
 	if err != nil {
 		return nil, err
 	}
-	p.eventSema = newSema(p.queue.BufferConfig().Events)
+
+	if count := p.queue.BufferConfig().Events; count > 0 {
+		p.eventSema = newSema(count)
+	}
+
+	maxEvents := p.queue.BufferConfig().Events
+	if maxEvents <= 0 {
+		// Maximum number of events until acker starts blocking.
+		// Only active if pipeline can drop events.
+		maxEvents = 64000
+	}
+	p.eventSema = newSema(maxEvents)
 
 	p.output = newOutputController(log, p.observer, p.queue)
 	p.output.Set(out)
