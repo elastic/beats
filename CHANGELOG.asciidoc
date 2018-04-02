@@ -32,6 +32,8 @@ https://github.com/elastic/beats/compare/v6.2.2...6.2[Check the HEAD diff]
 
 *Auditbeat*
 
+- Add hex decoding for the name field in audit path records. {pull}6687[6687]
+
 *Filebeat*
 
 *Heartbeat*
