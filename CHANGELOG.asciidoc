@@ -273,6 +273,7 @@ https://github.com/elastic/beats/compare/v6.0.0-beta2...master[Check the HEAD di
 - Set `service` as default metricset in Windows module. {pull}6675[6675]
 - Set all metricsets as default metricsets in uwsgi module. {pull}6688[6688]
 - Mark kubernetes.event metricset as beta. {pull}[]
+- Allow autodiscover to monitor unexposed ports {pull}6727[6727]
 
 *Packetbeat*
 
