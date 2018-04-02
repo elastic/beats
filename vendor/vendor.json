@@ -985,12 +985,6 @@
 			"revisionTime": "2014-01-24T17:37:10Z"
 		},
 		{
-			"checksumSHA1": "a8Ge6pE7oxux9ZMZVAlyEeGzCng=",
-			"path": "github.com/juju/ratelimit",
-			"revision": "5b9ff866471762aa2ab2dced63c9fb6f53921342",
-			"revisionTime": "2017-05-23T01:21:41Z"
-		},
-		{
 			"checksumSHA1": "+CqJGh7NIDMnHgScq9sl9tPrnVM=",
 			"path": "github.com/klauspost/compress/flate",
 			"revision": "14c9a76e3c95e47f8ccce949bba2c1101a8b85e6",
@@ -1602,6 +1596,12 @@
 			"path": "golang.org/x/text/unicode/norm",
 			"revision": "4e4a3210bb54bb31f6ab2cdca2edcc0b50c420c1",
 			"revisionTime": "2018-02-04T03:07:25Z"
+		},
+		{
+			"checksumSHA1": "vGfePfr0+weQUeTM/71mu+LCFuE=",
+			"path": "golang.org/x/time/rate",
+			"revision": "26559e0f760e39c24d730d3224364aef164ee23f",
+			"revisionTime": "2018-03-14T17:21:34Z"
 		},
 		{
 			"checksumSHA1": "p3gWsy4fQOSXGRMUHr3TnmVFias=",
