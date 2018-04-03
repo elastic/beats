@@ -2660,6 +2660,121 @@ Elasticsearch cluster name.
 
 
 [float]
+== cluster.stats fields
+
+cluster_stats
+
+
+
+[float]
+=== `elasticsearch.cluster.stats.status`
+
+type: keyword
+
+Cluster status.
+
+
+[float]
+== indices fields
+
+Cluster indices.
+
+
+
+[float]
+=== `elasticsearch.cluster.stats.indices.count`
+
+type: long
+
+The count of all indices.
+
+
+[float]
+=== `elasticsearch.cluster.stats.indices.shards.total`
+
+type: long
+
+The count of all shards.
+
+
+[float]
+=== `elasticsearch.cluster.stats.indices.docs.count`
+
+type: long
+
+The count of all docs.    
+
+
+[float]
+=== `elasticsearch.cluster.stats.indices.segments.count`
+
+type: long
+
+The count of all segments.   
+
+
+[float]
+== nodes fields
+
+Cluster nodes.
+
+
+
+[float]
+=== `elasticsearch.cluster.stats.nodes.count.total`
+
+type: long
+
+The count of all nodes.
+
+
+[float]
+=== `elasticsearch.cluster.stats.nodes.jvm.mem.heap.used`
+
+type: long
+
+JVM memory heap used bytes.
+
+
+[float]
+=== `elasticsearch.cluster.stats.nodes.jvm.mem.heap.max`
+
+type: long
+
+JVM memory heap max bytes.
+
+
+[float]
+=== `elasticsearch.cluster.stats.nodes.fs.total.bytes`
+
+type: long
+
+format: bytes
+
+The total disk space in bytes.
+
+
+[float]
+=== `elasticsearch.cluster.stats.nodes.fs.free.bytes`
+
+type: long
+
+format: bytes
+
+The disk space free in bytes.
+
+
+[float]
+=== `elasticsearch.cluster.stats.nodes.fs.available.bytes`
+
+type: long
+
+format: bytes
+
+The disk space available in bytes.
+
+
+[float]
 == node fields
 
 node

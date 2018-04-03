@@ -1,0 +1,65 @@
+- name: cluster.stats
+  type: group
+  description: >
+    cluster_stats
+  release: beta  
+  fields:
+    - name: status
+      type: keyword
+      description: >
+        Cluster status.
+
+    - name: indices
+      type: group
+      description: >
+        Cluster indices.
+      fields:
+        - name: count
+          type: long
+          description: >
+            The count of all indices.
+        - name: shards.total
+          type: long
+          description: >
+            The count of all shards.
+        - name: docs.count
+          type: long
+          description: >
+            The count of all docs.    
+        - name: segments.count
+          type: long
+          description: >
+            The count of all segments.   
+                
+    - name: nodes
+      type: group
+      description: >
+        Cluster nodes.
+      fields:
+        - name: count.total
+          type: long
+          description: >
+            The count of all nodes.
+        - name: jvm.mem.heap.used
+          type: long
+          description: >
+            JVM memory heap used bytes.
+        - name: jvm.mem.heap.max
+          type: long
+          description: >
+            JVM memory heap max bytes.
+        - name: fs.total.bytes
+          type: long
+          format: bytes
+          description: >
+            The total disk space in bytes.
+        - name: fs.free.bytes
+          type: long
+          format: bytes
+          description: >
+            The disk space free in bytes.
+        - name: fs.available.bytes
+          type: long
+          format: bytes
+          description: >
+            The disk space available in bytes.

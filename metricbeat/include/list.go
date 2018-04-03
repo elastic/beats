@@ -36,6 +36,7 @@ import (
 	_ "github.com/elastic/beats/metricbeat/module/dropwizard"
 	_ "github.com/elastic/beats/metricbeat/module/dropwizard/collector"
 	_ "github.com/elastic/beats/metricbeat/module/elasticsearch"
+	_ "github.com/elastic/beats/metricbeat/module/elasticsearch/cluster_stats"
 	_ "github.com/elastic/beats/metricbeat/module/elasticsearch/node"
 	_ "github.com/elastic/beats/metricbeat/module/elasticsearch/node_stats"
 	_ "github.com/elastic/beats/metricbeat/module/etcd"

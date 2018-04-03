@@ -1,0 +1,5 @@
+=== Elasticsearch cluster_stats metricset
+
+The `cluster_stats` metricset interrogates the
+https://www.elastic.co/guide/en/elasticsearch/reference/master/cluster-stats.html[Cluster API endpoint] of
+Elasticsearch to get the cluster statistics. 
