@@ -53,11 +53,11 @@ func NewInput(
 		e.Event = beat.Event{
 			Timestamp: time.Now(),
 			Meta: common.MapStr{
-				"source":    metadata.Source.String(),
 				"truncated": metadata.Truncated,
 			},
 			Fields: common.MapStr{
 				"message": string(data),
+				"source":  metadata.Addr.String(),
 			},
 		}
 		forwarder.Send(e)
