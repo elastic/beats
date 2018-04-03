@@ -141,7 +141,7 @@ func (*parser) parseHTTPLine(s *stream, m *message) (cont, ok, complete bool) {
 	var version []byte
 	var err error
 	fline := s.data[s.parseOffset:i]
-	if len(fline) < 8 {
+	if len(fline) < 9 {
 		if isDebug {
 			debugf("First line too small")
 		}
