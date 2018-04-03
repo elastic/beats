@@ -29,7 +29,7 @@ type MetricSet struct {
 // Part of new is also setting up the configuration by processing additional
 // configuration entries if needed.
 func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
-	cfgwarn.Experimental("EXPERIMENTAL: The http server metricset is experimental")
+	cfgwarn.Beta("The http server metricset is beta")
 
 	config := defaultHttpServerConfig()
 	if err := base.Module().UnpackConfig(&config); err != nil {
