@@ -275,6 +275,7 @@ https://github.com/elastic/beats/compare/v6.0.0-beta2...master[Check the HEAD di
 - Mark kubernetes.event metricset as beta. {pull}6715[6715]
 - Set all metricsets as default metricsets in couchbase module. {pull}6683[6683]
 - Mark http.server metricset as beta. {pull}6712[6712]
+- Mark metricbeat logstash module and metricsets as beta. {pull}6713[6713]
 
 *Packetbeat*
 

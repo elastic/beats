@@ -32,7 +32,7 @@ type MetricSet struct {
 
 // New create a new instance of the MetricSet
 func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
-	cfgwarn.Experimental("The logstash node_stats metricset is experimental")
+	cfgwarn.Beta("The logstash node_stats metricset is beta")
 
 	http, err := helper.NewHTTP(base)
 	if err != nil {
