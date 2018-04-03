@@ -70,9 +70,9 @@ This file is generated! See scripts/docs_collector.py
 |<<metricbeat-metricset-kubernetes-state_statefulset,state_statefulset>>   
 |<<metricbeat-metricset-kubernetes-system,system>>   
 |<<metricbeat-metricset-kubernetes-volume,volume>>   
-|<<metricbeat-module-logstash,Logstash>>  experimental[]   |    
-.2+|   |<<metricbeat-metricset-logstash-node,node>> experimental[]  
-|<<metricbeat-metricset-logstash-node_stats,node_stats>> experimental[]  
+|<<metricbeat-module-logstash,Logstash>>  beta[]   |    
+.2+|   |<<metricbeat-metricset-logstash-node,node>> beta[]  
+|<<metricbeat-metricset-logstash-node_stats,node_stats>> beta[]  
 |<<metricbeat-module-memcached,Memcached>>  beta[]   |    
 .1+|   |<<metricbeat-metricset-memcached-stats,stats>> beta[]  
 |<<metricbeat-module-mongodb,MongoDB>>     |    
