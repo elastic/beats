@@ -150,6 +150,7 @@ metricbeat.modules:
   metricsets: ["bucket", "cluster", "node"]
   period: 10s
   hosts: ["localhost:8091"]
+  enabled: true
 
 #------------------------------- Docker Module -------------------------------
 - module: docker

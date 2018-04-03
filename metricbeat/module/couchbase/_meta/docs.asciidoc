@@ -1,2 +1,2 @@
 This module periodically fetches metrics from https://www.couchbase.com/[Couchbase]
-servers.
+servers. The default metricsets are `bucket`, `cluster`, `node`.
