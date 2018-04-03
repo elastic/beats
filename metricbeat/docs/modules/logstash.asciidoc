@@ -5,7 +5,7 @@ This file is generated! See scripts/docs_collector.py
 [[metricbeat-module-logstash]]
 == Logstash module
 
-experimental[]
+beta[]
 
 This is the Logstash module.
 
