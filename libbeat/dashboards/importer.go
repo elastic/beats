@@ -71,7 +71,7 @@ func (imp Importer) ImportDashboard(file string) error {
 }
 
 func (imp Importer) ImportFile(fileType string, file string) error {
-	imp.loader.statusMsg("Import %s from %s\n", fileType, file)
+	imp.loader.statusMsg("Import %s from %s", fileType, file)
 
 	if fileType == "dashboard" {
 		return imp.loader.ImportDashboard(file)
