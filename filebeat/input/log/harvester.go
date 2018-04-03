@@ -246,7 +246,7 @@ func (h *Harvester) Run() error {
 			case ErrInactive:
 				logp.Info("File is inactive: %s. Closing because close_inactive of %v reached.", h.state.Source, h.config.CloseInactive)
 			default:
-				logp.Err("Read line error: %s; File: ", err, h.state.Source)
+				logp.Err("Read line error: %v; File: %v", err, h.state.Source)
 			}
 			return nil
 		}
