@@ -49,7 +49,7 @@ This file is generated! See scripts/docs_collector.py
 |<<metricbeat-metricset-haproxy-stat,stat>>   
 |<<metricbeat-module-http,HTTP>>     |    
 .2+|   |<<metricbeat-metricset-http-json,json>>   
-|<<metricbeat-metricset-http-server,server>> experimental[]  
+|<<metricbeat-metricset-http-server,server>> beta[]  
 |<<metricbeat-module-jolokia,Jolokia>>     |    
 .1+|   |<<metricbeat-metricset-jolokia-jmx,jmx>>   
 |<<metricbeat-module-kafka,Kafka>>  beta[]   |    
