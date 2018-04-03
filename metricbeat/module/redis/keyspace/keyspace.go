@@ -17,9 +17,10 @@ var (
 )
 
 func init() {
-	if err := mb.Registry.AddMetricSet("redis", "keyspace", New, parse.PassThruHostParser); err != nil {
-		panic(err)
-	}
+	mb.Registry.MustAddMetricSet("redis", "keyspace", New,
+		mb.WithHostParser(parse.PassThruHostParser),
+		mb.DefaultMetricSet(),
+	)
 }
 
 // MetricSet for fetching Redis server information and statistics.
