@@ -9,6 +9,7 @@ beta[]
 
 The RabbitMQ module uses http://www.rabbitmq.com/management.html[HTTP API] created by the management plugin to collect metrics.
 
+The default metricsets are `connection`, `node` and `queue`.
 
 
 [float]
@@ -21,12 +22,7 @@ in <<configuration-metricbeat>>. Here is an example configuration:
 ----
 metricbeat.modules:
 - module: rabbitmq
-  metricsets: ["node", "queue", "connection"]
-  period: 10s
   hosts: ["localhost:15672"]
-
-  username: guest
-  password: guest
 ----
 
 This module supports TLS connection when using `ssl` config field, as described in <<configuration-ssl>>.
