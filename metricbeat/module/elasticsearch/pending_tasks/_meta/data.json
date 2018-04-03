@@ -1,0 +1,22 @@
+{
+    "@timestamp": "2018-04-02T13:53:10.360Z",
+    "beat": {
+        "name": "host.example.com",
+        "hostname": "host.example.com"
+    },
+    "elasticsearch": {
+      "pending_tasks": {
+        "insert_order": 101,
+        "priority": "URGENT",
+        "source": "create-index [foo_9], cause [api]",
+        "time_in_queue_millis": 86,
+        "time_in_queue": "86ms"
+      }
+    },
+    "metricset": {
+      "rtt": 73,
+      "name": "pending_tasks",
+      "module": "elasticsearch",
+      "host": "elasticsearch:9200"
+    }
+  }

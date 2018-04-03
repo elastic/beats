@@ -3020,6 +3020,53 @@ format: bytes
 
 
 
+[float]
+== pending_tasks fields
+
+pending_tasks
+
+
+
+[float]
+=== `elasticsearch.pending_tasks.insert_order`
+
+type: long
+
+Insert order
+
+
+[float]
+=== `elasticsearch.pending_tasks.priority`
+
+type: keyword
+
+Task's priority
+
+
+[float]
+=== `elasticsearch.pending_tasks.source`
+
+type: keyword
+
+Source of the task
+
+
+[float]
+=== `elasticsearch.pending_tasks.time_in_queue_millis`
+
+type: keyword
+
+Time in ms in the queue with unit
+
+
+[float]
+=== `elasticsearch.pending_tasks.time_in_queue`
+
+type: long
+
+Time in ms in the queue    
+
+
 [[exported-fields-etcd]]
 == Etcd fields
 

@@ -33,8 +33,9 @@ This file is generated! See scripts/docs_collector.py
 |<<metricbeat-module-dropwizard,Dropwizard>>  beta[]   |    
 .1+|   |<<metricbeat-metricset-dropwizard-collector,collector>> beta[]  
 |<<metricbeat-module-elasticsearch,Elasticsearch>>  beta[]   |    
-.2+|   |<<metricbeat-metricset-elasticsearch-node,node>> beta[]  
+.3+|   |<<metricbeat-metricset-elasticsearch-node,node>> beta[]  
 |<<metricbeat-metricset-elasticsearch-node_stats,node_stats>> beta[]  
+|<<metricbeat-metricset-elasticsearch-pending_tasks,pending_tasks>> experimental[]  
 |<<metricbeat-module-etcd,Etcd>>  beta[]   |    
 .3+|   |<<metricbeat-metricset-etcd-leader,leader>> beta[]  
 |<<metricbeat-metricset-etcd-self,self>> beta[]  

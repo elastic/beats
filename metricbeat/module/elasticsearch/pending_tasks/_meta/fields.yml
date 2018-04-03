@@ -1,0 +1,25 @@
+- name: pending_tasks
+  type: group
+  description: >
+    pending_tasks
+  fields:
+    - name: insert_order
+      type: long
+      description: >
+        Insert order
+    - name: priority
+      type: keyword
+      description: >
+        Task's priority
+    - name: source
+      type: keyword
+      description: >
+        Source of the task
+    - name: time_in_queue_millis
+      type: keyword
+      description: >
+        Time in ms in the queue with unit
+    - name: time_in_queue
+      type: long
+      description: >
+        Time in ms in the queue    
