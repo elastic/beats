@@ -444,6 +444,7 @@ metricbeat.modules:
 #-------------------------------- Redis Module -------------------------------
 - module: redis
   metricsets: ["info", "keyspace"]
+  enabled: true
   period: 10s
 
   # Redis hosts
