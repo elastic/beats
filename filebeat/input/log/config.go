@@ -97,6 +97,7 @@ type LogConfig struct {
 	CloseRenamed  bool          `config:"close_renamed"`
 	CloseEOF      bool          `config:"close_eof"`
 	CloseTimeout  time.Duration `config:"close_timeout" validate:"min=0"`
+	CloseCheck    time.Duration `config:"close_check" validate:"min=0"`
 }
 
 // Contains available scan options
