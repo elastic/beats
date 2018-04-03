@@ -98,6 +98,11 @@ packetbeat.protocols:
   # the TLS protocol by commenting out the list of ports.
   ports: [443]
 
+- type: sip
+  # Configure the ports where to listen for SIP traffic. You can disable
+  # the SIP protocol by commenting out the list of ports.
+  ports: [5060]
+
 #==================== Elasticsearch template setting ==========================
 
 setup.template.settings:

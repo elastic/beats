@@ -2072,3 +2072,93 @@
                   type: keyword
                   description: >
                     The JA3 string used to calculate the hash.
+
+- key: sip
+  title: "SIP"
+  description: SIP-specific event fields.
+  fields:
+    # general
+    - name: type
+      type: keyword
+      description: >
+        Must be 'sip'
+
+    - name: "@timestamp"
+      type: date
+
+    # general
+    - name: sip.src
+      type: keyword
+      description: >
+        Source IP address and port
+      example: 192.168.0.1:5060
+
+    - name: sip.dst
+      type: keyword
+      description: >
+        Destination IP address and port
+      example: 192.168.0.1:5060
+
+    - name: sip.unixtimenano
+      type: long
+      description: >
+        unixtime as nanosec
+      example: 1516199666016756000
+
+    - name: sip.transport
+      type: keyword
+      description: >
+        transport protocol(udp,tcp)
+      example: tcp
+
+     #in case Request
+    - name: sip.method
+      type: keyword
+      description: >
+        SIP Request Method
+      example: INVITE
+
+    - name: sip.request-uri
+      type: keyword
+      description: >
+        SIP Request URI
+      example: sip:hoge@example.com:5060;transport=udp
+
+    # in case Response
+    - name: sip.status-code
+      type: long
+      description: >
+        SIP Response code, status code
+      example: 200
+
+    - name: sip.status-phrase
+      type: keyword
+      description: >
+        SIP Response , status phrase
+      example: OK
+
+    # mandatory headers
+    - name: sip.from
+      type: keyword
+      description: >
+        SIP From header value
+      example: "\"sipp\" <sip:sipp@10.0.0.1>;tag=2363SIPpTag001"
+
+    - name: sip.to
+      type: keyword
+      description: >
+        SIP To header value
+      example: "\"sut\" <sip:6505550252@192.168.0.1>;tag=16489SIPpTag012"
+
+    - name: sip.call-id
+      type: keyword
+      description: >
+        SIP Call-ID header value
+      example: ""
+
+    - name: sip.cseq
+      type: keyword
+      description: >
+        SIP CSeq header value
+      example: 1 INVITE
+

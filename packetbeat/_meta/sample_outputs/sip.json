@@ -1,0 +1,76 @@
+{
+    "@timestamp": "2018-01-17T05:36:15.635Z",
+    "beat": {
+        "hostname": "server",
+        "name": "server",
+        "version": "7.0.0-alpha1"
+    },
+    "body": {
+        "application/sdp": {
+            "a": [
+                "rtpmap:0 PCMU/8000"
+            ],
+            "c": [
+                "IN IP4 192.168.0.20"
+            ],
+            "m": [
+                "audio 6000 RTP/AVP 0"
+            ],
+            "o": [
+                "user1 53655765 2353687637 IN IP4 192.168.0.20"
+            ],
+            "s": [
+                "-"
+            ],
+            "t": [
+                "0 0"
+            ],
+            "v": [
+                "0"
+            ]
+        }
+    },
+    "call_id": "723-13253@192.168.0.20",
+    "cseq": "1 INVITE",
+    "dst": "192.168.0.10:5060",
+    "from": "sipp <sip:sipp@192.168.0.20:5060>;tag=13253SIPpTag00723",
+    "headers": {
+        "call-id": [
+            "723-13253@192.168.0.20"
+        ],
+        "contact": [
+            "sip:sipp@192.168.0.20:5060"
+        ],
+        "content-length": [
+            "135"
+        ],
+        "content-type": [
+            "application/sdp"
+        ],
+        "cseq": [
+            "1 INVITE"
+        ],
+        "from": [
+            "sipp <sip:sipp@192.168.0.20:5060>;tag=13253SIPpTag00723"
+        ],
+        "max-forwards": [
+            "70"
+        ],
+        "subject": [
+            "Performance Test"
+        ],
+        "to": [
+            "service <sip:service@192.168.0.10:5060>"
+        ],
+        "via": [
+            "SIP/2.0/UDP 192.168.0.20:5060;branch=z9hG4bK-13253-723-0"
+        ]
+    },
+    "method": "INVITE",
+    "raw": "INVITE sip:service@192.168.0.10:5060 SIP/2.0\r\nVia: SIP/2.0/UDP 192.168.0.20:5060;branch=z9hG4bK-13253-723-0\r\nFrom: sipp <sip:sipp@192.168.0.20:5060>;tag=13253SIPpTag00723\r\nTo: service <sip:service@192.168.0.10:5060>\r\nCall-ID: 723-13253@192.168.0.20\r\nCSeq: 1 INVITE\r\nContact: sip:sipp@192.168.0.20:5060\r\nMax-Forwards: 70\r\nSubject: Performance Test\r\nContent-Type: application/sdp\r\nContent-Length:   135\r\n\r\nv=0\r\no=user1 53655765 2353687637 IN IP4 192.168.0.20\r\ns=-\r\nc=IN IP4 192.168.0.20\r\nt=0 0\r\nm=audio 6000 RTP/AVP 0\r\na=rtpmap:0 PCMU/8000\r\n",
+    "request_uri": "sip:service@192.168.0.10:5060",
+    "src": "192.168.0.20:5060",
+    "to": "service <sip:service@192.168.0.10:5060>",
+    "transport": "udp",
+    "type": "sip"
+}

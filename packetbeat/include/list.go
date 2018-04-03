@@ -19,6 +19,7 @@ import (
 	_ "github.com/elastic/beats/packetbeat/protos/nfs"
 	_ "github.com/elastic/beats/packetbeat/protos/pgsql"
 	_ "github.com/elastic/beats/packetbeat/protos/redis"
+	_ "github.com/elastic/beats/packetbeat/protos/sip"
 	_ "github.com/elastic/beats/packetbeat/protos/tcp"
 	_ "github.com/elastic/beats/packetbeat/protos/thrift"
 	_ "github.com/elastic/beats/packetbeat/protos/tls"
