@@ -145,5 +145,4 @@ a=rtpmap:0 PCMU/8000
 * More body parser.
  - ISUP(SIP-I/SIP-T)
  - multipart/form-data boundary
-* その他いろいろ思いついたら追記する
 
