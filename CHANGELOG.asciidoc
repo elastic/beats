@@ -364,6 +364,7 @@ https://github.com/elastic/beats/compare/v6.0.1...v6.1.0[View commits]
 - Add experimental Docker autodiscover functionality. {pull}5245[5245]
 - Add Windows service metricset in the windows module. {pull}5332[5332]
 - Update gosigar to v0.6.0. {pull}5775[5775]
+- Add support for wildcards and explicit metrics grouping in jolokia/jmx. {pull}6462[6462]
 
 *Packetbeat*
 
