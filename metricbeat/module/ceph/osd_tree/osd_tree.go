@@ -21,9 +21,10 @@ var (
 )
 
 func init() {
-	if err := mb.Registry.AddMetricSet("ceph", "osd_tree", New, hostParser); err != nil {
-		panic(err)
-	}
+	mb.Registry.MustAddMetricSet("ceph", "osd_tree", New,
+		mb.WithHostParser(hostParser),
+		mb.DefaultMetricSet(),
+	)
 }
 
 type MetricSet struct {
