@@ -64,14 +64,14 @@ func TestReceiveEventFromUDP(t *testing.T) {
 			assert.Equal(t, test.expected, info.message)
 			if runtime.GOOS == "windows" {
 				if len(test.expected) < len(test.message) {
-					assert.Nil(t, info.mt.Source)
+					assert.Nil(t, info.mt.RemoteAddr)
 					assert.True(t, info.mt.Truncated)
 				} else {
-					assert.NotNil(t, info.mt.Source)
+					assert.NotNil(t, info.mt.RemoteAddr)
 					assert.False(t, info.mt.Truncated)
 				}
 			} else {
-				assert.NotNil(t, info.mt.Source)
+				assert.NotNil(t, info.mt.RemoteAddr)
 				assert.False(t, info.mt.Truncated)
 			}
 		})

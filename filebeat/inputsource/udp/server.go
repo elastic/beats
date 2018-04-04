@@ -16,8 +16,8 @@ const windowErrBuffer = "A message sent on a datagram socket was larger than the
 
 // Metadata contains formations about the packet.
 type Metadata struct {
-	Addr      net.Addr
-	Truncated bool
+	RemoteAddr net.Addr
+	Truncated  bool
 }
 
 // Config options for the UDPServer
@@ -93,13 +93,13 @@ func (u *Server) run() {
 			// On Windows send the current buffer and mark it as truncated.
 			// The buffer will have content but length will return 0, addr will be nil.
 			if isLargerThanBuffer(err) {
-				u.callback(buffer, Metadata{Addr: addr, Truncated: true})
+				u.callback(buffer, Metadata{RemoteAddr: addr, Truncated: true})
 				continue
 			}
 		}
 
 		if length > 0 {
-			u.callback(buffer[:length], Metadata{Addr: addr})
+			u.callback(buffer[:length], Metadata{RemoteAddr: addr})
 		}
 	}
 }
