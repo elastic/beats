@@ -75,6 +75,7 @@ of targets and stores the round trip time (RTT) in Elasticsearch.
 https://github.com/carlpett/prombeat[prombeat]:: Indexes https://prometheus.io[Prometheus] metrics.
 https://github.com/infonova/prometheusbeat[prometheusbeat]:: Send Prometheus metrics to Elasticsearch via the remote write feature.
 https://github.com/hartfordfive/protologbeat[protologbeat]:: Accepts structured and unstructured logs via UDP or TCP.  Can also be used to receive syslog messages or GELF formatted messages. (To be used as a successor to udplogbeat)
+https://github.com/GoogleCloudPlatform/pubsubbeat[pubsubbeat]:: Reads data from https://cloud.google.com/pubsub/[Google Cloud Pub/Sub].
 https://github.com/voigt/redditbeat[redditbeat]:: Collects new Reddit Submissions of one or multiple Subreddits.
 https://github.com/chrsblck/redisbeat[redisbeat]:: Used for Redis monitoring.
 https://github.com/consulthys/retsbeat[retsbeat]:: Collects counts of http://www.reso.org[RETS] resource/class records from https://en.wikipedia.org/wiki/Multiple_listing_service[Multiple Listing Service] (MLS) servers.
