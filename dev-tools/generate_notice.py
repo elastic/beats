@@ -216,7 +216,7 @@ def detect_license_summary(content):
     # replace all white spaces with a single space
     content = re.sub(r"\s+", ' ', content)
     # replace smart quotes with less intelligent ones
-    content = content.replace(b'\xe2\x80\x9c', '"').replace(b'\xe2\x80\x9d', '"')
+    content = content.replace(b'\xe2\x80\x9c'.decode("utf-8"), '"').replace(b'\xe2\x80\x9d'.decode("utf-8"), '"')
     if any(sentence in content[0:1000] for sentence in APACHE2_LICENSE_TITLES):
         return "Apache-2.0"
     if any(sentence in content[0:1000] for sentence in MIT_LICENSES):
