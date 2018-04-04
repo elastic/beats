@@ -89,11 +89,11 @@ func (p *Input) Run() {
 
 // Stop stops TCP server
 func (p *Input) Stop() {
-	p.log.Info("Stopping TCP input")
 	defer p.outlet.Close()
 	p.Lock()
 	defer p.Unlock()
 
+	p.log.Info("Stopping TCP input")
 	p.server.Stop()
 	p.started = false
 }
