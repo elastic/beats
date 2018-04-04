@@ -7,7 +7,7 @@ This file is generated! See scripts/docs_collector.py
 
 beta[]
 
-This is the http://dropwizard.io[Dropwizard] module.
+This is the http://dropwizard.io[Dropwizard] module. The default metricset is `collector`.
 
 
 
@@ -21,8 +21,6 @@ in <<configuration-metricbeat>>. Here is an example configuration:
 ----
 metricbeat.modules:
 - module: dropwizard
-  metricsets: ["collector"]
-  period: 10s
   hosts: ["localhost:8080"]
   metrics_path: /metrics/metrics
   namespace: example

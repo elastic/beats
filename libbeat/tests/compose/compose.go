@@ -11,6 +11,8 @@ import (
 	"testing"
 	"time"
 
+	"strconv"
+
 	"github.com/docker/libcompose/docker"
 	"github.com/docker/libcompose/docker/ctx"
 	"github.com/docker/libcompose/project"
@@ -43,6 +45,12 @@ func EnsureUp(t *testing.T, services ...string) {
 // EnsureUpWithTimeout starts all the requested services (must be defined in docker-compose.yml)
 // Wait for `timeout` seconds for health
 func EnsureUpWithTimeout(t *testing.T, timeout int, services ...string) {
+	// The NO_COMPOSE env variables makes it possible to skip the starting of the environment.
+	// This is useful if the service is already running locally.
+	if noCompose, err := strconv.ParseBool(os.Getenv("NO_COMPOSE")); err == nil && noCompose {
+		return
+	}
+
 	compose, err := getComposeProject()
 	if err != nil {
 		t.Fatal(err)
