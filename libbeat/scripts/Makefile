@@ -230,6 +230,7 @@ python-env: ${ES_BEATS}/libbeat/tests/system/requirements.txt
 	else \
 		. ${PYTHON_ENV}/bin/activate && pip install ${PIP_INSTALL_PARAMS} -qUr ${ES_BEATS}/libbeat/tests/system/requirements.txt ; \
 	fi
+	# Work around pip bug. See: https://github.com/pypa/pip/issues/4464
 	find ${PYTHON_ENV} -type d -name 'dist-packages' -exec sh -c "echo dist-packages > {}.pth" ';'
 
 .PHONY: test
