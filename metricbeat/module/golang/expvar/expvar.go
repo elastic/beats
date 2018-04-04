@@ -44,7 +44,7 @@ type MetricSet struct {
 // Part of new is also setting up the configuration by processing additional
 // configuration entries if needed.
 func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
-	cfgwarn.Experimental("The golang expvar metricset is experimental")
+	cfgwarn.Beta("The golang expvar metricset is beta")
 
 	config := struct {
 		Namespace string `config:"expvar.namespace" validate:"required"`
