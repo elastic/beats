@@ -11,9 +11,9 @@ import (
 )
 
 func init() {
-	if err := mb.Registry.AddMetricSet("memcached", "stats", New); err != nil {
-		panic(err)
-	}
+	mb.Registry.MustAddMetricSet("memcached", "stats", New,
+		mb.DefaultMetricSet(),
+	)
 }
 
 type MetricSet struct {
