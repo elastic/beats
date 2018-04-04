@@ -10,6 +10,8 @@ beta[]
 This module periodically fetches metrics from
 https://prometheus.io/docs/[Prometheus].
 
+The default metricset is `collector`.
+
 
 [float]
 === Example configuration
@@ -21,10 +23,8 @@ in <<configuration-metricbeat>>. Here is an example configuration:
 ----
 metricbeat.modules:
 - module: prometheus
-  metricsets: ["stats"]
   period: 10s
   hosts: ["localhost:9090"]
-  metrics_path: /metrics
   #namespace: example
 ----
 
