@@ -1,6 +1,7 @@
 package tcp
 
 import (
+	"sync"
 	"time"
 
 	"github.com/elastic/beats/filebeat/channel"
@@ -10,7 +11,6 @@ import (
 	"github.com/elastic/beats/filebeat/util"
 	"github.com/elastic/beats/libbeat/beat"
 	"github.com/elastic/beats/libbeat/common"
-	"github.com/elastic/beats/libbeat/common/atomic"
 	"github.com/elastic/beats/libbeat/common/cfgwarn"
 	"github.com/elastic/beats/libbeat/logp"
 )
@@ -24,8 +24,9 @@ func init() {
 
 // Input for TCP connection
 type Input struct {
+	sync.Mutex
 	server  *tcp.Server
-	started atomic.Bool
+	started bool
 	outlet  channel.Outleter
 	config  *config
 	log     *logp.Logger
@@ -64,7 +65,7 @@ func NewInput(
 
 	return &Input{
 		server:  server,
-		started: atomic.MakeBool(false),
+		started: false,
 		outlet:  out,
 		config:  &config,
 		log:     logp.NewLogger("tcp input").With(config.Config.Host),
@@ -73,13 +74,16 @@ func NewInput(
 
 // Run start a TCP input
 func (p *Input) Run() {
-	if !p.started.Load() {
+	p.Lock()
+	defer p.Unlock()
+
+	if !p.started {
 		p.log.Info("Starting TCP input")
 		err := p.server.Start()
 		if err != nil {
 			p.log.Errorw("Error starting the TCP server", "error", err)
 		}
-		p.started.Swap(true)
+		p.started = true
 	}
 }
 
@@ -87,8 +91,11 @@ func (p *Input) Run() {
 func (p *Input) Stop() {
 	p.log.Info("Stopping TCP input")
 	defer p.outlet.Close()
-	defer p.started.Swap(false)
+	p.Lock()
+	defer p.Unlock()
+
 	p.server.Stop()
+	p.started = false
 }
 
 // Wait stop the current server
