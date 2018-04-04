@@ -202,7 +202,6 @@ metricbeat.modules:
   period: 10s
   hosts: ["localhost:2379"]
 
-
 #------------------------------- Golang Module -------------------------------
 - module: golang
   metricsets: ["expvar","heap"]
