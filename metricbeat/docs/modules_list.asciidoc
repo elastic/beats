@@ -115,8 +115,8 @@ This file is generated! See scripts/docs_collector.py
 |<<metricbeat-metricset-system-raid,raid>> beta[]  
 |<<metricbeat-metricset-system-socket,socket>> beta[]  
 |<<metricbeat-metricset-system-uptime,uptime>>   
-|<<metricbeat-module-uwsgi,uwsgi>>  experimental[]   |    
-.1+|   |<<metricbeat-metricset-uwsgi-status,status>> experimental[]  
+|<<metricbeat-module-uwsgi,uwsgi>>  beta[]   |    
+.1+|   |<<metricbeat-metricset-uwsgi-status,status>> beta[]  
 |<<metricbeat-module-vsphere,vSphere>>  beta[]   |    
 .3+|   |<<metricbeat-metricset-vsphere-datastore,datastore>> beta[]  
 |<<metricbeat-metricset-vsphere-host,host>> beta[]  
