@@ -3,23 +3,23 @@
   description: >
     pending_tasks
   fields:
-    - name: insert_order
+    - name: max_time_in_queue_millis
       type: long
       description: >
-        Insert order
-    - name: priority
-      type: keyword
+        Max time in queue (ms)
+    - name: pending_tasks_priority_high
+      type: long
       description: >
-        Task's priority
+        Number of pending tasks in priority high
+    - name: pending_tasks_priority_urgent
+      type: long
+      description: >
+        Number of pending tasks in priority urgent
+    - name: pending_tasks_total
+      type: long
+      description: >
+        Number of pendings tasks (total)
     - name: source
-      type: keyword
+      type: array
       description: >
-        Source of the task
-    - name: time_in_queue_millis
-      type: keyword
-      description: >
-        Time in ms in the queue with unit
-    - name: time_in_queue
-      type: long
-      description: >
-        Time in ms in the queue    
+        List of the pending tasks   

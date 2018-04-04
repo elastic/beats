@@ -3028,43 +3028,43 @@ pending_tasks
 
 
 [float]
-=== `elasticsearch.pending_tasks.insert_order`
+=== `elasticsearch.pending_tasks.max_time_in_queue_millis`
 
 type: long
 
-Insert order
+Max time in queue (ms)
 
 
 [float]
-=== `elasticsearch.pending_tasks.priority`
+=== `elasticsearch.pending_tasks.pending_tasks_priority_high`
 
-type: keyword
+type: long
 
-Task's priority
+Number of pending tasks in priority high
+
+
+[float]
+=== `elasticsearch.pending_tasks.pending_tasks_priority_urgent`
+
+type: long
+
+Number of pending tasks in priority urgent
+
+
+[float]
+=== `elasticsearch.pending_tasks.pending_tasks_total`
+
+type: long
+
+Number of pendings tasks (total)
 
 
 [float]
 === `elasticsearch.pending_tasks.source`
 
-type: keyword
+type: array
 
-Source of the task
-
-
-[float]
-=== `elasticsearch.pending_tasks.time_in_queue_millis`
-
-type: keyword
-
-Time in ms in the queue with unit
-
-
-[float]
-=== `elasticsearch.pending_tasks.time_in_queue`
-
-type: long
-
-Time in ms in the queue    
+List of the pending tasks   
 
 
 [[exported-fields-etcd]]

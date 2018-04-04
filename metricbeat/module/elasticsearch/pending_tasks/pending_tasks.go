@@ -6,6 +6,7 @@ import (
 	"github.com/elastic/beats/metricbeat/helper"
 	"github.com/elastic/beats/metricbeat/mb"
 	"github.com/elastic/beats/metricbeat/mb/parse"
+	"github.com/elastic/beats/metricbeat/module/elasticsearch"
 )
 
 // init registers the MetricSet with the central registry.
@@ -28,7 +29,8 @@ var (
 // interface methods except for Fetch.
 type MetricSet struct {
 	mb.BaseMetricSet
-	http *helper.HTTP
+	http   *helper.HTTP
+	source bool
 }
 
 // New creates a new instance of the MetricSet. New is responsible for unpacking
@@ -41,20 +43,31 @@ func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
 		return nil, err
 	}
 
+	config := elasticsearch.DefaultConfig()
+	if err := base.Module().UnpackConfig(&config); err != nil {
+		return nil, err
+	}
+
 	return &MetricSet{
 		base,
 		http,
+		config.Source,
 	}, nil
 }
 
 // Fetch methods implements the data gathering and data conversion to the right format
-func (m *MetricSet) Fetch() ([]common.MapStr, error) {
+func (m *MetricSet) Fetch() (common.MapStr, error) {
 	content, err := m.http.FetchContent()
 	if err != nil {
 		return nil, err
 	}
 
-	events, _ := eventsMapping([]byte(content))
+	event, _ := eventMapping(content)
 
-	return events, nil
+	if m.source {
+		events, _ := eventsMapping(content)
+		event.Put("source", events)
+	}
+
+	return event, nil
 }
