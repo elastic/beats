@@ -6,7 +6,7 @@ import (
 	"github.com/elastic/beats/libbeat/beat"
 	"github.com/elastic/beats/libbeat/common"
 	"github.com/elastic/beats/libbeat/processors"
-	sysinfo "github.com/elastic/go-sysinfo"
+	"github.com/elastic/go-sysinfo"
 	"github.com/elastic/go-sysinfo/types"
 )
 
