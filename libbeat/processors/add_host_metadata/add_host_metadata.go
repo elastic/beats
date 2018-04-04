@@ -48,7 +48,7 @@ func (p *addHostMetadata) loadData() {
 	if p.lastUpdate.Add(cacheExpiration).Before(time.Now()) {
 		p.data = common.MapStr{
 			"host": common.MapStr{
-				"hostname":     p.info.Hostname,
+				"name":         p.info.Hostname,
 				"architecture": p.info.Architecture,
 				"os": common.MapStr{
 					"platform": p.info.OS.Platform,
