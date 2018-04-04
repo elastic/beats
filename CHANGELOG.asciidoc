@@ -93,6 +93,7 @@ https://github.com/elastic/beats/compare/v6.0.0-beta2...master[Check the HEAD di
 - Add add_host_metadata processor {pull}5968[5968]
 - Retry configuration to load dashboards if Kibana is not reachable when the beat starts. {pull}6560[6560]
 - Add support for spooling to disk to the beats event publishing pipeline. {pull}6581[6581]
+- Added logging of system info at Beat startup. {issue}5946[5946]
 
 *Auditbeat*
 
