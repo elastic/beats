@@ -116,6 +116,7 @@ https://github.com/elastic/beats/compare/v6.0.0-beta2...master[Check the HEAD di
 - Fix variable name for `convert_timezone` in the system module. {pull}5936[5936]
 - Fix a conversion issue for time related fields in the Logstash module for the slowlog
   fileset. {issue}6317[6317]
+- Add missing %s to format string in error reporting of log input. {pull}6754[6754]
 
 *Heartbeat*
 
