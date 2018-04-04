@@ -13,9 +13,9 @@ import (
 
 // init registers the MetricSet with the central registry.
 func init() {
-	if err := mb.Registry.AddMetricSet("kafka", "consumergroup", New); err != nil {
-		panic(err)
-	}
+	mb.Registry.MustAddMetricSet("kafka", "consumergroup", New,
+		mb.DefaultMetricSet(),
+	)
 }
 
 // MetricSet type defines all fields of the MetricSet

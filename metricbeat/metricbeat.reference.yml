@@ -283,9 +283,10 @@ metricbeat.modules:
 
 #-------------------------------- Kafka Module -------------------------------
 - module: kafka
-  metricsets: ["partition"]
+  metricsets: ["consumergroup", "partition"]
   period: 10s
   hosts: ["localhost:9092"]
+  enabled: true
 
   #client_id: metricbeat
   #retries: 3
