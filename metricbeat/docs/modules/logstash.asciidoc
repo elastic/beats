@@ -9,6 +9,7 @@ beta[]
 
 This is the Logstash module.
 
+The default metricsets are `node` and `node_stats`.
 
 
 [float]
@@ -21,11 +22,7 @@ in <<configuration-metricbeat>>. Here is an example configuration:
 ----
 metricbeat.modules:
 - module: logstash
-  metricsets: ["node", "node_stats"]
-  enabled: false
-  period: 10s
   hosts: ["localhost:9600"]
-
 ----
 
 This module supports TLS connection when using `ssl` config field, as described in <<configuration-ssl>>.

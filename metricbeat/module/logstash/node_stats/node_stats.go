@@ -20,6 +20,7 @@ func init() {
 	mb.Registry.MustAddMetricSet(moduleName, metricsetName, New,
 		mb.WithHostParser(hostParser),
 		mb.WithNamespace(namespace),
+		mb.DefaultMetricSet(),
 	)
 }
 
