@@ -17,9 +17,10 @@ import (
 
 // init registers the partition MetricSet with the central registry.
 func init() {
-	if err := mb.Registry.AddMetricSet("kafka", "partition", New, parse.PassThruHostParser); err != nil {
-		panic(err)
-	}
+	mb.Registry.MustAddMetricSet("kafka", "partition", New,
+		mb.WithHostParser(parse.PassThruHostParser),
+		mb.DefaultMetricSet(),
+	)
 }
 
 // MetricSet type defines all fields of the partition MetricSet
