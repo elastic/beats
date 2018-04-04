@@ -314,6 +314,7 @@ metricbeat.modules:
   metricsets: ["status"]
   period: 10s
   hosts: ["localhost:5601"]
+  enabled: default
 
 #----------------------------- Kubernetes Module -----------------------------
 # Node metrics, from kubelet:
