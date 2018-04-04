@@ -110,3 +110,61 @@ type procVnodePathInfo struct {
 	Cdir vnodeInfoPath
 	Rdir vnodeInfoPath
 }
+
+type vmStatisticsData struct {
+	Free_count        uint32
+	Active_count      uint32
+	Inactive_count    uint32
+	Wire_count        uint32
+	Zero_fill_count   uint32
+	Reactivations     uint32
+	Pageins           uint32
+	Pageouts          uint32
+	Faults            uint32
+	Cow_faults        uint32
+	Lookups           uint32
+	Hits              uint32
+	Purgeable_count   uint32
+	Purges            uint32
+	Speculative_count uint32
+}
+
+type vmStatistics64Data struct {
+	Free_count                             uint32
+	Active_count                           uint32
+	Inactive_count                         uint32
+	Wire_count                             uint32
+	Zero_fill_count                        uint64
+	Reactivations                          uint64
+	Pageins                                uint64
+	Pageouts                               uint64
+	Faults                                 uint64
+	Cow_faults                             uint64
+	Lookups                                uint64
+	Hits                                   uint64
+	Purges                                 uint64
+	Purgeable_count                        uint32
+	Speculative_count                      uint32
+	Decompressions                         uint64
+	Compressions                           uint64
+	Swapins                                uint64
+	Swapouts                               uint64
+	Compressor_page_count                  uint32
+	Throttled_count                        uint32
+	External_page_count                    uint32
+	Internal_page_count                    uint32
+	Total_uncompressed_pages_in_compressor uint64
+}
+
+type vmSize uint64
+
+const (
+	cpuStateUser   = 0x0
+	cpuStateSystem = 0x1
+	cpuStateIdle   = 0x2
+	cpuStateNice   = 0x3
+)
+
+type hostCPULoadInfo struct {
+	Ticks [4]uint32
+}
