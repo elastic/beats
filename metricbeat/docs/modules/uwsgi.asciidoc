@@ -5,7 +5,7 @@ This file is generated! See scripts/docs_collector.py
 [[metricbeat-module-uwsgi]]
 == uwsgi module
 
-experimental[]
+beta[]
 
 == uwsgi module
 
