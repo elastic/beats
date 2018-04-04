@@ -1,6 +1,7 @@
 package udp
 
 import (
+	"sync"
 	"time"
 
 	"github.com/elastic/beats/filebeat/channel"
@@ -10,7 +11,6 @@ import (
 	"github.com/elastic/beats/filebeat/util"
 	"github.com/elastic/beats/libbeat/beat"
 	"github.com/elastic/beats/libbeat/common"
-	"github.com/elastic/beats/libbeat/common/atomic"
 	"github.com/elastic/beats/libbeat/common/cfgwarn"
 	"github.com/elastic/beats/libbeat/logp"
 )
@@ -24,8 +24,9 @@ func init() {
 
 // Input defines a udp input to receive event on a specific host:port.
 type Input struct {
+	sync.Mutex
 	udp     *udp.Server
-	started atomic.Bool
+	started bool
 	outlet  channel.Outleter
 }
 
@@ -68,28 +69,34 @@ func NewInput(
 	return &Input{
 		outlet:  out,
 		udp:     udp,
-		started: atomic.MakeBool(false),
+		started: false,
 	}, nil
 }
 
 // Run starts and start the UDP server and read events from the socket
 func (p *Input) Run() {
-	if !p.started.Load() {
+	p.Lock()
+	defer p.Unlock()
+
+	if !p.started {
 		logp.Info("Starting UDP input")
 		err := p.udp.Start()
 		if err != nil {
 			logp.Err("Error running harvester: %v", err)
 		}
-		p.started.Swap(true)
+		p.started = true
 	}
 }
 
 // Stop stops the UDP input
 func (p *Input) Stop() {
 	defer p.outlet.Close()
-	defer p.started.Swap(false)
+	p.Lock()
+	defer p.Unlock()
+
 	logp.Info("Stopping UDP input")
 	p.udp.Stop()
+	p.started = false
 }
 
 // Wait suspends the UDP input
