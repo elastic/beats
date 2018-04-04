@@ -368,6 +368,7 @@ metricbeat.modules:
 - module: mongodb
   metricsets: ["dbstats", "status"]
   period: 10s
+  enabled: true
 
   # The hosts must be passed as MongoDB URLs in the format:
   # [mongodb://][user:pass@]host[:port].
