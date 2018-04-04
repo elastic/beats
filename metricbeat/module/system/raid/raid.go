@@ -14,9 +14,9 @@ import (
 )
 
 func init() {
-	if err := mb.Registry.AddMetricSet("system", "raid", New, parse.EmptyHostParser); err != nil {
-		panic(err)
-	}
+	mb.Registry.MustAddMetricSet("system", "raid", New,
+		mb.WithHostParser(parse.EmptyHostParser),
+	)
 }
 
 // MetricSet contains proc fs data.
