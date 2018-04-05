@@ -7,11 +7,12 @@ import (
 	"net"
 	"testing"
 
+	"github.com/stretchr/testify/assert"
+
 	"github.com/elastic/beats/libbeat/common"
 	"github.com/elastic/beats/libbeat/logp"
 	"github.com/elastic/beats/packetbeat/protos"
 	"github.com/elastic/beats/packetbeat/publish"
-	"github.com/stretchr/testify/assert"
 )
 
 // Helper function returning a Mongodb module that can be used
@@ -332,4 +333,32 @@ func TestMaxDocSize(t *testing.T) {
 	res := expectTransaction(t, mongodb)
 
 	assert.Equal(t, "\"1234 ...\n\"123\"\n\"12\"", res["response"])
+}
+
+// Test for a (recovered) panic parsing document length in request/response messages
+func TestDocumentLengthBoundsChecked(t *testing.T) {
+	if testing.Verbose() {
+		logp.LogInit(logp.LOG_DEBUG, "", false, true, []string{"mongodb", "mongodbdetailed"})
+	}
+
+	mongodb := mongodbModForTests()
+
+	// request and response from tests/pcaps/mongo_one_row.pcap
+	reqData, err := hex.DecodeString(
+		// Request message with out of bounds document
+		"320000000a000000ffffffffd4070000" +
+			"00000000746573742e72667374617572" +
+			"616e7473000000000001000000" +
+			// Document length (including itself)
+			"06000000" +
+			// Document (1 byte instead of 2)
+			"00")
+	assert.Nil(t, err)
+
+	tcptuple := testTCPTuple()
+	req := protos.Packet{Payload: reqData}
+	private := protos.ProtocolData(new(mongodbConnectionData))
+
+	private = mongodb.Parse(&req, tcptuple, 0, private)
+	assert.NotNil(t, private, "mongodb parser recovered from a panic")
 }
