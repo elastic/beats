@@ -16,4 +16,4 @@
         - name: message
           type: text
           description: >
-            The actual desriptive message for this event.
+            The actual descriptive message for this event.

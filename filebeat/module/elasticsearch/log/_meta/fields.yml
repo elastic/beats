@@ -73,7 +73,7 @@
       - name: total_duration
         description: Total amount of time spent on all collections.
         type: keyword
-  - name: old_heap_use
+    - name: old_heap_use
       description: Previous heap usage total.
       type: keyword
     - name: new_heap_use
