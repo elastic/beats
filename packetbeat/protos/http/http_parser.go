@@ -4,6 +4,7 @@ import (
 	"bytes"
 	"errors"
 	"fmt"
+	"strconv"
 	"time"
 	"unicode"
 
@@ -20,7 +21,6 @@ type message struct {
 	version          version
 	connection       common.NetString
 	chunkedLength    int
-	chunkedBody      []byte
 
 	isRequest    bool
 	tcpTuple     common.TCPTuple
@@ -38,18 +38,21 @@ type message struct {
 	contentLength    int
 	contentType      common.NetString
 	transferEncoding common.NetString
+	isChunked        bool
 	headers          map[string]common.NetString
 	size             uint64
 
-	//Raw Data
-	raw []byte
+	rawHeaders []byte
+
+	// sendBody determines if the body must be sent along with the event
+	// because the content-type is included in the send_body_for setting.
+	sendBody bool
+	// saveBody determines if the body must be saved. It is set when sendBody
+	// is true or when the body type is form-urlencoded.
+	saveBody bool
+	body     []byte
 
 	notes []string
-
-	//Offsets
-	start      int
-	end        int
-	bodyOffset int
 
 	next *message
 }
@@ -68,6 +71,7 @@ type parserConfig struct {
 	sendHeaders      bool
 	sendAllHeaders   bool
 	headersWhitelist map[string]bool
+	includeBodyFor   []string
 }
 
 var (
@@ -130,7 +134,6 @@ func (parser *parser) parse(s *stream, extraMsgSize int) (bool, bool) {
 }
 
 func (*parser) parseHTTPLine(s *stream, m *message) (cont, ok, complete bool) {
-	m.start = s.parseOffset
 	i := bytes.Index(s.data[s.parseOffset:], []byte("\r\n"))
 	if i == -1 {
 		return false, true, false
@@ -243,8 +246,10 @@ func (parser *parser) parseHeaders(s *stream, m *message) (cont, ok, complete bo
 	if len(s.data)-s.parseOffset >= 2 &&
 		bytes.Equal(s.data[s.parseOffset:s.parseOffset+2], []byte("\r\n")) {
 		// EOH
-		s.parseOffset += 2
-		m.bodyOffset = s.parseOffset
+		m.size = uint64(s.parseOffset + 2)
+		m.rawHeaders = s.data[:m.size]
+		s.data = s.data[m.size:]
+		s.parseOffset = 0
 
 		if !m.isRequest && ((100 <= m.statusCode && m.statusCode < 200) || m.statusCode == 204 || m.statusCode == 304) {
 			//response with a 1xx, 204 , or 304 status  code is always terminated
@@ -252,12 +257,13 @@ func (parser *parser) parseHeaders(s *stream, m *message) (cont, ok, complete bo
 			if isDebug {
 				debugf("Terminate response, status code %d", m.statusCode)
 			}
-			m.end = s.parseOffset
-			m.size = uint64(m.end - m.start)
 			return false, true, true
 		}
 
-		if bytes.Equal(m.transferEncoding, transferEncodingChunked) {
+		m.sendBody = parser.shouldIncludeInBody(m.contentType)
+		m.saveBody = m.sendBody || (m.contentLength > 0 && bytes.Contains(m.contentType, []byte("urlencoded")))
+
+		if m.isChunked {
 			// support for HTTP/1.1 Chunked transfer
 			// Transfer-Encoding overrides the Content-Length
 			if isDebug {
@@ -272,8 +278,6 @@ func (parser *parser) parseHeaders(s *stream, m *message) (cont, ok, complete bo
 				debugf("Empty content length, ignore body")
 			}
 			// Ignore body for request that contains a message body but not a Content-Length
-			m.end = s.parseOffset
-			m.size = uint64(m.end - m.start)
 			return false, true, true
 		}
 
@@ -338,7 +342,7 @@ func (parser *parser) parseHeader(m *message, data []byte) (bool, bool, int) {
 			} else if bytes.Equal(headerName, nameContentType) {
 				m.contentType = headerVal
 			} else if bytes.Equal(headerName, nameTransferEncoding) {
-				m.transferEncoding = common.NetString(headerVal)
+				m.isChunked = bytes.Equal(common.NetString(headerVal), transferEncodingChunked)
 			} else if bytes.Equal(headerName, nameConnection) {
 				m.connection = headerVal
 			}
@@ -375,28 +379,39 @@ func (parser *parser) parseHeader(m *message, data []byte) (bool, bool, int) {
 }
 
 func (*parser) parseBody(s *stream, m *message) (ok, complete bool) {
-	if isDebug {
-		debugf("parseBody body: %d", s.parseOffset)
-	}
+	nbytes := len(s.data)
 	if !m.hasContentLength && (bytes.Equal(m.connection, constClose) ||
 		(isVersion(m.version, 1, 0) && !bytes.Equal(m.connection, constKeepAlive))) {
 
+		m.size += uint64(nbytes)
+		s.bodyReceived += nbytes
+		m.contentLength += nbytes
+
 		// HTTP/1.0 no content length. Add until the end of the connection
 		if isDebug {
-			debugf("http conn close, received %d", len(s.data)-s.parseOffset)
+			debugf("http conn close, received %d", len(s.data))
 		}
-		s.bodyReceived += (len(s.data) - s.parseOffset)
-		m.contentLength += (len(s.data) - s.parseOffset)
-		s.parseOffset = len(s.data)
+		if m.saveBody {
+			m.body = append(m.body, s.data...)
+		}
+		s.data = nil
 		return true, false
-	} else if len(s.data[s.parseOffset:]) >= m.contentLength-s.bodyReceived {
-		s.parseOffset += (m.contentLength - s.bodyReceived)
-		m.end = s.parseOffset
-		m.size = uint64(m.end - m.start)
+	} else if nbytes >= m.contentLength-s.bodyReceived {
+		wanted := m.contentLength - s.bodyReceived
+		if m.saveBody {
+			m.body = append(m.body, s.data[:wanted]...)
+		}
+		s.bodyReceived = m.contentLength
+		m.size += uint64(wanted)
+		s.data = s.data[wanted:]
 		return true, true
 	} else {
-		s.bodyReceived += (len(s.data) - s.parseOffset)
-		s.parseOffset = len(s.data)
+		if m.saveBody {
+			m.body = append(m.body, s.data...)
+		}
+		s.data = nil
+		s.bodyReceived += nbytes
+		m.size += uint64(nbytes)
 		if isDebug {
 			debugf("bodyReceived: %d", s.bodyReceived)
 		}
@@ -408,7 +423,7 @@ func (*parser) parseBody(s *stream, m *message) (ok, complete bool) {
 // those bytes.
 func (*parser) eatBody(s *stream, m *message, size int) (ok, complete bool) {
 	if isDebug {
-		debugf("eatBody body: %d", s.parseOffset)
+		debugf("eatBody body")
 	}
 	if !m.hasContentLength && (bytes.Equal(m.connection, constClose) ||
 		(isVersion(m.version, 1, 0) && !bytes.Equal(m.connection, constKeepAlive))) {
@@ -417,16 +432,18 @@ func (*parser) eatBody(s *stream, m *message, size int) (ok, complete bool) {
 		if isDebug {
 			debugf("http conn close, received %d", size)
 		}
+		m.size += uint64(size)
 		s.bodyReceived += size
 		m.contentLength += size
 		return true, false
 	} else if size >= m.contentLength-s.bodyReceived {
-		s.bodyReceived += (m.contentLength - s.bodyReceived)
-		m.end = s.parseOffset
-		m.size = uint64(m.bodyOffset-m.start) + uint64(m.contentLength)
+		wanted := m.contentLength - s.bodyReceived
+		s.bodyReceived += wanted
+		m.size = uint64(len(m.rawHeaders) + m.contentLength)
 		return true, true
 	} else {
 		s.bodyReceived += size
+		m.size += uint64(size)
 		if isDebug {
 			debugf("bodyReceived: %d", s.bodyReceived)
 		}
@@ -436,31 +453,32 @@ func (*parser) eatBody(s *stream, m *message, size int) (ok, complete bool) {
 
 func (*parser) parseBodyChunkedStart(s *stream, m *message) (cont, ok, complete bool) {
 	// read hexa length
-	i := bytes.Index(s.data[s.parseOffset:], constCRLF)
+	i := bytes.Index(s.data, constCRLF)
 	if i == -1 {
 		return false, true, false
 	}
-	line := string(s.data[s.parseOffset : s.parseOffset+i])
-	_, err := fmt.Sscanf(line, "%x", &m.chunkedLength)
+	line := string(s.data[:i])
+	chunkLength, err := strconv.ParseInt(line, 16, 32)
 	if err != nil {
 		logp.Warn("Failed to understand chunked body start line")
 		return false, false, false
 	}
+	m.chunkedLength = int(chunkLength)
 
-	s.parseOffset += i + 2 //+ \r\n
+	s.data = s.data[i+2:] //+ \r\n
+	m.size += uint64(i + 2)
+
 	if m.chunkedLength == 0 {
-		if len(s.data[s.parseOffset:]) < 2 {
+		if len(s.data) < 2 {
 			s.parseState = stateBodyChunkedWaitFinalCRLF
 			return false, true, false
 		}
-		if s.data[s.parseOffset] != '\r' || s.data[s.parseOffset+1] != '\n' {
+		m.size += 2
+		if s.data[0] != '\r' || s.data[1] != '\n' {
 			logp.Warn("Expected CRLF sequence at end of message")
 			return false, false, false
 		}
-		s.parseOffset += 2 // skip final CRLF
-
-		m.end = s.parseOffset
-		m.size = uint64(m.end - m.start)
+		s.data = s.data[2:]
 		return false, true, true
 	}
 	s.bodyReceived = 0
@@ -470,41 +488,63 @@ func (*parser) parseBodyChunkedStart(s *stream, m *message) (cont, ok, complete 
 }
 
 func (*parser) parseBodyChunked(s *stream, m *message) (cont, ok, complete bool) {
-	if len(s.data[s.parseOffset:]) >= m.chunkedLength-s.bodyReceived+2 /*\r\n*/ {
+	wanted := m.chunkedLength - s.bodyReceived
+	if len(s.data) >= wanted+2 /*\r\n*/ {
 		// Received more data than expected
-		m.chunkedBody = append(m.chunkedBody, s.data[s.parseOffset:s.parseOffset+m.chunkedLength-s.bodyReceived]...)
-		s.parseOffset += (m.chunkedLength - s.bodyReceived + 2 /*\r\n*/)
+		if m.saveBody {
+			m.body = append(m.body, s.data[:wanted]...)
+		}
+		m.size += uint64(wanted + 2)
+		s.data = s.data[wanted+2:]
 		m.contentLength += m.chunkedLength
 		s.parseState = stateBodyChunkedStart
 		return true, true, false
 	}
 
-	if len(s.data[s.parseOffset:]) >= m.chunkedLength-s.bodyReceived {
+	if len(s.data) >= wanted {
 		// we need need to wait for the +2, else we can crash on next call
 		return false, true, false
 	}
 
 	// Received less data than expected
-	m.chunkedBody = append(m.chunkedBody, s.data[s.parseOffset:]...)
-	s.bodyReceived += (len(s.data) - s.parseOffset)
-	s.parseOffset = len(s.data)
+	if m.saveBody {
+		m.body = append(m.body, s.data...)
+	}
+	s.bodyReceived += len(s.data)
+	m.size += uint64(len(s.data))
+	s.data = nil
 	return false, true, false
 }
 
 func (*parser) parseBodyChunkedWaitFinalCRLF(s *stream, m *message) (ok, complete bool) {
-	if len(s.data[s.parseOffset:]) < 2 {
+	if len(s.data) < 2 {
 		return true, false
 	}
 
-	if s.data[s.parseOffset] != '\r' || s.data[s.parseOffset+1] != '\n' {
+	m.size += 2
+	if s.data[0] != '\r' || s.data[1] != '\n' {
 		logp.Warn("Expected CRLF sequence at end of message")
 		return false, false
 	}
 
-	s.parseOffset += 2 // skip final CRLF
-	m.end = s.parseOffset
-	m.size = uint64(m.end - m.start)
+	s.data = s.data[2:]
 	return true, true
+}
+
+func (parser *parser) shouldIncludeInBody(contenttype []byte) bool {
+	for _, include := range parser.config.includeBodyFor {
+		if bytes.Contains(contenttype, []byte(include)) {
+			if isDebug {
+				debugf("Should Include Body = true Content-Type %s include_body %s",
+					contenttype, include)
+			}
+			return true
+		}
+	}
+	if isDebug {
+		debugf("Should Include Body = false Content-Type %s", contenttype)
+	}
+	return false
 }
 
 func isVersion(v version, major, minor uint8) bool {
