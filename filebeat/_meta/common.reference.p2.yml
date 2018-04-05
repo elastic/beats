@@ -236,6 +236,7 @@ filebeat.inputs:
 #------------------------------ Udp input --------------------------------
 # Experimental: Config options for the udp input
 #- type: udp
+  #enabled: false
 
   # Maximum size of the message received over UDP
   #max_message_size: 10240
