@@ -1,6 +1,9 @@
 The System module allows you to monitor your servers. Because the System module
 always applies to the local server, the `hosts` config option is not needed.
 
+The default metricsets are `cpu`, `load`, `memory`, `network`, `process` and
+`process_summary`.
+
 [float]
 === Dashboard
 

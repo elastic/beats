@@ -61,6 +61,7 @@ metricbeat.modules:
     - uptime          # System Uptime
     #- core           # Per CPU core usage
     #- diskio         # Disk IO
+    #- raid           # Raid
     #- socket         # Sockets and connection info (linux only)
   enabled: true
   period: 10s
@@ -106,6 +107,9 @@ metricbeat.modules:
   # to false.
   #process.include_cpu_ticks: false
 
+  # Raid mount point to monitor
+  #raid.mount_point: '/'
+
   # Configure reverse DNS lookup on remote IP addresses in the socket metricset.
   #socket.reverse_lookup.enabled: false
   #socket.reverse_lookup.success_ttl: 60s
@@ -144,18 +148,29 @@ metricbeat.modules:
   metricsets: ["cluster_disk", "cluster_health", "monitor_health", "pool_disk", "osd_tree"]
   period: 10s
   hosts: ["localhost:5000"]
+  enabled: true
 
 #------------------------------ Couchbase Module -----------------------------
 - module: couchbase
   metricsets: ["bucket", "cluster", "node"]
   period: 10s
   hosts: ["localhost:8091"]
+  enabled: true
 
 #------------------------------- Docker Module -------------------------------
 - module: docker
-  metricsets: ["container", "cpu", "diskio", "healthcheck", "info", "memory", "network"]
+  metricsets:
+    - "container"
+    - "cpu"
+    - "diskio"
+    - "healthcheck"
+    - "info"
+    #- "image"
+    - "memory"
+    - "network"
   hosts: ["unix:///var/run/docker.sock"]
   period: 10s
+  enabled: true
 
   # Replace dots in labels with `_`. Set to false to keep dots
   labels.dedot: true
@@ -173,6 +188,7 @@ metricbeat.modules:
   hosts: ["localhost:8080"]
   metrics_path: /metrics/metrics
   namespace: example
+  enabled: true
 
 #---------------------------- Elasticsearch Module ---------------------------
 - module: elasticsearch
@@ -185,7 +201,6 @@ metricbeat.modules:
   metricsets: ["leader", "self", "store"]
   period: 10s
   hosts: ["localhost:2379"]
-
 
 #------------------------------- Golang Module -------------------------------
 - module: golang
@@ -214,6 +229,7 @@ metricbeat.modules:
   metricsets: ["info", "stat"]
   period: 10s
   hosts: ["tcp://127.0.0.1:14567"]
+  enabled: true
 
 #-------------------------------- HTTP Module --------------------------------
 - module: http
@@ -246,16 +262,31 @@ metricbeat.modules:
   period: 10s
   hosts: ["localhost"]
   namespace: "metrics"
-  path: "/jolokia/?ignoreErrors=true&canonicalNaming=false"
-  jmx.mapping:
-  jmx.application:
-  jmx.instance:
+  jmx.mappings:
+    - mbean: 'java.lang:type=Runtime'
+      attributes:
+        - attr: Uptime
+          field: uptime
+    - mbean: 'java.lang:type=Memory'
+      attributes:
+        - attr: HeapMemoryUsage
+          field: memory.heap_usage
+        - attr: NonHeapMemoryUsage
+          field: memory.non_heap_usage
+    # GC Metrics - this depends on what is available on your JVM
+    # - mbean: 'java.lang:type=GarbageCollector,name=ConcurrentMarkSweep'
+    #   attributes:
+    #     - attr: CollectionTime
+    #       field: gc.cms_collection_time
+    #     - attr: CollectionCount
+    #       field: gc.cms_collection_count
 
 #-------------------------------- Kafka Module -------------------------------
 - module: kafka
-  metricsets: ["partition"]
+  metricsets: ["consumergroup", "partition"]
   period: 10s
   hosts: ["localhost:9092"]
+  enabled: true
 
   #client_id: metricbeat
   #retries: 3
@@ -283,25 +314,27 @@ metricbeat.modules:
   metricsets: ["status"]
   period: 10s
   hosts: ["localhost:5601"]
+  enabled: default
 
 #----------------------------- Kubernetes Module -----------------------------
 # Node metrics, from kubelet:
 - module: kubernetes
   metricsets:
-    - node
-    - system
-    - pod
     - container
+    - node
+    - pod
+    - system
     - volume
   period: 10s
   hosts: ["localhost:10255"]
+  enabled: true
   #ssl.certificate_authorities: ["/etc/pki/root/ca.pem"]
   #ssl.certificate: "/etc/pki/client/cert.pem"
   #ssl.key: "/etc/pki/client/cert.key"
 
 # State metrics from kube-state-metrics service:
 - module: kubernetes
-  enabled: false
+  enabled: true
   metricsets:
     - state_node
     - state_deployment
@@ -314,28 +347,29 @@ metricbeat.modules:
 
 # Kubernetes events
 - module: kubernetes
-  enabled: false
+  enabled: true
   metricsets:
     - event
 
 #------------------------------ Logstash Module ------------------------------
 - module: logstash
   metricsets: ["node", "node_stats"]
-  enabled: false
+  enabled: true
   period: 10s
   hosts: ["localhost:9600"]
-
 
 #------------------------------ Memcached Module -----------------------------
 - module: memcached
   metricsets: ["stats"]
   period: 10s
   hosts: ["localhost:11211"]
+  enabled: true
 
 #------------------------------- MongoDB Module ------------------------------
 - module: mongodb
   metricsets: ["dbstats", "status"]
   period: 10s
+  enabled: true
 
   # The hosts must be passed as MongoDB URLs in the format:
   # [mongodb://][user:pass@]host[:port].
@@ -398,6 +432,7 @@ metricbeat.modules:
 
 #----------------------------- PostgreSQL Module -----------------------------
 - module: postgresql
+  enabled: true
   metricsets:
     # Stats about every PostgreSQL database
     - database
@@ -425,23 +460,34 @@ metricbeat.modules:
 #----------------------------- Prometheus Module -----------------------------
 - module: prometheus
   metricsets: ["stats"]
+  enabled: true
   period: 10s
   hosts: ["localhost:9090"]
-  metrics_path: /metrics
+  #metrics_path: /metrics
+  #namespace: example
+
+- module: prometheus
+  metricsets: ["collector"]
+  enabled: true
+  period: 10s
+  hosts: ["localhost:9090"]
+  #metrics_path: /metrics
   #namespace: example
 
 #------------------------------ RabbitMQ Module ------------------------------
 - module: rabbitmq
   metricsets: ["node", "queue", "connection"]
+  enabled: true
   period: 10s
   hosts: ["localhost:15672"]
 
-  username: guest
-  password: guest
+  #username: guest
+  #password: guest
 
 #-------------------------------- Redis Module -------------------------------
 - module: redis
   metricsets: ["info", "keyspace"]
+  enabled: true
   period: 10s
 
   # Redis hosts
@@ -473,6 +519,7 @@ metricbeat.modules:
 #-------------------------------- uwsgi Module -------------------------------
 - module: uwsgi
   metricsets: ["status"]
+  enable: true
   period: 10s
   hosts: ["tcp://127.0.0.1:9191"]
 
@@ -493,11 +540,18 @@ metricbeat.modules:
 #------------------------------- Windows Module ------------------------------
 - module: windows
   metricsets: ["perfmon"]
+  enabled: true
   period: 10s
+  perfmon.ignore_non_existent_counters: true
   perfmon.counters:
+  #  - instance_label: processor.name
+  #    instance_name: total
+  #    measurement_label: processor.time.total.pct
+  #    query: '\Processor Information(_Total)\% Processor Time'
 
 - module: windows
   metricsets: ["service"]
+  enabled: true
   period: 60s
 
 #------------------------------ ZooKeeper Module -----------------------------

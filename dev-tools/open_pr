@@ -2,6 +2,7 @@
 """Open a PR from the current branch"""
 
 import sys
+import os
 import argparse
 import requests
 import re
@@ -54,6 +55,11 @@ def main():
     if args.wip:
         lables += "in progress"
 
+    # get version and set a version label on the original PR
+    version = get_version(os.getcwd())
+    if version:
+        labels.append("v" + version)
+
     print("Branch: {}".format(args.branch))
     print("Remote: {}".format(args.remote))
     print("Local branch: {}".format(local_branch))
@@ -96,6 +102,15 @@ def main():
 
     print("\nDone. PR created: {}".format(new_pr["html_url"]))
     print("Please go and review it for the message and labels.")
+
+
+def get_version(beats_dir):
+    pattern = re.compile(r'(const\s|)\w*(v|V)ersion\s=\s"(?P<version>.*)"')
+    with open(os.path.join(beats_dir, "libbeat/version/version.go"), "r") as f:
+        for line in f:
+            match = pattern.match(line)
+            if match:
+                return match.group('version')
 
 
 if __name__ == "__main__":

@@ -8,7 +8,7 @@ This file is generated! See scripts/docs_collector.py
 beta[]
 
 This module periodically fetches metrics from https://www.couchbase.com/[Couchbase]
-servers.
+servers. The default metricsets are `bucket`, `cluster`, `node`.
 
 
 [float]
@@ -21,8 +21,6 @@ in <<configuration-metricbeat>>. Here is an example configuration:
 ----
 metricbeat.modules:
 - module: couchbase
-  metricsets: ["bucket", "cluster", "node"]
-  period: 10s
   hosts: ["localhost:8091"]
 ----
 

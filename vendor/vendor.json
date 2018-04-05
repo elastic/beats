@@ -369,44 +369,44 @@
 			"revisionTime": "2016-08-05T00:47:13Z"
 		},
 		{
-			"checksumSHA1": "yxowcZEI5Qx1xwu9TI+L5NS87Sw=",
+			"checksumSHA1": "FmPMalgdsaNNmghFB2DWm8fJjVA=",
 			"path": "github.com/elastic/go-libaudit",
-			"revision": "c139147102117edd4175a74ce071e4cc7982259a",
-			"revisionTime": "2018-01-18T05:11:38Z",
-			"version": "v0.0.7",
-			"versionExact": "v0.0.7"
+			"revision": "4a806edf821706e315ef7d4f3b5d0cac6d638b34",
+			"revisionTime": "2018-03-28T14:46:34Z",
+			"version": "v0.1.0",
+			"versionExact": "v0.1.0"
 		},
 		{
-			"checksumSHA1": "n8bRlhOdmfREBoCgStzHWGWiwSY=",
+			"checksumSHA1": "uu4544BCRlonueK+mB7549opucs=",
 			"path": "github.com/elastic/go-libaudit/aucoalesce",
-			"revision": "df0d4981f3fce65ffd3d7411dfec3e03231b491c",
-			"revisionTime": "2017-09-07T20:19:58Z",
-			"version": "v0.0.6",
-			"versionExact": "v0.0.6"
+			"revision": "4a806edf821706e315ef7d4f3b5d0cac6d638b34",
+			"revisionTime": "2018-03-28T14:46:34Z",
+			"version": "v0.1.0",
+			"versionExact": "v0.1.0"
 		},
 		{
-			"checksumSHA1": "eUIiDm0pSFKNKjWme5s3PtWEoSU=",
+			"checksumSHA1": "+L/ZGneCw2zrkK5Vlto9UB3LaEk=",
 			"path": "github.com/elastic/go-libaudit/auparse",
-			"revision": "df0d4981f3fce65ffd3d7411dfec3e03231b491c",
-			"revisionTime": "2017-09-07T20:19:58Z",
-			"version": "v0.0.6",
-			"versionExact": "v0.0.6"
+			"revision": "4a806edf821706e315ef7d4f3b5d0cac6d638b34",
+			"revisionTime": "2018-03-28T14:46:34Z",
+			"version": "v0.1.0",
+			"versionExact": "v0.1.0"
 		},
 		{
 			"checksumSHA1": "H0rnscnKHbkjmXc4whC3gtIPR0c=",
 			"path": "github.com/elastic/go-libaudit/rule",
-			"revision": "df0d4981f3fce65ffd3d7411dfec3e03231b491c",
-			"revisionTime": "2017-09-07T20:19:58Z",
-			"version": "v0.0.6",
-			"versionExact": "v0.0.6"
+			"revision": "4a806edf821706e315ef7d4f3b5d0cac6d638b34",
+			"revisionTime": "2018-03-28T14:46:34Z",
+			"version": "v0.1.0",
+			"versionExact": "v0.1.0"
 		},
 		{
 			"checksumSHA1": "36UaYid29Kyhrsa5D8N6BoM8dVw=",
 			"path": "github.com/elastic/go-libaudit/rule/flags",
-			"revision": "df0d4981f3fce65ffd3d7411dfec3e03231b491c",
-			"revisionTime": "2017-09-07T20:19:58Z",
-			"version": "v0.0.6",
-			"versionExact": "v0.0.6"
+			"revision": "4a806edf821706e315ef7d4f3b5d0cac6d638b34",
+			"revisionTime": "2018-03-28T14:46:34Z",
+			"version": "v0.1.0",
+			"versionExact": "v0.1.0"
 		},
 		{
 			"checksumSHA1": "3jizmlZPCyo6FAZY8Trk9jA8NH4=",
@@ -983,12 +983,6 @@
 			"path": "github.com/joeshaw/multierror",
 			"revision": "69b34d4ec901851247ae7e77d33909caf9df99ed",
 			"revisionTime": "2014-01-24T17:37:10Z"
-		},
-		{
-			"checksumSHA1": "a8Ge6pE7oxux9ZMZVAlyEeGzCng=",
-			"path": "github.com/juju/ratelimit",
-			"revision": "5b9ff866471762aa2ab2dced63c9fb6f53921342",
-			"revisionTime": "2017-05-23T01:21:41Z"
 		},
 		{
 			"checksumSHA1": "+CqJGh7NIDMnHgScq9sl9tPrnVM=",
@@ -1602,6 +1596,12 @@
 			"path": "golang.org/x/text/unicode/norm",
 			"revision": "4e4a3210bb54bb31f6ab2cdca2edcc0b50c420c1",
 			"revisionTime": "2018-02-04T03:07:25Z"
+		},
+		{
+			"checksumSHA1": "vGfePfr0+weQUeTM/71mu+LCFuE=",
+			"path": "golang.org/x/time/rate",
+			"revision": "26559e0f760e39c24d730d3224364aef164ee23f",
+			"revisionTime": "2018-03-14T17:21:34Z"
 		},
 		{
 			"checksumSHA1": "p3gWsy4fQOSXGRMUHr3TnmVFias=",

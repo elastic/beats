@@ -105,7 +105,7 @@ func init() {
 	initRand()
 
 	flag.BoolVar(&printVersion, "version", false, "Print the version and exit")
-	flag.BoolVar(&setup, "setup", false, "Load the sample Kibana dashboards")
+	flag.BoolVar(&setup, "setup", false, "Load sample Kibana dashboards and setup Machine Learning")
 }
 
 // initRand initializes the runtime random number generator seed using

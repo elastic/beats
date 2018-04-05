@@ -38,6 +38,8 @@ required authentication add this to the haproxy config:
    stats auth admin:admin
 ----
 
+The default metricsets are `info`and `stat`.
+
 [float]
 === Compatibility
 
@@ -54,8 +56,6 @@ in <<configuration-metricbeat>>. Here is an example configuration:
 ----
 metricbeat.modules:
 - module: haproxy
-  metricsets: ["info", "stat"]
-  period: 10s
   hosts: ["tcp://127.0.0.1:14567"]
 ----
 
