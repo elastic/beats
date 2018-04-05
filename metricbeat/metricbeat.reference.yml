@@ -399,7 +399,7 @@ metricbeat.modules:
 #-------------------------------- Munin Module -------------------------------
 - module: munin
   metricsets: ["node"]
-  enabled: false
+  enabled: true
   period: 10s
   hosts: ["localhost:4949"]
   node.namespace: node
