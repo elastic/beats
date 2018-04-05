@@ -52,6 +52,7 @@ https://github.com/elastic/beats/compare/v6.0.0-beta2...master[Check the HEAD di
 - Remove the undefined `username` option from the Redis input and clarify the documentation. {pull}6662[6662]
 - Add validation for Stdin, when Filebeat is configured with Stdin and any other inputs, Filebeat
   will now refuses to start. {pull}6463[6463]
+- Addition of the TCP input {pull}6700[6700]
 
 *Heartbeat*
 
