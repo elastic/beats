@@ -50,6 +50,13 @@ type UDPPlugin interface {
 	ParseUDP(pkt *Packet)
 }
 
+type ExpirationAwareTCPPlugin interface {
+	TCPPlugin
+
+	// Expired is called when the TCP stream is expired due to connection timeout.
+	Expired(tuple *common.TCPTuple, private ProtocolData)
+}
+
 // Protocol identifier.
 type Protocol uint16
 
