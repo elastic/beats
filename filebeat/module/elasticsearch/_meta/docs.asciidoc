@@ -5,7 +5,7 @@ This is a Filebeat module that can ingest Elasticsearch server logs. It allows y
 [float]
 === Compatibility
 
-The Elasticsearch module was tested with logs from versions in the 5.x series.
+The Elasticsearch module was tested with logs from versions in the 5.x 6.x series.
 
 [float]
 === Dashboard

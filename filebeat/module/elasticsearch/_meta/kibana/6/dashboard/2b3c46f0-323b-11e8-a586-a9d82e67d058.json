@@ -1,0 +1,99 @@
+{
+  "objects": [
+    {
+      "attributes": {
+        "columns": [
+          "elasticsearch.log_level",
+          "elasticsearch.log.component",
+          "elasticsearch.log.node.name",
+          "message"
+        ],
+        "description": "",
+        "hits": 0,
+        "kibanaSavedObjectMeta": {
+          "searchSourceJSON": "{\"index\":\"0c7dae80-3217-11e8-a586-a9d82e67d058\",\"highlightAll\":true,\"version\":true,\"query\":{\"language\":\"lucene\",\"query\":\"\"},\"filter\":[]}"
+        },
+        "sort": [
+          "@timestamp",
+          "desc"
+        ],
+        "title": "Event Explorer [Elasticsearch Log]",
+        "version": 1
+      },
+      "id": "a7320d00-3239-11e8-a586-a9d82e67d058",
+      "type": "search",
+      "updated_at": "2018-03-28T03:43:23.319Z",
+      "version": 2
+    },
+    {
+      "attributes": {
+        "description": "",
+        "kibanaSavedObjectMeta": {
+          "searchSourceJSON": "{\"filter\":[],\"query\":{\"query\":\"\",\"language\":\"lucene\"}}"
+        },
+        "savedSearchId": "a7320d00-3239-11e8-a586-a9d82e67d058",
+        "title": "Index/Shard Occurrences [Elasticsearch Log]",
+        "uiStateJSON": "{\"vis\":{\"legendOpen\":false}}",
+        "version": 1,
+        "visState": "{\"title\":\"Index/Shard Occurrences [Elasticsearch Log]\",\"type\":\"histogram\",\"params\":{\"type\":\"histogram\",\"grid\":{\"categoryLines\":false,\"style\":{\"color\":\"#eee\"}},\"categoryAxes\":[{\"id\":\"CategoryAxis-1\",\"type\":\"category\",\"position\":\"bottom\",\"show\":true,\"style\":{},\"scale\":{\"type\":\"linear\"},\"labels\":{\"show\":true,\"truncate\":100},\"title\":{}}],\"valueAxes\":[{\"id\":\"ValueAxis-1\",\"name\":\"LeftAxis-1\",\"type\":\"value\",\"position\":\"left\",\"show\":true,\"style\":{},\"scale\":{\"type\":\"linear\",\"mode\":\"normal\"},\"labels\":{\"show\":true,\"rotate\":0,\"filter\":false,\"truncate\":100},\"title\":{\"text\":\"Count\"}}],\"seriesParams\":[{\"show\":\"true\",\"type\":\"histogram\",\"mode\":\"stacked\",\"data\":{\"label\":\"Count\",\"id\":\"1\"},\"valueAxis\":\"ValueAxis-1\",\"drawLinesBetweenPoints\":true,\"showCircles\":true}],\"addTooltip\":true,\"addLegend\":true,\"legendPosition\":\"right\",\"times\":[],\"addTimeMarker\":false},\"aggs\":[{\"id\":\"1\",\"enabled\":true,\"type\":\"count\",\"schema\":\"metric\",\"params\":{}},{\"id\":\"2\",\"enabled\":true,\"type\":\"terms\",\"schema\":\"segment\",\"params\":{\"field\":\"elasticsearch.log.index.name\",\"otherBucket\":false,\"otherBucketLabel\":\"Other\",\"missingBucket\":false,\"missingBucketLabel\":\"Missing\",\"size\":10,\"order\":\"desc\",\"orderBy\":\"1\",\"customLabel\":\"Index\"}},{\"id\":\"3\",\"enabled\":true,\"type\":\"terms\",\"schema\":\"group\",\"params\":{\"field\":\"elasticsearch.log.index.shard\",\"otherBucket\":false,\"otherBucketLabel\":\"Other\",\"missingBucket\":false,\"missingBucketLabel\":\"Missing\",\"size\":10,\"order\":\"desc\",\"orderBy\":\"1\",\"customLabel\":\"Shard\"}}]}"
+      },
+      "id": "bd2ee820-323a-11e8-a586-a9d82e67d058",
+      "type": "visualization",
+      "updated_at": "2018-03-28T03:47:29.823Z",
+      "version": 1
+    },
+    {
+      "attributes": {
+        "description": "",
+        "kibanaSavedObjectMeta": {
+          "searchSourceJSON": "{\"filter\":[],\"query\":{\"query\":\"\",\"language\":\"lucene\"}}"
+        },
+        "savedSearchId": "a7320d00-3239-11e8-a586-a9d82e67d058",
+        "title": "Log Level and Component Heatmap [Elasticsearch Log]",
+        "uiStateJSON": "{\"vis\":{\"defaultColors\":{\"0 - 17,500\":\"rgb(247,252,245)\",\"17,500 - 35,000\":\"rgb(229,245,224)\",\"35,000 - 52,500\":\"rgb(199,233,192)\",\"52,500 - 70,000\":\"rgb(161,217,155)\",\"70,000 - 87,500\":\"rgb(116,196,118)\",\"87,500 - 105,000\":\"rgb(65,171,93)\",\"105,000 - 122,500\":\"rgb(35,139,69)\",\"122,500 - 140,000\":\"rgb(0,109,44)\"},\"legendOpen\":false}}",
+        "version": 1,
+        "visState": "{\"title\":\"Log Level and Component Heatmap [Elasticsearch Log]\",\"type\":\"heatmap\",\"params\":{\"type\":\"heatmap\",\"addTooltip\":true,\"addLegend\":true,\"enableHover\":false,\"legendPosition\":\"right\",\"times\":[],\"colorsNumber\":8,\"colorSchema\":\"Greens\",\"setColorRange\":false,\"colorsRange\":[],\"invertColors\":false,\"percentageMode\":false,\"valueAxes\":[{\"show\":false,\"id\":\"ValueAxis-1\",\"type\":\"value\",\"scale\":{\"type\":\"linear\",\"defaultYExtents\":false},\"labels\":{\"show\":false,\"rotate\":0,\"color\":\"#555\"}}]},\"aggs\":[{\"id\":\"1\",\"enabled\":true,\"type\":\"count\",\"schema\":\"metric\",\"params\":{}},{\"id\":\"2\",\"enabled\":true,\"type\":\"terms\",\"schema\":\"segment\",\"params\":{\"field\":\"elasticsearch.log_level\",\"otherBucket\":false,\"otherBucketLabel\":\"Other\",\"missingBucket\":false,\"missingBucketLabel\":\"Missing\",\"size\":7,\"order\":\"desc\",\"orderBy\":\"1\",\"customLabel\":\"Level\"}},{\"id\":\"3\",\"enabled\":true,\"type\":\"terms\",\"schema\":\"group\",\"params\":{\"field\":\"elasticsearch.log.component\",\"otherBucket\":false,\"otherBucketLabel\":\"Other\",\"missingBucket\":false,\"missingBucketLabel\":\"Missing\",\"size\":8,\"order\":\"desc\",\"orderBy\":\"1\",\"customLabel\":\"Component\"}}]}"
+      },
+      "id": "1b5bc090-323a-11e8-a586-a9d82e67d058",
+      "type": "visualization",
+      "updated_at": "2018-03-28T04:44:42.465Z",
+      "version": 4
+    },
+    {
+      "attributes": {
+        "description": "",
+        "kibanaSavedObjectMeta": {
+          "searchSourceJSON": "{\"filter\":[],\"query\":{\"query\":\"\",\"language\":\"lucene\"}}"
+        },
+        "savedSearchId": "a7320d00-3239-11e8-a586-a9d82e67d058",
+        "title": "Events over Time [Elasticsearch Log]",
+        "uiStateJSON": "{}",
+        "version": 1,
+        "visState": "{\"title\":\"Events over Time [Elasticsearch Log]\",\"type\":\"histogram\",\"params\":{\"type\":\"histogram\",\"grid\":{\"categoryLines\":false,\"style\":{\"color\":\"#eee\"}},\"categoryAxes\":[{\"id\":\"CategoryAxis-1\",\"type\":\"category\",\"position\":\"bottom\",\"show\":true,\"style\":{},\"scale\":{\"type\":\"linear\"},\"labels\":{\"show\":true,\"truncate\":100},\"title\":{}}],\"valueAxes\":[{\"id\":\"ValueAxis-1\",\"name\":\"LeftAxis-1\",\"type\":\"value\",\"position\":\"left\",\"show\":true,\"style\":{},\"scale\":{\"type\":\"linear\",\"mode\":\"normal\"},\"labels\":{\"show\":true,\"rotate\":0,\"filter\":false,\"truncate\":100},\"title\":{\"text\":\"Count\"}}],\"seriesParams\":[{\"show\":\"true\",\"type\":\"histogram\",\"mode\":\"stacked\",\"data\":{\"label\":\"Count\",\"id\":\"1\"},\"valueAxis\":\"ValueAxis-1\",\"drawLinesBetweenPoints\":true,\"showCircles\":true}],\"addTooltip\":true,\"addLegend\":true,\"legendPosition\":\"right\",\"times\":[],\"addTimeMarker\":false},\"aggs\":[{\"id\":\"1\",\"enabled\":true,\"type\":\"count\",\"schema\":\"metric\",\"params\":{}},{\"id\":\"2\",\"enabled\":true,\"type\":\"date_histogram\",\"schema\":\"segment\",\"params\":{\"field\":\"@timestamp\",\"interval\":\"auto\",\"customInterval\":\"2h\",\"min_doc_count\":1,\"extended_bounds\":{},\"customLabel\":\"Time\"}},{\"id\":\"3\",\"enabled\":true,\"type\":\"terms\",\"schema\":\"group\",\"params\":{\"field\":\"elasticsearch.log.component\",\"otherBucket\":false,\"otherBucketLabel\":\"Other\",\"missingBucket\":false,\"missingBucketLabel\":\"Missing\",\"size\":5,\"order\":\"desc\",\"orderBy\":\"1\",\"customLabel\":\"Component\"}}]}"
+      },
+      "id": "c9bf31d0-32da-11e8-a13f-313dcdebb99d",
+      "type": "visualization",
+      "updated_at": "2018-03-28T22:53:10.381Z",
+      "version": 1
+    },
+    {
+      "attributes": {
+        "description": "",
+        "hits": 0,
+        "kibanaSavedObjectMeta": {
+          "searchSourceJSON": "{\"query\":{\"language\":\"lucene\",\"query\":\"\"},\"filter\":[],\"highlightAll\":true,\"version\":true}"
+        },
+        "optionsJSON": "{\"darkTheme\":false,\"hidePanelTitles\":false,\"useMargins\":true}",
+        "panelsJSON": "[{\"panelIndex\":\"1\",\"gridData\":{\"x\":0,\"y\":7,\"w\":12,\"h\":7,\"i\":\"1\"},\"id\":\"a7320d00-3239-11e8-a586-a9d82e67d058\",\"type\":\"search\",\"version\":\"6.2.3\"},{\"panelIndex\":\"2\",\"gridData\":{\"x\":6,\"y\":3,\"w\":6,\"h\":4,\"i\":\"2\"},\"id\":\"bd2ee820-323a-11e8-a586-a9d82e67d058\",\"type\":\"visualization\",\"version\":\"6.2.3\"},{\"panelIndex\":\"3\",\"gridData\":{\"x\":0,\"y\":0,\"w\":6,\"h\":7,\"i\":\"3\"},\"embeddableConfig\":{\"vis\":{\"defaultColors\":{\"0 - 1,500\":\"rgb(247,252,245)\",\"1,500 - 3,000\":\"rgb(229,245,224)\",\"3,000 - 4,500\":\"rgb(199,233,192)\",\"4,500 - 6,000\":\"rgb(161,217,155)\",\"6,000 - 7,500\":\"rgb(116,196,118)\",\"7,500 - 9,000\":\"rgb(65,171,93)\",\"9,000 - 10,500\":\"rgb(35,139,69)\",\"10,500 - 12,000\":\"rgb(0,109,44)\"},\"legendOpen\":false}},\"id\":\"1b5bc090-323a-11e8-a586-a9d82e67d058\",\"type\":\"visualization\",\"version\":\"6.2.3\"},{\"panelIndex\":\"4\",\"gridData\":{\"x\":6,\"y\":0,\"w\":6,\"h\":3,\"i\":\"4\"},\"version\":\"6.2.3\",\"type\":\"visualization\",\"id\":\"c9bf31d0-32da-11e8-a13f-313dcdebb99d\"}]",
+        "timeRestore": false,
+        "title": "[Elasticsearch Log] Overview",
+        "version": 1
+      },
+      "id": "2b3c46f0-323b-11e8-a586-a9d82e67d058",
+      "type": "dashboard",
+      "updated_at": "2018-03-28T22:55:41.665Z",
+      "version": 3
+    }
+  ],
+  "version": "6.2.3"
+}

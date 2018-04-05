@@ -13,3 +13,7 @@
           type: keyword
           description: >
             The log level for this event.
+        - name: message
+          type: text
+          description: >
+            The actual desriptive message for this event.
