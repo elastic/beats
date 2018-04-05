@@ -161,6 +161,7 @@ https://github.com/elastic/beats/compare/v6.2.3...master[Check the HEAD diff]
 - Add experimental Jolokia Discovery autodiscover provider. {pull}7141[7141]
 - Add owner object info to Kubernetes metadata. {pull}7231[7231]
 - Add beat export dashboard command. {pull}7239[7239]
+- Add support for docker autodiscover to monitor containers on host network {pull}6708[6708]
 
 *Auditbeat*
 

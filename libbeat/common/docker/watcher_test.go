@@ -1,6 +1,7 @@
 package docker
 
 import (
+	"errors"
 	"testing"
 	"time"
 
@@ -44,6 +45,10 @@ func (m *MockClient) Events(ctx context.Context, options types.EventsOptions) (<
 	}()
 
 	return eventsC, errorsC
+}
+
+func (m *MockClient) ContainerInspect(ctx context.Context, container string) (types.ContainerJSON, error) {
+	return types.ContainerJSON{}, errors.New("unimplemented")
 }
 
 func TestWatcherInitialization(t *testing.T) {

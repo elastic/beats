@@ -71,13 +71,12 @@ type Container struct {
 	Labels      map[string]string
 	IPAddresses []string
 	Ports       []types.Port
-	// Only needed internally
-	gateways []string
 }
 
 // Client for docker interface
 type Client interface {
 	ContainerList(ctx context.Context, options types.ContainerListOptions) ([]types.Container, error)
+	ContainerInspect(ctx context.Context, container string) (types.ContainerJSON, error)
 	Events(ctx context.Context, options types.EventsOptions) (<-chan events.Message, <-chan error)
 }
 
@@ -291,14 +290,20 @@ func (w *watcher) listContainers(options types.ContainerListOptions) ([]*Contain
 	var result []*Container
 	for _, c := range containers {
 		var ipaddresses []string
-		var gateways []string
 		for _, net := range c.NetworkSettings.Networks {
 			if net.IPAddress != "" {
 				ipaddresses = append(ipaddresses, net.IPAddress)
 			}
+		}
 
-			if net.Gateway != "" {
-				gateways = append(gateways, net.Gateway)
+		// If there are no network interfaces, assume that the container is on host network
+		// Inspect the container directly and use the hostname as the IP address in order
+		if len(ipaddresses) == 0 {
+			info, err := w.client.ContainerInspect(w.ctx, c.ID)
+			if err == nil {
+				ipaddresses = append(ipaddresses, info.Config.Hostname)
+			} else {
+				logp.Warn("unable to inspect container %s due to error %v", c.ID, err)
 			}
 		}
 		result = append(result, &Container{
@@ -308,7 +313,6 @@ func (w *watcher) listContainers(options types.ContainerListOptions) ([]*Contain
 			Labels:      c.Labels,
 			Ports:       c.Ports,
 			IPAddresses: ipaddresses,
-			gateways:    gateways,
 		})
 	}
 
