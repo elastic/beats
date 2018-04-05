@@ -637,10 +637,10 @@
 			"revisionTime": "2017-02-07T06:38:51Z"
 		},
 		{
-			"checksumSHA1": "DRu6+HSK/RVvCx0j2LdlL6vQjcA=",
+			"checksumSHA1": "yu/X+qHftvfQlAnjPdYLwrDn2nI=",
 			"path": "github.com/elastic/go-windows",
-			"revision": "a8f9f07dec5f30c1e17afc9f360c0aed39225222",
-			"revisionTime": "2018-02-07T18:09:04Z"
+			"revision": "a730c8b4e08aef7e1ebb642928bf862996ad2383",
+			"revisionTime": "2018-04-05T16:13:57Z"
 		},
 		{
 			"checksumSHA1": "RPOLNUpw00QUUaA/U4YbPVf6WlA=",
