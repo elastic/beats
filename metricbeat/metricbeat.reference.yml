@@ -412,16 +412,16 @@ metricbeat.modules:
   #raw: false
 
 #-------------------------------- Nginx Module -------------------------------
-#- module: nginx
-  #metricsets: ["stubstatus"]
-  #enabled: true
-  #period: 10s
+- module: nginx
+  metricsets: ["stubstatus"]
+  enabled: true
+  period: 10s
 
   # Nginx hosts
-  #hosts: ["http://127.0.0.1"]
+  hosts: ["http://127.0.0.1"]
 
   # Path to server status. Default server-status
-  #server_status_path: "server-status"
+  server_status_path: "server-status"
 
 #------------------------------- PHP_FPM Module ------------------------------
 - module: php_fpm
