@@ -1,0 +1,22 @@
+- module: graphite
+  metricsets: ["server"]
+  enabled: true
+
+  # Host address to listen on. Default localhost.
+  #host: localhost
+
+  # Listening port. Default 2003.
+  #port: 2003
+
+  # Protocol to listen on. This can be udp or tcp. Default udp.
+  #protocol: "udp"
+
+  # Receive buffer size in bytes
+  #receive_buffer_size: 1024
+
+  #templates:
+  #  - filter: "test.*.bash.*" # This would match metrics like test.localhost.bash.stats
+  #    namespace: "test"
+  #    template: ".host.shell.metric*" # test.localhost.bash.stats would become metric=stats and tags host=localhost,shell=bash
+  #    delimiter: "_"
+
