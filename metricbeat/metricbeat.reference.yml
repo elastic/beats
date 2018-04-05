@@ -426,6 +426,7 @@ metricbeat.modules:
 #------------------------------- PHP_FPM Module ------------------------------
 - module: php_fpm
   metricsets: ["pool"]
+  enabled: true
   period: 10s
   status_path: "/status"
   hosts: ["localhost:8080"]
