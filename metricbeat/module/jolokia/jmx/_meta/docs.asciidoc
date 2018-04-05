@@ -22,6 +22,7 @@ mapping:
       attributes:
         - attr: Uptime
           field: uptime
+          event: uptime
 ---
 
 In case the underlying attribute is an object (e.g. see HeapMemoryUsage attribute in java.lang:type=Memory) its
@@ -34,11 +35,16 @@ All metrics from a single mapping will be POSTed to the defined host/port and se
 To make it possible to differentiate between metrics from multiple similar applications running on the same host,
 please configure multiple modules.
 
+When wildcards are used, an event will be sent to Elastic for each matching mbean, in that case a `mbean` field is added.
+
+Optionally, an `event` name can be added to each attribute, this makes all metrics with the same `event`
+to be grouped in the same event when being sent to Elastic.
+
 It is required to set a namespace in the general module config section.
 
 [float]
 === Limitations
-No authentication against Jolokia is supported yet. No wildcards in Jolokia requests supported yet.
+No authentication against Jolokia is supported yet.
 All Jolokia requests have canonicalNaming set to false (details see here: https://jolokia.org/reference/html/protocol.html).
 
 

@@ -31,7 +31,7 @@ type MetricSet struct {
 // Part of new is also setting up the configuration by processing additional
 // configuration entries if needed.
 func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
-	cfgwarn.Experimental("The kubernetes event metricset is experimental")
+	cfgwarn.Beta("The kubernetes event metricset is beta")
 
 	config := defaultKubernetesEventsConfig()
 

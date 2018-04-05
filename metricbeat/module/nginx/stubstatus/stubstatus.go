@@ -26,9 +26,10 @@ var (
 )
 
 func init() {
-	if err := mb.Registry.AddMetricSet("nginx", "stubstatus", New, hostParser); err != nil {
-		panic(err)
-	}
+	mb.Registry.MustAddMetricSet("nginx", "stubstatus", New,
+		mb.WithHostParser(hostParser),
+		mb.DefaultMetricSet(),
+	)
 }
 
 // MetricSet for fetching Nginx stub status.

@@ -1,6 +1,7 @@
 package autodiscover
 
 import (
+	"errors"
 	"fmt"
 	"strings"
 
@@ -80,4 +81,32 @@ func (b Builders) GetConfig(event bus.Event) []*common.Config {
 	}
 
 	return configs
+}
+
+// NewBuilders instances the given list of builders. If hintsEnabled is true it will
+// just enable the hints builder
+func NewBuilders(bConfigs []*common.Config, hintsEnabled bool) (Builders, error) {
+	var builders Builders
+	if hintsEnabled {
+		if len(bConfigs) > 0 {
+			return nil, errors.New("hints.enabled is incompatible with manually defining builders")
+		}
+
+		hints, err := common.NewConfigFrom(map[string]string{"type": "hints"})
+		if err != nil {
+			return nil, err
+		}
+
+		bConfigs = append(bConfigs, hints)
+	}
+
+	for _, bcfg := range bConfigs {
+		builder, err := Registry.BuildBuilder(bcfg)
+		if err != nil {
+			return nil, err
+		}
+		builders = append(builders, builder)
+	}
+
+	return builders, nil
 }

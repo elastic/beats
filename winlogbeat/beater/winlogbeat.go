@@ -5,7 +5,6 @@ Winlogbeat. The main event loop is implemented in this package.
 package beater
 
 import (
-	"expvar"
 	"fmt"
 	"sync"
 	"time"
@@ -19,10 +18,6 @@ import (
 	"github.com/elastic/beats/winlogbeat/config"
 	"github.com/elastic/beats/winlogbeat/eventlog"
 )
-
-func init() {
-	expvar.Publish("uptime", expvar.Func(uptime))
-}
 
 // Debug logging functions for this package.
 var (
@@ -162,17 +157,4 @@ func (eb *Winlogbeat) processEventLog(
 ) {
 	defer wg.Done()
 	logger.run(eb.done, eb.pipeline, state)
-}
-
-// uptime returns a map of uptime related metrics.
-func uptime() interface{} {
-	now := time.Now().UTC()
-	uptimeDur := now.Sub(startTime)
-
-	return map[string]interface{}{
-		"start_time":  startTime,
-		"uptime":      uptimeDur.String(),
-		"uptime_ms":   fmt.Sprintf("%d", uptimeDur.Nanoseconds()/int64(time.Microsecond)),
-		"server_time": now,
-	}
 }

@@ -4,6 +4,7 @@ package http
 
 import (
 	"bytes"
+	"fmt"
 	"net"
 	"regexp"
 	"strings"
@@ -394,51 +395,21 @@ func TestHttpParser_Response_HTTP_10_without_content_length(t *testing.T) {
 }
 
 func TestHttpParser_Response_without_phrase(t *testing.T) {
-	data := "HTTP/1.1 200 \r\n" +
-		"Date: Tue, 14 Aug 2012 22:31:45 GMT\r\n" +
-		"Expires: -1\r\n" +
-		"Cache-Control: private, max-age=0\r\n" +
-		"Content-Type: text/html; charset=UTF-8\r\n" +
-		"Content-Encoding: gzip\r\n" +
-		"Server: gws\r\n" +
-		"Content-Length: 0\r\n" +
-		"X-XSS-Protection: 1; mode=block\r\n" +
-		"X-Frame-Options: SAMEORIGIN\r\n" +
-		"\r\n"
-	r, ok, complete := testParse(nil, data)
-
-	assert.True(t, ok)
-	assert.True(t, complete)
-	assert.False(t, r.isRequest)
-	assert.Equal(t, 200, int(r.statusCode))
-	assert.Equal(t, "", string(r.statusPhrase))
-	assert.Equal(t, 0, r.contentLength)
-
-	broken := "HTTP/1.1 301 \r\n" +
-		"Date: Sun, 29 Sep 2013 16:53:59 GMT\r\n" +
-		"Server: Apache\r\n" +
-		"Location: http://www.hotnews.ro/\r\n" +
-		"Vary: Accept-Encoding\r\n" +
-		"Content-Length: 290\r\n" +
-		"Connection: close\r\n" +
-		"Content-Type: text/html; charset=iso-8859-1\r\n" +
-		"\r\n" +
-		"<!DOCTYPE HTML PUBLIC \"-//IETF//DTD HTML 2.0//EN\">\r\n" +
-		"<html><head>\r\n" +
-		"<title>301 Moved Permanently</title>\r\n" +
-		"</head><body>\r\n" +
-		"<h1>Moved Permanently</h1>\r\n" +
-		"<p>The document has moved <a href=\"http://www.hotnews.ro/\">here</a>.</p>\r\n" +
-		"<hr>\r\n" +
-		"<address>Apache Server at hotnews.ro Port 80</address>\r\n" +
-		"</body></html>"
-	r, ok, complete = testParse(nil, broken)
-
-	assert.True(t, ok)
-	assert.True(t, complete)
-	assert.Equal(t, 290, r.contentLength)
-	assert.Equal(t, "", string(r.statusPhrase))
-	assert.Equal(t, 301, int(r.statusCode))
+	for idx, testCase := range []struct {
+		ok, complete bool
+		code         int
+		request      string
+	}{
+		{true, true, 200, "HTTP/1.1 200 \r\nContent-Length: 0\r\n\r\n"},
+		{true, true, 301, "HTTP/1.1 301\r\nContent-Length: 0\r\n\r\n"},
+	} {
+		msg := fmt.Sprintf("failed test case[%d]: \"%s\"", idx, testCase.request)
+		r, ok, complete := testParse(nil, testCase.request)
+		assert.Equal(t, testCase.ok, ok, msg)
+		assert.Equal(t, testCase.complete, complete, msg)
+		assert.Equal(t, testCase.code, int(r.statusCode), msg)
+		assert.Equal(t, "", string(r.statusPhrase), msg)
+	}
 }
 
 func TestHttpParser_splitResponse_midBody(t *testing.T) {

@@ -9,6 +9,7 @@ beta[]
 
 This is the Memcached module. These metricsets were tested with Memcached version 1.4.35.
 
+The default metricset is `stats`.
 
 
 [float]
@@ -21,8 +22,6 @@ in <<configuration-metricbeat>>. Here is an example configuration:
 ----
 metricbeat.modules:
 - module: memcached
-  metricsets: ["stats"]
-  period: 10s
   hosts: ["localhost:11211"]
 ----
 

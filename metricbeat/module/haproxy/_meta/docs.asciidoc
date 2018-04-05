@@ -31,6 +31,8 @@ required authentication add this to the haproxy config:
    stats auth admin:admin
 ----
 
+The default metricsets are `info`and `stat`.
+
 [float]
 === Compatibility
 
