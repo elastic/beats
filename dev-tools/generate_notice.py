@@ -87,7 +87,7 @@ def get_licenses(folder):
     Get a list of license files from a given directory.
     """
     licenses = []
-    for filename in os.listdir(folder):
+    for filename in sorted(os.listdir(folder)):
         if filename.startswith("LICENSE") and "docs" not in filename:
             licenses.append(filename)
         elif filename.startswith("APLv2"):  # gorhill/cronexpr
