@@ -1,4 +1,4 @@
-// +build darwin,go1.10
+// +build darwin,!go1.10
 
 package fsevents
 
@@ -35,7 +35,14 @@ import (
 )
 
 // eventIDSinceNow is a sentinel to begin watching events "since now".
-const eventIDSinceNow = uint64(C.kFSEventStreamEventIdSinceNow)
+// NOTE: Go 1.9.2 broke compatibility here, for 1.9.1 and earlier we did:
+//   uint64(C.kFSEventStreamEventIdSinceNow + (1 << 64))
+// But 1.9.2+ complains about overflow and requires:
+//   uint64(C.kFSEventStreamEventIdSinceNow)
+// There does not seem to be an easy way to rectify, so hardcoding the value
+// here from FSEvents.h:
+//   kFSEventStreamEventIdSinceNow = 0xFFFFFFFFFFFFFFFFULL
+const eventIDSinceNow = uint64(0xFFFFFFFFFFFFFFFF)
 
 // LatestEventID returns the most recently generated event ID, system-wide.
 func LatestEventID() uint64 {
@@ -109,14 +116,14 @@ func GetStreamRefPaths(f FSEventStreamRef) []string {
 // in the FSEvents database
 func GetDeviceUUID(deviceID int32) string {
 	uuid := C.FSEventsCopyUUIDForDevice(C.dev_t(deviceID))
-	if uuid == C.CFUUIDRef(0) {
+	if uuid == nil {
 		return ""
 	}
 	return cfStringToGoString(C.CFUUIDCreateString(nil, uuid))
 }
 
 func cfStringToGoString(cfs C.CFStringRef) string {
-	if cfs == 0 {
+	if cfs == nil {
 		return ""
 	}
 	cfStr := C.CFStringCreateCopy(nil, cfs)
@@ -173,7 +180,7 @@ func createPaths(paths []string) (C.CFArrayRef, error) {
 		defer C.free(unsafe.Pointer(cpath))
 
 		str := C.CFStringCreateWithCString(nil, cpath, C.kCFStringEncodingUTF8)
-		C.CFArrayAppendValue(C.CFMutableArrayRef(cPaths), unsafe.Pointer(str))
+		C.CFArrayAppendValue(cPaths, unsafe.Pointer(str))
 	}
 	var err error
 	if len(errs) > 0 {
@@ -229,7 +236,7 @@ func (es *EventStream) start(paths []string, callbackInfo uintptr) {
 	go func() {
 		runtime.LockOSThread()
 		es.rlref = CFRunLoopRef(C.CFRunLoopGetCurrent())
-		C.FSEventStreamScheduleWithRunLoop(es.stream, C.CFRunLoopRef(es.rlref), C.kCFRunLoopDefaultMode)
+		C.FSEventStreamScheduleWithRunLoop(es.stream, es.rlref, C.kCFRunLoopDefaultMode)
 		C.FSEventStreamStart(es.stream)
 		close(started)
 		C.CFRunLoopRun()
@@ -265,5 +272,5 @@ func stop(stream FSEventStreamRef, rlref CFRunLoopRef) {
 	C.FSEventStreamStop(stream)
 	C.FSEventStreamInvalidate(stream)
 	C.FSEventStreamRelease(stream)
-	C.CFRunLoopStop(C.CFRunLoopRef(rlref))
+	C.CFRunLoopStop(rlref)
 }
