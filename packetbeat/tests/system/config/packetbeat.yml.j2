@@ -81,6 +81,7 @@ packetbeat.protocols:
   ]
 {%- endif %}
 {%- if http_max_message_size %}  max_message_size: {{ http_max_message_size }} {%- endif %}
+{%- if http_transaction_timeout %}  transaction_timeout: {{ http_transaction_timeout }} {%- endif %}
 
 - type: memcache
   ports: [{{ memcache_ports|default([11211])|join(", ") }}]

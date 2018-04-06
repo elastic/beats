@@ -29,7 +29,8 @@ class BaseTest(TestCase):
                        output="packetbeat.log",
                        extra_args=[],
                        debug_selectors=[],
-                       exit_code=0):
+                       exit_code=0,
+                       real_time=False):
         """
         Executes packetbeat on an input pcap file.
         Waits for the process to finish before returning to
@@ -41,11 +42,13 @@ class BaseTest(TestCase):
 
         args = [cmd]
 
+        if not real_time:
+            args.extend(["-t"])
+
         args.extend([
             "-e",
             "-I", os.path.join(self.beat_path + "/tests/system/pcaps", pcap),
             "-c", os.path.join(self.working_dir, config),
-            "-t",
             "-systemTest",
             "-test.coverprofile", os.path.join(self.working_dir, "coverage.cov"),
         ])
