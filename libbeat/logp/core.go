@@ -27,14 +27,16 @@ func init() {
 		selectors:    map[string]struct{}{},
 		rootLogger:   zap.NewNop(),
 		globalLogger: zap.NewNop(),
+		logger:       newLogger(zap.NewNop(), ""),
 	})
 }
 
 type coreLogger struct {
-	selectors    map[string]struct{}
-	rootLogger   *zap.Logger
-	globalLogger *zap.Logger
-	observedLogs *observer.ObservedLogs
+	selectors    map[string]struct{}    // Set of enabled debug selectors.
+	rootLogger   *zap.Logger            // Root logger without any options configured.
+	globalLogger *zap.Logger            // Logger used by legacy global functions (e.g. logp.Info).
+	logger       *Logger                // Logger that is the basis for all logp.Loggers.
+	observedLogs *observer.ObservedLogs // Contains events generated while in observation mode (a testing mode).
 }
 
 // Configure configures the logp package.
@@ -92,6 +94,7 @@ func Configure(cfg Config) error {
 		selectors:    selectors,
 		rootLogger:   root,
 		globalLogger: root.WithOptions(zap.AddCallerSkip(1)),
+		logger:       newLogger(root, ""),
 		observedLogs: observedLogs,
 	})
 	return nil
