@@ -141,7 +141,7 @@ func New(
 ) (*Pipeline, error) {
 	var err error
 
-	log := defaultLogger
+	log := logp.NewLogger("publish")
 	annotations := settings.Annotations
 	processors := settings.Processors
 	disabledOutput := settings.Disabled
