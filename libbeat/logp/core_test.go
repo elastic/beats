@@ -187,3 +187,29 @@ func TestIsDebug(t *testing.T) {
 	assert.False(t, IsDebug("all"))
 	assert.True(t, IsDebug("only_this"))
 }
+
+func TestL(t *testing.T) {
+	if err := DevelopmentSetup(ToObserverOutput()); err != nil {
+		t.Fatal(err)
+	}
+
+	L().Infow("infow", "rate", 2)
+	logs := ObserverLogs().TakeAll()
+	if assert.Len(t, logs, 1) {
+		log := logs[0]
+		assert.Equal(t, zap.InfoLevel, log.Level)
+		assert.Equal(t, "", log.LoggerName)
+		assert.Equal(t, "infow", log.Message)
+		assert.Contains(t, log.ContextMap(), "rate")
+	}
+
+	const loggerName = "tester"
+	L().Named(loggerName).Warnf("warning %d", 1)
+	logs = ObserverLogs().TakeAll()
+	if assert.Len(t, logs, 1) {
+		log := logs[0]
+		assert.Equal(t, zap.WarnLevel, log.Level)
+		assert.Equal(t, loggerName, log.LoggerName)
+		assert.Equal(t, "warning 1", log.Message)
+	}
+}
