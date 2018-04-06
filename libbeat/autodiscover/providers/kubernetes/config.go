@@ -20,10 +20,11 @@ type Config struct {
 	ExcludeLabels      []string `config:"exclude_labels"`
 	IncludeAnnotations []string `config:"include_annotations"`
 
-	Prefix    string                  `config:"prefix"`
-	Builders  []*common.Config        `config:"builders"`
-	Appenders []*common.Config        `config:"appenders"`
-	Templates template.MapperSettings `config:"templates"`
+	Prefix       string                  `config:"prefix"`
+	HintsEnabled bool                    `config:"hints.enabled"`
+	Builders     []*common.Config        `config:"builders"`
+	Appenders    []*common.Config        `config:"appenders"`
+	Templates    template.MapperSettings `config:"templates"`
 }
 
 func defaultConfig() *Config {

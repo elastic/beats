@@ -28,9 +28,7 @@ type Config struct {
 }
 
 func init() {
-	if err := mb.Registry.AddMetricSet("windows", "perfmon", New); err != nil {
-		panic(err)
-	}
+	mb.Registry.MustAddMetricSet("windows", "perfmon", New)
 }
 
 type MetricSet struct {

@@ -25,6 +25,7 @@ https://github.com/elastic/beats/compare/v6.0.0-beta2...master[Check the HEAD di
 - Add logging when monitoring cannot connect to Elasticsearch. {pull}6365[6365]
 - Rename beat.cpu.*.time metrics to beat.cpu.*.time.ms. {pull}6449[6449]
 - Mark `system.syslog.message` and `system.auth.message` as `text` instead of `keyword`. {pull}6589[6589]
+- Allow override of dynamic template `match_mapping_type` for fields with object_type. {pull}6691[6691]
 
 *Auditbeat*
 
@@ -48,6 +49,9 @@ https://github.com/elastic/beats/compare/v6.0.0-beta2...master[Check the HEAD di
 - Refactor the usage of prospector to input in the YAML reference and
   the system test. {pull}6121[6121]
 - Add IIS module to parse access log and error log. {pull}6127[6127]
+- Remove the undefined `username` option from the Redis input and clarify the documentation. {pull}6662[6662]
+- Add validation for Stdin, when Filebeat is configured with Stdin and any other inputs, Filebeat
+  will now refuses to start. {pull}6463[6463]
 
 *Heartbeat*
 
@@ -67,6 +71,9 @@ https://github.com/elastic/beats/compare/v6.0.0-beta2...master[Check the HEAD di
 - Fix dealing with new process status codes in Linux kernel 4.14+. {pull}6306[6306]
 - Add config option for windows/perfmon metricset to ignore non existent counters. {pull}6432[6432]
 - Support apache status pages for versions older than 2.4.16. {pull}6450[6450]
+- Add support for huge pages on Linux. {pull}6436[6436]
+- Refactor docker CPU calculations to be more consistent with `docker stats`. {pull}6608[6608]
+- Update logstash.node_stats metricset to write data under `logstash.node.stats.*`. {pull}[]
 
 *Packetbeat*
 
@@ -103,6 +110,7 @@ https://github.com/elastic/beats/compare/v6.0.0-beta2...master[Check the HEAD di
 - Fixed parsing of the `key` value when multiple keys are present.
 - Fix possible resource leak if file_integrity module is used with config
   reloading on Windows or Linux. {pull}6198[6198]
+- Add hex decoding for the name field in audit path records. {pull}6687[6687]
 
 *Filebeat*
 
@@ -156,6 +164,7 @@ https://github.com/elastic/beats/compare/v6.0.0-beta2...master[Check the HEAD di
 - Fix panic when parsing partial AMQP messages. {pull}6384[6384]
 - Fix out of bounds access to slice in MongoDB parser. {pull}6256[6256]
 - Fix sniffer hanging on exit under Linux. {pull}6535[6535]
+- Fix bounds check error in http parser causing a panic. {pull}6750[6750]
 
 *Winlogbeat*
 
@@ -257,12 +266,29 @@ https://github.com/elastic/beats/compare/v6.0.0-beta2...master[Check the HEAD di
 - Making the MongoDB module GA. {pull}6554[6554]
 - Allow to disable labels `dedot` in Docker module, in favor of a safe way to keep dots. {pull}6490[6490]
 - Add experimental module to collect metrics from munin nodes. {pull}6517[6517]
+- Add support for wildcards and explicit metrics grouping in jolokia/jmx. {pull}6462[6462]
+- Set `collector` as default metricset in Prometheus module. {pull}6636[6636] {pull}6747[6747]
+- Set `mntr` as default metricset in Zookeeper module. {pull}6674[6674]
+- Set default metricsets in vSphere module. {pull}6676[6676]
+- Set `status` as default metricset in Apache module. {pull}6673[6673]
+- Set `namespace` as default metricset in Aerospike module. {pull}6669[6669]
+- Set `service` as default metricset in Windows module. {pull}6675[6675]
+- Set all metricsets as default metricsets in uwsgi module. {pull}6688[6688]
+- Allow autodiscover to monitor unexposed ports {pull}6727[6727]
+- Mark kubernetes.event metricset as beta. {pull}6715[6715]
+- Set all metricsets as default metricsets in couchbase module. {pull}6683[6683]
+- Mark uwsgi module and metricset as beta. {pull}6717[6717]
+- Mark Golang module and metricsets as beta. {pull}6711[6711]
+- Mark system.raid metricset as beta. {pull}6710[6710]
+- Mark http.server metricset as beta. {pull}6712[6712]
+- Mark metricbeat logstash module and metricsets as beta. {pull}6713[6713]
 
 *Packetbeat*
 
 - Configure good defaults for `add_kubernetes_metadata`. {pull}5707[5707]
 - Add support for condition on bool type {issue}5659[5659] {pull}5954[5954]
 - HTTP parses successfully on empty status phrase. {issue}6176[6176]
+- HTTP parser supports broken status line. {pull}6631[6631]
 
 *Winlogbeat*
 

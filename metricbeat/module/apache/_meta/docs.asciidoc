@@ -1,5 +1,5 @@
 This module periodically fetches metrics from https://httpd.apache.org/[Apache
-HTTPD] servers.
+HTTPD] servers. The default metricset is `status`.
 
 [float]
 === Compatibility
