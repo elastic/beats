@@ -50,6 +50,8 @@ type UDPPlugin interface {
 	ParseUDP(pkt *Packet)
 }
 
+// ExpirationAwareTCPPlugin is a TCPPlugin that also provides the Expired()
+// method. No need to use this type directly, just implement the method.
 type ExpirationAwareTCPPlugin interface {
 	TCPPlugin
 
