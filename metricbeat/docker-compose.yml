@@ -74,6 +74,16 @@ services:
   haproxy:
     build: ./module/haproxy/_meta
 
+  haproxy_1_6:
+    build:
+      context: ./module/haproxy/_meta
+      dockerfile: Dockerfile.1.6
+
+  haproxy_1_7:
+    build:
+      context: ./module/haproxy/_meta
+      dockerfile: Dockerfile.1.7
+
   http:
     build: ./module/http/_meta
 
