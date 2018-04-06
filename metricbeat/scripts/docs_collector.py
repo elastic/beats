@@ -195,7 +195,7 @@ For a description of each field in the metricset, see the
                                                               release_label, dashboards, "")
 
         # Make sure empty entry row spans over all metricset rows for this module
-        module_list_output += '.{}+|   '.format(len(m["metricsets"]))
+        module_list_output += '.{}+| .{}+|  '.format(len(m["metricsets"]), len(m["metricsets"]))
 
         for key, ms in sorted(six.iteritems(m["metricsets"])):
 
@@ -203,7 +203,7 @@ For a description of each field in the metricset, see the
             if ms["release"] != "ga":
                 release_label = ms["release"] + "[]"
 
-            module_list_output += '|   |{} {}  \n'.format(ms["link"], release_label)
+            module_list_output += '|{} {}  \n'.format(ms["link"], release_label)
 
     module_list_output += '|================================'
 
