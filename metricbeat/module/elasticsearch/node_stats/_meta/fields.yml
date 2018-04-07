@@ -30,6 +30,53 @@
           type: long
           description: >
             Total size of the store in bytes.
+        - name: fielddata.memory.bytes
+          type: long
+          description: >
+            Bytes of memory used by fielddata.
+        - name: search.query.total
+          type: long
+          description: >
+            Total count of query.
+        - name: search.query.current
+          type: long
+          description: >
+            Current count of query.
+        - name: search.query.ms
+          type: long
+          description: >
+            The taked millisecond of query.
+        - name: indexing.index.total
+          type: long
+          description: >
+            Total count of indexing index.
+        - name: indexing.index.current
+          type: long
+          description: >
+            Current count of indexing index.
+        - name: indexing.index.ms
+          type: long
+          description: >
+            The taked millisecond of indexing index.
+
+    - name: jvm.mem.heap
+      type: group
+      description: >
+        JVM memory heap
+      fields:
+        - name: used.bytes
+          type: long
+          description: >
+            JVM memory heap used bytes.
+        - name: max.bytes
+          type: long
+          description: >
+            JVM memory heap max bytes.
+        - name: percent
+          type: long
+          description: >
+            JVM memory heap used percent.         
+    
     - name: jvm.mem.pools
       type: group
       description: >
@@ -124,9 +171,11 @@
             - name: count
               type: long
               description: >
+                Old collection count
             - name: ms
               type: long
               description: >
+                Old collection millisecond
         - name: young.collection
           type: group
           description: >
@@ -135,9 +184,11 @@
             - name: count
               type: long
               description: >
+                Young collection count
             - name: ms
               type: long
               description: >
+                Young collection millisecond
 
     - name: fs.summary
       type: group
@@ -148,11 +199,70 @@
           type: long
           format: bytes
           description: >
+            The total disk space in bytes.
         - name: free.bytes
           type: long
           format: bytes
           description: >
+            The disk space free in bytes.
         - name: available.bytes
           type: long
           format: bytes
           description: >
+            The disk space available in bytes.
+
+    - name: threadpool
+      type: group
+      description: >
+        Node threadpool stats
+      fields: 
+        - name: bulk.active
+          type: long
+          description: >
+            The count of bulk threads.
+        - name: bulk.queue
+          type: long
+          description: >
+            The length of bulk queue.
+        - name: bulk.rejected
+          type: long
+          description: >
+            The count of rejected bulk.
+        - name: index.active
+          type: long
+          description: >
+            The count of index threads.
+        - name: index.queue
+          type: long
+          description: >
+            The length of index queue.
+        - name: index.rejected
+          type: long
+          description: >
+            The count of rejected index.
+        - name: search.active
+          type: long
+          description: >
+            The count of search threads.
+        - name: search.queue
+          type: long
+          description: >
+            The length of search queue.
+        - name: search.rejected
+          type: long
+          description: >
+            The count of rejected bulk.
+    
+    - name: transport
+      type: group
+      description: >
+        Node network transport stats
+      fields: 
+        - name: rx.bytes
+          type: long
+          description: >
+            The bytes of network received.
+        - name: tx.bytes
+          type: long
+          description: >
+            The bytes of network sent.
