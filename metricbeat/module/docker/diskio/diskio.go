@@ -9,9 +9,10 @@ import (
 )
 
 func init() {
-	if err := mb.Registry.AddMetricSet("docker", "diskio", New, docker.HostParser); err != nil {
-		panic(err)
-	}
+	mb.Registry.MustAddMetricSet("docker", "diskio", New,
+		mb.WithHostParser(docker.HostParser),
+		mb.DefaultMetricSet(),
+	)
 }
 
 type MetricSet struct {

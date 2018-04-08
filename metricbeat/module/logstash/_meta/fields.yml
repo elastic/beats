@@ -2,7 +2,7 @@
   title: "Logstash"
   description: >
     Logstash module
-  release: experimental
+  release: beta
   settings: ["ssl"]
   fields:
     - name: logstash

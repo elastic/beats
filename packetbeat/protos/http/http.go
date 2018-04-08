@@ -24,7 +24,6 @@ type parserState uint8
 
 const (
 	stateStart parserState = iota
-	stateFLine
 	stateHeaders
 	stateBody
 	stateBodyChunkedStart
@@ -67,7 +66,6 @@ type httpPlugin struct {
 	splitCookie         bool
 	hideKeywords        []string
 	redactAuthorization bool
-	includeBodyFor      []string
 	maxMessageSize      int
 
 	parserConfig parserConfig
@@ -124,7 +122,7 @@ func (http *httpPlugin) setFromConfig(config *httpConfig) {
 	http.splitCookie = config.SplitCookie
 	http.parserConfig.realIPHeader = strings.ToLower(config.RealIPHeader)
 	http.transactionTimeout = config.TransactionTimeout
-	http.includeBodyFor = config.IncludeBodyFor
+	http.parserConfig.includeBodyFor = config.IncludeBodyFor
 	http.maxMessageSize = config.MaxMessageSize
 
 	if config.SendAllHeaders {
@@ -168,13 +166,11 @@ func (http *httpPlugin) messageGap(s *stream, nbytes int) (ok bool, complete boo
 		}
 		if !m.hasContentLength && (bytes.Equal(m.connection, constClose) ||
 			(isVersion(m.version, 1, 0) && !bytes.Equal(m.connection, constKeepAlive))) {
-
 			s.bodyReceived += nbytes
 			m.contentLength += nbytes
 			return true, false
-		} else if len(s.data[s.parseOffset:])+nbytes >= m.contentLength-s.bodyReceived {
+		} else if len(s.data)+nbytes >= m.contentLength-s.bodyReceived {
 			// we're done, but the last portion of the data is gone
-			m.end = s.parseOffset
 			return true, true
 		} else {
 			s.bodyReceived += nbytes
@@ -186,7 +182,6 @@ func (http *httpPlugin) messageGap(s *stream, nbytes int) (ok bool, complete boo
 }
 
 func (st *stream) PrepareForNewMessage() {
-	st.data = st.data[st.message.end:]
 	st.parseState = stateStart
 	st.parseOffset = 0
 	st.bodyReceived = 0
@@ -201,8 +196,6 @@ func (http *httpPlugin) messageComplete(
 	dir uint8,
 	st *stream,
 ) {
-	st.message.raw = st.data[st.message.start:st.message.end]
-
 	http.handleHTTP(conn, st.message, tcptuple, dir)
 }
 
@@ -274,7 +267,12 @@ func (http *httpPlugin) doParse(
 		conn.streams[dir] = st
 	} else {
 		// concatenate bytes
-		if len(st.data)+len(pkt.Payload) > http.maxMessageSize {
+		totalLength := len(st.data) + len(pkt.Payload)
+		msg := st.message
+		if msg != nil {
+			totalLength += len(msg.body)
+		}
+		if totalLength > http.maxMessageSize {
 			if isDebug {
 				debugf("Stream data too large, ignoring message")
 			}
@@ -284,13 +282,14 @@ func (http *httpPlugin) doParse(
 		}
 	}
 
-	for len(st.data) > 0 {
+	for len(st.data) > 0 || extraMsgSize > 0 {
 		if st.message == nil {
 			st.message = &message{ts: pkt.Ts}
 		}
 
 		parser := newParser(&http.parserConfig)
 		ok, complete := parser.parse(st, extraMsgSize)
+		extraMsgSize = 0
 		if !ok {
 			// drop this tcp stream. Will retry parsing with the next
 			// segment in it
@@ -338,8 +337,7 @@ func (http *httpPlugin) ReceivedFin(tcptuple *common.TCPTuple, dir uint8,
 
 	// send whatever data we got so far as complete. This
 	// is needed for the HTTP/1.0 without Content-Length situation.
-	if stream.message != nil && len(stream.data[stream.message.start:]) > 0 {
-		stream.message.raw = stream.data[stream.message.start:]
+	if stream.message != nil {
 		http.handleHTTP(conn, stream.message, tcptuple, dir)
 
 		// and reset message. Probably not needed, just to be sure.
@@ -445,7 +443,7 @@ func (http *httpPlugin) newTransaction(requ, resp *message) beat.Event {
 	// resp_time in milliseconds
 	responseTime := int32(resp.ts.Sub(requ.ts).Nanoseconds() / 1e6)
 
-	path, params, err := http.extractParameters(requ, requ.raw)
+	path, params, err := http.extractParameters(requ)
 	if err != nil {
 		logp.Warn("Fail to parse HTTP parameters: %v", err)
 	}
@@ -495,10 +493,10 @@ func (http *httpPlugin) newTransaction(requ, resp *message) beat.Event {
 	}
 
 	if http.sendRequest {
-		fields["request"] = string(http.cutMessageBody(requ))
+		fields["request"] = http.makeRawMessage(requ)
 	}
 	if http.sendResponse {
-		fields["response"] = string(http.cutMessageBody(resp))
+		fields["response"] = http.makeRawMessage(resp)
 	}
 
 	if len(requ.notes)+len(resp.notes) > 0 {
@@ -512,6 +510,16 @@ func (http *httpPlugin) newTransaction(requ, resp *message) beat.Event {
 		Timestamp: timestamp,
 		Fields:    fields,
 	}
+}
+
+func (http *httpPlugin) makeRawMessage(m *message) string {
+	var result []byte
+	result = append(result, m.rawHeaders...)
+	if m.sendBody {
+		result = append(result, m.body...)
+	}
+	// TODO: (go1.10) Use strings.Builder to avoid allocation/copying
+	return string(result)
 }
 
 func (http *httpPlugin) publishTransaction(event beat.Event) {
@@ -554,9 +562,8 @@ func (http *httpPlugin) collectHeaders(m *message) interface{} {
 }
 
 func (http *httpPlugin) setBody(result common.MapStr, m *message) {
-	body := string(http.extractBody(m))
-	if len(body) > 0 {
-		result["body"] = body
+	if m.sendBody && len(m.body) > 0 {
+		result["body"] = string(m.body)
 	}
 }
 
@@ -583,57 +590,13 @@ func parseCookieValue(raw string) string {
 	return raw
 }
 
-func (http *httpPlugin) extractBody(m *message) []byte {
-	body := []byte{}
-
-	if len(m.contentType) > 0 && http.shouldIncludeInBody(m.contentType) {
-		if len(m.chunkedBody) > 0 {
-			body = append(body, m.chunkedBody...)
-		} else {
-			if isDebug {
-				debugf("Body to include: [%s]", m.raw[m.bodyOffset:])
-			}
-			body = append(body, m.raw[m.bodyOffset:]...)
-		}
-	}
-
-	return body
-}
-
-func (http *httpPlugin) cutMessageBody(m *message) []byte {
-	cutMsg := []byte{}
-
-	// add headers always
-	cutMsg = m.raw[:m.bodyOffset]
-
-	// add body
-	return append(cutMsg, http.extractBody(m)...)
-}
-
-func (http *httpPlugin) shouldIncludeInBody(contenttype []byte) bool {
-	includedBodies := http.includeBodyFor
-	for _, include := range includedBodies {
-		if bytes.Contains(contenttype, []byte(include)) {
-			if isDebug {
-				debugf("Should Include Body = true Content-Type %s include_body %s",
-					contenttype, include)
-			}
-			return true
-		}
-		if isDebug {
-			debugf("Should Include Body = false Content-Type %s include_body %s",
-				contenttype, include)
-		}
-	}
-	return false
-}
-
 func (http *httpPlugin) hideHeaders(m *message) {
 	if !m.isRequest || !http.redactAuthorization {
 		return
 	}
 
-	msg := m.raw
+	msg := m.rawHeaders
+	limit := len(msg)
 
 	// byte64 != encryption, so obscure it in headers in case of Basic Authentication
 
@@ -641,24 +604,24 @@ func (http *httpPlugin) hideHeaders(m *message) {
 	authText := []byte("uthorization:") // [aA] case insensitive, also catches Proxy-Authorization:
 
 	authHeaderStartX := m.headerOffset
-	authHeaderEndX := m.bodyOffset
+	authHeaderEndX := limit
 
-	for authHeaderStartX < m.bodyOffset {
+	for authHeaderStartX < limit {
 		if isDebug {
 			debugf("looking for authorization from %d to %d",
 				authHeaderStartX, authHeaderEndX)
 		}
 
-		startOfHeader := bytes.Index(msg[authHeaderStartX:m.bodyOffset], authText)
+		startOfHeader := bytes.Index(msg[authHeaderStartX:], authText)
 		if startOfHeader >= 0 {
 			authHeaderStartX = authHeaderStartX + startOfHeader
 
-			endOfHeader := bytes.Index(msg[authHeaderStartX:m.bodyOffset], []byte("\r\n"))
+			endOfHeader := bytes.Index(msg[authHeaderStartX:], constCRLF)
 			if endOfHeader >= 0 {
 				authHeaderEndX = authHeaderStartX + endOfHeader
 
-				if authHeaderEndX > m.bodyOffset {
-					authHeaderEndX = m.bodyOffset
+				if authHeaderEndX > limit {
+					authHeaderEndX = limit
 				}
 
 				if isDebug {
@@ -670,8 +633,8 @@ func (http *httpPlugin) hideHeaders(m *message) {
 				}
 			}
 		}
-		authHeaderStartX = authHeaderEndX + len("\r\n")
-		authHeaderEndX = m.bodyOffset
+		authHeaderStartX = authHeaderEndX + len(constCRLF)
+		authHeaderEndX = len(m.rawHeaders)
 	}
 
 	for _, header := range redactHeaders {
@@ -679,8 +642,6 @@ func (http *httpPlugin) hideHeaders(m *message) {
 			m.headers[header] = []byte("*")
 		}
 	}
-
-	m.raw = msg
 }
 
 func (http *httpPlugin) hideSecrets(values url.Values) url.Values {
@@ -700,7 +661,7 @@ func (http *httpPlugin) hideSecrets(values url.Values) url.Values {
 // extractParameters parses the URL and the form parameters and replaces the secrets
 // with the string xxxxx. The parameters containing secrets are defined in http.Hide_secrets.
 // Returns the Request URI path and the (adjusted) parameters.
-func (http *httpPlugin) extractParameters(m *message, msg []byte) (path string, params string, err error) {
+func (http *httpPlugin) extractParameters(m *message) (path string, params string, err error) {
 	var values url.Values
 
 	u, err := url.Parse(string(m.requestURI))
@@ -712,9 +673,9 @@ func (http *httpPlugin) extractParameters(m *message, msg []byte) (path string, 
 
 	paramsMap := http.hideSecrets(values)
 
-	if m.contentLength > 0 && bytes.Contains(m.contentType, []byte("urlencoded")) {
+	if m.contentLength > 0 && m.saveBody && bytes.Contains(m.contentType, []byte("urlencoded")) {
 
-		values, err = url.ParseQuery(string(msg[m.bodyOffset:]))
+		values, err = url.ParseQuery(string(m.body))
 		if err != nil {
 			return
 		}

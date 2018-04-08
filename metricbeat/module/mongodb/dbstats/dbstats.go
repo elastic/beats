@@ -16,9 +16,10 @@ var debugf = logp.MakeDebug("mongodb.dbstats")
 // init registers the MetricSet with the central registry.
 // The New method will be called after the setup of the module and before starting to fetch data
 func init() {
-	if err := mb.Registry.AddMetricSet("mongodb", "dbstats", New, mongodb.ParseURL); err != nil {
-		panic(err)
-	}
+	mb.Registry.MustAddMetricSet("mongodb", "dbstats", New,
+		mb.WithHostParser(mongodb.ParseURL),
+		mb.DefaultMetricSet(),
+	)
 }
 
 // MetricSet type defines all fields of the MetricSet

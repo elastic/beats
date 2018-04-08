@@ -6,7 +6,7 @@ This file is generated! See scripts/docs_collector.py
 == Apache module
 
 This module periodically fetches metrics from https://httpd.apache.org/[Apache
-HTTPD] servers.
+HTTPD] servers. The default metricset is `status`.
 
 [float]
 === Compatibility
@@ -33,10 +33,6 @@ in <<configuration-metricbeat>>. Here is an example configuration:
 ----
 metricbeat.modules:
 - module: apache
-  metricsets: ["status"]
-  period: 10s
-
-  # Apache hosts
   hosts: ["http://127.0.0.1"]
 ----
 

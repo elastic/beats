@@ -18,7 +18,10 @@ import (
 )
 
 func init() {
-	mb.Registry.AddMetricSet("uwsgi", "status", New, uwsgi.HostParser)
+	mb.Registry.MustAddMetricSet("uwsgi", "status", New,
+		mb.WithHostParser(uwsgi.HostParser),
+		mb.DefaultMetricSet(),
+	)
 }
 
 // MetricSet for fetching uwsgi metrics from StatServer.
@@ -28,7 +31,7 @@ type MetricSet struct {
 
 // New creates a new instance of the MetricSet.
 func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
-	cfgwarn.Experimental("The uWSGI status metricset is experimental")
+	cfgwarn.Beta("The uWSGI status metricset is beta")
 	return &MetricSet{BaseMetricSet: base}, nil
 }
 

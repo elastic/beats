@@ -39,6 +39,8 @@ import (
 	svc "github.com/elastic/beats/libbeat/service"
 	"github.com/elastic/beats/libbeat/template"
 	"github.com/elastic/beats/libbeat/version"
+	"github.com/elastic/go-sysinfo"
+	"github.com/elastic/go-sysinfo/types"
 
 	// Register publisher pipeline modules
 	_ "github.com/elastic/beats/libbeat/publisher/includes"
@@ -105,7 +107,7 @@ func init() {
 	initRand()
 
 	flag.BoolVar(&printVersion, "version", false, "Print the version and exit")
-	flag.BoolVar(&setup, "setup", false, "Load the sample Kibana dashboards")
+	flag.BoolVar(&setup, "setup", false, "Load sample Kibana dashboards and setup Machine Learning")
 }
 
 // initRand initializes the runtime random number generator seed using
@@ -219,6 +221,7 @@ func (b *Beat) createBeater(bt beat.Creator) (beat.Beater, error) {
 		return nil, err
 	}
 
+	logSystemInfo(b.Info)
 	logp.Info("Setup Beat: %s; Version: %s", b.Info.Beat, b.Info.Version)
 
 	err = b.registerTemplateLoading()
@@ -678,4 +681,74 @@ func handleError(err error) error {
 	logp.Critical("Exiting: %v", err)
 	fmt.Fprintf(os.Stderr, "Exiting: %v\n", err)
 	return err
+}
+
+// logSystemInfo logs information about this system for situational awareness
+// in debugging. This information includes data about the beat, build, go
+// runtime, host, and process. If any of the data is not available it will be
+// omitted.
+func logSystemInfo(info beat.Info) {
+	defer logp.Recover("An unexpected error occurred while collecting " +
+		"information about the system.")
+	log := logp.NewLogger("beat").With(logp.Namespace("system_info"))
+
+	// Beat
+	beat := common.MapStr{
+		"type": info.Beat,
+		"uuid": info.UUID,
+		"path": common.MapStr{
+			"config": paths.Resolve(paths.Config, ""),
+			"data":   paths.Resolve(paths.Data, ""),
+			"home":   paths.Resolve(paths.Home, ""),
+			"logs":   paths.Resolve(paths.Logs, ""),
+		},
+	}
+	log.Infow("Beat info", "beat", beat)
+
+	// Build
+	build := common.MapStr{
+		"commit":  version.Commit(),
+		"time":    version.BuildTime(),
+		"version": info.Version,
+		"libbeat": version.GetDefaultVersion(),
+	}
+	log.Infow("Build info", "build", build)
+
+	// Go Runtime
+	log.Infow("Go runtime info", "go", sysinfo.Go())
+
+	// Host
+	if host, err := sysinfo.Host(); err == nil {
+		log.Infow("Host info", "host", host.Info())
+	}
+
+	// Process
+	if self, err := sysinfo.Self(); err == nil {
+		process := common.MapStr{}
+
+		if info, err := self.Info(); err == nil {
+			process["name"] = info.Name
+			process["pid"] = info.PID
+			process["ppid"] = info.PPID
+			process["cwd"] = info.CWD
+			process["exe"] = info.Exe
+			process["start_time"] = info.StartTime
+		}
+
+		if proc, ok := self.(types.Seccomp); ok {
+			if seccomp, err := proc.Seccomp(); err == nil {
+				process["seccomp"] = seccomp
+			}
+		}
+
+		if proc, ok := self.(types.Capabilities); ok {
+			if caps, err := proc.Capabilities(); err == nil {
+				process["capabilities"] = caps
+			}
+		}
+
+		if len(process) > 0 {
+			log.Infow("Process info", "process", process)
+		}
+	}
 }

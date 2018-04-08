@@ -27,9 +27,9 @@ var (
 )
 
 func init() {
-	if err := mb.Registry.AddMetricSet("system", "socket", New, parse.EmptyHostParser); err != nil {
-		panic(err)
-	}
+	mb.Registry.MustAddMetricSet("system", "socket", New,
+		mb.WithHostParser(parse.EmptyHostParser),
+	)
 }
 
 type MetricSet struct {

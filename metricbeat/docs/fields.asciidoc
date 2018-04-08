@@ -6512,7 +6512,7 @@ Pid
 
 
 [float]
-== node_stats fields
+== node.stats fields
 
 node_stats metrics.
 
@@ -6526,7 +6526,7 @@ Events stats
 
 
 [float]
-=== `logstash.node_stats.events.in`
+=== `logstash.node.stats.events.in`
 
 type: long
 
@@ -6534,7 +6534,7 @@ Incoming events counter.
 
 
 [float]
-=== `logstash.node_stats.events.out`
+=== `logstash.node.stats.events.out`
 
 type: long
 
@@ -6542,7 +6542,7 @@ Outgoing events counter.
 
 
 [float]
-=== `logstash.node_stats.events.filtered`
+=== `logstash.node.stats.events.filtered`
 
 type: long
 

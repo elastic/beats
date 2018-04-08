@@ -109,7 +109,8 @@ func TestGenerateHints(t *testing.T) {
 			},
 		},
 		{
-			message: "Module, namespace, host hint should return valid config without port should not return hosts",
+			message: "Module, namespace, host hint should return valid config with port should return hosts for " +
+				"docker host network scenario",
 			event: bus.Event{
 				"host": "1.2.3.4",
 				"hints": common.MapStr{
@@ -128,6 +129,7 @@ func TestGenerateHints(t *testing.T) {
 				"timeout":    "3s",
 				"period":     "1m",
 				"enabled":    true,
+				"hosts":      []interface{}{"1.2.3.4:9090"},
 			},
 		},
 		{

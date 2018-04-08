@@ -52,6 +52,7 @@ NOSETESTS_OPTIONS?=--process-timeout=$(TIMEOUT) --with-timer -v --with-xunit --x
 TEST_ENVIRONMENT?=false ## @testing if true, "make testsuite" runs integration tests and system tests in a dockerized test environment
 SYSTEM_TESTS?=false ## @testing if true, "make test" and "make testsuite" run unit tests and system tests
 STRESS_TESTS?=false ## @testing if true, "make test" and "make testsuite" run also run the stress tests
+STRESS_TEST_OPTIONS?=-timeout=20m -race -v
 GOX_OS?=linux darwin windows freebsd netbsd openbsd ## @Building List of all OS to be supported by "make crosscompile".
 GOX_OSARCH?=!darwin/arm !darwin/arm64 !darwin/386 ## @building Space separated list of GOOS/GOARCH pairs to build by "make crosscompile".
 GOX_FLAGS?= ## @building Additional flags to append to the gox command used by "make crosscompile".
@@ -206,7 +207,7 @@ fast-system-tests: ${BEAT_NAME}.test python-env
 stress-tests: ## @testing Runs the stress tests with race detector enabled
 stress-tests:
 	if [ -n '${GOPACKAGES_STRESSTESTS}' ]; then \
-		go test -race --tags=stresstest -v ${GOPACKAGES_STRESSTESTS}; \
+		go test --tags=stresstest ${STRESS_TEST_OPTIONS} ${GOPACKAGES_STRESSTESTS}; \
 	fi
 
 # Run benchmark tests
@@ -230,7 +231,8 @@ python-env: ${ES_BEATS}/libbeat/tests/system/requirements.txt
 	else \
 		. ${PYTHON_ENV}/bin/activate && pip install ${PIP_INSTALL_PARAMS} -qUr ${ES_BEATS}/libbeat/tests/system/requirements.txt ; \
 	fi
-
+	# Work around pip bug. See: https://github.com/pypa/pip/issues/4464
+	find ${PYTHON_ENV} -type d -name 'dist-packages' -exec sh -c "echo dist-packages > {}.pth" ';'
 
 .PHONY: test
 test: ## @testing Runs unit and system tests without coverage reports
@@ -261,8 +263,8 @@ testsuite: clean update
 	# Runs system and system integration tests if SYSTEM_TESTS is set to true
 	if [ $(SYSTEM_TESTS) = true ]; then \
 		if [ $(TEST_ENVIRONMENT) = true ]; then \
-        	$(MAKE) system-tests-environment; \
-    	else \
+			$(MAKE) system-tests-environment; \
+		else \
 			$(MAKE) system-tests; \
 		fi \
 	fi
