@@ -36,6 +36,8 @@ https://github.com/elastic/beats/compare/v6.2.2...6.2[Check the HEAD diff]
 
 *Filebeat*
 
+- Fix panic when log prospector configuration fails to load. {issue}6800[6800]
+
 *Heartbeat*
 
 *Metricbeat*
