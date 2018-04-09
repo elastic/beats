@@ -57,6 +57,8 @@ https://github.com/elastic/beats/compare/v6.0.0-beta2...master[Check the HEAD di
 
 *Filebeat*
 
+- Fix panic when log prospector configuration fails to load. {issue}6800[6800]
+
 *Heartbeat*
 
 *Metricbeat*
