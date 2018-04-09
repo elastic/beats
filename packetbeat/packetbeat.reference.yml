@@ -179,8 +179,17 @@ packetbeat.protocols:
   #send_all_headers: false
 
   # The list of content types for which Packetbeat includes the full HTTP
-  # payload in the response field.
+  # payload. If the request's or response's Content-Type matches any on this
+  # list, the full body will be included under the request or response field.
   #include_body_for: []
+
+  # The list of content types for which Packetbeat includes the full HTTP
+  # request payload.
+  #include_request_body_for: []
+
+  # The list of content types for which Packetbeat includes the full HTTP
+  # response payload.
+  #include_response_body_for: []
 
   # If the Cookie or Set-Cookie headers are sent, this option controls whether
   # they are split into individual values.

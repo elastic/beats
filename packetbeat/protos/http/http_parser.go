@@ -67,11 +67,12 @@ type parser struct {
 }
 
 type parserConfig struct {
-	realIPHeader     string
-	sendHeaders      bool
-	sendAllHeaders   bool
-	headersWhitelist map[string]bool
-	includeBodyFor   []string
+	realIPHeader           string
+	sendHeaders            bool
+	sendAllHeaders         bool
+	headersWhitelist       map[string]bool
+	includeRequestBodyFor  []string
+	includeResponseBodyFor []string
 }
 
 var (
@@ -260,7 +261,11 @@ func (parser *parser) parseHeaders(s *stream, m *message) (cont, ok, complete bo
 			return false, true, true
 		}
 
-		m.sendBody = parser.shouldIncludeInBody(m.contentType)
+		if m.isRequest {
+			m.sendBody = parser.shouldIncludeInBody(m.contentType, parser.config.includeRequestBodyFor)
+		} else {
+			m.sendBody = parser.shouldIncludeInBody(m.contentType, parser.config.includeResponseBodyFor)
+		}
 		m.saveBody = m.sendBody || (m.contentLength > 0 && bytes.Contains(m.contentType, []byte("urlencoded")))
 
 		if m.isChunked {
@@ -531,8 +536,8 @@ func (*parser) parseBodyChunkedWaitFinalCRLF(s *stream, m *message) (ok, complet
 	return true, true
 }
 
-func (parser *parser) shouldIncludeInBody(contenttype []byte) bool {
-	for _, include := range parser.config.includeBodyFor {
+func (parser *parser) shouldIncludeInBody(contenttype []byte, capturedContentTypes []string) bool {
+	for _, include := range capturedContentTypes {
 		if bytes.Contains(contenttype, []byte(include)) {
 			if isDebug {
 				debugf("Should Include Body = true Content-Type %s include_body %s",
