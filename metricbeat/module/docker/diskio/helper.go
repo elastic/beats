@@ -28,25 +28,27 @@ type BlkioRaw struct {
 
 // BlkioService is a helper to collect and calculate disk I/O metrics
 type BlkioService struct {
-	BlkioStatsPerContainer map[string]BlkioRaw
+	lastStatsPerContainer map[string]BlkioRaw
 }
 
 // NewBlkioService builds a new initialized BlkioService
 func NewBlkioService() *BlkioService {
 	return &BlkioService{
-		BlkioStatsPerContainer: make(map[string]BlkioRaw),
+		lastStatsPerContainer: make(map[string]BlkioRaw),
 	}
 }
 
 func (io *BlkioService) getBlkioStatsList(rawStats []docker.Stat, dedot bool) []BlkioStats {
 	formattedStats := []BlkioStats{}
-	if io.BlkioStatsPerContainer == nil {
-		io.BlkioStatsPerContainer = make(map[string]BlkioRaw)
-	}
+
+	statsPerContainer := make(map[string]BlkioRaw)
 	for _, myRawStats := range rawStats {
-		formattedStats = append(formattedStats, io.getBlkioStats(&myRawStats, dedot))
+		stats := io.getBlkioStats(&myRawStats, dedot)
+		statsPerContainer[myRawStats.Container.ID] = stats.serviced
+		formattedStats = append(formattedStats, stats)
 	}
 
+	io.lastStatsPerContainer = statsPerContainer
 	return formattedStats
 }
 
@@ -62,15 +64,12 @@ func (io *BlkioService) getBlkioStats(myRawStat *docker.Stat, dedot bool) BlkioS
 		servicedBytes: bytesBlkioStats,
 	}
 
-	oldBlkioStats, exist := io.BlkioStatsPerContainer[myRawStat.Container.ID]
+	oldBlkioStats, exist := io.lastStatsPerContainer[myRawStat.Container.ID]
 	if exist {
 		myBlkioStats.reads = io.getReadPs(&oldBlkioStats, &newBlkioStats)
 		myBlkioStats.writes = io.getWritePs(&oldBlkioStats, &newBlkioStats)
 		myBlkioStats.totals = io.getTotalPs(&oldBlkioStats, &newBlkioStats)
 	}
-
-	// FIXME: Memory leak
-	io.BlkioStatsPerContainer[myRawStat.Container.ID] = newBlkioStats
 
 	return myBlkioStats
 }
