@@ -185,6 +185,7 @@ https://github.com/elastic/beats/compare/v6.0.0-beta2...master[Check the HEAD di
 
 - Add support for condition on bool type {issue}5659[5659] {pull}5954[5954]
 - Fix high memory usage on HTTP body if body is not published. {pull}6680[6680]
+- Allow to capture the HTTP request or response bodies independently. {pull}6784[6784]
 
 *Winlogbeat*
 
