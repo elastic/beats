@@ -59,7 +59,10 @@ This file is generated! See scripts/docs_collector.py
         modules_list[module]["dashboards"] = os.path.exists(module_meta_path + "/kibana")
         modules_list[module]["metricsets"] = {}
 
-        config_file = module_meta_path + "/config.yml"
+        config_file = module_meta_path + "/config.reference.yml"
+
+        if os.path.isfile(config_file) == False:
+            config_file = module_meta_path + "/config.yml"
 
         # Add example config file
         if os.path.isfile(config_file) == True:

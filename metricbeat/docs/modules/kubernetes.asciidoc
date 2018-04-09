@@ -24,6 +24,7 @@ in <<configuration-metricbeat>>. Here is an example configuration:
 [source,yaml]
 ----
 metricbeat.modules:
+# Node metrics, from kubelet:
 - module: kubernetes
   metricsets:
     - container
@@ -31,7 +32,31 @@ metricbeat.modules:
     - pod
     - system
     - volume
+  period: 10s
   hosts: ["localhost:10255"]
+  enabled: true
+  #ssl.certificate_authorities: ["/etc/pki/root/ca.pem"]
+  #ssl.certificate: "/etc/pki/client/cert.pem"
+  #ssl.key: "/etc/pki/client/cert.key"
+
+# State metrics from kube-state-metrics service:
+- module: kubernetes
+  enabled: true
+  metricsets:
+    - state_node
+    - state_deployment
+    - state_replicaset
+    - state_statefulset
+    - state_pod
+    - state_container
+  period: 10s
+  hosts: ["kube-state-metrics:8080"]
+
+# Kubernetes events
+- module: kubernetes
+  enabled: true
+  metricsets:
+    - event
 ----
 
 This module supports TLS connection when using `ssl` config field, as described in <<configuration-ssl>>.
