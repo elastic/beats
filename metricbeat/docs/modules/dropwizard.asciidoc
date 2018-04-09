@@ -21,9 +21,12 @@ in <<configuration-metricbeat>>. Here is an example configuration:
 ----
 metricbeat.modules:
 - module: dropwizard
+  metricsets: ["collector"]
+  period: 10s
   hosts: ["localhost:8080"]
   metrics_path: /metrics/metrics
   namespace: example
+  enabled: true
 ----
 
 This module supports TLS connection when using `ssl` config field, as described in <<configuration-ssl>>.

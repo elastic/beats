@@ -31,7 +31,7 @@
   # If both the `by_cpu` and `by_memory` options are used, the union of the two sets
   # is included.
   #process.include_top_n:
-    #
+
     # Set to false to disable this feature and include all processes
     #enabled: true
 
