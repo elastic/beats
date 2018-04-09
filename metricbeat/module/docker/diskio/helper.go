@@ -69,6 +69,7 @@ func (io *BlkioService) getBlkioStats(myRawStat *docker.Stat, dedot bool) BlkioS
 		myBlkioStats.totals = io.getTotalPs(&oldBlkioStats, &newBlkioStats)
 	}
 
+	// FIXME: Memory leak
 	io.BlkioStatsPerContainer[myRawStat.Container.ID] = newBlkioStats
 
 	return myBlkioStats
