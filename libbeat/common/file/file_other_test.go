@@ -4,6 +4,7 @@ package file
 
 import (
 	"io/ioutil"
+	"math"
 	"os"
 	"runtime"
 	"testing"
@@ -46,5 +47,23 @@ func TestGetOSFileStateStat(t *testing.T) {
 		assert.True(t, state.Device >= 0, "Device %d", state.Device)
 	} else {
 		assert.True(t, state.Device > 0, "Device %d", state.Device)
+	}
+}
+
+func BenchmarkStateString(b *testing.B) {
+	var samples [50]uint64
+	for i, v := 0, uint64(0); i < len(samples); i, v = i+1, v+math.MaxUint64/uint64(len(samples)) {
+		samples[i] = v
+	}
+
+	for i := 0; i < b.N; i++ {
+		for _, inode := range samples {
+			for _, device := range samples {
+				st := StateOS{Inode: inode, Device: device}
+				if st.String() == "" {
+					b.Fatal("empty state string")
+				}
+			}
+		}
 	}
 }
