@@ -585,7 +585,9 @@ func (p *Input) createHarvester(state file.State, onTerminate func()) (*Harveste
 		},
 		outlet,
 	)
-	h.onTerminate = onTerminate
+	if err == nil {
+		h.onTerminate = onTerminate
+	}
 	return h, err
 }
 
