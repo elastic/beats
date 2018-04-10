@@ -66,7 +66,7 @@ func TestFileSystemListFiltering(t *testing.T) {
 			},
 		},
 		{
-			description: "Don't repeat devices, sortest of dir names should be used",
+			description: "Don't repeat devices, shortest of dir names should be used",
 			fss: []sigar.FileSystem{
 				{DirName: "/", DevName: "/dev/sda1"},
 				{DirName: "/bind", DevName: "/dev/sda1"},
@@ -76,7 +76,7 @@ func TestFileSystemListFiltering(t *testing.T) {
 			},
 		},
 		{
-			description: "Don't repeat devices, sortest of dir names should be used",
+			description: "Don't repeat devices, shortest of dir names should be used",
 			fss: []sigar.FileSystem{
 				{DirName: "/bind", DevName: "/dev/sda1"},
 				{DirName: "/", DevName: "/dev/sda1"},
@@ -97,7 +97,7 @@ func TestFileSystemListFiltering(t *testing.T) {
 			},
 		},
 		{
-			description: "Don't repeat devices, sortest of dir names should be used, keep tmpfs",
+			description: "Don't repeat devices, shortest of dir names should be used, keep tmpfs",
 			fss: []sigar.FileSystem{
 				{DirName: "/", DevName: "/dev/sda1"},
 				{DirName: "/bind", DevName: "/dev/sda1"},
