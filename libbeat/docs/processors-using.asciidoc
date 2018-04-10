@@ -691,7 +691,7 @@ The fields added to the event are looking as following:
 {
    "host":{
       "architecture":"x86_64",
-      "hostname":"example-host",
+      "name":"example-host",
       "id":"",
       "os":{
          "family":"darwin",
