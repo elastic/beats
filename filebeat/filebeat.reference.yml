@@ -1565,8 +1565,7 @@ logging.files:
 
 # Port on which the HTTP endpoint will bind. Default is 5066.
 #http.port: 5066
-#
-#
+
 #================================ Keystore ==========================================
 # Location of the Keystore containing the keys and their sensitive values.
 #keystore.path: "${path.config}/beats.keystore"
