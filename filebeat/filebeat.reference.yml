@@ -307,7 +307,7 @@ filebeat.modules:
     #input:
 
 
- new#=========================== Filebeat inputs =============================
+#=========================== Filebeat inputs =============================
 
 # List of inputs to fetch data.
 filebeat.inputs:
