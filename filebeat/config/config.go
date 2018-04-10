@@ -34,6 +34,7 @@ type Config struct {
 	ConfigProspector        *common.Config       `config:"config.prospectors"`
 	ConfigModules           *common.Config       `config:"config.modules"`
 	Autodiscover            *autodiscover.Config `config:"autodiscover"`
+	UpdatePipelines         bool                 `config:"update_pipelines"`
 }
 
 var (
@@ -41,6 +42,7 @@ var (
 		RegistryFile:            "registry",
 		RegistryFilePermissions: 0600,
 		ShutdownTimeout:         0,
+		UpdatePipelines:         false,
 	}
 )
 

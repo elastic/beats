@@ -1,4 +1,4 @@
-#=========================== Filebeat inputs =============================
+ new#=========================== Filebeat inputs =============================
 
 # List of inputs to fetch data.
 filebeat.inputs:
@@ -285,6 +285,10 @@ filebeat.inputs:
 # Must be a valid Unix-style file permissions mask expressed in octal notation.
 # This option is not supported on Windows.
 #filebeat.registry_file_permissions: 0600
+
+# By default Ingest pipelines are not updated. If this option is enabled Filebeat updates
+# pipelines everytime a new Elasticsearch connection is established.
+#filebeat.update_pipelines: false
 
 # These config files must have the full filebeat config part inside, but only
 # the input part is processed. All global options like spool_size are ignored.
