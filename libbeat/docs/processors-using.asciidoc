@@ -535,23 +535,20 @@ the required fields, `@timestamp` and `type`, are exported.
 [[rename-fields]]
 === Rename fields from events
 
-The `rename` processor specifies a list of fields that should be renamed. The
-list of fields to be renamed are listed under `fields`. Each entry contains a
-`from: old-key` and a `to: new-key` pair. `from` is the origin and `to` the
-target name of the field.
-
-The renaming of fields can be useful in case two fields potentially conflict.
+The `rename` processor specifies a list of fields to rename. Under the `fields`
+key each entry contains a `from: old-key` and a `to: new-key` pair. `from` is
+the origin and `to` the target name of the field.
 
 Renaming fields can be useful in cases where field names cause conflicts. For
-example if an event has two fields, `a` and `a.b`, that are both assigned a
-scalar values (e.g. `{"a": 1, "a.b": 2}`) this will result in an error at ingest
-time from Elasticsearch. This is because the value of a cannot simultaneously be
-a scalar and an object. To prevent this rename_fields can be used to rename a to
-a.value.
+example if an event has two fields, `c` and `c.b`, that are both assigned scalar
+values (e.g. `{"c": 1, "c.b": 2}`) this will result in an Elasticsearch error at
+ingest time. This is because the value of a cannot simultaneously be a scalar
+and an object. To prevent this rename_fields can be used to rename `c` to
+`c.value`.
 
 Rename fields cannot be used to overwrite fields. To overwrite fields either
-first rename the target field or use the drop_fields processor to drop the field
-and then rename the field.
+first rename the target field or use the `drop_fields` processor to drop the
+field and then rename the field.
 
 [source,yaml]
 -------
