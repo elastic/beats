@@ -1,4 +1,4 @@
-The System `socket_summary` metricset provides the summary of open sockets in the.
+The System `socket_summary` metricset provides the summary of open network sockets in the host system.
 
 The following metrics are exported:
 * TCP
@@ -9,7 +9,10 @@ The following metrics are exported:
 
 This metricset is available on:
 
+- FreeBSD
 - Linux
+- macOS
+- Windows
 
 [float]
 === Configuration

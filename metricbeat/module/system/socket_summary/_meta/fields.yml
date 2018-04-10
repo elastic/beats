@@ -2,7 +2,7 @@
   title: Socket summary
   type: group
   description: >
-    ss
+    Summary metrics of open sockets in the host system
   fields:
     - name: tcp.listening
       type: integer
