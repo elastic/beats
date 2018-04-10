@@ -46,14 +46,11 @@ func (c *publishClient) Connect() error {
 	}
 	status, body, err := c.es.Request("GET", "/_xpack", "", params, nil)
 	if err != nil {
-		debugf("XPack capabilities query failed with: %v", err)
-		return err
+		return fmt.Errorf("X-Pack capabilities query failed with: %v", err)
 	}
 
 	if status != 200 {
-		err := fmt.Errorf("XPack capabilities query failed with status code: %v", status)
-		debugf("%s", err)
-		return err
+		return fmt.Errorf("X-Pack capabilities query failed with status code: %v", status)
 	}
 
 	resp := struct {
