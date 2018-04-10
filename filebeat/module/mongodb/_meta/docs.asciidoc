@@ -1,0 +1,56 @@
+:modulename: mongodb
+
+== MongoDB module
+
+The +{modulename}+ module collects and parses logs created by
+https://www.mongodb.com/[MongoDB].
+
+include::../include/what-happens.asciidoc[]
+
+[float]
+=== Compatibility
+
+The +{modulename}+ module was tested with logs from versions v3.2.11 on Debian.
+
+include::../include/running-modules.asciidoc[]
+
+[float]
+=== Example dashboard
+
+This module comes with one sample dashboard including error and regular logs.
+
+[role="screenshot"]
+image::./images/filebeat-mongodb-overview.png[]
+
+include::../include/configuring-intro.asciidoc[]
+
+The following example shows how to set paths in the +modules.d/{modulename}.yml+
+file to override the default paths for MongoDB logs:
+
+
+["source","yaml",subs="attributes"]
+-----
+- module: mongodb
+  log:
+    enabled: true
+    var.paths: ["/path/to/log/mongodb/*.log*"]
+-----
+
+
+To specify the same settings at the command line, you use:
+
+["source","sh",subs="attributes"]
+-----
+./{beatname_lc} --modules {modulename} -M "mongodb.log.var.paths=[/path/to/log/mongodb/*.log*]"
+-----
+
+
+:fileset_ex: log
+
+include::../include/config-option-intro.asciidoc[]
+
+
+[float]
+==== `log` log fileset settings
+
+include::../include/var-paths.asciidoc[]
