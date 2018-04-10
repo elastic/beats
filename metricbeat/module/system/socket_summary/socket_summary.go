@@ -41,12 +41,17 @@ func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
 
 func calculateConnStats(conns []net.ConnectionStat) common.MapStr {
 	var (
+		allConns     = len(conns)
+		allListening = 0
 		tcpConns     = 0
 		tcpListening = 0
 		udpConns     = 0
 	)
 
 	for _, conn := range conns {
+		if conn.Status == "LISTEN" {
+			allListening++
+		}
 		switch conn.Type {
 		case syscall.SOCK_STREAM:
 			tcpConns++
@@ -60,12 +65,20 @@ func calculateConnStats(conns []net.ConnectionStat) common.MapStr {
 	}
 
 	return common.MapStr{
+		"all": common.MapStr{
+			"connections": allConns,
+			"listening":   allListening,
+		},
 		"tcp": common.MapStr{
-			"connections": tcpConns,
-			"listening":   tcpListening,
+			"all": common.MapStr{
+				"connections": tcpConns,
+				"listening":   tcpListening,
+			},
 		},
 		"udp": common.MapStr{
-			"connections": udpConns,
+			"all": common.MapStr{
+				"connections": udpConns,
+			},
 		},
 	}
 }
@@ -75,6 +88,7 @@ func calculateConnStats(conns []net.ConnectionStat) common.MapStr {
 // of an error set the Error field of mb.Event or simply call report.Error().
 func (m *MetricSet) Fetch(report mb.ReporterV2) {
 
+	// all network connections
 	conns, err := net.Connections("inet")
 
 	if err != nil {

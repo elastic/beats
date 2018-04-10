@@ -4,15 +4,50 @@
   description: >
     Summary metrics of open sockets in the host system
   fields:
-    - name: tcp.listening
-      type: integer
+    - name: all
+      type: group
       description: >
-        TCP connections in listening state
-    - name: tcp.connections
-      type: integer
+        All connections
+      fields:
+        - name: connections
+          type: integer
+          description: >
+            All open connections
+        - name: listening
+          type: integer
+          description: >
+            All listening ports
+    - name: tcp
+      type: group
       description: >
         All TCP connections
-    - name: udp.connections
-      type: integer
+      fields:
+        - name: all
+          type: group
+          description: >
+            All TCP connections
+          fields:
+            - name: connections
+              type: integer
+              description: >
+                All open TCP connections
+            - name: listening
+              type: integer
+              description: >
+                All TCP listening ports
+    - name: udp
+      type: group
       description: >
         All UDP connections
+      fields:
+        - name: all
+          type: group
+          description: >
+            All UDP connections
+          fields:
+            - name: connections
+              type: integer
+              description: >
+                All open TCP connections
+
+

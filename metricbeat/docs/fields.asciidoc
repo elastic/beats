@@ -19481,36 +19481,91 @@ Name of the user running the process.
 [float]
 == socket.summary fields
 
-ss
+Summary metrics of open sockets in the host system
 
 
 
-*`system.socket.summary.tcp.listening`*::
+[float]
+== all fields
+
+All connections
+
+
+
+*`system.socket.summary.all.connections`*::
 +
 --
 type: integer
 
-TCP connections in listening state
+All open connections
 
 
 --
 
-*`system.socket.summary.tcp.connections`*::
+*`system.socket.summary.all.listening`*::
 +
 --
 type: integer
+
+All listening ports
+
+
+--
+
+[float]
+== tcp fields
 
 All TCP connections
 
 
---
 
-*`system.socket.summary.udp.connections`*::
+[float]
+== all fields
+
+All TCP connections
+
+
+
+*`system.socket.summary.tcp.all.connections`*::
 +
 --
 type: integer
 
+All open TCP connections
+
+
+--
+
+*`system.socket.summary.tcp.all.listening`*::
++
+--
+type: integer
+
+All TCP listening ports
+
+
+--
+
+[float]
+== udp fields
+
 All UDP connections
+
+
+
+[float]
+== all fields
+
+All UDP connections
+
+
+
+*`system.socket.summary.udp.all.connections`*::
++
+--
+type: integer
+
+All open TCP connections
 
 
 --
