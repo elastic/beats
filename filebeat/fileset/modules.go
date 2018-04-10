@@ -263,7 +263,7 @@ func (reg *ModuleRegistry) InfoString() string {
 	var result string
 	for module, filesets := range reg.registry {
 		var filesetNames string
-		for name, _ := range filesets {
+		for name := range filesets {
 			if filesetNames != "" {
 				filesetNames += ", "
 			}

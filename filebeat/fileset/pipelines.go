@@ -8,7 +8,7 @@ import (
 	"github.com/elastic/beats/libbeat/logp"
 )
 
-// PipelineLoader factory builds and returns a PipelineLoader
+// PipelineLoaderFactory builds and returns a PipelineLoader
 type PipelineLoaderFactory func() (PipelineLoader, error)
 
 // PipelineLoader is a subset of the Elasticsearch client API capable of loading
@@ -21,7 +21,6 @@ type PipelineLoader interface {
 
 // LoadPipelines loads the pipelines for each configured fileset.
 func (reg *ModuleRegistry) LoadPipelines(esClient PipelineLoader, forceUpdate bool) error {
-	fmt.Println("itten")
 	for module, filesets := range reg.registry {
 		for name, fileset := range filesets {
 			// check that all the required Ingest Node plugins are available
