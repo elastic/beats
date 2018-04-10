@@ -12914,7 +12914,7 @@ The percentage of used disk space.
 [float]
 == fsstat fields
 
-`system.fsstat` contains filesystem metrics aggregated from all mounted filesystems, similar with what `df -a` prints out.
+`system.fsstat` contains filesystem metrics aggregated from all mounted filesystems.
 
 
 

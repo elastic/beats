@@ -31,19 +31,45 @@ func GetFileSystemList() ([]sigar.FileSystem, error) {
 		return nil, err
 	}
 
-	// Ignore relative mount points, which are present for example
-	// in /proc/mounts on Linux with network namespaces.
-	filtered := fss.List[:0]
-	for _, fs := range fss.List {
-		if filepath.IsAbs(fs.DirName) {
+	return filterFileSystemList(fss.List), nil
+}
+
+// filterFileSystemList filters mountpoints to avoid virtual filesystems
+// and duplications
+func filterFileSystemList(fsList []sigar.FileSystem) []sigar.FileSystem {
+	var filtered []sigar.FileSystem
+	devices := make(map[string]sigar.FileSystem)
+	for _, fs := range fsList {
+		// Ignore relative mount points, which are present for example
+		// in /proc/mounts on Linux with network namespaces.
+		if !filepath.IsAbs(fs.DirName) {
+			debugf("Filtering filesystem with relative mountpoint %+v", fs)
+			continue
+		}
+
+		// Don't do further checks in special devices
+		if !filepath.IsAbs(fs.DevName) {
 			filtered = append(filtered, fs)
 			continue
 		}
-		debugf("Filtering filesystem with relative mountpoint %+v", fs)
-	}
-	fss.List = filtered
 
-	return fss.List, nil
+		// If a block device is mounted multiple times (e.g. with bind mounts),
+		// store it only once, and use the shorter mount point path.
+		if seen, found := devices[fs.DevName]; found {
+			if len(fs.DirName) < len(seen.DirName) {
+				devices[fs.DevName] = fs
+			}
+			continue
+		}
+
+		devices[fs.DevName] = fs
+	}
+
+	for _, fs := range devices {
+		filtered = append(filtered, fs)
+	}
+
+	return filtered
 }
 
 func GetFileSystemStat(fs sigar.FileSystem) (*FileSystemStat, error) {

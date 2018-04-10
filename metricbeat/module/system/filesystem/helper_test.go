@@ -47,6 +47,103 @@ func TestFileSystemList(t *testing.T) {
 	}
 }
 
+func TestFileSystemListFiltering(t *testing.T) {
+	if runtime.GOOS == "windows" {
+		t.Skip("These cases don't need to work on Windows")
+	}
+
+	cases := []struct {
+		description   string
+		fss, expected []sigar.FileSystem
+	}{
+		{
+			fss: []sigar.FileSystem{
+				{DirName: "/", DevName: "/dev/sda1"},
+				{DirName: "/", DevName: "/dev/sda1"},
+			},
+			expected: []sigar.FileSystem{
+				{DirName: "/", DevName: "/dev/sda1"},
+			},
+		},
+		{
+			description: "Don't repeat devices, sortest of dir names should be used",
+			fss: []sigar.FileSystem{
+				{DirName: "/", DevName: "/dev/sda1"},
+				{DirName: "/bind", DevName: "/dev/sda1"},
+			},
+			expected: []sigar.FileSystem{
+				{DirName: "/", DevName: "/dev/sda1"},
+			},
+		},
+		{
+			description: "Don't repeat devices, sortest of dir names should be used",
+			fss: []sigar.FileSystem{
+				{DirName: "/bind", DevName: "/dev/sda1"},
+				{DirName: "/", DevName: "/dev/sda1"},
+			},
+			expected: []sigar.FileSystem{
+				{DirName: "/", DevName: "/dev/sda1"},
+			},
+		},
+		{
+			description: "Keep tmpfs",
+			fss: []sigar.FileSystem{
+				{DirName: "/run", DevName: "tmpfs"},
+				{DirName: "/tmp", DevName: "tmpfs"},
+			},
+			expected: []sigar.FileSystem{
+				{DirName: "/run", DevName: "tmpfs"},
+				{DirName: "/tmp", DevName: "tmpfs"},
+			},
+		},
+		{
+			description: "Don't repeat devices, sortest of dir names should be used, keep tmpfs",
+			fss: []sigar.FileSystem{
+				{DirName: "/", DevName: "/dev/sda1"},
+				{DirName: "/bind", DevName: "/dev/sda1"},
+				{DirName: "/run", DevName: "tmpfs"},
+			},
+			expected: []sigar.FileSystem{
+				{DirName: "/", DevName: "/dev/sda1"},
+				{DirName: "/run", DevName: "tmpfs"},
+			},
+		},
+	}
+
+	for _, c := range cases {
+		filtered := filterFileSystemList(c.fss)
+		assert.ElementsMatch(t, c.expected, filtered, c.description)
+	}
+}
+
+func TestFileSystemListFilteringWindows(t *testing.T) {
+	if runtime.GOOS != "windows" {
+		t.Skip("These cases only need to work on windows")
+	}
+
+	cases := []struct {
+		description   string
+		fss, expected []sigar.FileSystem
+	}{
+		{
+			description: "Keep all filesystems in Windows",
+			fss: []sigar.FileSystem{
+				{DirName: "C:\\", DevName: "C:\\"},
+				{DirName: "D:\\", DevName: "D:\\"},
+			},
+			expected: []sigar.FileSystem{
+				{DirName: "C:\\", DevName: "C:\\"},
+				{DirName: "D:\\", DevName: "D:\\"},
+			},
+		},
+	}
+
+	for _, c := range cases {
+		filtered := filterFileSystemList(c.fss)
+		assert.ElementsMatch(t, c.expected, filtered, c.description)
+	}
+}
+
 func TestFilter(t *testing.T) {
 	in := []sigar.FileSystem{
 		{SysTypeName: "nfs"},
