@@ -595,8 +595,9 @@ filebeat.inputs:
 # This option is not supported on Windows.
 #filebeat.registry_file_permissions: 0600
 
-# By default Ingest pipelines are not updated. If this option is enabled Filebeat updates
-# pipelines everytime a new Elasticsearch connection is established.
+# By default Ingest pipelines are not updated if a pipeline with the same ID
+# already exists. If this option is enabled Filebeat updates pipelines everytime
+# a new Elasticsearch connection is established.
 #filebeat.update_pipelines: false
 
 # These config files must have the full filebeat config part inside, but only
