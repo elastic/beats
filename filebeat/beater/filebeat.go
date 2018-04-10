@@ -126,7 +126,31 @@ func New(b *beat.Beat, rawConfig *common.Config) (beat.Beater, error) {
 	b.SetupMLCallback = func(b *beat.Beat, kibanaConfig *common.Config) error {
 		return fb.loadModulesML(b, kibanaConfig)
 	}
+
+	err = fb.setupPipelineLoaderCallback(b)
+	if err != nil {
+		return nil, err
+	}
+
 	return fb, nil
+}
+
+func (fb *Filebeat) setupPipelineLoaderCallback(b *beat.Beat) error {
+	if !fb.moduleRegistry.Empty() {
+		updatePipelines := fb.config.UpdatePipelines
+		if b.InSetupCmd {
+			updatePipelines = true
+		}
+
+		b.UpdatePipelinesCallback = func(esConfig *common.Config) error {
+			esClient, err := elasticsearch.NewConnectedClient(esConfig)
+			if err != nil {
+				return err
+			}
+			return fb.moduleRegistry.LoadPipelines(esClient, updatePipelines)
+		}
+	}
+	return nil
 }
 
 // loadModulesPipelines is called when modules are configured to do the initial
@@ -135,6 +159,11 @@ func (fb *Filebeat) loadModulesPipelines(b *beat.Beat) error {
 	if b.Config.Output.Name() != "elasticsearch" {
 		logp.Warn(pipelinesWarning)
 		return nil
+	}
+
+	updatePipelines := fb.config.UpdatePipelines
+	if b.InSetupCmd {
+		updatePipelines = true
 	}
 
 	// register pipeline loading to happen every time a new ES connection is
