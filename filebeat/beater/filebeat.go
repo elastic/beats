@@ -137,17 +137,17 @@ func New(b *beat.Beat, rawConfig *common.Config) (beat.Beater, error) {
 
 func (fb *Filebeat) setupPipelineLoaderCallback(b *beat.Beat) error {
 	if !fb.moduleRegistry.Empty() {
-		updatePipelines := fb.config.UpdatePipelines
+		overwritePipelines := fb.config.OverwritePipelines
 		if b.InSetupCmd {
-			updatePipelines = true
+			overwritePipelines = true
 		}
 
-		b.UpdatePipelinesCallback = func(esConfig *common.Config) error {
+		b.OverwritePipelinesCallback = func(esConfig *common.Config) error {
 			esClient, err := elasticsearch.NewConnectedClient(esConfig)
 			if err != nil {
 				return err
 			}
-			return fb.moduleRegistry.LoadPipelines(esClient, updatePipelines)
+			return fb.moduleRegistry.LoadPipelines(esClient, overwritePipelines)
 		}
 	}
 	return nil
@@ -161,15 +161,15 @@ func (fb *Filebeat) loadModulesPipelines(b *beat.Beat) error {
 		return nil
 	}
 
-	updatePipelines := fb.config.UpdatePipelines
+	overwritePipelines := fb.config.OverwritePipelines
 	if b.InSetupCmd {
-		updatePipelines = true
+		overwritePipelines = true
 	}
 
 	// register pipeline loading to happen every time a new ES connection is
 	// established
 	callback := func(esClient *elasticsearch.Client) error {
-		return fb.moduleRegistry.LoadPipelines(esClient, updatePipelines)
+		return fb.moduleRegistry.LoadPipelines(esClient, overwritePipelines)
 	}
 	elasticsearch.RegisterConnectCallback(callback)
 
@@ -342,11 +342,11 @@ func (fb *Filebeat) Run(b *beat.Beat) error {
 		logp.Warn(pipelinesWarning)
 	}
 
-	if config.UpdatePipelines {
+	if config.OverwritePipelines {
 		logp.Debug("modules", "Existing Ingest pipelines will be updated")
 	}
 
-	err = crawler.Start(registrar, config.ConfigInput, config.ConfigModules, pipelineLoaderFactory, config.UpdatePipelines)
+	err = crawler.Start(registrar, config.ConfigInput, config.ConfigModules, pipelineLoaderFactory, config.OverwritePipelines)
 	if err != nil {
 		crawler.Stop()
 		return err

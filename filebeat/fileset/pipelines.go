@@ -20,7 +20,7 @@ type PipelineLoader interface {
 }
 
 // LoadPipelines loads the pipelines for each configured fileset.
-func (reg *ModuleRegistry) LoadPipelines(esClient PipelineLoader, forceUpdate bool) error {
+func (reg *ModuleRegistry) LoadPipelines(esClient PipelineLoader, overwrite bool) error {
 	for module, filesets := range reg.registry {
 		for name, fileset := range filesets {
 			// check that all the required Ingest Node plugins are available
@@ -37,7 +37,7 @@ func (reg *ModuleRegistry) LoadPipelines(esClient PipelineLoader, forceUpdate bo
 			if err != nil {
 				return fmt.Errorf("Error getting pipeline for fileset %s/%s: %v", module, name, err)
 			}
-			err = loadPipeline(esClient, pipelineID, content, forceUpdate)
+			err = loadPipeline(esClient, pipelineID, content, overwrite)
 			if err != nil {
 				return fmt.Errorf("Error loading pipeline for fileset %s/%s: %v", module, name, err)
 			}
@@ -46,9 +46,9 @@ func (reg *ModuleRegistry) LoadPipelines(esClient PipelineLoader, forceUpdate bo
 	return nil
 }
 
-func loadPipeline(esClient PipelineLoader, pipelineID string, content map[string]interface{}, forceUpdate bool) error {
+func loadPipeline(esClient PipelineLoader, pipelineID string, content map[string]interface{}, overwrite bool) error {
 	path := "/_ingest/pipeline/" + pipelineID
-	if !forceUpdate {
+	if !overwrite {
 		status, _, _ := esClient.Request("GET", path, "", nil, nil)
 		if status == 200 {
 			logp.Debug("modules", "Pipeline %s already loaded", pipelineID)

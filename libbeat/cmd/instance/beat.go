@@ -404,9 +404,9 @@ func (b *Beat) Setup(bt beat.Creator, template, dashboards, machineLearning, pip
 			fmt.Println("Loaded machine learning job configurations")
 		}
 
-		if pipelines && b.UpdatePipelinesCallback != nil {
+		if pipelines && b.OverwritePipelinesCallback != nil {
 			esConfig := b.Config.Output.Config()
-			err = b.UpdatePipelinesCallback(esConfig)
+			err = b.OverwritePipelinesCallback(esConfig)
 			if err != nil {
 				return err
 			}

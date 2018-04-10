@@ -38,7 +38,7 @@ type Beat struct {
 	SetupMLCallback SetupMLCallback // setup callback for ML job configs
 	InSetupCmd      bool            // this is set to true when the `setup` command is called
 
-	UpdatePipelinesCallback UpdatePipelinesCallback // ingest pipeline loader callback
+	OverwritePipelinesCallback OverwritePipelinesCallback // ingest pipeline loader callback
 	// XXX: remove Config from public interface.
 	//      It's currently used by filebeat modules to setup the Ingest Node
 	//      pipeline and ML jobs.
@@ -57,6 +57,6 @@ type BeatConfig struct {
 // for the enabled modules.
 type SetupMLCallback func(*Beat, *common.Config) error
 
-// UpdatePipelinesCallback can be used by the Beat to register Ingest pipeline loader
+// OverwritePipelinesCallback can be used by the Beat to register Ingest pipeline loader
 // for the enabled modules.
-type UpdatePipelinesCallback func(*common.Config) error
+type OverwritePipelinesCallback func(*common.Config) error
