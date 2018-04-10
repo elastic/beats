@@ -879,6 +879,10 @@ output.elasticsearch:
 # the default for the logs path is a logs subdirectory inside the home path.
 #path.logs: ${path.home}/logs
 
+#================================ Keystore ==========================================
+# Location of the Keystore containing the keys and their sensitive values.
+#keystore.path: "${path.config}/beats.keystore"
+
 #============================== Dashboards =====================================
 # These settings control loading the sample dashboards to the Kibana index. Loading
 # the dashboards are disabled by default and can be enabled either by setting the
