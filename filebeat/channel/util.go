@@ -22,13 +22,20 @@ func SubOutlet(out Outleter) Outleter {
 		res:    make(chan bool, 1),
 	}
 
-	go func() {
-		for event := range s.ch {
-			s.res <- out.OnEvent(event)
-		}
-	}()
+	go s.drainLoop(out)
 
 	return s
+}
+
+func (o *subOutlet) drainLoop(out Outleter) {
+	for {
+		select {
+		case <-o.done:
+			return
+		case event := <-o.ch:
+			o.res <- out.OnEvent(event)
+		}
+	}
 }
 
 func (o *subOutlet) Close() error {

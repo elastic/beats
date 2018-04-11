@@ -144,6 +144,7 @@ func (h *Harvester) ID() uuid.UUID {
 func (h *Harvester) Setup() error {
 	err := h.open()
 	if err != nil {
+		h.stop()
 		return fmt.Errorf("Harvester setup failed. Unexpected file opening error: %s", err)
 	}
 
@@ -152,6 +153,7 @@ func (h *Harvester) Setup() error {
 		if h.source != nil {
 			h.source.Close()
 		}
+		h.stop()
 		return fmt.Errorf("Harvester setup failed. Unexpected encoding line reader error: %s", err)
 	}
 
