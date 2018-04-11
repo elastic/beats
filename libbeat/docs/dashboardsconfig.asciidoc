@@ -41,7 +41,9 @@ You can specify the following options in the `setup.dashboards` section of the
 
 If this option is set to true, {beatname_uc} loads the sample Kibana dashboards
 automatically on startup. If no other options are set, the dashboard are loaded
-from the local `kibana` directory in the home path of the installation.
+from the local `kibana` directory in the home path of the installation. Note that
+any existing dashboards with the same names will be overwritten anytime Beats
+starts.
 
 To load dashboards from a different location, you can configure one of the
 following options: <<directory-option,`setup.dashboards.directory`>>,
