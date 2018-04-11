@@ -13,12 +13,12 @@ class Test(BaseTest):
         objs = self.read_output()
         assert all([o["type"] == "mysql" for o in objs])
         assert all([o["port"] == 3307 for o in objs])
-        assert len(objs) == 1
+        assert len(objs) == 2
 
-        assert objs[0]["method"] == "SELECT"
-        assert objs[0]["status"] == "OK"
-        assert objs[0]["params"] == "A1224638#2017/7/28 0:0:0#2017/10/28 23:59:59"
-        assert objs[0]["mysql.num_rows"] == 1
+        assert objs[1]["method"] == "SELECT"
+        assert objs[1]["status"] == "OK"
+        assert objs[1]["params"][0] == "A1224638"
+        assert objs[1]["mysql.num_rows"] == 1
 
         assert all(["bytes_in" in o.keys() for o in objs])
         assert all(["bytes_out" in o.keys() for o in objs])

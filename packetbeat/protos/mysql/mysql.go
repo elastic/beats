@@ -83,7 +83,7 @@ type mysqlMessage struct {
 
 	statementID       int
 	numberOfParameter int
-	param             string
+	params            []string
 }
 
 type mysqlTransaction struct {
@@ -104,8 +104,8 @@ type mysqlTransaction struct {
 	requestRaw  string
 	responseRaw string
 
-	statementID int    // for prepare statement
-	param       string // for execute statement param
+	statementID int      // for prepare statement
+	params      []string // for execute statement param
 }
 
 type mysqlStream struct {
@@ -213,7 +213,7 @@ func (mysql *mysqlPlugin) setFromConfig(config *mysqlConfig) {
 	mysql.sendRequest = config.SendRequest
 	mysql.sendResponse = config.SendResponse
 	mysql.transactionTimeout = config.TransactionTimeout
-	mysql.preparestatementTimeout = config.TransactionTimeout
+	mysql.preparestatementTimeout = config.StatementTimeout
 }
 
 func (mysql *mysqlPlugin) getTransaction(k common.HashableTCPTuple) *mysqlTransaction {
@@ -680,24 +680,32 @@ func (mysql *mysqlPlugin) receivedMysqlRequest(msg *mysqlMessage) {
 		trans.statementID = msg.statementID
 		stmts := mysql.getStmtsMap(msg.tcpTuple.Hashable())
 		if stmts == nil {
-			logp.Debug("mysqldetailed", "Request execute statement for no stream map. Ignoring.")
+			if msg.typ == mysqlCmdStmtExecute {
+				trans.query = "Request Execute Statement"
+			} else if msg.typ == mysqlCmdStmtClose {
+				trans.query = "Request Close Statement"
+			}
+			trans.notes = append(trans.notes, "The actual query being used is unknown")
+			trans.requestRaw = msg.query
+			trans.bytesIn = msg.size
 			return
 		}
 		if msg.typ == mysqlCmdStmtExecute {
 			if value, ok := stmts[trans.statementID]; ok {
 				trans.query = value.query
 				// parse parameters
-				parameters := mysql.parseMysqlExecuteStatement(msg.raw, value)
-				trans.param = strings.Join(parameters, "#")
-				logp.Debug("mysqldetailed", "parameters: %s", trans.param)
+				trans.params = mysql.parseMysqlExecuteStatement(msg.raw, value)
 			} else {
-				logp.Debug("mysqldetailed", "Request execute statement from unknown prepare statement ID. Ignoring.")
-				mysql.transactions.Delete(tuple.Hashable())
+				trans.query = "Request Execute Statement"
+				trans.notes = append(trans.notes, "The actual query being used is unknown")
+				trans.requestRaw = msg.query
+				trans.bytesIn = msg.size
 				return
 			}
 		} else if msg.typ == mysqlCmdStmtClose {
 			delete(stmts, trans.statementID)
-			mysql.transactions.Delete(tuple.Hashable())
+			trans.query = "CmdStmtClose"
+			//mysql.transactions.Delete(tuple.Hashable())
 		}
 	} else {
 		trans.query = msg.query
@@ -771,9 +779,8 @@ func (mysql *mysqlPlugin) receivedMysqlResponse(msg *mysqlMessage) {
 			}
 			mysql.preparestatements.Put(msg.tcpTuple.Hashable(), stmts)
 		}
-		// not publish prepare statement
-		mysql.transactions.Delete(trans.tuple.Hashable())
-		return
+		trans.notes = append(trans.notes, trans.query)
+		trans.query = "Request Prepare Statement"
 	}
 
 	trans.bytesOut = msg.size
@@ -793,7 +800,7 @@ func (mysql *mysqlPlugin) receivedMysqlResponse(msg *mysqlMessage) {
 	mysql.publishTransaction(trans)
 	mysql.transactions.Delete(trans.tuple.Hashable())
 
-	logp.Debug("mysql", "Mysql transaction completed: %s %s %s", trans.query, trans.param, trans.mysql)
+	logp.Debug("mysql", "Mysql transaction completed: %s %s %s", trans.query, trans.params, trans.mysql)
 	//	logp.Debug("mysql", "%s", trans.responseRaw)
 }
 
@@ -821,9 +828,11 @@ func (mysql *mysqlPlugin) parseMysqlExecuteStatement(data []byte, stmtdata *mysq
 	// null-bitmap
 	if nparam > 0 {
 		offset += (nparam + 7) / 8
+	} else {
+		return []string{}
 	}
 	// stmt bound
-	if dataLen < offset {
+	if dataLen <= offset {
 		logp.Debug("mysql", "Data too small")
 		return []string{}
 	}
@@ -832,7 +841,7 @@ func (mysql *mysqlPlugin) parseMysqlExecuteStatement(data []byte, stmtdata *mysq
 	paramOffset := offset
 	if stmtBound == 1 {
 		paramOffset += nparam * 2
-		if dataLen < paramOffset {
+		if dataLen <= paramOffset {
 			logp.Debug("mysql", "Data too small to contain parameters")
 			return []string{}
 		}
@@ -1168,7 +1177,7 @@ func (mysql *mysqlPlugin) publishTransaction(t *mysqlTransaction) {
 	}
 	fields["method"] = t.method
 	fields["query"] = t.query
-	fields["params"] = t.param
+	fields["params"] = t.params
 	fields["mysql"] = t.mysql
 	fields["path"] = t.path
 	fields["bytes_out"] = t.bytesOut
