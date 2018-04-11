@@ -3,13 +3,17 @@
 package filesystem
 
 import (
+	"bufio"
 	"os"
+	"path"
 	"path/filepath"
+	"strings"
 	"time"
 
 	"runtime"
 
 	"github.com/elastic/beats/libbeat/common"
+	"github.com/elastic/beats/metricbeat/module/system"
 	sigar "github.com/elastic/gosigar"
 )
 
@@ -159,4 +163,22 @@ func BuildTypeFilter(ignoreType ...string) Predicate {
 		}
 		return true
 	}
+}
+
+// DefaultIgnoredTypes tries to guess a sane list of filesystem types that
+// could be ignored in the running system
+func DefaultIgnoredTypes() (types []string) {
+	// If /proc/filesystems exist, default ignored types are all marked
+	// as nodev
+	fsListFile := path.Join(*system.HostFS, "/proc/filesystems")
+	if f, err := os.Open(fsListFile); err == nil {
+		scanner := bufio.NewScanner(f)
+		for scanner.Scan() {
+			line := strings.Fields(scanner.Text())
+			if len(line) == 2 && line[0] == "nodev" {
+				types = append(types, line[1])
+			}
+		}
+	}
+	return
 }

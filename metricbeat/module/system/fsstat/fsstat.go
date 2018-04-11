@@ -3,6 +3,8 @@
 package fsstat
 
 import (
+	"strings"
+
 	"github.com/elastic/beats/libbeat/common"
 	"github.com/elastic/beats/libbeat/logp"
 	"github.com/elastic/beats/metricbeat/mb"
@@ -31,6 +33,13 @@ func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
 	var config filesystem.Config
 	if err := base.Module().UnpackConfig(&config); err != nil {
 		return nil, err
+	}
+
+	if config.IgnoreTypes == nil {
+		config.IgnoreTypes = filesystem.DefaultIgnoredTypes()
+	}
+	if len(config.IgnoreTypes) > 0 {
+		logp.Info("Ignoring filesystem types: %s", strings.Join(config.IgnoreTypes, ", "))
 	}
 
 	return &MetricSet{
