@@ -3,6 +3,7 @@
 package filesystem
 
 import (
+	"os"
 	"path/filepath"
 	"time"
 
@@ -53,7 +54,14 @@ func filterFileSystemList(fsList []sigar.FileSystem) []sigar.FileSystem {
 			continue
 		}
 
-		// If a block device is mounted multiple times (e.g. with bind mounts),
+		// If the device name is a directory, this is a bind mount or nullfs,
+		// don't count it as it'd be counting again its parent filesystem.
+		devFileInfo, _ := os.Stat(fs.DevName)
+		if devFileInfo != nil && devFileInfo.IsDir() {
+			continue
+		}
+
+		// If a block device is mounted multiple times (e.g. with some bind mounts),
 		// store it only once, and use the shorter mount point path.
 		if seen, found := devices[fs.DevName]; found {
 			if len(fs.DirName) < len(seen.DirName) {
