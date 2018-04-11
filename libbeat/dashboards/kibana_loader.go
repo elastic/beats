@@ -1,10 +1,12 @@
 package dashboards
 
 import (
+	"context"
 	"encoding/json"
 	"fmt"
 	"io/ioutil"
 	"net/url"
+	"time"
 
 	"github.com/elastic/beats/libbeat/common"
 	"github.com/elastic/beats/libbeat/logp"
@@ -21,13 +23,13 @@ type KibanaLoader struct {
 	msgOutputter MessageOutputter
 }
 
-func NewKibanaLoader(cfg *common.Config, dashboardsConfig *Config, hostname string, msgOutputter MessageOutputter) (*KibanaLoader, error) {
+func NewKibanaLoader(ctx context.Context, cfg *common.Config, dashboardsConfig *Config, hostname string, msgOutputter MessageOutputter) (*KibanaLoader, error) {
 
 	if cfg == nil || !cfg.Enabled() {
 		return nil, fmt.Errorf("Kibana is not configured or enabled")
 	}
 
-	client, err := kibana.NewKibanaClient(cfg)
+	client, err := getKibanaClient(ctx, cfg, dashboardsConfig.Retry, 0)
 	if err != nil {
 		return nil, fmt.Errorf("Error creating Kibana client: %v", err)
 	}
@@ -43,6 +45,22 @@ func NewKibanaLoader(cfg *common.Config, dashboardsConfig *Config, hostname stri
 	loader.statusMsg("Initialize the Kibana %s loader", client.GetVersion())
 
 	return &loader, nil
+}
+
+func getKibanaClient(ctx context.Context, cfg *common.Config, retryCfg *Retry, retryAttempt uint) (*kibana.Client, error) {
+	client, err := kibana.NewKibanaClient(cfg)
+	if err != nil {
+		if retryCfg.Enabled && (retryCfg.Maximum == 0 || retryCfg.Maximum > retryAttempt) {
+			select {
+			case <-ctx.Done():
+				return nil, err
+			case <-time.After(retryCfg.Interval):
+				return getKibanaClient(ctx, cfg, retryCfg, retryAttempt+1)
+			}
+		}
+		return nil, fmt.Errorf("Error creating Kibana client: %v", err)
+	}
+	return client, nil
 }
 
 func (loader KibanaLoader) ImportIndex(file string) error {

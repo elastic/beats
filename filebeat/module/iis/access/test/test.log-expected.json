@@ -1,0 +1,188 @@
+[
+  {
+    "_index": "filebeat-6.1.3-alpha1-2018.01.20",
+    "_type": "doc",
+    "_id": "dL-VFGEBcLJksy_1Pk15",
+    "_version": 1,
+    "_score": null,
+    "_source": {
+      "iis": {
+        "access": {
+          "response_code": "200",
+          "geoip": {
+            "continent_name": "Europe",
+            "city_name": "Berlin",
+            "location": {
+                "lat": 52.5167,
+                "lon": 13.4
+            },
+            "region_name": "Land Berlin",
+            "country_iso_code": "DE"
+          },
+          "method": "GET",
+          "sub_status": "0",
+          "user_name": "-",
+          "request_time_ms": "123",
+          "url": "/",
+          "referrer": "-",
+          "remote_ip": "85.181.35.98",
+          "port": "80",
+          "server_ip": "127.0.0.1",
+          "win32_status": "0",
+          "query_string": "q=100",
+          "user_agent": {
+            "major": "57",
+            "minor": "0",
+            "os": "Windows",
+            "name": "Firefox",
+            "os_name": "Windows",
+            "device": "Other"
+          }
+        }
+      },
+      "@timestamp": "2018-01-01T08:09:10.000Z",
+      "offset": 405,
+      "beat": {
+        "hostname": "MACHINE-NAME",
+        "name": "MACHINE-NAME",
+        "version": "6.1.3-alpha1"
+      },
+      "prospector": {
+        "type": "log"
+      },
+      "read_timestamp": "2018-01-20T17:19:39.236Z",
+      "source": "/go/src/github.com/elastic/beats/filebeat/module/iis/access/test/test.log",
+      "fileset": {
+        "module": "iis",
+        "name": "access"
+      }
+    }
+  },
+  {
+    "_index": "filebeat-6.1.3-alpha1-2018.01.20",
+    "_type": "doc",
+    "_id": "db-VFGEBcLJksy_1Pk15",
+    "_version": 1,
+    "_score": null,
+    "_source": {
+      "iis": {
+        "access": {
+          "response_code": "200",
+          "cookie": "-",
+          "method": "GET",
+          "sub_status": "0",
+          "user_name": "-",
+          "request_time_ms": "789",
+          "url": "/",
+          "site_name": "W3SVC1",
+          "referrer": "-",
+          "body_received": {
+            "bytes": "456"
+          },
+          "hostname": "example.com",
+          "remote_ip": "127.0.0.1",
+          "port": "80",
+          "body_sent": {
+            "bytes": "123"
+          },
+          "win32_status": "0",
+          "query_string": "-",
+          "user_agent": {
+            "major": "57",
+            "minor": "0",
+            "os": "Windows",
+            "name": "Firefox",
+            "os_name": "Windows",
+            "device": "Other"
+          }
+        }
+      },
+      "@timestamp": "2018-01-01T09:10:11.000Z",
+      "offset": 869,
+      "beat": {
+        "hostname": "MACHINE-NAME",
+        "name": "MACHINE-NAME",
+        "version": "6.1.3-alpha1"
+      },
+      "prospector": {
+        "type": "log"
+      },
+      "read_timestamp": "2018-01-20T17:19:39.237Z",
+      "source": "/go/src/github.com/elastic/beats/filebeat/module/iis/access/test/test.log",
+      "fileset": {
+        "module": "iis",
+        "name": "access"
+      }
+    }
+  },
+  {
+    "_index": "filebeat-6.1.3-alpha1-2018.01.20",
+    "_type": "doc",
+    "_id": "dr-VFGEBcLJksy_1Pk15",
+    "_version": 1,
+    "_score": null,
+    "_source": {
+      "iis": {
+        "access": {
+          "server_name": "MACHINE-NAME",
+          "response_code": "200",
+          "geoip": {
+            "continent_name": "Europe",
+            "city_name": "Berlin",
+            "location": {
+                "lat": 52.5167,
+                "lon": 13.4
+            },
+            "region_name": "Land Berlin",
+            "country_iso_code": "DE"
+          },
+          "cookie": "-",
+          "method": "GET",
+          "sub_status": "0",
+          "user_name": "-",
+          "request_time_ms": "789",
+          "http_version": "1.1",
+          "url": "/",
+          "site_name": "W3SVC1",
+          "referrer": "-",
+          "body_received": {
+            "bytes": "456"
+          },
+          "hostname": "example.com",
+          "remote_ip": "85.181.35.98",
+          "port": "80",
+          "server_ip": "127.0.0.1",
+          "body_sent": {
+            "bytes": "123"
+          },
+          "win32_status": "0",
+          "query_string": "-",
+          "user_agent": {
+            "major": "57",
+            "minor": "0",
+            "os": "Windows",
+            "name": "Firefox",
+            "os_name": "Windows",
+            "device": "Other"
+          }
+        }
+      },
+      "@timestamp": "2018-01-01T10:11:12.000Z",
+      "offset": 1399,
+      "beat": {
+        "hostname": "MACHINE-NAME",
+        "name": "MACHINE-NAME",
+        "version": "6.1.3-alpha1"
+      },
+      "prospector": {
+        "type": "log"
+      },
+      "read_timestamp": "2018-01-20T17:19:39.237Z",
+      "source": "/go/src/github.com/elastic/beats/filebeat/module/iis/access/test/test.log",
+      "fileset": {
+        "module": "iis",
+        "name": "access"
+      }
+    }
+  }
+]

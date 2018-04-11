@@ -74,7 +74,7 @@ func AddFileSystemUsedPercentage(f *FileSystemStat) {
 		return
 	}
 
-	perc := float64(f.Used) / float64(f.Total)
+	perc := float64(f.Used) / float64(f.Used+f.Avail)
 	f.UsedPercent = common.Round(perc, common.DefaultDecimalPlacesCount)
 }
 

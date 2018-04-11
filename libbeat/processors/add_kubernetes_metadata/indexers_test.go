@@ -28,7 +28,9 @@ func TestPodIndexer(t *testing.T) {
 				"labelkey": "labelvalue",
 			},
 		},
-		Spec: kubernetes.PodSpec{},
+		Spec: kubernetes.PodSpec{
+			NodeName: "testnode",
+		},
 	}
 
 	indexers := podIndexer.GetMetadata(&pod)
@@ -42,6 +44,9 @@ func TestPodIndexer(t *testing.T) {
 		"namespace": "testns",
 		"labels": common.MapStr{
 			"labelkey": "labelvalue",
+		},
+		"node": common.MapStr{
+			"name": "testnode",
 		},
 	}
 
@@ -89,8 +94,11 @@ func TestContainerIndexer(t *testing.T) {
 		"labels": common.MapStr{
 			"labelkey": "labelvalue",
 		},
+		"node": common.MapStr{
+			"name": "testnode",
+		},
 	}
-
+	pod.Spec.NodeName = "testnode"
 	pod.Status.ContainerStatuses = []kubernetes.PodContainerStatus{
 		{
 			Name:        container,
@@ -282,6 +290,9 @@ func TestIpPortIndexer(t *testing.T) {
 		"labels": common.MapStr{
 			"labelkey": "labelvalue",
 		},
+		"node": common.MapStr{
+			"name": "testnode",
+		},
 	}
 
 	pod.Spec.Containers = []kubernetes.Container{
@@ -295,6 +306,7 @@ func TestIpPortIndexer(t *testing.T) {
 			},
 		},
 	}
+	pod.Spec.NodeName = "testnode"
 
 	indexers = ipIndexer.GetMetadata(&pod)
 	assert.Equal(t, 2, len(indexers))

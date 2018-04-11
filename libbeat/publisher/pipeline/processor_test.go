@@ -34,9 +34,25 @@ func TestProcessors(t *testing.T) {
 			[]local{
 				{
 					config: beat.ClientConfig{},
-					events: []common.MapStr{{"value": "abc"}},
+					events: []common.MapStr{{"value": "abc", "user": nil}},
 					expected: []common.MapStr{
 						{"value": "abc", "global": 1, "tags": []string{"tag"}},
+					},
+				},
+			},
+		},
+		{
+			"no normalization",
+			pipelineProcessors{
+				fields: common.MapStr{"global": 1},
+				tags:   []string{"tag"},
+			},
+			[]local{
+				{
+					config: beat.ClientConfig{SkipNormalization: true},
+					events: []common.MapStr{{"value": "abc", "user": nil}},
+					expected: []common.MapStr{
+						{"value": "abc", "user": nil, "global": 1, "tags": []string{"tag"}},
 					},
 				},
 			},

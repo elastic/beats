@@ -6,6 +6,7 @@
 :heartbeat: http://www.elastic.co/guide/en/beats/heartbeat/{doc-branch}
 :filebeat: http://www.elastic.co/guide/en/beats/filebeat/{doc-branch}
 :winlogbeat: http://www.elastic.co/guide/en/beats/winlogbeat/{doc-branch}
+:auditbeat: http://www.elastic.co/guide/en/beats/auditbeat/{doc-branch}
 :logstashdoc: https://www.elastic.co/guide/en/logstash/{doc-branch}
 :elasticsearch: https://www.elastic.co/guide/en/elasticsearch/reference/{doc-branch}
 :elasticsearch-plugins: https://www.elastic.co/guide/en/elasticsearch/plugins/{doc-branch}

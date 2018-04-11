@@ -91,6 +91,7 @@ spec:
       serviceAccountName: metricbeat
       terminationGracePeriodSeconds: 30
       hostNetwork: true
+      dnsPolicy: ClusterFirstWithHostNet
       containers:
       - name: metricbeat
         image: docker.elastic.co/beats/metricbeat:7.0.0-alpha1
@@ -158,6 +159,9 @@ spec:
         configMap:
           defaultMode: 0600
           name: metricbeat-daemonset-modules
+      # We set an `emptyDir` here to ensure the manifest will deploy correctly.
+      # It's recommended to change this to a `hostPath` folder, to ensure internal data
+      # files survive pod changes (ie: version upgrade)
       - name: data
         emptyDir: {}
 ---

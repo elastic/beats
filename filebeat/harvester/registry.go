@@ -80,7 +80,7 @@ func (r *Registry) Start(h Harvester) error {
 		// Starts harvester and picks the right type. In case type is not set, set it to default (log)
 		err := h.Run()
 		if err != nil {
-			logp.Err("Error running prospector: %v", err)
+			logp.Err("Error running input: %v", err)
 		}
 	}()
 	return nil

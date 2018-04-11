@@ -123,8 +123,8 @@ func TestFetchEventContents(t *testing.T) {
 	assert.EqualValues(t, 63, event["total_kbytes"])
 
 	uptime := event["uptime"].(common.MapStr)
-	assert.EqualValues(t, 1026782, uptime["server_uptime"])
 	assert.EqualValues(t, 1026782, uptime["uptime"])
+	assert.EqualValues(t, 1026782, uptime["server_uptime"])
 }
 
 // TestFetchTimeout verifies that the HTTP request times out and an error is

@@ -28,6 +28,7 @@ grouped in the following categories:
 * <<exported-fields-golang>>
 * <<exported-fields-graphite>>
 * <<exported-fields-haproxy>>
+* <<exported-fields-host-processor>>
 * <<exported-fields-http>>
 * <<exported-fields-jolokia>>
 * <<exported-fields-kafka>>
@@ -37,6 +38,7 @@ grouped in the following categories:
 * <<exported-fields-logstash>>
 * <<exported-fields-memcached>>
 * <<exported-fields-mongodb>>
+* <<exported-fields-munin>>
 * <<exported-fields-mysql>>
 * <<exported-fields-nginx>>
 * <<exported-fields-php_fpm>>
@@ -1549,7 +1551,7 @@ example: metricsets
 
 required: True
 
-The document type. Always set to "metricsets".
+The document type. Always set to "doc".
 
 
 [[exported-fields-couchbase]]
@@ -2014,7 +2016,6 @@ Number of items/documents that are replicas.
 [[exported-fields-docker-processor]]
 == Docker fields
 
-beta[]
 Docker stats collected from Docker.
 
 
@@ -2150,7 +2151,7 @@ type: scaled_float
 
 format: percentage
 
-The system kernel consumed by the Docker server.
+Percentage of time in kernel space.
 
 
 [float]
@@ -2158,7 +2159,7 @@ The system kernel consumed by the Docker server.
 
 type: long
 
-CPU kernel ticks.
+CPU ticks in kernel space.
 
 
 [float]
@@ -2168,6 +2169,7 @@ type: scaled_float
 
 format: percentage
 
+Percentage of total CPU time in the system.
 
 
 [float]
@@ -2185,6 +2187,7 @@ type: scaled_float
 
 format: percentage
 
+Percentage of time in user space.
 
 
 [float]
@@ -2192,7 +2195,7 @@ format: percentage
 
 type: long
 
-CPU user ticks
+CPU ticks in user space.
 
 
 [float]
@@ -4986,6 +4989,62 @@ type: integer
 The average queue time in ms over the last 1024 requests.
 
 
+[[exported-fields-host-processor]]
+== Host fields
+
+Info collected for the host machine.
+
+
+
+
+[float]
+=== `host.name`
+
+type: keyword
+
+Hostname.
+
+
+[float]
+=== `host.id`
+
+type: keyword
+
+Unique host id.
+
+
+[float]
+=== `host.architecture`
+
+type: keyword
+
+Host architecture (e.g. x86_64, arm, ppc, mips).
+
+
+[float]
+=== `host.os.platform`
+
+type: keyword
+
+OS platform (e.g. centos, ubuntu, windows).
+
+
+[float]
+=== `host.os.version`
+
+type: keyword
+
+OS version.
+
+
+[float]
+=== `host.os.family`
+
+type: keyword
+
+OS family (e.g. redhat, debian, freebsd, windows).
+
+
 [[exported-fields-http]]
 == HTTP fields
 
@@ -5423,7 +5482,6 @@ Total number of connections.
 [[exported-fields-kubernetes-processor]]
 == Kubernetes fields
 
-beta[]
 Kubernetes metadata added by the kubernetes processor
 
 
@@ -5443,6 +5501,14 @@ Kubernetes pod name
 type: keyword
 
 Kubernetes namespace
+
+
+[float]
+=== `kubernetes.node.name`
+
+type: keyword
+
+Kubernetes node name
 
 
 [float]
@@ -5532,6 +5598,26 @@ CPU used nanocores
 
 
 [float]
+=== `kubernetes.container.cpu.usage.node.pct`
+
+type: scaled_float
+
+format: percentage
+
+CPU usage as a percentage of the total node allocatable CPU
+
+
+[float]
+=== `kubernetes.container.cpu.usage.limit.pct`
+
+type: scaled_float
+
+format: percentage
+
+CPU usage as a percentage of the defined limit for the container (or total node allocatable CPU if unlimited)
+
+
+[float]
 == logs fields
 
 Logs info
@@ -5617,6 +5703,26 @@ type: long
 format: bytes
 
 Total memory usage
+
+
+[float]
+=== `kubernetes.container.memory.usage.node.pct`
+
+type: scaled_float
+
+format: percentage
+
+Memory usage as a percentage of the total node allocatable memory
+
+
+[float]
+=== `kubernetes.container.memory.usage.limit.pct`
+
+type: scaled_float
+
+format: percentage
+
+Memory usage as a percentage of the defined limit for the container (or total node allocatable memory if unlimited)
 
 
 
@@ -5847,14 +5953,6 @@ UUID version of the object
 
 kubernetes node metrics
 
-
-
-[float]
-=== `kubernetes.node.name`
-
-type: keyword
-
-Node name
 
 
 [float]
@@ -6139,6 +6237,74 @@ Tx errors
 
 
 [float]
+== cpu fields
+
+CPU usage metrics
+
+
+
+
+[float]
+=== `kubernetes.pod.cpu.usage.nanocores`
+
+type: long
+
+CPU used nanocores
+
+
+[float]
+=== `kubernetes.pod.cpu.usage.node.pct`
+
+type: scaled_float
+
+format: percentage
+
+CPU usage as a percentage of the total node CPU
+
+
+[float]
+=== `kubernetes.pod.cpu.usage.limit.pct`
+
+type: scaled_float
+
+format: percentage
+
+CPU usage as a percentage of the defined limit for the pod containers (or total node CPU if unlimited)
+
+
+
+
+[float]
+=== `kubernetes.pod.memory.usage.bytes`
+
+type: long
+
+format: bytes
+
+Total memory usage
+
+
+[float]
+=== `kubernetes.pod.memory.usage.node.pct`
+
+type: scaled_float
+
+format: percentage
+
+Memory usage as a percentage of the total node allocatable memory
+
+
+[float]
+=== `kubernetes.pod.memory.usage.limit.pct`
+
+type: scaled_float
+
+format: percentage
+
+Memory usage as a percentage of the defined limit for the pod containers (or total node allocatable memory if unlimited)
+
+
+[float]
 == container fields
 
 kubernetes container metrics
@@ -6305,7 +6471,7 @@ Node unschedulable status
 [float]
 === `kubernetes.node.cpu.allocatable.cores`
 
-type: long
+type: float
 
 Node CPU allocatable cores
 
@@ -6470,6 +6636,75 @@ The generation observed by the ReplicaSet controller
 type: long
 
 The number of fully labeled replicas per ReplicaSet
+
+
+[float]
+== statefulset fields
+
+kubernetes stateful set metrics
+
+
+
+[float]
+=== `kubernetes.statefulset.name`
+
+type: keyword
+
+Kubernetes stateful set name
+
+
+[float]
+=== `kubernetes.statefulset.created`
+
+type: long
+
+The creation timestamp (epoch) for StatefulSet
+
+
+[float]
+== replicas fields
+
+Kubernetes stateful set replicas status
+
+
+
+[float]
+=== `kubernetes.statefulset.replicas.observed`
+
+type: long
+
+The number of observed replicas per StatefulSet
+
+
+[float]
+=== `kubernetes.statefulset.replicas.desired`
+
+type: long
+
+The number of desired replicas per StatefulSet
+
+
+[float]
+== generation fields
+
+Kubernetes stateful set generation information
+
+
+
+[float]
+=== `kubernetes.statefulset.generation.observed`
+
+type: long
+
+The observed generation per StatefulSet
+
+
+[float]
+=== `kubernetes.statefulset.generation.desired`
+
+type: long
+
+The desired generation per StatefulSet
 
 
 [float]
@@ -6704,7 +6939,7 @@ Pid
 
 
 [float]
-== node_stats fields
+== node.stats fields
 
 node_stats metrics.
 
@@ -6718,7 +6953,7 @@ Events stats
 
 
 [float]
-=== `logstash.node_stats.events.in`
+=== `logstash.node.stats.events.in`
 
 type: long
 
@@ -6726,7 +6961,7 @@ Incoming events counter.
 
 
 [float]
-=== `logstash.node_stats.events.out`
+=== `logstash.node.stats.events.out`
 
 type: long
 
@@ -6734,7 +6969,7 @@ Outgoing events counter.
 
 
 [float]
-=== `logstash.node_stats.events.filtered`
+=== `logstash.node.stats.events.filtered`
 
 type: long
 
@@ -6919,7 +7154,7 @@ Combination of database and collection name.
 
 
 [float]
-=== `mongodb.collstats.total.time`
+=== `mongodb.collstats.total.time.us`
 
 type: long
 
@@ -7849,6 +8084,21 @@ Number of scan operations.
 type: long
 
 Number of sync operations.
+
+
+[[exported-fields-munin]]
+== Munin fields
+
+experimental[]
+Munin node metrics exporter
+
+
+
+[float]
+== munin fields
+
+munin contains metrics exposed by a munin node agent
+
 
 
 [[exported-fields-mysql]]
@@ -8850,6 +9100,151 @@ RabbitMQ module
 == rabbitmq fields
 
 
+
+
+[float]
+== connection fields
+
+connection
+
+
+
+[float]
+=== `rabbitmq.connection.name`
+
+type: keyword
+
+The name of the connection with non-ASCII characters escaped as in C.
+
+
+[float]
+=== `rabbitmq.connection.vhost`
+
+type: keyword
+
+Virtual host name with non-ASCII characters escaped as in C.
+
+
+[float]
+=== `rabbitmq.connection.user`
+
+type: keyword
+
+User name.
+
+
+[float]
+=== `rabbitmq.connection.node`
+
+type: keyword
+
+Node name.
+
+
+[float]
+=== `rabbitmq.connection.channels`
+
+type: long
+
+The number of channels on the connection.
+
+
+[float]
+=== `rabbitmq.connection.channel_max`
+
+type: long
+
+The maximum number of channels allowed on the connection.
+
+
+[float]
+=== `rabbitmq.connection.frame_max`
+
+type: long
+
+format: bytes
+
+Maximum permissible size of a frame (in bytes) to negotiate with clients.
+
+
+[float]
+=== `rabbitmq.connection.type`
+
+type: keyword
+
+Type of the connection.
+
+
+[float]
+=== `rabbitmq.connection.host`
+
+type: keyword
+
+Server hostname obtained via reverse DNS, or its IP address if reverse DNS failed or was disabled.
+
+
+[float]
+=== `rabbitmq.connection.peer.host`
+
+type: keyword
+
+Peer hostname obtained via reverse DNS, or its IP address if reverse DNS failed or was not enabled.
+
+
+[float]
+=== `rabbitmq.connection.port`
+
+type: long
+
+Server port.
+
+
+[float]
+=== `rabbitmq.connection.peer.port`
+
+type: long
+
+Peer port.
+
+
+[float]
+=== `rabbitmq.connection.packet_count.sent`
+
+type: long
+
+Number of packets sent on the connection.
+
+
+[float]
+=== `rabbitmq.connection.packet_count.received`
+
+type: long
+
+Number of packets received on the connection.
+
+
+[float]
+=== `rabbitmq.connection.packet_count.pending`
+
+type: long
+
+Number of packets pending on the connection.
+
+
+[float]
+=== `rabbitmq.connection.octet_count.sent`
+
+type: long
+
+Number of octets sent on the connection.
+
+
+[float]
+=== `rabbitmq.connection.octet_count.received`
+
+type: long
+
+Number of octets received on the connection.
 
 
 [float]
@@ -10914,6 +11309,82 @@ type: scaled_float
 format: percent
 
 The percentage of used swap memory.
+
+
+[float]
+== hugepages fields
+
+This group contains statistics related to huge pages usage on the system.
+
+
+[float]
+=== `system.memory.hugepages.total`
+
+type: long
+
+format: number
+
+Number of huge pages in the pool.
+
+
+[float]
+=== `system.memory.hugepages.used.bytes`
+
+type: long
+
+format: bytes
+
+Memory used in allocated huge pages.
+
+
+[float]
+=== `system.memory.hugepages.used.pct`
+
+type: long
+
+format: percent
+
+Percentage of huge pages used.
+
+
+[float]
+=== `system.memory.hugepages.free`
+
+type: long
+
+format: number
+
+Number of available huge pages in the pool.
+
+
+[float]
+=== `system.memory.hugepages.reserved`
+
+type: long
+
+format: number
+
+Number of reserved but not allocated huge pages in the pool.
+
+
+[float]
+=== `system.memory.hugepages.surplus`
+
+type: long
+
+format: number
+
+Number of overcommited huge pages.
+
+
+[float]
+=== `system.memory.hugepages.default_size`
+
+type: long
+
+format: bytes
+
+Default size for huge pages.
 
 
 [float]

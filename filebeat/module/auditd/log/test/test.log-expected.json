@@ -10,6 +10,9 @@
             "prospector": {
                 "type": "log"
             },
+            "input": {
+                "type": "log"
+            },
             "source": "/Users/me/go/src/github.com/elastic/beats/filebeat/module/auditd/log/test/test.log",
             "fileset": {
                 "module": "auditd",
@@ -47,6 +50,9 @@
         "_source": {
             "offset": 534,
             "prospector": {
+                "type": "log"
+            },
+            "input": {
                 "type": "log"
             },
             "source": "/Users/me/go/src/github.com/elastic/beats/filebeat/module/auditd/log/test/test.log",

@@ -10,7 +10,8 @@ import (
 	"github.com/elastic/beats/libbeat/common"
 )
 
-var commonConfigKeys = []string{"api", "name", "fields", "fields_under_root", "tags"}
+var commonConfigKeys = []string{"api", "name", "fields", "fields_under_root",
+	"tags", "processors"}
 
 // ConfigCommon is the common configuration data used to instantiate a new
 // EventLog. Each implementation is free to support additional configuration

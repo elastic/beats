@@ -44,38 +44,96 @@ func TestEventMapping(t *testing.T) {
 	events, err := f.Fetch()
 	assert.NoError(t, err)
 
-	assert.Equal(t, 9, len(events), "Wrong number of returned events")
+	assert.Equal(t, 12, len(events), "Wrong number of returned events")
 
-	testCases := map[string]interface{}{
-		"_module.namespace": "kube-system",
-		"_module.node.name": "minikube",
-		"_module.pod.name":  "kube-dns-v20-5g5cb",
-
-		"image":           "gcr.io/google_containers/exechealthz-amd64:1.2",
-		"status.phase":    "running",
-		"status.ready":    true,
-		"status.restarts": 2,
-
-		"memory.limit.bytes":    52428800,
-		"memory.request.bytes":  52428800,
-		"cpu.request.nanocores": 10000000,
-	}
-
+	testCases := testCases()
 	for _, event := range events {
 		name, err := event.GetValue("name")
-		if err == nil && name == "healthz" {
-			for k, v := range testCases {
-				testValue(t, event, k, v)
+		if err == nil {
+			namespace, err := event.GetValue("_module.namespace")
+			if err != nil {
+				continue
 			}
-			return
+			pod, err := event.GetValue("_module.pod.name")
+			if err != nil {
+				continue
+			}
+			eventKey := namespace.(string) + "@" + pod.(string) + "@" + name.(string)
+			oneTestCase, oneTestCaseFound := testCases[eventKey]
+			if oneTestCaseFound {
+				for k, v := range oneTestCase {
+					testValue(eventKey, t, event, k, v)
+				}
+				delete(testCases, eventKey)
+			}
 		}
 	}
 
-	t.Error("Test reference event not found")
+	if len(testCases) > 0 {
+		t.Errorf("Test reference events not found: %v, \n\ngot: %v", testCases, events)
+	}
 }
 
-func testValue(t *testing.T, event common.MapStr, field string, expected interface{}) {
+func testValue(eventKey string, t *testing.T, event common.MapStr, field string, expected interface{}) {
 	data, err := event.GetValue(field)
-	assert.NoError(t, err, "Could not read field "+field)
-	assert.EqualValues(t, expected, data, "Wrong value for field "+field)
+	assert.NoError(t, err, eventKey+": Could not read field "+field)
+	assert.EqualValues(t, expected, data, eventKey+": Wrong value for field "+field)
+}
+
+// Test cases built to match 3 examples in 'module/kubernetes/_meta/test/kube-state-metrics'.
+// In particular, test same named containers  in different namespaces
+func testCases() map[string]map[string]interface{} {
+	return map[string]map[string]interface{}{
+		"kube-system@kube-dns-v20-5g5cb@kubedns": {
+			"_namespace":        "container",
+			"_module.namespace": "kube-system",
+			"_module.node.name": "minikube",
+			"_module.pod.name":  "kube-dns-v20-5g5cb",
+			"name":              "kubedns",
+			"id":                "docker://fa3d83f648de42492b38fa3e8501d109376f391c50f2bd210c895c8477ae4b62",
+
+			"image":           "gcr.io/google_containers/kubedns-amd64:1.9",
+			"status.phase":    "running",
+			"status.ready":    true,
+			"status.restarts": 2,
+
+			"memory.limit.bytes":    178257920,
+			"memory.request.bytes":  73400320,
+			"cpu.request.nanocores": float64(1e+08),
+		},
+		"test@kube-dns-v20-5g5cb-test@kubedns": {
+			"_namespace":        "container",
+			"_module.namespace": "test",
+			"_module.node.name": "minikube-test",
+			"_module.pod.name":  "kube-dns-v20-5g5cb-test",
+			"name":              "kubedns",
+			"id":                "docker://fa3d83f648de42492b38fa3e8501d109376f391c50f2bd210c895c8477ae4b62-test",
+
+			"image":           "gcr.io/google_containers/kubedns-amd64:1.9-test",
+			"status.phase":    "terminate",
+			"status.ready":    false,
+			"status.restarts": 3,
+
+			"memory.limit.bytes":    278257920,
+			"memory.request.bytes":  83400320,
+			"cpu.request.nanocores": float64(2e+08),
+		},
+		"kube-system@kube-dns-v20-5g5cb@healthz": {
+			"_namespace":        "container",
+			"_module.namespace": "kube-system",
+			"_module.node.name": "minikube",
+			"_module.pod.name":  "kube-dns-v20-5g5cb",
+			"name":              "healthz",
+			"id":                "docker://52fa55e051dc5b68e44c027588685b7edd85aaa03b07f7216d399249ff4fc821",
+
+			"image":           "gcr.io/google_containers/exechealthz-amd64:1.2",
+			"status.phase":    "running",
+			"status.ready":    true,
+			"status.restarts": 2,
+
+			"memory.limit.bytes":    52428800,
+			"memory.request.bytes":  52428800,
+			"cpu.request.nanocores": float64(1e+07),
+		},
+	}
 }

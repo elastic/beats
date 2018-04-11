@@ -1,0 +1,24 @@
+{
+  "sort": [
+    "@timestamp", 
+    "desc"
+  ], 
+  "hits": 0, 
+  "description": "", 
+  "title": "Audit Event Table [Auditbeat Auditd]", 
+  "version": 1, 
+  "kibanaSavedObjectMeta": {
+    "searchSourceJSON": "{\n  \"index\": \"auditbeat-*\",\n  \"highlightAll\": true,\n  \"version\": true,\n  \"filter\": [\n    {\n      \"meta\": {\n        \"negate\": false,\n        \"index\": \"auditbeat-*\",\n        \"type\": \"phrase\",\n        \"key\": \"event.module\",\n        \"value\": \"auditd\",\n        \"params\": {\n          \"query\": \"auditd\",\n          \"type\": \"phrase\"\n        },\n        \"disabled\": false,\n        \"alias\": null\n      },\n      \"query\": {\n        \"match\": {\n          \"event.module\": {\n            \"query\": \"auditd\",\n            \"type\": \"phrase\"\n          }\n        }\n      },\n      \"$state\": {\n        \"store\": \"appState\"\n      }\n    }\n  ]\n}"
+  }, 
+  "columns": [
+    "beat.hostname", 
+    "auditd.summary.actor.primary", 
+    "auditd.summary.actor.secondary", 
+    "event.action", 
+    "auditd.summary.object.type", 
+    "auditd.summary.object.primary", 
+    "auditd.summary.object.secondary", 
+    "auditd.summary.how", 
+    "auditd.result"
+  ]
+}

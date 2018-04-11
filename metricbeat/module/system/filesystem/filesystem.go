@@ -14,9 +14,9 @@ import (
 var debugf = logp.MakeDebug("system.filesystem")
 
 func init() {
-	if err := mb.Registry.AddMetricSet("system", "filesystem", New, parse.EmptyHostParser); err != nil {
-		panic(err)
-	}
+	mb.Registry.MustAddMetricSet("system", "filesystem", New,
+		mb.WithHostParser(parse.EmptyHostParser),
+	)
 }
 
 // MetricSet for fetching filesystem metrics.

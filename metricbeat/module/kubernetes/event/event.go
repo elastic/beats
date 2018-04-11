@@ -2,14 +2,13 @@ package event
 
 import (
 	"fmt"
-	"io/ioutil"
+	"time"
 
 	"github.com/elastic/beats/libbeat/common"
 	"github.com/elastic/beats/libbeat/common/cfgwarn"
+	"github.com/elastic/beats/libbeat/common/kubernetes"
+	"github.com/elastic/beats/libbeat/common/safemapstr"
 	"github.com/elastic/beats/metricbeat/mb"
-
-	"github.com/ericchiang/k8s"
-	"github.com/ghodss/yaml"
 )
 
 // init registers the MetricSet with the central registry.
@@ -25,46 +24,34 @@ func init() {
 // MetricSet implements the mb.PushMetricSet interface, and therefore does not rely on polling.
 type MetricSet struct {
 	mb.BaseMetricSet
-	watcher *Watcher
+	watcher kubernetes.Watcher
 }
 
 // New create a new instance of the MetricSet
 // Part of new is also setting up the configuration by processing additional
 // configuration entries if needed.
 func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
-	cfgwarn.Experimental("The kubernetes event metricset is experimental")
+	cfgwarn.Beta("The kubernetes event metricset is beta")
 
-	config := defaultKuberentesEventsConfig()
+	config := defaultKubernetesEventsConfig()
 
 	err := base.Module().UnpackConfig(&config)
 	if err != nil {
 		return nil, fmt.Errorf("fail to unpack the kubernetes event configuration: %s", err)
 	}
 
-	var client *k8s.Client
-	if config.InCluster == true {
-		client, err = k8s.NewInClusterClient()
-		if err != nil {
-			return nil, fmt.Errorf("Unable to get in cluster configuration")
-		}
-	} else {
-		data, err := ioutil.ReadFile(config.KubeConfig)
-		if err != nil {
-			return nil, fmt.Errorf("read kubeconfig: %v", err)
-		}
-
-		// Unmarshal YAML into a Kubernetes config object.
-		var config k8s.Config
-		if err = yaml.Unmarshal(data, &config); err != nil {
-			return nil, fmt.Errorf("unmarshal kubeconfig: %v", err)
-		}
-		client, err = k8s.NewClient(&config)
-		if err != nil {
-			return nil, err
-		}
+	client, err := kubernetes.GetKubernetesClient(config.InCluster, config.KubeConfig)
+	if err != nil {
+		return nil, fmt.Errorf("fail to get kubernetes client: %s", err.Error())
 	}
 
-	watcher := NewWatcher(client, config.SyncPeriod, config.Namespace)
+	watcher, err := kubernetes.NewWatcher(client, &kubernetes.Event{}, kubernetes.WatchOptions{
+		SyncTimeout: config.SyncPeriod,
+		Namespace:   config.Namespace,
+	})
+	if err != nil {
+		return nil, fmt.Errorf("fail to init kubernetes watcher: %s", err.Error())
+	}
 
 	return &MetricSet{
 		BaseMetricSet: base,
@@ -74,24 +61,36 @@ func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
 
 // Run method provides the Kubernetes event watcher with a reporter with which events can be reported.
 func (m *MetricSet) Run(reporter mb.PushReporter) {
-	// Start event watcher
-	m.watcher.Run()
-
-	for {
-		select {
-		case <-reporter.Done():
-			m.watcher.Stop()
-			return
-		case msg := <-m.watcher.eventQueue:
-			// Ignore events that are deleted
-			if msg.Metadata.DeletionTimestamp == nil {
-				reporter.Event(generateMapStrFromEvent(msg))
-			}
-		}
+	now := time.Now()
+	handler := kubernetes.ResourceEventHandlerFuncs{
+		AddFunc: func(obj kubernetes.Resource) {
+			reporter.Event(generateMapStrFromEvent(obj.(*kubernetes.Event)))
+		},
+		UpdateFunc: func(obj kubernetes.Resource) {
+			reporter.Event(generateMapStrFromEvent(obj.(*kubernetes.Event)))
+		},
+		// ignore events that are deleted
+		DeleteFunc: nil,
 	}
+	m.watcher.AddEventHandler(kubernetes.FilteringResourceEventHandler{
+		// skip events happened before watch
+		FilterFunc: func(obj kubernetes.Resource) bool {
+			eve := obj.(*kubernetes.Event)
+			if eve.LastTimestamp.Before(now) {
+				return false
+			}
+			return true
+		},
+		Handler: handler,
+	})
+	// start event watcher
+	m.watcher.Start()
+	<-reporter.Done()
+	m.watcher.Stop()
+	return
 }
 
-func generateMapStrFromEvent(eve *Event) common.MapStr {
+func generateMapStrFromEvent(eve *kubernetes.Event) common.MapStr {
 	eventMeta := common.MapStr{
 		"timestamp": common.MapStr{
 			"created": eve.Metadata.CreationTimestamp,
@@ -107,7 +106,7 @@ func generateMapStrFromEvent(eve *Event) common.MapStr {
 	if len(eve.Metadata.Labels) != 0 {
 		labels := make(common.MapStr, len(eve.Metadata.Labels))
 		for k, v := range eve.Metadata.Labels {
-			labels[k] = v
+			safemapstr.Put(labels, k, v)
 		}
 
 		eventMeta["labels"] = labels
@@ -116,7 +115,7 @@ func generateMapStrFromEvent(eve *Event) common.MapStr {
 	if len(eve.Metadata.Annotations) != 0 {
 		annotations := make(common.MapStr, len(eve.Metadata.Annotations))
 		for k, v := range eve.Metadata.Annotations {
-			annotations[k] = v
+			safemapstr.Put(annotations, k, v)
 		}
 
 		eventMeta["annotations"] = annotations

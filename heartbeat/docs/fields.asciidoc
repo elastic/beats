@@ -16,6 +16,7 @@ grouped in the following categories:
 * <<exported-fields-cloud>>
 * <<exported-fields-common>>
 * <<exported-fields-docker-processor>>
+* <<exported-fields-host-processor>>
 * <<exported-fields-http>>
 * <<exported-fields-icmp>>
 * <<exported-fields-kubernetes-processor>>
@@ -259,7 +260,6 @@ Indicator if monitor could validate the service to be available.
 [[exported-fields-docker-processor]]
 == Docker fields
 
-beta[]
 Docker stats collected from Docker.
 
 
@@ -297,6 +297,62 @@ type: object
 Image labels.
 
 
+[[exported-fields-host-processor]]
+== Host fields
+
+Info collected for the host machine.
+
+
+
+
+[float]
+=== `host.name`
+
+type: keyword
+
+Hostname.
+
+
+[float]
+=== `host.id`
+
+type: keyword
+
+Unique host id.
+
+
+[float]
+=== `host.architecture`
+
+type: keyword
+
+Host architecture (e.g. x86_64, arm, ppc, mips).
+
+
+[float]
+=== `host.os.platform`
+
+type: keyword
+
+OS platform (e.g. centos, ubuntu, windows).
+
+
+[float]
+=== `host.os.version`
+
+type: keyword
+
+OS version.
+
+
+[float]
+=== `host.os.family`
+
+type: keyword
+
+OS family (e.g. redhat, debian, freebsd, windows).
+
+
 [[exported-fields-http]]
 == HTTP monitor fields
 
@@ -316,6 +372,14 @@ HTTP related fields.
 type: text
 
 Service url used by monitor.
+
+
+[float]
+=== `http.url.raw`
+
+type: keyword
+
+The service url used by monitor. This is a non-analyzed field that is useful for aggregations.
 
 
 [float]
@@ -461,7 +525,6 @@ Duration in microseconds
 [[exported-fields-kubernetes-processor]]
 == Kubernetes fields
 
-beta[]
 Kubernetes metadata added by the kubernetes processor
 
 
@@ -481,6 +544,14 @@ Kubernetes pod name
 type: keyword
 
 Kubernetes namespace
+
+
+[float]
+=== `kubernetes.node.name`
+
+type: keyword
+
+Kubernetes node name
 
 
 [float]

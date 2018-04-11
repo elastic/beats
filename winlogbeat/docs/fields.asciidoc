@@ -17,6 +17,7 @@ grouped in the following categories:
 * <<exported-fields-common>>
 * <<exported-fields-docker-processor>>
 * <<exported-fields-eventlog>>
+* <<exported-fields-host-processor>>
 * <<exported-fields-kubernetes-processor>>
 
 --
@@ -186,7 +187,6 @@ The Event Logging API was designed for Windows Server 2003, Windows XP, or Windo
 [[exported-fields-docker-processor]]
 == Docker fields
 
-beta[]
 Docker stats collected from Docker.
 
 
@@ -476,10 +476,65 @@ The raw XML representation of the event obtained from Windows. This field is onl
 The XML representation of the event is useful for troubleshooting purposes. The data in the fields reported by Winlogbeat can be compared to the data in the XML to diagnose problems.
 
 
+[[exported-fields-host-processor]]
+== Host fields
+
+Info collected for the host machine.
+
+
+
+
+[float]
+=== `host.name`
+
+type: keyword
+
+Hostname.
+
+
+[float]
+=== `host.id`
+
+type: keyword
+
+Unique host id.
+
+
+[float]
+=== `host.architecture`
+
+type: keyword
+
+Host architecture (e.g. x86_64, arm, ppc, mips).
+
+
+[float]
+=== `host.os.platform`
+
+type: keyword
+
+OS platform (e.g. centos, ubuntu, windows).
+
+
+[float]
+=== `host.os.version`
+
+type: keyword
+
+OS version.
+
+
+[float]
+=== `host.os.family`
+
+type: keyword
+
+OS family (e.g. redhat, debian, freebsd, windows).
+
+
 [[exported-fields-kubernetes-processor]]
 == Kubernetes fields
 
-beta[]
 Kubernetes metadata added by the kubernetes processor
 
 
@@ -499,6 +554,14 @@ Kubernetes pod name
 type: keyword
 
 Kubernetes namespace
+
+
+[float]
+=== `kubernetes.node.name`
+
+type: keyword
+
+Kubernetes node name
 
 
 [float]

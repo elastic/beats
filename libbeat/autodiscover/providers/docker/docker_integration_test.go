@@ -34,7 +34,9 @@ func TestDockerStart(t *testing.T) {
 	defer listener.Stop()
 
 	// Start
-	ID, err := d.ContainerStart("busybox", "echo", "Hi!")
+	cmd := []string{"echo", "Hi!"}
+	labels := map[string]string{"label": "foo", "label.child": "bar"}
+	ID, err := d.ContainerStart("busybox", cmd, labels)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -69,7 +71,12 @@ func checkEvent(t *testing.T, listener bus.Listener, start bool) {
 				assert.Nil(t, getValue(e, "start"))
 			}
 			assert.Equal(t, getValue(e, "docker.container.image"), "busybox")
-			assert.Equal(t, getValue(e, "docker.container.labels"), map[string]string{})
+			assert.Equal(t, getValue(e, "docker.container.labels"), common.MapStr{
+				"label": common.MapStr{
+					"value": "foo",
+					"child": "bar",
+				},
+			})
 			assert.NotNil(t, getValue(e, "docker.container.id"))
 			assert.NotNil(t, getValue(e, "docker.container.name"))
 			assert.NotNil(t, getValue(e, "host"))

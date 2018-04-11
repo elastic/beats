@@ -40,7 +40,7 @@ func applyFlags(cfg *logp.Config) {
 	if toStderr {
 		cfg.ToStderr = true
 	}
-	if cfg.Level > logp.InfoLevel {
+	if cfg.Level > logp.InfoLevel && verbose {
 		cfg.Level = logp.InfoLevel
 	}
 	for _, selectors := range debugSelectors {

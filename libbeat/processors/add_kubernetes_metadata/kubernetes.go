@@ -1,43 +1,26 @@
 package add_kubernetes_metadata
 
 import (
-	"context"
 	"errors"
 	"fmt"
-	"io/ioutil"
-	"os"
-	"sync"
 	"time"
 
 	"github.com/elastic/beats/libbeat/beat"
 	"github.com/elastic/beats/libbeat/common"
-	"github.com/elastic/beats/libbeat/common/bus"
-	"github.com/elastic/beats/libbeat/common/cfgwarn"
 	"github.com/elastic/beats/libbeat/common/kubernetes"
 	"github.com/elastic/beats/libbeat/logp"
 	"github.com/elastic/beats/libbeat/processors"
-
-	"github.com/ericchiang/k8s"
-	"github.com/ghodss/yaml"
 )
 
 const (
 	timeout = time.Second * 5
 )
 
-var (
-	fatalError = errors.New("Unable to create kubernetes processor")
-)
-
 type kubernetesAnnotator struct {
-	sync.RWMutex
-	watcher        kubernetes.Watcher
-	startListener  bus.Listener
-	stopListener   bus.Listener
-	updateListener bus.Listener
-	indexers       *Indexers
-	matchers       *Matchers
-	metadata       map[string]common.MapStr
+	watcher  kubernetes.Watcher
+	indexers *Indexers
+	matchers *Matchers
+	cache    *cache
 }
 
 func init() {
@@ -52,8 +35,6 @@ func init() {
 }
 
 func newKubernetesAnnotator(cfg *common.Config) (processors.Processor, error) {
-	cfgwarn.Beta("The kubernetes processor is beta")
-
 	config := defaultKubernetesAnnotatorConfig()
 
 	err := cfg.Unpack(&config)
@@ -93,76 +74,51 @@ func newKubernetesAnnotator(cfg *common.Config) (processors.Processor, error) {
 		return nil, fmt.Errorf("Can not initialize kubernetes plugin with zero matcher plugins")
 	}
 
-	var client *k8s.Client
-	if config.InCluster == true {
-		client, err = k8s.NewInClusterClient()
-		if err != nil {
-			return nil, fmt.Errorf("Unable to get in cluster configuration: %v", err)
-		}
-	} else {
-		data, err := ioutil.ReadFile(config.KubeConfig)
-		if err != nil {
-			return nil, fmt.Errorf("read kubeconfig: %v", err)
-		}
-
-		// Unmarshal YAML into a Kubernetes config object.
-		var config k8s.Config
-		if err = yaml.Unmarshal(data, &config); err != nil {
-			return nil, fmt.Errorf("unmarshal kubeconfig: %v", err)
-		}
-		client, err = k8s.NewClient(&config)
-		if err != nil {
-			return nil, err
-		}
+	client, err := kubernetes.GetKubernetesClient(config.InCluster, config.KubeConfig)
+	if err != nil {
+		return nil, err
 	}
 
-	ctx := context.Background()
-	if config.Host == "" {
-		podName := os.Getenv("HOSTNAME")
-		logp.Info("Using pod name %s and namespace %s", podName, client.Namespace)
-		if podName == "localhost" {
-			config.Host = "localhost"
-		} else {
-			pod, error := client.CoreV1().GetPod(ctx, podName, client.Namespace)
-			if error != nil {
-				logp.Err("Querying for pod failed with error: ", error.Error())
-				logp.Info("Unable to find pod, setting host to localhost")
-				config.Host = "localhost"
-			} else {
-				config.Host = pod.Spec.GetNodeName()
-			}
-
-		}
-	}
+	config.Host = kubernetes.DiscoverKubernetesNode(config.Host, config.InCluster, client)
 
 	logp.Debug("kubernetes", "Using host ", config.Host)
 	logp.Debug("kubernetes", "Initializing watcher")
-	if client != nil {
-		watcher := kubernetes.NewWatcher(client.CoreV1(), config.SyncPeriod, config.CleanupTimeout, config.Host)
-		start := watcher.ListenStart()
-		stop := watcher.ListenStop()
-		update := watcher.ListenUpdate()
 
-		processor := &kubernetesAnnotator{
-			watcher:        watcher,
-			indexers:       indexers,
-			matchers:       matchers,
-			metadata:       make(map[string]common.MapStr, 0),
-			startListener:  start,
-			stopListener:   stop,
-			updateListener: update,
-		}
-
-		// Start worker
-		go processor.worker()
-
-		if err := watcher.Start(); err != nil {
-			return nil, err
-		}
-		return processor, nil
+	watcher, err := kubernetes.NewWatcher(client, &kubernetes.Pod{}, kubernetes.WatchOptions{
+		SyncTimeout: config.SyncPeriod,
+		Node:        config.Host,
+		Namespace:   config.Namespace,
+	})
+	if err != nil {
+		logp.Err("kubernetes: Couldn't create watcher for %t", &kubernetes.Pod{})
+		return nil, err
 	}
 
-	return nil, fatalError
+	processor := &kubernetesAnnotator{
+		watcher:  watcher,
+		indexers: indexers,
+		matchers: matchers,
+		cache:    newCache(config.CleanupTimeout),
+	}
+
+	watcher.AddEventHandler(kubernetes.ResourceEventHandlerFuncs{
+		AddFunc: func(obj kubernetes.Resource) {
+			processor.addPod(obj.(*kubernetes.Pod))
+		},
+		UpdateFunc: func(obj kubernetes.Resource) {
+			processor.removePod(obj.(*kubernetes.Pod))
+			processor.addPod(obj.(*kubernetes.Pod))
+		},
+		DeleteFunc: func(obj kubernetes.Resource) {
+			processor.removePod(obj.(*kubernetes.Pod))
+		},
+	})
+
+	if err := watcher.Start(); err != nil {
+		return nil, err
+	}
+
+	return processor, nil
 }
 
 func (k *kubernetesAnnotator) Run(event *beat.Event) (*beat.Event, error) {
@@ -171,9 +127,7 @@ func (k *kubernetesAnnotator) Run(event *beat.Event) (*beat.Event, error) {
 		return event, nil
 	}
 
-	k.RLock()
-	metadata := k.metadata[index]
-	k.RUnlock()
+	metadata := k.cache.get(index)
 	if metadata == nil {
 		return event, nil
 	}
@@ -192,48 +146,17 @@ func (k *kubernetesAnnotator) Run(event *beat.Event) (*beat.Event, error) {
 	return event, nil
 }
 
-// worker watches pod events and keeps a map of metadata
-func (k *kubernetesAnnotator) worker() {
-	for {
-		select {
-		case event := <-k.startListener.Events():
-			processEvent(k.addPod, event)
-
-		case event := <-k.stopListener.Events():
-			processEvent(k.removePod, event)
-
-		case event := <-k.updateListener.Events():
-			processEvent(k.removePod, event)
-			processEvent(k.addPod, event)
-		}
-	}
-}
-
-// Run pod actions while handling errors
-func processEvent(f func(pod *kubernetes.Pod), event bus.Event) {
-	pod, ok := event["pod"].(*kubernetes.Pod)
-	if !ok {
-		logp.Err("Couldn't get a pod from watcher event")
-		return
-	}
-	f(pod)
-}
-
 func (k *kubernetesAnnotator) addPod(pod *kubernetes.Pod) {
 	metadata := k.indexers.GetMetadata(pod)
-	k.Lock()
-	defer k.Unlock()
 	for _, m := range metadata {
-		k.metadata[m.Index] = m.Data
+		k.cache.set(m.Index, m.Data)
 	}
 }
 
 func (k *kubernetesAnnotator) removePod(pod *kubernetes.Pod) {
 	indexes := k.indexers.GetIndexes(pod)
-	k.Lock()
-	defer k.Unlock()
 	for _, idx := range indexes {
-		delete(k.metadata, idx)
+		k.cache.delete(idx)
 	}
 }
 

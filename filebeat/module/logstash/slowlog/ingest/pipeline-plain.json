@@ -57,13 +57,13 @@
         {
             "convert": {
                 "field": "logstash.slowlog.took_in_nanos",
-                "type": "auto"
+                "type": "long"
             }
         },
         {
             "convert": {
                 "field": "logstash.slowlog.took_in_millis",
-                "type": "auto"
+                "type": "long"
             }
         }
     ]

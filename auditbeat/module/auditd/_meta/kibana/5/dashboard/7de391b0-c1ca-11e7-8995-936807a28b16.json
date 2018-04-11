@@ -1,0 +1,13 @@
+{
+  "hits": 0, 
+  "timeRestore": false, 
+  "description": "", 
+  "title": "[Auditbeat Auditd] Executions", 
+  "uiStateJSON": "{}", 
+  "panelsJSON": "[{\"col\":1,\"id\":\"2efac370-c1ca-11e7-8995-936807a28b16\",\"panelIndex\":1,\"row\":1,\"size_x\":4,\"size_y\":4,\"type\":\"visualization\"},{\"col\":5,\"id\":\"20a8e8d0-c1c8-11e7-8995-936807a28b16\",\"panelIndex\":2,\"row\":1,\"size_x\":4,\"size_y\":4,\"type\":\"visualization\"},{\"col\":1,\"columns\":[\"beat.hostname\",\"process.args\",\"auditd.summary.actor.primary\",\"auditd.summary.actor.secondary\",\"process.exe\"],\"id\":\"d382f5b0-c1c6-11e7-8995-936807a28b16\",\"panelIndex\":4,\"row\":5,\"size_x\":12,\"size_y\":5,\"sort\":[\"@timestamp\",\"desc\"],\"type\":\"search\"},{\"size_x\":4,\"size_y\":4,\"panelIndex\":5,\"type\":\"visualization\",\"id\":\"AWECQyrvI1bE2ipp1pSa\",\"col\":9,\"row\":1}]", 
+  "optionsJSON": "{\"darkTheme\":false,\"useMargins\":false}", 
+  "version": 1, 
+  "kibanaSavedObjectMeta": {
+    "searchSourceJSON": "{\"filter\":[{\"query\":{\"match_all\":{}}}],\"highlightAll\":true,\"version\":true}"
+  }
+}

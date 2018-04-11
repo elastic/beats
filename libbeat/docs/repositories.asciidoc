@@ -88,7 +88,7 @@ install {beatname_uc} by running:
 sudo apt-get update && sudo apt-get install {beatname_pkg}
 --------------------------------------------------
 
-. To configure the Beat to start automatically during boot, run:
+. To configure {beatname_uc} to start automatically during boot, run:
 +
 ["source","sh",subs="attributes"]
 --------------------------------------------------

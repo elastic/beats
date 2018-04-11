@@ -8,6 +8,10 @@ include::{asciidoc-dir}/../../shared/attributes.asciidoc[]
 :beatname_lc: auditbeat
 :beatname_uc: Auditbeat
 :beatname_pkg: {beatname_lc}
+:github_repo_name: beats
+:discuss_forum: beats/{beatname_lc}
+:beat_default_index_prefix: {beatname_lc}
+:has_ml_jobs: yes
 
 include::../../libbeat/docs/shared-beats-attributes.asciidoc[]
 
@@ -19,6 +23,8 @@ include::./getting-started.asciidoc[]
 
 include::../../libbeat/docs/repositories.asciidoc[]
 
+include::./breaking.asciidoc[]
+
 include::./setting-up-running.asciidoc[]
 
 include::./configuring-howto.asciidoc[]
@@ -26,6 +32,8 @@ include::./configuring-howto.asciidoc[]
 include::./modules.asciidoc[]
 
 include::./fields.asciidoc[]
+
+include::../../libbeat/docs/monitoring/monitoring-beats.asciidoc[]
 
 include::./securing-auditbeat.asciidoc[]
 

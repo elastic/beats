@@ -1,0 +1,11 @@
+{
+  "visState": "{\n  \"title\": \"File Event Summary By Host [Auditbeat File Integrity]\",\n  \"type\": \"table\",\n  \"params\": {\n    \"perPage\": 10,\n    \"showPartialRows\": false,\n    \"showMeticsAtAllLevels\": false,\n    \"sort\": {\n      \"columnIndex\": null,\n      \"direction\": null\n    },\n    \"showTotal\": true,\n    \"totalFunc\": \"sum\"\n  },\n  \"aggs\": [\n    {\n      \"id\": \"1\",\n      \"enabled\": true,\n      \"type\": \"count\",\n      \"schema\": \"metric\",\n      \"params\": {\n        \"customLabel\": \"Total Events\"\n      }\n    },\n    {\n      \"id\": \"2\",\n      \"enabled\": true,\n      \"type\": \"terms\",\n      \"schema\": \"bucket\",\n      \"params\": {\n        \"field\": \"beat.name\",\n        \"size\": 50,\n        \"order\": \"desc\",\n        \"orderBy\": \"1\",\n        \"customLabel\": \"Host\"\n      }\n    },\n    {\n      \"id\": \"5\",\n      \"enabled\": true,\n      \"type\": \"top_hits\",\n      \"schema\": \"metric\",\n      \"params\": {\n        \"field\": \"@timestamp\",\n        \"aggregate\": \"concat\",\n        \"size\": 1,\n        \"sortField\": \"@timestamp\",\n        \"sortOrder\": \"desc\",\n        \"customLabel\": \"Last Report\"\n      }\n    }\n  ]\n}", 
+  "description": "", 
+  "title": "File Event Summary By Host [Auditbeat File Integrity]", 
+  "uiStateJSON": "{\n  \"vis\": {\n    \"params\": {\n      \"sort\": {\n        \"columnIndex\": null,\n        \"direction\": null\n      }\n    }\n  }\n}", 
+  "version": 1, 
+  "savedSearchId": "a380a060-cb44-11e7-9835-2f31fe08873b", 
+  "kibanaSavedObjectMeta": {
+    "searchSourceJSON": ""
+  }
+}

@@ -100,7 +100,7 @@ func cpuStat(path string, cpu *CPUSubsystem) error {
 		}
 	}
 
-	return nil
+	return sc.Err()
 }
 
 func cpuCFS(path string, cpu *CPUSubsystem) error {

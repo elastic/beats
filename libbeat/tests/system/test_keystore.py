@@ -49,3 +49,24 @@ class TestKeystore(KeystoreBase):
         assert self.log_contains(
             "missing field accessing 'output.elasticsearch.hosts'")
         assert exit_code == 1
+
+    def test_keystore_with_nested_key(self):
+        """
+        test that we support nested key
+        """
+
+        key = "output.elasticsearch.hosts.0"
+        secret = "myeleasticsearchsecrethost"
+
+        self.render_config_template(keystore_path=self.keystore_path, elasticsearch={
+            'hosts': "${%s}" % key
+        })
+
+        exit_code = self.run_beat(extra_args=["keystore", "create"])
+        assert exit_code == 0
+
+        self.add_secret(key, secret)
+        proc = self.start_beat()
+        self.wait_until(lambda: self.log_contains("no such host"))
+        assert self.log_contains(secret)
+        proc.check_kill_and_wait()

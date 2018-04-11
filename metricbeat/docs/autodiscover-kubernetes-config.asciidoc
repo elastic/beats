@@ -1,0 +1,22 @@
+Metricbeat supports templates for modules:
+
+["source","yaml",subs="attributes"]
+-------------------------------------------------------------------------------------
+metricbeat.autodiscover:
+  providers:
+    - type: kubernetes
+      include_annotations: ["prometheus.io.scrape"]
+      templates:
+        - condition:
+            contains:
+              kubernetes.annotations.prometheus.io.scrape: "true"
+          config:
+            - module: prometheus
+              metricsets: ["collector"]
+              hosts: "${data.host}:{data.port}"
+-------------------------------------------------------------------------------------
+
+This configuration launches a `prometheus` module for all containers of pods annotated `prometheus.io.scrape=true`.
+There are cases where the PodSpec does not expose a port. In such cases the host can be provided as `${data.host}:9090`
+directly. However, the metadata which is used to enrich the metric would not have information regarding the container since
+the discovery mechanism would not have information on which container the port maps to.

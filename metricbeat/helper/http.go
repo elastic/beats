@@ -25,14 +25,14 @@ type HTTP struct {
 }
 
 // NewHTTP creates new http helper
-func NewHTTP(base mb.BaseMetricSet) *HTTP {
+func NewHTTP(base mb.BaseMetricSet) (*HTTP, error) {
 	config := struct {
 		TLS     *outputs.TLSConfig `config:"ssl"`
 		Timeout time.Duration      `config:"timeout"`
 		Headers map[string]string  `config:"headers"`
 	}{}
 	if err := base.Module().UnpackConfig(&config); err != nil {
-		return nil
+		return nil, err
 	}
 
 	if config.Headers == nil {
@@ -41,7 +41,7 @@ func NewHTTP(base mb.BaseMetricSet) *HTTP {
 
 	tlsConfig, err := outputs.LoadTLSConfig(config.TLS)
 	if err != nil {
-		return nil
+		return nil, err
 	}
 
 	var dialer, tlsDialer transport.Dialer
@@ -49,7 +49,7 @@ func NewHTTP(base mb.BaseMetricSet) *HTTP {
 	dialer = transport.NetDialer(config.Timeout)
 	tlsDialer, err = transport.TLSDialer(dialer, tlsConfig, config.Timeout)
 	if err != nil {
-		return nil
+		return nil, err
 	}
 
 	return &HTTP{
@@ -65,7 +65,7 @@ func NewHTTP(base mb.BaseMetricSet) *HTTP {
 		method:  "GET",
 		uri:     base.HostData().SanitizedURI,
 		body:    nil,
-	}
+	}, nil
 }
 
 // FetchResponse fetches a response for the http metricset.

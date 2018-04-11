@@ -20,6 +20,7 @@ func init() {
 	var runFlags = pflag.NewFlagSet(Name, pflag.ExitOnError)
 	runFlags.AddGoFlag(flag.CommandLine.Lookup("once"))
 	runFlags.AddGoFlag(flag.CommandLine.Lookup("modules"))
+	runFlags.AddGoFlag(flag.CommandLine.Lookup("update-pipelines"))
 
 	RootCmd = cmd.GenRootCmdWithRunFlags(Name, "", beater.New, runFlags)
 	RootCmd.PersistentFlags().AddGoFlag(flag.CommandLine.Lookup("M"))

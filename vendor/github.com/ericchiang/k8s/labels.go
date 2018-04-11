@@ -35,10 +35,10 @@ func (l labelSelectorOption) queryParam() (string, string) {
 }
 
 func (l *LabelSelector) Selector() Option {
-	return labelSelectorOption(l.encode())
+	return labelSelectorOption(l.String())
 }
 
-func (l *LabelSelector) encode() string {
+func (l *LabelSelector) String() string {
 	return strings.Join(l.stmts, ",")
 }
 

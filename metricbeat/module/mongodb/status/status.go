@@ -2,7 +2,6 @@ package status
 
 import (
 	"github.com/elastic/beats/libbeat/common"
-	"github.com/elastic/beats/libbeat/common/cfgwarn"
 	"github.com/elastic/beats/libbeat/logp"
 	"github.com/elastic/beats/metricbeat/mb"
 	"github.com/elastic/beats/metricbeat/module/mongodb"
@@ -20,9 +19,10 @@ TODOs:
 var debugf = logp.MakeDebug("mongodb.status")
 
 func init() {
-	if err := mb.Registry.AddMetricSet("mongodb", "status", New, mongodb.ParseURL); err != nil {
-		panic(err)
-	}
+	mb.Registry.MustAddMetricSet("mongodb", "status", New,
+		mb.WithHostParser(mongodb.ParseURL),
+		mb.DefaultMetricSet(),
+	)
 }
 
 // MetricSet type defines all fields of the MetricSet
@@ -38,9 +38,6 @@ type MetricSet struct {
 // Part of new is also setting up the configuration by processing additional
 // configuration entries if needed.
 func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
-
-	cfgwarn.Beta("The %v %v metricset is Beta", base.Module().Name(), base.Name())
-
 	dialInfo, err := mgo.ParseURL(base.HostData().URI)
 	if err != nil {
 		return nil, err

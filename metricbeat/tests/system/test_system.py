@@ -39,7 +39,7 @@ SYSTEM_FILESYSTEM_FIELDS = ["available", "device_name", "type", "files", "free",
 SYSTEM_FSSTAT_FIELDS = ["count", "total_files", "total_size"]
 
 SYSTEM_MEMORY_FIELDS = ["swap", "actual.free", "free", "total", "used.bytes", "used.pct", "actual.used.bytes",
-                        "actual.used.pct"]
+                        "actual.used.pct", "hugepages"]
 
 SYSTEM_NETWORK_FIELDS = ["name", "out.bytes", "in.bytes", "out.packets",
                          "in.packets", "in.error", "out.error", "in.dropped", "out.dropped"]
@@ -288,6 +288,9 @@ class Test(metricbeat.BaseTest):
         self.assert_fields_are_documented(evt)
 
         memory = evt["system"]["memory"]
+        if not re.match("(?i)linux", sys.platform) and not "hugepages" in memory:
+            # Ensure presence of hugepages only in Linux
+            memory["hugepages"] = None
         self.assertItemsEqual(self.de_dot(SYSTEM_MEMORY_FIELDS), memory.keys())
 
         # Check that percentages are calculated.

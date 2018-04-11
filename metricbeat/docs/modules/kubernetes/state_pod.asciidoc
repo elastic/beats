@@ -5,8 +5,6 @@ This file is generated! See scripts/docs_collector.py
 [[metricbeat-metricset-kubernetes-state_pod]]
 === Kubernetes state_pod metricset
 
-beta[]
-
 include::../../../module/kubernetes/state_pod/_meta/docs.asciidoc[]
 
 

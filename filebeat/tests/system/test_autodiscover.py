@@ -14,13 +14,13 @@ class TestAutodiscover(filebeat.BaseTest):
                      "integration test not available on 2.x")
     def test_docker(self):
         """
-        Test docker autodiscover starts prospector
+        Test docker autodiscover starts input
         """
         import docker
         docker_client = docker.from_env()
 
         self.render_config_template(
-            prospectors=False,
+            inputs=False,
             autodiscover={
                 'docker': {
                     'templates': '''
@@ -42,8 +42,8 @@ class TestAutodiscover(filebeat.BaseTest):
         docker_client.images.pull('busybox')
         docker_client.containers.run('busybox', 'sleep 1')
 
-        self.wait_until(lambda: self.log_contains('Autodiscover starting runner: prospector'))
-        self.wait_until(lambda: self.log_contains('Autodiscover stopping runner: prospector'))
+        self.wait_until(lambda: self.log_contains('Autodiscover starting runner: input'))
+        self.wait_until(lambda: self.log_contains('Autodiscover stopping runner: input'))
 
         output = self.read_output_json()
         proc.check_kill_and_wait()

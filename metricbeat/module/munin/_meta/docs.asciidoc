@@ -1,0 +1,5 @@
+== munin module
+
+This is the munin module.
+
+The default metricset is `node`.

@@ -2,7 +2,7 @@
   type: group
   description: >
     kubernetes system containers metrics
-  release: beta
+  release: ga
   fields:
     - name: container
       type: keyword

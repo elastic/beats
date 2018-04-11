@@ -15,3 +15,13 @@ func TestExtractString(t *testing.T) {
 	}
 	assert.Equal(t, input, v)
 }
+
+func TestExtractBool(t *testing.T) {
+	input := true
+
+	v, err := extractBool(input)
+	if err != nil {
+		t.Fatal(err)
+	}
+	assert.Equal(t, input, v)
+}

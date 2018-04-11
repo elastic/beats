@@ -89,7 +89,12 @@ func (r *reference) String() string {
 
 func (r *reference) resolveRef(cfg *Config, opts *options) (value, error) {
 	env := opts.env
-	var err error
+
+	if ok := opts.activeFields.AddNew(r.Path.String()); !ok {
+		return nil, raiseCyclicErr(r.Path.String())
+	}
+
+	var err Error
 
 	for {
 		var v value
@@ -103,6 +108,7 @@ func (r *reference) resolveRef(cfg *Config, opts *options) (value, error) {
 			if v == nil {
 				break
 			}
+
 			return v, nil
 		}
 
@@ -137,13 +143,25 @@ func (r *reference) resolveEnv(cfg *Config, opts *options) (string, error) {
 
 func (r *reference) resolve(cfg *Config, opts *options) (value, error) {
 	v, err := r.resolveRef(cfg, opts)
-	if v != nil || err != nil {
+	if v != nil || criticalResolveError(err) {
 		return v, err
 	}
 
+	previousErr := err
+
 	s, err := r.resolveEnv(cfg, opts)
-	if s == "" || err != nil {
+	if err != nil {
+		// TODO(ph): Not everything is an Error, will do some cleanup in another PR.
+		if v, ok := previousErr.(Error); ok {
+			if v.Reason() == ErrCyclicReference {
+				return nil, previousErr
+			}
+		}
 		return nil, err
+	}
+
+	if s == "" {
+		return nil, nil
 	}
 
 	return newString(context{field: r.Path.String()}, nil, s), nil

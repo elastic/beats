@@ -17,9 +17,13 @@ In addition to configuring authentication credentials for the {beatname_uc}
 itself, you need to grant authorized users permission to access the indices it
 creates. See <<beats-user-access>>.
 
+If you plan to monitor {beatname_uc} in Kibana, you must also 
+<<beats-system-user,configure the `beats_system` built-in user>>.
+
 For more information about {security}, see
 {xpack-ref}/xpack-security.html[Securing {es} and {kib}].
 
 include::basic-auth.asciidoc[]
 include::user-access.asciidoc[]
 include::tls.asciidoc[]
+include::beats-system.asciidoc[]

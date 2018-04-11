@@ -1,0 +1,120 @@
+{
+    "version": "6.1.2",
+    "objects": [
+        {
+            "id": "eb2db5b0-fe11-11e7-a3b0-d13028918f9f",
+            "type": "visualization",
+            "updated_at": "2018-01-20T18:44:17.162Z",
+            "version": 1,
+            "attributes": {
+                "title": "Access map [Filebeat IIS]",
+                "visState": "{\"title\":\"Access map [Filebeat IIS]\",\"type\":\"tile_map\",\"params\":{\"mapType\":\"Scaled Circle Markers\",\"isDesaturated\":true,\"addTooltip\":true,\"heatClusterSize\":1.5,\"legendPosition\":\"bottomright\",\"mapZoom\":2,\"mapCenter\":[0,0],\"wms\":{\"enabled\":false,\"options\":{\"format\":\"image/png\",\"transparent\":true}}},\"aggs\":[{\"id\":\"1\",\"enabled\":true,\"type\":\"count\",\"schema\":\"metric\",\"params\":{}},{\"id\":\"2\",\"enabled\":true,\"type\":\"geohash_grid\",\"schema\":\"segment\",\"params\":{\"field\":\"iis.access.geoip.location\",\"autoPrecision\":true,\"isFilteredByCollar\":true,\"useGeocentroid\":true,\"precision\":2}}]}",
+                "uiStateJSON": "{}",
+                "description": "",
+                "version": 1,
+                "kibanaSavedObjectMeta": {
+                    "searchSourceJSON": "{\"index\":\"filebeat-*\",\"filter\":[],\"query\":{\"query\":\"\",\"language\":\"lucene\"}}"
+                }
+            }
+        },
+        {
+            "id": "f31414b0-fe14-11e7-a3b0-d13028918f9f",
+            "type": "visualization",
+            "updated_at": "2018-01-20T19:05:58.905Z",
+            "version": 1,
+            "attributes": {
+                "title": "Response codes over time [Filebeat IIS]",
+                "visState": "{\"title\":\"Response codes over time [Filebeat IIS]\",\"type\":\"histogram\",\"params\":{\"type\":\"histogram\",\"grid\":{\"categoryLines\":false,\"style\":{\"color\":\"#eee\"}},\"categoryAxes\":[{\"id\":\"CategoryAxis-1\",\"type\":\"category\",\"position\":\"bottom\",\"show\":true,\"style\":{},\"scale\":{\"type\":\"linear\"},\"labels\":{\"show\":true,\"truncate\":100},\"title\":{}}],\"valueAxes\":[{\"id\":\"ValueAxis-1\",\"name\":\"LeftAxis-1\",\"type\":\"value\",\"position\":\"left\",\"show\":true,\"style\":{},\"scale\":{\"type\":\"linear\",\"mode\":\"normal\"},\"labels\":{\"show\":true,\"rotate\":0,\"filter\":false,\"truncate\":100},\"title\":{\"text\":\"Count\"}}],\"seriesParams\":[{\"show\":\"true\",\"type\":\"histogram\",\"mode\":\"stacked\",\"data\":{\"label\":\"Count\",\"id\":\"1\"},\"valueAxis\":\"ValueAxis-1\",\"drawLinesBetweenPoints\":true,\"showCircles\":true}],\"addTooltip\":true,\"addLegend\":true,\"legendPosition\":\"right\",\"times\":[],\"addTimeMarker\":false},\"aggs\":[{\"id\":\"1\",\"enabled\":true,\"type\":\"count\",\"schema\":\"metric\",\"params\":{}},{\"id\":\"2\",\"enabled\":true,\"type\":\"date_histogram\",\"schema\":\"segment\",\"params\":{\"field\":\"@timestamp\",\"interval\":\"auto\",\"customInterval\":\"2h\",\"min_doc_count\":1,\"extended_bounds\":{}}},{\"id\":\"3\",\"enabled\":true,\"type\":\"terms\",\"schema\":\"group\",\"params\":{\"field\":\"iis.access.response_code\",\"size\":5,\"order\":\"desc\",\"orderBy\":\"1\"}}]}",
+                "uiStateJSON": "{}",
+                "description": "",
+                "version": 1,
+                "kibanaSavedObjectMeta": {
+                    "searchSourceJSON": "{\"index\":\"filebeat-*\",\"filter\":[],\"query\":{\"query\":\"\",\"language\":\"lucene\"}}"
+                }
+            }
+        },
+        {
+            "id": "63129c80-fe12-11e7-a3b0-d13028918f9f",
+            "type": "visualization",
+            "updated_at": "2018-01-20T18:47:38.312Z",
+            "version": 1,
+            "attributes": {
+                "title": "Broswers breakdown [Filebeat IIS]",
+                "visState": "{\"title\":\"Broswers breakdown [Filebeat IIS]\",\"type\":\"pie\",\"params\":{\"type\":\"pie\",\"addTooltip\":true,\"addLegend\":true,\"legendPosition\":\"right\",\"isDonut\":true,\"labels\":{\"show\":false,\"values\":true,\"last_level\":true,\"truncate\":100}},\"aggs\":[{\"id\":\"1\",\"enabled\":true,\"type\":\"count\",\"schema\":\"metric\",\"params\":{}},{\"id\":\"2\",\"enabled\":true,\"type\":\"terms\",\"schema\":\"segment\",\"params\":{\"field\":\"iis.access.user_agent.name\",\"size\":5,\"order\":\"desc\",\"orderBy\":\"1\"}},{\"id\":\"3\",\"enabled\":true,\"type\":\"terms\",\"schema\":\"segment\",\"params\":{\"field\":\"iis.access.user_agent.major\",\"size\":5,\"order\":\"desc\",\"orderBy\":\"1\"}}]}",
+                "uiStateJSON": "{}",
+                "description": "",
+                "version": 1,
+                "kibanaSavedObjectMeta": {
+                    "searchSourceJSON": "{\"index\":\"filebeat-*\",\"filter\":[],\"query\":{\"query\":\"\",\"language\":\"lucene\"}}"
+                }
+            }
+        },
+        {
+            "id": "ccd3f9c0-fe12-11e7-a3b0-d13028918f9f",
+            "type": "visualization",
+            "updated_at": "2018-01-20T18:51:54.619Z",
+            "version": 2,
+            "attributes": {
+                "title": "Operating systems breakdown [Filebeat IIS]",
+                "visState": "{\"title\":\"Operating systems breakdown [Filebeat IIS]\",\"type\":\"pie\",\"params\":{\"type\":\"pie\",\"addTooltip\":true,\"addLegend\":true,\"legendPosition\":\"right\",\"isDonut\":true,\"labels\":{\"show\":false,\"values\":true,\"last_level\":true,\"truncate\":100}},\"aggs\":[{\"id\":\"1\",\"enabled\":true,\"type\":\"count\",\"schema\":\"metric\",\"params\":{}},{\"id\":\"2\",\"enabled\":true,\"type\":\"terms\",\"schema\":\"segment\",\"params\":{\"field\":\"iis.access.user_agent.os_name\",\"size\":5,\"order\":\"desc\",\"orderBy\":\"1\"}},{\"id\":\"3\",\"enabled\":true,\"type\":\"terms\",\"schema\":\"segment\",\"params\":{\"field\":\"iis.access.user_agent.os_major\",\"size\":5,\"order\":\"desc\",\"orderBy\":\"1\"}}]}",
+                "uiStateJSON": "{}",
+                "description": "",
+                "version": 1,
+                "kibanaSavedObjectMeta": {
+                    "searchSourceJSON": "{\"index\":\"filebeat-*\",\"filter\":[],\"query\":{\"query\":\"\",\"language\":\"lucene\"}}"
+                }
+            }
+        },
+        {
+            "id": "41f38230-fe17-11e7-a3b0-d13028918f9f",
+            "type": "visualization",
+            "updated_at": "2018-01-20T19:22:30.227Z",
+            "version": 1,
+            "attributes": {
+                "title": "Error logs over time [Filebeat IIS]",
+                "visState": "{\"title\":\"Error logs over time [Filebeat IIS]\",\"type\":\"histogram\",\"params\":{\"type\":\"histogram\",\"grid\":{\"categoryLines\":false,\"style\":{\"color\":\"#eee\"}},\"categoryAxes\":[{\"id\":\"CategoryAxis-1\",\"type\":\"category\",\"position\":\"bottom\",\"show\":true,\"style\":{},\"scale\":{\"type\":\"linear\"},\"labels\":{\"show\":true,\"truncate\":100},\"title\":{}}],\"valueAxes\":[{\"id\":\"ValueAxis-1\",\"name\":\"LeftAxis-1\",\"type\":\"value\",\"position\":\"left\",\"show\":true,\"style\":{},\"scale\":{\"type\":\"linear\",\"mode\":\"normal\"},\"labels\":{\"show\":true,\"rotate\":0,\"filter\":false,\"truncate\":100},\"title\":{\"text\":\"Count\"}}],\"seriesParams\":[{\"show\":\"true\",\"type\":\"histogram\",\"mode\":\"stacked\",\"data\":{\"label\":\"Count\",\"id\":\"1\"},\"valueAxis\":\"ValueAxis-1\",\"drawLinesBetweenPoints\":true,\"showCircles\":true}],\"addTooltip\":true,\"addLegend\":true,\"legendPosition\":\"right\",\"times\":[],\"addTimeMarker\":false},\"aggs\":[{\"id\":\"1\",\"enabled\":true,\"type\":\"count\",\"schema\":\"metric\",\"params\":{}},{\"id\":\"2\",\"enabled\":true,\"type\":\"date_histogram\",\"schema\":\"segment\",\"params\":{\"field\":\"@timestamp\",\"interval\":\"auto\",\"customInterval\":\"2h\",\"min_doc_count\":1,\"extended_bounds\":{}}},{\"id\":\"3\",\"enabled\":true,\"type\":\"terms\",\"schema\":\"group\",\"params\":{\"field\":\"iis.error.response_code\",\"size\":5,\"order\":\"desc\",\"orderBy\":\"1\"}}]}",
+                "uiStateJSON": "{}",
+                "description": "",
+                "version": 1,
+                "kibanaSavedObjectMeta": {
+                    "searchSourceJSON": "{\"index\":\"filebeat-*\",\"filter\":[],\"query\":{\"query\":\"\",\"language\":\"lucene\"}}"
+                }
+            }
+        },
+        {
+            "id": "c0d02cd0-fe1b-11e7-a3b0-d13028918f9f",
+            "type": "visualization",
+            "updated_at": "2018-01-20T19:58:24.005Z",
+            "version": 2,
+            "attributes": {
+                "title": "Top URLs by response code [Filebeat IIS]",
+                "visState": "{\"title\":\"Top URLs by response code [Filebeat IIS]\",\"type\":\"pie\",\"params\":{\"type\":\"pie\",\"addTooltip\":true,\"addLegend\":true,\"legendPosition\":\"right\",\"isDonut\":false,\"labels\":{\"show\":false,\"values\":true,\"last_level\":true,\"truncate\":100}},\"aggs\":[{\"id\":\"1\",\"enabled\":true,\"type\":\"count\",\"schema\":\"metric\",\"params\":{}},{\"id\":\"2\",\"enabled\":true,\"type\":\"terms\",\"schema\":\"split\",\"params\":{\"field\":\"iis.access.url\",\"size\":5,\"order\":\"desc\",\"orderBy\":\"1\",\"customLabel\":\"URL\",\"row\":false}},{\"id\":\"3\",\"enabled\":true,\"type\":\"terms\",\"schema\":\"segment\",\"params\":{\"field\":\"iis.access.response_code\",\"size\":5,\"order\":\"desc\",\"orderBy\":\"1\"}}]}",
+                "uiStateJSON": "{}",
+                "description": "",
+                "version": 1,
+                "kibanaSavedObjectMeta": {
+                    "searchSourceJSON": "{\"index\":\"filebeat-*\",\"filter\":[],\"query\":{\"query\":\"\",\"language\":\"lucene\"}}"
+                }
+            }
+        },
+        {
+            "id": "4278ad30-fe16-11e7-a3b0-d13028918f9f",
+            "type": "dashboard",
+            "updated_at": "2018-01-20T19:57:50.287Z",
+            "version": 4,
+            "attributes": {
+                "title": "[Filebeat IIS] Access and error logs",
+                "hits": 0,
+                "description": "Dashboard for the Filebeat IIS module",
+                "panelsJSON": "[{\"gridData\":{\"h\":3,\"i\":\"1\",\"w\":12,\"x\":0,\"y\":0},\"id\":\"eb2db5b0-fe11-11e7-a3b0-d13028918f9f\",\"panelIndex\":\"1\",\"type\":\"visualization\",\"version\":\"6.1.2\"},{\"gridData\":{\"h\":3,\"i\":\"2\",\"w\":7,\"x\":0,\"y\":3},\"id\":\"f31414b0-fe14-11e7-a3b0-d13028918f9f\",\"panelIndex\":\"2\",\"type\":\"visualization\",\"version\":\"6.1.2\"},{\"gridData\":{\"h\":3,\"i\":\"4\",\"w\":6,\"x\":0,\"y\":9},\"id\":\"63129c80-fe12-11e7-a3b0-d13028918f9f\",\"panelIndex\":\"4\",\"type\":\"visualization\",\"version\":\"6.1.2\"},{\"gridData\":{\"h\":3,\"i\":\"5\",\"w\":6,\"x\":6,\"y\":9},\"id\":\"ccd3f9c0-fe12-11e7-a3b0-d13028918f9f\",\"panelIndex\":\"5\",\"type\":\"visualization\",\"version\":\"6.1.2\"},{\"gridData\":{\"h\":3,\"i\":\"6\",\"w\":5,\"x\":7,\"y\":3},\"id\":\"41f38230-fe17-11e7-a3b0-d13028918f9f\",\"panelIndex\":\"6\",\"type\":\"visualization\",\"version\":\"6.1.2\"},{\"gridData\":{\"h\":3,\"i\":\"7\",\"w\":12,\"x\":0,\"y\":6},\"id\":\"c0d02cd0-fe1b-11e7-a3b0-d13028918f9f\",\"panelIndex\":\"7\",\"type\":\"visualization\",\"version\":\"6.1.2\"}]",
+                "optionsJSON": "{\"darkTheme\":false,\"hidePanelTitles\":false,\"useMargins\":true}",
+                "uiStateJSON": "{}",
+                "version": 1,
+                "timeRestore": false,
+                "kibanaSavedObjectMeta": {
+                    "searchSourceJSON": "{\"query\":{\"language\":\"lucene\",\"query\":\"\"},\"filter\":[],\"highlightAll\":true,\"version\":true}"
+                }
+            }
+        }
+    ]
+}

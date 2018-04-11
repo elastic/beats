@@ -1,6 +1,8 @@
 package add_docker_metadata
 
 import (
+	"fmt"
+	"os"
 	"testing"
 
 	"github.com/stretchr/testify/assert"
@@ -10,6 +12,27 @@ import (
 	"github.com/elastic/beats/libbeat/common/bus"
 	"github.com/elastic/beats/libbeat/common/docker"
 )
+
+func init() {
+	// Stub out the procfs.
+	processCgroupPaths = func(_ string, pid int) (map[string]string, error) {
+		switch pid {
+		case 1000:
+			return map[string]string{
+				"cpu": "/docker/FABADA",
+			}, nil
+		case 2000:
+			return map[string]string{
+				"memory": "/user.slice",
+			}, nil
+		case 3000:
+			// Parser error (hopefully this never happens).
+			return nil, fmt.Errorf("cgroup parse failure")
+		default:
+			return nil, os.ErrNotExist
+		}
+	}
+}
 
 func TestInitialization(t *testing.T) {
 	var testConfig = common.NewConfig()
@@ -73,8 +96,9 @@ func TestMatchContainer(t *testing.T) {
 				Image: "image",
 				Name:  "name",
 				Labels: map[string]string{
-					"a": "1",
-					"b": "2",
+					"a.x":   "1",
+					"b":     "2",
+					"b.foo": "3",
 				},
 			},
 		}))
@@ -92,8 +116,13 @@ func TestMatchContainer(t *testing.T) {
 				"id":    "container_id",
 				"image": "image",
 				"labels": common.MapStr{
-					"a": "1",
-					"b": "2",
+					"a": common.MapStr{
+						"x": "1",
+					},
+					"b": common.MapStr{
+						"value": "2",
+						"foo":   "3",
+					},
 				},
 				"name": "name",
 			},
@@ -174,13 +203,108 @@ func TestDisableSource(t *testing.T) {
 	assert.EqualValues(t, input, result.Fields)
 }
 
+func TestMatchPIDs(t *testing.T) {
+	p, err := buildDockerMetadataProcessor(common.NewConfig(), MockWatcherFactory(
+		map[string]*docker.Container{
+			"FABADA": &docker.Container{
+				ID:    "FABADA",
+				Image: "image",
+				Name:  "name",
+				Labels: map[string]string{
+					"a": "1",
+					"b": "2",
+				},
+			},
+		},
+	))
+	assert.NoError(t, err, "initializing add_docker_metadata processor")
+
+	dockerMetadata := common.MapStr{
+		"docker": common.MapStr{
+			"container": common.MapStr{
+				"id":    "FABADA",
+				"image": "image",
+				"labels": common.MapStr{
+					"a": "1",
+					"b": "2",
+				},
+				"name": "name",
+			},
+		},
+	}
+
+	t.Run("pid is not containerized", func(t *testing.T) {
+		input := common.MapStr{}
+		input.Put("process.pid", 2000)
+		input.Put("process.ppid", 1000)
+
+		expected := common.MapStr{}
+		expected.DeepUpdate(input)
+
+		result, err := p.Run(&beat.Event{Fields: input})
+		assert.NoError(t, err, "processing an event")
+		assert.EqualValues(t, expected, result.Fields)
+	})
+
+	t.Run("pid does not exist", func(t *testing.T) {
+		input := common.MapStr{}
+		input.Put("process.pid", 9999)
+
+		expected := common.MapStr{}
+		expected.DeepUpdate(input)
+
+		result, err := p.Run(&beat.Event{Fields: input})
+		assert.NoError(t, err, "processing an event")
+		assert.EqualValues(t, expected, result.Fields)
+	})
+
+	t.Run("pid is containerized", func(t *testing.T) {
+		fields := common.MapStr{}
+		fields.Put("process.pid", "1000")
+
+		expected := common.MapStr{}
+		expected.DeepUpdate(dockerMetadata)
+		expected.DeepUpdate(fields)
+
+		result, err := p.Run(&beat.Event{Fields: fields})
+		assert.NoError(t, err, "processing an event")
+		assert.EqualValues(t, expected, result.Fields)
+	})
+
+	t.Run("pid exited and ppid is containerized", func(t *testing.T) {
+		fields := common.MapStr{}
+		fields.Put("process.pid", 9999)
+		fields.Put("process.ppid", 1000)
+
+		expected := common.MapStr{}
+		expected.DeepUpdate(dockerMetadata)
+		expected.DeepUpdate(fields)
+
+		result, err := p.Run(&beat.Event{Fields: fields})
+		assert.NoError(t, err, "processing an event")
+		assert.EqualValues(t, expected, result.Fields)
+	})
+
+	t.Run("cgroup error", func(t *testing.T) {
+		fields := common.MapStr{}
+		fields.Put("process.pid", 3000)
+
+		expected := common.MapStr{}
+		expected.DeepUpdate(fields)
+
+		result, err := p.Run(&beat.Event{Fields: fields})
+		assert.NoError(t, err, "processing an event")
+		assert.EqualValues(t, expected, result.Fields)
+	})
+}
+
 // Mock container watcher
 
 func MockWatcherFactory(containers map[string]*docker.Container) docker.WatcherConstructor {
 	if containers == nil {
 		containers = make(map[string]*docker.Container)
 	}
-	return func(host string, tls *docker.TLSConfig) (docker.Watcher, error) {
+	return func(host string, tls *docker.TLSConfig, shortID bool) (docker.Watcher, error) {
 		return &mockWatcher{containers: containers}, nil
 	}
 }

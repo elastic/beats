@@ -1,8 +1,6 @@
 - key: docker
   title: Docker
   description: >
-    beta[]
-
     Docker stats collected from Docker.
   short_config: false
   anchor: docker-processor

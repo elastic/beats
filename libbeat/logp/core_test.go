@@ -81,12 +81,12 @@ func TestGlobalLoggerLevel(t *testing.T) {
 		assert.Equal(t, "info", logs[0].Message)
 	}
 
-	Warn("warn")
+	Warn("warning")
 	logs = ObserverLogs().TakeAll()
 	if assert.Len(t, logs, 1) {
 		assert.Equal(t, zap.WarnLevel, logs[0].Level)
 		assert.Equal(t, "", logs[0].LoggerName)
-		assert.Equal(t, "warn", logs[0].Message)
+		assert.Equal(t, "warning", logs[0].Message)
 	}
 
 	Err("error")
@@ -148,7 +148,7 @@ func TestLoggerLevel(t *testing.T) {
 }
 
 func TestRecover(t *testing.T) {
-	const recoveryExplanation = "Something went wrong."
+	const recoveryExplanation = "Something went wrong"
 	const cause = "unexpected condition"
 
 	DevelopmentSetup(ToObserverOutput())
@@ -160,8 +160,9 @@ func TestRecover(t *testing.T) {
 			assert.Equal(t, zap.ErrorLevel, log.Level)
 			assert.Equal(t, "logp/core_test.go",
 				strings.Split(log.Caller.TrimmedPath(), ":")[0])
-			assert.Contains(t, log.Message, recoveryExplanation)
-			assert.Contains(t, log.Message, cause)
+			assert.Contains(t, log.Message, recoveryExplanation+
+				". Recovering, but please report this.")
+			assert.Contains(t, log.ContextMap(), "panic")
 		}
 	}()
 
@@ -185,4 +186,30 @@ func TestIsDebug(t *testing.T) {
 	DevelopmentSetup(WithSelectors("only_this"))
 	assert.False(t, IsDebug("all"))
 	assert.True(t, IsDebug("only_this"))
+}
+
+func TestL(t *testing.T) {
+	if err := DevelopmentSetup(ToObserverOutput()); err != nil {
+		t.Fatal(err)
+	}
+
+	L().Infow("infow", "rate", 2)
+	logs := ObserverLogs().TakeAll()
+	if assert.Len(t, logs, 1) {
+		log := logs[0]
+		assert.Equal(t, zap.InfoLevel, log.Level)
+		assert.Equal(t, "", log.LoggerName)
+		assert.Equal(t, "infow", log.Message)
+		assert.Contains(t, log.ContextMap(), "rate")
+	}
+
+	const loggerName = "tester"
+	L().Named(loggerName).Warnf("warning %d", 1)
+	logs = ObserverLogs().TakeAll()
+	if assert.Len(t, logs, 1) {
+		log := logs[0]
+		assert.Equal(t, zap.WarnLevel, log.Level)
+		assert.Equal(t, loggerName, log.LoggerName)
+		assert.Equal(t, "warning 1", log.Message)
+	}
 }

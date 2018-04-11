@@ -5,7 +5,7 @@ This file is generated! See scripts/docs_collector.py
 [[metricbeat-metricset-logstash-node_stats]]
 === Logstash node_stats metricset
 
-experimental[]
+beta[]
 
 include::../../../module/logstash/node_stats/_meta/docs.asciidoc[]
 

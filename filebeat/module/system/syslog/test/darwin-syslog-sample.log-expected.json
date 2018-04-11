@@ -24,6 +24,9 @@
             "prospector": {
                 "type": "log"
             },
+            "input": {
+                "type": "log"
+            },
             "source": "module/system/syslog/test/darwin-syslog-sample.log",
             "fields": {
                 "source_type": "system-syslog"
@@ -55,6 +58,9 @@
             "prospector": {
                 "type": "log"
             },
+            "input": {
+                "type": "log"
+            },
             "source": "module/system/syslog/test/darwin-syslog-sample.log",
             "fields": {
                 "source_type": "system-syslog"
@@ -81,6 +87,9 @@
                 "version": "6.0.0-alpha1"
             },
             "prospector": {
+                "type": "log"
+            },
+            "input": {
                 "type": "log"
             },
             "source": "/Users/tsg/src/github.com/elastic/beats/filebeat/module/system/syslog/test/darwin-syslog-sample.log",

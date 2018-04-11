@@ -1,0 +1,78 @@
+{
+    "auditd": {
+        "data": {
+            "a0": "3",
+            "a1": "7ffd0dc80040",
+            "a2": "7ffd0dc7ffd0",
+            "a3": "0",
+            "arch": "x86_64",
+            "exit": "5",
+            "socket": {
+                "addr": "72.83.230.100",
+                "family": "ipv4",
+                "port": "58140"
+            },
+            "syscall": "accept",
+            "tty": "(none)"
+        },
+        "result": "success",
+        "sequence": 8832,
+        "session": "unset",
+        "summary": {
+            "actor": {
+                "primary": "unset",
+                "secondary": "root"
+            },
+            "how": "/usr/sbin/sshd",
+            "object": {
+                "primary": "72.83.230.100",
+                "secondary": "58140",
+                "type": "socket"
+            }
+        }
+    },
+    "event": {
+        "action": "accepted-connection-from",
+        "category": "audit-rule",
+        "module": "auditd",
+        "type": "syscall"
+    },
+    "network": {
+        "direction": "incoming"
+    },
+    "process": {
+        "exe": "/usr/sbin/sshd",
+        "name": "sshd",
+        "pid": "1663",
+        "ppid": "1",
+        "title": "(sshd)"
+    },
+    "source": {
+        "ip": "72.83.230.100",
+        "port": "58140"
+    },
+    "tags": [
+        "net"
+    ],
+    "user": {
+        "auid": "unset",
+        "egid": "0",
+        "euid": "0",
+        "fsgid": "0",
+        "fsuid": "0",
+        "gid": "0",
+        "name_map": {
+            "egid": "root",
+            "euid": "root",
+            "fsgid": "root",
+            "fsuid": "root",
+            "gid": "root",
+            "sgid": "root",
+            "suid": "root",
+            "uid": "root"
+        },
+        "sgid": "0",
+        "suid": "0",
+        "uid": "0"
+    }
+}

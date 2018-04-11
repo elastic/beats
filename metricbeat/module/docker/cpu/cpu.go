@@ -1,31 +1,30 @@
 package cpu
 
 import (
+	"github.com/docker/docker/client"
+
 	"github.com/elastic/beats/libbeat/common"
-	"github.com/elastic/beats/libbeat/common/cfgwarn"
 	"github.com/elastic/beats/metricbeat/mb"
 	"github.com/elastic/beats/metricbeat/module/docker"
-
-	dc "github.com/fsouza/go-dockerclient"
 )
 
 func init() {
-	if err := mb.Registry.AddMetricSet("docker", "cpu", New, docker.HostParser); err != nil {
-		panic(err)
-	}
+	mb.Registry.MustAddMetricSet("docker", "cpu", New,
+		mb.WithHostParser(docker.HostParser),
+		mb.DefaultMetricSet(),
+	)
 }
 
 type MetricSet struct {
 	mb.BaseMetricSet
 	cpuService   *CPUService
-	dockerClient *dc.Client
+	dockerClient *client.Client
+	dedot        bool
 }
 
 // New creates a new instance of the docker cpu MetricSet.
 func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
-	cfgwarn.Beta("The docker cpu metricset is beta")
-
-	config := docker.Config{}
+	config := docker.DefaultConfig()
 	if err := base.Module().UnpackConfig(&config); err != nil {
 		return nil, err
 	}
@@ -39,6 +38,7 @@ func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
 		BaseMetricSet: base,
 		dockerClient:  client,
 		cpuService:    &CPUService{},
+		dedot:         config.DeDot,
 	}, nil
 }
 
@@ -49,6 +49,6 @@ func (m *MetricSet) Fetch() ([]common.MapStr, error) {
 		return nil, err
 	}
 
-	formattedStats := m.cpuService.getCPUStatsList(stats)
+	formattedStats := m.cpuService.getCPUStatsList(stats, m.dedot)
 	return eventsMapping(formattedStats), nil
 }

@@ -2,7 +2,7 @@
   type: group
   description: >
     Docker image metrics.
-  release: beta
+  release: ga
   fields:
     - name: id
       type: group

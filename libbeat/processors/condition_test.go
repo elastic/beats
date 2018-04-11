@@ -129,6 +129,40 @@ func TestCondition(t *testing.T) {
 			},
 			result: true,
 		},
+		{
+			config: ConditionConfig{
+				Equals: &ConditionFields{fields: map[string]interface{}{
+					"final": true,
+				}},
+			},
+			result: false,
+		},
+		{
+			config: ConditionConfig{
+				Equals: &ConditionFields{fields: map[string]interface{}{
+					"final": false,
+				}},
+			},
+			result: true,
+		},
+		{
+			config: ConditionConfig{
+				HasFields: []string{"proc.cmdline", "type"},
+			},
+			result: true,
+		},
+		{
+			config: ConditionConfig{
+				HasFields: []string{"cpu"},
+			},
+			result: false,
+		},
+		{
+			config: ConditionConfig{
+				HasFields: []string{"proc", "beat"},
+			},
+			result: false,
+		},
 	}
 
 	event := &beat.Event{
@@ -150,7 +184,8 @@ func TestCondition(t *testing.T) {
 				"username": "monica",
 				"keywords": []string{"foo", "bar"},
 			},
-			"type": "process",
+			"type":  "process",
+			"final": false,
 		},
 	}
 
@@ -563,6 +598,18 @@ func TestWhenProcessor(t *testing.T) {
 			config{},
 			[]common.MapStr{{"i": 10}},
 			1,
+		},
+		{
+			"condition_matches",
+			config{"when.has_fields": []string{"i"}},
+			[]common.MapStr{{"i": 10}},
+			1,
+		},
+		{
+			"condition_fails",
+			config{"when.has_fields": []string{"j"}},
+			[]common.MapStr{{"i": 10}},
+			0,
 		},
 	}
 

@@ -61,5 +61,18 @@ class ComposeMixin(object):
             cls.compose_project().kill(service_names=cls.COMPOSE_SERVICES)
 
     @classmethod
+    def compose_hosts(cls):
+        if not INTEGRATION_TESTS or not cls.COMPOSE_SERVICES:
+            return []
+
+        hosts = []
+        for container in cls.compose_project().containers(service_names=cls.COMPOSE_SERVICES):
+            network_settings = container.inspect()['NetworkSettings']
+            for network in network_settings['Networks'].values():
+                if network['IPAddress']:
+                    hosts.append(network['IPAddress'])
+        return hosts
+
+    @classmethod
     def compose_project(cls):
         return get_project(cls.COMPOSE_PROJECT_DIR, project_name=os.environ.get('DOCKER_COMPOSE_PROJECT_NAME'))

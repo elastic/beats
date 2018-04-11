@@ -1,0 +1,11 @@
+{
+  "visState": "{\"title\":\"Top deleted [Auditbeat File Integrity]\",\"type\":\"pie\",\"params\":{\"addLegend\":true,\"addTooltip\":true,\"isDonut\":false,\"legendPosition\":\"right\",\"type\":\"pie\"},\"aggs\":[{\"id\":\"1\",\"enabled\":true,\"type\":\"count\",\"schema\":\"metric\",\"params\":{}},{\"id\":\"2\",\"enabled\":true,\"type\":\"terms\",\"schema\":\"segment\",\"params\":{\"field\":\"file.path.raw\",\"size\":10,\"order\":\"desc\",\"orderBy\":\"1\",\"customLabel\":\"Path\"}}],\"listeners\":{}}", 
+  "description": "", 
+  "title": "Top deleted [Auditbeat File Integrity]", 
+  "uiStateJSON": "{}", 
+  "version": 1, 
+  "savedSearchId": "a380a060-cb44-11e7-9835-2f31fe08873b", 
+  "kibanaSavedObjectMeta": {
+    "searchSourceJSON": "{\"filter\":[{\"meta\":{\"index\":\"auditbeat-*\",\"negate\":false,\"disabled\":false,\"alias\":null,\"type\":\"phrase\",\"key\":\"event.action\",\"value\":\"deleted\"},\"query\":{\"match\":{\"event.action\":{\"query\":\"deleted\",\"type\":\"phrase\"}}},\"$state\":{\"store\":\"appState\"}}]}"
+  }
+}

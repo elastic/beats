@@ -18,6 +18,7 @@ cp fields.yml $PREFIX/fields.yml
 # linux
 cp $BEAT_NAME.yml $PREFIX/$BEAT_NAME-linux.yml
 chmod 0600 $PREFIX/$BEAT_NAME-linux.yml
+chmod 0600 $PREFIX/$BEAT_NAME-linux-386.yml || true
 cp $BEAT_NAME.reference.yml $PREFIX/$BEAT_NAME-linux.reference.yml
 rm -rf $PREFIX/modules.d-linux
 cp -r modules.d/ $PREFIX/modules.d-linux || true

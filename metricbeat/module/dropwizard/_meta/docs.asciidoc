@@ -1,2 +1,2 @@
-This is the http://dropwizard.io[Dropwizard] module.
+This is the http://dropwizard.io[Dropwizard] module. The default metricset is `collector`.
 

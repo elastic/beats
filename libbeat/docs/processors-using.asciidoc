@@ -45,6 +45,7 @@ The supported processors are:
  * <<include-fields,`include_fields`>>
  * <<add-kubernetes-metadata,`add_kubernetes_metadata`>>
  * <<add-docker-metadata,`add_docker_metadata`>>
+ * <<add-host-metadata,`add_host_metadata`>>
 
 [[conditions]]
 ==== Conditions
@@ -65,6 +66,7 @@ The supported conditions are:
 * <<condition-contains,`contains`>>
 * <<condition-regexp,`regexp`>>
 * <<condition-range, `range`>>
+* <<condition-has_fields, `has_fields`>>
 * <<condition-or, `or`>>
 * <<condition-and, `and`>>
 * <<condition-not, `not`>>
@@ -153,6 +155,23 @@ between 0.5 and 0.8.
 range:
     system.cpu.user.pct.gte: 0.5
     system.cpu.user.pct.lt: 0.8
+------
+
+
+[float]
+[[condition-has_fields]]
+===== `has_fields`
+
+The `has_fields` condition checks if all the given fields exist in the
+event. The condition accepts a list of string values denoting the field names.
+
+For example, the following condition checks if the `http.response.code` field
+is present in the event.
+
+
+[source,yaml]
+------
+has_fields: ['http.response.code']
 ------
 
 
@@ -543,7 +562,7 @@ default. For example, FileBeat enables the `container` indexer, which indexes
 pod metadata based on all container IDs, and a `logs_path` matcher, which takes
 the `source` field, extracts the container ID, and uses it to retrieve metadata.
 
-The configuration below enables the processor when the Beat is run as a pod in
+The configuration below enables the processor when {beatname_lc} is run as a pod in
 Kubernetes.
 
 [source,yaml]
@@ -616,8 +635,10 @@ processors:
 - add_docker_metadata:
     host: "unix:///var/run/docker.sock"
     #match_fields: ["system.process.cgroup.id"]
+    #match_pids: ["process.pid", "process.ppid"]
     #match_source: true
     #match_source_index: 4
+    #match_short_id: true
     #cleanup_timeout: 60
     # To connect to Docker over TLS you must specify a client and CA certificate.
     #ssl:
@@ -629,13 +650,57 @@ processors:
 It has the following settings:
 
 `host`:: (Optional) Docker socket (UNIX or TCP socket). It uses
-  `unix:///var/run/docker.sock` by default.
-`match_fields`:: (Optional) A list of fields to match a container id, at least
-  one of them should hold a container id to get the event enriched.
-`match_source`:: (Optional) Match container id from a log path present in
-  `source` field. Enabled by default.
-`match_source_index`:: (Optional) Index in the source path split by / to look
-  for container id. It defaults to 4 to match
-  `/var/lib/docker/containers/<container_id>/*.log`
+`unix:///var/run/docker.sock` by default.
+
+`ssl`:: (Optional) SSL configuration to use when connecting to the Docker
+socket.
+
+`match_fields`:: (Optional) A list of fields to match a container ID, at least
+one of them should hold a container ID to get the event enriched.
+
+`match_pids`:: (Optional) A list of fields that contain process IDs. If the
+process is running in Docker then the event will be enriched. The default value
+is `["process.pid", "process.ppid"]`.
+
+`match_source`:: (Optional) Match container ID from a log path present in the
+`source` field. Enabled by default.
+
+`match_short_id`:: (Optional) Match container short ID from a log path present
+in the `source` field. Disabled by default.
+This allows to match directories names that have the first 12 characters
+of the container ID. For example, `/var/log/containers/b7e3460e2b21/*.log`.
+
+`match_source_index`:: (Optional) Index in the source path split by `/` to look
+for container ID. It defaults to 4 to match
+`/var/lib/docker/containers/<container_id>/*.log`
+
 `cleanup_timeout`:: (Optional) Time of inactivity to consider we can clean and
 forget metadata for a container, 60s by default.
+
+
+[[add-host-metadata]]
+=== Add Host metadata
+
+beta[]
+
+The `add_host_metadata` processor annotates each event with relevant metadata from the host machine.
+The fields added to the event are looking as following:
+
+[source,json]
+-------------------------------------------------------------------------------
+{
+   "host":{
+      "architecture":"x86_64",
+      "name":"example-host",
+      "id":"",
+      "os":{
+         "family":"darwin",
+         "build":"16G1212",
+         "platform":"darwin",
+         "version":"10.12.6"
+      }
+   }
+}
+-------------------------------------------------------------------------------
+
+NOTE: The host information is refreshed every 5 minutes.

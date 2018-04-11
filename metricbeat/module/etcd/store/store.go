@@ -21,9 +21,10 @@ var (
 )
 
 func init() {
-	if err := mb.Registry.AddMetricSet("etcd", "store", New, hostParser); err != nil {
-		panic(err)
-	}
+	mb.Registry.MustAddMetricSet("etcd", "store", New,
+		mb.WithHostParser(hostParser),
+		mb.DefaultMetricSet(),
+	)
 }
 
 type MetricSet struct {
@@ -39,9 +40,13 @@ func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
 		return nil, err
 	}
 
+	http, err := helper.NewHTTP(base)
+	if err != nil {
+		return nil, err
+	}
 	return &MetricSet{
 		base,
-		helper.NewHTTP(base),
+		http,
 	}, nil
 }
 

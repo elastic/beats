@@ -2,7 +2,7 @@
   type: group
   description: >
     kubernetes deployment metrics
-  release: beta
+  release: ga
   fields:
     - name: name
       type: keyword

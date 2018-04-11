@@ -76,7 +76,7 @@
       "startTime": "2017-04-18T16:47:44Z",
       "cpu": {
        "time": "2017-04-20T08:06:34Z",
-       "usageNanoCores": 0,
+       "usageNanoCores": 11263994,
        "usageCoreNanoSeconds": 43959424
       },
       "memory": {

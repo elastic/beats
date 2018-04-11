@@ -5,8 +5,6 @@ This file is generated! See scripts/docs_collector.py
 [[metricbeat-metricset-docker-memory]]
 === Docker memory metricset
 
-beta[]
-
 include::../../../module/docker/memory/_meta/docs.asciidoc[]
 
 

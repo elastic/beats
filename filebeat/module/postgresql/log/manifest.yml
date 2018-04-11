@@ -10,4 +10,4 @@ var:
       - "c:/Program Files/PostgreSQL/*/logs/*.log*"
 
 ingest_pipeline: ingest/pipeline.json
-prospector: config/log.yml
+input: config/log.yml

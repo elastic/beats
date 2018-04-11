@@ -10,4 +10,4 @@ var:
       - c:/programdata/logstash/logs/logstash-{{.format}}*.log
 
 ingest_pipeline: ingest/pipeline-{{.format}}.json
-prospector: config/log.yml
+input: config/log.yml

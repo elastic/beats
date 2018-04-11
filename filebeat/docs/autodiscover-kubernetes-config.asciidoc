@@ -1,0 +1,40 @@
+Filebeat supports templates for inputs and modules.
+
+["source","yaml",subs="attributes"]
+-------------------------------------------------------------------------------------
+filebeat.autodiscover:
+  providers:
+    - type: kubernetes
+      templates:
+        - condition:
+            equals:
+              kubernetes.namespace: kube-system
+          config:
+            - type: docker
+              containers.ids:
+                - "${data.kubernetes.container.id}"
+              exclude_lines: ["^\\s+[\\-`('.|_]"]  # drop asciiart lines
+-------------------------------------------------------------------------------------
+
+This configuration launches a `docker` logs input for all containers of pods running in the Kubernetes namespace
+`kube-system`.
+
+If you are using modules, you can override the default input and use the docker input instead.
+
+["source","yaml",subs="attributes"]
+-------------------------------------------------------------------------------------
+filebeat.autodiscover:
+  providers:
+    - type: kubernetes
+      templates:
+        - condition:
+            equals:
+              kubernetes.container.image: "redis"
+          config:
+            - module: redis
+              log:
+                input:
+                  type: docker
+                  containers.ids:
+                    - "${data.kubernetes.container.id}"
+-------------------------------------------------------------------------------------

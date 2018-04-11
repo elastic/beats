@@ -2,7 +2,7 @@
   type: group
   description: >
     Network metrics.
-  release: beta
+  release: ga
   fields:
 
     - name: interface

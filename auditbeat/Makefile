@@ -1,13 +1,15 @@
 BEAT_NAME=auditbeat
 BEAT_TITLE=Auditbeat
 BEAT_DESCRIPTION=Audit the activities of users and processes on your system.
-SYSTEM_TESTS=false
-TEST_ENVIRONMENT=false
+SYSTEM_TESTS=true
+TEST_ENVIRONMENT?=true
 GOX_OS?=linux windows ## @Building List of all OS to be supported by "make crosscompile".
 DEV_OS?=linux
+TESTING_ENVIRONMENT?=snapshot-noxpack
+ES_BEATS?=..
 
 # Path to the libbeat Makefile
--include ../libbeat/scripts/Makefile
+include ${ES_BEATS}/libbeat/scripts/Makefile
 
 # This is called by the beats packer before building starts
 .PHONY: before-build
@@ -33,7 +35,7 @@ before-build:
 	     ${PREFIX}/${BEAT_NAME}-darwin.reference.yml
 
 	@cat ${ES_BEATS}/auditbeat/_meta/common.p1.yml \
-	     <(go run scripts/generate_config.go -os linux -concat) \
+	     <(go run scripts/generate_config.go -os linux -arch amd64 -concat) \
 	     ${ES_BEATS}/auditbeat/_meta/common.p2.yml \
 	     ${ES_BEATS}/libbeat/_meta/config.yml > \
 	     ${PREFIX}/${BEAT_NAME}-linux.yml
@@ -41,6 +43,16 @@ before-build:
 	     <(go run scripts/generate_config.go -os linux -concat -ref) \
 	     ${ES_BEATS}/libbeat/_meta/config.reference.yml > \
 	     ${PREFIX}/${BEAT_NAME}-linux.reference.yml
+
+	@cat ${ES_BEATS}/auditbeat/_meta/common.p1.yml \
+	     <(go run scripts/generate_config.go -os linux -arch i386 -concat) \
+	     ${ES_BEATS}/auditbeat/_meta/common.p2.yml \
+	     ${ES_BEATS}/libbeat/_meta/config.yml > \
+	     ${PREFIX}/${BEAT_NAME}-linux-386.yml
+	@cat ${ES_BEATS}/auditbeat/_meta/common.reference.yml \
+	     <(go run scripts/generate_config.go -os linux -concat -ref) \
+	     ${ES_BEATS}/libbeat/_meta/config.reference.yml > \
+	     ${PREFIX}/${BEAT_NAME}-linux-386.reference.yml
 
 # Collects all dependencies and then calls update
 .PHONY: collect

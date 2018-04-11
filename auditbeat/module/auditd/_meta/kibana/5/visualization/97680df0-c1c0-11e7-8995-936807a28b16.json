@@ -1,0 +1,10 @@
+{
+  "visState": "{\n  \"title\": \"Event Actions [Auditbeat Auditd Overview]\",\n  \"type\": \"metrics\",\n  \"params\": {\n    \"id\": \"61ca57f0-469d-11e7-af02-69e470af7417\",\n    \"type\": \"timeseries\",\n    \"series\": [\n      {\n        \"id\": \"61ca57f1-469d-11e7-af02-69e470af7417\",\n        \"color\": \"#68BC00\",\n        \"split_mode\": \"terms\",\n        \"metrics\": [\n          {\n            \"id\": \"6b9fb2d0-c1bc-11e7-938f-ab0645b6c431\",\n            \"type\": \"count\"\n          }\n        ],\n        \"seperate_axis\": 0,\n        \"axis_position\": \"right\",\n        \"formatter\": \"number\",\n        \"chart_type\": \"line\",\n        \"line_width\": 1,\n        \"point_size\": 1,\n        \"fill\": 0.5,\n        \"stacked\": \"none\",\n        \"terms_field\": \"event.action\",\n        \"label\": \"Actions\"\n      }\n    ],\n    \"time_field\": \"@timestamp\",\n    \"index_pattern\": \"auditbeat-*\",\n    \"interval\": \"auto\",\n    \"axis_position\": \"left\",\n    \"axis_formatter\": \"number\",\n    \"show_legend\": 1,\n    \"show_grid\": 1,\n    \"filter\": \"event.module:auditd\",\n    \"background_color_rules\": [\n      {\n        \"id\": \"58c95a20-c1bd-11e7-938f-ab0645b6c431\"\n      }\n    ],\n    \"bar_color_rules\": [\n      {\n        \"id\": \"5bfc71a0-c1bd-11e7-938f-ab0645b6c431\"\n      }\n    ],\n    \"gauge_color_rules\": [\n      {\n        \"id\": \"5d20a650-c1bd-11e7-938f-ab0645b6c431\"\n      }\n    ],\n    \"gauge_width\": 10,\n    \"gauge_inner_width\": 10,\n    \"gauge_style\": \"half\",\n    \"legend_position\": \"left\"\n  },\n  \"aggs\": []\n}", 
+  "description": "", 
+  "title": "Event Actions [Auditbeat Auditd Overview]", 
+  "uiStateJSON": "{}", 
+  "version": 1, 
+  "kibanaSavedObjectMeta": {
+    "searchSourceJSON": "{}"
+  }
+}

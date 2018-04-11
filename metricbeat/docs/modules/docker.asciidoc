@@ -5,9 +5,7 @@ This file is generated! See scripts/docs_collector.py
 [[metricbeat-module-docker]]
 == Docker module
 
-beta[]
-
-This module fetches metrics from https://www.docker.com/[Docker] containers.
+This module fetches metrics from https://www.docker.com/[Docker] containers. The default metricsets are: `container`, `cpu`, `diskio`, `healthcheck`, `info`, `memory` and `network`. The `image` metricset is not enabled by default.
 
 The Docker module is currently not tested on Windows.
 
@@ -31,9 +29,21 @@ in <<configuration-metricbeat>>. Here is an example configuration:
 ----
 metricbeat.modules:
 - module: docker
-  metricsets: ["container", "cpu", "diskio", "healthcheck", "info", "memory", "network"]
+  metricsets:
+    - "container"
+    - "cpu"
+    - "diskio"
+    - "healthcheck"
+    - "info"
+    #- "image"
+    - "memory"
+    - "network"
   hosts: ["unix:///var/run/docker.sock"]
   period: 10s
+  enabled: true
+
+  # Replace dots in labels with `_`. Set to false to keep dots
+  labels.dedot: true
 
   # To connect to Docker over TLS you must specify a client and CA certificate.
   #ssl:

@@ -207,8 +207,8 @@ auditbeat.modules:
     ## Executions.
     #-a always,exit -F arch=b64 -S execve,execveat -k exec
 
-    ## External access.
-    #-a always,exit -F arch=b64 -S accept,bind,connect,recvfrom -F key=external-access
+    ## External access (warning: these can be expensive to audit).
+    #-a always,exit -F arch=b64 -S accept,bind,connect -F key=external-access
 
     ## Identity changes.
     #-w /etc/group -p wa -k identity

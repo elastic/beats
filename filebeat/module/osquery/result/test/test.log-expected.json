@@ -43,6 +43,9 @@
 	  "prospector": {
 		"type": "log"
 	  },
+	  "input": {
+		"type": "log"
+	  },
 	  "source": "/Users/tsg/src/github.com/elastic/beats/filebeat/module/osquery/result/test/test.log",
 	  "fileset": {
 		"module": "osquery",

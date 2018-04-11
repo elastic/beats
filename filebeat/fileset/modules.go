@@ -14,7 +14,13 @@ import (
 	"github.com/elastic/beats/libbeat/logp"
 	mlimporter "github.com/elastic/beats/libbeat/ml-importer"
 	"github.com/elastic/beats/libbeat/paths"
+	"github.com/elastic/beats/libbeat/setup/kibana"
 )
+
+var availableMLModules = map[string]string{
+	"apache2": "access",
+	"nginx":   "access",
+}
 
 type ModuleRegistry struct {
 	registry map[string]map[string]*Fileset // module -> fileset -> Fileset
@@ -133,7 +139,7 @@ func mcfgFromConfig(cfg *common.Config) (*ModuleConfig, error) {
 
 	err = cfg.Unpack(&dict)
 	if err != nil {
-		return nil, fmt.Errorf("Error unpacking module %s in a dict: %v", mcfg.Module, err)
+		return nil, fmt.Errorf("error unpacking module %s in a dict: %v", mcfg.Module, err)
 	}
 
 	mcfg.Filesets = map[string]*FilesetConfig{}
@@ -142,17 +148,16 @@ func mcfgFromConfig(cfg *common.Config) (*ModuleConfig, error) {
 			continue
 		}
 
-		var fcfg FilesetConfig
 		tmpCfg, err := common.NewConfigFrom(filesetConfig)
 		if err != nil {
-			return nil, fmt.Errorf("Error creating config from fileset %s/%s: %v", mcfg.Module, name, err)
+			return nil, fmt.Errorf("error creating config from fileset %s/%s: %v", mcfg.Module, name, err)
 		}
-		err = tmpCfg.Unpack(&fcfg)
-		if err != nil {
-			return nil, fmt.Errorf("Error unpacking fileset %s/%s: %v", mcfg.Module, name, err)
-		}
-		mcfg.Filesets[name] = &fcfg
 
+		fcfg, err := NewFilesetConfig(tmpCfg)
+		if err != nil {
+			return nil, fmt.Errorf("error creating config from fileset %s/%s: %v", mcfg.Module, name, err)
+		}
+		mcfg.Filesets[name] = fcfg
 	}
 
 	return &mcfg, nil
@@ -204,13 +209,12 @@ func applyOverrides(fcfg *FilesetConfig,
 		return nil, fmt.Errorf("Error merging configs: %v", err)
 	}
 
-	var res FilesetConfig
-	err = resultConfig.Unpack(&res)
+	res, err := NewFilesetConfig(resultConfig)
 	if err != nil {
 		return nil, fmt.Errorf("Error unpacking configs: %v", err)
 	}
 
-	return &res, nil
+	return res, nil
 }
 
 // appendWithoutDuplicates appends basic module configuration for each module in the
@@ -238,13 +242,13 @@ func appendWithoutDuplicates(moduleConfigs []*ModuleConfig, modules []string) ([
 	return moduleConfigs, nil
 }
 
-func (reg *ModuleRegistry) GetProspectorConfigs() ([]*common.Config, error) {
+func (reg *ModuleRegistry) GetInputConfigs() ([]*common.Config, error) {
 	result := []*common.Config{}
 	for module, filesets := range reg.registry {
 		for name, fileset := range filesets {
-			fcfg, err := fileset.getProspectorConfig()
+			fcfg, err := fileset.getInputConfig()
 			if err != nil {
-				return result, fmt.Errorf("Error getting config for fielset %s/%s: %v",
+				return result, fmt.Errorf("Error getting config for fileset %s/%s: %v",
 					module, name, err)
 			}
 			result = append(result, fcfg)
@@ -265,7 +269,7 @@ type PipelineLoader interface {
 }
 
 // LoadPipelines loads the pipelines for each configured fileset.
-func (reg *ModuleRegistry) LoadPipelines(esClient PipelineLoader) error {
+func (reg *ModuleRegistry) LoadPipelines(esClient PipelineLoader, forceUpdate bool) error {
 	for module, filesets := range reg.registry {
 		for name, fileset := range filesets {
 			// check that all the required Ingest Node plugins are available
@@ -282,7 +286,7 @@ func (reg *ModuleRegistry) LoadPipelines(esClient PipelineLoader) error {
 			if err != nil {
 				return fmt.Errorf("Error getting pipeline for fileset %s/%s: %v", module, name, err)
 			}
-			err = loadPipeline(esClient, pipelineID, content)
+			err = loadPipeline(esClient, pipelineID, content, forceUpdate)
 			if err != nil {
 				return fmt.Errorf("Error loading pipeline for fileset %s/%s: %v", module, name, err)
 			}
@@ -370,12 +374,14 @@ func checkAvailableProcessors(esClient PipelineLoader, requiredProcessors []Proc
 	return nil
 }
 
-func loadPipeline(esClient PipelineLoader, pipelineID string, content map[string]interface{}) error {
+func loadPipeline(esClient PipelineLoader, pipelineID string, content map[string]interface{}, forceUpdate bool) error {
 	path := "/_ingest/pipeline/" + pipelineID
-	status, _, _ := esClient.Request("GET", path, "", nil, nil)
-	if status == 200 {
-		logp.Debug("modules", "Pipeline %s already loaded", pipelineID)
-		return nil
+	if !forceUpdate {
+		status, _, _ := esClient.Request("GET", path, "", nil, nil)
+		if status == 200 {
+			logp.Debug("modules", "Pipeline %s already loaded", pipelineID)
+			return nil
+		}
 	}
 	body, err := esClient.LoadJSON(path, content)
 	if err != nil {
@@ -449,28 +455,60 @@ func interpretError(initialErr error, body []byte) error {
 	return fmt.Errorf("couldn't load pipeline: %v. Response body: %s", initialErr, body)
 }
 
-// LoadML loads the machine-learning configurations into Elasticsearch, if Xpack is available
+// LoadML loads the machine-learning configurations into Elasticsearch, if X-Pack is available
 func (reg *ModuleRegistry) LoadML(esClient PipelineLoader) error {
 	haveXpack, err := mlimporter.HaveXpackML(esClient)
 	if err != nil {
-		return errors.Errorf("Error checking if xpack is available: %v", err)
+		return errors.Errorf("error checking if xpack is available: %v", err)
 	}
 	if !haveXpack {
-		logp.Warn("Xpack Machine Learning is not enabled")
+		logp.Warn("X-Pack Machine Learning is not enabled")
 		return nil
 	}
 
 	for module, filesets := range reg.registry {
 		for name, fileset := range filesets {
 			for _, mlConfig := range fileset.GetMLConfigs() {
-				err = mlimporter.ImportMachineLearningJob(esClient, &mlConfig)
+				err := mlimporter.ImportMachineLearningJob(esClient, &mlConfig)
 				if err != nil {
-					return errors.Errorf("Error loading ML config from %s/%s: %v", module, name, err)
+					return errors.Errorf("error loading ML config from %s/%s: %v", module, name, err)
 				}
 			}
 		}
 	}
 
+	return nil
+}
+
+// SetupML sets up the machine-learning configurations into Elasticsearch using Kibana, if X-Pack is available
+func (reg *ModuleRegistry) SetupML(esClient PipelineLoader, kibanaClient *kibana.Client) error {
+	haveXpack, err := mlimporter.HaveXpackML(esClient)
+	if err != nil {
+		return errors.Errorf("Error checking if xpack is available: %v", err)
+	}
+	if !haveXpack {
+		logp.Warn("X-Pack Machine Learning is not enabled")
+		return nil
+	}
+
+	modules := make(map[string]string)
+	if reg.Empty() {
+		modules = availableMLModules
+	} else {
+		for _, module := range reg.ModuleNames() {
+			if fileset, ok := availableMLModules[module]; ok {
+				modules[module] = fileset
+			}
+		}
+	}
+
+	for module, fileset := range modules {
+		prefix := fmt.Sprintf("filebeat-%s-%s-", module, fileset)
+		err := mlimporter.SetupModule(kibanaClient, module, prefix)
+		if err != nil {
+			return errors.Errorf("Error setting up ML for %s: %v", module, err)
+		}
+	}
 	return nil
 }
 
@@ -480,4 +518,13 @@ func (reg *ModuleRegistry) Empty() bool {
 		count += len(filesets)
 	}
 	return count == 0
+}
+
+// ModuleNames returns the names of modules in the ModuleRegistry.
+func (reg *ModuleRegistry) ModuleNames() []string {
+	var modules []string
+	for m := range reg.registry {
+		modules = append(modules, m)
+	}
+	return modules
 }

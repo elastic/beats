@@ -6,7 +6,6 @@ import (
 	"gopkg.in/mgo.v2"
 
 	"github.com/elastic/beats/libbeat/common"
-	"github.com/elastic/beats/libbeat/common/cfgwarn"
 	"github.com/elastic/beats/libbeat/logp"
 	"github.com/elastic/beats/metricbeat/mb"
 	"github.com/elastic/beats/metricbeat/module/mongodb"
@@ -17,9 +16,10 @@ var debugf = logp.MakeDebug("mongodb.dbstats")
 // init registers the MetricSet with the central registry.
 // The New method will be called after the setup of the module and before starting to fetch data
 func init() {
-	if err := mb.Registry.AddMetricSet("mongodb", "dbstats", New, mongodb.ParseURL); err != nil {
-		panic(err)
-	}
+	mb.Registry.MustAddMetricSet("mongodb", "dbstats", New,
+		mb.WithHostParser(mongodb.ParseURL),
+		mb.DefaultMetricSet(),
+	)
 }
 
 // MetricSet type defines all fields of the MetricSet
@@ -35,8 +35,6 @@ type MetricSet struct {
 // Part of new is also setting up the configuration by processing additional
 // configuration entries if needed.
 func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
-	cfgwarn.Beta("The %v %v metricset is Beta", base.Module().Name(), base.Name())
-
 	dialInfo, err := mgo.ParseURL(base.HostData().URI)
 	if err != nil {
 		return nil, err

@@ -1,0 +1,11 @@
+{
+  "visState": "{\n  \"title\": \"Top groups [Auditbeat File Integrity]\",\n  \"type\": \"pie\",\n  \"params\": {\n    \"addTooltip\": true,\n    \"addLegend\": true,\n    \"legendPosition\": \"right\",\n    \"isDonut\": true,\n    \"type\": \"pie\"\n  },\n  \"aggs\": [\n    {\n      \"id\": \"1\",\n      \"enabled\": true,\n      \"type\": \"count\",\n      \"schema\": \"metric\",\n      \"params\": {}\n    },\n    {\n      \"id\": \"2\",\n      \"enabled\": true,\n      \"type\": \"terms\",\n      \"schema\": \"segment\",\n      \"params\": {\n        \"field\": \"file.group\",\n        \"size\": 5,\n        \"order\": \"desc\",\n        \"orderBy\": \"1\",\n        \"customLabel\": \"Group\"\n      }\n    }\n  ]\n}", 
+  "description": "", 
+  "title": "Top groups [Auditbeat File Integrity]", 
+  "uiStateJSON": "{}", 
+  "version": 1, 
+  "savedSearchId": "a380a060-cb44-11e7-9835-2f31fe08873b", 
+  "kibanaSavedObjectMeta": {
+    "searchSourceJSON": ""
+  }
+}

@@ -560,7 +560,7 @@ func getArch(arch string) (string, uint32, error) {
 	return realArch, archValue, nil
 }
 
-// getRuntimeArch returns the programs arch (not the machines arch).
+// getRuntimeArch returns the program's arch (not the machine's arch).
 func getRuntimeArch() (string, error) {
 	var arch string
 	switch runtime.GOARCH {
@@ -574,6 +574,10 @@ func getRuntimeArch() (string, error) {
 		arch = "x86_64"
 	case "ppc64", "ppc64le":
 		arch = "ppc"
+	case "s390":
+		arch = "s390"
+	case "s390x":
+		arch = "s390x"
 	case "mips", "mipsle", "mips64", "mips64le":
 		fallthrough
 	default:
