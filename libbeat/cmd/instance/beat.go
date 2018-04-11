@@ -341,7 +341,7 @@ func (b *Beat) TestConfig(bt beat.Creator) error {
 }
 
 // Setup registers ES index template and kibana dashboards
-func (b *Beat) Setup(bt beat.Creator, template, dashboards, machineLearning bool) error {
+func (b *Beat) Setup(bt beat.Creator, template, dashboards, machineLearning, pipelines bool) error {
 	return handleError(func() error {
 		err := b.Init()
 		if err != nil {
@@ -402,6 +402,16 @@ func (b *Beat) Setup(bt beat.Creator, template, dashboards, machineLearning bool
 				return err
 			}
 			fmt.Println("Loaded machine learning job configurations")
+		}
+
+		if pipelines && b.OverwritePipelinesCallback != nil {
+			esConfig := b.Config.Output.Config()
+			err = b.OverwritePipelinesCallback(esConfig)
+			if err != nil {
+				return err
+			}
+
+			fmt.Println("Loaded Ingest pipelines")
 		}
 
 		return nil

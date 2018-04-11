@@ -18,7 +18,7 @@ type Factory struct {
 	registrar             *registrar.Registrar
 	beatVersion           string
 	pipelineLoaderFactory PipelineLoaderFactory
-	updatePipelines       bool
+	overwritePipelines    bool
 	beatDone              chan struct{}
 }
 
@@ -28,19 +28,19 @@ type inputsRunner struct {
 	moduleRegistry        *ModuleRegistry
 	inputs                []*input.Runner
 	pipelineLoaderFactory PipelineLoaderFactory
-	updatePipelines       bool
+	overwritePipelines    bool
 }
 
 // NewFactory instantiates a new Factory
 func NewFactory(outlet channel.Factory, registrar *registrar.Registrar, beatVersion string,
-	pipelineLoaderFactory PipelineLoaderFactory, updatePipelines bool, beatDone chan struct{}) *Factory {
+	pipelineLoaderFactory PipelineLoaderFactory, overwritePipelines bool, beatDone chan struct{}) *Factory {
 	return &Factory{
 		outlet:                outlet,
 		registrar:             registrar,
 		beatVersion:           beatVersion,
 		beatDone:              beatDone,
 		pipelineLoaderFactory: pipelineLoaderFactory,
-		updatePipelines:       updatePipelines,
+		overwritePipelines:    overwritePipelines,
 	}
 }
 
@@ -79,7 +79,7 @@ func (f *Factory) Create(c *common.Config, meta *common.MapStrPointer) (cfgfile.
 		moduleRegistry:        m,
 		inputs:                inputs,
 		pipelineLoaderFactory: f.pipelineLoaderFactory,
-		updatePipelines:       f.updatePipelines,
+		overwritePipelines:    f.overwritePipelines,
 	}, nil
 }
 
@@ -91,7 +91,7 @@ func (p *inputsRunner) Start() {
 		if err != nil {
 			logp.Err("Error loading pipeline: %s", err)
 		} else {
-			err := p.moduleRegistry.LoadPipelines(pipelineLoader, p.updatePipelines)
+			err := p.moduleRegistry.LoadPipelines(pipelineLoader, p.overwritePipelines)
 			if err != nil {
 				// Log error and continue
 				logp.Err("Error loading pipeline: %s", err)
@@ -100,7 +100,7 @@ func (p *inputsRunner) Start() {
 
 		// Callback:
 		callback := func(esClient *elasticsearch.Client) error {
-			return p.moduleRegistry.LoadPipelines(esClient, p.updatePipelines)
+			return p.moduleRegistry.LoadPipelines(esClient, p.overwritePipelines)
 		}
 		elasticsearch.RegisterConnectCallback(callback)
 	}
