@@ -39,6 +39,8 @@ This file is generated! See scripts/docs_collector.py
 .3+| .3+|  |<<metricbeat-metricset-etcd-leader,leader>> beta[]  
 |<<metricbeat-metricset-etcd-self,self>> beta[]  
 |<<metricbeat-metricset-etcd-store,store>> beta[]  
+|<<metricbeat-module-galera,galera>>  experimental[]   |image:./images/icon-no.png[No prebuilt dashboards]    |  
+.1+| .1+|  |<<metricbeat-metricset-galera-status,status>> experimental[]  
 |<<metricbeat-module-golang,Golang>>  beta[]   |image:./images/icon-yes.png[Prebuilt dashboards are available]    |  
 .2+| .2+|  |<<metricbeat-metricset-golang-expvar,expvar>> beta[]  
 |<<metricbeat-metricset-golang-heap,heap>> beta[]  
