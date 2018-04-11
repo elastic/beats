@@ -25,17 +25,7 @@ Example configuration:
 The `udp` input supports the following configuration options plus the
 <<{beatname_lc}-input-{type}-common-options>> described later.
 
-[float]
-[id="{beatname_lc}-input-{type}-max-message-size"]
-==== `max_message_size`
-
-The maximum size of the message received over UDP. The default is `10KiB`.
-
-[float]
-[id="{beatname_lc}-input-{type}-host"]
-==== `host`
-
-The host and UDP port to listen on for event streams.
+include::../inputs/input-common-udp-options.asciidoc[]
 
 [id="{beatname_lc}-input-{type}-common-options"]
 include::../inputs/input-common-options.asciidoc[]

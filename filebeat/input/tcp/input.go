@@ -7,6 +7,7 @@ import (
 	"github.com/elastic/beats/filebeat/channel"
 	"github.com/elastic/beats/filebeat/harvester"
 	"github.com/elastic/beats/filebeat/input"
+	"github.com/elastic/beats/filebeat/inputsource"
 	"github.com/elastic/beats/filebeat/inputsource/tcp"
 	"github.com/elastic/beats/filebeat/util"
 	"github.com/elastic/beats/libbeat/beat"
@@ -53,12 +54,12 @@ func NewInput(
 		return nil, err
 	}
 
-	cb := func(data []byte, metadata tcp.Metadata) {
+	cb := func(data []byte, metadata inputsource.NetworkMetadata) {
 		event := createEvent(data, metadata)
 		forwarder.Send(event)
 	}
 
-	server, err := tcp.New(cb, &config.Config)
+	server, err := tcp.New(&config.Config, cb)
 	if err != nil {
 		return nil, err
 	}
@@ -103,7 +104,7 @@ func (p *Input) Wait() {
 	p.Stop()
 }
 
-func createEvent(raw []byte, metadata tcp.Metadata) *util.Data {
+func createEvent(raw []byte, metadata inputsource.NetworkMetadata) *util.Data {
 	data := util.NewData()
 	data.Event = beat.Event{
 		Timestamp: time.Now(),
