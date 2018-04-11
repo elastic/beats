@@ -2,6 +2,8 @@ FROM centos:7
 
 SHELL [ "/bin/bash", "-c" ]
 
+ARG DATAFILE
+
 # install packages
 COPY assets/galera.repo /etc/yum.repos.d/galera.repo
 RUN rpm --import "http://releases.galeracluster.com/GPG-KEY-galeracluster.com"
@@ -15,10 +17,8 @@ RUN yum install -y \
 # copy mysql files & cluster data
 WORKDIR /var/lib
 RUN rm -rf mysql
-COPY assets/master.tar.gz /var/lib/data.tar.gz
+COPY assets/${DATAFILE}.tar.gz /var/lib/data.tar.gz
 RUN tar xzf data.tar.gz && chown -R mysql:mysql mysql
-
-EXPOSE 3306
 
 HEALTHCHECK --interval=1s --retries=90 CMD nc localhost 3306
 
