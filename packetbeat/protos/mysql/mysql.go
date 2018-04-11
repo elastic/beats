@@ -252,6 +252,14 @@ func (stream *mysqlStream) prepareForNewMessage() {
 	stream.message = nil
 }
 
+func isRequest(typ uint8) (request bool, support bool) {
+	if typ == mysqlCmdQuery || typ == mysqlCmdStmtPrepare ||
+		typ == mysqlCmdStmtExecute || typ == mysqlCmdStmtClose {
+		return true, true
+	}
+	return false, false
+}
+
 func mysqlMessageParser(s *mysqlStream) (bool, bool) {
 	logp.Debug("mysqldetailed", "MySQL parser called. parseState = %s", s.parseState)
 
@@ -273,9 +281,8 @@ func mysqlMessageParser(s *mysqlStream) (bool, bool) {
 
 			if m.seq == 0 {
 				// starts Command Phase
-
-				if m.typ == mysqlCmdQuery || m.typ == mysqlCmdStmtPrepare ||
-					m.typ == mysqlCmdStmtExecute || m.typ == mysqlCmdStmtClose {
+				request, _ := isRequest(m.typ)
+				if request {
 					// parse request
 					m.isRequest = true
 					m.start = s.parseOffset
