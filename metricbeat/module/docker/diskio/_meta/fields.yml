@@ -15,6 +15,7 @@
             Number of reads during the life of the container
         - name: bytes
           type: long
+          format: bytes
           description: >
             Bytes read during the life of the container
         - name: rate
@@ -37,6 +38,7 @@
             Number of writes during the life of the container
         - name: bytes
           type: long
+          format: bytes
           description: >
             Bytes written during the life of the container
         - name: rate
@@ -59,6 +61,7 @@
             Number of I/O operations during the life of the container
         - name: bytes
           type: long
+          format: bytes
           description: >
             Bytes read and written during the life of the container
         - name: rate

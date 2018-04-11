@@ -2234,6 +2234,8 @@ Number of reads during the life of the container
 
 type: long
 
+format: bytes
+
 Bytes read during the life of the container
 
 
@@ -2273,6 +2275,8 @@ Number of writes during the life of the container
 
 type: long
 
+format: bytes
+
 Bytes written during the life of the container
 
 
@@ -2311,6 +2315,8 @@ Number of I/O operations during the life of the container
 === `docker.diskio.summary.bytes`
 
 type: long
+
+format: bytes
 
 Bytes read and written during the life of the container
 

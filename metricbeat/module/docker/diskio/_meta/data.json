@@ -6,20 +6,40 @@
     },
     "docker": {
         "container": {
-            "id": "af5b4d9b5a792bf883e3f0cb55413aec8148d75a2bbd5723680f7ad8dc5545f6",
+            "id": "59c5d4838454f38c7d67fdacec7a32ca4476a062ef00edf69ba6be9117cf2e7b",
             "labels": {
-                "com_docker_compose_config-hash": "b41e43e99efa9215f20761ad78899d65e4119b55",
+                "build-date": "20170911",
+                "com_docker_compose_config-hash": "a2bcfc1f8c99a4be6920deda8da8d4d06fe0d10d51623b8e1dbcc8228e96926c",
                 "com_docker_compose_container-number": "1",
                 "com_docker_compose_oneoff": "False",
                 "com_docker_compose_project": "metricbeat",
-                "com_docker_compose_service": "nginx",
-                "com_docker_compose_version": "1.5.0"
+                "com_docker_compose_service": "elasticsearch",
+                "com_docker_compose_version": "1.20.1",
+                "license": "GPLv2",
+                "maintainer": "Elastic Docker Team \u003cdocker@elastic.co\u003e",
+                "name": "CentOS Base Image",
+                "vendor": "CentOS"
             },
-            "name": "metricbeat_nginx_1"
+            "name": "metricbeat_elasticsearch_1"
         },
         "diskio": {
+            "read": {
+                "bytes": 61964288,
+                "ops": 3284,
+                "rate": 0
+            },
             "reads": 0,
+            "summary": {
+                "bytes": 63479808,
+                "ops": 3500,
+                "rate": 0
+            },
             "total": 0,
+            "write": {
+                "bytes": 1515520,
+                "ops": 216,
+                "rate": 0
+            },
             "writes": 0
         }
     },
