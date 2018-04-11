@@ -43,7 +43,7 @@ The supported processors are:
  * <<drop-event,`drop_event`>>
  * <<drop-fields,`drop_fields`>>
  * <<include-fields,`include_fields`>>
- * <<rename,`rename`>>
+ * <<rename-fields,`rename`>>
  * <<add-kubernetes-metadata,`add_kubernetes_metadata`>>
  * <<add-docker-metadata,`add_docker_metadata`>>
  * <<add-host-metadata,`add_host_metadata`>>
