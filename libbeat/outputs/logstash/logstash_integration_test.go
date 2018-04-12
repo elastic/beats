@@ -6,7 +6,6 @@ import (
 	"encoding/json"
 	"fmt"
 	"os"
-	"sync"
 	"testing"
 	"time"
 
@@ -37,6 +36,7 @@ type esConnection struct {
 }
 
 type testOutputer struct {
+	*testing.T
 	outputs.NetworkClient
 	*esConnection
 }
@@ -136,7 +136,7 @@ func newTestLogstashOutput(t *testing.T, test string, tls bool) *testOutputer {
 	index := testLogstashIndex(test)
 	connection := esConnect(t, index)
 
-	return &testOutputer{output, connection}
+	return &testOutputer{t, output, connection}
 }
 
 func newTestElasticsearchOutput(t *testing.T, test string) *testOutputer {
@@ -163,9 +163,11 @@ func newTestElasticsearchOutput(t *testing.T, test string) *testOutputer {
 		t.Fatalf("init elasticsearch output plugin failed: %v", err)
 	}
 
-	es := &testOutputer{}
-	es.NetworkClient = grp.Clients[0].(outputs.NetworkClient)
-	es.esConnection = connection
+	es := &testOutputer{
+		T:             t,
+		NetworkClient: grp.Clients[0].(outputs.NetworkClient),
+		esConnection:  connection,
+	}
 	return es
 }
 
@@ -519,17 +521,20 @@ func (t *testOutputer) PublishEvent(event beat.Event) {
 }
 
 func (t *testOutputer) BulkPublish(events []beat.Event) bool {
-	ok := false
 	batch := outest.NewBatch(events...)
 
-	var wg sync.WaitGroup
-	wg.Add(1)
+	result := make(chan bool, 1)
 	batch.OnSignal = func(sig outest.BatchSignal) {
-		ok = sig.Tag == outest.BatchACK
-		wg.Done()
+		result <- sig.Tag == outest.BatchACK
 	}
 
-	t.Publish(batch)
-	wg.Wait()
-	return ok
+	go t.Publish(batch)
+
+	select {
+	case ok := <-result:
+		return ok
+	case <-time.After(10 * time.Second):
+		t.Fatal("bulk publish took too long")
+		return false
+	}
 }
