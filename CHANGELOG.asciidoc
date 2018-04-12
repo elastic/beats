@@ -22,6 +22,13 @@ https://github.com/elastic/beats/compare/v6.2.4...6.2[Check the HEAD diff]
 
 *Metricbeat*
 
+- Kubernetes deployment: Add ServiceAccount config to system metricbeat. {pull}6824[6824]
+- Kubernetes deployment: Add DNS Policy to system metricbeat. {pull}6656[6656]
+- De dot keys in kubernetes/event metricset to prevent collisions. {pull}6203[6203]
+- Add config option for windows/perfmon metricset to ignore non existent counters. {pull}6432[6432]
+- Refactor docker CPU calculations to be more consistent with `docker stats`. {pull}6608[6608]
+- Update logstash.node_stats metricset to write data under `logstash.node.stats.*`. {pull}6714[6714]
+
 *Packetbeat*
 
 *Winlogbeat*
