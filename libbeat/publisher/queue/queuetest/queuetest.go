@@ -8,6 +8,7 @@ import (
 	"github.com/elastic/beats/libbeat/publisher/queue"
 )
 
+// QueueFactory is used to create a per test queue instance.
 type QueueFactory func(t *testing.T) queue.Queue
 
 type workerFactory func(*sync.WaitGroup, interface{}, *TestLogger, queue.Queue) func()

@@ -21,12 +21,10 @@ in <<configuration-metricbeat>>. Here is an example configuration:
 ----
 metricbeat.modules:
 - module: ceph
-  metricsets: ["cluster_health", "cluster_status", "monitor_health"]
+  metricsets: ["cluster_disk", "cluster_health", "monitor_health", "pool_disk", "osd_tree"]
   period: 10s
-
-- module: ceph
-  metricsets: ["cluster_disk", "osd_tree", "pool_disk"]
-  period: 1m
+  hosts: ["localhost:5000"]
+  enabled: true
 ----
 
 This module supports TLS connection when using `ssl` config field, as described in <<configuration-ssl>>.

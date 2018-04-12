@@ -2,6 +2,7 @@ package main
 
 import (
 	"flag"
+	"fmt"
 	"log"
 	"net/http"
 	_ "net/http/pprof"
@@ -9,13 +10,14 @@ import (
 
 	"github.com/elastic/beats/libbeat/beat"
 	"github.com/elastic/beats/libbeat/common"
-	"github.com/elastic/beats/libbeat/logp"
+	logpcfg "github.com/elastic/beats/libbeat/logp/configure"
 	"github.com/elastic/beats/libbeat/paths"
 	"github.com/elastic/beats/libbeat/publisher/pipeline/stress"
 	"github.com/elastic/beats/libbeat/service"
 
 	// import queue types
 	_ "github.com/elastic/beats/libbeat/publisher/queue/memqueue"
+	_ "github.com/elastic/beats/libbeat/publisher/queue/spool"
 
 	// import outputs
 	_ "github.com/elastic/beats/libbeat/outputs/console"
@@ -31,7 +33,7 @@ var (
 
 type config struct {
 	Path    paths.Path
-	Logging logp.Logging
+	Logging *common.Config
 }
 
 func main() {
@@ -52,6 +54,8 @@ func run() error {
 	flag.Parse()
 
 	files := flag.Args()
+	fmt.Println("load config files:", files)
+
 	cfg, err := common.LoadFiles(files...)
 	if err != nil {
 		return err
@@ -72,10 +76,11 @@ func run() error {
 	if err := paths.InitPaths(&config.Path); err != nil {
 		return err
 	}
-	if err = logp.Init("test", time.Now(), &config.Logging); err != nil {
+	if err = logpcfg.Logging("test", config.Logging); err != nil {
 		return err
 	}
-	logp.SetStderr()
+
+	cfg.PrintDebugf("input config:")
 
 	return stress.RunTests(info, duration, cfg, nil)
 }
