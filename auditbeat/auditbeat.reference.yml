@@ -1084,3 +1084,20 @@ logging.files:
 
 # Port on which the HTTP endpoint will bind. Default is 5066.
 #http.port: 5066
+
+#============================= Process Security ================================
+
+# Enable or disable seccomp system call filtering on Linux. Default is enabled.
+seccomp.enabled: true
+
+# The default seccomp policy. This policy blacklists system calls that allow
+# process creation.
+seccomp:
+  default_action: allow
+  syscalls:
+  - action: errno
+    names:
+    - execve
+    - execveat
+    - fork
+    - vfork
