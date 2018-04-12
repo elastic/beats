@@ -40,6 +40,7 @@ https://github.com/gamegos/etcdbeat[etcdbeat]:: Reads stats from the Etcd v2 API
 https://github.com/christiangalsterer/execbeat[execbeat]:: Periodically executes shell commands and sends the standard output and standard error to
 Logstash or Elasticsearch.
 https://github.com/jarpy/factbeat[factbeat]:: Collects facts from https://puppetlabs.com/facter[Facter].
+https://github.com/ctindel/fastcombeat[fastcombeat]:: Periodcially gather internet download speed from  https://fast.com[fast.com].
 https://github.com/FStelzer/flowbeat[flowbeat]:: Collects, parses, and indexes http://www.sflow.org/index.php[sflow] samples.
 https://github.com/GeneralElectric/GABeat[gabeat]:: Collects data from Google Analytics Realtime API.
 https://github.com/GoogleCloudPlatform/gcsbeat[gcsbeat]:: Reads data from https://cloud.google.com/storage/[Google Cloud Storage] buckets.
