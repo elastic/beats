@@ -1,14 +1,17 @@
-[[securing-winlogbeat]]
-= Securing Winlogbeat
+[id="securing-{beatname_lc}"]
+= Securing {beatname_uc}
 
 [partintro]
 
 --
-The following topics describe how to secure communication between Winlogbeat and other products in the Elastic stack:
+The following topics provide information about securing the {beatname_uc}
+process and securing communication between {beatname_uc} and other products in
+the Elastic stack:
 
 * <<securing-communication-elasticsearch>>
 * <<configuring-ssl-logstash>>
 * <<securing-beats>>
+* <<linux-seccomp>>
 
 //sets block macro for https.asciidoc included in next section
 
@@ -16,10 +19,16 @@ The following topics describe how to secure communication between Winlogbeat and
 
 [[securing-communication-elasticsearch]]
 == Secure communication with Elasticsearch
-include::../../libbeat/docs/https.asciidoc[]
+
+include::./https.asciidoc[]
 
 //sets block macro for shared-ssl-logstash-config.asciidoc included in next section
 
 [[configuring-ssl-logstash]]
 == Secure communication with Logstash by using SSL
-include::../../libbeat/docs/shared-ssl-logstash-config.asciidoc[]
+
+include::./shared-ssl-logstash-config.asciidoc[]
+
+include::./security/securing-beats.asciidoc[]
+
+include::./security/linux-seccomp.asciidoc[]
