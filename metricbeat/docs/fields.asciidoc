@@ -2650,6 +2650,24 @@ Total CPU usage.
 --
 
 [float]
+=== `docker.cpu.core.*.pct`
+
+type: scaled_float
+
+format: percentage
+
+Percentage of CPU time in this core.
+
+
+[float]
+=== `docker.cpu.core.*.ticks`
+
+type: long
+
+Number of CPU ticks in this core.
+
+
+[float]
 == diskio fields
 
 Disk I/O metrics.
