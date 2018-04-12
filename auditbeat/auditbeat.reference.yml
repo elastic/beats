@@ -242,6 +242,14 @@ auditbeat.modules:
 #       equals:
 #           http.code: 200
 #
+# The following example renames the field a to b:
+#
+#processors:
+#- rename:
+#    fields:
+#       - from: "a"
+#         to: "b"
+#
 # The following example enriches each event with metadata from the cloud
 # provider about the host machine. It works on EC2, GCE, DigitalOcean,
 # Tencent Cloud, and Alibaba Cloud.
