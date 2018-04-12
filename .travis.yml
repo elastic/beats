@@ -12,7 +12,7 @@ env:
   global:
     # Cross-compile for amd64 only to speed up testing.
     - GOX_FLAGS="-arch amd64"
-    - DOCKER_COMPOSE_VERSION=1.11.1
+    - DOCKER_COMPOSE_VERSION=1.21.0
     - GO_VERSION="$(cat .go-version)"
     - TRAVIS_ETCD_VERSION=v3.2.8
 
