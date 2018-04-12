@@ -519,7 +519,9 @@ class TestCase(unittest.TestCase, ComposeMixin):
                 result[prefix + key] = value
         return result
 
-    def copy_files(self, files, source_dir="files/", target_dir=""):
+    def copy_files(self, files, source_dir="", target_dir=""):
+        if not source_dir:
+            source_dir = self.beat_path + "/tests/files/"
         if target_dir:
             target_dir = os.path.join(self.working_dir, target_dir)
         else:

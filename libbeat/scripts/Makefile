@@ -48,6 +48,7 @@ REVIEWDOG_OPTIONS?=-diff "git diff master"
 REVIEWDOG_REPO?=github.com/haya14busa/reviewdog/cmd/reviewdog
 PROCESSES?= 4
 TIMEOUT?= 90
+PYTHON_TEST_FILES?=$(shell find . -type f -name 'test_*.py' -not -path "*/build/*" -not -path "*/vendor/*")
 NOSETESTS_OPTIONS?=--process-timeout=$(TIMEOUT) --with-timer -v --with-xunit --xunit-file=${BUILD_DIR}/TEST-system.xml ## @testing the options to pass when calling nosetests
 TEST_ENVIRONMENT?=false ## @testing if true, "make testsuite" runs integration tests and system tests in a dockerized test environment
 SYSTEM_TESTS?=false ## @testing if true, "make test" and "make testsuite" run unit tests and system tests
@@ -187,7 +188,7 @@ integration-tests-environment: prepare-tests build-image
 .PHONY: system-tests
 system-tests: ## @testing Runs the system tests
 system-tests: prepare-tests ${BEAT_NAME}.test python-env ${ES_BEATS}/dev-tools/cmd/dashboards/export_dashboards
-	. ${PYTHON_ENV}/bin/activate; INTEGRATION_TESTS=${INTEGRATION_TESTS} TESTING_ENVIRONMENT=${TESTING_ENVIRONMENT} DOCKER_COMPOSE_PROJECT_NAME=${DOCKER_COMPOSE_PROJECT_NAME} nosetests -w tests/system ${NOSETESTS_OPTIONS}
+	. ${PYTHON_ENV}/bin/activate; INTEGRATION_TESTS=${INTEGRATION_TESTS} TESTING_ENVIRONMENT=${TESTING_ENVIRONMENT} DOCKER_COMPOSE_PROJECT_NAME=${DOCKER_COMPOSE_PROJECT_NAME} nosetests ${PYTHON_TEST_FILES} ${NOSETESTS_OPTIONS}
 	python ${ES_BEATS}/dev-tools/aggregate_coverage.py -o ${COVERAGE_DIR}/system.cov ./build/system-tests/run
 
 # Runs the system tests
@@ -200,7 +201,7 @@ system-tests-environment: prepare-tests build-image
 .PHONY: fast-system-tests
 fast-system-tests: ## @testing Runs system tests without coverage reports and in parallel
 fast-system-tests: ${BEAT_NAME}.test python-env
-	. ${PYTHON_ENV}/bin/activate; nosetests -w tests/system ${NOSETESTS_OPTIONS}
+	. ${PYTHON_ENV}/bin/activate; nosetests ${PYTHON_TEST_FILES} ${NOSETESTS_OPTIONS}
 
 # Runs the go based stress tests
 .PHONY: stress-tests
@@ -219,7 +220,7 @@ benchmark-tests: ## @testing Runs benchmarks (NOT YET IMPLEMENTED)
 # Run load tests
 .PHONY: load-tests
 load-tests: ## @testing Runs load tests
-	. ${PYTHON_ENV}/bin/activate; LOAD_TESTS=1  nosetests -w tests/system --processes=$(PROCESSES) --process-timeout=$(TIMEOUT) -a 'load'
+	. ${PYTHON_ENV}/bin/activate; LOAD_TESTS=1  nosetests ${PYTHON_TEST_FILES} --processes=$(PROCESSES) --process-timeout=$(TIMEOUT) -a 'load'
 
 # Sets up the virtual python environment
 .PHONY: python-env
@@ -231,8 +232,8 @@ python-env: ${ES_BEATS}/libbeat/tests/system/requirements.txt
 	else \
 		. ${PYTHON_ENV}/bin/activate && pip install ${PIP_INSTALL_PARAMS} -qUr ${ES_BEATS}/libbeat/tests/system/requirements.txt ; \
 	fi
-	# Work around pip bug. See: https://github.com/pypa/pip/issues/4464
-	find ${PYTHON_ENV} -type d -name 'dist-packages' -exec sh -c "echo dist-packages > {}.pth" ';'
+	@# Work around pip bug. See: https://github.com/pypa/pip/issues/4464
+	@find ${PYTHON_ENV} -type d -name 'dist-packages' -exec sh -c "echo dist-packages > {}.pth" ';'
 
 .PHONY: test
 test: ## @testing Runs unit and system tests without coverage reports
