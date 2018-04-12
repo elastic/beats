@@ -8,7 +8,7 @@
 // Template, add newest changes here
 
 === Beats version HEAD
-https://github.com/elastic/beats/compare/v6.2.2...6.2[Check the HEAD diff]
+https://github.com/elastic/beats/compare/v6.2.4...6.2[Check the HEAD diff]
 
 ==== Breaking changes
 
@@ -32,19 +32,13 @@ https://github.com/elastic/beats/compare/v6.2.2...6.2[Check the HEAD diff]
 
 *Auditbeat*
 
-- Add hex decoding for the name field in audit path records. {pull}6687[6687]
-
 *Filebeat*
-
-- Fix panic when log prospector configuration fails to load. {issue}6800[6800]
 
 *Heartbeat*
 
 *Metricbeat*
 
 *Packetbeat*
-
-- HTTP parses successfully on empty status phrase. {issue}6176[6176]
 
 *Winlogbeat*
 
@@ -82,6 +76,24 @@ https://github.com/elastic/beats/compare/v6.2.2...6.2[Check the HEAD diff]
 
 
 ////////////////////////////////////////////////////////////
+
+[[release-notes-6.2.4]]
+=== Beats version 6.2.4
+https://github.com/elastic/beats/compare/v6.2.3...v6.2.4[View commits]
+
+==== Bugfixes
+
+*Auditbeat*
+
+- Add hex decoding for the name field in audit path records. {pull}6687[6687]
+
+*Filebeat*
+
+- Fix panic when log prospector configuration fails to load. {issue}6800[6800]
+
+*Packetbeat*
+
+- HTTP parses successfully on empty status phrase. {issue}6176[6176]
 
 
 [[release-notes-6.2.3]]
