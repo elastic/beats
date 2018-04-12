@@ -7,7 +7,7 @@
 // Template, add newest changes here
 
 === Beats version HEAD
-https://github.com/elastic/beats/compare/v6.0.0-beta2...master[Check the HEAD diff]
+https://github.com/elastic/beats/compare/v6.2.3...master[Check the HEAD diff]
 
 ==== Breaking changes
 
@@ -119,6 +119,8 @@ https://github.com/elastic/beats/compare/v6.0.0-beta2...master[Check the HEAD di
 - Do not log errors if X-Pack Monitoring is enabled but Elastisearch X-Pack is not. {pull}6627[6627]
 - Add rename processor. {pull}6292[6292]
 - Add IP-addresses and MAC-addresses to add_host_metadata. {pull}6878[6878]
+- Add a default seccomp (secure computing) filter on Linux that prohibits
+  execve, execveat, fork, and vfork syscalls. A custom policy can be configured. {issue}5213[5213]
 
 *Auditbeat*
 
