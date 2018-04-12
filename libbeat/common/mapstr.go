@@ -334,6 +334,8 @@ func tryToMapStr(v interface{}) (MapStr, bool) {
 }
 
 func mapFind(key string, data MapStr, createMissing bool) (string, MapStr, interface{}, bool, error) {
+	// XXX `safemapstr.mapFind` mimics this implementation, both should be updated to have similar behavior
+
 	for {
 		// Fast path, key is present as is.
 		if v, exists := data[key]; exists {

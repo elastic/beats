@@ -22,39 +22,60 @@ const alternativeKey = "value"
 // `.value`
 func Put(data common.MapStr, key string, value interface{}) error {
 	// XXX This implementation mimics `common.MapStr.Put`, both should be updated to have similar behavior
-	keyParts := strings.SplitN(key, ".", 2)
 
-	// If leaf node or key exists directly
-	if len(keyParts) == 1 {
-		oldValue, exists := data[key]
-		if exists {
-			oldMap, ok := tryToMapStr(oldValue)
-			if ok {
-				// This would replace a whole object, change its key to avoid that:
-				oldMap[alternativeKey] = value
-				return nil
+	d, k := mapFind(data, key)
+	d[k] = value
+	return nil
+}
+
+// mapFind walk the map based on the given dotted key and returns the final map
+// and key to operate on. This function adds intermediate maps, if the key is
+// missing from the original map.
+
+func mapFind(data common.MapStr, key string) (common.MapStr, string) {
+	// XXX This implementation mimics `common.mapFind`, both should be updated to have similar behavior
+
+	for {
+		if oldValue, exists := data[key]; exists {
+			if oldMap, ok := tryToMapStr(oldValue); ok {
+				return oldMap, alternativeKey
 			}
+			return data, key
 		}
-		data[key] = value
-		return nil
-	}
 
-	// Checks if first part of the key exists
-	k := keyParts[0]
-	d, exists := data[k]
-	if !exists {
-		d = common.MapStr{}
-		data[k] = d
-	}
+		idx := strings.IndexRune(key, '.')
+		if idx < 0 {
+			// if old value exists and is a dictionary, return the old dictionary and
+			// make sure we store the new value using the 'alternativeKey'
+			if oldValue, exists := data[key]; exists {
+				if oldMap, ok := tryToMapStr(oldValue); ok {
+					return oldMap, alternativeKey
+				}
+			}
 
-	v, ok := tryToMapStr(d)
-	if !ok {
-		// This would replace a leaf with an object, change its key to avoid that:
-		v = common.MapStr{alternativeKey: d}
-		data[k] = v
-	}
+			return data, key
+		}
 
-	return Put(v, keyParts[1], value)
+		// Check if first sub-key exists. Create an intermediate map if not.
+		k := key[:idx]
+		d, exists := data[k]
+		if !exists {
+			d = common.MapStr{}
+			data[k] = d
+		}
+
+		// store old value under 'alternativeKey' if the old value is no map.
+		// Do not overwrite old value.
+		v, ok := tryToMapStr(d)
+		if !ok {
+			v = common.MapStr{alternativeKey: d}
+			data[k] = v
+		}
+
+		// advance into sub-map
+		key = key[idx+1:]
+		data = v
+	}
 }
 
 func tryToMapStr(v interface{}) (common.MapStr, bool) {
