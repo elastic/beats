@@ -30,7 +30,7 @@ class Test(BaseTest):
             self.es = Elasticsearch([self.get_elasticsearch_url()])
 
         # Copy system module
-        shutil.copytree(os.path.join("module", "test"),
+        shutil.copytree(os.path.join(self.beat_path, "tests", "system", "module", "test"),
                         os.path.join(self.working_dir, "module", "test"))
 
     def test_reload(self):
