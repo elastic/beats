@@ -16,6 +16,9 @@
 
 [partintro]
 --
+
+NOTE: {monitoring} for {beatname_uc} requires {es} 6.2 or later.
+
 {monitoring} enables you to easily monitor {beatname_uc} from {kib}. For more
 information, see
 {xpack-ref}/xpack-monitoring.html[Monitoring the Elastic Stack] and

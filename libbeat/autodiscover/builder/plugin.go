@@ -23,7 +23,7 @@ func init() {
 	p.MustRegisterLoader(pluginKey, func(ifc interface{}) error {
 		b, ok := ifc.(builderPlugin)
 		if !ok {
-			return errors.New("plugin does not match processor plugin type")
+			return errors.New("plugin does not match builder plugin type")
 		}
 
 		return autodiscover.Registry.AddBuilder(b.name, b.builder)

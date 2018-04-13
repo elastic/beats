@@ -34,7 +34,7 @@ Lists and dictionaries are used in beats to build structured configurations.
 ["source","yaml",subs="attributes"]
 ------------------------------------------------------------------------------
 filebeat:
-  prospectors:
+  inputs:
     - type: log
       paths:
         - /var/log/*.log
@@ -92,12 +92,12 @@ For example this filebeat setting:
 ------------------------------------------------------------------------------
 
 filebeat:
-  prospectors:
+  inputs:
     - type: log
 
 ------------------------------------------------------------------------------
 
-Gets collapsed into `filebeat.prospectors.0.type: log`.
+Gets collapsed into `filebeat.inputs.0.type: log`.
 
 Alternatively to using indentation, setting names can be used in collapsed form too.
 
@@ -109,7 +109,7 @@ Simple filebeat example with partially collapsed setting names and use of compac
 ["source","yaml",subs="attributes"]
 ------------------------------------------------------------------------------
 
-filebeat.prospectors:
+filebeat.inputs:
 - type: log
   paths: ["/var/log/*.log"]
   multiline.pattern: '^['

@@ -24,6 +24,7 @@ grouped in the following categories:
 * <<exported-fields-kubernetes-processor>>
 * <<exported-fields-log>>
 * <<exported-fields-logstash>>
+* <<exported-fields-mongodb>>
 * <<exported-fields-mysql>>
 * <<exported-fields-nginx>>
 * <<exported-fields-osquery>>
@@ -657,7 +658,7 @@ Info collected for the host machine.
 
 
 [float]
-=== `host.hostname`
+=== `host.name`
 
 type: keyword
 
@@ -683,7 +684,7 @@ Host architecture (e.g. x86_64, arm, ppc, mips).
 [float]
 === `host.os.platform`
 
-type: object
+type: keyword
 
 OS platform (e.g. centos, ubuntu, windows).
 
@@ -691,7 +692,7 @@ OS platform (e.g. centos, ubuntu, windows).
 [float]
 === `host.os.version`
 
-type: object
+type: keyword
 
 OS version.
 
@@ -699,7 +700,7 @@ OS version.
 [float]
 === `host.os.family`
 
-type: object
+type: keyword
 
 OS family (e.g. redhat, debian, freebsd, windows).
 
@@ -1650,6 +1651,65 @@ type: object
 key -> value of the configuration used by the plugin.
 
 
+[[exported-fields-mongodb]]
+== mongodb fields
+
+Module for parsing MongoDB log files.
+
+
+
+[float]
+== mongodb fields
+
+Fields from MongoDB logs.
+
+
+
+[float]
+== log fields
+
+Contains fields from MongoDB logs.
+
+
+
+[float]
+=== `mongodb.log.severity`
+
+type: keyword
+
+example: I
+
+Severity level of message
+
+
+[float]
+=== `mongodb.log.component`
+
+type: keyword
+
+example: COMMAND
+
+Functional categorization of message
+
+
+[float]
+=== `mongodb.log.context`
+
+type: keyword
+
+example: initandlisten
+
+Context of message
+
+
+[float]
+=== `mongodb.log.message`
+
+type: text
+
+The message in the log line.
+
+
 [[exported-fields-mysql]]
 == MySQL fields
 
@@ -2352,6 +2412,8 @@ The PID of the process that sent the auth message.
 [float]
 === `system.auth.message`
 
+type: text
+
 The message in the log line.
 
 
@@ -2589,6 +2651,8 @@ The PID of the process that sent the syslog message.
 
 [float]
 === `system.syslog.message`
+
+type: text
 
 The message in the log line.
 

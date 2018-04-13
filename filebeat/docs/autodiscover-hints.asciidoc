@@ -1,0 +1,61 @@
+Filebeat supports a autodiscover based on hints from the provider:
+
+["source","yaml",subs="attributes"]
+-------------------------------------------------------------------------------------
+filebeat.autodiscover:
+  providers:
+    - type: kubernetes
+      hints.enabled: true
+-------------------------------------------------------------------------------------
+
+This configuration enables the `hints` autodiscover for Kubernetes. The `hints` system looks for
+hints in Kubernetes annotations or Docker labels which have the prefix `co.elastic.logs`.
+
+[float]
+==== Kubernetes
+
+You can annotate Kubernetes Pods with useful info to spin up Filebeat inputs or modules:
+
+["source","yaml",subs="attributes"]
+-------------------------------------------------------------------------------------
+annotations:
+  co.elastic.logs/multiline.pattern: '^\['
+  co.elastic.logs/multiline.negate: 'true'
+  co.elastic.logs/multiline.match: after
+  co.elastic.logs.sidecar/exlude_lines: '^DBG'
+-------------------------------------------------------------------------------------
+
+The above annotations are used to add additional information to the input that is generated. The hints
+generated convey the multiline configuration to use and the lines to exclude in the container which is
+named `sidecar`. Hints can also be provided for the following input configuration:
+parameters:
+
+["source","yaml",subs="attributes"]
+-------------------------------------------------------------------------------------
+include_lines
+-------------------------------------------------------------------------------------
+
+[float]
+==== Docker
+
+Docker autodiscover provider supports hints in labels, to enable it just set `hints.enabled`:
+
+["source","yaml",subs="attributes"]
+-------------------------------------------------------------------------------------
+metricbeat.autodiscover:
+  providers:
+    - type: docker
+      hints.enabled: true
+-------------------------------------------------------------------------------------
+
+You can label Docker containers with useful info to spin up Filebeat inputs, for example:
+
+["source","yaml",subs="attributes"]
+-------------------------------------------------------------------------------------
+  co.elastic.logs/multiline.pattern: '^\['
+  co.elastic.logs/multiline.negate: 'true'
+  co.elastic.logs/multiline.match: after
+-------------------------------------------------------------------------------------
+
+The above labels would allow Filebeat to add a multiline pattern to the input that will be
+generated for the logs of the running container.

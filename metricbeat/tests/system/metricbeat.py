@@ -78,3 +78,25 @@ class BaseTest(TestCase):
 
     def build_log_regex(self, message):
         return re.compile(r"^.*\t(?:ERROR|WARN)\t.*" + message + r".*$", re.MULTILINE)
+
+    def check_metricset(self, module, metricset, hosts):
+        """
+        Method to test a metricset for its fields
+        """
+        self.render_config_template(modules=[{
+            "name": module,
+            "metricsets": [metricset],
+            "hosts": hosts,
+            "period": "1s",
+        }])
+        proc = self.start_beat()
+        self.wait_until(lambda: self.output_lines() > 0, max_timeout=20)
+        proc.check_kill_and_wait()
+        self.assert_no_logged_warnings()
+
+        output = self.read_output_json()
+        self.assertTrue(len(output) >= 1)
+        evt = output[0]
+        print(evt)
+
+        self.assert_fields_are_documented(evt)

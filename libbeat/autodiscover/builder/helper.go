@@ -77,30 +77,39 @@ func IsNoOp(hints common.MapStr, key string) bool {
 // GenerateHints parses annotations based on a prefix and sets up hints that can be picked up by individual Beats.
 func GenerateHints(annotations common.MapStr, container, prefix string) common.MapStr {
 	hints := common.MapStr{}
-	plen := len(prefix)
+	if rawEntries, err := annotations.GetValue(prefix); err == nil {
+		if entries, ok := rawEntries.(common.MapStr); ok {
+			for key, rawValue := range entries {
+				// If there are top level hints like co.elastic.logs/ then just add the values after the /
+				// Only consider namespaced annotations
+				parts := strings.Split(key, "/")
+				if len(parts) == 2 {
+					hintKey := fmt.Sprintf("%s.%s", parts[0], parts[1])
+					// Insert only if there is no entry already. container level annotations take
+					// higher priority.
+					if _, err := hints.GetValue(hintKey); err != nil {
+						hints.Put(hintKey, rawValue)
+					}
+				} else if container != "" {
+					// Only consider annotations that are of type common.MapStr as we are looking for
+					// container level nesting
+					builderHints, ok := rawValue.(common.MapStr)
+					if !ok {
+						continue
+					}
 
-	for key, value := range annotations {
-		// Filter out all annotations which start with the prefix
-		if strings.Index(key, prefix) == 0 {
-			subKey := key[plen:]
-			// Split an annotation by /. Ex co.elastic.metrics/module would split to ["metrics", "module"]
-			// part[0] would give the type of config and part[1] would give the config entry
-			parts := strings.Split(subKey, "/")
-			if len(parts) == 0 || parts[0] == "" {
-				continue
-			}
-			// tc stands for type and container
-			// Split part[0] to get the builder type and the container if it exists
-			tc := strings.Split(parts[0], ".")
-			k := fmt.Sprintf("%s.%s", tc[0], parts[1])
-			if len(tc) == 2 && container != "" && tc[1] == container {
-				// Container specific properties always carry higher preference.
-				// Overwrite properties even if they exist.
-				hints.Put(k, value)
-			} else {
-				// Only insert the config if it doesn't already exist
-				if _, err := hints.GetValue(k); err != nil {
-					hints.Put(k, value)
+					// Check for <containerName>/ prefix
+					for hintKey, rawVal := range builderHints {
+						if strings.HasPrefix(hintKey, container) {
+							// Split the key to get part[1] to be the hint
+							parts := strings.Split(hintKey, "/")
+							if len(parts) == 2 {
+								// key will be the hint type
+								hintKey := fmt.Sprintf("%s.%s", key, parts[1])
+								hints.Put(hintKey, rawVal)
+							}
+						}
+					}
 				}
 			}
 		}

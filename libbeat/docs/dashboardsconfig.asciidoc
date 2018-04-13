@@ -99,3 +99,20 @@ NOTE: This setting only works for Kibana 6.0 and newer.
 
 Force loading of dashboards using the Kibana API without querying Elasticsearch for the version
 The default is `false`.
+
+[float]
+==== `setup.dashboards.retry.enabled`
+
+If this option is set to true, and Kibana is not reachable at the time when dashboards are loaded,
+ {beatname_uc} will retry to reconnect to Kibana instead of exiting with an error. Disabled by default.
+
+[float]
+==== `setup.dashboards.retry.interval`
+
+Duration interval between Kibana connection retries. Defaults to 1 second.
+
+[float]
+==== `setup.dashboards.retry.maximum`
+
+Maximum number of retries before exiting with an error. Set to 0 for unlimited retrying.
+Default is unlimited.

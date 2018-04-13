@@ -10,6 +10,7 @@ import (
 	"github.com/elastic/beats/libbeat/common/bus"
 	"github.com/elastic/beats/libbeat/common/cfgwarn"
 	"github.com/elastic/beats/libbeat/common/kubernetes"
+	"github.com/elastic/beats/libbeat/common/safemapstr"
 	"github.com/elastic/beats/libbeat/logp"
 )
 
@@ -61,22 +62,14 @@ func AutodiscoverBuilder(bus bus.Bus, c *common.Config) (autodiscover.Provider, 
 		return nil, err
 	}
 
-	var builders autodiscover.Builders
-	for _, bcfg := range config.Builders {
-		if builder, err := autodiscover.Registry.BuildBuilder(bcfg); err != nil {
-			logp.Warn("kubernetes", "failed to construct autodiscover builder due to error: %v", err)
-		} else {
-			builders = append(builders, builder)
-		}
+	builders, err := autodiscover.NewBuilders(config.Builders, config.HintsEnabled)
+	if err != nil {
+		return nil, err
 	}
 
-	var appenders autodiscover.Appenders
-	for _, acfg := range config.Appenders {
-		if appender, err := autodiscover.Registry.BuildAppender(acfg); err != nil {
-			logp.Warn("kubernetes", "failed to construct autodiscover appender due to error: %v", err)
-		} else {
-			appenders = append(appenders, appender)
-		}
+	appenders, err := autodiscover.NewAppenders(config.Appenders)
+	if err != nil {
+		return nil, err
 	}
 
 	p := &Provider{
@@ -150,7 +143,7 @@ func (p *Provider) emitEvents(pod *kubernetes.Pod, flag string, containers []kub
 		// Pass annotations to all events so that it can be used in templating and by annotation builders.
 		annotations := common.MapStr{}
 		for k, v := range pod.GetMetadata().Annotations {
-			annotations[k] = v
+			safemapstr.Put(annotations, k, v)
 		}
 		kubemeta["annotations"] = annotations
 

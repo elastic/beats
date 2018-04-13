@@ -4,7 +4,6 @@ package instance
 
 import (
 	"fmt"
-	"os"
 	"runtime"
 
 	"github.com/elastic/beats/libbeat/logp"
@@ -65,8 +64,12 @@ func reportMemStats(m monitoring.Mode, V monitoring.Visitor) {
 }
 
 func getRSSSize() (uint64, error) {
-	beatPID := os.Getpid()
-	state, err := beatProcessStats.GetOne(beatPID)
+	pid, err := process.GetSelfPid()
+	if err != nil {
+		return 0, fmt.Errorf("error getting PID for self process: %v", err)
+	}
+
+	state, err := beatProcessStats.GetOne(pid)
 	if err != nil {
 		return 0, fmt.Errorf("error retrieving process stats: %v", err)
 	}
@@ -121,8 +124,12 @@ func reportBeatCPU(_ monitoring.Mode, V monitoring.Visitor) {
 }
 
 func getCPUUsage() (float64, *process.Ticks, error) {
-	beatPID := os.Getpid()
-	state, err := beatProcessStats.GetOne(beatPID)
+	pid, err := process.GetSelfPid()
+	if err != nil {
+		return 0.0, nil, fmt.Errorf("error getting PID for self process: %v", err)
+	}
+
+	state, err := beatProcessStats.GetOne(pid)
 	if err != nil {
 		return 0.0, nil, fmt.Errorf("error retrieving process stats: %v", err)
 	}

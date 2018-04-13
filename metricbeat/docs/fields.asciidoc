@@ -37,6 +37,7 @@ grouped in the following categories:
 * <<exported-fields-logstash>>
 * <<exported-fields-memcached>>
 * <<exported-fields-mongodb>>
+* <<exported-fields-munin>>
 * <<exported-fields-mysql>>
 * <<exported-fields-nginx>>
 * <<exported-fields-php_fpm>>
@@ -2149,7 +2150,7 @@ type: scaled_float
 
 format: percentage
 
-The system kernel consumed by the Docker server.
+Percentage of time in kernel space.
 
 
 [float]
@@ -2157,7 +2158,7 @@ The system kernel consumed by the Docker server.
 
 type: long
 
-CPU kernel ticks.
+CPU ticks in kernel space.
 
 
 [float]
@@ -2167,6 +2168,7 @@ type: scaled_float
 
 format: percentage
 
+Percentage of total CPU time in the system.
 
 
 [float]
@@ -2184,6 +2186,7 @@ type: scaled_float
 
 format: percentage
 
+Percentage of time in user space.
 
 
 [float]
@@ -2191,7 +2194,7 @@ format: percentage
 
 type: long
 
-CPU user ticks
+CPU ticks in user space.
 
 
 [float]
@@ -2212,11 +2215,77 @@ Disk I/O metrics.
 
 
 [float]
+== read fields
+
+Accumulated reads during the life of the container
+
+
+
+[float]
+=== `docker.diskio.read.ops`
+
+type: long
+
+Number of reads during the life of the container
+
+
+[float]
+=== `docker.diskio.read.bytes`
+
+type: long
+
+format: bytes
+
+Bytes read during the life of the container
+
+
+[float]
+=== `docker.diskio.read.rate`
+
+type: long
+
+Number of current reads per second
+
+
+[float]
 === `docker.diskio.reads`
 
 type: scaled_float
 
-Number of reads.
+Number of current reads per second
+
+
+[float]
+== write fields
+
+Accumulated writes during the life of the container
+
+
+
+[float]
+=== `docker.diskio.write.ops`
+
+type: long
+
+Number of writes during the life of the container
+
+
+[float]
+=== `docker.diskio.write.bytes`
+
+type: long
+
+format: bytes
+
+Bytes written during the life of the container
+
+
+[float]
+=== `docker.diskio.write.rate`
+
+type: long
+
+Number of current writes per second
 
 
 [float]
@@ -2224,7 +2293,40 @@ Number of reads.
 
 type: scaled_float
 
-Number of writes.
+Number of current writes per second
+
+
+[float]
+== summary fields
+
+Accumulated reads and writes during the life of the container
+
+
+
+[float]
+=== `docker.diskio.summary.ops`
+
+type: long
+
+Number of I/O operations during the life of the container
+
+
+[float]
+=== `docker.diskio.summary.bytes`
+
+type: long
+
+format: bytes
+
+Bytes read and written during the life of the container
+
+
+[float]
+=== `docker.diskio.summary.rate`
+
+type: long
+
+Number of current operations per second
 
 
 [float]
@@ -2232,7 +2334,7 @@ Number of writes.
 
 type: scaled_float
 
-Number of reads and writes combined.
+Number of reads and writes per second
 
 
 [float]
@@ -4568,7 +4670,7 @@ Info collected for the host machine.
 
 
 [float]
-=== `host.hostname`
+=== `host.name`
 
 type: keyword
 
@@ -4594,7 +4696,7 @@ Host architecture (e.g. x86_64, arm, ppc, mips).
 [float]
 === `host.os.platform`
 
-type: object
+type: keyword
 
 OS platform (e.g. centos, ubuntu, windows).
 
@@ -4602,7 +4704,7 @@ OS platform (e.g. centos, ubuntu, windows).
 [float]
 === `host.os.version`
 
-type: object
+type: keyword
 
 OS version.
 
@@ -4610,7 +4712,7 @@ OS version.
 [float]
 === `host.os.family`
 
-type: object
+type: keyword
 
 OS family (e.g. redhat, debian, freebsd, windows).
 
@@ -6509,7 +6611,7 @@ Pid
 
 
 [float]
-== node_stats fields
+== node.stats fields
 
 node_stats metrics.
 
@@ -6523,7 +6625,7 @@ Events stats
 
 
 [float]
-=== `logstash.node_stats.events.in`
+=== `logstash.node.stats.events.in`
 
 type: long
 
@@ -6531,7 +6633,7 @@ Incoming events counter.
 
 
 [float]
-=== `logstash.node_stats.events.out`
+=== `logstash.node.stats.events.out`
 
 type: long
 
@@ -6539,7 +6641,7 @@ Outgoing events counter.
 
 
 [float]
-=== `logstash.node_stats.events.filtered`
+=== `logstash.node.stats.events.filtered`
 
 type: long
 
@@ -7654,6 +7756,21 @@ Number of scan operations.
 type: long
 
 Number of sync operations.
+
+
+[[exported-fields-munin]]
+== Munin fields
+
+experimental[]
+Munin node metrics exporter
+
+
+
+[float]
+== munin fields
+
+munin contains metrics exposed by a munin node agent
+
 
 
 [[exported-fields-mysql]]
@@ -10864,6 +10981,82 @@ type: scaled_float
 format: percent
 
 The percentage of used swap memory.
+
+
+[float]
+== hugepages fields
+
+This group contains statistics related to huge pages usage on the system.
+
+
+[float]
+=== `system.memory.hugepages.total`
+
+type: long
+
+format: number
+
+Number of huge pages in the pool.
+
+
+[float]
+=== `system.memory.hugepages.used.bytes`
+
+type: long
+
+format: bytes
+
+Memory used in allocated huge pages.
+
+
+[float]
+=== `system.memory.hugepages.used.pct`
+
+type: long
+
+format: percent
+
+Percentage of huge pages used.
+
+
+[float]
+=== `system.memory.hugepages.free`
+
+type: long
+
+format: number
+
+Number of available huge pages in the pool.
+
+
+[float]
+=== `system.memory.hugepages.reserved`
+
+type: long
+
+format: number
+
+Number of reserved but not allocated huge pages in the pool.
+
+
+[float]
+=== `system.memory.hugepages.surplus`
+
+type: long
+
+format: number
+
+Number of overcommited huge pages.
+
+
+[float]
+=== `system.memory.hugepages.default_size`
+
+type: long
+
+format: bytes
+
+Default size for huge pages.
 
 
 [float]

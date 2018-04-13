@@ -23,7 +23,7 @@ class Test(BaseTest):
             extra_args=["setup",
                         "--dashboards",
                         "-E", "setup.dashboards.file=" +
-                        os.path.join("../../dashboards/testdata", "testbeat-dashboards.zip"),
+                        os.path.join(self.beat_path, "tests", "files", "testbeat-dashboards.zip"),
                         "-E", "setup.dashboards.beat=testbeat",
                         "-E", "setup.kibana.protocol=http",
                         "-E", "setup.kibana.host=" + self.get_kibana_host(),
@@ -45,11 +45,11 @@ class Test(BaseTest):
 
         self.test_load_dashboard()
 
-        command = "./../../../dev-tools/cmd/dashboards/export_dashboards -kibana http://" + \
+        command = self.beat_path + "/../dev-tools/cmd/dashboards/export_dashboards -kibana http://" + \
             self.get_kibana_host() + ":" + self.get_kibana_port()
 
         if os.name == "nt":
-            command = "..\..\..\dev-tools\cmd\dashboards\export_dashboards -kibana http://" + \
+            command = self.beat_path + "\..\dev-tools\cmd\dashboards\export_dashboards -kibana http://" + \
                 self.get_kibana_host() + ":" + self.get_kibana_port()
 
         command = command + " -dashboard Metricbeat-system-overview"

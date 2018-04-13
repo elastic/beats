@@ -1,4 +1,4 @@
-This module fetches metrics from https://www.docker.com/[Docker] containers.
+This module fetches metrics from https://www.docker.com/[Docker] containers. The default metricsets are: `container`, `cpu`, `diskio`, `healthcheck`, `info`, `memory` and `network`. The `image` metricset is not enabled by default.
 
 The Docker module is currently not tested on Windows.
 

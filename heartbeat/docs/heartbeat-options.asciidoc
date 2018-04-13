@@ -459,7 +459,7 @@ Under `check.response`, specify these options:
 *`status`*:: The expected status code. If this setting is not configured or
 it's set to 0, any status code other than 404 is accepted.
 *`headers`*:: The required response headers.
-*`body`*:: The required response body content.
+*`body`*:: A list of regular expressions to match the the body output. Only a single expression needs to match.
 
 The following configuration shows how to check the response when the body
 contains JSON:
@@ -469,13 +469,49 @@ contains JSON:
 - type: http
   schedule: '@every 5s'
   urls: ["https://myhost:80"]
-check.request:
-  method: GET
-  headers:
-    'X-API-Key': '12345-mykey-67890'
-check.response:
-  status: 200
-  body: '{"status": "ok"}'
+  check.request:
+    method: GET
+    headers:
+      'X-API-Key': '12345-mykey-67890'
+  check.response:
+    status: 200
+    body: '{"status": "ok"}'
+-------------------------------------------------------------------------------
+
+The following configuration shows how to check the response for multiple regex
+patterns:
+
+[source,yaml]
+-------------------------------------------------------------------------------
+- type: http
+  schedule: '@every 5s'
+  urls: ["https://myhost:80"]
+  check.request:
+    method: GET
+    headers:
+      'X-API-Key': '12345-mykey-67890'
+  check.response:
+    status: 200
+    body:
+      - hello
+      - world
+-------------------------------------------------------------------------------
+
+The following configuration shows how to check the response with a multiline
+regex:
+
+[source,yaml]
+-------------------------------------------------------------------------------
+- type: http
+  schedule: '@every 5s'
+  urls: ["https://myhost:80"]
+  check.request:
+    method: GET
+    headers:
+      'X-API-Key': '12345-mykey-67890'
+  check.response:
+    status: 200
+    body: '(?s)first.*second.*third'
 -------------------------------------------------------------------------------
 
 

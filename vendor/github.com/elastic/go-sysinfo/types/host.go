@@ -1,16 +1,19 @@
-// Copyright 2018 Elasticsearch Inc.
-//
-// Licensed under the Apache License, Version 2.0 (the "License");
-// you may not use this file except in compliance with the License.
+// Licensed to Elasticsearch B.V. under one or more contributor
+// license agreements. See the NOTICE file distributed with
+// this work for additional information regarding copyright
+// ownership. Elasticsearch B.V. licenses this file to you under
+// the Apache License, Version 2.0 (the "License"); you may
+// not use this file except in compliance with the License.
 // You may obtain a copy of the License at
 //
 // http://www.apache.org/licenses/LICENSE-2.0
 //
-// Unless required by applicable law or agreed to in writing, software
-// distributed under the License is distributed on an "AS IS" BASIS,
-// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-// See the License for the specific language governing permissions and
-// limitations under the License.
+// Unless required by applicable law or agreed to in writing,
+// software distributed under the License is distributed on an
+// "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+// KIND, either express or implied.  See the License for the
+// specific language governing permissions and limitations
+// under the License.
 
 package types
 
@@ -18,6 +21,8 @@ import "time"
 
 type Host interface {
 	Info() HostInfo
+	Memory() (*HostMemoryInfo, error)
+	CPUTime() (*CPUTimes, error)
 }
 
 type HostInfo struct {
@@ -50,12 +55,25 @@ type OSInfo struct {
 	Codename string `json:"codename,omitempty"` // OS codename (e.g. jessie).
 }
 
-type LoadAverager interface {
-	LoadAverage() LoadAverage
+type LoadAverage interface {
+	LoadAverage() LoadAverageInfo
 }
 
-type LoadAverage struct {
+type LoadAverageInfo struct {
 	One     float64 `json:"one_min"`
 	Five    float64 `json:"five_min"`
 	Fifteen float64 `json:"fifteen_min"`
+}
+
+// HostMemoryInfo (all values are specified in bytes).
+type HostMemoryInfo struct {
+	Timestamp    time.Time         `json:"timestamp"`           // Time at which samples were collected.
+	Total        uint64            `json:"total_bytes"`         // Total physical memory.
+	Used         uint64            `json:"used_bytes"`          // Total - Free
+	Available    uint64            `json:"available_bytes"`     // Amount of memory available without swapping.
+	Free         uint64            `json:"free_bytes"`          // Amount of memory not used by the system.
+	VirtualTotal uint64            `json:"virtual_total_bytes"` // Total virtual memory.
+	VirtualUsed  uint64            `json:"virtual_used_bytes"`  // VirtualTotal - VirtualFree
+	VirtualFree  uint64            `json:"virtual_free_bytes"`  // Virtual memory that is not used.
+	Metrics      map[string]uint64 `json:"raw,omitempty"`       // Other memory related metrics.
 }
