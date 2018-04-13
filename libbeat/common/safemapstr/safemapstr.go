@@ -23,7 +23,7 @@ const alternativeKey = "value"
 func Put(data common.MapStr, key string, value interface{}) error {
 	// XXX This implementation mimics `common.MapStr.Put`, both should be updated to have similar behavior
 
-	d, k := mapFind(data, key)
+	d, k := mapFind(data, key, alternativeKey)
 	d[k] = value
 	return nil
 }
@@ -32,7 +32,13 @@ func Put(data common.MapStr, key string, value interface{}) error {
 // and key to operate on. This function adds intermediate maps, if the key is
 // missing from the original map.
 
-func mapFind(data common.MapStr, key string) (common.MapStr, string) {
+// mapFind iterates a MapStr based on the given dotted key, finding the final
+// subMap and subKey to operate on.
+// If a key is already used, but the used value is no map, an intermediate map will be inserted and
+// the old value will be stored using the 'alternativeKey' in a new map.
+// If the old value found under key is already an dictionary, subMap will be
+// the old value and subKey will be set to alternativeKey.
+func mapFind(data common.MapStr, key, alternativeKey string) (subMap common.MapStr, subKey string) {
 	// XXX This implementation mimics `common.mapFind`, both should be updated to have similar behavior
 
 	for {

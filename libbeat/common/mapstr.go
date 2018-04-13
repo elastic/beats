@@ -333,7 +333,19 @@ func tryToMapStr(v interface{}) (MapStr, bool) {
 	}
 }
 
-func mapFind(key string, data MapStr, createMissing bool) (string, MapStr, interface{}, bool, error) {
+// mapFind iterates a MapStr based on a the given dotted key, finding the final
+// subMap and subKey to operate on.
+// An error is returned if some intermediate is no map or the key doesn't exist.
+// If createMissing is set to true, intermediate maps are created.
+// The final map and un-dotted key to run further operations on are returned in
+// subKey and subMap. The subMap already contains a value for subKey, the
+// present flag is set to true and the oldValue return will hold
+// the original value.
+func mapFind(
+	key string,
+	data MapStr,
+	createMissing bool,
+) (subKey string, subMap MapStr, oldValue interface{}, present bool, err error) {
 	// XXX `safemapstr.mapFind` mimics this implementation, both should be updated to have similar behavior
 
 	for {
