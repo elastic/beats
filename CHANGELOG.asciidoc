@@ -187,6 +187,7 @@ https://github.com/elastic/beats/compare/v6.0.0-beta2...master[Check the HEAD di
 - Set `status` as default metricset for mysql module. {pull} 6769[6769]
 - Set `stubstatus` as default metricset for nginx module. {pull}6770[6770]
 - Added support for haproxy 1.7 and 1.8. {pull}6793[6793]
+- Add accumulated I/O stats to diskio in the line of `docker stats`. {pull}6701[6701]
 
 *Packetbeat*
 

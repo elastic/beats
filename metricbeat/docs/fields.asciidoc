@@ -2215,11 +2215,77 @@ Disk I/O metrics.
 
 
 [float]
+== read fields
+
+Accumulated reads during the life of the container
+
+
+
+[float]
+=== `docker.diskio.read.ops`
+
+type: long
+
+Number of reads during the life of the container
+
+
+[float]
+=== `docker.diskio.read.bytes`
+
+type: long
+
+format: bytes
+
+Bytes read during the life of the container
+
+
+[float]
+=== `docker.diskio.read.rate`
+
+type: long
+
+Number of current reads per second
+
+
+[float]
 === `docker.diskio.reads`
 
 type: scaled_float
 
-Number of reads.
+Number of current reads per second
+
+
+[float]
+== write fields
+
+Accumulated writes during the life of the container
+
+
+
+[float]
+=== `docker.diskio.write.ops`
+
+type: long
+
+Number of writes during the life of the container
+
+
+[float]
+=== `docker.diskio.write.bytes`
+
+type: long
+
+format: bytes
+
+Bytes written during the life of the container
+
+
+[float]
+=== `docker.diskio.write.rate`
+
+type: long
+
+Number of current writes per second
 
 
 [float]
@@ -2227,7 +2293,40 @@ Number of reads.
 
 type: scaled_float
 
-Number of writes.
+Number of current writes per second
+
+
+[float]
+== summary fields
+
+Accumulated reads and writes during the life of the container
+
+
+
+[float]
+=== `docker.diskio.summary.ops`
+
+type: long
+
+Number of I/O operations during the life of the container
+
+
+[float]
+=== `docker.diskio.summary.bytes`
+
+type: long
+
+format: bytes
+
+Bytes read and written during the life of the container
+
+
+[float]
+=== `docker.diskio.summary.rate`
+
+type: long
+
+Number of current operations per second
 
 
 [float]
@@ -2235,7 +2334,7 @@ Number of writes.
 
 type: scaled_float
 
-Number of reads and writes combined.
+Number of reads and writes per second
 
 
 [float]
