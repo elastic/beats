@@ -140,34 +140,6 @@ func TestFileSystemListFiltering(t *testing.T) {
 	}
 }
 
-func TestFileSystemListFilteringWindows(t *testing.T) {
-	if runtime.GOOS != "windows" {
-		t.Skip("These cases only need to work on windows")
-	}
-
-	cases := []struct {
-		description   string
-		fss, expected []sigar.FileSystem
-	}{
-		{
-			description: "Keep all filesystems in Windows",
-			fss: []sigar.FileSystem{
-				{DirName: "C:\\", DevName: "C:\\"},
-				{DirName: "D:\\", DevName: "D:\\"},
-			},
-			expected: []sigar.FileSystem{
-				{DirName: "C:\\", DevName: "C:\\"},
-				{DirName: "D:\\", DevName: "D:\\"},
-			},
-		},
-	}
-
-	for _, c := range cases {
-		filtered := filterFileSystemList(c.fss)
-		assert.ElementsMatch(t, c.expected, filtered, c.description)
-	}
-}
-
 func TestFilter(t *testing.T) {
 	in := []sigar.FileSystem{
 		{SysTypeName: "nfs"},

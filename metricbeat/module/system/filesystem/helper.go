@@ -36,6 +36,11 @@ func GetFileSystemList() ([]sigar.FileSystem, error) {
 		return nil, err
 	}
 
+	if runtime.GOOS == "windows" {
+		// No filtering on Windows
+		return fss.List, nil
+	}
+
 	return filterFileSystemList(fss.List), nil
 }
 
