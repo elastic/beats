@@ -9,7 +9,7 @@
       description: >
         All connections
       fields:
-        - name: connections
+        - name: count
           type: integer
           description: >
             All open connections
@@ -27,7 +27,7 @@
           description: >
             All TCP connections
           fields:
-            - name: connections
+            - name: count
               type: integer
               description: >
                 All open TCP connections
@@ -45,7 +45,7 @@
           description: >
             All UDP connections
           fields:
-            - name: connections
+            - name: count
               type: integer
               description: >
                 All open TCP connections

@@ -52,7 +52,7 @@ func TestCalculateConnStats(t *testing.T) {
 	conns := getMockedConns()
 	metrics := calculateConnStats(conns)
 
-	allConns, err := metrics.GetValue("all.connections")
+	allConns, err := metrics.GetValue("all.count")
 
 	if err != nil {
 		t.Fail()
@@ -64,13 +64,13 @@ func TestCalculateConnStats(t *testing.T) {
 		t.Fail()
 	}
 
-	udpConns, err := metrics.GetValue("udp.all.connections")
+	udpConns, err := metrics.GetValue("udp.all.count")
 
 	if err != nil {
 		t.Fail()
 	}
 
-	tcpConns, err := metrics.GetValue("tcp.all.connections")
+	tcpConns, err := metrics.GetValue("tcp.all.count")
 
 	if err != nil {
 		t.Fail()

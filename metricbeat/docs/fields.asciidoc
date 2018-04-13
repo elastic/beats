@@ -19492,7 +19492,7 @@ All connections
 
 
 
-*`system.socket.summary.all.connections`*::
+*`system.socket.summary.all.count`*::
 +
 --
 type: integer
@@ -19526,7 +19526,7 @@ All TCP connections
 
 
 
-*`system.socket.summary.tcp.all.connections`*::
+*`system.socket.summary.tcp.all.count`*::
 +
 --
 type: integer
@@ -19560,7 +19560,7 @@ All UDP connections
 
 
 
-*`system.socket.summary.udp.all.connections`*::
+*`system.socket.summary.udp.all.count`*::
 +
 --
 type: integer

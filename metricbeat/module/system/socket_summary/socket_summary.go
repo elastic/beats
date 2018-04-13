@@ -66,18 +66,18 @@ func calculateConnStats(conns []net.ConnectionStat) common.MapStr {
 
 	return common.MapStr{
 		"all": common.MapStr{
-			"connections": allConns,
-			"listening":   allListening,
+			"count":     allConns,
+			"listening": allListening,
 		},
 		"tcp": common.MapStr{
 			"all": common.MapStr{
-				"connections": tcpConns,
-				"listening":   tcpListening,
+				"count":     tcpConns,
+				"listening": tcpListening,
 			},
 		},
 		"udp": common.MapStr{
 			"all": common.MapStr{
-				"connections": udpConns,
+				"count": udpConns,
 			},
 		},
 	}

@@ -475,13 +475,13 @@ class Test(metricbeat.BaseTest):
             tcp = summary["tcp"]
             udp = summary["udp"]
 
-            assert isinstance(a["connections"], int)
+            assert isinstance(a["count"], int)
             assert isinstance(a["listening"], int)
 
-            assert isinstance(tcp["all"]["connections"], int)
+            assert isinstance(tcp["all"]["count"], int)
             assert isinstance(tcp["all"]["listening"], int)
 
-            assert isinstance(udp["all"]["connections"], int)
+            assert isinstance(udp["all"]["count"], int)
 
     def check_username(self, observed, expected=None):
         if expected == None:
