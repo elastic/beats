@@ -32,7 +32,7 @@ required authentication add this to the haproxy config:
 [source,haproxy]
 ----
  listen stats
-   bind 0.0.0.0:14569
+   bind 0.0.0.0:14567
    stats enable
    stats uri /stats
    stats auth admin:admin
