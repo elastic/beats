@@ -22,7 +22,10 @@ in <<configuration-metricbeat>>. Here is an example configuration:
 ----
 metricbeat.modules:
 - module: kibana
+  metricsets: ["status"]
+  period: 10s
   hosts: ["localhost:5601"]
+  enabled: default
 ----
 
 This module supports TLS connection when using `ssl` config field, as described in <<configuration-ssl>>.

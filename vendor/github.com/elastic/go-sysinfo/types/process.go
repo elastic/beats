@@ -1,16 +1,19 @@
-// Copyright 2018 Elasticsearch Inc.
-//
-// Licensed under the Apache License, Version 2.0 (the "License");
-// you may not use this file except in compliance with the License.
+// Licensed to Elasticsearch B.V. under one or more contributor
+// license agreements. See the NOTICE file distributed with
+// this work for additional information regarding copyright
+// ownership. Elasticsearch B.V. licenses this file to you under
+// the Apache License, Version 2.0 (the "License"); you may
+// not use this file except in compliance with the License.
 // You may obtain a copy of the License at
 //
 // http://www.apache.org/licenses/LICENSE-2.0
 //
-// Unless required by applicable law or agreed to in writing, software
-// distributed under the License is distributed on an "AS IS" BASIS,
-// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-// See the License for the specific language governing permissions and
-// limitations under the License.
+// Unless required by applicable law or agreed to in writing,
+// software distributed under the License is distributed on an
+// "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+// KIND, either express or implied.  See the License for the
+// specific language governing permissions and limitations
+// under the License.
 
 package types
 
@@ -66,13 +69,28 @@ func (cpu CPUTimes) Total() time.Duration {
 
 type MemoryInfo struct {
 	Timestamp time.Time         `json:"timestamp"` // Time at which samples were collected.
-	Resident  uint64            `json:"resident"`
-	Virtual   uint64            `json:"virtual"`
+	Resident  uint64            `json:"resident_bytes"`
+	Virtual   uint64            `json:"virtual_bytes"`
 	Metrics   map[string]uint64 `json:"raw,omitempty"` // Other memory related metrics.
 }
 
 type SeccompInfo struct {
-	Mode          string   `json:"mode"`
-	EffectiveCaps []string `json:"effective_capabilities"`
-	NoNewPrivs    *bool    `json:"no_new_privs"`
+	Mode       string `json:"mode"`
+	NoNewPrivs *bool  `json:"no_new_privs,omitempty"` // Added in kernel 4.10.
+}
+
+type CapabilityInfo struct {
+	Inheritable []string `json:"inheritable"`
+	Permitted   []string `json:"permitted"`
+	Effective   []string `json:"effective"`
+	Bounding    []string `json:"bounding"`
+	Ambient     []string `json:"ambient"`
+}
+
+type Capabilities interface {
+	Capabilities() (*CapabilityInfo, error)
+}
+
+type Seccomp interface {
+	Seccomp() (*SeccompInfo, error)
 }

@@ -11,6 +11,7 @@ experimental[]
 
 This is the munin module.
 
+The default metricset is `node`.
 
 
 [float]
@@ -24,7 +25,7 @@ in <<configuration-metricbeat>>. Here is an example configuration:
 metricbeat.modules:
 - module: munin
   metricsets: ["node"]
-  enabled: false
+  enabled: true
   period: 10s
   hosts: ["localhost:4949"]
   node.namespace: node
