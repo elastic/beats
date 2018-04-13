@@ -15,9 +15,10 @@
     "grok": {
       "field": "nginx.access.info",
       "patterns": [
+          "",
           "(?:%{WORD:nginx.access.method} )(?:%{DATA:nginx.access.url} )(?:HTTP/%{NUMBER:nginx.access.http_version})"
       ],
-      "ignore_missing": false
+      "ignore_missing": true
     }
   }, {
     "remove": {
