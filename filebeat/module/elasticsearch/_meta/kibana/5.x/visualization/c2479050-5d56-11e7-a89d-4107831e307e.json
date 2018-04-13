@@ -1,0 +1,11 @@
+{
+  "visState": "{\"title\":\"Node and Log Level Breakdown [Elasticsearch]\",\"type\":\"pie\",\"params\":{\"addTooltip\":true,\"addLegend\":true,\"legendPosition\":\"right\",\"isDonut\":false},\"aggs\":[{\"id\":\"1\",\"enabled\":true,\"type\":\"count\",\"schema\":\"metric\",\"params\":{\"customLabel\":\"# of Messages\"}},{\"id\":\"2\",\"enabled\":true,\"type\":\"terms\",\"schema\":\"segment\",\"params\":{\"field\":\"elasticsearch.log.node.name\",\"size\":10,\"order\":\"desc\",\"orderBy\":\"1\",\"customLabel\":\"Node\"}},{\"id\":\"3\",\"enabled\":true,\"type\":\"terms\",\"schema\":\"segment\",\"params\":{\"field\":\"elasticsearch.log_level\",\"size\":7,\"order\":\"desc\",\"orderBy\":\"1\",\"customLabel\":\"Level\"}}],\"listeners\":{}}", 
+  "description": "", 
+  "title": "Node and Log Level Breakdown [Elasticsearch]", 
+  "uiStateJSON": "{}", 
+  "version": 1, 
+  "savedSearchId": "98c945e0-5d4a-11e7-a89d-4107831e307e", 
+  "kibanaSavedObjectMeta": {
+    "searchSourceJSON": "{\"filter\":[]}"
+  }
+}

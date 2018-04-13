@@ -1,0 +1,54 @@
+{
+  "description": "Pipeline for parsing the Elasticsearch standard log file.",
+  "on_failure": [
+    {
+      "set": {
+        "field": "error.message",
+        "value": "{{ _ingest.on_failure_message }}"
+      }
+    }
+  ],
+  "processors": [
+    {
+      "grok": {
+        "field": "message",
+        "pattern_definitions": {
+          "GREEDYMULTILINE": "(.|\n)*"
+        },
+        "patterns": [
+          "%{TIMESTAMP_ISO8601:timestamp} %{GREEDYDATA:message}",
+          "\\[%{TIMESTAMP_ISO8601:timestamp}\\]\\[%{LOGLEVEL:elasticsearch.log_level}%{SPACE}?\\]\\[%{DATA:elasticsearch.log.component}%{SPACE}*\\]%{SPACE}\\[%{USER:elasticsearch.log.xpack.ml.job_id}\\] \\[%{WORD:elasticsearch.log.xpack.ml.process}/%{POSINT:elasticsearch.log.xpack.ml.process_id}\\] \\[%{DATA:elasticsearch.log.xpack.ml.code}\\] %{GREEDYDATA:elasticsearch.log.reason}",
+          "\\[%{TIMESTAMP_ISO8601:timestamp}\\]\\[%{LOGLEVEL:elasticsearch.log_level}%{SPACE}?\\]\\[%{DATA:elasticsearch.log.component}%{SPACE}*\\](%{SPACE}\\[%{USER:elasticsearch.log.node.name}?\\])? %{GREEDYMULTILINE:message}"
+        ]
+      }
+    },
+    {
+      "date": {
+        "field": "timestamp",
+        "target_field": "@timestamp",
+        "formats": [
+          "ISO8601",
+          "YYYY-MM-dd HH:mm:ss,SSS"
+        ]
+      }
+    },
+    {
+      "grok": {
+        "field": "message",
+        "pattern_definitions": {
+          "GREEDYMULTILINE": "(.|\n)*",
+          "INDEX_ID": "(\\[%{USER:elasticsearch.log.index.name}\\/%{DATA:elasticsearch.log.index.uuid}\\])|(\\[%{USER:elasticsearch.log.index.name}\\]\\[%{INT:elasticsearch.log.index.shard}\\])|(\\[%{USER:elasticsearch.log.index.name}\\])",
+          "CLUSTER_ACTION": "(added|removed|cluster state update task|cluster state updated|detected_master|master_left|new_master|(set local|applying|publishing) cluster state)",
+          "NODE_UPDOWN": "(starting|started|initializing|initialized|stopping|stopped|closed|closing)"
+        },
+        "patterns": [
+          "%{NODE_UPDOWN:elasticsearch.log.node.status}( \\.\\.\\.)?",
+          "\\[gc\\]\\[%{INT:elasticsearch.log.gc.sequence}\\] overhead, spent \\[%{GREEDYDATA:elasticsearch.log.gc.overhead}\\] collecting in the last \\[%{GREEDYDATA:elasticsearch.log.gc.interval}\\]",
+          "\\[gc\\]\\[%{WORD:elasticsearch.log.gc.generation}\\]\\[%{POSINT:elasticsearch.log.gc.sequence}\\]\\[%{POSINT:elasticsearch.log.gc.total_count}\\] duration \\[%{DATA:elasticsearch.log.gc.overhead}\\], collections \\[%{POSINT:elasticsearch.log.gc.collection.count_since_last_cycle}\\]\\/\\[%{DATA:elasticsearch.log.gc.collection.time_since_last_cycle}\\], total \\[%{DATA}\\/\\[%{DATA:elasticsearch.log.gc.collection.total_duration}\\], memory \\[%{DATA:elasticsearch.log.gc.old_heap_use}\\]->\\[%{DATA:elasticsearch.log.gc.new_heap_use}\\]\\/\\[%{DATA:elasticsearch.log.gc.max_heap}\\], all_pools %{GREEDYDATA:elasticsearch.log.gc.pool_info}",
+          "^%{INDEX_ID} %{GREEDYDATA:message}",
+          "%{DATA:message}\\n%{GREEDYMULTILINE:elasticsearch.log.exception}"
+        ]
+      }
+    }
+  ]
+}
