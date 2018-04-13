@@ -52,6 +52,9 @@ var (
 	ErrClosed       = errors.New("reader closed")
 )
 
+// OutletFactory provides an outlet for the harvester
+type OutletFactory func() channel.Outleter
+
 // Harvester contains all harvester related data
 type Harvester struct {
 	id     uuid.UUID
@@ -75,8 +78,8 @@ type Harvester struct {
 	encoding        encoding.Encoding
 
 	// event/state publishing
-	forwarder    *harvester.Forwarder
-	publishState func(*util.Data) bool
+	outletFactory OutletFactory
+	publishState  func(*util.Data) bool
 
 	onTerminate func()
 }
@@ -87,17 +90,18 @@ func NewHarvester(
 	state file.State,
 	states *file.States,
 	publishState func(*util.Data) bool,
-	outlet channel.Outleter,
+	outletFactory OutletFactory,
 ) (*Harvester, error) {
 
 	h := &Harvester{
-		config:       defaultConfig,
-		state:        state,
-		states:       states,
-		publishState: publishState,
-		done:         make(chan struct{}),
-		stopWg:       &sync.WaitGroup{},
-		id:           uuid.NewV4(),
+		config:        defaultConfig,
+		state:         state,
+		states:        states,
+		publishState:  publishState,
+		done:          make(chan struct{}),
+		stopWg:        &sync.WaitGroup{},
+		id:            uuid.NewV4(),
+		outletFactory: outletFactory,
 	}
 
 	if err := config.Unpack(&h.config); err != nil {
@@ -116,8 +120,6 @@ func NewHarvester(
 	}
 
 	// Add outlet signal so harvester can also stop itself
-	outlet = channel.CloseOnSignal(outlet, h.done)
-	h.forwarder = harvester.NewForwarder(outlet)
 	return h, nil
 }
 
@@ -164,6 +166,10 @@ func (h *Harvester) Run() error {
 	if h.onTerminate != nil {
 		defer h.onTerminate()
 	}
+
+	outlet := channel.CloseOnSignal(h.outletFactory(), h.done)
+	forwarder := harvester.NewForwarder(outlet)
+
 	// This is to make sure a harvester is not started anymore if stop was already
 	// called before the harvester was started. The waitgroup is not incremented afterwards
 	// as otherwise it could happened that between checking for the close channel and incrementing
@@ -308,7 +314,7 @@ func (h *Harvester) Run() error {
 
 		// Always send event to update state, also if lines was skipped
 		// Stop harvester in case of an error
-		if !h.sendEvent(data) {
+		if !h.sendEvent(data, forwarder) {
 			return nil
 		}
 
@@ -335,12 +341,12 @@ func (h *Harvester) Stop() {
 
 // sendEvent sends event to the spooler channel
 // Return false if event was not sent
-func (h *Harvester) sendEvent(data *util.Data) bool {
+func (h *Harvester) sendEvent(data *util.Data, forwarder *harvester.Forwarder) bool {
 	if h.source.HasState() {
 		h.states.Update(data.GetState())
 	}
 
-	err := h.forwarder.Send(data)
+	err := forwarder.Send(data)
 	return err == nil
 }
 
