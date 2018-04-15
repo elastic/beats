@@ -14,6 +14,7 @@ type MultilineConfig struct {
 	Pattern      *match.Matcher `config:"pattern" validate:"required"`
 	Timeout      *time.Duration `config:"timeout" validate:"positive"`
 	FlushPattern *match.Matcher `config:"flush_pattern"`
+	LastMatch    bool           `config:"last_match"`
 }
 
 func (c *MultilineConfig) Validate() error {
