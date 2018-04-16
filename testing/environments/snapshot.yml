@@ -9,8 +9,6 @@ services:
     build:
       context: ./docker/elasticsearch
       dockerfile: Dockerfile
-      args:
-        XPACK: 1
     environment:
       - "ES_JAVA_OPTS=-Xms512m -Xmx512m"
       - "network.host="
@@ -35,5 +33,3 @@ services:
     build:
       context: ./docker/kibana
       dockerfile: Dockerfile
-      args:
-        XPACK: 1

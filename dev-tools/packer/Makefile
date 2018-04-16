@@ -12,32 +12,32 @@ beat_abspath=${BEATS_GOPATH}/src/${BEAT_PATH}
 
 %/deb: ${BUILD_DIR}/god-linux-386 ${BUILD_DIR}/god-linux-amd64 fpm-image
 	echo Creating DEB packages for $(@D)
-	ARCH=386 BEAT=$(@D) BUILD_DIR=${BUILD_DIR} BEAT_PATH=$(beat_abspath) BUILDID=$(BUILDID) SNAPSHOT=$(SNAPSHOT) $(packer_absdir)/platforms/debian/build.sh
-	ARCH=amd64 BEAT=$(@D) BUILD_DIR=${BUILD_DIR} BEAT_PATH=$(beat_abspath) BUILDID=$(BUILDID) SNAPSHOT=$(SNAPSHOT) $(packer_absdir)/platforms/debian/build.sh
+	ARCH=386 BEAT=$(@D) BUILD_DIR=${BUILD_DIR} UPLOAD_DIR=${UPLOAD_DIR} BEAT_PATH=$(beat_abspath) BUILDID=$(BUILDID) SNAPSHOT=$(SNAPSHOT) $(packer_absdir)/platforms/debian/build.sh
+	ARCH=amd64 BEAT=$(@D) BUILD_DIR=${BUILD_DIR} UPLOAD_DIR=${UPLOAD_DIR} BEAT_PATH=$(beat_abspath) BUILDID=$(BUILDID) SNAPSHOT=$(SNAPSHOT) $(packer_absdir)/platforms/debian/build.sh
 
 %/rpm: ${BUILD_DIR}/god-linux-386 ${BUILD_DIR}/god-linux-amd64 fpm-image
 	echo Creating RPM packages for $(@D)
-	ARCH=386 BEAT=$(@D) BUILD_DIR=${BUILD_DIR} BEAT_PATH=$(beat_abspath) BUILDID=$(BUILDID) SNAPSHOT=$(SNAPSHOT) $(packer_absdir)/platforms/centos/build.sh
-	ARCH=amd64 BEAT=$(@D) BUILD_DIR=${BUILD_DIR} BEAT_PATH=$(beat_abspath) BUILDID=$(BUILDID) SNAPSHOT=$(SNAPSHOT) $(packer_absdir)/platforms/centos/build.sh
+	ARCH=386 BEAT=$(@D) BUILD_DIR=${BUILD_DIR} UPLOAD_DIR=${UPLOAD_DIR} BEAT_PATH=$(beat_abspath) BUILDID=$(BUILDID) SNAPSHOT=$(SNAPSHOT) $(packer_absdir)/platforms/centos/build.sh
+	ARCH=amd64 BEAT=$(@D) BUILD_DIR=${BUILD_DIR} UPLOAD_DIR=${UPLOAD_DIR} BEAT_PATH=$(beat_abspath) BUILDID=$(BUILDID) SNAPSHOT=$(SNAPSHOT) $(packer_absdir)/platforms/centos/build.sh
 
 %/darwin:
 	echo Creating Darwin packages for $(@D)
-	ARCH=amd64 BEAT=$(@D) BUILD_DIR=${BUILD_DIR} BEAT_PATH=$(beat_abspath) BUILDID=$(BUILDID) SNAPSHOT=$(SNAPSHOT) $(packer_absdir)/platforms/darwin/build.sh
+	ARCH=amd64 BEAT=$(@D) BUILD_DIR=${BUILD_DIR} UPLOAD_DIR=${UPLOAD_DIR} BEAT_PATH=$(beat_abspath) BUILDID=$(BUILDID) SNAPSHOT=$(SNAPSHOT) $(packer_absdir)/platforms/darwin/build.sh
 
 %/win:
 	echo Creating Darwin packages for $(@D)
-	ARCH=386 BEAT=$(@D) BUILD_DIR=${BUILD_DIR} BEAT_PATH=$(beat_abspath) BUILDID=$(BUILDID) SNAPSHOT=$(SNAPSHOT) $(packer_absdir)/platforms/windows/build.sh
-	ARCH=amd64 BEAT=$(@D) BUILD_DIR=${BUILD_DIR} BEAT_PATH=$(beat_abspath) BUILDID=$(BUILDID) SNAPSHOT=$(SNAPSHOT) $(packer_absdir)/platforms/windows/build.sh
+	ARCH=386 BEAT=$(@D) BUILD_DIR=${BUILD_DIR} UPLOAD_DIR=${UPLOAD_DIR} BEAT_PATH=$(beat_abspath) BUILDID=$(BUILDID) SNAPSHOT=$(SNAPSHOT) $(packer_absdir)/platforms/windows/build.sh
+	ARCH=amd64 BEAT=$(@D) BUILD_DIR=${BUILD_DIR} UPLOAD_DIR=${UPLOAD_DIR} BEAT_PATH=$(beat_abspath) BUILDID=$(BUILDID) SNAPSHOT=$(SNAPSHOT) $(packer_absdir)/platforms/windows/build.sh
 
 %/bin:
 	echo Creating Linux packages for $(@D)
-	ARCH=386 BEAT=$(@D) BUILD_DIR=${BUILD_DIR} BEAT_PATH=$(beat_abspath) BUILDID=$(BUILDID) SNAPSHOT=$(SNAPSHOT) $(packer_absdir)/platforms/binary/build.sh
-	ARCH=amd64 BEAT=$(@D) BUILD_DIR=${BUILD_DIR} BEAT_PATH=$(beat_abspath) BUILDID=$(BUILDID) SNAPSHOT=$(SNAPSHOT) $(packer_absdir)/platforms/binary/build.sh
+	ARCH=386 BEAT=$(@D) BUILD_DIR=${BUILD_DIR} UPLOAD_DIR=${UPLOAD_DIR} BEAT_PATH=$(beat_abspath) BUILDID=$(BUILDID) SNAPSHOT=$(SNAPSHOT) $(packer_absdir)/platforms/binary/build.sh
+	ARCH=amd64 BEAT=$(@D) BUILD_DIR=${BUILD_DIR} UPLOAD_DIR=${UPLOAD_DIR} BEAT_PATH=$(beat_abspath) BUILDID=$(BUILDID) SNAPSHOT=$(SNAPSHOT) $(packer_absdir)/platforms/binary/build.sh
 
 .PHONY: package-dashboards
 package-dashboards:
 	echo Creating the Dashboards package
-	BUILDID=$(BUILDID) SNAPSHOT=$(SNAPSHOT) $(packer_absdir)/platforms/dashboards/build.sh
+	UPLOAD_DIR=${UPLOAD_DIR} BUILDID=$(BUILDID) SNAPSHOT=$(SNAPSHOT) $(packer_absdir)/platforms/dashboards/build.sh
 
 .PHONY: deps
 deps:
@@ -61,11 +61,11 @@ go-daemon-image:
 ${BUILD_DIR}/god-linux-386 ${BUILD_DIR}/god-linux-amd64:
 	docker run --rm -v ${BUILD_DIR}:/build tudorg/go-daemon
 
-${BUILD_DIR}/upload:
-	mkdir -p ${BUILD_DIR}/upload
+${UPLOAD_DIR}:
+	mkdir -p ${UPLOAD_DIR}
 
-${BUILD_DIR}/upload/build_id.txt:
-	echo $(BUILDID) > ${BUILD_DIR}/upload/build_id.txt
+${UPLOAD_DIR}/build_id.txt:
+	echo $(BUILDID) > ${UPLOAD_DIR}/build_id.txt
 
 # Build the image required for package-upload.
 .PHONY: deb-rpm-s3

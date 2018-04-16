@@ -21,10 +21,9 @@ cp -a modules.d-win/ /{{.beat_name}}-${VERSION}-windows-{{.win_arch}}/modules.d 
 cp install-service-{{.beat_name}}.ps1 /{{.beat_name}}-${VERSION}-windows-{{.win_arch}}/
 cp uninstall-service-{{.beat_name}}.ps1 /{{.beat_name}}-${VERSION}-windows-{{.win_arch}}/
 
-mkdir -p upload
-zip -r upload/{{.beat_name}}-${VERSION}-windows-{{.win_arch}}.zip /{{.beat_name}}-${VERSION}-windows-{{.win_arch}}
-echo "Created upload/{{.beat_name}}-${VERSION}-windows-{{.win_arch}}.zip"
+zip -r /upload/{{.beat_name}}{{.beat_pkg_suffix}}-${VERSION}-windows-{{.win_arch}}.zip /{{.beat_name}}-${VERSION}-windows-{{.win_arch}}
+echo "Created /upload/{{.beat_name}}{{.beat_pkg_suffix}}-${VERSION}-windows-{{.win_arch}}.zip"
 
-cd upload
-sha512sum {{.beat_name}}-${VERSION}-windows-{{.win_arch}}.zip > {{.beat_name}}-${VERSION}-windows-{{.win_arch}}.zip.sha512
-echo "Created upload/{{.beat_name}}-${VERSION}-windows-{{.win_arch}}.zip.sha512"
+cd /upload
+sha512sum {{.beat_name}}{{.beat_pkg_suffix}}-${VERSION}-windows-{{.win_arch}}.zip > {{.beat_name}}{{.beat_pkg_suffix}}-${VERSION}-windows-{{.win_arch}}.zip.sha512
+echo "Created /upload/{{.beat_name}}{{.beat_pkg_suffix}}-${VERSION}-windows-{{.win_arch}}.zip.sha512"
