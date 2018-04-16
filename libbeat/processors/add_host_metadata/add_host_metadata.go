@@ -1,6 +1,7 @@
 package add_host_metadata
 
 import (
+	"net"
 	"time"
 
 	"github.com/elastic/beats/libbeat/beat"
@@ -71,8 +72,52 @@ func (p *addHostMetadata) loadData() {
 		if p.info.OS.Build != "" {
 			p.data.Put("host.os.build", p.info.OS.Build)
 		}
+
+		// IP-address and MAC-address
+		var ipList, hwList = p.getNetInfo()
+		p.data.Put("host.net.ip", ipList)
+		p.data.Put("host.net.hw", hwList)
+
 		p.lastUpdate = time.Now()
 	}
+}
+
+func (p addHostMetadata) getNetInfo() ([]string, []string) {
+	var ipList []string
+	var hwList []string
+
+	// Get all interfaces and loop through them
+	ifaces, err := net.Interfaces()
+	if err != nil {
+		return ipList, hwList
+	}
+	for _, i := range ifaces {
+		// Skip loopback interfaces
+		if i.Flags&net.FlagLoopback == net.FlagLoopback {
+			continue
+		}
+
+		hw := i.HardwareAddr.String()
+		// Skip empty hardware addresses
+		if hw != "" {
+			hwList = append(hwList, hw)
+		}
+
+		addrs, err := i.Addrs()
+		if err != nil {
+			return ipList, hwList
+		}
+		for _, addr := range addrs {
+			switch v := addr.(type) {
+			case *net.IPNet:
+				ipList = append(ipList, v.IP.String())
+			case *net.IPAddr:
+				ipList = append(ipList, v.IP.String())
+			}
+		}
+	}
+
+	return ipList, hwList
 }
 
 func (p addHostMetadata) String() string {
