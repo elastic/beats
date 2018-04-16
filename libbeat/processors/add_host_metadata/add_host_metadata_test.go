@@ -31,4 +31,12 @@ func TestRun(t *testing.T) {
 	v, err := newEvent.GetValue("host.os.family")
 	assert.NoError(t, err)
 	assert.NotNil(t, v)
+
+	v, err = newEvent.GetValue("host.net.ip")
+	assert.NoError(t, err)
+	assert.NotNil(t, v)
+
+	v, err = newEvent.GetValue("host.net.hw")
+	assert.NoError(t, err)
+	assert.NotNil(t, v)
 }
