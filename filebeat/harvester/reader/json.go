@@ -101,6 +101,13 @@ func MergeJSONFields(data common.MapStr, jsonFields common.MapStr, text *string,
 		jsonFields[config.MessageKey] = *text
 	}
 
+	// handle the case in which r.cfg.AddErrorKey is set and len(jsonFields) == 1
+	// and only thing it contains is `error` key due to error in json decoding
+	// which results in loss of message key in the main beat event
+	if len(jsonFields) == 1 && jsonFields["error"] != nil {
+		data["message"] = *text
+	}
+
 	if config.KeysUnderRoot {
 		// Delete existing json key
 		delete(data, "json")
