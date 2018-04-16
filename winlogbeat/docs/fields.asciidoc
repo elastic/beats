@@ -28,33 +28,41 @@ Contains common beat fields available in all event types.
 
 
 
-[float]
-=== `beat.name`
-
+*`beat.name`*::
++
+--
 The name of the Beat sending the log messages. If the Beat name is set in the configuration file, then that value is used. If it is not set, the hostname is used. To set the Beat name, use the `name` option in the configuration file.
 
 
-[float]
-=== `beat.hostname`
+--
 
+*`beat.hostname`*::
++
+--
 The hostname as returned by the operating system on which the Beat is running.
 
 
-[float]
-=== `beat.timezone`
+--
 
+*`beat.timezone`*::
++
+--
 The timezone as returned by the operating system on which the Beat is running.
 
 
-[float]
-=== `beat.version`
+--
 
+*`beat.version`*::
++
+--
 The version of the beat that generated this event.
 
 
-[float]
-=== `@timestamp`
+--
 
+*`@timestamp`*::
++
+--
 type: date
 
 example: August 26th 2016, 12:35:53.332
@@ -66,19 +74,25 @@ required: True
 The timestamp when the event log record was generated.
 
 
-[float]
-=== `tags`
+--
 
+*`tags`*::
++
+--
 Arbitrary tags that can be set per Beat and per transaction type.
 
 
-[float]
-=== `fields`
+--
 
+*`fields`*::
++
+--
 type: object
 
 Contains user configurable fields.
 
+
+--
 
 [float]
 == error fields
@@ -87,29 +101,35 @@ Error fields containing additional info in case of errors.
 
 
 
-[float]
-=== `error.message`
-
+*`error.message`*::
++
+--
 type: text
 
 Error message.
 
 
-[float]
-=== `error.code`
+--
 
+*`error.code`*::
++
+--
 type: long
 
 Error code.
 
 
-[float]
-=== `error.type`
+--
 
+*`error.type`*::
++
+--
 type: keyword
 
 Error type.
 
+
+--
 
 [[exported-fields-cloud]]
 == Cloud provider metadata fields
@@ -118,55 +138,69 @@ Metadata from cloud providers added by the add_cloud_metadata processor.
 
 
 
-[float]
-=== `meta.cloud.provider`
-
+*`meta.cloud.provider`*::
++
+--
 example: ec2
 
 Name of the cloud provider. Possible values are ec2, gce, or digitalocean.
 
 
-[float]
-=== `meta.cloud.instance_id`
+--
 
+*`meta.cloud.instance_id`*::
++
+--
 Instance ID of the host machine.
 
 
-[float]
-=== `meta.cloud.instance_name`
+--
 
+*`meta.cloud.instance_name`*::
++
+--
 Instance name of the host machine.
 
 
-[float]
-=== `meta.cloud.machine_type`
+--
 
+*`meta.cloud.machine_type`*::
++
+--
 example: t2.medium
 
 Machine type of the host machine.
 
 
-[float]
-=== `meta.cloud.availability_zone`
+--
 
+*`meta.cloud.availability_zone`*::
++
+--
 example: us-east-1c
 
 Availability zone in which this host is running.
 
 
-[float]
-=== `meta.cloud.project_id`
+--
 
+*`meta.cloud.project_id`*::
++
+--
 example: project-x
 
 Name of the project in Google Cloud.
 
 
-[float]
-=== `meta.cloud.region`
+--
 
+*`meta.cloud.region`*::
++
+--
 Region in which this host is running.
 
+
+--
 
 [[exported-fields-common]]
 == Common Winlogbeat fields
@@ -175,14 +209,16 @@ Contains common fields available in all event types.
 
 
 
-[float]
-=== `type`
-
+*`type`*::
++
+--
 required: True
 
 The event log API type used to read the record. The possible values are "wineventlog" for the Windows Event Log API or "eventlogging" for the Event Logging API.
 The Event Logging API was designed for Windows Server 2003, Windows XP, or Windows 2000 operating systems. In Windows Vista, the event logging infrastructure was redesigned. On Windows Vista or later operating systems, the Windows Event Log API is used. Winlogbeat automatically detects which API to use for reading event logs.
 
+
+--
 
 [[exported-fields-docker-processor]]
 == Docker fields
@@ -192,37 +228,45 @@ Docker stats collected from Docker.
 
 
 
-[float]
-=== `docker.container.id`
-
+*`docker.container.id`*::
++
+--
 type: keyword
 
 Unique container id.
 
 
-[float]
-=== `docker.container.image`
+--
 
+*`docker.container.image`*::
++
+--
 type: keyword
 
 Name of the image the container was built on.
 
 
-[float]
-=== `docker.container.name`
+--
 
+*`docker.container.name`*::
++
+--
 type: keyword
 
 Container name.
 
 
-[float]
-=== `docker.container.labels`
+--
 
+*`docker.container.labels`*::
++
+--
 type: object
 
 Image labels.
 
+
+--
 
 [[exported-fields-eventlog]]
 == Event log record fields
@@ -231,9 +275,9 @@ Contains data from a Windows event log record.
 
 
 
-[float]
-=== `activity_id`
-
+*`activity_id`*::
++
+--
 type: keyword
 
 required: False
@@ -241,9 +285,11 @@ required: False
 A globally unique identifier that identifies the current activity. The events that are published with this identifier are part of the same activity.
 
 
-[float]
-=== `computer_name`
+--
 
+*`computer_name`*::
++
+--
 type: keyword
 
 required: True
@@ -251,9 +297,11 @@ required: True
 The name of the computer that generated the record. When using Windows event forwarding, this name can differ from the `beat.hostname`.
 
 
-[float]
-=== `event_data`
+--
 
+*`event_data`*::
++
+--
 type: object
 
 required: False
@@ -261,9 +309,11 @@ required: False
 The event-specific data. This field is mutually exclusive with `user_data`. If you are capturing event data on versions prior to Windows Vista, the parameters in `event_data` are named `param1`, `param2`, and so on, because event log parameters are unnamed in earlier versions of Windows.
 
 
-[float]
-=== `event_id`
+--
 
+*`event_id`*::
++
+--
 type: long
 
 required: True
@@ -271,9 +321,11 @@ required: True
 The event identifier. The value is specific to the source of the event.
 
 
-[float]
-=== `keywords`
+--
 
+*`keywords`*::
++
+--
 type: keyword
 
 required: False
@@ -281,9 +333,11 @@ required: False
 The keywords are used to classify an event.
 
 
-[float]
-=== `log_name`
+--
 
+*`log_name`*::
++
+--
 type: keyword
 
 required: True
@@ -291,9 +345,11 @@ required: True
 The name of the event log from which this record was read. This value is one of the names from the `event_logs` collection in the configuration.
 
 
-[float]
-=== `level`
+--
 
+*`level`*::
++
+--
 type: keyword
 
 required: False
@@ -301,9 +357,11 @@ required: False
 The level of the event. There are five levels of events that can be logged: Success, Information, Warning, Error, Audit Success, and Audit Failure.
 
 
-[float]
-=== `message`
+--
 
+*`message`*::
++
+--
 type: text
 
 required: False
@@ -311,9 +369,11 @@ required: False
 The message from the event log record.
 
 
-[float]
-=== `message_error`
+--
 
+*`message_error`*::
++
+--
 type: keyword
 
 required: False
@@ -321,9 +381,11 @@ required: False
 The error that occurred while reading and formatting the message from the log.
 
 
-[float]
-=== `record_number`
+--
 
+*`record_number`*::
++
+--
 type: keyword
 
 required: True
@@ -331,9 +393,11 @@ required: True
 The record number of the event log record. The first record written to an event log is record number 1, and other records are numbered sequentially. If the record number reaches the maximum value (2^32^ for the Event Logging API and 2^64^ for the Windows Event Log API), the next record number will be 0.
 
 
-[float]
-=== `related_activity_id`
+--
 
+*`related_activity_id`*::
++
+--
 type: keyword
 
 required: False
@@ -341,9 +405,11 @@ required: False
 A globally unique identifier that identifies the activity to which control was transferred to. The related events would then have this identifier as their `activity_id` identifier.
 
 
-[float]
-=== `opcode`
+--
 
+*`opcode`*::
++
+--
 type: keyword
 
 required: False
@@ -351,9 +417,11 @@ required: False
 The opcode defined in the event. Task and opcode are typically used to identify the location in the application from where the event was logged.
 
 
-[float]
-=== `provider_guid`
+--
 
+*`provider_guid`*::
++
+--
 type: keyword
 
 required: False
@@ -361,9 +429,11 @@ required: False
 A globally unique identifier that identifies the provider that logged the event.
 
 
-[float]
-=== `process_id`
+--
 
+*`process_id`*::
++
+--
 type: long
 
 required: False
@@ -371,9 +441,11 @@ required: False
 The process_id identifies the process that generated the event.
 
 
-[float]
-=== `source_name`
+--
 
+*`source_name`*::
++
+--
 type: keyword
 
 required: True
@@ -381,9 +453,11 @@ required: True
 The source of the event log record (the application or service that logged the record).
 
 
-[float]
-=== `task`
+--
 
+*`task`*::
++
+--
 type: keyword
 
 required: False
@@ -391,9 +465,11 @@ required: False
 The task defined in the event. Task and opcode are typically used to identify the location in the application from where the event was logged. The category used by the Event Logging API (on pre Windows Vista operating systems) is written to this field.
 
 
-[float]
-=== `thread_id`
+--
 
+*`thread_id`*::
++
+--
 type: long
 
 required: False
@@ -401,9 +477,11 @@ required: False
 The thread_id identifies the thread that generated the event.
 
 
-[float]
-=== `user_data`
+--
 
+*`user_data`*::
++
+--
 type: object
 
 required: False
@@ -411,9 +489,11 @@ required: False
 The event specific data. This field is mutually exclusive with `event_data`.
 
 
-[float]
-=== `user.identifier`
+--
 
+*`user.identifier`*::
++
+--
 type: keyword
 
 example: S-1-5-21-3541430928-2051711210-1391384369-1001
@@ -425,9 +505,11 @@ The Windows security identifier (SID) of the account associated with this event.
 If Winlogbeat cannot resolve the SID to a name, then the `user.name`, `user.domain`, and `user.type` fields will be omitted from the event. If you discover Winlogbeat not resolving SIDs, review the log for clues as to what the problem may be.
 
 
-[float]
-=== `user.name`
+--
 
+*`user.name`*::
++
+--
 type: keyword
 
 required: False
@@ -435,9 +517,11 @@ required: False
 The name of the account associated with this event.
 
 
-[float]
-=== `user.domain`
+--
 
+*`user.domain`*::
++
+--
 type: keyword
 
 required: False
@@ -445,9 +529,11 @@ required: False
 The domain that the account associated with this event is a member of.
 
 
-[float]
-=== `user.type`
+--
 
+*`user.type`*::
++
+--
 type: keyword
 
 required: False
@@ -455,18 +541,22 @@ required: False
 The type of account associated with this event.
 
 
-[float]
-=== `version`
+--
 
+*`version`*::
++
+--
 type: long
 
 required: False
 
 The version number of the event's definition.
 
-[float]
-=== `xml`
+--
 
+*`xml`*::
++
+--
 type: text
 
 required: False
@@ -476,6 +566,8 @@ The raw XML representation of the event obtained from Windows. This field is onl
 The XML representation of the event is useful for troubleshooting purposes. The data in the fields reported by Winlogbeat can be compared to the data in the XML to diagnose problems.
 
 
+--
+
 [[exported-fields-host-processor]]
 == Host fields
 
@@ -484,53 +576,65 @@ Info collected for the host machine.
 
 
 
-[float]
-=== `host.name`
-
+*`host.name`*::
++
+--
 type: keyword
 
 Hostname.
 
 
-[float]
-=== `host.id`
+--
 
+*`host.id`*::
++
+--
 type: keyword
 
 Unique host id.
 
 
-[float]
-=== `host.architecture`
+--
 
+*`host.architecture`*::
++
+--
 type: keyword
 
 Host architecture (e.g. x86_64, arm, ppc, mips).
 
 
-[float]
-=== `host.os.platform`
+--
 
+*`host.os.platform`*::
++
+--
 type: keyword
 
 OS platform (e.g. centos, ubuntu, windows).
 
 
-[float]
-=== `host.os.version`
+--
 
+*`host.os.version`*::
++
+--
 type: keyword
 
 OS version.
 
 
-[float]
-=== `host.os.family`
+--
 
+*`host.os.family`*::
++
+--
 type: keyword
 
 OS family (e.g. redhat, debian, freebsd, windows).
 
+
+--
 
 [[exported-fields-kubernetes-processor]]
 == Kubernetes fields
@@ -540,59 +644,73 @@ Kubernetes metadata added by the kubernetes processor
 
 
 
-[float]
-=== `kubernetes.pod.name`
-
+*`kubernetes.pod.name`*::
++
+--
 type: keyword
 
 Kubernetes pod name
 
 
-[float]
-=== `kubernetes.namespace`
+--
 
+*`kubernetes.namespace`*::
++
+--
 type: keyword
 
 Kubernetes namespace
 
 
-[float]
-=== `kubernetes.node.name`
+--
 
+*`kubernetes.node.name`*::
++
+--
 type: keyword
 
 Kubernetes node name
 
 
-[float]
-=== `kubernetes.labels`
+--
 
+*`kubernetes.labels`*::
++
+--
 type: object
 
 Kubernetes labels map
 
 
-[float]
-=== `kubernetes.annotations`
+--
 
+*`kubernetes.annotations`*::
++
+--
 type: object
 
 Kubernetes annotations map
 
 
-[float]
-=== `kubernetes.container.name`
+--
 
+*`kubernetes.container.name`*::
++
+--
 type: keyword
 
 Kubernetes container name
 
 
-[float]
-=== `kubernetes.container.image`
+--
 
+*`kubernetes.container.image`*::
++
+--
 type: keyword
 
 Kubernetes container image
 
+
+--
 
