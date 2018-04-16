@@ -18,10 +18,9 @@ cp {{.beat_name}}-darwin.reference.yml /{{.beat_name}}-${VERSION}-darwin-x86_64/
 cp fields.yml /{{.beat_name}}-${VERSION}-darwin-x86_64/
 cp -a modules.d-darwin/ /{{.beat_name}}-${VERSION}-darwin-x86_64/modules.d || true
 
-mkdir -p upload
-tar czvf upload/{{.beat_name}}-${VERSION}-darwin-x86_64.tar.gz /{{.beat_name}}-${VERSION}-darwin-x86_64
-echo "Created upload/{{.beat_name}}-${VERSION}-darwin-x86_64.tar.gz"
+tar czvf /upload/{{.beat_name}}{{.beat_pkg_suffix}}-${VERSION}-darwin-x86_64.tar.gz /{{.beat_name}}-${VERSION}-darwin-x86_64
+echo "Created /upload/{{.beat_name}}-${VERSION}-darwin-x86_64.tar.gz"
 
-cd upload
-sha512sum {{.beat_name}}-${VERSION}-darwin-x86_64.tar.gz > {{.beat_name}}-${VERSION}-darwin-x86_64.tar.gz.sha512
-echo "Created upload/{{.beat_name}}-${VERSION}-darwin-x86_64.tar.gz.sha512"
+cd /upload
+sha512sum {{.beat_name}}{{.beat_pkg_suffix}}-${VERSION}-darwin-x86_64.tar.gz > {{.beat_name}}{{.beat_pkg_suffix}}-${VERSION}-darwin-x86_64.tar.gz.sha512
+echo "Created /upload/{{.beat_name}}{{.beat_pkg_suffix}}-${VERSION}-darwin-x86_64.tar.gz.sha512"

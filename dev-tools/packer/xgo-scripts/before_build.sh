@@ -45,7 +45,7 @@ PREFIX=$PREFIX make before-build
 
 # Add data to the home directory
 mkdir -p $PREFIX/homedir
-make install-home HOME_PREFIX=$PREFIX/homedir
+make install-home HOME_PREFIX=$PREFIX/homedir LICENSE_FILE=${LICENSE_FILE}
 
 if [ -n "BUILDID" ]; then
     echo "$BUILDID" > $PREFIX/homedir/.build_hash.txt

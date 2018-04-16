@@ -14,7 +14,7 @@ gotpl ${BASEDIR}/install-service.ps1.j2 < ${BUILD_DIR}/settings-$runid.yml > ${B
 gotpl ${BASEDIR}/uninstall-service.ps1.j2 < ${BUILD_DIR}/settings-$runid.yml > ${BUILD_DIR}/uninstall-service-$BEAT.ps1
 chmod +x ${BUILD_DIR}/run-$runid.sh
 
-docker run --rm -v ${BUILD_DIR}:/build \
+docker run --rm -v ${BUILD_DIR}:/build -v ${UPLOAD_DIR}:/upload \
     -e BUILDID=$BUILDID -e SNAPSHOT=$SNAPSHOT -e RUNID=$runid \
     tudorg/fpm /build/run-$runid.sh
 
