@@ -439,7 +439,6 @@ class Test(BaseTest):
 
         os.mkdir(self.working_dir + "/log/")
         self.copy_files(["logs/bom8.log"],
-                        source_dir="../files",
                         target_dir="log")
 
         filebeat = self.start_beat()

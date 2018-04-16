@@ -1,0 +1,1080 @@
+[
+  {
+    "_index": "filebeat-7.0.0-alpha1-2018.02.05",
+    "_type": "doc",
+    "_id": "2IHaZmEBQXBNR1UUaDmZ",
+    "_score": 1,
+    "_source": {
+      "@timestamp": "2018-02-05T16:44:04.007Z",
+      "offset": 326,
+      "beat": {
+        "hostname": "sleipnir",
+        "name": "sleipnir",
+        "version": "7.0.0-alpha1"
+      },
+      "prospector": {
+        "type": "log"
+      },
+      "source": "/home/n/go/src/github.com/elastic/beats/filebeat/module/mongodb/log/test/mongodb-debian-3.2.11.log",
+      "fileset": {
+        "module": "mongodb",
+        "name": "log"
+      },
+      "mongodb": {
+        "log": {
+          "severity": "I",
+          "component": "CONTROL",
+          "context": "initandlisten",
+          "message": "git version: 009580ad490190ba33d1c6253ebd8d91808923e4",
+          "timestamp": "2018-02-05T13:44:56.657+0100"
+        }
+      }
+    }
+  },
+  {
+    "_index": "filebeat-7.0.0-alpha1-2018.02.05",
+    "_type": "doc",
+    "_id": "24HaZmEBQXBNR1UUaDmZ",
+    "_score": 1,
+    "_source": {
+      "@timestamp": "2018-02-05T16:44:04.007Z",
+      "offset": 573,
+      "beat": {
+        "hostname": "sleipnir",
+        "name": "sleipnir",
+        "version": "7.0.0-alpha1"
+      },
+      "prospector": {
+        "type": "log"
+      },
+      "source": "/home/n/go/src/github.com/elastic/beats/filebeat/module/mongodb/log/test/mongodb-debian-3.2.11.log",
+      "fileset": {
+        "module": "mongodb",
+        "name": "log"
+      },
+      "mongodb": {
+        "log": {
+          "severity": "I",
+          "component": "CONTROL",
+          "context": "initandlisten",
+          "message": "modules: none",
+          "timestamp": "2018-02-05T13:44:56.657+0100"
+        }
+      }
+    }
+  },
+  {
+    "_index": "filebeat-7.0.0-alpha1-2018.02.05",
+    "_type": "doc",
+    "_id": "4IHaZmEBQXBNR1UUaDmZ",
+    "_score": 1,
+    "_source": {
+      "@timestamp": "2018-02-05T16:44:04.007Z",
+      "offset": 1482,
+      "beat": {
+        "hostname": "sleipnir",
+        "name": "sleipnir",
+        "version": "7.0.0-alpha1"
+      },
+      "prospector": {
+        "type": "log"
+      },
+      "source": "/home/n/go/src/github.com/elastic/beats/filebeat/module/mongodb/log/test/mongodb-debian-3.2.11.log",
+      "fileset": {
+        "module": "mongodb",
+        "name": "log"
+      },
+      "mongodb": {
+        "log": {
+          "severity": "I",
+          "component": "STORAGE",
+          "context": "initandlisten",
+          "message": "wiredtiger_open config: create,cache_size=8G,session_max=20000,eviction=(threads_max=4),config_base=false,statistics=(fast),log=(enabled=true,archive=true,path=journal,compressor=snappy),file_manager=(close_idle_time=100000),checkpoint=(wait=60,log_size=2GB),statistics_log=(wait=0),",
+          "timestamp": "2018-02-05T13:44:56.677+0100"
+        }
+      }
+    }
+  },
+  {
+    "_index": "filebeat-7.0.0-alpha1-2018.02.05",
+    "_type": "doc",
+    "_id": "4YHaZmEBQXBNR1UUaDmZ",
+    "_score": 1,
+    "_source": {
+      "@timestamp": "2018-02-05T16:44:04.007Z",
+      "offset": 1635,
+      "beat": {
+        "hostname": "sleipnir",
+        "name": "sleipnir",
+        "version": "7.0.0-alpha1"
+      },
+      "prospector": {
+        "type": "log"
+      },
+      "source": "/home/n/go/src/github.com/elastic/beats/filebeat/module/mongodb/log/test/mongodb-debian-3.2.11.log",
+      "message": "2018-02-05T13:44:56.724+0100 I FTDC     [initandlisten] Initializing full-time diagnostic data capture with directory '/var/lib/mongodb/diagnostic.data'",
+      "fileset": {
+        "module": "mongodb",
+        "name": "log"
+      },
+      "error": {
+        "message": "Provided Grok expressions do not match field value: [2018-02-05T13:44:56.724+0100 I FTDC     [initandlisten] Initializing full-time diagnostic data capture with directory '/var/lib/mongodb/diagnostic.data']"
+      }
+    }
+  },
+  {
+    "_index": "filebeat-7.0.0-alpha1-2018.02.05",
+    "_type": "doc",
+    "_id": "4oHaZmEBQXBNR1UUaDmZ",
+    "_score": 1,
+    "_source": {
+      "@timestamp": "2018-02-05T16:44:04.007Z",
+      "offset": 1750,
+      "beat": {
+        "hostname": "sleipnir",
+        "name": "sleipnir",
+        "version": "7.0.0-alpha1"
+      },
+      "prospector": {
+        "type": "log"
+      },
+      "source": "/home/n/go/src/github.com/elastic/beats/filebeat/module/mongodb/log/test/mongodb-debian-3.2.11.log",
+      "fileset": {
+        "module": "mongodb",
+        "name": "log"
+      },
+      "mongodb": {
+        "log": {
+          "severity": "I",
+          "component": "NETWORK",
+          "context": "HostnameCanonicalizationWorker",
+          "message": "Starting hostname canonicalization worker",
+          "timestamp": "2018-02-05T13:44:56.724+0100"
+        }
+      }
+    }
+  },
+  {
+    "_index": "filebeat-7.0.0-alpha1-2018.02.05",
+    "_type": "doc",
+    "_id": "44HaZmEBQXBNR1UUaDmZ",
+    "_score": 1,
+    "_source": {
+      "@timestamp": "2018-02-05T16:44:04.007Z",
+      "offset": 1844,
+      "beat": {
+        "hostname": "sleipnir",
+        "name": "sleipnir",
+        "version": "7.0.0-alpha1"
+      },
+      "prospector": {
+        "type": "log"
+      },
+      "source": "/home/n/go/src/github.com/elastic/beats/filebeat/module/mongodb/log/test/mongodb-debian-3.2.11.log",
+      "fileset": {
+        "module": "mongodb",
+        "name": "log"
+      },
+      "mongodb": {
+        "log": {
+          "severity": "I",
+          "component": "NETWORK",
+          "context": "initandlisten",
+          "message": "waiting for connections on port 27017",
+          "timestamp": "2018-02-05T13:44:56.744+0100"
+        }
+      }
+    }
+  },
+  {
+    "_index": "filebeat-7.0.0-alpha1-2018.02.05",
+    "_type": "doc",
+    "_id": "5YHaZmEBQXBNR1UUaDmZ",
+    "_score": 1,
+    "_source": {
+      "@timestamp": "2018-02-05T16:44:04.007Z",
+      "offset": 2072,
+      "beat": {
+        "hostname": "sleipnir",
+        "name": "sleipnir",
+        "version": "7.0.0-alpha1"
+      },
+      "prospector": {
+        "type": "log"
+      },
+      "source": "/home/n/go/src/github.com/elastic/beats/filebeat/module/mongodb/log/test/mongodb-debian-3.2.11.log",
+      "fileset": {
+        "module": "mongodb",
+        "name": "log"
+      },
+      "mongodb": {
+        "log": {
+          "severity": "I",
+          "component": "NETWORK",
+          "context": "conn1",
+          "message": "end connection 127.0.0.1:55404 (0 connections now open)",
+          "timestamp": "2018-02-05T13:50:55.170+0100"
+        }
+      }
+    }
+  },
+  {
+    "_index": "filebeat-7.0.0-alpha1-2018.02.05",
+    "_type": "doc",
+    "_id": "5oHaZmEBQXBNR1UUaDmZ",
+    "_score": 1,
+    "_source": {
+      "@timestamp": "2018-02-05T16:44:04.007Z",
+      "offset": 2196,
+      "beat": {
+        "hostname": "sleipnir",
+        "name": "sleipnir",
+        "version": "7.0.0-alpha1"
+      },
+      "prospector": {
+        "type": "log"
+      },
+      "source": "/home/n/go/src/github.com/elastic/beats/filebeat/module/mongodb/log/test/mongodb-debian-3.2.11.log",
+      "fileset": {
+        "module": "mongodb",
+        "name": "log"
+      },
+      "mongodb": {
+        "log": {
+          "severity": "I",
+          "component": "NETWORK",
+          "context": "initandlisten",
+          "message": "connection accepted from 127.0.0.1:55406 #2 (1 connection now open)",
+          "timestamp": "2018-02-05T13:50:55.487+0100"
+        }
+      }
+    }
+  },
+  {
+    "_index": "filebeat-7.0.0-alpha1-2018.02.05",
+    "_type": "doc",
+    "_id": "7oHaZmEBQXBNR1UUaDmZ",
+    "_score": 1,
+    "_source": {
+      "@timestamp": "2018-02-05T16:44:04.007Z",
+      "offset": 3077,
+      "beat": {
+        "hostname": "sleipnir",
+        "name": "sleipnir",
+        "version": "7.0.0-alpha1"
+      },
+      "prospector": {
+        "type": "log"
+      },
+      "source": "/home/n/go/src/github.com/elastic/beats/filebeat/module/mongodb/log/test/mongodb-debian-3.2.11.log",
+      "fileset": {
+        "module": "mongodb",
+        "name": "log"
+      },
+      "mongodb": {
+        "log": {
+          "severity": "I",
+          "component": "CONTROL",
+          "context": "signalProcessingThread",
+          "message": "now exiting",
+          "timestamp": "2018-02-05T14:49:45.606+0100"
+        }
+      }
+    }
+  },
+  {
+    "_index": "filebeat-7.0.0-alpha1-2018.02.05",
+    "_type": "doc",
+    "_id": "8YHaZmEBQXBNR1UUaDma",
+    "_score": 1,
+    "_source": {
+      "@timestamp": "2018-02-05T16:44:04.007Z",
+      "offset": 3374,
+      "beat": {
+        "hostname": "sleipnir",
+        "name": "sleipnir",
+        "version": "7.0.0-alpha1"
+      },
+      "prospector": {
+        "type": "log"
+      },
+      "source": "/home/n/go/src/github.com/elastic/beats/filebeat/module/mongodb/log/test/mongodb-debian-3.2.11.log",
+      "fileset": {
+        "module": "mongodb",
+        "name": "log"
+      },
+      "mongodb": {
+        "log": {
+          "severity": "I",
+          "component": "NETWORK",
+          "context": "signalProcessingThread",
+          "message": "closing listening socket: 7",
+          "timestamp": "2018-02-05T14:49:45.606+0100"
+        }
+      }
+    }
+  },
+  {
+    "_index": "filebeat-7.0.0-alpha1-2018.02.05",
+    "_type": "doc",
+    "_id": "8oHaZmEBQXBNR1UUaDma",
+    "_score": 1,
+    "_source": {
+      "@timestamp": "2018-02-05T16:44:04.007Z",
+      "offset": 3493,
+      "beat": {
+        "hostname": "sleipnir",
+        "name": "sleipnir",
+        "version": "7.0.0-alpha1"
+      },
+      "prospector": {
+        "type": "log"
+      },
+      "source": "/home/n/go/src/github.com/elastic/beats/filebeat/module/mongodb/log/test/mongodb-debian-3.2.11.log",
+      "fileset": {
+        "module": "mongodb",
+        "name": "log"
+      },
+      "mongodb": {
+        "log": {
+          "severity": "I",
+          "component": "NETWORK",
+          "context": "signalProcessingThread",
+          "message": "removing socket file: /run/mongodb/mongodb-27017.sock",
+          "timestamp": "2018-02-05T14:49:45.606+0100"
+        }
+      }
+    }
+  },
+  {
+    "_index": "filebeat-7.0.0-alpha1-2018.02.05",
+    "_type": "doc",
+    "_id": "84HaZmEBQXBNR1UUaDma",
+    "_score": 1,
+    "_source": {
+      "@timestamp": "2018-02-05T16:44:04.007Z",
+      "offset": 3594,
+      "beat": {
+        "hostname": "sleipnir",
+        "name": "sleipnir",
+        "version": "7.0.0-alpha1"
+      },
+      "prospector": {
+        "type": "log"
+      },
+      "source": "/home/n/go/src/github.com/elastic/beats/filebeat/module/mongodb/log/test/mongodb-debian-3.2.11.log",
+      "fileset": {
+        "module": "mongodb",
+        "name": "log"
+      },
+      "mongodb": {
+        "log": {
+          "severity": "I",
+          "component": "NETWORK",
+          "context": "signalProcessingThread",
+          "message": "shutdown: going to flush diaglog...",
+          "timestamp": "2018-02-05T14:49:45.606+0100"
+        }
+      }
+    }
+  },
+  {
+    "_index": "filebeat-7.0.0-alpha1-2018.02.05",
+    "_type": "doc",
+    "_id": "9IHaZmEBQXBNR1UUaDma",
+    "_score": 1,
+    "_source": {
+      "@timestamp": "2018-02-05T16:44:04.007Z",
+      "offset": 3695,
+      "beat": {
+        "hostname": "sleipnir",
+        "name": "sleipnir",
+        "version": "7.0.0-alpha1"
+      },
+      "prospector": {
+        "type": "log"
+      },
+      "source": "/home/n/go/src/github.com/elastic/beats/filebeat/module/mongodb/log/test/mongodb-debian-3.2.11.log",
+      "fileset": {
+        "module": "mongodb",
+        "name": "log"
+      },
+      "mongodb": {
+        "log": {
+          "severity": "I",
+          "component": "NETWORK",
+          "context": "signalProcessingThread",
+          "message": "shutdown: going to close sockets...",
+          "timestamp": "2018-02-05T14:49:45.606+0100"
+        }
+      }
+    }
+  },
+  {
+    "_index": "filebeat-7.0.0-alpha1-2018.02.05",
+    "_type": "doc",
+    "_id": "9oHaZmEBQXBNR1UUaDma",
+    "_score": 1,
+    "_source": {
+      "@timestamp": "2018-02-05T16:44:04.007Z",
+      "offset": 3888,
+      "beat": {
+        "hostname": "sleipnir",
+        "name": "sleipnir",
+        "version": "7.0.0-alpha1"
+      },
+      "prospector": {
+        "type": "log"
+      },
+      "source": "/home/n/go/src/github.com/elastic/beats/filebeat/module/mongodb/log/test/mongodb-debian-3.2.11.log",
+      "fileset": {
+        "module": "mongodb",
+        "name": "log"
+      },
+      "mongodb": {
+        "log": {
+          "severity": "I",
+          "component": "STORAGE",
+          "context": "signalProcessingThread",
+          "message": "shutdown: removing fs lock...",
+          "timestamp": "2018-02-05T14:49:45.688+0100"
+        }
+      }
+    }
+  },
+  {
+    "_index": "filebeat-7.0.0-alpha1-2018.02.05",
+    "_type": "doc",
+    "_id": "14HaZmEBQXBNR1UUaDmZ",
+    "_score": 1,
+    "_source": {
+      "@timestamp": "2018-02-05T16:44:04.007Z",
+      "offset": 216,
+      "beat": {
+        "hostname": "sleipnir",
+        "name": "sleipnir",
+        "version": "7.0.0-alpha1"
+      },
+      "prospector": {
+        "type": "log"
+      },
+      "source": "/home/n/go/src/github.com/elastic/beats/filebeat/module/mongodb/log/test/mongodb-debian-3.2.11.log",
+      "fileset": {
+        "module": "mongodb",
+        "name": "log"
+      },
+      "mongodb": {
+        "log": {
+          "severity": "I",
+          "component": "CONTROL",
+          "context": "initandlisten",
+          "message": "db version v3.2.11",
+          "timestamp": "2018-02-05T13:44:56.657+0100"
+        }
+      }
+    }
+  },
+  {
+    "_index": "filebeat-7.0.0-alpha1-2018.02.05",
+    "_type": "doc",
+    "_id": "3IHaZmEBQXBNR1UUaDmZ",
+    "_score": 1,
+    "_source": {
+      "@timestamp": "2018-02-05T16:44:04.007Z",
+      "offset": 648,
+      "beat": {
+        "hostname": "sleipnir",
+        "name": "sleipnir",
+        "version": "7.0.0-alpha1"
+      },
+      "prospector": {
+        "type": "log"
+      },
+      "source": "/home/n/go/src/github.com/elastic/beats/filebeat/module/mongodb/log/test/mongodb-debian-3.2.11.log",
+      "fileset": {
+        "module": "mongodb",
+        "name": "log"
+      },
+      "mongodb": {
+        "log": {
+          "severity": "I",
+          "component": "CONTROL",
+          "context": "initandlisten",
+          "message": "build environment:",
+          "timestamp": "2018-02-05T13:44:56.657+0100"
+        }
+      }
+    }
+  },
+  {
+    "_index": "filebeat-7.0.0-alpha1-2018.02.05",
+    "_type": "doc",
+    "_id": "3YHaZmEBQXBNR1UUaDmZ",
+    "_score": 1,
+    "_source": {
+      "@timestamp": "2018-02-05T16:44:04.007Z",
+      "offset": 725,
+      "beat": {
+        "hostname": "sleipnir",
+        "name": "sleipnir",
+        "version": "7.0.0-alpha1"
+      },
+      "prospector": {
+        "type": "log"
+      },
+      "source": "/home/n/go/src/github.com/elastic/beats/filebeat/module/mongodb/log/test/mongodb-debian-3.2.11.log",
+      "fileset": {
+        "module": "mongodb",
+        "name": "log"
+      },
+      "mongodb": {
+        "log": {
+          "severity": "I",
+          "component": "CONTROL",
+          "context": "initandlisten",
+          "message": "    distarch: x86_64",
+          "timestamp": "2018-02-05T13:44:56.657+0100"
+        }
+      }
+    }
+  },
+  {
+    "_index": "filebeat-7.0.0-alpha1-2018.02.05",
+    "_type": "doc",
+    "_id": "34HaZmEBQXBNR1UUaDmZ",
+    "_score": 1,
+    "_source": {
+      "@timestamp": "2018-02-05T16:44:04.007Z",
+      "offset": 1142,
+      "beat": {
+        "hostname": "sleipnir",
+        "name": "sleipnir",
+        "version": "7.0.0-alpha1"
+      },
+      "prospector": {
+        "type": "log"
+      },
+      "source": "/home/n/go/src/github.com/elastic/beats/filebeat/module/mongodb/log/test/mongodb-debian-3.2.11.log",
+      "fileset": {
+        "module": "mongodb",
+        "name": "log"
+      },
+      "mongodb": {
+        "log": {
+          "severity": "I",
+          "component": "CONTROL",
+          "context": "initandlisten",
+          "message": """options: { config: "/etc/mongodb.conf", net: { bindIp: "127.0.0.1", unixDomainSocket: { pathPrefix: "/run/mongodb" } }, storage: { dbPath: "/var/lib/mongodb", journal: { enabled: true } }, systemLog: { destination: "file", logAppend: true, path: "/var/log/mongodb/mongodb.log" } }""",
+          "timestamp": "2018-02-05T13:44:56.657+0100"
+        }
+      }
+    }
+  },
+  {
+    "_index": "filebeat-7.0.0-alpha1-2018.02.05",
+    "_type": "doc",
+    "_id": "5IHaZmEBQXBNR1UUaDmZ",
+    "_score": 1,
+    "_source": {
+      "@timestamp": "2018-02-05T16:44:04.007Z",
+      "offset": 1968,
+      "beat": {
+        "hostname": "sleipnir",
+        "name": "sleipnir",
+        "version": "7.0.0-alpha1"
+      },
+      "prospector": {
+        "type": "log"
+      },
+      "source": "/home/n/go/src/github.com/elastic/beats/filebeat/module/mongodb/log/test/mongodb-debian-3.2.11.log",
+      "fileset": {
+        "module": "mongodb",
+        "name": "log"
+      },
+      "mongodb": {
+        "log": {
+          "severity": "I",
+          "component": "NETWORK",
+          "context": "initandlisten",
+          "message": "connection accepted from 127.0.0.1:55404 #1 (1 connection now open)",
+          "timestamp": "2018-02-05T13:50:55.170+0100"
+        }
+      }
+    }
+  },
+  {
+    "_index": "filebeat-7.0.0-alpha1-2018.02.05",
+    "_type": "doc",
+    "_id": "6YHaZmEBQXBNR1UUaDmZ",
+    "_score": 1,
+    "_source": {
+      "@timestamp": "2018-02-05T16:44:04.007Z",
+      "offset": 2528,
+      "beat": {
+        "hostname": "sleipnir",
+        "name": "sleipnir",
+        "version": "7.0.0-alpha1"
+      },
+      "prospector": {
+        "type": "log"
+      },
+      "source": "/home/n/go/src/github.com/elastic/beats/filebeat/module/mongodb/log/test/mongodb-debian-3.2.11.log",
+      "fileset": {
+        "module": "mongodb",
+        "name": "log"
+      },
+      "mongodb": {
+        "log": {
+          "severity": "I",
+          "component": "NETWORK",
+          "context": "conn3",
+          "message": "end connection 127.0.0.1:55414 (0 connections now open)",
+          "timestamp": "2018-02-05T13:50:56.180+0100"
+        }
+      }
+    }
+  },
+  {
+    "_index": "filebeat-7.0.0-alpha1-2018.02.05",
+    "_type": "doc",
+    "_id": "64HaZmEBQXBNR1UUaDmZ",
+    "_score": 1,
+    "_source": {
+      "@timestamp": "2018-02-05T16:44:04.007Z",
+      "offset": 2756,
+      "beat": {
+        "hostname": "sleipnir",
+        "name": "sleipnir",
+        "version": "7.0.0-alpha1"
+      },
+      "prospector": {
+        "type": "log"
+      },
+      "source": "/home/n/go/src/github.com/elastic/beats/filebeat/module/mongodb/log/test/mongodb-debian-3.2.11.log",
+      "fileset": {
+        "module": "mongodb",
+        "name": "log"
+      },
+      "mongodb": {
+        "log": {
+          "severity": "I",
+          "component": "NETWORK",
+          "context": "conn4",
+          "message": "end connection 127.0.0.1:58336 (0 connections now open)",
+          "timestamp": "2018-02-05T14:15:42.095+0100"
+        }
+      }
+    }
+  },
+  {
+    "_index": "filebeat-7.0.0-alpha1-2018.02.05",
+    "_type": "doc",
+    "_id": "74HaZmEBQXBNR1UUaDma",
+    "_score": 1,
+    "_source": {
+      "@timestamp": "2018-02-05T16:44:04.007Z",
+      "offset": 3188,
+      "beat": {
+        "hostname": "sleipnir",
+        "name": "sleipnir",
+        "version": "7.0.0-alpha1"
+      },
+      "prospector": {
+        "type": "log"
+      },
+      "source": "/home/n/go/src/github.com/elastic/beats/filebeat/module/mongodb/log/test/mongodb-debian-3.2.11.log",
+      "fileset": {
+        "module": "mongodb",
+        "name": "log"
+      },
+      "mongodb": {
+        "log": {
+          "severity": "I",
+          "component": "NETWORK",
+          "context": "signalProcessingThread",
+          "message": "shutdown: going to close listening sockets...",
+          "timestamp": "2018-02-05T14:49:45.606+0100"
+        }
+      }
+    }
+  },
+  {
+    "_index": "filebeat-7.0.0-alpha1-2018.02.05",
+    "_type": "doc",
+    "_id": "9YHaZmEBQXBNR1UUaDma",
+    "_score": 1,
+    "_source": {
+      "@timestamp": "2018-02-05T16:44:04.007Z",
+      "offset": 3793,
+      "beat": {
+        "hostname": "sleipnir",
+        "name": "sleipnir",
+        "version": "7.0.0-alpha1"
+      },
+      "prospector": {
+        "type": "log"
+      },
+      "source": "/home/n/go/src/github.com/elastic/beats/filebeat/module/mongodb/log/test/mongodb-debian-3.2.11.log",
+      "fileset": {
+        "module": "mongodb",
+        "name": "log"
+      },
+      "mongodb": {
+        "log": {
+          "severity": "I",
+          "component": "STORAGE",
+          "context": "signalProcessingThread",
+          "message": "WiredTigerKVEngine shutting down",
+          "timestamp": "2018-02-05T14:49:45.606+0100"
+        }
+      }
+    }
+  },
+  {
+    "_index": "filebeat-7.0.0-alpha1-2018.02.05",
+    "_type": "doc",
+    "_id": "94HaZmEBQXBNR1UUaDma",
+    "_score": 1,
+    "_source": {
+      "@timestamp": "2018-02-05T16:44:04.007Z",
+      "offset": 3968,
+      "beat": {
+        "hostname": "sleipnir",
+        "name": "sleipnir",
+        "version": "7.0.0-alpha1"
+      },
+      "prospector": {
+        "type": "log"
+      },
+      "source": "/home/n/go/src/github.com/elastic/beats/filebeat/module/mongodb/log/test/mongodb-debian-3.2.11.log",
+      "fileset": {
+        "module": "mongodb",
+        "name": "log"
+      },
+      "mongodb": {
+        "log": {
+          "severity": "I",
+          "component": "CONTROL",
+          "context": "signalProcessingThread",
+          "message": "dbexit:  rc: 0",
+          "timestamp": "2018-02-05T14:49:45.688+0100"
+        }
+      }
+    }
+  },
+  {
+    "_index": "filebeat-7.0.0-alpha1-2018.02.05",
+    "_type": "doc",
+    "_id": "1oHaZmEBQXBNR1UUaDmZ",
+    "_score": 1,
+    "_source": {
+      "@timestamp": "2018-02-05T16:44:04.007Z",
+      "offset": 141,
+      "beat": {
+        "hostname": "sleipnir",
+        "name": "sleipnir",
+        "version": "7.0.0-alpha1"
+      },
+      "prospector": {
+        "type": "log"
+      },
+      "source": "/home/n/go/src/github.com/elastic/beats/filebeat/module/mongodb/log/test/mongodb-debian-3.2.11.log",
+      "fileset": {
+        "module": "mongodb",
+        "name": "log"
+      },
+      "mongodb": {
+        "log": {
+          "severity": "I",
+          "component": "CONTROL",
+          "context": "initandlisten",
+          "message": "MongoDB starting : pid=29803 port=27017 dbpath=/var/lib/mongodb 64-bit host=sleipnir",
+          "timestamp": "2018-02-05T13:44:56.657+0100"
+        }
+      }
+    }
+  },
+  {
+    "_index": "filebeat-7.0.0-alpha1-2018.02.05",
+    "_type": "doc",
+    "_id": "2YHaZmEBQXBNR1UUaDmZ",
+    "_score": 1,
+    "_source": {
+      "@timestamp": "2018-02-05T16:44:04.007Z",
+      "offset": 427,
+      "beat": {
+        "hostname": "sleipnir",
+        "name": "sleipnir",
+        "version": "7.0.0-alpha1"
+      },
+      "prospector": {
+        "type": "log"
+      },
+      "source": "/home/n/go/src/github.com/elastic/beats/filebeat/module/mongodb/log/test/mongodb-debian-3.2.11.log",
+      "fileset": {
+        "module": "mongodb",
+        "name": "log"
+      },
+      "mongodb": {
+        "log": {
+          "severity": "I",
+          "component": "CONTROL",
+          "context": "initandlisten",
+          "message": "OpenSSL version: OpenSSL 1.0.2l  25 May 2017",
+          "timestamp": "2018-02-05T13:44:56.657+0100"
+        }
+      }
+    }
+  },
+  {
+    "_index": "filebeat-7.0.0-alpha1-2018.02.05",
+    "_type": "doc",
+    "_id": "2oHaZmEBQXBNR1UUaDmZ",
+    "_score": 1,
+    "_source": {
+      "@timestamp": "2018-02-05T16:44:04.007Z",
+      "offset": 503,
+      "beat": {
+        "hostname": "sleipnir",
+        "name": "sleipnir",
+        "version": "7.0.0-alpha1"
+      },
+      "prospector": {
+        "type": "log"
+      },
+      "source": "/home/n/go/src/github.com/elastic/beats/filebeat/module/mongodb/log/test/mongodb-debian-3.2.11.log",
+      "fileset": {
+        "module": "mongodb",
+        "name": "log"
+      },
+      "mongodb": {
+        "log": {
+          "severity": "I",
+          "component": "CONTROL",
+          "context": "initandlisten",
+          "message": "allocator: tcmalloc",
+          "timestamp": "2018-02-05T13:44:56.657+0100"
+        }
+      }
+    }
+  },
+  {
+    "_index": "filebeat-7.0.0-alpha1-2018.02.05",
+    "_type": "doc",
+    "_id": "3oHaZmEBQXBNR1UUaDmZ",
+    "_score": 1,
+    "_source": {
+      "@timestamp": "2018-02-05T16:44:04.007Z",
+      "offset": 805,
+      "beat": {
+        "hostname": "sleipnir",
+        "name": "sleipnir",
+        "version": "7.0.0-alpha1"
+      },
+      "prospector": {
+        "type": "log"
+      },
+      "source": "/home/n/go/src/github.com/elastic/beats/filebeat/module/mongodb/log/test/mongodb-debian-3.2.11.log",
+      "fileset": {
+        "module": "mongodb",
+        "name": "log"
+      },
+      "mongodb": {
+        "log": {
+          "severity": "I",
+          "component": "CONTROL",
+          "context": "initandlisten",
+          "message": "    target_arch: x86_64",
+          "timestamp": "2018-02-05T13:44:56.657+0100"
+        }
+      }
+    }
+  },
+  {
+    "_index": "filebeat-7.0.0-alpha1-2018.02.05",
+    "_type": "doc",
+    "_id": "54HaZmEBQXBNR1UUaDmZ",
+    "_score": 1,
+    "_source": {
+      "@timestamp": "2018-02-05T16:44:04.007Z",
+      "offset": 2300,
+      "beat": {
+        "hostname": "sleipnir",
+        "name": "sleipnir",
+        "version": "7.0.0-alpha1"
+      },
+      "prospector": {
+        "type": "log"
+      },
+      "source": "/home/n/go/src/github.com/elastic/beats/filebeat/module/mongodb/log/test/mongodb-debian-3.2.11.log",
+      "fileset": {
+        "module": "mongodb",
+        "name": "log"
+      },
+      "mongodb": {
+        "log": {
+          "severity": "I",
+          "component": "NETWORK",
+          "context": "conn2",
+          "message": "end connection 127.0.0.1:55406 (0 connections now open)",
+          "timestamp": "2018-02-05T13:50:55.487+0100"
+        }
+      }
+    }
+  },
+  {
+    "_index": "filebeat-7.0.0-alpha1-2018.02.05",
+    "_type": "doc",
+    "_id": "6IHaZmEBQXBNR1UUaDmZ",
+    "_score": 1,
+    "_source": {
+      "@timestamp": "2018-02-05T16:44:04.007Z",
+      "offset": 2424,
+      "beat": {
+        "hostname": "sleipnir",
+        "name": "sleipnir",
+        "version": "7.0.0-alpha1"
+      },
+      "prospector": {
+        "type": "log"
+      },
+      "source": "/home/n/go/src/github.com/elastic/beats/filebeat/module/mongodb/log/test/mongodb-debian-3.2.11.log",
+      "fileset": {
+        "module": "mongodb",
+        "name": "log"
+      },
+      "mongodb": {
+        "log": {
+          "severity": "I",
+          "component": "NETWORK",
+          "context": "initandlisten",
+          "message": "connection accepted from 127.0.0.1:55414 #3 (1 connection now open)",
+          "timestamp": "2018-02-05T13:50:56.180+0100"
+        }
+      }
+    }
+  },
+  {
+    "_index": "filebeat-7.0.0-alpha1-2018.02.05",
+    "_type": "doc",
+    "_id": "6oHaZmEBQXBNR1UUaDmZ",
+    "_score": 1,
+    "_source": {
+      "@timestamp": "2018-02-05T16:44:04.007Z",
+      "offset": 2652,
+      "beat": {
+        "hostname": "sleipnir",
+        "name": "sleipnir",
+        "version": "7.0.0-alpha1"
+      },
+      "prospector": {
+        "type": "log"
+      },
+      "source": "/home/n/go/src/github.com/elastic/beats/filebeat/module/mongodb/log/test/mongodb-debian-3.2.11.log",
+      "fileset": {
+        "module": "mongodb",
+        "name": "log"
+      },
+      "mongodb": {
+        "log": {
+          "severity": "I",
+          "component": "NETWORK",
+          "context": "initandlisten",
+          "message": "connection accepted from 127.0.0.1:58336 #4 (1 connection now open)",
+          "timestamp": "2018-02-05T14:11:41.401+0100"
+        }
+      }
+    }
+  },
+  {
+    "_index": "filebeat-7.0.0-alpha1-2018.02.05",
+    "_type": "doc",
+    "_id": "7IHaZmEBQXBNR1UUaDmZ",
+    "_score": 1,
+    "_source": {
+      "@timestamp": "2018-02-05T16:44:04.007Z",
+      "offset": 2887,
+      "beat": {
+        "hostname": "sleipnir",
+        "name": "sleipnir",
+        "version": "7.0.0-alpha1"
+      },
+      "prospector": {
+        "type": "log"
+      },
+      "source": "/home/n/go/src/github.com/elastic/beats/filebeat/module/mongodb/log/test/mongodb-debian-3.2.11.log",
+      "fileset": {
+        "module": "mongodb",
+        "name": "log"
+      },
+      "mongodb": {
+        "log": {
+          "severity": "I",
+          "component": "CONTROL",
+          "context": "signalProcessingThread",
+          "message": "got signal 15 (Terminated), will terminate after current cmd ends",
+          "timestamp": "2018-02-05T14:49:45.605+0100"
+        }
+      }
+    }
+  },
+  {
+    "_index": "filebeat-7.0.0-alpha1-2018.02.05",
+    "_type": "doc",
+    "_id": "7YHaZmEBQXBNR1UUaDmZ",
+    "_score": 1,
+    "_source": {
+      "@timestamp": "2018-02-05T16:44:04.007Z",
+      "offset": 3000,
+      "beat": {
+        "hostname": "sleipnir",
+        "name": "sleipnir",
+        "version": "7.0.0-alpha1"
+      },
+      "prospector": {
+        "type": "log"
+      },
+      "source": "/home/n/go/src/github.com/elastic/beats/filebeat/module/mongodb/log/test/mongodb-debian-3.2.11.log",
+      "message": "2018-02-05T14:49:45.605+0100 I FTDC     [signalProcessingThread] Shutting down full-time diagnostic data capture",
+      "fileset": {
+        "module": "mongodb",
+        "name": "log"
+      },
+      "error": {
+        "message": "Provided Grok expressions do not match field value: [2018-02-05T14:49:45.605+0100 I FTDC     [signalProcessingThread] Shutting down full-time diagnostic data capture]"
+      }
+    }
+  },
+  {
+    "_index": "filebeat-7.0.0-alpha1-2018.02.05",
+    "_type": "doc",
+    "_id": "8IHaZmEBQXBNR1UUaDma",
+    "_score": 1,
+    "_source": {
+      "@timestamp": "2018-02-05T16:44:04.007Z",
+      "offset": 3281,
+      "beat": {
+        "hostname": "sleipnir",
+        "name": "sleipnir",
+        "version": "7.0.0-alpha1"
+      },
+      "prospector": {
+        "type": "log"
+      },
+      "source": "/home/n/go/src/github.com/elastic/beats/filebeat/module/mongodb/log/test/mongodb-debian-3.2.11.log",
+      "fileset": {
+        "module": "mongodb",
+        "name": "log"
+      },
+      "mongodb": {
+        "log": {
+          "severity": "I",
+          "component": "NETWORK",
+          "context": "signalProcessingThread",
+          "message": "closing listening socket: 6",
+          "timestamp": "2018-02-05T14:49:45.606+0100"
+        }
+      }
+    }
+  }
+]

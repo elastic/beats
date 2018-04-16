@@ -12,21 +12,33 @@ type Logger struct {
 	sugar *zap.SugaredLogger
 }
 
-// NewLogger returns a new Logger labeled with the name of the selector. This
-// should never be used from any global contexts (instead create "per instance"
-// loggers).
-func NewLogger(selector string, options ...LogOption) *Logger {
-	log := loadLogger().rootLogger.
+func newLogger(rootLogger *zap.Logger, selector string, options ...LogOption) *Logger {
+	log := rootLogger.
 		WithOptions(zap.AddCallerSkip(1)).
 		WithOptions(options...).
 		Named(selector)
 	return &Logger{log.Sugar()}
 }
 
+// NewLogger returns a new Logger labeled with the name of the selector. This
+// should never be used from any global contexts, otherwise you will receive a
+// no-op Logger. This is because the logp package needs to be initialized first.
+// Instead create new Logger instance that your object reuses. Or if you need to
+// log from a static context then you may use logp.L().Infow(), for example.
+func NewLogger(selector string, options ...LogOption) *Logger {
+	return newLogger(loadLogger().rootLogger, selector, options...)
+}
+
 // With creates a child logger and adds structured context to it. Fields added
 // to the child don't affect the parent, and vice versa.
 func (l *Logger) With(args ...interface{}) *Logger {
 	return &Logger{l.sugar.With(args...)}
+}
+
+// Named adds a new path segment to the logger's name. Segments are joined by
+// periods.
+func (l *Logger) Named(name string) *Logger {
+	return &Logger{l.sugar.Named(name)}
 }
 
 // Sprint
@@ -163,4 +175,9 @@ func (l *Logger) Panicw(msg string, keysAndValues ...interface{}) {
 // Field such as logp.Stringer.
 func (l *Logger) DPanicw(msg string, keysAndValues ...interface{}) {
 	l.sugar.DPanicw(msg, keysAndValues...)
+}
+
+// L returns an unnamed global logger.
+func L() *Logger {
+	return loadLogger().logger
 }

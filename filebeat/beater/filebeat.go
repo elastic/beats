@@ -35,8 +35,7 @@ const pipelinesWarning = "Filebeat is unable to load the Ingest Node pipelines f
 	" can ignore this warning."
 
 var (
-	once            = flag.Bool("once", false, "Run filebeat only once until all harvesters reach EOF")
-	updatePipelines = flag.Bool("update-pipelines", false, "Update Ingest pipelines")
+	once = flag.Bool("once", false, "Run filebeat only once until all harvesters reach EOF")
 )
 
 // Filebeat is a beater object. Contains all objects needed to run the beat
@@ -127,7 +126,31 @@ func New(b *beat.Beat, rawConfig *common.Config) (beat.Beater, error) {
 	b.SetupMLCallback = func(b *beat.Beat, kibanaConfig *common.Config) error {
 		return fb.loadModulesML(b, kibanaConfig)
 	}
+
+	err = fb.setupPipelineLoaderCallback(b)
+	if err != nil {
+		return nil, err
+	}
+
 	return fb, nil
+}
+
+func (fb *Filebeat) setupPipelineLoaderCallback(b *beat.Beat) error {
+	if !fb.moduleRegistry.Empty() {
+		overwritePipelines := fb.config.OverwritePipelines
+		if b.InSetupCmd {
+			overwritePipelines = true
+		}
+
+		b.OverwritePipelinesCallback = func(esConfig *common.Config) error {
+			esClient, err := elasticsearch.NewConnectedClient(esConfig)
+			if err != nil {
+				return err
+			}
+			return fb.moduleRegistry.LoadPipelines(esClient, overwritePipelines)
+		}
+	}
+	return nil
 }
 
 // loadModulesPipelines is called when modules are configured to do the initial
@@ -138,10 +161,15 @@ func (fb *Filebeat) loadModulesPipelines(b *beat.Beat) error {
 		return nil
 	}
 
+	overwritePipelines := fb.config.OverwritePipelines
+	if b.InSetupCmd {
+		overwritePipelines = true
+	}
+
 	// register pipeline loading to happen every time a new ES connection is
 	// established
 	callback := func(esClient *elasticsearch.Client) error {
-		return fb.moduleRegistry.LoadPipelines(esClient, *updatePipelines)
+		return fb.moduleRegistry.LoadPipelines(esClient, overwritePipelines)
 	}
 	elasticsearch.RegisterConnectCallback(callback)
 
@@ -314,11 +342,11 @@ func (fb *Filebeat) Run(b *beat.Beat) error {
 		logp.Warn(pipelinesWarning)
 	}
 
-	if *updatePipelines {
+	if config.OverwritePipelines {
 		logp.Debug("modules", "Existing Ingest pipelines will be updated")
 	}
 
-	err = crawler.Start(registrar, config.ConfigInput, config.ConfigModules, pipelineLoaderFactory, *updatePipelines)
+	err = crawler.Start(registrar, config.ConfigInput, config.ConfigModules, pipelineLoaderFactory, config.OverwritePipelines)
 	if err != nil {
 		crawler.Stop()
 		return err
