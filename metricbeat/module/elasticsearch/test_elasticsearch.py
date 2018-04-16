@@ -1,6 +1,11 @@
+import re
+import sys
 import os
-import metricbeat
 import unittest
+
+sys.path.append(os.path.join(os.path.dirname(__file__), '../../tests/system'))
+
+import metricbeat
 
 
 class Test(metricbeat.BaseTest):
