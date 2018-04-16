@@ -1,31 +1,52 @@
-FROM java:8-jre
+FROM centos:7
+LABEL maintainer "Elastic Docker Team <docker@elastic.co>"
 
-RUN apt-get update && \
-    apt-get install -y netcat
-
+# Beats variables.
 ARG DOWNLOAD_URL
 ARG ELASTIC_VERSION
 ARG CACHE_BUST=1
+ARG IMAGE_FLAVOR=x-pack
 
-ENV URL ${DOWNLOAD_URL}/logstash/logstash-${ELASTIC_VERSION}.tar.gz
-ENV PATH $PATH:/opt/logstash-${ELASTIC_VERSION}/bin
+# Install Java and the "which" command, which is needed by Logstash's shell
+# scripts.
+RUN yum update -y && yum install -y java-1.8.0-openjdk-devel which && \
+    yum clean all
 
-# As all snapshot builds have the same url, the image is cached. The date at then can be used to invalidate the image
-RUN set -x && \
-    cd /opt && \
-    wget -qO logstash.tar.gz $URL?${CACHE_BUST} && \
-    tar xzf logstash.tar.gz
+# Provide a non-root user to run the process.
+RUN groupadd --gid 1000 logstash && \
+    adduser --uid 1000 --gid 1000 \
+      --home-dir /usr/share/logstash --no-create-home \
+      logstash
 
+# Add Logstash itself.
+COPY download.sh /download.sh
+RUN /download.sh $DOWNLOAD_URL $ELASTIC_VERSION $CACHE_BUST && rm /download.sh
+RUN tar zxf logstash-${ELASTIC_VERSION}.tar.gz -C /usr/share && \
+    mv /usr/share/logstash-${ELASTIC_VERSION} /usr/share/logstash && \
+    chown --recursive logstash:logstash /usr/share/logstash/ && \
+    ln -s /usr/share/logstash /opt/logstash
 
-COPY logstash.conf.tmpl /logstash.conf.tmpl
-COPY docker-entrypoint.sh /entrypoint.sh
+WORKDIR /usr/share/logstash
 
-COPY pki /etc/pki
+ENV ELASTIC_CONTAINER true
+ENV PATH=/usr/share/logstash/bin:$PATH
 
-HEALTHCHECK --interval=1s --retries=600 CMD nc -z localhost 5044
+# Provide a minimal configuration, so that simple invocations will provide
+# a good experience.
+ADD config/pipelines.yml config/pipelines.yml
+ADD config/logstash-${IMAGE_FLAVOR}.yml config/logstash.yml
+ADD config/log4j2.properties config/
+ADD pipeline/default.conf pipeline/logstash.conf
+ADD pki /etc/pki
+RUN chown --recursive logstash:logstash config/ pipeline/
 
-ENTRYPOINT ["/entrypoint.sh"]
+# Ensure Logstash gets a UTF-8 locale by default.
+ENV LANG='en_US.UTF-8' LC_ALL='en_US.UTF-8'
+
+HEALTHCHECK --interval=1s --retries=600 CMD curl -f http://localhost:9600/_node/stats
 
 EXPOSE 5044 5055 9600
 
-CMD logstash -f /logstash.conf --log.level=debug --config.debug --http.host=0.0.0.0
+COPY docker-entrypoint.sh /entrypoint.sh
+ENTRYPOINT ["/entrypoint.sh"]
+CMD logstash
