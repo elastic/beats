@@ -78,6 +78,7 @@ https://github.com/elastic/beats/compare/v6.0.0-beta2...master[Check the HEAD di
 - Fix Windows perfmon metricset so that it sends metrics when an error occurs. {pull}6542[6542]
 - Fix Kubernetes calculated fields store. {pull}6564{6564}
 - Exclude bind mounts in fsstat and filesystem metricsets. {pull}6819[6819]
+- Don't stop Metricbeat if aerospike server is down. {pull}6874[6874]
 
 *Packetbeat*
 
