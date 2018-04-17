@@ -280,6 +280,8 @@ func (r *Registrar) writeRegistry() error {
 		return err
 	}
 
+	// Commit the changes to storage to avoid corrupt registry files
+	f.Sync()
 	// Directly close file because of windows
 	f.Close()
 
