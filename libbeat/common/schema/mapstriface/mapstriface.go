@@ -208,7 +208,7 @@ func Float(key string, opts ...schema.SchemaOption) schema.Conv {
 func toFloat(key string, data map[string]interface{}) (interface{}, error) {
 	emptyIface, exists := data[key]
 	if !exists {
-		return 0, fmt.Errorf("Key %s not found", key)
+		return 0, fmt.Errorf("key %s not found", key)
 	}
 	switch emptyIface.(type) {
 	case float64:
