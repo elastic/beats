@@ -20,13 +20,6 @@ type Metadata struct {
 	Truncated  bool
 }
 
-// Config options for the UDPServer
-type Config struct {
-	Host           string        `config:"host"`
-	MaxMessageSize int           `config:"max_message_size" validate:"positive,nonzero"`
-	Timeout        time.Duration `config:"timeout"`
-}
-
 // Server creates a simple UDP Server and listen to a specific host:port and will send any
 // event received to the callback method.
 type Server struct {
