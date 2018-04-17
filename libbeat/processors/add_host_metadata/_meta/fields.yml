@@ -32,9 +32,11 @@
           description: >
             OS family (e.g. redhat, debian, freebsd, windows).
         - name: net.ip
+          type: ip
           description: >
             List of IP-addresses.
         - name: net.hw
+          type: keyword
           description: >
             List of hardware-addresses, usually MAC-addresses.
 
