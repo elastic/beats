@@ -46,6 +46,8 @@ NOTE: When dashboard loading is enabled, {beatname_uc} overwrites any existing
 dashboards that match the names of the dashboards you are loading. This happens
 every time {beatname_uc} starts. 
 
+If no other options are set, the dashboard are loaded
+from the local `kibana` directory in the home path of the {beatname_uc} installation.
 To load dashboards from a different location, you can configure one of the
 following options: <<directory-option,`setup.dashboards.directory`>>,
 <<url-option,`setup.dashboards.url`>>, or
