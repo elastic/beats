@@ -39,53 +39,45 @@ func TestFetchEventContents(t *testing.T) {
 
 	t.Logf("%s/%s event: %+v", f.Module().Name(), f.Name(), event.StringToPrint())
 
-	assert.EqualValues(t, "exchange.name", event["name"])
-	assert.EqualValues(t, "/", event["vhost"])
-	assert.EqualValues(t, true, event["durable"])
-	assert.EqualValues(t, false, event["auto_delete"])
-	assert.EqualValues(t, false, event["internal"])
+	messagesExpected := common.MapStr{
+		"publish": common.MapStr{
+			"count": int64(123),
+			"details": common.MapStr{"rate": float64(0.1)},
+		},
+		"publish_in": common.MapStr{
+			"count": int64(100),
+			"details": common.MapStr{"rate": float64(0.5)},
+		},
+		"publish_out": common.MapStr{
+			"count": int64(99),
+			"details": common.MapStr{"rate": float64(0.9)},
+		},
+		"ack": common.MapStr{
+			"count": int64(60),
+			"details": common.MapStr{"rate": float64(12.5)},
+		},
+		"deliver_get": common.MapStr{
+			"count": int64(50),
+			"details": common.MapStr{"rate": float64(43.21)},
+		},
+		"confirm": common.MapStr{
+			"count": int64(120),
+			"details": common.MapStr{"rate": float64(98.63)},
+		},
+		"return_unroutable": common.MapStr{
+			"count": int64(40),
+			"details": common.MapStr{"rate": float64(123)},
+		},
+		"redeliver": common.MapStr{
+			"count": int64(30),
+			"details": common.MapStr{"rate": float64(0)},
+		},
+	}
 
-	messages := event["messages"].(common.MapStr)
-	publish := messages["publish"].(common.MapStr)
-	publishIn := messages["publish_in"].(common.MapStr)
-	publishOut := messages["publish_out"].(common.MapStr)
-	ack := messages["ack"].(common.MapStr)
-	deliverGet := messages["deliver_get"].(common.MapStr)
-	confirm := messages["confirm"].(common.MapStr)
-	returnUnroutable := messages["return_unroutable"].(common.MapStr)
-	redeliver := messages["redeliver"].(common.MapStr)
-
-	assert.EqualValues(t, 123, publish["count"])
-	assert.EqualValues(t, 100, publishIn["count"])
-	assert.EqualValues(t, 99, publishOut["count"])
-	assert.EqualValues(t, 60, ack["count"])
-	assert.EqualValues(t, 50, deliverGet["count"])
-	assert.EqualValues(t, 120, confirm["count"])
-	assert.EqualValues(t, 40, returnUnroutable["count"])
-	assert.EqualValues(t, 30, redeliver["count"])
-
-	publishDetails := publish["details"].(common.MapStr)
-	assert.EqualValues(t, 0.1, publishDetails["rate"])
-
-	publishInDetails := publishIn["details"].(common.MapStr)
-	assert.EqualValues(t, 0.5, publishInDetails["rate"])
-
-	publishOutDetails := publishOut["details"].(common.MapStr)
-	assert.EqualValues(t, 0.9, publishOutDetails["rate"])
-
-	ackDetails := ack["details"].(common.MapStr)
-	assert.EqualValues(t, 12.5, ackDetails["rate"])
-
-	deliverGetDetails := deliverGet["details"].(common.MapStr)
-	assert.EqualValues(t, 43.21, deliverGetDetails["rate"])
-
-	confirmDetails := confirm["details"].(common.MapStr)
-	assert.EqualValues(t, 98.63, confirmDetails["rate"])
-
-	returnUnroutableDetails := returnUnroutable["details"].(common.MapStr)
-	assert.EqualValues(t, 123, returnUnroutableDetails["rate"])
-
-	redeliverDetails := redeliver["details"].(common.MapStr)
-	assert.EqualValues(t, 0, redeliverDetails["rate"])
-
+	assert.Equal(t, "exchange.name", event["name"])
+	assert.Equal(t, "/", event["vhost"])
+	assert.Equal(t, true, event["durable"])
+	assert.Equal(t, false, event["auto_delete"])
+	assert.Equal(t, false, event["internal"])
+	assert.Equal(t, messagesExpected, event["messages"])
 }
