@@ -22,9 +22,7 @@
 
 ifeval::["{has_ml_jobs}"=="yes"]
 :setup-command-short-desc: Sets up the initial environment, including the index template, Kibana dashboards (when available), and machine learning jobs (when available)
-endif::[]
-
-ifeval::["{has_ml_jobs}"!="yes"]
+else::[]
 :setup-command-short-desc: Sets up the initial environment, including the index template, Kibana dashboards (when available)
 endif::[]
 
@@ -450,8 +448,11 @@ Or:
 * The index template ensures that fields are mapped correctly in Elasticsearch.
 * The Kibana dashboards make it easier for you to visualize {beatname_uc} data
 in Kibana.
+
+ifeval::["{has_ml_jobs}"=="yes"]
 * The machine learning jobs contain the configuration information and metadata
 necessary to analyze data for anomalies.
+endif::[]
 
 Use this command instead of `run --setup` when you want to set up the
 environment without actually running {beatname_uc} and ingesting data.
@@ -472,8 +473,10 @@ Sets up the Kibana dashboards only.
 *`-h, --help`*::
 Shows help for the `setup` command.
 
+ifeval::["{has_ml_jobs}"=="yes"]
 *`--machine-learning`*::
 Sets up machine learning job configurations only.
+endif::[]
 
 ifeval::["{beatname_lc}"=="filebeat"]
 
