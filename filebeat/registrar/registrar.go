@@ -206,8 +206,10 @@ func (r *Registrar) onEvents(states []file.State) {
 	r.gcRequired = r.gcEnabled
 }
 
-// gcStates runs a registry Cleanup. The bool returned indicates wether more
-// events in the registry can be gc'ed in the future.
+// gcStates runs a registry Cleanup. The method check if more event in the
+// registry can be gc'ed in the future. If no potential removable state is found,
+// the gcEnabled flag is set to false, indicating the current registrar state being
+// stable. New registry update events can re-enable state gc'ing.
 func (r *Registrar) gcStates() {
 	if !r.gcRequired {
 		return

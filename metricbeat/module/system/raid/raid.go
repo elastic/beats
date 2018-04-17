@@ -14,9 +14,9 @@ import (
 )
 
 func init() {
-	if err := mb.Registry.AddMetricSet("system", "raid", New, parse.EmptyHostParser); err != nil {
-		panic(err)
-	}
+	mb.Registry.MustAddMetricSet("system", "raid", New,
+		mb.WithHostParser(parse.EmptyHostParser),
+	)
 }
 
 // MetricSet contains proc fs data.
@@ -27,7 +27,7 @@ type MetricSet struct {
 
 // New creates a new instance of the raid metricset.
 func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
-	cfgwarn.Experimental("The system raid metricset is experimental")
+	cfgwarn.Beta("The system raid metricset is beta")
 
 	systemModule, ok := base.Module().(*system.Module)
 	if !ok {

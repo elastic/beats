@@ -1,0 +1,55 @@
+:type: tcp
+
+[id="{beatname_lc}-input-{type}"]
+=== TCP input
+
+++++
+<titleabbrev>TCP</titleabbrev>
+++++
+
+Use the `TCP` input to read events over TCP.
+
+Example configuration:
+
+["source","yaml",subs="attributes"]
+----
+{beatname_lc}.inputs:
+- type: tcp
+  max_message_size: 10240
+  host: "localhost:9000"
+----
+
+
+==== Configuration options
+
+The `tcp` input supports the following configuration options plus the
+<<{beatname_lc}-input-{type}-common-options>> described later.
+
+[float]
+[id="{beatname_lc}-input-{type}-max-message-size"]
+==== `max_message_size`
+
+The maximum size of the message received over TCP. The default is `20MiB`.
+
+[float]
+[id="{beatname_lc}-input-{type}-host"]
+==== `host`
+
+The host and TCP port to listen on for event streams.
+
+[float]
+[id="{beatname_lc}-input-{type}-line-delimiter"]
+==== `line_delimiter`
+
+Specify the characters used to split the incoming events. The default is '\n'.
+
+[float]
+[id="{beatname_lc}-input-{type}-timeout"]
+==== `timeout`
+
+The number of seconds of inactivity before a remote connection is closed. The default is `300s`.
+
+[id="{beatname_lc}-input-{type}-common-options"]
+include::../inputs/input-common-options.asciidoc[]
+
+:type!:

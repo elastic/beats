@@ -353,6 +353,7 @@ func enrichData(msg *AuditMessage) error {
 		}
 	case AUDIT_PATH:
 		parseSELinuxContext("obj", msg.fields)
+		hexDecode("name", msg.fields)
 	case AUDIT_USER_LOGIN:
 		// acct only exists in failed logins.
 		hexDecode("acct", msg.fields)

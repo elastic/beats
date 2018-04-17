@@ -1,4 +1,2 @@
 - module: elasticsearch
-  metricsets: ["node", "node_stats"]
-  period: 10s
   hosts: ["localhost:9200"]

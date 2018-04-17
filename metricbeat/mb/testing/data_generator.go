@@ -78,9 +78,11 @@ func StandardizeEvent(ms mb.MetricSet, e mb.Event, modifiers ...mb.EventModifier
 	}
 
 	e.Timestamp = startTime
-	e.Namespace = ms.Registration().Namespace
 	e.Took = 115 * time.Microsecond
 	e.Host = ms.Host()
+	if e.Namespace == "" {
+		e.Namespace = ms.Registration().Namespace
+	}
 
 	fullEvent := e.BeatEvent(ms.Module().Name(), ms.Name(), modifiers...)
 

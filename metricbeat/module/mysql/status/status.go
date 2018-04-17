@@ -22,9 +22,10 @@ var (
 )
 
 func init() {
-	if err := mb.Registry.AddMetricSet("mysql", "status", New, mysql.ParseDSN); err != nil {
-		panic(err)
-	}
+	mb.Registry.MustAddMetricSet("mysql", "status", New,
+		mb.WithHostParser(mysql.ParseDSN),
+		mb.DefaultMetricSet(),
+	)
 }
 
 // MetricSet for fetching MySQL server status.

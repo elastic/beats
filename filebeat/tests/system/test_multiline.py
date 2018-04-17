@@ -24,7 +24,6 @@ class Test(BaseTest):
 
         os.mkdir(self.working_dir + "/log/")
         self.copy_files(["logs/elasticsearch-multiline-log.log"],
-                        source_dir="../files",
                         target_dir="log")
 
         proc = self.start_beat()
@@ -55,7 +54,6 @@ class Test(BaseTest):
 
         os.mkdir(self.working_dir + "/log/")
         self.copy_files(["logs/multiline-c-log.log"],
-                        source_dir="../files",
                         target_dir="log")
 
         proc = self.start_beat()
@@ -132,7 +130,6 @@ connection <0.23893.109>, channel 3 - soft error:
 
         os.mkdir(self.working_dir + "/log/")
         self.copy_files(["logs/elasticsearch-multiline-log.log"],
-                        source_dir="../files",
                         target_dir="log")
 
         proc = self.start_beat()
@@ -215,7 +212,6 @@ connection <0.23893.109>, channel 3 - soft error:
 
         os.mkdir(self.working_dir + "/log/")
         self.copy_files(["logs/elasticsearch-multiline-log.log"],
-                        source_dir="../files",
                         target_dir="log")
 
         proc = self.start_beat()

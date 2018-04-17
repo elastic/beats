@@ -1,6 +1,10 @@
 package includes
 
 import (
+	// import queue types
+	_ "github.com/elastic/beats/libbeat/publisher/queue/memqueue"
+	_ "github.com/elastic/beats/libbeat/publisher/queue/spool"
+
 	// load supported output plugins
 	_ "github.com/elastic/beats/libbeat/outputs/console"
 	_ "github.com/elastic/beats/libbeat/outputs/elasticsearch"

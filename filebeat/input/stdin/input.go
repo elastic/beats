@@ -73,7 +73,9 @@ func (p *Input) createHarvester(state file.State) (*log.Harvester, error) {
 	h, err := log.NewHarvester(
 		p.cfg,
 		state, nil, nil,
-		p.outlet,
+		func() channel.Outleter {
+			return p.outlet
+		},
 	)
 
 	return h, err

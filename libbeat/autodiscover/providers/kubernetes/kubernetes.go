@@ -62,22 +62,14 @@ func AutodiscoverBuilder(bus bus.Bus, c *common.Config) (autodiscover.Provider, 
 		return nil, err
 	}
 
-	var builders autodiscover.Builders
-	for _, bcfg := range config.Builders {
-		if builder, err := autodiscover.Registry.BuildBuilder(bcfg); err != nil {
-			logp.Info("kubernetes: failed to construct autodiscover builder due to error: %v", err)
-		} else {
-			builders = append(builders, builder)
-		}
+	builders, err := autodiscover.NewBuilders(config.Builders, config.HintsEnabled)
+	if err != nil {
+		return nil, err
 	}
 
-	var appenders autodiscover.Appenders
-	for _, acfg := range config.Appenders {
-		if appender, err := autodiscover.Registry.BuildAppender(acfg); err != nil {
-			logp.Info("kubernetes: failed to construct autodiscover appender due to error: %v", err)
-		} else {
-			appenders = append(appenders, appender)
-		}
+	appenders, err := autodiscover.NewAppenders(config.Appenders)
+	if err != nil {
+		return nil, err
 	}
 
 	p := &Provider{
