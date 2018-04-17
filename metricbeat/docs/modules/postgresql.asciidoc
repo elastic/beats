@@ -8,6 +8,8 @@ This file is generated! See scripts/docs_collector.py
 This module periodically fetches metrics from
 https://www.postgresql.org/[PostgreSQL] servers.
 
+Default metricsets are `activity`, `bgwriter` and `database`.
+
 [float]
 === Module-specific configuration notes
 
@@ -64,6 +66,7 @@ in <<configuration-metricbeat>>. Here is an example configuration:
 ----
 metricbeat.modules:
 - module: postgresql
+  enabled: true
   metricsets:
     # Stats about every PostgreSQL database
     - database

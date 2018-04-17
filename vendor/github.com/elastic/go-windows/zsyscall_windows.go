@@ -40,6 +40,8 @@ var (
 
 	procGetNativeSystemInfo     = modkernel32.NewProc("GetNativeSystemInfo")
 	procGetTickCount64          = modkernel32.NewProc("GetTickCount64")
+	procGetSystemTimes          = modkernel32.NewProc("GetSystemTimes")
+	procGlobalMemoryStatusEx    = modkernel32.NewProc("GlobalMemoryStatusEx")
 	procGetFileVersionInfoW     = modversion.NewProc("GetFileVersionInfoW")
 	procGetFileVersionInfoSizeW = modversion.NewProc("GetFileVersionInfoSizeW")
 	procVerQueryValueW          = modversion.NewProc("VerQueryValueW")
@@ -61,6 +63,30 @@ func _GetTickCount64() (millis uint64, err error) {
 	r0, _, e1 := syscall.Syscall(procGetTickCount64.Addr(), 0, 0, 0, 0)
 	millis = uint64(r0)
 	if millis == 0 {
+		if e1 != 0 {
+			err = errnoErr(e1)
+		} else {
+			err = syscall.EINVAL
+		}
+	}
+	return
+}
+
+func _GetSystemTimes(idleTime *syscall.Filetime, kernelTime *syscall.Filetime, userTime *syscall.Filetime) (err error) {
+	r1, _, e1 := syscall.Syscall(procGetSystemTimes.Addr(), 3, uintptr(unsafe.Pointer(idleTime)), uintptr(unsafe.Pointer(kernelTime)), uintptr(unsafe.Pointer(userTime)))
+	if r1 == 0 {
+		if e1 != 0 {
+			err = errnoErr(e1)
+		} else {
+			err = syscall.EINVAL
+		}
+	}
+	return
+}
+
+func _GlobalMemoryStatusEx(buffer *MemoryStatusEx) (err error) {
+	r1, _, e1 := syscall.Syscall(procGlobalMemoryStatusEx.Addr(), 1, uintptr(unsafe.Pointer(buffer)), 0, 0)
+	if r1 == 0 {
 		if e1 != 0 {
 			err = errnoErr(e1)
 		} else {

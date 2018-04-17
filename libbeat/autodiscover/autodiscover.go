@@ -16,7 +16,6 @@ const debugK = "autodiscover"
 
 // Adapter must be implemented by the beat in order to provide Autodiscover
 type Adapter interface {
-	// TODO Hints
 
 	// CreateConfig generates a valid list of configs from the given event, the received event will have all keys defined by `StartFilter`
 	CreateConfig(bus.Event) ([]*common.Config, error)

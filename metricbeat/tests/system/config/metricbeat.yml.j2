@@ -111,8 +111,7 @@ metricbeat.autodiscover:
   - type: {{provider}}
     {%- if settings %}
     {%- for k, v in settings.items() %}
-    {{k}}:
-      {{v | default([])}}
+    {{k}}: {{v | default([])}}
     {%- endfor %}
     {%- endif %}
   {%- endfor %}

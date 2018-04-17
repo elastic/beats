@@ -45,11 +45,6 @@ file to override the default paths for logs:
 -----
 
 
-// REVIEWERS: I must be doing something wrong with the config settings. The
-// above config works, but when I try to specify var.kafka_home, it doesn't
-// seem to have any effect. 
-
-
 To specify the same settings at the command line, you use:
 
 ["source","sh",subs="attributes"]
@@ -65,14 +60,6 @@ include::../include/config-option-intro.asciidoc[]
 
 [float]
 ==== `log` fileset settings
-
-// REVIEWERS: I've added a description because this variable appears in the
-// kafka.yml file. However, I don't understand how it works.
-
-//*`var.kafka_home`*::
-
-//The home path for Kafka. If this variable is not set,  {beatname_uc} looks under
-//`/opt`.
 
 include::../include/var-paths.asciidoc[]
 

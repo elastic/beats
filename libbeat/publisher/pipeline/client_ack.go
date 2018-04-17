@@ -13,7 +13,7 @@ type clientACKer struct {
 }
 
 func (p *Pipeline) makeACKer(
-	withProcessors bool,
+	canDrop bool,
 	cfg *beat.ClientConfig,
 	waitClose time.Duration,
 ) acker {
@@ -25,17 +25,17 @@ func (p *Pipeline) makeACKer(
 	sema := p.eventSema
 	switch {
 	case cfg.ACKCount != nil:
-		acker = bld.createCountACKer(withProcessors, sema, cfg.ACKCount)
+		acker = bld.createCountACKer(canDrop, sema, cfg.ACKCount)
 	case cfg.ACKEvents != nil:
-		acker = bld.createEventACKer(withProcessors, sema, cfg.ACKEvents)
+		acker = bld.createEventACKer(canDrop, sema, cfg.ACKEvents)
 	case cfg.ACKLastEvent != nil:
 		cb := lastEventACK(cfg.ACKLastEvent)
-		acker = bld.createEventACKer(withProcessors, sema, cb)
+		acker = bld.createEventACKer(canDrop, sema, cb)
 	default:
 		if waitClose <= 0 {
-			return bld.createPipelineACKer(withProcessors, sema)
+			return bld.createPipelineACKer(canDrop, sema)
 		}
-		acker = bld.createCountACKer(withProcessors, sema, func(_ int) {})
+		acker = bld.createCountACKer(canDrop, sema, func(_ int) {})
 	}
 
 	if waitClose <= 0 {

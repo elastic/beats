@@ -81,7 +81,9 @@ output.elasticsearch:
 
 ==== Compatibility
 
-This output works with all compatible versions of Elasticsearch. See "Supported Beats Versions" in the https://www.elastic.co/support/matrix#show_compatibility[Elastic Support Matrix].
+This output works with all compatible versions of Elasticsearch. See the
+https://www.elastic.co/support/matrix#matrix_compatibility[Elastic Support
+Matrix].
 
 ==== Configuration options
 
@@ -256,7 +258,7 @@ Example elasticsearch output with `pipelines`:
 
 ["source","yaml"]
 ------------------------------------------------------------------------------
-filebeat.prospectors:
+filebeat.inputs:
 - type: log
   paths: ["/var/log/app/normal/*.log"]
   fields:
@@ -401,7 +403,9 @@ will be similar to events directly indexed by Beats into Elasticsearch.
 
 ==== Compatibility
 
-This output works with all compatible versions of Logstash. See "Supported Beats Versions" in the https://www.elastic.co/support/matrix#show_compatibility[Elastic Support Matrix].
+This output works with all compatible versions of Logstash. See the
+https://www.elastic.co/support/matrix#matrix_compatibility[Elastic Support
+Matrix].
 
 ==== Configuration options
 

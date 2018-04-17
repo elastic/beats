@@ -2,6 +2,3 @@
   metricsets: ["node", "queue", "connection", "exchange"]
   period: 10s
   hosts: ["localhost:15672"]
-
-  username: guest
-  password: guest

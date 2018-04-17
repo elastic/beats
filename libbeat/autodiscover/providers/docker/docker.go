@@ -48,22 +48,14 @@ func AutodiscoverBuilder(bus bus.Bus, c *common.Config) (autodiscover.Provider, 
 		return nil, err
 	}
 
-	var builders autodiscover.Builders
-	for _, bcfg := range config.Builders {
-		if builder, err := autodiscover.Registry.BuildBuilder(bcfg); err != nil {
-			logp.Info("docker: failed to construct autodiscover builder due to error: %v", err)
-		} else {
-			builders = append(builders, builder)
-		}
+	builders, err := autodiscover.NewBuilders(config.Builders, config.HintsEnabled)
+	if err != nil {
+		return nil, err
 	}
 
-	var appenders autodiscover.Appenders
-	for _, acfg := range config.Appenders {
-		if appender, err := autodiscover.Registry.BuildAppender(acfg); err != nil {
-			logp.Info("docker: failed to construct autodiscover appender due to error: %v", err)
-		} else {
-			appenders = append(appenders, appender)
-		}
+	appenders, err := autodiscover.NewAppenders(config.Appenders)
+	if err != nil {
+		return nil, err
 	}
 
 	start := watcher.ListenStart()
@@ -166,6 +158,7 @@ func (d *Provider) publish(event bus.Event) {
 	if config := d.templates.GetConfig(event); config != nil {
 		event["config"] = config
 	} else {
+		// If no template matches, try builders:
 		if config := d.builders.GetConfig(d.generateHints(event)); config != nil {
 			event["config"] = config
 		}
@@ -173,6 +166,7 @@ func (d *Provider) publish(event bus.Event) {
 
 	// Call all appenders to append any extra configuration
 	d.appenders.Append(event)
+
 	d.bus.Publish(event)
 }
 

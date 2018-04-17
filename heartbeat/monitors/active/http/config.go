@@ -5,6 +5,7 @@ import (
 	"strings"
 	"time"
 
+	"github.com/elastic/beats/libbeat/common/match"
 	"github.com/elastic/beats/libbeat/outputs"
 
 	"github.com/elastic/beats/heartbeat/monitors"
@@ -52,7 +53,7 @@ type responseParameters struct {
 	// expected HTTP response configuration
 	Status      uint16            `config:"status" verify:"min=0, max=699"`
 	RecvHeaders map[string]string `config:"headers"`
-	RecvBody    string            `config:"body"`
+	RecvBody    []match.Matcher   `config:"body"`
 }
 
 type compressionConfig struct {
@@ -74,7 +75,7 @@ var defaultConfig = Config{
 		Response: responseParameters{
 			Status:      0,
 			RecvHeaders: nil,
-			RecvBody:    "",
+			RecvBody:    []match.Matcher{},
 		},
 	},
 }

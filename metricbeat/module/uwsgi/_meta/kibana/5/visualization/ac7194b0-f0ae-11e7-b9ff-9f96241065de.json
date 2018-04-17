@@ -1,0 +1,10 @@
+{
+  "description": "",
+  "kibanaSavedObjectMeta": {
+    "searchSourceJSON": "{}"
+  },
+  "title": "Memory usage [Metricbeat uWSGI]",
+  "uiStateJSON": "{}",
+  "version": 1,
+  "visState": "{\"type\":\"timelion\",\"title\":\"Memory usage [Metricbeat uWSGI]\",\"params\":{\"expression\":\".es(metric=max:uwsgi.status.worker.rss).label('Currently used (rss)').title('Memory usage'),.es(metric=max:uwsgi.status.worker.vsz).label('Assigned (vsz)').yaxis(2)\",\"interval\":\"15s\"}}"
+}

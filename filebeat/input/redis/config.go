@@ -7,7 +7,6 @@ import (
 )
 
 var defaultConfig = config{
-
 	ForwarderConfig: harvester.ForwarderConfig{
 		Type: "redis",
 	},

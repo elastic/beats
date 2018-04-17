@@ -5,7 +5,7 @@ This file is generated! See scripts/docs_collector.py
 [[metricbeat-metricset-uwsgi-status]]
 === uwsgi status metricset
 
-experimental[]
+beta[]
 
 include::../../../module/uwsgi/status/_meta/docs.asciidoc[]
 
