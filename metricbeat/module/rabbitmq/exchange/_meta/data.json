@@ -1,0 +1,24 @@
+{
+    "@timestamp": "2017-10-12T08:05:34.853Z",
+    "beat": {
+        "hostname": "host.example.com",
+        "name": "host.example.com"
+    },
+    "metricset": {
+        "host": "localhost:15672",
+        "module": "rabbitmq",
+        "name": "exchange",
+        "rtt": 115
+    },
+    "rabbitmq": {
+        "exchange": {
+            "arguments": {},
+            "auto_delete": false,
+            "durable": true,
+            "internal": false,
+            "name": "",
+            "type": "direct",
+            "vhost": "/"
+        }
+    }
+}

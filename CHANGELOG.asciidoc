@@ -193,6 +193,7 @@ https://github.com/elastic/beats/compare/v6.0.0-beta2...master[Check the HEAD di
 - Added support for haproxy 1.7 and 1.8. {pull}6793[6793]
 - Add accumulated I/O stats to diskio in the line of `docker stats`. {pull}6701[6701]
 - Ignore virtual filesystem types by default in system module. {pull}6819[6819]
+- Add exchanges metricset to the RabbitMQ module {issue}6442[6442] {pull}6607[6607]
 
 *Packetbeat*
 

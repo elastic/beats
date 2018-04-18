@@ -1,2 +1,4 @@
 - module: rabbitmq
+  metricsets: ["connection", "exchange", "node", "queue"]
+  period: 10s
   hosts: ["localhost:15672"]

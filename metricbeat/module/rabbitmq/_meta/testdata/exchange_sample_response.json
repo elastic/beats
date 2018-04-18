@@ -1,0 +1,45 @@
+[
+    {
+        "message_stats": {
+            "publish": 123,
+            "publish_details": {
+                "rate": 0.1
+            },
+            "publish_in": 100,
+            "publish_in_details": {
+                "rate": 0.5
+            },
+            "publish_out": 99,
+            "publish_out_details": {
+                "rate": 0.9
+            },
+            "ack": 60,
+            "ack_details": {
+                "rate": 12.5
+            },
+            "deliver_get": 50,
+            "deliver_get_details": {
+                "rate": 43.21
+            },
+            "confirm": 120,
+            "confirm_details": {
+                "rate": 98.63
+            },
+            "return_unroutable": 40,
+            "return_unroutable_details": {
+                "rate": 123
+            },
+            "redeliver": 30,
+            "redeliver_details": {
+                "rate": 0
+            }
+        },
+        "name": "exchange.name",
+        "vhost": "/",
+        "type": "fanout",
+        "durable": true,
+        "auto_delete": false,
+        "internal": false,
+        "arguments": {}
+    }
+]
