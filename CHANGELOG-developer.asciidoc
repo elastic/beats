@@ -3,7 +3,12 @@
 :issue: https://github.com/elastic/beats/issues/
 :pull: https://github.com/elastic/beats/pull/
 
-This changelog is intended for community Beats developers. It covers the major breaking changes to the interal API's in the official Beats and changes around developing a Beat like generators or `fields.yml`. Only the major changes will be covered in this changelog which are expected to affect community developers. Each breaking change added here should have an explanation on how other Beats should be migrated.
+This changelog is intended for community Beat developers. It covers the major
+breaking changes to the internal APIs in the official Beats and changes related
+to developing a Beat like code generators or `fields.yml`. Only the major
+changes will be covered in this changelog that are expected to affect community
+developers. Each breaking change added here should have an explanation on how
+other Beats should be migrated.
 
 Note: This changelog was only started after the 6.3 release.
 
