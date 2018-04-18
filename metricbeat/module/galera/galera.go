@@ -1,7 +1,6 @@
 /*
 Package galera is Metricbeat module for Galera Cluster.
 */
-
 package galera
 
 import (

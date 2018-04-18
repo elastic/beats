@@ -10,7 +10,7 @@ import (
 
 var (
 	// Schema for mapping all Galera-Status-Variables
-	schema_full = s.Schema{
+	schemaFull = s.Schema{
 		"apply": s.Object{
 			"oooe": c.Float("wsrep_apply_oooe"),
 			"oool": c.Float("wsrep_apply_oool"),
@@ -77,7 +77,7 @@ var (
 	}
 
 	// Schema for mapping Galera-Status-Variables related to cluster health
-	schema_small = s.Schema{
+	schemaSmall = s.Schema{
 		"local" : s.Object{
 			"state" : c.Str("wsrep_local_state_comment"),
 		},
@@ -135,9 +135,9 @@ func rawEventMapping(status map[string]string, queryMode string) (common.MapStr,
 func getSchemaforMode(queryMode string) (s.Schema, error) {
 	switch queryMode {
 	case "full":
-		return schema_full, nil
+		return schemaFull, nil
 	case "small":
-		return schema_small, nil
+		return schemaSmall, nil
 	default:
 		return nil, fmt.Errorf("Illegal query mode: %s", queryMode)
 	}
