@@ -46,10 +46,10 @@ var (
 		},
 		"disk": s.Object{
 			"reads": s.Object{
-				"count": c.Int("disk_reads"),
+				"count": c.Int("disk_reads", s.Optional),
 			},
 			"writes": s.Object{
-				"count": c.Int("disk_writes"),
+				"count": c.Int("disk_writes", s.Optional),
 			},
 		},
 	}
