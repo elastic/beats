@@ -12,7 +12,7 @@ func defaultConfig() config {
 		"type": "docker",
 		"containers": map[string]interface{}{
 			"ids": []string{
-				"${data.docker.container.id}",
+				"${data.container.id}",
 			},
 		},
 	}
