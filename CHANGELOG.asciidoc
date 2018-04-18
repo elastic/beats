@@ -57,6 +57,7 @@ https://github.com/elastic/beats/compare/v6.0.0-beta2...master[Check the HEAD di
 *Auditbeat*
 
 - Add hex decoding for the name field in audit path records. {pull}6687[6687]
+- Fixed a deadlock in the file_integrity module under Windows. {issue}6864[6864]
 
 *Filebeat*
 
