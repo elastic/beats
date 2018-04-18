@@ -1,12 +1,14 @@
 package hints
 
 import (
+	"path/filepath"
 	"testing"
 
 	"github.com/stretchr/testify/assert"
 
 	"github.com/elastic/beats/libbeat/common"
 	"github.com/elastic/beats/libbeat/common/bus"
+	"github.com/elastic/beats/libbeat/paths"
 )
 
 func TestGenerateHints(t *testing.T) {
@@ -117,14 +119,167 @@ func TestGenerateHints(t *testing.T) {
 				},
 			},
 		},
+		{
+			msg: "Hint with module should attach input to its filesets",
+			event: bus.Event{
+				"host": "1.2.3.4",
+				"kubernetes": common.MapStr{
+					"container": common.MapStr{
+						"name": "foobar",
+						"id":   "abc",
+					},
+				},
+				"container": common.MapStr{
+					"name": "foobar",
+					"id":   "abc",
+				},
+				"hints": common.MapStr{
+					"logs": common.MapStr{
+						"module": "apache2",
+					},
+				},
+			},
+			len: 1,
+			result: common.MapStr{
+				"module": "apache2",
+				"error": map[string]interface{}{
+					"enabled": true,
+					"input": map[string]interface{}{
+						"type": "docker",
+						"containers": map[string]interface{}{
+							"stream": "all",
+							"ids":    []interface{}{"abc"},
+						},
+					},
+				},
+				"access": map[string]interface{}{
+					"enabled": true,
+					"input": map[string]interface{}{
+						"type": "docker",
+						"containers": map[string]interface{}{
+							"stream": "all",
+							"ids":    []interface{}{"abc"},
+						},
+					},
+				},
+			},
+		},
+		{
+			msg: "Hint with module should honor defined filesets",
+			event: bus.Event{
+				"host": "1.2.3.4",
+				"kubernetes": common.MapStr{
+					"container": common.MapStr{
+						"name": "foobar",
+						"id":   "abc",
+					},
+				},
+				"container": common.MapStr{
+					"name": "foobar",
+					"id":   "abc",
+				},
+				"hints": common.MapStr{
+					"logs": common.MapStr{
+						"module":  "apache2",
+						"fileset": "access",
+					},
+				},
+			},
+			len: 1,
+			result: common.MapStr{
+				"module": "apache2",
+				"access": map[string]interface{}{
+					"enabled": true,
+					"input": map[string]interface{}{
+						"type": "docker",
+						"containers": map[string]interface{}{
+							"stream": "all",
+							"ids":    []interface{}{"abc"},
+						},
+					},
+				},
+				"error": map[string]interface{}{
+					"enabled": false,
+					"input": map[string]interface{}{
+						"type": "docker",
+						"containers": map[string]interface{}{
+							"stream": "all",
+							"ids":    []interface{}{"abc"},
+						},
+					},
+				},
+			},
+		},
+		{
+			msg: "Hint with module should honor defined filesets with streams",
+			event: bus.Event{
+				"host": "1.2.3.4",
+				"kubernetes": common.MapStr{
+					"container": common.MapStr{
+						"name": "foobar",
+						"id":   "abc",
+					},
+				},
+				"container": common.MapStr{
+					"name": "foobar",
+					"id":   "abc",
+				},
+				"hints": common.MapStr{
+					"logs": common.MapStr{
+						"module":         "apache2",
+						"fileset.stdout": "access",
+						"fileset.stderr": "error",
+					},
+				},
+			},
+			len: 1,
+			result: common.MapStr{
+				"module": "apache2",
+				"access": map[string]interface{}{
+					"enabled": true,
+					"input": map[string]interface{}{
+						"type": "docker",
+						"containers": map[string]interface{}{
+							"stream": "stdout",
+							"ids":    []interface{}{"abc"},
+						},
+					},
+				},
+				"error": map[string]interface{}{
+					"enabled": true,
+					"input": map[string]interface{}{
+						"type": "docker",
+						"containers": map[string]interface{}{
+							"stream": "stderr",
+							"ids":    []interface{}{"abc"},
+						},
+					},
+				},
+			},
+		},
 	}
 
 	for _, test := range tests {
-		cfg := defaultConfig()
-		l := logHints{
-			Key:    cfg.Key,
-			Config: cfg.Config,
+		cfg, _ := common.NewConfigFrom(map[string]interface{}{
+			"type": "docker",
+			"containers": map[string]interface{}{
+				"ids": []string{
+					"${data.container.id}",
+				},
+			},
+		})
+
+		// Configure path for modules access
+		abs, _ := filepath.Abs("../../..")
+		err := paths.InitPaths(&paths.Path{
+			Home: abs,
+		})
+
+		l, err := NewLogHints(cfg)
+		if err != nil {
+			t.Fatal(err)
 		}
+
 		cfgs := l.CreateConfig(test.event)
 		assert.Equal(t, len(cfgs), test.len, test.msg)
 
@@ -133,7 +288,7 @@ func TestGenerateHints(t *testing.T) {
 			err := cfgs[0].Unpack(&config)
 			assert.Nil(t, err, test.msg)
 
-			assert.Equal(t, config, test.result, test.msg)
+			assert.Equal(t, test.result, config, test.msg)
 		}
 
 	}

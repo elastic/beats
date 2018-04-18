@@ -409,3 +409,10 @@ func (reg *ModuleRegistry) ModuleNames() []string {
 	}
 	return modules
 }
+
+// ModuleFilesets return the list of available filesets for the given module
+// it returns an empty list if the module doesn't exist
+func (reg *ModuleRegistry) ModuleFilesets(module string) ([]string, error) {
+	modulesPath := paths.Resolve(paths.Home, "module")
+	return getModuleFilesets(modulesPath, module)
+}
