@@ -339,27 +339,30 @@ class TestCase(unittest.TestCase, ComposeMixin):
 
     def wait_log_contains(self, msg, logfile=None,
                           max_timeout=10, poll_interval=0.1,
-                          name="log_contains"):
+                          name="log_contains",
+                          ignore_case=False):
         self.wait_until(
-            cond=lambda: self.log_contains(msg, logfile),
+            cond=lambda: self.log_contains(msg, logfile, ignore_case=ignore_case),
             max_timeout=max_timeout,
             poll_interval=poll_interval,
             name=name)
 
-    def log_contains(self, msg, logfile=None):
+    def log_contains(self, msg, logfile=None, ignore_case=False):
         """
         Returns true if the give logfile contains the given message.
         Note that the msg must be present in a single line.
         """
 
-        return self.log_contains_count(msg, logfile) > 0
+        return self.log_contains_count(msg, logfile, ignore_case=ignore_case) > 0
 
-    def log_contains_count(self, msg, logfile=None):
+    def log_contains_count(self, msg, logfile=None, ignore_case=False):
         """
         Returns the number of appearances of the given string in the log file
         """
 
         counter = 0
+        if ignore_case:
+            msg = msg.lower()
 
         # Init defaults
         if logfile is None:
@@ -368,6 +371,8 @@ class TestCase(unittest.TestCase, ComposeMixin):
         try:
             with open(os.path.join(self.working_dir, logfile), "r") as f:
                 for line in f:
+                    if ignore_case:
+                        line = line.lower()
                     if line.find(msg) >= 0:
                         counter = counter + 1
         except IOError:

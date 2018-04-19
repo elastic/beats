@@ -543,7 +543,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 --------------------------------------------------------------------
 Dependency: github.com/fsnotify/fsnotify
-Revision: 4da3e2cfbabc9f751898f250b49f2439785783a1
+Revision: c9bbe1f46f1da9904baf3916a4ba4aec7f1e9000
 License type (autodetected): BSD-3-Clause
 ./vendor/github.com/fsnotify/fsnotify/LICENSE:
 --------------------------------------------------------------------
