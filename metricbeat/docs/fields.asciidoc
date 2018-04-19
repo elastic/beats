@@ -34,6 +34,7 @@ grouped in the following categories:
 * <<exported-fields-kibana>>
 * <<exported-fields-kubernetes-processor>>
 * <<exported-fields-kubernetes>>
+* <<exported-fields-kvm>>
 * <<exported-fields-logstash>>
 * <<exported-fields-memcached>>
 * <<exported-fields-mongodb>>
@@ -7847,6 +7848,74 @@ Free inodes
 type: long
 
 Total inodes
+
+
+--
+
+[[exported-fields-kvm]]
+== kvm fields
+
+experimental[]
+kvm module
+
+
+
+[float]
+== kvm fields
+
+
+
+
+[float]
+== dommemstat fields
+
+dommemstat
+
+
+
+[float]
+== stat fields
+
+Memory stat
+
+
+
+*`kvm.dommemstat.stat.name`*::
++
+--
+type: keyword
+
+Memory stat name
+
+
+--
+
+*`kvm.dommemstat.stat.value`*::
++
+--
+type: long
+
+Memory stat value
+
+
+--
+
+*`kvm.dommemstat.id`*::
++
+--
+type: long
+
+Domain id
+
+
+--
+
+*`kvm.dommemstat.name`*::
++
+--
+type: keyword
+
+Domain name
 
 
 --
