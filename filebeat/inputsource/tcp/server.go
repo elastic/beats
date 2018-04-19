@@ -89,7 +89,7 @@ func (s *Server) run() {
 			s.log,
 			s.callback,
 			s.splitFunc,
-			s.config.MaxMessageSize,
+			uint64(s.config.MaxMessageSize),
 			s.config.Timeout,
 		)
 

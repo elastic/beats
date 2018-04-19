@@ -18,7 +18,7 @@ type client struct {
 	done           chan struct{}
 	metadata       Metadata
 	splitFunc      bufio.SplitFunc
-	maxReadMessage size
+	maxMessageSize uint64
 	timeout        time.Duration
 }
 
@@ -27,7 +27,7 @@ func newClient(
 	log *logp.Logger,
 	callback CallbackFunc,
 	splitFunc bufio.SplitFunc,
-	maxReadMessage size,
+	maxReadMessage uint64,
 	timeout time.Duration,
 ) *client {
 	client := &client{
@@ -36,7 +36,7 @@ func newClient(
 		callback:       callback,
 		done:           make(chan struct{}),
 		splitFunc:      splitFunc,
-		maxReadMessage: maxReadMessage,
+		maxMessageSize: maxReadMessage,
 		timeout:        timeout,
 		metadata: Metadata{
 			RemoteAddr: conn.RemoteAddr(),
@@ -46,7 +46,7 @@ func newClient(
 }
 
 func (c *client) handle() error {
-	r := NewResetableLimitedReader(NewDeadlineReader(c.conn, c.timeout), uint64(c.maxReadMessage))
+	r := NewResetableLimitedReader(NewDeadlineReader(c.conn, c.timeout), c.maxMessageSize)
 	buf := bufio.NewReader(r)
 	scanner := bufio.NewScanner(buf)
 	scanner.Split(c.splitFunc)

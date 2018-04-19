@@ -3,6 +3,8 @@ package udp
 import (
 	"time"
 
+	"github.com/dustin/go-humanize"
+
 	"github.com/elastic/beats/filebeat/harvester"
 	"github.com/elastic/beats/filebeat/inputsource/udp"
 )
@@ -12,7 +14,7 @@ var defaultConfig = config{
 		Type: "udp",
 	},
 	Config: udp.Config{
-		MaxMessageSize: 10240,
+		MaxMessageSize: 10 * humanize.KiByte,
 		// TODO: What should be default port?
 		Host: "localhost:8080",
 		// TODO: What should be the default timeout?
