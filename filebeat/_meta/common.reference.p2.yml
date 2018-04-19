@@ -239,7 +239,7 @@ filebeat.inputs:
   #enabled: false
 
   # Maximum size of the message received over UDP
-  #max_message_size: 10240
+  #max_message_size: 10KiB
 
 #------------------------------ TCP prospector --------------------------------
 # Experimental: Config options for the TCP input
