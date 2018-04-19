@@ -963,10 +963,11 @@
 			"tree": true
 		},
 		{
-			"checksumSHA1": "x2Km0Qy3WgJJnV19Zv25VwTJcBM=",
+			"checksumSHA1": "xGjYGUfsd36pm3CqdV/RYT87xxM=",
+			"origin": "github.com/adriansr/fsnotify",
 			"path": "github.com/fsnotify/fsnotify",
-			"revision": "4da3e2cfbabc9f751898f250b49f2439785783a1",
-			"revisionTime": "2017-03-29T04:21:07Z"
+			"revision": "c9bbe1f46f1da9904baf3916a4ba4aec7f1e9000",
+			"revisionTime": "2018-04-17T23:40:13Z"
 		},
 		{
 			"checksumSHA1": "2UmMbNHc8FBr98mJFN1k8ISOIHk=",
