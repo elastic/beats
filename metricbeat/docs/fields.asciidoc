@@ -2649,6 +2649,28 @@ Total CPU usage.
 
 --
 
+*`docker.cpu.core.*.pct`*::
++
+--
+type: object
+
+format: percentage
+
+Percentage of CPU time in this core.
+
+
+--
+
+*`docker.cpu.core.*.ticks`*::
++
+--
+type: object
+
+Number of CPU ticks in this core.
+
+
+--
+
 [float]
 == diskio fields
 
