@@ -317,6 +317,18 @@ Setting `bulk_max_size` to values less than or equal to 0 disables the
 splitting of batches. When splitting is disabled, the queue decides on the
 number of events to be contained in a batch.
 
+===== `backoff.init`
+
+The number of seconds to wait before attempting to connect to Elasticsearch
+after an initial connection error. The default is 1s. If additional errors
+occur, the wait time is increased exponentially for each try until `backoff.max`
+is met.
+
+===== `backoff.max`
+
+The maximum number of seconds to wait before attempting to connect to
+Elasticsearch after a connection error. The default is 60s.
+
 ===== `timeout`
 
 The http request timeout in seconds for the Elasticsearch request. The default is 90.
@@ -580,6 +592,18 @@ The number of events to be sent increases up to `bulk_max_size` if no error is e
 On error the number of events per transaction is reduced again.
 
 The default is `false`.
+
+===== `backoff.init`
+
+The number of seconds to wait before attempting to connect to Logstash
+after an initial connection error. The default is 1s. If additional errors
+occur, the wait time is increased exponentially for each try until `backoff.max`
+is met.
+
+===== `backoff.max`
+
+The maximum number of seconds to wait before attempting to connect to
+Logstash after a connection error. The default is 60s.
 
 [[kafka-output]]
 === Configure the Kafka output
