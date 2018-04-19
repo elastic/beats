@@ -7,6 +7,7 @@ import (
 
 	"github.com/pkg/errors"
 
+	"github.com/elastic/beats/filebeat/inputsource"
 	"github.com/elastic/beats/libbeat/logp"
 )
 
@@ -14,20 +15,20 @@ import (
 type client struct {
 	conn           net.Conn
 	log            *logp.Logger
-	callback       CallbackFunc
+	callback       inputsource.NetworkFunc
 	done           chan struct{}
-	metadata       Metadata
+	metadata       inputsource.NetworkMetadata
 	splitFunc      bufio.SplitFunc
-	maxReadMessage size
+	maxMessageSize uint64
 	timeout        time.Duration
 }
 
 func newClient(
 	conn net.Conn,
 	log *logp.Logger,
-	callback CallbackFunc,
+	callback inputsource.NetworkFunc,
 	splitFunc bufio.SplitFunc,
-	maxReadMessage size,
+	maxReadMessage uint64,
 	timeout time.Duration,
 ) *client {
 	client := &client{
@@ -36,9 +37,9 @@ func newClient(
 		callback:       callback,
 		done:           make(chan struct{}),
 		splitFunc:      splitFunc,
-		maxReadMessage: maxReadMessage,
+		maxMessageSize: maxReadMessage,
 		timeout:        timeout,
-		metadata: Metadata{
+		metadata: inputsource.NetworkMetadata{
 			RemoteAddr: conn.RemoteAddr(),
 		},
 	}
@@ -46,7 +47,7 @@ func newClient(
 }
 
 func (c *client) handle() error {
-	r := NewResetableLimitedReader(NewDeadlineReader(c.conn, c.timeout), uint64(c.maxReadMessage))
+	r := NewResetableLimitedReader(NewDeadlineReader(c.conn, c.timeout), c.maxMessageSize)
 	buf := bufio.NewReader(r)
 	scanner := bufio.NewScanner(buf)
 	scanner.Split(c.splitFunc)

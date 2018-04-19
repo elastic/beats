@@ -9,6 +9,8 @@ import (
 
 	"github.com/dustin/go-humanize"
 	"github.com/joeshaw/multierror"
+
+	"github.com/elastic/beats/libbeat/common/cfgtype"
 )
 
 type config struct {
@@ -18,18 +20,18 @@ type config struct {
 }
 
 type pathConfig struct {
-	Path        string      `config:"path"`
-	Permissions os.FileMode `config:"permissions"`
-	MaxSize     size        `config:"size"`
-	PageSize    size        `config:"page_size"`
-	Prealloc    bool        `config:"prealloc"`
+	Path        string           `config:"path"`
+	Permissions os.FileMode      `config:"permissions"`
+	MaxSize     cfgtype.ByteSize `config:"size"`
+	PageSize    cfgtype.ByteSize `config:"page_size"`
+	Prealloc    bool             `config:"prealloc"`
 }
 
 type writeConfig struct {
-	BufferSize   size          `config:"buffer_size"`
-	FlushEvents  time.Duration `config:"flush.events"`
-	FlushTimeout time.Duration `config:"flush.timeout"`
-	Codec        codecID       `config:"codec"`
+	BufferSize   cfgtype.ByteSize `config:"buffer_size"`
+	FlushEvents  time.Duration    `config:"flush.events"`
+	FlushTimeout time.Duration    `config:"flush.timeout"`
+	Codec        codecID          `config:"codec"`
 }
 
 type readConfig struct {
@@ -56,8 +58,6 @@ func defaultConfig() config {
 		},
 	}
 }
-
-type size uint64
 
 func (c *pathConfig) Validate() error {
 	var errs multierror.Errors
@@ -92,16 +92,6 @@ func (c *writeConfig) Validate() error {
 }
 
 func (c *readConfig) Validate() error {
-	return nil
-}
-
-func (s *size) Unpack(value string) error {
-	sz, err := humanize.ParseBytes(value)
-	if err != nil {
-		return err
-	}
-
-	*s = size(sz)
 	return nil
 }
 
