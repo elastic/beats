@@ -30,11 +30,9 @@ func TestGenerateHints(t *testing.T) {
 				},
 			},
 			result: bus.Event{
-				"docker": common.MapStr{
-					"container": common.MapStr{
-						"id":   "abc",
-						"name": "foobar",
-					},
+				"container": common.MapStr{
+					"id":   "abc",
+					"name": "foobar",
 				},
 			},
 		},
@@ -55,15 +53,13 @@ func TestGenerateHints(t *testing.T) {
 				},
 			},
 			result: bus.Event{
-				"docker": common.MapStr{
-					"container": common.MapStr{
-						"id":   "abc",
-						"name": "foobar",
-						"labels": getNestedAnnotations(common.MapStr{
-							"do.not.include":          "true",
-							"co.elastic.logs/disable": "true",
-						}),
-					},
+				"container": common.MapStr{
+					"id":   "abc",
+					"name": "foobar",
+					"labels": getNestedAnnotations(common.MapStr{
+						"do.not.include":          "true",
+						"co.elastic.logs/disable": "true",
+					}),
 				},
 				"hints": common.MapStr{
 					"logs": common.MapStr{

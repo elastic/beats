@@ -1,5 +1,15 @@
 # Changelog
 
+## v1.4.7 / 2018-01-09
+
+* BSD/macOS: Fix possible deadlock on closing the watcher on kqueue (thanks @nhooyr and @glycerine)
+* Tests: Fix missing verb on format string (thanks @rchiossi)
+* Linux: Fix deadlock in Remove (thanks @aarondl)
+* Linux: Watch.Add improvements (avoid race, fix consistency, reduce garbage) (thanks @twpayne)
+* Docs: Moved FAQ into the README (thanks @vahe)
+* Linux: Properly handle inotify's IN_Q_OVERFLOW event (thanks @zeldovich)
+* Docs: replace references to OS X with macOS
+
 ## v1.4.2 / 2016-10-10
 
 * Linux: use InotifyInit1 with IN_CLOEXEC to stop leaking a file descriptor to a child process when using fork/exec [#178](https://github.com/fsnotify/fsnotify/pull/178) (thanks @pattyshack)

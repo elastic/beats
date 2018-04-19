@@ -572,10 +572,21 @@ func (p *Input) isCleanInactive(state file.State) bool {
 	return false
 }
 
+// subOutletWrap returns a factory method that will wrap the passed outlet
+// in a SubOutlet and memoize the result so the wrapping is done only once.
+func subOutletWrap(outlet channel.Outleter) func() channel.Outleter {
+	var subOutlet channel.Outleter
+	return func() channel.Outleter {
+		if subOutlet == nil {
+			subOutlet = channel.SubOutlet(outlet)
+		}
+		return subOutlet
+	}
+}
+
 // createHarvester creates a new harvester instance from the given state
 func (p *Input) createHarvester(state file.State, onTerminate func()) (*Harvester, error) {
 	// Each wraps the outlet, for closing the outlet individually
-	outlet := channel.SubOutlet(p.outlet)
 	h, err := NewHarvester(
 		p.cfg,
 		state,
@@ -583,7 +594,7 @@ func (p *Input) createHarvester(state file.State, onTerminate func()) (*Harveste
 		func(d *util.Data) bool {
 			return p.stateOutlet.OnEvent(d)
 		},
-		outlet,
+		subOutletWrap(p.outlet),
 	)
 	if err == nil {
 		h.onTerminate = onTerminate

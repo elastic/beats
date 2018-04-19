@@ -2,6 +2,7 @@ package tcp
 
 import (
 	"fmt"
+	"sync"
 	"time"
 
 	"github.com/elastic/beats/libbeat/common"
@@ -22,10 +23,21 @@ const (
 )
 
 type TCP struct {
-	id        uint32
-	streams   *common.Cache
-	portMap   map[uint16]protos.Protocol
-	protocols protos.Protocols
+	id           uint32
+	streams      *common.Cache
+	portMap      map[uint16]protos.Protocol
+	protocols    protos.Protocols
+	expiredConns expirationQueue
+}
+
+type expiredConnection struct {
+	mod  protos.ExpirationAwareTCPPlugin
+	conn *TCPConnection
+}
+
+type expirationQueue struct {
+	mutex sync.Mutex
+	conns []expiredConnection
 }
 
 type Processor interface {
@@ -131,6 +143,8 @@ func (tcp *TCP) Process(id *flows.FlowID, tcphdr *layers.TCP, pkt *protos.Packet
 	// This Recover should catch all exceptions in
 	// protocol modules.
 	defer logp.Recover("Process tcp exception")
+
+	tcp.expiredConns.notifyAll()
 
 	stream, created := tcp.getStream(pkt)
 	if stream.conn == nil {
@@ -298,14 +312,53 @@ func NewTCP(p protos.Protocols) (*TCP, error) {
 	tcp := &TCP{
 		protocols: p,
 		portMap:   portMap,
-		streams: common.NewCache(
-			protos.DefaultTransactionExpiration,
-			protos.DefaultTransactionHashSize),
 	}
+	tcp.streams = common.NewCacheWithRemovalListener(
+		protos.DefaultTransactionExpiration,
+		protos.DefaultTransactionHashSize,
+		tcp.removalListener)
+
 	tcp.streams.StartJanitor(protos.DefaultTransactionExpiration)
 	if isDebug {
 		debugf("tcp", "Port map: %v", portMap)
 	}
 
 	return tcp, nil
+}
+
+func (tcp *TCP) removalListener(_ common.Key, value common.Value) {
+	conn := value.(*TCPConnection)
+	mod := conn.tcp.protocols.GetTCP(conn.protocol)
+	if mod != nil {
+		awareMod, ok := mod.(protos.ExpirationAwareTCPPlugin)
+		if ok {
+			tcp.expiredConns.add(awareMod, conn)
+		}
+	}
+}
+
+func (ec *expiredConnection) notify() {
+	ec.mod.Expired(&ec.conn.tcptuple, ec.conn.data)
+}
+
+func (eq *expirationQueue) add(mod protos.ExpirationAwareTCPPlugin, conn *TCPConnection) {
+	eq.mutex.Lock()
+	eq.conns = append(eq.conns, expiredConnection{
+		mod:  mod,
+		conn: conn,
+	})
+	eq.mutex.Unlock()
+}
+
+func (eq *expirationQueue) getExpired() (conns []expiredConnection) {
+	eq.mutex.Lock()
+	conns, eq.conns = eq.conns, nil
+	eq.mutex.Unlock()
+	return conns
+}
+
+func (eq *expirationQueue) notifyAll() {
+	for _, expiration := range eq.getExpired() {
+		expiration.notify()
+	}
 }

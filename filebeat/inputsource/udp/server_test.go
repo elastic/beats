@@ -7,6 +7,8 @@ import (
 	"time"
 
 	"github.com/stretchr/testify/assert"
+
+	"github.com/elastic/beats/filebeat/inputsource"
 )
 
 const maxMessageSize = 20
@@ -14,7 +16,7 @@ const timeout = time.Second * 15
 
 type info struct {
 	message []byte
-	mt      Metadata
+	mt      inputsource.NetworkMetadata
 }
 
 func TestReceiveEventFromUDP(t *testing.T) {
@@ -38,7 +40,7 @@ func TestReceiveEventFromUDP(t *testing.T) {
 	ch := make(chan info)
 	host := "localhost:0"
 	config := &Config{Host: host, MaxMessageSize: maxMessageSize, Timeout: timeout}
-	fn := func(message []byte, metadata Metadata) {
+	fn := func(message []byte, metadata inputsource.NetworkMetadata) {
 		ch <- info{message: message, mt: metadata}
 	}
 	s := New(config, fn)

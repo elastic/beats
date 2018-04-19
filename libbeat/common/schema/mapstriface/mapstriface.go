@@ -193,9 +193,43 @@ func toInteger(key string, data map[string]interface{}) (interface{}, error) {
 		if err == nil {
 			return int64(f64), nil
 		}
-		return 0, fmt.Errorf("Expected integer, found json.Number (%v) that cannot be converted", num)
+		return 0, fmt.Errorf("expected integer, found json.Number (%v) that cannot be converted", num)
 	default:
-		return 0, fmt.Errorf("Expected integer, found %T", emptyIface)
+		return 0, fmt.Errorf("expected integer, found %T", emptyIface)
+	}
+}
+
+// Float creates a Conv object for converting floats. Acceptable input
+// types are int64, int, and float64.
+func Float(key string, opts ...schema.SchemaOption) schema.Conv {
+	return schema.SetOptions(schema.Conv{Key: key, Func: toFloat}, opts)
+}
+
+func toFloat(key string, data map[string]interface{}) (interface{}, error) {
+	emptyIface, exists := data[key]
+	if !exists {
+		return 0, fmt.Errorf("key %s not found", key)
+	}
+	switch emptyIface.(type) {
+	case float64:
+		return emptyIface.(float64), nil
+	case int:
+		return float64(emptyIface.(int)), nil
+	case int64:
+		return float64(emptyIface.(int64)), nil
+	case json.Number:
+		num := emptyIface.(json.Number)
+		i64, err := num.Float64()
+		if err == nil {
+			return i64, nil
+		}
+		f64, err := num.Float64()
+		if err == nil {
+			return f64, nil
+		}
+		return 0, fmt.Errorf("expected float, found json.Number (%v) that cannot be converted", num)
+	default:
+		return 0, fmt.Errorf("expected float, found %T", emptyIface)
 	}
 }
 

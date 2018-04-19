@@ -57,10 +57,13 @@ https://github.com/elastic/beats/compare/v6.0.0-beta2...master[Check the HEAD di
 *Auditbeat*
 
 - Add hex decoding for the name field in audit path records. {pull}6687[6687]
+- Fixed a deadlock in the file_integrity module under Windows. {issue}6864[6864]
 
 *Filebeat*
 
 - Fix panic when log prospector configuration fails to load. {issue}6800[6800]
+- Fix memory leak in log prospector when files cannot be read. {issue}6797[6797]
+- Add raw JSON to message field when JSON parsing fails. {issue}6516[6516]
 
 *Heartbeat*
 
@@ -75,6 +78,10 @@ https://github.com/elastic/beats/compare/v6.0.0-beta2...master[Check the HEAD di
 - Fix namespace disambiguation in Kubernetes state_* metricsets. {issue}6281[6281]
 - Fix Windows perfmon metricset so that it sends metrics when an error occurs. {pull}6542[6542]
 - Fix Kubernetes calculated fields store. {pull}6564{6564}
+- Exclude bind mounts in fsstat and filesystem metricsets. {pull}6819[6819]
+- Don't stop Metricbeat if aerospike server is down. {pull}6874[6874]
+- disk reads and write count metrics in RabbitMQ queue metricset made optional. {issue}6876[6876]
+- Add mapping for docker metrics per cpu. {pull}6843[6843]
 
 *Packetbeat*
 
@@ -120,6 +127,10 @@ https://github.com/elastic/beats/compare/v6.0.0-beta2...master[Check the HEAD di
 - Make registry file permission configurable. {pull}6455[6455]
 - Add MongoDB module. {pull}6283[6238]
 - Add Ingest pipeline loading to setup. {pull}6814[6814]
+- Add support of log_format combined to NGINX access logs. {pull}6858[6858]
+- Release config reloading feature as GA.
+- Add support human friendly size for the UDP input. {pull}6886[6886]
+- Add Syslog input to ingest RFC3164 Events via TCP and UDP {pull}6842[6842]
 
 *Heartbeat*
 
@@ -186,12 +197,16 @@ https://github.com/elastic/beats/compare/v6.0.0-beta2...master[Check the HEAD di
 - Set `status` as default metricset for mysql module. {pull} 6769[6769]
 - Set `stubstatus` as default metricset for nginx module. {pull}6770[6770]
 - Added support for haproxy 1.7 and 1.8. {pull}6793[6793]
+- Add accumulated I/O stats to diskio in the line of `docker stats`. {pull}6701[6701]
+- Ignore virtual filesystem types by default in system module. {pull}6819[6819]
+- Release config reloading feature as GA.
 
 *Packetbeat*
 
 - Add support for condition on bool type {issue}5659[5659] {pull}5954[5954]
 - Fix high memory usage on HTTP body if body is not published. {pull}6680[6680]
 - Allow to capture the HTTP request or response bodies independently. {pull}6784[6784]
+- HTTP publishes an Error event for unmatched requests or responses. {pull}6794[6794]
 
 *Winlogbeat*
 

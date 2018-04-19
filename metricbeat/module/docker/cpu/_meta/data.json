@@ -6,33 +6,55 @@
     },
     "docker": {
         "container": {
-            "id": "0b8f7cd09c17df586a8e56f5b2d45dd00735d44fcc2665776d07d33b027b4f09",
+            "id": "bbdcbc751e7eda7a50e773b4a5d8c2800af664f835ef9c0ad6bbb9c160c50d83",
             "labels": {
-                "com_docker_compose_config-hash": "1c0f606c0e592b110060ad4e159cf25d361fb8fa",
+                "build-date": "20170911",
+                "com_docker_compose_config-hash": "371e477ae73fd44b19bcbcf0d4feaf4de9adfb69137a8f16d09cff749724ca99",
                 "com_docker_compose_container-number": "1",
                 "com_docker_compose_oneoff": "False",
                 "com_docker_compose_project": "metricbeat",
-                "com_docker_compose_service": "phpfpm",
-                "com_docker_compose_version": "1.5.0"
+                "com_docker_compose_service": "elasticsearch",
+                "com_docker_compose_version": "1.21.0",
+                "license": "GPLv2",
+                "maintainer": "Elastic Docker Team \u003cdocker@elastic.co\u003e",
+                "name": "CentOS Base Image",
+                "vendor": "CentOS"
             },
-            "name": "metricbeat_phpfpm_1"
+            "name": "metricbeat_elasticsearch_1"
         },
         "cpu": {
-            "core": {},
+            "core": {
+                "0": {
+                    "pct": 0.01012583677581864,
+                    "ticks": 9528454911
+                },
+                "1": {
+                    "pct": 0.0069975889168765746,
+                    "ticks": 11916812270
+                },
+                "2": {
+                    "pct": 0.001329603022670025,
+                    "ticks": 10894346015
+                },
+                "3": {
+                    "pct": 0.0018390015113350126,
+                    "ticks": 10847487614
+                }
+            },
             "kernel": {
-                "pct": 0,
-                "ticks": 0
+                "pct": 0.010075566750629723,
+                "ticks": 1960000000
             },
             "system": {
-                "pct": 0,
-                "ticks": 0
+                "pct": 4,
+                "ticks": 1092479570000000
             },
             "total": {
-                "pct": 0
+                "pct": 0.02029203022670025
             },
             "user": {
-                "pct": 0,
-                "ticks": 0
+                "pct": 0.010075566750629723,
+                "ticks": 40960000000
             }
         }
     },

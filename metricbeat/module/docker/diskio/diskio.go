@@ -17,7 +17,7 @@ func init() {
 
 type MetricSet struct {
 	mb.BaseMetricSet
-	blkioService *BLkioService
+	blkioService *BlkioService
 	dockerClient *client.Client
 	dedot        bool
 }
@@ -37,10 +37,8 @@ func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
 	return &MetricSet{
 		BaseMetricSet: base,
 		dockerClient:  client,
-		blkioService: &BLkioService{
-			BlkioSTatsPerContainer: make(map[string]BlkioRaw),
-		},
-		dedot: config.DeDot,
+		blkioService:  NewBlkioService(),
+		dedot:         config.DeDot,
 	}, nil
 }
 

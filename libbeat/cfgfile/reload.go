@@ -10,7 +10,6 @@ import (
 	"github.com/pkg/errors"
 
 	"github.com/elastic/beats/libbeat/common"
-	"github.com/elastic/beats/libbeat/common/cfgwarn"
 	"github.com/elastic/beats/libbeat/logp"
 	"github.com/elastic/beats/libbeat/monitoring"
 	"github.com/elastic/beats/libbeat/paths"
@@ -71,10 +70,6 @@ func NewReloader(cfg *common.Config) *Reloader {
 	path := config.Path
 	if !filepath.IsAbs(path) {
 		path = paths.Resolve(paths.Config, path)
-	}
-
-	if config.Reload.Enabled {
-		cfgwarn.Beta("Dynamic config reload is enabled.")
 	}
 
 	return &Reloader{
