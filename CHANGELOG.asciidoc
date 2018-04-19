@@ -129,6 +129,7 @@ https://github.com/elastic/beats/compare/v6.0.0-beta2...master[Check the HEAD di
 - Add support of log_format combined to NGINX access logs. {pull}6858[6858]
 - Release config reloading feature as GA.
 - Add support human friendly size for the UDP input. {pull}6886[6886]
+- Add Syslog input to ingest RFC3164 Events via TCP and UDP {pull}6842[6842]
 
 *Heartbeat*
 

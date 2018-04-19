@@ -1808,6 +1808,90 @@ The Filebeat fileset that generated this event.
 
 --
 
+*`syslog.facility`*::
++
+--
+type: long
+
+required: False
+
+The facility extracted from the priority.
+
+
+--
+
+*`syslog.priority`*::
++
+--
+type: long
+
+required: False
+
+The priority of the syslog event.
+
+
+--
+
+*`syslog.severity_label`*::
++
+--
+type: keyword
+
+required: False
+
+The human readable severity.
+
+
+--
+
+*`syslog.facility_label`*::
++
+--
+type: keyword
+
+required: False
+
+The human readable facility.
+
+
+--
+
+*`process.program`*::
++
+--
+type: keyword
+
+required: False
+
+The name of the program.
+
+
+--
+
+*`process.pid`*::
++
+--
+type: long
+
+required: False
+
+The pid of the process.
+
+
+--
+
+*`event.severity`*::
++
+--
+type: long
+
+required: False
+
+The severity of the event.
+
+
+--
+
 [[exported-fields-logstash]]
 == logstash fields
 

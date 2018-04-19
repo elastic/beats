@@ -7,24 +7,22 @@ import (
 	"sync"
 	"time"
 
+	"github.com/elastic/beats/filebeat/inputsource"
 	"github.com/elastic/beats/libbeat/logp"
 )
+
+// Name is the human readable name and identifier.
+const Name = "udp"
 
 const windowErrBuffer = "A message sent on a datagram socket was larger than the internal message" +
 	" buffer or some other network limit, or the buffer used to receive a datagram into was smaller" +
 	" than the datagram itself."
 
-// Metadata contains formations about the packet.
-type Metadata struct {
-	RemoteAddr net.Addr
-	Truncated  bool
-}
-
 // Server creates a simple UDP Server and listen to a specific host:port and will send any
 // event received to the callback method.
 type Server struct {
 	config   *Config
-	callback func(data []byte, mt Metadata)
+	callback inputsource.NetworkFunc
 	Listener net.PacketConn
 	log      *logp.Logger
 	wg       sync.WaitGroup
@@ -32,7 +30,7 @@ type Server struct {
 }
 
 // New returns a new UDPServer instance.
-func New(config *Config, callback func(data []byte, mt Metadata)) *Server {
+func New(config *Config, callback inputsource.NetworkFunc) *Server {
 	return &Server{
 		config:   config,
 		callback: callback,
@@ -86,13 +84,13 @@ func (u *Server) run() {
 			// On Windows send the current buffer and mark it as truncated.
 			// The buffer will have content but length will return 0, addr will be nil.
 			if isLargerThanBuffer(err) {
-				u.callback(buffer, Metadata{RemoteAddr: addr, Truncated: true})
+				u.callback(buffer, inputsource.NetworkMetadata{RemoteAddr: addr, Truncated: true})
 				continue
 			}
 		}
 
 		if length > 0 {
-			u.callback(buffer[:length], Metadata{RemoteAddr: addr})
+			u.callback(buffer[:length], inputsource.NetworkMetadata{RemoteAddr: addr})
 		}
 	}
 }
