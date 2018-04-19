@@ -7,21 +7,14 @@ import (
 	"net"
 	"sync"
 
+	"github.com/elastic/beats/filebeat/inputsource"
 	"github.com/elastic/beats/libbeat/logp"
 )
-
-// Metadata information about the remote host.
-type Metadata struct {
-	RemoteAddr net.Addr
-}
-
-// CallbackFunc receives new events read from the TCP socket.
-type CallbackFunc = func(data []byte, metadata Metadata)
 
 // Server represent a TCP server
 type Server struct {
 	sync.RWMutex
-	callback  CallbackFunc
+	callback  inputsource.NetworkFunc
 	config    *Config
 	Listener  net.Listener
 	clients   map[*client]struct{}
@@ -33,8 +26,8 @@ type Server struct {
 
 // New creates a new tcp server
 func New(
-	callback CallbackFunc,
 	config *Config,
+	callback inputsource.NetworkFunc,
 ) (*Server, error) {
 
 	if len(config.LineDelimiter) == 0 {
