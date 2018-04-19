@@ -1,0 +1,23 @@
+// Use these for links to issue and pulls. Note issues and pulls redirect one to
+// each other on Github, so don't worry too much on using the right prefix.
+:issue: https://github.com/elastic/beats/issues/
+:pull: https://github.com/elastic/beats/pull/
+
+This changelog is intended for community Beat developers. It covers the major
+breaking changes to the internal APIs in the official Beats and changes related
+to developing a Beat like code generators or `fields.yml`. Only the major
+changes will be covered in this changelog that are expected to affect community
+developers. Each breaking change added here should have an explanation on how
+other Beats should be migrated.
+
+Note: This changelog was only started after the 6.3 release.
+
+=== Beats version HEAD
+https://github.com/elastic/beats/compare/v6.3.0..master[Check the HEAD diff]
+
+The list below covers the major changes between 6.3.0 and master only.
+
+==== Breaking changes
+
+
+==== Added
