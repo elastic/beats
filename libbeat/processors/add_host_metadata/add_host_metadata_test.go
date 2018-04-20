@@ -32,11 +32,11 @@ func TestRun(t *testing.T) {
 	assert.NoError(t, err)
 	assert.NotNil(t, v)
 
-	v, err = newEvent.GetValue("host.net.ip")
+	v, err = newEvent.GetValue("host.ip")
 	assert.NoError(t, err)
 	assert.NotNil(t, v)
 
-	v, err = newEvent.GetValue("host.net.hw")
+	v, err = newEvent.GetValue("host.mac")
 	assert.NoError(t, err)
 	assert.NotNil(t, v)
 }

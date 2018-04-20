@@ -75,8 +75,8 @@ func (p *addHostMetadata) loadData() {
 
 		// IP-address and MAC-address
 		var ipList, hwList = p.getNetInfo()
-		p.data.Put("host.net.ip", ipList)
-		p.data.Put("host.net.hw", hwList)
+		p.data.Put("host.ip", ipList)
+		p.data.Put("host.mac", hwList)
 
 		p.lastUpdate = time.Now()
 	}
