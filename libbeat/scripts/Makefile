@@ -317,6 +317,8 @@ ifeq ($(BEAT_NAME), libbeat)
 	@cp ${ES_BEATS}/libbeat/_meta/fields.generated.yml fields.yml
 else
 	@cat ${ES_BEATS}/libbeat/_meta/fields.generated.yml _meta/fields.generated.yml > fields.yml
+	mkdir -p include
+	go run  ${ES_BEATS}/dev-tools/cmd/asset/asset.go -pkg include fields.yml $(BEAT_NAME) > include/fields.go
 endif
 
 	@# Update docs
