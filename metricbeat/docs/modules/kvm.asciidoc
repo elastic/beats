@@ -24,7 +24,7 @@ in <<configuration-metricbeat>>. Here is an example configuration:
 metricbeat.modules:
 - module: kvm
   metricsets: ["dommemstat"]
-  enabled: false
+  enabled: true
   period: 10s
   hosts: ["localhost"]
 
