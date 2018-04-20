@@ -30,7 +30,6 @@ import (
 	"github.com/spf13/pflag"
 	tml "golang.org/x/crypto/ssh/terminal"
 
-	"github.com/elastic/beats/libbeat/beat"
 	"github.com/elastic/beats/libbeat/cmd/instance"
 	"github.com/elastic/beats/libbeat/common/cli"
 	"github.com/elastic/beats/libbeat/common/terminal"
@@ -59,7 +58,6 @@ func getKeystore(name, version string) (keystore.Keystore, error) {
 //  - list
 func genKeystoreCmd(
 	name, idxPrefix, version string,
-	beatCreator beat.Creator,
 	runFlags *pflag.FlagSet,
 ) *cobra.Command {
 	keystoreCmd := cobra.Command{

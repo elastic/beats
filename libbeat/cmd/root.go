@@ -85,7 +85,7 @@ func GenRootCmdWithIndexPrefixWithRunFlags(name, indexPrefix, version string, be
 	rootCmd.CompletionCmd = genCompletionCmd(name, version, rootCmd)
 	rootCmd.ExportCmd = genExportCmd(name, indexPrefix, version)
 	rootCmd.TestCmd = genTestCmd(name, version, beatCreator)
-	rootCmd.KeystoreCmd = genKeystoreCmd(name, indexPrefix, version, beatCreator, runFlags)
+	rootCmd.KeystoreCmd = genKeystoreCmd(name, indexPrefix, version, runFlags)
 
 	// Root command is an alias for run
 	rootCmd.Run = rootCmd.RunCmd.Run
