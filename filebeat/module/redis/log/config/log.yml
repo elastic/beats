@@ -3,5 +3,5 @@ paths:
 {{ range $i, $path := .paths }}
  - {{$path}}
 {{ end }}
-exclude_files: [".gz$"]
+exclude_files: [".gz$", ".bz2$", ".xz$"]
 exclude_lines: ["^\\s+[\\-`('.|_]"]  # drop asciiart lines\n

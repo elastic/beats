@@ -3,6 +3,6 @@ paths:
 {{ range $i, $path := .paths }}
  - {{$path}}
 {{ end }}
-exclude_files: [".gz$"]
+exclude_files: [".gz$", ".bz2$", ".xz$"]
 json.overwrite_keys: true
 json.add_error_key: true

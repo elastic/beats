@@ -111,13 +111,23 @@ class Test(BaseTest):
 
         self.render_config_template(
             path=os.path.abspath(self.working_dir) + "/log/*",
-            exclude_files=[".gz$"]
+            exclude_files=[".gz$", ".bz2$", ".xz$"]
         )
         os.mkdir(self.working_dir + "/log/")
 
         testfile = self.working_dir + "/log/test.gz"
         file = open(testfile, 'w')
         file.write("line in gz file\n")
+        file.close()
+
+        testfile = self.working_dir + "/log/test.bz2"
+        file = open(testfile, 'w')
+        file.write("line in bz2 file\n")
+        file.close()
+
+        testfile = self.working_dir + "/log/test.xz"
+        file = open(testfile, 'w')
+        file.write("line in xz file\n")
         file.close()
 
         testfile = self.working_dir + "/log/test.log"
