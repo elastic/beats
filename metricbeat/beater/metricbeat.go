@@ -28,6 +28,7 @@ import (
 	"github.com/elastic/beats/libbeat/cfgfile"
 	"github.com/elastic/beats/libbeat/common"
 	"github.com/elastic/beats/libbeat/common/cfgwarn"
+	"github.com/elastic/beats/libbeat/generator/fields"
 	"github.com/elastic/beats/libbeat/logp"
 	mbautodiscover "github.com/elastic/beats/metricbeat/autodiscover"
 	"github.com/elastic/beats/metricbeat/mb"
@@ -174,6 +175,10 @@ func newMetricbeat(b *beat.Beat, c *common.Config, options ...Option) (*Metricbe
 		if err != nil {
 			return nil, err
 		}
+	}
+
+	b.CollectFieldsYmlCallback = func() ([]*fields.YmlFile, error) {
+		return fields.CollectModuleFiles("module")
 	}
 
 	return metricbeat, nil

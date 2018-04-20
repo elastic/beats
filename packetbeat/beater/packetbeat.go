@@ -28,6 +28,7 @@ import (
 
 	"github.com/elastic/beats/libbeat/beat"
 	"github.com/elastic/beats/libbeat/common"
+	"github.com/elastic/beats/libbeat/generator/fields"
 	"github.com/elastic/beats/libbeat/logp"
 	"github.com/elastic/beats/libbeat/processors"
 	"github.com/elastic/beats/libbeat/service"
@@ -102,6 +103,10 @@ func New(b *beat.Beat, rawConfig *common.Config) (beat.Beater, error) {
 	err = pb.init(b)
 	if err != nil {
 		return nil, err
+	}
+
+	b.CollectFieldsYmlCallback = func() ([]*fields.YmlFile, error) {
+		return fields.CollectModuleFiles("protos")
 	}
 
 	return pb, nil

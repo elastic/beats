@@ -45,6 +45,7 @@ import (
 	"github.com/elastic/beats/libbeat/common/file"
 	"github.com/elastic/beats/libbeat/common/seccomp"
 	"github.com/elastic/beats/libbeat/dashboards"
+	"github.com/elastic/beats/libbeat/generator/fields"
 	"github.com/elastic/beats/libbeat/keystore"
 	"github.com/elastic/beats/libbeat/logp"
 	"github.com/elastic/beats/libbeat/logp/configure"
@@ -455,6 +456,38 @@ func (b *Beat) Setup(bt beat.Creator, template, dashboards, machineLearning, pip
 			fmt.Println("Loaded Ingest pipelines")
 		}
 
+		return nil
+	}())
+}
+
+// Setup registers ES index template and kibana dashboards
+func (b *Beat) GenerateGlobalFields(bt beat.Creator, beatsPath string) error {
+	return handleError(func() error {
+		err := b.Init()
+		if err != nil {
+			return err
+		}
+
+		_, err = b.createBeater(bt)
+		if err != nil {
+			return err
+		}
+
+		if b.CollectFieldsYmlCallback == nil {
+			return fmt.Errorf("fields.yml collector callback is not set")
+		}
+
+		fieldFiles, err := b.CollectFieldsYmlCallback()
+		if err != nil {
+			return err
+		}
+
+		err = fields.Generate(beatsPath, b.Beat.Info.Beat, fieldFiles)
+		if err != nil {
+			return err
+		}
+
+		fmt.Println("Generated global fields.yml under _meta/fields.generated.yml")
 		return nil
 	}())
 }

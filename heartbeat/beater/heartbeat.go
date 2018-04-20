@@ -19,10 +19,12 @@ package beater
 
 import (
 	"fmt"
+	"path/filepath"
 	"time"
 
 	"github.com/elastic/beats/libbeat/beat"
 	"github.com/elastic/beats/libbeat/common"
+	"github.com/elastic/beats/libbeat/generator/fields"
 	"github.com/elastic/beats/libbeat/logp"
 
 	"github.com/elastic/beats/heartbeat/config"
@@ -66,6 +68,12 @@ func New(b *beat.Beat, cfg *common.Config) (beat.Beater, error) {
 		scheduler: sched,
 		manager:   manager,
 	}
+
+	pathToFields := filepath.Join("monitors", "active")
+	b.CollectFieldsYmlCallback = func() ([]*fields.YmlFile, error) {
+		return fields.CollectModuleFiles(pathToFields)
+	}
+
 	return bt, nil
 }
 

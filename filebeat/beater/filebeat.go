@@ -30,6 +30,7 @@ import (
 	"github.com/elastic/beats/libbeat/cfgfile"
 	"github.com/elastic/beats/libbeat/common"
 	"github.com/elastic/beats/libbeat/common/cfgwarn"
+	"github.com/elastic/beats/libbeat/generator/fields"
 	"github.com/elastic/beats/libbeat/kibana"
 	"github.com/elastic/beats/libbeat/logp"
 	"github.com/elastic/beats/libbeat/monitoring"
@@ -147,6 +148,10 @@ func New(b *beat.Beat, rawConfig *common.Config) (beat.Beater, error) {
 	err = fb.setupPipelineLoaderCallback(b)
 	if err != nil {
 		return nil, err
+	}
+
+	b.CollectFieldsYmlCallback = func() ([]*fields.YmlFile, error) {
+		return fields.CollectModuleFiles("module")
 	}
 
 	return fb, nil
