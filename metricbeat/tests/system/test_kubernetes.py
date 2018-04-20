@@ -8,6 +8,7 @@ KUBERNETES_FIELDS = metricbeat.COMMON_FIELDS + ["kubernetes"]
 class Test(metricbeat.BaseTest):
 
     COMPOSE_SERVICES = ['kubernetes']  # 'kubestate']
+    COMPOSE_TIMEOUT = 300
 
     @unittest.skipUnless(metricbeat.INTEGRATION_TESTS, "integration test")
     def test_kubelet_node(self):
