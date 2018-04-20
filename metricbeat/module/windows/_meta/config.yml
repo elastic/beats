@@ -1,2 +1,8 @@
 - module: windows
-  period: 60s
+  metricsets: ["perfmon"]
+  period: 10s
+  perfmon.counters:
+
+- module: windows
+  metricsets: ["service"]
+  period: 1m

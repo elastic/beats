@@ -1,4 +1,5 @@
 - module: vsphere
+  metricsets: ["datastore", "host", "virtualmachine"]
   period: 10s
   hosts: ["https://localhost/sdk"]
 
