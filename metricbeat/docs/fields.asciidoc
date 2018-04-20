@@ -1864,6 +1864,16 @@ The document type. Always set to "doc".
 
 --
 
+*`service.name`*::
++
+--
+example: elasticsearch
+
+Name of the service metricbeat fetches the data from.
+
+
+--
+
 [[exported-fields-couchbase]]
 == Couchbase fields
 
@@ -3315,6 +3325,88 @@ Elasticsearch module
 type: keyword
 
 Elasticsearch cluster name.
+
+
+--
+
+*`elasticsearch.cluster.id`*::
++
+--
+type: keyword
+
+Elasticsearch cluster id.
+
+
+--
+
+[float]
+== index fields
+
+index
+
+
+
+*`elasticsearch.index.name`*::
++
+--
+type: keyword
+
+Index name.
+
+
+--
+
+
+*`elasticsearch.index.total.docs.count`*::
++
+--
+type: long
+
+Total number of documents in the index.
+
+
+--
+
+*`elasticsearch.index.total.docs.deleted`*::
++
+--
+type: long
+
+Total number of deleted documents in the index.
+
+
+--
+
+*`elasticsearch.index.total.store.size.bytes`*::
++
+--
+type: long
+
+format: bytes
+
+Total size of the index in bytes.
+
+
+--
+
+*`elasticsearch.index.total.segments.count`*::
++
+--
+type: long
+
+Total number of index segments.
+
+
+--
+
+*`elasticsearch.index.total.segments.memory.bytes`*::
++
+--
+type: long
+
+format: bytes
+
+Total number of memory used by the segments in bytes.
 
 
 --

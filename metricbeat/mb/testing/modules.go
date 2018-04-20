@@ -151,25 +151,38 @@ func NewReportingMetricSetV2(t testing.TB, config interface{}) mb.ReportingMetri
 	return reportingMetricSetV2
 }
 
-type capturingReporterV2 struct {
+// CapturingReporterV2 is a reporter used for testing which stores all events and errors
+type CapturingReporterV2 struct {
 	events []mb.Event
 	errs   []error
 }
 
-func (r *capturingReporterV2) Event(event mb.Event) bool {
+// Event is used to report an event
+func (r *CapturingReporterV2) Event(event mb.Event) bool {
 	r.events = append(r.events, event)
 	return true
 }
 
-func (r *capturingReporterV2) Error(err error) bool {
+// Error is used to report an error
+func (r *CapturingReporterV2) Error(err error) bool {
 	r.errs = append(r.errs, err)
 	return true
+}
+
+// GetEvents returns all reported events
+func (r *CapturingReporterV2) GetEvents() []mb.Event {
+	return r.events
+}
+
+// GetErrors returns all reported errors
+func (r *CapturingReporterV2) GetErrors() []error {
+	return r.errs
 }
 
 // ReportingFetchV2 runs the given reporting metricset and returns all of the
 // events and errors that occur during that period.
 func ReportingFetchV2(metricSet mb.ReportingMetricSetV2) ([]mb.Event, []error) {
-	r := &capturingReporterV2{}
+	r := &CapturingReporterV2{}
 	metricSet.Fetch(r)
 	return r.events, r.errs
 }

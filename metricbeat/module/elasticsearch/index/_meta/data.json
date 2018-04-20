@@ -1,0 +1,36 @@
+{
+    "@timestamp": "2017-10-12T08:05:34.853Z",
+    "beat": {
+        "hostname": "host.example.com",
+        "name": "host.example.com"
+    },
+    "elasticsearch": {
+        "cluster": {
+            "id": "AI8XrG4wTLKQg3lbRGgQYQ",
+            "name": "docker-cluster"
+        },
+        "index": {
+            "name": ".watches",
+            "total": {
+                "docs": {
+                    "count": 6,
+                    "deleted": 0
+                },
+                "segments": {
+                    "count": 3,
+                    "memory": {
+                        "bytes": 11505
+                    }
+                },
+                "store": {
+                    "size": {
+                        "bytes": 67980
+                    }
+                }
+            }
+        }
+    },
+    "service": {
+        "name": "elasticsearch"
+    }
+}

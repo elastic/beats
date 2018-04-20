@@ -128,7 +128,7 @@ https://github.com/elastic/beats/compare/v6.0.0-beta2...master[Check the HEAD di
 - Add MongoDB module. {pull}6283[6238]
 - Add Ingest pipeline loading to setup. {pull}6814[6814]
 - Add support of log_format combined to NGINX access logs. {pull}6858[6858]
-- Release config reloading feature as GA.
+- Release config reloading feature as GA. {pull}6891[6891]
 - Add support human friendly size for the UDP input. {pull}6886[6886]
 - Add Syslog input to ingest RFC3164 Events via TCP and UDP {pull}6842[6842]
 
@@ -199,7 +199,8 @@ https://github.com/elastic/beats/compare/v6.0.0-beta2...master[Check the HEAD di
 - Added support for haproxy 1.7 and 1.8. {pull}6793[6793]
 - Add accumulated I/O stats to diskio in the line of `docker stats`. {pull}6701[6701]
 - Ignore virtual filesystem types by default in system module. {pull}6819[6819]
-- Release config reloading feature as GA.
+- Release config reloading feature as GA. {pull}6891[6891]
+- Add experimental Elasticsearch index metricset. {pull}6881[6881]
 
 *Packetbeat*
 
