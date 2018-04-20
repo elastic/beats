@@ -195,7 +195,10 @@ metricbeat.modules:
 
 #---------------------------- Elasticsearch Module ---------------------------
 - module: elasticsearch
-  metricsets: ["node", "node_stats"]
+  metricsets:
+   #- index
+   - node
+   - node_stats
   period: 10s
   hosts: ["localhost:9200"]
 

@@ -26,6 +26,14 @@ class Test(metricbeat.BaseTest):
         """
         self.check_metricset("elasticsearch", "node_stats", self.get_hosts())
 
+    @unittest.skipUnless(metricbeat.INTEGRATION_TESTS, "integration test")
+    def test_index(self):
+        """
+        elasticsearch index metricset test
+        """
+        # TODO: need to create an index first to get stats
+        self.check_metricset("elasticsearch", "index", self.get_hosts())
+
     def get_hosts(self):
         return [os.getenv('ES_HOST', 'localhost') + ':' +
                 os.getenv('ES_PORT', '9200')]
