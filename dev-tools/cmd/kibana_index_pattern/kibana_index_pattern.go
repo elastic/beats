@@ -21,6 +21,7 @@ import (
 	"flag"
 	"fmt"
 	"os"
+	"path"
 
 	"github.com/elastic/beats/libbeat/common"
 	"github.com/elastic/beats/libbeat/kibana"
@@ -47,6 +48,15 @@ func main() {
 	if *beatDir == "" {
 		fmt.Fprint(os.Stderr, "The beat directory must be set.")
 		os.Exit(1)
+	}
+
+	folders := []string{"5", "6"}
+	for _, f := range folders {
+		patternPath := path.Join(beatsPath, name, "_meta", "kibana", f, "index-pattern")
+		err := os.MkdirAll(patternPath, 0750)
+		if err != nil {
+			return err
+		}
 	}
 
 	version5, _ := common.NewVersion("5.0.0")
