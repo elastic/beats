@@ -21,7 +21,9 @@ func New(recursive bool) (Watcher, error) {
 	if err != nil {
 		return nil, err
 	}
-	if recursive {
+	// Use our simulated recursive watches unless the fsnotify implementation
+	// supports OS-provided recursive watches
+	if recursive && fsnotify.SetRecursive() != nil {
 		return newRecursiveWatcher(fsnotify), nil
 	}
 	return (*nonRecursiveWatcher)(fsnotify), nil

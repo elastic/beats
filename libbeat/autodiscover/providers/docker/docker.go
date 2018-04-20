@@ -176,9 +176,9 @@ func (d *Provider) generateHints(event bus.Event) bus.Event {
 	e := bus.Event{}
 	var dockerMeta common.MapStr
 
-	if rawDocker, ok := event["docker"]; ok {
+	if rawDocker, err := common.MapStr(event).GetValue("docker.container"); err == nil {
 		dockerMeta = rawDocker.(common.MapStr)
-		e["docker"] = dockerMeta
+		e["container"] = dockerMeta
 	}
 
 	if host, ok := event["host"]; ok {
@@ -187,7 +187,7 @@ func (d *Provider) generateHints(event bus.Event) bus.Event {
 	if port, ok := event["port"]; ok {
 		e["port"] = port
 	}
-	if labels, err := dockerMeta.GetValue("container.labels"); err == nil {
+	if labels, err := dockerMeta.GetValue("labels"); err == nil {
 		hints := builder.GenerateHints(labels.(common.MapStr), "", d.config.Prefix)
 		e["hints"] = hints
 	}

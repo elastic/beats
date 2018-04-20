@@ -6,7 +6,7 @@ import (
 
 	"github.com/stretchr/testify/assert"
 
-	"github.com/elastic/beats/filebeat/inputsource/tcp"
+	"github.com/elastic/beats/filebeat/inputsource"
 )
 
 func TestCreateEvent(t *testing.T) {
@@ -16,7 +16,7 @@ func TestCreateEvent(t *testing.T) {
 	addr := &net.IPAddr{IP: parsedIP, Zone: ""}
 
 	message := []byte(hello)
-	mt := tcp.Metadata{RemoteAddr: addr}
+	mt := inputsource.NetworkMetadata{RemoteAddr: addr}
 
 	data := createEvent(message, mt)
 	event := data.GetEvent()

@@ -34,6 +34,7 @@ grouped in the following categories:
 * <<exported-fields-kibana>>
 * <<exported-fields-kubernetes-processor>>
 * <<exported-fields-kubernetes>>
+* <<exported-fields-kvm>>
 * <<exported-fields-logstash>>
 * <<exported-fields-memcached>>
 * <<exported-fields-mongodb>>
@@ -2655,6 +2656,28 @@ type: scaled_float
 format: percentage
 
 Total CPU usage.
+
+
+--
+
+*`docker.cpu.core.*.pct`*::
++
+--
+type: object
+
+format: percentage
+
+Percentage of CPU time in this core.
+
+
+--
+
+*`docker.cpu.core.*.ticks`*::
++
+--
+type: object
+
+Number of CPU ticks in this core.
 
 
 --
@@ -7917,6 +7940,74 @@ Free inodes
 type: long
 
 Total inodes
+
+
+--
+
+[[exported-fields-kvm]]
+== kvm fields
+
+experimental[]
+kvm module
+
+
+
+[float]
+== kvm fields
+
+
+
+
+[float]
+== dommemstat fields
+
+dommemstat
+
+
+
+[float]
+== stat fields
+
+Memory stat
+
+
+
+*`kvm.dommemstat.stat.name`*::
++
+--
+type: keyword
+
+Memory stat name
+
+
+--
+
+*`kvm.dommemstat.stat.value`*::
++
+--
+type: long
+
+Memory stat value
+
+
+--
+
+*`kvm.dommemstat.id`*::
++
+--
+type: long
+
+Domain id
+
+
+--
+
+*`kvm.dommemstat.name`*::
++
+--
+type: keyword
+
+Domain name
 
 
 --

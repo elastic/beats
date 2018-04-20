@@ -11,6 +11,7 @@ import (
 	"github.com/dustin/go-humanize"
 	"github.com/stretchr/testify/assert"
 
+	"github.com/elastic/beats/filebeat/inputsource"
 	"github.com/elastic/beats/libbeat/common"
 )
 
@@ -22,7 +23,7 @@ var defaultConfig = Config{
 
 type info struct {
 	message string
-	mt      Metadata
+	mt      inputsource.NetworkMetadata
 }
 
 func TestErrorOnEmptyLineDelimiter(t *testing.T) {
@@ -134,7 +135,7 @@ func TestReceiveEventsAndMetadata(t *testing.T) {
 		t.Run(test.name, func(t *testing.T) {
 			ch := make(chan *info, len(test.expectedMessages))
 			defer close(ch)
-			to := func(message []byte, mt Metadata) {
+			to := func(message []byte, mt inputsource.NetworkMetadata) {
 				ch <- &info{message: string(message), mt: mt}
 			}
 			test.cfg["host"] = "localhost:0"
@@ -144,7 +145,7 @@ func TestReceiveEventsAndMetadata(t *testing.T) {
 			if !assert.NoError(t, err) {
 				return
 			}
-			server, err := New(to, &config)
+			server, err := New(&config, to)
 			if !assert.NoError(t, err) {
 				return
 			}
@@ -182,7 +183,7 @@ func TestReceiveNewEventsConcurrently(t *testing.T) {
 	eventsCount := 100
 	ch := make(chan *info, eventsCount*workers)
 	defer close(ch)
-	to := func(message []byte, mt Metadata) {
+	to := func(message []byte, mt inputsource.NetworkMetadata) {
 		ch <- &info{message: string(message), mt: mt}
 	}
 	cfg, err := common.NewConfigFrom(map[string]interface{}{"host": ":0"})
@@ -194,7 +195,7 @@ func TestReceiveNewEventsConcurrently(t *testing.T) {
 	if !assert.NoError(t, err) {
 		return
 	}
-	server, err := New(to, &config)
+	server, err := New(&config, to)
 	if !assert.NoError(t, err) {
 		return
 	}

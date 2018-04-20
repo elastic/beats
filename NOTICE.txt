@@ -167,6 +167,34 @@ ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING OUT OF
 OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 
 --------------------------------------------------------------------
+Dependency: github.com/davecgh/go-xdr
+Revision: e6a2ba005892b6a5b27cb5352f64c2e96942dd28
+License type (autodetected): MIT
+./metricbeat/module/kvm/vendor/github.com/davecgh/go-xdr/LICENSE:
+--------------------------------------------------------------------
+Copyright (c) 2012-2014 Dave Collins <dave@davec.name>
+
+Permission to use, copy, modify, and distribute this software for any
+purpose with or without fee is hereby granted, provided that the above
+copyright notice and this permission notice appear in all copies.
+
+THE SOFTWARE IS PROVIDED "AS IS" AND THE AUTHOR DISCLAIMS ALL WARRANTIES
+WITH REGARD TO THIS SOFTWARE INCLUDING ALL IMPLIED WARRANTIES OF
+MERCHANTABILITY AND FITNESS. IN NO EVENT SHALL THE AUTHOR BE LIABLE FOR
+ANY SPECIAL, DIRECT, INDIRECT, OR CONSEQUENTIAL DAMAGES OR ANY DAMAGES
+WHATSOEVER RESULTING FROM LOSS OF USE, DATA OR PROFITS, WHETHER IN AN
+ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING OUT OF
+OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
+--------------------------------------------------------------------
+Dependency: github.com/digitalocean/go-libvirt
+Revision: 59d541f19311883ad82708651353009fb207d8a9
+License type (autodetected): Apache-2.0
+./metricbeat/module/kvm/vendor/github.com/digitalocean/go-libvirt/LICENSE.md:
+--------------------------------------------------------------------
+Apache License 2.0
+
+
+--------------------------------------------------------------------
 Dependency: github.com/docker/distribution
 Revision: 1e2f10eb65743fed02f573d31a4587de09afb20e
 License type (autodetected): Apache-2.0
@@ -515,7 +543,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 --------------------------------------------------------------------
 Dependency: github.com/fsnotify/fsnotify
-Revision: 4da3e2cfbabc9f751898f250b49f2439785783a1
+Revision: c9bbe1f46f1da9904baf3916a4ba4aec7f1e9000
 License type (autodetected): BSD-3-Clause
 ./vendor/github.com/fsnotify/fsnotify/LICENSE:
 --------------------------------------------------------------------

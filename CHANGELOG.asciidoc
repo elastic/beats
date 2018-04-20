@@ -57,6 +57,7 @@ https://github.com/elastic/beats/compare/v6.0.0-beta2...master[Check the HEAD di
 *Auditbeat*
 
 - Add hex decoding for the name field in audit path records. {pull}6687[6687]
+- Fixed a deadlock in the file_integrity module under Windows. {issue}6864[6864]
 
 *Filebeat*
 
@@ -80,6 +81,7 @@ https://github.com/elastic/beats/compare/v6.0.0-beta2...master[Check the HEAD di
 - Exclude bind mounts in fsstat and filesystem metricsets. {pull}6819[6819]
 - Don't stop Metricbeat if aerospike server is down. {pull}6874[6874]
 - disk reads and write count metrics in RabbitMQ queue metricset made optional. {issue}6876[6876]
+- Add mapping for docker metrics per cpu. {pull}6843[6843]
 
 *Packetbeat*
 
@@ -125,8 +127,10 @@ https://github.com/elastic/beats/compare/v6.0.0-beta2...master[Check the HEAD di
 - Make registry file permission configurable. {pull}6455[6455]
 - Add MongoDB module. {pull}6283[6238]
 - Add Ingest pipeline loading to setup. {pull}6814[6814]
-- Add support of log_format combined to NGINX access logs. 
+- Add support of log_format combined to NGINX access logs. {pull}6858[6858]
 - Release config reloading feature as GA. {pull}6891[6891]
+- Add support human friendly size for the UDP input. {pull}6886[6886]
+- Add Syslog input to ingest RFC3164 Events via TCP and UDP {pull}6842[6842]
 
 *Heartbeat*
 
