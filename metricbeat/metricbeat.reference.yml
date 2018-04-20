@@ -369,7 +369,7 @@ metricbeat.modules:
 #--------------------------------- kvm Module --------------------------------
 - module: kvm
   metricsets: ["dommemstat"]
-  enabled: false
+  enabled: true
   period: 10s
   hosts: ["localhost"]
 
