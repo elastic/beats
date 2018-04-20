@@ -11,6 +11,9 @@ COMMON_FIELDS = ["@timestamp", "beat", "metricset.name", "metricset.host",
 
 INTEGRATION_TESTS = os.environ.get('INTEGRATION_TESTS', False)
 
+import logging
+logging.getLogger("urllib3").setLevel(logging.WARNING)
+
 
 class BaseTest(TestCase):
 
