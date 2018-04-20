@@ -1,8 +1,8 @@
-:modulename: {module}
+:modulename: test
 
-== {module} module
+== test module
 
-This is the {module} module.
+This is the test module.
 
 include::../include/what-happens.asciidoc[]
 

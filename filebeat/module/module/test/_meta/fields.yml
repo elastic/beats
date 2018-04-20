@@ -1,9 +1,9 @@
-- key: {module}
-  title: "{module}"
+- key: test
+  title: "test"
   description: >
-    {module} Module
+    test Module
   fields:
-    - name: {module}
+    - name: test
       type: group
       description: >
       fields:
