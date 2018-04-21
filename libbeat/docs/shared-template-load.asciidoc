@@ -184,7 +184,7 @@ and run:
 
 ["source","sh",subs="attributes,callouts"]
 ----------------------------------------------------------------------
-PS > .{backslash}{beatname_lc} setup --template{disable_logstash} -E 'output.elasticsearch.hosts=["localhost:9200"]'
+PS > .{backslash}{beatname_lc}.exe setup --template{disable_logstash} -E 'output.elasticsearch.hosts=["localhost:9200"]'
 ----------------------------------------------------------------------
 
 

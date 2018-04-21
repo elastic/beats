@@ -139,6 +139,7 @@ the `set2` metricset will be fetched every 2 minutes:
 
 
 [float]
+[[module-config-options]]
 === Standard config options
 
 You can specify the following options for any Metricbeat module. Some modules
