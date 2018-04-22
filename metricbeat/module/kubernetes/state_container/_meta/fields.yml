@@ -26,14 +26,14 @@
     - name: cpu
       type: group
       fields:
-        - name: limit.nanocores
+        - name: limit.cores
           type: long
           description: >
-            Container CPU nanocores limit
-        - name: request.nanocores
+            Container CPU cores limit
+        - name: request.cores
           type: long
           description: >
-            Container CPU requested nanocores
+            Container CPU requested cores
     - name: memory
       type: group
       fields:

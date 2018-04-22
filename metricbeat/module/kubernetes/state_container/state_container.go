@@ -2,7 +2,7 @@ package state_container
 
 import (
 	"github.com/elastic/beats/libbeat/common"
-	"github.com/elastic/beats/metricbeat/helper"
+	p "github.com/elastic/beats/metricbeat/helper/prometheus"
 	"github.com/elastic/beats/metricbeat/mb"
 	"github.com/elastic/beats/metricbeat/mb/parse"
 )
@@ -17,6 +17,35 @@ var (
 		DefaultScheme: defaultScheme,
 		DefaultPath:   defaultPath,
 	}.Build()
+
+	mapping = &p.MetricsMapping{
+		Metrics: map[string]p.MetricMap{
+			"kube_pod_container_info":                           p.Metric(""),
+			"kube_pod_container_resource_limits_cpu_cores":      p.Metric("cpu.limit.cores"),
+			"kube_pod_container_resource_requests_cpu_cores":    p.Metric("cpu.request.cores"),
+			"kube_pod_container_resource_limits_memory_bytes":   p.Metric("memory.limit.bytes"),
+			"kube_pod_container_resource_requests_memory_bytes": p.Metric("memory.request.bytes"),
+			"kube_pod_container_status_ready":                   p.BooleanMetric("status.ready"),
+			"kube_pod_container_status_restarts":                p.Metric("status.restarts"),
+			"kube_pod_container_status_running":                 p.KeywordMetric("status.phase", "running"),
+			"kube_pod_container_status_terminated":              p.KeywordMetric("status.phase", "terminated"),
+			"kube_pod_container_status_waiting":                 p.KeywordMetric("status.phase", "waiting"),
+		},
+
+		Labels: map[string]p.LabelMap{
+			"pod":       p.KeyLabel(mb.ModuleDataKey + ".pod.name"),
+			"container": p.KeyLabel("name"),
+			"namespace": p.KeyLabel(mb.ModuleDataKey + ".namespace"),
+
+			"node":         p.Label(mb.ModuleDataKey + ".node.name"),
+			"container_id": p.Label("id"),
+			"image":        p.Label("image"),
+		},
+
+		ExtraFields: map[string]string{
+			mb.NamespaceKey: "container",
+		},
+	}
 )
 
 // init registers the MetricSet with the central registry.
@@ -33,14 +62,14 @@ func init() {
 // multiple fetch calls.
 type MetricSet struct {
 	mb.BaseMetricSet
-	prometheus helper.Prometheus
+	prometheus p.Prometheus
 }
 
 // New create a new instance of the MetricSet
 // Part of new is also setting up the configuration by processing additional
 // configuration entries if needed.
 func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
-	prometheus, err := helper.NewPrometheusClient(base)
+	prometheus, err := p.NewPrometheusClient(base)
 	if err != nil {
 		return nil, err
 	}
@@ -54,10 +83,5 @@ func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
 // It returns the event which is then forward to the output. In case of an error, a
 // descriptive error must be returned.
 func (m *MetricSet) Fetch() ([]common.MapStr, error) {
-	families, err := m.prometheus.GetFamilies()
-	if err != nil {
-		return nil, err
-	}
-
-	return eventMapping(families)
+	return m.prometheus.GetProcessedMetrics(mapping)
 }
