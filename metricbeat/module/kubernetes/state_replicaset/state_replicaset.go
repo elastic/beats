@@ -33,7 +33,7 @@ func init() {
 // multiple fetch calls.
 type MetricSet struct {
 	mb.BaseMetricSet
-	prometheus *helper.Prometheus
+	prometheus helper.Prometheus
 }
 
 // New create a new instance of the MetricSet
