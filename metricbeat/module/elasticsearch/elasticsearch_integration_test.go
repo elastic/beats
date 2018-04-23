@@ -17,6 +17,7 @@ import (
 	_ "github.com/elastic/beats/metricbeat/module/elasticsearch/index_summary"
 	_ "github.com/elastic/beats/metricbeat/module/elasticsearch/node"
 	_ "github.com/elastic/beats/metricbeat/module/elasticsearch/node_stats"
+	_ "github.com/elastic/beats/metricbeat/module/elasticsearch/shard"
 )
 
 var metricSets = []string{
@@ -24,6 +25,7 @@ var metricSets = []string{
 	"index_summary",
 	"node",
 	"node_stats",
+	"shard",
 }
 
 func TestFetch(t *testing.T) {

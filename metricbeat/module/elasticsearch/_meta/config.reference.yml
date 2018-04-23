@@ -1,8 +1,9 @@
 - module: elasticsearch
   metricsets:
-   #- index
-   #- index_summary
-   - node
-   - node_stats
+    - node
+    - node_stats
+    #- index
+    #- index_summary
+    #- shard
   period: 10s
   hosts: ["localhost:9200"]
