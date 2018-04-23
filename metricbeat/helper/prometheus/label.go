@@ -17,7 +17,7 @@ func Label(field string) LabelMap {
 	}
 }
 
-// KeyLabel maps a Prometheus label to a Metricbeat field. The lable is flagged as key.
+// KeyLabel maps a Prometheus label to a Metricbeat field. The label is flagged as key.
 // Metrics with the same tuple of key labels will be grouped in the same event.
 func KeyLabel(field string) LabelMap {
 	return &commonLabel{
