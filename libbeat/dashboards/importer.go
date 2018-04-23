@@ -126,7 +126,7 @@ func (imp Importer) unzip(archive, target string) error {
 			return err
 		}
 		if strings.HasPrefix(filepath.ToSlash(relPath), "../") {
-			return fmt.Errorf("Zip file contains files outside of directory target: %s", relPath)
+			return fmt.Errorf("Zip file contains files outside of the target directory: %s", relPath)
 		}
 
 		if file.FileInfo().IsDir() {
