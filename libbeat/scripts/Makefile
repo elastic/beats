@@ -304,6 +304,10 @@ coverage-report:
 	test ! -s ${COVERAGE_DIR}/unit.cov   || go tool cover -html=${COVERAGE_DIR}/unit.cov   -o ${COVERAGE_DIR}/unit.html
 
 
+.PHONY: fields
+fields:
+	@go run ${ES_BEATS}/libbeat/scripts/cmd/global_fields/main.go --beats_path $(ES_BEATS) --beat_name $(BEAT_NAME) $(FIELDS_FILE_PATH)
+
 .PHONY: update
 update: ## @build Update expects the most recent version of libbeat in the GOPATH
 update: python-env collect
