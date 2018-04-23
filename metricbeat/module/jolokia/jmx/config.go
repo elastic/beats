@@ -13,8 +13,9 @@ type Attribute struct {
 	Field string
 }
 
+// Target inputs the value you want to set for jolokia target block
 type Target struct {
-	Url      string
+	URL      string
 	User     string
 	Password string
 }
@@ -35,7 +36,12 @@ type Target struct {
 //       "attribute":[
 //          "CollectionTime",
 //          "CollectionCount"
-//       ]
+//       ],
+//       "target":{
+//          "url":"service:jmx:rmi:///jndi/rmi://targethost:9999/jmxrmi",
+//          "user":"jolokia",
+//          "password":"s!cr!t"
+//       }
 //    }
 // ]
 type RequestBlock struct {
@@ -45,8 +51,15 @@ type RequestBlock struct {
 	Target    *TargetBlock `json:"target,omitempty"`
 }
 
+// TargetBlock is used to build the target blocks of the following format into RequestBlock.
+//
+// "target":{
+//    "url":"service:jmx:rmi:///jndi/rmi://targethost:9999/jmxrmi",
+//    "user":"jolokia",
+//    "password":"s!cr!t"
+// }
 type TargetBlock struct {
-	Url      string `json:"url"`
+	URL      string `json:"url"`
 	User     string `json:"user,omitempty"`
 	Password string `json:"password,omitempty"`
 }
@@ -61,9 +74,9 @@ func buildRequestBodyAndMapping(mappings []JMXMapping) ([]byte, map[string]strin
 			MBean: mapping.MBean,
 		}
 
-		if len(mapping.Target.Url) != 0 {
+		if len(mapping.Target.URL) != 0 {
 			rb.Target = new(TargetBlock)
-			rb.Target.Url = mapping.Target.Url
+			rb.Target.URL = mapping.Target.URL
 			rb.Target.User = mapping.Target.User
 			rb.Target.Password = mapping.Target.Password
 		}

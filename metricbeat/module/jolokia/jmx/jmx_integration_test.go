@@ -74,6 +74,29 @@ func getConfig() map[string]interface{} {
 					},
 				},
 			},
+			{
+				"mbean": "Catalina:type=Server",
+				"attributes": []map[string]string{
+					{
+						"attr":  "serverNumber",
+						"field": "server_number_local",
+					},
+				},
+			},
+			{
+				"mbean": "Catalina:type=Server",
+				"attributes": []map[string]string{
+					{
+						"attr":  "serverInfo",
+						"field": "server_info_proxy",
+					},
+				},
+				"target": &TargetBlock{
+					URL:      "service:jmx:rmi:///jndi/rmi://localhost:7091/jmxrmi",
+					User:     "monitorRole",
+					Password: "QED",
+				},
+			},
 		},
 	}
 }

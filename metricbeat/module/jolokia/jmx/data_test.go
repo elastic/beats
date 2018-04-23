@@ -27,6 +27,7 @@ func TestEventMapper(t *testing.T) {
 		"java.lang:type=Memory_HeapMemoryUsage":                                    "memory.heap_usage",
 		"java.lang:type=Memory_NonHeapMemoryUsage":                                 "memory.non_heap_usage",
 		"org.springframework.boot:type=Endpoint,name=metricsEndpoint_Metrics":      "metrics",
+		"Catalina:type=Server_serverInfo":                                          "server_info",
 	}
 
 	event, err := eventMapping(jolokiaResponse, mapping)
@@ -58,6 +59,7 @@ func TestEventMapper(t *testing.T) {
 			"classes_loaded":          float64(19127),
 			"classes_unloaded":        float64(270),
 		},
+		"server_info": "Apache Tomcat/9.0.7",
 	}
 
 	assert.Equal(t, expected, event)
