@@ -49,6 +49,7 @@ cp "$BEAT_DIR/LICENSE.txt" LICENSE.txt
 
 productbuild --distribution distribution.plist \
     --resources . \
+    --package-path "BeatsPrefPane.pkg" \
     --package-path "$INNER_NAME" \
     --component-compression auto \
     --sign "$SIGN_IDENTITY_INSTALLER" \

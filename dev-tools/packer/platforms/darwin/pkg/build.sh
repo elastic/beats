@@ -1,7 +1,7 @@
 #!/bin/bash
 
 BASEDIR=$(cd "$(dirname "$0")"; pwd)
-ARCHDIR=${BASEDIR}/../../../
+PACKERDIR=${BASEDIR}/../../../
 
 die() {
     echo "Error: $@" >&2
@@ -11,7 +11,7 @@ die() {
 test "$(uname -s)" = Darwin || die "Must be run in macOS"
 
 FAIL=0
-for bin in gotpl markdown pkgbuild productbuild hdiutil codesign
+for bin in gotpl markdown pkgbuild productbuild hdiutil codesign xcodebuild
 do
     which -s "$bin" || {
         echo "Required command '$bin' not found in PATH" >&2
@@ -39,7 +39,7 @@ test -n "SIGN_IDENTITY_APP" || die "Codesigning certificate not found"
 export SIGN_IDENTITY_INSTALLER SIGN_IDENTITY_APP
 
 test -f "${BUILD_DIR}/package.yml" || die "package.yml not found in BUILD_DIR"
-ARCH_FILE="${ARCHDIR}/archs/$ARCH.yml"
+ARCH_FILE="${PACKERDIR}/archs/$ARCH.yml"
 test -f "$ARCH_FILE" || die "$ARCH_FILE not found (check ARCH environment variable)"
 
 TMPDIR=$(mktemp -d)
@@ -53,6 +53,10 @@ if [ "$SNAPSHOT" = "yes" ]; then
 else
     echo 'snapshot: ""' >> "${TMPDIR}/conf.yml"
 fi
+
+echo 'Building preference-pane'
+make -e CODE_SIGNING_REQUIRED=YES -C "${PACKERDIR}/platforms/darwin/preference-pane" clean build pkg || die "Build of preference-pane failed"
+cp -a "${PACKERDIR}/platforms/darwin/preference-pane/BeatsPrefPane.pkg" "${TMPDIR}/" || die "Preference pane package not found"
 
 pushd "${BASEDIR}/templates"
 for dir in $(find . -type d); do

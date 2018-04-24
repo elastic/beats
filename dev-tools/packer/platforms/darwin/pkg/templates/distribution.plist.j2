@@ -15,10 +15,11 @@
     <choice id="default"/>
     <choice id="{{.identifier_base}}.{{.beat_name}}" visible="false">
         <pkg-ref id="{{.identifier_base}}.{{.beat_name}}"/>
+        <pkg-ref id="{{.identifier_base}}.preference-pane"/>
     </choice>
     <pkg-ref id="{{.identifier_base}}.{{.beat_name}}" version="{{.version}}{{.snapshot}}" auth="Root" onConclusion="none">internal-{{.beat_name}}-{{.version}}{{.snapshot}}-{{.osx_arch}}.pkg</pkg-ref>
-    <!-- <welcome file="LICENSE.txt" mime-type="text/plain" auto="yes"/> -->
     <readme file="README.html" />
     <license file="LICENSE.txt" />
     <title>{{.beat_name}} {{.version}}{{.snapshot}}</title>
+    <pkg-ref id="{{.identifier_base}}.preference-pane" version="{{.version}}{{.snapshot}}" auth="Root" onConclusion="none">BeatsPrefPane.pkg</pkg-ref>
 </installer-gui-script>
