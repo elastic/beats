@@ -81,6 +81,7 @@ func ExampleWrapper() {
 	//   "metricset": {
 	//     "module": "fake",
 	//     "name": "eventfetcher",
+	//     "period": 10000000,
 	//     "rtt": 111
 	//   }
 	// }

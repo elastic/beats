@@ -308,6 +308,9 @@ func (r reporterV2) Event(event mb.Event) bool {
 	if event.Took == 0 && !r.start.IsZero() {
 		event.Took = time.Since(r.start)
 	}
+	if r.msw.Module().Config().Period > 0 {
+		event.Period = r.msw.Module().Config().Period
+	}
 
 	if event.Timestamp.IsZero() {
 		if !r.start.IsZero() {

@@ -28,6 +28,11 @@
       description: >
         Namespace of dynamic metricsets.
 
+    - name: metricset.period
+      type: long
+      description: >
+        Current data collection period for this events in micro seconds.
+
     - name: type
       required: true
       example: metricsets

@@ -1852,6 +1852,16 @@ Namespace of dynamic metricsets.
 
 --
 
+*`metricset.period`*::
++
+--
+type: long
+
+Current data collection period for this events in micro seconds.
+
+
+--
+
 *`type`*::
 +
 --

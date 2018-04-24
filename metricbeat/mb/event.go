@@ -24,6 +24,7 @@ type Event struct {
 	Error     error         // Error that occurred while collecting the event data.
 	Host      string        // Host from which the data was collected.
 	Took      time.Duration // Amount of time it took to collect the event data.
+	Period    time.Duration // Period that is set to retrieve the events
 }
 
 // BeatEvent returns a new beat.Event containing the data this Event. It does
@@ -96,6 +97,9 @@ func AddMetricSetInfo(module, metricset string, event *Event) {
 	}
 	if event.Took > 0 {
 		info["rtt"] = event.Took / time.Microsecond
+	}
+	if event.Period > 0 {
+		info["period"] = event.Period / time.Microsecond
 	}
 	if event.Namespace != "" {
 		info["namespace"] = event.Namespace
