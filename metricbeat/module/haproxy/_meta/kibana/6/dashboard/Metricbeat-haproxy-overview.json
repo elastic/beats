@@ -1,0 +1,23 @@
+{
+  "objects": [
+    {
+      "attributes": {
+        "description": "",
+        "hits": 0,
+        "kibanaSavedObjectMeta": {
+          "searchSourceJSON": "{\"query\":{\"language\":\"lucene\",\"query\":\"\"},\"filter\":[],\"highlightAll\":true,\"version\":true}"
+        },
+        "optionsJSON": "{\"darkTheme\":false,\"hidePanelTitles\":false,\"useMargins\":true}",
+        "panelsJSON": "[{\"panelIndex\":\"2\",\"gridData\":{\"x\":8,\"y\":2,\"w\":4,\"h\":6,\"i\":\"2\"},\"id\":\"79350d50-47db-11e8-bc13-1397384faad3\",\"title\":\"Servers\",\"type\":\"visualization\",\"version\":\"6.2.2\"},{\"panelIndex\":\"3\",\"gridData\":{\"x\":4,\"y\":2,\"w\":4,\"h\":6,\"i\":\"3\"},\"id\":\"8c8f0300-47dc-11e8-bc13-1397384faad3\",\"title\":\"Backends\",\"type\":\"visualization\",\"version\":\"6.2.2\"},{\"panelIndex\":\"4\",\"gridData\":{\"x\":0,\"y\":2,\"w\":4,\"h\":6,\"i\":\"4\"},\"id\":\"f1e27ed0-47dc-11e8-bc13-1397384faad3\",\"title\":\"Frontends\",\"type\":\"visualization\",\"version\":\"6.2.2\"},{\"panelIndex\":\"5\",\"gridData\":{\"x\":0,\"y\":0,\"w\":12,\"h\":2,\"i\":\"5\"},\"version\":\"6.2.2\",\"type\":\"visualization\",\"id\":\"a64b4fd0-471c-11e8-bc13-1397384faad3\"}]",
+        "timeRestore": false,
+        "title": "[Metricbeat Haproxy] Overview",
+        "version": 1
+      },
+      "id": "4b555c30-47dd-11e8-bc13-1397384faad3",
+      "type": "dashboard",
+      "updated_at": "2018-04-24T18:31:56.356Z",
+      "version": 3
+    }
+  ],
+  "version": "6.2.2"
+}

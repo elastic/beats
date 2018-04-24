@@ -45,7 +45,7 @@ This file is generated! See scripts/docs_collector.py
 |<<metricbeat-metricset-golang-heap,heap>> beta[]  
 |<<metricbeat-module-graphite,Graphite>>  beta[]   |image:./images/icon-no.png[No prebuilt dashboards]    |  
 .1+| .1+|  |<<metricbeat-metricset-graphite-server,server>> beta[]  
-|<<metricbeat-module-haproxy,HAProxy>>     |image:./images/icon-no.png[No prebuilt dashboards]    |  
+|<<metricbeat-module-haproxy,HAProxy>>     |image:./images/icon-yes.png[Prebuilt dashboards are available]    |  
 .2+| .2+|  |<<metricbeat-metricset-haproxy-info,info>>   
 |<<metricbeat-metricset-haproxy-stat,stat>>   
 |<<metricbeat-module-http,HTTP>>     |image:./images/icon-no.png[No prebuilt dashboards]    |  
