@@ -1,22 +1,22 @@
-#=========================== Filebeat prospectors =============================
+#=========================== Filebeat inputs =============================
 
-# List of prospectors to fetch data.
-filebeat.prospectors:
-# Each - is a prospector. Most options can be set at the prospector level, so
-# you can use different prospectors for various configurations.
-# Below are the prospector specific configurations.
+# List of inputs to fetch data.
+filebeat.inputs:
+# Each - is an input. Most options can be set at the input level, so
+# you can use different inputs for various configurations.
+# Below are the input specific configurations.
 
 # Type of the files. Based on this the way the file is read is decided.
-# The different types cannot be mixed in one prospector
+# The different types cannot be mixed in one input
 #
 # Possible options are:
 # * log: Reads every line of the log file (default)
 # * stdin: Reads the standard in
 
-#------------------------------ Log prospector --------------------------------
+#------------------------------ Log input --------------------------------
 - type: log
 
-  # Change to true to enable this prospector configuration.
+  # Change to true to enable this input configuration.
   enabled: false
 
   # Paths that should be crawled and fetched. Glob based paths.
@@ -67,7 +67,7 @@ filebeat.prospectors:
   # Time strings like 2h (2 hours), 5m (5 minutes) can be used.
   #ignore_older: 0
 
-  # How often the prospector checks for new files in the paths that are specified
+  # How often the input checks for new files in the paths that are specified
   # for harvesting. Specify 1s to scan the directory as frequently as possible
   # without causing Filebeat to scan too frequently. Default: 10s.
   #scan_frequency: 10s
@@ -137,7 +137,7 @@ filebeat.prospectors:
   # this can mean that the first entries of a new file are skipped.
   #tail_files: false
 
-  # The Ingest Node pipeline ID associated with this prospector. If this is set, it
+  # The Ingest Node pipeline ID associated with this input. If this is set, it
   # overwrites the pipeline option from the Elasticsearch output.
   #pipeline:
 
@@ -203,23 +203,25 @@ filebeat.prospectors:
   # Note: Potential data loss. Make sure to read and understand the docs for this option.
   #close_timeout: 0
 
-  # Defines if prospectors is enabled
+  # Defines if inputs is enabled
   #enabled: true
 
-#----------------------------- Stdin prospector -------------------------------
+#----------------------------- Stdin input -------------------------------
 # Configuration to use stdin input
 #- type: stdin
 
-#------------------------- Redis slowlog prospector ---------------------------
-# Experimental: Config options for the redis slow log prospector
+#------------------------- Redis slowlog input ---------------------------
+# Experimental: Config options for the redis slow log input
 #- type: redis
-  #hosts: ["localhost:6379"]
-  #username:
-  #password:
   #enabled: false
+
+  # List of hosts to pool to retrieve the slow log information.
+  #hosts: ["localhost:6379"]
+
+  # How often the input checks for redis slow log.
   #scan_frequency: 10s
 
-  # Timeout after which time the prospector should return an error
+  # Timeout after which time the input should return an error
   #timeout: 1s
 
   # Network type to be used for redis connection. Default: tcp
@@ -231,17 +233,64 @@ filebeat.prospectors:
   # Redis AUTH password. Empty by default.
   #password: foobared
 
-#------------------------------ Udp prospector --------------------------------
-# Experimental: Config options for the udp prospector
+#------------------------------ Udp input --------------------------------
+# Experimental: Config options for the udp input
 #- type: udp
+  #enabled: false
 
   # Maximum size of the message received over UDP
-  #max_message_size: 10240
+  #max_message_size: 10KiB
+
+#------------------------------ TCP input --------------------------------
+# Experimental: Config options for the TCP input
+#- type: tcp
+  #enabled: false
+
+  # The host and port to receive the new event
+  #host: "localhost:9000"
+
+  # Character used to split new message
+  #line_delimiter: "\n"
+
+  # Maximum size in bytes of the message received over TCP
+  #max_message_size: 20MiB
+
+  # The number of seconds of inactivity before a remote connection is closed.
+  #timeout: 300s
+
+#------------------------------ Syslog input --------------------------------
+# Experimental: Config options for the Syslog input
+# Accept RFC3164 formatted syslog event via UDP.
+#- type: syslog
+  #enabled: false
+  #protocol.udp:
+    # The host and port to receive the new event
+    #host: "localhost:9000"
+
+    # Maximum size of the message received over UDP
+    #max_message_size: 10KiB
+
+# Accept RFC3164 formatted syslog event via TCP.
+#- type: syslog
+  #enabled: false
+
+  #protocol.tcp:
+    # The host and port to receive the new event
+    #host: "localhost:9000"
+
+    # Character used to split new message
+    #line_delimiter: "\n"
+
+    # Maximum size in bytes of the message received over TCP
+    #max_message_size: 20MiB
+
+    # The number of seconds of inactivity before a remote connection is closed.
+    #timeout: 300s
 
 #========================== Filebeat autodiscover ==============================
 
 # Autodiscover allows you to detect changes in the system and spawn new modules
-# or prospectors as they happen.
+# or inputs as they happen.
 
 #filebeat.autodiscover:
   # List of enabled autodiscover providers
@@ -261,10 +310,15 @@ filebeat.prospectors:
 # data path.
 #filebeat.registry_file: ${path.data}/registry
 
-# These config files must have the full filebeat config part inside, but only
-# the prospector part is processed. All global options like spool_size are ignored.
-# The config_dir MUST point to a different directory then where the main filebeat config file is in.
-#filebeat.config_dir:
+# The permissions mask to apply on registry file. The default value is 0600.
+# Must be a valid Unix-style file permissions mask expressed in octal notation.
+# This option is not supported on Windows.
+#filebeat.registry_file_permissions: 0600
+
+# By default Ingest pipelines are not updated if a pipeline with the same ID
+# already exists. If this option is enabled Filebeat overwrites pipelines
+# everytime a new Elasticsearch connection is established.
+#filebeat.overwrite_pipelines: false
 
 # How long filebeat waits on shutdown for the publisher to finish.
 # Default is 0, not waiting.
@@ -272,9 +326,9 @@ filebeat.prospectors:
 
 # Enable filebeat config reloading
 #filebeat.config:
-  #prospectors:
+  #inputs:
     #enabled: false
-    #path: prospectors.d/*.yml
+    #path: inputs.d/*.yml
     #reload.enabled: true
     #reload.period: 10s
   #modules:

@@ -1,0 +1,42 @@
+{
+  "description": "Pipeline for parsing IIS error logs. Requires the geoip plugin.",
+  "processors": [{
+    "grok": {
+      "field": "message",
+      "patterns":[
+        "%{TIMESTAMP_ISO8601:iis.error.time} %{IPORHOST:iis.error.remote_ip} %{NUMBER:iis.error.remote_port} %{IPORHOST:iis.error.server_ip} %{IPORHOST:iis.error.server_port} (?:HTTP/%{NUMBER:iis.error.http_version}|-) (?:%{WORD:iis.error.method}|-) (?:%{URIPATHPARAM:iis.error.url}|-)(?: -)? (?:%{NUMBER:iis.error.response_code}|-) (?:%{NUMBER}|-) (?:%{NOTSPACE:iis.error.reason_phrase}|-) (?:%{NOTSPACE:iis.error.queue_name}|-)"
+      ],
+      "ignore_missing": true
+    }
+  }, {
+    "remove":{
+      "field": "message"
+    }
+  }, {
+    "rename": {
+      "field": "@timestamp",
+      "target_field": "read_timestamp"
+    }
+  }, {
+    "date": {
+      "field": "iis.error.time",
+      "target_field": "@timestamp",
+      "formats": ["yyyy-MM-dd HH:mm:ss"]
+    }
+  }, {
+    "remove": {
+      "field": "iis.error.time"
+    }
+  }, {
+    "geoip": {
+      "field": "iis.error.remote_ip",
+      "target_field": "iis.error.geoip"
+    }
+  }],
+  "on_failure" : [{
+    "set" : {
+      "field" : "error.message",
+      "value" : "{{ _ingest.on_failure_message }}"
+    }
+  }]
+}

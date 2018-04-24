@@ -7,10 +7,11 @@ import (
 	"time"
 	"unsafe"
 
-	mbtest "github.com/elastic/beats/metricbeat/mb/testing"
-
 	"github.com/pkg/errors"
 	"github.com/stretchr/testify/assert"
+
+	"github.com/elastic/beats/metricbeat/mb"
+	mbtest "github.com/elastic/beats/metricbeat/mb/testing"
 )
 
 const processorTimeCounter = `\Processor Information(_Total)\% Processor Time`
@@ -38,16 +39,20 @@ func TestData(t *testing.T) {
 		},
 	}
 
-	f := mbtest.NewEventsFetcher(t, config)
-
-	f.Fetch()
-
+	ms := mbtest.NewReportingMetricSetV2(t, config)
+	mbtest.ReportingFetchV2(ms)
 	time.Sleep(60 * time.Millisecond)
 
-	err := mbtest.WriteEvents(f, t)
-	if err != nil {
-		t.Fatal("write", err)
+	events, errs := mbtest.ReportingFetchV2(ms)
+	if len(errs) > 0 {
+		t.Fatal(errs)
 	}
+	if len(events) == 0 {
+		t.Fatal("no events received")
+	}
+
+	beatEvent := mbtest.StandardizeEvent(ms, events[0], mb.AddMetricSetInfo)
+	mbtest.WriteEventToDataJSON(t, beatEvent)
 }
 
 func TestQuery(t *testing.T) {
@@ -85,11 +90,13 @@ func TestQuery(t *testing.T) {
 }
 
 func TestExistingCounter(t *testing.T) {
-	config := make([]CounterConfig, 1)
-	config[0].InstanceLabel = "processor.name"
-	config[0].MeasurementLabel = "processor.time.total.pct"
-	config[0].Query = processorTimeCounter
-	config[0].Format = "float"
+	config := Config{
+		CounterConfig: make([]CounterConfig, 1),
+	}
+	config.CounterConfig[0].InstanceLabel = "processor.name"
+	config.CounterConfig[0].MeasurementLabel = "processor.time.total.pct"
+	config.CounterConfig[0].Query = processorTimeCounter
+	config.CounterConfig[0].Format = "float"
 	handle, err := NewPerfmonReader(config)
 	if err != nil {
 		t.Fatal(err)
@@ -105,11 +112,13 @@ func TestExistingCounter(t *testing.T) {
 }
 
 func TestNonExistingCounter(t *testing.T) {
-	config := make([]CounterConfig, 1)
-	config[0].InstanceLabel = "processor.name"
-	config[0].MeasurementLabel = "processor.time.total.pct"
-	config[0].Query = "\\Processor Information(_Total)\\not existing counter"
-	config[0].Format = "float"
+	config := Config{
+		CounterConfig: make([]CounterConfig, 1),
+	}
+	config.CounterConfig[0].InstanceLabel = "processor.name"
+	config.CounterConfig[0].MeasurementLabel = "processor.time.total.pct"
+	config.CounterConfig[0].Query = "\\Processor Information(_Total)\\not existing counter"
+	config.CounterConfig[0].Format = "float"
 	handle, err := NewPerfmonReader(config)
 	if assert.Error(t, err) {
 		assert.EqualValues(t, PDH_CSTATUS_NO_COUNTER, errors.Cause(err))
@@ -121,12 +130,39 @@ func TestNonExistingCounter(t *testing.T) {
 	}
 }
 
+func TestIgnoreNonExistentCounter(t *testing.T) {
+	config := Config{
+		CounterConfig:    make([]CounterConfig, 1),
+		IgnoreNECounters: true,
+	}
+	config.CounterConfig[0].InstanceLabel = "processor.name"
+	config.CounterConfig[0].MeasurementLabel = "processor.time.total.pct"
+	config.CounterConfig[0].Query = "\\Processor Information(_Total)\\not existing counter"
+	config.CounterConfig[0].Format = "float"
+	handle, err := NewPerfmonReader(config)
+
+	values, err := handle.Read()
+
+	if assert.Error(t, err) {
+		assert.EqualValues(t, PDH_NO_DATA, errors.Cause(err))
+	}
+
+	if handle != nil {
+		err = handle.query.Close()
+		assert.NoError(t, err)
+	}
+
+	t.Log(values)
+}
+
 func TestNonExistingObject(t *testing.T) {
-	config := make([]CounterConfig, 1)
-	config[0].InstanceLabel = "processor.name"
-	config[0].MeasurementLabel = "processor.time.total.pct"
-	config[0].Query = "\\non existing object\\% Processor Performance"
-	config[0].Format = "float"
+	config := Config{
+		CounterConfig: make([]CounterConfig, 1),
+	}
+	config.CounterConfig[0].InstanceLabel = "processor.name"
+	config.CounterConfig[0].MeasurementLabel = "processor.time.total.pct"
+	config.CounterConfig[0].Query = "\\non existing object\\% Processor Performance"
+	config.CounterConfig[0].Format = "float"
 	handle, err := NewPerfmonReader(config)
 	if assert.Error(t, err) {
 		assert.EqualValues(t, PDH_CSTATUS_NO_OBJECT, errors.Cause(err))
@@ -253,11 +289,13 @@ func TestRawValues(t *testing.T) {
 }
 
 func TestWildcardQuery(t *testing.T) {
-	config := make([]CounterConfig, 1)
-	config[0].InstanceLabel = "processor.name"
-	config[0].MeasurementLabel = "processor.time.pct"
-	config[0].Query = `\Processor Information(*)\% Processor Time`
-	config[0].Format = "float"
+	config := Config{
+		CounterConfig: make([]CounterConfig, 1),
+	}
+	config.CounterConfig[0].InstanceLabel = "processor.name"
+	config.CounterConfig[0].MeasurementLabel = "processor.time.pct"
+	config.CounterConfig[0].Query = `\Processor Information(*)\% Processor Time`
+	config.CounterConfig[0].Format = "float"
 	handle, err := NewPerfmonReader(config)
 	if err != nil {
 		t.Fatal(err)
@@ -273,7 +311,7 @@ func TestWildcardQuery(t *testing.T) {
 		t.Fatal(err)
 	}
 
-	pctKey, err := values[0].HasKey("processor.time.pct")
+	pctKey, err := values[0].MetricSetFields.HasKey("processor.time.pct")
 	if err != nil {
 		t.Fatal(err)
 	}

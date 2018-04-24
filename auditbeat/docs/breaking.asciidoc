@@ -1,0 +1,126 @@
+[[auditbeat-breaking-changes]]
+== Breaking changes in 6.2
+
+As a general rule, we strive to keep backwards compatibility between minor
+versions (e.g.  6.x to 6.y) so you can upgrade without any configuration file
+changes, but there are breaking changes between the earlier beta releases and
+the 6.2 GA release.
+
+There are changes that affect both the configuration and the event schema.
+
+[float]
+=== Configuration Changes
+
+The audit module has been renamed and is now two separate modules: the
+<<auditbeat-module-auditd,auditd module>> and the
+<<auditbeat-module-file_integrity,file_integrity module>>. You must update your
+configuration to use these modules.
+
+The `kernel` metricset has become the <<auditbeat-module-auditd,auditd module>>.
+
+.Old Config
+[source,yaml]
+----
+- module: audit
+  metricsets: ["kernel"]
+  kernel.resolve_ids: true
+  kernel.failure_mode: silent
+  kernel.backlog_limit: 8196
+  kernel.rate_limit: 0
+  kernel.include_raw_message: false
+  kernel.include_warnings: false
+  kernel.audit_rules: |
+    # Rules
+----
+
+.New Config
+[source,yaml]
+----
+- module: auditd
+  resolve_ids: true
+  failure_mode: silent
+  backlog_limit: 8196
+  rate_limit: 0
+  include_raw_message: false
+  include_warnings: false
+  audit_rules: |
+    # Rules
+----
+
+The `file` metricset has become the
+<<auditbeat-module-file_integrity,file_integrity module>>.
+
+.Old Config
+[source,yaml]
+----
+- module: audit
+  metricsets: [file]
+  file.paths:
+  - /bin
+  - /usr/bin
+  - /sbin
+  - /usr/sbin
+  - /etc
+  file.scan_at_start: true
+  file.scan_rate_per_sec: 50 MiB
+  file.max_file_size: 100 MiB
+  file.hash_types: [sha1]
+----
+
+.New Config
+[source,yaml]
+----
+- module: file_integrity
+  paths:
+  - /bin
+  - /usr/bin
+  - /sbin
+  - /usr/sbin
+  - /etc
+  scan_at_start: true
+  scan_rate_per_sec: 50 MiB
+  max_file_size: 100 MiB
+  hash_types: [sha1]
+  recursive: false <1>
+----
+<1> `recursive` is a new option in 6.2 and is disabled by default. Set the value
+to true to watch for changes in all sub-directories.
+
+[float]
+=== Event Schema Changes
+
+Most field names were changed in 6.2. We wanted to rename the modules and use
+common field names for similar data types across all the modules. The table
+below provides a summary of the field changes.
+
+In Kibana you need to <<load-kibana-dashboards,import>> the latest dashboards
+that work with the new event format. The new dashboards will not work with data
+produced by older versions of Auditbeat.
+
+.Renamed Fields
+[frame="topbot",options="header"]
+|======================
+|Old Field|New Field
+|`metricset.module`        |`event.module`
+|`metricset.name`          |_Removed_
+|`audit.kernel.action`     |`event.action`
+|`audit.kernel.category`   |`event.category`
+|`audit.kernel.record_type`|`event.type`
+|`audit.kernel.key`        |`tags`
+|`audit.kernel.actor.attrs`|`user`
+|`audit.kernel.actor`      |`auditd.summary.actor`
+|`audit.kernel.thing`      |`auditd.summary.object`
+|`audit.kernel.how`        |`auditd.summary.how`
+|`audit.kernel.socket`     |`auditd.data.socket`, `source`, `destination`
+footnote:[Based on the syscall type either the `source` or `destination` may
+also be populated.]
+|`audit.kernel.data.*`     |`process.*` footnote:[Fields related to a process
+will be moved under the `process` namespace.]
+|`audit.kernel.data.*`     |`file.*` footnote:[Fields related to a file will be
+moved under the `file` namespace.]
+|`audit.kernel.data`       |`auditd.data`
+|`audit.file.action`       |`event.action`
+|`audit.file.hash`         |`hash`
+|`audit.file`              |`file`
+|======================
+

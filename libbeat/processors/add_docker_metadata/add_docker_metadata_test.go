@@ -96,8 +96,9 @@ func TestMatchContainer(t *testing.T) {
 				Image: "image",
 				Name:  "name",
 				Labels: map[string]string{
-					"a": "1",
-					"b": "2",
+					"a.x":   "1",
+					"b":     "2",
+					"b.foo": "3",
 				},
 			},
 		}))
@@ -115,8 +116,13 @@ func TestMatchContainer(t *testing.T) {
 				"id":    "container_id",
 				"image": "image",
 				"labels": common.MapStr{
-					"a": "1",
-					"b": "2",
+					"a": common.MapStr{
+						"x": "1",
+					},
+					"b": common.MapStr{
+						"value": "2",
+						"foo":   "3",
+					},
 				},
 				"name": "name",
 			},
@@ -298,7 +304,7 @@ func MockWatcherFactory(containers map[string]*docker.Container) docker.WatcherC
 	if containers == nil {
 		containers = make(map[string]*docker.Container)
 	}
-	return func(host string, tls *docker.TLSConfig) (docker.Watcher, error) {
+	return func(host string, tls *docker.TLSConfig, shortID bool) (docker.Watcher, error) {
 		return &mockWatcher{containers: containers}, nil
 	}
 }

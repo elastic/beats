@@ -2,6 +2,7 @@ package elasticsearch
 
 import "os"
 
+// GetEnvHost returns host for Elasticsearch
 func GetEnvHost() string {
 	host := os.Getenv("ES_HOST")
 
@@ -11,6 +12,7 @@ func GetEnvHost() string {
 	return host
 }
 
+// GetEnvPort returns port for Elasticsearch
 func GetEnvPort() string {
 	port := os.Getenv("ES_PORT")
 
@@ -20,6 +22,7 @@ func GetEnvPort() string {
 	return port
 }
 
+// GetConfig returns config for elasticsearch module
 func GetConfig(metricset string) map[string]interface{} {
 	return map[string]interface{}{
 		"module":     "elasticsearch",

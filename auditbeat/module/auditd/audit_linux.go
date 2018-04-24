@@ -11,7 +11,6 @@ import (
 	"github.com/pkg/errors"
 
 	"github.com/elastic/beats/libbeat/common"
-	"github.com/elastic/beats/libbeat/common/cfgwarn"
 	"github.com/elastic/beats/libbeat/logp"
 	"github.com/elastic/beats/libbeat/monitoring"
 	"github.com/elastic/beats/metricbeat/mb"
@@ -56,8 +55,6 @@ type MetricSet struct {
 
 // New constructs a new MetricSet.
 func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
-	cfgwarn.Beta("The %v module is a beta feature", moduleName)
-
 	config := defaultConfig
 	if err := base.Module().UnpackConfig(&config); err != nil {
 		return nil, errors.Wrap(err, "failed to unpack the auditd config")
@@ -167,7 +164,7 @@ func (ms *MetricSet) addRules(reporter mb.PushReporterV2) error {
 			// Treat rule add errors as warnings and continue.
 			err = errors.Wrapf(err, "failed to add audit rule '%v'", rule.flags)
 			reporter.Error(err)
-			ms.log.Warnw("Failure adding audit rule", err)
+			ms.log.Warnw("Failure adding audit rule", "error", err)
 			failCount++
 		}
 	}

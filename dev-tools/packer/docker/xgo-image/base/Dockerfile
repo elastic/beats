@@ -19,7 +19,10 @@ RUN chmod +x $FETCH
 
 
 # Make sure apt-get is up to date and dependent packages are installed
+# XXX: The first line is a workaround for the "Sum hash mismatch" error, from here:
+# https://askubuntu.com/questions/760574/sudo-apt-get-update-failes-due-to-hash-sum-mismatch
 RUN \
+  apt-get clean && \
   apt-get update && \
   apt-get install -y automake autogen build-essential ca-certificates           \
     gcc-arm-linux-gnueabi g++-arm-linux-gnueabi libc6-dev-armel-cross           \

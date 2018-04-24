@@ -1,0 +1,42 @@
+////
+This file is generated! See scripts/docs_collector.py
+////
+
+[[metricbeat-module-munin]]
+== Munin module
+
+experimental[]
+
+== munin module
+
+This is the munin module.
+
+The default metricset is `node`.
+
+
+[float]
+=== Example configuration
+
+The Munin module supports the standard configuration options that are described
+in <<configuration-metricbeat>>. Here is an example configuration:
+
+[source,yaml]
+----
+metricbeat.modules:
+- module: munin
+  metricsets: ["node"]
+  enabled: true
+  period: 10s
+  hosts: ["localhost:4949"]
+  node.namespace: node
+----
+
+[float]
+=== Metricsets
+
+The following metricsets are available:
+
+* <<metricbeat-metricset-munin-node,node>>
+
+include::munin/node.asciidoc[]
+

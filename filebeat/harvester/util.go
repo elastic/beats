@@ -2,7 +2,7 @@ package harvester
 
 import "github.com/elastic/beats/libbeat/common/match"
 
-// Contains available prospector types
+// Contains available input types
 const (
 	LogType    = "log"
 	StdinType  = "stdin"

@@ -27,6 +27,8 @@ This section includes additional information on how to set up and run
 
 include::../../libbeat/docs/shared-directory-layout.asciidoc[]
 
+include::../../libbeat/docs/keystore.asciidoc[]
+
 include::../../libbeat/docs/command-reference.asciidoc[]
 
 include::./running-on-docker.asciidoc[]

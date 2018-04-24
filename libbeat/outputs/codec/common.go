@@ -3,7 +3,7 @@ package codec
 import (
 	"time"
 
-	structform "github.com/urso/go-structform"
+	"github.com/elastic/go-structform"
 
 	"github.com/elastic/beats/libbeat/common"
 	"github.com/elastic/beats/libbeat/common/dtfmt"

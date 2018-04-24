@@ -40,9 +40,13 @@ type MetricSet struct {
 // Part of new is also setting up the configuration by processing additional
 // configuration entries if needed.
 func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
+	prometheus, err := helper.NewPrometheusClient(base)
+	if err != nil {
+		return nil, err
+	}
 	return &MetricSet{
 		BaseMetricSet: base,
-		prometheus:    helper.NewPrometheusClient(base),
+		prometheus:    prometheus,
 	}, nil
 }
 

@@ -151,8 +151,10 @@ func (r *reporter) Stop() {
 }
 
 func (r *reporter) initLoop() {
-	logp.Info("Start monitoring endpoint init loop.")
-	defer logp.Info("Stop monitoring endpoint init loop.")
+	debugf("Start monitoring endpoint init loop.")
+	defer debugf("Finish monitoring endpoint init loop.")
+
+	logged := false
 
 	for {
 		// Select one configured endpoint by random and check if xpack is available
@@ -161,6 +163,12 @@ func (r *reporter) initLoop() {
 		if err == nil {
 			closing(client)
 			break
+		} else {
+			if !logged {
+				logp.Info("Failed to connect to Elastic X-Pack Monitoring. Either Elasticsearch X-Pack monitoring is not enabled or Elasticsearch is not available. Will keep retrying.")
+				logged = true
+			}
+			debugf("Monitoring could not connect to elasticsearch, failed with %v", err)
 		}
 
 		select {
@@ -169,6 +177,8 @@ func (r *reporter) initLoop() {
 		case <-time.After(r.checkRetry):
 		}
 	}
+
+	logp.Info("Successfully connected to X-Pack Monitoring endpoint.")
 
 	// Start collector and send loop if monitoring endpoint has been found.
 	go r.snapshotLoop()

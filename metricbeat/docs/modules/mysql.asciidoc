@@ -8,6 +8,8 @@ This file is generated! See scripts/docs_collector.py
 This module periodically fetches metrics from https://www.mysql.com/[MySQL]
 servers.
 
+The default metricset is `status`.
+
 [float]
 === Module-specific configuration notes
 

@@ -12,29 +12,38 @@ import (
 )
 
 func init() {
-	if err := mb.Registry.AddMetricSet("system", "diskio", New, parse.EmptyHostParser); err != nil {
-		panic(err)
-	}
+	mb.Registry.MustAddMetricSet("system", "diskio", New,
+		mb.WithHostParser(parse.EmptyHostParser),
+	)
 }
 
 // MetricSet for fetching system disk IO metrics.
 type MetricSet struct {
 	mb.BaseMetricSet
-	statistics *DiskIOStat
+	statistics     *DiskIOStat
+	includeDevices []string
 }
 
 // New is a mb.MetricSetFactory that returns a new MetricSet.
 func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
-	ms := &MetricSet{
-		BaseMetricSet: base,
-		statistics:    NewDiskIOStat(),
+	config := struct {
+		IncludeDevices []string `config:"diskio.include_devices"`
+	}{IncludeDevices: []string{}}
+
+	if err := base.Module().UnpackConfig(&config); err != nil {
+		return nil, err
 	}
-	return ms, nil
+
+	return &MetricSet{
+		BaseMetricSet:  base,
+		statistics:     NewDiskIOStat(),
+		includeDevices: config.IncludeDevices,
+	}, nil
 }
 
 // Fetch fetches disk IO metrics from the OS.
 func (m *MetricSet) Fetch() ([]common.MapStr, error) {
-	stats, err := disk.IOCounters()
+	stats, err := disk.IOCounters(m.includeDevices...)
 	if err != nil {
 		return nil, errors.Wrap(err, "disk io counters")
 	}

@@ -1,0 +1,3 @@
+- module: munin
+  hosts: ["localhost:4949"]
+  node.namespace: node

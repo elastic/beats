@@ -32,11 +32,33 @@ func TestDockerJSON(t *testing.T) {
 			stream:        "all",
 			expectedError: true,
 		},
+		// Wrong CRI
+		{
+			input:         [][]byte{[]byte(`2017-09-12T22:32:21.212861448Z stdout`)},
+			stream:        "all",
+			expectedError: true,
+		},
+		// Wrong CRI
+		{
+			input:         [][]byte{[]byte(`{this is not JSON nor CRI`)},
+			stream:        "all",
+			expectedError: true,
+		},
 		// Missing time
 		{
 			input:         [][]byte{[]byte(`{"log":"1:M 09 Nov 13:27:36.276 # User requested shutdown...\n","stream":"stdout"}`)},
 			stream:        "all",
 			expectedError: true,
+		},
+		// CRI log
+		{
+			input:  [][]byte{[]byte(`2017-09-12T22:32:21.212861448Z stdout 2017-09-12 22:32:21.212 [INFO][88] table.go 710: Invalidating dataplane cache`)},
+			stream: "all",
+			expectedMessage: Message{
+				Content: []byte("2017-09-12 22:32:21.212 [INFO][88] table.go 710: Invalidating dataplane cache"),
+				Fields:  common.MapStr{"stream": "stdout"},
+				Ts:      time.Date(2017, 9, 12, 22, 32, 21, 212861448, time.UTC),
+			},
 		},
 		// Filtering stream
 		{
@@ -50,6 +72,20 @@ func TestDockerJSON(t *testing.T) {
 				Content: []byte("unfiltered\n"),
 				Fields:  common.MapStr{"stream": "stderr"},
 				Ts:      time.Date(2017, 11, 9, 13, 27, 36, 277747246, time.UTC),
+			},
+		},
+		// Filtering stream
+		{
+			input: [][]byte{
+				[]byte(`2017-10-12T13:32:21.232861448Z stdout 2017-10-12 13:32:21.212 [INFO][88] table.go 710: Invalidating dataplane cache`),
+				[]byte(`2017-11-12T23:32:21.212771448Z stderr 2017-11-12 23:32:21.212 [ERROR][77] table.go 111: error`),
+				[]byte(`2017-12-12T10:32:21.212864448Z stdout 2017-12-12 10:32:21.212 [WARN][88] table.go 222: Warn`),
+			},
+			stream: "stderr",
+			expectedMessage: Message{
+				Content: []byte("2017-11-12 23:32:21.212 [ERROR][77] table.go 111: error"),
+				Fields:  common.MapStr{"stream": "stderr"},
+				Ts:      time.Date(2017, 11, 12, 23, 32, 21, 212771448, time.UTC),
 			},
 		},
 	}

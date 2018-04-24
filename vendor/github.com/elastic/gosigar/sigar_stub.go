@@ -22,6 +22,10 @@ func (s *Swap) Get() error {
 	return ErrNotImplemented{runtime.GOOS}
 }
 
+func (s *HugeTLBPages) Get() error {
+	return ErrNotImplemented{runtime.GOOS}
+}
+
 func (f *FDUsage) Get() error {
 	return ErrNotImplemented{runtime.GOOS}
 }
@@ -63,5 +67,9 @@ func (p *ProcList) Get() error {
 }
 
 func (p *ProcArgs) Get(int) error {
+	return ErrNotImplemented{runtime.GOOS}
+}
+
+func (self *Rusage) Get(int) error {
 	return ErrNotImplemented{runtime.GOOS}
 }

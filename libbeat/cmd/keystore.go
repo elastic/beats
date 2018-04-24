@@ -196,14 +196,13 @@ func addKey(store keystore.Keystore, keys []string, force, stdin bool) error {
 			return fmt.Errorf("could not read value from the input, error: %s", err)
 		}
 	}
-
-	store.Store(key, keyValue)
-	err = store.Save()
-
-	if err == nil {
-		fmt.Println("Successfully updated the keystore")
+	if err = store.Store(key, keyValue); err != nil {
+		return fmt.Errorf("could not add the key in the keystore, error: %s", err)
+	}
+	if err = store.Save(); err != nil {
+		return fmt.Errorf("fail to save the keystore: %s", err)
 	} else {
-		return fmt.Errorf("fail to add the key to the Keystore: %s", err)
+		fmt.Println("Successfully updated the keystore")
 	}
 	return nil
 }

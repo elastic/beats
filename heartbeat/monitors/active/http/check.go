@@ -1,12 +1,12 @@
 package http
 
 import (
-	"bytes"
 	"errors"
 	"fmt"
-	"io"
 	"io/ioutil"
 	"net/http"
+
+	"github.com/elastic/beats/libbeat/common/match"
 )
 
 type RespCheck func(*http.Response) error
@@ -29,7 +29,7 @@ func makeValidateResponse(config *responseParameters) RespCheck {
 	}
 
 	if len(config.RecvBody) > 0 {
-		checks = append(checks, checkBody([]byte(config.RecvBody)))
+		checks = append(checks, checkBody(config.RecvBody))
 	}
 
 	return checkAll(checks...)
@@ -84,18 +84,17 @@ func checkHeaders(headers map[string]string) RespCheck {
 	}
 }
 
-func checkBody(body []byte) RespCheck {
+func checkBody(body []match.Matcher) RespCheck {
 	return func(r *http.Response) error {
-		// read up to len(body)+1 bytes for comparing content to be equal
-		in := io.LimitReader(r.Body, int64(len(body))+1)
-		content, err := ioutil.ReadAll(in)
+		content, err := ioutil.ReadAll(r.Body)
 		if err != nil {
 			return err
 		}
-
-		if !bytes.Equal(body, content) {
-			return errBodyMismatch
+		for _, m := range body {
+			if m.Match(content) {
+				return nil
+			}
 		}
-		return nil
+		return errBodyMismatch
 	}
 }

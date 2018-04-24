@@ -3,20 +3,20 @@ package raid
 import (
 	"path/filepath"
 
+	"github.com/pkg/errors"
+	"github.com/prometheus/procfs"
+
 	"github.com/elastic/beats/libbeat/common"
 	"github.com/elastic/beats/libbeat/common/cfgwarn"
 	"github.com/elastic/beats/metricbeat/mb"
 	"github.com/elastic/beats/metricbeat/mb/parse"
 	"github.com/elastic/beats/metricbeat/module/system"
-	"github.com/elastic/procfs"
-
-	"github.com/pkg/errors"
 )
 
 func init() {
-	if err := mb.Registry.AddMetricSet("system", "raid", New, parse.EmptyHostParser); err != nil {
-		panic(err)
-	}
+	mb.Registry.MustAddMetricSet("system", "raid", New,
+		mb.WithHostParser(parse.EmptyHostParser),
+	)
 }
 
 // MetricSet contains proc fs data.
@@ -27,7 +27,7 @@ type MetricSet struct {
 
 // New creates a new instance of the raid metricset.
 func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
-	cfgwarn.Experimental("The system raid metricset is experimental")
+	cfgwarn.Beta("The system raid metricset is beta")
 
 	systemModule, ok := base.Module().(*system.Module)
 	if !ok {
@@ -53,12 +53,10 @@ func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
 		return nil, err
 	}
 
-	m := &MetricSet{
+	return &MetricSet{
 		BaseMetricSet: base,
 		fs:            fs,
-	}
-
-	return m, nil
+	}, nil
 }
 
 // Fetch fetches one event for each device

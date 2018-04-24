@@ -16,5 +16,6 @@
       description: >
         The PID of the process that sent the syslog message.
     - name: message
+      type: text
       description: >
         The message in the log line.

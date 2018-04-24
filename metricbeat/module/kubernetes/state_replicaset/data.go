@@ -16,11 +16,14 @@ func eventMapping(families []*dto.MetricFamily) ([]common.MapStr, error) {
 			if replicaset == "" {
 				continue
 			}
-			event, ok := eventsMap[replicaset]
+			namespace := util.GetLabel(metric, "namespace")
+			replicasetKey := namespace + "::" + replicaset
+			event, ok := eventsMap[replicasetKey]
 			if !ok {
 				event = common.MapStr{}
-				eventsMap[replicaset] = event
+				eventsMap[replicasetKey] = event
 			}
+
 			switch family.GetName() {
 			case "kube_replicaset_metadata_generation":
 				event.Put(mb.ModuleDataKey+".namespace", util.GetLabel(metric, "namespace"))
@@ -50,7 +53,8 @@ func eventMapping(families []*dto.MetricFamily) ([]common.MapStr, error) {
 		}
 	}
 
-	var events []common.MapStr
+	// initialize, populate events array from values in eventsMap
+	events := make([]common.MapStr, 0, len(eventsMap))
 	for _, event := range eventsMap {
 		events = append(events, event)
 	}

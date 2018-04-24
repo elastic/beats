@@ -111,7 +111,7 @@ class Test(BaseTest):
             "-M", "{module}.{fileset}.enabled=true".format(module=module, fileset=fileset),
             "-M", "{module}.{fileset}.var.paths=[{test_file}]".format(
                 module=module, fileset=fileset, test_file=test_file),
-            "-M", "*.*.prospector.close_eof=true",
+            "-M", "*.*.input.close_eof=true",
         ]
 
         output_path = os.path.join(self.working_dir, module, fileset, os.path.basename(test_file))
@@ -153,13 +153,13 @@ class Test(BaseTest):
     @unittest.skipIf(not INTEGRATION_TESTS or
                      os.getenv("TESTING_ENVIRONMENT") == "2x",
                      "integration test not available on 2.x")
-    def test_prospector_pipeline_config(self):
+    def test_input_pipeline_config(self):
         """
-        Tests that the pipeline configured in the prospector overwrites
+        Tests that the pipeline configured in the input overwrites
         the one from the output.
         """
         self.init()
-        index_name = "filebeat-test-prospector"
+        index_name = "filebeat-test-input"
         try:
             self.es.indices.delete(index=index_name)
         except:
@@ -267,7 +267,8 @@ class Test(BaseTest):
         if modules_flag:
             cmd += ["--modules=nginx"]
 
-        output = open(os.path.join(self.working_dir, "output.log"), "ab")
+        output_path = os.path.join(self.working_dir, "output.log")
+        output = open(output_path, "ab")
         output.write(" ".join(cmd) + "\n")
         beat = subprocess.Popen(cmd,
                                 stdin=None,
@@ -282,5 +283,22 @@ class Test(BaseTest):
                         max_timeout=30)
         self.wait_until(lambda: "datafeed-filebeat-nginx-access-response_code" in
                         (df["datafeed_id"] for df in self.es.transport.perform_request("GET", "/_xpack/ml/datafeeds/")["datafeeds"]))
+
+        beat.kill()
+
+        # check if fails during trying to setting it up again
+        output = open(output_path, "ab")
+        output.write(" ".join(cmd) + "\n")
+        beat = subprocess.Popen(cmd,
+                                stdin=None,
+                                stdout=output,
+                                stderr=output,
+                                bufsize=0)
+
+        output = open(output_path, "r")
+        for obj in ["Datafeed", "Job", "Dashboard", "Search", "Visualization"]:
+            self.wait_log_contains("{obj} already exists".format(obj=obj),
+                                   logfile=output_path,
+                                   max_timeout=30)
 
         beat.kill()

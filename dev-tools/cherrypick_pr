@@ -2,6 +2,7 @@
 """Cherry pick and backport a PR"""
 
 import sys
+import os
 import argparse
 from os.path import expanduser
 import re
@@ -57,6 +58,8 @@ def main():
     parser.add_argument("--create_pr", action="store_true",
                         help="Create a PR using the Github API " +
                         "(requires token in ~/.elastic/github.token)")
+    parser.add_argument("--diff", action="store_true",
+                        help="Display the diff before pushing the PR")
     args = parser.parse_args()
 
     print(args)
@@ -96,6 +99,12 @@ def main():
                         shell=True).strip()) == 0:
         print("No commit to push")
         return 1
+
+    if args.diff:
+        call("git diff {}".format(args.to_branch), shell=True)
+        if raw_input("Continue? [y/n]: ") != "y":
+            print("Aborting cherry-pick.")
+            return 1
 
     print("Ready to push branch.")
     remote = raw_input("To which remote should I push? (your fork): ")
@@ -140,8 +149,22 @@ def main():
         # remove needs backport label from the original PR
         session.delete(base + "/issues/{}/labels/needs_backport".format(args.pr_number))
 
+        # get version and set a version label on the original PR
+        version = get_version(os.getcwd())
+        if version:
+            session.post(
+                base + "/issues/{}/labels".format(args.pr_number), json=["v" + version])
+
         print("\nDone. PR created: {}".format(new_pr["html_url"]))
         print("Please go and check it and add the review tags")
+
+def get_version(beats_dir):
+    pattern = re.compile(r'(const\s|)\w*(v|V)ersion\s=\s"(?P<version>.*)"')
+    with open(os.path.join(beats_dir, "libbeat/version/version.go"), "r") as f:
+        for line in f:
+            match = pattern.match(line)
+            if match:
+                return match.group('version')
 
 
 if __name__ == "__main__":

@@ -1,0 +1,17 @@
+//////////////////////////////////////////////////////////////////////////
+//// This content is shared by Filebeat inputs that use the UDP inputsource
+//// If you add IDs to sections, make sure you use attributes to create
+//// unique IDs for each input that includes this file. Use the format:
+//// [id="{beatname_lc}-input-{type}-option-name"]
+//////////////////////////////////////////////////////////////////////////
+[float]
+[id="{beatname_lc}-input-{type}-udp-max-message-size"]
+==== `max_message_size`
+
+The maximum size of the message received over UDP. The default is `10KiB`.
+
+[float]
+[id="{beatname_lc}-input-{type}-udp-host"]
+==== `host`
+
+The host and UDP port to listen on for event streams.

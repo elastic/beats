@@ -1,7 +1,15 @@
 package docker
 
 type Config struct {
-	TLS *TLSConfig `config:"ssl"`
+	TLS   *TLSConfig `config:"ssl"`
+	DeDot bool       `config:"labels.dedot"`
+}
+
+// DefaultConfig returns default module config
+func DefaultConfig() Config {
+	return Config{
+		DeDot: true,
+	}
 }
 
 type TLSConfig struct {

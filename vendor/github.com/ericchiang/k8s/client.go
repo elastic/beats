@@ -1,15 +1,23 @@
 /*
 Package k8s implements a Kubernetes client.
 
-	c, err := k8s.NewInClusterClient()
-	if err != nil {
-		// handle error
-	}
-	extensions := c.ExtensionsV1Beta1()
+	import (
+		"github.com/ericchiang/k8s"
+		appsv1 "github.com/ericchiang/k8s/apis/apps/v1"
+		metav1 "github.com/ericchiang/k8s/apis/meta/v1"
+	)
 
-	ingresses, err := extensions.ListIngresses(ctx, c.Namespace)
-	if err != nil {
-		// handle error
+	func listDeployments() (*apssv1.DeploymentList, error) {
+		c, err := k8s.NewInClusterClient()
+		if err != nil {
+			return nil, err
+		}
+
+		var deployments appsv1.DeploymentList
+		if err := c.List(ctx, "my-namespace", &deployments); err != nil {
+			return nil, err
+		}
+		return deployments, nil
 	}
 
 */
@@ -21,26 +29,19 @@ import (
 	"crypto/tls"
 	"crypto/x509"
 	"encoding/base64"
-	"encoding/binary"
 	"errors"
 	"fmt"
 	"io"
 	"io/ioutil"
 	"net"
 	"net/http"
-	"net/url"
 	"os"
-	"path"
 	"strconv"
-	"strings"
 	"time"
 
 	"golang.org/x/net/http2"
 
-	"github.com/ericchiang/k8s/api/unversioned"
-	"github.com/ericchiang/k8s/runtime"
-	"github.com/ericchiang/k8s/watch/versioned"
-	"github.com/golang/protobuf/proto"
+	metav1 "github.com/ericchiang/k8s/apis/meta/v1"
 )
 
 const (
@@ -55,23 +56,15 @@ const (
 
 // String returns a pointer to a string. Useful for creating API objects
 // that take pointers instead of literals.
-//
-//		cm := &v1.ConfigMap{
-//			Metadata: &v1.ObjectMeta{
-//				Name:      k8s.String("myconfigmap"),
-//				Namespace: k8s.String("default"),
-//			},
-//			Data: map[string]string{
-//				"foo": "bar",
-//			},
-//		}
-//
 func String(s string) *string { return &s }
 
-// Int is a convinence for converting an int literal to a pointer to an int.
+// Int is a convenience for converting an int literal to a pointer to an int.
 func Int(i int) *int { return &i }
 
-// Bool is a convinence for converting a bool literal to a pointer to a bool.
+// Int32 is a convenience for converting an int32 literal to a pointer to an int32.
+func Int32(i int32) *int32 { return &i }
+
+// Bool is a convenience for converting a bool literal to a pointer to a bool.
 func Bool(b bool) *bool { return &b }
 
 const (
@@ -292,7 +285,10 @@ func newClient(cluster Cluster, user AuthInfo, namespace string) (*Client, error
 	}
 
 	// See https://github.com/gtank/cryptopasta
-	tlsConfig := &tls.Config{MinVersion: tls.VersionTLS12}
+	tlsConfig := &tls.Config{
+		MinVersion:         tls.VersionTLS12,
+		InsecureSkipVerify: cluster.InsecureSkipTLSVerify,
+	}
 
 	if len(ca) != 0 {
 		tlsConfig.RootCAs = x509.NewCertPool()
@@ -361,7 +357,7 @@ func newClient(cluster Cluster, user AuthInfo, namespace string) (*Client, error
 // APIError is an error from a unexpected status code.
 type APIError struct {
 	// The status object returned by the Kubernetes API,
-	Status *unversioned.Status
+	Status *metav1.Status
 
 	// Status code returned by the HTTP request.
 	//
@@ -378,18 +374,18 @@ func (e *APIError) Error() string {
 	return fmt.Sprintf("%#v", e)
 }
 
-func checkStatusCode(c *codec, statusCode int, body []byte) error {
+func checkStatusCode(contentType string, statusCode int, body []byte) error {
 	if statusCode/100 == 2 {
 		return nil
 	}
 
-	return newAPIError(c, statusCode, body)
+	return newAPIError(contentType, statusCode, body)
 }
 
-func newAPIError(c *codec, statusCode int, body []byte) error {
-	status := new(unversioned.Status)
-	if err := c.unmarshal(body, status); err != nil {
-		return fmt.Errorf("decode error status: %v", err)
+func newAPIError(contentType string, statusCode int, body []byte) error {
+	status := new(metav1.Status)
+	if err := unmarshal(body, contentType, status); err != nil {
+		return fmt.Errorf("decode error status %d: %v", statusCode, err)
 	}
 	return &APIError{status, statusCode}
 }
@@ -401,70 +397,95 @@ func (c *Client) client() *http.Client {
 	return c.Client
 }
 
-// The following methods hold the logic for interacting with the Kubernetes API. Generated
-// clients are thin wrappers on top of these methods.
+// Create creates a resource of a registered type. The API version and resource
+// type is determined by the type of the req argument. The result is unmarshaled
+// into req.
 //
-// This client implements specs in the "API Conventions" developer document, which can be
-// found here:
+//		configMap := corev1.ConfigMap{
+//			Metadata: &metav1.ObjectMeta{
+//				Name:      k8s.String("my-configmap"),
+//				Namespace: k8s.String("my-namespace"),
+//			},
+//			Data: map[string]string{
+//				"my-key": "my-val",
+//			},
+//		}
+//		if err := client.Create(ctx, &configMap); err != nil {
+//			// handle error
+//		}
+//		// resource is updated with response of create request
+//		fmt.Println(conifgMap.Metaata.GetCreationTimestamp())
 //
-//   https://github.com/kubernetes/kubernetes/blob/master/docs/devel/api-conventions.md
-
-func (c *Client) urlFor(apiGroup, apiVersion, namespace, resource, name string, options ...Option) string {
-	basePath := "apis/"
-	if apiGroup == "" {
-		basePath = "api/"
-	}
-
-	var p string
-	if namespace != "" {
-		p = path.Join(basePath, apiGroup, apiVersion, "namespaces", namespace, resource, name)
-	} else {
-		p = path.Join(basePath, apiGroup, apiVersion, resource, name)
-	}
-	endpoint := ""
-	if strings.HasSuffix(c.Endpoint, "/") {
-		endpoint = c.Endpoint + p
-	} else {
-		endpoint = c.Endpoint + "/" + p
-	}
-	if len(options) == 0 {
-		return endpoint
-	}
-
-	v := url.Values{}
-	for _, option := range options {
-		key, val := option.queryParam()
-		v.Set(key, val)
-	}
-	return endpoint + "?" + v.Encode()
-}
-
-func (c *Client) urlForPath(path string) string {
-	if strings.HasPrefix(path, "/") {
-		path = path[1:]
-	}
-	if strings.HasSuffix(c.Endpoint, "/") {
-		return c.Endpoint + path
-	}
-	return c.Endpoint + "/" + path
-}
-
-func (c *Client) create(ctx context.Context, codec *codec, verb, url string, req, resp interface{}) error {
-	body, err := codec.marshal(req)
+func (c *Client) Create(ctx context.Context, req Resource, options ...Option) error {
+	url, err := resourceURL(c.Endpoint, req, false, options...)
 	if err != nil {
 		return err
 	}
+	return c.do(ctx, "POST", url, req, req)
+}
 
-	r, err := c.newRequest(ctx, verb, url, bytes.NewReader(body))
+func (c *Client) Delete(ctx context.Context, req Resource, options ...Option) error {
+	url, err := resourceURL(c.Endpoint, req, true, options...)
 	if err != nil {
 		return err
 	}
-	r.Header.Set("Content-Type", codec.contentType)
-	r.Header.Set("Accept", codec.contentType)
+	return c.do(ctx, "DELETE", url, nil, nil)
+}
+
+func (c *Client) Update(ctx context.Context, req Resource, options ...Option) error {
+	url, err := resourceURL(c.Endpoint, req, true, options...)
+	if err != nil {
+		return err
+	}
+	return c.do(ctx, "PUT", url, req, req)
+}
+
+func (c *Client) Get(ctx context.Context, namespace, name string, resp Resource, options ...Option) error {
+	url, err := resourceGetURL(c.Endpoint, namespace, name, resp, options...)
+	if err != nil {
+		return err
+	}
+	return c.do(ctx, "GET", url, nil, resp)
+}
+
+func (c *Client) List(ctx context.Context, namespace string, resp ResourceList, options ...Option) error {
+	url, err := resourceListURL(c.Endpoint, namespace, resp, options...)
+	if err != nil {
+		return err
+	}
+	return c.do(ctx, "GET", url, nil, resp)
+}
+
+func (c *Client) do(ctx context.Context, verb, url string, req, resp interface{}) error {
+	var (
+		contentType string
+		body        io.Reader
+	)
+	if req != nil {
+		ct, data, err := marshal(req)
+		if err != nil {
+			return fmt.Errorf("encoding object: %v", err)
+		}
+		contentType = ct
+		body = bytes.NewReader(data)
+	}
+	r, err := http.NewRequest(verb, url, body)
+	if err != nil {
+		return fmt.Errorf("new request: %v", err)
+	}
+	if contentType != "" {
+		r.Header.Set("Content-Type", contentType)
+		r.Header.Set("Accept", contentType)
+	} else if resp != nil {
+		r.Header.Set("Accept", contentTypeFor(resp))
+	}
+	if c.SetHeaders != nil {
+		c.SetHeaders(r.Header)
+	}
 
 	re, err := c.client().Do(r)
 	if err != nil {
-		return err
+		return fmt.Errorf("performing request: %v", err)
 	}
 	defer re.Body.Close()
 
@@ -473,143 +494,14 @@ func (c *Client) create(ctx context.Context, codec *codec, verb, url string, req
 		return fmt.Errorf("read body: %v", err)
 	}
 
-	if err := checkStatusCode(codec, re.StatusCode, respBody); err != nil {
+	respCT := re.Header.Get("Content-Type")
+	if err := checkStatusCode(respCT, re.StatusCode, respBody); err != nil {
 		return err
 	}
-	return codec.unmarshal(respBody, resp)
-}
-
-func (c *Client) delete(ctx context.Context, codec *codec, url string) error {
-	r, err := c.newRequest(ctx, "DELETE", url, nil)
-	if err != nil {
-		return err
-	}
-	r.Header.Set("Accept", codec.contentType)
-
-	re, err := c.client().Do(r)
-	if err != nil {
-		return err
-	}
-	defer re.Body.Close()
-
-	respBody, err := ioutil.ReadAll(re.Body)
-	if err != nil {
-		return fmt.Errorf("read body: %v", err)
-	}
-
-	if err := checkStatusCode(codec, re.StatusCode, respBody); err != nil {
-		return err
+	if resp != nil {
+		if err := unmarshal(respBody, respCT, resp); err != nil {
+			return fmt.Errorf("decode response: %v", err)
+		}
 	}
 	return nil
-}
-
-// get can be used to either get or list a given resource.
-func (c *Client) get(ctx context.Context, codec *codec, url string, resp interface{}) error {
-	r, err := c.newRequest(ctx, "GET", url, nil)
-	if err != nil {
-		return err
-	}
-	r.Header.Set("Accept", codec.contentType)
-	re, err := c.client().Do(r)
-	if err != nil {
-		return err
-	}
-	defer re.Body.Close()
-
-	respBody, err := ioutil.ReadAll(re.Body)
-	if err != nil {
-		return fmt.Errorf("read body: %v", err)
-	}
-
-	if err := checkStatusCode(codec, re.StatusCode, respBody); err != nil {
-		return err
-	}
-	return codec.unmarshal(respBody, resp)
-}
-
-var unknownPrefix = []byte{0x6b, 0x38, 0x73, 0x00}
-
-func parseUnknown(b []byte) (*runtime.Unknown, error) {
-	if !bytes.HasPrefix(b, unknownPrefix) {
-		return nil, errors.New("bytes did not start with expected prefix")
-	}
-
-	var u runtime.Unknown
-	if err := proto.Unmarshal(b[len(unknownPrefix):], &u); err != nil {
-		return nil, err
-	}
-	return &u, nil
-}
-
-type event struct {
-	event   *versioned.Event
-	unknown *runtime.Unknown
-}
-
-type watcher struct {
-	r io.ReadCloser
-}
-
-func (w *watcher) Close() error {
-	return w.r.Close()
-}
-
-// Decode the next event from a watch stream.
-//
-// See: https://github.com/kubernetes/community/blob/master/contributors/design-proposals/protobuf.md#streaming-wire-format
-func (w *watcher) next() (*versioned.Event, *runtime.Unknown, error) {
-	length := make([]byte, 4)
-	if _, err := io.ReadFull(w.r, length); err != nil {
-		return nil, nil, err
-	}
-
-	body := make([]byte, int(binary.BigEndian.Uint32(length)))
-	if _, err := io.ReadFull(w.r, body); err != nil {
-		return nil, nil, fmt.Errorf("read frame body: %v", err)
-	}
-
-	var event versioned.Event
-	if err := proto.Unmarshal(body, &event); err != nil {
-		return nil, nil, err
-	}
-
-	if event.Object == nil {
-		return nil, nil, fmt.Errorf("event had no underlying object")
-	}
-
-	unknown, err := parseUnknown(event.Object.Raw)
-	if err != nil {
-		return nil, nil, err
-	}
-
-	return &event, unknown, nil
-}
-
-func (c *Client) watch(ctx context.Context, url string) (*watcher, error) {
-	if strings.Contains(url, "?") {
-		url = url + "&watch=true"
-	} else {
-		url = url + "?watch=true"
-	}
-	r, err := c.newRequest(ctx, "GET", url, nil)
-	if err != nil {
-		return nil, err
-	}
-	r.Header.Set("Accept", "application/vnd.kubernetes.protobuf;type=watch")
-	resp, err := c.client().Do(r)
-	if err != nil {
-		return nil, err
-	}
-
-	if resp.StatusCode/100 != 2 {
-		body, err := ioutil.ReadAll(resp.Body)
-		resp.Body.Close()
-		if err != nil {
-			return nil, err
-		}
-		return nil, newAPIError(pbCodec, resp.StatusCode, body)
-	}
-
-	w := &watcher{resp.Body}
-	return w, nil
 }

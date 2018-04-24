@@ -36,6 +36,14 @@ func NewEventReader(c Config) (EventProducer, error) {
 }
 
 func (r *reader) Start(done <-chan struct{}) (<-chan Event, error) {
+	if err := r.watcher.Start(); err != nil {
+		return nil, errors.Wrap(err, "unable to start watcher")
+	}
+	go r.consumeEvents(done)
+
+	// Windows implementation of fsnotify needs to have the watched paths
+	// installed after the event consumer is started, to avoid a potential
+	// deadlock. Do it on all platforms for simplicity.
 	for _, p := range r.config.Paths {
 		if err := r.watcher.Add(p); err != nil {
 			if err == syscall.EMFILE {
@@ -48,22 +56,21 @@ func (r *reader) Start(done <-chan struct{}) (<-chan Event, error) {
 		}
 	}
 
-	if err := r.watcher.Start(); err != nil {
-		return nil, errors.Wrap(err, "unable to start watcher")
-	}
-	go r.consumeEvents()
 	r.log.Infow("Started fsnotify watcher",
 		"file_path", r.config.Paths,
 		"recursive", r.config.Recursive)
 	return r.eventC, nil
 }
 
-func (r *reader) consumeEvents() {
+func (r *reader) consumeEvents(done <-chan struct{}) {
 	defer close(r.eventC)
 	defer r.watcher.Close()
 
 	for {
 		select {
+		case <-done:
+			r.log.Debug("fsnotify reader terminated")
+			return
 		case event := <-r.watcher.EventChannel():
 			if event.Name == "" || r.config.IsExcludedPath(event.Name) {
 				continue

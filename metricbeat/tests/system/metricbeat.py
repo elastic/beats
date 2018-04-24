@@ -11,6 +11,9 @@ COMMON_FIELDS = ["@timestamp", "beat", "metricset.name", "metricset.host",
 
 INTEGRATION_TESTS = os.environ.get('INTEGRATION_TESTS', False)
 
+import logging
+logging.getLogger("urllib3").setLevel(logging.WARNING)
+
 
 class BaseTest(TestCase):
 
@@ -78,3 +81,25 @@ class BaseTest(TestCase):
 
     def build_log_regex(self, message):
         return re.compile(r"^.*\t(?:ERROR|WARN)\t.*" + message + r".*$", re.MULTILINE)
+
+    def check_metricset(self, module, metricset, hosts):
+        """
+        Method to test a metricset for its fields
+        """
+        self.render_config_template(modules=[{
+            "name": module,
+            "metricsets": [metricset],
+            "hosts": hosts,
+            "period": "1s",
+        }])
+        proc = self.start_beat()
+        self.wait_until(lambda: self.output_lines() > 0, max_timeout=20)
+        proc.check_kill_and_wait()
+        self.assert_no_logged_warnings()
+
+        output = self.read_output_json()
+        self.assertTrue(len(output) >= 1)
+        evt = output[0]
+        print(evt)
+
+        self.assert_fields_are_documented(evt)

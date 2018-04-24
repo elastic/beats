@@ -18,6 +18,7 @@ const defaultGlob = "module/*/_meta/config*.yml.tpl"
 
 var (
 	goos      = flag.String("os", runtime.GOOS, "generate config specific to the specified operating system")
+	goarch    = flag.String("arch", runtime.GOARCH, "generate config specific to the specified CPU architecture")
 	reference = flag.Bool("ref", false, "generate a reference config")
 	concat    = flag.Bool("concat", false, "concatenate all configs instead writing individual files")
 )
@@ -40,9 +41,20 @@ func getConfig(file string) ([]byte, error) {
 		return nil, errors.Wrapf(err, "failed reading %v", file)
 	}
 
+	var archBits string
+	switch *goarch {
+	case "i386":
+		archBits = "32"
+	case "amd64":
+		archBits = "64"
+	default:
+		return nil, fmt.Errorf("supporting only i386 and amd64 architecture")
+	}
 	data := map[string]interface{}{
+		"goarch":    *goarch,
 		"goos":      *goos,
 		"reference": *reference,
+		"arch_bits": archBits,
 	}
 	buf := new(bytes.Buffer)
 	if err = tpl.Execute(buf, data); err != nil {

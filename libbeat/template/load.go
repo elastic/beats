@@ -67,7 +67,7 @@ func (l *Loader) Load() error {
 
 		err = l.LoadTemplate(tmpl.GetName(), output)
 		if err != nil {
-			return fmt.Errorf("could not load template: %v", err)
+			return fmt.Errorf("could not load template. Elasticsearh returned: %v. Template is: %s", err, output)
 		}
 	} else {
 		logp.Info("Template already exists and will not be overwritten.")

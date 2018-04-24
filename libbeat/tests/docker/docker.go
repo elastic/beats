@@ -20,15 +20,16 @@ func NewClient() (Client, error) {
 }
 
 // ContainerStart pulls and starts the given container
-func (c Client) ContainerStart(image string, cmd ...string) (string, error) {
+func (c Client) ContainerStart(image string, cmd []string, labels map[string]string) (string, error) {
 	ctx := context.Background()
 	if _, err := c.cli.ImagePull(ctx, image, types.ImagePullOptions{}); err != nil {
 		return "", err
 	}
 
 	resp, err := c.cli.ContainerCreate(ctx, &container.Config{
-		Image: image,
-		Cmd:   cmd,
+		Image:  image,
+		Cmd:    cmd,
+		Labels: labels,
 	}, nil, nil, "")
 	if err != nil {
 		return "", err

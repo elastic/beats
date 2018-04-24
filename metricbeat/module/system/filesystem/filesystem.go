@@ -3,6 +3,8 @@
 package filesystem
 
 import (
+	"strings"
+
 	"github.com/elastic/beats/libbeat/common"
 	"github.com/elastic/beats/libbeat/logp"
 	"github.com/elastic/beats/metricbeat/mb"
@@ -14,9 +16,9 @@ import (
 var debugf = logp.MakeDebug("system.filesystem")
 
 func init() {
-	if err := mb.Registry.AddMetricSet("system", "filesystem", New, parse.EmptyHostParser); err != nil {
-		panic(err)
-	}
+	mb.Registry.MustAddMetricSet("system", "filesystem", New,
+		mb.WithHostParser(parse.EmptyHostParser),
+	)
 }
 
 // MetricSet for fetching filesystem metrics.
@@ -30,6 +32,13 @@ func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
 	var config Config
 	if err := base.Module().UnpackConfig(&config); err != nil {
 		return nil, err
+	}
+
+	if config.IgnoreTypes == nil {
+		config.IgnoreTypes = DefaultIgnoredTypes()
+	}
+	if len(config.IgnoreTypes) > 0 {
+		logp.Info("Ignoring filesystem types: %s", strings.Join(config.IgnoreTypes, ", "))
 	}
 
 	return &MetricSet{

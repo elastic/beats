@@ -4,4 +4,4 @@
 /env/
 
 # copied over from xgo-image/
-docker/xgo-image-deb6/base/build.sh
+docker/xgo-image-deb7/base/build.sh

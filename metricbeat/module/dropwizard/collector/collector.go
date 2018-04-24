@@ -28,9 +28,10 @@ var (
 // The New method will be called after the setup of the module and before starting to fetch data
 
 func init() {
-	if err := mb.Registry.AddMetricSet("dropwizard", "collector", New, hostParser); err != nil {
-		panic(err)
-	}
+	mb.Registry.MustAddMetricSet("dropwizard", "collector", New,
+		mb.WithHostParser(hostParser),
+		mb.DefaultMetricSet(),
+	)
 }
 
 // MetricSet type defines all fields of the MetricSet
@@ -56,9 +57,13 @@ func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
 		return nil, err
 	}
 
+	http, err := helper.NewHTTP(base)
+	if err != nil {
+		return nil, err
+	}
 	return &MetricSet{
 		BaseMetricSet: base,
-		http:          helper.NewHTTP(base),
+		http:          http,
 		namespace:     config.Namespace,
 	}, nil
 }

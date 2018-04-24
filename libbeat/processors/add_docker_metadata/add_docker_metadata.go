@@ -4,7 +4,6 @@ import (
 	"fmt"
 	"os"
 	"path/filepath"
-	"strconv"
 	"strings"
 	"time"
 
@@ -13,6 +12,7 @@ import (
 	"github.com/elastic/beats/libbeat/beat"
 	"github.com/elastic/beats/libbeat/common"
 	"github.com/elastic/beats/libbeat/common/docker"
+	"github.com/elastic/beats/libbeat/common/safemapstr"
 	"github.com/elastic/beats/libbeat/logp"
 	"github.com/elastic/beats/libbeat/processors"
 	"github.com/elastic/beats/libbeat/processors/actions"
@@ -54,7 +54,7 @@ func buildDockerMetadataProcessor(cfg *common.Config, watcherConstructor docker.
 		return nil, errors.Wrapf(err, "fail to unpack the %v configuration", processorName)
 	}
 
-	watcher, err := watcherConstructor(config.Host, config.TLS)
+	watcher, err := watcherConstructor(config.Host, config.TLS, config.MatchShortID)
 	if err != nil {
 		return nil, err
 	}
@@ -156,7 +156,7 @@ func (d *addDockerMetadata) Run(event *beat.Event) (*beat.Event, error) {
 		if len(container.Labels) > 0 {
 			labels := common.MapStr{}
 			for k, v := range container.Labels {
-				labels.Put(k, v)
+				safemapstr.Put(labels, k, v)
 			}
 			meta.Put("container.labels", labels)
 		}
@@ -187,7 +187,7 @@ func (d *addDockerMetadata) lookupContainerIDByPID(event *beat.Event) string {
 			continue
 		}
 
-		pid, ok := tryToInt(v)
+		pid, ok := common.TryToInt(v)
 		if !ok {
 			d.log.Debugf("field %v is not a PID (type=%T, value=%v)", field, v, v)
 			continue
@@ -240,41 +240,4 @@ func getContainerIDFromCgroups(cgroups map[string]string) string {
 	}
 
 	return ""
-}
-
-// tryToInt tries to coerce the given interface to an int. On success it returns
-// the int value and true.
-func tryToInt(number interface{}) (int, bool) {
-	var rtn int
-	switch v := number.(type) {
-	case int:
-		rtn = int(v)
-	case int8:
-		rtn = int(v)
-	case int16:
-		rtn = int(v)
-	case int32:
-		rtn = int(v)
-	case int64:
-		rtn = int(v)
-	case uint:
-		rtn = int(v)
-	case uint8:
-		rtn = int(v)
-	case uint16:
-		rtn = int(v)
-	case uint32:
-		rtn = int(v)
-	case uint64:
-		rtn = int(v)
-	case string:
-		var err error
-		rtn, err = strconv.Atoi(v)
-		if err != nil {
-			return 0, false
-		}
-	default:
-		return 0, false
-	}
-	return rtn, true
 }

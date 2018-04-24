@@ -21,8 +21,9 @@ type RangeValue struct {
 }
 
 type EqualsValue struct {
-	Int uint64
-	Str string
+	Int  uint64
+	Str  string
+	Bool bool
 }
 
 type Condition struct {
@@ -31,10 +32,11 @@ type Condition struct {
 		name    string
 		filters map[string]match.Matcher
 	}
-	rangexp map[string]RangeValue
-	or      []Condition
-	and     []Condition
-	not     *Condition
+	hasfields []string
+	rangexp   map[string]RangeValue
+	or        []Condition
+	and       []Condition
+	not       *Condition
 }
 
 type WhenProcessor struct {
@@ -81,6 +83,8 @@ func NewCondition(config *ConditionConfig) (*Condition, error) {
 		c.matches.filters, err = compileMatches(config.Regexp.fields, match.Compile)
 	case config.Range != nil:
 		err = c.setRange(config.Range)
+	case config.HasFields != nil:
+		c.hasfields = config.HasFields
 	case len(config.OR) > 0:
 		c.or, err = NewConditionList(config.OR)
 	case len(config.AND) > 0:
@@ -118,13 +122,22 @@ func (c *Condition) setEquals(cfg *ConditionFields) error {
 		uintValue, err := extractInt(value)
 		if err == nil {
 			c.equals[field] = EqualsValue{Int: uintValue}
-		} else {
-			sValue, err := extractString(value)
-			if err != nil {
-				return err
-			}
-			c.equals[field] = EqualsValue{Str: sValue}
+			continue
 		}
+
+		sValue, err := extractString(value)
+		if err == nil {
+			c.equals[field] = EqualsValue{Str: sValue}
+			continue
+		}
+
+		bValue, err := extractBool(value)
+		if err == nil {
+			c.equals[field] = EqualsValue{Bool: bValue}
+			continue
+		}
+
+		return fmt.Errorf("unexpected type %T in equals condition", value)
 	}
 
 	return nil
@@ -216,7 +229,8 @@ func (c *Condition) Check(event ValuesMap) bool {
 
 	return c.checkEquals(event) &&
 		c.checkMatches(event) &&
-		c.checkRange(event)
+		c.checkRange(event) &&
+		c.checkHasFields(event)
 }
 
 func (c *Condition) checkOR(event ValuesMap) bool {
@@ -257,16 +271,30 @@ func (c *Condition) checkEquals(event ValuesMap) bool {
 			if intValue != equalValue.Int {
 				return false
 			}
-		} else {
-			sValue, err := extractString(value)
-			if err != nil {
-				logp.Warn("unexpected type %T in equals condition as it accepts only integers and strings. ", value)
-				return false
-			}
+
+			continue
+		}
+
+		sValue, err := extractString(value)
+		if err == nil {
 			if sValue != equalValue.Str {
 				return false
 			}
+
+			continue
 		}
+
+		bValue, err := extractBool(value)
+		if err == nil {
+			if bValue != equalValue.Bool {
+				return false
+			}
+
+			continue
+		}
+
+		logp.Err("unexpected type %T in equals condition as it accepts only integers, strings or bools. ", value)
+		return false
 	}
 
 	return true
@@ -375,6 +403,16 @@ func (c *Condition) checkRange(event ValuesMap) bool {
 	return true
 }
 
+func (c *Condition) checkHasFields(event ValuesMap) bool {
+	for _, field := range c.hasfields {
+		_, err := event.GetValue(field)
+		if err != nil {
+			return false
+		}
+	}
+	return true
+}
+
 func (c Condition) String() string {
 	s := ""
 
@@ -386,6 +424,9 @@ func (c Condition) String() string {
 	}
 	if len(c.rangexp) > 0 {
 		s = s + fmt.Sprintf("range: %v", c.rangexp)
+	}
+	if len(c.hasfields) > 0 {
+		s = s + fmt.Sprintf("has_fields: %v", c.hasfields)
 	}
 	if len(c.or) > 0 {
 		for _, cond := range c.or {

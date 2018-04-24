@@ -38,7 +38,7 @@ func TestWriteMaxUpdates(t *testing.T) {
 	defer cp.Shutdown()
 
 	// Send update - it's not written to disk but it's in memory.
-	cp.Persist("App", 1, time.Now())
+	cp.Persist("App", 1, time.Now(), "")
 	time.Sleep(500 * time.Millisecond)
 	_, found := cp.States()["App"]
 	assert.True(t, found)
@@ -50,7 +50,7 @@ func TestWriteMaxUpdates(t *testing.T) {
 	assert.Len(t, ps.States, 0)
 
 	// Send update - it is written to disk.
-	cp.Persist("App", 2, time.Now())
+	cp.Persist("App", 2, time.Now(), "")
 	time.Sleep(750 * time.Millisecond)
 	ps, err = cp.read()
 	if err != nil {
@@ -89,7 +89,7 @@ func TestWriteTimedFlush(t *testing.T) {
 
 	// Send update then wait longer than the flush interval and it should be
 	// on disk.
-	cp.Persist("App", 1, time.Now())
+	cp.Persist("App", 1, time.Now(), "")
 	time.Sleep(1500 * time.Millisecond)
 	ps, err := cp.read()
 	if err != nil {

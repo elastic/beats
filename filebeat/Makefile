@@ -21,7 +21,7 @@ kibana:
 
 # Collects all module and dataset fields
 .PHONY: fields
-fields:
+fields: python-env
 	@mkdir -p _meta/
 	@cp ${ES_BEATS}/filebeat/_meta/fields.common.yml  _meta/fields.generated.yml
 	@${PYTHON_ENV}/bin/python ${ES_BEATS}/metricbeat/scripts/fields_collector.py >> _meta/fields.generated.yml
@@ -61,6 +61,11 @@ imports: python-env
 # Runs all collection steps and updates afterwards
 .PHONY: collect
 collect: fields kibana modules configs collect-docs imports
+
+# Creates a new module. Requires the params MODULE
+.PHONY: create-module
+create-module:
+	@go run ${ES_BEATS}/filebeat/scripts/generator/module/main.go --path=$(PWD) --beats_path=$(BEAT_GOPATH)/src/$(BEAT_PATH) --module=$(MODULE)
 
 # Creates a new fileset. Requires the params MODULE and FILESET
 .PHONY: create-fileset

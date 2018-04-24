@@ -201,6 +201,7 @@ func NewClient(
 
 		compressionLevel: compression,
 		proxyURL:         s.Proxy,
+		observer:         s.Observer,
 	}
 
 	client.Connection.onConnectCallback = func() error {

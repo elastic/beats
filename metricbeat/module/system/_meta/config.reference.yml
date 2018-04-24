@@ -11,6 +11,7 @@
     - uptime          # System Uptime
     #- core           # Per CPU core usage
     #- diskio         # Disk IO
+    #- raid           # Raid
     #- socket         # Sockets and connection info (linux only)
   enabled: true
   period: 10s
@@ -23,6 +24,9 @@
   # A list of filesystem types to ignore. The filesystem metricset will not
   # collect data from filesystems matching any of the specified types, and
   # fsstats will not include data from these filesystems in its summary stats.
+  # If not set, types associated to virtual filesystems are automatically
+  # added when this information is available in the system (e.g. the list of
+  # `nodev` types in `/proc/filesystem`).
   #filesystem.ignore_types: []
 
   # These options allow you to filter out all processes that are not
@@ -30,7 +34,7 @@
   # If both the `by_cpu` and `by_memory` options are used, the union of the two sets
   # is included.
   #process.include_top_n:
-    #
+
     # Set to false to disable this feature and include all processes
     #enabled: true
 
@@ -56,7 +60,13 @@
   # to false.
   #process.include_cpu_ticks: false
 
+  # Raid mount point to monitor
+  #raid.mount_point: '/'
+
   # Configure reverse DNS lookup on remote IP addresses in the socket metricset.
   #socket.reverse_lookup.enabled: false
   #socket.reverse_lookup.success_ttl: 60s
   #socket.reverse_lookup.failure_ttl: 60s
+
+  # Diskio configurations
+  #diskio.include_devices: []

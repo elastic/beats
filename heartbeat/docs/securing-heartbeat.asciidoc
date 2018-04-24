@@ -9,6 +9,7 @@ and other products in the Elastic stack:
 
 * <<securing-communication-elasticsearch>>
 * <<configuring-ssl-logstash>>
+* <<securing-beats>>
 
 //sets block macro for https.asciidoc included in next section
 

@@ -1,17 +1,17 @@
 # For more available modules and options, please see the filebeat.reference.yml sample
 # configuration file.
 
-#=========================== Filebeat prospectors =============================
+#=========================== Filebeat inputs =============================
 
-filebeat.prospectors:
+filebeat.inputs:
 
-# Each - is a prospector. Most options can be set at the prospector level, so
-# you can use different prospectors for various configurations.
-# Below are the prospector specific configurations.
+# Each - is an input. Most options can be set at the input level, so
+# you can use different inputs for various configurations.
+# Below are the input specific configurations.
 
 - type: log
 
-  # Change to true to enable this prospector configuration.
+  # Change to true to enable this input configuration.
   enabled: false
 
   # Paths that should be crawled and fetched. Glob based paths.

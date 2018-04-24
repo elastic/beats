@@ -8,13 +8,14 @@ import (
 
 // Config for docker processor.
 type Config struct {
-	Host        string            `config:"host"`               // Docker socket (UNIX or TCP socket).
-	TLS         *docker.TLSConfig `config:"ssl"`                // TLS settings for connecting to Docker.
-	Fields      []string          `config:"match_fields"`       // A list of fields to match a container ID.
-	MatchSource bool              `config:"match_source"`       // Match container ID from a log path present in source field.
-	SourceIndex int               `config:"match_source_index"` // Index in the source path split by / to look for container ID.
-	MatchPIDs   []string          `config:"match_pids"`         // A list of fields containing process IDs (PIDs).
-	HostFS      string            `config:"system.hostfs"`      // Specifies the mount point of the host’s filesystem for use in monitoring a host from within a container.
+	Host         string            `config:"host"`               // Docker socket (UNIX or TCP socket).
+	TLS          *docker.TLSConfig `config:"ssl"`                // TLS settings for connecting to Docker.
+	Fields       []string          `config:"match_fields"`       // A list of fields to match a container ID.
+	MatchSource  bool              `config:"match_source"`       // Match container ID from a log path present in source field.
+	MatchShortID bool              `config:"match_short_id"`     // Match to container short ID from a log path present in source field.
+	SourceIndex  int               `config:"match_source_index"` // Index in the source path split by / to look for container ID.
+	MatchPIDs    []string          `config:"match_pids"`         // A list of fields containing process IDs (PIDs).
+	HostFS       string            `config:"system.hostfs"`      // Specifies the mount point of the host’s filesystem for use in monitoring a host from within a container.
 
 	// Annotations are kept after container is killed, until they haven't been
 	// accessed for a full `cleanup_timeout`:

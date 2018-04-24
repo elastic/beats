@@ -97,6 +97,10 @@ func (self *ProcFDUsage) Get(pid int) error {
 	return nil
 }
 
+func (self *HugeTLBPages) Get() error {
+	return ErrNotImplemented{runtime.GOOS}
+}
+
 func parseCpuStat(self *Cpu, line string) error {
 	fields := strings.Fields(line)
 

@@ -27,7 +27,7 @@ func TestResolverWhenTheKeyExist(t *testing.T) {
 	keystore := CreateAnExistingKeystore(path)
 
 	resolver := ResolverWrap(keystore)
-	v, err := resolver("output_elasticsearch_password")
+	v, err := resolver("output.elasticsearch.password")
 	assert.NoError(t, err)
 	assert.Equal(t, v, "secret")
 }

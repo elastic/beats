@@ -1,30 +1,37 @@
 [[filebeat-configuration-reloading]]
 == Load external configuration files
 
-Filebeat can load external configuration files for prospectors and modules,
-which allows you to separate your configuration into multiple smaller
-configuration files. See the <<load-prospector-config>> and the
+{beatname_uc} can load external configuration files for inputs and modules,
+allowing you to separate your configuration into multiple smaller
+configuration files. See the <<load-input-config>> and the
 <<load-module-config>> sections for details.
 
 include::../../libbeat/docs/shared-note-file-permissions.asciidoc[]
 
 [float]
-[[load-prospector-config]]
-=== Prospector config
+[[load-input-config]]
+=== Input config
 
-For prospector configurations, you specify `path` option in the
-`filebeat.config.prospectors` section of the +{beatname_lc}.yml+ file. For
+For input configurations, you specify the `path` option in the
++{beatname_lc}.config.inputs+ section of the +{beatname_lc}.yml+ file. For
 example:
 
-[source,yaml]
+["source","sh",subs="attributes,callouts"]
 ------------------------------------------------------------------------------
-filebeat.config.prospectors:
+{beatname_lc}.config.inputs:
   enabled: true
   path: configs/*.yml
 ------------------------------------------------------------------------------
 
-Each file found by the Glob must contain a list of one or more prospector
-definitions. For example:
+
+Each file found by the `path` Glob must contain a list of one or more input
+definitions. 
+ 
+TIP: The first line of each external configuration file must be an input
+definition that starts with `- type`. Make sure you omit the line
++{beatname_lc}.config.inputs+ from this file.
+ 
+For example:
 
 [source,yaml]
 ------------------------------------------------------------------------------
@@ -40,8 +47,8 @@ definitions. For example:
 ------------------------------------------------------------------------------
 
 
-WARNING: It is critical that two running prospectors DO NOT have overlapping
-file paths defined. If more than one prospector harvests the same file at the
+WARNING: It is critical that two running inputs DO NOT have overlapping
+file paths defined. If more than one input harvests the same file at the
 same time, it can lead to unexpected behavior.
 
 [float]
@@ -49,13 +56,13 @@ same time, it can lead to unexpected behavior.
 === Module config
 
 For module configurations, you specify the `path` option in the
-`filebeat.config.modules` section of the +{beatname_lc}.yml+ file. By default,
-Filebeat loads the module configurations enabled in the
++{beatname_lc}.config.modules+ section of the +{beatname_lc}.yml+ file. By default,
+{beatname_uc} loads the module configurations enabled in the
 <<enable-modules-d-configs,`modules.d`>> directory. For example:
 
-[source,yaml]
+["source","sh",subs="attributes"]
 ------------------------------------------------------------------------------
-filebeat.config.modules:
+{beatname_lc}.config.modules:
   enabled: true
   path: ${path.config}/modules.d/*.yml
 ------------------------------------------------------------------------------
@@ -66,7 +73,13 @@ the <<modules-command,`modules`>> command to enable and disable module
 configurations.
 
 Each file found by the Glob must contain a list of one or more module
-definitions. For example:
+definitions. 
+ 
+TIP: The first line of each external configuration file must be a module
+definition that starts with `- module`. Make sure you omit the line
++{beatname_lc}.config.modules+ from this file.
+
+For example:
 
 [source,yaml]
 ------------------------------------------------------------------------------
@@ -82,25 +95,27 @@ definitions. For example:
 
 === Live reloading
 
-You can configure Filebeat to dynamically reload configuration files when there
-are changes. This feature is available for prospector and module configuration
-files only.
+You can configure {beatname_uc} to dynamically reload external configuration files
+when there are changes. This feature is available for input and module
+configurations that are loaded as
+<<{beatname_lc}-configuration-reloading,external configuration files>>. You cannot
+use this feature to reload the main +{beatname_lc}.yml+ configuration file.
 
 To configure this feature, you specify a path
 (https://golang.org/pkg/path/filepath/#Glob[Glob]) to watch for configuration
-changes. When the files found by the Glob change, new prospectors and/or
+changes. When the files found by the Glob change, new inputs and/or
 modules are started and stopped according to changes in the configuration files.
 
 This feature is especially useful in container environments where one container
 is used to tail logs for services running in other containers on the same host.
 
 To enable dynamic config reloading, you specify the `path` and `reload` options
-under `filebeat.config.prospectors` or `filebeat.config.modules` sections. For
-example:
+under +{beatname_lc}.config.inputs+ or +{beatname_lc}.config.modules+ sections.
+For example:
 
-[source,yaml]
+["source","sh",subs="attributes"]
 ------------------------------------------------------------------------------
-filebeat.config.prospectors:
+{beatname_lc}.config.inputs:
   enabled: true
   path: configs/*.yml
   reload.enabled: true

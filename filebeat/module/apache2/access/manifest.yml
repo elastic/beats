@@ -12,7 +12,7 @@ var:
       - "C:/Program Files/Apache Software Foundation/Apache2.*/logs/access.log*"
 
 ingest_pipeline: ingest/default.json
-prospector: config/access.yml
+input: config/access.yml
 
 requires.processors:
 - name: user_agent

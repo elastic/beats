@@ -9,6 +9,8 @@ beta[]
 
 The Elasticsearch module contains a minimal set of metrics to enable monitoring of Elasticsearch across multiple versions. To monitor more Elasticsearch metrics, use our {monitoringdoc}/xpack-monitoring.html[X-Pack monitoring] which is available under a free basic license.
 
+The default metricsets are `node` and `node_stats`.
+
 
 [float]
 === Example configuration
@@ -20,7 +22,10 @@ in <<configuration-metricbeat>>. Here is an example configuration:
 ----
 metricbeat.modules:
 - module: elasticsearch
-  metricsets: ["node", "node_stats"]
+  metricsets:
+   #- index
+   - node
+   - node_stats
   period: 10s
   hosts: ["localhost:9200"]
 ----
@@ -32,9 +37,13 @@ This module supports TLS connection when using `ssl` config field, as described 
 
 The following metricsets are available:
 
+* <<metricbeat-metricset-elasticsearch-index,index>>
+
 * <<metricbeat-metricset-elasticsearch-node,node>>
 
 * <<metricbeat-metricset-elasticsearch-node_stats,node_stats>>
+
+include::elasticsearch/index.asciidoc[]
 
 include::elasticsearch/node.asciidoc[]
 

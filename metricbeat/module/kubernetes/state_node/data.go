@@ -28,12 +28,14 @@ func eventMapping(families []*dto.MetricFamily) ([]common.MapStr, error) {
 
 			case "kube_node_status_allocatable_cpu_cores":
 				event.Put("cpu.allocatable.cores", metric.GetGauge().GetValue())
+				util.PerfMetrics.NodeCoresAllocatable.Set(util.GetLabel(metric, "node"), metric.GetGauge().GetValue())
 
 			case "kube_node_status_capacity_cpu_cores":
 				event.Put("cpu.capacity.cores", metric.GetGauge().GetValue())
 
 			case "kube_node_status_allocatable_memory_bytes":
 				event.Put("memory.allocatable.bytes", metric.GetGauge().GetValue())
+				util.PerfMetrics.NodeMemAllocatable.Set(util.GetLabel(metric, "node"), metric.GetGauge().GetValue())
 
 			case "kube_node_status_capacity_memory_bytes":
 				event.Put("memory.capacity.bytes", metric.GetGauge().GetValue())

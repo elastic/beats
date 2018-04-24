@@ -2,6 +2,7 @@ package template
 
 import (
 	"errors"
+	"strings"
 
 	"github.com/elastic/beats/libbeat/common"
 )
@@ -200,7 +201,17 @@ func (p *Processor) array(f *common.Field) common.MapStr {
 func (p *Processor) object(f *common.Field) common.MapStr {
 	dynProperties := getDefaultProperties(f)
 
+	matchType := func(onlyType string) string {
+		if f.ObjectTypeMappingType != "" {
+			return f.ObjectTypeMappingType
+		}
+		return onlyType
+	}
+
 	switch f.ObjectType {
+	case "scaled_float":
+		dynProperties = p.scaledFloat(f)
+		addDynamicTemplate(f, dynProperties, matchType("*"))
 	case "text":
 		dynProperties["type"] = "text"
 
@@ -208,13 +219,13 @@ func (p *Processor) object(f *common.Field) common.MapStr {
 			dynProperties["type"] = "string"
 			dynProperties["index"] = "analyzed"
 		}
-		addDynamicTemplate(f, dynProperties, "string")
+		addDynamicTemplate(f, dynProperties, matchType("string"))
 	case "long":
 		dynProperties["type"] = f.ObjectType
-		addDynamicTemplate(f, dynProperties, "long")
+		addDynamicTemplate(f, dynProperties, matchType("long"))
 	case "keyword":
 		dynProperties["type"] = f.ObjectType
-		addDynamicTemplate(f, dynProperties, "string")
+		addDynamicTemplate(f, dynProperties, matchType("string"))
 	}
 
 	properties := getDefaultProperties(f)
@@ -235,12 +246,16 @@ func addDynamicTemplate(f *common.Field, properties common.MapStr, matchType str
 	if len(f.Path) > 0 {
 		path = f.Path + "."
 	}
+	pathMatch := path + f.Name
+	if !strings.ContainsRune(pathMatch, '*') {
+		pathMatch += ".*"
+	}
 	template := common.MapStr{
 		// Set the path of the field as name
 		path + f.Name: common.MapStr{
 			"mapping":            properties,
 			"match_mapping_type": matchType,
-			"path_match":         path + f.Name + ".*",
+			"path_match":         pathMatch,
 		},
 	}
 

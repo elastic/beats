@@ -12,21 +12,33 @@ type Logger struct {
 	sugar *zap.SugaredLogger
 }
 
-// NewLogger returns a new Logger labeled with the name of the selector. This
-// should never be used from any global contexts (instead create "per instance"
-// loggers).
-func NewLogger(selector string, options ...LogOption) *Logger {
-	log := loadLogger().rootLogger.
+func newLogger(rootLogger *zap.Logger, selector string, options ...LogOption) *Logger {
+	log := rootLogger.
 		WithOptions(zap.AddCallerSkip(1)).
 		WithOptions(options...).
 		Named(selector)
 	return &Logger{log.Sugar()}
 }
 
+// NewLogger returns a new Logger labeled with the name of the selector. This
+// should never be used from any global contexts, otherwise you will receive a
+// no-op Logger. This is because the logp package needs to be initialized first.
+// Instead create new Logger instance that your object reuses. Or if you need to
+// log from a static context then you may use logp.L().Infow(), for example.
+func NewLogger(selector string, options ...LogOption) *Logger {
+	return newLogger(loadLogger().rootLogger, selector, options...)
+}
+
 // With creates a child logger and adds structured context to it. Fields added
 // to the child don't affect the parent, and vice versa.
 func (l *Logger) With(args ...interface{}) *Logger {
 	return &Logger{l.sugar.With(args...)}
+}
+
+// Named adds a new path segment to the logger's name. Segments are joined by
+// periods.
+func (l *Logger) Named(name string) *Logger {
+	return &Logger{l.sugar.Named(name)}
 }
 
 // Sprint
@@ -49,6 +61,11 @@ func (l *Logger) Warn(args ...interface{}) {
 // Error uses fmt.Sprint to construct and log a message.
 func (l *Logger) Error(args ...interface{}) {
 	l.sugar.Error(args...)
+}
+
+// Fatal uses fmt.Sprint to construct and log a message, then calls os.Exit(1).
+func (l *Logger) Fatal(args ...interface{}) {
+	l.sugar.Fatal(args...)
 }
 
 // Panic uses fmt.Sprint to construct and log a message, then panics.
@@ -82,6 +99,11 @@ func (l *Logger) Warnf(format string, args ...interface{}) {
 // Errorf uses fmt.Sprintf to log a templated message.
 func (l *Logger) Errorf(format string, args ...interface{}) {
 	l.sugar.Errorf(format, args...)
+}
+
+// Fatalf uses fmt.Sprintf to log a templated message, then calls os.Exit(1).
+func (l *Logger) Fatalf(format string, args ...interface{}) {
+	l.sugar.Fatalf(format, args...)
 }
 
 // Panicf uses fmt.Sprintf to log a templated message, then panics.
@@ -129,6 +151,15 @@ func (l *Logger) Errorw(msg string, keysAndValues ...interface{}) {
 	l.sugar.Errorw(msg, keysAndValues...)
 }
 
+// Fatalw logs a message with some additional context, then calls os.Exit(1).
+// The additional context is added in the form of key-value pairs. The optimal
+// way to write the value to the log message will be inferred by the value's
+// type. To explicitly specify a type you can pass a Field such as
+// logp.Stringer.
+func (l *Logger) Fatalw(msg string, keysAndValues ...interface{}) {
+	l.sugar.Fatalw(msg, keysAndValues...)
+}
+
 // Panicw logs a message with some additional context, then panics. The
 // additional context is added in the form of key-value pairs. The optimal way
 // to write the value to the log message will be inferred by the value's type.
@@ -144,4 +175,9 @@ func (l *Logger) Panicw(msg string, keysAndValues ...interface{}) {
 // Field such as logp.Stringer.
 func (l *Logger) DPanicw(msg string, keysAndValues ...interface{}) {
 	l.sugar.DPanicw(msg, keysAndValues...)
+}
+
+// L returns an unnamed global logger.
+func L() *Logger {
+	return loadLogger().logger
 }
