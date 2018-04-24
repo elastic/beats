@@ -18,7 +18,7 @@ command (as described here) or
 +{beatname_lc}.yml+ config file.
 
 This requires a Kibana endpoint configuration. If you didn't already configure
-a Kibana endpoint, see <<{beatname_lc}-configuration,configured {beatname_uc}>> 
+a Kibana endpoint, see <<{beatname_lc}-configuration,configure {beatname_uc}>>. 
 
 Make sure Kibana is running before you perform this step. If you are accessing a
 secured Kibana instance, make sure you've configured credentials as described in
