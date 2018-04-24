@@ -1,15 +1,35 @@
 PROJECT=beats-preference-pane.xcodeproj
 CONFIGURATION?=Release
-CODE_SIGN_IDENTITY?=''
-CODE_SIGNING_REQUIRED?=NO
+SIGN_IDENTITY_APP?=
+SIGN_IDENTITY_INSTALLER?=
+PACKAGE_NAME?=BeatsPrefPane.pkg
+INSTALL_DIR=/Library/PreferencePanes
+IDENTIFIER?=co.elastic.beats.preference-pane
+VERSION?=1.0.0
 
-default: pref-pane
+default: build
 
-.PHONY: pref-pane
+build:
+	xcodebuild build -project $(PROJECT) -alltargets -configuration $(CONFIGURATION)
+	echo version="${VERSION}"
+	test -z '$(SIGN_IDENTITY_APP)' || \
+	    codesign -s '$(SIGN_IDENTITY_APP)' --force --keychain '$(KEYCHAIN)' --timestamp \
+	    build/$(CONFIGURATION)/*.prefPane
 
-pref-pane:
-	xcodebuild build -project $(PROJECT) -alltargets -configuration $(CONFIGURATION) CODE_SIGN_IDENTITY=$(CODE_SIGN_IDENTITY) CODE_SIGNING_REQUIRED=$(CODE_SIGNING_REQUIRED)
+.PHONY: clean pkg
+
+pkg: $(PACKAGE_NAME)
+
+$(PACKAGE_NAME): build
+	mkdir -p build/root/$(INSTALL_DIR)
+	cp -a build/$(CONFIGURATION)/Beats.prefPane build/root/$(INSTALL_DIR)/
+	SIGN_ARGS='' ;\
+        test -z '$(SIGN_IDENTITY_INSTALLER)' || SIGN_ARGS="--sign $(SIGN_IDENTITY_INSTALLER)" ;\
+	pkgbuild --root build/root/ \
+	    --identifier $(IDENTIFIER) \
+	    --version '$(VERSION)' \
+	    $$SIGN_ARGS --keychain "$(KEYCHAIN)" --timestamp \
+	    $(PACKAGE_NAME)
 
 clean:
-	rm -rf build/
-
+	rm -rf build/ $(PACKAGE_NAME)
