@@ -10,6 +10,8 @@ import (
 const (
 	defaultScheme = "http"
 	defaultPath   = "/metrics"
+	// Nanocores conversion 10^9
+	nanocores = 1000000000
 )
 
 var (
@@ -83,5 +85,24 @@ func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
 // It returns the event which is then forward to the output. In case of an error, a
 // descriptive error must be returned.
 func (m *MetricSet) Fetch() ([]common.MapStr, error) {
-	return m.prometheus.GetProcessedMetrics(mapping)
+	events, err := m.prometheus.GetProcessedMetrics(mapping)
+	if err != nil {
+		return nil, err
+	}
+
+	for _, event := range events {
+		if request, ok := event["cpu.request.cores"]; ok {
+			if requestCores, ok := request.(float64); ok {
+				event["cpu.request.nanocores"] = requestCores * nanocores
+			}
+		}
+
+		if limit, ok := event["cpu.limit.cores"]; ok {
+			if limitCores, ok := limit.(float64); ok {
+				event["cpu.limit.nanocores"] = limitCores * nanocores
+			}
+		}
+	}
+
+	return events, err
 }

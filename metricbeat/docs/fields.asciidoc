@@ -7327,6 +7327,26 @@ Container CPU requested cores
 
 --
 
+*`kubernetes.container.cpu.limit.nanocores`*::
++
+--
+type: long
+
+Container CPU nanocores limit
+
+
+--
+
+*`kubernetes.container.cpu.request.nanocores`*::
++
+--
+type: long
+
+Container CPU requested nanocores
+
+
+--
+
 
 *`kubernetes.container.memory.limit.bytes`*::
 +
