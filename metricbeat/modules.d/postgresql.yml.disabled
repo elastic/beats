@@ -1,3 +1,6 @@
+# Module: postgresql
+# Docs: https://www.elastic.co/guide/en/beats/metricbeat/master/metricbeat-module-postgresql.html
+
 - module: postgresql
   metricsets:
     # Stats about every PostgreSQL database

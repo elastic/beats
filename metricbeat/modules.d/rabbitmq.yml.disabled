@@ -1,3 +1,6 @@
+# Module: rabbitmq
+# Docs: https://www.elastic.co/guide/en/beats/metricbeat/master/metricbeat-module-rabbitmq.html
+
 - module: rabbitmq
   metricsets:
     - node

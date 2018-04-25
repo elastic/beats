@@ -1,3 +1,6 @@
+# Module: prometheus
+# Docs: https://www.elastic.co/guide/en/beats/metricbeat/master/metricbeat-module-prometheus.html
+
 - module: prometheus
   metricsets: ["stats"]
   period: 10s

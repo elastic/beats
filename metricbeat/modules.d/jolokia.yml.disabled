@@ -1,3 +1,6 @@
+# Module: jolokia
+# Docs: https://www.elastic.co/guide/en/beats/metricbeat/master/metricbeat-module-jolokia.html
+
 - module: jolokia
   metricsets: ["jmx"]
   period: 10s

@@ -1,3 +1,6 @@
+# Module: uwsgi
+# Docs: https://www.elastic.co/guide/en/beats/metricbeat/master/metricbeat-module-uwsgi.html
+
 - module: uwsgi
   metricsets: ["status"]
   period: 10s

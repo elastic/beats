@@ -1,3 +1,6 @@
+# Module: apache
+# Docs: https://www.elastic.co/guide/en/beats/metricbeat/master/metricbeat-module-apache.html
+
 - module: apache
   metricsets: ["status"]
   period: 10s

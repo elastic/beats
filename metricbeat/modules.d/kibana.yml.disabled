@@ -1,3 +1,6 @@
+# Module: kibana
+# Docs: https://www.elastic.co/guide/en/beats/metricbeat/master/metricbeat-module-kibana.html
+
 - module: kibana
   metricsets: ["status"]
   period: 10s

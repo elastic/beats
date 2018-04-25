@@ -1,3 +1,6 @@
+# Module: nginx
+# Docs: https://www.elastic.co/guide/en/beats/metricbeat/master/metricbeat-module-nginx.html
+
 - module: nginx
   metricsets: ["stubstatus"]
   period: 10s

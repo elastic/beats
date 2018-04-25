@@ -1,3 +1,6 @@
+# Module: kubernetes
+# Docs: https://www.elastic.co/guide/en/beats/metricbeat/master/metricbeat-module-kubernetes.html
+
 # Node metrics, from kubelet:
 - module: kubernetes
   metricsets:

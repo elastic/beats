@@ -1,3 +1,6 @@
+# Module: golang
+# Docs: https://www.elastic.co/guide/en/beats/metricbeat/master/metricbeat-module-golang.html
+
 - module: golang
   metricsets:
     - expvar

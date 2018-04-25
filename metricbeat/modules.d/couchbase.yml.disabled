@@ -1,3 +1,6 @@
+# Module: couchbase
+# Docs: https://www.elastic.co/guide/en/beats/metricbeat/master/metricbeat-module-couchbase.html
+
 - module: couchbase
   metricsets:
     - bucket
