@@ -11,7 +11,7 @@ options in the `queue` section of the +{beatname_lc}.yml+ config file. Only one
 queue type can be configured.
 
 
-Example configuration:
+This sample configurations configures the memory queue, buffering up to 4096 events:
 
 [source,yaml]
 ------------------------------------------------------------------------------
@@ -38,7 +38,7 @@ the queue is full, no new events can be inserted into the memory queue. Only
 after the signal from the output will the queue free up space for more events to be accepted.
 
 This sample configuration forwards events to the output if 512 events are
-available or the oldest available event is already waiting for 5s in the queue:
+available or the oldest available event has been waiting for 5s in the queue:
 
 [source,yaml]
 ------------------------------------------------------------------------------
@@ -81,7 +81,7 @@ The default values is 0s.
 [[configuration-internal-queue-spool]]
 === Configure the file spool queue
 
-The file spooling queue stores all events in an on disk ring buffer. The spool
+The file spool queue stores all events in an on disk ring buffer. The spool
 has a write buffer, which new events are written to. Events written to the
 spool are forwarded to the outputs, only after the write buffer has been
 flushed successfully.
@@ -90,11 +90,12 @@ The spool waits for the output to acknowledge or drop events. If the spool is
 full, no new events can be inserted. The spool will block. Space is freed only
 after a signal from the output has been received.
 
-On disk, the spool operates in pages. The `file.page_size` setting configures
-the files page size on creation time. The optimal page size depends on the
-effective block size, used by the underlying file system.
+On disk, the spool divides a file into pages. The `file.page_size` setting
+configures the file's page size at file creation time. The optimal page size depends
+on the effective block size, used by the underlying file system.
 
-This sample configuration enables the spool with all default settings and the
+This sample configuration enables the spool with all default settings (See
+<<configuration-internal-queue-spool-reference>> for defaults) and the
 default file path:
 
 [source,yaml]
@@ -104,7 +105,7 @@ queue.spool: ~
 
 This sample configuration creates a spool of 512MiB, with 16KiB pages. The
 write buffer is flushed if 10MiB of contents, or 1024 events have been
-written. If oldest available event is already waiting for 5s in the write
+written. If the oldest available event has been waiting for 5s in the write
 buffer, the buffer will be flushed as well:
 
 [source,yaml]
@@ -121,6 +122,7 @@ queue.spool:
 ------------------------------------------------------------------------------
 
 [float]
+[[configuration-internal-queue-spool-reference]]
 ==== Configuration options
 
 You can specify the following options in the `queue.spool` section of the
@@ -136,7 +138,7 @@ The default value is "${path.data}/spool.dat".
 ===== `file.permissions`
 
 The file permissions. The permissions are applied when the file is
-created. In case the file already exists, The file permissions are compared
+created. In case the file already exists, the file permissions are compared
 with `file.permissions`. The spool file is not opened if the actual file
 permissions are more permissive then configured.
 
@@ -149,28 +151,28 @@ Spool file size.
 
 The default value is 100 MiB.
 
-Note: The size should be much larger then the expected event sizes
+NOTE: The size should be much larger then the expected event sizes
 and write buffer size. Otherwise the queue will block, because it has not
 enough space.
 
-Note: The file size can not be changed once the file has been generated. This
+NOTE: The file size cannot be changed once the file has been generated. This
 limitation will be removed in the future.
 
 
 ===== `file.page_size`
 
-The files page size.
+The file's page size.
 
-The spool file is split into multiple pages of `page_size`. All write
-operations write a complete page.
+The spool file is split into pages of `page_size`. All I/O
+operations operate on complete pages.
 
 The default value is 4096 (4KiB).
 
-Note: This setting should match the file systems minimum block size. If the
-`page_size` is not a multiple of the file systems block size, the file system
+NOTE: This setting should match the file system's minimum block size. If the
+`page_size` is not a multiple of the file system's block size, the file system
 might create additional read operations on writes.
 
-Note: The page size is only set on file creation time. It can not be changed
+NOTE: The page size is only set at file creation time. It cannot be changed
 afterwards.
 
 
@@ -214,10 +216,14 @@ The default value is 16384.
 
 ===== `read.flush.timeout`
 
-If configured, the `read.flush.timeout` ensures the spool will wait for more
-events to be flushed to the spool file, If the number of available events is
-less then the outputs `bulk_max_size`.
+The spool reader tries to read up to the output's `bulk_max_size` events at once.
 
-If `read.flush.timeout` is 0, all available events are forwarded to the output immediately.
+If `read.flush.timeout` is set to 0s, all available events are forwarded
+immediately to the output.
+
+If `read.flush.timeout` is set to a value bigger then 0s, the spool will wait
+for more events to be flushed. Events are forwarded to the output if
+`bulk_max_size` events have been read or the oldest read event has been waiting
+for the configured duration.
 
 The default value is 0s.
