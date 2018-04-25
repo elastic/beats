@@ -5,7 +5,7 @@ For more information on the query it uses, see:
 http://dev.mysql.com/doc/refman/5.7/en/show-status.html
 http://galeracluster.com/documentation-webpages/galerastatusvariables.html
 */
-package galeraStatus
+package galerastatus
 
 import (
 	"database/sql"
