@@ -445,6 +445,35 @@
 			"revisionTime": "2016-06-17T14:03:01Z"
 		},
 		{
+			"checksumSHA1": "dyjXEG8sZgR7ZaKsvX8PnaeH+Uo=",
+			"path": "github.com/elastic/go-seccomp-bpf",
+			"revision": "bc35619931bc4ae13c582a78cfb2ebdaee789ff2",
+			"revisionTime": "2018-05-01T16:48:19Z"
+		},
+		{
+			"checksumSHA1": "qTs7QT+GC2Dr4aFoLFHCkAOoVeU=",
+			"path": "github.com/elastic/go-seccomp-bpf/arch",
+			"revision": "bc35619931bc4ae13c582a78cfb2ebdaee789ff2",
+			"revisionTime": "2018-05-01T16:48:19Z"
+		},
+		{
+			"path": "github.com/elastic/go-seccomp-bpf/cmd/seccomp-profile",
+			"revision": "",
+			"tree": true
+		},
+		{
+			"checksumSHA1": "WxO9XU6khHcSui6YRpH8LFb0hxM=",
+			"path": "github.com/elastic/go-seccomp-bpf/cmd/seccomp-profiler",
+			"revision": "bc35619931bc4ae13c582a78cfb2ebdaee789ff2",
+			"revisionTime": "2018-05-01T16:48:19Z"
+		},
+		{
+			"checksumSHA1": "HyikAKbV34BwmYCEzZpCAwefZ3o=",
+			"path": "github.com/elastic/go-seccomp-bpf/cmd/seccomp-profiler/disasm",
+			"revision": "bc35619931bc4ae13c582a78cfb2ebdaee789ff2",
+			"revisionTime": "2018-05-01T16:48:19Z"
+		},
+		{
 			"checksumSHA1": "AaEPt+KMknLXze11YOnBGKzP3aA=",
 			"path": "github.com/elastic/go-structform",
 			"revision": "0a66add879601f69f55663f4c913c72988218982",
