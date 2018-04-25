@@ -10,25 +10,31 @@
             "name": "docker-cluster"
         },
         "index": {
-            "name": ".watches",
+            "name": ".monitoring-es-6-2018.04.22",
             "total": {
                 "docs": {
-                    "count": 6,
-                    "deleted": 0
+                    "count": 241933,
+                    "deleted": 525
                 },
                 "segments": {
-                    "count": 3,
+                    "count": 16,
                     "memory": {
-                        "bytes": 11505
+                        "bytes": 565573
                     }
                 },
                 "store": {
                     "size": {
-                        "bytes": 67980
+                        "bytes": 135541290
                     }
                 }
             }
         }
+    },
+    "metricset": {
+        "host": "127.0.0.1:9200",
+        "module": "elasticsearch",
+        "name": "index",
+        "rtt": 115
     },
     "service": {
         "name": "elasticsearch"

@@ -73,7 +73,7 @@ func WriteEventsReporterV2(f mb.ReportingMetricSetV2, t testing.TB) error {
 		return fmt.Errorf("no events were generated")
 	}
 
-	e := StandardizeEvent(f, events[0])
+	e := StandardizeEvent(f, events[0], mb.AddMetricSetInfo)
 
 	WriteEventToDataJSON(t, e)
 	return nil
