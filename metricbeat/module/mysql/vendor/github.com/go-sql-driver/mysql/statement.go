@@ -20,10 +20,11 @@ type mysqlStmt struct {
 	mc         *mysqlConn
 	id         uint32
 	paramCount int
+	columns    [][]mysqlField // cached from the first query
 }
 
 func (stmt *mysqlStmt) Close() error {
-	if stmt.mc == nil || stmt.mc.closed.IsSet() {
+	if stmt.mc == nil || stmt.mc.netConn == nil {
 		// driver.Stmt.Close can be called more than once, thus this function
 		// has to be idempotent.
 		// See also Issue #450 and golang/go#16019.
@@ -45,14 +46,14 @@ func (stmt *mysqlStmt) ColumnConverter(idx int) driver.ValueConverter {
 }
 
 func (stmt *mysqlStmt) Exec(args []driver.Value) (driver.Result, error) {
-	if stmt.mc.closed.IsSet() {
+	if stmt.mc.netConn == nil {
 		errLog.Print(ErrInvalidConn)
 		return nil, driver.ErrBadConn
 	}
 	// Send command
 	err := stmt.writeExecutePacket(args)
 	if err != nil {
-		return nil, stmt.mc.markBadConn(err)
+		return nil, err
 	}
 
 	mc := stmt.mc
@@ -89,18 +90,14 @@ func (stmt *mysqlStmt) Exec(args []driver.Value) (driver.Result, error) {
 }
 
 func (stmt *mysqlStmt) Query(args []driver.Value) (driver.Rows, error) {
-	return stmt.query(args)
-}
-
-func (stmt *mysqlStmt) query(args []driver.Value) (*binaryRows, error) {
-	if stmt.mc.closed.IsSet() {
+	if stmt.mc.netConn == nil {
 		errLog.Print(ErrInvalidConn)
 		return nil, driver.ErrBadConn
 	}
 	// Send command
 	err := stmt.writeExecutePacket(args)
 	if err != nil {
-		return nil, stmt.mc.markBadConn(err)
+		return nil, err
 	}
 
 	mc := stmt.mc
@@ -112,10 +109,20 @@ func (stmt *mysqlStmt) query(args []driver.Value) (*binaryRows, error) {
 	}
 
 	rows := new(binaryRows)
+	rows.stmtCols = &stmt.columns
 
 	if resLen > 0 {
 		rows.mc = mc
-		rows.rs.columns, err = mc.readColumns(resLen)
+		rows.i++
+		// Columns
+		// If not cached, read them and cache them
+		if len(stmt.columns) == 0 {
+			rows.rs.columns, err = mc.readColumns(resLen)
+			stmt.columns = append(stmt.columns, rows.rs.columns)
+		} else {
+			rows.rs.columns = stmt.columns[0]
+			err = mc.readUntilEOF()
+		}
 	} else {
 		rows.rs.done = true
 
@@ -135,12 +142,6 @@ type converter struct{}
 func (c converter) ConvertValue(v interface{}) (driver.Value, error) {
 	if driver.IsValue(v) {
 		return v, nil
-	}
-
-	if v != nil {
-		if valuer, ok := v.(driver.Valuer); ok {
-			return valuer.Value()
-		}
 	}
 
 	rv := reflect.ValueOf(v)
@@ -163,16 +164,6 @@ func (c converter) ConvertValue(v interface{}) (driver.Value, error) {
 		return int64(u64), nil
 	case reflect.Float32, reflect.Float64:
 		return rv.Float(), nil
-	case reflect.Bool:
-		return rv.Bool(), nil
-	case reflect.Slice:
-		ek := rv.Type().Elem().Kind()
-		if ek == reflect.Uint8 {
-			return rv.Bytes(), nil
-		}
-		return nil, fmt.Errorf("unsupported type %T, a slice of %s", v, ek)
-	case reflect.String:
-		return rv.String(), nil
 	}
 	return nil, fmt.Errorf("unsupported type %T, a %s", v, rv.Kind())
 }

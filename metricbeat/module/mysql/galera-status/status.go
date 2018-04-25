@@ -1,28 +1,32 @@
-package status
+/*
+Package galera-status fetches MySQL Galera server status metrics.
 
+For more information on the query it uses, see:
+http://dev.mysql.com/doc/refman/5.7/en/show-status.html
+http://galeracluster.com/documentation-webpages/galerastatusvariables.html
+*/
+package galeraStatus
 
 import (
 	"database/sql"
 
-	"github.com/elastic/beats/metricbeat/mb"
-	"github.com/pkg/errors"
-	"github.com/elastic/beats/libbeat/logp"
 	"github.com/elastic/beats/libbeat/common"
+	"github.com/elastic/beats/libbeat/logp"
+	"github.com/elastic/beats/metricbeat/mb"
+	"github.com/elastic/beats/metricbeat/module/mysql"
 
-	mbSql "github.com/elastic/beats/metricbeat/module/mysql"
+	"github.com/pkg/errors"
 )
-
 
 var (
-	debugf = logp.MakeDebug("galera-status")
+	debugf = logp.MakeDebug("mysql-galera-status")
 )
-
 
 // init registers the MetricSet with the central registry.
 func init() {
-	if err := mb.Registry.AddMetricSet("galera", "status", New, mbSql.ParseDSN); err != nil {
-		panic(err)
-	}
+	mb.Registry.MustAddMetricSet("mysql", "galera-status", New, 
+		mb.WithHostParser(mysql.ParseDSN),
+	)
 }
 
 // MetricSet for fetching Galera-MySQL server status
@@ -36,7 +40,7 @@ type MetricSet struct {
 // Loads query_mode config setting from the config file
 func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
 	config := struct {
-		QueryMode string `config:"query_mode"`
+		QueryMode string `config:"galera.query_mode"`
 	}{
 		QueryMode: "small",
 	}
@@ -59,7 +63,7 @@ func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
 func (m *MetricSet) Fetch() (common.MapStr, error) {
 	if m.db == nil {
 		var err error
-		m.db, err = mbSql.NewDB(m.HostData().URI)
+		m.db, err = mysql.NewDB(m.HostData().URI)
 		if err != nil {
 			return nil, errors.Wrap(err, "Galera-status fetch failed")
 		}
@@ -71,7 +75,6 @@ func (m *MetricSet) Fetch() (common.MapStr, error) {
 	}
 
 	event, err := eventMapping(status, m.queryMode)
-
 	if err != nil {
 		return nil, err
 	}

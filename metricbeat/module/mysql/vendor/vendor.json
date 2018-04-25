@@ -1,0 +1,13 @@
+{
+	"comment": "",
+	"ignore": "test github.com/elastic/beats",
+	"package": [
+		{
+			"checksumSHA1": "42vkdsxNaLyPu+FktCzZ/8zsNSE=",
+			"path": "github.com/go-sql-driver/mysql",
+			"revision": "9dee4ca50b83acdf57a35fb9e6fb4be640afa2f3",
+			"revisionTime": "2017-03-27T11:30:21Z"
+		}
+	],
+	"rootPath": "github.com/elastic/beats/metricbeat/module/mysql"
+}
