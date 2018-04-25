@@ -39,6 +39,7 @@ https://github.com/elastic/beats/compare/v6.0.0-beta2...master[Check the HEAD di
 - Add config option for windows/perfmon metricset to ignore non existent counters. {pull}6432[6432]
 - Refactor docker CPU calculations to be more consistent with `docker stats`. {pull}6608[6608]
 - Update logstash.node_stats metricset to write data under `logstash.node.stats.*`. {pull}6714[6714]
+- Fixed typo in values for `state_container` `status.phase`, from `terminate` to `terminated`. {pull}6916[6916]
 
 *Packetbeat*
 
@@ -222,6 +223,9 @@ https://github.com/elastic/beats/compare/v6.0.0-beta2...master[Check the HEAD di
 *Heartbeat*
 
 *Metricbeat*
+
+- Kubernetes `state_container` `cpu.limit.nanocores` and `cpu.request.nanocores` have been
+deprecated in favor of `cpu.*.cores`. {pull}6916[6916]
 
 *Packetbeat*
 
