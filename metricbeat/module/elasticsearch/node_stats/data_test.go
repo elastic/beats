@@ -8,6 +8,7 @@ import (
 	"testing"
 
 	s "github.com/elastic/beats/libbeat/common/schema"
+	mbtest "github.com/elastic/beats/metricbeat/mb/testing"
 
 	"github.com/stretchr/testify/assert"
 )
@@ -17,18 +18,17 @@ func TestStats(t *testing.T) {
 	assert.NoError(t, err)
 
 	for _, f := range files {
-		content, err := ioutil.ReadFile(f)
+		input, err := ioutil.ReadFile(f)
 		assert.NoError(t, err)
 
-		_, errs := eventsMapping(content)
-		if errs == nil {
-			continue
+		reporter := &mbtest.CapturingReporterV2{}
+		errors := eventsMapping(reporter, input)
+		for _, errs := range errors {
+			if e, ok := errs.(*s.Errors); ok {
+				assert.False(t, e.HasRequiredErrors(), "mapping error: %s", e)
+			}
 		}
-		errors, ok := errs.(*s.Errors)
-		if ok {
-			assert.False(t, errors.HasRequiredErrors(), "mapping error: %s", errors)
-		} else {
-			t.Error(err)
-		}
+		assert.True(t, len(reporter.GetEvents()) >= 1)
+		assert.Equal(t, 0, len(reporter.GetErrors()))
 	}
 }

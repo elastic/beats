@@ -1,7 +1,6 @@
 package node_stats
 
 import (
-	"github.com/elastic/beats/libbeat/common"
 	"github.com/elastic/beats/libbeat/common/cfgwarn"
 	"github.com/elastic/beats/metricbeat/helper"
 	"github.com/elastic/beats/metricbeat/mb"
@@ -14,6 +13,7 @@ func init() {
 	mb.Registry.MustAddMetricSet("elasticsearch", "node_stats", New,
 		mb.WithHostParser(hostParser),
 		mb.DefaultMetricSet(),
+		mb.WithNamespace("elasticsearch.node.stats"),
 	)
 }
 
@@ -47,12 +47,12 @@ func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
 }
 
 // Fetch methods implements the data gathering and data conversion to the right format
-func (m *MetricSet) Fetch() ([]common.MapStr, error) {
+func (m *MetricSet) Fetch(r mb.ReporterV2) {
 	content, err := m.http.FetchContent()
 	if err != nil {
-		return nil, err
+		r.Error(err)
+		return
 	}
 
-	events, _ := eventsMapping(content)
-	return events, nil
+	eventsMapping(r, content)
 }
