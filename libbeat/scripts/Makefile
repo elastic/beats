@@ -115,7 +115,7 @@ crosscompile: $(GOFILES)
 	gox -output="${BUILD_DIR}/bin/{{.Dir}}-{{.OS}}-{{.Arch}}" -os="$(strip $(GOX_OS))" -osarch="$(strip $(GOX_OSARCH))" ${GOX_FLAGS}
 
 .PHONY: check
-check: python-env ## @build Checks project and source code if everything is according to standard
+check: python-env prepare-tests ## @build Checks project and source code if everything is according to standard
 	@go vet ${GOPACKAGES}
 	@go get $(GOIMPORTS_REPO)
 	@goimports -local ${GOIMPORTS_LOCAL_PREFIX} -l ${GOFILES_NOVENDOR} | (! grep .) || (echo "Code differs from goimports' style ^" && false)
