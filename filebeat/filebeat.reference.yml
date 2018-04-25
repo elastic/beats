@@ -638,12 +638,12 @@ filebeat.inputs:
   #inputs:
     #enabled: false
     #path: inputs.d/*.yml
-    #reload.enabled: true
+    #reload.enabled: false
     #reload.period: 10s
   #modules:
     #enabled: false
     #path: modules.d/*.yml
-    #reload.enabled: true
+    #reload.enabled: false
     #reload.period: 10s
 
 #================================ General ======================================
