@@ -15,8 +15,8 @@ test: prepare-test
 	cd ${BEAT_PATH} ; \
 	$(MAKE) copy-vendor || exit 1  ; \
 	${PREPARE_COMMAND} \
-	$(MAKE) check || exit 1 ; \
 	$(MAKE) update || exit 1 ; \
+	$(MAKE) check || exit 1 ; \
 	$(MAKE) || exit 1 ; \
 	$(MAKE) unit
 
