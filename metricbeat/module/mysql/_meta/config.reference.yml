@@ -27,6 +27,8 @@
   # While "full" queries nearly all available variables, small only catches a small subset of it, which is:
   #  - wsrep_local_state_comment
   #  - wsrep_evs_state
+  #  - wsrep_flow_ctl_paused
+  #  - wsrep_flow_ctl_paused_ns
   #  - wsrep_cluster_size
   #  - wsrep_cluster_status
   #  - wsrep_connected

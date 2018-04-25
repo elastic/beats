@@ -84,6 +84,10 @@ var (
 		"evs": s.Object{
 			"state": c.Str("wsrep_evs_state"),
 		},
+		"flow_ctl": s.Object{
+			"paused": c.Float("wsrep_flow_control_paused"),
+			"paused_ns": c.Int("wsrep_flow_control_paused_ns"),
+		}
 		"cluster": s.Object{
 			"size": c.Int("wsrep_cluster_size"),
 			"status": c.Str("wsrep_cluster_status"),
