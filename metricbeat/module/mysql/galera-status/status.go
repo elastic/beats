@@ -39,6 +39,8 @@ type MetricSet struct {
 // New create a new instance of the MetricSet
 // Loads query_mode config setting from the config file
 func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
+	cfgwarn.Experimental("The mysql galera-status metricset is experimental") 
+	
 	config := struct {
 		QueryMode string `config:"galera.query_mode"`
 	}{
