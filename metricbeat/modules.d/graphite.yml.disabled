@@ -2,7 +2,7 @@
 # Docs: https://www.elastic.co/guide/en/beats/metricbeat/master/metricbeat-module-graphite.html
 
 - module: graphite
-  metricsets: ["server"]
+#  metricsets: ["server"]
 #  protocol: "udp"
 #  templates:
 #    - filter: "test.*.bash.*" # This would match metrics like test.localhost.bash.stats

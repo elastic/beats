@@ -2,9 +2,9 @@
 # Docs: https://www.elastic.co/guide/en/beats/metricbeat/master/metricbeat-module-mongodb.html
 
 - module: mongodb
-  metricsets:
-    - dbstats
-    - status
+#  metricsets:
+#    - dbstats
+#    - status
   period: 10s
 
   # The hosts must be passed as MongoDB URLs in the format:

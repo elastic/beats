@@ -1,5 +1,5 @@
 - module: nginx
-  metricsets: ["stubstatus"]
+#  metricsets: ["stubstatus"]
   period: 10s
 
   # Nginx hosts

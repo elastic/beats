@@ -1,4 +1,4 @@
 - module: aerospike
-  metricsets: ["namespace"]
+#  metricsets: ["namespace"]
   period: 10s
   hosts: ["localhost:3000"]
