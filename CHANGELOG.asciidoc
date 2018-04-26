@@ -54,6 +54,8 @@ https://github.com/elastic/beats/compare/v6.2.4...6.2[Check the HEAD diff]
 
 *Metricbeat*
 
+- Kubernetes deployment: Add ServiceAccount config to system metricbeat. {pull}6824[6824]
+
 *Packetbeat*
 
 *Winlogbeat*
