@@ -519,13 +519,6 @@ https://github.com/elastic/beats/compare/v6.0.1...v6.1.0[View commits]
 - Add experimental Docker autodiscover functionality. {pull}5245[5245]
 - Add Windows service metricset in the windows module. {pull}5332[5332]
 - Update gosigar to v0.6.0. {pull}5775[5775]
-- Add experimental system/raid metricset. {pull}5642[5642]
-- Add a dashboard for the Nginx module. {pull}5991[5991]
-- Add experimental mongodb/collstats metricset. {pull}5852[5852]
-- Update the MySQL dashboard to use the Time Series Visual Builder. {pull}5996[5996]
-- Add experimental uwsgi module. {pull}6006[6006]
-- Docker and Kubernetes modules are now GA, instead of Beta. {pull}6105[6105]
-- Add Jolokia agent in proxy mode. {pull}6475[6475]
 
 *Packetbeat*
 
