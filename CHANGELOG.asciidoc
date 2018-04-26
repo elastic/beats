@@ -67,6 +67,7 @@ https://github.com/elastic/beats/compare/v6.0.0-beta2...master[Check the HEAD di
 - Add raw JSON to message field when JSON parsing fails. {issue}6516[6516]
 
 *Heartbeat*
+- Fix race due to updates of shared a map, that was not supposed to be shared between multiple go-routines. {issue}6616[6616]
 
 *Metricbeat*
 
