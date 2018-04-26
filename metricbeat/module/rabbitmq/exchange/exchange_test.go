@@ -41,35 +41,35 @@ func TestFetchEventContents(t *testing.T) {
 
 	messagesExpected := common.MapStr{
 		"publish": common.MapStr{
-			"count": int64(123),
+			"count":   int64(123),
 			"details": common.MapStr{"rate": float64(0.1)},
 		},
 		"publish_in": common.MapStr{
-			"count": int64(100),
+			"count":   int64(100),
 			"details": common.MapStr{"rate": float64(0.5)},
 		},
 		"publish_out": common.MapStr{
-			"count": int64(99),
+			"count":   int64(99),
 			"details": common.MapStr{"rate": float64(0.9)},
 		},
 		"ack": common.MapStr{
-			"count": int64(60),
+			"count":   int64(60),
 			"details": common.MapStr{"rate": float64(12.5)},
 		},
 		"deliver_get": common.MapStr{
-			"count": int64(50),
+			"count":   int64(50),
 			"details": common.MapStr{"rate": float64(43.21)},
 		},
 		"confirm": common.MapStr{
-			"count": int64(120),
+			"count":   int64(120),
 			"details": common.MapStr{"rate": float64(98.63)},
 		},
 		"return_unroutable": common.MapStr{
-			"count": int64(40),
+			"count":   int64(40),
 			"details": common.MapStr{"rate": float64(123)},
 		},
 		"redeliver": common.MapStr{
-			"count": int64(30),
+			"count":   int64(30),
 			"details": common.MapStr{"rate": float64(0)},
 		},
 	}

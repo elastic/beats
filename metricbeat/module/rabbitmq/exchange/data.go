@@ -17,9 +17,9 @@ var (
 		"durable":     c.Bool("durable"),
 		"auto_delete": c.Bool("auto_delete"),
 		"internal":    c.Bool("internal"),
-		"arguments":   c.Dict("arguments", s.Schema{
-		}),
-		"messages":    c.Dict("message_stats", s.Schema{
+		"arguments":   c.Dict("arguments", s.Schema{}),
+		"user":        c.Str("user_who_performed_action", s.Optional),
+		"messages": c.Dict("message_stats", s.Schema{
 			"publish": s.Object{
 				"count": c.Int("publish", s.Optional),
 				"details": c.Dict("publish_details", s.Schema{
@@ -73,8 +73,8 @@ var (
 )
 
 func eventsMapping(content []byte) ([]common.MapStr, error) {
-	var queues []map[string]interface{}
-	err := json.Unmarshal(content, &queues)
+	var exchanges []map[string]interface{}
+	err := json.Unmarshal(content, &exchanges)
 	if err != nil {
 		logp.Err("Error: ", err)
 	}
@@ -82,8 +82,8 @@ func eventsMapping(content []byte) ([]common.MapStr, error) {
 	events := []common.MapStr{}
 	errors := s.NewErrors()
 
-	for _, queue := range queues {
-		event, errs := eventMapping(queue)
+	for _, exchange := range exchanges {
+		event, errs := eventMapping(exchange)
 		events = append(events, event)
 		errors.AddErrors(errs)
 	}
@@ -91,6 +91,6 @@ func eventsMapping(content []byte) ([]common.MapStr, error) {
 	return events, errors
 }
 
-func eventMapping(queue map[string]interface{}) (common.MapStr, *s.Errors) {
-	return schema.Apply(queue)
+func eventMapping(exchange map[string]interface{}) (common.MapStr, *s.Errors) {
+	return schema.Apply(exchange)
 }

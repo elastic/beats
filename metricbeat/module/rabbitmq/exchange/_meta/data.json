@@ -16,8 +16,29 @@
             "auto_delete": false,
             "durable": true,
             "internal": false,
+            "messages": {
+                "ack": {},
+                "confirm": {},
+                "deliver_get": {},
+                "publish": {},
+                "publish_in": {
+                    "count": 607,
+                    "details": {
+                        "rate": 4
+                    }
+                },
+                "publish_out": {
+                    "count": 547,
+                    "details": {
+                        "rate": 4
+                    }
+                },
+                "redeliver": {},
+                "return_unroutable": {}
+            },
             "name": "",
             "type": "direct",
+            "user": "rmq-internal",
             "vhost": "/"
         }
     }

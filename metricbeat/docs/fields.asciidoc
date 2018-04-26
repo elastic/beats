@@ -10971,6 +10971,16 @@ Whether the exchange is internal, i.e. cannot be directly published to by a clie
 
 --
 
+*`rabbitmq.exchange.user`*::
++
+--
+type: keyword
+
+User who created the exchange.
+
+
+--
+
 *`rabbitmq.exchange.messages.publish.count`*::
 +
 --
