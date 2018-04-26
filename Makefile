@@ -110,13 +110,13 @@ docs:
 	@$(foreach var,$(PROJECTS),BUILD_DIR=${BUILD_DIR} $(MAKE) -C $(var) docs || exit 1;)
 	sh ./script/build_docs.sh dev-guide github.com/elastic/beats/docs/devguide ${BUILD_DIR}
 
-.PHONY: package
-package: update beats-dashboards
-	@$(foreach var,$(BEATS),SNAPSHOT=$(SNAPSHOT) $(MAKE) -C $(var) package || exit 1;)
+.PHONY: package-all
+package-all: update beats-dashboards
+	@$(foreach var,$(BEATS),SNAPSHOT=$(SNAPSHOT) $(MAKE) -C $(var) package-all || exit 1;)
 
 	@echo "Start building the dashboards package"
 	@mkdir -p build/upload/
-	@BUILD_DIR=${BUILD_DIR} SNAPSHOT=$(SNAPSHOT) $(MAKE) -C dev-tools/packer package-dashboards ${BUILD_DIR}/upload/build_id.txt
+	@BUILD_DIR=${BUILD_DIR} UPLOAD_DIR=${BUILD_DIR}/upload SNAPSHOT=$(SNAPSHOT) $(MAKE) -C dev-tools/packer package-dashboards ${BUILD_DIR}/upload/build_id.txt
 	@mv build/upload build/dashboards-upload
 
 	@# Copy build files over to top build directory

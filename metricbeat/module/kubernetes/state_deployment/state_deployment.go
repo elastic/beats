@@ -2,7 +2,8 @@ package state_deployment
 
 import (
 	"github.com/elastic/beats/libbeat/common"
-	"github.com/elastic/beats/metricbeat/helper"
+
+	p "github.com/elastic/beats/metricbeat/helper/prometheus"
 	"github.com/elastic/beats/metricbeat/mb"
 	"github.com/elastic/beats/metricbeat/mb/parse"
 )
@@ -17,6 +18,26 @@ var (
 		DefaultScheme: defaultScheme,
 		DefaultPath:   defaultPath,
 	}.Build()
+
+	mapping = &p.MetricsMapping{
+		Metrics: map[string]p.MetricMap{
+			"kube_deployment_metadata_generation":         p.Metric(""),
+			"kube_deployment_status_replicas_updated":     p.Metric("replicas.updated"),
+			"kube_deployment_status_replicas_unavailable": p.Metric("replicas.unavailable"),
+			"kube_deployment_status_replicas_available":   p.Metric("replicas.available"),
+			"kube_deployment_spec_replicas":               p.Metric("replicas.desired"),
+			"kube_deployment_spec_paused":                 p.BooleanMetric("paused"),
+		},
+
+		Labels: map[string]p.LabelMap{
+			"deployment": p.KeyLabel("name"),
+			"namespace":  p.KeyLabel(mb.ModuleDataKey + ".namespace"),
+		},
+
+		ExtraFields: map[string]string{
+			mb.NamespaceKey: "deployment",
+		},
+	}
 )
 
 // init registers the MetricSet with the central registry.
@@ -33,14 +54,14 @@ func init() {
 // multiple fetch calls.
 type MetricSet struct {
 	mb.BaseMetricSet
-	prometheus *helper.Prometheus
+	prometheus p.Prometheus
 }
 
 // New create a new instance of the MetricSet
 // Part of new is also setting up the configuration by processing additional
 // configuration entries if needed.
 func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
-	prometheus, err := helper.NewPrometheusClient(base)
+	prometheus, err := p.NewPrometheusClient(base)
 	if err != nil {
 		return nil, err
 	}
@@ -54,10 +75,5 @@ func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
 // It returns the event which is then forward to the output. In case of an error, a
 // descriptive error must be returned.
 func (m *MetricSet) Fetch() ([]common.MapStr, error) {
-	families, err := m.prometheus.GetFamilies()
-	if err != nil {
-		return nil, err
-	}
-
-	return eventMapping(families)
+	return m.prometheus.GetProcessedMetrics(mapping)
 }

@@ -1,0 +1,23 @@
+{
+  "objects": [
+    {
+      "attributes": {
+        "description": "",
+        "hits": 0,
+        "kibanaSavedObjectMeta": {
+          "searchSourceJSON": "{\"query\":{\"query\":\"\",\"language\":\"lucene\"},\"filter\":[],\"highlightAll\":true,\"version\":true}"
+        },
+        "optionsJSON": "{\"darkTheme\":false,\"useMargins\":true,\"hidePanelTitles\":false}",
+        "panelsJSON": "[{\"panelIndex\":\"2\",\"gridData\":{\"x\":0,\"y\":0,\"w\":6,\"h\":3,\"i\":\"2\"},\"version\":\"6.2.2\",\"type\":\"visualization\",\"id\":\"a64b4fd0-471c-11e8-bc13-1397384faad3\"},{\"panelIndex\":\"3\",\"gridData\":{\"x\":6,\"y\":0,\"w\":6,\"h\":3,\"i\":\"3\"},\"version\":\"6.2.2\",\"type\":\"visualization\",\"id\":\"86159190-47c5-11e8-bc13-1397384faad3\"}]",
+        "timeRestore": false,
+        "title": "[Metricbeat Haproxy] Frontend",
+        "version": 1
+      },
+      "id": "d5878d00-47c5-11e8-bc13-1397384faad3",
+      "type": "dashboard",
+      "updated_at": "2018-04-24T18:32:51.945Z",
+      "version": 5
+    }
+  ],
+  "version": "6.2.2"
+}

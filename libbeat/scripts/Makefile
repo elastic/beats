@@ -15,7 +15,8 @@ ES_BEATS?=..## @community_beat Must be set to ./vendor/github.com/elastic/beats.
 GOPACKAGES?=$(shell go list ${BEAT_PATH}/... | grep -v /vendor/ | grep -v /scripts/cmd/ )
 PACKER_TEMPLATES_DIR?=${ES_BEATS}/dev-tools/packer ## @Building Directory of templates that are used by "make package"
 NOTICE_FILE?=../NOTICE.txt
-LICENSE_FILE?=../LICENSE.txt
+LICENSE_FILE?=../licenses/APACHE-LICENSE-2.0.txt
+ELASTIC_LICENSE_FILE?=../licenses/ELASTIC-LICENSE.txt
 
 space:=$() #
 comma:=,
@@ -31,6 +32,8 @@ SHELL=bash
 ES_HOST?="elasticsearch"
 PWD=$(shell pwd)
 BUILD_DIR?=$(shell pwd)/build
+PKG_BUILD_DIR?=$(BUILD_DIR)/package${PKG_SUFFIX}
+PKG_UPLOAD_DIR?=$(BUILD_DIR)/upload
 COVERAGE_DIR?=${BUILD_DIR}/coverage
 COVERAGE_TOOL?=${BEAT_GOPATH}/bin/gotestcover
 COVERAGE_TOOL_REPO?=github.com/elastic/beats/vendor/github.com/pierrre/gotestcover
@@ -391,7 +394,7 @@ install-home:
 		install -m 644 ${NOTICE_FILE} ${HOME_PREFIX}/; \
 	fi
 	if [ -a ${LICENSE_FILE} ]; then \
-		install -m 644 ${LICENSE_FILE} ${HOME_PREFIX}/; \
+		install -m 644 ${LICENSE_FILE} ${HOME_PREFIX}/LICENSE.txt; \
 	fi
 	if [ -d _meta/module.generated ]; then \
 		install -d -m 755 ${HOME_PREFIX}/module; \
@@ -411,7 +414,7 @@ prepare-package:
 		-v $(abspath ${ES_BEATS}/dev-tools/packer/xgo-scripts):/scripts \
 		-v $(abspath ${PACKER_TEMPLATES_DIR}):/templates \
 		-v $(abspath ../):/source \
-		-v $(BUILD_DIR):/build \
+		-v $(PKG_BUILD_DIR):/build \
 		-e PUREGO="yes" \
 		-e PACK=${BEAT_NAME} \
 		-e BEFORE_BUILD=before_build.sh \
@@ -421,6 +424,7 @@ prepare-package:
 		-e ES_BEATS=${ES_BEATS} \
 		-e BEAT_PATH=${BEAT_PATH} \
 		-e BEAT_NAME=${BEAT_NAME} \
+		-e LICENSE_FILE=${LICENSE_FILE} \
 		${BEATS_BUILDER_IMAGE}
 
 # Prepares for packaging. Builds binaries with cgo
@@ -432,7 +436,7 @@ prepare-package-cgo:
 		-v $(abspath ${ES_BEATS}/dev-tools/packer/xgo-scripts):/scripts \
 		-v $(abspath ${PACKER_TEMPLATES_DIR}):/templates \
 		-v $(abspath ../):/source \
-		-v $(BUILD_DIR):/build \
+		-v $(PKG_BUILD_DIR):/build \
 		-e PACK=${BEAT_NAME} \
 		-e BEFORE_BUILD=before_build.sh \
 		-e SOURCE=/source \
@@ -441,14 +445,15 @@ prepare-package-cgo:
 		-e ES_BEATS=${ES_BEATS} \
 		-e BEAT_PATH=${BEAT_PATH} \
 		-e BEAT_NAME=${BEAT_NAME} \
+		-e LICENSE_FILE=${LICENSE_FILE} \
 		${BEATS_BUILDER_IMAGE}
 
 	# linux builds on older debian for compatibility
 	docker run --rm \
-		-v ${BUILD_DIR}:/build \
 		-v $(abspath ${ES_BEATS}/dev-tools/packer/xgo-scripts):/scripts \
 		-v $(abspath ${PACKER_TEMPLATES_DIR}):/templates \
 		-v $(abspath ..):/source \
+		-v ${PKG_BUILD_DIR}:/build \
 		-e PACK=${BEAT_NAME} \
 		-e BEFORE_BUILD=before_build.sh \
 		-e SOURCE=/source \
@@ -457,6 +462,7 @@ prepare-package-cgo:
 		-e ES_BEATS=${ES_BEATS} \
 		-e BEAT_PATH=${BEAT_PATH} \
 		-e BEAT_NAME=${BEAT_NAME} \
+		-e LICENSE_FILE=${LICENSE_FILE} \
 		${BEATS_BUILDER_DEB_IMAGE}
 
 # Prepares images for packaging
@@ -466,26 +472,28 @@ package-setup:
 
 .PHONY: package
 package: ## @packaging Create binary packages for the beat.
-package: clean update package-setup
-
+package: update package-setup
 	echo "Start building packages for ${BEAT_NAME}"
 
-	mkdir -p ${BUILD_DIR}/upload
+	rm -rf ${PKG_BUILD_DIR}
+	mkdir -p ${PKG_BUILD_DIR}
+	mkdir -p ${PKG_UPLOAD_DIR}
 
 	# Generates the package.yml file with all information needed to create packages
-	echo "beat_name: ${BEAT_NAME}" > ${BUILD_DIR}/package.yml
-	echo "beat_url: ${BEAT_URL}" >> ${BUILD_DIR}/package.yml
-	echo "beat_repo: ${BEAT_PATH}" >> ${BUILD_DIR}/package.yml
-	echo "beat_pkg_name: ${BEAT_PACKAGE_NAME}" >> ${BUILD_DIR}/package.yml
-	echo "beat_description: ${BEAT_DESCRIPTION}" >> ${BUILD_DIR}/package.yml
-	echo "beat_vendor: ${BEAT_VENDOR}" >> ${BUILD_DIR}/package.yml
-	echo "beat_license: ${BEAT_LICENSE}" >> ${BUILD_DIR}/package.yml
-	echo "beat_doc_url: ${BEAT_DOC_URL}" >> ${BUILD_DIR}/package.yml
+	echo "beat_name: ${BEAT_NAME}"                          >  ${PKG_BUILD_DIR}/package.yml
+	echo "beat_url: ${BEAT_URL}"                            >> ${PKG_BUILD_DIR}/package.yml
+	echo "beat_repo: ${BEAT_PATH}"                          >> ${PKG_BUILD_DIR}/package.yml
+	echo "beat_pkg_name: ${BEAT_PACKAGE_NAME}"              >> ${PKG_BUILD_DIR}/package.yml
+	echo "beat_pkg_suffix: '${PKG_SUFFIX}'"                 >> ${PKG_BUILD_DIR}/package.yml
+	echo "beat_description: ${BEAT_DESCRIPTION}"            >> ${PKG_BUILD_DIR}/package.yml
+	echo "beat_vendor: ${BEAT_VENDOR}"                      >> ${PKG_BUILD_DIR}/package.yml
+	echo "beat_license: ${BEAT_LICENSE}"                    >> ${PKG_BUILD_DIR}/package.yml
+	echo "beat_doc_url: ${BEAT_DOC_URL}"                    >> ${PKG_BUILD_DIR}/package.yml
 
 	if [ -a version.yml ]; then \
-		cat version.yml >> ${BUILD_DIR}/package.yml; \
+		cat version.yml >> ${PKG_BUILD_DIR}/package.yml; \
 	else \
-		cat ${ES_BEATS}/dev-tools/packer/version.yml >> ${BUILD_DIR}/package.yml; \
+		cat ${ES_BEATS}/dev-tools/packer/version.yml >> ${PKG_BUILD_DIR}/package.yml; \
 	fi
 
 	if [ $(CGO) = true ]; then \
@@ -494,9 +502,22 @@ package: clean update package-setup
 		$(MAKE) prepare-package; \
 	fi
 
-	SNAPSHOT=${SNAPSHOT} BUILDID=${BUILDID} BEAT_PATH=${BEAT_PATH} BUILD_DIR=${BUILD_DIR} $(MAKE) -C ${ES_BEATS}/dev-tools/packer ${PACKAGES} ${BUILD_DIR}/upload/build_id.txt
+	SNAPSHOT=${SNAPSHOT} BUILDID=${BUILDID} BEAT_PATH=${BEAT_PATH} BUILD_DIR=${PKG_BUILD_DIR} UPLOAD_DIR=${PKG_UPLOAD_DIR} $(MAKE) -C ${ES_BEATS}/dev-tools/packer ${PACKAGES} ${BUILD_DIR}/upload/build_id.txt
 	$(MAKE) fix-permissions
 	echo "Finished packages for ${BEAT_NAME}"
+
+# Packages the Beat without Elastic X-Pack content (OSS only).
+.PHONY: package-oss
+package-oss:
+	@$(MAKE) PKG_SUFFIX=-oss package
+
+# Packages the Beat with Elastic X-Pack content.
+.PHONY: package-elastic
+package-elastic:
+	@$(MAKE) BEAT_LICENSE="Elastic License" LICENSE_FILE=$(ELASTIC_LICENSE_FILE) package
+
+.PHONY: package-all
+package-all: package-elastic package-oss
 
 package-dashboards: package-setup
 	mkdir -p ${BUILD_DIR}

@@ -54,11 +54,16 @@ func (watcher *recursiveWatcher) ErrorChannel() <-chan error {
 
 func (watcher *recursiveWatcher) addRecursive(path string) error {
 	var errs multierror.Errors
-	err := filepath.Walk(path, func(path string, info os.FileInfo, err error) error {
-		if err != nil {
-			errs = append(errs, errors.Wrapf(watcher.inner.Add(path), "recursion into dir '%s' failed", path))
-			return nil
+	err := filepath.Walk(path, func(path string, info os.FileInfo, fnErr error) error {
+		if fnErr != nil {
+			errs = append(errs, errors.Wrapf(fnErr, "error walking path '%s'", path))
+			// If FileInfo is not nil, the directory entry can be processed
+			// even if there was some error
+			if info == nil {
+				return nil
+			}
 		}
+		var err error
 		if info.IsDir() {
 			if err = watcher.tree.AddDir(path); err == nil {
 				if err = watcher.inner.Add(path); err != nil {

@@ -7307,6 +7307,26 @@ Container restarts count
 --
 
 
+*`kubernetes.container.cpu.limit.cores`*::
++
+--
+type: long
+
+Container CPU cores limit
+
+
+--
+
+*`kubernetes.container.cpu.request.cores`*::
++
+--
+type: long
+
+Container CPU requested cores
+
+
+--
+
 *`kubernetes.container.cpu.limit.nanocores`*::
 +
 --

@@ -6,6 +6,7 @@ import unittest
 class Test(metricbeat.BaseTest):
 
     COMPOSE_SERVICES = ['ceph']
+    COMPOSE_TIMEOUT = 300
 
     @unittest.skipUnless(metricbeat.INTEGRATION_TESTS, "integration test")
     def test_cluster_disk(self):
@@ -26,6 +27,10 @@ class Test(metricbeat.BaseTest):
         self.assertTrue(len(output) >= 1)
         evt = output[0]
         print evt
+
+        self.assertTrue("error" not in evt)
+        self.assertTrue("ceph" in evt)
+        self.assertTrue("cluster_disk" in evt["ceph"])
 
         self.assert_fields_are_documented(evt)
 
@@ -49,6 +54,10 @@ class Test(metricbeat.BaseTest):
         evt = output[0]
         print evt
 
+        self.assertTrue("error" not in evt)
+        self.assertTrue("ceph" in evt)
+        self.assertTrue("cluster_health" in evt["ceph"])
+
         self.assert_fields_are_documented(evt)
 
     @unittest.skipUnless(metricbeat.INTEGRATION_TESTS, "integration test")
@@ -71,6 +80,10 @@ class Test(metricbeat.BaseTest):
         evt = output[0]
         print evt
 
+        self.assertTrue("error" not in evt)
+        self.assertTrue("ceph" in evt)
+        self.assertTrue("monitor_health" in evt["ceph"])
+
         self.assert_fields_are_documented(evt)
 
     @unittest.skipUnless(metricbeat.INTEGRATION_TESTS, "integration test")
@@ -92,6 +105,10 @@ class Test(metricbeat.BaseTest):
         self.assertTrue(len(output) >= 1)
         evt = output[0]
         print evt
+
+        self.assertTrue("error" not in evt)
+        self.assertTrue("ceph" in evt)
+        self.assertTrue("pool_disk" in evt["ceph"])
 
         self.assert_fields_are_documented(evt)
 

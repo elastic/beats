@@ -1,0 +1,245 @@
+{
+  "objects": [
+    {
+      "attributes": {
+        "description": "",
+        "kibanaSavedObjectMeta": {
+          "searchSourceJSON": "{}"
+        },
+        "title": "Connections [Metricbeat Haproxy]",
+        "uiStateJSON": "{}",
+        "version": 1,
+        "visState": "{\"title\":\"Haproxy connections\",\"type\":\"metrics\",\"params\":{\"axis_formatter\":\"number\",\"axis_position\":\"left\",\"background_color_rules\":[{\"id\":\"4e35d500-471b-11e8-a520-3f46123ab5eb\"}],\"bar_color_rules\":[{\"id\":\"69899960-4719-11e8-a520-3f46123ab5eb\"}],\"filter\":\"haproxy.stat.component_type:(0 OR 1)\",\"gauge_color_rules\":[{\"id\":\"6f171ba0-4719-11e8-a520-3f46123ab5eb\"}],\"gauge_inner_width\":10,\"gauge_style\":\"half\",\"gauge_width\":10,\"id\":\"61ca57f0-469d-11e7-af02-69e470af7417\",\"index_pattern\":\"metricbeat-*\",\"interval\":\"\",\"series\":[{\"axis_position\":\"right\",\"chart_type\":\"line\",\"color\":\"#68BC00\",\"fill\":0.5,\"filter\":\"\",\"formatter\":\"number\",\"id\":\"61ca57f1-469d-11e7-af02-69e470af7417\",\"label\":\"Number of connections\",\"line_width\":1,\"metrics\":[{\"field\":\"haproxy.stat.connection.total\",\"id\":\"61ca57f2-469d-11e7-af02-69e470af7417\",\"type\":\"sum\"},{\"field\":\"61ca57f2-469d-11e7-af02-69e470af7417\",\"id\":\"41ff3940-4719-11e8-a520-3f46123ab5eb\",\"type\":\"derivative\",\"unit\":\"\"},{\"unit\":\"\",\"id\":\"456a5fa0-4738-11e8-8633-8f8b3acf1566\",\"type\":\"positive_only\",\"field\":\"41ff3940-4719-11e8-a520-3f46123ab5eb\"}],\"point_size\":1,\"seperate_axis\":0,\"series_drop_last_bucket\":1,\"split_color_mode\":\"rainbow\",\"split_filters\":[{\"color\":\"#68BC00\",\"id\":\"0ceb7740-471a-11e8-a520-3f46123ab5eb\"}],\"split_mode\":\"terms\",\"stacked\":\"none\",\"terms_field\":\"haproxy.stat.proxy.name\"}],\"show_grid\":1,\"show_legend\":1,\"time_field\":\"@timestamp\",\"type\":\"timeseries\"},\"aggs\":[]}"
+      },
+      "id": "a64b4fd0-471c-11e8-bc13-1397384faad3",
+      "type": "visualization",
+      "updated_at": "2018-04-23T20:54:01.082Z",
+      "version": 3
+    },
+    {
+      "attributes": {
+        "description": "",
+        "kibanaSavedObjectMeta": {
+          "searchSourceJSON": "{}"
+        },
+        "title": "Active servers in backend [Metricbeat Haproxy]",
+        "uiStateJSON": "{}",
+        "version": 1,
+        "visState": "{\"title\":\"Haproxy active servers in backend\",\"type\":\"metrics\",\"params\":{\"axis_formatter\":\"number\",\"axis_position\":\"left\",\"background_color_rules\":[{\"value\":0,\"color\":\"rgba(255,0,6,1)\",\"id\":\"1ec0dde0-471d-11e8-9876-09cc6c85f5f2\",\"opperator\":\"lte\"}],\"bar_color_rules\":[{\"id\":\"297160c0-471d-11e8-9876-09cc6c85f5f2\"}],\"filter\":\"haproxy.stat.component_type:(2 OR 3)\",\"gauge_color_rules\":[{\"gauge\":\"rgba(255,0,5,1)\",\"id\":\"4ce156a0-471d-11e8-9876-09cc6c85f5f2\",\"opperator\":\"lte\",\"text\":null,\"value\":0},{\"gauge\":\"rgba(255,196,0,1)\",\"id\":\"f8458a80-4721-11e8-b854-2f6d2b452362\",\"opperator\":\"lte\",\"value\":0.5}],\"gauge_inner_width\":10,\"gauge_max\":\"1\",\"gauge_style\":\"half\",\"gauge_width\":10,\"id\":\"61ca57f0-469d-11e7-af02-69e470af7417\",\"index_pattern\":\"metricbeat-*\",\"interval\":\"auto\",\"series\":[{\"axis_position\":\"right\",\"chart_type\":\"line\",\"color\":\"#68BC00\",\"fill\":0.5,\"formatter\":\"number\",\"id\":\"61ca57f1-469d-11e7-af02-69e470af7417\",\"label\":\"Active servers\",\"line_width\":1,\"metrics\":[{\"denominator\":\"*\",\"field\":\"haproxy.stat.server.id\",\"id\":\"b754d060-471e-11e8-9876-09cc6c85f5f2\",\"metric_agg\":\"count\",\"numerator\":\"*\",\"script\":\"params.up / (params.down + params.up)\",\"type\":\"cardinality\",\"variables\":[{\"field\":\"61ca57f2-469d-11e7-af02-69e470af7417\",\"id\":\"cfd51780-471e-11e8-9d35-6baabcdce3dc\",\"name\":\"down\"},{\"field\":\"a049c420-471e-11e8-9876-09cc6c85f5f2\",\"id\":\"45e6ec00-471f-11e8-9d35-6baabcdce3dc\",\"name\":\"up\"}]}],\"point_size\":1,\"seperate_axis\":0,\"split_mode\":\"everything\",\"stacked\":\"none\",\"terms_field\":\"haproxy.stat.proxy.name\",\"filter\":\"haproxy.stat.status:UP\"},{\"id\":\"2cba9420-4724-11e8-b854-2f6d2b452362\",\"color\":\"#68BC00\",\"split_mode\":\"everything\",\"metrics\":[{\"id\":\"2cba9421-4724-11e8-b854-2f6d2b452362\",\"type\":\"cardinality\",\"field\":\"haproxy.stat.server.id\"}],\"seperate_axis\":0,\"axis_position\":\"right\",\"formatter\":\"number\",\"chart_type\":\"line\",\"line_width\":1,\"point_size\":1,\"fill\":0.5,\"stacked\":\"none\",\"label\":\"Total servers\"}],\"show_grid\":1,\"show_legend\":1,\"time_field\":\"@timestamp\",\"type\":\"metric\"},\"aggs\":[]}"
+      },
+      "id": "794b6cd0-471d-11e8-bc13-1397384faad3",
+      "type": "visualization",
+      "updated_at": "2018-04-23T21:36:57.634Z",
+      "version": 8
+    },
+    {
+      "attributes": {
+        "description": "",
+        "kibanaSavedObjectMeta": {
+          "searchSourceJSON": "{}"
+        },
+        "title": "Connections per server [Metricbeat Haproxy]",
+        "uiStateJSON": "{}",
+        "version": 1,
+        "visState": "{\"title\":\"Haproxy connections per server\",\"type\":\"metrics\",\"params\":{\"id\":\"61ca57f0-469d-11e7-af02-69e470af7417\",\"type\":\"top_n\",\"series\":[{\"id\":\"61ca57f1-469d-11e7-af02-69e470af7417\",\"color\":\"#68BC00\",\"split_mode\":\"terms\",\"metrics\":[{\"id\":\"61ca57f2-469d-11e7-af02-69e470af7417\",\"type\":\"avg\",\"field\":\"haproxy.stat.connection.total\"},{\"unit\":\"\",\"id\":\"3ea29000-4735-11e8-b619-8f82b8185e96\",\"type\":\"derivative\",\"field\":\"61ca57f2-469d-11e7-af02-69e470af7417\"}],\"seperate_axis\":0,\"axis_position\":\"right\",\"formatter\":\"number\",\"chart_type\":\"line\",\"line_width\":1,\"point_size\":1,\"fill\":0.5,\"stacked\":\"none\",\"terms_field\":\"haproxy.stat.service_name\",\"label\":\"Connections per server\"}],\"time_field\":\"@timestamp\",\"index_pattern\":\"metricbeat-*\",\"interval\":\"auto\",\"axis_position\":\"left\",\"axis_formatter\":\"number\",\"show_legend\":1,\"show_grid\":1,\"filter\":\"haproxy.stat.component_type:(2 OR 3)\",\"bar_color_rules\":[{\"id\":\"978f2660-4735-11e8-b619-8f82b8185e96\"}],\"drilldown_url\":\"../app/kibana#/dashboard/8cc50a50-47e0-11e8-bc13-1397384faad3?_a=(query:(language:lucene,query:'haproxy.stat.service_name:\\\"{{ key }}\\\"'))\"},\"aggs\":[]}"
+      },
+      "id": "bb0ab500-4735-11e8-bc13-1397384faad3",
+      "type": "visualization",
+      "updated_at": "2018-04-24T17:12:35.298Z",
+      "version": 3
+    },
+    {
+      "attributes": {
+        "description": "",
+        "kibanaSavedObjectMeta": {
+          "searchSourceJSON": "{}"
+        },
+        "title": "Downtime seconds [Metricbeat Haproxy]",
+        "uiStateJSON": "{}",
+        "version": 1,
+        "visState": "{\"title\":\"Haproxy downtime seconds\",\"type\":\"metrics\",\"params\":{\"axis_formatter\":\"number\",\"axis_position\":\"left\",\"id\":\"61ca57f0-469d-11e7-af02-69e470af7417\",\"index_pattern\":\"metricbeat-*\",\"interval\":\"auto\",\"series\":[{\"axis_position\":\"right\",\"chart_type\":\"line\",\"color\":\"rgba(255,0,0,1)\",\"fill\":0.5,\"formatter\":\"number\",\"id\":\"61ca57f1-469d-11e7-af02-69e470af7417\",\"label\":\"Downtime\",\"line_width\":1,\"metrics\":[{\"field\":\"haproxy.stat.downtime\",\"id\":\"61ca57f2-469d-11e7-af02-69e470af7417\",\"type\":\"avg\"},{\"unit\":\"\",\"id\":\"91aa6a20-473a-11e8-8953-55bbe33e1362\",\"type\":\"derivative\",\"field\":\"61ca57f2-469d-11e7-af02-69e470af7417\"},{\"sigma\":\"\",\"id\":\"a8ce7ca0-473a-11e8-8953-55bbe33e1362\",\"type\":\"sum_bucket\",\"field\":\"91aa6a20-473a-11e8-8953-55bbe33e1362\"}],\"point_size\":1,\"seperate_axis\":0,\"split_mode\":\"terms\",\"stacked\":\"none\",\"terms_field\":\"haproxy.stat.proxy.name\",\"value_template\":\"{{value}}s\"}],\"show_grid\":1,\"show_legend\":1,\"time_field\":\"@timestamp\",\"type\":\"metric\",\"filter\":\"haproxy.stat.component_type:1\",\"background_color_rules\":[{\"id\":\"c86b8e00-4739-11e8-8953-55bbe33e1362\"}]},\"aggs\":[]}"
+      },
+      "id": "40bed190-473b-11e8-bc13-1397384faad3",
+      "type": "visualization",
+      "updated_at": "2018-04-23T21:29:04.708Z",
+      "version": 3
+    },
+    {
+      "attributes": {
+        "description": "",
+        "kibanaSavedObjectMeta": {
+          "searchSourceJSON": "{}"
+        },
+        "title": "Average time in queue [Metricbeat Haproxy]",
+        "uiStateJSON": "{}",
+        "version": 1,
+        "visState": "{\"title\":\"Haproxy average time in queue\",\"type\":\"metrics\",\"params\":{\"id\":\"61ca57f0-469d-11e7-af02-69e470af7417\",\"type\":\"timeseries\",\"series\":[{\"id\":\"61ca57f1-469d-11e7-af02-69e470af7417\",\"color\":\"#68BC00\",\"split_mode\":\"everything\",\"metrics\":[{\"id\":\"61ca57f2-469d-11e7-af02-69e470af7417\",\"type\":\"avg\",\"field\":\"haproxy.stat.queue.time.avg\"}],\"seperate_axis\":0,\"axis_position\":\"right\",\"formatter\":\"number\",\"chart_type\":\"line\",\"line_width\":1,\"point_size\":1,\"fill\":0.5,\"stacked\":\"none\",\"label\":\"Average time in queue\"}],\"time_field\":\"@timestamp\",\"index_pattern\":\"metricbeat-*\",\"interval\":\"auto\",\"axis_position\":\"left\",\"axis_formatter\":\"number\",\"show_legend\":1,\"show_grid\":1},\"aggs\":[]}"
+      },
+      "id": "b3463670-47a1-11e8-bc13-1397384faad3",
+      "type": "visualization",
+      "updated_at": "2018-04-24T09:27:25.783Z",
+      "version": 1
+    },
+    {
+      "attributes": {
+        "description": "",
+        "kibanaSavedObjectMeta": {
+          "searchSourceJSON": "{}"
+        },
+        "title": "Traffic volume [Metricbeat Haproxy]",
+        "uiStateJSON": "{}",
+        "version": 1,
+        "visState": "{\"title\":\"Haproxy traffic volume\",\"type\":\"metrics\",\"params\":{\"axis_formatter\":\"number\",\"axis_position\":\"left\",\"id\":\"61ca57f0-469d-11e7-af02-69e470af7417\",\"index_pattern\":\"metricbeat-*\",\"interval\":\"\",\"series\":[{\"axis_position\":\"right\",\"chart_type\":\"line\",\"color\":\"rgba(164,221,0,1)\",\"fill\":\"0.5\",\"formatter\":\"bytes\",\"id\":\"61ca57f1-469d-11e7-af02-69e470af7417\",\"label\":\"Incoming\",\"line_width\":\"1\",\"metrics\":[{\"field\":\"haproxy.stat.in.bytes\",\"id\":\"61ca57f2-469d-11e7-af02-69e470af7417\",\"type\":\"sum\"},{\"unit\":\"\",\"id\":\"9814c420-47c4-11e8-994c-81d2daeb7c86\",\"type\":\"derivative\",\"field\":\"61ca57f2-469d-11e7-af02-69e470af7417\"}],\"point_size\":\"1\",\"seperate_axis\":0,\"split_mode\":\"everything\",\"stacked\":\"none\"},{\"axis_position\":\"right\",\"chart_type\":\"line\",\"color\":\"rgba(25,77,51,1)\",\"fill\":\"0.5\",\"formatter\":\"bytes\",\"id\":\"c89d1520-47c4-11e8-994c-81d2daeb7c86\",\"label\":\"Outgoing\",\"line_width\":\"1\",\"metrics\":[{\"field\":\"haproxy.stat.out.bytes\",\"id\":\"c89d6340-47c4-11e8-994c-81d2daeb7c86\",\"type\":\"sum\"},{\"unit\":\"\",\"id\":\"c89d6341-47c4-11e8-994c-81d2daeb7c86\",\"type\":\"derivative\",\"field\":\"c89d6340-47c4-11e8-994c-81d2daeb7c86\"}],\"point_size\":\"1\",\"seperate_axis\":0,\"split_mode\":\"everything\",\"stacked\":\"none\",\"override_index_pattern\":0}],\"show_grid\":1,\"show_legend\":1,\"time_field\":\"@timestamp\",\"type\":\"timeseries\"},\"aggs\":[]}"
+      },
+      "id": "86159190-47c5-11e8-bc13-1397384faad3",
+      "type": "visualization",
+      "updated_at": "2018-04-24T14:43:27.616Z",
+      "version": 3
+    },
+    {
+      "attributes": {
+        "description": "",
+        "kibanaSavedObjectMeta": {
+          "searchSourceJSON": "{}"
+        },
+        "title": "HTTP response codes [Metricbeat Haproxy]",
+        "uiStateJSON": "{}",
+        "version": 1,
+        "visState": "{\"title\":\"Haproxy HTTP response codes\",\"type\":\"metrics\",\"params\":{\"id\":\"61ca57f0-469d-11e7-af02-69e470af7417\",\"type\":\"timeseries\",\"series\":[{\"id\":\"61ca57f1-469d-11e7-af02-69e470af7417\",\"color\":\"#68BC00\",\"split_mode\":\"everything\",\"metrics\":[{\"id\":\"61ca57f2-469d-11e7-af02-69e470af7417\",\"type\":\"sum\",\"field\":\"haproxy.stat.response.http.2xx\"},{\"unit\":\"\",\"id\":\"973a6de0-47bd-11e8-b7ab-dff70b15977c\",\"type\":\"derivative\",\"field\":\"61ca57f2-469d-11e7-af02-69e470af7417\"},{\"unit\":\"\",\"id\":\"4971d580-47e5-11e8-b45e-f10c3845381c\",\"type\":\"positive_only\",\"field\":\"973a6de0-47bd-11e8-b7ab-dff70b15977c\"}],\"seperate_axis\":0,\"axis_position\":\"right\",\"formatter\":\"number\",\"chart_type\":\"line\",\"line_width\":1,\"point_size\":1,\"fill\":0.5,\"stacked\":\"none\",\"label\":\"200s\"},{\"id\":\"aafd05e0-47bd-11e8-b7ab-dff70b15977c\",\"color\":\"rgba(64,240,0,1)\",\"split_mode\":\"everything\",\"metrics\":[{\"id\":\"aafd05e1-47bd-11e8-b7ab-dff70b15977c\",\"type\":\"sum\",\"field\":\"haproxy.stat.response.http.3xx\"},{\"unit\":\"\",\"id\":\"aafd05e2-47bd-11e8-b7ab-dff70b15977c\",\"type\":\"derivative\",\"field\":\"aafd05e1-47bd-11e8-b7ab-dff70b15977c\"}],\"seperate_axis\":0,\"axis_position\":\"right\",\"formatter\":\"number\",\"chart_type\":\"line\",\"line_width\":1,\"point_size\":1,\"fill\":0.5,\"stacked\":\"none\",\"label\":\"300s\"},{\"id\":\"c77191a0-47bd-11e8-b7ab-dff70b15977c\",\"color\":\"rgba(255,246,0,1)\",\"split_mode\":\"everything\",\"metrics\":[{\"id\":\"c77191a1-47bd-11e8-b7ab-dff70b15977c\",\"type\":\"sum\",\"field\":\"haproxy.stat.response.http.4xx\"},{\"unit\":\"\",\"id\":\"c77191a2-47bd-11e8-b7ab-dff70b15977c\",\"type\":\"derivative\",\"field\":\"c77191a1-47bd-11e8-b7ab-dff70b15977c\"}],\"seperate_axis\":0,\"axis_position\":\"right\",\"formatter\":\"number\",\"chart_type\":\"line\",\"line_width\":1,\"point_size\":1,\"fill\":0.5,\"stacked\":\"none\",\"label\":\"400s\"},{\"id\":\"d574e900-47bd-11e8-b7ab-dff70b15977c\",\"color\":\"rgba(255,0,4,1)\",\"split_mode\":\"everything\",\"metrics\":[{\"id\":\"d574e901-47bd-11e8-b7ab-dff70b15977c\",\"type\":\"sum\",\"field\":\"haproxy.stat.response.http.5xx\"},{\"unit\":\"\",\"id\":\"d5753720-47bd-11e8-b7ab-dff70b15977c\",\"type\":\"derivative\",\"field\":\"d574e901-47bd-11e8-b7ab-dff70b15977c\"}],\"seperate_axis\":0,\"axis_position\":\"right\",\"formatter\":\"number\",\"chart_type\":\"line\",\"line_width\":1,\"point_size\":1,\"fill\":0.5,\"stacked\":\"none\",\"label\":\"500s\"},{\"id\":\"e3b8a4c0-47bd-11e8-b7ab-dff70b15977c\",\"color\":\"rgba(0,251,255,1)\",\"split_mode\":\"everything\",\"metrics\":[{\"id\":\"e3b8a4c1-47bd-11e8-b7ab-dff70b15977c\",\"type\":\"sum\",\"field\":\"haproxy.stat.response.http.other\"},{\"unit\":\"\",\"id\":\"e3b8a4c2-47bd-11e8-b7ab-dff70b15977c\",\"type\":\"derivative\",\"field\":\"e3b8a4c1-47bd-11e8-b7ab-dff70b15977c\"}],\"seperate_axis\":0,\"axis_position\":\"right\",\"formatter\":\"number\",\"chart_type\":\"line\",\"line_width\":1,\"point_size\":1,\"fill\":0.5,\"stacked\":\"none\",\"label\":\"Other\"},{\"id\":\"f9217d40-47be-11e8-b7ab-dff70b15977c\",\"color\":\"rgba(15,20,25,1)\",\"split_mode\":\"everything\",\"metrics\":[{\"id\":\"f9217d41-47be-11e8-b7ab-dff70b15977c\",\"type\":\"sum\",\"field\":\"haproxy.stat.response.errors\"},{\"unit\":\"\",\"id\":\"1b7d4400-47bf-11e8-b7ab-dff70b15977c\",\"type\":\"derivative\",\"field\":\"f9217d41-47be-11e8-b7ab-dff70b15977c\"}],\"seperate_axis\":0,\"axis_position\":\"right\",\"formatter\":\"number\",\"chart_type\":\"line\",\"line_width\":1,\"point_size\":1,\"fill\":0.5,\"stacked\":\"none\",\"label\":\"Response errors\"}],\"time_field\":\"@timestamp\",\"index_pattern\":\"metricbeat-*\",\"interval\":\"auto\",\"axis_position\":\"left\",\"axis_formatter\":\"number\",\"show_legend\":1,\"show_grid\":1},\"aggs\":[]}"
+      },
+      "id": "fcbdfa60-47bd-11e8-bc13-1397384faad3",
+      "type": "visualization",
+      "updated_at": "2018-04-24T17:31:30.169Z",
+      "version": 4
+    },
+    {
+      "attributes": {
+        "description": "",
+        "kibanaSavedObjectMeta": {
+          "searchSourceJSON": "{}"
+        },
+        "title": "Average response time [Metricbeat Haproxy]",
+        "uiStateJSON": "{}",
+        "version": 1,
+        "visState": "{\"title\":\"Haproxy average response time\",\"type\":\"metrics\",\"params\":{\"id\":\"61ca57f0-469d-11e7-af02-69e470af7417\",\"type\":\"timeseries\",\"series\":[{\"id\":\"61ca57f1-469d-11e7-af02-69e470af7417\",\"color\":\"#68BC00\",\"split_mode\":\"everything\",\"metrics\":[{\"id\":\"61ca57f2-469d-11e7-af02-69e470af7417\",\"type\":\"avg\",\"field\":\"haproxy.stat.response.time.avg\"}],\"seperate_axis\":0,\"axis_position\":\"right\",\"formatter\":\"s,ms,0\",\"chart_type\":\"line\",\"line_width\":1,\"point_size\":1,\"fill\":0.5,\"stacked\":\"none\",\"label\":\"Average response time\",\"value_template\":\"{{value}}ms\"}],\"time_field\":\"@timestamp\",\"index_pattern\":\"metricbeat-*\",\"interval\":\"auto\",\"axis_position\":\"left\",\"axis_formatter\":\"number\",\"show_legend\":1,\"show_grid\":1},\"aggs\":[]}"
+      },
+      "id": "981d1040-47be-11e8-bc13-1397384faad3",
+      "type": "visualization",
+      "updated_at": "2018-04-24T13:01:49.811Z",
+      "version": 2
+    },
+    {
+      "attributes": {
+        "description": "",
+        "kibanaSavedObjectMeta": {
+          "searchSourceJSON": "{}"
+        },
+        "title": "Requests [Metricbeat Haproxy]",
+        "uiStateJSON": "{}",
+        "version": 1,
+        "visState": "{\"title\":\"Haproxy requests\",\"type\":\"metrics\",\"params\":{\"id\":\"61ca57f0-469d-11e7-af02-69e470af7417\",\"type\":\"timeseries\",\"series\":[{\"id\":\"61ca57f1-469d-11e7-af02-69e470af7417\",\"color\":\"#68BC00\",\"split_mode\":\"everything\",\"metrics\":[{\"id\":\"61ca57f2-469d-11e7-af02-69e470af7417\",\"type\":\"max\",\"field\":\"haproxy.stat.request.total\"},{\"unit\":\"\",\"id\":\"ad38e2c0-47d6-11e8-994c-81d2daeb7c86\",\"type\":\"derivative\",\"field\":\"61ca57f2-469d-11e7-af02-69e470af7417\"},{\"unit\":\"\",\"id\":\"b1ca03a0-47d6-11e8-994c-81d2daeb7c86\",\"type\":\"positive_only\",\"field\":\"ad38e2c0-47d6-11e8-994c-81d2daeb7c86\"}],\"seperate_axis\":0,\"axis_position\":\"right\",\"formatter\":\"number\",\"chart_type\":\"line\",\"line_width\":1,\"point_size\":1,\"fill\":0.5,\"stacked\":\"none\",\"label\":\"Requests\"},{\"id\":\"c2f30500-47d6-11e8-994c-81d2daeb7c86\",\"color\":\"rgba(255,0,0,1)\",\"split_mode\":\"everything\",\"metrics\":[{\"id\":\"c2f30501-47d6-11e8-994c-81d2daeb7c86\",\"type\":\"max\",\"field\":\"haproxy.stat.request.errors\"},{\"unit\":\"\",\"id\":\"c2f30502-47d6-11e8-994c-81d2daeb7c86\",\"type\":\"derivative\",\"field\":\"c2f30501-47d6-11e8-994c-81d2daeb7c86\"},{\"unit\":\"\",\"id\":\"c2f30503-47d6-11e8-994c-81d2daeb7c86\",\"type\":\"positive_only\",\"field\":\"c2f30502-47d6-11e8-994c-81d2daeb7c86\"}],\"seperate_axis\":0,\"axis_position\":\"right\",\"formatter\":\"number\",\"chart_type\":\"line\",\"line_width\":1,\"point_size\":1,\"fill\":0.5,\"stacked\":\"none\",\"label\":\"Request errors\"},{\"id\":\"11968ce0-47d7-11e8-994c-81d2daeb7c86\",\"color\":\"rgba(0,0,0,1)\",\"split_mode\":\"everything\",\"metrics\":[{\"id\":\"11968ce1-47d7-11e8-994c-81d2daeb7c86\",\"type\":\"max\",\"field\":\"haproxy.stat.request.denied\"},{\"unit\":\"\",\"id\":\"11968ce2-47d7-11e8-994c-81d2daeb7c86\",\"type\":\"derivative\",\"field\":\"11968ce1-47d7-11e8-994c-81d2daeb7c86\"},{\"unit\":\"\",\"id\":\"11968ce3-47d7-11e8-994c-81d2daeb7c86\",\"type\":\"positive_only\",\"field\":\"11968ce2-47d7-11e8-994c-81d2daeb7c86\"}],\"seperate_axis\":0,\"axis_position\":\"right\",\"formatter\":\"number\",\"chart_type\":\"line\",\"line_width\":1,\"point_size\":1,\"fill\":0.5,\"stacked\":\"none\",\"label\":\"Denied requests\"}],\"time_field\":\"@timestamp\",\"index_pattern\":\"metricbeat-*\",\"interval\":\"auto\",\"axis_position\":\"left\",\"axis_formatter\":\"number\",\"show_legend\":1,\"show_grid\":1},\"aggs\":[]}"
+      },
+      "id": "30956d00-47d7-11e8-bc13-1397384faad3",
+      "type": "visualization",
+      "updated_at": "2018-04-24T15:50:19.344Z",
+      "version": 1
+    },
+    {
+      "attributes": {
+        "description": "",
+        "kibanaSavedObjectMeta": {
+          "searchSourceJSON": "{}"
+        },
+        "title": "Average connection time [Metricbeat Haproxy]",
+        "uiStateJSON": "{}",
+        "version": 1,
+        "visState": "{\"title\":\"Haproxy average connection time\",\"type\":\"metrics\",\"params\":{\"id\":\"61ca57f0-469d-11e7-af02-69e470af7417\",\"type\":\"timeseries\",\"series\":[{\"id\":\"61ca57f1-469d-11e7-af02-69e470af7417\",\"color\":\"#68BC00\",\"split_mode\":\"everything\",\"metrics\":[{\"id\":\"61ca57f2-469d-11e7-af02-69e470af7417\",\"type\":\"percentile\",\"field\":\"haproxy.stat.connection.time.avg\",\"percentiles\":[{\"value\":\"99\",\"percentile\":\"\",\"shade\":0.2,\"id\":\"9fa517e0-479b-11e8-9590-e34c5ed2dd95\",\"mode\":\"line\"},{\"value\":\"90\",\"percentile\":\"\",\"shade\":0.2,\"id\":\"daafd6e0-479b-11e8-9590-e34c5ed2dd95\",\"mode\":\"line\"},{\"value\":\"50\",\"percentile\":\"\",\"shade\":0.2,\"id\":\"e006b8c0-479b-11e8-9590-e34c5ed2dd95\",\"mode\":\"line\"}]}],\"seperate_axis\":0,\"axis_position\":\"right\",\"formatter\":\"number\",\"chart_type\":\"line\",\"line_width\":\"1\",\"point_size\":1,\"fill\":\"0.1\",\"stacked\":\"none\",\"terms_field\":\"haproxy.stat.service_name\",\"label\":\"Percentile\",\"split_color_mode\":\"gradient\"}],\"time_field\":\"@timestamp\",\"index_pattern\":\"metricbeat-*\",\"interval\":\"auto\",\"axis_position\":\"left\",\"axis_formatter\":\"number\",\"show_legend\":1,\"show_grid\":1},\"aggs\":[]}"
+      },
+      "id": "0751ed00-479c-11e8-bc13-1397384faad3",
+      "type": "visualization",
+      "updated_at": "2018-04-24T08:51:34.252Z",
+      "version": 4
+    },
+    {
+      "attributes": {
+        "description": "",
+        "kibanaSavedObjectMeta": {
+          "searchSourceJSON": "{}"
+        },
+        "title": "Number of server connections [Metricbeat Haproxy]",
+        "uiStateJSON": "{}",
+        "version": 1,
+        "visState": "{\"title\":\"Haproxy number of server connections\",\"type\":\"metrics\",\"params\":{\"id\":\"61ca57f0-469d-11e7-af02-69e470af7417\",\"type\":\"timeseries\",\"series\":[{\"id\":\"61ca57f1-469d-11e7-af02-69e470af7417\",\"color\":\"#68BC00\",\"split_mode\":\"terms\",\"metrics\":[{\"id\":\"61ca57f2-469d-11e7-af02-69e470af7417\",\"type\":\"sum\",\"field\":\"haproxy.stat.connection.total\"},{\"unit\":\"\",\"id\":\"22668d40-47e1-11e8-96ee-d767c73d008a\",\"type\":\"derivative\",\"field\":\"61ca57f2-469d-11e7-af02-69e470af7417\"},{\"unit\":\"\",\"id\":\"2a1d0a00-47e1-11e8-96ee-d767c73d008a\",\"type\":\"positive_only\",\"field\":\"22668d40-47e1-11e8-96ee-d767c73d008a\"}],\"seperate_axis\":0,\"axis_position\":\"right\",\"formatter\":\"number\",\"chart_type\":\"line\",\"line_width\":1,\"point_size\":1,\"fill\":0.5,\"stacked\":\"none\",\"label\":\"Number of connections\",\"terms_field\":\"haproxy.stat.service_name\",\"filter\":\"haproxy.stat.component_type:(2 OR 3)\"}],\"time_field\":\"@timestamp\",\"index_pattern\":\"metricbeat-*\",\"interval\":\"auto\",\"axis_position\":\"left\",\"axis_formatter\":\"number\",\"show_legend\":1,\"show_grid\":1},\"aggs\":[]}"
+      },
+      "id": "72e84b00-47e1-11e8-bc13-1397384faad3",
+      "type": "visualization",
+      "updated_at": "2018-04-24T17:05:00.128Z",
+      "version": 2
+    },
+    {
+      "attributes": {
+        "description": "",
+        "kibanaSavedObjectMeta": {
+          "searchSourceJSON": "{}"
+        },
+        "title": "Healthcheck [Metricbeat Haproxy]",
+        "uiStateJSON": "{}",
+        "version": 1,
+        "visState": "{\"title\":\"Haproxy healthcheck\",\"type\":\"metrics\",\"params\":{\"axis_formatter\":\"number\",\"axis_position\":\"left\",\"id\":\"61ca57f0-469d-11e7-af02-69e470af7417\",\"index_pattern\":\"metricbeat-*\",\"interval\":\"auto\",\"series\":[{\"axis_position\":\"right\",\"chart_type\":\"line\",\"color\":\"rgba(255,0,4,1)\",\"fill\":0.5,\"formatter\":\"number\",\"id\":\"198f56e0-47e4-11e8-b45e-f10c3845381c\",\"label\":\"Down\",\"line_width\":1,\"metrics\":[{\"field\":\"haproxy.stat.downtime\",\"id\":\"198f56e1-47e4-11e8-b45e-f10c3845381c\",\"type\":\"sum\"},{\"unit\":\"\",\"sigma\":\"\",\"id\":\"dbf38560-47e6-11e8-b45e-f10c3845381c\",\"type\":\"derivative\",\"field\":\"198f56e1-47e4-11e8-b45e-f10c3845381c\"},{\"unit\":\"\",\"id\":\"62274b80-47e7-11e8-b45e-f10c3845381c\",\"type\":\"positive_only\",\"field\":\"dbf38560-47e6-11e8-b45e-f10c3845381c\"},{\"script\":\"(params.down \u003e 0) ? 1 : 0\",\"id\":\"7b7a7300-47e7-11e8-b45e-f10c3845381c\",\"type\":\"calculation\",\"variables\":[{\"id\":\"7e577b40-47e7-11e8-b45e-f10c3845381c\",\"name\":\"down\",\"field\":\"62274b80-47e7-11e8-b45e-f10c3845381c\"}]}],\"point_size\":1,\"seperate_axis\":1,\"split_mode\":\"everything\",\"stacked\":\"none\"},{\"axis_position\":\"right\",\"chart_type\":\"line\",\"color\":\"rgba(255,218,0,1)\",\"fill\":0.5,\"formatter\":\"ms,ms,0\",\"id\":\"61ca57f1-469d-11e7-af02-69e470af7417\",\"label\":\"Duration (ms)\",\"line_width\":1,\"metrics\":[{\"field\":\"haproxy.stat.check.duration\",\"id\":\"61ca57f2-469d-11e7-af02-69e470af7417\",\"type\":\"avg\"}],\"point_size\":1,\"seperate_axis\":0,\"split_mode\":\"everything\",\"stacked\":\"none\"}],\"show_grid\":1,\"show_legend\":1,\"time_field\":\"@timestamp\",\"type\":\"timeseries\"},\"aggs\":[]}"
+      },
+      "id": "976b0910-47e4-11e8-bc13-1397384faad3",
+      "type": "visualization",
+      "updated_at": "2018-04-24T17:49:15.393Z",
+      "version": 5
+    },
+    {
+      "attributes": {
+        "description": "",
+        "kibanaSavedObjectMeta": {
+          "searchSourceJSON": "{}"
+        },
+        "title": "Servers per connection [Metricbeat Haproxy]",
+        "uiStateJSON": "{}",
+        "version": 1,
+        "visState": "{\"title\":\"Haproxy servers per connection\",\"type\":\"metrics\",\"params\":{\"id\":\"61ca57f0-469d-11e7-af02-69e470af7417\",\"type\":\"top_n\",\"series\":[{\"id\":\"61ca57f1-469d-11e7-af02-69e470af7417\",\"color\":\"#68BC00\",\"split_mode\":\"terms\",\"metrics\":[{\"id\":\"61ca57f2-469d-11e7-af02-69e470af7417\",\"type\":\"sum\",\"field\":\"haproxy.stat.connection.total\"}],\"seperate_axis\":0,\"axis_position\":\"right\",\"formatter\":\"number\",\"chart_type\":\"line\",\"line_width\":1,\"point_size\":1,\"fill\":0.5,\"stacked\":\"none\",\"var_name\":\"\",\"terms_field\":\"haproxy.stat.service_name\",\"label\":\"Servers\",\"filter\":\"haproxy.stat.component_type:(2 OR 3)\",\"terms_order_by\":\"61ca57f2-469d-11e7-af02-69e470af7417\",\"terms_size\":\"20\"}],\"time_field\":\"@timestamp\",\"index_pattern\":\"metricbeat-*\",\"interval\":\"auto\",\"axis_position\":\"left\",\"axis_formatter\":\"number\",\"show_legend\":1,\"show_grid\":1,\"bar_color_rules\":[{\"id\":\"50830800-47d9-11e8-9db9-274c7a5e25e4\"}],\"ignore_global_filter\":0,\"markdown\":\"{{#each _all}}\\n{{ label }}\\n\\n{{/each}}\",\"filter\":\"\",\"drilldown_url\":\"../app/kibana#/dashboard/8cc50a50-47e0-11e8-bc13-1397384faad3?_a=(query:(language:lucene,query:'haproxy.stat.service_name:\\\"{{ key }}\\\"'))\"},\"aggs\":[]}"
+      },
+      "id": "79350d50-47db-11e8-bc13-1397384faad3",
+      "type": "visualization",
+      "updated_at": "2018-04-24T17:11:53.619Z",
+      "version": 7
+    },
+    {
+      "attributes": {
+        "description": "",
+        "kibanaSavedObjectMeta": {
+          "searchSourceJSON": "{}"
+        },
+        "title": "Backends per connection [Metricbeat Haproxy]",
+        "uiStateJSON": "{}",
+        "version": 1,
+        "visState": "{\"title\":\"Haproxy backends per connection\",\"type\":\"metrics\",\"params\":{\"axis_formatter\":\"number\",\"axis_position\":\"left\",\"bar_color_rules\":[{\"id\":\"4aeddd40-47dc-11e8-9db9-274c7a5e25e4\"}],\"drilldown_url\":\"../app/kibana#/dashboard/0836a4b0-47bd-11e8-bc13-1397384faad3?_a=(query:(language:lucene,query:'haproxy.stat.proxy.name:\\\"{{ key }}\\\"'))\",\"id\":\"61ca57f0-469d-11e7-af02-69e470af7417\",\"index_pattern\":\"metricbeat-*\",\"interval\":\"auto\",\"series\":[{\"axis_position\":\"right\",\"chart_type\":\"line\",\"color\":\"#68BC00\",\"fill\":0.5,\"filter\":\"haproxy.stat.component_type:1\",\"formatter\":\"number\",\"id\":\"61ca57f1-469d-11e7-af02-69e470af7417\",\"label\":\"Backends\",\"line_width\":1,\"metrics\":[{\"field\":\"haproxy.stat.connection.total\",\"id\":\"61ca57f2-469d-11e7-af02-69e470af7417\",\"type\":\"sum\"}],\"point_size\":1,\"seperate_axis\":0,\"split_mode\":\"terms\",\"stacked\":\"none\",\"terms_field\":\"haproxy.stat.proxy.name\",\"terms_order_by\":\"61ca57f2-469d-11e7-af02-69e470af7417\",\"terms_size\":\"20\"}],\"show_grid\":1,\"show_legend\":1,\"time_field\":\"@timestamp\",\"type\":\"top_n\"},\"aggs\":[]}"
+      },
+      "id": "8c8f0300-47dc-11e8-bc13-1397384faad3",
+      "type": "visualization",
+      "updated_at": "2018-04-24T16:46:24.802Z",
+      "version": 2
+    },
+    {
+      "attributes": {
+        "description": "",
+        "kibanaSavedObjectMeta": {
+          "searchSourceJSON": "{}"
+        },
+        "title": "Frontends per connection [Metricbeat Haproxy]",
+        "uiStateJSON": "{}",
+        "version": 1,
+        "visState": "{\"title\":\"Haproxy frontends per connection\",\"type\":\"metrics\",\"params\":{\"id\":\"61ca57f0-469d-11e7-af02-69e470af7417\",\"type\":\"top_n\",\"series\":[{\"id\":\"61ca57f1-469d-11e7-af02-69e470af7417\",\"color\":\"#68BC00\",\"split_mode\":\"terms\",\"metrics\":[{\"id\":\"61ca57f2-469d-11e7-af02-69e470af7417\",\"type\":\"sum\",\"field\":\"haproxy.stat.connection.total\"}],\"seperate_axis\":0,\"axis_position\":\"right\",\"formatter\":\"number\",\"chart_type\":\"line\",\"line_width\":1,\"point_size\":1,\"fill\":0.5,\"stacked\":\"none\",\"label\":\"Frontends\",\"terms_field\":\"haproxy.stat.proxy.name\",\"filter\":\"haproxy.stat.component_type:0\",\"terms_size\":\"20\",\"terms_order_by\":\"61ca57f2-469d-11e7-af02-69e470af7417\"}],\"time_field\":\"@timestamp\",\"index_pattern\":\"metricbeat-*\",\"interval\":\"auto\",\"axis_position\":\"left\",\"axis_formatter\":\"number\",\"show_legend\":1,\"show_grid\":1,\"bar_color_rules\":[{\"id\":\"b81d8640-47dc-11e8-9a25-99b107967d82\"}],\"drilldown_url\":\"../app/kibana#/dashboard/e9057ae0-47c5-11e8-bc13-1397384faad3?_a=(query:(language:lucene,query:'haproxy.stat.proxy.name:\\\"{{ key }}\\\"'))\"},\"aggs\":[]}"
+      },
+      "id": "f1e27ed0-47dc-11e8-bc13-1397384faad3",
+      "type": "visualization",
+      "updated_at": "2018-04-24T16:54:16.639Z",
+      "version": 3
+    }
+  ],
+  "version": "6.2.2"
+}

@@ -181,7 +181,7 @@ func TestRecursiveSubdirPermissions(t *testing.T) {
 
 	assertNoError(t, os.Chmod(filepath.Join(outDir, "b"), 0))
 
-	// Setup watched on watched dir
+	// Setup watches on watched dir
 
 	watcher, err := New(true)
 	assertNoError(t, err)
