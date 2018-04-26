@@ -6,6 +6,13 @@ import (
 	"path/filepath"
 )
 
+var indentByModule = map[string]int{
+	"processors": 0,
+	"module":     8,
+	"active":     8,
+	"protos":     8,
+}
+
 // CollectModuleFiles looks for fields.yml files under the
 // specified root directory
 func CollectModuleFiles(root string) ([]*YmlFile, error) {
@@ -16,13 +23,13 @@ func CollectModuleFiles(root string) ([]*YmlFile, error) {
 
 	var files []*YmlFile
 	for _, m := range modules {
-		files = collect(m, files, root)
+		files = collectFiles(m, files, root)
 	}
 
 	return files, nil
 }
 
-func collect(module os.FileInfo, files []*YmlFile, modulesPath string) []*YmlFile {
+func collectFiles(module os.FileInfo, files []*YmlFile, modulesPath string) []*YmlFile {
 	if !module.IsDir() {
 		return files
 	}
@@ -35,6 +42,7 @@ func collect(module os.FileInfo, files []*YmlFile, modulesPath string) []*YmlFil
 		})
 	}
 
+	modulesRoot := filepath.Base(modulesPath)
 	sets, err := ioutil.ReadDir(filepath.Join(modulesPath, module.Name()))
 	for _, s := range sets {
 		if !s.IsDir() {
@@ -45,7 +53,7 @@ func collect(module os.FileInfo, files []*YmlFile, modulesPath string) []*YmlFil
 		if _, err = os.Stat(fieldsYmlPath); !os.IsNotExist(err) {
 			files = append(files, &YmlFile{
 				Path:   fieldsYmlPath,
-				Indent: 8,
+				Indent: indentByModule[modulesRoot],
 			})
 		}
 	}
