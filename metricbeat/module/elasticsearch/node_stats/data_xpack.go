@@ -200,11 +200,8 @@ func eventsMappingXPack(r mb.ReporterV2, m *MetricSet, content []byte) {
 		sourceNode["uuid"] = nodeID
 
 		nodeData, _ := schemaXpack.Apply(node)
-		nodeStats := common.MapStr{
-			"node_master": isMaster,
-			"node_id":     nodeID,
-		}
-		nodeStats.DeepUpdate(nodeData)
+		nodeData["node_master"] = isMaster
+		nodeData["node_id"] = nodeID
 
 		event.RootFields = common.MapStr{
 			"timestamp":    time.Now(),
@@ -212,7 +209,7 @@ func eventsMappingXPack(r mb.ReporterV2, m *MetricSet, content []byte) {
 			"interval_ms":  m.Module().Config().Period.Nanoseconds() / 1000 / 1000,
 			"type":         "node_stats",
 			"source_node":  sourceNode,
-			"node_stats":   nodeStats,
+			"node_stats":   nodeData,
 		}
 
 		// Hard coded index prefix for monitoring, no detection done for ES version at the moment
