@@ -18,6 +18,7 @@ type Event struct {
 	ModuleFields    common.MapStr // Fields that will be namespaced under [module].
 	MetricSetFields common.MapStr // Fields that will be namespaced under [module].[metricset].
 
+	Index     string        // Index name prefix. If set overwrites the default prefix.
 	Namespace string        // Fully qualified namespace to use for MetricSetFields.
 	Timestamp time.Time     // Timestamp when the event data was collected.
 	Error     error         // Error that occurred while collecting the event data.
@@ -58,6 +59,11 @@ func (e *Event) BeatEvent(module, metricSet string, modifiers ...EventModifier) 
 		}
 
 		e.MetricSetFields = nil
+	}
+
+	// Set index prefix to overwrite default
+	if e.Index != "" {
+		b.Meta = common.MapStr{"index": e.Index}
 	}
 
 	if e.Error != nil {

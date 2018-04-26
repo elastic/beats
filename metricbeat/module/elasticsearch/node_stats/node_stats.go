@@ -29,20 +29,35 @@ var (
 // MetricSet type defines all fields of the MetricSet
 type MetricSet struct {
 	mb.BaseMetricSet
-	http *helper.HTTP
+	http  *helper.HTTP
+	xpack bool
 }
 
 // New create a new instance of the MetricSet
 func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
 	cfgwarn.Beta("The elasticsearch node_stats metricset is beta")
 
+	config := struct {
+		XPack bool `config:"xpack.enabled"`
+	}{
+		XPack: false,
+	}
+	if err := base.Module().UnpackConfig(&config); err != nil {
+		return nil, err
+	}
+
+	if config.XPack {
+		cfgwarn.Experimental("The experimental xpack.enabled flag in elasticsearch/node_stats metricset is enabled.")
+	}
+
 	http, err := helper.NewHTTP(base)
 	if err != nil {
 		return nil, err
 	}
 	return &MetricSet{
-		base,
-		http,
+		BaseMetricSet: base,
+		http:          http,
+		xpack:         config.XPack,
 	}, nil
 }
 
@@ -54,5 +69,9 @@ func (m *MetricSet) Fetch(r mb.ReporterV2) {
 		return
 	}
 
-	eventsMapping(r, content)
+	if m.xpack {
+		eventsMappingXPack(r, m, content)
+	} else {
+		eventsMapping(r, content)
+	}
 }
