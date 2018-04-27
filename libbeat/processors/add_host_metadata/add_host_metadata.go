@@ -1,6 +1,7 @@
 package add_host_metadata
 
 import (
+	"fmt"
 	"net"
 	"time"
 
@@ -9,6 +10,7 @@ import (
 	"github.com/elastic/beats/libbeat/processors"
 	"github.com/elastic/go-sysinfo"
 	"github.com/elastic/go-sysinfo/types"
+	"github.com/pkg/errors"
 )
 
 func init() {
@@ -19,19 +21,27 @@ type addHostMetadata struct {
 	info       types.HostInfo
 	lastUpdate time.Time
 	data       common.MapStr
+	config     Config
 }
 
 const (
+	processorName   = "add_host_metadata"
 	cacheExpiration = time.Minute * 5
 )
 
-func newHostMetadataProcessor(_ *common.Config) (processors.Processor, error) {
+func newHostMetadataProcessor(cfg *common.Config) (processors.Processor, error) {
+	config := defaultConfig()
+	if err := cfg.Unpack(&config); err != nil {
+		return nil, errors.Wrapf(err, "fail to unpack the %v configuration", processorName)
+	}
+
 	h, err := sysinfo.Host()
 	if err != nil {
 		return nil, err
 	}
 	p := &addHostMetadata{
-		info: h.Info(),
+		info:   h.Info(),
+		config: config,
 	}
 	return p, nil
 }
@@ -73,10 +83,12 @@ func (p *addHostMetadata) loadData() {
 			p.data.Put("host.os.build", p.info.OS.Build)
 		}
 
-		// IP-address and MAC-address
-		var ipList, hwList = p.getNetInfo()
-		p.data.Put("host.ip", ipList)
-		p.data.Put("host.mac", hwList)
+		if p.config.NetInfoEnabled {
+			// IP-address and MAC-address
+			var ipList, hwList = p.getNetInfo()
+			p.data.Put("host.ip", ipList)
+			p.data.Put("host.mac", hwList)
+		}
 
 		p.lastUpdate = time.Now()
 	}
@@ -121,5 +133,6 @@ func (p addHostMetadata) getNetInfo() ([]string, []string) {
 }
 
 func (p addHostMetadata) String() string {
-	return "add_host_metadata=[]"
+	return fmt.Sprintf("%v=[netinfo.enabled=[%v]]",
+		processorName, p.config.NetInfoEnabled)
 }
