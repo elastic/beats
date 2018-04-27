@@ -28,14 +28,7 @@
       type: keyword
       description: >
         User who created the exchange.
-    - name: messages.publish.count
-      type: long
-      description: >
-         Count of messages published.
-    - name: messages.publish.details.rate
-      type: float
-      description: >
-         How much the exchange publish count has changed per second in the most recent sampling interval.
+
     - name: messages.publish_in.count
       type: long
       description: >
@@ -52,43 +45,3 @@
       type: float
       description: >
           How much the exchange publish-out count has changed per second in the most recent sampling interval.
-    - name: messages.ack.count
-      type: long
-      description: >
-         Count of acknowledged messages.
-    - name: messages.ack.details.rate
-      type: float
-      description: >
-          How much the exchange ack count has changed per second in the most recent sampling interval.
-    - name: messages.deliver_get.count
-      type: long
-      description: >
-         Count of all messages delivered to consumers.
-    - name: messages.deliver_get.details.rate
-      type: float
-      description: >
-          How much the exchange deliver-get count has changed per second in the most recent sampling interval.
-    - name: messages.confirm.count
-      type: long
-      description: >
-         Count of messages confirmed.
-    - name: messages.confirm.details.rate
-      type: float
-      description: >
-          How much the exchange confirm count has changed per second in the most recent sampling interval.
-    - name: messages.return_unroutable.count
-      type: long
-      description: >
-         Count of messages returned to publisher as unroutable.
-    - name: messages.return_unroutable.details.rate
-      type: float
-      description: >
-          How much the exchange return-unroutable count has changed per second in the most recent sampling interval.
-    - name: messages.redeliver.count
-      type: long
-      description: >
-         Count of subset of messages in deliver_get which had the redelivered flag set.
-    - name: messages.redeliver.details.rate
-      type: float
-      description: >
-          How much the exchange redeliver count has changed per second in the most recent sampling interval.
