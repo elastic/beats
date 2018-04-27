@@ -11,6 +11,6 @@ type Config struct {
 
 func defaultConfig() Config {
 	return Config{
-		//		netInfoEnabled: "false",
+		NetInfoEnabled: false,
 	}
 }
