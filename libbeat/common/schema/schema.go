@@ -2,7 +2,6 @@ package schema
 
 import (
 	"github.com/elastic/beats/libbeat/common"
-	"github.com/elastic/beats/libbeat/logp"
 )
 
 // Schema describes how a map[string]interface{} object can be parsed and converted into
@@ -37,8 +36,6 @@ func (conv Conv) Map(key string, event common.MapStr, data map[string]interface{
 		err := NewError(key, err.Error())
 		if conv.Optional {
 			err.SetType(OptionalType)
-		} else {
-			logp.Err("Error on field '%s': %v", key, err)
 		}
 
 		errs := NewErrors()
@@ -73,6 +70,7 @@ func (o Object) HasKey(key string) bool {
 // event map.
 func (s Schema) ApplyTo(event common.MapStr, data map[string]interface{}) (common.MapStr, *Errors) {
 	errors := applySchemaToEvent(event, data, s)
+	errors.Log()
 	return event, errors
 }
 
