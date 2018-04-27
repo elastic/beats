@@ -16,12 +16,14 @@ EXPOSE 8778
 # Prepare a server where jolokia runs in proxy mode
 RUN wget http://archive.apache.org/dist/tomcat/tomcat-7/v${TOMCAT_VERSION}/bin/${TC}.tar.gz;\
     tar xzf ${TC}.tar.gz -C /usr;\
+    rm ${TC}.tar.gz;\
     sed -i -e 's/Connector port="8080"/Connector port="8778"/g' /usr/${TC}/conf/server.xml;\
     wget http://central.maven.org/maven2/org/jolokia/jolokia-war/${JOLOKIA_VERSION}/jolokia-war-${JOLOKIA_VERSION}.war -O /usr/${TC}/webapps/jolokia.war
 
 # Set up a server to be connected in proxy mode
 RUN wget http://archive.apache.org/dist/tomcat/tomcat-9/v${PROXT_TARGET_TOMCAT_VERSION}/bin/${PX_TC}.tar.gz;\
     tar xzf ${PX_TC}.tar.gz -C /usr;\
+    rm ${PX_TC}.tar.gz;\
     sed -i -e 's/Connector port="8/Connector port="18/g' /usr/${PX_TC}/conf/server.xml;\
     sed -i -e 's/Server port="8005"/Server port="18005"/g' /usr/${PX_TC}/conf/server.xml
 
