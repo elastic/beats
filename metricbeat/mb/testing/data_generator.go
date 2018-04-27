@@ -39,6 +39,13 @@ func WriteEvent(f mb.EventFetcher, t testing.TB) error {
 // WriteEvents fetches events and writes the first event to a ./_meta/data.json
 // file.
 func WriteEvents(f mb.EventsFetcher, t testing.TB) error {
+	return WriteEventsCond(f, t, nil)
+
+}
+
+// WriteEventsCond fetches events and writes the first event that matches the condition
+// to a ./_meta/data.json file.
+func WriteEventsCond(f mb.EventsFetcher, t testing.TB, cond func(e common.MapStr) bool) error {
 	if !*dataFlag {
 		t.Skip("skip data generation tests")
 	}
@@ -52,7 +59,22 @@ func WriteEvents(f mb.EventsFetcher, t testing.TB) error {
 		return fmt.Errorf("no events were generated")
 	}
 
-	fullEvent := CreateFullEvent(f, events[0])
+	var event *common.MapStr
+	if cond == nil {
+		event = &events[0]
+	} else {
+		for _, e := range events {
+			if cond(e) {
+				event = &e
+				break
+			}
+		}
+		if event == nil {
+			return fmt.Errorf("no events satisfied the condition")
+		}
+	}
+
+	fullEvent := CreateFullEvent(f, *event)
 	WriteEventToDataJSON(t, fullEvent)
 	return nil
 }
