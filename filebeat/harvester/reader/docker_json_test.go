@@ -13,6 +13,7 @@ func TestDockerJSON(t *testing.T) {
 	tests := []struct {
 		input           [][]byte
 		stream          string
+		partial         bool
 		expectedError   bool
 		expectedMessage Message
 	}{
@@ -88,11 +89,39 @@ func TestDockerJSON(t *testing.T) {
 				Ts:      time.Date(2017, 11, 12, 23, 32, 21, 212771448, time.UTC),
 			},
 		},
+		// Split lines
+		{
+			input: [][]byte{
+				[]byte(`{"log":"1:M 09 Nov 13:27:36.276 # User requested ","stream":"stdout","time":"2017-11-09T13:27:36.277747246Z"}`),
+				[]byte(`{"log":"shutdown...\n","stream":"stdout","time":"2017-11-09T13:27:36.277747246Z"}`),
+			},
+			stream:  "stdout",
+			partial: true,
+			expectedMessage: Message{
+				Content: []byte("1:M 09 Nov 13:27:36.276 # User requested shutdown...\n"),
+				Fields:  common.MapStr{"stream": "stdout"},
+				Ts:      time.Date(2017, 11, 9, 13, 27, 36, 277747246, time.UTC),
+			},
+		},
+		// Split lines with partial disabled
+		{
+			input: [][]byte{
+				[]byte(`{"log":"1:M 09 Nov 13:27:36.276 # User requested ","stream":"stdout","time":"2017-11-09T13:27:36.277747246Z"}`),
+				[]byte(`{"log":"shutdown...\n","stream":"stdout","time":"2017-11-09T13:27:36.277747246Z"}`),
+			},
+			stream:  "stdout",
+			partial: false,
+			expectedMessage: Message{
+				Content: []byte("1:M 09 Nov 13:27:36.276 # User requested "),
+				Fields:  common.MapStr{"stream": "stdout"},
+				Ts:      time.Date(2017, 11, 9, 13, 27, 36, 277747246, time.UTC),
+			},
+		},
 	}
 
 	for _, test := range tests {
 		r := &mockReader{messages: test.input}
-		json := NewDockerJSON(r, test.stream)
+		json := NewDockerJSON(r, test.stream, test.partial)
 		message, err := json.Next()
 
 		assert.Equal(t, test.expectedError, err != nil)
