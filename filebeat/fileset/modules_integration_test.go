@@ -17,7 +17,7 @@ import (
 func TestLoadPipeline(t *testing.T) {
 	client := estest.GetTestingElasticsearch(t)
 	if !hasIngest(client) {
-		t.Skip("Skip tests because ingest is missing in this elasticsearch version: %s", client.GetVersion())
+		t.Skip("Skip tests because ingest is missing in this elasticsearch version: ", client.GetVersion())
 	}
 
 	client.Request("DELETE", "/_ingest/pipeline/my-pipeline-id", "", nil, nil)
@@ -68,7 +68,7 @@ func checkUploadedPipeline(t *testing.T, client *elasticsearch.Client, expectedD
 func TestSetupNginx(t *testing.T) {
 	client := estest.GetTestingElasticsearch(t)
 	if !hasIngest(client) {
-		t.Skip("Skip tests because ingest is missing in this elasticsearch version: %s", client.GetVersion())
+		t.Skip("Skip tests because ingest is missing in this elasticsearch version: ", client.GetVersion())
 	}
 
 	client.Request("DELETE", "/_ingest/pipeline/filebeat-5.2.0-nginx-access-default", "", nil, nil)
@@ -100,7 +100,7 @@ func TestSetupNginx(t *testing.T) {
 func TestAvailableProcessors(t *testing.T) {
 	client := estest.GetTestingElasticsearch(t)
 	if !hasIngest(client) {
-		t.Skip("Skip tests because ingest is missing in this elasticsearch version: %s", client.GetVersion())
+		t.Skip("Skip tests because ingest is missing in this elasticsearch version: ", client.GetVersion())
 	}
 	// these exists on our integration test setup
 	requiredProcessors := []ProcessorRequirement{
