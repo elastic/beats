@@ -56,6 +56,14 @@ func TestNonRecursive(t *testing.T) {
 }
 
 func TestRecursive(t *testing.T) {
+	if runtime.GOOS == "darwin" {
+		// This test races on Darwin because internal races in the kqueue
+		// implementation of fsnotify when a watch is added in response to
+		// a subdirectory created inside a watched directory.
+		// This race doesn't affect auditbeat because the file_integrity module
+		// under Darwin uses fsevents instead of kqueue.
+		t.Skip("Disabled on Darwin")
+	}
 	dir, err := ioutil.TempDir("", "monitor")
 	assertNoError(t, err)
 	// under macOS, temp dir has a symlink in the path (/var -> /private/var)
