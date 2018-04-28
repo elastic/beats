@@ -415,6 +415,32 @@ func (msg *sipMessage) parseSIPHeaderToMap(cutPosS []int,cutPosE []int) (*map[st
                 continue
             }
 
+            // Convert compact form to full form
+            if len(key) == 1{
+                switch(key){
+                    // referfenced by https://www.iana.org/assignments/sip-parameters/sip-parameters.xhtml
+                    case "a": key="accept-contact"      //[RFC3841]
+                    case "b": key="referred-by"         //[RFC3892]
+                    case "c": key="content-type"        //[RFC3261]
+                    case "d": key="request-disposition" //[RFC3841]
+                    case "e": key="content-encoding"    //[RFC3261]
+                    case "f": key="from"                //[RFC3261]
+                    case "i": key="call-id"             //[RFC3261]
+                    case "j": key="reject-contact"      //[RFC3841]
+                    case "k": key="supported"           //[RFC3261]
+                    case "l": key="content-length"      //[RFC3261]
+                    case "m": key="contact"             //[RFC3261]
+                    case "o": key="event"               //[RFC6665] [RFC6446]
+                    case "r": key="refer-to"            //[RFC3515]
+                    case "s": key="subject"             //[RFC3261]
+                    case "t": key="to"                  //[RFC3261]
+                    case "u": key="allow-events"        //[RFC6665]
+                    case "v": key="via"                 //[RFC3261] [RFC7118]
+                    case "x": key="session-expires"     //[RFC4028]
+                    case "y": key="identity"            //[RFC8224]
+                }
+            }
+
             // Initialize and add to map, if first find the header name in process
             _,ok := (*headers)[key]
             if !ok{
@@ -525,3 +551,4 @@ func (msg *sipMessage) getMessageStatus() (int){
     if msg.contentlength < 0 { return SIP_STATUS_BODY_RECEIVING}
     return SIP_STATUS_RECEIVED
 }
+
