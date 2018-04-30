@@ -59,6 +59,7 @@ https://github.com/elastic/beats/compare/v6.0.0-beta2...master[Check the HEAD di
 
 - Add hex decoding for the name field in audit path records. {pull}6687[6687]
 - Fixed a deadlock in the file_integrity module under Windows. {issue}6864[6864]
+- Fixed parsing of AppArmor audit messages. {pull}6978[6978]
 
 *Filebeat*
 
@@ -114,6 +115,9 @@ https://github.com/elastic/beats/compare/v6.0.0-beta2...master[Check the HEAD di
 - Add rename processor. {pull}6292[6292]
 
 *Auditbeat*
+
+- Added caching of UID and GID values to auditd module. {pull}6978[6978]
+- Updated syscall tables for Linux 4.16. {pull}6978[6978]
 
 *Filebeat*
 
