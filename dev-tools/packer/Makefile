@@ -40,7 +40,7 @@ beat_abspath=${BEATS_GOPATH}/src/${BEAT_PATH}
 
 %/dmg:
 	echo Creating OSX packages for $(@D)
-	ARCH=amd64 BEAT=$(@D) BUILD_DIR=${BUILD_DIR} UPLOAD_DIR=${UPLOAD_DIR} BEAT_PATH=$(beat_abspath) BUILDID=$(BUILDID) SNAPSHOT=$(SNAPSHOT) $(packer_absdir)/platforms/darwin/pkg/build.sh
+	ARCH=amd64 BEAT=$(@D) BUILD_DIR=${BUILD_DIR} UPLOAD_DIR=${UPLOAD_DIR} BEAT_PATH=$(beat_abspath) BUILDID=$(BUILDID) SNAPSHOT=$(SNAPSHOT) PKG_SUFFIX=$(PKG_SUFFIX) $(packer_absdir)/platforms/darwin/pkg/build.sh
 
 .PHONY: package-dashboards
 package-dashboards:

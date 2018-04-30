@@ -38,7 +38,8 @@ test -n "SIGN_IDENTITY_INSTALLER" || die "Installer certificate not found"
 test -n "SIGN_IDENTITY_APP" || die "Codesigning certificate not found"
 export SIGN_IDENTITY_INSTALLER SIGN_IDENTITY_APP
 
-test -f "${BUILD_DIR}/package.yml" || die "package.yml not found in BUILD_DIR"
+PKG_YML="${BUILD_DIR}/package${PKG_SUFFIX}/package.yml"
+test -f "$PKG_YML"  || die "package.yml not found in $PKG_YML"
 ARCH_FILE="${PACKERDIR}/archs/$ARCH.yml"
 test -f "$ARCH_FILE" || die "$ARCH_FILE not found (check ARCH environment variable)"
 
@@ -46,13 +47,15 @@ TMPDIR=$(mktemp -d)
 test "$?" -ne 0 && die "Failed creating temporary directory"
 echo "Building in directory $TMPDIR"
 
-cat "${BUILD_DIR}/package.yml" "$ARCH_FILE" "$BASEDIR/base_conf.yml" > "${TMPDIR}/conf.yml" || die "Failed generating conf.yml"
+cat "$PKG_YML" "$ARCH_FILE" "$BASEDIR/base_conf.yml" > "${TMPDIR}/conf.yml" || die "Failed generating conf.yml"
 
 if [ "$SNAPSHOT" = "yes" ]; then
     echo 'snapshot: "-SNAPSHOT"' >> "${TMPDIR}/conf.yml"
 else
     echo 'snapshot: ""' >> "${TMPDIR}/conf.yml"
 fi
+
+echo "pkg_suffix: '${PKG_SUFFIX}'" >> "${TMPDIR}/conf.yml"
 
 echo 'Building preference-pane'
 make -e CODE_SIGNING_REQUIRED=YES -C "${PACKERDIR}/platforms/darwin/preference-pane" clean build pkg || die "Build of preference-pane failed"

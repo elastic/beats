@@ -549,10 +549,21 @@ package-dashboards: package-setup
 	# build the dashboards package
 	BEAT_NAME=${BEAT_NAME} BUILD_DIR=${BUILD_DIR} SNAPSHOT=$(SNAPSHOT) $(MAKE) -C ${ES_BEATS}/dev-tools/packer package-dashboards ${shell pwd}/build/upload/build_id.txt
 
+.PHONY: osx-package-all
+osx-package-all: osx-package-elastic osx-package-oss
+
+.PHONY: osx-package-elastic
+osx-package-elastic:
+	@$(MAKE) osx-package
+
+.PHONY: osx-package-oss
+osx-package-oss:
+	@$(MAKE) PKG_SUFFIX=-oss osx-package
+
 .PHONY: osx-package
 osx-package: package-yml
 osx-package: ## @packaging Create OSX packages for the beat.
-	$(MAKE) -C ${ES_BEATS}/dev-tools/packer -e BEAT_NAME=${BEAT_NAME} BUILD_DIR=${BUILD_DIR} SNAPSHOT=$(SNAPSHOT) $(BEAT_NAME)/dmg
+	$(MAKE) -C ${ES_BEATS}/dev-tools/packer -e PKG_SUFFIX=${PKG_SUFFIX} BEAT_NAME=${BEAT_NAME} BUILD_DIR=${BUILD_DIR} SNAPSHOT=$(SNAPSHOT) $(BEAT_NAME)/dmg
 
 fix-permissions:
 	# Change ownership of all files inside /build folder from root/root to current user/group

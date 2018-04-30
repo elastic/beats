@@ -6,16 +6,19 @@ set -e
 
 BASEDIR=$(cd "$(dirname "$0")"; pwd)
 
-FILE_NAME="$BEAT-$VERSION-$ARCH"
+FILE_NAME="$BEAT$PKG_SUFFIX-$VERSION-$ARCH"
 PKG_NAME="$FILE_NAME.pkg"
 DMG_NAME="$FILE_NAME.dmg"
 INNER_NAME="internal-$FILE_NAME.pkg"
 VENDOR_DIR="root/$INSTALL_PATH/$VENDOR"
 BEAT_DIR="$VENDOR_DIR/$BEAT"
 mkdir -p "$VENDOR_DIR"
-TAR_NAME="$BEAT-$VERSION-darwin-$ARCH"
+TAR_NAME="$BEAT$PKG_SUFFIX-$VERSION-darwin-$ARCH"
+# When uncompressed, both the -oss and non-oss tar.gz
+# yield the same directory name.
+TAR_DIR_NAME="$BEAT-$VERSION-darwin-$ARCH"
 tar zxf "$BUILD_DIR/upload/$TAR_NAME".tar.gz
-mv "$TAR_NAME" "$BEAT_DIR"
+mv "$TAR_DIR_NAME" "$BEAT_DIR"
 
 cp launchd-daemon.plist "$BEAT_DIR/$IDENTIFIER.plist"
 

@@ -128,10 +128,10 @@ package-all: update beats-dashboards
 	@# Run tests on the generated packages.
 	@go test ./dev-tools/package_test.go -files "${BUILD_DIR}/upload/*/*"
 
-.PHONY: osx-package
-osx-package:
+.PHONY: osx-package-all
+osx-package-all:
 	@$(test "$(uname -s)" = Darwin || { echo "Must run on Darwin" ; exit 1;} )
-	@$(foreach var,$(OSX_BEATS),$(MAKE) -C $(var) osx-package || exit 1;)
+	@$(foreach var,$(OSX_BEATS),$(MAKE) -C $(var) osx-package-all || exit 1;)
 	@mkdir -p build/upload/
 	@$(foreach var,$(OSX_BEATS),cp -r $(var)/build/upload/*.dmg $(var)/build/upload/*.pkg build/upload/$(var)  || exit 1;)
 
