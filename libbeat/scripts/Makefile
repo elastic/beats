@@ -60,9 +60,7 @@ STRESS_TEST_OPTIONS?=-timeout=20m -race -v
 GOX_OS?=linux darwin windows freebsd netbsd openbsd ## @Building List of all OS to be supported by "make crosscompile".
 GOX_OSARCH?=!darwin/arm !darwin/arm64 !darwin/386 ## @building Space separated list of GOOS/GOARCH pairs to build by "make crosscompile".
 GOX_FLAGS?= ## @building Additional flags to append to the gox command used by "make crosscompile".
-# XXX: Should be switched back to `snapshot` once the Elasticsearch
-# snapshots are working. https://github.com/elastic/beats/pull/6416
-TESTING_ENVIRONMENT?=latest## @testing The name of the environment under test
+TESTING_ENVIRONMENT?=snapshot## @testing The name of the environment under test
 BEAT_VERSION=$(shell head -n 1 ${ES_BEATS}/libbeat/docs/version.asciidoc | cut -c 17- )
 COMMIT_ID=$(shell git rev-parse HEAD)
 DOCKER_COMPOSE_PROJECT_NAME?=${BEAT_NAME}${TESTING_ENVIRONMENT//-}${COMMIT_ID} ## @testing The name of the docker-compose project used by the integration and system tests
