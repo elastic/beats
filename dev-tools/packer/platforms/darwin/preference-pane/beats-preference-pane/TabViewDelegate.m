@@ -63,7 +63,7 @@
             continue;
         }
         NSTabViewItem *item = [[NSTabViewItem alloc] initWithIdentifier:beatName];
-        [item setLabel:beatName];
+        [item setLabel:[beat displayName]];
         BeatViewController *vc = [[BeatViewController alloc]
                                  initWithBeat:[beatsInterface getBeat:beatName] auth:auth bundle:bundle beatsInterface:beatsInterface];
         [item setViewController:vc];

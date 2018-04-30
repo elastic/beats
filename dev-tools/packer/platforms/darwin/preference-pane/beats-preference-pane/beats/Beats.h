@@ -22,6 +22,7 @@
 - (bool) isBoot;
 - (int) pid;
 - (NSString*) name;
+- (NSString*) displayName;
 - (NSString*) plistPath;
 - (NSString*) configFile;
 - (NSString*) logsPath;

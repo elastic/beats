@@ -25,6 +25,7 @@ static NSString *empty = @"";
     @public NSString *config;
     @public NSString *logs;
     @public NSString *name;
+    @public NSString *displayName;
     @public bool running;
     @public bool startAtBoot;
     @public pid_t pid;
@@ -39,6 +40,7 @@ static NSString *empty = @"";
 - (id) initWithPrefix:(NSString*)prefix andName:(NSString *)name {
     if (self = [self init]) {
         self->name = name;
+        self->displayName = [name capitalizedString];
         self->prefix = prefix;
         self->config = nil;
         self->logs = nil;
@@ -125,6 +127,11 @@ BOOL runHelperTaskList(id<AuthorizationProvider> auth, NSArray *argList) {
 - (NSString *)plistPath {
     return self->plistPath;
 }
+
+- (NSString *)displayName {
+    return self->displayName;
+}
+
 
 @end
 

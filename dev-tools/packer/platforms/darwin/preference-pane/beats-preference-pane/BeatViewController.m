@@ -42,10 +42,10 @@
     id<Beat> beat = self->beat;
 
     if ([beat isRunning]) {
-        [statusLabel setStringValue:[NSString stringWithFormat:@"%@ is running with PID %d", [beat name], [beat pid]]];
+        [statusLabel setStringValue:[NSString stringWithFormat:@"%@ is running with PID %d", [beat displayName], [beat pid]]];
         [startStopButton setTitle:@"Stop"];
     } else {
-        [statusLabel setStringValue:[NSString stringWithFormat:@"%@ is stopped", [beat name]]];
+        [statusLabel setStringValue:[NSString stringWithFormat:@"%@ is stopped", [beat displayName]]];
         [startStopButton setTitle:@"Start"];
     }
 
@@ -111,7 +111,7 @@
     [auth runAsRoot:@"/bin/sh" args:@[@"-c", [NSString stringWithFormat:@"cat '%@' > '%@'", conf, tmpFile]]];
 
     // Display editor on temp file
-    EditorWindow *editor = [[EditorWindow alloc] initWithBeat:[beat name] config:tmpFile];
+    EditorWindow *editor = [[EditorWindow alloc] initWithBeat:[beat displayName] config:tmpFile];
     NSWindow *window = [editor window];
     [window setFrameOrigin:[[[self view] window] frame].origin];
     NSModalResponse resp = [NSApp runModalForWindow: window];
