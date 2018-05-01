@@ -107,8 +107,13 @@ func getConfigs() []map[string]interface{} {
 					"attributes": []map[string]string{
 						{
 							"attr":  "serverNumber",
-							"field": "server_number_local",
+							"field": "server_number_dosntconnect",
 						},
+					},
+					"target": &TargetBlock{
+						URL:      "service:jmx:rmi:///jndi/rmi://localhost:7091/jmxrmi",
+						User:     "monitorRole",
+						Password: "IGNORE",
 					},
 				},
 				{
