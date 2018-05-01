@@ -20,7 +20,7 @@ func TestNumberOfRoutingShards(t *testing.T) {
 	template, err := New(beatVersion, beatName, "6.1.0", config)
 	assert.NoError(t, err)
 
-	data := template.generate(nil, nil)
+	data := template.Generate(nil, nil)
 	shards, err := data.GetValue("settings.index.number_of_routing_shards")
 	assert.NoError(t, err)
 
@@ -30,7 +30,7 @@ func TestNumberOfRoutingShards(t *testing.T) {
 	template, err = New(beatVersion, beatName, "6.0.0", config)
 	assert.NoError(t, err)
 
-	data = template.generate(nil, nil)
+	data = template.Generate(nil, nil)
 	shards, err = data.GetValue("settings.index.number_of_routing_shards")
 	assert.Error(t, err)
 	assert.Equal(t, nil, shards)
@@ -50,7 +50,7 @@ func TestNumberOfRoutingShardsOverwrite(t *testing.T) {
 	template, err := New(beatVersion, beatName, "6.1.0", config)
 	assert.NoError(t, err)
 
-	data := template.generate(nil, nil)
+	data := template.Generate(nil, nil)
 	shards, err := data.GetValue("settings.index.number_of_routing_shards")
 	assert.NoError(t, err)
 
