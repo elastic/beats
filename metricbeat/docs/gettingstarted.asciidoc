@@ -176,6 +176,8 @@ You can either enable the default module configurations defined in the
 +{beatname_lc}.yml+ file. The `modules.d` directory contains default
 configurations for all available {beatname_uc} modules. 
 +
+If you are using a Docker image, see <<running-on-docker>>.
++
 The following examples enable the `apache` and `mysql` configs in the
 `modules.d` directory :
 +
@@ -191,13 +193,6 @@ The following examples enable the `apache` and `mysql` configs in the
 ["source","sh",subs="attributes"]
 ----
 ./{beatname_lc} modules enable apache mysql
-----
-+
-*docker*:
-+
-["source","sh",subs="attributes"]
-----
-docker run docker.elastic.co/beats/{beatname_lc}:{version} modules enable apache mysql
 ----
 +
 *win:*
@@ -280,6 +275,8 @@ sudo service {beatname_lc} start
 ----------------------------------------------------------------------
 docker run {dockerimage}
 ----------------------------------------------------------------------
+
+Also see <<running-on-docker>>.
 
 *mac:*
 
