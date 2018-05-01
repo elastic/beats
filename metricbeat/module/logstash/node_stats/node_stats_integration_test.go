@@ -13,7 +13,7 @@ import (
 )
 
 func TestFetch(t *testing.T) {
-	compose.EnsureUpWithTimeout(t, 120, "logstash")
+	compose.EnsureUpWithTimeout(t, 300, "logstash")
 
 	f := mbtest.NewEventFetcher(t, logstash.GetConfig("node_stats"))
 	event, err := f.Fetch()
