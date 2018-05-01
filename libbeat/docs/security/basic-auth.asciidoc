@@ -43,7 +43,7 @@ following request creates a ++{beat_default_index_prefix}_internal++ user that h
 ---------------------------------------------------------------
 POST /_xpack/security/user/{beat_default_index_prefix}_internal
 {
-  "password" : "x-pack-test-password",
+  "password" : "test-password",
   "roles" : [ "{beat_default_index_prefix}_writer"],
   "full_name" : "Internal {beatname_uc} User"
 }
@@ -76,7 +76,7 @@ output.elasticsearch:
     hosts: ["localhost:9200"]
     index: "{beat_default_index_prefix}"
     username: "{beat_default_index_prefix}_internal"
-    password: "x-pack-test-password"
+    password: "test-password"
 --------------------------------------------------
 
 .. To use PKI authentication, configure the `certificate` and
