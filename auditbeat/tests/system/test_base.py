@@ -24,7 +24,7 @@ class Test(BaseTest):
         proc = self.start_beat()
         self.wait_until(lambda: self.log_contains("start running"))
         proc.check_kill_and_wait()
-        self.assert_no_logged_warnings()
+        self.assert_no_logged_warnings('"error": "failed to stat: lstat file.example: no such file or directory"')
 
         # Ensure all Beater stages are used.
         assert self.log_contains("Setup Beat: auditbeat")

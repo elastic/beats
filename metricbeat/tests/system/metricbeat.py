@@ -65,7 +65,7 @@ class BaseTest(TestCase):
         """
         log = self.get_log()
 
-        pattern = self.build_log_regex("[cfgwarn]")
+        pattern = self.build_log_regex("\[cfgwarn\]")
         log = pattern.sub("", log)
 
         # Jenkins runs as a Windows service and when Jenkins executes these
@@ -77,12 +77,12 @@ class BaseTest(TestCase):
             for r in replace:
                 pattern = self.build_log_regex(r)
                 log = pattern.sub("", log)
-        self.assertNotRegexpMatches(log, "ERROR|WARN")
+        self.assertNotRegexpMatches(log, "\tERROR\t|\tWARN\t")
 
     def build_log_regex(self, message):
         return re.compile(r"^.*\t(?:ERROR|WARN)\t.*" + message + r".*$", re.MULTILINE)
 
-    def check_metricset(self, module, metricset, hosts):
+    def check_metricset(self, module, metricset, hosts, fields=[]):
         """
         Method to test a metricset for its fields
         """
@@ -93,7 +93,7 @@ class BaseTest(TestCase):
             "period": "1s",
         }])
         proc = self.start_beat()
-        self.wait_until(lambda: self.output_lines() > 0, max_timeout=20)
+        self.wait_until(lambda: self.output_lines() > 0)
         proc.check_kill_and_wait()
         self.assert_no_logged_warnings()
 
@@ -101,5 +101,8 @@ class BaseTest(TestCase):
         self.assertTrue(len(output) >= 1)
         evt = output[0]
         print(evt)
+
+        fields = COMMON_FIELDS + fields
+        self.assertItemsEqual(self.de_dot(fields), evt.keys())
 
         self.assert_fields_are_documented(evt)
