@@ -7,6 +7,7 @@ import (
 	"github.com/elastic/beats/libbeat/common"
 )
 
+// Processor struct to process fields to template
 type Processor struct {
 	EsVersion common.Version
 }
@@ -15,10 +16,8 @@ var (
 	defaultScalingFactor = 1000
 )
 
-// This includes all entries without special handling for different versions.
-// Currently this is:
-// long, geo_point, date, short, byte, float, double, boolean
-func (p *Processor) process(fields common.Fields, path string, output common.MapStr) error {
+// Process recursively processes the given fields and writes the template in the given output
+func (p *Processor) Process(fields common.Fields, path string, output common.MapStr) error {
 	for _, field := range fields {
 
 		if field.Name == "" {
@@ -70,7 +69,7 @@ func (p *Processor) process(fields common.Fields, path string, output common.Map
 				}
 			}
 
-			if err := p.process(field.Fields, newPath, properties); err != nil {
+			if err := p.Process(field.Fields, newPath, properties); err != nil {
 				return err
 			}
 			mapping["properties"] = properties
@@ -183,7 +182,7 @@ func (p *Processor) text(f *common.Field) common.MapStr {
 
 	if len(f.MultiFields) > 0 {
 		fields := common.MapStr{}
-		p.process(f.MultiFields, "", fields)
+		p.Process(f.MultiFields, "", fields)
 		properties["fields"] = fields
 	}
 

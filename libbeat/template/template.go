@@ -111,10 +111,10 @@ func (t *Template) Load(file string) (common.MapStr, error) {
 	// Start processing at the root
 	properties := common.MapStr{}
 	processor := Processor{EsVersion: t.esVersion}
-	if err := processor.process(fields, "", properties); err != nil {
+	if err := processor.Process(fields, "", properties); err != nil {
 		return nil, err
 	}
-	output := t.generate(properties, dynamicTemplates)
+	output := t.Generate(properties, dynamicTemplates)
 
 	return output, nil
 }
@@ -129,9 +129,9 @@ func (t *Template) GetPattern() string {
 	return t.pattern
 }
 
-// generate generates the full template
+// Generate generates the full template
 // The default values are taken from the default variable.
-func (t *Template) generate(properties common.MapStr, dynamicTemplates []common.MapStr) common.MapStr {
+func (t *Template) Generate(properties common.MapStr, dynamicTemplates []common.MapStr) common.MapStr {
 	// Add base dynamic template
 	var dynamicTemplateBase = common.MapStr{
 		"strings_as_keyword": common.MapStr{

@@ -330,7 +330,7 @@ func TestPropertiesCombine(t *testing.T) {
 	}
 
 	p := Processor{EsVersion: *version}
-	err = p.process(fields, "", output)
+	err = p.Process(fields, "", output)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -378,7 +378,7 @@ func TestProcessNoName(t *testing.T) {
 	}
 
 	p := Processor{EsVersion: *version}
-	err = p.process(fields, "", output)
+	err = p.Process(fields, "", output)
 	if err != nil {
 		t.Fatal(err)
 	}
