@@ -129,7 +129,7 @@ func (t *Template) GetPattern() string {
 	return t.pattern
 }
 
-// generate generates the full template
+// Generate generates the full template
 // The default values are taken from the default variable.
 func (t *Template) Generate(properties common.MapStr, dynamicTemplates []common.MapStr) common.MapStr {
 	// Add base dynamic template
