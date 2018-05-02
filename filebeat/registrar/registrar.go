@@ -43,6 +43,8 @@ var (
 	registrySuccess = monitoring.NewInt(nil, "registrar.writes.success")
 )
 
+// New creates a new Registrar instance, updating the registry file on
+// `file.State` updates. New fails if the file can not be opened or created.
 func New(registryFile string, fileMode os.FileMode, flushTimeout time.Duration, out successLogger) (*Registrar, error) {
 	r := &Registrar{
 		registryFile: registryFile,
