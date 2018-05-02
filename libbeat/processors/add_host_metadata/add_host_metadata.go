@@ -9,6 +9,7 @@ import (
 
 	"github.com/elastic/beats/libbeat/beat"
 	"github.com/elastic/beats/libbeat/common"
+	"github.com/elastic/beats/libbeat/logp"
 	"github.com/elastic/beats/libbeat/processors"
 	"github.com/elastic/go-sysinfo"
 	"github.com/elastic/go-sysinfo/types"
@@ -86,23 +87,31 @@ func (p *addHostMetadata) loadData() {
 
 		if p.config.NetInfoEnabled {
 			// IP-address and MAC-address
-			var ipList, hwList = p.getNetInfo()
-			p.data.Put("host.ip", ipList)
-			p.data.Put("host.mac", hwList)
+			var ipList, hwList, err = p.getNetInfo()
+			if err != nil {
+				logp.Warn("Error when getting network information %v", err)
+			}
+
+			if len(ipList) > 0 {
+				p.data.Put("host.ip", ipList)
+			}
+			if len(hwList) > 0 {
+				p.data.Put("host.mac", hwList)
+			}
 		}
 
 		p.lastUpdate = time.Now()
 	}
 }
 
-func (p addHostMetadata) getNetInfo() ([]string, []string) {
+func (p addHostMetadata) getNetInfo() ([]string, []string, error) {
 	var ipList []string
 	var hwList []string
 
 	// Get all interfaces and loop through them
 	ifaces, err := net.Interfaces()
 	if err != nil {
-		return ipList, hwList
+		return ipList, hwList, err
 	}
 	for _, i := range ifaces {
 		// Skip loopback interfaces
@@ -118,8 +127,11 @@ func (p addHostMetadata) getNetInfo() ([]string, []string) {
 
 		addrs, err := i.Addrs()
 		if err != nil {
-			return ipList, hwList
+			// If we get an error, log it and continue with the next interface
+			logp.Warn("Error when getting IP address %v", err)
+			continue
 		}
+
 		for _, addr := range addrs {
 			switch v := addr.(type) {
 			case *net.IPNet:
@@ -130,7 +142,7 @@ func (p addHostMetadata) getNetInfo() ([]string, []string) {
 		}
 	}
 
-	return ipList, hwList
+	return ipList, hwList, nil
 }
 
 func (p addHostMetadata) String() string {
