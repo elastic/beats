@@ -763,7 +763,10 @@ metricbeat.modules:
 #
 #processors:
 #- add_docker_metadata: ~
-#- add_host_metadata: ~
+#
+#processors:
+#- add_host_metadata:
+#   netinfo.enabled: false
 
 #============================= Elastic Cloud ==================================
 
