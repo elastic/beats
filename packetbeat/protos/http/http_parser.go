@@ -181,9 +181,10 @@ func (*parser) parseHTTPLine(s *stream, m *message) (cont, ok, complete bool) {
 		m.method = common.NetString(fline[:afterMethodIdx])
 		m.requestURI = common.NetString(fline[afterMethodIdx+1 : afterRequestURIIdx])
 
-		if bytes.Equal(fline[afterRequestURIIdx+1:afterRequestURIIdx+len(constHTTPVersion)+1], constHTTPVersion) {
+		versionIdx := afterRequestURIIdx + len(constHTTPVersion) + 1
+		if len(fline) > versionIdx && bytes.Equal(fline[afterRequestURIIdx+1:versionIdx], constHTTPVersion) {
 			m.isRequest = true
-			version = fline[afterRequestURIIdx+len(constHTTPVersion)+1:]
+			version = fline[versionIdx:]
 		} else {
 			if isDebug {
 				debugf("Couldn't understand HTTP version: %s", fline)
