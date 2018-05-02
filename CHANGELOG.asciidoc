@@ -67,6 +67,7 @@ https://github.com/elastic/beats/compare/v6.0.0-beta2...master[Check the HEAD di
 - Fix memory leak in log prospector when files cannot be read. {issue}6797[6797]
 - Add raw JSON to message field when JSON parsing fails. {issue}6516[6516]
 - Commit registry writes to stable storage to avoid corrupt registry files. {pull}6877[6877]
+- Fix a data race between stopping and starting of the harverters. {issue}#6879[6879]
 
 *Heartbeat*
 - Fix race due to updates of shared a map, that was not supposed to be shared between multiple go-routines. {issue}6616[6616]
