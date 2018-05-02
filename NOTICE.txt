@@ -515,7 +515,7 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
 --------------------------------------------------------------------
 Dependency: github.com/fsnotify/fsevents
-Revision: 70114c7d2e1e4d1ae5179b285d65ea21aae111cc
+Revision: 4d5197691b054c220286f7c6ea167de9753d902d
 License type (autodetected): BSD-3-Clause
 ./vendor/github.com/fsnotify/fsevents/LICENSE:
 --------------------------------------------------------------------

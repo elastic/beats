@@ -955,11 +955,11 @@
 			"versionExact": "v1.5.0"
 		},
 		{
-			"checksumSHA1": "ZRP2NldqpFv4H1VsE70PEeqVjaw=",
+			"checksumSHA1": "TmMTaJIWueXrKneUOKMOgq75fKE=",
 			"origin": "github.com/elastic/fsevents",
 			"path": "github.com/fsnotify/fsevents",
-			"revision": "70114c7d2e1e4d1ae5179b285d65ea21aae111cc",
-			"revisionTime": "2018-04-06T06:16:07Z",
+			"revision": "4d5197691b054c220286f7c6ea167de9753d902d",
+			"revisionTime": "2018-05-02T14:11:16Z",
 			"tree": true
 		},
 		{
