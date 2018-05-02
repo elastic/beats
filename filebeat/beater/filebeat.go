@@ -197,6 +197,18 @@ func (fb *Filebeat) loadModulesML(b *beat.Beat, kibanaConfig *common.Config) err
 		kibanaConfig = common.NewConfig()
 	}
 
+	if esConfig.Enabled() {
+		username, _ := esConfig.String("username", -1)
+		password, _ := esConfig.String("password", -1)
+
+		if !kibanaConfig.HasField("username") && username != "" {
+			kibanaConfig.SetString("username", -1, username)
+		}
+		if !kibanaConfig.HasField("password") && password != "" {
+			kibanaConfig.SetString("password", -1, password)
+		}
+	}
+
 	kibanaClient, err := kibana.NewKibanaClient(kibanaConfig)
 	if err != nil {
 		return errors.Errorf("Error creating Kibana client: %v", err)
