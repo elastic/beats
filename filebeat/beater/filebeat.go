@@ -204,7 +204,7 @@ func (fb *Filebeat) loadModulesML(b *beat.Beat, kibanaConfig *common.Config) err
 
 	kibanaVersion, err := common.NewVersion(kibanaClient.GetVersion())
 	if err != nil {
-		return err
+		return errors.Errorf("Error checking Kibana version: %v", err)
 	}
 
 	if err := setupMLBasedOnVersion(fb.moduleRegistry, esClient, kibanaClient, kibanaVersion); err != nil {
