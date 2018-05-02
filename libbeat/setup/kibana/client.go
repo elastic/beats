@@ -118,7 +118,7 @@ func NewKibanaClient(cfg *common.Config) (*Client, error) {
 	}
 
 	if err = client.SetVersion(); err != nil {
-		return nil, fmt.Errorf("fail to get the Kibana version:%v", err)
+		return nil, fmt.Errorf("fail to get the Kibana version: %v", err)
 	}
 
 	return client, nil
