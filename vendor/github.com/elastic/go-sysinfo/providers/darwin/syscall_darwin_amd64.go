@@ -1,31 +1,42 @@
-// Copyright 2018 Elasticsearch Inc.
-//
-// Licensed under the Apache License, Version 2.0 (the "License");
-// you may not use this file except in compliance with the License.
+// Licensed to Elasticsearch B.V. under one or more contributor
+// license agreements. See the NOTICE file distributed with
+// this work for additional information regarding copyright
+// ownership. Elasticsearch B.V. licenses this file to you under
+// the Apache License, Version 2.0 (the "License"); you may
+// not use this file except in compliance with the License.
 // You may obtain a copy of the License at
 //
 // http://www.apache.org/licenses/LICENSE-2.0
 //
-// Unless required by applicable law or agreed to in writing, software
-// distributed under the License is distributed on an "AS IS" BASIS,
-// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-// See the License for the specific language governing permissions and
-// limitations under the License.
+// Unless required by applicable law or agreed to in writing,
+// software distributed under the License is distributed on an
+// "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+// KIND, either express or implied.  See the License for the
+// specific language governing permissions and limitations
+// under the License.
 
 // +build darwin,amd64,cgo
 
 package darwin
 
-// #cgo LDFLAGS:-lproc
-// #include <sys/sysctl.h>
+/*
+#cgo LDFLAGS:-lproc
+#include <sys/sysctl.h>
+#include <mach/mach_time.h>
+#include <mach/mach_host.h>
+#include <unistd.h>
+*/
 import "C"
 
 import (
 	"bytes"
 	"encoding/binary"
+	"fmt"
 	"sync"
 	"syscall"
 	"unsafe"
+
+	"github.com/pkg/errors"
 )
 
 // Single-word zero for use when we need a valid pointer to 0 bytes.
@@ -152,4 +163,78 @@ func sysctlByName(name string, out interface{}) error {
 	}
 
 	return sysctl(mib, out)
+}
+
+type cpuUsage struct {
+	User   uint32
+	System uint32
+	Idle   uint32
+	Nice   uint32
+}
+
+func getHostCPULoadInfo() (*cpuUsage, error) {
+	var count C.mach_msg_type_number_t = C.HOST_CPU_LOAD_INFO_COUNT
+	var cpu cpuUsage
+	status := C.host_statistics(C.host_t(C.mach_host_self()),
+		C.HOST_CPU_LOAD_INFO,
+		C.host_info_t(unsafe.Pointer(&cpu)),
+		&count)
+
+	if status != C.KERN_SUCCESS {
+		return nil, errors.Errorf("host_statistics returned status %d", status)
+	}
+
+	return &cpu, nil
+}
+
+// getClockTicks returns the number of click ticks in one jiffie.
+func getClockTicks() int {
+	return int(C.sysconf(C._SC_CLK_TCK))
+}
+
+func getHostVMInfo64() (*vmStatistics64Data, error) {
+	var count C.mach_msg_type_number_t = C.HOST_VM_INFO64_COUNT
+
+	var vmStat vmStatistics64Data
+	status := C.host_statistics64(
+		C.host_t(C.mach_host_self()),
+		C.HOST_VM_INFO64,
+		C.host_info_t(unsafe.Pointer(&vmStat)),
+		&count)
+
+	if status != C.KERN_SUCCESS {
+		return nil, fmt.Errorf("host_statistics64 returned status %d", status)
+	}
+
+	return &vmStat, nil
+}
+
+func getPageSize() (uint64, error) {
+	var pageSize vmSize
+	status := C.host_page_size(
+		C.host_t(C.mach_host_self()),
+		(*C.vm_size_t)(unsafe.Pointer(&pageSize)))
+	if status != C.KERN_SUCCESS {
+		return 0, errors.Errorf("host_page_size returned status %d", status)
+	}
+
+	return uint64(pageSize), nil
+}
+
+// From sysctl.h - xsw_usage.
+type swapUsage struct {
+	Total     uint64
+	Available uint64
+	Used      uint64
+	PageSize  uint64
+}
+
+const vmSwapUsageMIB = "vm.swapusage"
+
+func getSwapUsage() (*swapUsage, error) {
+	var swap swapUsage
+	if err := sysctlByName(vmSwapUsageMIB, &swap); err != nil {
+		return nil, err
+	}
+	return &swap, nil
 }

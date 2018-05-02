@@ -4,6 +4,7 @@
 package filesystem
 
 import (
+	"io/ioutil"
 	"os"
 	"runtime"
 	"testing"
@@ -44,6 +45,98 @@ func TestFileSystemList(t *testing.T) {
 				assert.NotEqual(t, "", stat.SysTypeName)
 			}
 		}
+	}
+}
+
+func TestFileSystemListFiltering(t *testing.T) {
+	if runtime.GOOS == "windows" {
+		t.Skip("These cases don't need to work on Windows")
+	}
+
+	fakeDevDir, err := ioutil.TempDir(os.TempDir(), "dir")
+	assert.Empty(t, err)
+	defer os.RemoveAll(fakeDevDir)
+
+	cases := []struct {
+		description   string
+		fss, expected []sigar.FileSystem
+	}{
+		{
+			fss: []sigar.FileSystem{
+				{DirName: "/", DevName: "/dev/sda1"},
+				{DirName: "/", DevName: "/dev/sda1"},
+			},
+			expected: []sigar.FileSystem{
+				{DirName: "/", DevName: "/dev/sda1"},
+			},
+		},
+		{
+			description: "Don't repeat devices, shortest of dir names should be used",
+			fss: []sigar.FileSystem{
+				{DirName: "/", DevName: "/dev/sda1"},
+				{DirName: "/bind", DevName: "/dev/sda1"},
+			},
+			expected: []sigar.FileSystem{
+				{DirName: "/", DevName: "/dev/sda1"},
+			},
+		},
+		{
+			description: "Don't repeat devices, shortest of dir names should be used",
+			fss: []sigar.FileSystem{
+				{DirName: "/bind", DevName: "/dev/sda1"},
+				{DirName: "/", DevName: "/dev/sda1"},
+			},
+			expected: []sigar.FileSystem{
+				{DirName: "/", DevName: "/dev/sda1"},
+			},
+		},
+		{
+			description: "Keep tmpfs",
+			fss: []sigar.FileSystem{
+				{DirName: "/run", DevName: "tmpfs"},
+				{DirName: "/tmp", DevName: "tmpfs"},
+			},
+			expected: []sigar.FileSystem{
+				{DirName: "/run", DevName: "tmpfs"},
+				{DirName: "/tmp", DevName: "tmpfs"},
+			},
+		},
+		{
+			description: "Don't repeat devices, shortest of dir names should be used, keep tmpfs",
+			fss: []sigar.FileSystem{
+				{DirName: "/", DevName: "/dev/sda1"},
+				{DirName: "/bind", DevName: "/dev/sda1"},
+				{DirName: "/run", DevName: "tmpfs"},
+			},
+			expected: []sigar.FileSystem{
+				{DirName: "/", DevName: "/dev/sda1"},
+				{DirName: "/run", DevName: "tmpfs"},
+			},
+		},
+		{
+			description: "Don't keep the fs if the device is a directory (it'd be a bind mount)",
+			fss: []sigar.FileSystem{
+				{DirName: "/", DevName: "/dev/sda1"},
+				{DirName: "/bind", DevName: fakeDevDir},
+			},
+			expected: []sigar.FileSystem{
+				{DirName: "/", DevName: "/dev/sda1"},
+			},
+		},
+		{
+			description: "Don't filter out NFS",
+			fss: []sigar.FileSystem{
+				{DirName: "/srv/data", DevName: "192.168.42.42:/exports/nfs1"},
+			},
+			expected: []sigar.FileSystem{
+				{DirName: "/srv/data", DevName: "192.168.42.42:/exports/nfs1"},
+			},
+		},
+	}
+
+	for _, c := range cases {
+		filtered := filterFileSystemList(c.fss)
+		assert.ElementsMatch(t, c.expected, filtered, c.description)
 	}
 }
 

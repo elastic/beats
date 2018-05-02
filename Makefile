@@ -110,13 +110,13 @@ docs:
 	@$(foreach var,$(PROJECTS),BUILD_DIR=${BUILD_DIR} $(MAKE) -C $(var) docs || exit 1;)
 	sh ./script/build_docs.sh dev-guide github.com/elastic/beats/docs/devguide ${BUILD_DIR}
 
-.PHONY: package
-package: update beats-dashboards
-	@$(foreach var,$(BEATS),SNAPSHOT=$(SNAPSHOT) $(MAKE) -C $(var) package || exit 1;)
+.PHONY: package-all
+package-all: update beats-dashboards
+	@$(foreach var,$(BEATS),SNAPSHOT=$(SNAPSHOT) $(MAKE) -C $(var) package-all || exit 1;)
 
 	@echo "Start building the dashboards package"
 	@mkdir -p build/upload/
-	@BUILD_DIR=${BUILD_DIR} SNAPSHOT=$(SNAPSHOT) $(MAKE) -C dev-tools/packer package-dashboards ${BUILD_DIR}/upload/build_id.txt
+	@BUILD_DIR=${BUILD_DIR} UPLOAD_DIR=${BUILD_DIR}/upload SNAPSHOT=$(SNAPSHOT) $(MAKE) -C dev-tools/packer package-dashboards ${BUILD_DIR}/upload/build_id.txt
 	@mv build/upload build/dashboards-upload
 
 	@# Copy build files over to top build directory
@@ -153,6 +153,8 @@ notice: python-env
 python-env:
 	@test -d $(PYTHON_ENV) || virtualenv $(VIRTUALENV_PARAMS) $(PYTHON_ENV)
 	@$(PYTHON_ENV)/bin/pip install -q --upgrade pip autopep8 six
+	@# Work around pip bug. See: https://github.com/pypa/pip/issues/4464
+	@find $(PYTHON_ENV) -type d -name dist-packages -exec sh -c "echo dist-packages > {}.pth" ';'
 
 # Tests if apm works with the current code
 .PHONY: test-apm

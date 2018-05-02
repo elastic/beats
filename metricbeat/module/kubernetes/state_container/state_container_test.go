@@ -44,7 +44,7 @@ func TestEventMapping(t *testing.T) {
 	events, err := f.Fetch()
 	assert.NoError(t, err)
 
-	assert.Equal(t, 12, len(events), "Wrong number of returned events")
+	assert.Equal(t, 11, len(events), "Wrong number of returned events")
 
 	testCases := testCases()
 	for _, event := range events {
@@ -99,7 +99,8 @@ func testCases() map[string]map[string]interface{} {
 
 			"memory.limit.bytes":    178257920,
 			"memory.request.bytes":  73400320,
-			"cpu.request.nanocores": float64(1e+08),
+			"cpu.request.cores":     0.1,
+			"cpu.request.nanocores": 1e+08,
 		},
 		"test@kube-dns-v20-5g5cb-test@kubedns": {
 			"_namespace":        "container",
@@ -110,13 +111,14 @@ func testCases() map[string]map[string]interface{} {
 			"id":                "docker://fa3d83f648de42492b38fa3e8501d109376f391c50f2bd210c895c8477ae4b62-test",
 
 			"image":           "gcr.io/google_containers/kubedns-amd64:1.9-test",
-			"status.phase":    "terminate",
+			"status.phase":    "terminated",
 			"status.ready":    false,
 			"status.restarts": 3,
 
 			"memory.limit.bytes":    278257920,
 			"memory.request.bytes":  83400320,
-			"cpu.request.nanocores": float64(2e+08),
+			"cpu.request.cores":     0.2,
+			"cpu.request.nanocores": 2e+08,
 		},
 		"kube-system@kube-dns-v20-5g5cb@healthz": {
 			"_namespace":        "container",
@@ -133,7 +135,8 @@ func testCases() map[string]map[string]interface{} {
 
 			"memory.limit.bytes":    52428800,
 			"memory.request.bytes":  52428800,
-			"cpu.request.nanocores": float64(1e+07),
+			"cpu.request.cores":     0.01,
+			"cpu.request.nanocores": 1e+07,
 		},
 	}
 }

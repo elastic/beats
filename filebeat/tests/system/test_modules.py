@@ -267,7 +267,8 @@ class Test(BaseTest):
         if modules_flag:
             cmd += ["--modules=nginx"]
 
-        output = open(os.path.join(self.working_dir, "output.log"), "ab")
+        output_path = os.path.join(self.working_dir, "output.log")
+        output = open(output_path, "ab")
         output.write(" ".join(cmd) + "\n")
         beat = subprocess.Popen(cmd,
                                 stdin=None,
@@ -282,5 +283,22 @@ class Test(BaseTest):
                         max_timeout=30)
         self.wait_until(lambda: "datafeed-filebeat-nginx-access-response_code" in
                         (df["datafeed_id"] for df in self.es.transport.perform_request("GET", "/_xpack/ml/datafeeds/")["datafeeds"]))
+
+        beat.kill()
+
+        # check if fails during trying to setting it up again
+        output = open(output_path, "ab")
+        output.write(" ".join(cmd) + "\n")
+        beat = subprocess.Popen(cmd,
+                                stdin=None,
+                                stdout=output,
+                                stderr=output,
+                                bufsize=0)
+
+        output = open(output_path, "r")
+        for obj in ["Datafeed", "Job", "Dashboard", "Search", "Visualization"]:
+            self.wait_log_contains("{obj} already exists".format(obj=obj),
+                                   logfile=output_path,
+                                   max_timeout=30)
 
         beat.kill()

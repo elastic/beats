@@ -2,6 +2,20 @@
 All notable changes to this project will be documented in this file.
 This project adheres to [Semantic Versioning](http://semver.org/).
 
+## [0.2.0]
+
+### Changed
+
+- auparse - Fixed parsing of apparmor AVC messages. #25
+- auparse - Update syscall and audit message type tables for Linux 4.16.
+- aucoalesce - Cache UID/GID values for one minute. #24
+
+## [0.1.1]
+
+- rules - Detect s390 or s390x as the runtime architecture (GOOS) and
+  automatically use the appropriate syscall name to number table without
+  requiring the rule to explicitly specify an arch (`-F arch=s390x`). #23
+
 ## [0.1.0]
 
 ### Changed

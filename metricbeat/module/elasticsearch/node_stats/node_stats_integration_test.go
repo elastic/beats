@@ -15,21 +15,19 @@ import (
 func TestFetch(t *testing.T) {
 	compose.EnsureUp(t, "elasticsearch")
 
-	f := mbtest.NewEventsFetcher(t, elasticsearch.GetConfig("node_stats"))
-	event, err := f.Fetch()
-	if !assert.NoError(t, err) {
-		t.FailNow()
-	}
+	f := mbtest.NewReportingMetricSetV2(t, elasticsearch.GetConfig("node_stats"))
+	events, errs := mbtest.ReportingFetchV2(f)
 
-	assert.NotNil(t, event)
-	t.Logf("%s/%s event: %+v", f.Module().Name(), f.Name(), event)
+	assert.NotNil(t, events)
+	assert.Nil(t, errs)
+	t.Logf("%s/%s event: %+v", f.Module().Name(), f.Name(), events[0])
 }
 
 func TestData(t *testing.T) {
 	compose.EnsureUp(t, "elasticsearch")
 
-	f := mbtest.NewEventsFetcher(t, elasticsearch.GetConfig("node_stats"))
-	err := mbtest.WriteEvents(f, t)
+	f := mbtest.NewReportingMetricSetV2(t, elasticsearch.GetConfig("node_stats"))
+	err := mbtest.WriteEventsReporterV2(f, t)
 	if err != nil {
 		t.Fatal("write", err)
 	}

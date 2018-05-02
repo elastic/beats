@@ -10,7 +10,7 @@ services:
       context: ./docker/elasticsearch
       dockerfile: Dockerfile
       args:
-        XPACK: 0
+        IMAGE_FLAVOR: oss
     environment:
       - "ES_JAVA_OPTS=-Xms512m -Xmx512m"
       - "network.host="
@@ -24,6 +24,8 @@ services:
     build:
       context: ./docker/logstash
       dockerfile: Dockerfile
+      args:
+        IMAGE_FLAVOR: oss
     environment:
       - ES_HOST=elasticsearch
 
@@ -35,4 +37,4 @@ services:
       context: ./docker/kibana
       dockerfile: Dockerfile
       args:
-        XPACK: 0
+        IMAGE_FLAVOR: oss

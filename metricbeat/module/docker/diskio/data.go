@@ -21,6 +21,21 @@ func eventMapping(stats *BlkioStats) common.MapStr {
 		"reads":  stats.reads,
 		"writes": stats.writes,
 		"total":  stats.totals,
+		"read": common.MapStr{
+			"ops":   stats.serviced.reads,
+			"bytes": stats.servicedBytes.reads,
+			"rate":  stats.reads,
+		},
+		"write": common.MapStr{
+			"ops":   stats.serviced.writes,
+			"bytes": stats.servicedBytes.writes,
+			"rate":  stats.writes,
+		},
+		"summary": common.MapStr{
+			"ops":   stats.serviced.totals,
+			"bytes": stats.servicedBytes.totals,
+			"rate":  stats.totals,
+		},
 	}
 
 	return event

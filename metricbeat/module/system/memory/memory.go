@@ -12,9 +12,10 @@ import (
 )
 
 func init() {
-	if err := mb.Registry.AddMetricSet("system", "memory", New, parse.EmptyHostParser); err != nil {
-		panic(err)
-	}
+	mb.Registry.MustAddMetricSet("system", "memory", New,
+		mb.WithHostParser(parse.EmptyHostParser),
+		mb.DefaultMetricSet(),
+	)
 }
 
 // MetricSet for fetching system memory metrics.

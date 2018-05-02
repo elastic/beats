@@ -44,7 +44,7 @@ def document_field(output, field, path):
     if "path" not in field:
         field["path"] = path
 
-    output.write("[float]\n=== `{}`\n\n".format(field["path"]))
+    output.write("*`{}`*::\n+\n--\n".format(field["path"]))
 
     if "type" in field:
         output.write("type: {}\n\n".format(field["type"]))
@@ -69,6 +69,7 @@ def document_field(output, field, path):
     if "multi_fields" in field:
         for subfield in field["multi_fields"]:
             document_field(output, subfield, path + "." + subfield["name"])
+    output.write("--\n\n")
 
 
 def fields_to_asciidoc(input, output, beat):

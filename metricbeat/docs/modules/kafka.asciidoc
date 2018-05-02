@@ -9,6 +9,7 @@ beta[]
 
 This is the Kafka module.
 
+The default metricsets are `consumergroup` and `partition`.
 
 
 [float]
@@ -21,9 +22,10 @@ in <<configuration-metricbeat>>. Here is an example configuration:
 ----
 metricbeat.modules:
 - module: kafka
-  metricsets: ["partition"]
+  metricsets: ["consumergroup", "partition"]
   period: 10s
   hosts: ["localhost:9092"]
+  enabled: true
 
   #client_id: metricbeat
   #retries: 3

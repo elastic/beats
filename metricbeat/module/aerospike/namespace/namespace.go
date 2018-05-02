@@ -27,6 +27,7 @@ func init() {
 // multiple fetch calls.
 type MetricSet struct {
 	mb.BaseMetricSet
+	host   *as.Host
 	client *as.Client
 }
 
@@ -47,14 +48,9 @@ func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
 		return nil, errors.Wrap(err, "Invalid host format, expected hostname:port")
 	}
 
-	client, err := as.NewClientWithPolicyAndHost(as.NewClientPolicy(), host)
-	if err != nil {
-		return nil, err
-	}
-
 	return &MetricSet{
 		BaseMetricSet: base,
-		client:        client,
+		host:          host,
 	}, nil
 }
 
@@ -63,6 +59,10 @@ func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
 // descriptive error must be returned.
 func (m *MetricSet) Fetch() ([]common.MapStr, error) {
 	var events []common.MapStr
+
+	if err := m.connect(); err != nil {
+		return nil, err
+	}
 
 	for _, node := range m.client.GetNodes() {
 		info, err := as.RequestNodeInfo(node, "namespaces")
@@ -90,4 +90,16 @@ func (m *MetricSet) Fetch() ([]common.MapStr, error) {
 	}
 
 	return events, nil
+}
+
+// create an aerospike client if it doesn't exist yet
+func (m *MetricSet) connect() error {
+	if m.client == nil {
+		client, err := as.NewClientWithPolicyAndHost(as.NewClientPolicy(), m.host)
+		if err != nil {
+			return err
+		}
+		m.client = client
+	}
+	return nil
 }

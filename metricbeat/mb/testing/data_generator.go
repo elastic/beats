@@ -39,6 +39,13 @@ func WriteEvent(f mb.EventFetcher, t testing.TB) error {
 // WriteEvents fetches events and writes the first event to a ./_meta/data.json
 // file.
 func WriteEvents(f mb.EventsFetcher, t testing.TB) error {
+	return WriteEventsCond(f, t, nil)
+
+}
+
+// WriteEventsCond fetches events and writes the first event that matches the condition
+// to a ./_meta/data.json file.
+func WriteEventsCond(f mb.EventsFetcher, t testing.TB, cond func(e common.MapStr) bool) error {
 	if !*dataFlag {
 		t.Skip("skip data generation tests")
 	}
@@ -52,8 +59,45 @@ func WriteEvents(f mb.EventsFetcher, t testing.TB) error {
 		return fmt.Errorf("no events were generated")
 	}
 
-	fullEvent := CreateFullEvent(f, events[0])
+	var event *common.MapStr
+	if cond == nil {
+		event = &events[0]
+	} else {
+		for _, e := range events {
+			if cond(e) {
+				event = &e
+				break
+			}
+		}
+		if event == nil {
+			return fmt.Errorf("no events satisfied the condition")
+		}
+	}
+
+	fullEvent := CreateFullEvent(f, *event)
 	WriteEventToDataJSON(t, fullEvent)
+	return nil
+}
+
+// WriteEventsReporterV2 fetches events and writes the first event to a ./_meta/data.json
+// file.
+func WriteEventsReporterV2(f mb.ReportingMetricSetV2, t testing.TB) error {
+	if !*dataFlag {
+		t.Skip("skip data generation tests")
+	}
+
+	events, errs := ReportingFetchV2(f)
+	if len(errs) > 0 {
+		return errs[0]
+	}
+
+	if len(events) == 0 {
+		return fmt.Errorf("no events were generated")
+	}
+
+	e := StandardizeEvent(f, events[0], mb.AddMetricSetInfo)
+
+	WriteEventToDataJSON(t, e)
 	return nil
 }
 
@@ -78,9 +122,11 @@ func StandardizeEvent(ms mb.MetricSet, e mb.Event, modifiers ...mb.EventModifier
 	}
 
 	e.Timestamp = startTime
-	e.Namespace = ms.Registration().Namespace
 	e.Took = 115 * time.Microsecond
 	e.Host = ms.Host()
+	if e.Namespace == "" {
+		e.Namespace = ms.Registration().Namespace
+	}
 
 	fullEvent := e.BeatEvent(ms.Module().Name(), ms.Name(), modifiers...)
 

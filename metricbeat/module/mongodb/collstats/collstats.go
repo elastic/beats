@@ -14,9 +14,10 @@ import (
 var debugf = logp.MakeDebug("mongodb.collstats")
 
 func init() {
-	if err := mb.Registry.AddMetricSet("mongodb", "collstats", New, mongodb.ParseURL); err != nil {
-		panic(err)
-	}
+	mb.Registry.MustAddMetricSet("mongodb", "collstats", New,
+		mb.WithHostParser(mongodb.ParseURL),
+		mb.DefaultMetricSet(),
+	)
 }
 
 // MetricSet type defines all fields of the MetricSet

@@ -1,0 +1,13 @@
+dashboards:
+- id: 9151c900-471d-11e8-bc13-1397384faad3
+  file: Metricbeat-haproxy-backend.json
+- id: d5878d00-47c5-11e8-bc13-1397384faad3
+  file: Metricbeat-haproxy-frontend.json
+- id: 0836a4b0-47bd-11e8-bc13-1397384faad3
+  file: Metricbeat-haproxy-http-backend.json
+- id: e9057ae0-47c5-11e8-bc13-1397384faad3
+  file: Metricbeat-haproxy-http-frontend.json
+- id: 8cc50a50-47e0-11e8-bc13-1397384faad3
+  file: Metricbeat-haproxy-http-server.json
+- id: 4b555c30-47dd-11e8-bc13-1397384faad3
+  file: Metricbeat-haproxy-overview.json

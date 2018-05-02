@@ -8,4 +8,5 @@ See https://www.elastic.co/community/security for more information.
 For confirmed bugs, please report:
 - Version: 
 - Operating System: 
+- Discuss Forum URL:
 - Steps to Reproduce: 

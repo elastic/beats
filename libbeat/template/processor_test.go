@@ -257,6 +257,38 @@ func TestDynamicTemplate(t *testing.T) {
 				},
 			},
 		},
+		{
+			field: common.Field{
+				Type: "object", ObjectType: "scaled_float",
+				Name: "core.*.pct",
+			},
+			expected: common.MapStr{
+				"core.*.pct": common.MapStr{
+					"mapping": common.MapStr{
+						"type":           "scaled_float",
+						"scaling_factor": defaultScalingFactor,
+					},
+					"match_mapping_type": "*",
+					"path_match":         "core.*.pct",
+				},
+			},
+		},
+		{
+			field: common.Field{
+				Type: "object", ObjectType: "scaled_float",
+				Name: "core.*.pct", ScalingFactor: 100, ObjectTypeMappingType: "float",
+			},
+			expected: common.MapStr{
+				"core.*.pct": common.MapStr{
+					"mapping": common.MapStr{
+						"type":           "scaled_float",
+						"scaling_factor": 100,
+					},
+					"match_mapping_type": "float",
+					"path_match":         "core.*.pct",
+				},
+			},
+		},
 	}
 
 	for _, test := range tests {
@@ -298,7 +330,7 @@ func TestPropertiesCombine(t *testing.T) {
 	}
 
 	p := Processor{EsVersion: *version}
-	err = p.process(fields, "", output)
+	err = p.Process(fields, "", output)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -346,7 +378,7 @@ func TestProcessNoName(t *testing.T) {
 	}
 
 	p := Processor{EsVersion: *version}
-	err = p.process(fields, "", output)
+	err = p.Process(fields, "", output)
 	if err != nil {
 		t.Fatal(err)
 	}

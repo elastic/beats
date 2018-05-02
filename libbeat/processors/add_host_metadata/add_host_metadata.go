@@ -6,7 +6,7 @@ import (
 	"github.com/elastic/beats/libbeat/beat"
 	"github.com/elastic/beats/libbeat/common"
 	"github.com/elastic/beats/libbeat/processors"
-	sysinfo "github.com/elastic/go-sysinfo"
+	"github.com/elastic/go-sysinfo"
 	"github.com/elastic/go-sysinfo/types"
 )
 
@@ -48,7 +48,7 @@ func (p *addHostMetadata) loadData() {
 	if p.lastUpdate.Add(cacheExpiration).Before(time.Now()) {
 		p.data = common.MapStr{
 			"host": common.MapStr{
-				"hostname":     p.info.Hostname,
+				"name":         p.info.Hostname,
 				"architecture": p.info.Architecture,
 				"os": common.MapStr{
 					"platform": p.info.OS.Platform,

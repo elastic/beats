@@ -9,6 +9,8 @@ beta[]
 
 The Kibana module only tracks the high-level metrics. To monitor more Kibana metrics, use our {monitoringdoc}/xpack-monitoring.html[X-Pack monitoring] which is available under a free basic license.
 
+The default metricset is `status`.
+
 
 [float]
 === Example configuration
@@ -23,6 +25,7 @@ metricbeat.modules:
   metricsets: ["status"]
   period: 10s
   hosts: ["localhost:5601"]
+  enabled: default
 ----
 
 This module supports TLS connection when using `ssl` config field, as described in <<configuration-ssl>>.

@@ -23,9 +23,9 @@ BEATS_YML_NAME="{{.beat_name}}-linux-{{.arch}}"
 # create deb
 FPM_ARGS=(
         --force -s dir -t deb
-        -n {{.beat_pkg_name}} -v ${VERSION}
+        -n {{.beat_pkg_name}}{{.beat_pkg_suffix}} -v ${VERSION}
         --vendor "{{.beat_vendor}}"
-        --license "{{.beat_license}}"
+        --license $(echo {{.beat_license}} | tr " " "-")
         --architecture {{.deb_arch}}
         --description "{{.beat_description}}"
         --url {{.beat_url}}
@@ -49,11 +49,10 @@ fi
 fpm "${FPM_ARGS[@]}"
 
 # move and rename to use the elastic conventions
-mkdir -p upload
-mv {{.beat_pkg_name}}_${VERSION}_{{.deb_arch}}.deb upload/{{.beat_name}}-${VERSION}-{{.deb_arch}}.deb
-echo "Created upload/{{.beat_name}}-${VERSION}-{{.deb_arch}}.deb"
+mv {{.beat_pkg_name}}{{.beat_pkg_suffix}}_${VERSION}_{{.deb_arch}}.deb /upload/{{.beat_name}}{{.beat_pkg_suffix}}-${VERSION}-{{.deb_arch}}.deb
+echo "Created /upload/{{.beat_name}}{{.beat_pkg_suffix}}-${VERSION}-{{.deb_arch}}.deb"
 
 # create sha512 file
-cd upload
-sha512sum {{.beat_name}}-${VERSION}-{{.deb_arch}}.deb > {{.beat_name}}-${VERSION}-{{.deb_arch}}.deb.sha512
-echo "Created upload/{{.beat_name}}-${VERSION}-{{.deb_arch}}.deb.sha512"
+cd /upload
+sha512sum {{.beat_name}}{{.beat_pkg_suffix}}-${VERSION}-{{.deb_arch}}.deb > {{.beat_name}}{{.beat_pkg_suffix}}-${VERSION}-{{.deb_arch}}.deb.sha512
+echo "Created /upload/{{.beat_name}}{{.beat_pkg_suffix}}-${VERSION}-{{.deb_arch}}.deb.sha512"

@@ -195,8 +195,9 @@ class Test(metricbeat.BaseTest):
 
         for evt in output:
             self.assert_fields_are_documented(evt)
-            diskio = evt["system"]["diskio"]
-            self.assertItemsEqual(self.de_dot(SYSTEM_DISKIO_FIELDS), diskio.keys())
+            if 'error' not in evt:
+                diskio = evt["system"]["diskio"]
+                self.assertItemsEqual(self.de_dot(SYSTEM_DISKIO_FIELDS), diskio.keys())
 
     @unittest.skipUnless(re.match("(?i)linux", sys.platform), "os")
     def test_diskio_linux(self):

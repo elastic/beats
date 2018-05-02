@@ -2,7 +2,7 @@
   type: group
   description: >
     The golang program heap information exposed by expvar.
-  release: experimental
+  release: beta
   fields:
     - name: cmdline
       type: keyword
