@@ -661,9 +661,12 @@ packetbeat.protocols:
 #processors:
 #- add_docker_metadata: ~
 #
+# The following example enriches each event with host metadata.
+#
 #processors:
 #- add_host_metadata:
 #   netinfo.enabled: false
+#
 
 #============================= Elastic Cloud ==================================
 
