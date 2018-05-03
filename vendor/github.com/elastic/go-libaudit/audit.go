@@ -105,7 +105,12 @@ func newAuditClient(netlinkGroups uint32, resp io.Writer) (*AuditClient, error) 
 
 	netlink, err := NewNetlinkClient(syscall.NETLINK_AUDIT, netlinkGroups, buf, resp)
 	if err != nil {
-		return nil, err
+		switch err {
+		case syscall.EINVAL, syscall.EPROTONOSUPPORT, syscall.EAFNOSUPPORT:
+			return nil, errors.Wrap(err, "audit not supported by kernel")
+		default:
+			return nil, errors.Wrap(err, "failed to open audit netlink socket")
+		}
 	}
 
 	return &AuditClient{Netlink: netlink}, nil
