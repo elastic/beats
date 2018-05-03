@@ -32,11 +32,6 @@ https://github.com/elastic/beats/compare/v6.2.4...6.2[Check the HEAD diff]
 
 *Affecting all Beats*
 
-- Fix panic when Events containing a float32 value are normalized. {pull}6129[6129]
-- Fix `setup.dashboards.always_kibana` when using Kibana 5.6. {issue}6090[6090]
-- Fix for kafka logger. {pull}6430[6430]
-- Remove double slashes in Windows service script. {pull}6491[6491]
-- Ensure Kubernetes labels/annotations don't break mapping {pull}6490[6490]
 - Ensure that the dashboard zip files can't contain files outside of the kibana directory. {pull}6921[6921]
 
 *Auditbeat*
