@@ -142,6 +142,7 @@ https://github.com/elastic/beats/compare/v6.0.0-beta2...master[Check the HEAD di
 - Release config reloading feature as GA. {pull}6891[6891]
 - Add support human friendly size for the UDP input. {pull}6886[6886]
 - Add Syslog input to ingest RFC3164 Events via TCP and UDP {pull}6842[6842]
+- Support MySQL 5.7.19 by mysql/slowlog {pull}6969[6969]
 
 *Heartbeat*
 
