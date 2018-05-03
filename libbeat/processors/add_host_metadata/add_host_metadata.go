@@ -89,7 +89,7 @@ func (p *addHostMetadata) loadData() {
 			// IP-address and MAC-address
 			var ipList, hwList, err = p.getNetInfo()
 			if err != nil {
-				logp.Warn("Error when getting network information %v", err)
+				logp.Info("Error when getting network information %v", err)
 			}
 
 			if len(ipList) > 0 {
@@ -128,7 +128,7 @@ func (p addHostMetadata) getNetInfo() ([]string, []string, error) {
 		addrs, err := i.Addrs()
 		if err != nil {
 			// If we get an error, log it and continue with the next interface
-			logp.Warn("Error when getting IP address %v", err)
+			logp.Info("Error when getting IP address %v", err)
 			continue
 		}
 
