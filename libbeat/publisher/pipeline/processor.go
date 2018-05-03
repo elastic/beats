@@ -53,8 +53,7 @@ func newProcessorPipeline(
 		localProcessors = makeClientProcessors(config)
 	)
 
-	// needsCopy := global.alwaysCopy || localProcessors != nil || global.processors != nil
-	needsCopy := true
+	needsCopy := global.alwaysCopy || localProcessors != nil || global.processors != nil
 
 	if !config.SkipNormalization {
 		// setup 1: generalize/normalize output (P)
