@@ -55,6 +55,7 @@ https://github.com/elastic/beats/compare/v6.0.0-beta2...master[Check the HEAD di
 - Remove double slashes in Windows service script. {pull}6491[6491]
 - Ensure Kubernetes labels/annotations don't break mapping {pull}6490[6490]
 - Ensure that the dashboard zip files can't contain files outside of the kibana directory. {pull}6921[6921]
+- Fix map overwrite panics by cloning shared structs before doing the update. {pull}6947[6947]
 
 *Auditbeat*
 
