@@ -32,6 +32,8 @@ https://github.com/elastic/beats/compare/v6.2.4...6.2[Check the HEAD diff]
 
 *Affecting all Beats*
 
+- Ensure that the dashboard zip files can't contain files outside of the kibana directory. {pull}6921[6921]
+
 *Auditbeat*
 
 *Filebeat*

@@ -119,6 +119,16 @@ func (imp Importer) unzip(archive, target string) error {
 	unzipFile := func(file *zip.File) error {
 		filePath := filepath.Join(target, file.Name)
 
+		// check that the resulting file path is indeed under target
+		// Note that Rel calls Clean.
+		relPath, err := filepath.Rel(target, filePath)
+		if err != nil {
+			return err
+		}
+		if strings.HasPrefix(filepath.ToSlash(relPath), "../") {
+			return fmt.Errorf("Zip file contains files outside of the target directory: %s", relPath)
+		}
+
 		if file.FileInfo().IsDir() {
 			return os.MkdirAll(filePath, file.Mode())
 		}
