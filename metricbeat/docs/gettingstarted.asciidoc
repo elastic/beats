@@ -130,8 +130,7 @@ https://www.elastic.co/downloads/beats/metricbeat[downloads page].
 . Rename the `metricbeat-<version>-windows` directory to `Metricbeat`.
 
 . Open a PowerShell prompt as an Administrator (right-click the PowerShell icon
-and select *Run As Administrator*). If you are running Windows XP, you may need
-to download and install PowerShell.
+and select *Run As Administrator*).
 
 . From the PowerShell prompt, run the following commands to install Metricbeat
 as a Windows service:
