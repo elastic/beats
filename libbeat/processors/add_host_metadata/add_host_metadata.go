@@ -111,7 +111,7 @@ func (p addHostMetadata) getNetInfo() ([]string, []string, error) {
 	// Get all interfaces and loop through them
 	ifaces, err := net.Interfaces()
 	if err != nil {
-		return ipList, hwList, err
+		return nil, nil, err
 	}
 	for _, i := range ifaces {
 		// Skip loopback interfaces
