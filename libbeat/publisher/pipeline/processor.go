@@ -79,11 +79,19 @@ func newProcessorPipeline(
 	}
 
 	if len(fields) > 0 {
-		processors.add(makeAddFieldsProcessor("fields", fields, needsCopy))
+		// Enforce a copy of fields if dynamic fields are configured or beats
+		// metadata will be merged into the fields.
+		// With dynamic fields potentially changing at any time, we need to copy,
+		// so we do not change shared structures be accident.
+		fieldsNeedsCopy := needsCopy || config.DynamicFields != nil || fields["beat"] != nil
+		processors.add(makeAddFieldsProcessor("fields", fields, fieldsNeedsCopy))
 	}
 
 	if config.DynamicFields != nil {
-		processors.add(makeAddDynMetaProcessor("dynamicFields", config.DynamicFields, needsCopy))
+		checkCopy := func(m common.MapStr) bool {
+			return needsCopy || hasKey(m, "beat")
+		}
+		processors.add(makeAddDynMetaProcessor("dynamicFields", config.DynamicFields, checkCopy))
 	}
 
 	// setup 5: client processor list
@@ -248,13 +256,19 @@ func makeAddFieldsProcessor(name string, fields common.MapStr, copy bool) *proce
 	return newAnnotateProcessor(name, fn)
 }
 
-func makeAddDynMetaProcessor(name string, meta *common.MapStrPointer, copy bool) *processorFn {
-	fn := func(event *beat.Event) { event.Fields.DeepUpdate(meta.Get()) }
-	if copy {
-		fn = func(event *beat.Event) { event.Fields.DeepUpdate(meta.Get().Clone()) }
-	}
+func makeAddDynMetaProcessor(
+	name string,
+	meta *common.MapStrPointer,
+	checkCopy func(m common.MapStr) bool,
+) *processorFn {
+	return newAnnotateProcessor(name, func(event *beat.Event) {
+		dynFields := meta.Get()
+		if checkCopy(dynFields) {
+			dynFields = dynFields.Clone()
+		}
 
-	return newAnnotateProcessor(name, fn)
+		event.Fields.DeepUpdate(dynFields)
+	})
 }
 
 func debugPrintProcessor(info beat.Info) *processorFn {
@@ -287,4 +301,9 @@ func makeClientProcessors(config beat.ClientConfig) processors.Processor {
 		title: "client",
 		list:  procs.All(),
 	}
+}
+
+func hasKey(m common.MapStr, key string) bool {
+	_, exists := m[key]
+	return exists
 }
