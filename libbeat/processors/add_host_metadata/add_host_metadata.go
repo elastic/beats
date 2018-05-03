@@ -5,6 +5,7 @@ import (
 	"net"
 	"time"
 
+	"github.com/joeshaw/multierror"
 	"github.com/pkg/errors"
 
 	"github.com/elastic/beats/libbeat/beat"
@@ -113,6 +114,10 @@ func (p addHostMetadata) getNetInfo() ([]string, []string, error) {
 	if err != nil {
 		return nil, nil, err
 	}
+
+	// Keep track of all errors
+	var errs multierror.Errors
+
 	for _, i := range ifaces {
 		// Skip loopback interfaces
 		if i.Flags&net.FlagLoopback == net.FlagLoopback {
@@ -127,8 +132,8 @@ func (p addHostMetadata) getNetInfo() ([]string, []string, error) {
 
 		addrs, err := i.Addrs()
 		if err != nil {
-			// If we get an error, log it and continue with the next interface
-			logp.Info("Error when getting IP address %v", err)
+			// If we get an error, keep track of it and continue with the next interface
+			errs = append(errs, err)
 			continue
 		}
 
@@ -142,7 +147,7 @@ func (p addHostMetadata) getNetInfo() ([]string, []string, error) {
 		}
 	}
 
-	return ipList, hwList, nil
+	return ipList, hwList, errs.Err()
 }
 
 func (p addHostMetadata) String() string {
