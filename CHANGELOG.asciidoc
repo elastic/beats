@@ -123,6 +123,8 @@ https://github.com/elastic/beats/compare/v6.0.0-beta2...master[Check the HEAD di
 
 - Added caching of UID and GID values to auditd module. {pull}6978[6978]
 - Updated syscall tables for Linux 4.16. {pull}6978[6978]
+- Added better error messages for when the auditd module fails due to the
+  Linux kernel not supporting auditing (CONFIG_AUDIT=n). {pull}7012[7012]
 
 *Filebeat*
 

@@ -369,44 +369,44 @@
 			"revisionTime": "2016-08-05T00:47:13Z"
 		},
 		{
-			"checksumSHA1": "+WyRdvGE4raLmW42Pmw3yDmktO8=",
+			"checksumSHA1": "hAB/G2FIWYwg3Rujgpt6UPtHMis=",
 			"path": "github.com/elastic/go-libaudit",
-			"revision": "7839a62a31ca608f5275da89bc75189b6845a52b",
-			"revisionTime": "2018-04-30T14:05:21Z",
-			"version": "v0.2.0",
-			"versionExact": "v0.2.0"
+			"revision": "55225d06b15c74082f9a7af75aa4284dbe48d20a",
+			"revisionTime": "2018-05-03T13:36:58Z",
+			"version": "v0.2.1",
+			"versionExact": "v0.2.1"
 		},
 		{
 			"checksumSHA1": "3V0tnqlCgmCXnbocuTqUKluynm8=",
 			"path": "github.com/elastic/go-libaudit/aucoalesce",
-			"revision": "7839a62a31ca608f5275da89bc75189b6845a52b",
-			"revisionTime": "2018-04-30T14:05:21Z",
-			"version": "v0.2.0",
-			"versionExact": "v0.2.0"
+			"revision": "55225d06b15c74082f9a7af75aa4284dbe48d20a",
+			"revisionTime": "2018-05-03T13:36:58Z",
+			"version": "v0.2.1",
+			"versionExact": "v0.2.1"
 		},
 		{
 			"checksumSHA1": "6OK3lLgocjmIUyLo8xNhYGpwE1E=",
 			"path": "github.com/elastic/go-libaudit/auparse",
-			"revision": "7839a62a31ca608f5275da89bc75189b6845a52b",
-			"revisionTime": "2018-04-30T14:05:21Z",
-			"version": "v0.2.0",
-			"versionExact": "v0.2.0"
+			"revision": "55225d06b15c74082f9a7af75aa4284dbe48d20a",
+			"revisionTime": "2018-05-03T13:36:58Z",
+			"version": "v0.2.1",
+			"versionExact": "v0.2.1"
 		},
 		{
 			"checksumSHA1": "Rr15sVPpJRQ+ggimmx3/0s1gUJc=",
 			"path": "github.com/elastic/go-libaudit/rule",
-			"revision": "7839a62a31ca608f5275da89bc75189b6845a52b",
-			"revisionTime": "2018-04-30T14:05:21Z",
-			"version": "v0.2.0",
-			"versionExact": "v0.2.0"
+			"revision": "55225d06b15c74082f9a7af75aa4284dbe48d20a",
+			"revisionTime": "2018-05-03T13:36:58Z",
+			"version": "v0.2.1",
+			"versionExact": "v0.2.1"
 		},
 		{
 			"checksumSHA1": "5C083BvwcAVSKquRXbxXa950/wE=",
 			"path": "github.com/elastic/go-libaudit/rule/flags",
-			"revision": "7839a62a31ca608f5275da89bc75189b6845a52b",
-			"revisionTime": "2018-04-30T14:05:21Z",
-			"version": "v0.2.0",
-			"versionExact": "v0.2.0"
+			"revision": "55225d06b15c74082f9a7af75aa4284dbe48d20a",
+			"revisionTime": "2018-05-03T13:36:58Z",
+			"version": "v0.2.1",
+			"versionExact": "v0.2.1"
 		},
 		{
 			"checksumSHA1": "3jizmlZPCyo6FAZY8Trk9jA8NH4=",
