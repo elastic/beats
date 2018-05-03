@@ -732,6 +732,7 @@ beta[]
 processors:
 - add_host_metadata:
     netinfo.enabled: false
+-------------------------------------------------------------------------------
 
 It has the following settings:
 
