@@ -39,7 +39,7 @@ var oldRegexp = regexp.MustCompile("minute")
 // EnsureUp starts all the requested services (must be defined in docker-compose.yml)
 // with a default timeout of 60 seconds
 func EnsureUp(t *testing.T, services ...string) {
-	EnsureUpWithTimeout(t, 60, services...)
+	EnsureUpWithTimeout(t, 300, services...)
 }
 
 // EnsureUpWithTimeout starts all the requested services (must be defined in docker-compose.yml)
