@@ -92,7 +92,8 @@ func TestMergeConfigFiles(t *testing.T) {
 	assert.Equal(t, 2, len(files))
 
 	config := &Config{}
-	mergeConfigFiles(files, config)
+	err = mergeConfigFiles(files, config)
+	assert.NoError(t, err)
 
 	assert.Equal(t, 4, len(config.Inputs))
 }
