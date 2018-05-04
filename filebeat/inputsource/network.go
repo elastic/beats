@@ -14,6 +14,15 @@ type Network interface {
 type NetworkMetadata struct {
 	RemoteAddr net.Addr
 	Truncated  bool
+	TLS        *TLSMetadata
+}
+
+// TLSMetadata defines information about the current SSL connection.
+type TLSMetadata struct {
+	TLSVersion       string
+	CipherSuite      string
+	ServerName       string
+	PeerCertificates []string
 }
 
 // NetworkFunc defines callback executed when a new event is received from a network source.
