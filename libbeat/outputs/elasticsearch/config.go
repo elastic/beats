@@ -3,24 +3,24 @@ package elasticsearch
 import (
 	"time"
 
-	"github.com/elastic/beats/libbeat/outputs"
+	"github.com/elastic/beats/libbeat/common/transport/tlscommon"
 )
 
 type elasticsearchConfig struct {
-	Protocol         string             `config:"protocol"`
-	Path             string             `config:"path"`
-	Params           map[string]string  `config:"parameters"`
-	Headers          map[string]string  `config:"headers"`
-	Username         string             `config:"username"`
-	Password         string             `config:"password"`
-	ProxyURL         string             `config:"proxy_url"`
-	LoadBalance      bool               `config:"loadbalance"`
-	CompressionLevel int                `config:"compression_level" validate:"min=0, max=9"`
-	TLS              *outputs.TLSConfig `config:"ssl"`
-	BulkMaxSize      int                `config:"bulk_max_size"`
-	MaxRetries       int                `config:"max_retries"`
-	Timeout          time.Duration      `config:"timeout"`
-	Backoff          Backoff            `config:"backoff"`
+	Protocol         string            `config:"protocol"`
+	Path             string            `config:"path"`
+	Params           map[string]string `config:"parameters"`
+	Headers          map[string]string `config:"headers"`
+	Username         string            `config:"username"`
+	Password         string            `config:"password"`
+	ProxyURL         string            `config:"proxy_url"`
+	LoadBalance      bool              `config:"loadbalance"`
+	CompressionLevel int               `config:"compression_level" validate:"min=0, max=9"`
+	TLS              *tlscommon.Config `config:"ssl"`
+	BulkMaxSize      int               `config:"bulk_max_size"`
+	MaxRetries       int               `config:"max_retries"`
+	Timeout          time.Duration     `config:"timeout"`
+	Backoff          Backoff           `config:"backoff"`
 }
 
 type Backoff struct {

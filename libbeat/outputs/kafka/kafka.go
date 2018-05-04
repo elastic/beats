@@ -12,6 +12,7 @@ import (
 
 	"github.com/elastic/beats/libbeat/beat"
 	"github.com/elastic/beats/libbeat/common"
+	"github.com/elastic/beats/libbeat/common/transport/tlscommon"
 	"github.com/elastic/beats/libbeat/logp"
 	"github.com/elastic/beats/libbeat/monitoring"
 	"github.com/elastic/beats/libbeat/monitoring/adapter"
@@ -176,7 +177,7 @@ func newKafkaConfig(config *kafkaConfig) (*sarama.Config, error) {
 	k.Net.KeepAlive = config.KeepAlive
 	k.Producer.Timeout = config.BrokerTimeout
 
-	tls, err := outputs.LoadTLSConfig(config.TLS)
+	tls, err := tlscommon.LoadTLSConfig(config.TLS)
 	if err != nil {
 		return nil, err
 	}

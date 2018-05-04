@@ -10,7 +10,7 @@ import (
 	"net/http"
 	"time"
 
-	"github.com/elastic/beats/libbeat/outputs"
+	"github.com/elastic/beats/libbeat/common/transport/tlscommon"
 	"github.com/elastic/beats/libbeat/outputs/transport"
 	"github.com/elastic/beats/metricbeat/mb"
 )
@@ -27,9 +27,9 @@ type HTTP struct {
 // NewHTTP creates new http helper
 func NewHTTP(base mb.BaseMetricSet) (*HTTP, error) {
 	config := struct {
-		TLS     *outputs.TLSConfig `config:"ssl"`
-		Timeout time.Duration      `config:"timeout"`
-		Headers map[string]string  `config:"headers"`
+		TLS     *tlscommon.Config `config:"ssl"`
+		Timeout time.Duration     `config:"timeout"`
+		Headers map[string]string `config:"headers"`
 	}{}
 	if err := base.Module().UnpackConfig(&config); err != nil {
 		return nil, err
@@ -39,7 +39,7 @@ func NewHTTP(base mb.BaseMetricSet) (*HTTP, error) {
 		config.Headers = map[string]string{}
 	}
 
-	tlsConfig, err := outputs.LoadTLSConfig(config.TLS)
+	tlsConfig, err := tlscommon.LoadTLSConfig(config.TLS)
 	if err != nil {
 		return nil, err
 	}
