@@ -19,5 +19,9 @@ The list below covers the major changes between 6.3.0 and master only.
 
 ==== Breaking changes
 
+*Affecting all Beats*
+
+- Moving of TLS helper functions and structs from `output/tls` to `tlscommon`. {pull}x[x]
+
 
 ==== Added
