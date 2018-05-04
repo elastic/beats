@@ -6,6 +6,7 @@ import (
 	"github.com/elastic/beats/filebeat/channel"
 	input "github.com/elastic/beats/filebeat/prospector"
 	"github.com/elastic/beats/filebeat/registrar"
+	"github.com/elastic/beats/libbeat/beat"
 	"github.com/elastic/beats/libbeat/cfgfile"
 	"github.com/elastic/beats/libbeat/common"
 	"github.com/elastic/beats/libbeat/logp"
@@ -45,7 +46,7 @@ func NewFactory(outlet channel.Factory, registrar *registrar.Registrar, beatVers
 }
 
 // Create creates a module based on a config
-func (f *Factory) Create(c *common.Config, meta *common.MapStrPointer) (cfgfile.Runner, error) {
+func (f *Factory) Create(p beat.Pipeline, c *common.Config, meta *common.MapStrPointer) (cfgfile.Runner, error) {
 	// Start a registry of one module:
 	m, err := NewModuleRegistry([]*common.Config{c}, f.beatVersion, false)
 	if err != nil {
@@ -66,8 +67,9 @@ func (f *Factory) Create(c *common.Config, meta *common.MapStrPointer) (cfgfile.
 	}
 
 	inputs := make([]*input.Runner, len(pConfigs))
+	connector := channel.ConnectTo(p, f.outlet)
 	for i, pConfig := range pConfigs {
-		inputs[i], err = input.New(pConfig, f.outlet, f.beatDone, f.registrar.GetStates(), meta)
+		inputs[i], err = input.New(pConfig, connector, f.beatDone, f.registrar.GetStates(), meta)
 		if err != nil {
 			logp.Err("Error creating input: %s", err)
 			return nil, err

@@ -36,7 +36,7 @@ type Input struct {
 // NewInput creates a new TCP input
 func NewInput(
 	cfg *common.Config,
-	outlet channel.Factory,
+	outlet channel.Connector,
 	context input.Context,
 ) (input.Input, error) {
 	cfgwarn.Experimental("TCP input type is used")

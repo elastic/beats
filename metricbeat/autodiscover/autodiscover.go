@@ -3,6 +3,7 @@ package autodiscover
 import (
 	"errors"
 
+	"github.com/elastic/beats/libbeat/beat"
 	"github.com/elastic/beats/libbeat/cfgfile"
 	"github.com/elastic/beats/libbeat/common"
 	"github.com/elastic/beats/libbeat/common/bus"
@@ -36,8 +37,8 @@ func (m *AutodiscoverAdapter) CheckConfig(c *common.Config) error {
 }
 
 // Create a module or prospector from the given config
-func (m *AutodiscoverAdapter) Create(c *common.Config, meta *common.MapStrPointer) (cfgfile.Runner, error) {
-	return m.factory.Create(c, meta)
+func (m *AutodiscoverAdapter) Create(p beat.Pipeline, c *common.Config, meta *common.MapStrPointer) (cfgfile.Runner, error) {
+	return m.factory.Create(p, c, meta)
 }
 
 // EventFilter returns the bus filter to retrieve runner start/stop triggering events

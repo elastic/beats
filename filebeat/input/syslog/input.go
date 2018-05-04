@@ -88,7 +88,7 @@ type Input struct {
 // NewInput creates a new syslog input
 func NewInput(
 	cfg *common.Config,
-	outlet channel.Factory,
+	outlet channel.Connector,
 	context input.Context,
 ) (input.Input, error) {
 	cfgwarn.Experimental("Syslog input type is used")

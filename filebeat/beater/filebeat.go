@@ -312,7 +312,7 @@ func (fb *Filebeat) Run(b *beat.Beat) error {
 
 	outDone := make(chan struct{}) // outDone closes down all active pipeline connections
 	crawler, err := crawler.New(
-		channel.NewOutletFactory(outDone, b.Publisher, wgEvents).Create,
+		channel.NewOutletFactory(outDone, wgEvents).Create,
 		config.Inputs,
 		b.Info.Version,
 		fb.done,
@@ -358,7 +358,7 @@ func (fb *Filebeat) Run(b *beat.Beat) error {
 		logp.Debug("modules", "Existing Ingest pipelines will be updated")
 	}
 
-	err = crawler.Start(registrar, config.ConfigInput, config.ConfigModules, pipelineLoaderFactory, config.OverwritePipelines)
+	err = crawler.Start(b.Publisher, registrar, config.ConfigInput, config.ConfigModules, pipelineLoaderFactory, config.OverwritePipelines)
 	if err != nil {
 		crawler.Stop()
 		return err
@@ -377,7 +377,7 @@ func (fb *Filebeat) Run(b *beat.Beat) error {
 	var adiscover *autodiscover.Autodiscover
 	if fb.config.Autodiscover != nil {
 		adapter := fbautodiscover.NewAutodiscoverAdapter(crawler.InputsFactory, crawler.ModulesFactory)
-		adiscover, err = autodiscover.NewAutodiscover("filebeat", adapter, config.Autodiscover)
+		adiscover, err = autodiscover.NewAutodiscover("filebeat", b.Publisher, adapter, config.Autodiscover)
 		if err != nil {
 			return err
 		}
