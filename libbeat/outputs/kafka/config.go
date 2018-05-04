@@ -8,13 +8,13 @@ import (
 
 	"github.com/elastic/beats/libbeat/common"
 	"github.com/elastic/beats/libbeat/common/fmtstr"
-	"github.com/elastic/beats/libbeat/outputs"
+	"github.com/elastic/beats/libbeat/common/transport/tlscommon"
 	"github.com/elastic/beats/libbeat/outputs/codec"
 )
 
 type kafkaConfig struct {
 	Hosts           []string                  `config:"hosts"               validate:"required"`
-	TLS             *outputs.TLSConfig        `config:"ssl"`
+	TLS             *tlscommon.Config         `config:"ssl"`
 	Timeout         time.Duration             `config:"timeout"             validate:"min=1"`
 	Metadata        metaConfig                `config:"metadata"`
 	Key             *fmtstr.EventFormatString `config:"key"`

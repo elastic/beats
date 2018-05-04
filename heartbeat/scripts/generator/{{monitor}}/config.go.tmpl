@@ -3,9 +3,9 @@ package {{monitor}}
 import (
 	"time"
 
-	"github.com/elastic/beats/libbeat/outputs"
 	"github.com/elastic/beats/libbeat/outputs/transport"
 
+	"github.com/elastic/beats/libbeat/common/transport/tlscommon"
 	"github.com/elastic/beats/heartbeat/monitors"
 )
 
@@ -19,7 +19,7 @@ type config struct {
 	Mode   monitors.IPSettings   `config:",inline"`
 
 	// configure tls
-	TLS *outputs.TLSConfig `config:"ssl"`
+	TLS *tlscommon.Config `config:"ssl"`
 
 	// configure validation
 	Check   checkConfig   `config:"check"`
