@@ -106,9 +106,17 @@ func (mw *Wrapper) Start(done <-chan struct{}) <-chan beat.Event {
 	wg.Add(len(mw.metricSets))
 	for _, msw := range mw.metricSets {
 		go func(msw *metricSetWrapper) {
+			metricsPath := msw.ID()
+			registry := monitoring.GetNamespace("dataset").GetRegistry()
+
+			defer registry.Remove(metricsPath)
 			defer releaseStats(msw.stats)
 			defer wg.Done()
 			defer msw.close()
+
+			registry.Add(metricsPath, msw.Metrics(), monitoring.Full)
+			monitoring.NewString(msw.Metrics(), "starttime").Set(common.Time{}.String())
+
 			msw.run(done, out)
 		}(msw)
 	}

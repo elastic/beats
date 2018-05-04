@@ -9,6 +9,7 @@ import (
 	"time"
 
 	"github.com/elastic/beats/libbeat/common"
+	"github.com/elastic/beats/libbeat/monitoring"
 )
 
 const (
@@ -78,6 +79,7 @@ func (m *BaseModule) UnpackConfig(to interface{}) error {
 // addition to this interface, all MetricSets must implement either
 // EventFetcher or EventsFetcher (but not both).
 type MetricSet interface {
+	ID() string     // Unique ID identifying a running MetricSet.
 	Name() string   // Name returns the name of the MetricSet.
 	Module() Module // Module returns the parent Module for the MetricSet.
 	Host() string   // Host returns a hostname or other module specific value
@@ -85,6 +87,7 @@ type MetricSet interface {
 	// metrics.
 	HostData() HostData                  // HostData returns the parsed host data.
 	Registration() MetricSetRegistration // Params used in registration.
+	Metrics() *monitoring.Registry       // MetricSet specific metrics
 }
 
 // Closer is an optional interface that a MetricSet can implement in order to
@@ -213,11 +216,13 @@ func (h HostData) GoString() string { return h.String() }
 // MetricSet interface requirements, leaving only the Fetch() method to be
 // implemented to have a complete MetricSet implementation.
 type BaseMetricSet struct {
+	id           string
 	name         string
 	module       Module
 	host         string
 	hostData     HostData
 	registration MetricSetRegistration
+	metrics      *monitoring.Registry
 }
 
 func (b *BaseMetricSet) String() string {
@@ -230,6 +235,16 @@ func (b *BaseMetricSet) String() string {
 }
 
 func (b *BaseMetricSet) GoString() string { return b.String() }
+
+// ID returns the unique ID of the MetricSet.
+func (b *BaseMetricSet) ID() string {
+	return b.id
+}
+
+// Metrics returns the metrics registry.
+func (b *BaseMetricSet) Metrics() *monitoring.Registry {
+	return b.metrics
+}
 
 // Name returns the name of the MetricSet. It should not include the name of
 // the module.

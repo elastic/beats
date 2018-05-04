@@ -6,8 +6,10 @@ import (
 
 	"github.com/joeshaw/multierror"
 	"github.com/pkg/errors"
+	"github.com/satori/go.uuid"
 
 	"github.com/elastic/beats/libbeat/common"
+	"github.com/elastic/beats/libbeat/monitoring"
 )
 
 var (
@@ -156,10 +158,21 @@ func newBaseMetricSets(r *Register, m Module) ([]BaseMetricSet, error) {
 	for _, name := range metricSetNames {
 		name = strings.ToLower(name)
 		for _, host := range hosts {
+			id := uuid.NewV4().String()
+			metrics := monitoring.NewRegistry()
+			monitoring.NewString(metrics, "module").Set(m.Name())
+			monitoring.NewString(metrics, "metricset").Set(name)
+			if host != "" {
+				monitoring.NewString(metrics, "host").Set(host)
+			}
+			monitoring.NewString(metrics, "id").Set(id)
+
 			metricsets = append(metricsets, BaseMetricSet{
-				name:   name,
-				module: m,
-				host:   host,
+				id:      id,
+				name:    name,
+				module:  m,
+				host:    host,
+				metrics: metrics,
 			})
 		}
 	}

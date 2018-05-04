@@ -16,6 +16,10 @@ const (
 // Default is the global default metrics registry provided by the monitoring package.
 var Default = NewRegistry()
 
+func init() {
+	GetNamespace("stats").SetRegistry(Default)
+}
+
 var errNotFound = errors.New("Name unknown")
 var errInvalidName = errors.New("Name does not point to a valid variable")
 
