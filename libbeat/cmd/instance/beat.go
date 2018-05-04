@@ -143,6 +143,15 @@ func Run(name, idxPrefix, version string, bt beat.Creator) error {
 		if err != nil {
 			return err
 		}
+
+		registry := monitoring.NewRegistry()
+		monitoring.GetNamespace("state").SetRegistry(registry)
+		monitoring.NewString(registry, "version").Set(b.Info.Version)
+		monitoring.NewString(registry, "beat").Set(b.Info.Beat)
+		monitoring.NewString(registry, "name").Set(b.Info.Name)
+		monitoring.NewString(registry, "uuid").Set(b.Info.UUID.String())
+		monitoring.NewString(registry, "hostname").Set(b.Info.Hostname)
+
 		return b.launch(bt)
 	}())
 }
@@ -315,7 +324,7 @@ func (b *Beat) launch(bt beat.Creator) error {
 	logp.Info("%s start running.", b.Info.Beat)
 
 	if b.Config.HTTP.Enabled() {
-		api.Start(b.Config.HTTP, b.Info)
+		api.Start(b.Config.HTTP)
 	}
 
 	return beater.Run(&b.Beat)
