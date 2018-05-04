@@ -5770,6 +5770,26 @@ OS family (e.g. redhat, debian, freebsd, windows).
 
 --
 
+*`host.ip`*::
++
+--
+type: ip
+
+List of IP-addresses.
+
+
+--
+
+*`host.mac`*::
++
+--
+type: keyword
+
+List of hardware-addresses, usually MAC-addresses.
+
+
+--
+
 [[exported-fields-http]]
 == HTTP fields
 
