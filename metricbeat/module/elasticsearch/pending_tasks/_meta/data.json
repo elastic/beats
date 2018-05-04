@@ -1,21 +1,25 @@
 {
-    "@timestamp": "2018-04-02T13:53:10.360Z",
-    "beat": {
-        "name": "host.example.com",
-        "hostname": "host.example.com"
-    },
-    "elasticsearch": {
+  "@timestamp": "2018-05-03T20:58:17.379Z",
+  "metricset": {
+    "rtt": 2487,
+    "namespace": "elasticsearch.cluster.pending_tasks",
+    "name": "pending_tasks",
+    "module": "elasticsearch",
+    "host": "localhost:9200"
+  },
+  "elasticsearch": {
+    "cluster": {
       "pending_tasks": {
-        "pending_tasks_priority_urgent": 2,
-        "pending_tasks_priority_high": 1,
-        "max_time_in_queue_millis": 189,
-        "pending_tasks_total": 3
+        "time_in_queue": "34ms",
+        "insert_order": 47,
+        "priority": "HIGH",
+        "source": "put-mapping",
+        "time_in_queue_millis": 34
       }
-    },
-    "metricset": {
-      "rtt": 73,
-      "name": "pending_tasks",
-      "module": "elasticsearch",
-      "host": "elasticsearch:9200"
     }
+  },
+  "beat": {
+    "name": "host.example.com",
+    "hostname": "host.example.com"
   }
+}

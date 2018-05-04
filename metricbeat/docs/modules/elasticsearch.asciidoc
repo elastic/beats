@@ -9,6 +9,8 @@ beta[]
 
 The Elasticsearch module contains a minimal set of metrics to enable monitoring of Elasticsearch across multiple versions. To monitor more Elasticsearch metrics, use our {monitoringdoc}/xpack-monitoring.html[X-Pack monitoring] which is available under a free basic license.
 
+The default metricsets are `node` and `node_stats`.
+
 
 [float]
 === Example configuration
@@ -41,6 +43,10 @@ The following metricsets are available:
 
 * <<metricbeat-metricset-elasticsearch-node_stats,node_stats>>
 
+* <<metricbeat-metricset-elasticsearch-pending_tasks,pending_tasks>>
+
+* <<metricbeat-metricset-elasticsearch-pending_tasks_summary,pending_tasks_summary>>
+
 include::elasticsearch/index.asciidoc[]
 
 include::elasticsearch/node.asciidoc[]
@@ -48,4 +54,6 @@ include::elasticsearch/node.asciidoc[]
 include::elasticsearch/node_stats.asciidoc[]
 
 include::elasticsearch/pending_tasks.asciidoc[]
+
+include::elasticsearch/pending_tasks_summary.asciidoc[]
 

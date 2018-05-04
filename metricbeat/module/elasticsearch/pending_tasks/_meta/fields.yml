@@ -1,25 +1,25 @@
-- name: pending_tasks
+- name: cluster.pending_tasks
   type: group
   description: >
-    pending_tasks
+    `cluster.pending_tasks` contains pending tasks description.
   fields:
-    - name: max_time_in_queue_millis
+    - name: time_in_queue
+      type: keyword
+      description: >
+        Time in queue with unit (ms)
+    - name: insert_order
       type: long
       description: >
-        Max time in queue (ms)
-    - name: pending_tasks_priority_high
+        Insert order
+    - name: priority
       type: long
       description: >
-        Number of pending tasks in priority high
-    - name: pending_tasks_priority_urgent
-      type: long
-      description: >
-        Number of pending tasks in priority urgent
-    - name: pending_tasks_total
-      type: long
-      description: >
-        Number of pendings tasks (total)
+        Priority
     - name: source
-      type: array
+      type: keyword
       description: >
-        List of the pending tasks   
+        Source. For example: put-mapping
+    - name: time_in_queue_millis
+      type: long
+      description: >
+        Time in queue

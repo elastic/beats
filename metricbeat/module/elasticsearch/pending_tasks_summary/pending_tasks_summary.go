@@ -1,4 +1,4 @@
-package pending_tasks
+package pending_tasks_summary
 
 import (
 	"errors"
@@ -15,7 +15,7 @@ import (
 // init registers the MetricSet with the central registry.
 // The New method will be called after the setup of the module and before starting to fetch data
 func init() {
-	mb.Registry.AddMetricSet("elasticsearch", "pending_tasks", New, hostParser)
+	mb.Registry.AddMetricSet("elasticsearch", "pending_tasks_summary", New, hostParser)
 }
 
 var (
@@ -52,7 +52,7 @@ func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
 }
 
 // Fetch methods implements the data gathering and data conversion to the right format
-func (m *MetricSet) Fetch() ([]common.MapStr, error) {
+func (m *MetricSet) Fetch() (common.MapStr, error) {
 	isMaster, err := elasticsearch.IsMaster(m.http, m.HostData().SanitizedURI)
 	if err != nil {
 		return nil, err
@@ -60,7 +60,7 @@ func (m *MetricSet) Fetch() ([]common.MapStr, error) {
 
 	// Not master, no event sent
 	if !isMaster {
-		logp.Debug("elasticsearch", "Trying to fetch pending tasks from a none master node.")
+		logp.Debug("elasticsearch", "Trying to fetch pending tasks summary from a none master node.")
 		return nil, errors.New("None master node")
 	}
 
@@ -69,11 +69,9 @@ func (m *MetricSet) Fetch() ([]common.MapStr, error) {
 		return nil, err
 	}
 
-	events, _ := eventsMapping(content)
+	event, _ := eventMapping(content)
 
-	for _, event := range events {
-		event.Put(mb.NamespaceKey, "cluster.pending_tasks")
-	}
+	event[mb.NamespaceKey] = "cluster.pending_tasks_summary"
 
-	return events, nil
+	return event, nil
 }
