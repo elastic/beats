@@ -8,7 +8,6 @@ import time
 class Test(metricbeat.BaseTest):
 
     COMPOSE_SERVICES = ['ceph']
-    COMPOSE_TIMEOUT = 300
     FIELDS = ["ceph"]
 
     @parameterized.expand([
