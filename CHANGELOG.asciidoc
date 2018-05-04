@@ -51,6 +51,8 @@ https://github.com/elastic/beats/compare/v6.2.4...6.2[Check the HEAD diff]
 
 *Affecting all Beats*
 
+- Fix map overwrite panics by cloning shared structs before doing the update. {pull}6947[6947]
+
 *Auditbeat*
 
 *Filebeat*
