@@ -727,6 +727,17 @@ forget metadata for a container, 60s by default.
 
 beta[]
 
+[source,yaml]
+-------------------------------------------------------------------------------
+processors:
+- add_host_metadata:
+    netinfo.enabled: false
+-------------------------------------------------------------------------------
+
+It has the following settings:
+
+`netinfo.enabled`:: (Optional) Default false. Include IP adresses and MAC addresses as fields host.ip and host.mac
+
 The `add_host_metadata` processor annotates each event with relevant metadata from the host machine.
 The fields added to the event are looking as following:
 
@@ -742,7 +753,9 @@ The fields added to the event are looking as following:
          "build":"16G1212",
          "platform":"darwin",
          "version":"10.12.6"
-      }
+      },
+      ip: ["192.168.0.1", "10.0.0.1"],
+      mac: ["00:25:96:12:34:56", "72:00:06:ff:79:f1"]
    }
 }
 -------------------------------------------------------------------------------

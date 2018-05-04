@@ -212,7 +212,13 @@ winlogbeat.event_logs:
 #
 #processors:
 #- add_docker_metadata: ~
-#- add_host_metadata: ~
+#
+# The following example enriches each event with host metadata.
+#
+#processors:
+#- add_host_metadata:
+#   netinfo.enabled: false
+#
 
 #============================= Elastic Cloud ==================================
 
