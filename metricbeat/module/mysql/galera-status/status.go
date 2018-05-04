@@ -11,6 +11,7 @@ import (
 	"database/sql"
 
 	"github.com/elastic/beats/libbeat/common"
+	"github.com/elastic/beats/libbeat/common/cfgwarn"
 	"github.com/elastic/beats/libbeat/logp"
 	"github.com/elastic/beats/metricbeat/mb"
 	"github.com/elastic/beats/metricbeat/module/mysql"
@@ -33,31 +34,14 @@ func init() {
 type MetricSet struct {
 	mb.BaseMetricSet
 	db *sql.DB
-	queryMode string
 }
 
 // New create a new instance of the MetricSet
 // Loads query_mode config setting from the config file
 func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
-	cfgwarn.Experimental("The mysql galera-status metricset is experimental") 
-	
-	config := struct {
-		QueryMode string `config:"galera.query_mode"`
-	}{
-		QueryMode: "small",
-	}
+	cfgwarn.Experimental("The mysql galera-status metricset is experimental")
 
-	err := base.Module().UnpackConfig(&config)
-	if err != nil {
-		return nil, err
-	}
-
-	logp.Debug("cfgfile", "Using %s metricset for fetching data.", config.QueryMode)
-
-	return &MetricSet{
-		BaseMetricSet:	base,
-		queryMode:		config.QueryMode,
-		}, nil
+	return &MetricSet{BaseMetricSet: base}, nil
 }
 
 // Fetch methods implements the data gathering and data conversion to the right format
@@ -76,17 +60,10 @@ func (m *MetricSet) Fetch() (common.MapStr, error) {
 		return nil, err
 	}
 
-	event, err := eventMapping(status, m.queryMode)
-	if err != nil {
-		return nil, err
-	}
+	event := eventMapping(status)
 
 	if m.Module().Config().Raw {
-		event["raw"], err = rawEventMapping(status, m.queryMode)
-
-		if err != nil {
-			return nil, err
-		}
+		event["raw"] = rawEventMapping(status)
 	}
 	return event, nil
 }

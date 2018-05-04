@@ -58,7 +58,7 @@ metricbeat.modules:
 - module: mysql
   metricsets:
     - "status"
-    - "galera-status"
+  #  - "galera-status"
   period: 10s
 
   # Host DSN should be defined as "user:pass@tcp(127.0.0.1:3306)/"
@@ -74,20 +74,7 @@ metricbeat.modules:
 
   # By setting raw to true, all raw fields from the status metricset will be added to the event.
   #raw: false
-
-
-  # galera options
-  # Specifies the status variables to query from the cluster
-  # Valid options are: "small", "full"
-  #
-  # While "full" queries nearly all available variables, small only catches a small subset of it, which is:
-  #  - wsrep_local_state_comment
-  #  - wsrep_evs_state
-  #  - wsrep_cluster_size
-  #  - wsrep_cluster_status
-  #  - wsrep_connected
-  #  - wsrep_ready
-  galera.query_mode: full----
+----
 
 [float]
 === Metricsets
