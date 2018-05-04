@@ -15,7 +15,7 @@ metricbeat.modules:
       attributes:
         - attr: Uptime
           field: uptime
-    - mbean: 'java.lang:type=GarbageCollector,name=ConcurrentMarkSweep'
+    - mbean: 'java.lang:name=ConcurrentMarkSweep,type=GarbageCollector'
       attributes:
         - attr: CollectionTime
           field: gc.cms_collection_time
