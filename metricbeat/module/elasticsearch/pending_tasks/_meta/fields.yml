@@ -1,0 +1,25 @@
+- name: cluster.pending_tasks
+  type: group
+  description: >
+    `cluster.pending_tasks` contains pending tasks description.
+  fields:
+    - name: time_in_queue
+      type: keyword
+      description: >
+        Time in queue with unit (ms)
+    - name: insert_order
+      type: long
+      description: >
+        Insert order
+    - name: priority
+      type: long
+      description: >
+        Priority
+    - name: source
+      type: keyword
+      description: >
+        Source. For example: put-mapping
+    - name: time_in_queue_millis
+      type: long
+      description: >
+        Time in queue

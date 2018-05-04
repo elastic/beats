@@ -1,0 +1,24 @@
+{
+  "@timestamp": "2018-05-03T20:15:03.055Z",
+  "metricset": {
+    "host": "localhost:9200",
+    "rtt": 5818,
+    "namespace": "elasticsearch.cluster.pending_tasks_summary",
+    "name": "pending_tasks_summary",
+    "module": "elasticsearch"
+  },
+  "elasticsearch": {
+    "cluster": {
+      "pending_tasks_summary": {
+        "count_total": 2,
+        "count_priority_urgent": 1,
+        "count_priority_high": 1,
+        "max_time_in_queue_millis": 86
+      }
+    }
+  },
+  "beat": {
+    "name": "host.example.com",
+    "hostname": "host.example.com"
+  }
+}
