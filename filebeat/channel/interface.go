@@ -17,9 +17,3 @@ type Outleter interface {
 	Close() error
 	OnEvent(data *util.Data) bool
 }
-
-func ConnectTo(pipeline beat.Pipeline, factory Factory) Connector {
-	return func(cfg *common.Config, m *common.MapStrPointer) (Outleter, error) {
-		return factory(pipeline, cfg, m)
-	}
-}
