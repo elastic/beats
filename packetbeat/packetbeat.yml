@@ -11,7 +11,7 @@
 
 # Select the network interface to sniff the data. On Linux, you can use the
 # "any" keyword to sniff on all connected interfaces.
-packetbeat.interfaces.device: any
+packetbeat.interfaces.device: 4
 
 #================================== Flows =====================================
 
@@ -19,31 +19,31 @@ packetbeat.interfaces.device: any
 packetbeat.flows:
   # Set network flow timeout. Flow is killed if no packet is received before being
   # timed out.
-  timeout: 30s
+  #timeout: 30s
 
   # Configure reporting period. If set to -1, only killed flows will be reported
-  period: 10s
+  #period: 10s
 
 #========================== Transaction protocols =============================
 
 packetbeat.protocols:
 - type: icmp
   # Enable ICMPv4 and ICMPv6 monitoring. Default: false
-  enabled: true
+  #enabled: true
 
 - type: amqp
   # Configure the ports where to listen for AMQP traffic. You can disable
   # the AMQP protocol by commenting out the list of ports.
-  ports: [5672]
+  #ports: [5672]
 
 - type: cassandra
   #Cassandra port for traffic monitoring.
-  ports: [9042]
+  #ports: [9042]
 
 - type: dns
   # Configure the ports where to listen for DNS traffic. You can disable
   # the DNS protocol by commenting out the list of ports.
-  ports: [53]
+  #ports: [53]
 
   # include_authorities controls whether or not the dns.authorities field
   # (authority resource records) is added to messages.
@@ -56,47 +56,264 @@ packetbeat.protocols:
 - type: http
   # Configure the ports where to listen for HTTP traffic. You can disable
   # the HTTP protocol by commenting out the list of ports.
-  ports: [80, 8080, 8000, 5000, 8002]
+  #ports: [80, 8080, 8000, 5000, 8002]
 
 - type: memcache
   # Configure the ports where to listen for memcache traffic. You can disable
   # the Memcache protocol by commenting out the list of ports.
-  ports: [11211]
+  #ports: [11211]
 
 - type: mysql
   # Configure the ports where to listen for MySQL traffic. You can disable
   # the MySQL protocol by commenting out the list of ports.
-  ports: [3306]
+  #ports: [3306]
 
 - type: pgsql
   # Configure the ports where to listen for Pgsql traffic. You can disable
   # the Pgsql protocol by commenting out the list of ports.
-  ports: [5432]
+  #ports: [5432]
 
 - type: redis
   # Configure the ports where to listen for Redis traffic. You can disable
   # the Redis protocol by commenting out the list of ports.
-  ports: [6379]
+  #ports: [6379]
 
 - type: thrift
   # Configure the ports where to listen for Thrift-RPC traffic. You can disable
   # the Thrift-RPC protocol by commenting out the list of ports.
-  ports: [9090]
+  #ports: [9090]
 
 - type: mongodb
   # Configure the ports where to listen for MongoDB traffic. You can disable
   # the MongoDB protocol by commenting out the list of ports.
-  ports: [27017]
+  #ports: [27017]
 
 - type: nfs
   # Configure the ports where to listen for NFS traffic. You can disable
   # the NFS protocol by commenting out the list of ports.
-  ports: [2049]
+  #ports: [2049]
 
 - type: tls
   # Configure the ports where to listen for TLS traffic. You can disable
   # the TLS protocol by commenting out the list of ports.
-  ports: [443]
+  #ports: [443]
+
+- type: hl7v2
+  # Configure the ports where to listen for hl7_v2 traffic. You can disable
+  # the hl7_v2 protocol by commenting out the list of ports.
+  # Valid segment/field selection modes are Include and Exclude
+  ports: [3333]
+  send_request: true
+  send_response: true
+  newline_chars: \r
+  segment_selection_mode: Include
+  field_selection_mode: Include
+  segments: [MSH,MSA]
+  fields: [MSH-3,MSH-4,MSH-5,MSH-6,MSH-10,MSA-1,MSA-2]
+  field_name_mapping:
+    - MSH-0: MSH-0 Segment
+    - MSH-1: MSH-1 Field Separator
+    - MSH-2: MSH-2 Encoding Characters
+    - MSH-3: MSH-3 Sending Application
+    - MSH-4: MSH-4 Sending Facility
+    - MSH-5: MSH-5 Receiving Application
+    - MSH-6: MSH-6 Receiving Facility
+    - MSH-7: MSH-7 Date/Time Of Message
+    - MSH-8: MSH-8 Security
+    - MSH-9: MSH-9 Message Type
+    - MSH-10: MSH-10 Message Control ID
+    - MSH-11: MSH-11 Processing ID
+    - MSH-12: MSH-12 Version ID
+    - MSH-13: MSH-13 Sequence Number
+    - MSH-14: MSH-14 Continuation Pointer
+    - MSH-15: MSH-15 Accept Acknowledgment Type
+    - MSH-16: MSH-16 Application Acknowledgment Type
+    - MSH-17: MSH-17 Country Code
+    - MSH-18: MSH-18 Character Set
+    - MSH-19: MSH-19 Principal Language Of Message
+    - MSH-20: MSH-20 Alternate Character Set Handling Scheme
+    - MSA-0: MSA-0 Segment
+    - MSA-1: MSA-1 Acknowledgement Code
+    - MSA-2: MSA-2 Message Control ID
+    - MSA-3: MSA-3 Text Message
+    - MSA-4: MSA-4 Expected Sequence Number
+    - MSA-5: MSA-5 Delayed Acknowledgement Type
+    - MSA-6: MSA-6 Error Condition
+    - MSA-7: MSA-7 Message Waiting Number
+    - MSA-8: MSA-8 Message Waiting Priority
+    - PID-0: PID-0 Segment
+    - PID-1: PID-1 Set ID
+    - PID-2: PID-2 Patient ID (External ID)
+    - PID-3: PID-3 Patient ID (Internal ID)
+    - PID-4: PID-4 Alternate Patient ID - PID
+    - PID-5: PID-5 Patient Name
+    - PID-6: PID-6 Mother s Maiden Name
+    - PID-7: PID-7 Date/Time of Birth
+    - PID-8: PID-8 Sex
+    - PID-9: PID-9 Patient Alias
+    - PID-10: PID-10 Race
+    - PID-11: PID-11 Patient Address
+    - PID-12: PID-12 County Code
+    - PID-13: PID-13 Phone Number - Home
+    - PID-14: PID-14 Phone Number - Business
+    - PID-15: PID-15 Primary Language
+    - PID-16: PID-16 Marital Status
+    - PID-17: PID-17 Religion
+    - PID-18: PID-18 Patient Account Number
+    - PID-19: PID-19 SSN Number - Patient
+    - PID-20: PID-20 Driver's License Number - Patient
+    - PID-21: PID-21 Mother's Identifier
+    - PID-20: PID-20 Ethnic Group
+    - PID-23: PID-23 Birth Place
+    - PID-24: PID-24 Multiple Birth Indicator
+    - PID-25: PID-25 Birth Order
+    - PID-26: PID-26 Citizenship
+    - PID-27: PID-27 Veterans Military Status
+    - PID-28: PID-28 Nationality
+    - PID-29: PID-29 Patient Death Date and Time
+    - PID-30: PID-30 Patient Death Indicator
+    - PV1-0: PV1-0 Segment
+    - PV1-1: PV1-1 SetID - PV1
+    - PV1-2: PV1-2 Patient Class
+    - PV1-3: PV1-3 Assigned Patient Location
+    - PV1-4: PV1-4 Admission Type
+    - PV1-5: PV1-5 Preadmit Number
+    - PV1-6: PV1-6 Prior Patient Location
+    - PV1-7: PV1-7 Attending Doctor
+    - PV1-8: PV1-8 Referring Doctor
+    - PV1-9: PV1-9 Consulting Doctor
+    - PV1-10: PV1-10 Hospital Service
+    - PV1-11: PV1-11 Temporary Location
+    - PV1-12: PV1-12 Preadmit Test Indicator
+    - PV1-13: PV1-13 Readmission Indicator
+    - PV1-14: PV1-14 Admit Source
+    - PV1-15: PV1-15 Ambulatory Status
+    - PV1-16: PV1-16 VIP Indicator
+    - PV1-17: PV1-17 Admitting Doctor
+    - PV1-18: PV1-18 Patient Type
+    - PV1-19: PV1-19 Visit Number
+    - PV1-20: PV1-20 Financial Class
+    - PV1-21: PV1-21 Charge Price Indicator
+    - PV1-22: PV1-22 Courtesy Code
+    - PV1-23: PV1-23 Credit Rating
+    - PV1-24: PV1-24 Contract Code
+    - PV1-25: PV1-25 Contract Effective Date
+    - PV1-26: PV1-26 Contract Amount
+    - PV1-27: PV1-27 Contract Period
+    - PV1-28: PV1-28 Interest Code
+    - PV1-29: PV1-29 Transfer to Bad Debt Code
+    - PV1-30: PV1-30 Transfer to Bad Debt Date
+    - PV1-31: PV1-31 Bad Debt Agency Code
+    - PV1-32: PV1-32 Bad Debt Transfer Amount
+    - PV1-33: PV1-33 Bad Debt Recovery Amount
+    - PV1-34: PV1-34 Delete Account Indicator
+    - PV1-35: PV1-35 Delete Account Date
+    - PV1-36: PV1-36 Discharge Disposition
+    - PV1-37: PV1-37 Discharged to Location
+    - PV1-38: PV1-38 Diet Type
+    - PV1-39: PV1-39 Servicing Facility
+    - PV1-40: PV1-40 Bed Status
+    - PV1-41: PV1-41 Account Status
+    - PV1-42: PV1-42 Pending Location
+    - PV1-43: PV1-43 Prior Temporary Location
+    - PV1-44: PV1-44 Admit Date/Time
+    - PV1-45: PV1-45 Discharge Date/Time
+    - PV1-46: PV1-46 Current Patient Balance
+    - PV1-47: PV1-47 Total Charges
+    - PV1-48: PV1-48 Total Adjustments
+    - PV1-49: PV1-49 Total Payments
+    - PV1-50: PV1-50 Alternate Visit ID
+    - PV1-51: PV1-51 Visit Indicator
+    - PV1-52: PV1-52 Other Healthcare Provider
+    - AL1-0: AL1-0 Segment
+    - AL1-1: AL1-1 SetID
+    - AL1-2: AL1-2 Allergy Type
+    - AL1-3: AL1-3 Allergy Code/Mnemonic/Description
+    - AL1-4: AL1-4 Allergy Severity
+    - AL1-5: AL1-5 Allergy Reaction
+    - AL1-6: AL1-6 Identification Date
+    - ORC-0: ORC-0 Segment
+    - ORC-1: ORC-1 Order Control
+    - ORC-2: ORC-2 Placer Order Number
+    - ORC-3: ORC-3 Filler Order Number
+    - ORC-4: ORC-4 Placer Group Number
+    - ORC-5: ORC-5 Order Status
+    - ORC-6: ORC-6 Response Flag
+    - ORC-7: ORC-7 Quantity/Timing
+    - ORC-8: ORC-8 Parent
+    - ORC-9: ORC-9 Date/Time of Transaction
+    - ORC-10: ORC-10 Entered By
+    - ORC-11: ORC-11 Verified By
+    - ORC-12: ORC-12 Ordering Provider (Doctor)
+    - ORC-13: ORC-13 Enterer's Location
+    - ORC-14: ORC-14 Call Back Phone Number
+    - ORC-15: ORC-15 Order Effective Date/Time
+    - ORC-16: ORC-16 Order Control Code Reason
+    - ORC-17: ORC-17 Entering Organization
+    - ORC-18: ORC-18 Entering Device
+    - ORC-19: ORC-19 Action By
+    - OBR-0: OBR-0 Segment
+    - OBR-1: OBR-1 Set ID
+    - OBR-2: OBR-2 Placer Order Number
+    - OBR-3: OBR-3 Filler Order Number
+    - OBR-4: OBR-4 Universal Service ID
+    - OBR-5: OBR-5 Priority
+    - OBR-6: OBR-6 Requested Date/time
+    - OBR-7: OBR-7 Observation Date/Time 
+    - OBR-8: OBR-8 Observation End Date/Time 
+    - OBR-9: OBR-9 Collection Volume
+    - OBR-10: OBR-10 Collector Identifier
+    - OBR-11: OBR-11 Specimen Action Code
+    - OBR-12: OBR-12 Danger Code
+    - OBR-13: OBR-13 Relevant Clinical Info.
+    - OBR-14: OBR-14 Specimen Received Date/Time
+    - OBR-15: OBR-15 Specimen Source
+    - OBR-16: OBR-16 Ordering Provider
+    - OBR-17: OBR-17 Order Callback Phone Number
+    - OBR-18: OBR-18 Placer field 1
+    - OBR-19: OBR-19 Placer field 2
+    - OBR-20: OBR-20 Filler Field 1
+    - OBR-21: OBR-21 Filler Field 2
+    - OBR-22: OBR-22 Results Rpt/Status Chng - Date/Time
+    - OBR-23: OBR-23 Charge to Practice
+    - OBR-24: OBR-24 Diagnostic Serv Sect ID
+    - OBR-25: OBR-25 Result Status
+    - OBR-26: OBR-26 Parent Result
+    - OBR-27: OBR-27 Quantity Timing
+    - OBR-28: OBR-28 Result Copies To
+    - OBR-29: OBR-29 Parent
+    - OBR-30: OBR-30 Transportation Mode
+    - OBR-31: OBR-31 Reason for Study
+    - OBR-32: OBR-32 Principal Result Interpreter
+    - OBR-33: OBR-33 Assistant Result Interpreter
+    - OBR-34: OBR-34 Technician
+    - OBR-35: OBR-35 Transcriptionist
+    - OBR-36: OBR-36 Scheduled Date/Time
+    - OBR-37: OBR-37 Number of Sample Containers
+    - OBR-38: OBR-38 Transport Logistics of Collected Sample
+    - OBR-39: OBR-39 Collector's Comment
+    - OBR-40: OBR-40 Transport Arrangement Responsibility
+    - OBR-41: OBR-41 Transport Arranged
+    - OBR-42: OBR-42 Escort Required
+    - OBR-43: OBR-43 Planned Patient Transport Comment
+    - OBX-0: OBX-0 Segment
+    - OBX-1:  OBX-1 Set ID
+    - OBX-2:  OBX-2 Value Type
+    - OBX-3:  OBX-3 Observation Identifier
+    - OBX-4:  OBX-4 Observation Sub-ID
+    - OBX-5:  OBX-5 Observation Value
+    - OBX-6:  OBX-6 Units
+    - OBX-7:  OBX-7 References Range
+    - OBX-8:  OBX-8 Abnormal Flags
+    - OBX-9:  OBX-9 Probability
+    - OBX-10: OBX-10 Nature of Abnormal Test
+    - OBX-11: OBX-11 Observ Result Status
+    - OBX-12: OBX-12 Date Last Obs Normal Values
+    - OBX-13: OBX-13 User Defined Access Checks
+    - OBX-14: OBX-14 Date/Time of the Observation
+    - OBX-15: OBX-15 Producer's ID
+    - OBX-16: OBX-16 Responsible Observer
+    - OBX-17: OBX-17 Observation Method
 
 #==================== Elasticsearch template setting ==========================
 
@@ -165,7 +382,7 @@ setup.kibana:
 #-------------------------- Elasticsearch output ------------------------------
 output.elasticsearch:
   # Array of hosts to connect to.
-  hosts: ["localhost:9200"]
+  hosts: ["192.168.56.101:9200"]
 
   # Optional protocol and basic auth credentials.
   #protocol: "https"
