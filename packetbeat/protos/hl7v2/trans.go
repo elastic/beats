@@ -1,11 +1,11 @@
 package hl7v2
 
 import (
-	"time"
 	"github.com/elastic/beats/libbeat/common"
 	"github.com/elastic/beats/libbeat/logp"
 	"github.com/elastic/beats/packetbeat/procs"
 	"github.com/elastic/beats/packetbeat/protos/applayer"
+	"time"
 )
 
 type transactions struct {
@@ -200,5 +200,3 @@ func (ml *messageList) first() *message {
 func (ml *messageList) last() *message {
 	return ml.tail
 }
-
-

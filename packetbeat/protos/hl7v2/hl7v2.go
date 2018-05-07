@@ -1,12 +1,12 @@
 package hl7v2
 
 import (
-	"time"
-	"strings"
 	"github.com/elastic/beats/libbeat/common"
 	"github.com/elastic/beats/libbeat/logp"
 	"github.com/elastic/beats/packetbeat/protos"
 	"github.com/elastic/beats/packetbeat/protos/tcp"
+	"strings"
+	"time"
 )
 
 // hl7v2Plugin application level protocol analyzer plugin
@@ -84,7 +84,7 @@ func (hp *hl7v2Plugin) setFromConfig(config *hl7v2Config) error {
 	if len(parser.NewLineChars) == 0 {
 		parser.NewLineChars = "\r"
 	}
-	
+
 	// set transaction correlator configuration
 	trans := &hp.transConfig
 	trans.transactionTimeout = config.TransactionTimeout
@@ -99,7 +99,7 @@ func (hp *hl7v2Plugin) setFromConfig(config *hl7v2Config) error {
 	}
 	pub.SegmentSelectionMode = config.SegmentSelectionMode
 	pub.FieldSelectionMode = config.FieldSelectionMode
-	
+
 	segmentsmap := make(map[string]bool)
 	if len(config.Segments) > 0 {
 		for _, segment := range config.Segments {
@@ -114,6 +114,13 @@ func (hp *hl7v2Plugin) setFromConfig(config *hl7v2Config) error {
 		}
 		pub.fieldsmap = fieldsmap
 	}
+	componentsmap := make(map[string]bool)
+	if len(config.Components) > 0 {
+		for _, component := range config.Components {
+			componentsmap[component] = true
+		}
+		pub.componentsmap = componentsmap
+	}
 
 	fieldmappingmap := make(map[string]string)
 	if len(config.FieldMappingMap) > 0 {
@@ -124,7 +131,7 @@ func (hp *hl7v2Plugin) setFromConfig(config *hl7v2Config) error {
 		}
 		pub.fieldmappingmap = fieldmappingmap
 	}
-	
+
 	return nil
 }
 

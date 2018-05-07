@@ -2,23 +2,23 @@ package hl7v2
 
 import (
 	"errors"
-	"time"
-	"strings"
 	"github.com/elastic/beats/libbeat/common"
 	"github.com/elastic/beats/libbeat/common/streambuf"
 	"github.com/elastic/beats/packetbeat/protos/applayer"
+	"strings"
+	"time"
 )
 
 type parser struct {
-	buf				streambuf.Buffer
-	config			*parserConfig
-	message			*message
+	buf       streambuf.Buffer
+	config    *parserConfig
+	message   *message
 	onMessage func(m *message) error
 }
 
 type parserConfig struct {
-	maxBytes		int
-	NewLineChars	string
+	maxBytes     int
+	NewLineChars string
 }
 
 type message struct {
@@ -30,10 +30,9 @@ type message struct {
 
 	// list element use by 'transactions' for correlation
 	next *message
-	
+
 	failed  bool
 	content common.NetString
-	
 }
 
 // Error code if stream exceeds max allowed size on append.
@@ -108,8 +107,8 @@ func (p *parser) parse() (*message, error) {
 
 	// wait for message being complete
 	// HL7 messages end with <fs><cr> (0x1c0x0d)
-	
-	buf, err := p.buf.CollectUntil([]byte{0x1c,0x0d})
+
+	buf, err := p.buf.CollectUntil([]byte{0x1c, 0x0d})
 	if err == streambuf.ErrNoMoreBytes {
 		return nil, nil
 	}
@@ -118,24 +117,24 @@ func (p *parser) parse() (*message, error) {
 	msg.Size = uint64(p.buf.BufferConsumed())
 
 	isRequest := true
-	
+
 	dir := applayer.NetOriginalDirection
 	if len(buf) > 0 {
-	
+
 		// First char in an HL7 should be <vt> (0x0b)
 		if buf[0] == '\v' {
 			buf = buf[1:]
 		}
-		
+
 		// Remove the ending <fs><cr> (0x1c0x0d)
 		buf = buf[:len(buf)-2]
 
 		// Split into segments
 		segments := strings.Split(string(buf[:]), p.config.NewLineChars)
-		
+
 		// Split MSH segment into fields
 		msh := strings.Split(segments[0], string(segments[0][3]))
-					
+
 		// If the 8th value in MSH segment contains ACK then it's a response
 		isRequest = !(strings.Contains(msh[8], "ACK"))
 		if !isRequest {

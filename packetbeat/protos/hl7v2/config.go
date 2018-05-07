@@ -6,13 +6,15 @@ import (
 )
 
 type hl7v2Config struct {
-	config.ProtocolCommon						`config:",inline"`
-	NewLineChars			string				`config:"newline_chars"`
-	SegmentSelectionMode	string				`config:"segment_selection_mode"`
-	Segments				[]string			`config:"segments"`
-	FieldSelectionMode		string				`config:"field_selection_mode"`
-	Fields					[]string			`config:"fields"`
-	FieldMappingMap			[]map[string]string	`config:"field_name_mapping"`
+	config.ProtocolCommon  `config:",inline"`
+	NewLineChars           string              `config:"newline_chars"`
+	SegmentSelectionMode   string              `config:"segment_selection_mode"`
+	Segments               []string            `config:"segments"`
+	FieldSelectionMode     string              `config:"field_selection_mode"`
+	Fields                 []string            `config:"fields"`
+	FieldMappingMap        []map[string]string `config:"field_name_mapping"`
+	ComponentSelectionMode string              `config:"component_selection_mode"`
+	Components             []string            `config:"components"`
 }
 
 var (
