@@ -5,6 +5,7 @@ import (
 	"testing"
 	"time"
 
+	"github.com/elastic/beats/libbeat/beat"
 	"github.com/elastic/beats/libbeat/cfgfile"
 	"github.com/elastic/beats/libbeat/common"
 	"github.com/elastic/beats/libbeat/common/bus"
@@ -56,7 +57,7 @@ func (m *mockAdapter) CheckConfig(*common.Config) error {
 	return nil
 }
 
-func (m *mockAdapter) Create(config *common.Config, meta *common.MapStrPointer) (cfgfile.Runner, error) {
+func (m *mockAdapter) Create(_ beat.Pipeline, config *common.Config, meta *common.MapStrPointer) (cfgfile.Runner, error) {
 	runner := &mockRunner{
 		config: config,
 		meta:   meta,
@@ -127,7 +128,7 @@ func TestAutodiscover(t *testing.T) {
 	}
 
 	// Create autodiscover manager
-	autodiscover, err := NewAutodiscover("test", &adapter, &config)
+	autodiscover, err := NewAutodiscover("test", nil, &adapter, &config)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -233,7 +234,7 @@ func TestAutodiscoverHash(t *testing.T) {
 	}
 
 	// Create autodiscover manager
-	autodiscover, err := NewAutodiscover("test", &adapter, &config)
+	autodiscover, err := NewAutodiscover("test", nil, &adapter, &config)
 	if err != nil {
 		t.Fatal(err)
 	}

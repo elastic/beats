@@ -16,7 +16,8 @@ type Context struct {
 	DynamicFields *common.MapStrPointer
 }
 
-type Factory = func(config *common.Config, outletFactory channel.Factory, context Context) (Input, error)
+// Factory is used to register functions creating new Input instances.
+type Factory = func(config *common.Config, connector channel.Connector, context Context) (Input, error)
 
 var registry = make(map[string]Factory)
 
