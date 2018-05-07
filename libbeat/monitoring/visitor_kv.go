@@ -52,8 +52,9 @@ func (vs *KeyValueVisitor) dropName() {
 	vs.level = vs.level[:len(vs.level)-1]
 }
 
-func (vs *KeyValueVisitor) OnString(s string) { vs.cb(vs.getName(), s) }
-func (vs *KeyValueVisitor) OnBool(b bool)     { vs.cb(vs.getName(), b) }
-func (vs *KeyValueVisitor) OnNil()            { vs.cb(vs.getName(), nil) }
-func (vs *KeyValueVisitor) OnInt(i int64)     { vs.cb(vs.getName(), i) }
-func (vs *KeyValueVisitor) OnFloat(f float64) { vs.cb(vs.getName(), f) }
+func (vs *KeyValueVisitor) OnString(s string)        { vs.cb(vs.getName(), s) }
+func (vs *KeyValueVisitor) OnBool(b bool)            { vs.cb(vs.getName(), b) }
+func (vs *KeyValueVisitor) OnNil()                   { vs.cb(vs.getName(), nil) }
+func (vs *KeyValueVisitor) OnInt(i int64)            { vs.cb(vs.getName(), i) }
+func (vs *KeyValueVisitor) OnFloat(f float64)        { vs.cb(vs.getName(), f) }
+func (vs *KeyValueVisitor) OnStringSlice(f []string) { vs.cb(vs.getName(), f) }
