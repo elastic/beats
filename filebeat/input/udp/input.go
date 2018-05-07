@@ -34,7 +34,7 @@ type Input struct {
 // NewInput creates a new udp input
 func NewInput(
 	cfg *common.Config,
-	outlet channel.Factory,
+	outlet channel.Connector,
 	context input.Context,
 ) (input.Input, error) {
 	cfgwarn.Experimental("UDP input type is used")

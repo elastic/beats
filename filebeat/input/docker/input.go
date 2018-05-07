@@ -23,7 +23,7 @@ func init() {
 // NewInput creates a new docker input
 func NewInput(
 	cfg *common.Config,
-	outletFactory channel.Factory,
+	outletFactory channel.Connector,
 	context input.Context,
 ) (input.Input, error) {
 	cfgwarn.Experimental("Docker input is enabled.")

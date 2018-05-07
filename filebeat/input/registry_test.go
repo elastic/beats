@@ -9,7 +9,7 @@ import (
 	"github.com/elastic/beats/libbeat/common"
 )
 
-var fakeFactory = func(config *common.Config, outletFactory channel.Factory, context Context) (Input, error) {
+var fakeFactory = func(_ *common.Config, _ channel.Connector, _ Context) (Input, error) {
 	return nil, nil
 }
 
@@ -28,8 +28,7 @@ func TestAddNilFactory(t *testing.T) {
 }
 
 func TestAddFactoryTwice(t *testing.T) {
-	var err error
-	err = Register("name", fakeFactory)
+	err := Register("name", fakeFactory)
 	if err != nil {
 		t.Fatal(err)
 	}
