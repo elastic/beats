@@ -2,14 +2,14 @@
 # Docs: https://www.elastic.co/guide/en/beats/metricbeat/master/metricbeat-module-docker.html
 
 - module: docker
-#  metricsets:
-#    - container
-#    - cpu
-#    - diskio
-#    - healthcheck
-#    - info
-#    - memory
-#    - network
+  #metricsets:
+  #  - container
+  #  - cpu
+  #  - diskio
+  #  - healthcheck
+  #  - info
+  #  - memory
+  #  - network
   period: 10s
   hosts: ["unix:///var/run/docker.sock"]
 

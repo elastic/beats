@@ -1,7 +1,7 @@
 - module: redis
-#  metricsets:
-#    - info
-#    - keyspace
+  #metricsets:
+  #  - info
+  #  - keyspace
   period: 10s
 
   # Redis hosts

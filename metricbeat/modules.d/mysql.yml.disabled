@@ -2,7 +2,8 @@
 # Docs: https://www.elastic.co/guide/en/beats/metricbeat/master/metricbeat-module-mysql.html
 
 - module: mysql
-#  metricsets: ["status"]
+  #metricsets:
+  #  - status
   period: 10s
 
   # Host DSN should be defined as "user:pass@tcp(127.0.0.1:3306)/"
@@ -15,6 +16,3 @@
 
   # Password of hosts. Empty by default.
   #password: secret
-
-  # By setting raw to true, all raw fields from the status metricset will be added to the event.
-  #raw: false

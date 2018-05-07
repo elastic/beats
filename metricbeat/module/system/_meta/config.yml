@@ -28,8 +28,8 @@
   metricsets:
     - uptime
 
-# - module: system
-#   period: 5m
-#   metricsets:
-#     - raid
-#   raid.mount_point: '/'
+#- module: system
+#  period: 5m
+#  metricsets:
+#    - raid
+#  raid.mount_point: '/'

@@ -1,4 +1,5 @@
 - module: kibana
-#  metricsets: ["status"]
+  #metricsets:
+  #  - status
   period: 10s
   hosts: ["localhost:5601"]

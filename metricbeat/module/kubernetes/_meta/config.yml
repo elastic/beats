@@ -1,11 +1,11 @@
 # Node metrics, from kubelet:
 - module: kubernetes
-#  metricsets:
-#    - node
-#    - system
-#    - pod
-#    - container
-#    - volume
+  #metricsets:
+  #  - node
+  #  - system
+  #  - pod
+  #  - container
+  #  - volume
   period: 10s
   hosts: ["localhost:10255"]
   #ssl.certificate_authorities: ["/etc/pki/root/ca.pem"]
@@ -13,18 +13,18 @@
   #ssl.key: "/etc/pki/client/cert.key"
 
 # State metrics from kube-state-metrics service:
-# - module: kubernetes
-#   metricsets:
-#     - state_node
-#     - state_deployment
-#     - state_replicaset
-#     - state_statefulset
-#     - state_pod
-#     - state_container
-#   period: 10s
-#   hosts: ["kube-state-metrics:8080"]
+#- module: kubernetes
+#  metricsets:
+#    - state_node
+#    - state_deployment
+#    - state_replicaset
+#    - state_statefulset
+#    - state_pod
+#    - state_container
+#  period: 10s
+#  hosts: ["kube-state-metrics:8080"]
 
 # Kubernetes events
-# - module: kubernetes
-#   metricsets:
-#     - event
+#- module: kubernetes
+#  metricsets:
+#    - event

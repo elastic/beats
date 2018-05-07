@@ -1,4 +1,5 @@
 - module: kvm
-#  metricsets: ["dommemstat"]
+  #metricsets:
+  #  - dommemstat
   period: 10s
   hosts: ["localhost"]
