@@ -136,7 +136,7 @@ func (p *parser) parse() (*message, error) {
 		msh := strings.Split(segments[0], string(segments[0][3]))
 
 		// If the 8th value in MSH segment contains ACK then it's a response
-		isRequest = !(strings.Contains(msh[8], "ACK"))
+		isRequest = !strings.Contains(msh[8], "ACK")
 		if !isRequest {
 			dir = applayer.NetReverseDirection
 		}

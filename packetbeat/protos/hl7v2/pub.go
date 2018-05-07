@@ -87,7 +87,7 @@ func (pub *transPub) createEvent(requ, resp *message) beat.Event {
 			hl7segmentheader := hl7segments[hl7segment][0:3]
 
 			// If segment matches
-			if (pub.SegmentSelectionMode == "Include" && pub.segmentsmap[hl7segmentheader]) || (pub.SegmentSelectionMode == "Exclude" && !(pub.segmentsmap[hl7segmentheader])) {
+			if pub.SegmentSelectionMode == "Include" && pub.segmentsmap[hl7segmentheader] || pub.SegmentSelectionMode == "Exclude" && !pub.segmentsmap[hl7segmentheader] {
 
 				// If MSH get our encoding characters
 				if hl7segmentheader == "MSH" {
@@ -114,7 +114,7 @@ func (pub *transPub) createEvent(requ, resp *message) beat.Event {
 					}
 
 					// If field matches
-					if (pub.FieldSelectionMode == "Include" && pub.fieldsmap[hl7fieldname]) || (pub.FieldSelectionMode == "Exclude" && !(pub.fieldsmap[hl7fieldname])) {
+					if pub.FieldSelectionMode == "Include" && pub.fieldsmap[hl7fieldname] || pub.FieldSelectionMode == "Exclude" && !pub.fieldsmap[hl7fieldname] {
 
 						// If selected split field into components
 						if pub.ComponentSelectionMode != "" {
@@ -124,7 +124,7 @@ func (pub *transPub) createEvent(requ, resp *message) beat.Event {
 								hl7fieldcomponentname := strings.Join([]string{hl7fieldname, ".", hl7fieldcomponentnumber}, "")
 								hl7fieldcomponentvalue := hl7fieldcomponents[hl7fieldcomponent]
 								// If component matches
-								if (pub.ComponentSelectionMode == "Include" && pub.componentsmap[hl7fieldcomponentvalue]) || (pub.ComponentSelectionMode == "Exclude" && !(pub.componentsmap[hl7fieldcomponentvalue])) {
+								if pub.ComponentSelectionMode == "Include" && pub.componentsmap[hl7fieldcomponentvalue] || pub.ComponentSelectionMode == "Exclude" && !pub.componentsmap[hl7fieldcomponentvalue] {
 									// Add to fields map if not empty
 									if hl7fieldcomponentvalue != "" {
 										fields[hl7fieldcomponentname] = hl7fieldcomponentvalue
