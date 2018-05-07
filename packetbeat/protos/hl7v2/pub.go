@@ -126,7 +126,7 @@ func (pub *transPub) createEvent(requ, resp *message) beat.Event {
 								// If component matches
 								if (pub.ComponentSelectionMode == "Include" && pub.componentsmap[hl7fieldcomponentvalue]) || (pub.ComponentSelectionMode == "Exclude" && !(pub.componentsmap[hl7fieldcomponentvalue])) {
 									// Add to fields map if not empty
-									if hl7fieldvalue != "" {
+									if hl7fieldcomponentvalue != "" {
 										fields[hl7fieldcomponentname] = hl7fieldcomponentvalue
 									}
 								}
