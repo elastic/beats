@@ -9,6 +9,7 @@ import (
 	"github.com/elastic/beats/filebeat/input/file"
 	input "github.com/elastic/beats/filebeat/prospector"
 	"github.com/elastic/beats/filebeat/registrar"
+	"github.com/elastic/beats/libbeat/beat"
 	"github.com/elastic/beats/libbeat/cfgfile"
 	"github.com/elastic/beats/libbeat/common"
 	"github.com/elastic/beats/libbeat/logp"
@@ -42,14 +43,20 @@ func New(out channel.Factory, inputConfigs []*common.Config, beatVersion string,
 }
 
 // Start starts the crawler with all inputs
-func (c *Crawler) Start(r *registrar.Registrar, configInputs *common.Config,
-	configModules *common.Config, pipelineLoaderFactory fileset.PipelineLoaderFactory, overwritePipelines bool) error {
+func (c *Crawler) Start(
+	pipeline beat.Pipeline,
+	r *registrar.Registrar,
+	configInputs *common.Config,
+	configModules *common.Config,
+	pipelineLoaderFactory fileset.PipelineLoaderFactory,
+	overwritePipelines bool,
+) error {
 
 	logp.Info("Loading Inputs: %v", len(c.inputConfigs))
 
 	// Prospect the globs/paths given on the command line and launch harvesters
 	for _, inputConfig := range c.inputConfigs {
-		err := c.startInput(inputConfig, r.GetStates())
+		err := c.startInput(pipeline, inputConfig, r.GetStates())
 		if err != nil {
 			return err
 		}
@@ -57,7 +64,7 @@ func (c *Crawler) Start(r *registrar.Registrar, configInputs *common.Config,
 
 	c.InputsFactory = input.NewRunnerFactory(c.out, r, c.beatDone)
 	if configInputs.Enabled() {
-		c.inputReloader = cfgfile.NewReloader(configInputs)
+		c.inputReloader = cfgfile.NewReloader(pipeline, configInputs)
 		if err := c.inputReloader.Check(c.InputsFactory); err != nil {
 			return err
 		}
@@ -69,7 +76,7 @@ func (c *Crawler) Start(r *registrar.Registrar, configInputs *common.Config,
 
 	c.ModulesFactory = fileset.NewFactory(c.out, r, c.beatVersion, pipelineLoaderFactory, overwritePipelines, c.beatDone)
 	if configModules.Enabled() {
-		c.modulesReloader = cfgfile.NewReloader(configModules)
+		c.modulesReloader = cfgfile.NewReloader(pipeline, configModules)
 		if err := c.modulesReloader.Check(c.ModulesFactory); err != nil {
 			return err
 		}
@@ -84,11 +91,17 @@ func (c *Crawler) Start(r *registrar.Registrar, configInputs *common.Config,
 	return nil
 }
 
-func (c *Crawler) startInput(config *common.Config, states []file.State) error {
+func (c *Crawler) startInput(
+	pipeline beat.Pipeline,
+	config *common.Config,
+	states []file.State,
+) error {
 	if !config.Enabled() {
 		return nil
 	}
-	p, err := input.New(config, c.out, c.beatDone, states, nil)
+
+	connector := channel.ConnectTo(pipeline, c.out)
+	p, err := input.New(config, connector, c.beatDone, states, nil)
 	if err != nil {
 		return fmt.Errorf("Error in initing input: %s", err)
 	}

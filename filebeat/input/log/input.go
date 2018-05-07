@@ -52,7 +52,7 @@ type Input struct {
 // NewInput instantiates a new Log
 func NewInput(
 	cfg *common.Config,
-	outlet channel.Factory,
+	outlet channel.Connector,
 	context input.Context,
 ) (input.Input, error) {
 
