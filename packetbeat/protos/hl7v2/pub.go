@@ -1,11 +1,12 @@
 package hl7v2
 
 import (
+	"strconv"
+	"strings"
+
 	"github.com/elastic/beats/libbeat/beat"
 	"github.com/elastic/beats/libbeat/common"
 	"github.com/elastic/beats/packetbeat/protos"
-	"strconv"
-	"strings"
 )
 
 // Transaction Publisher.

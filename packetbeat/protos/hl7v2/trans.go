@@ -1,11 +1,12 @@
 package hl7v2
 
 import (
+	"time"
+
 	"github.com/elastic/beats/libbeat/common"
 	"github.com/elastic/beats/libbeat/logp"
 	"github.com/elastic/beats/packetbeat/procs"
 	"github.com/elastic/beats/packetbeat/protos/applayer"
-	"time"
 )
 
 type transactions struct {

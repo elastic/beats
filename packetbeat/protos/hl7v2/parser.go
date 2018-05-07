@@ -2,11 +2,12 @@ package hl7v2
 
 import (
 	"errors"
+	"strings"
+	"time"
+
 	"github.com/elastic/beats/libbeat/common"
 	"github.com/elastic/beats/libbeat/common/streambuf"
 	"github.com/elastic/beats/packetbeat/protos/applayer"
-	"strings"
-	"time"
 )
 
 type parser struct {

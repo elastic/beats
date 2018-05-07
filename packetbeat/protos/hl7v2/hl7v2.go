@@ -1,12 +1,13 @@
 package hl7v2
 
 import (
+	"strings"
+	"time"
+
 	"github.com/elastic/beats/libbeat/common"
 	"github.com/elastic/beats/libbeat/logp"
 	"github.com/elastic/beats/packetbeat/protos"
 	"github.com/elastic/beats/packetbeat/protos/tcp"
-	"strings"
-	"time"
 )
 
 // hl7v2Plugin application level protocol analyzer plugin
