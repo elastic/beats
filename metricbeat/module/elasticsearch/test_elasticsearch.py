@@ -3,6 +3,7 @@ import sys
 import os
 import unittest
 from elasticsearch import Elasticsearch, TransportError
+from parameterized import parameterized
 
 sys.path.append(os.path.join(os.path.dirname(__file__), '../../tests/system'))
 
@@ -14,28 +15,19 @@ class Test(metricbeat.BaseTest):
     COMPOSE_SERVICES = ['elasticsearch']
     FIELDS = ["elasticsearch"]
 
+    @parameterized.expand([
+        "index",
+        "node",
+        "node_stats",
+    ])
     @unittest.skipUnless(metricbeat.INTEGRATION_TESTS, "integration test")
-    def test_node(self):
+    def test_metricsets(self, metricset):
         """
-        elasticsearch node metricset test
-        """
-        self.check_metricset("elasticsearch", "node", self.get_hosts(), self.FIELDS)
-
-    @unittest.skipUnless(metricbeat.INTEGRATION_TESTS, "integration test")
-    def test_node_stats(self):
-        """
-        elasticsearch node_stats metricset test
-        """
-        self.check_metricset("elasticsearch", "node_stats", self.get_hosts(), self.FIELDS + ["service.name"])
-
-    @unittest.skipUnless(metricbeat.INTEGRATION_TESTS, "integration test")
-    def test_index(self):
-        """
-        elasticsearch index metricset test
+        elasticsearch metricset tests
         """
         es = Elasticsearch(self.get_hosts())
         es.indices.create(index='test-index', ignore=400)
-        self.check_metricset("elasticsearch", "index", self.get_hosts(), self.FIELDS + ["service.name"])
+        self.check_metricset("elasticsearch", metricset, self.get_hosts(), self.FIELDS + ["service.name"])
 
     def get_hosts(self):
         return [os.getenv('ES_HOST', 'localhost') + ':' +
