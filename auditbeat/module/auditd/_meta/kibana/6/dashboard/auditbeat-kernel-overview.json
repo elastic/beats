@@ -71,7 +71,7 @@
           "searchSourceJSON": "{\"query\":{\"language\":\"lucene\",\"query\":\"\"},\"filter\":[],\"highlightAll\":true,\"version\":true}"
         },
         "optionsJSON": "{\"darkTheme\":false,\"useMargins\":false}",
-        "panelsJSON": "[{\"gridData\":{\"h\":3,\"i\":\"1\",\"w\":7,\"x\":0,\"y\":0},\"id\":\"97680df0-c1c0-11e7-8995-936807a28b16\",\"panelIndex\":\"1\",\"type\":\"visualization\",\"version\":\"7.0.0-alpha1-SNAPSHOT\"},{\"gridData\":{\"h\":3,\"i\":\"4\",\"w\":5,\"x\":7,\"y\":0},\"id\":\"08679220-c25a-11e7-8692-232bd1143e8a\",\"panelIndex\":\"4\",\"type\":\"visualization\",\"version\":\"7.0.0-alpha1-SNAPSHOT\"},{\"gridData\":{\"h\":5,\"i\":\"5\",\"w\":12,\"x\":0,\"y\":3},\"id\":\"0f10c430-c1c3-11e7-8995-936807a28b16\",\"panelIndex\":\"5\",\"type\":\"search\",\"version\":\"7.0.0-alpha1-SNAPSHOT\"}]",
+        "panelsJSON": "[{\"gridData\":{\"h\":3,\"i\":\"1\",\"w\":7,\"x\":0,\"y\":0},\"id\":\"97680df0-c1c0-11e7-8995-936807a28b16\",\"panelIndex\":\"1\",\"type\":\"visualization\",\"version\":\"6.2.4\"},{\"gridData\":{\"h\":3,\"i\":\"4\",\"w\":5,\"x\":7,\"y\":0},\"id\":\"08679220-c25a-11e7-8692-232bd1143e8a\",\"panelIndex\":\"4\",\"type\":\"visualization\",\"version\":\"6.2.4\"},{\"gridData\":{\"h\":5,\"i\":\"5\",\"w\":12,\"x\":0,\"y\":3},\"id\":\"0f10c430-c1c3-11e7-8995-936807a28b16\",\"panelIndex\":\"5\",\"type\":\"search\",\"version\":\"6.2.4\"}]",
         "timeRestore": false,
         "title": "[Auditbeat Auditd] Overview",
         "version": 1
@@ -82,5 +82,5 @@
       "version": 5
     }
   ],
-  "version": "7.0.0-alpha1-SNAPSHOT"
+  "version": "6.2.4"
 }
