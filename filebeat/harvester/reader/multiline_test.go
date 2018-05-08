@@ -131,6 +131,24 @@ func TestMultilineBeforeNegateOKWithEmptyLine(t *testing.T) {
 	)
 }
 
+func TestMultilineRepeatingFlushPattern(t *testing.T) {
+	flushMatcher := match.MustCompile(`EventEnd`)
+	pattern := match.MustCompile(`EventStart`)
+
+	testMultilineOK(t,
+		MultilineConfig{
+			Pattern:      &pattern,
+			Negate:       true,
+			Match:        "after",
+			FlushPattern: &flushMatcher,
+			LastMatch:    true,
+		},
+		2, //first two non-matching lines, will be merged to one event
+		"EventStart\nEventId: 1\nEventEnd\nEventEnd\nEventEnd\nEventEnd\n",
+		"EventStart\nEventId: 2\nEventEnd\nEventEnd\nEventEnd\n",
+	)
+}
+
 func testMultilineOK(t *testing.T, cfg MultilineConfig, events int, expected ...string) {
 	_, buf := createLineBuffer(expected...)
 	reader := createMultilineTestReader(t, buf, cfg)

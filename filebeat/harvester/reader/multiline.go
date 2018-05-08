@@ -203,12 +203,19 @@ func (mlr *Multiline) readNext() (Message, error) {
 		if mlr.flushMatcher != nil {
 			endPatternReached := (mlr.flushMatcher.Match(message.Content))
 
-			if (endPatternReached == true && !mlr.lastMatch) || (mlr.lastMatch && !endPatternReached && mlr.flushMatchedAlready) {
+			if endPatternReached == true && !mlr.lastMatch {
 				// return collected multiline event and
 				// empty buffer for new multiline event
 				mlr.addLine(message)
 				msg := mlr.finalize()
 				mlr.resetState()
+				return msg, nil
+			}
+
+			if mlr.lastMatch && mlr.flushMatchedAlready && !endPatternReached {
+				msg := mlr.finalize()
+				mlr.load(message)
+				mlr.flushMatchedAlready = false
 				return msg, nil
 			}
 
