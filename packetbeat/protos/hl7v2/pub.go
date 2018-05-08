@@ -69,6 +69,7 @@ func (pub *transPub) createEvent(requ, resp *message) beat.Event {
 	var hl7segments []string
 	var hl7fieldseperator string
 	var hl7componentseperator string
+	// Do comments count?
 	//var hl7subcomponentseperator string
 	//var hl7fieldrepeatseperator string
 	//var hl7escapecharacter string
