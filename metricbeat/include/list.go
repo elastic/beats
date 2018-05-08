@@ -64,6 +64,7 @@ import (
 	_ "github.com/elastic/beats/metricbeat/module/kibana"
 	_ "github.com/elastic/beats/metricbeat/module/kibana/status"
 	_ "github.com/elastic/beats/metricbeat/module/kubernetes"
+	_ "github.com/elastic/beats/metricbeat/module/kubernetes/apiserver"
 	_ "github.com/elastic/beats/metricbeat/module/kubernetes/container"
 	_ "github.com/elastic/beats/metricbeat/module/kubernetes/event"
 	_ "github.com/elastic/beats/metricbeat/module/kubernetes/node"
