@@ -25,7 +25,7 @@ var (
 
 // init registers the MetricSet with the central registry.
 func init() {
-	mb.Registry.MustAddMetricSet("mysql", "galera-status", New, 
+	mb.Registry.MustAddMetricSet("mysql", "galera_status", New, 
 		mb.WithHostParser(mysql.ParseDSN),
 	)
 }
