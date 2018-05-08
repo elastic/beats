@@ -88,7 +88,7 @@
           "searchSourceJSON": "{\"query\":{\"language\":\"lucene\",\"query\":\"\"},\"filter\":[],\"highlightAll\":true,\"version\":true}"
         },
         "optionsJSON": "{\"darkTheme\":false,\"hidePanelTitles\":false,\"useMargins\":true}",
-        "panelsJSON": "[{\"panelIndex\":\"1\",\"gridData\":{\"x\":6,\"y\":0,\"w\":6,\"h\":3,\"i\":\"1\"},\"id\":\"555df8a0-f1a1-11e7-a9ef-93c69af7b129\",\"type\":\"visualization\",\"version\":\"7.0.0-alpha1\"},{\"panelIndex\":\"2\",\"gridData\":{\"x\":6,\"y\":3,\"w\":6,\"h\":3,\"i\":\"2\"},\"id\":\"a1d92240-f1a1-11e7-a9ef-93c69af7b129\",\"type\":\"visualization\",\"version\":\"7.0.0-alpha1\"},{\"panelIndex\":\"3\",\"gridData\":{\"x\":0,\"y\":3,\"w\":6,\"h\":3,\"i\":\"3\"},\"id\":\"d763a570-f1a1-11e7-a9ef-93c69af7b129\",\"type\":\"visualization\",\"version\":\"7.0.0-alpha1\"},{\"panelIndex\":\"4\",\"gridData\":{\"x\":0,\"y\":0,\"w\":6,\"h\":3,\"i\":\"4\"},\"id\":\"47a8e0f0-f1a4-11e7-a9ef-93c69af7b129\",\"type\":\"visualization\",\"version\":\"7.0.0-alpha1\"},{\"panelIndex\":\"5\",\"gridData\":{\"x\":0,\"y\":6,\"w\":12,\"h\":3,\"i\":\"5\"},\"version\":\"7.0.0-alpha1\",\"type\":\"visualization\",\"id\":\"dcbffe30-f1a4-11e7-a9ef-93c69af7b129\"}]",
+        "panelsJSON": "[{\"panelIndex\":\"1\",\"gridData\":{\"x\":6,\"y\":0,\"w\":6,\"h\":3,\"i\":\"1\"},\"id\":\"555df8a0-f1a1-11e7-a9ef-93c69af7b129\",\"type\":\"visualization\",\"version\":\"6.2.4\"},{\"panelIndex\":\"2\",\"gridData\":{\"x\":6,\"y\":3,\"w\":6,\"h\":3,\"i\":\"2\"},\"id\":\"a1d92240-f1a1-11e7-a9ef-93c69af7b129\",\"type\":\"visualization\",\"version\":\"6.2.4\"},{\"panelIndex\":\"3\",\"gridData\":{\"x\":0,\"y\":3,\"w\":6,\"h\":3,\"i\":\"3\"},\"id\":\"d763a570-f1a1-11e7-a9ef-93c69af7b129\",\"type\":\"visualization\",\"version\":\"6.2.4\"},{\"panelIndex\":\"4\",\"gridData\":{\"x\":0,\"y\":0,\"w\":6,\"h\":3,\"i\":\"4\"},\"id\":\"47a8e0f0-f1a4-11e7-a9ef-93c69af7b129\",\"type\":\"visualization\",\"version\":\"6.2.4\"},{\"panelIndex\":\"5\",\"gridData\":{\"x\":0,\"y\":6,\"w\":12,\"h\":3,\"i\":\"5\"},\"version\":\"6.2.4\",\"type\":\"visualization\",\"id\":\"dcbffe30-f1a4-11e7-a9ef-93c69af7b129\"}]",
         "timeRestore": false,
         "title": "[Metricbeat Nginx] Overview",
         "version": 1
@@ -99,5 +99,5 @@
       "version": 1
     }
   ],
-  "version": "7.0.0-alpha1"
+  "version": "6.2.4"
 }
