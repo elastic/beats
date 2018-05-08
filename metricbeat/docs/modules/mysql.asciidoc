@@ -81,11 +81,11 @@ metricbeat.modules:
 
 The following metricsets are available:
 
-* <<metricbeat-metricset-mysql-galera-status,galera-status>>
+* <<metricbeat-metricset-mysql-galera_status,galera_status>>
 
 * <<metricbeat-metricset-mysql-status,status>>
 
-include::mysql/galera-status.asciidoc[]
+include::mysql/galera_status.asciidoc[]
 
 include::mysql/status.asciidoc[]
 

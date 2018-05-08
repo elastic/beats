@@ -1,4 +1,4 @@
-package galerastatus
+package galera_status
 
 import (
 	"github.com/elastic/beats/libbeat/common"

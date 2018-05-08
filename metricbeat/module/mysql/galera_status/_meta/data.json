@@ -7,7 +7,7 @@
     "metricset":{
         "host":"localhost:3306",
         "module":"mysql",
-        "name":"galera-status",
+        "name":"galera_status",
         "rtt":44269
     },
     "mysql":{

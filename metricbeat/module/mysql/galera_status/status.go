@@ -5,7 +5,7 @@ For more information on the query it uses, see:
 http://dev.mysql.com/doc/refman/5.7/en/show-status.html
 http://galeracluster.com/documentation-webpages/galerastatusvariables.html
 */
-package galerastatus
+package galera_status
 
 import (
 	"database/sql"
@@ -39,7 +39,7 @@ type MetricSet struct {
 // New create a new instance of the MetricSet
 // Loads query_mode config setting from the config file
 func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
-	cfgwarn.Experimental("The mysql galera-status metricset is experimental")
+	cfgwarn.Experimental("The mysql galera_status metricset is experimental")
 
 	return &MetricSet{BaseMetricSet: base}, nil
 }
