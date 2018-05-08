@@ -287,6 +287,20 @@ filebeat.inputs:
     # The number of seconds of inactivity before a remote connection is closed.
     #timeout: 300s
 
+#------------------------------ Docker input --------------------------------
+# Experimental: Docker input reads and parses `json-file` logs from Docker
+#- type: docker
+  #enabled: false
+
+  # Combine partial lines flagged by `json-file` format
+  #combine_partials: true
+
+  # Use this to read from all containers, replace * with a container id to read from one:
+  #containers:
+  #  stream: all # can be all, stdout or stderr
+  #  ids:
+  #    - '*'
+
 #========================== Filebeat autodiscover ==============================
 
 # Autodiscover allows you to detect changes in the system and spawn new modules
