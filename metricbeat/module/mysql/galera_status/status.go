@@ -1,5 +1,5 @@
 /*
-Package galerastatus fetches MySQL Galera server status metrics.
+Package galera_status fetches MySQL Galera server status metrics.
 
 For more information on the query it uses, see:
 http://dev.mysql.com/doc/refman/5.7/en/show-status.html
