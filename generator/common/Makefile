@@ -5,6 +5,8 @@ BEAT_TYPE?=beat
 BEAT_PATH=${BUILD_DIR}/src/beatpath/testbeat
 ES_BEATS=${GOPATH}/src/github.com/elastic/beats
 PREPARE_COMMAND?=
+override FIELDS_FILE_PATH=
+export FIELDS_FILE_PATH
 
 # Runs test build for mock beat
 .PHONY: test

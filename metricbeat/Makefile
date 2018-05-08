@@ -5,7 +5,7 @@ BEAT_DESCRIPTION?=Metricbeat is a lightweight shipper for metrics.
 SYSTEM_TESTS?=true
 TEST_ENVIRONMENT?=true
 ES_BEATS?=..
-FIELDS_FILE_PATH=module
+FIELDS_FILE_PATH?=module
 
 # Metricbeat can only be cross-compiled on platforms not requiring CGO.
 GOX_OS=netbsd linux windows
