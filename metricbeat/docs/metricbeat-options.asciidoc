@@ -139,6 +139,7 @@ the `set2` metricset will be fetched every 2 minutes:
 
 
 [float]
+[[module-config-options]]
 === Standard config options
 
 You can specify the following options for any Metricbeat module. Some modules
@@ -156,8 +157,7 @@ The name of the module to run. For documentation about each module, see the
 
 A list of metricsets to execute. Make sure that you only list metricsets that
 are available in the module. It is not possible to reference metricsets from
-other modules. For a list of available metricsets, see the documentation for the
-module.
+other modules. For a list of available metricsets, see <<metricbeat-modules>>.
 
 [float]
 ==== `enabled`

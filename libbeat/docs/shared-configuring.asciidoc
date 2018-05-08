@@ -8,6 +8,6 @@ There’s also a full example configuration file called +{beatname_lc}.reference
 that shows all non-deprecated options.
 endif::[]
 
-See the
+TIP: See the
 {libbeat}/config-file-format.html[Config File Format] section of the
 _Beats Platform Reference_ for more about the structure of the config file.

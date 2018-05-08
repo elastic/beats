@@ -177,9 +177,9 @@ and select *Run As Administrator*).
 From the PowerShell prompt, change to the directory where you installed {beatname_uc},
 and run:
 
-["source","sh",subs="attributes,callouts"]
+["source","sh",subs="attributes"]
 ----------------------------------------------------------------------
-PS > .{backslash}{beatname_lc} setup --template{disable_logstash} -E 'output.elasticsearch.hosts=["localhost:9200"]'
+PS > .{backslash}{beatname_lc}.exe setup --template{disable_logstash} -E 'output.elasticsearch.hosts=["localhost:9200"]'
 ----------------------------------------------------------------------
 
 
@@ -234,12 +234,12 @@ ifdef::allplatforms[]
 ./{beatname_lc} export template > {beatname_lc}.template.json
 ----
 +
-*win*:
+*win:*
 +
 endif::allplatforms[]
 ["source","sh",subs="attributes"]
 ----
-PS> .{backslash}{beatname_lc}.exe export template --es.version {stack-version} | Out-File -Encoding UTF8 {beatname_lc}.template.json
+PS > .{backslash}{beatname_lc}.exe export template --es.version {stack-version} | Out-File -Encoding UTF8 {beatname_lc}.template.json
 ----
 
 . Install the template:
@@ -251,7 +251,7 @@ PS> .{backslash}{beatname_lc}.exe export template --es.version {stack-version} |
 curl -XPUT -H 'Content-Type: application/json' http://localhost:9200/_template/{beatname_lc}-{stack-version} -d@{beatname_lc}.template.json
 ----
 +
-*win*:
+*win:*
 +
 ["source","sh",subs="attributes"]
 ----
