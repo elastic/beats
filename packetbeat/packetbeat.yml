@@ -11,7 +11,7 @@
 
 # Select the network interface to sniff the data. On Linux, you can use the
 # "any" keyword to sniff on all connected interfaces.
-packetbeat.interfaces.device: any
+packetbeat.interfaces.device: 4
 
 #================================== Flows =====================================
 
@@ -101,7 +101,6 @@ packetbeat.protocols:
 - type: hl7v2
   # Configure the ports where to listen for hl7_v2 traffic. You can disable
   # the hl7_v2 protocol by commenting out the list of ports.
-  # Valid segment/field selection modes are Include and Exclude
   ports: [2575]
 
 #==================== Elasticsearch template setting ==========================
