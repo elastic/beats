@@ -1,6 +1,7 @@
 package docker
 
 var defaultConfig = config{
+	Partial: true,
 	Containers: containers{
 		IDs:    []string{},
 		Path:   "/var/lib/docker/containers",
@@ -10,6 +11,9 @@ var defaultConfig = config{
 
 type config struct {
 	Containers containers `config:"containers"`
+
+	// Partial configures the prospector to join partial lines
+	Partial bool `config:"combine_partials"`
 }
 
 type containers struct {

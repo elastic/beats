@@ -46,7 +46,11 @@ func NewInput(
 		return nil, err
 	}
 
-	if err := cfg.SetString("docker-json", -1, config.Containers.Stream); err != nil {
+	if err := cfg.SetString("docker-json.stream", -1, config.Containers.Stream); err != nil {
+		return nil, errors.Wrap(err, "update input config")
+	}
+
+	if err := cfg.SetBool("docker-json.partial", -1, config.Partial); err != nil {
 		return nil, errors.Wrap(err, "update input config")
 	}
 	return log.NewInput(cfg, outletFactory, context)
