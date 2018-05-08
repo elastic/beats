@@ -59,6 +59,19 @@ example `dns.question.name`.
 See <<exported-fields>> for a list of all the fields that are exported by
 {beatname_uc}.
 
+You can also scope processors to individual plugin prospectors by placing them under the prospector definition: 
+
+[source,yaml]
+------
+- type: <propector_type>
+  processors:
+   - <processor_name>:
+     when:
+        <condition>
+     <parameters>
+...
+------
+
 The supported conditions are:
 
 * <<condition-equals,`equals`>>
