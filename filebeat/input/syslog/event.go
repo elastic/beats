@@ -1,6 +1,7 @@
 package syslog
 
 import (
+	"math"
 	"time"
 )
 
@@ -22,6 +23,22 @@ var month = map[string]time.Month{
 	"Dec": time.December,
 }
 
+var monthIndexed = []time.Month{
+	0,
+	time.January,
+	time.February,
+	time.March,
+	time.April,
+	time.May,
+	time.June,
+	time.July,
+	time.August,
+	time.September,
+	time.October,
+	time.November,
+	time.December,
+}
+
 // event is a parsed syslog event, validation of the format is done at the parser level.
 type event struct {
 	message    string
@@ -35,6 +52,7 @@ type event struct {
 	minute     int
 	second     int
 	nanosecond int
+	year       int
 	loc        *time.Location
 }
 
@@ -48,7 +66,13 @@ func newEvent() *event {
 		hour:     -1,
 		minute:   -1,
 		second:   -1,
+		year:     time.Now().Year(),
 	}
+}
+
+// SetMonthNumeric sets the month with a number.
+func (s *event) SetMonthNumeric(b []byte) {
+	s.month = monthIndexed[bytesToInt(skipLeadZero(b))]
 }
 
 // SetMonth sets the month.
@@ -110,9 +134,14 @@ func (s *event) Second() int {
 	return s.second
 }
 
+// SetYear sets the current year.
+func (s *event) SetYear(b []byte) {
+	s.year = bytesToInt(b)
+}
+
 // Year returns the current year, since syslog events don't include that.
 func (s *event) Year() int {
-	return time.Now().Year()
+	return s.year
 }
 
 // SetMessage sets the message.
@@ -192,7 +221,13 @@ func (s *event) HasPid() bool {
 
 // SetNanoSecond sets the nanosecond.
 func (s *event) SetNanosecond(b []byte) {
-	s.nanosecond = bytesToInt(skipLeadZero(b))
+	// We assume that we receive a byte array representing a nanosecond, this might not be
+	// always the case, so we have to pad it.
+	if len(b) < 7 {
+		s.nanosecond = bytesToInt(skipLeadZero(b)) * int(math.Pow10((7 - len(b))))
+	} else {
+		s.nanosecond = bytesToInt(skipLeadZero(b))
+	}
 }
 
 // NanoSecond returns the nanosecond.
