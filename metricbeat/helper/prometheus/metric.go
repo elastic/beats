@@ -6,6 +6,7 @@ import (
 	"strings"
 
 	"github.com/elastic/beats/libbeat/common"
+
 	dto "github.com/prometheus/client_model/go"
 )
 
