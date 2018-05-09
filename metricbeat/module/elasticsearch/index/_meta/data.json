@@ -6,25 +6,25 @@
     },
     "elasticsearch": {
         "cluster": {
-            "id": "AI8XrG4wTLKQg3lbRGgQYQ",
+            "id": "EFdYsDSoSZmU7fXE2wvJ0g",
             "name": "docker-cluster"
         },
         "index": {
-            "name": ".monitoring-es-6-2018.04.22",
+            "name": ".ml-anomalies-shared",
             "total": {
                 "docs": {
-                    "count": 241933,
-                    "deleted": 525
+                    "count": 7,
+                    "deleted": 2
                 },
                 "segments": {
-                    "count": 16,
+                    "count": 6,
                     "memory": {
-                        "bytes": 565573
+                        "bytes": 10886
                     }
                 },
                 "store": {
                     "size": {
-                        "bytes": 135541290
+                        "bytes": 44505
                     }
                 }
             }

@@ -77,7 +77,7 @@ func TestData(t *testing.T) {
 	}
 
 	beatEvent := mbtest.StandardizeEvent(ms, events[0], core.AddDatasetToEvent)
-	mbtest.WriteEventToDataJSON(t, beatEvent)
+	mbtest.WriteEventToDataJSON(t, beatEvent, "")
 }
 
 func getConfig() map[string]interface{} {
