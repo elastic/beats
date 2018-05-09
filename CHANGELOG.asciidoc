@@ -17,6 +17,7 @@ https://github.com/elastic/beats/compare/v6.2.3...master[Check the HEAD diff]
 - Rename beat.cpu.*.time metrics to beat.cpu.*.time.ms. {pull}6449[6449]
 - Mark `system.syslog.message` and `system.auth.message` as `text` instead of `keyword`. {pull}6589[6589]
 - Allow override of dynamic template `match_mapping_type` for fields with object_type. {pull}6691[6691]
+- Set default kafka version to 1.0.0 in kafka output. Older versions are still supported by configuring the `version` setting. {pull}7025[7025]
 
 *Auditbeat*
 
@@ -56,6 +57,7 @@ https://github.com/elastic/beats/compare/v6.2.3...master[Check the HEAD diff]
 - Ensure Kubernetes labels/annotations don't break mapping {pull}6490[6490]
 - Ensure that the dashboard zip files can't contain files outside of the kibana directory. {pull}6921[6921]
 - Fix map overwrite panics by cloning shared structs before doing the update. {pull}6947[6947]
+- Fix error if lz4 compression is used with the kafka output. {pull}7025[7025]
 
 *Auditbeat*
 
@@ -123,6 +125,7 @@ https://github.com/elastic/beats/compare/v6.2.3...master[Check the HEAD diff]
 - Add IP-addresses and MAC-addresses to add_host_metadata. {pull}6878[6878]
 - Add a default seccomp (secure computing) filter on Linux that prohibits
   execve, execveat, fork, and vfork syscalls. A custom policy can be configured. {issue}5213[5213]
+- Update Sarama to v1.16.0, adding better support for kafka 0.11, 1.0, and 1.1 {pull}7025[7025]
 
 *Auditbeat*
 

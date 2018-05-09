@@ -9,14 +9,14 @@
 			"revisionTime": "2017-05-24T00:36:31Z"
 		},
 		{
-			"checksumSHA1": "GCpYz281OE/XkAQK23BLr+nK6O0=",
+			"checksumSHA1": "pH1jOw5Kfigc2tteo6KlaU9+JE8=",
 			"origin": "github.com/urso/sarama",
 			"path": "github.com/Shopify/sarama",
-			"revision": "c292021939f5aba53b3ffc2cb09c7aadb32a42df",
+			"revision": "32b4ad5c9537ed14e471779b76713ff65420db39",
 			"revisionTime": "2016-11-23T00:27:23Z",
 			"tree": true,
-			"version": "v1.12/enh/offset-replica-id",
-			"versionExact": "v1.12/enh/offset-replica-id"
+			"version": "v1.16.0/enh/offset-replica-id",
+			"versionExact": "v1.16.0/enh/offset-replica-id"
 		},
 		{
 			"checksumSHA1": "DYv6Q1+VfnUVxMwvk5IshAClLvw=",
