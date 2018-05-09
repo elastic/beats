@@ -18,6 +18,12 @@ const promMetrics = `
 first_metric{label1="value1",label2="value2",label3="value3"} 1
 # TYPE second_metric gauge
 second_metric{label1="value1",label3="othervalue"} 0
+# TYPE summary_metric summary
+summary_metric{quantile="0.5"} 29735
+summary_metric{quantile="0.9"} 47103
+summary_metric{quantile="0.99"} 50681
+summary_metric_sum 234892394
+summary_metric_count 44000
 `
 
 type mockFetcher struct{}
@@ -172,6 +178,27 @@ func TestPrometheus(t *testing.T) {
 				common.MapStr{
 					"first.metric":  "value3",
 					"labels.label1": "value1",
+				},
+			},
+		},
+		{
+			msg: "Summary metric",
+			mapping: &MetricsMapping{
+				Metrics: map[string]MetricMap{
+					"summary_metric": Metric("summary.metric"),
+				},
+			},
+			expected: []common.MapStr{
+				common.MapStr{
+					"summary.metric": common.MapStr{
+						"sum":   234892394.0,
+						"count": uint64(44000),
+						"percentile": common.MapStr{
+							"50": 29735.0,
+							"90": 47103.0,
+							"99": 50681.0,
+						},
+					},
 				},
 			},
 		},
