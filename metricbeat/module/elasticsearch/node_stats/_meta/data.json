@@ -9,15 +9,15 @@
             "name": "docker-cluster"
         },
         "node": {
-            "name": "VnS118cKS7-8mz8l2jZZKQ",
+            "name": "q7ya3ngBTS2cxzYi0duQdA",
             "stats": {
                 "fs": {
                     "summary": {
                         "available": {
-                            "bytes": 36334804992
+                            "bytes": 31770497024
                         },
                         "free": {
-                            "bytes": 39551520768
+                            "bytes": 34987212800
                         },
                         "total": {
                             "bytes": 62725623808
@@ -26,18 +26,18 @@
                 },
                 "indices": {
                     "docs": {
-                        "count": 1141228,
-                        "deleted": 42042
+                        "count": 23809,
+                        "deleted": 34
                     },
                     "segments": {
-                        "count": 154,
+                        "count": 54,
                         "memory": {
-                            "bytes": 2862018
+                            "bytes": 319028
                         }
                     },
                     "store": {
                         "size": {
-                            "bytes": 642756442
+                            "bytes": 8625187
                         }
                     }
                 },
@@ -46,14 +46,14 @@
                         "collectors": {
                             "old": {
                                 "collection": {
-                                    "count": 105,
-                                    "ms": 14100
+                                    "count": 5,
+                                    "ms": 854
                                 }
                             },
                             "young": {
                                 "collection": {
-                                    "count": 43895,
-                                    "ms": 423308
+                                    "count": 673,
+                                    "ms": 19783
                                 }
                             }
                         }
@@ -65,13 +65,13 @@
                                     "bytes": 362414080
                                 },
                                 "peak": {
-                                    "bytes": 275023840
+                                    "bytes": 273524720
                                 },
                                 "peak_max": {
                                     "bytes": 362414080
                                 },
                                 "used": {
-                                    "bytes": 255660936
+                                    "bytes": 138590056
                                 }
                             },
                             "survivor": {
@@ -85,7 +85,7 @@
                                     "bytes": 17432576
                                 },
                                 "used": {
-                                    "bytes": 4414672
+                                    "bytes": 5442216
                                 }
                             },
                             "young": {
@@ -99,7 +99,7 @@
                                     "bytes": 139591680
                                 },
                                 "used": {
-                                    "bytes": 91758824
+                                    "bytes": 22574552
                                 }
                             }
                         }
@@ -108,14 +108,14 @@
             }
         }
     },
-    "event": {
-        "service": "elasticsearch"
-    },
     "metricset": {
         "host": "127.0.0.1:9200",
         "module": "elasticsearch",
         "name": "node_stats",
         "namespace": "elasticsearch.node.stats",
         "rtt": 115
+    },
+    "service": {
+        "name": "elasticsearch"
     }
 }
