@@ -32,8 +32,8 @@ func TestFetch(t *testing.T) {
 	assert.Contains(t, event["user"].(common.MapStr), "id")
 
 	assert.Contains(t, event, "database")
-	db_oid := event["database"].(common.MapStr)["oid"].(int64)
-	assert.True(t, db_oid > 0)
+	dbOid := event["database"].(common.MapStr)["oid"].(int64)
+	assert.True(t, dbOid > 0)
 
 	assert.Contains(t, event, "query")
 	query := event["query"].(common.MapStr)
