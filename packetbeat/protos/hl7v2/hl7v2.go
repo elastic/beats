@@ -34,7 +34,7 @@ var (
 
 	// use isDebug/isDetailed to guard debugf/detailedf to minimize allocations
 	// (garbage collection) when debug log is disabled.
-	isDebug = false
+	isDebug = true
 )
 
 func init() {
@@ -100,6 +100,7 @@ func (hp *hl7v2Plugin) setFromConfig(config *hl7v2Config) error {
 	}
 	pub.SegmentSelectionMode = config.SegmentSelectionMode
 	pub.FieldSelectionMode = config.FieldSelectionMode
+	pub.ComponentSelectionMode = config.ComponentSelectionMode
 
 	segmentsmap := make(map[string]bool)
 	if len(config.Segments) > 0 {
@@ -123,14 +124,14 @@ func (hp *hl7v2Plugin) setFromConfig(config *hl7v2Config) error {
 		pub.componentsmap = componentsmap
 	}
 
-	fieldmappingmap := make(map[string]string)
-	if len(config.FieldMappingMap) > 0 {
-		for mappings := range config.FieldMappingMap {
-			for field, mapping := range config.FieldMappingMap[mappings] {
-				fieldmappingmap[field] = mapping
+	namemappingmap := make(map[string]string)
+	if len(config.NameMappingMap) > 0 {
+		for mappings := range config.NameMappingMap {
+			for name, mapping := range config.NameMappingMap[mappings] {
+				namemappingmap[name] = mapping
 			}
 		}
-		pub.fieldmappingmap = fieldmappingmap
+		pub.namemappingmap = namemappingmap
 	}
 
 	return nil

@@ -12,9 +12,9 @@ type hl7v2Config struct {
 	Segments               []string            `config:"segments"`
 	FieldSelectionMode     string              `config:"field_selection_mode"`
 	Fields                 []string            `config:"fields"`
-	FieldMappingMap        []map[string]string `config:"field_name_mapping"`
 	ComponentSelectionMode string              `config:"component_selection_mode"`
 	Components             []string            `config:"components"`
+	NameMappingMap         []map[string]string `config:"name_mapping"`
 }
 
 var (
