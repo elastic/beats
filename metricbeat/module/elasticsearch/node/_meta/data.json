@@ -13,10 +13,10 @@
                 "memory": {
                     "heap": {
                         "init": {
-                            "bytes": 1073741824
+                            "bytes": 536870912
                         },
                         "max": {
-                            "bytes": 1056309248
+                            "bytes": 519438336
                         }
                     },
                     "nonheap": {
@@ -30,7 +30,7 @@
                 },
                 "version": "1.8.0_161"
             },
-            "name": "xMLdnuCzSoempTmcPqdtfw",
+            "name": "q7ya3ngBTS2cxzYi0duQdA",
             "process": {
                 "mlockall": false
             },
