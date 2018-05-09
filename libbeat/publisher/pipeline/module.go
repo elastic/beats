@@ -55,6 +55,9 @@ func Load(
 				"hostname": beatInfo.Hostname,
 				"version":  beatInfo.Version,
 			},
+			Host: common.MapStr{
+				"name": name,
+			},
 		},
 	}
 

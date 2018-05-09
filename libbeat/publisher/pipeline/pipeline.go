@@ -63,6 +63,7 @@ type pipelineProcessors struct {
 	// constructing the clients complete processor
 	// pipeline on connect.
 	beatsMeta common.MapStr
+	hostMeta  common.MapStr
 	fields    common.MapStr
 	tags      []string
 
@@ -93,6 +94,7 @@ type Settings struct {
 type Annotations struct {
 	Beat  common.MapStr
 	Event common.EventMetadata
+	Host  common.MapStr
 }
 
 // WaitCloseMode enumerates the possible behaviors of WaitClose in a pipeline.
@@ -403,6 +405,10 @@ func makePipelineProcessors(
 
 	if meta := annotations.Beat; meta != nil {
 		p.beatsMeta = common.MapStr{"beat": meta}
+	}
+
+	if meta := annotations.Host; meta != nil {
+		p.hostMeta = common.MapStr{"host": meta}
 	}
 
 	if em := annotations.Event; len(em.Fields) > 0 {
