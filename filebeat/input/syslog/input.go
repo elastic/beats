@@ -109,11 +109,27 @@ func NewInput(
 	cb := func(data []byte, metadata inputsource.NetworkMetadata) {
 		ev := newEvent()
 		Parse(data, ev)
+		var d *util.Data
 		if !ev.IsValid() {
 			log.Errorw("can't not parse event as syslog rfc3164", "message", string(data))
+			// On error revert to the raw bytes content, we need a better way to communicate this kind of
+			// error upstream this should be a global effort.
+			d = &util.Data{
+				Event: beat.Event{
+					Timestamp: time.Now(),
+					Meta: common.MapStr{
+						"truncated": metadata.Truncated,
+					},
+					Fields: common.MapStr{
+						"message": string(data),
+					},
+				},
+			}
+		} else {
+			event := createEvent(ev, metadata, time.Local, log)
+			d = &util.Data{Event: *event}
 		}
-		event := createEvent(ev, metadata, time.Local, log)
-		d := &util.Data{Event: *event}
+
 		forwarder.Send(d)
 	}
 

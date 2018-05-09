@@ -33,6 +33,14 @@ func Parse(data []byte, event *event) {
         event.SetMonth(data[tok:p])
       }
 
+      action year{
+        event.SetYear(data[tok:p])
+      }
+
+      action month_numeric {
+        event.SetMonthNumeric(data[tok:p])
+      }
+
       action day {
         event.SetDay(data[tok:p])
       }
