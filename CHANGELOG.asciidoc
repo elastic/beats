@@ -176,6 +176,10 @@ https://github.com/elastic/beats/compare/v6.2.3...v6.3.0[View commits]
 - Add mapping for docker metrics per cpu. {pull}6843[6843]
 - Ensure canonical naming for JMX beans is disabled in Jolokia module. {pull}7047[7047]
 
+*Packetbeat*
+
+- Fix an out of bounds access in HTTP parser caused by malformed request. {pull}6997[6997]
+
 *Winlogbeat*
 
 - Fixed a crash under Windows 2003 and XP when an event had less insert strings than required by its format string. {pull}6247[6247]
