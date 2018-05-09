@@ -1,6 +1,7 @@
 - module: elasticsearch
   metricsets:
    #- index
+   #- index_summary
    - node
    - node_stats
   period: 10s

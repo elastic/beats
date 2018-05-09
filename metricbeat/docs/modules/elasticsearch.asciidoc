@@ -24,6 +24,7 @@ metricbeat.modules:
 - module: elasticsearch
   metricsets:
    #- index
+   #- index_summary
    - node
    - node_stats
   period: 10s
@@ -39,11 +40,15 @@ The following metricsets are available:
 
 * <<metricbeat-metricset-elasticsearch-index,index>>
 
+* <<metricbeat-metricset-elasticsearch-index_summary,index_summary>>
+
 * <<metricbeat-metricset-elasticsearch-node,node>>
 
 * <<metricbeat-metricset-elasticsearch-node_stats,node_stats>>
 
 include::elasticsearch/index.asciidoc[]
+
+include::elasticsearch/index_summary.asciidoc[]
 
 include::elasticsearch/node.asciidoc[]
 
