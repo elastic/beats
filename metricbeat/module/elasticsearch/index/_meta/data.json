@@ -6,25 +6,25 @@
     },
     "elasticsearch": {
         "cluster": {
-            "id": "EFdYsDSoSZmU7fXE2wvJ0g",
-            "name": "docker-cluster"
+            "id": "UziYVLPkTTmCzccc6102Bg",
+            "name": "elasticsearch"
         },
         "index": {
-            "name": ".ml-anomalies-shared",
+            "name": "filebeat-7.0.0-alpha1-2018.05.09",
             "total": {
                 "docs": {
-                    "count": 7,
-                    "deleted": 2
+                    "count": 1,
+                    "deleted": 0
                 },
                 "segments": {
-                    "count": 6,
+                    "count": 1,
                     "memory": {
-                        "bytes": 10886
+                        "bytes": 6983
                     }
                 },
                 "store": {
                     "size": {
-                        "bytes": 44505
+                        "bytes": 19326
                     }
                 }
             }

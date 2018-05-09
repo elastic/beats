@@ -6,6 +6,7 @@ import (
 	"fmt"
 	"io/ioutil"
 	"os"
+	"path"
 	"testing"
 	"time"
 
@@ -141,17 +142,17 @@ func StandardizeEvent(ms mb.MetricSet, e mb.Event, modifiers ...mb.EventModifier
 // WriteEventToDataJSON writes the given event as "pretty" JSON to
 // a ./_meta/data.json file. If the -data CLI flag is unset or false then the
 // method is a no-op.
-func WriteEventToDataJSON(t testing.TB, fullEvent beat.Event, pathPostfix string) {
+func WriteEventToDataJSON(t testing.TB, fullEvent beat.Event, postfixPath string) {
 	if !*dataFlag {
 		return
 	}
 
-	path, err := os.Getwd()
+	p, err := os.Getwd()
 	if err != nil {
 		t.Fatal(err)
 	}
 
-	path = path + pathPostfix
+	p = path.Join(p, postfixPath, "_meta", "data.json")
 
 	fields := fullEvent.Fields
 	fields["@timestamp"] = fullEvent.Timestamp
@@ -161,7 +162,7 @@ func WriteEventToDataJSON(t testing.TB, fullEvent beat.Event, pathPostfix string
 		t.Fatal(err)
 	}
 
-	if err = ioutil.WriteFile(path+"/_meta/data.json", output, 0644); err != nil {
+	if err = ioutil.WriteFile(p, output, 0644); err != nil {
 		t.Fatal(err)
 	}
 }

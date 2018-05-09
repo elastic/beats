@@ -3412,6 +3412,123 @@ Total number of memory used by the segments in bytes.
 --
 
 [float]
+== index.summary fields
+
+index
+
+
+
+
+*`elasticsearch.index.summary.primaries.docs.count`*::
++
+--
+type: long
+
+Total number of documents in the index.
+
+
+--
+
+*`elasticsearch.index.summary.primaries.docs.deleted`*::
++
+--
+type: long
+
+Total number of deleted documents in the index.
+
+
+--
+
+*`elasticsearch.index.summary.primaries.store.size.bytes`*::
++
+--
+type: long
+
+format: bytes
+
+Total size of the index in bytes.
+
+
+--
+
+*`elasticsearch.index.summary.primaries.segments.count`*::
++
+--
+type: long
+
+Total number of index segments.
+
+
+--
+
+*`elasticsearch.index.summary.primaries.segments.memory.bytes`*::
++
+--
+type: long
+
+format: bytes
+
+Total number of memory used by the segments in bytes.
+
+
+--
+
+
+*`elasticsearch.index.summary.total.docs.count`*::
++
+--
+type: long
+
+Total number of documents in the index.
+
+
+--
+
+*`elasticsearch.index.summary.total.docs.deleted`*::
++
+--
+type: long
+
+Total number of deleted documents in the index.
+
+
+--
+
+*`elasticsearch.index.summary.total.store.size.bytes`*::
++
+--
+type: long
+
+format: bytes
+
+Total size of the index in bytes.
+
+
+--
+
+*`elasticsearch.index.summary.total.segments.count`*::
++
+--
+type: long
+
+Total number of index segments.
+
+
+--
+
+*`elasticsearch.index.summary.total.segments.memory.bytes`*::
++
+--
+type: long
+
+format: bytes
+
+Total number of memory used by the segments in bytes.
+
+
+--
+
+[float]
 == node fields
 
 node

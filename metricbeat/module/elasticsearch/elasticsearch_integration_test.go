@@ -14,12 +14,14 @@ import (
 	mbtest "github.com/elastic/beats/metricbeat/mb/testing"
 
 	_ "github.com/elastic/beats/metricbeat/module/elasticsearch/index"
+	_ "github.com/elastic/beats/metricbeat/module/elasticsearch/index_summary"
 	_ "github.com/elastic/beats/metricbeat/module/elasticsearch/node"
 	_ "github.com/elastic/beats/metricbeat/module/elasticsearch/node_stats"
 )
 
 var metricSets = []string{
 	"index",
+	"index_summary",
 	"node",
 	"node_stats",
 }
@@ -48,7 +50,7 @@ func TestData(t *testing.T) {
 	for _, metricSet := range metricSets {
 		t.Run(metricSet, func(t *testing.T) {
 			f := mbtest.NewReportingMetricSetV2(t, getConfig(metricSet))
-			err := mbtest.WriteEventsReporterV2(f, t, "/"+metricSet)
+			err := mbtest.WriteEventsReporterV2(f, t, metricSet)
 			if err != nil {
 				t.Fatal("write", err)
 			}
