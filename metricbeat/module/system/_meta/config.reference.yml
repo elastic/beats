@@ -1,8 +1,6 @@
 - module: system
   metricsets:
     - cpu             # CPU usage
-    - filesystem      # File system usage for each mountpoint
-    - fsstat          # File system summary metrics
     - load            # CPU load averages
     - memory          # Memory usage
     - network         # Network IO
@@ -11,6 +9,8 @@
     - uptime          # System Uptime
     #- core           # Per CPU core usage
     #- diskio         # Disk IO
+    #- filesystem     # File system usage for each mountpoint
+    #- fsstat         # File system summary metrics
     #- raid           # Raid
     #- socket         # Sockets and connection info (linux only)
   enabled: true
