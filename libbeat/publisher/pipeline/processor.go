@@ -100,11 +100,8 @@ func newProcessorPipeline(
 	processors.add(localProcessors)
 
 	// setup 6: add beats and host metadata
-	if meta := global.beatsMeta; len(meta) > 0 {
+	if meta := global.builtinMeta; len(meta) > 0 {
 		processors.add(makeAddFieldsProcessor("beatsMeta", meta, needsCopy))
-	}
-	if meta := global.hostMeta; len(meta) > 0 {
-		processors.add(makeAddFieldsProcessor("hostMeta", meta, needsCopy))
 	}
 
 	// setup 7: pipeline processors list

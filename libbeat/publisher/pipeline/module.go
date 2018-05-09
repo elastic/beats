@@ -50,13 +50,15 @@ func Load(
 		Processors:    processors,
 		Annotations: Annotations{
 			Event: config.EventMetadata,
-			Beat: common.MapStr{
-				"name":     name,
-				"hostname": beatInfo.Hostname,
-				"version":  beatInfo.Version,
-			},
-			Host: common.MapStr{
-				"name": name,
+			Builtin: common.MapStr{
+				"beat": common.MapStr{
+					"name":     name,
+					"hostname": beatInfo.Hostname,
+					"version":  beatInfo.Version,
+				},
+				"host": common.MapStr{
+					"name": name,
+				},
 			},
 		},
 	}
