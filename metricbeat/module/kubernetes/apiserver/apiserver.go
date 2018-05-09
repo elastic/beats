@@ -8,7 +8,8 @@ import (
 func init() {
 	mapping := &prometheus.MetricsMapping{
 		Metrics: map[string]prometheus.MetricMap{
-			"apiserver_request_count": prometheus.Metric("request.count"),
+			"apiserver_request_count":             prometheus.Metric("request.count"),
+			"apiserver_request_latencies_summary": prometheus.Metric("request.latency"),
 		},
 
 		Labels: map[string]prometheus.LabelMap{
