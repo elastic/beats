@@ -362,5 +362,51 @@
         "name" : "access"
       }
     }
+  },
+  {
+    "_index" : "filebeat-6.0.0-alpha2-2017.05.30",
+    "_type" : "doc",
+    "_id" : "AVxWUuZ8OMOtqbaTipsE",
+    "_score" : 1.0,
+    "_source": {
+      "@timestamp": "2018-04-12T07:48:40.000Z",
+      "nginx": {
+      "access": {
+        "body_sent": {
+          "bytes": "0"
+        },
+        "referrer": "-",
+        "remote_ip": "127.0.0.1",
+        "remote_ip_list": [
+          "127.0.0.1"
+        ],
+        "response_code": "400",
+        "user_agent": {
+         "device": "Other",
+         "name": "Other",
+         "os": "Other",
+         "os_name": "Other"
+        },
+        "user_name": "-"
+      }
+      },
+      "beat" : {
+        "hostname" : "a-mac-with-esc-key-2.local",
+        "name" : "a-mac-with-esc-key-2.local",
+        "version" : "6.0.0-alpha2"
+      },
+      "prospector" : {
+        "type" : "log"
+      },
+      "input" : {
+        "type" : "log"
+      },
+      "read_timestamp": "2018-04-13T11:13:43.103Z",
+      "source" : "/Users/tsg/src/github.com/elastic/beats/filebeat/module/nginx/access/test/test.log",
+      "fileset" : {
+        "module" : "nginx",
+        "name" : "access"
+      }
+    }
   }
 ]

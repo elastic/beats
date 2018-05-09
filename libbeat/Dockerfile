@@ -1,5 +1,5 @@
 # Beats dockerfile used for testing
-FROM golang:1.9.4
+FROM golang:1.10.1
 MAINTAINER Nicolas Ruflin <ruflin@elastic.co>
 
 RUN set -x && \

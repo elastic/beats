@@ -9,15 +9,15 @@ import (
 	"github.com/elastic/beats/metricbeat/module/docker"
 )
 
-func eventsMapping(containersList []types.Container) []common.MapStr {
+func eventsMapping(containersList []types.Container, dedot bool) []common.MapStr {
 	myEvents := []common.MapStr{}
 	for _, container := range containersList {
-		myEvents = append(myEvents, eventMapping(&container))
+		myEvents = append(myEvents, eventMapping(&container, dedot))
 	}
 	return myEvents
 }
 
-func eventMapping(cont *types.Container) common.MapStr {
+func eventMapping(cont *types.Container, dedot bool) common.MapStr {
 	event := common.MapStr{
 		"created":      common.Time(time.Unix(cont.Created, 0)),
 		"id":           cont.ID,
@@ -32,7 +32,7 @@ func eventMapping(cont *types.Container) common.MapStr {
 		"status": cont.Status,
 	}
 
-	labels := docker.DeDotLabels(cont.Labels)
+	labels := docker.DeDotLabels(cont.Labels, dedot)
 
 	if len(labels) > 0 {
 		event["labels"] = labels

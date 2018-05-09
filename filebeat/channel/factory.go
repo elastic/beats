@@ -7,8 +7,7 @@ import (
 )
 
 type OutletFactory struct {
-	done     <-chan struct{}
-	pipeline beat.Pipeline
+	done <-chan struct{}
 
 	eventer  beat.ClientEventer
 	wgEvents eventCounter
@@ -47,12 +46,10 @@ type inputOutletConfig struct {
 // connecting an input to the publisher pipeline.
 func NewOutletFactory(
 	done <-chan struct{},
-	pipeline beat.Pipeline,
 	wgEvents eventCounter,
 ) *OutletFactory {
 	o := &OutletFactory{
 		done:     done,
-		pipeline: pipeline,
 		wgEvents: wgEvents,
 	}
 
@@ -67,7 +64,7 @@ func NewOutletFactory(
 // Inputs and all harvesters use the same pipeline client instance.
 // This guarantees ordering between events as required by the registrar for
 // file.State updates
-func (f *OutletFactory) Create(cfg *common.Config, dynFields *common.MapStrPointer) (Outleter, error) {
+func (f *OutletFactory) Create(p beat.Pipeline, cfg *common.Config, dynFields *common.MapStrPointer) (Outleter, error) {
 	config := inputOutletConfig{}
 	if err := cfg.Unpack(&config); err != nil {
 		return nil, err
@@ -104,7 +101,7 @@ func (f *OutletFactory) Create(cfg *common.Config, dynFields *common.MapStrPoint
 		}
 	}
 
-	client, err := f.pipeline.ConnectWith(beat.ClientConfig{
+	client, err := p.ConnectWith(beat.ClientConfig{
 		PublishMode:   beat.GuaranteedSend,
 		EventMetadata: config.EventMetadata,
 		DynamicFields: dynFields,

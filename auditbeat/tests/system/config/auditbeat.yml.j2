@@ -18,15 +18,8 @@ auditbeat.modules:
 {%- endfor %}
 
 queue.mem:
-  events: 4096
-  flush.min_events: 8
-  flush.timeout: 0.1s
+  events: 4
+  flush.min_events: 0
+  flush.timeout: 0.01s
 
-{%- if elasticsearch %}
-output.elasticsearch:
-  hosts: ["{{ elasticsearch.host }}"]
-{%- else %}
-output.file:
-  path: '{{ output_file_path|default(beat.working_dir + "/output") }}'
-  filename: {{ output_file_filename|default("auditbeat") }}
-{%- endif %}
+{% include './tests/system/config/libbeat.yml.j2' %}

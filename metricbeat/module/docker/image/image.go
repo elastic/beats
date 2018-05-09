@@ -14,9 +14,9 @@ import (
 // init registers the MetricSet with the central registry.
 // The New method will be called after the setup of the module and before starting to fetch data
 func init() {
-	if err := mb.Registry.AddMetricSet("docker", "image", New); err != nil {
-		panic(err)
-	}
+	mb.Registry.MustAddMetricSet("docker", "image", New,
+		mb.WithHostParser(docker.HostParser),
+	)
 }
 
 // MetricSet type defines all fields of the MetricSet
@@ -26,13 +26,14 @@ func init() {
 type MetricSet struct {
 	mb.BaseMetricSet
 	dockerClient *client.Client
+	dedot        bool
 }
 
 // New create a new instance of the MetricSet
 // Part of new is also setting up the configuration by processing additional
 // configuration entries if needed.
 func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
-	config := docker.Config{}
+	config := docker.DefaultConfig()
 	if err := base.Module().UnpackConfig(&config); err != nil {
 		return nil, err
 	}
@@ -45,6 +46,7 @@ func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
 	return &MetricSet{
 		BaseMetricSet: base,
 		dockerClient:  client,
+		dedot:         config.DeDot,
 	}, nil
 }
 
@@ -57,5 +59,5 @@ func (m *MetricSet) Fetch() ([]common.MapStr, error) {
 		return nil, err
 	}
 
-	return eventsMapping(images), nil
+	return eventsMapping(images, m.dedot), nil
 }

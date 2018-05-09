@@ -9,8 +9,8 @@ import (
 	"github.com/mitchellh/hashstructure"
 	"github.com/pkg/errors"
 
+	"github.com/elastic/beats/libbeat/beat"
 	"github.com/elastic/beats/libbeat/common"
-	"github.com/elastic/beats/libbeat/common/cfgwarn"
 	"github.com/elastic/beats/libbeat/logp"
 	"github.com/elastic/beats/libbeat/monitoring"
 	"github.com/elastic/beats/libbeat/paths"
@@ -46,7 +46,7 @@ type Reload struct {
 }
 
 type RunnerFactory interface {
-	Create(config *common.Config, meta *common.MapStrPointer) (Runner, error)
+	Create(p beat.Pipeline, config *common.Config, meta *common.MapStrPointer) (Runner, error)
 }
 
 type Runner interface {
@@ -56,6 +56,7 @@ type Runner interface {
 
 // Reloader is used to register and reload modules
 type Reloader struct {
+	pipeline beat.Pipeline
 	registry *Registry
 	config   DynamicConfig
 	path     string
@@ -64,7 +65,7 @@ type Reloader struct {
 }
 
 // NewReloader creates new Reloader instance for the given config
-func NewReloader(cfg *common.Config) *Reloader {
+func NewReloader(pipeline beat.Pipeline, cfg *common.Config) *Reloader {
 	config := DefaultDynamicConfig
 	cfg.Unpack(&config)
 
@@ -73,11 +74,8 @@ func NewReloader(cfg *common.Config) *Reloader {
 		path = paths.Resolve(paths.Config, path)
 	}
 
-	if config.Reload.Enabled {
-		cfgwarn.Beta("Dynamic config reload is enabled.")
-	}
-
 	return &Reloader{
+		pipeline: pipeline,
 		registry: NewRegistry(),
 		config:   config,
 		path:     path,
@@ -114,7 +112,7 @@ func (rl *Reloader) Check(runnerFactory RunnerFactory) error {
 		if !c.Enabled() {
 			continue
 		}
-		_, err := runnerFactory.Create(c, nil)
+		_, err := runnerFactory.Create(rl.pipeline, c, nil)
 		if err != nil {
 			return err
 		}
@@ -201,7 +199,7 @@ func (rl *Reloader) Run(runnerFactory RunnerFactory) {
 				// As module already exist, it must be removed from the stop list and not started
 				if !rl.registry.Has(hash) {
 					debugf("Add module to startlist: %v", hash)
-					runner, err := runnerFactory.Create(c, nil)
+					runner, err := runnerFactory.Create(rl.pipeline, c, nil)
 					if err != nil {
 						logp.Err("Unable to create runner due to error: %v", err)
 						continue

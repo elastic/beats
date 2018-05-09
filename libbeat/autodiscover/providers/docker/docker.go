@@ -6,7 +6,9 @@ import (
 	"github.com/elastic/beats/libbeat/autodiscover/template"
 	"github.com/elastic/beats/libbeat/common"
 	"github.com/elastic/beats/libbeat/common/bus"
+	"github.com/elastic/beats/libbeat/common/cfgwarn"
 	"github.com/elastic/beats/libbeat/common/docker"
+	"github.com/elastic/beats/libbeat/common/safemapstr"
 	"github.com/elastic/beats/libbeat/logp"
 )
 
@@ -19,6 +21,7 @@ type Provider struct {
 	config        *Config
 	bus           bus.Bus
 	builders      autodiscover.Builders
+	appenders     autodiscover.Appenders
 	watcher       docker.Watcher
 	templates     *template.Mapper
 	stop          chan interface{}
@@ -28,6 +31,7 @@ type Provider struct {
 
 // AutodiscoverBuilder builds and returns an autodiscover provider
 func AutodiscoverBuilder(bus bus.Bus, c *common.Config) (autodiscover.Provider, error) {
+	cfgwarn.Beta("The docker autodiscover is beta")
 	config := defaultConfig()
 	err := c.Unpack(&config)
 	if err != nil {
@@ -44,13 +48,14 @@ func AutodiscoverBuilder(bus bus.Bus, c *common.Config) (autodiscover.Provider, 
 		return nil, err
 	}
 
-	var builders autodiscover.Builders
-	for _, bcfg := range config.Builders {
-		if builder, err := autodiscover.Registry.BuildBuilder(bcfg); err != nil {
-			logp.Debug("docker", "failed to construct autodiscover builder due to error: %v", err)
-		} else {
-			builders = append(builders, builder)
-		}
+	builders, err := autodiscover.NewBuilders(config.Builders, config.HintsEnabled)
+	if err != nil {
+		return nil, err
+	}
+
+	appenders, err := autodiscover.NewAppenders(config.Appenders)
+	if err != nil {
+		return nil, err
 	}
 
 	start := watcher.ListenStart()
@@ -64,6 +69,7 @@ func AutodiscoverBuilder(bus bus.Bus, c *common.Config) (autodiscover.Provider, 
 		config:        config,
 		bus:           bus,
 		builders:      builders,
+		appenders:     appenders,
 		templates:     mapper,
 		watcher:       watcher,
 		stop:          make(chan interface{}),
@@ -106,7 +112,7 @@ func (d *Provider) emitContainer(event bus.Event, flag string) {
 
 	labelMap := common.MapStr{}
 	for k, v := range container.Labels {
-		labelMap[k] = v
+		safemapstr.Put(labelMap, k, v)
 	}
 
 	meta := common.MapStr{
@@ -117,7 +123,6 @@ func (d *Provider) emitContainer(event bus.Event, flag string) {
 			"labels": labelMap,
 		},
 	}
-
 	// Without this check there would be overlapping configurations with and without ports.
 	if len(container.Ports) == 0 {
 		event := bus.Event{
@@ -153,10 +158,15 @@ func (d *Provider) publish(event bus.Event) {
 	if config := d.templates.GetConfig(event); config != nil {
 		event["config"] = config
 	} else {
+		// If no template matches, try builders:
 		if config := d.builders.GetConfig(d.generateHints(event)); config != nil {
 			event["config"] = config
 		}
 	}
+
+	// Call all appenders to append any extra configuration
+	d.appenders.Append(event)
+
 	d.bus.Publish(event)
 }
 
@@ -166,9 +176,9 @@ func (d *Provider) generateHints(event bus.Event) bus.Event {
 	e := bus.Event{}
 	var dockerMeta common.MapStr
 
-	if rawDocker, ok := event["docker"]; ok {
+	if rawDocker, err := common.MapStr(event).GetValue("docker.container"); err == nil {
 		dockerMeta = rawDocker.(common.MapStr)
-		e["docker"] = dockerMeta
+		e["container"] = dockerMeta
 	}
 
 	if host, ok := event["host"]; ok {
@@ -177,11 +187,10 @@ func (d *Provider) generateHints(event bus.Event) bus.Event {
 	if port, ok := event["port"]; ok {
 		e["port"] = port
 	}
-	if labels, err := dockerMeta.GetValue("container.labels"); err == nil {
+	if labels, err := dockerMeta.GetValue("labels"); err == nil {
 		hints := builder.GenerateHints(labels.(common.MapStr), "", d.config.Prefix)
 		e["hints"] = hints
 	}
-
 	return e
 }
 

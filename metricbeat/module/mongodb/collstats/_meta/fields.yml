@@ -2,6 +2,7 @@
   type: group
   description: >
     MongoDB collection statistics metrics.
+  release: ga
   fields:
     - name: db
       type: keyword

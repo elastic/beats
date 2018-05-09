@@ -118,7 +118,7 @@ func NewKibanaClient(cfg *common.Config) (*Client, error) {
 	}
 
 	if err = client.SetVersion(); err != nil {
-		return nil, fmt.Errorf("fail to get the Kibana version:%v", err)
+		return nil, fmt.Errorf("fail to get the Kibana version: %v", err)
 	}
 
 	return client, nil
@@ -179,8 +179,8 @@ func (client *Client) SetVersion() error {
 		Version string `json:"version"`
 	}
 
-	_, result, err := client.Connection.Request("GET", "/api/status", nil, nil)
-	if err != nil {
+	code, result, err := client.Connection.Request("GET", "/api/status", nil, nil)
+	if err != nil || code >= 400 {
 		return fmt.Errorf("HTTP GET request to /api/status fails: %v. Response: %s.",
 			err, truncateString(result))
 	}

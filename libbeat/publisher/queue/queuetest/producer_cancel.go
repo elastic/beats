@@ -25,7 +25,7 @@ func TestProducerCancelRemovesEvents(t *testing.T, factory QueueFactory) {
 		)
 
 		log := NewTestLogger(t)
-		b := factory()
+		b := factory(t)
 		defer b.Close()
 
 		log.Debug("create first producer")

@@ -6,6 +6,7 @@ import (
 	"github.com/elastic/beats/filebeat/channel"
 	input "github.com/elastic/beats/filebeat/prospector"
 	"github.com/elastic/beats/filebeat/registrar"
+	"github.com/elastic/beats/libbeat/beat"
 	"github.com/elastic/beats/libbeat/cfgfile"
 	"github.com/elastic/beats/libbeat/common"
 	"github.com/elastic/beats/libbeat/logp"
@@ -18,6 +19,7 @@ type Factory struct {
 	registrar             *registrar.Registrar
 	beatVersion           string
 	pipelineLoaderFactory PipelineLoaderFactory
+	overwritePipelines    bool
 	beatDone              chan struct{}
 }
 
@@ -27,22 +29,24 @@ type inputsRunner struct {
 	moduleRegistry        *ModuleRegistry
 	inputs                []*input.Runner
 	pipelineLoaderFactory PipelineLoaderFactory
+	overwritePipelines    bool
 }
 
 // NewFactory instantiates a new Factory
 func NewFactory(outlet channel.Factory, registrar *registrar.Registrar, beatVersion string,
-	pipelineLoaderFactory PipelineLoaderFactory, beatDone chan struct{}) *Factory {
+	pipelineLoaderFactory PipelineLoaderFactory, overwritePipelines bool, beatDone chan struct{}) *Factory {
 	return &Factory{
 		outlet:                outlet,
 		registrar:             registrar,
 		beatVersion:           beatVersion,
 		beatDone:              beatDone,
 		pipelineLoaderFactory: pipelineLoaderFactory,
+		overwritePipelines:    overwritePipelines,
 	}
 }
 
 // Create creates a module based on a config
-func (f *Factory) Create(c *common.Config, meta *common.MapStrPointer) (cfgfile.Runner, error) {
+func (f *Factory) Create(p beat.Pipeline, c *common.Config, meta *common.MapStrPointer) (cfgfile.Runner, error) {
 	// Start a registry of one module:
 	m, err := NewModuleRegistry([]*common.Config{c}, f.beatVersion, false)
 	if err != nil {
@@ -63,8 +67,9 @@ func (f *Factory) Create(c *common.Config, meta *common.MapStrPointer) (cfgfile.
 	}
 
 	inputs := make([]*input.Runner, len(pConfigs))
+	connector := channel.ConnectTo(p, f.outlet)
 	for i, pConfig := range pConfigs {
-		inputs[i], err = input.New(pConfig, f.outlet, f.beatDone, f.registrar.GetStates(), meta)
+		inputs[i], err = input.New(pConfig, connector, f.beatDone, f.registrar.GetStates(), meta)
 		if err != nil {
 			logp.Err("Error creating input: %s", err)
 			return nil, err
@@ -76,6 +81,7 @@ func (f *Factory) Create(c *common.Config, meta *common.MapStrPointer) (cfgfile.
 		moduleRegistry:        m,
 		inputs:                inputs,
 		pipelineLoaderFactory: f.pipelineLoaderFactory,
+		overwritePipelines:    f.overwritePipelines,
 	}, nil
 }
 
@@ -87,7 +93,7 @@ func (p *inputsRunner) Start() {
 		if err != nil {
 			logp.Err("Error loading pipeline: %s", err)
 		} else {
-			err := p.moduleRegistry.LoadPipelines(pipelineLoader)
+			err := p.moduleRegistry.LoadPipelines(pipelineLoader, p.overwritePipelines)
 			if err != nil {
 				// Log error and continue
 				logp.Err("Error loading pipeline: %s", err)
@@ -96,7 +102,7 @@ func (p *inputsRunner) Start() {
 
 		// Callback:
 		callback := func(esClient *elasticsearch.Client) error {
-			return p.moduleRegistry.LoadPipelines(esClient)
+			return p.moduleRegistry.LoadPipelines(esClient, p.overwritePipelines)
 		}
 		elasticsearch.RegisterConnectCallback(callback)
 	}

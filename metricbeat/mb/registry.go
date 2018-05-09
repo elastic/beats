@@ -217,10 +217,10 @@ func (r *Register) metricSetRegistration(module, name string) (MetricSetRegistra
 	return registration, nil
 }
 
-// defaultMetricSets returns the names of the default MetricSets for a module.
+// DefaultMetricSets returns the names of the default MetricSets for a module.
 // An error is returned if no default MetricSet is declared or the module does
 // not exist.
-func (r *Register) defaultMetricSets(module string) ([]string, error) {
+func (r *Register) DefaultMetricSets(module string) ([]string, error) {
 	r.lock.RLock()
 	defer r.lock.RUnlock()
 

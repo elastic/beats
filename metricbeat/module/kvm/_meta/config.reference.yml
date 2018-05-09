@@ -1,0 +1,8 @@
+- module: kvm
+  metricsets: ["dommemstat"]
+  enabled: true
+  period: 10s
+  hosts: ["localhost"]
+
+  # Timeout to connect to Libvirt server
+  #timeout: 1s

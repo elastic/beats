@@ -22,7 +22,7 @@ func generateModule(module, modulesPath, beatsPath string) error {
 
 	replace := map[string]string{"module": module}
 	templatesPath := path.Join(beatsPath, "scripts", "module")
-	filesToCopy := []string{path.Join("_meta", "fields.yml"), path.Join("_meta", "docs.asciidoc"), path.Join("module.yml")}
+	filesToCopy := []string{path.Join("_meta", "fields.yml"), path.Join("_meta", "docs.asciidoc"), path.Join("_meta", "config.yml"), path.Join("module.yml")}
 	generator.CopyTemplates(templatesPath, modulePath, filesToCopy, replace)
 	if err != nil {
 		return err

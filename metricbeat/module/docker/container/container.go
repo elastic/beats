@@ -12,19 +12,21 @@ import (
 )
 
 func init() {
-	if err := mb.Registry.AddMetricSet("docker", "container", New, docker.HostParser); err != nil {
-		panic(err)
-	}
+	mb.Registry.MustAddMetricSet("docker", "container", New,
+		mb.WithHostParser(docker.HostParser),
+		mb.DefaultMetricSet(),
+	)
 }
 
 type MetricSet struct {
 	mb.BaseMetricSet
 	dockerClient *client.Client
+	dedot        bool
 }
 
 // New creates a new instance of the docker container MetricSet.
 func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
-	config := docker.Config{}
+	config := docker.DefaultConfig()
 	if err := base.Module().UnpackConfig(&config); err != nil {
 		return nil, err
 	}
@@ -37,6 +39,7 @@ func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
 	return &MetricSet{
 		BaseMetricSet: base,
 		dockerClient:  client,
+		dedot:         config.DeDot,
 	}, nil
 }
 
@@ -48,5 +51,5 @@ func (m *MetricSet) Fetch() ([]common.MapStr, error) {
 	if err != nil {
 		return nil, err
 	}
-	return eventsMapping(containers), nil
+	return eventsMapping(containers, m.dedot), nil
 }

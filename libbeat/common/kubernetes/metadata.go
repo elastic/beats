@@ -1,6 +1,9 @@
 package kubernetes
 
-import "github.com/elastic/beats/libbeat/common"
+import (
+	"github.com/elastic/beats/libbeat/common"
+	"github.com/elastic/beats/libbeat/common/safemapstr"
+)
 
 // MetaGenerator builds metadata objects for pods and containers
 type MetaGenerator interface {
@@ -31,7 +34,7 @@ func (g *metaGenerator) PodMetadata(pod *Pod) common.MapStr {
 	labelMap := common.MapStr{}
 	if len(g.labels) == 0 {
 		for k, v := range pod.Metadata.Labels {
-			labelMap[k] = v
+			safemapstr.Put(labelMap, k, v)
 		}
 	} else {
 		labelMap = generateMapSubset(pod.Metadata.Labels, g.labels)
@@ -54,11 +57,11 @@ func (g *metaGenerator) PodMetadata(pod *Pod) common.MapStr {
 	}
 
 	if len(labelMap) != 0 {
-		meta["labels"] = common.DeDotJSON(labelMap)
+		meta["labels"] = labelMap
 	}
 
 	if len(annotationsMap) != 0 {
-		meta["annotations"] = common.DeDotJSON(annotationsMap)
+		meta["annotations"] = annotationsMap
 	}
 
 	return meta
@@ -85,7 +88,7 @@ func generateMapSubset(input map[string]string, keys []string) common.MapStr {
 	for _, key := range keys {
 		value, ok := input[key]
 		if ok {
-			output[key] = value
+			safemapstr.Put(output, key, value)
 		}
 	}
 

@@ -1,6 +1,7 @@
 package instance
 
 import (
+	"context"
 	cryptRand "crypto/rand"
 	"encoding/json"
 	"flag"
@@ -38,6 +39,9 @@ import (
 	svc "github.com/elastic/beats/libbeat/service"
 	"github.com/elastic/beats/libbeat/template"
 	"github.com/elastic/beats/libbeat/version"
+	"github.com/elastic/go-seccomp-bpf"
+	"github.com/elastic/go-sysinfo"
+	"github.com/elastic/go-sysinfo/types"
 
 	// Register publisher pipeline modules
 	_ "github.com/elastic/beats/libbeat/publisher/includes"
@@ -46,6 +50,7 @@ import (
 	_ "github.com/elastic/beats/libbeat/processors/actions"
 	_ "github.com/elastic/beats/libbeat/processors/add_cloud_metadata"
 	_ "github.com/elastic/beats/libbeat/processors/add_docker_metadata"
+	_ "github.com/elastic/beats/libbeat/processors/add_host_metadata"
 	_ "github.com/elastic/beats/libbeat/processors/add_kubernetes_metadata"
 	_ "github.com/elastic/beats/libbeat/processors/add_locale"
 
@@ -72,8 +77,9 @@ type beatConfig struct {
 	// instance internal configs
 
 	// beat top-level settings
-	Name     string `config:"name"`
-	MaxProcs int    `config:"max_procs"`
+	Name     string         `config:"name"`
+	MaxProcs int            `config:"max_procs"`
+	Seccomp  *common.Config `config:"seccomp"`
 
 	// beat internal components configurations
 	HTTP          *common.Config `config:"http"`
@@ -103,7 +109,7 @@ func init() {
 	initRand()
 
 	flag.BoolVar(&printVersion, "version", false, "Print the version and exit")
-	flag.BoolVar(&setup, "setup", false, "Load the sample Kibana dashboards")
+	flag.BoolVar(&setup, "setup", false, "Load sample Kibana dashboards and setup Machine Learning")
 }
 
 // initRand initializes the runtime random number generator seed using
@@ -139,6 +145,15 @@ func Run(name, idxPrefix, version string, bt beat.Creator) error {
 		if err != nil {
 			return err
 		}
+
+		registry := monitoring.NewRegistry()
+		monitoring.GetNamespace("state").SetRegistry(registry)
+		monitoring.NewString(registry, "version").Set(b.Info.Version)
+		monitoring.NewString(registry, "beat").Set(b.Info.Beat)
+		monitoring.NewString(registry, "name").Set(b.Info.Name)
+		monitoring.NewString(registry, "uuid").Set(b.Info.UUID.String())
+		monitoring.NewString(registry, "hostname").Set(b.Info.Hostname)
+
 		return b.launch(bt)
 	}())
 }
@@ -217,6 +232,7 @@ func (b *Beat) createBeater(bt beat.Creator) (beat.Beater, error) {
 		return nil, err
 	}
 
+	logSystemInfo(b.Info)
 	logp.Info("Setup Beat: %s; Version: %s", b.Info.Beat, b.Info.Version)
 
 	err = b.registerTemplateLoading()
@@ -265,6 +281,12 @@ func (b *Beat) launch(bt beat.Creator) error {
 	svc.BeforeRun()
 	defer svc.Cleanup()
 
+	if b.Config.Seccomp == nil || b.Config.Seccomp.Enabled() {
+		if err = loadSeccompFilter(b.Config.Seccomp); err != nil {
+			return err
+		}
+	}
+
 	beater, err := b.createBeater(bt)
 	if err != nil {
 		return err
@@ -293,14 +315,15 @@ func (b *Beat) launch(bt beat.Creator) error {
 		return beat.GracefulExit
 	}
 
-	svc.HandleSignals(beater.Stop)
+	ctx, cancel := context.WithCancel(context.Background())
+	svc.HandleSignals(beater.Stop, cancel)
 
-	err = b.loadDashboards(false)
+	err = b.loadDashboards(ctx, false)
 	if err != nil {
 		return err
 	}
 	if setup && b.SetupMLCallback != nil {
-		err = b.SetupMLCallback(&b.Beat)
+		err = b.SetupMLCallback(&b.Beat, b.Config.Kibana)
 		if err != nil {
 			return err
 		}
@@ -309,7 +332,7 @@ func (b *Beat) launch(bt beat.Creator) error {
 	logp.Info("%s start running.", b.Info.Beat)
 
 	if b.Config.HTTP.Enabled() {
-		api.Start(b.Config.HTTP, b.Info)
+		api.Start(b.Config.HTTP)
 	}
 
 	return beater.Run(&b.Beat)
@@ -335,7 +358,7 @@ func (b *Beat) TestConfig(bt beat.Creator) error {
 }
 
 // Setup registers ES index template and kibana dashboards
-func (b *Beat) Setup(bt beat.Creator, template, dashboards, machineLearning bool) error {
+func (b *Beat) Setup(bt beat.Creator, template, dashboards, machineLearning, pipelines bool) error {
 	return handleError(func() error {
 		err := b.Init()
 		if err != nil {
@@ -381,7 +404,8 @@ func (b *Beat) Setup(bt beat.Creator, template, dashboards, machineLearning bool
 		}
 
 		if dashboards {
-			err = b.loadDashboards(true)
+			fmt.Println("Loading dashboards (Kibana must be running and reachable)")
+			err = b.loadDashboards(context.Background(), true)
 			if err != nil {
 				return err
 			}
@@ -390,11 +414,21 @@ func (b *Beat) Setup(bt beat.Creator, template, dashboards, machineLearning bool
 		}
 
 		if machineLearning && b.SetupMLCallback != nil {
-			err = b.SetupMLCallback(&b.Beat)
+			err = b.SetupMLCallback(&b.Beat, b.Config.Kibana)
 			if err != nil {
 				return err
 			}
 			fmt.Println("Loaded machine learning job configurations")
+		}
+
+		if pipelines && b.OverwritePipelinesCallback != nil {
+			esConfig := b.Config.Output.Config()
+			err = b.OverwritePipelinesCallback(esConfig)
+			if err != nil {
+				return err
+			}
+
+			fmt.Println("Loaded Ingest pipelines")
 		}
 
 		return nil
@@ -564,7 +598,7 @@ func openRegular(filename string) (*os.File, error) {
 	return f, nil
 }
 
-func (b *Beat) loadDashboards(force bool) error {
+func (b *Beat) loadDashboards(ctx context.Context, force bool) error {
 	if setup || force {
 		// -setup implies dashboards.enabled=true
 		if b.Config.Dashboards == nil {
@@ -582,7 +616,7 @@ func (b *Beat) loadDashboards(force bool) error {
 		if b.Config.Output.Name() == "elasticsearch" {
 			esConfig = b.Config.Output.Config()
 		}
-		err := dashboards.ImportDashboards(b.Info.Beat, b.Info.Hostname, paths.Resolve(paths.Home, ""),
+		err := dashboards.ImportDashboards(ctx, b.Info.Beat, b.Info.Hostname, paths.Resolve(paths.Home, ""),
 			b.Config.Kibana, esConfig, b.Config.Dashboards, nil)
 		if err != nil {
 			return fmt.Errorf("Error importing Kibana dashboards: %v", err)
@@ -674,4 +708,123 @@ func handleError(err error) error {
 	logp.Critical("Exiting: %v", err)
 	fmt.Fprintf(os.Stderr, "Exiting: %v\n", err)
 	return err
+}
+
+// logSystemInfo logs information about this system for situational awareness
+// in debugging. This information includes data about the beat, build, go
+// runtime, host, and process. If any of the data is not available it will be
+// omitted.
+func logSystemInfo(info beat.Info) {
+	defer logp.Recover("An unexpected error occurred while collecting " +
+		"information about the system.")
+	log := logp.NewLogger("beat").With(logp.Namespace("system_info"))
+
+	// Beat
+	beat := common.MapStr{
+		"type": info.Beat,
+		"uuid": info.UUID,
+		"path": common.MapStr{
+			"config": paths.Resolve(paths.Config, ""),
+			"data":   paths.Resolve(paths.Data, ""),
+			"home":   paths.Resolve(paths.Home, ""),
+			"logs":   paths.Resolve(paths.Logs, ""),
+		},
+	}
+	log.Infow("Beat info", "beat", beat)
+
+	// Build
+	build := common.MapStr{
+		"commit":  version.Commit(),
+		"time":    version.BuildTime(),
+		"version": info.Version,
+		"libbeat": version.GetDefaultVersion(),
+	}
+	log.Infow("Build info", "build", build)
+
+	// Go Runtime
+	log.Infow("Go runtime info", "go", sysinfo.Go())
+
+	// Host
+	if host, err := sysinfo.Host(); err == nil {
+		log.Infow("Host info", "host", host.Info())
+	}
+
+	// Process
+	if self, err := sysinfo.Self(); err == nil {
+		process := common.MapStr{}
+
+		if info, err := self.Info(); err == nil {
+			process["name"] = info.Name
+			process["pid"] = info.PID
+			process["ppid"] = info.PPID
+			process["cwd"] = info.CWD
+			process["exe"] = info.Exe
+			process["start_time"] = info.StartTime
+		}
+
+		if proc, ok := self.(types.Seccomp); ok {
+			if seccomp, err := proc.Seccomp(); err == nil {
+				process["seccomp"] = seccomp
+			}
+		}
+
+		if proc, ok := self.(types.Capabilities); ok {
+			if caps, err := proc.Capabilities(); err == nil {
+				process["capabilities"] = caps
+			}
+		}
+
+		if len(process) > 0 {
+			log.Infow("Process info", "process", process)
+		}
+	}
+}
+
+// loadSeccompFilter loads a seccomp system call filter into the kernel for
+// this process. This feature is only available on Linux and our implementation
+// requires Linux 3.17 or newer. This only returns an error if there is a
+// configuration problem. An errors interfacing with the kernel are only logged.
+func loadSeccompFilter(c *common.Config) error {
+	if runtime.GOOS != "linux" {
+		return nil
+	}
+
+	filter := seccomp.Filter{
+		NoNewPrivs: true,
+		Flag:       seccomp.FilterFlagTSync,
+		Policy: seccomp.Policy{
+			DefaultAction: seccomp.ActionAllow,
+			Syscalls: []seccomp.SyscallGroup{
+				{
+					Action: seccomp.ActionErrno,
+					Names: []string{
+						"execve",
+						"fork",
+						"vfork",
+						"execveat",
+					},
+				},
+			},
+		},
+	}
+
+	if c != nil && (c.HasField("default_profile") || c.HasField("syscalls")) {
+		var p seccomp.Policy
+		if err := c.Unpack(&p); err != nil {
+			return err
+		}
+		filter.Policy = p
+	}
+
+	log := logp.L().With("seccomp_filter", filter)
+	if err := seccomp.LoadFilter(filter); err != nil {
+		log.Warnf("seccomp BPF filter could not be installed (perhaps the "+
+			"kernel doesn't support this feature): %v", err)
+
+		// Only log the error. This is a non-fatal issue.
+		return nil
+	}
+
+	log.Infow("seccomp BPF filter successfully installed")
+	return nil
 }

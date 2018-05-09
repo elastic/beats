@@ -2,6 +2,7 @@ package autodiscover
 
 import (
 	"github.com/elastic/beats/libbeat/autodiscover/meta"
+	"github.com/elastic/beats/libbeat/beat"
 	"github.com/elastic/beats/libbeat/cfgfile"
 	"github.com/elastic/beats/libbeat/common"
 	"github.com/elastic/beats/libbeat/common/bus"
@@ -16,7 +17,6 @@ const debugK = "autodiscover"
 
 // Adapter must be implemented by the beat in order to provide Autodiscover
 type Adapter interface {
-	// TODO Hints
 
 	// CreateConfig generates a valid list of configs from the given event, the received event will have all keys defined by `StartFilter`
 	CreateConfig(bus.Event) ([]*common.Config, error)
@@ -34,17 +34,18 @@ type Adapter interface {
 // Autodiscover process, it takes a beat adapter and user config and runs autodiscover process, spawning
 // new modules when any configured providers does a match
 type Autodiscover struct {
-	bus       bus.Bus
-	adapter   Adapter
-	providers []Provider
-	runners   *cfgfile.Registry
-	meta      *meta.Map
+	bus             bus.Bus
+	defaultPipeline beat.Pipeline
+	adapter         Adapter
+	providers       []Provider
+	runners         *cfgfile.Registry
+	meta            *meta.Map
 
 	listener bus.Listener
 }
 
 // NewAutodiscover instantiates and returns a new Autodiscover manager
-func NewAutodiscover(name string, adapter Adapter, config *Config) (*Autodiscover, error) {
+func NewAutodiscover(name string, pipeline beat.Pipeline, adapter Adapter, config *Config) (*Autodiscover, error) {
 	// Init Event bus
 	bus := bus.New(name)
 
@@ -60,11 +61,12 @@ func NewAutodiscover(name string, adapter Adapter, config *Config) (*Autodiscove
 	}
 
 	return &Autodiscover{
-		bus:       bus,
-		adapter:   adapter,
-		runners:   cfgfile.NewRegistry(),
-		providers: providers,
-		meta:      meta.NewMap(),
+		bus:             bus,
+		defaultPipeline: pipeline,
+		adapter:         adapter,
+		runners:         cfgfile.NewRegistry(),
+		providers:       providers,
+		meta:            meta.NewMap(),
 	}, nil
 }
 
@@ -136,7 +138,7 @@ func (a *Autodiscover) handleStart(event bus.Event) {
 			continue
 		}
 
-		runner, err := a.adapter.Create(config, &dynFields)
+		runner, err := a.adapter.Create(a.defaultPipeline, config, &dynFields)
 		if err != nil {
 			logp.Debug(debugK, "Failed to create runner with config %v: %v", config, err)
 			continue

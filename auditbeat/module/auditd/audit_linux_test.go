@@ -12,12 +12,13 @@ import (
 
 	"github.com/stretchr/testify/assert"
 
+	"github.com/prometheus/procfs"
+
 	"github.com/elastic/beats/auditbeat/core"
 	"github.com/elastic/beats/libbeat/logp"
 	mbtest "github.com/elastic/beats/metricbeat/mb/testing"
 	"github.com/elastic/go-libaudit"
 	"github.com/elastic/go-libaudit/auparse"
-	"github.com/elastic/procfs"
 )
 
 // Specify the -audit flag when running these tests to interact with the real

@@ -16,10 +16,10 @@ func TestPodMetadataDeDot(t *testing.T) {
 		{
 			pod: &Pod{
 				Metadata: ObjectMeta{
-					Labels: map[string]string{"a.key": "a.value"},
+					Labels: map[string]string{"a.key": "foo", "a": "bar"},
 				},
 			},
-			meta: common.MapStr{"labels": common.MapStr{"a_key": "a.value"}},
+			meta: common.MapStr{"labels": common.MapStr{"a": common.MapStr{"value": "bar", "key": "foo"}}},
 		},
 	}
 

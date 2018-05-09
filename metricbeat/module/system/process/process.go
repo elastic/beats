@@ -20,9 +20,10 @@ import (
 var debugf = logp.MakeDebug("system.process")
 
 func init() {
-	if err := mb.Registry.AddMetricSet("system", "process", New, parse.EmptyHostParser); err != nil {
-		panic(err)
-	}
+	mb.Registry.MustAddMetricSet("system", "process", New,
+		mb.WithHostParser(parse.EmptyHostParser),
+		mb.DefaultMetricSet(),
+	)
 }
 
 // MetricSet that fetches process metrics.

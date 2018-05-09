@@ -52,6 +52,9 @@ var (
 	ErrClosed       = errors.New("reader closed")
 )
 
+// OutletFactory provides an outlet for the harvester
+type OutletFactory func() channel.Outleter
+
 // Harvester contains all harvester related data
 type Harvester struct {
 	id     uuid.UUID
@@ -62,6 +65,7 @@ type Harvester struct {
 	done     chan struct{}
 	stopOnce sync.Once
 	stopWg   *sync.WaitGroup
+	stopLock sync.Mutex
 
 	// internal harvester state
 	state  file.State
@@ -74,8 +78,8 @@ type Harvester struct {
 	encoding        encoding.Encoding
 
 	// event/state publishing
-	forwarder    *harvester.Forwarder
-	publishState func(*util.Data) bool
+	outletFactory OutletFactory
+	publishState  func(*util.Data) bool
 
 	onTerminate func()
 }
@@ -86,17 +90,18 @@ func NewHarvester(
 	state file.State,
 	states *file.States,
 	publishState func(*util.Data) bool,
-	outlet channel.Outleter,
+	outletFactory OutletFactory,
 ) (*Harvester, error) {
 
 	h := &Harvester{
-		config:       defaultConfig,
-		state:        state,
-		states:       states,
-		publishState: publishState,
-		done:         make(chan struct{}),
-		stopWg:       &sync.WaitGroup{},
-		id:           uuid.NewV4(),
+		config:        defaultConfig,
+		state:         state,
+		states:        states,
+		publishState:  publishState,
+		done:          make(chan struct{}),
+		stopWg:        &sync.WaitGroup{},
+		id:            uuid.NewV4(),
+		outletFactory: outletFactory,
 	}
 
 	if err := config.Unpack(&h.config); err != nil {
@@ -115,8 +120,6 @@ func NewHarvester(
 	}
 
 	// Add outlet signal so harvester can also stop itself
-	outlet = channel.CloseOnSignal(outlet, h.done)
-	h.forwarder = harvester.NewForwarder(outlet)
 	return h, nil
 }
 
@@ -163,11 +166,20 @@ func (h *Harvester) Run() error {
 	if h.onTerminate != nil {
 		defer h.onTerminate()
 	}
+
+	outlet := channel.CloseOnSignal(h.outletFactory(), h.done)
+	forwarder := harvester.NewForwarder(outlet)
+
 	// This is to make sure a harvester is not started anymore if stop was already
 	// called before the harvester was started. The waitgroup is not incremented afterwards
 	// as otherwise it could happened that between checking for the close channel and incrementing
 	// the waitgroup, the harvester could be stopped.
+	// Here stopLock is used to prevent a data race where stopWg.Add(1) below is called
+	// while stopWg.Wait() is executing in a different goroutine, which is forbidden
+	// according to sync.WaitGroup docs.
+	h.stopLock.Lock()
 	h.stopWg.Add(1)
+	h.stopLock.Unlock()
 	select {
 	case <-h.done:
 		h.stopWg.Done()
@@ -240,7 +252,7 @@ func (h *Harvester) Run() error {
 			case ErrInactive:
 				logp.Info("File is inactive: %s. Closing because close_inactive of %v reached.", h.state.Source, h.config.CloseInactive)
 			default:
-				logp.Err("Read line error: %s; File: ", err, h.state.Source)
+				logp.Err("Read line error: %v; File: %v", err, h.state.Source)
 			}
 			return nil
 		}
@@ -302,7 +314,7 @@ func (h *Harvester) Run() error {
 
 		// Always send event to update state, also if lines was skipped
 		// Stop harvester in case of an error
-		if !h.sendEvent(data) {
+		if !h.sendEvent(data, forwarder) {
 			return nil
 		}
 
@@ -321,17 +333,20 @@ func (h *Harvester) stop() {
 // Stop stops harvester and waits for completion
 func (h *Harvester) Stop() {
 	h.stop()
+	// Prevent stopWg.Wait() to be called at the same time as stopWg.Add(1)
+	h.stopLock.Lock()
 	h.stopWg.Wait()
+	h.stopLock.Unlock()
 }
 
 // sendEvent sends event to the spooler channel
 // Return false if event was not sent
-func (h *Harvester) sendEvent(data *util.Data) bool {
+func (h *Harvester) sendEvent(data *util.Data, forwarder *harvester.Forwarder) bool {
 	if h.source.HasState() {
 		h.states.Update(data.GetState())
 	}
 
-	err := h.forwarder.Send(data)
+	err := forwarder.Send(data)
 	return err == nil
 }
 
@@ -518,9 +533,9 @@ func (h *Harvester) newLogFileReader() (reader.Reader, error) {
 		return nil, err
 	}
 
-	if h.config.DockerJSON != "" {
+	if h.config.DockerJSON != nil {
 		// Docker json-file format, add custom parsing to the pipeline
-		r = reader.NewDockerJSON(r, h.config.DockerJSON)
+		r = reader.NewDockerJSON(r, h.config.DockerJSON.Stream, h.config.DockerJSON.Partial)
 	}
 
 	if h.config.JSON != nil {

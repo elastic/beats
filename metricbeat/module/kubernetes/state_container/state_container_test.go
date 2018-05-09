@@ -44,22 +44,27 @@ func TestEventMapping(t *testing.T) {
 	events, err := f.Fetch()
 	assert.NoError(t, err)
 
-	assert.Equal(t, 10, len(events), "Wrong number of returned events")
+	assert.Equal(t, 11, len(events), "Wrong number of returned events")
 
 	testCases := testCases()
 	for _, event := range events {
 		name, err := event.GetValue("name")
 		if err == nil {
 			namespace, err := event.GetValue("_module.namespace")
-			if err == nil {
-				eventKey := namespace.(string) + "@" + name.(string)
-				oneTestCase, oneTestCaseFound := testCases[eventKey]
-				if oneTestCaseFound {
-					for k, v := range oneTestCase {
-						testValue(eventKey, t, event, k, v)
-					}
-					delete(testCases, eventKey)
+			if err != nil {
+				continue
+			}
+			pod, err := event.GetValue("_module.pod.name")
+			if err != nil {
+				continue
+			}
+			eventKey := namespace.(string) + "@" + pod.(string) + "@" + name.(string)
+			oneTestCase, oneTestCaseFound := testCases[eventKey]
+			if oneTestCaseFound {
+				for k, v := range oneTestCase {
+					testValue(eventKey, t, event, k, v)
 				}
+				delete(testCases, eventKey)
 			}
 		}
 	}
@@ -79,7 +84,7 @@ func testValue(eventKey string, t *testing.T, event common.MapStr, field string,
 // In particular, test same named containers  in different namespaces
 func testCases() map[string]map[string]interface{} {
 	return map[string]map[string]interface{}{
-		"kube-system@kubedns": {
+		"kube-system@kube-dns-v20-5g5cb@kubedns": {
 			"_namespace":        "container",
 			"_module.namespace": "kube-system",
 			"_module.node.name": "minikube",
@@ -94,9 +99,10 @@ func testCases() map[string]map[string]interface{} {
 
 			"memory.limit.bytes":    178257920,
 			"memory.request.bytes":  73400320,
-			"cpu.request.nanocores": float64(1e+08),
+			"cpu.request.cores":     0.1,
+			"cpu.request.nanocores": 1e+08,
 		},
-		"test@kubedns": {
+		"test@kube-dns-v20-5g5cb-test@kubedns": {
 			"_namespace":        "container",
 			"_module.namespace": "test",
 			"_module.node.name": "minikube-test",
@@ -105,15 +111,16 @@ func testCases() map[string]map[string]interface{} {
 			"id":                "docker://fa3d83f648de42492b38fa3e8501d109376f391c50f2bd210c895c8477ae4b62-test",
 
 			"image":           "gcr.io/google_containers/kubedns-amd64:1.9-test",
-			"status.phase":    "terminate",
+			"status.phase":    "terminated",
 			"status.ready":    false,
 			"status.restarts": 3,
 
 			"memory.limit.bytes":    278257920,
 			"memory.request.bytes":  83400320,
-			"cpu.request.nanocores": float64(2e+08),
+			"cpu.request.cores":     0.2,
+			"cpu.request.nanocores": 2e+08,
 		},
-		"kube-system@healthz": {
+		"kube-system@kube-dns-v20-5g5cb@healthz": {
 			"_namespace":        "container",
 			"_module.namespace": "kube-system",
 			"_module.node.name": "minikube",
@@ -128,7 +135,8 @@ func testCases() map[string]map[string]interface{} {
 
 			"memory.limit.bytes":    52428800,
 			"memory.request.bytes":  52428800,
-			"cpu.request.nanocores": float64(1e+07),
+			"cpu.request.cores":     0.01,
+			"cpu.request.nanocores": 1e+07,
 		},
 	}
 }

@@ -1,5 +1,0 @@
-queue.mem:
-  events: 4096
-  flush:
-    min_events: 0
-    timeout: 0

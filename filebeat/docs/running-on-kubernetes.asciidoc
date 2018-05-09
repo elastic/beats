@@ -19,7 +19,7 @@ By deploying Filebeat as a https://kubernetes.io/docs/concepts/workloads/control
 we ensure we get a running instance on each node of the cluster.
 
 Docker logs host folder (`/var/lib/docker/containers`) is mounted on the Filebeat
-container. Filebeat will start a prospector for these files and start harvesting
+container. Filebeat will start an input for these files and start harvesting
 them as they appear.
 
 Everything is deployed under `kube-system` namespace, you can change that by

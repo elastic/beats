@@ -5,6 +5,7 @@ import (
 	"log"
 	"os"
 	"path/filepath"
+	"sort"
 	"time"
 
 	"github.com/elastic/beats/libbeat/autodiscover"
@@ -21,23 +22,27 @@ const (
 )
 
 type Config struct {
-	Inputs           []*common.Config     `config:"inputs"`
-	Prospectors      []*common.Config     `config:"prospectors"`
-	RegistryFile     string               `config:"registry_file"`
-	RegistryFlush    time.Duration        `config:"registry_flush"`
-	ConfigDir        string               `config:"config_dir"`
-	ShutdownTimeout  time.Duration        `config:"shutdown_timeout"`
-	Modules          []*common.Config     `config:"modules"`
-	ConfigInput      *common.Config       `config:"config.inputs"`
-	ConfigProspector *common.Config       `config:"config.prospectors"`
-	ConfigModules    *common.Config       `config:"config.modules"`
-	Autodiscover     *autodiscover.Config `config:"autodiscover"`
+	Inputs                  []*common.Config     `config:"inputs"`
+	Prospectors             []*common.Config     `config:"prospectors"`
+	RegistryFile            string               `config:"registry_file"`
+	RegistryFilePermissions os.FileMode          `config:"registry_file_permissions"`
+	RegistryFlush           time.Duration        `config:"registry_flush"`
+	ConfigDir               string               `config:"config_dir"`
+	ShutdownTimeout         time.Duration        `config:"shutdown_timeout"`
+	Modules                 []*common.Config     `config:"modules"`
+	ConfigInput             *common.Config       `config:"config.inputs"`
+	ConfigProspector        *common.Config       `config:"config.prospectors"`
+	ConfigModules           *common.Config       `config:"config.modules"`
+	Autodiscover            *autodiscover.Config `config:"autodiscover"`
+	OverwritePipelines      bool                 `config:"overwrite_pipelines"`
 }
 
 var (
 	DefaultConfig = Config{
-		RegistryFile:    "registry",
-		ShutdownTimeout: 0,
+		RegistryFile:            "registry",
+		RegistryFilePermissions: 0600,
+		ShutdownTimeout:         0,
+		OverwritePipelines:      false,
 	}
 )
 
@@ -129,4 +134,31 @@ func (config *Config) FetchConfigs() error {
 	}
 
 	return nil
+}
+
+// ListEnabledInputs returns a list of enabled inputs sorted by alphabetical order.
+func (config *Config) ListEnabledInputs() []string {
+	t := struct {
+		Type string `config:"type"`
+	}{}
+	var inputs []string
+	for _, input := range config.Inputs {
+		if input.Enabled() {
+			input.Unpack(&t)
+			inputs = append(inputs, t.Type)
+		}
+	}
+	sort.Strings(inputs)
+	return inputs
+}
+
+// IsInputEnabled returns true if the plugin name is enabled.
+func (config *Config) IsInputEnabled(name string) bool {
+	enabledInputs := config.ListEnabledInputs()
+	for _, input := range enabledInputs {
+		if name == input {
+			return true
+		}
+	}
+	return false
 }

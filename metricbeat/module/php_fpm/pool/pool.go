@@ -13,9 +13,10 @@ import (
 
 // init registers the MetricSet with the central registry.
 func init() {
-	if err := mb.Registry.AddMetricSet("php_fpm", "pool", New, HostParser); err != nil {
-		panic(err)
-	}
+	mb.Registry.MustAddMetricSet("php_fpm", "pool", New,
+		mb.WithHostParser(hostParser),
+		mb.DefaultMetricSet(),
+	)
 }
 
 const (
@@ -23,8 +24,8 @@ const (
 	defaultPath   = "/status"
 )
 
-// HostParser is used for parsing the configured php-fpm hosts.
-var HostParser = parse.URLHostParserBuilder{
+// hostParser is used for parsing the configured php-fpm hosts.
+var hostParser = parse.URLHostParserBuilder{
 	DefaultScheme: defaultScheme,
 	DefaultPath:   defaultPath,
 	QueryParams:   "json",

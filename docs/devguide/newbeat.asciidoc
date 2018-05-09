@@ -41,17 +41,16 @@ For general information about contributing to Beats, see <<beats-contributing>>.
 
 After you have https://golang.org/doc/install[installed Go] and set up the
 https://golang.org/doc/code.html#GOPATH[GOPATH] environment variable to point to
-your preferred workspace location, a simple way of getting the source code for
-Beats, including libbeat and the Beat generator, is to do:
+your preferred workspace location, clone the Beats repository in the correct location
+under `GOPATH`:
 
 [source,shell]
 ----------------------------------------------------------------------
-go get github.com/elastic/beats
+mkdir -p ${GOPATH}/src/github.com/elastic
+git clone https://github.com/elastic/beats ${GOPATH}/src/github.com/elastic/beats
 ----------------------------------------------------------------------
 
-When you run the command, all source files are downloaded to the
-`$GOPATH/src/github.com/elastic/beats` path. You can ignore the "no buildable Go source files" message because
-you will build the source later. By default `go get`  fetches the master branch. To build your beat
+To build your beat
 on a specific version of libbeat, check out the specific branch ({doc-branch} in the example below):
 
 ["source","sh",subs="attributes"]

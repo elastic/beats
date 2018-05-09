@@ -43,8 +43,10 @@ The supported processors are:
  * <<drop-event,`drop_event`>>
  * <<drop-fields,`drop_fields`>>
  * <<include-fields,`include_fields`>>
+ * <<rename-fields,`rename`>>
  * <<add-kubernetes-metadata,`add_kubernetes_metadata`>>
  * <<add-docker-metadata,`add_docker_metadata`>>
+ * <<add-host-metadata,`add_host_metadata`>>
 
 [[conditions]]
 ==== Conditions
@@ -53,8 +55,8 @@ Each condition receives a field to compare. You can specify multiple fields
 under the same condition by using `AND` between the fields (for example,
 `field1 AND field2`).
 
-For each field, you can specify a simple field name or a nested map, for
-example `dns.question.name`.
+For each field, you can specify a simple field name or a nested map, for example
+`dns.question.name`.
 
 See <<exported-fields>> for a list of all the fields that are exported by
 {beatname_uc}.
@@ -65,6 +67,7 @@ The supported conditions are:
 * <<condition-contains,`contains`>>
 * <<condition-regexp,`regexp`>>
 * <<condition-range, `range`>>
+* <<condition-has_fields, `has_fields`>>
 * <<condition-or, `or`>>
 * <<condition-and, `and`>>
 * <<condition-not, `not`>>
@@ -153,6 +156,23 @@ between 0.5 and 0.8.
 range:
     system.cpu.user.pct.gte: 0.5
     system.cpu.user.pct.lt: 0.8
+------
+
+
+[float]
+[[condition-has_fields]]
+===== `has_fields`
+
+The `has_fields` condition checks if all the given fields exist in the
+event. The condition accepts a list of string values denoting the field names.
+
+For example, the following condition checks if the `http.response.code` field
+is present in the event.
+
+
+[source,yaml]
+------
+has_fields: ['http.response.code']
 ------
 
 
@@ -512,6 +532,49 @@ section.
 NOTE: If you define an empty list of fields under `include_fields`, then only
 the required fields, `@timestamp` and `type`, are exported.
 
+[[rename-fields]]
+=== Rename fields from events
+
+The `rename` processor specifies a list of fields to rename. Under the `fields`
+key each entry contains a `from: old-key` and a `to: new-key` pair. `from` is
+the origin and `to` the target name of the field.
+
+Renaming fields can be useful in cases where field names cause conflicts. For
+example if an event has two fields, `c` and `c.b`, that are both assigned scalar
+values (e.g. `{"c": 1, "c.b": 2}`) this will result in an Elasticsearch error at
+ingest time. This is because the value of a cannot simultaneously be a scalar
+and an object. To prevent this rename_fields can be used to rename `c` to
+`c.value`.
+
+Rename fields cannot be used to overwrite fields. To overwrite fields either
+first rename the target field or use the `drop_fields` processor to drop the
+field and then rename the field.
+
+[source,yaml]
+-------
+processors:
+- rename:
+    fields:
+     - from: "a.g"
+       to: "e.d"
+    ignore_missing: false
+    fail_on_error: true
+-------
+
+The `rename` processor has the following configuration settings:
+
+`ignore_missing`:: (Optional) If set to true, no error is logged in case a key
+which should be renamed is missing. Default is `false`.
+
+`fail_on_error`:: (Optional) If set to true, in case of an error the renaming of
+fields is stopped and the original event is returned. If set to false, renaming
+continues also if an error happened during renaming. Default is `true`.
+
+See <<conditions>> for a list of supported conditions.
+
+You can specify multiple `ignore_missing` processors under the `processors`
+section.
+
 [[add-kubernetes-metadata]]
 === Add Kubernetes metadata
 
@@ -657,3 +720,44 @@ for container ID. It defaults to 4 to match
 
 `cleanup_timeout`:: (Optional) Time of inactivity to consider we can clean and
 forget metadata for a container, 60s by default.
+
+
+[[add-host-metadata]]
+=== Add Host metadata
+
+beta[]
+
+[source,yaml]
+-------------------------------------------------------------------------------
+processors:
+- add_host_metadata:
+    netinfo.enabled: false
+-------------------------------------------------------------------------------
+
+It has the following settings:
+
+`netinfo.enabled`:: (Optional) Default false. Include IP adresses and MAC addresses as fields host.ip and host.mac
+
+The `add_host_metadata` processor annotates each event with relevant metadata from the host machine.
+The fields added to the event are looking as following:
+
+[source,json]
+-------------------------------------------------------------------------------
+{
+   "host":{
+      "architecture":"x86_64",
+      "name":"example-host",
+      "id":"",
+      "os":{
+         "family":"darwin",
+         "build":"16G1212",
+         "platform":"darwin",
+         "version":"10.12.6"
+      },
+      ip: ["192.168.0.1", "10.0.0.1"],
+      mac: ["00:25:96:12:34:56", "72:00:06:ff:79:f1"]
+   }
+}
+-------------------------------------------------------------------------------
+
+NOTE: The host information is refreshed every 5 minutes.

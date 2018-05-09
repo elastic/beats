@@ -1,6 +1,7 @@
 package service
 
 import (
+	"context"
 	"expvar"
 	"flag"
 	"fmt"
@@ -22,7 +23,7 @@ import (
 // HandleSignals manages OS signals that ask the service/daemon to stop.
 // The stopFunction should break the loop in the Beat so that
 // the service shut downs gracefully.
-func HandleSignals(stopFunction func()) {
+func HandleSignals(stopFunction func(), cancel context.CancelFunc) {
 	var callback sync.Once
 
 	// On ^C or SIGTERM, gracefully stop the sniffer
@@ -31,6 +32,7 @@ func HandleSignals(stopFunction func()) {
 	go func() {
 		<-sigc
 		logp.Debug("service", "Received sigterm/sigint, stopping")
+		cancel()
 		callback.Do(stopFunction)
 	}()
 

@@ -8,7 +8,9 @@ import (
 	"github.com/elastic/beats/libbeat/autodiscover/template"
 	"github.com/elastic/beats/libbeat/common"
 	"github.com/elastic/beats/libbeat/common/bus"
+	"github.com/elastic/beats/libbeat/common/cfgwarn"
 	"github.com/elastic/beats/libbeat/common/kubernetes"
+	"github.com/elastic/beats/libbeat/common/safemapstr"
 	"github.com/elastic/beats/libbeat/logp"
 )
 
@@ -24,10 +26,12 @@ type Provider struct {
 	metagen   kubernetes.MetaGenerator
 	templates *template.Mapper
 	builders  autodiscover.Builders
+	appenders autodiscover.Appenders
 }
 
 // AutodiscoverBuilder builds and returns an autodiscover provider
 func AutodiscoverBuilder(bus bus.Bus, c *common.Config) (autodiscover.Provider, error) {
+	cfgwarn.Beta("The kubernetes autodiscover is beta")
 	config := defaultConfig()
 	err := c.Unpack(&config)
 	if err != nil {
@@ -58,13 +62,14 @@ func AutodiscoverBuilder(bus bus.Bus, c *common.Config) (autodiscover.Provider, 
 		return nil, err
 	}
 
-	var builders autodiscover.Builders
-	for _, bcfg := range config.Builders {
-		if builder, err := autodiscover.Registry.BuildBuilder(bcfg); err != nil {
-			logp.Debug("kubernetes", "failed to construct autodiscover builder due to error: %v", err)
-		} else {
-			builders = append(builders, builder)
-		}
+	builders, err := autodiscover.NewBuilders(config.Builders, config.HintsEnabled)
+	if err != nil {
+		return nil, err
+	}
+
+	appenders, err := autodiscover.NewAppenders(config.Appenders)
+	if err != nil {
+		return nil, err
 	}
 
 	p := &Provider{
@@ -72,6 +77,7 @@ func AutodiscoverBuilder(bus bus.Bus, c *common.Config) (autodiscover.Provider, 
 		bus:       bus,
 		templates: mapper,
 		builders:  builders,
+		appenders: appenders,
 		metagen:   metagen,
 		watcher:   watcher,
 	}
@@ -111,19 +117,22 @@ func (p *Provider) emitEvents(pod *kubernetes.Pod, flag string, containers []kub
 	containerstatuses []kubernetes.PodContainerStatus) {
 	host := pod.Status.PodIP
 
-	// Collect all container IDs
+	// Collect all container IDs and runtimes from status information.
 	containerIDs := map[string]string{}
+	runtimes := map[string]string{}
 	for _, c := range containerstatuses {
-		cid := c.GetContainerID()
+		cid, runtime := c.GetContainerIDWithRuntime()
 		containerIDs[c.Name] = cid
+		runtimes[c.Name] = runtime
 	}
 
 	// Emit container and port information
 	for _, c := range containers {
 		cmeta := common.MapStr{
-			"id":    containerIDs[c.Name],
-			"name":  c.Name,
-			"image": c.Image,
+			"id":      containerIDs[c.Name],
+			"name":    c.Name,
+			"image":   c.Image,
+			"runtime": runtimes[c.Name],
 		}
 		meta := p.metagen.ContainerMetadata(pod, c.Name)
 
@@ -134,7 +143,7 @@ func (p *Provider) emitEvents(pod *kubernetes.Pod, flag string, containers []kub
 		// Pass annotations to all events so that it can be used in templating and by annotation builders.
 		annotations := common.MapStr{}
 		for k, v := range pod.GetMetadata().Annotations {
-			annotations[k] = v
+			safemapstr.Put(annotations, k, v)
 		}
 		kubemeta["annotations"] = annotations
 
@@ -177,6 +186,8 @@ func (p *Provider) publish(event bus.Event) {
 		}
 	}
 
+	// Call all appenders to append any extra configuration
+	p.appenders.Append(event)
 	p.bus.Publish(event)
 }
 
@@ -204,9 +215,10 @@ func (p *Provider) generateHints(event bus.Event) bus.Event {
 
 	if rawCont, ok := kubeMeta["container"]; ok {
 		container = rawCont.(common.MapStr)
-		e["docker"] = common.MapStr{
-			"container": container,
-		}
+		// This would end up adding a runtime entry into the event. This would make sure
+		// that there is not an attempt to spin up a docker input for a rkt container and when a
+		// rkt input exists it would be natively supported.
+		e["container"] = container
 	}
 
 	cname := builder.GetContainerName(container)

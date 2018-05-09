@@ -7,8 +7,8 @@ import (
 	"net/http"
 	"time"
 
-	"github.com/urso/go-structform/gotype"
-	"github.com/urso/go-structform/json"
+	"github.com/elastic/go-structform/gotype"
+	"github.com/elastic/go-structform/json"
 
 	"github.com/elastic/beats/libbeat/beat"
 	"github.com/elastic/beats/libbeat/common"

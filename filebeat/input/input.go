@@ -34,7 +34,7 @@ type Runner struct {
 // New instantiates a new Runner
 func New(
 	conf *common.Config,
-	outlet channel.Factory,
+	outlet channel.Connector,
 	beatDone chan struct{},
 	states []file.State,
 	dynFields *common.MapStrPointer,

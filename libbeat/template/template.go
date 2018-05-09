@@ -6,6 +6,7 @@ import (
 
 	"github.com/elastic/beats/libbeat/beat"
 	"github.com/elastic/beats/libbeat/common"
+	"github.com/elastic/beats/libbeat/common/cfgwarn"
 	"github.com/elastic/beats/libbeat/common/fmtstr"
 )
 
@@ -24,7 +25,7 @@ type Template struct {
 	pattern     string
 	beatVersion common.Version
 	esVersion   common.Version
-	settings    TemplateSettings
+	config      TemplateConfig
 }
 
 // New creates a new template instance
@@ -87,24 +88,33 @@ func New(beatVersion string, beatName string, esVersion string, config TemplateC
 		name:        name,
 		beatVersion: *bV,
 		esVersion:   *esV,
-		settings:    config.Settings,
+		config:      config,
 	}, nil
 }
 
 // Load the given input and generates the input based on it
 func (t *Template) Load(file string) (common.MapStr, error) {
+
 	fields, err := common.LoadFieldsYaml(file)
 	if err != nil {
 		return nil, err
 	}
 
+	if len(t.config.AppendFields) > 0 {
+		cfgwarn.Experimental("append_fields is used.")
+		fields, err = appendFields(fields, t.config.AppendFields)
+		if err != nil {
+			return nil, err
+		}
+	}
+
 	// Start processing at the root
 	properties := common.MapStr{}
 	processor := Processor{EsVersion: t.esVersion}
-	if err := processor.process(fields, "", properties); err != nil {
+	if err := processor.Process(fields, "", properties); err != nil {
 		return nil, err
 	}
-	output := t.generate(properties, dynamicTemplates)
+	output := t.Generate(properties, dynamicTemplates)
 
 	return output, nil
 }
@@ -119,9 +129,9 @@ func (t *Template) GetPattern() string {
 	return t.pattern
 }
 
-// generate generates the full template
+// Generate generates the full template
 // The default values are taken from the default variable.
-func (t *Template) generate(properties common.MapStr, dynamicTemplates []common.MapStr) common.MapStr {
+func (t *Template) Generate(properties common.MapStr, dynamicTemplates []common.MapStr) common.MapStr {
 	// Add base dynamic template
 	var dynamicTemplateBase = common.MapStr{
 		"strings_as_keyword": common.MapStr{
@@ -155,7 +165,7 @@ func (t *Template) generate(properties common.MapStr, dynamicTemplates []common.
 		indexSettings.Put("number_of_routing_shards", defaultNumberOfRoutingShards)
 	}
 
-	indexSettings.DeepUpdate(t.settings.Index)
+	indexSettings.DeepUpdate(t.config.Settings.Index)
 
 	var mappingName string
 	if t.esVersion.Major >= 6 {
@@ -182,9 +192,9 @@ func (t *Template) generate(properties common.MapStr, dynamicTemplates []common.
 		},
 	}
 
-	if len(t.settings.Source) > 0 {
+	if len(t.config.Settings.Source) > 0 {
 		key := fmt.Sprintf("mappings.%s._source", mappingName)
-		basicStructure.Put(key, t.settings.Source)
+		basicStructure.Put(key, t.config.Settings.Source)
 	}
 
 	// ES 6 moved from template to index_patterns: https://github.com/elastic/elasticsearch/pull/21009
@@ -199,4 +209,20 @@ func (t *Template) generate(properties common.MapStr, dynamicTemplates []common.
 	}
 
 	return basicStructure
+}
+
+func appendFields(fields, appendFields common.Fields) (common.Fields, error) {
+	if len(appendFields) > 0 {
+		appendFieldKeys := appendFields.GetKeys()
+
+		// Append is only allowed to add fields, not overwrite
+		for _, key := range appendFieldKeys {
+			if fields.HasNode(key) {
+				return nil, fmt.Errorf("append_fields contains an already existing key: %s", key)
+			}
+		}
+		// Appends fields to existing fields
+		fields = append(fields, appendFields...)
+	}
+	return fields, nil
 }

@@ -1,0 +1,6 @@
+- module: munin
+  metricsets: ["node"]
+  enabled: true
+  period: 10s
+  hosts: ["localhost:4949"]
+  node.namespace: node

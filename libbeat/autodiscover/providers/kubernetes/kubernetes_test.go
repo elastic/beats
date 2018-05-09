@@ -41,23 +41,24 @@ func TestGenerateHints(t *testing.T) {
 			event: bus.Event{
 				"kubernetes": common.MapStr{
 					"container": common.MapStr{
-						"name": "foobar",
-						"id":   "abc",
+						"name":    "foobar",
+						"id":      "abc",
+						"runtime": "rkt",
 					},
 				},
 			},
 			result: bus.Event{
 				"kubernetes": common.MapStr{
 					"container": common.MapStr{
-						"name": "foobar",
-						"id":   "abc",
+						"name":    "foobar",
+						"id":      "abc",
+						"runtime": "rkt",
 					},
 				},
-				"docker": common.MapStr{
-					"container": common.MapStr{
-						"name": "foobar",
-						"id":   "abc",
-					},
+				"container": common.MapStr{
+					"name":    "foobar",
+					"id":      "abc",
+					"runtime": "rkt",
 				},
 			},
 		},
@@ -69,31 +70,33 @@ func TestGenerateHints(t *testing.T) {
 		{
 			event: bus.Event{
 				"kubernetes": common.MapStr{
-					"annotations": common.MapStr{
+					"annotations": getNestedAnnotations(common.MapStr{
 						"co.elastic.logs/multiline.pattern": "^test",
 						"co.elastic.metrics/module":         "prometheus",
 						"co.elastic.metrics/period":         "10s",
 						"co.elastic.metrics.foobar/period":  "15s",
 						"not.to.include":                    "true",
-					},
+					}),
 					"container": common.MapStr{
-						"name": "foobar",
-						"id":   "abc",
+						"name":    "foobar",
+						"id":      "abc",
+						"runtime": "docker",
 					},
 				},
 			},
 			result: bus.Event{
 				"kubernetes": common.MapStr{
-					"annotations": common.MapStr{
+					"annotations": getNestedAnnotations(common.MapStr{
 						"co.elastic.logs/multiline.pattern": "^test",
 						"co.elastic.metrics/module":         "prometheus",
 						"not.to.include":                    "true",
 						"co.elastic.metrics/period":         "10s",
 						"co.elastic.metrics.foobar/period":  "15s",
-					},
+					}),
 					"container": common.MapStr{
-						"name": "foobar",
-						"id":   "abc",
+						"name":    "foobar",
+						"id":      "abc",
+						"runtime": "docker",
 					},
 				},
 				"hints": common.MapStr{
@@ -107,11 +110,10 @@ func TestGenerateHints(t *testing.T) {
 						"period": "15s",
 					},
 				},
-				"docker": common.MapStr{
-					"container": common.MapStr{
-						"name": "foobar",
-						"id":   "abc",
-					},
+				"container": common.MapStr{
+					"name":    "foobar",
+					"id":      "abc",
+					"runtime": "docker",
 				},
 			},
 		},
@@ -125,4 +127,13 @@ func TestGenerateHints(t *testing.T) {
 	for _, test := range tests {
 		assert.Equal(t, p.generateHints(test.event), test.result)
 	}
+}
+
+func getNestedAnnotations(in common.MapStr) common.MapStr {
+	out := common.MapStr{}
+
+	for k, v := range in {
+		out.Put(k, v)
+	}
+	return out
 }

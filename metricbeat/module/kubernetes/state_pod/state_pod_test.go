@@ -44,7 +44,7 @@ func TestEventMapping(t *testing.T) {
 	events, err := f.Fetch()
 	assert.NoError(t, err)
 
-	assert.Equal(t, 11, len(events), "Wrong number of returned events")
+	assert.Equal(t, 9, len(events), "Wrong number of returned events")
 
 	testCases := testCases()
 	for _, event := range events {
