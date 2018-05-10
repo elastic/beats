@@ -57,10 +57,10 @@ func TestPodIndexer(t *testing.T) {
 	assert.Equal(t, indices[0], fmt.Sprintf("%s/%s", ns, podName))
 }
 
-func TestPodUidIndexer(t *testing.T) {
+func TestPodUIDIndexer(t *testing.T) {
 	var testConfig = common.NewConfig()
 
-	podUidIndexer, err := NewPodUidIndexer(*testConfig, metagen)
+	podUIDIndexer, err := NewPodUIDIndexer(*testConfig, metagen)
 	assert.Nil(t, err)
 
 	podName := "testpod"
@@ -80,7 +80,7 @@ func TestPodUidIndexer(t *testing.T) {
 		},
 	}
 
-	indexers := podUidIndexer.GetMetadata(&pod)
+	indexers := podUIDIndexer.GetMetadata(&pod)
 	assert.Equal(t, len(indexers), 1)
 	assert.Equal(t, indexers[0].Index, uid)
 
@@ -100,7 +100,7 @@ func TestPodUidIndexer(t *testing.T) {
 
 	assert.Equal(t, expected.String(), indexers[0].Data.String())
 
-	indices := podUidIndexer.GetIndexes(&pod)
+	indices := podUIDIndexer.GetIndexes(&pod)
 	assert.Equal(t, len(indices), 1)
 	assert.Equal(t, indices[0], uid)
 }

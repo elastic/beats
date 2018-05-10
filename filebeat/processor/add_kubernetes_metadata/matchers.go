@@ -55,10 +55,8 @@ func newLogsPathMatcher(cfg common.Config) (add_kubernetes_metadata.Matcher, err
 
 // Docker container ID is a 64-character-long hexadecimal string
 const containerIdLen = 64
-// Pod UID is a 36-character-long string
-const podUidLen = 36
 // Pod UID is on the 5th index of the path directories
-const podUidPos = 5
+const podUIDPos = 5
 
 func (f *LogPathMatcher) MetadataIndex(event common.MapStr) string {
 	if value, ok := event["source"]; ok {
@@ -78,11 +76,11 @@ func (f *LogPathMatcher) MetadataIndex(event common.MapStr) string {
 			// This will extract only the pod UID, which offers less granularity of metadata when compared to the container ID
 			if strings.HasPrefix(f.LogsPath, "/var/lib/kubelet/pods/") && strings.HasSuffix(source, ".log") {
 				pathDirs := strings.Split(source, "/")
-				if len(pathDirs) > podUidPos {
-					podUid := strings.Split(source, "/")[podUidPos]
+				if len(pathDirs) > podUIDPos {
+					podUID := strings.Split(source, "/")[podUIDPos]
 
-					logp.Debug("kubernetes", "Using pod uid: %s", podUid)
-					return podUid
+					logp.Debug("kubernetes", "Using pod uid: %s", podUID)
+					return podUID
 				}
 
 				logp.Debug("kubernetes", "Error extracting pod uid - source value contains matcher's logs_path, however it is too short to contain a Pod UID.")
@@ -91,8 +89,8 @@ func (f *LogPathMatcher) MetadataIndex(event common.MapStr) string {
 			// In case of the Kubernetes log path "/var/log/containers/",
 			// the container ID will be located right before the ".log" extension.
 			if strings.HasPrefix(f.LogsPath, "/var/log/containers/") && strings.HasSuffix(source, ".log") && sourceLen >= containerIdLen+4 {
-				containerIdEnd := sourceLen - 4
-				cid := source[containerIdEnd-containerIdLen : containerIdEnd]
+				containerIDEnd := sourceLen - 4
+				cid := source[containerIDEnd-containerIdLen : containerIDEnd]
 				logp.Debug("kubernetes", "Using container id: %s", cid)
 				return cid
 			}
