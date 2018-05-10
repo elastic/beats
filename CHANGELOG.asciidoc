@@ -42,6 +42,7 @@ https://github.com/elastic/beats/compare/v6.2.3...master[Check the HEAD diff]
 - Refactor docker CPU calculations to be more consistent with `docker stats`. {pull}6608[6608]
 - Update logstash.node_stats metricset to write data under `logstash.node.stats.*`. {pull}6714[6714]
 - Fixed typo in values for `state_container` `status.phase`, from `terminate` to `terminated`. {pull}6916[6916]
+- RabbitMQ management plugin path is now configured at the module level instead of having to do it in each of the metricsets. New `management_path_prefix` option should be used now {pull}7074[7074]
 
 *Packetbeat*
 
@@ -230,6 +231,7 @@ https://github.com/elastic/beats/compare/v6.2.3...master[Check the HEAD diff]
 - Add message rates to the RabbitMQ queue metricset {issue}6442[6442] {pull}6606[6606]
 - Add exchanges metricset to the RabbitMQ module {issue}6442[6442] {pull}6607[6607]
 - Add Elasticsearch index_summary metricset. {pull}6918[6918]
+- Add config option `management_path_prefix` for RabbitMQ module to configure management plugin path prefix {issue}6875[6875] {pull}7074[7074]
 
 *Packetbeat*
 
