@@ -17,6 +17,7 @@ https://github.com/elastic/beats/compare/v6.0.0-beta2...master[Check the HEAD di
 - Rename beat.cpu.*.time metrics to beat.cpu.*.time.ms. {pull}6449[6449]
 - Mark `system.syslog.message` and `system.auth.message` as `text` instead of `keyword`. {pull}6589[6589]
 - Allow override of dynamic template `match_mapping_type` for fields with object_type. {pull}6691[6691]
+- Add `host.name` field to all events, to avoid mapping conflicts. This could be breaking Logstash configs if you rely on the `host` field being a string. {pull}7051[7051]
 
 *Auditbeat*
 

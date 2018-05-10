@@ -36,13 +36,14 @@ exec { go get -u github.com/jstemmer/go-junit-report }
 echo "Building $env:beat"
 exec { go build } "Build FAILURE"
 
+# always build the libbeat fields
+cp ..\libbeat\_meta\fields.common.yml ..\libbeat\_meta\fields.generated.yml
+cat ..\libbeat\processors\*\_meta\fields.yml | Out-File -append -encoding UTF8 -filepath ..\libbeat\_meta\fields.generated.yml
+cp ..\libbeat\_meta\fields.generated.yml ..\libbeat\fields.yml
+
 if ($env:beat -eq "metricbeat") {
     cp .\_meta\fields.common.yml .\_meta\fields.generated.yml
     python .\scripts\fields_collector.py | out-file -append -encoding UTF8 -filepath .\_meta\fields.generated.yml
-} elseif ($env:beat -eq "libbeat") {
-    cp .\_meta\fields.common.yml .\_meta\fields.generated.yml
-    cat processors\*\_meta\fields.yml | Out-File -append -encoding UTF8 -filepath .\_meta\fields.generated.yml
-    cp .\_meta\fields.generated.yml .\fields.yml
 }
 
 echo "Unit testing $env:beat"
