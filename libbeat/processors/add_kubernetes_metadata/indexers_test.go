@@ -57,6 +57,54 @@ func TestPodIndexer(t *testing.T) {
 	assert.Equal(t, indices[0], fmt.Sprintf("%s/%s", ns, podName))
 }
 
+func TestPodUidIndexer(t *testing.T) {
+	var testConfig = common.NewConfig()
+
+	podUidIndexer, err := NewPodUidIndexer(*testConfig, metagen)
+	assert.Nil(t, err)
+
+	podName := "testpod"
+	ns := "testns"
+	uid := "005f3b90-4b9d-12f8-acf0-31020a840133"
+	pod := kubernetes.Pod{
+		Metadata: kubernetes.ObjectMeta{
+			Name:      podName,
+			Namespace: ns,
+			UID:       uid,
+			Labels: map[string]string{
+				"labelkey": "labelvalue",
+			},
+		},
+		Spec: kubernetes.PodSpec{
+			NodeName: "testnode",
+		},
+	}
+
+	indexers := podUidIndexer.GetMetadata(&pod)
+	assert.Equal(t, len(indexers), 1)
+	assert.Equal(t, indexers[0].Index, uid)
+
+	expected := common.MapStr{
+		"pod": common.MapStr{
+			"name": "testpod",
+			"uid": "005f3b90-4b9d-12f8-acf0-31020a840133",
+		},
+		"namespace": "testns",
+		"labels": common.MapStr{
+			"labelkey": "labelvalue",
+		},
+		"node": common.MapStr{
+			"name": "testnode",
+		},
+	}
+
+	assert.Equal(t, expected.String(), indexers[0].Data.String())
+
+	indices := podUidIndexer.GetIndexes(&pod)
+	assert.Equal(t, len(indices), 1)
+	assert.Equal(t, indices[0], uid)
+}
+
 func TestContainerIndexer(t *testing.T) {
 	var testConfig = common.NewConfig()
 

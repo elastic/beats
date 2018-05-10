@@ -11,6 +11,8 @@ import (
 
 // A random container ID that we use for our tests
 const cid = "0069869de9adf97f574c62029aeba65d1ecd85a2a112e87fbc28afe4dec2b843"
+// A random pod UID that we use for our tests
+const puid = "005f3b90-4b9d-12f8-acf0-31020a840133"
 
 func TestLogsPathMatcher_InvalidSource1(t *testing.T) {
 	cfgLogsPath := "" // use the default matcher configuration
@@ -54,10 +56,34 @@ func TestLogsPathMatcher_AnotherLogDir(t *testing.T) {
 	executeTest(t, cfgLogsPath, source, expectedResult)
 }
 
+func TestLogsPathMatcher_VarLibKubeletPods(t *testing.T) {
+	cfgLogsPath := "/var/lib/kubelet/pods/"
+	cfgResourceType := "pod"
+	source := fmt.Sprintf("/var/lib/kubelet/pods/%s/volumes/kubernetes.io~empty-dir/applogs/server.log", puid)
+	expectedResult := puid
+	executeTestWithResourceType(t, cfgLogsPath, cfgResourceType, source, expectedResult)
+}
+
+func TestLogsPathMatcher_InvalidSource4(t *testing.T) {
+	cfgLogsPath := "/var/lib/kubelet/pods/"
+	cfgResourceType := "pod"
+	source := fmt.Sprintf("/invalid/dir/%s/volumes/kubernetes.io~empty-dir/applogs/server.log", puid)
+	expectedResult := ""
+	executeTestWithResourceType(t, cfgLogsPath, cfgResourceType, source, expectedResult)
+}
+
 func executeTest(t *testing.T, cfgLogsPath string, source string, expectedResult string) {
+	executeTestWithResourceType(t, cfgLogsPath, "", source, expectedResult)
+}
+
+func executeTestWithResourceType(t *testing.T, cfgLogsPath string, cfgResourceType string, source string, expectedResult string) {
 	var testConfig = common.NewConfig()
 	if cfgLogsPath != "" {
 		testConfig.SetString("logs_path", -1, cfgLogsPath)
+	}
+
+	if cfgResourceType != "" {
+		testConfig.SetString("resource_type", -1, cfgResourceType)
 	}
 
 	logMatcher, err := newLogsPathMatcher(*testConfig)
@@ -67,5 +93,5 @@ func executeTest(t *testing.T, cfgLogsPath string, source string, expectedResult
 		"source": source,
 	}
 	output := logMatcher.MetadataIndex(input)
-	assert.Equal(t, output, expectedResult)
+	assert.Equal(t, expectedResult, output)
 }

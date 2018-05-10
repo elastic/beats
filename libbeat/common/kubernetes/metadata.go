@@ -10,6 +10,9 @@ type MetaGenerator interface {
 	// PodMetadata generates metadata for the given pod taking to account certain filters
 	PodMetadata(pod *Pod) common.MapStr
 
+	// PodMetadataWithUid generates the PodUID in addition to PodMetadata metadata
+	PodMetadataWithUid(pod *Pod) common.MapStr
+
 	// Containermetadata generates metadata for the given container of a pod
 	ContainerMetadata(pod *Pod, container string) common.MapStr
 }
@@ -65,6 +68,21 @@ func (g *metaGenerator) PodMetadata(pod *Pod) common.MapStr {
 	}
 
 	return meta
+}
+
+func (g *metaGenerator) PodMetadataWithUid(pod *Pod) common.MapStr {
+	podMeta := g.PodMetadata(pod)
+
+	// Add Pod UID to existing metadata
+	uidMeta := common.MapStr{
+		"pod": common.MapStr{
+			"uid": pod.Metadata.UID,
+		},
+	}
+
+	podMeta.DeepUpdate(uidMeta)
+
+	return podMeta
 }
 
 // Containermetadata generates metadata for the given container of a pod
