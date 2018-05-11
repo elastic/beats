@@ -127,8 +127,8 @@ https://github.com/elastic/beats/compare/v6.2.3...master[Check the HEAD diff]
 - Do not log errors if X-Pack Monitoring is enabled but Elastisearch X-Pack is not. {pull}6627[6627]
 - Add rename processor. {pull}6292[6292]
 - Add IP-addresses and MAC-addresses to add_host_metadata. {pull}6878[6878]
-- Add a default seccomp (secure computing) filter on Linux that prohibits
-  execve, execveat, fork, and vfork syscalls. A custom policy can be configured. {issue}5213[5213]
+- Added a seccomp (secure computing) filter on Linux that whitelists the
+  necessary system calls used by each Beat. {issue}5213[5213]
 - Update Sarama to v1.16.0, adding better support for kafka 0.11, 1.0, and 1.1 {pull}7025[7025]
 - Ship fields.yml as part of the binary {pull}4834[4834]
 - Added options to dev-tools/cmd/dashboards/export_dashboard.go: -indexPattern to include index-pattern in output, -quiet to be quiet. {pull}7101[7101]
