@@ -18,14 +18,17 @@ func Load(c Config) (*Scheduling, error) {
 		return nil, err
 	}
 
-	groups := make(map[string][]Policy, len(c.Groups))
-	for name, cfgs := range c.Groups {
-		policies, err := LoadPolicies(cfgs)
+	groups := make(map[string]Group, len(c.Groups))
+	for name, grp := range c.Groups {
+		policies, err := LoadPolicies(grp.Policies)
 		if err != nil {
 			return nil, fmt.Errorf("error configuring scheduling group '%v': %v", name, err)
 		}
 
-		groups[name] = policies
+		groups[name] = Group{
+			parent:   grp.Parent,
+			policies: policies,
+		}
 	}
 
 	return &Scheduling{

@@ -5,27 +5,26 @@ import (
 )
 
 type Scheduling struct {
-	groups map[string][]Policy
+	groups map[string]Group
 	global []Policy
 }
 
-func (s *Scheduling) Connect(group string, local []Policy) (*Client, error) {
+type Group struct {
+	parent   string
+	policies []Policy
+}
 
+func (s *Scheduling) Connect(group string, local []Policy) (*Client, error) {
 	var groupPolicies []Policy
 	var global []Policy
 
 	if group != "" {
-		var exist bool
-
-		var groups map[string][]Policy
-		if s != nil {
-			groups = s.groups
+		gp, err := s.collectGroupPolicies(group)
+		if err != nil {
+			return nil, err
 		}
 
-		groupPolicies, exist = groups[group]
-		if !exist {
-			return nil, fmt.Errorf("scheduling group '%v' does not exist", group)
-		}
+		groupPolicies = gp
 	}
 
 	if s != nil {
@@ -68,4 +67,35 @@ func (s *Scheduling) Connect(group string, local []Policy) (*Client, error) {
 	}
 
 	return newClient(ctx, handlers), nil
+}
+
+func (s *Scheduling) collectGroupPolicies(name string) ([]Policy, error) {
+	if s == nil {
+		if name != "" {
+			return nil, fmt.Errorf("unknown policy group '%v'", name)
+		}
+		return nil, nil
+	}
+
+	if name == "" {
+		return nil, nil
+	}
+
+	var policies []Policy
+	visited := map[string]bool{}
+	for name != "" {
+		if visited[name] {
+			return nil, fmt.Errorf("group definition cycle detected when accessing: %v", name)
+		}
+
+		grp, exists := s.groups[name]
+		if !exists {
+			return nil, fmt.Errorf("unknown policy group '%v'", name)
+		}
+
+		policies = append(policies, grp.policies...)
+		name = grp.parent
+	}
+
+	return policies, nil
 }
