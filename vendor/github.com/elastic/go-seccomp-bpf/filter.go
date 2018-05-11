@@ -115,8 +115,8 @@ type Filter struct {
 
 // Policy defines the BPF seccomp filter.
 type Policy struct {
-	DefaultAction Action         `config:"default_action" validate:"required" json:"default_action" yaml:"default_action"` // Action when no syscalls match.
-	Syscalls      []SyscallGroup `config:"syscalls"       validate:"required" json:"syscalls"       yaml:"syscalls"`       // Groups of syscalls and actions.
+	DefaultAction Action         `config:"default_action" json:"default_action" yaml:"default_action"` // Action when no syscalls match.
+	Syscalls      []SyscallGroup `config:"syscalls"       json:"syscalls"       yaml:"syscalls"`       // Groups of syscalls and actions.
 
 	arch *arch.Info
 }
@@ -130,9 +130,27 @@ type SyscallGroup struct {
 	arch *arch.Info
 }
 
+// Validate validates that the configuration has both a default action and a
+// set of syscalls.
+func (p *Policy) Validate() error {
+	if _, found := actionNames[p.DefaultAction]; !found {
+		return errors.Errorf("invalid default_action value %d", p.DefaultAction)
+	}
+
+	if len(p.Syscalls) == 0 {
+		return errors.New("syscalls must not be empty")
+	}
+
+	return nil
+}
+
 // Assemble assembles the policy into a list of BPF instructions. If the policy
 // contains any unknown syscalls or invalid actions an error will be returned.
 func (p *Policy) Assemble() ([]bpf.Instruction, error) {
+	if err := p.Validate(); err != nil {
+		return nil, err
+	}
+
 	if p.arch == nil {
 		arch, err := arch.GetInfo("")
 		if err != nil {
