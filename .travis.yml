@@ -130,6 +130,7 @@ jobs:
 
 addons:
   apt:
+    update: true
     packages:
       - python-virtualenv
       - libpcap-dev
