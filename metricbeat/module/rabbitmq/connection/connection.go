@@ -3,50 +3,31 @@ package connection
 import (
 	"github.com/elastic/beats/libbeat/common"
 	"github.com/elastic/beats/libbeat/common/cfgwarn"
-	"github.com/elastic/beats/metricbeat/helper"
 	"github.com/elastic/beats/metricbeat/mb"
-	"github.com/elastic/beats/metricbeat/mb/parse"
-)
-
-const (
-	defaultScheme = "http"
-	defaultPath   = "/api/connections"
-)
-
-var (
-	hostParser = parse.URLHostParserBuilder{
-		DefaultScheme: defaultScheme,
-		DefaultPath:   defaultPath,
-	}.Build()
+	"github.com/elastic/beats/metricbeat/module/rabbitmq"
 )
 
 func init() {
 	mb.Registry.MustAddMetricSet("rabbitmq", "connection", New,
-		mb.WithHostParser(hostParser),
+		mb.WithHostParser(rabbitmq.HostParser),
 		mb.DefaultMetricSet(),
 	)
 }
 
 // MetricSet for fetching RabbitMQ connections.
 type MetricSet struct {
-	mb.BaseMetricSet
-	*helper.HTTP
+	*rabbitmq.MetricSet
 }
 
 // New creates new instance of MetricSet
 func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
 	cfgwarn.Beta("The rabbitmq connection metricset is beta")
 
-	http, err := helper.NewHTTP(base)
+	ms, err := rabbitmq.NewMetricSet(base, rabbitmq.ConnectionsPath)
 	if err != nil {
 		return nil, err
 	}
-	http.SetHeader("Accept", "application/json")
-
-	return &MetricSet{
-		base,
-		http,
-	}, nil
+	return &MetricSet{ms}, nil
 }
 
 // Fetch makes an HTTP request to fetch connections metrics from the connections endpoint.
