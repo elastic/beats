@@ -61,9 +61,9 @@ type RequestBlock struct {
 //    "password":"s!cr!t"
 // }
 type TargetBlock struct {
-	URL      string                 `json:"url"`
-	User     string                 `json:"user,omitempty"`
-	Password string                 `json:"password,omitempty"`
+	URL      string `json:"url"`
+	User     string `json:"user,omitempty"`
+	Password string `json:"password,omitempty"`
 }
 
 type attributeMappingKey struct {
