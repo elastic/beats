@@ -12,6 +12,7 @@ import (
 	"github.com/elastic/beats/libbeat/outputs"
 	"github.com/elastic/beats/libbeat/processors"
 	"github.com/elastic/beats/libbeat/publisher/queue"
+	"github.com/elastic/beats/libbeat/publisher/scheduling"
 )
 
 // Global pipeline module for loading the main pipeline from a configuration object
@@ -40,6 +41,11 @@ func Load(
 	processors, err := processors.New(config.Processors)
 	if err != nil {
 		return nil, fmt.Errorf("error initializing processors: %v", err)
+	}
+
+	sched, err := scheduling.Load(config.Scheduling)
+	if err != nil {
+		return nil, fmt.Errorf("error initializing event scheduling: %v", err)
 	}
 
 	name := beatInfo.Name
@@ -73,7 +79,7 @@ func Load(
 		return nil, err
 	}
 
-	p, err := New(beatInfo, reg, queueBuilder, out, settings)
+	p, err := New(beatInfo, reg, sched, queueBuilder, out, settings)
 	if err != nil {
 		return nil, err
 	}

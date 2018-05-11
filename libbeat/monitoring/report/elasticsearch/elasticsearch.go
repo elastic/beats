@@ -116,6 +116,7 @@ func makeReporter(beat beat.Info, cfg *common.Config) (report.Reporter, error) {
 	pipeline, err := pipeline.New(
 		beat,
 		monitoring,
+		nil,
 		queueFactory, out, pipeline.Settings{
 			WaitClose:     0,
 			WaitCloseMode: pipeline.NoWaitOnClose,

@@ -24,6 +24,12 @@ type Client interface {
 type ClientConfig struct {
 	PublishMode PublishMode
 
+	// SchedulingPolicies group configures a shared scheduling group.
+	SchedulingGroup string
+
+	// SchedulingPolicies add additional local event scheduling to a Client.
+	SchedulingPolicies []SchedulingPolicy
+
 	// EventMetadata configures additional fields/tags to be added to published events.
 	EventMetadata common.EventMetadata
 
@@ -102,6 +108,18 @@ type PipelineACKHandler struct {
 
 type ProcessorList interface {
 	All() []Processor
+}
+
+type SchedulingPolicy interface {
+	Connect(ctx Context) (SchedulingHandler, error)
+}
+
+type SchedulingHandler interface {
+	OnEvent(Event) (Event, error)
+}
+
+type Context interface {
+	Done() <-chan struct{}
 }
 
 // Processor defines the minimal required interface for processor, that can be

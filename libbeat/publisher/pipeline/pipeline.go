@@ -17,6 +17,7 @@ import (
 	"github.com/elastic/beats/libbeat/processors"
 	"github.com/elastic/beats/libbeat/publisher"
 	"github.com/elastic/beats/libbeat/publisher/queue"
+	"github.com/elastic/beats/libbeat/publisher/scheduling"
 )
 
 // Pipeline implementation providint all beats publisher functionality.
@@ -54,6 +55,8 @@ type Pipeline struct {
 	ackDone    chan struct{}
 	ackBuilder ackBuilder
 	eventSema  *sema
+
+	scheduling *scheduling.Scheduling
 
 	processors pipelineProcessors
 }
@@ -135,6 +138,7 @@ type queueFactory func(queue.Eventer) (queue.Queue, error)
 func New(
 	beat beat.Info,
 	metrics *monitoring.Registry,
+	scheduling *scheduling.Scheduling,
 	queueFactory queueFactory,
 	out outputs.Group,
 	settings Settings,
@@ -152,6 +156,7 @@ func New(
 		waitCloseMode:    settings.WaitCloseMode,
 		waitCloseTimeout: settings.WaitClose,
 		processors:       makePipelineProcessors(annotations, processors, disabledOutput),
+		scheduling:       scheduling,
 	}
 	p.ackBuilder = &pipelineEmptyACK{p}
 	p.ackActive = atomic.MakeBool(true)
@@ -292,6 +297,14 @@ func (p *Pipeline) ConnectWith(cfg beat.ClientConfig) (beat.Client, error) {
 		return nil, err
 	}
 
+	sched, err := p.scheduling.Connect(
+		cfg.SchedulingGroup,
+		wrapPolicies(cfg.SchedulingPolicies),
+	)
+	if err != nil {
+		return nil, err
+	}
+
 	p.eventer.mutex.Lock()
 	p.eventer.modifyable = false
 	p.eventer.mutex.Unlock()
@@ -344,6 +357,7 @@ func (p *Pipeline) ConnectWith(cfg beat.ClientConfig) (beat.Client, error) {
 	producer := p.queue.Producer(producerCfg)
 	client := &client{
 		pipeline:     p,
+		sched:        sched,
 		isOpen:       atomic.MakeBool(true),
 		eventer:      cfg.Events,
 		processors:   processors,

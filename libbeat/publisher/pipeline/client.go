@@ -7,6 +7,7 @@ import (
 	"github.com/elastic/beats/libbeat/common/atomic"
 	"github.com/elastic/beats/libbeat/publisher"
 	"github.com/elastic/beats/libbeat/publisher/queue"
+	"github.com/elastic/beats/libbeat/publisher/scheduling"
 )
 
 // client connects a beat with the processors and pipeline queue.
@@ -16,6 +17,7 @@ import (
 //       -> add support for not dropping pending ACKs
 type client struct {
 	pipeline   *Pipeline
+	sched      *scheduling.Client
 	processors beat.Processor
 	producer   queue.Producer
 	mutex      sync.Mutex
@@ -61,7 +63,13 @@ func (c *client) publish(e beat.Event) {
 		return
 	}
 
-	if c.processors != nil {
+	if sched := c.sched; sched != nil {
+		var err error
+		e, err = sched.OnEvent(e)
+		publish = err == nil
+	}
+
+	if publish && c.processors != nil {
 		var err error
 
 		event, err = c.processors.Run(event)
@@ -127,6 +135,13 @@ func (c *client) Close() error {
 	}
 
 	c.onClosing()
+
+	// send local close signal to scheduler, so to signal a client
+	// is going to be disconnect.
+	// Scheduler will unblock publishing on async Close signal.
+	if s := c.sched; s != nil {
+		s.Close()
+	}
 
 	log.Debug("client: closing acker")
 	c.acker.close()

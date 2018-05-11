@@ -7,6 +7,7 @@ import (
 	"github.com/elastic/beats/libbeat/beat"
 	"github.com/elastic/beats/libbeat/common"
 	"github.com/elastic/beats/libbeat/processors"
+	"github.com/elastic/beats/libbeat/publisher/scheduling"
 )
 
 // Config object for loading a pipeline instance via Load.
@@ -14,6 +15,8 @@ type Config struct {
 	// Event processing configurations
 	common.EventMetadata `config:",inline"`      // Fields and tags to add to each event.
 	Processors           processors.PluginConfig `config:"processors"`
+
+	Scheduling scheduling.Config `config:"scheduling"`
 
 	// Event queue
 	Queue common.ConfigNamespace `config:"queue"`
