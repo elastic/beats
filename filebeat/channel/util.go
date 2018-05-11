@@ -2,6 +2,8 @@ package channel
 
 import (
 	"github.com/elastic/beats/filebeat/util"
+	"github.com/elastic/beats/libbeat/beat"
+	"github.com/elastic/beats/libbeat/common"
 	"github.com/elastic/beats/libbeat/common/atomic"
 )
 
@@ -10,6 +12,13 @@ type subOutlet struct {
 	done   chan struct{}
 	ch     chan *util.Data
 	res    chan bool
+}
+
+// ConnectTo creates a new Connector, combining a beat.Pipeline with an outlet Factory.
+func ConnectTo(pipeline beat.Pipeline, factory Factory) Connector {
+	return func(cfg *common.Config, m *common.MapStrPointer) (Outleter, error) {
+		return factory(pipeline, cfg, m)
+	}
 }
 
 // SubOutlet create a sub-outlet, which can be closed individually, without closing the

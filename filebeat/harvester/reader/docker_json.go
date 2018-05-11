@@ -16,6 +16,9 @@ type DockerJSON struct {
 	reader Reader
 	// stream filter, `all`, `stderr` or `stdout`
 	stream string
+
+	// join partial lines
+	partial bool
 }
 
 type dockerLog struct {
@@ -31,10 +34,11 @@ type crioLog struct {
 }
 
 // NewDockerJSON creates a new reader renaming a field
-func NewDockerJSON(r Reader, stream string) *DockerJSON {
+func NewDockerJSON(r Reader, stream string, partial bool) *DockerJSON {
 	return &DockerJSON{
-		stream: stream,
-		reader: r,
+		stream:  stream,
+		partial: partial,
+		reader:  r,
 	}
 }
 
@@ -100,6 +104,21 @@ func (p *DockerJSON) Next() (Message, error) {
 
 		if strings.HasPrefix(string(message.Content), "{") {
 			message, err = parseDockerJSONLog(message, &dockerLine)
+			if err != nil {
+				return message, err
+			}
+			// Handle multiline messages, join lines that don't end with \n
+			for p.partial && message.Content[len(message.Content)-1] != byte('\n') {
+				next, err := p.reader.Next()
+				if err != nil {
+					return message, err
+				}
+				next, err = parseDockerJSONLog(next, &dockerLine)
+				if err != nil {
+					return message, err
+				}
+				message.Content = append(message.Content, next.Content...)
+			}
 		} else {
 			message, err = parseCRILog(message, &crioLine)
 		}

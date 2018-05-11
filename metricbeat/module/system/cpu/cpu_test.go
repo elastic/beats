@@ -23,7 +23,7 @@ func TestData(t *testing.T) {
 	}
 
 	event := mbtest.CreateFullEvent(f, fields)
-	mbtest.WriteEventToDataJSON(t, event)
+	mbtest.WriteEventToDataJSON(t, event, "")
 }
 
 func getConfig() map[string]interface{} {

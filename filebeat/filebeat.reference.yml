@@ -596,6 +596,20 @@ filebeat.inputs:
     # The number of seconds of inactivity before a remote connection is closed.
     #timeout: 300s
 
+#------------------------------ Docker input --------------------------------
+# Experimental: Docker input reads and parses `json-file` logs from Docker
+#- type: docker
+  #enabled: false
+
+  # Combine partial lines flagged by `json-file` format
+  #combine_partials: true
+
+  # Use this to read from all containers, replace * with a container id to read from one:
+  #containers:
+  #  stream: all # can be all, stdout or stderr
+  #  ids:
+  #    - '*'
+
 #========================== Filebeat autodiscover ==============================
 
 # Autodiscover allows you to detect changes in the system and spawn new modules
@@ -830,7 +844,13 @@ filebeat.inputs:
 #
 #processors:
 #- add_docker_metadata: ~
-#- add_host_metadata: ~
+#
+# The following example enriches each event with host metadata.
+#
+#processors:
+#- add_host_metadata:
+#   netinfo.enabled: false
+#
 
 #============================= Elastic Cloud ==================================
 
@@ -1620,3 +1640,20 @@ logging.files:
 
 # Port on which the HTTP endpoint will bind. Default is 5066.
 #http.port: 5066
+
+#============================= Process Security ================================
+
+# Enable or disable seccomp system call filtering on Linux. Default is enabled.
+seccomp.enabled: true
+
+# The default seccomp policy. This policy blacklists system calls that allow
+# process creation.
+seccomp:
+  default_action: allow
+  syscalls:
+  - action: errno
+    names:
+    - execve
+    - execveat
+    - fork
+    - vfork

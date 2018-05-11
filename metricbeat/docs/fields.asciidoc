@@ -3412,6 +3412,123 @@ Total number of memory used by the segments in bytes.
 --
 
 [float]
+== index.summary fields
+
+index
+
+
+
+
+*`elasticsearch.index.summary.primaries.docs.count`*::
++
+--
+type: long
+
+Total number of documents in the index.
+
+
+--
+
+*`elasticsearch.index.summary.primaries.docs.deleted`*::
++
+--
+type: long
+
+Total number of deleted documents in the index.
+
+
+--
+
+*`elasticsearch.index.summary.primaries.store.size.bytes`*::
++
+--
+type: long
+
+format: bytes
+
+Total size of the index in bytes.
+
+
+--
+
+*`elasticsearch.index.summary.primaries.segments.count`*::
++
+--
+type: long
+
+Total number of index segments.
+
+
+--
+
+*`elasticsearch.index.summary.primaries.segments.memory.bytes`*::
++
+--
+type: long
+
+format: bytes
+
+Total number of memory used by the segments in bytes.
+
+
+--
+
+
+*`elasticsearch.index.summary.total.docs.count`*::
++
+--
+type: long
+
+Total number of documents in the index.
+
+
+--
+
+*`elasticsearch.index.summary.total.docs.deleted`*::
++
+--
+type: long
+
+Total number of deleted documents in the index.
+
+
+--
+
+*`elasticsearch.index.summary.total.store.size.bytes`*::
++
+--
+type: long
+
+format: bytes
+
+Total size of the index in bytes.
+
+
+--
+
+*`elasticsearch.index.summary.total.segments.count`*::
++
+--
+type: long
+
+Total number of index segments.
+
+
+--
+
+*`elasticsearch.index.summary.total.segments.memory.bytes`*::
++
+--
+type: long
+
+format: bytes
+
+Total number of memory used by the segments in bytes.
+
+
+--
+
+[float]
 == node fields
 
 node
@@ -5766,6 +5883,26 @@ OS version.
 type: keyword
 
 OS family (e.g. redhat, debian, freebsd, windows).
+
+
+--
+
+*`host.ip`*::
++
+--
+type: ip
+
+List of IP-addresses.
+
+
+--
+
+*`host.mac`*::
++
+--
+type: keyword
+
+List of hardware-addresses, usually MAC-addresses.
 
 
 --
@@ -10890,6 +11027,113 @@ Number of octets sent on the connection.
 type: long
 
 Number of octets received on the connection.
+
+
+--
+
+[float]
+== exchange fields
+
+exchange
+
+
+
+*`rabbitmq.exchange.name`*::
++
+--
+type: keyword
+
+The name of the queue with non-ASCII characters escaped as in C.
+
+
+--
+
+*`rabbitmq.exchange.vhost`*::
++
+--
+type: keyword
+
+Virtual host name with non-ASCII characters escaped as in C.
+
+
+--
+
+*`rabbitmq.exchange.durable`*::
++
+--
+type: boolean
+
+Whether or not the queue survives server restarts.
+
+
+--
+
+*`rabbitmq.exchange.auto_delete`*::
++
+--
+type: boolean
+
+Whether the queue will be deleted automatically when no longer used.
+
+
+--
+
+*`rabbitmq.exchange.internal`*::
++
+--
+type: boolean
+
+Whether the exchange is internal, i.e. cannot be directly published to by a client.
+
+
+--
+
+*`rabbitmq.exchange.user`*::
++
+--
+type: keyword
+
+User who created the exchange.
+
+
+--
+
+*`rabbitmq.exchange.messages.publish_in.count`*::
++
+--
+type: long
+
+Count of messages published "in" to an exchange, i.e. not taking account of routing.
+
+
+--
+
+*`rabbitmq.exchange.messages.publish_in.details.rate`*::
++
+--
+type: float
+
+How much the exchange publish-in count has changed per second in the most recent sampling interval.
+
+
+--
+
+*`rabbitmq.exchange.messages.publish_out.count`*::
++
+--
+type: long
+
+Count of messages published "out" of an exchange, i.e. taking account of routing.
+
+
+--
+
+*`rabbitmq.exchange.messages.publish_out.details.rate`*::
++
+--
+type: float
+
+How much the exchange publish-out count has changed per second in the most recent sampling interval.
 
 
 --

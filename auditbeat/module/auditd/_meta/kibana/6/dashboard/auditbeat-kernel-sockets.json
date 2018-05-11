@@ -173,7 +173,7 @@
           "searchSourceJSON": "{\"query\":{\"language\":\"lucene\",\"query\":\"*\"},\"filter\":[],\"highlightAll\":true,\"version\":true}"
         },
         "optionsJSON": "{\"darkTheme\":false,\"useMargins\":false}",
-        "panelsJSON": "[{\"embeddableConfig\":{\"vis\":{\"params\":{\"sort\":{\"columnIndex\":null,\"direction\":null}}}},\"gridData\":{\"h\":4,\"i\":\"1\",\"w\":6,\"x\":6,\"y\":3},\"id\":\"faf882f0-c242-11e7-8692-232bd1143e8a\",\"panelIndex\":\"1\",\"type\":\"visualization\",\"version\":\"7.0.0-alpha1-SNAPSHOT\"},{\"embeddableConfig\":{\"vis\":{\"params\":{\"sort\":{\"columnIndex\":null,\"direction\":null}}}},\"gridData\":{\"h\":5,\"i\":\"2\",\"w\":6,\"x\":0,\"y\":7},\"id\":\"ea483730-c246-11e7-8692-232bd1143e8a\",\"panelIndex\":\"2\",\"type\":\"visualization\",\"version\":\"7.0.0-alpha1-SNAPSHOT\"},{\"embeddableConfig\":{\"vis\":{\"params\":{\"sort\":{\"columnIndex\":null,\"direction\":null}}}},\"gridData\":{\"h\":5,\"i\":\"3\",\"w\":6,\"x\":6,\"y\":7},\"id\":\"ceb91de0-c250-11e7-8692-232bd1143e8a\",\"panelIndex\":\"3\",\"type\":\"visualization\",\"version\":\"7.0.0-alpha1-SNAPSHOT\"},{\"gridData\":{\"h\":3,\"i\":\"4\",\"w\":12,\"x\":0,\"y\":0},\"id\":\"b21e0c70-c252-11e7-8692-232bd1143e8a\",\"panelIndex\":\"4\",\"type\":\"visualization\",\"version\":\"7.0.0-alpha1-SNAPSHOT\"},{\"gridData\":{\"h\":4,\"i\":\"5\",\"w\":6,\"x\":0,\"y\":3},\"id\":\"a8e20450-c256-11e7-8692-232bd1143e8a\",\"panelIndex\":\"5\",\"type\":\"visualization\",\"version\":\"7.0.0-alpha1-SNAPSHOT\"}]",
+        "panelsJSON": "[{\"embeddableConfig\":{\"vis\":{\"params\":{\"sort\":{\"columnIndex\":null,\"direction\":null}}}},\"gridData\":{\"h\":4,\"i\":\"1\",\"w\":6,\"x\":6,\"y\":3},\"id\":\"faf882f0-c242-11e7-8692-232bd1143e8a\",\"panelIndex\":\"1\",\"type\":\"visualization\",\"version\":\"6.2.4\"},{\"embeddableConfig\":{\"vis\":{\"params\":{\"sort\":{\"columnIndex\":null,\"direction\":null}}}},\"gridData\":{\"h\":5,\"i\":\"2\",\"w\":6,\"x\":0,\"y\":7},\"id\":\"ea483730-c246-11e7-8692-232bd1143e8a\",\"panelIndex\":\"2\",\"type\":\"visualization\",\"version\":\"6.2.4\"},{\"embeddableConfig\":{\"vis\":{\"params\":{\"sort\":{\"columnIndex\":null,\"direction\":null}}}},\"gridData\":{\"h\":5,\"i\":\"3\",\"w\":6,\"x\":6,\"y\":7},\"id\":\"ceb91de0-c250-11e7-8692-232bd1143e8a\",\"panelIndex\":\"3\",\"type\":\"visualization\",\"version\":\"6.2.4\"},{\"gridData\":{\"h\":3,\"i\":\"4\",\"w\":12,\"x\":0,\"y\":0},\"id\":\"b21e0c70-c252-11e7-8692-232bd1143e8a\",\"panelIndex\":\"4\",\"type\":\"visualization\",\"version\":\"6.2.4\"},{\"gridData\":{\"h\":4,\"i\":\"5\",\"w\":6,\"x\":0,\"y\":3},\"id\":\"a8e20450-c256-11e7-8692-232bd1143e8a\",\"panelIndex\":\"5\",\"type\":\"visualization\",\"version\":\"6.2.4\"}]",
         "timeRestore": false,
         "title": "[Auditbeat Auditd] Sockets",
         "version": 1
@@ -184,5 +184,5 @@
       "version": 4
     }
   ],
-  "version": "7.0.0-alpha1-SNAPSHOT"
+  "version": "6.2.4"
 }

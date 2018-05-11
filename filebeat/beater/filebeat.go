@@ -197,6 +197,18 @@ func (fb *Filebeat) loadModulesML(b *beat.Beat, kibanaConfig *common.Config) err
 		kibanaConfig = common.NewConfig()
 	}
 
+	if esConfig.Enabled() {
+		username, _ := esConfig.String("username", -1)
+		password, _ := esConfig.String("password", -1)
+
+		if !kibanaConfig.HasField("username") && username != "" {
+			kibanaConfig.SetString("username", -1, username)
+		}
+		if !kibanaConfig.HasField("password") && password != "" {
+			kibanaConfig.SetString("password", -1, password)
+		}
+	}
+
 	kibanaClient, err := kibana.NewKibanaClient(kibanaConfig)
 	if err != nil {
 		return errors.Errorf("Error creating Kibana client: %v", err)
@@ -204,7 +216,7 @@ func (fb *Filebeat) loadModulesML(b *beat.Beat, kibanaConfig *common.Config) err
 
 	kibanaVersion, err := common.NewVersion(kibanaClient.GetVersion())
 	if err != nil {
-		return err
+		return errors.Errorf("Error checking Kibana version: %v", err)
 	}
 
 	if err := setupMLBasedOnVersion(fb.moduleRegistry, esClient, kibanaClient, kibanaVersion); err != nil {
@@ -300,7 +312,7 @@ func (fb *Filebeat) Run(b *beat.Beat) error {
 
 	outDone := make(chan struct{}) // outDone closes down all active pipeline connections
 	crawler, err := crawler.New(
-		channel.NewOutletFactory(outDone, b.Publisher, wgEvents).Create,
+		channel.NewOutletFactory(outDone, wgEvents).Create,
 		config.Inputs,
 		b.Info.Version,
 		fb.done,
@@ -346,7 +358,7 @@ func (fb *Filebeat) Run(b *beat.Beat) error {
 		logp.Debug("modules", "Existing Ingest pipelines will be updated")
 	}
 
-	err = crawler.Start(registrar, config.ConfigInput, config.ConfigModules, pipelineLoaderFactory, config.OverwritePipelines)
+	err = crawler.Start(b.Publisher, registrar, config.ConfigInput, config.ConfigModules, pipelineLoaderFactory, config.OverwritePipelines)
 	if err != nil {
 		crawler.Stop()
 		return err
@@ -365,7 +377,7 @@ func (fb *Filebeat) Run(b *beat.Beat) error {
 	var adiscover *autodiscover.Autodiscover
 	if fb.config.Autodiscover != nil {
 		adapter := fbautodiscover.NewAutodiscoverAdapter(crawler.InputsFactory, crawler.ModulesFactory)
-		adiscover, err = autodiscover.NewAutodiscover("filebeat", adapter, config.Autodiscover)
+		adiscover, err = autodiscover.NewAutodiscover("filebeat", b.Publisher, adapter, config.Autodiscover)
 		if err != nil {
 			return err
 		}

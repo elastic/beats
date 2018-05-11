@@ -39,7 +39,7 @@ example, the following request grants ++{beat_default_index_prefix}_user++ the
 ---------------------------------------------------------------
 POST /_xpack/security/user/{beat_default_index_prefix}_user
 {
-  "password" : "x-pack-test-password",
+  "password" : "test-password",
   "roles" : [ "{beat_default_index_prefix}_reader"],
   "full_name" : "{beatname_uc} User"
 }

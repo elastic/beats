@@ -25,9 +25,18 @@
   hour = ([01][0-9]|"2"[0-3])>tok %hour;
   minute = ([0-5][0-9])>tok %minute;
   second = ([0-5][0-9])>tok %second;
-  nanosecond = digit+;
+  nanosecond = digit+>tok %nanosecond;
   time = hour ":" minute ":" second ("." nanosecond)?;
-  timestamp = month space day space time;
+
+  # Some BSD style actually uses rfc3339 formatted date.
+  year = digit{4}>tok %year;
+  month_numeric = digit{2}>tok %month_numeric;
+  day_two_digits = ([0-3][0-9])>tok %day;
+
+  # common timestamp format
+  timestamp_rfc3164 = month space day space time;
+  timestamp_rfc3339 = year "-" month_numeric "-" day_two_digits "T" time;
+  timestamp = timestamp_rfc3339 | timestamp_rfc3164;
 
   hostname = [a-zA-Z0-9.-_:]+>tok %hostname;
   header = timestamp space hostname space;

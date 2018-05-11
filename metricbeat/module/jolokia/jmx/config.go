@@ -46,10 +46,11 @@ type Target struct {
 //    }
 // ]
 type RequestBlock struct {
-	Type      string       `json:"type"`
-	MBean     string       `json:"mbean"`
-	Attribute []string     `json:"attribute"`
-	Target    *TargetBlock `json:"target,omitempty"`
+	Type      string                 `json:"type"`
+	MBean     string                 `json:"mbean"`
+	Attribute []string               `json:"attribute"`
+	Config    map[string]interface{} `json:"config"`
+	Target    *TargetBlock           `json:"target,omitempty"`
 }
 
 // TargetBlock is used to build the target blocks of the following format into RequestBlock.
@@ -60,9 +61,9 @@ type RequestBlock struct {
 //    "password":"s!cr!t"
 // }
 type TargetBlock struct {
-	URL      string `json:"url"`
-	User     string `json:"user,omitempty"`
-	Password string `json:"password,omitempty"`
+	URL      string                 `json:"url"`
+	User     string                 `json:"user,omitempty"`
+	Password string                 `json:"password,omitempty"`
 }
 
 type attributeMappingKey struct {
@@ -83,10 +84,15 @@ func buildRequestBodyAndMapping(mappings []JMXMapping) ([]byte, AttributeMapping
 	responseMapping := make(AttributeMapping)
 	var blocks []RequestBlock
 
+	config := map[string]interface{}{
+		"ignoreErrors":    true,
+		"canonicalNaming": false,
+	}
 	for _, mapping := range mappings {
 		rb := RequestBlock{
-			Type:  "read",
-			MBean: mapping.MBean,
+			Type:   "read",
+			MBean:  mapping.MBean,
+			Config: config,
 		}
 
 		if len(mapping.Target.URL) != 0 {

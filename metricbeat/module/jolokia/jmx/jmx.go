@@ -23,7 +23,7 @@ func init() {
 
 const (
 	defaultScheme = "http"
-	defaultPath   = "/jolokia/?ignoreErrors=true&canonicalNaming=false"
+	defaultPath   = "/jolokia/"
 )
 
 var (

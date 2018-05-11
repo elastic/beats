@@ -52,7 +52,7 @@ func TestData(t *testing.T) {
 	}
 
 	beatEvent := mbtest.StandardizeEvent(ms, events[0], mb.AddMetricSetInfo)
-	mbtest.WriteEventToDataJSON(t, beatEvent)
+	mbtest.WriteEventToDataJSON(t, beatEvent, "")
 }
 
 func TestQuery(t *testing.T) {

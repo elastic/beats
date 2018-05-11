@@ -92,7 +92,7 @@ func eventsMapping(r mb.ReporterV2, content []byte) []error {
 	err := json.Unmarshal(content, nodeData)
 	if err != nil {
 		r.Error(err)
-		return nil
+		return []error{err}
 	}
 
 	var errs []error

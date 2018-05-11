@@ -23,7 +23,7 @@ func init() {
 // NewInput creates a new docker input
 func NewInput(
 	cfg *common.Config,
-	outletFactory channel.Factory,
+	outletFactory channel.Connector,
 	context input.Context,
 ) (input.Input, error) {
 	cfgwarn.Experimental("Docker input is enabled.")
@@ -46,7 +46,11 @@ func NewInput(
 		return nil, err
 	}
 
-	if err := cfg.SetString("docker-json", -1, config.Containers.Stream); err != nil {
+	if err := cfg.SetString("docker-json.stream", -1, config.Containers.Stream); err != nil {
+		return nil, errors.Wrap(err, "update input config")
+	}
+
+	if err := cfg.SetBool("docker-json.partial", -1, config.Partial); err != nil {
 		return nil, errors.Wrap(err, "update input config")
 	}
 	return log.NewInput(cfg, outletFactory, context)
