@@ -3,7 +3,7 @@ package ratelimit
 import "errors"
 
 type config struct {
-	EventsPerSecond uint `config:"events_pre_second" validate:"min=1"`
+	EventsPerSecond uint `config:"events_per_second" validate:"min=1"`
 	Shared          bool `config:"shared"`
 }
 
