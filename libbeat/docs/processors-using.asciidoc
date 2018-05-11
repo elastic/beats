@@ -32,6 +32,20 @@ condition is present, then the action is executed only if the condition is
 fulfilled. If no condition is passed, then the action is always executed.
 * `<parameters>` is the list of parameters to pass to the processor.
 
+
+You can also scope processors to individual plugin prospectors by placing them under the prospector definition, this is common when wanting to process only logs from modules such as docker, but having more than one prospector enabled: 
+
+[source,yaml]
+------
+- type: <propector_type>
+  processors:
+   - <processor_name>:
+     when:
+        <condition>
+     <parameters>
+...
+------
+
 [[processors]]
 ==== Processors
 
