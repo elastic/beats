@@ -79,6 +79,7 @@ func LoadPolicy(cfg common.ConfigNamespace) (Policy, error) {
 	}
 
 	settings := cfg.Config()
+	settings.PrintDebugf("policy '%v' config =>", name)
 	return factory(settings)
 }
 
