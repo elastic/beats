@@ -154,7 +154,7 @@ func TestApplyWithServerConfig(t *testing.T) {
     key: ca_test.key
     certificate_authorities: [ca_test.pem]
     verification_mode: none
-    client_authentification: optional
+    client_authentication: optional
     supported_protocols: [TLSv1.1, TLSv1.2]
     cipher_suites:
       - "ECDHE-ECDSA-AES-256-CBC-SHA"

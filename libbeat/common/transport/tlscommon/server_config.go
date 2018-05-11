@@ -15,7 +15,7 @@ type ServerConfig struct {
 	CAs              []string            `config:"certificate_authorities"`
 	Certificate      CertificateConfig   `config:",inline"`
 	CurveTypes       []tlsCurveType      `config:"curve_types"`
-	ClientAuth       tlsClientAuth       `config:"client_authentification"` //`none`, `optional` or `required`
+	ClientAuth       tlsClientAuth       `config:"client_authentication"` //`none`, `optional` or `required`
 }
 
 // LoadTLSServerConfig tranforms a ServerConfig into a `tls.Config` to be used directly with golang
