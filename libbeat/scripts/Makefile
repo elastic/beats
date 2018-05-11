@@ -17,6 +17,9 @@ PACKER_TEMPLATES_DIR?=${ES_BEATS}/dev-tools/packer ## @Building Directory of tem
 NOTICE_FILE?=../NOTICE.txt
 LICENSE_FILE?=../licenses/APACHE-LICENSE-2.0.txt
 ELASTIC_LICENSE_FILE?=../licenses/ELASTIC-LICENSE.txt
+SECCOMP_BINARY?=${BEAT_NAME}
+SECCOMP_BLACKLIST?=${ES_BEATS}/libbeat/common/seccomp/seccomp-profiler-blacklist.txt
+SECCOMP_ALLOWLIST?=${ES_BEATS}/libbeat/common/seccomp/seccomp-profiler-allow.txt
 
 space:=$() #
 comma:=,
@@ -548,3 +551,23 @@ help: ## @help Show this help.
 
 help_variables: ## @help Show Makefile customizable variables.
 	@python ${ES_BEATS}/libbeat/scripts/generate_makefile_doc.py --variables $(MAKEFILE_LIST)
+
+# Generates a seccomp whitelist policy for the binary pointed to by
+# SECCOMP_BINARY.
+.PHONY: seccomp
+seccomp:
+	@go get github.com/elastic/beats/vendor/github.com/elastic/go-seccomp-bpf/cmd/seccomp-profiler
+	@test -f ${SECCOMP_BINARY} || (echo "${SECCOMP_BINARY} binary is not built."; false)
+	seccomp-profiler \
+	-b "$(shell grep -v ^# "${SECCOMP_BLACKLIST}")" \
+	-allow "$(shell grep -v ^# "${SECCOMP_ALLOWLIST}")" \
+	-t "${ES_BEATS}/libbeat/common/seccomp/policy.go.tpl" \
+	-pkg include \
+	-out "include/seccomp_linux_{{.GOARCH}}.go" \
+	${SECCOMP_BINARY}
+
+# Generates seccomp profiles based on the binaries produced by the package target.
+.PHONY: seccomp-package
+seccomp-package:
+	SECCOMP_BINARY=build/package/${BEAT_NAME}-linux-386 $(MAKE) seccomp
+	SECCOMP_BINARY=build/package/${BEAT_NAME}-linux-amd64 $(MAKE) seccomp
