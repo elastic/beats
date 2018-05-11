@@ -52,11 +52,15 @@ func LoadFilter(filter Filter) error {
 
 	if filter.NoNewPrivs {
 		if err = SetNoNewPrivs(); err != nil {
-			return errors.Wrap(err, "failed to set NoNewPrivs")
+			return errors.Wrap(err, "failed to set no_new_privs with prctl")
 		}
 	}
 
 	if err = seccomp(seccompSetModeFilter, filter.Flag, unsafe.Pointer(program)); err != nil {
+		if err == syscall.ENOSYS {
+			return errors.Wrap(err, "failed loading seccomp filter: seccomp "+
+				"is not supported by the kernel")
+		}
 		return errors.Wrap(err, "failed loading seccomp filter")
 	}
 
