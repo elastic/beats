@@ -7,20 +7,24 @@ import (
 	"github.com/elastic/beats/libbeat/common"
 	"github.com/elastic/beats/libbeat/logp"
 	"github.com/elastic/beats/libbeat/processors"
+	"github.com/elastic/beats/libbeat/publisher/scheduling"
 
 	"github.com/elastic/beats/winlogbeat/checkpoint"
 	"github.com/elastic/beats/winlogbeat/eventlog"
 )
 
 type eventLogger struct {
-	source     eventlog.EventLog
-	eventMeta  common.EventMetadata
-	processors beat.ProcessorList
+	source             eventlog.EventLog
+	eventMeta          common.EventMetadata
+	processors         beat.ProcessorList
+	schedulingGroup    string
+	schedulingPolicies []beat.SchedulingPolicy
 }
 
 type eventLoggerConfig struct {
 	common.EventMetadata `config:",inline"`      // Fields and tags to add to events.
 	Processors           processors.PluginConfig `config:"processors"`
+	Scheduling           scheduling.LocalConfig  `config:"scheduling"`
 }
 
 func newEventLogger(
@@ -37,20 +41,29 @@ func newEventLogger(
 		return nil, err
 	}
 
+	schedGroup, schedPolicies, err := scheduling.LoadLocal(config.Scheduling)
+	if err != nil {
+		return nil, err
+	}
+
 	return &eventLogger{
-		source:     source,
-		eventMeta:  config.EventMetadata,
-		processors: processors,
+		source:             source,
+		eventMeta:          config.EventMetadata,
+		processors:         processors,
+		schedulingGroup:    schedGroup,
+		schedulingPolicies: schedPolicies,
 	}, nil
 }
 
 func (e *eventLogger) connect(pipeline beat.Pipeline) (beat.Client, error) {
 	api := e.source.Name()
 	return pipeline.ConnectWith(beat.ClientConfig{
-		PublishMode:   beat.GuaranteedSend,
-		EventMetadata: e.eventMeta,
-		Meta:          nil, // TODO: configure modules/ES ingest pipeline?
-		Processor:     e.processors,
+		PublishMode:        beat.GuaranteedSend,
+		SchedulingGroup:    e.schedulingGroup,
+		SchedulingPolicies: e.schedulingPolicies,
+		EventMetadata:      e.eventMeta,
+		Meta:               nil, // TODO: configure modules/ES ingest pipeline?
+		Processor:          e.processors,
 		ACKCount: func(n int) {
 			addPublished(api, n)
 			logp.Info("EventLog[%s] successfully published %d events", api, n)
