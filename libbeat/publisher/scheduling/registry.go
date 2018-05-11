@@ -10,7 +10,9 @@ type policyRegistry struct {
 	mu  sync.Mutex
 }
 
-var PolicyRegistry = &policyRegistry{}
+var PolicyRegistry = &policyRegistry{
+	reg: map[string]PolicyFactory{},
+}
 
 func (p *policyRegistry) Register(name string, factory PolicyFactory) {
 	p.mu.Lock()
