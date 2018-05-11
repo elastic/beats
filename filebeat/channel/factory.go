@@ -4,6 +4,7 @@ import (
 	"github.com/elastic/beats/libbeat/beat"
 	"github.com/elastic/beats/libbeat/common"
 	"github.com/elastic/beats/libbeat/processors"
+	"github.com/elastic/beats/libbeat/publisher/scheduling"
 )
 
 type OutletFactory struct {
@@ -29,6 +30,8 @@ type inputOutletConfig struct {
 	// event processing
 	common.EventMetadata `config:",inline"`      // Fields and tags to add to events.
 	Processors           processors.PluginConfig `config:"processors"`
+
+	Scheduling scheduling.LocalConfig `config:"scheduling"`
 
 	// implicit event fields
 	Type string `config:"type"` // input.type
@@ -75,6 +78,11 @@ func (f *OutletFactory) Create(p beat.Pipeline, cfg *common.Config, dynFields *c
 		return nil, err
 	}
 
+	schedGroup, schedPolicies, err := scheduling.LoadLocal(config.Scheduling)
+	if err != nil {
+		return nil, err
+	}
+
 	setMeta := func(to common.MapStr, key, value string) {
 		if value != "" {
 			to[key] = value
@@ -102,13 +110,15 @@ func (f *OutletFactory) Create(p beat.Pipeline, cfg *common.Config, dynFields *c
 	}
 
 	client, err := p.ConnectWith(beat.ClientConfig{
-		PublishMode:   beat.GuaranteedSend,
-		EventMetadata: config.EventMetadata,
-		DynamicFields: dynFields,
-		Meta:          meta,
-		Fields:        fields,
-		Processor:     processors,
-		Events:        f.eventer,
+		PublishMode:        beat.GuaranteedSend,
+		SchedulingGroup:    schedGroup,
+		SchedulingPolicies: schedPolicies,
+		EventMetadata:      config.EventMetadata,
+		DynamicFields:      dynFields,
+		Meta:               meta,
+		Fields:             fields,
+		Processor:          processors,
+		Events:             f.eventer,
 	})
 	if err != nil {
 		return nil, err
