@@ -445,16 +445,16 @@
 			"revisionTime": "2016-06-17T14:03:01Z"
 		},
 		{
-			"checksumSHA1": "dyjXEG8sZgR7ZaKsvX8PnaeH+Uo=",
+			"checksumSHA1": "kKIue9tf5+ugetNnbI8tdYSy1HI=",
 			"path": "github.com/elastic/go-seccomp-bpf",
-			"revision": "bc35619931bc4ae13c582a78cfb2ebdaee789ff2",
-			"revisionTime": "2018-05-01T16:48:19Z"
+			"revision": "5b8918a6690928ed0248e202b7367d8a926f2a93",
+			"revisionTime": "2018-05-15T03:39:52Z"
 		},
 		{
 			"checksumSHA1": "qTs7QT+GC2Dr4aFoLFHCkAOoVeU=",
 			"path": "github.com/elastic/go-seccomp-bpf/arch",
-			"revision": "bc35619931bc4ae13c582a78cfb2ebdaee789ff2",
-			"revisionTime": "2018-05-01T16:48:19Z"
+			"revision": "5b8918a6690928ed0248e202b7367d8a926f2a93",
+			"revisionTime": "2018-05-15T03:39:52Z"
 		},
 		{
 			"path": "github.com/elastic/go-seccomp-bpf/cmd/seccomp-profile",
@@ -462,16 +462,16 @@
 			"tree": true
 		},
 		{
-			"checksumSHA1": "WxO9XU6khHcSui6YRpH8LFb0hxM=",
+			"checksumSHA1": "5vWvvnghiBzyFo+KnD9iRlRc5Uw=",
 			"path": "github.com/elastic/go-seccomp-bpf/cmd/seccomp-profiler",
-			"revision": "bc35619931bc4ae13c582a78cfb2ebdaee789ff2",
-			"revisionTime": "2018-05-01T16:48:19Z"
+			"revision": "5b8918a6690928ed0248e202b7367d8a926f2a93",
+			"revisionTime": "2018-05-15T03:39:52Z"
 		},
 		{
-			"checksumSHA1": "HyikAKbV34BwmYCEzZpCAwefZ3o=",
+			"checksumSHA1": "386906x6hGeUDkGJ1Wk0kUWWA4Y=",
 			"path": "github.com/elastic/go-seccomp-bpf/cmd/seccomp-profiler/disasm",
-			"revision": "bc35619931bc4ae13c582a78cfb2ebdaee789ff2",
-			"revisionTime": "2018-05-01T16:48:19Z"
+			"revision": "5b8918a6690928ed0248e202b7367d8a926f2a93",
+			"revisionTime": "2018-05-15T03:39:52Z"
 		},
 		{
 			"checksumSHA1": "AaEPt+KMknLXze11YOnBGKzP3aA=",
