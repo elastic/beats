@@ -469,7 +469,7 @@ exist in the event are overwritten by keys from the decoded JSON object. The
 default value is false.
 
 [[drop-event]]
-=== Drop events
+=== Drop event
 
 The `drop_event` processor drops the entire event if the associated condition
 is fulfilled. The condition is mandatory, because without one, all the events
