@@ -13,4 +13,7 @@ type Policy interface {
 
 type Handler interface {
 	OnEvent(beat.Event) (beat.Event, error)
+
+	// optional: run on (*scheduling.Client).Close
+	// Close()
 }

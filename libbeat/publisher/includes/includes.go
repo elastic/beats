@@ -5,6 +5,9 @@ import (
 	_ "github.com/elastic/beats/libbeat/publisher/queue/memqueue"
 	_ "github.com/elastic/beats/libbeat/publisher/queue/spool"
 
+	// import event scheduling policies
+	_ "github.com/elastic/beats/libbeat/publisher/scheduling/ratelimit"
+
 	// load supported output plugins
 	_ "github.com/elastic/beats/libbeat/outputs/console"
 	_ "github.com/elastic/beats/libbeat/outputs/elasticsearch"

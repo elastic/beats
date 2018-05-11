@@ -15,7 +15,17 @@ func newClient(ctx *context, handler []Handler) *Client {
 }
 
 func (c *Client) Close() {
+	type closingHandler interface {
+		Close()
+	}
+
 	c.ctx.Close()
+
+	for _, h := range c.handlers {
+		if c, ok := h.(closingHandler); ok {
+			c.Close()
+		}
+	}
 }
 
 func (c *Client) OnEvent(evt beat.Event) (beat.Event, error) {
