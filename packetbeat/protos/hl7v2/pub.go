@@ -86,10 +86,10 @@ func (pub *transPub) createEvent(requ, resp *message) beat.Event {
 			hl7segmentheader := hl7segments[hl7segment][0:3]
 			debugf("Processing segment: %s", hl7segmentheader)
 			// If segment matches
-			if pub.SegmentSelectionMode == "Include" && pub.segmentsmap[hl7segmentheader] || pub.SegmentSelectionMode == "Exclude" && !pub.segmentsmap[hl7segmentheader] {
+			if strings.EqualFold(pub.SegmentSelectionMode, "Include") && pub.segmentsmap[hl7segmentheader] || strings.EqualFold(pub.SegmentSelectionMode, "Exclude") && !pub.segmentsmap[hl7segmentheader] {
 				debugf("Segment %s matched.", hl7segmentheader)
 				// If MSH get our encoding characters
-				if hl7segmentheader == "MSH" {
+				if strings.EqualFold(hl7segmentheader, "MSH") {
 					hl7fieldseperator = string(hl7segments[hl7segment][3])
 					hl7componentseperator = string(hl7segments[hl7segment][4])
 					//hl7subcomponentseperator = string(hl7segments[hl7segment][5])
@@ -103,18 +103,18 @@ func (pub *transPub) createEvent(requ, resp *message) beat.Event {
 					for hl7field := range hl7fields {
 						hl7fieldnumber := strconv.Itoa(hl7field)
 						// Increment field numbers if this is an MSH value
-						if hl7segmentheader == "MSH" {
+						if strings.EqualFold(hl7segmentheader, "MSH") {
 							hl7fieldnumber = strconv.Itoa(hl7field + 1)
 						}
 						hl7fieldname := strings.Join([]string{hl7segmentheader, "-", hl7fieldnumber}, "")
 						debugf("Processing field: %s", hl7fieldname)
 						hl7fieldvalue := hl7fields[hl7field]
 						// If this is MSH-1 change hl7fieldvalue to the sperator character
-						if hl7fieldname == "MSH-1" {
+						if strings.EqualFold(hl7fieldname, "MSH-1") {
 							hl7fieldvalue = hl7fieldseperator
 						}
 						// If field matches
-						if pub.FieldSelectionMode == "Include" && pub.fieldsmap[hl7fieldname] || pub.FieldSelectionMode == "Exclude" && !pub.fieldsmap[hl7fieldname] {
+						if strings.EqualFold(pub.FieldSelectionMode, "Include") && pub.fieldsmap[hl7fieldname] || strings.EqualFold(pub.FieldSelectionMode, "Exclude") && !pub.fieldsmap[hl7fieldname] {
 							debugf("Field %s matched.", hl7fieldname)
 							// If selected split field into components
 							if pub.ComponentSelectionMode != "" {
@@ -127,7 +127,7 @@ func (pub *transPub) createEvent(requ, resp *message) beat.Event {
 									hl7fieldcomponentvalue := hl7fieldcomponents[hl7fieldcomponent]
 									debugf("Processing component: %s", hl7fieldcomponentname)
 									// If component matches
-									if pub.ComponentSelectionMode == "Include" && pub.componentsmap[hl7fieldcomponentname] || pub.ComponentSelectionMode == "Exclude" && !pub.componentsmap[hl7fieldcomponentname] {
+									if strings.EqualFold(pub.ComponentSelectionMode, "Include") && pub.componentsmap[hl7fieldcomponentname] || strings.EqualFold(pub.ComponentSelectionMode, "Exclude") && !pub.componentsmap[hl7fieldcomponentname] {
 										debugf("Component %s matched.", hl7fieldcomponentname)
 										// Re-map componentname if configured
 										if pub.namemappingmap[hl7fieldcomponentname] != "" {
