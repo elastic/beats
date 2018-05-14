@@ -21,7 +21,7 @@ func main() {
 	}
 
 	if *name == "" {
-		fmt.Println("Beat_name cannot be empty")
+		fmt.Println("beat_name cannot be empty")
 		os.Exit(1)
 	}
 
@@ -39,5 +39,5 @@ func main() {
 		os.Exit(3)
 	}
 
-	fmt.Println("Generated global fields.yml under _meta/fields.generated.yml")
+	fmt.Printf("Generated fields.yml for %s\n", *name)
 }
