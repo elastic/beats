@@ -50,6 +50,9 @@
       "prospector": {
         "type": "log"
       },
+      "input": {
+        "type": "log"
+      },
       "read_timestamp": "2018-01-20T17:19:39.236Z",
       "source": "/go/src/github.com/elastic/beats/filebeat/module/iis/access/test/test.log",
       "fileset": {
@@ -105,6 +108,9 @@
         "version": "6.1.3-alpha1"
       },
       "prospector": {
+        "type": "log"
+      },
+      "input": {
         "type": "log"
       },
       "read_timestamp": "2018-01-20T17:19:39.237Z",
@@ -175,6 +181,9 @@
         "version": "6.1.3-alpha1"
       },
       "prospector": {
+        "type": "log"
+      },
+      "input": {
         "type": "log"
       },
       "read_timestamp": "2018-01-20T17:19:39.237Z",
