@@ -3339,6 +3339,16 @@ Elasticsearch cluster id.
 
 --
 
+*`elasticsearch.cluster.state.id`*::
++
+--
+type: keyword
+
+Elasticsearch state id.
+
+
+--
+
 [float]
 == index fields
 
@@ -3949,6 +3959,43 @@ type: long
 
 format: bytes
 
+
+
+--
+
+[float]
+== shard fields
+
+shard fields
+
+
+
+*`elasticsearch.shard.primary`*::
++
+--
+type: boolean
+
+True if this is the primary shard.
+
+
+--
+
+*`elasticsearch.shard.number`*::
++
+--
+type: long
+
+The number of this shard.
+
+
+--
+
+*`elasticsearch.shard.state`*::
++
+--
+type: keyword
+
+The state of this shard.
 
 
 --
