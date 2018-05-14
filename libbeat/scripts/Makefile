@@ -315,7 +315,7 @@ libbeat_fields:
 
 .PHONY: update
 update: ## @build Update expects the most recent version of libbeat in the GOPATH
-update: python-env collect libbeat_fields
+update: python-env libbeat_fields collect
 	@echo "Updating generated files for ${BEAT_NAME}"
 
 	@# Update config files.
