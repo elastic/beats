@@ -1,0 +1,23 @@
+- name: apiserver
+  type: group
+  description: >
+    Kubernetes API server metrics
+  release: beta
+  fields:
+    - name: request.count
+      type: long
+      description: >
+        Total number of requests
+    - name: request.latency.sum
+      type: double
+      description: >
+        Requests latency, sum of latencies
+    - name: request.latency.count
+      type: long
+      description: >
+        Request latency, number of requests
+    - name: request.latency.percentiles
+      type: object
+      object_type: double
+      description: >
+        Request latency percentile values

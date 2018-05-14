@@ -6565,6 +6565,53 @@ Information and statistics of pods managed by kubernetes.
 
 
 [float]
+== apiserver fields
+
+Kubernetes API server metrics
+
+
+
+*`kubernetes.apiserver.request.count`*::
++
+--
+type: long
+
+Total number of requests
+
+
+--
+
+*`kubernetes.apiserver.request.latency.sum`*::
++
+--
+type: double
+
+Requests latency, sum of latencies
+
+
+--
+
+*`kubernetes.apiserver.request.latency.count`*::
++
+--
+type: long
+
+Request latency, number of requests
+
+
+--
+
+*`kubernetes.apiserver.request.latency.percentiles`*::
++
+--
+type: object
+
+Request latency percentile values
+
+
+--
+
+[float]
 == container fields
 
 kubernetes container metrics
