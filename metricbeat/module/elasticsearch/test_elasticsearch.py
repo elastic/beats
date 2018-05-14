@@ -20,6 +20,7 @@ class Test(metricbeat.BaseTest):
         "index_summary",
         "node_stats",
         "node",
+        "shard"
     ])
     @unittest.skipUnless(metricbeat.INTEGRATION_TESTS, "integration test")
     def test_metricsets(self, metricset):
