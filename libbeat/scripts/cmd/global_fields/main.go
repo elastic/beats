@@ -17,6 +17,11 @@ func main() {
 	beatFieldsPath := flag.Args()
 	if len(beatFieldsPath) == 0 {
 		fmt.Println("No field files to collect")
+		err := fields.AppendFromLibbeat(*beatsPath, *name)
+		if err != nil {
+			fmt.Println(err)
+			os.Exit(2)
+		}
 		return
 	}
 
