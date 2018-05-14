@@ -23,6 +23,10 @@ mapping:
         - attr: Uptime
           field: uptime
           event: uptime
+      target:
+          url: "service:jmx:rmi:///jndi/rmi://targethost:9999/jmxrmi"
+          user: "jolokia"
+          password: "s!cr!t"
 ---
 
 In case the underlying attribute is an object (e.g. see HeapMemoryUsage attribute in java.lang:type=Memory) its
