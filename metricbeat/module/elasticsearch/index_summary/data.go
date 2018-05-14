@@ -49,7 +49,7 @@ var (
 	}
 )
 
-func eventMapping(r mb.ReporterV2, info elasticsearch.Info, content []byte) {
+func eventMapping(r mb.ReporterV2, info elasticsearch.Info, content []byte) []error {
 	var all struct {
 		Data map[string]interface{} `json:"_all"`
 	}
@@ -57,10 +57,15 @@ func eventMapping(r mb.ReporterV2, info elasticsearch.Info, content []byte) {
 	err := json.Unmarshal(content, &all)
 	if err != nil {
 		r.Error(err)
-		return
+		return []error{err}
 	}
 
-	fields, _ := schema.Apply(all.Data)
+	var errs []error
+
+	fields, err := schema.Apply(all.Data)
+	if err != nil {
+		errs = append(errs, err)
+	}
 
 	event := mb.Event{}
 	event.RootFields = common.MapStr{}
@@ -73,4 +78,6 @@ func eventMapping(r mb.ReporterV2, info elasticsearch.Info, content []byte) {
 	event.MetricSetFields = fields
 
 	r.Event(event)
+
+	return errs
 }

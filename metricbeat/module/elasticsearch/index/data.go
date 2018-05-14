@@ -32,17 +32,25 @@ var (
 	}
 )
 
-func eventsMapping(r mb.ReporterV2, info elasticsearch.Info, content []byte) {
+func eventsMapping(r mb.ReporterV2, info elasticsearch.Info, content []byte) []error {
 
 	var indicesStruct struct {
 		Indices map[string]map[string]interface{} `json:"indices"`
 	}
 
-	json.Unmarshal(content, &indicesStruct)
+	err := json.Unmarshal(content, &indicesStruct)
+	if err != nil {
+		r.Error(err)
+		return []error{err}
+	}
 
+	var errs []error
 	for name, index := range indicesStruct.Indices {
 		event := mb.Event{}
-		event.MetricSetFields = eventMapping(index)
+		event.MetricSetFields, err = schema.Apply(index)
+		if err != nil {
+			errs = append(errs, err)
+		}
 		// Write name here as full name only available as key
 		event.MetricSetFields["name"] = name
 		event.RootFields = common.MapStr{}
@@ -52,9 +60,5 @@ func eventsMapping(r mb.ReporterV2, info elasticsearch.Info, content []byte) {
 		event.ModuleFields.Put("cluster.id", info.ClusterID)
 		r.Event(event)
 	}
-}
-
-func eventMapping(node map[string]interface{}) common.MapStr {
-	event, _ := schema.Apply(node)
-	return event
+	return errs
 }
