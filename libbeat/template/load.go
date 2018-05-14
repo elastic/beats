@@ -24,8 +24,8 @@ type Loader struct {
 	fields   []byte
 }
 
+// NewLoader creates a new template loader
 func NewLoader(cfg *common.Config, client ESClient, beatInfo beat.Info, fields []byte) (*Loader, error) {
-
 	config := DefaultConfig
 
 	err := cfg.Unpack(&config)
