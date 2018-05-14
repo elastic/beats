@@ -8,8 +8,8 @@ import (
 	"path/filepath"
 )
 
-const (
-	generatedFieldsYml = "_meta/fields.generated.yml"
+var (
+	generatedFieldsYml = filepath.Join("_meta", "fields.generated.yml")
 )
 
 type YmlFile struct {
