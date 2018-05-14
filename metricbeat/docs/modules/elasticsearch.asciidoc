@@ -23,10 +23,11 @@ in <<configuration-metricbeat>>. Here is an example configuration:
 metricbeat.modules:
 - module: elasticsearch
   metricsets:
-   #- index
-   #- index_summary
-   - node
-   - node_stats
+    - node
+    - node_stats
+    #- index
+    #- index_summary
+    #- shard
   period: 10s
   hosts: ["localhost:9200"]
 ----
@@ -46,6 +47,8 @@ The following metricsets are available:
 
 * <<metricbeat-metricset-elasticsearch-node_stats,node_stats>>
 
+* <<metricbeat-metricset-elasticsearch-shard,shard>>
+
 include::elasticsearch/index.asciidoc[]
 
 include::elasticsearch/index_summary.asciidoc[]
@@ -53,4 +56,6 @@ include::elasticsearch/index_summary.asciidoc[]
 include::elasticsearch/node.asciidoc[]
 
 include::elasticsearch/node_stats.asciidoc[]
+
+include::elasticsearch/shard.asciidoc[]
 
