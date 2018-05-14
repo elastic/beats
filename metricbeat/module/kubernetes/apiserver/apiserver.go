@@ -8,16 +8,16 @@ import (
 func init() {
 	mapping := &prometheus.MetricsMapping{
 		Metrics: map[string]prometheus.MetricMap{
-			"apiserver_request_count":             prometheus.Metric("request.count"),
-			"apiserver_request_latencies_summary": prometheus.Metric("request.latency"),
+			"apiserver_request_count":     prometheus.Metric("request.count"),
+			"apiserver_request_latencies": prometheus.Metric("request.latency"),
 		},
 
 		Labels: map[string]prometheus.LabelMap{
-			"client":      prometheus.KeyLabel("client"),
-			"resource":    prometheus.KeyLabel("resource"),
-			"scope":       prometheus.KeyLabel("scope"),
-			"subresource": prometheus.KeyLabel("subresource"),
-			"verb":        prometheus.KeyLabel("verb"),
+			"client":      prometheus.KeyLabel("request.client"),
+			"resource":    prometheus.KeyLabel("request.resource"),
+			"scope":       prometheus.KeyLabel("request.scope"),
+			"subresource": prometheus.KeyLabel("request.subresource"),
+			"verb":        prometheus.KeyLabel("request.verb"),
 		},
 	}
 

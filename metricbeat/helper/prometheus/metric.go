@@ -101,6 +101,26 @@ func (m *commonMetric) GetValue(metric *dto.Metric) interface{} {
 		return value
 	}
 
+	histogram := metric.GetHistogram()
+	if histogram != nil {
+		value := common.MapStr{}
+		value["sum"] = histogram.GetSampleSum()
+		value["count"] = histogram.GetSampleCount()
+
+		buckets := histogram.GetBucket()
+		bucketMap := common.MapStr{}
+		for _, bucket := range buckets {
+			key := strconv.FormatFloat(bucket.GetUpperBound(), 'f', -1, 64)
+			bucketMap[key] = bucket.GetCumulativeCount()
+		}
+
+		if len(bucketMap) != 0 {
+			value["bucket"] = bucketMap
+		}
+
+		return value
+	}
+
 	// Other types are not supported here
 	return nil
 }

@@ -6571,6 +6571,56 @@ Kubernetes API server metrics
 
 
 
+*`kubernetes.apiserver.request.client`*::
++
+--
+type: keyword
+
+Client doing the requests
+
+
+--
+
+*`kubernetes.apiserver.request.resource`*::
++
+--
+type: keyword
+
+Requested resource
+
+
+--
+
+*`kubernetes.apiserver.request.subresource`*::
++
+--
+type: keyword
+
+Requested subresource
+
+
+--
+
+*`kubernetes.apiserver.request.scope`*::
++
+--
+type: keyword
+
+Request scope (cluster, namespace, resource)
+
+
+--
+
+*`kubernetes.apiserver.request.verb`*::
++
+--
+type: keyword
+
+Request HTTP verb
+
+
+--
+
 *`kubernetes.apiserver.request.count`*::
 +
 --
@@ -6584,9 +6634,9 @@ Total number of requests
 *`kubernetes.apiserver.request.latency.sum`*::
 +
 --
-type: double
+type: long
 
-Requests latency, sum of latencies
+Requests latency, sum of latencies in microseconds
 
 
 --
@@ -6601,12 +6651,12 @@ Request latency, number of requests
 
 --
 
-*`kubernetes.apiserver.request.latency.percentiles`*::
+*`kubernetes.apiserver.request.latency.bucket`*::
 +
 --
 type: object
 
-Request latency percentile values
+Request latency histagram buckets
 
 
 --
