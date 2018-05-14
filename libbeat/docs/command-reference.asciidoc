@@ -481,6 +481,9 @@ ifeval::["{beatname_lc}"=="filebeat"]
 Specifies a comma-separated list of modules. Use this flag to avoid errors when
 there are no modules defined in the +{beatname_lc}.yml+ file.
 
+*`--pipelines`*::
+Sets up ingest pipelines for configured filesets.
+
 endif::[]
 
 *`--template`*::
