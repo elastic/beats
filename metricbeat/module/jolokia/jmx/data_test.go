@@ -33,6 +33,8 @@ func TestEventMapper(t *testing.T) {
 			Attr: "NonHEapMemoryUsage", Field: "memory.non_heap_usage"},
 		attributeMappingKey{"org.springframework.boot:type=Endpoint,name=metricsEndpoint", "Metrics"}: Attribute{
 			Attr: "Metrics", Field: "metrics"},
+		attributeMappingKey{"Catalina:type=Server", "serverInfo"}: Attribute{
+			Attr: "serverInfo", Field: "server_info"},
 	}
 
 	events, err := eventMapping(jolokiaResponse, mapping)
@@ -65,6 +67,7 @@ func TestEventMapper(t *testing.T) {
 				"classes_loaded":          float64(19127),
 				"classes_unloaded":        float64(270),
 			},
+			"server_info": "Apache Tomcat/9.0.7",
 		},
 	}
 
@@ -94,6 +97,8 @@ func TestEventGroupingMapper(t *testing.T) {
 			Attr: "NonHEapMemoryUsage", Field: "memory.non_heap_usage", Event: "memory"},
 		attributeMappingKey{"org.springframework.boot:type=Endpoint,name=metricsEndpoint", "Metrics"}: Attribute{
 			Attr: "Metrics", Field: "metrics"},
+		attributeMappingKey{"Catalina:type=Server", "serverInfo"}: Attribute{
+			Attr: "serverInfo", Field: "server_info"},
 	}
 
 	events, err := eventMapping(jolokiaResponse, mapping)
@@ -108,6 +113,7 @@ func TestEventGroupingMapper(t *testing.T) {
 				"classes_loaded":          float64(19127),
 				"classes_unloaded":        float64(270),
 			},
+			"server_info": "Apache Tomcat/9.0.7",
 		},
 		{
 			"gc": common.MapStr{
