@@ -97,7 +97,7 @@ ifeq ($(RACE_DETECTOR),1)
 endif
 
 # Only build experimental targets for snapshots
-ifeq ($(SNAPSHOT),no)
+ifneq ($(SNAPSHOT),yes)
 	PACKAGES_EXPERIMENTAL=""
 endif
 
