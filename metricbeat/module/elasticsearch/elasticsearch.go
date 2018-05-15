@@ -23,6 +23,7 @@ type NodeInfo struct {
 	TransportAddress string `json:"transport_address"`
 	IP               string `json:"ip"`
 	Name             string `json:"name"`
+	ID               string
 }
 
 // GetClusterID fetches cluster id for given nodeID
@@ -147,7 +148,9 @@ func GetNodeInfo(http *helper.HTTP, uri string, nodeID string) (*NodeInfo, error
 
 	// _local will only fetch one node info. First entry is node name
 	for k, v := range nodesStruct.Nodes {
-		if k == nodeID {
+		// In case the nodeID is empty, first node info will be returned
+		if k == nodeID || nodeID == "" {
+			v.ID = k
 			return v, nil
 		}
 	}
