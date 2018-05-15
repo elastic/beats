@@ -45,6 +45,8 @@ type Beat struct {
 	Config *BeatConfig // Common Beat configuration data.
 
 	BeatConfig *common.Config // The beat's own configuration section
+
+	Fields []byte // Data from fields.yml
 }
 
 // BeatConfig struct contains the basic configuration of every beat

@@ -19,6 +19,7 @@ import (
 	"go.uber.org/zap"
 
 	"github.com/elastic/beats/libbeat/api"
+	"github.com/elastic/beats/libbeat/asset"
 	"github.com/elastic/beats/libbeat/beat"
 	"github.com/elastic/beats/libbeat/cfgfile"
 	"github.com/elastic/beats/libbeat/cloudid"
@@ -172,6 +173,11 @@ func NewBeat(name, indexPrefix, v string) (*Beat, error) {
 		return nil, err
 	}
 
+	fields, err := asset.GetFields(name + "/fields.yml")
+	if err != nil {
+		return nil, err
+	}
+
 	b := beat.Beat{
 		Info: beat.Info{
 			Beat:        name,
@@ -181,6 +187,7 @@ func NewBeat(name, indexPrefix, v string) (*Beat, error) {
 			Hostname:    hostname,
 			UUID:        uuid.NewV4(),
 		},
+		Fields: fields,
 	}
 
 	return &Beat{Beat: b}, nil
@@ -680,7 +687,7 @@ func (b *Beat) templateLoadingCallback() (func(esClient *elasticsearch.Client) e
 			b.Config.Template = common.NewConfig()
 		}
 
-		loader, err := template.NewLoader(b.Config.Template, esClient, b.Info)
+		loader, err := template.NewLoader(b.Config.Template, esClient, b.Info, b.Fields)
 		if err != nil {
 			return fmt.Errorf("Error creating Elasticsearch template loader: %v", err)
 		}
