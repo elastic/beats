@@ -2,6 +2,8 @@ import os
 import metricbeat
 import unittest
 from nose.plugins.attrib import attr
+import requests
+import time
 
 HTTP_FIELDS = metricbeat.COMMON_FIELDS + ["http"]
 
@@ -35,6 +37,37 @@ class Test(metricbeat.BaseTest):
 
         # Delete dynamic namespace part for fields comparison
         del evt["http"]["test"]
+
+        self.assertItemsEqual(self.de_dot(HTTP_FIELDS), evt.keys(), evt)
+
+        self.assert_fields_are_documented(evt)
+
+    def test_server(self):
+        """
+        http server metricset test
+        """
+        self.render_config_template(modules=[{
+            "name": "http",
+            "metricsets": ["server"],
+        }])
+        proc = self.start_beat()
+        time.sleep(5)
+
+        self.wait_until(lambda: self.log_contains("Starting http server on localhost:8080"))
+
+        requests.post('http://localhost:8080/', json={'hello': 'world'}, headers={'Content-Type': 'application/json'})
+        self.wait_until(lambda: self.output_lines() > 0)
+        proc.check_kill_and_wait()
+        self.assert_no_logged_warnings()
+
+        output = self.read_output_json()
+        self.assertEqual(len(output), 1)
+        evt = output[0]
+
+        assert evt["http"]["server"]["hello"] == "world"
+
+        # Delete dynamic namespace part for fields comparison
+        del evt["http"]["server"]
 
         self.assertItemsEqual(self.de_dot(HTTP_FIELDS), evt.keys(), evt)
 
