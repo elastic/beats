@@ -1,7 +1,6 @@
 package prometheus
 
 import (
-	"github.com/elastic/beats/libbeat/common"
 	"github.com/elastic/beats/metricbeat/mb"
 	"github.com/elastic/beats/metricbeat/mb/parse"
 )
@@ -40,6 +39,6 @@ type prometheusMetricSet struct {
 	mapping    *MetricsMapping
 }
 
-func (m *prometheusMetricSet) Fetch() ([]common.MapStr, error) {
-	return m.prometheus.GetProcessedMetrics(m.mapping)
+func (m *prometheusMetricSet) Fetch(r mb.ReporterV2) {
+	m.prometheus.ReportProcessedMetrics(m.mapping, r)
 }

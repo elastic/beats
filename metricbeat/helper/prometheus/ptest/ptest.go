@@ -9,7 +9,7 @@ import (
 	"os"
 	"testing"
 
-	"github.com/elastic/beats/libbeat/common"
+	"github.com/elastic/beats/metricbeat/mb"
 	mbtest "github.com/elastic/beats/metricbeat/mb/testing"
 
 	"github.com/stretchr/testify/assert"
@@ -54,13 +54,13 @@ func TestMetricSet(t *testing.T, module, metricset string, cases TestCases) {
 			"hosts":      []string{server.URL},
 		}
 
-		f := mbtest.NewEventsFetcher(t, config)
-
-		events, err := f.Fetch()
-		assert.NoError(t, err)
+		f := mbtest.NewReportingMetricSetV2(t, config)
+		reporter := &mbtest.CapturingReporterV2{}
+		f.Fetch(reporter)
+		assert.Nil(t, reporter.GetErrors(), "Errors while fetching metrics")
 
 		if *expectedFlag {
-			eventsJSON, _ := json.MarshalIndent(events, "", "\t")
+			eventsJSON, _ := json.MarshalIndent(reporter.GetEvents(), "", "\t")
 			err = ioutil.WriteFile(test.ExpectedFile, eventsJSON, 0644)
 			assert.NoError(t, err)
 		}
@@ -71,17 +71,19 @@ func TestMetricSet(t *testing.T, module, metricset string, cases TestCases) {
 			t.Fatal(err)
 		}
 
-		var expectedEvents []common.MapStr
+		var expectedEvents []mb.Event
 		err = json.Unmarshal(expected, &expectedEvents)
 		if err != nil {
 			t.Fatal(err)
 		}
 
-		for _, event := range events {
+		for _, event := range reporter.GetEvents() {
 			// ensure the event is in expected list
 			found := -1
 			for i, expectedEvent := range expectedEvents {
-				if event.String() == expectedEvent.String() {
+				if event.RootFields.String() == expectedEvent.RootFields.String() &&
+					event.ModuleFields.String() == expectedEvent.ModuleFields.String() &&
+					event.MetricSetFields.String() == expectedEvent.MetricSetFields.String() {
 					found = i
 					break
 				}

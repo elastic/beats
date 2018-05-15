@@ -11,6 +11,7 @@ import (
 	"github.com/stretchr/testify/assert"
 
 	"github.com/elastic/beats/libbeat/common"
+	mbtest "github.com/elastic/beats/metricbeat/mb/testing"
 )
 
 const promMetrics = `
@@ -241,12 +242,16 @@ func TestPrometheus(t *testing.T) {
 	}
 
 	for _, test := range tests {
-		res, err := p.GetProcessedMetrics(test.mapping)
-		assert.Nil(t, err, test.msg)
+		reporter := &mbtest.CapturingReporterV2{}
+		p.ReportProcessedMetrics(test.mapping, reporter)
+		assert.Nil(t, reporter.GetErrors(), test.msg)
 		// Sort slice to avoid randomness
+		res := reporter.GetEvents()
 		sort.Slice(res, func(i, j int) bool {
-			return res[i].String() < res[j].String()
+			return res[i].MetricSetFields.String() < res[j].MetricSetFields.String()
 		})
-		assert.Equal(t, test.expected, res, test.msg)
+		for j, ev := range res {
+			assert.Equal(t, test.expected[j], ev.MetricSetFields, test.msg)
+		}
 	}
 }
