@@ -7,6 +7,9 @@ ES_BEATS?=..
 
 include ${ES_BEATS}/libbeat/scripts/Makefile
 
+TARGETS?="windows/amd64 windows/386 darwin/amd64 " ## @building list of platforms/architecture to be built by "make package"
+PACKAGES?=${BEAT_NAME}/deb ${BEAT_NAME}/rpm ${BEAT_NAME}/darwin ${BEAT_NAME}/win ${BEAT_NAME}/bin ## @Building List of OS to be supported by "make package"
+
 # This is called by the beats packer before building starts
 .PHONY: before-build
 before-build:

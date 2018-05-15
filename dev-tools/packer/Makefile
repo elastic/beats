@@ -34,6 +34,10 @@ beat_abspath=${BEATS_GOPATH}/src/${BEAT_PATH}
 	ARCH=386 BEAT=$(@D) BUILD_DIR=${BUILD_DIR} UPLOAD_DIR=${UPLOAD_DIR} BEAT_PATH=$(beat_abspath) BUILDID=$(BUILDID) SNAPSHOT=$(SNAPSHOT) $(packer_absdir)/platforms/binary/build.sh
 	ARCH=amd64 BEAT=$(@D) BUILD_DIR=${BUILD_DIR} UPLOAD_DIR=${UPLOAD_DIR} BEAT_PATH=$(beat_abspath) BUILDID=$(BUILDID) SNAPSHOT=$(SNAPSHOT) $(packer_absdir)/platforms/binary/build.sh
 
+%/arm:
+	echo Creating ARM packages for $(@D)
+	ARCH=arm BEAT=$(@D) BUILD_DIR=${BUILD_DIR} BEAT_PATH=$(beat_abspath) BUILDID=$(BUILDID) SNAPSHOT=$(SNAPSHOT) $(packer_absdir)/platforms/binary/build.sh
+
 .PHONY: package-dashboards
 package-dashboards:
 	echo Creating the Dashboards package
