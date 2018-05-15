@@ -12,7 +12,7 @@ import (
 const (
 	ContainerIndexerName = "container"
 	PodNameIndexerName   = "pod_name"
-	PodUIDIndexerName   = "pod_uid"
+	PodUIDIndexerName    = "pod_uid"
 	IPPortIndexerName    = "ip_port"
 )
 
@@ -141,11 +141,11 @@ func NewPodUIDIndexer(_ common.Config, metaGen kubernetes.MetaGenerator) (Indexe
 
 // GetMetadata returns the composed metadata from PodNameIndexer and the pod UID
 func (p *PodUIDIndexer) GetMetadata(pod *kubernetes.Pod) []MetadataIndex {
-	data := p.metaGen.PodMetadataWithUID(pod)
+	data := p.metaGen.PodMetadata(pod)
 	return []MetadataIndex{
 		{
 			Index: pod.Metadata.UID,
-			Data: data,
+			Data:  data,
 		},
 	}
 }

@@ -23,16 +23,16 @@ func init() {
 const LogPathMatcherName = "logs_path"
 
 type LogPathMatcher struct {
-	LogsPath string
+	LogsPath     string
 	ResourceType string
 }
 
 func newLogsPathMatcher(cfg common.Config) (add_kubernetes_metadata.Matcher, error) {
 	config := struct {
-		LogsPath string `config:"logs_path"`
+		LogsPath     string `config:"logs_path"`
 		ResourceType string `config:"resource_type"`
 	}{
-		LogsPath: "/var/lib/docker/containers/",
+		LogsPath:     "/var/lib/docker/containers/",
 		ResourceType: "container",
 	}
 
@@ -55,6 +55,7 @@ func newLogsPathMatcher(cfg common.Config) (add_kubernetes_metadata.Matcher, err
 
 // Docker container ID is a 64-character-long hexadecimal string
 const containerIdLen = 64
+
 // Pod UID is on the 5th index of the path directories
 const podUIDPos = 5
 

@@ -10,7 +10,7 @@ import (
 	"github.com/elastic/beats/libbeat/common/kubernetes"
 )
 
-var metagen = kubernetes.NewMetaGenerator([]string{}, []string{}, []string{})
+var metagen = kubernetes.NewMetaGenerator([]string{}, []string{}, []string{}, false)
 
 func TestPodIndexer(t *testing.T) {
 	var testConfig = common.NewConfig()
@@ -60,7 +60,9 @@ func TestPodIndexer(t *testing.T) {
 func TestPodUIDIndexer(t *testing.T) {
 	var testConfig = common.NewConfig()
 
-	podUIDIndexer, err := NewPodUIDIndexer(*testConfig, metagen)
+	metaGenWithPodUID := kubernetes.NewMetaGenerator([]string{}, []string{}, []string{}, true)
+
+	podUIDIndexer, err := NewPodUIDIndexer(*testConfig, metaGenWithPodUID)
 	assert.Nil(t, err)
 
 	podName := "testpod"
@@ -87,7 +89,7 @@ func TestPodUIDIndexer(t *testing.T) {
 	expected := common.MapStr{
 		"pod": common.MapStr{
 			"name": "testpod",
-			"uid": "005f3b90-4b9d-12f8-acf0-31020a840133",
+			"uid":  "005f3b90-4b9d-12f8-acf0-31020a840133",
 		},
 		"namespace": "testns",
 		"labels": common.MapStr{
@@ -218,7 +220,7 @@ func TestFilteredGenMeta(t *testing.T) {
 	rawAnnotations := indexers[0].Data["annotations"]
 	assert.Nil(t, rawAnnotations)
 
-	filteredGen := kubernetes.NewMetaGenerator([]string{"a"}, []string{"foo"}, []string{})
+	filteredGen := kubernetes.NewMetaGenerator([]string{"a"}, []string{"foo"}, []string{}, false)
 	podIndexer, err = NewPodNameIndexer(*testConfig, filteredGen)
 	assert.Nil(t, err)
 
@@ -249,7 +251,7 @@ func TestFilteredGenMeta(t *testing.T) {
 func TestFilteredGenMetaExclusion(t *testing.T) {
 	var testConfig = common.NewConfig()
 
-	filteredGen := kubernetes.NewMetaGenerator([]string{}, []string{}, []string{"x"})
+	filteredGen := kubernetes.NewMetaGenerator([]string{}, []string{}, []string{"x"}, false)
 	podIndexer, err := NewPodNameIndexer(*testConfig, filteredGen)
 	assert.Nil(t, err)
 

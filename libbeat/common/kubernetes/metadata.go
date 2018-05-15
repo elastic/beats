@@ -10,9 +10,6 @@ type MetaGenerator interface {
 	// PodMetadata generates metadata for the given pod taking to account certain filters
 	PodMetadata(pod *Pod) common.MapStr
 
-	// PodMetadataWithUID generates the PodUID in addition to PodMetadata metadata
-	PodMetadataWithUID(pod *Pod) common.MapStr
-
 	// Containermetadata generates metadata for the given container of a pod
 	ContainerMetadata(pod *Pod, container string) common.MapStr
 }
@@ -21,14 +18,16 @@ type metaGenerator struct {
 	annotations   []string
 	labels        []string
 	labelsExclude []string
+	poduid        bool
 }
 
 // NewMetaGenerator initializes and returns a new kubernetes metadata generator
-func NewMetaGenerator(annotations, labels, labelsExclude []string) MetaGenerator {
+func NewMetaGenerator(annotations, labels, labelsExclude []string, includePodUID bool) MetaGenerator {
 	return &metaGenerator{
 		annotations:   annotations,
 		labels:        labels,
 		labelsExclude: labelsExclude,
+		poduid:        includePodUID,
 	}
 }
 
@@ -59,6 +58,11 @@ func (g *metaGenerator) PodMetadata(pod *Pod) common.MapStr {
 		"namespace": pod.Metadata.Namespace,
 	}
 
+	// Add Pod UID metadata if enabled
+	if g.poduid {
+		safemapstr.Put(meta, "pod.uid", pod.Metadata.UID)
+	}
+
 	if len(labelMap) != 0 {
 		meta["labels"] = labelMap
 	}
@@ -68,21 +72,6 @@ func (g *metaGenerator) PodMetadata(pod *Pod) common.MapStr {
 	}
 
 	return meta
-}
-
-func (g *metaGenerator) PodMetadataWithUID(pod *Pod) common.MapStr {
-	podMeta := g.PodMetadata(pod)
-
-	// Add Pod UID to existing metadata
-	uidMeta := common.MapStr{
-		"pod": common.MapStr{
-			"uid": pod.Metadata.UID,
-		},
-	}
-
-	podMeta.DeepUpdate(uidMeta)
-
-	return podMeta
 }
 
 // Containermetadata generates metadata for the given container of a pod

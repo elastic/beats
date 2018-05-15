@@ -66,7 +66,10 @@ func newKubernetesAnnotator(cfg *common.Config) (processors.Processor, error) {
 		Indexing.RUnlock()
 	}
 
-	metaGen := kubernetes.NewMetaGenerator(config.IncludeAnnotations, config.IncludeLabels, config.ExcludeLabels)
+	//Checks whether the PodUIDIndexer has been added in order to turn on the pod uid gathering
+	_, hasPodUIDIndexer := Indexing.indexers["pod_uid"]
+
+	metaGen := kubernetes.NewMetaGenerator(config.IncludeAnnotations, config.IncludeLabels, config.ExcludeLabels, config.IncludePodUID || hasPodUIDIndexer)
 	indexers := NewIndexers(config.Indexers, metaGen)
 
 	matchers := NewMatchers(config.Matchers)
