@@ -2,6 +2,7 @@ package prometheus
 
 import (
 	"encoding/json"
+	"flag"
 	"io/ioutil"
 	"net/http"
 	"net/http/httptest"
@@ -27,6 +28,8 @@ var (
 		DefaultScheme: defaultScheme,
 		DefaultPath:   defaultPath,
 	}.Build()
+
+	expectedFlag = flag.Bool("update_expected", false, "Update prometheus expected files")
 )
 
 // MetricSetBuilder returns a builder function for a new Prometheus metricset using the given mapping
@@ -65,8 +68,8 @@ type TestCases []struct {
 
 // TestMetricSet goes over the given TestCases and ensures that source Prometheus metrics gets converted into the expected
 // events when passed by the given metricset.
-// If update is true, the expected JSON file will be updated with the result
-func TestMetricSet(t *testing.T, module, metricset string, cases TestCases, update bool) {
+// If -update_expected flag is passed, the expected JSON file will be updated with the result
+func TestMetricSet(t *testing.T, module, metricset string, cases TestCases) {
 	for _, test := range cases {
 		t.Logf("Testing %s file\n", test.MetricsFile)
 
@@ -96,7 +99,7 @@ func TestMetricSet(t *testing.T, module, metricset string, cases TestCases, upda
 		events, err := f.Fetch()
 		assert.NoError(t, err)
 
-		if update {
+		if *expectedFlag {
 			eventsJSON, _ := json.MarshalIndent(events, "", "\t")
 			err = ioutil.WriteFile(test.ExpectedFile, eventsJSON, 0644)
 			assert.NoError(t, err)

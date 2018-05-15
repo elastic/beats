@@ -18,6 +18,5 @@ func TestEventMapping(t *testing.T) {
 				ExpectedFile: "./_meta/test/metrics.expected",
 			},
 		},
-		// This flag set to true will override expected files with the output of this run:
-		false)
+	)
 }
