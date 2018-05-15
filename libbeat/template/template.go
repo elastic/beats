@@ -8,6 +8,7 @@ import (
 	"github.com/elastic/beats/libbeat/common"
 	"github.com/elastic/beats/libbeat/common/cfgwarn"
 	"github.com/elastic/beats/libbeat/common/fmtstr"
+	"github.com/elastic/go-ucfg/yaml"
 )
 
 var (
@@ -92,14 +93,9 @@ func New(beatVersion string, beatName string, esVersion string, config TemplateC
 	}, nil
 }
 
-// Load the given input and generates the input based on it
-func (t *Template) Load(file string) (common.MapStr, error) {
+func (t *Template) load(fields common.Fields) (common.MapStr, error) {
 
-	fields, err := common.LoadFieldsYaml(file)
-	if err != nil {
-		return nil, err
-	}
-
+	var err error
 	if len(t.config.AppendFields) > 0 {
 		cfgwarn.Experimental("append_fields is used.")
 		fields, err = appendFields(fields, t.config.AppendFields)
@@ -117,6 +113,27 @@ func (t *Template) Load(file string) (common.MapStr, error) {
 	output := t.Generate(properties, dynamicTemplates)
 
 	return output, nil
+}
+
+// LoadFile loads the the template from the given file path
+func (t *Template) LoadFile(file string) (common.MapStr, error) {
+
+	fields, err := common.LoadFieldsYaml(file)
+	if err != nil {
+		return nil, err
+	}
+
+	return t.load(fields)
+}
+
+// LoadBytes loads the the template from the given byte array
+func (t *Template) LoadBytes(data []byte) (common.MapStr, error) {
+	fields, err := loadYamlByte(data)
+	if err != nil {
+		return nil, err
+	}
+
+	return t.load(fields)
 }
 
 // GetName returns the name of the template
@@ -223,6 +240,24 @@ func appendFields(fields, appendFields common.Fields) (common.Fields, error) {
 		}
 		// Appends fields to existing fields
 		fields = append(fields, appendFields...)
+	}
+	return fields, nil
+}
+
+func loadYamlByte(data []byte) (common.Fields, error) {
+
+	var keys []common.Field
+
+	cfg, err := yaml.NewConfig(data)
+	if err != nil {
+		return nil, err
+	}
+	cfg.Unpack(&keys)
+
+	fields := common.Fields{}
+
+	for _, key := range keys {
+		fields = append(fields, key.Fields...)
 	}
 	return fields, nil
 }

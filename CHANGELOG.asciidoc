@@ -128,6 +128,7 @@ https://github.com/elastic/beats/compare/v6.2.3...master[Check the HEAD diff]
 - Add a default seccomp (secure computing) filter on Linux that prohibits
   execve, execveat, fork, and vfork syscalls. A custom policy can be configured. {issue}5213[5213]
 - Update Sarama to v1.16.0, adding better support for kafka 0.11, 1.0, and 1.1 {pull}7025[7025]
+- Ship fields.yml as part of the binary {pull}4834[4834]
 
 *Auditbeat*
 

@@ -11,6 +11,7 @@ import (
 	"os"
 
 	"github.com/elastic/beats/winlogbeat/cmd"
+	_ "github.com/elastic/beats/winlogbeat/include"
 )
 
 func main() {

@@ -21,9 +21,11 @@ type Loader struct {
 	config   TemplateConfig
 	client   ESClient
 	beatInfo beat.Info
+	fields   []byte
 }
 
-func NewLoader(cfg *common.Config, client ESClient, beatInfo beat.Info) (*Loader, error) {
+// NewLoader creates a new template loader
+func NewLoader(cfg *common.Config, client ESClient, beatInfo beat.Info, fields []byte) (*Loader, error) {
 	config := DefaultConfig
 
 	err := cfg.Unpack(&config)
@@ -35,6 +37,7 @@ func NewLoader(cfg *common.Config, client ESClient, beatInfo beat.Info) (*Loader
 		config:   config,
 		client:   client,
 		beatInfo: beatInfo,
+		fields:   fields,
 	}, nil
 }
 
@@ -58,11 +61,24 @@ func (l *Loader) Load() error {
 			logp.Info("Existing template will be overwritten, as overwrite is enabled.")
 		}
 
-		fieldsPath := paths.Resolve(paths.Config, l.config.Fields)
+		var output common.MapStr
 
-		output, err := tmpl.Load(fieldsPath)
-		if err != nil {
-			return fmt.Errorf("error creating template from file %s: %v", fieldsPath, err)
+		// Load fields from path
+		if l.config.Fields != "" {
+			logp.Debug("template", "Load fields.yml from file: %s", l.config.Fields)
+
+			fieldsPath := paths.Resolve(paths.Config, l.config.Fields)
+
+			output, err = tmpl.LoadFile(fieldsPath)
+			if err != nil {
+				return fmt.Errorf("error creating template from file %s: %v", fieldsPath, err)
+			}
+		} else {
+			logp.Debug("template", "Load default fields.yml")
+			output, err = tmpl.LoadBytes(l.fields)
+			if err != nil {
+				return fmt.Errorf("error creating template: %v", err)
+			}
 		}
 
 		err = l.LoadTemplate(tmpl.GetName(), output)
