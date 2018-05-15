@@ -4,33 +4,18 @@ package node
 
 import (
 	"io/ioutil"
-	"path/filepath"
 	"testing"
 
 	s "github.com/elastic/beats/libbeat/common/schema"
 	mbtest "github.com/elastic/beats/metricbeat/mb/testing"
 
 	"github.com/stretchr/testify/assert"
+
+	"github.com/elastic/beats/metricbeat/module/elasticsearch"
 )
 
 func TestGetMappings(t *testing.T) {
-	files, err := filepath.Glob("./_meta/test/node.*.json")
-	assert.NoError(t, err)
-
-	for _, f := range files {
-		content, err := ioutil.ReadFile(f)
-		assert.NoError(t, err)
-
-		reporter := &mbtest.CapturingReporterV2{}
-		errors := eventsMapping(reporter, content)
-		for _, errs := range errors {
-			if e, ok := errs.(*s.Errors); ok {
-				assert.False(t, e.HasRequiredErrors(), "mapping error: %s", e)
-			}
-		}
-		assert.True(t, len(reporter.GetEvents()) >= 1)
-		assert.Equal(t, 0, len(reporter.GetErrors()))
-	}
+	elasticsearch.TestMapper(t, "./_meta/test/node.*.json", eventsMapping)
 }
 
 func TestInvalid(t *testing.T) {

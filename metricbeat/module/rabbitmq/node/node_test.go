@@ -14,13 +14,21 @@ import (
 )
 
 func TestFetchEventContents(t *testing.T) {
-	absPath, err := filepath.Abs("../_meta/testdata/")
+	absPath, _ := filepath.Abs("../_meta/testdata/")
 
-	response, err := ioutil.ReadFile(absPath + "/node_sample_response.json")
+	response, _ := ioutil.ReadFile(absPath + "/node_sample_response.json")
+	notFound, _ := ioutil.ReadFile(absPath + "/notfound_response.json")
 	server := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		w.WriteHeader(200)
-		w.Header().Set("Content-Type", "application/json;")
-		w.Write([]byte(response))
+		switch r.URL.Path {
+		case "/api/nodes":
+			w.WriteHeader(200)
+			w.Header().Set("Content-Type", "application/json;")
+			w.Write([]byte(response))
+		default:
+			w.WriteHeader(404)
+			w.Header().Set("Content-Type", "application/json;")
+			w.Write([]byte(notFound))
+		}
 	}))
 	defer server.Close()
 
