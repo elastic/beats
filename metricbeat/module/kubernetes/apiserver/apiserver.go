@@ -21,8 +21,7 @@ func init() {
 		},
 	}
 
-	if err := mb.Registry.AddMetricSet("kubernetes", "apiserver",
-		prometheus.MetricSetBuilder(mapping), prometheus.HostParser); err != nil {
-		panic(err)
-	}
+	mb.Registry.MustAddMetricSet("kubernetes", "apiserver",
+		prometheus.MetricSetBuilder(mapping),
+		mb.WithHostParser(prometheus.HostParser))
 }
