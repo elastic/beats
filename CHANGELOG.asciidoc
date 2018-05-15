@@ -43,6 +43,7 @@ https://github.com/elastic/beats/compare/v6.2.3...master[Check the HEAD diff]
 - Update logstash.node_stats metricset to write data under `logstash.node.stats.*`. {pull}6714[6714]
 - Fixed typo in values for `state_container` `status.phase`, from `terminate` to `terminated`. {pull}6916[6916]
 - RabbitMQ management plugin path is now configured at the module level instead of having to do it in each of the metricsets. New `management_path_prefix` option should be used now {pull}7074[7074]
+- RabbitMQ node metricset only collects metrics of the instance it connects to, `node.collect: cluster` can be used to collect all nodes as before. {issue}6556[6556] {pull}6971[6971]
 
 *Packetbeat*
 
