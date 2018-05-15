@@ -11,17 +11,19 @@ import (
 
 var (
 	schema = s.Schema{
-		"state":   c.Str("state"),
-		"primary": c.Bool("primary"),
-		"node":    c.Str("node"),
-		"index":   c.Str("index"),
-		"shard":   c.Int("number"),
+		"state":           c.Str("state"),
+		"primary":         c.Bool("primary"),
+		"node":            c.Str("node"),
+		"index":           c.Str("index"),
+		"shard":           c.Int("number"),
+		"relocating_node": c.Str("relocating_node"),
 	}
 )
 
 type stateStruct struct {
 	ClusterName  string `json:"cluster_name"`
 	StateID      string `json:"state_uuid"`
+	MasterNode   string `json:"master_node"`
 	RoutingTable struct {
 		Indices map[string]struct {
 			Shards map[string][]map[string]interface{} `json:"shards"`
