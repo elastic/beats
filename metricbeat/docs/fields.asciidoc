@@ -3339,6 +3339,16 @@ Elasticsearch cluster id.
 
 --
 
+*`elasticsearch.cluster.state.id`*::
++
+--
+type: keyword
+
+Elasticsearch state id.
+
+
+--
+
 [float]
 == index fields
 
@@ -3400,6 +3410,123 @@ Total number of index segments.
 --
 
 *`elasticsearch.index.total.segments.memory.bytes`*::
++
+--
+type: long
+
+format: bytes
+
+Total number of memory used by the segments in bytes.
+
+
+--
+
+[float]
+== index.summary fields
+
+index
+
+
+
+
+*`elasticsearch.index.summary.primaries.docs.count`*::
++
+--
+type: long
+
+Total number of documents in the index.
+
+
+--
+
+*`elasticsearch.index.summary.primaries.docs.deleted`*::
++
+--
+type: long
+
+Total number of deleted documents in the index.
+
+
+--
+
+*`elasticsearch.index.summary.primaries.store.size.bytes`*::
++
+--
+type: long
+
+format: bytes
+
+Total size of the index in bytes.
+
+
+--
+
+*`elasticsearch.index.summary.primaries.segments.count`*::
++
+--
+type: long
+
+Total number of index segments.
+
+
+--
+
+*`elasticsearch.index.summary.primaries.segments.memory.bytes`*::
++
+--
+type: long
+
+format: bytes
+
+Total number of memory used by the segments in bytes.
+
+
+--
+
+
+*`elasticsearch.index.summary.total.docs.count`*::
++
+--
+type: long
+
+Total number of documents in the index.
+
+
+--
+
+*`elasticsearch.index.summary.total.docs.deleted`*::
++
+--
+type: long
+
+Total number of deleted documents in the index.
+
+
+--
+
+*`elasticsearch.index.summary.total.store.size.bytes`*::
++
+--
+type: long
+
+format: bytes
+
+Total size of the index in bytes.
+
+
+--
+
+*`elasticsearch.index.summary.total.segments.count`*::
++
+--
+type: long
+
+Total number of index segments.
+
+
+--
+
+*`elasticsearch.index.summary.total.segments.memory.bytes`*::
 +
 --
 type: long
@@ -3832,6 +3959,43 @@ type: long
 
 format: bytes
 
+
+
+--
+
+[float]
+== shard fields
+
+shard fields
+
+
+
+*`elasticsearch.shard.primary`*::
++
+--
+type: boolean
+
+True if this is the primary shard.
+
+
+--
+
+*`elasticsearch.shard.number`*::
++
+--
+type: long
+
+The number of this shard.
+
+
+--
+
+*`elasticsearch.shard.state`*::
++
+--
+type: keyword
+
+The state of this shard.
 
 
 --

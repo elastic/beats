@@ -26,6 +26,8 @@
 #   - Folder syncing doesn't work well. Consider copying the files into the box or
 #     cloning the project inside the box.
 
+GO_VERSION = File.read(File.join(File.dirname(__FILE__), ".go-version")).strip
+
 # Provisioning for Windows PowerShell
 $winPsProvision = <<SCRIPT
 echo 'Creating github.com\elastic in the GOPATH'
@@ -33,11 +35,22 @@ New-Item -itemtype directory -path "C:\\Gopath\\src\\github.com\\elastic" -force
 echo "Symlinking C:\\Vagrant to C:\\Gopath\\src\\github.com\\elastic"
 cmd /c mklink /d C:\\Gopath\\src\\github.com\\elastic\\beats \\\\vboxsvr\\vagrant
 
+echo "Installing gvm to manage go version"
+[Net.ServicePointManager]::SecurityProtocol = "tls12"
+Invoke-WebRequest -URI https://github.com/andrewkroh/gvm/releases/download/v0.0.5/gvm-windows-amd64.exe -Outfile C:\Windows\System32\gvm.exe
+C:\Windows\System32\gvm.exe --format=powershell #{GO_VERSION} | Invoke-Expression
+go version
+
+echo "Configure environment variables"
+[System.Environment]::SetEnvironmentVariable("GOROOT", "C:\\Users\\vagrant\\.gvm\\versions\\go#{GO_VERSION}.windows.amd64", [System.EnvironmentVariableTarget]::Machine)
+[System.Environment]::SetEnvironmentVariable("PATH", "$env:GOROOT\\bin;$env:PATH", [System.EnvironmentVariableTarget]::Machine)
+
 echo "Creating Beats Shell desktop shortcut"
 $WshShell = New-Object -comObject WScript.Shell
 $Shortcut = $WshShell.CreateShortcut("$Home\\Desktop\\Beats Shell.lnk")
 $Shortcut.TargetPath = "cmd.exe"
-$Shortcut.Arguments = "/K cd /d C:\\Gopath\\src\\github.com\\elastic\\beats"
+$Shortcut.Arguments = '/c "SET GOROOT=C:\\Users\\vagrant\\.gvm\\versions\\go#{GO_VERSION}.windows.amd64&PATH=C:\\Users\\vagrant\\.gvm\\versions\\go#{GO_VERSION}.windows.amd64\\bin;%PATH%" && START'
+$Shortcut.WorkingDirectory = "C:\\Gopath\\src\\github.com\\elastic\\beats"
 $Shortcut.Save()
 
 echo "Disable automatic updates"
@@ -63,7 +76,7 @@ if [ ! -e "~/bin/gvm" ]; then
   chmod +x ~/bin/gvm
   echo 'export GOPATH=$HOME/go' >> ~/.bash_profile
   echo 'export PATH=$HOME/bin:$GOPATH/bin:$PATH' >> ~/.bash_profile
-  echo 'eval "$(gvm 1.10.1)"' >> ~/.bash_profile
+  echo 'eval "$(gvm #{GO_VERSION})"' >> ~/.bash_profile
 fi
 SCRIPT
 

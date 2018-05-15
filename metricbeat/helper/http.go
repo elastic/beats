@@ -95,18 +95,27 @@ func (h *HTTP) FetchResponse() (*http.Response, error) {
 	return resp, nil
 }
 
+// SetHeader sets HTTP headers to use in requests
 func (h *HTTP) SetHeader(key, value string) {
 	h.headers[key] = value
 }
 
+// SetMethod sets HTTP method to use in requests
 func (h *HTTP) SetMethod(method string) {
 	h.method = method
 }
 
+// GetURI gets the URI used in requests
+func (h *HTTP) GetURI() string {
+	return h.uri
+}
+
+// SetURI sets URI to use in requests
 func (h *HTTP) SetURI(uri string) {
 	h.uri = uri
 }
 
+// SetBody sets the body of the requests
 func (h *HTTP) SetBody(body []byte) {
 	h.body = body
 }

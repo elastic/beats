@@ -1,5 +1,119 @@
 # Changelog
 
+#### Version 1.16.0 (2018-02-12)
+
+New Features:
+ - Add support for the Create/Delete Topics request/response pairs
+   ([#1007](https://github.com/Shopify/sarama/pull/1007),
+    [#1008](https://github.com/Shopify/sarama/pull/1008)).
+ - Add support for the Describe/Create/Delete ACL request/response pairs
+   ([#1009](https://github.com/Shopify/sarama/pull/1009)).
+ - Add support for the five transaction-related request/response pairs
+   ([#1016](https://github.com/Shopify/sarama/pull/1016)).
+
+Improvements:
+ - Permit setting version on mock producer responses
+   ([#999](https://github.com/Shopify/sarama/pull/999)).
+ - Add `NewMockBrokerListener` helper for testing TLS connections
+   ([#1019](https://github.com/Shopify/sarama/pull/1019)).
+ - Changed the default value for `Consumer.Fetch.Default` from 32KiB to 1MiB
+   which results in much higher throughput in most cases
+   ([#1024](https://github.com/Shopify/sarama/pull/1024)).
+ - Reuse the `time.Ticker` across fetch requests in the PartitionConsumer to
+   reduce CPU and memory usage when processing many partitions
+   ([#1028](https://github.com/Shopify/sarama/pull/1028)).
+ - Assign relative offsets to messages in the producer to save the brokers a
+   recompression pass
+   ([#1002](https://github.com/Shopify/sarama/pull/1002),
+    [#1015](https://github.com/Shopify/sarama/pull/1015)).
+
+Bug Fixes:
+ - Fix producing uncompressed batches with the new protocol format
+   ([#1032](https://github.com/Shopify/sarama/issues/1032)).
+ - Fix consuming compacted topics with the new protocol format
+   ([#1005](https://github.com/Shopify/sarama/issues/1005)).
+ - Fix consuming topics with a mix of protocol formats
+   ([#1021](https://github.com/Shopify/sarama/issues/1021)).
+ - Fix consuming when the broker includes multiple batches in a single response
+   ([#1022](https://github.com/Shopify/sarama/issues/1022)).
+ - Fix detection of `PartialTrailingMessage` when the partial message was
+   truncated before the magic value indicating its version
+   ([#1030](https://github.com/Shopify/sarama/pull/1030)).
+ - Fix expectation-checking in the mock of `SyncProducer.SendMessages`
+   ([#1035](https://github.com/Shopify/sarama/pull/1035)).
+
+#### Version 1.15.0 (2017-12-08)
+
+New Features:
+ - Claim official support for Kafka 1.0, though it did already work
+   ([#984](https://github.com/Shopify/sarama/pull/984)).
+ - Helper methods for Kafka version numbers to/from strings
+   ([#989](https://github.com/Shopify/sarama/pull/989)).
+ - Implement CreatePartitions request/response
+   ([#985](https://github.com/Shopify/sarama/pull/985)).
+
+Improvements:
+ - Add error codes 45-60
+   ([#986](https://github.com/Shopify/sarama/issues/986)).
+
+Bug Fixes:
+ - Fix slow consuming for certain Kafka 0.11/1.0 configurations
+   ([#982](https://github.com/Shopify/sarama/pull/982)).
+ - Correctly determine when a FetchResponse contains the new message format
+   ([#990](https://github.com/Shopify/sarama/pull/990)).
+ - Fix producing with multiple headers
+   ([#996](https://github.com/Shopify/sarama/pull/996)).
+ - Fix handling of truncated record batches
+   ([#998](https://github.com/Shopify/sarama/pull/998)).
+ - Fix leaking metrics when closing brokers
+   ([#991](https://github.com/Shopify/sarama/pull/991)).
+
+#### Version 1.14.0 (2017-11-13)
+
+New Features:
+ - Add support for the new Kafka 0.11 record-batch format, including the wire
+   protocol and the necessary behavioural changes in the producer and consumer.
+   Transactions and idempotency are not yet supported, but producing and
+   consuming should work with all the existing bells and whistles (batching,
+   compression, etc) as well as the new custom headers. Thanks to Vlad Hanciuta
+   of Arista Networks for this work. Part of
+   ([#901](https://github.com/Shopify/sarama/issues/901)).
+
+Bug Fixes:
+ - Fix encoding of ProduceResponse versions in test
+   ([#970](https://github.com/Shopify/sarama/pull/970)).
+ - Return partial replicas list when we have it
+   ([#975](https://github.com/Shopify/sarama/pull/975)).
+
+#### Version 1.13.0 (2017-10-04)
+
+New Features:
+ - Support for FetchRequest version 3
+   ([#905](https://github.com/Shopify/sarama/pull/905)).
+ - Permit setting version on mock FetchResponses
+   ([#939](https://github.com/Shopify/sarama/pull/939)).
+ - Add a configuration option to support storing only minimal metadata for
+   extremely large clusters
+   ([#937](https://github.com/Shopify/sarama/pull/937)).
+ - Add `PartitionOffsetManager.ResetOffset` for backtracking tracked offsets
+   ([#932](https://github.com/Shopify/sarama/pull/932)).
+
+Improvements:
+ - Provide the block-level timestamp when consuming compressed messages
+   ([#885](https://github.com/Shopify/sarama/issues/885)).
+ - `Client.Replicas` and `Client.InSyncReplicas` now respect the order returned
+   by the broker, which can be meaningful
+   ([#930](https://github.com/Shopify/sarama/pull/930)).
+ - Use a `Ticker` to reduce consumer timer overhead at the cost of higher
+   variance in the actual timeout
+   ([#933](https://github.com/Shopify/sarama/pull/933)).
+
+Bug Fixes:
+ - Gracefully handle messages with negative timestamps
+   ([#907](https://github.com/Shopify/sarama/pull/907)).
+ - Raise a proper error when encountering an unknown message version
+   ([#940](https://github.com/Shopify/sarama/pull/940)).
+
 #### Version 1.12.0 (2017-05-08)
 
 New Features:

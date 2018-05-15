@@ -14,6 +14,58 @@ func TestParseSyslog(t *testing.T) {
 		syslog event
 	}{
 		{
+			title: "priority and timestamp defined as 2018-05-08T10:31:24 (rfc3339)",
+			log:   []byte("<38>2018-05-08T10:31:24 localhost prg00000[1234]: seq: 0000000000, thread: 0000, runid: 1525768284, stamp: 2018-05-08T10:31:24 PADDPADDPADDPADDPADDPADDPADDPADDPADDPADDPADDPADDPADDPADDPAD DPADDPADDPADDPADDPADDPADDPADDPADDPADDPADDPADDPADDPADDPADDPADDPADDPADD"),
+			syslog: event{
+				priority: 38,
+				message:  "seq: 0000000000, thread: 0000, runid: 1525768284, stamp: 2018-05-08T10:31:24 PADDPADDPADDPADDPADDPADDPADDPADDPADDPADDPADDPADDPADDPADDPAD DPADDPADDPADDPADDPADDPADDPADDPADDPADDPADDPADDPADDPADDPADDPADDPADDPADD",
+				hostname: "localhost",
+				program:  "prg00000",
+				pid:      1234,
+				month:    5,
+				day:      8,
+				hour:     10,
+				minute:   31,
+				second:   24,
+				year:     2016,
+			},
+		},
+		{
+			title: "timestamp defined as 2018-05-08T10:31:24 (rfc3339)",
+			log:   []byte("2016-05-08T10:31:24 localhost prg00000[1234]: seq: 0000000000, thread: 0000, runid: 1525768284"),
+			syslog: event{
+				priority: -1,
+				message:  "seq: 0000000000, thread: 0000, runid: 1525768284",
+				hostname: "localhost",
+				program:  "prg00000",
+				pid:      1234,
+				month:    5,
+				day:      8,
+				hour:     10,
+				minute:   31,
+				second:   24,
+				year:     2016,
+			},
+		},
+		{
+			title: "timestamp with nanosecond defined as 2018-05-08T10:31:24.0004 (rfc3339)",
+			log:   []byte("2016-05-08T10:31:24.0004 localhost prg00000[1234]: seq: 0000000000, thread: 0000, runid: 1525768284"),
+			syslog: event{
+				priority:   -1,
+				message:    "seq: 0000000000, thread: 0000, runid: 1525768284",
+				hostname:   "localhost",
+				program:    "prg00000",
+				pid:        1234,
+				month:      5,
+				day:        8,
+				hour:       10,
+				minute:     31,
+				second:     24,
+				year:       2016,
+				nanosecond: 4000,
+			},
+		},
+		{
 			title: "message only",
 			log:   []byte("--- last message repeated 1 time ---"),
 			syslog: event{
@@ -43,6 +95,23 @@ func TestParseSyslog(t *testing.T) {
 				hour:     22,
 				minute:   14,
 				second:   15,
+			},
+		},
+		{
+			title: "time with nanosecond",
+			log:   []byte("Oct 11 22:14:15.0000005 --- last message repeated 1 time ---"),
+			syslog: event{
+				priority:   -1,
+				message:    "--- last message repeated 1 time ---",
+				hostname:   "",
+				program:    "",
+				pid:        -1,
+				month:      10,
+				day:        11,
+				hour:       22,
+				minute:     14,
+				second:     15,
+				nanosecond: 5,
 			},
 		},
 		{
@@ -89,7 +158,7 @@ func TestParseSyslog(t *testing.T) {
 				hour:       22,
 				minute:     14,
 				second:     15,
-				nanosecond: 57643,
+				nanosecond: 5764300,
 			},
 		},
 		{
@@ -243,6 +312,7 @@ func TestParseSyslog(t *testing.T) {
 			assert.Equal(t, test.syslog.Hour(), l.Hour())
 			assert.Equal(t, test.syslog.Minute(), l.Minute())
 			assert.Equal(t, test.syslog.Second(), l.Second())
+			assert.Equal(t, test.syslog.Nanosecond(), l.Nanosecond())
 		})
 	}
 }

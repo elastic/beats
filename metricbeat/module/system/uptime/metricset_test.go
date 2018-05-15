@@ -17,7 +17,7 @@ func TestData(t *testing.T) {
 	}
 
 	event := mbtest.CreateFullEvent(f, uptime)
-	mbtest.WriteEventToDataJSON(t, event)
+	mbtest.WriteEventToDataJSON(t, event, "")
 }
 
 func getConfig() map[string]interface{} {

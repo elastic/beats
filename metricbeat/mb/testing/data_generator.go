@@ -6,6 +6,7 @@ import (
 	"fmt"
 	"io/ioutil"
 	"os"
+	"path"
 	"testing"
 	"time"
 
@@ -32,7 +33,7 @@ func WriteEvent(f mb.EventFetcher, t testing.TB) error {
 	}
 
 	fullEvent := CreateFullEvent(f, event)
-	WriteEventToDataJSON(t, fullEvent)
+	WriteEventToDataJSON(t, fullEvent, "")
 	return nil
 }
 
@@ -75,13 +76,13 @@ func WriteEventsCond(f mb.EventsFetcher, t testing.TB, cond func(e common.MapStr
 	}
 
 	fullEvent := CreateFullEvent(f, *event)
-	WriteEventToDataJSON(t, fullEvent)
+	WriteEventToDataJSON(t, fullEvent, "")
 	return nil
 }
 
 // WriteEventsReporterV2 fetches events and writes the first event to a ./_meta/data.json
 // file.
-func WriteEventsReporterV2(f mb.ReportingMetricSetV2, t testing.TB) error {
+func WriteEventsReporterV2(f mb.ReportingMetricSetV2, t testing.TB, path string) error {
 	if !*dataFlag {
 		t.Skip("skip data generation tests")
 	}
@@ -97,7 +98,7 @@ func WriteEventsReporterV2(f mb.ReportingMetricSetV2, t testing.TB) error {
 
 	e := StandardizeEvent(f, events[0], mb.AddMetricSetInfo)
 
-	WriteEventToDataJSON(t, e)
+	WriteEventToDataJSON(t, e, path)
 	return nil
 }
 
@@ -141,15 +142,17 @@ func StandardizeEvent(ms mb.MetricSet, e mb.Event, modifiers ...mb.EventModifier
 // WriteEventToDataJSON writes the given event as "pretty" JSON to
 // a ./_meta/data.json file. If the -data CLI flag is unset or false then the
 // method is a no-op.
-func WriteEventToDataJSON(t testing.TB, fullEvent beat.Event) {
+func WriteEventToDataJSON(t testing.TB, fullEvent beat.Event, postfixPath string) {
 	if !*dataFlag {
 		return
 	}
 
-	path, err := os.Getwd()
+	p, err := os.Getwd()
 	if err != nil {
 		t.Fatal(err)
 	}
+
+	p = path.Join(p, postfixPath, "_meta", "data.json")
 
 	fields := fullEvent.Fields
 	fields["@timestamp"] = fullEvent.Timestamp
@@ -159,7 +162,7 @@ func WriteEventToDataJSON(t testing.TB, fullEvent beat.Event) {
 		t.Fatal(err)
 	}
 
-	if err = ioutil.WriteFile(path+"/_meta/data.json", output, 0644); err != nil {
+	if err = ioutil.WriteFile(p, output, 0644); err != nil {
 		t.Fatal(err)
 	}
 }
