@@ -18,7 +18,7 @@ itself, you need to grant authorized users permission to access the indices it
 creates. See <<beats-user-access>>.
 
 For more information about {security}, see
-{xpack-ref}/xpack-security.html[Securing {es} and {kib}].
+{xpack-ref}/elasticsearch-security.html[Securing {es} and {kib}].
 
 include::basic-auth.asciidoc[]
 include::user-access.asciidoc[]
