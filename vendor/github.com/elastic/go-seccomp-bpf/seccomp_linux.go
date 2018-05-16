@@ -26,6 +26,17 @@ import (
 	"golang.org/x/sys/unix"
 )
 
+// Supported returns true if the seccomp syscall is supported.
+func Supported() bool {
+	// Strict mode requires that flags be set to 0, but we are sending 1 so
+	// this will return EINVAL if the syscall exists and is allowed.
+	if err := seccomp(seccompSetModeStrict, 1, nil); err == syscall.EINVAL {
+		return true
+	}
+
+	return false
+}
+
 // SetNoNewPrivs will use prctl to set the calling thread's no_new_privs bit to
 // 1 (true). Once set, this bit cannot be unset.
 func SetNoNewPrivs() error {
