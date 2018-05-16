@@ -131,6 +131,7 @@ https://github.com/elastic/beats/compare/v6.2.3...master[Check the HEAD diff]
   execve, execveat, fork, and vfork syscalls. A custom policy can be configured. {issue}5213[5213]
 - Update Sarama to v1.16.0, adding better support for kafka 0.11, 1.0, and 1.1 {pull}7025[7025]
 - Ship fields.yml as part of the binary {pull}4834[4834]
+- Added options to dev-tools/cmd/dashboards/export_dashboard.go: -indexPattern to include index-pattern in output, -quiet to be quiet. {pull}7101[7101]
 - Add Indexer indexing by pod uid. Enable pod uid metadata gathering in add_kubernetes_metadata. Extended Matcher log_path matching to support volume mounts {pull}7072[7072]
 
 *Auditbeat*
