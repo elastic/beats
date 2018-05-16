@@ -9,7 +9,7 @@ import (
 
 const (
 	defaultScheme = "http"
-	pathConfigKey = "management_path_prefix"
+	pathConfigKey = "path"
 )
 
 var (

@@ -16,6 +16,10 @@ func init() {
 	)
 }
 
+const (
+	nodeStatsPath = "/_nodes/_local/stats"
+)
+
 // MetricSet type defines all fields of the MetricSet
 type MetricSet struct {
 	*elasticsearch.MetricSet
@@ -26,7 +30,7 @@ func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
 	cfgwarn.Beta("The elasticsearch node_stats metricset is beta")
 
 	// Get the stats from the local node
-	ms, err := elasticsearch.NewMetricSet(base, "/_nodes/_local/stats")
+	ms, err := elasticsearch.NewMetricSet(base, nodeStatsPath)
 	if err != nil {
 		return nil, err
 	}
