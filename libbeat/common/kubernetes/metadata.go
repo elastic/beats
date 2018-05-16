@@ -18,14 +18,16 @@ type metaGenerator struct {
 	annotations   []string
 	labels        []string
 	labelsExclude []string
+	poduid        bool
 }
 
 // NewMetaGenerator initializes and returns a new kubernetes metadata generator
-func NewMetaGenerator(annotations, labels, labelsExclude []string) MetaGenerator {
+func NewMetaGenerator(annotations, labels, labelsExclude []string, includePodUID bool) MetaGenerator {
 	return &metaGenerator{
 		annotations:   annotations,
 		labels:        labels,
 		labelsExclude: labelsExclude,
+		poduid:        includePodUID,
 	}
 }
 
@@ -54,6 +56,11 @@ func (g *metaGenerator) PodMetadata(pod *Pod) common.MapStr {
 			"name": pod.Spec.NodeName,
 		},
 		"namespace": pod.Metadata.Namespace,
+	}
+
+	// Add Pod UID metadata if enabled
+	if g.poduid {
+		safemapstr.Put(meta, "pod.uid", pod.Metadata.UID)
 	}
 
 	if len(labelMap) != 0 {

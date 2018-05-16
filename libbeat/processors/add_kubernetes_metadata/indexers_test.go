@@ -10,7 +10,7 @@ import (
 	"github.com/elastic/beats/libbeat/common/kubernetes"
 )
 
-var metagen = kubernetes.NewMetaGenerator([]string{}, []string{}, []string{})
+var metagen = kubernetes.NewMetaGenerator([]string{}, []string{}, []string{}, false)
 
 func TestPodIndexer(t *testing.T) {
 	var testConfig = common.NewConfig()
@@ -55,6 +55,56 @@ func TestPodIndexer(t *testing.T) {
 	indices := podIndexer.GetIndexes(&pod)
 	assert.Equal(t, len(indices), 1)
 	assert.Equal(t, indices[0], fmt.Sprintf("%s/%s", ns, podName))
+}
+
+func TestPodUIDIndexer(t *testing.T) {
+	var testConfig = common.NewConfig()
+
+	metaGenWithPodUID := kubernetes.NewMetaGenerator([]string{}, []string{}, []string{}, true)
+
+	podUIDIndexer, err := NewPodUIDIndexer(*testConfig, metaGenWithPodUID)
+	assert.Nil(t, err)
+
+	podName := "testpod"
+	ns := "testns"
+	uid := "005f3b90-4b9d-12f8-acf0-31020a840133"
+	pod := kubernetes.Pod{
+		Metadata: kubernetes.ObjectMeta{
+			Name:      podName,
+			Namespace: ns,
+			UID:       uid,
+			Labels: map[string]string{
+				"labelkey": "labelvalue",
+			},
+		},
+		Spec: kubernetes.PodSpec{
+			NodeName: "testnode",
+		},
+	}
+
+	indexers := podUIDIndexer.GetMetadata(&pod)
+	assert.Equal(t, len(indexers), 1)
+	assert.Equal(t, indexers[0].Index, uid)
+
+	expected := common.MapStr{
+		"pod": common.MapStr{
+			"name": "testpod",
+			"uid":  "005f3b90-4b9d-12f8-acf0-31020a840133",
+		},
+		"namespace": "testns",
+		"labels": common.MapStr{
+			"labelkey": "labelvalue",
+		},
+		"node": common.MapStr{
+			"name": "testnode",
+		},
+	}
+
+	assert.Equal(t, expected.String(), indexers[0].Data.String())
+
+	indices := podUIDIndexer.GetIndexes(&pod)
+	assert.Equal(t, len(indices), 1)
+	assert.Equal(t, indices[0], uid)
 }
 
 func TestContainerIndexer(t *testing.T) {
@@ -170,7 +220,7 @@ func TestFilteredGenMeta(t *testing.T) {
 	rawAnnotations := indexers[0].Data["annotations"]
 	assert.Nil(t, rawAnnotations)
 
-	filteredGen := kubernetes.NewMetaGenerator([]string{"a"}, []string{"foo"}, []string{})
+	filteredGen := kubernetes.NewMetaGenerator([]string{"a"}, []string{"foo"}, []string{}, false)
 	podIndexer, err = NewPodNameIndexer(*testConfig, filteredGen)
 	assert.Nil(t, err)
 
@@ -201,7 +251,7 @@ func TestFilteredGenMeta(t *testing.T) {
 func TestFilteredGenMetaExclusion(t *testing.T) {
 	var testConfig = common.NewConfig()
 
-	filteredGen := kubernetes.NewMetaGenerator([]string{}, []string{}, []string{"x"})
+	filteredGen := kubernetes.NewMetaGenerator([]string{}, []string{}, []string{"x"}, false)
 	podIndexer, err := NewPodNameIndexer(*testConfig, filteredGen)
 	assert.Nil(t, err)
 
