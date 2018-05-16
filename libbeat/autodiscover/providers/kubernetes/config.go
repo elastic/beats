@@ -19,6 +19,7 @@ type Config struct {
 	IncludeLabels      []string `config:"include_labels"`
 	ExcludeLabels      []string `config:"exclude_labels"`
 	IncludeAnnotations []string `config:"include_annotations"`
+	IncludePodUID      bool     `config:"include_pod_uid"`
 
 	Prefix       string                  `config:"prefix"`
 	HintsEnabled bool                    `config:"hints.enabled"`
