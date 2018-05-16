@@ -98,6 +98,11 @@ packetbeat.protocols:
   # the TLS protocol by commenting out the list of ports.
   ports: [443]
 
+- type: hl7v2
+  # Configure the ports where to listen for HL7v2 traffic. You can disable
+  # the HL7v2 protocol by commenting out the list of ports.
+  ports: [2575]
+  
 #==================== Elasticsearch template setting ==========================
 
 setup.template.settings:
