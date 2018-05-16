@@ -16,7 +16,7 @@ class Test(BaseTest):
         assert len(objs) == 1
         o = objs[0]
         assert o["type"] == "hl7v2"
-		assert o["MSH=10"] == "MSGID12349876"
+        assert o["MSH=10"] == "MSGID12349876"
         assert o["PID-5"] == "Durden^Tyler^^^Mr."
 
     def test_hl7v2_reject(self):
@@ -29,5 +29,5 @@ class Test(BaseTest):
         o = objs[0]
         print(o)
         assert o["type"] == "hl7v2"
-		assert o["MSH=10"] == "MSGID12349877"
+        assert o["MSH=10"] == "MSGID12349877"
         assert o["PID-5"] == "Durden^^^^Mr."
