@@ -31,6 +31,7 @@ func init() {
 	Indexing.AddIndexer(PodUIDIndexerName, NewPodUIDIndexer)
 	Indexing.AddIndexer(ContainerIndexerName, NewContainerIndexer)
 	Indexing.AddIndexer(IPPortIndexerName, NewIPPortIndexer)
+	Indexing.AddIndexer(PodUIDIndexerName, NewPodUIDIndexer)
 	Indexing.AddMatcher(FieldMatcherName, NewFieldMatcher)
 	Indexing.AddMatcher(FieldFormatMatcherName, NewFieldFormatMatcher)
 }
