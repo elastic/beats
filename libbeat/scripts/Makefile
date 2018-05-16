@@ -101,7 +101,7 @@ endif
 
 # Only build experimental targets for snapshots
 ifneq ($(SNAPSHOT),yes)
-	PACKAGES_EXPERIMENTAL=""
+	PACKAGES_EXPERIMENTAL=
 endif
 
 ### BUILDING ###
