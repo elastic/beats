@@ -12,6 +12,11 @@ type FieldsGeneratorTestCase struct {
 	fields   []*fieldYml
 }
 
+type RemoveProcessorTestCase struct {
+	processor map[string]interface{}
+	fields    []string
+}
+
 func TestFieldsGenerator(t *testing.T) {
 	tests := []FieldsGeneratorTestCase{
 		FieldsGeneratorTestCase{
@@ -157,5 +162,40 @@ func TestFieldsGeneratorKnownLimitations(t *testing.T) {
 
 		f := generateFields(fs, false)
 		assert.False(t, reflect.DeepEqual(f, tc.fields))
+	}
+}
+
+func TestRemoveProcessor(t *testing.T) {
+	tests := []RemoveProcessorTestCase{
+		RemoveProcessorTestCase{
+			processor: map[string]interface{}{
+				"field": []string{},
+			},
+			fields: []string{},
+		},
+		RemoveProcessorTestCase{
+			processor: map[string]interface{}{
+				"field": []interface{}{},
+			},
+			fields: []string{},
+		},
+		RemoveProcessorTestCase{
+			processor: map[string]interface{}{
+				"field": "prospector.type",
+			},
+			fields: []string{"prospector.type"},
+		},
+		RemoveProcessorTestCase{
+			processor: map[string]interface{}{
+				"field": []string{"prospector.type", "input.type"},
+			},
+			fields: []string{"prospector.type", "input.type"},
+		},
+	}
+
+	for _, tc := range tests {
+		out := []string{}
+		res := accumulateRemoveFields(tc.processor, out)
+		assert.True(t, reflect.DeepEqual(res, tc.fields))
 	}
 }
