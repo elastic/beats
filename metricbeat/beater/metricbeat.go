@@ -98,6 +98,11 @@ func newMetricbeat(b *beat.Beat, c *common.Config, options ...Option) (*Metricbe
 		applyOption(metricbeat)
 	}
 
+	if b.InSetupCmd {
+		// Return without instantiating the metricsets.
+		return metricbeat, nil
+	}
+
 	moduleOptions := append(
 		[]module.Option{module.WithMaxStartDelay(config.MaxStartDelay)},
 		metricbeat.moduleOptions...)
