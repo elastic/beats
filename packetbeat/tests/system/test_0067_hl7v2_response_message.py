@@ -1,9 +1,5 @@
 from packetbeat import BaseTest
 
-"""
-Tests for checking if the acknowlegement code from HL7 v2 response messages are parsed correctly.
-"""
-
 
 class Test(BaseTest):
 
@@ -26,6 +22,5 @@ class Test(BaseTest):
 
         assert len(objs) == 1
         o = objs[0]
-        print(o)
         assert o["type"] == "hl7v2"
         assert o["MSA-1"] == "AR"

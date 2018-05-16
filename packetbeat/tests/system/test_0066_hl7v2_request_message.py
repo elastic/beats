@@ -1,9 +1,5 @@
 from packetbeat import BaseTest
 
-"""
-Tests for checking if the message id/ptient name values from HL7 v2 response messages are parsed correctly.
-"""
-
 
 class Test(BaseTest):
 
@@ -27,7 +23,6 @@ class Test(BaseTest):
 
         assert len(objs) == 1
         o = objs[0]
-        print(o)
         assert o["type"] == "hl7v2"
         assert o["MSH=10"] == "MSGID12349877"
         assert o["PID-5"] == "Durden^^^^Mr."
