@@ -630,9 +630,9 @@ THE SOFTWARE IS PROVIDED “AS IS”, WITHOUT WARRANTY OF ANY KIND, EXPRESS OR I
 
 --------------------------------------------------------------------
 Dependency: github.com/go-sql-driver/mysql
-Revision: cd4cb909ce1a31435164be29bf3682031f61539a
+Revision: 9dee4ca50b83acdf57a35fb9e6fb4be640afa2f3
 License type (autodetected): MPL-2.0
-./metricbeat/vendor/github.com/go-sql-driver/mysql/LICENSE:
+./metricbeat/module/mysql/vendor/github.com/go-sql-driver/mysql/LICENSE:
 --------------------------------------------------------------------
 Mozilla Public License Version 2.0
 ==================================
