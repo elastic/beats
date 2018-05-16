@@ -67,6 +67,7 @@ https://github.com/elastic/beats/compare/v6.2.3...master[Check the HEAD diff]
 - Add hex decoding for the name field in audit path records. {pull}6687[6687]
 - Fixed a deadlock in the file_integrity module under Windows. {issue}6864[6864]
 - Fixed parsing of AppArmor audit messages. {pull}6978[6978]
+- Allow `auditbeat setup` to run without requiring elevated privileges for the audit client. {issue}7111[7111]
 
 *Filebeat*
 
