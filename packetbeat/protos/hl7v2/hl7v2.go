@@ -5,6 +5,7 @@ import (
 	"time"
 
 	"github.com/elastic/beats/libbeat/common"
+	"github.com/elastic/beats/libbeat/common/cfgwarn"
 	"github.com/elastic/beats/libbeat/logp"
 	"github.com/elastic/beats/packetbeat/protos"
 	"github.com/elastic/beats/packetbeat/protos/tcp"
@@ -47,6 +48,7 @@ func New(
 	results protos.Reporter,
 	cfg *common.Config,
 ) (protos.Plugin, error) {
+	cfgwarn.Experimental("The HL7 v2 protocol is experimental")
 	p := &hl7v2Plugin{}
 	config := defaultConfig
 	if !testMode {
