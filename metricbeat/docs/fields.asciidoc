@@ -3964,6 +3964,53 @@ format: bytes
 --
 
 [float]
+== cluster.pending_tasks_summary fields
+
+Summary metrics for the pending tasks on elasticsearch.
+
+
+
+*`elasticsearch.cluster.pending_tasks_summary.max_time_in_queue_millis`*::
++
+--
+type: long
+
+Max time in queue (ms)
+
+
+--
+
+*`elasticsearch.cluster.pending_tasks_summary.count_priority_high`*::
++
+--
+type: long
+
+Number of pending tasks in priority high
+
+
+--
+
+*`elasticsearch.cluster.pending_tasks_summary.count_priority_urgent`*::
++
+--
+type: long
+
+Number of pending tasks in priority urgent
+
+
+--
+
+*`elasticsearch.cluster.pending_tasks_summary.count_total`*::
++
+--
+type: long
+
+Number of pendings tasks 
+
+
+--
+
+[float]
 == shard fields
 
 shard fields

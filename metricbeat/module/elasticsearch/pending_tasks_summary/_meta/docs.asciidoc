@@ -1,0 +1,3 @@
+=== elasticsearch pending_tasks_summary MetricSet
+
+This is the pending_tasks_summary metricset of the module elasticsearch.

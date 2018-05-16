@@ -1,0 +1,21 @@
+- name: cluster.pending_tasks_summary
+  type: group
+  description: >
+    Summary metrics for the pending tasks on elasticsearch.
+  fields:
+    - name: max_time_in_queue_millis
+      type: long
+      description: >
+        Max time in queue (ms)
+    - name: count_priority_high
+      type: long
+      description: >
+        Number of pending tasks in priority high
+    - name: count_priority_urgent
+      type: long
+      description: >
+        Number of pending tasks in priority urgent
+    - name: count_total
+      type: long
+      description: >
+        Number of pendings tasks 
