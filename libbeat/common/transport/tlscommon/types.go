@@ -190,12 +190,12 @@ func (m *tlsClientAuth) Unpack(in interface{}) error {
 
 	s, ok := in.(string)
 	if !ok {
-		return fmt.Errorf("client authentification must be an identifier")
+		return fmt.Errorf("client authentication must be an identifier")
 	}
 
 	mode, found := tlsClientAuthTypes[s]
 	if !found {
-		return fmt.Errorf("unknown client authentification mode'%v'", s)
+		return fmt.Errorf("unknown client authentication mode'%v'", s)
 	}
 
 	*m = mode
