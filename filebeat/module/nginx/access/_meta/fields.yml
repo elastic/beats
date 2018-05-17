@@ -26,7 +26,13 @@
     - name: url
       type: keyword
       description: >
-        The request HTTP URL.
+        The request HTTP URL, analyzed as a single token.
+      multi_fields:
+        - name: text
+          type: text
+          description: >
+            The analyzed version of the request HTTP URL,
+            useful for full text search.
     - name: http_version
       type: keyword
       description: >
