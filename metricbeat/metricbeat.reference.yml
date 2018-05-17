@@ -212,7 +212,9 @@ metricbeat.modules:
 
 #------------------------------- Golang Module -------------------------------
 - module: golang
-  metricsets: ["expvar","heap"]
+  #metricsets:
+  #  - expvar
+  #  - heap
   period: 10s
   hosts: ["localhost:6060"]
   heap.path: "/debug/vars"
@@ -253,7 +255,8 @@ metricbeat.modules:
 
 #-------------------------------- HTTP Module --------------------------------
 - module: http
-  metricsets: ["json"]
+  #metricsets:
+  #  - json
   period: 10s
   hosts: ["localhost:80"]
   namespace: "json_namespace"
@@ -266,40 +269,45 @@ metricbeat.modules:
   #dedot.enabled: false
 
 - module: http
-  metricsets: ["server"]
+  #metricsets:
+  #  - server
   host: "localhost"
   port: "8080"
   enabled: false
-#  paths:
-#    - path: "/foo"
-#      namespace: "foo"
-#      fields: # added to the the response in root. overwrites existing fields
-#        key: "value"
+  #paths:
+  #  - path: "/foo"
+  #    namespace: "foo"
+  #    fields: # added to the the response in root. overwrites existing fields
+  #      key: "value"
 
 #------------------------------- Jolokia Module ------------------------------
 - module: jolokia
-  metricsets: ["jmx"]
+  #metricsets: ["jmx"]
   period: 10s
   hosts: ["localhost"]
   namespace: "metrics"
+  #path: "/jolokia/?ignoreErrors=true&canonicalNaming=false"
   jmx.mappings:
-    - mbean: 'java.lang:type=Runtime'
-      attributes:
-        - attr: Uptime
-          field: uptime
-    - mbean: 'java.lang:type=Memory'
-      attributes:
-        - attr: HeapMemoryUsage
-          field: memory.heap_usage
-        - attr: NonHeapMemoryUsage
-          field: memory.non_heap_usage
+    #- mbean: 'java.lang:type=Runtime'
+    #  attributes:
+    #    - attr: Uptime
+    #      field: uptime
+    #- mbean: 'java.lang:type=Memory'
+    #  attributes:
+    #    - attr: HeapMemoryUsage
+    #      field: memory.heap_usage
+    #    - attr: NonHeapMemoryUsage
+    #      field: memory.non_heap_usage
     # GC Metrics - this depends on what is available on your JVM
-    # - mbean: 'java.lang:type=GarbageCollector,name=ConcurrentMarkSweep'
-    #   attributes:
-    #     - attr: CollectionTime
-    #       field: gc.cms_collection_time
-    #     - attr: CollectionCount
-    #       field: gc.cms_collection_count
+    #- mbean: 'java.lang:type=GarbageCollector,name=ConcurrentMarkSweep'
+    #  attributes:
+    #    - attr: CollectionTime
+    #      field: gc.cms_collection_time
+    #    - attr: CollectionCount
+    #      field: gc.cms_collection_count
+
+  jmx.application:
+  jmx.instance:
 
 #-------------------------------- Kafka Module -------------------------------
 - module: kafka
