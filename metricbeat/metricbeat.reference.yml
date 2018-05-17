@@ -379,6 +379,13 @@ metricbeat.modules:
   metricsets:
     - event
 
+# Kubernetes API server
+- module: kubernetes
+  enabled: true
+  metricsets:
+    - apiserver
+  hosts: ["https://${KUBERNETES_SERVICE_HOST}:${KUBERNETES_SERVICE_PORT}"]
+
 #--------------------------------- kvm Module --------------------------------
 - module: kvm
   metricsets: ["dommemstat"]

@@ -11,6 +11,7 @@ import (
 	"github.com/stretchr/testify/assert"
 
 	"github.com/elastic/beats/libbeat/common"
+	mbtest "github.com/elastic/beats/metricbeat/mb/testing"
 )
 
 const promMetrics = `
@@ -18,6 +19,23 @@ const promMetrics = `
 first_metric{label1="value1",label2="value2",label3="value3"} 1
 # TYPE second_metric gauge
 second_metric{label1="value1",label3="othervalue"} 0
+# TYPE summary_metric summary
+summary_metric{quantile="0.5"} 29735
+summary_metric{quantile="0.9"} 47103
+summary_metric{quantile="0.99"} 50681
+summary_metric_sum 234892394
+summary_metric_count 44000
+# TYPE histogram_metric histogram
+histogram_metric_bucket{le="1000"} 1
+histogram_metric_bucket{le="10000"} 1
+histogram_metric_bucket{le="100000"} 1
+histogram_metric_bucket{le="1e+06"} 1
+histogram_metric_bucket{le="1e+08"} 1
+histogram_metric_bucket{le="1e+09"} 1
+histogram_metric_bucket{le="+Inf"} 1
+histogram_metric_sum 117
+histogram_metric_count 1
+
 `
 
 type mockFetcher struct{}
@@ -175,15 +193,65 @@ func TestPrometheus(t *testing.T) {
 				},
 			},
 		},
+		{
+			msg: "Summary metric",
+			mapping: &MetricsMapping{
+				Metrics: map[string]MetricMap{
+					"summary_metric": Metric("summary.metric"),
+				},
+			},
+			expected: []common.MapStr{
+				common.MapStr{
+					"summary.metric": common.MapStr{
+						"sum":   234892394.0,
+						"count": uint64(44000),
+						"percentile": common.MapStr{
+							"50": 29735.0,
+							"90": 47103.0,
+							"99": 50681.0,
+						},
+					},
+				},
+			},
+		},
+		{
+			msg: "Histogram metric",
+			mapping: &MetricsMapping{
+				Metrics: map[string]MetricMap{
+					"histogram_metric": Metric("histogram.metric"),
+				},
+			},
+			expected: []common.MapStr{
+				common.MapStr{
+					"histogram.metric": common.MapStr{
+						"count": uint64(1),
+						"bucket": common.MapStr{
+							"1000000000": uint64(1),
+							"+Inf":       uint64(1),
+							"1000":       uint64(1),
+							"10000":      uint64(1),
+							"100000":     uint64(1),
+							"1000000":    uint64(1),
+							"100000000":  uint64(1),
+						},
+						"sum": 117.0,
+					},
+				},
+			},
+		},
 	}
 
 	for _, test := range tests {
-		res, err := p.GetProcessedMetrics(test.mapping)
-		assert.Nil(t, err, test.msg)
+		reporter := &mbtest.CapturingReporterV2{}
+		p.ReportProcessedMetrics(test.mapping, reporter)
+		assert.Nil(t, reporter.GetErrors(), test.msg)
 		// Sort slice to avoid randomness
+		res := reporter.GetEvents()
 		sort.Slice(res, func(i, j int) bool {
-			return res[i].String() < res[j].String()
+			return res[i].MetricSetFields.String() < res[j].MetricSetFields.String()
 		})
-		assert.Equal(t, test.expected, res, test.msg)
+		for j, ev := range res {
+			assert.Equal(t, test.expected[j], ev.MetricSetFields, test.msg)
+		}
 	}
 }
