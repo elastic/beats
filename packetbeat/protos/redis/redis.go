@@ -274,16 +274,8 @@ func (redis *redisPlugin) newTransaction(requ, resp *redisMessage) beat.Event {
 		}
 	}
 
-	src := &common.Endpoint{
-		IP:   requ.tcpTuple.SrcIP.String(),
-		Port: requ.tcpTuple.SrcPort,
-		Proc: string(requ.cmdlineTuple.Src),
-	}
-	dst := &common.Endpoint{
-		IP:   requ.tcpTuple.DstIP.String(),
-		Port: requ.tcpTuple.DstPort,
-		Proc: string(requ.cmdlineTuple.Dst),
-	}
+	source, destination := common.MakeEndpointPair(requ.tcpTuple.BaseTuple, requ.cmdlineTuple)
+	src, dst := &source, &destination
 	if requ.direction == tcp.TCPDirectionReverse {
 		src, dst = dst, src
 	}
