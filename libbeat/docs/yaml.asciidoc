@@ -49,7 +49,7 @@ ifdef::allplatforms[]
 
 ["source","shell",subs="attributes"]
 ----------------------------------------------------------------------
-{beatname_lc} -c {beatname_lc}.yml -configtest
+{beatname_lc} test config -c {beatname_lc}.yml
 ----------------------------------------------------------------------
 
 endif::allplatforms[]
