@@ -2,6 +2,8 @@
 
 == Kibana module
 
+beta[]
+
 This is the Kibana module.
 
 include::../include/what-happens.asciidoc[]
