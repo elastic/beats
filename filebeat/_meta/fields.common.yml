@@ -101,3 +101,16 @@
       type: keyword
       description: >
         Service name.
+
+    - name: log.level
+      type: keyword
+      description: >
+        Logging level.
+
+    - name: event.created
+      type: date
+      description: >
+        event.created contains the date on which the event was created. In case of
+        log events this is when the log line was read by Filebeat. In comparison
+        @timestamp is the processed timestamp from the log line. If both are identical
+        only @timestamp should be used.

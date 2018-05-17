@@ -17,6 +17,7 @@ grouped in the following categories:
 * <<exported-fields-beat>>
 * <<exported-fields-cloud>>
 * <<exported-fields-docker-processor>>
+* <<exported-fields-elasticsearch>>
 * <<exported-fields-host-processor>>
 * <<exported-fields-icinga>>
 * <<exported-fields-iis>>
@@ -782,6 +783,35 @@ Container name.
 type: object
 
 Image labels.
+
+
+--
+
+[[exported-fields-elasticsearch]]
+== elasticsearch fields
+
+elasticsearch Module
+
+
+
+[float]
+== elasticsearch fields
+
+
+
+
+[float]
+== server fields
+
+
+
+
+*`elasticsearch.server.component`*::
++
+--
+type: keyword
+
+Elasticsearch component.
 
 
 --
@@ -1976,6 +2006,26 @@ The severity of the event.
 type: keyword
 
 Service name.
+
+
+--
+
+*`log.level`*::
++
+--
+type: keyword
+
+Logging level.
+
+
+--
+
+*`event.created`*::
++
+--
+type: date
+
+event.created contains the date on which the event was created. In case of log events this is when the log line was read by Filebeat. In comparison @timestamp is the processed timestamp from the log line. If both are identical only @timestamp should be used.
 
 
 --
