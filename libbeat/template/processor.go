@@ -219,12 +219,12 @@ func (p *Processor) object(f *common.Field) common.MapStr {
 			dynProperties["index"] = "analyzed"
 		}
 		addDynamicTemplate(f, dynProperties, matchType("string"))
-	case "long":
-		dynProperties["type"] = f.ObjectType
-		addDynamicTemplate(f, dynProperties, matchType("long"))
 	case "keyword":
 		dynProperties["type"] = f.ObjectType
 		addDynamicTemplate(f, dynProperties, matchType("string"))
+	case "long", "double":
+		dynProperties["type"] = f.ObjectType
+		addDynamicTemplate(f, dynProperties, matchType(f.ObjectType))
 	}
 
 	properties := getDefaultProperties(f)

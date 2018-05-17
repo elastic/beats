@@ -174,6 +174,12 @@ func TestProcessor(t *testing.T) {
 			},
 		},
 		{
+			output: p.other(&common.Field{Type: "double", DocValues: &falseVar}),
+			expected: common.MapStr{
+				"type": "double", "doc_values": false,
+			},
+		},
+		{
 			output: p.other(&common.Field{Type: "text", DocValues: &trueVar}),
 			expected: common.MapStr{
 				"type": "text", "doc_values": true,
