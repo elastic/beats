@@ -1,21 +1,21 @@
 // +build !integration
 
-package outputs
+package tlscommon
 
 import (
 	"crypto/tls"
+	"fmt"
 	"testing"
 
 	"github.com/stretchr/testify/assert"
 
 	"github.com/elastic/beats/libbeat/common"
-	"github.com/elastic/beats/libbeat/outputs/transport"
 )
 
 // test TLS config loading
 
-func load(yamlStr string) (*TLSConfig, error) {
-	var cfg TLSConfig
+func load(yamlStr string) (*Config, error) {
+	var cfg Config
 	config, err := common.NewConfigWithYAML([]byte(yamlStr), "")
 	if err != nil {
 		return nil, err
@@ -27,7 +27,7 @@ func load(yamlStr string) (*TLSConfig, error) {
 	return &cfg, nil
 }
 
-func mustLoad(t *testing.T, yamlStr string) *TLSConfig {
+func mustLoad(t *testing.T, yamlStr string) *Config {
 	cfg, err := load(yamlStr)
 	if err != nil {
 		t.Fatal(err)
@@ -39,7 +39,7 @@ func TestEmptyTlsConfig(t *testing.T) {
 	cfg, err := load("")
 	assert.Nil(t, err)
 
-	assert.Equal(t, cfg, &TLSConfig{})
+	assert.Equal(t, cfg, &Config{})
 }
 
 func TestLoadWithEmptyValues(t *testing.T) {
@@ -56,7 +56,7 @@ func TestLoadWithEmptyValues(t *testing.T) {
   `)
 
 	assert.Nil(t, err)
-	assert.Equal(t, cfg, &TLSConfig{})
+	assert.Equal(t, cfg, &Config{})
 }
 
 func TestNoLoadNilConfig(t *testing.T) {
@@ -67,7 +67,7 @@ func TestNoLoadNilConfig(t *testing.T) {
 
 func TestNoLoadDisabledConfig(t *testing.T) {
 	enabled := false
-	cfg, err := LoadTLSConfig(&TLSConfig{Enabled: &enabled})
+	cfg, err := LoadTLSConfig(&Config{Enabled: &enabled})
 	assert.Nil(t, err)
 	assert.Nil(t, cfg)
 }
@@ -95,10 +95,10 @@ func TestValuesSet(t *testing.T) {
 	assert.Equal(t, "mycert.pem", cfg.Certificate.Certificate)
 	assert.Equal(t, "mycert.key", cfg.Certificate.Key)
 	assert.Len(t, cfg.CAs, 2)
-	assert.Equal(t, transport.VerifyNone, cfg.VerificationMode)
+	assert.Equal(t, VerifyNone, cfg.VerificationMode)
 	assert.Len(t, cfg.CipherSuites, 2)
 	assert.Equal(t,
-		[]transport.TLSVersion{transport.TLSVersion11, transport.TLSVersion12},
+		[]TLSVersion{TLSVersion11, TLSVersion12},
 		cfg.Versions)
 	assert.Len(t, cfg.CurveTypes, 1)
 	assert.Equal(t,
@@ -107,7 +107,7 @@ func TestValuesSet(t *testing.T) {
 }
 
 func TestApplyEmptyConfig(t *testing.T) {
-	tmp, err := LoadTLSConfig(&TLSConfig{})
+	tmp, err := LoadTLSConfig(&Config{})
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -124,9 +124,9 @@ func TestApplyEmptyConfig(t *testing.T) {
 
 func TestApplyWithConfig(t *testing.T) {
 	tmp, err := LoadTLSConfig(mustLoad(t, `
-    certificate: logstash/ca_test.pem
-    key: logstash/ca_test.key
-    certificate_authorities: [logstash/ca_test.pem]
+    certificate: ca_test.pem
+    key: ca_test.key
+    certificate_authorities: [ca_test.pem]
     verification_mode: none
     cipher_suites:
       - "ECDHE-ECDSA-AES-256-CBC-SHA"
@@ -146,6 +146,46 @@ func TestApplyWithConfig(t *testing.T) {
 	assert.Equal(t, int(tls.VersionTLS10), int(cfg.MinVersion))
 	assert.Equal(t, int(tls.VersionTLS12), int(cfg.MaxVersion))
 	assert.Len(t, cfg.CurvePreferences, 1)
+}
+
+func TestApplyWithServerConfig(t *testing.T) {
+	yamlStr := `
+    certificate: ca_test.pem
+    key: ca_test.key
+    certificate_authorities: [ca_test.pem]
+    verification_mode: none
+    client_authentication: optional
+    supported_protocols: [TLSv1.1, TLSv1.2]
+    cipher_suites:
+      - "ECDHE-ECDSA-AES-256-CBC-SHA"
+      - "ECDHE-ECDSA-AES-256-GCM-SHA384"
+    curve_types: [P-384]
+  `
+	var c ServerConfig
+	config, err := common.NewConfigWithYAML([]byte(yamlStr), "")
+	if !assert.NoError(t, err) {
+		return
+	}
+
+	err = config.Unpack(&c)
+	if !assert.NoError(t, err) {
+		return
+	}
+	tmp, err := LoadTLSServerConfig(&c)
+	if !assert.NoError(t, err) {
+		return
+	}
+
+	cfg := tmp.BuildModuleConfig("")
+	assert.NotNil(t, cfg)
+	assert.Len(t, cfg.Certificates, 1)
+	assert.NotNil(t, cfg.ClientCAs)
+	assert.Equal(t, true, cfg.InsecureSkipVerify)
+	assert.Len(t, cfg.CipherSuites, 2)
+	assert.Equal(t, int(tls.VersionTLS11), int(cfg.MinVersion))
+	assert.Equal(t, int(tls.VersionTLS12), int(cfg.MaxVersion))
+	assert.Len(t, cfg.CurvePreferences, 1)
+	assert.Equal(t, tls.VerifyClientCertIfGiven, cfg.ClientAuth)
 }
 
 func TestCertificateFails(t *testing.T) {
@@ -180,22 +220,32 @@ func TestCertificateFails(t *testing.T) {
 	}
 
 	for i, test := range tests {
-		t.Logf("run test (%v): %v", i, test.title)
+		t.Run(fmt.Sprintf("run test (%v): %v", i, test.title), func(t *testing.T) {
+			config, err := common.NewConfigWithYAML([]byte(test.yaml), "")
+			if err != nil {
+				t.Error(err)
+				return
+			}
 
-		config, err := common.NewConfigWithYAML([]byte(test.yaml), "")
-		if err != nil {
-			t.Error(err)
-			continue
-		}
-
-		// one must fail: validators on Unpack or transformation to *tls.Config
-		var tlscfg TLSConfig
-		if err = config.Unpack(&tlscfg); err != nil {
+			// one must fail: validators on Unpack or transformation to *tls.Config
+			var tlscfg Config
+			if err = config.Unpack(&tlscfg); err != nil {
+				t.Log(err)
+				return
+			}
+			_, err = LoadTLSConfig(&tlscfg)
 			t.Log(err)
-			continue
-		}
-		_, err = LoadTLSConfig(&tlscfg)
-		t.Log(err)
-		assert.Error(t, err)
+			assert.Error(t, err)
+		})
 	}
+}
+
+func TestResolveTLSVersion(t *testing.T) {
+	v := ResolveTLSVersion(tls.VersionTLS11)
+	assert.Equal(t, "TLSv1.1", v)
+}
+
+func TestResolveCipherSuite(t *testing.T) {
+	c := ResolveCipherSuite(tls.TLS_RSA_WITH_AES_128_CBC_SHA)
+	assert.Equal(t, "RSA-AES-128-CBC-SHA", c)
 }
