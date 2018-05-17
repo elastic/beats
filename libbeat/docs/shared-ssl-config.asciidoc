@@ -168,3 +168,13 @@ are `never`, `once`, and `freely`. The default value is never.
 * `never` - Disables renegotiation.
 * `once` - Allows a remote server to request renegotiation once per connection.
 * `freely` - Allows a remote server to repeatedly request renegotiation.
+
+[float]
+==== `client_authentication`
+
+This configures what types of client authentication are supported. The valid options
+are `none`, `optional`, and `required`. The default value is required.
+
+* `none` - Disables client authentification.
+* `optional` - When a client certificate is given, the server will verify it.
+* `required` - Will require clients to provide a valid certificate.
