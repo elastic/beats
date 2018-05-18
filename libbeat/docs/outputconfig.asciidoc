@@ -14,7 +14,7 @@
 == Configure the output
 
 ifdef::only-elasticsearch[]
-You configure {beatname_uc} to write to Elasticsearch by setting options 
+You configure {beatname_uc} to write to Elasticsearch by setting options
 in the `output.elasticsearch` section of the +{beatname_lc}.yml+ config file
 endif::[]
 
@@ -601,7 +601,7 @@ NOTE: Events bigger than <<kafka-max_message_bytes,`max_message_bytes`>> will be
 
 ==== Compatibility
 
-This output works with Kafka 0.8, 0.9, and 0.10.
+This output works with Kafka 0.8, 0.9, 0.10 and 0.11.
 
 ==== Configuration options
 
