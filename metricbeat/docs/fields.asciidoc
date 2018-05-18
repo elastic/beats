@@ -12078,6 +12078,27 @@ Used memory lua.
 
 --
 
+*`redis.info.memory.max.value`*::
++
+--
+type: long
+
+format: bytes
+
+Memory limit.
+
+
+--
+
+*`redis.info.memory.max.policy`*::
++
+--
+type: keyword
+
+Eviction policy to use when memory limit is reached.
+
+--
+
 *`redis.info.memory.allocator`*::
 +
 --
