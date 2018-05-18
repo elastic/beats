@@ -29,6 +29,10 @@ for your system. The command shown here loads the dashboards from the {beatname_
 package. For more options, such as loading customized dashboards, see
 {beatsdevguide}/import-dashboards.html[Importing Existing Beat Dashboards] in
 the _Beats Developer Guide_.
+ifndef::only-elasticsearch[]
+If you've configured the Logstash output, see
+<<load-dashboards-logstash>>.
+endif::[]
 
 ifdef::allplatforms[]
 
@@ -79,3 +83,113 @@ and run:
 ----------------------------------------------------------------------
 PS > .{backslash}{beatname_lc}.exe setup --dashboards
 ----------------------------------------------------------------------
+
+ifndef::only-elasticsearch[]
+[[load-dashboards-logstash]]
+==== Set up dashboards for Logstash output
+
+// REVIEWERS: Please confirm that the command syntax is correct on all the
+// platforms shown below. I've only tested on mac OS.
+
+During dashboard loading, {beatname_uc} connects to Elasticsearch to check
+version information. To load dashboards when the Logstash output is enabled, you
+need to temporarily disable the Logstash output and enable Elasticsearch. To
+connect to a secured Elasticsearch cluster, you also need to pass Elasticsearch
+credentials.
+
+TIP: The example shows a hard-coded password, but you should store sensitive
+values in the <<keystore,secrets keystore>>.
+
+ifdef::allplatforms[]
+
+*deb and rpm:*
+
+["source","sh",subs="attributes"]
+----
+{beatname_lc} setup -e \
+  -E output.logstash.enabled=false \
+  -E output.elasticsearch.hosts=['localhost:9200'] \
+  -E output.elasticsearch.username=filebeat_internal \
+  -E output.elasticsearch.password={pwd} \
+  -E setup.kibana.host=localhost:5601 \
+  -E setup.dashboards.always_kibana=true
+----
+
+
+// REVIEWERS: I don't really understand how always_kibana is meant to be used.
+// It seems like you still need to query ES even if you have this options set.
+// Do we want to tell users to set it or no?
+
+// REVIEWERS: Is this the correct way for users to set credentials? I assume
+// they need to do this from the command line because the settings will be
+// commented out in the config file, right?
+
+*mac:*
+
+["source","sh",subs="attributes"]
+----
+./{beatname_lc} setup -e \
+  -E output.logstash.enabled=false \
+  -E output.elasticsearch.hosts=['localhost:9200'] \
+  -E output.elasticsearch.username=filebeat_internal \
+  -E output.elasticsearch.password={pwd} \
+  -E setup.kibana.host=localhost:5601 \
+  -E setup.dashboards.always_kibana=true
+----
+
+
+//REVEIWERS: Do you think we should show how to pass credentials here? We don't
+// do that in other places, but this seems like a special situation where it's
+// likely that the user will need to pass credentials. 
+
+
+ifeval::["{beatname_lc}"!="auditbeat"]
+
+// REVIEWERS: we used to conditionally exclude docker commands for auditbeat, but
+// I see that we have a topic about running auditbeat on docker now. Do I need
+// to remove the conditional sections so that this content appears for
+// auditbeat, too?
+
+*docker:*
+
+["source","sh",subs="attributes"]
+----
+docker run {dockerimage} setup -e \
+  -E output.logstash.enabled=false \
+  -E output.elasticsearch.hosts=['localhost:9200'] \
+  -E output.elasticsearch.username=filebeat_internal \
+  -E output.elasticsearch.password={pwd} \
+  -E setup.kibana.host=localhost:5601 \
+  -E setup.dashboards.always_kibana=true
+----
+
+
+endif::[]
+
+*win:*
+
+endif::allplatforms[]
+
+Open a PowerShell prompt as an Administrator (right-click the PowerShell icon
+and select *Run As Administrator*).
+
+From the PowerShell prompt, change to the directory where you installed {beatname_uc},
+and run:
+
+["source","sh",subs="attributes"]
+----
+PS > .{backslash}{beatname_lc}.exe setup -e `
+  -E output.logstash.enabled=false `
+  -E output.elasticsearch.hosts=['localhost:9200'] `
+  -E output.elasticsearch.username=filebeat_internal `
+  -E output.elasticsearch.password={pwd} `
+  -E setup.kibana.host=localhost:5601 `
+  -E setup.dashboards.always_kibana=true
+----
+
+
+// REVIEWERS: Please confirm the syntax here. The internet told me to use
+// back ticks for line continuation, but I have not tested/confirmed on PS.
+
+endif::only-elasticsearch[]
+
