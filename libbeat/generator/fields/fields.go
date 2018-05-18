@@ -13,6 +13,7 @@ var (
 	generatedFieldsYml = filepath.Join("_meta", "fields.generated.yml")
 )
 
+// YmlFile holds the info on files and how to write them into the global fields.yml
 type YmlFile struct {
 	Path   string
 	Indent int
