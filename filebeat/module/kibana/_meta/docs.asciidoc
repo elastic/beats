@@ -1,0 +1,29 @@
+:modulename: kibana
+
+== Kibana module
+
+beta[]
+
+This is the Kibana module.
+
+include::../include/what-happens.asciidoc[]
+
+[float]
+=== Compatibility
+
+The Kibana modules is compatible with Kibana 6.3 and newer.
+
+include::../include/running-modules.asciidoc[]
+
+
+include::../include/configuring-intro.asciidoc[]
+
+//set the fileset name used in the included example
+:fileset_ex: log
+
+include::../include/config-option-intro.asciidoc[]
+
+[float]
+==== `{fileset}` log fileset settings
+
+include::../include/var-paths.asciidoc[]

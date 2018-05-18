@@ -96,3 +96,8 @@
       required: false
       description: >
         The severity of the event.
+
+    - name: service.name
+      type: keyword
+      description: >
+        Service name.
