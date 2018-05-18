@@ -8,3 +8,6 @@
 
   # Path to server status. Default server-status
   #server_status_path: "server-status"
+
+  #username: "user"
+  #password: "secret"

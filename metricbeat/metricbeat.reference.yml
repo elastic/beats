@@ -263,6 +263,8 @@ metricbeat.modules:
   path: "/"
   #body: ""
   #method: "GET"
+  #username: "user"
+  #password: "secret"
   #request.enabled: false
   #response.enabled: false
   #json.is_array: false
@@ -287,6 +289,8 @@ metricbeat.modules:
   hosts: ["localhost"]
   namespace: "metrics"
   #path: "/jolokia/?ignoreErrors=true&canonicalNaming=false"
+  #username: "user"
+  #password: "secret"
   jmx.mappings:
     #- mbean: 'java.lang:type=Runtime'
     #  attributes:
