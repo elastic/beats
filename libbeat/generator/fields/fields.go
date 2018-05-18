@@ -87,45 +87,56 @@ func Generate(beatsPath, beatName string, files []*YmlFile) error {
 func AppendFromLibbeat(beatsPath, beatName string) error {
 	fieldsMetaPath := path.Join(beatsPath, beatName, "_meta", "fields.yml")
 	generatedPath := path.Join(beatsPath, beatName, generatedFieldsYml)
-	err := cpIfNotExists(fieldsMetaPath, generatedPath)
+
+	err := createIfNotExists(fieldsMetaPath, generatedPath)
 	if err != nil {
 		return err
 	}
 
 	fieldsPath := path.Join(beatsPath, beatName, "fields.yml")
 	if beatName == "libbeat" {
-		return cp(generatedPath, fieldsPath, os.O_RDWR|os.O_CREATE)
+		return createFile(generatedPath, fieldsPath)
 	}
 
 	libbeatPath := path.Join(beatsPath, "libbeat", generatedFieldsYml)
-	return appendLibbeatFields(generatedFieldsYml, fieldsPath, libbeatPath)
+	err = createFile(libbeatPath, fieldsPath)
+	if err != nil {
+		return err
+	}
+	return appendGenerated(generatedPath, fieldsPath)
 }
 
-func cpIfNotExists(inPath, outPath string) error {
+func createIfNotExists(inPath, outPath string) error {
 	_, err := os.Stat(outPath)
 	if os.IsNotExist(err) {
-		return cp(inPath, outPath, os.O_RDWR|os.O_CREATE)
+		return createFile(inPath, outPath)
 	}
-	return nil
-
+	return err
 }
 
-func appendLibbeatFields(generatedPath, fieldsPath, libbeatPath string) error {
-	err := cp(libbeatPath, fieldsPath, os.O_RDWR|os.O_CREATE)
-	if err != nil {
-		return nil
-	}
-
-	return cp(generatedPath, fieldsPath, os.O_WRONLY|os.O_APPEND)
-}
-
-func cp(in, out string, mode int) error {
+func createFile(in, out string) error {
 	input, err := ioutil.ReadFile(in)
 	if err != nil {
 		return err
 	}
 
-	output, err := os.OpenFile(out, mode, 0644)
+	output, err := os.Create(out)
+	if err != nil {
+		return err
+	}
+	defer output.Close()
+
+	_, err = output.Write(input)
+	return err
+}
+
+func appendGenerated(generatedPath, fieldsPath string) error {
+	input, err := ioutil.ReadFile(generatedPath)
+	if err != nil {
+		return err
+	}
+
+	output, err := os.OpenFile(fieldsPath, os.O_WRONLY|os.O_APPEND, 0644)
 	if err != nil {
 		return err
 	}
