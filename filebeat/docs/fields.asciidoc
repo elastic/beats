@@ -21,6 +21,7 @@ grouped in the following categories:
 * <<exported-fields-icinga>>
 * <<exported-fields-iis>>
 * <<exported-fields-kafka>>
+* <<exported-fields-kibana>>
 * <<exported-fields-kubernetes-processor>>
 * <<exported-fields-log>>
 * <<exported-fields-logstash>>
@@ -1651,6 +1652,53 @@ The full trace in the log line.
 
 --
 
+[[exported-fields-kibana]]
+== kibana fields
+
+kibana Module
+
+
+
+[float]
+== kibana fields
+
+
+
+
+[float]
+== log fields
+
+Kafka log lines.
+
+
+
+*`kibana.log.tags`*::
++
+--
+type: keyword
+
+Kibana logging tags.
+
+
+--
+
+*`kibana.log.state`*::
++
+--
+type: keyword
+
+Current state of Kibana.
+
+
+--
+
+*`kibana.log.meta`*::
++
+--
+type: object
+
+--
+
 [[exported-fields-kubernetes-processor]]
 == Kubernetes fields
 
@@ -1918,6 +1966,16 @@ type: long
 required: False
 
 The severity of the event.
+
+
+--
+
+*`service.name`*::
++
+--
+type: keyword
+
+Service name.
 
 
 --

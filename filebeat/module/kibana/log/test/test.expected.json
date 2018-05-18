@@ -1,0 +1,66 @@
+{
+    "_index": "filebeat-7.0.0-alpha1-2018.05.09",
+    "_type": "doc",
+    "_id": "ZWiiRGMBDInET1s1jXXw",
+    "_score": 1,
+    "_source": {
+        "offset": 920,
+        "prospector": {
+            "type": "log"
+        },
+        "read_timestamp": "2018-05-09T10:57:55Z",
+        "source": "/Users/ruflin/Dev/gopath/src/github.com/elastic/beats/filebeat/module/kibana/log/test/test.log",
+        "fileset": {
+            "module": "kibana",
+            "name": "log"
+        },
+        "input": {
+            "type": "log"
+        },
+        "@timestamp": "2018-05-09T10:57:55.000Z",
+        "service": {
+            "name": [
+                "kibana"
+            ]
+        },
+        "beat": {
+            "hostname": "ruflin",
+            "name": "ruflin",
+            "version": "7.0.0-alpha1"
+        },
+        "kibana": {
+            "log": {
+                "res": {
+                    "responseTime": 26,
+                    "contentLength": 9,
+                    "statusCode": 304
+                },
+                "method": "get",
+                "pid": 69410,
+                "message": "GET /ui/fonts/open_sans/open_sans_v15_latin_600.woff2 304 26ms - 9.0B",
+                "type": "response",
+                "req": {
+                    "referer": "http://localhost:5601/app/kibana",
+                    "headers": {
+                        "if-modified-since": "Thu, 03 May 2018 09:45:28 GMT",
+                        "referer": "http://localhost:5601/app/kibana",
+                        "if-none-match": """"24234c1c81b3948758c1a0be8e5a65386ca94c52"""",
+                        "accept-language": "en-US,en;q=0.9,de;q=0.8",
+                        "origin": "http://localhost:5601",
+                        "host": "localhost:5601",
+                        "connection": "keep-alive",
+                        "accept-encoding": "gzip, deflate, br",
+                        "user-agent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_13_4) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/66.0.3359.139 Safari/537.36",
+                        "accept": "*/*"
+                    },
+                    "method": "get",
+                    "userAgent": "127.0.0.1",
+                    "url": "/ui/fonts/open_sans/open_sans_v15_latin_600.woff2",
+                    "remoteAddress": "127.0.0.1"
+                },
+                "tags": [],
+                "statusCode": 304
+            }
+        }
+    }
+}
