@@ -2,6 +2,7 @@ package fields
 
 import (
 	"bytes"
+	"fmt"
 	"io/ioutil"
 	"os"
 	"path"
@@ -17,10 +18,16 @@ type YmlFile struct {
 	Indent int
 }
 
-func collectBeatFiles(beatsPath, name string, fieldFiles []*YmlFile) []*YmlFile {
+func collectBeatFiles(beatPath string, fieldFiles []*YmlFile) []*YmlFile {
+	commonFields := filepath.Join(beatPath, "_meta", "fields.common.yml")
+	_, err := os.Stat(commonFields)
+	if os.IsNotExist(err) {
+		return fieldFiles
+	}
+
 	files := []*YmlFile{
 		&YmlFile{
-			Path:   filepath.Join(beatsPath, name, "_meta", "fields.common.yml"),
+			Path:   commonFields,
 			Indent: 0,
 		},
 	}
@@ -28,8 +35,8 @@ func collectBeatFiles(beatsPath, name string, fieldFiles []*YmlFile) []*YmlFile 
 	return append(files, fieldFiles...)
 }
 
-func writeGeneratedFieldsYml(beatsPath, name string, fieldFiles []*YmlFile) error {
-	outPath := path.Join(beatsPath, name, generatedFieldsYml)
+func writeGeneratedFieldsYml(beatsPath string, fieldFiles []*YmlFile) error {
+	outPath := path.Join(beatsPath, generatedFieldsYml)
 	f, err := os.Create(outPath)
 	if err != nil {
 		return err
@@ -67,49 +74,53 @@ func indent(content []byte, n int) []byte {
 }
 
 // Generate collects fields.yml files and concatenates them into one global file.
-func Generate(beatsPath, beatName string, files []*YmlFile) error {
-	files = collectBeatFiles(beatsPath, beatName, files)
+func Generate(esBeatsPath, beatPath string, files []*YmlFile) error {
+	files = collectBeatFiles(beatPath, files)
 
-	err := os.MkdirAll(filepath.Join(beatsPath, beatName, "_meta"), 0644)
+	err := writeGeneratedFieldsYml(beatPath, files)
 	if err != nil {
 		return err
 	}
 
-	err = writeGeneratedFieldsYml(beatsPath, beatName, files)
-	if err != nil {
-		return err
-	}
-
-	return AppendFromLibbeat(beatsPath, beatName)
+	return AppendFromLibbeat(esBeatsPath, beatPath)
 }
 
 // AppendFromLibbeat appends fields.yml of libbeat to the fields.yml
-func AppendFromLibbeat(beatsPath, beatName string) error {
-	fieldsMetaPath := path.Join(beatsPath, beatName, "_meta", "fields.yml")
-	generatedPath := path.Join(beatsPath, beatName, generatedFieldsYml)
+func AppendFromLibbeat(esBeatsPath, beatPath string) error {
+	fieldsMetaPath := path.Join(beatPath, "_meta", "fields.yml")
+	generatedPath := path.Join(beatPath, generatedFieldsYml)
 
 	err := createIfNotExists(fieldsMetaPath, generatedPath)
 	if err != nil {
 		return err
 	}
 
-	fieldsPath := path.Join(beatsPath, beatName, "fields.yml")
-	if beatName == "libbeat" {
-		return createFile(generatedPath, fieldsPath)
+	if isLibbeat(beatPath) {
+		out := filepath.Join(esBeatsPath, "libbeat", "fields.yml")
+		return createFile(generatedPath, out)
 	}
 
-	libbeatPath := path.Join(beatsPath, "libbeat", generatedFieldsYml)
-	err = createFile(libbeatPath, fieldsPath)
+	libbeatPath := filepath.Join(esBeatsPath, "libbeat", generatedFieldsYml)
+	out := filepath.Join(beatPath, "fields.yml")
+	err = createFile(libbeatPath, out)
 	if err != nil {
 		return err
 	}
-	return appendGenerated(generatedPath, fieldsPath)
+	return appendGenerated(generatedPath, out)
+}
+
+func isLibbeat(beatPath string) bool {
+	return filepath.Base(beatPath) == "libbeat"
 }
 
 func createIfNotExists(inPath, outPath string) error {
 	_, err := os.Stat(outPath)
 	if os.IsNotExist(err) {
-		return createFile(inPath, outPath)
+		err := createFile(inPath, outPath)
+		if err != nil {
+			fmt.Println("Cannot find _meta/fields.yml")
+		}
+		return nil
 	}
 	return err
 }

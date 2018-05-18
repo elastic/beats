@@ -306,7 +306,8 @@ coverage-report:
 
 .PHONY: fields
 fields:
-	@go run ${ES_BEATS}/libbeat/scripts/cmd/global_fields/main.go --beats_path $(ES_BEATS) --beat_name $(BEAT_NAME) $(FIELDS_FILE_PATH)
+	echo $(PWD)
+	@go run ${ES_BEATS}/libbeat/scripts/cmd/global_fields/main.go --es_beats_path $(ES_BEATS) --beat_path $(PWD) $(FIELDS_FILE_PATH)
 
 
 .PHONY: libbeat_fields

@@ -6,6 +6,7 @@ BEAT_PATH=${BUILD_DIR}/src/beatpath/testbeat
 ES_BEATS=${GOPATH}/src/github.com/elastic/beats
 PREPARE_COMMAND?=
 
+
 # Runs test build for mock beat
 .PHONY: test
 test: prepare-test
