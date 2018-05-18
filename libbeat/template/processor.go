@@ -157,6 +157,13 @@ func (p *Processor) keyword(f *common.Field) common.MapStr {
 		property["ignore_above"] = 1024
 		property["index"] = "not_analyzed"
 	}
+
+	if len(f.MultiFields) > 0 {
+		fields := common.MapStr{}
+		p.Process(f.MultiFields, "", fields)
+		property["fields"] = fields
+	}
+
 	return property
 }
 

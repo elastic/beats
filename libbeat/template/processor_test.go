@@ -119,6 +119,37 @@ func TestProcessor(t *testing.T) {
 			},
 		},
 		{
+			output: p.keyword(&common.Field{Type: "keyword", MultiFields: common.Fields{common.Field{Name: "analyzed", Type: "text", Norms: true}}}),
+			expected: common.MapStr{
+				"type":         "keyword",
+				"ignore_above": 1024,
+				"fields": common.MapStr{
+					"analyzed": common.MapStr{
+						"type": "text",
+					},
+				},
+			},
+		},
+		{
+			output: p.text(&common.Field{Type: "text", MultiFields: common.Fields{
+				common.Field{Name: "raw", Type: "keyword"},
+				common.Field{Name: "indexed", Type: "text"},
+			}, Norms: true}),
+			expected: common.MapStr{
+				"type": "text",
+				"fields": common.MapStr{
+					"raw": common.MapStr{
+						"type":         "keyword",
+						"ignore_above": 1024,
+					},
+					"indexed": common.MapStr{
+						"type":  "text",
+						"norms": false,
+					},
+				},
+			},
+		},
+		{
 			output: p.text(&common.Field{Type: "text", MultiFields: common.Fields{
 				common.Field{Name: "raw", Type: "keyword"},
 				common.Field{Name: "indexed", Type: "text"},
