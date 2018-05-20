@@ -1151,6 +1151,304 @@
           type: long
           description: Requestor's UDP payload size (in bytes).
 
+- key: hl7v2
+  title: "HL7 v2"
+  description: HL7v2-specific event fields.
+  fields:
+    - name: hl7v2
+      type: group
+      fields:
+        - name: MSA-1
+          type: keyword
+          description: Acknowledgment Code
+
+        - name: MSA-2
+          type: keyword
+          description: Message Control ID
+
+        - name: MSA-3
+          type: keyword
+          description: Text Message
+
+        - name: MSA-4
+          type: keyword
+          description: Expected Sequence Number
+
+        - name: MSA-5
+          type: keyword
+          description: Delayed Acknowledgment Type
+
+        - name: MSA-6
+          type: keyword
+          description: Error Condition
+
+        - name: MSA-7
+          type: keyword
+          description: Message Waiting Number
+
+        - name: MSA-8
+          type: keyword
+          description: Message Waiting Priority
+
+        - name: MSH-1
+          type: keyword
+          description: Field Separator
+
+        - name: MSH-2
+          type: keyword
+          description: Encoding Characters
+
+        - name: MSH-3
+          type: keyword
+          description: Sending Application
+
+        - name: MSH-4
+          type: keyword
+          description: Sending Facility
+
+        - name: MSH-5
+          type: keyword
+          description: Receiving Application
+
+        - name: MSH-6
+          type: keyword
+          description: Receiving Facility
+
+        - name: MSH-7
+          type: keyword
+          description: Date/Time of Message
+
+        - name: MSH-8
+          type: keyword
+          description: Security
+
+        - name: MSH-9
+          type: keyword
+          description: Message Type
+
+        - name: MSH-10
+          type: keyword
+          description: Message Control ID
+
+        - name: MSH-11
+          type: keyword
+          description: Processing ID
+
+        - name: MSH-12
+          type: keyword
+          description: Version ID
+
+        - name: MSH-13
+          type: keyword
+          description: Sequence Number
+
+        - name: MSH-14
+          type: keyword
+          description: Continuation Pointer
+
+        - name: MSH-15
+          type: keyword
+          description: Accept Acknowledgment Type
+
+        - name: MSH-16
+          type: keyword
+          description: Application Acknowledgment Type
+
+        - name: MSH-17
+          type: keyword
+          description: Country Code
+
+        - name: MSH-18
+          type: keyword
+          description: Character Set
+
+        - name: MSH-19
+          type: keyword
+          description: Principal Language Of Message
+
+        - name: MSH-20
+          type: keyword
+          description: Alternate Character Set Handling Scheme
+
+        - name: MSH-21
+          type: keyword
+          description: Message Profile Identifier
+
+        - name: MSH-22
+          type: keyword
+          description: Sending Responsible Organization
+
+        - name: MSH-23
+          type: keyword
+          description: Receiving Responsible Organization
+
+        - name: MSH-24
+          type: keyword
+          description: Sending Network Address
+
+        - name: MSH-25
+          type: keyword
+          description: Receiving Network Address
+
+        - name: PID-1
+          type: keyword
+          description: Set ID - PID
+
+        - name: PID-2
+          type: keyword
+          description: Patient ID
+
+        - name: PID-3
+          type: keyword
+          description: Patient Identifier List
+
+        - name: PID-4
+          type: keyword
+          description: Alternate Patient ID - PID
+
+        - name: PID-5
+          type: keyword
+          description: Patient Name
+
+        - name: PID-6
+          type: keyword
+          description: Mother's Maiden Name
+
+        - name: PID-7
+          type: keyword
+          description: Date/Time of Birth
+
+        - name: PID-8
+          type: keyword
+          description: Administrative Sex
+
+        - name: PID-9
+          type: keyword
+          description: Patient Alias
+
+        - name: PID-10
+          type: keyword
+          description: Race
+
+        - name: PID-11
+          type: keyword
+          description: Patient Address
+
+        - name: PID-12
+          type: keyword
+          description: County Code
+
+        - name: PID-13
+          type: keyword
+          description: Phone Number - Home
+
+        - name: PID-14
+          type: keyword
+          description: Phone Number - Business
+
+        - name: PID-15
+          type: keyword
+          description: Primary Language
+
+        - name: PID-16
+          type: keyword
+          description: Marital Status
+
+        - name: PID-17
+          type: keyword
+          description: Religion
+
+        - name: PID-18
+          type: keyword
+          description: Patient Account Number
+
+        - name: PID-19
+          type: keyword
+          description: SSN Number - Patient
+
+        - name: PID-20
+          type: keyword
+          description: Driver's License Number - Patient
+
+        - name: PID-21
+          type: keyword
+          description: Mother's Identifier
+
+        - name: PID-22
+          type: keyword
+          description: Ethnic Group
+
+        - name: PID-23
+          type: keyword
+          description: Birth Place
+
+        - name: PID-24
+          type: keyword
+          description: Multiple Birth Indicator
+
+        - name: PID-25
+          type: keyword
+          description: Birth Order
+
+        - name: PID-26
+          type: keyword
+          description: Citizenship
+
+        - name: PID-27
+          type: keyword
+          description: Veterans Military Status
+
+        - name: PID-28
+          type: keyword
+          description: Nationality
+
+        - name: PID-29
+          type: keyword
+          description: Patient Death Date and Time
+
+        - name: PID-30
+          type: keyword
+          description: Patient Death Indicator
+
+        - name: PID-31
+          type: keyword
+          description: Identity Unknown Indicator
+
+        - name: PID-32
+          type: keyword
+          description: Identity Reliability Code
+
+        - name: PID-33
+          type: keyword
+          description: Last Update Date/Time
+
+        - name: PID-34
+          type: keyword
+          description: Last Update Facility
+
+        - name: PID-35
+          type: keyword
+          description: Taxonomic Classification Code
+
+        - name: PID-36
+          type: keyword
+          description: Breed Code
+
+        - name: PID-37
+          type: keyword
+          description: Strain
+
+        - name: PID-38
+          type: keyword
+          description: Production Class Code
+
+        - name: PID-39
+          type: keyword
+          description: Tribal Citizenship
+
+        - name: PID-40
+          type: keyword
+          description: Patient Telecommunication Information
 - key: http
   title: "HTTP"
   description: HTTP-specific event fields.

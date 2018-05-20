@@ -20,6 +20,7 @@ grouped in the following categories:
 * <<exported-fields-dns>>
 * <<exported-fields-docker-processor>>
 * <<exported-fields-flows_event>>
+* <<exported-fields-hl7v2>>
 * <<exported-fields-host-processor>>
 * <<exported-fields-http>>
 * <<exported-fields-icmp>>
@@ -2247,6 +2248,670 @@ ICMP id used in ICMP based flow.
 --
 optional TCP connection id
 
+
+--
+
+[[exported-fields-hl7v2]]
+== HL7 v2 fields
+
+HL7v2-specific event fields.
+
+
+
+*`hl7v2.MSA-1`*::
++
+--
+type: keyword
+
+Acknowledgment Code
+
+--
+
+*`hl7v2.MSA-2`*::
++
+--
+type: keyword
+
+Message Control ID
+
+--
+
+*`hl7v2.MSA-3`*::
++
+--
+type: keyword
+
+Text Message
+
+--
+
+*`hl7v2.MSA-4`*::
++
+--
+type: keyword
+
+Expected Sequence Number
+
+--
+
+*`hl7v2.MSA-5`*::
++
+--
+type: keyword
+
+Delayed Acknowledgment Type
+
+--
+
+*`hl7v2.MSA-6`*::
++
+--
+type: keyword
+
+Error Condition
+
+--
+
+*`hl7v2.MSA-7`*::
++
+--
+type: keyword
+
+Message Waiting Number
+
+--
+
+*`hl7v2.MSA-8`*::
++
+--
+type: keyword
+
+Message Waiting Priority
+
+--
+
+*`hl7v2.MSH-1`*::
++
+--
+type: keyword
+
+Field Separator
+
+--
+
+*`hl7v2.MSH-2`*::
++
+--
+type: keyword
+
+Encoding Characters
+
+--
+
+*`hl7v2.MSH-3`*::
++
+--
+type: keyword
+
+Sending Application
+
+--
+
+*`hl7v2.MSH-4`*::
++
+--
+type: keyword
+
+Sending Facility
+
+--
+
+*`hl7v2.MSH-5`*::
++
+--
+type: keyword
+
+Receiving Application
+
+--
+
+*`hl7v2.MSH-6`*::
++
+--
+type: keyword
+
+Receiving Facility
+
+--
+
+*`hl7v2.MSH-7`*::
++
+--
+type: keyword
+
+Date/Time of Message
+
+--
+
+*`hl7v2.MSH-8`*::
++
+--
+type: keyword
+
+Security
+
+--
+
+*`hl7v2.MSH-9`*::
++
+--
+type: keyword
+
+Message Type
+
+--
+
+*`hl7v2.MSH-10`*::
++
+--
+type: keyword
+
+Message Control ID
+
+--
+
+*`hl7v2.MSH-11`*::
++
+--
+type: keyword
+
+Processing ID
+
+--
+
+*`hl7v2.MSH-12`*::
++
+--
+type: keyword
+
+Version ID
+
+--
+
+*`hl7v2.MSH-13`*::
++
+--
+type: keyword
+
+Sequence Number
+
+--
+
+*`hl7v2.MSH-14`*::
++
+--
+type: keyword
+
+Continuation Pointer
+
+--
+
+*`hl7v2.MSH-15`*::
++
+--
+type: keyword
+
+Accept Acknowledgment Type
+
+--
+
+*`hl7v2.MSH-16`*::
++
+--
+type: keyword
+
+Application Acknowledgment Type
+
+--
+
+*`hl7v2.MSH-17`*::
++
+--
+type: keyword
+
+Country Code
+
+--
+
+*`hl7v2.MSH-18`*::
++
+--
+type: keyword
+
+Character Set
+
+--
+
+*`hl7v2.MSH-19`*::
++
+--
+type: keyword
+
+Principal Language Of Message
+
+--
+
+*`hl7v2.MSH-20`*::
++
+--
+type: keyword
+
+Alternate Character Set Handling Scheme
+
+--
+
+*`hl7v2.MSH-21`*::
++
+--
+type: keyword
+
+Message Profile Identifier
+
+--
+
+*`hl7v2.MSH-22`*::
++
+--
+type: keyword
+
+Sending Responsible Organization
+
+--
+
+*`hl7v2.MSH-23`*::
++
+--
+type: keyword
+
+Receiving Responsible Organization
+
+--
+
+*`hl7v2.MSH-24`*::
++
+--
+type: keyword
+
+Sending Network Address
+
+--
+
+*`hl7v2.MSH-25`*::
++
+--
+type: keyword
+
+Receiving Network Address
+
+--
+
+*`hl7v2.PID-1`*::
++
+--
+type: keyword
+
+Set ID - PID
+
+--
+
+*`hl7v2.PID-2`*::
++
+--
+type: keyword
+
+Patient ID
+
+--
+
+*`hl7v2.PID-3`*::
++
+--
+type: keyword
+
+Patient Identifier List
+
+--
+
+*`hl7v2.PID-4`*::
++
+--
+type: keyword
+
+Alternate Patient ID - PID
+
+--
+
+*`hl7v2.PID-5`*::
++
+--
+type: keyword
+
+Patient Name
+
+--
+
+*`hl7v2.PID-6`*::
++
+--
+type: keyword
+
+Mother's Maiden Name
+
+--
+
+*`hl7v2.PID-7`*::
++
+--
+type: keyword
+
+Date/Time of Birth
+
+--
+
+*`hl7v2.PID-8`*::
++
+--
+type: keyword
+
+Administrative Sex
+
+--
+
+*`hl7v2.PID-9`*::
++
+--
+type: keyword
+
+Patient Alias
+
+--
+
+*`hl7v2.PID-10`*::
++
+--
+type: keyword
+
+Race
+
+--
+
+*`hl7v2.PID-11`*::
++
+--
+type: keyword
+
+Patient Address
+
+--
+
+*`hl7v2.PID-12`*::
++
+--
+type: keyword
+
+County Code
+
+--
+
+*`hl7v2.PID-13`*::
++
+--
+type: keyword
+
+Phone Number - Home
+
+--
+
+*`hl7v2.PID-14`*::
++
+--
+type: keyword
+
+Phone Number - Business
+
+--
+
+*`hl7v2.PID-15`*::
++
+--
+type: keyword
+
+Primary Language
+
+--
+
+*`hl7v2.PID-16`*::
++
+--
+type: keyword
+
+Marital Status
+
+--
+
+*`hl7v2.PID-17`*::
++
+--
+type: keyword
+
+Religion
+
+--
+
+*`hl7v2.PID-18`*::
++
+--
+type: keyword
+
+Patient Account Number
+
+--
+
+*`hl7v2.PID-19`*::
++
+--
+type: keyword
+
+SSN Number - Patient
+
+--
+
+*`hl7v2.PID-20`*::
++
+--
+type: keyword
+
+Driver's License Number - Patient
+
+--
+
+*`hl7v2.PID-21`*::
++
+--
+type: keyword
+
+Mother's Identifier
+
+--
+
+*`hl7v2.PID-22`*::
++
+--
+type: keyword
+
+Ethnic Group
+
+--
+
+*`hl7v2.PID-23`*::
++
+--
+type: keyword
+
+Birth Place
+
+--
+
+*`hl7v2.PID-24`*::
++
+--
+type: keyword
+
+Multiple Birth Indicator
+
+--
+
+*`hl7v2.PID-25`*::
++
+--
+type: keyword
+
+Birth Order
+
+--
+
+*`hl7v2.PID-26`*::
++
+--
+type: keyword
+
+Citizenship
+
+--
+
+*`hl7v2.PID-27`*::
++
+--
+type: keyword
+
+Veterans Military Status
+
+--
+
+*`hl7v2.PID-28`*::
++
+--
+type: keyword
+
+Nationality
+
+--
+
+*`hl7v2.PID-29`*::
++
+--
+type: keyword
+
+Patient Death Date and Time
+
+--
+
+*`hl7v2.PID-30`*::
++
+--
+type: keyword
+
+Patient Death Indicator
+
+--
+
+*`hl7v2.PID-31`*::
++
+--
+type: keyword
+
+Identity Unknown Indicator
+
+--
+
+*`hl7v2.PID-32`*::
++
+--
+type: keyword
+
+Identity Reliability Code
+
+--
+
+*`hl7v2.PID-33`*::
++
+--
+type: keyword
+
+Last Update Date/Time
+
+--
+
+*`hl7v2.PID-34`*::
++
+--
+type: keyword
+
+Last Update Facility
+
+--
+
+*`hl7v2.PID-35`*::
++
+--
+type: keyword
+
+Taxonomic Classification Code
+
+--
+
+*`hl7v2.PID-36`*::
++
+--
+type: keyword
+
+Breed Code
+
+--
+
+*`hl7v2.PID-37`*::
++
+--
+type: keyword
+
+Strain
+
+--
+
+*`hl7v2.PID-38`*::
++
+--
+type: keyword
+
+Production Class Code
+
+--
+
+*`hl7v2.PID-39`*::
++
+--
+type: keyword
+
+Tribal Citizenship
+
+--
+
+*`hl7v2.PID-40`*::
++
+--
+type: keyword
+
+Patient Telecommunication Information
 
 --
 
