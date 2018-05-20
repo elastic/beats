@@ -1,35 +1,17 @@
 package connection
 
 import (
-	"io/ioutil"
-	"net/http"
-	"net/http/httptest"
-	"path/filepath"
 	"testing"
 
 	"github.com/elastic/beats/libbeat/common"
 	mbtest "github.com/elastic/beats/metricbeat/mb/testing"
+	"github.com/elastic/beats/metricbeat/module/rabbitmq/mtest"
 
 	"github.com/stretchr/testify/assert"
 )
 
 func TestFetchEventContents(t *testing.T) {
-	absPath, _ := filepath.Abs("../_meta/testdata/")
-
-	response, _ := ioutil.ReadFile(absPath + "/connection_sample_response.json")
-	notFound, _ := ioutil.ReadFile(absPath + "/notfound_response.json")
-	server := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		switch r.URL.Path {
-		case "/api/connections":
-			w.WriteHeader(200)
-			w.Header().Set("Content-Type", "application/json;")
-			w.Write([]byte(response))
-		default:
-			w.WriteHeader(404)
-			w.Header().Set("Content-Type", "application/json;")
-			w.Write([]byte(notFound))
-		}
-	}))
+	server := mtest.Server(t, mtest.DefaultServerConfig)
 	defer server.Close()
 
 	config := map[string]interface{}{

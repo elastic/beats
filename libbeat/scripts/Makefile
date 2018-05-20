@@ -84,7 +84,7 @@ PERM_EXEC?=$(shell [ `uname -s` = "Darwin" ] && echo "+111" || echo "/a+x")
 CGO?=true ## @building if true, Build with C Go support
 TARGETS?="windows/amd64 windows/386 darwin/amd64 linux/arm" ## @building list of platforms/architecture to be built by "make package"
 TARGETS_OLD?="linux/amd64 linux/386" ## @building list of Debian6 architecture to be built by "make package" when CGO is true
-PACKAGES?=${BEAT_NAME}/deb ${BEAT_NAME}/rpm ${BEAT_NAME}/darwin ${BEAT_NAME}/win ${BEAT_NAME}/bin ${BEAT_NAME}/arm ## @Building List of OS to be supported by "make package"
+PACKAGES?=${BEAT_NAME}/deb ${BEAT_NAME}/rpm ${BEAT_NAME}/darwin ${BEAT_NAME}/win ${BEAT_NAME}/bin ## @Building List of OS to be supported by "make package"
 PACKAGES_EXPERIMENTAL?=${BEAT_NAME}/arm ## @Building List of experimental OS by "make package". Only build when SNAPSHOT=yes
 SNAPSHOT?=yes ## @Building If yes, builds a snapshot version
 BEATS_BUILDER_IMAGE?=tudorg/beats-builder ## @Building Name of the docker image to use when packaging the application
@@ -101,7 +101,7 @@ endif
 
 # Only build experimental targets for snapshots
 ifneq ($(SNAPSHOT),yes)
-	PACKAGES_EXPERIMENTAL=""
+	PACKAGES_EXPERIMENTAL=
 endif
 
 ### BUILDING ###
@@ -129,6 +129,7 @@ check: python-env prepare-tests ## @build Checks project and source code if ever
 	@goimports -local ${GOIMPORTS_LOCAL_PREFIX} -l ${GOFILES_NOVENDOR} | (! grep .) || (echo "Code differs from goimports' style ^" && false)
 	@${FIND} -name *.py -exec autopep8 -d --max-line-length 120  {} \; | (! grep . -q) || (echo "Code differs from autopep8's style" && false)
 	@${FIND} -wholename "*tests/system/test_*.py" -perm ${PERM_EXEC} -exec false {} + || (echo "Python test files shouldn't be executable, otherwise nose doesn't find them" && false)
+	@${FIND} -name "*.yml" -perm ${PERM_EXEC} -exec false {} + || (echo "YAML files should not be executable" && false)
 
 .PHONY: fmt
 fmt: python-env ## @build Runs `goimports -l -w` and `autopep8`on the project's source code, modifying any files that do not match its style.

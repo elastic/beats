@@ -8,6 +8,45 @@ import subprocess
 from elasticsearch import Elasticsearch
 import json
 import logging
+from parameterized import parameterized
+
+
+def load_fileset_test_cases():
+    """
+    Creates a list of all modules, filesets and testfiles inside for testing.
+    To execute tests for only 1 module, set the env variable TESTING_FILEBEAT_MODULES
+    to the specific module name or a , separated lists of modules.
+    """
+    current_dir = os.path.dirname(os.path.abspath(__file__))
+    modules_dir = os.path.join(current_dir, "..", "..", "module")
+
+    modules = os.getenv("TESTING_FILEBEAT_MODULES")
+    if modules:
+        modules = modules.split(",")
+    else:
+        modules = os.listdir(modules_dir)
+
+    test_cases = []
+
+    for module in modules:
+        path = os.path.join(modules_dir, module)
+
+        if not os.path.isdir(path):
+            continue
+
+        for fileset in os.listdir(path):
+            if not os.path.isdir(os.path.join(path, fileset)):
+                continue
+
+            if not os.path.isfile(os.path.join(path, fileset, "manifest.yml")):
+                continue
+
+            test_files = glob.glob(os.path.join(modules_dir, module,
+                                                fileset, "test", "*.log"))
+            for test_file in test_files:
+                test_cases.append([module, fileset, test_file])
+
+    return test_cases
 
 
 class Test(BaseTest):
@@ -31,19 +70,12 @@ class Test(BaseTest):
 
         self.index_name = "test-filebeat-modules"
 
+    @parameterized.expand(load_fileset_test_cases)
     @unittest.skipIf(not INTEGRATION_TESTS or
                      os.getenv("TESTING_ENVIRONMENT") == "2x",
                      "integration test not available on 2.x")
-    def test_modules(self):
-        """
-        Tests all filebeat modules
-        """
+    def test_fileset_file(self, module, fileset, test_file):
         self.init()
-        modules = os.getenv("TESTING_FILEBEAT_MODULES")
-        if modules:
-            modules = modules.split(",")
-        else:
-            modules = os.listdir(self.modules_path)
 
         # generate a minimal configuration
         cfgfile = os.path.join(self.working_dir, "filebeat.yml")
@@ -54,21 +86,11 @@ class Test(BaseTest):
             elasticsearch_url=self.elasticsearch_url
         )
 
-        for module in modules:
-            path = os.path.join(self.modules_path, module)
-            filesets = [name for name in os.listdir(path) if
-                        os.path.isfile(os.path.join(path, name,
-                                                    "manifest.yml"))]
-
-            for fileset in filesets:
-                test_files = glob.glob(os.path.join(self.modules_path, module,
-                                                    fileset, "test", "*.log"))
-                for test_file in test_files:
-                    self.run_on_file(
-                        module=module,
-                        fileset=fileset,
-                        test_file=test_file,
-                        cfgfile=cfgfile)
+        self.run_on_file(
+            module=module,
+            fileset=fileset,
+            test_file=test_file,
+            cfgfile=cfgfile)
 
     def _test_expected_events(self, module, test_file, res, objects):
         with open(test_file + "-expected.json", "r") as f:
@@ -114,10 +136,7 @@ class Test(BaseTest):
             "-M", "*.*.input.close_eof=true",
         ]
 
-        output_path = os.path.join(self.working_dir, module, fileset, os.path.basename(test_file))
-        if not os.path.exists(output_path):
-            os.makedirs(output_path)
-
+        output_path = os.path.join(self.working_dir)
         output = open(os.path.join(output_path, "output.log"), "ab")
         output.write(" ".join(cmd) + "\n")
         subprocess.Popen(cmd,

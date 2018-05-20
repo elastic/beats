@@ -72,6 +72,12 @@ func loadFilter(p *seccomp.Policy) {
 		return
 	}
 
+	if !seccomp.Supported() {
+		log.Info("Syscall filter could not be installed because the kernel " +
+			"does not support seccomp")
+		return
+	}
+
 	if p == nil {
 		log.Debug("No seccomp policy is defined")
 		return
@@ -83,10 +89,10 @@ func loadFilter(p *seccomp.Policy) {
 		Policy:     *p,
 	}
 
-	log.Debug("Loading syscall filter")
-	log = log.With("seccomp_filter", filter)
+	log.Debugw("Loading syscall filter", "seccomp_filter", filter)
 	if err := seccomp.LoadFilter(filter); err != nil {
-		log.Warnw("Syscall filter could not be installed", "error", err)
+		log.Warn("Syscall filter could not be installed", "error", err,
+			"seccomp_filter", filter)
 		return
 	}
 
