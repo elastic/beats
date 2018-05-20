@@ -19,6 +19,8 @@ type Prometheus interface {
 	GetFamilies() ([]*dto.MetricFamily, error)
 
 	GetProcessedMetrics(mapping *MetricsMapping) ([]common.MapStr, error)
+
+	ReportProcessedMetrics(mapping *MetricsMapping, r mb.ReporterV2)
 }
 
 type prometheus struct {
@@ -138,10 +140,22 @@ func (p *prometheus) GetProcessedMetrics(mapping *MetricsMapping) ([]common.MapS
 		for k, v := range mapping.ExtraFields {
 			event[k] = v
 		}
-
 		events = append(events, event)
+
 	}
 	return events, nil
+
+}
+
+func (p *prometheus) ReportProcessedMetrics(mapping *MetricsMapping, r mb.ReporterV2) {
+	events, err := p.GetProcessedMetrics(mapping)
+	if err != nil {
+		r.Error(err)
+		return
+	}
+	for _, event := range events {
+		r.Event(mb.Event{MetricSetFields: event})
+	}
 }
 
 func getEvent(m map[string]common.MapStr, labels common.MapStr) common.MapStr {

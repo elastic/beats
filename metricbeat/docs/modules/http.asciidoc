@@ -26,7 +26,8 @@ in <<configuration-metricbeat>>. Here is an example configuration:
 ----
 metricbeat.modules:
 - module: http
-  metricsets: ["json"]
+  #metricsets:
+  #  - json
   period: 10s
   hosts: ["localhost:80"]
   namespace: "json_namespace"
@@ -39,15 +40,16 @@ metricbeat.modules:
   #dedot.enabled: false
 
 - module: http
-  metricsets: ["server"]
+  #metricsets:
+  #  - server
   host: "localhost"
   port: "8080"
   enabled: false
-#  paths:
-#    - path: "/foo"
-#      namespace: "foo"
-#      fields: # added to the the response in root. overwrites existing fields
-#        key: "value"
+  #paths:
+  #  - path: "/foo"
+  #    namespace: "foo"
+  #    fields: # added to the the response in root. overwrites existing fields
+  #      key: "value"
 ----
 
 This module supports TLS connection when using `ssl` config field, as described in <<configuration-ssl>>.

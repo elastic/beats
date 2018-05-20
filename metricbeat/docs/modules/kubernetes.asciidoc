@@ -57,6 +57,13 @@ metricbeat.modules:
   enabled: true
   metricsets:
     - event
+
+# Kubernetes API server
+- module: kubernetes
+  enabled: true
+  metricsets:
+    - apiserver
+  hosts: ["https://${KUBERNETES_SERVICE_HOST}:${KUBERNETES_SERVICE_PORT}"]
 ----
 
 This module supports TLS connection when using `ssl` config field, as described in <<configuration-ssl>>.

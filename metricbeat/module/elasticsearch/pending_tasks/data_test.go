@@ -108,26 +108,26 @@ func TestEventsMappedMatchToContentReceived(t *testing.T) {
 	}{
 		{"./_meta/test/empty.json", []common.MapStr(nil)},
 		{"./_meta/test/task.622.json", []common.MapStr{common.MapStr{
-			"priority":             "URGENT",
-			"source":               "create-index [foo_9], cause [api]",
+			"priority":         "URGENT",
+			"source":           "create-index [foo_9], cause [api]",
 			"time_in_queue.ms": int64(86),
-			"insert_order":         int64(101),
+			"insert_order":     int64(101),
 		}}},
 		{"./_meta/test/tasks.622.json", []common.MapStr{common.MapStr{
-			"priority":             "URGENT",
-			"source":               "create-index [foo_9], cause [api]",
+			"priority":         "URGENT",
+			"source":           "create-index [foo_9], cause [api]",
 			"time_in_queue.ms": int64(86),
-			"insert_order":         int64(101)},
+			"insert_order":     int64(101)},
 			common.MapStr{
-				"priority":             "HIGH",
-				"source":               "shard-started ([foo_2][1], node[tMTocMvQQgGCkj7QDHl3OA], [P], s[INITIALIZING]), reason [after recovery from shard_store]",
+				"priority":         "HIGH",
+				"source":           "shard-started ([foo_2][1], node[tMTocMvQQgGCkj7QDHl3OA], [P], s[INITIALIZING]), reason [after recovery from shard_store]",
 				"time_in_queue.ms": int64(842),
-				"insert_order":         int64(46),
+				"insert_order":     int64(46),
 			}, common.MapStr{
-				"priority":             "HIGH",
-				"source":               "shard-started ([foo_2][0], node[tMTocMvQQgGCkj7QDHl3OA], [P], s[INITIALIZING]), reason [after recovery from shard_store]",
+				"priority":         "HIGH",
+				"source":           "shard-started ([foo_2][0], node[tMTocMvQQgGCkj7QDHl3OA], [P], s[INITIALIZING]), reason [after recovery from shard_store]",
 				"time_in_queue.ms": int64(858),
-				"insert_order":         int64(45),
+				"insert_order":     int64(45),
 			}}},
 	}
 

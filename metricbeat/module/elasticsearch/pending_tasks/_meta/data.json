@@ -9,7 +9,7 @@
   },
   "elasticsearch": {
     "cluster": {
-      "pending_tasks": {
+      "pending_task": {
         "insert_order": 47,
         "priority": "HIGH",
         "source": "put-mapping",

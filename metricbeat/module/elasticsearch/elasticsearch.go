@@ -17,15 +17,20 @@ type Info struct {
 	ClusterID   string `json:"cluster_uuid"`
 }
 
+// NodeInfo struct cotains data about the node
+type NodeInfo struct {
+	Host             string `json:"host"`
+	TransportAddress string `json:"transport_address"`
+	IP               string `json:"ip"`
+	Name             string `json:"name"`
+}
+
 // GetClusterID fetches cluster id for given nodeID
 func GetClusterID(http *helper.HTTP, uri string, nodeID string) (string, error) {
 	// Check if cluster id already cached. If yes, return it.
 	if clusterID, ok := clusterIDCache[nodeID]; ok {
 		return clusterID, nil
 	}
-
-	// Makes sure the http uri is reset to its inital value
-	defer http.SetURI(uri)
 
 	info, err := GetInfo(http, uri)
 	if err != nil {
@@ -44,8 +49,6 @@ func GetClusterID(http *helper.HTTP, uri string, nodeID string) (string, error) 
 //
 // The two names are compared
 func IsMaster(http *helper.HTTP, uri string) (bool, error) {
-	// Makes sure the http uri is reset to its inital value
-	defer http.SetURI(uri)
 
 	node, err := getNodeName(http, uri)
 	if err != nil {
@@ -97,6 +100,7 @@ func getMasterName(http *helper.HTTP, uri string) (string, error) {
 
 // GetInfo returns the data for the Elasticsearch / endpoint
 func GetInfo(http *helper.HTTP, uri string) (*Info, error) {
+	defer http.SetURI(uri)
 
 	// Parses the uri to replace the path
 	u, _ := url.Parse(uri)
@@ -116,6 +120,8 @@ func GetInfo(http *helper.HTTP, uri string) (*Info, error) {
 }
 
 func fetchPath(http *helper.HTTP, uri, path string) ([]byte, error) {
+	defer http.SetURI(uri)
+
 	// Parses the uri to replace the path
 	u, _ := url.Parse(uri)
 	u.Path = path
@@ -123,4 +129,27 @@ func fetchPath(http *helper.HTTP, uri, path string) ([]byte, error) {
 	// Http helper includes the HostData with username and password
 	http.SetURI(u.String())
 	return http.FetchContent()
+}
+
+// GetNodeInfo returns the node information
+func GetNodeInfo(http *helper.HTTP, uri string, nodeID string) (*NodeInfo, error) {
+
+	content, err := fetchPath(http, uri, "/_nodes/_local/nodes")
+	if err != nil {
+		return nil, err
+	}
+
+	nodesStruct := struct {
+		Nodes map[string]*NodeInfo `json:"nodes"`
+	}{}
+
+	json.Unmarshal(content, &nodesStruct)
+
+	// _local will only fetch one node info. First entry is node name
+	for k, v := range nodesStruct.Nodes {
+		if k == nodeID {
+			return v, nil
+		}
+	}
+	return nil, fmt.Errorf("no node matched id %s", nodeID)
 }

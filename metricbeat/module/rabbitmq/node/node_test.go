@@ -1,47 +1,14 @@
 package node
 
 import (
-	"io/ioutil"
-	"net/http"
-	"net/http/httptest"
-	"path/filepath"
 	"testing"
 
 	"github.com/elastic/beats/libbeat/common"
 	mbtest "github.com/elastic/beats/metricbeat/mb/testing"
+	"github.com/elastic/beats/metricbeat/module/rabbitmq/mtest"
 
 	"github.com/stretchr/testify/assert"
 )
-
-func nodeTestServer() *httptest.Server {
-	absPath, _ := filepath.Abs("../_meta/testdata/")
-
-	nodeResponse, _ := ioutil.ReadFile(absPath + "/node_sample_response.json")
-	nodesResponse := []byte("[" + string(nodeResponse) + "]")
-	overviewResponse, _ := ioutil.ReadFile(absPath + "/overview_sample_response.json")
-	notFound, _ := ioutil.ReadFile(absPath + "/notfound_response.json")
-	server := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		switch {
-		case r.URL.Path == "/api/overview":
-			w.WriteHeader(200)
-			w.Header().Set("Content-Type", "application/json;")
-			w.Write(overviewResponse)
-		case r.URL.Path == "/api/nodes":
-			w.WriteHeader(200)
-			w.Header().Set("Content-Type", "application/json;")
-			w.Write(nodesResponse)
-		case r.URL.Path == "/api/nodes/rabbit@e2b1ae6390fd":
-			w.WriteHeader(200)
-			w.Header().Set("Content-Type", "application/json;")
-			w.Write(nodeResponse)
-		default:
-			w.WriteHeader(404)
-			w.Header().Set("Content-Type", "application/json;")
-			w.Write([]byte(notFound))
-		}
-	}))
-	return server
-}
 
 func TestFetchNodeEventContents(t *testing.T) {
 	testFetch(t, configCollectNode)
@@ -52,7 +19,7 @@ func TestFetchClusterEventContents(t *testing.T) {
 }
 
 func testFetch(t *testing.T, collect string) {
-	server := nodeTestServer()
+	server := mtest.Server(t, mtest.DefaultServerConfig)
 	defer server.Close()
 
 	config := map[string]interface{}{

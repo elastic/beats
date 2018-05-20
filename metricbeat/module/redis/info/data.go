@@ -32,6 +32,10 @@ var (
 				"peak":  c.Int("used_memory_peak"),
 				"lua":   c.Int("used_memory_lua"),
 			},
+			"max": s.Object{
+				"value":  c.Int("maxmemory"),
+				"policy": c.Str("maxmemory_policy"),
+			},
 			"allocator": c.Str("mem_allocator"), // Could be moved to server as it rarely changes
 		},
 		"persistence": s.Object{
