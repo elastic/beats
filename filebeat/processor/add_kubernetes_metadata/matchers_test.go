@@ -38,7 +38,8 @@ func TestLogsPathMatcher_VarLibDockerContainers(t *testing.T) {
 	cfgLogsPath := "" // use the default matcher configuration
 	source := fmt.Sprintf("/var/lib/docker/containers/%s/%s-json.log", cid, cid)
 	if runtime.GOOS == "windows" {
-		source = fmt.Sprintf("/var/lib/docker/containers/\\%s/%s-json.log", cid, cid)
+		cfgLogsPath = "D:\\containers\\logs"
+		source = fmt.Sprintf("D:\\containers\\logs\\%s\\%s-json.log", cid, cid)
 	}
 	expectedResult := cid
 	executeTest(t, cfgLogsPath, source, expectedResult)
@@ -48,7 +49,8 @@ func TestLogsPathMatcher_VarLogContainers(t *testing.T) {
 	cfgLogsPath := "/var/log/containers/"
 	source := fmt.Sprintf("/var/log/containers/kube-proxy-4d7nt_kube-system_kube-proxy-%s.log", cid)
 	if runtime.GOOS == "windows" {
-		source = fmt.Sprintf("/var/log/containers/\\kube-proxy-4d7nt_kube-system_kube-proxy-%s.log", cid)
+		cfgLogsPath = "D:\\containers\\logs"
+		source = fmt.Sprintf("D:\\containers\\logs\\%s\\%s-json.log", cid, cid)
 	}
 	expectedResult := cid
 	executeTest(t, cfgLogsPath, source, expectedResult)
@@ -58,7 +60,8 @@ func TestLogsPathMatcher_AnotherLogDir(t *testing.T) {
 	cfgLogsPath := "/var/log/other/"
 	source := fmt.Sprintf("/var/log/other/%s.log", cid)
 	if runtime.GOOS == "windows" {
-		source = fmt.Sprintf("/var/log/other/\\%s.log", cid)
+		cfgLogsPath = "D:\\containers\\logs"
+		source = fmt.Sprintf("D:\\containers\\logs\\%s\\%s-json.log", cid, cid)
 	}
 	expectedResult := cid
 	executeTest(t, cfgLogsPath, source, expectedResult)

@@ -41,7 +41,7 @@ func newLogsPathMatcher(cfg common.Config) (add_kubernetes_metadata.Matcher, err
 
 	logPath := config.LogsPath
 	separator := string(filepath.Separator)
-	if logPath[len(logPath)-1:] != separator {
+	if !strings.HasSuffix(logPath, separator) {
 		logPath = logPath + separator
 	}
 
