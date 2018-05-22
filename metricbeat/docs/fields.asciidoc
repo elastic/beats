@@ -3964,6 +3964,53 @@ format: bytes
 --
 
 [float]
+== cluster.pending_task fields
+
+`cluster.pending_task` contains a pending task description.
+
+
+
+*`elasticsearch.cluster.pending_task.insert_order`*::
++
+--
+type: long
+
+Insert order
+
+
+--
+
+*`elasticsearch.cluster.pending_task.priority`*::
++
+--
+type: long
+
+Priority
+
+
+--
+
+*`elasticsearch.cluster.pending_task.source`*::
++
+--
+type: keyword
+
+Source. For example: put-mapping
+
+
+--
+
+*`elasticsearch.cluster.pending_task.time_in_queue.ms`*::
++
+--
+type: long
+
+Time in queue
+
+
+--
+
+[float]
 == shard fields
 
 shard fields

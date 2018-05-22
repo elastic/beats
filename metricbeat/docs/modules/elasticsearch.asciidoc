@@ -47,6 +47,8 @@ The following metricsets are available:
 
 * <<metricbeat-metricset-elasticsearch-node_stats,node_stats>>
 
+* <<metricbeat-metricset-elasticsearch-pending_tasks,pending_tasks>>
+
 * <<metricbeat-metricset-elasticsearch-shard,shard>>
 
 include::elasticsearch/index.asciidoc[]
@@ -56,6 +58,8 @@ include::elasticsearch/index_summary.asciidoc[]
 include::elasticsearch/node.asciidoc[]
 
 include::elasticsearch/node_stats.asciidoc[]
+
+include::elasticsearch/pending_tasks.asciidoc[]
 
 include::elasticsearch/shard.asciidoc[]
 
