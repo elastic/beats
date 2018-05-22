@@ -1,7 +1,7 @@
 package diskio
 
 import (
-	"github.com/docker/docker/client"
+	client "docker.io/go-docker"
 
 	"github.com/elastic/beats/libbeat/common"
 	"github.com/elastic/beats/metricbeat/mb"

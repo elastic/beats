@@ -5,7 +5,7 @@ import (
 	"testing"
 	"time"
 
-	"github.com/docker/docker/api/types"
+	"docker.io/go-docker/api/types"
 	"github.com/stretchr/testify/assert"
 
 	"github.com/elastic/beats/metricbeat/module/docker"

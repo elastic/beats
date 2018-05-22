@@ -3,7 +3,7 @@ package docker
 import (
 	"strings"
 
-	"github.com/docker/docker/api/types"
+	"docker.io/go-docker/api/types"
 
 	"github.com/elastic/beats/libbeat/common"
 	"github.com/elastic/beats/libbeat/common/safemapstr"

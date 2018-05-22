@@ -3,9 +3,9 @@ package docker
 import (
 	"context"
 
-	"github.com/docker/docker/api/types"
-	"github.com/docker/docker/api/types/container"
-	"github.com/docker/docker/client"
+	client "docker.io/go-docker"
+	"docker.io/go-docker/api/types"
+	"docker.io/go-docker/api/types/container"
 )
 
 // Client for Docker
@@ -43,10 +43,9 @@ func (c Client) ContainerStart(image string, cmd []string, labels map[string]str
 }
 
 // ContainerWait waits for a container to finish
-func (c Client) ContainerWait(ID string) error {
+func (c Client) ContainerWait(ID string) {
 	ctx := context.Background()
-	_, err := c.cli.ContainerWait(ctx, ID)
-	return err
+	c.cli.ContainerWait(ctx, ID, container.WaitConditionRemoved)
 }
 
 // ContainerKill kills the given container
