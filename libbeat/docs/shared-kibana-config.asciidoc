@@ -109,7 +109,7 @@ setup.kibana.protocol: "https"
 setup.kibana.ssl.enabled: true
 setup.kibana.ssl.certificate_authorities: ["/etc/pki/root/ca.pem"]
 setup.kibana.ssl.certificate: "/etc/pki/client/cert.pem"
-setup.kibana.ssl.key: "/etc/pki/client/cert.key
+setup.kibana.ssl.key: "/etc/pki/client/cert.key"
 ----
 
 See <<configuration-ssl>> for more information.
