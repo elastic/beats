@@ -68,8 +68,8 @@ func newHTTPMonitorHostJob(
 }
 
 func newHTTPMonitorIPsJob(
-	config *Config,
 	addr string,
+	config *Config,
 	tls *transport.TLSConfig,
 	enc contentEncoder,
 	body []byte,
