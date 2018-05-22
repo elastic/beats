@@ -19,7 +19,7 @@
       "attributes": {
         "description": "",
         "kibanaSavedObjectMeta": {
-          "searchSourceJSON": "{\"index\":\"metricbeat-*\",\"query\":{\"query\":{\"query_string\":{\"query\":\"*\",\"analyze_wildcard\":true,\"default_field\":\"*\"}},\"language\":\"lucene\"},\"filter\":[]}"
+          "searchSourceJSON": "{\"index\":\"metricbeat-*\",\"query\":{\"query\":{\"query_string\":{\"query\":\"*\",\"analyze_wildcard\":true}},\"language\":\"lucene\"},\"filter\":[]}"
         },
         "title": "Number of hosts [Metricbeat System]",
         "uiStateJSON": "{\"vis\":{\"defaultColors\":{\"0 - 100\":\"rgb(0,104,55)\"}}}",
@@ -64,7 +64,7 @@
       "attributes": {
         "description": "",
         "kibanaSavedObjectMeta": {
-          "searchSourceJSON": "{\"index\":\"metricbeat-*\",\"query\":{\"query\":{\"query_string\":{\"query\":\"*\",\"analyze_wildcard\":true,\"default_field\":\"*\"}},\"language\":\"lucene\"},\"filter\":[]}"
+          "searchSourceJSON": "{\"index\":\"metricbeat-*\",\"query\":{\"query\":{\"query_string\":{\"query\":\"*\",\"analyze_wildcard\":true}},\"language\":\"lucene\"},\"filter\":[]}"
         },
         "title": "Hosts histogram by CPU usage [Metricbeat System]",
         "uiStateJSON": "{\"vis\":{\"defaultColors\":{\"0% - 5%\":\"rgb(247,252,245)\",\"5% - 10%\":\"rgb(199,233,192)\",\"10% - 15%\":\"rgb(116,196,118)\",\"15% - 20%\":\"rgb(35,139,69)\"}}}",
@@ -155,7 +155,7 @@
         "description": "",
         "hits": 0,
         "kibanaSavedObjectMeta": {
-          "searchSourceJSON": "{\"filter\":[],\"highlightAll\":true,\"version\":true,\"query\":{\"language\":\"lucene\",\"query\":{\"query_string\":{\"analyze_wildcard\":true,\"default_field\":\"*\",\"query\":\"*\"}}}}"
+          "searchSourceJSON": "{\"filter\":[],\"highlightAll\":true,\"version\":true,\"query\":{\"language\":\"lucene\",\"query\":{\"query_string\":{\"analyze_wildcard\":true,\"query\":\"*\"}}}}"
         },
         "optionsJSON": "{\"darkTheme\":false}",
         "panelsJSON": "[{\"col\":1,\"id\":\"System-Navigation\",\"panelIndex\":9,\"row\":1,\"size_x\":12,\"size_y\":1,\"type\":\"visualization\"},{\"col\":1,\"id\":\"c6f2ffd0-4d17-11e7-a196-69b9a7a020a9\",\"panelIndex\":11,\"row\":2,\"size_x\":2,\"size_y\":2,\"type\":\"visualization\"},{\"col\":7,\"id\":\"fe064790-1b1f-11e7-bec4-a5e9ec5cab8b\",\"panelIndex\":12,\"row\":4,\"size_x\":6,\"size_y\":5,\"type\":\"visualization\"},{\"col\":1,\"id\":\"855899e0-1b1c-11e7-b09e-037021c4f8df\",\"panelIndex\":13,\"row\":4,\"size_x\":6,\"size_y\":5,\"type\":\"visualization\"},{\"col\":1,\"id\":\"7cdb1330-4d1a-11e7-a196-69b9a7a020a9\",\"panelIndex\":14,\"row\":9,\"size_x\":12,\"size_y\":6,\"type\":\"visualization\"},{\"col\":9,\"id\":\"522ee670-1b92-11e7-bec4-a5e9ec5cab8b\",\"panelIndex\":16,\"row\":2,\"size_x\":2,\"size_y\":2,\"type\":\"visualization\"},{\"col\":11,\"id\":\"1aae9140-1b93-11e7-8ada-3df93aab833e\",\"panelIndex\":17,\"row\":2,\"size_x\":2,\"size_y\":2,\"type\":\"visualization\"},{\"col\":7,\"id\":\"825fdb80-4d1d-11e7-b5f2-2b7c1895bf32\",\"panelIndex\":18,\"row\":2,\"size_x\":2,\"size_y\":2,\"type\":\"visualization\"},{\"col\":5,\"id\":\"d3166e80-1b91-11e7-bec4-a5e9ec5cab8b\",\"panelIndex\":19,\"row\":2,\"size_x\":2,\"size_y\":2,\"type\":\"visualization\"},{\"col\":3,\"id\":\"83e12df0-1b91-11e7-bec4-a5e9ec5cab8b\",\"panelIndex\":20,\"row\":2,\"size_x\":2,\"size_y\":2,\"type\":\"visualization\"}]",
