@@ -91,7 +91,7 @@
         "description": "Sudo commands dashboard from the Filebeat System module",
         "hits": 0,
         "kibanaSavedObjectMeta": {
-          "searchSourceJSON": "{\"filter\":[],\"query\":{\"query\":{\"query_string\":{\"analyze_wildcard\":true,\"query\":\"*\",\"default_field\":\"*\"}},\"language\":\"lucene\"},\"highlightAll\":true,\"version\":true}"
+          "searchSourceJSON": "{\"filter\":[],\"query\":{\"query\":{\"query_string\":{\"analyze_wildcard\":true,\"query\":\"*\"}},\"language\":\"lucene\"},\"highlightAll\":true,\"version\":true}"
         },
         "optionsJSON": "{\"darkTheme\":false}",
         "panelsJSON": "[{\"col\":1,\"id\":\"5c7af030-fa2a-11e6-bbd3-29c986c96e5a\",\"panelIndex\":1,\"row\":6,\"size_x\":12,\"size_y\":4,\"type\":\"visualization\"},{\"col\":1,\"id\":\"51164310-fa2b-11e6-bbd3-29c986c96e5a\",\"panelIndex\":2,\"row\":10,\"size_x\":12,\"size_y\":3,\"type\":\"visualization\"},{\"col\":1,\"id\":\"dc589770-fa2b-11e6-bbd3-29c986c96e5a\",\"panelIndex\":3,\"row\":2,\"size_x\":12,\"size_y\":4,\"type\":\"visualization\"},{\"size_x\":12,\"size_y\":1,\"panelIndex\":4,\"type\":\"visualization\",\"id\":\"327417e0-8462-11e7-bab8-bd2f0fb42c54\",\"col\":1,\"row\":1}]",

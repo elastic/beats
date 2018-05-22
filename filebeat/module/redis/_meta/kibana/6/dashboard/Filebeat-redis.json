@@ -4,7 +4,7 @@
       "attributes": {
         "description": "",
         "kibanaSavedObjectMeta": {
-          "searchSourceJSON": "{\"filter\":[],\"index\":\"filebeat-*\",\"highlightAll\":true,\"version\":true,\"query\":{\"query\":{\"query_string\":{\"query\":\"_exists_:redis.log\",\"analyze_wildcard\":true,\"default_field\":\"*\"}},\"language\":\"lucene\"}}"
+          "searchSourceJSON": "{\"filter\":[],\"index\":\"filebeat-*\",\"highlightAll\":true,\"version\":true,\"query\":{\"query\":{\"query_string\":{\"query\":\"_exists_:redis.log\",\"analyze_wildcard\":true}},\"language\":\"lucene\"}}"
         },
         "title": "Log levels and roles breakdown [Filebeat Redis]",
         "uiStateJSON": "{}",
@@ -19,7 +19,7 @@
       "attributes": {
         "description": "",
         "kibanaSavedObjectMeta": {
-          "searchSourceJSON": "{\"filter\":[],\"index\":\"filebeat-*\",\"highlightAll\":true,\"version\":true,\"query\":{\"query\":{\"query_string\":{\"query\":\"_exists_:redis.log\",\"analyze_wildcard\":true,\"default_field\":\"*\"}},\"language\":\"lucene\"}}"
+          "searchSourceJSON": "{\"filter\":[],\"index\":\"filebeat-*\",\"highlightAll\":true,\"version\":true,\"query\":{\"query\":{\"query_string\":{\"query\":\"_exists_:redis.log\",\"analyze_wildcard\":true}},\"language\":\"lucene\"}}"
         },
         "title": "Logs over time [Filebeat Redis]",
         "uiStateJSON": "{\"vis\":{\"colors\":{\"notice\":\"#629E51\",\"warning\":\"#EF843C\"}}}",
@@ -81,7 +81,7 @@
         "description": "",
         "hits": 0,
         "kibanaSavedObjectMeta": {
-          "searchSourceJSON": "{\"index\":\"filebeat-*\",\"highlightAll\":true,\"version\":true,\"query\":{\"language\":\"lucene\",\"query\":{\"query_string\":{\"analyze_wildcard\":true,\"query\":\"_exists_:redis.slowlog\",\"default_field\":\"*\"}}},\"filter\":[]}"
+          "searchSourceJSON": "{\"index\":\"filebeat-*\",\"highlightAll\":true,\"version\":true,\"query\":{\"language\":\"lucene\",\"query\":{\"query_string\":{\"analyze_wildcard\":true,\"query\":\"_exists_:redis.slowlog\"}}},\"filter\":[]}"
         },
         "sort": [
           "@timestamp",
@@ -99,7 +99,7 @@
         "description": "Overview dashboard for the FIlebeat Redis module",
         "hits": 0,
         "kibanaSavedObjectMeta": {
-          "searchSourceJSON": "{\"filter\":[],\"highlightAll\":true,\"version\":true,\"query\":{\"language\":\"lucene\",\"query\":{\"query_string\":{\"analyze_wildcard\":true,\"default_field\":\"*\",\"query\":\"*\"}}}}"
+          "searchSourceJSON": "{\"filter\":[],\"highlightAll\":true,\"version\":true,\"query\":{\"language\":\"lucene\",\"query\":{\"query_string\":{\"analyze_wildcard\":true,\"query\":\"*\"}}}}"
         },
         "optionsJSON": "{\"darkTheme\":false}",
         "panelsJSON": "[{\"col\":1,\"id\":\"78b9afe0-478f-11e7-b1f0-cb29bac6bf8b\",\"panelIndex\":2,\"row\":5,\"size_x\":3,\"size_y\":3,\"type\":\"visualization\"},{\"col\":4,\"id\":\"d2864600-478f-11e7-be88-2ddb32f3df97\",\"panelIndex\":3,\"row\":5,\"size_x\":9,\"size_y\":3,\"type\":\"visualization\"},{\"col\":1,\"columns\":[\"beat.name\",\"redis.log.level\",\"redis.log.role\",\"redis.log.message\"],\"id\":\"73613570-4791-11e7-be88-2ddb32f3df97\",\"panelIndex\":4,\"row\":8,\"size_x\":12,\"size_y\":4,\"sort\":[\"@timestamp\",\"desc\"],\"type\":\"search\"},{\"col\":7,\"id\":\"dcccaa80-4791-11e7-be88-2ddb32f3df97\",\"panelIndex\":5,\"row\":1,\"size_x\":6,\"size_y\":4,\"type\":\"visualization\"},{\"col\":1,\"columns\":[\"beat.name\",\"message\",\"redis.slowlog.duration.us\",\"redis.slowlog.key\"],\"id\":\"0ab87b80-478e-11e7-b1f0-cb29bac6bf8b\",\"panelIndex\":6,\"row\":1,\"size_x\":6,\"size_y\":4,\"sort\":[\"@timestamp\",\"desc\"],\"type\":\"search\"}]",
