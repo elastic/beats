@@ -19,7 +19,9 @@ cp fields.yml $PREFIX/fields.yml
 cp $BEAT_NAME.yml $PREFIX/$BEAT_NAME-linux.yml
 chmod 0600 $PREFIX/$BEAT_NAME-linux.yml
 chmod 0600 $PREFIX/$BEAT_NAME-linux-386.yml || true
-cp $BEAT_NAME.reference.yml $PREFIX/$BEAT_NAME-linux.reference.yml
+if [ -z "${BEAT_REF_YAML}" ] || [ ${BEAT_REF_YAML} = true ]; then
+  cp $BEAT_NAME.reference.yml $PREFIX/$BEAT_NAME-linux.reference.yml
+fi
 rm -rf $PREFIX/modules.d-linux
 cp -r modules.d/ $PREFIX/modules.d-linux || true
 [ -d "$PREFIX/modules.d-linux" ] && chmod 0755 $PREFIX/modules.d-linux
@@ -27,7 +29,9 @@ cp -r modules.d/ $PREFIX/modules.d-linux || true
 # darwin
 cp $BEAT_NAME.yml $PREFIX/$BEAT_NAME-darwin.yml
 chmod 0600 $PREFIX/$BEAT_NAME-darwin.yml
-cp $BEAT_NAME.reference.yml $PREFIX/$BEAT_NAME-darwin.reference.yml
+if [ -z "${BEAT_REF_YAML}" ] || [ ${BEAT_REF_YAML} = true ]; then
+  cp $BEAT_NAME.reference.yml $PREFIX/$BEAT_NAME-darwin.reference.yml
+fi
 rm -rf $PREFIX/modules.d-darwin
 cp -r modules.d/ $PREFIX/modules.d-darwin || true
 [ -d "$PREFIX/modules.d-darwin" ] && chmod 0755 $PREFIX/modules.d-darwin
@@ -35,7 +39,9 @@ cp -r modules.d/ $PREFIX/modules.d-darwin || true
 # win
 cp $BEAT_NAME.yml $PREFIX/$BEAT_NAME-win.yml
 chmod 0600 $PREFIX/$BEAT_NAME-win.yml
-cp $BEAT_NAME.reference.yml $PREFIX/$BEAT_NAME-win.reference.yml
+if [ -z "${BEAT_REF_YAML}" ] || [ ${BEAT_REF_YAML} = true ]; then
+  cp $BEAT_NAME.reference.yml $PREFIX/$BEAT_NAME-win.reference.yml
+fi
 rm -rf $PREFIX/modules.d-win
 cp -r modules.d/ $PREFIX/modules.d-win || true
 [ -d "$PREFIX/modules.d-win" ] && chmod 0755 $PREFIX/modules.d-win
