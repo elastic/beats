@@ -854,6 +854,15 @@ output.elasticsearch:
 # Path to fields.yml file to generate the template
 #setup.template.fields: "${path.config}/fields.yml"
 
+# Enable json template loading. If this is enabled, the fields.yml is ignored.
+#setup.template.json.enabled: false
+
+# Path to the json template file
+#setup.template.json.path: "${path.config}/template.json"
+
+# Name under which the template is stored in Elasticsearch
+#setup.template.json.name: ""
+
 # Overwrite existing template
 #setup.template.overwrite: false
 
