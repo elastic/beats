@@ -12,6 +12,7 @@ import (
 const (
 	ContainerIndexerName = "container"
 	PodNameIndexerName   = "pod_name"
+	PodUIDIndexerName    = "pod_uid"
 	IPPortIndexerName    = "ip_port"
 )
 
@@ -126,6 +127,32 @@ func (p *PodNameIndexer) GetMetadata(pod *kubernetes.Pod) []MetadataIndex {
 // GetIndexes returns the indexes for the given Pod
 func (p *PodNameIndexer) GetIndexes(pod *kubernetes.Pod) []string {
 	return []string{fmt.Sprintf("%s/%s", pod.Metadata.Namespace, pod.Metadata.Name)}
+}
+
+// PodUIDIndexer indexes pods based on the pod UID
+type PodUIDIndexer struct {
+	metaGen kubernetes.MetaGenerator
+}
+
+// NewPodUIDIndexer initializes and returns a PodUIDIndexer
+func NewPodUIDIndexer(_ common.Config, metaGen kubernetes.MetaGenerator) (Indexer, error) {
+	return &PodUIDIndexer{metaGen: metaGen}, nil
+}
+
+// GetMetadata returns the composed metadata from PodNameIndexer and the pod UID
+func (p *PodUIDIndexer) GetMetadata(pod *kubernetes.Pod) []MetadataIndex {
+	data := p.metaGen.PodMetadata(pod)
+	return []MetadataIndex{
+		{
+			Index: pod.Metadata.UID,
+			Data:  data,
+		},
+	}
+}
+
+// GetIndexes returns the indexes for the given Pod
+func (p *PodUIDIndexer) GetIndexes(pod *kubernetes.Pod) []string {
+	return []string{pod.Metadata.UID}
 }
 
 // ContainerIndexer indexes pods based on all their containers IDs

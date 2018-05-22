@@ -142,6 +142,13 @@ func (p *Processor) ip(f *common.Field) common.MapStr {
 func (p *Processor) keyword(f *common.Field) common.MapStr {
 	property := getDefaultProperties(f)
 
+	fullName := f.Name
+	if f.Path != "" {
+		fullName = f.Path + "." + f.Name
+	}
+
+	defaultFields = append(defaultFields, fullName)
+
 	property["type"] = "keyword"
 	property["ignore_above"] = 1024
 
@@ -155,6 +162,13 @@ func (p *Processor) keyword(f *common.Field) common.MapStr {
 
 func (p *Processor) text(f *common.Field) common.MapStr {
 	properties := getDefaultProperties(f)
+
+	fullName := f.Name
+	if f.Path != "" {
+		fullName = f.Path + "." + f.Name
+	}
+
+	defaultFields = append(defaultFields, fullName)
 
 	properties["type"] = "text"
 
@@ -219,12 +233,12 @@ func (p *Processor) object(f *common.Field) common.MapStr {
 			dynProperties["index"] = "analyzed"
 		}
 		addDynamicTemplate(f, dynProperties, matchType("string"))
-	case "long":
-		dynProperties["type"] = f.ObjectType
-		addDynamicTemplate(f, dynProperties, matchType("long"))
 	case "keyword":
 		dynProperties["type"] = f.ObjectType
 		addDynamicTemplate(f, dynProperties, matchType("string"))
+	case "long", "double":
+		dynProperties["type"] = f.ObjectType
+		addDynamicTemplate(f, dynProperties, matchType(f.ObjectType))
 	}
 
 	properties := getDefaultProperties(f)

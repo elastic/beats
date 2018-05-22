@@ -46,7 +46,7 @@ func TestLoadTemplate(t *testing.T) {
 
 	tmpl, err := New(version.GetDefaultVersion(), index, client.GetVersion(), TemplateConfig{})
 	assert.NoError(t, err)
-	content, err := tmpl.Load(fieldsPath)
+	content, err := tmpl.LoadFile(fieldsPath)
 	assert.NoError(t, err)
 
 	loader := &Loader{
@@ -134,7 +134,7 @@ func TestLoadBeatsTemplate(t *testing.T) {
 
 		tmpl, err := New(version.GetDefaultVersion(), index, client.GetVersion(), TemplateConfig{})
 		assert.NoError(t, err)
-		content, err := tmpl.Load(fieldsPath)
+		content, err := tmpl.LoadFile(fieldsPath)
 		assert.NoError(t, err)
 
 		loader := &Loader{
@@ -183,7 +183,7 @@ func TestTemplateSettings(t *testing.T) {
 	}
 	tmpl, err := New(version.GetDefaultVersion(), "testbeat", client.GetVersion(), config)
 	assert.NoError(t, err)
-	content, err := tmpl.Load(fieldsPath)
+	content, err := tmpl.LoadFile(fieldsPath)
 	assert.NoError(t, err)
 
 	loader := &Loader{
@@ -237,7 +237,7 @@ func TestOverwrite(t *testing.T) {
 		Enabled: true,
 		Fields:  absPath + "/fields.yml",
 	})
-	loader, err := NewLoader(config, client, beatInfo)
+	loader, err := NewLoader(config, client, beatInfo, nil)
 	assert.NoError(t, err)
 	err = loader.Load()
 	assert.NoError(t, err)
@@ -252,7 +252,7 @@ func TestOverwrite(t *testing.T) {
 			},
 		},
 	})
-	loader, err = NewLoader(config, client, beatInfo)
+	loader, err = NewLoader(config, client, beatInfo, nil)
 	assert.NoError(t, err)
 	err = loader.Load()
 	assert.NoError(t, err)
@@ -273,7 +273,7 @@ func TestOverwrite(t *testing.T) {
 			},
 		},
 	})
-	loader, err = NewLoader(config, client, beatInfo)
+	loader, err = NewLoader(config, client, beatInfo, nil)
 	assert.NoError(t, err)
 	err = loader.Load()
 	assert.NoError(t, err)
@@ -341,7 +341,7 @@ func TestTemplateWithData(t *testing.T) {
 
 	tmpl, err := New(version.GetDefaultVersion(), "testindex", client.GetVersion(), TemplateConfig{})
 	assert.NoError(t, err)
-	content, err := tmpl.Load(fieldsPath)
+	content, err := tmpl.LoadFile(fieldsPath)
 	assert.NoError(t, err)
 
 	loader := &Loader{

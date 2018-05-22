@@ -17,6 +17,9 @@ PACKER_TEMPLATES_DIR?=${ES_BEATS}/dev-tools/packer ## @Building Directory of tem
 NOTICE_FILE?=../NOTICE.txt
 LICENSE_FILE?=../licenses/APACHE-LICENSE-2.0.txt
 ELASTIC_LICENSE_FILE?=../licenses/ELASTIC-LICENSE.txt
+SECCOMP_BINARY?=${BEAT_NAME}
+SECCOMP_BLACKLIST?=${ES_BEATS}/libbeat/common/seccomp/seccomp-profiler-blacklist.txt
+SECCOMP_ALLOWLIST?=${ES_BEATS}/libbeat/common/seccomp/seccomp-profiler-allow.txt
 
 space:=$() #
 comma:=,
@@ -79,9 +82,10 @@ PERM_EXEC?=$(shell [ `uname -s` = "Darwin" ] && echo "+111" || echo "/a+x")
 
 # Cross compiling targets
 CGO?=true ## @building if true, Build with C Go support
-TARGETS?="windows/amd64 windows/386 darwin/amd64" ## @building list of platforms/architecture to be built by "make package"
+TARGETS?="windows/amd64 windows/386 darwin/amd64 linux/arm" ## @building list of platforms/architecture to be built by "make package"
 TARGETS_OLD?="linux/amd64 linux/386" ## @building list of Debian6 architecture to be built by "make package" when CGO is true
 PACKAGES?=${BEAT_NAME}/deb ${BEAT_NAME}/rpm ${BEAT_NAME}/darwin ${BEAT_NAME}/win ${BEAT_NAME}/bin ## @Building List of OS to be supported by "make package"
+PACKAGES_EXPERIMENTAL?=${BEAT_NAME}/arm ## @Building List of experimental OS by "make package". Only build when SNAPSHOT=yes
 SNAPSHOT?=yes ## @Building If yes, builds a snapshot version
 BEATS_BUILDER_IMAGE?=tudorg/beats-builder ## @Building Name of the docker image to use when packaging the application
 BEATS_BUILDER_DEB_IMAGE?=tudorg/beats-builder-deb7 ## @Building Name of the docker image to use when packaging the application for Debian 7
@@ -95,6 +99,10 @@ ifeq ($(RACE_DETECTOR),1)
 	RACE=-race
 endif
 
+# Only build experimental targets for snapshots
+ifneq ($(SNAPSHOT),yes)
+	PACKAGES_EXPERIMENTAL=
+endif
 
 ### BUILDING ###
 
@@ -121,6 +129,7 @@ check: python-env prepare-tests ## @build Checks project and source code if ever
 	@goimports -local ${GOIMPORTS_LOCAL_PREFIX} -l ${GOFILES_NOVENDOR} | (! grep .) || (echo "Code differs from goimports' style ^" && false)
 	@${FIND} -name *.py -exec autopep8 -d --max-line-length 120  {} \; | (! grep . -q) || (echo "Code differs from autopep8's style" && false)
 	@${FIND} -wholename "*tests/system/test_*.py" -perm ${PERM_EXEC} -exec false {} + || (echo "Python test files shouldn't be executable, otherwise nose doesn't find them" && false)
+	@${FIND} -name "*.yml" -perm ${PERM_EXEC} -exec false {} + || (echo "YAML files should not be executable" && false)
 
 .PHONY: fmt
 fmt: python-env ## @build Runs `goimports -l -w` and `autopep8`on the project's source code, modifying any files that do not match its style.
@@ -317,6 +326,8 @@ ifeq ($(BEAT_NAME), libbeat)
 	@cp ${ES_BEATS}/libbeat/_meta/fields.generated.yml fields.yml
 else
 	@cat ${ES_BEATS}/libbeat/_meta/fields.generated.yml _meta/fields.generated.yml > fields.yml
+	mkdir -p include
+	go run  ${ES_BEATS}/dev-tools/cmd/asset/asset.go -pkg include fields.yml $(BEAT_NAME) > include/fields.go
 endif
 
 	@# Update docs
@@ -502,7 +513,8 @@ package: update package-setup
 		$(MAKE) prepare-package; \
 	fi
 
-	SNAPSHOT=${SNAPSHOT} BUILDID=${BUILDID} BEAT_PATH=${BEAT_PATH} BUILD_DIR=${PKG_BUILD_DIR} UPLOAD_DIR=${PKG_UPLOAD_DIR} $(MAKE) -C ${ES_BEATS}/dev-tools/packer ${PACKAGES} ${BUILD_DIR}/upload/build_id.txt
+	SNAPSHOT=${SNAPSHOT} BUILDID=${BUILDID} BEAT_PATH=${BEAT_PATH} BUILD_DIR=${PKG_BUILD_DIR} UPLOAD_DIR=${PKG_UPLOAD_DIR} $(MAKE) -C ${ES_BEATS}/dev-tools/packer ${PACKAGES} ${PACKAGES_EXPERIMENTAL} ${BUILD_DIR}/upload/build_id.txt
+
 	$(MAKE) fix-permissions
 	echo "Finished packages for ${BEAT_NAME}"
 
@@ -540,3 +552,23 @@ help: ## @help Show this help.
 
 help_variables: ## @help Show Makefile customizable variables.
 	@python ${ES_BEATS}/libbeat/scripts/generate_makefile_doc.py --variables $(MAKEFILE_LIST)
+
+# Generates a seccomp whitelist policy for the binary pointed to by
+# SECCOMP_BINARY.
+.PHONY: seccomp
+seccomp:
+	@go get github.com/elastic/beats/vendor/github.com/elastic/go-seccomp-bpf/cmd/seccomp-profiler
+	@test -f ${SECCOMP_BINARY} || (echo "${SECCOMP_BINARY} binary is not built."; false)
+	seccomp-profiler \
+	-b "$(shell grep -v ^# "${SECCOMP_BLACKLIST}")" \
+	-allow "$(shell grep -v ^# "${SECCOMP_ALLOWLIST}")" \
+	-t "${ES_BEATS}/libbeat/common/seccomp/policy.go.tpl" \
+	-pkg include \
+	-out "include/seccomp_linux_{{.GOARCH}}.go" \
+	${SECCOMP_BINARY}
+
+# Generates seccomp profiles based on the binaries produced by the package target.
+.PHONY: seccomp-package
+seccomp-package:
+	SECCOMP_BINARY=build/package/${BEAT_NAME}-linux-386 $(MAKE) seccomp
+	SECCOMP_BINARY=build/package/${BEAT_NAME}-linux-amd64 $(MAKE) seccomp

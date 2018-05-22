@@ -8,6 +8,7 @@ This file is generated! See scripts/docs_collector.py
   * <<filebeat-module-icinga>>
   * <<filebeat-module-iis>>
   * <<filebeat-module-kafka>>
+  * <<filebeat-module-kibana>>
   * <<filebeat-module-logstash>>
   * <<filebeat-module-mongodb>>
   * <<filebeat-module-mysql>>
@@ -27,6 +28,7 @@ include::modules/auditd.asciidoc[]
 include::modules/icinga.asciidoc[]
 include::modules/iis.asciidoc[]
 include::modules/kafka.asciidoc[]
+include::modules/kibana.asciidoc[]
 include::modules/logstash.asciidoc[]
 include::modules/mongodb.asciidoc[]
 include::modules/mysql.asciidoc[]

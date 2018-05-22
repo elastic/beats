@@ -1,7 +1,11 @@
 package prometheus
 
 import (
+	"math"
+	"strconv"
 	"strings"
+
+	"github.com/elastic/beats/libbeat/common"
 
 	dto "github.com/prometheus/client_model/go"
 )
@@ -72,6 +76,49 @@ func (m *commonMetric) GetValue(metric *dto.Metric) interface{} {
 	gauge := metric.GetGauge()
 	if gauge != nil {
 		return gauge.GetValue()
+	}
+
+	summary := metric.GetSummary()
+	if summary != nil {
+		value := common.MapStr{}
+		value["sum"] = summary.GetSampleSum()
+		value["count"] = summary.GetSampleCount()
+
+		quantiles := summary.GetQuantile()
+		percentileMap := common.MapStr{}
+		for _, quantile := range quantiles {
+			if !math.IsNaN(quantile.GetValue()) {
+				key := strconv.FormatFloat((100 * quantile.GetQuantile()), 'f', -1, 64)
+				percentileMap[key] = quantile.GetValue()
+			}
+
+		}
+
+		if len(percentileMap) != 0 {
+			value["percentile"] = percentileMap
+		}
+
+		return value
+	}
+
+	histogram := metric.GetHistogram()
+	if histogram != nil {
+		value := common.MapStr{}
+		value["sum"] = histogram.GetSampleSum()
+		value["count"] = histogram.GetSampleCount()
+
+		buckets := histogram.GetBucket()
+		bucketMap := common.MapStr{}
+		for _, bucket := range buckets {
+			key := strconv.FormatFloat(bucket.GetUpperBound(), 'f', -1, 64)
+			bucketMap[key] = bucket.GetCumulativeCount()
+		}
+
+		if len(bucketMap) != 0 {
+			value["bucket"] = bucketMap
+		}
+
+		return value
 	}
 
 	// Other types are not supported here

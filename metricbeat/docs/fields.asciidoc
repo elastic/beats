@@ -6480,6 +6480,16 @@ Kubernetes pod name
 
 --
 
+*`kubernetes.pod.uid`*::
++
+--
+type: keyword
+
+Kubernetes pod uid
+
+
+--
+
 *`kubernetes.namespace`*::
 +
 --
@@ -6553,6 +6563,103 @@ Kubernetes metrics
 Information and statistics of pods managed by kubernetes.
 
 
+
+[float]
+== apiserver fields
+
+Kubernetes API server metrics
+
+
+
+*`kubernetes.apiserver.request.client`*::
++
+--
+type: keyword
+
+Client doing the requests
+
+
+--
+
+*`kubernetes.apiserver.request.resource`*::
++
+--
+type: keyword
+
+Requested resource
+
+
+--
+
+*`kubernetes.apiserver.request.subresource`*::
++
+--
+type: keyword
+
+Requested subresource
+
+
+--
+
+*`kubernetes.apiserver.request.scope`*::
++
+--
+type: keyword
+
+Request scope (cluster, namespace, resource)
+
+
+--
+
+*`kubernetes.apiserver.request.verb`*::
++
+--
+type: keyword
+
+Request HTTP verb
+
+
+--
+
+*`kubernetes.apiserver.request.count`*::
++
+--
+type: long
+
+Total number of requests
+
+
+--
+
+*`kubernetes.apiserver.request.latency.sum`*::
++
+--
+type: long
+
+Requests latency, sum of latencies in microseconds
+
+
+--
+
+*`kubernetes.apiserver.request.latency.count`*::
++
+--
+type: long
+
+Request latency, number of requests
+
+
+--
+
+*`kubernetes.apiserver.request.latency.bucket`*::
++
+--
+type: object
+
+Request latency histagram buckets
+
+
+--
 
 [float]
 == container fields
@@ -11968,6 +12075,27 @@ format: bytes
 
 Used memory lua.
 
+
+--
+
+*`redis.info.memory.max.value`*::
++
+--
+type: long
+
+format: bytes
+
+Memory limit.
+
+
+--
+
+*`redis.info.memory.max.policy`*::
++
+--
+type: keyword
+
+Eviction policy to use when memory limit is reached.
 
 --
 

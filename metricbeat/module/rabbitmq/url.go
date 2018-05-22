@@ -9,6 +9,7 @@ const (
 	ConnectionsPath = "/api/connections"
 	ExchangesPath   = "/api/exchanges"
 	NodesPath       = "/api/nodes"
+	OverviewPath    = "/api/overview"
 	QueuesPath      = "/api/queues"
 )
 

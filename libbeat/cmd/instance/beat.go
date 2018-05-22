@@ -19,12 +19,14 @@ import (
 	"go.uber.org/zap"
 
 	"github.com/elastic/beats/libbeat/api"
+	"github.com/elastic/beats/libbeat/asset"
 	"github.com/elastic/beats/libbeat/beat"
 	"github.com/elastic/beats/libbeat/cfgfile"
 	"github.com/elastic/beats/libbeat/cloudid"
 	"github.com/elastic/beats/libbeat/common"
 	"github.com/elastic/beats/libbeat/common/cfgwarn"
 	"github.com/elastic/beats/libbeat/common/file"
+	"github.com/elastic/beats/libbeat/common/seccomp"
 	"github.com/elastic/beats/libbeat/dashboards"
 	"github.com/elastic/beats/libbeat/keystore"
 	"github.com/elastic/beats/libbeat/logp"
@@ -39,7 +41,6 @@ import (
 	svc "github.com/elastic/beats/libbeat/service"
 	"github.com/elastic/beats/libbeat/template"
 	"github.com/elastic/beats/libbeat/version"
-	"github.com/elastic/go-seccomp-bpf"
 	"github.com/elastic/go-sysinfo"
 	"github.com/elastic/go-sysinfo/types"
 
@@ -172,6 +173,11 @@ func NewBeat(name, indexPrefix, v string) (*Beat, error) {
 		return nil, err
 	}
 
+	fields, err := asset.GetFields(name + "/fields.yml")
+	if err != nil {
+		return nil, err
+	}
+
 	b := beat.Beat{
 		Info: beat.Info{
 			Beat:        name,
@@ -181,6 +187,7 @@ func NewBeat(name, indexPrefix, v string) (*Beat, error) {
 			Hostname:    hostname,
 			UUID:        uuid.NewV4(),
 		},
+		Fields: fields,
 	}
 
 	return &Beat{Beat: b}, nil
@@ -281,10 +288,8 @@ func (b *Beat) launch(bt beat.Creator) error {
 	svc.BeforeRun()
 	defer svc.Cleanup()
 
-	if b.Config.Seccomp == nil || b.Config.Seccomp.Enabled() {
-		if err = loadSeccompFilter(b.Config.Seccomp); err != nil {
-			return err
-		}
+	if err = seccomp.LoadFilter(b.Config.Seccomp); err != nil {
+		return err
 	}
 
 	beater, err := b.createBeater(bt)
@@ -680,7 +685,7 @@ func (b *Beat) templateLoadingCallback() (func(esClient *elasticsearch.Client) e
 			b.Config.Template = common.NewConfig()
 		}
 
-		loader, err := template.NewLoader(b.Config.Template, esClient, b.Info)
+		loader, err := template.NewLoader(b.Config.Template, esClient, b.Info, b.Fields)
 		if err != nil {
 			return fmt.Errorf("Error creating Elasticsearch template loader: %v", err)
 		}
@@ -778,53 +783,4 @@ func logSystemInfo(info beat.Info) {
 			log.Infow("Process info", "process", process)
 		}
 	}
-}
-
-// loadSeccompFilter loads a seccomp system call filter into the kernel for
-// this process. This feature is only available on Linux and our implementation
-// requires Linux 3.17 or newer. This only returns an error if there is a
-// configuration problem. An errors interfacing with the kernel are only logged.
-func loadSeccompFilter(c *common.Config) error {
-	if runtime.GOOS != "linux" {
-		return nil
-	}
-
-	filter := seccomp.Filter{
-		NoNewPrivs: true,
-		Flag:       seccomp.FilterFlagTSync,
-		Policy: seccomp.Policy{
-			DefaultAction: seccomp.ActionAllow,
-			Syscalls: []seccomp.SyscallGroup{
-				{
-					Action: seccomp.ActionErrno,
-					Names: []string{
-						"execve",
-						"fork",
-						"vfork",
-						"execveat",
-					},
-				},
-			},
-		},
-	}
-
-	if c != nil && (c.HasField("default_profile") || c.HasField("syscalls")) {
-		var p seccomp.Policy
-		if err := c.Unpack(&p); err != nil {
-			return err
-		}
-		filter.Policy = p
-	}
-
-	log := logp.L().With("seccomp_filter", filter)
-	if err := seccomp.LoadFilter(filter); err != nil {
-		log.Warnf("seccomp BPF filter could not be installed (perhaps the "+
-			"kernel doesn't support this feature): %v", err)
-
-		// Only log the error. This is a non-fatal issue.
-		return nil
-	}
-
-	log.Infow("seccomp BPF filter successfully installed")
-	return nil
 }
