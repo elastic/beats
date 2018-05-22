@@ -4,7 +4,7 @@ import (
 	"reflect"
 	"testing"
 
-	"github.com/docker/docker/api/types"
+	"docker.io/go-docker/api/types"
 
 	"github.com/elastic/beats/libbeat/common"
 	"github.com/elastic/beats/metricbeat/module/docker"

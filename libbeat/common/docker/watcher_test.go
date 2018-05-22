@@ -4,8 +4,8 @@ import (
 	"testing"
 	"time"
 
-	"github.com/docker/docker/api/types"
-	"github.com/docker/docker/api/types/events"
+	"docker.io/go-docker/api/types"
+	"docker.io/go-docker/api/types/events"
 	"github.com/stretchr/testify/assert"
 	"golang.org/x/net/context"
 
