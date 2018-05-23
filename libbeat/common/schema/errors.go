@@ -6,25 +6,10 @@ import (
 	"github.com/elastic/beats/libbeat/logp"
 )
 
-type Errors []Error
+type Errors []*Error
 
-func NewErrors() *Errors {
-	return &Errors{}
-}
-
-func (errs *Errors) AddError(err *Error) {
-	*errs = append(*errs, *err)
-}
-
-func (errs *Errors) AddErrors(errors *Errors) {
-	if errors == nil {
-		return
-	}
-	*errs = append(*errs, *errors...)
-}
-
-func (errs *Errors) HasRequiredErrors() bool {
-	for _, err := range *errs {
+func (errs Errors) HasRequiredErrors() bool {
+	for _, err := range errs {
 		if err.IsType(RequiredType) {
 			return true
 		}
@@ -32,24 +17,24 @@ func (errs *Errors) HasRequiredErrors() bool {
 	return false
 }
 
-func (errs *Errors) Error() string {
-	error := "Required fields are missing: "
-	for _, err := range *errs {
+func (errs Errors) Error() string {
+	var required []string
+	for _, err := range errs {
 		if err.IsType(RequiredType) {
-			error = error + "," + err.key
+			required = append(required, err.key)
 		}
 	}
-	return error
+	return "Required fields are missing: " + strings.Join(required, ", ")
 }
 
 // Log logs all missing required and optional fields to the debug log.
-func (errs *Errors) Log() {
-	if len(*errs) == 0 {
+func (errs Errors) Log() {
+	if len(errs) == 0 {
 		return
 	}
 	var optional, required []string
 
-	for _, err := range *errs {
+	for _, err := range errs {
 		if err.IsType(RequiredType) {
 			required = append(required, err.key)
 		} else {

@@ -34,3 +34,16 @@ func (err *Error) IsType(errorType ErrorType) bool {
 func (err *Error) Error() string {
 	return fmt.Sprintf("Missing field: %s, Error: %s", err.key, err.message)
 }
+
+type KeyNotFoundError struct {
+	Key string
+	Err error
+}
+
+func (err *KeyNotFoundError) Error() string {
+	msg := fmt.Sprintf("Key `%s` not found", err.Key)
+	if err.Err != nil {
+		msg += ": " + err.Err.Error()
+	}
+	return msg
+}

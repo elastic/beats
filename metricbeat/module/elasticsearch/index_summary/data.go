@@ -3,6 +3,8 @@ package index_summary
 import (
 	"encoding/json"
 
+	"github.com/joeshaw/multierror"
+
 	"github.com/elastic/beats/libbeat/common"
 	s "github.com/elastic/beats/libbeat/common/schema"
 	c "github.com/elastic/beats/libbeat/common/schema/mapstriface"
@@ -49,7 +51,7 @@ var (
 	}
 )
 
-func eventMapping(r mb.ReporterV2, info elasticsearch.Info, content []byte) []error {
+func eventMapping(r mb.ReporterV2, info elasticsearch.Info, content []byte) error {
 	var all struct {
 		Data map[string]interface{} `json:"_all"`
 	}
@@ -57,10 +59,10 @@ func eventMapping(r mb.ReporterV2, info elasticsearch.Info, content []byte) []er
 	err := json.Unmarshal(content, &all)
 	if err != nil {
 		r.Error(err)
-		return []error{err}
+		return err
 	}
 
-	var errs []error
+	var errs multierror.Errors
 
 	fields, err := schema.Apply(all.Data)
 	if err != nil {
@@ -79,5 +81,5 @@ func eventMapping(r mb.ReporterV2, info elasticsearch.Info, content []byte) []er
 
 	r.Event(event)
 
-	return errs
+	return errs.Err()
 }

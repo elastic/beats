@@ -145,7 +145,7 @@ func Str(key string, opts ...schema.SchemaOption) schema.Conv {
 func getString(key string, data map[string]interface{}) (string, error) {
 	val, exists := data[key]
 	if !exists {
-		return "", fmt.Errorf("Key `%s` not found", key)
+		return "", &schema.KeyNotFoundError{Key: key}
 	}
 
 	str, ok := val.(string)

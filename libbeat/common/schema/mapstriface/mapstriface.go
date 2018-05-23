@@ -70,7 +70,7 @@ type ConvMap struct {
 }
 
 // Map drills down in the data dictionary by using the key
-func (convMap ConvMap) Map(key string, event common.MapStr, data map[string]interface{}) *schema.Errors {
+func (convMap ConvMap) Map(key string, event common.MapStr, data map[string]interface{}) schema.Errors {
 	subData, ok := data[convMap.Key].(map[string]interface{})
 	if !ok {
 		err := schema.NewError(convMap.Key, "Error accessing sub-dictionary")
@@ -80,10 +80,7 @@ func (convMap ConvMap) Map(key string, event common.MapStr, data map[string]inte
 			logp.Err("Error accessing sub-dictionary `%s`", convMap.Key)
 		}
 
-		errors := schema.NewErrors()
-		errors.AddError(err)
-
-		return errors
+		return schema.Errors{err}
 	}
 
 	subEvent := common.MapStr{}
@@ -107,7 +104,7 @@ func Dict(key string, s schema.Schema, opts ...DictSchemaOption) ConvMap {
 func toStrFromNum(key string, data map[string]interface{}) (interface{}, error) {
 	emptyIface, exists := data[key]
 	if !exists {
-		return false, fmt.Errorf("Key %s not found", key)
+		return false, &schema.KeyNotFoundError{Key: key}
 	}
 	switch emptyIface.(type) {
 	case int, int32, int64, uint, uint32, uint64, float32, float64:
@@ -127,7 +124,7 @@ func StrFromNum(key string, opts ...schema.SchemaOption) schema.Conv {
 func toStr(key string, data map[string]interface{}) (interface{}, error) {
 	emptyIface, err := common.MapStr(data).GetValue(key)
 	if err != nil {
-		return "", fmt.Errorf("Key %s not found: %s", key, err.Error())
+		return "", &schema.KeyNotFoundError{Key: key}
 	}
 	str, ok := emptyIface.(string)
 	if !ok {
@@ -144,7 +141,7 @@ func Str(key string, opts ...schema.SchemaOption) schema.Conv {
 func toIfc(key string, data map[string]interface{}) (interface{}, error) {
 	intf, err := common.MapStr(data).GetValue(key)
 	if err != nil {
-		return "", fmt.Errorf("Key %s not found: %s", key, err.Error())
+		return "", &schema.KeyNotFoundError{Key: key, Err: err}
 	}
 	return intf, nil
 }
@@ -157,7 +154,7 @@ func Ifc(key string, opts ...schema.SchemaOption) schema.Conv {
 func toBool(key string, data map[string]interface{}) (interface{}, error) {
 	emptyIface, exists := data[key]
 	if !exists {
-		return false, fmt.Errorf("Key %s not found", key)
+		return false, &schema.KeyNotFoundError{Key: key}
 	}
 	boolean, ok := emptyIface.(bool)
 	if !ok {
@@ -174,7 +171,7 @@ func Bool(key string, opts ...schema.SchemaOption) schema.Conv {
 func toInteger(key string, data map[string]interface{}) (interface{}, error) {
 	emptyIface, exists := data[key]
 	if !exists {
-		return 0, fmt.Errorf("Key %s not found", key)
+		return 0, &schema.KeyNotFoundError{Key: key}
 	}
 	switch emptyIface.(type) {
 	case int64:
@@ -208,7 +205,7 @@ func Float(key string, opts ...schema.SchemaOption) schema.Conv {
 func toFloat(key string, data map[string]interface{}) (interface{}, error) {
 	emptyIface, exists := data[key]
 	if !exists {
-		return 0, fmt.Errorf("key %s not found", key)
+		return 0, &schema.KeyNotFoundError{Key: key}
 	}
 	switch emptyIface.(type) {
 	case float64:
@@ -242,7 +239,7 @@ func Int(key string, opts ...schema.SchemaOption) schema.Conv {
 func toTime(key string, data map[string]interface{}) (interface{}, error) {
 	emptyIface, exists := data[key]
 	if !exists {
-		return common.Time(time.Unix(0, 0)), fmt.Errorf("Key %s not found", key)
+		return common.Time(time.Unix(0, 0)), &schema.KeyNotFoundError{Key: key}
 	}
 
 	switch emptyIface.(type) {

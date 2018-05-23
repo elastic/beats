@@ -13,7 +13,7 @@ type Schema map[string]Mapper
 type Mapper interface {
 	// Map applies the Mapper conversion on the data and adds the result
 	// to the event on the key.
-	Map(key string, event common.MapStr, data map[string]interface{}) *Errors
+	Map(key string, event common.MapStr, data map[string]interface{}) Errors
 
 	HasKey(key string) bool
 }
@@ -25,26 +25,21 @@ type Conv struct {
 	Optional bool      // Whether to log errors if the key is not found
 }
 
-// Convertor function type
+// Converter function type
 type Converter func(key string, data map[string]interface{}) (interface{}, error)
 
 // Map applies the conversion on the data and adds the result
 // to the event on the key.
-func (conv Conv) Map(key string, event common.MapStr, data map[string]interface{}) *Errors {
+func (conv Conv) Map(key string, event common.MapStr, data map[string]interface{}) Errors {
 	value, err := conv.Func(conv.Key, data)
 	if err != nil {
-		err := NewError(key, err.Error())
-		if conv.Optional {
-			err.SetType(OptionalType)
+		if _, keyNotFound := err.(*KeyNotFoundError); keyNotFound && conv.Optional {
+			return nil
 		}
+		return Errors{NewError(key, err.Error())}
 
-		errs := NewErrors()
-		errs.AddError(err)
-		return errs
-
-	} else {
-		event[key] = value
 	}
+	event[key] = value
 	return nil
 }
 
@@ -55,7 +50,7 @@ func (conv Conv) HasKey(key string) bool {
 // implements Mapper interface for structure
 type Object map[string]Mapper
 
-func (o Object) Map(key string, event common.MapStr, data map[string]interface{}) *Errors {
+func (o Object) Map(key string, event common.MapStr, data map[string]interface{}) Errors {
 	subEvent := common.MapStr{}
 	errs := applySchemaToEvent(subEvent, data, o)
 	event[key] = subEvent
@@ -68,14 +63,17 @@ func (o Object) HasKey(key string) bool {
 
 // ApplyTo adds the fields extracted from data, converted using the schema, to the
 // event map.
-func (s Schema) ApplyTo(event common.MapStr, data map[string]interface{}) (common.MapStr, *Errors) {
+func (s Schema) ApplyTo(event common.MapStr, data map[string]interface{}) (common.MapStr, error) {
 	errors := applySchemaToEvent(event, data, s)
-	errors.Log()
-	return event, errors
+	if len(errors) > 0 {
+		errors.Log()
+		return event, errors
+	}
+	return event, nil
 }
 
 // Apply converts the fields extracted from data, using the schema, into a new map and reports back the errors.
-func (s Schema) Apply(data map[string]interface{}) (common.MapStr, *Errors) {
+func (s Schema) Apply(data map[string]interface{}) (common.MapStr, error) {
 	return s.ApplyTo(common.MapStr{}, data)
 }
 
@@ -93,11 +91,11 @@ func hasKey(key string, mappers map[string]Mapper) bool {
 	return false
 }
 
-func applySchemaToEvent(event common.MapStr, data map[string]interface{}, conversions map[string]Mapper) *Errors {
-	errs := NewErrors()
+func applySchemaToEvent(event common.MapStr, data map[string]interface{}, conversions map[string]Mapper) Errors {
+	var errs Errors
 	for key, mapper := range conversions {
 		errors := mapper.Map(key, event, data)
-		errs.AddErrors(errors)
+		errs = append(errs, errors...)
 	}
 	return errs
 }

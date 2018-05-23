@@ -3,6 +3,8 @@ package node_stats
 import (
 	"encoding/json"
 
+	"github.com/joeshaw/multierror"
+
 	"github.com/elastic/beats/libbeat/common"
 	s "github.com/elastic/beats/libbeat/common/schema"
 	c "github.com/elastic/beats/libbeat/common/schema/mapstriface"
@@ -86,16 +88,16 @@ type nodesStruct struct {
 	Nodes       map[string]map[string]interface{} `json:"nodes"`
 }
 
-func eventsMapping(r mb.ReporterV2, content []byte) []error {
+func eventsMapping(r mb.ReporterV2, content []byte) error {
 
 	nodeData := &nodesStruct{}
 	err := json.Unmarshal(content, nodeData)
 	if err != nil {
 		r.Error(err)
-		return []error{err}
+		return err
 	}
 
-	var errs []error
+	var errs multierror.Errors
 	for name, node := range nodeData.Nodes {
 		event := mb.Event{}
 
@@ -116,5 +118,5 @@ func eventsMapping(r mb.ReporterV2, content []byte) []error {
 		event.RootFields.Put("service.name", "elasticsearch")
 		r.Event(event)
 	}
-	return errs
+	return errs.Err()
 }

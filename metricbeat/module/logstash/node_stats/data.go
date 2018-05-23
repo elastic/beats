@@ -16,6 +16,6 @@ var (
 	}
 )
 
-func eventMapping(node map[string]interface{}) (common.MapStr, *s.Errors) {
+func eventMapping(node map[string]interface{}) (common.MapStr, error) {
 	return schema.Apply(node)
 }

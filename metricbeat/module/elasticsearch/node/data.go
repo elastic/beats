@@ -3,6 +3,8 @@ package node
 import (
 	"encoding/json"
 
+	"github.com/joeshaw/multierror"
+
 	"github.com/elastic/beats/libbeat/common"
 	s "github.com/elastic/beats/libbeat/common/schema"
 	c "github.com/elastic/beats/libbeat/common/schema/mapstriface"
@@ -40,7 +42,7 @@ var (
 	}
 )
 
-func eventsMapping(r mb.ReporterV2, content []byte) []error {
+func eventsMapping(r mb.ReporterV2, content []byte) error {
 	nodesStruct := struct {
 		ClusterName string                            `json:"cluster_name"`
 		Nodes       map[string]map[string]interface{} `json:"nodes"`
@@ -49,10 +51,10 @@ func eventsMapping(r mb.ReporterV2, content []byte) []error {
 	err := json.Unmarshal(content, &nodesStruct)
 	if err != nil {
 		r.Error(err)
-		return []error{err}
+		return err
 	}
 
-	var errs []error
+	var errs multierror.Errors
 
 	for name, node := range nodesStruct.Nodes {
 
@@ -75,9 +77,9 @@ func eventsMapping(r mb.ReporterV2, content []byte) []error {
 		r.Event(event)
 	}
 
-	return errs
+	return errs.Err()
 }
 
-func eventMapping(node map[string]interface{}) (common.MapStr, *s.Errors) {
+func eventMapping(node map[string]interface{}) (common.MapStr, error) {
 	return schema.Apply(node)
 }

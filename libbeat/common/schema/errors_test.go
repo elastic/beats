@@ -7,9 +7,8 @@ import (
 )
 
 func TestErrors(t *testing.T) {
-	errs := NewErrors()
-	err := NewError("test", "Hello World")
-	errs.AddError(err)
+	var errs Errors
+	errs = append(errs, NewError("test", "Hello World"))
 
 	assert.True(t, errs.HasRequiredErrors())
 }
