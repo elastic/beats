@@ -23,6 +23,8 @@ metricbeat.modules:
   period: 10s
   hosts: ["localhost"]
   namespace: "metrics"
+  #username: "user"
+  #password: "secret"
   jmx.mappings:
     - mbean: 'java.lang:type=Runtime'
       attributes:
@@ -43,7 +45,7 @@ metricbeat.modules:
     #       field: gc.cms_collection_count
 ----
 
-This module supports TLS connection when using `ssl` config field, as described in <<configuration-ssl>>.
+This module supports TLS connection when using `ssl` config field, as described in <<configuration-ssl>>. It also supports the options described in <<module-http-config-options>>.
 
 [float]
 === Metricsets

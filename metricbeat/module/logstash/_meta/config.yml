@@ -1,2 +1,4 @@
 - module: logstash
   hosts: ["localhost:9600"]
+  #username: "user"
+  #password: "secret"

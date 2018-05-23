@@ -3,6 +3,8 @@
   period: 10s
   hosts: ["localhost"]
   namespace: "metrics"
+  #username: "user"
+  #password: "secret"
   jmx.mappings:
     - mbean: 'java.lang:type=Runtime'
       attributes:
