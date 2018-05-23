@@ -84,7 +84,7 @@ func eventMappingXPack(r mb.ReporterV2, m *MetricSet, info elasticsearch.Info, c
 	event.RootFields.Put("indices_stats._all", fields)
 	event.RootFields.Put("cluser_uuid", info.ClusterID)
 	event.RootFields.Put("timestamp", common.Time(time.Now()))
-	event.RootFields.Put("interval_ms", m.Module().Config().Period.Nanoseconds()/1000/1000)
+	event.RootFields.Put("interval_ms", m.Module().Config().Period/time.Millisecond)
 	event.RootFields.Put("type", "indices_stats")
 	event.RootFields.Put("source_node", sourceNode)
 
