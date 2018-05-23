@@ -11,6 +11,7 @@ import (
 	"github.com/elastic/beats/libbeat/common"
 	"github.com/elastic/beats/libbeat/common/streambuf"
 	"github.com/elastic/beats/libbeat/logp"
+	"github.com/elastic/beats/packetbeat/protos/tcp"
 )
 
 // Http Message
@@ -180,9 +181,10 @@ func (*parser) parseHTTPLine(s *stream, m *message) (cont, ok, complete bool) {
 		m.method = common.NetString(fline[:afterMethodIdx])
 		m.requestURI = common.NetString(fline[afterMethodIdx+1 : afterRequestURIIdx])
 
-		if bytes.Equal(fline[afterRequestURIIdx+1:afterRequestURIIdx+len(constHTTPVersion)+1], constHTTPVersion) {
+		versionIdx := afterRequestURIIdx + len(constHTTPVersion) + 1
+		if len(fline) > versionIdx && bytes.Equal(fline[afterRequestURIIdx+1:versionIdx], constHTTPVersion) {
 			m.isRequest = true
-			version = fline[afterRequestURIIdx+len(constHTTPVersion)+1:]
+			version = fline[versionIdx:]
 		} else {
 			if isDebug {
 				debugf("Couldn't understand HTTP version: %s", fline)
@@ -550,6 +552,27 @@ func (parser *parser) shouldIncludeInBody(contenttype []byte, capturedContentTyp
 		debugf("Should Include Body = false Content-Type %s", contenttype)
 	}
 	return false
+}
+
+func (m *message) headersReceived() bool {
+	return m.headerOffset > 0
+}
+
+func (m *message) getEndpoints() (src *common.Endpoint, dst *common.Endpoint) {
+	src = &common.Endpoint{
+		IP:   m.tcpTuple.SrcIP.String(),
+		Port: m.tcpTuple.SrcPort,
+		Proc: string(m.cmdlineTuple.Src),
+	}
+	dst = &common.Endpoint{
+		IP:   m.tcpTuple.DstIP.String(),
+		Port: m.tcpTuple.DstPort,
+		Proc: string(m.cmdlineTuple.Dst),
+	}
+	if m.direction == tcp.TCPDirectionReverse {
+		src, dst = dst, src
+	}
+	return src, dst
 }
 
 func isVersion(v version, major, minor uint8) bool {

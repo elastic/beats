@@ -23,9 +23,9 @@ BEATS_YML_NAME="{{.beat_name}}-linux-{{.arch}}"
 # create deb
 FPM_ARGS=(
         --force -s dir -t deb
-        -n {{.beat_pkg_name}} -v ${VERSION}
+        -n {{.beat_pkg_name}}{{.beat_pkg_suffix}} -v ${VERSION}
         --vendor "{{.beat_vendor}}"
-        --license "{{.beat_license}}"
+        --license $(echo {{.beat_license}} | tr " " "-")
         --architecture {{.deb_arch}}
         --description "{{.beat_description}}"
         --url {{.beat_url}}
@@ -36,11 +36,15 @@ FPM_ARGS=(
         beatname-${RUNID}.sh=/usr/bin/{{.beat_name}}
         {{.beat_name}}-linux-{{.arch}}=/usr/share/{{.beat_name}}/bin/{{.beat_name}}
         ${BEATS_YML_NAME}.yml=/etc/{{.beat_name}}/{{.beat_name}}.yml
-        ${BEATS_YML_NAME}.reference.yml=/etc/{{.beat_name}}/{{.beat_name}}.reference.yml
         fields.yml=/etc/{{.beat_name}}/fields.yml
         ${RUNID}.service=/lib/systemd/system/{{.beat_pkg_name}}.service
         god-linux-{{.arch}}=/usr/share/{{.beat_name}}/bin/{{.beat_name}}-god
   )
+
+if [ -z "${BEAT_REF_YAML}" ] || [ ${BEAT_REF_YAML} = true ]; then
+  FPM_ARGS+=(${BEATS_YML_NAME}.reference.yml=/etc/{{.beat_name}}/{{.beat_name}}.reference.yml)
+fi
+
 
 if [ -d modules.d-linux ]; then
   FPM_ARGS+=(modules.d-linux/=/etc/{{.beat_name}}/modules.d/)
@@ -49,11 +53,10 @@ fi
 fpm "${FPM_ARGS[@]}"
 
 # move and rename to use the elastic conventions
-mkdir -p upload
-mv {{.beat_pkg_name}}_${VERSION}_{{.deb_arch}}.deb upload/{{.beat_name}}-${VERSION}-{{.deb_arch}}.deb
-echo "Created upload/{{.beat_name}}-${VERSION}-{{.deb_arch}}.deb"
+mv {{.beat_pkg_name}}{{.beat_pkg_suffix}}_${VERSION}_{{.deb_arch}}.deb /upload/{{.beat_name}}{{.beat_pkg_suffix}}-${VERSION}-{{.deb_arch}}.deb
+echo "Created /upload/{{.beat_name}}{{.beat_pkg_suffix}}-${VERSION}-{{.deb_arch}}.deb"
 
 # create sha512 file
-cd upload
-sha512sum {{.beat_name}}-${VERSION}-{{.deb_arch}}.deb > {{.beat_name}}-${VERSION}-{{.deb_arch}}.deb.sha512
-echo "Created upload/{{.beat_name}}-${VERSION}-{{.deb_arch}}.deb.sha512"
+cd /upload
+sha512sum {{.beat_name}}{{.beat_pkg_suffix}}-${VERSION}-{{.deb_arch}}.deb > {{.beat_name}}{{.beat_pkg_suffix}}-${VERSION}-{{.deb_arch}}.deb.sha512
+echo "Created /upload/{{.beat_name}}{{.beat_pkg_suffix}}-${VERSION}-{{.deb_arch}}.deb.sha512"

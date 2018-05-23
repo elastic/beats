@@ -7,9 +7,12 @@ sys.path.append(os.path.join(os.path.dirname(__file__), '../../../libbeat/tests/
 from beat.beat import TestCase
 
 COMMON_FIELDS = ["@timestamp", "beat", "metricset.name", "metricset.host",
-                 "metricset.module", "metricset.rtt"]
+                 "metricset.module", "metricset.rtt", "host.name"]
 
 INTEGRATION_TESTS = os.environ.get('INTEGRATION_TESTS', False)
+
+import logging
+logging.getLogger("urllib3").setLevel(logging.WARNING)
 
 
 class BaseTest(TestCase):
@@ -62,7 +65,7 @@ class BaseTest(TestCase):
         """
         log = self.get_log()
 
-        pattern = self.build_log_regex("[cfgwarn]")
+        pattern = self.build_log_regex("\[cfgwarn\]")
         log = pattern.sub("", log)
 
         # Jenkins runs as a Windows service and when Jenkins executes these
@@ -74,7 +77,32 @@ class BaseTest(TestCase):
             for r in replace:
                 pattern = self.build_log_regex(r)
                 log = pattern.sub("", log)
-        self.assertNotRegexpMatches(log, "ERROR|WARN")
+        self.assertNotRegexpMatches(log, "\tERROR\t|\tWARN\t")
 
     def build_log_regex(self, message):
         return re.compile(r"^.*\t(?:ERROR|WARN)\t.*" + message + r".*$", re.MULTILINE)
+
+    def check_metricset(self, module, metricset, hosts, fields=[]):
+        """
+        Method to test a metricset for its fields
+        """
+        self.render_config_template(modules=[{
+            "name": module,
+            "metricsets": [metricset],
+            "hosts": hosts,
+            "period": "1s",
+        }])
+        proc = self.start_beat()
+        self.wait_until(lambda: self.output_lines() > 0)
+        proc.check_kill_and_wait()
+        self.assert_no_logged_warnings()
+
+        output = self.read_output_json()
+        self.assertTrue(len(output) >= 1)
+        evt = output[0]
+        print(evt)
+
+        fields = COMMON_FIELDS + fields
+        self.assertItemsEqual(self.de_dot(fields), evt.keys())
+
+        self.assert_fields_are_documented(evt)

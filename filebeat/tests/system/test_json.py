@@ -20,7 +20,6 @@ class Test(BaseTest):
 
         os.mkdir(self.working_dir + "/log/")
         self.copy_files(["logs/docker.log"],
-                        source_dir="../files",
                         target_dir="log")
 
         proc = self.start_beat()
@@ -48,7 +47,6 @@ class Test(BaseTest):
 
         os.mkdir(self.working_dir + "/log/")
         self.copy_files(["logs/docker.log"],
-                        source_dir="../files",
                         target_dir="log")
 
         proc = self.start_beat()
@@ -81,7 +79,6 @@ class Test(BaseTest):
 
         os.mkdir(self.working_dir + "/log/")
         self.copy_files(["logs/docker_multiline.log"],
-                        source_dir="../files",
                         target_dir="log")
 
         proc = self.start_beat()
@@ -116,7 +113,6 @@ class Test(BaseTest):
 
         os.mkdir(self.working_dir + "/log/")
         self.copy_files(["logs/json_override.log"],
-                        source_dir="../files",
                         target_dir="log")
 
         proc = self.start_beat()
@@ -140,7 +136,6 @@ class Test(BaseTest):
         )
         os.mkdir(self.working_dir + "/log/")
         self.copy_files(["logs/json_tag.log"],
-                        source_dir="../files",
                         target_dir="log")
 
         proc = self.start_beat()
@@ -208,7 +203,6 @@ class Test(BaseTest):
         )
         os.mkdir(self.working_dir + "/log/")
         self.copy_files(["logs/json_timestamp.log"],
-                        source_dir="../files",
                         target_dir="log")
 
         proc = self.start_beat()
@@ -250,7 +244,6 @@ class Test(BaseTest):
         )
         os.mkdir(self.working_dir + "/log/")
         self.copy_files(["logs/json_type.log"],
-                        source_dir="../files",
                         target_dir="log")
 
         proc = self.start_beat()
@@ -295,7 +288,6 @@ class Test(BaseTest):
 
         os.mkdir(self.working_dir + "/log/")
         self.copy_files(["logs/json_null.log"],
-                        source_dir="../files",
                         target_dir="log")
 
         proc = self.start_beat()
@@ -405,7 +397,6 @@ class Test(BaseTest):
 
         os.mkdir(self.working_dir + "/log/")
         self.copy_files(["logs/json_null.log"],
-                        source_dir="../files",
                         target_dir="log")
 
         proc = self.start_beat()
@@ -444,7 +435,6 @@ class Test(BaseTest):
         )
         os.mkdir(self.working_dir + "/log/")
         self.copy_files(["logs/json_int.log"],
-                        source_dir="../files",
                         target_dir="log")
 
         proc = self.start_beat()

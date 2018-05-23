@@ -39,7 +39,7 @@ func TestData(t *testing.T) {
 	}
 
 	fullEvent := mbtest.StandardizeEvent(ms, events[len(events)-1], core.AddDatasetToEvent)
-	mbtest.WriteEventToDataJSON(t, fullEvent)
+	mbtest.WriteEventToDataJSON(t, fullEvent, "")
 }
 
 func TestDetectDeletedFiles(t *testing.T) {

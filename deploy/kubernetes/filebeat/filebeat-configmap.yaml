@@ -10,10 +10,10 @@ metadata:
 data:
   filebeat.yml: |-
     filebeat.config:
-      prospectors:
-        # Mounted `filebeat-prospectors` configmap:
-        path: ${path.config}/prospectors.d/*.yml
-        # Reload prospectors configs as they change:
+      inputs:
+        # Mounted `filebeat-inputs` configmap:
+        path: ${path.config}/inputs.d/*.yml
+        # Reload inputs configs as they change:
         reload.enabled: false
       modules:
         path: ${path.config}/modules.d/*.yml
@@ -34,7 +34,7 @@ data:
 apiVersion: v1
 kind: ConfigMap
 metadata:
-  name: filebeat-prospectors
+  name: filebeat-inputs
   namespace: kube-system
   labels:
     k8s-app: filebeat

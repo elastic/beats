@@ -90,7 +90,7 @@ class TestCommands(BaseTest):
             extra_args=["--setup",
                         "--path.config", self.working_dir,
                         "-E", "setup.dashboards.file=" +
-                        os.path.join("../../dashboards/testdata", "testbeat-dashboards.zip"),
+                        os.path.join(self.beat_path, "tests", "files", "testbeat-dashboards.zip"),
                         "-E", "setup.dashboards.beat=testbeat",
                         "-E", "setup.kibana.protocol=http",
                         "-E", "setup.kibana.host=" + self.get_kibana_host(),

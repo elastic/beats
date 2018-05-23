@@ -9,14 +9,14 @@
 			"revisionTime": "2017-05-24T00:36:31Z"
 		},
 		{
-			"checksumSHA1": "GCpYz281OE/XkAQK23BLr+nK6O0=",
+			"checksumSHA1": "pH1jOw5Kfigc2tteo6KlaU9+JE8=",
 			"origin": "github.com/urso/sarama",
 			"path": "github.com/Shopify/sarama",
-			"revision": "c292021939f5aba53b3ffc2cb09c7aadb32a42df",
+			"revision": "32b4ad5c9537ed14e471779b76713ff65420db39",
 			"revisionTime": "2016-11-23T00:27:23Z",
 			"tree": true,
-			"version": "v1.12/enh/offset-replica-id",
-			"versionExact": "v1.12/enh/offset-replica-id"
+			"version": "v1.16.0/enh/offset-replica-id",
+			"versionExact": "v1.16.0/enh/offset-replica-id"
 		},
 		{
 			"checksumSHA1": "DYv6Q1+VfnUVxMwvk5IshAClLvw=",
@@ -369,44 +369,44 @@
 			"revisionTime": "2016-08-05T00:47:13Z"
 		},
 		{
-			"checksumSHA1": "xnqOjimkuBpJ7ecRgl04tAHomIw=",
+			"checksumSHA1": "hAB/G2FIWYwg3Rujgpt6UPtHMis=",
 			"path": "github.com/elastic/go-libaudit",
-			"revision": "bc9f53eaa23bfe3fbf023ab5ec7523336b4d9b2f",
-			"revisionTime": "2018-04-05T19:19:11Z",
-			"version": "v0.1.1",
-			"versionExact": "v0.1.1"
+			"revision": "55225d06b15c74082f9a7af75aa4284dbe48d20a",
+			"revisionTime": "2018-05-03T13:36:58Z",
+			"version": "v0.2.1",
+			"versionExact": "v0.2.1"
 		},
 		{
-			"checksumSHA1": "uu4544BCRlonueK+mB7549opucs=",
+			"checksumSHA1": "3V0tnqlCgmCXnbocuTqUKluynm8=",
 			"path": "github.com/elastic/go-libaudit/aucoalesce",
-			"revision": "bc9f53eaa23bfe3fbf023ab5ec7523336b4d9b2f",
-			"revisionTime": "2018-04-05T19:19:11Z",
-			"version": "v0.1.1",
-			"versionExact": "v0.1.1"
+			"revision": "55225d06b15c74082f9a7af75aa4284dbe48d20a",
+			"revisionTime": "2018-05-03T13:36:58Z",
+			"version": "v0.2.1",
+			"versionExact": "v0.2.1"
 		},
 		{
-			"checksumSHA1": "+L/ZGneCw2zrkK5Vlto9UB3LaEk=",
+			"checksumSHA1": "6OK3lLgocjmIUyLo8xNhYGpwE1E=",
 			"path": "github.com/elastic/go-libaudit/auparse",
-			"revision": "bc9f53eaa23bfe3fbf023ab5ec7523336b4d9b2f",
-			"revisionTime": "2018-04-05T19:19:11Z",
-			"version": "v0.1.1",
-			"versionExact": "v0.1.1"
+			"revision": "55225d06b15c74082f9a7af75aa4284dbe48d20a",
+			"revisionTime": "2018-05-03T13:36:58Z",
+			"version": "v0.2.1",
+			"versionExact": "v0.2.1"
 		},
 		{
-			"checksumSHA1": "aItCMksfjRftKVKgTd8Ro3yBB/0=",
+			"checksumSHA1": "Rr15sVPpJRQ+ggimmx3/0s1gUJc=",
 			"path": "github.com/elastic/go-libaudit/rule",
-			"revision": "bc9f53eaa23bfe3fbf023ab5ec7523336b4d9b2f",
-			"revisionTime": "2018-04-05T19:19:11Z",
-			"version": "v0.1.1",
-			"versionExact": "v0.1.1"
+			"revision": "55225d06b15c74082f9a7af75aa4284dbe48d20a",
+			"revisionTime": "2018-05-03T13:36:58Z",
+			"version": "v0.2.1",
+			"versionExact": "v0.2.1"
 		},
 		{
-			"checksumSHA1": "36UaYid29Kyhrsa5D8N6BoM8dVw=",
+			"checksumSHA1": "5C083BvwcAVSKquRXbxXa950/wE=",
 			"path": "github.com/elastic/go-libaudit/rule/flags",
-			"revision": "bc9f53eaa23bfe3fbf023ab5ec7523336b4d9b2f",
-			"revisionTime": "2018-04-05T19:19:11Z",
-			"version": "v0.1.1",
-			"versionExact": "v0.1.1"
+			"revision": "55225d06b15c74082f9a7af75aa4284dbe48d20a",
+			"revisionTime": "2018-05-03T13:36:58Z",
+			"version": "v0.2.1",
+			"versionExact": "v0.2.1"
 		},
 		{
 			"checksumSHA1": "3jizmlZPCyo6FAZY8Trk9jA8NH4=",
@@ -443,6 +443,35 @@
 			"path": "github.com/elastic/go-lumber/server/v2",
 			"revision": "616041e345fc33c97bc0eb0fa6b388aa07bca3e1",
 			"revisionTime": "2016-06-17T14:03:01Z"
+		},
+		{
+			"checksumSHA1": "TatpgVf9fhQp1GtNwSyNw5cgVKM=",
+			"path": "github.com/elastic/go-seccomp-bpf",
+			"revision": "5bed103a93993f24c58dd267faaab582f2373e31",
+			"revisionTime": "2018-05-17T07:14:48Z"
+		},
+		{
+			"checksumSHA1": "qTs7QT+GC2Dr4aFoLFHCkAOoVeU=",
+			"path": "github.com/elastic/go-seccomp-bpf/arch",
+			"revision": "5bed103a93993f24c58dd267faaab582f2373e31",
+			"revisionTime": "2018-05-17T07:14:48Z"
+		},
+		{
+			"path": "github.com/elastic/go-seccomp-bpf/cmd/seccomp-profile",
+			"revision": "",
+			"tree": true
+		},
+		{
+			"checksumSHA1": "5vWvvnghiBzyFo+KnD9iRlRc5Uw=",
+			"path": "github.com/elastic/go-seccomp-bpf/cmd/seccomp-profiler",
+			"revision": "5bed103a93993f24c58dd267faaab582f2373e31",
+			"revisionTime": "2018-05-17T07:14:48Z"
+		},
+		{
+			"checksumSHA1": "386906x6hGeUDkGJ1Wk0kUWWA4Y=",
+			"path": "github.com/elastic/go-seccomp-bpf/cmd/seccomp-profiler/disasm",
+			"revision": "5bed103a93993f24c58dd267faaab582f2373e31",
+			"revisionTime": "2018-05-17T07:14:48Z"
 		},
 		{
 			"checksumSHA1": "AaEPt+KMknLXze11YOnBGKzP3aA=",
@@ -955,18 +984,19 @@
 			"versionExact": "v1.5.0"
 		},
 		{
-			"checksumSHA1": "ZRP2NldqpFv4H1VsE70PEeqVjaw=",
+			"checksumSHA1": "TmMTaJIWueXrKneUOKMOgq75fKE=",
 			"origin": "github.com/elastic/fsevents",
 			"path": "github.com/fsnotify/fsevents",
-			"revision": "70114c7d2e1e4d1ae5179b285d65ea21aae111cc",
-			"revisionTime": "2018-04-06T06:16:07Z",
+			"revision": "4d5197691b054c220286f7c6ea167de9753d902d",
+			"revisionTime": "2018-05-02T14:11:16Z",
 			"tree": true
 		},
 		{
-			"checksumSHA1": "x2Km0Qy3WgJJnV19Zv25VwTJcBM=",
+			"checksumSHA1": "xGjYGUfsd36pm3CqdV/RYT87xxM=",
+			"origin": "github.com/adriansr/fsnotify",
 			"path": "github.com/fsnotify/fsnotify",
-			"revision": "4da3e2cfbabc9f751898f250b49f2439785783a1",
-			"revisionTime": "2017-03-29T04:21:07Z"
+			"revision": "c9bbe1f46f1da9904baf3916a4ba4aec7f1e9000",
+			"revisionTime": "2018-04-17T23:40:13Z"
 		},
 		{
 			"checksumSHA1": "2UmMbNHc8FBr98mJFN1k8ISOIHk=",

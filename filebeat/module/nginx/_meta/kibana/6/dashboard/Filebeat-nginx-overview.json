@@ -133,7 +133,7 @@
         "description": "",
         "hits": 0,
         "kibanaSavedObjectMeta": {
-          "searchSourceJSON": "{\"index\":\"filebeat-*\",\"query\":{\"language\":\"lucene\",\"query\":{\"query_string\":{\"analyze_wildcard\":true,\"default_field\":\"*\",\"query\":\"_exists_:nginx\"}}},\"filter\":[],\"highlight\":{\"pre_tags\":[\"@kibana-highlighted-field@\"],\"post_tags\":[\"@/kibana-highlighted-field@\"],\"fields\":{\"*\":{}},\"require_field_match\":false,\"fragment_size\":2147483647},\"highlightAll\":true,\"version\":true}"
+          "searchSourceJSON": "{\"index\":\"filebeat-*\",\"query\":{\"language\":\"lucene\",\"query\":{\"query_string\":{\"analyze_wildcard\":true,\"query\":\"_exists_:nginx\"}}},\"filter\":[],\"highlight\":{\"pre_tags\":[\"@kibana-highlighted-field@\"],\"post_tags\":[\"@/kibana-highlighted-field@\"],\"fields\":{\"*\":{}},\"require_field_match\":false,\"fragment_size\":2147483647},\"highlightAll\":true,\"version\":true}"
         },
         "sort": [
           "@timestamp",
@@ -151,7 +151,7 @@
         "description": "Dashboard for the Filebeat Nginx module",
         "hits": 0,
         "kibanaSavedObjectMeta": {
-          "searchSourceJSON": "{\"filter\":[],\"query\":{\"language\":\"lucene\",\"query\":{\"query_string\":{\"analyze_wildcard\":true,\"default_field\":\"*\",\"query\":\"*\"}}},\"highlightAll\":true,\"version\":true}"
+          "searchSourceJSON": "{\"filter\":[],\"query\":{\"language\":\"lucene\",\"query\":{\"query_string\":{\"analyze_wildcard\":true,\"query\":\"*\"}}},\"highlightAll\":true,\"version\":true}"
         },
         "optionsJSON": "{\"darkTheme\":false}",
         "panelsJSON": "[{\"col\":10,\"id\":\"Nginx-Access-Browsers\",\"panelIndex\":3,\"row\":12,\"size_x\":3,\"size_y\":3,\"type\":\"visualization\"},{\"col\":7,\"id\":\"Nginx-Access-OSes\",\"panelIndex\":4,\"row\":12,\"size_x\":3,\"size_y\":3,\"type\":\"visualization\"},{\"col\":1,\"id\":\"Nginx-Access-Map\",\"panelIndex\":8,\"row\":2,\"size_x\":12,\"size_y\":4,\"type\":\"visualization\"},{\"col\":1,\"id\":\"b70b1b20-a1f4-11e7-928f-5dbe6f6f5519\",\"panelIndex\":13,\"row\":6,\"size_x\":12,\"size_y\":3,\"type\":\"visualization\"},{\"col\":7,\"id\":\"9184fa00-a1f5-11e7-928f-5dbe6f6f5519\",\"panelIndex\":14,\"row\":9,\"size_x\":6,\"size_y\":3,\"type\":\"visualization\"},{\"col\":1,\"id\":\"46322e50-a1f6-11e7-928f-5dbe6f6f5519\",\"panelIndex\":15,\"row\":9,\"size_x\":6,\"size_y\":3,\"type\":\"visualization\"},{\"col\":1,\"id\":\"0dd6f320-a29f-11e7-928f-5dbe6f6f5519\",\"panelIndex\":16,\"row\":12,\"size_x\":6,\"size_y\":3,\"type\":\"visualization\"},{\"size_x\":12,\"size_y\":1,\"panelIndex\":17,\"type\":\"visualization\",\"id\":\"97109780-a2a5-11e7-928f-5dbe6f6f5519\",\"col\":1,\"row\":1}]",

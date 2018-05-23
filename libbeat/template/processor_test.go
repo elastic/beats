@@ -119,6 +119,37 @@ func TestProcessor(t *testing.T) {
 			},
 		},
 		{
+			output: p.keyword(&common.Field{Type: "keyword", MultiFields: common.Fields{common.Field{Name: "analyzed", Type: "text", Norms: true}}}),
+			expected: common.MapStr{
+				"type":         "keyword",
+				"ignore_above": 1024,
+				"fields": common.MapStr{
+					"analyzed": common.MapStr{
+						"type": "text",
+					},
+				},
+			},
+		},
+		{
+			output: p.text(&common.Field{Type: "text", MultiFields: common.Fields{
+				common.Field{Name: "raw", Type: "keyword"},
+				common.Field{Name: "indexed", Type: "text"},
+			}, Norms: true}),
+			expected: common.MapStr{
+				"type": "text",
+				"fields": common.MapStr{
+					"raw": common.MapStr{
+						"type":         "keyword",
+						"ignore_above": 1024,
+					},
+					"indexed": common.MapStr{
+						"type":  "text",
+						"norms": false,
+					},
+				},
+			},
+		},
+		{
 			output: p.text(&common.Field{Type: "text", MultiFields: common.Fields{
 				common.Field{Name: "raw", Type: "keyword"},
 				common.Field{Name: "indexed", Type: "text"},
@@ -171,6 +202,12 @@ func TestProcessor(t *testing.T) {
 			output: p.other(&common.Field{Type: "long", DocValues: &falseVar}),
 			expected: common.MapStr{
 				"type": "long", "doc_values": false,
+			},
+		},
+		{
+			output: p.other(&common.Field{Type: "double", DocValues: &falseVar}),
+			expected: common.MapStr{
+				"type": "double", "doc_values": false,
 			},
 		},
 		{
@@ -257,6 +294,38 @@ func TestDynamicTemplate(t *testing.T) {
 				},
 			},
 		},
+		{
+			field: common.Field{
+				Type: "object", ObjectType: "scaled_float",
+				Name: "core.*.pct",
+			},
+			expected: common.MapStr{
+				"core.*.pct": common.MapStr{
+					"mapping": common.MapStr{
+						"type":           "scaled_float",
+						"scaling_factor": defaultScalingFactor,
+					},
+					"match_mapping_type": "*",
+					"path_match":         "core.*.pct",
+				},
+			},
+		},
+		{
+			field: common.Field{
+				Type: "object", ObjectType: "scaled_float",
+				Name: "core.*.pct", ScalingFactor: 100, ObjectTypeMappingType: "float",
+			},
+			expected: common.MapStr{
+				"core.*.pct": common.MapStr{
+					"mapping": common.MapStr{
+						"type":           "scaled_float",
+						"scaling_factor": 100,
+					},
+					"match_mapping_type": "float",
+					"path_match":         "core.*.pct",
+				},
+			},
+		},
 	}
 
 	for _, test := range tests {
@@ -298,7 +367,7 @@ func TestPropertiesCombine(t *testing.T) {
 	}
 
 	p := Processor{EsVersion: *version}
-	err = p.process(fields, "", output)
+	err = p.Process(fields, "", output)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -346,7 +415,7 @@ func TestProcessNoName(t *testing.T) {
 	}
 
 	p := Processor{EsVersion: *version}
-	err = p.process(fields, "", output)
+	err = p.Process(fields, "", output)
 	if err != nil {
 		t.Fatal(err)
 	}

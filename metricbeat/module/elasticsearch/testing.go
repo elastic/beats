@@ -1,29 +1,70 @@
+// +build !integration
+
 package elasticsearch
 
-import "os"
+import (
+	"io/ioutil"
+	"path/filepath"
+	"testing"
 
-func GetEnvHost() string {
-	host := os.Getenv("ES_HOST")
+	s "github.com/elastic/beats/libbeat/common/schema"
+	"github.com/elastic/beats/metricbeat/mb"
+	mbtest "github.com/elastic/beats/metricbeat/mb/testing"
 
-	if len(host) == 0 {
-		host = "127.0.0.1"
+	"github.com/stretchr/testify/assert"
+)
+
+// TestMapper tests mapping methods
+func TestMapper(t *testing.T, glob string, mapper func(mb.ReporterV2, []byte) []error) {
+	files, err := filepath.Glob(glob)
+	assert.NoError(t, err)
+	// Makes sure glob matches at least 1 file
+	assert.True(t, len(files) > 0)
+
+	for _, f := range files {
+		t.Run(f, func(t *testing.T) {
+			input, err := ioutil.ReadFile(f)
+			assert.NoError(t, err)
+
+			reporter := &mbtest.CapturingReporterV2{}
+			errors := mapper(reporter, input)
+			for _, errs := range errors {
+				if e, ok := errs.(*s.Errors); ok {
+					assert.False(t, e.HasRequiredErrors(), "mapping error: %s", e)
+				}
+			}
+			assert.True(t, len(reporter.GetEvents()) >= 1)
+			assert.Equal(t, 0, len(reporter.GetErrors()))
+		})
 	}
-	return host
 }
 
-func GetEnvPort() string {
-	port := os.Getenv("ES_PORT")
+// TestMapperWithInfo tests mapping methods with Info fields
+func TestMapperWithInfo(t *testing.T, glob string, mapper func(mb.ReporterV2, Info, []byte) []error) {
+	files, err := filepath.Glob(glob)
+	assert.NoError(t, err)
+	// Makes sure glob matches at least 1 file
+	assert.True(t, len(files) > 0)
 
-	if len(port) == 0 {
-		port = "9200"
+	info := Info{
+		ClusterID:   "1234",
+		ClusterName: "helloworld",
 	}
-	return port
-}
 
-func GetConfig(metricset string) map[string]interface{} {
-	return map[string]interface{}{
-		"module":     "elasticsearch",
-		"metricsets": []string{metricset},
-		"hosts":      []string{GetEnvHost() + ":" + GetEnvPort()},
+	for _, f := range files {
+		t.Run(f, func(t *testing.T) {
+			input, err := ioutil.ReadFile(f)
+			assert.NoError(t, err)
+
+			reporter := &mbtest.CapturingReporterV2{}
+			errors := mapper(reporter, info, input)
+			for _, errs := range errors {
+				if e, ok := errs.(*s.Errors); ok {
+					assert.False(t, e.HasRequiredErrors(), "mapping error: %s", e)
+				}
+			}
+			assert.True(t, len(reporter.GetEvents()) >= 1)
+			assert.Equal(t, 0, len(reporter.GetErrors()))
+		})
 	}
 }

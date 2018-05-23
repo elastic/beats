@@ -154,7 +154,7 @@
         "description": "",
         "hits": 0,
         "kibanaSavedObjectMeta": {
-          "searchSourceJSON": "{\"filter\":[],\"query\":{\"language\":\"lucene\",\"query\":{\"query_string\":{\"analyze_wildcard\":true,\"default_field\":\"*\",\"query\":\"*\"}}},\"highlightAll\":true,\"version\":true}"
+          "searchSourceJSON": "{\"filter\":[],\"query\":{\"language\":\"lucene\",\"query\":{\"query_string\":{\"analyze_wildcard\":true,\"query\":\"*\"}}},\"highlightAll\":true,\"version\":true}"
         },
         "optionsJSON": "{\"darkTheme\":false}",
         "panelsJSON": "[{\"col\":1,\"id\":\"MongoDB-hosts\",\"panelIndex\":1,\"row\":1,\"size_x\":8,\"size_y\":3,\"type\":\"visualization\"},{\"col\":9,\"id\":\"MongoDB-Engine-ampersand-Version\",\"panelIndex\":4,\"row\":1,\"size_x\":4,\"size_y\":3,\"type\":\"visualization\"},{\"col\":1,\"id\":\"MongoDB-operation-counters\",\"panelIndex\":2,\"row\":4,\"size_x\":6,\"size_y\":3,\"type\":\"visualization\"},{\"col\":7,\"id\":\"MongoDB-Concurrent-transactions-Read\",\"panelIndex\":6,\"row\":4,\"size_x\":3,\"size_y\":3,\"type\":\"visualization\"},{\"col\":10,\"id\":\"MongoDB-Concurrent-transactions-Write\",\"panelIndex\":7,\"row\":4,\"size_x\":3,\"size_y\":3,\"type\":\"visualization\"},{\"col\":1,\"id\":\"MongoDB-memory-stats\",\"panelIndex\":5,\"row\":10,\"size_x\":12,\"size_y\":4,\"type\":\"visualization\"},{\"col\":7,\"id\":\"MongoDB-asserts\",\"panelIndex\":3,\"row\":7,\"size_x\":6,\"size_y\":3,\"type\":\"visualization\"},{\"col\":1,\"id\":\"MongoDB-WiredTiger-Cache\",\"panelIndex\":8,\"row\":7,\"size_x\":6,\"size_y\":3,\"type\":\"visualization\"}]",

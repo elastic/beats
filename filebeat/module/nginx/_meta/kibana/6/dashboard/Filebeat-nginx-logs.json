@@ -81,7 +81,7 @@
         "description": "Dashboard for the Filebeat Nginx module",
         "hits": 0,
         "kibanaSavedObjectMeta": {
-          "searchSourceJSON": "{\"filter\":[],\"query\":{\"language\":\"lucene\",\"query\":{\"query_string\":{\"analyze_wildcard\":true,\"default_field\":\"*\",\"query\":\"*\"}}},\"highlightAll\":true,\"version\":true}"
+          "searchSourceJSON": "{\"filter\":[],\"query\":{\"language\":\"lucene\",\"query\":{\"query_string\":{\"analyze_wildcard\":true,\"query\":\"*\"}}},\"highlightAll\":true,\"version\":true}"
         },
         "optionsJSON": "{\"darkTheme\":false}",
         "panelsJSON": "[{\"col\":1,\"columns\":[\"nginx.error.level\",\"nginx.error.message\"],\"id\":\"9eb25600-a1f0-11e7-928f-5dbe6f6f5519\",\"panelIndex\":11,\"row\":5,\"size_x\":12,\"size_y\":3,\"sort\":[\"@timestamp\",\"desc\"],\"type\":\"search\"},{\"col\":1,\"columns\":[\"nginx.access.url\",\"nginx.access.method\",\"nginx.access.response_code\",\"nginx.access.body_sent.bytes\"],\"id\":\"6d9e66d0-a1f0-11e7-928f-5dbe6f6f5519\",\"panelIndex\":16,\"row\":8,\"size_x\":12,\"size_y\":7,\"sort\":[\"@timestamp\",\"desc\"],\"type\":\"search\"},{\"col\":1,\"id\":\"1cfb1a80-a1f4-11e7-928f-5dbe6f6f5519\",\"panelIndex\":18,\"row\":2,\"size_x\":12,\"size_y\":3,\"type\":\"visualization\"},{\"size_x\":12,\"size_y\":1,\"panelIndex\":19,\"type\":\"visualization\",\"id\":\"97109780-a2a5-11e7-928f-5dbe6f6f5519\",\"col\":1,\"row\":1}]",

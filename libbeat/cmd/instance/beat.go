@@ -19,12 +19,14 @@ import (
 	"go.uber.org/zap"
 
 	"github.com/elastic/beats/libbeat/api"
+	"github.com/elastic/beats/libbeat/asset"
 	"github.com/elastic/beats/libbeat/beat"
 	"github.com/elastic/beats/libbeat/cfgfile"
 	"github.com/elastic/beats/libbeat/cloudid"
 	"github.com/elastic/beats/libbeat/common"
 	"github.com/elastic/beats/libbeat/common/cfgwarn"
 	"github.com/elastic/beats/libbeat/common/file"
+	"github.com/elastic/beats/libbeat/common/seccomp"
 	"github.com/elastic/beats/libbeat/dashboards"
 	"github.com/elastic/beats/libbeat/keystore"
 	"github.com/elastic/beats/libbeat/logp"
@@ -76,8 +78,9 @@ type beatConfig struct {
 	// instance internal configs
 
 	// beat top-level settings
-	Name     string `config:"name"`
-	MaxProcs int    `config:"max_procs"`
+	Name     string         `config:"name"`
+	MaxProcs int            `config:"max_procs"`
+	Seccomp  *common.Config `config:"seccomp"`
 
 	// beat internal components configurations
 	HTTP          *common.Config `config:"http"`
@@ -143,6 +146,15 @@ func Run(name, idxPrefix, version string, bt beat.Creator) error {
 		if err != nil {
 			return err
 		}
+
+		registry := monitoring.NewRegistry()
+		monitoring.GetNamespace("state").SetRegistry(registry)
+		monitoring.NewString(registry, "version").Set(b.Info.Version)
+		monitoring.NewString(registry, "beat").Set(b.Info.Beat)
+		monitoring.NewString(registry, "name").Set(b.Info.Name)
+		monitoring.NewString(registry, "uuid").Set(b.Info.UUID.String())
+		monitoring.NewString(registry, "hostname").Set(b.Info.Hostname)
+
 		return b.launch(bt)
 	}())
 }
@@ -161,6 +173,11 @@ func NewBeat(name, indexPrefix, v string) (*Beat, error) {
 		return nil, err
 	}
 
+	fields, err := asset.GetFields(name + "/fields.yml")
+	if err != nil {
+		return nil, err
+	}
+
 	b := beat.Beat{
 		Info: beat.Info{
 			Beat:        name,
@@ -170,6 +187,7 @@ func NewBeat(name, indexPrefix, v string) (*Beat, error) {
 			Hostname:    hostname,
 			UUID:        uuid.NewV4(),
 		},
+		Fields: fields,
 	}
 
 	return &Beat{Beat: b}, nil
@@ -270,6 +288,10 @@ func (b *Beat) launch(bt beat.Creator) error {
 	svc.BeforeRun()
 	defer svc.Cleanup()
 
+	if err = seccomp.LoadFilter(b.Config.Seccomp); err != nil {
+		return err
+	}
+
 	beater, err := b.createBeater(bt)
 	if err != nil {
 		return err
@@ -315,7 +337,7 @@ func (b *Beat) launch(bt beat.Creator) error {
 	logp.Info("%s start running.", b.Info.Beat)
 
 	if b.Config.HTTP.Enabled() {
-		api.Start(b.Config.HTTP, b.Info)
+		api.Start(b.Config.HTTP)
 	}
 
 	return beater.Run(&b.Beat)
@@ -341,7 +363,7 @@ func (b *Beat) TestConfig(bt beat.Creator) error {
 }
 
 // Setup registers ES index template and kibana dashboards
-func (b *Beat) Setup(bt beat.Creator, template, dashboards, machineLearning bool) error {
+func (b *Beat) Setup(bt beat.Creator, template, dashboards, machineLearning, pipelines bool) error {
 	return handleError(func() error {
 		err := b.Init()
 		if err != nil {
@@ -402,6 +424,16 @@ func (b *Beat) Setup(bt beat.Creator, template, dashboards, machineLearning bool
 				return err
 			}
 			fmt.Println("Loaded machine learning job configurations")
+		}
+
+		if pipelines && b.OverwritePipelinesCallback != nil {
+			esConfig := b.Config.Output.Config()
+			err = b.OverwritePipelinesCallback(esConfig)
+			if err != nil {
+				return err
+			}
+
+			fmt.Println("Loaded Ingest pipelines")
 		}
 
 		return nil
@@ -653,7 +685,7 @@ func (b *Beat) templateLoadingCallback() (func(esClient *elasticsearch.Client) e
 			b.Config.Template = common.NewConfig()
 		}
 
-		loader, err := template.NewLoader(b.Config.Template, esClient, b.Info)
+		loader, err := template.NewLoader(b.Config.Template, esClient, b.Info, b.Fields)
 		if err != nil {
 			return fmt.Errorf("Error creating Elasticsearch template loader: %v", err)
 		}

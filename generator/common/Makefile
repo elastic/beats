@@ -15,8 +15,8 @@ test: prepare-test
 	cd ${BEAT_PATH} ; \
 	$(MAKE) copy-vendor || exit 1  ; \
 	${PREPARE_COMMAND} \
-	$(MAKE) check || exit 1 ; \
 	$(MAKE) update || exit 1 ; \
+	$(MAKE) check || exit 1 ; \
 	$(MAKE) || exit 1 ; \
 	$(MAKE) unit
 
@@ -44,7 +44,7 @@ test-build: test
 python-env:
 	@test -d ${PYTHON_ENV} || virtualenv ${PYTHON_ENV}
 	@${PYTHON_ENV}/bin/pip install --upgrade pip PyYAML
-	# Work around pip bug. See: https://github.com/pypa/pip/issues/4464
+	@# Work around pip bug. See: https://github.com/pypa/pip/issues/4464
 	@find $(PYTHON_ENV) -type d -name dist-packages -exec sh -c "echo dist-packages > {}.pth" ';'
 
 # Cleans up environment

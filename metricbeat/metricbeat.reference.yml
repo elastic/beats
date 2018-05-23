@@ -51,8 +51,6 @@ metricbeat.modules:
 - module: system
   metricsets:
     - cpu             # CPU usage
-    - filesystem      # File system usage for each mountpoint
-    - fsstat          # File system summary metrics
     - load            # CPU load averages
     - memory          # Memory usage
     - network         # Network IO
@@ -61,6 +59,8 @@ metricbeat.modules:
     - uptime          # System Uptime
     #- core           # Per CPU core usage
     #- diskio         # Disk IO
+    #- filesystem     # File system usage for each mountpoint
+    #- fsstat         # File system summary metrics
     #- raid           # Raid
     #- socket         # Sockets and connection info (linux only)
   enabled: true
@@ -74,6 +74,9 @@ metricbeat.modules:
   # A list of filesystem types to ignore. The filesystem metricset will not
   # collect data from filesystems matching any of the specified types, and
   # fsstats will not include data from these filesystems in its summary stats.
+  # If not set, types associated to virtual filesystems are automatically
+  # added when this information is available in the system (e.g. the list of
+  # `nodev` types in `/proc/filesystem`).
   #filesystem.ignore_types: []
 
   # These options allow you to filter out all processes that are not
@@ -192,7 +195,12 @@ metricbeat.modules:
 
 #---------------------------- Elasticsearch Module ---------------------------
 - module: elasticsearch
-  metricsets: ["node", "node_stats"]
+  metricsets:
+    - node
+    - node_stats
+    #- index
+    #- index_summary
+    #- shard
   period: 10s
   hosts: ["localhost:9200"]
 
@@ -204,7 +212,9 @@ metricbeat.modules:
 
 #------------------------------- Golang Module -------------------------------
 - module: golang
-  metricsets: ["expvar","heap"]
+  #metricsets:
+  #  - expvar
+  #  - heap
   period: 10s
   hosts: ["localhost:6060"]
   heap.path: "/debug/vars"
@@ -245,7 +255,8 @@ metricbeat.modules:
 
 #-------------------------------- HTTP Module --------------------------------
 - module: http
-  metricsets: ["json"]
+  #metricsets:
+  #  - json
   period: 10s
   hosts: ["localhost:80"]
   namespace: "json_namespace"
@@ -258,40 +269,45 @@ metricbeat.modules:
   #dedot.enabled: false
 
 - module: http
-  metricsets: ["server"]
+  #metricsets:
+  #  - server
   host: "localhost"
   port: "8080"
   enabled: false
-#  paths:
-#    - path: "/foo"
-#      namespace: "foo"
-#      fields: # added to the the response in root. overwrites existing fields
-#        key: "value"
+  #paths:
+  #  - path: "/foo"
+  #    namespace: "foo"
+  #    fields: # added to the the response in root. overwrites existing fields
+  #      key: "value"
 
 #------------------------------- Jolokia Module ------------------------------
 - module: jolokia
-  metricsets: ["jmx"]
+  #metricsets: ["jmx"]
   period: 10s
   hosts: ["localhost"]
   namespace: "metrics"
+  #path: "/jolokia/?ignoreErrors=true&canonicalNaming=false"
   jmx.mappings:
-    - mbean: 'java.lang:type=Runtime'
-      attributes:
-        - attr: Uptime
-          field: uptime
-    - mbean: 'java.lang:type=Memory'
-      attributes:
-        - attr: HeapMemoryUsage
-          field: memory.heap_usage
-        - attr: NonHeapMemoryUsage
-          field: memory.non_heap_usage
+    #- mbean: 'java.lang:type=Runtime'
+    #  attributes:
+    #    - attr: Uptime
+    #      field: uptime
+    #- mbean: 'java.lang:type=Memory'
+    #  attributes:
+    #    - attr: HeapMemoryUsage
+    #      field: memory.heap_usage
+    #    - attr: NonHeapMemoryUsage
+    #      field: memory.non_heap_usage
     # GC Metrics - this depends on what is available on your JVM
-    # - mbean: 'java.lang:type=GarbageCollector,name=ConcurrentMarkSweep'
-    #   attributes:
-    #     - attr: CollectionTime
-    #       field: gc.cms_collection_time
-    #     - attr: CollectionCount
-    #       field: gc.cms_collection_count
+    #- mbean: 'java.lang:type=GarbageCollector,name=ConcurrentMarkSweep'
+    #  attributes:
+    #    - attr: CollectionTime
+    #      field: gc.cms_collection_time
+    #    - attr: CollectionCount
+    #      field: gc.cms_collection_count
+
+  jmx.application:
+  jmx.instance:
 
 #-------------------------------- Kafka Module -------------------------------
 - module: kafka
@@ -362,6 +378,23 @@ metricbeat.modules:
   enabled: true
   metricsets:
     - event
+
+# Kubernetes API server
+- module: kubernetes
+  enabled: true
+  metricsets:
+    - apiserver
+  hosts: ["https://${KUBERNETES_SERVICE_HOST}:${KUBERNETES_SERVICE_PORT}"]
+
+#--------------------------------- kvm Module --------------------------------
+- module: kvm
+  metricsets: ["dommemstat"]
+  enabled: true
+  period: 10s
+  hosts: ["localhost"]
+
+  # Timeout to connect to Libvirt server
+  #timeout: 1s
 
 #------------------------------ Logstash Module ------------------------------
 - module: logstash
@@ -495,6 +528,10 @@ metricbeat.modules:
   enabled: true
   period: 10s
   hosts: ["localhost:15672"]
+
+  # Management path prefix, if `management.path_prefix` is set in RabbitMQ
+  # configuration, it has to be set to the same value.
+  #management_path_prefix: ""
 
   #username: guest
   #password: guest
@@ -716,6 +753,14 @@ metricbeat.modules:
 #       equals:
 #           http.code: 200
 #
+# The following example renames the field a to b:
+#
+#processors:
+#- rename:
+#    fields:
+#       - from: "a"
+#         to: "b"
+#
 # The following example enriches each event with metadata from the cloud
 # provider about the host machine. It works on EC2, GCE, DigitalOcean,
 # Tencent Cloud, and Alibaba Cloud.
@@ -754,7 +799,13 @@ metricbeat.modules:
 #
 #processors:
 #- add_docker_metadata: ~
-#- add_host_metadata: ~
+#
+# The following example enriches each event with host metadata.
+#
+#processors:
+#- add_host_metadata:
+#   netinfo.enabled: false
+#
 
 #============================= Elastic Cloud ==================================
 
@@ -1314,6 +1365,15 @@ output.elasticsearch:
 # Path to fields.yml file to generate the template
 #setup.template.fields: "${path.config}/fields.yml"
 
+# Enable json template loading. If this is enabled, the fields.yml is ignored.
+#setup.template.json.enabled: false
+
+# Path to the json template file
+#setup.template.json.path: "${path.config}/template.json"
+
+# Name under which the template is stored in Elasticsearch
+#setup.template.json.name: ""
+
 # Overwrite existing template
 #setup.template.overwrite: false
 
@@ -1544,3 +1604,8 @@ logging.files:
 
 # Port on which the HTTP endpoint will bind. Default is 5066.
 #http.port: 5066
+
+#============================= Process Security ================================
+
+# Enable or disable seccomp system call filtering on Linux. Default is enabled.
+#seccomp.enabled: true

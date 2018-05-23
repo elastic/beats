@@ -30,12 +30,21 @@ var (
 		"messages": s.Object{
 			"total": s.Object{
 				"count": c.Int("messages"),
+				"details": c.Dict("messages_details", s.Schema{
+					"rate": c.Float("rate"),
+				}),
 			},
 			"ready": s.Object{
 				"count": c.Int("messages_ready"),
+				"details": c.Dict("messages_ready_details", s.Schema{
+					"rate": c.Float("rate"),
+				}),
 			},
 			"unacknowledged": s.Object{
 				"count": c.Int("messages_unacknowledged"),
+				"details": c.Dict("messages_unacknowledged_details", s.Schema{
+					"rate": c.Float("rate"),
+				}),
 			},
 			"persistent": s.Object{
 				"count": c.Int("messages_persistent"),
@@ -46,10 +55,10 @@ var (
 		},
 		"disk": s.Object{
 			"reads": s.Object{
-				"count": c.Int("disk_reads"),
+				"count": c.Int("disk_reads", s.Optional),
 			},
 			"writes": s.Object{
-				"count": c.Int("disk_writes"),
+				"count": c.Int("disk_writes", s.Optional),
 			},
 		},
 	}
@@ -60,6 +69,7 @@ func eventsMapping(content []byte) ([]common.MapStr, error) {
 	err := json.Unmarshal(content, &queues)
 	if err != nil {
 		logp.Err("Error: ", err)
+		return nil, err
 	}
 
 	events := []common.MapStr{}

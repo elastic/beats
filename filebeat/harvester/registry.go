@@ -31,12 +31,6 @@ func (r *Registry) remove(h Harvester) {
 	delete(r.harvesters, h.ID())
 }
 
-func (r *Registry) add(h Harvester) {
-	r.Lock()
-	defer r.Unlock()
-	r.harvesters[h.ID()] = h
-}
-
 // Stop stops all harvesters in the registry
 func (r *Registry) Stop() {
 	r.Lock()
@@ -71,12 +65,16 @@ func (r *Registry) Start(h Harvester) error {
 	}
 
 	r.wg.Add(1)
+
+	// Add the harvester to the registry and share the lock with stop making sure Start() and Stop()
+	// have a consistent view of the harvesters.
+	r.harvesters[h.ID()] = h
+
 	go func() {
 		defer func() {
 			r.remove(h)
 			r.wg.Done()
 		}()
-		r.add(h)
 		// Starts harvester and picks the right type. In case type is not set, set it to default (log)
 		err := h.Run()
 		if err != nil {

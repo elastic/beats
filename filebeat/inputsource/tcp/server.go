@@ -3,25 +3,21 @@ package tcp
 import (
 	"bufio"
 	"bytes"
+	"crypto/tls"
 	"fmt"
 	"net"
 	"sync"
 
+	"github.com/elastic/beats/filebeat/inputsource"
+	"github.com/elastic/beats/libbeat/common/transport/tlscommon"
 	"github.com/elastic/beats/libbeat/logp"
+	"github.com/elastic/beats/libbeat/outputs/transport"
 )
-
-// Metadata information about the remote host.
-type Metadata struct {
-	RemoteAddr net.Addr
-}
-
-// CallbackFunc receives new events read from the TCP socket.
-type CallbackFunc = func(data []byte, metadata Metadata)
 
 // Server represent a TCP server
 type Server struct {
 	sync.RWMutex
-	callback  CallbackFunc
+	callback  inputsource.NetworkFunc
 	config    *Config
 	Listener  net.Listener
 	clients   map[*client]struct{}
@@ -29,16 +25,22 @@ type Server struct {
 	done      chan struct{}
 	splitFunc bufio.SplitFunc
 	log       *logp.Logger
+	tlsConfig *transport.TLSConfig
 }
 
 // New creates a new tcp server
 func New(
-	callback CallbackFunc,
 	config *Config,
+	callback inputsource.NetworkFunc,
 ) (*Server, error) {
 
 	if len(config.LineDelimiter) == 0 {
 		return nil, fmt.Errorf("empty line delimiter")
+	}
+
+	tlsConfig, err := tlscommon.LoadTLSServerConfig(config.TLS)
+	if err != nil {
+		return nil, err
 	}
 
 	sf := splitFunc([]byte(config.LineDelimiter))
@@ -49,13 +51,14 @@ func New(
 		done:      make(chan struct{}),
 		splitFunc: sf,
 		log:       logp.NewLogger("tcp").With("address", config.Host),
+		tlsConfig: tlsConfig,
 	}, nil
 }
 
 // Start listen to the TCP socket.
 func (s *Server) Start() error {
 	var err error
-	s.Listener, err = net.Listen("tcp", s.config.Host)
+	s.Listener, err = s.createServer()
 	if err != nil {
 		return err
 	}
@@ -89,11 +92,11 @@ func (s *Server) run() {
 			s.log,
 			s.callback,
 			s.splitFunc,
-			s.config.MaxMessageSize,
+			uint64(s.config.MaxMessageSize),
 			s.config.Timeout,
 		)
 
-		s.log.Debugw("New client", "address", conn.RemoteAddr(), "total", s.clientsCount())
+		s.log.Debugw("New client", "remote_address", conn.RemoteAddr(), "total", s.clientsCount())
 		s.wg.Add(1)
 		go func() {
 			defer logp.Recover("recovering from a tcp client crash")
@@ -108,7 +111,13 @@ func (s *Server) run() {
 				s.log.Debugw("Client error", "error", err)
 			}
 
-			s.log.Debugw("Client disconnected", "address", conn.RemoteAddr(), "total", s.clientsCount())
+			s.log.Debugw(
+				"Client disconnected",
+				"remote_address",
+				conn.RemoteAddr(),
+				"total",
+				s.clientsCount(),
+			)
 		}()
 	}
 }
@@ -147,6 +156,15 @@ func (s *Server) allClients() []*client {
 		idx++
 	}
 	return currentClients
+}
+
+func (s *Server) createServer() (net.Listener, error) {
+	if s.tlsConfig != nil {
+		t := s.tlsConfig.BuildModuleConfig(s.config.Host)
+		s.log.Info("Listening over TLS")
+		return tls.Listen("tcp", s.config.Host, t)
+	}
+	return net.Listen("tcp", s.config.Host)
 }
 
 func (s *Server) clientsCount() int {

@@ -1,5 +1,4 @@
 # Copy of https://github.com/elastic/elasticsearch-docker/blob/master/build/elasticsearch/Dockerfile
-#FROM docker.elastic.co/elasticsearch/elasticsearch-alpine-base:latest
 FROM centos:7
 MAINTAINER Elastic Docker Team <docker@elastic.co>
 
@@ -7,7 +6,7 @@ ARG ELASTIC_VERSION
 ARG DOWNLOAD_URL
 ARG ES_JAVA_OPTS
 ARG CACHE_BUST=1
-ARG XPACK
+ARG IMAGE_FLAVOR=x-pack
 
 ENV ELASTIC_CONTAINER true
 ENV PATH /usr/share/elasticsearch/bin:$PATH
@@ -19,30 +18,29 @@ RUN groupadd -g 1000 elasticsearch && adduser -u 1000 -g 1000 -d /usr/share/elas
 
 WORKDIR /usr/share/elasticsearch
 
-# Download/extract defined ES version. busybox tar can't strip leading dir.
-RUN curl -L -o elasticsearch-${ELASTIC_VERSION}.tar.gz ${DOWNLOAD_URL}/elasticsearch/elasticsearch-${ELASTIC_VERSION}.tar.gz?c=${CACHE_BUST} && \
-    EXPECTED_SHA=$(wget -O - ${DOWNLOAD_URL}/elasticsearch/elasticsearch-${ELASTIC_VERSION}.tar.gz.sha512 | awk '{print $1}') && \
-    test $EXPECTED_SHA == $(sha512sum elasticsearch-${ELASTIC_VERSION}.tar.gz | awk '{print $1}') && \
-    tar zxf elasticsearch-${ELASTIC_VERSION}.tar.gz && \
+# Download/extract the defined ES version.
+COPY download.sh /download.sh
+RUN /download.sh $DOWNLOAD_URL $ELASTIC_VERSION $CACHE_BUST && rm /download.sh
+
+RUN tar zxf elasticsearch-${ELASTIC_VERSION}.tar.gz && \
     chown -R elasticsearch:elasticsearch elasticsearch-${ELASTIC_VERSION} && \
     mv elasticsearch-${ELASTIC_VERSION}/* . && \
     rmdir elasticsearch-${ELASTIC_VERSION} && \
     rm elasticsearch-${ELASTIC_VERSION}.tar.gz
 
-RUN set -ex && for esdirs in config data logs; do \
+RUN set -e && for esdirs in config data logs; do \
         mkdir -p "$esdirs"; \
         chown -R elasticsearch:elasticsearch "$esdirs"; \
     done
 
 USER elasticsearch
 
-# Install xpack
-RUN if [ ${XPACK} = "1" ]; then elasticsearch-plugin install --batch ${DOWNLOAD_URL}/packs/x-pack/x-pack-${ELASTIC_VERSION}.zip?c=${CACHE_BUST}; fi
-RUN elasticsearch-plugin install --batch ${DOWNLOAD_URL}/elasticsearch-plugins/ingest-user-agent/ingest-user-agent-${ELASTIC_VERSION}.zip?c=${CACHE_BUST}
-RUN elasticsearch-plugin install --batch ${DOWNLOAD_URL}/elasticsearch-plugins/ingest-geoip/ingest-geoip-${ELASTIC_VERSION}.zip?c=${CACHE_BUST}
+# Install plugins.
+RUN elasticsearch-plugin install --batch ${DOWNLOAD_URL}/elasticsearch-plugins/ingest-user-agent/ingest-user-agent-${ELASTIC_VERSION}.zip
+RUN elasticsearch-plugin install --batch ${DOWNLOAD_URL}/elasticsearch-plugins/ingest-geoip/ingest-geoip-${ELASTIC_VERSION}.zip
 
 # Set bootstrap password (for when security is used)
-RUN if [ ${XPACK} = "1" ]; then elasticsearch-keystore create; echo "changeme" | elasticsearch-keystore add -x 'bootstrap.password'; fi
+RUN if [ "${IMAGE_FLAVOR}" = "x-pack" ]; then elasticsearch-keystore create; echo "changeme" | elasticsearch-keystore add -x 'bootstrap.password'; fi
 
 COPY config/elasticsearch.yml config/
 COPY config/log4j2.properties config/
@@ -51,6 +49,9 @@ COPY bin/es-docker bin/es-docker
 USER root
 RUN chown elasticsearch:elasticsearch config/elasticsearch.yml config/log4j2.properties bin/es-docker && \
     chmod 0750 bin/es-docker
+
+# Enable a trial license for testing ML and Alerting.
+RUN if [ "${IMAGE_FLAVOR}" = "x-pack" ]; then echo "xpack.license.self_generated.type: trial" >> config/elasticsearch.yml; fi
 
 USER elasticsearch
 CMD ["/bin/bash", "bin/es-docker"]

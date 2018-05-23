@@ -7,7 +7,7 @@
 // Template, add newest changes here
 
 === Beats version HEAD
-https://github.com/elastic/beats/compare/v6.0.0-beta2...master[Check the HEAD diff]
+https://github.com/elastic/beats/compare/v6.2.3...master[Check the HEAD diff]
 
 ==== Breaking changes
 
@@ -17,6 +17,8 @@ https://github.com/elastic/beats/compare/v6.0.0-beta2...master[Check the HEAD di
 - Rename beat.cpu.*.time metrics to beat.cpu.*.time.ms. {pull}6449[6449]
 - Mark `system.syslog.message` and `system.auth.message` as `text` instead of `keyword`. {pull}6589[6589]
 - Allow override of dynamic template `match_mapping_type` for fields with object_type. {pull}6691[6691]
+- Set default kafka version to 1.0.0 in kafka output. Older versions are still supported by configuring the `version` setting. {pull}7025[7025]
+- Add `host.name` field to all events, to avoid mapping conflicts. This could be breaking Logstash configs if you rely on the `host` field being a string. {pull}7051[7051]
 
 *Auditbeat*
 
@@ -33,11 +35,15 @@ https://github.com/elastic/beats/compare/v6.0.0-beta2...master[Check the HEAD di
 
 *Metricbeat*
 
+- Kubernetes deployment: Add ServiceAccount config to system metricbeat. {pull}6824[6824]
 - Kubernetes deployment: Add DNS Policy to system metricbeat. {pull}6656[6656]
 - De dot keys in kubernetes/event metricset to prevent collisions. {pull}6203[6203]
 - Add config option for windows/perfmon metricset to ignore non existent counters. {pull}6432[6432]
 - Refactor docker CPU calculations to be more consistent with `docker stats`. {pull}6608[6608]
 - Update logstash.node_stats metricset to write data under `logstash.node.stats.*`. {pull}6714[6714]
+- Fixed typo in values for `state_container` `status.phase`, from `terminate` to `terminated`. {pull}6916[6916]
+- RabbitMQ management plugin path is now configured at the module level instead of having to do it in each of the metricsets. New `management_path_prefix` option should be used now {pull}7074[7074]
+- RabbitMQ node metricset only collects metrics of the instance it connects to, `node.collect: cluster` can be used to collect all nodes as before. {issue}6556[6556] {pull}6971[6971]
 
 *Packetbeat*
 
@@ -52,16 +58,29 @@ https://github.com/elastic/beats/compare/v6.0.0-beta2...master[Check the HEAD di
 - Fix for kafka logger. {pull}6430[6430]
 - Remove double slashes in Windows service script. {pull}6491[6491]
 - Ensure Kubernetes labels/annotations don't break mapping {pull}6490[6490]
+- Ensure that the dashboard zip files can't contain files outside of the kibana directory. {pull}6921[6921]
+- Fix map overwrite panics by cloning shared structs before doing the update. {pull}6947[6947]
+- Fix error if lz4 compression is used with the kafka output. {pull}7025[7025]
+- Preserve the event when source matching fails in `add_docker_metadata`. {pull}7133[7133]
 
 *Auditbeat*
 
 - Add hex decoding for the name field in audit path records. {pull}6687[6687]
+- Fixed a deadlock in the file_integrity module under Windows. {issue}6864[6864]
+- Fixed parsing of AppArmor audit messages. {pull}6978[6978]
+- Allow `auditbeat setup` to run without requiring elevated privileges for the audit client. {issue}7111[7111]
 
 *Filebeat*
 
 - Fix panic when log prospector configuration fails to load. {issue}6800[6800]
+- Fix memory leak in log prospector when files cannot be read. {issue}6797[6797]
+- Add raw JSON to message field when JSON parsing fails. {issue}6516[6516]
+- Commit registry writes to stable storage to avoid corrupt registry files. {issue}6792[6792]
+- Fix a data race between stopping and starting of the harverters. {issue}#6879[6879]
+- Fix a parsing issue in the syslog input for RFC3339 timestamp and time with nanoseconds. {pull}7046[7046]
 
 *Heartbeat*
+- Fix race due to updates of shared a map, that was not supposed to be shared between multiple go-routines. {issue}6616[6616]
 
 *Metricbeat*
 
@@ -74,8 +93,15 @@ https://github.com/elastic/beats/compare/v6.0.0-beta2...master[Check the HEAD di
 - Fix namespace disambiguation in Kubernetes state_* metricsets. {issue}6281[6281]
 - Fix Windows perfmon metricset so that it sends metrics when an error occurs. {pull}6542[6542]
 - Fix Kubernetes calculated fields store. {pull}6564{6564}
+- Exclude bind mounts in fsstat and filesystem metricsets. {pull}6819[6819]
+- Don't stop Metricbeat if aerospike server is down. {pull}6874[6874]
+- disk reads and write count metrics in RabbitMQ queue metricset made optional. {issue}6876[6876]
+- Add mapping for docker metrics per cpu. {pull}6843[6843]
+- Ensure canonical naming for JMX beans is disabled in Jolokia module. {pull}7047[7047]
 
 *Packetbeat*
+
+- Fix an out of bounds access in HTTP parser caused by malformed request. {pull}6997[6997]
 
 *Winlogbeat*
 
@@ -100,8 +126,25 @@ https://github.com/elastic/beats/compare/v6.0.0-beta2...master[Check the HEAD di
 - Add support for spooling to disk to the beats event publishing pipeline. {pull}6581[6581]
 - Added logging of system info at Beat startup. {issue}5946[5946]
 - Do not log errors if X-Pack Monitoring is enabled but Elastisearch X-Pack is not. {pull}6627[6627]
+- Add rename processor. {pull}6292[6292]
+- Add IP-addresses and MAC-addresses to add_host_metadata. {pull}6878[6878]
+- Added a seccomp (secure computing) filter on Linux that whitelists the
+  necessary system calls used by each Beat. {issue}5213[5213]
+- Update Sarama to v1.16.0, adding better support for kafka 0.11, 1.0, and 1.1 {pull}7025[7025]
+- Ship fields.yml as part of the binary {pull}4834[4834]
+- Added options to dev-tools/cmd/dashboards/export_dashboard.go: -indexPattern to include index-pattern in output, -quiet to be quiet. {pull}7101[7101]
+- Add Indexer indexing by pod uid. Enable pod uid metadata gathering in add_kubernetes_metadata. Extended Matcher log_path matching to support volume mounts {pull}7072[7072]
+- Add Kibana module with log fileset. {pull}7052[7052]
+- Add default_fields to Elasticsearch template when connecting to Elasticsearch >= 7.0. {pull}7015[7015]
+- Add support for loading a template.json file directly instead of using fields.yml. {pull}7039[7039]
+- Add support for keyword multifields in field.yml. {pull}7131[7131]
 
 *Auditbeat*
+
+- Added caching of UID and GID values to auditd module. {pull}6978[6978]
+- Updated syscall tables for Linux 4.16. {pull}6978[6978]
+- Added better error messages for when the auditd module fails due to the
+  Linux kernel not supporting auditing (CONFIG_AUDIT=n). {pull}7012[7012]
 
 *Filebeat*
 
@@ -117,6 +160,14 @@ https://github.com/elastic/beats/compare/v6.0.0-beta2...master[Check the HEAD di
 - Add json.ignore_decoding_error config to not log json decoding erors. {issue}6547[6547]
 - Make registry file permission configurable. {pull}6455[6455]
 - Add MongoDB module. {pull}6283[6238]
+- Add Ingest pipeline loading to setup. {pull}6814[6814]
+- Add support of log_format combined to NGINX access logs. {pull}6858[6858]
+- Release config reloading feature as GA. {pull}6891[6891]
+- Add support human friendly size for the UDP input. {pull}6886[6886]
+- Add Syslog input to ingest RFC3164 Events via TCP and UDP {pull}6842[6842]
+- Support MySQL 5.7.19 by mysql/slowlog {pull}6969[6969]
+- Correctly join partial log lines when using `docker` input. {pull}6967[6967]
+- Add support for TLS with client authentication to the TCP input {pull}7056[7056]
 
 *Heartbeat*
 
@@ -183,12 +234,26 @@ https://github.com/elastic/beats/compare/v6.0.0-beta2...master[Check the HEAD di
 - Set `status` as default metricset for mysql module. {pull} 6769[6769]
 - Set `stubstatus` as default metricset for nginx module. {pull}6770[6770]
 - Added support for haproxy 1.7 and 1.8. {pull}6793[6793]
+- Add accumulated I/O stats to diskio in the line of `docker stats`. {pull}6701[6701]
+- Ignore virtual filesystem types by default in system module. {pull}6819[6819]
+- Release config reloading feature as GA. {pull}6891[6891]
+- Add experimental Elasticsearch index metricset. {pull}6881[6881]
+- Add dashboards and visualizations for haproxy metrics. {pull}6934[6934]
+- Add Jolokia agent in proxy mode. {pull}6475[6475]
+- Add message rates to the RabbitMQ queue metricset {issue}6442[6442] {pull}6606[6606]
+- Add exchanges metricset to the RabbitMQ module {issue}6442[6442] {pull}6607[6607]
+- Add Elasticsearch index_summary metricset. {pull}6918[6918]
+- Add config option `management_path_prefix` for RabbitMQ module to configure management plugin path prefix {issue}6875[6875] {pull}7074[7074]
+- Add shard metricset to Elasticsearch module. {pull}7006[7006]
+- Add apiserver metricset to Kubernetes module. {pull}7059[7059]
+- Add maxmemory to redis info metricset. {pull}7127[7127]
 
 *Packetbeat*
 
 - Add support for condition on bool type {issue}5659[5659] {pull}5954[5954]
 - Fix high memory usage on HTTP body if body is not published. {pull}6680[6680]
 - Allow to capture the HTTP request or response bodies independently. {pull}6784[6784]
+- HTTP publishes an Error event for unmatched requests or responses. {pull}6794[6794]
 
 *Winlogbeat*
 
@@ -203,6 +268,9 @@ https://github.com/elastic/beats/compare/v6.0.0-beta2...master[Check the HEAD di
 *Heartbeat*
 
 *Metricbeat*
+
+- Kubernetes `state_container` `cpu.limit.nanocores` and `cpu.request.nanocores` have been
+deprecated in favor of `cpu.*.cores`. {pull}6916[6916]
 
 *Packetbeat*
 

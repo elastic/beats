@@ -3,6 +3,7 @@ package input
 import (
 	"github.com/elastic/beats/filebeat/channel"
 	"github.com/elastic/beats/filebeat/registrar"
+	"github.com/elastic/beats/libbeat/beat"
 	"github.com/elastic/beats/libbeat/cfgfile"
 	"github.com/elastic/beats/libbeat/common"
 )
@@ -24,8 +25,13 @@ func NewRunnerFactory(outlet channel.Factory, registrar *registrar.Registrar, be
 }
 
 // Create creates a input based on a config
-func (r *RunnerFactory) Create(c *common.Config, meta *common.MapStrPointer) (cfgfile.Runner, error) {
-	p, err := New(c, r.outlet, r.beatDone, r.registrar.GetStates(), meta)
+func (r *RunnerFactory) Create(
+	pipeline beat.Pipeline,
+	c *common.Config,
+	meta *common.MapStrPointer,
+) (cfgfile.Runner, error) {
+	connector := channel.ConnectTo(pipeline, r.outlet)
+	p, err := New(c, connector, r.beatDone, r.registrar.GetStates(), meta)
 	if err != nil {
 		// In case of error with loading state, input is still returned
 		return p, err

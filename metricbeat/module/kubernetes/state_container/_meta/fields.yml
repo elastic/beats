@@ -26,11 +26,21 @@
     - name: cpu
       type: group
       fields:
+        - name: limit.cores
+          type: long
+          description: >
+            Container CPU cores limit
+        - name: request.cores
+          type: long
+          description: >
+            Container CPU requested cores
         - name: limit.nanocores
           type: long
+          deprecated: true
           description: >
             Container CPU nanocores limit
         - name: request.nanocores
+          deprecated: true
           type: long
           description: >
             Container CPU requested nanocores

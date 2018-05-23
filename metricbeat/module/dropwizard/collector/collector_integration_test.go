@@ -14,7 +14,7 @@ import (
 )
 
 func TestFetch(t *testing.T) {
-	compose.EnsureUpWithTimeout(t, 300, "dropwizard")
+	compose.EnsureUp(t, "dropwizard")
 
 	f := mbtest.NewEventsFetcher(t, getConfig())
 	events, err := f.Fetch()

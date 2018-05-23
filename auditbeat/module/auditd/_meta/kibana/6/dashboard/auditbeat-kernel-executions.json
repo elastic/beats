@@ -84,7 +84,7 @@
           "searchSourceJSON": "{\"query\":{\"language\":\"lucene\",\"query\":\"\"},\"filter\":[],\"highlightAll\":true,\"version\":true}"
         },
         "optionsJSON": "{\"darkTheme\":false,\"useMargins\":false}",
-        "panelsJSON": "[{\"gridData\":{\"h\":3,\"i\":\"1\",\"w\":4,\"x\":4,\"y\":0},\"id\":\"20a8e8d0-c1c8-11e7-8995-936807a28b16\",\"panelIndex\":\"1\",\"type\":\"visualization\",\"version\":\"7.0.0-alpha1-SNAPSHOT\"},{\"gridData\":{\"h\":3,\"i\":\"3\",\"w\":4,\"x\":8,\"y\":0},\"id\":\"f81a6de0-c1c1-11e7-8995-936807a28b16\",\"panelIndex\":\"3\",\"type\":\"visualization\",\"version\":\"7.0.0-alpha1-SNAPSHOT\"},{\"gridData\":{\"h\":3,\"i\":\"5\",\"w\":4,\"x\":0,\"y\":0},\"id\":\"2efac370-c1ca-11e7-8995-936807a28b16\",\"panelIndex\":\"5\",\"type\":\"visualization\",\"version\":\"7.0.0-alpha1-SNAPSHOT\"},{\"gridData\":{\"h\":5,\"i\":\"6\",\"w\":12,\"x\":0,\"y\":3},\"id\":\"d382f5b0-c1c6-11e7-8995-936807a28b16\",\"panelIndex\":\"6\",\"type\":\"search\",\"version\":\"7.0.0-alpha1-SNAPSHOT\"}]",
+        "panelsJSON": "[{\"gridData\":{\"h\":3,\"i\":\"1\",\"w\":4,\"x\":4,\"y\":0},\"id\":\"20a8e8d0-c1c8-11e7-8995-936807a28b16\",\"panelIndex\":\"1\",\"type\":\"visualization\",\"version\":\"6.2.4\"},{\"gridData\":{\"h\":3,\"i\":\"3\",\"w\":4,\"x\":8,\"y\":0},\"id\":\"f81a6de0-c1c1-11e7-8995-936807a28b16\",\"panelIndex\":\"3\",\"type\":\"visualization\",\"version\":\"6.2.4\"},{\"gridData\":{\"h\":3,\"i\":\"5\",\"w\":4,\"x\":0,\"y\":0},\"id\":\"2efac370-c1ca-11e7-8995-936807a28b16\",\"panelIndex\":\"5\",\"type\":\"visualization\",\"version\":\"6.2.4\"},{\"gridData\":{\"h\":5,\"i\":\"6\",\"w\":12,\"x\":0,\"y\":3},\"id\":\"d382f5b0-c1c6-11e7-8995-936807a28b16\",\"panelIndex\":\"6\",\"type\":\"search\",\"version\":\"6.2.4\"}]",
         "timeRestore": false,
         "title": "[Auditbeat Auditd] Executions",
         "version": 1
@@ -95,5 +95,5 @@
       "version": 5
     }
   ],
-  "version": "7.0.0-alpha1-SNAPSHOT"
+  "version": "6.2.4"
 }

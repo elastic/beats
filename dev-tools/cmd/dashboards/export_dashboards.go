@@ -48,7 +48,7 @@ func ExtractIndexPattern(body []byte) ([]byte, error) {
 		if !ok {
 			return nil, fmt.Errorf("type key not found or not string")
 		}
-		if _type != "index-pattern" {
+		if _type != "index-pattern" || indexPattern {
 			result = append(result, obj)
 		}
 	}
@@ -68,7 +68,9 @@ func Export(client *http.Client, conn string, dashboard string, out string) erro
 	params.Add("dashboard", dashboard)
 
 	fullURL := makeURL(conn, exportAPI, params)
-	fmt.Printf("Calling HTTP GET %v\n", fullURL)
+	if !quiet {
+		fmt.Printf("Calling HTTP GET %v\n", fullURL)
+	}
 
 	req, err := http.NewRequest("GET", fullURL, nil)
 
@@ -95,7 +97,9 @@ func Export(client *http.Client, conn string, dashboard string, out string) erro
 
 	err = ioutil.WriteFile(out, body, 0666)
 
-	fmt.Printf("The dashboard %s was exported under the %s file\n", dashboard, out)
+	if !quiet {
+		fmt.Printf("The dashboard %s was exported under the %s file\n", dashboard, out)
+	}
 	return err
 }
 
@@ -113,11 +117,16 @@ func ReadManifest(file string) ([]map[string]string, error) {
 	return manifest.Dashboards, nil
 }
 
+var indexPattern = false
+var quiet = false
+
 func main() {
 	kibanaURL := flag.String("kibana", "http://localhost:5601", "Kibana URL")
 	dashboard := flag.String("dashboard", "", "Dashboard ID")
 	fileOutput := flag.String("output", "output.json", "Output file")
 	ymlFile := flag.String("yml", "", "Path to the module.yml file containing the dashboards")
+	flag.BoolVar(&indexPattern, "indexPattern", false, "include index-pattern in output")
+	flag.BoolVar(&quiet, "quiet", false, "be quiet")
 
 	flag.Parse()
 

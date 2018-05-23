@@ -33,8 +33,12 @@ This file is generated! See scripts/docs_collector.py
 |<<metricbeat-module-dropwizard,Dropwizard>>  beta[]   |image:./images/icon-no.png[No prebuilt dashboards]    |  
 .1+| .1+|  |<<metricbeat-metricset-dropwizard-collector,collector>> beta[]  
 |<<metricbeat-module-elasticsearch,Elasticsearch>>  beta[]   |image:./images/icon-no.png[No prebuilt dashboards]    |  
-.2+| .2+|  |<<metricbeat-metricset-elasticsearch-node,node>> beta[]  
+.6+| .6+|  |<<metricbeat-metricset-elasticsearch-index,index>> experimental[]  
+|<<metricbeat-metricset-elasticsearch-index_summary,index_summary>> experimental[]  
+|<<metricbeat-metricset-elasticsearch-node,node>> beta[]  
 |<<metricbeat-metricset-elasticsearch-node_stats,node_stats>> beta[]  
+|<<metricbeat-metricset-elasticsearch-pending_tasks,pending_tasks>> experimental[]  
+|<<metricbeat-metricset-elasticsearch-shard,shard>> experimental[]  
 |<<metricbeat-module-etcd,Etcd>>  beta[]   |image:./images/icon-no.png[No prebuilt dashboards]    |  
 .3+| .3+|  |<<metricbeat-metricset-etcd-leader,leader>> beta[]  
 |<<metricbeat-metricset-etcd-self,self>> beta[]  
@@ -44,7 +48,7 @@ This file is generated! See scripts/docs_collector.py
 |<<metricbeat-metricset-golang-heap,heap>> beta[]  
 |<<metricbeat-module-graphite,Graphite>>  beta[]   |image:./images/icon-no.png[No prebuilt dashboards]    |  
 .1+| .1+|  |<<metricbeat-metricset-graphite-server,server>> beta[]  
-|<<metricbeat-module-haproxy,HAProxy>>     |image:./images/icon-no.png[No prebuilt dashboards]    |  
+|<<metricbeat-module-haproxy,HAProxy>>     |image:./images/icon-yes.png[Prebuilt dashboards are available]    |  
 .2+| .2+|  |<<metricbeat-metricset-haproxy-info,info>>   
 |<<metricbeat-metricset-haproxy-stat,stat>>   
 |<<metricbeat-module-http,HTTP>>     |image:./images/icon-no.png[No prebuilt dashboards]    |  
@@ -70,6 +74,8 @@ This file is generated! See scripts/docs_collector.py
 |<<metricbeat-metricset-kubernetes-state_statefulset,state_statefulset>>   
 |<<metricbeat-metricset-kubernetes-system,system>>   
 |<<metricbeat-metricset-kubernetes-volume,volume>>   
+|<<metricbeat-module-kvm,kvm>>  experimental[]   |image:./images/icon-no.png[No prebuilt dashboards]    |  
+.1+| .1+|  |<<metricbeat-metricset-kvm-dommemstat,dommemstat>> experimental[]  
 |<<metricbeat-module-logstash,Logstash>>  beta[]   |image:./images/icon-no.png[No prebuilt dashboards]    |  
 .2+| .2+|  |<<metricbeat-metricset-logstash-node,node>> beta[]  
 |<<metricbeat-metricset-logstash-node_stats,node_stats>> beta[]  
@@ -96,7 +102,8 @@ This file is generated! See scripts/docs_collector.py
 .2+| .2+|  |<<metricbeat-metricset-prometheus-collector,collector>> beta[]  
 |<<metricbeat-metricset-prometheus-stats,stats>> beta[]  
 |<<metricbeat-module-rabbitmq,RabbitMQ>>  beta[]   |image:./images/icon-yes.png[Prebuilt dashboards are available]    |  
-.3+| .3+|  |<<metricbeat-metricset-rabbitmq-connection,connection>> beta[]  
+.4+| .4+|  |<<metricbeat-metricset-rabbitmq-connection,connection>> beta[]  
+|<<metricbeat-metricset-rabbitmq-exchange,exchange>> beta[]  
 |<<metricbeat-metricset-rabbitmq-node,node>> beta[]  
 |<<metricbeat-metricset-rabbitmq-queue,queue>> beta[]  
 |<<metricbeat-module-redis,Redis>>     |image:./images/icon-yes.png[Prebuilt dashboards are available]    |  
@@ -147,6 +154,7 @@ include::modules/jolokia.asciidoc[]
 include::modules/kafka.asciidoc[]
 include::modules/kibana.asciidoc[]
 include::modules/kubernetes.asciidoc[]
+include::modules/kvm.asciidoc[]
 include::modules/logstash.asciidoc[]
 include::modules/memcached.asciidoc[]
 include::modules/mongodb.asciidoc[]

@@ -30,7 +30,7 @@ type Input struct {
 
 // NewInput creates a new stdin input
 // This input contains one harvester which is reading from stdin
-func NewInput(cfg *common.Config, outlet channel.Factory, context input.Context) (input.Input, error) {
+func NewInput(cfg *common.Config, outlet channel.Connector, context input.Context) (input.Input, error) {
 	out, err := outlet(cfg, context.DynamicFields)
 	if err != nil {
 		return nil, err
@@ -73,7 +73,9 @@ func (p *Input) createHarvester(state file.State) (*log.Harvester, error) {
 	h, err := log.NewHarvester(
 		p.cfg,
 		state, nil, nil,
-		p.outlet,
+		func() channel.Outleter {
+			return p.outlet
+		},
 	)
 
 	return h, err

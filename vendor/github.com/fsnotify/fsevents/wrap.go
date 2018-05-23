@@ -229,6 +229,7 @@ func (es *EventStream) start(paths []string, callbackInfo uintptr) {
 	go func() {
 		runtime.LockOSThread()
 		es.rlref = CFRunLoopRef(C.CFRunLoopGetCurrent())
+		C.CFRetain(C.CFTypeRef(es.rlref))
 		C.FSEventStreamScheduleWithRunLoop(es.stream, C.CFRunLoopRef(es.rlref), C.kCFRunLoopDefaultMode)
 		C.FSEventStreamStart(es.stream)
 		close(started)
@@ -266,4 +267,5 @@ func stop(stream FSEventStreamRef, rlref CFRunLoopRef) {
 	C.FSEventStreamInvalidate(stream)
 	C.FSEventStreamRelease(stream)
 	C.CFRunLoopStop(C.CFRunLoopRef(rlref))
+	C.CFRelease(C.CFTypeRef(rlref))
 }

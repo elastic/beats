@@ -6,6 +6,7 @@ import (
 	"fmt"
 	"io/ioutil"
 	"os"
+	"path"
 	"testing"
 	"time"
 
@@ -32,13 +33,20 @@ func WriteEvent(f mb.EventFetcher, t testing.TB) error {
 	}
 
 	fullEvent := CreateFullEvent(f, event)
-	WriteEventToDataJSON(t, fullEvent)
+	WriteEventToDataJSON(t, fullEvent, "")
 	return nil
 }
 
 // WriteEvents fetches events and writes the first event to a ./_meta/data.json
 // file.
 func WriteEvents(f mb.EventsFetcher, t testing.TB) error {
+	return WriteEventsCond(f, t, nil)
+
+}
+
+// WriteEventsCond fetches events and writes the first event that matches the condition
+// to a ./_meta/data.json file.
+func WriteEventsCond(f mb.EventsFetcher, t testing.TB, cond func(e common.MapStr) bool) error {
 	if !*dataFlag {
 		t.Skip("skip data generation tests")
 	}
@@ -52,8 +60,45 @@ func WriteEvents(f mb.EventsFetcher, t testing.TB) error {
 		return fmt.Errorf("no events were generated")
 	}
 
-	fullEvent := CreateFullEvent(f, events[0])
-	WriteEventToDataJSON(t, fullEvent)
+	var event *common.MapStr
+	if cond == nil {
+		event = &events[0]
+	} else {
+		for _, e := range events {
+			if cond(e) {
+				event = &e
+				break
+			}
+		}
+		if event == nil {
+			return fmt.Errorf("no events satisfied the condition")
+		}
+	}
+
+	fullEvent := CreateFullEvent(f, *event)
+	WriteEventToDataJSON(t, fullEvent, "")
+	return nil
+}
+
+// WriteEventsReporterV2 fetches events and writes the first event to a ./_meta/data.json
+// file.
+func WriteEventsReporterV2(f mb.ReportingMetricSetV2, t testing.TB, path string) error {
+	if !*dataFlag {
+		t.Skip("skip data generation tests")
+	}
+
+	events, errs := ReportingFetchV2(f)
+	if len(errs) > 0 {
+		return errs[0]
+	}
+
+	if len(events) == 0 {
+		return fmt.Errorf("no events were generated")
+	}
+
+	e := StandardizeEvent(f, events[0], mb.AddMetricSetInfo)
+
+	WriteEventToDataJSON(t, e, path)
 	return nil
 }
 
@@ -97,15 +142,17 @@ func StandardizeEvent(ms mb.MetricSet, e mb.Event, modifiers ...mb.EventModifier
 // WriteEventToDataJSON writes the given event as "pretty" JSON to
 // a ./_meta/data.json file. If the -data CLI flag is unset or false then the
 // method is a no-op.
-func WriteEventToDataJSON(t testing.TB, fullEvent beat.Event) {
+func WriteEventToDataJSON(t testing.TB, fullEvent beat.Event, postfixPath string) {
 	if !*dataFlag {
 		return
 	}
 
-	path, err := os.Getwd()
+	p, err := os.Getwd()
 	if err != nil {
 		t.Fatal(err)
 	}
+
+	p = path.Join(p, postfixPath, "_meta", "data.json")
 
 	fields := fullEvent.Fields
 	fields["@timestamp"] = fullEvent.Timestamp
@@ -115,7 +162,7 @@ func WriteEventToDataJSON(t testing.TB, fullEvent beat.Event) {
 		t.Fatal(err)
 	}
 
-	if err = ioutil.WriteFile(path+"/_meta/data.json", output, 0644); err != nil {
+	if err = ioutil.WriteFile(p, output, 0644); err != nil {
 		t.Fatal(err)
 	}
 }

@@ -1,0 +1,16 @@
+- name: log
+  type: group
+  description: >
+    Kafka log lines.
+  fields:
+    - name: tags
+      type: keyword
+      description: >
+        Kibana logging tags.
+    - name: state
+      type: keyword
+      description: >
+        Current state of Kibana.
+    - name: meta
+      type: object
+      object_type: keyword

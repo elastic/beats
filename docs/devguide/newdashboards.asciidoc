@@ -85,7 +85,7 @@ import only the dashboards, use the `--dashboards` flag:
 
 Starting with Beats 6.0.0, the dashboards are no longer loaded directly into Elasticsearch. Instead, they are imported directly into Kibana.
 Thus, if your Kibana instance is not listening on localhost, or you enabled
-X-Pack for Kibana, you need to either configure the Kibana endpoint in
+{xpack} for Kibana, you need to either configure the Kibana endpoint in
 the config for the Beat, or pass the Kibana host and credentials as
 arguments to the `setup` command. For example:
 

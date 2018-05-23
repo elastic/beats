@@ -7,6 +7,7 @@ import (
 	"github.com/elastic/beats/filebeat/channel"
 	"github.com/elastic/beats/filebeat/harvester"
 	"github.com/elastic/beats/filebeat/input"
+	"github.com/elastic/beats/filebeat/inputsource"
 	"github.com/elastic/beats/filebeat/inputsource/udp"
 	"github.com/elastic/beats/filebeat/util"
 	"github.com/elastic/beats/libbeat/beat"
@@ -33,7 +34,7 @@ type Input struct {
 // NewInput creates a new udp input
 func NewInput(
 	cfg *common.Config,
-	outlet channel.Factory,
+	outlet channel.Connector,
 	context input.Context,
 ) (input.Input, error) {
 	cfgwarn.Experimental("UDP input type is used")
@@ -49,7 +50,7 @@ func NewInput(
 	}
 
 	forwarder := harvester.NewForwarder(out)
-	callback := func(data []byte, metadata udp.Metadata) {
+	callback := func(data []byte, metadata inputsource.NetworkMetadata) {
 		e := util.NewData()
 		e.Event = beat.Event{
 			Timestamp: time.Now(),

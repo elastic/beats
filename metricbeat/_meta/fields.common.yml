@@ -34,3 +34,7 @@
       description: >
         The document type. Always set to "doc".
 
+    - name: service.name
+      example: elasticsearch
+      description: >
+        Name of the service metricbeat fetches the data from.

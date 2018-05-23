@@ -31,7 +31,7 @@ type Input struct {
 }
 
 // NewInput creates a new redis input
-func NewInput(cfg *common.Config, outletFactory channel.Factory, context input.Context) (input.Input, error) {
+func NewInput(cfg *common.Config, outletFactory channel.Connector, context input.Context) (input.Input, error) {
 	cfgwarn.Experimental("Redis slowlog input is enabled.")
 
 	config := defaultConfig

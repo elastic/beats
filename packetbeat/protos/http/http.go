@@ -14,7 +14,6 @@ import (
 
 	"github.com/elastic/beats/packetbeat/procs"
 	"github.com/elastic/beats/packetbeat/protos"
-	"github.com/elastic/beats/packetbeat/protos/tcp"
 )
 
 var debugf = logp.MakeDebug("http")
@@ -33,6 +32,7 @@ const (
 
 var (
 	unmatchedResponses = monitoring.NewInt(nil, "http.unmatched_responses")
+	unmatchedRequests  = monitoring.NewInt(nil, "http.unmatched_requests")
 )
 
 type stream struct {
@@ -415,14 +415,31 @@ func (http *httpPlugin) handleHTTP(
 	}
 }
 
+func (http *httpPlugin) flushResponses(conn *httpConnectionData) {
+	for !conn.responses.empty() {
+		unmatchedResponses.Add(1)
+		resp := conn.responses.pop()
+		debugf("Response from unknown transaction: %s. Reporting error.", resp.tcpTuple)
+		event := http.newTransaction(nil, resp)
+		http.publishTransaction(event)
+	}
+}
+
+func (http *httpPlugin) flushRequests(conn *httpConnectionData) {
+	for !conn.requests.empty() {
+		unmatchedRequests.Add(1)
+		requ := conn.requests.pop()
+		debugf("Request from unknown transaction %s. Reporting error.", requ.tcpTuple)
+		event := http.newTransaction(requ, nil)
+		http.publishTransaction(event)
+	}
+}
+
 func (http *httpPlugin) correlate(conn *httpConnectionData) {
+
 	// drop responses with missing requests
 	if conn.requests.empty() {
-		for !conn.responses.empty() {
-			debugf("Response from unknown transaction. Ignoring.")
-			unmatchedResponses.Add(1)
-			conn.responses.pop()
-		}
+		http.flushResponses(conn)
 		return
 	}
 
@@ -441,74 +458,92 @@ func (http *httpPlugin) correlate(conn *httpConnectionData) {
 
 func (http *httpPlugin) newTransaction(requ, resp *message) beat.Event {
 	status := common.OK_STATUS
-	if resp.statusCode >= 400 {
+	if resp == nil {
+		status = common.ERROR_STATUS
+		if requ != nil {
+			requ.notes = append(requ.notes, "Unmatched request")
+		}
+	} else if resp.statusCode >= 400 {
 		status = common.ERROR_STATUS
 	}
-
-	// resp_time in milliseconds
-	responseTime := int32(resp.ts.Sub(requ.ts).Nanoseconds() / 1e6)
-
-	path, params, err := http.extractParameters(requ)
-	if err != nil {
-		logp.Warn("Fail to parse HTTP parameters: %v", err)
+	if requ == nil {
+		status = common.ERROR_STATUS
+		if resp != nil {
+			resp.notes = append(resp.notes, "Unmatched response")
+		}
 	}
 
-	src := common.Endpoint{
-		IP:   requ.tcpTuple.SrcIP.String(),
-		Port: requ.tcpTuple.SrcPort,
-		Proc: string(requ.cmdlineTuple.Src),
-	}
-	dst := common.Endpoint{
-		IP:   requ.tcpTuple.DstIP.String(),
-		Port: requ.tcpTuple.DstPort,
-		Proc: string(requ.cmdlineTuple.Dst),
-	}
-	if requ.direction == tcp.TCPDirectionReverse {
-		src, dst = dst, src
+	httpDetails := common.MapStr{}
+	fields := common.MapStr{
+		"type":   "http",
+		"status": status,
+		"http":   httpDetails,
 	}
 
-	httpDetails := common.MapStr{
-		"request": common.MapStr{
+	var timestamp time.Time
+
+	if requ != nil {
+		path, params, err := http.extractParameters(requ)
+		if err != nil {
+			logp.Warn("Fail to parse HTTP parameters: %v", err)
+		}
+		httpDetails["request"] = common.MapStr{
 			"params":  params,
 			"headers": http.collectHeaders(requ),
-		},
-		"response": common.MapStr{
+		}
+		fields["method"] = requ.method
+		fields["path"] = path
+		fields["query"] = fmt.Sprintf("%s %s", requ.method, path)
+		fields["bytes_in"] = requ.size
+
+		fields["src"], fields["dst"] = requ.getEndpoints()
+
+		http.setBody(httpDetails["request"].(common.MapStr), requ)
+
+		timestamp = requ.ts
+
+		if len(requ.notes) > 0 {
+			fields["notes"] = requ.notes
+		}
+
+		if len(requ.realIP) > 0 {
+			fields["real_ip"] = requ.realIP
+		}
+
+		if http.sendRequest {
+			fields["request"] = string(http.makeRawMessage(requ))
+		}
+	}
+
+	if resp != nil {
+		httpDetails["response"] = common.MapStr{
 			"code":    resp.statusCode,
 			"phrase":  resp.statusPhrase,
 			"headers": http.collectHeaders(resp),
-		},
+		}
+		http.setBody(httpDetails["response"].(common.MapStr), resp)
+		fields["bytes_out"] = resp.size
+
+		if http.sendResponse {
+			fields["response"] = string(http.makeRawMessage(resp))
+		}
+
+		if len(resp.notes) > 0 {
+			if fields["notes"] != nil {
+				fields["notes"] = append(fields["notes"].([]string), resp.notes...)
+			} else {
+				fields["notes"] = resp.notes
+			}
+		}
+		if requ == nil {
+			timestamp = resp.ts
+			fields["src"], fields["dst"] = resp.getEndpoints()
+		}
 	}
 
-	http.setBody(httpDetails["request"].(common.MapStr), requ)
-	http.setBody(httpDetails["response"].(common.MapStr), resp)
-
-	timestamp := requ.ts
-	fields := common.MapStr{
-		"type":         "http",
-		"status":       status,
-		"responsetime": responseTime,
-		"method":       requ.method,
-		"path":         path,
-		"query":        fmt.Sprintf("%s %s", requ.method, path),
-		"http":         httpDetails,
-		"bytes_out":    resp.size,
-		"bytes_in":     requ.size,
-		"src":          &src,
-		"dst":          &dst,
-	}
-
-	if http.sendRequest {
-		fields["request"] = http.makeRawMessage(requ)
-	}
-	if http.sendResponse {
-		fields["response"] = http.makeRawMessage(resp)
-	}
-
-	if len(requ.notes)+len(resp.notes) > 0 {
-		fields["notes"] = append(requ.notes, resp.notes...)
-	}
-	if len(requ.realIP) > 0 {
-		fields["real_ip"] = requ.realIP
+	// resp_time in milliseconds
+	if requ != nil && resp != nil {
+		fields["responsetime"] = int32(resp.ts.Sub(requ.ts).Nanoseconds() / 1e6)
 	}
 
 	return beat.Event{
@@ -704,6 +739,33 @@ func (http *httpPlugin) isSecretParameter(key string) bool {
 		}
 	}
 	return false
+}
+
+func (http *httpPlugin) Expired(tuple *common.TCPTuple, private protos.ProtocolData) {
+	conn := getHTTPConnection(private)
+	if conn == nil {
+		return
+	}
+	if isDebug {
+		debugf("expired connection %s", tuple)
+	}
+	// terminate streams
+	for dir, s := range conn.streams {
+		// Do not send incomplete or empty messages
+		if s != nil && s.message != nil && s.message.headersReceived() {
+			if isDebug {
+				debugf("got message %+v", s.message)
+			}
+			http.handleHTTP(conn, s.message, tuple, uint8(dir))
+			s.PrepareForNewMessage()
+		}
+	}
+	// correlate transactions
+	http.correlate(conn)
+
+	// flush uncorrelated requests and responses
+	http.flushRequests(conn)
+	http.flushResponses(conn)
 }
 
 func (ml *messageList) append(msg *message) {

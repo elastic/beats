@@ -2,10 +2,12 @@ package template
 
 import (
 	"errors"
+	"strings"
 
 	"github.com/elastic/beats/libbeat/common"
 )
 
+// Processor struct to process fields to template
 type Processor struct {
 	EsVersion common.Version
 }
@@ -14,10 +16,8 @@ var (
 	defaultScalingFactor = 1000
 )
 
-// This includes all entries without special handling for different versions.
-// Currently this is:
-// long, geo_point, date, short, byte, float, double, boolean
-func (p *Processor) process(fields common.Fields, path string, output common.MapStr) error {
+// Process recursively processes the given fields and writes the template in the given output
+func (p *Processor) Process(fields common.Fields, path string, output common.MapStr) error {
 	for _, field := range fields {
 
 		if field.Name == "" {
@@ -69,7 +69,7 @@ func (p *Processor) process(fields common.Fields, path string, output common.Map
 				}
 			}
 
-			if err := p.process(field.Fields, newPath, properties); err != nil {
+			if err := p.Process(field.Fields, newPath, properties); err != nil {
 				return err
 			}
 			mapping["properties"] = properties
@@ -142,6 +142,13 @@ func (p *Processor) ip(f *common.Field) common.MapStr {
 func (p *Processor) keyword(f *common.Field) common.MapStr {
 	property := getDefaultProperties(f)
 
+	fullName := f.Name
+	if f.Path != "" {
+		fullName = f.Path + "." + f.Name
+	}
+
+	defaultFields = append(defaultFields, fullName)
+
 	property["type"] = "keyword"
 	property["ignore_above"] = 1024
 
@@ -150,11 +157,25 @@ func (p *Processor) keyword(f *common.Field) common.MapStr {
 		property["ignore_above"] = 1024
 		property["index"] = "not_analyzed"
 	}
+
+	if len(f.MultiFields) > 0 {
+		fields := common.MapStr{}
+		p.Process(f.MultiFields, "", fields)
+		property["fields"] = fields
+	}
+
 	return property
 }
 
 func (p *Processor) text(f *common.Field) common.MapStr {
 	properties := getDefaultProperties(f)
+
+	fullName := f.Name
+	if f.Path != "" {
+		fullName = f.Path + "." + f.Name
+	}
+
+	defaultFields = append(defaultFields, fullName)
 
 	properties["type"] = "text"
 
@@ -182,7 +203,7 @@ func (p *Processor) text(f *common.Field) common.MapStr {
 
 	if len(f.MultiFields) > 0 {
 		fields := common.MapStr{}
-		p.process(f.MultiFields, "", fields)
+		p.Process(f.MultiFields, "", fields)
 		properties["fields"] = fields
 	}
 
@@ -208,6 +229,9 @@ func (p *Processor) object(f *common.Field) common.MapStr {
 	}
 
 	switch f.ObjectType {
+	case "scaled_float":
+		dynProperties = p.scaledFloat(f)
+		addDynamicTemplate(f, dynProperties, matchType("*"))
 	case "text":
 		dynProperties["type"] = "text"
 
@@ -216,12 +240,12 @@ func (p *Processor) object(f *common.Field) common.MapStr {
 			dynProperties["index"] = "analyzed"
 		}
 		addDynamicTemplate(f, dynProperties, matchType("string"))
-	case "long":
-		dynProperties["type"] = f.ObjectType
-		addDynamicTemplate(f, dynProperties, matchType("long"))
 	case "keyword":
 		dynProperties["type"] = f.ObjectType
 		addDynamicTemplate(f, dynProperties, matchType("string"))
+	case "long", "double":
+		dynProperties["type"] = f.ObjectType
+		addDynamicTemplate(f, dynProperties, matchType(f.ObjectType))
 	}
 
 	properties := getDefaultProperties(f)
@@ -242,12 +266,16 @@ func addDynamicTemplate(f *common.Field, properties common.MapStr, matchType str
 	if len(f.Path) > 0 {
 		path = f.Path + "."
 	}
+	pathMatch := path + f.Name
+	if !strings.ContainsRune(pathMatch, '*') {
+		pathMatch += ".*"
+	}
 	template := common.MapStr{
 		// Set the path of the field as name
 		path + f.Name: common.MapStr{
 			"mapping":            properties,
 			"match_mapping_type": matchType,
-			"path_match":         path + f.Name + ".*",
+			"path_match":         pathMatch,
 		},
 	}
 
