@@ -31,6 +31,13 @@ func (e *Event) SetID(id string) {
 	e.Meta["id"] = id
 }
 
+func (e *Event) HasKey(key string) (bool, error) {
+	if key == "@timestamp" {
+		return true, nil
+	}
+	return e.Fields.HasKey(key)
+}
+
 func (e *Event) GetValue(key string) (interface{}, error) {
 	if key == "@timestamp" {
 		return e.Timestamp, nil
