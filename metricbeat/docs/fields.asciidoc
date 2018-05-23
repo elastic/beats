@@ -9878,29 +9878,35 @@ Apply status fields.
 
 
 
-[float]
-=== `mysql.status.apply.oooe`
-
+*`mysql.status.apply.oooe`*::
++
+--
 type: double
 
 How often applier started write-set applying out-of-order (parallelization efficiency).
 
 
-[float]
-=== `mysql.status.apply.oool`
+--
 
+*`mysql.status.apply.oool`*::
++
+--
 type: double
 
 How often write-set was so slow to apply that write-set with higher seqno's were applied earlier. Values closer to 0 refer to a greater gap between slow and fast write-sets.
 
 
-[float]
-=== `mysql.status.apply.window`
+--
 
+*`mysql.status.apply.window`*::
++
+--
 type: double
 
 Average distance between highest and lowest concurrently applied seqno.
 
+
+--
 
 [float]
 == cert fields
@@ -9909,29 +9915,35 @@ Certification status fields.
 
 
 
-[float]
-=== `mysql.status.cert.deps_distance`
-
+*`mysql.status.cert.deps_distance`*::
++
+--
 type: double
 
 Average distance between highest and lowest seqno value that can be possibly applied in parallel (potential degree of parallelization).
 
 
-[float]
-=== `mysql.status.cert.index_size`
+--
 
+*`mysql.status.cert.index_size`*::
++
+--
 type: long
 
 The number of entries in the certification index.
 
 
-[float]
-=== `mysql.status.cert.interval`
+--
 
+*`mysql.status.cert.interval`*::
++
+--
 type: double
 
 Average number of transactions received while a transaction replicates.
 
+
+--
 
 [float]
 == cluster fields
@@ -9940,29 +9952,35 @@ Cluster status fields.
 
 
 
-[float]
-=== `mysql.status.cluster.conf_id`
-
+*`mysql.status.cluster.conf_id`*::
++
+--
 type: long
 
 Total number of cluster membership changes happened.
 
 
-[float]
-=== `mysql.status.cluster.size`
+--
 
+*`mysql.status.cluster.size`*::
++
+--
 type: long
 
 Current number of members in the cluster.
 
 
-[float]
-=== `mysql.status.cluster.status`
+--
 
+*`mysql.status.cluster.status`*::
++
+--
 type: keyword
 
 Status of this cluster component. That is, whether the node is part of a PRIMARY or NON_PRIMARY component.
 
+
+--
 
 [float]
 == commit fields
@@ -9971,29 +9989,35 @@ Commit status fields.
 
 
 
-[float]
-=== `mysql.status.commit.oooe`
-
+*`mysql.status.commit.oooe`*::
++
+--
 type: double
 
 How often a transaction was committed out of order.
 
 
-[float]
-=== `mysql.status.commit.window`
+--
 
+*`mysql.status.commit.window`*::
++
+--
 type: long
 
 Average distance between highest and lowest concurrently committed seqno.
 
 
-[float]
-=== `mysql.status.connected`
+--
 
+*`mysql.status.connected`*::
++
+--
 type: keyword
 
 If the value is OFF, the node has not yet connected to any of the cluster components. This may be due to misconfiguration. Check the error log for proper diagnostics.
 
+
+--
 
 [float]
 == evs fields
@@ -10002,21 +10026,25 @@ Evs Fields.
 
 
 
-[float]
-=== `mysql.status.evs.evict`
-
+*`mysql.status.evs.evict`*::
++
+--
 type: keyword
 
 Lists the UUID's of all nodes evicted from the cluster. Evicted nodes cannot rejoin the cluster until you restart their mysqld processes.
 
 
-[float]
-=== `mysql.status.evs.state`
+--
 
+*`mysql.status.evs.state`*::
++
+--
 type: keyword
 
 Shows the internal state of the EVS Protocol.
 
+
+--
 
 [float]
 == flow_ctl fields
@@ -10025,45 +10053,55 @@ Flow Control fields.
 
 
 
-[float]
-=== `mysql.status.flow_ctl.paused`
-
+*`mysql.status.flow_ctl.paused`*::
++
+--
 type: double
 
 The fraction of time since the last FLUSH STATUS command that replication was paused due to flow control. In other words, how much the slave lag is slowing down the cluster.
 
 
-[float]
-=== `mysql.status.flow_ctl.paused_ns`
+--
 
+*`mysql.status.flow_ctl.paused_ns`*::
++
+--
 type: long
 
 The total time spent in a paused state measured in nanoseconds.
 
 
-[float]
-=== `mysql.status.flow_ctl.recv`
+--
 
+*`mysql.status.flow_ctl.recv`*::
++
+--
 type: long
 
 Returns the number of FC_PAUSE events the node has received, including those the node has sent. Unlike most status variables, the counter for this one does not reset every time you run the query.
 
 
-[float]
-=== `mysql.status.flow_ctl.sent`
+--
 
+*`mysql.status.flow_ctl.sent`*::
++
+--
 type: long
 
 Returns the number of FC_PAUSE events the node has sent. Unlike most status variables, the counter for this one does not reset every time you run the query.
 
 
-[float]
-=== `mysql.status.last_committed`
+--
 
+*`mysql.status.last_committed`*::
++
+--
 type: long
 
 The sequence number, or seqno, of the last committed transaction.
 
+
+--
 
 [float]
 == local fields
@@ -10072,29 +10110,35 @@ Node specific Cluster status fields.
 
 
 
-[float]
-=== `mysql.status.local.bf_aborts`
-
+*`mysql.status.local.bf_aborts`*::
++
+--
 type: long
 
 Total number of local transactions that were aborted by slave transactions while in execution.
 
 
-[float]
-=== `mysql.status.local.cert_failures`
+--
 
+*`mysql.status.local.cert_failures`*::
++
+--
 type: long
 
 Total number of local transactions that failed certification test.
 
 
-[float]
-=== `mysql.status.local.commits`
+--
 
+*`mysql.status.local.commits`*::
++
+--
 type: long
 
 Total number of local transactions committed.
 
+
+--
 
 [float]
 == recv fields
@@ -10103,45 +10147,55 @@ Node specific recv fields.
 
 
 
-[float]
-=== `mysql.status.local.recv.queue`
-
+*`mysql.status.local.recv.queue`*::
++
+--
 type: long
 
 Current (instantaneous) length of the recv queue.
 
 
-[float]
-=== `mysql.status.local.recv.queue_avg`
+--
 
+*`mysql.status.local.recv.queue_avg`*::
++
+--
 type: double
 
 Recv queue length averaged over interval since the last FLUSH STATUS command. Values considerably larger than 0.0 mean that the node cannot apply write-sets as fast as they are received and will generate a lot of replication throttling.
 
 
-[float]
-=== `mysql.status.local.recv.queue_max`
+--
 
+*`mysql.status.local.recv.queue_max`*::
++
+--
 type: long
 
 The maximum length of the recv queue since the last FLUSH STATUS command.
 
 
-[float]
-=== `mysql.status.local.recv.queue_min`
+--
 
+*`mysql.status.local.recv.queue_min`*::
++
+--
 type: long
 
 The minimum length of the recv queue since the last FLUSH STATUS command.
 
 
-[float]
-=== `mysql.status.local.replays`
+--
 
+*`mysql.status.local.replays`*::
++
+--
 type: long
 
 Total number of transaction replays due to asymmetric lock granularity.
 
+
+--
 
 [float]
 == send fields
@@ -10150,53 +10204,65 @@ Node specific sent fields.
 
 
 
-[float]
-=== `mysql.status.local.send.queue`
-
+*`mysql.status.local.send.queue`*::
++
+--
 type: long
 
 Current (instantaneous) length of the send queue.
 
 
-[float]
-=== `mysql.status.local.send.queue_avg`
+--
 
+*`mysql.status.local.send.queue_avg`*::
++
+--
 type: double
 
 Send queue length averaged over time since the last FLUSH STATUS command. Values considerably larger than 0.0 indicate replication throttling or network throughput issue.
 
 
-[float]
-=== `mysql.status.local.send.queue_max`
+--
 
+*`mysql.status.local.send.queue_max`*::
++
+--
 type: long
 
 The maximum length of the send queue since the last FLUSH STATUS command.
 
 
-[float]
-=== `mysql.status.local.send.queue_min`
+--
 
+*`mysql.status.local.send.queue_min`*::
++
+--
 type: long
 
 The minimum length of the send queue since the last FLUSH STATUS command.
 
 
-[float]
-=== `mysql.status.local.state`
+--
 
+*`mysql.status.local.state`*::
++
+--
 type: keyword
 
 Internal Galera Cluster FSM state number.
 
 
-[float]
-=== `mysql.status.ready`
+--
 
+*`mysql.status.ready`*::
++
+--
 type: keyword
 
 Whether the server is ready to accept queries.
 
+
+--
 
 [float]
 == received fields
@@ -10205,21 +10271,25 @@ Write-Set receive status fields.
 
 
 
-[float]
-=== `mysql.status.received.count`
-
+*`mysql.status.received.count`*::
++
+--
 type: long
 
 Total number of write-sets received from other nodes.
 
 
-[float]
-=== `mysql.status.received.bytes`
+--
 
+*`mysql.status.received.bytes`*::
++
+--
 type: long
 
 Total size of write-sets received from other nodes.
 
+
+--
 
 [float]
 == repl fields
@@ -10228,53 +10298,65 @@ Replication status fields.
 
 
 
-[float]
-=== `mysql.status.repl.data_bytes`
-
+*`mysql.status.repl.data_bytes`*::
++
+--
 type: long
 
 Total size of data replicated.
 
 
-[float]
-=== `mysql.status.repl.keys`
+--
 
+*`mysql.status.repl.keys`*::
++
+--
 type: long
 
 Total number of keys replicated.
 
 
-[float]
-=== `mysql.status.repl.keys_bytes`
+--
 
+*`mysql.status.repl.keys_bytes`*::
++
+--
 type: long
 
 Total size of keys replicated.
 
 
-[float]
-=== `mysql.status.repl.other_bytes`
+--
 
+*`mysql.status.repl.other_bytes`*::
++
+--
 type: long
 
 Total size of other bits replicated.
 
 
-[float]
-=== `mysql.status.repl.count`
+--
 
+*`mysql.status.repl.count`*::
++
+--
 type: long
 
 Total number of write-sets replicated (sent to other nodes).
 
 
-[float]
-=== `mysql.status.repl.bytes`
+--
 
+*`mysql.status.repl.bytes`*::
++
+--
 type: long
 
 Total size of write-sets replicated.
 
+
+--
 
 [float]
 == status fields
