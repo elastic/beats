@@ -47,5 +47,6 @@
                 same header name are present in the message, they will be separated
                 by commas.
             - name: body
+              type: text
               description: The body of the HTTP response.
 
