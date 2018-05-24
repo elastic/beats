@@ -38,7 +38,7 @@ type Autodiscover struct {
 	defaultPipeline beat.Pipeline
 	adapter         Adapter
 	providers       []Provider
-	runners         *cfgfile.Registry
+	runners         *cfgfile.RunnerList
 	meta            *meta.Map
 
 	listener bus.Listener
@@ -64,7 +64,7 @@ func NewAutodiscover(name string, pipeline beat.Pipeline, adapter Adapter, confi
 		bus:             bus,
 		defaultPipeline: pipeline,
 		adapter:         adapter,
-		runners:         cfgfile.NewRegistry(),
+		runners:         cfgfile.NewRunnerList(adapter, pipeline),
 		providers:       providers,
 		meta:            meta.NewMap(),
 	}, nil
@@ -112,13 +112,7 @@ func (a *Autodiscover) handleStart(event bus.Event) {
 
 	meta := getMeta(event)
 	for _, config := range configs {
-		rawCfg := map[string]interface{}{}
-		if err := config.Unpack(rawCfg); err != nil {
-			logp.Debug(debugK, "Error unpacking config: %v", err)
-			continue
-		}
-
-		hash, err := hashstructure.Hash(rawCfg, nil)
+		hash, err := cfgfile.HashConfig(config)
 		if err != nil {
 			logp.Debug(debugK, "Could not hash config %v: %v", config, err)
 			continue
@@ -220,9 +214,6 @@ func (a *Autodiscover) Stop() {
 	}
 
 	// Stop runners
-	for hash, runner := range a.runners.CopyList() {
-		runner.Stop()
-		a.meta.Remove(hash)
-	}
+	a.runners.Stop()
 	logp.Info("Stopped autodiscover manager")
 }
