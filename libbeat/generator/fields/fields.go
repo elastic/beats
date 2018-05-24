@@ -19,11 +19,13 @@ type YmlFile struct {
 	Indent int
 }
 
-func collectBeatFiles(beatPath string, fieldFiles []*YmlFile) []*YmlFile {
+func collectBeatFiles(beatPath string, fieldFiles []*YmlFile) ([]*YmlFile, error) {
 	commonFields := filepath.Join(beatPath, "_meta", "fields.common.yml")
 	_, err := os.Stat(commonFields)
 	if os.IsNotExist(err) {
-		return fieldFiles
+		return fieldFiles, nil
+	} else if err != nil {
+		return nil, err
 	}
 
 	files := []*YmlFile{
@@ -33,7 +35,7 @@ func collectBeatFiles(beatPath string, fieldFiles []*YmlFile) []*YmlFile {
 		},
 	}
 
-	return append(files, fieldFiles...)
+	return append(files, fieldFiles...), nil
 }
 
 func writeGeneratedFieldsYml(beatsPath string, fieldFiles []*YmlFile) error {
@@ -76,9 +78,12 @@ func indent(content []byte, n int) []byte {
 
 // Generate collects fields.yml files and concatenates them into one global file.
 func Generate(esBeatsPath, beatPath string, files []*YmlFile) error {
-	files = collectBeatFiles(beatPath, files)
+	files, err := collectBeatFiles(beatPath, files)
+	if err != nil {
+		return err
+	}
 
-	err := writeGeneratedFieldsYml(beatPath, files)
+	err = writeGeneratedFieldsYml(beatPath, files)
 	if err != nil {
 		return err
 	}
