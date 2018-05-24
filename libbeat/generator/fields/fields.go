@@ -98,16 +98,16 @@ func AppendFromLibbeat(esBeatsPath, beatPath string) error {
 
 	if isLibbeat(beatPath) {
 		out := filepath.Join(esBeatsPath, "libbeat", "fields.yml")
-		return createFile(generatedPath, out)
+		return copyFileWithFlag(generatedPath, out, os.O_RDWR|os.O_CREATE|os.O_TRUNC)
 	}
 
 	libbeatPath := filepath.Join(esBeatsPath, "libbeat", generatedFieldsYml)
 	out := filepath.Join(beatPath, "fields.yml")
-	err = createFile(libbeatPath, out)
+	err = copyFileWithFlag(libbeatPath, out, os.O_RDWR|os.O_CREATE|os.O_TRUNC)
 	if err != nil {
 		return err
 	}
-	return appendGenerated(generatedPath, out)
+	return copyFileWithFlag(generatedPath, out, os.O_WRONLY|os.O_APPEND)
 }
 
 func isLibbeat(beatPath string) bool {
@@ -117,7 +117,7 @@ func isLibbeat(beatPath string) bool {
 func createIfNotExists(inPath, outPath string) error {
 	_, err := os.Stat(outPath)
 	if os.IsNotExist(err) {
-		err := createFile(inPath, outPath)
+		err := copyFileWithFlag(inPath, outPath, os.O_RDWR|os.O_CREATE|os.O_TRUNC)
 		if err != nil {
 			fmt.Println("Cannot find _meta/fields.yml")
 		}
@@ -126,13 +126,13 @@ func createIfNotExists(inPath, outPath string) error {
 	return err
 }
 
-func createFile(in, out string) error {
+func copyFileWithFlag(in, out string, flag int) error {
 	input, err := ioutil.ReadFile(in)
 	if err != nil {
 		return err
 	}
 
-	output, err := os.Create(out)
+	output, err := os.OpenFile(out, flag, 0664)
 	if err != nil {
 		return err
 	}
@@ -140,20 +140,5 @@ func createFile(in, out string) error {
 
 	_, err = output.Write(input)
 	return err
-}
 
-func appendGenerated(generatedPath, fieldsPath string) error {
-	input, err := ioutil.ReadFile(generatedPath)
-	if err != nil {
-		return err
-	}
-
-	output, err := os.OpenFile(fieldsPath, os.O_WRONLY|os.O_APPEND, 0644)
-	if err != nil {
-		return err
-	}
-	defer output.Close()
-
-	_, err = output.Write(input)
-	return err
 }
