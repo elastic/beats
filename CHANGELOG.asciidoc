@@ -62,6 +62,7 @@ https://github.com/elastic/beats/compare/v6.2.3...master[Check the HEAD diff]
 - Fix map overwrite panics by cloning shared structs before doing the update. {pull}6947[6947]
 - Fix error if lz4 compression is used with the kafka output. {pull}7025[7025]
 - Preserve the event when source matching fails in `add_docker_metadata`. {pull}7133[7133]
+- Negotiate Docker API version from our client instead of using a hardcoded one. {pull}7165[7165]
 
 *Auditbeat*
 
