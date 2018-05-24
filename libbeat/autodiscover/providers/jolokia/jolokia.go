@@ -12,34 +12,35 @@ func init() {
 	autodiscover.Registry.AddProvider("jolokia", AutodiscoverBuilder)
 }
 
+// DiscoveryProber implements discovery probes
+type DiscoveryProber interface {
+	Start()
+	Stop()
+	Events() <-chan Event
+}
+
+// Provider is the Jolokia Discovery autodiscover provider
 type Provider struct {
 	config    *Config
 	bus       bus.Bus
 	builders  autodiscover.Builders
 	appenders autodiscover.Appenders
 	templates *template.Mapper
-	discovery *Discovery
+	discovery DiscoveryProber
 }
 
+// AutodiscoverBuilder builds a Jolokia Discovery autodiscover provider, it fails if
+// there is some problem with the configuration
 func AutodiscoverBuilder(bus bus.Bus, c *common.Config) (autodiscover.Provider, error) {
 	cfgwarn.Experimental("The Jolokia Discovery autodiscover is experimental")
 
-	config := defaultConfig()
-	err := c.Unpack(&config)
+	config, err := getConfig(c)
 	if err != nil {
 		return nil, err
 	}
 
-	// Avoid having sockets open more time than needed
-	if config.ProbeTimeout > config.Period {
-		config.ProbeTimeout = config.Period
-	}
-
 	discovery := &Discovery{
-		Interfaces:   config.Interfaces,
-		Period:       config.Period,
-		GracePeriod:  config.GracePeriod,
-		ProbeTimeout: config.ProbeTimeout,
+		Interfaces: config.Interfaces,
 	}
 
 	mapper, err := template.NewConfigMapper(config.Templates)
@@ -66,6 +67,7 @@ func AutodiscoverBuilder(bus bus.Bus, c *common.Config) (autodiscover.Provider, 
 	}, nil
 }
 
+// Start starts autodiscover provider
 func (p *Provider) Start() {
 	p.discovery.Start()
 	go func() {
@@ -83,14 +85,15 @@ func (p *Provider) publish(event bus.Event) {
 	}
 
 	p.appenders.Append(event)
-
 	p.bus.Publish(event)
 }
 
+// Stop stops autodiscover provider
 func (p *Provider) Stop() {
 	p.discovery.Stop()
 }
 
+// String returns the name of the provider
 func (p *Provider) String() string {
 	return "jolokia"
 }

@@ -3,6 +3,7 @@ package jolokia
 import (
 	"encoding/json"
 	"net"
+	"reflect"
 	"strings"
 	"sync"
 	"time"
@@ -53,11 +54,13 @@ var messageSchema = s.Schema{
 	"url": c.Str("url"),
 }
 
+// Event is a Jolokia Discovery event
 type Event struct {
 	Type    string
 	Message common.MapStr
 }
 
+// BusEvent converts a Jolokia Discovery event to a autodiscover bus event
 func (e *Event) BusEvent() bus.Event {
 	event := bus.Event{
 		e.Type:    true,
@@ -70,18 +73,19 @@ func (e *Event) BusEvent() bus.Event {
 	return event
 }
 
+// Instance is a discovered Jolokia instance, it keeps information of the
+// last probe it replied
 type Instance struct {
-	LastSeen time.Time
-	Message  common.MapStr
+	LastSeen      time.Time
+	LastInterface *InterfaceConfig
+	Message       common.MapStr
 }
 
+// Discovery controls the Jolokia Discovery probes
 type Discovery struct {
 	sync.Mutex
 
-	Interfaces   []string
-	Period       time.Duration
-	ProbeTimeout time.Duration
-	GracePeriod  time.Duration
+	Interfaces []InterfaceConfig
 
 	instances map[string]*Instance
 
@@ -89,6 +93,7 @@ type Discovery struct {
 	stop   chan struct{}
 }
 
+// Start starts discovery probes
 func (d *Discovery) Start() {
 	d.instances = make(map[string]*Instance)
 	d.events = make(chan Event)
@@ -96,52 +101,62 @@ func (d *Discovery) Start() {
 	go d.run()
 }
 
+// Stop stops discovery probes
 func (d *Discovery) Stop() {
 	d.stop <- struct{}{}
 	close(d.events)
 }
 
-func (d *Discovery) Events() chan Event {
+// Events returns a channel with the events of started and stopped Jolokia
+// instances discovered
+func (d *Discovery) Events() <-chan Event {
 	return d.events
 }
 
 func (d *Discovery) run() {
-	for {
-		d.sendProbe()
-		d.checkStopped()
+	var cases []reflect.SelectCase
+	for _, i := range d.Interfaces {
+		ticker := time.NewTicker(i.Interval)
+		defer ticker.Stop()
+		cases = append(cases, reflect.SelectCase{
+			Dir:  reflect.SelectRecv,
+			Chan: reflect.ValueOf(ticker.C),
+		})
+	}
 
-		select {
-		case <-time.After(d.Period):
-		case <-d.stop:
+	// As a last case, place the stop channel so the loop can be gracefuly stopped
+	stopIndex := len(cases)
+	cases = append(cases, reflect.SelectCase{
+		Dir:  reflect.SelectRecv,
+		Chan: reflect.ValueOf(d.stop),
+	})
+
+	for {
+		chosen, _, _ := reflect.Select(cases)
+		if chosen == stopIndex {
 			return
 		}
+		d.sendProbe(d.Interfaces[chosen])
+		d.checkStopped()
 	}
 }
 
-// TODO: Check if this can be reused, or if packetbeat has something for this
-func (d *Discovery) interfaces() ([]net.Interface, error) {
+func (d *Discovery) interfaces(name string) ([]net.Interface, error) {
 	interfaces, err := net.Interfaces()
 	if err != nil {
 		return nil, err
 	}
-	matching := make(map[string]net.Interface)
-	for _, name := range d.Interfaces {
-		if name == "any" {
-			return interfaces, nil
-		}
-
-		for _, i := range interfaces {
-			if _, found := matching[i.Name]; !found && matchInterfaceName(name, i.Name) {
-				matching[i.Name] = i
-			}
-		}
+	if name == "any" || name == "*" {
+		return interfaces, nil
 	}
 
-	r := make([]net.Interface, 0, len(matching))
-	for _, i := range matching {
-		r = append(r, i)
+	var matching []net.Interface
+	for _, i := range interfaces {
+		if matchInterfaceName(name, i.Name) {
+			matching = append(matching, i)
+		}
 	}
-	return r, nil
+	return matching, nil
 }
 
 func matchInterfaceName(name, candidate string) bool {
@@ -169,8 +184,8 @@ func getIPv4Addr(i net.Interface) (net.IP, error) {
 var discoveryAddress = net.UDPAddr{IP: net.IPv4(239, 192, 48, 84), Port: 24884}
 var queryMessage = []byte(`{"type":"query"}`)
 
-func (d *Discovery) sendProbe() {
-	interfaces, err := d.interfaces()
+func (d *Discovery) sendProbe(config InterfaceConfig) {
+	interfaces, err := d.interfaces(config.Name)
 	if err != nil {
 		logp.Err("failed to get interfaces: ", err)
 		return
@@ -197,7 +212,7 @@ func (d *Discovery) sendProbe() {
 				return
 			}
 			defer conn.Close()
-			conn.SetDeadline(time.Now().Add(d.ProbeTimeout))
+			conn.SetDeadline(time.Now().Add(config.ProbeTimeout))
 
 			if _, err := conn.WriteTo(queryMessage, &discoveryAddress); err != nil {
 				logp.Err(err.Error())
@@ -208,7 +223,7 @@ func (d *Discovery) sendProbe() {
 			for {
 				n, _, err := conn.ReadFrom(b)
 				if err != nil {
-					if !err.(net.Error).Timeout() {
+					if netErr, ok := err.(net.Error); !ok || !netErr.Timeout() {
 						logp.Err(err.Error())
 					}
 					return
@@ -220,40 +235,43 @@ func (d *Discovery) sendProbe() {
 					continue
 				}
 				message, _ := messageSchema.Apply(m)
-				/*
-					if err != nil {
-						logp.Err(err.Error())
-						continue
-					}
-				*/
-				d.update(message)
+				d.update(config, message)
 			}
 		}()
 	}
 	wg.Wait()
 }
 
-func (d *Discovery) update(message common.MapStr) {
+func (d *Discovery) update(config InterfaceConfig, message common.MapStr) {
 	v, err := message.GetValue("agent.id")
 	if err != nil {
 		logp.Err("failed to update agent without id: " + err.Error())
 		return
 	}
-	agentId, ok := v.(string)
-	if len(agentId) == 0 || !ok {
+	agentID, ok := v.(string)
+	if len(agentID) == 0 || !ok {
 		logp.Err("empty agent?")
+		return
+	}
+
+	url, err := message.GetValue("url")
+	if err != nil || url == nil {
+		// This can happen if Jolokia agent is initializing and it still
+		// doesn't know its URL
+		logp.Info("agent %s without url, ignoring by now", agentID)
 		return
 	}
 
 	d.Lock()
 	defer d.Unlock()
-	i, found := d.instances[agentId]
+	i, found := d.instances[agentID]
 	if !found {
 		i = &Instance{Message: message}
-		d.instances[agentId] = i
+		d.instances[agentID] = i
 		d.events <- Event{"start", message}
 	}
 	i.LastSeen = time.Now()
+	i.LastInterface = &config
 }
 
 func (d *Discovery) checkStopped() {
@@ -261,7 +279,7 @@ func (d *Discovery) checkStopped() {
 	defer d.Unlock()
 
 	for id, i := range d.instances {
-		if time.Since(i.LastSeen) > d.GracePeriod {
+		if time.Since(i.LastSeen) > i.LastInterface.GracePeriod {
 			d.events <- Event{"stop", i.Message}
 			delete(d.instances, id)
 		}
