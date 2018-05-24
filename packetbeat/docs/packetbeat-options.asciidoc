@@ -570,7 +570,7 @@ If enabled Packetbeat will generate the following BPF filter: `"icmp or icmp6"`.
 <titleabbrev>DNS</titleabbrev>
 ++++
 
-The `dns` section of the +{beatname_lc}.yml+ config file specifies configuration options for the DNS protocol. The DNS protocol supports processing DNS messages on UDP. Here is a sample configuration section for DNS:
+The `dns` section of the +{beatname_lc}.yml+ config file specifies configuration options for the DNS protocol. The DNS protocol supports processing DNS messages on TCP and UDP. Here is a sample configuration section for DNS:
 
 [source,yaml]
 ------------------------------------------------------------------------------
