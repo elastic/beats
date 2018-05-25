@@ -1,6 +1,8 @@
 package cfgfile
 
 import (
+	"sync"
+
 	"github.com/mitchellh/hashstructure"
 
 	"github.com/elastic/beats/libbeat/beat"
@@ -11,6 +13,7 @@ import (
 // RunnerList implements a reloadable.List of Runners
 type RunnerList struct {
 	runners  map[uint64]Runner
+	mutex    sync.Mutex
 	factory  RunnerFactory
 	pipeline beat.Pipeline
 }
@@ -27,6 +30,9 @@ func NewRunnerList(factory RunnerFactory, pipeline beat.Pipeline) *RunnerList {
 // Reload the list of runners to match the given state
 // TODO return list of errors (even we don't stop on them)
 func (r *RunnerList) Reload(configs []*common.Config) error {
+	r.mutex.Lock()
+	defer r.mutex.Unlock()
+
 	startList := map[uint64]*common.Config{}
 	stopList := r.copyRunnerList()
 
@@ -72,6 +78,9 @@ func (r *RunnerList) Reload(configs []*common.Config) error {
 
 // Stop all runners
 func (r *RunnerList) Stop() {
+	r.mutex.Lock()
+	defer r.mutex.Unlock()
+
 	for h, runner := range r.runners {
 		debugf("Stopping runner: %s", runner)
 		delete(r.runners, h)
@@ -81,22 +90,30 @@ func (r *RunnerList) Stop() {
 
 // Has returns true if a runner with the given hash is running
 func (r *RunnerList) Has(hash uint64) bool {
+	r.mutex.Lock()
+	defer r.mutex.Unlock()
 	_, ok := r.runners[hash]
 	return ok
 }
 
 // Add the given runner to the list of running runners
 func (r *RunnerList) Add(hash uint64, runner Runner) {
+	r.mutex.Lock()
+	defer r.mutex.Unlock()
 	r.runners[hash] = runner
 }
 
 // Get returns the runner with the given hash (nil if not found)
 func (r *RunnerList) Get(hash uint64) Runner {
+	r.mutex.Lock()
+	defer r.mutex.Unlock()
 	return r.runners[hash]
 }
 
 // Remove the Runner with the given hash
 func (r *RunnerList) Remove(hash uint64) {
+	r.mutex.Lock()
+	defer r.mutex.Unlock()
 	delete(r.runners, hash)
 }
 
