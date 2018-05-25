@@ -3,7 +3,7 @@ package logstash
 import (
 	"time"
 
-	"github.com/elastic/beats/libbeat/outputs"
+	"github.com/elastic/beats/libbeat/common/transport/tlscommon"
 	"github.com/elastic/beats/libbeat/outputs/transport"
 )
 
@@ -18,7 +18,7 @@ type Config struct {
 	Pipelining       int                   `config:"pipelining"        validate:"min=0"`
 	CompressionLevel int                   `config:"compression_level" validate:"min=0, max=9"`
 	MaxRetries       int                   `config:"max_retries"       validate:"min=-1"`
-	TLS              *outputs.TLSConfig    `config:"ssl"`
+	TLS              *tlscommon.Config     `config:"ssl"`
 	Proxy            transport.ProxyConfig `config:",inline"`
 	Backoff          Backoff               `config:"backoff"`
 }

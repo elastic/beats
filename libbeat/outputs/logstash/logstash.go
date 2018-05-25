@@ -3,6 +3,7 @@ package logstash
 import (
 	"github.com/elastic/beats/libbeat/beat"
 	"github.com/elastic/beats/libbeat/common"
+	"github.com/elastic/beats/libbeat/common/transport/tlscommon"
 	"github.com/elastic/beats/libbeat/logp"
 	"github.com/elastic/beats/libbeat/outputs"
 	"github.com/elastic/beats/libbeat/outputs/transport"
@@ -38,7 +39,7 @@ func makeLogstash(
 		return outputs.Fail(err)
 	}
 
-	tls, err := outputs.LoadTLSConfig(config.TLS)
+	tls, err := tlscommon.LoadTLSConfig(config.TLS)
 	if err != nil {
 		return outputs.Fail(err)
 	}

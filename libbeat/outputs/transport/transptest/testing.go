@@ -14,7 +14,7 @@ import (
 	"testing"
 	"time"
 
-	"github.com/elastic/beats/libbeat/outputs"
+	"github.com/elastic/beats/libbeat/common/transport/tlscommon"
 	"github.com/elastic/beats/libbeat/outputs/transport"
 )
 
@@ -108,8 +108,8 @@ func NewMockServerTLS(t *testing.T, to time.Duration, cert string, proxy *transp
 		t.Fatalf("failed to generate TCP listener")
 	}
 
-	tlsConfig, err := outputs.LoadTLSConfig(&outputs.TLSConfig{
-		Certificate: outputs.CertificateConfig{
+	tlsConfig, err := tlscommon.LoadTLSConfig(&tlscommon.Config{
+		Certificate: tlscommon.CertificateConfig{
 			Certificate: cert + ".pem",
 			Key:         cert + ".key",
 		},
@@ -158,7 +158,7 @@ func connectTCP(timeout time.Duration) TransportFactory {
 
 func connectTLS(timeout time.Duration, certName string) TransportFactory {
 	return func(addr string, proxy *transport.ProxyConfig) (*transport.Client, error) {
-		tlsConfig, err := outputs.LoadTLSConfig(&outputs.TLSConfig{
+		tlsConfig, err := tlscommon.LoadTLSConfig(&tlscommon.Config{
 			CAs: []string{certName + ".pem"},
 		})
 		if err != nil {
