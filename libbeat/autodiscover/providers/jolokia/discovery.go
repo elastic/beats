@@ -115,6 +115,10 @@ func (d *Discovery) Events() <-chan Event {
 func (d *Discovery) run() {
 	var cases []reflect.SelectCase
 	for _, i := range d.Interfaces {
+		// Send a probe on each interface when starting
+		d.sendProbe(i)
+
+		// And then one after each interval
 		ticker := time.NewTicker(i.Interval)
 		defer ticker.Stop()
 		cases = append(cases, reflect.SelectCase{
