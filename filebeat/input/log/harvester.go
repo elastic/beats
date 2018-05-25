@@ -523,7 +523,7 @@ func (h *Harvester) newLogFileReader() (reader.Reader, error) {
 	// TODO: NewLineReader uses additional buffering to deal with encoding and testing
 	//       for new lines in input stream. Simple 8-bit based encodings, or plain
 	//       don't require 'complicated' logic.
-	h.log, err = NewLog(h.source, h.config.LogConfig)
+	h.log, err = NewLog(h.source, h.state.FileStateOS, h.config.LogConfig)
 	if err != nil {
 		return nil, err
 	}

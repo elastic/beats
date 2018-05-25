@@ -8,11 +8,14 @@ import (
 	"github.com/elastic/beats/filebeat/harvester"
 	"github.com/elastic/beats/filebeat/input/file"
 	"github.com/elastic/beats/libbeat/logp"
+
+	file_helper "github.com/elastic/beats/libbeat/common/file"
 )
 
 // Log contains all log related data
 type Log struct {
 	fs           harvester.Source
+	stateOS      file_helper.StateOS
 	offset       int64
 	config       LogConfig
 	lastTimeRead time.Time
@@ -23,6 +26,7 @@ type Log struct {
 // NewLog creates a new log instance to read log sources
 func NewLog(
 	fs harvester.Source,
+	stateOS file_helper.StateOS,
 	config LogConfig,
 ) (*Log, error) {
 	var offset int64
@@ -36,6 +40,7 @@ func NewLog(
 
 	return &Log{
 		fs:           fs,
+		stateOS:      stateOS,
 		offset:       offset,
 		config:       config,
 		lastTimeRead: time.Now(),
@@ -135,10 +140,10 @@ func (f *Log) errorChecks(err error) error {
 
 	if f.config.CloseRemoved {
 		// Check if the file name exists. See https://github.com/elastic/filebeat/issues/93
-		_, statErr := os.Stat(f.fs.Name())
+		stat, statErr := os.Stat(f.fs.Name())
 
-		// Error means file does not exist.
-		if statErr != nil {
+		// Error means file does not exist, or if inode has changed, then file was removed.
+		if statErr != nil || !file_helper.GetOSState(stat).IsSame(f.stateOS) {
 			return ErrRemoved
 		}
 	}
