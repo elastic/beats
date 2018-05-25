@@ -64,7 +64,6 @@ type Event struct {
 func (e *Event) BusEvent() bus.Event {
 	event := bus.Event{
 		e.Type:    true,
-		"host":    e.Message["url"],
 		"jolokia": e.Message,
 		"meta": common.MapStr{
 			"jolokia": e.Message,
