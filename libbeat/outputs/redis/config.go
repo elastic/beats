@@ -5,8 +5,8 @@ import (
 	"fmt"
 	"time"
 
+	"github.com/elastic/beats/libbeat/common/transport/tlscommon"
 	"github.com/elastic/beats/libbeat/logp"
-	"github.com/elastic/beats/libbeat/outputs"
 	"github.com/elastic/beats/libbeat/outputs/codec"
 	"github.com/elastic/beats/libbeat/outputs/transport"
 )
@@ -20,7 +20,7 @@ type redisConfig struct {
 	Timeout     time.Duration         `config:"timeout"`
 	BulkMaxSize int                   `config:"bulk_max_size"`
 	MaxRetries  int                   `config:"max_retries"`
-	TLS         *outputs.TLSConfig    `config:"ssl"`
+	TLS         *tlscommon.Config     `config:"ssl"`
 	Proxy       transport.ProxyConfig `config:",inline"`
 	Codec       codec.Config          `config:"codec"`
 	Db          int                   `config:"db"`

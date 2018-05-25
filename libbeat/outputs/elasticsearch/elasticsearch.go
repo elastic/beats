@@ -7,6 +7,7 @@ import (
 
 	"github.com/elastic/beats/libbeat/beat"
 	"github.com/elastic/beats/libbeat/common"
+	"github.com/elastic/beats/libbeat/common/transport/tlscommon"
 	"github.com/elastic/beats/libbeat/logp"
 	"github.com/elastic/beats/libbeat/outputs"
 	"github.com/elastic/beats/libbeat/outputs/outil"
@@ -81,7 +82,7 @@ func makeES(
 		return outputs.Fail(err)
 	}
 
-	tlsConfig, err := outputs.LoadTLSConfig(config.TLS)
+	tlsConfig, err := tlscommon.LoadTLSConfig(config.TLS)
 	if err != nil {
 		return outputs.Fail(err)
 	}
@@ -188,7 +189,7 @@ func NewElasticsearchClients(cfg *common.Config) ([]Client, error) {
 		return nil, err
 	}
 
-	tlsConfig, err := outputs.LoadTLSConfig(config.TLS)
+	tlsConfig, err := tlscommon.LoadTLSConfig(config.TLS)
 	if err != nil {
 		return nil, err
 	}
