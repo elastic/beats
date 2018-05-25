@@ -60,7 +60,8 @@ This file is generated! See scripts/docs_collector.py
 .2+| .2+|  |<<metricbeat-metricset-kafka-consumergroup,consumergroup>> beta[]  
 |<<metricbeat-metricset-kafka-partition,partition>> beta[]  
 |<<metricbeat-module-kibana,Kibana>>  beta[]   |image:./images/icon-no.png[No prebuilt dashboards]    |  
-.1+| .1+|  |<<metricbeat-metricset-kibana-status,status>> beta[]  
+.2+| .2+|  |<<metricbeat-metricset-kibana-stats,stats>> beta[]  
+|<<metricbeat-metricset-kibana-status,status>> beta[]  
 |<<metricbeat-module-kubernetes,Kubernetes>>     |image:./images/icon-yes.png[Prebuilt dashboards are available]    |  
 .12+| .12+|  |<<metricbeat-metricset-kubernetes-container,container>>   
 |<<metricbeat-metricset-kubernetes-event,event>> beta[]  
