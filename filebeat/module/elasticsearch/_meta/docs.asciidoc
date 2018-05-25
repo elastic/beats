@@ -1,0 +1,29 @@
+:modulename: elasticsearch
+
+== Elasticsearch module
+
+beta[]
+
+This is the elasticsearch module.
+
+include::../include/what-happens.asciidoc[]
+
+[float]
+=== Compatibility
+
+The Elasticsearch module is compatible with Elasticsearch 6.2 and newer.
+
+
+include::../include/running-modules.asciidoc[]
+
+
+include::../include/configuring-intro.asciidoc[]
+
+:fileset_ex: server
+
+include::../include/config-option-intro.asciidoc[]
+
+[float]
+==== `server` log fileset settings
+
+include::../include/var-paths.asciidoc[]
