@@ -1,0 +1,53 @@
+{
+  "cluster_uuid": "G279hqGeSDqjj_OgBq6wUw",
+  "name": "ruflin",
+  "uuid": "3a64c6a4-b758-41b4-9564-375ca3165039",
+  "version": {
+    "number": "6.4.0"
+  },
+  "status": {
+    "overall": {
+      "state": "green"
+    }
+  },
+  "response_times": {
+    "avg_in_millis": 401,
+    "max_in_millis": 411
+  },
+  "requests": {
+    "status_codes": {}
+  },
+  "concurrent_connections": 0,
+  "sockets": {
+    "http": {
+      "total": 76
+    },
+    "https": {
+      "total": 0
+    }
+  },
+  "event_loop_delay": 46.37134699523449,
+  "process": {
+    "mem": {
+      "heap_max_in_bytes": 171405312,
+      "heap_used_in_bytes": 143607728,
+      "resident_set_size_in_bytes": 237985792,
+      "external_in_bytes": 2075915
+    },
+    "pid": 18204,
+    "uptime_ms": 584494
+  },
+  "os": {
+    "cpu": {
+      "load_average": {
+        "1m": 1.96044921875,
+        "5m": 2.00732421875,
+        "15m": 2.07470703125
+      }
+    },
+    "mem": {
+      "free_in_bytes": 896122880,
+      "total_in_bytes": 17179869184
+    }
+  }
+}
