@@ -53,7 +53,7 @@ class Test(metricbeat.BaseTest):
         proc = self.start_beat()
         time.sleep(5)
 
-        self.wait_until(lambda: self.log_contains("Starting http server on localhost:8080"))
+        self.wait_until(lambda: self.log_contains("Starting http server on "))
 
         requests.post(self.get_host(), json={'hello': 'world'}, headers={'Content-Type': 'application/json'})
         self.wait_until(lambda: self.output_lines() > 0)
