@@ -559,16 +559,8 @@ func (m *message) headersReceived() bool {
 }
 
 func (m *message) getEndpoints() (src *common.Endpoint, dst *common.Endpoint) {
-	src = &common.Endpoint{
-		IP:   m.tcpTuple.SrcIP.String(),
-		Port: m.tcpTuple.SrcPort,
-		Proc: string(m.cmdlineTuple.Src),
-	}
-	dst = &common.Endpoint{
-		IP:   m.tcpTuple.DstIP.String(),
-		Port: m.tcpTuple.DstPort,
-		Proc: string(m.cmdlineTuple.Dst),
-	}
+	source, destination := common.MakeEndpointPair(m.tcpTuple.BaseTuple, m.cmdlineTuple)
+	src, dst = &source, &destination
 	if m.direction == tcp.TCPDirectionReverse {
 		src, dst = dst, src
 	}

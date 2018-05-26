@@ -257,6 +257,7 @@ https://github.com/elastic/beats/compare/v6.2.3...master[Check the HEAD diff]
 - Fix high memory usage on HTTP body if body is not published. {pull}6680[6680]
 - Allow to capture the HTTP request or response bodies independently. {pull}6784[6784]
 - HTTP publishes an Error event for unmatched requests or responses. {pull}6794[6794]
+- The process monitor now reports the command-line for all processes, under Linux and Windows. {pull}7135[7135]
 
 *Winlogbeat*
 

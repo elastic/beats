@@ -173,6 +173,9 @@ func (p *transProcessor) normalizeTransAddr(event common.MapStr) bool {
 		event["client_ip"] = src.IP
 		event["client_port"] = src.Port
 		event["client_proc"] = src.Proc
+		if len(src.Cmdline) > 0 {
+			event["client_cmdline"] = src.Cmdline
+		}
 		if _, exists := event["client_server"]; !exists {
 			event["client_server"] = p.GetServerName(src.IP)
 		}
@@ -185,6 +188,9 @@ func (p *transProcessor) normalizeTransAddr(event common.MapStr) bool {
 		event["ip"] = dst.IP
 		event["port"] = dst.Port
 		event["proc"] = dst.Proc
+		if len(dst.Cmdline) > 0 {
+			event["cmdline"] = dst.Cmdline
+		}
 		if _, exists := event["server"]; !exists {
 			event["server"] = p.GetServerName(dst.IP)
 		}
