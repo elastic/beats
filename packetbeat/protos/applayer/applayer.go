@@ -175,16 +175,7 @@ func (t *Transaction) Init(
 	// transactions have microseconds resolution
 	t.Ts.Ts = time
 	t.Ts.Millis = int64(time.UnixNano() / 1000)
-	t.Src = common.Endpoint{
-		IP:   tuple.SrcIP.String(),
-		Port: tuple.SrcPort,
-		Proc: string(cmdline.Src),
-	}
-	t.Dst = common.Endpoint{
-		IP:   tuple.DstIP.String(),
-		Port: tuple.DstPort,
-		Proc: string(cmdline.Dst),
-	}
+	t.Src, t.Dst = common.MakeEndpointPair(tuple.BaseTuple, cmdline)
 	t.Notes = notes
 
 	if direction == NetReverseDirection {

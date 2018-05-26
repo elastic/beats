@@ -573,8 +573,10 @@ func expectThriftTransaction(t *testing.T, thrift *thriftPlugin) *thriftTransact
 func testTCPTuple() *common.TCPTuple {
 	t := &common.TCPTuple{
 		IPLength: 4,
-		SrcIP:    net.IPv4(192, 168, 0, 1), DstIP: net.IPv4(192, 168, 0, 2),
-		SrcPort: 9200, DstPort: 9201,
+		BaseTuple: common.BaseTuple{
+			SrcIP: net.IPv4(192, 168, 0, 1), DstIP: net.IPv4(192, 168, 0, 2),
+			SrcPort: 9200, DstPort: 9201,
+		},
 	}
 	t.ComputeHashebles()
 	return t
