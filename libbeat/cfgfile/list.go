@@ -81,11 +81,27 @@ func (r *RunnerList) Stop() {
 	r.mutex.Lock()
 	defer r.mutex.Unlock()
 
-	for h, runner := range r.runners {
-		debugf("Stopping runner: %s", runner)
-		delete(r.runners, h)
-		defer runner.Stop()
+	if len(r.runners) == 0 {
+		return
 	}
+
+	logp.Info("Stopping %v runners ...", len(r.runners))
+
+	wg := sync.WaitGroup{}
+	for hash, runner := range r.runners {
+		wg.Add(1)
+
+		// Stop modules in parallel
+		go func(h uint64, run Runner) {
+			defer wg.Done()
+			debugf("Stopping runner: %s", run)
+			delete(r.runners, h)
+			run.Stop()
+			debugf("Stopped runner: %s", run)
+		}(hash, runner)
+	}
+
+	wg.Wait()
 }
 
 // Has returns true if a runner with the given hash is running
