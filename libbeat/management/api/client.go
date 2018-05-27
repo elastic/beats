@@ -7,9 +7,10 @@ import (
 	"net/url"
 	"time"
 
+	"github.com/pkg/errors"
+
 	"github.com/elastic/beats/libbeat/common"
 	"github.com/elastic/beats/libbeat/setup/kibana"
-	"github.com/pkg/errors"
 )
 
 const defaultTimeout = 10 * time.Second
