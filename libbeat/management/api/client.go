@@ -10,7 +10,7 @@ import (
 	"github.com/pkg/errors"
 
 	"github.com/elastic/beats/libbeat/common"
-	"github.com/elastic/beats/libbeat/setup/kibana"
+	"github.com/elastic/beats/libbeat/kibana"
 )
 
 const defaultTimeout = 10 * time.Second
@@ -21,7 +21,7 @@ type Client struct {
 }
 
 // ConfigFromURL generates a full kibana client config from an URL
-func ConfigFromURL(kibanaURL string) (*kibana.Config, error) {
+func ConfigFromURL(kibanaURL string) (*kibana.ClientConfig, error) {
 	data, err := url.Parse(kibanaURL)
 	if err != nil {
 		return nil, err
@@ -33,7 +33,7 @@ func ConfigFromURL(kibanaURL string) (*kibana.Config, error) {
 		password, _ = data.User.Password()
 	}
 
-	return &kibana.Config{
+	return &kibana.ClientConfig{
 		Protocol: data.Scheme,
 		Host:     data.Host,
 		Path:     data.Path,
@@ -44,7 +44,7 @@ func ConfigFromURL(kibanaURL string) (*kibana.Config, error) {
 }
 
 // NewClient creates and returns a kibana client
-func NewClient(cfg *kibana.Config) (*Client, error) {
+func NewClient(cfg *kibana.ClientConfig) (*Client, error) {
 	client, err := kibana.NewClientWithConfig(cfg)
 	if err != nil {
 		return nil, err
