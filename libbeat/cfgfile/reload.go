@@ -167,7 +167,10 @@ func (rl *Reloader) Run(runnerFactory RunnerFactory) {
 
 			debugf("Number of module configs found: %v", len(configs))
 
-			list.Reload(configs)
+			if err := list.Reload(configs); err != nil {
+				// Make sure the next run also updates because some runners were not properly loaded
+				overwriteUpdate = true
+			}
 		}
 
 		// Path loading is enabled but not reloading. Loads files only once and then stops.
