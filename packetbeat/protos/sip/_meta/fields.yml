@@ -49,24 +49,18 @@
           type: object
           object_type: keyword
           description: The body of the SIP message. 
+        - name: src
+          type: keyword
+          description: >
+            Source IP address and port
+          example: 192.168.0.1:5060
+        - name: dst
+          type: keyword
+          description: >
+            Destination IP address and port
+          example: 192.168.0.1:5060
     - name: unixtimenano
       type: long
       description: >
         unixtime as nanosec
       example: 1516199666016756000
-    - name: src
-      type: keyword
-      description: >
-        Source IP address and port
-      example: 192.168.0.1:5060
-    - name: dst
-      type: keyword
-      description: >
-        Destination IP address and port
-      example: 192.168.0.1:5060
-    - name: transport
-      type: keyword
-      description: >
-        transport protocol(udp,tcp)
-      example: tcp
-

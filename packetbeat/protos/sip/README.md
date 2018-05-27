@@ -160,10 +160,10 @@ SIP is text-base protocol like HTTP. But SIP has various unique features like :
       "name": "TJ-X220-LNX",
       "hostname": "TJ-X220-LNX"
     },
-    "src": "192.168.122.1:5061",
-    "dst": "192.168.122.1:5060",
     "transport": "udp",
     "sip": {
+      "src": "192.168.122.1:5061",
+      "dst": "192.168.122.1:5060",
       "body": {
         "application/sdp": {
           "a": [
@@ -244,9 +244,10 @@ SIP is text-base protocol like HTTP. But SIP has various unique features like :
   "_score": 1,
   "_source": {
     "@timestamp": "2018-05-27T07:45:15.115Z",
-    "dst": "192.168.122.1:5060",
     "transport": "udp",
     "sip": {
+      "dst": "192.168.122.1:5060",
+      "src": "192.168.122.1:5061",
       "cseq": "1 INVITE",
       "call-id": "1-6831@127.0.1.1",
       "raw": "INVITE sip:service@192.168.122.1:5060 SIP/2.0\r\nVia: SIP/2.0/UDP 127.0.1.1:5061;branch=z9hG4bK-6831-1-0\r\nFrom: sipp <sip:sipp@127.0.1.1:5061>;tag=6831SIPpTag001\r\nTo: service <sip:service@192.168.122.1:5060>\r\nCall-ID: 1-6831@127.0.1.1\r\nCSeq: 1 INVITE\r\nContact: sip:sipp@127.0.1.1:5061\r\nMax-Forwards: 70\r\nSubject: Performance Test\r\nContent-Type: application/sdp\r\nContent-Length:   129\r\n\r\nv=0\r\no=user1 53655765 2353687637 IN IP4 127.0.1.1\r\ns=-\r\nc=IN IP4 127.0.1.1\r\nt=0 0\r\nm=audio 6000 RTP/AVP 0\r\na=rtpmap:0 PCMU/8000\r\n",
@@ -355,7 +356,6 @@ SIP is text-base protocol like HTTP. But SIP has various unique features like :
     },
     "type": "sip",
     "unixtimenano": 1527407115115924000,
-    "src": "192.168.122.1:5061",
     "beat": {
       "name": "beathost",
       "hostname": "beathost",

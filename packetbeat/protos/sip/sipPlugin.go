@@ -107,12 +107,13 @@ func (sip *sipPlugin) publishMessage(msg *sipMessage) {
 	fields := common.MapStr{}
 	fields["type"] = "sip"
 	fields["unixtimenano"] = timestamp.UnixNano()
-	fields["src"] = fmt.Sprintf("%s:%d", msg.tuple.SrcIP, msg.tuple.SrcPort)
-	fields["dst"] = fmt.Sprintf("%s:%d", msg.tuple.DstIP, msg.tuple.DstPort)
 	fields["transport"] = msg.transport.String()
 
 	sipFields := common.MapStr{}
 	fields["sip"] = sipFields
+
+	sipFields["src"] = fmt.Sprintf("%s:%d", msg.tuple.SrcIP, msg.tuple.SrcPort)
+	sipFields["dst"] = fmt.Sprintf("%s:%d", msg.tuple.DstIP, msg.tuple.DstPort)
 
 	if sip.includeRawMessage {
 		sipFields["raw"] = string(msg.raw)
