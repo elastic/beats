@@ -13,7 +13,7 @@ import (
 // RunnerList implements a reloadable.List of Runners
 type RunnerList struct {
 	runners  map[uint64]Runner
-	mutex    sync.Mutex
+	mutex    sync.RWMutex
 	factory  RunnerFactory
 	pipeline beat.Pipeline
 }
@@ -84,14 +84,14 @@ func (r *RunnerList) Stop() {
 	for h, runner := range r.runners {
 		debugf("Stopping runner: %s", runner)
 		delete(r.runners, h)
-		runner.Stop()
+		defer runner.Stop()
 	}
 }
 
 // Has returns true if a runner with the given hash is running
 func (r *RunnerList) Has(hash uint64) bool {
-	r.mutex.Lock()
-	defer r.mutex.Unlock()
+	r.mutex.RLock()
+	defer r.mutex.RUnlock()
 	_, ok := r.runners[hash]
 	return ok
 }
@@ -105,8 +105,8 @@ func (r *RunnerList) Add(hash uint64, runner Runner) {
 
 // Get returns the runner with the given hash (nil if not found)
 func (r *RunnerList) Get(hash uint64) Runner {
-	r.mutex.Lock()
-	defer r.mutex.Unlock()
+	r.mutex.RLock()
+	defer r.mutex.RUnlock()
 	return r.runners[hash]
 }
 
