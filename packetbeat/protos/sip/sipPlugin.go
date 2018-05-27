@@ -105,31 +105,35 @@ func (sip *sipPlugin) publishMessage(msg *sipMessage) {
 
 	timestamp := msg.ts
 	fields := common.MapStr{}
-	fields["sip.unixtimenano"] = timestamp.UnixNano()
 	fields["type"] = "sip"
-	fields["sip.transport"] = msg.transport.String()
+	fields["unixtimenano"] = timestamp.UnixNano()
+	fields["src"] = fmt.Sprintf("%s:%d", msg.tuple.SrcIP, msg.tuple.SrcPort)
+	fields["dst"] = fmt.Sprintf("%s:%d", msg.tuple.DstIP, msg.tuple.DstPort)
+	fields["transport"] = msg.transport.String()
+
+	sipFields := common.MapStr{}
+	fields["sip"] = sipFields
+
 	if sip.includeRawMessage {
-		fields["sip.raw"] = string(msg.raw)
+		sipFields["raw"] = string(msg.raw)
 	}
-	fields["sip.src"] = fmt.Sprintf("%s:%d", msg.tuple.SrcIP, msg.tuple.SrcPort)
-	fields["sip.dst"] = fmt.Sprintf("%s:%d", msg.tuple.DstIP, msg.tuple.DstPort)
 
 	if msg.isRequest {
-		fields["sip.method"] = fmt.Sprintf("%s", msg.method)
-		fields["sip.request-uri"] = fmt.Sprintf("%s", msg.requestURI)
+		sipFields["method"] = fmt.Sprintf("%s", msg.method)
+		sipFields["request-uri"] = fmt.Sprintf("%s", msg.requestURI)
 	} else {
-		fields["sip.status-code"] = int(msg.statusCode)
-		fields["sip.status-phrase"] = fmt.Sprintf("%s", msg.statusPhrase)
+		sipFields["status-code"] = int(msg.statusCode)
+		sipFields["status-phrase"] = fmt.Sprintf("%s", msg.statusPhrase)
 	}
 
-	fields["sip.from"] = fmt.Sprintf("%s", msg.from)
-	fields["sip.to"] = fmt.Sprintf("%s", msg.to)
-	fields["sip.cseq"] = fmt.Sprintf("%s", msg.cseq)
-	fields["sip.call-id"] = fmt.Sprintf("%s", msg.callid)
+	sipFields["from"] = fmt.Sprintf("%s", msg.from)
+	sipFields["to"] = fmt.Sprintf("%s", msg.to)
+	sipFields["cseq"] = fmt.Sprintf("%s", msg.cseq)
+	sipFields["call-id"] = fmt.Sprintf("%s", msg.callid)
 
 	sipHeaders := common.MapStr{}
 	if sip.includeHeaders {
-		fields["sip.headers"] = sipHeaders
+		sipFields["headers"] = sipHeaders
 
 		if msg.headers != nil {
 			for header, lines := range *(msg.headers) {
@@ -140,7 +144,7 @@ func (sip *sipPlugin) publishMessage(msg *sipMessage) {
 
 	if sip.includeBody {
 		sipBody := common.MapStr{}
-		fields["sip.body"] = sipBody
+		sipFields["body"] = sipBody
 
 		if msg.body != nil {
 			for content, keyval := range msg.body {
@@ -160,17 +164,17 @@ func (sip *sipPlugin) publishMessage(msg *sipMessage) {
 		var err error
 
 		// Detail of Request-URI
-		if value, ok := fields["sip.request-uri"]; ok {
+		if value, ok := sipFields["request-uri"]; ok {
 			userInfo, host, port, addrparams = sip.parseDetailURI(value.(string))
 
-			fields["sip.request-uri-user"] = userInfo
+			sipFields["request-uri-user"] = userInfo
 			number, err = strconv.Atoi(strings.TrimSpace(port))
 			if err == nil {
-				fields["sip.request-uri-port"] = number
+				sipFields["request-uri-port"] = number
 			}
-			fields["sip.request-uri-host"] = host
+			sipFields["request-uri-host"] = host
 			if len(addrparams) > 0 {
-				fields["sip.request-uri-params"] = addrparams
+				sipFields["request-uri-params"] = addrparams
 			}
 		}
 
@@ -240,7 +244,7 @@ func (sip *sipPlugin) publishMessage(msg *sipMessage) {
 	}
 
 	if msg.notes != nil {
-		fields["sip.notes"] = fmt.Sprintf("%s", msg.notes)
+		fields["notes"] = fmt.Sprintf("%s", msg.notes)
 	}
 
 	sip.results(beat.Event{

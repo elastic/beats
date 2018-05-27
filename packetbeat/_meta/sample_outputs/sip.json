@@ -1,76 +1,123 @@
 {
-    "@timestamp": "2018-01-17T05:36:15.635Z",
-    "beat": {
-        "hostname": "server",
-        "name": "server",
-        "version": "7.0.0-alpha1"
-    },
-    "body": {
-        "application/sdp": {
-            "a": [
-                "rtpmap:0 PCMU/8000"
-            ],
-            "c": [
-                "IN IP4 192.168.0.20"
-            ],
-            "m": [
-                "audio 6000 RTP/AVP 0"
-            ],
-            "o": [
-                "user1 53655765 2353687637 IN IP4 192.168.0.20"
-            ],
-            "s": [
-                "-"
-            ],
-            "t": [
-                "0 0"
-            ],
-            "v": [
-                "0"
-            ]
-        }
-    },
-    "call_id": "723-13253@192.168.0.20",
+  "@timestamp": "2018-05-27T07:45:15.115Z",
+  "dst": "192.168.122.1:5060",
+  "transport": "udp",
+  "sip": {
     "cseq": "1 INVITE",
-    "dst": "192.168.0.10:5060",
-    "from": "sipp <sip:sipp@192.168.0.20:5060>;tag=13253SIPpTag00723",
-    "headers": {
-        "call-id": [
-            "723-13253@192.168.0.20"
+    "call-id": "1-6831@127.0.1.1",
+    "raw": "INVITE sip:service@192.168.122.1:5060 SIP/2.0\r\nVia: SIP/2.0/UDP 127.0.1.1:5061;branch=z9hG4bK-6831-1-0\r\nFrom: sipp <sip:sipp@127.0.1.1:5061>;tag=6831SIPpTag001\r\nTo: service <sip:service@192.168.122.1:5060>\r\nCall-ID: 1-6831@127.0.1.1\r\nCSeq: 1 INVITE\r\nContact: sip:sipp@127.0.1.1:5061\r\nMax-Forwards: 70\r\nSubject: Performance Test\r\nContent-Type: application/sdp\r\nContent-Length:   129\r\n\r\nv=0\r\no=user1 53655765 2353687637 IN IP4 127.0.1.1\r\ns=-\r\nc=IN IP4 127.0.1.1\r\nt=0 0\r\nm=audio 6000 RTP/AVP 0\r\na=rtpmap:0 PCMU/8000\r\n",
+    "request-uri": "sip:service@192.168.122.1:5060",
+    "from": "sipp <sip:sipp@127.0.1.1:5061>;tag=6831SIPpTag001",
+    "body": {
+      "application/sdp": {
+        "c": [
+          "IN IP4 127.0.1.1"
         ],
-        "contact": [
-            "sip:sipp@192.168.0.20:5060"
+        "t": [
+          "0 0"
         ],
-        "content-length": [
-            "135"
+        "m": [
+          "audio 6000 RTP/AVP 0"
         ],
-        "content-type": [
-            "application/sdp"
+        "a": [
+          "rtpmap:0 PCMU/8000"
         ],
-        "cseq": [
-            "1 INVITE"
+        "v": [
+          "0"
         ],
-        "from": [
-            "sipp <sip:sipp@192.168.0.20:5060>;tag=13253SIPpTag00723"
+        "o": [
+          "user1 53655765 2353687637 IN IP4 127.0.1.1"
         ],
-        "max-forwards": [
-            "70"
-        ],
-        "subject": [
-            "Performance Test"
-        ],
-        "to": [
-            "service <sip:service@192.168.0.10:5060>"
-        ],
-        "via": [
-            "SIP/2.0/UDP 192.168.0.20:5060;branch=z9hG4bK-13253-723-0"
+        "s": [
+          "-"
         ]
+      }
     },
+    "request-uri-user": "service",
+    "request-uri-port": 5060,
     "method": "INVITE",
-    "raw": "INVITE sip:service@192.168.0.10:5060 SIP/2.0\r\nVia: SIP/2.0/UDP 192.168.0.20:5060;branch=z9hG4bK-13253-723-0\r\nFrom: sipp <sip:sipp@192.168.0.20:5060>;tag=13253SIPpTag00723\r\nTo: service <sip:service@192.168.0.10:5060>\r\nCall-ID: 723-13253@192.168.0.20\r\nCSeq: 1 INVITE\r\nContact: sip:sipp@192.168.0.20:5060\r\nMax-Forwards: 70\r\nSubject: Performance Test\r\nContent-Type: application/sdp\r\nContent-Length:   135\r\n\r\nv=0\r\no=user1 53655765 2353687637 IN IP4 192.168.0.20\r\ns=-\r\nc=IN IP4 192.168.0.20\r\nt=0 0\r\nm=audio 6000 RTP/AVP 0\r\na=rtpmap:0 PCMU/8000\r\n",
-    "request_uri": "sip:service@192.168.0.10:5060",
-    "src": "192.168.0.20:5060",
-    "to": "service <sip:service@192.168.0.10:5060>",
-    "transport": "udp",
-    "type": "sip"
+    "to": "service <sip:service@192.168.122.1:5060>",
+    "headers": {
+      "to": [
+        {
+          "port": 5060,
+          "raw": "service <sip:service@192.168.122.1:5060>",
+          "display": "service",
+          "user": "service",
+          "host": "192.168.122.1"
+        }
+      ],
+      "subject": [
+        {
+          "raw": "Performance Test"
+        }
+      ],
+      "content-length": [
+        {
+          "raw": "129",
+          "number": 129
+        }
+      ],
+      "cseq": [
+        {
+          "raw": "1 INVITE",
+          "number": 1,
+          "method": "INVITE"
+        }
+      ],
+      "content-type": [
+        {
+          "raw": "application/sdp"
+        }
+      ],
+      "from": [
+        {
+          "params": [
+            "tag=6831SIPpTag001"
+          ],
+          "raw": "sipp <sip:sipp@127.0.1.1:5061>;tag=6831SIPpTag001",
+          "display": "sipp",
+          "user": "sipp",
+          "host": "127.0.1.1",
+          "port": 5061
+        }
+      ],
+      "call-id": [
+        {
+          "raw": "1-6831@127.0.1.1"
+        }
+      ],
+      "via": [
+        {
+          "raw": "SIP/2.0/UDP 127.0.1.1:5061;branch=z9hG4bK-6831-1-0"
+        }
+      ],
+      "contact": [
+        {
+          "user": "sipp",
+          "host": "127.0.1.1",
+          "port": 5061,
+          "raw": "sip:sipp@127.0.1.1:5061"
+        }
+      ],
+      "max-forwards": [
+        {
+          "raw": "70",
+          "number": 70
+        }
+      ]
+    },
+    "request-uri-host": "192.168.122.1"
+  },
+  "type": "sip",
+  "unixtimenano": 1527407115115924000,
+  "src": "192.168.122.1:5061",
+  "beat": {
+    "name": "beathost",
+    "hostname": "beathost",
+    "version": "7.0.0-alpha1"
+  }
 }
+
+
+
