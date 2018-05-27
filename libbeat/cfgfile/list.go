@@ -3,7 +3,9 @@ package cfgfile
 import (
 	"sync"
 
+	"github.com/joeshaw/multierror"
 	"github.com/mitchellh/hashstructure"
+	"github.com/pkg/errors"
 
 	"github.com/elastic/beats/libbeat/beat"
 	"github.com/elastic/beats/libbeat/common"
@@ -28,10 +30,11 @@ func NewRunnerList(factory RunnerFactory, pipeline beat.Pipeline) *RunnerList {
 }
 
 // Reload the list of runners to match the given state
-// TODO return list of errors (even we don't stop on them)
 func (r *RunnerList) Reload(configs []*common.Config) error {
 	r.mutex.Lock()
 	defer r.mutex.Unlock()
+
+	var errs multierror.Errors
 
 	startList := map[uint64]*common.Config{}
 	stopList := r.copyRunnerList()
@@ -42,7 +45,9 @@ func (r *RunnerList) Reload(configs []*common.Config) error {
 	for _, config := range configs {
 		hash, err := HashConfig(config)
 		if err != nil {
-			logp.Err("Unable to hash given config: %v", err)
+			err = errors.Wrap(err, "Unable to hash given config")
+			errs = append(errs)
+			logp.Error(err)
 			continue
 		}
 
@@ -64,7 +69,9 @@ func (r *RunnerList) Reload(configs []*common.Config) error {
 	for hash, config := range startList {
 		runner, err := r.factory.Create(r.pipeline, config, nil)
 		if err != nil {
-			debugf("Error creating runner from config: %s", err)
+			err = errors.Wrap(err, "Error creating runner from config")
+			errs = append(errs)
+			logp.Error(err)
 			continue
 		}
 
@@ -73,7 +80,7 @@ func (r *RunnerList) Reload(configs []*common.Config) error {
 		runner.Start()
 	}
 
-	return nil
+	return errs.Err()
 }
 
 // Stop all runners
