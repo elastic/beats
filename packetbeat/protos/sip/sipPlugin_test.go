@@ -28,20 +28,20 @@ func TestInitDetailOption(t *testing.T) {
 	sip.initDetailOption()
 
 	assert.Equal(t, 14, len(sip.parseSet), "parseSet size will be only [2]")
-	assert.Equal(t, SIP_DETAIL_NAME_ADDR, sip.parseSet["from"], "Initiation fiald, from")
-	assert.Equal(t, SIP_DETAIL_NAME_ADDR, sip.parseSet["to"], "Initiation fiald, to")
-	assert.Equal(t, SIP_DETAIL_NAME_ADDR, sip.parseSet["contact"], "Initiation fiald, contact")
-	assert.Equal(t, SIP_DETAIL_NAME_ADDR, sip.parseSet["record-route"], "Initiation fiald, record-route")
-	assert.Equal(t, SIP_DETAIL_NAME_ADDR, sip.parseSet["p-asserted-identity"], "Initiation fiald, p-asserted-identity")
-	assert.Equal(t, SIP_DETAIL_NAME_ADDR, sip.parseSet["p-preferred-identity"], "Initiation fiald, p-preferred-identity")
-	assert.Equal(t, SIP_DETAIL_INT_METHOD, sip.parseSet["cseq"], "Initiation fiald, cseq")
-	assert.Equal(t, SIP_DETAIL_INT_INT_METHOD, sip.parseSet["rack"], "Initiation fiald, rack")
-	assert.Equal(t, SIP_DETAIL_INT, sip.parseSet["rseq"], "Initiation fiald, rseq")
-	assert.Equal(t, SIP_DETAIL_INT, sip.parseSet["content-length"], "Initiation fiald, content-length")
-	assert.Equal(t, SIP_DETAIL_INT, sip.parseSet["max-forwards"], "Initiation fiald, max-forwards")
-	assert.Equal(t, SIP_DETAIL_INT, sip.parseSet["expires"], "Initiation fiald, expires")
-	assert.Equal(t, SIP_DETAIL_INT, sip.parseSet["session-expires"], "Initiation fiald, session-expires")
-	assert.Equal(t, SIP_DETAIL_INT, sip.parseSet["min-se"], "Initiation fiald, min-se")
+	assert.Equal(t, SipDetailNameAddr, sip.parseSet["from"], "Initiation fiald, from")
+	assert.Equal(t, SipDetailNameAddr, sip.parseSet["to"], "Initiation fiald, to")
+	assert.Equal(t, SipDetailNameAddr, sip.parseSet["contact"], "Initiation fiald, contact")
+	assert.Equal(t, SipDetailNameAddr, sip.parseSet["record-route"], "Initiation fiald, record-route")
+	assert.Equal(t, SipDetailNameAddr, sip.parseSet["p-asserted-identity"], "Initiation fiald, p-asserted-identity")
+	assert.Equal(t, SipDetailNameAddr, sip.parseSet["p-preferred-identity"], "Initiation fiald, p-preferred-identity")
+	assert.Equal(t, SipDetailIntMethod, sip.parseSet["cseq"], "Initiation fiald, cseq")
+	assert.Equal(t, SipDetailIntIntMethod, sip.parseSet["rack"], "Initiation fiald, rack")
+	assert.Equal(t, SipDetailInt, sip.parseSet["rseq"], "Initiation fiald, rseq")
+	assert.Equal(t, SipDetailInt, sip.parseSet["content-length"], "Initiation fiald, content-length")
+	assert.Equal(t, SipDetailInt, sip.parseSet["max-forwards"], "Initiation fiald, max-forwards")
+	assert.Equal(t, SipDetailInt, sip.parseSet["expires"], "Initiation fiald, expires")
+	assert.Equal(t, SipDetailInt, sip.parseSet["session-expires"], "Initiation fiald, session-expires")
+	assert.Equal(t, SipDetailInt, sip.parseSet["min-se"], "Initiation fiald, min-se")
 }
 
 func TestInitDetailOptionWithOverwriteFlag(t *testing.T) {
@@ -55,8 +55,8 @@ func TestInitDetailOptionWithOverwriteFlag(t *testing.T) {
 	sip.initDetailOption()
 
 	assert.Equal(t, 2, len(sip.parseSet), "parseSet size will be only [2]")
-	assert.Equal(t, SIP_DETAIL_INT_METHOD, sip.parseSet["cseq"], "Initiation fiald, cseq")
-	assert.Equal(t, SIP_DETAIL_INT_INT_METHOD, sip.parseSet["rack"], "Initiation fiald, rack")
+	assert.Equal(t, SipDetailIntMethod, sip.parseSet["cseq"], "Initiation fiald, cseq")
+	assert.Equal(t, SipDetailIntIntMethod, sip.parseSet["rack"], "Initiation fiald, rack")
 }
 
 func TestInitDetailOptionWithOverwriteFlagAndAddtionalHeaderFromSetting(t *testing.T) {
@@ -72,12 +72,12 @@ func TestInitDetailOptionWithOverwriteFlagAndAddtionalHeaderFromSetting(t *testi
 	sip.initDetailOption()
 
 	assert.Equal(t, 6, len(sip.parseSet), "parseSet size will be only [2]")
-	assert.Equal(t, SIP_DETAIL_NAME_ADDR, sip.parseSet["x-original-header1"], "Initiation fiald, p-preferred-identity")
-	assert.Equal(t, SIP_DETAIL_NAME_ADDR, sip.parseSet["x-original-header2"], "Initiation fiald, p-preferred-identity")
-	assert.Equal(t, SIP_DETAIL_INT, sip.parseSet["x-original-header3"], "Initiation fiald, p-preferred-identity")
-	assert.Equal(t, SIP_DETAIL_INT, sip.parseSet["x-original-header4"], "Initiation fiald, p-preferred-identity")
-	assert.Equal(t, SIP_DETAIL_INT_METHOD, sip.parseSet["cseq"], "Initiation fiald, cseq")
-	assert.Equal(t, SIP_DETAIL_INT_INT_METHOD, sip.parseSet["rack"], "Initiation fiald, rack")
+	assert.Equal(t, SipDetailNameAddr, sip.parseSet["x-original-header1"], "Initiation fiald, p-preferred-identity")
+	assert.Equal(t, SipDetailNameAddr, sip.parseSet["x-original-header2"], "Initiation fiald, p-preferred-identity")
+	assert.Equal(t, SipDetailInt, sip.parseSet["x-original-header3"], "Initiation fiald, p-preferred-identity")
+	assert.Equal(t, SipDetailInt, sip.parseSet["x-original-header4"], "Initiation fiald, p-preferred-identity")
+	assert.Equal(t, SipDetailIntMethod, sip.parseSet["cseq"], "Initiation fiald, cseq")
+	assert.Equal(t, SipDetailIntIntMethod, sip.parseSet["rack"], "Initiation fiald, rack")
 }
 
 func TestSetFromConfig(t *testing.T) {
@@ -142,7 +142,7 @@ func TestPublishMessage(t *testing.T) {
 		net.ParseIP("10.0.0.2"), 2222)
 	msg := sipMessage{transport: 0, raw: common.NetString(rawText),
 		tuple: ipTuple, method: common.NetString(methodText),
-		requestUri: common.NetString("sip:test"),
+		requestURI: common.NetString("sip:test"),
 		statusCode: uint16(200), statusPhrase: common.NetString(phraseText),
 		from: common.NetString("from"), to: common.NetString("to"),
 		cseq: common.NetString("cseq"), callid: common.NetString("callid"),
@@ -173,7 +173,7 @@ func TestPublishMessageWithDetailOptionRequest(t *testing.T) {
 	methodText := "INVITE"
 	from := `"0311112222"<sip:311112222@sip.addr:5060>;tag=FromTag`
 	to := `<sip:612341234@192.168.0.1>`
-	requestUri := "sip:+8137890123;npdi;rn=+81312341234@hoge.com:5060;user=phone;transport=udp"
+	requestURI := "sip:+8137890123;npdi;rn=+81312341234@hoge.com:5060;user=phone;transport=udp"
 	cseqNum := 6789
 	cseqMethod := "INVITE"
 	cseq := fmt.Sprintf("%d %s", cseqNum, cseqMethod)
@@ -205,7 +205,7 @@ func TestPublishMessageWithDetailOptionRequest(t *testing.T) {
 
 	msg := sipMessage{transport: 0, raw: common.NetString(rawText),
 		tuple: ipTuple, method: common.NetString(methodText),
-		requestUri:    common.NetString(requestUri),
+		requestURI:    common.NetString(requestURI),
 		from:          common.NetString(from),
 		to:            common.NetString(to),
 		cseq:          common.NetString(cseq),
@@ -219,7 +219,7 @@ func TestPublishMessageWithDetailOptionRequest(t *testing.T) {
 
 	stored := store.events[0].Fields
 	assert.Equal(t, methodText, stored["sip.method"], "Invalid Method text")
-	assert.Equal(t, requestUri, stored["sip.request-uri"], "Invalid Request URI")
+	assert.Equal(t, requestURI, stored["sip.request-uri"], "Invalid Request URI")
 	assert.Equal(t, to, stored["sip.to"], "Invalid To text")
 	assert.Equal(t, from, stored["sip.from"], "Invalid from text")
 	assert.Equal(t, cseq, stored["sip.cseq"], "Invalid CSeq text")
@@ -407,7 +407,7 @@ func TestPublishMessageWithoutRawMessage(t *testing.T) {
 		net.ParseIP("10.0.0.2"), 2222)
 	msg := sipMessage{transport: 0, raw: common.NetString(rawText),
 		tuple: ipTuple, method: common.NetString(methodText),
-		requestUri: common.NetString("sip:test"),
+		requestURI: common.NetString("sip:test"),
 		statusCode: uint16(200), statusPhrase: common.NetString(phraseText),
 		from: common.NetString("from"), to: common.NetString("to"),
 		cseq: common.NetString("cseq"), callid: common.NetString("callid"),
@@ -442,9 +442,9 @@ func TestCreateSIPMessage(t *testing.T) {
 	assert.Nil(t, err, "Should be no errors.")
 	assert.Equal(t, trans, sipMsg.transport, "Compare transport value.")
 	assert.Equal(t, garbage, sipMsg.raw, "Compare packet raw message.")
-	assert.Equal(t, -1, sipMsg.hdr_start, "Initialization check.")
-	assert.Equal(t, -1, sipMsg.hdr_len, "Initialization check.")
-	assert.Equal(t, -1, sipMsg.bdy_start, "Initialization check.")
+	assert.Equal(t, -1, sipMsg.hdrStart, "Initialization check.")
+	assert.Equal(t, -1, sipMsg.hdrLen, "Initialization check.")
+	assert.Equal(t, -1, sipMsg.bdyStart, "Initialization check.")
 	assert.Equal(t, -1, sipMsg.contentlength, "Initialization check.")
 }
 

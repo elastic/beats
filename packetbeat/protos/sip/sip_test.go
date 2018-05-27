@@ -16,10 +16,10 @@ func TestConstTransportNumbers(t *testing.T) {
 }
 
 func TestConstSipPacketRecievingStatus(t *testing.T) {
-	assert.Equal(t, 0, SIP_STATUS_RECEIVED, "Should be fixed magic number.")
-	assert.Equal(t, 1, SIP_STATUS_HEADER_RECEIVING, "Should be fixed magic number.")
-	assert.Equal(t, 2, SIP_STATUS_BODY_RECEIVING, "Should be fixed magic number.")
-	assert.Equal(t, 3, SIP_STATUS_REJECTED, "Should be fixed magic number.")
+	assert.Equal(t, 0, SipStatusReceived, "Should be fixed magic number.")
+	assert.Equal(t, 1, SipStatusHeaderReceiving, "Should be fixed magic number.")
+	assert.Equal(t, 2, SipStatusBodyReceiving, "Should be fixed magic number.")
+	assert.Equal(t, 3, SipStatusRejected, "Should be fixed magic number.")
 }
 
 func TestGetLastElementStrArray(t *testing.T) {

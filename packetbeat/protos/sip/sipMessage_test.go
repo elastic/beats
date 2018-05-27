@@ -11,18 +11,18 @@ import (
 
 func TestSeparatedStrings(t *testing.T) {
 	msg := sipMessage{}
-	var input_str string
+	var inputStr string
 	var separatedStrings *[]common.NetString
 
-	input_str = "aaaa,bbbb,cccc,dddd"
-	separatedStrings = msg.separateCsv(input_str)
+	inputStr = "aaaa,bbbb,cccc,dddd"
+	separatedStrings = msg.separateCsv(inputStr)
 	assert.Equal(t, "aaaa", fmt.Sprintf("%s", (*separatedStrings)[0]), "There should be [aaaa].")
 	assert.Equal(t, "bbbb", fmt.Sprintf("%s", (*separatedStrings)[1]), "There should be [bbbb].")
 	assert.Equal(t, "cccc", fmt.Sprintf("%s", (*separatedStrings)[2]), "There should be [cccc].")
 	assert.Equal(t, "dddd", fmt.Sprintf("%s", (*separatedStrings)[3]), "There should be [dddd].")
 
-	input_str = ",aaaa,\"bbbb,ccc\",dddd\\,eeee,\\\"ff,gg\\\","
-	separatedStrings = msg.separateCsv(input_str)
+	inputStr = ",aaaa,\"bbbb,ccc\",dddd\\,eeee,\\\"ff,gg\\\","
+	separatedStrings = msg.separateCsv(inputStr)
 	assert.Equal(t, "", fmt.Sprintf("%s", (*separatedStrings)[0]), "There should be blank.")
 	assert.Equal(t, "aaaa", fmt.Sprintf("%s", (*separatedStrings)[1]), "There should be [aaaa].")
 	assert.Equal(t, "\"bbbb,ccc\"", fmt.Sprintf("%s", (*separatedStrings)[2]), "There should be [\"bbbb,ccc\"].")
@@ -31,13 +31,13 @@ func TestSeparatedStrings(t *testing.T) {
 	assert.Equal(t, "gg\\\"", fmt.Sprintf("%s", (*separatedStrings)[5]), "There should be [gg\\\"].")
 	assert.Equal(t, "", fmt.Sprintf("%s", (*separatedStrings)[6]), "There should be blank.")
 
-	input_str = "aaaa,\"aaaaa,bbb"
-	separatedStrings = msg.separateCsv(input_str)
+	inputStr = "aaaa,\"aaaaa,bbb"
+	separatedStrings = msg.separateCsv(inputStr)
 	assert.Equal(t, "aaaa", fmt.Sprintf("%s", (*separatedStrings)[0]), "There should be [aaaa].")
 	assert.Equal(t, "\"aaaaa,bbb", fmt.Sprintf("%s", (*separatedStrings)[1]), "There should be [\"aaaaa,bbb].")
 
-	input_str = "aaaa,\"aaaaa,"
-	separatedStrings = msg.separateCsv(input_str)
+	inputStr = "aaaa,\"aaaaa,"
+	separatedStrings = msg.separateCsv(inputStr)
 	assert.Equal(t, "aaaa", fmt.Sprintf("%s", (*separatedStrings)[0]), "There should be [aaaa].")
 	assert.Equal(t, "\"aaaaa,", fmt.Sprintf("%s", (*separatedStrings)[1]), "There should be [\"aaaaa,].")
 }
@@ -60,9 +60,9 @@ func TestParseSIPHeader(t *testing.T) {
 	msg.raw = garbage
 	err = msg.parseSIPHeader()
 	assert.Equal(t, "malformed packet", fmt.Sprintf("%s", err), "There should be no error.")
-	assert.Equal(t, -1, msg.hdr_start, "There should be no error.")
-	assert.Equal(t, -1, msg.hdr_len, "There should be no error.")
-	assert.Equal(t, -1, msg.bdy_start, "There should be no error.")
+	assert.Equal(t, -1, msg.hdrStart, "There should be no error.")
+	assert.Equal(t, -1, msg.hdrLen, "There should be no error.")
+	assert.Equal(t, -1, msg.bdyStart, "There should be no error.")
 	assert.Equal(t, -1, msg.contentlength, "There should be no error.")
 
 	// \r\n start and fragmented packet
@@ -76,16 +76,15 @@ func TestParseSIPHeader(t *testing.T) {
 		" testVia3,  testVia4\r\n" +
 		"From: testFrom\r\n" +
 		"To  \t :\t  testTo\t\t\r\n" +
-		"Call-ID: testCall-ID\r\n" +
-		"CSeq: testCSeq\r\n" +
+		"Call-ID: testCall-ID\r\n" + "CSeq: testCSeq\r\n" +
 		"Vi")
 	msg = sipMessage{}
 	msg.raw = garbage
 	err = msg.parseSIPHeader()
 	assert.Equal(t, nil, err, "There should be no error.")
-	assert.Equal(t, 8, msg.hdr_start, "There should be no error.")
-	assert.Equal(t, len(garbage)-8, msg.hdr_len, "There should be no error.")
-	assert.Equal(t, len(garbage), msg.bdy_start, "There should be no error.")
+	assert.Equal(t, 8, msg.hdrStart, "There should be no error.")
+	assert.Equal(t, len(garbage)-8, msg.hdrLen, "There should be no error.")
+	assert.Equal(t, len(garbage), msg.bdyStart, "There should be no error.")
 	assert.Equal(t, 0, msg.contentlength, "There should be no error.")
 
 	// no mandatory header
@@ -107,9 +106,9 @@ func TestParseSIPHeader(t *testing.T) {
 	assert.Contains(t, msg.notes, common.NetString("mandatory header [From] does not exist."), "There should be contained.")
 	assert.Contains(t, msg.notes, common.NetString("mandatory header [CSeq] does not exist."), "There should be contained.")
 	assert.Contains(t, msg.notes, common.NetString("mandatory header [Call-ID] does not exist."), "There should be contained.")
-	assert.Equal(t, 0, msg.hdr_start, "There should be  0.")
-	assert.Equal(t, 89, msg.hdr_len, "There should be 89.")
-	assert.Equal(t, 93, msg.bdy_start, "There should be 93.")
+	assert.Equal(t, 0, msg.hdrStart, "There should be  0.")
+	assert.Equal(t, 89, msg.hdrLen, "There should be 89.")
+	assert.Equal(t, 93, msg.bdyStart, "There should be 93.")
 	assert.Equal(t, 0, msg.contentlength, "There should be  0.")
 	// status-line/request-line fault
 	garbage = []byte("HTTP/1.1 302 Found\r\n" +
@@ -167,9 +166,9 @@ func TestParseSIPHeader(t *testing.T) {
 	assert.Equal(t, common.NetString("testFrom"), msg.from, "There should be.")
 	assert.Equal(t, common.NetString("testCSeq"), msg.cseq, "There should be.")
 	assert.Equal(t, common.NetString("testCall-ID"), msg.callid, "There should be.")
-	assert.Equal(t, 0, msg.hdr_start, "There should be  0.")
-	assert.Equal(t, 95, msg.hdr_len, "There should be 95.")
-	assert.Equal(t, 99, msg.bdy_start, "There should be 99.")
+	assert.Equal(t, 0, msg.hdrStart, "There should be  0.")
+	assert.Equal(t, 95, msg.hdrLen, "There should be 95.")
+	assert.Equal(t, 99, msg.bdyStart, "There should be 99.")
 	assert.Equal(t, 0, msg.contentlength, "There should be  0.")
 
 	// status phrase missing (split error)
@@ -207,9 +206,9 @@ func TestParseSIPHeader(t *testing.T) {
 	assert.Equal(t, common.NetString("testFrom"), msg.from, "There should be.")
 	assert.Equal(t, common.NetString("testCSeq"), msg.cseq, "There should be.")
 	assert.Equal(t, common.NetString("testCall-ID"), msg.callid, "There should be.")
-	assert.Equal(t, 0, msg.hdr_start, "There should be   0.")
-	assert.Equal(t, 179, msg.hdr_len, "There should be 179.")
-	assert.Equal(t, 183, msg.bdy_start, "There should be 183.")
+	assert.Equal(t, 0, msg.hdrStart, "There should be   0.")
+	assert.Equal(t, 179, msg.hdrLen, "There should be 179.")
+	assert.Equal(t, 183, msg.bdyStart, "There should be 183.")
 	assert.Equal(t, 0, msg.contentlength, "There should be   0.")
 
 	// Toomany SP deliminater at start line
@@ -230,14 +229,14 @@ func TestParseSIPHeader(t *testing.T) {
 	assert.Equal(t, uint16(0), msg.statusCode, "There should be nill.")
 	assert.Equal(t, (common.NetString)(nil), msg.statusPhrase, "There should be nill.")
 	assert.Equal(t, common.NetString("INVITE"), msg.method, "There should be INVITE.")
-	assert.Equal(t, common.NetString("testRequstURI"), msg.requestUri, "There should be testRequstURI.")
+	assert.Equal(t, common.NetString("testRequstURI"), msg.requestURI, "There should be testRequstURI.")
 	assert.Equal(t, common.NetString("testTo"), msg.to, "There should be.")
 	assert.Equal(t, common.NetString("testFrom"), msg.from, "There should be.")
 	assert.Equal(t, common.NetString("testCSeq"), msg.cseq, "There should be.")
 	assert.Equal(t, common.NetString("testCall-ID"), msg.callid, "There should be.")
-	assert.Equal(t, 0, msg.hdr_start, "There should be   0.")
-	assert.Equal(t, 177, msg.hdr_len, "There should be 177.")
-	assert.Equal(t, 181, msg.bdy_start, "There should be 181.")
+	assert.Equal(t, 0, msg.hdrStart, "There should be   0.")
+	assert.Equal(t, 177, msg.hdrLen, "There should be 177.")
+	assert.Equal(t, 181, msg.bdyStart, "There should be 181.")
 	assert.Equal(t, 0, msg.contentlength, "There should be   0.")
 
 	// content-type and content-length missing
@@ -261,9 +260,9 @@ func TestParseSIPHeader(t *testing.T) {
 	assert.Equal(t, nil, err, "There should be no error.")
 	assert.Equal(t, uint16(183), msg.statusCode, "There should be.")
 	assert.Equal(t, common.NetString("Session Progress"), msg.statusPhrase, "There should be.")
-	assert.Equal(t, 0, msg.hdr_start, "There should be   0.")
-	assert.Equal(t, 112, msg.hdr_len, "There should be 112.")
-	assert.Equal(t, 116, msg.bdy_start, "There should be 116.")
+	assert.Equal(t, 0, msg.hdrStart, "There should be   0.")
+	assert.Equal(t, 112, msg.hdrLen, "There should be 112.")
+	assert.Equal(t, 116, msg.bdyStart, "There should be 116.")
 	assert.Equal(t, 0, msg.contentlength, "There should be   0.")
 	assert.Equal(t, (map[string]*map[string][]common.NetString)(nil), msg.body, "There should be nill.")
 
@@ -289,9 +288,9 @@ func TestParseSIPHeader(t *testing.T) {
 	assert.Equal(t, nil, err, "There should be no error.")
 	assert.Equal(t, uint16(183), msg.statusCode, "There should be.")
 	assert.Equal(t, common.NetString("Session Progress"), msg.statusPhrase, "There should be.")
-	assert.Equal(t, 0, msg.hdr_start, "There should be   0.")
-	assert.Equal(t, 142, msg.hdr_len, "There should be 142.")
-	assert.Equal(t, 146, msg.bdy_start, "There should be 146.")
+	assert.Equal(t, 0, msg.hdrStart, "There should be   0.")
+	assert.Equal(t, 142, msg.hdrLen, "There should be 142.")
+	assert.Equal(t, 146, msg.bdyStart, "There should be 146.")
 	assert.Equal(t, 107, msg.contentlength, "There should be 107.")
 	assert.Equal(t, (map[string]*map[string][]common.NetString)(nil), msg.body, "There should be nill.")
 
@@ -325,9 +324,9 @@ func TestParseSIPHeader(t *testing.T) {
 	assert.Equal(t, common.NetString("testFrom"), msg.from, "There should be.")
 	assert.Equal(t, common.NetString("testCSeq"), msg.cseq, "There should be.")
 	assert.Equal(t, common.NetString("testCall-ID"), msg.callid, "There should be.")
-	assert.Equal(t, 0, msg.hdr_start, "There should be -1.")
-	assert.Equal(t, 229, msg.hdr_len, "There should be -1.")
-	assert.Equal(t, 233, msg.bdy_start, "There should be -1.")
+	assert.Equal(t, 0, msg.hdrStart, "There should be -1.")
+	assert.Equal(t, 229, msg.hdrLen, "There should be -1.")
+	assert.Equal(t, 233, msg.bdyStart, "There should be -1.")
 	assert.Equal(t, -1, msg.contentlength, "There should be -1.")
 	assert.Equal(t, (map[string]*map[string][]common.NetString)(nil), msg.body, "There should be nill.")
 
@@ -356,7 +355,7 @@ func TestParseSIPHeader(t *testing.T) {
 	err = msg.parseSIPHeader()
 	assert.Equal(t, nil, err, "There should be no error.")
 	assert.Equal(t, common.NetString("INVITE"), msg.method, "There should be.")
-	assert.Equal(t, common.NetString("sip:alice@boston.com"), msg.requestUri, "There should be.")
+	assert.Equal(t, common.NetString("sip:alice@boston.com"), msg.requestURI, "There should be.")
 	assert.Equal(t, common.NetString("testTo"), msg.to, "There should be.")
 	assert.Equal(t, common.NetString("testFrom"), msg.from, "There should be.")
 	assert.Equal(t, common.NetString("testCSeq"), msg.cseq, "There should be.")
@@ -368,9 +367,9 @@ func TestParseSIPHeader(t *testing.T) {
 	assert.Equal(t, common.NetString("testVia4"), vias[3], "There should be.")
 	assert.Equal(t, common.NetString("testVia5"), vias[4], "There should be.")
 	assert.Equal(t, common.NetString("testVia6"), vias[5], "There should be.")
-	assert.Equal(t, 0, msg.hdr_start, "There should be -1.")
-	assert.Equal(t, 239, msg.hdr_len, "There should be -1.")
-	assert.Equal(t, 243, msg.bdy_start, "There should be -1.")
+	assert.Equal(t, 0, msg.hdrStart, "There should be -1.")
+	assert.Equal(t, 239, msg.hdrLen, "There should be -1.")
+	assert.Equal(t, 243, msg.bdyStart, "There should be -1.")
 	assert.Equal(t, 107, msg.contentlength, "There should be 107.")
 	assert.Equal(t, (map[string]*map[string][]common.NetString)(nil), msg.body, "There should be nill.")
 
@@ -404,9 +403,9 @@ func TestParseSIPHeader(t *testing.T) {
 	assert.Equal(t, common.NetString("testFrom"), msg.from, "There should be.")
 	assert.Equal(t, common.NetString("testCSeq"), msg.cseq, "There should be.")
 	assert.Equal(t, common.NetString("testCall-ID"), msg.callid, "There should be.")
-	assert.Equal(t, 0, msg.hdr_start, "There should be -1.")
-	assert.Equal(t, 229, msg.hdr_len, "There should be -1.")
-	assert.Equal(t, 233, msg.bdy_start, "There should be -1.")
+	assert.Equal(t, 0, msg.hdrStart, "There should be -1.")
+	assert.Equal(t, 229, msg.hdrLen, "There should be -1.")
+	assert.Equal(t, 233, msg.bdyStart, "There should be -1.")
 	assert.Equal(t, 107, msg.contentlength, "There should be 107.")
 	assert.Equal(t, (map[string]*map[string][]common.NetString)(nil), msg.body, "There should be nill.")
 }
@@ -449,12 +448,12 @@ func TestParseSIPHeaderToMap(t *testing.T) {
 		offset6 + len(header5) - 2, offset7 + len(header6) - 2, offset8 + len(header7) - 2}
 	msg := sipMessage{}
 	msg.raw = garbage
-	headers, first_lines := msg.parseSIPHeaderToMap(cuts, cute)
+	headers, firstLines := msg.parseSIPHeaderToMap(cuts, cute)
 
-	assert.Equal(t, 3, len(first_lines), "There should be.")
-	assert.Equal(t, "SIP/2.0", fmt.Sprintf("%s", first_lines[0]), "There should be.")
-	assert.Equal(t, "200", fmt.Sprintf("%s", first_lines[1]), "There should be.")
-	assert.Equal(t, "OK", fmt.Sprintf("%s", first_lines[2]), "There should be.")
+	assert.Equal(t, 3, len(firstLines), "There should be.")
+	assert.Equal(t, "SIP/2.0", fmt.Sprintf("%s", firstLines[0]), "There should be.")
+	assert.Equal(t, "200", fmt.Sprintf("%s", firstLines[1]), "There should be.")
+	assert.Equal(t, "OK", fmt.Sprintf("%s", firstLines[2]), "There should be.")
 
 	assert.Equal(t, 5, len(*headers), "There should be.")
 	assert.Equal(t, 1, len((*headers)["from"]), "There should be.")
@@ -475,7 +474,7 @@ func TestParseSIPHeaderToMap(t *testing.T) {
 	assert.Equal(t, "testVia6", fmt.Sprintf("%s", (*headers)["via"][5]), "There should be.")
 }
 
-func TestParseSIPHeaderToMap_compactform(t *testing.T) {
+func TestParseSIPHeaderToMapCompactform(t *testing.T) {
 	var garbage []byte
 	firstline := "SIP/2.0 200 OK\r\n"
 	header0 := "Via: testVia1,\r\n"
@@ -537,12 +536,12 @@ func TestParseSIPHeaderToMap_compactform(t *testing.T) {
 		offset12 + len(header11) - 2, offset13 + len(header12) - 2, offset14 + len(header13) - 2, offset15 + len(header14) - 2}
 	msg := sipMessage{}
 	msg.raw = garbage
-	headers, first_lines := msg.parseSIPHeaderToMap(cuts, cute)
+	headers, firstLines := msg.parseSIPHeaderToMap(cuts, cute)
 
-	assert.Equal(t, 3, len(first_lines), "There should be.")
-	assert.Equal(t, "SIP/2.0", fmt.Sprintf("%s", first_lines[0]), "There should be.")
-	assert.Equal(t, "200", fmt.Sprintf("%s", first_lines[1]), "There should be.")
-	assert.Equal(t, "OK", fmt.Sprintf("%s", first_lines[2]), "There should be.")
+	assert.Equal(t, 3, len(firstLines), "There should be.")
+	assert.Equal(t, "SIP/2.0", fmt.Sprintf("%s", firstLines[0]), "There should be.")
+	assert.Equal(t, "200", fmt.Sprintf("%s", firstLines[1]), "There should be.")
+	assert.Equal(t, "OK", fmt.Sprintf("%s", firstLines[2]), "There should be.")
 
 	assert.Equal(t, 12, len(*headers), "There should be.")
 	assert.Equal(t, 1, len((*headers)["from"]), "There should be.")
@@ -634,14 +633,14 @@ func TestParseSIPBody(t *testing.T) {
 	array = append(array, common.NetString("application/sdp"))
 	(*msg.headers)["content-type"] = array
 	msg.raw = garbage
-	msg.bdy_start = 0
+	msg.bdyStart = 0
 	msg.contentlength = len(garbage)
 	err = msg.parseSIPBody()
 	assert.Equal(t, nil, err, "shuld be no error")
 	assert.Equal(t, 1, len(msg.body), "shuld be one entity in msg.body")
 }
 
-func TestParseBody_SDP(t *testing.T) {
+func TestParseBodySDP(t *testing.T) {
 	var result *map[string][]common.NetString
 	var err error
 	var garbage []byte
@@ -649,13 +648,13 @@ func TestParseBody_SDP(t *testing.T) {
 	msg := sipMessage{}
 
 	// nil
-	result, err = msg.parseBody_SDP(garbage)
+	result, err = msg.parseBodySDP(garbage)
 	assert.Equal(t, nil, err, "error recived")
 	assert.Equal(t, 0, len(*result), "There should be.")
 
 	// malformed
 	garbage = []byte("\r\n123149afajbngohk;kdgj\r\najkavnaa:aaaa\r\n===a===")
-	result, err = msg.parseBody_SDP(garbage)
+	result, err = msg.parseBodySDP(garbage)
 	assert.Equal(t, nil, err, "error recived")
 	assert.Equal(t, 1, len(*result), "There should be.")
 	assert.Equal(t, "==a===", fmt.Sprintf("%s", (*result)[""][0]), "There should be.")
@@ -669,7 +668,7 @@ func TestParseBody_SDP(t *testing.T) {
 		"a=rtpmap:0 PCMU/8000\r\n" + // Multiple
 		"a=rtpmap:16 G729/8000\r\n")
 
-	result, err = msg.parseBody_SDP(garbage)
+	result, err = msg.parseBodySDP(garbage)
 	assert.Equal(t, nil, err, "error recived")
 
 	assert.Equal(t, 7, len(*result), "There should be.")
@@ -689,35 +688,35 @@ func TestParseBody_SDP(t *testing.T) {
 func TestGetMessageStatus(t *testing.T) {
 	msg := sipMessage{}
 
-	msg.hdr_start = 30
-	msg.hdr_len = -1
-	msg.bdy_start = -1
+	msg.hdrStart = 30
+	msg.hdrLen = -1
+	msg.bdyStart = -1
 	msg.contentlength = -1
 	msg.isIncompletedHdrMsg = true
 	msg.isIncompletedBdyMsg = false
-	assert.Equal(t, SIP_STATUS_HEADER_RECEIVING, msg.getMessageStatus(), "There should be HEADER RECEIVING.")
+	assert.Equal(t, SipStatusHeaderReceiving, msg.getMessageStatus(), "There should be HEADER RECEIVING.")
 
-	msg.hdr_start = 30
-	msg.hdr_len = 50
-	msg.bdy_start = 54
+	msg.hdrStart = 30
+	msg.hdrLen = 50
+	msg.bdyStart = 54
 	msg.contentlength = -1
 	msg.isIncompletedHdrMsg = false
 	msg.isIncompletedBdyMsg = true
-	assert.Equal(t, SIP_STATUS_BODY_RECEIVING, msg.getMessageStatus(), "There should be BODY RECEIVING.")
+	assert.Equal(t, SipStatusBodyReceiving, msg.getMessageStatus(), "There should be BODY RECEIVING.")
 
-	msg.hdr_start = 30
-	msg.hdr_len = 50
-	msg.bdy_start = 54
+	msg.hdrStart = 30
+	msg.hdrLen = 50
+	msg.bdyStart = 54
 	msg.contentlength = 55
 	msg.isIncompletedHdrMsg = false
 	msg.isIncompletedBdyMsg = false
-	assert.Equal(t, SIP_STATUS_RECEIVED, msg.getMessageStatus(), "There should be RECEIVED.")
+	assert.Equal(t, SipStatusReceived, msg.getMessageStatus(), "There should be RECEIVED.")
 
-	msg.hdr_start = 30
-	msg.hdr_len = 50
-	msg.bdy_start = 54
+	msg.hdrStart = 30
+	msg.hdrLen = 50
+	msg.bdyStart = 54
 	msg.contentlength = 0
 	msg.isIncompletedHdrMsg = false
 	msg.isIncompletedBdyMsg = false
-	assert.Equal(t, SIP_STATUS_RECEIVED, msg.getMessageStatus(), "There should be RECEIVED.")
+	assert.Equal(t, SipStatusReceived, msg.getMessageStatus(), "There should be RECEIVED.")
 }

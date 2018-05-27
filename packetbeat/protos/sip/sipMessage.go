@@ -25,7 +25,7 @@ type sipMessage struct {
 	// SIP FirstLines
 	isRequest    bool
 	method       common.NetString
-	requestUri   common.NetString
+	requestURI   common.NetString
 	statusCode   uint16
 	statusPhrase common.NetString
 
@@ -47,9 +47,9 @@ type sipMessage struct {
 	notes []common.NetString
 
 	// Offsets
-	hdr_start int
-	hdr_len   int
-	bdy_start int
+	hdrStart int
+	hdrLen   int
+	bdyStart int
 
 	// flags
 	isIncompletedHdrMsg bool
@@ -67,7 +67,7 @@ func (msg sipMessage) String() string {
 		outputs += "Request: ("
 		outputs += string(msg.method)
 		outputs += ", "
-		outputs += string(msg.requestUri)
+		outputs += string(msg.requestURI)
 		outputs += "), "
 	} else {
 		outputs += "Response: ("
@@ -91,10 +91,10 @@ func (msg sipMessage) String() string {
 	}
 	if msg.body != nil {
 		outputs += ", body: "
-		for body, maps_p := range msg.body {
+		for body, mapsP := range msg.body {
 			outputs += fmt.Sprintf("{ %s : ", body)
 			if body == "application/sdp" {
-				for key, lines := range *maps_p {
+				for key, lines := range *mapsP {
 					for idx, line := range lines {
 						outputs += fmt.Sprintf("  { %5s[%3d] : %s } ", key, idx, line)
 					}
@@ -106,125 +106,125 @@ func (msg sipMessage) String() string {
 	return outputs
 }
 func (msg *sipMessage) parseSIPHeader() (err error) {
-	msg.hdr_start = -1
-	msg.hdr_len = -1
-	msg.bdy_start = -1
+	msg.hdrStart = -1
+	msg.hdrLen = -1
+	msg.bdyStart = -1
 	msg.contentlength = -1
 
 	// Find SIP header start position and headers-bodies separeted postion
 	cutPosS := []int{} // SIP message start point and after CRLF points
 	cutPosE := []int{} // before CRLF points
 
-	byte_len := len(msg.raw)
-	hdr_start := -1       // SIP message statr point was initialized by -1
-	hdr_end := -1         // SIP header end point(\r\n\r\n) was initialized by -1
-	bdy_start := byte_len // SIP bodies start point (after \r\n\r\n) was initialized by packet length
+	byteLen := len(msg.raw)
+	hdrStart := -1      // SIP message statr point was initialized by -1
+	hdrEnd := -1        // SIP header end point(\r\n\r\n) was initialized by -1
+	bdyStart := byteLen // SIP bodies start point (after \r\n\r\n) was initialized by packet length
 
 	for i, ch := range msg.raw {
 		// ignore any CRLF appearing before the start-line (RFC3261 7.5)
-		if hdr_start == -1 {
+		if hdrStart == -1 {
 			if ch == byte('\n') || ch == byte('\r') {
 				continue
 			} else {
 				cutPosS = append(cutPosS, i)
-				hdr_start = i
+				hdrStart = i
 			}
 		}
 
 		// getting all CRLF points
-		if i+1 < byte_len &&
+		if i+1 < byteLen &&
 			msg.raw[i+0] == byte('\r') && msg.raw[i+1] == byte('\n') {
 			cutPosE = append(cutPosE, i)
 			cutPosS = append(cutPosS, i+2)
 		}
 		// getting header break point
-		if i+3 < byte_len &&
+		if i+3 < byteLen &&
 			msg.raw[i+0] == byte('\r') && msg.raw[i+1] == byte('\n') &&
 			msg.raw[i+2] == byte('\r') && msg.raw[i+3] == byte('\n') {
-			hdr_end = i
-			bdy_start = i + 4
+			hdrEnd = i
+			bdyStart = i + 4
 			break
 		}
 	}
 
 	// Set finded point to sipMessage member field
-	msg.hdr_start = hdr_start
+	msg.hdrStart = hdrStart
 
-	// in case hdr_star == -1,
+	// in case hdrStar == -1,
 	// it is means that the packet was padded with CRLFs
 	// return errors
-	if hdr_start < 0 {
+	if hdrStart < 0 {
 		return fmt.Errorf("malformed packet")
 	}
 
 	// in case missing header end point
 	// it is means that the packet was incomplete as SIP message
 	// flag the indicator
-	if hdr_end < 0 {
+	if hdrEnd < 0 {
 		msg.isIncompletedHdrMsg = true
-		hdr_end = byte_len
+		hdrEnd = byteLen
 	}
 
 	// calculate header length by header endpoint and startpoint
-	msg.hdr_len = hdr_end - hdr_start
-	msg.bdy_start = bdy_start
+	msg.hdrLen = hdrEnd - hdrStart
+	msg.bdyStart = bdyStart
 
 	// parse SIP header and getting maps
-	headers, start_line := msg.parseSIPHeaderToMap(cutPosS, cutPosE)
+	headers, startLine := msg.parseSIPHeaderToMap(cutPosS, cutPosE)
 
 	// in case start line was malformed, return error
-	if len(start_line) != 3 {
+	if len(startLine) != 3 {
 		msg.notes = append(msg.notes, common.NetString("start line parse error."))
 		return fmt.Errorf("malformed packet")
 	}
 
 	// decide request or response
-	msg.isRequest = strings.Contains(start_line[2], "SIP/2.0")
+	msg.isRequest = strings.Contains(startLine[2], "SIP/2.0")
 	if msg.isRequest {
-		msg.method = common.NetString(start_line[0])
-		msg.requestUri = common.NetString(start_line[1])
-	} else if strings.Contains(start_line[0], "SIP/2.0") { // Response
-		parsedStatusCode, err := strconv.ParseInt(start_line[1], 10, 16)
+		msg.method = common.NetString(startLine[0])
+		msg.requestURI = common.NetString(startLine[1])
+	} else if strings.Contains(startLine[0], "SIP/2.0") { // Response
+		parsedStatusCode, err := strconv.ParseInt(startLine[1], 10, 16)
 		if err != nil {
 			msg.statusCode = uint16(999)
-			msg.notes = append(msg.notes, common.NetString(fmt.Sprintf("invalid status-code %s", start_line[1])))
+			msg.notes = append(msg.notes, common.NetString(fmt.Sprintf("invalid status-code %s", startLine[1])))
 		} else {
 			msg.statusCode = uint16(parsedStatusCode)
 		}
-		msg.statusPhrase = common.NetString(strings.TrimSpace(start_line[2]))
+		msg.statusPhrase = common.NetString(strings.TrimSpace(startLine[2]))
 	} else {
 		msg.notes = append(msg.notes, common.NetString("malformed packet. this is not sip message."))
 		return fmt.Errorf("malformed packet(this is not sip message)")
 	}
 
 	// mandatory header fields check
-	to_array, existTo := (*headers)["to"]
-	from_array, existFrom := (*headers)["from"]
-	cseq_array, existCSeq := (*headers)["cseq"]
-	callid_array, existCallId := (*headers)["call-id"]
-	maxfrowards_array, existMaxForwards := (*headers)["max-forwards"]
-	via_array, existVia := (*headers)["via"]
+	toArray, existTo := (*headers)["to"]
+	fromArray, existFrom := (*headers)["from"]
+	cseqArray, existCSeq := (*headers)["cseq"]
+	callidArray, existCallID := (*headers)["call-id"]
+	maxfrowardsArray, existMaxForwards := (*headers)["max-forwards"]
+	viaArray, existVia := (*headers)["via"]
 
 	if existTo {
-		msg.to = getLastElementStrArray(to_array)
+		msg.to = getLastElementStrArray(toArray)
 	} else {
 		msg.notes = append(msg.notes, common.NetString("mandatory header [To] does not exist."))
 	}
 
 	if existFrom {
-		msg.from = getLastElementStrArray(from_array)
+		msg.from = getLastElementStrArray(fromArray)
 	} else {
 		msg.notes = append(msg.notes, common.NetString("mandatory header [From] does not exist."))
 	}
 
 	if existCSeq {
-		msg.cseq = getLastElementStrArray(cseq_array)
+		msg.cseq = getLastElementStrArray(cseqArray)
 	} else {
 		msg.notes = append(msg.notes, common.NetString("mandatory header [CSeq] does not exist."))
 	}
 
-	if existCallId {
-		msg.callid = getLastElementStrArray(callid_array)
+	if existCallID {
+		msg.callid = getLastElementStrArray(callidArray)
 	} else {
 		msg.notes = append(msg.notes, common.NetString("mandatory header [Call-ID] does not exist."))
 	}
@@ -239,14 +239,14 @@ func (msg *sipMessage) parseSIPHeader() (err error) {
 	msg.headers = headers
 
 	// unused
-	_ = maxfrowards_array
-	_ = via_array
+	_ = maxfrowardsArray
+	_ = viaArray
 
 	// Content-Lenght initialized to 0
 	msg.contentlength = 0
-	contenttype_array, existContentType := (*headers)["content-type"]
-	contentlength_array, existContentLength := (*headers)["content-length"]
-	_ = contenttype_array
+	contenttypeArray, existContentType := (*headers)["content-type"]
+	contentlengthArray, existContentLength := (*headers)["content-length"]
+	_ = contenttypeArray
 
 	contentlength := 0
 
@@ -255,15 +255,15 @@ func (msg *sipMessage) parseSIPHeader() (err error) {
 		// getting content-Length with header values
 		// in case parseint missed , lenght was reset with 0
 		if existContentLength {
-			raw_cnt_len, err_cnt_len := strconv.ParseInt(string(getLastElementStrArray(contentlength_array)), 10, 64)
-			contentlength = int(raw_cnt_len)
+			rawCntLen, errCntLen := strconv.ParseInt(string(getLastElementStrArray(contentlengthArray)), 10, 64)
+			contentlength = int(rawCntLen)
 
 			// parseint error, 0 reset
-			if err_cnt_len != nil {
+			if errCntLen != nil {
 				contentlength = 0
 			}
 		} else {
-			contentlength = byte_len - bdy_start
+			contentlength = byteLen - bdyStart
 		}
 	} else {
 		// in case content-type was not founded from packet
@@ -273,7 +273,7 @@ func (msg *sipMessage) parseSIPHeader() (err error) {
 
 	msg.contentlength = contentlength
 
-	if msg.bdy_start+msg.contentlength > byte_len {
+	if msg.bdyStart+msg.contentlength > byteLen {
 		// in case bodies length was short than content-length
 		// flag the indicator
 		msg.isIncompletedBdyMsg = true
@@ -351,7 +351,7 @@ func (msg *sipMessage) separateCsv(commaSeparatedString string) (separatedString
 }
 
 func (msg *sipMessage) parseSIPHeaderToMap(cutPosS []int, cutPosE []int) (*map[string][]common.NetString, []string) {
-	first_lines := []string{}
+	firstLines := []string{}
 	headers := &map[string][]common.NetString{}
 
 	var lastheader string
@@ -360,8 +360,8 @@ func (msg *sipMessage) parseSIPHeaderToMap(cutPosS []int, cutPosE []int) (*map[s
 		e := cutPosE[i]
 
 		if i == 0 {
-			// Request-line or Status-line is set to first_lines
-			first_lines = strings.SplitN(string(msg.raw[s:e]), " ", 3)
+			// Request-line or Status-line is set to firstLines
+			firstLines = strings.SplitN(string(msg.raw[s:e]), " ", 3)
 		} else {
 			//  Header fields can be extended over multiple lines by preceding each
 			// extra line with at least one SP or horizontal tab (HT).(RFC3261 7.3.1)
@@ -407,9 +407,9 @@ func (msg *sipMessage) parseSIPHeaderToMap(cutPosS []int, cutPosE []int) (*map[s
 			// this line will be header parameter
 			// header parameter shuld be include ':'
 			// and split two string ,before first ':' and after first ':'.
-			header_kv := strings.SplitN(string(msg.raw[s:e]), ":", 2)
-			key := strings.ToLower(strings.TrimSpace(header_kv[0]))
-			val := strings.TrimSpace(header_kv[1])
+			headerKeyVal := strings.SplitN(string(msg.raw[s:e]), ":", 2)
+			key := strings.ToLower(strings.TrimSpace(headerKeyVal[0]))
+			val := strings.TrimSpace(headerKeyVal[1])
 
 			// in case string was not included the ':', it is not valid data, ignored.
 			if val == "" {
@@ -489,7 +489,7 @@ func (msg *sipMessage) parseSIPHeaderToMap(cutPosS []int, cutPosE []int) (*map[s
 			}
 		}
 	}
-	return headers, first_lines
+	return headers, firstLines
 }
 
 // TODO:The procedure with Content-Encoding(RFC3261).
@@ -504,57 +504,57 @@ func (msg *sipMessage) parseSIPBody() (err error) {
 		return nil
 	}
 
-	contenttype_array, hd_ctype_ok := (*msg.headers)["content-type"]
+	contenttypeArray, hdCtypeOk := (*msg.headers)["content-type"]
 
 	// if not exist Content-Type header, return a error
-	if !hd_ctype_ok {
+	if !hdCtypeOk {
 		debugf("parseSIPBody: This sip message has not body.")
 		return fmt.Errorf("no content-type header")
 	}
 
 	msg.body = map[string]*map[string][]common.NetString{}
 
-	if len(contenttype_array) == 0 {
-		//contenttype_array has no element
+	if len(contenttypeArray) == 0 {
+		//contenttypeArray has no element
 		return nil
 	}
 
 	// Switch the function with body content type
 	// TODO: Now, it is supported only SDP,
 	//       more SIP body application support (I planning to support SIP-I(ISUP)/Multi-part)
-	lower_case_content_type := strings.ToLower(string(getLastElementStrArray(contenttype_array)))
-	switch lower_case_content_type {
+	lowerCaseContentType := strings.ToLower(string(getLastElementStrArray(contenttypeArray)))
+	switch lowerCaseContentType {
 	case "application/sdp":
-		body, err := msg.parseBody_SDP(msg.raw[msg.bdy_start : msg.bdy_start+msg.contentlength])
+		body, err := msg.parseBodySDP(msg.raw[msg.bdyStart : msg.bdyStart+msg.contentlength])
 		_ = err
 		if err != nil {
-			debugf("%s : parseError", lower_case_content_type)
-			return fmt.Errorf("invalid %s format.", lower_case_content_type)
+			debugf("%s : parseError", lowerCaseContentType)
+			return fmt.Errorf("invalid %s format", lowerCaseContentType)
 		}
 
-		msg.body[lower_case_content_type] = body
+		msg.body[lowerCaseContentType] = body
 
 	default:
-		debugf("unsupported content-type. : %s", lower_case_content_type)
+		debugf("unsupported content-type. : %s", lowerCaseContentType)
 		return fmt.Errorf("unsupported content-type")
 	}
 
 	return nil
 }
 
-func (msg *sipMessage) parseBody_SDP(rawData []byte) (body *map[string][]common.NetString, err error) {
+func (msg *sipMessage) parseBodySDP(rawData []byte) (body *map[string][]common.NetString, err error) {
 	body = &map[string][]common.NetString{}
-	sdp_lines := strings.Split(string(rawData), "\r\n")
-	for i := 0; i < len(sdp_lines); i++ {
+	sdpLines := strings.Split(string(rawData), "\r\n")
+	for i := 0; i < len(sdpLines); i++ {
 
-		key_val := strings.SplitN(sdp_lines[i], "=", 2)
+		keyVal := strings.SplitN(sdpLines[i], "=", 2)
 
-		if len(key_val) != 2 {
+		if len(keyVal) != 2 {
 			continue
 		}
 
-		key := strings.TrimSpace(key_val[0])
-		val := strings.TrimSpace(key_val[1])
+		key := strings.TrimSpace(keyVal[0])
+		val := strings.TrimSpace(keyVal[1])
 
 		_, existkey := (*body)[key]
 		if !existkey {
@@ -568,16 +568,16 @@ func (msg *sipMessage) parseBody_SDP(rawData []byte) (body *map[string][]common.
 
 func (msg *sipMessage) getMessageStatus() int {
 	if msg.isIncompletedHdrMsg {
-		return SIP_STATUS_HEADER_RECEIVING
+		return SipStatusHeaderReceiving
 	}
 	if msg.isIncompletedBdyMsg {
-		return SIP_STATUS_BODY_RECEIVING
+		return SipStatusBodyReceiving
 	}
-	if msg.hdr_start < 0 {
-		return SIP_STATUS_REJECTED
+	if msg.hdrStart < 0 {
+		return SipStatusRejected
 	}
 	if msg.contentlength < 0 {
-		return SIP_STATUS_BODY_RECEIVING
+		return SipStatusBodyReceiving
 	}
-	return SIP_STATUS_RECEIVED
+	return SipStatusReceived
 }

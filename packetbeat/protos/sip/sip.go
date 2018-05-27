@@ -22,22 +22,24 @@ const (
 	transportUDP = 1
 )
 
+// MessegeStatus
 const (
-	SIP_STATUS_RECEIVED         = 0
-	SIP_STATUS_HEADER_RECEIVING = 1
-	SIP_STATUS_BODY_RECEIVING   = 2
-	SIP_STATUS_REJECTED         = 3
+	SipStatusReceived        = 0
+	SipStatusHeaderReceiving = 1
+	SipStatusBodyReceiving   = 2
+	SipStatusRejected        = 3
 )
 
+// Detail parse mode
 const (
-	SIP_DETAIL_URI            = 1
-	SIP_DETAIL_NAME_ADDR      = 2
-	SIP_DETAIL_INT            = 3
-	SIP_DETAIL_INT_METHOD     = 4
-	SIP_DETAIL_INT_INT_METHOD = 5
-	SIP_DETAIL_INT_STRING     = 6
-	SIP_DETAIL_INT_INT        = 7
-	SIP_DETAIL_INT_INT_STRING = 8
+	SipDetailURI          = 1 // ex. sip:bob@example.com
+	SipDetailNameAddr     = 2 // ex. "Bob"<sip:bob@example.com>
+	SipDetailInt          = 3 // ex. 123
+	SipDetailIntMethod    = 4 // ex. 123 INVITE
+	SipDetailIntIntMethod = 5 // ex. 123 123 INVITE
+	SipDetailIntString    = 6 // ex. 123 INVITE
+	SipDetailIntInt       = 7 // ex. 123 123
+	SipDetailIntIntString = 8 // ex. 123 123 INVITE
 )
 
 func init() {
@@ -45,6 +47,7 @@ func init() {
 	protos.Register("sip", New)
 }
 
+// New create a sip plugin
 func New(
 	testMode bool,
 	results protos.Reporter,
