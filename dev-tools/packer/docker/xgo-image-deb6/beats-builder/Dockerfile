@@ -12,14 +12,17 @@ RUN \
 	rm libpcap0.8-dev*.deb
 RUN \
 	apt-get -o Acquire::Check-Valid-Until=false update && \
-	apt-get install -y libpcap0.8-dev
+	apt-get install -y --force-yes libpcap0.8-dev
 
 
-# Old git version which does not support proxy with go get requires to fetch go-yaml directly
-RUN git clone https://github.com/go-yaml/yaml.git /go/src/gopkg.in/yaml.v2
+# Old git version which does not support proxy with go get directly, and git cloning
+# from github also no longer works.
+ADD yaml.v2 /go/src/gopkg.in/yaml.v2
+ADD gotpl /go/src/github.com/tsg/gotpl
 
 # Load gotpl which is needed for creating the templates.
-RUN go get github.com/tsg/gotpl
+RUN cd /go/src/github.com/tsg/gotpl && \
+  go install
 
 # add patch for gopacket
 ADD gopacket_pcap.patch /gopacket_pcap.patch

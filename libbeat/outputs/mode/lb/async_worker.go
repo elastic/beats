@@ -111,25 +111,10 @@ func (w *asyncWorker) sendLoop() (done bool) {
 }
 
 func (w *asyncWorker) onMessage(msg eventsMessage) error {
-	var err error
 	if msg.datum.Event != nil {
-		err = w.client.AsyncPublishEvent(w.handleResult(msg), msg.datum)
-	} else {
-		err = w.client.AsyncPublishEvents(w.handleResults(msg), msg.data)
+		return w.client.AsyncPublishEvent(w.handleResult(msg), msg.datum)
 	}
-
-	if err != nil {
-		if msg.attemptsLeft > 0 {
-			msg.attemptsLeft--
-		}
-
-		// asynchronously retry to insert message (if attempts left), so worker can not
-		// deadlock on retries channel if client puts multiple failed outstanding
-		// events into the pipeline
-		w.onFail(msg, err)
-	}
-
-	return err
+	return w.client.AsyncPublishEvents(w.handleResults(msg), msg.data)
 }
 
 func (w *asyncWorker) handleResult(msg eventsMessage) func(error) {
@@ -193,7 +178,7 @@ func (w *asyncWorker) handleResults(msg eventsMessage) func([]outputs.Data, erro
 		}
 
 		// all events published -> signal success
-		debugf("async bulk publish success")
+		debugf("async bulk publish success (signaler=%v)", msg.signaler)
 		op.SigCompleted(msg.signaler)
 	}
 }

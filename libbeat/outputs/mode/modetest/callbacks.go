@@ -120,6 +120,7 @@ func AsyncPublishFailStartWith(
 	inc := makeCounter(n, err)
 	return func(cb func([]outputs.Data, error), data []outputs.Data) error {
 		if err := inc(); err != nil {
+			cb(data, err)
 			return err
 		}
 		return pub(cb, data)

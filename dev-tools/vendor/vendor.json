@@ -1,0 +1,85 @@
+{
+	"comment": "",
+	"ignore": "test github.com/elastic/beats",
+	"package": [
+		{
+			"checksumSHA1": "Hc4yYaBrUJXrXge+C5PecOIFX84=",
+			"path": "github.com/blakesmith/ar",
+			"revision": "8bd4349a67f2533b078dbc524689d15dba0f4659",
+			"revisionTime": "2015-03-11T14:59:44Z"
+		},
+		{
+			"checksumSHA1": "oqq6XncFUhs7TnBccRh8O4kr0UQ=",
+			"path": "github.com/cavaliercoder/badio",
+			"revision": "ce5280129e9e9d80def35bfe203b845a4eebc9db",
+			"revisionTime": "2016-02-13T15:00:51Z"
+		},
+		{
+			"checksumSHA1": "hF5b2KHFFtGWPLYHixNGhgtMgc4=",
+			"path": "github.com/cavaliercoder/go-rpm",
+			"revision": "83f26baae1d04c483e8ab002c02c1ceaf63a5f51",
+			"revisionTime": "2017-01-17T14:01:51Z"
+		},
+		{
+			"checksumSHA1": "yPWWiioidIJuDhVSDe+ogjTmJ18=",
+			"path": "github.com/tsg/gotpl",
+			"revision": "a4179fb207b3ef8a96681fc9c9b6e20f99a6d2ef",
+			"revisionTime": "2015-08-11T13:42:54Z"
+		},
+		{
+			"checksumSHA1": "TT1rac6kpQp2vz24m5yDGUNQ/QQ=",
+			"path": "golang.org/x/crypto/cast5",
+			"revision": "3cb07270c9455e8ad27956a70891c962d121a228",
+			"revisionTime": "2017-03-30T16:02:45Z"
+		},
+		{
+			"checksumSHA1": "IIhFTrLlmlc6lEFSitqi4aw2lw0=",
+			"path": "golang.org/x/crypto/openpgp",
+			"revision": "3cb07270c9455e8ad27956a70891c962d121a228",
+			"revisionTime": "2017-03-30T16:02:45Z"
+		},
+		{
+			"checksumSHA1": "olOKkhrdkYQHZ0lf1orrFQPQrv4=",
+			"path": "golang.org/x/crypto/openpgp/armor",
+			"revision": "3cb07270c9455e8ad27956a70891c962d121a228",
+			"revisionTime": "2017-03-30T16:02:45Z"
+		},
+		{
+			"checksumSHA1": "eo/KtdjieJQXH7Qy+faXFcF70ME=",
+			"path": "golang.org/x/crypto/openpgp/elgamal",
+			"revision": "3cb07270c9455e8ad27956a70891c962d121a228",
+			"revisionTime": "2017-03-30T16:02:45Z"
+		},
+		{
+			"checksumSHA1": "rlxVSaGgqdAgwblsErxTxIfuGfg=",
+			"path": "golang.org/x/crypto/openpgp/errors",
+			"revision": "3cb07270c9455e8ad27956a70891c962d121a228",
+			"revisionTime": "2017-03-30T16:02:45Z"
+		},
+		{
+			"checksumSHA1": "LWdaR8Q9yn6eBCcnGl0HvJRDUBE=",
+			"path": "golang.org/x/crypto/openpgp/packet",
+			"revision": "3cb07270c9455e8ad27956a70891c962d121a228",
+			"revisionTime": "2017-03-30T16:02:45Z"
+		},
+		{
+			"checksumSHA1": "s2qT4UwvzBSkzXuiuMkowif1Olw=",
+			"path": "golang.org/x/crypto/openpgp/s2k",
+			"revision": "3cb07270c9455e8ad27956a70891c962d121a228",
+			"revisionTime": "2017-03-30T16:02:45Z"
+		},
+		{
+			"checksumSHA1": "y/oIaxq2d3WPizRZfVjo8RCRYTU=",
+			"path": "golang.org/x/crypto/ripemd160",
+			"revision": "3cb07270c9455e8ad27956a70891c962d121a228",
+			"revisionTime": "2017-03-30T16:02:45Z"
+		},
+		{
+			"checksumSHA1": "qOmvuDm+F+2nQQecUZBVkZrTn6Y=",
+			"path": "gopkg.in/yaml.v2",
+			"revision": "d670f9405373e636a5a2765eea47fac0c9bc91a4",
+			"revisionTime": "2018-01-09T11:43:31Z"
+		}
+	],
+	"rootPath": "github.com/elastic/beats/dev-tools"
+}

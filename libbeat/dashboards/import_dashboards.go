@@ -167,7 +167,7 @@ func ImportDashboards() error {
 	}
 
 	if len(cl.opt.CertificateAuthority) > 0 {
-		tlsConfig["certificate_authorities"] = fmt.Sprintf("[%s]", cl.opt.CertificateAuthority)
+		tlsConfig["certificate_authorities"] = []string{cl.opt.CertificateAuthority}
 	}
 
 	if len(tlsConfig) > 0 {

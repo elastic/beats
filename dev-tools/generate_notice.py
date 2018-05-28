@@ -1,8 +1,12 @@
+from __future__ import print_function
+
 import glob
-import sys
 import os
 import datetime
 import argparse
+import yaml
+import csv
+import re
 
 
 def read_file(filename):
@@ -11,62 +15,231 @@ def read_file(filename):
         print("File not found {}".format(filename))
         return ""
 
-    with open(filename, 'r') as f:
-        file_content = f.read()
-        return file_content
+    try:
+        with open(filename, 'r') as f:
+            return f.read()
+    except UnicodeDecodeError:
+        # try latin-1
+        with open(filename, 'r', encoding="ISO-8859-1") as f:
+            return f.read()
 
 
-def get_library_name(license):
-
-    lib = ""
-    path = os.path.dirname(license)
-    # get the last three directories
-    for i in range(0, 3):
-        path, x = os.path.split(path)
-        if len(lib) == 0:
-            lib = x
-        elif len(x) > 0:
-            lib = x + "/" + lib
-
-    return lib
+def get_library_path(license):
+    """
+    Get the contents up to the vendor folder.
+    """
+    split = license.split(os.sep)
+    for i, word in reversed(list(enumerate(split))):
+        if word == "vendor":
+            return "/".join(split[i + 1:])
+    return "/".join(split)
 
 
-def add_licenses(f, licenses):
+def read_versions(vendor):
+    libs = []
+    with open(os.path.join(vendor, "../glide.yaml")) as f:
+        glide = yaml.load(f)
+        for package in glide["import"]:
+            revision = ""
+            version = package.get("version", "")
+            if version and len(version) == 40:   # probably a git hash
+                    revision = version
+                    version = ""
+            libs.append({
+                "path": package["package"],
+                "version": version,
+                "revision": revision,
+            })
+    return libs
 
-    for license in licenses:
-        for license_file in glob.glob(license):
-            f.write("\n--------------------------------------------------------------------\n")
-            f.write("{}\n".format(get_library_name(license_file)))
-            f.write("--------------------------------------------------------------------\n")
-            copyright = read_file(license_file)
-            if "Apache License" not in copyright:
-                f.write(copyright)
-            else:
-                # it's an Apache License, so include only the NOTICE file
-                f.write("Apache License\n\n")
-                for notice_file in glob.glob(os.path.join(os.path.dirname(license_file), "NOTICE*")):
-                    f.write("-------{}-----\n".format(os.path.basename(notice_file)))
-                    f.write(read_file(notice_file))
+
+def gather_dependencies(vendor_dirs):
+    dependencies = {}   # lib_path -> [array of lib]
+    for vendor in vendor_dirs:
+        libs = read_versions(vendor)
+
+        # walk looking for LICENSE files
+        for root, dirs, filenames in os.walk(vendor):
+            for filename in sorted(filenames):
+                if filename.startswith("LICENSE"):
+                    lib_path = get_library_path(root)
+                    lib_search = [l for l in libs if l["path"].startswith(lib_path)]
+                    if len(lib_search) == 0:
+                        print("WARNING: No version information found for: {}".format(lib_path))
+                        lib = {"path": lib_path}
+                    else:
+                        lib = lib_search[0]
+                    lib["license_file"] = os.path.join(root, filename)
+
+                    lib["license_contents"] = read_file(lib["license_file"])
+                    lib["license_summary"] = detect_license_summary(lib["license_contents"])
+                    if lib["license_summary"] == "UNKNOWN":
+                        print("WARNING: Unknown license for: {}".format(lib_path))
+
+                    if lib_path not in dependencies:
+                        dependencies[lib_path] = [lib]
+                    else:
+                        dependencies[lib_path].append(lib)
+
+            # don't walk down into another vendor dir
+            if "vendor" in dirs:
+                dirs.remove("vendor")
+    return dependencies
 
 
-def create_notice(filename, beat, copyright, licenses):
+def write_notice_file(f, beat, copyright, dependencies):
 
     now = datetime.datetime.now()
 
-    with open(filename, "w+") as f:
+    # Add header
+    f.write("{}\n".format(beat))
+    f.write("Copyright 2014-{0} {1}\n".format(now.year, copyright))
+    f.write("\n")
+    f.write("This product includes software developed by The Apache Software \n" +
+            "Foundation (http://www.apache.org/).\n\n")
 
-        # Add header
-        f.write("{}\n".format(beat))
-        f.write("Copyright 2014-{0} {1}\n".format(now.year, copyright))
-        f.write("\n")
-        f.write("This product includes software developed by The Apache Software \nFoundation (http://www.apache.org/).\n\n")
+    # Add licenses for 3rd party libraries
+    f.write("==========================================================================\n")
+    f.write("Third party libraries used by the {} project:\n".format(beat))
+    f.write("==========================================================================\n\n")
 
-        # Add licenses for 3rd party libraries
-        f.write("==========================================================================\n")
-        f.write("Third party libraries used by the Beats project:\n")
-        f.write("==========================================================================\n\n")
-        add_licenses(f, licenses)
+    # Sort licenses by package path, ignore upper / lower case
+    for key in sorted(dependencies, key=str.lower):
+        for lib in dependencies[key]:
+            f.write("\n--------------------------------------------------------------------\n")
+            f.write("Dependency: {}\n".format(key))
+            if "version" in lib:
+                f.write("Version: {}\n".format(lib["version"]))
+            if "revision" in lib:
+                f.write("Revision: {}\n".format(lib["revision"]))
+            f.write("License type (autodetected): {}\n".format(lib["license_summary"]))
+            f.write("{}:\n".format(lib["license_file"]))
+            f.write("--------------------------------------------------------------------\n")
+            if lib["license_summary"] != "Apache-2.0":
+                f.write(lib["license_contents"])
+            else:
+                # it's an Apache License, so include only the NOTICE file
+                f.write("Apache License 2.0\n\n")
 
+                # Skip NOTICE files which are not needed
+                if os.path.join(os.path.dirname(lib["license_file"])) in SKIP_NOTICE:
+                    continue
+
+                for notice_file in glob.glob(os.path.join(os.path.dirname(lib["license_file"]), "NOTICE*")):
+                    notice_file_hdr = "-------{}-----\n".format(os.path.basename(notice_file))
+                    f.write(notice_file_hdr)
+                    f.write(read_file(notice_file))
+
+
+def write_csv_file(csvwriter, dependencies):
+    csvwriter.writerow(["name", "url", "version", "revision", "license"])
+    for key in sorted(dependencies, key=str.lower):
+        for lib in dependencies[key]:
+            csvwriter.writerow([key, get_url(key), lib.get("version", ""), lib.get("revision", ""),
+                                lib["license_summary"]])
+
+
+def get_url(repo):
+    words = repo.split("/")
+    if words[0] != "github.com":
+        return repo
+    return "https://github.com/{}/{}".format(words[1], words[2])
+
+
+def create_notice(filename, beat, copyright, vendor_dirs, csvfile):
+    dependencies = gather_dependencies(vendor_dirs)
+    if not csvfile:
+        with open(filename, "w+") as f:
+            write_notice_file(f, beat, copyright, dependencies)
+    else:
+        with open(csvfile, "wb") as f:
+            csvwriter = csv.writer(f)
+            write_csv_file(csvwriter, dependencies)
+
+
+APACHE2_LICENSE_TITLES = [
+    "Apache License Version 2.0",
+    "Apache License, Version 2.0"
+]
+
+MIT_LICENSES = [
+    re.sub(r"\s+", " ", """Permission is hereby granted, free of charge, to any person obtaining a copy
+of this software and associated documentation files (the "Software"), to deal
+in the Software without restriction, including without limitation the rights
+to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+copies of the Software, and to permit persons to whom the Software is
+furnished to do so, subject to the following conditions:
+
+The above copyright notice and this permission notice shall be included in all
+copies or substantial portions of the Software.
+    """),
+    re.sub(r"\s+", " ", """Permission to use, copy, modify, and distribute this software for any
+purpose with or without fee is hereby granted, provided that the above
+copyright notice and this permission notice appear in all copies.""")
+]
+
+BSD_LICENSE_CONTENTS = [
+    re.sub(r"\s+", " ", """Redistribution and use in source and binary forms, with or without modification,
+are permitted provided that the following conditions are met:"""),
+    re.sub(r"\s+", " ", """Redistributions of source code must retain the above copyright notice, this
+   list of conditions and the following disclaimer."""),
+    re.sub(r"\s+", " ", """Redistributions in binary form must reproduce the above copyright notice,
+   this list of conditions and the following disclaimer in the documentation
+   and/or other materials provided with the distribution.
+""")]
+
+BSD_LICENSE_3_CLAUSE = [
+    re.sub(r"\s+", " ", """Neither the name of"""),
+    re.sub(r"\s+", " ", """nor the
+      names of its contributors may be used to endorse or promote products
+      derived from this software without specific prior written permission.""")
+]
+
+BSD_LICENSE_4_CLAUSE = [
+    re.sub(r"\s+", " ", """All advertising materials mentioning features or use of this software
+   must display the following acknowledgement"""),
+]
+
+CC_SA_4_LICENSE_TITLE = [
+    "Creative Commons Attribution-ShareAlike 4.0 International"
+]
+
+LGPL_3_LICENSE_TITLE = [
+    "GNU LESSER GENERAL PUBLIC LICENSE Version 3"
+]
+
+MPL_LICENSE_TITLES = [
+    "Mozilla Public License Version 2.0",
+    "Mozilla Public License, version 2.0"
+]
+
+
+# return SPDX identifiers from https://spdx.org/licenses/
+def detect_license_summary(content):
+    # replace all white spaces with a single space
+    content = re.sub(r"\s+", ' ', content)
+    if any(sentence in content[0:1000] for sentence in APACHE2_LICENSE_TITLES):
+        return "Apache-2.0"
+    if any(sentence in content[0:1000] for sentence in MIT_LICENSES):
+        return "MIT"
+    if all(sentence in content[0:1000] for sentence in BSD_LICENSE_CONTENTS):
+        if all(sentence in content[0:1000] for sentence in BSD_LICENSE_3_CLAUSE):
+            if all(sentence in content[0:1000] for sentence in BSD_LICENSE_4_CLAUSE):
+                return "BSD-4-Clause"
+            return "BSD-3-Clause"
+        else:
+            return "BSD-2-Clause"
+    if any(sentence in content[0:300] for sentence in MPL_LICENSE_TITLES):
+        return "MPL-2.0"
+    if any(sentence in content[0:3000] for sentence in CC_SA_4_LICENSE_TITLE):
+        return "CC-BY-SA-4.0"
+    if any(sentence in content[0:3000] for sentence in LGPL_3_LICENSE_TITLE):
+        return "LGPL-3.0"
+
+    return "UNKNOWN"
+
+
+SKIP_NOTICE = []
 
 if __name__ == "__main__":
 
@@ -78,20 +251,38 @@ if __name__ == "__main__":
                         help="Beat name")
     parser.add_argument("-c", "--copyright", default="Elasticsearch BV",
                         help="copyright owner")
-
+    parser.add_argument("--csv", dest="csvfile",
+                        help="Output to a csv file")
+    parser.add_argument("-e", "--excludes", default=["dev-tools", "build"],
+                        help="List of top directories to exclude")
+    parser.add_argument("-s", "--skip-notice", default=[],
+                        help="List of NOTICE files to skip")
     args = parser.parse_args()
 
     cwd = os.getcwd()
     notice = os.path.join(cwd, "NOTICE")
-    licenses = []
+    vendor_dirs = []
+
+    excludes = args.excludes
+    if not isinstance(excludes, list):
+        excludes = [excludes]
+    SKIP_NOTICE = args.skip_notice
 
     for root, dirs, files in os.walk(args.vendor):
+
+        # Skips all hidden paths like ".git"
+        if '/.' in root:
+            continue
+
         if 'vendor' in dirs:
-            license = os.path.join(os.path.join(root, 'vendor'),
-                                   '**/**/**/LICENSE*')
-            licenses.append(license)
+            vendor_dirs.append(os.path.join(root, 'vendor'))
+            dirs.remove('vendor')   # don't walk down into sub-vendors
 
-    print("Get the licenses available from {}".format(licenses))
-    create_notice(notice, args.beat, args.copyright, licenses)
+        for exclude in excludes:
+            if exclude in dirs:
+                dirs.remove(exclude)
 
-    print("Available at {}\n".format(notice))
+    print("Get the licenses available from {}".format(vendor_dirs))
+    create_notice(notice, args.beat, args.copyright, vendor_dirs, args.csvfile)
+
+    print("Available at {}".format(notice))

@@ -107,15 +107,7 @@ func (c *asyncClient) AsyncPublishEvents(
 		return nil
 	}
 
-	ref := &msgRef{
-		client:    c,
-		count:     1,
-		batch:     data,
-		batchSize: len(data),
-		win:       c.win,
-		cb:        cb,
-		err:       nil,
-	}
+	ref := newMsgRef(c, data, cb)
 	defer ref.dec()
 
 	for len(data) > 0 {
@@ -171,7 +163,7 @@ func (c *asyncClient) sendEvents(ref *msgRef, data []outputs.Data) error {
 	for i, d := range data {
 		window[i] = d
 	}
-	atomic.AddInt32(&ref.count, 1)
+	ref.inc()
 	return c.client.Send(ref.callback, window)
 }
 
@@ -183,7 +175,33 @@ func (r *msgRef) callback(seq uint32, err error) {
 	}
 }
 
+func newMsgRef(
+	client *asyncClient,
+	data []outputs.Data,
+	cb func([]outputs.Data, error),
+) *msgRef {
+	r := &msgRef{
+		client:    client,
+		count:     1,
+		batch:     data,
+		batchSize: len(data),
+		win:       client.win,
+		cb:        cb,
+		err:       nil,
+	}
+
+	debug("msgref(%p) new: batch=%p, cb=%p", r, &r.batch[0], cb)
+	return r
+}
+
+func (r *msgRef) inc() {
+	count := atomic.AddInt32(&r.count, 1)
+	debug("msgref(%p) inc -> %v", r, count)
+}
+
 func (r *msgRef) done(n uint32) {
+	debug("msgref(%p) done(%v)", r, n)
+
 	ackedEvents.Add(int64(n))
 	r.batch = r.batch[n:]
 	if r.win != nil {
@@ -193,6 +211,8 @@ func (r *msgRef) done(n uint32) {
 }
 
 func (r *msgRef) fail(n uint32, err error) {
+	debug("msgref(%p) fail(%v, %v)", r, n, err)
+
 	ackedEvents.Add(int64(n))
 	if r.err == nil {
 		r.err = err
@@ -206,6 +226,7 @@ func (r *msgRef) fail(n uint32, err error) {
 
 func (r *msgRef) dec() {
 	i := atomic.AddInt32(&r.count, -1)
+	debug("msgref(%p) dec -> %v", r, i)
 	if i > 0 {
 		return
 	}
@@ -214,9 +235,11 @@ func (r *msgRef) dec() {
 	if err != nil {
 		eventsNotAcked.Add(int64(len(r.batch)))
 		logp.Err("Failed to publish events (host: %v) caused by: %v", r.client.host, err)
+		debug("msgref(%p) exec callback(%p, %v)", r, &r.batch[0], err)
 		r.cb(r.batch, err)
 		return
 	}
 
+	debug("msgref(%p) exec callback(nil, nil)", r)
 	r.cb(nil, nil)
 }

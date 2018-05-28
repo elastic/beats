@@ -10,6 +10,8 @@ import (
 	"sync"
 	"time"
 
+	"github.com/joeshaw/multierror"
+
 	"github.com/elastic/beats/libbeat/common"
 	"github.com/elastic/beats/libbeat/common/op"
 	"github.com/elastic/beats/libbeat/logp"
@@ -82,15 +84,18 @@ func NewConnectedClient(cfg *common.Config) (*Client, error) {
 		return nil, err
 	}
 
+	var errs multierror.Errors
+
 	for _, client := range clients {
 		err = client.Connect(client.timeout)
 		if err != nil {
 			logp.Err("Error connecting to Elasticsearch: %s", client.Connection.URL)
+			errs = append(errs, err)
 			continue
 		}
 		return &client, nil
 	}
-	return nil, fmt.Errorf("Couldn't connect to any of the configured Elasticsearch hosts")
+	return nil, fmt.Errorf("Couldn't connect to any of the configured Elasticsearch hosts, errors: %v", errs.Err())
 }
 
 // NewElasticsearchClients returns a list of Elasticsearch clients based on the given

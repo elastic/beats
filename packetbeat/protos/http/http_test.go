@@ -4,6 +4,7 @@ package http
 
 import (
 	"bytes"
+	"fmt"
 	"net"
 	"regexp"
 	"strings"
@@ -380,6 +381,24 @@ func TestHttpParser_Response_HTTP_10_without_content_length(t *testing.T) {
 	assert.Equal(t, 4, message.contentLength)
 }
 
+func TestHttpParser_Response_without_phrase(t *testing.T) {
+	for idx, testCase := range []struct {
+		ok, complete bool
+		code         int
+		request      string
+	}{
+		{true, true, 200, "HTTP/1.1 200 \r\nContent-Length: 0\r\n\r\n"},
+		{true, true, 301, "HTTP/1.1 301\r\nContent-Length: 0\r\n\r\n"},
+	} {
+		msg := fmt.Sprintf("failed test case[%d]: \"%s\"", idx, testCase.request)
+		r, ok, complete := testParse(nil, testCase.request)
+		assert.Equal(t, testCase.ok, ok, msg)
+		assert.Equal(t, testCase.complete, complete, msg)
+		assert.Equal(t, testCase.code, int(r.statusCode), msg)
+		assert.Equal(t, "", string(r.statusPhrase), msg)
+	}
+}
+
 func TestHttpParser_splitResponse_midBody(t *testing.T) {
 	data1 := "HTTP/1.1 200 OK\r\n" +
 		"Date: Tue, 14 Aug 2012 22:31:45 GMT\r\n" +
@@ -525,6 +544,54 @@ func TestHttpParser_301_response(t *testing.T) {
 	assert.Equal(t, 290, msg.contentLength)
 }
 
+func TestHttpParser_PhraseContainsSpaces(t *testing.T) {
+	if testing.Verbose() {
+		logp.LogInit(logp.LOG_DEBUG, "", false, true, []string{"http"})
+	}
+	response_404 := "HTTP/1.1 404 Not Found\r\n" +
+		"Server: Apache-Coyote/1.1\r\n" +
+		"Content-Type: text/html;charset=utf-8\r\n" +
+		"Content-Length: 18\r\n" +
+		"Date: Mon, 31 Jul 2017 11:31:53 GMT\r\n" +
+		"\r\n" +
+		"Http Response Body"
+
+	r, ok, complete := testParse(nil, response_404)
+	assert.True(t, ok)
+	assert.True(t, complete)
+	assert.Equal(t, 18, r.contentLength)
+	assert.Equal(t, "Not Found", string(r.statusPhrase))
+	assert.Equal(t, 404, int(r.statusCode))
+
+	response_500 := "HTTP/1.1 500 Internal Server Error\r\n" +
+		"Server: Apache-Coyote/1.1\r\n" +
+		"Content-Type: text/html;charset=utf-8\r\n" +
+		"Content-Length: 2\r\n" +
+		"Date: Mon, 30 Jul 2017 00:00:00 GMT\r\n" +
+		"\r\n" +
+		"xx"
+	r, ok, complete = testParse(nil, response_500)
+	assert.True(t, ok)
+	assert.True(t, complete)
+	assert.Equal(t, 2, r.contentLength)
+	assert.Equal(t, "Internal Server Error", string(r.statusPhrase))
+	assert.Equal(t, 500, int(r.statusCode))
+
+	broken := "HTTP/1.1 500 \r\n" +
+		"Server: Apache-Coyote/1.1\r\n" +
+		"Content-Type: text/html;charset=utf-8\r\n" +
+		"Content-Length: 2\r\n" +
+		"Date: Mon, 30 Jul 2017 00:00:00 GMT\r\n" +
+		"\r\n" +
+		"xx"
+	r, ok, complete = testParse(nil, broken)
+	assert.True(t, ok)
+	assert.True(t, complete)
+	assert.Equal(t, 2, r.contentLength)
+	assert.Equal(t, "", string(r.statusPhrase))
+	assert.Equal(t, 500, int(r.statusCode))
+}
+
 func TestEatBodyChunked(t *testing.T) {
 	if testing.Verbose() {
 		logp.LogInit(logp.LOG_DEBUG, "", false, true, []string{"http", "httpdetailed"})
@@ -652,6 +719,45 @@ func TestEatBodyChunkedWaitCRLF(t *testing.T) {
 	if msg.end != 14 {
 		t.Error("Wrong message end", msg.end)
 	}
+}
+
+func TestHttpParser_requestURIWithSpace(t *testing.T) {
+	if testing.Verbose() {
+		logp.LogInit(logp.LOG_DEBUG, "", false, true, []string{"http", "httpdetailed"})
+	}
+
+	http := httpModForTests()
+	http.hideKeywords = []string{"password", "pass"}
+	http.parserConfig.sendHeaders = true
+	http.parserConfig.sendAllHeaders = true
+
+	// Non URL-encoded string, RFC says it should be encoded
+	data1 := "GET http://localhost:8080/test?password=two secret HTTP/1.1\r\n" +
+		"Host: www.google.com\r\n" +
+		"Connection: keep-alive\r\n" +
+		"User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10_7_4) AppleWebKit/537.1 (KHTML, like Gecko) Chrome/21.0.1180.75 Safari/537.1\r\n" +
+		"Accept: */*\r\n" +
+		"X-Chrome-Variations: CLa1yQEIj7bJAQiftskBCKS2yQEIp7bJAQiptskBCLSDygE=\r\n" +
+		"Referer: http://www.google.com/\r\n" +
+		"Accept-Encoding: gzip,deflate,sdch\r\n" +
+		"Accept-Language: en-US,en;q=0.8\r\n" +
+		"Content-Type: application/x-www-form-urlencoded\r\n" +
+		"Content-Length: 23\r\n" +
+		"Accept-Charset: ISO-8859-1,utf-8;q=0.7,*;q=0.3\r\n" +
+		"Cookie: PREF=ID=6b67d166417efec4:U=69097d4080ae0e15:FF=0:TM=1340891937:LM=1340891938:S=8t97UBiUwKbESvVX; NID=61=sf10OV-t02wu5PXrc09AhGagFrhSAB2C_98ZaI53-uH4jGiVG_yz9WmE3vjEBcmJyWUogB1ZF5puyDIIiB-UIdLd4OEgPR3x1LHNyuGmEDaNbQ_XaxWQqqQ59mX1qgLQ\r\n" +
+		"\r\n" +
+		"username=ME&pass=twosecret"
+	tp := newTestParser(http, data1)
+
+	msg, ok, complete := tp.parse()
+	assert.True(t, ok)
+	assert.True(t, complete)
+	rawMsg := tp.stream.data[tp.stream.message.start:tp.stream.message.end]
+	path, params, err := http.extractParameters(msg, rawMsg)
+	assert.Nil(t, err)
+	assert.Equal(t, "/test", path)
+	assert.Equal(t, string(msg.requestURI), "http://localhost:8080/test?password=two secret")
+	assert.False(t, strings.Contains(params, "two secret"))
 }
 
 func TestHttpParser_censorPasswordURL(t *testing.T) {
@@ -1046,6 +1152,28 @@ func Test_gap_in_body_http1dot0(t *testing.T) {
 	assert.Equal(t, true, ok)
 	assert.Equal(t, false, complete)
 
+}
+
+func TestHttpParser_composedHeaders(t *testing.T) {
+	data := "HTTP/1.1 200 OK\r\n" +
+		"Content-Length: 0\r\n" +
+		"Date: Tue, 14 Aug 2012 22:31:45 GMT\r\n" +
+		"Set-Cookie: aCookie=yummy\r\n" +
+		"Set-Cookie: anotherCookie=why%20not\r\n" +
+		"\r\n"
+	http := httpModForTests()
+	http.parserConfig.sendHeaders = true
+	http.parserConfig.sendAllHeaders = true
+	message, ok, complete := testParse(http, data)
+
+	assert.True(t, ok)
+	assert.True(t, complete)
+	assert.False(t, message.isRequest)
+	assert.Equal(t, 200, int(message.statusCode))
+	assert.Equal(t, "OK", string(message.statusPhrase))
+	header, ok := message.headers["set-cookie"]
+	assert.True(t, ok)
+	assert.Equal(t, "aCookie=yummy, anotherCookie=why%20not", string(header))
 }
 
 func testCreateTCPTuple() *common.TCPTuple {

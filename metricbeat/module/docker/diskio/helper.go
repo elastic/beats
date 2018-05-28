@@ -35,7 +35,9 @@ type BLkioService struct {
 
 func (io *BLkioService) getBlkioStatsList(rawStats []docker.Stat) []BlkioStats {
 	formattedStats := []BlkioStats{}
-
+	if io.BlkioSTatsPerContainer == nil {
+		io.BlkioSTatsPerContainer = make(map[string]BlkioRaw)
+	}
 	for _, myRawStats := range rawStats {
 		formattedStats = append(formattedStats, io.getBlkioStats(&myRawStats))
 	}
@@ -55,9 +57,7 @@ func (io *BLkioService) getBlkioStats(myRawStat *docker.Stat) BlkioStats {
 	if exist {
 		myBlkioStats.reads = io.getReadPs(&oldBlkioStats, &newBlkioStats)
 		myBlkioStats.writes = io.getWritePs(&oldBlkioStats, &newBlkioStats)
-		myBlkioStats.totals = io.getReadPs(&oldBlkioStats, &newBlkioStats)
-	} else {
-		io.BlkioSTatsPerContainer = make(map[string]BlkioRaw)
+		myBlkioStats.totals = io.getTotalPs(&oldBlkioStats, &newBlkioStats)
 	}
 
 	io.BlkioSTatsPerContainer[myRawStat.Container.ID] = newBlkioStats

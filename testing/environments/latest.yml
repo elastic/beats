@@ -17,7 +17,7 @@ services:
       context: docker/logstash
       dockerfile: Dockerfile
       args:
-        ELASTIC_VERSION: 5.4.1
+        ELASTIC_VERSION: 5.6.8
         DOWNLOAD_URL: https://artifacts.elastic.co/downloads
     environment:
       - ES_HOST=elasticsearch
