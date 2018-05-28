@@ -60,7 +60,7 @@ func NewProspector(cfg *common.Config, outlet Outlet, beatDone chan struct{}) (*
 		wg:            &sync.WaitGroup{},
 		runDone:       make(chan struct{}),
 		runWg:         &sync.WaitGroup{},
-		states:        &file.States{},
+		states:        file.NewStates(),
 		channelWg:     &sync.WaitGroup{},
 		Once:          false,
 		registry:      newHarvesterRegistry(),

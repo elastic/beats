@@ -25,6 +25,9 @@ type Registrar struct {
 	registryFile string       // Path to the Registry File
 	states       *file.States // Map with all file paths inside and the corresponding state
 	wg           sync.WaitGroup
+
+	gcRequired bool // gcRequired is set if registry state needs to be gc'ed before the next write
+	gcEnabled  bool // gcEnabled indictes the registry contains some state that can be gc'ed in the future
 }
 
 var (
@@ -43,6 +46,8 @@ func New(registryFile string, out publisher.SuccessLogger) (*Registrar, error) {
 		Channel:      make(chan []*input.Event, 1),
 		out:          out,
 		wg:           sync.WaitGroup{},
+		gcRequired:   true,
+		gcEnabled:    true,
 	}
 	err := r.Init()
 
@@ -251,15 +256,7 @@ func (r *Registrar) Run() {
 		}
 
 		r.processEventStates(events)
-
-		beforeCount := r.states.Count()
-		cleanedStates := r.states.Cleanup()
-		statesCleanup.Add(int64(cleanedStates))
-
-		logp.Debug("registrar",
-			"Registrar states cleaned up. Before: %d, After: %d",
-			beforeCount, beforeCount-cleanedStates)
-
+		r.gcStates()
 		if err := r.writeRegistry(); err != nil {
 			logp.Err("Writing of registry returned error: %v. Continuing...", err)
 		}
@@ -275,15 +272,52 @@ func (r *Registrar) processEventStates(events []*input.Event) {
 	logp.Debug("registrar", "Processing %d events", len(events))
 
 	// Take the last event found for each file source
+	ts := time.Now()
 	for _, event := range events {
 
 		// skip stdin
 		if event.InputType == cfg.StdinInputType {
 			continue
 		}
-		r.states.Update(event.State)
+
+		r.states.UpdateWithTs(event.State, ts)
 		statesUpdate.Add(1)
 	}
+
+	// check if we need to enable state cleanup
+	if !r.gcEnabled {
+		for i := range events {
+			if events[i].State.TTL >= 0 || events[i].State.Finished {
+				r.gcEnabled = true
+				break
+			}
+		}
+	}
+
+	// new set of events received -> mark state registry ready for next
+	// cleanup phase in case gc'able events are stored in the registry.
+	r.gcRequired = r.gcEnabled
+}
+
+// gcStates runs a registry Cleanup. The method check if more event in the
+// registry can be gc'ed in the future. If no potential removable state is found,
+// the gcEnabled flag is set to false, indicating the current registrar state being
+// stable. New registry update events can re-enable state gc'ing.
+func (r *Registrar) gcStates() {
+	if !r.gcRequired {
+		return
+	}
+
+	beforeCount := r.states.Count()
+	cleanedStates, pendingClean := r.states.Cleanup()
+	statesCleanup.Add(int64(cleanedStates))
+
+	logp.Debug("registrar",
+		"Registrar states cleaned up. Before: %d, After: %d",
+		beforeCount, beforeCount-cleanedStates)
+
+	r.gcRequired = false
+	r.gcEnabled = pendingClean > 0
 }
 
 // Stop stops the registry. It waits until Run function finished.
@@ -295,6 +329,8 @@ func (r *Registrar) Stop() {
 
 // writeRegistry writes the new json registry file to disk.
 func (r *Registrar) writeRegistry() error {
+	r.gcStates()
+
 	logp.Debug("registrar", "Write registry file: %s", r.registryFile)
 
 	tempfile := r.registryFile + ".new"

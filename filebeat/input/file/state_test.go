@@ -59,8 +59,12 @@ func TestCleanup(t *testing.T) {
 		states := NewStates()
 		states.states = append(states.states, test.state)
 
-		assert.Equal(t, test.countBefore, states.Count())
-		assert.Equal(t, test.cleanupCount, states.Cleanup())
-		assert.Equal(t, test.countAfter, states.Count())
+		before := states.Count()
+		cleanedUp, _ := states.Cleanup()
+		after := states.Count()
+
+		assert.Equal(t, test.countBefore, before)
+		assert.Equal(t, test.cleanupCount, cleanedUp)
+		assert.Equal(t, test.countAfter, after)
 	}
 }
