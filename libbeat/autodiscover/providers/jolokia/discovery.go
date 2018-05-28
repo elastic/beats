@@ -215,7 +215,13 @@ func (d *Discovery) sendProbe(config InterfaceConfig) {
 				return
 			}
 			defer conn.Close()
-			conn.SetDeadline(time.Now().Add(config.ProbeTimeout))
+
+			// Avoid having sockets open more time than needed
+			timeout := config.ProbeTimeout
+			if timeout > config.Interval {
+				timeout = config.Interval
+			}
+			conn.SetDeadline(time.Now().Add(timeout))
 
 			if _, err := conn.WriteTo(queryMessage, &discoveryAddress); err != nil {
 				logp.Err(err.Error())

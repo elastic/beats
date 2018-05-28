@@ -34,7 +34,8 @@ type Provider struct {
 func AutodiscoverBuilder(bus bus.Bus, c *common.Config) (autodiscover.Provider, error) {
 	cfgwarn.Experimental("The Jolokia Discovery autodiscover is experimental")
 
-	config, err := getConfig(c)
+	config := defaultConfig()
+	err := c.Unpack(&config)
 	if err != nil {
 		return nil, err
 	}
