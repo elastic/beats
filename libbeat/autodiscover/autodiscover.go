@@ -174,8 +174,12 @@ func (a *Autodiscover) handleStop(event bus.Event) {
 		}
 
 		if runner := a.runners.Get(hash); runner != nil {
+			// Stop can block, we run it asyncrhonously to avoid blocking
+			// the whole events loop. The runner hash is removed in any case
+			// so an equivalent configuration can be added again while this
+			// one stops, and a duplicated event don't try to stop it twice.
 			logp.Info("Autodiscover stopping runner: %s", runner)
-			runner.Stop()
+			go runner.Stop()
 			a.runners.Remove(hash)
 		} else {
 			logp.Debug(debugK, "Runner not found for stopping: %s", hash)
