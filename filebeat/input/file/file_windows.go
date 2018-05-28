@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"os"
 	"reflect"
+	"strconv"
 	"syscall"
 
 	"github.com/elastic/beats/libbeat/logp"
@@ -43,6 +44,16 @@ func GetOSState(info os.FileInfo) StateOS {
 // IsSame file checks if the files are identical
 func (fs StateOS) IsSame(state StateOS) bool {
 	return fs.IdxHi == state.IdxHi && fs.IdxLo == state.IdxLo && fs.Vol == state.Vol
+}
+
+func (fs StateOS) String() string {
+	var buf [92]byte
+	current := strconv.AppendUint(buf[:0], fs.IdxHi, 10)
+	current = append(current, '-')
+	current = strconv.AppendUint(current, fs.IdxLo, 10)
+	current = append(current, '-')
+	current = strconv.AppendUint(current, fs.Vol, 10)
+	return string(current)
 }
 
 // SafeFileRotate safely rotates an existing file under path and replaces it with the tempfile

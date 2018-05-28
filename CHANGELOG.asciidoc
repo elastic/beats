@@ -43,6 +43,7 @@ https://github.com/elastic/beats/compare/v5.6.4...5.6[Check the HEAD diff]
 *Affecting all Beats*
 
 *Filebeat*
+- Improve state updates in large registries.
 
 *Heartbeat*
 
