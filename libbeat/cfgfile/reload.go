@@ -107,10 +107,10 @@ func (rl *Reloader) Check(runnerFactory RunnerFactory) error {
 	// Initialize modules
 	for _, c := range configs {
 		// Only add configs to startList which are enabled
-		if !c.Enabled() {
+		if !c.Config.Enabled() {
 			continue
 		}
-		_, err := runnerFactory.Create(rl.pipeline, c, nil)
+		_, err := runnerFactory.Create(rl.pipeline, c.Config, c.Meta)
 		if err != nil {
 			return err
 		}
@@ -122,7 +122,7 @@ func (rl *Reloader) Check(runnerFactory RunnerFactory) error {
 func (rl *Reloader) Run(runnerFactory RunnerFactory) {
 	logp.Info("Config reloader started")
 
-	list := NewRunnerList(runnerFactory, rl.pipeline)
+	list := NewRunnerList("reload", runnerFactory, rl.pipeline)
 
 	rl.wg.Add(1)
 	defer rl.wg.Done()
@@ -185,22 +185,24 @@ func (rl *Reloader) Run(runnerFactory RunnerFactory) {
 	}
 }
 
-func (rl *Reloader) loadConfigs(files []string) ([]*common.Config, error) {
+func (rl *Reloader) loadConfigs(files []string) ([]*ConfigWithMeta, error) {
 	// Load all config objects
-	configs := []*common.Config{}
+	result := []*ConfigWithMeta{}
 	var errs multierror.Errors
 	for _, file := range files {
-		c, err := LoadList(file)
+		configs, err := LoadList(file)
 		if err != nil {
 			errs = append(errs, err)
 			logp.Err("Error loading config: %s", err)
 			continue
 		}
 
-		configs = append(configs, c...)
+		for _, c := range configs {
+			result = append(result, &ConfigWithMeta{Config: c})
+		}
 	}
 
-	return configs, errs.Err()
+	return result, errs.Err()
 }
 
 // Stop stops the reloader and waits for all modules to properly stop

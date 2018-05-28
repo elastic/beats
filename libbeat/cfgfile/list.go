@@ -18,36 +18,46 @@ type RunnerList struct {
 	mutex    sync.RWMutex
 	factory  RunnerFactory
 	pipeline beat.Pipeline
+	logger   *logp.Logger
+}
+
+// ConfigWithMeta holds a pair of common.Config and optional metadata for it
+type ConfigWithMeta struct {
+	// Config to store
+	Config *common.Config
+
+	// Meta data related to this config
+	Meta *common.MapStrPointer
 }
 
 // NewRunnerList builds and returns a RunnerList
-func NewRunnerList(factory RunnerFactory, pipeline beat.Pipeline) *RunnerList {
+func NewRunnerList(name string, factory RunnerFactory, pipeline beat.Pipeline) *RunnerList {
 	return &RunnerList{
 		runners:  map[uint64]Runner{},
 		factory:  factory,
 		pipeline: pipeline,
+		logger:   logp.NewLogger(name),
 	}
 }
 
 // Reload the list of runners to match the given state
-func (r *RunnerList) Reload(configs []*common.Config) error {
+func (r *RunnerList) Reload(configs []*ConfigWithMeta) error {
 	r.mutex.Lock()
 	defer r.mutex.Unlock()
 
 	var errs multierror.Errors
 
-	startList := map[uint64]*common.Config{}
+	startList := map[uint64]*ConfigWithMeta{}
 	stopList := r.copyRunnerList()
 
-	debugf("Starting reload procedure, current runners: %d", len(stopList))
+	r.logger.Debugf("Starting reload procedure, current runners: %d", len(stopList))
 
 	// diff current & desired state, create action lists
 	for _, config := range configs {
-		hash, err := HashConfig(config)
+		hash, err := HashConfig(config.Config)
 		if err != nil {
-			err = errors.Wrap(err, "Unable to hash given config")
-			errs = append(errs)
-			logp.Error(err)
+			r.logger.Errorf("Unable to hash given config: %s", err)
+			errs = append(errs, errors.Wrap(err, "Unable to hash given config"))
 			continue
 		}
 
@@ -58,24 +68,25 @@ func (r *RunnerList) Reload(configs []*common.Config) error {
 		}
 	}
 
+	r.logger.Debugf("Start list: %d, Stop list: %d", len(startList), len(stopList))
+
 	// Stop removed runners
 	for hash, runner := range stopList {
-		debugf("Stopping runner: %s", runner)
+		r.logger.Debugf("Stopping runner: %s", runner)
 		delete(r.runners, hash)
 		go runner.Stop()
 	}
 
 	// Start new runners
 	for hash, config := range startList {
-		runner, err := r.factory.Create(r.pipeline, config, nil)
+		runner, err := r.factory.Create(r.pipeline, config.Config, config.Meta)
 		if err != nil {
-			err = errors.Wrap(err, "Error creating runner from config")
-			errs = append(errs)
-			logp.Error(err)
+			r.logger.Errorf("Error creating runner from config: %s", err)
+			errs = append(errs, errors.Wrap(err, "Error creating runner from config"))
 			continue
 		}
 
-		debugf("Starting runner: %s", runner)
+		r.logger.Debugf("Starting runner: %s", runner)
 		r.runners[hash] = runner
 		runner.Start()
 	}
@@ -92,19 +103,20 @@ func (r *RunnerList) Stop() {
 		return
 	}
 
-	logp.Info("Stopping %v runners ...", len(r.runners))
+	r.logger.Infof("Stopping %v runners ...", len(r.runners))
 
 	wg := sync.WaitGroup{}
-	for hash, runner := range r.runners {
+	for hash, runner := range r.copyRunnerList() {
 		wg.Add(1)
+
+		delete(r.runners, hash)
 
 		// Stop modules in parallel
 		go func(h uint64, run Runner) {
 			defer wg.Done()
-			debugf("Stopping runner: %s", run)
-			delete(r.runners, h)
+			r.logger.Debugf("Stopping runner: %s", run)
 			run.Stop()
-			debugf("Stopped runner: %s", run)
+			r.logger.Debugf("Stopped runner: %s", run)
 		}(hash, runner)
 	}
 
@@ -117,27 +129,6 @@ func (r *RunnerList) Has(hash uint64) bool {
 	defer r.mutex.RUnlock()
 	_, ok := r.runners[hash]
 	return ok
-}
-
-// Add the given runner to the list of running runners
-func (r *RunnerList) Add(hash uint64, runner Runner) {
-	r.mutex.Lock()
-	defer r.mutex.Unlock()
-	r.runners[hash] = runner
-}
-
-// Get returns the runner with the given hash (nil if not found)
-func (r *RunnerList) Get(hash uint64) Runner {
-	r.mutex.RLock()
-	defer r.mutex.RUnlock()
-	return r.runners[hash]
-}
-
-// Remove the Runner with the given hash
-func (r *RunnerList) Remove(hash uint64) {
-	r.mutex.Lock()
-	defer r.mutex.Unlock()
-	delete(r.runners, hash)
 }
 
 // HashConfig hashes a given common.Config
