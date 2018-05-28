@@ -63,6 +63,7 @@ https://github.com/elastic/beats/compare/v6.2.3...master[Check the HEAD diff]
 - Fix error if lz4 compression is used with the kafka output. {pull}7025[7025]
 - Preserve the event when source matching fails in `add_docker_metadata`. {pull}7133[7133]
 - Negotiate Docker API version from our client instead of using a hardcoded one. {pull}7165[7165]
+- Fix delays on autodiscovery events handling caused by blocking runner stops. {pull}7170[7170]
 
 *Auditbeat*
 
