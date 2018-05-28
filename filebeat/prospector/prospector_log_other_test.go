@@ -3,6 +3,7 @@
 package prospector
 
 import (
+	"fmt"
 	"testing"
 
 	"github.com/elastic/beats/filebeat/input"
@@ -129,25 +130,29 @@ var initStateTests = []struct {
 func TestInit(t *testing.T) {
 
 	for _, test := range initStateTests {
-		p := ProspectorLog{
-			Prospector: &Prospector{
-				states: file.NewStates(),
-				outlet: TestOutlet{},
-			},
-			config: prospectorConfig{
-				Paths: test.paths,
-			},
-		}
-		states := file.NewStates()
-		// Set states to finished
-		for i, state := range test.states {
-			state.Finished = true
-			test.states[i] = state
-		}
-		states.SetStates(test.states)
-		err := p.LoadStates(states.GetStates())
-		assert.NoError(t, err)
-		assert.Equal(t, test.count, p.Prospector.states.Count())
+		t.Run(fmt.Sprintf("%v", test.states), func(t *testing.T) {
+
+			p := ProspectorLog{
+				Prospector: &Prospector{
+					states: file.NewStates(),
+					outlet: TestOutlet{},
+				},
+				config: prospectorConfig{
+					Paths: test.paths,
+				},
+			}
+			states := file.NewStates()
+			// Set states to finished
+			for i, state := range test.states {
+				state.Finished = true
+				test.states[i] = state
+			}
+			states.SetStates(test.states)
+			err := p.LoadStates(states.GetStates())
+			assert.NoError(t, err)
+			assert.Equal(t, test.count, p.Prospector.states.Count())
+
+		})
 	}
 
 }

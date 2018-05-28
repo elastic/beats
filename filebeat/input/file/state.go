@@ -33,6 +33,9 @@ func NewState(fileInfo os.FileInfo, path string) State {
 
 // ID returns a unique id for the state as a string
 func (s *State) ID() string {
+	if s.Id == "" {
+		s.Id = s.FileStateOS.String()
+	}
 	return s.Id
 }
 
