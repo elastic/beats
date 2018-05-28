@@ -31,10 +31,19 @@ const (
 	lostEventsUpdateInterval = time.Second * 15
 )
 
+type backpressureStrategy uint8
+
+const (
+	bsKernel backpressureStrategy = 1 << iota
+	bsUserSpace
+	bsAuto
+)
+
 var (
 	auditdMetrics         = monitoring.Default.NewRegistry(moduleName)
 	reassemblerlostMetric = monitoring.NewInt(auditdMetrics, "reassembler_lost")
 	kernelLostMetric      = monitoring.NewInt(auditdMetrics, "kernel_lost")
+	userspaceLostMetric   = monitoring.NewInt(auditdMetrics, "userspace_lost")
 )
 
 func init() {
@@ -58,6 +67,7 @@ type MetricSet struct {
 		enabled bool
 		counter uint32
 	}
+	backpressureStrategy backpressureStrategy
 }
 
 // New constructs a new MetricSet.
@@ -78,12 +88,14 @@ func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
 
 	reassemblerlostMetric.Set(0)
 	kernelLostMetric.Set(0)
+	userspaceLostMetric.Set(0)
 
 	return &MetricSet{
-		BaseMetricSet: base,
-		client:        client,
-		config:        config,
-		log:           log,
+		BaseMetricSet:        base,
+		client:               client,
+		config:               config,
+		log:                  log,
+		backpressureStrategy: getBackpressureStrategy(config.BackpressureStrategy, log),
 	}, nil
 }
 
@@ -245,6 +257,26 @@ func (ms *MetricSet) initClient() error {
 		}
 	}
 
+	if ms.backpressureStrategy&(bsKernel|bsAuto) != 0 {
+		// "kernel" backpressure mitigation strategy
+		//
+		// configure the kernel to drop audit events immediately if the
+		// backlog queue is full.
+		if status.FeatureBitmap&libaudit.AuditFeatureBitmapBacklogWaitTime != 0 {
+			ms.log.Info("Setting kernel backlog wait time to prevent backpressure propagating to the kernel.")
+			if err = ms.client.SetBacklogWaitTime(0, libaudit.NoWait); err != nil {
+				return errors.Wrap(err, "failed to set audit backlog wait time in kernel")
+			}
+		} else {
+			if ms.backpressureStrategy == bsAuto {
+				ms.log.Warn("setting backlog wait time is not supported in this kernel. Enabling workaround.")
+				ms.backpressureStrategy |= bsUserSpace
+			} else {
+				return errors.New("kernel backlog wait time not supported by kernel, but required by backpressure_strategy")
+			}
+		}
+	}
+
 	if status.Enabled == 0 {
 		if err = ms.client.SetEnabled(true, libaudit.NoWait); err != nil {
 			return errors.Wrap(err, "failed to enable auditing in the kernel")
@@ -287,7 +319,17 @@ func (ms *MetricSet) receiveEvents(done <-chan struct{}) (<-chan []*auparse.Audi
 
 	out := make(chan []*auparse.AuditMessage, ms.config.StreamBufferQueueSize)
 	statusC := make(chan *libaudit.AuditStatus, 8)
-	reassembler, err := libaudit.NewReassembler(int(ms.config.ReassemblerMaxInFlight), ms.config.ReassemblerTimeout, &stream{done, out})
+
+	var st libaudit.Stream = &stream{done, out}
+	if ms.backpressureStrategy&bsUserSpace != 0 {
+		// "user-space" backpressure mitigation strategy
+		//
+		// Consume events from our side as fast as possible, by dropping events
+		// if the publishing pipeline would block.
+		ms.log.Info("Using non-blocking stream to prevent backpressure propagating to the kernel.")
+		st = &nonBlockingStream{done, out}
+	}
+	reassembler, err := libaudit.NewReassembler(int(ms.config.ReassemblerMaxInFlight), ms.config.ReassemblerTimeout, st)
 	if err != nil {
 		return nil, nil, errors.Wrap(err, "failed to create Reassembler")
 	}
@@ -599,6 +641,25 @@ func (s *stream) EventsLost(count int) {
 	reassemblerlostMetric.Inc()
 }
 
+// nonBlockingStream behaves as stream above, except that it will never block
+// on backpressure from the publishing pipeline.
+// Instead, events will be discarded.
+type nonBlockingStream stream
+
+func (s *nonBlockingStream) ReassemblyComplete(msgs []*auparse.AuditMessage) {
+	select {
+	case <-s.done:
+		return
+	case s.out <- msgs:
+	default:
+		userspaceLostMetric.Add(int64(len(msgs)))
+	}
+}
+
+func (s *nonBlockingStream) EventsLost(count int) {
+	(*stream)(s).EventsLost(count)
+}
+
 func hasMulticastSupport() bool {
 	// Check the kernel version because 3.16+ should have multicast
 	// support.
@@ -727,4 +788,24 @@ func determineSocketType(c *Config, log *logp.Logger) (string, error) {
 		return unicast, nil
 	}
 
+}
+
+func getBackpressureStrategy(value string, logger *logp.Logger) backpressureStrategy {
+	switch value {
+	case "kernel":
+		return bsKernel
+	case "userspace", "user-space":
+		return bsUserSpace
+	case "auto":
+		return bsAuto
+	case "both":
+		return bsKernel | bsUserSpace
+	case "none":
+		return 0
+	default:
+		logger.Warn("Unknown value for the 'backpressure_strategy' option. Using default.")
+		fallthrough
+	case "", "default":
+		return bsAuto
+	}
 }
