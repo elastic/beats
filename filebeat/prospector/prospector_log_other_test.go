@@ -131,7 +131,7 @@ func TestInit(t *testing.T) {
 	for _, test := range initStateTests {
 		p := ProspectorLog{
 			Prospector: &Prospector{
-				states: &file.States{},
+				states: file.NewStates(),
 				outlet: TestOutlet{},
 			},
 			config: prospectorConfig{
