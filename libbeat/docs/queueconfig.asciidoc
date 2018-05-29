@@ -74,5 +74,5 @@ The default value is 0.
 Maximum wait time for `flush.min_events` to be fulfilled. If set to 0s, events
 will be immediately available for consumption.
 
-The default values is 0s.
+The default values is 1s.
 
