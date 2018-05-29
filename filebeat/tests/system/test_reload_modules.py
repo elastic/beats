@@ -151,7 +151,7 @@ class Test(BaseTest):
 
         # Wait until input is stopped
         self.wait_until(
-            lambda: self.log_contains("Runner stopped:"),
+            lambda: self.log_contains("Stopping runner:"),
             max_timeout=15)
 
         with open(logfile, 'a') as f:
