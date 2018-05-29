@@ -3,6 +3,8 @@ package autodiscover
 import (
 	"time"
 
+	"github.com/pkg/errors"
+
 	"github.com/elastic/beats/libbeat/autodiscover/meta"
 	"github.com/elastic/beats/libbeat/beat"
 	"github.com/elastic/beats/libbeat/cfgfile"
@@ -60,7 +62,7 @@ func NewAutodiscover(name string, pipeline beat.Pipeline, adapter Adapter, confi
 	for _, providerCfg := range config.Providers {
 		provider, err := Registry.BuildProvider(bus, providerCfg)
 		if err != nil {
-			return nil, err
+			return nil, errors.Wrap(err, "error in autodiscover provider settings")
 		}
 		logp.Debug(debugK, "Configured autodiscover provider: %s", provider)
 		providers = append(providers, provider)
