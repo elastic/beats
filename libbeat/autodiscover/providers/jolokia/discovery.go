@@ -3,7 +3,6 @@ package jolokia
 import (
 	"encoding/json"
 	"net"
-	"reflect"
 	"strings"
 	"sync"
 	"time"
@@ -102,7 +101,7 @@ func (d *Discovery) Start() {
 
 // Stop stops discovery probes
 func (d *Discovery) Stop() {
-	d.stop <- struct{}{}
+	close(d.stop)
 	close(d.events)
 }
 
@@ -113,35 +112,21 @@ func (d *Discovery) Events() <-chan Event {
 }
 
 func (d *Discovery) run() {
-	var cases []reflect.SelectCase
 	for _, i := range d.Interfaces {
-		// Send a probe on each interface when starting
-		d.sendProbe(i)
-
-		// And then one after each interval
-		ticker := time.NewTicker(i.Interval)
-		defer ticker.Stop()
-		cases = append(cases, reflect.SelectCase{
-			Dir:  reflect.SelectRecv,
-			Chan: reflect.ValueOf(ticker.C),
-		})
+		i := i
+		go func() {
+			for {
+				d.sendProbe(i)
+				d.checkStopped()
+				select {
+				case <-time.After(i.Interval):
+				case <-d.stop:
+					return
+				}
+			}
+		}()
 	}
-
-	// As a last case, place the stop channel so the loop can be gracefuly stopped
-	stopIndex := len(cases)
-	cases = append(cases, reflect.SelectCase{
-		Dir:  reflect.SelectRecv,
-		Chan: reflect.ValueOf(d.stop),
-	})
-
-	for {
-		chosen, _, _ := reflect.Select(cases)
-		if chosen == stopIndex {
-			return
-		}
-		d.sendProbe(d.Interfaces[chosen])
-		d.checkStopped()
-	}
+	<-d.stop
 }
 
 func (d *Discovery) interfaces(name string) ([]net.Interface, error) {
