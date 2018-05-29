@@ -7,11 +7,11 @@
     "metricset": {
         "host": "postgresql:5432",
         "module": "postgresql",
-        "name": "statements",
+        "name": "statement",
         "rtt": 115
     },
     "postgresql": {
-        "statements": {
+        "statement": {
             "user": {
                 "id": 10
             },

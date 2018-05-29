@@ -6,6 +6,11 @@
 ////////////////////////////////////////////////////////////
 // Template, add newest changes here
 
+==== Added
+
+*MetricBeat*
+- Add postgresql statement metricset. {issue}7048[7048] {pull}7060[7060]
+
 === Beats version HEAD
 https://github.com/elastic/beats/compare/v6.2.3...master[Check the HEAD diff]
 
