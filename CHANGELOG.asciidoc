@@ -141,6 +141,7 @@ https://github.com/elastic/beats/compare/v6.2.3...master[Check the HEAD diff]
 - Add default_fields to Elasticsearch template when connecting to Elasticsearch >= 7.0. {pull}7015[7015]
 - Add support for loading a template.json file directly instead of using fields.yml. {pull}7039[7039]
 - Add support for keyword multifields in field.yml. {pull}7131[7131]
+- Add dissect processor. {pull}6925[6925]
 
 *Auditbeat*
 
